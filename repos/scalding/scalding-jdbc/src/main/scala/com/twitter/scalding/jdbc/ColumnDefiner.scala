@@ -5,7 +5,7 @@ case class Definition(get: String)
 
 case class ColumnDefinition(name: ColumnName, definition: Definition)
 
-trait ColumnDefiner {
+trait ColumnDefiner
   def columns: Iterable[ColumnDefinition]
 
   protected def columnNames: Array[ColumnName] = columns.map(_.name).toArray
@@ -37,4 +37,3 @@ trait ColumnDefiner {
   protected def double(name: String, nullable: IsNullable = NotNullable)(
       implicit coldef: DriverColumnDefiner[DOUBLE.type]) =
     coldef(name, nullable)
-}

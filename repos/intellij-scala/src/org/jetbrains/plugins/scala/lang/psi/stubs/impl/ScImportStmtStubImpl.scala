@@ -18,19 +18,17 @@ class ScImportStmtStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScImportStmt](parent, elemType)
-    with ScImportStmtStub {
+    with ScImportStmtStub
   private var importText: StringRef = _
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           importText: String) {
+           importText: String)
     this(
         parent,
         elemType
           .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.importText = StringRef.fromString(importText)
-  }
 
   def getImportText: String = StringRef.toString(importText)
-}

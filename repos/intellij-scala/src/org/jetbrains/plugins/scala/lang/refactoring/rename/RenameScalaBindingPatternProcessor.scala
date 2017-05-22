@@ -15,18 +15,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScValue, ScVariable}
   * 1/20/14
   */
 class RenameScalaBindingPatternProcessor
-    extends RenamePsiElementProcessor with ScalaRenameProcessor {
-  def canProcessElement(element: PsiElement): Boolean = element match {
+    extends RenamePsiElementProcessor with ScalaRenameProcessor
+  def canProcessElement(element: PsiElement): Boolean = element match
     case pattern: ScBindingPattern =>
-      ScalaPsiUtil.nameContext(pattern) match {
+      ScalaPsiUtil.nameContext(pattern) match
         case _: ScVariable | _: ScValue | _: ScClassParameter =>
           false //handled by RenameScalaValsProcessor
         case _ => true
-      }
     case _ => false
-  }
 
   override def findReferences(
       element: PsiElement): util.Collection[PsiReference] =
     ScalaRenameUtil.findReferences(element)
-}

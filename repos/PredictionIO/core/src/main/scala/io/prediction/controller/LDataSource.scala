@@ -32,26 +32,22 @@ import scala.reflect._
   * @group Data Source
   */
 abstract class LDataSource[TD : ClassTag, EI, Q, A]
-    extends BaseDataSource[RDD[TD], EI, Q, A] {
+    extends BaseDataSource[RDD[TD], EI, Q, A]
 
-  def readTrainingBase(sc: SparkContext): RDD[TD] = {
+  def readTrainingBase(sc: SparkContext): RDD[TD] =
     sc.parallelize(Seq(None)).map(_ => readTraining())
-  }
 
   /** Implement this method to only return training data from a data source */
   def readTraining(): TD
 
-  def readEvalBase(sc: SparkContext): Seq[(RDD[TD], EI, RDD[(Q, A)])] = {
+  def readEvalBase(sc: SparkContext): Seq[(RDD[TD], EI, RDD[(Q, A)])] =
     val localEvalData: Seq[(TD, EI, Seq[(Q, A)])] = readEval()
 
-    localEvalData.map {
-      case (td, ei, qaSeq) => {
+    localEvalData.map
+      case (td, ei, qaSeq) =>
           val tdRDD = sc.parallelize(Seq(None)).map(_ => td)
           val qaRDD = sc.parallelize(qaSeq)
           (tdRDD, ei, qaRDD)
-        }
-    }
-  }
 
   /** To provide evaluation feature for your engine, your must override this
     * method to return data for evaluation from a data source. Returned data can
@@ -65,4 +61,3 @@ abstract class LDataSource[TD : ClassTag, EI, Q, A]
 
   @deprecated("Use readEval() instead.", "0.9.0")
   def read(): Seq[(TD, EI, Seq[(Q, A)])] = readEval()
-}

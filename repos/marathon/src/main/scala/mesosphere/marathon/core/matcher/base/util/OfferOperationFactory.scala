@@ -12,26 +12,24 @@ import org.apache.mesos.{Protos => Mesos}
 import org.slf4j.LoggerFactory
 
 class OfferOperationFactory(private val principalOpt: Option[String],
-                            private val roleOpt: Option[String]) {
+                            private val roleOpt: Option[String])
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  private[this] lazy val principal: String = principalOpt match {
+  private[this] lazy val principal: String = principalOpt match
     case Some(value) => value
     case _ =>
       throw new WrongConfigurationException(
           "No principal set. Set --mesos_authentication_principal to enable using local volumes in Marathon.")
-  }
 
-  private[this] lazy val role: String = roleOpt match {
+  private[this] lazy val role: String = roleOpt match
     case Some(value) => value
     case _ =>
       throw new WrongConfigurationException(
           "No role set. Set --mesos_role to enable using local volumes in Marathon.")
-  }
 
   /** Create a launch operation for the given taskInfo. */
-  def launch(taskInfo: Mesos.TaskInfo): Mesos.Offer.Operation = {
+  def launch(taskInfo: Mesos.TaskInfo): Mesos.Offer.Operation =
     val launch =
       Mesos.Offer.Operation.Launch.newBuilder().addTaskInfos(taskInfo).build()
 
@@ -40,13 +38,12 @@ class OfferOperationFactory(private val principalOpt: Option[String],
       .setType(Mesos.Offer.Operation.Type.LAUNCH)
       .setLaunch(launch)
       .build()
-  }
 
   def reserve(frameworkId: FrameworkId,
               taskId: Task.Id,
-              resources: Iterable[Mesos.Resource]): Mesos.Offer.Operation = {
+              resources: Iterable[Mesos.Resource]): Mesos.Offer.Operation =
     import scala.collection.JavaConverters._
-    val reservedResources = resources.map { resource =>
+    val reservedResources = resources.map  resource =>
       Mesos.Resource
         .newBuilder(resource)
         .setRole(role)
@@ -58,7 +55,6 @@ class OfferOperationFactory(private val principalOpt: Option[String],
                   TaskLabels.labelsForTask(frameworkId, taskId).mesosLabels)
           )
         .build()
-    }
 
     val reserve = Mesos.Offer.Operation.Reserve
       .newBuilder()
@@ -70,16 +66,15 @@ class OfferOperationFactory(private val principalOpt: Option[String],
       .setType(Mesos.Offer.Operation.Type.RESERVE)
       .setReserve(reserve)
       .build()
-  }
 
   def createVolumes(
       frameworkId: FrameworkId,
       taskId: Task.Id,
-      localVolumes: Iterable[LocalVolume]): Mesos.Offer.Operation = {
+      localVolumes: Iterable[LocalVolume]): Mesos.Offer.Operation =
     import scala.collection.JavaConverters._
 
-    val volumes: Iterable[Mesos.Resource] = localVolumes.map { vol =>
-      val disk = {
+    val volumes: Iterable[Mesos.Resource] = localVolumes.map  vol =>
+      val disk =
         val persistence = Mesos.Resource.DiskInfo.Persistence
           .newBuilder()
           .setId(vol.id.idString)
@@ -93,7 +88,6 @@ class OfferOperationFactory(private val principalOpt: Option[String],
           .newBuilder()
           .setPersistence(persistence)
           .setVolume(volume)
-      }
 
       val reservation = Mesos.Resource.ReservationInfo
         .newBuilder()
@@ -113,7 +107,6 @@ class OfferOperationFactory(private val principalOpt: Option[String],
         .setReservation(reservation)
         .setDisk(disk)
         .build()
-    }
 
     val create =
       Mesos.Offer.Operation.Create.newBuilder().addAllVolumes(volumes.asJava)
@@ -123,5 +116,3 @@ class OfferOperationFactory(private val principalOpt: Option[String],
       .setType(Mesos.Offer.Operation.Type.CREATE)
       .setCreate(create)
       .build()
-  }
-}

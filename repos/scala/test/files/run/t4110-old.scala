@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   def inferredType[T : Manifest](v: T) = println(manifest[T])
 
   trait A
@@ -8,4 +8,3 @@ object Test extends App {
 
   val name = new A with B
   inferredType(name)
-}

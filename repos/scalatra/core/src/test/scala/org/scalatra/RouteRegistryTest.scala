@@ -2,7 +2,7 @@ package org.scalatra
 
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
-object RouteRegistryTestServlet extends ScalatraServlet {
+object RouteRegistryTestServlet extends ScalatraServlet
   get("/foo") {}
   post("/foo/:bar") {}
   put("""^/foo.../bar$""".r) {}
@@ -10,11 +10,10 @@ object RouteRegistryTestServlet extends ScalatraServlet {
   get(false) {}
 
   def renderRouteRegistry: String = routes.toString
-}
 
-class RouteRegistryTest extends ScalatraFunSuite {
+class RouteRegistryTest extends ScalatraFunSuite
 
-  test("route registry string representation contains the entry points") {
+  test("route registry string representation contains the entry points")
     RouteRegistryTestServlet.renderRouteRegistry should equal(
         List(
             "GET /foo",
@@ -23,5 +22,3 @@ class RouteRegistryTest extends ScalatraFunSuite {
             "POST /foo/:bar",
             "PUT ^/foo.../bar$"
         ) mkString ", ")
-  }
-}

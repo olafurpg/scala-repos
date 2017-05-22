@@ -12,9 +12,9 @@ import scala.concurrent.Future
 import scala.collection.immutable.Seq
 
 class DeploymentsResourceTest
-    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+    extends MarathonSpec with GivenWhenThen with Matchers with Mockito
 
-  test("access without authentication is denied") {
+  test("access without authentication is denied")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -33,9 +33,8 @@ class DeploymentsResourceTest
     val cancel = deploymentsResource.cancel(deployment.plan.id, false, req)
     Then("we receive a NotAuthenticated response")
     cancel.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("access without authorization is denied") {
+  test("access without authorization is denied")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -50,7 +49,6 @@ class DeploymentsResourceTest
     val cancel = deploymentsResource.cancel(deployment.plan.id, false, req)
     Then("we receive a not authorized response")
     cancel.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   var service: MarathonSchedulerService = _
   var groupManager: GroupManager = _
@@ -58,12 +56,10 @@ class DeploymentsResourceTest
   var deploymentsResource: DeploymentsResource = _
   var auth: TestAuthFixture = _
 
-  before {
+  before
     auth = new TestAuthFixture
     groupManager = mock[GroupManager]
     config = mock[MarathonConf]
     service = mock[MarathonSchedulerService]
     deploymentsResource = new DeploymentsResource(
         service, groupManager, auth.auth, auth.auth, config)
-  }
-}

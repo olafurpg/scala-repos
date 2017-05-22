@@ -47,7 +47,7 @@ class NettyServer(config: ServerConfig,
                   stopHook: () => Future[_],
                   val actorSystem: ActorSystem)(
     implicit val materializer: Materializer)
-    extends Server {
+    extends Server
 
   private val nettyConfig =
     config.configuration.underlying.getConfig("play.server.netty")
@@ -56,13 +56,12 @@ class NettyServer(config: ServerConfig,
   private val maxChunkSize = nettyConfig.getInt("maxChunkSize")
   private val logWire = nettyConfig.getBoolean("log.wire")
 
-  private lazy val transport = nettyConfig.getString("transport") match {
+  private lazy val transport = nettyConfig.getString("transport") match
     case "native" => Native
     case "jdk" => Jdk
     case _ =>
       throw ServerStartException(
           "Netty transport configuration value should be either jdk or native")
-  }
 
   import NettyServer._
 
@@ -71,14 +70,12 @@ class NettyServer(config: ServerConfig,
   /**
     * The event loop
     */
-  private val eventLoop = {
+  private val eventLoop =
     val threadCount = nettyConfig.getInt("eventLoopThreads")
     val threadFactory = NamedThreadFactory("netty-event-loop")
-    transport match {
+    transport match
       case Native => new EpollEventLoopGroup(threadCount, threadFactory)
       case Jdk => new NioEventLoopGroup(threadCount, threadFactory)
-    }
-  }
 
   /**
     * A reference to every channel, both server and incoming, this allows us to shutdown cleanly.
@@ -88,57 +85,50 @@ class NettyServer(config: ServerConfig,
   /**
     * SSL engine provider, only created if needed.
     */
-  private lazy val sslEngineProvider: Option[SSLEngineProvider] = try {
+  private lazy val sslEngineProvider: Option[SSLEngineProvider] = try
     Some(ServerSSLEngine.createSSLEngineProvider(config, applicationProvider))
-  } catch {
+  catch
     case NonFatal(e) =>
       logger.error(s"cannot load SSL context", e)
       None
-  }
 
   private def setOptions(
-      setOption: (ChannelOption[AnyRef], AnyRef) => Any, config: Config) = {
-    def unwrap(value: ConfigValue) = value.unwrapped() match {
+      setOption: (ChannelOption[AnyRef], AnyRef) => Any, config: Config) =
+    def unwrap(value: ConfigValue) = value.unwrapped() match
       case number: Number => number.intValue().asInstanceOf[Integer]
       case other => other
-    }
     config
       .entrySet()
       .asScala
       .filterNot(_.getKey.startsWith("child."))
-      .foreach { option =>
-        if (ChannelOption.exists(option.getKey)) {
+      .foreach  option =>
+        if (ChannelOption.exists(option.getKey))
           setOption(
               ChannelOption.valueOf(option.getKey), unwrap(option.getValue))
-        } else {
+        else
           logger.warn(
               "Ignoring unknown Netty channel option: " + option.getKey)
-          transport match {
+          transport match
             case Native =>
               logger.warn(
                   "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html and http://netty.io/4.0/api/io/netty/channel/epoll/EpollChannelOption.html")
             case Jdk =>
               logger.warn(
                   "Valid values can be found at http://netty.io/4.0/api/io/netty/channel/ChannelOption.html")
-          }
-        }
-      }
-  }
 
   /**
     * Bind to the given address, returning the server channel, and a stream of incoming connection channels.
     */
-  private def bind(address: InetSocketAddress): (Channel, Source[Channel, _]) = {
+  private def bind(address: InetSocketAddress): (Channel, Source[Channel, _]) =
     val serverChannelEventLoop = eventLoop.next
 
     // Watches for channel events, and pushes them through a reactive streams publisher.
     val channelPublisher = new HandlerPublisher(
         serverChannelEventLoop, classOf[Channel])
 
-    val channelClass = transport match {
+    val channelClass = transport match
       case Native => classOf[EpollServerSocketChannel]
       case Jdk => classOf[NioServerSocketChannel]
-    }
 
     val bootstrap = new Bootstrap()
       .channel(channelClass)
@@ -153,13 +143,12 @@ class NettyServer(config: ServerConfig,
     allChannels.add(channel)
 
     (channel, Source.fromPublisher(channelPublisher))
-  }
 
   /**
     * Create a sink for the incoming connection channels.
     */
-  private def channelSink(secure: Boolean): Sink[Channel, Future[Done]] = {
-    Sink.foreach[Channel] { (connChannel: Channel) =>
+  private def channelSink(secure: Boolean): Sink[Channel, Future[Done]] =
+    Sink.foreach[Channel]  (connChannel: Channel) =>
       // Setup the channel for explicit reads
       connChannel
         .config()
@@ -169,23 +158,19 @@ class NettyServer(config: ServerConfig,
                  nettyConfig.getConfig("option.child"))
 
       val pipeline = connChannel.pipeline()
-      if (secure) {
-        sslEngineProvider.map { sslEngineProvider =>
+      if (secure)
+        sslEngineProvider.map  sslEngineProvider =>
           val sslEngine = sslEngineProvider.createSSLEngine()
           sslEngine.setUseClientMode(false)
           if (config.configuration
                 .getBoolean("play.server.https.wantClientAuth")
-                .getOrElse(false)) {
+                .getOrElse(false))
             sslEngine.setWantClientAuth(true)
-          }
           if (config.configuration
                 .getBoolean("play.server.https.needClientAuth")
-                .getOrElse(false)) {
+                .getOrElse(false))
             sslEngine.setNeedClientAuth(true)
-          }
           pipeline.addLast("ssl", new SslHandler(sslEngine))
-        }
-      }
 
       // Netty HTTP decoders/encoders/etc
       pipeline.addLast("decoder",
@@ -193,9 +178,8 @@ class NettyServer(config: ServerConfig,
                            maxInitialLineLength, maxHeaderSize, maxChunkSize))
       pipeline.addLast("encoder", new HttpResponseEncoder())
       pipeline.addLast("decompressor", new HttpContentDecompressor())
-      if (logWire) {
+      if (logWire)
         pipeline.addLast("logging", new LoggingHandler(LogLevel.DEBUG))
-      }
 
       val requestHandler = new PlayRequestHandler(this)
 
@@ -210,19 +194,15 @@ class NettyServer(config: ServerConfig,
       val childChannelEventLoop = eventLoop.next()
       childChannelEventLoop.register(connChannel)
       allChannels.add(connChannel)
-    }
-  }
 
-  private def handleSubscriberError(error: Throwable): Unit = {
-    error match {
+  private def handleSubscriberError(error: Throwable): Unit =
+    error match
       // IO exceptions happen all the time, it usually just means that the client has closed the connection before fully
       // sending/receiving the response.
       case e: IOException =>
         logger.trace("Benign IO exception caught in Netty", e)
       case e =>
         logger.error("Exception caught in Netty", e)
-    }
-  }
 
   // Maybe the HTTP server channel
   private val httpChannel = config.port.map(bindChannel(_, secure = false))
@@ -230,24 +210,21 @@ class NettyServer(config: ServerConfig,
   // Maybe the HTTPS server channel
   private val httpsChannel = config.sslPort.map(bindChannel(_, secure = true))
 
-  private def bindChannel(port: Int, secure: Boolean): Channel = {
+  private def bindChannel(port: Int, secure: Boolean): Channel =
     val protocolName = if (secure) "HTTPS" else "HTTP"
     val address = new InetSocketAddress(config.address, port)
     val (serverChannel, channelSource) = bind(address)
     channelSource.runWith(channelSink(secure = secure))
     val boundAddress = serverChannel.localAddress()
-    if (boundAddress == null) {
+    if (boundAddress == null)
       val e = new ServerListenException(protocolName, address)
       logger.error(e.getMessage)
       throw e
-    }
-    if (mode != Mode.Test) {
+    if (mode != Mode.Test)
       logger.info(s"Listening for $protocolName on $boundAddress")
-    }
     serverChannel
-  }
 
-  override def stop() {
+  override def stop()
 
     // First, close all opened sockets
     allChannels.close().awaitUninterruptibly()
@@ -258,40 +235,35 @@ class NettyServer(config: ServerConfig,
     // Now shut the application down
     applicationProvider.current.foreach(Play.stop)
 
-    try {
+    try
       super.stop()
-    } catch {
+    catch
       case NonFatal(e) => logger.error("Error while stopping logger", e)
-    }
 
-    mode match {
+    mode match
       case Mode.Test =>
       case _ => logger.info("Stopping server...")
-    }
 
     // Call provided hook
     // Do this last because the hooks were created before the server,
     // so the server might need them to run until the last moment.
     Await.result(stopHook(), Duration.Inf)
-  }
 
-  override lazy val mainAddress = {
+  override lazy val mainAddress =
     (httpChannel orElse httpsChannel).get
       .localAddress()
       .asInstanceOf[InetSocketAddress]
-  }
 
   def httpPort =
     httpChannel map (_.localAddress().asInstanceOf[InetSocketAddress].getPort)
 
   def httpsPort =
     httpsChannel map (_.localAddress().asInstanceOf[InetSocketAddress].getPort)
-}
 
 /**
   * The Netty server provider
   */
-class NettyServerProvider extends ServerProvider {
+class NettyServerProvider extends ServerProvider
   def createServer(context: ServerProvider.Context) =
     new NettyServer(
         context.config,
@@ -301,22 +273,20 @@ class NettyServerProvider extends ServerProvider {
     )(
         context.materializer
     )
-}
 
 /**
   * Bootstraps Play application with a NettyServer backend.
   */
-object NettyServer {
+object NettyServer
 
   private val logger = Logger(this.getClass)
 
   implicit val provider = new NettyServerProvider
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     System.err.println(
         s"NettyServer.main is deprecated. Please start your Play server with the ${ProdServerStart.getClass.getName}.main.")
     ProdServerStart.main(args)
-  }
 
   /**
     * Create a Netty server from the given application and server configuration.
@@ -326,38 +296,34 @@ object NettyServer {
     * @return A started Netty server, serving the application.
     */
   def fromApplication(application: Application,
-                      config: ServerConfig = ServerConfig()): NettyServer = {
+                      config: ServerConfig = ServerConfig()): NettyServer =
     new NettyServer(config,
                     ApplicationProvider(application),
                     () => Future.successful(()),
                     application.actorSystem)(application.materializer)
-  }
 
   /**
     * Create a Netty server from the given router and server config.
     */
   def fromRouter(config: ServerConfig = ServerConfig())(
-      routes: PartialFunction[RequestHeader, Handler]): NettyServer = {
-    new NettyServerComponents with BuiltInComponents {
+      routes: PartialFunction[RequestHeader, Handler]): NettyServer =
+    new NettyServerComponents with BuiltInComponents
       override lazy val serverConfig = config
       lazy val router = Router.from(routes)
-    }.server
-  }
-}
+    .server
 
 /**
   * Cake for building a simple Netty server.
   */
-trait NettyServerComponents {
+trait NettyServerComponents
   lazy val serverConfig: ServerConfig = ServerConfig()
-  lazy val server: NettyServer = {
+  lazy val server: NettyServer =
     // Start the application first
     Play.start(application)
     new NettyServer(serverConfig,
                     ApplicationProvider(application),
                     serverStopHook,
                     application.actorSystem)(application.materializer)
-  }
 
   lazy val environment: Environment =
     Environment.simple(mode = serverConfig.mode)
@@ -371,4 +337,3 @@ trait NettyServerComponents {
     * Called when Server.stop is called.
     */
   def serverStopHook: () => Future[Unit] = () => Future.successful(())
-}

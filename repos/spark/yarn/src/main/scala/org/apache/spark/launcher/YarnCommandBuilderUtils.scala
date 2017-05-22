@@ -23,11 +23,10 @@ import scala.collection.mutable.ListBuffer
 /**
   * Exposes methods from the launcher library that are used by the YARN backend.
   */
-private[spark] object YarnCommandBuilderUtils {
+private[spark] object YarnCommandBuilderUtils
 
-  def quoteForBatchScript(arg: String): String = {
+  def quoteForBatchScript(arg: String): String =
     CommandBuilderUtils.quoteForBatchScript(arg)
-  }
 
   /**
     * Adds the perm gen configuration to the list of java options if needed and not yet added.
@@ -37,7 +36,5 @@ private[spark] object YarnCommandBuilderUtils {
     * not be added (e.g. if the AM is running Java 8 but the container's node is set up to use
     * Java 7).
     */
-  def addPermGenSizeOpt(args: ListBuffer[String]): Unit = {
+  def addPermGenSizeOpt(args: ListBuffer[String]): Unit =
     CommandBuilderUtils.addPermGenSizeOpt(args.asJava)
-  }
-}

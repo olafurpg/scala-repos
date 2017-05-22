@@ -25,37 +25,32 @@ import org.junit.{Test, After, Before}
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
-class TimerTest {
+class TimerTest
 
   private class TestTask(override val expirationMs: Long,
                          id: Int,
                          latch: CountDownLatch,
                          output: ArrayBuffer[Int])
-      extends TimerTask {
+      extends TimerTask
     private[this] val completed = new AtomicBoolean(false)
-    def run(): Unit = {
-      if (completed.compareAndSet(false, true)) {
+    def run(): Unit =
+      if (completed.compareAndSet(false, true))
         output.synchronized { output += id }
         latch.countDown()
-      }
-    }
-  }
 
   private[this] var executor: ExecutorService = null
 
   @Before
-  def setup() {
+  def setup()
     executor = Executors.newSingleThreadExecutor()
-  }
 
   @After
-  def teardown(): Unit = {
+  def teardown(): Unit =
     executor.shutdown()
     executor = null
-  }
 
   @Test
-  def testAlreadyExpiredTask(): Unit = {
+  def testAlreadyExpiredTask(): Unit =
     val startTime = System.currentTimeMillis()
     val timer = new Timer(taskExecutor = executor,
                           tickMs = 1,
@@ -63,25 +58,22 @@ class TimerTest {
                           startMs = startTime)
     val output = new ArrayBuffer[Int]()
 
-    val latches = (-5 until 0).map { i =>
+    val latches = (-5 until 0).map  i =>
       val latch = new CountDownLatch(1)
       timer.add(new TestTask(startTime + i, i, latch, output))
       latch
-    }
 
-    latches.take(5).foreach { latch =>
+    latches.take(5).foreach  latch =>
       assertEquals("already expired tasks should run immediately",
                    true,
                    latch.await(3, TimeUnit.SECONDS))
-    }
 
     assertEquals("output of already expired tasks",
                  Set(-5, -4, -3, -2, -1),
                  output.toSet)
-  }
 
   @Test
-  def testTaskExpiration(): Unit = {
+  def testTaskExpiration(): Unit =
     val startTime = System.currentTimeMillis()
     val timer = new Timer(taskExecutor = executor,
                           tickMs = 1,
@@ -93,36 +85,31 @@ class TimerTest {
     val ids = new ArrayBuffer[Int]()
 
     val latches =
-      (0 until 5).map { i =>
+      (0 until 5).map  i =>
         val latch = new CountDownLatch(1)
         tasks += new TestTask(startTime + i, i, latch, output)
         ids += i
         latch
-      } ++ (10 until 100).map { i =>
+      ++ (10 until 100).map  i =>
         val latch = new CountDownLatch(2)
         tasks += new TestTask(startTime + i, i, latch, output)
         tasks += new TestTask(startTime + i, i, latch, output)
         ids += i
         ids += i
         latch
-      } ++ (100 until 500).map { i =>
+      ++ (100 until 500).map  i =>
         val latch = new CountDownLatch(1)
         tasks += new TestTask(startTime + i, i, latch, output)
         ids += i
         latch
-      }
 
     // randomly submit requests
-    Random.shuffle(tasks.toSeq).foreach { task =>
+    Random.shuffle(tasks.toSeq).foreach  task =>
       timer.add(task)
-    }
 
     while (timer.advanceClock(1000)) {}
 
-    latches.foreach { latch =>
+    latches.foreach  latch =>
       latch.await()
-    }
 
     assertEquals("output should match", ids.sorted, output.toSeq)
-  }
-}

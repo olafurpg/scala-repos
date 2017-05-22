@@ -1,14 +1,13 @@
-object Test extends App {
+object Test extends App
   val s = "Scala"
   val d = 8
   val b = false
   val f = 3.14159
   val c = 'c'
   val t = new java.util.Date
-  val x = new java.util.Formattable {
+  val x = new java.util.Formattable
     def formatTo(ff: java.util.Formatter, g: Int, w: Int, p: Int): Unit =
       ff format "xxx"
-  }
 
   // 1) number of arguments
   new StringContext().f()
@@ -27,11 +26,9 @@ object Test extends App {
   f"$s%e"
   f"$b%f"
 
-  {
     implicit val strToInt1 = (s: String) => 1
     implicit val strToInt2 = (s: String) => 2
     f"$s%d"
-  }
 
   f"$s%i"
 
@@ -74,4 +71,3 @@ object Test extends App {
 
   // 8) other brain failures
   f"${d}random-leading-junk%d"
-}

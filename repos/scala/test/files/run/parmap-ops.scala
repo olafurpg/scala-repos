@@ -1,8 +1,8 @@
 import collection._
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val gm: GenMap[Int, Int] = GenMap(0 -> 0, 1 -> 1).par
 
     // ops
@@ -15,12 +15,11 @@ object Test {
     assert(gm.keySet == Set(0, 1))
     assert(gm.keys.toSet == Set(0, 1))
     assert(gm.values.toSet == Set(0, 1))
-    try {
+    try
       gm.default(-1)
       assert(false)
-    } catch {
+    catch
       case e: NoSuchElementException => // ok
-    }
 
     assert(gm.filterKeys(_ % 2 == 0)(0) == 0)
     assert(gm.filterKeys(_ % 2 == 0).get(1) == None)
@@ -43,5 +42,3 @@ object Test {
     assert(imdm(1) == 1)
     assert(imdm(2) == -2)
     assert(imdm.updated(2, 2) == parallel.ParMap(0 -> 0, 1 -> 1, 2 -> 2))
-  }
-}

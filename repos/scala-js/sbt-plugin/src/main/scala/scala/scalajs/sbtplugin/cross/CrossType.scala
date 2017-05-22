@@ -12,7 +12,7 @@ import sbt._
 
 import java.io.File
 
-abstract class CrossType {
+abstract class CrossType
 
   /** The base directory for a (true sbt) Project
     *  @param crossBase The base directory of the CrossProject
@@ -32,30 +32,25 @@ abstract class CrossType {
     *      or "test")
     */
   def sharedSrcDir(projectBase: File, conf: String): Option[File]
-}
 
-object CrossType {
+object CrossType
 
-  object Full extends CrossType {
+  object Full extends CrossType
     def projectDir(crossBase: File, projectType: String): File =
       crossBase / projectType
 
     def sharedSrcDir(projectBase: File, conf: String): Option[File] =
       Some(projectBase.getParentFile / "shared" / "src" / conf / "scala")
-  }
 
-  object Pure extends CrossType {
+  object Pure extends CrossType
     def projectDir(crossBase: File, projectType: String): File =
       crossBase / ("." + projectType)
 
     def sharedSrcDir(projectBase: File, conf: String): Option[File] =
       Some(projectBase.getParentFile / "src" / conf / "scala")
-  }
 
-  object Dummy extends CrossType {
+  object Dummy extends CrossType
     def projectDir(crossBase: File, projectType: String): File =
       crossBase / projectType
 
     def sharedSrcDir(projectBase: File, conf: String): Option[File] = None
-  }
-}

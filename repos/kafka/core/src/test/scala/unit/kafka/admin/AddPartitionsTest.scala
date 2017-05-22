@@ -27,7 +27,7 @@ import kafka.client.ClientUtils
 import kafka.server.{KafkaConfig, KafkaServer}
 import org.junit.{Test, After, Before}
 
-class AddPartitionsTest extends ZooKeeperTestHarness {
+class AddPartitionsTest extends ZooKeeperTestHarness
   var configs: Seq[KafkaConfig] = null
   var servers: Seq[KafkaServer] = Seq.empty[KafkaServer]
   var brokers: Seq[Broker] = Seq.empty[Broker]
@@ -40,7 +40,7 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
   val topic4 = "new-topic4"
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     configs = (0 until 4).map(i =>
@@ -68,39 +68,33 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
                 topic4,
                 partitionReplicaAssignment = Map(0 -> Seq(0, 3)),
                 servers = servers)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     servers.foreach(_.shutdown())
     servers.foreach(server => CoreUtils.rm(server.config.logDirs))
     super.tearDown()
-  }
 
   @Test
-  def testTopicDoesNotExist {
-    try {
+  def testTopicDoesNotExist
+    try
       AdminUtils.addPartitions(zkUtils, "Blah", 1)
       fail("Topic should not exist")
-    } catch {
+    catch
       case e: AdminOperationException => //this is good
       case e2: Throwable => throw e2
-    }
-  }
 
   @Test
-  def testWrongReplicaCount {
-    try {
+  def testWrongReplicaCount
+    try
       AdminUtils.addPartitions(zkUtils, topic1, 2, "0:1,0:1:2")
       fail("Add partitions should fail")
-    } catch {
+    catch
       case e: AdminOperationException => //this is good
       case e2: Throwable => throw e2
-    }
-  }
 
   @Test
-  def testIncrementPartitions {
+  def testIncrementPartitions
     AdminUtils.addPartitions(zkUtils, topic1, 3)
     // wait until leader is elected
     var leader1 = waitUntilLeaderIsElectedOrChanged(zkUtils, topic1, 1)
@@ -130,10 +124,9 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     val replicas = partitionDataForTopic1(1).replicas
     assertEquals(replicas.size, 2)
     assert(replicas.contains(partitionDataForTopic1(1).leader.get))
-  }
 
   @Test
-  def testManualAssignmentOfReplicas {
+  def testManualAssignmentOfReplicas
     AdminUtils.addPartitions(zkUtils, topic2, 3, "1:2,0:1,2:3")
     // wait until leader is elected
     var leader1 = waitUntilLeaderIsElectedOrChanged(zkUtils, topic2, 1)
@@ -164,10 +157,9 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     assertEquals(replicas.size, 2)
     assert(replicas(0).id == 0 || replicas(0).id == 1)
     assert(replicas(1).id == 0 || replicas(1).id == 1)
-  }
 
   @Test
-  def testReplicaPlacementAllServers {
+  def testReplicaPlacementAllServers
     AdminUtils.addPartitions(zkUtils, topic3, 7)
 
     // read metadata from a broker and verify the new topic partitions exist
@@ -196,10 +188,9 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     validateLeaderAndReplicas(metaDataForTopic3, 4, 2, Set(2, 3, 0, 1))
     validateLeaderAndReplicas(metaDataForTopic3, 5, 3, Set(3, 0, 1, 2))
     validateLeaderAndReplicas(metaDataForTopic3, 6, 0, Set(0, 1, 2, 3))
-  }
 
   @Test
-  def testReplicaPlacementPartialServers {
+  def testReplicaPlacementPartialServers
     AdminUtils.addPartitions(zkUtils, topic2, 3)
 
     // read metadata from a broker and verify the new topic partitions exist
@@ -220,12 +211,11 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     validateLeaderAndReplicas(metaDataForTopic2, 0, 1, Set(1, 2))
     validateLeaderAndReplicas(metaDataForTopic2, 1, 2, Set(0, 2))
     validateLeaderAndReplicas(metaDataForTopic2, 2, 3, Set(1, 3))
-  }
 
   def validateLeaderAndReplicas(metadata: TopicMetadata,
                                 partitionId: Int,
                                 expectedLeaderId: Int,
-                                expectedReplicas: Set[Int]) = {
+                                expectedReplicas: Set[Int]) =
     val partitionOpt =
       metadata.partitionsMetadata.find(_.partitionId == partitionId)
     assertTrue(s"Partition $partitionId should exist", partitionOpt.isDefined)
@@ -239,5 +229,3 @@ class AddPartitionsTest extends ZooKeeperTestHarness {
     assertEquals("Replica set should match",
                  expectedReplicas,
                  partition.replicas.map(_.id).toSet)
-  }
-}

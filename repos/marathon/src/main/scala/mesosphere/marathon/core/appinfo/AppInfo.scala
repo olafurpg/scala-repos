@@ -16,13 +16,11 @@ case class AppInfo(app: AppDefinition,
                    maybeLastTaskFailure: Option[TaskFailure] = None,
                    maybeTaskStats: Option[TaskStatsByVersion] = None)
 
-object AppInfo {
+object AppInfo
   sealed trait Embed
-  object Embed {
+  object Embed
     case object Tasks extends Embed
     case object Deployments extends Embed
     case object Counts extends Embed
     case object LastTaskFailure extends Embed
     case object TaskStats extends Embed
-  }
-}

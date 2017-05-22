@@ -1,6 +1,6 @@
 package spire
 
-package object std {
+package object std
   object any extends AnyInstances
 
   object boolean extends BooleanInstances
@@ -23,4 +23,3 @@ package object std {
   object tuples extends ProductInstances
   object option extends OptionInstances
   object unit extends UnitInstances
-}

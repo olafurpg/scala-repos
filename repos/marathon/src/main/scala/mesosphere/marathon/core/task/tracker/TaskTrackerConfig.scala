@@ -2,7 +2,7 @@ package mesosphere.marathon.core.task.tracker
 
 import org.rogach.scallop.ScallopConf
 
-trait TaskTrackerConfig extends ScallopConf {
+trait TaskTrackerConfig extends ScallopConf
   //scalastyle:off magic.number
 
   lazy val internalTaskTrackerRequestTimeout = opt[Int](
@@ -16,4 +16,3 @@ trait TaskTrackerConfig extends ScallopConf {
       descr = "INTERNAL TUNING PARAMETER: Timeout (in ms) for task update requests.",
       hidden = true,
       default = Some(10000))
-}

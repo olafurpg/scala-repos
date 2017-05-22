@@ -44,7 +44,7 @@ import org.apache.spark.sql.DataFrame
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object LogisticRegressionExample {
+object LogisticRegressionExample
 
   case class Params(input: String = null,
                     testInput: String = "",
@@ -57,10 +57,10 @@ object LogisticRegressionExample {
                     fracTest: Double = 0.2)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("LogisticRegressionExample") {
+    val parser = new OptionParser[Params]("LogisticRegressionExample")
       head(
           "LogisticRegressionExample: an example Logistic Regression with Elastic-Net app.")
       opt[Double]("regParam")
@@ -101,27 +101,21 @@ object LogisticRegressionExample {
         .text("input path to labeled examples")
         .required()
         .action((x, c) => c.copy(input = x))
-      checkConfig { params =>
-        if (params.fracTest < 0 || params.fracTest >= 1) {
+      checkConfig  params =>
+        if (params.fracTest < 0 || params.fracTest >= 1)
           failure(
               s"fracTest ${params.fracTest} value incorrect; should be in [0,1).")
-        } else {
+        else
           success
-        }
-      }
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf =
       new SparkConf().setAppName(s"LogisticRegressionExample with $params")
     val sc = new SparkContext(conf)
@@ -176,6 +170,4 @@ object LogisticRegressionExample {
         pipelineModel, test, "indexedLabel")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

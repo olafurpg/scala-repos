@@ -24,41 +24,34 @@ import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, Project}
 import org.apache.spark.sql.execution.SparkPlan
 import org.apache.spark.sql.test.SharedSQLContext
 
-case class FastOperator(output: Seq[Attribute]) extends SparkPlan {
+case class FastOperator(output: Seq[Attribute]) extends SparkPlan
 
-  override protected def doExecute(): RDD[InternalRow] = {
+  override protected def doExecute(): RDD[InternalRow] =
     val str = Literal("so fast").value
     val row = new GenericInternalRow(Array[Any](str))
     val unsafeProj = UnsafeProjection.create(schema)
     val unsafeRow = unsafeProj(row).copy()
     sparkContext.parallelize(Seq(unsafeRow))
-  }
 
   override def producedAttributes: AttributeSet = outputSet
   override def children: Seq[SparkPlan] = Nil
-}
 
-object TestStrategy extends Strategy {
-  def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
+object TestStrategy extends Strategy
+  def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match
     case Project(Seq(attr), _) if attr.name == "a" =>
       FastOperator(attr.toAttribute :: Nil) :: Nil
     case _ => Nil
-  }
-}
 
-class ExtraStrategiesSuite extends QueryTest with SharedSQLContext {
+class ExtraStrategiesSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("insert an extraStrategy") {
-    try {
+  test("insert an extraStrategy")
+    try
       sqlContext.experimental.extraStrategies = TestStrategy :: Nil
 
       val df = sparkContext.parallelize(Seq(("so slow", 1))).toDF("a", "b")
       checkAnswer(df.select("a"), Row("so fast"))
 
       checkAnswer(df.select("a", "b"), Row("so slow", 1))
-    } finally {
+    finally
       sqlContext.experimental.extraStrategies = Nil
-    }
-  }
-}

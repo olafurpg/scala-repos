@@ -23,9 +23,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.clustering.KMeansModel
 import org.apache.spark.mllib.linalg.Vectors
 
-class KMeansPMMLModelExportSuite extends SparkFunSuite {
+class KMeansPMMLModelExportSuite extends SparkFunSuite
 
-  test("KMeansPMMLModelExport generate PMML format") {
+  test("KMeansPMMLModelExport generate PMML format")
     val clusterCenters = Array(Vectors.dense(1.0, 2.0, 6.0),
                                Vectors.dense(1.0, 3.0, 0.0),
                                Vectors.dense(1.0, 4.0, 6.0))
@@ -44,5 +44,3 @@ class KMeansPMMLModelExportSuite extends SparkFunSuite {
     val pmmlClusteringModel =
       pmml.getModels.get(0).asInstanceOf[ClusteringModel]
     assert(pmmlClusteringModel.getNumberOfClusters === clusterCenters.length)
-  }
-}

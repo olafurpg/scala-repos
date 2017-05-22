@@ -14,7 +14,7 @@ import java.util.concurrent.CompletionStage
 /**
   * Converters for interacting with the blocking `java.io` streams APIs
   */
-object StreamConverters {
+object StreamConverters
 
   /**
     * Sink which writes incoming [[ByteString]]s to an [[OutputStream]] created by the given function.
@@ -164,4 +164,3 @@ object StreamConverters {
     */
   def asOutputStream(): javadsl.Source[ByteString, OutputStream] =
     new Source(scaladsl.StreamConverters.asOutputStream())
-}

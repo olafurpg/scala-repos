@@ -19,21 +19,18 @@
  */
 package com.precog.common
 
-package object jobs {
+package object jobs
   type ChannelId = String
   type JobId = String
   type MessageId = Long
   type StatusId = Long
 
-  trait IdExtractor {
+  trait IdExtractor
     val NonNegInt = """(\d+)""".r
 
-    def unapply(str: String): Option[Long] = str match {
+    def unapply(str: String): Option[Long] = str match
       case NonNegInt(str) => Some(str.toLong)
       case _ => None
-    }
-  }
 
   object StatusId extends IdExtractor
   object MessageId extends IdExtractor
-}

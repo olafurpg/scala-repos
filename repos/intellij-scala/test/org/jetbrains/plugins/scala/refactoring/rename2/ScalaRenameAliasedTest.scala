@@ -9,8 +9,8 @@ import org.junit.Assert
   * Tests functionality in [[org.jetbrains.plugins.scala.findUsages.ScalaAliasedImportedElementSearcher]]
   * and [[org.jetbrains.plugins.scala.lang.refactoring.rename.ScalaRenameUtil.filterAliasedReferences]]
   */
-class ScalaRenameAliasedTest extends ScalaRenameTestBase {
-  def testRenameValAliased() {
+class ScalaRenameAliasedTest extends ScalaRenameTestBase
+  def testRenameValAliased()
     val fileText = """
       |object test {
       |
@@ -45,9 +45,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
         |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameDefAliased() {
+  def testRenameDefAliased()
     val fileText = """
       |object test {
       |
@@ -83,9 +82,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
       |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameObjectAliased() {
+  def testRenameObjectAliased()
     val fileText = """
       |object test {
       |
@@ -125,9 +123,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
       |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameClassAliased() {
+  def testRenameClassAliased()
     val fileText = """
       |object test {
       |
@@ -167,9 +164,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
       |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameAliasOfTypeAliasToClass() {
+  def testRenameAliasOfTypeAliasToClass()
     val fileText = """
       |object test {
       |
@@ -209,9 +205,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
         |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameTypeAliasToClass() {
+  def testRenameTypeAliasToClass()
     val fileText = """
       |object test {
       |
@@ -243,9 +238,8 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
       |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
 
-  def testRenameClassWithSameNameTypeAlias() {
+  def testRenameClassWithSameNameTypeAlias()
     val fileText = """
         |class oldName<caret>
         |
@@ -278,6 +272,4 @@ class ScalaRenameAliasedTest extends ScalaRenameTestBase {
         |}""".stripMargin('|').replaceAll("\r", "").trim()
 
     myFixture.checkResult(resultText)
-  }
   // TODO packages.
-}

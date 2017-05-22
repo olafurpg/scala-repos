@@ -1,7 +1,7 @@
 package lila.tournament
 
 // All durations are expressed in seconds
-case class TournamentClock(limit: Int, increment: Int) {
+case class TournamentClock(limit: Int, increment: Int)
 
   def limitInMinutes = chessClock.limitInMinutes
 
@@ -10,4 +10,3 @@ case class TournamentClock(limit: Int, increment: Int) {
   lazy val chessClock = chess.Clock(limit, increment)
 
   def hasIncrement = increment > 0
-}

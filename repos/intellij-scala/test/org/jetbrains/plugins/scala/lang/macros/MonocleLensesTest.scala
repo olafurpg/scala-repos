@@ -19,9 +19,9 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success}
 import org.jetbrains.plugins.scala.util.TestUtils
 import org.jetbrains.plugins.scala.util.TestUtils.ScalaSdkVersion
 
-class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter
 
-  override def setUp() {
+  override def setUp()
     super.setUp(ScalaSdkVersion._2_11)
     addIvyCacheLibrary("monocle-core",
                        "com.github.julien-truffaut/monocle-core_2.11/jars",
@@ -35,12 +35,11 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
     VirtualFilePointerManager.getInstance
       .asInstanceOf[VirtualFilePointerManagerImpl]
       .storePointers()
-  }
 
   protected def folderPath: String = TestUtils.getTestDataPath
 
   protected def addIvyCacheLibrary(
-      libraryName: String, libraryPath: String, jarNames: String*) {
+      libraryName: String, libraryPath: String, jarNames: String*)
     val libsPath = TestUtils.getIvyCachePath
     val pathExtended = s"$libsPath/$libraryPath/"
     VfsRootAccess.allowRootAccess(pathExtended)
@@ -49,26 +48,22 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
         libraryName,
         pathExtended,
         jarNames: _*)
-  }
 
-  def doTest(text: String, methodName: String, expectedType: String) = {
+  def doTest(text: String, methodName: String, expectedType: String) =
     val caretPos = text.indexOf("<caret>")
     configureFromFileTextAdapter("dummy.scala", text.replace("<caret>", ""))
     val exp = PsiTreeUtil
       .findElementOfClassAtOffset(
           getFileAdapter, caretPos, classOf[ScalaPsiElement], false)
       .asInstanceOf[ScObject]
-    exp.allMethods.find(_.name == methodName) match {
+    exp.allMethods.find(_.name == methodName) match
       case Some(x) =>
-        x.method.asInstanceOf[ScFunctionDefinition].returnType match {
+        x.method.asInstanceOf[ScFunctionDefinition].returnType match
           case Success(t, _) =>
             org.junit.Assert.assertEquals(
                 s"${t.toString} != $expectedType", expectedType, t.toString)
           case Failure(cause, _) => org.junit.Assert.fail(cause)
-        }
       case None => org.junit.Assert.fail("method not found")
-    }
-  }
 
   val lensesSimple =
     """
@@ -108,7 +103,7 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
            "q",
            "monocle.Lens[Main.Foo[A, B], Map[(A, B), Double]]")
 
-  def testRecursion() = {
+  def testRecursion() =
     //SCL-9420
     val fileText = """
         |object Main {
@@ -127,5 +122,3 @@ class MonocleLensesTest extends ScalaLightPlatformCodeInsightTestCaseAdapter {
       """.stripMargin
 
     doTest(fileText, "s", "monocle.Lens[Main.A, Main.A.B]")
-  }
-}

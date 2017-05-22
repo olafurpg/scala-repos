@@ -16,7 +16,7 @@
 
 package shapeless.examples
 
-object NewtypeExampes extends App {
+object NewtypeExampes extends App
   import shapeless._
   import newtype._
 
@@ -28,9 +28,8 @@ object NewtypeExampes extends App {
   def MyString(s: String): MyString = newtype(s)
 
   // Expose String#size as MyString#mySize. No other operations of String are accessible
-  case class MyStringOps(s: String) {
+  case class MyStringOps(s: String)
     def mySize = s.size
-  }
   implicit val mkOps = MyStringOps
 
   val ms = MyString("foo")
@@ -46,4 +45,3 @@ object NewtypeExampes extends App {
 
   // Verify that this is an unboxed representation
   assert(ms2 eq (s2: AnyRef))
-}

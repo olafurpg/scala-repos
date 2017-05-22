@@ -23,9 +23,9 @@ import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.mllib.fpm.PrefixSpan
 // $example off$
 
-object PrefixSpanExample {
+object PrefixSpanExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("PrefixSpanExample")
     val sc = new SparkContext(conf)
 
@@ -41,12 +41,9 @@ object PrefixSpanExample {
       .cache()
     val prefixSpan = new PrefixSpan().setMinSupport(0.5).setMaxPatternLength(5)
     val model = prefixSpan.run(sequences)
-    model.freqSequences.collect().foreach { freqSequence =>
+    model.freqSequences.collect().foreach  freqSequence =>
       println(freqSequence.sequence
             .map(_.mkString("[", ", ", "]"))
             .mkString("[", ", ", "]") + ", " + freqSequence.freq)
-    }
     // $example off$
-  }
-}
 // scalastyle:off println

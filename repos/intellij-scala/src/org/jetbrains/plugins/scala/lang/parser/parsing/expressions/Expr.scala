@@ -18,15 +18,15 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * implicit closures are actually implemented in other parts of the parser, not here! The grammar
  * from the Scala Reference does not match the implementation in Parsers.scala.
  */
-object Expr {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Expr
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val exprMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER | ScalaTokenTypes.tUNDER =>
         val pmarker = builder.mark
         builder.advanceLexer() //Ate id
-        builder.getTokenType match {
-          case ScalaTokenTypes.tFUNTYPE => {
+        builder.getTokenType match
+          case ScalaTokenTypes.tFUNTYPE =>
               val psm = pmarker.precede // 'parameter clause'
               val pssm = psm.precede // 'parameter list'
               pmarker.done(ScalaElementTypes.PARAM)
@@ -38,30 +38,21 @@ object Expr {
                 builder error ErrMsg("wrong.expression")
               exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
               return true
-            }
-          case _ => {
+          case _ =>
               pmarker.drop()
               exprMarker.rollbackTo()
-            }
-        }
 
       case ScalaTokenTypes.tLPARENTHESIS =>
-        if (Bindings.parse(builder)) {
-          builder.getTokenType match {
-            case ScalaTokenTypes.tFUNTYPE => {
+        if (Bindings.parse(builder))
+          builder.getTokenType match
+            case ScalaTokenTypes.tFUNTYPE =>
                 builder.advanceLexer() //Ate =>
                 if (!Expr.parse(builder))
                   builder error ErrMsg("wrong.expression")
                 exprMarker.done(ScalaElementTypes.FUNCTION_EXPR)
                 return true
-              }
             case _ => exprMarker.rollbackTo()
-          }
-        } else {
+        else
           exprMarker.drop()
-        }
       case _ => exprMarker.drop()
-    }
     Expr1.parse(builder)
-  }
-}

@@ -33,15 +33,15 @@ import org.apache.spark.sql.hive.{HiveContext, HiveMetastoreTypes, MetastoreRela
   */
 private[hive] case class CreateTableAsSelect(
     tableDesc: CatalogTable, query: LogicalPlan, allowExisting: Boolean)
-    extends RunnableCommand {
+    extends RunnableCommand
 
   private val tableIdentifier = tableDesc.name
 
   override def children: Seq[LogicalPlan] = Seq(query)
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     val hiveContext = sqlContext.asInstanceOf[HiveContext]
-    lazy val metastoreRelation: MetastoreRelation = {
+    lazy val metastoreRelation: MetastoreRelation =
       import org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat
       import org.apache.hadoop.hive.serde2.`lazy`.LazySimpleSerDe
       import org.apache.hadoop.io.Text
@@ -56,46 +56,38 @@ private[hive] case class CreateTableAsSelect(
               .orElse(Some(classOf[LazySimpleSerDe].getName)))
 
       val withSchema =
-        if (withFormat.schema.isEmpty) {
+        if (withFormat.schema.isEmpty)
           // Hive doesn't support specifying the column list for target table in CTAS
           // However we don't think SparkSQL should follow that.
           tableDesc.copy(
-              schema = query.output.map { c =>
+              schema = query.output.map  c =>
             CatalogColumn(c.name,
                           HiveMetastoreTypes.toMetastoreType(c.dataType))
-          })
-        } else {
+          )
+        else
           withFormat
-        }
 
       hiveContext.sessionState.catalog.client
         .createTable(withSchema, ignoreIfExists = false)
 
       // Get the Metastore Relation
-      hiveContext.sessionState.catalog.lookupRelation(tableIdentifier, None) match {
+      hiveContext.sessionState.catalog.lookupRelation(tableIdentifier, None) match
         case r: MetastoreRelation => r
-      }
-    }
     // TODO ideally, we should get the output data ready first and then
     // add the relation into catalog, just in case of failure occurs while data
     // processing.
-    if (hiveContext.sessionState.catalog.tableExists(tableIdentifier)) {
-      if (allowExisting) {
+    if (hiveContext.sessionState.catalog.tableExists(tableIdentifier))
+      if (allowExisting)
         // table already exists, will do nothing, to keep consistent with Hive
-      } else {
+      else
         throw new AnalysisException(s"$tableIdentifier already exists.")
-      }
-    } else {
+    else
       hiveContext
         .executePlan(
             InsertIntoTable(metastoreRelation, Map(), query, true, false))
         .toRdd
-    }
 
     Seq.empty[Row]
-  }
 
-  override def argString: String = {
+  override def argString: String =
     s"[Database:${tableDesc.database}}, TableName: ${tableDesc.name.table}, InsertIntoHiveTable]"
-  }
-}

@@ -23,28 +23,23 @@ import org.apache.spark.SparkFunSuite
   * Helper class that runs Kinesis real data transfer tests or
   * ignores them based on env variable is set or not.
   */
-trait KinesisFunSuite extends SparkFunSuite {
+trait KinesisFunSuite extends SparkFunSuite
   import KinesisTestUtils._
 
   /** Run the test if environment variable is set or ignore the test */
-  def testIfEnabled(testName: String)(testBody: => Unit) {
-    if (shouldRunTests) {
+  def testIfEnabled(testName: String)(testBody: => Unit)
+    if (shouldRunTests)
       test(testName)(testBody)
-    } else {
+    else
       ignore(
           s"$testName [enable by setting env var $envVarNameForEnablingTests=1]")(
           testBody)
-    }
-  }
 
   /** Run the give body of code only if Kinesis tests are enabled */
-  def runIfTestsEnabled(message: String)(body: => Unit): Unit = {
-    if (shouldRunTests) {
+  def runIfTestsEnabled(message: String)(body: => Unit): Unit =
+    if (shouldRunTests)
       body
-    } else {
+    else
       ignore(
           s"$message [enable by setting env var $envVarNameForEnablingTests=1]")(
           ())
-    }
-  }
-}

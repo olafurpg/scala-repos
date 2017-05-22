@@ -5,9 +5,9 @@ import scala.collection.generic.CanBuildFrom
 import scala.collection.{immutable, mutable}
 import scala.pickling.internal._
 
-object MapPicklerHelper {
-  def tupleTagExtractor[T, U](tpe: AppliedType): FastTypeTag[(T, U)] = {
-    tpe.typeargs match {
+object MapPicklerHelper
+  def tupleTagExtractor[T, U](tpe: AppliedType): FastTypeTag[(T, U)] =
+    tpe.typeargs match
       case List(one, two) =>
         FastTypeTag
           .apply(
@@ -21,11 +21,8 @@ object MapPicklerHelper {
       case x =>
         throw new PicklingException(
             s"Error, expected one type argument  on $tpe, found: $x")
-    }
-  }
-}
 
-trait MapPicklers {
+trait MapPicklers
   implicit def mapPickler[K : FastTypeTag, V : FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
@@ -35,12 +32,12 @@ trait MapPicklers {
     : Pickler[Map[K, V]] with Unpickler[Map[K, V]] =
     MapPickler[K, V, Map]
 
-  locally {
+  locally
     val generator = TravPickler.generate[(Any, Any), Map[Any, Any]](
         implicitly[CanBuildFrom[Map[Any, Any], (Any, Any), Map[Any, Any]]],
-        identity[Map[Any, Any]]) { tpe =>
+        identity[Map[Any, Any]])  tpe =>
       MapPicklerHelper.tupleTagExtractor(tpe)
-    } _
+    _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
         "scala.collection.immutable.Map", generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
@@ -53,10 +50,8 @@ trait MapPicklers {
         "scala.collection.immutable.Map.Map4", generator)
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
         "scala.collection.immutable.HashMap.HashTrieMap", generator)
-  }
-}
 
-trait ImmutableSortedMapPicklers {
+trait ImmutableSortedMapPicklers
   implicit def immutableSortedMapPickler[K : FastTypeTag, V : FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
@@ -69,9 +64,8 @@ trait ImmutableSortedMapPicklers {
     MapPickler[K, V, immutable.SortedMap]
 
   // TODO - SortedMap runtime generation involves using a specialized pickler that can remember the ordering of elements.  Currently our pickler does not do that.
-}
 
-trait MutableMapPicklers {
+trait MutableMapPicklers
   implicit def mutableMapPickler[K : FastTypeTag, V : FastTypeTag](
       implicit elemPickler: Pickler[(K, V)],
       elemUnpickler: Unpickler[(K, V)],
@@ -81,15 +75,13 @@ trait MutableMapPicklers {
     : Pickler[mutable.Map[K, V]] with Unpickler[mutable.Map[K, V]] =
     MapPickler[K, V, mutable.Map]
 
-  locally {
+  locally
     val generator = TravPickler.generate[(Any, Any), mutable.Map[Any, Any]](
         implicitly[CanBuildFrom[mutable.Map[Any, Any],
                                 (Any, Any),
                                 mutable.Map[Any, Any]]],
-        identity[mutable.Map[Any, Any]]) { tpe =>
+        identity[mutable.Map[Any, Any]])  tpe =>
       MapPicklerHelper.tupleTagExtractor(tpe)
-    } _
+    _
     currentRuntime.picklers.registerPicklerUnpicklerGenerator(
         "scala.collection.mutable.Map", generator)
-  }
-}

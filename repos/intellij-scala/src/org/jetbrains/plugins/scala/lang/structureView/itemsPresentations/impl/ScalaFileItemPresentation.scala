@@ -11,9 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * Date: 04.05.2008
   */
 class ScalaFileItemPresentation(private val element: ScalaFile)
-    extends ScalaItemPresentation(element) {
-  def getPresentableText: String = {
+    extends ScalaItemPresentation(element)
+  def getPresentableText: String =
     ScalaElementPresentation.getFilePresentableText(
         myElement.asInstanceOf[ScalaFile])
-  }
-}

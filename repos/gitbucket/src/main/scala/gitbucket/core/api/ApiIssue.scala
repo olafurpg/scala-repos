@@ -16,15 +16,15 @@ case class ApiIssue(number: Int,
                     created_at: Date,
                     updated_at: Date,
                     body: String)(
-    repositoryName: RepositoryName, isPullRequest: Boolean) {
+    repositoryName: RepositoryName, isPullRequest: Boolean)
   val comments_url = ApiPath(
       s"/api/v3/repos/${repositoryName.fullName}/issues/${number}/comments")
   val html_url = ApiPath(
-      s"/${repositoryName.fullName}/${if (isPullRequest) { "pull" } else {
+      s"/${repositoryName.fullName}/$if (isPullRequest) { "pull" } else
     "issues"
-  }}/${number}")
+  /${number}")
   val pull_request =
-    if (isPullRequest) {
+    if (isPullRequest)
       Some(
           Map(
               "url" -> ApiPath(
@@ -34,12 +34,10 @@ case class ApiIssue(number: Int,
               // "diff_url" -> ApiPath(s"/${repositoryName.fullName}/pull/${number}.diff"),
               // "patch_url" -> ApiPath(s"/${repositoryName.fullName}/pull/${number}.patch")
           ))
-    } else {
+    else
       None
-    }
-}
 
-object ApiIssue {
+object ApiIssue
   def apply(
       issue: Issue, repositoryName: RepositoryName, user: ApiUser): ApiIssue =
     ApiIssue(
@@ -50,4 +48,3 @@ object ApiIssue {
         body = issue.content.getOrElse(""),
         created_at = issue.registeredDate,
         updated_at = issue.updatedDate)(repositoryName, issue.isPullRequest)
-}

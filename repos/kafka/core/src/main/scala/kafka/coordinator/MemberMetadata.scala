@@ -55,7 +55,7 @@ private[coordinator] class MemberMetadata(
     val clientId: String,
     val clientHost: String,
     val sessionTimeoutMs: Int,
-    var supportedProtocols: List[(String, Array[Byte])]) {
+    var supportedProtocols: List[(String, Array[Byte])])
 
   var assignment: Array[Byte] = Array.empty[Byte]
   var awaitingJoinCallback: JoinGroupResult => Unit = null
@@ -68,54 +68,44 @@ private[coordinator] class MemberMetadata(
   /**
     * Get metadata corresponding to the provided protocol.
     */
-  def metadata(protocol: String): Array[Byte] = {
-    supportedProtocols.find(_._1 == protocol) match {
+  def metadata(protocol: String): Array[Byte] =
+    supportedProtocols.find(_._1 == protocol) match
       case Some((_, metadata)) => metadata
       case None =>
         throw new IllegalArgumentException("Member does not support protocol")
-    }
-  }
 
   /**
     * Check if the provided protocol metadata matches the currently stored metadata.
     */
-  def matches(protocols: List[(String, Array[Byte])]): Boolean = {
+  def matches(protocols: List[(String, Array[Byte])]): Boolean =
     if (protocols.size != this.supportedProtocols.size) return false
 
-    for (i <- 0 until protocols.size) {
+    for (i <- 0 until protocols.size)
       val p1 = protocols(i)
       val p2 = supportedProtocols(i)
       if (p1._1 != p2._1 || !util.Arrays.equals(p1._2, p2._2)) return false
-    }
     return true
-  }
 
-  def summary(protocol: String): MemberSummary = {
+  def summary(protocol: String): MemberSummary =
     MemberSummary(
         memberId, clientId, clientHost, metadata(protocol), assignment)
-  }
 
-  def summaryNoMetadata(): MemberSummary = {
+  def summaryNoMetadata(): MemberSummary =
     MemberSummary(
         memberId, clientId, clientHost, Array.empty[Byte], Array.empty[Byte])
-  }
 
   /**
     * Vote for one of the potential group protocols. This takes into account the protocol preference as
     * indicated by the order of supported protocols and returns the first one also contained in the set
     */
-  def vote(candidates: Set[String]): String = {
-    supportedProtocols.find({
+  def vote(candidates: Set[String]): String =
+    supportedProtocols.find(
       case (protocol, _) => candidates.contains(protocol)
-    }) match {
+    ) match
       case Some((protocol, _)) => protocol
       case None =>
         throw new IllegalArgumentException(
             "Member does not support any of the candidate protocols")
-    }
-  }
 
-  override def toString = {
+  override def toString =
     "[%s,%s,%s,%d]".format(memberId, clientId, clientHost, sessionTimeoutMs)
-  }
-}

@@ -22,7 +22,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.{logging => javalog}
 
-object QueueingHandler {
+object QueueingHandler
 
   private[this] val executor = Executors.newCachedThreadPool(
       new NamedPoolThreadFactory("QueueingHandlerPool", makeDaemons = true))
@@ -54,7 +54,6 @@ object QueueingHandler {
   // java interop
   def apply[H <: Handler](handler: () => H): () => QueueingHandler =
     apply(handler, Int.MaxValue)
-}
 
 /**
   * Proxy handler that queues log records and publishes them in another thread to
@@ -79,7 +78,7 @@ object QueueingHandler {
   */
 class QueueingHandler(
     handler: Handler, val maxQueueSize: Int, inferClassNames: Boolean)
-    extends ProxyHandler(handler) {
+    extends ProxyHandler(handler)
 
   import QueueingHandler._
 
@@ -96,63 +95,52 @@ class QueueingHandler(
 
   private[this] val closed = new AtomicBoolean(false)
 
-  override def publish(record: javalog.LogRecord): Unit = {
+  override def publish(record: javalog.LogRecord): Unit =
     // Calling getSourceClassName has the side-effect of inspecting the
     // stack and filling in the class and method names if they have not
     // already been set. See the description of inferClassNames for why
     // we might do this here.
     if (inferClassNames) record.getSourceClassName
 
-    DefaultFuturePool {
+    DefaultFuturePool
       // We run this in a FuturePool to avoid satisfying pollers
       // (which flush the record) inline.
       if (!queue.offer(record)) onOverflow(record)
-    }
-  }
 
   private[this] def doPublish(record: javalog.LogRecord): Unit =
     super.publish(record)
 
-  private[this] def loop(): Future[Unit] = {
-    queue.poll().map(doPublish).respond {
+  private[this] def loop(): Future[Unit] =
+    queue.poll().map(doPublish).respond
       case Return(_) => loop()
       case Throw(QueueClosedException) => // indicates we should shutdown
       case Throw(e) =>
         // `doPublish` can throw, and we want to keep on publishing...
         e.printStackTrace()
         loop()
-    }
-  }
 
   // begin polling for log records
-  DefaultFuturePool {
+  DefaultFuturePool
     loop()
-  }
 
-  override def close(): Unit = {
-    if (closed.compareAndSet(false, true)) {
+  override def close(): Unit =
+    if (closed.compareAndSet(false, true))
       queue.fail(QueueClosedException, discard = true)
 
       // Propagate close
       super.close()
-    }
-  }
 
-  override def flush(): Unit = {
+  override def flush(): Unit =
     // Publish all records in queue
-    queue.drain().map { records =>
+    queue.drain().map  records =>
       records.foreach(doPublish)
-    }
 
     // Propagate flush
     super.flush()
-  }
 
   /**
     * Called when record dropped.  Default is to log to console.
     */
-  protected def onOverflow(record: javalog.LogRecord): Unit = {
+  protected def onOverflow(record: javalog.LogRecord): Unit =
     Console.err.println(String.format(
             "[%s] log queue overflow - record dropped", Time.now.toString))
-  }
-}

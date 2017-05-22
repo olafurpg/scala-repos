@@ -29,26 +29,22 @@ import org.scalatest.junit.JUnitRunner
   */
 @RunWith(classOf[JUnitRunner])
 class InlineParsersTest
-    extends FlatSpec with ShouldMatchers with InlineParsers {
+    extends FlatSpec with ShouldMatchers with InlineParsers
 
   ///////////////////////////////////////////////////////////////
   // Inline parsing Tests                                      //
   ///////////////////////////////////////////////////////////////
-  def runSucceedingParsingTests(p: Parser[String], l: List[(String, String)]) {
-    for ((a, b) <- l) {
-      try {
+  def runSucceedingParsingTests(p: Parser[String], l: List[(String, String)])
+    for ((a, b) <- l)
+      try
         apply(p, a) should equal(b)
-      } catch {
+      catch
         case e: Throwable =>
           println("Input causing the failure was: '" + a + "'."); throw e;
-      }
-    }
-  }
 
-  def runExceptionParsingTests(p: Parser[String], l: List[String]) {
+  def runExceptionParsingTests(p: Parser[String], l: List[String])
     for (s <- l) evaluating { apply(p, s) } should produce[
         IllegalArgumentException]
-  }
 
   val italicTests: List[(String, String)] = List(
       ("*italic*", "<em>italic</em>"),
@@ -179,62 +175,50 @@ class InlineParsersTest
   val allInlineTests =
     italicTests ++ boldTests ++ entityTest ++ codeTests ++ linkTests ++ fastLinkTests ++ imageTests ++ brTests ++ xmlStartTagTests ++ xmlEndTagTests ++ xmlInlineTests ++ dummyTests
 
-  it should "create italic text" in {
+  it should "create italic text" in
     runSucceedingParsingTests(
         emAsterisk(new InlineContext()) | emUnderscore(new InlineContext()),
         italicTests)
-  }
 
-  it should "create bold text" in {
+  it should "create bold text" in
     runSucceedingParsingTests(
         strongAsterisk(new InlineContext()) | strongUnderscore(
             new InlineContext()),
         boldTests)
-  }
 
-  it should "create inline code" in {
+  it should "create inline code" in
     runSucceedingParsingTests(code, codeTests)
-  }
 
-  it should "create links" in {
+  it should "create links" in
     runSucceedingParsingTests(link(new InlineContext()), linkTests)
-  }
 
-  it should "create fast links" in {
+  it should "create fast links" in
     runSucceedingParsingTests(fastLink(new InlineContext()), fastLinkTests)
     val p = fastLink(new InlineContext())
     evaluating(apply(p, "<this is not a fast link<span>")) should produce[
         IllegalArgumentException]
-  }
 
-  it should "create images" in {
+  it should "create images" in
     runSucceedingParsingTests((elem('!') ~> directImg), imageTests)
-  }
 
-  it should "create line breaks" in {
+  it should "create line breaks" in
     runSucceedingParsingTests(br, brTests)
-  }
 
-  it should "parse simplified xml identifiers" in {
+  it should "parse simplified xml identifiers" in
     runSucceedingParsingTests(xmlName, xmlNameTests)
     runExceptionParsingTests(xmlName, xmlNameExTests)
-  }
 
-  it should "parse opening xml tags and escape their attribute vals" in {
+  it should "parse opening xml tags and escape their attribute vals" in
     runSucceedingParsingTests(xmlStartOrEmptyTag, xmlStartTagTests)
-  }
 
-  it should "parse closing xml tags" in {
+  it should "parse closing xml tags" in
     runSucceedingParsingTests(xmlEndTag, xmlEndTagTests)
-  }
 
-  it should "allow inline xml and escape its parameters" in {
+  it should "allow inline xml and escape its parameters" in
     runSucceedingParsingTests(inline(Map()), xmlInlineTests)
-  }
 
-  it should "parse mixed inline cases" in {
+  it should "parse mixed inline cases" in
     runSucceedingParsingTests(inline(Map()), mixedTests)
-  }
 
   val ld1 = new LinkDefinition("id", "http://www.example.com", Some("Title"))
   val ld2 = new LinkDefinition(
@@ -243,7 +227,7 @@ class InlineParsersTest
   val map = Map(ld1.id -> ld1, ld2.id -> ld2, ld3.id -> ld3)
   val ctx = new InlineContext(map)
 
-  it should "resolve references" in {
+  it should "resolve references" in
     val p = ref(ctx)
     apply(p, "[text][id]") should equal((ld1, "text"))
     apply(p, "[text] [id]") should equal((ld1, "text"))
@@ -251,9 +235,8 @@ class InlineParsersTest
     apply(p, "[id] []") should equal((ld1, "id"))
     apply(p, "[id]") should equal((ld1, "id"))
     apply(p, "[Id]") should equal((ld1, "Id"))
-  }
 
-  it should "resolve reference links" in {
+  it should "resolve reference links" in
     val p = inline(map)
     apply(p, "[text][id]") should equal(
         """<a href="http://www.example.com" title="Title">text</a>""")
@@ -274,9 +257,8 @@ class InlineParsersTest
         """<a href="http://none.example.com">id 3</a>""")
     apply(p, "[foo \"bar\"][id 3]") should equal(
         """<a href="http://none.example.com">foo &quot;bar&quot;</a>""")
-  }
 
-  it should "resolve reference images" in {
+  it should "resolve reference images" in
     val p = inline(map)
     apply(p, "![text][id]") should equal(
         """<img src="http://www.example.com" alt="text" title="Title" />""")
@@ -297,9 +279,8 @@ class InlineParsersTest
         """<img src="http://none.example.com" alt="id 3" />""")
     apply(p, "![foo \"bar\"][id 3]") should equal(
         """<img src="http://none.example.com" alt="foo &quot;bar&quot;" />""")
-  }
 
-  it should "handle all inline cases with the inline replacer" in {
+  it should "handle all inline cases with the inline replacer" in
     runSucceedingParsingTests(inline(Map()), allInlineTests)
     val concatTests = for ((a1, a2) <- allInlineTests;
     (b1, b2) <- allInlineTests;
@@ -307,5 +288,3 @@ class InlineParsersTest
       (a1 + " " + b1 + " " + c1, a2 + " " + b2 + " " + c2);
 
     runSucceedingParsingTests(inline(Map()), concatTests)
-  }
-}

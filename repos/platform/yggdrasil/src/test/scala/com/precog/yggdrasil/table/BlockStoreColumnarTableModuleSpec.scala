@@ -53,21 +53,20 @@ import TableModule.paths._
 
 trait BlockStoreColumnarTableModuleSpec[M[+ _]]
     extends TableModuleSpec[M] with BlockLoadSpec[M]
-    with BlockSortSpec[M] with BlockAlignSpec[M] {
+    with BlockSortSpec[M] with BlockAlignSpec[M]
   self =>
 
   type MemoId = Int
 
-  "a block store columnar table" should {
-    "load" >> {
+  "a block store columnar table" should
+    "load" >>
       "a problem sample1" in testLoadSample1
       "a problem sample2" in testLoadSample2
       "a problem sample3" in testLoadSample3
       "a problem sample4" in testLoadSample4
       //"a problem sample5" in testLoadSample5 //pathological sample in the case of duplicated ids.
       //"a dense dataset" in checkLoadDense //scalacheck + numeric columns = pain
-    }
-    "sort" >> {
+    "sort" >>
       "fully homogeneous data" in homogeneousSortSample
       "fully homogeneous data with object" in homogeneousSortSampleWithNonexistentSortKey
       "data with undefined sort keys" in partiallyUndefinedSortSample
@@ -83,22 +82,17 @@ trait BlockStoreColumnarTableModuleSpec[M[+ _]]
 
       "arbitrary datasets" in checkSortDense(SortAscending)
       "arbitrary datasets descending" in checkSortDense(SortDescending)
-    }
-  }
-}
 
 object BlockStoreColumnarTableModuleSpec
-    extends BlockStoreColumnarTableModuleSpec[Need] {
+    extends BlockStoreColumnarTableModuleSpec[Need]
   implicit def M = Need.need
 
   type YggConfig = IdSourceConfig with ColumnarTableModuleConfig
 
-  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
+  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig
     val maxSliceSize = 10
     val smallSliceSize = 3
 
     val idSource = new FreshAtomicIdSource
-  }
-}
 
 // vim: set ts=4 sw=4 et:

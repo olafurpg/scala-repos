@@ -7,14 +7,12 @@ import Predef.{any2stringadd => _, _ => _}
 import org.ensime.api._
 import org.ensime.util.file._
 
-package object config {
+package object config
 
-  implicit class RichEnsimeConfig(val c: EnsimeConfig) extends AnyVal {
+  implicit class RichEnsimeConfig(val c: EnsimeConfig) extends AnyVal
     def scalaSourceFiles: Set[File] =
-      for {
+      for
         module: EnsimeModule <- c.modules.values.toSet
         root <- module.sourceRoots
         file <- root.tree if file.isFile && file.getName.endsWith(".scala")
-      } yield file
-  }
-}
+      yield file

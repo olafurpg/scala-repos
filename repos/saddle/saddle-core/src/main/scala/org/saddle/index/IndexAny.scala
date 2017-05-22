@@ -27,7 +27,7 @@ import locator.Locator
   * An implementation of [[org.saddle.Index]] generic in type T for which there is an Ordering[T]
   * and a ST[T] available in the implicit context.
   */
-class IndexAny[T : ST : ORD](keys: Vec[T]) extends Index[T] {
+class IndexAny[T : ST : ORD](keys: Vec[T]) extends Index[T]
   val scalarTag = keys.scalarTag
 
   private lazy val (lmap, IndexProperties(contiguous, monotonic)) =
@@ -64,57 +64,49 @@ class IndexAny[T : ST : ORD](keys: Vec[T]) extends Index[T] {
     JoinerImpl.join(this, other, how)
 
   // Intersects two indices if both have set semantics
-  def intersect(other: Index[T]): ReIndexer[T] = {
+  def intersect(other: Index[T]): ReIndexer[T] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot intersect non-unique indexes")
     JoinerImpl.join(this, other, InnerJoin)
-  }
 
   // Unions two indices if both have set semantics
-  def union(other: Index[T]): ReIndexer[T] = {
+  def union(other: Index[T]): ReIndexer[T] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot union non-unique indexes")
     JoinerImpl.join(this, other, OuterJoin)
-  }
 
-  def slice(from: Int, until: Int, stride: Int): Index[T] = {
+  def slice(from: Int, until: Int, stride: Int): Index[T] =
     Index[T](keys.slice(from, until, stride))
-  }
 
   // find the first location whereby an insertion would maintain a sorted index
-  def lsearch(t: T): Int = {
+  def lsearch(t: T): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   // find the last location whereby an insertion would maintain a sorted index
-  def rsearch(t: T): Int = {
+  def rsearch(t: T): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) fnd + locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   // adapted from java source
-  private def binarySearch(a: Array[T], key: T): Int = {
-    @tailrec def bSearch(lo: Int = 0, hi: Int = a.length - 1): Int = {
+  private def binarySearch(a: Array[T], key: T): Int =
+    @tailrec def bSearch(lo: Int = 0, hi: Int = a.length - 1): Int =
       if (lo > hi) -(lo + 1)
-      else {
+      else
         val mid: Int = (lo + hi) >>> 1
         val midVal: T = a(mid)
         if (scalarTag.lt(midVal, key)) bSearch(mid + 1, hi)
         else if (scalarTag.gt(midVal, key)) bSearch(lo, mid - 1)
         else mid
-      }
-    }
     bSearch(0, a.length - 1)
-  }
 
   def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
       f: T => B): Index[B] =
@@ -123,19 +115,14 @@ class IndexAny[T : ST : ORD](keys: Vec[T]) extends Index[T] {
   def toArray: Array[T] = keys.toArray
 
   /**Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case rv: IndexInt =>
-        (this eq rv) || (this.length == rv.length) && {
+        (this eq rv) || (this.length == rv.length) &&
           var i = 0
           var eq = true
-          while (eq && i < this.length) {
+          while (eq && i < this.length)
             eq &&= raw(i) == rv.raw(i)
             i += 1
-          }
           eq
-        }
       case _ => super.equals(o)
-    }
-  }
-}

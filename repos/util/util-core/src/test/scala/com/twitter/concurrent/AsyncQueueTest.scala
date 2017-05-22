@@ -7,8 +7,8 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.immutable.Queue
 
 @RunWith(classOf[JUnitRunner])
-class AsyncQueueTest extends FunSuite {
-  test("queue pollers") {
+class AsyncQueueTest extends FunSuite
+  test("queue pollers")
     val q = new AsyncQueue[Int]
 
     val p0 = q.poll()
@@ -30,9 +30,8 @@ class AsyncQueueTest extends FunSuite {
 
     q.offer(3)
     assert(p2.poll == Some(Return(3)))
-  }
 
-  test("queue offers") {
+  test("queue offers")
     val q = new AsyncQueue[Int]
 
     q.offer(1)
@@ -42,9 +41,8 @@ class AsyncQueueTest extends FunSuite {
     assert(q.poll().poll == Some(Return(1)))
     assert(q.poll().poll == Some(Return(2)))
     assert(q.poll().poll == Some(Return(3)))
-  }
 
-  test("into idle state and back") {
+  test("into idle state and back")
     val q = new AsyncQueue[Int]
 
     q.offer(1)
@@ -57,9 +55,8 @@ class AsyncQueueTest extends FunSuite {
 
     q.offer(3)
     assert(q.poll().poll == Some(Return(3)))
-  }
 
-  test("fail pending and new pollers discard=true") {
+  test("fail pending and new pollers discard=true")
     val q = new AsyncQueue[Int]
 
     val exc = new Exception("sad panda")
@@ -74,9 +71,8 @@ class AsyncQueueTest extends FunSuite {
     assert(p1.poll == Some(Throw(exc)))
 
     assert(q.poll().poll == Some(Throw(exc)))
-  }
 
-  test("fail pending and new pollers discard=false") {
+  test("fail pending and new pollers discard=false")
     val q = new AsyncQueue[Int]
 
     val exc = new Exception("sad panda")
@@ -93,9 +89,8 @@ class AsyncQueueTest extends FunSuite {
     assert(q.poll().poll == Some(Return(2)))
     assert(q.poll().poll == Some(Throw(exc)))
     assert(q.poll().poll == Some(Throw(exc)))
-  }
 
-  test("fail doesn't blow up offer") {
+  test("fail doesn't blow up offer")
     val q = new AsyncQueue[Int]
 
     val exc = new Exception
@@ -103,9 +98,8 @@ class AsyncQueueTest extends FunSuite {
 
     q.offer(1)
     assert(q.poll().poll == Some(Throw(exc)))
-  }
 
-  test("failure is final") {
+  test("failure is final")
     val exc = new Exception()
     val q = new AsyncQueue[Int]()
 
@@ -124,9 +118,8 @@ class AsyncQueueTest extends FunSuite {
     // partially observable via offer
     assert(!q.offer(1))
     assert(q.poll().poll == Some(Throw(exc)))
-  }
 
-  test("drain") {
+  test("drain")
     val q = new AsyncQueue[Int]()
     q.offer(1)
     q.offer(2)
@@ -144,9 +137,8 @@ class AsyncQueueTest extends FunSuite {
     assert(Return(Seq(5, 6)) == q.drain())
     // draining an empty failed queue returns the exception
     assert(Throw(ex) == q.drain())
-  }
 
-  test("offer at max capacity") {
+  test("offer at max capacity")
     val q = new AsyncQueue[Int](1)
     assert(q.offer(1)) // ok
     assert(!q.offer(2)) // over capacity
@@ -159,5 +151,3 @@ class AsyncQueueTest extends FunSuite {
     assert(1 == q.size)
     assert(Return(Queue(3)) == q.drain())
     assert(0 == q.size)
-  }
-}

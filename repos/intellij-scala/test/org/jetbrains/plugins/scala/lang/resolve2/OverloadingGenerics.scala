@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * @author Alexander Podkhalyuzin
   */
-class OverloadingGenerics extends ResolveTestBase {
-  override def folderPath: String = {
+class OverloadingGenerics extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "overloading/generics/"
-  }
 
   def testDefaultValue() = doTest()
   def testDefaultValue2() = doTest()
@@ -19,4 +18,3 @@ class OverloadingGenerics extends ResolveTestBase {
   def testNoLiteralNarrowing() = doTest()
   def testSimpleGenercs() = doTest()
   def testWeakConforms() = doTest()
-}

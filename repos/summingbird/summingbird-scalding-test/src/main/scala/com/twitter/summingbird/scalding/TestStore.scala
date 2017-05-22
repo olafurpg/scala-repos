@@ -30,7 +30,7 @@ import cascading.scheme.local.{TextDelimited => CLTextDelimited}
 import cascading.tuple.{Tuple, TupleEntry}
 import cascading.flow.FlowDef
 
-object TestStore {
+object TestStore
   def apply[K, V](store: String,
                   inBatcher: Batcher,
                   initStore: Iterable[(K, V)],
@@ -38,13 +38,11 @@ object TestStore {
                   pruning: PrunedSpace[(K, V)] = PrunedSpace.neverPruned)(
       implicit ord: Ordering[K],
       tset: TupleSetter[(K, V)],
-      tconv: TupleConverter[(K, V)]) = {
+      tconv: TupleConverter[(K, V)]) =
     val startBatch = inBatcher.batchOf(Timestamp(0)).prev
     val endBatch = inBatcher.batchOf(Timestamp(lastTime)).next
     new TestStore[K, V](
         store, inBatcher, startBatch, initStore, endBatch, pruning)
-  }
-}
 
 class TestStore[K, V](store: String,
                       inBatcher: Batcher,
@@ -55,30 +53,27 @@ class TestStore[K, V](store: String,
     implicit ord: Ordering[K],
     tset: TupleSetter[(K, V)],
     tconv: TupleConverter[(K, V)])
-    extends batch.BatchedStore[K, V] {
+    extends batch.BatchedStore[K, V]
   import OrderedFromOrderingExt._
   var writtenBatches = Set[BatchID](initBatch)
   val batches: Map[BatchID, Mappable[(K, V)]] = BatchID
     .range(initBatch, lastBatch)
-    .map { b =>
+    .map  b =>
       (b, mockFor(b))
-    }
     .toMap
 
   // Needed to init the Test mode:
   val sourceToBuffer: Map[ScaldingSource, Buffer[Tuple]] = BatchID
     .range(initBatch, lastBatch)
-    .map { b =>
+    .map  b =>
       if (initBatch == b) (batches(b), initStore.map { tset(_) }.toBuffer)
       else (batches(b), Buffer.empty[Tuple])
-    }
     .toMap
 
   // Call this after you compute to check the results of the
   def lastToIterable: Iterable[(K, V)] =
-    sourceToBuffer(batches(writtenBatches.max)).toIterable.map { tup =>
+    sourceToBuffer(batches(writtenBatches.max)).toIterable.map  tup =>
       tconv(new TupleEntry(tup))
-    }
 
   val batcher = inBatcher
   val ordering = ord
@@ -86,25 +81,20 @@ class TestStore[K, V](store: String,
   def mockFor(b: BatchID): Mappable[(K, V)] =
     new MockMappable(store + b.toString)
 
-  override def readLast(exclusiveUB: BatchID, mode: Mode) = {
+  override def readLast(exclusiveUB: BatchID, mode: Mode) =
     val candidates = writtenBatches.filter { _ < exclusiveUB }
-    if (candidates.isEmpty) {
+    if (candidates.isEmpty)
       Left(List("No batches < :" + exclusiveUB.toString))
-    } else {
+    else
       val batch = candidates.max
       val mappable = batches(batch)
-      val rdr = Reader { (fd: (FlowDef, Mode)) =>
+      val rdr = Reader  (fd: (FlowDef, Mode)) =>
         TypedPipe.from(mappable)
-      }
       Right((batch, rdr))
-    }
-  }
 
   /** Instances may choose to write out the last or just compute it from the stream */
   override def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit = {
+      implicit flowDef: FlowDef, mode: Mode): Unit =
     val out = batches(batchID)
     lastVals.write(TypedSink[(K, V)](out))
     writtenBatches = writtenBatches + batchID
-  }
-}

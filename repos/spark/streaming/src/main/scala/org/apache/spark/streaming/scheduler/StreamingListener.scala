@@ -69,7 +69,7 @@ case class StreamingListenerReceiverStopped(receiverInfo: ReceiverInfo)
   * computation.
   */
 @DeveloperApi
-trait StreamingListener {
+trait StreamingListener
 
   /** Called when a receiver has been started */
   def onReceiverStarted(receiverStarted: StreamingListenerReceiverStarted) {}
@@ -96,7 +96,6 @@ trait StreamingListener {
   /** Called when processing of a job of a batch has completed. */
   def onOutputOperationCompleted(
       outputOperationCompleted: StreamingListenerOutputOperationCompleted) {}
-}
 
 /**
   * :: DeveloperApi ::
@@ -104,30 +103,25 @@ trait StreamingListener {
   * @param numBatchInfos Number of last batches to consider for generating statistics (default: 10)
   */
 @DeveloperApi
-class StatsReportListener(numBatchInfos: Int = 10) extends StreamingListener {
+class StatsReportListener(numBatchInfos: Int = 10) extends StreamingListener
   // Queue containing latest completed batches
   val batchInfos = new Queue[BatchInfo]()
 
   override def onBatchCompleted(
-      batchStarted: StreamingListenerBatchCompleted) {
+      batchStarted: StreamingListenerBatchCompleted)
     batchInfos.enqueue(batchStarted.batchInfo)
     if (batchInfos.size > numBatchInfos) batchInfos.dequeue()
     printStats()
-  }
 
-  def printStats() {
+  def printStats()
     showMillisDistribution("Total delay: ", _.totalDelay)
     showMillisDistribution("Processing time: ", _.processingDelay)
-  }
 
   def showMillisDistribution(
-      heading: String, getMetric: BatchInfo => Option[Long]) {
+      heading: String, getMetric: BatchInfo => Option[Long])
     org.apache.spark.scheduler.StatsReportListener
       .showMillisDistribution(heading, extractDistribution(getMetric))
-  }
 
   def extractDistribution(
-      getMetric: BatchInfo => Option[Long]): Option[Distribution] = {
+      getMetric: BatchInfo => Option[Long]): Option[Distribution] =
     Distribution(batchInfos.flatMap(getMetric(_)).map(_.toDouble))
-  }
-}

@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Companion Object for [[scalafx.print.PrintColor]].
   */
 object PrintColor
-    extends SFXEnumDelegateCompanion[jfxp.PrintColor, PrintColor] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintColor, PrintColor]
 
   /**
     * Specifies color printing.
@@ -48,7 +48,6 @@ object PrintColor
 
   protected override def unsortedValues: Array[PrintColor] =
     Array(Color, Monochrome)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintColor.html JavaFX PrintColor]].

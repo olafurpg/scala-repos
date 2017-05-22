@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object ScaloidSettings {
+object ScaloidSettings
 
   import SourceGenerator._
   import AndroidClassExtractor._
@@ -21,4 +21,3 @@ object ScaloidSettings {
       apiVersion in Scaloid := 16,
       libraryDependencies += android
   )
-}

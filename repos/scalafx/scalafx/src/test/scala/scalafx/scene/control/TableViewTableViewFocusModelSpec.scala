@@ -43,8 +43,7 @@ class TableViewTableViewFocusModelSpec[S]
                                   TableView.TableViewFocusModel[S]](
         classOf[jfxsc.TableView.TableViewFocusModel[S]],
         classOf[TableView.TableViewFocusModel[S]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override def getJavaClassInstance =
     new jfxsc.TableView.TableViewFocusModel(new jfxsc.TableView[S])
-}

@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author Miles Sabin
   */
-object SizedExamples extends App {
+object SizedExamples extends App
   import shapeless._
   import syntax.sized._
 
@@ -34,7 +34,7 @@ object SizedExamples extends App {
       hdrs: Sized[Seq[String], N], rows: List[Sized[Seq[String], N]]) =
     row(hdrs) :: rows.map(row(_))
 
-  def fullyStatic {
+  def fullyStatic
     val hdrs = Sized("Title", "Author") // Sized[IndexedSeq[String], _2]
     val rows = List(
         // List[Sized[IndexedSeq[String], _2]]
@@ -59,9 +59,8 @@ object SizedExamples extends App {
 
     val extendedFormatted = csv(extendedHdrs, extendedRows) // Compiles
     extendedFormatted foreach println
-  }
 
-  def mixedDynamicStatic {
+  def mixedDynamicStatic
     val hdrs = List("Title", "Author")
     val rows = List(
         List("Types and Programming Languages", "Benjamin Pierce"),
@@ -69,42 +68,38 @@ object SizedExamples extends App {
              "Simon Peyton-Jones")
     )
 
-    for {
+    for
       shdrs <- hdrs.sized(2)
       srows <- sequence(rows map (_.sized(2)))
-    } {
+    
       // If we get here then our lists are statically know to be
       // of the appropriate sizes
       val formatted = csv(shdrs, srows)
       formatted foreach println
-    }
 
     println
 
     // extendedHdrs has the wrong number of columns for rows
     val extendedHdrs = List("Title", "Author", "ISBN")
 
-    for {
+    for
       shdrs <- extendedHdrs.sized(2) // This will be empty ... 
       srows <- sequence(rows map (_.sized(2)))
-    } {
+    
       // ... hence, not reached
       val formatted = csv(shdrs, srows)
       formatted foreach println
-    }
 
     // Extend the rows to match ...
     val extendedRows = rows map (_ :+ "-")
 
-    for {
+    for
       shdrs <- extendedHdrs.sized(3)
       srows <- sequence(extendedRows map (_.sized(3)))
-    } {
+    
       // ... reached this time
       val formatted = csv(shdrs, srows)
       formatted foreach println
-    }
-  }
 
   println("Fully static: ")
   fullyStatic
@@ -113,4 +108,3 @@ object SizedExamples extends App {
 
   println("Mixed dynamic/static")
   mixedDynamicStatic
-}

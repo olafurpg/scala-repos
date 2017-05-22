@@ -10,18 +10,17 @@ import scala.reflect.runtime.universe.Mirror
   * When unpickling from a stream, a subclass such as `BinaryInputPickle` is used, which initializes the `value`
   * to a dummy value. TODO - we may want to rethink this interface.
   */
-trait Pickle {
+trait Pickle
 
   /** The type of values stored in this pickle. */
   type ValueType
   /* The value currently stored in this pickle. */
   val value: ValueType
-}
 
 /**
   * A format for how to pickle the structure of an object.
   */
-trait PickleFormat {
+trait PickleFormat
 
   /** The type of the pickle, which stores the content of the object. */
   type PickleType <: Pickle
@@ -37,4 +36,3 @@ trait PickleFormat {
 
   /** Create a reader which can take a pickle and create a structured reader for the pickle. */
   def createReader(pickle: PickleType): PReader
-}

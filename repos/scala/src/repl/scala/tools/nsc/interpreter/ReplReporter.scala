@@ -15,7 +15,7 @@ import scala.reflect.internal.util.Position
   */
 class ReplReporter(intp: IMain)
     extends ConsoleReporter(
-        intp.settings, Console.in, new ReplStrippingWriter(intp)) {
+        intp.settings, Console.in, new ReplStrippingWriter(intp))
   def printUntruncatedMessage(msg: String) =
     withoutTruncating(printMessage(msg))
 
@@ -25,11 +25,10 @@ class ReplReporter(intp: IMain)
     */
   private var _truncationOK: Boolean = !intp.settings.verbose
   def truncationOK = _truncationOK
-  def withoutTruncating[T](body: => T): T = {
+  def withoutTruncating[T](body: => T): T =
     val saved = _truncationOK
     _truncationOK = false
     try body finally _truncationOK = saved
-  }
 
   override def warning(pos: Position, msg: String): Unit =
     withoutTruncating(super.warning(pos, msg))
@@ -38,32 +37,27 @@ class ReplReporter(intp: IMain)
 
   import scala.io.AnsiColor.{RED, YELLOW, RESET}
 
-  def severityColor(severity: Severity): String = severity match {
+  def severityColor(severity: Severity): String = severity match
     case ERROR => RED
     case WARNING => YELLOW
     case INFO => RESET
-  }
 
-  override def print(pos: Position, msg: String, severity: Severity) {
+  override def print(pos: Position, msg: String, severity: Severity)
     val prefix =
       (if (replProps.colorOk)
          severityColor(severity) + clabel(severity) + RESET
        else clabel(severity))
     printMessage(pos, prefix + msg)
-  }
 
-  override def printMessage(msg: String) {
+  override def printMessage(msg: String)
     // Avoiding deadlock if the compiler starts logging before
     // the lazy val is complete.
-    if (intp.isInitializeComplete) {
-      if (intp.totalSilence) {
+    if (intp.isInitializeComplete)
+      if (intp.totalSilence)
         if (isReplTrace) super.printMessage("[silent] " + msg)
-      } else super.printMessage(msg)
-    } else Console.println("[init] " + msg)
-  }
+      else super.printMessage(msg)
+    else Console.println("[init] " + msg)
 
-  override def displayPrompt() {
+  override def displayPrompt()
     if (intp.totalSilence) ()
     else super.displayPrompt()
-  }
-}

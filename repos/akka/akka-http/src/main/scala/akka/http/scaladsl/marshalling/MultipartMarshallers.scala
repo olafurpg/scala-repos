@@ -8,16 +8,15 @@ import akka.event.{NoLogging, LoggingAdapter}
 import akka.http.impl.engine.rendering.BodyPartRenderer
 import akka.http.scaladsl.model._
 
-trait MultipartMarshallers {
+trait MultipartMarshallers
   implicit def multipartMarshaller[T <: Multipart](
       implicit log: LoggingAdapter = NoLogging): ToEntityMarshaller[T] =
-    Marshaller strict { value ⇒
+    Marshaller strict  value ⇒
       val boundary = randomBoundary()
       val mediaType = value.mediaType withBoundary boundary
-      Marshalling.WithOpenCharset(mediaType, { charset ⇒
+      Marshalling.WithOpenCharset(mediaType,  charset ⇒
         value.toEntity(charset, boundary)(log)
-      })
-    }
+      )
 
   /**
     * The random instance that is used to create multipart boundaries. This can be overriden (e.g. in tests) to
@@ -38,6 +37,5 @@ trait MultipartMarshallers {
   protected def randomBoundary(): String =
     BodyPartRenderer.randomBoundary(
         length = multipartBoundaryLength, random = multipartBoundaryRandom)
-}
 
 object MultipartMarshallers extends MultipartMarshallers

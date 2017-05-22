@@ -15,7 +15,7 @@ import spire.syntax.order._
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary._
 
-object gen {
+object gen
 
   lazy val ubyte: Gen[UByte] = arbitrary[Byte].map(new UByte(_))
 
@@ -45,21 +45,20 @@ object gen {
       arbitrary[Long].map(n => Natural(n & Long.MaxValue)),
       arbitrary[BigInt].map(n => Natural(n.abs)))
 
-  lazy val rational: Gen[Rational] = {
-    val rationalFromLongs: Gen[Rational] = for {
+  lazy val rational: Gen[Rational] =
+    val rationalFromLongs: Gen[Rational] = for
       n <- arbitrary[Long]
       d <- arbitrary[Long].map(n => if (n == 0) 1L else n)
-    } yield Rational(n, d)
+    yield Rational(n, d)
 
-    val rationalFromSafeLongs: Gen[Rational] = for {
+    val rationalFromSafeLongs: Gen[Rational] = for
       n <- safeLong
       d <- safeLong.map(n => if (n.isZero) SafeLong.one else n)
-    } yield Rational(n, d)
+    yield Rational(n, d)
 
-    val bigRational: Gen[Rational] = {
+    val bigRational: Gen[Rational] =
       val m = Rational("1/393050634124102232869567034555427371542904833")
       rationalFromSafeLongs.map(_ * m)
-    }
 
     Gen.frequency(
         10 → rationalFromLongs, // we keep this to make long/long rationals more frequent
@@ -68,7 +67,6 @@ object gen {
         1 → bigRational, // a rational that is guaranteed to have a big denominator
         1 → bigRational.map(x ⇒ if (x.isZero) Rational.one else x.inverse)
     )
-  }
 
   lazy val number: Gen[Number] = Gen.oneOf(
       arbitrary[Long].map(Number(_)),
@@ -83,43 +81,43 @@ object gen {
   lazy val sign: Gen[Sign] = Gen.oneOf(Sign.Positive, Sign.Zero, Sign.Negative)
 
   def term[A : Arbitrary]: Gen[poly.Term[A]] =
-    for {
+    for
       e <- arbitrary[Short]
       c <- arbitrary[A]
-    } yield poly.Term(c, e.toInt)
+    yield poly.Term(c, e.toInt)
 
   def polynomial[
       A : Arbitrary : Semiring : Eq : ClassTag]: Gen[Polynomial[A]] =
-    for {
+    for
       ts <- Gen.listOf(term[A])
-    } yield Polynomial(ts.take(6))
+    yield Polynomial(ts.take(6))
 
   def complex[A : Arbitrary]: Gen[Complex[A]] =
-    for {
+    for
       r <- arbitrary[A]
       i <- arbitrary[A]
-    } yield Complex(r, i)
+    yield Complex(r, i)
 
   def jet2[A : Arbitrary : ClassTag]: Gen[Jet[A]] =
-    for {
+    for
       r <- arbitrary[A]
       inf0 <- arbitrary[A]
       inf1 <- arbitrary[A]
-    } yield Jet(r, Array(inf0, inf1))
+    yield Jet(r, Array(inf0, inf1))
 
   def jet[A : Arbitrary : ClassTag]: Gen[Jet[A]] =
-    for {
+    for
       r <- arbitrary[A]
       infs <- arbitrary[Array[A]]
-    } yield Jet(r, infs)
+    yield Jet(r, infs)
 
   def quaternion[A : Arbitrary]: Gen[Quaternion[A]] =
-    for {
+    for
       r <- arbitrary[A]
       i <- arbitrary[A]
       j <- arbitrary[A]
       k <- arbitrary[A]
-    } yield Quaternion(r, i, j, k)
+    yield Quaternion(r, i, j, k)
 
   def bound[A : Arbitrary]: Gen[Bound[A]] =
     Gen.oneOf(arbitrary[A].map(Open(_)),
@@ -160,41 +158,35 @@ object gen {
                                (15, boundedInterval[A]))
 
   def freeMonoid[A : Arbitrary]: Gen[FreeMonoid[A]] =
-    for {
+    for
       as <- arbitrary[List[A]]
-    } yield
-      as.foldLeft(FreeMonoid.id[A]) { (acc, a) =>
+    yield
+      as.foldLeft(FreeMonoid.id[A])  (acc, a) =>
         acc |+| FreeMonoid(a)
-      }
 
   def freeGroup[A : Arbitrary]: Gen[FreeGroup[A]] =
-    for {
+    for
       aas <- arbitrary[List[Either[A, A]]]
-    } yield
-      aas.foldLeft(FreeGroup.id[A]) {
+    yield
+      aas.foldLeft(FreeGroup.id[A])
         case (acc, Left(a)) => acc |-| FreeGroup(a)
         case (acc, Right(a)) => acc |+| FreeGroup(a)
-      }
 
   def freeAbGroup[A : Arbitrary]: Gen[FreeAbGroup[A]] =
-    for {
+    for
       tpls <- arbitrary[List[(A, Short)]]
-    } yield
-      tpls.foldLeft(FreeAbGroup.id[A]) {
+    yield
+      tpls.foldLeft(FreeAbGroup.id[A])
         case (acc, (a, n)) =>
           acc |+| Group[FreeAbGroup[A]].combinen(FreeAbGroup(a), n.toInt)
-      }
 
-  val perm: Gen[Perm] = Gen.parameterized { params =>
+  val perm: Gen[Perm] = Gen.parameterized  params =>
     import params.rng.nextInt
     val domainSize = params.size / 10 + 1
     val images = new Array[Int](domainSize)
-    cforRange(0 until domainSize) { i =>
+    cforRange(0 until domainSize)  i =>
       val j =
         nextInt(i + 1) // uses the Fisher-Yates shuffle, inside out variant
       images(i) = images(j)
       images(j) = i
-    }
     Perm(images.zipWithIndex.filter { case (p, i) => p != i }.toMap)
-  }
-}

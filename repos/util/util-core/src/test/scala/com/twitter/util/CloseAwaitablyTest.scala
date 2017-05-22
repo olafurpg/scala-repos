@@ -5,19 +5,17 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class CloseAwaitablyTest extends FunSuite {
-  class Context extends Closable with CloseAwaitably {
+class CloseAwaitablyTest extends FunSuite
+  class Context extends Closable with CloseAwaitably
     val p = new Promise[Unit]
     var n = 0
-    def close(deadline: Time): Future[Unit] = closeAwaitably {
+    def close(deadline: Time): Future[Unit] = closeAwaitably
       n += 1
       p
-    }
-  }
 
   def make(): Context = new Context()
 
-  test("close") {
+  test("close")
     val c = make()
     assert(c.n == 0)
     val f = c.close(Time.now)
@@ -28,21 +26,16 @@ class CloseAwaitablyTest extends FunSuite {
     assert(f.poll == None)
     c.p.setDone()
     assert(f.poll == Some(Return.Unit))
-  }
 
-  test("Await.ready") {
+  test("Await.ready")
     val c = make()
-    val t = new Thread {
+    val t = new Thread
       start()
-      override def run() {
+      override def run()
         Await.ready(c)
-      }
-    }
 
     c.close(Time.now)
     assert(t.isAlive)
     c.p.setDone()
     t.join(10000)
     assert(!t.isAlive)
-  }
-}

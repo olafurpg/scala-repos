@@ -31,7 +31,7 @@ package scala.scalajs.js.typedarray
 
 import java.nio._
 
-private[typedarray] object TypedArrayBufferBridge {
+private[typedarray] object TypedArrayBufferBridge
   def wrap(array: ArrayBuffer): ByteBuffer =
     sys.error("stub")
 
@@ -73,4 +73,3 @@ private[typedarray] object TypedArrayBufferBridge {
 
   def Buffer_typedArray(buffer: Buffer): TypedArray[_, _] =
     sys.error("stub")
-}

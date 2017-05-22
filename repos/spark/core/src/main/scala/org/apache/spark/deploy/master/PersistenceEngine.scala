@@ -34,7 +34,7 @@ import org.apache.spark.rpc.RpcEnv
   * The implementation of this trait defines how name-object pairs are stored or retrieved.
   */
 @DeveloperApi
-abstract class PersistenceEngine {
+abstract class PersistenceEngine
 
   /**
     * Defines how the object is serialized and persisted. Implementation will
@@ -53,51 +53,41 @@ abstract class PersistenceEngine {
     */
   def read[T : ClassTag](prefix: String): Seq[T]
 
-  final def addApplication(app: ApplicationInfo): Unit = {
+  final def addApplication(app: ApplicationInfo): Unit =
     persist("app_" + app.id, app)
-  }
 
-  final def removeApplication(app: ApplicationInfo): Unit = {
+  final def removeApplication(app: ApplicationInfo): Unit =
     unpersist("app_" + app.id)
-  }
 
-  final def addWorker(worker: WorkerInfo): Unit = {
+  final def addWorker(worker: WorkerInfo): Unit =
     persist("worker_" + worker.id, worker)
-  }
 
-  final def removeWorker(worker: WorkerInfo): Unit = {
+  final def removeWorker(worker: WorkerInfo): Unit =
     unpersist("worker_" + worker.id)
-  }
 
-  final def addDriver(driver: DriverInfo): Unit = {
+  final def addDriver(driver: DriverInfo): Unit =
     persist("driver_" + driver.id, driver)
-  }
 
-  final def removeDriver(driver: DriverInfo): Unit = {
+  final def removeDriver(driver: DriverInfo): Unit =
     unpersist("driver_" + driver.id)
-  }
 
   /**
     * Returns the persisted data sorted by their respective ids (which implies that they're
     * sorted by time of creation).
     */
   final def readPersistedData(rpcEnv: RpcEnv)
-    : (Seq[ApplicationInfo], Seq[DriverInfo], Seq[WorkerInfo]) = {
-    rpcEnv.deserialize { () =>
+    : (Seq[ApplicationInfo], Seq[DriverInfo], Seq[WorkerInfo]) =
+    rpcEnv.deserialize  () =>
       (read[ApplicationInfo]("app_"),
        read[DriverInfo]("driver_"),
        read[WorkerInfo]("worker_"))
-    }
-  }
 
   def close() {}
-}
 
-private[master] class BlackHolePersistenceEngine extends PersistenceEngine {
+private[master] class BlackHolePersistenceEngine extends PersistenceEngine
 
   override def persist(name: String, obj: Object): Unit = {}
 
   override def unpersist(name: String): Unit = {}
 
   override def read[T : ClassTag](name: String): Seq[T] = Nil
-}

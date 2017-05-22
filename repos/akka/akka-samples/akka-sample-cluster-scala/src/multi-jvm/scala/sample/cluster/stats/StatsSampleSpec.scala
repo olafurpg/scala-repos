@@ -15,7 +15,7 @@ import akka.cluster.ClusterEvent.MemberUp
 import akka.remote.testkit.MultiNodeConfig
 import com.typesafe.config.ConfigFactory
 
-object StatsSampleSpecConfig extends MultiNodeConfig {
+object StatsSampleSpecConfig extends MultiNodeConfig
   // register the named roles (nodes) of the test
   val first = role("first")
   val second = role("second")
@@ -24,8 +24,8 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
   def nodeList = Seq(first, second, third)
 
   // Extract individual sigar library for every node.
-  nodeList foreach { role ⇒
-    nodeConfig(role) {
+  nodeList foreach  role ⇒
+    nodeConfig(role)
       ConfigFactory.parseString(s"""
       # Disable legacy metrics in akka-cluster.
       akka.cluster.metrics.enabled=off
@@ -34,8 +34,6 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
       # Sigar native library extract location during tests.
       akka.cluster.metrics.native-library-extract-folder=target/native/${role.name}
       """)
-    }
-  }
 
   // this configuration will be used for all nodes
   // note that no fixed host names and ports are used
@@ -57,7 +55,6 @@ object StatsSampleSpecConfig extends MultiNodeConfig {
     }
     #//#router-lookup-config
     """))
-}
 //#MultiNodeConfig
 
 //#concrete-tests
@@ -76,7 +73,7 @@ import akka.testkit.ImplicitSender
 
 abstract class StatsSampleSpec
     extends MultiNodeSpec(StatsSampleSpecConfig) with WordSpecLike
-    with Matchers with BeforeAndAfterAll with ImplicitSender {
+    with Matchers with BeforeAndAfterAll with ImplicitSender
 
   import StatsSampleSpecConfig._
 
@@ -88,10 +85,10 @@ abstract class StatsSampleSpec
 
   //#abstract-test
 
-  "The stats sample" must {
+  "The stats sample" must
 
     //#startup-cluster
-    "illustrate how to startup cluster" in within(15 seconds) {
+    "illustrate how to startup cluster" in within(15 seconds)
       Cluster(system).subscribe(testActor, classOf[MemberUp])
       expectMsgClass(classOf[CurrentClusterState])
 
@@ -114,34 +111,26 @@ abstract class StatsSampleSpec
       Cluster(system).unsubscribe(testActor)
 
       testConductor.enter("all-up")
-    }
     //#startup-cluster
 
     //#test-statsService
-    "show usage of the statsService from one node" in within(15 seconds) {
-      runOn(second) {
+    "show usage of the statsService from one node" in within(15 seconds)
+      runOn(second)
         assertServiceOk()
-      }
 
       testConductor.enter("done-2")
-    }
 
-    def assertServiceOk(): Unit = {
+    def assertServiceOk(): Unit =
       val service =
         system.actorSelection(node(third) / "user" / "statsService")
       // eventually the service should be ok,
       // first attempts might fail because worker actors not started yet
-      awaitAssert {
+      awaitAssert
         service ! StatsJob("this is the text that will be analyzed")
         expectMsgType[StatsResult](1.second).meanWordLength should be(
             3.875 +- 0.001)
-      }
-    }
     //#test-statsService
 
-    "show usage of the statsService from all nodes" in within(15 seconds) {
+    "show usage of the statsService from all nodes" in within(15 seconds)
       assertServiceOk()
       testConductor.enter("done-3")
-    }
-  }
-}

@@ -11,33 +11,28 @@ import lila.db.Types.Coll
 import lila.memo.AsyncCache
 import lila.user.{User, UserRepo}
 
-private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
+private[video] final class VideoApi(videoColl: Coll, viewColl: Coll)
 
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.bson.Macros
-  private implicit val YoutubeBSONHandler = {
+  private implicit val YoutubeBSONHandler =
     import Youtube.Metadata
     Macros.handler[Metadata]
-  }
   private implicit val VideoBSONHandler = Macros.handler[Video]
   private implicit val TagNbBSONHandler = Macros.handler[TagNb]
   import View.viewBSONHandler
 
   private def videoViews(userOption: Option[User])(
-      videos: Seq[Video]): Fu[Seq[VideoView]] = userOption match {
+      videos: Seq[Video]): Fu[Seq[VideoView]] = userOption match
     case None =>
-      fuccess {
+      fuccess
         videos map { VideoView(_, false) }
-      }
     case Some(user) =>
-      view.seenVideoIds(user, videos) map { ids =>
-        videos.map { v =>
+      view.seenVideoIds(user, videos) map  ids =>
+        videos.map  v =>
           VideoView(v, ids contains v.id)
-        }
-      }
-  }
 
-  object video {
+  object video
 
     private val maxPerPage = 18
 
@@ -46,11 +41,11 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     def search(user: Option[User],
                query: String,
-               page: Int): Fu[Paginator[VideoView]] = {
+               page: Int): Fu[Paginator[VideoView]] =
       val q =
-        query.split(' ').map { word =>
+        query.split(' ').map  word =>
           s""""$word""""
-        } mkString " "
+        mkString " "
       val textScore = BSONDocument(
           "score" -> BSONDocument("$meta" -> "textScore"))
       Paginator(adapter = new BSONAdapter[Video](
@@ -63,7 +58,6 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                   ) mapFutureList videoViews(user),
                 currentPage = page,
                 maxPerPage = maxPerPage)
-    }
 
     def save(video: Video): Funit =
       videoColl
@@ -141,13 +135,13 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
         .sort(BSONDocument("metadata.likes" -> -1))
         .cursor[Video]()
         .collect[List]()
-        .map { videos =>
-          videos.sortBy { v =>
+        .map  videos =>
+          videos.sortBy  v =>
             -v.similarity(video)
-          } take max
-        } flatMap videoViews(user)
+          take max
+        flatMap videoViews(user)
 
-    object count {
+    object count
 
       private val cache =
         AsyncCache.single(f = videoColl.count(none), timeToLive = 1.day)
@@ -155,10 +149,8 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
       def clearCache = cache.clear
 
       def apply: Fu[Int] = cache apply true
-    }
-  }
 
-  object view {
+  object view
 
     def find(videoId: Video.ID, userId: String): Fu[Option[View]] =
       viewColl
@@ -178,13 +170,12 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
     def seenVideoIds(user: User, videos: Seq[Video]): Fu[Set[Video.ID]] =
       viewColl.distinct(View.BSONFields.videoId,
                         BSONDocument(
-                            "_id" -> BSONDocument("$in" -> videos.map { v =>
+                            "_id" -> BSONDocument("$in" -> videos.map  v =>
                               View.makeId(v.id, user.id)
-                            })
+                            )
                         ).some) map lila.db.BSON.asStringSet
-  }
 
-  object tag {
+  object tag
 
     def paths(filterTags: List[Tag]): Fu[List[TagNb]] =
       pathsCache(filterTags.sorted)
@@ -199,12 +190,11 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
 
     private val pathsCache = AsyncCache[List[Tag], List[TagNb]](
         f = filterTags =>
-            {
             val allPaths =
               if (filterTags.isEmpty)
-                allPopular map { tags =>
+                allPopular map  tags =>
                   tags.filterNot(_.isNumeric)
-                } else
+                else
                 videoColl
                   .aggregate(
                       Match(BSONDocument(
@@ -214,26 +204,22 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                            GroupField("tags")("nb" -> SumValue(1))))
                   .map(_.documents.flatMap(_.asOpt[TagNb]))
 
-            allPopular zip allPaths map {
+            allPopular zip allPaths map
               case (all, paths) =>
                 val tags =
-                  all map { t =>
+                  all map  t =>
                     paths find (_._id == t._id) getOrElse TagNb(t._id, 0)
-                  } filterNot (_.empty) take max
+                  filterNot (_.empty) take max
                 val missing =
-                  filterTags filterNot { t =>
+                  filterTags filterNot  t =>
                     tags exists (_.tag == t)
-                  }
                 val list =
-                  tags.take(max - missing.size) ::: missing.flatMap { t =>
+                  tags.take(max - missing.size) ::: missing.flatMap  t =>
                     all find (_.tag == t)
-                  }
-                list.sortBy { t =>
+                list.sortBy  t =>
                   if (filterTags contains t.tag) Int.MinValue
                   else -t.nb
-                }
-            }
-        },
+        ,
         maxCapacity = 100)
 
     private val popularCache = AsyncCache.single[List[TagNb]](
@@ -244,5 +230,3 @@ private[video] final class VideoApi(videoColl: Coll, viewColl: Coll) {
                             Sort(Descending("nb"))))
             .map(_.documents.flatMap(_.asOpt[TagNb])),
         timeToLive = 1.day)
-  }
-}

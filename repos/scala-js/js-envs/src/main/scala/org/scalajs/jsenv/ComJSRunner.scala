@@ -2,7 +2,7 @@ package org.scalajs.jsenv
 
 import scala.concurrent.duration.Duration
 
-trait ComJSRunner extends AsyncJSRunner {
+trait ComJSRunner extends AsyncJSRunner
 
   /** Send a message to the JS VM. Throws if the message cannot be sent. */
   def send(msg: String): Unit
@@ -33,8 +33,6 @@ trait ComJSRunner extends AsyncJSRunner {
   def close(): Unit
 
   /** Abort the associated run. Also closes the communication channel. */
-  abstract override def stop(): Unit = {
+  abstract override def stop(): Unit =
     close()
     super.stop()
-  }
-}

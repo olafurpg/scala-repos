@@ -10,11 +10,11 @@ import scala.concurrent.duration._
 import com.typesafe.config.ConfigFactory
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ClusterMetricsSettingsSpec extends AkkaSpec {
+class ClusterMetricsSettingsSpec extends AkkaSpec
 
-  "ClusterMetricsSettings" must {
+  "ClusterMetricsSettings" must
 
-    "be able to parse generic metrics config elements" in {
+    "be able to parse generic metrics config elements" in
       val settings = new ClusterMetricsSettings(system.settings.config)
       import settings._
 
@@ -37,6 +37,3 @@ class ClusterMetricsSettingsSpec extends AkkaSpec {
       CollectorSampleInterval should ===(3 seconds)
       CollectorGossipInterval should ===(3 seconds)
       CollectorMovingAverageHalfLife should ===(12 seconds)
-    }
-  }
-}

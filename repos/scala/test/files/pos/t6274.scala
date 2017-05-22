@@ -1,12 +1,10 @@
-trait Crash {
+trait Crash
 
   def foo(i: => Int)(j: Int): Int
 
-  def t = {
+  def t =
     // var count = 0
-    foo {
+    foo
       var count = 0
       count
-    } _
-  }
-}
+    _

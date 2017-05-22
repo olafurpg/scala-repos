@@ -22,7 +22,7 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
     parent: StubElement[ParentPsi],
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
-    extends StubBaseWrapper[ScFunction](parent, elemType) with ScFunctionStub {
+    extends StubBaseWrapper[ScFunction](parent, elemType) with ScFunctionStub
   private var name: StringRef = _
   private var declaration: Boolean = false
   private var annotations: Array[StringRef] = Array[StringRef]()
@@ -45,7 +45,7 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
            bodyText: String,
            assign: Boolean,
            isImplicit: Boolean,
-           isLocal: Boolean) = {
+           isLocal: Boolean) =
     this(
         parent,
         elemType
@@ -58,7 +58,6 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
     this.assign = assign
     _implicit = isImplicit
     local = isLocal
-  }
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
@@ -70,7 +69,7 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
            bodyText: StringRef,
            assign: Boolean,
            isImplicit: Boolean,
-           isLocal: Boolean) = {
+           isLocal: Boolean) =
     this(
         parent,
         elemType
@@ -83,7 +82,6 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
     this.assign = assign
     _implicit = isImplicit
     local = isLocal
-  }
 
   def isLocal: Boolean = local
 
@@ -93,38 +91,33 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
 
   def getAnnotations: Array[String] = annotations.map(StringRef.toString)
 
-  def getReturnTypeElement: Option[ScTypeElement] = {
-    if (myReturnTypeElement != null) {
+  def getReturnTypeElement: Option[ScTypeElement] =
+    if (myReturnTypeElement != null)
       val returnTypeElement = myReturnTypeElement.get
       if (returnTypeElement != null &&
           (returnTypeElement.isEmpty ||
-              (returnTypeElement.get.getContext eq getPsi))) {
+              (returnTypeElement.get.getContext eq getPsi)))
         return returnTypeElement
-      }
-    }
     val res: Option[ScTypeElement] =
-      if (getReturnTypeText != "") {
+      if (getReturnTypeText != "")
         Some(ScalaPsiElementFactory.createTypeElementFromText(
                 getReturnTypeText, getPsi, null))
-      } else None
+      else None
     myReturnTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
-  }
 
-  def getBodyExpression: Option[ScExpression] = {
-    if (myBodyExpression != null) {
+  def getBodyExpression: Option[ScExpression] =
+    if (myBodyExpression != null)
       val body = myBodyExpression.get
       if (body != null && (body.isEmpty || (body.get.getContext eq getPsi)))
         return body
-    }
     val res: Option[ScExpression] =
-      if (getBodyText != "") {
+      if (getBodyText != "")
         Some(ScalaPsiElementFactory.createExpressionWithContextFromText(
                 getBodyText, getPsi, null))
-      } else None
+      else None
     myBodyExpression = new SofterReference[Option[ScExpression]](res)
     res
-  }
 
   def getBodyText: String = StringRef.toString(bodyText)
 
@@ -133,4 +126,3 @@ class ScFunctionStubImpl[ParentPsi <: PsiElement](
   def hasAssign: Boolean = assign
 
   def isImplicit: Boolean = _implicit
-}

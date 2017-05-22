@@ -8,7 +8,7 @@ import java.io.{File, FileInputStream, FileNotFoundException, InputStream, Outpu
   * A Reader represents a stream of bytes, read in discrete chunks.
   * Readers permit at most one outstanding read.
   */
-trait Reader {
+trait Reader
 
   /**
     * Asynchronously read at most `n` bytes from the byte stream. The
@@ -24,27 +24,23 @@ trait Reader {
     * Discard this reader: its output is no longer required.
     */
   def discard()
-}
 
-object Reader {
+object Reader
 
-  val Null = new Reader {
+  val Null = new Reader
     def read(n: Int) = Future.None
     def discard() = ()
-  }
 
   /**
     * Read the entire bytestream presented by `r`.
     */
-  def readAll(r: Reader): Future[Buf] = {
+  def readAll(r: Reader): Future[Buf] =
     def loop(left: Buf): Future[Buf] =
-      r.read(Int.MaxValue) flatMap {
+      r.read(Int.MaxValue) flatMap
         case Some(right) => loop(left concat right)
         case none => Future.value(left)
-      }
 
     loop(Buf.Empty)
-  }
 
   /**
     * Reader from a Buf.
@@ -122,21 +118,20 @@ object Reader {
     *
     * @see Readers.writable() for a Java API.
     */
-  def writable(): Writable = new Writable {
+  def writable(): Writable = new Writable
     // thread-safety provided by synchronization on `this`
     private[this] var state: State = Idle
 
-    override def toString: String = synchronized {
+    override def toString: String = synchronized
       s"Reader.writable(state=$state)"
-    }
 
     /**
       * The returned [[com.twitter.util.Future]] is satisfied when this has either been
       * [[discard discarded]], a [[read]] has seen the EOF, or a [[read]]
       * has seen the [[fail failure]].
       */
-    def close(deadline: Time): Future[Unit] = synchronized {
-      state match {
+    def close(deadline: Time): Future[Unit] = synchronized
+      state match
         case Failing(t) =>
           Future.exception(t)
 
@@ -162,11 +157,9 @@ object Reader {
           p.setException(
               new IllegalStateException("close while write is pending"))
           reof
-      }
-    }
 
-    def write(buf: Buf): Future[Unit] = synchronized {
-      state match {
+    def write(buf: Buf): Future[Unit] = synchronized
+      state match
         case Failing(exc) =>
           Future.exception(exc)
 
@@ -193,11 +186,9 @@ object Reader {
 
         case Writing(_, _) =>
           Future.exception(new IllegalStateException("write while Writing"))
-      }
-    }
 
-    def read(n: Int): Future[Option[Buf]] = synchronized {
-      state match {
+    def read(n: Int): Future[Option[Buf]] = synchronized
+      state match
         case Failing(exc) =>
           Future.exception(exc)
 
@@ -227,19 +218,16 @@ object Reader {
 
         case Reading(_, _) =>
           Future.exception(new IllegalStateException("read() while Reading"))
-      }
-    }
 
-    def discard(): Unit = synchronized {
+    def discard(): Unit = synchronized
       val cause = new ReaderDiscarded()
       fail(cause)
-    }
 
-    def fail(cause: Throwable): Unit = synchronized {
+    def fail(cause: Throwable): Unit = synchronized
       // We fix the state before inspecting it so we enter in a
       // good state if setting promises recurses.
       val oldState = state
-      oldState match {
+      oldState match
         case Eof | Failing(_) =>
         // do not update state to failing
         case Idle =>
@@ -253,9 +241,6 @@ object Reader {
         case Writing(_, p) =>
           state = Failing(cause)
           p.setException(cause)
-      }
-    }
-  }
 
   /**
     * Create a new Reader for a File
@@ -277,16 +262,15 @@ object Reader {
     * Convenient abstraction to read from a stream of Readers as if it were a
     * single Reader.
     */
-  def concat(readers: AsyncStream[Reader]): Reader = {
+  def concat(readers: AsyncStream[Reader]): Reader =
     val target = Reader.writable()
     val f =
-      copyMany(readers, target) respond {
+      copyMany(readers, target) respond
         case Throw(exc) => target.fail(exc)
         case _ => target.close()
-      }
-    new Reader {
+    new Reader
       def read(n: Int) = target.read(n)
-      def discard() {
+      def discard()
         // We have to do this so that when the the target is discarded we can
         // interrupt the read operation. Consider the following:
         //
@@ -296,9 +280,6 @@ object Reader {
         // interrupt handler in Reader.copy to discard `r`.
         f.raise(new Reader.ReaderDiscarded())
         target.discard()
-      }
-    }
-  }
 
   /**
     * Copy bytes from many Readers to a Writer. The Writer is unmanaged, the
@@ -337,19 +318,17 @@ object Reader {
     *
     * @param n The number of bytes to read on each refill of the Writer.
     */
-  def copy(r: Reader, w: Writer, n: Int): Future[Unit] = {
+  def copy(r: Reader, w: Writer, n: Int): Future[Unit] =
     def loop(): Future[Unit] =
-      r.read(n) flatMap {
+      r.read(n) flatMap
         case None => Future.Done
         case Some(buf) => w.write(buf) before loop()
-      }
     val p = new Promise[Unit]
     // We have to do this because discarding the writer doesn't interrupt read
     // operations, it only fails the next write operation.
     loop() proxyTo p
     p setInterruptHandler { case exc => r.discard() }
     p
-  }
 
   /**
     * Copy the bytes from a Reader to a Writer in chunks of size
@@ -361,13 +340,12 @@ object Reader {
     * }}}
     */
   def copy(r: Reader, w: Writer): Future[Unit] = copy(r, w, Writer.BufferSize)
-}
 
 /**
   * A Writer represents a sink for a stream of bytes, providing
   * a convenient interface for the producer of such streams.
   */
-trait Writer {
+trait Writer
 
   /**
     * Write a chunk. The returned future is completed
@@ -383,12 +361,11 @@ trait Writer {
     * failed. No further writes are allowed.
     */
   def fail(cause: Throwable)
-}
 
 /**
   * @see Writers for Java friendly APIs.
   */
-object Writer {
+object Writer
 
   /**
     * Represents a [[Writer]] which is [[Closable]].
@@ -420,4 +397,3 @@ object Writer {
     */
   def fromOutputStream(out: OutputStream): ClosableWriter =
     fromOutputStream(out, BufferSize)
-}

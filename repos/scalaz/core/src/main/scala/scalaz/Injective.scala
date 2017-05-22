@@ -13,7 +13,7 @@ case class Injective3[T[_, _, _]]()
 case class Injective4[T[_, _, _, _]]()
 case class Injective5[T[_, _, _, _, _]]()
 
-object Injectivity {
+object Injectivity
   implicit def DisjunctionInjective = Injective2[\/]()
   implicit def EitherInjective = Injective2[Either]()
   implicit def EitherRightProjectionInjective =
@@ -46,4 +46,3 @@ object Injectivity {
   implicit def Tuple5Injective = Injective5[Tuple5]()
   implicit def ValidationInjective = Injective2[Validation]()
   implicit def StreamInjective = Injective[Stream]()
-}

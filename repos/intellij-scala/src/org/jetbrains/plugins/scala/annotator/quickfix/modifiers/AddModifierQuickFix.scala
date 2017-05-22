@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScModifierListOwner
   * Date: 23.10.2008
   */
 class AddModifierQuickFix(method: ScModifierListOwner, modifier: String)
-    extends IntentionAction {
+    extends IntentionAction
   def getText: String = ScalaBundle.message("add.modifier.fix", modifier)
 
   def startInWriteAction: Boolean = true
@@ -25,4 +25,3 @@ class AddModifierQuickFix(method: ScModifierListOwner, modifier: String)
     method.setModifierProperty(modifier, value = true)
 
   def getFamilyName: String = ScalaBundle.message("add.modifier.fix", modifier)
-}

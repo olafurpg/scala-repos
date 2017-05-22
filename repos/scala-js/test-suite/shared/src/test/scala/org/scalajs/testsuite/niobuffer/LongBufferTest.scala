@@ -11,60 +11,51 @@ import java.nio._
 
 import org.scalajs.testsuite.niobuffer.ByteBufferFactories._
 
-abstract class LongBufferTest extends BaseBufferTest {
+abstract class LongBufferTest extends BaseBufferTest
   type Factory = BufferFactory.LongBufferFactory
 
-  class AllocLongBufferFactory extends Factory {
+  class AllocLongBufferFactory extends Factory
     def allocBuffer(capacity: Int): LongBuffer =
       LongBuffer.allocate(capacity)
-  }
 
   class WrappedLongBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory with BufferFactory.WrappedBufferFactory
     def baseWrap(array: Array[Long]): LongBuffer =
       LongBuffer.wrap(array)
 
     def baseWrap(array: Array[Long], offset: Int, length: Int): LongBuffer =
       LongBuffer.wrap(array, offset, length)
-  }
 
   class ByteBufferLongViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory with BufferFactory.ByteBufferViewFactory
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): LongBuffer =
       byteBufferFactory.allocBuffer(capacity * 8).order(order).asLongBuffer()
-  }
-}
 
-class AllocLongBufferTest extends LongBufferTest {
+class AllocLongBufferTest extends LongBufferTest
   val factory: Factory = new AllocLongBufferFactory
-}
 
-class WrappedLongBufferTest extends LongBufferTest {
+class WrappedLongBufferTest extends LongBufferTest
   val factory: Factory = new WrappedLongBufferFactory
-}
 
-class WrappedLongReadOnlyBufferTest extends LongBufferTest {
+class WrappedLongReadOnlyBufferTest extends LongBufferTest
   val factory: Factory = new WrappedLongBufferFactory
   with BufferFactory.ReadOnlyBufferFactory
-}
 
-class AllocLongSlicedBufferTest extends LongBufferTest {
+class AllocLongSlicedBufferTest extends LongBufferTest
   val factory: Factory = new AllocLongBufferFactory
   with BufferFactory.SlicedBufferFactory
-}
 
 // Long views of byte buffers
 
 abstract class LongViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends LongBufferTest {
+    extends LongBufferTest
 
   val factory: BufferFactory.LongBufferFactory = new ByteBufferLongViewFactory(
       byteBufferFactory, order)
-}
 
 class LongViewOfAllocByteBufferBigEndianTest
     extends LongViewOfByteBufferTest(
@@ -94,13 +85,11 @@ class LongViewOfSlicedAllocByteBufferLittleEndianTest
 
 abstract class ReadOnlyLongViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends LongBufferTest {
+    extends LongBufferTest
 
-  val factory: BufferFactory.LongBufferFactory = {
+  val factory: BufferFactory.LongBufferFactory =
     new ByteBufferLongViewFactory(byteBufferFactory, order)
     with BufferFactory.ReadOnlyBufferFactory
-  }
-}
 
 class ReadOnlyLongViewOfAllocByteBufferBigEndianTest
     extends ReadOnlyLongViewOfByteBufferTest(

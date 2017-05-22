@@ -8,7 +8,7 @@ import scalaz.scalacheck.ScalazProperties
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.std.java.time._
 
-object TimeTest extends SpecLite {
+object TimeTest extends SpecLite
 
   private[this] def gen[A](implicit A: Arbitrary[A]): Gen[A] = A.arbitrary
 
@@ -67,4 +67,3 @@ object TimeTest extends SpecLite {
 
   checkAll("LocalDate", ScalazProperties.enum.laws[LocalDate])
   checkAll("Year", ScalazProperties.enum.laws[Year])
-}

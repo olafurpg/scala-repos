@@ -31,13 +31,12 @@ import javafx.beans.{binding => jfxbb}
 
 import scala.language.implicitConversions
 
-object StringExpression {
+object StringExpression
   implicit def sfxStringExpression2jfx(
       se: StringExpression): jfxbb.StringExpression =
     if (se != null) se.delegate else null
-}
 
-class StringExpression(val delegate: jfxbb.StringExpression) {
+class StringExpression(val delegate: jfxbb.StringExpression)
   def ===(v: Null) = delegate.isNull
   def ===(v: String) = delegate.isEqualTo(v)
   def ===(v: ObservableStringValue) = delegate.isEqualTo(v)
@@ -74,4 +73,3 @@ class StringExpression(val delegate: jfxbb.StringExpression) {
   def +(v: Null) = delegate.concat(v.asInstanceOf[String])
   def +(v: ObservableStringValue) = delegate.concat(v)
   def +(v: Any) = delegate.concat(v)
-}

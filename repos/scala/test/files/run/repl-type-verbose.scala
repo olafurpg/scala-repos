@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
     |// verbose!
@@ -18,4 +18,3 @@ object Test extends ReplTest {
     |:type -v def f[T: Ordering] = implicitly[Ordering[T]]
     |:type -v def f[T <: { type Bippy = List[Int] ; def g(): Bippy }] = 5
   """.stripMargin
-}

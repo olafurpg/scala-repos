@@ -15,20 +15,16 @@ import org.scalatest.BeforeAndAfterAll
 //#implicit-sender
 class MySpec()
     extends TestKit(ActorSystem("MySpec")) with ImplicitSender
-    with WordSpecLike with Matchers with BeforeAndAfterAll {
+    with WordSpecLike with Matchers with BeforeAndAfterAll
   //#implicit-sender
 
-  override def afterAll {
+  override def afterAll
     TestKit.shutdownActorSystem(system)
-  }
 
-  "An Echo actor" must {
+  "An Echo actor" must
 
-    "send back messages unchanged" in {
+    "send back messages unchanged" in
       val echo = system.actorOf(TestActors.echoActorProps)
       echo ! "hello world"
       expectMsg("hello world")
-    }
-  }
-}
 //#plain-spec

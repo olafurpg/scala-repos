@@ -1,4 +1,4 @@
-class NameDefaults {
+class NameDefaults
   val someString = "abc"
   val someInt = 42
 
@@ -6,10 +6,8 @@ class NameDefaults {
 
   implicit val l = 42
 
-  def bar {
+  def bar
     println()
     val someOtherInt = 10
 
     foo(y = someOtherInt /*#*/, x = someString /*#*/ )
-  }
-}

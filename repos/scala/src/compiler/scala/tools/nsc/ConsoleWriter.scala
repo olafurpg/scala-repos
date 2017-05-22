@@ -12,14 +12,12 @@ import java.io.Writer
   *  @author  Lex Spoon
   *  @version 1.0
   */
-class ConsoleWriter extends Writer {
+class ConsoleWriter extends Writer
   def close() = flush()
 
   def flush() = Console.flush()
 
-  def write(cbuf: Array[Char], off: Int, len: Int) {
+  def write(cbuf: Array[Char], off: Int, len: Int)
     if (len > 0) write(new String(cbuf.slice(off, off + len)))
-  }
 
   override def write(str: String) { Console.print(str) }
-}

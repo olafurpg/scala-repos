@@ -25,7 +25,7 @@ import org.apache.spark.sql.execution.datasources.json.JacksonUtils.nextUntil
 import org.apache.spark.sql.types._
 import org.apache.spark.util.Utils
 
-private[sql] object InferSchema {
+private[sql] object InferSchema
 
   /**
     * Infer the type of a collection of json records in three stages:
@@ -35,57 +35,51 @@ private[sql] object InferSchema {
     */
   def infer(json: RDD[String],
             columnNameOfCorruptRecords: String,
-            configOptions: JSONOptions): StructType = {
+            configOptions: JSONOptions): StructType =
     require(
         configOptions.samplingRatio > 0,
         s"samplingRatio (${configOptions.samplingRatio}) should be greater than 0")
     val shouldHandleCorruptRecord = configOptions.permissive
     val schemaData =
-      if (configOptions.samplingRatio > 0.99) {
+      if (configOptions.samplingRatio > 0.99)
         json
-      } else {
+      else
         json.sample(withReplacement = false, configOptions.samplingRatio, 1)
-      }
 
     // perform schema inference on each row and merge afterwards
-    val rootType = schemaData.mapPartitions { iter =>
+    val rootType = schemaData.mapPartitions  iter =>
       val factory = new JsonFactory()
       configOptions.setJacksonOptions(factory)
-      iter.flatMap { row =>
-        try {
-          Utils.tryWithResource(factory.createParser(row)) { parser =>
+      iter.flatMap  row =>
+        try
+          Utils.tryWithResource(factory.createParser(row))  parser =>
             parser.nextToken()
             Some(inferField(parser, configOptions))
-          }
-        } catch {
+        catch
           case _: JsonParseException if shouldHandleCorruptRecord =>
             Some(StructType(
                     Seq(StructField(columnNameOfCorruptRecords, StringType))))
           case _: JsonParseException =>
             None
-        }
-      }
-    }.treeAggregate[DataType](StructType(Seq()))(
+    .treeAggregate[DataType](StructType(Seq()))(
         compatibleRootType(
             columnNameOfCorruptRecords, shouldHandleCorruptRecord),
         compatibleRootType(
             columnNameOfCorruptRecords, shouldHandleCorruptRecord))
 
-    canonicalizeType(rootType) match {
+    canonicalizeType(rootType) match
       case Some(st: StructType) => st
       case _ =>
         // canonicalizeType erases all empty structs, including the only one we want to keep
         StructType(Seq())
-    }
-  }
 
   /**
     * Infer the type of a json document from the parser's token stream
     */
   private def inferField(
-      parser: JsonParser, configOptions: JSONOptions): DataType = {
+      parser: JsonParser, configOptions: JSONOptions): DataType =
     import com.fasterxml.jackson.core.JsonToken._
-    parser.getCurrentToken match {
+    parser.getCurrentToken match
       case null | VALUE_NULL => NullType
 
       case FIELD_NAME =>
@@ -104,11 +98,10 @@ private[sql] object InferSchema {
       case VALUE_STRING => StringType
       case START_OBJECT =>
         val builder = Seq.newBuilder[StructField]
-        while (nextUntil(parser, END_OBJECT)) {
+        while (nextUntil(parser, END_OBJECT))
           builder += StructField(parser.getCurrentName,
                                  inferField(parser, configOptions),
                                  nullable = true)
-        }
 
         StructType(builder.result().sortBy(_.name))
 
@@ -117,10 +110,9 @@ private[sql] object InferSchema {
         // If this array is not empty in other JSON objects, we can resolve
         // the type as we pass through all JSON objects.
         var elementType: DataType = NullType
-        while (nextUntil(parser, END_ARRAY)) {
+        while (nextUntil(parser, END_ARRAY))
           elementType = compatibleType(
               elementType, inferField(parser, configOptions))
-        }
 
         ArrayType(elementType)
 
@@ -133,7 +125,7 @@ private[sql] object InferSchema {
 
       case VALUE_NUMBER_INT | VALUE_NUMBER_FLOAT =>
         import JsonParser.NumberType._
-        parser.getNumberType match {
+        parser.getNumberType match
           // For Integer values, use LongType by default.
           case INT | LONG => LongType
           // Since we do not have a data type backed by BigInteger,
@@ -142,66 +134,56 @@ private[sql] object InferSchema {
             val v = parser.getDecimalValue
             DecimalType(v.precision(), v.scale())
           case FLOAT | DOUBLE =>
-            if (configOptions.floatAsBigDecimal) {
+            if (configOptions.floatAsBigDecimal)
               val v = parser.getDecimalValue
               DecimalType(v.precision(), v.scale())
-            } else {
+            else
               DoubleType
-            }
-        }
 
       case VALUE_TRUE | VALUE_FALSE => BooleanType
-    }
-  }
 
   /**
     * Convert NullType to StringType and remove StructTypes with no fields
     */
-  private def canonicalizeType(tpe: DataType): Option[DataType] = tpe match {
+  private def canonicalizeType(tpe: DataType): Option[DataType] = tpe match
     case at @ ArrayType(elementType, _) =>
-      for {
+      for
         canonicalType <- canonicalizeType(elementType)
-      } yield {
+      yield
         at.copy(canonicalType)
-      }
 
     case StructType(fields) =>
-      val canonicalFields: Array[StructField] = for {
+      val canonicalFields: Array[StructField] = for
         field <- fields if field.name.length > 0
         canonicalType <- canonicalizeType(field.dataType)
-      } yield {
+      yield
         field.copy(dataType = canonicalType)
-      }
 
-      if (canonicalFields.length > 0) {
+      if (canonicalFields.length > 0)
         Some(StructType(canonicalFields))
-      } else {
+      else
         // per SPARK-8093: empty structs should be deleted
         None
-      }
 
     case NullType => Some(StringType)
     case other => Some(other)
-  }
 
   private def withCorruptField(
-      struct: StructType, columnNameOfCorruptRecords: String): StructType = {
-    if (!struct.fieldNames.contains(columnNameOfCorruptRecords)) {
+      struct: StructType, columnNameOfCorruptRecords: String): StructType =
+    if (!struct.fieldNames.contains(columnNameOfCorruptRecords))
       // If this given struct does not have a column used for corrupt records,
       // add this field.
       struct.add(columnNameOfCorruptRecords, StringType, nullable = true)
-    } else {
+    else
       // Otherwise, just return this struct.
       struct
-    }
-  }
 
   /**
     * Remove top-level ArrayType wrappers and merge the remaining schemas
     */
   private def compatibleRootType(
       columnNameOfCorruptRecords: String,
-      shouldHandleCorruptRecord: Boolean): (DataType, DataType) => DataType = {
+      shouldHandleCorruptRecord: Boolean): (DataType, DataType) => DataType =
     // Since we support array of json objects at the top level,
     // we need to check the element type and find the root level data type.
     case (ArrayType(ty1, _), ty2) =>
@@ -223,15 +205,14 @@ private[sql] object InferSchema {
     // If we get anything else, we call compatibleType.
     // Usually, when we reach here, ty1 and ty2 are two StructTypes.
     case (ty1, ty2) => compatibleType(ty1, ty2)
-  }
 
   /**
     * Returns the most general data type for two given data types.
     */
-  def compatibleType(t1: DataType, t2: DataType): DataType = {
-    HiveTypeCoercion.findTightestCommonTypeOfTwo(t1, t2).getOrElse {
+  def compatibleType(t1: DataType, t2: DataType): DataType =
+    HiveTypeCoercion.findTightestCommonTypeOfTwo(t1, t2).getOrElse
       // t1 or t2 is a StructType, ArrayType, or an unexpected type.
-      (t1, t2) match {
+      (t1, t2) match
         // Double support larger range than fixed decimal, DecimalType.Maximum should be enough
         // in most case, also have better precision.
         case (DoubleType, _: DecimalType) | (_: DecimalType, DoubleType) =>
@@ -241,21 +222,19 @@ private[sql] object InferSchema {
           val scale = math.max(t1.scale, t2.scale)
           val range =
             math.max(t1.precision - t1.scale, t2.precision - t2.scale)
-          if (range + scale > 38) {
+          if (range + scale > 38)
             // DecimalType can't support precision > 38
             DoubleType
-          } else {
+          else
             DecimalType(range + scale, scale)
-          }
 
         case (StructType(fields1), StructType(fields2)) =>
           val newFields =
-            (fields1 ++ fields2).groupBy(field => field.name).map {
+            (fields1 ++ fields2).groupBy(field => field.name).map
               case (name, fieldTypes) =>
                 val dataType =
                   fieldTypes.view.map(_.dataType).reduce(compatibleType)
                 StructField(name, dataType, nullable = true)
-            }
           StructType(newFields.toSeq.sortBy(_.name))
 
         case (ArrayType(elementType1, containsNull1),
@@ -265,7 +244,3 @@ private[sql] object InferSchema {
 
         // strings and every string is a Json object.
         case (_, _) => StringType
-      }
-    }
-  }
-}

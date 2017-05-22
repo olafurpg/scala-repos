@@ -4,7 +4,7 @@ import cascading.tap.hadoop.Hfs
 import org.apache.hadoop.mapred.JobConf
 import org.slf4j.LoggerFactory
 
-object InputSizeReducerEstimator {
+object InputSizeReducerEstimator
   val BytesPerReducer = "scalding.reducer.estimator.bytes.per.reducer"
   val defaultBytesPerReducer = 1L << 32 // 4 GB
 
@@ -18,14 +18,13 @@ object InputSizeReducerEstimator {
     */
   def getBytesPerReducer(conf: JobConf): Long =
     conf.getLongBytes(BytesPerReducer, defaultBytesPerReducer)
-}
 
 /**
   * Estimator that uses the input size and a fixed "bytesPerReducer" target.
   *
   * Bytes per reducer can be configured with configuration parameter, defaults to 4 GB.
   */
-class InputSizeReducerEstimator extends ReducerEstimator {
+class InputSizeReducerEstimator extends ReducerEstimator
 
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
@@ -34,7 +33,7 @@ class InputSizeReducerEstimator extends ReducerEstimator {
     * of reducers using the "bytesPerReducer" configuration parameter.
     */
   override def estimateReducers(info: FlowStrategyInfo): Option[Int] =
-    Common.inputSizes(info.step) match {
+    Common.inputSizes(info.step) match
       case Nil =>
         LOG.warn(
             "InputSizeReducerEstimator unable to estimate reducers; " +
@@ -51,9 +50,9 @@ class InputSizeReducerEstimator extends ReducerEstimator {
         val nReducers =
           (totalBytes.toDouble / bytesPerReducer).ceil.toInt max 1
 
-        lazy val logStr = inputSizes.map {
+        lazy val logStr = inputSizes.map
           case (name, bytes) => s"   - ${name}\t${bytes}"
-        }.mkString("\n")
+        .mkString("\n")
 
         LOG.info(
             "\nInputSizeReducerEstimator" + "\n - input size (bytes): " +
@@ -61,5 +60,3 @@ class InputSizeReducerEstimator extends ReducerEstimator {
             "\n - Breakdown:\n" + logStr)
 
         Some(nReducers)
-    }
-}

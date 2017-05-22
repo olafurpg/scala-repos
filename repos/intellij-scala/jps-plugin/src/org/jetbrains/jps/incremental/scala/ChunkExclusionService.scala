@@ -8,15 +8,12 @@ import scala.collection.JavaConverters._
 /**
   * @author Pavel Fatin
   */
-abstract class ChunkExclusionService {
+abstract class ChunkExclusionService
   def isExcluded(chunk: ModuleChunk): Boolean
-}
 
-object ChunkExclusionService {
-  def isExcluded(chunk: ModuleChunk): Boolean = {
+object ChunkExclusionService
+  def isExcluded(chunk: ModuleChunk): Boolean =
     val providers = JpsServiceManager.getInstance
       .getExtensions(classOf[ChunkExclusionService])
       .asScala
     providers.exists(_.isExcluded(chunk))
-  }
-}

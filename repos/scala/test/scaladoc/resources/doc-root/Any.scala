@@ -11,7 +11,7 @@ package scala
 /** Class `Any` is the root of the Scala class hierarchy.  Every class in a Scala
   *  execution environment inherits directly or indirectly from this class.
   */
-abstract class Any {
+abstract class Any
 
   /** Compares the receiver object (`this`) with the argument object (`that`) for equivalence.
     *
@@ -112,4 +112,3 @@ abstract class Any {
     *  @return the receiver object.
     */
   def asInstanceOf[T0]: T0 = sys.error("asInstanceOf")
-}

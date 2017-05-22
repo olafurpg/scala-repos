@@ -26,13 +26,13 @@ case class BrokerMetadata(brokerId: Int)
 /**
   * This class saves broker's metadata to a file
   */
-class BrokerMetadataCheckpoint(val file: File) extends Logging {
+class BrokerMetadataCheckpoint(val file: File) extends Logging
   private val lock = new Object()
   new File(file + ".tmp").delete() // try to delete any existing temp files for cleanliness
 
-  def write(brokerMetadata: BrokerMetadata) = {
-    lock synchronized {
-      try {
+  def write(brokerMetadata: BrokerMetadata) =
+    lock synchronized
+      try
         val brokerMetaProps = new Properties()
         brokerMetaProps.setProperty("version", 0.toString)
         brokerMetaProps.setProperty(
@@ -44,22 +44,19 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
         fileOutputStream.getFD().sync()
         fileOutputStream.close()
         Utils.atomicMoveWithFallback(temp.toPath, file.toPath)
-      } catch {
+      catch
         case ie: IOException =>
           error("Failed to write meta.properties due to", ie)
           throw ie
-      }
-    }
-  }
 
-  def read(): Option[BrokerMetadata] = {
-    lock synchronized {
-      try {
+  def read(): Option[BrokerMetadata] =
+    lock synchronized
+      try
         val brokerMetaProps =
           new VerifiableProperties(Utils.loadProps(file.getAbsolutePath()))
         val version =
           brokerMetaProps.getIntInRange("version", (0, Int.MaxValue))
-        version match {
+        version match
           case 0 =>
             val brokerId =
               brokerMetaProps.getIntInRange("broker.id", (0, Int.MaxValue))
@@ -68,8 +65,7 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
             throw new IOException(
                 "Unrecognized version of the server meta.properties file: " +
                 version)
-        }
-      } catch {
+      catch
         case e: FileNotFoundException =>
           warn("No meta.properties file under dir %s".format(
                   file.getAbsolutePath()))
@@ -78,7 +74,3 @@ class BrokerMetadataCheckpoint(val file: File) extends Logging {
           error("Failed to read meta.properties file under dir %s due to %s"
                 .format(file.getAbsolutePath(), e1.getMessage))
           throw e1
-      }
-    }
-  }
-}

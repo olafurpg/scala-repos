@@ -29,23 +29,22 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 class DecisionTreeRegressorSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   import DecisionTreeRegressorSuite.compareAPIs
 
   private var categoricalDataPointsRDD: RDD[LabeledPoint] = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     categoricalDataPointsRDD = sc.parallelize(
         OldDecisionTreeSuite.generateCategoricalDataPoints())
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests calling train()
   /////////////////////////////////////////////////////////////////////////////
 
-  test("Regression stump with 3-ary (ordered) categorical features") {
+  test("Regression stump with 3-ary (ordered) categorical features")
     val dt = new DecisionTreeRegressor()
       .setImpurity("variance")
       .setMaxDepth(2)
@@ -53,18 +52,16 @@ class DecisionTreeRegressorSuite
       .setSeed(1)
     val categoricalFeatures = Map(0 -> 3, 1 -> 3)
     compareAPIs(categoricalDataPointsRDD, dt, categoricalFeatures)
-  }
 
-  test("Regression stump with binary (ordered) categorical features") {
+  test("Regression stump with binary (ordered) categorical features")
     val dt = new DecisionTreeRegressor()
       .setImpurity("variance")
       .setMaxDepth(2)
       .setMaxBins(100)
     val categoricalFeatures = Map(0 -> 2, 1 -> 2)
     compareAPIs(categoricalDataPointsRDD, dt, categoricalFeatures)
-  }
 
-  test("copied model must have the same parent") {
+  test("copied model must have the same parent")
     val categoricalFeatures = Map(0 -> 2, 1 -> 2)
     val df = TreeTests.setMetadata(
         categoricalDataPointsRDD, categoricalFeatures, numClasses = 0)
@@ -74,9 +71,8 @@ class DecisionTreeRegressorSuite
       .setMaxBins(8)
       .fit(df)
     MLTestingUtils.checkCopy(model)
-  }
 
-  test("predictVariance") {
+  test("predictVariance")
     val dt = new DecisionTreeRegressor()
       .setImpurity("variance")
       .setMaxDepth(2)
@@ -94,16 +90,14 @@ class DecisionTreeRegressorSuite
       .select(model.getFeaturesCol, model.getVarianceCol)
       .collect()
 
-    predictions.foreach {
+    predictions.foreach
       case Row(features: Vector, variance: Double) =>
         val expectedVariance =
           model.rootNode.predictImpl(features).impurityStats.calculate()
         assert(variance === expectedVariance,
                s"Expected variance $expectedVariance but got $variance.")
-    }
-  }
 
-  test("Feature importance with toy data") {
+  test("Feature importance with toy data")
     val dt = new DecisionTreeRegressor()
       .setImpurity("variance")
       .setMaxDepth(3)
@@ -121,18 +115,16 @@ class DecisionTreeRegressorSuite
     assert(mostImportantFeature === 1)
     assert(importances.toArray.sum === 1.0)
     assert(importances.toArray.forall(_ >= 0.0))
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests of model save/load
   /////////////////////////////////////////////////////////////////////////////
 
-  test("read/write") {
+  test("read/write")
     def checkModelData(model: DecisionTreeRegressionModel,
-                       model2: DecisionTreeRegressionModel): Unit = {
+                       model2: DecisionTreeRegressionModel): Unit =
       TreeTests.checkEqual(model, model2)
       assert(model.numFeatures === model2.numFeatures)
-    }
 
     val dt = new DecisionTreeRegressor()
     val rdd = TreeTests.getTreeReadWriteData(sc)
@@ -155,10 +147,8 @@ class DecisionTreeRegressorSuite
         continuousData,
         TreeTests.allParamSettings ++ Map("maxDepth" -> 0),
         checkModelData)
-  }
-}
 
-private[ml] object DecisionTreeRegressorSuite extends SparkFunSuite {
+private[ml] object DecisionTreeRegressorSuite extends SparkFunSuite
 
   /**
     * Train 2 decision trees on the given dataset, one using the old API and one using the new API.
@@ -166,7 +156,7 @@ private[ml] object DecisionTreeRegressorSuite extends SparkFunSuite {
     */
   def compareAPIs(data: RDD[LabeledPoint],
                   dt: DecisionTreeRegressor,
-                  categoricalFeatures: Map[Int, Int]): Unit = {
+                  categoricalFeatures: Map[Int, Int]): Unit =
     val numFeatures = data.first().features.size
     val oldStrategy = dt.getOldStrategy(categoricalFeatures)
     val oldTree = OldDecisionTree.train(data, oldStrategy)
@@ -180,5 +170,3 @@ private[ml] object DecisionTreeRegressorSuite extends SparkFunSuite {
         categoricalFeatures)
     TreeTests.checkEqual(oldTreeAsNew, newTree)
     assert(newTree.numFeatures === numFeatures)
-  }
-}

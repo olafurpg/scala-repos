@@ -20,7 +20,7 @@ import org.jetbrains.sbt.project.data.AndroidFacetData
   */
 class AndroidFacetDataService
     extends AbstractDataService[AndroidFacetData, AndroidFacet](
-        AndroidFacetData.Key) {
+        AndroidFacetData.Key)
 
   override def createImporter(toImport: Seq[DataNode[AndroidFacetData]],
                               projectData: ProjectData,
@@ -29,41 +29,37 @@ class AndroidFacetDataService
     : Importer[AndroidFacetData] =
     new AndroidFacetDataService.Importer(
         toImport, projectData, project, modelsProvider)
-}
 
-object AndroidFacetDataService {
+object AndroidFacetDataService
   private class Importer(dataToImport: Seq[DataNode[AndroidFacetData]],
                          projectData: ProjectData,
                          project: Project,
                          modelsProvider: IdeModifiableModelsProvider)
       extends AbstractImporter[AndroidFacetData](
-          dataToImport, projectData, project, modelsProvider) {
+          dataToImport, projectData, project, modelsProvider)
 
     override def importData(): Unit =
-      dataToImport.foreach { facetNode =>
-        for {
+      dataToImport.foreach  facetNode =>
+        for
           module <- getIdeModuleByNode(facetNode)
           facet = getOrCreateFacet(module)
-        } {
+        
           configureFacet(module, facet, facetNode.getData)
-        }
-      }
 
     private def getOrCreateFacet(module: Module): AndroidFacet =
       Option(getModifiableFacetModel(module).getFacetByType(AndroidFacet.ID))
         .getOrElse(createFacet(module))
 
-    private def createFacet(module: Module): AndroidFacet = {
+    private def createFacet(module: Module): AndroidFacet =
       val model = getModifiableFacetModel(module)
       val facetType = new AndroidFacetType
       val facet = facetType.createFacet(
           module, "Android", facetType.createDefaultConfiguration(), null)
       model.addFacet(facet)
       facet
-    }
 
     private def configureFacet(
-        module: Module, facet: AndroidFacet, data: AndroidFacetData) = {
+        module: Module, facet: AndroidFacet, data: AndroidFacetData) =
       val configuration = facet.getConfiguration.getState
 
       val base = AndroidRootUtil.getModuleDirPath(module)
@@ -82,7 +78,7 @@ object AndroidFacetDataService {
       configuration.LIBRARY_PROJECT = data.isLibrary
       configuration.myProGuardCfgFiles = new util.ArrayList[String]()
 
-      if (data.proguardConfig.nonEmpty) {
+      if (data.proguardConfig.nonEmpty)
         val proguardFile =
           new File(module.getProject.getBasePath) / "proguard-sbt.txt"
         FileUtil.writeToFile(
@@ -90,7 +86,3 @@ object AndroidFacetDataService {
             data.proguardConfig.mkString(SystemProperties.getLineSeparator))
         configuration.myProGuardCfgFiles.add(proguardFile.getCanonicalPath)
         configuration.RUN_PROGUARD = true
-      }
-    }
-  }
-}

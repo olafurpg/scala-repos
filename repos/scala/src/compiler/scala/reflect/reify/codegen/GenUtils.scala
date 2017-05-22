@@ -1,7 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenUtils { self: Reifier =>
+trait GenUtils  self: Reifier =>
 
   import global._
 
@@ -11,12 +11,11 @@ trait GenUtils { self: Reifier =>
   def reifyProduct(x: Product): Tree =
     reifyProduct(x.productPrefix, x.productIterator.toList)
 
-  def reifyProduct(prefix: String, elements: List[Any]): Tree = {
+  def reifyProduct(prefix: String, elements: List[Any]): Tree =
     // reflection would be more robust, but, hey, this is a hot path
     if (prefix.startsWith("Tuple"))
       scalaFactoryCall(prefix, (elements map reify).toList: _*)
     else mirrorCall(TermName(prefix), (elements map reify): _*)
-  }
 
   // helper functions
 
@@ -70,49 +69,43 @@ trait GenUtils { self: Reifier =>
     * An (unreified) path that refers to definition with given fully qualified name
     *  @param mkName   Creator for last portion of name (either TermName or TypeName)
     */
-  def path(fullname: String, mkName: String => Name): Tree = {
+  def path(fullname: String, mkName: String => Name): Tree =
     val parts = fullname split "\\."
     val prefixParts = parts.init
     val lastName = mkName(parts.last)
     if (prefixParts.isEmpty) Ident(lastName)
-    else {
+    else
       val prefixTree =
         ((Ident(prefixParts.head): Tree) /: prefixParts.tail)(Select(_, _))
       Select(prefixTree, lastName)
-    }
-  }
 
   /** An (unreified) path that refers to term definition with given fully qualified name */
   def termPath(fullname: String): Tree = path(fullname, newTermName)
 
-  object TypedOrAnnotated {
-    def unapply(tree: Tree): Option[Tree] = tree match {
+  object TypedOrAnnotated
+    def unapply(tree: Tree): Option[Tree] = tree match
       case ty @ Typed(_, _) =>
         Some(ty)
       case at @ Annotated(_, _) =>
         Some(at)
       case _ =>
         None
-    }
-  }
 
-  def isSemiConcreteTypeMember(tpe: Type) = tpe match {
+  def isSemiConcreteTypeMember(tpe: Type) = tpe match
     case TypeRef(SingleType(_, _), sym, _)
         if sym.isAbstractType && !sym.isExistential =>
       true
     case _ => false
-  }
 
-  def isCrossStageTypeBearer(tree: Tree): Boolean = tree match {
+  def isCrossStageTypeBearer(tree: Tree): Boolean = tree match
     case TypeApply(hk, _) => isCrossStageTypeBearer(hk)
     case Select(sym @ Select(_, ctor), nme.apply)
         if ctor == nme.WeakTypeTag || ctor == nme.TypeTag ||
         ctor == nme.Expr =>
       true
     case _ => false
-  }
 
-  def origin(sym: Symbol) = {
+  def origin(sym: Symbol) =
     var origin = ""
     if (sym.owner != NoSymbol) origin += "defined by %s".format(sym.owner.name)
     if (sym.pos != NoPosition)
@@ -120,5 +113,3 @@ trait GenUtils { self: Reifier =>
           sym.pos.source.file.name, sym.pos.line, sym.pos.column)
     if (origin == "") origin = "of unknown origin"
     origin
-  }
-}

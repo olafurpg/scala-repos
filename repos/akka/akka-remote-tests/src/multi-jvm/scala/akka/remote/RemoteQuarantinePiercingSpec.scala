@@ -18,7 +18,7 @@ import akka.remote.testconductor.RoleName
 import akka.actor.Identify
 import scala.concurrent.Await
 
-object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
+object RemoteQuarantinePiercingSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -27,14 +27,11 @@ object RemoteQuarantinePiercingSpec extends MultiNodeConfig {
       akka.remote.log-remote-lifecycle-events = INFO
                               """)))
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒ context.system.terminate()
       case "identify" ⇒
         sender() ! (AddressUidExtension(context.system).addressUid -> self)
-    }
-  }
-}
 
 class RemoteQuarantinePiercingMultiJvmNode1
     extends RemoteQuarantinePiercingSpec
@@ -43,21 +40,20 @@ class RemoteQuarantinePiercingMultiJvmNode2
 
 abstract class RemoteQuarantinePiercingSpec
     extends MultiNodeSpec(RemoteQuarantinePiercingSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import RemoteQuarantinePiercingSpec._
 
   override def initialParticipants = roles.size
 
-  def identify(role: RoleName, actorName: String): (Int, ActorRef) = {
+  def identify(role: RoleName, actorName: String): (Int, ActorRef) =
     system.actorSelection(node(role) / "user" / actorName) ! "identify"
     expectMsgType[(Int, ActorRef)]
-  }
 
-  "RemoteNodeShutdownAndComesBack" must {
+  "RemoteNodeShutdownAndComesBack" must
 
-    "allow piercing through the quarantine when remote UID is new" taggedAs LongRunningTest in {
-      runOn(first) {
+    "allow piercing through the quarantine when remote UID is new" taggedAs LongRunningTest in
+      runOn(first)
         val secondAddress = node(second).address
         enterBarrier("actors-started")
 
@@ -78,25 +74,22 @@ abstract class RemoteQuarantinePiercingSpec
         Await.result(testConductor.shutdown(second), 30.seconds)
 
         // Now wait until second system becomes alive again
-        within(30.seconds) {
+        within(30.seconds)
           // retry because the Subject actor might not be started yet
-          awaitAssert {
+          awaitAssert
             system.actorSelection(
                 RootActorPath(secondAddress) / "user" / "subject") ! "identify"
             val (uidSecond, subjectSecond) =
               expectMsgType[(Int, ActorRef)](1.second)
             uidSecond should not be (uidFirst)
             subjectSecond should not be (subjectFirst)
-          }
-        }
 
         // If we got here the Quarantine was successfully pierced since it is configured to last 1 day
 
         system.actorSelection(
             RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
-      }
 
-      runOn(second) {
+      runOn(second)
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         system.actorOf(Props[Subject], "subject")
@@ -116,7 +109,3 @@ abstract class RemoteQuarantinePiercingSpec
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
-      }
-    }
-  }
-}

@@ -23,17 +23,16 @@ trait MyNumeric[R]
   *                                        // should not be abstract!
   * }}}
   */
-class A[T] {
+class A[T]
 
   /** This should prevent the implicitly inherited `def convToEnrichedA: T` from `enrichA0` from showing up */
   def convToEnrichedA(x: T): T = sys.error("Let's check it out!")
 
   /** This should check implicit member elimination in the case of subtyping */
   def foo(a: T, b: AnyRef): T
-}
 
 /** Companion object with implicit transformations  */
-object A {
+object A
   import language.implicitConversions // according to SIP18
 
   implicit def enrichA0[V](a: A[V]) = new EnrichedA(a)
@@ -49,10 +48,8 @@ object A {
   implicit def enrichA6[Z : MyNumeric](a: A[Z]) = new MyNumericA[Z](a)
   // TODO: Add H <: Double and see why it crashes for C and D -- context bounds, need to check!
   implicit def enrichA7[H <: Double : Manifest](a: A[H]) =
-    new ManifestA[H](a) with MyTraversableOps[H] {
+    new ManifestA[H](a) with MyTraversableOps[H]
       def convToTraversableOps(x: H): H = sys.error("no")
-    }
-}
 
 /** Class B
   *  - tests the existential type solving
@@ -103,64 +100,57 @@ object D extends A
 /** EnrichedA class <br/>
   *  - tests simple inheritance and asSeenFrom
   *  - A, B and C should be implicitly converted to this */
-class EnrichedA[V](a: A[V]) {
+class EnrichedA[V](a: A[V])
 
   /** The convToEnrichedA: V documentation... */
   def convToEnrichedA(x: V): V = sys.error("Not implemented")
-}
 
 /** NumericA class <br/>
   *  - tests the implicit conversion between parametric and fixed types
   *  - A, B and C should be implicitly converted to this */
-class NumericA[U : Numeric](a: A[U]) {
+class NumericA[U : Numeric](a: A[U])
 
   /** The convToNumericA: U documentation... */
   def convToNumericA(x: U): U = implicitly[Numeric[U]].zero
-}
 
 /** IntA class <br/>
   *  - tests the interaction between implicit conversion and specific types
   *  - A and C should be implicitly converted to this */
-class IntA(a: A[Int]) {
+class IntA(a: A[Int])
 
   /** The convToIntA: Int documentation... */
   def convToIntA(x: Int): Int = 0
-}
 
 /** GtColonDoubleA class <br/>
   *  - tests the interaction between implicit conversion and existential types
   *  - A and B should be implicitly converted to this */
-class GtColonDoubleA(a: A[T] forSome { type T <: Double }) {
+class GtColonDoubleA(a: A[T] forSome { type T <: Double })
 
   /** The convToGtColonDoubleA: Double documentation... */
   def convToGtColonDoubleA(x: Double): Double = 0
-}
 
 /** MyNumericA class <br/>
   *  - tests the implicit conversion between parametric and fixed types
   *  - A should be implicitly converted to this */
-class MyNumericA[U : MyNumeric](a: A[U]) {
+class MyNumericA[U : MyNumeric](a: A[U])
 
   /** The convToMyNumericA: U documentation... */
   def convToMyNumericA(x: U): U = sys.error("dunno")
-}
 
 /** ManifestA class <br/>
   *  - tests the manifest recognition
   *  - A, B, C, D should be implicitly converted to this */
-class ManifestA[W : Manifest](a: A[W]) {
+class ManifestA[W : Manifest](a: A[W])
 
   /** The convToManifestA: W documentation... */
   def convToManifestA(x: W): W = sys.error("dunno")
-}
 
 // [Eugene to Vlad] how do I test typetags here?
 
 /** MyTraversableOps class <br/>
   *  - checks if any abstract members are added - should not happen!
   */
-trait MyTraversableOps[S] {
+trait MyTraversableOps[S]
 
   /** The convToTraversableOps: S documentation... */
   def convToTraversableOps(x: S): S
-}

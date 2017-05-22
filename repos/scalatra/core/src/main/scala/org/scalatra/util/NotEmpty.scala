@@ -8,16 +8,12 @@ package org.scalatra.util
   *   case _ => message("foo is required")
   * }
   */
-object NotEmpty {
+object NotEmpty
 
-  def unapply(s: String): Option[String] = {
+  def unapply(s: String): Option[String] =
     if (s != null && !s.isEmpty) Some(s)
     else None
-  }
 
-  def unapply(o: Option[String]): Option[String] = {
-    o flatMap { s =>
+  def unapply(o: Option[String]): Option[String] =
+    o flatMap  s =>
       unapply(s)
-    }
-  }
-}

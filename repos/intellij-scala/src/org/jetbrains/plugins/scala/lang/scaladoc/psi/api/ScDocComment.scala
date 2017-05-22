@@ -11,10 +11,9 @@ import com.intellij.psi.javadoc.{PsiDocComment, PsiDocTag}
   * User: Alexander Podkhalyuzin
   * Date: 22.07.2008
   */
-trait ScDocComment extends PsiDocComment with ScalaPsiElement {
+trait ScDocComment extends PsiDocComment with ScalaPsiElement
   def version: Int
 
   def findTagsByName(name: String): Array[PsiDocTag]
 
   def findTagsByName(filter: String => Boolean): Array[PsiDocTag]
-}

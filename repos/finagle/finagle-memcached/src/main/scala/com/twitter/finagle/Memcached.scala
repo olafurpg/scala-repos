@@ -31,45 +31,37 @@ import scala.collection.mutable
   * Defines a [[Tracer]] that understands the finagle-memcached request type.
   * This is installed as the `ClientTracingFilter` in the default stack.
   */
-private[finagle] object MemcachedTraceInitializer {
+private[finagle] object MemcachedTraceInitializer
   object Module
-      extends Stack.Module1[param.Tracer, ServiceFactory[Command, Response]] {
+      extends Stack.Module1[param.Tracer, ServiceFactory[Command, Response]]
     val role = TraceInitializerFilter.role
     val description = "Initialize traces for the client and record hits/misses"
-    def make(_tracer: param.Tracer, next: ServiceFactory[Command, Response]) = {
+    def make(_tracer: param.Tracer, next: ServiceFactory[Command, Response]) =
       val param.Tracer(tracer) = _tracer
       val filter = new Filter(tracer)
       filter andThen next
-    }
-  }
 
-  class Filter(tracer: Tracer) extends SimpleFilter[Command, Response] {
+  class Filter(tracer: Tracer) extends SimpleFilter[Command, Response]
     def apply(command: Command,
               service: Service[Command, Response]): Future[Response] =
-      Trace.letTracerAndNextId(tracer) {
+      Trace.letTracerAndNextId(tracer)
         val response = service(command)
         Trace.recordRpc(command.name)
-        command match {
+        command match
           case command: RetrievalCommand if Trace.isActivelyTracing =>
-            response onSuccess {
+            response onSuccess
               case Values(vals) =>
                 val cmd = command.asInstanceOf[RetrievalCommand]
                 val misses = mutable.Set.empty[String]
                 cmd.keys foreach { case Buf.Utf8(key) => misses += key }
-                vals foreach { value =>
+                vals foreach  value =>
                   val Buf.Utf8(key) = value.key
                   Trace.recordBinary(key, "Hit")
                   misses.remove(key)
-                }
                 misses foreach { Trace.recordBinary(_, "Miss") }
               case _ =>
-            }
           case _ =>
-        }
         response
-      }
-  }
-}
 
 /**
   * Factory methods to build a finagle-memcached client.
@@ -88,27 +80,24 @@ private[finagle] object MemcachedTraceInitializer {
   * Argument `label` is used to assign a label to this client.
   * The label is used to scope stats, etc.
   */
-trait MemcachedRichClient { self: finagle.Client[Command, Response] =>
+trait MemcachedRichClient  self: finagle.Client[Command, Response] =>
 
   /** $partitioned $label */
   def newRichClient(dest: Name, label: String): memcached.Client =
     newTwemcacheClient(dest, label)
 
   /** $partitioned */
-  def newRichClient(dest: String): memcached.Client = {
+  def newRichClient(dest: String): memcached.Client =
     val (n, l) = Resolver.evalLabeled(dest)
     newTwemcacheClient(n, l)
-  }
 
   /** $partitioned $label */
   def newTwemcacheClient(dest: Name, label: String): TwemcacheClient
 
   /** $partitioned */
-  def newTwemcacheClient(dest: String): TwemcacheClient = {
+  def newTwemcacheClient(dest: String): TwemcacheClient =
     val (n, l) = Resolver.evalLabeled(dest)
     newTwemcacheClient(n, l)
-  }
-}
 
 /**
   * Stack based Memcached client.
@@ -131,42 +120,35 @@ trait MemcachedRichClient { self: finagle.Client[Command, Response] =>
   */
 object Memcached
     extends finagle.Client[Command, Response]
-    with finagle.Server[Command, Response] {
+    with finagle.Server[Command, Response]
 
   /**
     * Memcached specific stack params.
     */
-  object param {
-    case class EjectFailedHost(v: Boolean) {
+  object param
+    case class EjectFailedHost(v: Boolean)
       def mk(): (EjectFailedHost, Stack.Param[EjectFailedHost]) =
         (this, EjectFailedHost.param)
-    }
 
-    object EjectFailedHost {
+    object EjectFailedHost
       implicit val param = Stack.Param(EjectFailedHost(false))
-    }
 
-    case class KeyHasher(hasher: hashing.KeyHasher) {
+    case class KeyHasher(hasher: hashing.KeyHasher)
       def mk(): (KeyHasher, Stack.Param[KeyHasher]) =
         (this, KeyHasher.param)
-    }
 
-    object KeyHasher {
+    object KeyHasher
       implicit val param = Stack.Param(KeyHasher(hashing.KeyHasher.KETAMA))
-    }
 
-    case class NumReps(reps: Int) {
+    case class NumReps(reps: Int)
       def mk(): (NumReps, Stack.Param[NumReps]) =
         (this, NumReps.param)
-    }
 
-    object NumReps {
+    object NumReps
       implicit val param =
         Stack.Param(NumReps(KetamaPartitionedClient.DefaultNumReps))
-    }
-  }
 
-  object Client {
+  object Client
 
     private[Memcached] val ProtocolLibraryName = "memcached"
 
@@ -205,13 +187,12 @@ object Memcached
       */
     def mkDestination(hostName: String, port: Int): String =
       s"${FixedInetResolver.scheme}!$hostName:$port"
-  }
 
   private[finagle] def registerClient(
       label: String,
       hasher: String,
       isPipelining: Boolean
-  ): Unit = {
+  ): Unit =
     GlobalRegistry.get.put(Seq(ClientRegistry.registryName,
                                Client.ProtocolLibraryName,
                                label,
@@ -222,7 +203,6 @@ object Memcached
                                label,
                                "key_hasher"),
                            hasher)
-  }
 
   /**
     * A memcached client with support for pipelined requests, consistent hashing,
@@ -232,7 +212,7 @@ object Memcached
       stack: Stack[ServiceFactory[Command, Response]] = Client.newStack,
       params: Stack.Params = Client.defaultParams)
       extends StdStackClient[Command, Response, Client]
-      with WithConcurrentLoadBalancer[Client] with MemcachedRichClient {
+      with WithConcurrentLoadBalancer[Client] with MemcachedRichClient
 
     import Client.mkDestination
 
@@ -255,20 +235,19 @@ object Memcached
             .scope(GenSerialClientDispatcher.StatsScope)
       )
 
-    def newTwemcacheClient(dest: Name, label: String): TwemcacheClient = {
+    def newTwemcacheClient(dest: Name, label: String): TwemcacheClient =
       val _dest =
-        if (LocalMemcached.enabled) {
+        if (LocalMemcached.enabled)
           Resolver.eval(mkDestination("localhost", LocalMemcached.port))
-        } else dest
+        else dest
 
       // Memcache only support Name.Bound names (TRFC-162).
       // See KetamaPartitionedClient for more details.
-      val va = _dest match {
+      val va = _dest match
         case Name.Bound(va) => va
         case n =>
           throw new IllegalArgumentException(
               s"Memcached client only supports Bound Names, was: $n")
-      }
 
       val finagle.param.Stats(sr) = params[finagle.param.Stats]
       val param.KeyHasher(hasher) = params[param.KeyHasher]
@@ -278,21 +257,19 @@ object Memcached
 
       val healthBroker = new Broker[NodeHealth]
 
-      def newService(node: CacheNode): Service[Command, Response] = {
+      def newService(node: CacheNode): Service[Command, Response] =
         val key = KetamaClientKey.fromCacheNode(node)
         val stk = stack.replace(
             FailureAccrualFactory.role,
             KetamaFailureAccrualFactory.module[Command, Response](
                 key, healthBroker))
         withStack(stk).newService(mkDestination(node.host, node.port), label)
-      }
 
       val group = CacheNodeGroup.fromVarAddr(va)
       val scopedSr = sr.scope(label)
       new KetamaPartitionedClient(
           group, newService, healthBroker, scopedSr, hasher, numReps)
       with TwemcachePartitionedClient
-    }
 
     /**
       * Whether to eject cache host from the Ketama ring based on failure accrual.
@@ -357,7 +334,6 @@ object Memcached
     override def filtered(
         filter: Filter[Command, Response, Command, Response]): Client =
       super.filtered(filter)
-  }
 
   val client: Memcached.Client = Client()
 
@@ -367,19 +343,18 @@ object Memcached
   def newService(dest: Name, label: String): Service[Command, Response] =
     client.newService(dest, label)
 
-  object Server {
+  object Server
 
     /**
       * Default stack parameters used for memcached server.
       */
     val defaultParams: Stack.Params =
       StackServer.defaultParams + finagle.param.ProtocolLibrary("memcached")
-  }
 
   case class Server(
       stack: Stack[ServiceFactory[Command, Response]] = StackServer.newStack,
       params: Stack.Params = Server.defaultParams)
-      extends StdStackServer[Command, Response, Server] {
+      extends StdStackServer[Command, Response, Server]
 
     protected def copy1(
         stack: Stack[ServiceFactory[Command, Response]] = this.stack,
@@ -389,9 +364,8 @@ object Memcached
     protected type In = Response
     protected type Out = Command
 
-    protected def newListener(): Listener[In, Out] = {
+    protected def newListener(): Listener[In, Out] =
       Netty3Listener("memcached", MemcachedServerPipelineFactory)
-    }
 
     protected def newDispatcher(
         transport: Transport[In, Out],
@@ -419,11 +393,9 @@ object Memcached
 
     override def configured[P](psp: (P, Stack.Param[P])): Server =
       super.configured(psp)
-  }
 
   val server: Memcached.Server = Server()
 
   def serve(addr: SocketAddress,
             service: ServiceFactory[Command, Response]): ListeningServer =
     server.serve(addr, service)
-}

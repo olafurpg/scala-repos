@@ -52,18 +52,16 @@ private[spark] class ShuffleMapTask(
     _initialAccums: Seq[Accumulator[_]])
     extends Task[MapStatus](
         stageId, stageAttemptId, partition.index, _initialAccums)
-    with Logging {
+    with Logging
 
   /** A constructor used only in test suites. This does not require passing in an RDD. */
-  def this(partitionId: Int) {
+  def this(partitionId: Int)
     this(0, 0, null, new Partition { override def index: Int = 0 }, null, null)
-  }
 
-  @transient private val preferredLocs: Seq[TaskLocation] = {
+  @transient private val preferredLocs: Seq[TaskLocation] =
     if (locs == null) Nil else locs.toSet.toSeq
-  }
 
-  override def runTask(context: TaskContext): MapStatus = {
+  override def runTask(context: TaskContext): MapStatus =
     // Deserialize the RDD using the broadcast variable.
     val deserializeStartTime = System.currentTimeMillis()
     val ser = SparkEnv.get.closureSerializer.newInstance()
@@ -75,7 +73,7 @@ private[spark] class ShuffleMapTask(
 
     metrics = Some(context.taskMetrics)
     var writer: ShuffleWriter[Any, Any] = null
-    try {
+    try
       val manager = SparkEnv.get.shuffleManager
       writer = manager.getWriter[Any, Any](
           dep.shuffleHandle, partitionId, context)
@@ -83,22 +81,17 @@ private[spark] class ShuffleMapTask(
             .iterator(partition, context)
             .asInstanceOf[Iterator[_ <: Product2[Any, Any]]])
       writer.stop(success = true).get
-    } catch {
+    catch
       case e: Exception =>
-        try {
-          if (writer != null) {
+        try
+          if (writer != null)
             writer.stop(success = false)
-          }
-        } catch {
+        catch
           case e: Exception =>
             log.debug("Could not stop writer", e)
-        }
         throw e
-    }
-  }
 
   override def preferredLocations: Seq[TaskLocation] = preferredLocs
 
   override def toString: String =
     "ShuffleMapTask(%d, %d)".format(stageId, partitionId)
-}

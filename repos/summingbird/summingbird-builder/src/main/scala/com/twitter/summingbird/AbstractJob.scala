@@ -26,18 +26,17 @@ import com.twitter.chill.IKryoRegistrar
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object AbstractJob {
+object AbstractJob
   def apply(jobName: String, env: Env): AbstractJob =
     Class
       .forName(jobName)
       .getConstructor(classOf[Env])
       .newInstance(env)
       .asInstanceOf[AbstractJob]
-}
 
 // Subclass this to write your job.
 
-abstract class AbstractJob(env: Env) extends java.io.Serializable {
+abstract class AbstractJob(env: Env) extends java.io.Serializable
   // Make these implicitly available. Lazy because the env doesn't
   // initially contain a reference to the builder, and the args
   // constructor might need to make use of it
@@ -45,4 +44,3 @@ abstract class AbstractJob(env: Env) extends java.io.Serializable {
   implicit lazy val _args = env.args
   def transformConfig(m: Map[String, AnyRef]): Map[String, AnyRef] = m
   def registrars: List[IKryoRegistrar] = Nil
-}

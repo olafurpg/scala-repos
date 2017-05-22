@@ -16,17 +16,17 @@ import TypeUtil._
   * types in the AST. This information can be used to selectively skip later compiler phases when
   * it is already known that there is nothing for them to translate.
   */
-class AssignUniqueSymbols extends Phase {
+class AssignUniqueSymbols extends Phase
   val name = "assignUniqueSymbols"
 
   type State = UsedFeatures
 
-  def apply(state: CompilerState) = {
+  def apply(state: CompilerState) =
     var hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption =
       false
-    val s2 = state.map { tree =>
+    val s2 = state.map  tree =>
       val replace = new HashMap[TermSymbol, AnonSymbol]
-      def checkFeatures(n: Node): Unit = n match {
+      def checkFeatures(n: Node): Unit = n match
         case _: Distinct => hasDistinct = true
         case _: TypeMapping => hasTypeMapping = true
         case n: Apply =>
@@ -37,9 +37,8 @@ class AssignUniqueSymbols extends Phase {
           if (j.jt == JoinType.LeftOption || j.jt == JoinType.RightOption ||
               j.jt == JoinType.OuterOption) hasNonPrimitiveOption = true
         case _ =>
-      }
-      def tr(n: Node): Node = {
-        val n3 = n match {
+      def tr(n: Node): Node =
+        val n3 = n match
           case Select(in, s) => Select(tr(in), s) :@ n.nodeType
           case r @ Ref(a: AnonSymbol) =>
             val s = replace.getOrElse(a, a)
@@ -63,24 +62,18 @@ class AssignUniqueSymbols extends Phase {
           case n =>
             checkFeatures(n)
             n.mapChildren(tr)
-        }
         // Remove all NominalTypes (which might have changed)
         if (n3.hasType && hasNominalType(n3.nodeType)) n3.untyped else n3
-      }
       tr(tree)
-    }
     val features = UsedFeatures(
         hasDistinct, hasTypeMapping, hasAggregate, hasNonPrimitiveOption)
     logger.debug("Detected features: " + features)
     s2 + (this -> features)
-  }
 
-  def hasNominalType(t: Type): Boolean = t match {
+  def hasNominalType(t: Type): Boolean = t match
     case _: NominalType => true
     case _: AtomicType => false
     case _ => t.children.exists(hasNominalType)
-  }
-}
 
 case class UsedFeatures(distinct: Boolean,
                         typeMapping: Boolean,

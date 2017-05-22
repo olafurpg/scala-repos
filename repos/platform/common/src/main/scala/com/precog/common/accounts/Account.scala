@@ -43,7 +43,7 @@ import scalaz.syntax.plus._
 import shapeless._
 
 case class AccountPlan(planType: String)
-object AccountPlan {
+object AccountPlan
   val Root = AccountPlan("Root")
   val Free = AccountPlan("Free")
 
@@ -51,7 +51,6 @@ object AccountPlan {
   val schema = "type" :: HNil
   implicit val (decomposer, extractor) =
     serializationV[AccountPlan](schema, None)
-}
 
 case class Account(accountId: AccountId,
                    email: String,
@@ -65,7 +64,7 @@ case class Account(accountId: AccountId,
                    lastPasswordChangeTime: Option[DateTime] = None,
                    profile: Option[JValue] = None)
 
-object Account {
+object Account
   implicit val iso = Iso.hlist(Account.apply _, Account.unapply _)
   val schemaV1 =
     "accountId" :: "email" :: "passwordHash" :: "passwordSalt" :: "accountCreationDate" :: "apiKey" :: "rootPath" :: "plan" :: "parentId" :: "lastPasswordChangeTime" :: "profile" :: HNil
@@ -78,24 +77,21 @@ object Account {
 
   private val randomSource = new java.security.SecureRandom
 
-  def randomSalt() = {
+  def randomSalt() =
     val saltBytes = new Array[Byte](256)
     randomSource.nextBytes(saltBytes)
     saltBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(
         collection.breakOut): String
-  }
 
   // FIXME: Remove when there are no SHA1 hashes in the accounts db
-  def saltAndHashSHA1(password: String, salt: String): String = {
+  def saltAndHashSHA1(password: String, salt: String): String =
     Hashing.sha1().hashString(password + salt, Charsets.UTF_8).toString
-  }
 
-  def saltAndHashSHA256(password: String, salt: String): String = {
+  def saltAndHashSHA256(password: String, salt: String): String =
     Hashing.sha256().hashString(password + salt, Charsets.UTF_8).toString
-  }
 
   // FIXME: Remove when there are no old-style SHA256 hashes in the accounts db
-  def saltAndHashLegacy(password: String, salt: String): String = {
+  def saltAndHashLegacy(password: String, salt: String): String =
     val md = java.security.MessageDigest.getInstance("SHA-256");
     val dataBytes = (password + salt).getBytes("UTF-8")
     md.update(dataBytes, 0, dataBytes.length)
@@ -103,10 +99,9 @@ object Account {
 
     hashBytes.flatMap(byte => Integer.toHexString(0xFF & byte))(
         collection.breakOut): String
-  }
 
   def newAccountPermissions(
-      accountId: AccountId, accountPath: Path): Set[Permission] = {
+      accountId: AccountId, accountPath: Path): Set[Permission] =
     // Path is "/" so that an account may read data it wrote no matter what path it exists under. 
     // See AccessControlSpec, NewGrantRequest
     Set[Permission](
@@ -114,12 +109,10 @@ object Account {
         DeletePermission(accountPath, WrittenByAny),
         ReadPermission(Path.Root, WrittenByAccount(accountId))
     )
-  }
-}
 
 case class WrappedAccountId(accountId: AccountId)
 
-object WrappedAccountId {
+object WrappedAccountId
   implicit val wrappedAccountIdIso =
     Iso.hlist(WrappedAccountId.apply _, WrappedAccountId.unapply _)
 
@@ -127,4 +120,3 @@ object WrappedAccountId {
 
   implicit val (wrappedAccountIdDecomposer, wrappedAccountIdExtractor) =
     serializationV[WrappedAccountId](schema, None)
-}

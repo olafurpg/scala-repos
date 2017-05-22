@@ -18,7 +18,7 @@ import io.prediction.data.webhooks.ConnectorTestUtil
 
 import org.specs2.mutable._
 
-class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
+class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil
 
   // TODO: test different optional fields
 
@@ -28,9 +28,9 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
        |  "version": "2",
      """.stripMargin
 
-  "SegmentIOConnector" should {
+  "SegmentIOConnector" should
 
-    "convert group with context to event JSON" in {
+    "convert group with context to event JSON" in
       val context =
         """
           |  "context": {
@@ -124,9 +124,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, group, expected)
-    }
 
-    "convert group to event JSON" in {
+    "convert group to event JSON" in
       val group = s"""
           |{ $commonFields
           |  "type": "group",
@@ -157,9 +156,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, group, expected)
-    }
 
-    "convert screen to event JSON" in {
+    "convert screen to event JSON" in
       val screen = s"""
           |{ $commonFields
           |  "type": "screen",
@@ -188,9 +186,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, screen, expected)
-    }
 
-    "convert page to event JSON" in {
+    "convert page to event JSON" in
       val page = s"""
           |{ $commonFields
           |  "type": "page",
@@ -221,9 +218,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, page, expected)
-    }
 
-    "convert alias to event JSON" in {
+    "convert alias to event JSON" in
       val alias = s"""
           |{ $commonFields
           |  "type": "alias",
@@ -246,9 +242,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, alias, expected)
-    }
 
-    "convert track to event JSON" in {
+    "convert track to event JSON" in
       val track = s"""
           |{ $commonFields
           |  "user_id": "some_user_id",
@@ -279,9 +274,8 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
         """.stripMargin
 
       check(SegmentIOConnector, track, expected)
-    }
 
-    "convert identify to event JSON" in {
+    "convert identify to event JSON" in
       val identify = s"""
         { $commonFields
           "type"      : "identify",
@@ -314,6 +308,3 @@ class SegmentIOConnectorSpec extends Specification with ConnectorTestUtil {
       """
 
       check(SegmentIOConnector, identify, expected)
-    }
-  }
-}

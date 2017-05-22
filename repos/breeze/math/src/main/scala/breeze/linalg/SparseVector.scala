@@ -49,7 +49,7 @@ import scala.reflect.ClassTag
 class SparseVector[@spec(Double, Int, Float, Long) V](
     val array: SparseArray[V])(implicit zero: Zero[V])
     extends StorageVector[V] with VectorLike[V, SparseVector[V]]
-    with Serializable {
+    with Serializable
 
   /** This auxiliary constructor assumes that the index array is already sorted. */
   def this(index: Array[Int], data: Array[V], activeSize: Int, length: Int)(
@@ -73,17 +73,15 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
 
   def contains(i: Int) = array.contains(i)
 
-  def apply(i: Int): V = {
+  def apply(i: Int): V =
     if (i < 0 || i >= size)
       throw new IndexOutOfBoundsException(i + " not in [0," + size + ")")
     array(i)
-  }
 
-  def update(i: Int, v: V): Unit = {
+  def update(i: Int, v: V): Unit =
     if (i < 0 || i >= size)
       throw new IndexOutOfBoundsException(i + " not in [0," + size + ")")
     array(i) = v
-  }
 
   def activeIterator: Iterator[(Int, V)] =
     activeKeysIterator zip activeValuesIterator
@@ -96,33 +94,28 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
   /** This is always assumed to be equal to 0, for now. */
   def default: V = zero.zero
 
-  override def equals(p1: Any) = p1 match {
+  override def equals(p1: Any) = p1 match
     case x: Vector[_] =>
       this.length == x.length && (valuesIterator sameElements x.valuesIterator)
     case _ => false
-  }
 
   def isActive(rawIndex: Int) = array.isActive(rawIndex)
 
-  override def toString = {
+  override def toString =
     activeIterator.mkString("SparseVector(", ", ", ")")
-  }
 
-  def copy: SparseVector[V] = {
+  def copy: SparseVector[V] =
     new SparseVector[V](ArrayUtil.copyOf(index, index.length),
                         ArrayUtil.copyOf(data, index.length),
                         activeSize,
                         size)
-  }
 
-  def reserve(nnz: Int): Unit = {
+  def reserve(nnz: Int): Unit =
     array.reserve(nnz)
-  }
 
-  def compact(): Unit = {
+  def compact(): Unit =
     //ToDo 3: will require changes if non-zero defaults are implemented
     array.compact()
-  }
 
   /**
     * Sets the underlying sparse array to use this data
@@ -130,14 +123,13 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
     * @param data values corresponding to the index
     * @param activeSize number of active elements. The first activeSize will be used.
     */
-  def use(index: Array[Int], data: Array[V], activeSize: Int): Unit = {
+  def use(index: Array[Int], data: Array[V], activeSize: Int): Unit =
     require(activeSize <= size,
             "Can't have more elements in the array than length!")
     require(activeSize >= 0, "activeSize must be non-negative")
     require(data.length >= activeSize,
             "activeSize must be no greater than array length...")
     array.use(index, data, activeSize)
-  }
 
   /**
     * same as data(i). Gives the value at the underlying offset.
@@ -160,36 +152,30 @@ class SparseVector[@spec(Double, Int, Float, Long) V](
   def allVisitableIndicesActive: Boolean = true
 
   @deprecated("Used asCSCRow instead", "0.12")
-  def asCSCMatrix(implicit man: ClassTag[V]): CSCMatrix[V] = {
+  def asCSCMatrix(implicit man: ClassTag[V]): CSCMatrix[V] =
     asCscRow
-  }
 
-  def asCscRow(implicit man: ClassTag[V]): CSCMatrix[V] = {
+  def asCscRow(implicit man: ClassTag[V]): CSCMatrix[V] =
     // zero SV
     if (index.length == 0) CSCMatrix.zeros[V](1, length)
-    else {
+    else
       var ii = 0
       val nIndex = Array.tabulate[Int](length + 1)((cp: Int) =>
             if (ii < used && cp == index(ii)) { ii += 1; ii - 1 } else ii)
       assert(ii == used)
       new CSCMatrix[V](
           data, 1, length, nIndex, activeSize, Array.fill[Int](data.length)(0))
-    }
-  }
 
-  def asCscColumn(implicit man: ClassTag[V]): CSCMatrix[V] = {
+  def asCscColumn(implicit man: ClassTag[V]): CSCMatrix[V] =
     // zero SV
     if (index.length == 0) CSCMatrix.zeros[V](length, 1)
-    else {
+    else
       new CSCMatrix[V](
           data.clone(), length, 1, Array(0, used), activeSize, index)
-    }
-  }
-}
 
 object SparseVector
     extends SparseVectorOps with DenseVector_SparseVector_Ops
-    with SparseVector_DenseMatrixOps with SparseVector_DenseVector_Ops {
+    with SparseVector_DenseMatrixOps with SparseVector_DenseVector_Ops
 
   def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](size: Int) =
     new SparseVector(Array.empty, Array.empty[V], 0, size)
@@ -205,22 +191,19 @@ object SparseVector
       f: Int => V): SparseVector[V] = apply(Array.tabulate(size)(f))
 
   def apply[V : ClassTag : Zero](length: Int)(
-      values: (Int, V)*): SparseVector[V] = {
+      values: (Int, V)*): SparseVector[V] =
     val r = zeros[V](length)
-    for ((i, v) <- values) {
+    for ((i, v) <- values)
       r(i) = v
-    }
     r
-  }
 
   def vertcat[V : Zero : ClassTag](
-      vectors: SparseVector[V]*): SparseVector[V] = {
+      vectors: SparseVector[V]*): SparseVector[V] =
     val resultArray =
       vectors.map(_.array).foldLeft(new SparseArray[V](0))(_ concatenate _)
     new SparseVector(resultArray)
-  }
 
-  def horzcat[V : Zero : ClassTag](vectors: SparseVector[V]*): CSCMatrix[V] = {
+  def horzcat[V : Zero : ClassTag](vectors: SparseVector[V]*): CSCMatrix[V] =
     if (!vectors.forall(_.size == vectors(0).size))
       throw new IllegalArgumentException(
           "vector lengths must be equal, but got: " +
@@ -234,7 +217,7 @@ object SparseVector
 
     var vec = 0
     var off = 0
-    while (vec < vectors.length) {
+    while (vec < vectors.length)
       colPtrs(vec) = off
       System.arraycopy(
           vectors(vec).data, 0, data, off, vectors(vec).activeSize)
@@ -242,169 +225,133 @@ object SparseVector
           vectors(vec).index, 0, rowIndices, off, vectors(vec).activeSize)
       off += vectors(vec).activeSize
       vec += 1
-    }
     colPtrs(vec) = off
 
     new CSCMatrix(data, rows, cols, colPtrs, used, rowIndices)
-  }
 
   // implicits
   class CanCopySparseVector[
       @spec(Double, Int, Float, Long) V : ClassTag : Zero]
-      extends CanCopy[SparseVector[V]] {
-    def apply(v1: SparseVector[V]) = {
+      extends CanCopy[SparseVector[V]]
+    def apply(v1: SparseVector[V]) =
       v1.copy
-    }
-  }
 
   implicit def canCopySparse[
       @spec(Double, Int, Float, Long) V : ClassTag : Zero] =
     new CanCopySparseVector[V]
 
   implicit def canMapValues[V, V2 : ClassTag : Zero]: CanMapValues[
-      SparseVector[V], V, V2, SparseVector[V2]] = {
-    new CanMapValues[SparseVector[V], V, V2, SparseVector[V2]] {
+      SparseVector[V], V, V2, SparseVector[V2]] =
+    new CanMapValues[SparseVector[V], V, V2, SparseVector[V2]]
 
       /**Maps all key-value pairs from the given collection. */
       override def apply(
-          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] = {
+          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] =
         SparseVector.tabulate(from.length)(i => fn(from(i)))
-      }
-    }
-  }
 
   implicit def canMapActiveValues[V, V2 : ClassTag : Zero]: CanMapActiveValues[
-      SparseVector[V], V, V2, SparseVector[V2]] = {
-    new CanMapActiveValues[SparseVector[V], V, V2, SparseVector[V2]] {
+      SparseVector[V], V, V2, SparseVector[V2]] =
+    new CanMapActiveValues[SparseVector[V], V, V2, SparseVector[V2]]
 
       /**Maps all active key-value pairs from the given collection. */
       override def apply(
-          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] = {
+          from: SparseVector[V], fn: (V) => V2): SparseVector[V2] =
         val out = new Array[V2](from.activeSize)
         var i = 0
-        while (i < from.activeSize) {
+        while (i < from.activeSize)
           out(i) = fn(from.data(i))
           i += 1
-        }
         new SparseVector(from.index.take(from.activeSize),
                          out,
                          from.activeSize,
                          from.length)
-      }
-    }
-  }
 
   implicit def scalarOf[T]: ScalarOf[SparseVector[T], T] = ScalarOf.dummy
 
-  implicit def canIterateValues[V]: CanTraverseValues[SparseVector[V], V] = {
-    new CanTraverseValues[SparseVector[V], V] {
+  implicit def canIterateValues[V]: CanTraverseValues[SparseVector[V], V] =
+    new CanTraverseValues[SparseVector[V], V]
 
       def isTraversableAgain(from: SparseVector[V]): Boolean = true
 
       /** Iterates all key-value pairs from the given collection. */
-      def traverse(from: SparseVector[V], fn: ValuesVisitor[V]): Unit = {
+      def traverse(from: SparseVector[V], fn: ValuesVisitor[V]): Unit =
         fn.zeros(from.size - from.activeSize, from.default)
         fn.visitArray(from.data, 0, from.activeSize, 1)
-      }
-    }
-  }
 
   implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
-      SparseVector[V], Int, V] = {
-    new CanTraverseKeyValuePairs[SparseVector[V], Int, V] {
+      SparseVector[V], Int, V] =
+    new CanTraverseKeyValuePairs[SparseVector[V], Int, V]
       def isTraversableAgain(from: SparseVector[V]): Boolean = true
 
       /** Iterates all key-value pairs from the given collection. */
       def traverse(
           from: SparseVector[V],
-          fn: CanTraverseKeyValuePairs.KeyValuePairsVisitor[Int, V]): Unit = {
+          fn: CanTraverseKeyValuePairs.KeyValuePairsVisitor[Int, V]): Unit =
         import from._
 
         fn.visitArray(index, data, 0, activeSize, 1)
-        if (activeSize != size) {
+        if (activeSize != size)
           fn.zeros(size - activeSize,
                    Iterator.range(0, size).filterNot(index contains _),
                    from.default)
-        }
-      }
-    }
-  }
 
   implicit def canCreateZeros[V : ClassTag : Zero]: CanCreateZeros[
-      SparseVector[V], Int] = {
-    new CanCreateZeros[SparseVector[V], Int] {
-      def apply(d: Int): SparseVector[V] = {
+      SparseVector[V], Int] =
+    new CanCreateZeros[SparseVector[V], Int]
+      def apply(d: Int): SparseVector[V] =
         zeros[V](d)
-      }
-    }
-  }
 
   implicit def canCreateZerosLike[V : ClassTag : Zero]: CanCreateZerosLike[
-      SparseVector[V], SparseVector[V]] = {
-    new CanCreateZerosLike[SparseVector[V], SparseVector[V]] {
-      def apply(d: SparseVector[V]): SparseVector[V] = {
+      SparseVector[V], SparseVector[V]] =
+    new CanCreateZerosLike[SparseVector[V], SparseVector[V]]
+      def apply(d: SparseVector[V]): SparseVector[V] =
         zeros[V](d.length)
-      }
-    }
-  }
 
   implicit def canTransformValues[V : Zero : ClassTag]: CanTransformValues[
-      SparseVector[V], V] = {
-    new CanTransformValues[SparseVector[V], V] {
+      SparseVector[V], V] =
+    new CanTransformValues[SparseVector[V], V]
       val z = implicitly[Zero[V]]
 
       /**Transforms all key-value pairs from the given collection. */
-      def transform(from: SparseVector[V], fn: (V) => V): Unit = {
+      def transform(from: SparseVector[V], fn: (V) => V): Unit =
         val newData = mutable.ArrayBuilder.make[V]()
         val newIndex = mutable.ArrayBuilder.make[Int]()
         var used = 0
         var i = 0
-        while (i < from.length) {
+        while (i < from.length)
           val vv = fn(from(i))
-          if (vv != z) {
+          if (vv != z)
             newData += vv
             newIndex += i
             used += 1
-          }
           i += 1
-        }
         from.array.use(newIndex.result(), newData.result(), used)
-      }
 
       /**Transforms all active key-value pairs from the given collection. */
-      def transformActive(from: SparseVector[V], fn: (V) => V): Unit = {
+      def transformActive(from: SparseVector[V], fn: (V) => V): Unit =
         var i = 0
-        while (i < from.activeSize) {
+        while (i < from.activeSize)
           from.data(i) = fn(from.data(i))
           i += 1
-        }
-      }
-    }
-  }
 
   implicit def canMapPairs[V, V2 : ClassTag : Zero]: CanMapKeyValuePairs[
-      SparseVector[V], Int, V, V2, SparseVector[V2]] = {
-    new CanMapKeyValuePairs[SparseVector[V], Int, V, V2, SparseVector[V2]] {
+      SparseVector[V], Int, V, V2, SparseVector[V2]] =
+    new CanMapKeyValuePairs[SparseVector[V], Int, V, V2, SparseVector[V2]]
 
       /**Maps all key-value pairs from the given collection. */
-      def map(from: SparseVector[V], fn: (Int, V) => V2): SparseVector[V2] = {
+      def map(from: SparseVector[V], fn: (Int, V) => V2): SparseVector[V2] =
         SparseVector.tabulate(from.length)(i => fn(i, from(i)))
-      }
 
       /**Maps all active key-value pairs from the given collection. */
       def mapActive(
-          from: SparseVector[V], fn: (Int, V) => V2): SparseVector[V2] = {
+          from: SparseVector[V], fn: (Int, V) => V2): SparseVector[V2] =
         val out = new Array[V2](from.used)
         var i = 0
-        while (i < from.used) {
+        while (i < from.used)
           out(i) = fn(from.index(i), from.data(i))
           i += 1
-        }
         new SparseVector(
             from.index.take(from.used), out, from.used, from.length)
-      }
-    }
-  }
 
 //  implicit def canTranspose[V:ClassTag:Zero]: CanTranspose[SparseVector[V], CSCMatrix[V]] = {
 //    new CanTranspose[SparseVector[V], CSCMatrix[V]] {
@@ -422,38 +369,30 @@ object SparseVector
 //  }
 
   implicit def canTransposeComplex: CanTranspose[
-      SparseVector[Complex], CSCMatrix[Complex]] = {
-    new CanTranspose[SparseVector[Complex], CSCMatrix[Complex]] {
-      def apply(from: SparseVector[Complex]) = {
+      SparseVector[Complex], CSCMatrix[Complex]] =
+    new CanTranspose[SparseVector[Complex], CSCMatrix[Complex]]
+      def apply(from: SparseVector[Complex]) =
         val transposedMtx: CSCMatrix[Complex] =
           CSCMatrix.zeros[Complex](1, from.length)
         var i = 0
-        while (i < from.activeSize) {
+        while (i < from.activeSize)
           val c = from.index(i)
           transposedMtx(0, c) = from.data(i).conjugate
           i += 1
-        }
         transposedMtx
-      }
-    }
-  }
 
   implicit def canDim[E]: dim.Impl[SparseVector[E], Int] =
-    new dim.Impl[SparseVector[E], Int] {
+    new dim.Impl[SparseVector[E], Int]
       def apply(v: SparseVector[E]): Int = v.size
-    }
 
   implicit def canTabulate[E : ClassTag : Zero]: CanTabulate[
-      Int, SparseVector[E], E] = new CanTabulate[Int, SparseVector[E], E] {
+      Int, SparseVector[E], E] = new CanTabulate[Int, SparseVector[E], E]
     def apply(d: Int, f: (Int) => E): SparseVector[E] = tabulate[E](d)(f)
-  }
 
   implicit def space[
       E : Field : ClassTag : Zero]: MutableFiniteCoordinateField[
-      SparseVector[E], Int, E] = {
+      SparseVector[E], Int, E] =
     MutableFiniteCoordinateField.make[SparseVector[E], Int, E]
-  }
 
   @noinline
   private def init() = {}
-}

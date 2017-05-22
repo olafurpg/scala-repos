@@ -2,7 +2,7 @@ package mesosphere.marathon.integration.facades
 
 import MesosFacade.{ITResourcePortValue, ITResourceScalarValue, ITResources}
 
-object MesosFormats {
+object MesosFormats
   import MesosFacade._
   import mesosphere.marathon.api.v2.json.Formats.FormatWithDefault
   import play.api.libs.functional.syntax._
@@ -21,17 +21,16 @@ object MesosFormats {
     )
 
   implicit lazy val ITResourceValueFormat: Format[ITResourceValue] = Format(
-      Reads[ITResourceValue] {
+      Reads[ITResourceValue]
         case JsNumber(value) =>
           JsSuccess(ITResourceScalarValue(value.toDouble))
         case JsString(portsString) =>
           JsSuccess(ITResourcePortValue(portsString))
         case _ => JsError("expected string or number")
-      },
-      Writes[ITResourceValue] {
+      ,
+      Writes[ITResourceValue]
         case ITResourceScalarValue(value) => JsNumber(value)
         case ITResourcePortValue(portsString) => JsString(portsString)
-      }
   )
 
   implicit lazy val ITResourcesFormat: Format[ITResources] = Format(
@@ -57,4 +56,3 @@ object MesosFormats {
     ((__ \ "version").format[String] ~ (__ \ "git_tag").format[String] ~
         (__ \ "slaves").format[Iterable[ITAgent]])(
         ITMesosState.apply, unlift(ITMesosState.unapply))
-}

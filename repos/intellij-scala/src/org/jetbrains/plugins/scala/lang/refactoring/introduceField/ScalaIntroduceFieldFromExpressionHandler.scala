@@ -28,7 +28,7 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * 6/27/13
   */
 class ScalaIntroduceFieldFromExpressionHandler
-    extends ScalaIntroduceFieldHandlerBase {
+    extends ScalaIntroduceFieldHandlerBase
 
   private var occurrenceHighlighters = Seq.empty[RangeHighlighter]
 
@@ -36,14 +36,14 @@ class ScalaIntroduceFieldFromExpressionHandler
              editor: Editor,
              file: PsiFile,
              startOffset: Int,
-             endOffset: Int) {
-    try {
+             endOffset: Int)
+    try
       UsageTrigger.trigger(ScalaBundle.message("introduce.field.id"))
       PsiDocumentManager.getInstance(project).commitAllDocuments()
       ScalaRefactoringUtil.checkFile(file, project, editor, REFACTORING_NAME)
 
       val (expr: ScExpression, types: Array[ScType]) = getExpression(
-          project, editor, file, startOffset, endOffset) match {
+          project, editor, file, startOffset, endOffset) match
         case Some((e, tps)) => (e, tps)
         case None =>
           showErrorMessage(
@@ -51,25 +51,21 @@ class ScalaIntroduceFieldFromExpressionHandler
               project,
               editor)
           return
-      }
 
       afterClassChoosing[ScExpression](expr,
                                        types,
                                        project,
                                        editor,
                                        file,
-                                       "Choose class for Introduce Field") {
+                                       "Choose class for Introduce Field")
         convertExpressionToField
-      }
-    } catch {
+    catch
       case _: IntroduceException =>
-    }
-  }
 
   override def invoke(project: Project,
                       editor: Editor,
                       file: PsiFile,
-                      dataContext: DataContext) {
+                      dataContext: DataContext)
     val canBeIntroduced: (ScExpression) => Boolean =
       ScalaRefactoringUtil.checkCanBeIntroduced(_)
     ScalaRefactoringUtil.afterExpressionChoosing(project,
@@ -77,48 +73,41 @@ class ScalaIntroduceFieldFromExpressionHandler
                                                  file,
                                                  dataContext,
                                                  REFACTORING_NAME,
-                                                 canBeIntroduced) {
+                                                 canBeIntroduced)
       ScalaRefactoringUtil.trimSpacesAndComments(editor, file)
       invoke(project,
              editor,
              file,
              editor.getSelectionModel.getSelectionStart,
              editor.getSelectionModel.getSelectionEnd)
-    }
-  }
 
   override def invoke(project: Project,
                       elements: Array[PsiElement],
-                      dataContext: DataContext) {
+                      dataContext: DataContext)
     //nothing
-  }
 
-  def convertExpressionToField(ifc: IntroduceFieldContext[ScExpression]) {
+  def convertExpressionToField(ifc: IntroduceFieldContext[ScExpression])
 
     val possiblePlace = ScalaRefactoringUtil.checkCanBeIntroduced(
         ifc.element, showErrorMessage(_, ifc.project, ifc.editor))
     if (!possiblePlace) return
 
-    def runWithDialog() {
+    def runWithDialog()
       val settings = new IntroduceFieldSettings(ifc)
-      if (!settings.canBeInitInDeclaration && !settings.canBeInitLocally) {
+      if (!settings.canBeInitInDeclaration && !settings.canBeInitLocally)
         showErrorMessage("Cannot create field from this expression",
                          ifc.project,
                          ifc.editor)
-      } else {
+      else
         val dialog = getDialog(ifc, settings)
-        if (dialog.isOK) {
+        if (dialog.isOK)
           runRefactoring(ifc, settings)
-        }
-      }
-    }
 
     runWithDialog()
-  }
 
   private def runRefactoringInside(
       ifc: IntroduceFieldContext[ScExpression],
-      settings: IntroduceFieldSettings[ScExpression]) {
+      settings: IntroduceFieldSettings[ScExpression])
     val expression = ScalaRefactoringUtil.expressionToIntroduce(ifc.element)
     val mainOcc = ifc.occurrences.filter(
         _.getStartOffset == ifc.editor.getSelectionModel.getSelectionStart)
@@ -127,11 +116,10 @@ class ScalaIntroduceFieldFromExpressionHandler
     val aClass = ifc.aClass
     val checkAnchor: PsiElement = anchorForNewDeclaration(
         expression, occurrencesToReplace, aClass)
-    if (checkAnchor == null) {
+    if (checkAnchor == null)
       showErrorMessage(
           "Cannot find place for the new field", ifc.project, ifc.editor)
       return
-    }
     val manager = aClass.getManager
     val name = settings.name
     val typeName = Option(settings.scType).map(_.canonicalText).getOrElse("")
@@ -142,16 +130,16 @@ class ScalaIntroduceFieldFromExpressionHandler
         expression, replacedOccurences, aClass)
     val initInDecl = settings.initInDeclaration
     var createdDeclaration: PsiElement = null
-    if (initInDecl) {
+    if (initInDecl)
       createdDeclaration = ScalaPsiElementFactory.createDeclaration(
           name, typeName, settings.defineVar, expression, manager)
-    } else {
+    else
       val underscore =
         ScalaPsiElementFactory.createExpressionFromText("_", manager)
       createdDeclaration = ScalaPsiElementFactory.createDeclaration(
           name, typeName, settings.defineVar, underscore, manager)
 
-      anchorForInitializer(replacedOccurences, ifc.file) match {
+      anchorForInitializer(replacedOccurences, ifc.file) match
         case Some(anchorForInit) =>
           val parent = anchorForInit.getParent
           val assignStmt = ScalaPsiElementFactory.createExpressionFromText(
@@ -161,11 +149,9 @@ class ScalaIntroduceFieldFromExpressionHandler
               ScalaPsiElementFactory.createNewLineNode(manager, "\n").getPsi,
               anchorForInit)
         case None => throw new IntroduceException
-      }
-    }
 
     import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings.VisibilityLevel
-    settings.visibilityLevel match {
+    settings.visibilityLevel match
       case VisibilityLevel.DEFAULT =>
       case VisibilityLevel.PRIVATE =>
         createdDeclaration
@@ -175,11 +161,10 @@ class ScalaIntroduceFieldFromExpressionHandler
         createdDeclaration
           .asInstanceOf[ScMember]
           .setModifierProperty("protected", value = true)
-    }
 
     lazy val document: Document = ifc.editor.getDocument
 
-    anchor match {
+    anchor match
       case (tp: ScTemplateParents) childOf (extBl: ScExtendsBlock) =>
         val earlyDef = extBl.addEarlyDefinitions()
         createdDeclaration = earlyDef.addAfter(
@@ -200,23 +185,19 @@ class ScalaIntroduceFieldFromExpressionHandler
         parent.addBefore(
             ScalaPsiElementFactory.createNewLineNode(manager, "\n").getPsi,
             anchor)
-    }
 
     ScalaPsiUtil.adjustTypes(createdDeclaration)
-  }
 
   def runRefactoring(ifc: IntroduceFieldContext[ScExpression],
-                     settings: IntroduceFieldSettings[ScExpression]) {
-    val runnable = new Runnable {
+                     settings: IntroduceFieldSettings[ScExpression])
+    val runnable = new Runnable
       def run() = runRefactoringInside(ifc, settings)
-    }
     ScalaUtils.runWriteAction(runnable, ifc.project, REFACTORING_NAME)
     ifc.editor.getSelectionModel.removeSelection()
-  }
 
   protected def getDialog(ifc: IntroduceFieldContext[ScExpression],
                           settings: IntroduceFieldSettings[ScExpression])
-    : ScalaIntroduceFieldDialog = {
+    : ScalaIntroduceFieldDialog =
     val occCount = ifc.occurrences.length
     // Add occurrences highlighting
     if (occCount > 1)
@@ -225,26 +206,20 @@ class ScalaIntroduceFieldFromExpressionHandler
 
     val dialog = new ScalaIntroduceFieldDialog(ifc, settings)
     dialog.show()
-    if (!dialog.isOK) {
-      if (occCount > 1) {
+    if (!dialog.isOK)
+      if (occCount > 1)
         occurrenceHighlighters.foreach(_.dispose())
         occurrenceHighlighters = Seq.empty
-      }
-    }
     dialog
-  }
 
   protected override def isSuitableClass(
       elem: PsiElement, clazz: ScTemplateDefinition): Boolean = true
 
-  private def onOneLine(document: Document, range: TextRange): Boolean = {
+  private def onOneLine(document: Document, range: TextRange): Boolean =
     document.getLineNumber(range.getStartOffset) == document.getLineNumber(
         range.getEndOffset)
-  }
 
   private def showErrorMessage(
-      text: String, project: Project, editor: Editor) = {
+      text: String, project: Project, editor: Editor) =
     CommonRefactoringUtil.showErrorHint(
         project, editor, text, REFACTORING_NAME, HelpID.INTRODUCE_FIELD)
-  }
-}

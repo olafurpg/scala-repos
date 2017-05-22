@@ -17,9 +17,9 @@ import scala.concurrent.Future
 
 class MigrationTest
     extends MarathonSpec with Mockito with Matchers with GivenWhenThen
-    with ScalaFutures {
+    with ScalaFutures
 
-  test("migrations can be filtered by version") {
+  test("migrations can be filtered by version")
     val f = new Fixture
     val all = f.migration.migrations
       .filter(_._1 > StorageVersions(0, 0, 0))
@@ -32,9 +32,8 @@ class MigrationTest
 
     val some = f.migration.migrations.filter(_._1 < StorageVersions(0, 10, 0))
     some should have size 1
-  }
 
-  test("migration calls initialization") {
+  test("migration calls initialization")
     val f = new Fixture
 
     f.groupRepo.rootGroup() returns Future.successful(None)
@@ -51,9 +50,8 @@ class MigrationTest
 
     f.migration.migrate()
     verify(f.store, atLeastOnce).initialize()
-  }
 
-  test("migration is executed sequentially") {
+  test("migration is executed sequentially")
     val f = new Fixture
 
     f.groupRepo.rootGroup() returns Future.successful(None)
@@ -73,9 +71,8 @@ class MigrationTest
       f.migration.applyMigrationSteps(StorageVersions(0, 8, 0)).futureValue
     result should not be 'empty
     result should be(f.migration.migrations.map(_._1).drop(1))
-  }
 
-  test("applyMigrationSteps throws an error for unsupported versions") {
+  test("applyMigrationSteps throws an error for unsupported versions")
     val f = new Fixture
     val minVersion = f.migration.minSupportedStorageVersion
 
@@ -83,16 +80,14 @@ class MigrationTest
     val unsupportedVersion = StorageVersions(0, 2, 0)
 
     When("applyMigrationSteps is called for that version")
-    val ex = intercept[RuntimeException] {
+    val ex = intercept[RuntimeException]
       f.migration.applyMigrationSteps(unsupportedVersion)
-    }
 
     Then("Migration exits with a readable error message")
     ex.getMessage should equal(
         s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
-  }
 
-  test("migrate() from unsupported version exits with a readable error") {
+  test("migrate() from unsupported version exits with a readable error")
     val f = new Fixture
     val minVersion = f.migration.minSupportedStorageVersion
 
@@ -113,16 +108,14 @@ class MigrationTest
                             bytes = unsupportedVersion.toByteArray)))
 
     When("A migration is approached for that version")
-    val ex = intercept[RuntimeException] {
+    val ex = intercept[RuntimeException]
       f.migration.migrate()
-    }
 
     Then("Migration exits with a readable error message")
     ex.getMessage should equal(
         s"Migration from versions < $minVersion is not supported. Your version: $unsupportedVersion")
-  }
 
-  class Fixture {
+  class Fixture
     trait StoreWithManagement
         extends PersistentStore with PersistentStoreManagement
     val metrics = new Metrics(new MetricRegistry)
@@ -148,5 +141,3 @@ class MigrationTest
                                   taskRepo,
                                   config,
                                   new Metrics(new MetricRegistry))
-  }
-}

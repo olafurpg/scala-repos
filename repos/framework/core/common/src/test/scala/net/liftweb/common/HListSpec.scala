@@ -22,11 +22,11 @@ import org.specs2.mutable.Specification
 /**
   * System under specification for Heterogeneous List.
   */
-object HListSpec extends Specification {
+object HListSpec extends Specification
 
-  "An HList" should {
+  "An HList" should
 
-    "get the types right" in {
+    "get the types right" in
       import HLists._
 
       val x = 1 :+: "Foo" :+: HNil
@@ -36,9 +36,8 @@ object HListSpec extends Specification {
 
       x.head must_== 1
       x.tail.head must_== "Foo"
-    }
 
-    "properly report its length" in {
+    "properly report its length" in
       import HLists._
 
       val x = 1 :+: "Foo" :+: HNil
@@ -46,32 +45,28 @@ object HListSpec extends Specification {
       HNil.length must_== 0
       x.length must_== 2
       ("Bam" :+: x).length must_== 3
-    }
-  }
 
-  "A combinable box" should {
+  "A combinable box" should
 
-    "have a box built with a failure result in a failure" in {
+    "have a box built with a failure result in a failure" in
       import CombinableBox._
 
       val x = Full("a") :&: Full(1) :&: Empty
 
       // result in a failure
-      x match {
+      x match
         case Left(_) => success
         case _ => failure
-      }
-    }
 
-    "be able to build a box with all the Full elements matching" in {
+    "be able to build a box with all the Full elements matching" in
       import CombinableBox._
       import HLists._
 
       val x = Full("a") :&: Full(1) :&: Full(List(1, 2, 3))
 
       // result in a failure
-      x match {
-        case Right(a :+: one :+: lst :+: HNil) => {
+      x match
+        case Right(a :+: one :+: lst :+: HNil) =>
             // val a2: Int = a  fails... not type safe
 
             val as: String = a
@@ -79,21 +74,15 @@ object HListSpec extends Specification {
             val lstl: List[Int] = lst
 
             success
-          }
         case Left(_) => failure
-      }
-    }
 
-    "be usable in for comprehension" in {
+    "be usable in for comprehension" in
       import CombinableBox._
       import HLists._
 
-      val res = for {
+      val res = for
         a :+: one :+: lst :+: _ <-
         (Full("a") ?~ "Yak" :&: Full(1) :&: Full(List(1, 2, 3))) ?~! "Dude"
-      } yield a.length * one * lst.foldLeft(1)(_ * _)
+      yield a.length * one * lst.foldLeft(1)(_ * _)
 
       res must_== Full(6)
-    }
-  }
-}

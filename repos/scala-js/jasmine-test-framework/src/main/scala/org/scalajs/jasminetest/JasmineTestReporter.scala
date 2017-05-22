@@ -23,50 +23,43 @@ import scala.scalajs.runtime.StackTrace
 class JasmineTestReporter(taskDef: TaskDef,
                           eventHandler: EventHandler,
                           loggers: Array[Logger],
-                          runnerDone: () => Unit) {
+                          runnerDone: () => Unit)
   private var currentSuite: Suite = _
 
   @JSExport
-  def reportRunnerStarting(): Unit = {
+  def reportRunnerStarting(): Unit =
     info("")
-  }
 
   @JSExport
-  def reportSpecStarting(spec: Spec): Unit = {
-    if (currentSuite != spec.suite) {
+  def reportSpecStarting(spec: Spec): Unit =
+    if (currentSuite != spec.suite)
       currentSuite = spec.suite
       info(currentSuite.description)
-    }
-  }
 
   @JSExport
-  def reportSpecResults(spec: Spec): Unit = {
+  def reportSpecResults(spec: Spec): Unit =
     val results = spec.results()
     val description = spec.description
 
     val selector = new NestedTestSelector(
         spec.suite.getFullName(), description)
 
-    if (results.passed) {
+    if (results.passed)
       eventHandler.handle(new JasmineEvent(taskDef, Status.Success, selector))
 
-      loggers foreach { log =>
+      loggers foreach  log =>
         val success = color(log, SuccessColor, "+")
         log.info(s"  $success $description")
-      }
-    } else {
+    else
       eventHandler.handle(new JasmineEvent(taskDef, Status.Error, selector))
 
-      loggers foreach { log =>
+      loggers foreach  log =>
         val failure = color(log, ErrorColor, "x")
         log.error(s" $failure $description")
         results.getItems.foreach(displayResult(log))
-      }
-    }
-  }
 
   @JSExport
-  def reportSuiteResults(suite: Suite): Unit = {
+  def reportSuiteResults(suite: Suite): Unit =
     var results = suite.results()
 
     info("")
@@ -76,26 +69,21 @@ class JasmineTestReporter(taskDef: TaskDef,
 
     val selector = new NestedSuiteSelector(suite.getFullName())
 
-    if (results.passedCount != results.totalCount) {
+    if (results.passedCount != results.totalCount)
       eventHandler.handle(new JasmineEvent(taskDef, Status.Error, selector))
 
-      loggers foreach { log =>
+      loggers foreach  log =>
         log.error(title)
         log.error(color(log, InfoColor, message))
-      }
-    } else {
-      loggers foreach { log =>
+    else
+      loggers foreach  log =>
         log.info(title)
         log.info(color(log, InfoColor, message))
-      }
-    }
     info("")
-  }
 
   @JSExport
-  def reportRunnerResults(): Unit = {
+  def reportRunnerResults(): Unit =
     runnerDone()
-  }
 
   private val ErrorColor = "\u001b[31m"
   private val SuccessColor = "\u001b[32m"
@@ -109,34 +97,27 @@ class JasmineTestReporter(taskDef: TaskDef,
     if (log.ansiCodesSupported) color + msg + Reset
     else msg
 
-  private def sanitizeMessage(message: String) = {
+  private def sanitizeMessage(message: String) =
     val FilePattern = """^(.+?) [^ ]+\.js \(line \d+\)\.*?$""".r
     val EvalPattern = """^(.+?) in eval.+\(eval\).+?\(line \d+\).*?$""".r
 
-    message match {
+    message match
       case FilePattern(originalMessage) => originalMessage
       case EvalPattern(originalMessage) => originalMessage
       case message => message
-    }
-  }
 
-  private def displayResult(log: Logger)(result: Result) = {
-    (result.`type`: String) match {
+  private def displayResult(log: Logger)(result: Result) =
+    (result.`type`: String) match
       case "log" =>
         log.info(s"    ${result.toString}")
       case "expect" =>
         val r = result.asInstanceOf[ExpectationResult]
 
-        if (!r.passed()) {
+        if (!r.passed())
           val message = sanitizeMessage(r.message)
-          val stack = StackTrace.extract(r.trace).takeWhile { stackElem =>
+          val stack = StackTrace.extract(r.trace).takeWhile  stackElem =>
             (stackElem.getFileName == null ||
                 !stackElem.getFileName.endsWith("jasmine.js"))
-          }
 
           if (stack.isEmpty) log.error(s"    $message")
           else log.trace(new JasmineTestException(message, stack))
-        }
-    }
-  }
-}

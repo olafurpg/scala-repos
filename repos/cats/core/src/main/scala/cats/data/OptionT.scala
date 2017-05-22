@@ -9,7 +9,7 @@ package data
   *
   * For more information, see the [[http://non.github.io/cats/tut/optiont.html documentation]].
   */
-final case class OptionT[F[_], A](value: F[Option[A]]) {
+final case class OptionT[F[_], A](value: F[Option[A]])
 
   def fold[B](default: => B)(f: A => B)(implicit F: Functor[F]): F[B] =
     F.map(value)(_.fold(default)(f))
@@ -30,10 +30,10 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
 
   def flatMapF[B](f: A => F[Option[B]])(implicit F: Monad[F]): OptionT[F, B] =
     OptionT(
-        F.flatMap(value) {
+        F.flatMap(value)
       case Some(a) => f(a)
       case None => F.pure(None)
-    })
+    )
 
   def transform[B](f: Option[A] => Option[B])(
       implicit F: Functor[F]): OptionT[F, B] =
@@ -46,10 +46,9 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
     F.map(value)(_.getOrElse(default))
 
   def getOrElseF(default: => F[A])(implicit F: Monad[F]): F[A] =
-    F.flatMap(value) {
+    F.flatMap(value)
       case Some(a) => F.pure(a)
       case None => default
-    }
 
   def collect[B](f: PartialFunction[A, B])(
       implicit F: Functor[F]): OptionT[F, B] =
@@ -78,10 +77,10 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
 
   def orElseF(default: => F[Option[A]])(implicit F: Monad[F]): OptionT[F, A] =
     OptionT(
-        F.flatMap(value) {
+        F.flatMap(value)
       case s @ Some(_) => F.pure(s)
       case None => default
-    })
+    )
 
   def toRight[L](left: => L)(implicit F: Functor[F]): XorT[F, L, A] =
     XorT(cata(Xor.Left(left), Xor.Right.apply))
@@ -90,9 +89,8 @@ final case class OptionT[F[_], A](value: F[Option[A]]) {
     XorT(cata(Xor.Right(right), Xor.Left.apply))
 
   def show(implicit F: Show[F[Option[A]]]): String = F.show(value)
-}
 
-object OptionT extends OptionTInstances {
+object OptionT extends OptionTInstances
   def pure[F[_], A](a: A)(implicit F: Applicative[F]): OptionT[F, A] =
     OptionT(F.pure(Some(a)))
 
@@ -113,10 +111,9 @@ object OptionT extends OptionTInstances {
   def fromOption[F[_]]: FromOptionPartiallyApplied[F] =
     new FromOptionPartiallyApplied
 
-  final class FromOptionPartiallyApplied[F[_]] private[OptionT] {
+  final class FromOptionPartiallyApplied[F[_]] private[OptionT]
     def apply[A](value: Option[A])(implicit F: Applicative[F]): OptionT[F, A] =
       OptionT(F.pure(value))
-  }
 
   /**
     * Lifts the `F[A]` Functor into an `OptionT[F, A]`.
@@ -124,25 +121,21 @@ object OptionT extends OptionTInstances {
     */
   def liftF[F[_], A](fa: F[A])(implicit F: Functor[F]): OptionT[F, A] =
     OptionT(F.map(fa)(Some(_)))
-}
 
-private[data] sealed trait OptionTInstances1 {
+private[data] sealed trait OptionTInstances1
   implicit def optionTFunctor[F[_]: Functor]: Functor[OptionT[F, ?]] =
-    new Functor[OptionT[F, ?]] {
+    new Functor[OptionT[F, ?]]
       override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] =
         fa.map(f)
-    }
 
   implicit def optionTTransLift[M[_]: Functor]: TransLift[OptionT, M] =
-    new TransLift[OptionT, M] {
+    new TransLift[OptionT, M]
       def liftT[A](ma: M[A]): OptionT[M, A] = OptionT.liftF(ma)
-    }
-}
 
-private[data] sealed trait OptionTInstances extends OptionTInstances1 {
+private[data] sealed trait OptionTInstances extends OptionTInstances1
 
   implicit def optionTMonad[F[_]](implicit F: Monad[F]): Monad[OptionT[F, ?]] =
-    new Monad[OptionT[F, ?]] {
+    new Monad[OptionT[F, ?]]
       def pure[A](a: A): OptionT[F, A] = OptionT.pure(a)
 
       def flatMap[A, B](fa: OptionT[F, A])(
@@ -151,7 +144,6 @@ private[data] sealed trait OptionTInstances extends OptionTInstances1 {
 
       override def map[A, B](fa: OptionT[F, A])(f: A => B): OptionT[F, B] =
         fa.map(f)
-    }
 
   implicit def optionTEq[F[_], A](
       implicit FA: Eq[F[Option[A]]]): Eq[OptionT[F, A]] =
@@ -160,4 +152,3 @@ private[data] sealed trait OptionTInstances extends OptionTInstances1 {
   implicit def optionTShow[F[_], A](
       implicit F: Show[F[Option[A]]]): Show[OptionT[F, A]] =
     functor.Contravariant[Show].contramap(F)(_.value)
-}

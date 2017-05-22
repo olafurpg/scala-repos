@@ -18,7 +18,7 @@ abstract class IdeClient(compilerName: String,
                          context: CompileContext,
                          modules: Seq[String],
                          consumer: OutputConsumer)
-    extends Client {
+    extends Client
 
   private var hasErrors = false
 
@@ -26,10 +26,9 @@ abstract class IdeClient(compilerName: String,
               text: String,
               source: Option[File],
               line: Option[Long],
-              column: Option[Long]) {
-    if (kind == Kind.ERROR) {
+              column: Option[Long])
+    if (kind == Kind.ERROR)
       hasErrors = true
-    }
 
     val name = if (source.isEmpty) compilerName else ""
 
@@ -37,14 +36,14 @@ abstract class IdeClient(compilerName: String,
 
     context.getProjectDescriptor.getProject.getName
     if (kind == Kind.WARNING &&
-        ScalaReflectMacroExpansionParser.isMacroMessage(text)) {
+        ScalaReflectMacroExpansionParser.isMacroMessage(text))
       ScalaReflectMacroExpansionParser.processMessage(text)
-    } else {
+    else
       val withoutPointer =
-        if (sourcePath.isDefined && line.isDefined && column.isDefined) {
+        if (sourcePath.isDefined && line.isDefined && column.isDefined)
           val lines = text.split('\n')
           lines.filterNot(_.trim == "^").mkString("\n")
-        } else text
+        else text
       context.processMessage(
           new CompilerMessage(name,
                               kind,
@@ -55,37 +54,29 @@ abstract class IdeClient(compilerName: String,
                               -1L,
                               line.getOrElse(-1L),
                               column.getOrElse(-1L)))
-    }
-  }
 
-  def trace(exception: Throwable) {
+  def trace(exception: Throwable)
     context.processMessage(new CompilerMessage(compilerName, exception))
-  }
 
-  def progress(text: String, done: Option[Float]) {
+  def progress(text: String, done: Option[Float])
     val formattedText =
       if (text.isEmpty) ""
-      else {
+      else
         val decapitalizedText =
           text.charAt(0).toLower.toString + text.substring(1)
         "%s: %s [%s]".format(
             compilerName, decapitalizedText, modules.mkString(", "))
-      }
     context.processMessage(
         new ProgressMessage(formattedText, done.getOrElse(-1.0F)))
-  }
 
-  def debug(text: String) {
+  def debug(text: String)
     ScalaBuilder.Log.info(text)
-  }
 
-  def deleted(module: File) {
+  def deleted(module: File)
     val paths =
       util.Collections.singletonList(FileUtil.toCanonicalPath(module.getPath))
     context.processMessage(new FileDeletedEvent(paths))
-  }
 
   def isCanceled = context.getCancelStatus.isCanceled
 
   def hasReportedErrors: Boolean = hasErrors
-}

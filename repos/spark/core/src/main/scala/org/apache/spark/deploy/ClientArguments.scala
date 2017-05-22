@@ -29,7 +29,7 @@ import org.apache.spark.util.{IntParam, MemoryParam, Utils}
 /**
   * Command-line parser for the driver client.
   */
-private[deploy] class ClientArguments(args: Array[String]) {
+private[deploy] class ClientArguments(args: Array[String])
   import ClientArguments._
 
   var cmd: String = "" // 'launch' or 'kill'
@@ -51,7 +51,7 @@ private[deploy] class ClientArguments(args: Array[String]) {
   parse(args.toList)
 
   @tailrec
-  private def parse(args: List[String]): Unit = args match {
+  private def parse(args: List[String]): Unit = args match
     case ("--cores" | "-c") :: IntParam(value) :: tail =>
       cores = value
       parse(tail)
@@ -74,14 +74,13 @@ private[deploy] class ClientArguments(args: Array[String]) {
     case "launch" :: _master :: _jarUrl :: _mainClass :: tail =>
       cmd = "launch"
 
-      if (!ClientArguments.isValidJarUrl(_jarUrl)) {
+      if (!ClientArguments.isValidJarUrl(_jarUrl))
         // scalastyle:off println
         println(s"Jar url '${_jarUrl}' is not in valid format.")
         println(s"Must be a jar file path in URL format " +
             "(e.g. hdfs://host:port/XX.jar, file:///XX.jar)")
         // scalastyle:on println
         printUsageAndExit(-1)
-      }
 
       jarUrl = _jarUrl
       masters = Utils.parseStandaloneMasterUrls(_master)
@@ -95,12 +94,11 @@ private[deploy] class ClientArguments(args: Array[String]) {
 
     case _ =>
       printUsageAndExit(1)
-  }
 
   /**
     * Print usage and exit JVM with the given exit code.
     */
-  private def printUsageAndExit(exitCode: Int) {
+  private def printUsageAndExit(exitCode: Int)
     // TODO: It wouldn't be too hard to allow users to submit their app and dependency jars
     //       separately similar to in the YARN client.
     val usage = s"""
@@ -118,21 +116,16 @@ private[deploy] class ClientArguments(args: Array[String]) {
     System.err.println(usage)
     // scalastyle:on println
     System.exit(exitCode)
-  }
-}
 
-private[deploy] object ClientArguments {
+private[deploy] object ClientArguments
   val DEFAULT_CORES = 1
   val DEFAULT_MEMORY = Utils.DEFAULT_DRIVER_MEM_MB // MB
   val DEFAULT_SUPERVISE = false
 
-  def isValidJarUrl(s: String): Boolean = {
-    try {
+  def isValidJarUrl(s: String): Boolean =
+    try
       val uri = new URI(s)
       uri.getScheme != null && uri.getPath != null &&
       uri.getPath.endsWith(".jar")
-    } catch {
+    catch
       case _: URISyntaxException => false
-    }
-  }
-}

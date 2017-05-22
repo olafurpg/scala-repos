@@ -23,7 +23,7 @@ import com.twitter.summingbird.graph._
   * by the fact that they are immutable.
   */
 case class Dependants[P <: Platform[P]](tail: Producer[P, Any])
-    extends DependantGraph[Producer[P, Any]] {
+    extends DependantGraph[Producer[P, Any]]
   override lazy val nodes: List[Producer[P, Any]] =
     Producer.entireGraphOf(tail)
   override def dependenciesOf(p: Producer[P, Any]) = Producer.dependenciesOf(p)
@@ -34,16 +34,13 @@ case class Dependants[P <: Platform[P]](tail: Producer[P, Any])
     * until write/sum to see if certain optimizations can be enabled
     */
   def transitiveDependantsTillOutput(
-      inp: Producer[P, Any]): List[Producer[P, Any]] = {
-    val neighborFn = { (p: Producer[P, Any]) =>
-      p match {
+      inp: Producer[P, Any]): List[Producer[P, Any]] =
+    val neighborFn =  (p: Producer[P, Any]) =>
+      p match
         case t: TailProducer[_, _] =>
           Iterable.empty // all legit writes are tails
         case _ => dependantsOf(p).getOrElse(Nil)
-      }
-    }
     depthFirstOf(inp)(neighborFn).toList
-  }
 
   /**
     * Return the first dependants of this node AFTER merges and skipping Alsos.
@@ -53,12 +50,10 @@ case class Dependants[P <: Platform[P]](tail: Producer[P, Any])
     * that plan from sources to all their dependants recursively.
     */
   def dependantsAfterMerge(inp: Producer[P, Any]): List[Producer[P, Any]] =
-    dependantsOf(inp).getOrElse(Nil).flatMap {
+    dependantsOf(inp).getOrElse(Nil).flatMap
       case m @ MergedProducer(_, _) => dependantsAfterMerge(m)
       case a @ AlsoProducer(_, _) => dependantsAfterMerge(a)
       case prod => List(prod)
-    }
 
   def namesOf(inp: Producer[P, Any]): List[NamedProducer[P, Any]] =
     transitiveDependantsOf(inp).collect { case n @ NamedProducer(_, _) => n }
-}

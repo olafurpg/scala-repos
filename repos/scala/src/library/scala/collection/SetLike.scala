@@ -57,7 +57,7 @@ import parallel.ParSet
   */
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     extends IterableLike[A, This] with GenSetLike[A, This]
-    with Subtractable[A, This] with Parallelizable[A, ParSet[A]] {
+    with Subtractable[A, This] with Parallelizable[A, ParSet[A]]
   self =>
 
   /** The empty set of the same type as this set
@@ -76,21 +76,18 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
   protected[this] override def parCombiner = ParSet.newCombiner[A]
 
   // Default collection type appropriate for immutable collections; mutable collections override this
-  override def toSeq: Seq[A] = {
+  override def toSeq: Seq[A] =
     if (isEmpty) Vector.empty[A]
-    else {
+    else
       val vb = Vector.newBuilder[A]
       foreach(vb += _)
       vb.result
-    }
-  }
 
-  override def toBuffer[A1 >: A]: mutable.Buffer[A1] = {
+  override def toBuffer[A1 >: A]: mutable.Buffer[A1] =
     val result = new mutable.ArrayBuffer[A1](size)
     // Faster to let the map iterate itself than to defer through copyToBuffer
     foreach(result += _)
     result
-  }
 
   // note: this is only overridden here to add the migration annotation,
   // which I hope to turn into an Xlint style warning as the migration aspect
@@ -185,33 +182,28 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @param len  the size of the subsets.
     *  @return     the iterator.
     */
-  def subsets(len: Int): Iterator[This] = {
+  def subsets(len: Int): Iterator[This] =
     if (len < 0 || len > size) Iterator.empty
     else new SubsetsItr(self.toIndexedSeq, len)
-  }
 
   /** An iterator over all subsets of this set.
     *
     *  @return     the iterator.
     */
-  def subsets(): Iterator[This] = new AbstractIterator[This] {
+  def subsets(): Iterator[This] = new AbstractIterator[This]
     private val elms = self.toIndexedSeq
     private var len = 0
     private var itr: Iterator[This] = Iterator.empty
 
     def hasNext = len <= elms.size || itr.hasNext
-    def next = {
-      if (!itr.hasNext) {
+    def next =
+      if (!itr.hasNext)
         if (len > elms.size) Iterator.empty.next()
-        else {
+        else
           itr = new SubsetsItr(elms, len)
           len += 1
-        }
-      }
 
       itr.next()
-    }
-  }
 
   /** An Iterator include all subsets containing exactly len elements.
     *  If the elements in 'This' type is ordered, then the subsets will also be in the same order.
@@ -221,13 +213,13 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @date 2010.12.6
     */
   private class SubsetsItr(elms: IndexedSeq[A], len: Int)
-      extends AbstractIterator[This] {
+      extends AbstractIterator[This]
     private val idxs = Array.range(0, len + 1)
     private var _hasNext = true
     idxs(len) = elms.size
 
     def hasNext = _hasNext
-    def next(): This = {
+    def next(): This =
       if (!hasNext) Iterator.empty.next()
 
       val buf = self.newBuilder
@@ -238,14 +230,11 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
       while (i >= 0 && idxs(i) == idxs(i + 1) - 1) i -= 1
 
       if (i < 0) _hasNext = false
-      else {
+      else
         idxs(i) += 1
         for (j <- (i + 1) until len) idxs(j) = idxs(j - 1) + 1
-      }
 
       result
-    }
-  }
 
   /** Defines the prefix of this object's `toString` representation.
     *  @return  a string representation which starts the result of `toString` applied to this set.
@@ -253,4 +242,3 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     */
   override def stringPrefix: String = "Set"
   override def toString = super [IterableLike].toString
-}

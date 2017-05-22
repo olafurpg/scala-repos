@@ -2,7 +2,7 @@ package lila
 
 import lila.db.JsTube
 
-package object relation extends PackageObject with WithPlay {
+package object relation extends PackageObject with WithPlay
 
   type Relation = Boolean
   private[relation] val Follow: Relation = true
@@ -10,9 +10,7 @@ package object relation extends PackageObject with WithPlay {
 
   private[relation] type ID = String
 
-  object tube {
+  object tube
 
     private[relation] implicit lazy val relationTube =
       JsTube.json inColl Env.current.relationColl
-  }
-}

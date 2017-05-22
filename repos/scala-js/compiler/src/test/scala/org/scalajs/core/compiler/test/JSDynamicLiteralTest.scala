@@ -5,14 +5,14 @@ import org.junit.Test
 
 // scalastyle:off line.size.limit
 
-class JSDynamicLiteralTest extends DirectTest with TestHelpers {
+class JSDynamicLiteralTest extends DirectTest with TestHelpers
 
   override def preamble: String =
     """import scala.scalajs.js.Dynamic.{ literal => lit }
     """
 
   @Test
-  def callApplyOnly: Unit = {
+  def callApplyOnly: Unit =
 
     // selectDynamic (with any name)
     expr"""
@@ -36,10 +36,9 @@ class JSDynamicLiteralTest extends DirectTest with TestHelpers {
       |    lit.helloWorld("a" -> "a")
       |                  ^
     """
-  }
 
   @Test
-  def goodTypesOnly: Unit = {
+  def goodTypesOnly: Unit =
 
     // Bad value type (applyDynamic)
     """
@@ -64,10 +63,9 @@ class JSDynamicLiteralTest extends DirectTest with TestHelpers {
       def foo = lit(a = x)
     }
     """.fails()
-  }
 
   @Test
-  def noNonLiteralMethodName: Unit = {
+  def noNonLiteralMethodName: Unit =
 
     // applyDynamicNamed
     """
@@ -92,10 +90,9 @@ class JSDynamicLiteralTest extends DirectTest with TestHelpers {
       |      def foo = lit.applyDynamic(x)()
       |                                   ^
     """
-  }
 
   @Test
-  def keyDuplicationWarning: Unit = {
+  def keyDuplicationWarning: Unit =
 
     // detects duplicate named keys
     expr"""
@@ -211,5 +208,3 @@ class JSDynamicLiteralTest extends DirectTest with TestHelpers {
       |      lit("a" -> "2", tup, ("a", "3"), b -> "5", tup, b -> "6")
       |         ^
     """
-  }
-}

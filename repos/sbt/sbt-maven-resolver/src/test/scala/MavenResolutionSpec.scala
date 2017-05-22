@@ -8,7 +8,7 @@ import sbt.librarymanagement.{Artifact, Configurations, CrossVersion, DefaultMav
 
 import sbt.internal.util.ShowLines
 
-class MavenResolutionSpec extends BaseIvySpecification {
+class MavenResolutionSpec extends BaseIvySpecification
 
   "the maven resolution" should "handle sbt plugins" in resolveSbtPlugins
 
@@ -77,49 +77,46 @@ class MavenResolutionSpec extends BaseIvySpecification {
   def defaultUpdateOptions =
     UpdateOptions().withResolverConverter(MavenResolverConverter.converter)
 
-  def resolveMajorConflicts = {
+  def resolveMajorConflicts =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(majorConflictLib),
                    None,
                    defaultUpdateOptions)
     val report = ivyUpdate(m) // should not(throwAn[IllegalStateException])
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == Compile.name
       m <- conf.modules if (m.module.name contains "stringtemplate")
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     jars should have size 1
-  }
 
-  def resolveCrossConfigurations = {
+  def resolveCrossConfigurations =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(scalaCompiler, scalaContinuationPlugin),
                    None,
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == ScalaTool.name
       m <- conf.modules if (m.module.name contains "scala-compiler")
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     jars should have size 1
-  }
 
-  def resolveSbtPlugins = {
+  def resolveSbtPlugins =
 
     def sha(f: java.io.File): String = sbt.io.Hash.toHex(sbt.io.Hash(f))
-    def findSbtIdeaJars(dep: ModuleID, name: String) = {
+    def findSbtIdeaJars(dep: ModuleID, name: String) =
       val m = module(ModuleID("com.example", name, "0.1.0", Some("compile")),
                      Seq(dep),
                      None,
                      defaultUpdateOptions)
       val report = ivyUpdate(m)
-      for {
+      for
         conf <- report.configurations if conf.configuration == "compile"
         m <- conf.modules if (m.module.name contains "sbt-idea")
         (a, f) <- m.artifacts if a.extension == "jar"
-      } yield (f, sha(f))
-    }
+      yield (f, sha(f))
 
     val oldJars = findSbtIdeaJars(oldSbtPlugin, "old")
     System.err.println(s"${oldJars.mkString("\n")}")
@@ -129,38 +126,35 @@ class MavenResolutionSpec extends BaseIvySpecification {
     (oldJars should have size 1)
     (oldJars.map(_._2) should not(
             contain theSameElementsAs (newJars.map(_._2))))
-  }
 
-  def resolveSnapshotPubDate = {
+  def resolveSnapshotPubDate =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(testSnapshot),
                    Some("2.10.2"),
                    defaultUpdateOptions.withLatestSnapshots(true))
     val report = ivyUpdate(m)
-    val pubTime = for {
+    val pubTime = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if m.module.revision endsWith "-SNAPSHOT"
       date <- m.publicationDate
-    } yield date
+    yield date
     (pubTime should have size 1)
-  }
 
-  def resolvePomArtifactAndDependencies = {
+  def resolvePomArtifactAndDependencies =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(scalaLibraryAll),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name == "scala-library") ||
           (m.module.name contains "parser")
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     jars should have size 2
-  }
 
-  def failIfPomMissing = {
+  def failIfPomMissing =
     // TODO - we need the jar to not exist too.
     val m = module(
         ModuleID("com.example", "foo", "0.1.0", Some("compile")),
@@ -169,88 +163,82 @@ class MavenResolutionSpec extends BaseIvySpecification {
         Some("2.10.2"),
         defaultUpdateOptions)
     an[Exception] should be thrownBy ivyUpdate(m)
-  }
 
-  def failIfMainArtifactMissing = {
+  def failIfMainArtifactMissing =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(jmxri),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     an[Exception] should be thrownBy ivyUpdate(m)
-  }
 
-  def resolveNonstandardClassifier = {
+  def resolveNonstandardClassifier =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(testngJdk5),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if m.module.name == "testng"
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     (report.configurations should have size configurations.size)
     (jars should have size 1)
     (jars.forall(_.exists) shouldBe true)
-  }
 
-  def resolveTransitiveMavenDependency = {
+  def resolveTransitiveMavenDependency =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(akkaActor),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if m.module.name == "scala-library"
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     (report.configurations should have size configurations.size)
     (jars should not be empty)
     (jars.forall(_.exists) shouldBe true)
-  }
 
-  def resolveIntransitiveMavenDependency = {
+  def resolveIntransitiveMavenDependency =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(akkaActorTestkit.intransitive()),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val transitiveJars = for {
+    val transitiveJars = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
           !(m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
-    val directJars = for {
+    yield f
+    val directJars = for
       conf <- report.configurations if conf.configuration == "compile"
       m <- conf.modules if (m.module.name contains "akka-actor") &&
           (m.module.name contains "testkit")
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     (report.configurations should have size configurations.size)
     (transitiveJars shouldBe empty)
     (directJars.forall(_.exists) shouldBe true)
-  }
 
-  def resolveTransitiveConfigurationMavenDependency = {
+  def resolveTransitiveConfigurationMavenDependency =
     val m = module(ModuleID("com.example", "foo", "0.1.0", Some("compile")),
                    Seq(akkaActorTestkit),
                    Some("2.10.2"),
                    defaultUpdateOptions)
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations if conf.configuration == "test"
       m <- conf.modules if m.module.name contains "akka-actor"
       (a, f) <- m.artifacts if a.extension == "jar"
-    } yield f
+    yield f
     (report.configurations should have size configurations.size)
     (jars should not be empty)
     (jars.forall(_.exists) shouldBe true)
-  }
 
-  def resolveSourceAndJavadoc = {
+  def resolveSourceAndJavadoc =
     val m = module(
         ModuleID("com.example", "foo", "0.1.0", Some("sources")),
         Seq(akkaActor.artifacts(Artifact(akkaActor.name, "javadoc"),
@@ -259,7 +247,7 @@ class MavenResolutionSpec extends BaseIvySpecification {
         defaultUpdateOptions
     )
     val report = ivyUpdate(m)
-    val jars = for {
+    val jars = for
       conf <- report.configurations
              //  We actually injected javadoc/sources into the compile scope, due to how we did the request.
              //  SO, we report that here.
@@ -267,19 +255,18 @@ class MavenResolutionSpec extends BaseIvySpecification {
       m <- conf.modules
       (a, f) <- m.artifacts if (f.getName contains "sources") ||
                (f.getName contains "javadoc")
-    } yield f
+    yield f
     (report.configurations should have size configurations.size)
     (jars should have size 2)
-  }
 
-  def publishMavenMetadata = {
+  def publishMavenMetadata =
     val m = module(
         ModuleID("com.example", "test-it", "1.0-SNAPSHOT", Some("compile")),
         Seq(),
         None,
         defaultUpdateOptions.withLatestSnapshots(true)
     )
-    sbt.io.IO.withTemporaryDirectory { dir =>
+    sbt.io.IO.withTemporaryDirectory  dir =>
       val pomFile = new java.io.File(dir, "pom.xml")
       sbt.io.IO.write(pomFile,
                       """
@@ -301,7 +288,6 @@ class MavenResolutionSpec extends BaseIvySpecification {
                   Artifact("test-it-1.0-SNAPSHOT.jar") -> pomFile,
                   Artifact("test-it-1.0-SNAPSHOT.pom", "pom", "pom") -> jarFile
               )))
-    }
     val baseLocalMavenDir: java.io.File = Resolver.publishMavenLocal.rootFile
     val allFiles: Seq[java.io.File] = sbt.io
       .PathFinder(new java.io.File(baseLocalMavenDir, "com/example/test-it"))
@@ -312,5 +298,3 @@ class MavenResolutionSpec extends BaseIvySpecification {
     // TODO - maybe we check INSIDE the metadata, or make sure we can get a publication date on resolve...
     // We end up with 4 files, two mavne-metadata files, and 2 maven-metadata-local files.
     metadataFiles should have size 2
-  }
-}

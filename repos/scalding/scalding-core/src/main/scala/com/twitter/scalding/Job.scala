@@ -33,21 +33,19 @@ import java.util.{List => JList}
 import java.util.concurrent.{Executors, TimeUnit, ThreadFactory, Callable, TimeoutException}
 import java.util.concurrent.atomic.AtomicInteger
 
-object Job {
+object Job
 
   /**
     * Use reflection to create the job by name.  We use the thread's
     * context classloader so that classes in the submitted jar and any
     * jars included via -libjar can be found.
     */
-  def apply(jobName: String, args: Args): Job = {
+  def apply(jobName: String, args: Args): Job =
     Class
       .forName(jobName, true, Thread.currentThread().getContextClassLoader)
       .getConstructor(classOf[Args])
       .newInstance(args)
       .asInstanceOf[Job]
-  }
-}
 
 /**
   * Job is a convenience class to make using Scalding easier.
@@ -70,7 +68,7 @@ object Job {
   * write code that rather than returning values, it returns a (FlowDef, Mode) => T,
   * these functions can be combined Monadically using algebird.monad.Reader.
   */
-class Job(val args: Args) extends FieldConversions with java.io.Serializable {
+class Job(val args: Args) extends FieldConversions with java.io.Serializable
   Tracing.init()
 
   // Set specific Mode
@@ -80,10 +78,9 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
   /**
     * Use this if a map or reduce phase takes a while before emitting tuples.
     */
-  def keepAlive {
+  def keepAlive
     val flowProcess = RuntimeStats.getFlowProcessForUniqueId(uniqueId)
     flowProcess.keepAlive
-  }
 
   /**
     * you should never call this directly, it is here to make
@@ -126,11 +123,10 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
 
   //This is the FlowDef used by all Sources this job creates
   @transient
-  implicit protected val flowDef = {
+  implicit protected val flowDef =
     val fd = new FlowDef
     fd.setName(name)
     fd
-  }
 
   // Do this before the job is submitted, because the flowDef is transient
   private[this] val uniqueId = UniqueID.getIDFor(flowDef)
@@ -178,7 +174,7 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
     *
     * This returns Map[AnyRef, AnyRef] for compatibility with older code
     */
-  def config: Map[AnyRef, AnyRef] = {
+  def config: Map[AnyRef, AnyRef] =
     val base = Config.empty
       .setListSpillThreshold(defaultSpillThreshold)
       .setMapSpillThreshold(defaultSpillThreshold)
@@ -188,10 +184,9 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
     AppProps.addApplicationFramework(
         null, String.format("scalding:%s", scaldingVersion))
 
-    val modeConf = mode match {
+    val modeConf = mode match
       case h: HadoopMode => Config.fromHadoop(h.jobConf)
       case _ => Config.empty
-    }
 
     val init = base ++ modeConf
 
@@ -209,7 +204,6 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
       ._2
       .toMap
       .toMap // the second one is to lift from String -> AnyRef
-  }
 
   /**
     * This is here so that Mappable.toIterator can find an implicit config
@@ -227,9 +221,8 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
   def stepStrategy: Option[FlowStepStrategy[_]] = None
 
   private def executionContext: Try[ExecutionContext] =
-    Config.tryFrom(config).map { conf =>
+    Config.tryFrom(config).map  conf =>
       ExecutionContext.newContext(conf)(flowDef, mode)
-    }
 
   /**
     * combine the config, flowDef and the Mode to produce a flow
@@ -237,11 +230,11 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
   def buildFlow: Flow[_] =
     executionContext
       .flatMap(_.buildFlow)
-      .map { flow =>
+      .map  flow =>
         listeners.foreach { flow.addListener(_) }
         stepListeners.foreach { flow.addStepListener(_) }
         skipStrategy.foreach { flow.setFlowSkipStrategy(_) }
-        stepStrategy.foreach { strategy =>
+        stepStrategy.foreach  strategy =>
           val existing = flow.getFlowStepStrategy
           val composed =
             if (existing == null) strategy
@@ -250,47 +243,38 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
                   existing.asInstanceOf[FlowStepStrategy[Any]],
                   strategy.asInstanceOf[FlowStepStrategy[Any]])
           flow.setFlowStepStrategy(composed)
-        }
         flow
-      }
       .get
 
   // called before run
   // only override if you do not use flowDef
-  def validate {
+  def validate
     FlowStateMap.validateSources(flowDef, mode)
-  }
 
   // called after successfull run
   // only override if you do not use flowDef
-  def clear {
+  def clear
     FlowStateMap.clear(flowDef)
-  }
 
-  protected def handleStats(statsData: CascadingStats) {
+  protected def handleStats(statsData: CascadingStats)
     scaldingCascadingStats = Some(statsData)
     // TODO: Why the two ways to do stats? Answer: jank-den.
-    if (args.boolean("scalding.flowstats")) {
+    if (args.boolean("scalding.flowstats"))
       val statsFilename =
         args.getOrElse("scalding.flowstats", name + "._flowstats.json")
       val br = new BufferedWriter(
           new OutputStreamWriter(new FileOutputStream(statsFilename), "utf-8"))
       br.write(JobStats(statsData).toJson)
       br.close
-    }
     // Print custom counters unless --scalding.nocounters is used or there are no custom stats
-    if (!args.boolean("scalding.nocounters")) {
+    if (!args.boolean("scalding.nocounters"))
       implicit val statProvider = statsData
       val jobStats = Stats.getAllCustomCounters
-      if (!jobStats.isEmpty) {
+      if (!jobStats.isEmpty)
         println("Dumping custom counters:")
-        jobStats.foreach {
+        jobStats.foreach
           case (counter, value) =>
             println("%s\t%s".format(counter, value))
-        }
-      }
-    }
-  }
 
   // TODO design a better way to test stats.
   // This awful name is designed to avoid collision
@@ -306,14 +290,13 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
   private[scalding] var completedFlow: Option[Flow[_]] = None
 
   //Override this if you need to do some extra processing other than complete the flow
-  def run: Boolean = {
+  def run: Boolean =
     val flow = buildFlow
     flow.complete
     val statsData = flow.getFlowStats
     handleStats(statsData)
     completedFlow = Some(flow)
     statsData.isSuccessful
-  }
 
   //override these to add any listeners you need
   def listeners: List[FlowListener] = Nil
@@ -360,40 +343,34 @@ class Job(val args: Args) extends FieldConversions with java.io.Serializable {
    * TODO: once we have a mechanism to access FlowProcess from user functions, we can use this
    *       function to allow long running jobs by notifying Cascading of progress.
    */
-  def timeout[T](timeout: AbsoluteDuration)(t: => T): Option[T] = {
-    val f = timeoutExecutor.submit(new Callable[Option[T]] {
+  def timeout[T](timeout: AbsoluteDuration)(t: => T): Option[T] =
+    val f = timeoutExecutor.submit(new Callable[Option[T]]
       def call(): Option[T] = Some(t)
-    });
-    try {
+    );
+    try
       f.get(timeout.toMillisecs, TimeUnit.MILLISECONDS)
-    } catch {
+    catch
       case _: TimeoutException =>
         f.cancel(true)
         None
-    }
-  }
-}
 
 /*
  * NamedPoolThreadFactory is copied from util.core to avoid dependency.
  */
 class NamedPoolThreadFactory(name: String, makeDaemons: Boolean)
-    extends ThreadFactory {
+    extends ThreadFactory
   def this(name: String) = this(name, false)
 
   val group = new ThreadGroup(Thread.currentThread().getThreadGroup(), name)
   val threadNumber = new AtomicInteger(1)
 
-  def newThread(r: Runnable) = {
+  def newThread(r: Runnable) =
     val thread = new Thread(
         group, r, name + "-" + threadNumber.getAndIncrement())
     thread.setDaemon(makeDaemons)
-    if (thread.getPriority != Thread.NORM_PRIORITY) {
+    if (thread.getPriority != Thread.NORM_PRIORITY)
       thread.setPriority(Thread.NORM_PRIORITY)
-    }
     thread
-  }
-}
 
 /**
   * Sets up an implicit dateRange to use in your sources and an implicit
@@ -401,17 +378,16 @@ class NamedPoolThreadFactory(name: String, makeDaemons: Boolean)
   * Example args: --date 2011-10-02 2011-10-04 --tz UTC
   * If no timezone is given, Pacific is assumed.
   */
-trait DefaultDateRangeJob extends Job {
+trait DefaultDateRangeJob extends Job
   //Get date implicits and PACIFIC and UTC vals.
   import DateOps._
 
   // Optionally take --tz argument, or use Pacific time.  Derived classes may
   // override defaultTimeZone to change the default.
   def defaultTimeZone = PACIFIC
-  implicit lazy val tz = args.optional("tz") match {
+  implicit lazy val tz = args.optional("tz") match
     case Some(tzn) => java.util.TimeZone.getTimeZone(tzn)
     case None => defaultTimeZone
-  }
 
   // Optionally take a --period, which determines how many days each job runs over (rather
   // than over the whole date range)
@@ -421,17 +397,16 @@ trait DefaultDateRangeJob extends Job {
     else if (args.boolean("weekly")) 7
     else args.getOrElse("period", "0").toInt
 
-  lazy val (startDate, endDate) = {
+  lazy val (startDate, endDate) =
     val DateRange(s, e) = DateRange.parse(args.list("date"))
     (s, e)
-  }
 
   implicit lazy val dateRange = DateRange(
       startDate,
       if (period > 0) startDate + Days(period) - Millisecs(1) else endDate)
 
   override def next: Option[Job] =
-    if (period > 0) {
+    if (period > 0)
       val nextStartDate = startDate + Days(period)
       if (nextStartDate + Days(period - 1) > endDate) None // we're done
       else
@@ -440,20 +415,18 @@ trait DefaultDateRangeJob extends Job {
             clone(args +
                 ("date" -> List(nextStartDate.toString("yyyy-MM-dd"),
                                 endDate.toString("yyyy-MM-dd")))))
-    } else None
-}
+    else None
 
 // DefaultDateRangeJob with default time zone as UTC instead of Pacific.
-trait UtcDateRangeJob extends DefaultDateRangeJob {
+trait UtcDateRangeJob extends DefaultDateRangeJob
   override def defaultTimeZone = DateOps.UTC
-}
 
 /**
   * This is a simple job that allows you to launch Execution[T]
   * instances using scalding.Tool and scald.rb. You cannot print
   * the graph.
   */
-abstract class ExecutionJob[+T](args: Args) extends Job(args) {
+abstract class ExecutionJob[+T](args: Args) extends Job(args)
   import scala.concurrent.{Await, ExecutionContext => scEC}
 
   /**
@@ -475,53 +448,42 @@ abstract class ExecutionJob[+T](args: Args) extends Job(args) {
     sys.error("ExecutionJobs do not have a single accessible flow. " +
         "You cannot print the graph as it may be dynamically built or recurrent")
 
-  final override def run = {
-    val r = Config.tryFrom(config).map { conf =>
+  final override def run =
+    val r = Config.tryFrom(config).map  conf =>
       Await.result(execution.run(conf, mode)(concurrentExecutionContext),
                    scala.concurrent.duration.Duration.Inf)
-    }
-    if (!resultPromise.tryComplete(r)) {
+    if (!resultPromise.tryComplete(r))
       // The test framework can call this more than once.
       println(
           "Warning: run called more than once, should not happen in production")
-    }
     // Force an exception if the run failed
     r.get
     true
-  }
-}
 
 /*
  * Run a list of shell commands through bash in the given order. Return success
  * when all commands succeed. Excution stops after the first failure. The
  * failing command is printed to stdout.
  */
-class ScriptJob(cmds: Iterable[String]) extends Job(Args("")) {
-  override def run = {
-    try {
-      cmds.dropWhile { cmd: String =>
-        {
-          new java.lang.ProcessBuilder("bash", "-c", cmd).start().waitFor() match {
+class ScriptJob(cmds: Iterable[String]) extends Job(Args(""))
+  override def run =
+    try
+      cmds.dropWhile  cmd: String =>
+          new java.lang.ProcessBuilder("bash", "-c", cmd).start().waitFor() match
             case x if x != 0 =>
               println(cmd + " failed, exitStatus: " + x)
               false
             case 0 => true
-          }
-        }
-      }.isEmpty
-    } catch {
-      case e: Exception => {
+      .isEmpty
+    catch
+      case e: Exception =>
           e.printStackTrace
           false
-        }
-    }
-  }
-}
 
 /**
   * Allows custom counter verification logic when the job completes.
   */
-trait CounterVerification extends Job {
+trait CounterVerification extends Job
 
   /**
     * Verify counter values. The job will fail if this returns false or throws an exception.
@@ -533,29 +495,23 @@ trait CounterVerification extends Job {
     */
   def verifyCountersInTest: Boolean = true
 
-  override def listeners: List[FlowListener] = {
-    if (this.mode.isInstanceOf[TestMode] && !this.verifyCountersInTest) {
+  override def listeners: List[FlowListener] =
+    if (this.mode.isInstanceOf[TestMode] && !this.verifyCountersInTest)
       super.listeners
-    } else {
+    else
       super.listeners :+ new StatsFlowListener(this.verifyCounters)
-    }
-  }
-}
 
 private[scalding] case class FlowStepStrategies[A]()
-    extends Semigroup[FlowStepStrategy[A]] {
+    extends Semigroup[FlowStepStrategy[A]]
 
   /**
     * Returns a new FlowStepStrategy that runs both strategies in sequence.
     */
   def plus(
       l: FlowStepStrategy[A], r: FlowStepStrategy[A]): FlowStepStrategy[A] =
-    new FlowStepStrategy[A] {
+    new FlowStepStrategy[A]
       override def apply(flow: Flow[A],
                          predecessorSteps: JList[FlowStep[A]],
-                         flowStep: FlowStep[A]): Unit = {
+                         flowStep: FlowStep[A]): Unit =
         l.apply(flow, predecessorSteps, flowStep)
         r.apply(flow, predecessorSteps, flowStep)
-      }
-    }
-}

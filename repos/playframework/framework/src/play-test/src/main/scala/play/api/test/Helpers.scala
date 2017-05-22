@@ -32,7 +32,7 @@ import akka.util.{ByteString, Timeout}
 /**
   * Helper functions to run tests.
   */
-trait PlayRunners extends HttpVerbs {
+trait PlayRunners extends HttpVerbs
 
   val HTMLUNIT = classOf[HtmlUnitDriver]
   val FIREFOX = classOf[FirefoxDriver]
@@ -42,73 +42,60 @@ trait PlayRunners extends HttpVerbs {
     */
   lazy val baseApplicationBuilder = new GuiceApplicationBuilder()
 
-  def running[T]()(block: Application => T): T = {
+  def running[T]()(block: Application => T): T =
     val app = baseApplicationBuilder.build()
     running(app)(block(app))
-  }
 
   /**
     * Executes a block of code in a running application.
     */
-  def running[T](app: Application)(block: => T): T = {
-    PlayRunners.mutex.synchronized {
-      try {
+  def running[T](app: Application)(block: => T): T =
+    PlayRunners.mutex.synchronized
+      try
         Play.start(app)
         block
-      } finally {
+      finally
         Play.stop(app)
-      }
-    }
-  }
 
   def running[T](builder: GuiceApplicationBuilder => GuiceApplicationBuilder)(
-      block: Application => T): T = {
+      block: Application => T): T =
     val app = builder(baseApplicationBuilder).build()
     running(app)(block(app))
-  }
 
   /**
     * Executes a block of code in a running server.
     */
-  def running[T](testServer: TestServer)(block: => T): T = {
-    PlayRunners.mutex.synchronized {
-      try {
+  def running[T](testServer: TestServer)(block: => T): T =
+    PlayRunners.mutex.synchronized
+      try
         testServer.start()
         block
-      } finally {
+      finally
         testServer.stop()
-      }
-    }
-  }
 
   /**
     * Executes a block of code in a running server, with a test browser.
     */
   def running[T, WEBDRIVER <: WebDriver](
       testServer: TestServer, webDriver: Class[WEBDRIVER])(
-      block: TestBrowser => T): T = {
+      block: TestBrowser => T): T =
     running(testServer, WebDriverFactory(webDriver))(block)
-  }
 
   /**
     * Executes a block of code in a running server, with a test browser.
     */
   def running[T](testServer: TestServer, webDriver: WebDriver)(
-      block: TestBrowser => T): T = {
+      block: TestBrowser => T): T =
     var browser: TestBrowser = null
-    PlayRunners.mutex.synchronized {
-      try {
+    PlayRunners.mutex.synchronized
+      try
         testServer.start()
         browser = TestBrowser(webDriver, None)
         block(browser)
-      } finally {
-        if (browser != null) {
+      finally
+        if (browser != null)
           browser.quit()
-        }
         testServer.stop()
-      }
-    }
-  }
 
   /**
     * The port to use for a test server. Defaults to 19001. May be configured using the system property
@@ -122,7 +109,7 @@ trait PlayRunners extends HttpVerbs {
     */
   def inMemoryDatabase(name: String = "default",
                        options: Map[String, String] = Map
-                           .empty[String, String]): Map[String, String] = {
+                           .empty[String, String]): Map[String, String] =
     val optionsForDbUrl = options.map { case (k, v) => k + "=" + v }
       .mkString(";", ";", "")
 
@@ -132,18 +119,15 @@ trait PlayRunners extends HttpVerbs {
         ("jdbc:h2:mem:play-test-" + scala.util.Random.nextInt +
             optionsForDbUrl)
     )
-  }
-}
 
-object PlayRunners {
+object PlayRunners
 
   /**
     * This mutex is used to ensure that no two tests that set the global application can run at the same time.
     */
   private[play] val mutex: AnyRef = new AnyRef()
-}
 
-trait Writeables {
+trait Writeables
   implicit def writeableOf_AnyContentAsJson(
       implicit codec: Codec): Writeable[AnyContentAsJson] =
     Writeable.writeableOf_JsValue.map(c => c.json)
@@ -166,9 +150,8 @@ trait Writeables {
   implicit def writeableOf_AnyContentAsEmpty(
       implicit code: Codec): Writeable[AnyContentAsEmpty.type] =
     Writeable(_ => ByteString.empty, None)
-}
 
-trait DefaultAwaitTimeout {
+trait DefaultAwaitTimeout
 
   /**
     * The default await timeout.  Override this to change it.
@@ -192,9 +175,8 @@ trait DefaultAwaitTimeout {
     */
   case class NegativeTimeout(t: Timeout)
   implicit val defaultNegativeTimeout = NegativeTimeout(200.millis)
-}
 
-trait FutureAwaits { self: DefaultAwaitTimeout =>
+trait FutureAwaits  self: DefaultAwaitTimeout =>
 
   import java.util.concurrent.TimeUnit
 
@@ -209,9 +191,8 @@ trait FutureAwaits { self: DefaultAwaitTimeout =>
     */
   def await[T](future: Future[T], timeout: Long, unit: TimeUnit): T =
     Await.result(future, Duration(timeout, unit))
-}
 
-trait EssentialActionCaller { self: Writeables =>
+trait EssentialActionCaller  self: Writeables =>
 
   /**
     * Execute an [[play.api.mvc.EssentialAction]].
@@ -228,27 +209,24 @@ trait EssentialActionCaller { self: Writeables =>
     * The body is serialised using the implicit writable, so that the action body parser can deserialise it.
     */
   def call[T](action: EssentialAction, rh: RequestHeader, body: T)(
-      implicit w: Writeable[T], mat: Materializer): Future[Result] = {
+      implicit w: Writeable[T], mat: Materializer): Future[Result] =
     import play.api.http.HeaderNames._
     val newContentType =
       rh.headers.get(CONTENT_TYPE).fold(w.contentType)(_ => None)
-    val rhWithCt = newContentType.map { ct =>
+    val rhWithCt = newContentType.map  ct =>
       rh.copy(headers = rh.headers.replace(CONTENT_TYPE -> ct))
-    }.getOrElse(rh)
+    .getOrElse(rh)
 
     val requestBody = Source.single(w.transform(body))
     action(rhWithCt).run(requestBody)
-  }
-}
 
-trait RouteInvokers extends EssentialActionCaller { self: Writeables =>
+trait RouteInvokers extends EssentialActionCaller  self: Writeables =>
 
   // Java compatibility
   def jRoute[T](app: Application,
                 r: RequestHeader,
-                body: RequestBody): Option[Future[Result]] = {
+                body: RequestBody): Option[Future[Result]] =
     route(app, r, body.asBytes())
-  }
 
   /**
     * Use the HttpRequestHandler to determine the Action to call for this request and execute it.
@@ -256,15 +234,13 @@ trait RouteInvokers extends EssentialActionCaller { self: Writeables =>
     * The body is serialised using the implicit writable, so that the action body parser can deserialise it.
     */
   def route[T](app: Application, rh: RequestHeader, body: T)(
-      implicit w: Writeable[T]): Option[Future[Result]] = {
+      implicit w: Writeable[T]): Option[Future[Result]] =
     val (taggedRh, handler) = app.requestHandler.handlerForRequest(rh)
     import app.materializer
-    handler match {
+    handler match
       case a: EssentialAction =>
         Some(call(a, taggedRh, body))
       case _ => None
-    }
-  }
 
   /**
     * Use the HttpRequestHandler to determine the Action to call for this request and execute it.
@@ -298,9 +274,8 @@ trait RouteInvokers extends EssentialActionCaller { self: Writeables =>
   def route[T](req: Request[T])(
       implicit w: Writeable[T]): Option[Future[Result]] =
     route(Play.current, req)
-}
 
-trait ResultExtractors { self: HeaderNames with Status =>
+trait ResultExtractors  self: HeaderNames with Status =>
 
   /**
     * Extracts the Content-Type of this Content value.
@@ -329,24 +304,21 @@ trait ResultExtractors { self: HeaderNames with Status =>
     * Extracts the Content-Type of this Result value.
     */
   def contentType(of: Future[Result])(
-      implicit timeout: Timeout): Option[String] = {
+      implicit timeout: Timeout): Option[String] =
     Await
       .result(of, timeout.duration)
       .body
       .contentType
       .map(_.split(";").take(1).mkString.trim)
-  }
 
   /**
     * Extracts the Charset of this Result value.
     */
-  def charset(of: Future[Result])(implicit timeout: Timeout): Option[String] = {
-    Await.result(of, timeout.duration).body.contentType match {
+  def charset(of: Future[Result])(implicit timeout: Timeout): Option[String] =
+    Await.result(of, timeout.duration).body.contentType match
       case Some(s) if s.contains("charset=") =>
         Some(s.split("; *charset=").drop(1).mkString.trim)
       case _ => None
-    }
-  }
 
   /**
     * Extracts the content as String.
@@ -360,10 +332,9 @@ trait ResultExtractors { self: HeaderNames with Status =>
     */
   def contentAsBytes(of: Future[Result])(
       implicit timeout: Timeout,
-      mat: Materializer = NoMaterializer): ByteString = {
+      mat: Materializer = NoMaterializer): ByteString =
     val result = Await.result(of, timeout.duration)
     Await.result(result.body.consumeData, timeout.duration)
-  }
 
   /**
     * Extracts the content as Json.
@@ -402,7 +373,7 @@ trait ResultExtractors { self: HeaderNames with Status =>
     */
   def redirectLocation(
       of: Future[Result])(implicit timeout: Timeout): Option[String] =
-    Await.result(of, timeout.duration).header match {
+    Await.result(of, timeout.duration).header match
       case ResponseHeader(FOUND, headers, _) => headers.get(LOCATION)
       case ResponseHeader(SEE_OTHER, headers, _) => headers.get(LOCATION)
       case ResponseHeader(TEMPORARY_REDIRECT, headers, _) =>
@@ -410,7 +381,6 @@ trait ResultExtractors { self: HeaderNames with Status =>
       case ResponseHeader(MOVED_PERMANENTLY, headers, _) =>
         headers.get(LOCATION)
       case ResponseHeader(_, _, _) => None
-    }
 
   /**
     * Extracts an Header value of this Result value.
@@ -424,7 +394,6 @@ trait ResultExtractors { self: HeaderNames with Status =>
   def headers(of: Future[Result])(
       implicit timeout: Timeout): Map[String, String] =
     Await.result(of, timeout.duration).header.headers
-}
 
 object Helpers
     extends PlayRunners with HeaderNames with Status with MimeTypes
@@ -437,7 +406,7 @@ object Helpers
   * strict body. So, rather than always requiring an implicit materializer, we use one if provided, otherwise we have
   * a default one that simply throws an exception if used.
   */
-private[play] object NoMaterializer extends Materializer {
+private[play] object NoMaterializer extends Materializer
   def withNamePrefix(name: String) =
     throw new UnsupportedOperationException("NoMaterializer cannot be named")
   implicit def executionContext =
@@ -455,4 +424,3 @@ private[play] object NoMaterializer extends Materializer {
                                     task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
         "NoMaterializer can't schedule tasks")
-}

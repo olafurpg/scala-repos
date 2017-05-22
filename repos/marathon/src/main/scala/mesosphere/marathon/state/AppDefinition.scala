@@ -51,7 +51,7 @@ case class AppDefinition(
     versionInfo: VersionInfo = VersionInfo.NoVersion,
     residency: Option[Residency] = AppDefinition.DefaultResidency)
     extends plugin.AppDefinition
-    with MarathonState[Protos.ServiceDefinition, AppDefinition] {
+    with MarathonState[Protos.ServiceDefinition, AppDefinition]
 
   import mesosphere.mesos.protos.Implicits._
 
@@ -65,21 +65,17 @@ case class AppDefinition(
     * of ths app's ports array, or if defined, the array of container
     * port mappings.
     */
-  def portIndicesAreValid(): Boolean = {
+  def portIndicesAreValid(): Boolean =
     val validPortIndices = hostPorts.indices
-    healthChecks.forall { hc =>
+    healthChecks.forall  hc =>
       hc.protocol == Protocol.COMMAND ||
       hc.portIndex.forall(validPortIndices.contains(_))
-    }
-  }
 
   def isResident: Boolean = residency.isDefined
 
-  def persistentVolumes: Iterable[PersistentVolume] = {
-    container.fold(Seq.empty[Volume])(_.volumes).collect {
+  def persistentVolumes: Iterable[PersistentVolume] =
+    container.fold(Seq.empty[Volume])(_.volumes).collect
       case vol: PersistentVolume => vol
-    }
-  }
 
   /**
     * @return the disk resources required for volumes
@@ -88,7 +84,7 @@ case class AppDefinition(
     persistentVolumes.map(_.persistent.size).sum.toDouble
 
   //scalastyle:off method.length
-  def toProto: Protos.ServiceDefinition = {
+  def toProto: Protos.ServiceDefinition =
     val commandInfo = TaskBuilder.commandInfo(
         app = this,
         taskId = None,
@@ -99,10 +95,9 @@ case class AppDefinition(
     val cpusResource = ScalarResource(Resource.CPUS, cpus)
     val memResource = ScalarResource(Resource.MEM, mem)
     val diskResource = ScalarResource(Resource.DISK, disk)
-    val appLabels = labels.map {
+    val appLabels = labels.map
       case (key, value) =>
         mesos.Parameter.newBuilder.setKey(key).setValue(value).build
-    }
 
     val builder = Protos.ServiceDefinition.newBuilder
       .setId(id.toString)
@@ -125,48 +120,42 @@ case class AppDefinition(
       .addAllStoreUrls(storeUrls.asJava)
       .addAllLabels(appLabels.asJava)
 
-    ipAddress.foreach { ip =>
+    ipAddress.foreach  ip =>
       builder.setIpAddress(ip.toProto)
-    }
 
-    container.foreach { c =>
+    container.foreach  c =>
       builder.setContainer(ContainerSerializer.toProto(c))
-    }
 
-    acceptedResourceRoles.foreach { acceptedResourceRoles =>
+    acceptedResourceRoles.foreach  acceptedResourceRoles =>
       val roles = Protos.ResourceRoles.newBuilder()
       acceptedResourceRoles.seq.foreach(roles.addRole)
       builder.setAcceptedResourceRoles(roles)
-    }
 
     builder.setVersion(version.toString)
-    versionInfo match {
+    versionInfo match
       case fullInfo: FullVersionInfo =>
         builder.setLastScalingAt(fullInfo.lastScalingAt.toDateTime.getMillis)
         builder.setLastConfigChangeAt(
             fullInfo.lastConfigChangeAt.toDateTime.getMillis)
       case _ => // ignore
-    }
 
-    residency.foreach { r =>
+    residency.foreach  r =>
       builder.setResidency(ResidencySerializer.toProto(r))
-    }
 
     builder.build
-  }
 
   //TODO: fix style issue and enable this scalastyle check
   //scalastyle:off cyclomatic.complexity method.length
-  def mergeFromProto(proto: Protos.ServiceDefinition): AppDefinition = {
+  def mergeFromProto(proto: Protos.ServiceDefinition): AppDefinition =
     val envMap: Map[String, String] =
-      proto.getCmd.getEnvironment.getVariablesList.asScala.map { v =>
+      proto.getCmd.getEnvironment.getVariablesList.asScala.map  v =>
         v.getName -> v.getValue
-      }.toMap
+      .toMap
 
     val resourcesMap: Map[String, Double] =
-      proto.getResourcesList.asScala.map { r =>
+      proto.getResourcesList.asScala.map  r =>
         r.getName -> (r.getScalar.getValue: Double)
-      }.toMap
+      .toMap
 
     val argsOption =
       if (proto.getCmd.getArgumentsCount > 0)
@@ -241,9 +230,9 @@ case class AppDefinition(
         healthChecks = proto.getHealthChecksList.asScala
             .map(new HealthCheck().mergeFromProto)
             .toSet,
-        labels = proto.getLabelsList.asScala.map { p =>
+        labels = proto.getLabelsList.asScala.map  p =>
           p.getKey -> p.getValue
-        }.toMap,
+        .toMap,
         versionInfo = versionInfoFromProto,
         upgradeStrategy = if (proto.hasUpgradeStrategy)
             UpgradeStrategy.fromProto(proto.getUpgradeStrategy)
@@ -254,15 +243,14 @@ case class AppDefinition(
         ipAddress = ipAddressOption,
         residency = residencyOption
     )
-  }
 
   def portMappings: Option[Seq[PortMapping]] =
-    for {
+    for
       c <- container
       d <- c.docker
       n <- d.network if n == DockerInfo.Network.BRIDGE
       pms <- d.portMappings
-    } yield pms
+    yield pms
 
   def containerHostPorts: Option[Seq[Int]] =
     for (pms <- portMappings) yield pms.map(_.hostPort)
@@ -277,10 +265,9 @@ case class AppDefinition(
   def hasDynamicPort: Boolean =
     servicePorts.contains(AppDefinition.RandomPortValue)
 
-  def mergeFromProto(bytes: Array[Byte]): AppDefinition = {
+  def mergeFromProto(bytes: Array[Byte]): AppDefinition =
     val proto = Protos.ServiceDefinition.parseFrom(bytes)
     mergeFromProto(proto)
-  }
 
   def version: Timestamp = versionInfo.version
 
@@ -294,8 +281,8 @@ case class AppDefinition(
     * True if the given app definition is a change to the current one in terms of runtime characteristics
     * of all deployed tasks of the current app, otherwise false.
     */
-  def isUpgrade(to: AppDefinition): Boolean = {
-    id == to.id && {
+  def isUpgrade(to: AppDefinition): Boolean =
+    id == to.id &&
       cmd != to.cmd || args != to.args || user != to.user || env != to.env ||
       cpus != to.cpus || mem != to.mem || disk != to.disk ||
       executor != to.executor || constraints != to.constraints ||
@@ -308,8 +295,6 @@ case class AppDefinition(
       upgradeStrategy != to.upgradeStrategy || labels != to.labels ||
       acceptedResourceRoles != to.acceptedResourceRoles ||
       ipAddress != to.ipAddress
-    }
-  }
 
   /**
     * Returns the changed app definition that is marked for restarting.
@@ -330,13 +315,11 @@ case class AppDefinition(
     * Identify other app definitions as the same, if id and version is the same.
     * Override the default equals implementation generated by scalac, which is very expensive.
     */
-  override def equals(obj: Any): Boolean = {
-    obj match {
+  override def equals(obj: Any): Boolean =
+    obj match
       case that: AppDefinition =>
         (that eq this) || (that.id == id && that.version == version)
       case _ => false
-    }
-  }
 
   /**
     * Compute the hashCode of an app only by id.
@@ -344,28 +327,23 @@ case class AppDefinition(
     */
   override def hashCode(): Int = id.hashCode()
 
-  def withCanonizedIds(base: PathId = PathId.empty): AppDefinition = {
+  def withCanonizedIds(base: PathId = PathId.empty): AppDefinition =
     val baseId = id.canonicalPath(base)
     copy(id = baseId, dependencies = dependencies.map(_.canonicalPath(baseId)))
-  }
-}
 
-object AppDefinition {
+object AppDefinition
 
-  sealed trait VersionInfo {
+  sealed trait VersionInfo
     def version: Timestamp
     def lastConfigChangeVersion: Timestamp
 
-    def withScaleOrRestartChange(newVersion: Timestamp): VersionInfo = {
+    def withScaleOrRestartChange(newVersion: Timestamp): VersionInfo =
       VersionInfo.forNewConfig(version).withScaleOrRestartChange(newVersion)
-    }
 
-    def withConfigChange(newVersion: Timestamp): VersionInfo = {
+    def withConfigChange(newVersion: Timestamp): VersionInfo =
       VersionInfo.forNewConfig(newVersion)
-    }
-  }
 
-  object VersionInfo {
+  object VersionInfo
 
     /**
       * This should only be used for new AppDefinitions.
@@ -373,17 +351,15 @@ object AppDefinition {
       * If you set the versionInfo of existing AppDefinitions to `NoVersion`,
       * it will result in a restart when this AppDefinition is passed to the GroupManager update method.
       */
-    case object NoVersion extends VersionInfo {
+    case object NoVersion extends VersionInfo
       override def version: Timestamp = Timestamp(0)
       override def lastConfigChangeVersion: Timestamp = version
-    }
 
     /**
       * Only contains a version timestamp. Will be converted to a FullVersionInfo before stored.
       */
-    case class OnlyVersion(version: Timestamp) extends VersionInfo {
+    case class OnlyVersion(version: Timestamp) extends VersionInfo
       override def lastConfigChangeVersion: Timestamp = version
-    }
 
     /**
       * @param version The versioning timestamp (we are currently assuming that this is the same as lastChangeAt)
@@ -394,22 +370,19 @@ object AppDefinition {
     case class FullVersionInfo(version: Timestamp,
                                lastScalingAt: Timestamp,
                                lastConfigChangeAt: Timestamp)
-        extends VersionInfo {
+        extends VersionInfo
 
       override def lastConfigChangeVersion: Timestamp = lastConfigChangeAt
 
       override def withScaleOrRestartChange(
-          newVersion: Timestamp): VersionInfo = {
+          newVersion: Timestamp): VersionInfo =
         copy(version = newVersion, lastScalingAt = newVersion)
-      }
-    }
 
     def forNewConfig(newVersion: Timestamp): FullVersionInfo = FullVersionInfo(
         version = newVersion,
         lastScalingAt = newVersion,
         lastConfigChangeAt = newVersion
     )
-  }
 
   val RandomPortValue: Int = 0
   val RandomPortDefinition: PortDefinition = PortDefinition(
@@ -474,7 +447,7 @@ object AppDefinition {
   def fromProto(proto: Protos.ServiceDefinition): AppDefinition =
     AppDefinition().mergeFromProto(proto)
 
-  private val validBasicAppDefinition = validator[AppDefinition] { appDef =>
+  private val validBasicAppDefinition = validator[AppDefinition]  appDef =>
     appDef.upgradeStrategy is valid
     appDef.container.each is valid
     appDef.storeUrls is every(urlCanBeResolvedValidator)
@@ -491,7 +464,6 @@ object AppDefinition {
     appDef must definesCorrectResidencyCombination
     (appDef.isResident is false) or
     (appDef.upgradeStrategy is UpgradeStrategy.validForResidentTasks)
-  }
 
   /**
     * We cannot validate HealthChecks here, because it would break backwards compatibility in weird ways.
@@ -501,11 +473,11 @@ object AppDefinition {
     * errors for every deployment potentially unrelated to the deployed apps.
     */
   implicit val validAppDefinition: Validator[AppDefinition] =
-    validator[AppDefinition] { app =>
+    validator[AppDefinition]  app =>
       app.id is valid
       app.id is PathId.absolutePathValidator
       app.dependencies is every(PathId.validPathWithBase(app.id.parent))
-    } and validBasicAppDefinition
+    and validBasicAppDefinition
 
   /**
     * Validator for apps, which are being part of a group.
@@ -513,76 +485,63 @@ object AppDefinition {
     * @return
     */
   def validNestedAppDefinition(base: PathId): Validator[AppDefinition] =
-    validator[AppDefinition] { app =>
+    validator[AppDefinition]  app =>
       app.id is PathId.validPathWithBase(base)
       app.dependencies is every(PathId.validPathWithBase(base))
-    } and validBasicAppDefinition
+    and validBasicAppDefinition
 
   private val definesCorrectResidencyCombination: Validator[AppDefinition] =
     isTrue(
-        "AppDefinition must contain persistent volumes and define residency") {
+        "AppDefinition must contain persistent volumes and define residency")
       app =>
         !(app.residency.isDefined ^ app.persistentVolumes.nonEmpty)
-    }
 
   private val containsCmdArgsOrContainer: Validator[AppDefinition] = isTrue(
-      "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.") {
+      "AppDefinition must either contain one of 'cmd' or 'args', and/or a 'container'.")
     app =>
       val cmd = app.cmd.nonEmpty
       val args = app.args.nonEmpty
       val container = app.container.exists(_ != Container.Empty)
       (cmd ^ args) || (!(cmd || args) && container)
-  }
 
   private def portIndexIsValid(
       hostPortsIndices: Range): Validator[HealthCheck] =
     isTrue(
-        "Health check port indices must address an element of the ports array or container port mappings.") {
+        "Health check port indices must address an element of the ports array or container port mappings.")
       hc =>
         hc.protocol == Protocol.COMMAND ||
-        (hc.portIndex match {
+        (hc.portIndex match
               case Some(idx) => hostPortsIndices contains idx
               case None =>
                 hostPortsIndices.length == 1 && hostPortsIndices.head == 0
-            })
-    }
+            )
 
-  def residentUpdateIsValid(from: AppDefinition): Validator[AppDefinition] = {
+  def residentUpdateIsValid(from: AppDefinition): Validator[AppDefinition] =
     val changeNoVolumes =
-      isTrue[AppDefinition]("Persistent volumes can not be changed!") { to =>
+      isTrue[AppDefinition]("Persistent volumes can not be changed!")  to =>
         val fromVolumes = from.persistentVolumes
         val toVolumes = to.persistentVolumes
         def sameSize = fromVolumes.size == toVolumes.size
-        def noChange = from.persistentVolumes.forall { fromVolume =>
+        def noChange = from.persistentVolumes.forall  fromVolume =>
           toVolumes
             .find(_.containerPath == fromVolume.containerPath)
             .contains(fromVolume)
-        }
         sameSize && noChange
-      }
 
     val changeNoResources = isTrue[AppDefinition](
-        "Resident Tasks may not change resource requirements!") { to =>
+        "Resident Tasks may not change resource requirements!")  to =>
       from.cpus == to.cpus && from.mem == to.mem && from.disk == to.disk &&
       from.portDefinitions == to.portDefinitions
-    }
 
-    validator[AppDefinition] { app =>
+    validator[AppDefinition]  app =>
       app should changeNoVolumes
       app should changeNoResources
       app.upgradeStrategy is UpgradeStrategy.validForResidentTasks
-    }
-  }
 
-  def updateIsValid(from: Group): Validator[AppDefinition] = {
-    new Validator[AppDefinition] {
-      override def apply(app: AppDefinition): Result = {
-        from.transitiveApps.find(_.id == app.id) match {
+  def updateIsValid(from: Group): Validator[AppDefinition] =
+    new Validator[AppDefinition]
+      override def apply(app: AppDefinition): Result =
+        from.transitiveApps.find(_.id == app.id) match
           case (Some(last)) if last.isResident || app.isResident =>
             residentUpdateIsValid(last)(app)
           case _ => Success
-        }
-      }
-    }
-  }
-}

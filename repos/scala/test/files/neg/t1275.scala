@@ -1,9 +1,8 @@
-object Test {
-  trait Seq[+t] {
+object Test
+  trait Seq[+t]
     type MyType [+t] <: Seq[t]
 
     def f: MyType[t]
-  }
 
   // illegal abstract type member refinement: changes the arity of MyType
   // the error is pretty strange, since the compiler forms the illegal type xs.MyType[a] anyway
@@ -13,4 +12,3 @@ object Test {
 //        ^
 // found   : xs.MyType[a]
 // required: s
-}

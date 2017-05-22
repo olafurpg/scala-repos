@@ -9,6 +9,5 @@ package types
   * @author Alexander Podkhalyuzin
   * Date: 13.03.2008
   */
-trait ScParenthesisedTypeElement extends ScTypeElement {
+trait ScParenthesisedTypeElement extends ScTypeElement
   def typeElement: Option[ScTypeElement] = findChild(classOf[ScTypeElement])
-}

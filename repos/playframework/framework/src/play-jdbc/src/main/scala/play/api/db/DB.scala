@@ -17,7 +17,7 @@ import play.api.Application
   * }}}
   */
 @deprecated(since = "2.4.3", message = "Use [[play.api.db.Database]]")
-object DB {
+object DB
 
   private val dbCache = Application.instanceCache[DBApi]
   private def db(implicit app: Application): DBApi = dbCache(app)
@@ -92,4 +92,3 @@ object DB {
   def withTransaction[A](block: Connection => A)(
       implicit app: Application): A =
     db.database("default").withTransaction(block)
-}

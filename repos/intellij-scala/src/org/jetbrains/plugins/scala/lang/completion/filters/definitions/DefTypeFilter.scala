@@ -19,17 +19,16 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.templates._
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
-class DefTypeFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class DefTypeFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
-      parent match {
+      parent match
         case _: ScReferenceExpression =>
         case _ => return false
-      }
-      parent.getParent match {
+      parent.getParent match
         case parent @ (_: ScBlock | _: ScCaseClause | _: ScTemplateBody |
             _: ScClassParameter | _: ScalaFile)
             if !parent.isInstanceOf[ScalaFile] ||
@@ -43,17 +42,11 @@ class DefTypeFilter extends ElementFilter {
                       !parent.getPrevSibling.getPrevSibling.getLastChild
                         .isInstanceOf[PsiErrorElement]))) return true
         case _ =>
-      }
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "'def', 'type' keyword filter"
-  }
-}

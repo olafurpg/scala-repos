@@ -28,17 +28,17 @@ import org.apache.spark.mllib.fpm.FPGrowth
   * Example usage: ./bin/run-example mllib.FPGrowthExample \
   *   --minSupport 0.8 --numPartition 2 ./data/mllib/sample_fpgrowth.txt
   */
-object FPGrowthExample {
+object FPGrowthExample
 
   case class Params(input: String = null,
                     minSupport: Double = 0.3,
                     numPartition: Int = -1)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("FPGrowthExample") {
+    val parser = new OptionParser[Params]("FPGrowthExample")
       head("FPGrowth: an example FP-growth app.")
       opt[Double]("minSupport")
         .text(s"minimal support level, default: ${defaultParams.minSupport}")
@@ -51,19 +51,15 @@ object FPGrowthExample {
             "contains a transaction with each item in String and separated by a space")
         .required()
         .action((x, c) => c.copy(input = x))
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"FPGrowthExample with $params")
     val sc = new SparkContext(conf)
     val transactions = sc.textFile(params.input).map(_.split(" ")).cache()
@@ -77,11 +73,8 @@ object FPGrowthExample {
 
     println(s"Number of frequent itemsets: ${model.freqItemsets.count()}")
 
-    model.freqItemsets.collect().foreach { itemset =>
+    model.freqItemsets.collect().foreach  itemset =>
       println(itemset.items.mkString("[", ",", "]") + ", " + itemset.freq)
-    }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

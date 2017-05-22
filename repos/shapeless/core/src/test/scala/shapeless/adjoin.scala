@@ -22,37 +22,33 @@ import test._
 
 import ops.adjoin._
 
-class AdjoinTests {
+class AdjoinTests
   @Test
-  def testHNil {
+  def testHNil
     val adjoin = Adjoin[HNil]
 
     typed[HNil](adjoin(HNil))
-  }
 
   @Test
-  def testIL {
+  def testIL
     val adjoin = Adjoin[Int :: HNil]
 
     typed[Int :: HNil](adjoin(1 :: HNil))
-  }
 
   @Test
-  def testIC {
+  def testIC
     val adjoin = Adjoin[Int :+: CNil]
 
     typed[Int :+: CNil](adjoin(Inl(1)))
-  }
 
   @Test
-  def testIandI {
+  def testIandI
     val adjoin = Adjoin[Int :: String :: HNil]
 
     typed[Int :: String :: HNil](adjoin(1 :: "foo" :: HNil))
-  }
 
   @Test
-  def testIandL {
+  def testIandL
     type I = Int
     type L = String :: Symbol :: HNil
     type R = Int :: String :: Symbol :: HNil
@@ -60,10 +56,9 @@ class AdjoinTests {
     val adjoin = Adjoin[I :: L :: HNil]
 
     typed[R](adjoin(1 :: ("foo" :: 'a :: HNil) :: HNil))
-  }
 
   @Test
-  def testLandI {
+  def testLandI
     type L = Int :: String :: HNil
     type I = Symbol
     type R = Int :: String :: Symbol :: HNil
@@ -71,10 +66,9 @@ class AdjoinTests {
     val adjoin = Adjoin[L :: I :: HNil]
 
     typed[R](adjoin((1 :: "foo" :: HNil) :: 'a :: HNil))
-  }
 
   @Test
-  def testLandL {
+  def testLandL
     type L1 = Int :: String :: HNil
     type L2 = Symbol :: Char :: HNil
     type R = Int :: String :: Symbol :: Char :: HNil
@@ -82,18 +76,16 @@ class AdjoinTests {
     val adjoin = Adjoin[L1 :: L2 :: HNil]
 
     typed[R](adjoin((1 :: "foo" :: HNil) :: ('a :: 'z' :: HNil) :: HNil))
-  }
 
   @Test
-  def testIorI {
+  def testIorI
     val adjoin = Adjoin[Int :+: String :+: CNil]
 
     typed[Int :+: String :+: CNil](adjoin(Inl(1)))
     typed[Int :+: String :+: CNil](adjoin(Inr(Inl("foo"))))
-  }
 
   @Test
-  def testIorC {
+  def testIorC
     type I = Int
     type C = String :+: Symbol :+: CNil
     type R = Int :+: String :+: Symbol :+: CNil
@@ -102,10 +94,9 @@ class AdjoinTests {
 
     typed[R](adjoin(Inl(1)))
     typed[R](adjoin(Inr(Inl(Inl("foo")))))
-  }
 
   @Test
-  def testCorI {
+  def testCorI
     type C = Int :+: String :+: CNil
     type I = Symbol
     type R = Int :+: String :+: Symbol :+: CNil
@@ -114,10 +105,9 @@ class AdjoinTests {
 
     typed[R](adjoin(Inl(Inl(1))))
     typed[R](adjoin(Inr(Inl('x))))
-  }
 
   @Test
-  def testCorC {
+  def testCorC
     type C1 = Int :+: String :+: CNil
     type C2 = Symbol :+: Char :+: CNil
     type R = Int :+: String :+: Symbol :+: Char :+: CNil
@@ -126,10 +116,9 @@ class AdjoinTests {
 
     typed[R](adjoin(Inl(Inl(1))))
     typed[R](adjoin(Inr(Inl(Inl('x)))))
-  }
 
   @Test
-  def testIandIandL {
+  def testIandIandL
     type I1 = Int
     type I2 = String
     type L = Symbol :: HNil
@@ -138,10 +127,9 @@ class AdjoinTests {
     val adjoin = Adjoin[I1 :: I2 :: L :: HNil]
 
     typed[R](adjoin(1 :: "foo" :: ('a :: HNil) :: HNil))
-  }
 
   @Test
-  def testIorIorC {
+  def testIorIorC
     type I1 = Int
     type I2 = String
     type C = Symbol :+: CNil
@@ -151,20 +139,18 @@ class AdjoinTests {
 
     typed[R](adjoin(Inl(1)))
     typed[R](adjoin(Inr(Inl("foo"))))
-  }
 
   @Test
-  def testHListSyntax {
+  def testHListSyntax
     type I1 = Int
     type I2 = String
     type L = Symbol :: HNil
     type R = Int :: String :: Symbol :: HNil
 
     typed[R]((1 :: "foo" :: ('a :: HNil) :: HNil).adjoined)
-  }
 
   @Test
-  def testCoproductSyntax {
+  def testCoproductSyntax
     type I1 = Int
     type I2 = String
     type C = Symbol :+: CNil
@@ -175,5 +161,3 @@ class AdjoinTests {
 
     typed[R](v1.adjoined)
     typed[R](v2.adjoined)
-  }
-}

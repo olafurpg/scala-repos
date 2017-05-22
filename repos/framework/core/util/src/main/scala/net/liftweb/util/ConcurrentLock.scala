@@ -19,34 +19,27 @@ package util
 
 import java.util.concurrent.locks._
 
-class ConcurrentLock extends ReentrantReadWriteLock {
+class ConcurrentLock extends ReentrantReadWriteLock
 
-  def read[T](f: => T): T = {
+  def read[T](f: => T): T =
     readLock().lock()
-    try {
+    try
       f
-    } finally {
+    finally
       readLock().unlock()
-    }
-  }
 
-  def write[T](f: => T): T = {
+  def write[T](f: => T): T =
     writeLock().lock()
-    try {
+    try
       f
-    } finally {
+    finally
       writeLock().unlock()
-    }
-  }
 
-  def upgrade[T](f: => T): T = {
+  def upgrade[T](f: => T): T =
     readLock().unlock
     writeLock().lock
-    try {
+    try
       f
-    } finally {
+    finally
       writeLock().unlock
       readLock().lock
-    }
-  }
-}

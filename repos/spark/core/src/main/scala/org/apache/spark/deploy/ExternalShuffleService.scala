@@ -40,7 +40,7 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
   */
 private[deploy] class ExternalShuffleService(
     sparkConf: SparkConf, securityManager: SecurityManager)
-    extends Logging {
+    extends Logging
 
   private val enabled =
     sparkConf.getBoolean("spark.shuffle.service.enabled", false)
@@ -57,62 +57,52 @@ private[deploy] class ExternalShuffleService(
 
   /** Create a new shuffle block handler. Factored out for subclasses to override. */
   protected def newShuffleBlockHandler(
-      conf: TransportConf): ExternalShuffleBlockHandler = {
+      conf: TransportConf): ExternalShuffleBlockHandler =
     new ExternalShuffleBlockHandler(conf, null)
-  }
 
   /** Starts the external shuffle service if the user has configured us to. */
-  def startIfEnabled() {
-    if (enabled) {
+  def startIfEnabled()
+    if (enabled)
       start()
-    }
-  }
 
   /** Start the external shuffle service */
-  def start() {
+  def start()
     require(server == null, "Shuffle server already started")
     logInfo(s"Starting shuffle service on port $port with useSasl = $useSasl")
     val bootstraps: Seq[TransportServerBootstrap] =
-      if (useSasl) {
+      if (useSasl)
         Seq(new SaslServerBootstrap(transportConf, securityManager))
-      } else {
+      else
         Nil
-      }
     server = transportContext.createServer(port, bootstraps.asJava)
-  }
 
   /** Clean up all shuffle files associated with an application that has exited. */
-  def applicationRemoved(appId: String): Unit = {
+  def applicationRemoved(appId: String): Unit =
     blockHandler.applicationRemoved(appId, true /* cleanupLocalDirs */ )
-  }
 
-  def stop() {
-    if (server != null) {
+  def stop()
+    if (server != null)
       server.close()
       server = null
-    }
-  }
-}
 
 /**
   * A main class for running the external shuffle service.
   */
-object ExternalShuffleService extends Logging {
+object ExternalShuffleService extends Logging
   @volatile
   private var server: ExternalShuffleService = _
 
   private val barrier = new CountDownLatch(1)
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     main(args,
          (conf: SparkConf,
          sm: SecurityManager) => new ExternalShuffleService(conf, sm))
-  }
 
   /** A helper main method that allows the caller to call this with a custom shuffle service. */
   private[spark] def main(args: Array[String],
                           newShuffleService: (SparkConf,
-                          SecurityManager) => ExternalShuffleService): Unit = {
+                          SecurityManager) => ExternalShuffleService): Unit =
     Utils.initDaemon(log)
     val sparkConf = new SparkConf
     Utils.loadDefaultSparkProperties(sparkConf)
@@ -124,13 +114,10 @@ object ExternalShuffleService extends Logging {
     server = newShuffleService(sparkConf, securityManager)
     server.start()
 
-    ShutdownHookManager.addShutdownHook { () =>
+    ShutdownHookManager.addShutdownHook  () =>
       logInfo("Shutting down shuffle service.")
       server.stop()
       barrier.countDown()
-    }
 
     // keep running until the process is terminated
     barrier.await()
-  }
-}

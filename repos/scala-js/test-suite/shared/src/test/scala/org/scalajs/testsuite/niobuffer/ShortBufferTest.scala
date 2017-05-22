@@ -11,60 +11,51 @@ import java.nio._
 
 import org.scalajs.testsuite.niobuffer.ByteBufferFactories._
 
-abstract class ShortBufferTest extends BaseBufferTest {
+abstract class ShortBufferTest extends BaseBufferTest
   type Factory = BufferFactory.ShortBufferFactory
 
-  class AllocShortBufferFactory extends Factory {
+  class AllocShortBufferFactory extends Factory
     def allocBuffer(capacity: Int): ShortBuffer =
       ShortBuffer.allocate(capacity)
-  }
 
   class WrappedShortBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory with BufferFactory.WrappedBufferFactory
     def baseWrap(array: Array[Short]): ShortBuffer =
       ShortBuffer.wrap(array)
 
     def baseWrap(array: Array[Short], offset: Int, length: Int): ShortBuffer =
       ShortBuffer.wrap(array, offset, length)
-  }
 
   class ByteBufferShortViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory with BufferFactory.ByteBufferViewFactory
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): ShortBuffer =
       byteBufferFactory.allocBuffer(capacity * 2).order(order).asShortBuffer()
-  }
-}
 
-class AllocShortBufferTest extends ShortBufferTest {
+class AllocShortBufferTest extends ShortBufferTest
   val factory: Factory = new AllocShortBufferFactory
-}
 
-class WrappedShortBufferTest extends ShortBufferTest {
+class WrappedShortBufferTest extends ShortBufferTest
   val factory: Factory = new WrappedShortBufferFactory
-}
 
-class WrappedShortReadOnlyBufferTest extends ShortBufferTest {
+class WrappedShortReadOnlyBufferTest extends ShortBufferTest
   val factory: Factory = new WrappedShortBufferFactory
   with BufferFactory.ReadOnlyBufferFactory
-}
 
-class AllocShortSlicedBufferTest extends ShortBufferTest {
+class AllocShortSlicedBufferTest extends ShortBufferTest
   val factory: Factory = new AllocShortBufferFactory
   with BufferFactory.SlicedBufferFactory
-}
 
 // Short views of byte buffers
 
 abstract class ShortViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends ShortBufferTest {
+    extends ShortBufferTest
 
   val factory: BufferFactory.ShortBufferFactory =
     new ByteBufferShortViewFactory(byteBufferFactory, order)
-}
 
 class ShortViewOfAllocByteBufferBigEndianTest
     extends ShortViewOfByteBufferTest(
@@ -94,13 +85,11 @@ class ShortViewOfSlicedAllocByteBufferLittleEndianTest
 
 abstract class ReadOnlyShortViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends ShortBufferTest {
+    extends ShortBufferTest
 
-  val factory: BufferFactory.ShortBufferFactory = {
+  val factory: BufferFactory.ShortBufferFactory =
     new ByteBufferShortViewFactory(byteBufferFactory, order)
     with BufferFactory.ReadOnlyBufferFactory
-  }
-}
 
 class ReadOnlyShortViewOfAllocByteBufferBigEndianTest
     extends ReadOnlyShortViewOfByteBufferTest(

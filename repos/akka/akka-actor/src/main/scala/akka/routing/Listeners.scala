@@ -22,7 +22,7 @@ final case class WithListeners(f: (ActorRef) ⇒ Unit) extends ListenerMessage
   * <p/>
   * Send <code>WithListeners(fun)</code> to traverse the current listeners.
   */
-trait Listeners { self: Actor ⇒
+trait Listeners  self: Actor ⇒
   protected val listeners: Set[ActorRef] = new TreeSet[ActorRef]
 
   /**
@@ -30,13 +30,12 @@ trait Listeners { self: Actor ⇒
     *
     * {{{ def receive = listenerManagement orElse … }}}
     */
-  protected def listenerManagement: Actor.Receive = {
+  protected def listenerManagement: Actor.Receive =
     case Listen(l) ⇒ listeners add l
     case Deafen(l) ⇒ listeners remove l
     case WithListeners(f) ⇒
       val i = listeners.iterator
       while (i.hasNext) f(i.next)
-  }
 
   /**
     * Sends the supplied message to all current listeners using the provided sender() as sender.
@@ -45,8 +44,6 @@ trait Listeners { self: Actor ⇒
     * @param sender
     */
   protected def gossip(msg: Any)(
-      implicit sender: ActorRef = Actor.noSender): Unit = {
+      implicit sender: ActorRef = Actor.noSender): Unit =
     val i = listeners.iterator
     while (i.hasNext) i.next ! msg
-  }
-}

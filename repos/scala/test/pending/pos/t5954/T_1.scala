@@ -1,8 +1,5 @@
-package p {
-  package base {
+package p
+  package base
     class X
-  }
-  package object base {
+  package object base
     case class B()
-  }
-}

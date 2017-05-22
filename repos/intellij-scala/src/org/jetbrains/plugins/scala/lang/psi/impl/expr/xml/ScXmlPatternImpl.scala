@@ -20,32 +20,26 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 21.04.2008
   */
 class ScXmlPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScXmlPattern {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScXmlPattern
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
-  override def subpatterns: Seq[ScPattern] = {
+  override def subpatterns: Seq[ScPattern] =
     val pattBuff: ArrayBuffer[ScPattern] = new ArrayBuffer[ScPattern]
     pattBuff ++= super.subpatterns
     val args = findChildrenByClassScala(classOf[ScPatterns])
-    for (arg <- args) {
+    for (arg <- args)
       pattBuff ++= arg.patterns
-    }
     pattBuff.toSeq
-  }
 
   override def toString: String = "XmlPattern"
 
-  override def getType(ctx: TypingContext): TypeResult[ScType] = {
+  override def getType(ctx: TypingContext): TypeResult[ScType] =
     val clazz = ScalaPsiManager
       .instance(getProject)
       .getCachedClass(getResolveScope, "scala.xml.Node")
       .orNull
     if (clazz == null) return Failure("not found scala.xml.Node", Some(this))
     Success(ScDesignatorType(clazz), Some(this))
-  }
-}

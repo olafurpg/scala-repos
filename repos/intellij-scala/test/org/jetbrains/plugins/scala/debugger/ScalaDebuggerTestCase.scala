@@ -39,7 +39,7 @@ import scala.util.{Failure, Success, Try}
   * User: Alefas
   * Date: 13.10.11
   */
-abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
+abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase
 
   protected val bp = "<breakpoint>"
 
@@ -48,44 +48,40 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
 
   protected def runDebugger(
       mainClass: String = mainClassName, debug: Boolean = false)(
-      callback: => Unit) {
+      callback: => Unit)
     var processHandler: ProcessHandler = null
-    UsefulTestCase.edt(new Runnable {
-      def run() {
-        if (needMake) {
+    UsefulTestCase.edt(new Runnable
+      def run()
+        if (needMake)
           make()
           saveChecksums()
-        }
         addBreakpoints()
-        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions.find {
+        val runner = ProgramRunner.PROGRAM_RUNNER_EP.getExtensions.find
           _.getClass == classOf[GenericDebuggerRunner]
-        }.get
+        .get
         processHandler = runProcess(mainClass,
                                     getModule,
                                     classOf[DefaultDebugExecutor],
-                                    new ProcessAdapter {
+                                    new ProcessAdapter
                                       override def onTextAvailable(
                                           event: ProcessEvent,
-                                          outputType: Key[_]) {
+                                          outputType: Key[_])
                                         val text = event.getText
                                         if (debug) print(text)
-                                      }
-                                    },
+                                    ,
                                     runner)
-      }
-    })
+    )
     callback
     clearXBreakpoints()
     getDebugProcess.stop(true)
     processHandler.destroyProcess()
-  }
 
   protected def runProcess(
       className: String,
       module: Module,
       executorClass: Class[_ <: Executor],
       listener: ProcessListener,
-      runner: ProgramRunner[_ <: RunnerSettings]): ProcessHandler = {
+      runner: ProgramRunner[_ <: RunnerSettings]): ProcessHandler =
     val configuration: ApplicationConfiguration = new ApplicationConfiguration(
         "app", module.getProject, ApplicationConfigurationType.getInstance)
     configuration.setModule(module)
@@ -100,42 +96,36 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     val processHandler: AtomicReference[ProcessHandler] =
       new AtomicReference[ProcessHandler]
     runner.execute(
-        executionEnvironmentBuilder.build, new ProgramRunner.Callback {
-      def processStarted(descriptor: RunContentDescriptor) {
+        executionEnvironmentBuilder.build, new ProgramRunner.Callback
+      def processStarted(descriptor: RunContentDescriptor)
         val handler: ProcessHandler = descriptor.getProcessHandler
         assert(handler != null)
         handler.addProcessListener(listener)
         processHandler.set(handler)
         semaphore.up()
-      }
-    })
+    )
     semaphore.waitFor()
     processHandler.get
-  }
 
-  protected def getDebugProcess: DebugProcessImpl = {
+  protected def getDebugProcess: DebugProcessImpl =
     getDebugSession.getProcess
-  }
 
-  protected def getDebugSession: DebuggerSession = {
+  protected def getDebugSession: DebuggerSession =
     DebuggerManagerEx.getInstanceEx(getProject).getContext.getDebuggerSession
-  }
 
-  protected def resume() {
+  protected def resume()
     val resumeCommand = getDebugProcess.createResumeCommand(suspendContext)
     getDebugProcess.getManagerThread.invokeAndWait(resumeCommand)
-  }
 
   protected def addBreakpoint(line: Int,
                               fileName: String = mainFileName,
-                              lambdaOrdinal: Integer = -1) {
+                              lambdaOrdinal: Integer = -1)
     breakpoints += ((fileName, line, lambdaOrdinal))
-  }
 
   protected def clearBreakpoints() = breakpoints.clear()
 
-  private def addBreakpoints() {
-    breakpoints.foreach {
+  private def addBreakpoints()
+    breakpoints.foreach
       case (fileName, line, ordinal) =>
         val ioFile = new File(srcDir, fileName)
         val file = getVirtualFile(ioFile)
@@ -143,55 +133,45 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
           XDebuggerManager.getInstance(getProject).getBreakpointManager
         val properties = new JavaLineBreakpointProperties
         properties.setLambdaOrdinal(ordinal)
-        inWriteAction {
+        inWriteAction
           xBreakpointManager.addLineBreakpoint(
               scalaLineBreakpointType, file.getUrl, line, properties)
-        }
-    }
-  }
 
-  private def clearXBreakpoints(): Unit = {
-    UsefulTestCase.edt(new Runnable {
-      def run() {
+  private def clearXBreakpoints(): Unit =
+    UsefulTestCase.edt(new Runnable
+      def run()
         val xBreakpointManager =
           XDebuggerManager.getInstance(getProject).getBreakpointManager
-        inWriteAction {
+        inWriteAction
           xBreakpointManager.getAllBreakpoints.foreach(
               xBreakpointManager.removeBreakpoint)
-        }
-      }
-    })
-  }
+    )
 
   protected def scalaLineBreakpointType =
     XBreakpointType.EXTENSION_POINT_NAME.findExtension(
         classOf[ScalaLineBreakpointType])
 
-  protected def waitForBreakpoint(): SuspendContextImpl = {
+  protected def waitForBreakpoint(): SuspendContextImpl =
     val (suspendContext, processTerminated) = waitForBreakpointInner()
 
     assert(suspendContext != null,
            "too long process, terminated=" + processTerminated)
     suspendContext
-  }
 
-  protected def processTerminatedNoBreakpoints(): Boolean = {
+  protected def processTerminatedNoBreakpoints(): Boolean =
     val (_, processTerminated) = waitForBreakpointInner()
     processTerminated
-  }
 
-  private def waitForBreakpointInner(): (SuspendContextImpl, Boolean) = {
+  private def waitForBreakpointInner(): (SuspendContextImpl, Boolean) =
     var i = 0
     def processTerminated: Boolean =
       getDebugProcess.getExecutionResult.getProcessHandler.isProcessTerminated
-    while (i < 1000 && suspendContext == null && !processTerminated) {
+    while (i < 1000 && suspendContext == null && !processTerminated)
       Thread.sleep(10)
       i += 1
-    }
     (suspendContext, processTerminated)
-  }
 
-  protected def managed[T >: Null](callback: => T): T = {
+  protected def managed[T >: Null](callback: => T): T =
     var result: T = null
     def ctx =
       DebuggerContextUtil.createDebuggerContext(
@@ -199,16 +179,14 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
     val semaphore = new Semaphore()
     semaphore.down()
     getDebugProcess.getManagerThread.invokeAndWait(
-        new DebuggerContextCommandImpl(ctx) {
-      def threadAction() {
+        new DebuggerContextCommandImpl(ctx)
+      def threadAction()
         result = callback
         semaphore.up()
-      }
-    })
+    )
     def finished = semaphore.waitFor(20000)
     assert(finished, "Too long debugger action")
     result
-  }
 
   protected def suspendManager = getDebugProcess.getSuspendManager
 
@@ -222,16 +200,16 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
   protected def currentSourcePosition =
     ContextUtil.getSourcePosition(suspendContext)
 
-  protected def evalResult(codeText: String): String = {
+  protected def evalResult(codeText: String): String =
     val semaphore = new Semaphore()
     semaphore.down()
-    val result = managed[String] {
+    val result = managed[String]
       val ctx: EvaluationContextImpl = evaluationContext()
       val factory = new ScalaCodeFragmentFactory()
       val kind =
         if (codeText.contains("\n")) CodeFragmentKind.CODE_BLOCK
         else CodeFragmentKind.EXPRESSION
-      val codeFragment: PsiCodeFragment = inReadAction {
+      val codeFragment: PsiCodeFragment = inReadAction
         val result =
           new CodeFragmentFactoryContextWrapper(factory).createCodeFragment(
               new TextWithImportsImpl(kind, codeText),
@@ -240,85 +218,69 @@ abstract class ScalaDebuggerTestCase extends ScalaDebuggerTestBase {
         result.forceResolveScope(GlobalSearchScope.allScope(getProject))
         DebuggerUtils.checkSyntax(result)
         result
-      }
       val evaluatorBuilder: EvaluatorBuilder = factory.getEvaluatorBuilder
 
-      val value = Try {
+      val value = Try
         val evaluator = inReadAction(
             evaluatorBuilder.build(codeFragment, currentSourcePosition))
         evaluator.evaluate(ctx)
-      }
-      val res = value match {
+      val res = value match
         case Success(v: VoidValue) => "undefined"
         case Success(v) => DebuggerUtils.getValueAsString(ctx, v)
         case Failure(e: EvaluateException) => e.getMessage
         case Failure(e: Throwable) => "Other error: " + e.getMessage
-      }
       semaphore.up()
       res
-    }
     assert(
         semaphore.waitFor(10000), "Too long evaluate expression: " + codeText)
     result
-  }
 
-  protected def evalEquals(codeText: String, expected: String) {
+  protected def evalEquals(codeText: String, expected: String)
     Assert.assertEquals(
         s"Evaluating:\n $codeText", expected, evalResult(codeText))
-  }
 
-  protected def evalStartsWith(codeText: String, startsWith: String) {
+  protected def evalStartsWith(codeText: String, startsWith: String)
     val result = evalResult(codeText)
     Assert.assertTrue(
         s"Evaluating:\n $codeText,\n $result doesn't starts with $startsWith",
         result.startsWith(startsWith))
-  }
 
   protected def evaluateCodeFragments(
-      fragmentsWithResults: (String, String)*): Unit = {
-    runDebugger() {
+      fragmentsWithResults: (String, String)*): Unit =
+    runDebugger()
       waitForBreakpoint()
-      fragmentsWithResults.foreach {
+      fragmentsWithResults.foreach
         case (fragment, result) =>
           evalEquals(fragment.stripMargin.trim().replace("\r", ""), result)
-      }
-    }
-  }
 
-  def atNextBreakpoint(action: => Unit) = {
+  def atNextBreakpoint(action: => Unit) =
     resume()
     waitForBreakpoint()
     action
-  }
 
   protected def addOtherLibraries() = {}
 
   def checkLocation(
-      source: String, methodName: String, lineNumber: Int): Unit = {
+      source: String, methodName: String, lineNumber: Int): Unit =
     def format(s: String, mn: String, ln: Int) = s"$s:$mn:$ln"
-    managed {
+    managed
       val location = suspendContext.getFrameProxy.getStackFrame.location
       val expected = format(source, methodName, lineNumber)
-      val actualLine = inReadAction {
+      val actualLine = inReadAction
         new ScalaPositionManager(getDebugProcess)
           .getSourcePosition(location)
           .getLine
-      }
       val actual =
         format(location.sourceName, location.method().name(), actualLine + 1)
       Assert.assertEquals("Wrong location:", expected, actual)
-    }
-  }
 
-  protected def addFileWithBreakpoints(path: String, fileText: String): Unit = {
-    val breakpointLines = for {
+  protected def addFileWithBreakpoints(path: String, fileText: String): Unit =
+    val breakpointLines = for
       (line, idx) <- fileText.lines.zipWithIndex if line.contains(bp)
-    } yield idx
+    yield idx
     val cleanedText = fileText.replace(bp, "")
     addSourceFile(path, cleanedText)
 
     breakpointLines.foreach(addBreakpoint(_, path))
-  }
-}
 
 case class Loc(className: String, methodName: String, line: Int)

@@ -18,16 +18,15 @@ package org.saddle.locator
 /**
   * A bool-to-integer hash map
   */
-class LocatorBool extends Locator[Boolean] {
+class LocatorBool extends Locator[Boolean]
   val map = Array.fill[Int](2)(-1)
   val cts = Array.ofDim[Int](2)
 
   def get(key: Boolean): Int = if (key) map(1) else map(0)
 
-  def put(key: Boolean, value: Int) {
+  def put(key: Boolean, value: Int)
     val idx = if (key) 1 else 0
     map(idx) = value
-  }
 
   def contains(key: Boolean) = get(key) != -1
 
@@ -45,12 +44,10 @@ class LocatorBool extends Locator[Boolean] {
 
   def counts() = cts
 
-  def inc(key: Boolean): Int = {
+  def inc(key: Boolean): Int =
     val idx = if (key) 1 else 0
     val tmp = cts(idx)
     cts(idx) += 1
     tmp
-  }
 
   def count(key: Boolean) = cts(if (key) 1 else 0)
-}

@@ -11,7 +11,7 @@ import akka.event.Logging
   * INTERNAL API
   */
 private[stream] trait FlowModule[In, Out, Mat]
-    extends StreamLayout.AtomicModule {
+    extends StreamLayout.AtomicModule
   override def replaceShape(s: Shape) =
     if (s != shape)
       throw new UnsupportedOperationException(
@@ -25,4 +25,3 @@ private[stream] trait FlowModule[In, Out, Mat]
   protected def label: String = Logging.simpleName(this)
   final override def toString: String =
     f"$label [${System.identityHashCode(this)}%08x]"
-}

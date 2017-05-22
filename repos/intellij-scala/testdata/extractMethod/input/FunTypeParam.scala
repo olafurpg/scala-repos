@@ -1,12 +1,10 @@
-class FunTypeParam {
-  def f[T](x: T) {
+class FunTypeParam
+  def f[T](x: T)
     val y = x
     /*start*/
     x
     y
 /*end*/
-  }
-}
 /*
 class FunTypeParam {
   def f[T](x: T) {

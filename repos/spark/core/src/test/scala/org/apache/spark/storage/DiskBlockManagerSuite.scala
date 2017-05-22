@@ -27,7 +27,7 @@ import org.apache.spark.{SparkConf, SparkFunSuite}
 import org.apache.spark.util.Utils
 
 class DiskBlockManagerSuite
-    extends SparkFunSuite with BeforeAndAfterEach with BeforeAndAfterAll {
+    extends SparkFunSuite with BeforeAndAfterEach with BeforeAndAfterAll
   private val testConf = new SparkConf(false)
   private var rootDir0: File = _
   private var rootDir1: File = _
@@ -35,56 +35,46 @@ class DiskBlockManagerSuite
 
   var diskBlockManager: DiskBlockManager = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     rootDir0 = Utils.createTempDir()
     rootDir1 = Utils.createTempDir()
     rootDirs = rootDir0.getAbsolutePath + "," + rootDir1.getAbsolutePath
-  }
 
-  override def afterAll() {
-    try {
+  override def afterAll()
+    try
       Utils.deleteRecursively(rootDir0)
       Utils.deleteRecursively(rootDir1)
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  override def beforeEach() {
+  override def beforeEach()
     super.beforeEach()
     val conf = testConf.clone
     conf.set("spark.local.dir", rootDirs)
     diskBlockManager = new DiskBlockManager(conf, deleteFilesOnStop = true)
-  }
 
-  override def afterEach() {
-    try {
+  override def afterEach()
+    try
       diskBlockManager.stop()
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  test("basic block creation") {
+  test("basic block creation")
     val blockId = new TestBlockId("test")
     val newFile = diskBlockManager.getFile(blockId)
     writeToFile(newFile, 10)
     assert(diskBlockManager.containsBlock(blockId))
     newFile.delete()
     assert(!diskBlockManager.containsBlock(blockId))
-  }
 
-  test("enumerating blocks") {
+  test("enumerating blocks")
     val ids = (1 to 100).map(i => TestBlockId("test_" + i))
     val files = ids.map(id => diskBlockManager.getFile(id))
     files.foreach(file => writeToFile(file, 10))
     assert(diskBlockManager.getAllBlocks.toSet === ids.toSet)
-  }
 
-  def writeToFile(file: File, numBytes: Int) {
+  def writeToFile(file: File, numBytes: Int)
     val writer = new FileWriter(file, true)
     for (i <- 0 until numBytes) writer.write(i)
     writer.close()
-  }
-}

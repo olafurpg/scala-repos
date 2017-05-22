@@ -25,22 +25,19 @@ import org.json4s._
   * @group Common
   */
 @DeveloperApi
-object DateTimeJson4sSupport {
+object DateTimeJson4sSupport
 
   @transient lazy implicit val formats = DefaultFormats
 
   /** Serialize DateTime to JValue */
-  def serializeToJValue: PartialFunction[Any, JValue] = {
+  def serializeToJValue: PartialFunction[Any, JValue] =
     case d: DateTime => JString(DataUtils.dateTimeToString(d))
-  }
 
   /** Deserialize JValue to DateTime */
-  def deserializeFromJValue: PartialFunction[JValue, DateTime] = {
+  def deserializeFromJValue: PartialFunction[JValue, DateTime] =
     case jv: JValue => DataUtils.stringToDateTime(jv.extract[String])
-  }
 
   /** Custom JSON4S serializer for Joda-Time */
   class Serializer
       extends CustomSerializer[DateTime](
           format => (deserializeFromJValue, serializeToJValue))
-}

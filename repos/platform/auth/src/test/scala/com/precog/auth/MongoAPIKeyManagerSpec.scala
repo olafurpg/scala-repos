@@ -51,7 +51,7 @@ import org.slf4j.LoggerFactory
 import scalaz._
 
 class MongoAPIKeyManagerSpec
-    extends Specification with RealMongoSpecSupport with FutureMatchers {
+    extends Specification with RealMongoSpecSupport with FutureMatchers
 
   override def mongoStartupPause = Some(0l)
   val timeout = Duration(10, "seconds")
@@ -59,124 +59,108 @@ class MongoAPIKeyManagerSpec
   lazy val logger = LoggerFactory.getLogger(
       "com.precog.common.security.MongoAPIKeyManagerSpec")
 
-  "mongo API key manager" should {
+  "mongo API key manager" should
 
-    "find API key present" in new TestAPIKeyManager {
+    "find API key present" in new TestAPIKeyManager
       val result = Await.result(apiKeyManager.findAPIKey(rootAPIKey), timeout)
 
-      result must beLike {
+      result must beLike
         case Some(APIKeyRecord(apiKey, _, _, _, _, _)) =>
           apiKey must_== rootAPIKey
-      }
-    }
 
-    "return current root API key" in new TestAPIKeyManager {
+    "return current root API key" in new TestAPIKeyManager
       val result =
         Await.result(MongoAPIKeyManager.findRootAPIKey(
                          testDB, MongoAPIKeyManagerSettings.defaults.apiKeys),
                      timeout)
 
       result.apiKey mustEqual rootAPIKey
-    }
 
-    "error if a root API key cannot be found and creation isn't requested" in new TestAPIKeyManager {
+    "error if a root API key cannot be found and creation isn't requested" in new TestAPIKeyManager
       Await.result(MongoAPIKeyManager.findRootAPIKey(
                        testDB,
                        MongoAPIKeyManagerSettings.defaults.apiKeys + "_empty"),
                    timeout) must throwAn[Exception]
-    }
 
-    "not find missing API key" in new TestAPIKeyManager {
+    "not find missing API key" in new TestAPIKeyManager
       val result =
         Await.result(apiKeyManager.findAPIKey(notFoundAPIKeyID), timeout)
       result must beNone
-    }
 
-    "issue new API key" in new TestAPIKeyManager {
+    "issue new API key" in new TestAPIKeyManager
       val name = "newAPIKey"
       val fResult =
         apiKeyManager.createAPIKey(Some(name), None, rootAPIKey, Set.empty)
 
       val result = Await.result(fResult, timeout)
 
-      result must beLike {
+      result must beLike
         case APIKeyRecord(_, n, _, _, g, _) =>
           n must beSome(name)
           g must beEmpty
-      }
-    }
 
-    "list children API keys" in new TestAPIKeyManager {
-      val (result, expected) = Await.result(for {
+    "list children API keys" in new TestAPIKeyManager
+      val (result, expected) = Await.result(for
         k1 <- apiKeyManager.createAPIKey(
             Some("blah1"), None, child2.apiKey, Set.empty)
         k2 <- apiKeyManager.createAPIKey(
             Some("blah2"), None, child2.apiKey, Set.empty)
         kids <- apiKeyManager.findAPIKeyChildren(child2.apiKey)
-      } yield (kids, List(k1, k2)), timeout)
+      yield (kids, List(k1, k2)), timeout)
 
       result must haveTheSameElementsAs(expected)
-    }
 
-    "move API key to deleted pool on deletion" in new TestAPIKeyManager {
+    "move API key to deleted pool on deletion" in new TestAPIKeyManager
 
       type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
       Option[APIKeyRecord], Option[APIKeyRecord])
 
-      val fut: Future[Results] = for {
+      val fut: Future[Results] = for
         before <- apiKeyManager.findAPIKey(child2.apiKey)
         deleted <- apiKeyManager.deleteAPIKey(before.get.apiKey)
         after <- apiKeyManager.findAPIKey(child2.apiKey)
         deleteCol <- apiKeyManager.findDeletedAPIKey(child2.apiKey)
-      } yield {
+      yield
         (before, deleted, after, deleteCol)
-      }
 
       val result = Await.result(fut, timeout)
 
-      result must beLike {
+      result must beLike
         case (Some(t1), Some(t2), None, Some(t3)) =>
           t1 must_== t2
           t1 must_== t3
-      }
-    }
 
-    "no failure on deleting API key that is already deleted" in new TestAPIKeyManager {
+    "no failure on deleting API key that is already deleted" in new TestAPIKeyManager
       type Results = (Option[APIKeyRecord], Option[APIKeyRecord],
       Option[APIKeyRecord], Option[APIKeyRecord], Option[APIKeyRecord])
 
-      val fut: Future[Results] = for {
+      val fut: Future[Results] = for
         before <- apiKeyManager.findAPIKey(child2.apiKey)
         deleted1 <- apiKeyManager.deleteAPIKey(before.get.apiKey)
         deleted2 <- apiKeyManager.deleteAPIKey(before.get.apiKey)
         after <- apiKeyManager.findAPIKey(child2.apiKey)
         deleteCol <- apiKeyManager.findDeletedAPIKey(child2.apiKey)
-      } yield {
+      yield
         (before, deleted1, deleted2, after, deleteCol)
-      }
 
       val result = Await.result(fut, timeout)
 
-      result must beLike {
+      result must beLike
         case (Some(t1), Some(t2), None, None, Some(t4)) =>
           t1 must_== t2
           t1 must_== t4
-      }
-    }
-  }
 
-  trait TestAPIKeyManager extends After {
+  trait TestAPIKeyManager extends After
     import MongoAPIKeyManagerSpec.dbId
     val defaultActorSystem = ActorSystem("apiKeyManagerTest")
     implicit val execContext =
       ExecutionContext.defaultExecutionContext(defaultActorSystem)
 
     val dbName = "test_v1_" + dbId.getAndIncrement()
-    val testDB = try {
+    val testDB = try
       mongo.database(dbName)
-    } catch {
+    catch
       case t => logger.error("Error during DB setup: " + t); throw t
-    }
 
     val to = Duration(30, "seconds")
     implicit val queryTimeout: Timeout = to
@@ -209,12 +193,10 @@ class MongoAPIKeyManagerSpec
         to)
 
     // wait until the keys appear in the DB (some delay between insert request and actor insert)
-    def waitForAppearance(apiKey: APIKey, name: String) {
-      while (Await.result(apiKeyManager.findAPIKey(apiKey), to) == None) {
+    def waitForAppearance(apiKey: APIKey, name: String)
+      while (Await.result(apiKeyManager.findAPIKey(apiKey), to) == None)
         logger.debug("Waiting for " + name)
         Thread.sleep(100)
-      }
-    }
 
     logger.debug("Starting base setup")
 
@@ -225,15 +207,11 @@ class MongoAPIKeyManagerSpec
 
     logger.debug("Base setup complete")
 
-    def after = {
+    def after =
       logger.debug("Cleaning up run for " + dbName)
       // Wipe the DB out
       realMongo.dropDatabase(dbName)
       defaultActorSystem.shutdown
-    }
-  }
-}
 
-object MongoAPIKeyManagerSpec {
+object MongoAPIKeyManagerSpec
   val dbId = new java.util.concurrent.atomic.AtomicInteger
-}

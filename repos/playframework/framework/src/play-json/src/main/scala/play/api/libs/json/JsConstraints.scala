@@ -6,7 +6,7 @@ package play.api.libs.json
 import play.api.data.validation.ValidationError
 import Json._
 
-trait ConstraintFormat {
+trait ConstraintFormat
   def of[A](implicit fmt: Format[A]): Format[A] = fmt
 
   /** deleted because useless and troublesome (better to use nullable anyway) */
@@ -14,17 +14,15 @@ trait ConstraintFormat {
 
   def optionWithNull[A](implicit fmt: Format[A]): Format[Option[A]] =
     Format[Option[A]](Reads.optionWithNull(fmt), Writes.optionWithNull(fmt))
-}
 
-trait PathFormat {
+trait PathFormat
   def at[A](path: JsPath)(implicit f: Format[A]): OFormat[A] =
     OFormat[A](Reads.at(path)(f), Writes.at(path)(f))
 
   def nullable[A](path: JsPath)(implicit f: Format[A]): OFormat[Option[A]] =
     OFormat(Reads.nullable(path)(f), Writes.nullable(path)(f))
-}
 
-trait PathReads {
+trait PathReads
 
   def required(path: JsPath)(implicit reads: Reads[JsValue]): Reads[JsValue] =
     at(path)(reads)
@@ -44,7 +42,7 @@ trait PathReads {
     *   - If last node is found with value "null" => returns None
     *   - If last node is found => applies implicit Reads[T]
     */
-  def nullable[A](path: JsPath)(implicit reads: Reads[A]) = Reads[Option[A]] {
+  def nullable[A](path: JsPath)(implicit reads: Reads[A]) = Reads[Option[A]]
     json =>
       path
         .applyTillLast(json)
@@ -54,13 +52,11 @@ trait PathReads {
               jsres.fold(
                   _ => JsSuccess(None),
                   a =>
-                    a match {
+                    a match
                       case JsNull => JsSuccess(None)
                       case js => reads.reads(js).repath(path).map(Some(_))
-                  }
             )
         )
-  }
 
   def jsPick[A <: JsValue](path: JsPath)(implicit reads: Reads[A]): Reads[A] =
     at(path)(reads)
@@ -71,9 +67,8 @@ trait PathReads {
         js =>
           path
             .asSingleJsResult(js)
-            .flatMap { jsv =>
+            .flatMap  jsv =>
           reads.reads(jsv).repath(path)
-        }
             .map(jsv => JsPath.createObj(path -> jsv)))
 
   def jsPut(path: JsPath, a: => JsValue) =
@@ -85,7 +80,7 @@ trait PathReads {
 
   def jsUpdate[A <: JsValue](path: JsPath)(reads: Reads[A]) =
     Reads[JsObject](js =>
-          js match {
+          js match
         case o: JsObject =>
           path
             .asSingleJsResult(o)
@@ -94,12 +89,11 @@ trait PathReads {
             .map(opath => o.deepMerge(opath))
         case _ =>
           JsError(JsPath(), ValidationError("error.expected.jsobject"))
-    })
+    )
 
   def jsPrune(path: JsPath) = Reads[JsObject](js => path.prune(js))
-}
 
-trait ConstraintReads {
+trait ConstraintReads
 
   /** The simpler of all Reads that just finds an implicit Reads[A] of the expected type */
   def of[A](implicit r: Reads[A]) = r
@@ -112,10 +106,10 @@ trait ConstraintReads {
   def optionWithNull[T](implicit rds: Reads[T]): Reads[Option[T]] =
     Reads(
         js =>
-          js match {
+          js match
         case JsNull => JsSuccess(None)
         case js => rds.reads(js).map(Some(_))
-    })
+    )
 
   /** Stupidly reads a field as an Option mapping any error (format or missing field) to None */
   def optionNoError[A](implicit reads: Reads[A]): Reads[Option[A]] =
@@ -171,9 +165,9 @@ trait ConstraintReads {
         js =>
           reads
             .reads(js)
-            .flatMap { o =>
+            .flatMap  o =>
           regex.unapplySeq(o).map(_ => JsSuccess(o)).getOrElse(JsError(error))
-      })
+      )
 
   def email(implicit reads: Reads[String]): Reads[String] =
     pattern(
@@ -185,26 +179,21 @@ trait ConstraintReads {
 
   def verifyingIf[A](
       cond: A => Boolean)(subreads: Reads[_])(implicit rds: Reads[A]) =
-    Reads[A] { js =>
-      rds.reads(js).flatMap { t =>
+    Reads[A]  js =>
+      rds.reads(js).flatMap  t =>
         (scala.util.control.Exception.catching(classOf[MatchError]) opt cond(
-                t)).flatMap { b =>
+                t)).flatMap  b =>
           if (b) Some(subreads.reads(js).map(_ => t))
           else None
-        }.getOrElse(JsSuccess(t))
-      }
-    }
+        .getOrElse(JsSuccess(t))
 
-  def pure[A](a: => A) = Reads[A] { js =>
+  def pure[A](a: => A) = Reads[A]  js =>
     JsSuccess(a)
-  }
-}
 
-trait PathWrites {
+trait PathWrites
   def at[A](path: JsPath)(implicit wrs: Writes[A]): OWrites[A] =
-    OWrites[A] { a =>
+    OWrites[A]  a =>
       JsPath.createObj(path -> wrs.writes(a))
-    }
 
   /**
     * writes a optional field in given JsPath : if None, doesn't write field at all.
@@ -212,26 +201,22 @@ trait PathWrites {
     * If you want to write a "null", use ConstraintWrites.optionWithNull[A]
     */
   def nullable[A](path: JsPath)(implicit wrs: Writes[A]): OWrites[Option[A]] =
-    OWrites[Option[A]] { a =>
-      a match {
+    OWrites[Option[A]]  a =>
+      a match
         case Some(a) => JsPath.createObj(path -> wrs.writes(a))
         case None => Json.obj()
-      }
-    }
 
   def jsPick(path: JsPath): Writes[JsValue] =
-    Writes[JsValue] { obj =>
+    Writes[JsValue]  obj =>
       path(obj).headOption.getOrElse(JsNull)
-    }
 
   def jsPickBranch(path: JsPath): OWrites[JsValue] =
-    OWrites[JsValue] { obj =>
+    OWrites[JsValue]  obj =>
       JsPath.createObj(path -> path(obj).headOption.getOrElse(JsNull))
-    }
 
   def jsPickBranchUpdate(
       path: JsPath, wrs: OWrites[JsValue]): OWrites[JsValue] =
-    OWrites[JsValue] { js =>
+    OWrites[JsValue]  js =>
       JsPath.createObj(
           path -> path(js).headOption
             .flatMap(js =>
@@ -239,16 +224,13 @@ trait PathWrites {
                     .map(obj => obj.deepMerge(wrs.writes(obj))))
             .getOrElse(JsNull)
         )
-    }
 
   def pure[A](
       path: JsPath, fixed: => A)(implicit wrs: Writes[A]): OWrites[JsValue] =
-    OWrites[JsValue] { js =>
+    OWrites[JsValue]  js =>
       JsPath.createObj(path -> wrs.writes(fixed))
-    }
-}
 
-trait ConstraintWrites {
+trait ConstraintWrites
   def of[A](implicit w: Writes[A]) = w
 
   // deleted because troublesome...
@@ -258,13 +240,11 @@ trait ConstraintWrites {
   //}}
 
   def pure[A](fixed: => A)(implicit wrs: Writes[A]): Writes[JsValue] =
-    Writes[JsValue] { js =>
+    Writes[JsValue]  js =>
       wrs.writes(fixed)
-    }
 
-  def pruned[A](implicit w: Writes[A]): Writes[A] = new Writes[A] {
+  def pruned[A](implicit w: Writes[A]): Writes[A] = new Writes[A]
     def writes(a: A): JsValue = JsNull
-  }
 
   def list[A](implicit writes: Writes[A]): Writes[List[A]] =
     Writes.traversableWrites[A]
@@ -279,10 +259,7 @@ trait ConstraintWrites {
     * Pure Option Writer[T] which writes "null" when None which is different
     * from `JsPath.writeNullable` which omits the field when None
     */
-  def optionWithNull[A](implicit wa: Writes[A]) = Writes[Option[A]] { a =>
-    a match {
+  def optionWithNull[A](implicit wa: Writes[A]) = Writes[Option[A]]  a =>
+    a match
       case None => JsNull
       case Some(av) => wa.writes(av)
-    }
-  }
-}

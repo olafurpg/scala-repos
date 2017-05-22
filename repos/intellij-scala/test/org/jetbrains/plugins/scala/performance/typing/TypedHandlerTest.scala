@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * @author Roman.Shein
   *         Date: 15.12.2015
   */
-class TypedHandlerTest extends TypingTestWithPerformanceTestBase {
+class TypedHandlerTest extends TypingTestWithPerformanceTestBase
 
   val typingTimeout = 200
 
@@ -25,4 +25,3 @@ class TypedHandlerTest extends TypingTestWithPerformanceTestBase {
   def testDefinitionAssignBeforeNewline() = doTest("a")
 
   def testParametersComaBeforeNewline() = doTest("a")
-}

@@ -24,7 +24,7 @@ import std.either._
   * some examples of common types for which we have Bifunctor
   * instances are Either, Validation, \/, Tuple2
   */
-object BifunctorUsage extends App {
+object BifunctorUsage extends App
   //
   // bimap
   //
@@ -118,4 +118,3 @@ object BifunctorUsage extends App {
 
   // or skip the step of extracting the unified functor using the umap method.
   assert(Bifunctor[Tuple2].umap((2, 3))(_ * 3) === (6, 9))
-}

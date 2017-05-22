@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * Activation trait that can be used to wait on activation or de-activation of Camel endpoints.
   * The Camel endpoints are activated asynchronously. This trait can signal when an endpoint is activated or de-activated.
   */
-trait Activation {
+trait Activation
 
   /**
     * Produces a Future with the specified endpoint that will be completed when the endpoint has been activated,
@@ -32,4 +32,3 @@ trait Activation {
     */
   def deactivationFutureFor(endpoint: ActorRef)(
       implicit timeout: Timeout, executor: ExecutionContext): Future[ActorRef]
-}

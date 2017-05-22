@@ -22,7 +22,7 @@ import play.api.i18n.Lang
   */
 trait Controller
     extends Results with BodyParsers with HttpProtocol with Status
-    with HeaderNames with ContentTypes with RequestExtractors with Rendering {
+    with HeaderNames with ContentTypes with RequestExtractors with Rendering
 
   /**
     * Provides an empty `Action` implementation: the result is a standard ‘Not implemented yet’ result page.
@@ -32,9 +32,8 @@ trait Controller
     * def index(name:String) = TODO
     * }}}
     */
-  val TODO = Action {
+  val TODO = Action
     NotImplemented[play.twirl.api.Html](views.html.defaultpages.todo())
-  }
 
   /**
     * Retrieves the session implicitly from the request.
@@ -75,7 +74,7 @@ trait Controller
     * }
     * }}}
     */
-  implicit def request2lang(implicit request: RequestHeader): Lang = {
+  implicit def request2lang(implicit request: RequestHeader): Lang =
     play.api.Play.privateMaybeApplication
       .map(app =>
             play.api.i18n.Messages
@@ -84,5 +83,3 @@ trait Controller
               .lang)
       .getOrElse(request.acceptLanguages.headOption
             .getOrElse(play.api.i18n.Lang.defaultLang))
-  }
-}

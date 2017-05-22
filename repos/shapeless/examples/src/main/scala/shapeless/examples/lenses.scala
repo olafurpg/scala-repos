@@ -21,7 +21,7 @@ package shapeless.examples
  * 
  * @author Miles Sabin
  */
-object LenseExamples extends App {
+object LenseExamples extends App
   import shapeless._
   import test._
 
@@ -85,4 +85,3 @@ object LenseExamples extends App {
   assert(person5 == Person(
           "Joe Soap", 27, Address("Southover Street", "London", "BN2 9UA")))
   println(person5)
-}

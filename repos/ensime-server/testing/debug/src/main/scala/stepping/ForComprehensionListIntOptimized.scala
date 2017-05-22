@@ -2,38 +2,29 @@ package stepping
 
 import debug.Helper._
 
-object ForComprehensionListIntOptimized {
+object ForComprehensionListIntOptimized
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val l = List(1, 2, 3, 4)
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
-    }
 
     foo(l)
     new ForComprehensionListIntOptimized(l).bar
-  }
 
-  def foo(l: List[Int]) {
+  def foo(l: List[Int])
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
-    }
-  }
-}
 
-class ForComprehensionListIntOptimized(l: List[Int]) {
+class ForComprehensionListIntOptimized(l: List[Int])
 
-  for (n <- l) {
+  for (n <- l)
     noop(n)
-  }
 
-  def bar() {
+  def bar()
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
-    }
-  }
-}

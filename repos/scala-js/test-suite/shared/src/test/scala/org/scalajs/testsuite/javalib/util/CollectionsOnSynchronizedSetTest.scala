@@ -11,12 +11,12 @@ import java.{util => ju}
 
 import scala.reflect.ClassTag
 
-trait CollectionsOnSynchronizedSetTest extends CollectionsOnSetsTest {
+trait CollectionsOnSynchronizedSetTest extends CollectionsOnSetsTest
 
   def originalFactory: SetFactory
 
-  def factory: SetFactory = {
-    new SetFactory {
+  def factory: SetFactory =
+    new SetFactory
       override def implementationName: String =
         s"synchronizedSet(${originalFactory.implementationName})"
 
@@ -25,17 +25,14 @@ trait CollectionsOnSynchronizedSetTest extends CollectionsOnSetsTest {
 
       def allowsNullElement: Boolean =
         originalFactory.allowsNullElement
-    }
-  }
-}
 
 trait CollectionsOnSynchronizedSortedSetTest
-    extends CollectionsOnSortedSetsTest {
+    extends CollectionsOnSortedSetsTest
 
   def originalFactory: SortedSetFactory
 
-  def factory: SortedSetFactory = {
-    new SortedSetFactory {
+  def factory: SortedSetFactory =
+    new SortedSetFactory
       override def implementationName: String =
         s"synchronizedSortedSet(${originalFactory.implementationName})"
 
@@ -44,21 +41,15 @@ trait CollectionsOnSynchronizedSortedSetTest
 
       def allowsNullElement: Boolean =
         originalFactory.allowsNullElement
-    }
-  }
-}
 
 class CollectionsOnSynchronizedSetHashSetFactoryTest
-    extends CollectionsOnSynchronizedSetTest {
+    extends CollectionsOnSynchronizedSetTest
   def originalFactory: SetFactory = new HashSetFactory
-}
 
 class CollectionsOnSynchronizedSetCollectionLinkedHashSetFactoryTest
-    extends CollectionsOnSynchronizedSetTest {
+    extends CollectionsOnSynchronizedSetTest
   def originalFactory: SetFactory = new LinkedHashSetFactory
-}
 
 class CollectionsOnSynchronizedSetCollectionConcurrentSkipListSetFactoryTest
-    extends CollectionsOnSynchronizedSetTest {
+    extends CollectionsOnSynchronizedSetTest
   def originalFactory: SetFactory = new concurrent.ConcurrentSkipListSetFactory
-}

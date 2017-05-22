@@ -32,7 +32,7 @@ import org.junit._
 import org.scalatest.junit.JUnitSuite
 import org.junit.Assert._
 
-object SerializationTestUtils {
+object SerializationTestUtils
   private val topic1 = "test1"
   private val topic2 = "test2"
   private val leader1 = 0
@@ -57,13 +57,12 @@ object SerializationTestUtils {
       (2, partitionDataFetchResponse2),
       (3, partitionDataFetchResponse3))
 
-  private val topicDataFetchResponse = {
+  private val topicDataFetchResponse =
     val groupedData = Array(topic1, topic2).flatMap(topic =>
           partitionDataFetchResponseMap.map(partitionAndData =>
                 (TopicAndPartition(topic, partitionAndData._1),
                  partitionAndData._2)))
     collection.immutable.Map(groupedData: _*)
-  }
 
   private val partitionDataMessage0 = new ByteBufferMessageSet(
       new Message("first message".getBytes))
@@ -78,15 +77,14 @@ object SerializationTestUtils {
                                                         partitionDataMessage2,
                                                         partitionDataMessage3)
 
-  val topicDataProducerRequest = {
+  val topicDataProducerRequest =
     val groupedData = Array(topic1, topic2).flatMap(
         topic =>
-          partitionDataProducerRequestArray.zipWithIndex.map {
+          partitionDataProducerRequestArray.zipWithIndex.map
         case (partitionDataMessage, partition) =>
           (TopicAndPartition(topic, partition), partitionDataMessage)
-    })
+    )
     collection.mutable.Map(groupedData: _*)
-  }
 
   private val requestInfos = collection.immutable.Map(
       TopicAndPartition(topic1, 0) -> PartitionFetchInfo(1000, 100),
@@ -178,9 +176,8 @@ object SerializationTestUtils {
         TopicAndPartition(topic1, 3) -> partitionStateInfo3
     )
 
-  def createTestProducerRequest: ProducerRequest = {
+  def createTestProducerRequest: ProducerRequest =
     new ProducerRequest(1, "client 1", 0, 1000, topicDataProducerRequest)
-  }
 
   def createTestProducerResponse: ProducerResponse =
     ProducerResponse(
@@ -194,13 +191,11 @@ object SerializationTestUtils {
         ProducerRequest.CurrentVersion,
         100)
 
-  def createTestFetchRequest: FetchRequest = {
+  def createTestFetchRequest: FetchRequest =
     new FetchRequest(requestInfo = requestInfos)
-  }
 
-  def createTestFetchResponse: FetchResponse = {
+  def createTestFetchResponse: FetchResponse =
     FetchResponse(1, topicDataFetchResponse)
-  }
 
   def createTestOffsetRequest = new OffsetRequest(
       collection.immutable.Map(
@@ -209,15 +204,14 @@ object SerializationTestUtils {
       replicaId = 0
   )
 
-  def createTestOffsetResponse: OffsetResponse = {
+  def createTestOffsetResponse: OffsetResponse =
     new OffsetResponse(
         0,
         collection.immutable.Map(
             TopicAndPartition(topic1, 1) -> PartitionOffsetsResponse(
                 Errors.NONE.code, Seq(1000l, 2000l, 3000l, 4000l))))
-  }
 
-  def createTestOffsetCommitRequestV2: OffsetCommitRequest = {
+  def createTestOffsetCommitRequestV2: OffsetCommitRequest =
     new OffsetCommitRequest(
         groupId = "group 1",
         retentionMs = SystemTime.milliseconds,
@@ -227,9 +221,8 @@ object SerializationTestUtils {
               TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
                   100L, OffsetMetadata.NoMetadata)
           ))
-  }
 
-  def createTestOffsetCommitRequestV1: OffsetCommitRequest = {
+  def createTestOffsetCommitRequestV1: OffsetCommitRequest =
     new OffsetCommitRequest(
         versionId = 1,
         groupId = "group 1",
@@ -239,9 +232,8 @@ object SerializationTestUtils {
               TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
                   100L, OffsetMetadata.NoMetadata, SystemTime.milliseconds)
           ))
-  }
 
-  def createTestOffsetCommitRequestV0: OffsetCommitRequest = {
+  def createTestOffsetCommitRequestV0: OffsetCommitRequest =
     new OffsetCommitRequest(
         versionId = 0,
         groupId = "group 1",
@@ -251,24 +243,21 @@ object SerializationTestUtils {
               TopicAndPartition(topic1, 1) -> OffsetAndMetadata(
                   100L, OffsetMetadata.NoMetadata)
           ))
-  }
 
-  def createTestOffsetCommitResponse: OffsetCommitResponse = {
+  def createTestOffsetCommitResponse: OffsetCommitResponse =
     new OffsetCommitResponse(
         collection.immutable.Map(
             TopicAndPartition(topic1, 0) -> Errors.NONE.code,
             TopicAndPartition(topic1, 1) -> Errors.NONE.code))
-  }
 
-  def createTestOffsetFetchRequest: OffsetFetchRequest = {
+  def createTestOffsetFetchRequest: OffsetFetchRequest =
     new OffsetFetchRequest("group 1",
                            Seq(
                                TopicAndPartition(topic1, 0),
                                TopicAndPartition(topic1, 1)
                            ))
-  }
 
-  def createTestOffsetFetchResponse: OffsetFetchResponse = {
+  def createTestOffsetFetchResponse: OffsetFetchResponse =
     new OffsetFetchResponse(
         collection.immutable.Map(
             TopicAndPartition(topic1, 0) -> OffsetMetadataAndError(
@@ -278,21 +267,17 @@ object SerializationTestUtils {
                 OffsetMetadata.NoMetadata,
                 Errors.UNKNOWN_TOPIC_OR_PARTITION.code)
         ))
-  }
 
-  def createConsumerMetadataRequest: GroupCoordinatorRequest = {
+  def createConsumerMetadataRequest: GroupCoordinatorRequest =
     GroupCoordinatorRequest("group 1", clientId = "client 1")
-  }
 
-  def createConsumerMetadataResponse: GroupCoordinatorResponse = {
+  def createConsumerMetadataResponse: GroupCoordinatorResponse =
     GroupCoordinatorResponse(
         Some(brokers.head.getBrokerEndPoint(SecurityProtocol.PLAINTEXT)),
         Errors.NONE.code,
         0)
-  }
-}
 
-class RequestResponseSerializationTest extends JUnitSuite {
+class RequestResponseSerializationTest extends JUnitSuite
   private val producerRequest =
     SerializationTestUtils.createTestProducerRequest
   private val producerResponse =
@@ -320,7 +305,7 @@ class RequestResponseSerializationTest extends JUnitSuite {
       None, ErrorMapping.ConsumerCoordinatorNotAvailableCode, 0)
 
   @Test
-  def testSerializationAndDeserialization() {
+  def testSerializationAndDeserialization()
 
     val requestsAndResponses = collection.immutable.Seq(
         producerRequest,
@@ -338,7 +323,7 @@ class RequestResponseSerializationTest extends JUnitSuite {
         consumerMetadataResponse,
         consumerMetadataResponseNoCoordinator)
 
-    requestsAndResponses.foreach { original =>
+    requestsAndResponses.foreach  original =>
       val buffer = ByteBuffer.allocate(original.sizeInBytes)
       original.writeTo(buffer)
       buffer.rewind()
@@ -353,11 +338,9 @@ class RequestResponseSerializationTest extends JUnitSuite {
                    original.getClass.getSimpleName + " should be the same.",
                    original,
                    deserialized)
-    }
-  }
 
   @Test
-  def testProduceResponseVersion() {
+  def testProduceResponseVersion()
     val oldClientResponse = ProducerResponse(
         1,
         Map(
@@ -386,10 +369,9 @@ class RequestResponseSerializationTest extends JUnitSuite {
     newClientResponse.writeTo(buffer)
     buffer.rewind()
     assertEquals(ProducerResponse.readFrom(buffer).throttleTime, 100)
-  }
 
   @Test
-  def testFetchResponseVersion() {
+  def testFetchResponseVersion()
     val oldClientResponse = FetchResponse(
         1,
         Map(
@@ -412,5 +394,3 @@ class RequestResponseSerializationTest extends JUnitSuite {
     // new response should have 4 bytes more than the old response since delayTime is an INT32
     assertEquals(
         oldClientResponse.sizeInBytes + 4, newClientResponse.sizeInBytes)
-  }
-}

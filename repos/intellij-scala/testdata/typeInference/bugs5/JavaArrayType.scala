@@ -1,6 +1,6 @@
 import java.io.File
 
-object JavaArrayType {
+object JavaArrayType
   val sink: File = null
 
   def foo(x: AnyRef) = 1
@@ -8,5 +8,4 @@ object JavaArrayType {
 
   /*start*/
   foo(if (true) sink.listFiles() else "text") /*end*/
-}
 //Int

@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Bitraverse` */
 final class BitraverseOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
     implicit val F: Bitraverse[F])
-    extends Ops[F[A, B]] {
+    extends Ops[F[A, B]]
   ////
   final def bitraverse[G[_], C, D](f: A => G[C], g: B => G[D])(
       implicit ap: Applicative[G]): G[F[C, D]] =
@@ -27,16 +27,14 @@ final class BitraverseOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
       G1: UnapplyProduct[Applicative, GC, GD]): G1.M[F[G1.A, G1.B]] =
     bitraverseU(eva, evb)
   ////
-}
 
-sealed trait ToBitraverseOps0 {
+sealed trait ToBitraverseOps0
   implicit def ToBitraverseOpsUnapply[FA](v: FA)(
       implicit F0: Unapply2[Bitraverse, FA]) =
     new BitraverseOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
-}
 
 trait ToBitraverseOps
-    extends ToBitraverseOps0 with ToBifunctorOps with ToBifoldableOps {
+    extends ToBitraverseOps0 with ToBifunctorOps with ToBifoldableOps
 
   implicit def ToBitraverseOps[F[_, _], A, B](v: F[A, B])(
       implicit F0: Bitraverse[F]) =
@@ -49,10 +47,9 @@ trait ToBitraverseOps
   ////
 
   ////
-}
 
 trait BitraverseSyntax[F[_, _]]
-    extends BifunctorSyntax[F] with BifoldableSyntax[F] {
+    extends BifunctorSyntax[F] with BifoldableSyntax[F]
   implicit def ToBitraverseOps[A, B](v: F[A, B]): BitraverseOps[F, A, B] =
     new BitraverseOps[F, A, B](v)(BitraverseSyntax.this.F)
 
@@ -60,4 +57,3 @@ trait BitraverseSyntax[F[_, _]]
   ////
 
   ////
-}

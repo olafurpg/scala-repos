@@ -28,7 +28,7 @@ import generic._
 trait Map[A, +B]
     extends Iterable[(A, B)]
 //                    with GenMap[A, B]
-    with scala.collection.Map[A, B] with MapLike[A, B, Map[A, B]] {
+    with scala.collection.Map[A, B] with MapLike[A, B, Map[A, B]]
   self =>
 
   override def empty: Map[A, B] = Map.empty
@@ -75,13 +75,12 @@ trait Map[A, +B]
     */
   override def updated[B1 >: B](key: A, value: B1): Map[A, B1]
   def +[B1 >: B](kv: (A, B1)): Map[A, B1]
-}
 
 /** $factoryInfo
   *  @define Coll `immutable.Map`
   *  @define coll immutable map
   */
-object Map extends ImmutableMapFactory[Map] {
+object Map extends ImmutableMapFactory[Map]
 
   /** $mapCanBuildFromInfo */
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), Map[A, B]] =
@@ -91,7 +90,7 @@ object Map extends ImmutableMapFactory[Map] {
 
   class WithDefault[A, +B](underlying: Map[A, B], d: A => B)
       extends scala.collection.Map.WithDefault[A, B](underlying, d)
-      with Map[A, B] {
+      with Map[A, B]
     override def empty = new WithDefault(underlying.empty, d)
     override def updated[B1 >: B](key: A, value: B1): WithDefault[A, B1] =
       new WithDefault[A, B1](underlying.updated[B1](key, value), d)
@@ -103,11 +102,10 @@ object Map extends ImmutableMapFactory[Map] {
       new WithDefault[A, B1](underlying, d)
     override def withDefaultValue[B1 >: B](d: B1): immutable.Map[A, B1] =
       new WithDefault[A, B1](underlying, x => d)
-  }
 
   private object EmptyMap
       extends AbstractMap[Any, Nothing] with Map[Any, Nothing]
-      with Serializable {
+      with Serializable
     override def size: Int = 0
     override def apply(key: Any) =
       throw new NoSuchElementException("key not found: " + key)
@@ -118,10 +116,9 @@ object Map extends ImmutableMapFactory[Map] {
       new Map1(key, value)
     def +[B1](kv: (Any, B1)): Map[Any, B1] = updated(kv._1, kv._2)
     def -(key: Any): Map[Any, Nothing] = this
-  }
 
   class Map1[A, +B](key1: A, value1: B)
-      extends AbstractMap[A, B] with Map[A, B] with Serializable {
+      extends AbstractMap[A, B] with Map[A, B] with Serializable
     override def size = 1
     override def apply(key: A) =
       if (key == key1) value1
@@ -136,13 +133,11 @@ object Map extends ImmutableMapFactory[Map] {
     def +[B1 >: B](kv: (A, B1)): Map[A, B1] = updated(kv._1, kv._2)
     def -(key: A): Map[A, B] =
       if (key == key1) Map.empty else this
-    override def foreach[U](f: ((A, B)) => U): Unit = {
+    override def foreach[U](f: ((A, B)) => U): Unit =
       f((key1, value1))
-    }
-  }
 
   class Map2[A, +B](key1: A, value1: B, key2: A, value2: B)
-      extends AbstractMap[A, B] with Map[A, B] with Serializable {
+      extends AbstractMap[A, B] with Map[A, B] with Serializable
     override def size = 2
     override def apply(key: A) =
       if (key == key1) value1
@@ -163,13 +158,11 @@ object Map extends ImmutableMapFactory[Map] {
       if (key == key1) new Map1(key2, value2)
       else if (key == key2) new Map1(key1, value1)
       else this
-    override def foreach[U](f: ((A, B)) => U): Unit = {
+    override def foreach[U](f: ((A, B)) => U): Unit =
       f((key1, value1)); f((key2, value2))
-    }
-  }
 
   class Map3[A, +B](key1: A, value1: B, key2: A, value2: B, key3: A, value3: B)
-      extends AbstractMap[A, B] with Map[A, B] with Serializable {
+      extends AbstractMap[A, B] with Map[A, B] with Serializable
     override def size = 3
     override def apply(key: A) =
       if (key == key1) value1
@@ -195,10 +188,8 @@ object Map extends ImmutableMapFactory[Map] {
       else if (key == key2) new Map2(key1, value1, key3, value3)
       else if (key == key3) new Map2(key1, value1, key2, value2)
       else this
-    override def foreach[U](f: ((A, B)) => U): Unit = {
+    override def foreach[U](f: ((A, B)) => U): Unit =
       f((key1, value1)); f((key2, value2)); f((key3, value3))
-    }
-  }
 
   class Map4[A, +B](key1: A,
                     value1: B,
@@ -208,7 +199,7 @@ object Map extends ImmutableMapFactory[Map] {
                     value3: B,
                     key4: A,
                     value4: B)
-      extends AbstractMap[A, B] with Map[A, B] with Serializable {
+      extends AbstractMap[A, B] with Map[A, B] with Serializable
     override def size = 4
     override def apply(key: A) =
       if (key == key1) value1
@@ -246,12 +237,9 @@ object Map extends ImmutableMapFactory[Map] {
       else if (key == key3) new Map3(key1, value1, key2, value2, key4, value4)
       else if (key == key4) new Map3(key1, value1, key2, value2, key3, value3)
       else this
-    override def foreach[U](f: ((A, B)) => U): Unit = {
+    override def foreach[U](f: ((A, B)) => U): Unit =
       f((key1, value1)); f((key2, value2)); f((key3, value3));
       f((key4, value4))
-    }
-  }
-}
 
 /** Explicit instantiation of the `Map` trait to reduce class file size in subclasses. */
 abstract class AbstractMap[A, +B]

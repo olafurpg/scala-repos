@@ -1,7 +1,7 @@
 import scala.tools.partest.ReplTest
 import scala.tools.util.Javap
 
-object Test extends ReplTest {
+object Test extends ReplTest
 
   // ugh, windows
   def expectedOutput =
@@ -31,4 +31,3 @@ scala>
     |:javap Bippy.Dingus
     |:javap Bippy.Bop
   """.stripMargin
-}

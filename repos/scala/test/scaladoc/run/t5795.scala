@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
 /**
@@ -35,7 +35,7 @@ object Test {
 
   def test(b: Boolean, text: => String): Unit = if (!b) println(text)
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     import access._
     val obj = root._object("Test")
     val c = obj.comment.get
@@ -62,5 +62,3 @@ object Test {
     test(!mc.result.isDefined, s"expected no result tag, found: ${mc.result}")
     // throws stay
     test(!mc.throws.isEmpty, s"expected an exception tag, found: ${mc.throws}")
-  }
-}

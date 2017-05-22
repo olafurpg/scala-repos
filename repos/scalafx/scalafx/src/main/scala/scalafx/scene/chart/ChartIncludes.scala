@@ -68,7 +68,7 @@ object ChartIncludes extends ChartIncludes
   * @define XTYPE X Axis Type
   * @define YTYPE Y Axis Type
   */
-trait ChartIncludes {
+trait ChartIncludes
 
   /**
     * $START$ARCH.html $ARCH$END
@@ -277,4 +277,3 @@ trait ChartIncludes {
   implicit def jfxXYChartSeries2sfx[X, Y](
       b: jfxsc.XYChart.Series[X, Y]): Series[X, Y] =
     if (b != null) new XYChart.Series[X, Y](b) else null
-}

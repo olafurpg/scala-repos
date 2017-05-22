@@ -34,16 +34,16 @@ case class Sketched[K, V](pipe: TypedPipe[(K, V)],
                           eps: Double,
                           seed: Int)(
     implicit serialization: K => Array[Byte], ordering: Ordering[K])
-    extends MustHaveReducers {
+    extends MustHaveReducers
 
   def serialize(k: K): Array[Byte] = serialization(k)
 
   def reducers = Some(numReducers)
 
   private lazy implicit val cms = CMS.monoid[Bytes](eps, delta, seed)
-  lazy val sketch: TypedPipe[CMS[Bytes]] = pipe.map {
+  lazy val sketch: TypedPipe[CMS[Bytes]] = pipe.map
     case (k, _) => cms.create(Bytes(serialization(k)))
-  }.groupAll.sum.values.forceToDisk
+  .groupAll.sum.values.forceToDisk
 
   /**
     * Like a hashJoin, this joiner does not see all the values V at one time, only one at a time.
@@ -65,12 +65,11 @@ case class Sketched[K, V](pipe: TypedPipe[(K, V)],
     */
   def leftJoin[V2](right: TypedPipe[(K, V2)]) =
     cogroup(right)(Joiner.hashLeft2)
-}
 
 case class SketchJoined[K : Ordering, V, V2, R](
     left: Sketched[K, V], right: TypedPipe[(K, V2)], numReducers: Int)(
     joiner: (K, V, Iterable[V2]) => Iterator[R])
-    extends MustHaveReducers {
+    extends MustHaveReducers
 
   def reducers = Some(numReducers)
 
@@ -79,7 +78,7 @@ case class SketchJoined[K : Ordering, V, V2, R](
 
   private def flatMapWithReplicas[W](pipe: TypedPipe[(K, W)])(
       fn: Int => Iterable[Int]) =
-    pipe.cross(left.sketch).flatMap {
+    pipe.cross(left.sketch).flatMap
       case ((k, w), cms) =>
         val maxPerReducer =
           (cms.totalCount / numReducers) * maxReducerFraction + 1
@@ -88,44 +87,33 @@ case class SketchJoined[K : Ordering, V, V2, R](
         //if the frequency is 0, maxReplicas.ceil will be 0 so we will filter out this key entirely
         //if it's < maxPerReducer, the ceil will round maxReplicas up to 1 to ensure we still see it
         val replicas = fn(maxReplicas.ceil.toInt.min(numReducers))
-        replicas.map { i =>
+        replicas.map  i =>
           (i, k) -> w
-        }
-    }
 
-  lazy val toTypedPipe: TypedPipe[(K, R)] = {
+  lazy val toTypedPipe: TypedPipe[(K, R)] =
     lazy val rand = new scala.util.Random(left.seed)
-    val lhs = flatMapWithReplicas(left.pipe) { n =>
+    val lhs = flatMapWithReplicas(left.pipe)  n =>
       Some(rand.nextInt(n) + 1)
-    }
-    val rhs = flatMapWithReplicas(right) { n =>
+    val rhs = flatMapWithReplicas(right)  n =>
       1.to(n)
-    }
 
     lhs.group
-      .cogroup(rhs.group) { (k, itv, itu) =>
-        itv.flatMap { v =>
+      .cogroup(rhs.group)  (k, itv, itu) =>
+        itv.flatMap  v =>
           joiner(k._2, v, itu)
-        }
-      }
       .withReducers(numReducers)
       .map { case ((r, k), v) => (k, v) }
-  }
 
-  private implicit def intKeyOrd: Ordering[(Int, K)] = {
+  private implicit def intKeyOrd: Ordering[(Int, K)] =
     val kord = implicitly[Ordering[K]]
 
-    kord match {
+    kord match
       case kos: OrderedSerialization[_] =>
         new OrderedSerialization2(
             ordSer[Int], kos.asInstanceOf[OrderedSerialization[K]])
       case _ => Ordering.Tuple2[Int, K]
-    }
-  }
-}
 
-object SketchJoined {
+object SketchJoined
   implicit def toTypedPipe[K, V, V2, R](
       joined: SketchJoined[K, V, V2, R]): TypedPipe[(K, R)] =
     joined.toTypedPipe
-}

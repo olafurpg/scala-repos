@@ -6,23 +6,19 @@ import org.ensime.util.file._
 
 import akka.event.slf4j.SLF4JLogging
 
-object PortUtil extends SLF4JLogging {
+object PortUtil extends SLF4JLogging
 
-  def port(cacheDir: File, name: String): Option[Int] = {
+  def port(cacheDir: File, name: String): Option[Int] =
     val portFile = cacheDir / name
     if (portFile.exists()) Some(portFile.readString().trim.toInt)
     else None
-  }
 
-  def writePort(cacheDir: File, port: Int, name: String): Unit = {
+  def writePort(cacheDir: File, port: Int, name: String): Unit =
     val portFile = cacheDir / name
-    if (!portFile.exists()) {
+    if (!portFile.exists())
       portFile.createNewFile()
-    }
 
     portFile.deleteOnExit() // doesn't work on Windows
     portFile.writeString(port.toString)
     // Some clients grep the log waiting for this file to be written - so always write the log message.
     log.info("creating port file: " + portFile)
-  }
-}

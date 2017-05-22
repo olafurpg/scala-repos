@@ -10,20 +10,19 @@ import play.api.test.WithApplication
 
 import scala.concurrent.duration._
 
-object WSConfigParserSpec extends Specification {
+object WSConfigParserSpec extends Specification
 
-  "WSConfigParser" should {
+  "WSConfigParser" should
 
-    def parseThis(input: String)(implicit app: play.api.Application) = {
+    def parseThis(input: String)(implicit app: play.api.Application) =
       val config = play.api.Configuration(ConfigFactory
             .parseString(input)
             .withFallback(ConfigFactory.defaultReference()))
       val parser =
         new WSConfigParser(config, app.injector.instanceOf[Environment])
       parser.parse()
-    }
 
-    "parse ws base section" in new WithApplication {
+    "parse ws base section" in new WithApplication
       val actual = parseThis("""
                                 |play.ws.timeout.connection = 9999 ms
                                 |play.ws.timeout.idle = 666 ms
@@ -44,6 +43,3 @@ object WSConfigParserSpec extends Specification {
       actual.useProxyProperties must beFalse
 
       actual.userAgent must beSome.which(_ must_== "FakeUserAgent")
-    }
-  }
-}

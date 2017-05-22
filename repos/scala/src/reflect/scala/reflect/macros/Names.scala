@@ -30,7 +30,7 @@ package macros
   *  having the same flavor (term name or type name) as the given name.
   *  Consult [[scala.reflect.macros.Names]] for more information on uniqueness of such names.
   */
-trait Names { self: blackbox.Context =>
+trait Names  self: blackbox.Context =>
 
   /** $freshNameNoParams */
   @deprecated("Use freshName instead", "2.11.0")
@@ -52,4 +52,3 @@ trait Names { self: blackbox.Context =>
 
   /** $freshNameNameParam */
   def freshName[NameType <: Name](name: NameType): NameType
-}

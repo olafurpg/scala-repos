@@ -1,3 +1,2 @@
-object Test {
+object Test
   val x = 1 += 1
-}

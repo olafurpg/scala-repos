@@ -15,8 +15,7 @@ class SbtProjectData(val owner: ProjectSystemId,
                      val projectPath: String)
     extends AbstractExternalEntityData(owner)
 
-object SbtProjectData {
+object SbtProjectData
   val Key: Key[SbtProjectData] = new Key(
       classOf[SbtProjectData].getName,
       ProjectKeys.MODULE.getProcessingWeight + 1)
-}

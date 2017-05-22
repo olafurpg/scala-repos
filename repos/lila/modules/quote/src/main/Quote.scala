@@ -5,7 +5,7 @@ import scala.util.Random
 
 final class Quote(val text: String, val author: String)
 
-object Quote {
+object Quote
 
   def one = all(Random nextInt size)
 
@@ -1240,7 +1240,5 @@ object Quote {
           "Peter Svidler")
   )
 
-  implicit def quoteWriter: OWrites[Quote] = OWrites { q =>
+  implicit def quoteWriter: OWrites[Quote] = OWrites  q =>
     Json.obj("text" -> q.text, "author" -> q.author)
-  }
-}

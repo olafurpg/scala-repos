@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.elements.wrappers.PsiFileStubW
   * @author ilyas
   */
 class ScFileStubImpl(file: ScalaFile)
-    extends PsiFileStubWrapperImpl[ScalaFile](file) with ScFileStub {
+    extends PsiFileStubWrapperImpl[ScalaFile](file) with ScFileStub
 
   override def getType =
     ScalaElementTypes.FILE.asInstanceOf[IStubFileElementType[Nothing]]
@@ -28,19 +28,17 @@ class ScFileStubImpl(file: ScalaFile)
            pName: StringRef,
            name: StringRef,
            compiled: Boolean,
-           script: Boolean) = {
+           script: Boolean) =
     this(file)
     this.sourceFileName = name
     packName = pName
     this.compiled = compiled
     this.script = script
-  }
 
-  def getClasses = {
+  def getClasses =
     import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes._
     getChildrenByType(TokenSet.create(CLASS_DEF, OBJECT_DEF, TRAIT_DEF),
                       PsiClass.ARRAY_FACTORY)
-  }
 
   def getFileName = StringRef.toString(sourceFileName)
 
@@ -49,4 +47,3 @@ class ScFileStubImpl(file: ScalaFile)
   def isCompiled: Boolean = compiled
 
   def isScript: Boolean = script
-}

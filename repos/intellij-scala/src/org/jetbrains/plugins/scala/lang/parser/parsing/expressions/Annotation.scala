@@ -15,29 +15,25 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * Annmotation ::= '@' AnnotationExpr [nl]
  */
 
-object Annotation {
+object Annotation
   def parse(builder: ScalaPsiBuilder,
-            countLinesAfterAnnotation: Boolean = true): Boolean = {
+            countLinesAfterAnnotation: Boolean = true): Boolean =
     val rollbackMarker = builder.mark()
     val annotMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tAT =>
         builder.advanceLexer() //Ate @
       case _ =>
         annotMarker.drop()
         rollbackMarker.drop()
         return false
-    }
-    if (!AnnotationExpr.parse(builder)) {
+    if (!AnnotationExpr.parse(builder))
       builder error ScalaBundle.message("wrong.annotation.expression")
       annotMarker.drop()
-    } else {
+    else
       annotMarker.done(ScalaElementTypes.ANNOTATION)
-    }
-    if (countLinesAfterAnnotation && builder.twoNewlinesBeforeCurrentToken) {
+    if (countLinesAfterAnnotation && builder.twoNewlinesBeforeCurrentToken)
       rollbackMarker.rollbackTo()
       return false
-    } else rollbackMarker.drop()
+    else rollbackMarker.drop()
     true
-  }
-}

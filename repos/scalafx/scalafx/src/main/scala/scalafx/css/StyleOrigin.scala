@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Companion object for [[scalafx.css.StyleOrigin]].
   */
 object StyleOrigin
-    extends SFXEnumDelegateCompanion[jfxcss.StyleOrigin, StyleOrigin] {
+    extends SFXEnumDelegateCompanion[jfxcss.StyleOrigin, StyleOrigin]
 
   /**
     * The stylesheet is an external file
@@ -57,7 +57,6 @@ object StyleOrigin
   val UserAgent: StyleOrigin = new StyleOrigin(jfxcss.StyleOrigin.USER_AGENT)
 
   override val unsortedValues = Array(Author, Inline, User, UserAgent)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/StyleOrigin.html JavaFX StyleOrigin]].

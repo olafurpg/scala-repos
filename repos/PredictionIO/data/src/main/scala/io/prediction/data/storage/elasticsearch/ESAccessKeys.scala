@@ -31,18 +31,17 @@ import scala.util.Random
 
 /** Elasticsearch implementation of AccessKeys. */
 class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
-    extends AccessKeys with Logging {
+    extends AccessKeys with Logging
   implicit val formats = DefaultFormats.lossless
   private val estype = "accesskeys"
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val json =
       (estype ->
           ("properties" ->
@@ -53,69 +52,56 @@ class ESAccessKeys(client: Client, config: StorageClientConfig, index: String)
       .setType(estype)
       .setSource(compact(render(json)))
       .get
-  }
 
-  def insert(accessKey: AccessKey): Option[String] = {
+  def insert(accessKey: AccessKey): Option[String] =
     val key = if (accessKey.key.isEmpty) generateKey else accessKey.key
     update(accessKey.copy(key = key))
     Some(key)
-  }
 
-  def get(key: String): Option[AccessKey] = {
-    try {
+  def get(key: String): Option[AccessKey] =
+    try
       val response = client.prepareGet(index, estype, key).get()
       Some(read[AccessKey](response.getSourceAsString))
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
       case e: NullPointerException => None
-    }
-  }
 
-  def getAll(): Seq[AccessKey] = {
-    try {
+  def getAll(): Seq[AccessKey] =
+    try
       val builder = client.prepareSearch(index).setTypes(estype)
       ESUtils.getAll[AccessKey](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq[AccessKey]()
-    }
-  }
 
-  def getByAppid(appid: Int): Seq[AccessKey] = {
-    try {
+  def getByAppid(appid: Int): Seq[AccessKey] =
+    try
       val builder = client
         .prepareSearch(index)
         .setTypes(estype)
         .setPostFilter(termFilter("appid", appid))
       ESUtils.getAll[AccessKey](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq[AccessKey]()
-    }
-  }
 
-  def update(accessKey: AccessKey): Unit = {
-    try {
+  def update(accessKey: AccessKey): Unit =
+    try
       client
         .prepareIndex(index, estype, accessKey.key)
         .setSource(write(accessKey))
         .get()
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
-    }
-  }
 
-  def delete(key: String): Unit = {
-    try {
+  def delete(key: String): Unit =
+    try
       client.prepareDelete(index, estype, key).get
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
-    }
-  }
-}

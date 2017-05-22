@@ -22,9 +22,9 @@ package org.apache.spark.examples.graphx
   * Uses GraphX to run PageRank on a LiveJournal social network graph. Download the dataset from
   * http://snap.stanford.edu/data/soc-LiveJournal1.html.
   */
-object LiveJournalPageRank {
-  def main(args: Array[String]) {
-    if (args.length < 1) {
+object LiveJournalPageRank
+  def main(args: Array[String])
+    if (args.length < 1)
       System.err.println(
           "Usage: LiveJournalPageRank <edge_list_file>\n" +
           "    --numEPart=<num_edge_partitions>\n" +
@@ -37,9 +37,6 @@ object LiveJournalPageRank {
           "CanonicalRandomVertexCut]\n" +
           "        The way edges are assigned to edge partitions. Default is RandomVertexCut.")
       System.exit(-1)
-    }
 
     Analytics.main(args.patch(0, List("pagerank"), 0))
-  }
-}
 // scalastyle:on println

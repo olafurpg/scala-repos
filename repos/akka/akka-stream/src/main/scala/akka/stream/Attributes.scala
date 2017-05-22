@@ -19,17 +19,16 @@ import scala.compat.java8.OptionConverters._
   *
   * Note that more attributes for the [[ActorMaterializer]] are defined in [[ActorAttributes]].
   */
-final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
+final case class Attributes(attributeList: List[Attributes.Attribute] = Nil)
 
   import Attributes._
 
   /**
     * Java API
     */
-  def getAttributeList(): java.util.List[Attribute] = {
+  def getAttributeList(): java.util.List[Attribute] =
     import scala.collection.JavaConverters._
     attributeList.asJava
-  }
 
   /**
     * Java API: Get all attributes of a given `Class` or
@@ -37,13 +36,11 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     */
   def getAttributeList[T <: Attribute](c: Class[T]): java.util.List[T] =
     if (attributeList.isEmpty) java.util.Collections.emptyList()
-    else {
+    else
       val result = new java.util.ArrayList[T]
-      attributeList.foreach { a ⇒
+      attributeList.foreach  a ⇒
         if (c.isInstance(a)) result.add(c.cast(a))
-      }
       result
-    }
 
   /**
     * Java API: Get the last (most specific) attribute of a given `Class` or subclass thereof.
@@ -72,19 +69,17 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     * Java API: Get the first (least specific) attribute of a given `Class` or subclass thereof.
     */
   def getFirstAttribute[T <: Attribute](c: Class[T]): Optional[T] =
-    attributeList.collectFirst {
+    attributeList.collectFirst
       case attr if c.isInstance(attr) => c cast attr
-    }.asJava
+    .asJava
 
   /**
     * Scala API: get all attributes of a given type (or subtypes thereof).
     */
-  def filtered[T <: Attribute : ClassTag]: List[T] = {
+  def filtered[T <: Attribute : ClassTag]: List[T] =
     val c = implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]]
-    attributeList.collect {
+    attributeList.collect
       case attr if c.isAssignableFrom(attr.getClass) ⇒ c.cast(attr)
-    }
-  }
 
   /**
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
@@ -103,22 +98,18 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
   /**
     * Scala API: Get the last (most specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def get[T <: Attribute : ClassTag]: Option[T] = {
+  def get[T <: Attribute : ClassTag]: Option[T] =
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
-    attributeList.reverseIterator.collectFirst[T] {
+    attributeList.reverseIterator.collectFirst[T]
       case attr if c.isInstance(attr) => c.cast(attr)
-    }
-  }
 
   /**
     * Scala API: Get the first (least specific) attribute of a given type parameter T `Class` or subclass thereof.
     */
-  def getFirst[T <: Attribute : ClassTag]: Option[T] = {
+  def getFirst[T <: Attribute : ClassTag]: Option[T] =
     val c = classTag[T].runtimeClass.asInstanceOf[Class[T]]
-    attributeList.collectFirst {
+    attributeList.collectFirst
       case attr if c.isInstance(attr) => c.cast(attr)
-    }
-  }
 
   /**
     * Test whether the given attribute is contained within this attributes list.
@@ -148,35 +139,32 @@ final case class Attributes(attributeList: List[Attributes.Attribute] = Nil) {
     * INTERNAL API
     */
   private[akka] def nameOrDefault(
-      default: String = "unknown-operation"): String = {
+      default: String = "unknown-operation"): String =
     @tailrec
     def concatNames(
         i: Iterator[Attribute], first: String, buf: StringBuilder): String =
       if (i.hasNext)
-        i.next() match {
+        i.next() match
           case Name(n) ⇒
             // FIXME this URLEncode is a bug IMO, if that format is important then that is how it should be store in Name
             val nn = URLEncoder.encode(n, "UTF-8")
             if (buf ne null) concatNames(i, null, buf.append('-').append(nn))
-            else if (first ne null) {
+            else if (first ne null)
               val b = new StringBuilder((first.length() + nn.length()) * 2)
               concatNames(i, null, b.append(first).append('-').append(nn))
-            } else concatNames(i, nn, null)
+            else concatNames(i, nn, null)
           case _ ⇒ concatNames(i, first, buf)
-        } else if (buf eq null) first
+        else if (buf eq null) first
       else buf.toString
 
-    concatNames(attributeList.iterator, null, null) match {
+    concatNames(attributeList.iterator, null, null) match
       case null ⇒ default
       case some ⇒ some
-    }
-  }
-}
 
 /**
   * Note that more attributes for the [[ActorMaterializer]] are defined in [[ActorAttributes]].
   */
-object Attributes {
+object Attributes
 
   trait Attribute
   final case class Name(n: String) extends Attribute
@@ -187,11 +175,10 @@ object Attributes {
       extends Attribute
   final case object AsyncBoundary extends Attribute
 
-  object LogLevels {
+  object LogLevels
 
     /** Use to disable logging on certain operations when configuring [[Attributes.LogLevels]] */
     final val Off: Logging.LogLevel = Logging.levelFor("off").get
-  }
 
   /**
     * INTERNAL API
@@ -248,20 +235,17 @@ object Attributes {
     * Compute a name by concatenating all Name attributes that the given module
     * has, returning the given default value if none are found.
     */
-  def extractName(mod: Module, default: String): String = {
-    mod match {
+  def extractName(mod: Module, default: String): String =
+    mod match
       case CopiedModule(_, attr, copyOf) ⇒
         (attr and copyOf.attributes).nameOrDefault(default)
       case _ ⇒ mod.attributes.nameOrDefault(default)
-    }
-  }
-}
 
 /**
   * Attributes for the [[ActorMaterializer]].
   * Note that more attributes defined in [[Attributes]].
   */
-object ActorAttributes {
+object ActorAttributes
   import Attributes._
   final case class Dispatcher(dispatcher: String) extends Attribute
   final case class SupervisionStrategy(decider: Supervision.Decider)
@@ -313,4 +297,3 @@ object ActorAttributes {
                 onFinish: Logging.LogLevel = Logging.DebugLevel,
                 onFailure: Logging.LogLevel = Logging.ErrorLevel) =
     Attributes(LogLevels(onElement, onFinish, onFailure))
-}

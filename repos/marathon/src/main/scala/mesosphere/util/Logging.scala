@@ -2,6 +2,5 @@ package mesosphere.util
 
 import org.slf4j.LoggerFactory
 
-trait Logging {
+trait Logging
   protected[this] val log = LoggerFactory.getLogger(getClass.getName)
-}

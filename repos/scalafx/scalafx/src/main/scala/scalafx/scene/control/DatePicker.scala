@@ -36,10 +36,9 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter
 
-object DatePicker {
+object DatePicker
   implicit def sfxDatePicker2jfx(v: DatePicker): jfxsc.DatePicker =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/DatePicker.html]].
@@ -47,7 +46,7 @@ object DatePicker {
 class DatePicker(
     override val delegate: jfxsc.DatePicker = new jfxsc.DatePicker())
     extends ComboBoxBase[LocalDate](delegate)
-    with SFXDelegate[jfxsc.DatePicker] {
+    with SFXDelegate[jfxsc.DatePicker]
 
   /**
     * Creates a `DatePicker` instance and sets the value to the given date.
@@ -58,29 +57,24 @@ class DatePicker(
     * The calendar system used for parsing, displaying, and choosing dates in the DatePicker control.
     */
   def chronology = delegate.chronologyProperty
-  def chronology_=(value: Chronology) {
+  def chronology_=(value: Chronology)
     chronology() = value
-  }
 
   /**
     * Converts the input text to an object of type `LocalDate` and vice versa.
     */
   def converter = delegate.converterProperty
-  def converter_=(value: StringConverter[LocalDate]) {
+  def converter_=(value: StringConverter[LocalDate])
     converter() = value
-  }
 
   /**
     * A custom cell factory can be provided to customize individual day cells in the `DatePicker` popup.
     */
   def dayCellFactory = delegate.dayCellFactoryProperty
-  def dayCellFactory_=(value: DatePicker => DateCell) {
-    dayCellFactory() = new jfxu.Callback[jfxsc.DatePicker, jfxsc.DateCell] {
-      def call(result: jfxsc.DatePicker) = {
+  def dayCellFactory_=(value: DatePicker => DateCell)
+    dayCellFactory() = new jfxu.Callback[jfxsc.DatePicker, jfxsc.DateCell]
+      def call(result: jfxsc.DatePicker) =
         value(result)
-      }
-    }
-  }
 
   /**
     * The editor for the `DatePicker`.
@@ -91,7 +85,5 @@ class DatePicker(
     * Whether the `DatePicker` popup should display a column showing week numbers.
     */
   def showWeekNumbers = delegate.showWeekNumbersProperty
-  def showWeekNumbers_=(value: Boolean) = {
+  def showWeekNumbers_=(value: Boolean) =
     showWeekNumbers() = value
-  }
-}

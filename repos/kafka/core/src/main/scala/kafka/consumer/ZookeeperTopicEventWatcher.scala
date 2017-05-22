@@ -23,13 +23,13 @@ import org.apache.zookeeper.Watcher.Event.KeeperState
 
 class ZookeeperTopicEventWatcher(
     val zkUtils: ZkUtils, val eventHandler: TopicEventHandler[String])
-    extends Logging {
+    extends Logging
 
   val lock = new Object()
 
   startWatchingTopicEvents()
 
-  private def startWatchingTopicEvents() {
+  private def startWatchingTopicEvents()
     val topicEventListener = new ZkTopicEventListener()
     zkUtils.makeSurePersistentPathExists(ZkUtils.BrokerTopicsPath)
 
@@ -42,60 +42,45 @@ class ZookeeperTopicEventWatcher(
 
     // call to bootstrap topic list
     topicEventListener.handleChildChange(ZkUtils.BrokerTopicsPath, topics)
-  }
 
   private def stopWatchingTopicEvents() { zkUtils.zkClient.unsubscribeAll() }
 
-  def shutdown() {
-    lock.synchronized {
+  def shutdown()
+    lock.synchronized
       info("Shutting down topic event watcher.")
-      if (zkUtils != null) {
+      if (zkUtils != null)
         stopWatchingTopicEvents()
-      } else {
+      else
         warn("Cannot shutdown since the embedded zookeeper client has already closed.")
-      }
-    }
-  }
 
-  class ZkTopicEventListener extends IZkChildListener {
+  class ZkTopicEventListener extends IZkChildListener
 
     @throws(classOf[Exception])
-    def handleChildChange(parent: String, children: java.util.List[String]) {
-      lock.synchronized {
-        try {
-          if (zkUtils != null) {
+    def handleChildChange(parent: String, children: java.util.List[String])
+      lock.synchronized
+        try
+          if (zkUtils != null)
             val latestTopics =
               zkUtils.zkClient.getChildren(ZkUtils.BrokerTopicsPath).toList
             debug("all topics: %s".format(latestTopics))
             eventHandler.handleTopicEvent(latestTopics)
-          }
-        } catch {
+        catch
           case e: Throwable =>
             error("error in handling child changes", e)
-        }
-      }
-    }
-  }
 
   class ZkSessionExpireListener(val topicEventListener: ZkTopicEventListener)
-      extends IZkStateListener {
+      extends IZkStateListener
 
     @throws(classOf[Exception])
     def handleStateChanged(state: KeeperState) {}
 
     @throws(classOf[Exception])
-    def handleNewSession() {
-      lock.synchronized {
-        if (zkUtils != null) {
+    def handleNewSession()
+      lock.synchronized
+        if (zkUtils != null)
           info("ZK expired: resubscribing topic event listener to topic registry")
           zkUtils.zkClient.subscribeChildChanges(
               ZkUtils.BrokerTopicsPath, topicEventListener)
-        }
-      }
-    }
 
-    override def handleSessionEstablishmentError(error: Throwable): Unit = {
+    override def handleSessionEstablishmentError(error: Throwable): Unit =
       //no-op ZookeeperConsumerConnector should log error.
-    }
-  }
-}

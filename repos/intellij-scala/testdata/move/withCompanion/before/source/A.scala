@@ -1,9 +1,7 @@
 package source
 
-class A {
+class A
   def a() = UtilS.foo()
-}
 
-object A {
+object A
   def a() = UtilS.foo()
-}

@@ -23,7 +23,7 @@ package org.apache.spark.streaming
   * time and midnight, January 1, 1970 UTC. This is the same format as what is returned by
   * System.currentTimeMillis.
   */
-case class Time(private val millis: Long) {
+case class Time(private val millis: Long)
 
   def milliseconds: Long = millis
 
@@ -57,16 +57,14 @@ case class Time(private val millis: Long) {
 
   def minus(that: Duration): Time = this - that
 
-  def floor(that: Duration): Time = {
+  def floor(that: Duration): Time =
     val t = that.milliseconds
     new Time((this.millis / t) * t)
-  }
 
-  def floor(that: Duration, zeroTime: Time): Time = {
+  def floor(that: Duration, zeroTime: Time): Time =
     val t = that.milliseconds
     new Time(((this.millis - zeroTime.milliseconds) / t) * t +
         zeroTime.milliseconds)
-  }
 
   def isMultipleOf(that: Duration): Boolean =
     (this.millis % that.milliseconds == 0)
@@ -75,19 +73,15 @@ case class Time(private val millis: Long) {
 
   def max(that: Time): Time = if (this > that) this else that
 
-  def until(that: Time, interval: Duration): Seq[Time] = {
+  def until(that: Time, interval: Duration): Seq[Time] =
     (this.milliseconds) until (that.milliseconds) by (interval.milliseconds) map
     (new Time(_))
-  }
 
-  def to(that: Time, interval: Duration): Seq[Time] = {
+  def to(that: Time, interval: Duration): Seq[Time] =
     (this.milliseconds) to (that.milliseconds) by (interval.milliseconds) map
     (new Time(_))
-  }
 
   override def toString: String = (millis.toString + " ms")
-}
 
-object Time {
+object Time
   implicit val ordering = Ordering.by((time: Time) => time.millis)
-}

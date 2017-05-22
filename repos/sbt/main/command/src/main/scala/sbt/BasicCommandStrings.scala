@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import java.io.File
 import sbt.io.Path._
 
-object BasicCommandStrings {
+object BasicCommandStrings
   val HelpCommand = "help"
   val CompletionsCommand = "completions"
   val Exit = "exit"
@@ -50,7 +50,7 @@ object BasicCommandStrings {
 
   def exitBrief = "Terminates the build."
 
-  def logLevelHelp = {
+  def logLevelHelp =
     val levels = Level.values.toSeq
     val levelList = levels.mkString(", ")
     val brief =
@@ -58,7 +58,6 @@ object BasicCommandStrings {
        "Sets the logging level to 'log-level'.  Valid levels: " + levelList)
     val detailed = levels.map(l => (l.toString, logLevelDetail(l))).toMap
     Help(brief, detailed)
-  }
   private[this] def logLevelDetail(level: Level.Value): String =
     s"""$level
 
@@ -74,15 +73,13 @@ ${runEarly(level.toString)}
 		* if no other commands are passed, interactive mode is still entered
 """
 
-  def runEarly(command: String) = {
+  def runEarly(command: String) =
     val sep =
       if (command.isEmpty || Character.isLetter(command.charAt(0))) "" else " "
     s"$EarlyCommand$sep$command"
-  }
-  private[sbt] def isEarlyCommand(s: String): Boolean = {
+  private[sbt] def isEarlyCommand(s: String): Boolean =
     s.startsWith(EarlyCommand) && s != Compat.FailureWall &&
     s != Compat.ClearOnFailure
-  }
 
   val EarlyCommand = "--"
   val EarlyCommandBrief =
@@ -176,7 +173,7 @@ ${runEarly(level.toString)}
 
   // commands with poor choices for names since they clash with the usual conventions for command line options
   //   these are not documented and are mainly internal commands and can be removed without a full deprecation cycle
-  object Compat {
+  object Compat
     def OnFailure = "-"
     def ClearOnFailure = "--"
     def FailureWall = "---"
@@ -189,7 +186,6 @@ ${runEarly(level.toString)}
     private[this] def deprecatedAlias(
         oldName: String, newName: String): String =
       s"The `$oldName` command is deprecated in favor of `$newName` and will be removed in 0.14.0"
-  }
 
   def FailureWall = "resumeFromFailure"
 
@@ -220,4 +216,3 @@ ${runEarly(level.toString)}
     "Executes the specified command whenever source files change."
   def continuousBriefHelp =
     (ContinuousExecutePrefix + " <command>", continuousDetail)
-}

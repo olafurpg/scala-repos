@@ -38,7 +38,7 @@ import scalafx.event.{Event, EventType}
 /**
   * Companion Object for [[scalafx.scene.control.ScrollToEvent]].
   */
-object ScrollToEvent {
+object ScrollToEvent
 
   /**
     * Converts a ScalaFX ScrollToEvent to its JavaFX couterpart
@@ -66,7 +66,6 @@ object ScrollToEvent {
     */
   def scrollToTopIndex(): EventType[jfxsc.ScrollToEvent[Integer]] =
     jfxsc.ScrollToEvent.scrollToTopIndex()
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ScrollToEvent.html ScrollToEvent]].
@@ -76,7 +75,7 @@ object ScrollToEvent {
   * @tparam T scroll target type
   */
 class ScrollToEvent[T](override val delegate: jfxsc.ScrollToEvent[T])
-    extends Event(delegate) with SFXDelegate[jfxsc.ScrollToEvent[T]] {
+    extends Event(delegate) with SFXDelegate[jfxsc.ScrollToEvent[T]]
 
   /**
     * Construct a new Event with the specified event source, target and type.
@@ -96,4 +95,3 @@ class ScrollToEvent[T](override val delegate: jfxsc.ScrollToEvent[T])
     *
     */
   def scrollTarget: T = delegate.getScrollTarget
-}

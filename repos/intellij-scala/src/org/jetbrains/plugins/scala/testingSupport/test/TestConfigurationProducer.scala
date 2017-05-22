@@ -17,17 +17,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
   */
 abstract class TestConfigurationProducer(configurationType: ConfigurationType)
     extends RunConfigurationProducer[AbstractTestRunConfiguration](
-        configurationType) with AbstractTestConfigurationProducer {
+        configurationType) with AbstractTestConfigurationProducer
 
   protected def isObjectInheritor(
-      clazz: ScTypeDefinition, fqn: String): Boolean = {
+      clazz: ScTypeDefinition, fqn: String): Boolean =
     val suiteClazz = ScalaPsiManager
       .instance(clazz.getProject)
       .getCachedClass(
           fqn, clazz.getResolveScope, ScalaPsiManager.ClassCategory.OBJECT)
     if (suiteClazz == null) return false
     ScalaPsiUtil.cachedDeepIsInheritor(clazz, suiteClazz)
-  }
 
   def getLocationClassAndTest(
       location: Location[_ <: PsiElement]): (ScTypeDefinition, String)
@@ -35,11 +34,11 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType)
   override def setupConfigurationFromContext(
       configuration: AbstractTestRunConfiguration,
       context: ConfigurationContext,
-      sourceElement: Ref[PsiElement]): Boolean = {
-    if (sourceElement.isNull) {
+      sourceElement: Ref[PsiElement]): Boolean =
+    if (sourceElement.isNull)
       false
-    } else {
-      createConfigurationByElement(context.getLocation, context) match {
+    else
+      createConfigurationByElement(context.getLocation, context) match
         case Some((testElement, resConfig))
             if testElement != null && resConfig != null =>
           sourceElement.set(testElement)
@@ -65,23 +64,20 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType)
           true
         case _ =>
           false
-      }
-    }
-  }
 
   override def isConfigurationFromContext(
       configuration: AbstractTestRunConfiguration,
-      context: ConfigurationContext): Boolean = {
+      context: ConfigurationContext): Boolean =
     //TODO: implement me properly
     val runnerClassName = configuration.mainClass
 
     if (runnerClassName != null &&
-        runnerClassName == configuration.mainClass) {
+        runnerClassName == configuration.mainClass)
       val configurationModule: Module =
         configuration.getConfigurationModule.getModule
-      if (context.getLocation != null) {
+      if (context.getLocation != null)
         isConfigurationByLocation(configuration, context.getLocation)
-      } else {
+      else
         (context.getModule == configurationModule || context.getRunManager
               .getConfigurationTemplate(getConfigurationFactory)
               .getConfiguration
@@ -90,7 +86,4 @@ abstract class TestConfigurationProducer(configurationType: ConfigurationType)
               .getModule == configurationModule) &&
         configuration.getTestClassPath == null &&
         configuration.getTestName == null
-      }
-    } else false
-  }
-}
+    else false

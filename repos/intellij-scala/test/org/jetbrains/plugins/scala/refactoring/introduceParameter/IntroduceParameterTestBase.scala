@@ -25,7 +25,7 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * @author Alexander Podkhalyuzin
   */
 abstract class IntroduceParameterTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   protected def folderPath = baseRootPath() + "introduceParameter/"
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
@@ -34,7 +34,7 @@ abstract class IntroduceParameterTestBase
   private val defaultMarker = "//default = "
   private val constructorMarker = "//constructor = "
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
     val project = getProjectAdapter
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -63,34 +63,31 @@ abstract class IntroduceParameterTestBase
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
 
     //getting settings
-    def getSetting(marker: String, default: String): String = {
+    def getSetting(marker: String, default: String): String =
       val offset = fileText.indexOf(marker)
       if (offset == -1) default
-      else {
+      else
         val comment = scalaFile.findElementAt(offset)
         comment.getText.substring(marker.length)
-      }
-    }
     val replaceAllOccurrences = getSetting(allMarker, "true").toBoolean
     val paramName = getSetting(nameMarker, "param")
     val isDefaultParam = getSetting(defaultMarker, "false").toBoolean
     val toPrimaryConstructor = getSetting(constructorMarker, "false").toBoolean
 
     //start to inline
-    try {
-      ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
-        def run() {
+    try
+      ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable
+        def run()
           editor.getSelectionModel.setSelection(startOffset, endOffset)
           ScalaRefactoringUtil.afterExpressionChoosing(
-              project, editor, scalaFile, null, "Introduce Variable") {
+              project, editor, scalaFile, null, "Introduce Variable")
             ScalaRefactoringUtil.trimSpacesAndComments(editor, scalaFile)
             PsiDocumentManager.getInstance(project).commitAllDocuments()
             val handler = new ScalaIntroduceParameterHandler()
             val (exprWithTypes, elems) =
-              handler.selectedElements(scalaFile, project, editor) match {
+              handler.selectedElements(scalaFile, project, editor) match
                 case Some((x, y)) => (x, y)
                 case None => return
-              }
 
             val (methodLike: ScMethodLike, returnType) =
               if (toPrimaryConstructor)
@@ -99,11 +96,10 @@ abstract class IntroduceParameterTestBase
                    .constructor
                    .get,
                  StdType.ANY)
-              else {
+              else
                 val fun = PsiTreeUtil.getContextOfType(
                     elems.head, true, classOf[ScFunctionDefinition])
                 (fun, fun.returnType.getOrAny)
-              }
             val collectedData =
               handler.collectData(exprWithTypes, elems, methodLike, editor)
             assert(collectedData.isDefined,
@@ -131,25 +127,19 @@ abstract class IntroduceParameterTestBase
 
             changeInfo.introducedParameterData = Some(data)
             new ScalaChangeSignatureProcessor(project, changeInfo).run()
-          }
-        }
-      }, project, "Test")
+      , project, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    } catch {
+    catch
       case e: Exception =>
         assert(
             assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res.trim)
-  }
-}

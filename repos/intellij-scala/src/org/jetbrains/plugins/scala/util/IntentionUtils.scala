@@ -31,71 +31,57 @@ import scala.collection.mutable.ArrayBuffer
   * @author Ksenia.Sautina
   * @since 5/12/12
   */
-object IntentionUtils {
+object IntentionUtils
 
   def addNameToArgumentsFix(
-      element: PsiElement, onlyBoolean: Boolean): Option[() => Unit] = {
+      element: PsiElement, onlyBoolean: Boolean): Option[() => Unit] =
     val argList: ScArgumentExprList =
       PsiTreeUtil.getParentOfType(element, classOf[ScArgumentExprList])
     if (argList == null || argList.isBraceArgs) return None
-    val currentArg = argList.exprs.find { e =>
+    val currentArg = argList.exprs.find  e =>
       PsiTreeUtil.isAncestor(e, element, /*strict =*/ false)
-    }
-    currentArg match {
+    currentArg match
       case None => return None
       case Some(assign: ScAssignStmt) if assign.isNamedParameter => return None
       case _ =>
-    }
 
-    def matchedParamsAfter(): Seq[(ScExpression, Parameter)] = {
+    def matchedParamsAfter(): Seq[(ScExpression, Parameter)] =
       val sortedMatchedArgs =
         argList.matchedParameters.sortBy(_._1.getTextOffset)
-      sortedMatchedArgs.dropWhile {
+      sortedMatchedArgs.dropWhile
         case (e, p) => !PsiTreeUtil.isAncestor(e, element, /*strict =*/ false)
         case _ => true
-      }
-    }
 
     val argsAndMatchedParams = matchedParamsAfter()
-    val hasRepeated = argsAndMatchedParams.exists {
+    val hasRepeated = argsAndMatchedParams.exists
       case (_, param) if param.isRepeated => true
       case _ => false
-    }
-    val allNamesDefined = argsAndMatchedParams.forall {
+    val allNamesDefined = argsAndMatchedParams.forall
       case (_, param) => !StringUtil.isEmpty(param.name)
-    }
-    val hasUnderscore = argsAndMatchedParams.exists {
+    val hasUnderscore = argsAndMatchedParams.exists
       case (underscore: ScUnderscoreSection, _) => true
       case _ => false
-    }
 
     if (hasRepeated || !allNamesDefined || hasUnderscore) None
-    else {
+    else
       val doIt = () =>
-        {
-          argsAndMatchedParams.foreach {
+          argsAndMatchedParams.foreach
             case (argExpr childOf (a: ScAssignStmt), param)
                 if a.getLExpression.getText == param.name =>
             case (argExpr, param) =>
-              if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean)) {
+              if (!onlyBoolean || (onlyBoolean && param.paramType == Boolean))
                 val newArgExpr =
                   ScalaPsiElementFactory.createExpressionFromText(
                       param.name + " = " + argExpr.getText, element.getManager)
-                inWriteAction {
+                inWriteAction
                   argExpr.replace(newArgExpr)
-                }
-              }
             case _ =>
-          }
-      }
       Some(doIt)
-    }
-  }
 
   def analyzeMethodCallArgs(
-      methodCallArgs: ScArgumentExprList, argsBuilder: scala.StringBuilder) {
-    if (methodCallArgs.exprs.length == 1) {
-      methodCallArgs.exprs.head match {
+      methodCallArgs: ScArgumentExprList, argsBuilder: scala.StringBuilder)
+    if (methodCallArgs.exprs.length == 1)
+      methodCallArgs.exprs.head match
         case _: ScLiteral =>
           argsBuilder
             .replace(argsBuilder.length - 1, argsBuilder.length, "")
@@ -124,12 +110,9 @@ object IntentionUtils {
             if infix.getBaseExpr.isInstanceOf[ScUnderscoreSection] =>
           argsBuilder.insert(0, "(").append(")")
         case _ =>
-      }
-    }
-  }
 
   def negateAndValidateExpression(
-      expr: ScExpression, manager: PsiManager, buf: scala.StringBuilder) = {
+      expr: ScExpression, manager: PsiManager, buf: scala.StringBuilder) =
     val parent =
       if (expr.getParent != null &&
           expr.getParent.isInstanceOf[ScParenthesisedExpr])
@@ -137,20 +120,19 @@ object IntentionUtils {
       else expr.getParent
 
     if (parent != null && parent.isInstanceOf[ScPrefixExpr] &&
-        parent.asInstanceOf[ScPrefixExpr].operation.getText == "!") {
+        parent.asInstanceOf[ScPrefixExpr].operation.getText == "!")
 
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
           buf.toString(), manager)
 
-      val size = newExpr match {
+      val size = newExpr match
         case infix: ScInfixExpr =>
           infix.operation.nameId.getTextRange.getStartOffset -
           newExpr.getTextRange.getStartOffset - 2
         case _ => 0
-      }
 
       (parent.asInstanceOf[ScPrefixExpr], newExpr, size)
-    } else {
+    else
       buf.insert(0, "!(").append(")")
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
           buf.toString(), manager)
@@ -160,30 +142,26 @@ object IntentionUtils {
         .getLastChild
         .asInstanceOf[ScParenthesisedExpr]
         .getChildren
-      val size = children(0) match {
+      val size = children(0) match
         case infix: ScInfixExpr =>
           infix.operation.nameId.getTextRange.getStartOffset -
           newExpr.getTextRange.getStartOffset
         case _ => 0
-      }
       (expr, newExpr, size)
-    }
-  }
 
-  def negate(expression: ScExpression): String = {
-    expression match {
+  def negate(expression: ScExpression): String =
+    expression match
       case e: ScPrefixExpr =>
-        if (e.operation.getText == "!") {
+        if (e.operation.getText == "!")
           val exprWithoutParentheses =
             if (e.getBaseExpr.isInstanceOf[ScParenthesisedExpr])
               e.getBaseExpr.getText.drop(1).dropRight(1)
             else e.getBaseExpr.getText
           val newExpr = ScalaPsiElementFactory.createExpressionFromText(
               exprWithoutParentheses, expression.getManager)
-          inWriteAction {
+          inWriteAction
             e.replaceExpression(newExpr, removeParenthesis = true).getText
-          }
-        } else "!(" + e.getText + ")"
+        else "!(" + e.getText + ")"
       case e: ScLiteral =>
         if (e.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.kTRUE)
           "false"
@@ -195,19 +173,17 @@ object IntentionUtils {
         if (ScalaNamesUtil.isOpCharacter(exprText(0)) ||
             expression.isInstanceOf[ScInfixExpr]) "!(" + exprText + ")"
         else "!" + expression.getText
-    }
-  }
 
   def replaceWithExplicit(expr: ScExpression,
                           f: ScFunction,
                           project: Project,
                           editor: Editor,
-                          secondPart: Seq[PsiNamedElement]) {
+                          secondPart: Seq[PsiNamedElement])
     if (expr == null || f == null || secondPart == null) return
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
+      .executeCommand(project, new Runnable
+        def run()
           val buf = new StringBuilder
           val clazz = f.containingClass
           if (clazz != null && secondPart.contains(f))
@@ -217,7 +193,7 @@ object IntentionUtils {
           val newExpr = ScalaPsiElementFactory.createExpressionFromText(
               buf.toString(), expr.getManager)
 
-          inWriteAction {
+          inWriteAction
             val replaced = expr.replace(newExpr)
             val ref = replaced
               .asInstanceOf[ScMethodCall]
@@ -229,21 +205,18 @@ object IntentionUtils {
             PsiDocumentManager
               .getInstance(project)
               .commitDocument(editor.getDocument)
-          }
-        }
-      }, null, null)
-  }
+      , null, null)
 
   def replaceWithExplicitStatically(expr: ScExpression,
                                     f: ScFunction,
                                     project: Project,
                                     editor: Editor,
-                                    secondPart: Seq[PsiNamedElement]) {
+                                    secondPart: Seq[PsiNamedElement])
     if (expr == null || f == null || secondPart == null) return
     CommandProcessor
       .getInstance()
-      .executeCommand(project, new Runnable {
-        def run() {
+      .executeCommand(project, new Runnable
+        def run()
           val buf = new StringBuilder
           val clazz = f.containingClass
           if (clazz != null && secondPart.contains(f))
@@ -258,7 +231,7 @@ object IntentionUtils {
             .createReferenceFromText(buf.toString(), expr.getManager)
             .resolve()
 
-          inWriteAction {
+          inWriteAction
             val replaced = expr.replace(newExpr)
             val ref = replaced
               .asInstanceOf[ScMethodCall]
@@ -269,28 +242,25 @@ object IntentionUtils {
             PsiDocumentManager
               .getInstance(project)
               .commitDocument(editor.getDocument)
-          }
-        }
-      }, null, null)
-  }
+      , null, null)
 
   def showMakeExplicitPopup(project: Project,
                             expr: ScExpression,
                             function: ScFunction,
                             editor: Editor,
                             secondPart: scala.Seq[PsiNamedElement],
-                            getCurrentItemBounds: () => Rectangle) {
+                            getCurrentItemBounds: () => Rectangle)
     val values = new ArrayBuffer[String]
     values += MakeExplicitAction.MAKE_EXPLICIT
     if (secondPart.contains(function))
       values += MakeExplicitAction.MAKE_EXPLICIT_STATICALLY
-    val base = new BaseListPopupStep[String](null, values.toArray: _*) {
+    val base = new BaseListPopupStep[String](null, values.toArray: _*)
       override def getTextFor(value: String): String = value
 
       override def onChosen(
-          selectedValue: String, finalChoice: Boolean): PopupStep[_] = {
+          selectedValue: String, finalChoice: Boolean): PopupStep[_] =
         if (selectedValue == null) return PopupStep.FINAL_CHOICE
-        if (finalChoice) {
+        if (finalChoice)
           PsiDocumentManager.getInstance(project).commitAllDocuments()
           GoToImplicitConversionAction.getPopup.dispose()
           if (selectedValue == MakeExplicitAction.MAKE_EXPLICIT)
@@ -300,10 +270,7 @@ object IntentionUtils {
             IntentionUtils.replaceWithExplicitStatically(
                 expr, function, project, editor, secondPart)
           return PopupStep.FINAL_CHOICE
-        }
         super.onChosen(selectedValue, finalChoice)
-      }
-    }
 
     val popup = JBPopupFactory.getInstance.createListPopup(base)
     val bounds: Rectangle = getCurrentItemBounds()
@@ -311,5 +278,3 @@ object IntentionUtils {
     popup.show(
         new RelativePoint(GoToImplicitConversionAction.getList,
                           new Point(bounds.x + bounds.width - 20, bounds.y)))
-  }
-}

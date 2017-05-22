@@ -44,9 +44,8 @@ class NumberStringConverterSpec
         Number, jfxuc.NumberStringConverter, Number, NumberStringConverter](
         classOf[jfxuc.NumberStringConverter],
         classOf[NumberStringConverter],
-        classOf[Number]) {
+        classOf[Number])
 
   val examples = List((new java.lang.Integer(10), "10"),
                       (new java.lang.Integer(0), "0"),
                       (new java.lang.Integer(-10), "-10"))
-}

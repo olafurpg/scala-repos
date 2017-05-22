@@ -105,17 +105,15 @@ final case class Inr[+H, +T <: Coproduct](tail: T) extends :+:[H, T]
   * This makes the type `Int :+: CNil` equivalent to `Int`, because the right (`Inr`) alternative
   * of `:+:` can not be constructed properly.
   */
-sealed trait CNil extends Coproduct {
+sealed trait CNil extends Coproduct
   def impossible: Nothing
-}
 
-object Coproduct extends Dynamic {
+object Coproduct extends Dynamic
   import ops.coproduct.Inject
   import syntax.CoproductOps
 
-  class MkCoproduct[C <: Coproduct] {
+  class MkCoproduct[C <: Coproduct]
     def apply[T](t: T)(implicit inj: Inject[C, T]): C = inj(t)
-  }
 
   def apply[C <: Coproduct] = new MkCoproduct[C]
 
@@ -125,10 +123,9 @@ object Coproduct extends Dynamic {
     (0 until length).foldLeft[Coproduct](Inl(value))((accum, _) => Inr(accum))
 
   @tailrec
-  def unsafeGet(c: Coproduct): Any = c match {
+  def unsafeGet(c: Coproduct): Any = c match
     case Inl(h) => h
     case Inr(c) => unsafeGet(c)
-  }
 
   /**
     * Allows to specify a `Coproduct` type with a syntax similar to `Record` and `Union`, as follows,
@@ -145,4 +142,3 @@ object Coproduct extends Dynamic {
     * }}}
     */
   def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.coproductTypeImpl
-}

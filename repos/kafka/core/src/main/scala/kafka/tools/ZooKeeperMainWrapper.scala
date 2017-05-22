@@ -19,21 +19,17 @@ package kafka.tools
 
 import org.apache.zookeeper.ZooKeeperMain
 
-class ZooKeeperMainWrapper(args: Array[String]) extends ZooKeeperMain(args) {
-  def runCmd(): Unit = {
+class ZooKeeperMainWrapper(args: Array[String]) extends ZooKeeperMain(args)
+  def runCmd(): Unit =
     processCmd(this.cl)
     System.exit(0)
-  }
-}
 
 /**
   * ZooKeeper 3.4.6 broke being able to pass commands on command line.
   * See ZOOKEEPER-1897.  This class is a hack to restore this facility.
   */
-object ZooKeeperMainWrapper {
+object ZooKeeperMainWrapper
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val main: ZooKeeperMainWrapper = new ZooKeeperMainWrapper(args)
     main.runCmd()
-  }
-}

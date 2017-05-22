@@ -41,24 +41,24 @@ import scalaz._
 class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
     implicit executor: ExecutionContext, M: Monad[Future])
     extends CustomHttpService[
-        ByteChunk, APIKey => Future[HttpResponse[ByteChunk]]] {
+        ByteChunk, APIKey => Future[HttpResponse[ByteChunk]]]
   import JobManager._
   import JobState._
   import scalaz.syntax.monad._
 
   val Utf8 = Charset.forName("utf-8")
 
-  val service = { (request: HttpRequest[ByteChunk]) =>
-    Success({ (apiKey: APIKey) =>
-      request.parameters get 'jobId map {
+  val service =  (request: HttpRequest[ByteChunk]) =>
+    Success( (apiKey: APIKey) =>
+      request.parameters get 'jobId map
         jobId =>
-          jobManager.findJob(jobId) flatMap {
+          jobManager.findJob(jobId) flatMap
             case Some(job) =>
-              job.state match {
+              job.state match
                 case NotStarted | Started(_, _) | Cancelled(_, _, _) =>
                   Future(HttpResponse[ByteChunk](Accepted))
                 case Finished(_, _) =>
-                  for {
+                  for
                     result <- jobManager.getResult(jobId)
                     warnings <- jobManager.listMessages(jobId,
                                                         channels.Warning,
@@ -66,20 +66,20 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
                     errors <- jobManager.listMessages(jobId,
                                                       channels.Error,
                                                       None)
-                  } yield {
-                    result.fold({ _ =>
+                  yield
+                    result.fold( _ =>
                       HttpResponse[ByteChunk](NotFound)
-                    }, {
+                    ,
                       case (mimeType0, data0) =>
                         val mimeType =
                           mimeType0 getOrElse
                           (MimeTypes.application / MimeTypes.json)
                         if (mimeType !=
-                            (MimeTypes.application / MimeTypes.json)) {
+                            (MimeTypes.application / MimeTypes.json))
                           HttpResponse[ByteChunk](HttpStatus(
                                   InternalServerError,
                                   "Incompatible mime-type of query results."))
-                        } else {
+                        else
                           val headers =
                             HttpHeaders.Empty + `Content-Type`(mimeType)
                           val data = data0
@@ -94,23 +94,16 @@ class AsyncQueryResultServiceHandler(jobManager: JobManager[Future])(
 
                           val chunks = Right(prefix :: (data ++ suffix))
                           HttpResponse[ByteChunk](OK, headers, Some(chunks))
-                        }
-                    })
-                  }
+                    )
                 case Aborted(_, _, _) | Expired(_, _) =>
                   Future(HttpResponse[ByteChunk](Gone))
-              }
 
             case None =>
               Future(HttpResponse[ByteChunk](NotFound))
-          }
-      } getOrElse {
+      getOrElse
         Future(HttpResponse[ByteChunk](
                 HttpStatus(BadRequest, "Missing required 'jobId parameter.")))
-      }
-    })
-  }
+    )
 
   val metadata = DescriptionMetadata(
       """Takes a job ID and may return the results of the execution of that query.""")
-}

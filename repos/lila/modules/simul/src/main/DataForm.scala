@@ -7,7 +7,7 @@ import play.api.data.validation.Constraints._
 import chess.Mode
 import lila.common.Form._
 
-final class DataForm {
+final class DataForm
 
   val clockTimes = (5 to 15 by 5) ++ (20 to 90 by 10) ++ (120 to 180 by 20)
   val clockTimeDefault = 20
@@ -34,7 +34,7 @@ final class DataForm {
             "clockTime" -> numberIn(clockTimeChoices),
             "clockIncrement" -> numberIn(clockIncrementChoices),
             "clockExtra" -> numberIn(clockExtraChoices),
-            "variants" -> list {
+            "variants" -> list
           number.verifying(Set(chess.variant.Standard.id,
                                chess.variant.Chess960.id,
                                chess.variant.KingOfTheHill.id,
@@ -44,7 +44,7 @@ final class DataForm {
                                chess.variant.Horde.id,
                                chess.variant.RacingKings.id,
                                chess.variant.Crazyhouse.id) contains _)
-        }.verifying("At least one variant", _.nonEmpty),
+        .verifying("At least one variant", _.nonEmpty),
             "color" -> stringIn(colorChoices)
         )(SimulSetup.apply)(SimulSetup.unapply)) fill SimulSetup(
         clockTime = clockTimeDefault,
@@ -52,7 +52,6 @@ final class DataForm {
         clockExtra = clockExtraDefault,
         variants = List(chess.variant.Standard.id),
         color = colorDefault)
-}
 
 case class SimulSetup(clockTime: Int,
                       clockIncrement: Int,

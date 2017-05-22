@@ -13,10 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScIfStmt
   * @since 1/28/13
   */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
-class ScalaIfConditionFixer extends ScalaFixer {
+class ScalaIfConditionFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+            psiElement: PsiElement): OperationPerformed =
     val ifStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScIfStmt], false)
     if (ifStatement == null) return NoOperation
@@ -25,16 +25,15 @@ class ScalaIfConditionFixer extends ScalaFixer {
     val leftParenthesis = ifStatement.getLeftParenthesis.orNull
     val rightParenthesis = ifStatement.getRightParenthesis.orNull
 
-    ifStatement.condition match {
+    ifStatement.condition match
       case None if leftParenthesis == null && rightParenthesis == null =>
         val ifStartOffset = ifStatement.getTextRange.getStartOffset
         var stopOffset = doc.getLineEndOffset(doc getLineNumber ifStartOffset)
 
-        ifStatement.thenBranch.foreach {
+        ifStatement.thenBranch.foreach
           case thenBranch =>
             stopOffset = Math.min(
                 stopOffset, thenBranch.getTextRange.getStartOffset)
-        }
 
         doc.replaceString(ifStartOffset, stopOffset, "if () {\n\n}")
 
@@ -42,23 +41,20 @@ class ScalaIfConditionFixer extends ScalaFixer {
 
         WithReformat(4)
       case None if leftParenthesis != null && rightParenthesis == null =>
-        def calcOffset(): Int = {
+        def calcOffset(): Int =
           var s = leftParenthesis.getNextSibling
 
-          while (s != null) {
-            s match {
+          while (s != null)
+            s match
               case error: PsiErrorElement =>
                 return error.getTextRange.getEndOffset
               case sp: PsiWhiteSpace if sp.textContains('\n') =>
                 return sp.getTextRange.getStartOffset
               case _ =>
-            }
 
             s = s.getNextSibling
-          }
 
           ifStatement.getTextRange.getEndOffset
-        }
 
         val actualOffset = calcOffset()
         doc.insertString(actualOffset, ") {\n\n}")
@@ -71,6 +67,3 @@ class ScalaIfConditionFixer extends ScalaFixer {
         doc.insertString(cond.getTextRange.getEndOffset, ")")
         WithReformat(0)
       case _ => NoOperation
-    }
-  }
-}

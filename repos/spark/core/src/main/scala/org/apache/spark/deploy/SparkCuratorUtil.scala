@@ -26,7 +26,7 @@ import org.apache.zookeeper.KeeperException
 import org.apache.spark.SparkConf
 import org.apache.spark.internal.Logging
 
-private[spark] object SparkCuratorUtil extends Logging {
+private[spark] object SparkCuratorUtil extends Logging
 
   private val ZK_CONNECTION_TIMEOUT_MILLIS = 15000
   private val ZK_SESSION_TIMEOUT_MILLIS = 60000
@@ -35,7 +35,7 @@ private[spark] object SparkCuratorUtil extends Logging {
 
   def newClient(
       conf: SparkConf,
-      zkUrlConf: String = "spark.deploy.zookeeper.url"): CuratorFramework = {
+      zkUrlConf: String = "spark.deploy.zookeeper.url"): CuratorFramework =
     val ZK_URL = conf.get(zkUrlConf)
     val zk = CuratorFrameworkFactory.newClient(
         ZK_URL,
@@ -44,26 +44,18 @@ private[spark] object SparkCuratorUtil extends Logging {
         new ExponentialBackoffRetry(RETRY_WAIT_MILLIS, MAX_RECONNECT_ATTEMPTS))
     zk.start()
     zk
-  }
 
-  def mkdir(zk: CuratorFramework, path: String) {
-    if (zk.checkExists().forPath(path) == null) {
-      try {
+  def mkdir(zk: CuratorFramework, path: String)
+    if (zk.checkExists().forPath(path) == null)
+      try
         zk.create().creatingParentsIfNeeded().forPath(path)
-      } catch {
+      catch
         case nodeExist: KeeperException.NodeExistsException =>
         // do nothing, ignore node existing exception.
         case e: Exception => throw e
-      }
-    }
-  }
 
-  def deleteRecursive(zk: CuratorFramework, path: String) {
-    if (zk.checkExists().forPath(path) != null) {
-      for (child <- zk.getChildren.forPath(path).asScala) {
+  def deleteRecursive(zk: CuratorFramework, path: String)
+    if (zk.checkExists().forPath(path) != null)
+      for (child <- zk.getChildren.forPath(path).asScala)
         zk.delete().forPath(path + "/" + child)
-      }
       zk.delete().forPath(path)
-    }
-  }
-}

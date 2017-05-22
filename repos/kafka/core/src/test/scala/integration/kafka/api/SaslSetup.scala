@@ -37,13 +37,13 @@ case object Both extends SaslSetupMode
  * Trait used in SaslTestHarness and EndToEndAuthorizationTest
  * currently to setup a keytab and jaas files.
  */
-trait SaslSetup {
+trait SaslSetup
   private val workDir = new File(
       System.getProperty("test.dir", "build/tmp/test-workDir"))
   private val kdcConf = MiniKdc.createConf()
   private val kdc = new MiniKdc(kdcConf, workDir)
 
-  def startSasl(mode: SaslSetupMode = Both) {
+  def startSasl(mode: SaslSetupMode = Both)
     // Important if tests leak consumers, producers or brokers
     LoginManager.closeAll()
     val keytabFile = createKeytabAndSetConfiguration(mode)
@@ -53,38 +53,32 @@ trait SaslSetup {
       System.setProperty(
           "zookeeper.authProvider.1",
           "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
-  }
 
-  protected def createKeytabAndSetConfiguration(mode: SaslSetupMode): File = {
+  protected def createKeytabAndSetConfiguration(mode: SaslSetupMode): File =
     val (keytabFile, jaasFile) = createKeytabAndJaasFiles(mode)
     // This will cause a reload of the Configuration singleton when `getConfiguration` is called
     Configuration.setConfiguration(null)
     System.setProperty(
         JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile.getAbsolutePath)
     keytabFile
-  }
 
-  private def createKeytabAndJaasFiles(mode: SaslSetupMode): (File, File) = {
+  private def createKeytabAndJaasFiles(mode: SaslSetupMode): (File, File) =
     val keytabFile = TestUtils.tempFile()
-    val jaasFileName: String = mode match {
+    val jaasFileName: String = mode match
       case ZkSasl =>
         JaasTestUtils.genZkFile
       case KafkaSasl =>
         JaasTestUtils.genKafkaFile(keytabFile.getAbsolutePath)
       case _ =>
         JaasTestUtils.genZkAndKafkaFile(keytabFile.getAbsolutePath)
-    }
     val jaasFile = new File(jaasFileName)
 
     (keytabFile, jaasFile)
-  }
 
-  def closeSasl() {
+  def closeSasl()
     kdc.stop()
     // Important if tests leak consumers, producers or brokers
     LoginManager.closeAll()
     System.clearProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
     System.clearProperty("zookeeper.authProvider.1");
     Configuration.setConfiguration(null)
-  }
-}

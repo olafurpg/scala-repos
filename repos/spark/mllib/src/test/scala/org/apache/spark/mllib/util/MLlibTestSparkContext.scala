@@ -22,11 +22,11 @@ import org.scalatest.{BeforeAndAfterAll, Suite}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SQLContext
 
-trait MLlibTestSparkContext extends BeforeAndAfterAll { self: Suite =>
+trait MLlibTestSparkContext extends BeforeAndAfterAll  self: Suite =>
   @transient var sc: SparkContext = _
   @transient var sqlContext: SQLContext = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     val conf =
       new SparkConf().setMaster("local[2]").setAppName("MLlibUnitTest")
@@ -34,18 +34,13 @@ trait MLlibTestSparkContext extends BeforeAndAfterAll { self: Suite =>
     SQLContext.clearActive()
     sqlContext = new SQLContext(sc)
     SQLContext.setActive(sqlContext)
-  }
 
-  override def afterAll() {
-    try {
+  override def afterAll()
+    try
       sqlContext = null
       SQLContext.clearActive()
-      if (sc != null) {
+      if (sc != null)
         sc.stop()
-      }
       sc = null
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
-}

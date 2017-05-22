@@ -14,21 +14,17 @@ import scala.language.implicitConversions
 /**
   * @since 2.8
   */
-trait Fractional[T] extends Numeric[T] {
+trait Fractional[T] extends Numeric[T]
   def div(x: T, y: T): T
 
-  class FractionalOps(lhs: T) extends Ops(lhs) {
+  class FractionalOps(lhs: T) extends Ops(lhs)
     def /(rhs: T) = div(lhs, rhs)
-  }
   override implicit def mkNumericOps(lhs: T): FractionalOps =
     new FractionalOps(lhs)
-}
 
-object Fractional {
-  trait ExtraImplicits {
+object Fractional
+  trait ExtraImplicits
     implicit def infixFractionalOps[T](x: T)(
         implicit num: Fractional[T]): Fractional[T]#FractionalOps =
       new num.FractionalOps(x)
-  }
   object Implicits extends ExtraImplicits
-}

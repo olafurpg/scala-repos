@@ -14,8 +14,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
-  class HttpConnectHandlerHelper {
+class HttpConnectHandlerTest extends FunSuite with MockitoSugar
+  class HttpConnectHandlerHelper
     val ctx = mock[ChannelHandlerContext]
     val channel = mock[Channel]
     when(ctx.getChannel) thenReturn channel
@@ -36,7 +36,7 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
         proxyAddress, remoteAddress, pipeline, None)
     ch.handleDownstream(ctx, connectRequested)
 
-    def checkDidClose() {
+    def checkDidClose()
       val ec = ArgumentCaptor.forClass(classOf[DownstreamChannelStateEvent])
       verify(pipeline).sendDownstream(ec.capture)
       val e = ec.getValue
@@ -44,11 +44,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
       assert(e.getFuture == closeFuture)
       assert(e.getState == ChannelState.OPEN)
       assert(e.getValue == java.lang.Boolean.FALSE)
-    }
-  }
 
   test(
-      "HttpConnectHandler should upon connect wrap the downstream connect request") {
+      "HttpConnectHandler should upon connect wrap the downstream connect request")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -60,9 +58,8 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(e.getFuture != connectFuture) // this is proxied
     assert(e.getState == ChannelState.CONNECTED)
     assert(e.getValue == proxyAddress)
-  }
 
-  test("HttpConnectHandler should upon connect propagate cancellation") {
+  test("HttpConnectHandler should upon connect propagate cancellation")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -73,10 +70,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!e.getFuture.isCancelled)
     connectFuture.cancel()
     assert(e.getFuture.isCancelled)
-  }
 
   test(
-      "HttpConnectHandler should when connect is successful not propagate success") {
+      "HttpConnectHandler should when connect is successful not propagate success")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -85,10 +81,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
                           channel, ChannelState.CONNECTED, remoteAddress))
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
-  }
 
   test(
-      "HttpConnectHandler should when connect is successful propagate connection cancellation") {
+      "HttpConnectHandler should when connect is successful propagate connection cancellation")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -100,9 +95,8 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
 
     connectFuture.cancel()
     checkDidClose()
-  }
 
-  test("HttpConnectHandler should when connect is successful do HTTP CONNECT") {
+  test("HttpConnectHandler should when connect is successful do HTTP CONNECT")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -112,7 +106,6 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
-    {
       // send connect request
       val ec = ArgumentCaptor.forClass(classOf[DownstreamMessageEvent])
       verify(ctx, atLeastOnce).sendDownstream(ec.capture)
@@ -121,9 +114,7 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
       assert(req.getMethod == HttpMethod.CONNECT)
       assert(req.getUri == "localhost:" + port)
       assert(req.headers().get("Host") == "localhost:" + port)
-    }
 
-    {
       // when connect response is received, propagate the connect and remove the handler
       ch.handleUpstream(ctx,
                         new UpstreamMessageEvent(
@@ -143,11 +134,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
       assert(e.getChannel == channel)
       assert(e.getState == ChannelState.CONNECTED)
       assert(e.getValue == remoteAddress)
-    }
-  }
 
   test(
-      "HttpConnectHandler should add ProxyAuthorization header when proxy credentials are supplied") {
+      "HttpConnectHandler should add ProxyAuthorization header when proxy credentials are supplied")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -173,9 +162,8 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(req.getUri == "localhost:" + port)
     assert(req.headers().get("Host") == "localhost:" + port)
     assert(req.headers().get("Proxy-Authorization") == "Basic dXNlcjpwYXNz")
-  }
 
-  test("HttpConnectHandler should propagate connection failure") {
+  test("HttpConnectHandler should propagate connection failure")
     val h = new HttpConnectHandlerHelper
     import h._
 
@@ -188,10 +176,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     e.getFuture.setFailure(exc)
     assert(connectFuture.isDone)
     assert(connectFuture.getCause == exc)
-  }
 
   test(
-      "HttpConnectHandler should not add socket address resolve handler when proxy address is resolved") {
+      "HttpConnectHandler should not add socket address resolve handler when proxy address is resolved")
     val pipeline = new DefaultChannelPipeline
     HttpConnectHandler.addHandler(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 2222),
@@ -201,10 +188,9 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     )
 
     assert(pipeline.get("socketAddressResolver") == null)
-  }
 
   test(
-      "HttpConnectHandler should add socket address resolve handler when proxy address is unresolved") {
+      "HttpConnectHandler should add socket address resolve handler when proxy address is unresolved")
     val pipeline = new DefaultChannelPipeline
     HttpConnectHandler.addHandler(
         InetSocketAddress.createUnresolved("meow.meow", 2222),
@@ -215,5 +201,3 @@ class HttpConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(pipeline
           .get("socketAddressResolver")
           .isInstanceOf[SocketAddressResolveHandler])
-  }
-}

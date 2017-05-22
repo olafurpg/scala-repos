@@ -12,7 +12,6 @@ class ScalaThrowExceptionPostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "throw",
         "throw expr",
-        new AncestorSelector(SelectorConditions.THROWABLE, Topmost)) {
+        new AncestorSelector(SelectorConditions.THROWABLE, Topmost))
 
   override def getTemplateString(element: PsiElement): String = "throw $expr$"
-}

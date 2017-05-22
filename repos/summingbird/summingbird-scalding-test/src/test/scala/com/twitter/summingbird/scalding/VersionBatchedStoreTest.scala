@@ -58,32 +58,29 @@ import org.scalatest.WordSpec
 /**
   * Tests for Summingbird's Scalding planner.
   */
-class VersionedBatchedStoreTest extends WordSpec {
+class VersionedBatchedStoreTest extends WordSpec
   import MapAlgebra.sparseEquiv
 
   implicit def timeExtractor[T <: (Long, _)] = TestUtil.simpleTimeExtractor[T]
 
-  private def createTempDirectory(): java.io.File = {
+  private def createTempDirectory(): java.io.File =
     val temp = File.createTempFile("temp", System.nanoTime().toString);
 
-    if (!(temp.delete())) {
+    if (!(temp.delete()))
       throw new java.io.IOException(
           "Could not delete temp file: " + temp.getAbsolutePath());
-    }
 
-    if (!(temp.mkdir())) {
+    if (!(temp.mkdir()))
       throw new java.io.IOException(
           "Could not create temp directory: " + temp.getAbsolutePath());
-    }
 
     temp
-  }
 
   def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
-  "The VersionedBatchStore" should {
+  "The VersionedBatchStore" should
 
-    "support a multiple summer job with one store already satisfied" in {
+    "support a multiple summer job with one store already satisfied" in
       val rangeMax = 1000
       val original: List[Int] = (0 until rangeMax).toList // Input Data
       implicit val batcher = new MillisecondBatcher(20L)
@@ -95,9 +92,8 @@ class VersionedBatchedStoreTest extends WordSpec {
       val fnC = sample[(Int) => List[(Int, Int)]]
 
       // Add a time:
-      val inWithTime = original.zipWithIndex.map {
+      val inWithTime = original.zipWithIndex.map
         case (item, time) => (time.toLong, item)
-      }
 
       // get time interval for the input
       val intr = TestUtil.toTimeInterval(0L, original.size.toLong)
@@ -108,12 +104,10 @@ class VersionedBatchedStoreTest extends WordSpec {
       val (inMemoryA, inMemoryB) =
         TestGraphs.multipleSummerJobInScala(batchCoveredInput)(fnA, fnB, fnC)
 
-      val packFn = { (bid: BatchID, kv: (Int, Int)) =>
+      val packFn =  (bid: BatchID, kv: (Int, Int)) =>
         ((bid.id, kv._1), kv._2)
-      }
-      val unpackFn = { kv: ((Long, Int), Int) =>
+      val unpackFn =  kv: ((Long, Int), Int) =>
         (kv._1._2, kv._2)
-      }
       implicit val tupEncoder: Injection[(Long, Int), Array[Byte]] =
         Bufferable.injectionOf[(Long, Int)]
       val conf = new org.apache.hadoop.conf.Configuration
@@ -121,19 +115,17 @@ class VersionedBatchedStoreTest extends WordSpec {
       implicit val mode: Mode = Hdfs(true, conf)
 
       def buildStore(
-          ): (String, batch.BatchedStore[Int, Int], Long => Map[Int, Int]) = {
+          ): (String, batch.BatchedStore[Int, Int], Long => Map[Int, Int]) =
         val rootFolder = createTempDirectory().getAbsolutePath
         val testStoreVBS = VersionedBatchStore[Int, Int, (Long, Int), Int](
             rootFolder, 1)(packFn)(unpackFn)
         val testStore = new InitialBatchedStore(
             batcher.batchOf(Timestamp(inWithTime.head._1)), testStoreVBS)
-        val testStoreReader = { version: Long =>
+        val testStoreReader =  version: Long =>
           VersionedKeyValSource[(Long, Int), Int](
               rootFolder,
               sourceVersion = Some(version)).toIterator.map(unpackFn).toMap
-        }
         (rootFolder, testStore, testStoreReader)
-      }
 
       val (_, testStoreA, testStoreAReader) = buildStore()
       val (_, testStoreB, testStoreBReader) = buildStore()
@@ -146,44 +138,38 @@ class VersionedBatchedStoreTest extends WordSpec {
       // Stores A & C should be equal after and the jobs should succeed
 
       // First store's A & B
-      {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreA, testStoreB)({ t =>
+            source, testStoreA, testStoreB)( t =>
           fnA(t._2)
-        }, fnB, fnC)
+        , fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
         assert(!ws.failed, "Job failed")
-      }
 
       // Now Stores C & B
-      {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
+            source, testStoreC, testStoreB)( t =>
           fnA(t._2)
-        }, fnB, fnC)
+        , fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
         assert(!ws.failed, "Job failed")
-      }
 
       // Run stores C & B again, now there should be no operations to do
       // This should warning but succeed
-      {
         val tail = TestGraphs
           .multipleSummerJob[Scalding, (Long, Int), Int, Int, Int, Int, Int](
-            source, testStoreC, testStoreB)({ t =>
+            source, testStoreC, testStoreB)( t =>
           fnA(t._2)
-        }, fnB, fnC)
+        , fnB, fnC)
         val scald = Scalding("scalaCheckMultipleSumJob")
         val ws = new LoopState(intr)
         scald.run(ws, mode, scald.plan(tail))
         assert(!ws.failed, "Job failed")
-      }
 
       // Now check that the inMemory == matches the hadoop job we ran
 
@@ -209,6 +195,3 @@ class VersionedBatchedStoreTest extends WordSpec {
                                testStoreAReader(lastExpectedWriteBatch),
                                testStoreCReader(lastExpectedWriteBatch),
                                "StoreC vs StoreA") == true)
-    }
-  }
-}

@@ -18,7 +18,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScType, TypeAliasSignature}
 class ScLightTypeAliasDeclaration(
     s: TypeAliasSignature, val ta: ScTypeAliasDeclaration)
     extends LightElement(ta.getManager, ta.getLanguage)
-    with ScTypeAliasDeclaration {
+    with ScTypeAliasDeclaration
   setNavigationElement(ta)
 
   override def nameId: PsiElement = ta.nameId
@@ -84,4 +84,3 @@ class ScLightTypeAliasDeclaration(
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
-}

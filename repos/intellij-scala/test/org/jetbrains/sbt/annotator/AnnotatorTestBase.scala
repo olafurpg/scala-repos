@@ -15,11 +15,11 @@ import org.jetbrains.sbt.language.{SbtFileImpl, SbtFileType}
   * @author Nikolay Obedin
   * @since 8/4/14.
   */
-abstract class AnnotatorTestBase extends PlatformTestCase {
+abstract class AnnotatorTestBase extends PlatformTestCase
 
   def testdataPath = TestUtils.getTestDataPath + "/annotator/Sbt/"
 
-  def loadTestFile() = {
+  def loadTestFile() =
     val fileName = getTestName(false) + ".sbt"
     val filePath = testdataPath + fileName
     val file = LocalFileSystem.getInstance.findFileByPath(
@@ -31,5 +31,3 @@ abstract class AnnotatorTestBase extends PlatformTestCase {
       .getInstance(getProject)
       .createFileFromText(fileName, SbtFileType, fileText)
       .asInstanceOf[SbtFileImpl]
-  }
-}

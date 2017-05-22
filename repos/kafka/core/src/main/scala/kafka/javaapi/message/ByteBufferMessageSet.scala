@@ -23,50 +23,42 @@ import kafka.message._
 
 import scala.collection.JavaConverters._
 
-class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet {
+class ByteBufferMessageSet(val buffer: ByteBuffer) extends MessageSet
   private val underlying: kafka.message.ByteBufferMessageSet =
     new kafka.message.ByteBufferMessageSet(buffer)
 
   def this(
-      compressionCodec: CompressionCodec, messages: java.util.List[Message]) {
+      compressionCodec: CompressionCodec, messages: java.util.List[Message])
     this(new kafka.message.ByteBufferMessageSet(
             compressionCodec, new LongRef(0), messages.asScala: _*).buffer)
-  }
 
-  def this(messages: java.util.List[Message]) {
+  def this(messages: java.util.List[Message])
     this(NoCompressionCodec, messages)
-  }
 
   def validBytes: Int = underlying.validBytes
 
   def getBuffer = buffer
 
   override def iterator: java.util.Iterator[MessageAndOffset] =
-    new java.util.Iterator[MessageAndOffset] {
+    new java.util.Iterator[MessageAndOffset]
       val underlyingIterator = underlying.iterator
-      override def hasNext(): Boolean = {
+      override def hasNext(): Boolean =
         underlyingIterator.hasNext
-      }
 
-      override def next(): MessageAndOffset = {
+      override def next(): MessageAndOffset =
         underlyingIterator.next
-      }
 
       override def remove =
         throw new UnsupportedOperationException(
             "remove API on MessageSet is not supported")
-    }
 
   override def toString: String = underlying.toString
 
   def sizeInBytes: Int = underlying.sizeInBytes
 
-  override def equals(other: Any): Boolean = {
-    other match {
+  override def equals(other: Any): Boolean =
+    other match
       case that: ByteBufferMessageSet => buffer.equals(that.buffer)
       case _ => false
-    }
-  }
 
   override def hashCode: Int = buffer.hashCode
-}

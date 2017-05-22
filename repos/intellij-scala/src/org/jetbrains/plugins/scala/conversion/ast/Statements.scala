@@ -59,10 +59,9 @@ case class TryCatchStatement(
     finallyStatements: Option[Seq[IntermediateNode]],
     arrow: String)
     extends IntermediateNode
-object WhileStatement {
+object WhileStatement
   val PRE_TEST_LOOP = 0
   val POST_TEST_LOOP = 1
-}
 
 case class WhileStatement(initialization: Option[IntermediateNode],
                           condition: Option[IntermediateNode],

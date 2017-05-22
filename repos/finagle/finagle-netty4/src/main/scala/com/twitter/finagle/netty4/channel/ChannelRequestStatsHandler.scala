@@ -6,10 +6,9 @@ import io.netty.channel.ChannelHandler.Sharable
 import io.netty.util.AttributeKey
 import java.util.concurrent.atomic.AtomicInteger
 
-private[finagle] object ChannelRequestStatsHandler {
+private[finagle] object ChannelRequestStatsHandler
   private[channel] val ConnectionRequestsKey: AttributeKey[AtomicInteger] =
     AttributeKey.valueOf("ChannelRequestStatsHandler.connection_requests")
-}
 
 /**
   * A channel stats handler that keeps per-connection request
@@ -20,24 +19,20 @@ private[finagle] object ChannelRequestStatsHandler {
   */
 @Sharable
 private[finagle] class ChannelRequestStatsHandler(statsReceiver: StatsReceiver)
-    extends ChannelInboundHandlerAdapter {
+    extends ChannelInboundHandlerAdapter
   import ChannelRequestStatsHandler.ConnectionRequestsKey
 
   private[this] val requestCount = statsReceiver.stat("connection_requests")
 
-  override def channelActive(ctx: ChannelHandlerContext): Unit = {
+  override def channelActive(ctx: ChannelHandlerContext): Unit =
     ctx.attr(ConnectionRequestsKey).set(new AtomicInteger(0))
     super.channelActive(ctx)
-  }
 
-  override def channelInactive(ctx: ChannelHandlerContext): Unit = {
+  override def channelInactive(ctx: ChannelHandlerContext): Unit =
     requestCount.add(ctx.attr(ConnectionRequestsKey).get.get)
     super.channelInactive(ctx)
-  }
 
-  override def channelRead(ctx: ChannelHandlerContext, msg: Any): Unit = {
+  override def channelRead(ctx: ChannelHandlerContext, msg: Any): Unit =
     val readCount = ctx.attr(ConnectionRequestsKey).get
     readCount.incrementAndGet()
     super.channelRead(ctx, msg)
-  }
-}

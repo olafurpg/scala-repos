@@ -8,7 +8,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
 
-trait ScTypeBoundsOwner extends ScalaPsiElement {
+trait ScTypeBoundsOwner extends ScalaPsiElement
   def lowerBound: TypeResult[ScType]
   def upperBound: TypeResult[ScType]
   def viewBound: Seq[ScType] = Nil
@@ -22,4 +22,3 @@ trait ScTypeBoundsOwner extends ScalaPsiElement {
   def contextBoundTypeElement: Seq[ScTypeElement] = Nil
 
   def removeImplicitBounds() {}
-}

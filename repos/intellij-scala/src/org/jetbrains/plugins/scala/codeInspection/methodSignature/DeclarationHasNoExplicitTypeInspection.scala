@@ -13,12 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDeclaration
 class DeclarationHasNoExplicitTypeInspection
     extends AbstractMethodSignatureInspection(
         "DeclarationHasNoExplicitType",
-        InspectionBundle.message("declaration.has.no.explicit.type.name")) {
+        InspectionBundle.message("declaration.has.no.explicit.type.name"))
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case f: ScFunctionDeclaration
         if f.hasUnitResultType && !f.hasExplicitType =>
       holder.registerProblem(
           f.nameId, getDisplayName, new AddUnitTypeToDeclaration(f))
-  }
-}

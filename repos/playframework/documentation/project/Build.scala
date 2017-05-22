@@ -11,7 +11,7 @@ import scala.util.Properties.isJavaAtLeast
 import com.typesafe.play.docs.sbtplugin._
 import com.typesafe.play.docs.sbtplugin.Imports._
 
-object ApplicationBuild extends Build {
+object ApplicationBuild extends Build
 
   lazy val main = Project("Play-Documentation", file("."))
     .enablePlugins(PlayDocsPlugin)
@@ -68,4 +68,3 @@ object ApplicationBuild extends Build {
 
   def playProject(name: String) =
     ProjectRef(Path.fileProperty("user.dir").getParentFile / "framework", name)
-}

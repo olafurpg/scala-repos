@@ -17,20 +17,17 @@ import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory
 import scala.language.reflectiveCalls
 
 class PersistentService[Req, Rep](factory: ServiceFactory[Req, Rep])
-    extends Service[Req, Rep] {
+    extends Service[Req, Rep]
   @volatile private[this] var currentService: Future[Service[Req, Rep]] =
     factory()
 
   def apply(req: Req) =
-    currentService flatMap { service =>
-      service(req) onFailure { _ =>
+    currentService flatMap  service =>
+      service(req) onFailure  _ =>
         currentService = factory()
-      }
-    }
-}
 
-object MemcacheStress extends App {
-  private[this] val config = new {
+object MemcacheStress extends App
+  private[this] val config = new
     val concurrency: Flag[Int] = flag("concurrency", 400, "concurrency")
     val hosts: Flag[String] = flag("hosts", "localhost:11211", "hosts")
     val keysize: Flag[Int] = flag("keysize", 55, "keysize")
@@ -38,17 +35,14 @@ object MemcacheStress extends App {
     val nworkers: Flag[Int] = flag("nworkers", -1, "nworkers")
     val stats: Flag[Boolean] = flag("stats", true, "stats")
     val tracing: Flag[Boolean] = flag("tracing", true, "tracing")
-  }
   val count = new AtomicLong
 
-  def proc(client: memcached.Client, key: String, value: Buf) {
-    client.set(key, value) ensure {
+  def proc(client: memcached.Client, key: String, value: Buf)
+    client.set(key, value) ensure
       count.incrementAndGet()
       proc(client, key, value)
-    }
-  }
 
-  def main() {
+  def main()
     var builder = ClientBuilder()
       .name("mc")
       .codec(Memcached())
@@ -81,13 +75,12 @@ object MemcacheStress extends App {
     val factory = builder.buildFactory()
     val elapsed = Stopwatch.start()
 
-    for (_ <- 0 until config.concurrency()) {
+    for (_ <- 0 until config.concurrency())
       val svc = new PersistentService(factory)
       val client = memcached.Client(svc)
       proc(client, key, value)
-    }
 
-    while (true) {
+    while (true)
       Thread.sleep(5000)
 
       val howlong = elapsed()
@@ -95,6 +88,3 @@ object MemcacheStress extends App {
       assert(howmuch > 0)
 
       printf("%d QPS\n", howmuch / howlong.inSeconds)
-    }
-  }
-}

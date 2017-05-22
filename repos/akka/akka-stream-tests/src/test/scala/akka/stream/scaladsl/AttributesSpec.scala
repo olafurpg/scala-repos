@@ -18,17 +18,16 @@ import org.scalatest.concurrent.ScalaFutures
 import akka.stream.impl.SinkholeSubscriber
 import akka.testkit.AkkaSpec
 
-object AttributesSpec {
+object AttributesSpec
 
-  object AttributesSink {
+  object AttributesSink
     def apply(): Sink[Nothing, Future[Attributes]] =
       new Sink(new AttributesSink(
               Attributes.name("attributesSink"), Sink.shape("attributesSink")))
-  }
 
   final class AttributesSink(
       val attributes: Attributes, shape: SinkShape[Nothing])
-      extends SinkModule[Nothing, Future[Attributes]](shape) {
+      extends SinkModule[Nothing, Future[Attributes]](shape)
     override def create(context: MaterializationContext) =
       (new SinkholeSubscriber(Promise()),
        Future.successful(context.effectiveAttributes))
@@ -39,10 +38,8 @@ object AttributesSpec {
 
     override def withAttributes(attr: Attributes): Module =
       new AttributesSink(attr, amendShape(attr))
-  }
-}
 
-class AttributesSpec extends AkkaSpec {
+class AttributesSpec extends AkkaSpec
   import AttributesSpec._
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
@@ -50,36 +47,28 @@ class AttributesSpec extends AkkaSpec {
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "attributes" must {
+  "attributes" must
 
-    "be overridable on a module basis" in {
+    "be overridable on a module basis" in
       val runnable = Source.empty.toMat(
           AttributesSink().withAttributes(Attributes.name("new-name")))(
           Keep.right)
-      whenReady(runnable.run()) { attributes ⇒
+      whenReady(runnable.run())  attributes ⇒
         attributes.get[Name] should contain(Name("new-name"))
-      }
-    }
 
-    "keep the outermost attribute as the least specific" in {
+    "keep the outermost attribute as the least specific" in
       val runnable = Source.empty
         .toMat(AttributesSink())(Keep.right)
         .withAttributes(Attributes.name("new-name"))
-      whenReady(runnable.run()) { attributes ⇒
+      whenReady(runnable.run())  attributes ⇒
         attributes.get[Name] should contain(Name("attributesSink"))
-      }
-    }
 
     val attributes =
       Attributes.name("a") and Attributes.name("b") and Attributes.inputBuffer(
           1, 2)
 
-    "give access to first attribute" in {
+    "give access to first attribute" in
       attributes.getFirst[Name] should ===(Some(Attributes.Name("a")))
-    }
 
-    "give access to attribute byt type" in {
+    "give access to attribute byt type" in
       attributes.get[Name] should ===(Some(Attributes.Name("b")))
-    }
-  }
-}

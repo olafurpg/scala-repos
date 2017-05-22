@@ -23,15 +23,12 @@ import org.scalatest.junit.JUnitRunner
 import com.twitter.app.App
 
 @RunWith(classOf[JUnitRunner])
-class AppTest extends FunSuite {
+class AppTest extends FunSuite
 
-  object TestLoggingApp extends App with Logging {
+  object TestLoggingApp extends App with Logging
     override def handlers = ScribeHandler() :: super.handlers
-  }
 
-  test("TestLoggingApp should have one factory with two log handlers") {
+  test("TestLoggingApp should have one factory with two log handlers")
     TestLoggingApp.main(Array.empty)
     assert(TestLoggingApp.loggerFactories.size == 1)
     assert(TestLoggingApp.loggerFactories.head.handlers.size == 2)
-  }
-}

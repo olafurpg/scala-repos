@@ -8,86 +8,73 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class AlarmTest extends FunSuite with LocalConductors {
-  test("DurationAlarm should work") {
+class AlarmTest extends FunSuite with LocalConductors
+  test("DurationAlarm should work")
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
-        Alarm.arm({ () =>
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new DurationAlarm(5.seconds)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         ctl.advance(5.seconds)
-      }
 
       conduct()
-    }
-  }
 
-  test("MinAlarm should take the min time") {
+  test("MinAlarm should take the min time")
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
-        Alarm.arm({ () =>
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new DurationAlarm(5.seconds) min new DurationAlarm(2.seconds)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         ctl.advance(2.seconds)
-      }
 
       conduct()
-    }
-  }
 
-  test("Alarm should continue if not yet finished") {
+  test("Alarm should continue if not yet finished")
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
-        Alarm.arm({ () =>
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new DurationAlarm(5.seconds) min new IntervalAlarm(1.second)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         ctl.advance(2.seconds)
         waitForBeat(2)
         ctl.advance(3.seconds)
-      }
 
       conduct()
-    }
-  }
 
   if (!sys.props.contains("SKIP_FLAKY"))
-    test("DurationAlarm should sleep until it's over") {
+    test("DurationAlarm should sleep until it's over")
       val conductor = new Conductor
       import conductor._
 
       @volatile var ctr = 0
 
-      Time.withCurrentTimeFrozen { ctl =>
-        localThread(conductor) {
-          Alarm.armAndExecute({ () =>
+      Time.withCurrentTimeFrozen  ctl =>
+        localThread(conductor)
+          Alarm.armAndExecute( () =>
             new DurationAlarm(5.seconds)
-          }, { () =>
+          ,  () =>
             ctr += 1
-          })
-        }
+          )
 
-        localThread(conductor) {
+        localThread(conductor)
           waitForBeat(1)
           assert(ctr == 1)
           ctl.advance(2.seconds)
@@ -95,107 +82,89 @@ class AlarmTest extends FunSuite with LocalConductors {
           waitForBeat(2)
           assert(ctr == 1)
           ctl.advance(3.seconds)
-        }
-      }
 
-      localWhenFinished(conductor) {
+      localWhenFinished(conductor)
         assert(ctr == 2)
-      }
-    }
 
-  trait GenerationAlarmHelper {
+  trait GenerationAlarmHelper
     val fakePool = new FakeMemoryPool(
         new FakeMemoryUsage(StorageUnit.zero, 10.megabytes))
     val fakeBean = new FakeGarbageCollectorMXBean(0, 0)
     val nfo = new JvmInfo(fakePool, fakeBean)
     val ctr = FakeByteCounter(1, Time.now, nfo)
-  }
 
-  test("GenerationAlarm should sleep until the next alarm") {
+  test("GenerationAlarm should sleep until the next alarm")
     val h = new GenerationAlarmHelper {}
     import h._
 
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
-        Alarm.arm({ () =>
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new GenerationAlarm(ctr) min new IntervalAlarm(1.second)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         fakeBean.getCollectionCount = 1
         ctl.advance(1.second)
-      }
 
       conduct()
-    }
-  }
 
-  test("PredicateAlarm") {
+  test("PredicateAlarm")
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
+    Time.withCurrentTimeFrozen  ctl =>
       @volatile var bool = false
 
-      localThread(conductor) {
-        Alarm.arm({ () =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new PredicateAlarm(() => bool) min new IntervalAlarm(1.second)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         bool = true
         ctl.advance(1.second)
-      }
 
       conduct()
-    }
-  }
 
   case class FakeByteCounter(rte: Double, gc: Time, nfo: JvmInfo)
-      extends ByteCounter {
+      extends ByteCounter
     def rate(): Double = rte
     def lastGc: Time = gc
     def info: JvmInfo = nfo
-  }
 
-  test("BytesAlarm should finish when we have enough bytes") {
+  test("BytesAlarm should finish when we have enough bytes")
     val h = new GenerationAlarmHelper {}
     import h._
 
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
+    Time.withCurrentTimeFrozen  ctl =>
       val ctr = new FakeByteCounter(1000, Time.now, nfo)
       @volatile var bool = false
 
       val usage = new FakeMemoryUsage(0.bytes, 10.megabytes)
       fakePool.setSnapshot(usage)
 
-      localThread(conductor) {
-        Alarm.arm({ () =>
+      localThread(conductor)
+        Alarm.arm( () =>
           new BytesAlarm(ctr, () => 5.megabytes)
-        })
-      }
+        )
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         fakePool.setSnapshot(usage.copy(used = 5.megabytes))
         ctl.advance(100.milliseconds)
-      }
 
       conduct()
-    }
-  }
 
-  test("BytesAlarm should use 80% of the target") {
+  test("BytesAlarm should use 80% of the target")
     val h = new GenerationAlarmHelper {}
     import h._
     val ctr = FakeByteCounter(50.kilobytes.inBytes, Time.now, nfo)
@@ -203,9 +172,8 @@ class AlarmTest extends FunSuite with LocalConductors {
     // 5MB / (50 KB/ms) * 8 / 10 == 80.milliseconds
     // 80.milliseconds < 100.milliseconds
     assert(alarm.sleeptime == ((80 * 1.kilobyte.inBytes / 1000).milliseconds))
-  }
 
-  test("BytesAlarm should use the default if the gap is too big") {
+  test("BytesAlarm should use the default if the gap is too big")
     val h = new GenerationAlarmHelper {}
     import h._
     val ctr = FakeByteCounter(1000, Time.now, nfo)
@@ -213,9 +181,8 @@ class AlarmTest extends FunSuite with LocalConductors {
     // 5MB / 1000000B/S * 8 / 10 == 4.seconds
     // 4.seconds > 100.milliseconds
     assert(alarm.sleeptime == 100.milliseconds)
-  }
 
-  test("BytesAlarm should use zero if we're past") {
+  test("BytesAlarm should use zero if we're past")
     val h = new GenerationAlarmHelper {}
     import h._
     val ctr = FakeByteCounter(1000, Time.now, nfo)
@@ -224,5 +191,3 @@ class AlarmTest extends FunSuite with LocalConductors {
     // -1MB / 1000000B/S * 8 / 10 == -800.milliseconds
     // -800.milliseconds < 10.milliseconds
     assert(alarm.sleeptime == 10.milliseconds)
-  }
-}

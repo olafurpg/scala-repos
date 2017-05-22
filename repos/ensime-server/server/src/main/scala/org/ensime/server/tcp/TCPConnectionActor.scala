@@ -20,7 +20,7 @@ class TCPConnectionActor(
     project: ActorRef,
     broadcaster: ActorRef
 )
-    extends Actor with Stash with ActorLogging {
+    extends Actor with Stash with ActorLogging
 
   case object Ack extends Tcp.Event
 
@@ -32,10 +32,9 @@ class TCPConnectionActor(
   // bytes we have seen but have been unable to process yet
   var seen = ByteString()
 
-  def handlePeerClosed(): Unit = {
+  def handlePeerClosed(): Unit =
     context.parent ! ClientConnectionClosed
     context stop self
-  }
 
   override def receive: Receive = idle
 
@@ -44,22 +43,20 @@ class TCPConnectionActor(
   def idle: PartialFunction[Any, Unit] = incoming orElse readyToSend
   def busy: PartialFunction[Any, Unit] = incoming orElse awaitingAck
 
-  def incoming: Receive = {
+  def incoming: Receive =
     case Received(data: ByteString) =>
       seen = seen ++ data
       attemptProcess()
     case PeerClosed =>
       handlePeerClosed()
-  }
 
-  def readyToSend: Receive = {
+  def readyToSend: Receive =
     case outgoing: EnsimeEvent =>
       sendMessage(RpcResponseEnvelope(None, outgoing))
     case outgoing: RpcResponseEnvelope =>
       sendMessage(outgoing)
-  }
 
-  def awaitingAck: Receive = {
+  def awaitingAck: Receive =
     case Ack =>
       // we only stash outgoing messages, so this will cause them to be queued for sending
       unstashAll()
@@ -70,12 +67,11 @@ class TCPConnectionActor(
       stash()
     case CommandFailed(Write(_, _)) =>
       connection ! ResumeWriting
-  }
 
-  def sendMessage(envelope: RpcResponseEnvelope): Unit = {
-    val msg = try {
+  def sendMessage(envelope: RpcResponseEnvelope): Unit =
+    val msg = try
       protocol.encode(envelope)
-    } catch {
+    catch
       case NonFatal(t) =>
         log.error(t, s"Problem serialising $envelope")
         protocol.encode(
@@ -84,46 +80,37 @@ class TCPConnectionActor(
                 EnsimeServerError(s"Server error: ${t.getMessage}")
             )
         )
-    }
     connection ! Tcp.Write(msg, Ack)
     context.become(busy, discardOld = true)
-  }
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     broadcaster ! Broadcaster.Register
-  }
 
-  final def attemptProcess(): Unit = {
-    try {
+  final def attemptProcess(): Unit =
+    try
       repeatedDecode()
-    } catch {
+    catch
       case e: Throwable =>
         log.error(
             e,
             "Error seen during message processing, closing client connection")
         context.stop(self)
-    }
-  }
 
   @tailrec
-  final def repeatedDecode(): Unit = {
+  final def repeatedDecode(): Unit =
     val (envelopeOpt, remainder) = protocol.decode(seen)
     seen = remainder
-    envelopeOpt match {
+    envelopeOpt match
       case Some(rawEnvelope: RpcRequestEnvelope) =>
         val envelope = Canonised(rawEnvelope)
         context.actorOf(
             RequestHandler(envelope, project, self), s"${envelope.callId}")
         repeatedDecode()
       case None =>
-    }
-  }
-}
 
-object TCPConnectionActor {
+object TCPConnectionActor
   def apply(connection: ActorRef,
             protocol: Protocol,
             project: ActorRef,
             broadcaster: ActorRef): Props =
     Props(new TCPConnectionActor(connection, protocol, project, broadcaster))
-}

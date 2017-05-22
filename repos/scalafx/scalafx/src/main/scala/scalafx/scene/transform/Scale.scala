@@ -33,17 +33,16 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
-object Scale {
+object Scale
   implicit def sfxScale2jfx(v: Scale): jfxst.Scale =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/scene/transform/Scale.html]]
   */
 class Scale(override val delegate: jfxst.Scale = new jfxst.Scale)
     extends Transform(delegate) with PositionDelegate[jfxst.Scale]
-    with SFXDelegate[jfxst.Scale] {
+    with SFXDelegate[jfxst.Scale]
 
   /**
     * Creates a two-dimensional Scale.
@@ -76,31 +75,26 @@ class Scale(override val delegate: jfxst.Scale = new jfxst.Scale)
     * Defines the X coordinate about which point the scale occurs.
     */
   def pivotX: DoubleProperty = delegate.pivotXProperty()
-  def pivotX_=(v: Double) {
+  def pivotX_=(v: Double)
     pivotX() = v
-  }
 
   /**
     * Defines the Y coordinate about which point the scale occurs.
     */
   def pivotY: DoubleProperty = delegate.pivotYProperty()
-  def pivotY_=(v: Double) {
+  def pivotY_=(v: Double)
     pivotY() = v
-  }
 
   /**
     * Defines the Z coordinate about which point the scale occurs.
     */
   def pivotZ: DoubleProperty = delegate.pivotZProperty()
-  def pivotZ_=(v: Double) {
+  def pivotZ_=(v: Double)
     pivotZ() = v
-  }
 
   /**
     * Defines the factor by which coordinates are scaled along the Z axis direction.
     */
   def z: DoubleProperty = delegate.zProperty()
-  def z_=(v: Double) {
+  def z_=(v: Double)
     z() = v
-  }
-}

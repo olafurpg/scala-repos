@@ -11,7 +11,7 @@ import scala.util.Random
 /**
   * An example of a streaming HTTP server using chunked transfer encoding.
   */
-object HttpStreamingServer {
+object HttpStreamingServer
   val random = new Random
   implicit val timer = new JavaTimer
 
@@ -21,8 +21,8 @@ object HttpStreamingServer {
       .fromFuture(Future.sleep(100.millis))
       .flatMap(_ => ints())
 
-  def main(args: Array[String]): Unit = {
-    val service = new Service[Request, Response] {
+  def main(args: Array[String]): Unit =
+    val service = new Service[Request, Response]
       // Only one stream exists.
       @volatile private[this] var messages: AsyncStream[Buf] =
         ints().map(n => Buf.Utf8(n.toString))
@@ -30,13 +30,11 @@ object HttpStreamingServer {
       // Allow the head of the stream to be collected.
       messages.foreach(_ => messages = messages.drop(1))
 
-      def apply(request: Request) = {
+      def apply(request: Request) =
         val writable = Reader.writable()
         // Start writing thread.
         messages.foreachF(writable.write)
         Future.value(Response(request.version, Status.Ok, writable))
-      }
-    }
 
     Await.result(
         Http.server
@@ -44,5 +42,3 @@ object HttpStreamingServer {
           .withStreaming(enabled = true)
           // Listen on port 8080.
           .serve("0.0.0.0:8080", service))
-  }
-}

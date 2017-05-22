@@ -10,28 +10,24 @@ import scala.collection.mutable.{Map => MMap}
 // A bijection that may be modified and accessed simultaneously.  Note
 // that we can allow only one modification at a time. Updates need to
 // be serialized to ensure that the bijective property is maintained.
-class ConcurrentBijection[A, B] extends MMap[A, B] {
+class ConcurrentBijection[A, B] extends MMap[A, B]
   val forward = new ConcurrentHashMap[A, B]
   val reverse = new ConcurrentHashMap[B, A]
 
   def toOpt[T](x: T) = if (x == null) None else Some(x)
 
-  def -=(key: A) = {
-    synchronized {
+  def -=(key: A) =
+    synchronized
       val value = forward.remove(key)
       if (value != null) reverse.remove(value)
-    }
     this
-  }
 
-  def +=(elem: (A, B)) = {
-    elem match {
+  def +=(elem: (A, B)) =
+    elem match
       case (key, value) => update(key, value)
-    }
     this
-  }
 
-  override def update(key: A, value: B) = synchronized {
+  override def update(key: A, value: B) = synchronized
     // We need to update:
     //
     //    a -> b
@@ -49,17 +45,14 @@ class ConcurrentBijection[A, B] extends MMap[A, B] {
     //
     // So we need to ensure these are killed.
     val oldValue = forward.put(key, value)
-    if (oldValue != value) {
-      if (oldValue != null) {
+    if (oldValue != value)
+      if (oldValue != null)
         // Remove the old reverse mapping.
         val keyForOldValue = reverse.remove(oldValue)
         if (key != keyForOldValue) forward.remove(keyForOldValue)
-      }
 
       val oldKeyForValue = reverse.put(value, key)
       if (oldKeyForValue != null) forward.remove(oldKeyForValue)
-    }
-  }
 
   override def size = forward.size
 
@@ -67,4 +60,3 @@ class ConcurrentBijection[A, B] extends MMap[A, B] {
   def getReverse(value: B) = toOpt(reverse.get(value))
 
   def iterator = forward.entrySet.iterator.map(e => (e.getKey, e.getValue))
-}

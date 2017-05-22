@@ -19,7 +19,7 @@ package org.apache.spark.sql.catalyst
 
 import org.apache.spark.sql.Encoder
 
-package object encoders {
+package object encoders
 
   /**
     * Returns an internal encoder object that can be used to serialize / deserialize JVM objects
@@ -28,10 +28,8 @@ package object encoders {
     * object type is being bound by name or by ordinal when doing resolution.
     */
   private[sql] def encoderFor[A : Encoder]: ExpressionEncoder[A] =
-    implicitly[Encoder[A]] match {
+    implicitly[Encoder[A]] match
       case e: ExpressionEncoder[A] =>
         e.assertUnresolved()
         e
       case _ => sys.error(s"Only expression encoders are supported today")
-    }
-}

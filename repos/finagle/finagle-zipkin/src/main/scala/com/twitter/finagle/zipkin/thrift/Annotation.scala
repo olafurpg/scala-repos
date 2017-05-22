@@ -11,9 +11,9 @@ case class ZipkinAnnotation(
     timestamp: Time,
     value: String,
     endpoint: Endpoint
-) {
+)
 
-  def toThrift: thrift.Annotation = {
+  def toThrift: thrift.Annotation =
     val thriftAnnotation = new thrift.Annotation
     val localEndpoint = endpoint.boundEndpoint.toThrift
     thriftAnnotation.setTimestamp(timestamp.inMicroseconds)
@@ -21,16 +21,14 @@ case class ZipkinAnnotation(
     thriftAnnotation.setHost(localEndpoint)
 
     thriftAnnotation
-  }
-}
 
 case class BinaryAnnotation(
     key: String,
     value: ByteBuffer,
     annotationType: thrift.AnnotationType,
     endpoint: Endpoint
-) {
-  def toThrift: thrift.BinaryAnnotation = {
+)
+  def toThrift: thrift.BinaryAnnotation =
     val thriftAnnotation = new thrift.BinaryAnnotation
     val localEndpoint = endpoint.boundEndpoint.toThrift
     thriftAnnotation.setKey(key)
@@ -39,5 +37,3 @@ case class BinaryAnnotation(
     thriftAnnotation.setHost(localEndpoint)
 
     thriftAnnotation
-  }
-}

@@ -12,7 +12,7 @@ import java.util.jar.{JarEntry, JarInputStream}
   * Loads a set of classes from a package (including ones which are NOT already in the classloader)
   * and return the set that
   */
-trait ClassFinder {
+trait ClassFinder
 
   def logger: org.slf4j.Logger
 
@@ -31,7 +31,7 @@ trait ClassFinder {
     */
   def isValidClass(className: String): Boolean
 
-  def findClasses: Set[Class[_]] = {
+  def findClasses: Set[Class[_]] =
     logger.debug(s"findClasses: using initialResource = ${initialResource}")
 
     val classSet = scala.collection.mutable.Set[Class[_]]()
@@ -48,25 +48,19 @@ trait ClassFinder {
     val jar: URL = new URL(jarURLString)
     val jarConnection: URLConnection = jar.openConnection
     val jis: JarInputStream = new JarInputStream(jarConnection.getInputStream)
-    try {
+    try
       var je: JarEntry = jis.getNextJarEntry
-      while (je != null) {
-        if (!je.isDirectory) {
+      while (je != null)
+        if (!je.isDirectory)
           var className: String =
             je.getName.substring(0, je.getName.length - 6)
           className = className.replace('/', '.')
-          if (isValidClass(className)) {
+          if (isValidClass(className))
             //logger.debug(s"findClasses: adding valid class ${className}")
 
             val c: Class[_] = classLoader.loadClass(className)
             classSet.add(c)
-          }
-        }
         je = jis.getNextJarEntry
-      }
-    } finally {
+    finally
       jis.close()
-    }
     classSet.toSet
-  }
-}

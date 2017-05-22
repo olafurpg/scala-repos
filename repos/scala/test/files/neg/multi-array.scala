@@ -3,9 +3,8 @@
   *  which was tested here impossible.
   *  This test will fail now because the constructor doesn't exist anymore.
   */
-class Foo {
+class Foo
   val a: Array[Int] = new Array(10, 10)
-}
 
 //Before removal of constructor non-unary Array constructors:
 /** Check that a multi-dimensional array can't be created

@@ -15,7 +15,7 @@ import com.intellij.openapi.project.Project
   */
 class SbtProjectImportBuilder(projectDataManager: ProjectDataManager)
     extends AbstractExternalProjectImportBuilder[SbtImportControl](
-        projectDataManager, new SbtImportControl(), SbtProjectSystem.Id) {
+        projectDataManager, new SbtImportControl(), SbtProjectSystem.Id)
 
   def getName = Sbt.Name
 
@@ -30,4 +30,3 @@ class SbtProjectImportBuilder(projectDataManager: ProjectDataManager)
   def getExternalProjectConfigToUse(file: File) = file
 
   def applyExtraSettings(context: WizardContext) {}
-}

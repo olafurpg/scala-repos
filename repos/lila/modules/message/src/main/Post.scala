@@ -7,7 +7,7 @@ case class Post(id: String,
                 text: String,
                 isByCreator: Boolean,
                 isRead: Boolean,
-                createdAt: DateTime) {
+                createdAt: DateTime)
 
   def isByInvited = !isByCreator
 
@@ -15,9 +15,8 @@ case class Post(id: String,
 
   def similar(other: Post) =
     text == other.text && isByCreator == other.isByCreator
-}
 
-object Post {
+object Post
 
   val idSize = 8
 
@@ -36,4 +35,3 @@ object Post {
       (__.json update readDate('createdAt)) andThen Json.reads[Post],
       Json.writes[Post].andThen(__.json update writeDate('createdAt))
   )
-}

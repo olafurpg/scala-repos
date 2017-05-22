@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
     |import scala.reflect.runtime.universe._
     |class A {
@@ -20,4 +20,3 @@ object Test extends ReplTest {
     |}
     |for (i <- 1 to 8) test(i)
     |""".stripMargin
-}

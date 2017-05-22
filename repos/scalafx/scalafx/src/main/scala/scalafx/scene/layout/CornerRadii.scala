@@ -31,19 +31,18 @@ import javafx.scene.{layout => jfxsl}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object CornerRadii {
+object CornerRadii
   implicit def sfxCornerRadii2jfx(v: CornerRadii): jfxsl.CornerRadii =
     if (v != null) v.delegate else null
 
   /** An empty Background, useful to use instead of null. */
   val Empty = jfxsl.CornerRadii.EMPTY
-}
 
 /**
   * Defines the radii of each of the four corners of a BorderStroke.
   */
 class CornerRadii(override val delegate: jfxsl.CornerRadii)
-    extends SFXDelegate[jfxsl.CornerRadii] {
+    extends SFXDelegate[jfxsl.CornerRadii]
 
   /**
     * Create a new CornerRadii with a single uniform radii value for all components of all corners.
@@ -147,4 +146,3 @@ class CornerRadii(override val delegate: jfxsl.CornerRadii)
     * The length of the vertical radii of the top-right corner.
     */
   def topRightVerticalRadius: Double = delegate.getTopRightVerticalRadius
-}

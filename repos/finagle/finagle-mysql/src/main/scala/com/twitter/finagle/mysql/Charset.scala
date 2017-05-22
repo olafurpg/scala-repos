@@ -2,7 +2,7 @@ package com.twitter.finagle.exp.mysql
 
 import java.nio.charset.{Charset => JCharset}
 
-object Charset {
+object Charset
 
   /**
     * Default Charset used by this client.
@@ -43,4 +43,3 @@ object Charset {
   def isUtf8(code: Short): Boolean = Utf8Set(code)
   def isLatin1(code: Short): Boolean = Latin1Set(code)
   def isBinary(code: Short): Boolean = code == Binary
-}

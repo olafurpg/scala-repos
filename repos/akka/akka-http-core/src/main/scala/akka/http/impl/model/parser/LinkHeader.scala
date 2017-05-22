@@ -8,19 +8,17 @@ import akka.parboiled2.Parser
 import akka.http.scaladsl.model.{ParsingException, IllegalUriException}
 import akka.http.scaladsl.model.headers._
 
-private[parser] trait LinkHeader {
+private[parser] trait LinkHeader
   this: Parser with CommonRules with CommonActions ⇒
   import CharacterClasses._
 
   // http://tools.ietf.org/html/rfc5988#section-5
-  def `link` = rule {
+  def `link` = rule
     zeroOrMore(`link-value`).separatedBy(listSep) ~ EOI ~> (Link(_))
-  }
 
-  def `link-value` = rule {
+  def `link-value` = rule
     ws('<') ~ UriReference('>') ~ ws('>') ~ oneOrMore(ws(';') ~ `link-param`) ~>
     (sanitize(_)) ~> (LinkValue(_, _: _*))
-  }
 
   def `link-param` =
     rule(
@@ -41,36 +39,29 @@ private[parser] trait LinkHeader {
 
   def `relation-type` = rule { `reg-rel-type` | `ext-rel-type` }
 
-  def `reg-rel-type` = rule {
+  def `reg-rel-type` = rule
     capture(LOWER_ALPHA ~ zeroOrMore(`reg-rel-type-octet`)) ~ !VCHAR
-  }
 
-  def `ext-rel-type` = rule {
+  def `ext-rel-type` = rule
     URI
-  }
 
   ////////////////////////////// helpers ///////////////////////////////////
 
-  def UriReference(terminationChar: Char) = rule {
+  def UriReference(terminationChar: Char) = rule
     capture(oneOrMore(!terminationChar ~ VCHAR)) ~>
     (newUriParser(_).parseUriReference())
-  }
 
-  def URI = rule {
-    capture(oneOrMore(!'"' ~ !';' ~ !',' ~ VCHAR)) ~> { s ⇒
-      try new UriParser(s).parseUriReference() catch {
+  def URI = rule
+    capture(oneOrMore(!'"' ~ !';' ~ !',' ~ VCHAR)) ~>  s ⇒
+      try new UriParser(s).parseUriReference() catch
         case IllegalUriException(info) ⇒
           throw ParsingException(
               info.withSummaryPrepended("Illegal `Link` header relation-type"))
-      }
       s
-    }
-  }
 
-  def `link-media-type` = rule {
+  def `link-media-type` = rule
     `media-type` ~>
     ((mt, st, pm) ⇒ getMediaType(mt, st, pm contains "charset", pm.toMap))
-  }
 
   // filter out subsequent `rel`, `media`, `title`, `type` and `type*` params
   @tailrec private def sanitize(params: Seq[LinkParam],
@@ -80,7 +71,7 @@ private[parser] trait LinkHeader {
                                 seenTitle: Boolean = false,
                                 seenTitleS: Boolean = false,
                                 seenType: Boolean = false): Seq[LinkParam] =
-    params match {
+    params match
       case Seq((x: LinkParams.rel), tail @ _ *) ⇒
         sanitize(tail,
                  if (seenRel) result else result :+ x,
@@ -130,5 +121,3 @@ private[parser] trait LinkHeader {
                  seenTitleS,
                  seenType)
       case Nil ⇒ result
-    }
-}

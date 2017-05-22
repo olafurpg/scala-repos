@@ -20,31 +20,27 @@ import org.specs2.mutable.Specification
 /**
   * Specs for a Frame
   */
-class FrameSpec extends Specification {
-  "Frame.empty behaves as expected" in {
+class FrameSpec extends Specification
+  "Frame.empty behaves as expected" in
     Frame("a" -> Vec.empty[Int], "b" -> Vec.empty[Int]).isEmpty must_== true
-  }
 
-  "shift-merge must work" in {
+  "shift-merge must work" in
     val s1 = org.saddle.Series(Vec(1, 2, 3), Index("a", "b", "c"))
     val mergeShift = s1.join(s1.shift(1))
     mergeShift.row("b") must_==
       Frame(0 -> Series("b" -> 2), 1 -> Series("b" -> 1))
-  }
 
-  "map works" in {
+  "map works" in
     val f = Frame("a" -> Series("x" -> 1, "y" -> 2, "z" -> 3),
                   "b" -> Series("x" -> 4, "y" -> 5, "z" -> 6))
     f.map { case (r, c, v) => (r, c, v + 1) } must_== f + 1
-  }
 
-  "flatMap works" in {
+  "flatMap works" in
     val f = Frame("a" -> Series("x" -> 1, "y" -> 2, "z" -> 3),
                   "b" -> Series("x" -> 4, "y" -> 5, "z" -> 6))
     f.flatMap { case (r, c, v) => Some((r, c, v + 1)) } must_== f + 1
-  }
 
-  "colType works within rfilter" in {
+  "colType works within rfilter" in
     val strVec = Vec("string", "another string", "unrelated")
     val intVec = vec.randi(3)
     val df = Panel(strVec, intVec)
@@ -52,5 +48,3 @@ class FrameSpec extends Specification {
         x => x.get(0).map(_.toString).getOrElse("").contains("string"))
     df2.colType[Int] must_!= Frame.empty[Int, Int, Int]
     df2.colType[String] must_!= Frame.empty[Int, Int, String]
-  }
-}

@@ -25,20 +25,19 @@ import cascading.tuple.Fields
   *
   */
 class CoGroupBuilder(groupFields: Fields, joinMode: JoinMode)
-    extends GroupBuilder(groupFields) {
+    extends GroupBuilder(groupFields)
   protected var coGroups: List[(Fields, Pipe, JoinMode)] = Nil
 
   // Joins (cogroups) with pipe p on fields f.
   // Make sure that pipe p is smaller than the left side pipe, otherwise this
   // might take a while.
-  def coGroup(f: Fields, p: Pipe, j: JoinMode = InnerJoinMode) = {
+  def coGroup(f: Fields, p: Pipe, j: JoinMode = InnerJoinMode) =
     coGroups ::= (f, RichPipe.assignName(p), j)
     this
-  }
 
   // TODO: move the automatic renaming of fields here
   // and remove it from joinWithSmaller/joinWithTiny
-  override def schedule(name: String, pipe: Pipe): Pipe = {
+  override def schedule(name: String, pipe: Pipe): Pipe =
     assert(!sorting.isDefined, "cannot use a sortBy when doing a coGroup")
     assert(!coGroups.isEmpty,
            "coGroupBy requires at least one other pipe to .coGroup")
@@ -49,15 +48,10 @@ class CoGroupBuilder(groupFields: Fields, joinMode: JoinMode)
     val cg: Pipe = new CoGroup(pipes, fields, null, WrappedJoiner(mixedJoiner))
     overrideReducers(cg)
     evs.foldRight(cg)((op: Pipe => Every, p) => op(p))
-  }
-}
 
-sealed abstract class JoinMode {
+sealed abstract class JoinMode
   def booleanValue: Boolean
-}
-case object InnerJoinMode extends JoinMode {
+case object InnerJoinMode extends JoinMode
   override def booleanValue = true
-}
-case object OuterJoinMode extends JoinMode {
+case object OuterJoinMode extends JoinMode
   override def booleanValue = false
-}

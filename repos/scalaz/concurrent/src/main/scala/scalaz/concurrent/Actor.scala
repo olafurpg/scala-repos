@@ -24,18 +24,17 @@ import java.util.concurrent.atomic.AtomicReference
   */
 final case class Actor[A](
     handler: A => Unit, onError: Throwable => Unit = ActorUtils.rethrowError)(
-    implicit val strategy: Strategy) {
+    implicit val strategy: Strategy)
   private val head = new AtomicReference[Node[A]]
 
   val toEffect: Run[A] = Run[A](a => this ! a)
 
   /** Alias for `apply` */
-  def !(a: A): Unit = {
+  def !(a: A): Unit =
     val n = new Node(a)
     val h = head.getAndSet(n)
     if (h ne null) h.lazySet(n)
     else schedule(n)
-  }
 
   /** Pass the message `a` to the mailbox of this actor */
   def apply(a: A): Unit = this ! a
@@ -46,15 +45,13 @@ final case class Actor[A](
   private def schedule(n: Node[A]): Unit = strategy(act(n))
 
   @annotation.tailrec
-  private def act(n: Node[A], i: Int = 1024): Unit = {
-    try handler(n.a) catch {
+  private def act(n: Node[A], i: Int = 1024): Unit =
+    try handler(n.a) catch
       case ex: Throwable => onError(ex)
-    }
     val n2 = n.get
     if (n2 eq null) scheduleLastTry(n)
     else if (i == 0) schedule(n2)
     else act(n2, i - 1)
-  }
 
   private def scheduleLastTry(n: Node[A]): Unit = strategy(lastTry(n))
 
@@ -62,32 +59,26 @@ final case class Actor[A](
     if (!head.compareAndSet(n, null)) act(next(n))
 
   @annotation.tailrec
-  private def next(n: Node[A]): Node[A] = {
+  private def next(n: Node[A]): Node[A] =
     val n2 = n.get
     if (n2 ne null) n2
     else next(n)
-  }
-}
 
 private class Node[A](val a: A) extends AtomicReference[Node[A]]
 
-private object ActorUtils {
+private object ActorUtils
   val rethrowError: Throwable => Unit = throw _
-}
 
 object Actor extends ActorInstances with ActorFunctions
 
-sealed abstract class ActorInstances {
+sealed abstract class ActorInstances
   implicit val actorContravariant: Contravariant[Actor] =
-    new Contravariant[Actor] {
+    new Contravariant[Actor]
       def contramap[A, B](r: Actor[A])(f: B => A): Actor[B] = r contramap f
-    }
-}
 
-trait ActorFunctions {
+trait ActorFunctions
   def actor[A](handler: A => Unit,
                onError: Throwable => Unit = ActorUtils.rethrowError)(
       implicit s: Strategy): Actor[A] = new Actor[A](handler, onError)(s)
 
   implicit def ToFunctionFromActor[A](a: Actor[A]): A => Unit = a ! _
-}

@@ -26,122 +26,105 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{StringType, StructType}
 import org.apache.spark.util.Utils
 
-class FileStreamSourceTest extends StreamTest with SharedSQLContext {
+class FileStreamSourceTest extends StreamTest with SharedSQLContext
 
   import testImplicits._
 
   case class AddTextFileData(
       source: FileStreamSource, content: String, src: File, tmp: File)
-      extends AddData {
+      extends AddData
 
-    override def addData(): Offset = {
-      source.withBatchingLocked {
+    override def addData(): Offset =
+      source.withBatchingLocked
         val file = Utils.tempFileWith(new File(tmp, "text"))
         stringToFile(file, content).renameTo(new File(src, file.getName))
         source.currentOffset
-      } + 1
-    }
-  }
+      + 1
 
   case class AddParquetFileData(source: FileStreamSource,
                                 content: Seq[String],
                                 src: File,
                                 tmp: File)
-      extends AddData {
+      extends AddData
 
-    override def addData(): Offset = {
-      source.withBatchingLocked {
+    override def addData(): Offset =
+      source.withBatchingLocked
         val file = Utils.tempFileWith(new File(tmp, "parquet"))
         content.toDS().toDF().write.parquet(file.getCanonicalPath)
         file.renameTo(new File(src, file.getName))
         source.currentOffset
-      } + 1
-    }
-  }
+      + 1
 
   /** Use `format` and `path` to create FileStreamSource via DataFrameReader */
   def createFileStreamSource(
       format: String,
       path: String,
-      schema: Option[StructType] = None): FileStreamSource = {
+      schema: Option[StructType] = None): FileStreamSource =
     val reader =
-      if (schema.isDefined) {
+      if (schema.isDefined)
         sqlContext.read.format(format).schema(schema.get)
-      } else {
+      else
         sqlContext.read.format(format)
-      }
     reader
       .stream(path)
       .queryExecution
       .analyzed
       .collect { case StreamingRelation(s: FileStreamSource, _) => s }
       .head
-  }
 
   val valueSchema = new StructType().add("value", StringType)
-}
 
 class FileStreamSourceSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest with SharedSQLContext
 
   import testImplicits._
 
   private def createFileStreamSourceAndGetSchema(
       format: Option[String],
       path: Option[String],
-      schema: Option[StructType] = None): StructType = {
+      schema: Option[StructType] = None): StructType =
     val reader = sqlContext.read
     format.foreach(reader.format)
     schema.foreach(reader.schema)
     val df =
-      if (path.isDefined) {
+      if (path.isDefined)
         reader.stream(path.get)
-      } else {
+      else
         reader.stream()
-      }
-    df.queryExecution.analyzed.collect {
+    df.queryExecution.analyzed.collect
       case StreamingRelation(s: FileStreamSource, _) => s
-    }.head.schema
-  }
+    .head.schema
 
-  test("FileStreamSource schema: no path") {
-    val e = intercept[IllegalArgumentException] {
+  test("FileStreamSource schema: no path")
+    val e = intercept[IllegalArgumentException]
       createFileStreamSourceAndGetSchema(
           format = None, path = None, schema = None)
-    }
     assert("'path' is not specified" === e.getMessage)
-  }
 
-  test("FileStreamSource schema: path doesn't exist") {
-    intercept[AnalysisException] {
+  test("FileStreamSource schema: path doesn't exist")
+    intercept[AnalysisException]
       createFileStreamSourceAndGetSchema(
           format = None, path = Some("/a/b/c"), schema = None)
-    }
-  }
 
-  test("FileStreamSource schema: text, no existing files, no schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: text, no existing files, no schema")
+    withTempDir  src =>
       val schema =
         createFileStreamSourceAndGetSchema(format = Some("text"),
                                            path = Some(src.getCanonicalPath),
                                            schema = None)
       assert(schema === new StructType().add("value", StringType))
-    }
-  }
 
-  test("FileStreamSource schema: text, existing files, no schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: text, existing files, no schema")
+    withTempDir  src =>
       stringToFile(new File(src, "1"), "a\nb\nc")
       val schema =
         createFileStreamSourceAndGetSchema(format = Some("text"),
                                            path = Some(src.getCanonicalPath),
                                            schema = None)
       assert(schema === new StructType().add("value", StringType))
-    }
-  }
 
-  test("FileStreamSource schema: text, existing files, schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: text, existing files, schema")
+    withTempDir  src =>
       stringToFile(new File(src, "1"), "a\nb\nc")
       val userSchema = new StructType().add("userColumn", StringType)
       val schema =
@@ -149,24 +132,19 @@ class FileStreamSourceSuite
                                            path = Some(src.getCanonicalPath),
                                            schema = Some(userSchema))
       assert(schema === userSchema)
-    }
-  }
 
-  test("FileStreamSource schema: parquet, no existing files, no schema") {
-    withTempDir { src =>
-      val e = intercept[AnalysisException] {
+  test("FileStreamSource schema: parquet, no existing files, no schema")
+    withTempDir  src =>
+      val e = intercept[AnalysisException]
         createFileStreamSourceAndGetSchema(
             format = Some("parquet"),
             path = Some(new File(src, "1").getCanonicalPath),
             schema = None)
-      }
       assert(
           "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
-    }
-  }
 
-  test("FileStreamSource schema: parquet, existing files, no schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: parquet, existing files, no schema")
+    withTempDir  src =>
       Seq("a", "b", "c")
         .toDS()
         .as("userColumn")
@@ -178,11 +156,9 @@ class FileStreamSourceSuite
                                            path = Some(src.getCanonicalPath),
                                            schema = None)
       assert(schema === new StructType().add("value", StringType))
-    }
-  }
 
-  test("FileStreamSource schema: parquet, existing files, schema") {
-    withTempPath { src =>
+  test("FileStreamSource schema: parquet, existing files, schema")
+    withTempPath  src =>
       Seq("a", "b", "c")
         .toDS()
         .as("oldUserColumn")
@@ -195,34 +171,27 @@ class FileStreamSourceSuite
                                            path = Some(src.getCanonicalPath),
                                            schema = Some(userSchema))
       assert(schema === userSchema)
-    }
-  }
 
-  test("FileStreamSource schema: json, no existing files, no schema") {
-    withTempDir { src =>
-      val e = intercept[AnalysisException] {
+  test("FileStreamSource schema: json, no existing files, no schema")
+    withTempDir  src =>
+      val e = intercept[AnalysisException]
         createFileStreamSourceAndGetSchema(format = Some("json"),
                                            path = Some(src.getCanonicalPath),
                                            schema = None)
-      }
       assert(
           "Unable to infer schema.  It must be specified manually.;" === e.getMessage)
-    }
-  }
 
-  test("FileStreamSource schema: json, existing files, no schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: json, existing files, no schema")
+    withTempDir  src =>
       stringToFile(new File(src, "1"), "{'c': '1'}\n{'c': '2'}\n{'c': '3'}")
       val schema =
         createFileStreamSourceAndGetSchema(format = Some("json"),
                                            path = Some(src.getCanonicalPath),
                                            schema = None)
       assert(schema === new StructType().add("c", StringType))
-    }
-  }
 
-  test("FileStreamSource schema: json, existing files, schema") {
-    withTempDir { src =>
+  test("FileStreamSource schema: json, existing files, schema")
+    withTempDir  src =>
       stringToFile(new File(src, "1"), "{'c': '1'}\n{'c': '2'}\n{'c', '3'}")
       val userSchema = new StructType().add("userColumn", StringType)
       val schema =
@@ -230,10 +199,8 @@ class FileStreamSourceSuite
                                            path = Some(src.getCanonicalPath),
                                            schema = Some(userSchema))
       assert(schema === userSchema)
-    }
-  }
 
-  test("read from text files") {
+  test("read from text files")
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
@@ -253,9 +220,8 @@ class FileStreamSourceSuite
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
 
-  test("read from json files") {
+  test("read from json files")
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
@@ -288,9 +254,8 @@ class FileStreamSourceSuite
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
 
-  test("read from json files with inferring schema") {
+  test("read from json files with inferring schema")
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
@@ -313,9 +278,8 @@ class FileStreamSourceSuite
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
 
-  test("read from parquet files") {
+  test("read from parquet files")
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
@@ -339,35 +303,29 @@ class FileStreamSourceSuite
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
 
-  test("file stream source without schema") {
+  test("file stream source without schema")
     val src = Utils.createTempDir("streaming.src")
 
     // Only "text" doesn't need a schema
     createFileStreamSource("text", src.getCanonicalPath)
 
     // Both "json" and "parquet" require a schema if no existing file to infer
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       createFileStreamSource("json", src.getCanonicalPath)
-    }
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       createFileStreamSource("parquet", src.getCanonicalPath)
-    }
 
     Utils.deleteRecursively(src)
-  }
 
-  test("fault tolerance") {
-    def assertBatch(batch1: Option[Batch], batch2: Option[Batch]): Unit = {
-      (batch1, batch2) match {
+  test("fault tolerance")
+    def assertBatch(batch1: Option[Batch], batch2: Option[Batch]): Unit =
+      (batch1, batch2) match
         case (Some(b1), Some(b2)) =>
           assert(b1.end === b2.end)
           assert(b1.data.as[String].collect() === b2.data.as[String].collect())
         case (None, None) =>
         case _ => fail(s"batch ($batch1) is not equal to batch ($batch2)")
-      }
-    }
 
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
@@ -389,23 +347,20 @@ class FileStreamSourceSuite
     val textSource2 = createFileStreamSource("text", src.getCanonicalPath)
     assert(textSource2.currentOffset === textSource.currentOffset)
     assertBatch(textSource2.getNextBatch(None), textSource.getNextBatch(None))
-    for (f <- 0L to textSource.currentOffset.offset) {
+    for (f <- 0L to textSource.currentOffset.offset)
       val offset = LongOffset(f)
       assertBatch(textSource2.getNextBatch(Some(offset)),
                   textSource.getNextBatch(Some(offset)))
-    }
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
-}
 
 class FileStreamSourceStressTestSuite
-    extends FileStreamSourceTest with SharedSQLContext {
+    extends FileStreamSourceTest with SharedSQLContext
 
   import testImplicits._
 
-  test("file source stress test") {
+  test("file source stress test")
     val src = Utils.createTempDir("streaming.src")
     val tmp = Utils.createTempDir("streaming.tmp")
 
@@ -414,11 +369,8 @@ class FileStreamSourceStressTestSuite
     runStressTest(
         ds,
         data =>
-          {
             AddTextFileData(textSource, data.mkString("\n"), src, tmp)
-        })
+        )
 
     Utils.deleteRecursively(src)
     Utils.deleteRecursively(tmp)
-  }
-}

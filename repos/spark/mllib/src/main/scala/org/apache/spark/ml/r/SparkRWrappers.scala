@@ -25,16 +25,16 @@ import org.apache.spark.ml.feature.{RFormula, VectorAssembler}
 import org.apache.spark.ml.regression.{LinearRegression, LinearRegressionModel}
 import org.apache.spark.sql.DataFrame
 
-private[r] object SparkRWrappers {
+private[r] object SparkRWrappers
   def fitRModelFormula(value: String,
                        df: DataFrame,
                        family: String,
                        lambda: Double,
                        alpha: Double,
                        standardize: Boolean,
-                       solver: String): PipelineModel = {
+                       solver: String): PipelineModel =
     val formula = new RFormula().setFormula(value)
-    val estimator = family match {
+    val estimator = family match
       case "gaussian" =>
         new LinearRegression()
           .setRegParam(lambda)
@@ -48,16 +48,14 @@ private[r] object SparkRWrappers {
           .setElasticNetParam(alpha)
           .setFitIntercept(formula.hasIntercept)
           .setStandardization(standardize)
-    }
     val pipeline = new Pipeline().setStages(Array(formula, estimator))
     pipeline.fit(df)
-  }
 
   def fitKMeans(df: DataFrame,
                 initMode: String,
                 maxIter: Double,
                 k: Double,
-                columns: Array[String]): PipelineModel = {
+                columns: Array[String]): PipelineModel =
     val assembler = new VectorAssembler().setInputCols(columns)
     val kMeans = new KMeans()
       .setInitMode(initMode)
@@ -66,11 +64,10 @@ private[r] object SparkRWrappers {
       .setFeaturesCol(assembler.getOutputCol)
     val pipeline = new Pipeline().setStages(Array(assembler, kMeans))
     pipeline.fit(df)
-  }
 
-  def getModelCoefficients(model: PipelineModel): Array[Double] = {
-    model.stages.last match {
-      case m: LinearRegressionModel => {
+  def getModelCoefficients(model: PipelineModel): Array[Double] =
+    model.stages.last match
+      case m: LinearRegressionModel =>
           val coefficientStandardErrorsR =
             Array(m.summary.coefficientStandardErrors.last) ++ m.summary.coefficientStandardErrors
               .dropRight(1)
@@ -78,94 +75,74 @@ private[r] object SparkRWrappers {
             Array(m.summary.tValues.last) ++ m.summary.tValues.dropRight(1)
           val pValuesR =
             Array(m.summary.pValues.last) ++ m.summary.pValues.dropRight(1)
-          if (m.getFitIntercept) {
+          if (m.getFitIntercept)
             Array(m.intercept) ++ m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
-          } else {
+          else
             m.coefficients.toArray ++ coefficientStandardErrorsR ++ tValuesR ++ pValuesR
-          }
-        }
-      case m: LogisticRegressionModel => {
-          if (m.getFitIntercept) {
+      case m: LogisticRegressionModel =>
+          if (m.getFitIntercept)
             Array(m.intercept) ++ m.coefficients.toArray
-          } else {
+          else
             m.coefficients.toArray
-          }
-        }
       case m: KMeansModel =>
         m.clusterCenters.flatMap(_.toArray)
-    }
-  }
 
-  def getModelDevianceResiduals(model: PipelineModel): Array[Double] = {
-    model.stages.last match {
+  def getModelDevianceResiduals(model: PipelineModel): Array[Double] =
+    model.stages.last match
       case m: LinearRegressionModel =>
         m.summary.devianceResiduals
       case m: LogisticRegressionModel =>
         throw new UnsupportedOperationException(
             "No deviance residuals available for LogisticRegressionModel")
-    }
-  }
 
-  def getKMeansModelSize(model: PipelineModel): Array[Int] = {
-    model.stages.last match {
+  def getKMeansModelSize(model: PipelineModel): Array[Int] =
+    model.stages.last match
       case m: KMeansModel => Array(m.getK) ++ m.summary.size
       case other =>
         throw new UnsupportedOperationException(
             s"KMeansModel required but ${other.getClass.getSimpleName} found.")
-    }
-  }
 
-  def getKMeansCluster(model: PipelineModel, method: String): DataFrame = {
-    model.stages.last match {
+  def getKMeansCluster(model: PipelineModel, method: String): DataFrame =
+    model.stages.last match
       case m: KMeansModel =>
-        if (method == "centers") {
+        if (method == "centers")
           // Drop the assembled vector for easy-print to R side.
           m.summary.predictions.drop(m.summary.featuresCol)
-        } else if (method == "classes") {
+        else if (method == "classes")
           m.summary.cluster
-        } else {
+        else
           throw new UnsupportedOperationException(
               s"Method (centers or classes) required but $method found.")
-        }
       case other =>
         throw new UnsupportedOperationException(
             s"KMeansModel required but ${other.getClass.getSimpleName} found.")
-    }
-  }
 
-  def getModelFeatures(model: PipelineModel): Array[String] = {
-    model.stages.last match {
+  def getModelFeatures(model: PipelineModel): Array[String] =
+    model.stages.last match
       case m: LinearRegressionModel =>
         val attrs = AttributeGroup.fromStructField(
             m.summary.predictions.schema(m.summary.featuresCol))
-        if (m.getFitIntercept) {
+        if (m.getFitIntercept)
           Array("(Intercept)") ++ attrs.attributes.get.map(_.name.get)
-        } else {
+        else
           attrs.attributes.get.map(_.name.get)
-        }
       case m: LogisticRegressionModel =>
         val attrs = AttributeGroup.fromStructField(
             m.summary.predictions.schema(m.summary.featuresCol))
-        if (m.getFitIntercept) {
+        if (m.getFitIntercept)
           Array("(Intercept)") ++ attrs.attributes.get.map(_.name.get)
-        } else {
+        else
           attrs.attributes.get.map(_.name.get)
-        }
       case m: KMeansModel =>
         val attrs = AttributeGroup.fromStructField(
             m.summary.predictions.schema(m.summary.featuresCol))
         attrs.attributes.get.map(_.name.get)
-    }
-  }
 
-  def getModelName(model: PipelineModel): String = {
-    model.stages.last match {
+  def getModelName(model: PipelineModel): String =
+    model.stages.last match
       case m: LinearRegressionModel =>
         "LinearRegressionModel"
       case m: LogisticRegressionModel =>
         "LogisticRegressionModel"
       case m: KMeansModel =>
         "KMeansModel"
-    }
-  }
-}

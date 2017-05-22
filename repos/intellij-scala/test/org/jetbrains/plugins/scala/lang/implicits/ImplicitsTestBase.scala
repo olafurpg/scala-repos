@@ -23,13 +23,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
   * Date: 10.03.2009
   */
 abstract class ImplicitsTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
 
   def folderPath: String = baseRootPath() + "implicits/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -63,22 +63,19 @@ abstract class ImplicitsTestBase
         .map(_.name)
         .sorted
         .mkString("Seq(", ",\n    ", ")") + ",\n" +
-      (implicitConversions._2 match {
+      (implicitConversions._2 match
             case None => "None"
             case Some(elem: PsiNamedElement) => "Some(" + elem.name + ")"
             case _ =>
               assert(
                   assertion = false, message = "elem is not PsiNamedElement")
-          })
+          )
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res)
-  }
-}

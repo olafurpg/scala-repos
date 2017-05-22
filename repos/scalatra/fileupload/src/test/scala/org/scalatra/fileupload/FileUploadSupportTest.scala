@@ -8,72 +8,57 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
 class FileUploadSupportTestServlet
-    extends ScalatraServlet with FileUploadSupport {
-  post("""/multipart.*""".r) {
-    multiParams.get("string") foreach { ps: Seq[String] =>
+    extends ScalatraServlet with FileUploadSupport
+  post("""/multipart.*""".r)
+    multiParams.get("string") foreach  ps: Seq[String] =>
       response.setHeader("string", ps.mkString(";"))
-    }
-    fileParams.get("file") foreach { fi =>
+    fileParams.get("file") foreach  fi =>
       response.setHeader("file", new String(fi.get).trim)
-    }
-    fileParams.get("file-none") foreach { fi =>
+    fileParams.get("file-none") foreach  fi =>
       response.setHeader("file-none", new String(fi.get).trim)
-    }
-    fileParams.get("file-two[]") foreach { fi =>
+    fileParams.get("file-two[]") foreach  fi =>
       response.setHeader("file-two", new String(fi.get).trim)
-    }
-    fileMultiParams.get("file-two[]") foreach { fis =>
-      response.setHeader("file-two-with-brackets", fis.foldLeft("") {
+    fileMultiParams.get("file-two[]") foreach  fis =>
+      response.setHeader("file-two-with-brackets", fis.foldLeft("")
         (acc, fi) =>
           acc + new String(fi.get).trim
-      })
-    }
-    fileMultiParams.get("file-two") foreach { fis =>
-      response.setHeader("file-two-without-brackets", fis.foldLeft("") {
+      )
+    fileMultiParams.get("file-two") foreach  fis =>
+      response.setHeader("file-two-without-brackets", fis.foldLeft("")
         (acc, fi) =>
           acc + new String(fi.get).trim
-      })
-    }
+      )
     params.get("file") foreach { response.setHeader("file-as-param", _) }
     params("utf8-string")
-  }
 
-  post("/multipart-pass") {
+  post("/multipart-pass")
     pass()
-  }
 
-  post("/multipart-param") {
-    params.get("queryParam") foreach { p =>
+  post("/multipart-param")
+    params.get("queryParam") foreach  p =>
       response.addHeader("Query-Param", p)
-    }
     pass()
-  }
 
-  post("/echo") {
+  post("/echo")
     params.getOrElse("echo", "")
-  }
-}
 
-class MaxSizeTestServlet extends ScalatraServlet with FileUploadSupport {
+class MaxSizeTestServlet extends ScalatraServlet with FileUploadSupport
   post() {}
 
-  error {
+  error
     case e: FileUploadBase.SizeLimitExceededException => halt(413, "boom")
-  }
 
-  override def newServletFileUpload = {
+  override def newServletFileUpload =
     val upload = super.newServletFileUpload
     upload.setSizeMax(1)
     upload
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class FileUploadSupportTest extends ScalatraFunSuite {
+class FileUploadSupportTest extends ScalatraFunSuite
   addServlet(classOf[FileUploadSupportTestServlet], "/*")
   addServlet(classOf[MaxSizeTestServlet], "/max-size/*")
 
-  def multipartResponse(path: String = "/multipart") = {
+  def multipartResponse(path: String = "/multipart") =
     val reqBody = new String(
         IOUtils
           .toString(getClass.getResourceAsStream("multipart_request.txt"))
@@ -85,10 +70,8 @@ class FileUploadSupportTest extends ScalatraFunSuite {
     post(path,
          headers = Map("Content-Type" -> "multipart/form-data; boundary=%s"
                  .format(boundary)),
-         body = reqBody) {
+         body = reqBody)
       response
-    }
-  }
 
   //  test("keeps input parameters on multipart request") {
   //    multipartResponse().getHeader("string") should equal ("foo")
@@ -98,65 +81,50 @@ class FileUploadSupportTest extends ScalatraFunSuite {
   //    multipartResponse().getContent() should equal ("föo")
   //  }
 
-  test("sets file params") {
+  test("sets file params")
     val out =
       multipartResponse().getHeader("file").toCharArray.map(_.toByte).toList
     println(s"the output of file params: $out")
     multipartResponse().getHeader("file") should equal("one")
-  }
 
-  test("sets file param with no bytes when no file is uploaded") {
+  test("sets file param with no bytes when no file is uploaded")
     multipartResponse().getHeader("file-none") should equal("")
-  }
 
-  test("sets multiple file params") {
+  test("sets multiple file params")
     multipartResponse().getHeader("file-two-with-brackets") should equal(
         "twothree")
-  }
 
-  test("looks for params with [] suffix, Ruby style") {
+  test("looks for params with [] suffix, Ruby style")
     multipartResponse().getHeader("file-two-without-brackets") should equal(
         "twothree")
-  }
 
-  test("fileParams returns first input for multiple file params") {
+  test("fileParams returns first input for multiple file params")
     multipartResponse().getHeader("file-two") should equal("two")
-  }
 
-  test("file params are not params") {
+  test("file params are not params")
     multipartResponse().getHeader("file-as-param") should equal(null)
-  }
 
-  test("keeps input params on pass") {
+  test("keeps input params on pass")
     multipartResponse("/multipart-pass").getHeader("string") should equal(
         "foo")
-  }
 
-  test("keeps file params on pass") {
+  test("keeps file params on pass")
     multipartResponse("/multipart-pass").getHeader("file") should equal("one")
-  }
 
-  test("reads form params on non-multipart request") {
-    post("/echo", "echo" -> "foo") {
+  test("reads form params on non-multipart request")
+    post("/echo", "echo" -> "foo")
       body should equal("foo")
-    }
-  }
 
-  test("keeps query parameters") {
+  test("keeps query parameters")
     multipartResponse("/multipart-param?queryParam=foo").getHeader(
         "Query-Param") should equal("foo")
-  }
 
-  test("query parameters don't shadow post parameters") {
+  test("query parameters don't shadow post parameters")
     multipartResponse("/multipart-param?string=bar").getHeader("string") should equal(
         "bar;foo")
-  }
 
-  test("max size is respected") {
+  test("max size is respected")
     multipartResponse("/max-size/").status should equal(413)
-  }
 
-  test("file upload exceptions are handled by standard error handler") {
+  test("file upload exceptions are handled by standard error handler")
     multipartResponse("/max-size/").body should equal("boom")
-  }
-}

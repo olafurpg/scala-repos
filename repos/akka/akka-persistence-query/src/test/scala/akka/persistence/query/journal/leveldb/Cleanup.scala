@@ -7,7 +7,7 @@ import akka.testkit.AkkaSpec
 import java.io.File
 import org.apache.commons.io.FileUtils
 
-trait Cleanup {
+trait Cleanup
   this: AkkaSpec ⇒
   val storageLocations =
     List("akka.persistence.journal.leveldb.dir",
@@ -15,11 +15,8 @@ trait Cleanup {
          "akka.persistence.snapshot-store.local.dir").map(
         s ⇒ new File(system.settings.config.getString(s)))
 
-  override protected def atStartup() {
+  override protected def atStartup()
     storageLocations.foreach(FileUtils.deleteDirectory)
-  }
 
-  override protected def afterTermination() {
+  override protected def afterTermination()
     storageLocations.foreach(FileUtils.deleteDirectory)
-  }
-}

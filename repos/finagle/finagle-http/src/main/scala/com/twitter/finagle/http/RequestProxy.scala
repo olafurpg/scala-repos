@@ -8,7 +8,7 @@ import org.jboss.netty.handler.codec.http.HttpRequest
   * Proxy for Request.  This can be used to create a richer request class
   * that wraps Request without exposing the underlying netty http type.
   */
-abstract class RequestProxy extends Request {
+abstract class RequestProxy extends Request
   def request: Request
 
   override def ctx = request.ctx
@@ -22,4 +22,3 @@ abstract class RequestProxy extends Request {
   def remoteSocketAddress = request.remoteSocketAddress
 
   override lazy val response = request.response
-}

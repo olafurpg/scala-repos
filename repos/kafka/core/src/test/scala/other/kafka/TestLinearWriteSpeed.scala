@@ -29,9 +29,9 @@ import joptsimple._
 /**
   * This test does linear writes using either a kafka log or a file and measures throughput and latency.
   */
-object TestLinearWriteSpeed {
+object TestLinearWriteSpeed
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val parser = new OptionParser
     val dirOpt = parser
       .accepts("dir", "The directory to write to.")
@@ -118,16 +118,16 @@ object TestLinearWriteSpeed {
     val writables = new Array[Writable](numFiles)
     val scheduler = new KafkaScheduler(1)
     scheduler.startup()
-    for (i <- 0 until numFiles) {
-      if (options.has(mmapOpt)) {
+    for (i <- 0 until numFiles)
+      if (options.has(mmapOpt))
         writables(i) = new MmapWritable(
             new File(dir, "kafka-test-" + i + ".dat"),
             bytesToWrite / numFiles,
             buffer)
-      } else if (options.has(channelOpt)) {
+      else if (options.has(channelOpt))
         writables(i) = new ChannelWritable(
             new File(dir, "kafka-test-" + i + ".dat"), buffer)
-      } else if (options.has(logOpt)) {
+      else if (options.has(logOpt))
         val segmentSize =
           rand.nextInt(512) * 1024 * 1024 +
           64 * 1024 * 1024 // vary size to avoid herd effect
@@ -140,12 +140,10 @@ object TestLinearWriteSpeed {
                                        new LogConfig(logProperties),
                                        scheduler,
                                        messageSet)
-      } else {
+      else
         System.err.println(
             "Must specify what to write to with one of --log, --channel, or --mmap")
         System.exit(1)
-      }
-    }
     bytesToWrite = (bytesToWrite / numFiles) * numFiles
 
     println("%10s\t%10s\t%10s".format("mb_sec", "avg_latency", "max_latency"))
@@ -157,7 +155,7 @@ object TestLinearWriteSpeed {
     var written = 0L
     var totalWritten = 0L
     var lastReport = beginTest
-    while (totalWritten + bufferSize < bytesToWrite) {
+    while (totalWritten + bufferSize < bytesToWrite)
       val start = System.nanoTime
       val writeSize = writables((count % numFiles).toInt.abs).write()
       val ellapsed = System.nanoTime - start
@@ -166,7 +164,7 @@ object TestLinearWriteSpeed {
       written += writeSize
       count += 1
       totalWritten += writeSize
-      if ((start - lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue) {
+      if ((start - lastReport) / (1000.0 * 1000.0) > reportingInterval.doubleValue)
         val ellapsedSecs = (start - lastReport) / (1000.0 * 1000.0 * 1000.0)
         val mb = written / (1024.0 * 1024.0)
         println(
@@ -178,71 +176,57 @@ object TestLinearWriteSpeed {
         written = 0
         maxLatency = 0L
         totalLatency = 0L
-      } else if (written > maxThroughputBytes * (reportingInterval / 1000.0)) {
+      else if (written > maxThroughputBytes * (reportingInterval / 1000.0))
         // if we have written enough, just sit out this reporting interval
         val lastReportMs = lastReport / (1000 * 1000)
         val now = System.nanoTime / (1000 * 1000)
         val sleepMs = lastReportMs + reportingInterval - now
         if (sleepMs > 0) Thread.sleep(sleepMs)
-      }
-    }
     val elapsedSecs =
       (System.nanoTime - beginTest) / (1000.0 * 1000.0 * 1000.0)
     println(bytesToWrite / (1024.0 * 1024.0 * elapsedSecs) + " MB per sec")
     scheduler.shutdown()
-  }
 
-  trait Writable {
+  trait Writable
     def write(): Int
     def close()
-  }
 
   class MmapWritable(val file: File, size: Long, val content: ByteBuffer)
-      extends Writable {
+      extends Writable
     file.deleteOnExit()
     val raf = new RandomAccessFile(file, "rw")
     raf.setLength(size)
     val buffer =
       raf.getChannel().map(FileChannel.MapMode.READ_WRITE, 0, raf.length())
-    def write(): Int = {
+    def write(): Int =
       buffer.put(content)
       content.rewind()
       content.limit
-    }
-    def close() {
+    def close()
       raf.close()
-    }
-  }
 
   class ChannelWritable(val file: File, val content: ByteBuffer)
-      extends Writable {
+      extends Writable
     file.deleteOnExit()
     val raf = new RandomAccessFile(file, "rw")
     val channel = raf.getChannel
-    def write(): Int = {
+    def write(): Int =
       channel.write(content)
       content.rewind()
       content.limit
-    }
-    def close() {
+    def close()
       raf.close()
-    }
-  }
 
   class LogWritable(val dir: File,
                     config: LogConfig,
                     scheduler: Scheduler,
                     val messages: ByteBufferMessageSet)
-      extends Writable {
+      extends Writable
     CoreUtils.rm(dir)
     val log = new Log(dir, config, 0L, scheduler, SystemTime)
-    def write(): Int = {
+    def write(): Int =
       log.append(messages, true)
       messages.sizeInBytes
-    }
-    def close() {
+    def close()
       log.close()
       CoreUtils.rm(log.dir)
-    }
-  }
-}

@@ -18,6 +18,5 @@ package org.saddle.io
 /**
   * Represents a csv data source to be parsed by [[org.saddle.io.CsvParser]]
   */
-trait CsvSource {
+trait CsvSource
   def readLine: String
-}

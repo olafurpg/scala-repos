@@ -1,11 +1,9 @@
-object K {
+object K
   object Z
   object F
-}
 
-class Tac {
+class Tac
   import K.{Z => ZK, F => FK}
 
   /* name: Z */
   ZK
-}

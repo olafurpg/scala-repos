@@ -11,7 +11,7 @@ import org.junit.experimental.categories.Category
 @Category(Array(classOf[SlowTests]))
 class ScalaCommunityHighlightingPerformanceTest
     extends PerformanceSbtProjectHighlightingTestBase
-    with ScalaCommunityDownloadingAndImportingTestCase {
+    with ScalaCommunityDownloadingAndImportingTestCase
 
   def testPerformanceScalaCommunityScalaPsiUtil() =
     doTest("ScalaPsiUtil.scala", 25.seconds)
@@ -27,4 +27,3 @@ class ScalaCommunityHighlightingPerformanceTest
 
   def testPerformanceScalaCommunityScalaSpacingProcessor() =
     doTest("ScalaSpacingProcessor.scala", 5.seconds)
-}

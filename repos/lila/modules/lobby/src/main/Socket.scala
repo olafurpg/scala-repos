@@ -23,25 +23,22 @@ import makeTimeout.short
 private[lobby] final class Socket(val history: History[Messadata],
                                   router: akka.actor.ActorSelection,
                                   uidTtl: FiniteDuration)
-    extends SocketActor[Member](uidTtl) with Historical[Member, Messadata] {
+    extends SocketActor[Member](uidTtl) with Historical[Member, Messadata]
 
   override val startsOnApplicationBoot = true
 
-  override def preStart {
+  override def preStart
     super.preStart
     context.system.lilaBus
       .subscribe(self, 'changeFeaturedGame, 'streams, 'nbMembers, 'nbRounds)
-  }
 
-  def receiveSpecific = {
+  def receiveSpecific =
 
     case PingVersion(uid, v) =>
-      Future {
+      Future
         ping(uid)
-        withMember(uid) { m =>
+        withMember(uid)  m =>
           history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
-      }
 
     case Join(uid, user, blocks, mobile) =>
       val (enumerator, channel) = Concurrent.broadcast[JsValue]
@@ -87,7 +84,6 @@ private[lobby] final class Socket(val history: History[Messadata],
       pong = pong + ("r" -> JsNumber(nb))
 
     case ChangeFeatured(_, msg) => notifyAllAsync(msg)
-  }
 
   private def notifyPlayerStart(game: lila.game.Game, color: chess.Color) =
     notifyMember("redirect",
@@ -100,13 +96,10 @@ private[lobby] final class Socket(val history: History[Messadata],
                    .noNull) _
 
   protected def shouldSkipMessageFor(message: Message, member: Member) =
-    message.metadata.hook ?? { hook =>
+    message.metadata.hook ??  hook =>
       hook.uid != member.uid && !Biter.canJoin(hook, member.user)
-    }
 
   private def playerUrl(fullId: String) = s"/$fullId"
 
-  private def notifySeeks() {
+  private def notifySeeks()
     notifyAll(makeMessage("reload_seeks"))
-  }
-}

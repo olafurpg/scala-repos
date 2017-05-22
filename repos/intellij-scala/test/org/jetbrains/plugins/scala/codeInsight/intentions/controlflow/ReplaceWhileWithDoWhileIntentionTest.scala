@@ -8,10 +8,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * User: Nikolay.Tropin
   * Date: 4/17/13
   */
-class ReplaceWhileWithDoWhileIntentionTest extends ScalaIntentionTestBase {
+class ReplaceWhileWithDoWhileIntentionTest extends ScalaIntentionTestBase
   def familyName: String = ReplaceWhileWithDoWhileIntention.familyName
 
-  def testReplaceWhile() {
+  def testReplaceWhile()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -37,9 +37,8 @@ class ReplaceWhileWithDoWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceWhile2() {
+  def testReplaceWhile2()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -65,9 +64,8 @@ class ReplaceWhileWithDoWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
 
-  def testReplaceWhile3() {
+  def testReplaceWhile3()
     val text = """
         |class X {
         |  val flag: Boolean
@@ -89,5 +87,3 @@ class ReplaceWhileWithDoWhileIntentionTest extends ScalaIntentionTestBase {
         |}
       """
     doTest(text, resultText)
-  }
-}

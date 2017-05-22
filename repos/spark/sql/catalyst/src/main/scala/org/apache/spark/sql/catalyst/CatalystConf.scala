@@ -19,7 +19,7 @@ package org.apache.spark.sql.catalyst
 
 import org.apache.spark.sql.catalyst.analysis._
 
-private[spark] trait CatalystConf {
+private[spark] trait CatalystConf
   def caseSensitiveAnalysis: Boolean
 
   def orderByOrdinal: Boolean
@@ -28,27 +28,21 @@ private[spark] trait CatalystConf {
     * Returns the [[Resolver]] for the current configuration, which can be used to determin if two
     * identifiers are equal.
     */
-  def resolver: Resolver = {
-    if (caseSensitiveAnalysis) {
+  def resolver: Resolver =
+    if (caseSensitiveAnalysis)
       caseSensitiveResolution
-    } else {
+    else
       caseInsensitiveResolution
-    }
-  }
-}
 
 /**
   * A trivial conf that is empty.  Used for testing when all
   * relations are already filled in and the analyser needs only to resolve attribute references.
   */
-object EmptyConf extends CatalystConf {
-  override def caseSensitiveAnalysis: Boolean = {
+object EmptyConf extends CatalystConf
+  override def caseSensitiveAnalysis: Boolean =
     throw new UnsupportedOperationException
-  }
-  override def orderByOrdinal: Boolean = {
+  override def orderByOrdinal: Boolean =
     throw new UnsupportedOperationException
-  }
-}
 
 /** A CatalystConf that can be used for local testing. */
 case class SimpleCatalystConf(

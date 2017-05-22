@@ -7,7 +7,7 @@ import spire.std.int._
 import org.scalatest.FunSuite
 import org.scalatest.prop.Checkers
 
-trait SelectTest extends FunSuite /* with Checkers */ {
+trait SelectTest extends FunSuite /* with Checkers */
   def selector: Select
 
   final def select[@sp A : Order : ClassTag](data: Array[A], k: Int) =
@@ -16,18 +16,16 @@ trait SelectTest extends FunSuite /* with Checkers */ {
   def shuffle[A : ClassTag](as: Array[A]): Array[A] =
     scala.util.Random.shuffle(as.toList).toArray
 
-  test("selection in 0-length array") {
+  test("selection in 0-length array")
     // Shouldn't throw an exception.
     select(new Array[Int](0), 0)
-  }
 
-  test("select in 1-length array") {
+  test("select in 1-length array")
     val as = Array(1)
     select(as, 0)
     assert(as(0) === 1)
-  }
 
-  test("select from multiple equal elements") {
+  test("select from multiple equal elements")
     val as = Array(0, 0, 1, 1, 2, 2)
     select(as, 0); assert(as(0) === 0)
     select(as, 1); assert(as(1) === 0)
@@ -35,30 +33,22 @@ trait SelectTest extends FunSuite /* with Checkers */ {
     select(as, 3); assert(as(3) === 1)
     select(as, 4); assert(as(4) === 2)
     select(as, 5); assert(as(5) === 2)
-  }
 
-  test("arbitrary selection") {
-    (1 to 10) foreach { len =>
+  test("arbitrary selection")
+    (1 to 10) foreach  len =>
       val as = Array.range(0, len)
 
-      (0 until len) foreach { i =>
-        (1 to 5) foreach { _ =>
+      (0 until len) foreach  i =>
+        (1 to 5) foreach  _ =>
           val bs = shuffle(as)
           val orig = bs.clone()
           select(bs, i)
           assert(bs(i) === i,
                  "Select %d on %s failed." format
                  (i, orig.mkString("[ ", ", ", " ]")))
-        }
-      }
-    }
-  }
-}
 
-class LinearSelectTest extends SelectTest {
+class LinearSelectTest extends SelectTest
   val selector = LinearSelect
-}
 
-class QuickSelectTest extends SelectTest {
+class QuickSelectTest extends SelectTest
   val selector = QuickSelect
-}

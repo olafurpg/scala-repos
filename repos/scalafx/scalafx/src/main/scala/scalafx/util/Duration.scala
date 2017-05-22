@@ -34,18 +34,17 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.util.Duration]].
   */
-object Duration {
+object Duration
   implicit def sfxDuration2jfx(d: Duration): jfxu.Duration =
     if (d != null) d.delegate else null
 
   def apply(millis: Double) = new Duration(millis)
 
-  private[util] class DurationHelper(d: Double) {
+  private[util] class DurationHelper(d: Double)
     def ms = apply(d)
     def s = new Duration(jfxu.Duration.seconds(d))
     def m = new Duration(jfxu.Duration.minutes(d))
     def h = new Duration(jfxu.Duration.hours(d))
-  }
 
   def Indefinite = new Duration(jfxu.Duration.INDEFINITE)
   @deprecated("Use Indefinite; INDEFINITE will be removed in a future release",
@@ -65,7 +64,6 @@ object Duration {
   @deprecated(
       "Use Zero; ZERO will be removed in a future release", "8.0.60-R10")
   def ZERO = Zero
-}
 
 /**
   * Wraps a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/util/Duration.html $D]].
@@ -76,7 +74,7 @@ object Duration {
   * @define D `Duration`
   */
 class Duration(override val delegate: jfxu.Duration)
-    extends SFXDelegate[jfxu.Duration] with Ordered[Duration] {
+    extends SFXDelegate[jfxu.Duration] with Ordered[Duration]
 
   /**
     * The constructor of $D
@@ -109,4 +107,3 @@ class Duration(override val delegate: jfxu.Duration)
   def =!=(d: jfxu.Duration) = !delegate.equals(d)
 
   def unary_-() = new Duration(delegate.negate())
-}

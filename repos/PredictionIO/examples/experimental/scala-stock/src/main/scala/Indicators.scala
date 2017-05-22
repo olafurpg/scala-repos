@@ -24,7 +24,7 @@ import nak.regress.LinearRegression
   * for further explanation (found in the README.md file).
   */
 @SerialVersionUID(100L)
-abstract class BaseIndicator extends Serializable {
+abstract class BaseIndicator extends Serializable
 
   /** Calculates training series for a particular stock.
     *
@@ -49,7 +49,6 @@ abstract class BaseIndicator extends Serializable {
     * @return the window size
     */
   def getMinWindowSize(): Int
-}
 
 /** Indicator that implements a relative strength index formula
   *
@@ -57,7 +56,7 @@ abstract class BaseIndicator extends Serializable {
   * @param period number of days to use for each of the 14 periods
   *         that are used in the RSI calculation
   */
-class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
+class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator
 
   private def getRet(dailyReturn: Series[DateTime, Double]) =
     (dailyReturn - dailyReturn.shift(1)).fillNA(_ => 0.0)
@@ -65,7 +64,7 @@ class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
   def getMinWindowSize(): Int = rsiPeriod + 1
 
   private def calcRS(
-      logPrice: Series[DateTime, Double]): Series[DateTime, Double] = {
+      logPrice: Series[DateTime, Double]): Series[DateTime, Double] =
     //Positive and Negative Vecs
     val posSeries =
       logPrice.mapValues[Double]((x: Double) => if (x > 0) x else 0)
@@ -80,24 +79,20 @@ class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
 
     val rsSeries = avgPosSeries / avgNegSeries
     rsSeries
-  }
 
   // Computes RSI of price data over the defined training window time frame
   def getTraining(
-      logPrice: Series[DateTime, Double]): Series[DateTime, Double] = {
+      logPrice: Series[DateTime, Double]): Series[DateTime, Double] =
     val rsSeries = calcRS(getRet(logPrice))
     val rsiSeries =
       rsSeries.mapValues[Double]((x: Double) => 100 - (100 / (1 + x)))
 
     // Fill in first 14 days offset with 50 to maintain results
     rsiSeries.reindex(logPrice.rowIx).fillNA(_ => 50.0)
-  }
 
   // Computes the RSI for the most recent time frame, returns single double
-  def getOne(logPrice: Series[DateTime, Double]): Double = {
+  def getOne(logPrice: Series[DateTime, Double]): Double =
     getTraining(logPrice).last
-  }
-}
 
 /** Indicator that calcuate differences of closing prices
   *
@@ -105,7 +100,7 @@ class RSIIndicator(rsiPeriod: Int = 14) extends BaseIndicator {
   * @param period number of days between any 2 closing prices to consider for 
   *          calculating a return
   */
-class ShiftsIndicator(period: Int) extends BaseIndicator {
+class ShiftsIndicator(period: Int) extends BaseIndicator
 
   private def getRet(logPrice: Series[DateTime, Double], frame: Int = period) =
     (logPrice - logPrice.shift(frame)).fillNA(_ => 0.0)
@@ -113,11 +108,8 @@ class ShiftsIndicator(period: Int) extends BaseIndicator {
   def getMinWindowSize(): Int = period + 1
 
   def getTraining(
-      logPrice: Series[DateTime, Double]): Series[DateTime, Double] = {
+      logPrice: Series[DateTime, Double]): Series[DateTime, Double] =
     getRet(logPrice)
-  }
 
-  def getOne(logPrice: Series[DateTime, Double]): Double = {
+  def getOne(logPrice: Series[DateTime, Double]): Double =
     getRet(logPrice).last
-  }
-}

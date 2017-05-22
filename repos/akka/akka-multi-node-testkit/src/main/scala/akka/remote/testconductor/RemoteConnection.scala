@@ -19,42 +19,38 @@ import org.jboss.netty.buffer.ChannelBuffer
 /**
   * INTERNAL API.
   */
-private[akka] class ProtobufEncoder extends OneToOneEncoder {
+private[akka] class ProtobufEncoder extends OneToOneEncoder
   override def encode(
       ctx: ChannelHandlerContext, ch: Channel, msg: AnyRef): AnyRef =
-    msg match {
+    msg match
       case m: Message ⇒
         val bytes = m.toByteArray()
         ctx.getChannel.getConfig.getBufferFactory
           .getBuffer(bytes, 0, bytes.length)
       case other ⇒ other
-    }
-}
 
 /**
   * INTERNAL API.
   */
 private[akka] class ProtobufDecoder(prototype: Message)
-    extends OneToOneDecoder {
+    extends OneToOneDecoder
   override def decode(
       ctx: ChannelHandlerContext, ch: Channel, obj: AnyRef): AnyRef =
-    obj match {
+    obj match
       case buf: ChannelBuffer ⇒
         val len = buf.readableBytes()
         val bytes = new Array[Byte](len)
         buf.getBytes(buf.readerIndex, bytes, 0, len)
         prototype.getParserForType.parseFrom(bytes)
       case other ⇒ other
-    }
-}
 
 /**
   * INTERNAL API.
   */
 private[akka] class TestConductorPipelineFactory(
     handler: ChannelUpstreamHandler)
-    extends ChannelPipelineFactory {
-  def getPipeline: ChannelPipeline = {
+    extends ChannelPipelineFactory
+  def getPipeline: ChannelPipeline =
     val encap = List(new LengthFieldPrepender(4),
                      new LengthFieldBasedFrameDecoder(10000, 0, 4, 0, 4))
     val proto = List(
@@ -62,11 +58,8 @@ private[akka] class TestConductorPipelineFactory(
         new ProtobufDecoder(TestConductorProtocol.Wrapper.getDefaultInstance))
     val msg = List(new MsgEncoder, new MsgDecoder)
     (encap ::: proto ::: msg ::: handler :: Nil)
-      .foldLeft(new DefaultChannelPipeline) { (pipe, handler) ⇒
+      .foldLeft(new DefaultChannelPipeline)  (pipe, handler) ⇒
       pipe.addLast(Logging.simpleName(handler.getClass), handler); pipe
-    }
-  }
-}
 
 /**
   * INTERNAL API.
@@ -86,12 +79,12 @@ private[akka] case object Server extends Role
 /**
   * INTERNAL API.
   */
-private[akka] object RemoteConnection {
+private[akka] object RemoteConnection
   def apply(role: Role,
             sockaddr: InetSocketAddress,
             poolSize: Int,
-            handler: ChannelUpstreamHandler): Channel = {
-    role match {
+            handler: ChannelUpstreamHandler): Channel =
+    role match
       case Client ⇒
         val socketfactory = new NioClientSocketChannelFactory(
             Executors.newCachedThreadPool,
@@ -111,15 +104,11 @@ private[akka] object RemoteConnection {
         bootstrap.setOption("reuseAddress", !Helpers.isWindows)
         bootstrap.setOption("child.tcpNoDelay", true)
         bootstrap.bind(sockaddr)
-    }
-  }
 
-  def getAddrString(channel: Channel) = channel.getRemoteAddress match {
+  def getAddrString(channel: Channel) = channel.getRemoteAddress match
     case i: InetSocketAddress ⇒ i.toString
     case _ ⇒ "[unknown]"
-  }
 
   def shutdown(channel: Channel) =
     try channel.close() finally try channel.getFactory.shutdown() finally channel.getFactory
       .releaseExternalResources()
-}

@@ -25,7 +25,7 @@ class DeploymentManager(appRepository: AppRepository,
                         storage: StorageProvider,
                         healthCheckManager: HealthCheckManager,
                         eventBus: EventStream)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import context.dispatcher
   import mesosphere.marathon.upgrade.DeploymentManager._
 
@@ -34,33 +34,30 @@ class DeploymentManager(appRepository: AppRepository,
   val deploymentStatus: mutable.Map[String, DeploymentStepInfo] =
     mutable.Map.empty[String, DeploymentStepInfo]
 
-  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy() {
+  override def supervisorStrategy: SupervisorStrategy = OneForOneStrategy()
     case NonFatal(e) => Stop
-  }
 
   //TODO: fix style issue and enable this scalastyle check
   //scalastyle:off cyclomatic.complexity method.length
-  def receive: Receive = {
+  def receive: Receive =
     case CancelConflictingDeployments(plan) =>
-      val conflictingDeployments = for {
+      val conflictingDeployments = for
         info <- runningDeployments.values if info.plan.isAffectedBy(plan)
-      } yield info
+      yield info
 
-      val cancellations = conflictingDeployments.map { info =>
+      val cancellations = conflictingDeployments.map  info =>
         stopActor(
             info.ref,
             new DeploymentCanceledException("The upgrade has been cancelled"))
-      }
 
-      Future.sequence(cancellations) onComplete {
+      Future.sequence(cancellations) onComplete
         case _ =>
           log.info(
               s"Conflicting deployments for deployment ${plan.id} have been canceled")
           scheduler.schedulerActor ! ConflictingDeploymentsCanceled(
-              plan.id, if (conflictingDeployments.nonEmpty) {
+              plan.id, if (conflictingDeployments.nonEmpty)
             conflictingDeployments.map(_.plan).to[Seq]
-          } else Seq(plan))
-      }
+          else Seq(plan))
 
     case CancelAllDeployments =>
       for ((_, DeploymentInfo(ref, _)) <- runningDeployments) ref ! Cancel(
@@ -71,7 +68,7 @@ class DeploymentManager(appRepository: AppRepository,
     case CancelDeployment(id) =>
       val origSender = sender()
 
-      runningDeployments.get(id) match {
+      runningDeployments.get(id) match
         case Some(info) =>
           info.ref ! Cancel(new DeploymentCanceledException(
                   "The upgrade has been cancelled"))
@@ -81,7 +78,6 @@ class DeploymentManager(appRepository: AppRepository,
                   id, Group.empty, Group.empty, Nil, Timestamp.now()),
               new DeploymentCanceledException(
                   "The upgrade has been cancelled"))
-      }
 
     case msg @ DeploymentFinished(plan) =>
       log.info(s"Removing ${plan.id} from list of running deployments")
@@ -116,16 +112,13 @@ class DeploymentManager(appRepository: AppRepository,
 
     case RetrieveRunningDeployments =>
       sender() ! RunningDeployments(deploymentStatus.values.to[Seq])
-  }
 
-  def stopActor(ref: ActorRef, reason: Throwable): Future[Boolean] = {
+  def stopActor(ref: ActorRef, reason: Throwable): Future[Boolean] =
     val promise = Promise[Boolean]()
     context.actorOf(Props(classOf[StopActor], ref, promise, reason))
     promise.future
-  }
-}
 
-object DeploymentManager {
+object DeploymentManager
   final case class PerformDeployment(
       driver: SchedulerDriver, plan: DeploymentPlan)
   final case class CancelDeployment(id: String)
@@ -141,4 +134,3 @@ object DeploymentManager {
       id: String, deployments: Seq[DeploymentPlan])
 
   final case class DeploymentInfo(ref: ActorRef, plan: DeploymentPlan)
-}

@@ -9,60 +9,51 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
-class ActivitySourceTest extends FunSuite with BeforeAndAfter {
+class ActivitySourceTest extends FunSuite with BeforeAndAfter
 
-  val ok = new ActivitySource[String] {
+  val ok = new ActivitySource[String]
     def get(varName: String) = Activity.value(varName)
-  }
 
-  val failed = new ActivitySource[Nothing] {
+  val failed = new ActivitySource[Nothing]
     def get(varName: String) = Activity.exception(new Exception(varName))
-  }
 
   val tempFile = Random.alphanumeric.take(5).mkString
 
-  def writeToTempFile(s: String): Unit = {
+  def writeToTempFile(s: String): Unit =
     val printer = new java.io.PrintWriter(new File(tempFile))
-    try {
+    try
       printer.print(s)
-    } finally {
+    finally
       printer.close()
-    }
-  }
 
-  def bufToString(buf: Buf): String = buf match {
+  def bufToString(buf: Buf): String = buf match
     case Buf.Utf8(s) => s
     case _ => ""
-  }
 
-  before {
+  before
     writeToTempFile("foo bar")
-  }
 
-  after {
+  after
     new File(tempFile).delete()
-  }
 
-  test("ActivitySource.orElse") {
+  test("ActivitySource.orElse")
     val a = failed.orElse(ok)
     val b = ok.orElse(failed)
 
     assert("42" == a.get("42").sample())
     assert("42" == b.get("42").sample())
-  }
 
-  test("CachingActivitySource") {
-    val cache = new CachingActivitySource[String](new ActivitySource[String] {
+  test("CachingActivitySource")
+    val cache = new CachingActivitySource[String](new ActivitySource[String]
       def get(varName: String) =
         Activity.value(Random.alphanumeric.take(10).mkString)
-    })
+    )
 
     val a = cache.get("a")
     assert(a == cache.get("a"))
-  }
 
-  test("FilePollingActivitySource") {
-    Time.withCurrentTimeFrozen { timeControl =>
+  test("FilePollingActivitySource")
+    Time.withCurrentTimeFrozen  timeControl =>
       import com.twitter.conversions.time._
       implicit val timer = new MockTimer
       val file =
@@ -71,12 +62,11 @@ class ActivitySourceTest extends FunSuite with BeforeAndAfter {
 
       var content: Option[String] = None
 
-      val listen = buf.run.changes.respond {
+      val listen = buf.run.changes.respond
         case Activity.Ok(b) =>
           content = Some(bufToString(b))
         case _ =>
           content = None
-      }
 
       timeControl.advance(2.microsecond)
       timer.tick()
@@ -89,19 +79,14 @@ class ActivitySourceTest extends FunSuite with BeforeAndAfter {
       assert(content == Some("foo baz"))
 
       listen.close()
-    }
-  }
 
-  test("ClassLoaderActivitySource") {
-    val classLoader = new ClassLoader() {
+  test("ClassLoaderActivitySource")
+    val classLoader = new ClassLoader()
       override def getResourceAsStream(name: String) =
         new ByteArrayInputStream(name.getBytes("UTF-8"))
-    }
 
     val loader =
       new ClassLoaderActivitySource(classLoader, FuturePool.immediatePool)
     val bufAct = loader.get("bar baz")
 
     assert("bar baz" == bufToString(bufAct.sample()))
-  }
-}

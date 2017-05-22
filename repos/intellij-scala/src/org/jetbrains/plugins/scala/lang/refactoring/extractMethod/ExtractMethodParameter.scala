@@ -14,23 +14,20 @@ case class ExtractMethodParameter(oldName: String,
                                   newName: String,
                                   fromElement: ScTypedDefinition,
                                   tp: ScType,
-                                  passAsParameter: Boolean) {
+                                  passAsParameter: Boolean)
 
-  val isEmptyParamFunction = fromElement match {
+  val isEmptyParamFunction = fromElement match
     case fun: ScFunction => fun.parameters.length == 0
     case _ => false
-  }
-  val isCallByNameParameter = ScalaPsiUtil.nameContext(fromElement) match {
+  val isCallByNameParameter = ScalaPsiUtil.nameContext(fromElement) match
     case v: ScValue if v.hasModifierProperty("lazy") => true
     case p: ScParameter if p.isCallByNameParameter => true
     case _ => false
-  }
   val isFunction = fromElement.isInstanceOf[ScFunction]
-}
 
-object ExtractMethodParameter {
+object ExtractMethodParameter
 
-  def from(variableData: ScalaVariableData): ExtractMethodParameter = {
+  def from(variableData: ScalaVariableData): ExtractMethodParameter =
     val element = variableData.element
     ExtractMethodParameter(
         oldName = element.name,
@@ -39,5 +36,3 @@ object ExtractMethodParameter {
         tp = variableData.scType,
         passAsParameter = variableData.passAsParameter
     )
-  }
-}

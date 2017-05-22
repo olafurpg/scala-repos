@@ -26,7 +26,7 @@ package scala
   * }
   *  }}}
   */
-trait Function0[@specialized(Specializable.Primitives) +R] extends AnyRef {
+trait Function0[@specialized(Specializable.Primitives) +R] extends AnyRef
   self =>
 
   /** Apply the body of this function to the arguments.
@@ -35,4 +35,3 @@ trait Function0[@specialized(Specializable.Primitives) +R] extends AnyRef {
   def apply(): R
 
   override def toString() = "<function0>"
-}

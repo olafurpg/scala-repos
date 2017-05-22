@@ -13,7 +13,7 @@ import akka.http.scaladsl.marshalling._
 import akka.http.scaladsl.model._
 import MediaTypes._
 
-trait ScalaXmlSupport {
+trait ScalaXmlSupport
   implicit def defaultNodeSeqMarshaller: ToEntityMarshaller[NodeSeq] =
     Marshaller.oneOf(
         ScalaXmlSupport.nodeSeqMediaTypes.map(nodeSeqMarshaller): _*)
@@ -29,13 +29,12 @@ trait ScalaXmlSupport {
       ranges: ContentTypeRange*): FromEntityUnmarshaller[NodeSeq] =
     Unmarshaller.byteArrayUnmarshaller
       .forContentTypes(ranges: _*)
-      .mapWithCharset { (bytes, charset) ⇒
-        if (bytes.length > 0) {
+      .mapWithCharset  (bytes, charset) ⇒
+        if (bytes.length > 0)
           val reader = new InputStreamReader(
               new ByteArrayInputStream(bytes), charset.nioCharset)
           XML.withSAXParser(createSAXParser()).load(reader): NodeSeq // blocking call! Ideally we'd have a `loadToFuture`
-        } else NodeSeq.Empty
-      }
+        else NodeSeq.Empty
 
   /**
     * Provides a SAXParser for the NodeSeqUnmarshaller to use. Override to provide a custom SAXParser implementation.
@@ -43,15 +42,14 @@ trait ScalaXmlSupport {
     */
   protected def createSAXParser(): SAXParser =
     ScalaXmlSupport.createSaferSAXParser()
-}
-object ScalaXmlSupport extends ScalaXmlSupport {
+object ScalaXmlSupport extends ScalaXmlSupport
   val nodeSeqMediaTypes: immutable.Seq[MediaType.NonBinary] = List(
       `text/xml`, `application/xml`, `text/html`, `application/xhtml+xml`)
   val nodeSeqContentTypeRanges: immutable.Seq[ContentTypeRange] =
     nodeSeqMediaTypes.map(ContentTypeRange(_))
 
   /** Creates a safer SAXParser. */
-  def createSaferSAXParser(): SAXParser = {
+  def createSaferSAXParser(): SAXParser =
     val factory = SAXParserFactory.newInstance()
     import com.sun.org.apache.xerces.internal.impl.Constants
     import javax.xml.XMLConstants
@@ -67,12 +65,9 @@ object ScalaXmlSupport extends ScalaXmlSupport {
                        true)
     factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true)
     val parser = factory.newSAXParser()
-    try {
+    try
       parser.setProperty(
           "http://apache.org/xml/properties/locale", java.util.Locale.ROOT)
-    } catch {
+    catch
       case e: org.xml.sax.SAXNotRecognizedException ⇒ // property is not needed
-    }
     parser
-  }
-}

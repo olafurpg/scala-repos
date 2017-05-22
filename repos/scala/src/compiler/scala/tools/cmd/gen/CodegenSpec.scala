@@ -8,7 +8,7 @@ package gen
 
 import FromString.ExistingDir
 
-trait CodegenSpec extends Spec with Meta.StdOpts with Interpolation {
+trait CodegenSpec extends Spec with Meta.StdOpts with Interpolation
   def referenceSpec = CodegenSpec
   def programInfo = Spec.Info("codegen", "", "scala.tools.cmd.gen.Codegen")
 
@@ -17,10 +17,8 @@ trait CodegenSpec extends Spec with Meta.StdOpts with Interpolation {
   val outDir = "out" / "directory for generated files" --^ ExistingDir
   val anyvals = "anyvals" / "generate sources for AnyVal types" --?
   val genall = "all" / "generate sources for everything" --?
-}
 
-object CodegenSpec extends CodegenSpec with Reference {
+object CodegenSpec extends CodegenSpec with Reference
   type ThisCommandLine = CommandLine
   def creator(args: List[String]): ThisCommandLine =
     new CommandLine(CodegenSpec, args)
-}

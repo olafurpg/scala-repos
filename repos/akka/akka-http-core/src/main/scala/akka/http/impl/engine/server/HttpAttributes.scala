@@ -13,7 +13,7 @@ import akka.stream.Attributes
   * Internally used attributes set in the HTTP pipeline.
   * May potentially be opened up in the future.
   */
-private[akka] object HttpAttributes {
+private[akka] object HttpAttributes
   import Attributes._
 
   private[akka] final case class RemoteAddress(
@@ -22,4 +22,3 @@ private[akka] object HttpAttributes {
 
   private[akka] def remoteAddress(address: Option[InetSocketAddress]) =
     Attributes(RemoteAddress(address))
-}

@@ -30,25 +30,24 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                    Seq.empty,
                                    kinds,
                                    isShapeResolve = shapeResolve,
-                                   enableTupling = true) {
-  override def execute(element: PsiElement, state: ResolveState): Boolean = {
+                                   enableTupling = true)
+  override def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
     val fromType = getFromType(state)
-    val subst = fromType match {
+    val subst = fromType match
       case Some(tp) => getSubst(state).followUpdateThisType(tp)
       case _ => getSubst(state)
-    }
 
     def nameShadow0: Option[String] = Option(state.get(ResolverEnv.nameKey))
-    if (nameAndKindMatch(named, state)) {
+    if (nameAndKindMatch(named, state))
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
-      named match {
+      named match
         case clazz: PsiClass =>
           val constructors: Array[PsiMethod] =
             if (accessibility) clazz.constructors.filter(isAccessible(_, ref))
             else clazz.constructors
-          if (constructors.isEmpty) {
+          if (constructors.isEmpty)
             //this is for Traits for example. They can be in constructor position.
             // But they haven't constructors.
             addResult(
@@ -59,7 +58,7 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                        boundClass = getBoundClass(state),
                                        fromType = fromType,
                                        isAccessible = accessible))
-          } else {
+          else
             addResults(
                 constructors.toSeq.map(
                     constr =>
@@ -73,7 +72,6 @@ class ConstructorResolveProcessor(constr: PsiElement,
                           fromType = fromType,
                           isAccessible = isAccessible(constr, ref) &&
                             accessible)))
-          }
         case ta: ScTypeAliasDeclaration =>
           addResult(
               new ScalaResolveResult(ta,
@@ -94,18 +92,18 @@ class ConstructorResolveProcessor(constr: PsiElement,
               isAccessible = true)
           val tp = ta
             .aliasedType(TypingContext.empty)
-            .getOrElse({
+            .getOrElse(
               addResult(r)
               return true
-            })
-          ScType.extractClassType(tp) match {
+            )
+          ScType.extractClassType(tp) match
             case Some((clazz, s)) =>
               val constructors: Array[PsiMethod] =
                 if (accessibility)
                   clazz.constructors.filter(isAccessible(_, ref))
                 else clazz.constructors
               if (constructors.isEmpty) addResult(r)
-              else {
+              else
                 addResults(
                     constructors.toSeq.map(
                         constr =>
@@ -119,21 +117,16 @@ class ConstructorResolveProcessor(constr: PsiElement,
                               fromType = fromType,
                               isAccessible = isAccessible(constr, ref) &&
                                 accessible)))
-              }
             case _ =>
               addResult(r)
-          }
         case _ =>
-      }
-    }
     true
-  }
 
-  override def candidatesS: Set[ScalaResolveResult] = {
-    if (!allConstructors) {
+  override def candidatesS: Set[ScalaResolveResult] =
+    if (!allConstructors)
       val superCandidates = super.candidatesS
       if (superCandidates.size <= 1) superCandidates
-      else {
+      else
         superCandidates.map(
             constr =>
               new ScalaResolveResult(constr.getActualElement,
@@ -142,9 +135,5 @@ class ConstructorResolveProcessor(constr: PsiElement,
                                      boundClass = constr.boundClass,
                                      fromType = constr.fromType,
                                      isAccessible = constr.isAccessible))
-      }
-    } else {
+    else
       super.candidatesS
-    }
-  }
-}

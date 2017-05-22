@@ -9,8 +9,8 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.server.directives.{DebuggingDirectives, LogEntry, LoggingMagnet}
 import docs.http.scaladsl.server.RoutingSpec
 
-class DebuggingDirectivesExamplesSpec extends RoutingSpec {
-  "logRequest-0" in {
+class DebuggingDirectivesExamplesSpec extends RoutingSpec
+  "logRequest-0" in
     // different possibilities of using logRequest
 
     // The first alternatives use an implicitly available LoggingContext for logging
@@ -35,11 +35,9 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
       DebuggingDirectives.logRequest(LoggingMagnet(_ => printRequestMethod))
 
     // tests:
-    Get("/") ~> logRequestPrintln(complete("logged")) ~> check {
+    Get("/") ~> logRequestPrintln(complete("logged")) ~> check
       responseAs[String] shouldEqual "logged"
-    }
-  }
-  "logRequestResult" in {
+  "logRequestResult" in
     // different possibilities of using logRequestResponse
 
     // The first alternatives use an implicitly available LoggingContext for logging
@@ -51,11 +49,10 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
 
     // logs just the request method and response status at info level
     def requestMethodAndResponseStatusAsInfo(
-        req: HttpRequest): Any => Option[LogEntry] = {
+        req: HttpRequest): Any => Option[LogEntry] =
       case res: HttpResponse =>
         Some(LogEntry(req.method + ":" + res.status, Logging.InfoLevel))
       case _ => None // other kind of responses
-    }
     DebuggingDirectives.logRequestResult(
         requestMethodAndResponseStatusAsInfo _)
 
@@ -68,11 +65,9 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
         LoggingMagnet(_ => printRequestMethodAndResponseStatus))
 
     // tests:
-    Get("/") ~> logRequestResultPrintln(complete("logged")) ~> check {
+    Get("/") ~> logRequestResultPrintln(complete("logged")) ~> check
       responseAs[String] shouldEqual "logged"
-    }
-  }
-  "logResult" in {
+  "logResult" in
     // different possibilities of using logResponse
 
     // The first alternatives use an implicitly available LoggingContext for logging
@@ -83,10 +78,9 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
     DebuggingDirectives.logResult(("get-user", Logging.InfoLevel))
 
     // logs just the response status at debug level
-    def responseStatus(res: Any): String = res match {
+    def responseStatus(res: Any): String = res match
       case x: HttpResponse => x.status.toString
       case _ => "unknown response part"
-    }
     DebuggingDirectives.logResult(responseStatus _)
 
     // logs just the response status at info level
@@ -100,8 +94,5 @@ class DebuggingDirectivesExamplesSpec extends RoutingSpec {
       DebuggingDirectives.logResult(LoggingMagnet(_ => printResponseStatus))
 
     // tests:
-    Get("/") ~> logResultPrintln(complete("logged")) ~> check {
+    Get("/") ~> logResultPrintln(complete("logged")) ~> check
       responseAs[String] shouldEqual "logged"
-    }
-  }
-}

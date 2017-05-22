@@ -1,6 +1,6 @@
-class Foo[@specialized A] {
+class Foo[@specialized A]
   def test(x: A) =
-    println(x match {
+    println(x match
       case _: Boolean => "bool"
       case _: Byte => "byte"
       case _: Short => "short"
@@ -10,12 +10,11 @@ class Foo[@specialized A] {
       case d: Double => "double"
       case e: Float => "float"
       case _ => "default"
-    })
-}
+    )
 
-object Test {
+object Test
   def test[@specialized A](x: A) =
-    println(x match {
+    println(x match
       case _: Boolean => "bool"
       case _: Byte => "byte"
       case _: Short => "short"
@@ -25,9 +24,9 @@ object Test {
       case d: Double => "double"
       case e: Float => "float"
       case _ => "default"
-    })
+    )
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     test(true)
     test(42.toByte)
     test(42.toShort)
@@ -50,5 +49,3 @@ object Test {
     (new Foo).test(new Object)
 
     println(runtime.BoxesRunTime.integerBoxCount)
-  }
-}

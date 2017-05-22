@@ -9,16 +9,15 @@ import org.scalatest.{Matchers, GivenWhenThen}
 import scala.concurrent.Future
 
 class DefaultInfoServiceTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
   import mesosphere.FutureTestSupport._
 
-  test("queryForAppId") {
+  test("queryForAppId")
     Given("a group repo with some apps")
     val f = new Fixture
     f.appRepo.currentVersion(app1.id) returns Future.successful(Some(app1))
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying for one App")
     val appInfo = f.infoService
@@ -29,21 +28,18 @@ class DefaultInfoServiceTest
     appInfo.map(_.app.id).toSet should be(Set(app1.id))
 
     verify(f.appRepo, times(1)).currentVersion(app1.id)
-    for (app <- Set(app1)) {
+    for (app <- Set(app1))
       verify(f.baseData, times(1)).appInfoFuture(app, Set.empty)
-    }
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("queryForAppId passes embed options along") {
+  test("queryForAppId passes embed options along")
     Given("a group repo with some apps")
     val f = new Fixture
     f.appRepo.currentVersion(app1.id) returns Future.successful(Some(app1))
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying for one App")
     val embed: Set[AppInfo.Embed] =
@@ -53,19 +49,16 @@ class DefaultInfoServiceTest
       .futureValue
 
     Then("we get the baseData calls with the correct embed info")
-    for (app <- Set(app1)) {
+    for (app <- Set(app1))
       verify(f.baseData, times(1)).appInfoFuture(app, embed)
-    }
-  }
 
-  test("queryAll") {
+  test("queryAll")
     Given("an app repo with some apps")
     val f = new Fixture
     val someGroup = Group.empty.copy(apps = someApps)
     f.groupManager.rootGroup() returns Future.successful(someGroup)
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying all apps")
     val appInfos = f.infoService
@@ -76,22 +69,19 @@ class DefaultInfoServiceTest
     appInfos.map(_.app.id).toSet should be(someApps.map(_.id))
 
     verify(f.groupManager, times(1)).rootGroup()
-    for (app <- someApps) {
+    for (app <- someApps)
       verify(f.baseData, times(1)).appInfoFuture(app, Set.empty)
-    }
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("queryAll passes embed options along") {
+  test("queryAll passes embed options along")
     Given("an app repo with some apps")
     val f = new Fixture
     val someGroup = Group.empty.copy(apps = someApps)
     f.groupManager.rootGroup() returns Future.successful(someGroup)
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying all apps")
     val embed: Set[AppInfo.Embed] =
@@ -101,12 +91,10 @@ class DefaultInfoServiceTest
       .futureValue
 
     Then("we get the base data calls with the correct embed")
-    for (app <- someApps) {
+    for (app <- someApps)
       verify(f.baseData, times(1)).appInfoFuture(app, embed)
-    }
-  }
 
-  test("queryAll filters") {
+  test("queryAll filters")
     Given("an app repo with some apps")
     val f = new Fixture
     val someGroup = Group.empty.copy(apps = someApps)
@@ -124,16 +112,14 @@ class DefaultInfoServiceTest
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("queryForGroupId") {
+  test("queryForGroupId")
     Given("a group repo with some apps below the queried group id")
     val f = new Fixture
     f.groupManager.group(PathId("/nested")) returns Future.successful(
         someGroupWithNested.group(PathId("/nested")))
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying all apps in that group")
     val appInfos = f.infoService
@@ -144,22 +130,19 @@ class DefaultInfoServiceTest
     appInfos.map(_.app.id).toSet should be(someNestedApps.map(_.id))
 
     verify(f.groupManager, times(1)).group(PathId("/nested"))
-    for (app <- someNestedApps) {
+    for (app <- someNestedApps)
       verify(f.baseData, times(1)).appInfoFuture(app, Set.empty)
-    }
 
     And("no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("queryForGroupId passes embed infos along") {
+  test("queryForGroupId passes embed infos along")
     Given("a group repo with some apps below the queried group id")
     val f = new Fixture
     f.groupManager.group(PathId("/nested")) returns Future.successful(
         someGroupWithNested.group(PathId("/nested")))
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
 
     When("querying all apps in that group")
     val embed: Set[AppInfo.Embed] =
@@ -169,18 +152,15 @@ class DefaultInfoServiceTest
       .futureValue
 
     Then("baseData was called with the correct embed options")
-    for (app <- someNestedApps) {
+    for (app <- someNestedApps)
       verify(f.baseData, times(1)).appInfoFuture(app, embed)
-    }
-  }
 
-  test("query for extended group information") {
+  test("query for extended group information")
     Given("a group with apps")
     val f = new Fixture
     val group = someGroupWithNested
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
     f.groupManager.group(group.id) returns Future.successful(Some(group))
 
     When("querying extending group information")
@@ -211,22 +191,19 @@ class DefaultInfoServiceTest
     Then("The group info contains no apps nor groups")
     result3.futureValue.get.maybeGroups should be(empty)
     result3.futureValue.get.maybeApps should be(empty)
-  }
 
-  test("Selecting with Group Selector filters the result") {
+  test("Selecting with Group Selector filters the result")
     Given("a nested group with apps")
     val f = new Fixture
     val group = nestedGroup
-    f.baseData.appInfoFuture(any, any) answers { args =>
+    f.baseData.appInfoFuture(any, any) answers  args =>
       Future.successful(AppInfo(args.head.asInstanceOf[AppDefinition]))
-    }
     f.groupManager.group(group.id) returns Future.successful(Some(group))
-    val selector = new GroupSelector {
+    val selector = new GroupSelector
       override def matches(group: Group): Boolean =
         group.id.toString.startsWith("/visible")
       override def matches(app: AppDefinition): Boolean =
         app.id.toString.startsWith("/visible")
-    }
 
     When("querying extending group information with selector")
     val result = f.infoService.selectGroup(
@@ -240,9 +217,8 @@ class DefaultInfoServiceTest
     result.futureValue.get.maybeApps should be(defined)
     result.futureValue.get.transitiveApps.get should have size 2
     result.futureValue.get.transitiveGroups.get should have size 2
-  }
 
-  class Fixture {
+  class Fixture
     lazy val groupManager = mock[GroupManager]
     lazy val appRepo = mock[AppRepository]
     lazy val baseData = mock[AppInfoBaseData]
@@ -250,12 +226,10 @@ class DefaultInfoServiceTest
     lazy val infoService = new DefaultInfoService(
         groupManager, appRepo, newBaseData)
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(groupManager)
       noMoreInteractions(appRepo)
       noMoreInteractions(baseData)
-    }
-  }
 
   private val app1: AppDefinition = AppDefinition(PathId("/test1"))
   val someApps = Set(
@@ -298,4 +272,3 @@ class DefaultInfoServiceTest
                 Set(AppDefinition(PathId("/other/app1"))),
                 Set(Group(PathId("/other/group"),
                           Set(AppDefinition(PathId("/other/group/app1"))))))))
-}

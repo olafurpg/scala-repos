@@ -2,7 +2,7 @@ package scalaz.example
 
 import scalaz._
 
-object ArrowUsage extends App {
+object ArrowUsage extends App
 
   import Scalaz._
 
@@ -26,4 +26,3 @@ object ArrowUsage extends App {
 
   // Perform plus1 on a pair using the Function1 arrow
   (plus1.product apply (9, 99)) assert_=== (10, 100)
-}

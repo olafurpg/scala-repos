@@ -24,12 +24,12 @@ import akka.testkit.AkkaSpec
 class TcpSpec
     extends AkkaSpec(
         "akka.stream.materializer.subscription-timeout.timeout = 2s")
-    with TcpHelper {
+    with TcpHelper
   var demand = 0L
 
-  "Outgoing TCP stream" must {
+  "Outgoing TCP stream" must
 
-    "work in the happy case" in assertAllStagesStopped {
+    "work in the happy case" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
 
       val server = new Server()
@@ -50,9 +50,8 @@ class TcpSpec
       tcpReadProbe.close()
 
       server.close()
-    }
 
-    "be able to write a sequence of ByteStrings" in {
+    "be able to write a sequence of ByteStrings" in
       val server = new Server()
       val testInput = (0 to 255).map(ByteString(_))
       val expectedOutput =
@@ -66,9 +65,8 @@ class TcpSpec
       val serverConnection = server.waitAccept()
       serverConnection.read(256)
       serverConnection.waitRead() should be(expectedOutput)
-    }
 
-    "be able to read a sequence of ByteStrings" in {
+    "be able to read a sequence of ByteStrings" in
       val server = new Server()
       val testInput = (0 to 255).map(ByteString(_))
       val expectedOutput =
@@ -81,15 +79,13 @@ class TcpSpec
         .runFold(ByteString.empty)((acc, in) ⇒ acc ++ in)
       val serverConnection = server.waitAccept()
 
-      for (in ← testInput) {
+      for (in ← testInput)
         serverConnection.write(in)
-      }
 
       serverConnection.confirmedClose()
       Await.result(resultFuture, 3.seconds) should be(expectedOutput)
-    }
 
-    "work when client closes write, then remote closes write" in assertAllStagesStopped {
+    "work when client closes write, then remote closes write" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -121,9 +117,8 @@ class TcpSpec
 
       serverConnection.expectClosed(ConfirmedClosed)
       serverConnection.expectTerminated()
-    }
 
-    "work when remote closes write, then client closes write" in assertAllStagesStopped {
+    "work when remote closes write, then client closes write" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -153,9 +148,8 @@ class TcpSpec
       tcpWriteProbe.close()
       serverConnection.expectClosed(ConfirmedClosed)
       serverConnection.expectTerminated()
-    }
 
-    "work when client closes read, then client closes write" in assertAllStagesStopped {
+    "work when client closes read, then client closes write" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -184,14 +178,13 @@ class TcpSpec
       tcpWriteProbe.close()
 
       // Need a write on the server side to detect the close event
-      awaitAssert({
+      awaitAssert(
         serverConnection.write(testData)
         serverConnection.expectClosed(_.isErrorClosed, 500.millis)
-      }, max = 5.seconds)
+      , max = 5.seconds)
       serverConnection.expectTerminated()
-    }
 
-    "work when client closes write, then client closes read" in assertAllStagesStopped {
+    "work when client closes write, then client closes read" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -221,14 +214,13 @@ class TcpSpec
       tcpReadProbe.tcpReadSubscription.cancel()
 
       // Need a write on the server side to detect the close event
-      awaitAssert({
+      awaitAssert(
         serverConnection.write(testData)
         serverConnection.expectClosed(_.isErrorClosed, 500.millis)
-      }, max = 5.seconds)
+      , max = 5.seconds)
       serverConnection.expectTerminated()
-    }
 
-    "work when client closes read, then server closes write, then client closes write" in assertAllStagesStopped {
+    "work when client closes read, then server closes write, then client closes write" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -259,9 +251,8 @@ class TcpSpec
       tcpWriteProbe.close()
       serverConnection.expectClosed(ConfirmedClosed)
       serverConnection.expectTerminated()
-    }
 
-    "shut everything down if client signals error" in assertAllStagesStopped {
+    "shut everything down if client signals error" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -291,9 +282,8 @@ class TcpSpec
       tcpReadProbe.subscriberProbe.expectError()
       serverConnection.expectClosed(_.isErrorClosed)
       serverConnection.expectTerminated()
-    }
 
-    "shut everything down if client signals error after remote has closed write" in assertAllStagesStopped {
+    "shut everything down if client signals error after remote has closed write" in assertAllStagesStopped
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
 
@@ -324,9 +314,8 @@ class TcpSpec
           new IllegalStateException("test"))
       serverConnection.expectClosed(_.isErrorClosed)
       serverConnection.expectTerminated()
-    }
 
-    "shut down both streams when connection is aborted remotely" in assertAllStagesStopped {
+    "shut down both streams when connection is aborted remotely" in assertAllStagesStopped
       // Client gets a PeerClosed event and does not know that the write side is also closed
       val testData = ByteString(1, 2, 3, 4, 5)
       val server = new Server()
@@ -346,9 +335,8 @@ class TcpSpec
       tcpWriteProbe.tcpWriteSubscription.expectCancellation()
 
       serverConnection.expectTerminated()
-    }
 
-    "materialize correctly when used in multiple flows" in {
+    "materialize correctly when used in multiple flows" in
       val testData = ByteString(1, 2, 3, 4, 5)
 
       val server = new Server()
@@ -389,9 +377,8 @@ class TcpSpec
       tcpReadProbe1.close()
 
       server.close()
-    }
 
-    "properly full-close if requested" in assertAllStagesStopped {
+    "properly full-close if requested" in assertAllStagesStopped
       val serverAddress = temporaryServerAddress()
       val writeButIgnoreRead: Flow[ByteString, ByteString, NotUsed] =
         Flow.fromSinkAndSourceMat(
@@ -402,9 +389,9 @@ class TcpSpec
                                    .bind(serverAddress.getHostName,
                                          serverAddress.getPort,
                                          halfClose = false)
-                                   .toMat(Sink.foreach { conn ⇒
+                                   .toMat(Sink.foreach  conn ⇒
                                      conn.flow.join(writeButIgnoreRead).run()
-                                   })(Keep.left)
+                                   )(Keep.left)
                                    .run(),
                                  3.seconds)
 
@@ -419,18 +406,17 @@ class TcpSpec
 
       promise.success(None) // close client upstream, no more data
       binding.unbind()
-    }
 
-    "Echo should work even if server is in full close mode" in {
+    "Echo should work even if server is in full close mode" in
       val serverAddress = temporaryServerAddress()
 
       val binding = Await.result(Tcp()
                                    .bind(serverAddress.getHostName,
                                          serverAddress.getPort,
                                          halfClose = false)
-                                   .toMat(Sink.foreach { conn ⇒
+                                   .toMat(Sink.foreach  conn ⇒
                                      conn.flow.join(Flow[ByteString]).run()
-                                   })(Keep.left)
+                                   )(Keep.left)
                                    .run(),
                                  3.seconds)
 
@@ -441,9 +427,8 @@ class TcpSpec
       Await.result(result, 3.seconds) should ===(1000)
 
       binding.unbind()
-    }
 
-    "handle when connection actor terminates unexpectedly" in {
+    "handle when connection actor terminates unexpectedly" in
       val system2 = ActorSystem()
       import system2.dispatcher
       val mat2 = ActorMaterializer.create(system2)
@@ -466,17 +451,14 @@ class TcpSpec
 
       binding.map(_.unbind()).recover { case NonFatal(_) ⇒ () } foreach
       (_ ⇒ system2.shutdown())
-    }
-  }
 
-  "TCP listen stream" must {
+  "TCP listen stream" must
 
     // Reusing handler
-    val echoHandler = Sink.foreach[Tcp.IncomingConnection] {
+    val echoHandler = Sink.foreach[Tcp.IncomingConnection]
       _.flow.join(Flow[ByteString]).run()
-    }
 
-    "be able to implement echo" in {
+    "be able to implement echo" in
       val serverAddress = temporaryServerAddress()
       val (bindingFuture, echoServerFinish) = Tcp()
         .bind(serverAddress.getHostName, serverAddress.getPort) // TODO getHostString in Java7
@@ -496,9 +478,8 @@ class TcpSpec
       Await.result(resultFuture, 3.seconds) should be(expectedOutput)
       Await.result(binding.unbind(), 3.seconds)
       Await.result(echoServerFinish, 1.second)
-    }
 
-    "work with a chain of echoes" in {
+    "work with a chain of echoes" in
       val serverAddress = temporaryServerAddress()
       val (bindingFuture, echoServerFinish) = Tcp()
         .bind(serverAddress.getHostName, serverAddress.getPort) // TODO getHostString in Java7
@@ -524,13 +505,11 @@ class TcpSpec
       Await.result(resultFuture, 3.seconds) should be(expectedOutput)
       Await.result(binding.unbind(), 3.seconds)
       Await.result(echoServerFinish, 1.second)
-    }
 
-    "bind and unbind correctly" in EventFilter[BindException](occurrences = 2).intercept {
-      if (Helpers.isWindows) {
+    "bind and unbind correctly" in EventFilter[BindException](occurrences = 2).intercept
+      if (Helpers.isWindows)
         info("On Windows unbinding is not immediate")
         pending
-      }
       val address = temporaryServerAddress()
       val probe1 = TestSubscriber.manualProbe[Tcp.IncomingConnection]()
       val bind =
@@ -549,12 +528,10 @@ class TcpSpec
       val binding3F = bind.to(Sink.fromSubscriber(probe3)).run()
       probe3.expectSubscriptionAndError()
 
-      a[BindFailedException] shouldBe thrownBy {
+      a[BindFailedException] shouldBe thrownBy
         Await.result(binding2F, 1.second)
-      }
-      a[BindFailedException] shouldBe thrownBy {
+      a[BindFailedException] shouldBe thrownBy
         Await.result(binding3F, 1.second)
-      }
 
       // Now unbind first
       Await.result(binding1.unbind(), 1.second)
@@ -568,32 +545,28 @@ class TcpSpec
 
       // clean up
       Await.result(binding4.unbind(), 1.second)
-    }
 
-    "not shut down connections after the connection stream cancelled" in assertAllStagesStopped {
+    "not shut down connections after the connection stream cancelled" in assertAllStagesStopped
       val address = temporaryServerAddress()
-      Tcp().bind(address.getHostName, address.getPort).take(1).runForeach {
+      Tcp().bind(address.getHostName, address.getPort).take(1).runForeach
         tcp ⇒
           Thread.sleep(1000) // we're testing here to see if it survives such race
           tcp.flow.join(Flow[ByteString]).run()
-      }
 
       val total = Source(immutable.Iterable.fill(1000)(ByteString(0)))
         .via(Tcp().outgoingConnection(address))
         .runFold(0)(_ + _.size)
 
       Await.result(total, 3.seconds) should ===(1000)
-    }
 
-    "shut down properly even if some accepted connection Flows have not been subscribed to" in assertAllStagesStopped {
+    "shut down properly even if some accepted connection Flows have not been subscribed to" in assertAllStagesStopped
       val address = temporaryServerAddress()
       val firstClientConnected = Promise[Unit]()
       val takeTwoAndDropSecond = Flow[IncomingConnection]
         .map(conn ⇒
-              {
             firstClientConnected.trySuccess(())
             conn
-        })
+        )
         .grouped(2)
         .take(1)
         .map(_.head)
@@ -614,20 +587,15 @@ class TcpSpec
 
       Await.result(total, 10.seconds) should ===(100)
 
-      a[StreamTcpException] should be thrownBy {
+      a[StreamTcpException] should be thrownBy
         Await.result(rejected, 5.seconds) should ===(100)
-      }
-    }
-  }
 
   def validateServerClientCommunication(testData: ByteString,
                                         serverConnection: ServerConnection,
                                         readProbe: TcpReadProbe,
-                                        writeProbe: TcpWriteProbe): Unit = {
+                                        writeProbe: TcpWriteProbe): Unit =
     serverConnection.write(testData)
     serverConnection.read(5)
     readProbe.read(5) should be(testData)
     writeProbe.write(testData)
     serverConnection.waitRead() should be(testData)
-  }
-}

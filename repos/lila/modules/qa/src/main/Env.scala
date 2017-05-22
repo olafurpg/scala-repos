@@ -8,7 +8,7 @@ final class Env(config: Config,
                 hub: lila.hub.Env,
                 detectLanguage: DetectLanguage,
                 mongoCache: lila.memo.MongoCache.Builder,
-                db: lila.db.Env) {
+                db: lila.db.Env)
 
   private val CollectionQuestion = config getString "collection.question"
   private val CollectionAnswer = config getString "collection.answer"
@@ -28,9 +28,8 @@ final class Env(config: Config,
   lazy val search = new Search(questionColl)
 
   lazy val forms = new DataForm(hub.actor.captcher, detectLanguage)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "qa" boot new Env(config = lila.common.PlayApp loadConfig "qa",
@@ -39,4 +38,3 @@ object Env {
                             lila.common.PlayApp loadConfig "detectlanguage"),
                       mongoCache = lila.memo.Env.current.mongoCache,
                       db = lila.db.Env.current)
-}

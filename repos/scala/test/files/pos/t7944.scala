@@ -1,11 +1,10 @@
 class M[+A, +B]
 
-object Test {
-  implicit class EitherOps[A, B](self: Either[A, B]) {
+object Test
+  implicit class EitherOps[A, B](self: Either[A, B])
     def disjunction: M[A, B] = null
-  }
 
-  def foo = {
+  def foo =
     val l: Either[Int, Nothing] = Left[Int, Nothing](1)
 
     var ok = EitherOps(l).disjunction
@@ -20,5 +19,3 @@ object Test {
     val assign1: M[Int, Nothing] = { val temp = runawayTypeVar; temp }
     val assign2: M[Int, String] = runawayTypeVar
     val assign3: M[Int, Nothing] = { val temp = Left(1).disjunction; temp }
-  }
-}

@@ -25,12 +25,9 @@ package org.ensime.indexer
 
 import org.apache.lucene.document._
 
-package object lucene {
-  implicit class RichEntity[T <: Entity](e: T) {
+package object lucene
+  implicit class RichEntity[T <: Entity](e: T)
     def toDocument(implicit p: DocumentProvider[T]) = p.toDocument(e)
-  }
 
-  implicit class RichDocument(d: Document) {
+  implicit class RichDocument(d: Document)
     def toEntity[T](implicit p: DocumentRecovery[T]) = p.toEntity(d)
-  }
-}

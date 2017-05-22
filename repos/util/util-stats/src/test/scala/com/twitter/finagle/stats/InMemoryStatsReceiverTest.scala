@@ -7,9 +7,9 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class InMemoryStatsReceiverTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite with Eventually with IntegrationPatience
 
-  test("clear") {
+  test("clear")
     val inMemoryStatsReceiver = new InMemoryStatsReceiver
     inMemoryStatsReceiver.counter("counter").incr()
     inMemoryStatsReceiver.counter("counter").incr(2)
@@ -27,33 +27,27 @@ class InMemoryStatsReceiverTest
     assert(!inMemoryStatsReceiver.counters.contains(Seq("counter")))
     assert(!inMemoryStatsReceiver.stats.contains(Seq("stat")))
     assert(!inMemoryStatsReceiver.gauges.contains(Seq("gauge")))
-  }
 
-  test("threadsafe counter") {
+  test("threadsafe counter")
     val inMemoryStatsReceiver = new InMemoryStatsReceiver
     (1 to 50).par.foreach(_ => inMemoryStatsReceiver.counter("same").incr())
-    eventually {
+    eventually
       assert(inMemoryStatsReceiver.counter("same")() == 50)
-    }
-  }
 
-  test("threadsafe stats") {
+  test("threadsafe stats")
     val inMemoryStatsReceiver = new InMemoryStatsReceiver
     (1 to 50).par.foreach(_ => inMemoryStatsReceiver.stat("same").add(1.0f))
-    eventually {
+    eventually
       assert(inMemoryStatsReceiver.stat("same")().size == 50)
-    }
-  }
 
-  test("ReadableCounter.toString") {
+  test("ReadableCounter.toString")
     val stats = new InMemoryStatsReceiver()
     val c = stats.counter("a", "b")
     assert("Counter(a/b=0)" == c.toString)
     c.incr()
     assert("Counter(a/b=1)" == c.toString)
-  }
 
-  test("ReadableGauge.toString") {
+  test("ReadableGauge.toString")
     var n = 0
     val stats = new InMemoryStatsReceiver()
     val g = stats.addGauge("a", "b") { n }
@@ -61,9 +55,8 @@ class InMemoryStatsReceiverTest
 
     n = 11
     assert("Gauge(a/b=11.0)" == g.toString)
-  }
 
-  test("ReadableStat.toString") {
+  test("ReadableStat.toString")
     val stats = new InMemoryStatsReceiver()
     val s = stats.stat("a", "b")
     assert("Stat(a/b=[])" == s.toString)
@@ -77,5 +70,3 @@ class InMemoryStatsReceiverTest
 
     s.add(4)
     assert("Stat(a/b=[1.0,2.0,3.0... (omitted 1 value(s))])" == s.toString)
-  }
-}

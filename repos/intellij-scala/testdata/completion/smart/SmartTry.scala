@@ -1,9 +1,7 @@
-object SmartTry {
+object SmartTry
   val intoint = 34
-  val x: Int = {
-    try {
+  val x: Int =
+    try
       into /*caret*/
-    } finally {}
-  }
-}
+    finally {}
 //intoint

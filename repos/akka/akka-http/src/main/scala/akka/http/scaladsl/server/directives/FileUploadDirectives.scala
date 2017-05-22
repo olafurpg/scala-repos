@@ -12,7 +12,7 @@ import scala.concurrent.Future
 import scala.util.{Failure, Success}
 import akka.stream.scaladsl._
 
-trait FileUploadDirectives {
+trait FileUploadDirectives
 
   import BasicDirectives._
   import RouteDirectives._
@@ -26,18 +26,18 @@ trait FileUploadDirectives {
     * used and the subsequent ones ignored.
     */
   def uploadedFile(fieldName: String): Directive1[(FileInfo, File)] =
-    extractRequestContext.flatMap { ctx ⇒
+    extractRequestContext.flatMap  ctx ⇒
       import ctx.executionContext
       import ctx.materializer
 
-      fileUpload(fieldName).flatMap {
+      fileUpload(fieldName).flatMap
         case (fileInfo, bytes) ⇒
           val destination = File.createTempFile("akka-http-upload", ".tmp")
           val uploadedF: Future[(FileInfo, File)] = bytes
             .runWith(FileIO.toFile(destination))
             .map(_ ⇒ (fileInfo, destination))
 
-          onComplete[(FileInfo, File)](uploadedF).flatMap {
+          onComplete[(FileInfo, File)](uploadedF).flatMap
 
             case Success(uploaded) ⇒
               provide(uploaded)
@@ -45,9 +45,6 @@ trait FileUploadDirectives {
             case Failure(ex) ⇒
               destination.delete()
               failWith(ex)
-          }
-      }
-    }
 
   /**
     * Collects each body part that is a multipart file as a tuple containing metadata and a `Source`
@@ -57,8 +54,8 @@ trait FileUploadDirectives {
     */
   def fileUpload(
       fieldName: String): Directive1[(FileInfo, Source[ByteString, Any])] =
-    entity(as[Multipart.FormData]).flatMap { formData ⇒
-      extractRequestContext.flatMap { ctx ⇒
+    entity(as[Multipart.FormData]).flatMap  formData ⇒
+      extractRequestContext.flatMap  ctx ⇒
         implicit val mat = ctx.materializer
         implicit val ec = ctx.executionContext
 
@@ -75,12 +72,9 @@ trait FileUploadDirectives {
             Sink.headOption[(FileInfo, Source[ByteString, Any])])
 
         onSuccess(onePartF)
-      }
-    }.flatMap {
+    .flatMap
       case Some(tuple) ⇒ provide(tuple)
       case None ⇒ reject(MissingFormFieldRejection(fieldName))
-    }
-}
 
 object FileUploadDirectives extends FileUploadDirectives
 

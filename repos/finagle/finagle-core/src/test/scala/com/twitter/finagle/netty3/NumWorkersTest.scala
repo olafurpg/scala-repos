@@ -6,14 +6,13 @@ import org.scalatest.FunSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class NumWorkersTest extends FunSpec {
-  describe("numWorkers") {
-    it("should have 2 * the number of available processors according to the runtime by default") {
+class NumWorkersTest extends FunSpec
+  describe("numWorkers")
+    it("should have 2 * the number of available processors according to the runtime by default")
       assert(System.getProperty("com.twitter.jvm.numProcs") == null)
       assert(numWorkers() == Runtime.getRuntime().availableProcessors() * 2)
-    }
 
-    it("should be settable as a flag") {
+    it("should be settable as a flag")
       val old = numWorkers()
       numWorkers.parse("20")
 
@@ -21,6 +20,3 @@ class NumWorkersTest extends FunSpec {
 
       numWorkers.parse()
       assert(numWorkers() == old)
-    }
-  }
-}

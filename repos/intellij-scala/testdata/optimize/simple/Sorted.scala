@@ -1,10 +1,9 @@
 import java.util.Date
 import java.sql.Connection
 
-abstract class Sorted {
+abstract class Sorted
   val d: Date
   val s: Connection
-}
 /*
 import java.sql.Connection
 import java.util.Date

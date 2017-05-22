@@ -15,13 +15,10 @@ import org.jetbrains.plugins.scala.lang.structureView.itemsPresentations.impl._
   */
 class ScalaPrimaryConstructorStructureViewElement(
     private val element: ScPrimaryConstructor)
-    extends ScalaStructureViewElement(element, false) {
+    extends ScalaStructureViewElement(element, false)
 
-  def getPresentation: ItemPresentation = {
+  def getPresentation: ItemPresentation =
     new ScalaPrimaryConstructorItemPresentation(element);
-  }
 
-  def getChildren: Array[TreeElement] = {
+  def getChildren: Array[TreeElement] =
     new Array[TreeElement](0)
-  }
-}

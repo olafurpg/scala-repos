@@ -4,7 +4,7 @@ import scala.reflect.runtime.{currentMirror => cm}
 class C
 object C
 
-object Test extends App {
+object Test extends App
   type T = C
 
   println(showRaw(symbolOf[C].companion, printKinds = true))
@@ -14,4 +14,3 @@ object Test extends App {
   println(showRaw(
           cm.staticPackage("scala").moduleClass.companion, printKinds = true))
   println(showRaw(cm.staticPackage("scala").companion, printKinds = true))
-}

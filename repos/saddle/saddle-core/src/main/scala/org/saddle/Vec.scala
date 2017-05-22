@@ -69,7 +69,7 @@ import java.io.OutputStream
   * @tparam T Type of elements within the Vec
   */
 trait Vec[@spec(Boolean, Int, Long, Double) T]
-    extends NumericOps[Vec[T]] with Serializable {
+    extends NumericOps[Vec[T]] with Serializable
 
   /**
     * The number of elements in the container                                                  F
@@ -102,18 +102,16 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     * Access a boxed element of a Vec[A] at a single location
     * @param loc offset into Vec
     */
-  def at(loc: Int): Scalar[T] = {
+  def at(loc: Int): Scalar[T] =
     implicit val st = scalarTag
     apply(loc)
-  }
 
   /**
     * Access an unboxed element of a Vec[A] at a single location
     * @param loc offset into Vec
     */
-  def raw(loc: Int): T = {
+  def raw(loc: Int): T =
     apply(loc)
-  }
 
   /**
     * Slice a Vec at a sequence of locations, e.g.
@@ -143,27 +141,24 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     *
     * @param rng evaluates to IRange
     */
-  def apply(rng: Slice[Int]): Vec[T] = {
+  def apply(rng: Slice[Int]): Vec[T] =
     val idx = new IndexIntRange(length)
     val pair = rng(idx)
     slice(pair._1, pair._2)
-  }
 
   /**
     * Access the first element of a Vec[A], or NA if length is zero
     */
-  def first: Scalar[T] = {
+  def first: Scalar[T] =
     implicit val st = scalarTag
     if (length > 0) apply(0) else NA
-  }
 
   /**
     * Access the last element of a Vec[A], or NA if length is zero
     */
-  def last: Scalar[T] = {
+  def last: Scalar[T] =
     implicit val st = scalarTag
     if (length > 0) apply(length - 1) else NA
-  }
 
   // ----------
 
@@ -328,9 +323,8 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     * @param pred Function A => Boolean
     * @param op Side-effecting function
     */
-  def forall(pred: T => Boolean)(op: T => Unit) {
+  def forall(pred: T => Boolean)(op: T => Unit)
     VecImpl.forall(this)(pred)(op)(scalarTag)
-  }
 
   /**
     * Return Vec of integer locations (offsets) which satisfy some predicate
@@ -390,10 +384,9 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
   /**
     * Yield a Vec whose elements have been reversed from their original order
     */
-  def reversed: Vec[T] = {
+  def reversed: Vec[T] =
     implicit val tag = scalarTag
     Vec(array.reverse(toArray))
-  }
 
   /**
     * Creates a view into original vector from an offset up to, but excluding,
@@ -478,16 +471,14 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
 
   private[saddle] def toArray: Array[T]
 
-  private[saddle] def toDoubleArray(implicit na: NUM[T]): Array[Double] = {
+  private[saddle] def toDoubleArray(implicit na: NUM[T]): Array[Double] =
     val arr = toArray
     val buf = new Array[Double](arr.length)
     var i = 0
-    while (i < arr.length) {
+    while (i < arr.length)
       buf(i) = scalarTag.toDouble(arr(i))
       i += 1
-    }
     buf
-  }
 
   /** Default hashcode is simple rolling prime multiplication of sums of hashcodes for all values. */
   override def hashCode(): Int = foldLeft(1)(_ * 31 + _.hashCode())
@@ -497,27 +488,24 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     *
     * NB: to avoid boxing, is overwritten in child classes
     */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: Vec[_] =>
-      (this eq rv) || (this.length == rv.length) && {
+      (this eq rv) || (this.length == rv.length) &&
         var i = 0
         var eq = true
-        while (eq && i < this.length) {
+        while (eq && i < this.length)
           eq &&=
           (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
-        }
         eq
-      }
     case _ => false
-  }
 
   /**
     * Creates a string representation of Vec
     * @param len Max number of elements to include
     */
-  def stringify(len: Int = 10): String = {
+  def stringify(len: Int = 10): String =
     val half = len / 2
 
     val buf = new StringBuilder()
@@ -527,7 +515,7 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
     val maxf = (a: Int, b: String) => math.max(a, b.length)
 
     if (length == 0) buf append "Empty Vec"
-    else {
+    else
       buf.append("[%d x 1]\n" format (length))
       val vlen = { head(half) concat tail(half) }
         .map(scalarTag.show(_))
@@ -537,23 +525,19 @@ trait Vec[@spec(Boolean, Int, Long, Double) T]
         ("%" + { if (vlen > 0) vlen else 1 } + "s\n")
           .format(scalarTag.show(apply(r)))
       buf append util.buildStr(len, length, createRow, " ... \n")
-    }
 
     buf.toString()
-  }
 
   /**
     * Pretty-printer for Vec, which simply outputs the result of stringify.
     * @param len Number of elements to display
     */
-  def print(len: Int = 10, stream: OutputStream = System.out) {
+  def print(len: Int = 10, stream: OutputStream = System.out)
     stream.write(stringify(len).getBytes)
-  }
 
   override def toString = stringify()
-}
 
-object Vec extends BinOpVec with VecStatsImplicits with VecBoolEnricher {
+object Vec extends BinOpVec with VecStatsImplicits with VecBoolEnricher
   // **** constructions
 
   /**
@@ -615,4 +599,3 @@ object Vec extends BinOpVec with VecStatsImplicits with VecBoolEnricher {
     * A Vec may be implicitly converted to a single column Mat
     */
   implicit def vecToMat[A : ST](s: Vec[A]): Mat[A] = Mat(s)
-}

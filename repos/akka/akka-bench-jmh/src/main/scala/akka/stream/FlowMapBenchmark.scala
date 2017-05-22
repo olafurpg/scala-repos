@@ -19,7 +19,7 @@ import scala.concurrent.duration._
 @State(Scope.Benchmark)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @BenchmarkMode(Array(Mode.Throughput))
-class FlowMapBenchmark {
+class FlowMapBenchmark
 
   val config = ConfigFactory
     .parseString("""
@@ -69,7 +69,7 @@ class FlowMapBenchmark {
   var numberOfMapOps = 0
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val settings = ActorMaterializerSettings(system).withInputBuffer(
         initialInputBufferSize, initialInputBufferSize)
 
@@ -77,45 +77,36 @@ class FlowMapBenchmark {
 
     // Important to use a synchronous, zero overhead source, otherwise the slowness of the source
     // might bias the benchmark, since the stream always adjusts the rate to the slowest stage.
-    val syncTestPublisher = new Publisher[Int] {
-      override def subscribe(s: Subscriber[_ >: Int]): Unit = {
-        val sub = new Subscription {
+    val syncTestPublisher = new Publisher[Int]
+      override def subscribe(s: Subscriber[_ >: Int]): Unit =
+        val sub = new Subscription
           var counter = 0 // Piggyback on caller thread, no need for volatile
 
-          override def request(n: Long): Unit = {
+          override def request(n: Long): Unit =
             var i = n
-            while (i > 0) {
+            while (i > 0)
               s.onNext(counter)
               counter += 1
-              if (counter == 100000) {
+              if (counter == 100000)
                 s.onComplete()
                 return
-              }
               i -= 1
-            }
-          }
 
           override def cancel(): Unit = ()
-        }
 
         s.onSubscribe(sub)
-      }
-    }
 
-    flow = mkMaps(Source.fromPublisher(syncTestPublisher), numberOfMapOps) {
+    flow = mkMaps(Source.fromPublisher(syncTestPublisher), numberOfMapOps)
       if (UseGraphStageIdentity) GraphStages.identity[Int]
       else Flow[Int].map(identity)
-    }
-  }
 
   @TearDown
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     Await.result(system.terminate(), 5.seconds)
-  }
 
   @Benchmark
   @OperationsPerInvocation(100000)
-  def flow_map_100k_elements(): Unit = {
+  def flow_map_100k_elements(): Unit =
     val lock =
       new Lock() // todo rethink what is the most lightweight way to await for a streams completion
     lock.acquire()
@@ -123,13 +114,10 @@ class FlowMapBenchmark {
     flow.runWith(Sink.onComplete(_ ⇒ lock.release()))(materializer)
 
     lock.acquire()
-  }
 
   // source setup
   private def mkMaps[O, Mat](source: Source[O, Mat], count: Int)(
-      flow: => Graph[FlowShape[O, O], _]): Source[O, Mat] = {
+      flow: => Graph[FlowShape[O, O], _]): Source[O, Mat] =
     var f = source
     for (i ← 1 to count) f = f.via(flow)
     f
-  }
-}

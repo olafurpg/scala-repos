@@ -22,7 +22,7 @@ import org.saddle.scalar._
 /**
   * A Mat instance containing elements of type Boolean
   * */
-class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean] {
+class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean]
   def repr = this
 
   def numRows = r
@@ -39,14 +39,13 @@ class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean] {
   // Cache the transpose: it's much faster to transpose and slice a continuous
   // bound than to take large strides, especially on large matrices where it
   // seems to eject cache lines on each stride (something like 10x slowdown)
-  lazy val cachedT = {
+  lazy val cachedT =
     val arrT = values.clone()
 
     if (this.isSquare) MatMath.squareTranspose(numCols, arrT)
     else MatMath.blockTranspose(numRows, numCols, this.toArray, arrT)
 
     new MatBool(numCols, numRows, arrT)
-  }
 
   def transpose = cachedT
 
@@ -71,31 +70,25 @@ class MatBool(r: Int, c: Int, values: Array[Boolean]) extends Mat[Boolean] {
   private[saddle] def toDoubleArray(implicit ev: NUM[Boolean]): Array[Double] =
     arrCopyToDblArr(values)
 
-  private[saddle] def arrCopyToDblArr(r: Array[Boolean]): Array[Double] = {
+  private[saddle] def arrCopyToDblArr(r: Array[Boolean]): Array[Double] =
     val arr = Array.ofDim[Double](r.length)
     var i = 0
-    while (i < r.length) {
+    while (i < r.length)
       arr(i) = if (r(i)) 1.0 else 0.0
       i += 1
-    }
     arr
-  }
 
   /** Row-by-row equality check of all values. */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+      this.numCols == rv.numCols &&
         var i = 0
         var eq = true
-        while (eq && i < length) {
+        while (eq && i < length)
           eq &&=
           (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
-        }
         eq
-      }
     case _ => super.equals(o)
-  }
-}

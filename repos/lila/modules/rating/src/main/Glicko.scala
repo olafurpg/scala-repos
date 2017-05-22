@@ -4,7 +4,7 @@ import reactivemongo.bson.BSONDocument
 
 import lila.db.BSON
 
-case class Glicko(rating: Double, deviation: Double, volatility: Double) {
+case class Glicko(rating: Double, deviation: Double, volatility: Double)
 
   def intRating = rating.toInt
   def intDeviation = deviation.toInt
@@ -24,9 +24,8 @@ case class Glicko(rating: Double, deviation: Double, volatility: Double) {
     volatility > 0 && volatility < 1
 
   override def toString = s"$intRating $intDeviation"
-}
 
-case object Glicko {
+case object Glicko
 
   val minRating = 800
 
@@ -39,7 +38,7 @@ case object Glicko {
       rating + (deviation * 2)
   )
 
-  implicit val glickoBSONHandler = new BSON[Glicko] {
+  implicit val glickoBSONHandler = new BSON[Glicko]
 
     def reads(r: BSON.Reader): Glicko =
       Glicko(rating = r double "r",
@@ -50,16 +49,12 @@ case object Glicko {
       BSONDocument("r" -> w.double(o.rating),
                    "d" -> w.double(o.deviation),
                    "v" -> w.double(o.volatility))
-  }
 
-  sealed abstract class Result(val v: Double) {
+  sealed abstract class Result(val v: Double)
     def negate: Result
-  }
-  object Result {
+  object Result
     case object Win extends Result(1) { def negate = Loss }
     case object Loss extends Result(0) { def negate = Win }
     case object Draw extends Result(0.5) { def negate = Draw }
-  }
 
   lazy val tube = lila.db.BsTube(glickoBSONHandler)
-}

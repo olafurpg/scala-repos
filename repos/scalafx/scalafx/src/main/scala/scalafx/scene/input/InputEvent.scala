@@ -35,15 +35,14 @@ import scalafx.event.Event
 
 // so far ony minimal stuff
 
-object InputEvent {
+object InputEvent
   implicit def sfxInputEvent2jfx(ie: InputEvent): jfxsi.InputEvent =
     if (ie != null) ie.delegate else null
 
   val Any: jfxe.EventType[jfxsi.InputEvent] = jfxsi.InputEvent.ANY
-}
 
 class InputEvent(override val delegate: jfxsi.InputEvent)
-    extends Event(delegate) with SFXDelegate[jfxsi.InputEvent] {
+    extends Event(delegate) with SFXDelegate[jfxsi.InputEvent]
 
   def this(eventType: jfxe.EventType[jfxsi.InputEvent]) =
     this(new jfxsi.InputEvent(eventType))
@@ -52,4 +51,3 @@ class InputEvent(override val delegate: jfxsi.InputEvent)
            target: jfxe.EventTarget,
            eventType: jfxe.EventType[jfxsi.InputEvent]) =
     this(new jfxsi.InputEvent(source, target, eventType))
-}

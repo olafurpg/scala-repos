@@ -33,7 +33,7 @@ class EngineParams(
     val preparatorParams: (String, Params) = ("", EmptyParams()),
     val algorithmParamsList: Seq[(String, Params)] = Seq(),
     val servingParams: (String, Params) = ("", EmptyParams()))
-    extends Serializable {
+    extends Serializable
 
   /** Java-friendly constructor
     *
@@ -51,7 +51,7 @@ class EngineParams(
            preparatorParams: Params,
            algorithmParamsList: _root_.java.util.Map[String, _ <: Params],
            servingName: String,
-           servingParams: Params) = {
+           servingParams: Params) =
 
     // To work around a json4s weird limitation, the parameter names can not be changed
     this(
@@ -60,26 +60,23 @@ class EngineParams(
         JavaConversions.mapAsScalaMap(algorithmParamsList).toSeq,
         (servingName, servingParams)
     )
-  }
 
   // A case class style copy method.
   def copy(dataSourceParams: (String, Params) = dataSourceParams,
            preparatorParams: (String, Params) = preparatorParams,
            algorithmParamsList: Seq[(String, Params)] = algorithmParamsList,
-           servingParams: (String, Params) = servingParams): EngineParams = {
+           servingParams: (String, Params) = servingParams): EngineParams =
 
     new EngineParams(dataSourceParams,
                      preparatorParams,
                      algorithmParamsList,
                      servingParams)
-  }
-}
 
 /** Companion object for creating [[EngineParams]] instances.
   *
   * @group Engine
   */
-object EngineParams {
+object EngineParams
 
   /** Create EngineParams.
     *
@@ -97,15 +94,13 @@ object EngineParams {
             preparatorParams: Params = EmptyParams(),
             algorithmParamsList: Seq[(String, Params)] = Seq(),
             servingName: String = "",
-            servingParams: Params = EmptyParams()): EngineParams = {
+            servingParams: Params = EmptyParams()): EngineParams =
     new EngineParams(
         dataSourceParams = (dataSourceName, dataSourceParams),
         preparatorParams = (preparatorName, preparatorParams),
         algorithmParamsList = algorithmParamsList,
         servingParams = (servingName, servingParams)
     )
-  }
-}
 
 /** SimpleEngine has only one algorithm, and uses default preparator and serving
   * layer. Current default preparator is `IdentityPreparator` and serving is

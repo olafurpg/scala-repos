@@ -29,27 +29,24 @@ import com.twitter.algebird._
   * form { _ / 100 } then you would never have any one reducer deal with more
   * than 2 entries.
   */
-object CumulativeSum {
+object CumulativeSum
   implicit def toCumulativeSum[K, U, V](pipe: TypedPipe[(K, (U, V))]) =
     new CumulativeSumExtension(pipe)
 
-  class CumulativeSumExtension[K, U, V](val pipe: TypedPipe[(K, (U, V))]) {
+  class CumulativeSumExtension[K, U, V](val pipe: TypedPipe[(K, (U, V))])
 
     /** Takes a sortable field and a monoid and returns the cumulative sum of that monoid **/
     def cumulativeSum(implicit sg: Semigroup[V],
                       ordU: Ordering[U],
-                      ordK: Ordering[K]): SortedGrouped[K, (U, V)] = {
+                      ordK: Ordering[K]): SortedGrouped[K, (U, V)] =
       pipe.group.sortBy { case (u, _) => u }
-        .scanLeft(Nil: List[(U, V)]) {
+        .scanLeft(Nil: List[(U, V)])
           case (acc, (u, v)) =>
-            acc match {
+            acc match
               case List((previousU, previousSum)) =>
                 List((u, sg.plus(previousSum, v)))
               case _ => List((u, v))
-            }
-        }
         .flattenValues
-    }
 
     /**
       * An optimization of cumulativeSum for cases when a particular key has many
@@ -62,47 +59,36 @@ object CumulativeSum {
         partition: U => S)(implicit ordS: Ordering[S],
                            sg: Semigroup[V],
                            ordU: Ordering[U],
-                           ordK: Ordering[K]): TypedPipe[(K, (U, V))] = {
+                           ordK: Ordering[K]): TypedPipe[(K, (U, V))] =
 
-      val sumPerS = pipe.map { case (k, (u, v)) => (k, partition(u)) -> v }.sumByKey.map {
+      val sumPerS = pipe.map { case (k, (u, v)) => (k, partition(u)) -> v }.sumByKey.map
         case ((k, s), v) => (k, (s, v))
-      }.group.sortBy { case (s, v) => s }
-        .scanLeft(None: Option[(Option[V], V, S)]) {
+      .group.sortBy { case (s, v) => s }
+        .scanLeft(None: Option[(Option[V], V, S)])
           case (acc, (s, v)) =>
-            acc match {
-              case Some((previousPreviousSum, previousSum, previousS)) => {
+            acc match
+              case Some((previousPreviousSum, previousSum, previousS)) =>
                   Some((Some(previousSum), sg.plus(v, previousSum), s))
-                }
               case _ => Some((None, v, s))
-            }
-        }
-        .flatMap {
+        .flatMap
           case (k, maybeAcc) =>
             for (acc <- maybeAcc;
             previousSum <- acc._1) yield { (k, acc._3) -> (None, previousSum) }
-        }
 
       val summands =
-        pipe.map {
+        pipe.map
           case (k, (u, v)) =>
             (k, partition(u)) -> (Some(u), v)
-        } ++ sumPerS
+        ++ sumPerS
 
       summands.group.sortBy { case (u, _) => u }
-        .scanLeft(None: Option[(Option[U], V)]) {
+        .scanLeft(None: Option[(Option[U], V)])
           case (acc, (maybeU, v)) =>
-            acc match {
+            acc match
               case Some((_, previousSum)) =>
                 Some((maybeU, sg.plus(v, previousSum)))
               case _ => Some((maybeU, v))
-            }
-        }
-        .flatMap {
+        .flatMap
           case ((k, s), acc) =>
-            for (uv <- acc; u <- uv._1) yield {
+            for (uv <- acc; u <- uv._1) yield
               (k, (u, uv._2))
-            }
-        }
-    }
-  }
-}

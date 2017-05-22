@@ -29,16 +29,16 @@ import scala.language.implicitConversions
   */
 class SystemProperties
     extends mutable.AbstractMap[String, String]
-    with mutable.Map[String, String] {
+    with mutable.Map[String, String]
 
   override def empty = mutable.Map[String, String]()
   override def default(key: String): String = null
 
   def iterator: Iterator[(String, String)] =
-    wrapAccess {
+    wrapAccess
       val ps = System.getProperties()
       names map (k => (k, ps getProperty k)) filter (_._2 ne null)
-    } getOrElse Iterator.empty
+    getOrElse Iterator.empty
 
   def names: Iterator[String] =
     wrapAccess(
@@ -50,16 +50,13 @@ class SystemProperties
   override def contains(key: String) =
     wrapAccess(super.contains(key)) exists (x => x)
 
-  def -=(key: String): this.type = {
+  def -=(key: String): this.type =
     wrapAccess(System.clearProperty(key)); this
-  }
-  def +=(kv: (String, String)): this.type = {
+  def +=(kv: (String, String)): this.type =
     wrapAccess(System.setProperty(kv._1, kv._2)); this
-  }
 
   def wrapAccess[T](body: => T): Option[T] =
     try Some(body) catch { case _: AccessControlException => None }
-}
 
 /** The values in SystemProperties can be used to access and manipulate
   *  designated system properties.  See `scala.sys.Prop` for particulars.
@@ -67,7 +64,7 @@ class SystemProperties
   *    if (!headless.isSet) headless.enable()
   *  }}}
   */
-object SystemProperties {
+object SystemProperties
 
   /** An unenforceable, advisory only place to do some synchronization when
     *  mutating system properties.
@@ -82,14 +79,13 @@ object SystemProperties {
   private final val PreferIPv6AddressesKey = "java.net.preferIPv6Addresses"
   private final val NoTraceSuppressionKey = "scala.control.noTraceSuppression"
 
-  def help(key: String): String = key match {
+  def help(key: String): String = key match
     case HeadlessKey => "system should not utilize a display device"
     case PreferIPv4StackKey => "system should prefer IPv4 sockets"
     case PreferIPv6AddressesKey => "system should prefer IPv6 addresses"
     case NoTraceSuppressionKey =>
       "scala should not suppress any stack trace creation"
     case _ => ""
-  }
 
   lazy val headless: BooleanProp = BooleanProp.keyExists(HeadlessKey)
   lazy val preferIPv4Stack: BooleanProp =
@@ -100,4 +96,3 @@ object SystemProperties {
     BooleanProp.valueIsTrue(NoTraceSuppressionKey)
   @deprecated("Use noTraceSuppression", "2.12.0")
   def noTraceSupression = noTraceSuppression
-}

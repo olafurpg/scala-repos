@@ -17,15 +17,15 @@ import akka.actor.Actor
   */
 private[akka] final case class StreamTestDefaultMailbox()
     extends MailboxType
-    with ProducesMessageQueue[UnboundedMailbox.MessageQueue] {
+    with ProducesMessageQueue[UnboundedMailbox.MessageQueue]
 
   def this(settings: ActorSystem.Settings, config: Config) = this()
 
   final override def create(
-      owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue = {
-    owner match {
+      owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
+    owner match
       case Some(r: ActorRefWithCell) ⇒
-        try {
+        try
           val actorClass = r.underlying.props.actorClass
           assert(
               actorClass != classOf[Actor],
@@ -37,16 +37,12 @@ private[akka] final case class StreamTestDefaultMailbox()
               "Did you forget to define `props.withDispatcher` when creating the actor? " +
               "Or did you forget to configure the `akka.stream.materializer` setting accordingly or force the " +
               """dispatcher using `ActorMaterializerSettings(sys).withDispatcher("akka.test.stream-dispatcher")` in the test?""")
-        } catch {
+        catch
           // this logging should not be needed when issue #15947 has been fixed
           case e: AssertionError ⇒
             system.foreach(_.log.error(
                     e,
                     s"StreamTestDefaultMailbox assertion failed: ${e.getMessage}"))
             throw e
-        }
       case _ ⇒
-    }
     new UnboundedMailbox.MessageQueue
-  }
-}

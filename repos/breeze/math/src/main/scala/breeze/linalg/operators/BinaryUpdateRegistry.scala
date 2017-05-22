@@ -29,7 +29,7 @@ import scala.reflect.ClassTag
 // because we don't need BinaryOp's to inherit from Function2, which has a lot of @specialzied cruft.
 trait BinaryUpdateRegistry[A <: AnyRef, B, Op <: OpType]
     extends UFunc.InPlaceImpl2[Op, A, B]
-    with MMRegistry2[UFunc.InPlaceImpl2[Op, _ <: A, _ <: B]] {
+    with MMRegistry2[UFunc.InPlaceImpl2[Op, _ <: A, _ <: B]]
   protected def bindingMissing(a: A, b: B): Unit =
     throw new UnsupportedOperationException(
         "Types not found!" + a + b + " " + ops)
@@ -37,24 +37,22 @@ trait BinaryUpdateRegistry[A <: AnyRef, B, Op <: OpType]
       a: A,
       b: B,
       m: Map[(Class[_], Class[_]), UFunc.InPlaceImpl2[Op, _ <: A, _ <: B]])
-    : Unit = {
+    : Unit =
     throw new RuntimeException("Multiple bindings for method: " + m)
-  }
 
-  def apply(a: A, b: B) {
+  def apply(a: A, b: B)
     val ac = a.asInstanceOf[AnyRef].getClass
     val bc = b.asInstanceOf[AnyRef].getClass
 
     val cached = cache.get(ac -> bc)
-    if (cached != null) {
-      cached match {
+    if (cached != null)
+      cached match
         case None => bindingMissing(a, b)
         case Some(m) =>
           m.asInstanceOf[InPlaceImpl2[Op, A, B]].apply(a, b)
-      }
-    } else {
+    else
       val options = resolve(ac, bc.asInstanceOf[Class[_ <: B]])
-      options.size match {
+      options.size match
         case 0 =>
           cache.put(ac -> bc, None)
           bindingMissing(a, b)
@@ -65,17 +63,11 @@ trait BinaryUpdateRegistry[A <: AnyRef, B, Op <: OpType]
         case _ =>
           val selected = selectBestOption(options)
           if (selected.size != 1) multipleOptions(a, b, options)
-          else {
+          else
             val method = selected.values.head
             cache.put(ac -> bc, Some(method))
             method.asInstanceOf[InPlaceImpl2[Op, A, B]].apply(a, b)
-          }
-      }
-    }
-  }
 
   def register[AA <: A, BB <: B](op: InPlaceImpl2[Op, AA, BB])(
-      implicit cA: ClassTag[AA], cB: ClassTag[BB]) {
+      implicit cA: ClassTag[AA], cB: ClassTag[BB])
     super.register(cA.runtimeClass, cB.runtimeClass, op)
-  }
-}

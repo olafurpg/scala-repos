@@ -8,54 +8,48 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 3/31/12
   */
 class InterpolatedStringTypingTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
 
-  def testSimpleStringTypingOpeningQuote() {
+  def testSimpleStringTypingOpeningQuote()
     val text = "class A { val a = s" + CARET_MARKER + " }"
     val assumedStub = "class A { val a = s\"" + CARET_MARKER + "\" }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testSimpleStringTypingClosingQuote() {
+  def testSimpleStringTypingClosingQuote()
     val text = "class A { val a = s\"" + CARET_MARKER + "\" }"
     val assumedStub = "class A { val a = s\"\"" + CARET_MARKER + " }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testMultilineStringTypingOpeningQuote() {
+  def testMultilineStringTypingOpeningQuote()
     val text = "class A { val a = f\"\"" + CARET_MARKER + " }"
     val assumedStub = "class A { val a = f\"\"\"" + CARET_MARKER + "\"\"\" }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testMultilingStringClosingQuote1() {
+  def testMultilingStringClosingQuote1()
     val text = "class A { val a = s\"\"\"blah blah" + CARET_MARKER + "\"\"\" }"
     val assumedStub =
       "class A { val a = s\"\"\"blah blah\"" + CARET_MARKER + "\"\" }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testMultilineStringClosingQuote2() {
+  def testMultilineStringClosingQuote2()
     val text = "class A { val a = s\"\"\"blah blah\"\"" + CARET_MARKER + "\" }"
     val assumedStub =
       "class A { val a = s\"\"\"blah blah\"\"\"" + CARET_MARKER + " }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testSimpleStringBraceTyped() {
+  def testSimpleStringBraceTyped()
     val text = "class A { val a = s\"blah blah $" + CARET_MARKER + "\" }"
     val assumedStub =
       "class A { val a = s\"blah blah ${" + CARET_MARKER + "}\" }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '{')
-  }
 
-  def testMultiLineStringBraceTyped() {
+  def testMultiLineStringBraceTyped()
     val text =
       "class A { val a = f\"\"\"blah blah $" + CARET_MARKER +
       " blah blah\"\"\"}"
@@ -64,19 +58,15 @@ class InterpolatedStringTypingTest
       "} blah blah\"\"\"}"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '{')
-  }
 
-  def testInsertBrace() {
+  def testInsertBrace()
     val text = s""" val a = s"($$$CARET_MARKER)" """
     val assumed = s""" val a = s"($${$CARET_MARKER})" """
 
     checkGeneratedTextAfterTyping(text, assumed, '{')
-  }
 
-  def testInsertBraceInvalidCode() {
+  def testInsertBraceInvalidCode()
     val text = s""" val a = s"blah-blah $$$CARET_MARKER """
     val assumed = s""" val a = s"blah-blah $${$CARET_MARKER} """
 
     checkGeneratedTextAfterTyping(text, assumed, '{')
-  }
-}

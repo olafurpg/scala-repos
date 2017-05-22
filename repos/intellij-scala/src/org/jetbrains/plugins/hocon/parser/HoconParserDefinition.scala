@@ -9,17 +9,16 @@ import com.intellij.psi.{FileViewProvider, PsiElement, PsiFile}
 import org.jetbrains.plugins.hocon.lexer.{HoconLexer, HoconTokenSets}
 import org.jetbrains.plugins.hocon.psi.{HoconPsiCreator, HoconPsiFile}
 
-class HoconParserDefinition extends ParserDefinition {
+class HoconParserDefinition extends ParserDefinition
 
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
 
   def spaceExistanceTypeBetweenTokens(
       left: ASTNode, right: ASTNode): SpaceRequirements =
-    (left.getElementType, right.getElementType) match {
+    (left.getElementType, right.getElementType) match
       case (Dollar, SubLBrace) | (SubLBrace, QMark) =>
         SpaceRequirements.MUST_NOT
       case _ => SpaceRequirements.MAY
-    }
 
   def createFile(viewProvider: FileViewProvider): PsiFile =
     new HoconPsiFile(viewProvider)
@@ -44,4 +43,3 @@ class HoconParserDefinition extends ParserDefinition {
 
   def createLexer(project: Project): Lexer =
     new HoconLexer
-}

@@ -10,27 +10,23 @@ import scala.language.experimental.{macros => smacros}
   * using Scala macros, and currently provide binary comparators for primitives, strings, Options, tuples, collections, case classes
   * and Scrooge objects.
   */
-trait RequiredBinaryComparators extends RequiredBinaryComparatorsConfig {
+trait RequiredBinaryComparators extends RequiredBinaryComparatorsConfig
 
   implicit def ordSer[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
     .OrderedSerializationProviderImpl[T]
-}
 
-object RequiredBinaryComparators {
+object RequiredBinaryComparators
 
   implicit def orderedSerialization[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
     .OrderedSerializationProviderImpl[T]
-}
 
 /**
   * Use this for an ExecutionApp.
   */
-trait RequiredBinaryComparatorsExecutionApp extends ExecutionApp {
+trait RequiredBinaryComparatorsExecutionApp extends ExecutionApp
   implicit def ordSer[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
     .OrderedSerializationProviderImpl[T]
 
-  override def config(inputArgs: Array[String]): (Config, Mode) = {
+  override def config(inputArgs: Array[String]): (Config, Mode) =
     val (conf, m) = super.config(inputArgs)
     (conf.setRequireOrderedSerialization(true), m)
-  }
-}

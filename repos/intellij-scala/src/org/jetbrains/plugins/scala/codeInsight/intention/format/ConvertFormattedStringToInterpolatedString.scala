@@ -14,13 +14,11 @@ import org.jetbrains.plugins.scala.project._
 class ConvertFormattedStringToInterpolatedString
     extends AbstractFormatConversionIntention("Convert to interpolated string",
                                               FormattedStringParser,
-                                              InterpolatedStringFormatter) {
+                                              InterpolatedStringFormatter)
 
   override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     if (!super.isAvailable(
             project: Project, editor: Editor, element: PsiElement))
       return false
     element.scalaLanguageLevel.getOrElse(ScalaLanguageLevel.Default) >= Scala_2_10
-  }
-}

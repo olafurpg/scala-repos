@@ -25,7 +25,7 @@ package com.gravity.goose.text
 import java.util._
 import com.gravity.goose.utils.FileHelper
 
-object StopWords {
+object StopWords
 
   // the confusing pattern below is basically just match any non-word character excluding white-space.
   private val PUNCTUATION: StringReplacement = StringReplacement.compile(
@@ -36,11 +36,10 @@ object StopWords {
     .split(sys.props("line.separator"))
     .toSet
 
-  def removePunctuation(str: String): String = {
+  def removePunctuation(str: String): String =
     PUNCTUATION.replaceAll(str)
-  }
 
-  def getStopWordCount(content: String): WordStats = {
+  def getStopWordCount(content: String): WordStats =
 
     if (string.isNullOrEmpty(content)) return WordStats.EMPTY
     val ws: WordStats = new WordStats
@@ -53,13 +52,10 @@ object StopWords {
 
     candidateWords.foreach(
         w =>
-          {
         if (STOP_WORDS.contains(w.toLowerCase))
           overlappingStopWords.add(w.toLowerCase)
-    })
+    )
     ws.setWordCount(candidateWords.length)
     ws.setStopWordCount(overlappingStopWords.size)
     ws.setStopWords(overlappingStopWords)
     ws
-  }
-}

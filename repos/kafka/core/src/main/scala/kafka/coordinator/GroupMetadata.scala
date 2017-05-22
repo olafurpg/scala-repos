@@ -38,9 +38,8 @@ private[coordinator] sealed trait GroupState { def state: Byte }
   * transition: some members have joined by the timeout => AwaitingSync
   *             all members have left the group => Dead
   */
-private[coordinator] case object PreparingRebalance extends GroupState {
+private[coordinator] case object PreparingRebalance extends GroupState
   val state: Byte = 1
-}
 
 /**
   * Group is awaiting state assignment from the leader
@@ -54,9 +53,8 @@ private[coordinator] case object PreparingRebalance extends GroupState {
   *             leave group from existing member => PreparingRebalance
   *             member failure detected => PreparingRebalance
   */
-private[coordinator] case object AwaitingSync extends GroupState {
+private[coordinator] case object AwaitingSync extends GroupState
   val state: Byte = 5
-}
 
 /**
   * Group is stable
@@ -71,9 +69,8 @@ private[coordinator] case object AwaitingSync extends GroupState {
   *             leader join-group received => PreparingRebalance
   *             follower join-group with new metadata => PreparingRebalance
   */
-private[coordinator] case object Stable extends GroupState {
+private[coordinator] case object Stable extends GroupState
   val state: Byte = 3
-}
 
 /**
   * Group has no more members
@@ -86,17 +83,15 @@ private[coordinator] case object Stable extends GroupState {
   *         allow offset fetch requests
   * transition: Dead is a final state before group metadata is cleaned up, so there are no transitions
   */
-private[coordinator] case object Dead extends GroupState {
+private[coordinator] case object Dead extends GroupState
   val state: Byte = 4
-}
 
-private object GroupMetadata {
+private object GroupMetadata
   private val validPreviousStates: Map[GroupState, Set[GroupState]] = Map(
       Dead -> Set(Stable, PreparingRebalance, AwaitingSync),
       AwaitingSync -> Set(PreparingRebalance),
       Stable -> Set(AwaitingSync),
       PreparingRebalance -> Set(Stable, AwaitingSync))
-}
 
 /**
   * Case class used to represent group metadata for the ListGroups API
@@ -126,7 +121,7 @@ case class GroupSummary(state: String,
   */
 @nonthreadsafe
 private[coordinator] class GroupMetadata(
-    val groupId: String, val protocolType: String) {
+    val groupId: String, val protocolType: String)
 
   private val members = new mutable.HashMap[String, MemberMetadata]
   private var state: GroupState = Stable
@@ -139,23 +134,19 @@ private[coordinator] class GroupMetadata(
   def has(memberId: String) = members.contains(memberId)
   def get(memberId: String) = members(memberId)
 
-  def add(memberId: String, member: MemberMetadata) {
+  def add(memberId: String, member: MemberMetadata)
     assert(supportsProtocols(member.protocols))
 
     if (leaderId == null) leaderId = memberId
     members.put(memberId, member)
-  }
 
-  def remove(memberId: String) {
+  def remove(memberId: String)
     members.remove(memberId)
-    if (memberId == leaderId) {
-      leaderId = if (members.isEmpty) {
+    if (memberId == leaderId)
+      leaderId = if (members.isEmpty)
         null
-      } else {
+      else
         members.keys.head
-      }
-    }
-  }
 
   def currentState = state
 
@@ -168,21 +159,19 @@ private[coordinator] class GroupMetadata(
 
   def allMemberMetadata = members.values.toList
 
-  def rebalanceTimeout = members.values.foldLeft(0) { (timeout, member) =>
+  def rebalanceTimeout = members.values.foldLeft(0)  (timeout, member) =>
     timeout.max(member.sessionTimeoutMs)
-  }
 
   // TODO: decide if ids should be predictable or random
   def generateMemberIdSuffix = UUID.randomUUID().toString
 
   def canRebalance = state == Stable || state == AwaitingSync
 
-  def transitionTo(groupState: GroupState) {
+  def transitionTo(groupState: GroupState)
     assertValidTransition(groupState)
     state = groupState
-  }
 
-  def selectProtocol: String = {
+  def selectProtocol: String =
     if (members.isEmpty)
       throw new IllegalStateException("Cannot select protocol for empty group")
 
@@ -197,56 +186,48 @@ private[coordinator] class GroupMetadata(
       .toList
 
     votes.maxBy(_._2)._1
-  }
 
-  private def candidateProtocols = {
+  private def candidateProtocols =
     // get the set of protocols that are commonly supported by all members
     allMemberMetadata
       .map(_.protocols)
       .reduceLeft((commonProtocols, protocols) => commonProtocols & protocols)
-  }
 
-  def supportsProtocols(memberProtocols: Set[String]) = {
+  def supportsProtocols(memberProtocols: Set[String]) =
     isEmpty || (memberProtocols & candidateProtocols).nonEmpty
-  }
 
-  def initNextGeneration() = {
+  def initNextGeneration() =
     assert(notYetRejoinedMembers == List.empty[MemberMetadata])
     generationId += 1
     protocol = selectProtocol
     transitionTo(AwaitingSync)
-  }
 
-  def currentMemberMetadata: Map[String, Array[Byte]] = {
+  def currentMemberMetadata: Map[String, Array[Byte]] =
     if (is(Dead) || is(PreparingRebalance))
       throw new IllegalStateException(
           "Cannot obtain member metadata for group in state %s".format(state))
-    members.map {
+    members.map
       case (memberId, memberMetadata) =>
         (memberId, memberMetadata.metadata(protocol))
-    }.toMap
-  }
+    .toMap
 
-  def summary: GroupSummary = {
-    if (is(Stable)) {
-      val members = this.members.values.map { member =>
+  def summary: GroupSummary =
+    if (is(Stable))
+      val members = this.members.values.map  member =>
         member.summary(protocol)
-      }.toList
+      .toList
       GroupSummary(state.toString, protocolType, protocol, members)
-    } else {
-      val members = this.members.values.map { member =>
+    else
+      val members = this.members.values.map  member =>
         member.summaryNoMetadata()
-      }.toList
+      .toList
       GroupSummary(
           state.toString, protocolType, GroupCoordinator.NoProtocol, members)
-    }
-  }
 
-  def overview: GroupOverview = {
+  def overview: GroupOverview =
     GroupOverview(groupId, protocolType)
-  }
 
-  private def assertValidTransition(targetState: GroupState) {
+  private def assertValidTransition(targetState: GroupState)
     if (!GroupMetadata.validPreviousStates(targetState).contains(state))
       throw new IllegalStateException(
           "Group %s should be in the %s states before moving to %s state. Instead it is in %s state"
@@ -255,10 +236,7 @@ private[coordinator] class GroupMetadata(
               GroupMetadata.validPreviousStates(targetState).mkString(","),
               targetState,
               state))
-  }
 
-  override def toString = {
+  override def toString =
     "[%s,%s,%s,%s]".format(
         groupId, protocolType, currentState.toString, members)
-  }
-}

@@ -17,59 +17,53 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
+class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig)
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
       "akka.actor.default-dispatcher")
   implicit val materializer = ActorMaterializer(settings)
 
-  "InputStreamSource" must {
+  "InputStreamSource" must
 
-    "not signal when no demand" in {
+    "not signal when no demand" in
       val f = StreamConverters.fromInputStream(() ⇒
-            new InputStream {
+            new InputStream
           override def read(): Int = 42
-      })
+      )
 
       Await.result(f.takeWithin(5.seconds).runForeach(it ⇒ ()), 10.seconds)
-    }
 
-    "read bytes from InputStream" in assertAllStagesStopped {
+    "read bytes from InputStream" in assertAllStagesStopped
       val f = StreamConverters
         .fromInputStream(() ⇒
-              new InputStream {
+              new InputStream
             @volatile var buf = List("a", "b", "c").map(_.charAt(0).toInt)
-            override def read(): Int = {
-              buf match {
+            override def read(): Int =
+              buf match
                 case head :: tail ⇒
                   buf = tail
                   head
                 case Nil ⇒
                   -1
-              }
-            }
-        })
+        )
         .runWith(Sink.head)
 
       f.futureValue should ===(ByteString("abc"))
-    }
 
-    "emit as soon as read" in assertAllStagesStopped {
+    "emit as soon as read" in assertAllStagesStopped
       val latch = new CountDownLatch(1)
       val probe = StreamConverters
         .fromInputStream(() ⇒
-                           new InputStream {
+                           new InputStream
                              @volatile var emitted = false
-                             override def read(): Int = {
-                               if (!emitted) {
+                             override def read(): Int =
+                               if (!emitted)
                                  emitted = true
                                  'M'.toInt
-                               } else {
+                               else
                                  latch.await()
                                  -1
-                               }
-                             }
-                         },
+                         ,
                          chunkSize = 1)
         .runWith(TestSink.probe)
 
@@ -77,6 +71,3 @@ class InputStreamSourceSpec extends AkkaSpec(UnboundedMailboxConfig) {
       probe.expectNext(ByteString("M"))
       latch.countDown()
       probe.expectComplete()
-    }
-  }
-}

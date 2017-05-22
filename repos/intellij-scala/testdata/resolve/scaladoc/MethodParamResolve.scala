@@ -1,4 +1,4 @@
-class a {
+class a
 
   /**
     *  @param <testref>T a
@@ -8,4 +8,3 @@ class a {
     *  @param <testref>e q
     */
   def f[T, U, E, Q <: E](T: Int, U: T, E: U, d: E, e: Q) {}
-}

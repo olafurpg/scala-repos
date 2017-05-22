@@ -25,7 +25,7 @@ import org.openjdk.jmh.annotations.Level
 @Warmup(iterations = 4)
 @Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-class VersionVectorBenchmark {
+class VersionVectorBenchmark
 
   @Param(Array("1", "2", "5"))
   var size = 0
@@ -45,12 +45,11 @@ class VersionVectorBenchmark {
   var dot1: VersionVector = _
 
   @Setup(Level.Trial)
-  def setup(): Unit = {
+  def setup(): Unit =
     vv1 = (1 to size).foldLeft(VersionVector.empty)((vv, n) => vv + nextNode())
     vv2 = vv1 + nextNode()
     vv3 = vv1 + nextNode()
     dot1 = VersionVector(nodeA, vv1.versionAt(nodeA))
-  }
 
   @Benchmark
   def increment: VersionVector = (vv1 + nodeA)
@@ -72,4 +71,3 @@ class VersionVectorBenchmark {
 
   @Benchmark
   def mergeConflicting: VersionVector = vv2.merge(vv3)
-}

@@ -7,27 +7,25 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable._
 import play.libs.oauth.OAuth
 
-class AhcWSRequestSpec extends Specification with Mockito {
+class AhcWSRequestSpec extends Specification with Mockito
 
-  "AhcWSRequest" should {
+  "AhcWSRequest" should
 
-    "respond to getMethod" in {
+    "respond to getMethod" in
       val client = mock[AhcWSClient]
       val request =
         new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
       request.buildRequest().getMethod must be_==("GET")
-    }
 
-    "set virtualHost appropriately" in {
+    "set virtualHost appropriately" in
       val client = mock[AhcWSClient]
       val request =
         new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
       request.setVirtualHost("foo.com")
       val actual = request.buildRequest().getVirtualHost()
       actual must beEqualTo("foo.com")
-    }
 
-    "Have form body on POST of content type text/plain" in {
+    "Have form body on POST of content type text/plain" in
       val client = mock[AhcWSClient]
       val formEncoding = java.net.URLEncoder.encode("param1=value1", "UTF-8")
 
@@ -38,9 +36,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
           .asInstanceOf[AhcWSRequest]
       val req = ahcRequest.buildRequest()
       req.getStringData must be_==("HELLO WORLD")
-    }
 
-    "Have form body on POST of content type application/x-www-form-urlencoded explicitly set" in {
+    "Have form body on POST of content type application/x-www-form-urlencoded explicitly set" in
       import scala.collection.JavaConverters._
       val client = mock[AhcWSClient]
       val req = new AhcWSRequest(client, "http://playframework.com/", null)
@@ -49,9 +46,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
         .asInstanceOf[AhcWSRequest]
         .buildRequest()
       req.getStringData must be_==("HELLO WORLD") // should result in byte data.
-    }
 
-    "Have form params on POST of content type application/x-www-form-urlencoded when signed" in {
+    "Have form params on POST of content type application/x-www-form-urlencoded when signed" in
       import scala.collection.JavaConverters._
       val client = mock[AhcWSClient]
       val consumerKey = new OAuth.ConsumerKey("key", "secret")
@@ -66,9 +62,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
       // Note we use getFormParams instead of getByteData here.
       req.getFormParams.asScala must containTheSameElementsAs(
           List(new org.asynchttpclient.Param("param1", "value1")))
-    }
 
-    "Remove a user defined content length header if we are parsing body explicitly when signed" in {
+    "Remove a user defined content length header if we are parsing body explicitly when signed" in
       import scala.collection.JavaConverters._
       val client = mock[AhcWSClient]
       val consumerKey = new OAuth.ConsumerKey("key", "secret")
@@ -86,34 +81,28 @@ class AhcWSRequestSpec extends Specification with Mockito {
       req.getFormParams.asScala must containTheSameElementsAs(
           List(new org.asynchttpclient.Param("param1", "value1")))
       headers.get("Content-Length") must beNull // no content length!
-    }
 
-    "support setting a request timeout" in {
+    "support setting a request timeout" in
       requestWithTimeout(1000) must beEqualTo(1000)
-    }
 
-    "support setting an infinite request timeout" in {
+    "support setting an infinite request timeout" in
       requestWithTimeout(-1) must beEqualTo(-1)
-    }
 
-    "not support setting a request timeout < -1" in {
+    "not support setting a request timeout < -1" in
       requestWithTimeout(-2) must throwA[IllegalArgumentException]
-    }
 
-    "not support setting a request timeout > Integer.MAX_VALUE" in {
+    "not support setting a request timeout > Integer.MAX_VALUE" in
       requestWithTimeout(Int.MaxValue.toLong + 1) must throwA[
           IllegalArgumentException]
-    }
 
-    "set a query string appropriately" in {
+    "set a query string appropriately" in
       val queryParams = requestWithQueryString("q=playframework&src=typd")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
             (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(p => (p.getName == "src") && (p.getValue == "typd")) must beTrue
-    }
 
-    "support several query string values for a parameter" in {
+    "support several query string values for a parameter" in
       val queryParams = requestWithQueryString("q=scala&q=playframework&q=fp")
       queryParams.size must beEqualTo(3)
       queryParams.exists(p => (p.getName == "q") && (p.getValue == "scala")) must beTrue
@@ -121,27 +110,23 @@ class AhcWSRequestSpec extends Specification with Mockito {
             (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(p => (p.getName == "q") && (p.getValue == "fp")) must beTrue
       queryParams.count(p => p.getName == "q") must beEqualTo(3)
-    }
 
-    "support a query string parameter without value" in {
+    "support a query string parameter without value" in
       val queryParams = requestWithQueryString("q=playframework&src=")
       queryParams.size must beEqualTo(2)
       queryParams.exists(p =>
             (p.getName == "q") && (p.getValue == "playframework")) must beTrue
       queryParams.exists(
           p => (p.getName.equals("src")) && (p.getValue == null)) must beTrue
-    }
 
-    "not support a query string with more than 2 = per part" in {
+    "not support a query string with more than 2 = per part" in
       requestWithQueryString("q=scala=playframework&src=typd") must throwA[
           RuntimeException]
-    }
 
-    "not support a query string if it starts with = and is empty" in {
+    "not support a query string if it starts with = and is empty" in
       requestWithQueryString("=&src=typd") must throwA[RuntimeException]
-    }
 
-    "only send first content type header and add charset=utf-8 to the Content-Type header if it's manually adding but lacking charset" in {
+    "only send first content type header and add charset=utf-8 to the Content-Type header if it's manually adding but lacking charset" in
       val client = mock[AhcWSClient]
       val request =
         new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
@@ -150,9 +135,8 @@ class AhcWSRequestSpec extends Specification with Mockito {
       request.setHeader("Content-Type", "application/xml")
       val req = request.buildRequest()
       req.getHeaders.get("Content-Type") must be_==("application/json")
-    }
 
-    "only send first content type header and keep the charset if it has been set manually with a charset" in {
+    "only send first content type header and keep the charset if it has been set manually with a charset" in
       val client = mock[AhcWSClient]
       val request =
         new AhcWSRequest(client, "http://example.com", /*materializer*/ null)
@@ -162,18 +146,15 @@ class AhcWSRequestSpec extends Specification with Mockito {
       val req = request.buildRequest()
       req.getHeaders.get("Content-Type") must be_==(
           "application/json; charset=US-ASCII")
-    }
-  }
 
-  def requestWithTimeout(timeout: Long) = {
+  def requestWithTimeout(timeout: Long) =
     val client = mock[AhcWSClient]
     val request = new AhcWSRequest(
         client, "http://example.com", /*materializer*/ null)
     request.setRequestTimeout(timeout)
     request.buildRequest().getRequestTimeout()
-  }
 
-  def requestWithQueryString(query: String) = {
+  def requestWithQueryString(query: String) =
     import scala.collection.JavaConverters._
     val client = mock[AhcWSClient]
     val request = new AhcWSRequest(
@@ -181,5 +162,3 @@ class AhcWSRequestSpec extends Specification with Mockito {
     request.setQueryString(query)
     val queryParams = request.buildRequest().getQueryParams
     queryParams.asScala.toSeq
-  }
-}

@@ -17,7 +17,7 @@
 
 package org.apache.spark.deploy
 
-private[deploy] object ExecutorState extends Enumeration {
+private[deploy] object ExecutorState extends Enumeration
 
   val LAUNCHING, RUNNING, KILLED, FAILED, LOST, EXITED = Value
 
@@ -25,4 +25,3 @@ private[deploy] object ExecutorState extends Enumeration {
 
   def isFinished(state: ExecutorState): Boolean =
     Seq(KILLED, FAILED, LOST, EXITED).contains(state)
-}

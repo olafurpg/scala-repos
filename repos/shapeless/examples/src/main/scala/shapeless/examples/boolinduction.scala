@@ -16,7 +16,7 @@
 
 package shapeless.examples
 
-object BooleanInduction extends App {
+object BooleanInduction extends App
   import shapeless._
   import syntax.singleton._
 
@@ -27,14 +27,11 @@ object BooleanInduction extends App {
   type False = wFalse.T
 
   trait If[C <: Boolean, A, B] { type T; def apply(a: A, b: B): T }
-  object If {
-    implicit def ifTrue[A, B] = new If[True, A, B] {
+  object If
+    implicit def ifTrue[A, B] = new If[True, A, B]
       type T = A; def apply(a: A, b: B) = a
-    }
-    implicit def ifFalse[A, B] = new If[False, A, B] {
+    implicit def ifFalse[A, B] = new If[False, A, B]
       type T = B; def apply(a: A, b: B) = b
-    }
-  }
 
   // Scala translation of:
   //
@@ -43,19 +40,17 @@ object BooleanInduction extends App {
   // bool-induction P pt pf false = pf
 
   def boolInduction[P <: { type Case [_ <: Boolean] <: { type T } }, PT, PF](
-      p: P)(t: PT)(f: PF)(x: Witness.Lt[Boolean])(implicit pt: p.Case[True] {
+      p: P)(t: PT)(f: PF)(x: Witness.Lt[Boolean])(implicit pt: p.Case[True]
     type T = PT
-  }, pf: p.Case[False] { type T = PF }, sel: If[x.T, PT, PF]): sel.T =
+  , pf: p.Case[False] { type T = PF }, sel: If[x.T, PT, PF]): sel.T =
     sel(t, f)
 
   // In use ...
 
-  object si {
+  object si
     trait Case[B <: Boolean] { type T }
     implicit val sit = new Case[True] { type T = String }
     implicit val sif = new Case[False] { type T = Int }
-  }
 
   val bt: String = boolInduction(si)("foo")(23)(true)
   val bf: Int = boolInduction(si)("foo")(23)(false)
-}

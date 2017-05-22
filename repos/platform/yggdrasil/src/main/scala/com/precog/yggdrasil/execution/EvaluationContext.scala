@@ -39,7 +39,7 @@ case class EvaluationContext(apiKey: APIKey,
                              scriptPath: Path,
                              startTime: DateTime)
 
-object EvaluationContext {
+object EvaluationContext
   implicit val iso =
     Iso.hlist(EvaluationContext.apply _, EvaluationContext.unapply _)
 
@@ -50,4 +50,3 @@ object EvaluationContext {
       schemaV1, Some("1.0".v))
   implicit val extractor: Extractor[EvaluationContext] = extractorV(
       schemaV1, Some("1.0".v))
-}

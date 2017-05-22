@@ -37,7 +37,7 @@ import scala.xml.{NodeSeq, Node}
   * template replacing the node with the id "name" with the firstName of
   * the user
   */
-trait MVCHelper extends LiftRules.DispatchPF {
+trait MVCHelper extends LiftRules.DispatchPF
 
   /**
     * The partial function to match a request to a response
@@ -53,16 +53,14 @@ trait MVCHelper extends LiftRules.DispatchPF {
 
   private lazy val nonDevDispatch = _dispatch.reverse
 
-  private object curRequest extends RequestVar[Req](null) {
+  private object curRequest extends RequestVar[Req](null)
     override def __nameSalt = Helpers.nextFuncName
-  }
 
   private object curSession
       extends RequestVar[LiftSession](
           S.session openOr LiftRules.statelessSession.vend
-            .apply(curRequest.is)) {
+            .apply(curRequest.is))
     override def __nameSalt = Helpers.nextFuncName
-  }
 
   private def dispatch: List[MVCMatch] =
     if (Props.devMode) _dispatch.reverse else nonDevDispatch
@@ -70,24 +68,21 @@ trait MVCHelper extends LiftRules.DispatchPF {
   /**
     * Is the Rest helper defined for a given request
     */
-  def isDefinedAt(in: Req) = {
-    S.session match {
+  def isDefinedAt(in: Req) =
+    S.session match
       case Full(_) => dispatch.find(_.isDefinedAt(in.path.partPath)).isDefined
 
       case _ =>
         curRequest.set(in)
-        S.init(Box !! in, curSession.is) {
+        S.init(Box !! in, curSession.is)
           dispatch.find(_.isDefinedAt(in.path.partPath)).isDefined
-        }
-    }
-  }
 
   /**
     * Apply the Rest helper
     */
-  def apply(in: Req): () => Box[LiftResponse] = {
+  def apply(in: Req): () => Box[LiftResponse] =
     val path = in.path.partPath
-    S.session match {
+    S.session match
       case Full(_) =>
         val resp = dispatch
           .find(_.isDefinedAt(path))
@@ -99,7 +94,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
             resp
 
         case _ =>
-        S.init(Box !! in, curSession.is) {
+        S.init(Box !! in, curSession.is)
           val resp = dispatch
             .find(_.isDefinedAt(path))
             .get
@@ -108,9 +103,6 @@ trait MVCHelper extends LiftRules.DispatchPF {
 
             () =>
               resp
-        }
-    }
-  }
 
   /**
     * A trait that holds a response for the MVCHelper.  Conversions
@@ -121,38 +113,33 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * or Box or Option of any of the above.
     * 
     */
-  protected sealed trait MVCResponse {
+  protected sealed trait MVCResponse
     def toResponse: Box[LiftResponse]
-  }
 
-  private def templateForPath(req: Req): Box[NodeSeq] = {
+  private def templateForPath(req: Req): Box[NodeSeq] =
 
-    def tryIt(path: List[String]): Box[NodeSeq] = path match {
+    def tryIt(path: List[String]): Box[NodeSeq] = path match
       case Nil => Empty
       case xs =>
-        Templates(path) match {
+        Templates(path) match
           case ret @ Full(_) => ret
           case _ => tryIt(path.dropRight(1))
-        }
-    }
 
     tryIt(req.path.partPath)
-  }
 
-  object MVCResponse {
+  object MVCResponse
     implicit def unitToResponse(unit: Unit): MVCResponse =
-      new MVCResponse {
-        val toResponse: Box[LiftResponse] = for {
+      new MVCResponse
+        val toResponse: Box[LiftResponse] = for
           session <- S.session
           req <- S.request
           template <- templateForPath(req)
           resp <- session.processTemplate(Full(template), req, req.path, 200)
-        } yield resp
-      }
+        yield resp
 
     implicit def bindToResponse(bind: CssBindFunc): MVCResponse =
-      new MVCResponse {
-        val toResponse: Box[LiftResponse] = for {
+      new MVCResponse
+        val toResponse: Box[LiftResponse] = for
           session <- S.session
           req <- S.request
           template <- templateForPath(req)
@@ -160,34 +147,27 @@ trait MVCHelper extends LiftRules.DispatchPF {
                                           req,
                                           req.path,
                                           200)
-        } yield resp
-      }
+        yield resp
 
-    implicit def nsToResponse(nodes: Seq[Node]): MVCResponse = {
-      new MVCResponse {
-        val toResponse: Box[LiftResponse] = for {
+    implicit def nsToResponse(nodes: Seq[Node]): MVCResponse =
+      new MVCResponse
+        val toResponse: Box[LiftResponse] = for
           session <- S.session
           req <- S.request
           resp <- session.processTemplate(Full(nodes), req, req.path, 200)
-        } yield resp
-      }
-    }
+        yield resp
 
     implicit def respToResponse(resp: LiftResponse): MVCResponse =
-      new MVCResponse {
+      new MVCResponse
         val toResponse: Box[LiftResponse] = Full(resp)
-      }
 
     implicit def boxThinginy[T](box: Box[T])(
-        implicit f: T => MVCResponse): MVCResponse = new MVCResponse {
+        implicit f: T => MVCResponse): MVCResponse = new MVCResponse
       val toResponse: Box[LiftResponse] = boxToResp(box)(f)
-    }
 
     implicit def optionThinginy[T](box: Option[T])(
-        implicit f: T => MVCResponse): MVCResponse = new MVCResponse {
+        implicit f: T => MVCResponse): MVCResponse = new MVCResponse
       val toResponse: Box[LiftResponse] = boxToResp(box)(f)
-    }
-  }
 
   /**
     * Turn a Box[T] into the return type expected by
@@ -197,10 +177,9 @@ trait MVCHelper extends LiftRules.DispatchPF {
     */
   protected implicit def boxToResp[T](
       in: Box[T])(implicit c: T => MVCResponse): Box[LiftResponse] =
-    in match {
+    in match
       case Full(v) => c(v).toResponse
       case e: EmptyBox => emptyToResp(e)
-    }
 
   /**
     * Convert an Empty into an appropriate LiftResponse.  In the
@@ -208,7 +187,7 @@ trait MVCHelper extends LiftRules.DispatchPF {
     * message to the user.
     */
   protected def emptyToResp(eb: EmptyBox): Box[LiftResponse] =
-    eb match {
+    eb match
       case ParamFailure(msg, _, _, code: Int) =>
         Full(
             InMemoryResponse(
@@ -221,22 +200,17 @@ trait MVCHelper extends LiftRules.DispatchPF {
         Full(NotFoundResponse(msg))
 
       case _ => Empty
-    }
 
   /**
     * Validate what, if it passes validation, then
     * redirect to the new URL, else display the messages
     * using S.error and redisplay the current page.
     */
-  protected def saveRedir(what: {
+  protected def saveRedir(what:
     def validate: List[FieldError];
     def save(): Boolean
-  }, where: String) =
+  , where: String) =
     () =>
-      {
-        what.validate match {
+        what.validate match
           case Nil => what.save(); S.redirectTo(where)
           case xs => S.error(xs)
-        }
-    }
-}

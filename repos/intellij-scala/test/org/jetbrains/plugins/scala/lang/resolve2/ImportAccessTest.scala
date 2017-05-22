@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ImportAccessTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ImportAccessTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "import/access/"
-  }
 
   def testInheritedPrivate() = doTest()
   def testInheritedPrivateClash1() = doTest()
@@ -20,4 +19,3 @@ class ImportAccessTest extends ResolveTestBase {
   def testPrivateValue() = doTest()
   def testPrivateVariable() = doTest()
   def testProtectedClass() = doTest()
-}

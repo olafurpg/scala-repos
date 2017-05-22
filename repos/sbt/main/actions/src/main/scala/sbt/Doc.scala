@@ -20,7 +20,7 @@ import xsbti.Reporter
 
 import sbt.util.Logger
 
-object Doc {
+object Doc
   import RawCompileLike._
   def scaladoc(label: String, cache: File, compiler: AnalyzingCompiler): Gen =
     scaladoc(label, cache, compiler, Seq())
@@ -50,10 +50,9 @@ object Doc {
                                  (sources: Seq[File], classpath: Seq[File],
                                  outputDirectory: File, options: Seq[String],
                                  maxErrors: Int, log: Logger) =>
-                                   {
                                      // doc.doc
                                      ???
-                                 })))
+                                 )))
 
   val javaSourcesOnly: File => Boolean = _.getName.endsWith(".java")
 
@@ -65,13 +64,13 @@ object Doc {
 
   private[sbt] final class Scaladoc(
       maximumErrors: Int, compiler: AnalyzingCompiler)
-      extends Doc {
+      extends Doc
     def apply(label: String,
               sources: Seq[File],
               classpath: Seq[File],
               outputDirectory: File,
               options: Seq[String],
-              log: Logger) {
+              log: Logger)
       generate("Scala",
                label,
                compiler.doc,
@@ -81,17 +80,15 @@ object Doc {
                options,
                maximumErrors,
                log)
-    }
-  }
   private[sbt] final class Javadoc(
       maximumErrors: Int, doc: sbt.internal.inc.Javadoc)
-      extends Doc {
+      extends Doc
     def apply(label: String,
               sources: Seq[File],
               classpath: Seq[File],
               outputDirectory: File,
               options: Seq[String],
-              log: Logger) {
+              log: Logger)
       // javadoc doesn't handle *.scala properly, so we evict them from javadoc sources list.
       generate("Java",
                label,
@@ -102,11 +99,8 @@ object Doc {
                options,
                maximumErrors,
                log)
-    }
-  }
-}
 // @deprecated("No longer used.  See `Doc.javadoc` or `Doc.scaladoc`", "0.13.0")
-sealed trait Doc {
+sealed trait Doc
   type Gen = (Seq[File], Seq[File], File, Seq[String], Int, Logger) => Unit
 
   //   def apply(label: String, sources: Seq[File], classpath: Seq[File], outputDirectory: File, options: Seq[String], log: Logger): Unit
@@ -119,19 +113,17 @@ sealed trait Doc {
                                   outputDirectory: File,
                                   options: Seq[String],
                                   maxErrors: Int,
-                                  log: Logger) {
+                                  log: Logger)
     val logSnip = variant + " API documentation"
     if (sources.isEmpty)
       log.info("No sources available, skipping " + logSnip + "...")
-    else {
+    else
       log.info("Generating " + logSnip + " for " + label + " sources to " +
           outputDirectory.absolutePath + "...")
       IO.delete(outputDirectory)
       IO.createDirectory(outputDirectory)
       docf(sources, classpath, outputDirectory, options, maxErrors, log)
       log.info(logSnip + " generation successful.")
-    }
-  }
 
   //   def cached(cache: File, label: String, sources: Seq[File], classpath: Seq[File], outputDirectory: File, options: Seq[String], log: Logger) {
   //     type Inputs = FilesInfo[HashFileInfo] :+: FilesInfo[ModifiedFileInfo] :+: String :+: File :+: Seq[String] :+: HNil
@@ -148,4 +140,3 @@ sealed trait Doc {
   //     }
   //     cachedDoc(inputs)(() => exists(outputDirectory.allPaths.get.toSet))
   //   }
-}

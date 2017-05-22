@@ -9,7 +9,7 @@ package akka.http.impl.engine.ws
   *
   * INTERNAL API
   */
-private[http] object Protocol {
+private[http] object Protocol
   val FIN_MASK = 0x80
   val RSV1_MASK = 0x40
   val RSV2_MASK = 0x20
@@ -21,12 +21,11 @@ private[http] object Protocol {
   val MASK_MASK = 0x80
   val LENGTH_MASK = 0x7F
 
-  sealed trait Opcode {
+  sealed trait Opcode
     def code: Byte
     def isControl: Boolean
-  }
-  object Opcode {
-    def forCode(code: Byte): Opcode = code match {
+  object Opcode
+    def forCode(code: Byte): Opcode = code match
       case 0x0 ⇒ Continuation
       case 0x1 ⇒ Text
       case 0x2 ⇒ Binary
@@ -39,12 +38,10 @@ private[http] object Protocol {
       case _ ⇒
         throw new IllegalArgumentException(
             f"Opcode must be 4bit long but was 0x$code%02X")
-    }
 
     sealed abstract class AbstractOpcode private[Opcode](val code: Byte)
-        extends Opcode {
+        extends Opcode
       def isControl: Boolean = (code & 0x8) != 0
-    }
 
     case object Continuation extends AbstractOpcode(0x0)
     case object Text extends AbstractOpcode(0x1)
@@ -55,12 +52,11 @@ private[http] object Protocol {
     case object Pong extends AbstractOpcode(0xA)
 
     case class Other(override val code: Byte) extends AbstractOpcode(code)
-  }
 
   /**
     * Close status codes as defined at http://tools.ietf.org/html/rfc6455#section-7.4.1
     */
-  object CloseCodes {
+  object CloseCodes
     def isError(code: Int): Boolean = !(code == Regular || code == GoingAway)
     def isValid(code: Int): Boolean =
       ((code >= 1000) && (code <= 1003)) || (code >= 1007) && (code <= 1011) ||
@@ -79,8 +75,6 @@ private[http] object Protocol {
     val ClientRejectsExtension = 1010
     val UnexpectedCondition = 1011
     val TLSHandshakeFailure = 1015
-  }
-}
 
 /** INTERNAL API */
 private[http] case class ProtocolException(cause: String)

@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.parser.ScalaElementTypes
 /**
   * @author ilyas
   */
-object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT) {
+object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT)
   def getText: String = null
   def removeRange(firstNodeToRemove: ASTNode, firstNodeToKeep: ASTNode) {}
   def replaceChild(oldChild: ASTNode, newChild: ASTNode) {}
@@ -48,4 +48,3 @@ object DummyASTNode extends TreeElement(ScalaElementTypes.DUMMY_ELEMENT) {
   def getPsi[T <: PsiElement](p1: Class[T]): T = null.asInstanceOf[T]
 
   def getInstanceForJava = this
-}

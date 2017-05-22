@@ -27,7 +27,7 @@ import scala.reflect.ClassTag
   *
   * @see The [[play.api.inject.Module Module]] class for information on how to provide bindings.
   */
-package object inject {
+package object inject
 
   /**
     * Create a binding key for the given class.
@@ -43,4 +43,3 @@ package object inject {
     */
   def bind[T : ClassTag]: BindingKey[T] =
     BindingKey(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
-}

@@ -47,7 +47,7 @@ import org.apache.spark.util.{ShutdownHookManager, Utils}
  */
 private[mesos] class MesosClusterDispatcher(
     args: MesosClusterDispatcherArguments, conf: SparkConf)
-    extends Logging {
+    extends Logging
 
   private val publicAddress =
     Option(conf.getenv("SPARK_PUBLIC_DNS")).getOrElse(args.host)
@@ -55,13 +55,12 @@ private[mesos] class MesosClusterDispatcher(
     conf.get("spark.deploy.recoveryMode", "NONE").toUpperCase()
   logInfo("Recovery mode in Mesos dispatcher set to: " + recoveryMode)
 
-  private val engineFactory = recoveryMode match {
+  private val engineFactory = recoveryMode match
     case "NONE" => new BlackHoleMesosClusterPersistenceEngineFactory
     case "ZOOKEEPER" => new ZookeeperMesosClusterPersistenceEngineFactory(conf)
     case _ =>
       throw new IllegalArgumentException(
           "Unsupported recovery mode: " + recoveryMode)
-  }
 
   private val scheduler = new MesosClusterScheduler(engineFactory, conf)
 
@@ -75,44 +74,36 @@ private[mesos] class MesosClusterDispatcher(
 
   private val shutdownLatch = new CountDownLatch(1)
 
-  def start(): Unit = {
+  def start(): Unit =
     webUi.bind()
     scheduler.frameworkUrl = conf.get(
         "spark.mesos.dispatcher.webui.url", webUi.activeWebUiUrl)
     scheduler.start()
     server.start()
-  }
 
-  def awaitShutdown(): Unit = {
+  def awaitShutdown(): Unit =
     shutdownLatch.await()
-  }
 
-  def stop(): Unit = {
+  def stop(): Unit =
     webUi.stop()
     server.stop()
     scheduler.stop()
     shutdownLatch.countDown()
-  }
-}
 
-private[mesos] object MesosClusterDispatcher extends Logging {
-  def main(args: Array[String]) {
+private[mesos] object MesosClusterDispatcher extends Logging
+  def main(args: Array[String])
     Utils.initDaemon(log)
     val conf = new SparkConf
     val dispatcherArgs = new MesosClusterDispatcherArguments(args, conf)
     conf.setMaster(dispatcherArgs.masterUrl)
     conf.setAppName(dispatcherArgs.name)
-    dispatcherArgs.zookeeperUrl.foreach { z =>
+    dispatcherArgs.zookeeperUrl.foreach  z =>
       conf.set("spark.deploy.recoveryMode", "ZOOKEEPER")
       conf.set("spark.deploy.zookeeper.url", z)
-    }
     val dispatcher = new MesosClusterDispatcher(dispatcherArgs, conf)
     dispatcher.start()
-    ShutdownHookManager.addShutdownHook { () =>
+    ShutdownHookManager.addShutdownHook  () =>
       logInfo("Shutdown hook is shutting down dispatcher")
       dispatcher.stop()
       dispatcher.awaitShutdown()
-    }
     dispatcher.awaitShutdown()
-  }
-}

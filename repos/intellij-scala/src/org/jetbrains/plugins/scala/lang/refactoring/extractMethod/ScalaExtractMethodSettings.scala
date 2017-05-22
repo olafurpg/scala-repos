@@ -21,24 +21,20 @@ class ScalaExtractMethodSettings(val methodName: String,
                                  val returnType: Option[ScType],
                                  val lastReturn: Boolean,
                                  val lastExprType: Option[ScType],
-                                 val innerClassSettings: InnerClassSettings) {
+                                 val innerClassSettings: InnerClassSettings)
 
   lazy val (calcReturnTypeIsUnit, calcReturnTypeText) =
     ScalaExtractMethodUtils.calcReturnTypeExt(this)
 
-  val typeParameters: Seq[ScTypeParam] = {
+  val typeParameters: Seq[ScTypeParam] =
     val tp: ArrayBuffer[ScTypeParam] = new ArrayBuffer
     var elem: PsiElement = elements.apply(0)
     val nextRange = nextSibling.getTextRange
     while (elem != null && !(elem.getTextRange.contains(nextRange) &&
         !elem.getTextRange.equalsToRange(
-            nextRange.getStartOffset, nextRange.getEndOffset))) {
-      elem match {
+            nextRange.getStartOffset, nextRange.getEndOffset)))
+      elem match
         case tpo: ScTypeParametersOwner => tp ++= tpo.typeParameters
         case _ =>
-      }
       elem = elem.getParent
-    }
     tp.reverse
-  }
-}

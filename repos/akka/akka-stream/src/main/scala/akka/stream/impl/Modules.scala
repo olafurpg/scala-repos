@@ -17,7 +17,7 @@ import akka.event.Logging
   */
 private[akka] abstract class SourceModule[+Out, +Mat](
     val shape: SourceShape[Out])
-    extends AtomicModule {
+    extends AtomicModule
 
   protected def label: String = Logging.simpleName(this)
   final override def toString: String =
@@ -39,14 +39,12 @@ private[akka] abstract class SourceModule[+Out, +Mat](
   override def carbonCopy: AtomicModule =
     newInstance(SourceShape(shape.out.carbonCopy()))
 
-  protected def amendShape(attr: Attributes): SourceShape[Out] = {
+  protected def amendShape(attr: Attributes): SourceShape[Out] =
     val thisN = attributes.nameOrDefault(null)
     val thatN = attr.nameOrDefault(null)
 
     if ((thatN eq null) || thisN == thatN) shape
     else shape.copy(out = Outlet(thatN + ".out"))
-  }
-}
 
 /**
   * INTERNAL API
@@ -55,20 +53,18 @@ private[akka] abstract class SourceModule[+Out, +Mat](
   */
 private[akka] final class SubscriberSource[Out](
     val attributes: Attributes, shape: SourceShape[Out])
-    extends SourceModule[Out, Subscriber[Out]](shape) {
+    extends SourceModule[Out, Subscriber[Out]](shape)
 
   override def create(
-      context: MaterializationContext): (Publisher[Out], Subscriber[Out]) = {
+      context: MaterializationContext): (Publisher[Out], Subscriber[Out]) =
     val processor = new VirtualProcessor[Out]
     (processor, processor)
-  }
 
   override protected def newInstance(
       shape: SourceShape[Out]): SourceModule[Out, Subscriber[Out]] =
     new SubscriberSource[Out](attributes, shape)
   override def withAttributes(attr: Attributes): AtomicModule =
     new SubscriberSource[Out](attr, amendShape(attr))
-}
 
 /**
   * INTERNAL API
@@ -79,7 +75,7 @@ private[akka] final class SubscriberSource[Out](
   */
 private[akka] final class PublisherSource[Out](
     p: Publisher[Out], val attributes: Attributes, shape: SourceShape[Out])
-    extends SourceModule[Out, NotUsed](shape) {
+    extends SourceModule[Out, NotUsed](shape)
 
   override protected def label: String = s"PublisherSource($p)"
 
@@ -90,26 +86,23 @@ private[akka] final class PublisherSource[Out](
     new PublisherSource[Out](p, attributes, shape)
   override def withAttributes(attr: Attributes): AtomicModule =
     new PublisherSource[Out](p, attr, amendShape(attr))
-}
 
 /**
   * INTERNAL API
   */
 private[akka] final class MaybeSource[Out](
     val attributes: Attributes, shape: SourceShape[Out])
-    extends SourceModule[Out, Promise[Option[Out]]](shape) {
+    extends SourceModule[Out, Promise[Option[Out]]](shape)
 
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     val p = Promise[Option[Out]]()
     new MaybePublisher[Out](p, attributes.nameOrDefault("MaybeSource"))(
         context.materializer.executionContext) → p
-  }
   override protected def newInstance(
       shape: SourceShape[Out]): SourceModule[Out, Promise[Option[Out]]] =
     new MaybeSource[Out](attributes, shape)
   override def withAttributes(attr: Attributes): AtomicModule =
     new MaybeSource(attr, amendShape(attr))
-}
 
 /**
   * INTERNAL API
@@ -118,21 +111,19 @@ private[akka] final class MaybeSource[Out](
   */
 private[akka] final class ActorPublisherSource[Out](
     props: Props, val attributes: Attributes, shape: SourceShape[Out])
-    extends SourceModule[Out, ActorRef](shape) {
+    extends SourceModule[Out, ActorRef](shape)
 
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     val publisherRef = ActorMaterializer
       .downcast(context.materializer)
       .actorOf(context, props)
       (akka.stream.actor.ActorPublisher[Out](publisherRef), publisherRef)
-  }
 
   override protected def newInstance(
       shape: SourceShape[Out]): SourceModule[Out, ActorRef] =
     new ActorPublisherSource[Out](props, attributes, shape)
   override def withAttributes(attr: Attributes): AtomicModule =
     new ActorPublisherSource(props, attr, amendShape(attr))
-}
 
 /**
   * INTERNAL API
@@ -142,22 +133,20 @@ private[akka] final class ActorRefSource[Out](
     overflowStrategy: OverflowStrategy,
     val attributes: Attributes,
     shape: SourceShape[Out])
-    extends SourceModule[Out, ActorRef](shape) {
+    extends SourceModule[Out, ActorRef](shape)
 
   override protected def label: String =
     s"ActorRefSource($bufferSize, $overflowStrategy)"
 
-  override def create(context: MaterializationContext) = {
+  override def create(context: MaterializationContext) =
     val mat = ActorMaterializer.downcast(context.materializer)
     val ref = mat.actorOf(
         context,
         ActorRefSourceActor.props(bufferSize, overflowStrategy, mat.settings))
     (akka.stream.actor.ActorPublisher[Out](ref), ref)
-  }
 
   override protected def newInstance(
       shape: SourceShape[Out]): SourceModule[Out, ActorRef] =
     new ActorRefSource[Out](bufferSize, overflowStrategy, attributes, shape)
   override def withAttributes(attr: Attributes): AtomicModule =
     new ActorRefSource(bufferSize, overflowStrategy, attr, amendShape(attr))
-}

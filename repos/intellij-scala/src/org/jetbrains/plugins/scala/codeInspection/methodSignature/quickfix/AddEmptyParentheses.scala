@@ -8,8 +8,6 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
   * Pavel Fatin
   */
 class AddEmptyParentheses(f: ScFunction)
-    extends AbstractFixOnPsiElement("Add empty parentheses", f) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnPsiElement("Add empty parentheses", f)
+  def doApplyFix(project: Project)
     getElement.addEmptyParens()
-  }
-}

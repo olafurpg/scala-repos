@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Scope.ThisScope
 
-object Sxr {
+object Sxr
   val sxrConf = config("sxr").hide
   val sxr = TaskKey[File]("sxr")
   val sourceDirectories = TaskKey[Seq[File]]("sxr-source-directories")
@@ -33,10 +33,10 @@ object Sxr {
      classpathOptions,
      scalaInstance,
      fullClasspath,
-     streams) map { (srcs, out, opts, cpOpts, si, cp, s) =>
+     streams) map  (srcs, out, opts, cpOpts, si, cp, s) =>
       val cache = s.cacheDirectory
       val outputDir = out.getParentFile / (out.getName + ".sxr")
-      val f = FileFunction.cached(cache / "sxr", FilesInfo.hash) { in =>
+      val f = FileFunction.cached(cache / "sxr", FilesInfo.hash)  in =>
         s.log.info(
             "Generating sxr output in " + outputDir.getAbsolutePath + "...")
         IO.delete(out)
@@ -44,8 +44,5 @@ object Sxr {
         val comp = new compiler.RawCompiler(si, cpOpts, s.log)
         comp(in.toSeq.sorted, cp.files, out, opts)
         Set(outputDir)
-      }
       f(srcs.toSet)
       outputDir
-    }
-}

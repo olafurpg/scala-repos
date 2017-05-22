@@ -17,9 +17,7 @@
 package shapeless
 package syntax
 
-object unwrapped {
-  implicit class UnwrappedSyntax[T](val t: T) extends AnyVal {
+object unwrapped
+  implicit class UnwrappedSyntax[T](val t: T) extends AnyVal
     def unwrap[U](implicit uw: Unwrapped.Aux[T, U]): U = uw.unwrap(t)
     def wrap[W](implicit uw: Unwrapped.Aux[W, T]): W = uw.wrap(t)
-  }
-}

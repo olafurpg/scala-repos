@@ -47,13 +47,12 @@ case class MongoScheduleStorageSettings(
     timeout: Long = 10000
 )
 
-object MongoScheduleStorageSettings {
+object MongoScheduleStorageSettings
   val defaults = MongoScheduleStorageSettings()
-}
 
-object MongoScheduleStorage {
+object MongoScheduleStorage
   def apply(config: Configuration)(implicit executor: ExecutionContext)
-    : (MongoScheduleStorage, Stoppable) = {
+    : (MongoScheduleStorage, Stoppable) =
     val settings = MongoScheduleStorageSettings(
         config[String]("mongo.tasks", "tasks"),
         config[String]("mongo.tasks_deleted", "tasks_deleted"),
@@ -69,18 +68,16 @@ object MongoScheduleStorage {
     val storage = new MongoScheduleStorage(mongo, database, settings)
 
     val dbStop = Stoppable.fromFuture(
-        database.disconnect.fallbackTo(Future(())) flatMap { _ =>
+        database.disconnect.fallbackTo(Future(())) flatMap  _ =>
       mongo.close
-    })
+    )
 
     (storage, dbStop)
-  }
-}
 
 class MongoScheduleStorage private[MongoScheduleStorage](
     mongo: Mongo, database: Database, settings: MongoScheduleStorageSettings)(
     implicit executor: ExecutionContext)
-    extends ScheduleStorage[Future] with Logging {
+    extends ScheduleStorage[Future] with Logging
   private implicit val M = new FutureMonad(executor)
 
   private implicit val timeout = new Timeout(settings.timeout)
@@ -90,57 +87,45 @@ class MongoScheduleStorage private[MongoScheduleStorage](
   database(ensureIndex("report_index").on(".id").in(settings.reports))
 
   def addTask(task: ScheduledTask) =
-    EitherT.right(insertTask(-\/(task), settings.tasks)) map { _ =>
+    EitherT.right(insertTask(-\/(task), settings.tasks)) map  _ =>
       task
-    }
 
   private def insertTask(task: ScheduledTask \/ JObject, collection: String) =
     database(
-        insert(task.valueOr { st =>
+        insert(task.valueOr  st =>
       st.serialize.asInstanceOf[JObject]
-    }).into(collection))
+    ).into(collection))
 
-  def deleteTask(id: UUID) = EitherT {
-    database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap {
+  def deleteTask(id: UUID) = EitherT
+    database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap
       case Some(taskjv) =>
-        for {
+        for
           _ <- insertTask(\/-(taskjv), settings.deletedTasks)
           _ <- database(
               remove.from(settings.tasks) where (".id" === id.toString))
-        } yield {
-          taskjv.validated[ScheduledTask].disjunction leftMap { _.message } map {
+        yield
+          taskjv.validated[ScheduledTask].disjunction leftMap { _.message } map
             Some(_)
-          }
-        }
 
       case None =>
         logger.warn("Could not locate task %s for deletion".format(id))
         Promise successful \/.right(None)
-    }
-  }
 
   def reportRun(report: ScheduledRunReport) =
     database(insert(report.serialize.asInstanceOf[JObject])
-          .into(settings.reports)) map { _ =>
+          .into(settings.reports)) map  _ =>
       PrecogUnit
-    }
 
-  def statusFor(id: UUID, limit: Option[Int]) = {
-    database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap {
+  def statusFor(id: UUID, limit: Option[Int]) =
+    database(selectOne().from(settings.tasks).where(".id" === id.toString)) flatMap
       taskOpt =>
         database(
-            selectAll.from(settings.reports).where(".id" === id.toString) /* TODO: limit */ ) map {
+            selectAll.from(settings.reports).where(".id" === id.toString) /* TODO: limit */ ) map
           history =>
-            taskOpt map { task =>
-              (task.deserialize[ScheduledTask], history.toSeq map {
+            taskOpt map  task =>
+              (task.deserialize[ScheduledTask], history.toSeq map
                 _.deserialize[ScheduledRunReport]
-              })
-            }
-        }
-    }
-  }
+              )
 
-  def listTasks = database(selectAll.from(settings.tasks)) map {
+  def listTasks = database(selectAll.from(settings.tasks)) map
     _.toSeq map { _.deserialize[ScheduledTask] }
-  }
-}

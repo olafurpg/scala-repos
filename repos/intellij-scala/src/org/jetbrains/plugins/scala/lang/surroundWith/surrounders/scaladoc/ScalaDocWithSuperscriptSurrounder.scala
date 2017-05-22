@@ -5,8 +5,7 @@ package lang.surroundWith.surrounders.scaladoc
   * User: Dmitry Naydanov
   * Date: 3/8/12
   */
-class ScalaDocWithSuperscriptSurrounder extends ScalaDocWithSyntaxSurrounder {
+class ScalaDocWithSuperscriptSurrounder extends ScalaDocWithSyntaxSurrounder
   def getSyntaxTag: String = "^"
 
   def getTemplateDescription: String = "Superscript: ^ ^"
-}

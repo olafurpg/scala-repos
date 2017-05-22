@@ -12,7 +12,7 @@ import scala.collection._
 import scala.collection.parallel.ops._
 
 abstract class ParallelHashMapCheck[K, V](tp: String)
-    extends ParallelMapCheck[K, V]("mutable.ParHashMap[" + tp + "]") {
+    extends ParallelMapCheck[K, V]("mutable.ParHashMap[" + tp + "]")
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -24,28 +24,24 @@ abstract class ParallelHashMapCheck[K, V](tp: String)
 
   def tasksupport: TaskSupport
 
-  def ofSize(vals: Seq[Gen[(K, V)]], sz: Int) = {
+  def ofSize(vals: Seq[Gen[(K, V)]], sz: Int) =
     val hm = new mutable.HashMap[K, V]
     val gen = vals(rnd.nextInt(vals.size))
     for (i <- 0 until sz) hm += sample(gen)
     hm
-  }
 
-  def fromTraversable(t: Traversable[(K, V)]) = {
+  def fromTraversable(t: Traversable[(K, V)]) =
     val phm = new ParHashMap[K, V]
     phm.tasksupport = tasksupport
     var i = 0
-    for (kv <- t.toList) {
+    for (kv <- t.toList)
       phm += kv
       i += 1
-    }
     phm
-  }
-}
 
 class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
     extends ParallelHashMapCheck[Int, Int]("Int, Int")
-    with PairOperators[Int, Int] with PairValues[Int, Int] {
+    with PairOperators[Int, Int] with PairValues[Int, Int]
   def intvalues = new IntValues {}
   def kvalues = intvalues.values
   def vvalues = intvalues.values
@@ -54,17 +50,16 @@ class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
   def voperators = intoperators
   def koperators = intoperators
 
-  override def printDataStructureDebugInfo(ds: AnyRef) = ds match {
+  override def printDataStructureDebugInfo(ds: AnyRef) = ds match
     case pm: ParHashMap[k, v] =>
       println(
           "Mutable parallel hash map\n" +
           pm.hashTableContents.debugInformation)
     case _ =>
       println("could not match data structure type: " + ds.getClass)
-  }
 
   override def checkDataStructureInvariants(
-      orig: Traversable[(Int, Int)], ds: AnyRef) = ds match {
+      orig: Traversable[(Int, Int)], ds: AnyRef) = ds match
     // case pm: ParHashMap[k, v] if 1 == 0 => // disabled this to make tests faster
     //   val invs = pm.brokenInvariants
 
@@ -82,5 +77,3 @@ class IntIntParallelHashMapCheck(val tasksupport: TaskSupport)
     //     false
     //   }
     case _ => true
-  }
-}

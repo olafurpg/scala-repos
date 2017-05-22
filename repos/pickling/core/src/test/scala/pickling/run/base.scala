@@ -9,8 +9,8 @@ sealed abstract class Base
 final class C extends Base { override def toString = "C" }
 final class D extends Base { override def toString = "D" }
 
-class BaseTest extends FunSuite {
-  test("main") {
+class BaseTest extends FunSuite
+  test("main")
     val c: Base = new C
     val pc = c.pickle
     assert(pc.unpickle[Base].isInstanceOf[C] === true)
@@ -18,5 +18,3 @@ class BaseTest extends FunSuite {
     val d: Base = new D
     val pd = d.pickle
     assert(pd.unpickle[Base].isInstanceOf[D] === true)
-  }
-}

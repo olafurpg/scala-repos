@@ -23,33 +23,31 @@ trait ExampleSpecification
     extends Specification with DefaultAwaitTimeout with FutureAwaits
     with Results
 
-class ScalaFunctionalTestSpec extends ExampleSpecification {
+class ScalaFunctionalTestSpec extends ExampleSpecification
 
   // lie and make this look like a DB model.
   case class Computer(name: String, introduced: Option[String])
 
-  object Computer {
+  object Computer
     def findById(id: Int): Option[Computer] =
       Some(Computer("Macintosh", Some("1984-01-24")))
-  }
 
-  "Scala Functional Test" should {
+  "Scala Functional Test" should
 
     // #scalafunctionaltest-application
     val application: Application = GuiceApplicationBuilder().build()
     // #scalafunctionaltest-application
 
     val applicationWithRouter = GuiceApplicationBuilder()
-      .router(Router.from {
+      .router(Router.from
         case GET(p"/Bob") =>
-          Action {
+          Action
             Ok("Hello Bob") as "text/html; charset=utf-8"
-          }
-      })
+      )
       .build()
 
     // #scalafunctionaltest-respondtoroute
-    "respond to the index Action" in new WithApplication(applicationWithRouter) {
+    "respond to the index Action" in new WithApplication(applicationWithRouter)
       // ###replace: val Some(result) = route(app, FakeRequest(GET, "/Bob"))
       val Some(result) = route(app, FakeRequest(GET_REQUEST, "/Bob"))
 
@@ -57,35 +55,32 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
       contentType(result) must beSome("text/html")
       charset(result) must beSome("utf-8")
       contentAsString(result) must contain("Hello Bob")
-    }
     // #scalafunctionaltest-respondtoroute
 
     // #scalafunctionaltest-testview
-    "render index template" in new WithApplication {
+    "render index template" in new WithApplication
       val html = views.html.index("Coco")
 
       contentAsString(html) must contain("Hello Coco")
-    }
     // #scalafunctionaltest-testview
 
     // #scalafunctionaltest-testmodel
     def appWithMemoryDatabase =
       new GuiceApplicationBuilder().configure(inMemoryDatabase("test")).build()
-    "run an application" in new WithApplication(appWithMemoryDatabase) {
+    "run an application" in new WithApplication(appWithMemoryDatabase)
 
       val Some(macintosh) = Computer.findById(21)
 
       macintosh.name must equalTo("Macintosh")
       macintosh.introduced must beSome.which(_ must beEqualTo("1984-01-24"))
-    }
     // #scalafunctionaltest-testmodel
 
     // #scalafunctionaltest-testwithbrowser
     def applicationWithBrowser =
       new GuiceApplicationBuilder()
-        .router(Router.from {
+        .router(Router.from
           case GET(p"/") =>
-            Action {
+            Action
               Ok("""
               |<html>
               |<body>
@@ -94,9 +89,8 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
               |</body>
               |</html>
             """.stripMargin) as "text/html"
-            }
           case GET(p"/login") =>
-            Action {
+            Action
               Ok("""
               |<html>
               |<body>
@@ -104,12 +98,11 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
               |</body>
               |</html>
             """.stripMargin) as "text/html"
-            }
-        })
+        )
         .build()
 
     "run in a browser" in new WithBrowser(
-        webDriver = WebDriverFactory(HTMLUNIT), app = applicationWithBrowser) {
+        webDriver = WebDriverFactory(HTMLUNIT), app = applicationWithBrowser)
       browser.goTo("/")
 
       // Check the page
@@ -119,7 +112,6 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
 
       browser.url must equalTo("/login")
       browser.$("#title").getTexts.get(0) must equalTo("Hello Coco")
-    }
     // #scalafunctionaltest-testwithbrowser
 
     val testPort = 19001
@@ -127,7 +119,7 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
     val testPaymentGatewayURL = s"http://$myPublicAddress"
     // #scalafunctionaltest-testpaymentgateway
     "test server logic" in new WithServer(app = applicationWithBrowser,
-                                          port = testPort) {
+                                          port = testPort)
       // The test payment gateway requires a callback to this server before it returns a result...
       val callbackURL = s"http://$myPublicAddress/callback"
 
@@ -138,22 +130,17 @@ class ScalaFunctionalTestSpec extends ExampleSpecification {
             .get())
 
       response.status must equalTo(OK)
-    }
     // #scalafunctionaltest-testpaymentgateway
 
     // #scalafunctionaltest-testws
     val appWithRoutes = GuiceApplicationBuilder()
-      .router(Router.from {
+      .router(Router.from
         case GET(p"/") =>
-          Action {
+          Action
             Ok("ok")
-          }
-      })
+      )
       .build()
 
-    "test WS logic" in new WithServer(app = appWithRoutes, port = 3333) {
+    "test WS logic" in new WithServer(app = appWithRoutes, port = 3333)
       await(WS.url("http://localhost:3333").get()).status must equalTo(OK)
-    }
     // #scalafunctionaltest-testws
-  }
-}

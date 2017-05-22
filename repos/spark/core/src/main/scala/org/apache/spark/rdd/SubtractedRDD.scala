@@ -51,56 +51,48 @@ private[spark] class SubtractedRDD[K : ClassTag, V : ClassTag, W : ClassTag](
     @transient var rdd1: RDD[_ <: Product2[K, V]],
     @transient var rdd2: RDD[_ <: Product2[K, W]],
     part: Partitioner)
-    extends RDD[(K, V)](rdd1.context, Nil) {
+    extends RDD[(K, V)](rdd1.context, Nil)
 
-  override def getDependencies: Seq[Dependency[_]] = {
+  override def getDependencies: Seq[Dependency[_]] =
     def rddDependency[T1 : ClassTag, T2 : ClassTag](
-        rdd: RDD[_ <: Product2[T1, T2]]): Dependency[_] = {
-      if (rdd.partitioner == Some(part)) {
+        rdd: RDD[_ <: Product2[T1, T2]]): Dependency[_] =
+      if (rdd.partitioner == Some(part))
         logDebug("Adding one-to-one dependency with " + rdd)
         new OneToOneDependency(rdd)
-      } else {
+      else
         logDebug("Adding shuffle dependency with " + rdd)
         new ShuffleDependency[T1, T2, Any](rdd, part)
-      }
-    }
     Seq(rddDependency[K, V](rdd1), rddDependency[K, W](rdd2))
-  }
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     val array = new Array[Partition](part.numPartitions)
-    for (i <- 0 until array.length) {
+    for (i <- 0 until array.length)
       // Each CoGroupPartition will depend on rdd1 and rdd2
-      array(i) = new CoGroupPartition(i, Seq(rdd1, rdd2).zipWithIndex.map {
+      array(i) = new CoGroupPartition(i, Seq(rdd1, rdd2).zipWithIndex.map
         case (rdd, j) =>
-          dependencies(j) match {
+          dependencies(j) match
             case s: ShuffleDependency[_, _, _] =>
               None
             case _ =>
               Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
-          }
-      }.toArray)
-    }
+      .toArray)
     array
-  }
 
   override val partitioner = Some(part)
 
-  override def compute(p: Partition, context: TaskContext): Iterator[(K, V)] = {
+  override def compute(p: Partition, context: TaskContext): Iterator[(K, V)] =
     val partition = p.asInstanceOf[CoGroupPartition]
     val map = new JHashMap[K, ArrayBuffer[V]]
-    def getSeq(k: K): ArrayBuffer[V] = {
+    def getSeq(k: K): ArrayBuffer[V] =
       val seq = map.get(k)
-      if (seq != null) {
+      if (seq != null)
         seq
-      } else {
+      else
         val seq = new ArrayBuffer[V]()
         map.put(k, seq)
         seq
-      }
-    }
-    def integrate(depNum: Int, op: Product2[K, V] => Unit): Unit = {
-      dependencies(depNum) match {
+    def integrate(depNum: Int, op: Product2[K, V] => Unit): Unit =
+      dependencies(depNum) match
         case oneToOneDependency: OneToOneDependency[_] =>
           val dependencyPartition = partition.narrowDeps(depNum).get.split
           oneToOneDependency.rdd
@@ -116,19 +108,14 @@ private[spark] class SubtractedRDD[K : ClassTag, V : ClassTag, W : ClassTag](
                        context)
             .read()
           iter.foreach(op)
-      }
-    }
 
     // the first dep is rdd1; add all values to the map
     integrate(0, t => getSeq(t._1) += t._2)
     // the second dep is rdd2; remove all of its keys
     integrate(1, t => map.remove(t._1))
     map.asScala.iterator.map(t => t._2.iterator.map((t._1, _))).flatten
-  }
 
-  override def clearDependencies() {
+  override def clearDependencies()
     super.clearDependencies()
     rdd1 = null
     rdd2 = null
-  }
-}

@@ -43,7 +43,7 @@ import scalafx.testutil.{RunOnApplicationThread, SimpleSFXDelegateSpec}
 @RunWith(classOf[JUnitRunner])
 class SceneSpec
     extends SimpleSFXDelegateSpec[jfxs.Scene, Scene](
-        classOf[jfxs.Scene], classOf[Scene]) with RunOnApplicationThread {
+        classOf[jfxs.Scene], classOf[Scene]) with RunOnApplicationThread
 
   override protected def getScalaClassInstance =
     new Scene(getJavaClassInstance)
@@ -75,7 +75,5 @@ class SceneSpec
   //    sfxObject.delegate should be(jfxObject)
   //  }
 
-  it should "have a Property class that exposes all the JavaFX properties" in {
+  it should "have a Property class that exposes all the JavaFX properties" in
     comparePropertiesInProxy(classOf[jfxs.Scene], classOf[SceneProperty])
-  }
-}

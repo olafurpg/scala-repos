@@ -12,11 +12,11 @@ import java.util.Random
   * to get only values they interested in (eg. even or
   * odd values, and so on).
   */
-object randomclient {
+object randomclient
 
-  def main(args: Array[String]) {
-    val filter /*?*/ = try {
-      Integer.parseInt(args(0) /*?*/ ) match {
+  def main(args: Array[String])
+    val filter /*?*/ = try
+      Integer.parseInt(args(0) /*?*/ ) match
         case 1 =>
           x: Int =>
             x % 2 != 0
@@ -26,14 +26,12 @@ object randomclient {
           case _ =>
           x: Int =>
             x != 0
-      }
-    } catch {
+    catch
       case _ /*?*/ =>
         x: Int =>
           x < 100
-    }
 
-    try {
+    try
       val ia = InetAddress.getByName("localhost")
       val socket = new Socket(ia, 9999)
       val out = new ObjectOutputStream(
@@ -43,64 +41,53 @@ object randomclient {
       out.writeObject(filter)
       out.flush()
 
-      while (true) {
+      while (true)
         val x = in.readInt()
         println("x = " + x)
-      }
       out.close()
       in.close()
       socket.close()
-    } catch {
+    catch
       case e: IOException =>
         e.printStackTrace()
-    }
-  }
-}
 
-object randomserver {
+object randomserver
 
-  def main(args: Array[String]): Unit = {
-    try {
+  def main(args: Array[String]): Unit =
+    try
       val listener = new ServerSocket(9999);
       while (true) new ServerThread(listener.accept()).start();
       listener.close()
-    } catch {
+    catch
       case e: IOException =>
         System.err.println("Could not listen on port: 9999.");
         System.exit(-1)
-    }
-  }
-}
 
-case class ServerThread(socket: Socket) extends Thread("ServerThread") {
+case class ServerThread(socket: Socket) extends Thread("ServerThread")
 
-  override def run(): Unit = {
+  override def run(): Unit =
     val rand = new Random(System.currentTimeMillis());
-    try {
+    try
       val out = new DataOutputStream(socket.getOutputStream());
       val in = new ObjectInputStream(
           new DataInputStream(socket.getInputStream()));
 
       val filter = in.readObject().asInstanceOf[Int => Boolean];
 
-      while (true) {
+      while (true)
         var succeeded = false;
-        do {
+        do
           val x = rand.nextInt(1000);
           succeeded = filter(x);
           if (succeeded) out.writeInt(x)
-        } while (!succeeded);
+        while (!succeeded);
         Thread.sleep(100)
-      }
 
       out.close();
       in.close();
       socket.close()
-    } catch {
+    catch
       case e: SocketException =>
         () // avoid stack trace when stopping a client with Ctrl-C
       case e: IOException =>
         e.printStackTrace();
-    }
-  }
-}

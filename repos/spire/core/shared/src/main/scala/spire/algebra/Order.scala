@@ -18,7 +18,7 @@ package algebra
   *
   * By the totality law, x <= y and y <= x cannot be both false.
   */
-trait Order[@sp A] extends Any with PartialOrder[A] { self =>
+trait Order[@sp A] extends Any with PartialOrder[A]  self =>
 
   def partialCompare(x: A, y: A): Double = compare(x, y).toDouble
 
@@ -42,28 +42,22 @@ trait Order[@sp A] extends Any with PartialOrder[A] { self =>
     * Defines an ordering on `A` where all arrows switch direction.
     */
   override def reverse: Order[A] = new ReversedOrder(this)
-}
 
 private[algebra] class MappedOrder[@sp A, @sp B](order: Order[B])(f: A => B)
-    extends Order[A] {
+    extends Order[A]
   def compare(x: A, y: A): Int = order.compare(f(x), f(y))
-}
 
-private[algebra] class ReversedOrder[@sp A](order: Order[A]) extends Order[A] {
+private[algebra] class ReversedOrder[@sp A](order: Order[A]) extends Order[A]
   def compare(x: A, y: A): Int = order.compare(y, x)
-}
 
-object Order {
+object Order
   @inline final def apply[A](implicit o: Order[A]): Order[A] = o
 
   def by[@sp A, @sp B](f: A => B)(implicit o: Order[B]): Order[A] = o.on(f)
 
-  def from[@sp A](f: (A, A) => Int): Order[A] = new Order[A] {
+  def from[@sp A](f: (A, A) => Int): Order[A] = new Order[A]
     def compare(x: A, y: A): Int = f(x, y)
-  }
 
   implicit def ordering[A](implicit o: Order[A]): Ordering[A] =
-    new Ordering[A] {
+    new Ordering[A]
       def compare(x: A, y: A): Int = o.compare(x, y)
-    }
-}

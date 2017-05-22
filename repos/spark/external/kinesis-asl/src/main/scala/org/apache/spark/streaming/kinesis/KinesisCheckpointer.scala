@@ -40,7 +40,7 @@ private[kinesis] class KinesisCheckpointer(receiver: KinesisReceiver[_],
                                            checkpointInterval: Duration,
                                            workerId: String,
                                            clock: Clock = new SystemClock)
-    extends Logging {
+    extends Logging
 
   // a map from shardId's to checkpointers
   private val checkpointers =
@@ -52,9 +52,8 @@ private[kinesis] class KinesisCheckpointer(receiver: KinesisReceiver[_],
 
   /** Update the checkpointer instance to the most recent one for the given shardId. */
   def setCheckpointer(
-      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit = {
+      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit =
     checkpointers.put(shardId, checkpointer)
-  }
 
   /**
     * Stop tracking the specified shardId.
@@ -64,23 +63,21 @@ private[kinesis] class KinesisCheckpointer(receiver: KinesisReceiver[_],
     * checkpoint, e.g. in case of [[ShutdownReason.ZOMBIE]].
     */
   def removeCheckpointer(
-      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit = {
-    synchronized {
+      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit =
+    synchronized
       checkpointers.remove(shardId)
       checkpoint(shardId, checkpointer)
-    }
-  }
 
   /** Perform the checkpoint. */
   private def checkpoint(
-      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit = {
-    try {
-      if (checkpointer != null) {
-        receiver.getLatestSeqNumToCheckpoint(shardId).foreach { latestSeqNum =>
+      shardId: String, checkpointer: IRecordProcessorCheckpointer): Unit =
+    try
+      if (checkpointer != null)
+        receiver.getLatestSeqNumToCheckpoint(shardId).foreach  latestSeqNum =>
           val lastSeqNum = lastCheckpointedSeqNums.get(shardId)
           // Kinesis sequence numbers are monotonically increasing strings, therefore we can do
           // safely do the string comparison
-          if (lastSeqNum == null || latestSeqNum > lastSeqNum) {
+          if (lastSeqNum == null || latestSeqNum > lastSeqNum)
             /* Perform the checkpoint */
             KinesisRecordProcessor.retryRandom(
                 checkpointer.checkpoint(latestSeqNum), 4, 100)
@@ -88,37 +85,29 @@ private[kinesis] class KinesisCheckpointer(receiver: KinesisReceiver[_],
                 s"Checkpoint:  WorkerId $workerId completed checkpoint at sequence number" +
                 s" $latestSeqNum for shardId $shardId")
             lastCheckpointedSeqNums.put(shardId, latestSeqNum)
-          }
-        }
-      } else {
+      else
         logDebug(
             s"Checkpointing skipped for shardId $shardId. Checkpointer not set.")
-      }
-    } catch {
+    catch
       case NonFatal(e) =>
         logWarning(s"Failed to checkpoint shardId $shardId to DynamoDB.", e)
-    }
-  }
 
   /** Checkpoint the latest saved sequence numbers for all active shardId's. */
-  private def checkpointAll(): Unit = synchronized {
+  private def checkpointAll(): Unit = synchronized
     // if this method throws an exception, then the scheduled task will not run again
-    try {
+    try
       val shardIds = checkpointers.keys()
-      while (shardIds.hasMoreElements) {
+      while (shardIds.hasMoreElements)
         val shardId = shardIds.nextElement()
         checkpoint(shardId, checkpointers.get(shardId))
-      }
-    } catch {
+    catch
       case NonFatal(e) =>
         logWarning("Failed to checkpoint to DynamoDB.", e)
-    }
-  }
 
   /**
     * Start the checkpointer thread with the given checkpoint duration.
     */
-  private def startCheckpointerThread(): RecurringTimer = {
+  private def startCheckpointerThread(): RecurringTimer =
     val period = checkpointInterval.milliseconds
     val threadName = s"Kinesis Checkpointer - Worker $workerId"
     val timer = new RecurringTimer(
@@ -126,16 +115,13 @@ private[kinesis] class KinesisCheckpointer(receiver: KinesisReceiver[_],
     timer.start()
     logDebug(s"Started checkpointer thread: $threadName")
     timer
-  }
 
   /**
     * Shutdown the checkpointer. Should be called on the onStop of the Receiver.
     */
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     // the recurring timer checkpoints for us one last time.
     checkpointerThread.stop(interruptTimer = false)
     checkpointers.clear()
     lastCheckpointedSeqNums.clear()
     logInfo("Successfully shutdown Kinesis Checkpointer.")
-  }
-}

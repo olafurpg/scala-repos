@@ -16,7 +16,7 @@ import java.util.regex.Pattern
   * Its nicer to put conveniences for working with `File` here
   * instead of using static accessors from J2SE or Guava.
   */
-package object file {
+package object file
   type File = JFile
 
   /**
@@ -35,19 +35,17 @@ package object file {
     * or the cleanup script will exit the sandbox and start deleting
     * other files.
     */
-  def withTempDir[T](a: File => T): T = {
+  def withTempDir[T](a: File => T): T =
     // sadly not able to provide a prefix. If we really need the
     // support we could re-implement the Guava method.
     val dir = Files.createTempDir().canon
     try a(dir) finally dir.tree.reverse.foreach(_.delete())
-  }
 
-  def withTempFile[T](a: File => T): T = {
+  def withTempFile[T](a: File => T): T =
     val file = JFile.createTempFile("ensime-", ".tmp").canon
     try a(file) finally file.delete()
-  }
 
-  implicit class RichFile(val file: File) extends AnyVal {
+  implicit class RichFile(val file: File) extends AnyVal
 
     def /(sub: String): File = new File(file, sub)
 
@@ -66,35 +64,29 @@ package object file {
 
     def outputStream(): OutputStream = new FileOutputStream(file)
 
-    def createWithParents(): Boolean = {
+    def createWithParents(): Boolean =
       Files.createParentDirs(file)
       file.createNewFile()
-    }
 
-    def readLines()(implicit cs: Charset): List[String] = {
+    def readLines()(implicit cs: Charset): List[String] =
       import collection.JavaConversions._
       Files.readLines(file, cs).toList
-    }
 
-    def writeLines(lines: List[String])(implicit cs: Charset): Unit = {
+    def writeLines(lines: List[String])(implicit cs: Charset): Unit =
       Files.write(lines.mkString("", "\n", "\n"), file, cs)
-    }
 
-    def writeString(contents: String)(implicit cs: Charset): Unit = {
+    def writeString(contents: String)(implicit cs: Charset): Unit =
       Files.write(contents, file, cs)
-    }
 
-    def readString()(implicit cs: Charset): String = {
+    def readString()(implicit cs: Charset): String =
       Files.toString(file, cs)
-    }
 
     /**
       * @return the file and its descendent family tree (if it is a directory).
       */
-    def tree: Stream[File] = {
+    def tree: Stream[File] =
       import collection.JavaConversions._
       file #:: Files.fileTreeTraverser().breadthFirstTraversal(file).toStream
-    }
 
     /**
       * Non-recursive children of the file.
@@ -111,8 +103,5 @@ package object file {
       * @return the canonical form of `file`, falling back to the absolute file.
       */
     def canon =
-      try file.getCanonicalFile catch {
+      try file.getCanonicalFile catch
         case t: Throwable => file.getAbsoluteFile
-      }
-  }
-}

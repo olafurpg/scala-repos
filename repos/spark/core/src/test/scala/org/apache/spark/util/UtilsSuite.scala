@@ -39,9 +39,9 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.util.ByteUnit
 
 class UtilsSuite
-    extends SparkFunSuite with ResetSystemProperties with Logging {
+    extends SparkFunSuite with ResetSystemProperties with Logging
 
-  test("timeConversion") {
+  test("timeConversion")
     // Test -1
     assert(Utils.timeStringAsSeconds("-1") === -1)
 
@@ -67,28 +67,22 @@ class UtilsSuite
     assert(Utils.timeStringAsMs("1d") === TimeUnit.DAYS.toMillis(1))
 
     // Test invalid strings
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.timeStringAsMs("600l")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.timeStringAsMs("This breaks 600s")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.timeStringAsMs("This breaks 600ds")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.timeStringAsMs("600s This breaks")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.timeStringAsMs("This 123s breaks")
-    }
-  }
 
-  test("Test byteString conversion") {
+  test("Test byteString conversion")
     // Test zero
     assert(Utils.byteStringAsBytes("0") === 0)
 
@@ -141,51 +135,41 @@ class UtilsSuite
     assert(ByteUnit.PiB.toPiB(9223372036854775807L) === 9223372036854775807L)
 
     // Test overflow exception
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // This value exceeds Long.MAX when converted to bytes
       Utils.byteStringAsBytes("9223372036854775808")
-    }
 
     // Test overflow exception
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // This value exceeds Long.MAX when converted to TB
       ByteUnit.PiB.toTiB(9223372036854775807L)
-    }
 
     // Test fractional string
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsMb("0.064")
-    }
 
     // Test fractional string
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsMb("0.064m")
-    }
 
     // Test invalid strings
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsBytes("500ub")
-    }
 
     // Test invalid strings
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsBytes("This breaks 600b")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsBytes("This breaks 600")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsBytes("600gb This breaks")
-    }
 
-    intercept[NumberFormatException] {
+    intercept[NumberFormatException]
       Utils.byteStringAsBytes("This 123mb breaks")
-    }
-  }
 
-  test("bytesToString") {
+  test("bytesToString")
     assert(Utils.bytesToString(10) === "10.0 B")
     assert(Utils.bytesToString(1500) === "1500.0 B")
     assert(Utils.bytesToString(2000000) === "1953.1 KB")
@@ -194,9 +178,8 @@ class UtilsSuite
     assert(Utils.bytesToString(5368709120L) === "5.0 GB")
     assert(
         Utils.bytesToString(5L * 1024L * 1024L * 1024L * 1024L) === "5.0 TB")
-  }
 
-  test("copyStream") {
+  test("copyStream")
     // input array initialization
     val bytes = Array.ofDim[Byte](9000)
     Random.nextBytes(bytes)
@@ -205,9 +188,8 @@ class UtilsSuite
     Utils.copyStream(new ByteArrayInputStream(bytes), os)
 
     assert(os.toByteArray.toList.equals(bytes.toList))
-  }
 
-  test("memoryStringToMb") {
+  test("memoryStringToMb")
     assert(Utils.memoryStringToMb("1") === 0)
     assert(Utils.memoryStringToMb("1048575") === 0)
     assert(Utils.memoryStringToMb("3145728") === 3)
@@ -225,9 +207,8 @@ class UtilsSuite
 
     assert(Utils.memoryStringToMb("2t") === 2097152)
     assert(Utils.memoryStringToMb("3t") === Utils.memoryStringToMb("3T"))
-  }
 
-  test("splitCommandString") {
+  test("splitCommandString")
     assert(Utils.splitCommandString("") === Seq())
     assert(Utils.splitCommandString("a") === Seq("a"))
     assert(Utils.splitCommandString("aaa") === Seq("aaa"))
@@ -251,9 +232,8 @@ class UtilsSuite
     assert(Utils.splitCommandString("\"a\"\"b\"") === Seq("ab"))
     assert(Utils.splitCommandString("''") === Seq(""))
     assert(Utils.splitCommandString("\"\"") === Seq(""))
-  }
 
-  test("string formatting of time durations") {
+  test("string formatting of time durations")
     val second = 1000
     val minute = second * 60
     val hour = minute * 60
@@ -271,9 +251,8 @@ class UtilsSuite
     assert(str(10 * hour + minute + 4 * second) === "10" + sep + "02 h")
     assert(str(10 * hour + 59 * minute + 59 * second + 999) === "11" + sep +
         "00 h")
-  }
 
-  test("reading offset bytes of a file") {
+  test("reading offset bytes of a file")
     val tmpDir2 = Utils.createTempDir()
     val f1Path = tmpDir2 + "/f1"
     val f1 = new FileOutputStream(f1Path)
@@ -299,9 +278,8 @@ class UtilsSuite
     assert(Utils.offsetBytes(f1Path, -3, 25) === "1\n2\n3\n4\n5\n6\n7\n8\n9\n")
 
     Utils.deleteRecursively(tmpDir2)
-  }
 
-  test("reading offset bytes across multiple files") {
+  test("reading offset bytes across multiple files")
     val tmpDir = Utils.createTempDir()
     val files = (1 to 3).map(i => new File(tmpDir, i.toString))
     Files.write("0123456789", files(0), StandardCharsets.UTF_8)
@@ -331,9 +309,8 @@ class UtilsSuite
         Utils.offsetBytes(files, -5, 35) === "0123456789abcdefghijABCDEFGHIJ")
 
     Utils.deleteRecursively(tmpDir)
-  }
 
-  test("deserialize long value") {
+  test("deserialize long value")
     val testval: Long = 9730889947L
     val bbuf = ByteBuffer.allocate(8)
     assert(bbuf.hasArray)
@@ -341,16 +318,14 @@ class UtilsSuite
     bbuf.putLong(testval)
     assert(bbuf.array.length === 8)
     assert(Utils.deserializeLongValue(bbuf.array) === testval)
-  }
 
-  test("get iterator size") {
+  test("get iterator size")
     val empty = Seq[Int]()
     assert(Utils.getIteratorSize(empty.toIterator) === 0L)
     val iterator = Iterator.range(0, 5)
     assert(Utils.getIteratorSize(iterator) === 5L)
-  }
 
-  test("doesDirectoryContainFilesNewerThan") {
+  test("doesDirectoryContainFilesNewerThan")
     // create some temporary directories and files
     val parent: File = Utils.createTempDir()
     // The parent directory has two child directories
@@ -373,10 +348,9 @@ class UtilsSuite
 
     child3.setLastModified(System.currentTimeMillis - (1000 * 30))
     assert(!Utils.doesDirectoryContainAnyNewFiles(parent, 5))
-  }
 
-  test("resolveURI") {
-    def assertResolves(before: String, after: String): Unit = {
+  test("resolveURI")
+    def assertResolves(before: String, after: String): Unit =
       // This should test only single paths
       assume(before.split(",").length === 1)
       // Repeated invocations of resolveURI should yield the same result
@@ -387,7 +361,6 @@ class UtilsSuite
       // Also test resolveURIs with single paths
       assert(new URI(Utils.resolveURIs(before)) === new URI(after))
       assert(new URI(Utils.resolveURIs(after)) === new URI(after))
-    }
     val rawCwd = System.getProperty("user.dir")
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("hdfs:/root/spark.jar", "hdfs:/root/spark.jar")
@@ -396,20 +369,18 @@ class UtilsSuite
     assertResolves("spark.jar", s"file:$cwd/spark.jar")
     assertResolves("spark.jar#app.jar", s"file:$cwd/spark.jar#app.jar")
     assertResolves("path to/file.txt", s"file:$cwd/path%20to/file.txt")
-    if (Utils.isWindows) {
+    if (Utils.isWindows)
       assertResolves("C:\\path\\to\\file.txt", "file:/C:/path/to/file.txt")
       assertResolves("C:\\path to\\file.txt", "file:/C:/path%20to/file.txt")
-    }
     assertResolves("file:/C:/path/to/file.txt", "file:/C:/path/to/file.txt")
     assertResolves("file:///C:/path/to/file.txt", "file:/C:/path/to/file.txt")
     assertResolves(
         "file:/C:/file.txt#alias.txt", "file:/C:/file.txt#alias.txt")
     assertResolves("file:foo", s"file:foo")
     assertResolves("file:foo:baby", s"file:foo:baby")
-  }
 
-  test("resolveURIs with multiple paths") {
-    def assertResolves(before: String, after: String): Unit = {
+  test("resolveURIs with multiple paths")
+    def assertResolves(before: String, after: String): Unit =
       assume(before.split(",").length > 1)
       assert(Utils.resolveURIs(before) === after)
       assert(Utils.resolveURIs(after) === after)
@@ -418,7 +389,6 @@ class UtilsSuite
       assert(resolve(after) === after)
       assert(resolve(resolve(after)) === after)
       assert(resolve(resolve(resolve(after))) === after)
-    }
     val rawCwd = System.getProperty("user.dir")
     val cwd = if (Utils.isWindows) s"/$rawCwd".replace("\\", "/") else rawCwd
     assertResolves("jar1,jar2", s"file:$cwd/jar1,file:$cwd/jar2")
@@ -428,14 +398,12 @@ class UtilsSuite
     assertResolves(
         "hdfs:/jar1,file:/jar2,jar3,jar4#jar5,path to/jar6",
         s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:$cwd/jar4#jar5,file:$cwd/path%20to/jar6")
-    if (Utils.isWindows) {
+    if (Utils.isWindows)
       assertResolves(
           """hdfs:/jar1,file:/jar2,jar3,C:\pi.py#py.pi,C:\path to\jar4""",
           s"hdfs:/jar1,file:/jar2,file:$cwd/jar3,file:/C:/pi.py#py.pi,file:/C:/path%20to/jar4")
-    }
-  }
 
-  test("nonLocalPaths") {
+  test("nonLocalPaths")
     assert(Utils.nonLocalPaths("spark.jar") === Array.empty)
     assert(Utils.nonLocalPaths("file:/spark.jar") === Array.empty)
     assert(Utils.nonLocalPaths("file:///spark.jar") === Array.empty)
@@ -483,9 +451,8 @@ class UtilsSuite
         Utils.nonLocalPaths("hdfs:/a.jar,s3:/another.jar,e:/our.jar",
                             testWindows = true) === Array("hdfs:/a.jar",
                                                           "s3:/another.jar"))
-  }
 
-  test("isBindCollision") {
+  test("isBindCollision")
     // Negatives
     assert(!Utils.isBindCollision(null))
     assert(!Utils.isBindCollision(new Exception))
@@ -503,35 +470,31 @@ class UtilsSuite
     // Actual bind exception
     var server1: ServerSocket = null
     var server2: ServerSocket = null
-    try {
+    try
       server1 = new java.net.ServerSocket(0)
       server2 = new java.net.ServerSocket(server1.getLocalPort)
-    } catch {
+    catch
       case e: Exception =>
         assert(e.isInstanceOf[java.net.BindException])
         assert(Utils.isBindCollision(e))
-    } finally {
+    finally
       Option(server1).foreach(_.close())
       Option(server2).foreach(_.close())
-    }
-  }
 
   // Test for using the util function to change our log levels.
-  test("log4j log level change") {
+  test("log4j log level change")
     val current = org.apache.log4j.Logger.getRootLogger().getLevel()
-    try {
+    try
       Utils.setLogLevel(org.apache.log4j.Level.ALL)
       assert(log.isInfoEnabled())
       Utils.setLogLevel(org.apache.log4j.Level.ERROR)
       assert(!log.isInfoEnabled())
       assert(log.isErrorEnabled())
-    } finally {
+    finally
       // Best effort at undoing changes this test made.
       Utils.setLogLevel(current)
-    }
-  }
 
-  test("deleteRecursively") {
+  test("deleteRecursively")
     val tempDir1 = Utils.createTempDir()
     assert(tempDir1.exists())
     Utils.deleteRecursively(tempDir1)
@@ -553,43 +516,36 @@ class UtilsSuite
     assert(!tempDir2.exists())
     assert(!tempDir3.exists())
     assert(!sourceFile2.exists())
-  }
 
-  test("loading properties from file") {
+  test("loading properties from file")
     val tmpDir = Utils.createTempDir()
     val outFile =
       File.createTempFile("test-load-spark-properties", "test", tmpDir)
-    try {
+    try
       System.setProperty("spark.test.fileNameLoadB", "2")
       Files.write(
           "spark.test.fileNameLoadA true\n" + "spark.test.fileNameLoadB 1\n",
           outFile,
           StandardCharsets.UTF_8)
       val properties = Utils.getPropertiesFromFile(outFile.getAbsolutePath)
-      properties.filter { case (k, v) => k.startsWith("spark.") }.foreach {
+      properties.filter { case (k, v) => k.startsWith("spark.") }.foreach
         case (k, v) => sys.props.getOrElseUpdate(k, v)
-      }
       val sparkConf = new SparkConf
       assert(sparkConf.getBoolean("spark.test.fileNameLoadA", false) === true)
       assert(sparkConf.getInt("spark.test.fileNameLoadB", 1) === 2)
-    } finally {
+    finally
       Utils.deleteRecursively(tmpDir)
-    }
-  }
 
-  test("timeIt with prepare") {
+  test("timeIt with prepare")
     var cnt = 0
     val prepare = () =>
-      {
         cnt += 1
         Thread.sleep(1000)
-    }
     val time = Utils.timeIt(2)({}, Some(prepare))
     require(cnt === 2, "prepare should be called twice")
     require(time < 500, "preparation time should not count")
-  }
 
-  test("fetch hcfs dir") {
+  test("fetch hcfs dir")
     val tempDir = Utils.createTempDir()
     val sourceDir = new File(tempDir, "source-dir")
     val innerSourceDir = Utils.createTempDir(root = sourceDir.getPath)
@@ -599,11 +555,10 @@ class UtilsSuite
     Files.write("some text", sourceFile, StandardCharsets.UTF_8)
 
     val path =
-      if (Utils.isWindows) {
+      if (Utils.isWindows)
         new Path("file:/" + sourceDir.getAbsolutePath.replace("\\", "/"))
-      } else {
+      else
         new Path("file://" + sourceDir.getAbsolutePath)
-      }
     val conf = new Configuration()
     val fs = Utils.getHadoopFileSystem(path.toString, conf)
 
@@ -624,11 +579,10 @@ class UtilsSuite
     assert(destInnerFile.isFile())
 
     val filePath =
-      if (Utils.isWindows) {
+      if (Utils.isWindows)
         new Path("file:/" + sourceFile.getAbsolutePath.replace("\\", "/"))
-      } else {
+      else
         new Path("file://" + sourceFile.getAbsolutePath)
-      }
     val testFileDir = new File(tempDir, "test-filename")
     val testFileName = "testFName"
     val testFilefs = Utils.getHadoopFileSystem(filePath.toString, conf)
@@ -641,9 +595,8 @@ class UtilsSuite
                         Some(testFileName))
     val newFileName = new File(testFileDir, testFileName)
     assert(newFileName.isFile())
-  }
 
-  test("shutdown hook manager") {
+  test("shutdown hook manager")
     val manager = new SparkShutdownHookManager()
     val output = new ListBuffer[Int]()
 
@@ -655,9 +608,8 @@ class UtilsSuite
 
     manager.runAll()
     assert(output.toList === List(4, 3, 2))
-  }
 
-  test("isInDirectory") {
+  test("isInDirectory")
     val tmpDir = new File(sys.props("java.io.tmpdir"))
     val parentDir = new File(tmpDir, "parent-dir")
     val childDir1 = new File(parentDir, "child-dir-1")
@@ -721,9 +673,8 @@ class UtilsSuite
     assert(!Utils.isInDirectory(childFile3, nullFile))
     assert(!Utils.isInDirectory(nullFile, parentDir))
     assert(!Utils.isInDirectory(nullFile, childFile3))
-  }
 
-  test("circular buffer") {
+  test("circular buffer")
     val buffer = new CircularBuffer(25)
     val stream = new java.io.PrintStream(buffer, true, "UTF-8")
 
@@ -732,13 +683,11 @@ class UtilsSuite
         "test circular test circular test circular test circular test circular")
     // scalastyle:on println
     assert(buffer.toString === "t circular test circular\n")
-  }
 
-  test("nanSafeCompareDoubles") {
-    def shouldMatchDefaultOrder(a: Double, b: Double): Unit = {
+  test("nanSafeCompareDoubles")
+    def shouldMatchDefaultOrder(a: Double, b: Double): Unit =
       assert(Utils.nanSafeCompareDoubles(a, b) === JDouble.compare(a, b))
       assert(Utils.nanSafeCompareDoubles(b, a) === JDouble.compare(b, a))
-    }
     shouldMatchDefaultOrder(0d, 0d)
     shouldMatchDefaultOrder(0d, 1d)
     shouldMatchDefaultOrder(Double.MinValue, Double.MaxValue)
@@ -751,13 +700,11 @@ class UtilsSuite
         Utils.nanSafeCompareDoubles(Double.PositiveInfinity, Double.NaN) === -1)
     assert(
         Utils.nanSafeCompareDoubles(Double.NegativeInfinity, Double.NaN) === -1)
-  }
 
-  test("nanSafeCompareFloats") {
-    def shouldMatchDefaultOrder(a: Float, b: Float): Unit = {
+  test("nanSafeCompareFloats")
+    def shouldMatchDefaultOrder(a: Float, b: Float): Unit =
       assert(Utils.nanSafeCompareFloats(a, b) === JFloat.compare(a, b))
       assert(Utils.nanSafeCompareFloats(b, a) === JFloat.compare(b, a))
-    }
     shouldMatchDefaultOrder(0f, 0f)
     shouldMatchDefaultOrder(1f, 1f)
     shouldMatchDefaultOrder(Float.MinValue, Float.MaxValue)
@@ -768,9 +715,8 @@ class UtilsSuite
         Utils.nanSafeCompareFloats(Float.PositiveInfinity, Float.NaN) === -1)
     assert(
         Utils.nanSafeCompareFloats(Float.NegativeInfinity, Float.NaN) === -1)
-  }
 
-  test("isDynamicAllocationEnabled") {
+  test("isDynamicAllocationEnabled")
     val conf = new SparkConf()
     conf.set("spark.master", "yarn-client")
     assert(Utils.isDynamicAllocationEnabled(conf) === false)
@@ -786,48 +732,42 @@ class UtilsSuite
         Utils.isDynamicAllocationEnabled(conf.set("spark.master", "local")) === false)
     assert(Utils.isDynamicAllocationEnabled(
             conf.set("spark.dynamicAllocation.testing", "true")))
-  }
 
-  test("encodeFileNameToURIRawPath") {
+  test("encodeFileNameToURIRawPath")
     assert(Utils.encodeFileNameToURIRawPath("abc") === "abc")
     assert(Utils.encodeFileNameToURIRawPath("abc xyz") === "abc%20xyz")
     assert(Utils.encodeFileNameToURIRawPath("abc:xyz") === "abc:xyz")
-  }
 
-  test("decodeFileNameInURI") {
+  test("decodeFileNameInURI")
     assert(Utils.decodeFileNameInURI(new URI("files:///abc/xyz")) === "xyz")
     assert(Utils.decodeFileNameInURI(new URI("files:///abc")) === "abc")
     assert(
         Utils.decodeFileNameInURI(new URI("files:///abc%20xyz")) === "abc xyz")
-  }
 
-  test("Kill process") {
+  test("Kill process")
     // Verify that we can terminate a process even if it is in a bad state. This is only run
     // on UNIX since it does some OS specific things to verify the correct behavior.
-    if (SystemUtils.IS_OS_UNIX) {
-      def getPid(p: Process): Int = {
+    if (SystemUtils.IS_OS_UNIX)
+      def getPid(p: Process): Int =
         val f = p.getClass().getDeclaredField("pid")
         f.setAccessible(true)
         f.get(p).asInstanceOf[Int]
-      }
 
-      def pidExists(pid: Int): Boolean = {
+      def pidExists(pid: Int): Boolean =
         val p = Runtime.getRuntime.exec(s"kill -0 $pid")
         p.waitFor()
         p.exitValue() == 0
-      }
 
-      def signal(pid: Int, s: String): Unit = {
+      def signal(pid: Int, s: String): Unit =
         val p = Runtime.getRuntime.exec(s"kill -$s $pid")
         p.waitFor()
-      }
 
       // Start up a process that runs 'sleep 10'. Terminate the process and assert it takes
       // less time and the process is no longer there.
       val startTimeMs = System.currentTimeMillis()
       val process = new ProcessBuilder("sleep", "10").start()
       val pid = getPid(process)
-      try {
+      try
         assert(pidExists(pid))
         val terminated = Utils.terminateProcess(process, 5000)
         assert(terminated.isDefined)
@@ -835,16 +775,15 @@ class UtilsSuite
         val durationMs = System.currentTimeMillis() - startTimeMs
         assert(durationMs < 5000)
         assert(!pidExists(pid))
-      } finally {
+      finally
         // Forcibly kill the test process just in case.
         signal(pid, "SIGKILL")
-      }
 
       val versionParts =
         System.getProperty("java.version").split("[+.\\-]+", 3)
       var majorVersion = versionParts(0).toInt
       if (majorVersion == 1) majorVersion = versionParts(1).toInt
-      if (majorVersion >= 8) {
+      if (majorVersion >= 8)
         // Java8 added a way to forcibly terminate a process. We'll make sure that works by
         // creating a very misbehaving process. It ignores SIGTERM and has been SIGSTOPed. On
         // older versions of java, this will *not* terminate.
@@ -860,7 +799,7 @@ class UtilsSuite
         val process = new ProcessBuilder(file.getAbsolutePath).start()
         val pid = getPid(process)
         assert(pidExists(pid))
-        try {
+        try
           signal(pid, "SIGSTOP")
           val start = System.currentTimeMillis()
           val terminated = Utils.terminateProcess(process, 5000)
@@ -869,10 +808,5 @@ class UtilsSuite
           val duration = System.currentTimeMillis() - start
           assert(duration < 5000)
           assert(!pidExists(pid))
-        } finally {
+        finally
           signal(pid, "SIGKILL")
-        }
-      }
-    }
-  }
-}

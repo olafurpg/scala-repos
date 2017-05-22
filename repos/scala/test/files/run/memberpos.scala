@@ -1,7 +1,7 @@
 import scala.tools.partest._
 
 // Simple sanity test for -Yshow-member-pos.
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String =
     "-usejavacp -Ystop-after:parser -Yshow-member-pos \"\" -d " +
     testOutput.path
@@ -38,4 +38,3 @@ object A {
 class B { def f = 1 }
 
 """
-}

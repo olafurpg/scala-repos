@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicInteger
   * instance would start an RpcEndpoint and we use this utility to assign the RpcEndpoints'
   * unique names.
   */
-private[spark] class IdGenerator {
+private[spark] class IdGenerator
   private val id = new AtomicInteger
   def next: Int = id.incrementAndGet
-}

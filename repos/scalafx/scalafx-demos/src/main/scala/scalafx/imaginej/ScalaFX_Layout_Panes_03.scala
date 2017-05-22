@@ -58,56 +58,46 @@ import scalafx.scene.text.{Font, FontWeight, Text}
   *         http://docs.oracle.com/javafx/2.0/layout/builtin_layouts.htm
   *
   */
-object ScalaFX_Layout_Panes_03 extends JFXApp {
-  val current = new Button {
+object ScalaFX_Layout_Panes_03 extends JFXApp
+  val current = new Button
     text = "Current"
     prefWidth = 100
     prefHeight = 20
-  }
-  val projected = new Button {
+  val projected = new Button
     text = "Projected"
     prefWidth = 100
     prefHeight = 20
-  }
   val data = List(
-      new Text {
+      new Text
         text = "Data"
         font = Font.font("Amble CN", FontWeight.Bold, 14)
-      },
-      new Text {
+      ,
+      new Text
         text = "  Sales"
-      },
-      new Text {
+      ,
+      new Text
         text = "  Marketing"
-      },
-      new Text {
+      ,
+      new Text
         text = "  Distribution"
-      },
-      new Text {
+      ,
+      new Text
         text = "  Costs"
-      }
   )
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ScalaFX Layout Panes 03"
-    scene = new Scene {
-      content = new BorderPane {
-        top = new HBox {
+    scene = new Scene
+      content = new BorderPane
+        top = new HBox
           spacing = 10
           padding = Insets(15, 12, 15, 12)
           style = "-fx-background-color: #336699"
           children = List(current, projected)
-        }
-        left = new VBox {
+        left = new VBox
           spacing = 10
           padding = Insets(10, 10, 10, 10)
           children = data
-        }
-        center = new Rectangle {
+        center = new Rectangle
           width = 380
           height = 220
           fill = Color.White
-        }
-      }
-    }
-  }
-}

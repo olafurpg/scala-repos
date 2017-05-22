@@ -24,7 +24,7 @@ import akka.actor._
   *
   * The Java API for generating UDP commands is available at [[UdpMessage]].
   */
-object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
+object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider
 
   override def lookup = Udp
 
@@ -44,9 +44,8 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
   /**
     * The common type of all commands supported by the UDP implementation.
     */
-  trait Command extends SelectionHandler.HasFailureMessage with Message {
+  trait Command extends SelectionHandler.HasFailureMessage with Message
     def failureMessage = CommandFailed(this)
-  }
 
   /**
     * Each [[Send]] can optionally request a positive acknowledgment to be sent
@@ -80,16 +79,14 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     */
   final case class Send(
       payload: ByteString, target: InetSocketAddress, ack: Event)
-      extends Command {
+      extends Command
     require(
         ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
 
     def wantsAck: Boolean = !ack.isInstanceOf[NoAck]
-  }
-  object Send {
+  object Send
     def apply(data: ByteString, target: InetSocketAddress): Send =
       Send(data, target, NoAck)
-  }
 
   /**
     * Send this message to the [[UdpExt#manager]] in order to bind to the given
@@ -180,21 +177,19 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     *
     * For the Java API see [[UdpSO]].
     */
-  object SO extends Inet.SoForwarders {
+  object SO extends Inet.SoForwarders
 
     /**
       * [[akka.io.Inet.SocketOption]] to set the SO_BROADCAST option
       *
       * For more information see [[java.net.DatagramSocket#setBroadcast]]
       */
-    final case class Broadcast(on: Boolean) extends SocketOption {
+    final case class Broadcast(on: Boolean) extends SocketOption
       override def beforeDatagramBind(s: DatagramSocket): Unit =
         s.setBroadcast(on)
-    }
-  }
 
   private[io] class UdpSettings(_config: Config)
-      extends SelectionHandlerSettings(_config) {
+      extends SelectionHandlerSettings(_config)
     import _config._
 
     val NrOfSelectors: Int =
@@ -209,26 +204,22 @@ object Udp extends ExtensionId[UdpExt] with ExtensionIdProvider {
     override val MaxChannelsPerSelector: Int =
       if (MaxChannels == -1) -1 else math.max(MaxChannels / NrOfSelectors, 1)
 
-    private[this] def getIntBytes(path: String): Int = {
+    private[this] def getIntBytes(path: String): Int =
       val size = getBytes(path)
       require(size < Int.MaxValue, s"$path must be < 2 GiB")
       size.toInt
-    }
-  }
-}
 
-class UdpExt(system: ExtendedActorSystem) extends IO.Extension {
+class UdpExt(system: ExtendedActorSystem) extends IO.Extension
 
   import Udp.UdpSettings
 
   val settings: UdpSettings = new UdpSettings(
       system.settings.config.getConfig("akka.io.udp"))
 
-  val manager: ActorRef = {
+  val manager: ActorRef =
     system.systemActorOf(
         props = Props(classOf[UdpManager], this).withDeploy(Deploy.local),
         name = "IO-UDP-FF")
-  }
 
   /**
     * Java API: retrieve the UDP manager actor’s reference.
@@ -240,12 +231,11 @@ class UdpExt(system: ExtendedActorSystem) extends IO.Extension {
     */
   private[io] val bufferPool: BufferPool = new DirectByteBufferPool(
       settings.DirectBufferSize, settings.MaxDirectBufferPoolSize)
-}
 
 /**
   * Java API: factory methods for the message types used when communicating with the Udp service.
   */
-object UdpMessage {
+object UdpMessage
   import Udp._
   import java.lang.{Iterable ⇒ JIterable}
   import scala.collection.JavaConverters._
@@ -345,9 +335,8 @@ object UdpMessage {
     * the socket after a `Udp.SuspendReading` command.
     */
   def resumeReading: Command = ResumeReading
-}
 
-object UdpSO extends SoJavaFactories {
+object UdpSO extends SoJavaFactories
   import Udp.SO._
 
   /**
@@ -356,4 +345,3 @@ object UdpSO extends SoJavaFactories {
     * For more information see [[java.net.DatagramSocket#setBroadcast]]
     */
   def broadcast(on: Boolean) = Broadcast(on)
-}

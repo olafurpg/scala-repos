@@ -6,18 +6,16 @@ package effect
   *
   */
 ////
-trait MonadIO[F[_]] extends LiftIO[F] with Monad[F] { self =>
+trait MonadIO[F[_]] extends LiftIO[F] with Monad[F]  self =>
   ////
 
   // derived functions
 
   ////
-  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F] {
+  val monadIOSyntax = new scalaz.syntax.effect.MonadIOSyntax[F]
     def F = MonadIO.this
-  }
-}
 
-object MonadIO {
+object MonadIO
   @inline def apply[F[_]](implicit F: MonadIO[F]): MonadIO[F] = F
 
   ////
@@ -25,24 +23,21 @@ object MonadIO {
   // TODO for some reason, putting this in RegionTInstances causes scalac to blow the stack
   implicit def regionTMonadIO[S, M[_]](implicit M0: MonadIO[M]) =
     new MonadIO[RegionT[S, M, ?]] with RegionTLiftIO[S, M]
-    with RegionTMonad[S, M] {
+    with RegionTMonad[S, M]
       implicit def M = M0
       implicit def L = M0
-    }
 
-  private[scalaz] trait FromLiftIO[F[_]] extends MonadIO[F] {
+  private[scalaz] trait FromLiftIO[F[_]] extends MonadIO[F]
     def FM: Monad[F]
     def FLO: LiftIO[F]
     def point[A](a: => A) = FM.point(a)
     def bind[A, B](fa: F[A])(f: A => F[B]) = FM.bind(fa)(f)
     def liftIO[A](ioa: IO[A]) = FLO.liftIO(ioa)
-  }
 
   private[scalaz] def fromLiftIO[F[_]: LiftIO : Monad]: MonadIO[F] =
-    new FromLiftIO[F] {
+    new FromLiftIO[F]
       def FM = Monad[F]
       def FLO = LiftIO[F]
-    }
 
   implicit def idTMonadIO[F[_]: MonadIO] = fromLiftIO[IdT[F, ?]]
 
@@ -63,4 +58,3 @@ object MonadIO {
   implicit def stateTMonadIO[F[_]: MonadIO, S] = fromLiftIO[StateT[F, S, ?]]
 
   ////
-}

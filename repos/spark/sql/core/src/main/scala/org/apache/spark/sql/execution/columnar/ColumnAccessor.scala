@@ -31,7 +31,7 @@ import org.apache.spark.sql.types._
   * a [[MutableRow]]. In this way, boxing cost can be avoided by leveraging the setter methods
   * for primitive values provided by [[MutableRow]].
   */
-private[columnar] trait ColumnAccessor {
+private[columnar] trait ColumnAccessor
   initialize()
 
   protected def initialize()
@@ -41,27 +41,23 @@ private[columnar] trait ColumnAccessor {
   def extractTo(row: MutableRow, ordinal: Int)
 
   protected def underlyingBuffer: ByteBuffer
-}
 
 private[columnar] abstract class BasicColumnAccessor[JvmType](
     protected val buffer: ByteBuffer,
     protected val columnType: ColumnType[JvmType])
-    extends ColumnAccessor {
+    extends ColumnAccessor
 
   protected def initialize() {}
 
   override def hasNext: Boolean = buffer.hasRemaining
 
-  override def extractTo(row: MutableRow, ordinal: Int): Unit = {
+  override def extractTo(row: MutableRow, ordinal: Int): Unit =
     extractSingle(row, ordinal)
-  }
 
-  def extractSingle(row: MutableRow, ordinal: Int): Unit = {
+  def extractSingle(row: MutableRow, ordinal: Int): Unit =
     columnType.extract(buffer, row, ordinal)
-  }
 
   protected def underlyingBuffer = buffer
-}
 
 private[columnar] class NullColumnAccessor(buffer: ByteBuffer)
     extends BasicColumnAccessor[Any](buffer, NULL) with NullableColumnAccessor
@@ -124,12 +120,12 @@ private[columnar] class MapColumnAccessor(
     extends BasicColumnAccessor[UnsafeMapData](buffer, MAP(dataType))
     with NullableColumnAccessor
 
-private[columnar] object ColumnAccessor {
+private[columnar] object ColumnAccessor
   @tailrec
-  def apply(dataType: DataType, buffer: ByteBuffer): ColumnAccessor = {
+  def apply(dataType: DataType, buffer: ByteBuffer): ColumnAccessor =
     val buf = buffer.order(ByteOrder.nativeOrder)
 
-    dataType match {
+    dataType match
       case NullType => new NullColumnAccessor(buf)
       case BooleanType => new BooleanColumnAccessor(buf)
       case ByteType => new ByteColumnAccessor(buf)
@@ -149,6 +145,3 @@ private[columnar] object ColumnAccessor {
       case udt: UserDefinedType[_] => ColumnAccessor(udt.sqlType, buffer)
       case other =>
         throw new Exception(s"not support type: $other")
-    }
-  }
-}

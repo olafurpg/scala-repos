@@ -11,7 +11,7 @@ import com.twitter.finagle.client.DefaultPool
   * @see [[https://twitter.github.io/finagle/guide/Clients.html#pooling]]
   */
 class SessionPoolingParams[A <: Stack.Parameterized[A]](
-    self: Stack.Parameterized[A]) {
+    self: Stack.Parameterized[A])
 
   /**
     * Configures the total number of temporary (may be closed and reestablished, depending
@@ -49,4 +49,3 @@ class SessionPoolingParams[A <: Stack.Parameterized[A]](
   def maxWaiters(maxWaitersPerHost: Int): A =
     self.configured(
         self.params[DefaultPool.Param].copy(maxWaiters = maxWaitersPerHost))
-}

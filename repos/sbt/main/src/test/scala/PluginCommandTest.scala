@@ -8,62 +8,54 @@ import sbt.internal.util.{AttributeEntry, AttributeMap, ConsoleOut, GlobalLoggin
 
 object PluginCommandTestPlugin0 extends AutoPlugin
 
-package subpackage {
+package subpackage
 
   object PluginCommandTestPlugin1 extends AutoPlugin
-}
 
-object PluginCommandTest extends Specification {
+object PluginCommandTest extends Specification
   sequential
 
   import subpackage._
   import FakeState._
 
-  "The `plugin` command" should {
+  "The `plugin` command" should
 
-    "should work for plugins within nested in one package" in {
+    "should work for plugins within nested in one package" in
       val output = processCommand("plugin sbt.PluginCommandTestPlugin0",
                                   PluginCommandTestPlugin0,
                                   PluginCommandTestPlugin1)
       output must contain("sbt.PluginCommandTestPlugin0 is activated.")
-    }
 
-    "should work for plugins nested more than one package" in {
+    "should work for plugins nested more than one package" in
       val output =
         processCommand("plugin sbt.subpackage.PluginCommandTestPlugin1",
                        PluginCommandTestPlugin0,
                        PluginCommandTestPlugin1)
       output must contain(
           "sbt.subpackage.PluginCommandTestPlugin1 is activated.")
-    }
 
-    "suggest a plugin when given an incorrect plugin with a similar name" in {
+    "suggest a plugin when given an incorrect plugin with a similar name" in
       val output = processCommand("plugin PluginCommandTestPlugin0",
                                   PluginCommandTestPlugin0,
                                   PluginCommandTestPlugin1)
       output must contain(
           "Not a valid plugin: PluginCommandTestPlugin0 (similar: sbt.PluginCommandTestPlugin0, sbt.subpackage.PluginCommandTestPlugin1)"
       )
-    }
-  }
-}
 
-object FakeState {
+object FakeState
 
-  def processCommand(input: String, enabledPlugins: AutoPlugin*): String = {
+  def processCommand(input: String, enabledPlugins: AutoPlugin*): String =
     val previousOut = System.out
     val outBuffer = new ByteArrayOutputStream
-    try {
+    try
       System.setOut(new PrintStream(outBuffer, true))
       val state = FakeState(enabledPlugins: _*)
       Command.process(input, state)
       new String(outBuffer.toByteArray)
-    } finally {
+    finally
       System.setOut(previousOut)
-    }
-  }
 
-  def apply(plugins: AutoPlugin*) = {
+  def apply(plugins: AutoPlugin*) =
 
     val base = new File("").getAbsoluteFile
     val testProject = Project("test-project", base).setAutoPlugins(plugins)
@@ -142,5 +134,3 @@ object FakeState {
                               ConsoleOut.systemOut),
         State.Continue
     )
-  }
-}

@@ -68,10 +68,10 @@ case class ComplexReflectData(arrayField: Seq[Int],
                               dataField: Data)
 
 class ScalaReflectionRelationSuite
-    extends SparkFunSuite with SharedSQLContext {
+    extends SparkFunSuite with SharedSQLContext
   import testImplicits._
 
-  test("query case class RDD") {
+  test("query case class RDD")
     val data = ReflectData("a",
                            1,
                            1L,
@@ -100,26 +100,23 @@ class ScalaReflectionRelationSuite
             Date.valueOf("1970-01-01"),
             new Timestamp(12345),
             Seq(1, 2, 3)))
-  }
 
-  test("query case class RDD with nulls") {
+  test("query case class RDD with nulls")
     val data = NullReflectData(null, null, null, null, null, null, null)
     Seq(data).toDF().registerTempTable("reflectNullData")
 
     assert(sql("SELECT * FROM reflectNullData").collect().head === Row.fromSeq(
             Seq.fill(7)(null)))
-  }
 
-  test("query case class RDD with Nones") {
+  test("query case class RDD with Nones")
     val data = OptionalReflectData(None, None, None, None, None, None, None)
     Seq(data).toDF().registerTempTable("reflectOptionalData")
 
     assert(sql("SELECT * FROM reflectOptionalData").collect().head === Row
           .fromSeq(Seq.fill(7)(null)))
-  }
 
   // Equality is broken for Arrays, so we test that separately.
-  test("query binary data") {
+  test("query binary data")
     Seq(ReflectBinary(Array[Byte](1)))
       .toDF()
       .registerTempTable("reflectBinary")
@@ -129,9 +126,8 @@ class ScalaReflectionRelationSuite
       .head(0)
       .asInstanceOf[Array[Byte]]
     assert(result.toSeq === Seq[Byte](1))
-  }
 
-  test("query complex data") {
+  test("query complex data")
     val data = ComplexReflectData(
         Seq(1, 2, 3),
         Seq(Some(1), Some(2), None),
@@ -155,5 +151,3 @@ class ScalaReflectionRelationSuite
                 Map(10 -> 100L, 20 -> 200L),
                 Map(10 -> 100L, 20 -> 200L, 30 -> null),
                 Row(null, "abc"))))
-  }
-}

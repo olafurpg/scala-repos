@@ -19,7 +19,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 import scala.collection.mutable.Buffer
 
-class SkewJoinJob(args: Args) extends Job(args) {
+class SkewJoinJob(args: Args) extends Job(args)
   val sampleRate = args.getOrElse("sampleRate", "0.001").toDouble
   val reducers = args.getOrElse("reducers", "-1").toInt
   val replicationFactor = args.getOrElse("replicationFactor", "1").toInt
@@ -28,14 +28,12 @@ class SkewJoinJob(args: Args) extends Job(args) {
       SkewReplicationA(replicationFactor)
     else SkewReplicationB()
 
-  val in0 = Tsv("input0").read.mapTo((0, 1, 2) -> ('x1, 'y1, 's1)) {
+  val in0 = Tsv("input0").read.mapTo((0, 1, 2) -> ('x1, 'y1, 's1))
     input: (Int, Int, Int) =>
       input
-  }
-  val in1 = Tsv("input1").read.mapTo((0, 1, 2) -> ('x2, 'y2, 's2)) {
+  val in1 = Tsv("input1").read.mapTo((0, 1, 2) -> ('x2, 'y2, 's2))
     input: (Int, Int, Int) =>
       input
-  }
 
   in0
     .skewJoinWithSmaller('y1 -> 'y2, in1, sampleRate, reducers, replicator)
@@ -46,21 +44,19 @@ class SkewJoinJob(args: Args) extends Job(args) {
     .joinWithSmaller('y1 -> 'y2, in1)
     .project('x1, 'y1, 's1, 'x2, 'y2, 's2)
     .write(Tsv("jws-output"))
-}
 
-object JoinTestHelper {
+object JoinTestHelper
   import Dsl._
 
   val rng = new java.util.Random
-  def generateInput(size: Int, max: Int): List[(String, String, String)] = {
+  def generateInput(size: Int, max: Int): List[(String, String, String)] =
     def next: String =
       rng
         .nextInt(max)
         .toString
-      (0 to size).map { i =>
+      (0 to size).map  i =>
       (next, next, next)
-    }.toList
-  }
+    .toList
 
   type JoinResult = (Int, Int, Int, Int, Int, Int)
 
@@ -69,7 +65,7 @@ object JoinTestHelper {
       sampleRate: Double = 0.001,
       reducers: Int = -1,
       replicationFactor: Int = 1,
-      replicator: String = "a"): (List[JoinResult], List[JoinResult]) = {
+      replicator: String = "a"): (List[JoinResult], List[JoinResult]) =
 
     val skewResult = Buffer[JoinResult]()
     val innerResult = Buffer[JoinResult]()
@@ -80,80 +76,65 @@ object JoinTestHelper {
       .arg("replicator", replicator.toString)
       .source(Tsv("input0"), generateInput(1000, 100))
       .source(Tsv("input1"), generateInput(100, 100))
-      .sink[(Int, Int, Int, Int, Int, Int)](Tsv("output")) { outBuf =>
+      .sink[(Int, Int, Int, Int, Int, Int)](Tsv("output"))  outBuf =>
         skewResult ++= outBuf
-      }
-      .sink[(Int, Int, Int, Int, Int, Int)](Tsv("jws-output")) { outBuf =>
+      .sink[(Int, Int, Int, Int, Int, Int)](Tsv("jws-output"))  outBuf =>
         innerResult ++= outBuf
-      }
       .run
       //.runHadoop //this takes MUCH longer to run. Commented out by default, but tests pass on my machine
       .finish
       (skewResult.toList.sorted, innerResult.toList.sorted)
-  }
-}
 
-class SkewJoinPipeTest extends WordSpec with Matchers {
+class SkewJoinPipeTest extends WordSpec with Matchers
   import JoinTestHelper._
 
-  "A SkewInnerProductJob" should {
-    "compute skew join with sampleRate = 0.001, using strategy A" in {
+  "A SkewInnerProductJob" should
+    "compute skew join with sampleRate = 0.001, using strategy A" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.001, replicator = "a")
       sk shouldBe inner
-    }
 
-    "compute skew join with sampleRate = 0.001, using strategy B" in {
+    "compute skew join with sampleRate = 0.001, using strategy B" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.001, replicator = "b")
       sk shouldBe inner
-    }
 
-    "compute skew join with sampleRate = 0.1, using strategy A" in {
+    "compute skew join with sampleRate = 0.1, using strategy A" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.1, replicator = "a")
       sk shouldBe inner
-    }
 
-    "compute skew join with sampleRate = 0.1, using strategy B" in {
+    "compute skew join with sampleRate = 0.1, using strategy B" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.1, replicator = "b")
       sk shouldBe inner
-    }
 
-    "compute skew join with sampleRate = 0.9, using strategy A" in {
+    "compute skew join with sampleRate = 0.9, using strategy A" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.9, replicator = "a")
       sk shouldBe inner
-    }
 
-    "compute skew join with sampleRate = 0.9, using strategy B" in {
+    "compute skew join with sampleRate = 0.9, using strategy B" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), sampleRate = 0.9, replicator = "b")
       sk shouldBe inner
-    }
 
-    "compute skew join with replication factor 5, using strategy A" in {
+    "compute skew join with replication factor 5, using strategy A" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), replicationFactor = 5, replicator = "a")
       sk shouldBe inner
-    }
 
-    "compute skew join with reducers = 10, using strategy A" in {
+    "compute skew join with reducers = 10, using strategy A" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), reducers = 10, replicator = "a")
       sk shouldBe inner
-    }
 
-    "compute skew join with reducers = 10, using strategy B" in {
+    "compute skew join with reducers = 10, using strategy B" in
       val (sk, inner) = runJobWithArguments(
           new SkewJoinJob(_), reducers = 10, replicator = "b")
       sk shouldBe inner
-    }
-  }
-}
 
-class CollidingKeySkewJoinJob(args: Args) extends Job(args) {
+class CollidingKeySkewJoinJob(args: Args) extends Job(args)
   val sampleRate = args.getOrElse("sampleRate", "0.001").toDouble
   val reducers = args.getOrElse("reducers", "-1").toInt
   val replicationFactor = args.getOrElse("replicationFactor", "1").toInt
@@ -162,14 +143,12 @@ class CollidingKeySkewJoinJob(args: Args) extends Job(args) {
       SkewReplicationA(replicationFactor)
     else SkewReplicationB()
 
-  val in0 = Tsv("input0").read.mapTo((0, 1, 2) -> ('k1, 'k3, 'v1)) {
+  val in0 = Tsv("input0").read.mapTo((0, 1, 2) -> ('k1, 'k3, 'v1))
     input: (Int, Int, Int) =>
       input
-  }
-  val in1 = Tsv("input1").read.mapTo((0, 1, 2) -> ('k2, 'k3, 'v2)) {
+  val in1 = Tsv("input1").read.mapTo((0, 1, 2) -> ('k2, 'k3, 'v2))
     input: (Int, Int, Int) =>
       input
-  }
 
   in0
     .skewJoinWithSmaller('k3 -> 'k3, in1, sampleRate, reducers, replicator)
@@ -182,22 +161,17 @@ class CollidingKeySkewJoinJob(args: Args) extends Job(args) {
     .project('k1, 'k3, 'v1, 'k2, 'v2)
     .insert('z, 0) // Make it have the same schema as the non-colliding job
     .write(Tsv("jws-output"))
-}
 
-class CollidingKeySkewJoinTest extends WordSpec with Matchers {
+class CollidingKeySkewJoinTest extends WordSpec with Matchers
   import JoinTestHelper._
 
-  "A CollidingSkewInnerProductJob" should {
-    "compute skew join with colliding fields, using strategy A" in {
+  "A CollidingSkewInnerProductJob" should
+    "compute skew join with colliding fields, using strategy A" in
       val (sk, inn) =
         runJobWithArguments(new CollidingKeySkewJoinJob(_), replicator = "a")
       sk shouldBe inn
-    }
 
-    "compute skew join with colliding fields, using strategy B" in {
+    "compute skew join with colliding fields, using strategy B" in
       val (sk, inn) =
         runJobWithArguments(new CollidingKeySkewJoinJob(_), replicator = "b")
       sk shouldBe inn
-    }
-  }
-}

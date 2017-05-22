@@ -33,7 +33,7 @@ import scala.collection.JavaConversions._
 @RunWith(value = classOf[Parameterized])
 class BrokerCompressionTest(
     messageCompression: String, brokerCompression: String)
-    extends JUnitSuite {
+    extends JUnitSuite
 
   val tmpDir = TestUtils.tempDir()
   val logDir = TestUtils.randomPartitionLogDir(tmpDir)
@@ -41,15 +41,14 @@ class BrokerCompressionTest(
   val logConfig = LogConfig()
 
   @After
-  def tearDown() {
+  def tearDown()
     CoreUtils.rm(tmpDir)
-  }
 
   /**
     * Test broker-side compression configuration
     */
   @Test
-  def testBrokerSideCompression() {
+  def testBrokerSideCompression()
     val messageCompressionCode =
       CompressionCodec.getCompressionCodec(messageCompression)
     val logProps = new Properties()
@@ -70,26 +69,22 @@ class BrokerCompressionTest(
     def readMessage(offset: Int) =
       log.read(offset, 4096).messageSet.head.message
 
-    if (!brokerCompression.equals("producer")) {
+    if (!brokerCompression.equals("producer"))
       val brokerCompressionCode =
         BrokerCompressionCodec.getCompressionCodec(brokerCompression)
       assertEquals("Compression at offset 0 should produce " +
                    brokerCompressionCode.name,
                    brokerCompressionCode,
                    readMessage(0).compressionCodec)
-    } else
+    else
       assertEquals("Compression at offset 0 should produce " +
                    messageCompressionCode.name,
                    messageCompressionCode,
                    readMessage(0).compressionCodec)
-  }
-}
 
-object BrokerCompressionTest {
+object BrokerCompressionTest
   @Parameters
-  def parameters: Collection[Array[String]] = {
+  def parameters: Collection[Array[String]] =
     for (brokerCompression <- BrokerCompressionCodec.brokerCompressionOptions;
     messageCompression <- CompressionType.values) yield
       Array(messageCompression.name, brokerCompression)
-  }
-}

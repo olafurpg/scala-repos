@@ -7,8 +7,8 @@ import org.scalatest.{BeforeAndAfter, GivenWhenThen, Matchers}
 
 class MarathonStartupIntegrationTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
-  test("Marathon should fail during start, if the HTTP port is already bound") {
+    with Matchers with BeforeAndAfter with GivenWhenThen
+  test("Marathon should fail during start, if the HTTP port is already bound")
     Given(
         s"a Marathon process already running on port ${config.marathonBasePort}")
 
@@ -29,5 +29,3 @@ class MarathonStartupIntegrationTest
 
     Then("the new process should fail and exit with an error code")
     assert(failingProcess.exitValue() > 0)
-  }
-}

@@ -26,7 +26,7 @@ package scala.test.scaladoc.implicits.shadowing
 import language.implicitConversions // according to SIP18
 
 /** conv5, conv8, conv9, conv10, conv11 should be visible */
-class A[T] {
+class A[T]
   def conv1: AnyRef = ???
   def conv2: T = ???
   def conv3(l: Int): AnyRef = ???
@@ -38,7 +38,6 @@ class A[T] {
   def conv9(l: AnyRef)(m: AnyRef): AnyRef = ???
   def conv10(l: T): T = ???
   def conv11(l: T): T = ???
-}
 
 /** conv5, conv8, conv9, conv11 should be visible */
 class B extends A[Int]
@@ -49,7 +48,7 @@ class C extends A[Double]
 /** conv5, conv8, conv9, conv10 should be visible */
 class D extends A[AnyRef]
 
-class Z[T] {
+class Z[T]
   def conv1: AnyRef = ???
   def conv2: T = ???
   def conv3(p: Int): AnyRef = ???
@@ -61,7 +60,5 @@ class Z[T] {
   def conv9(p: AnyRef, q: AnyRef): AnyRef = ???
   def conv10(p: Int): T = ???
   def conv11(p: String): T = ???
-}
-object A {
+object A
   implicit def AtoZ[T](a: A[T]) = new Z[T]
-}

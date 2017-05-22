@@ -9,7 +9,7 @@ import sbt.Def.Initialize
 import java.io.File
 import sbt.Task
 
-object ActivatorDist {
+object ActivatorDist
 
   val activatorDistDirectory = SettingKey[File]("activator-dist-directory")
   val activatorDist = TaskKey[File](
@@ -21,21 +21,20 @@ object ActivatorDist {
       activatorDist <<= activatorDistTask
   )
 
-  def activatorDistTask: Initialize[Task[File]] = {
+  def activatorDistTask: Initialize[Task[File]] =
     (thisProjectRef,
      baseDirectory,
      activatorDistDirectory,
      version,
      buildStructure,
-     streams) map {
+     streams) map
       (project, projectBase, activatorDistDirectory, version, structure, s) =>
-        {
           val directories = projectBase
             .listFiles(DirectoryFilter)
             .filter(dir => (dir / "activator.properties").exists)
           val rootGitignoreLines =
             IO.readLines(AkkaBuild.root.base / ".gitignore")
-          for (dir <- directories) {
+          for (dir <- directories)
             val localGitignoreLines =
               if ((dir / ".gitignore").exists) IO.readLines(dir / ".gitignore")
               else Nil
@@ -46,20 +45,14 @@ object ActivatorDist {
               PathFinder(dir) descendantsExcept ("*", gitignoreFileFilter) filter
               (_.isFile)
             filteredPathFinder pair Path.rebase(
-                dir, activatorDistDirectory / dir.name) map {
+                dir, activatorDistDirectory / dir.name) map
               case (source, target) =>
                 s.log.info(s"copying: $source -> $target")
                 IO.copyFile(source, target, preserveLastModified = true)
-            }
             val targetDir = activatorDistDirectory / dir.name
             val targetFile =
               activatorDistDirectory / (dir.name + "-" + version + ".zip")
             s.log.info(s"zipping: $targetDir -> $targetFile")
             Dist.zip(targetDir, targetFile)
-          }
 
           activatorDistDirectory
-        }
-    }
-  }
-}

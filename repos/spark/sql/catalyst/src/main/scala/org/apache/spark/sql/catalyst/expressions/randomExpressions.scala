@@ -32,7 +32,7 @@ import org.apache.spark.util.random.XORShiftRandom
   *
   * Since this expression is stateful, it cannot be a case object.
   */
-abstract class RDG extends LeafExpression with Nondeterministic {
+abstract class RDG extends LeafExpression with Nondeterministic
 
   protected def seed: Long
 
@@ -42,9 +42,8 @@ abstract class RDG extends LeafExpression with Nondeterministic {
     */
   @transient protected var rng: XORShiftRandom = _
 
-  override protected def initInternal(): Unit = {
+  override protected def initInternal(): Unit =
     rng = new XORShiftRandom(seed + TaskContext.getPartitionId)
-  }
 
   override def nullable: Boolean = false
 
@@ -52,10 +51,9 @@ abstract class RDG extends LeafExpression with Nondeterministic {
 
   // NOTE: Even if the user doesn't provide a seed, Spark SQL adds a default seed.
   override def sql: String = s"$prettyName($seed)"
-}
 
 /** Generate a random column with i.i.d. uniformly distributed values in [0, 1). */
-case class Rand(seed: Long) extends RDG {
+case class Rand(seed: Long) extends RDG
   override protected def evalInternal(input: InternalRow): Double =
     rng.nextDouble()
 
@@ -63,14 +61,14 @@ case class Rand(seed: Long) extends RDG {
 
   def this(seed: Expression) =
     this(
-        seed match {
+        seed match
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(
             "Input argument to rand must be an integer literal.")
-    })
+    )
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val rngTerm = ctx.freshName("rng")
     val className = classOf[XORShiftRandom].getName
     ctx.addMutableState(
@@ -81,11 +79,9 @@ case class Rand(seed: Long) extends RDG {
     s"""
       final ${ctx.javaType(dataType)} ${ev.value} = $rngTerm.nextDouble();
     """
-  }
-}
 
 /** Generate a random column with i.i.d. gaussian random distribution. */
-case class Randn(seed: Long) extends RDG {
+case class Randn(seed: Long) extends RDG
   override protected def evalInternal(input: InternalRow): Double =
     rng.nextGaussian()
 
@@ -93,14 +89,14 @@ case class Randn(seed: Long) extends RDG {
 
   def this(seed: Expression) =
     this(
-        seed match {
+        seed match
       case IntegerLiteral(s) => s
       case _ =>
         throw new AnalysisException(
             "Input argument to randn must be an integer literal.")
-    })
+    )
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val rngTerm = ctx.freshName("rng")
     val className = classOf[XORShiftRandom].getName
     ctx.addMutableState(
@@ -111,5 +107,3 @@ case class Randn(seed: Long) extends RDG {
     s"""
       final ${ctx.javaType(dataType)} ${ev.value} = $rngTerm.nextGaussian();
     """
-  }
-}

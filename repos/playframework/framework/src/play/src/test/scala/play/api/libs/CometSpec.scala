@@ -16,64 +16,55 @@ import play.core.test.FakeRequest
 
 import scala.concurrent.{Await, Future}
 
-class CometSpec extends Specification {
+class CometSpec extends Specification
 
-  class MockController(val materializer: Materializer) extends Controller {
+  class MockController(val materializer: Materializer) extends Controller
 
     //#comet-string
-    def cometString = Action {
+    def cometString = Action
       implicit val m = materializer
       def stringSource: Source[String, _] = Source(List("kiki", "foo", "bar"))
       Ok.chunked(stringSource via Comet.string("parent.cometMessage"))
         .as(ContentTypes.HTML)
-    }
     //#comet-string
 
     //#comet-json
-    def cometJson = Action {
+    def cometJson = Action
       implicit val m = materializer
       def stringSource: Source[JsValue, _] =
         Source(List(JsString("jsonString")))
       Ok.chunked(stringSource via Comet.json("parent.cometMessage"))
         .as(ContentTypes.HTML)
-    }
     //#comet-json
-  }
 
-  "play comet" should {
+  "play comet" should
 
-    "work with enumerator" in {
+    "work with enumerator" in
       val result = Results.Ok.chunked(
           Enumerator("foo", "bar", "baz") &> Comet("callback.method"))
       result.body.contentType must beSome(ContentTypes.HTML)
-    }
 
-    "work with string" in {
+    "work with string" in
       val app = new GuiceApplicationBuilder().build()
-      try {
+      try
         implicit val m = app.materializer
         val controller = new MockController(m)
         val result = controller.cometString.apply(FakeRequest())
         contentAsString(result) must contain(
             "<html><body><script type=\"text/javascript\">parent.cometMessage('kiki');</script><script type=\"text/javascript\">parent.cometMessage('foo');</script><script type=\"text/javascript\">parent.cometMessage('bar');</script>")
-      } finally {
+      finally
         app.stop()
-      }
-    }
 
-    "work with json" in {
+    "work with json" in
       val app = new GuiceApplicationBuilder().build()
-      try {
+      try
         implicit val m = app.materializer
         val controller = new MockController(m)
         val result = controller.cometJson.apply(FakeRequest())
         contentAsString(result) must contain(
             "<html><body><script type=\"text/javascript\">parent.cometMessage(\"jsonString\");</script>")
-      } finally {
+      finally
         app.stop()
-      }
-    }
-  }
 
   //---------------------------------------------------------------------------
   // Can't use play.api.test.ResultsExtractor here as it is not imported
@@ -83,13 +74,11 @@ class CometSpec extends Specification {
 
   implicit def timeout: Timeout = 20.seconds
 
-  def charset(of: Future[Result]): Option[String] = {
-    Await.result(of, timeout.duration).body.contentType match {
+  def charset(of: Future[Result]): Option[String] =
+    Await.result(of, timeout.duration).body.contentType match
       case Some(s) if s.contains("charset=") =>
         Some(s.split("; *charset=").drop(1).mkString.trim)
       case _ => None
-    }
-  }
 
   /**
     * Extracts the content as String.
@@ -101,8 +90,6 @@ class CometSpec extends Specification {
     * Extracts the content as bytes.
     */
   def contentAsBytes(of: Future[Result])(
-      implicit mat: Materializer): ByteString = {
+      implicit mat: Materializer): ByteString =
     val result = Await.result(of, timeout.duration)
     Await.result(result.body.consumeData, timeout.duration)
-  }
-}

@@ -25,13 +25,12 @@ import org.apache.spark.sql.catalyst.expressions.codegen._
 import org.apache.spark.sql.catalyst.util.quoteIdentifier
 import org.apache.spark.sql.types._
 
-object NamedExpression {
+object NamedExpression
   private val curId = new java.util.concurrent.atomic.AtomicLong()
   private[expressions] val jvmId = UUID.randomUUID()
   def newExprId: ExprId = ExprId(curId.getAndIncrement(), jvmId)
   def unapply(expr: NamedExpression): Option[(String, DataType)] =
     Some(expr.name, expr.dataType)
-}
 
 /**
   * A globally unique id for a given named expression.
@@ -42,14 +41,13 @@ object NamedExpression {
   */
 case class ExprId(id: Long, jvmId: UUID)
 
-object ExprId {
+object ExprId
   def apply(id: Long): ExprId = ExprId(id, NamedExpression.jvmId)
-}
 
 /**
   * An [[Expression]] that is named.
   */
-trait NamedExpression extends Expression {
+trait NamedExpression extends Expression
 
   /** We should never fold named expressions in order to not remove the alias. */
   override def foldable: Boolean = false
@@ -89,17 +87,14 @@ trait NamedExpression extends Expression {
   def newInstance(): NamedExpression
 
   protected def typeSuffix =
-    if (resolved) {
-      dataType match {
+    if (resolved)
+      dataType match
         case LongType => "L"
         case _ => ""
-      }
-    } else {
+    else
       ""
-    }
-}
 
-abstract class Attribute extends LeafExpression with NamedExpression {
+abstract class Attribute extends LeafExpression with NamedExpression
 
   override def references: AttributeSet = AttributeSet(this)
 
@@ -109,7 +104,6 @@ abstract class Attribute extends LeafExpression with NamedExpression {
 
   override def toAttribute: Attribute = this
   def newInstance(): Attribute
-}
 
 /**
   * Used to assign a new name to a computation.
@@ -134,7 +128,7 @@ case class Alias(child: Expression, name: String)(
     val qualifiers: Seq[String] = Nil,
     val explicitMetadata: Option[Metadata] = None,
     override val isGenerated: java.lang.Boolean = false)
-    extends UnaryExpression with NamedExpression {
+    extends UnaryExpression with NamedExpression
 
   // Alias(Generator, xx) need to be transformed into Generate(generator, ...)
   override lazy val resolved =
@@ -150,48 +144,39 @@ case class Alias(child: Expression, name: String)(
 
   override def dataType: DataType = child.dataType
   override def nullable: Boolean = child.nullable
-  override def metadata: Metadata = {
-    explicitMetadata.getOrElse {
-      child match {
+  override def metadata: Metadata =
+    explicitMetadata.getOrElse
+      child match
         case named: NamedExpression => named.metadata
         case _ => Metadata.empty
-      }
-    }
-  }
 
   def newInstance(): NamedExpression =
     Alias(child, name)(qualifiers = qualifiers,
                        explicitMetadata = explicitMetadata,
                        isGenerated = isGenerated)
 
-  override def toAttribute: Attribute = {
-    if (resolved) {
+  override def toAttribute: Attribute =
+    if (resolved)
       AttributeReference(name, child.dataType, child.nullable, metadata)(
           exprId, qualifiers, isGenerated)
-    } else {
+    else
       UnresolvedAttribute(name)
-    }
-  }
 
   override def toString: String = s"$child AS $name#${exprId.id}$typeSuffix"
 
-  override protected final def otherCopyArgs: Seq[AnyRef] = {
+  override protected final def otherCopyArgs: Seq[AnyRef] =
     exprId :: qualifiers :: explicitMetadata :: isGenerated :: Nil
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case a: Alias =>
       name == a.name && exprId == a.exprId && child == a.child &&
       qualifiers == a.qualifiers && explicitMetadata == a.explicitMetadata
     case _ => false
-  }
 
-  override def sql: String = {
+  override def sql: String =
     val qualifiersString =
       if (qualifiers.isEmpty) "" else qualifiers.head + "."
     s"${child.sql} AS $qualifiersString${quoteIdentifier(name)}"
-  }
-}
 
 /**
   * A reference to an attribute produced by another operator in the tree.
@@ -215,31 +200,28 @@ case class AttributeReference(
     val exprId: ExprId = NamedExpression.newExprId,
     val qualifiers: Seq[String] = Nil,
     override val isGenerated: java.lang.Boolean = false)
-    extends Attribute with Unevaluable {
+    extends Attribute with Unevaluable
 
   /**
     * Returns true iff the expression id is the same for both attributes.
     */
   def sameRef(other: AttributeReference): Boolean = this.exprId == other.exprId
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case ar: AttributeReference =>
       name == ar.name && dataType == ar.dataType && nullable == ar.nullable &&
       metadata == ar.metadata && exprId == ar.exprId &&
       qualifiers == ar.qualifiers
     case _ => false
-  }
 
-  override def semanticEquals(other: Expression): Boolean = other match {
+  override def semanticEquals(other: Expression): Boolean = other match
     case ar: AttributeReference => sameRef(ar)
     case _ => false
-  }
 
-  override def semanticHash(): Int = {
+  override def semanticHash(): Int =
     this.exprId.hashCode()
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     // See http://stackoverflow.com/questions/113511/hash-code-implementation
     var h = 17
     h = h * 37 + name.hashCode()
@@ -249,7 +231,6 @@ case class AttributeReference(
     h = h * 37 + exprId.hashCode()
     h = h * 37 + qualifiers.hashCode()
     h
-  }
 
   override def newInstance(): AttributeReference =
     AttributeReference(name, dataType, nullable, metadata)(
@@ -258,48 +239,39 @@ case class AttributeReference(
   /**
     * Returns a copy of this [[AttributeReference]] with changed nullability.
     */
-  override def withNullability(newNullability: Boolean): AttributeReference = {
-    if (nullable == newNullability) {
+  override def withNullability(newNullability: Boolean): AttributeReference =
+    if (nullable == newNullability)
       this
-    } else {
+    else
       AttributeReference(name, dataType, newNullability, metadata)(
           exprId, qualifiers, isGenerated)
-    }
-  }
 
-  override def withName(newName: String): AttributeReference = {
-    if (name == newName) {
+  override def withName(newName: String): AttributeReference =
+    if (name == newName)
       this
-    } else {
+    else
       AttributeReference(newName, dataType, nullable, metadata)(
           exprId, qualifiers, isGenerated)
-    }
-  }
 
   /**
     * Returns a copy of this [[AttributeReference]] with new qualifiers.
     */
-  override def withQualifiers(newQualifiers: Seq[String]): AttributeReference = {
-    if (newQualifiers.toSet == qualifiers.toSet) {
+  override def withQualifiers(newQualifiers: Seq[String]): AttributeReference =
+    if (newQualifiers.toSet == qualifiers.toSet)
       this
-    } else {
+    else
       AttributeReference(name, dataType, nullable, metadata)(
           exprId, newQualifiers, isGenerated)
-    }
-  }
 
-  def withExprId(newExprId: ExprId): AttributeReference = {
-    if (exprId == newExprId) {
+  def withExprId(newExprId: ExprId): AttributeReference =
+    if (exprId == newExprId)
       this
-    } else {
+    else
       AttributeReference(name, dataType, nullable, metadata)(
           newExprId, qualifiers, isGenerated)
-    }
-  }
 
-  override protected final def otherCopyArgs: Seq[AnyRef] = {
+  override protected final def otherCopyArgs: Seq[AnyRef] =
     exprId :: qualifiers :: isGenerated :: Nil
-  }
 
   override def toString: String = s"$name#${exprId.id}$typeSuffix"
 
@@ -308,26 +280,24 @@ case class AttributeReference(
   override def simpleString: String =
     s"$name#${exprId.id}: ${dataType.simpleString}"
 
-  override def sql: String = {
+  override def sql: String =
     val qualifiersString =
       if (qualifiers.isEmpty) "" else qualifiers.head + "."
     s"$qualifiersString${quoteIdentifier(name)}"
-  }
-}
 
 /**
   * A place holder used when printing expressions without debugging information such as the
   * expression id or the unresolved indicator.
   */
 case class PrettyAttribute(name: String, dataType: DataType = NullType)
-    extends Attribute with Unevaluable {
+    extends Attribute with Unevaluable
 
   def this(attribute: Attribute) =
-    this(attribute.name, attribute match {
+    this(attribute.name, attribute match
       case a: AttributeReference => a.dataType
       case a: PrettyAttribute => a.dataType
       case _ => NullType
-    })
+    )
 
   override def toString: String = name
   override def sql: String = toString
@@ -344,10 +314,8 @@ case class PrettyAttribute(name: String, dataType: DataType = NullType)
     throw new UnsupportedOperationException
   override def exprId: ExprId = throw new UnsupportedOperationException
   override def nullable: Boolean = throw new UnsupportedOperationException
-}
 
-object VirtualColumn {
+object VirtualColumn
   val groupingIdName: String = "grouping__id"
   val groupingIdAttribute: UnresolvedAttribute = UnresolvedAttribute(
       groupingIdName)
-}

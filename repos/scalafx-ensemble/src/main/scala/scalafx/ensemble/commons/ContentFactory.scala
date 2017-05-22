@@ -47,46 +47,40 @@ import scalafx.stage.DirectoryChooser
   * populates the tabbed content by loading
   * EnsembleExample instance
   */
-object ContentFactory {
-  def createContent(exampleName: String, groupName: String) = {
+object ContentFactory
+  def createContent(exampleName: String, groupName: String) =
 
     // Construct content of the samples dynamically
     val fullClassName = ExampleInfo.className(exampleName, groupName)
     var cache = Map[String, EnsembleExample]()
     val sampleNode =
-      if (cache.get(fullClassName).isDefined) {
+      if (cache.get(fullClassName).isDefined)
         cache(fullClassName).getContent
-      } else {
+      else
         val inst = Class
           .forName(fullClassName)
           .newInstance()
           .asInstanceOf[EnsembleExample]
         cache = cache.+((fullClassName, inst))
         inst.getContent
-      }
 
-    val header = new Label(exampleName) {
+    val header = new Label(exampleName)
       styleClass += "page-header"
-    }
 
-    val sampleArea = new StackPane {
+    val sampleArea = new StackPane
       children = sampleNode
       vgrow = Priority.Sometimes
-    }
 
     // ScrollPane is applied for borderPane that contains samples
-    new ScrollPane {
+    new ScrollPane
       fitToWidth = true
       fitToHeight = true
-      content = new VBox(8) {
+      content = new VBox(8)
         children ++= Seq(header, sampleArea)
         styleClass += "sample-page"
-      }
       styleClass += "noborder-scroll-pane"
-    }
-  }
 
-  def createSrcContent(exampleName: String, exampleGroupName: String): Node = {
+  def createSrcContent(exampleName: String, exampleGroupName: String): Node =
 
     // Load syntax highlighter
     val shCoreJs =
@@ -136,30 +130,28 @@ object ContentFactory {
       .replace("@@shCoreDefaultCss@@", shCoreDefaultCss)
 
     //Border pane is sufficient to handle the content
-    val borderPane = new BorderPane() {
+    val borderPane = new BorderPane()
 
-      top = new ToolBar {
+      top = new ToolBar
         items = Seq(
-            new Button { thisButton =>
+            new Button  thisButton =>
               text = "Save SBT Project..."
               tooltip = "Save sample code in a new project that can be build and run with SBT"
               onAction = (ae: ActionEvent) =>
-                try {
+                try
                   val initialDir = SBTProjectBuilder.parentDir
-                  val fileChooser = new DirectoryChooser() {
+                  val fileChooser = new DirectoryChooser()
                     title = "Save SBT Project As:"
                     initialDirectory = initialDir
-                  }
                   val result =
                     Option(fileChooser.showDialog(thisButton.scene.window()))
-                  result match {
+                  result match
                     case Some(projectDir) =>
                       SBTProjectBuilder.createSampleProject(
                           projectDir, exampleInfo)
                       SBTProjectBuilder.parentDir = projectDir.getCanonicalFile.getParentFile
                     case _ =>
-                  }
-                } catch {
+                catch
                   case t: Throwable =>
                     val stage = thisButton.scene().window().asInstanceOf[Stage]
                     showError(
@@ -168,18 +160,17 @@ object ContentFactory {
                         header = "Error saving sample SBT project",
                         message = t.getClass.getName + ": " + t.getMessage,
                         t)
-              }
-            },
-            new Button { thisButton =>
+            ,
+            new Button  thisButton =>
               text = "Copy Source"
               tooltip = "Copy sample source code to clipboard"
               onAction = (ae: ActionEvent) =>
-                try {
+                try
                   val content = new ClipboardContent()
                   content.putString(exampleInfo.sourceCode)
                   content.putHtml(htmlSource)
                   Clipboard.systemClipboard.setContent(content)
-                } catch {
+                catch
                   case t: Throwable =>
                     val stage = thisButton.scene().window().asInstanceOf[Stage]
                     showError(
@@ -188,31 +179,24 @@ object ContentFactory {
                         header = "Error copying source to clipboard",
                         message = t.getClass.getName + ": " + t.getMessage,
                         t)
-              }
-            }
         )
-      }
       // Load source through webview
-      center = new WebView() {
+      center = new WebView()
         contextMenuEnabled = false
         prefWidth = 300
         this.engine.loadContent(htmlSource)
-      }
-    }
 
     borderPane
-  }
 
-  def isMac: Boolean = {
+  def isMac: Boolean =
     val os = System.getProperty("os.name").toLowerCase(new Locale(""))
     os.indexOf("mac") >= 0
-  }
 
   private def showError(stage: Stage,
                         title: String,
                         header: String,
                         message: String,
-                        t: Throwable): Unit = {
+                        t: Throwable): Unit =
     t.printStackTrace()
     val alert = new Alert(AlertType.ERROR)
     alert.initOwner(stage)
@@ -220,5 +204,3 @@ object ContentFactory {
     alert.setHeaderText(header)
     alert.setTitle(title)
     alert.showAndWait()
-  }
-}

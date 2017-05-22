@@ -32,7 +32,7 @@ import org.apache.kafka.common.protocol.Errors
 import org.junit.Assert._
 import org.junit.{After, Before, Test}
 
-class LogOffsetTest extends ZooKeeperTestHarness {
+class LogOffsetTest extends ZooKeeperTestHarness
   val random = new Random()
   var logDir: File = null
   var topicLogDir: File = null
@@ -42,7 +42,7 @@ class LogOffsetTest extends ZooKeeperTestHarness {
   var time: Time = new MockTime()
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val config: Properties = createBrokerConfig(1)
     val logDirPath = config.getProperty("log.dir")
@@ -51,18 +51,16 @@ class LogOffsetTest extends ZooKeeperTestHarness {
     server = TestUtils.createServer(KafkaConfig.fromProps(config), time)
     simpleConsumer = new SimpleConsumer(
         "localhost", server.boundPort(), 1000000, 64 * 1024, "")
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     simpleConsumer.close
     server.shutdown
     CoreUtils.rm(logDir)
     super.tearDown()
-  }
 
   @Test
-  def testGetOffsetsForUnknownTopic() {
+  def testGetOffsetsForUnknownTopic()
     val topicAndPartition = TopicAndPartition("foo", 0)
     val request = OffsetRequest(
         Map(topicAndPartition -> PartitionOffsetRequestInfo(
@@ -71,10 +69,9 @@ class LogOffsetTest extends ZooKeeperTestHarness {
     assertEquals(
         Errors.UNKNOWN_TOPIC_OR_PARTITION.code,
         offsetResponse.partitionErrorAndOffsets(topicAndPartition).error)
-  }
 
   @Test
-  def testGetOffsetsBeforeLatestTime() {
+  def testGetOffsetsBeforeLatestTime()
     val topicPartition = "kafka-" + 0
     val topic = topicPartition.split("-").head
     val part = Integer.valueOf(topicPartition.split("-").last).intValue
@@ -120,10 +117,9 @@ class LogOffsetTest extends ZooKeeperTestHarness {
           .addFetch(topic, 0, consumerOffsets.head, 300 * 1024)
           .build())
     assertFalse(fetchResponse.messageSet(topic, 0).iterator.hasNext)
-  }
 
   @Test
-  def testEmptyLogsGetOffsets() {
+  def testEmptyLogsGetOffsets()
     val topicPartition = "kafka-" + random.nextInt(10)
     val topicPartitionPath = getLogDir.getAbsolutePath + "/" + topicPartition
     topicLogDir = new File(topicPartitionPath)
@@ -139,7 +135,7 @@ class LogOffsetTest extends ZooKeeperTestHarness {
                 servers = Seq(server))
 
     var offsetChanged = false
-    for (i <- 1 to 14) {
+    for (i <- 1 to 14)
       val topicAndPartition = TopicAndPartition(topic, 0)
       val offsetRequest = OffsetRequest(
           Map(topicAndPartition -> PartitionOffsetRequestInfo(
@@ -149,15 +145,12 @@ class LogOffsetTest extends ZooKeeperTestHarness {
         .partitionErrorAndOffsets(topicAndPartition)
         .offsets
 
-      if (consumerOffsets(0) == 1) {
+      if (consumerOffsets(0) == 1)
         offsetChanged = true
-      }
-    }
     assertFalse(offsetChanged)
-  }
 
   @Test
-  def testGetOffsetsBeforeNow() {
+  def testGetOffsetsBeforeNow()
     val topicPartition = "kafka-" + random.nextInt(3)
     val topic = topicPartition.split("-").head
     val part = Integer.valueOf(topicPartition.split("-").last).intValue
@@ -194,10 +187,9 @@ class LogOffsetTest extends ZooKeeperTestHarness {
       .offsets
     assertEquals(
         Seq(20L, 18L, 16L, 14L, 12L, 10L, 8L, 6L, 4L, 2L, 0L), consumerOffsets)
-  }
 
   @Test
-  def testGetOffsetsBeforeEarliestTime() {
+  def testGetOffsetsBeforeEarliestTime()
     val topicPartition = "kafka-" + random.nextInt(3)
     val topic = topicPartition.split("-").head
     val part = Integer.valueOf(topicPartition.split("-").last).intValue
@@ -231,9 +223,8 @@ class LogOffsetTest extends ZooKeeperTestHarness {
       .partitionErrorAndOffsets(topicAndPartition)
       .offsets
     assertEquals(Seq(0L), consumerOffsets)
-  }
 
-  private def createBrokerConfig(nodeId: Int): Properties = {
+  private def createBrokerConfig(nodeId: Int): Properties =
     val props = new Properties
     props.put("broker.id", nodeId.toString)
     props.put("port", TestUtils.RandomPort.toString())
@@ -246,10 +237,7 @@ class LogOffsetTest extends ZooKeeperTestHarness {
     props.put("log.segment.bytes", logSize.toString)
     props.put("zookeeper.connect", zkConnect.toString)
     props
-  }
 
-  private def getLogDir(): File = {
+  private def getLogDir(): File =
     val dir = TestUtils.tempDir()
     dir
-  }
-}

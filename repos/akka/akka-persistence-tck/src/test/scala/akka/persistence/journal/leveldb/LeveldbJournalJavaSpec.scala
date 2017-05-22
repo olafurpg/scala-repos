@@ -10,7 +10,6 @@ class LeveldbJournalJavaSpec
               "LeveldbJournalJavaSpec",
               extraConfig = Some(
                     "akka.persistence.journal.leveldb.native = off")))
-    with PluginCleanup {
+    with PluginCleanup
 
   override def supportsRejectingNonSerializableObjects = true
-}

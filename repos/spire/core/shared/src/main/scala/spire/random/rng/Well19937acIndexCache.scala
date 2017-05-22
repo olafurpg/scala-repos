@@ -29,7 +29,7 @@ package rng
   * @see <a href="http://en.wikipedia.org/wiki/Well_Equidistributed_Long-period_Linear">WELL @ Wikipedia</a>
   * @author <a href="mailto:dusan.kysel@gmail.com">Dušan Kysel</a>
   */
-private[random] object Well19937acIndexCache {
+private[random] object Well19937acIndexCache
 
   // Number of bits in the pool.
   @inline private final val K: Int = 19937
@@ -57,4 +57,3 @@ private[random] object Well19937acIndexCache {
   val vm3 = Array.tabulate(R)(i => (i + M3) % R)
   val vrm1 = Array.tabulate(R)(i => (i + R_1) % R)
   val vrm2 = Array.tabulate(R)(i => (i + R_2) % R)
-}

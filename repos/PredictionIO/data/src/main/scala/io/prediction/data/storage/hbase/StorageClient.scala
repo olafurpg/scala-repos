@@ -34,20 +34,19 @@ case class HBClient(
 )
 
 class StorageClient(val config: StorageClientConfig)
-    extends BaseStorageClient with Logging {
+    extends BaseStorageClient with Logging
 
   val conf = HBaseConfiguration.create()
 
-  if (config.test) {
+  if (config.test)
     // use fewer retries and shorter timeout for test mode
     conf.set("hbase.client.retries.number", "1")
     conf.set("zookeeper.session.timeout", "30000");
     conf.set("zookeeper.recovery.retry", "1")
-  }
 
-  try {
+  try
     HBaseAdmin.checkHBaseAvailable(conf)
-  } catch {
+  catch
     case e: MasterNotRunningException =>
       error(
           "HBase master is not running (ZooKeeper ensemble: " + conf.get(
@@ -64,12 +63,10 @@ class StorageClient(val config: StorageClientConfig)
           "configured HBase to use an external ZooKeeper, that means your " +
           "HBase is not started or configured properly.")
       throw e
-    case e: Exception => {
+    case e: Exception =>
         error("Failed to connect to HBase." +
             " Please check if HBase is running properly.")
         throw e
-      }
-  }
 
   val connection = HConnectionManager.createConnection(conf)
 
@@ -80,4 +77,3 @@ class StorageClient(val config: StorageClientConfig)
   )
 
   override val prefix = "HB"
-}

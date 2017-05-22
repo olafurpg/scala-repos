@@ -18,26 +18,23 @@ import org.openjdk.jmh.infra.Blackhole
   */
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Array(Mode.AverageTime))
-class SchedulerBenchmark {
+class SchedulerBenchmark
   import SchedulerBenchmark._
 
   @Benchmark
-  def timeSubmit(state: SchedulerState): Unit = {
+  def timeSubmit(state: SchedulerState): Unit =
     state.scheduler.submit(state.cpuRunnable)
     state.scheduler.flush()
-  }
 
   @Benchmark
-  def timeLocalQueue(state: SchedulerState): Unit = {
+  def timeLocalQueue(state: SchedulerState): Unit =
     state.scheduler.submit(state.runnable)
     state.scheduler.flush()
-  }
-}
 
-object SchedulerBenchmark {
+object SchedulerBenchmark
 
   @State(Scope.Benchmark)
-  class SchedulerState {
+  class SchedulerState
     @Param(Array("1", "2", "4", "8", "16", "32"))
     var m: Int = 0
 
@@ -51,20 +48,13 @@ object SchedulerBenchmark {
     var runnable: Runnable = null
 
     @Setup(Level.Trial)
-    def setup(): Unit = {
+    def setup(): Unit =
       scheduler = new LocalScheduler(lifo)
-      cpuRunnable = new Runnable {
+      cpuRunnable = new Runnable
         def run(): Unit = Blackhole.consumeCPU(1)
-      }
-      runnable = new Runnable {
-        def run(): Unit = {
+      runnable = new Runnable
+        def run(): Unit =
           var j = 0
-          while (j < m) {
+          while (j < m)
             scheduler.submit(cpuRunnable)
             j += 1
-          }
-        }
-      }
-    }
-  }
-}

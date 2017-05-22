@@ -21,7 +21,7 @@ import org.scalatest.BeforeAndAfterAll
 import org.scalatest.Suite
 
 /** Shares a local `SparkContext` between all tests in a suite and closes it at the end */
-trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
+trait SharedSparkContext extends BeforeAndAfterAll  self: Suite =>
 
   @transient private var _sc: SparkContext = _
 
@@ -29,17 +29,13 @@ trait SharedSparkContext extends BeforeAndAfterAll { self: Suite =>
 
   var conf = new SparkConf(false)
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     _sc = new SparkContext("local[4]", "test", conf)
-  }
 
-  override def afterAll() {
-    try {
+  override def afterAll()
+    try
       LocalSparkContext.stop(_sc)
       _sc = null
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
-}

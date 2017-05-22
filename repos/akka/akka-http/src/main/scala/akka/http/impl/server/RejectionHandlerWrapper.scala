@@ -17,15 +17,15 @@ import akka.http.impl.util.JavaMapping.Implicits._
   */
 private[http] class RejectionHandlerWrapper(
     javaHandler: server.RejectionHandler)
-    extends RejectionHandler {
-  def apply(rejs: immutable.Seq[Rejection]): Option[Route] = Some { scalaCtx ⇒
+    extends RejectionHandler
+  def apply(rejs: immutable.Seq[Rejection]): Option[Route] = Some  scalaCtx ⇒
     val ctx = new RequestContextImpl(scalaCtx)
 
     import javaHandler._
     def handle(): RouteResult =
       if (rejs.isEmpty) handleEmptyRejection(ctx)
       else
-        rejs.head match {
+        rejs.head match
           case MethodRejection(supported) ⇒
             handleMethodRejection(ctx, supported.asJava)
           case SchemeRejection(supported) ⇒
@@ -86,11 +86,7 @@ private[http] class RejectionHandlerWrapper(
           case CustomRejectionWrapper(custom) ⇒
             handleCustomRejection(ctx, custom)
           case o ⇒ handleCustomScalaRejection(ctx, o)
-        }
 
-    handle() match {
+    handle() match
       case r: RouteResultImpl ⇒ r.underlying
       case PassRejectionRouteResult ⇒ scalaCtx.reject(rejs: _*)
-    }
-  }
-}

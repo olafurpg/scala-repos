@@ -1,4 +1,4 @@
-object testCQ {
+object testCQ
   // why does this not work directly
   case class Thing(name: String, contains: List[Thing]);
 
@@ -6,4 +6,3 @@ object testCQ {
   abstract class T;
   case class Thing2( name:String, contains:List[ T ]  ) extends T;
  */
-}

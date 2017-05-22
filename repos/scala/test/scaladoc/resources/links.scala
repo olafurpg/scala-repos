@@ -6,11 +6,11 @@
 // SI-6487 "Scaladoc can't link to inner classes"
 // SI-6495 "Scaladoc won't pick up group name, priority and description from owner chain"
 // SI-6501 "Scaladoc won't link to a @template type T as a template but as a member"
-package scala.test.scaladoc.links {
+package scala.test.scaladoc.links
   import language.higherKinds
   class C
 
-  trait Target {
+  trait Target
     type T
     type S = String
     class C
@@ -20,9 +20,8 @@ package scala.test.scaladoc.links {
     def foo[A[_ [_]]](x: A[List]) = 6
     val bar: Boolean
     def baz(c: scala.test.scaladoc.links.C) = 7
-  }
 
-  object Target {
+  object Target
     type T = Int => Int
     type S = Int
     type ::[X] = scala.collection.immutable.::[X]
@@ -34,7 +33,6 @@ package scala.test.scaladoc.links {
     val bar: Boolean = false
     val onlyInObject = 1
     def baz(c: scala.test.scaladoc.links.C) = 7
-  }
 
   /**
     *  Links to the trait:
@@ -63,15 +61,11 @@ package scala.test.scaladoc.links {
     *  - [[ImOutside.T                                      class ImOutside#type T (check correct linking to templates)]]
     *  - [[ImOutside.T#foo                                  class ImOutside#type T#method foo (check correct interaction between @template and links)]]
     */
-  object TEST {
+  object TEST
     def localMethod = 3
-  }
-}
-trait ImOutside {
+trait ImOutside
 
   /** @template */
   type T <: Inner
-  class Inner {
+  class Inner
     def foo: Any
-  }
-}

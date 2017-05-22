@@ -30,7 +30,7 @@ import scala.collection.mutable.ArrayBuilder
   */
 class ScDocTagValueImpl(node: ASTNode)
     extends ScalaPsiElementImpl(node) with ScDocTagValue
-    with ScDocReferenceElement {
+    with ScDocReferenceElement
   def nameId: PsiElement = this
 
   override def getName = getText
@@ -55,25 +55,22 @@ class ScDocTagValueImpl(node: ASTNode)
 
   def getValue: String = getText
 
-  def bindToElement(element: PsiElement): PsiElement = {
-    element match {
+  def bindToElement(element: PsiElement): PsiElement =
+    element match
       case _: ScParameter => this
       case _: ScTypeParam =>
         handleElementRename(element.getText)
         this
       case _ =>
         throw new UnsupportedOperationException("Can't bind to this element")
-    }
-  }
 
   override def getCanonicalText: String =
     if (getFirstChild == null) null else getFirstChild.getText
 
-  override def isReferenceTo(element: PsiElement) = {
+  override def isReferenceTo(element: PsiElement) =
     if (resolve() == null || resolve() != element) false else true
-  }
 
-  override def handleElementRename(newElementName: String): PsiElement = {
+  override def handleElementRename(newElementName: String): PsiElement =
     if (!ScalaNamesUtil.isIdentifier(newElementName)) return this
     val doc = FileDocumentManager
       .getInstance()
@@ -86,33 +83,27 @@ class ScDocTagValueImpl(node: ASTNode)
     PsiDocumentManager.getInstance(getProject).commitAllDocuments()
 
     getElement
-  }
 
-  def getVariants: Array[AnyRef] = {
+  def getVariants: Array[AnyRef] =
     val result = ArrayBuilder.make[AnyRef]()
     val parameters = getParametersVariants
-    if (parameters == null) {
+    if (parameters == null)
       return Array[AnyRef]()
-    }
-    parameters.foreach { param =>
+    parameters.foreach  param =>
       result += new ScalaLookupItem(param, param.name, None)
-    }
     result.result()
-  }
 
   override def isSoft: Boolean =
     getParent.asInstanceOf[ScDocTag].name == MyScaladocParsing.THROWS_TAG
 
-  def getParametersVariants: Array[ScNamedElement] = {
+  def getParametersVariants: Array[ScNamedElement] =
     import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing.{PARAM_TAG, TYPE_PARAM_TAG}
-    val parentTagType: String = getParent match {
+    val parentTagType: String = getParent match
       case a: ScDocTag => a.name
       case _ => null
-    }
     var parent = getParent
-    while (parent != null && !parent.isInstanceOf[ScDocComment]) {
+    while (parent != null && !parent.isInstanceOf[ScDocComment])
       parent = parent.getParent
-    }
 
     if (parent == null ||
         (parentTagType != PARAM_TAG && parentTagType != TYPE_PARAM_TAG))
@@ -120,7 +111,7 @@ class ScDocTagValueImpl(node: ASTNode)
 
     def filterParamsByName(
         tagName: String,
-        params: Seq[ScNamedElement]): Array[ScNamedElement] = {
+        params: Seq[ScNamedElement]): Array[ScNamedElement] =
       val paramsSet =
         (for (tag <- parent.asInstanceOf[ScDocComment].findTagsByName(tagName)
                         if tag.getValueElement != null &&
@@ -131,44 +122,34 @@ class ScDocTagValueImpl(node: ASTNode)
         .filter(param => !paramsSet.contains(param.name))
         .foreach(result += _)
       result.result()
-    }
 
-    parent.getParent match {
+    parent.getParent match
       case func: ScFunction =>
-        if (parentTagType == PARAM_TAG) {
+        if (parentTagType == PARAM_TAG)
           filterParamsByName(PARAM_TAG, func.parameters)
-        } else {
+        else
           filterParamsByName(TYPE_PARAM_TAG, func.typeParameters)
-        }
       case clazz: ScClass =>
         val constr = clazz.constructor
 
-        constr match {
+        constr match
           case primaryConstr: Some[ScPrimaryConstructor] =>
-            if (parentTagType == PARAM_TAG) {
+            if (parentTagType == PARAM_TAG)
               filterParamsByName(PARAM_TAG, primaryConstr.get.parameters)
-            } else {
-              primaryConstr.get.getClassTypeParameters match {
+            else
+              primaryConstr.get.getClassTypeParameters match
                 case tParam: Some[ScTypeParamClause] =>
                   filterParamsByName(TYPE_PARAM_TAG, tParam.get.typeParameters)
                 case _ => Array.empty[ScNamedElement]
-              }
-            }
           case None => Array.empty[ScNamedElement]
-        }
       case traitt: ScTrait =>
-        if (parentTagType == TYPE_PARAM_TAG) {
+        if (parentTagType == TYPE_PARAM_TAG)
           filterParamsByName(TYPE_PARAM_TAG, traitt.typeParameters)
-        } else {
+        else
           Array.empty[ScNamedElement]
-        }
       case typeAlias: ScTypeAlias =>
-        if (parentTagType == TYPE_PARAM_TAG) {
+        if (parentTagType == TYPE_PARAM_TAG)
           filterParamsByName(TYPE_PARAM_TAG, typeAlias.typeParameters)
-        } else {
+        else
           Array.empty[ScNamedElement]
-        }
       case _ => Array.empty[ScNamedElement]
-    }
-  }
-}

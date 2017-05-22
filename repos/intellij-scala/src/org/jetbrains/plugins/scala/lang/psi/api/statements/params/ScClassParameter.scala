@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScMem
   * Date: 22.02.2008
   */
 trait ScClassParameter
-    extends ScParameter with ScModifierListOwner with ScMember {
+    extends ScParameter with ScModifierListOwner with ScMember
   def isVal: Boolean
   def isVar: Boolean
   def isPrivateThis: Boolean
@@ -22,15 +22,12 @@ trait ScClassParameter
   def isEffectiveVal = isVal || isVar || isCaseClassVal
 
   /** Is the parameter automatically a val, due to it's position in a case class parameter list */
-  def isCaseClassVal = containingClass match {
+  def isCaseClassVal = containingClass match
     case c: ScClass if c.isCase =>
-      val isInPrimaryConstructorFirstParamSection = c.constructor match {
+      val isInPrimaryConstructorFirstParamSection = c.constructor match
         case Some(const) => const.effectiveFirstParameterSection.contains(this)
         case None => false
-      }
       val hasExplicitModifier =
         Option(getModifierList).exists(_.hasExplicitModifiers)
       isInPrimaryConstructorFirstParamSection && !hasExplicitModifier
     case _ => false
-  }
-}

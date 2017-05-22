@@ -7,7 +7,7 @@ import cats.data.Xor
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 
-trait ChoiceTests[F[_, _]] extends CategoryTests[F] {
+trait ChoiceTests[F[_, _]] extends CategoryTests[F]
   def laws: ChoiceLaws[F]
 
   def choice[A, B, C, D](implicit ArbFAB: Arbitrary[F[A, B]],
@@ -21,9 +21,7 @@ trait ChoiceTests[F[_, _]] extends CategoryTests[F] {
                        parent = Some(category[A, B, C, D]),
                        "choice composition distributivity" -> forAll(
                            laws.choiceCompositionDistributivity[A, B, C, D] _))
-}
 
-object ChoiceTests {
+object ChoiceTests
   def apply[F[_, _]: Choice]: ChoiceTests[F] =
     new ChoiceTests[F] { def laws: ChoiceLaws[F] = ChoiceLaws[F] }
-}

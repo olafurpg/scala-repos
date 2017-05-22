@@ -7,7 +7,7 @@ import scala.scalajs.js
 /* This is a hijacked class. Its instances are the representation of scala.Longs.
  * Constructors are not emitted.
  */
-final class Long private () extends Number with Comparable[Long] {
+final class Long private () extends Number with Comparable[Long]
   def this(value: scala.Long) = this()
   def this(s: String) = this()
 
@@ -20,10 +20,9 @@ final class Long private () extends Number with Comparable[Long] {
   @inline def floatValue(): scala.Float = longValue.toFloat
   @inline def doubleValue(): scala.Double = longValue.toDouble
 
-  @inline override def equals(that: Any): scala.Boolean = that match {
+  @inline override def equals(that: Any): scala.Boolean = that match
     case that: Long => longValue == that.longValue
     case _ => false
-  }
 
   @inline override def hashCode(): Int =
     Long.hashCode(longValue)
@@ -33,9 +32,8 @@ final class Long private () extends Number with Comparable[Long] {
 
   @inline override def toString(): String =
     Long.toString(longValue)
-}
 
-object Long {
+object Long
   import scala.scalajs.runtime.RuntimeLong
 
   final val TYPE = classOf[scala.Long]
@@ -54,12 +52,12 @@ object Long {
   /** Precomputed table for toUnsignedStringInternalLarge and
     *  parseUnsignedLongInternal.
     */
-  private lazy val StringRadixInfos: js.Array[StringRadixInfo] = {
+  private lazy val StringRadixInfos: js.Array[StringRadixInfo] =
     val r = new js.Array[StringRadixInfo]()
 
     for (_ <- 0 until Character.MIN_RADIX) r += null
 
-    for (radix <- Character.MIN_RADIX to Character.MAX_RADIX) {
+    for (radix <- Character.MIN_RADIX to Character.MAX_RADIX)
       /* Find the biggest chunk size we can use.
        *
        * - radixPowLength should be the biggest signed int32 value that is an
@@ -73,30 +71,26 @@ object Long {
       var radixPowLength = radix
       var chunkLength = 1
       var paddingZeros = "0"
-      while (radixPowLength <= barrier) {
+      while (radixPowLength <= barrier)
         radixPowLength *= radix
         chunkLength += 1
         paddingZeros += "0"
-      }
       val radixPowLengthLong = radixPowLength.toLong
       val overflowBarrier = Long.divideUnsigned(-1L, radixPowLengthLong)
       r += new StringRadixInfo(
           chunkLength, radixPowLengthLong, paddingZeros, overflowBarrier)
-    }
 
     r
-  }
 
   @inline // because radix is almost certainly constant at call site
-  def toString(i: scala.Long, radix: Int): String = {
+  def toString(i: scala.Long, radix: Int): String =
     if (radix == 10 || radix < Character.MIN_RADIX ||
         radix > Character.MAX_RADIX) toString(i)
     else toStringImpl(i, radix)
-  }
 
   @inline // because radix is almost certainly constant at call site
-  def toUnsignedString(i: scala.Long, radix: Int): String = {
-    (radix: @switch) match {
+  def toUnsignedString(i: scala.Long, radix: Int): String =
+    (radix: @switch) match
       case 2 => toBinaryString(i)
       case 8 => toOctalString(i)
       case 16 => toHexString(i)
@@ -105,8 +99,6 @@ object Long {
           if (radix < Character.MIN_RADIX || radix > Character.MAX_RADIX) 10
           else radix
         toUnsignedStringImpl(i, radix1)
-    }
-  }
 
   // Intrinsic
   @inline def toString(i: scala.Long): String =
@@ -116,34 +108,30 @@ object Long {
     toUnsignedStringImpl(i, 10)
 
   // Must be called only with valid radix
-  private def toStringImpl(i: scala.Long, radix: Int): String = {
+  private def toStringImpl(i: scala.Long, radix: Int): String =
     val lo = i.toInt
     val hi = (i >>> 32).toInt
-    if (lo >> 31 == hi) {
+    if (lo >> 31 == hi)
       // It's a signed int32
       import js.JSNumberOps.enableJSNumberOps
       lo.toString(radix)
-    } else if (hi < 0) {
+    else if (hi < 0)
       "-" + toUnsignedStringInternalLarge(-i, radix)
-    } else {
+    else
       toUnsignedStringInternalLarge(i, radix)
-    }
-  }
 
   // Must be called only with valid radix
-  private def toUnsignedStringImpl(i: scala.Long, radix: Int): String = {
-    if ((i >>> 32).toInt == 0) {
+  private def toUnsignedStringImpl(i: scala.Long, radix: Int): String =
+    if ((i >>> 32).toInt == 0)
       // It's an unsigned int32
       import js.JSNumberOps._
       i.toInt.toUint.toString(radix)
-    } else {
+    else
       toUnsignedStringInternalLarge(i, radix)
-    }
-  }
 
   // Must be called only with valid radix
   private def toUnsignedStringInternalLarge(
-      i: scala.Long, radix: Int): String = {
+      i: scala.Long, radix: Int): String =
     import js.JSNumberOps._
     import js.JSStringOps._
 
@@ -155,49 +143,44 @@ object Long {
 
     var res = ""
     var value = i
-    while ( (value ^ SignBit) >= divisorXorSignBit) {
+    while ( (value ^ SignBit) >= divisorXorSignBit)
       // unsigned comparison
       val div = divideUnsigned(value, divisor)
       val rem = value - div * divisor // == remainderUnsigned(value, divisor)
       val remStr = rem.toInt.toString(radix)
       res = paddingZeros.jsSubstring(remStr.length) + remStr + res
       value = div
-    }
 
     value.toInt.toString(radix) + res
-  }
 
-  def parseLong(s: String, radix: Int): scala.Long = {
+  def parseLong(s: String, radix: Int): scala.Long =
     if (s == "") parseLongError(s)
 
     var start = 0
     var neg = false
 
-    s.charAt(0) match {
+    s.charAt(0) match
       case '+' =>
         start = 1
       case '-' =>
         start = 1
         neg = true
       case _ =>
-    }
 
     val unsignedResult = parseUnsignedLongInternal(s, radix, start)
 
-    if (neg) {
+    if (neg)
       val result = -unsignedResult
       if (result > 0) parseLongError(s)
       result
-    } else {
+    else
       if (unsignedResult < 0) parseLongError(s)
       unsignedResult
-    }
-  }
 
   @inline def parseLong(s: String): scala.Long =
     parseLong(s, 10)
 
-  def parseUnsignedLong(s: String, radix: Int): scala.Long = {
+  def parseUnsignedLong(s: String, radix: Int): scala.Long =
     if (s == "") parseLongError(s)
 
     val start =
@@ -205,21 +188,20 @@ object Long {
       else 0
 
     parseUnsignedLongInternal(s, radix, start)
-  }
 
   @inline def parseUnsignedLong(s: String): scala.Long =
     parseUnsignedLong(s, 10)
 
   def parseUnsignedLongInternal(
-      s: String, radix: Int, start: Int): scala.Long = {
+      s: String, radix: Int, start: Int): scala.Long =
     import js.JSStringOps._
 
     val length = s.length
 
     if (start >= length || radix < Character.MIN_RADIX ||
-        radix > Character.MAX_RADIX) {
+        radix > Character.MAX_RADIX)
       parseLongError(s)
-    } else {
+    else
       val radixInfo = StringRadixInfos(radix)
       val chunkLen = radixInfo.chunkLength
 
@@ -237,17 +219,15 @@ object Long {
 
       // Check each character for validity
       var i = firstChunkStart
-      while (i < length) {
+      while (i < length)
         if (Character.digit(s.charAt(i), radix) < 0) parseLongError(s)
         i += 1
-      }
 
-      @inline def parseChunk(chunkStart: Int, chunkEnd: Int): scala.Long = {
+      @inline def parseChunk(chunkStart: Int, chunkEnd: Int): scala.Long =
         val chunk = s.jsSubstring(chunkStart, chunkEnd)
         val chunkValueDouble =
           js.Dynamic.global.parseInt(chunk, radix).asInstanceOf[scala.Double]
         Integer.toUnsignedLong(chunkValueDouble.toInt)
-      }
 
       /* The first chunk is sized so that all subsequent chunks are of size
        * chunkLen. Note also that the first chunk cannot overflow.
@@ -258,18 +238,18 @@ object Long {
       val firstChunkEnd = firstChunkStart + firstChunkLength
       val firstResult = parseChunk(firstChunkStart, firstChunkEnd)
 
-      if (firstChunkEnd == length) {
+      if (firstChunkEnd == length)
         firstResult
-      } else {
+      else
         // Second chunk. Still cannot overflow.
         val multiplier = radixInfo.radixPowLength
         val secondChunkEnd = firstChunkEnd + chunkLen
         val secondResult =
           firstResult * multiplier + parseChunk(firstChunkEnd, secondChunkEnd)
 
-        if (secondChunkEnd == length) {
+        if (secondChunkEnd == length)
           secondResult
-        } else {
+        else
           // Third and final chunk. This one can overflow
           assert(secondChunkEnd + chunkLen == length)
 
@@ -283,10 +263,6 @@ object Long {
             parseLongError(s) // + overflowed
 
           thirdResult
-        }
-      }
-    }
-  }
 
   private def parseLongError(s: String): Nothing =
     throw new NumberFormatException(s"""For input string: "$s"""")
@@ -301,11 +277,10 @@ object Long {
     value.toInt ^ (value >>> 32).toInt
 
   // Intrinsic
-  @inline def compare(x: scala.Long, y: scala.Long): scala.Int = {
+  @inline def compare(x: scala.Long, y: scala.Long): scala.Int =
     if (x == y) 0
     else if (x < y) -1
     else 1
-  }
 
   // TODO Intrinsic?
   @inline def compareUnsigned(x: scala.Long, y: scala.Long): scala.Int =
@@ -321,7 +296,7 @@ object Long {
     divModUnsigned(dividend, divisor, isDivide = false)
 
   private def divModUnsigned(
-      a: scala.Long, b: scala.Long, isDivide: scala.Boolean): scala.Long = {
+      a: scala.Long, b: scala.Long, isDivide: scala.Boolean): scala.Long =
     /* This is a much simplified (and slow) version of
      * RuntimeLong.unsignedDivModHelper.
      */
@@ -340,42 +315,35 @@ object Long {
      *   0 <= rem < 2 * bShift
      *   quot * b + rem == a
      */
-    while (shift >= 0 && rem != 0) {
-      if ((rem ^ SignBit) >= (bShift ^ SignBit)) {
+    while (shift >= 0 && rem != 0)
+      if ((rem ^ SignBit) >= (bShift ^ SignBit))
         rem -= bShift
         quot |= (1L << shift)
-      }
       shift -= 1
       bShift >>>= 1
-    }
 
     if (isDivide) quot
     else rem
-  }
 
-  def highestOneBit(i: scala.Long): scala.Long = {
+  def highestOneBit(i: scala.Long): scala.Long =
     val hi = (i >>> 32).toInt
     if (hi != 0) Integer.highestOneBit(hi).toLong << 32
     else Integer.highestOneBit(i.toInt).toLong & 0xffffffffL
-  }
 
-  def lowestOneBit(i: scala.Long): scala.Long = {
+  def lowestOneBit(i: scala.Long): scala.Long =
     val lo = i.toInt
     if (lo != 0) Integer.lowestOneBit(lo).toLong & 0xffffffffL
     else Integer.lowestOneBit((i >>> 32).toInt).toLong << 32
-  }
 
-  def bitCount(i: scala.Long): scala.Int = {
+  def bitCount(i: scala.Long): scala.Int =
     val lo = i.toInt
     val hi = (i >>> 32).toInt
     Integer.bitCount(lo) + Integer.bitCount(hi)
-  }
 
-  def reverseBytes(i: scala.Long): scala.Long = {
+  def reverseBytes(i: scala.Long): scala.Long =
     val hiReversed = Integer.reverseBytes((i >>> 32).toInt)
     val loReversed = Integer.reverseBytes(i.toInt)
     (loReversed.toLong << 32) | (hiReversed.toLong & 0xffffffffL)
-  }
 
   def rotateLeft(i: scala.Long, distance: scala.Int): scala.Long =
     (i << distance) | (i >>> -distance)
@@ -383,59 +351,51 @@ object Long {
   def rotateRight(i: scala.Long, distance: scala.Int): scala.Long =
     (i >>> distance) | (i << -distance)
 
-  def signum(i: scala.Long): Int = {
+  def signum(i: scala.Long): Int =
     val hi = (i >>> 32).toInt
     if (hi < 0) -1
     else if (hi == 0 && i.toInt == 0) 0
     else 1
-  }
 
-  def numberOfLeadingZeros(l: scala.Long): Int = {
+  def numberOfLeadingZeros(l: scala.Long): Int =
     val hi = (l >>> 32).toInt
     if (hi != 0) Integer.numberOfLeadingZeros(hi)
     else Integer.numberOfLeadingZeros(l.toInt) + 32
-  }
 
-  def numberOfTrailingZeros(l: scala.Long): Int = {
+  def numberOfTrailingZeros(l: scala.Long): Int =
     val lo = l.toInt
     if (lo != 0) Integer.numberOfTrailingZeros(lo)
     else Integer.numberOfTrailingZeros((l >>> 32).toInt) + 32
-  }
 
-  def toBinaryString(l: scala.Long): String = {
+  def toBinaryString(l: scala.Long): String =
     val zeros = "00000000000000000000000000000000" // 32 zeros
-    @inline def padBinary32(i: Int) = {
+    @inline def padBinary32(i: Int) =
       val s = Integer.toBinaryString(i)
       zeros.substring(s.length) + s
-    }
 
     val lo = l.toInt
     val hi = (l >>> 32).toInt
 
     if (hi != 0) Integer.toBinaryString(hi) + padBinary32(lo)
     else Integer.toBinaryString(lo)
-  }
 
-  def toHexString(l: scala.Long): String = {
+  def toHexString(l: scala.Long): String =
     val zeros = "00000000" // 8 zeros
-    @inline def padBinary8(i: Int) = {
+    @inline def padBinary8(i: Int) =
       val s = Integer.toHexString(i)
       zeros.substring(s.length) + s
-    }
 
     val lo = l.toInt
     val hi = (l >>> 32).toInt
 
     if (hi != 0) Integer.toHexString(hi) + padBinary8(lo)
     else Integer.toHexString(lo)
-  }
 
-  def toOctalString(l: scala.Long): String = {
+  def toOctalString(l: scala.Long): String =
     val zeros = "0000000000" // 10 zeros
-    @inline def padOctal10(i: Int) = {
+    @inline def padOctal10(i: Int) =
       val s = Integer.toOctalString(i)
       zeros.substring(s.length) + s
-    }
 
     val lo = l.toInt
     val hi = (l >>> 32).toInt
@@ -447,7 +407,6 @@ object Long {
     if (hp != 0) Integer.toOctalString(hp) + padOctal10(mp) + padOctal10(lp)
     else if (mp != 0) Integer.toOctalString(mp) + padOctal10(lp)
     else Integer.toOctalString(lp)
-  }
 
   @inline def sum(a: scala.Long, b: scala.Long): scala.Long =
     a + b
@@ -457,4 +416,3 @@ object Long {
 
   @inline def min(a: scala.Long, b: scala.Long): scala.Long =
     Math.min(a, b)
-}

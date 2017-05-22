@@ -20,7 +20,7 @@ import akka.dispatch.ThreadPoolConfig
   * }}}
   */
 object TestConductor
-    extends ExtensionId[TestConductorExt] with ExtensionIdProvider {
+    extends ExtensionId[TestConductorExt] with ExtensionIdProvider
 
   override def lookup = TestConductor
 
@@ -33,7 +33,6 @@ object TestConductor
   override def get(system: ActorSystem): TestConductorExt = super.get(system)
 
   def apply()(implicit ctx: ActorContext): TestConductorExt = apply(ctx.system)
-}
 
 /**
   * This binds together the [[akka.remote.testconductor.Conductor]] and
@@ -51,9 +50,9 @@ object TestConductor
   *
   */
 class TestConductorExt(val system: ExtendedActorSystem)
-    extends Extension with Conductor with Player {
+    extends Extension with Conductor with Player
 
-  object Settings {
+  object Settings
     val config = system.settings.config.getConfig("akka.testconductor")
     import akka.util.Helpers.ConfigOps
 
@@ -78,7 +77,6 @@ class TestConductorExt(val system: ExtendedActorSystem)
 
     val ClientSocketWorkerPoolSize = computeWPS(
         config.getConfig("netty.client-socket-worker-pool"))
-  }
 
   /**
     * Remote transport used by the actor ref provider.
@@ -90,4 +88,3 @@ class TestConductorExt(val system: ExtendedActorSystem)
     * Transport address of this Netty-like remote transport.
     */
   val address = transport.defaultAddress
-}

@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 import org.jetbrains.plugins.scala.lang.psi.types.ScType
 
 class ChangeTypeFix(typeElement: ScTypeElement, newType: ScType)
-    extends IntentionAction {
+    extends IntentionAction
   val getText: String = "Change type '%s' to '%s'".format(
       typeElement.getText, newType.presentableText)
 
@@ -25,7 +25,7 @@ class ChangeTypeFix(typeElement: ScTypeElement, newType: ScType)
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     typeElement.isValid && typeElement.getManager.isInProject(file)
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     if (!typeElement.isValid) return
     if (!FileModificationService.getInstance.prepareFileForWrite(
             typeElement.getContainingFile)) return
@@ -36,5 +36,3 @@ class ChangeTypeFix(typeElement: ScTypeElement, newType: ScType)
     val replaced = typeElement.replace(newTypeElement)
     ScalaPsiUtil.adjustTypes(replaced)
     UndoUtil.markPsiFileForUndo(file)
-  }
-}

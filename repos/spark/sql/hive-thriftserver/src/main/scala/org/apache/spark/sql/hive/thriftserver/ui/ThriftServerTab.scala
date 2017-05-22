@@ -28,7 +28,7 @@ import org.apache.spark.ui.{SparkUI, SparkUITab}
   * This assumes the given SparkContext has enabled its SparkUI.
   */
 private[thriftserver] class ThriftServerTab(sparkContext: SparkContext)
-    extends SparkUITab(getSparkUI(sparkContext), "sqlserver") with Logging {
+    extends SparkUITab(getSparkUI(sparkContext), "sqlserver") with Logging
 
   override val name = "JDBC/ODBC Server"
 
@@ -39,16 +39,11 @@ private[thriftserver] class ThriftServerTab(sparkContext: SparkContext)
   attachPage(new ThriftServerSessionPage(this))
   parent.attachTab(this)
 
-  def detach() {
+  def detach()
     getSparkUI(sparkContext).detachTab(this)
-  }
-}
 
-private[thriftserver] object ThriftServerTab {
-  def getSparkUI(sparkContext: SparkContext): SparkUI = {
-    sparkContext.ui.getOrElse {
+private[thriftserver] object ThriftServerTab
+  def getSparkUI(sparkContext: SparkContext): SparkUI =
+    sparkContext.ui.getOrElse
       throw new SparkException(
           "Parent SparkUI to attach this tab to not found!")
-    }
-  }
-}

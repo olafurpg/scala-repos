@@ -28,9 +28,9 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
 // $example off$
 
-object SVDExample {
+object SVDExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val conf = new SparkConf().setAppName("SVDExample")
     val sc = new SparkContext(conf)
@@ -54,11 +54,8 @@ object SVDExample {
     // $example off$
     val collect = U.rows.collect()
     println("U factor is:")
-    collect.foreach { vector =>
+    collect.foreach  vector =>
       println(vector)
-    }
     println(s"Singular values are: $s")
     println(s"V factor is:\n$V")
-  }
-}
 // scalastyle:on println

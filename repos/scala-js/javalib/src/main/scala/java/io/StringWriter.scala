@@ -1,6 +1,6 @@
 package java.io
 
-class StringWriter extends Writer {
+class StringWriter extends Writer
 
   private[this] val buf = new StringBuffer
 
@@ -18,20 +18,17 @@ class StringWriter extends Writer {
   override def write(str: String, off: Int, len: Int): Unit =
     buf.append(str, off, off + len) // Third param is 'end', not 'len'
 
-  override def append(csq: CharSequence): StringWriter = {
+  override def append(csq: CharSequence): StringWriter =
     buf.append(csq)
     this
-  }
 
-  override def append(csq: CharSequence, start: Int, end: Int): StringWriter = {
+  override def append(csq: CharSequence, start: Int, end: Int): StringWriter =
     buf.append(csq, start, end)
     this
-  }
 
-  override def append(c: Char): StringWriter = {
+  override def append(c: Char): StringWriter =
     buf.append(c)
     this
-  }
 
   override def toString(): String = buf.toString
 
@@ -40,4 +37,3 @@ class StringWriter extends Writer {
   def flush(): Unit = ()
 
   def close(): Unit = ()
-}

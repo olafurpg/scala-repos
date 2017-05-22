@@ -9,11 +9,11 @@ import sbt.librarymanagement.Resolver
 import sbt.internal.librarymanagement.{InlineIvyConfiguration, IvyPaths}
 import sbt.internal.inc.{AnalyzingCompiler, ClasspathOptions, IncrementalCompilerImpl}
 
-object ConsoleProject {
+object ConsoleProject
   def apply(state: State,
             extra: String,
             cleanupCommands: String = "",
-            options: Seq[String] = Nil)(implicit log: Logger): Unit = {
+            options: Seq[String] = Nil)(implicit log: Logger): Unit =
     val extracted = Project extract state
     val cpImports = new Imports(extracted, state)
     val bindings =
@@ -37,9 +37,8 @@ object ConsoleProject {
         log)
     val compiler: AnalyzingCompiler =
       Compiler.compilers(ClasspathOptions.repl, ivyConfiguration)(
-          state.configuration, log) match {
+          state.configuration, log) match
         case IncrementalCompilerImpl.Compilers(scalac, _) => scalac
-      }
     val imports =
       BuildUtil.getImports(unit.unit) ++ BuildUtil.importAll(
           bindings.map(_._1))
@@ -52,19 +51,15 @@ object ConsoleProject {
         initCommands,
         cleanupCommands
     )(Some(unit.loader), bindings)
-  }
 
   /** Conveniences for consoleProject that shouldn't normally be used for builds. */
-  final class Imports private[sbt](extracted: Extracted, state: State) {
+  final class Imports private[sbt](extracted: Extracted, state: State)
     import extracted._
     implicit def taskKeyEvaluate[T](t: TaskKey[T]): Evaluate[T] =
       new Evaluate(runTask(t, state)._2)
     implicit def settingKeyEvaluate[T](s: SettingKey[T]): Evaluate[T] =
       new Evaluate(get(s))
-  }
   final class Evaluate[T] private[sbt](val eval: T)
   private def bootIvyHome(app: xsbti.AppConfiguration): Option[File] =
-    try { Option(app.provider.scalaProvider.launcher.ivyHome) } catch {
+    try { Option(app.provider.scalaProvider.launcher.ivyHome) } catch
       case _: NoSuchMethodError => None
-    }
-}

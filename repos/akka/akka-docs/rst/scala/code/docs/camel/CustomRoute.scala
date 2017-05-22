@@ -8,36 +8,31 @@ import akka.actor.Status.Failure
 
 import language.existentials
 
-object CustomRoute {
-  object Sample1 {
+object CustomRoute
+  object Sample1
     //#CustomRoute
     import akka.actor.{Props, ActorSystem, Actor, ActorRef}
     import akka.camel.{CamelMessage, CamelExtension}
     import org.apache.camel.builder.RouteBuilder
     import akka.camel._
-    class Responder extends Actor {
-      def receive = {
+    class Responder extends Actor
+      def receive =
         case msg: CamelMessage =>
           sender() !
-          (msg.mapBody { body: String =>
+          (msg.mapBody  body: String =>
                 "received %s" format body
-              })
-      }
-    }
+              )
 
     class CustomRouteBuilder(system: ActorSystem, responder: ActorRef)
-        extends RouteBuilder {
-      def configure {
+        extends RouteBuilder
+      def configure
         from("jetty:http://localhost:8877/camel/custom").to(responder)
-      }
-    }
     val system = ActorSystem("some-system")
     val camel = CamelExtension(system)
     val responder = system.actorOf(Props[Responder], name = "TestResponder")
     camel.context.addRoutes(new CustomRouteBuilder(system, responder))
     //#CustomRoute
-  }
-  object Sample2 {
+  object Sample2
     //#ErrorThrowingConsumer
     import akka.camel.Consumer
 
@@ -45,11 +40,10 @@ object CustomRoute {
     import org.apache.camel.model.RouteDefinition
 
     class ErrorThrowingConsumer(override val endpointUri: String)
-        extends Consumer {
-      def receive = {
+        extends Consumer
+      def receive =
         case msg: CamelMessage =>
           throw new Exception("error: %s" format msg.body)
-      }
       override def onRouteDefinition =
         (rd) =>
           rd.onException(classOf[Exception])
@@ -57,10 +51,6 @@ object CustomRoute {
             .transform(Builder.exceptionMessage)
             .end
 
-      final override def preRestart(reason: Throwable, message: Option[Any]) {
+      final override def preRestart(reason: Throwable, message: Option[Any])
         sender() ! Failure(reason)
-      }
-    }
     //#ErrorThrowingConsumer
-  }
-}

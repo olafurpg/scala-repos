@@ -6,7 +6,7 @@ import akka.actor.ActorRef
   * Messages for actors which need some preparation to be ready and
   * are created via `LeadershipModule.startWhenLeader()` with `considerPreparedOnStart = false`.
   */
-object PreparationMessages {
+object PreparationMessages
 
   /**
     * Sent to actors which are created via `LeadershipModule.startWhenLeader()` with considerPreparedOnStart = false.
@@ -17,4 +17,3 @@ object PreparationMessages {
 
   /** Response to `PrepareForStart`. */
   case class Prepared(whenLeaderRef: ActorRef)
-}

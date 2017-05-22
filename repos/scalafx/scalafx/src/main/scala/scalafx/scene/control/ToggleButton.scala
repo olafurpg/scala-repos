@@ -32,15 +32,14 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object ToggleButton {
+object ToggleButton
   implicit def sfxToggleButton2jfx(v: ToggleButton): jfxsc.ToggleButton =
     if (v != null) v.delegate else null
-}
 
 class ToggleButton(
     override val delegate: jfxsc.ToggleButton = new jfxsc.ToggleButton)
     extends ButtonBase(delegate) with Toggle
-    with SFXDelegate[jfxsc.ToggleButton] {
+    with SFXDelegate[jfxsc.ToggleButton]
 
   /**
     * Creates a toggle button with the specified text as its label.
@@ -52,4 +51,3 @@ class ToggleButton(
     */
   def this(text: String, graphic: Node) =
     this(new jfxsc.ToggleButton(text, graphic))
-}

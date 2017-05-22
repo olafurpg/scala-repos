@@ -26,7 +26,7 @@ import scala.language.postfixOps
   * This is used by the result classes of the block parsers to handle
   * Markdown within a block.
   */
-trait InlineParsers extends BaseParsers {
+trait InlineParsers extends BaseParsers
 
   /**
     * Defines how the output is formatted and whether inline xml elements are allowed.
@@ -50,11 +50,10 @@ trait InlineParsers extends BaseParsers {
   /**
     *  Keeps track of visited tags and provides a lookup for link ids.
     */
-  case class InlineContext(val map: LinkMap, val tags: VisitedTags) {
+  case class InlineContext(val map: LinkMap, val tags: VisitedTags)
     def this(m: LinkMap) = this(m, Set())
     def this() = this(Map())
     def addTag(tag: String) = new InlineContext(map, tags + tag)
-  }
 
   /** This array is used as a lookup for mapping markdown escapes
     * to the resulting char (if necessary already escaped for XML)
@@ -85,44 +84,40 @@ trait InlineParsers extends BaseParsers {
     * used to quickly escape any text between special inline markdown like
     * emphasis.
     */
-  def markdownText(special: Set[Char], markdownEscapes: Boolean) = Parser {
+  def markdownText(special: Set[Char], markdownEscapes: Boolean) = Parser
     in =>
-      if (in.atEnd) {
+      if (in.atEnd)
         Failure("End of input.", in)
-      } else {
+      else
         var start = in.offset
         var i = in.offset
         val s = in.source
         val end = s.length
         val result = new StringBuffer()
         //process chars until we hit a special char or the end
-        while (i < end && !special.contains(s.charAt(i))) {
+        while (i < end && !special.contains(s.charAt(i)))
           val c = s.charAt(i)
 
           val xmlEscape = escapeFastForXml(c)
           if (markdownEscapes && c == '\\' && i + 1 < end &&
-              escapableMarkdownChars(s.charAt(i + 1)) != null) {
+              escapableMarkdownChars(s.charAt(i + 1)) != null)
             result.append(s.subSequence(start, i).toString)
             result.append(escapableMarkdownChars(s.charAt(i + 1)))
             i += 2
             start = i
-          } else if (xmlEscape != null && c == '&' &&
-                     checkForSemi(i, s, end)) {
+          else if (xmlEscape != null && c == '&' &&
+                     checkForSemi(i, s, end))
             i += 1
-          } else if (xmlEscape != null) {
+          else if (xmlEscape != null)
             result.append(s.subSequence(start, i).toString)
             result.append(xmlEscape)
             i += 1
             start = i
-          } else {
+          else
             i += 1
-          }
-        }
         if (start != i) result.append(s.subSequence(start, i).toString)
         if (result.length == 0) Failure("No text consumed.", in)
         else Success(result.toString(), in.drop(i - in.offset))
-      }
-  }
 
   /**
     *  all markdown inline element parsers or'ed together
@@ -153,11 +148,11 @@ trait InlineParsers extends BaseParsers {
   /** Hand rolled parser that parses a chunk of special inline markdown (like links or emphasis)
     * based on a one char lookahead.
     */
-  def elementParsers(ctx: InlineContext) = Parser { in =>
-    if (in.atEnd) {
+  def elementParsers(ctx: InlineContext) = Parser  in =>
+    if (in.atEnd)
       Failure("End of Input Reached", in)
-    } else {
-      in.first match {
+    else
+      in.first match
         case ' ' => br(in)
         case '`' => code(in)
         case '<' => (xmlTag | fastLink(ctx))(in)
@@ -166,9 +161,6 @@ trait InlineParsers extends BaseParsers {
         case '_' => spanUnderscore(ctx)(in)
         case '!' => img(ctx)(in)
         case _ => Failure("Lookahead does not start inline element.", in)
-      }
-    }
-  }
 
   /** Parses a single inline token. Either a span element or a chunk of text.
     */
@@ -195,9 +187,8 @@ trait InlineParsers extends BaseParsers {
     */
   val code: Parser[String] =
     ((("``" ~> ((not("``") ~> aChar) +) <~ "``") ^^ { _.mkString }) |
-        ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^ { c =>
+        ('`' ~> markdownText(Set('`'), false) <~ '`')) ^^  c =>
       deco.decorateCode(c.mkString)
-    }
 
   /** Parses any xml tag and escapes attribute values.
     */
@@ -208,14 +199,12 @@ trait InlineParsers extends BaseParsers {
   /** A shortcut markdown link of the form <http://example.com>
     */
   def fastLink(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("a")) {
+    if (ctx.tags.contains("a"))
       failure("Cannot nest a link in a link.")
-    } else {
-      elem('<') ~> markdownText(Set('>', ' ', '<', '\n'), true) <~ '>' ^^ {
+    else
+      elem('<') ~> markdownText(Set('>', ' ', '<', '\n'), true) <~ '>' ^^
         u =>
           deco.decorateLink(u, u, None)
-      }
-    }
 
   /** A link started by square brackets, either a reference or a a link with the full URL.
     */
@@ -225,25 +214,21 @@ trait InlineParsers extends BaseParsers {
   /** A markdown link with the full url given.
     */
   def fullLink(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("a")) {
+    if (ctx.tags.contains("a"))
       failure("Cannot nest a link in a link.")
-    } else {
+    else
       '[' ~> linkInline(ctx.addTag("a")) ~ ("](" ~ ows) ~ url ~ ows ~ title <~
-      (ows ~ ')') ^^ {
+      (ows ~ ')') ^^
         case txt ~ _ ~ u ~ _ ~ ttl => deco.decorateLink(txt, u, ttl)
-      }
-    }
 
   /** A markdown link which references an url by id.
     */
   def referenceLink(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("a")) {
+    if (ctx.tags.contains("a"))
       failure("Cannot nest a link in a link.")
-    } else {
-      ref(ctx.addTag("a")) ^^ {
+    else
+      ref(ctx.addTag("a")) ^^
         case (LinkDefinition(_, u, ttl), txt) => deco.decorateLink(txt, u, ttl)
-      }
-    }
 
   /** Inline markdown in a link. Like normal inline stuff but stops when it reaches a closing square bracket.
     */
@@ -263,19 +248,15 @@ trait InlineParsers extends BaseParsers {
     */
   val title: Parser[Option[String]] =
     opt('"' ~>
-        ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^ {
+        ((markdownText(Set('"'), true) ~ opt(not('"' ~ ows ~ ')') ~> aChar)) *) <~ '"') ^^
       case None => None
-      case Some(chunks) => {
+      case Some(chunks) =>
           val result = new StringBuilder()
-          for (chunk <- chunks) {
-            chunk match {
+          for (chunk <- chunks)
+            chunk match
               case (text) ~ None => result.append(text)
               case (text) ~ Some(s) => result.append(text).append(s)
-            }
-          }
           Some(result.toString)
-        }
-    }
 
   /** Plaintext variant to refInline. Escapable text until a square bracket is hit.
     */
@@ -286,21 +267,20 @@ trait InlineParsers extends BaseParsers {
     * Returns the found link definition and the matched text.
     */
   def idReference(ctx: InlineContext): Parser[(String, LinkDefinition)] =
-    guard(acceptMatch(ctx.map)(refText ^^ (_.trim.toLowerCase))) ~ refText ^^ {
+    guard(acceptMatch(ctx.map)(refText ^^ (_.trim.toLowerCase))) ~ refText ^^
       case ld ~ t => (t, ld)
-    }
 
   /**
     * A markdown reference of the form [text][id], [idText][] or [idText]
     * Parser returns a tuple with the link definition first and the text to display second.
     */
   def ref(ctx: InlineContext): Parser[(LinkDefinition, String)] =
-    ('[' ~> linkInline(ctx) ~ (']' ~ opt(' ') ~ '[') ~ idReference(ctx) <~ ']' ^^ {
+    ('[' ~> linkInline(ctx) ~ (']' ~ opt(' ') ~ '[') ~ idReference(ctx) <~ ']' ^^
           case t ~ dummy ~ pair => (pair._2, t)
-        }) |
-    ('[' ~> idReference(ctx) <~ (']' ~ opt(opt(' ') ~ '[' ~ ows ~ ']')) ^^ {
+        ) |
+    ('[' ~> idReference(ctx) <~ (']' ~ opt(opt(' ') ~ '[' ~ ows ~ ']')) ^^
           case (t, ld) => (ld, t)
-        })
+        )
 
   /**
     * Parses either a referenced or a directly defined image.
@@ -311,16 +291,14 @@ trait InlineParsers extends BaseParsers {
   /** An image with an explicit path.
     */
   val directImg: Parser[String] =
-    elem('[') ~> refText ~ ("](" ~ ows) ~ url ~ ows ~ title <~ (ows ~ ')') ^^ {
+    elem('[') ~> refText ~ ("](" ~ ows) ~ url ~ ows ~ title <~ (ows ~ ')') ^^
       case altText ~ _ ~ path ~ _ ~ ttl => deco.decorateImg(altText, path, ttl)
-    }
 
   /**
     * Parses a referenced image.
     */
-  def refImg(ctx: InlineContext): Parser[String] = ref(ctx) ^^ {
+  def refImg(ctx: InlineContext): Parser[String] = ref(ctx) ^^
     case (LinkDefinition(_, u, ttl), alt) => deco.decorateImg(alt, u, ttl)
-  }
 
   /** Parses inline in a span element like bold or emphasis or link up until the given end marker
     */
@@ -332,9 +310,8 @@ trait InlineParsers extends BaseParsers {
     */
   def span(limiter: String, ctx: InlineContext): Parser[String] =
     (limiter ~ not(ws)) ~>
-    (spanInline((not(lookbehind(Set(' ', '\t', '\n'))) ~ limiter), ctx) +) <~ limiter ^^ {
+    (spanInline((not(lookbehind(Set(' ', '\t', '\n'))) ~ limiter), ctx) +) <~ limiter ^^
       _.mkString
-    }
 
   /** Either an emphasis or a strong text wrapped in asterisks.
     */
@@ -348,38 +325,34 @@ trait InlineParsers extends BaseParsers {
   /**Parses emphasized text wrapped in asterisks: *foo*
     */
   def emAsterisk(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("em")) {
+    if (ctx.tags.contains("em"))
       failure("Cannot nest emphasis.")
-    } else {
+    else
       span("*", ctx.addTag("em")) ^^ { deco.decorateEmphasis(_) }
-    }
 
   /**Parses emphasized text wrapped in underscores: _foo_
     */
   def emUnderscore(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("em")) {
+    if (ctx.tags.contains("em"))
       failure("Cannot nest emphasis.")
-    } else {
+    else
       span("_", ctx.addTag("em")) ^^ { deco.decorateEmphasis(_) }
-    }
 
   /**Parses strong text in asterisks: **foo**
     */
   def strongAsterisk(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("strong")) {
+    if (ctx.tags.contains("strong"))
       failure("Cannot nest strong text.")
-    } else {
+    else
       span("**", ctx.addTag("strong")) ^^ { deco.decorateStrong(_) }
-    }
 
   /**Parses strong text in underscores: __foo__
     */
   def strongUnderscore(ctx: InlineContext): Parser[String] =
-    if (ctx.tags.contains("strong")) {
+    if (ctx.tags.contains("strong"))
       failure("Cannot nest strong text.")
-    } else {
+    else
       span("__", ctx.addTag("strong")) ^^ { deco.decorateStrong(_) }
-    }
 
   /**
     * Runs the inline parser on the given input and returns the result
@@ -390,12 +363,12 @@ trait InlineParsers extends BaseParsers {
     * Escapes the given string so it it can be embedded in xml.
     * Markdown escapes are not processed.
     */
-  def escapeXml(s: String) = {
+  def escapeXml(s: String) =
     var i = 0
     val end = s.length
     val result = new StringBuffer()
     //process chars until we hit a special char or the end
-    while (i < end) {
+    while (i < end)
       val out = s.charAt(i)
       //if it is a an xml reserved char, xml escape it, else just add it
       val xmlEscape = escapeFastForXml(out)
@@ -403,9 +376,7 @@ trait InlineParsers extends BaseParsers {
       else result.append(out)
       //advance a char
       i += 1
-    }
     result.toString
-  }
 
   private lazy val entList = List(
       ("quot", 34),
@@ -660,21 +631,17 @@ trait InlineParsers extends BaseParsers {
 
   private lazy val validEntitySet = Set(entList.map(_._1): _*)
 
-  private def checkForSemi(i: Int, s: CharSequence, end: Int): Boolean = {
+  private def checkForSemi(i: Int, s: CharSequence, end: Int): Boolean =
     var pos = i + 1
     val last = i + 10
     val sb = new StringBuffer(20)
-    while (pos < end && pos < last) {
-      s.charAt(pos) match {
+    while (pos < end && pos < last)
+      s.charAt(pos) match
         case ';' if pos > i + 1 =>
           return validEntitySet.contains(sb.toString)
         case c if c == '#' || Character.isLetter(c) || Character.isDigit(c) =>
           sb.append(c)
         case _ => return false
-      }
       pos += 1
-    }
 
     false
-  }
-}

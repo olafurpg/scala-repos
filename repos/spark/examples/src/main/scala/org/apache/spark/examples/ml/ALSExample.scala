@@ -29,23 +29,21 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.DoubleType
 // $example off$
 
-object ALSExample {
+object ALSExample
 
   // $example on$
   case class Rating(userId: Int, movieId: Int, rating: Float, timestamp: Long)
-  object Rating {
-    def parseRating(str: String): Rating = {
+  object Rating
+    def parseRating(str: String): Rating =
       val fields = str.split("::")
       assert(fields.size == 4)
       Rating(fields(0).toInt,
              fields(1).toInt,
              fields(2).toFloat,
              fields(3).toLong)
-    }
-  }
   // $example off$
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("ALSExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -81,6 +79,4 @@ object ALSExample {
     println(s"Root-mean-square error = $rmse")
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

@@ -33,18 +33,15 @@ import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 
-object Skinnable {
+object Skinnable
   implicit def sfxSkinnable2jfx(s: Skinnable): jfxsc.Skinnable =
     if (s != null) s.delegate else null
-}
 
-trait Skinnable extends SFXDelegate[jfxsc.Skinnable] {
+trait Skinnable extends SFXDelegate[jfxsc.Skinnable]
 
   /**
     * Skin is responsible for rendering this `Control`.
     */
   def skin: ObjectProperty[jfxsc.Skin[_]] = delegate.skinProperty
-  def skin_=(v: Skin[_]) {
+  def skin_=(v: Skin[_])
     skin() = v.delegate
-  }
-}

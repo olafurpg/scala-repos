@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def extraSettings = "-deprecation"
   def code = """
     |@deprecated("foooo", "ReplTest version 1.0-FINAL") class Foo() {
@@ -8,4 +8,3 @@ object Test extends ReplTest {
     |}
     |val f = new Foo
   """.stripMargin
-}

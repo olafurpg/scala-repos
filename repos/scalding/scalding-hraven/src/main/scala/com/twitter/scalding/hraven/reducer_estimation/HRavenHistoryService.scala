@@ -13,7 +13,7 @@ import com.twitter.hraven.JobDescFactory.{JOBTRACKER_KEY, RESOURCE_MANAGER_KEY}
 
 import scala.util.{Failure, Success, Try}
 
-object HRavenClient {
+object HRavenClient
   import HRavenHistoryService.jobConfToRichConfig
 
   val apiHostnameKey = "hraven.api.hostname"
@@ -31,13 +31,12 @@ object HRavenClient {
               conf.getInt(
                   clientConnectTimeoutKey, clientConnectTimeoutDefault),
               conf.getInt(clientReadTimeoutKey, clientReadTimeoutDefault)))
-}
 
 /**
   * Mixin for ReducerEstimators to give them the ability to query hRaven for
   * info about past runs.
   */
-object HRavenHistoryService extends HistoryService {
+object HRavenHistoryService extends HistoryService
 
   private val LOG = LoggerFactory.getLogger(this.getClass)
 
@@ -54,7 +53,7 @@ object HRavenHistoryService extends HistoryService {
   /**
     * Add some helper methods to JobConf
     */
-  case class RichConfig(conf: JobConf) {
+  case class RichConfig(conf: JobConf)
 
     val MaxFetch = "hraven.reducer.estimator.max.flow.history"
     val MaxFetchDefault = 8
@@ -66,13 +65,11 @@ object HRavenHistoryService extends HistoryService {
       * Logs a warning if nothing was found.
       */
     def getFirstKey(fields: String*): Try[String] =
-      fields.collectFirst {
+      fields.collectFirst
         case f if conf.get(f) != null => Success(conf.get(f))
-      }.getOrElse {
+      .getOrElse
         LOG.warn("Missing required config param: " + fields.mkString(" or "))
         Failure(MissingFieldsException(fields))
-      }
-  }
   implicit def jobConfToRichConfig(conf: JobConf): RichConfig =
     RichConfig(conf)
 
@@ -97,33 +94,28 @@ object HRavenHistoryService extends HistoryService {
                                     batch,
                                     signature,
                                     nFetch,
-                                    RequiredJobConfigs: _*)).flatMap { flows =>
-      Try {
+                                    RequiredJobConfigs: _*)).flatMap  flows =>
+      Try
         // Ugly mutable code to add task info to flows
-        flows.asScala.foreach { flow =>
-          flow.getJobs.asScala.foreach { job =>
+        flows.asScala.foreach  flow =>
+          flow.getJobs.asScala.foreach  job =>
             // client.fetchTaskDetails might throw IOException
             val tasks = client.fetchTaskDetails(flow.getCluster,
                                                 job.getJobId,
                                                 TaskDetailFields)
             job.addTasks(tasks)
-          }
-        }
 
         val successfulFlows =
           flows.asScala.filter(_.getHdfsBytesRead > 0).take(max)
-        if (successfulFlows.isEmpty) {
+        if (successfulFlows.isEmpty)
           LOG.warn("Unable to find any successful flows in the last " +
               nFetch + " jobs.")
-        }
         successfulFlows
-      }
-    }.recoverWith {
+    .recoverWith
       case e: IOException =>
         LOG.error(
             "Error making API request to hRaven. HRavenHistoryService will be disabled.")
         Failure(e)
-    }
 
   /**
     * Fetch info from hRaven for the last time the given JobStep ran.
@@ -134,36 +126,32 @@ object HRavenHistoryService extends HistoryService {
     * @return      Details about the previous successful run.
     */
   def fetchPastJobDetails(
-      step: FlowStep[JobConf], max: Int): Try[Seq[JobDetails]] = {
+      step: FlowStep[JobConf], max: Int): Try[Seq[JobDetails]] =
     val conf = step.getConfig
     val stepNum = step.getStepNum
 
     def findMatchingJobStep(pastFlow: Flow) =
-      pastFlow.getJobs.asScala.find { step =>
-        try {
+      pastFlow.getJobs.asScala.find  step =>
+        try
           step.getConfiguration.get("cascading.flow.step.num").toInt == stepNum
-        } catch {
+        catch
           case _: NumberFormatException => false
-        }
-      } orElse {
+      orElse
         LOG.warn("No matching job step in the retrieved hRaven flow.")
         None
-      }
 
-    def lookupClusterName(client: HRavenRestClient): Try[String] = {
+    def lookupClusterName(client: HRavenRestClient): Try[String] =
       // regex for case matching URL to get hostname out
       val hostRegex = """(.*):\d+""".r
 
       // first try resource manager (for Hadoop v2), then fallback to job tracker
-      conf.getFirstKey(RESOURCE_MANAGER_KEY, JOBTRACKER_KEY).flatMap {
+      conf.getFirstKey(RESOURCE_MANAGER_KEY, JOBTRACKER_KEY).flatMap
         // extract hostname from hostname:port
         case hostRegex(host) =>
           // convert hostname -> cluster name (e.g. dw2@smf1)
           Try(client.getCluster(host))
-      }
-    }
 
-    val flowsTry = for {
+    val flowsTry = for
       // connect to hRaven REST API
       client <- HRavenClient(conf)
 
@@ -178,17 +166,16 @@ object HRavenHistoryService extends HistoryService {
       // query hRaven for matching flows
       flows <- fetchSuccessfulFlows(
           client, cluster, user, batch, signature, max, conf.maxFetch)
-    } yield flows
+    yield flows
 
     // Find the FlowStep in the hRaven flow that corresponds to the current step
     // *Note*: when hRaven says "Job" it means "FlowStep"
     flowsTry.map(flows => flows.flatMap(findMatchingJobStep))
-  }
 
   override def fetchHistory(
       info: FlowStrategyInfo, maxHistory: Int): Try[Seq[FlowStepHistory]] =
-    fetchPastJobDetails(info.step, maxHistory).map { history =>
-      for {
+    fetchPastJobDetails(info.step, maxHistory).map  history =>
+      for
         step <- history
         keys = FlowStepKeys(step.getJobName,
                             step.getUser,
@@ -197,11 +184,9 @@ object HRavenHistoryService extends HistoryService {
                             step.getVersion,
                             "")
         // update HRavenHistoryService.TaskDetailFields when consuming additional task fields from hraven below
-        tasks = step.getTasks.asScala.map { t =>
+        tasks = step.getTasks.asScala.map  t =>
           Task(t.getType, t.getStatus, t.getStartTime, t.getFinishTime)
-        }
-      } yield toFlowStepHistory(keys, step, tasks)
-    }
+      yield toFlowStepHistory(keys, step, tasks)
 
   private def toFlowStepHistory(
       keys: FlowStepKeys, step: JobDetails, tasks: Seq[Task]) =
@@ -225,12 +210,9 @@ object HRavenHistoryService extends HistoryService {
                     reduceShuffleBytes = step.getReduceShuffleBytes,
                     cost = 0,
                     tasks = tasks)
-}
 
-class HRavenRatioBasedEstimator extends RatioBasedEstimator {
+class HRavenRatioBasedEstimator extends RatioBasedEstimator
   override val historyService = HRavenHistoryService
-}
 
-class HRavenRuntimeBasedEstimator extends RuntimeReducerEstimator {
+class HRavenRuntimeBasedEstimator extends RuntimeReducerEstimator
   override val historyService = HRavenHistoryService
-}

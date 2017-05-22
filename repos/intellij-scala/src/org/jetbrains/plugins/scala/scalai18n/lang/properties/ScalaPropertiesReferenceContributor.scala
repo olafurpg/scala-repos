@@ -15,15 +15,13 @@ import org.jetbrains.plugins.scala.injection.ScalaPatterns
   * @author Ksenia.Sautina
   * @since 7/17/12
   */
-class ScalaPropertiesReferenceContributor extends PsiReferenceContributor {
+class ScalaPropertiesReferenceContributor extends PsiReferenceContributor
   private final val CLASS_REFERENCE_PROVIDER: JavaClassReferenceProvider =
-    new JavaClassReferenceProvider {
-      override def isSoft: Boolean = {
+    new JavaClassReferenceProvider
+      override def isSoft: Boolean =
         true
-      }
-    }
 
-  def registerReferenceProviders(registrar: PsiReferenceRegistrar) {
+  def registerReferenceProviders(registrar: PsiReferenceRegistrar)
     registrar.registerReferenceProvider(
         ScalaPatterns
           .scalaLiteral()
@@ -37,17 +35,14 @@ class ScalaPropertiesReferenceContributor extends PsiReferenceContributor {
         new ResourceBundleReferenceProvider)
     registrar.registerReferenceProvider(
         PsiJavaPatterns.psiElement(classOf[PropertyValueImpl]),
-        new PsiReferenceProvider {
+        new PsiReferenceProvider
           @NotNull
           def getReferencesByElement(
               @NotNull element: PsiElement,
-              @NotNull context: ProcessingContext): Array[PsiReference] = {
+              @NotNull context: ProcessingContext): Array[PsiReference] =
             val text: String = element.getText
             val words: Array[String] = text.split("\\s")
             if (words.length != 1) return PsiReference.EMPTY_ARRAY
             CLASS_REFERENCE_PROVIDER.getReferencesByString(
                 words(0), element, 0)
-          }
-        })
-  }
-}
+        )

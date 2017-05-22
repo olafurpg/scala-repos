@@ -9,7 +9,7 @@ import scala.util.control.NonFatal
 /**
   * Helper to communicate with promoted bundles from our sbtbuild.
   */
-trait SlickOsgiHelper {
+trait SlickOsgiHelper
   private def makeBundle(file: File): exam.Option =
     bundle(file.toURI.toASCIIString)
 
@@ -23,10 +23,8 @@ trait SlickOsgiHelper {
     allBundleFiles.map(makeBundle) ++ Array[exam.Option](junitBundles())
 
   def wrap(f: => Unit): Unit =
-    try f catch {
+    try f catch
       case NonFatal(t) =>
         // Force all classes required for printing the exception to be loaded before the bundles are released
         t.printStackTrace(new PrintWriter(new StringWriter()))
         throw t
-    }
-}

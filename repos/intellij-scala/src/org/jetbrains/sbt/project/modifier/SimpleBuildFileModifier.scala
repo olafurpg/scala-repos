@@ -26,7 +26,7 @@ class SimpleBuildFileModifier(
           SimpleModuleBuildFileProvider, ProjectRootBuildFileProvider),
     val buildFileLocationProviders: List[BuildFileModificationLocationProvider] = List(
           EndOfFileLocationProvider))
-    extends BuildFileModifier {
+    extends BuildFileModifier
 
   /**
     * Performs some specific modification(s) of sbt build file(s) (library dependencies, resolvers, sbt options, etc.)
@@ -35,22 +35,21 @@ class SimpleBuildFileModifier(
   override protected def modifyInner(
       module: IJModule,
       fileToWorkingCopy: mutable.Map[VirtualFile, LightVirtualFile])
-    : Option[List[VirtualFile]] = {
+    : Option[List[VirtualFile]] =
     val empty: Option[List[VirtualFile]] = Some(List())
     requiredElementTypes.foldLeft(empty)(
         (acc, nextType) =>
-          acc match {
+          acc match
         case Some(accList) =>
           addElements(module, nextType, fileToWorkingCopy).map(_ :: accList)
         case _ => None
-    })
-  }
+    )
 
   protected def addElements(
       module: IJModule,
       elementType: BuildFileElementType,
       fileToWorkingCopy: mutable.Map[VirtualFile, LightVirtualFile])
-    : Option[VirtualFile] = {
+    : Option[VirtualFile] =
     val locationProvidersStream = buildFileLocationProviders.toStream
     //TODO: rewrite this?
     buildFileProviders
@@ -80,13 +79,12 @@ class SimpleBuildFileModifier(
       .map(opt => opt.flatten.flatten)
       .find(_.isDefined)
       .flatten
-  }
 
   protected def buildPsiElement(
       project: IJProject,
       inName: Option[String],
-      elementType: BuildFileElementType): Option[PsiElement] = {
-    elementType match {
+      elementType: BuildFileElementType): Option[PsiElement] =
+    elementType match
       case BuildFileElementType.libraryDependencyElementId =>
         SimpleBuildFileModifier.buildLibraryDependenciesPsi(
             project, inName, libDependencies)
@@ -98,11 +96,9 @@ class SimpleBuildFileModifier(
       case _ =>
         throw new IllegalArgumentException(
             "Unsupported build file element type: " + elementType)
-    }
-  }
 
-  protected def requiredElementTypes = {
-    SimpleBuildFileModifier.supportedElementTypes.filter {
+  protected def requiredElementTypes =
+    SimpleBuildFileModifier.supportedElementTypes.filter
       case BuildFileElementType.libraryDependencyElementId =>
         libDependencies.nonEmpty
       case BuildFileElementType.resolverElementId => resolvers.nonEmpty
@@ -111,11 +107,8 @@ class SimpleBuildFileModifier(
       case elementType =>
         throw new IllegalArgumentException(
             "Unsupported build file element type: " + elementType)
-    }
-  }
-}
 
-object SimpleBuildFileModifier {
+object SimpleBuildFileModifier
 
   def newLine(project: IJProject) =
     ScalaPsiElementFactory.createNewLine(PsiManager.getInstance(project))
@@ -164,20 +157,19 @@ object SimpleBuildFileModifier {
       locationProvider: BuildFileModificationLocationProvider,
       elementType: BuildFileElementType,
       buildFile: PsiFile,
-      psiElements: PsiElement*): Option[VirtualFile] = {
-    locationProvider.getAddElementLocation(module, elementType, buildFile) match {
+      psiElements: PsiElement*): Option[VirtualFile] =
+    locationProvider.getAddElementLocation(module, elementType, buildFile) match
       case Some((parent, index))
           if (index == 0) || parent.getChildren.size >= index =>
         val children = parent.getChildren
-        if (children.isEmpty) {
+        if (children.isEmpty)
           for (psiElement <- psiElements) parent.add(psiElement)
-        } else if (index == 0) {
+        else if (index == 0)
           for (psiElement <- psiElements) parent.addBefore(
               psiElement, children(0))
-        } else {
+        else
           for (psiElement <- psiElements.reverse) parent.addAfter(
               psiElement, children(index - 1))
-        }
         val psiFile = parent.getContainingFile
         val res = psiFile.getVirtualFile
         //TODO: this 'saveText' seems extremely weird here
@@ -186,34 +178,29 @@ object SimpleBuildFileModifier {
         VfsUtil.saveText(res, psiFile.getText)
         Some(res)
       case None => None
-    }
-  }
 
   def addElementToBuildFile(
       module: IJModule,
       locationProvider: BuildFileModificationLocationProvider,
       elementType: BuildFileElementType,
       buildFile: PsiFile,
-      psiElement: PsiElement) = {
+      psiElement: PsiElement) =
     addElementsToBuildFile(
         module, locationProvider, elementType, buildFile, psiElement)
-  }
 
   def removeElementFromBuildFile(
       module: IJModule,
       locationProvider: BuildFileModificationLocationProvider,
       buildFile: PsiFile,
       elementType: BuildFileElementType,
-      elementCondition: PsiElement => Boolean) = {
+      elementCondition: PsiElement => Boolean) =
     locationProvider.getModifyOrRemoveElement(
-        module, elementType, elementCondition, buildFile) match {
+        module, elementType, elementCondition, buildFile) match
       case Some(element) =>
         val res = element.getContainingFile
         element.delete()
         Some(res)
       case None => None
-    }
-  }
 
   def modifyElementInBuildFile(
       module: IJModule,
@@ -221,14 +208,11 @@ object SimpleBuildFileModifier {
       elementType: BuildFileElementType,
       buildFile: PsiFile,
       elementCondition: PsiElement => Boolean,
-      modifyFunction: PsiElement => PsiElement) = {
+      modifyFunction: PsiElement => PsiElement) =
     locationProvider.getModifyOrRemoveElement(
-        module, elementType, elementCondition, buildFile) match {
+        module, elementType, elementCondition, buildFile) match
       case Some(element) =>
         val res = element.getContainingFile
         element.replace(modifyFunction(element))
         Some(res)
       case None => None
-    }
-  }
-}

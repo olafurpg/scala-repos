@@ -15,19 +15,15 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *  Import ::= import ImportExpr { ,  ImportExpr}
  */
 
-object Import {
-  def parse(builder: ScalaPsiBuilder) {
+object Import
+  def parse(builder: ScalaPsiBuilder)
     val importMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kIMPORT =>
         builder.advanceLexer //Ate import
       case _ => builder error ErrMsg("unreachable.error")
-    }
     ImportExpr parse builder
-    while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+    while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
       builder.advanceLexer() //Ate ,
       ImportExpr parse builder
-    }
     importMarker.done(ScalaElementTypes.IMPORT_STMT)
-  }
-}

@@ -13,7 +13,7 @@ import org.openjdk.jmh.annotations._
 @BenchmarkMode(Array(Mode.Throughput))
 @Warmup(iterations = 10)
 @Measurement(iterations = 20, timeUnit = TimeUnit.MILLISECONDS)
-class LogLevelAccessBenchmark {
+class LogLevelAccessBenchmark
 
   /*
   volatile logLevel, guard on loggers
@@ -24,14 +24,13 @@ class LogLevelAccessBenchmark {
     a.e.LogLevelAccessBenchmark.g:writeLogLevel_2        thrpt        60     1245.023       51.071   ops/ms
    */
 
-  val NoopBus = new LoggingBus {
+  val NoopBus = new LoggingBus
     override def subscribe(subscriber: Subscriber, to: Classifier): Boolean =
       true
     override def publish(event: Event): Unit = ()
     override def unsubscribe(
         subscriber: Subscriber, from: Classifier): Boolean = true
     override def unsubscribe(subscriber: Subscriber): Unit = ()
-  }
 
   var log: BusLogging =
     akka.event.Logging(NoopBus, "").asInstanceOf[BusLogging]
@@ -51,4 +50,3 @@ class LogLevelAccessBenchmark {
   @Group("g")
   def setLogLevel_2(): Unit =
     log.bus.setLogLevel(Logging.DebugLevel)
-}

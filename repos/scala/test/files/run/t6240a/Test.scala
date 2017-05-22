@@ -1,12 +1,11 @@
 import java.io.File
 import scala.sys.process._
 
-object Test extends App {
-  def prop(key: String) = {
+object Test extends App
+  def prop(key: String) =
     val value = System.getProperties.getProperty(key)
     assert(value != null, key)
     value
-  }
   val testClassesDir = prop("partest.output")
   assert(new File(testClassesDir).exists, testClassesDir)
   val fullTestClassesClasspath =
@@ -19,4 +18,3 @@ object Test extends App {
        testClassesDir,
        "-Dlaunch.classpath=" + fullTestClassesClasspath,
        "StepOne").!
-}

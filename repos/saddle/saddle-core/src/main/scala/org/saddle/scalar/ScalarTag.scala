@@ -27,7 +27,7 @@ import org.saddle.array.Sorter
   */
 trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
     extends ClassManifest[T] with SpecializedFactory[T] with CouldBeOrdered[T]
-    with CouldBeNumber[T] with ScalarHelperOps[T] with Serializable {
+    with CouldBeNumber[T] with ScalarHelperOps[T] with Serializable
   // representation of missing data
   def missing: T
   def isMissing(t: T): Boolean
@@ -49,12 +49,11 @@ trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
     isAny.hashCode() + isAnyVal.hashCode() * 31 +
     runtimeClass.hashCode() * 31 * 31
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case s: ScalarTag[_] =>
       (this eq s) || runtimeClass == s.runtimeClass && isAny == s.isAny &&
       isAnyVal == s.isAnyVal
     case _ => false
-  }
 
   override def toString = "ScalarTag[%s]" format runtimeClass
 
@@ -62,9 +61,8 @@ trait ScalarTag[@spec(Boolean, Int, Long, Float, Double) T]
 
   // forward 2.10 compatibility
   def runtimeClass: Class[_]
-}
 
-object ScalarTag extends ScalarTagImplicits {
+object ScalarTag extends ScalarTagImplicits
   implicit val stChar = ScalarTagChar
   implicit val stByte = ScalarTagByte
   implicit val stBool = ScalarTagBool
@@ -74,45 +72,36 @@ object ScalarTag extends ScalarTagImplicits {
   implicit val stLong = ScalarTagLong
   implicit val stDouble = ScalarTagDouble
   implicit val stTime = ScalarTagTime
-}
 
-trait ScalarTagImplicits extends ScalarTagImplicitsL1 {
+trait ScalarTagImplicits extends ScalarTagImplicitsL1
   implicit def stPrd[T <: Product : CLM] = new ScalarTagProduct[T]
-}
 
-trait ScalarTagImplicitsL1 extends ScalarTagImplicitsL2 {
-  implicit def stAnyVal[T <: AnyVal : CLM] = new ScalarTagAny[T] {
+trait ScalarTagImplicitsL1 extends ScalarTagImplicitsL2
+  implicit def stAnyVal[T <: AnyVal : CLM] = new ScalarTagAny[T]
     override def isAnyVal = true
-  }
-}
 
-trait ScalarTagImplicitsL2 extends ScalarTagImplicitsL3 {
+trait ScalarTagImplicitsL2 extends ScalarTagImplicitsL3
   implicit def stAnyRef[T <: AnyRef : CLM] = new ScalarTagAny[T]
-}
 
-trait ScalarTagImplicitsL3 {
-  implicit def stAny[T : CLM] = new ScalarTagAny[T] {
+trait ScalarTagImplicitsL3
+  implicit def stAny[T : CLM] = new ScalarTagAny[T]
     override def isAny = true
-  }
-}
 
-trait CouldBeOrdered[@spec(Boolean, Int, Long, Float, Double) T] {
+trait CouldBeOrdered[@spec(Boolean, Int, Long, Float, Double) T]
   // for comparable scalars
   def compare(a: T, b: T)(implicit ev: ORD[T]): Int
   def lt(a: T, b: T)(implicit ev: ORD[T]) = compare(a, b) < 0
   def gt(a: T, b: T)(implicit ev: ORD[T]) = compare(a, b) > 0
   def iseq(a: T, b: T)(implicit ev: ORD[T]) = compare(a, b) == 0
-}
 
-trait ScalarHelperOps[@spec(Boolean, Int, Long, Float, Double) T] {
+trait ScalarHelperOps[@spec(Boolean, Int, Long, Float, Double) T]
 
   /**
     * Offer a type-specific way to concat vecs
     */
   def concat(vecs: IndexedSeq[Vec[T]]): Vec[T]
-}
 
-trait CouldBeNumber[@spec(Boolean, Int, Long, Float, Double) T] {
+trait CouldBeNumber[@spec(Boolean, Int, Long, Float, Double) T]
   // for numeric scalars
   def toDouble(t: T)(implicit ev: NUM[T]): Double
   def isDouble: Boolean
@@ -121,9 +110,8 @@ trait CouldBeNumber[@spec(Boolean, Int, Long, Float, Double) T] {
   def one(implicit ev: NUM[T]): T
   def inf(implicit ev: NUM[T]): T
   def negInf(implicit ev: NUM[T]): T
-}
 
-trait SpecializedFactory[@spec(Boolean, Int, Long, Float, Double) T] {
+trait SpecializedFactory[@spec(Boolean, Int, Long, Float, Double) T]
   def makeBuf(sz: Int = Buffer.INIT_CAPACITY): Buffer[T]
   def makeLoc(sz: Int = Buffer.INIT_CAPACITY): Locator[T]
   def makeVec(arr: Array[T]): Vec[T]
@@ -134,19 +122,16 @@ trait SpecializedFactory[@spec(Boolean, Int, Long, Float, Double) T] {
   /**
     * An alternative Mat factory method using array of Vecs
     */
-  final def makeMat(arr: Array[Vec[T]])(implicit st: ST[T]): Mat[T] = {
+  final def makeMat(arr: Array[Vec[T]])(implicit st: ST[T]): Mat[T] =
     val c = arr.length
     if (c == 0) st.makeMat(0, 0, st.newArray(0))
-    else {
+    else
       val r = arr(0).length
       if (r == 0) st.makeMat(0, 0, st.newArray(0))
-      else {
+      else
         require(arr.foldLeft(true)(_ && _.length == r),
                 "All vec inputs must have the same length")
         altMatConstructor(r, c, arr)
-      }
-    }
-  }
 
   /**
     * Can override this default construction methodology to avoid the toArray call if you
@@ -155,4 +140,3 @@ trait SpecializedFactory[@spec(Boolean, Int, Long, Float, Double) T] {
   protected def altMatConstructor(r: Int, c: Int, arr: Array[Vec[T]])(
       implicit st: ST[T]): Mat[T] =
     makeMat(c, r, st.concat(arr).toArray).T
-}

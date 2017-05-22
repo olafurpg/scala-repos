@@ -32,71 +32,57 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 class ScTypeParamImpl private (
     stub: StubElement[ScTypeParam], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScTypeBoundsOwnerImpl with ScTypeParam with PsiClassFake {
+    with ScTypeBoundsOwnerImpl with ScTypeParam with PsiClassFake
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScTypeParamStub) = {
+  def this(stub: ScTypeParamStub) =
     this(stub, ScalaElementTypes.TYPE_PARAM, null)
-  }
 
   override def toString: String = "TypeParameter: " + name
 
   override def getPsiElementId: PsiElement = this
 
-  def getOffsetInFile: Int = {
+  def getOffsetInFile: Int =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTypeParamStub].getPositionInFile
-    }
     getTextRange.getStartOffset
-  }
 
-  def getContainingFileName: String = {
+  def getContainingFileName: String =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTypeParamStub].getContainingFileName
-    }
     val containingFile = getContainingFile
     if (containingFile == null) return "NoFile"
     containingFile.name
-  }
 
   def getIndex: Int = 0
-  def getOwner: PsiTypeParameterListOwner = getContext.getContext match {
+  def getOwner: PsiTypeParameterListOwner = getContext.getContext match
     case c: PsiTypeParameterListOwner => c
     case _ => null
-  }
 
   override def getContainingClass: ScTemplateDefinition = null
 
-  def isCovariant: Boolean = {
+  def isCovariant: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTypeParamStub].isCovariant
-    }
-    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
+    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match
       case null => false
       case x => x.getText == "+"
-    }
-  }
 
-  def isContravariant: Boolean = {
+  def isContravariant: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTypeParamStub].isContravariant
-    }
-    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match {
+    findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER) match
       case null => false
       case x => x.getText == "-"
-    }
-  }
 
-  def typeParameterText: String = {
+  def typeParameterText: String =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScTypeParamStub].typeParameterText
-    }
     getText
-  }
 
   def owner: ScTypeParametersOwner =
     getContext.getContext.asInstanceOf[ScTypeParametersOwner]
@@ -108,57 +94,46 @@ class ScTypeParamImpl private (
 
   override def getNameIdentifier: PsiIdentifier = new JavaIdentifier(nameId)
 
-  override def viewTypeElement: Seq[ScTypeElement] = {
+  override def viewTypeElement: Seq[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScTypeParamStub].getViewTypeElement
-    } else super.viewTypeElement
-  }
+    else super.viewTypeElement
 
-  override def contextBoundTypeElement: Seq[ScTypeElement] = {
+  override def contextBoundTypeElement: Seq[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScTypeParamStub].getContextBoundTypeElement
-    } else super.contextBoundTypeElement
-  }
+    else super.contextBoundTypeElement
 
-  override def lowerTypeElement: Option[ScTypeElement] = {
+  override def lowerTypeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScTypeParamStub].getLowerTypeElement
-    } else super.lowerTypeElement
-  }
+    else super.lowerTypeElement
 
-  override def upperTypeElement: Option[ScTypeElement] = {
+  override def upperTypeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScTypeParamStub].getUpperTypeElement
-    } else super.upperTypeElement
-  }
+    else super.upperTypeElement
 
-  override def getIcon(flags: Int) = {
+  override def getIcon(flags: Int) =
     Icons.TYPE_ALIAS
-  }
 
-  override def getSuperTypes: Array[PsiClassType] = {
+  override def getSuperTypes: Array[PsiClassType] =
     // For Java
-    upperBound match {
+    upperBound match
       case Success(t, _) =>
         val psiType =
-          if (hasTypeParameters) {
-            t match {
+          if (hasTypeParameters)
+            t match
               case ScParameterizedType(des, _) =>
                 ScType.toPsi(des, getProject, getResolveScope)
               case _ => ScType.toPsi(t, getProject, getResolveScope)
-            }
-          } else {
+          else
             ScType.toPsi(t, getProject, getResolveScope)
-          }
-        psiType match {
+        psiType match
           case x: PsiClassType => Array(x)
           case _ => Array() // TODO
-        }
       case Failure(_, _) => Array()
-    }
-  }
-}

@@ -9,14 +9,14 @@ import org.jetbrains.plugins.scala.project.converter.ScalaModuleConversionProces
   * @author Pavel Fatin
   */
 private class ScalaModuleConversionProcessor(context: ConversionContext)
-    extends ConversionProcessor[ModuleSettings] {
+    extends ConversionProcessor[ModuleSettings]
   private var createdSdks: Seq[ScalaSdkData] = Seq.empty
   private var newSdkFiles: Seq[File] = Seq.empty
 
   def isConversionNeeded(module: ModuleSettings) =
     ScalaFacetData.isPresentIn(module)
 
-  def process(module: ModuleSettings) {
+  def process(module: ModuleSettings)
     val scalaFacet = ScalaFacetData
       .findIn(module)
       .getOrElse(throw new IllegalStateException(
@@ -29,11 +29,11 @@ private class ScalaModuleConversionProcessor(context: ConversionContext)
     val scalaCompilerLibrary =
       scalaFacet.compilerLibrary.flatMap(_.resolveIn(context))
 
-    scalaCompilerLibrary.foreach { compilerLibrary =>
+    scalaCompilerLibrary.foreach  compilerLibrary =>
       val existingScalaSdk =
         createdSdks.find(_.isEquivalentTo(compilerLibrary))
 
-      val scalaSdk = existingScalaSdk.getOrElse {
+      val scalaSdk = existingScalaSdk.getOrElse
         val name = scalaStandardLibrary
           .map(library => transform(library.name))
           .getOrElse("scala-sdk")
@@ -45,28 +45,21 @@ private class ScalaModuleConversionProcessor(context: ConversionContext)
         createdSdks :+= sdk
         newSdkFiles ++= sdk.createIn(context)
         sdk
-      }
 
       scalaSdk.addReferenceTo(module)
-    }
 
     scalaStandardLibraryReference.foreach(_.removeFrom(module))
     scalaFacet.removeFrom(module)
-  }
 
   def createdFiles: Seq[File] = newSdkFiles
-}
 
-object ScalaModuleConversionProcessor {
+object ScalaModuleConversionProcessor
   private val BuildTools = Set("sbt", "maven", "gradle")
 
-  def transform(name: String): String = {
+  def transform(name: String): String =
     val name0 = name.toLowerCase
 
-    if (BuildTools.exists(name0.startsWith)) {
+    if (BuildTools.exists(name0.startsWith))
       name
-    } else {
+    else
       name.replaceFirst("library", "sdk")
-    }
-  }
-}

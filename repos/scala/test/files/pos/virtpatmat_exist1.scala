@@ -1,16 +1,15 @@
 import annotation.unchecked.{uncheckedVariance => uV}
 import scala.collection.immutable.{ListMap, HashMap, ListSet, HashSet}
 
-object Test {
+object Test
   class HashMapCollision1[A, +B](var hash: Int, var kvs: ListMap[A, B @uV])
       extends HashMap[A, B @uV]
   class HashSetCollision1[A](var hash: Int, var ks: ListSet[A])
       extends HashSet[A]
 
   def splitArray[T](ad: Array[Iterable[T]]): Any =
-    ad(0) match {
+    ad(0) match
       case _: HashMapCollision1[_, _] | _: HashSetCollision1[_] => null
-    }
 
   // without type ascription for the one in the body of the last flatmap of each alternative, type inference borks on the existentials
   // def splitArray[T >: Nothing <: Any](ad: Array[Iterable[T]]): Any = { import OptionMatching._
@@ -21,4 +20,3 @@ object Test {
   //     (zero: Option[Any])))
   //   )
   // }
-}

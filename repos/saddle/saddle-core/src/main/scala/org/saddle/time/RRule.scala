@@ -73,60 +73,47 @@ case class RRule private (
     bysecond: List[Int] = List.empty,
     inzone: DateTimeZone = TZ_LOCAL,
     joins: List[(RRule, Option[DateTime])] = List.empty,
-    excepts: List[(RRule, Option[DateTime])] = List.empty) {
+    excepts: List[(RRule, Option[DateTime])] = List.empty)
 
-  private def dt2dtv(dt: DateTime): com.google.ical.values.DateTimeValueImpl = {
+  private def dt2dtv(dt: DateTime): com.google.ical.values.DateTimeValueImpl =
     new com.google.ical.values.DateTimeValueImpl(dt.getYear,
                                                  dt.getMonthOfYear,
                                                  dt.getDayOfMonth,
                                                  dt.getHourOfDay,
                                                  dt.getMinuteOfHour,
                                                  dt.getSecondOfMinute)
-  }
 
-  protected[time] def toICal: com.google.ical.values.RRule = {
+  protected[time] def toICal: com.google.ical.values.RRule =
     val rrule = new com.google.ical.values.RRule()
 
     rrule.setFreq(freq.toICal)
     rrule.setInterval(interval)
 
-    wkst.foreach { w =>
+    wkst.foreach  w =>
       rrule.setWkSt(w.toICal)
-    }
     count.foreach { rrule.setCount(_) }
-    until.foreach { dt =>
+    until.foreach  dt =>
       rrule.setUntil(dt2dtv(dt))
-    }
-    bysetpos.headOption.foreach { _ =>
+    bysetpos.headOption.foreach  _ =>
       rrule.setBySetPos(bysetpos.toArray)
-    }
-    bymonth.headOption.foreach { _ =>
+    bymonth.headOption.foreach  _ =>
       rrule.setByMonth(bymonth.toArray)
-    }
-    bymonthday.headOption.foreach { _ =>
+    bymonthday.headOption.foreach  _ =>
       rrule.setByMonthDay(bymonthday.toArray)
-    }
-    byyearday.headOption.foreach { _ =>
+    byyearday.headOption.foreach  _ =>
       rrule.setByYearDay(byyearday.toArray)
-    }
-    byweekno.headOption.foreach { _ =>
+    byweekno.headOption.foreach  _ =>
       rrule.setByWeekNo(byweekno.toArray)
-    }
-    byday.headOption.foreach { _ =>
+    byday.headOption.foreach  _ =>
       rrule.setByDay(seqAsJavaList(byday.map(v => v.toICal)))
-    }
-    byhour.headOption.foreach { _ =>
+    byhour.headOption.foreach  _ =>
       rrule.setByHour(byhour.toArray)
-    }
-    byminute.headOption.foreach { _ =>
+    byminute.headOption.foreach  _ =>
       rrule.setByMinute(byminute.toArray)
-    }
-    bysecond.headOption.foreach { _ =>
+    bysecond.headOption.foreach  _ =>
       rrule.setBySecond(bysecond.toArray)
-    }
 
     rrule
-  }
 
   // setters, makes for a nice DSL
 
@@ -226,27 +213,26 @@ case class RRule private (
     * Note that in both cases, if the 'from' date conforms to the recurrence
     * rule, it will be counted.
     */
-  def counting(i: Int) = {
+  def counting(i: Int) =
     val outer = this
-    new {
-      def from(dt: DateTime): DateTime = {
+    new
+      def from(dt: DateTime): DateTime =
         if (i == 0)
           throw new IllegalArgumentException(
               "argument to occurrence must not equal 0")
         else if (i > 0)
           // counting occurrences forward
           outer.from(dt).toStream.drop(i - 1).head
-        else {
+        else
           // counting occurrences backward
           val iabs = i.abs
 
           // heuristic: take 4 observations, find the largest daycount between subsequent
           // occurrences, with a day of padding, and with a minimum of 1 day
           val dseq = { outer from dt take 4 }.toSeq
-          val ival = { dseq.tail zip dseq }.foldLeft(1) {
+          val ival = { dseq.tail zip dseq }.foldLeft(1)
             case (days, (d1, d2)) =>
               days max { Days.daysBetween(d2, d1).getDays + 2 }
-          }
 
           // use this daycount to estimate lower bound from which to start generating dates
           val lbound = dt.minusDays(ival * iabs)
@@ -255,10 +241,6 @@ case class RRule private (
           // create index and count backward from min conforming time >= dt
           val idx = Index.make(outer, lbound, ubound)
           idx.raw(idx.rsearch(dt) - iabs)
-        }
-      }
-    }
-  }
 
   /**
     * Join with another RRule, and optionally specify a start date. If a start date is not specified,
@@ -278,35 +260,29 @@ case class RRule private (
     * Generate an iterator of DateTime instances based on the current RRule instance starting on or after the
     * provided DateTime instance.
     */
-  def from(dt: DateTime): Iterator[DateTime] = {
+  def from(dt: DateTime): Iterator[DateTime] =
     val riter = RecurrenceIteratorFactory.createRecurrenceIterator(
         toICal, dt2dtv(dt), inzone.toTimeZone)
 
-    val iterWithJoins = joins.foldLeft(riter) {
+    val iterWithJoins = joins.foldLeft(riter)
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
         val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
             rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.join(i1, tmpiter)
-    }
 
-    val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins) {
+    val iterWithJoinsWithExcepts = excepts.foldLeft(iterWithJoins)
       case (i1, (rrule, t)) =>
         val tmpfrom = t.map { dt2dtv } getOrElse dt2dtv(dt)
         val tmpiter = RecurrenceIteratorFactory.createRecurrenceIterator(
             rrule.toICal, tmpfrom, inzone.toTimeZone)
         RecurrenceIteratorFactory.except(i1, tmpiter)
-    }
 
-    DateTimeIteratorFactory.createDateTimeIterator(iterWithJoinsWithExcepts) map {
+    DateTimeIteratorFactory.createDateTimeIterator(iterWithJoinsWithExcepts) map
       dt =>
         dt.withZone(inzone)
-    }
-  }
 
   override def toString = toICal.toIcal
-}
 
-object RRule {
+object RRule
   def apply(f: Frequency): RRule = new RRule(freq = f)
-}

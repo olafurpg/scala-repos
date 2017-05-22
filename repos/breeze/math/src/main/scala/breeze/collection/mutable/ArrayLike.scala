@@ -29,7 +29,7 @@ import scala.reflect.ClassTag
   * @author dlwh
   */
 // TODO: perhaps these should be called sparse Arrays
-trait ArrayLike[V] {
+trait ArrayLike[V]
   def apply(i: Int): V
   def update(i: Int, t: V): Unit
 
@@ -73,4 +73,3 @@ trait ArrayLike[V] {
   def toIndexedSeq = List.tabulate(length)(apply)
 
   def toMap = (keysIterator zip valuesIterator).toMap
-}

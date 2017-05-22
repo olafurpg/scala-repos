@@ -41,12 +41,12 @@ Lost after 18/flatten {
 /** A class for methods to be injected into the intp in power mode.
   */
 class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
-    val intp: IMain, replVals: ReplValsImpl) {
+    val intp: IMain, replVals: ReplValsImpl)
   import intp.{beQuietDuring, parse}
   import intp.global._
   import definitions.{compilerTypeFromTag, compilerSymbolFromTag}
 
-  abstract class SymSlurper {
+  abstract class SymSlurper
     def isKeep(sym: Symbol): Boolean
     def isIgnore(sym: Symbol): Boolean
     def isRecur(sym: Symbol): Boolean
@@ -65,15 +65,14 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     var pass = 0
     val unseenHistory = new mutable.ListBuffer[Int]
 
-    def loop(todo: Set[Symbol]): Set[Symbol] = {
+    def loop(todo: Set[Symbol]): Set[Symbol] =
       pass += 1
       val (repeats, unseen) = todo partition seen
       unseenHistory += unseen.size
-      if (settings.verbose) {
+      if (settings.verbose)
         println(
             "%3d  %s accumulated, %s discarded.  This pass: %s unseen, %s repeats"
               .format(pass, keep.size, discarded, unseen.size, repeats.size))
-      }
       if (lastCount == processed || unseen.isEmpty || isFinished())
         return keep.toSet
 
@@ -81,43 +80,34 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
       keep ++= (unseen filter isKeep filterNot isIgnore)
       seen ++= unseen
       loop(unseen filter isRecur flatMap members)
-    }
 
-    def apply(sym: Symbol): Set[Symbol] = {
+    def apply(sym: Symbol): Set[Symbol] =
       keep.clear()
       seen.clear()
       loop(Set(sym))
-    }
-  }
 
-  class PackageSlurper(packageClass: Symbol) extends SymSlurper {
+  class PackageSlurper(packageClass: Symbol) extends SymSlurper
 
     /** Looking for dwindling returns */
-    def droppedEnough() = unseenHistory.size >= 4 && {
-      unseenHistory takeRight 4 sliding 2 forall { it =>
+    def droppedEnough() = unseenHistory.size >= 4 &&
+      unseenHistory takeRight 4 sliding 2 forall  it =>
         val List(a, b) = it.toList
         a > b
-      }
-    }
 
     def isRecur(sym: Symbol) = true
     def isIgnore(sym: Symbol) =
       sym.isAnonOrRefinementClass || (sym.name.toString contains "$mc")
     def isKeep(sym: Symbol) = sym.hasTransOwner(packageClass)
     def isFinished() = droppedEnough()
-    def slurp() = {
+    def slurp() =
       if (packageClass.isPackageClass) apply(packageClass)
-      else {
+      else
         repldbg("Not a package class! " + packageClass)
         Set()
-      }
-    }
-  }
 
-  private def customBanner = replProps.powerBanner.option flatMap {
+  private def customBanner = replProps.powerBanner.option flatMap
     case f if f.getName == "classic" => Some(classic)
     case f => io.File(f).safeSlurp()
-  }
   private def customInit =
     replProps.powerInitCode.option flatMap (f => io.File(f).safeSlurp())
 
@@ -149,19 +139,17 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
 
   /** Quietly starts up power mode and runs whatever is in init.
     */
-  def unleash(): Unit = beQuietDuring {
+  def unleash(): Unit = beQuietDuring
     // First we create the ReplVals instance and bind it to $r
     intp.bind("$r", replVals)
     // Then we import everything from $r.
     intp interpret s"import ${intp.originalPath("$r")}._"
     // And whatever else there is to do.
     init.lines foreach (intp interpret _)
-  }
 
-  trait LowPriorityInternalInfo {
+  trait LowPriorityInternalInfo
     implicit def apply[T : ru.TypeTag : ClassTag]: InternalInfo[T] =
       new InternalInfo[T](None)
-  }
   object InternalInfo extends LowPriorityInternalInfo {}
 
   /** Now dealing with the problem of accidentally calling a method on Type
@@ -172,9 +160,8 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     */
   trait LowPriorityInternalInfoWrapper {}
   class InternalInfoWrapper[
-      T : ru.TypeTag : ClassTag](value: Option[T] = None) {
+      T : ru.TypeTag : ClassTag](value: Option[T] = None)
     def ? : InternalInfo[T] = new InternalInfo[T](value)
-  }
 
   /** Todos...
     *    translate tag type arguments into applied types
@@ -182,7 +169,7 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     */
   class InternalInfo[T](value: Option[T] = None)(
       implicit typeEvidence: ru.TypeTag[T],
-      runtimeClassEvidence: ClassTag[T]) {
+      runtimeClassEvidence: ClassTag[T])
     private def isSpecialized(s: Symbol) = s.name.toString contains "$mc"
     private def isImplClass(s: Symbol) = s.name.toString endsWith "$class"
 
@@ -199,16 +186,14 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     def shortClass = runtimeClass.getName split "[$.]" last
     def baseClasses = tpe.baseClasses
 
-    override def toString = value match {
+    override def toString = value match
       case Some(x) => "%s (%s)".format(x, shortClass)
       case _ => runtimeClass.getName
-    }
-  }
 
-  trait LowPriorityPrettifier {
-    implicit object AnyPrettifier extends Prettifier[Any] {
+  trait LowPriorityPrettifier
+    implicit object AnyPrettifier extends Prettifier[Any]
       def show(x: Any): Unit = prettify(x) foreach println
-      def prettify(x: Any): TraversableOnce[String] = x match {
+      def prettify(x: Any): TraversableOnce[String] = x match
         case x: Name => List(x.decode)
         case Tuple2(k, v) =>
           List(
@@ -216,29 +201,22 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
         case xs: Array[_] => xs.iterator flatMap prettify
         case xs: TraversableOnce[_] => xs flatMap prettify
         case x => List(Prettifier.stringOf(x))
-      }
-    }
-  }
-  object StringPrettifier extends Prettifier[String] {
+  object StringPrettifier extends Prettifier[String]
     def show(x: String) = println(x)
     def prettify(x: String) = List(Prettifier stringOf x)
-  }
-  object Prettifier extends LowPriorityPrettifier {
+  object Prettifier extends LowPriorityPrettifier
     def stringOf(x: Any): String = scala.runtime.ScalaRunTime.stringOf(x)
-    def default[T] = new Prettifier[T] {
+    def default[T] = new Prettifier[T]
       def prettify(x: T): TraversableOnce[String] = AnyPrettifier prettify x
       def show(x: T): Unit = AnyPrettifier show x
-    }
-  }
-  trait Prettifier[T] {
+  trait Prettifier[T]
     def show(x: T): Unit
     def prettify(x: T): TraversableOnce[String]
 
     def prettify(xs: TraversableOnce[T]): TraversableOnce[String] =
       xs flatMap (x => prettify(x))
-  }
 
-  abstract class PrettifierClass[T : Prettifier]() {
+  abstract class PrettifierClass[T : Prettifier]()
     val pretty = implicitly[Prettifier[T]]
     def value: Seq[T]
 
@@ -252,47 +230,39 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
     def >>(implicit ord: Ordering[T]): Unit = pp(_.sorted)
     def >!(): Unit = pp(_.distinct)
     def >(): Unit = pp(identity)
-  }
 
   class MultiPrettifierClass[T : Prettifier](val value: Seq[T])
       extends PrettifierClass[T]() {}
   class SinglePrettifierClass[T : Prettifier](single: T)
-      extends PrettifierClass[T]() {
+      extends PrettifierClass[T]()
     val value = List(single)
-  }
 
-  class RichReplString(s: String) {
+  class RichReplString(s: String)
     // make an url out of the string
     def u: URL = (if (s contains ":") new URL(s)
                   else if (new JFile(s) exists) new JFile(s).toURI.toURL
                   else new URL("http://" + s))
-  }
-  class RichInputStream(in: InputStream)(implicit codec: Codec) {
+  class RichInputStream(in: InputStream)(implicit codec: Codec)
     def bytes(): Array[Byte] = io.Streamable.bytes(in)
     def slurp(): String = io.Streamable.slurp(in)
     def <<(): String = slurp()
-  }
-  class RichReplURL(url: URL)(implicit codec: Codec) {
+  class RichReplURL(url: URL)(implicit codec: Codec)
     def slurp(): String = io.Streamable.slurp(url)
-  }
 
-  trait Implicits1 {
+  trait Implicits1
     // fallback
     implicit def replPrinting[T](x: T)(
         implicit pretty: Prettifier[T] = Prettifier.default[T]) =
       new SinglePrettifierClass[T](x)
-  }
-  trait Implicits2 extends Implicits1 {
-    class RichSymbol(sym: Symbol) {
+  trait Implicits2 extends Implicits1
+    class RichSymbol(sym: Symbol)
       // convenient type application
       def apply(targs: Type*): Type = typeRef(NoPrefix, sym, targs.toList)
-    }
-    object symbolSubtypeOrdering extends Ordering[Symbol] {
+    object symbolSubtypeOrdering extends Ordering[Symbol]
       def compare(s1: Symbol, s2: Symbol) =
         if (s1 eq s2) 0
         else if (s1 isLess s2) -1
         else 1
-    }
     implicit lazy val powerSymbolOrdering: Ordering[Symbol] =
       Ordering[Name] on (_.name)
     implicit lazy val powerTypeOrdering: Ordering[Type] =
@@ -313,41 +283,35 @@ class Power[ReplValsImpl <: ReplVals : ru.TypeTag : ClassTag](
       new RichInputStream(in)
     implicit def replEnhancedURLs(url: URL)(
         implicit codec: Codec): RichReplURL = new RichReplURL(url)(codec)
-  }
 
-  trait ReplUtilities {
+  trait ReplUtilities
     def module[T : ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isPackage)
     def clazz[T : ru.TypeTag] = ru.typeOf[T].typeSymbol.suchThat(_.isClass)
     def info[T : ru.TypeTag : ClassTag] = InternalInfo[T]
     def ?[T : ru.TypeTag : ClassTag] = InternalInfo[T]
     def sanitize(s: String): String = sanitize(s.getBytes())
     def sanitize(s: Array[Byte]): String =
-      (s map {
+      (s map
             case x if x.toChar.isControl => '?'
             case x => x.toChar
-          }).mkString
+          ).mkString
 
-    def strings(s: Seq[Byte]): List[String] = {
+    def strings(s: Seq[Byte]): List[String] =
       if (s.length == 0) Nil
       else
-        s dropWhile (_.toChar.isControl) span (x => !x.toChar.isControl) match {
+        s dropWhile (_.toChar.isControl) span (x => !x.toChar.isControl) match
           case (next, rest) => next.map(_.toChar).mkString :: strings(rest)
-        }
-    }
-  }
 
   lazy val rutil: ReplUtilities = new ReplUtilities {}
   lazy val phased: Phased = new { val global: intp.global.type = intp.global }
   with Phased {}
 
   def unit(code: String) = newCompilationUnit(code)
-  def trees(code: String) = parse(code) match {
+  def trees(code: String) = parse(code) match
     case parse.Success(trees) => trees; case _ => Nil
-  }
 
   override def toString = s"""
     |** Power mode status **
     |Default phase: ${phased.get}
     |Names: ${intp.unqualifiedIds mkString " "}
   """.stripMargin
-}

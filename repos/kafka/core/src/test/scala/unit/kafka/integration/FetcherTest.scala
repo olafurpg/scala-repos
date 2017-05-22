@@ -28,7 +28,7 @@ import kafka.server._
 import kafka.consumer._
 import kafka.utils.TestUtils
 
-class FetcherTest extends KafkaServerTestHarness {
+class FetcherTest extends KafkaServerTestHarness
   val numNodes = 1
   def generateConfigs() =
     TestUtils
@@ -42,7 +42,7 @@ class FetcherTest extends KafkaServerTestHarness {
   var fetcher: ConsumerFetcherManager = null
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp
     TestUtils.createTopic(
         zkUtils,
@@ -69,16 +69,14 @@ class FetcherTest extends KafkaServerTestHarness {
                                  new AtomicInteger(0),
                                  ""))
     fetcher.startConnections(topicInfos, cluster)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     fetcher.stopConnections()
     super.tearDown
-  }
 
   @Test
-  def testFetcher() {
+  def testFetcher()
     val perNode = 2
     var count = TestUtils.produceMessages(servers, topic, perNode).size
 
@@ -87,17 +85,13 @@ class FetcherTest extends KafkaServerTestHarness {
     count = TestUtils.produceMessages(servers, topic, perNode).size
     fetch(count)
     assertQueueEmpty()
-  }
 
   def assertQueueEmpty(): Unit = assertEquals(0, queue.size)
 
-  def fetch(expected: Int) {
+  def fetch(expected: Int)
     var count = 0
-    while (true) {
+    while (true)
       val chunk = queue.poll(2L, TimeUnit.SECONDS)
       assertNotNull("Timed out waiting for data chunk " + (count + 1), chunk)
       for (message <- chunk.messages) count += 1
       if (count == expected) return
-    }
-  }
-}

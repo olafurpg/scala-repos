@@ -10,14 +10,12 @@ package org.scalajs.core.tools.logging
 
 import scala.math.Ordered
 
-abstract sealed class Level extends Ordered[Level] { x =>
+abstract sealed class Level extends Ordered[Level]  x =>
   protected val order: Int
   def compare(y: Level) = x.order - y.order
-}
 
-object Level {
+object Level
   case object Error extends Level { protected val order = 4 }
   case object Warn extends Level { protected val order = 3 }
   case object Info extends Level { protected val order = 2 }
   case object Debug extends Level { protected val order = 1 }
-}

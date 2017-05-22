@@ -11,7 +11,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import akka.http.scaladsl.model._
 import akka.http.impl.util._
 
-object TestClient extends App {
+object TestClient extends App
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loglevel = DEBUG
@@ -30,14 +30,14 @@ object TestClient extends App {
   //  Console.readLine()
   //  system.terminate()
 
-  def fetchServerVersion1(): Unit = {
+  def fetchServerVersion1(): Unit =
     println(
         s"Fetching HTTPS server version of host `$host` via a direct low-level connection ...")
 
     val connection = Http().outgoingConnectionHttps(host)
     val result =
       Source.single(HttpRequest()).via(connection).runWith(Sink.head)
-    result.map(_.header[headers.Server]) onComplete {
+    result.map(_.header[headers.Server]) onComplete
       case Success(res) ⇒
         println(s"$host is running ${res mkString ", "}")
         println()
@@ -47,25 +47,19 @@ object TestClient extends App {
         println(s"Error: $error")
         println()
         fetchServerVersion2()
-    }
-  }
 
-  def fetchServerVersion2(): Unit = {
+  def fetchServerVersion2(): Unit =
     println(
         s"Fetching HTTP server version of host `$host` via the high-level API ...")
     val result = Http().singleRequest(HttpRequest(uri = s"https://$host/"))
-    result.map(_.header[headers.Server]) onComplete {
+    result.map(_.header[headers.Server]) onComplete
       case Success(res) ⇒
         println(s"$host is running ${res mkString ", "}")
-        Http().shutdownAllConnectionPools().onComplete { _ ⇒
+        Http().shutdownAllConnectionPools().onComplete  _ ⇒
           system.log.info("STOPPED"); shutdown()
-        }
 
       case Failure(error) ⇒
         println(s"Error: $error")
         shutdown()
-    }
-  }
 
   def shutdown(): Unit = system.terminate()
-}

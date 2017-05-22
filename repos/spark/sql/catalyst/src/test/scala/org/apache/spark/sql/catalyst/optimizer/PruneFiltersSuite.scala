@@ -25,9 +25,9 @@ import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
-class PruneFiltersSuite extends PlanTest {
+class PruneFiltersSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
           "Filter Pushdown and Pruning",
@@ -36,11 +36,10 @@ class PruneFiltersSuite extends PlanTest {
           PruneFilters,
           PushPredicateThroughProject,
           PushPredicateThroughJoin) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
-  test("Constraints of isNull + LeftOuter") {
+  test("Constraints of isNull + LeftOuter")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
 
@@ -51,9 +50,8 @@ class PruneFiltersSuite extends PlanTest {
     val correctAnswer = query.analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Constraints of unionall") {
+  test("Constraints of unionall")
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int)
     val tr2 = LocalRelation('d.int, 'e.int, 'f.int)
     val tr3 = LocalRelation('g.int, 'h.int, 'i.int)
@@ -67,9 +65,8 @@ class PruneFiltersSuite extends PlanTest {
     val correctAnswer = query.analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Pruning multiple constraints in the same run") {
+  test("Pruning multiple constraints in the same run")
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
 
@@ -86,9 +83,8 @@ class PruneFiltersSuite extends PlanTest {
     val correctAnswer = query.analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Partial pruning") {
+  test("Partial pruning")
     val tr1 = LocalRelation('a.int, 'b.int, 'c.int).subquery('tr1)
     val tr2 = LocalRelation('a.int, 'd.int, 'e.int).subquery('tr2)
 
@@ -111,9 +107,8 @@ class PruneFiltersSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("No predicate is pruned") {
+  test("No predicate is pruned")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
 
@@ -128,14 +123,11 @@ class PruneFiltersSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Nondeterministic predicate is not pruned") {
+  test("Nondeterministic predicate is not pruned")
     val originalQuery =
       testRelation.where(Rand(10) > 5).select('a).where(Rand(10) > 5).analyze
     val optimized = Optimize.execute(originalQuery)
     val correctAnswer =
       testRelation.where(Rand(10) > 5).where(Rand(10) > 5).select('a).analyze
     comparePlans(optimized, correctAnswer)
-  }
-}

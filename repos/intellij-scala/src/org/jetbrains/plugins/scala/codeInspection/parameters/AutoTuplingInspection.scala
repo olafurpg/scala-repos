@@ -14,24 +14,21 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * Nikolay.Tropin
   * 2014-09-26
   */
-class AutoTuplingInspection extends AbstractInspection("Auto-tupling") {
+class AutoTuplingInspection extends AbstractInspection("Auto-tupling")
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case mc @ ScMethodCall(ref: ScReferenceExpression, _)
         if ref.bind().exists(_.tuplingUsed) =>
       holder.registerProblem(mc.args, message, new MakeTuplesExplicitFix(mc))
-  }
-}
 
-object AutoTuplingInspection {
+object AutoTuplingInspection
   val message = "Scala compiler will replace this argument list with tuple"
-}
 
 class MakeTuplesExplicitFix(invoc: MethodInvocation)
-    extends AbstractFixOnPsiElement(hint, invoc) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement(hint, invoc)
+  override def doApplyFix(project: Project): Unit =
     val mInvoc = getElement
-    mInvoc match {
+    mInvoc match
       case mc: ScMethodCall =>
         val newArgsText = s"(${mc.args.getText})"
         val invokedExprText = mc.getInvokedExpr.getText
@@ -39,10 +36,6 @@ class MakeTuplesExplicitFix(invoc: MethodInvocation)
             s"$invokedExprText$newArgsText", mc.getManager)
         mc.replaceExpression(newCall, removeParenthesis = false)
       case _ =>
-    }
-  }
-}
 
-object MakeTuplesExplicitFix {
+object MakeTuplesExplicitFix
   val hint = "Make tuple explicit"
-}

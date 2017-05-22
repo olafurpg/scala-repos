@@ -26,7 +26,7 @@ import kafka.utils.Logging
 
 import scala.collection.immutable
 
-trait KafkaMetricsGroup extends Logging {
+trait KafkaMetricsGroup extends Logging
 
   /**
     * Creates a new MetricName object for gauges, meters, etc. created for this
@@ -36,19 +36,18 @@ trait KafkaMetricsGroup extends Logging {
     * @return Sanitized metric name object.
     */
   private def metricName(
-      name: String, tags: scala.collection.Map[String, String] = Map.empty) = {
+      name: String, tags: scala.collection.Map[String, String] = Map.empty) =
     val klass = this.getClass
     val pkg = if (klass.getPackage == null) "" else klass.getPackage.getName
     val simpleName = klass.getSimpleName.replaceAll("\\$$", "")
 
     explicitMetricName(pkg, simpleName, name, tags)
-  }
 
   private def explicitMetricName(
       group: String,
       typeName: String,
       name: String,
-      tags: scala.collection.Map[String, String] = Map.empty) = {
+      tags: scala.collection.Map[String, String] = Map.empty) =
     val nameBuilder: StringBuilder = new StringBuilder
 
     nameBuilder.append(group)
@@ -57,21 +56,18 @@ trait KafkaMetricsGroup extends Logging {
 
     nameBuilder.append(typeName)
 
-    if (name.length > 0) {
+    if (name.length > 0)
       nameBuilder.append(",name=")
       nameBuilder.append(name)
-    }
 
     val scope: String = KafkaMetricsGroup.toScope(tags).getOrElse(null)
     val tagsName = KafkaMetricsGroup.toMBeanName(tags)
-    tagsName match {
+    tagsName match
       case Some(tn) =>
         nameBuilder.append(",").append(tn)
       case None =>
-    }
 
     new MetricName(group, typeName, name, scope, nameBuilder.toString())
-  }
 
   def newGauge[T](name: String,
                   metric: Gauge[T],
@@ -102,9 +98,8 @@ trait KafkaMetricsGroup extends Logging {
   def removeMetric(
       name: String, tags: scala.collection.Map[String, String] = Map.empty) =
     Metrics.defaultRegistry().removeMetric(metricName(name, tags))
-}
 
-object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
+object KafkaMetricsGroup extends KafkaMetricsGroup with Logging
 
   /**
     * To make sure all the metrics be de-registered after consumer/producer close, the metric names should be
@@ -191,73 +186,63 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
   )
 
   private def toMBeanName(
-      tags: collection.Map[String, String]): Option[String] = {
-    val filteredTags = tags.filter {
+      tags: collection.Map[String, String]): Option[String] =
+    val filteredTags = tags.filter
       case (tagKey, tagValue) => tagValue != ""
-    }
-    if (filteredTags.nonEmpty) {
-      val tagsString = filteredTags.map {
+    if (filteredTags.nonEmpty)
+      val tagsString = filteredTags.map
         case (key, value) => "%s=%s".format(key, value)
-      }.mkString(",")
+      .mkString(",")
 
       Some(tagsString)
-    } else {
+    else
       None
-    }
-  }
 
-  private def toScope(tags: collection.Map[String, String]): Option[String] = {
-    val filteredTags = tags.filter {
+  private def toScope(tags: collection.Map[String, String]): Option[String] =
+    val filteredTags = tags.filter
       case (tagKey, tagValue) => tagValue != ""
-    }
-    if (filteredTags.nonEmpty) {
+    if (filteredTags.nonEmpty)
       // convert dot to _ since reporters like Graphite typically use dot to represent hierarchy
       val tagsString = filteredTags.toList
         .sortWith((t1, t2) => t1._1 < t2._1)
-        .map {
+        .map
           case (key, value) =>
             "%s.%s".format(key, value.replaceAll("\\.", "_"))
-        }
         .mkString(".")
 
       Some(tagsString)
-    } else {
+    else
       None
-    }
-  }
 
-  def removeAllConsumerMetrics(clientId: String) {
+  def removeAllConsumerMetrics(clientId: String)
     FetchRequestAndResponseStatsRegistry
       .removeConsumerFetchRequestAndResponseStats(clientId)
     ConsumerTopicStatsRegistry.removeConsumerTopicStat(clientId)
     ProducerRequestStatsRegistry.removeProducerRequestStats(clientId)
     removeAllMetricsInList(KafkaMetricsGroup.consumerMetricNameList, clientId)
-  }
 
   @deprecated(
       "This method has been deprecated and will be removed in a future release.",
       "0.10.0.0")
-  def removeAllProducerMetrics(clientId: String) {
+  def removeAllProducerMetrics(clientId: String)
     ProducerRequestStatsRegistry.removeProducerRequestStats(clientId)
     ProducerTopicStatsRegistry.removeProducerTopicStats(clientId)
     ProducerStatsRegistry.removeProducerStats(clientId)
     removeAllMetricsInList(KafkaMetricsGroup.producerMetricNameList, clientId)
-  }
 
   private def removeAllMetricsInList(
-      metricNameList: immutable.List[MetricName], clientId: String) {
+      metricNameList: immutable.List[MetricName], clientId: String)
     metricNameList.foreach(
         metric =>
-          {
         val pattern = (".*clientId=" + clientId + ".*").r
         val registeredMetrics = scala.collection.JavaConversions
           .asScalaSet(Metrics.defaultRegistry().allMetrics().keySet())
-        for (registeredMetric <- registeredMetrics) {
+        for (registeredMetric <- registeredMetrics)
           if (registeredMetric.getGroup == metric.getGroup &&
               registeredMetric.getName == metric.getName &&
-              registeredMetric.getType == metric.getType) {
-            pattern.findFirstIn(registeredMetric.getMBeanName) match {
-              case Some(_) => {
+              registeredMetric.getType == metric.getType)
+            pattern.findFirstIn(registeredMetric.getMBeanName) match
+              case Some(_) =>
                   val beforeRemovalSize =
                     Metrics.defaultRegistry().allMetrics().keySet().size
                   Metrics.defaultRegistry().removeMetric(registeredMetric)
@@ -267,11 +252,5 @@ object KafkaMetricsGroup extends KafkaMetricsGroup with Logging {
                         .format(registeredMetric,
                                 beforeRemovalSize,
                                 afterRemovalSize))
-                }
               case _ =>
-            }
-          }
-        }
-    })
-  }
-}
+    )

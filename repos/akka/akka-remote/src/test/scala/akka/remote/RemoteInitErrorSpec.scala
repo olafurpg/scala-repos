@@ -20,7 +20,7 @@ import scala.util.control.NonFatal
   * the ActorSystem with the use of remoting will intentionally fail.
   */
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RemoteInitErrorSpec extends FlatSpec with Matchers {
+class RemoteInitErrorSpec extends FlatSpec with Matchers
   val conf =
     ConfigFactory.parseString("""
       akka {
@@ -37,26 +37,20 @@ class RemoteInitErrorSpec extends FlatSpec with Matchers {
       }
     """).resolve()
 
-  def currentThreadIds(): Set[Long] = {
+  def currentThreadIds(): Set[Long] =
     val threads = Thread.getAllStackTraces().keySet()
     threads.collect({ case t: Thread if (!t.isDaemon()) ⇒ t.getId() })
-  }
 
-  "Remoting" must "shut down properly on RemoteActorRefProvider initialization failure" in {
+  "Remoting" must "shut down properly on RemoteActorRefProvider initialization failure" in
     val start = currentThreadIds()
-    try {
+    try
       ActorSystem(
           "duplicate",
           ConfigFactory.parseString("akka.loglevel=OFF").withFallback(conf))
       fail("initialization should fail due to invalid IP address")
-    } catch {
-      case NonFatal(e) ⇒ {
-          eventually(timeout(30 seconds), interval(800 milliseconds)) {
+    catch
+      case NonFatal(e) ⇒
+          eventually(timeout(30 seconds), interval(800 milliseconds))
             val current = currentThreadIds()
             // no new threads should remain compared to the start state
             (current diff start) should be(empty)
-          }
-        }
-    }
-  }
-}

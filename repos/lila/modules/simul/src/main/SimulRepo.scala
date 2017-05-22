@@ -11,28 +11,26 @@ import lila.db.Types.Coll
 import lila.game.{Game, GameRepo}
 import lila.user.{User, UserRepo}
 
-private[simul] final class SimulRepo(simulColl: Coll) {
+private[simul] final class SimulRepo(simulColl: Coll)
 
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.bson.Macros
   private implicit val SimulStatusBSONHandler =
-    new BSONHandler[BSONInteger, SimulStatus] {
+    new BSONHandler[BSONInteger, SimulStatus]
       def read(bsonInt: BSONInteger): SimulStatus =
         SimulStatus(bsonInt.value) err s"No such simul status: ${bsonInt.value}"
       def write(x: SimulStatus) = BSONInteger(x.id)
-    }
   private implicit val ChessStatusBSONHandler =
     lila.game.BSONHandlers.StatusBSONHandler
   private implicit val VariantBSONHandler =
-    new BSONHandler[BSONInteger, Variant] {
+    new BSONHandler[BSONInteger, Variant]
       def read(bsonInt: BSONInteger): Variant =
         Variant(bsonInt.value) err s"No such variant: ${bsonInt.value}"
       def write(x: Variant) = BSONInteger(x.id)
-    }
   private implicit val ClockBSONHandler = Macros.handler[SimulClock]
   private implicit val PlayerBSONHandler = Macros.handler[SimulPlayer]
   private implicit val ApplicantBSONHandler = Macros.handler[SimulApplicant]
-  private implicit val SimulPairingBSONHandler = new BSON[SimulPairing] {
+  private implicit val SimulPairingBSONHandler = new BSON[SimulPairing]
     def reads(r: BSON.Reader) =
       SimulPairing(
           player = r.get[SimulPlayer]("player"),
@@ -46,7 +44,6 @@ private[simul] final class SimulRepo(simulColl: Coll) {
                    "status" -> o.status,
                    "wins" -> o.wins,
                    "hostColor" -> o.hostColor.name)
-  }
 
   private implicit val SimulBSONHandler = Macros.handler[Simul]
 
@@ -151,4 +148,3 @@ private[simul] final class SimulRepo(simulColl: Coll) {
   def cleanup =
     simulColl.remove(createdSelect ++ BSONDocument("createdAt" -> BSONDocument(
                 "$lt" -> (DateTime.now minusMinutes 60))))
-}

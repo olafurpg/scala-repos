@@ -1,26 +1,23 @@
 import scala.collection.mutable.Queue
 
-class ExtQueue[T] extends Queue[T] {
-  def printState {
+class ExtQueue[T] extends Queue[T]
+  def printState
     println("-------------------")
     println("Length: " + len)
     println("First: " + first0)
     println("First elem: " + first0.elem)
     println("After first: " + first0.next)
-  }
-}
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testEmpty
     testEnqueue
     testTwoEnqueues
     testFewEnqueues
     testMoreEnqueues
-  }
 
-  def testEmpty {
+  def testEmpty
     val queue = new Queue[Int]
 
     assert(queue.isEmpty)
@@ -35,9 +32,8 @@ object Test {
     assert(queue.length == 0)
     assert(queue.dequeueFirst(_ > 500) == None)
     assert(queue.dequeueAll(_ > 500).isEmpty)
-  }
 
-  def testEnqueue {
+  def testEnqueue
     val queue = new Queue[Int]
 
     queue.enqueue(10)
@@ -72,9 +68,8 @@ object Test {
     val somepd = queue.dequeueFirst(_ >= 1)
     assert(somepd == Some(12))
     assert(queue.isEmpty && queue.length == 0)
-  }
 
-  def testTwoEnqueues {
+  def testTwoEnqueues
     val queue = new ExtQueue[Int]
     queue.enqueue(30)
     queue.enqueue(40)
@@ -91,9 +86,8 @@ object Test {
     assert(all.contains(40))
     assert(queue.size == 0)
     assert(queue.isEmpty)
-  }
 
-  def testFewEnqueues {
+  def testFewEnqueues
     val queue = new ExtQueue[Int]
     queue.enqueue(10)
     queue.enqueue(20)
@@ -160,17 +154,15 @@ object Test {
     assert(queue.head == 80)
     assert(queue.last == 80)
     assert(queue.front == 80)
-  }
 
-  def testMoreEnqueues {
+  def testMoreEnqueues
     val queue = new ExtQueue[Int]
     for (i <- 0 until 10) queue.enqueue(i * 2)
 
-    for (i <- 0 until 10) {
+    for (i <- 0 until 10)
       val top = queue.dequeue
       assert(top == i * 2)
       assert(queue.length == 10 - i - 1)
-    }
     assert(queue.isEmpty)
     assert(queue.length == 0)
 
@@ -283,5 +275,3 @@ object Test {
     assert(queue.last == 97)
     assert(queue.head == 1)
     // well... seems to work
-  }
-}

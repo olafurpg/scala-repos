@@ -3,7 +3,7 @@ package org.scalatra.util
 import java.text.SimpleDateFormat
 import java.util.{Date, Locale, TimeZone}
 
-object DateUtil {
+object DateUtil
 
   @volatile private[this] var _currentTimeMillis: Option[Long] = None
 
@@ -20,9 +20,7 @@ object DateUtil {
   def formatDate(date: Date,
                  format: String,
                  timeZone: TimeZone = TimeZone.getTimeZone("GMT"),
-                 locale: Locale = Locale.ENGLISH): String = {
+                 locale: Locale = Locale.ENGLISH): String =
     val df = new SimpleDateFormat(format, locale)
     df.setTimeZone(timeZone)
     df.format(date)
-  }
-}

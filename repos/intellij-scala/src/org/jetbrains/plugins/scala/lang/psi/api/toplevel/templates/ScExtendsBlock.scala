@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */
-trait ScExtendsBlock extends ScalaPsiElement {
+trait ScExtendsBlock extends ScalaPsiElement
 
   def members: Seq[ScMember]
   def functions: Seq[ScFunction]
@@ -50,16 +50,12 @@ trait ScExtendsBlock extends ScalaPsiElement {
   def isUnderCaseClass: Boolean
 
   def addEarlyDefinitions(): ScEarlyDefinitions
-}
 
-object ScExtendsBlock {
+object ScExtendsBlock
 
-  object EarlyDefinitions {
+  object EarlyDefinitions
     def unapply(block: ScExtendsBlock): Option[ScEarlyDefinitions] =
       block.earlyDefinitions
-  }
-  object TemplateBody {
+  object TemplateBody
     def unapply(block: ScExtendsBlock): Option[ScTemplateBody] =
       block.templateBody
-  }
-}

@@ -31,21 +31,20 @@ import com.mongodb._
 
 class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
     extends Field[JObject, OwnerType] with MandatoryTypedField[JObject]
-    with MongoFieldFlavor[JObject] {
+    with MongoFieldFlavor[JObject]
 
   def owner = rec
 
   def asJValue: JValue = valueBox openOr (JNothing: JValue)
 
-  def setFromJValue(jvalue: JValue): Box[JObject] = jvalue match {
+  def setFromJValue(jvalue: JValue): Box[JObject] = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case jo: JObject => setBox(Full(jo))
     case other => setBox(FieldHelpers.expectedA("JObject", other))
-  }
 
   def defaultValue = JObject(List())
 
-  def setFromAny(in: Any): Box[JObject] = in match {
+  def setFromAny(in: Any): Box[JObject] = in match
     case dbo: DBObject => setBox(setFromDBObject(dbo))
     case jv: JObject => setBox(Full(jv))
     case Some(jv: JObject) => setBox(Full(jv))
@@ -56,22 +55,19 @@ class JObjectField[OwnerType <: BsonRecord[OwnerType]](rec: OwnerType)
     case s: String => setFromString(s)
     case None | Empty | Failure(_, _, _) => setBox(Full(null))
     case o => setFromString(o.toString)
-  }
 
   // assume string is json
-  def setFromString(in: String): Box[JObject] = {
+  def setFromString(in: String): Box[JObject] =
     // use lift-json to parse string into a JObject
     setBox(tryo(JsonParser.parse(in).asInstanceOf[JObject]))
-  }
 
   def toForm: Box[NodeSeq] = Empty
 
   def asDBObject: DBObject =
-    valueBox.map { v =>
+    valueBox.map  v =>
       JObjectParser.parse(v)(owner.meta.formats)
-    }.openOr(new BasicDBObject)
+    .openOr(new BasicDBObject)
 
   def setFromDBObject(obj: DBObject): Box[JObject] =
     Full(
         JObjectParser.serialize(obj)(owner.meta.formats).asInstanceOf[JObject])
-}

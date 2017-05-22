@@ -27,7 +27,7 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 import org.apache.spark.util.Utils
 
-class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
+class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter
 
   val url = "jdbc:h2:mem:testdb2"
   var conn: java.sql.Connection = null
@@ -38,7 +38,7 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
   properties.setProperty("password", "testPass")
   properties.setProperty("rowId", "false")
 
-  before {
+  before
     Utils.classForName("org.h2.Driver")
     conn = DriverManager.getConnection(url)
     conn.prepareStatement("create schema test").executeUpdate()
@@ -74,12 +74,10 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
         |USING org.apache.spark.sql.jdbc
         |OPTIONS (url '$url1', dbtable 'TEST.PEOPLE1', user 'testUser', password 'testPass')
       """.stripMargin.replaceAll("\n", " "))
-  }
 
-  after {
+  after
     conn.close()
     conn1.close()
-  }
 
   private lazy val arr2x2 =
     Array[Row](Row.apply("dave", 42), Row.apply("mary", 222))
@@ -93,7 +91,7 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
     StructType(StructField("name", StringType) :: StructField(
             "id", IntegerType) :: StructField("seq", IntegerType) :: Nil)
 
-  test("Basic CREATE") {
+  test("Basic CREATE")
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x2), schema2)
 
@@ -106,9 +104,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url, "TEST.BASICCREATETEST", new Properties)
           .collect()(0)
           .length)
-  }
 
-  test("CREATE with overwrite") {
+  test("CREATE with overwrite")
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x3), schema3)
     val df2 =
@@ -129,9 +126,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url1, "TEST.DROPTEST", properties)
           .collect()(0)
           .length)
-  }
 
-  test("CREATE then INSERT to append") {
+  test("CREATE then INSERT to append")
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x2), schema2)
     val df2 =
@@ -149,9 +145,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url, "TEST.APPENDTEST", new Properties)
           .collect()(0)
           .length)
-  }
 
-  test("CREATE then INSERT to truncate") {
+  test("CREATE then INSERT to truncate")
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x2), schema2)
     val df2 =
@@ -169,23 +164,20 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url1, "TEST.TRUNCATETEST", properties)
           .collect()(0)
           .length)
-  }
 
-  test("Incompatible INSERT to append") {
+  test("Incompatible INSERT to append")
     val df =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x2), schema2)
     val df2 =
       sqlContext.createDataFrame(sparkContext.parallelize(arr2x3), schema3)
 
     df.write.jdbc(url, "TEST.INCOMPATIBLETEST", new Properties)
-    intercept[org.apache.spark.SparkException] {
+    intercept[org.apache.spark.SparkException]
       df2.write
         .mode(SaveMode.Append)
         .jdbc(url, "TEST.INCOMPATIBLETEST", new Properties)
-    }
-  }
 
-  test("INSERT to JDBC Datasource") {
+  test("INSERT to JDBC Datasource")
     sql("INSERT INTO TABLE PEOPLE1 SELECT * FROM PEOPLE")
     assert(2 === sqlContext.read.jdbc(url1, "TEST.PEOPLE1", properties).count)
     assert(
@@ -193,9 +185,8 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url1, "TEST.PEOPLE1", properties)
           .collect()(0)
           .length)
-  }
 
-  test("INSERT to JDBC Datasource with overwrite") {
+  test("INSERT to JDBC Datasource with overwrite")
     sql("INSERT INTO TABLE PEOPLE1 SELECT * FROM PEOPLE")
     sql("INSERT OVERWRITE TABLE PEOPLE1 SELECT * FROM PEOPLE")
     assert(2 === sqlContext.read.jdbc(url1, "TEST.PEOPLE1", properties).count)
@@ -204,5 +195,3 @@ class JDBCWriteSuite extends SharedSQLContext with BeforeAndAfter {
           .jdbc(url1, "TEST.PEOPLE1", properties)
           .collect()(0)
           .length)
-  }
-}

@@ -1,35 +1,25 @@
-object Macros1 {
-  class C[T] {
+object Macros1
+  class C[T]
     def foo[U](x: U): Unit = macro Impls1.foo[U]
-  }
-}
 
-object Macros2 {
-  class C[T] {
+object Macros2
+  class C[T]
     def foo[U](x: U): Unit = macro Impls2.foo[T, U]
-  }
-}
 
-object Macros3 {
-  class D[T] {
-    class C[U] {
+object Macros3
+  class D[T]
+    class C[U]
       def foo[V]: Unit = macro Impls345.foo[T, U, V]
-    }
-  }
-}
 
 // object Macros4 is declared in Impls_1.scala
 
-object Macros5 {
-  class D[T] {
-    class C[U] {
+object Macros5
+  class D[T]
+    class C[U]
       def foo[V]: Unit = macro Impls345.foo[T, U, V]
       foo[Boolean]
-    }
-  }
-}
 
-object Test extends App {
+object Test extends App
   println("===Macros1===")
   new Macros1.C[Int]().foo(42)
   new Macros1.C[Boolean]().foo(42)
@@ -54,4 +44,3 @@ object Test extends App {
   println("===Macros5===")
   val outer1 = new Macros5.D[Int]
   new outer1.C[String]
-}

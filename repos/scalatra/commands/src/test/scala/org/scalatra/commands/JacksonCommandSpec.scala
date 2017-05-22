@@ -26,7 +26,7 @@ import org.scalatra.test.specs2.MutableScalatraSpec
 //class JacksonCommandSpec extends JsonCommandSpec("Jackson", new JacksonCommandSpecServlet)
 abstract class JsonCommandSpec(
     jsonTestTitle: String, servletUnderTest: => ScalatraServlet)
-    extends MutableScalatraSpec {
+    extends MutableScalatraSpec
 
   val validJson = """{"name":"ihavemorethan5chars","quantity":5}"""
   val validXml =
@@ -35,56 +35,42 @@ abstract class JsonCommandSpec(
   val invalidXml = "<line><name>4cha</name><quantity>2</quantity></line>"
   addServlet(servletUnderTest, "/*")
 
-  (jsonTestTitle + " command support") should {
+  (jsonTestTitle + " command support") should
 
-    "read valid json" in {
+    "read valid json" in
       post("/valid",
            body = validJson,
-           headers = Map("Content-Type" -> "application/json")) {
+           headers = Map("Content-Type" -> "application/json"))
         status must_== 200
         body must_== "ihavemorethan5chars:5"
-      }
-    }
 
-    "read valid params" in {
-      post("/valid", "name" -> "ihavemorethan5chars", "quantity" -> "5") {
+    "read valid params" in
+      post("/valid", "name" -> "ihavemorethan5chars", "quantity" -> "5")
         status must_== 200
         body must_== "ihavemorethan5chars:5"
-      }
-    }
 
-    "read valid xml" in {
+    "read valid xml" in
       post("/valid",
            body = validXml,
-           headers = Map("Content-Type" -> "application/xml")) {
+           headers = Map("Content-Type" -> "application/xml"))
         status must_== 200
         body must_== "ihavemorethan5chars:5"
-      }
-    }
 
-    "read invalid json" in {
+    "read invalid json" in
       post("/invalid",
            body = invalidJson,
-           headers = Map("Content-Type" -> "application/json")) {
+           headers = Map("Content-Type" -> "application/json"))
         status must_== 200
         body must_== "OK"
-      }
-    }
 
-    "read invalid params" in {
-      post("/invalid", "name" -> "4cha", "quantity" -> "2") {
+    "read invalid params" in
+      post("/invalid", "name" -> "4cha", "quantity" -> "2")
         status must_== 200
         body must_== "OK"
-      }
-    }
 
-    "read invalid xml" in {
+    "read invalid xml" in
       post("/invalid",
            body = invalidXml,
-           headers = Map("Content-Type" -> "application/xml")) {
+           headers = Map("Content-Type" -> "application/xml"))
         status must_== 200
         body must_== "OK"
-      }
-    }
-  }
-}

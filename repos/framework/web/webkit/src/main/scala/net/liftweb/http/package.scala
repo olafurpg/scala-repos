@@ -24,7 +24,7 @@ import builtin.comet.AsyncRenderComet
 import http.js.JsCmds.Replace
 import util._
 
-package object http {
+package object http
 
   /**
     * Provides support for binding anything that has a `CanResolveAsync`
@@ -37,23 +37,22 @@ package object http {
       implicit asyncResolveProvider: CanResolveAsync[
           ResolvableType, ResolvedType],
       innerTransform: CanBind[ResolvedType]
-  ) = {
-    new CanBind[ResolvableType] {
-      def apply(resolvable: => ResolvableType)(ns: NodeSeq): Seq[NodeSeq] = {
+  ) =
+    new CanBind[ResolvableType]
+      def apply(resolvable: => ResolvableType)(ns: NodeSeq): Seq[NodeSeq] =
         val placeholderId = Helpers.nextFuncName
         AsyncRenderComet.setupAsync
 
         val concreteResolvable: ResolvableType = resolvable
 
-        S.session.map { session =>
+        S.session.map  session =>
           // Capture context now.
           val deferredRender = session.buildDeferredFunction(
               (resolved: ResolvedType) =>
-                {
               AsyncRenderComet.completeAsyncRender(
                   Replace(placeholderId, innerTransform(resolved)(ns).flatten)
               )
-          })
+          )
 
           // Actually complete the render once the future is fulfilled.
           asyncResolveProvider.resolveAsync(
@@ -61,11 +60,6 @@ package object http {
               resolvedResult => deferredRender(resolvedResult))
 
           <div id={placeholderId}><img src="/images/ajax-loader.gif" alt="Loading..." /></div>
-        } openOr {
+        openOr
           Comment(
               "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
-        }
-      }
-    }
-  }
-}

@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContextExecutor
 
 import scala.concurrent.duration.FiniteDuration
 
-abstract class Materializer {
+abstract class Materializer
 
   /**
     * The `namePrefix` shall be used for deriving the names of processing
@@ -53,12 +53,11 @@ abstract class Materializer {
   def schedulePeriodically(initialDelay: FiniteDuration,
                            interval: FiniteDuration,
                            task: Runnable): Cancellable
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object NoMaterializer extends Materializer {
+private[akka] object NoMaterializer extends Materializer
   override def withNamePrefix(name: String): Materializer =
     throw new UnsupportedOperationException("NoMaterializer cannot be named")
   override def materialize[Mat](runnable: Graph[ClosedShape, Mat]): Mat =
@@ -77,7 +76,6 @@ private[akka] object NoMaterializer extends Materializer {
                            task: Runnable): Cancellable =
     throw new UnsupportedOperationException(
         "NoMaterializer cannot schedule a repeated event")
-}
 
 /**
   * INTERNAL API: this might become public later

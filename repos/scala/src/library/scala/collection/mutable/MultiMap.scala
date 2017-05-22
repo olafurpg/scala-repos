@@ -51,7 +51,7 @@ package mutable
   *  @version 2.8
   *  @since   1
   */
-trait MultiMap[A, B] extends Map[A, Set[B]] {
+trait MultiMap[A, B] extends Map[A, Set[B]]
 
   /** Creates a new set.
     *
@@ -71,17 +71,15 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
     *  @param value  The value to bind to the key.
     *  @return       A reference to this multimap.
     */
-  def addBinding(key: A, value: B): this.type = {
-    get(key) match {
+  def addBinding(key: A, value: B): this.type =
+    get(key) match
       case None =>
         val set = makeSet
         set += value
         this(key) = set
       case Some(set) =>
         set += value
-    }
     this
-  }
 
   /** Removes the binding of `value` to `key` if it exists, otherwise this
     *  operation doesn't have any effect.
@@ -93,15 +91,13 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
     *  @param value   The value to remove.
     *  @return        A reference to this multimap.
     */
-  def removeBinding(key: A, value: B): this.type = {
-    get(key) match {
+  def removeBinding(key: A, value: B): this.type =
+    get(key) match
       case None =>
       case Some(set) =>
         set -= value
         if (set.isEmpty) this -= key
-    }
     this
-  }
 
   /** Checks if there exists a binding to `key` such that it satisfies the predicate `p`.
     *
@@ -109,8 +105,6 @@ trait MultiMap[A, B] extends Map[A, Set[B]] {
     *  @param p     The predicate which a value assigned to the key must satisfy.
     *  @return      A boolean if such a binding exists
     */
-  def entryExists(key: A, p: B => Boolean): Boolean = get(key) match {
+  def entryExists(key: A, p: B => Boolean): Boolean = get(key) match
     case None => false
     case Some(set) => set exists p
-  }
-}

@@ -27,15 +27,12 @@ import org.jetbrains.plugins.scala.lang.psi.types
   */
 case class MacroContext(place: PsiElement, expectedType: Option[ScType])
 
-trait ScalaMacroExpandable {
+trait ScalaMacroExpandable
   def expandMacro(
       macros: ScFunction, context: MacroContext): Option[ScalaPsiElement]
-}
 
-trait ScalaMacroTypeable {
+trait ScalaMacroTypeable
   def checkMacro(macros: ScFunction, context: MacroContext): Option[ScType]
-}
 
-object ScalaMacroDummyTypeable extends ScalaMacroTypeable {
+object ScalaMacroDummyTypeable extends ScalaMacroTypeable
   def checkMacro(macros: ScFunction, context: MacroContext) = Some(types.Any)
-}

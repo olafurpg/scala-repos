@@ -29,16 +29,15 @@ import org.apache.spark.annotation.DeveloperApi
 class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
                                    _recordsWritten: Accumulator[Long],
                                    _writeTime: Accumulator[Long])
-    extends Serializable {
+    extends Serializable
 
-  private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
+  private[executor] def this(accumMap: Map[String, Accumulator[_]])
     this(TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.shuffleWrite.BYTES_WRITTEN),
          TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.shuffleWrite.RECORDS_WRITTEN),
          TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.shuffleWrite.WRITE_TIME))
-  }
 
   /**
     * Create a new [[ShuffleWriteMetrics]] that is not associated with any particular task.
@@ -49,15 +48,13 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
     *
     * A better alternative is [[TaskMetrics.registerShuffleWriteMetrics]].
     */
-  private[spark] def this() {
+  private[spark] def this()
     this(
         InternalAccumulator
           .createShuffleWriteAccums()
-          .map { a =>
+          .map  a =>
         (a.name.get, a)
-      }
           .toMap)
-  }
 
   /**
     * Number of bytes written for the shuffle by this task.
@@ -77,12 +74,10 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
   private[spark] def incBytesWritten(v: Long): Unit = _bytesWritten.add(v)
   private[spark] def incRecordsWritten(v: Long): Unit = _recordsWritten.add(v)
   private[spark] def incWriteTime(v: Long): Unit = _writeTime.add(v)
-  private[spark] def decBytesWritten(v: Long): Unit = {
+  private[spark] def decBytesWritten(v: Long): Unit =
     _bytesWritten.setValue(bytesWritten - v)
-  }
-  private[spark] def decRecordsWritten(v: Long): Unit = {
+  private[spark] def decRecordsWritten(v: Long): Unit =
     _recordsWritten.setValue(recordsWritten - v)
-  }
 
   // Legacy methods for backward compatibility.
   // TODO: remove these once we make this class private.
@@ -92,4 +87,3 @@ class ShuffleWriteMetrics private (_bytesWritten: Accumulator[Long],
   def shuffleWriteTime: Long = writeTime
   @deprecated("use recordsWritten instead", "2.0.0")
   def shuffleRecordsWritten: Long = recordsWritten
-}

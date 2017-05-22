@@ -22,76 +22,64 @@ import scala.util.{Failure, Success, Try}
 
 class Serialization2[A, B](
     val serA: Serialization[A], val serB: Serialization[B])
-    extends Serialization[(A, B)] {
-  override def hash(x: (A, B)) = {
+    extends Serialization[(A, B)]
+  override def hash(x: (A, B)) =
     import MurmurHashUtils._
     val h1 = mixH1(seed, serA.hash(x._1))
     val h2 = mixH1(h1, serB.hash(x._2))
     fmix(h2, 2)
-  }
   override def equiv(x: (A, B), y: (A, B)): Boolean =
     serA.equiv(x._1, y._1) && serB.equiv(x._2, y._2)
 
-  override def read(in: InputStream): Try[(A, B)] = {
+  override def read(in: InputStream): Try[(A, B)] =
     val a = serA.read(in)
     val b = serB.read(in)
-    (a, b) match {
+    (a, b) match
       case (Success(a), Success(b)) => Success((a, b))
       case (Failure(e), _) => Failure(e)
       case (_, Failure(e)) => Failure(e)
-    }
-  }
 
-  override def write(out: OutputStream, a: (A, B)): Try[Unit] = {
+  override def write(out: OutputStream, a: (A, B)): Try[Unit] =
     val resA = serA.write(out, a._1)
     if (resA.isSuccess) serB.write(out, a._2)
     else resA
-  }
 
-  override val staticSize = for {
+  override val staticSize = for
     a <- serA.staticSize
     b <- serB.staticSize
-  } yield a + b
+  yield a + b
 
   override def dynamicSize(t: (A, B)) =
     if (staticSize.isDefined) staticSize
     else
-      for {
+      for
         a <- serA.dynamicSize(t._1)
         b <- serB.dynamicSize(t._2)
-      } yield a + b
-}
+      yield a + b
 
-object OrderedSerialization2 {
+object OrderedSerialization2
   def maybeOrderedSerialization2[A, B](
-      implicit ordA: Ordering[A], ordB: Ordering[B]): Ordering[(A, B)] = {
-    (ordA, ordB) match {
+      implicit ordA: Ordering[A], ordB: Ordering[B]): Ordering[(A, B)] =
+    (ordA, ordB) match
       case (ordA: OrderedSerialization[_], ordB: OrderedSerialization[_]) =>
         new OrderedSerialization2(ordA.asInstanceOf[OrderedSerialization[A]],
                                   ordB.asInstanceOf[OrderedSerialization[B]])
       case _ => Ordering.Tuple2(ordA, ordB)
-    }
-  }
-}
 
 class OrderedSerialization2[A, B](
     val ordA: OrderedSerialization[A], val ordB: OrderedSerialization[B])
     extends Serialization2[A, B](ordA, ordB)
-    with OrderedSerialization[(A, B)] {
-  override def compare(x: (A, B), y: (A, B)) = {
+    with OrderedSerialization[(A, B)]
+  override def compare(x: (A, B), y: (A, B)) =
     val ca = ordA.compare(x._1, y._1)
     if (ca != 0) ca
     else ordB.compare(x._2, y._2)
-  }
-  override def compareBinary(a: InputStream, b: InputStream) = {
+  override def compareBinary(a: InputStream, b: InputStream) =
     // This mutates the buffers and advances them. Only keep reading if they are different
     val cA = ordA.compareBinary(a, b)
     // we have to read the second ones to skip
     val cB = ordB.compareBinary(a, b)
-    cA match {
+    cA match
       case OrderedSerialization.Equal => cB
       case f @ OrderedSerialization.CompareFailure(_) => f
       case _ => cA // the first is not equal
-    }
-  }
-}

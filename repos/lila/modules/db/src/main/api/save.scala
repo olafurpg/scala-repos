@@ -4,7 +4,7 @@ package api
 import play.api.libs.json._
 import Types._
 
-object $save {
+object $save
   import play.modules.reactivemongo.json._
 
   def apply[ID : Writes, A <: Identified[ID]: JsTubeInColl](doc: A): Funit =
@@ -20,4 +20,3 @@ object $save {
             doc + ("_id" -> Json.toJson(id)),
             upsert = true,
             multi = false)
-}

@@ -23,13 +23,11 @@ import com.twitter.bijection.Injection
   * Source used to write some type T into an LZO-compressed SequenceFile using a
   * codec on T for serialization.
   */
-object LzoCodecSource {
+object LzoCodecSource
   def apply[T](
       paths: String*)(implicit passedInjection: Injection[T, Array[Byte]]) =
-    new LzoCodec[T] {
+    new LzoCodec[T]
       val hdfsPaths = paths
       val localPaths = paths
       val boxed = Externalizer(passedInjection)
       override def injection = boxed.get
-    }
-}

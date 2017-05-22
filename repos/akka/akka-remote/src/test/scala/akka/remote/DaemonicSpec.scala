@@ -12,7 +12,7 @@ import java.net.InetSocketAddress
 import scala.collection.JavaConverters._
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class DaemonicSpec extends AkkaSpec {
+class DaemonicSpec extends AkkaSpec
 
   def addr(sys: ActorSystem, proto: String) =
     sys
@@ -21,17 +21,16 @@ class DaemonicSpec extends AkkaSpec {
       .getExternalAddressFor(Address(s"akka.$proto", "", "", 0))
       .get
 
-  def unusedPort = {
+  def unusedPort =
     val ss = ServerSocketChannel.open().socket()
     ss.bind(new InetSocketAddress("localhost", 0))
     val port = ss.getLocalPort
     ss.close()
     port
-  }
 
-  "Remoting configured with daemonic = on" must {
+  "Remoting configured with daemonic = on" must
 
-    "shut down correctly after getting connection refused" in {
+    "shut down correctly after getting connection refused" in
       // get all threads running before actor system i started
       val origThreads: Set[Thread] =
         Thread.getAllStackTraces().keySet().asScala.to[Set]
@@ -64,6 +63,3 @@ class DaemonicSpec extends AkkaSpec {
 
       newNonDaemons should ===(Set.empty[Thread])
       shutdown(daemonicSystem)
-    }
-  }
-}

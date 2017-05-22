@@ -16,8 +16,8 @@ import org.scalatest.{BeforeAndAfterAll, WordSpec}
 import org.scalatest.Matchers
 import akka.testkit._
 
-class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
-  "schedule a one-off task" in {
+class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO"))
+  "schedule a one-off task" in
     //#schedule-one-off-message
     //Use the system's dispatcher as ExecutionContext
     import system.dispatcher
@@ -30,21 +30,17 @@ class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
 
     //#schedule-one-off-thunk
     //Schedules a function to be executed (send a message to the testActor) after 50ms
-    system.scheduler.scheduleOnce(50 milliseconds) {
+    system.scheduler.scheduleOnce(50 milliseconds)
       testActor ! System.currentTimeMillis
-    }
     //#schedule-one-off-thunk
-  }
 
-  "schedule a recurring task" in {
-    new AnyRef {
+  "schedule a recurring task" in
+    new AnyRef
       //#schedule-recurring
       val Tick = "tick"
-      class TickActor extends Actor {
-        def receive = {
+      class TickActor extends Actor
+        def receive =
           case Tick => //Do something
-        }
-      }
       val tickActor = system.actorOf(Props(classOf[TickActor], this))
       //Use system's dispatcher as ExecutionContext
       import system.dispatcher
@@ -58,6 +54,3 @@ class SchedulerDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
       cancellable.cancel()
       //#schedule-recurring
       system.stop(tickActor)
-    }
-  }
-}

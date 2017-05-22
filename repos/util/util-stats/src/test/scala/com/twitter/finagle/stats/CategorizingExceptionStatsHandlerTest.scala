@@ -5,10 +5,10 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class CategorizingExceptionStatsHandlerTest extends FunSuite {
+class CategorizingExceptionStatsHandlerTest extends FunSuite
   val categorizer = (t: Throwable) => { "clienterrors" }
 
-  test("uses category, source, exception chains and rollup") {
+  test("uses category, source, exception chains and rollup")
     val receiver = new InMemoryStatsReceiver
 
     val esh = new CategorizingExceptionStatsHandler(
@@ -54,9 +54,8 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
             "sourcedfailures/service/java.lang.RuntimeException",
             "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
 
-  test("skips unknown source and defaults to failures") {
+  test("skips unknown source and defaults to failures")
     val receiver = new InMemoryStatsReceiver
 
     val esh = new CategorizingExceptionStatsHandler(_ => None, _ => None, true)
@@ -75,9 +74,8 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
             "failures/java.lang.RuntimeException",
             "failures/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
 
-  test("supports no rollup") {
+  test("supports no rollup")
     val receiver = new InMemoryStatsReceiver
 
     val esh = new CategorizingExceptionStatsHandler(
@@ -113,5 +111,3 @@ class CategorizingExceptionStatsHandlerTest extends FunSuite {
             "sourcedfailures/service",
             "sourcedfailures/service/java.lang.RuntimeException/java.lang.Exception"
         ))
-  }
-}

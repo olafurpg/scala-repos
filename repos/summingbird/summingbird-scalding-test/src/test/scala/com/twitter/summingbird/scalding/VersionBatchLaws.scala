@@ -48,26 +48,23 @@ import org.apache.hadoop.mapred.OutputCollector
 
 import org.scalatest.WordSpec
 
-object VersionBatchLaws extends Properties("VersionBatchLaws") {
-  property("version -> BatchID -> version") = forAll { (l: Long) =>
-    (l == Long.MinValue) || {
+object VersionBatchLaws extends Properties("VersionBatchLaws")
+  property("version -> BatchID -> version") = forAll  (l: Long) =>
+    (l == Long.MinValue) ||
       // This law is only true for numbers greater than MinValue
       val vbs =
         new store.VersionedBatchStore[Int, Int, Array[Byte], Array[Byte]](
             null, 0, Batcher.ofHours(1))(null)(null)
       val b = vbs.versionToBatchID(l)
       vbs.batchIDToVersion(b) <= l
-    }
-  }
-  property("BatchID -> version -> BatchID") = forAll { (bint: Int) =>
+  property("BatchID -> version -> BatchID") = forAll  (bint: Int) =>
     val b = BatchID(bint)
     val vbs =
       new store.VersionedBatchStore[Int, Int, Array[Byte], Array[Byte]](
           null, 0, Batcher.ofHours(1))(null)(null)
     val v = vbs.batchIDToVersion(b)
     vbs.versionToBatchID(v) == b
-  }
-  property("version is an upperbound on time") = forAll { (lBig: Long) =>
+  property("version is an upperbound on time") = forAll  (lBig: Long) =>
     val l = lBig / 1000L
     val batcher = Batcher.ofHours(1)
     val vbs =
@@ -77,5 +74,3 @@ object VersionBatchLaws extends Properties("VersionBatchLaws") {
     (batcher.earliestTimeOf(b.next).milliSinceEpoch <= l) &&
     (batcher.earliestTimeOf(b).milliSinceEpoch < l)
     (batcher.earliestTimeOf(b.next.next).milliSinceEpoch > l)
-  }
-}

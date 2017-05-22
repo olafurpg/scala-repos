@@ -3,7 +3,7 @@ package mesosphere.marathon.plugin.http
 /**
   * Abstraction for HTTP Response.
   */
-trait HttpResponse {
+trait HttpResponse
 
   /**
     * Set header to a specific value
@@ -39,4 +39,3 @@ trait HttpResponse {
     * @param bytes the body as byte array.
     */
   def body(mediaType: String, bytes: Array[Byte])
-}

@@ -6,7 +6,7 @@
 package scala.tools.nsc
 package interpreter
 
-object Results {
+object Results
 
   /** A result from the Interpreter interpreting one line of input. */
   abstract sealed class Result
@@ -20,4 +20,3 @@ object Results {
   /** The input was incomplete.  The caller should request more input.
     */
   case object Incomplete extends Result
-}

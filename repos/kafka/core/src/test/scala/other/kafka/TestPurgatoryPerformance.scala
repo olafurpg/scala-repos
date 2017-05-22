@@ -31,9 +31,9 @@ import scala.collection.JavaConversions._
 /**
   * This is a benchmark test of the purgatory.
   */
-object TestPurgatoryPerformance {
+object TestPurgatoryPerformance
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val parser = new OptionParser
     val keySpaceSizeOpt = parser
       .accepts("key-space-size", "The total number of possible keys")
@@ -128,10 +128,10 @@ object TestPurgatoryPerformance {
         i => "fakeKey%d".format(rand.nextInt(numPossibleKeys)))
     @volatile var requestArrivalTime = start
     @volatile var end = 0L
-    val generator = new Runnable {
-      def run(): Unit = {
+    val generator = new Runnable
+      def run(): Unit =
         var i = numRequests
-        while (i > 0) {
+        while (i > 0)
           i -= 1
           val requestArrivalInterval = intervalSamples.next()
           val latencyToComplete = latencySamples.next()
@@ -144,10 +144,7 @@ object TestPurgatoryPerformance {
               timeout, requestDataSize, latencyToComplete, latch)
           if (latencyToComplete < timeout) queue.add(request)
           purgatory.tryCompleteElseWatch(request, keys)
-        }
         end = System.currentTimeMillis
-      }
-    }
     val generatorThread = new Thread(generator)
 
     generatorThread.start()
@@ -156,7 +153,7 @@ object TestPurgatoryPerformance {
     val done = System.currentTimeMillis
     queue.shutdown()
 
-    if (verbose) {
+    if (verbose)
       latencySamples.printStats()
       intervalSamples.printStats()
       println("# enqueue rate (%d requests):".format(numRequests))
@@ -165,7 +162,6 @@ object TestPurgatoryPerformance {
       println(
           "# <elapsed time ms>\t<target rate>\t<actual rate>\t<process cpu time ms>\t%s\t%s"
             .format(gcCountHeader, gcTimeHeader))
-    }
 
     val targetRate =
       numRequests.toDouble * 1000d / (requestArrivalTime - start).toDouble
@@ -185,161 +181,134 @@ object TestPurgatoryPerformance {
                                         gcTimes.mkString(" ")))
 
     purgatory.shutdown()
-  }
 
   // Use JRE-specific class to get process CPU time
-  private def getProcessCpuTimeNanos(osMXBean: OperatingSystemMXBean) = {
-    try {
+  private def getProcessCpuTimeNanos(osMXBean: OperatingSystemMXBean) =
+    try
       Some(
           Class
             .forName("com.sun.management.OperatingSystemMXBean")
             .getMethod("getProcessCpuTime")
             .invoke(osMXBean)
             .asInstanceOf[Long])
-    } catch {
+    catch
       case _: Throwable =>
-        try {
+        try
           Some(
               Class
                 .forName("com.ibm.lang.management.OperatingSystemMXBean")
                 .getMethod("getProcessCpuTimeByNS")
                 .invoke(osMXBean)
                 .asInstanceOf[Long])
-        } catch {
+        catch
           case _: Throwable => None
-        }
-    }
-  }
 
   // log-normal distribution (http://en.wikipedia.org/wiki/Log-normal_distribution)
   //   mu: the mean of the underlying normal distribution (not the mean of this log-normal distribution)
   //   sigma: the standard deviation of the underlying normal distribution (not the stdev of this log-normal distribution)
-  private class LogNormalDistribution(mu: Double, sigma: Double) {
+  private class LogNormalDistribution(mu: Double, sigma: Double)
     val rand = new Random
-    def next(): Double = {
+    def next(): Double =
       val n = rand.nextGaussian() * sigma + mu
       math.exp(n)
-    }
-  }
 
   // exponential distribution (http://en.wikipedia.org/wiki/Exponential_distribution)
   //  lambda : the rate parameter of the exponential distribution
-  private class ExponentialDistribution(lambda: Double) {
+  private class ExponentialDistribution(lambda: Double)
     val rand = new Random
-    def next(): Double = {
+    def next(): Double =
       math.log(1d - rand.nextDouble()) / (-lambda)
-    }
-  }
 
   // Samples of Latencies to completion
   // They are drawn from a log normal distribution.
   // A latency value can never be negative. A log-normal distribution is a convenient way to
   // model such a random variable.
-  private class LatencySamples(sampleSize: Int, pct75: Double, pct50: Double) {
+  private class LatencySamples(sampleSize: Int, pct75: Double, pct50: Double)
     private[this] val rand = new Random
-    private[this] val samples = {
+    private[this] val samples =
       val normalMean = math.log(pct50)
       val normalStDev =
         (math.log(pct75) -
             normalMean) / 0.674490d // 0.674490 is 75th percentile point in N(0,1)
       val dist = new LogNormalDistribution(normalMean, normalStDev)
-      (0 until sampleSize).map { _ =>
+      (0 until sampleSize).map  _ =>
         dist.next().toLong
-      }.toArray
-    }
+      .toArray
     def next() = samples(rand.nextInt(sampleSize))
 
-    def printStats(): Unit = {
+    def printStats(): Unit =
       val p75 = samples.sorted.apply((sampleSize.toDouble * 0.75d).toInt)
       val p50 = samples.sorted.apply((sampleSize.toDouble * 0.5d).toInt)
 
       println(
           "# latency samples: pct75 = %d, pct50 = %d, min = %d, max = %d"
             .format(p75, p50, samples.min, samples.max))
-    }
-  }
 
   // Samples of Request arrival intervals
   // The request arrival is modeled as a Poisson process.
   // So, the internals are drawn from an exponential distribution.
-  private class IntervalSamples(sampleSize: Int, requestPerSecond: Double) {
+  private class IntervalSamples(sampleSize: Int, requestPerSecond: Double)
     private[this] val rand = new Random
-    private[this] val samples = {
+    private[this] val samples =
       val dist = new ExponentialDistribution(requestPerSecond / 1000d)
       var residue = 0.0
-      (0 until sampleSize).map { _ =>
+      (0 until sampleSize).map  _ =>
         val interval = dist.next() + residue
         val roundedInterval = interval.toLong
         residue = interval - roundedInterval.toDouble
         roundedInterval
-      }.toArray
-    }
+      .toArray
 
     def next() = samples(rand.nextInt(sampleSize))
 
-    def printStats(): Unit = {
+    def printStats(): Unit =
       println(
           "# interval samples: rate = %f, min = %d, max = %d".format(
               1000d / (samples.map(_.toDouble).sum / sampleSize.toDouble),
               samples.min,
               samples.max)
       )
-    }
-  }
 
   private class FakeOperation(
       delayMs: Long, size: Int, val latencyMs: Long, latch: CountDownLatch)
-      extends DelayedOperation(delayMs) {
+      extends DelayedOperation(delayMs)
     private[this] val data = new Array[Byte](size)
     val completesAt = System.currentTimeMillis + latencyMs
 
     def onExpiration(): Unit = {}
 
-    def onComplete(): Unit = {
+    def onComplete(): Unit =
       latch.countDown()
-    }
 
-    def tryComplete(): Boolean = {
+    def tryComplete(): Boolean =
       if (System.currentTimeMillis >= completesAt) forceComplete()
       else false
-    }
-  }
 
-  private class CompletionQueue {
+  private class CompletionQueue
     private[this] val delayQueue = new DelayQueue[Scheduled]()
     private[this] val thread = new ShutdownableThread(
-        name = "completion thread", isInterruptible = false) {
-      override def doWork(): Unit = {
+        name = "completion thread", isInterruptible = false)
+      override def doWork(): Unit =
         val scheduled = delayQueue.poll(100, TimeUnit.MILLISECONDS)
-        if (scheduled != null) {
+        if (scheduled != null)
           scheduled.operation.forceComplete()
-        }
-      }
-    }
     thread.start()
 
-    def add(operation: FakeOperation): Unit = {
+    def add(operation: FakeOperation): Unit =
       delayQueue.offer(new Scheduled(operation))
-    }
 
-    def shutdown() = {
+    def shutdown() =
       thread.shutdown()
-    }
 
-    private class Scheduled(val operation: FakeOperation) extends Delayed {
-      def getDelay(unit: TimeUnit): Long = {
+    private class Scheduled(val operation: FakeOperation) extends Delayed
+      def getDelay(unit: TimeUnit): Long =
         unit.convert(max(operation.completesAt - SystemTime.milliseconds, 0),
                      TimeUnit.MILLISECONDS)
-      }
 
-      def compareTo(d: Delayed): Int = {
+      def compareTo(d: Delayed): Int =
 
         val other = d.asInstanceOf[Scheduled]
 
         if (operation.completesAt < other.operation.completesAt) -1
         else if (operation.completesAt > other.operation.completesAt) 1
         else 0
-      }
-    }
-  }
-}

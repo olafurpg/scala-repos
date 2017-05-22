@@ -3,7 +3,7 @@ package gitbucket.core.model
 import scala.slick.lifted.MappedTo
 import scala.slick.jdbc._
 
-trait CommitStatusComponent extends TemplateComponent { self: Profile =>
+trait CommitStatusComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
@@ -12,7 +12,7 @@ trait CommitStatusComponent extends TemplateComponent { self: Profile =>
 
   lazy val CommitStatuses = TableQuery[CommitStatuses]
   class CommitStatuses(tag: Tag)
-      extends Table[CommitStatus](tag, "COMMIT_STATUS") with CommitTemplate {
+      extends Table[CommitStatus](tag, "COMMIT_STATUS") with CommitTemplate
     val commitStatusId = column[Int]("COMMIT_STATUS_ID", O AutoInc)
     val context = column[String]("CONTEXT")
     val state = column[CommitState]("STATE")
@@ -34,8 +34,6 @@ trait CommitStatusComponent extends TemplateComponent { self: Profile =>
        registeredDate,
        updatedDate) <> ((CommitStatus.apply _).tupled, CommitStatus.unapply)
     def byPrimaryKey(id: Int) = commitStatusId === id.bind
-  }
-}
 
 case class CommitStatus(
     commitStatusId: Int = 0,
@@ -50,7 +48,7 @@ case class CommitStatus(
     registeredDate: java.util.Date,
     updatedDate: java.util.Date
 )
-object CommitStatus {
+object CommitStatus
   def pending(owner: String, repository: String, context: String) =
     CommitStatus(commitStatusId = 0,
                  userName = owner,
@@ -63,11 +61,10 @@ object CommitStatus {
                  creator = "",
                  registeredDate = new java.util.Date(),
                  updatedDate = new java.util.Date())
-}
 
 sealed abstract class CommitState(val name: String)
 
-object CommitState {
+object CommitState
   object ERROR extends CommitState("error")
 
   object FAILURE extends CommitState("failure")
@@ -90,21 +87,18 @@ object CommitState {
     * pending if there are no statuses or a context is pending
     * success if the latest status for all contexts is success
     */
-  def combine(statuses: Set[CommitState]): CommitState = {
-    if (statuses.isEmpty) {
+  def combine(statuses: Set[CommitState]): CommitState =
+    if (statuses.isEmpty)
       PENDING
-    } else if (statuses.contains(CommitState.ERROR) ||
-               statuses.contains(CommitState.FAILURE)) {
+    else if (statuses.contains(CommitState.ERROR) ||
+               statuses.contains(CommitState.FAILURE))
       FAILURE
-    } else if (statuses.contains(CommitState.PENDING)) {
+    else if (statuses.contains(CommitState.PENDING))
       PENDING
-    } else {
+    else
       SUCCESS
-    }
-  }
 
   implicit val getResult: GetResult[CommitState] = GetResult(
       r => CommitState(r.<<))
   implicit val getResultOpt: GetResult[Option[CommitState]] = GetResult(
       r => r.<<?[String].map(CommitState(_)))
-}

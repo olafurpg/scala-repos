@@ -23,7 +23,7 @@ import com.github.fommil.netlib.BLAS.{getInstance => NativeBLAS}
 /**
   * In-place DGEMM and DGEMV for Breeze
   */
-private[ann] object BreezeUtil {
+private[ann] object BreezeUtil
 
   // TODO: switch to MLlib BLAS interface
   private def transposeString(a: BDM[Double]): String =
@@ -41,7 +41,7 @@ private[ann] object BreezeUtil {
             a: BDM[Double],
             b: BDM[Double],
             beta: Double,
-            c: BDM[Double]): Unit = {
+            c: BDM[Double]): Unit =
     // TODO: add code if matrices isTranspose!!!
     require(a.cols == b.rows, "A & B Dimension mismatch!")
     require(a.rows == c.rows, "A & C Dimension mismatch!")
@@ -62,7 +62,6 @@ private[ann] object BreezeUtil {
                      c.data,
                      c.offset,
                      c.rows)
-  }
 
   /**
     * DGEMV: y := alpha * A * x + beta * y
@@ -76,7 +75,7 @@ private[ann] object BreezeUtil {
             a: BDM[Double],
             x: BDV[Double],
             beta: Double,
-            y: BDV[Double]): Unit = {
+            y: BDV[Double]): Unit =
     require(a.cols == x.length, "A & b Dimension mismatch!")
     NativeBLAS.dgemv(transposeString(a),
                      a.rows,
@@ -92,5 +91,3 @@ private[ann] object BreezeUtil {
                      y.data,
                      y.offset,
                      y.stride)
-  }
-}

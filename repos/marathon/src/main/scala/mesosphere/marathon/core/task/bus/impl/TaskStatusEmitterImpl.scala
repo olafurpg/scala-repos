@@ -6,11 +6,9 @@ import org.slf4j.LoggerFactory
 
 private[bus] class TaskStatusEmitterImpl(
     internalTaskStatusEventStream: InternalTaskStatusEventStream)
-    extends TaskStatusEmitter {
+    extends TaskStatusEmitter
   private[this] val log = LoggerFactory.getLogger(getClass)
 
-  override def publish(status: TaskStatusUpdate): Unit = {
+  override def publish(status: TaskStatusUpdate): Unit =
     log.debug("publishing update {}", status)
     internalTaskStatusEventStream.publish(status)
-  }
-}

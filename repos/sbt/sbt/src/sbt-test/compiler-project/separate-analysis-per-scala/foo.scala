@@ -1,5 +1,4 @@
 package foo
 
-object Foo extends App {
+object Foo extends App
   println("yay")
-}

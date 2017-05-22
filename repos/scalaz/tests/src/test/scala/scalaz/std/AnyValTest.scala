@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import Tags._
 
-object AnyValTest extends SpecLite {
+object AnyValTest extends SpecLite
 
   checkAll("Unit", order.laws[Unit])
   checkAll(
@@ -31,10 +31,8 @@ object AnyValTest extends SpecLite {
 
   checkAll("Boolean @@ Conjunction", monoid.laws[Boolean @@ Conjunction])
 
-  {
     implicit val B = std.anyVal.booleanInstance.conjunction
     checkAll("Boolean", monoid.laws[Boolean])
-  }
 
   checkAll("Short @@ Multiplication", monoid.laws[Short @@ Multiplication])
   checkAll("Byte", monoid.laws[Byte])
@@ -58,4 +56,3 @@ object AnyValTest extends SpecLite {
   checkAll("Byte @@ Multiplication", enum.laws[Byte @@ Multiplication])
   checkAll("Long @@ Multiplication", enum.laws[Long @@ Multiplication])
   checkAll("Short @@ Multiplication", enum.laws[Short @@ Multiplication])
-}

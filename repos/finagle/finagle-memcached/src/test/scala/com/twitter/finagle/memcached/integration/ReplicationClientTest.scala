@@ -20,7 +20,7 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 
 @RunWith(classOf[JUnitRunner])
-class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
+class ReplicationClientTest extends FunSuite with BeforeAndAfterEach
 
   /**
     * Note: This integration test requires a real Memcached server to run.
@@ -34,7 +34,7 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
   var zookeeperServer: ZooKeeperTestServer = null
   var zookeeperClient: ZooKeeperClient = null
 
-  override def beforeEach() {
+  override def beforeEach()
     // start zookeeper server and create zookeeper client
     shutdownRegistry = new ShutdownRegistryImpl
     zookeeperServer = new ZooKeeperTestServer(0, shutdownRegistry)
@@ -49,27 +49,23 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
         ServerSets.create(zookeeperClient,
                           ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
                           firstPoolPath))
-    (0 to 1) foreach { _ =>
-      TestMemcachedServer.start() match {
+    (0 to 1) foreach  _ =>
+      TestMemcachedServer.start() match
         case Some(server) =>
           firstTestServerPool :+= server
           firstPoolCluster.join(server.address)
         case None => fail("Cannot start memcached.")
-      }
-    }
 
     val secondPoolCluster = new ZookeeperServerSetCluster(
         ServerSets.create(zookeeperClient,
                           ZooKeeperUtils.EVERYONE_READ_CREATOR_ALL,
                           secondPoolPath))
-    (0 to 1) foreach { _ =>
-      TestMemcachedServer.start() match {
+    (0 to 1) foreach  _ =>
+      TestMemcachedServer.start() match
         case Some(server) =>
           secondTestServerPool :+= server
           secondPoolCluster.join(server.address)
         case None => fail("Cannot start memcached.")
-      }
-    }
 
     // set cache pool config node data
     val cachePoolConfig: CachePoolConfig = new CachePoolConfig(
@@ -82,9 +78,8 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
     // a separate client which only does zk discovery for integration test
     zookeeperClient = zookeeperServer.createClient(
         ZooKeeperClient.digestCredentials("user", "pass"))
-  }
 
-  override def afterEach() {
+  override def afterEach()
     // shutdown zookeeper server and client
     shutdownRegistry.execute()
 
@@ -93,10 +88,9 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
     secondTestServerPool foreach { _.stop() }
     firstTestServerPool = List()
     secondTestServerPool = List()
-  }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client set & getOne") {
+    test("base replication client set & getOne")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -141,10 +135,10 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match {
+          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match
         case InconsistentReplication(Seq(Throw(_), Return(()))) => true
         case _ => false
-      })
+      )
       assert(Await.result(replicatedClient.getOne("foo")) == Some(
               Buf.Utf8("baz")))
 
@@ -152,17 +146,15 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match {
+          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-      intercept[WriteException] {
+      )
+      intercept[WriteException]
         Await.result(replicatedClient.getOne("foo"))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client set & getAll") {
+    test("base replication client set & getAll")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -210,34 +202,33 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match {
+          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match
         case InconsistentReplication(Seq(Throw(_), Return(()))) => true
         case _ => false
-      })
+      )
       assert(
-          Await.result(replicatedClient.getAll("foo")) match {
+          Await.result(replicatedClient.getAll("foo")) match
         case InconsistentReplication(Seq(Throw(_), Return(Some(v)))) =>
           v equals Buf.Utf8("baz")
         case _ => false
-      })
+      )
 
       // all failed
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match {
+          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
+      )
       assert(
-          Await.result(replicatedClient.getAll("foo")) match {
+          Await.result(replicatedClient.getAll("foo")) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-    }
+      )
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client delete") {
+    test("base replication client delete")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -283,36 +274,35 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       assert(
           Await.result(client2.add("client2-only", Buf.Utf8("bar"))) == true)
       assert(
-          Await.result(replicatedClient.delete("client2-only")) match {
+          Await.result(replicatedClient.delete("client2-only")) match
         case InconsistentReplication(
             Seq(Return(JBoolean.FALSE), Return(JBoolean.TRUE))) =>
           true
         case _ => false
-      })
+      )
 
       // inconsistent replica state
       Await.result(client2.set("client2-only", Buf.Utf8("bar")))
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.delete("client2-only")) match {
+          Await.result(replicatedClient.delete("client2-only")) match
         case InconsistentReplication(Seq(Throw(_), Return(JBoolean.TRUE))) =>
           true
         case _ => false
-      })
+      )
 
       // all failed
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.delete("client2-only")) match {
+          Await.result(replicatedClient.delete("client2-only")) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-    }
+      )
 
   if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined)
-    test("base replication client getsAll & cas") {
+    test("base replication client getsAll & cas")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -395,12 +385,12 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
           Await.result(replicatedClient.checkAndSet(
                   "foo",
                   Buf.Utf8("bar"),
-                  Seq(Buf.Utf8("7"), Buf.Utf8("5")))) match {
+                  Seq(Buf.Utf8("7"), Buf.Utf8("5")))) match
         case InconsistentReplication(
             Seq(Throw(_), Return(CasResult.NotFound))) =>
           true
         case _ => false
-      })
+      )
       Await.result(client1.set("foo", Buf.Utf8("bar")))
       assert(
           Await.result(replicatedClient.checkAndSet(
@@ -413,43 +403,42 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.getsAll("foo")) match {
+          Await.result(replicatedClient.getsAll("foo")) match
         case InconsistentReplication(
             Seq(Throw(_), Return(Some((v, SCasUnique(_)))))) =>
           v equals Buf.Utf8("bar")
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.checkAndSet(
                   "foo",
                   Buf.Utf8("bar"),
-                  Seq(Buf.Utf8("7"), Buf.Utf8("7")))) match {
+                  Seq(Buf.Utf8("7"), Buf.Utf8("7")))) match
         case InconsistentReplication(
             Seq(Throw(_), Return(CasResult.Stored))) =>
           true
         case _ => false
-      })
+      )
 
       // all failed
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.getsAll("foo")) match {
+          Await.result(replicatedClient.getsAll("foo")) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.checkAndSet(
                   "foo",
                   Buf.Utf8("bar"),
-                  Seq(Buf.Utf8("7"), Buf.Utf8("7")))) match {
+                  Seq(Buf.Utf8("7"), Buf.Utf8("7")))) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-    }
+      )
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client add & replace") {
+    test("base replication client add & replace")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -505,56 +494,55 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       assert(
           Await.result(client2.add("client2-only", Buf.Utf8("test"))) == true)
       assert(Await.result(
-              replicatedClient.add("client2-only", Buf.Utf8("test"))) match {
+              replicatedClient.add("client2-only", Buf.Utf8("test"))) match
         case InconsistentReplication(
             Seq(Return(JBoolean.TRUE), Return(JBoolean.FALSE))) =>
           true
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.replace("client1-only",
-                                                Buf.Utf8("test"))) match {
+                                                Buf.Utf8("test"))) match
         case InconsistentReplication(
             Seq(Return(JBoolean.TRUE), Return(JBoolean.FALSE))) =>
           true
         case _ => false
-      })
+      )
 
       // inconsistent replica state
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(Await.result(
-              replicatedClient.add("client2-only", Buf.Utf8("test"))) match {
+              replicatedClient.add("client2-only", Buf.Utf8("test"))) match
         case InconsistentReplication(Seq(Throw(_), Return(JBoolean.FALSE))) =>
           true
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.replace("client1-only",
-                                                Buf.Utf8("test"))) match {
+                                                Buf.Utf8("test"))) match
         case InconsistentReplication(Seq(Throw(_), Return(JBoolean.FALSE))) =>
           true
         case _ => false
-      })
+      )
 
       // all failed
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(Await.result(
-              replicatedClient.add("client2-only", Buf.Utf8("test"))) match {
+              replicatedClient.add("client2-only", Buf.Utf8("test"))) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.replace("client1-only",
-                                                Buf.Utf8("test"))) match {
+                                                Buf.Utf8("test"))) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-    }
+      )
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client incr & decr") {
+    test("base replication client incr & decr")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -620,24 +608,23 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.decr("foo", 1)) match {
+          Await.result(replicatedClient.decr("foo", 1)) match
         case InconsistentReplication(Seq(Throw(_), Return(Some(v)))) =>
           v equals 1L
         case _ => false
-      })
+      )
 
       // all failed
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
       assert(
-          Await.result(replicatedClient.decr("foo", 1)) match {
+          Await.result(replicatedClient.decr("foo", 1)) match
         case FailedReplication(Seq(Throw(_), Throw(_))) => true
         case _ => false
-      })
-    }
+      )
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client many keys") {
+    test("base replication client many keys")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -665,39 +652,29 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       val replicatedClient = new BaseReplicationClient(Seq(client1, client2))
 
       val count = 100
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           Await.result(replicatedClient.set("foo" + n, Buf.Utf8("bar" + n)))
-        }
-      }
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           val ConsistentReplication(Some(Buf.Utf8(res))) =
             Await.result(replicatedClient.getAll("foo" + n))
           assert(res == "bar" + n)
-        }
-      }
 
       // shutdown primary pool
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           assert(
-              Await.result(replicatedClient.getAll("foo" + n)) match {
+              Await.result(replicatedClient.getAll("foo" + n)) match
             case InconsistentReplication(Seq(Throw(_), Return(Some(v)))) =>
               val Buf.Utf8(res) = v
               res equals "bar" + n
             case _ => false
-          })
-        }
-      }
-    }
+          )
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1731
-    test("base replication client replica down") {
+    test("base replication client replica down")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -736,34 +713,33 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       firstTestServerPool(1).stop()
 
       assert(
-          Await.result(replicatedClient.getAll("foo")) match {
+          Await.result(replicatedClient.getAll("foo")) match
         case InconsistentReplication(Seq(Throw(_), Return(Some(v)))) =>
           v equals Buf.Utf8("bar")
         case _ => false
-      })
+      )
       assert(
-          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match {
+          Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) match
         case InconsistentReplication(Seq(Throw(_), Return(()))) => true
         case _ => false
-      })
+      )
 
       // bring back primary pool
       TestMemcachedServer.start(Some(firstTestServerPool(0).address))
       TestMemcachedServer.start(Some(firstTestServerPool(1).address))
 
       assert(
-          Await.result(replicatedClient.getAll("foo")) match {
+          Await.result(replicatedClient.getAll("foo")) match
         case InconsistentReplication(Seq(Return(None), Return(Some(v)))) =>
           v equals Buf.Utf8("baz")
         case _ => false
-      })
+      )
       assert(
           Await.result(replicatedClient.set("foo", Buf.Utf8("baz"))) == ConsistentReplication(
               ()))
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("base replication client non supported operation") {
+    test("base replication client non supported operation")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -790,18 +766,15 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
         .build()
       val replicatedClient = new BaseReplicationClient(Seq(client1, client2))
 
-      intercept[UnsupportedOperationException] {
+      intercept[UnsupportedOperationException]
         Await.result(
             replicatedClient.append("not-supported", Buf.Utf8("value")))
-      }
-      intercept[UnsupportedOperationException] {
+      intercept[UnsupportedOperationException]
         Await.result(
             replicatedClient.prepend("not-supported", Buf.Utf8("value")))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("simple replication client get & set") {
+    test("simple replication client get & set")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -857,23 +830,19 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       // inconsistent replica state
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.set("foo", Buf.Utf8("baz")))
-      }
       Await.result(replicatedClient.get("foo"))
 
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.set("foo", Buf.Utf8("baz")))
-      }
-      intercept[WriteException] {
+      intercept[WriteException]
         Await.result(replicatedClient.get("foo"))
-      }
-    }
 
   if (Option(System.getProperty("USE_EXTERNAL_MEMCACHED")).isDefined)
-    test("simple replication client gets & cas") {
+    test("simple replication client gets & cas")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -918,17 +887,14 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       // inconsistent replica state
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(
             replicatedClient.cas("foo", Buf.Utf8("baz"), Buf.Utf8("2|3")))
-      }
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.gets("foo"))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1731
-    test("simple replication client delete") {
+    test("simple replication client delete")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -982,18 +948,15 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
           Await.result(client2.get("client2-only")) == Some(Buf.Utf8("bar")))
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.delete("client2-only"))
-      }
       secondTestServerPool(0).stop()
       secondTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.delete("client2-only"))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("simple replication client add & replace") {
+    test("simple replication client add & replace")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -1052,17 +1015,14 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       // inconsistent replica state
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.add("client2-only", Buf.Utf8("test")))
-      }
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(
             replicatedClient.replace("client1-only", Buf.Utf8("test")))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1731
-    test("simple replication client incr & decr") {
+    test("simple replication client incr & decr")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -1104,16 +1064,13 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       // inconsistent replica state
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.incr("foo", 2L))
-      }
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.decr("foo", 2L))
-      }
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1731
-    test("simple replication client many keys") {
+    test("simple replication client many keys")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -1141,37 +1098,27 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       val replicatedClient = new SimpleReplicationClient(Seq(client1, client2))
 
       val count = 100
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           Await.result(replicatedClient.set("foo" + n, Buf.Utf8("bar" + n)))
-        }
-      }
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           assert(Await.result(replicatedClient.get("foo" + n)) == Some(
                   Buf.Utf8("bar" + n)))
           assert(Await.result(client1.get("foo" + n)) == Some(
                   Buf.Utf8("bar" + n)))
           assert(Await.result(client2.get("foo" + n)) == Some(
                   Buf.Utf8("bar" + n)))
-        }
-      }
 
       // shutdown primary pool
       firstTestServerPool(0).stop()
       firstTestServerPool(1).stop()
 
-      (0 until count).foreach { n =>
-        {
+      (0 until count).foreach  n =>
           assert(Await.result(replicatedClient.get("foo" + n)) == Some(
                   Buf.Utf8("bar" + n)))
-        }
-      }
-    }
 
   if (!Option(System.getProperty("SKIP_FLAKY")).isDefined)
-    test("simple replication client replica down") {
+    test("simple replication client replica down")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -1210,9 +1157,8 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
 
       assert(
           Await.result(replicatedClient.get("foo")) == Some(Buf.Utf8("bar")))
-      intercept[SimpleReplicationFailure] {
+      intercept[SimpleReplicationFailure]
         Await.result(replicatedClient.set("foo", Buf.Utf8("baz")))
-      }
 
       // bring back primary pool
       TestMemcachedServer.start(Some(firstTestServerPool(0).address))
@@ -1223,10 +1169,9 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
       assert(Await.result(client1.get("foo")) == None)
       assert(Await.result(client2.get("foo")) == Some(Buf.Utf8("baz")))
       Await.result(replicatedClient.set("foo", Buf.Utf8("baz")))
-    }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1712
-    test("simple replication client non supported operation") {
+    test("simple replication client non supported operation")
       // create my cluster client solely based on a zk client and a path
       val mycluster1 =
         CachePoolCluster.newZkCluster(firstPoolPath, zookeeperClient)
@@ -1253,13 +1198,9 @@ class ReplicationClientTest extends FunSuite with BeforeAndAfterEach {
         .build()
       val replicatedClient = new SimpleReplicationClient(Seq(client1, client2))
 
-      intercept[UnsupportedOperationException] {
+      intercept[UnsupportedOperationException]
         Await.result(
             replicatedClient.append("not-supported", Buf.Utf8("value")))
-      }
-      intercept[UnsupportedOperationException] {
+      intercept[UnsupportedOperationException]
         Await.result(
             replicatedClient.prepend("not-supported", Buf.Utf8("value")))
-      }
-    }
-}

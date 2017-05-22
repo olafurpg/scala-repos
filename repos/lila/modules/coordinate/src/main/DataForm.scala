@@ -3,7 +3,7 @@ package lila.coordinate
 import play.api.data._
 import play.api.data.Forms._
 
-object DataForm {
+object DataForm
 
   val color = Form(
       single(
@@ -16,8 +16,6 @@ object DataForm {
           "score" -> number(min = 0, max = 100)
       )(ScoreData.apply)(ScoreData.unapply))
 
-  case class ScoreData(color: String, score: Int) {
+  case class ScoreData(color: String, score: Int)
 
     def isWhite = color == "white"
-  }
-}

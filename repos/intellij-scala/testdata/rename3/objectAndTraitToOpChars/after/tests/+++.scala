@@ -1,6 +1,6 @@
 package tests
 
-object +++ {
+object +++
   val x = 0
 
   def qqq() = {}
@@ -8,17 +8,12 @@ object +++ {
   def apply() = {}
 
   def unapply(i: Int) = Some(i)
-}
 
-trait +++ {
+trait +++
   def baz(): Int = 1
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     +++()
-    1 match {
+    1 match
       case +++(i) =>
-    }
-  }
-}

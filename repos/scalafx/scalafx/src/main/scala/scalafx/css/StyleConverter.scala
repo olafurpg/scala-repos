@@ -36,7 +36,7 @@ import scalafx.scene.text.Font.sfxFont2jfx
 /**
   * Companion object for [[scalafx.css.StyleConverter]].
   */
-object StyleConverter {
+object StyleConverter
 
   /**
     * Converts a ScalaFX StyleConverter to its JavaFX counterpart.
@@ -97,7 +97,6 @@ object StyleConverter {
     */
   def urlConverter: StyleConverter[Array[jfxcss.ParsedValue[_, _]], String] =
     new StyleConverter(jfxcss.StyleConverter.getUrlConverter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/StyleConverter.html JavaFX
@@ -112,7 +111,7 @@ object StyleConverter {
   */
 class StyleConverter[F, T](
     override val delegate: jfxcss.StyleConverter[F, T] = new jfxcss.StyleConverter)
-    extends SFXDelegate[jfxcss.StyleConverter[F, T]] {
+    extends SFXDelegate[jfxcss.StyleConverter[F, T]]
 
   /**
     * Convert from the parsed CSS value to the target property type.
@@ -122,4 +121,3 @@ class StyleConverter[F, T](
     */
   def convert(value: jfxcss.ParsedValue[F, T], font: Font): T =
     delegate.convert(value, font)
-}

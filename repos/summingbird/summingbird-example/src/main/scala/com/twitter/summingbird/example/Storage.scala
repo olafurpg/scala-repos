@@ -34,10 +34,10 @@ import org.jboss.netty.buffer.ChannelBuffer
   * merged into Storehaus and Storehaus sees its next release. This
   * pull req will make it easier to create Memcache store instances.
   */
-object Memcache {
+object Memcache
   val DEFAULT_TIMEOUT = 1.seconds
 
-  def client = {
+  def client =
     val builder = ClientBuilder()
       .name("memcached")
       .retries(2)
@@ -52,13 +52,12 @@ object Memcache {
       .clientBuilder(builder)
       .nodes("localhost:11211")
       .build()
-  }
 
   /**
     * Returns a function that encodes a key to a Memcache key string
     * given a unique namespace string.
     */
-  def keyEncoder[T](namespace: String)(implicit inj: Codec[T]): T => String = {
+  def keyEncoder[T](namespace: String)(implicit inj: Codec[T]): T => String =
     key: T =>
       def concat(bytes: Array[Byte]): Array[Byte] =
         namespace.getBytes ++ bytes
@@ -68,14 +67,11 @@ object Memcache {
         .andThen(HashEncoder())
         .andThen(Bijection.connect[Array[Byte], Base64String]))(key)
         .str
-  }
 
-  def store[K : Codec, V : Codec](keyPrefix: String): Store[K, V] = {
+  def store[K : Codec, V : Codec](keyPrefix: String): Store[K, V] =
     implicit val valueToBuf = Injection.connect[V, Array[Byte], ChannelBuffer]
     MemcacheStore(client).convert(keyEncoder[K](keyPrefix))
-  }
 
   def mergeable[K : Codec, V : Codec : Monoid](
       keyPrefix: String): MergeableStore[K, V] =
     MergeableStore.fromStore(store[K, V](keyPrefix))
-}

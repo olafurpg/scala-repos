@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object Dependencies {
+object Dependencies
   lazy val scala282 = "2.8.2"
   lazy val scala292 = "2.9.2"
   lazy val scala293 = "2.9.3"
@@ -52,23 +52,19 @@ object Dependencies {
   lazy val jsch = "com.jcraft" % "jsch" % "0.1.46" intransitive ()
   lazy val sbinary = "org.scala-tools.sbinary" %% "sbinary" % "0.4.2"
   lazy val sbtSerialization = "org.scala-sbt" %% "serialization" % "0.1.2"
-  lazy val scalaCompiler = Def.setting {
+  lazy val scalaCompiler = Def.setting
     "org.scala-lang" % "scala-compiler" % scalaVersion.value
-  }
-  lazy val scalaReflect = Def.setting {
+  lazy val scalaReflect = Def.setting
     "org.scala-lang" % "scala-reflect" % scalaVersion.value
-  }
   lazy val scalaCheck = "org.scalacheck" %% "scalacheck" % "1.11.4"
   lazy val specs2 = "org.specs2" %% "specs2" % "2.3.11"
   lazy val junit = "junit" % "junit" % "4.11"
 
   private def scala211Module(name: String, moduleVersion: String) =
-    Def.setting {
-      scalaVersion.value match {
+    Def.setting
+      scalaVersion.value match
         case sv if (sv startsWith "2.9.") || (sv startsWith "2.10.") => Nil
         case _ => ("org.scala-lang.modules" %% name % moduleVersion) :: Nil
-      }
-    }
   lazy val scalaXml = scala211Module("scala-xml", "1.0.1")
   lazy val scalaParsers = scala211Module("scala-parser-combinators", "1.0.1")
 
@@ -113,4 +109,3 @@ object Dependencies {
         aetherImpl,
         aetherConnectorBasic,
         mvnAether)
-}

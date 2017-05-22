@@ -9,10 +9,10 @@ import akka.stream.impl.fusing.GraphStages
 import akka.stream.scaladsl.Flow
 import org.reactivestreams.Processor
 
-class FusableProcessorTest extends AkkaIdentityProcessorVerification[Int] {
+class FusableProcessorTest extends AkkaIdentityProcessorVerification[Int]
 
   override def createIdentityProcessor(
-      maxBufferSize: Int): Processor[Int, Int] = {
+      maxBufferSize: Int): Processor[Int, Int] =
     val settings = ActorMaterializerSettings(system).withInputBuffer(
         initialSize = maxBufferSize / 2, maxSize = maxBufferSize)
 
@@ -25,7 +25,5 @@ class FusableProcessorTest extends AkkaIdentityProcessorVerification[Int] {
       .named("identity")
       .toProcessor
       .run()
-  }
 
   override def createElement(element: Int): Int = element
-}

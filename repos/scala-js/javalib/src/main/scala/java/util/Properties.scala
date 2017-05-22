@@ -5,7 +5,7 @@ import java.{util => ju}
 import scala.collection.JavaConversions._
 
 class Properties(protected val defaults: Properties)
-    extends ju.Hashtable[AnyRef, AnyRef] {
+    extends ju.Hashtable[AnyRef, AnyRef]
 
   def this() = this(null)
 
@@ -24,39 +24,31 @@ class Properties(protected val defaults: Properties)
   def getProperty(key: String): String =
     getProperty(key, defaultValue = null)
 
-  def getProperty(key: String, defaultValue: String): String = {
-    get(key) match {
+  def getProperty(key: String, defaultValue: String): String =
+    get(key) match
       case value: String => value
 
       case _ =>
         if (defaults != null) defaults.getProperty(key, defaultValue)
         else defaultValue
-    }
-  }
 
-  def propertyNames(): ju.Enumeration[_] = {
+  def propertyNames(): ju.Enumeration[_] =
     val thisSet: ju.Set[String] = keySet().map(_.asInstanceOf[String])
     val defaultsIterator =
       if (defaults != null) defaults.propertyNames().toIterator
       else scala.collection.Iterator.empty
-    val filteredDefaults = defaultsIterator.collect {
+    val filteredDefaults = defaultsIterator.collect
       case k: String if !thisSet(k) => k
-    }
     thisSet.iterator ++ filteredDefaults
-  }
 
-  def stringPropertyNames(): ju.Set[String] = {
+  def stringPropertyNames(): ju.Set[String] =
     val set = new ju.HashSet[String]
-    entrySet().foreach { entry =>
-      (entry.getKey, entry.getValue) match {
+    entrySet().foreach  entry =>
+      (entry.getKey, entry.getValue) match
         case (key: String, _: String) => set.add(key)
         case _ => // Ignore key
-      }
-    }
     if (defaults != null) set ++= defaults.stringPropertyNames()
     set
-  }
 
   // def list(out: PrintStream): Unit
   // def list(out: PrintWriter): Unit
-}

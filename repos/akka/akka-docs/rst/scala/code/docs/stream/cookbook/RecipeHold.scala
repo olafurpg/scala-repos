@@ -6,12 +6,12 @@ import akka.stream.testkit._
 
 import scala.concurrent.duration._
 
-object HoldOps {
+object HoldOps
   //#hold-version-1
   import akka.stream._
   import akka.stream.stage._
   final class HoldWithInitial[T](initial: T)
-      extends GraphStage[FlowShape[T, T]] {
+      extends GraphStage[FlowShape[T, T]]
     val in = Inlet[T]("HoldWithInitial.in")
     val out = Outlet[T]("HoldWithInitial.out")
 
@@ -19,31 +19,26 @@ object HoldOps {
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
+      new GraphStageLogic(shape)
         private var currentValue: T = initial
 
-        setHandlers(in, out, new InHandler with OutHandler {
-          override def onPush(): Unit = {
+        setHandlers(in, out, new InHandler with OutHandler
+          override def onPush(): Unit =
             currentValue = grab(in)
             pull(in)
-          }
 
-          override def onPull(): Unit = {
+          override def onPull(): Unit =
             push(out, currentValue)
-          }
-        })
+        )
 
-        override def preStart(): Unit = {
+        override def preStart(): Unit =
           pull(in)
-        }
-      }
-  }
   //#hold-version-1
 
   //#hold-version-2
   import akka.stream._
   import akka.stream.stage._
-  final class HoldWithWait[T] extends GraphStage[FlowShape[T, T]] {
+  final class HoldWithWait[T] extends GraphStage[FlowShape[T, T]]
     val in = Inlet[T]("HoldWithWait.in")
     val out = Outlet[T]("HoldWithWait.out")
 
@@ -51,39 +46,32 @@ object HoldOps {
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
+      new GraphStageLogic(shape)
         private var currentValue: T = _
         private var waitingFirstValue = true
 
-        setHandlers(in, out, new InHandler with OutHandler {
-          override def onPush(): Unit = {
+        setHandlers(in, out, new InHandler with OutHandler
+          override def onPush(): Unit =
             currentValue = grab(in)
-            if (waitingFirstValue) {
+            if (waitingFirstValue)
               waitingFirstValue = false
               if (isAvailable(out)) push(out, currentValue)
-            }
             pull(in)
-          }
 
-          override def onPull(): Unit = {
+          override def onPull(): Unit =
             if (!waitingFirstValue) push(out, currentValue)
-          }
-        })
+        )
 
-        override def preStart(): Unit = {
+        override def preStart(): Unit =
           pull(in)
-        }
-      }
-  }
   //#hold-version-2
-}
 
-class RecipeHold extends RecipeSpec {
+class RecipeHold extends RecipeSpec
   import HoldOps._
 
-  "Recipe for creating a holding element" must {
+  "Recipe for creating a holding element" must
 
-    "work for version 1" in {
+    "work for version 1" in
 
       val pub = TestPublisher.probe[Int]()
       val sub = TestSubscriber.manualProbe[Int]()
@@ -115,9 +103,8 @@ class RecipeHold extends RecipeSpec {
       pub.sendComplete()
       subscription.request(1)
       sub.expectComplete()
-    }
 
-    "work for version 2" in {
+    "work for version 2" in
 
       val pub = TestPublisher.probe[Int]()
       val sub = TestSubscriber.manualProbe[Int]()
@@ -145,6 +132,3 @@ class RecipeHold extends RecipeSpec {
       pub.sendComplete()
       subscription.request(1)
       sub.expectComplete()
-    }
-  }
-}

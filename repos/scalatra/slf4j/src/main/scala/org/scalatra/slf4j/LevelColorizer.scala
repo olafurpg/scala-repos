@@ -6,7 +6,7 @@ import ch.qos.logback.classic.pattern.ClassicConverter
 import ch.qos.logback.classic.spi.ILoggingEvent
 import org.scalatra.util.RicherString._
 
-object LevelColorizer {
+object LevelColorizer
   private val EndColor = "\u001b[m"
   private val ErrorColor = "\u001b[0;31m"
   private val WarnColor = "\u001b[0;33m"
@@ -18,7 +18,6 @@ object LevelColorizer {
                            Level.INFO -> InfoColor,
                            Level.WARN -> WarnColor,
                            Level.ERROR -> ErrorColor)
-}
 
 /**
   * Adds ANSI colorization of the log level for use in the console.
@@ -47,12 +46,10 @@ object LevelColorizer {
   * </configuration>
   * }}}
   */
-class LevelColorizer extends ClassicConverter {
+class LevelColorizer extends ClassicConverter
 
-  def convert(event: ILoggingEvent) = {
+  def convert(event: ILoggingEvent) =
     import org.scalatra.slf4j.LevelColorizer._
     val c = colors.getOrElse(event.getLevel, "")
     "%s%s%s" format
     (c, event.getLevel, c.blankOption map (_ ⇒ EndColor) getOrElse "")
-  }
-}

@@ -19,7 +19,6 @@
  */
 package com.precog.common
 
-package object accounts {
+package object accounts
   type AccountId = String
   type ResetTokenId = String
-}

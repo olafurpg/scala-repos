@@ -5,14 +5,13 @@ import org.joda.time.DateTime
 import lila.db.BSON.BSONJodaDateTimeHandler
 import reactivemongo.bson._
 
-final class TrophyApi(coll: lila.db.Types.Coll) {
+final class TrophyApi(coll: lila.db.Types.Coll)
 
   private implicit val trophyKindBSONHandler =
-    new BSONHandler[BSONString, Trophy.Kind] {
+    new BSONHandler[BSONString, Trophy.Kind]
       def read(bsonString: BSONString): Trophy.Kind =
         Trophy.Kind byKey bsonString.value err s"No such trophy kind: ${bsonString.value}"
       def write(x: Trophy.Kind) = BSONString(x.key)
-    }
   private implicit val trophyBSONHandler = Macros.handler[Trophy]
 
   def award(userId: String, kind: Trophy.Kind): Funit =
@@ -29,4 +28,3 @@ final class TrophyApi(coll: lila.db.Types.Coll) {
       .find(BSONDocument("user" -> user.id))
       .cursor[Trophy]()
       .collect[List](max)
-}

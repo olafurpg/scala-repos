@@ -31,10 +31,9 @@ import javafx.{scene => jfxs}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object ParallelCamera {
+object ParallelCamera
   implicit def sfxParallelCamera2jfx(c: ParallelCamera): jfxs.ParallelCamera =
     if (c != null) c.delegate else null
-}
 
 class ParallelCamera(
     override val delegate: jfxs.ParallelCamera = new jfxs.ParallelCamera)

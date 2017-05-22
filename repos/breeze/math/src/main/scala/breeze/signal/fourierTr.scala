@@ -21,12 +21,12 @@ import breeze.numerics.{sin, cos}
   * @return
   * @author ktakagaki, dlwh
   */
-object fourierTr extends UFunc {
+object fourierTr extends UFunc
 
   implicit val dvDouble1DFFT: fourierTr.Impl[
-      DenseVector[Double], DenseVector[Complex]] = {
-    new fourierTr.Impl[DenseVector[Double], DenseVector[Complex]] {
-      def apply(v: DenseVector[Double]) = {
+      DenseVector[Double], DenseVector[Complex]] =
+    new fourierTr.Impl[DenseVector[Double], DenseVector[Complex]]
+      def apply(v: DenseVector[Double]) =
         //reformat for input: note difference in format for input to complex fft
         val tempArr = denseVectorDToTemp(v)
 
@@ -36,32 +36,23 @@ object fourierTr extends UFunc {
 
         //reformat for output
         tempToDenseVector(tempArr)
-      }
-    }
-  }
 
-  implicit def dvDT1DFFT_Float: Impl[DenseVector[Float], DenseVector[Complex]] = {
-    new Impl[DenseVector[Float], DenseVector[Complex]] {
+  implicit def dvDT1DFFT_Float: Impl[DenseVector[Float], DenseVector[Complex]] =
+    new Impl[DenseVector[Float], DenseVector[Complex]]
       def apply(v: DenseVector[Float]) = fourierTr(v.map(_.toDouble))
-    }
-  }
 
-  implicit def dvDT1DFFT_Int: Impl[DenseVector[Int], DenseVector[Complex]] = {
-    new Impl[DenseVector[Int], DenseVector[Complex]] {
+  implicit def dvDT1DFFT_Int: Impl[DenseVector[Int], DenseVector[Complex]] =
+    new Impl[DenseVector[Int], DenseVector[Complex]]
       def apply(v: DenseVector[Int]) = fourierTr(v.map(_.toDouble))
-    }
-  }
 
-  implicit def dvDT1DFFT_Long: Impl[DenseVector[Long], DenseVector[Complex]] = {
-    new Impl[DenseVector[Long], DenseVector[Complex]] {
+  implicit def dvDT1DFFT_Long: Impl[DenseVector[Long], DenseVector[Complex]] =
+    new Impl[DenseVector[Long], DenseVector[Complex]]
       def apply(v: DenseVector[Long]) = fourierTr(v.map(_.toDouble))
-    }
-  }
 
   implicit val dvComplex1DFFT: fourierTr.Impl[
-      DenseVector[Complex], DenseVector[Complex]] = {
-    new fourierTr.Impl[DenseVector[Complex], DenseVector[Complex]] {
-      def apply(v: DenseVector[Complex]) = {
+      DenseVector[Complex], DenseVector[Complex]] =
+    new fourierTr.Impl[DenseVector[Complex], DenseVector[Complex]]
+      def apply(v: DenseVector[Complex]) =
         //reformat for input: note difference in format for input to real fft
         val tempArr = denseVectorCToTemp(v)
 
@@ -71,14 +62,11 @@ object fourierTr extends UFunc {
 
         //reformat for output
         tempToDenseVector(tempArr)
-      }
-    }
-  }
 
   implicit val dmComplex2DFFT: fourierTr.Impl[
-      DenseMatrix[Complex], DenseMatrix[Complex]] = {
-    new fourierTr.Impl[DenseMatrix[Complex], DenseMatrix[Complex]] {
-      def apply(v: DenseMatrix[Complex]) = {
+      DenseMatrix[Complex], DenseMatrix[Complex]] =
+    new fourierTr.Impl[DenseMatrix[Complex], DenseMatrix[Complex]]
+      def apply(v: DenseMatrix[Complex]) =
         //reformat for input: note difference in format for input to real fft
         val tempMat = denseMatrixCToTemp(v)
 
@@ -88,14 +76,11 @@ object fourierTr extends UFunc {
 
         //reformat for output
         tempToDenseMatrix(tempMat, v.rows, v.cols)
-      }
-    }
-  }
 
   implicit val dmDouble2DFFT: fourierTr.Impl[
-      DenseMatrix[Double], DenseMatrix[Complex]] = {
-    new fourierTr.Impl[DenseMatrix[Double], DenseMatrix[Complex]] {
-      def apply(v: DenseMatrix[Double]) = {
+      DenseMatrix[Double], DenseMatrix[Complex]] =
+    new fourierTr.Impl[DenseMatrix[Double], DenseMatrix[Complex]]
+      def apply(v: DenseMatrix[Double]) =
         //reformat for input
         val tempMat = denseMatrixDToTemp(v)
 
@@ -106,31 +91,22 @@ object fourierTr extends UFunc {
 
         //reformat for output
         tempToDenseMatrix(tempMat, v.rows, v.cols)
-      }
-    }
-  }
 
   implicit val dvDouble1DFourierRange: Impl2[
-      DenseVector[Double], Range, DenseVector[Complex]] = {
-    new Impl2[DenseVector[Double], Range, DenseVector[Complex]] {
+      DenseVector[Double], Range, DenseVector[Complex]] =
+    new Impl2[DenseVector[Double], Range, DenseVector[Complex]]
       def apply(v: DenseVector[Double],
-                rangeNegative: Range): DenseVector[Complex] = {
+                rangeNegative: Range): DenseVector[Complex] =
 
         val range = rangeNegative.getRangeWithoutNegativeIndexes(v.length)
         //ToDo check lengths and throw errors
 
-        val tempret = for (k <- range) yield {
+        val tempret = for (k <- range) yield
           val pk2_N = scala.math.Pi * k * 2d / v.length
           sum(
               DenseVector.tabulate[Complex](v.length)((n: Int) =>
-                    {
               val nd = n.toDouble
               Complex(cos(pk2_N * nd), sin(pk2_N * nd))
-          }))
-        }
+          ))
 
         new DenseVector[Complex](tempret.toArray[Complex])
-      }
-    }
-  }
-}

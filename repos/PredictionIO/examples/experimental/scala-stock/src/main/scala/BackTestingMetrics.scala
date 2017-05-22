@@ -53,19 +53,16 @@ case class BacktestingResult(
     val daily: Seq[DailyStat],
     val overall: OverallStat
 )
-    extends Serializable with NiceRendering {
+    extends Serializable with NiceRendering
   override def toString(): String = overall.toString
 
-  def toHTML(): String = {
+  def toHTML(): String =
     implicit val formats = DefaultFormats
     html.backtesting().toString
-  }
 
-  def toJSON(): String = {
+  def toJSON(): String =
     implicit val formats = DefaultFormats
     Serialization.write(this)
-  }
-}
 
 class BacktestingEvaluator(val params: BacktestingParams)
     extends Evaluator[DataParams,
@@ -74,37 +71,34 @@ class BacktestingEvaluator(val params: BacktestingParams)
                       AnyRef,
                       DailyResult,
                       Seq[DailyResult],
-                      BacktestingResult] {
+                      BacktestingResult]
 
   def evaluateUnit(queryDate: QueryDate,
                    prediction: Prediction,
-                   unusedActual: AnyRef): DailyResult = {
+                   unusedActual: AnyRef): DailyResult =
 
     val todayIdx = queryDate.idx
 
     // Decide enter / exit, also sort by pValue desc
-    val data = prediction.data.map {
-      case (ticker, pValue) => {
-          val dir = pValue match {
+    val data = prediction.data.map
+      case (ticker, pValue) =>
+          val dir = pValue match
             case p if p >= params.enterThreshold => 1
             case p if p <= params.exitThreshold => -1
             case _ => 0
-          }
           (ticker, dir, pValue)
-        }
-    }.toArray.sortBy(-_._3)
+    .toArray.sortBy(-_._3)
 
     val toEnter = data.filter(_._2 == 1).map(_._1)
     val toExit = data.filter(_._2 == -1).map(_._1)
 
     new DailyResult(dateIdx = todayIdx, toEnter = toEnter, toExit = toExit)
-  }
 
   def evaluateSet(dp: DataParams, input: Seq[DailyResult]): Seq[DailyResult] =
     input
 
   def evaluateAll(
-      input: Seq[(DataParams, Seq[DailyResult])]): BacktestingResult = {
+      input: Seq[(DataParams, Seq[DailyResult])]): BacktestingResult =
     var dailyResultsSeq = input.map(_._2).flatten.toArray.sortBy(_.dateIdx)
 
     var rawData = input.head._1.rawDataB.value
@@ -122,50 +116,40 @@ class BacktestingEvaluator(val params: BacktestingParams)
     val positions = MMap[String, Double]()
     val maxPositions = params.maxPositions
 
-    for (daily <- dailyResultsSeq) {
+    for (daily <- dailyResultsSeq)
       val todayIdx = daily.dateIdx
       val today = rawData.timeIndex(todayIdx)
       val todayRet = retFrame.rowAt(todayIdx)
       val todayPrice = priceFrame.rowAt(todayIdx)
 
       // Update price change
-      positions.keys.foreach { ticker =>
-        {
+      positions.keys.foreach  ticker =>
           positions(ticker) *= todayRet.first(ticker).get
-        }
-      }
 
       // Determine exit
-      daily.toExit.foreach { ticker =>
-        {
-          if (positions.contains(ticker)) {
+      daily.toExit.foreach  ticker =>
+          if (positions.contains(ticker))
             val money = positions.remove(ticker).get
             cash += money
-          }
-        }
-      }
 
       // Determine enter
       val slack = maxPositions - positions.size
       val money = cash / slack
-      daily.toEnter.filter(t => !positions.contains(t)).take(slack).map {
+      daily.toEnter.filter(t => !positions.contains(t)).take(slack).map
         ticker =>
-          {
             cash -= money
             positions += (ticker -> money)
-          }
-      }
 
       // Book keeping
       val nav = cash + positions.values.sum
 
       val ret =
         (if (dailyStats.isEmpty) 0
-         else {
+         else
            val yestStats = dailyStats.last
            val yestNav = yestStats.nav
            (nav - yestNav) / nav - 1
-         })
+         )
 
       dailyStats.append(
           DailyStat(
@@ -175,7 +159,6 @@ class BacktestingEvaluator(val params: BacktestingParams)
               market = todayPrice.first(mktTicker).get,
               positionCount = positions.size
           ))
-    }
     // FIXME. Force Close the last day.
 
     val lastStat = dailyStats.last
@@ -199,16 +182,11 @@ class BacktestingEvaluator(val params: BacktestingParams)
         overall = overall
     )
 
-    params.optOutputPath.map { path =>
+    params.optOutputPath.map  path =>
       MV.save(result, path)
-    }
 
     result
-  }
-}
 
-object RenderMain {
-  def main(args: Array[String]) {
+object RenderMain
+  def main(args: Array[String])
     MV.render(MV.load[BacktestingResult](args(0)), args(0))
-  }
-}

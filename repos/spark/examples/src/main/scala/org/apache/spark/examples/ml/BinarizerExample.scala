@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.Binarizer
 // $example off$
 import org.apache.spark.sql.{DataFrame, SQLContext}
 
-object BinarizerExample {
-  def main(args: Array[String]): Unit = {
+object BinarizerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("BinarizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -44,6 +44,4 @@ object BinarizerExample {
     binarizedFeatures.collect().foreach(println)
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

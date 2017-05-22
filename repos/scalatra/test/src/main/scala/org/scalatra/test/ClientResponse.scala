@@ -8,7 +8,7 @@ case class ResponseStatus(code: Int, message: String)
 
 import scala.collection.JavaConverters._
 
-abstract class ClientResponse {
+abstract class ClientResponse
   def bodyBytes: Array[Byte]
   def inputStream: InputStream
   def statusLine: ResponseStatus
@@ -16,45 +16,35 @@ abstract class ClientResponse {
 
   def body = new String(bodyBytes, charset.getOrElse("ISO-8859-1"))
 
-  def mediaType: Option[String] = {
-    header.get("Content-Type") match {
+  def mediaType: Option[String] =
+    header.get("Content-Type") match
       case Some(contentType) => contentType.split(";").map(_.trim).headOption
       case _ => None
-    }
-  }
 
   def status = statusLine.code
 
-  val header = new DefaultMap[String, String] {
-    def get(key: String) = {
-      headers.get(key) match {
+  val header = new DefaultMap[String, String]
+    def get(key: String) =
+      headers.get(key) match
         case Some(values) => Some(values.head)
         case _ => None
-      }
-    }
 
-    override def apply(key: String) = {
-      get(key) match {
+    override def apply(key: String) =
+      get(key) match
         case Some(value) => value
         case _ => null
-      }
-    }
 
-    def iterator = {
+    def iterator =
       headers.keys.map(name => (name -> this(name))).iterator
-    }
-  }
 
-  def charset = {
+  def charset =
     header
       .getOrElse("Content-Type", "")
       .split(";")
       .map(_.trim)
-      .find(_.startsWith("charset=")) match {
+      .find(_.startsWith("charset=")) match
       case Some(attr) => Some(attr.split("=")(1))
       case _ => None
-    }
-  }
 
   def getReason() = statusLine.message
 
@@ -73,4 +63,3 @@ abstract class ClientResponse {
   def getContent() = body
 
   def getContentType() = header.getOrElse("Content-Type", null)
-}

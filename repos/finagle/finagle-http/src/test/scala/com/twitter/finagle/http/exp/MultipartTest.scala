@@ -7,7 +7,7 @@ import com.twitter.finagle.http.{FileElement, Request, RequestBuilder, SimpleEle
 import com.twitter.io.{Files, Buf}
 
 @RunWith(classOf[JUnitRunner])
-class MultipartTest extends FunSuite {
+class MultipartTest extends FunSuite
 
   /*
    * The generated request is equivalent to the following form:
@@ -27,7 +27,7 @@ class MultipartTest extends FunSuite {
       .add(SimpleElement("type", "text"))
       .buildFormPost(multipart = true)
 
-  test("sanity check") {
+  test("sanity check")
     val req = Request()
     req.method = Method.Post
     req.contentString = "abc=foo&def=123&abc=bar"
@@ -39,14 +39,12 @@ class MultipartTest extends FunSuite {
                           "def" -> Seq("123")
                       ),
                       Map.empty[String, Seq[Multipart.FileUpload]])))
-  }
 
-  test("Attribute") {
+  test("Attribute")
     assert(
         newRequest(Buf.Empty).multipart.get.attributes("type").head == "text")
-  }
 
-  test("FileUpload (in-memory)") {
+  test("FileUpload (in-memory)")
     val foo = Buf.Utf8("foo")
     val multipart = newRequest(foo).multipart.get
 
@@ -60,9 +58,8 @@ class MultipartTest extends FunSuite {
     assert(fileName == "dealwithit.gif")
     assert(contentTransferEncoding == "binary")
     assert(attr == "text")
-  }
 
-  test("FileUpload (on-disk)") {
+  test("FileUpload (on-disk)")
     val foo =
       Buf.Utf8("." * (Multipart.MaxInMemoryFileSize.inBytes.toInt + 10))
     val multipart = newRequest(foo).multipart.get
@@ -78,5 +75,3 @@ class MultipartTest extends FunSuite {
     assert(fileName == "dealwithit.gif")
     assert(contentTransferEncoding == "binary")
     assert(attr == "text")
-  }
-}

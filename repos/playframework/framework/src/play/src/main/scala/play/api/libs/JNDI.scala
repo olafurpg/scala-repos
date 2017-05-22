@@ -11,7 +11,7 @@ import javax.naming.Context._
 /**
   * JNDI Helpers.
   */
-object JNDI {
+object JNDI
 
   private val IN_MEMORY_JNDI = "tyrex.naming.MemoryContextFactory"
   private val IN_MEMORY_URL = "/"
@@ -19,28 +19,24 @@ object JNDI {
   /**
     * An in memory JNDI implementation.
     */
-  lazy val initialContext = {
+  lazy val initialContext =
 
     val env = new java.util.Hashtable[String, String]
 
-    env.put(INITIAL_CONTEXT_FACTORY, {
+    env.put(INITIAL_CONTEXT_FACTORY,
       Play.privateMaybeApplication
         .flatMap(_.configuration.getString(INITIAL_CONTEXT_FACTORY))
-        .getOrElse {
+        .getOrElse
           System.setProperty(INITIAL_CONTEXT_FACTORY, IN_MEMORY_JNDI)
           IN_MEMORY_JNDI
-        }
-    })
+    )
 
-    env.put(PROVIDER_URL, {
+    env.put(PROVIDER_URL,
       Play.privateMaybeApplication
         .flatMap(_.configuration.getString(PROVIDER_URL))
-        .getOrElse {
+        .getOrElse
           System.setProperty(PROVIDER_URL, IN_MEMORY_URL)
           IN_MEMORY_URL
-        }
-    })
+    )
 
     new InitialContext(env)
-  }
-}

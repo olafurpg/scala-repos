@@ -24,35 +24,28 @@ import kafka.api.RequestOrResponse
 import kafka.utils.Logging
 import org.apache.kafka.common.network.NetworkSend
 
-object RequestOrResponseSend {
-  def serialize(request: RequestOrResponse): ByteBuffer = {
+object RequestOrResponseSend
+  def serialize(request: RequestOrResponse): ByteBuffer =
     val buffer = ByteBuffer.allocate(
         request.sizeInBytes + (if (request.requestId != None) 2 else 0))
-    request.requestId match {
+    request.requestId match
       case Some(requestId) =>
         buffer.putShort(requestId)
       case None =>
-    }
     request.writeTo(buffer)
     buffer.rewind()
     buffer
-  }
-}
 
 class RequestOrResponseSend(val dest: String, val buffer: ByteBuffer)
-    extends NetworkSend(dest, buffer) with Logging {
+    extends NetworkSend(dest, buffer) with Logging
 
-  def this(dest: String, request: RequestOrResponse) {
+  def this(dest: String, request: RequestOrResponse)
     this(dest, RequestOrResponseSend.serialize(request))
-  }
 
-  def writeCompletely(channel: GatheringByteChannel): Long = {
+  def writeCompletely(channel: GatheringByteChannel): Long =
     var totalWritten = 0L
-    while (!completed()) {
+    while (!completed())
       val written = writeTo(channel)
       trace(written + " bytes written.")
       totalWritten += written
-    }
     totalWritten
-  }
-}

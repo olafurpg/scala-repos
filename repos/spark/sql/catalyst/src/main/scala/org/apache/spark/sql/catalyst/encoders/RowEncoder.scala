@@ -31,8 +31,8 @@ import org.apache.spark.unsafe.types.UTF8String
   * A factory for constructing encoders that convert external row to/from the Spark SQL
   * internal binary representation.
   */
-object RowEncoder {
-  def apply(schema: StructType): ExpressionEncoder[Row] = {
+object RowEncoder
+  def apply(schema: StructType): ExpressionEncoder[Row] =
     val cls = classOf[Row]
     val inputObject = BoundReference(0, ObjectType(cls), nullable = true)
     // We use an If expression to wrap extractorsFor result of StructType
@@ -45,11 +45,10 @@ object RowEncoder {
         extractExpressions.asInstanceOf[CreateStruct].children,
         constructExpression,
         ClassTag(cls))
-  }
 
   private def extractorsFor(
       inputObject: Expression, inputType: DataType): Expression =
-    inputType match {
+    inputType match
       case NullType | BooleanType | ByteType | ShortType | IntegerType |
           LongType | FloatType | DoubleType | BinaryType |
           CalendarIntervalType =>
@@ -91,7 +90,7 @@ object RowEncoder {
                      inputObject :: Nil)
 
       case t @ ArrayType(et, _) =>
-        et match {
+        et match
           case BooleanType | ByteType | ShortType | IntegerType | LongType |
               FloatType | DoubleType =>
             NewInstance(classOf[GenericArrayData],
@@ -100,7 +99,6 @@ object RowEncoder {
           case _ =>
             MapObjects(
                 extractorsFor(_, et), inputObject, externalDataTypeFor(et))
-        }
 
       case t @ MapType(kt, vt, valueNullable) =>
         val keys = Invoke(
@@ -125,14 +123,13 @@ object RowEncoder {
                     dataType = t)
 
       case StructType(fields) =>
-        val convertedFields = fields.zipWithIndex.map {
+        val convertedFields = fields.zipWithIndex.map
           case (f, i) =>
             val method =
-              if (f.dataType.isInstanceOf[StructType]) {
+              if (f.dataType.isInstanceOf[StructType])
                 "getStruct"
-              } else {
+              else
                 "get"
-              }
             If(Invoke(inputObject, "isNullAt", BooleanType, Literal(i) :: Nil),
                Literal.create(null, f.dataType),
                extractorsFor(Invoke(inputObject,
@@ -140,13 +137,11 @@ object RowEncoder {
                                     externalDataTypeFor(f.dataType),
                                     Literal(i) :: Nil),
                              f.dataType))
-        }
         If(IsNull(inputObject),
            Literal.create(null, inputType),
            CreateStruct(convertedFields))
-    }
 
-  private def externalDataTypeFor(dt: DataType): DataType = dt match {
+  private def externalDataTypeFor(dt: DataType): DataType = dt match
     case _ if ScalaReflection.isNativeType(dt) => dt
     case CalendarIntervalType => dt
     case TimestampType => ObjectType(classOf[java.sql.Timestamp])
@@ -158,27 +153,23 @@ object RowEncoder {
     case _: StructType => ObjectType(classOf[Row])
     case udt: UserDefinedType[_] => ObjectType(udt.userClass)
     case _: NullType => ObjectType(classOf[java.lang.Object])
-  }
 
-  private def constructorFor(schema: StructType): Expression = {
-    val fields = schema.zipWithIndex.map {
+  private def constructorFor(schema: StructType): Expression =
+    val fields = schema.zipWithIndex.map
       case (f, i) =>
-        val dt = f.dataType match {
+        val dt = f.dataType match
           case p: PythonUserDefinedType => p.sqlType
           case other => other
-        }
         val field = BoundReference(i, dt, f.nullable)
         If(
             IsNull(field),
             Literal.create(null, externalDataTypeFor(dt)),
             constructorFor(field)
         )
-    }
     CreateExternalRow(fields, schema)
-  }
 
   private def constructorFor(input: Expression): Expression =
-    input.dataType match {
+    input.dataType match
       case NullType | BooleanType | ByteType | ShortType | IntegerType |
           LongType | FloatType | DoubleType | BinaryType |
           CalendarIntervalType =>
@@ -236,14 +227,11 @@ object RowEncoder {
                      keyData :: valueData :: Nil)
 
       case schema @ StructType(fields) =>
-        val convertedFields = fields.zipWithIndex.map {
+        val convertedFields = fields.zipWithIndex.map
           case (f, i) =>
             If(Invoke(input, "isNullAt", BooleanType, Literal(i) :: Nil),
                Literal.create(null, externalDataTypeFor(f.dataType)),
                constructorFor(GetStructField(input, i)))
-        }
         If(IsNull(input),
            Literal.create(null, externalDataTypeFor(input.dataType)),
            CreateExternalRow(convertedFields, schema))
-    }
-}

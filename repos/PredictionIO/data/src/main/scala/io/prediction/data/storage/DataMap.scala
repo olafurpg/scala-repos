@@ -25,9 +25,8 @@ import scala.collection.JavaConversions
   * @group Event Data
   */
 case class DataMapException(msg: String, cause: Exception)
-    extends Exception(msg, cause) {
+    extends Exception(msg, cause)
   def this(msg: String) = this(msg, null)
-}
 
 /** A DataMap stores properties of the event or entity. Internally it is a Map
   * whose keys are property names and values are corresponding JSON values
@@ -40,7 +39,7 @@ case class DataMapException(msg: String, cause: Exception)
 class DataMap(
     val fields: Map[String, JValue]
 )
-    extends Serializable {
+    extends Serializable
   @transient lazy implicit private val formats =
     DefaultFormats + new DateTimeJson4sSupport.Serializer
 
@@ -49,20 +48,17 @@ class DataMap(
     *
     * @param name The property name
     */
-  def require(name: String): Unit = {
-    if (!fields.contains(name)) {
+  def require(name: String): Unit =
+    if (!fields.contains(name))
       throw new DataMapException(s"The field $name is required.")
-    }
-  }
 
   /** Check if this DataMap contains a specific property.
     *
     * @param name The property name
     * @return Return true if the property exists, else false.
     */
-  def contains(name: String): Boolean = {
+  def contains(name: String): Boolean =
     fields.contains(name)
-  }
 
   /** Get the value of a mandatory property. Exception is thrown if the property
     * does not exist.
@@ -71,14 +67,12 @@ class DataMap(
     * @param name The property name
     * @return Return the property value of type T
     */
-  def get[T : Manifest](name: String): T = {
+  def get[T : Manifest](name: String): T =
     require(name)
-    fields(name) match {
+    fields(name) match
       case JNull =>
         throw new DataMapException(s"The required field $name cannot be null.")
       case x: JValue => x.extract[T]
-    }
-  }
 
   /** Get the value of an optional property. Return None if the property does
     * not exist.
@@ -87,10 +81,9 @@ class DataMap(
     * @param name The property name
     * @return Return the property value of type Option[T]
     */
-  def getOpt[T : Manifest](name: String): Option[T] = {
+  def getOpt[T : Manifest](name: String): Option[T] =
     // either the field doesn't exist or its value is null
     fields.get(name).flatMap(_.extract[Option[T]])
-  }
 
   /** Get the value of an optional property. Return default value if the
     * property does not exist.
@@ -100,9 +93,8 @@ class DataMap(
     * @param default The default property value of type T
     * @return Return the property value of type T
     */
-  def getOrElse[T : Manifest](name: String, default: T): T = {
+  def getOrElse[T : Manifest](name: String, default: T): T =
     getOpt[T](name).getOrElse(default)
-  }
 
   /** Java-friendly method for getting the value of a property. Return null if the
     * property does not exist.
@@ -112,18 +104,15 @@ class DataMap(
     * @param clazz The class of the type of the property value
     * @return Return the property value of type T
     */
-  def get[T](name: String, clazz: java.lang.Class[T]): T = {
-    val manifest = new Manifest[T] {
+  def get[T](name: String, clazz: java.lang.Class[T]): T =
+    val manifest = new Manifest[T]
       override def erasure: Class[_] = clazz
       override def runtimeClass: Class[_] = clazz
-    }
 
-    fields.get(name) match {
+    fields.get(name) match
       case None => null.asInstanceOf[T]
       case Some(JNull) => null.asInstanceOf[T]
       case Some(x) => x.extract[T](formats, manifest)
-    }
-  }
 
   /** Java-friendly method for getting a list of values of a property. Return null if the
     * property does not exist.
@@ -131,15 +120,13 @@ class DataMap(
     * @param name The property name
     * @return Return the list of property values
     */
-  def getStringList(name: String): java.util.List[String] = {
-    fields.get(name) match {
+  def getStringList(name: String): java.util.List[String] =
+    fields.get(name) match
       case None => null
       case Some(JNull) => null
       case Some(x) =>
         JavaConversions.seqAsJavaList(
             x.extract[List[String]](formats, manifest[List[String]]))
-    }
-  }
 
   /** Return a new DataMap with elements containing elements from the left hand
     * side operand followed by elements from the right hand side operand.
@@ -186,28 +173,25 @@ class DataMap(
     *
     * @return the object of type T.
     */
-  def extract[T : Manifest]: T = {
+  def extract[T : Manifest]: T =
     toJObject().extract[T]
-  }
 
   override def toString: String = s"DataMap($fields)"
 
   override def hashCode: Int = 41 + fields.hashCode
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case that: DataMap =>
       that.canEqual(this) && this.fields.equals(that.fields)
     case _ => false
-  }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[DataMap]
-}
 
 /** Companion object of the [[DataMap]] class
   *
   * @group Event Data
   */
-object DataMap {
+object DataMap
 
   /** Create an empty DataMap
     * @return an empty DataMap
@@ -224,17 +208,14 @@ object DataMap {
     * @param jObj JObject
     * @return a new DataMap initialized by a JObject
     */
-  def apply(jObj: JObject): DataMap = {
-    if (jObj == null) {
+  def apply(jObj: JObject): DataMap =
+    if (jObj == null)
       apply()
-    } else {
+    else
       new DataMap(jObj.obj.toMap)
-    }
-  }
 
   /** Create an DataMap from a JSON String
     * @param js JSON String. eg """{ "a": 1, "b": "foo" }"""
     * @return a new DataMap initialized by a JSON string
     */
   def apply(js: String): DataMap = apply(parse(js).asInstanceOf[JObject])
-}

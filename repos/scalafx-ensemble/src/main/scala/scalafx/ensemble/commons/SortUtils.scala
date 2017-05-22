@@ -33,7 +33,7 @@ import scalafx.scene.control._
 /**
   * utility to sort the items
   */
-object SortUtils {
+object SortUtils
 
   def treeItemSort =
     (ti: TreeItem[String], t2: TreeItem[String]) =>
@@ -46,4 +46,3 @@ object SortUtils {
   def sortKeys = (x: String, y: String) => compare(x, y)
 
   private def compare = (x: String, y: String) => x.compareToIgnoreCase(y) < 0
-}

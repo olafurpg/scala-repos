@@ -1,7 +1,7 @@
 import collection.immutable._
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val ps = PagedSeq.fromLines(
         List(
             "line1",
@@ -16,5 +16,3 @@ object Test {
 
     val eps = PagedSeq.fromLines(List().iterator)
     assert(eps.filter(_ == '\n').size == 0)
-  }
-}

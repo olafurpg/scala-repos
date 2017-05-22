@@ -1,17 +1,14 @@
-object SeveralDuplicates {
-  def foo(i: Int) {
+object SeveralDuplicates
+  def foo(i: Int)
     /*start*/
     println(i + 1)
     /*end*/
     println(2 + 1)
-  }
 
-  def bar() {
+  def bar()
     println(3 + 1)
-  }
 
   println(4 + 1)
-}
 /*
 object SeveralDuplicates {
   def foo(i: Int) {

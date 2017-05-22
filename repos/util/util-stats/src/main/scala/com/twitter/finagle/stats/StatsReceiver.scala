@@ -4,14 +4,13 @@ import java.lang.{Float => JFloat}
 import java.util.concurrent.Callable
 import scala.annotation.varargs
 
-object StatsReceiver {
+object StatsReceiver
   private[StatsReceiver] var immortalGauges: List[Gauge] = Nil
-}
 
 /**
   * [[StatsReceiver]] utility methods for ease of use from java.
   */
-object StatsReceivers {
+object StatsReceivers
 
   /**
     * Java compatible version of [[StatsReceiver.counter]].
@@ -44,7 +43,6 @@ object StatsReceivers {
   @varargs
   def stat(statsReceiver: StatsReceiver, name: String*): Stat =
     statsReceiver.stat(name: _*)
-}
 
 /**
   * An interface for recording metrics. Named
@@ -53,7 +51,7 @@ object StatsReceivers {
   *
   * @see [[StatsReceivers]] for a Java-friendly API.
   */
-trait StatsReceiver { self =>
+trait StatsReceiver  self =>
 
   /**
     * Specifies the representative receiver.  This is in order to
@@ -105,12 +103,10 @@ trait StatsReceiver { self =>
     * @see [[StatsReceiver.addGauge]] if you can properly control the lifecycle
     *     of the returned [[Gauge gauge]].
     */
-  def provideGauge(name: String*)(f: => Float): Unit = {
+  def provideGauge(name: String*)(f: => Float): Unit =
     val gauge = addGauge(name: _*)(f)
-    StatsReceiver.synchronized {
+    StatsReceiver.synchronized
       StatsReceiver.immortalGauges ::= gauge
-    }
-  }
 
   /**
     * Add the function `f` as a [[Gauge gauge]] with the given name.
@@ -142,15 +138,12 @@ trait StatsReceiver { self =>
     * will generate [[Counter counters]] named `/client/adds`
     * and `/client/backend/adds`.
     */
-  def scope(namespace: String): StatsReceiver = {
+  def scope(namespace: String): StatsReceiver =
     if (namespace == "") this
-    else {
-      new NameTranslatingStatsReceiver(this, namespace) {
+    else
+      new NameTranslatingStatsReceiver(this, namespace)
         protected[this] def translate(name: Seq[String]): Seq[String] =
           namespace +: name
-      }
-    }
-  }
 
   /**
     * Prepend `namespace` and `namespaces` to the names of the returned [[StatsReceiver]].
@@ -175,10 +168,10 @@ trait StatsReceiver { self =>
     * }}}
     * will generate a [[Counter counter]] named `/client/toto/adds`.
     */
-  def scopeSuffix(suffix: String): StatsReceiver = {
+  def scopeSuffix(suffix: String): StatsReceiver =
     if (suffix == "") this
-    else {
-      new StatsReceiver {
+    else
+      new StatsReceiver
         val repr = self.repr
 
         override def toString: String = s"$self/$suffix"
@@ -192,10 +185,6 @@ trait StatsReceiver { self =>
 
         override def scope(namespace: String): StatsReceiver =
           self.scope(namespace).scope(suffix)
-      }
-    }
-  }
-}
 
 /**
   * For Java clients that want to implement a [[StatsReceiver]].

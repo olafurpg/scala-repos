@@ -6,7 +6,7 @@ import parsers.Transformers._
 import Implicits._
 import core.Parser
 
-trait ParserApi[+T] {
+trait ParserApi[+T]
 
   /**
     * Wraps this in a [[Logged]]. This prints out information
@@ -83,9 +83,8 @@ trait ParserApi[+T] {
     * applies the supplied predicate to the current parser succeeding on true failing on false
     */
   def filter(predicate: T => Boolean): Parser[T]
-}
 
-class ParserApiImpl[+T](self: Parser[T]) extends ParserApi[T] {
+class ParserApiImpl[+T](self: Parser[T]) extends ParserApi[T]
 
   def log(msg: String = self.toString)(implicit output: Logger) =
     Logged(self, msg, output.f)
@@ -120,4 +119,3 @@ class ParserApiImpl[+T](self: Parser[T]) extends ParserApi[T] {
   def flatMap[V](f: T => Parser[V]): Parser[V] = FlatMapped(self, f)
 
   def filter(predicate: T => Boolean): Parser[T] = Filtered(self, predicate)
-}

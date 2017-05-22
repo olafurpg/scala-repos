@@ -15,7 +15,7 @@ import scala.collection.JavaConverters._
   */
 class CookieMap(message: Message)
     extends mutable.Map[String, Cookie]
-    with mutable.MapLike[String, Cookie, CookieMap] {
+    with mutable.MapLike[String, Cookie, CookieMap]
   override def empty: CookieMap = new CookieMap(Request())
 
   private[this] val underlying =
@@ -31,47 +31,41 @@ class CookieMap(message: Message)
     if (message.isRequest) HttpHeaders.Names.COOKIE
     else HttpHeaders.Names.SET_COOKIE
 
-  private[this] def decodeCookies(header: String): Iterable[Cookie] = {
+  private[this] def decodeCookies(header: String): Iterable[Cookie] =
     val decoder = new NettyCookieDecoder
-    try {
+    try
       decoder.decode(header).asScala map { new Cookie(_) }
-    } catch {
+    catch
       case e: IllegalArgumentException =>
         _isValid = false
         Nil
-    }
-  }
 
-  protected def rewriteCookieHeaders() {
+  protected def rewriteCookieHeaders()
     // Clear all cookies - there may be more than one with this name.
     message.headers.remove(cookieHeaderName)
 
     // Add cookies back again
-    if (message.isRequest) {
+    if (message.isRequest)
       val encoder = new NettyCookieEncoder(false)
-      foreach {
+      foreach
         case (_, cookie) =>
           encoder.addCookie(cookie.underlying)
-      }
       message.headers.set(cookieHeaderName, encoder.encode())
-    } else {
+    else
       val encoder = new NettyCookieEncoder(true)
-      foreach {
+      foreach
         case (_, cookie) =>
           encoder.addCookie(cookie.underlying)
           message.headers.add(cookieHeaderName, encoder.encode())
-      }
-    }
-  }
 
   /**
     * Returns an iterator that iterates over all cookies in this map.
     */
   def iterator: Iterator[(String, Cookie)] =
-    for {
+    for
       (name, cookies) <- underlying.iterator
       cookie <- cookies
-    } yield (name, cookie)
+    yield (name, cookie)
 
   /**
     * Applies the given function ''f'' to each cookie in this map.
@@ -112,12 +106,11 @@ class CookieMap(message: Message)
     *
     * @param cookie the tuple representing ''name'' and ''Cookie''
     */
-  def +=(cookie: (String, Cookie)) = {
+  def +=(cookie: (String, Cookie)) =
     val (n, c) = cookie
     underlying(n) = Set(c)
     rewriteCookieHeaders()
     this
-  }
 
   /**
     * Adds the given  ''cookie'' into this map. If there are already cookies
@@ -125,20 +118,18 @@ class CookieMap(message: Message)
     *
     * @param cookie the ''Cookie'' to add
     */
-  def +=(cookie: Cookie): CookieMap = {
+  def +=(cookie: Cookie): CookieMap =
     this += ((cookie.name, cookie))
-  }
 
   /**
     * Deletes all cookies with the given ''name'' from this map.
     *
     * @param name the name of the cookies to delete
     */
-  def -=(name: String) = {
+  def -=(name: String) =
     underlying -= name
     rewriteCookieHeaders()
     this
-  }
 
   /**
     * Adds the given ''cookie'' with ''name'' into this map. Existing cookies
@@ -149,10 +140,9 @@ class CookieMap(message: Message)
     * @param name the cookie name to add
     * @param cookie the ''Cookie'' to add
     */
-  def add(name: String, cookie: Cookie) {
+  def add(name: String, cookie: Cookie)
     underlying(name) = (underlying(name) - cookie) + cookie
     rewriteCookieHeaders()
-  }
 
   /**
     * Adds the given ''cookie'' into this map. Existing cookies with this name
@@ -162,14 +152,11 @@ class CookieMap(message: Message)
     *
     * @param cookie the ''Cookie'' to add
     */
-  def add(cookie: Cookie) {
+  def add(cookie: Cookie)
     add(cookie.name, cookie)
-  }
 
-  for {
+  for
     cookieHeader <- message.headers.getAll(cookieHeaderName).asScala
     cookie <- decodeCookies(cookieHeader)
-  } {
+  
     add(cookie)
-  }
-}

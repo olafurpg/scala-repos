@@ -19,27 +19,24 @@ import cascading.tuple.{TupleEntry, Tuple => CTuple}
 
 import org.scalatest.{Matchers, WordSpec}
 
-class TupleTest extends WordSpec with Matchers {
+class TupleTest extends WordSpec with Matchers
   def get[T](ctup: CTuple)(implicit tc: TupleConverter[T]) =
     tc(new TupleEntry(ctup))
   def set[T](t: T)(implicit ts: TupleSetter[T]): CTuple = ts(t)
 
   def arityConvMatches[T](t: T, ar: Int)(
-      implicit tc: TupleConverter[T]): Boolean = {
+      implicit tc: TupleConverter[T]): Boolean =
     tc.arity == ar
-  }
-  def aritySetMatches[T](t: T, ar: Int)(implicit tc: TupleSetter[T]): Boolean = {
+  def aritySetMatches[T](t: T, ar: Int)(implicit tc: TupleSetter[T]): Boolean =
     tc.arity == ar
-  }
 
   def roundTrip[T](t: T)(
-      implicit tc: TupleConverter[T], ts: TupleSetter[T]): Boolean = {
+      implicit tc: TupleConverter[T], ts: TupleSetter[T]): Boolean =
     tc(new TupleEntry(ts(t))) == t
-  }
 
-  "TupleConverters" should {
+  "TupleConverters" should
 
-    "TupleGetter should work as a type-class" in {
+    "TupleGetter should work as a type-class" in
       val emptyTup = new CTuple
       val ctup = new CTuple(
           "hey", new java.lang.Long(2), new java.lang.Integer(3), emptyTup)
@@ -47,9 +44,8 @@ class TupleTest extends WordSpec with Matchers {
       TupleGetter.get[Long](ctup, 1) shouldBe 2L
       TupleGetter.get[Int](ctup, 2) shouldBe 3
       TupleGetter.get[CTuple](ctup, 3) shouldBe emptyTup
-    }
 
-    "get primitives out of cascading tuples" in {
+    "get primitives out of cascading tuples" in
       val ctup =
         new CTuple("hey", new java.lang.Long(2), new java.lang.Integer(3))
       get[(String, Long, Int)](ctup) shouldBe ("hey", 2L, 3)
@@ -66,8 +62,7 @@ class TupleTest extends WordSpec with Matchers {
       roundTrip[(Int, Int)]((4, 2)) shouldBe true
       arityConvMatches((2, 3), 2) shouldBe true
       aritySetMatches((2, 3), 2) shouldBe true
-    }
-    "get non-primitives out of cascading tuples" in {
+    "get non-primitives out of cascading tuples" in
       val ctup = new CTuple(None, List(1, 2, 3), 1 -> 2)
       get[(Option[Int], List[Int], (Int, Int))](ctup) shouldBe
       (None, List(1, 2, 3), 1 -> 2)
@@ -80,8 +75,7 @@ class TupleTest extends WordSpec with Matchers {
       aritySetMatches(None, 1) shouldBe true
       arityConvMatches(List(1, 2, 3), 1) shouldBe true
       aritySetMatches(List(1, 2, 3), 1) shouldBe true
-    }
-    "deal with AnyRef" in {
+    "deal with AnyRef" in
       val ctup = new CTuple(None, List(1, 2, 3), 1 -> 2)
       get[(AnyRef, AnyRef, AnyRef)](ctup) shouldBe
       (None, List(1, 2, 3), 1 -> 2)
@@ -91,6 +85,3 @@ class TupleTest extends WordSpec with Matchers {
       roundTrip[(AnyRef, AnyRef)]((Nil, Nil)) shouldBe true
       arityConvMatches[(AnyRef, AnyRef)](("hey", "you"), 2) shouldBe true
       aritySetMatches[(AnyRef, AnyRef)](("hey", "you"), 2) shouldBe true
-    }
-  }
-}

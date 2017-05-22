@@ -21,7 +21,7 @@ import com.twitter.bijection.Bijection
 import java.util.Date
 import com.twitter.scalding.RichDate
 
-case class Timestamp(milliSinceEpoch: Long) extends AnyVal {
+case class Timestamp(milliSinceEpoch: Long) extends AnyVal
   def compare(that: Timestamp) = milliSinceEpoch.compare(that.milliSinceEpoch)
   def prev = copy(milliSinceEpoch = milliSinceEpoch - 1)
   def next = copy(milliSinceEpoch = milliSinceEpoch + 1)
@@ -41,9 +41,8 @@ case class Timestamp(milliSinceEpoch: Long) extends AnyVal {
     Timestamp(milliSinceEpoch + (hours * 1000 * 60 * 60))
   def incrementDays(days: Long) =
     Timestamp(milliSinceEpoch + (days * 1000 * 60 * 60 * 24))
-}
 
-object Timestamp {
+object Timestamp
   val Max = Timestamp(Long.MaxValue)
   val Min = Timestamp(Long.MinValue)
   def now: Timestamp = Timestamp(System.currentTimeMillis)
@@ -55,43 +54,37 @@ object Timestamp {
     Monoid.from(Timestamp.Min)(orderingOnTimestamp.max(_, _))
 
   implicit val timestamp2Date: Bijection[Timestamp, Date] =
-    Bijection.build[Timestamp, Date] { ts =>
+    Bijection.build[Timestamp, Date]  ts =>
       new Date(ts.milliSinceEpoch)
-    } { fromDate(_) }
+    { fromDate(_) }
 
   implicit val timestamp2Long: Bijection[Timestamp, Long] =
     Bijection.build[Timestamp, Long] { _.milliSinceEpoch } { Timestamp(_) }
 
   implicit val timestampSuccessible: Successible[Timestamp] =
-    new Successible[Timestamp] {
+    new Successible[Timestamp]
       def next(old: Timestamp) =
         if (old.milliSinceEpoch != Long.MaxValue) Some(old.next) else None
       def ordering: Ordering[Timestamp] = Timestamp.orderingOnTimestamp
       def partialOrdering = Timestamp.orderingOnTimestamp
-    }
 
   implicit val timestampPredecessible: Predecessible[Timestamp] =
-    new Predecessible[Timestamp] {
+    new Predecessible[Timestamp]
       def prev(old: Timestamp) =
         if (old.milliSinceEpoch != Long.MinValue) Some(old.prev) else None
       def ordering: Ordering[Timestamp] = Timestamp.orderingOnTimestamp
       def partialOrdering = Timestamp.orderingOnTimestamp
-    }
 
   // This is a right semigroup, that given any two Timestamps just take the one on the right.
   // The reason we did this is because we don't want to give a stronger contract to the semigroup
   // than the store actually respects
-  val rightSemigroup = new Semigroup[Timestamp] {
+  val rightSemigroup = new Semigroup[Timestamp]
     def plus(a: Timestamp, b: Timestamp) = b
     override def sumOption(ti: TraversableOnce[Timestamp]) =
       if (ti.isEmpty) None
-      else {
+      else
         val iter = ti.toIterator
         var last: Timestamp = iter.next
-        while (iter.hasNext) {
+        while (iter.hasNext)
           last = iter.next
-        }
         Some(last)
-      }
-  }
-}

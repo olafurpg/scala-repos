@@ -27,7 +27,7 @@ import org.apache.spark.internal.Logging
 private[spark] class BroadcastManager(val isDriver: Boolean,
                                       conf: SparkConf,
                                       securityManager: SecurityManager)
-    extends Logging {
+    extends Logging
 
   private var initialized = false
   private var broadcastFactory: BroadcastFactory = null
@@ -35,28 +35,21 @@ private[spark] class BroadcastManager(val isDriver: Boolean,
   initialize()
 
   // Called by SparkContext or Executor before using Broadcast
-  private def initialize() {
-    synchronized {
-      if (!initialized) {
+  private def initialize()
+    synchronized
+      if (!initialized)
         broadcastFactory = new TorrentBroadcastFactory
         broadcastFactory.initialize(isDriver, conf, securityManager)
         initialized = true
-      }
-    }
-  }
 
-  def stop() {
+  def stop()
     broadcastFactory.stop()
-  }
 
   private val nextBroadcastId = new AtomicLong(0)
 
-  def newBroadcast[T : ClassTag](value_ : T, isLocal: Boolean): Broadcast[T] = {
+  def newBroadcast[T : ClassTag](value_ : T, isLocal: Boolean): Broadcast[T] =
     broadcastFactory.newBroadcast[T](
         value_, isLocal, nextBroadcastId.getAndIncrement())
-  }
 
-  def unbroadcast(id: Long, removeFromDriver: Boolean, blocking: Boolean) {
+  def unbroadcast(id: Long, removeFromDriver: Boolean, blocking: Boolean)
     broadcastFactory.unbroadcast(id, removeFromDriver, blocking)
-  }
-}

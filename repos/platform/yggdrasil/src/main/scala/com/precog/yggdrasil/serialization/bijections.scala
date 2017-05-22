@@ -29,7 +29,7 @@ import java.nio.ByteBuffer
 import scala.annotation.tailrec
 import scala.collection.generic.CanBuildFrom
 
-package object bijections {
+package object bijections
   private val UTF8 = java.nio.charset.Charset.forName("UTF-8")
 
 /*
@@ -95,6 +95,5 @@ package object bijections {
     }
   }
  */
-}
 
 // vim: set ts=4 sw=4 et:

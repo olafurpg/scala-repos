@@ -2,7 +2,7 @@
 // Programmation IV - 2002 - Week 01
 //############################################################################
 
-object M0 {
+object M0
 
   //##########################################################################
 
@@ -74,7 +74,7 @@ object M0 {
 
   //##########################################################################
 
-  def sqrt1(x: Double) = {
+  def sqrt1(x: Double) =
     def sqrtIter1(guess: Double, x: Double): Double =
       if (isGoodEnough1(guess, x)) guess
       else sqrtIter1(improve1(guess, x), x);
@@ -86,7 +86,6 @@ object M0 {
       abs(square(guess) - x) < 0.001;
 
     sqrtIter1(1.0, x)
-  }
 
   Console.println(sqrt1(2));
   Console.println(sqrt1(3));
@@ -94,7 +93,7 @@ object M0 {
 
   //##########################################################################
 
-  def sqrt2(x: Double) = {
+  def sqrt2(x: Double) =
     def sqrtIter2(guess: Double): Double =
       if (isGoodEnough2(guess)) guess
       else sqrtIter2(improve2(guess));
@@ -106,21 +105,19 @@ object M0 {
       abs(square(guess) - x) < 0.001;
 
     sqrtIter2(1.0)
-  }
 
   Console.println(sqrt2(2));
   Console.println(sqrt2(3));
   Console.println(sqrt2(4));
 
   //##########################################################################
-}
 
 //############################################################################
 
-object M1 {
+object M1
   def abs(x: Double) = if (x >= 0) x else -x;
 
-  def sqrt(x: Double): Double = {
+  def sqrt(x: Double): Double =
     def sqrtIter(prev: Double, guess: Double): Double =
       if (isGoodEnough(prev, guess)) guess
       else sqrtIter(guess, improve(guess));
@@ -131,22 +128,19 @@ object M1 {
       abs(prev - guess) / guess < 0.001;
 
     sqrtIter(1.0, improve(1.0))
-  }
 
   Console.println("sqrt(2) = " + sqrt(2));
-}
 
 //############################################################################
 
-object M2 {
+object M2
   def abs(x: Double) = if (x >= 0) x else -x;
 
-  def sqrt(x: Double): Double = {
-    def sqrtIter(guess: Double): Double = {
+  def sqrt(x: Double): Double =
+    def sqrtIter(guess: Double): Double =
       val next = improve(guess);
       if (isGoodEnough(guess, next)) next
       else sqrtIter(next)
-    }
 
     def improve(guess: Double) = (guess + x / guess) / 2;
 
@@ -154,22 +148,19 @@ object M2 {
       abs(prev - guess) / guess < 0.001;
 
     sqrtIter(1.0)
-  }
 
   Console.println("sqrt(2) = " + sqrt(2));
-}
 
 //############################################################################
 
-object M3 {
+object M3
   def abs(x: Double) = if (x >= 0) x else -x;
 
-  def cbrt(x: Double): Double = {
-    def cbrtIter(guess: Double): Double = {
+  def cbrt(x: Double): Double =
+    def cbrtIter(guess: Double): Double =
       val next = improve(guess);
       if (isGoodEnough(guess, next)) next
       else cbrtIter(next)
-    }
 
     def improve(y: Double) = (x / (y * y) + 2 * y) / 3;
 
@@ -177,14 +168,12 @@ object M3 {
       abs(prev - guess) / guess < 0.001;
 
     cbrtIter(1.0)
-  }
 
   Console.println("cbrt(2) = " + cbrt(2));
-}
 
 //############################################################################
 
-object M4 {
+object M4
   def pascal(c: Int, l: Int): Int =
     if (c <= 0 || c >= l) 1
     else pascal(c - 1, l - 1) + pascal(c, l - 1);
@@ -223,19 +212,16 @@ object M4 {
   Console.print(' ');
   Console.print(pascal(4, 4));
   Console.println;
-}
 
 //############################################################################
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     M0;
     M1;
     M2;
     M3;
     M4;
     ()
-  }
-}
 
 //############################################################################

@@ -4,50 +4,44 @@ import scala.annotation.tailrec
 
 import scala.collection.GenTraversableOnce
 
-package object runtime {
+package object runtime
 
   @deprecated("Use scala.scalajs.LinkingInfo.assumingES6 instead.", "0.6.6")
   @inline
   def assumingES6: Boolean =
     scala.scalajs.LinkingInfo.assumingES6
 
-  def wrapJavaScriptException(e: Any): Throwable = e match {
+  def wrapJavaScriptException(e: Any): Throwable = e match
     case e: Throwable => e
     case _ => js.JavaScriptException(e)
-  }
 
-  def unwrapJavaScriptException(th: Throwable): Any = th match {
+  def unwrapJavaScriptException(th: Throwable): Any = th match
     case js.JavaScriptException(e) => e
     case _ => th
-  }
 
-  def cloneObject(from: js.Object): js.Object = {
+  def cloneObject(from: js.Object): js.Object =
     val fromDyn = from.asInstanceOf[js.Dynamic]
     val result = js.Dynamic.newInstance(fromDyn.constructor)()
     val fromDict = from.asInstanceOf[js.Dictionary[js.Any]]
     val resultDict = result.asInstanceOf[js.Dictionary[js.Any]]
     for (key <- fromDict.keys) resultDict(key) = fromDict(key)
     result
-  }
 
   @inline final def genTraversableOnce2jsArray[A](
-      col: GenTraversableOnce[A]): js.Array[A] = {
-    col match {
+      col: GenTraversableOnce[A]): js.Array[A] =
+    col match
       case col: js.ArrayOps[A] => col.result()
       case col: js.WrappedArray[A] => col.array
       case _ =>
         val result = new js.Array[A]
         col.foreach(x => result.push(x))
         result
-    }
-  }
 
   final def jsTupleArray2jsObject(
-      tuples: js.Array[(String, js.Any)]): js.Object with js.Dynamic = {
+      tuples: js.Array[(String, js.Any)]): js.Object with js.Dynamic =
     val result = js.Dynamic.literal()
     for ((name, value) <- tuples) result.updateDynamic(name)(value)
     result
-  }
 
   /** Instantiates a JS object with variadic arguments to the constructor.
     *
@@ -85,26 +79,25 @@ package object runtime {
     *
     *  This is the implementation of [[js.Object.properties]].
     */
-  def propertiesOf(obj: js.Any): js.Array[String] = {
+  def propertiesOf(obj: js.Any): js.Array[String] =
     // See http://stackoverflow.com/questions/26445248/
-    if (obj == null || js.isUndefined(obj)) {
+    if (obj == null || js.isUndefined(obj))
       js.Array()
-    } else {
+    else
       val result = new js.Array[String]
       val alreadySeen = js.Dictionary.empty[Boolean]
 
       @tailrec
-      def loop(obj: js.Object): Unit = {
-        if (obj != null) {
+      def loop(obj: js.Object): Unit =
+        if (obj != null)
           // Add own enumerable properties that have not been seen yet
           val enumProps = js.Object.keys(obj)
           val enumPropsLen = enumProps.length
           var i = 0
-          while (i < enumPropsLen) {
+          while (i < enumPropsLen)
             val prop = enumProps(i)
             if (!alreadySeen.get(prop).isDefined) result.push(prop)
             i += 1
-          }
 
           /* Add all own properties to the alreadySeen set, including
            * non-enumerable ones.
@@ -112,20 +105,15 @@ package object runtime {
           val allProps = js.Object.getOwnPropertyNames(obj)
           val allPropsLen = allProps.length
           var j = 0
-          while (j < allPropsLen) {
+          while (j < allPropsLen)
             alreadySeen(allProps(j)) = true
             j += 1
-          }
 
           // Continue with the next object in the prototype chain
           loop(js.Object.getPrototypeOf(obj))
-        }
-      }
       loop(js.Object(obj))
 
       result
-    }
-  }
 
   /** Information about the environment Scala.js runs in
     *
@@ -147,7 +135,7 @@ package object runtime {
     *  do `x.toFloat` somewhere in here, which would itself, in turn, call this
     *  method.
     */
-  def froundPolyfill(v: Double): Double = {
+  def froundPolyfill(v: Double): Double =
     /* Originally inspired by the Typed Array polyfills written by Joshua Bell:
      * https://github.com/inexorabletash/polyfill/blob/a682f42c1092280bb01907c245979fb07219513d/typedarray.js#L150-L255
      * Then simplified quite a lot because
@@ -158,9 +146,9 @@ package object runtime {
     import Math._
 
     // Special cases
-    if (v.isNaN || v == 0.0 || v.isInfinite) {
+    if (v.isNaN || v == 0.0 || v.isInfinite)
       v
-    } else {
+    else
       val LN2 = 0.6931471805599453
       val ebits = 8
       val fbits = 23
@@ -172,42 +160,35 @@ package object runtime {
       val av = if (isNegative) -v else v
 
       val absResult =
-        if (av >= SubnormalThreshold) {
+        if (av >= SubnormalThreshold)
           val e0 = floor(log(av) / LN2)
           // 1-bias <= e0 <= 1024
-          if (e0 > bias) {
+          if (e0 > bias)
             // Overflow
             Double.PositiveInfinity
-          } else {
+          else
             val twoPowE0 = pow(2, e0)
             val f0 = Bits.roundToEven(av / twoPowE0 * twoPowFbits)
-            if (f0 / twoPowFbits >= 2) {
+            if (f0 / twoPowFbits >= 2)
               //val e = e0 + 1.0 // not used
               val f = 1.0
-              if (e0 > bias - 1) {
+              if (e0 > bias - 1)
                 // === (e > bias) because e0 is whole
                 // Overflow
                 Double.PositiveInfinity
-              } else {
+              else
                 // Normalized case 1
                 val twoPowE = 2 * twoPowE0
                 twoPowE * (1.0 + (f - twoPowFbits) / twoPowFbits)
-              }
-            } else {
+            else
               // Normalized case 2
               // val e = e0 // not used
               val f = f0
               val twoPowE = twoPowE0
               twoPowE * (1.0 + (f - twoPowFbits) / twoPowFbits)
-            }
-          }
-        } else {
+        else
           // Subnormal
           val rounder = Float.MinPositiveValue.toDouble
           Bits.roundToEven(av / rounder) * rounder
-        }
 
       if (isNegative) -absResult else absResult
-    }
-  }
-}

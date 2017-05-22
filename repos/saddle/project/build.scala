@@ -19,7 +19,7 @@ import sbtassembly.Plugin._
 import sbtassembly.Plugin.AssemblyKeys._
 import sbtrelease.ReleasePlugin._
 
-object SaddleBuild extends sbt.Build {
+object SaddleBuild extends sbt.Build
 
   lazy val root =
     project(id = "saddle",
@@ -28,12 +28,11 @@ object SaddleBuild extends sbt.Build {
                   console <<= (console in core in Compile) { identity },
                   assembleArtifact in packageScala := false,
                   publishArtifact := false,
-                  mergeStrategy in assembly := {
+                  mergeStrategy in assembly :=
                   case "META-INF/MANIFEST.MF" | "META-INF/LICENSE" |
                       "META-INF/BCKEY.DSA" =>
                     MergeStrategy.discard
                   case _ => MergeStrategy.first
-                }
               ),
             base = file(".")) aggregate (core, hdf5, test_framework)
 
@@ -94,10 +93,9 @@ object SaddleBuild extends sbt.Build {
         id = id,
         base = base,
         settings = assemblySettings ++ Project.defaultSettings ++ Shared.settings ++ releaseSettings ++ settings)
-}
 
-object Shared {
-  def testDeps(version: String, conf: String = "test") = {
+object Shared
+  def testDeps(version: String, conf: String = "test") =
     val specs2 =
       if (version.startsWith("2.1")) "org.specs2" %% "specs2" % "2.4.1"
       else if (version.startsWith("2.9.3"))
@@ -114,15 +112,14 @@ object Shared {
         scalacheck % conf,
         "junit" % "junit" % "4.11" % conf
     )
-  }
 
   val settings = Seq(
       organization := "org.scala-saddle",
       publishMavenStyle := true,
       publishArtifact in Test := false,
-      pomIncludeRepository := { x =>
+      pomIncludeRepository :=  x =>
         false
-      },
+      ,
       pomExtra := (<url>http://saddle.github.io/</url>
       <licenses>
         <license>
@@ -154,20 +151,19 @@ object Shared {
       version := "1.3.5-SNAPSHOT",
       crossScalaVersions := Seq("2.9.3", "2.10.5", "2.11.6"),
       scalacOptions := Seq("-deprecation", "-unchecked"), // , "-Xexperimental"),
-      shellPrompt := { (state: State) =>
+      shellPrompt :=  (state: State) =>
         "[%s]$ " format (Project.extract(state).currentProject.id)
-      },
+      ,
       resolvers ++= Seq(
           "Sonatype OSS Releases" at "http://oss.sonatype.org/content/repositories/releases/",
           "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
       ),
-      publishTo <<= (version) { version: String =>
+      publishTo <<= (version)  version: String =>
         val nexus = "https://oss.sonatype.org/"
         if (version.trim.endsWith("SNAPSHOT"))
           Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
+      ,
       credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
       compile <<= (compile in Compile) dependsOn (compile in Test)
   )
-}

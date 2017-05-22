@@ -21,26 +21,23 @@ import scala.io.{Source => ScalaSource}
 
 import org.scalatest.{Matchers, WordSpec}
 
-class TemplateTestJob(args: Args) extends Job(args) {
-  try {
+class TemplateTestJob(args: Args) extends Job(args)
+  try
     Tsv("input", ('col1, 'col2)).read.write(TemplatedTsv("base", "%s", 'col1))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class TemplateSourceTest extends WordSpec with Matchers {
+class TemplateSourceTest extends WordSpec with Matchers
   import Dsl._
-  "TemplatedTsv" should {
-    "split output by template" in {
+  "TemplatedTsv" should
+    "split output by template" in
       val input = Seq(("A", 1), ("A", 2), ("B", 3))
 
       // Need to save the job to allow, find the temporary directory data was written to
       var job: Job = null;
-      def buildJob(args: Args): Job = {
+      def buildJob(args: Args): Job =
         job = new TemplateTestJob(args)
         job
-      }
 
       JobTest(buildJob(_))
         .source(Tsv("input", ('col1, 'col2)), input)
@@ -59,6 +56,3 @@ class TemplateSourceTest extends WordSpec with Matchers {
 
       aSource.getLines.toList shouldBe Seq("A\t1", "A\t2")
       bSource.getLines.toList shouldBe Seq("B\t3")
-    }
-  }
-}

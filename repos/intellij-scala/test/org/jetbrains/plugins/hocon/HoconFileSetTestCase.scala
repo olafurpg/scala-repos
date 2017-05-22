@@ -14,27 +14,25 @@ import org.junit.Assert
 /**
   * @author ghik
   */
-object HoconFileSetTestCase {
+object HoconFileSetTestCase
   val CaretMarker = "<caret>"
-}
 
 import org.jetbrains.plugins.hocon.HoconFileSetTestCase._
 
 abstract class HoconFileSetTestCase(subpath: String)
-    extends FileSetTestCase(TestUtils.getTestDataPath + "/hocon/" + subpath) {
+    extends FileSetTestCase(TestUtils.getTestDataPath + "/hocon/" + subpath)
 
   protected def transform(data: Seq[String]): String
 
   protected def preprocessData(parts: Seq[String]): Seq[String] =
     parts
 
-  private def trimNewLines(str: String) = {
+  private def trimNewLines(str: String) =
     val preTrimmed = str.substring(str.prefixLength(_ == '\n'))
     val endingNewlines = preTrimmed.reverseIterator.takeWhile(_ == '\n').length
     preTrimmed.substring(0, preTrimmed.length - endingNewlines)
-  }
 
-  protected def runTest(file: File): Unit = {
+  protected def runTest(file: File): Unit =
     val fileContents = new String(FileUtil.loadFileText(file, "UTF-8"))
       .replaceAllLiterally("\r", "")
     val allParts = preprocessData(
@@ -45,7 +43,6 @@ abstract class HoconFileSetTestCase(subpath: String)
     Assert.assertEquals(
         expectedResult,
         trimNewLines(transform(data).replaceAllLiterally("\r", "")))
-  }
 
   protected def settings =
     CodeStyleSettingsManager
@@ -53,27 +50,24 @@ abstract class HoconFileSetTestCase(subpath: String)
       .getCurrentSettings
       .getCommonSettings(HoconLanguage)
 
-  protected def adjustSettings(): Unit = {
+  protected def adjustSettings(): Unit =
     val indentOptions = settings.getIndentOptions
     indentOptions.INDENT_SIZE = 2
     indentOptions.CONTINUATION_INDENT_SIZE = 2
     indentOptions.TAB_SIZE = 2
-  }
 
-  override protected def setUp(project: Project): Unit = {
+  override protected def setUp(project: Project): Unit =
     super.setUp(project)
     adjustSettings()
     getProject
-  }
 
-  protected def extractCaret(fileText: String): (String, Int) = {
+  protected def extractCaret(fileText: String): (String, Int) =
     val caretOffset = fileText.indexOf(CaretMarker)
     if (caretOffset >= 0)
       (fileText.substring(0, caretOffset) +
        fileText.substring(caretOffset + CaretMarker.length),
        caretOffset)
     else (fileText, -1)
-  }
 
   protected def insertCaret(fileText: String, caretOffset: Int) =
     if (caretOffset >= 0 && caretOffset <= fileText.length)
@@ -86,4 +80,3 @@ abstract class HoconFileSetTestCase(subpath: String)
 
   protected def inReadAction[T](code: => T): T =
     extensions.inReadAction(code)
-}

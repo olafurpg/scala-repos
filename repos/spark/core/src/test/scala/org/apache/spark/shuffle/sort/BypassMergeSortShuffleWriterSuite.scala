@@ -39,7 +39,7 @@ import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
 class BypassMergeSortShuffleWriterSuite
-    extends SparkFunSuite with BeforeAndAfterEach {
+    extends SparkFunSuite with BeforeAndAfterEach
 
   @Mock(answer = RETURNS_SMART_NULLS)
   private var blockManager: BlockManager = _
@@ -62,7 +62,7 @@ class BypassMergeSortShuffleWriterSuite
     new mutable.HashMap[BlockId, File]
   private var shuffleHandle: BypassMergeSortShuffleHandle[Int, Int] = _
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     tempDir = Utils.createTempDir()
     outputFile = File.createTempFile("shuffle", null, tempDir)
@@ -77,16 +77,14 @@ class BypassMergeSortShuffleWriterSuite
     when(dependency.serializer).thenReturn(new JavaSerializer(conf))
     when(taskContext.taskMetrics()).thenReturn(taskMetrics)
     when(blockResolver.getDataFile(0, 0)).thenReturn(outputFile)
-    doAnswer(new Answer[Void] {
-      def answer(invocationOnMock: InvocationOnMock): Void = {
+    doAnswer(new Answer[Void]
+      def answer(invocationOnMock: InvocationOnMock): Void =
         val tmp: File = invocationOnMock.getArguments()(3).asInstanceOf[File]
-        if (tmp != null) {
+        if (tmp != null)
           outputFile.delete
           tmp.renameTo(outputFile)
-        }
         null
-      }
-    }).when(blockResolver)
+    ).when(blockResolver)
       .writeIndexFileAndCommit(
           anyInt, anyInt, any(classOf[Array[Long]]), any(classOf[File]))
     when(blockManager.diskBlockManager).thenReturn(diskBlockManager)
@@ -97,9 +95,9 @@ class BypassMergeSortShuffleWriterSuite
             any[SerializerInstance],
             anyInt(),
             any[ShuffleWriteMetrics]
-        )).thenAnswer(new Answer[DiskBlockObjectWriter] {
+        )).thenAnswer(new Answer[DiskBlockObjectWriter]
       override def answer(
-          invocation: InvocationOnMock): DiskBlockObjectWriter = {
+          invocation: InvocationOnMock): DiskBlockObjectWriter =
         val args = invocation.getArguments
         new DiskBlockObjectWriter(
             args(1).asInstanceOf[File],
@@ -110,40 +108,34 @@ class BypassMergeSortShuffleWriterSuite
             args(4).asInstanceOf[ShuffleWriteMetrics],
             blockId = args(0).asInstanceOf[BlockId]
         )
-      }
-    })
+    )
     when(diskBlockManager.createTempShuffleBlock())
-      .thenAnswer(new Answer[(TempShuffleBlockId, File)] {
+      .thenAnswer(new Answer[(TempShuffleBlockId, File)]
       override def answer(
-          invocation: InvocationOnMock): (TempShuffleBlockId, File) = {
+          invocation: InvocationOnMock): (TempShuffleBlockId, File) =
         val blockId = new TempShuffleBlockId(UUID.randomUUID)
         val file = new File(tempDir, blockId.name)
         blockIdToFileMap.put(blockId, file)
         temporaryFilesCreated.append(file)
         (blockId, file)
-      }
-    })
+    )
     when(diskBlockManager.getFile(any[BlockId])).thenAnswer(
-        new Answer[File] {
-      override def answer(invocation: InvocationOnMock): File = {
+        new Answer[File]
+      override def answer(invocation: InvocationOnMock): File =
         blockIdToFileMap
           .get(invocation.getArguments.head.asInstanceOf[BlockId])
           .get
-      }
-    })
-  }
+    )
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       Utils.deleteRecursively(tempDir)
       blockIdToFileMap.clear()
       temporaryFilesCreated.clear()
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  test("write empty iterator") {
+  test("write empty iterator")
     val writer = new BypassMergeSortShuffleWriter[Int, Int](
         blockManager,
         blockResolver,
@@ -163,9 +155,8 @@ class BypassMergeSortShuffleWriterSuite
     assert(shuffleWriteMetrics.recordsWritten === 0)
     assert(taskMetrics.diskBytesSpilled === 0)
     assert(taskMetrics.memoryBytesSpilled === 0)
-  }
 
-  test("write with some empty partitions") {
+  test("write with some empty partitions")
     def records: Iterator[(Int, Int)] =
       Iterator((1, 1), (5, 5)) ++ (0 until 100000).iterator.map(x => (2, 2))
     val writer = new BypassMergeSortShuffleWriter[Int, Int](
@@ -187,20 +178,17 @@ class BypassMergeSortShuffleWriterSuite
     assert(shuffleWriteMetrics.recordsWritten === records.length)
     assert(taskMetrics.diskBytesSpilled === 0)
     assert(taskMetrics.memoryBytesSpilled === 0)
-  }
 
-  test("only generate temp shuffle file for non-empty partition") {
+  test("only generate temp shuffle file for non-empty partition")
     // Using exception to test whether only non-empty partition creates temp shuffle file,
     // because temp shuffle file will only be cleaned after calling stop(false) in the failure
     // case, so we could use it to validate the temp shuffle files.
     def records: Iterator[(Int, Int)] =
-      Iterator((1, 1), (5, 5)) ++ (0 until 100000).iterator.map { i =>
-        if (i == 99990) {
+      Iterator((1, 1), (5, 5)) ++ (0 until 100000).iterator.map  i =>
+        if (i == 99990)
           throw new SparkException("intentional failure")
-        } else {
+        else
           (2, 2)
-        }
-      }
 
     val writer = new BypassMergeSortShuffleWriter[Int, Int](
         blockManager,
@@ -211,9 +199,8 @@ class BypassMergeSortShuffleWriterSuite
         conf
     )
 
-    intercept[SparkException] {
+    intercept[SparkException]
       writer.write(records)
-    }
 
     assert(temporaryFilesCreated.nonEmpty)
     // Only 3 temp shuffle files will be created
@@ -221,9 +208,8 @@ class BypassMergeSortShuffleWriterSuite
 
     writer.stop( /* success = */ false)
     assert(temporaryFilesCreated.count(_.exists()) === 0) // check that temporary files were deleted
-  }
 
-  test("cleanup of intermediate files after errors") {
+  test("cleanup of intermediate files after errors")
     val writer = new BypassMergeSortShuffleWriter[Int, Int](
         blockManager,
         blockResolver,
@@ -232,18 +218,13 @@ class BypassMergeSortShuffleWriterSuite
         taskContext,
         conf
     )
-    intercept[SparkException] {
+    intercept[SparkException]
       writer.write(
           (0 until 100000).iterator.map(i =>
-                {
-          if (i == 99990) {
+          if (i == 99990)
             throw new SparkException("Intentional failure")
-          }
           (i, i)
-      }))
-    }
+      ))
     assert(temporaryFilesCreated.nonEmpty)
     writer.stop( /* success = */ false)
     assert(temporaryFilesCreated.count(_.exists()) === 0)
-  }
-}

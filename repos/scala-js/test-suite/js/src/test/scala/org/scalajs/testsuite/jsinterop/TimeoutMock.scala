@@ -2,12 +2,12 @@ package org.scalajs.testsuite.jsinterop
 
 import scala.scalajs.js
 
-object TimeoutMock {
+object TimeoutMock
 
   private var installed = false
 
   @noinline
-  def withMockedTimeout[A](body: (Int => Unit) => A): A = {
+  def withMockedTimeout[A](body: (Int => Unit) => A): A =
     assert(!installed, "Mock timeout already installed.")
     import js.Dynamic.global
 
@@ -20,23 +20,21 @@ object TimeoutMock {
     val mockClearTimeout: js.Function = (timeout: MockTimeout) =>
       mockTimeouts.clearTimeout(timeout)
 
-    try {
+    try
       global.setTimeout = mockSetTimeout
       global.clearTimeout = mockClearTimeout
       installed = true
       body(mockTimeouts.tick)
-    } finally {
+    finally
       global.setTimeout = realSetTimeout
       global.clearTimeout = realClearTimeout
       installed = false
-    }
-  }
 
-  private class MockTimeouts {
+  private class MockTimeouts
     private var timeouts = List.empty[MockTimeout]
     private var currentTime: Int = 0
 
-    def setTimeout(fun: js.Function0[_], delay: Int): MockTimeout = {
+    def setTimeout(fun: js.Function0[_], delay: Int): MockTimeout =
       assert(delay >= 0, "Delay should be positive.")
       val triggerTime = currentTime + delay
       assert(triggerTime >= 0, "Time overflow")
@@ -44,35 +42,26 @@ object TimeoutMock {
       val timeout = new MockTimeout(triggerTime, fun)
       timeouts = before ::: timeout :: after
       timeout
-    }
 
-    def clearTimeout(timeout: MockTimeout): Unit = {
+    def clearTimeout(timeout: MockTimeout): Unit =
       timeout.clearTimeout()
-    }
 
-    def tick(ms: Int): Unit = {
+    def tick(ms: Int): Unit =
       assert(ms >= 0)
       val targetTime = currentTime + ms
       assert(targetTime >= 0)
-      while (timeouts.nonEmpty && timeouts.head.triggerTime <= targetTime) {
+      while (timeouts.nonEmpty && timeouts.head.triggerTime <= targetTime)
         val timeout = timeouts.head
         timeouts = timeouts.tail
         currentTime = timeout.triggerTime
         timeout.execute()
-      }
       currentTime = targetTime
-    }
-  }
 
-  class MockTimeout(val triggerTime: Int, fun: js.Function0[_]) {
+  class MockTimeout(val triggerTime: Int, fun: js.Function0[_])
     private var cleared = false
 
-    def clearTimeout(): Unit = {
+    def clearTimeout(): Unit =
       cleared = true
-    }
 
-    def execute(): Unit = {
+    def execute(): Unit =
       if (!cleared) fun()
-    }
-  }
-}

@@ -2,7 +2,7 @@ package java.util.concurrent.locks
 
 import java.util.concurrent.TimeUnit
 
-trait Lock {
+trait Lock
   def lock(): Unit
   def lockInterruptibly(): Unit
   def tryLock(): Boolean
@@ -11,4 +11,3 @@ trait Lock {
 
   //Not implemented:
   //def newCondition(): Condition
-}

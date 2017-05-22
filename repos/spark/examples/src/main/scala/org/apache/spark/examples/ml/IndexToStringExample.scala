@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.{IndexToString, StringIndexer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object IndexToStringExample {
-  def main(args: Array[String]) {
+object IndexToStringExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("IndexToStringExample")
     val sc = new SparkContext(conf)
 
@@ -58,6 +58,4 @@ object IndexToStringExample {
     converted.select("id", "originalCategory").show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

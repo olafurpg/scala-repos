@@ -10,12 +10,10 @@ import AssertUtil._
 import java.lang.ref._
 
 @RunWith(classOf[JUnit4])
-class AssertUtilTest {
+class AssertUtilTest
 
-  @Test def reachableIgnoresReferences(): Unit = {
+  @Test def reachableIgnoresReferences(): Unit =
     class Holder[A](val ref: SoftReference[A])
     val o = new Object
     val r = new SoftReference(o)
     assertNotReachable(o, new Holder(r)) {}
-  }
-}

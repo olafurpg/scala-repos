@@ -37,7 +37,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.util.StringConverter
 
-object TextFormatter {
+object TextFormatter
 
   /**
     * Converts a ScalaFX TextFormatter to its JavaFX counterpart.
@@ -56,11 +56,10 @@ object TextFormatter {
   val IdentityStringConverter: StringConverter[String] =
     jfxsc.TextFormatter.IDENTITY_STRING_CONVERTER
 
-  object Change {
+  object Change
     implicit def sfxTextFormatterChange2jfx[V](
         v: Change): jfxsc.TextFormatter.Change =
       if (v != null) v.delegate else null
-  }
 
   /**
     * Contains the state representing a change in the content or selection for a
@@ -69,7 +68,7 @@ object TextFormatter {
     * Wraps a JavaFX [[https://docs.oracle.com/javase/8/javafx/api/javafx/scalafx/scene/control/TextFormatter.Change.html]]
     */
   class Change(override val delegate: jfxsc.TextFormatter.Change)
-      extends SFXDelegate[jfxsc.TextFormatter.Change] {
+      extends SFXDelegate[jfxsc.TextFormatter.Change]
 
     /**
       * Gets the control associated with this change.
@@ -111,9 +110,8 @@ object TextFormatter {
       *
       * @param newCaretPosition The new caret position
       */
-    def caretPosition_=(newCaretPosition: Int): Unit = {
+    def caretPosition_=(newCaretPosition: Int): Unit =
       delegate.setCaretPosition(newCaretPosition)
-    }
 
     /**
       * Gets the new anchor. This value will always be &gt; 0 and
@@ -193,17 +191,14 @@ object TextFormatter {
       *         to the state set for start, end, and text properties on this Change object.
       */
     def controlNewText: String = delegate.getControlNewText
-  }
 
   private def toUnaryOperator(
       op: (TextFormatter.Change) => TextFormatter.Change)
     : UnaryOperator[jfxsc.TextFormatter.Change] =
-    new UnaryOperator[jfxsc.TextFormatter.Change] {
+    new UnaryOperator[jfxsc.TextFormatter.Change]
       override def apply(
           a: jfxsc.TextFormatter.Change): jfxsc.TextFormatter.Change =
         op(new TextFormatter.Change(a))
-    }
-}
 
 /**
   * A Formatter describes a format of a `TextInputControl` text.
@@ -216,7 +211,7 @@ object TextFormatter {
   * @define ORIGINALDOC Original Documentation]].
   */
 class TextFormatter[V](override val delegate: jfxsc.TextFormatter[V])
-    extends SFXDelegate[jfxsc.TextFormatter[V]] {
+    extends SFXDelegate[jfxsc.TextFormatter[V]]
 
   /**
     * Creates a new Formatter with the provided filter.
@@ -289,4 +284,3 @@ class TextFormatter[V](override val delegate: jfxsc.TextFormatter[V])
     */
   def value: ObjectProperty[V] = delegate.valueProperty
   def value_=(v: V): Unit = { delegate.valueProperty.setValue(v) }
-}

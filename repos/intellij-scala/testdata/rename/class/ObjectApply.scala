@@ -1,16 +1,12 @@
-object OuterObjectApply {
-  object Objecta {
+object OuterObjectApply
+  object Objecta
     def apply(s: String) = s + "biaka"
 
     def foo(s: String) = Objecta(s)
-  }
 
-  object Main {
-    def main(args: Array[String]) {
+  object Main
+    def main(args: Array[String])
       print( /*caret*/ Objecta.foo("ti "))
-    }
-  }
-}
 /*
 object OuterObjectApply {
   object NameAfterRename {

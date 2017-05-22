@@ -7,7 +7,7 @@ import org.scalatra.servlet.ServletApiImplicits
 /**
   * This trait provides session support for stateful applications.
   */
-trait SessionSupport { self: ServletApiImplicits =>
+trait SessionSupport  self: ServletApiImplicits =>
 
   /**
     * The current session.  Creates a session if none exists.
@@ -27,4 +27,3 @@ trait SessionSupport { self: ServletApiImplicits =>
   def sessionOption(
       implicit request: HttpServletRequest): Option[HttpSession] =
     Option(request.getSession(false))
-}

@@ -25,13 +25,11 @@ import org.apache.hive.service.server.HiveServer2.{ServerOptionsProcessor, Start
   * @param serverName name of the hive server
   */
 private[apache] class HiveServerServerOptionsProcessor(serverName: String)
-    extends ServerOptionsProcessor(serverName) {
+    extends ServerOptionsProcessor(serverName)
 
-  def process(args: Array[String]): Boolean = {
+  def process(args: Array[String]): Boolean =
     // A parse failure automatically triggers a system exit
     val response = super.parse(args)
     val executor = response.getServerOptionsExecutor()
     // return true if the parsed option was to start the service
     executor.isInstanceOf[StartOptionExecutor]
-  }
-}

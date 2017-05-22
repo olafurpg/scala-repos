@@ -6,42 +6,38 @@ import org.ensime.api._
 import org.ensime.util.{EnsimeSpec, EscapingStringInterpolation}
 
 class JerkFormatsSpec
-    extends EnsimeSpec with SprayJsonTestSupport with EnsimeTestData {
+    extends EnsimeSpec with SprayJsonTestSupport with EnsimeTestData
 
   import JerkFormats._
   import JerkEnvelopeFormats._
 
   import EscapingStringInterpolation._
 
-  "Jerk Formats" should "roundtrip request envelopes" in {
+  "Jerk Formats" should "roundtrip request envelopes" in
     roundtrip(
         RpcRequestEnvelope(ConnectionInfoReq, 13),
         """{"callId":13,"req":{"typehint":"ConnectionInfoReq"}}"""
     )
-  }
 
-  it should "roundtrip RPC response envelopes" in {
+  it should "roundtrip RPC response envelopes" in
     roundtrip(
         RpcResponseEnvelope(Some(13), sourcePos3),
         """{"callId":13,"payload":{"typehint":"EmptySourcePosition"}}"""
     )
-  }
 
-  it should "roundtrip async response envelopes" in {
+  it should "roundtrip async response envelopes" in
     roundtrip(
         RpcResponseEnvelope(None, SendBackgroundMessageEvent("ABCDEF", 1)),
         """{"payload":{"typehint":"SendBackgroundMessageEvent","detail":"ABCDEF","code":1}}"""
     )
-  }
 
-  it should "roundtrip startup messages" in {
+  it should "roundtrip startup messages" in
     roundtrip(
         ConnectionInfoReq: RpcRequest,
         """{"typehint":"ConnectionInfoReq"}"""
     )
-  }
 
-  it should "unmarshal RpcSearchRequests" in {
+  it should "unmarshal RpcSearchRequests" in
     roundtrip(
         PublicSymbolSearchReq(List("foo", "bar"), 10): RpcRequest,
         """{"typehint":"PublicSymbolSearchReq","keywords":["foo","bar"],"maxResults":10}"""
@@ -51,9 +47,8 @@ class JerkFormatsSpec
         ImportSuggestionsReq(Left(file1), 1, List("foo", "bar"), 10): RpcRequest,
         s"""{"point":1,"maxResults":10,"names":["foo","bar"],"typehint":"ImportSuggestionsReq","file":"$file1"}"""
     )
-  }
 
-  it should "unmarshal RpcAnalyserRequests" in {
+  it should "unmarshal RpcAnalyserRequests" in
     roundtrip(
         RemoveFileReq(file1): RpcRequest,
         s"""{"typehint":"RemoveFileReq","file":"$file1"}"""
@@ -211,9 +206,8 @@ class JerkFormatsSpec
         StructureViewReq(sourceFileInfo): RpcRequest,
         s"""{"typehint":"StructureViewReq","fileInfo":{"file":"$file1","contents":"{/* code here */}","contentsIn":"$file2"}}"""
     )
-  }
 
-  it should "roundtrip RpcDebugRequests" in {
+  it should "roundtrip RpcDebugRequests" in
     roundtrip(
         DebugActiveVmReq: RpcRequest,
         """{"typehint":"DebugActiveVmReq"}"""
@@ -303,9 +297,8 @@ class JerkFormatsSpec
         DebugBacktraceReq(dtid, 100, 200): RpcRequest,
         """{"typehint":"DebugBacktraceReq","threadId":13,"index":100,"count":200}"""
     )
-  }
 
-  it should "roundtrip EnsimeGeneralEvent as EnsimeEvent" in {
+  it should "roundtrip EnsimeGeneralEvent as EnsimeEvent" in
     roundtrip(
         SendBackgroundMessageEvent("ABCDEF", 1): EnsimeServerMessage,
         """{"typehint":"SendBackgroundMessageEvent","detail":"ABCDEF","code":1}"""
@@ -338,9 +331,8 @@ class JerkFormatsSpec
         ClearAllScalaNotesEvent: EnsimeServerMessage,
         """{"typehint":"ClearAllScalaNotesEvent"}"""
     )
-  }
 
-  it should "roundtrip DebugEvent as EnsimeEvent" in {
+  it should "roundtrip DebugEvent as EnsimeEvent" in
     roundtrip(
         DebugOutputEvent("XXX"): EnsimeServerMessage,
         """{"typehint":"DebugOutputEvent","body":"XXX"}"""
@@ -392,9 +384,8 @@ class JerkFormatsSpec
         DebugThreadDeathEvent(dtid): EnsimeServerMessage,
         """{"typehint":"DebugThreadDeathEvent","threadId":13}"""
     )
-  }
 
-  it should "roundtrip DebugLocation" in {
+  it should "roundtrip DebugLocation" in
     roundtrip(
         DebugObjectReference(57L): EnsimeServerMessage,
         """{"typehint":"DebugObjectReference","objectId":{"id":57}}"""
@@ -414,9 +405,8 @@ class JerkFormatsSpec
         DebugStackSlot(DebugThreadId(27), 12, 23): EnsimeServerMessage,
         """{"typehint":"DebugStackSlot","threadId":27,"frame":12,"offset":23}"""
     )
-  }
 
-  it should "roundtrip DebugValue" in {
+  it should "roundtrip DebugValue" in
     roundtrip(
         DebugPrimitiveValue("summaryStr", "typeNameStr"): EnsimeServerMessage,
         """{"typehint":"DebugPrimitiveValue","summary":"summaryStr","typeName":"typeNameStr"}"""
@@ -504,9 +494,8 @@ class JerkFormatsSpec
         DebugVmError(303, "xxxx"): EnsimeServerMessage,
         """{"typehint":"DebugVmError","errorCode":303,"details":"xxxx","status":"error"}"""
     )
-  }
 
-  it should "roundtrip various informational types" in {
+  it should "roundtrip various informational types" in
     roundtrip(
         note1: EnsimeServerMessage,
         """{"typehint":"Note","beg":23,"line":19,"col":8,"end":33,"file":"file1","msg":"note1","severity":{"typehint":"NoteError"}}"""
@@ -565,9 +554,8 @@ class JerkFormatsSpec
         new TypeInspectInfo(typeInfo, List(interfaceInfo)): EnsimeServerMessage,
         """{"typehint":"TypeInspectInfo","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"interfaces":[{"type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"viaView":"DEF"}],"infoType":"typeInspect"}"""
     )
-  }
 
-  it should "support search related responses" in {
+  it should "support search related responses" in
     roundtrip(
         SymbolSearchResults(List(methodSearchRes, typeSearchRes)): EnsimeServerMessage,
         s"""{"typehint":"SymbolSearchResults","syms":[{"name":"abc","localName":"a","pos":{"typehint":"LineSourcePosition","file":"$abd","line":10},"typehint":"MethodSearchResult","ownerName":"ownerStr","declAs":{"typehint":"Method"}},{"name":"abc","localName":"a","pos":{"typehint":"LineSourcePosition","file":"$abd","line":10},"typehint":"TypeSearchResult","declAs":{"typehint":"Trait"}}]}"""
@@ -587,9 +575,8 @@ class JerkFormatsSpec
         typeSearchRes: EnsimeServerMessage,
         s"""{"name":"abc","localName":"a","pos":{"typehint":"LineSourcePosition","file":"$abd","line":10},"typehint":"TypeSearchResult","declAs":{"typehint":"Trait"}}"""
     )
-  }
 
-  it should "support ranges and semantic highlighting" in {
+  it should "support ranges and semantic highlighting" in
     roundtrip(
         ERangePositions(ERangePosition(batchSourceFile, 75, 70, 90) :: Nil): EnsimeServerMessage,
         s"""{"typehint":"ERangePositions","positions":[{"file":"/abc","offset":75,"start":70,"end":90}]}"""
@@ -625,9 +612,8 @@ class JerkFormatsSpec
                                    true))): EnsimeServerMessage,
         """{"typehint":"ImplicitInfos","infos":[{"params":[{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false},{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false}],"typehint":"ImplicitParamInfo","fun":{"name":"name","localName":"localName","type":{"name":"type1","fullName":"FOO.type1","typehint":"BasicTypeInfo","typeArgs":[],"members":[],"declAs":{"typehint":"Method"}},"isCallable":false},"funIsImplicit":true,"end":6,"start":5}]}"""
     )
-  }
 
-  it should "support refactoring messages" in {
+  it should "support refactoring messages" in
     roundtrip(
         RefactorFailure(7, "message"): EnsimeServerMessage,
         """{"typehint":"RefactorFailure","procedureId":7,"reason":"message","status":"failure"}"""
@@ -647,9 +633,8 @@ class JerkFormatsSpec
         refactorDiffEffect: EnsimeServerMessage,
         s"""{"typehint":"RefactorDiffEffect","procedureId":9,"refactorType":{"typehint":"AddImport"},"diff":"$file2"}"""
     )
-  }
 
-  it should "support legacy raw response types" in {
+  it should "support legacy raw response types" in
     roundtrip(
         FalseResponse: EnsimeServerMessage,
         """{"typehint":"FalseResponse"}"""
@@ -669,5 +654,3 @@ class JerkFormatsSpec
         VoidResponse: EnsimeServerMessage,
         """{"typehint":"VoidResponse"}"""
     )
-  }
-}

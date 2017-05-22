@@ -11,7 +11,7 @@ import spire.math.interval.{Bound, Closed, Open, Unbound}
 
 import org.scalacheck.Arbitrary
 
-object arb {
+object arb
 
   implicit val ubyte: Arbitrary[UByte] = Arbitrary(gen.ubyte)
 
@@ -77,4 +77,3 @@ object arb {
 
   implicit def perm: Arbitrary[Perm] =
     Arbitrary(gen.perm)
-}

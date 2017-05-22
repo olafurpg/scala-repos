@@ -22,7 +22,7 @@ import org.saddle.scalar._
 /**
   * A Mat instance containing elements of type Int
   */
-class MatInt(r: Int, c: Int, values: Array[Int]) extends Mat[Int] {
+class MatInt(r: Int, c: Int, values: Array[Int]) extends Mat[Int]
   def repr = this
 
   def numRows = r
@@ -39,14 +39,13 @@ class MatInt(r: Int, c: Int, values: Array[Int]) extends Mat[Int] {
   // Cache the transpose: it's much faster to transpose and slice a continuous
   // bound than to take large strides, especially on large matrices where it
   // seems to eject cache lines on each stride (something like 10x slowdown)
-  lazy val cachedT = {
+  lazy val cachedT =
     val arrT = values.clone()
 
     if (this.isSquare) MatMath.squareTranspose(numCols, arrT)
     else MatMath.blockTranspose(numRows, numCols, this.toArray, arrT)
 
     new MatInt(numCols, numRows, arrT)
-  }
 
   def transpose = cachedT
 
@@ -68,32 +67,26 @@ class MatInt(r: Int, c: Int, values: Array[Int]) extends Mat[Int] {
   private[saddle] def toDoubleArray(implicit ev: NUM[Int]): Array[Double] =
     arrCopyToDblArr(values)
 
-  private[saddle] def arrCopyToDblArr(r: Array[Int]): Array[Double] = {
+  private[saddle] def arrCopyToDblArr(r: Array[Int]): Array[Double] =
     val sa = ScalarTagInt
     val arr = Array.ofDim[Double](r.length)
     var i = 0
-    while (i < r.length) {
+    while (i < r.length)
       arr(i) = sa.toDouble(r(i))
       i += 1
-    }
     arr
-  }
 
   /** Row-by-row equality check of all values. */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: Mat[_] =>
       (this eq rv) || this.numRows == rv.numRows &&
-      this.numCols == rv.numCols && {
+      this.numCols == rv.numCols &&
         var i = 0
         var eq = true
-        while (eq && i < length) {
+        while (eq && i < length)
           eq &&=
           (apply(i) == rv(i) || this.scalarTag.isMissing(apply(i)) &&
               rv.scalarTag.isMissing(rv(i)))
           i += 1
-        }
         eq
-      }
     case _ => super.equals(o)
-  }
-}

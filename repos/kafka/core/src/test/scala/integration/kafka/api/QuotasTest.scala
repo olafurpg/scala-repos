@@ -35,7 +35,7 @@ import scala.collection.JavaConverters._
 import scala.collection.Map
 import scala.collection.mutable
 
-class QuotasTest extends KafkaServerTestHarness {
+class QuotasTest extends KafkaServerTestHarness
   private val producerBufferSize = 300000
   private val producerId1 = "QuotasTestProducer-1"
   private val producerId2 = "QuotasTestProducer-2"
@@ -51,13 +51,12 @@ class QuotasTest extends KafkaServerTestHarness {
   overridingProps.put(
       KafkaConfig.ConsumerQuotaBytesPerSecondDefaultProp, "2500")
 
-  override def generateConfigs() = {
+  override def generateConfigs() =
     FixedPortTestUtils
       .createBrokerConfigs(numServers,
                            zkConnect,
                            enableControlledShutdown = false)
       .map(KafkaConfig.fromProps(_, overridingProps))
-  }
 
   var producers = mutable.Buffer[KafkaProducer[Array[Byte], Array[Byte]]]()
   var consumers = mutable.Buffer[KafkaConsumer[Array[Byte], Array[Byte]]]()
@@ -68,7 +67,7 @@ class QuotasTest extends KafkaServerTestHarness {
   private val topic1 = "topic-1"
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val producerProps = new Properties()
     producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokerList)
@@ -122,18 +121,16 @@ class QuotasTest extends KafkaServerTestHarness {
     consumers += new KafkaConsumer(consumerProps)
     replicaConsumers += new SimpleConsumer(
         "localhost", leaderNode.boundPort(), 1000000, 64 * 1024, consumerId2)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     producers.foreach(_.close)
     consumers.foreach(_.close)
     replicaConsumers.foreach(_.close)
     super.tearDown()
-  }
 
   @Test
-  def testThrottledProducerConsumer() {
+  def testThrottledProducerConsumer()
     val allMetrics: mutable.Map[MetricName, KafkaMetric] =
       leaderNode.metrics.metrics().asScala
 
@@ -165,10 +162,9 @@ class QuotasTest extends KafkaServerTestHarness {
         consumerId1)
     assertTrue("Should have been throttled",
                allMetrics(consumerMetricName).value() > 0)
-  }
 
   @Test
-  def testProducerConsumerOverrideUnthrottled() {
+  def testProducerConsumerOverrideUnthrottled()
     // Give effectively unlimited quota for producerId2 and consumerId2
     val props = new Properties()
     props.put(ClientConfigOverride.ProducerOverride, Long.MaxValue.toString)
@@ -177,7 +173,7 @@ class QuotasTest extends KafkaServerTestHarness {
     AdminUtils.changeClientIdConfig(zkUtils, producerId2, props)
     AdminUtils.changeClientIdConfig(zkUtils, consumerId2, props)
 
-    TestUtils.retry(10000) {
+    TestUtils.retry(10000)
       val quotaManagers: Map[Short, ClientQuotaManager] =
         leaderNode.apis.quotaManagers
       val overrideProducerQuota =
@@ -191,7 +187,6 @@ class QuotasTest extends KafkaServerTestHarness {
       assertEquals(s"ClientId $consumerId2 must have unlimited consumer quota",
                    Quota.upperBound(Long.MaxValue),
                    overrideConsumerQuota)
-    }
 
     val allMetrics: mutable.Map[MetricName, KafkaMetric] =
       leaderNode.metrics.metrics().asScala
@@ -226,11 +221,10 @@ class QuotasTest extends KafkaServerTestHarness {
                  0.0,
                  allMetrics(consumerMetricName).value(),
                  0.0)
-  }
 
-  def produce(p: KafkaProducer[Array[Byte], Array[Byte]], count: Int): Int = {
+  def produce(p: KafkaProducer[Array[Byte], Array[Byte]], count: Int): Int =
     var numBytesProduced = 0
-    for (i <- 0 to count) {
+    for (i <- 0 to count)
       val payload = i.toString.getBytes
       numBytesProduced += payload.length
       p.send(new ProducerRecord[Array[Byte], Array[Byte]](
@@ -238,18 +232,12 @@ class QuotasTest extends KafkaServerTestHarness {
               new ErrorLoggingCallback(topic1, null, null, true))
         .get()
       Thread.sleep(1)
-    }
     numBytesProduced
-  }
 
   def consume(
-      consumer: KafkaConsumer[Array[Byte], Array[Byte]], numRecords: Int) {
+      consumer: KafkaConsumer[Array[Byte], Array[Byte]], numRecords: Int)
     consumer.subscribe(List(topic1))
     var numConsumed = 0
-    while (numConsumed < numRecords) {
-      for (cr <- consumer.poll(100)) {
+    while (numConsumed < numRecords)
+      for (cr <- consumer.poll(100))
         numConsumed += 1
-      }
-    }
-  }
-}

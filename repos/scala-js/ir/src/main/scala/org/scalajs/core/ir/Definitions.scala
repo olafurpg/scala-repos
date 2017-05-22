@@ -10,7 +10,7 @@ package org.scalajs.core.ir
 
 import Types._
 
-object Definitions {
+object Definitions
   val ObjectClass = "O"
   val ClassClass = "jl_Class"
 
@@ -68,41 +68,37 @@ object Definitions {
   val ExportedConstructorsName = "__exportedInits"
 
   /** Encodes a class name. */
-  def encodeClassName(fullName: String): String = {
+  def encodeClassName(fullName: String): String =
     val base = fullName.replace("_", "$und").replace(".", "_")
-    val encoded = compressedClasses.getOrElse(base, {
-      compressedPrefixes collectFirst {
+    val encoded = compressedClasses.getOrElse(base,
+      compressedPrefixes collectFirst
         case (prefix, compressed) if base.startsWith(prefix) =>
           compressed + base.substring(prefix.length)
-      } getOrElse {
+      getOrElse
         "L" + base
-      }
-    })
+    )
     if (Trees.isKeyword(encoded) || encoded.charAt(0).isDigit ||
-        encoded.charAt(0) == '$') {
+        encoded.charAt(0) == '$')
       "$" + encoded
-    } else encoded
-  }
+    else encoded
 
   // !!! Duplicate logic: this code must be in sync with runtime.StackTrace
 
   /** Decodes a class name encoded with [[encodeClassName]]. */
-  def decodeClassName(encodedName: String): String = {
+  def decodeClassName(encodedName: String): String =
     val encoded =
       if (encodedName.charAt(0) == '$') encodedName.substring(1)
       else encodedName
-    val base = decompressedClasses.getOrElse(encoded, {
-      decompressedPrefixes collectFirst {
+    val base = decompressedClasses.getOrElse(encoded,
+      decompressedPrefixes collectFirst
         case (prefix, decompressed) if encoded.startsWith(prefix) =>
           decompressed + encoded.substring(prefix.length)
-      } getOrElse {
+      getOrElse
         assert(!encoded.isEmpty && encoded.charAt(0) == 'L',
                s"Cannot decode invalid encoded name '$encodedName'")
         encoded.substring(1)
-      }
-    })
+    )
     base.replace("_", ".").replace("$und", "_")
-  }
 
   private val compressedClasses: Map[String, String] =
     Map(
@@ -146,20 +142,19 @@ object Definitions {
     *  information from `encodedName.indexOf("__p") >= 0`.
     */
   def decodeMethodName(encodedName: String)
-    : (String, List[ReferenceType], Option[ReferenceType]) = {
+    : (String, List[ReferenceType], Option[ReferenceType]) =
     val (simpleName, privateAndSigString) =
-      if (isConstructorName(encodedName)) {
+      if (isConstructorName(encodedName))
         val privateAndSigString =
           if (encodedName == "init___") ""
           else encodedName.stripPrefix("init___") + "__"
         ("<init>", privateAndSigString)
-      } else {
+      else
         val pos = encodedName.indexOf("__")
         val pos2 =
           if (!encodedName.substring(pos + 2).startsWith("p")) pos
           else encodedName.indexOf("__", pos + 2)
         (encodedName.substring(0, pos), encodedName.substring(pos2 + 2))
-      }
 
     // -1 preserves trailing empty strings
     val parts = privateAndSigString.split("__", -1).toSeq
@@ -175,15 +170,13 @@ object Definitions {
       else Some(decodeReferenceType(resultString))
 
     (simpleName, paramTypes, resultType)
-  }
 
   /** Decodes a [[Types.ReferenceType]], such as in an encoded method signature.
     */
-  def decodeReferenceType(encodedName: String): ReferenceType = {
+  def decodeReferenceType(encodedName: String): ReferenceType =
     val arrayDepth = encodedName.indexWhere(_ != 'A')
     if (arrayDepth == 0) ClassType(encodedName)
     else ArrayType(encodedName.substring(arrayDepth), arrayDepth)
-  }
 
   /* Common predicates on encoded names */
 
@@ -192,4 +185,3 @@ object Definitions {
 
   def isReflProxyName(name: String): Boolean =
     name.endsWith("__") && !isConstructorName(name)
-}

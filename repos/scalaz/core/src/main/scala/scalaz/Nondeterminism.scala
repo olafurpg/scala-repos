@@ -12,7 +12,7 @@ package scalaz
   * TODO - laws
   */
 ////
-trait Nondeterminism[F[_]] extends Monad[F] { self =>
+trait Nondeterminism[F[_]] extends Monad[F]  self =>
   ////
 
   import scalaz.Tags.Parallel
@@ -31,29 +31,27 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     * two-element list and uses the `Functor` for `F` to fix up types.
     */
   def choose[A, B](a: F[A], b: F[B]): F[(A, F[B]) \/ (F[A], B)] =
-    map(chooseAny(List[F[A \/ B]](map(a)(\/.left), map(b)(\/.right))).get) {
+    map(chooseAny(List[F[A \/ B]](map(a)(\/.left), map(b)(\/.right))).get)
       (x: (A \/ B, Seq[F[A \/ B]])) =>
-        x match {
+        x match
           case (-\/(a), Seq(br)) =>
             -\/(
-                (a, map(br) {
+                (a, map(br)
               case \/-(b) => b
               case _ =>
                 sys.error(
                     "broken residual handling in a Nondeterminism instance")
-            }))
+            ))
           case (\/-(b), Seq(ar)) =>
             \/-(
-                (map(ar) {
+                (map(ar)
               case -\/(a) => a
               case _ =>
                 sys.error(
                     "broken residual handling in a Nondeterminism instance")
-            }, b))
+            , b))
           case _ =>
             sys.error("broken Nondeterminism instance tossed out a residual")
-        }
-    }
 
   /**
     * A commutative operation which chooses nondeterministically to obtain
@@ -76,10 +74,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     * ordering their effects.
     */
   def mapBoth[A, B, C](a: F[A], b: F[B])(f: (A, B) => C): F[C] =
-    bind(choose(a, b)) {
+    bind(choose(a, b))
       case -\/((a, rb)) => map(rb)(b => f(a, b))
       case \/-((ra, b)) => map(ra)(a => f(a, b))
-    }
 
   /**
     * Apply a function to 2 results, nondeterminstically ordering their effects, alias of mapBoth
@@ -134,14 +131,12 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def gatherUnordered[A](fs: Seq[F[A]]): F[List[A]] =
     reduceUnordered[A, List[A]](fs)
 
-  def gatherUnordered1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] = {
+  def gatherUnordered1[A](fs: NonEmptyList[F[A]]): F[NonEmptyList[A]] =
     val R = implicitly[Reducer[A, List[A]]]
-    bind(chooseAny(fs.head, fs.tail.toList)) {
+    bind(chooseAny(fs.head, fs.tail.toList))
       case (a, residuals) =>
         map(reduceUnordered(residuals)(R))(
             list => NonEmptyList.nels(a, list: _*))
-    }
-  }
 
   /**
     * Nondeterministically gather results from the given sequence of actions.
@@ -151,10 +146,9 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
   def reduceUnordered[A, M](fs: Seq[F[A]])(implicit R: Reducer[A, M]): F[M] =
     if (fs.isEmpty) point(R.zero)
     else
-      bind(chooseAny(fs.head, fs.tail)) {
+      bind(chooseAny(fs.head, fs.tail))
         case (a, residuals) =>
           map(reduceUnordered(residuals))(R.cons(a, _))
-      }
 
   /**
     * Nondeterministically gather results from the given sequence of actions.
@@ -199,24 +193,20 @@ trait Nondeterminism[F[_]] extends Monad[F] { self =>
     map(gatherUnordered1(fs))(Foldable1[NonEmptyList].suml1(_))
 
   def parallel: Applicative[λ[α => F[α] @@ Parallel]] =
-    new Applicative[λ[α => F[α] @@ Parallel]] {
+    new Applicative[λ[α => F[α] @@ Parallel]]
       def point[A](a: => A) = Parallel(self.point(a))
       override def map[A, B](fa: F[A] @@ Parallel)(f: A => B) =
         Parallel(self.map(Tag.unwrap(fa))(f))
       def ap[A, B](fa: => F[A] @@ Parallel)(fab: => F[A => B] @@ Parallel) =
         Parallel(self.mapBoth(Tag.unwrap(fa), Tag.unwrap(fab))((a, f) => f(a)))
-    }
 
   ////
-  val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F] {
+  val nondeterminismSyntax = new scalaz.syntax.NondeterminismSyntax[F]
     def F = Nondeterminism.this
-  }
-}
 
-object Nondeterminism {
+object Nondeterminism
   @inline def apply[F[_]](implicit F: Nondeterminism[F]): Nondeterminism[F] = F
 
   ////
 
   ////
-}

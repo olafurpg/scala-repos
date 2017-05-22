@@ -33,11 +33,11 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * bin/run-example ml.LDAExample
   * }}}
   */
-object LDAExample {
+object LDAExample
 
   final val FEATURES_COL = "features"
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val input = "data/mllib/sample_lda_data.txt"
     // Creates a Spark context and a SQL context
@@ -74,6 +74,4 @@ object LDAExample {
 
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

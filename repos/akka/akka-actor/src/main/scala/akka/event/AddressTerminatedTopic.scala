@@ -22,7 +22,7 @@ import akka.actor.ExtensionIdProvider
   * dead.
   */
 private[akka] object AddressTerminatedTopic
-    extends ExtensionId[AddressTerminatedTopic] with ExtensionIdProvider {
+    extends ExtensionId[AddressTerminatedTopic] with ExtensionIdProvider
   override def get(system: ActorSystem): AddressTerminatedTopic =
     super.get(system)
 
@@ -31,29 +31,24 @@ private[akka] object AddressTerminatedTopic
   override def createExtension(
       system: ExtendedActorSystem): AddressTerminatedTopic =
     new AddressTerminatedTopic
-}
 
 /**
   * INTERNAL API
   */
-private[akka] final class AddressTerminatedTopic extends Extension {
+private[akka] final class AddressTerminatedTopic extends Extension
 
   private val subscribers =
     new AtomicReference[Set[ActorRef]](Set.empty[ActorRef])
 
-  @tailrec def subscribe(subscriber: ActorRef): Unit = {
+  @tailrec def subscribe(subscriber: ActorRef): Unit =
     val current = subscribers.get
     if (!subscribers.compareAndSet(current, current + subscriber))
       subscribe(subscriber) // retry
-  }
 
-  @tailrec def unsubscribe(subscriber: ActorRef): Unit = {
+  @tailrec def unsubscribe(subscriber: ActorRef): Unit =
     val current = subscribers.get
     if (!subscribers.compareAndSet(current, current - subscriber))
       unsubscribe(subscriber) // retry
-  }
 
-  def publish(msg: AddressTerminated): Unit = {
+  def publish(msg: AddressTerminated): Unit =
     subscribers.get foreach { _.tell(msg, ActorRef.noSender) }
-  }
-}

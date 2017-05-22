@@ -36,97 +36,82 @@ import java.nio.CharBuffer
 // TODO: define better upper/lower bound methods, better comparisons,
 // better names, better everything!
 
-sealed trait TableSize {
+sealed trait TableSize
   def maxSize: Long
   def lessThan(other: TableSize): Boolean = maxSize < other.maxSize
   def +(other: TableSize): TableSize
   def *(other: TableSize): TableSize
-}
 
-object TableSize {
+object TableSize
   def apply(size: Long): TableSize = ExactSize(size)
   def apply(minSize: Long, maxSize: Long): TableSize =
     if (minSize != maxSize) EstimateSize(minSize, maxSize)
     else ExactSize(minSize)
-}
 
-case class ExactSize(minSize: Long) extends TableSize {
+case class ExactSize(minSize: Long) extends TableSize
   val maxSize = minSize
 
-  def +(other: TableSize) = other match {
+  def +(other: TableSize) = other match
     case ExactSize(n) => ExactSize(minSize + n)
     case EstimateSize(n1, n2) => EstimateSize(minSize + n1, minSize + n2)
     case UnknownSize => UnknownSize
     case InfiniteSize => InfiniteSize
-  }
 
-  def *(other: TableSize) = other match {
+  def *(other: TableSize) = other match
     case ExactSize(n) => ExactSize(minSize * n)
     case EstimateSize(n1, n2) => EstimateSize(minSize * n1, minSize * n2)
     case UnknownSize => UnknownSize
     case InfiniteSize => InfiniteSize
-  }
-}
 
-case class EstimateSize(minSize: Long, maxSize: Long) extends TableSize {
-  def +(other: TableSize) = other match {
+case class EstimateSize(minSize: Long, maxSize: Long) extends TableSize
+  def +(other: TableSize) = other match
     case ExactSize(n) => EstimateSize(minSize + n, maxSize + n)
     case EstimateSize(n1, n2) => EstimateSize(minSize + n1, maxSize + n2)
     case UnknownSize => UnknownSize
     case InfiniteSize => InfiniteSize
-  }
 
-  def *(other: TableSize) = other match {
+  def *(other: TableSize) = other match
     case ExactSize(n) => EstimateSize(minSize * n, maxSize * n)
     case EstimateSize(n1, n2) => EstimateSize(minSize * n1, maxSize * n2)
     case UnknownSize => UnknownSize
     case InfiniteSize => InfiniteSize
-  }
-}
 
-case object UnknownSize extends TableSize {
+case object UnknownSize extends TableSize
   val maxSize = Long.MaxValue
   def +(other: TableSize) = UnknownSize
   def *(other: TableSize) = UnknownSize
-}
 
-case object InfiniteSize extends TableSize {
+case object InfiniteSize extends TableSize
   val maxSize = Long.MaxValue
   def +(other: TableSize) = InfiniteSize
   def *(other: TableSize) = InfiniteSize
-}
 
-object TableModule {
+object TableModule
   val paths = TransSpecModule.paths
 
   sealed trait SortOrder
-  sealed trait DesiredSortOrder extends SortOrder {
+  sealed trait DesiredSortOrder extends SortOrder
     def isAscending: Boolean
-  }
 
   case object SortAscending extends DesiredSortOrder { val isAscending = true }
-  case object SortDescending extends DesiredSortOrder {
+  case object SortDescending extends DesiredSortOrder
     val isAscending = false
-  }
   case object SortUnknown extends SortOrder
 
   sealed trait JoinOrder
-  object JoinOrder {
+  object JoinOrder
     case object LeftOrder extends JoinOrder
     case object RightOrder extends JoinOrder
     case object KeyOrder extends JoinOrder
-  }
 
   sealed trait CrossOrder
-  object CrossOrder {
+  object CrossOrder
     case object CrossLeft extends CrossOrder
     case object CrossRight extends CrossOrder
     case object CrossLeftRight extends CrossOrder
     case object CrossRightLeft extends CrossOrder
-  }
-}
 
-trait TableModule[M[+ _]] extends TransSpecModule {
+trait TableModule[M[+ _]] extends TransSpecModule
   import TableModule._
 
   implicit def M: Monad[M]
@@ -139,7 +124,7 @@ trait TableModule[M[+ _]] extends TransSpecModule {
 
   val Table: TableCompanion
 
-  trait TableCompanionLike {
+  trait TableCompanionLike
     import trans._
     //import trans._
     import trans.constants._
@@ -187,9 +172,8 @@ trait TableModule[M[+ _]] extends TransSpecModule {
       */
     def cross(left: Table, right: Table, orderHint: Option[CrossOrder] = None)(
         spec: TransSpec2): M[(CrossOrder, Table)]
-  }
 
-  trait TableLike {
+  trait TableLike
     this: Table =>
     import trans._
     import TransSpecModule._
@@ -303,18 +287,15 @@ trait TableModule[M[+ _]] extends TransSpecModule {
     def printer(prelude: String = "", flag: String = ""): Table
 
     def metrics: TableMetrics
-  }
 
-  sealed trait GroupingSpec {
+  sealed trait GroupingSpec
     def sources: Vector[GroupingSource]
     def sorted: M[GroupingSpec]
-  }
 
-  object GroupingSpec {
+  object GroupingSpec
     sealed trait Alignment
     case object Union extends Alignment
     case object Intersection extends Alignment
-  }
 
   /**
     * Definition for a single group set and its associated composite key part.
@@ -328,28 +309,23 @@ trait TableModule[M[+ _]] extends TransSpecModule {
                                   targetTrans: Option[trans.TransSpec1],
                                   groupId: GroupId,
                                   groupKeySpec: trans.GroupKeySpec)
-      extends GroupingSpec {
+      extends GroupingSpec
     def sources: Vector[GroupingSource] = Vector(this)
     def sorted: M[GroupingSource] =
-      for {
+      for
         t <- table.sort(trans.DerefObjectStatic(
                 trans.Leaf(trans.Source), CPathField("key")))
-      } yield {
+      yield
         GroupingSource(t, idTrans, targetTrans, groupId, groupKeySpec)
-      }
-  }
 
   final case class GroupingAlignment(groupKeyLeftTrans: trans.TransSpec1,
                                      groupKeyRightTrans: trans.TransSpec1,
                                      left: GroupingSpec,
                                      right: GroupingSpec,
                                      alignment: GroupingSpec.Alignment)
-      extends GroupingSpec {
+      extends GroupingSpec
     def sources: Vector[GroupingSource] = left.sources ++ right.sources
-    def sorted: M[GroupingAlignment] = (left.sorted |@| right.sorted) {
+    def sorted: M[GroupingAlignment] = (left.sorted |@| right.sorted)
       (t1, t2) =>
         GroupingAlignment(
             groupKeyLeftTrans, groupKeyRightTrans, t1, t2, alignment)
-    }
-  }
-}

@@ -8,7 +8,7 @@ import java.awt.{Paint, Stroke}
   * and plotted
   * @author dlwh
   */
-trait Series {
+trait Series
 
   /**
     * returns data needed by jfreechart.
@@ -21,4 +21,3 @@ trait Series {
                     defaultColor: Int => Paint,
                     defaultStroke: Int => Stroke)
     : (org.jfree.data.xy.XYDataset, XYItemRenderer)
-}

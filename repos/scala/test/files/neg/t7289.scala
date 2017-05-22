@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   trait Schtroumpf[T]
 
   implicit def schtroumpf[T, U <: Coll[T], Coll[X] <: Traversable[X]](
@@ -6,7 +6,6 @@ object Test extends App {
 
   implicit val qoo: Schtroumpf[Int] = new Schtroumpf[Int] {}
   implicitly[Schtroumpf[Nil.type]]
-}
 
 /*
 info1 = {scala.tools.nsc.typechecker.Implicits$ImplicitInfo@3468}"qoo: => Test.Schtroumpf[Int]"

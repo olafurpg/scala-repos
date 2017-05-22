@@ -26,19 +26,18 @@ import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
-class EliminateSortsSuite extends PlanTest {
+class EliminateSortsSuite extends PlanTest
   val conf = new SimpleCatalystConf(
       caseSensitiveAnalysis = true, orderByOrdinal = false)
   val catalog = new SimpleCatalog(conf)
   val analyzer = new Analyzer(catalog, EmptyFunctionRegistry, conf)
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches = Batch("Eliminate Sorts", Once, EliminateSorts) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
-  test("Empty order by clause") {
+  test("Empty order by clause")
     val x = testRelation
 
     val query = x.orderBy()
@@ -46,9 +45,8 @@ class EliminateSortsSuite extends PlanTest {
     val correctAnswer = x.analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("All the SortOrder are no-op") {
+  test("All the SortOrder are no-op")
     val x = testRelation
 
     val query = x.orderBy(SortOrder(3, Ascending), SortOrder(-1, Ascending))
@@ -56,9 +54,8 @@ class EliminateSortsSuite extends PlanTest {
     val correctAnswer = analyzer.execute(x)
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("Partial order-by clauses contain no-op SortOrder") {
+  test("Partial order-by clauses contain no-op SortOrder")
     val x = testRelation
 
     val query = x.orderBy(SortOrder(3, Ascending), 'a.asc)
@@ -66,5 +63,3 @@ class EliminateSortsSuite extends PlanTest {
     val correctAnswer = analyzer.execute(x.orderBy('a.asc))
 
     comparePlans(optimized, correctAnswer)
-  }
-}

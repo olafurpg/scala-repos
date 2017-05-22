@@ -11,7 +11,7 @@ trait D1[T] extends A1[Int]
 trait E1[T] extends B1[Int]
 trait F1[T] extends B1[T]
 
-object MiscUnchecked {
+object MiscUnchecked
   /* nowarn */
   def knownType1(x: A[Int]) = x match { case _: B[Int] if true => 1 }
   /* nowarn */
@@ -43,10 +43,9 @@ object MiscUnchecked {
   def twotypes4[T](x: A2[T]) = x match { case _: B2[T, _] => true }
   /*   warn */
   def twotypes5[T](x: A2[T]) = x match { case _: B2[_, Int] => true }
-}
 
-object Arrays {
-  def f1(x: Any) = x match {
+object Arrays
+  def f1(x: Any) = x match
     /* nowarn */
     case _: Array[Int] => ()
     /* nowarn */
@@ -61,9 +60,8 @@ object Arrays {
     case _: Array[Array[Array[String]]] => ()
     /*   warn */
     case _: Array[Array[List[String]]] => ()
-  }
 
-  def f2(x: Array[_]) = x match {
+  def f2(x: Array[_]) = x match
     /* nowarn */
     case _: Array[Int] => ()
     /* nowarn */
@@ -78,9 +76,8 @@ object Arrays {
     case _: Array[Array[Array[String]]] => ()
     /*   warn */
     case _: Array[Array[List[String]]] => ()
-  }
 
-  def f3[T](x: Array[T]) = x match {
+  def f3[T](x: Array[T]) = x match
     /* nowarn */
     case _: Array[Int] => ()
     /* nowarn */
@@ -95,29 +92,23 @@ object Arrays {
     case _: Array[List[Array[String]]] => ()
     /*   warn */
     case _: Array[Array[List[String]]] => ()
-  }
-}
 
-object Matching {
-  class Q {
+object Matching
+  class Q
     type A
     type B <: A
 
-    def f(xs: Traversable[B]) = xs match {
+    def f(xs: Traversable[B]) = xs match
       /* nowarn */
       case xs: List[A] => xs.head
       /* nowarn */
       case xs: Seq[B] => xs.head
       /*   warn */
       case xs: Set[A] => xs.head
-    }
-    def f2[T <: B](xs: Traversable[T]) = xs match {
+    def f2[T <: B](xs: Traversable[T]) = xs match
       /* nowarn */
       case xs: List[B with T] => xs.head
       /* nowarn */
       case xs: Seq[A] => xs.head
       /* nowarn */
       case xs: Set[T] => xs.head
-    }
-  }
-}

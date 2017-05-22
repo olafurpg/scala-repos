@@ -20,7 +20,7 @@ import org.saddle._
 import org.saddle.scalar._
 import util.Concat.Promoter
 
-class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
+class VecBool(values: Array[Boolean]) extends Vec[Boolean]  self =>
   def length = values.length
 
   def scalarTag = ScalarTagBool
@@ -78,40 +78,37 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
       f: (Boolean, B) => C): Vec[C] =
     VecImpl.zipMap(this, other)(f)
 
-  def slice(from: Int, until: Int, stride: Int = 1) = {
+  def slice(from: Int, until: Int, stride: Int = 1) =
     val b = math.max(from, 0)
     val e = math.min(until, self.length)
 
     if (e <= b) Vec.empty
     else
-      new VecBool(values) {
+      new VecBool(values)
         private val ub = math.min(self.length, e)
 
         override def length = math.ceil((ub - b) / stride.toDouble).toInt
 
-        override def apply(i: Int): Boolean = {
+        override def apply(i: Int): Boolean =
           val loc = b + i * stride
           if (loc >= ub)
             throw new ArrayIndexOutOfBoundsException(
                 "Cannot access location %d >= length %d".format(loc, ub))
           self.apply(loc)
-        }
 
         override def needsCopy = true
-      }
-  }
 
   // ex. shift(1)  : [1 2 3 4] => [NA 1 2 3]
   //     shift(-1) : [1 2 3 4] => [2 3 4 NA]
-  def shift(n: Int) = {
+  def shift(n: Int) =
     val m = math.min(n, self.length)
     val b = -m
     val e = self.length - m
 
-    new VecBool(values) {
+    new VecBool(values)
       override def length = self.length
 
-      override def apply(i: Int): Boolean = {
+      override def apply(i: Int): Boolean =
         val loc = b + i
         if (loc >= e || loc < b)
           throw new ArrayIndexOutOfBoundsException(
@@ -119,89 +116,70 @@ class VecBool(values: Array[Boolean]) extends Vec[Boolean] { self =>
                   i, self.length))
         else if (loc >= self.length || loc < 0) scalarTag.missing
         else self.apply(loc)
-      }
 
       override def needsCopy = true
-    }
-  }
 
-  private[saddle] def toArray: Array[Boolean] = {
+  private[saddle] def toArray: Array[Boolean] =
     // need to check if we're a view on an array
     if (!needsCopy) values
-    else {
+    else
       val buf = Array.ofDim[Boolean](length)
       var i = 0
-      while (i < length) {
+      while (i < length)
         buf(i) = apply(i)
         i += 1
-      }
       buf
-    }
-  }
 
   /** Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case rv: VecBool =>
-      (this eq rv) || (this.length == rv.length) && {
+      (this eq rv) || (this.length == rv.length) &&
         var i = 0
         var eq = true
-        while (eq && i < this.length) {
+        while (eq && i < this.length)
           eq &&= apply(i) == rv(i)
           i += 1
-        }
         eq
-      }
     case _ => super.equals(o)
-  }
-}
 
-private[saddle] object VecBool {
+private[saddle] object VecBool
   // indirect counting sort of boolean vector
-  def argSort(arr: Array[Boolean]): Array[Int] = {
+  def argSort(arr: Array[Boolean]): Array[Int] =
     val newArr = array.range(0, arr.length)
     var c = 0
 
     // first pass for false
     var i = 0
-    while (i < arr.length) {
-      if (!arr(i)) {
+    while (i < arr.length)
+      if (!arr(i))
         newArr(i) = c
         c += 1
-      }
       i += 1
-    }
 
     // second pass for true
     i = 0
-    while (c < arr.length) {
-      if (arr(i)) {
+    while (c < arr.length)
+      if (arr(i))
         newArr(i) = c
         c += 1
-      }
       i += 1
-    }
 
     newArr
-  }
 
   // direct sort of boolean vector
-  def sort(arr: Array[Boolean]): Array[Boolean] = {
+  def sort(arr: Array[Boolean]): Array[Boolean] =
     val newArr = array.empty[Boolean](arr.length)
     var c = 0
     var i = 0
 
     // count # false
-    while (i < arr.length) {
+    while (i < arr.length)
       if (!arr(i)) c += 1
       i += 1
-    }
 
     // populate true
-    while (c < arr.length) {
+    while (c < arr.length)
       newArr(c) = true
       c += 1
-    }
 
     newArr
-  }
-}

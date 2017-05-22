@@ -1,5 +1,3 @@
-package foo {
-  package object foo {
+package foo
+  package object foo
     case class X(z: Int) {}
-  }
-}

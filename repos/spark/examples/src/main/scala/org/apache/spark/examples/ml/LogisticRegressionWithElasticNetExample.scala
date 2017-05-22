@@ -24,9 +24,9 @@ import org.apache.spark.ml.classification.LogisticRegression
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object LogisticRegressionWithElasticNetExample {
+object LogisticRegressionWithElasticNetExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("LogisticRegressionWithElasticNetExample")
     val sc = new SparkContext(conf)
@@ -51,6 +51,4 @@ object LogisticRegressionWithElasticNetExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

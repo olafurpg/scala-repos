@@ -22,7 +22,7 @@ package shapeless.examples
   * 
   * @author Miles Sabin
   */
-object PackExamples extends App {
+object PackExamples extends App
   import shapeless._
 
   sealed trait Pack[F[_], L <: HList]
@@ -30,7 +30,7 @@ object PackExamples extends App {
       extends Pack[F, H :: T]
   final case class PNil[F[_]]() extends Pack[F, HNil]
 
-  object Pack {
+  object Pack
     implicit def packHNil[F[_]]: PNil[F] = PNil[F]()
 
     implicit def packHList[F[_], H, T <: HList](
@@ -40,48 +40,38 @@ object PackExamples extends App {
         implicit pack: Pack[F, L], unpack: Unpack[F, L, E]): F[E] =
       unpack(pack)
 
-    trait Unpack[F[_], L <: HList, E] {
+    trait Unpack[F[_], L <: HList, E]
       def apply(pack: Pack[F, L]): F[E]
-    }
 
-    object Unpack extends {
+    object Unpack extends
       implicit def unpack1[F[_], H, T <: HList](
           implicit pc: IsPCons.Aux[F, H :: T, H, T]): Unpack[F, H :: T, H] =
-        new Unpack[F, H :: T, H] {
+        new Unpack[F, H :: T, H]
           def apply(pack: Pack[F, H :: T]): F[H] = pc.split(pack)._1
-        }
 
       implicit def unpack2[F[_], H, T <: HList, E](
           implicit pc: IsPCons.Aux[F, H :: T, H, T],
           ut: Unpack[F, T, E]): Unpack[F, H :: T, E] =
-        new Unpack[F, H :: T, E] {
+        new Unpack[F, H :: T, E]
           def apply(pack: Pack[F, H :: T]): F[E] = ut(pc.split(pack)._2)
-        }
-    }
 
-    trait IsPCons[F[_], L <: HList] {
+    trait IsPCons[F[_], L <: HList]
       type H
       type T <: HList
 
       def split(p: Pack[F, L]): (F[H], Pack[F, T])
-    }
 
-    object IsPCons {
-      type Aux[F[_], L <: HList, H0, T0 <: HList] = IsPCons[F, L] {
+    object IsPCons
+      type Aux[F[_], L <: HList, H0, T0 <: HList] = IsPCons[F, L]
         type H = H0; type T = T0
-      }
       implicit def hlistIsPCons[F[_], H0, T0 <: HList]: Aux[
           F, H0 :: T0, H0, T0] =
-        new IsPCons[F, H0 :: T0] {
+        new IsPCons[F, H0 :: T0]
           type H = H0
           type T = T0
 
-          def split(p: Pack[F, H :: T]): (F[H], Pack[F, T]) = p match {
+          def split(p: Pack[F, H :: T]): (F[H], Pack[F, T]) = p match
             case PCons(fh, pt) => (fh, pt)
-          }
-        }
-    }
-  }
 
   import Pack._
 
@@ -89,9 +79,8 @@ object PackExamples extends App {
   trait B
   trait C
 
-  trait Show[T] {
+  trait Show[T]
     def show: String
-  }
 
   def show[T](t: T)(implicit s: Show[T]) = s.show
 
@@ -104,11 +93,9 @@ object PackExamples extends App {
   implicit val sc = new Show[C] { def show = "C" }
 
   def use3[T, U, V](t: T, u: U, v: V)(
-      implicit pack: Pack[Show, T :: U :: V :: HNil]) = {
+      implicit pack: Pack[Show, T :: U :: V :: HNil]) =
     // Instances automatically unpacked here
     (show(t), show(u), show(v))
-  }
 
   // Instances automatically packed here
   assert(use3(a, b, c) == ("A", "B", "C"))
-}

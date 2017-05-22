@@ -1,10 +1,10 @@
 import sys._
 
 /** Basic sys.Prop test. */
-object Test {
+object Test
   val key = "ding.dong.doobie"
 
-  def bool() = {
+  def bool() =
     val prop = BooleanProp.valueIsTrue(key)
     assert(prop.key == key)
 
@@ -24,8 +24,7 @@ object Test {
     assert(prop.value)
     prop.disable()
     assert(!prop.value)
-  }
-  def int() = {
+  def int() =
     val prop = Prop[Int](key)
     prop.clear()
     assert(prop.value == 0)
@@ -33,19 +32,14 @@ object Test {
     assert(prop.value == 523)
     prop.set("DingusInt")
 
-    try { println(prop.value); assert(false, "should not get here") } catch {
+    try { println(prop.value); assert(false, "should not get here") } catch
       case _: Exception => ()
-    }
-  }
-  def double() = {
+  def double() =
     val prop = Prop[Double](key)
     prop.set("55.0")
     assert(prop.value == 55.0)
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     bool()
     int()
     double()
-  }
-}

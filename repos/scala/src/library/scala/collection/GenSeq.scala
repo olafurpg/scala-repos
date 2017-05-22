@@ -20,13 +20,11 @@ import generic._
   */
 trait GenSeq[+A]
     extends GenSeqLike[A, GenSeq[A]] with GenIterable[A] with Equals
-    with GenericTraversableTemplate[A, GenSeq] {
+    with GenericTraversableTemplate[A, GenSeq]
   def seq: Seq[A]
   override def companion: GenericCompanion[GenSeq] = GenSeq
-}
 
-object GenSeq extends GenTraversableFactory[GenSeq] {
+object GenSeq extends GenTraversableFactory[GenSeq]
   implicit def canBuildFrom[A] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A] = Seq.newBuilder
-}

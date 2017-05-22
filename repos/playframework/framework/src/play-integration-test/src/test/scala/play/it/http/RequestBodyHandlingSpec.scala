@@ -20,24 +20,22 @@ object AkkaHttpRequestBodyHandlingSpec
     extends RequestBodyHandlingSpec with AkkaHttpIntegrationSpecification
 
 trait RequestBodyHandlingSpec
-    extends PlaySpecification with ServerIntegrationSpecification {
+    extends PlaySpecification with ServerIntegrationSpecification
 
   sequential
 
-  "Play request body handling" should {
+  "Play request body handling" should
 
-    def withServer[T](action: EssentialAction)(block: Port => T) = {
+    def withServer[T](action: EssentialAction)(block: Port => T) =
       val port = testServerPort
-      running(TestServer(port, GuiceApplicationBuilder().routes {
+      running(TestServer(port, GuiceApplicationBuilder().routes
         case _ => action
-      }.build())) {
+      .build()))
         block(port)
-      }
-    }
 
-    "handle large bodies" in withServer(EssentialAction { rh =>
+    "handle large bodies" in withServer(EssentialAction  rh =>
       Accumulator(Sink.ignore).map(_ => Results.Ok)
-    }) { port =>
+    )  port =>
       val body = new String(Random.alphanumeric.take(50 * 1024).toArray)
       val responses =
         BasicHttpClient.makeRequests(port, trickleFeed = Some(100L))(
@@ -52,14 +50,13 @@ trait RequestBodyHandlingSpec
       responses.length must_== 2
       responses(0).status must_== 200
       responses(1).status must_== 200
-    }
 
     "gracefully handle early body parser termination" in withServer(
-        EssentialAction { rh =>
+        EssentialAction  rh =>
       Accumulator(Sink.ignore)
         .through(Flow[ByteString].take(10))
         .map(_ => Results.Ok)
-    }) { port =>
+    )  port =>
       val body = new String(Random.alphanumeric.take(50 * 1024).toArray)
       // Trickle feed is important, otherwise it won't switch to ignoring the body.
       val responses =
@@ -75,6 +72,3 @@ trait RequestBodyHandlingSpec
       responses.length must_== 2
       responses(0).status must_== 200
       responses(1).status must_== 200
-    }
-  }
-}

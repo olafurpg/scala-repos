@@ -33,35 +33,30 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object Box {
+object Box
   implicit def sfxBox2jfx(v: Box): jfxss.Box =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Box.html]].
   */
 class Box(override val delegate: jfxss.Box = new jfxss.Box())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.Box] {
+    extends Shape3D(delegate) with SFXDelegate[jfxss.Box]
 
   def this(width: Double, height: Double, depth: Double) =
     this(new jfxss.Box(width, height, depth))
 
   /** Defines the depth or the Z dimension of the Box. */
   def depth: DoubleProperty = delegate.depthProperty
-  def depth_=(v: Double) {
+  def depth_=(v: Double)
     depth() = v
-  }
 
   /** Defines the height or the Y dimension of the Box. */
   def height: DoubleProperty = delegate.heightProperty
-  def height_=(v: Double) {
+  def height_=(v: Double)
     height() = v
-  }
 
   /** Defines the width or the Z dimension of the Box. */
   def width: DoubleProperty = delegate.widthProperty
-  def width_=(v: Double) {
+  def width_=(v: Double)
     width() = v
-  }
-}

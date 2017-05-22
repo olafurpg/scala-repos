@@ -2,14 +2,13 @@ package lila.pref
 
 import scalaz.NonEmptyList
 
-sealed class Theme private[pref](val name: String) {
+sealed class Theme private[pref](val name: String)
 
   override def toString = name
 
   def cssClass = name
-}
 
-sealed trait ThemeObject {
+sealed trait ThemeObject
 
   def all: NonEmptyList[Theme]
 
@@ -19,16 +18,15 @@ sealed trait ThemeObject {
 
   lazy val listString = list mkString " "
 
-  lazy val allByName = list map { c =>
+  lazy val allByName = list map  c =>
     c.name -> c
-  } toMap
+  toMap
 
   def apply(name: String) = (allByName get name) | default
 
   def contains(name: String) = allByName contains name
-}
 
-object Theme extends ThemeObject {
+object Theme extends ThemeObject
 
   val all =
     NonEmptyList(
@@ -48,14 +46,12 @@ object Theme extends ThemeObject {
         "metal",
         "olive",
         "purple"
-    ) map { name =>
+    ) map  name =>
       new Theme(name)
-    }
 
   lazy val default = allByName get "brown" err "Can't find default theme D:"
-}
 
-object Theme3d extends ThemeObject {
+object Theme3d extends ThemeObject
 
   val all =
     NonEmptyList(
@@ -74,9 +70,7 @@ object Theme3d extends ThemeObject {
         "Wax",
         "Jade",
         "Woodi"
-    ) map { name =>
+    ) map  name =>
       new Theme(name)
-    }
 
   lazy val default = allByName get "Woodi" err "Can't find default theme D:"
-}

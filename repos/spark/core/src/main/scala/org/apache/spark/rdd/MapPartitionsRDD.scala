@@ -29,7 +29,7 @@ private[spark] class MapPartitionsRDD[U : ClassTag, T : ClassTag](
     f: (TaskContext, Int,
     Iterator[T]) => Iterator[U], // (TaskContext, partition index, iterator)
     preservesPartitioning: Boolean = false)
-    extends RDD[U](prev) {
+    extends RDD[U](prev)
 
   override val partitioner =
     if (preservesPartitioning) firstParent[T].partitioner else None
@@ -39,8 +39,6 @@ private[spark] class MapPartitionsRDD[U : ClassTag, T : ClassTag](
   override def compute(split: Partition, context: TaskContext): Iterator[U] =
     f(context, split.index, firstParent[T].iterator(split, context))
 
-  override def clearDependencies() {
+  override def clearDependencies()
     super.clearDependencies()
     prev = null
-  }
-}

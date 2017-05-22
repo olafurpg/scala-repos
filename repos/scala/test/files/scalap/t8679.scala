@@ -1,4 +1,4 @@
-class T8679 {
+class T8679
   def foo1(): Int = 3
   def foo2(): Int = 4
   def foo3(): Int = 5
@@ -3499,4 +3499,3 @@ class T8679 {
   def foo3498(): Int = 3500
   def foo3499(): Int = 3501
   def foo3500(): Int = 3502
-}

@@ -4,31 +4,28 @@ package effect
 import std.AllInstances._
 import ST._
 
-object STTest extends SpecLite {
+object STTest extends SpecLite
   type ForallST[A] = Forall[ST[?, A]]
 
-  "STRef" in {
+  "STRef" in
     def e1[S] =
-      for {
+      for
         x <- newVar[S](0)
         r <- x mod { _ + 1 }
-      } yield x
+      yield x
     def e2[S]: ST[S, Int] =
-      for {
+      for
         x <- e1[S]
         r <- x.read
-      } yield r
+      yield r
     runST(new ForallST[Int] { def apply[S] = e2[S] }) must_=== (1)
-  }
 
-  "STArray" in {
+  "STArray" in
     def e1[S] =
-      for {
+      for
         arr <- newArr[S, Boolean](3, true)
         _ <- arr.write(0, false)
         r <- arr.freeze
-      } yield r
+      yield r
     runST(new ForallST[ImmutableArray[Boolean]] { def apply[S] = e1[S] }).toList must_===
     (List(false, true, true))
-  }
-}

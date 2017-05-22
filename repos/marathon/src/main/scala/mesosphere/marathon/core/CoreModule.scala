@@ -15,7 +15,7 @@ import mesosphere.marathon.core.task.tracker.TaskTrackerModule
   * This is necessary to allow guice to introduce proxies to break cyclic dependencies
   * (as long as we have them).
   */
-trait CoreModule {
+trait CoreModule
   def leadershipModule: LeadershipModule
   def taskBusModule: TaskBusModule
   def taskJobsModule: TaskJobsModule
@@ -24,4 +24,3 @@ trait CoreModule {
   def appOfferMatcherModule: LaunchQueueModule
   def pluginModule: PluginModule
   def authModule: AuthModule
-}

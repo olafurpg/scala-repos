@@ -11,7 +11,7 @@ import akka.actor.{ActorInitializationException, ActorRef}
   *
   * @author Martin Krasser
   */
-trait ListenerManagement {
+trait ListenerManagement
 
   private val listeners = new ConcurrentSkipListSet[ActorRef]
 
@@ -24,19 +24,17 @@ trait ListenerManagement {
     * Adds the <code>listener</code> this registry's listener list.
     * The <code>listener</code> is started by this method if manageLifeCycleOfListeners yields true.
     */
-  def addListener(listener: ActorRef) {
+  def addListener(listener: ActorRef)
     if (manageLifeCycleOfListeners) listener.start()
     listeners add listener
-  }
 
   /**
     * Removes the <code>listener</code> this registry's listener list.
     * The <code>listener</code> is stopped by this method if manageLifeCycleOfListeners yields true.
     */
-  def removeListener(listener: ActorRef) {
+  def removeListener(listener: ActorRef)
     listeners remove listener
     if (manageLifeCycleOfListeners) listener.stop()
-  }
 
   /*
    * Returns whether there are any listeners currently
@@ -49,32 +47,25 @@ trait ListenerManagement {
     */
   def hasListener(listener: ActorRef): Boolean = listeners.contains(listener)
 
-  protected[akka] def notifyListeners(message: => Any) {
-    if (hasListeners) {
+  protected[akka] def notifyListeners(message: => Any)
+    if (hasListeners)
       val msg = message
       val iterator = listeners.iterator
-      while (iterator.hasNext) {
+      while (iterator.hasNext)
         val listener = iterator.next
         // Uncomment if those exceptions are so frequent as to bottleneck
         // if (listener.isShutdown) iterator.remove() else
-        try {
+        try
           listener ! msg
-        } catch {
+        catch
           case e: ActorInitializationException =>
             if (listener.isShutdown) iterator.remove()
-        }
-      }
-    }
-  }
 
   /**
     * Execute <code>f</code> with each listener as argument. ActorInitializationException is not handled.
     */
-  protected[akka] def foreachListener(f: (ActorRef) => Unit) {
+  protected[akka] def foreachListener(f: (ActorRef) => Unit)
     val iterator = listeners.iterator
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       val listener = iterator.next
       if (listener.isRunning) f(listener)
-    }
-  }
-}

@@ -13,16 +13,15 @@ import lila.round.actorApi.round.{Outoftime, Abandon}
 
 private[round] final class Titivate(
     roundMap: ActorRef, bookmark: ActorSelection)
-    extends Actor {
+    extends Actor
 
   object Schedule
   object Run
 
   def scheduler = context.system.scheduler
 
-  override def preStart() {
+  override def preStart()
     self ! Schedule
-  }
 
   val delayDuration = 200 millis
   def delayF(f: => Funit): Funit =
@@ -30,50 +29,42 @@ private[round] final class Titivate(
   def delay(f: => Unit): Funit =
     akka.pattern.after(delayDuration, scheduler)(Future(f))
 
-  def receive = {
+  def receive =
 
     case Schedule =>
       scheduler.scheduleOnce(30 seconds, self, Run)
 
     case Run =>
       $enumerate
-        .over[Game]($query(Query.checkable), 5000) { game =>
+        .over[Game]($query(Query.checkable), 5000)  game =>
           if (game.finished || game.isPgnImport)
-            delayF {
+            delayF
               GameRepo unsetCheckAt game
-            } else if (game.outoftime(_ => chess.Clock.maxGraceMillis))
-            delay {
+            else if (game.outoftime(_ => chess.Clock.maxGraceMillis))
+            delay
               roundMap ! Tell(game.id, Outoftime)
-            } else if (game.abandoned)
-            delay {
+            else if (game.abandoned)
+            delay
               roundMap ! Tell(game.id, Abandon)
-            } else if (game.unplayed)
-            delayF {
+            else if (game.unplayed)
+            delayF
               bookmark ! lila.hub.actorApi.bookmark.Remove(game.id)
               GameRepo remove game.id
-            } else
-            game.clock match {
+            else
+            game.clock match
               case Some(clock) if clock.isRunning =>
-                delayF {
+                delayF
                   val minutes = (clock.estimateTotalTime / 60).toInt
                   GameRepo.setCheckAt(game, DateTime.now plusMinutes minutes)
-                }
               case Some(clock) =>
-                delayF {
+                delayF
                   val hours = Game.unplayedHours
                   GameRepo.setCheckAt(game, DateTime.now plusHours hours)
-                }
               case None =>
-                delayF {
+                delayF
                   val days =
                     game.daysPerTurn | game.hasAi.fold(Game.aiAbandonedDays,
                                                        Game.abandonedDays)
                   GameRepo.setCheckAt(game, DateTime.now plusDays days)
-                }
-            }
-        }
-        .void andThenAnyway {
+        .void andThenAnyway
         self ! Schedule
-      }
-  }
-}

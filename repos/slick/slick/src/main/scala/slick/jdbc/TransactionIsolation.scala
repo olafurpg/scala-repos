@@ -5,7 +5,7 @@ import java.sql.{Connection, ResultSet}
 /** Represents a transaction isolation level. */
 sealed abstract class TransactionIsolation(val intValue: Int)
 
-object TransactionIsolation {
+object TransactionIsolation
 
   /** A transaction isolation level indicating that dirty reads, non-repeatable reads and phantom
     * reads can occur. This level allows a row changed by one transaction to be readby another
@@ -36,4 +36,3 @@ object TransactionIsolation {
     * rereads for the same condition, retrieving the additional "phantom" row in the second read. */
   case object Serializable
       extends TransactionIsolation(Connection.TRANSACTION_SERIALIZABLE)
-}

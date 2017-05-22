@@ -20,18 +20,15 @@ package com.twitter.summingbird
   * TimeExtractor is really just a function, but we've used a
   * specialized type for implicit resolution and serializability.
   */
-object TimeExtractor {
+object TimeExtractor
   def apply[T](fn: T => Long): TimeExtractor[T] =
-    new TimeExtractor[T] {
+    new TimeExtractor[T]
       override def apply(t: T) = fn(t)
-    }
-}
 
 /**
   * This cannot be a subclass of function and use the pattern
   * of implicit dependencies, since then you get an implicit function.
   * Not good
   */
-trait TimeExtractor[T] extends java.io.Serializable {
+trait TimeExtractor[T] extends java.io.Serializable
   def apply(t: T): Long
-}

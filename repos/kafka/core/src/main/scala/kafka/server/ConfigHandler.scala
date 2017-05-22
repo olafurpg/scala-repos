@@ -30,9 +30,8 @@ import scala.collection.JavaConverters._
 /**
   * The ConfigHandler is used to process config change notifications received by the DynamicConfigManager
   */
-trait ConfigHandler {
+trait ConfigHandler
   def processConfigChanges(entityName: String, value: Properties)
-}
 
 /**
   * The TopicConfigHandler will process topic config changes in ZK.
@@ -40,43 +39,37 @@ trait ConfigHandler {
   */
 class TopicConfigHandler(
     private val logManager: LogManager, kafkaConfig: KafkaConfig)
-    extends ConfigHandler with Logging {
+    extends ConfigHandler with Logging
 
-  def processConfigChanges(topic: String, topicConfig: Properties) {
+  def processConfigChanges(topic: String, topicConfig: Properties)
     // Validate the compatibility of message format version.
     val configNameToExclude = Option(
-        topicConfig.getProperty(LogConfig.MessageFormatVersionProp)).flatMap {
+        topicConfig.getProperty(LogConfig.MessageFormatVersionProp)).flatMap
       versionString =>
-        if (kafkaConfig.interBrokerProtocolVersion < ApiVersion(versionString)) {
+        if (kafkaConfig.interBrokerProtocolVersion < ApiVersion(versionString))
           warn(
               s"Log configuration ${LogConfig.MessageFormatVersionProp} is ignored for `$topic` because `$versionString` " +
               s"is not compatible with Kafka inter-broker protocol version `${kafkaConfig.interBrokerProtocolVersionString}`")
           Some(LogConfig.MessageFormatVersionProp)
-        } else None
-    }
+        else None
 
     val logs = logManager.logsByTopicPartition
       .filterKeys(_.topic == topic)
       .values
       .toBuffer
-    if (logs.nonEmpty) {
+    if (logs.nonEmpty)
       /* combine the default properties with the overrides in zk to create the new LogConfig */
       val props = new Properties()
       props.putAll(logManager.defaultConfig.originals)
-      topicConfig.asScala.foreach {
+      topicConfig.asScala.foreach
         case (key, value) =>
           if (key != configNameToExclude) props.put(key, value)
-      }
       val logConfig = LogConfig(props)
       logs.foreach(_.config = logConfig)
-    }
-  }
-}
 
-object ClientConfigOverride {
+object ClientConfigOverride
   val ProducerOverride = "producer_byte_rate"
   val ConsumerOverride = "consumer_byte_rate"
-}
 
 /**
   * The ClientIdConfigHandler will process clientId config changes in ZK.
@@ -85,25 +78,21 @@ object ClientConfigOverride {
   */
 class ClientIdConfigHandler(
     private val quotaManagers: Map[Short, ClientQuotaManager])
-    extends ConfigHandler {
+    extends ConfigHandler
 
-  def processConfigChanges(clientId: String, clientConfig: Properties) = {
-    if (clientConfig.containsKey(ClientConfigOverride.ProducerOverride)) {
+  def processConfigChanges(clientId: String, clientConfig: Properties) =
+    if (clientConfig.containsKey(ClientConfigOverride.ProducerOverride))
       quotaManagers(ApiKeys.PRODUCE.id).updateQuota(
           clientId,
           new Quota(clientConfig
                       .getProperty(ClientConfigOverride.ProducerOverride)
                       .toLong,
                     true))
-    }
 
-    if (clientConfig.containsKey(ClientConfigOverride.ConsumerOverride)) {
+    if (clientConfig.containsKey(ClientConfigOverride.ConsumerOverride))
       quotaManagers(ApiKeys.FETCH.id).updateQuota(
           clientId,
           new Quota(clientConfig
                       .getProperty(ClientConfigOverride.ConsumerOverride)
                       .toLong,
                     true))
-    }
-  }
-}

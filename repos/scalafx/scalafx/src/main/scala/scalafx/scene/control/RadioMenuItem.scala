@@ -32,10 +32,9 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object RadioMenuItem {
+object RadioMenuItem
   implicit def sfxRadioMenuItem2jfx(m: RadioMenuItem): jfxsc.RadioMenuItem =
     if (m != null) m.delegate else null
-}
 
 /**
   * Wrapper class for [[scalafx.scene.control.RadioMenuItem]]
@@ -43,7 +42,7 @@ object RadioMenuItem {
   */
 class RadioMenuItem(override val delegate: jfxsc.RadioMenuItem)
     extends MenuItem(delegate) with Toggle
-    with SFXDelegate[jfxsc.RadioMenuItem] {
+    with SFXDelegate[jfxsc.RadioMenuItem]
 
   /**
     * Constructs a RadioMenuItem and sets the display text with the specified text.
@@ -62,4 +61,3 @@ class RadioMenuItem(override val delegate: jfxsc.RadioMenuItem)
   //  def userData_=(v: AnyRef) {
   //    delegate.setUserData(v)
   //  }
-}

@@ -1,6 +1,6 @@
 package com.twitter.concurrent
 
-package object exp {
+package object exp
 
   /**
     * Backwards compatibility forwarding for
@@ -15,4 +15,3 @@ package object exp {
     */
   @deprecated("Use `com.twitter.concurrent.AsyncStream` instead", "2015-10-20")
   val AsyncStream = com.twitter.concurrent.AsyncStream
-}

@@ -130,12 +130,10 @@ import java.io.BufferedInputStream
   *  ----------------------------------------------
   *  All other tests were passed
   */
-object Xor64 {
-  def main(args: Array[String]) {
+object Xor64
+  def main(args: Array[String])
     val stream = new BufferedInputStream(RandomStream(XorShift(12345678910L)))
     while (true) System.out.write(stream.read())
-  }
-}
 
 /**
   * ========= Summary results of SmallCrush =========
@@ -170,12 +168,10 @@ object Xor64 {
   *
   *  All tests were passed
   */
-object LFib {
-  def main(args: Array[String]) {
+object LFib
+  def main(args: Array[String])
     val stream = new BufferedInputStream(RandomStream(LFib4(12345678910L)))
     while (true) System.out.write(stream.read())
-  }
-}
 
 /**
   * ========= Summary results of SmallCrush =========
@@ -210,9 +206,7 @@ object LFib {
   *  ----------------------------------------------
   *  All other tests were passed
   */
-object Ziff {
-  def main(args: Array[String]) {
+object Ziff
+  def main(args: Array[String])
     val stream = new BufferedInputStream(RandomStream(Ziff98(12345678910L)))
     while (true) System.out.write(stream.read())
-  }
-}

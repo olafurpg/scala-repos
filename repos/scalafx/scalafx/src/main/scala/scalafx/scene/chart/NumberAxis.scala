@@ -34,7 +34,7 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty}
 import scalafx.delegate.SFXDelegate
 import scalafx.util.converter.StringConverterDelegate
 
-object NumberAxis {
+object NumberAxis
   implicit def sfxNumberAxis2jfx(v: NumberAxis): jfxsc.NumberAxis =
     if (v != null) v.delegate else null
 
@@ -52,7 +52,7 @@ object NumberAxis {
 
   def apply() = new NumberAxis()
 
-  object DefaultFormatter {
+  object DefaultFormatter
     implicit def sfxDefaultFormatter2jfx(
         v: DefaultFormatter): jfxsc.NumberAxis.DefaultFormatter =
       if (v != null) v.delegate else null
@@ -63,43 +63,36 @@ object NumberAxis {
     def apply(axis: NumberAxis, prefix: String, suffix: String) =
       new DefaultFormatter(
           new jfxsc.NumberAxis.DefaultFormatter(axis, prefix, suffix))
-  }
 
   class DefaultFormatter(
       override val delegate: jfxsc.NumberAxis.DefaultFormatter)
       extends StringConverterDelegate[
           java.lang.Number, Number, jfxsc.NumberAxis.DefaultFormatter](
           delegate)
-}
 
 class NumberAxis(
     override val delegate: jfxsc.NumberAxis = new jfxsc.NumberAxis)
-    extends ValueAxis[Number](delegate) with SFXDelegate[jfxsc.NumberAxis] {
+    extends ValueAxis[Number](delegate) with SFXDelegate[jfxsc.NumberAxis]
 
-  def this(lowerBound: Double, upperBound: Double, tickUnit: Double) {
+  def this(lowerBound: Double, upperBound: Double, tickUnit: Double)
     this(new jfxsc.NumberAxis(lowerBound, upperBound, tickUnit))
-  }
 
   def this(axisLabel: String,
            lowerBound: Double,
            upperBound: Double,
-           tickUnit: Double) {
+           tickUnit: Double)
     this(new jfxsc.NumberAxis(axisLabel, lowerBound, upperBound, tickUnit))
-  }
 
   /**
     * When `true` zero is always included in the visible range.
     */
   def forceZeroInRange: BooleanProperty = delegate.forceZeroInRangeProperty
-  def forceZeroInRange_=(v: Boolean) {
+  def forceZeroInRange_=(v: Boolean)
     forceZeroInRange() = v
-  }
 
   /**
     * The value between each major tick mark in data units.
     */
   def tickUnit: DoubleProperty = delegate.tickUnitProperty
-  def tickUnit_=(v: Double) {
+  def tickUnit_=(v: Double)
     tickUnit() = v
-  }
-}

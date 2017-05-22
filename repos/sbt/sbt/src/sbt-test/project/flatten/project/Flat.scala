@@ -3,7 +3,7 @@ import Import._
 import Keys._
 import Configurations.{Compile, Test}
 
-object Flat extends Build {
+object Flat extends Build
   lazy val root = Project(
       "root",
       file("."),
@@ -30,4 +30,3 @@ object Flat extends Build {
   )
 
   val unpackage = TaskKey[Unit]("unpackage")
-}

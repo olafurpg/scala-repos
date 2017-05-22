@@ -7,8 +7,8 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
   * @author Alexander Podkhalyuzin
   */
 class ScalaSmartAnonymousFunctionCompletionTest
-    extends ScalaCodeInsightTestBase {
-  def testAbstractTypeInfoFromFirstClause() {
+    extends ScalaCodeInsightTestBase
+  def testAbstractTypeInfoFromFirstClause()
     val fileText = """
 def foo[T](x: T)(y: T => Int) = 1
 foo(2)(<caret>)
@@ -23,9 +23,8 @@ foo(2)((i: Int) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testSimpleCaseTest() {
+  def testSimpleCaseTest()
     val fileText = """
 def foo(x: String => String) = 1
 foo {<caret>}
@@ -40,9 +39,8 @@ foo {case s: String =><caret>}
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testSimple() {
+  def testSimple()
     val fileText = """
 def foo(x: String => String) = 1
 foo(<caret>)
@@ -57,9 +55,8 @@ foo((s: String) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testJustTuple() {
+  def testJustTuple()
     val fileText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo(<caret>)
@@ -74,9 +71,8 @@ foo((tuple: (Int, Int)) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testCaseTuple() {
+  def testCaseTuple()
     val fileText = """
 def foo(x: Tuple2[Int, Int] => Int) = 1
 foo{<caret>}
@@ -91,9 +87,8 @@ foo{case (i: Int, i0: Int) =><caret>}
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testAbstractTypeInfoWithUpper() {
+  def testAbstractTypeInfoWithUpper()
     val fileText = """
 def foo[T <: Runnable](x: (T, String) => String) = 1
 foo(<caret>)
@@ -108,9 +103,8 @@ foo((value: Runnable, s: String) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testAbstractTypeInfoWithLower() {
+  def testAbstractTypeInfoWithLower()
     val fileText = """
 def foo[T >: Int](x: (T, String) => String) = 1
 foo(<caret>)
@@ -125,9 +119,8 @@ foo((value: Int, s: String) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testAbstractTypeInfoTypeParameters() {
+  def testAbstractTypeInfoTypeParameters()
     val fileText = """
 def foo[T <: Runnable](x: T => String) = 1
 class X extends Runnable
@@ -144,9 +137,8 @@ foo[X]((x: X) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testFewParams() {
+  def testFewParams()
     val fileText = """
       |def foo(c: (Int, Int, Int, Int) => Int) = 1
       |foo(<caret>)
@@ -161,9 +153,8 @@ foo[X]((x: X) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testFewParamsDifferent() {
+  def testFewParamsDifferent()
     val fileText = """
       |def foo(x: (Int, String, Int, String) => Int) = 1
       |foo(<caret>)
@@ -178,9 +169,8 @@ foo[X]((x: X) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testAbstractTypeInfo() {
+  def testAbstractTypeInfo()
     val fileText = """
       |def foo[T](x: (T, String) => String) = 1
       |foo(<caret>)
@@ -195,9 +185,8 @@ foo[X]((x: X) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
 
-  def testAliasType() {
+  def testAliasType()
     val fileText = """
       |type T = Int => String
       |def zoo(p: T) {}
@@ -214,5 +203,3 @@ foo[X]((x: X) =><caret>)
 
     completeLookupItem(activeLookup.find(le => le.getLookupString == "").get)
     checkResultByText(resultText)
-  }
-}

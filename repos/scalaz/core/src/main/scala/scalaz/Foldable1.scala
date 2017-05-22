@@ -6,23 +6,21 @@ package scalaz
   * That is, `toList` cannot return an empty list.
   */
 ////
-trait Foldable1[F[_]] extends Foldable[F] { self =>
+trait Foldable1[F[_]] extends Foldable[F]  self =>
   ////
 
   /**The product of Foldable1 `F` and `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product[G[_]](
       implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] =
-    new ProductFoldable1[F, G] {
+    new ProductFoldable1[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The composition of Foldable1 `F` and `G`, `[x]F[G[x]]`, is a Foldable1 */
   def compose[G[_]: Foldable1]: Foldable1[λ[α => F[G[α]]]] =
-    new CompositionFoldable1[F, G] {
+    new CompositionFoldable1[F, G]
       def F = self
       def G = implicitly
-    }
 
   /** Map each element of the structure to a [[scalaz.Semigroup]], and combine the results. */
   def foldMap1[A, B](fa: F[A])(f: A => B)(implicit F: Semigroup[B]): B
@@ -44,13 +42,12 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     foldMapRight1(fa)(f(_, z))(f)
 
   /**Left-associative fold of a structure. */
-  def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B = {
+  def foldMapLeft1[A, B](fa: F[A])(z: A => B)(f: (B, A) => B): B =
     import std.option._
-    foldLeft(fa, none[B]) {
+    foldLeft(fa, none[B])
       case (None, r) => some(z(r))
       case (Some(l), r) => some(f(l, r))
-    }.getOrElse(sys.error("foldMapLeft1"))
-  }
+    .getOrElse(sys.error("foldMapLeft1"))
 
   /**Left-associative fold of a structure. */
   def foldLeft1[A](fa: F[A])(f: (A, A) => A): A =
@@ -119,19 +116,19 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /** ``O(n log n)`` complexity */
   def distinct1[A](fa: F[A])(implicit A: Order[A]): NonEmptyList[A] =
     foldMapLeft1[A, (ISet[A], NonEmptyList[A])](fa)(
-        a => (ISet.singleton(a), NonEmptyList(a))) {
+        a => (ISet.singleton(a), NonEmptyList(a)))
       case ((seen, acc), a) =>
         if (seen.notMember(a)) (seen.insert(a), a <:: acc)
         else (seen, acc)
-    }._2.reverse
+    ._2.reverse
 
   /** ``O(n^2^)`` complexity */
   def distinctE1[A](fa: F[A])(implicit A: Equal[A]): NonEmptyList[A] =
-    foldMapLeft1[A, NonEmptyList[A]](fa)(a => NonEmptyList(a)) {
+    foldMapLeft1[A, NonEmptyList[A]](fa)(a => NonEmptyList(a))
       case (seen, a) =>
         if (!NonEmptyList.nonEmptyList.element(seen, a)) a <:: seen
         else seen
-    }.reverse
+    .reverse
 
   def sumr1[A](fa: F[A])(implicit A: Semigroup[A]): A =
     foldRight1(fa)(A.append)
@@ -163,10 +160,9 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   /**The product of Foldable1 `F` and Foldable `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product0[G[_]](
       implicit G0: Foldable[G]): Foldable1[λ[α => (F[α], G[α])]] =
-    new ProductFoldable1L[F, G] {
+    new ProductFoldable1L[F, G]
       def F = self
       def G = G0
-    }
 
   def toNel[A](fa: F[A]): NonEmptyList[A] =
     foldMapRight1(fa)(NonEmptyList.nel(_, INil()))(_ <:: _)
@@ -177,7 +173,7 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
   def scanRight1[A](fa: F[A])(f: (A, A) => A): NonEmptyList[A] =
     foldMapRight1(fa)(NonEmptyList(_))((x, xs) => f(x, xs.head) <:: xs)
 
-  trait Foldable1Law extends FoldableLaw {
+  trait Foldable1Law extends FoldableLaw
     import std.vector._
 
     /** Left fold is consistent with foldMap1. */
@@ -189,19 +185,15 @@ trait Foldable1[F[_]] extends Foldable[F] { self =>
     def rightFM1Consistent[A : Equal](fa: F[A]): Boolean =
       Equal[Vector[A]].equal(foldMap1(fa)(Vector(_)),
                              foldMapRight1(fa)(Vector(_))(_ +: _))
-  }
   def foldable1Law = new Foldable1Law {}
 
   ////
-  val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F] {
+  val foldable1Syntax = new scalaz.syntax.Foldable1Syntax[F]
     def F = Foldable1.this
-  }
-}
 
-object Foldable1 {
+object Foldable1
   @inline def apply[F[_]](implicit F: Foldable1[F]): Foldable1[F] = F
 
   ////
 
   ////
-}

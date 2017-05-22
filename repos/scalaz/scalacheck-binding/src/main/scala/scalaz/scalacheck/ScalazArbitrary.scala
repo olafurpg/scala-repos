@@ -9,7 +9,7 @@ import reflect.ClassTag
 /**
   * Instances of {@link scalacheck.Arbitrary} for many types in Scalaz.
   */
-object ScalazArbitrary extends ScalazArbitraryPlatform {
+object ScalazArbitrary extends ScalazArbitraryPlatform
   import Scalaz._
   import Tags._
   import Arbitrary._
@@ -123,75 +123,65 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit val OrderingArbitrary: Arbitrary[Ordering] = Arbitrary(
       oneOf(LT, EQ, GT))
 
-  private[this] def withSize[A](size: Int)(f: Int => Gen[A]): Gen[Stream[A]] = {
+  private[this] def withSize[A](size: Int)(f: Int => Gen[A]): Gen[Stream[A]] =
     Applicative[Gen]
       .sequence(
           Stream.fill(size)(Gen.choose(1, size))
       )
-      .flatMap { s =>
+      .flatMap  s =>
         val ns = Traverse[Stream]
-          .traverseS(s) { n =>
-            for {
+          .traverseS(s)  n =>
+            for
               sum <- State.get[Int]
-              r <- if (sum >= size) {
+              r <- if (sum >= size)
                     State.state[Int, Option[Int]](None)
-                  } else if ((sum + n) > size) {
+                  else if ((sum + n) > size)
                     State((s: Int) => (s + n) -> Option(size - sum))
-                  } else {
+                  else
                     State((s: Int) => (s + n) -> Option(n))
-                  }
-            } yield r
-          }
+            yield r
           .eval(0)
           .flatten
 
         Applicative[Gen].sequence(ns.map(f))
-      }
-  }
 
   private[scalaz] def treeGenSized[A : NotNothing](
       size: Int)(implicit A: Arbitrary[A]): Gen[Tree[A]] =
-    size match {
+    size match
       case n if n <= 1 =>
         A.arbitrary.map(a => Tree.Leaf(a))
       case 2 =>
-        arb[(A, A)].arbitrary.map {
+        arb[(A, A)].arbitrary.map
           case (a1, a2) =>
             Tree.Node(a1, Stream(Tree.Leaf(a2)))
-        }
       case 3 =>
-        arb[(A, A, A)].arbitrary.flatMap {
+        arb[(A, A, A)].arbitrary.flatMap
           case (a1, a2, a3) =>
             Gen.oneOf(
                 Tree.Node(a1, Stream(Tree.Leaf(a2), Tree.Leaf(a3))),
                 Tree.Node(a1, Stream(Tree.Node(a2, Stream(Tree.Leaf(a3)))))
             )
-        }
       case _ =>
-        withSize(size - 1)(treeGenSized[A]).flatMap { as =>
+        withSize(size - 1)(treeGenSized[A]).flatMap  as =>
           A.arbitrary.map(a => Tree.Node(a, as))
-        }
-    }
 
   implicit def TreeArbitrary[A : Arbitrary]: Arbitrary[Tree[A]] =
     Arbitrary(Gen.sized(n => Gen.choose(1, n).flatMap(treeGenSized[A])))
 
   private[scalaz] def treeLocGenSized[A : NotNothing](size: Int)(
-      implicit A: Arbitrary[A]): Gen[TreeLoc[A]] = {
+      implicit A: Arbitrary[A]): Gen[TreeLoc[A]] =
     def forest(n: Int): Gen[TreeLoc.TreeForest[A]] =
       withSize(n)(treeGenSized[A])
 
-    val parent: Int => Gen[TreeLoc.Parent[A]] = { n =>
-      Gen.choose(0, n - 1).flatMap { x1 =>
+    val parent: Int => Gen[TreeLoc.Parent[A]] =  n =>
+      Gen.choose(0, n - 1).flatMap  x1 =>
         Apply[Gen].tuple3(
             forest(x1),
             A.arbitrary,
             forest(n - x1 - 1)
         )
-      }
-    }
 
-    for {
+    for
       a <- Gen.choose(1, size)
       b = size - a
       aa <- Gen.choose(1, a)
@@ -202,8 +192,7 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
           forest(ba),
           withSize(b - ba)(parent)
       )(TreeLoc.apply[A])
-    } yield t
-  }
+    yield t
 
   implicit def IterableArbitrary[A : Arbitrary]: Arbitrary[Iterable[A]] =
     Apply[Arbitrary].apply2[A, List[A], Iterable[A]](arb[A], arb[List[A]])(
@@ -214,10 +203,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def DisjunctionArbitrary[A : Arbitrary, B : Arbitrary]: Arbitrary[
       A \/ B] =
-    Functor[Arbitrary].map(arb[Either[A, B]]) {
+    Functor[Arbitrary].map(arb[Either[A, B]])
       case Left(a) => -\/(a)
       case Right(b) => \/-(b)
-    }
 
   implicit def ValidationArbitrary[A : Arbitrary, B : Arbitrary]: Arbitrary[
       Validation[A, B]] =
@@ -314,22 +302,19 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def FingerTreeArbitrary[V, A](
       implicit a: Arbitrary[A],
-      measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary {
+      measure: Reducer[A, V]): Arbitrary[FingerTree[V, A]] = Arbitrary
     def fingerTree[A](n: Int)(implicit a1: Arbitrary[A],
                               measure1: Reducer[A, V]): Gen[FingerTree[V, A]] =
-      n match {
+      n match
         case 0 => empty[V, A]
         case 1 => arbitrary[A].map(single[V, A](_))
-        case n => {
+        case n =>
             val nextSize = n.abs / 2
             ^^(FingerArbitrary[V, A].arbitrary,
                fingerTree[Node[V, A]](nextSize)(NodeArbitrary[V, A],
                                                 implicitly),
                FingerArbitrary[V, A].arbitrary)(deep[V, A](_, _, _))
-          }
-      }
     Gen.sized(fingerTree[A] _)
-  }
 
   implicit def IndSeqArbibrary[A : Arbitrary]: Arbitrary[IndSeq[A]] =
     Functor[Arbitrary].map(arb[List[A]])(IndSeq.fromSeq)
@@ -378,10 +363,9 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
 
   implicit def lazyEitherArb[F[_], A : Arbitrary, B : Arbitrary]: Arbitrary[
       LazyEither[A, B]] =
-    Functor[Arbitrary].map(arb[Either[A, B]]) {
+    Functor[Arbitrary].map(arb[Either[A, B]])
       case Left(a) => LazyEither.lazyLeft(a)
       case Right(b) => LazyEither.lazyRight(b)
-    }
 
   implicit def lazyEitherTArb[F[_], A, B](
       implicit A: Arbitrary[F[LazyEither[A, B]]])
@@ -429,9 +413,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Applicative[Arbitrary].apply4(arb[A], arb[B], arb[C], arb[D])(
         LazyTuple4(_, _, _, _))
 
-  implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) = {
+  implicit def heapArbitrary[A](implicit O: Order[A], A: Arbitrary[List[A]]) =
     Functor[Arbitrary].map(A)(as => Heap.fromData(as))
-  }
 
   // backwards compatibility
   def storeTArb[F[+ _], A, B](
@@ -453,9 +436,8 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
     Functor[Arbitrary].map(FA)(StreamT.fromStream(_))
 
   // workaround bug in Scalacheck 1.8-SNAPSHOT.
-  private def arbDouble: Arbitrary[Double] = Arbitrary {
+  private def arbDouble: Arbitrary[Double] = Arbitrary
     Gen.oneOf(posNum[Double], negNum[Double])
-  }
 
   implicit def CaseInsensitiveArbitrary[A](
       implicit A0: Arbitrary[A],
@@ -465,16 +447,15 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
   implicit def dievArbitrary[A](
       implicit A: Arbitrary[List[A]], E: Enum[A]): Arbitrary[Diev[A]] =
     Functor[Arbitrary].map(A)(
-        _.grouped(2).foldLeft(Diev.empty[A]) { (working, possiblePair) =>
-      possiblePair match {
+        _.grouped(2).foldLeft(Diev.empty[A])  (working, possiblePair) =>
+      possiblePair match
         case first :: second :: Nil => working + ((first, second))
         case value :: Nil => working
         case _ => sys.error("Unexpected amount of items in paired list.")
-      }
-    })
+    )
 
   implicit def iterateeInputArbitrary[A : Arbitrary]: Arbitrary[
-      scalaz.iteratee.Input[A]] = {
+      scalaz.iteratee.Input[A]] =
     import scalaz.iteratee.Input._
     Arbitrary(
         Gen.oneOf(
@@ -482,5 +463,3 @@ object ScalazArbitrary extends ScalazArbitraryPlatform {
             Gen.const(eofInput[A]),
             arbitrary[A].map(e => elInput(e))
         ))
-  }
-}

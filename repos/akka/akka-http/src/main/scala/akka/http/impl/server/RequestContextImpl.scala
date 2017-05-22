@@ -21,7 +21,7 @@ import scala.compat.java8.FutureConverters._
   */
 private[http] final case class RequestContextImpl(
     underlying: ScalaRequestContext)
-    extends RequestContext {
+    extends RequestContext
   // provides auto-conversion to japi.RouteResult
   import RouteResultImpl._
 
@@ -29,9 +29,9 @@ private[http] final case class RequestContextImpl(
   def unmatchedPath: String = underlying.unmatchedPath.toString
 
   def completeWith(futureResult: Future[RouteResult]): RouteResult =
-    futureResult.flatMap {
+    futureResult.flatMap
       case r: RouteResultImpl ⇒ r.underlying
-    }(executionContext())
+    (executionContext())
   def completeWith(futureResult: CompletionStage[RouteResult]): RouteResult =
     completeWith(futureResult.toScala)
   def complete(text: String): RouteResult = underlying.complete(text)
@@ -43,14 +43,13 @@ private[http] final case class RequestContextImpl(
   def completeWithStatus(statusCode: jm.StatusCode): RouteResult =
     underlying.complete(statusCode.asScala)
   def completeAs[T](marshaller: Marshaller[T], value: T): RouteResult =
-    marshaller match {
+    marshaller match
       case MarshallerImpl(m) ⇒
         implicit val marshaller = m(underlying.executionContext)
         underlying.complete(value)
       case _ ⇒
         throw new IllegalArgumentException(
             s"Unsupported marshaller: $marshaller")
-    }
   def complete(response: jm.HttpResponse): RouteResult =
     underlying.complete(response.asScala)
 
@@ -65,4 +64,3 @@ private[http] final case class RequestContextImpl(
 
   override def settings: RoutingSettings = underlying.settings
   override def parserSettings: ParserSettings = underlying.parserSettings
-}

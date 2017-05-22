@@ -44,10 +44,9 @@ class SupervisorException private[akka](
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Supervisor {
+object Supervisor
   def apply(config: SupervisorConfig): Supervisor =
     SupervisorFactory(config).newInstance.start
-}
 
 /**
   * Use this factory instead of the Supervisor factory object if you want to control
@@ -77,18 +76,16 @@ object Supervisor {
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-case class SupervisorFactory(val config: SupervisorConfig) {
+case class SupervisorFactory(val config: SupervisorConfig)
 
   def newInstance: Supervisor = newInstanceFor(config)
 
-  def newInstanceFor(config: SupervisorConfig): Supervisor = {
+  def newInstanceFor(config: SupervisorConfig): Supervisor =
     val supervisor = new Supervisor(
         config.restartStrategy, config.maxRestartsHandler)
     supervisor.configure(config)
     supervisor.start
     supervisor
-  }
-}
 
 /**
   * <b>NOTE:</b>
@@ -105,7 +102,7 @@ case class SupervisorFactory(val config: SupervisorConfig) {
 sealed class Supervisor(
     handler: FaultHandlingStrategy,
     maxRestartsHandler: (ActorRef,
-    MaximumNumberOfRestartsWithinTimeRangeReached) => Unit) {
+    MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
   import Supervisor._
 
   private val _childActors = new ConcurrentHashMap[String, List[ActorRef]]
@@ -116,9 +113,8 @@ sealed class Supervisor(
 
   def uuid = supervisor.uuid
 
-  def start: Supervisor = {
+  def start: Supervisor =
     this
-  }
 
   def shutdown(): Unit = supervisor.stop()
 
@@ -134,19 +130,18 @@ sealed class Supervisor(
   def childSupervisors: List[Supervisor] =
     _childActors.values.toArray.toList.asInstanceOf[List[Supervisor]]
 
-  def configure(config: SupervisorConfig): Unit = config match {
+  def configure(config: SupervisorConfig): Unit = config match
     case SupervisorConfig(_, servers, _) =>
       servers.map(
           server =>
-            server match {
+            server match
           case Supervise(actorRef, lifeCycle, registerAsRemoteService) =>
             actorRef.start()
             val className = actorRef.actor.getClass.getName
-            val currentActors = {
+            val currentActors =
               val list = _childActors.get(className)
               if (list eq null) List[ActorRef]()
               else list
-            }
             _childActors.put(className, actorRef :: currentActors)
             actorRef.lifeCycle = lifeCycle
             supervisor.link(actorRef)
@@ -156,9 +151,7 @@ sealed class Supervisor(
             val childSupervisor = Supervisor(supervisorConfig)
             supervisor.link(childSupervisor.supervisor)
             _childSupervisors.add(childSupervisor)
-      })
-  }
-}
+      )
 
 /**
   * For internal use only.
@@ -169,24 +162,20 @@ final class SupervisorActor private[akka](
     handler: FaultHandlingStrategy,
     maxRestartsHandler: (ActorRef,
     MaximumNumberOfRestartsWithinTimeRangeReached) => Unit)
-    extends Actor {
+    extends Actor
   self.faultHandler = handler
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     val i = self.linkedActors.values.iterator
-    while (i.hasNext) {
+    while (i.hasNext)
       val ref = i.next
       ref.stop()
       self.unlink(ref)
-    }
-  }
 
-  def receive = {
+  def receive =
     case max @ MaximumNumberOfRestartsWithinTimeRangeReached(_, _, _, _) =>
       maxRestartsHandler(self, max)
     case unknown =>
       throw new SupervisorException(
           "SupervisorActor can not respond to messages.\n\tUnknown message [" +
           unknown + "]")
-  }
-}

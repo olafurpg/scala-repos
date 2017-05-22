@@ -20,11 +20,11 @@ package org.apache.spark.sql.internal
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.internal.SQLConf._
 
-class SQLConfEntrySuite extends SparkFunSuite {
+class SQLConfEntrySuite extends SparkFunSuite
 
   val conf = new SQLConf
 
-  test("intConf") {
+  test("intConf")
     val key = "spark.sql.SQLConfEntrySuite.int"
     val confEntry = SQLConfEntry.intConf(key)
     assert(conf.getConf(confEntry, 5) === 5)
@@ -37,13 +37,11 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "20")
     assert(conf.getConf(confEntry, 5) === 20)
 
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       conf.setConfString(key, "abc")
-    }
     assert(e.getMessage === s"$key should be int, but was abc")
-  }
 
-  test("longConf") {
+  test("longConf")
     val key = "spark.sql.SQLConfEntrySuite.long"
     val confEntry = SQLConfEntry.longConf(key)
     assert(conf.getConf(confEntry, 5L) === 5L)
@@ -56,13 +54,11 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "20")
     assert(conf.getConf(confEntry, 5L) === 20L)
 
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       conf.setConfString(key, "abc")
-    }
     assert(e.getMessage === s"$key should be long, but was abc")
-  }
 
-  test("booleanConf") {
+  test("booleanConf")
     val key = "spark.sql.SQLConfEntrySuite.boolean"
     val confEntry = SQLConfEntry.booleanConf(key)
     assert(conf.getConf(confEntry, false) === false)
@@ -75,13 +71,11 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "true")
     assert(conf.getConf(confEntry, false) === true)
 
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       conf.setConfString(key, "abc")
-    }
     assert(e.getMessage === s"$key should be boolean, but was abc")
-  }
 
-  test("doubleConf") {
+  test("doubleConf")
     val key = "spark.sql.SQLConfEntrySuite.double"
     val confEntry = SQLConfEntry.doubleConf(key)
     assert(conf.getConf(confEntry, 5.0) === 5.0)
@@ -94,13 +88,11 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "20.0")
     assert(conf.getConf(confEntry, 5.0) === 20.0)
 
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       conf.setConfString(key, "abc")
-    }
     assert(e.getMessage === s"$key should be double, but was abc")
-  }
 
-  test("stringConf") {
+  test("stringConf")
     val key = "spark.sql.SQLConfEntrySuite.string"
     val confEntry = SQLConfEntry.stringConf(key)
     assert(conf.getConf(confEntry, "abc") === "abc")
@@ -112,9 +104,8 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key, "abc") === "abcde")
     assert(conf.getConfString(key) === "abcde")
     assert(conf.getConf(confEntry, "abc") === "abcde")
-  }
 
-  test("enumConf") {
+  test("enumConf")
     val key = "spark.sql.SQLConfEntrySuite.enum"
     val confEntry = SQLConfEntry.enumConf(
         key, v => v, Set("a", "b", "c"), defaultValue = Some("a"))
@@ -128,14 +119,12 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "c")
     assert(conf.getConf(confEntry) === "c")
 
-    val e = intercept[IllegalArgumentException] {
+    val e = intercept[IllegalArgumentException]
       conf.setConfString(key, "d")
-    }
     assert(
         e.getMessage === s"The value of $key should be one of a, b, c, but was d")
-  }
 
-  test("stringSeqConf") {
+  test("stringSeqConf")
     val key = "spark.sql.SQLConfEntrySuite.stringSeq"
     val confEntry = SQLConfEntry.stringSeqConf(
         "spark.sql.SQLConfEntrySuite.stringSeq", defaultValue = Some(Nil))
@@ -150,5 +139,3 @@ class SQLConfEntrySuite extends SparkFunSuite {
     assert(conf.getConfString(key) === "a,b,c,d,e")
     assert(conf.getConf(confEntry, Seq("a", "b", "c")) === Seq(
             "a", "b", "c", "d", "e"))
-  }
-}

@@ -19,7 +19,7 @@ import scala.compat.java8.FutureConverters.FutureOps
 import akka.stream.impl.SinkQueueAdapter
 
 /** Java API */
-object Sink {
+object Sink
 
   /**
     * A `Sink` that will invoke the given function for every received element, giving it its previous
@@ -170,7 +170,7 @@ object Sink {
     *
     * See also [[Flow.limit]], [[Flow.limitWeighted]], [[Flow.take]], [[Flow.takeWithin]], [[Flow.takeWhile]]
     */
-  def seq[In]: Sink[In, CompletionStage[java.util.List[In]]] = {
+  def seq[In]: Sink[In, CompletionStage[java.util.List[In]]] =
     import scala.collection.JavaConverters._
     new Sink(
         scaladsl.Sink
@@ -180,7 +180,6 @@ object Sink {
                   .map(sq ⇒ sq.asJava)(
                       ExecutionContexts.sameThreadExecutionContext)
                   .toJava))
-  }
 
   /**
     * Sends the elements of the stream to the given `ActorRef`.
@@ -240,10 +239,9 @@ object Sink {
     * it so also in type.
     */
   def fromGraph[T, M](g: Graph[SinkShape[T], M]): Sink[T, M] =
-    g match {
+    g match
       case s: Sink[T, M] ⇒ s
       case other ⇒ new Sink(scaladsl.Sink.fromGraph(other))
-    }
 
   /**
     * Combine several sinks with fan-out strategy like `Broadcast` or `Balance` and returns `Sink`.
@@ -254,13 +252,12 @@ object Sink {
       rest: java.util.List[Sink[U, _]],
       strategy: function.Function[
           java.lang.Integer, Graph[UniformFanOutShape[T, U], NotUsed]])
-    : Sink[T, NotUsed] = {
+    : Sink[T, NotUsed] =
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Sink(
         scaladsl.Sink.combine(output1.asScala, output2.asScala, seq: _*)(
             num ⇒ strategy.apply(num)))
-  }
 
   /**
     * Creates a `Sink` that is materialized as an [[akka.stream.SinkQueue]].
@@ -282,7 +279,6 @@ object Sink {
   def queue[T](): Sink[T, SinkQueue[T]] =
     new Sink(
         scaladsl.Sink.queue[T]().mapMaterializedValue(new SinkQueueAdapter(_)))
-}
 
 /**
   * Java API
@@ -291,7 +287,7 @@ object Sink {
   * Can be used as a `Subscriber`
   */
 final class Sink[-In, +Mat](delegate: scaladsl.Sink[In, Mat])
-    extends Graph[SinkShape[In], Mat] {
+    extends Graph[SinkShape[In], Mat]
 
   override def shape: SinkShape[In] = delegate.shape
   private[stream] def module: StreamLayout.Module = delegate.module
@@ -356,4 +352,3 @@ final class Sink[-In, +Mat](delegate: scaladsl.Sink[In, Mat])
     */
   override def async: javadsl.Sink[In, Mat] =
     new Sink(delegate.async)
-}

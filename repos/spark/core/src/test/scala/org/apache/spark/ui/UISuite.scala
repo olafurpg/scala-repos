@@ -28,13 +28,13 @@ import org.scalatest.time.SpanSugar._
 import org.apache.spark._
 import org.apache.spark.LocalSparkContext._
 
-class UISuite extends SparkFunSuite {
+class UISuite extends SparkFunSuite
 
   /**
     * Create a test SparkContext with the SparkUI enabled.
     * It is safe to `get` the SparkUI directly from the SparkContext returned here.
     */
-  private def newSparkContext(): SparkContext = {
+  private def newSparkContext(): SparkContext =
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("test")
@@ -42,52 +42,43 @@ class UISuite extends SparkFunSuite {
     val sc = new SparkContext(conf)
     assert(sc.ui.isDefined)
     sc
-  }
 
-  private def sslDisabledConf(): (SparkConf, SSLOptions) = {
+  private def sslDisabledConf(): (SparkConf, SSLOptions) =
     val conf = new SparkConf
     (conf, new SecurityManager(conf).getSSLOptions("ui"))
-  }
 
-  private def sslEnabledConf(): (SparkConf, SSLOptions) = {
+  private def sslEnabledConf(): (SparkConf, SSLOptions) =
     val conf = new SparkConf()
       .set("spark.ssl.ui.enabled", "true")
       .set("spark.ssl.ui.keyStore", "./src/test/resources/spark.keystore")
       .set("spark.ssl.ui.keyStorePassword", "123456")
       .set("spark.ssl.ui.keyPassword", "123456")
       (conf, new SecurityManager(conf).getSSLOptions("ui"))
-  }
 
-  ignore("basic ui visibility") {
-    withSpark(newSparkContext()) { sc =>
+  ignore("basic ui visibility")
+    withSpark(newSparkContext())  sc =>
       // test if the ui is visible, and all the expected tabs are visible
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         val html = Source.fromURL(sc.ui.get.appUIAddress).mkString
         assert(!html.contains("random data that should not be present"))
         assert(html.toLowerCase.contains("stages"))
         assert(html.toLowerCase.contains("storage"))
         assert(html.toLowerCase.contains("environment"))
         assert(html.toLowerCase.contains("executors"))
-      }
-    }
-  }
 
-  ignore("visibility at localhost:4040") {
-    withSpark(newSparkContext()) { sc =>
+  ignore("visibility at localhost:4040")
+    withSpark(newSparkContext())  sc =>
       // test if visible from http://localhost:4040
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         val html = Source.fromURL("http://localhost:4040").mkString
         assert(html.toLowerCase.contains("stages"))
-      }
-    }
-  }
 
-  test("jetty selects different port under contention") {
+  test("jetty selects different port under contention")
     var server: ServerSocket = null
     var serverInfo1: ServerInfo = null
     var serverInfo2: ServerInfo = null
     val (conf, sslOptions) = sslDisabledConf()
-    try {
+    try
       server = new ServerSocket(0)
       val startPort = server.getLocalPort
       serverInfo1 = JettyUtils.startJettyServer(
@@ -100,18 +91,16 @@ class UISuite extends SparkFunSuite {
       assert(boundPort1 != startPort)
       assert(boundPort2 != startPort)
       assert(boundPort1 != boundPort2)
-    } finally {
+    finally
       stopServer(serverInfo1)
       stopServer(serverInfo2)
       closeSocket(server)
-    }
-  }
 
-  test("jetty with https selects different port under contention") {
+  test("jetty with https selects different port under contention")
     var server: ServerSocket = null
     var serverInfo1: ServerInfo = null
     var serverInfo2: ServerInfo = null
-    try {
+    try
       server = new ServerSocket(0)
       val startPort = server.getLocalPort
       val (conf, sslOptions) = sslEnabledConf()
@@ -133,37 +122,32 @@ class UISuite extends SparkFunSuite {
       assert(boundPort1 != startPort)
       assert(boundPort2 != startPort)
       assert(boundPort1 != boundPort2)
-    } finally {
+    finally
       stopServer(serverInfo1)
       stopServer(serverInfo2)
       closeSocket(server)
-    }
-  }
 
-  test("jetty binds to port 0 correctly") {
+  test("jetty binds to port 0 correctly")
     var socket: ServerSocket = null
     var serverInfo: ServerInfo = null
     val (conf, sslOptions) = sslDisabledConf()
-    try {
+    try
       serverInfo = JettyUtils.startJettyServer(
           "0.0.0.0", 0, sslOptions, Seq[ServletContextHandler](), conf)
       val server = serverInfo.server
       val boundPort = serverInfo.boundPort
       assert(server.getState === "STARTED")
       assert(boundPort != 0)
-      intercept[BindException] {
+      intercept[BindException]
         socket = new ServerSocket(boundPort)
-      }
-    } finally {
+    finally
       stopServer(serverInfo)
       closeSocket(socket)
-    }
-  }
 
-  test("jetty with https binds to port 0 correctly") {
+  test("jetty with https binds to port 0 correctly")
     var socket: ServerSocket = null
     var serverInfo: ServerInfo = null
-    try {
+    try
       val (conf, sslOptions) = sslEnabledConf()
       serverInfo = JettyUtils.startJettyServer(
           "0.0.0.0", 0, sslOptions, Seq[ServletContextHandler](), conf)
@@ -171,38 +155,28 @@ class UISuite extends SparkFunSuite {
       val boundPort = serverInfo.boundPort
       assert(server.getState === "STARTED")
       assert(boundPort != 0)
-      intercept[BindException] {
+      intercept[BindException]
         socket = new ServerSocket(boundPort)
-      }
-    } finally {
+    finally
       stopServer(serverInfo)
       closeSocket(socket)
-    }
-  }
 
-  test("verify appUIAddress contains the scheme") {
-    withSpark(newSparkContext()) { sc =>
+  test("verify appUIAddress contains the scheme")
+    withSpark(newSparkContext())  sc =>
       val ui = sc.ui.get
       val uiAddress = ui.appUIAddress
       val uiHostPort = ui.appUIHostPort
       assert(uiAddress.equals("http://" + uiHostPort))
-    }
-  }
 
-  test("verify appUIAddress contains the port") {
-    withSpark(newSparkContext()) { sc =>
+  test("verify appUIAddress contains the port")
+    withSpark(newSparkContext())  sc =>
       val ui = sc.ui.get
       val splitUIAddress = ui.appUIAddress.split(':')
       val boundPort = ui.boundPort
       assert(splitUIAddress(2).toInt == boundPort)
-    }
-  }
 
-  def stopServer(info: ServerInfo): Unit = {
+  def stopServer(info: ServerInfo): Unit =
     if (info != null && info.server != null) info.server.stop
-  }
 
-  def closeSocket(socket: ServerSocket): Unit = {
+  def closeSocket(socket: ServerSocket): Unit =
     if (socket != null) socket.close
-  }
-}

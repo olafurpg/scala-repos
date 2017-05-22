@@ -3,13 +3,12 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{universe => ru}
 import scala.reflect.runtime.{currentMirror => cm}
 
-object Test extends App {
-  class C[A] {
+object Test extends App
+  class C[A]
     def m(a: A): Int = 5
-  }
 
   def test(tag: TypeTag[_]) =
-    try {
+    try
       val fout = new ByteArrayOutputStream()
       val out = new ObjectOutputStream(fout)
       out.writeObject(tag)
@@ -23,12 +22,10 @@ object Test extends App {
       fin.close()
 
       println(retag)
-    } catch {
+    catch
       case ex: Exception =>
         println(ex)
-    }
 
   test(implicitly[TypeTag[Int]])
   test(implicitly[TypeTag[String]])
   test(implicitly[TypeTag[C[Double]]])
-}

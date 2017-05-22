@@ -25,7 +25,7 @@ import org.apache.spark.graphx._
 import org.apache.spark.rdd._
 
 /** Implementation of SVD++ algorithm. */
-object SVDPlusPlus {
+object SVDPlusPlus
 
   /** Configuration parameters for SVDPlusPlus. */
   class Conf(var rank: Int,
@@ -54,7 +54,7 @@ object SVDPlusPlus {
     */
   def run(edges: RDD[Edge[Double]], conf: Conf)
     : (Graph[(Array[Double], Array[Double], Double, Double), Double],
-    Double) = {
+    Double) =
     require(conf.maxIters > 0,
             s"Maximum of iterations must be greater than 0," +
             s" but got ${conf.maxIters}")
@@ -63,12 +63,11 @@ object SVDPlusPlus {
             s" but got {maxVal: ${conf.maxVal}, minVal: ${conf.minVal}}")
 
     // Generate default vertex attribute
-    def defaultF(rank: Int): (Array[Double], Array[Double], Double, Double) = {
+    def defaultF(rank: Int): (Array[Double], Array[Double], Double, Double) =
       // TODO: use a fixed random seed
       val v1 = Array.fill(rank)(Random.nextDouble())
       val v2 = Array.fill(rank)(Random.nextDouble())
       (v1, v2, 0.0, 0.0)
-    }
 
     // calculate global rating mean
     edges.cache()
@@ -88,14 +87,13 @@ object SVDPlusPlus {
         (g1, g2) => (g1._1 + g2._1, g1._2 + g2._2))
 
     val gJoinT0 = g
-      .outerJoinVertices(t0) {
+      .outerJoinVertices(t0)
         (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
         msg: Option[(Long, Double)]) =>
           (vd._1,
            vd._2,
            msg.get._2 / msg.get._1 - u,
            1.0 / scala.math.sqrt(msg.get._1))
-      }
       .cache()
     materialize(gJoinT0)
     g.unpersist()
@@ -104,7 +102,7 @@ object SVDPlusPlus {
     def sendMsgTrainF(conf: Conf, u: Double)(
         ctx: EdgeContext[(Array[Double], Array[Double], Double, Double),
                          Double,
-                         (Array[Double], Array[Double], Double)]) {
+                         (Array[Double], Array[Double], Double)])
       val (usr, itm) = (ctx.srcAttr, ctx.dstAttr)
       val (p, q) = (usr._1, itm._1)
       val rank = p.length
@@ -128,31 +126,27 @@ object SVDPlusPlus {
           (updateP, updateY, (err - conf.gamma6 * usr._3) * conf.gamma1))
       ctx.sendToDst(
           (updateQ, updateY, (err - conf.gamma6 * itm._3) * conf.gamma1))
-    }
 
-    for (i <- 0 until conf.maxIters) {
+    for (i <- 0 until conf.maxIters)
       // Phase 1, calculate pu + |N(u)|^(-0.5)*sum(y) for user nodes
       g.cache()
       val t1 = g.aggregateMessages[Array[Double]](
           ctx => ctx.sendToSrc(ctx.dstAttr._2),
           (g1, g2) =>
-            {
               val out = g1.clone()
               blas.daxpy(out.length, 1.0, g2, 1, out, 1)
               out
-          })
+          )
       val gJoinT1 = g
-        .outerJoinVertices(t1) {
+        .outerJoinVertices(t1)
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
           msg: Option[Array[Double]]) =>
-            if (msg.isDefined) {
+            if (msg.isDefined)
               val out = vd._1.clone()
               blas.daxpy(out.length, vd._4, msg.get, 1, out, 1)
               (vd._1, out, vd._3, vd._4)
-            } else {
+            else
               vd
-            }
-        }
         .cache()
       materialize(gJoinT1)
       g.unpersist()
@@ -164,35 +158,30 @@ object SVDPlusPlus {
           sendMsgTrainF(conf, u),
           (g1: (Array[Double], Array[Double],
           Double), g2: (Array[Double], Array[Double], Double)) =>
-            {
               val out1 = g1._1.clone()
               blas.daxpy(out1.length, 1.0, g2._1, 1, out1, 1)
               val out2 = g2._2.clone()
               blas.daxpy(out2.length, 1.0, g2._2, 1, out2, 1)
               (out1, out2, g1._3 + g2._3)
-          })
+          )
       val gJoinT2 = g
-        .outerJoinVertices(t2) {
+        .outerJoinVertices(t2)
           (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
           msg: Option[(Array[Double], Array[Double], Double)]) =>
-            {
               val out1 = vd._1.clone()
               blas.daxpy(out1.length, 1.0, msg.get._1, 1, out1, 1)
               val out2 = vd._2.clone()
               blas.daxpy(out2.length, 1.0, msg.get._2, 1, out2, 1)
               (out1, out2, vd._3 + msg.get._3, vd._4)
-            }
-        }
         .cache()
       materialize(gJoinT2)
       g.unpersist()
       g = gJoinT2
-    }
 
     // calculate error on training set
     def sendMsgTestF(conf: Conf, u: Double)(
         ctx: EdgeContext[
-            (Array[Double], Array[Double], Double, Double), Double, Double]) {
+            (Array[Double], Array[Double], Double, Double), Double, Double])
       val (usr, itm) = (ctx.srcAttr, ctx.dstAttr)
       val (p, q) = (usr._1, itm._1)
       var pred = u + usr._3 + itm._3 + blas.ddot(q.length, q, 1, usr._2, 1)
@@ -200,16 +189,14 @@ object SVDPlusPlus {
       pred = math.min(pred, conf.maxVal)
       val err = (ctx.attr - pred) * (ctx.attr - pred)
       ctx.sendToDst(err)
-    }
 
     g.cache()
     val t3 = g.aggregateMessages[Double](sendMsgTestF(conf, u), _ + _)
     val gJoinT3 = g
-      .outerJoinVertices(t3) {
+      .outerJoinVertices(t3)
         (vid: VertexId, vd: (Array[Double], Array[Double], Double, Double),
         msg: Option[Double]) =>
           if (msg.isDefined) (vd._1, vd._2, vd._3, msg.get) else vd
-      }
       .cache()
     materialize(gJoinT3)
     g.unpersist()
@@ -219,13 +206,10 @@ object SVDPlusPlus {
     val newVertices =
       g.vertices.mapValues(v => (v._1.toArray, v._2.toArray, v._3, v._4))
     (Graph(newVertices, g.edges), u)
-  }
 
   /**
     * Forces materialization of a Graph by count()ing its RDDs.
     */
-  private def materialize(g: Graph[_, _]): Unit = {
+  private def materialize(g: Graph[_, _]): Unit =
     g.vertices.count()
     g.edges.count()
-  }
-}

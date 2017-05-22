@@ -5,7 +5,7 @@ import java.lang.System.{out => sysout}
 /** A trait for testing repl's javap command
   *  or possibly examining its output.
   */
-abstract class JavapTest extends ReplTest {
+abstract class JavapTest extends ReplTest
 
   /** Your Assertion Here, whatever you want to bejahen.
     *  Assertions must be satisfied by all flavors of javap
@@ -17,9 +17,8 @@ abstract class JavapTest extends ReplTest {
 
   // give it a pass if javap is broken
   override def show() =
-    try {
+    try
       val res = eval().toSeq
       val unsupported = res exists (s => baddies exists (s contains _))
       assert((unsupported || yah(res)), res.mkString("", "\n", "\n"))
-    } catch { case ae: AssertionError => ae.printStackTrace(sysout) }
-}
+    catch { case ae: AssertionError => ae.printStackTrace(sysout) }

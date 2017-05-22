@@ -14,7 +14,7 @@ import scala.annotation.unchecked.uncheckedVariance
   * It is also used in the Java DSL for “untyped Inlets” as a work-around
   * for otherwise unreasonable existential types.
   */
-sealed abstract class InPort { self: Inlet[_] ⇒
+sealed abstract class InPort  self: Inlet[_] ⇒
   final override def hashCode: Int = super.hashCode
   final override def equals(that: Any): Boolean =
     this eq that.asInstanceOf[AnyRef]
@@ -28,7 +28,6 @@ sealed abstract class InPort { self: Inlet[_] ⇒
     * INTERNAL API
     */
   private[stream] def inlet: Inlet[_] = this
-}
 
 /**
   * An output port of a StreamLayout.Module. This type logically belongs
@@ -36,7 +35,7 @@ sealed abstract class InPort { self: Inlet[_] ⇒
   * It is also used in the Java DSL for “untyped Outlets” as a work-around
   * for otherwise unreasonable existential types.
   */
-sealed abstract class OutPort { self: Outlet[_] ⇒
+sealed abstract class OutPort  self: Outlet[_] ⇒
   final override def hashCode: Int = super.hashCode
   final override def equals(that: Any): Boolean =
     this eq that.asInstanceOf[AnyRef]
@@ -50,14 +49,13 @@ sealed abstract class OutPort { self: Outlet[_] ⇒
     * INTERNAL API
     */
   private[stream] def outlet: Outlet[_] = this
-}
 
 /**
   * An Inlet is a typed input to a Shape. Its partner in the Module view
   * is the InPort (which does not bear an element type because Modules only
   * express the internal structural hierarchy of stream topologies).
   */
-object Inlet {
+object Inlet
 
   /**
     * Scala API
@@ -74,23 +72,21 @@ object Inlet {
     * displaying debug information or error messages involving the port.
     */
   def create[T](name: String): Inlet[T] = Inlet(name)
-}
 
-final class Inlet[T] private (override val toString: String) extends InPort {
+final class Inlet[T] private (override val toString: String) extends InPort
   def carbonCopy(): Inlet[T] = Inlet(toString)
 
   /**
     * INTERNAL API.
     */
   def as[U]: Inlet[U] = this.asInstanceOf[Inlet[U]]
-}
 
 /**
   * An Outlet is a typed output to a Shape. Its partner in the Module view
   * is the OutPort (which does not bear an element type because Modules only
   * express the internal structural hierarchy of stream topologies).
   */
-object Outlet {
+object Outlet
 
   /**
     * Scala API
@@ -107,16 +103,14 @@ object Outlet {
     * displaying debug information or error messages involving the port.
     */
   def create[T](name: String): Outlet[T] = Outlet(name)
-}
 
-final class Outlet[T] private (override val toString: String) extends OutPort {
+final class Outlet[T] private (override val toString: String) extends OutPort
   def carbonCopy(): Outlet[T] = Outlet(toString)
 
   /**
     * INTERNAL API.
     */
   def as[U]: Outlet[U] = this.asInstanceOf[Outlet[U]]
-}
 
 /**
   * A Shape describes the inlets and outlets of a [[Graph]]. In keeping with the
@@ -124,7 +118,7 @@ final class Outlet[T] private (override val toString: String) extends OutPort {
   * matters from the outside are the connections that can be made with it,
   * otherwise it is just a black box.
   */
-abstract class Shape {
+abstract class Shape
 
   /**
     * Scala API: get a list of all input ports
@@ -185,14 +179,13 @@ abstract class Shape {
     require(hasSamePortsAndShapeAs(s), nonCorrespondingMessage(s))
 
   private def nonCorrespondingMessage(s: Shape) =
-    s"The inlets [${s.inlets.mkString(", ")}] and outlets [${s.outlets.mkString(", ")}] must correspond to the inlets [${inlets
-      .mkString(", ")}] and outlets [${outlets.mkString(", ")}]"
-}
+    s"The inlets [${s.inlets.mkString(", ")}] and outlets [${s.outlets.mkString(", ")}] must correspond to the inlets [$inlets
+      .mkString(", ")] and outlets [${outlets.mkString(", ")}]"
 
 /**
   * Java API for creating custom [[Shape]] types.
   */
-abstract class AbstractShape extends Shape {
+abstract class AbstractShape extends Shape
 
   /**
     * Provide the list of all input ports of this shape.
@@ -211,19 +204,18 @@ abstract class AbstractShape extends Shape {
 
   final override def getInlets = allInlets
   final override def getOutlets = allOutlets
-}
 
 /**
   * This [[Shape]] is used for graphs that have neither open inputs nor open
   * outputs. Only such a [[Graph]] can be materialized by a [[Materializer]].
   */
 sealed abstract class ClosedShape extends Shape
-object ClosedShape extends ClosedShape {
+object ClosedShape extends ClosedShape
   override val inlets: immutable.Seq[Inlet[_]] = EmptyImmutableSeq
   override val outlets: immutable.Seq[Outlet[_]] = EmptyImmutableSeq
   override def deepCopy() = this
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
-                             outlets: immutable.Seq[Outlet[_]]): Shape = {
+                             outlets: immutable.Seq[Outlet[_]]): Shape =
     require(
         inlets.isEmpty,
         s"proposed inlets [${inlets.mkString(", ")}] do not fit ClosedShape")
@@ -231,7 +223,6 @@ object ClosedShape extends ClosedShape {
         outlets.isEmpty,
         s"proposed outlets [${outlets.mkString(", ")}] do not fit ClosedShape")
     this
-  }
 
   /**
     * Java API: obtain ClosedShape instance
@@ -239,7 +230,6 @@ object ClosedShape extends ClosedShape {
   def getInstance: ClosedShape = this
 
   override def toString: String = "ClosedShape"
-}
 
 /**
   * This type of [[Shape]] can express any number of inputs and outputs at the
@@ -249,26 +239,25 @@ object ClosedShape extends ClosedShape {
   */
 case class AmorphousShape(
     inlets: immutable.Seq[Inlet[_]], outlets: immutable.Seq[Outlet[_]])
-    extends Shape {
+    extends Shape
   override def deepCopy() =
     AmorphousShape(inlets.map(_.carbonCopy()), outlets.map(_.carbonCopy()))
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
                              outlets: immutable.Seq[Outlet[_]]): Shape =
     AmorphousShape(inlets, outlets)
-}
 
 /**
   * A Source [[Shape]] has exactly one output and no inputs, it models a source
   * of data.
   */
 final case class SourceShape[+T](out: Outlet[T @uncheckedVariance])
-    extends Shape {
+    extends Shape
   override val inlets: immutable.Seq[Inlet[_]] = EmptyImmutableSeq
   override val outlets: immutable.Seq[Outlet[_]] = List(out)
 
   override def deepCopy(): SourceShape[T] = SourceShape(out.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
-                             outlets: immutable.Seq[Outlet[_]]): Shape = {
+                             outlets: immutable.Seq[Outlet[_]]): Shape =
     require(
         inlets.isEmpty,
         s"proposed inlets [${inlets.mkString(", ")}] do not fit SourceShape")
@@ -276,14 +265,11 @@ final case class SourceShape[+T](out: Outlet[T @uncheckedVariance])
         outlets.size == 1,
         s"proposed outlets [${outlets.mkString(", ")}] do not fit SourceShape")
     SourceShape(outlets.head)
-  }
-}
-object SourceShape {
+object SourceShape
 
   /** Java API */
   def of[T](outlet: Outlet[T @uncheckedVariance]): SourceShape[T] =
     SourceShape(outlet)
-}
 
 /**
   * A Flow [[Shape]] has exactly one input and one output, it looks from the
@@ -292,54 +278,48 @@ object SourceShape {
   */
 final case class FlowShape[-I, +O](
     in: Inlet[I @uncheckedVariance], out: Outlet[O @uncheckedVariance])
-    extends Shape {
+    extends Shape
   override val inlets: immutable.Seq[Inlet[_]] = List(in)
   override val outlets: immutable.Seq[Outlet[_]] = List(out)
 
   override def deepCopy(): FlowShape[I, O] =
     FlowShape(in.carbonCopy(), out.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
-                             outlets: immutable.Seq[Outlet[_]]): Shape = {
+                             outlets: immutable.Seq[Outlet[_]]): Shape =
     require(inlets.size == 1,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit FlowShape")
     require(
         outlets.size == 1,
         s"proposed outlets [${outlets.mkString(", ")}] do not fit FlowShape")
     FlowShape(inlets.head, outlets.head)
-  }
-}
-object FlowShape {
+object FlowShape
 
   /** Java API */
   def of[I, O](inlet: Inlet[I @uncheckedVariance],
                outlet: Outlet[O @uncheckedVariance]): FlowShape[I, O] =
     FlowShape(inlet, outlet)
-}
 
 /**
   * A Sink [[Shape]] has exactly one input and no outputs, it models a data sink.
   */
-final case class SinkShape[-T](in: Inlet[T @uncheckedVariance]) extends Shape {
+final case class SinkShape[-T](in: Inlet[T @uncheckedVariance]) extends Shape
   override val inlets: immutable.Seq[Inlet[_]] = List(in)
   override val outlets: immutable.Seq[Outlet[_]] = EmptyImmutableSeq
 
   override def deepCopy(): SinkShape[T] = SinkShape(in.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
-                             outlets: immutable.Seq[Outlet[_]]): Shape = {
+                             outlets: immutable.Seq[Outlet[_]]): Shape =
     require(inlets.size == 1,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit SinkShape")
     require(
         outlets.isEmpty,
         s"proposed outlets [${outlets.mkString(", ")}] do not fit SinkShape")
     SinkShape(inlets.head)
-  }
-}
-object SinkShape {
+object SinkShape
 
   /** Java API */
   def of[T](inlet: Inlet[T @uncheckedVariance]): SinkShape[T] =
     SinkShape(inlet)
-}
 
 //#bidi-shape
 /**
@@ -359,7 +339,7 @@ final case class BidiShape[-In1, +Out1, -In2, +Out2](
     out1: Outlet[Out1 @uncheckedVariance],
     in2: Inlet[In2 @uncheckedVariance],
     out2: Outlet[Out2 @uncheckedVariance])
-    extends Shape {
+    extends Shape
   //#implementation-details-elided
   override val inlets: immutable.Seq[Inlet[_]] = List(in1, in2)
   override val outlets: immutable.Seq[Outlet[_]] = List(out1, out2)
@@ -376,19 +356,17 @@ final case class BidiShape[-In1, +Out1, -In2, +Out2](
               in2.carbonCopy(),
               out2.carbonCopy())
   override def copyFromPorts(inlets: immutable.Seq[Inlet[_]],
-                             outlets: immutable.Seq[Outlet[_]]): Shape = {
+                             outlets: immutable.Seq[Outlet[_]]): Shape =
     require(inlets.size == 2,
             s"proposed inlets [${inlets.mkString(", ")}] do not fit BidiShape")
     require(
         outlets.size == 2,
         s"proposed outlets [${outlets.mkString(", ")}] do not fit BidiShape")
     BidiShape(inlets(0), outlets(0), inlets(1), outlets(1))
-  }
   def reversed: Shape = copyFromPorts(inlets.reverse, outlets.reverse)
   //#implementation-details-elided
-}
 //#bidi-shape
-object BidiShape {
+object BidiShape
   def fromFlows[I1, O1, I2, O2](
       top: FlowShape[I1, O1],
       bottom: FlowShape[I2, O2]): BidiShape[I1, O1, I2, O2] =
@@ -401,4 +379,3 @@ object BidiShape {
       in2: Inlet[In2 @uncheckedVariance],
       out2: Outlet[Out2 @uncheckedVariance]): BidiShape[In1, Out1, In2, Out2] =
     BidiShape(in1, out1, in2, out2)
-}

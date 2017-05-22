@@ -25,18 +25,15 @@ import org.scalatest.FunSuite
   *
   * @author dlwh
   **/
-class partitionTest extends FunSuite {
+class partitionTest extends FunSuite
 
-  test("partition array in place") {
+  test("partition array in place")
     val a = Array(3, 4, 2, 1)
     partition.inPlace(a, 3)
     assert(a(3) === 4)
-  }
 
-  test("partition array copy") {
+  test("partition array copy")
     val a = Array(3, 4, 2, 1)
     val b = partition(a, 3)
     assert(b(3) === 4)
     assert(a.toIndexedSeq == IndexedSeq(3, 4, 2, 1))
-  }
-}

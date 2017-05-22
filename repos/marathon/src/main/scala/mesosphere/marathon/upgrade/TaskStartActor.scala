@@ -18,7 +18,7 @@ class TaskStartActor(val driver: SchedulerDriver,
                      val app: AppDefinition,
                      val scaleTo: Int,
                      promise: Promise[Unit])
-    extends Actor with ActorLogging with StartingBehavior {
+    extends Actor with ActorLogging with StartingBehavior
 
   val nrToStart: Int =
     scaleTo - taskQueue
@@ -26,20 +26,16 @@ class TaskStartActor(val driver: SchedulerDriver,
       .map(_.finalTaskCount)
       .getOrElse(taskTracker.countLaunchedAppTasksSync(app.id))
 
-  override def initializeStart(): Unit = {
+  override def initializeStart(): Unit =
     if (nrToStart > 0) taskQueue.add(app, nrToStart)
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     eventBus.unsubscribe(self)
     if (!promise.isCompleted)
       promise.tryFailure(new TaskUpgradeCanceledException(
               "The task upgrade has been cancelled"))
-  }
 
-  override def success(): Unit = {
+  override def success(): Unit =
     log.info(s"Successfully started $nrToStart instances of ${app.id}")
     promise.success(())
     context.stop(self)
-  }
-}

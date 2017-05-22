@@ -18,14 +18,14 @@ import com.github.fommil.netlib.LAPACK.{getInstance => lapack}
   *
   * Based on EVD.java from MTJ 0.9.12
   */
-object eig extends UFunc {
+object eig extends UFunc
 
   // TODO: probably we should just return an eigenValues: DV[Complex] ?
   case class Eig[V, M](eigenvalues: V, eigenvaluesComplex: V, eigenvectors: M)
   type DenseEig = Eig[DenseVector[Double], DenseMatrix[Double]]
 
-  implicit object Eig_DM_Impl extends Impl[DenseMatrix[Double], DenseEig] {
-    def apply(m: DenseMatrix[Double]): DenseEig = {
+  implicit object Eig_DM_Impl extends Impl[DenseMatrix[Double], DenseEig]
+    def apply(m: DenseMatrix[Double]): DenseEig =
       requireNonEmptyMatrix(m)
       requireSquareMatrix(m)
       require(!m.valuesIterator.exists(_.isNaN))
@@ -88,38 +88,29 @@ object eig extends UFunc {
       else if (info.`val` < 0) throw new IllegalArgumentException()
 
       Eig(Wr, Wi, Vr)
-    }
-  }
-}
 
 /**
   * Computes all eigenvalues (and optionally right eigenvectors) of the given
   * real symmetric matrix X.
   */
-object eigSym extends UFunc {
+object eigSym extends UFunc
   case class EigSym[V, M](eigenvalues: V, eigenvectors: M)
   type DenseEigSym = EigSym[DenseVector[Double], DenseMatrix[Double]]
   implicit object EigSym_DM_Impl
-      extends Impl[DenseMatrix[Double], DenseEigSym] {
-    def apply(X: DenseMatrix[Double]): DenseEigSym = {
-      doEigSym(X, true) match {
+      extends Impl[DenseMatrix[Double], DenseEigSym]
+    def apply(X: DenseMatrix[Double]): DenseEigSym =
+      doEigSym(X, true) match
         case (ev, Some(rev)) => EigSym(ev, rev)
         case _ => throw new RuntimeException("Shouldn't be here!")
-      }
-    }
-  }
 
-  object justEigenvalues extends UFunc {
+  object justEigenvalues extends UFunc
     implicit object EigSym_DM_Impl
-        extends Impl[DenseMatrix[Double], DenseVector[Double]] {
-      def apply(X: DenseMatrix[Double]): DenseVector[Double] = {
+        extends Impl[DenseMatrix[Double], DenseVector[Double]]
+      def apply(X: DenseMatrix[Double]): DenseVector[Double] =
         doEigSym(X, false)._1
-      }
-    }
-  }
 
   private def doEigSym(X: Matrix[Double], rightEigenvectors: Boolean)
-    : (DenseVector[Double], Option[DenseMatrix[Double]]) = {
+    : (DenseVector[Double], Option[DenseMatrix[Double]]) =
     requireNonEmptyMatrix(X)
 
     // As LAPACK doesn't check if the given matrix is in fact symmetric,
@@ -157,5 +148,3 @@ object eigSym extends UFunc {
       throw new NotConvergedException(NotConvergedException.Iterations)
 
     (evs, if (rightEigenvectors) Some(A) else None)
-  }
-}

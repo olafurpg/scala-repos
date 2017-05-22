@@ -24,7 +24,7 @@ import poly._
  * 
  * @author Miles Sabin
  */
-object SybClassExamples {
+object SybClassExamples
 
   // Example taken from the original SYB paper: 
   // "Scrap your boilerplate: a practical approach to generic programming", Ralf Laemmel, Simon Peyton Jones
@@ -43,7 +43,7 @@ object SybClassExamples {
   type Name = String
   type Address = String
 
-  def paradise: Unit = {
+  def paradise: Unit =
     val beforeRaise = Company(
         List(
             Dept("Research",
@@ -79,13 +79,12 @@ object SybClassExamples {
     )
 
     assert(afterRaise == expected)
-  }
 
   sealed trait Tree[T]
   case class Leaf[T](t: T) extends Tree[T]
   case class Node[T](left: Tree[T], right: Tree[T]) extends Tree[T]
 
-  def recursion: Unit = {
+  def recursion: Unit =
     val tree: Tree[Int] = Node(
         Node(
             Node(
@@ -125,10 +124,7 @@ object SybClassExamples {
     )
 
     assert(expected == result)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     paradise
     recursion
-  }
-}

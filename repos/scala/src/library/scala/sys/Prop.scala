@@ -19,7 +19,7 @@ package sys
   *  @version 2.9
   *  @since   2.9
   */
-trait Prop[+T] {
+trait Prop[+T]
 
   /** The full name of the property, e.g., "java.awt.headless".
     */
@@ -72,9 +72,8 @@ trait Prop[+T] {
     *  and 0/0.0/false for non-reference types.
     */
   protected def zero: T
-}
 
-object Prop {
+object Prop
 
   /** A creator of property instances.  For any type `T`, if an implicit
     *  parameter of type Creator[T] is in scope, a Prop[T] can be created
@@ -82,11 +81,10 @@ object Prop {
     */
   @annotation.implicitNotFound(
       "No implicit property creator available for type ${T}.")
-  trait Creator[+T] {
+  trait Creator[+T]
 
     /** Creates a Prop[T] of this type based on the given key. */
     def apply(key: String): Prop[T]
-  }
 
   implicit object FileProp
       extends CreatorImpl[java.io.File](s => new java.io.File(s))
@@ -96,4 +94,3 @@ object Prop {
 
   def apply[T : Creator](key: String): Prop[T] =
     implicitly[Creator[T]] apply key
-}

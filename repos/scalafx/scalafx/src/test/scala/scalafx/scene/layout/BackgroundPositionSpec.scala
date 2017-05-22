@@ -42,10 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class BackgroundPositionSpec
     extends SimpleSFXDelegateSpec[
         jfxsl.BackgroundPosition, BackgroundPosition](
-        classOf[jfxsl.BackgroundPosition], classOf[BackgroundPosition]) {
+        classOf[jfxsl.BackgroundPosition], classOf[BackgroundPosition])
 
   override protected def getScalaClassInstance =
     new BackgroundPosition(getJavaClassInstance) {}
 
   override protected def getJavaClassInstance = BackgroundPosition.Center
-}

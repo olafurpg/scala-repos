@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 26.06.2015.
   */
-trait FunSuiteStaticStringTest extends ScalaTestTestCase {
+trait FunSuiteStaticStringTest extends ScalaTestTestCase
   val funSuiteClassName = "FunSuiteStringTest"
   val funSuiteFileName = funSuiteClassName + ".scala"
 
-  def addFunSuite(): Unit = {
+  def addFunSuite(): Unit =
     addFileToProject(funSuiteFileName,
                      """
         |import org.scalatest._
@@ -28,27 +28,24 @@ trait FunSuiteStaticStringTest extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
-  def testFunSuiteSum() = {
+  def testFunSuiteSum() =
     addFunSuite()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(5, 10, funSuiteFileName),
                                funSuiteClassName,
                                "should work with sums"))
-  }
 
-  def testFunSuiteVal() = {
+  def testFunSuiteVal() =
     addFunSuite()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(8, 10, funSuiteFileName),
                                funSuiteClassName,
                                "consts"))
-  }
 
-  def testFunSuiteValSum() = {
+  def testFunSuiteValSum() =
     addFunSuite()
 
     assert(
@@ -56,5 +53,3 @@ trait FunSuiteStaticStringTest extends ScalaTestTestCase {
             createTestFromLocation(11, 10, funSuiteFileName),
             funSuiteClassName,
             "should sum consts"))
-  }
-}

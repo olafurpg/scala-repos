@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScTypeElement
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-trait ScAnnotation extends ScalaPsiElement with PsiAnnotation {
+trait ScAnnotation extends ScalaPsiElement with PsiAnnotation
 
   /**
     * Return full annotation only without @ token.
@@ -29,4 +29,3 @@ trait ScAnnotation extends ScalaPsiElement with PsiAnnotation {
   def constructor = annotationExpr.constr
 
   def typeElement: ScTypeElement
-}

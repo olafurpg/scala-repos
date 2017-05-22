@@ -11,6 +11,5 @@ package play.api
   * val conn = DB.getConnection("customers")
   * }}}
   */
-package object db {
+package object db
   type NamedDatabase = play.db.NamedDatabase
-}

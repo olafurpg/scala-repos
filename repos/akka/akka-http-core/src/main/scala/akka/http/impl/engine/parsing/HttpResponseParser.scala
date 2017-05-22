@@ -18,7 +18,7 @@ import ParserOutput._
   */
 private[http] class HttpResponseParser(
     _settings: ParserSettings, _headerParser: HttpHeaderParser)
-    extends HttpMessageParser[ResponseOutput](_settings, _headerParser) {
+    extends HttpMessageParser[ResponseOutput](_settings, _headerParser)
   import HttpResponseParser._
   import HttpMessageParser._
   import settings._
@@ -34,44 +34,38 @@ private[http] class HttpResponseParser(
       contextForCurrentResponse = Some(responseContext)
 
   protected def parseMessage(input: ByteString, offset: Int): StateResult =
-    if (contextForCurrentResponse.isDefined) {
+    if (contextForCurrentResponse.isDefined)
       var cursor = parseProtocol(input, offset)
-      if (byteChar(input, cursor) == ' ') {
+      if (byteChar(input, cursor) == ' ')
         cursor = parseStatus(input, cursor + 1)
         parseHeaderLines(input, cursor)
-      } else badProtocol
-    } else {
+      else badProtocol
+    else
       emit(NeedNextRequestMethod)
       continue(input, offset)(startNewMessage)
-    }
 
-  override def emit(output: ResponseOutput): Unit = {
+  override def emit(output: ResponseOutput): Unit =
     if (output == MessageEnd) contextForCurrentResponse = None
     super.emit(output)
-  }
 
   def badProtocol =
     throw new ParsingException("The server-side HTTP version is not supported")
 
-  def parseStatus(input: ByteString, cursor: Int): Int = {
+  def parseStatus(input: ByteString, cursor: Int): Int =
     def badStatusCode =
       throw new ParsingException("Illegal response status code")
-    def parseStatusCode() = {
-      def intValue(offset: Int): Int = {
+    def parseStatusCode() =
+      def intValue(offset: Int): Int =
         val c = byteChar(input, cursor + offset)
         if (CharacterClasses.DIGIT(c)) c - '0' else badStatusCode
-      }
       val code = intValue(0) * 100 + intValue(1) * 10 + intValue(2)
-      statusCode = code match {
+      statusCode = code match
         case 200 ⇒ StatusCodes.OK
         case _ ⇒
-          StatusCodes.getForKey(code) match {
+          StatusCodes.getForKey(code) match
             case Some(x) ⇒ x
             case None ⇒ customStatusCodes(code) getOrElse badStatusCode
-          }
-      }
-    }
-    if (byteChar(input, cursor + 3) == ' ') {
+    if (byteChar(input, cursor + 3) == ' ')
       parseStatusCode()
       val startIdx = cursor + 4
       @tailrec def skipReason(idx: Int): Int =
@@ -84,11 +78,10 @@ private[http] class HttpResponseParser(
               "Response reason phrase exceeds the configured limit of " +
               maxResponseReasonLength + " characters")
       skipReason(startIdx)
-    } else if (byteChar(input, cursor + 3) == '\r' &&
-               byteChar(input, cursor + 4) == '\n') {
+    else if (byteChar(input, cursor + 3) == '\r' &&
+               byteChar(input, cursor + 4) == '\n')
       throw new ParsingException("Status code misses trailing space")
-    } else badStatusCode
-  }
+    else badStatusCode
 
   def handleInformationalResponses: Boolean = true
 
@@ -102,13 +95,13 @@ private[http] class HttpResponseParser(
                   teh: Option[`Transfer-Encoding`],
                   expect100continue: Boolean,
                   hostHeaderPresent: Boolean,
-                  closeAfterResponseCompletion: Boolean): StateResult = {
+                  closeAfterResponseCompletion: Boolean): StateResult =
 
     def emitResponseStart(
         createEntity: EntityCreator[ResponseOutput, ResponseEntity],
-        headers: List[HttpHeader] = headers) = {
+        headers: List[HttpHeader] = headers) =
       val close =
-        contextForCurrentResponse.get.oneHundredContinueTrigger match {
+        contextForCurrentResponse.get.oneHundredContinueTrigger match
           case None ⇒ closeAfterResponseCompletion
           case Some(trigger) if statusCode.isSuccess ⇒
             trigger.trySuccess(())
@@ -116,12 +109,10 @@ private[http] class HttpResponseParser(
           case Some(trigger) ⇒
             trigger.tryFailure(OneHundredContinueError)
             true
-        }
       emit(ResponseStart(statusCode, protocol, headers, createEntity, close))
-    }
 
     def finishEmptyResponse() =
-      statusCode match {
+      statusCode match
         case _: StatusCodes.Informational if handleInformationalResponses ⇒
           if (statusCode == StatusCodes.Continue)
             contextForCurrentResponse.get.oneHundredContinueTrigger
@@ -137,55 +128,49 @@ private[http] class HttpResponseParser(
           setCompletionHandling(HttpMessageParser.CompletionOk)
           emit(MessageEnd)
           startNewMessage(input, bodyStart)
-      }
 
     if (statusCode.allowsEntity &&
-        (contextForCurrentResponse.get.requestMethod != HttpMethods.HEAD)) {
-      teh match {
+        (contextForCurrentResponse.get.requestMethod != HttpMethods.HEAD))
+      teh match
         case None ⇒
-          clh match {
+          clh match
             case Some(`Content-Length`(contentLength)) ⇒
               if (contentLength == 0) finishEmptyResponse()
-              else if (contentLength <= input.size - bodyStart) {
+              else if (contentLength <= input.size - bodyStart)
                 val cl = contentLength.toInt
                 emitResponseStart(strictEntity(cth, input, bodyStart, cl))
                 setCompletionHandling(HttpMessageParser.CompletionOk)
                 emit(MessageEnd)
                 startNewMessage(input, bodyStart + cl)
-              } else {
+              else
                 emitResponseStart(defaultEntity(cth, contentLength))
                 parseFixedLengthBody(
                     contentLength, closeAfterResponseCompletion)(
                     input, bodyStart)
-              }
             case None ⇒
-              emitResponseStart {
-                StreamedEntityCreator { entityParts ⇒
-                  val data = entityParts.collect {
+              emitResponseStart
+                StreamedEntityCreator  entityParts ⇒
+                  val data = entityParts.collect
                     case EntityPart(bytes) ⇒ bytes
-                  }
                   HttpEntity.CloseDelimited(
                       contentType(cth), HttpEntity.limitableByteSource(data))
-                }
-              }
               setCompletionHandling(HttpMessageParser.CompletionOk)
               parseToCloseBody(input, bodyStart, totalBytesRead = 0)
-          }
 
         case Some(te) ⇒
           val completedHeaders = addTransferEncodingWithChunkedPeeled(
               headers, te)
-          if (te.isChunked) {
-            if (clh.isEmpty) {
+          if (te.isChunked)
+            if (clh.isEmpty)
               emitResponseStart(chunkedEntity(cth), completedHeaders)
               parseChunk(input,
                          bodyStart,
                          closeAfterResponseCompletion,
                          totalBytesRead = 0L)
-            } else
+            else
               failMessageStart(
                   "A chunked response must not contain a Content-Length header.")
-          } else
+          else
             parseEntity(completedHeaders,
                         protocol,
                         input,
@@ -196,20 +181,16 @@ private[http] class HttpResponseParser(
                         expect100continue,
                         hostHeaderPresent,
                         closeAfterResponseCompletion)
-      }
-    } else finishEmptyResponse()
-  }
+    else finishEmptyResponse()
 
   def parseToCloseBody(
-      input: ByteString, bodyStart: Int, totalBytesRead: Long): StateResult = {
+      input: ByteString, bodyStart: Int, totalBytesRead: Long): StateResult =
     val newTotalBytes = totalBytesRead + math.max(0, input.length - bodyStart)
     if (input.length > bodyStart)
       emit(EntityPart(input.drop(bodyStart).compact))
     continue(parseToCloseBody(_, _, newTotalBytes))
-  }
-}
 
-private[http] object HttpResponseParser {
+private[http] object HttpResponseParser
 
   /**
     * @param requestMethod the request's HTTP method
@@ -225,4 +206,3 @@ private[http] object HttpResponseParser {
       extends RuntimeException(
           "Received error response for request with `Expect: 100-continue` header")
       with NoStackTrace
-}

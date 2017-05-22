@@ -6,7 +6,7 @@ package play.api.http.websocket
 /**
   * WebSocket close codes
   */
-object CloseCodes {
+object CloseCodes
   val Regular = 1000
   val GoingAway = 1001
   val ProtocolError = 1002
@@ -19,4 +19,3 @@ object CloseCodes {
   val ClientRejectsExtension = 1010
   val UnexpectedCondition = 1011
   val TLSHandshakeFailure = 1015
-}

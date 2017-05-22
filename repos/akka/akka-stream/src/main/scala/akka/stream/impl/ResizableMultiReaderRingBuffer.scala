@@ -16,7 +16,7 @@ import ResizableMultiReaderRingBuffer._
 private[akka] class ResizableMultiReaderRingBuffer[T](
     initialSize: Int, // constructor param, not field
     maxSize: Int, // constructor param, not field
-    val cursors: Cursors) {
+    val cursors: Cursors)
   require(Integer.lowestOneBit(maxSize) == maxSize && 0 < maxSize &&
           maxSize <= Int.MaxValue / 2,
           "maxSize must be a power of 2 that is > 0 and < Int.MaxValue/2")
@@ -76,12 +76,12 @@ private[akka] class ResizableMultiReaderRingBuffer[T](
     * Returns `true` if the write was successful and false if the buffer is full and cannot grow anymore.
     */
   def write(value: T): Boolean =
-    if (size < array.length) {
+    if (size < array.length)
       // if we have space left we can simply write and be done
       array(writeIx & mask) = value
       writeIx += 1
       true
-    } else if (lenBit < maxSizeBit) {
+    else if (lenBit < maxSizeBit)
       // if we are full but can grow we do so
       // the growing logic is quite simple: we assemble all current buffer entries in the new array
       // in their natural order (removing potential wrap around) and rebase all indices to zero
@@ -90,12 +90,11 @@ private[akka] class ResizableMultiReaderRingBuffer[T](
       System.arraycopy(array, r, newArray, 0, array.length - r)
       System.arraycopy(array, 0, newArray, array.length - r, r)
       @tailrec def rebaseCursors(remaining: List[Cursor]): Unit =
-        remaining match {
+        remaining match
           case head :: tail ⇒
             head.cursor -= readIx
             rebaseCursors(tail)
           case _ ⇒ // done
-        }
       rebaseCursors(cursors.cursors)
       array = newArray
       val w = size
@@ -103,58 +102,50 @@ private[akka] class ResizableMultiReaderRingBuffer[T](
       writeIx = w + 1
       readIx = 0
       true
-    } else false
+    else false
 
   /**
     * Tries to read from the buffer using the given Cursor.
     * If there are no more data to be read (i.e. the cursor is already
     * at writeIx) the method throws ResizableMultiReaderRingBuffer.NothingToReadException!
     */
-  def read(cursor: Cursor): T = {
+  def read(cursor: Cursor): T =
     val c = cursor.cursor
-    if (c - writeIx < 0) {
+    if (c - writeIx < 0)
       cursor.cursor += 1
       val ret = array(c & mask).asInstanceOf[T]
       if (c == readIx) updateReadIx()
       ret
-    } else throw NothingToReadException
-  }
+    else throw NothingToReadException
 
   def onCursorRemoved(cursor: Cursor): Unit =
     if (cursor.cursor == readIx) // if this cursor is the last one it must be at readIx
       updateReadIx()
 
-  private def updateReadIx(): Unit = {
+  private def updateReadIx(): Unit =
     @tailrec def minCursor(remaining: List[Cursor], result: Int): Int =
-      remaining match {
+      remaining match
         case head :: tail ⇒
           minCursor(tail, math.min(head.cursor - writeIx, result))
         case _ ⇒ result
-      }
     val newReadIx = writeIx + minCursor(cursors.cursors, 0)
-    while (readIx != newReadIx) {
+    while (readIx != newReadIx)
       array(readIx & mask) = null
       readIx += 1
-    }
-  }
 
   protected def underlyingArray: Array[Any] = array
 
   override def toString: String =
     s"ResizableMultiReaderRingBuffer(size=$size, writeIx=$writeIx, readIx=$readIx, cursors=${cursors.cursors.size})"
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object ResizableMultiReaderRingBuffer {
+private[akka] object ResizableMultiReaderRingBuffer
   object NothingToReadException extends RuntimeException with NoStackTrace
 
-  trait Cursors {
+  trait Cursors
     def cursors: List[Cursor]
-  }
-  trait Cursor {
+  trait Cursor
     def cursor: Int
     def cursor_=(ix: Int): Unit
-  }
-}

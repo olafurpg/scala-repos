@@ -4,7 +4,7 @@ package com.twitter.util
   * A token bucket is used to control the relative rates of two
   * processes: one fills the bucket, another empties it.
   */
-abstract class TokenBucket {
+abstract class TokenBucket
 
   /**
     * Put `n` tokens into the bucket.
@@ -28,9 +28,8 @@ abstract class TokenBucket {
     * The number of tokens currently in the bucket.
     */
   def count: Long
-}
 
-object TokenBucket {
+object TokenBucket
 
   /**
     * A token bucket that doesn't exceed a given bound.
@@ -40,7 +39,7 @@ object TokenBucket {
     *
     * @param limit: the upper bound on the number of tokens in the bucket.
     */
-  def newBoundedBucket(limit: Long): TokenBucket = new TokenBucket {
+  def newBoundedBucket(limit: Long): TokenBucket = new TokenBucket
     private[this] var counter = 0L
 
     /**
@@ -49,26 +48,20 @@ object TokenBucket {
       * If putting in `n` tokens would overflow `limit` tokens, instead sets the
       * number of tokens to be `limit`.
       */
-    def put(n: Int): Unit = {
+    def put(n: Int): Unit =
       require(n >= 0)
-      synchronized {
+      synchronized
         counter = math.min((counter + n), limit)
-      }
-    }
 
-    def tryGet(n: Int): Boolean = {
+    def tryGet(n: Int): Boolean =
       require(n >= 0)
-      synchronized {
+      synchronized
         val ok = counter >= n
-        if (ok) {
+        if (ok)
           counter -= n
-        }
         ok
-      }
-    }
 
     def count: Long = synchronized { counter }
-  }
 
   /**
     * A leaky bucket expires tokens after approximately `ttl` time.
@@ -85,18 +78,17 @@ object TokenBucket {
     */
   def newLeakyBucket(
       ttl: Duration, reserve: Int, nowMs: () => Long): TokenBucket =
-    new TokenBucket {
+    new TokenBucket
       private[this] val w = WindowedAdder(ttl.inMilliseconds, 10, nowMs)
 
-      def put(n: Int): Unit = {
+      def put(n: Int): Unit =
         require(n >= 0)
         w.add(n)
-      }
 
-      def tryGet(n: Int): Boolean = {
+      def tryGet(n: Int): Boolean =
         require(n >= 0)
 
-        synchronized {
+        synchronized
           // Note that this is a bit sloppy: the answer to w.sum
           // can change before we're able to decrement it. That's
           // ok, though, because the debit will simply roll over to
@@ -107,11 +99,8 @@ object TokenBucket {
           val ok = count >= n
           if (ok) w.add(-n)
           ok
-        }
-      }
 
       def count: Long = w.sum() + reserve
-    }
 
   /**
     * A leaky bucket expires tokens after approximately `ttl` time.
@@ -126,4 +115,3 @@ object TokenBucket {
     */
   def newLeakyBucket(ttl: Duration, reserve: Int): TokenBucket =
     newLeakyBucket(ttl, reserve, Stopwatch.systemMillis)
-}

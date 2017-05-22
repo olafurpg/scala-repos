@@ -25,18 +25,18 @@ import actor.LAScheduler
 import common._
 import js.JsCmds._
 
-object CometActorSpec extends Specification {
+object CometActorSpec extends Specification
   private case object TestMessage
 
   private val testSession = new LiftSession("Test Session", "", Empty)
 
-  private class SpecCometActor extends CometActor {
+  private class SpecCometActor extends CometActor
     var receivedMessages = List[Any]()
 
     def render = NodeSeq.Empty
     override def theSession = testSession
 
-    override def !(msg: Any) = {
+    override def !(msg: Any) =
       receivedMessages ::= msg
 
       LAScheduler.onSameThread = true
@@ -44,52 +44,40 @@ object CometActorSpec extends Specification {
       super.!(msg)
 
       LAScheduler.onSameThread = false
-    }
-  }
 
-  "A CometActor" should {
-    class RedirectingComet extends SpecCometActor {
-      override def lowPriority = {
+  "A CometActor" should
+    class RedirectingComet extends SpecCometActor
+      override def lowPriority =
         case TestMessage =>
           S.redirectTo("place")
-      }
-    }
 
-    "redirect the user when a ResponseShortcutException with redirect occurs" in {
+    "redirect the user when a ResponseShortcutException with redirect occurs" in
       val comet = new RedirectingComet
 
       comet ! TestMessage
 
-      comet.receivedMessages.exists {
+      comet.receivedMessages.exists
         case PartialUpdateMsg(update) if update() == RedirectTo("place") =>
           true
         case _ =>
           false
-      } must beTrue
-    }
+      must beTrue
 
-    class FunctionRedirectingComet extends SpecCometActor {
-      override def lowPriority = {
+    class FunctionRedirectingComet extends SpecCometActor
+      override def lowPriority =
         case TestMessage =>
           S.redirectTo("place", () => "do stuff")
-      }
-    }
 
-    "redirect the user with a function when a ResponseShortcutException with redirect+function occurs" in {
+    "redirect the user with a function when a ResponseShortcutException with redirect+function occurs" in
       val comet = new FunctionRedirectingComet
 
       comet ! TestMessage
 
-      val matchingMessage = comet.receivedMessages.collect {
+      val matchingMessage = comet.receivedMessages.collect
         case PartialUpdateMsg(update) =>
           update()
-      }
 
-      matchingMessage must beLike {
+      matchingMessage must beLike
         case List(RedirectTo(redirectUri)) =>
           redirectUri must startWith("place")
           redirectUri must beMatching("^[^?]+\\?F[^=]+=_$".r)
-      }
-    }
-  }
-}

@@ -24,7 +24,7 @@ import org.scalajs.jsenv.{JSEnv, JSConsole}
 import org.scalajs.jsenv.nodejs.NodeJSEnv
 import org.scalajs.jsenv.phantomjs.PhantomJSEnv
 
-object ScalaJSPlugin extends AutoPlugin {
+object ScalaJSPlugin extends AutoPlugin
   override def requires: Plugins = plugins.JvmPlugin
 
   /* The following module-case double definition is a workaround for a bug
@@ -41,7 +41,7 @@ object ScalaJSPlugin extends AutoPlugin {
   val autoImport = AutoImport
 
   object AutoImport
-      extends impl.DependencyBuilders with cross.CrossProjectExtra {
+      extends impl.DependencyBuilders with cross.CrossProjectExtra
     import KeyRanks._
 
     // Some constants
@@ -79,9 +79,8 @@ object ScalaJSPlugin extends AutoPlugin {
         executable: String = "node",
         args: Seq[String] = Seq.empty,
         env: Map[String, String] = Map.empty
-    ): Def.Initialize[Task[NodeJSEnv]] = Def.task {
+    ): Def.Initialize[Task[NodeJSEnv]] = Def.task
       new NodeJSEnv(executable, args, env)
-    }
 
     /**
       *  Creates a [[sbt.Def.Initialize Def.Initialize]] for a PhantomJSEnv. Use
@@ -104,10 +103,9 @@ object ScalaJSPlugin extends AutoPlugin {
         args: Seq[String] = Seq.empty,
         env: Map[String, String] = Map.empty,
         autoExit: Boolean = true
-    ): Def.Initialize[Task[PhantomJSEnv]] = Def.task {
+    ): Def.Initialize[Task[PhantomJSEnv]] = Def.task
       val loader = scalaJSPhantomJSClassLoader.value
       new PhantomJSEnv(executable, args, env, autoExit, loader)
-    }
 
     // All our public-facing keys
 
@@ -288,19 +286,16 @@ object ScalaJSPlugin extends AutoPlugin {
         "scalaJSJavaSystemProperties",
         "List of arguments to pass to the Scala.js Java System.properties.",
         CTask)
-  }
 
   import autoImport._
   import ScalaJSPluginInternal._
 
-  override def globalSettings: Seq[Setting[_]] = {
+  override def globalSettings: Seq[Setting[_]] =
     super.globalSettings ++ Seq(
         scalaJSStage := Stage.FastOpt,
         scalaJSUseRhino := true,
         scalaJSClearCacheStats := globalIRCache.clearStats()
     )
-  }
 
   override def projectSettings: Seq[Setting[_]] =
     (scalaJSAbstractSettings ++ scalaJSEcosystemSettings)
-}

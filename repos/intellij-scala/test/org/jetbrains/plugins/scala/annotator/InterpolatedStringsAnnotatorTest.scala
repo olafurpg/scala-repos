@@ -10,28 +10,24 @@ import org.junit.Assert
   * Date: 7/3/12
   */
 class InterpolatedStringsAnnotatorTest
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-  private def collectAnnotatorMessages(text: String) = {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
+  private def collectAnnotatorMessages(text: String) =
     configureFromFileTextAdapter("dummy.scala", text)
     val mock = new AnnotatorHolderMock
 
     new ScalaAnnotator()
       .annotate(getFileAdapter.asInstanceOf[ScalaFile].getLastChild, mock)
     mock.annotations
-  }
 
-  private def emptyMessages(text: String) {
+  private def emptyMessages(text: String)
     assert(collectAnnotatorMessages(text).isEmpty)
-  }
 
-  private def messageExists(text: String, message: String) {
+  private def messageExists(text: String, message: String)
     val annotatorMessages = collectAnnotatorMessages(text)
-    if (!annotatorMessages.exists(_.toString == message)) {
+    if (!annotatorMessages.exists(_.toString == message))
       Assert.assertTrue(
           "annotator messages is empty", annotatorMessages.nonEmpty)
       Assert.assertEquals(message, annotatorMessages.head)
-    }
-  }
 
   @Language(value = "Scala")
   private val header =
@@ -50,31 +46,24 @@ class InterpolatedStringsAnnotatorTest
        
     """.replace("\r", "")
 
-  def testCorrectInt() {
+  def testCorrectInt()
     emptyMessages(header + "a\"blah blah $i1 $i2 ${1 + 2 + 3} blah\"")
-  }
 
-  def testCorrectAny() {
+  def testCorrectAny()
     emptyMessages(header + "b\"blah blah ${1} $s1 ${s2 + c1}blah blah\"")
-  }
 
-  def testCorrextStrings() {
+  def testCorrextStrings()
     emptyMessages(header + "c\"blah blah $s1 ${s2}\"")
-  }
 
-  def testMultiResolve() {
+  def testMultiResolve()
     messageExists(
         header + "d\"blah $s1 blah $s2 blah\"",
         "ErrorWithRange((445,446),Value 'd' is not a member of StringContext)")
-  }
 
-  def testMultipleResolve() {
+  def testMultipleResolve()
     messageExists(header + "c\"blah blah $i1 $i2\"",
                   "Error(i1,Type mismatch, expected: String, actual: Int)")
-  }
 
-  def testMultipleResolve2() {
+  def testMultipleResolve2()
     messageExists(header + "c\"blah $i1 blah $s1 $i2\"",
                   "Error(i2,Too many arguments for method c(String, String))")
-  }
-}

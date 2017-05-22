@@ -26,31 +26,28 @@ import java.util.regex.Pattern
 import org.bson.types.ObjectId
 import org.specs2.mutable.Specification
 
-package queryexamplesfixtures {
+package queryexamplesfixtures
   case class Person(_id: ObjectId,
                     name: String,
                     birthDate: Date,
                     childId: UUID,
                     petId: Option[ObjectId])
-      extends MongoDocument[Person] {
+      extends MongoDocument[Person]
     def meta = Person
-  }
-  object Person extends MongoDocumentMeta[Person] {
+  object Person extends MongoDocumentMeta[Person]
     override def formats = allFormats
     // index name
     createIndex(("name" -> 1))
 
     // implicit formats already exists
     def findAllBornAfter(dt: Date) = findAll(("birthDate" -> ("$gt" -> dt)))
-  }
-}
 
-object QueryExamplesSpec extends Specification with MongoTestKit {
+object QueryExamplesSpec extends Specification with MongoTestKit
   "QueryExamples Specification".title
 
   import queryexamplesfixtures._
 
-  "Query examples" in {
+  "Query examples" in
     checkMongoIsRunning
 
     val fredsBirthDate = Calendar.getInstance
@@ -166,5 +163,3 @@ object QueryExamplesSpec extends Specification with MongoTestKit {
 
     people4.length must_== 4
     people4.map(_._id) must_== List(fred._id, wilma._id, barney._id, betty._id)
-  }
-}

@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScVariable
   * User: Alexander Podkhalyuzin
   * Date: 18.10.2008
   */
-class ScVariableNameIndex extends StringStubIndexExtension[ScVariable] {
+class ScVariableNameIndex extends StringStubIndexExtension[ScVariable]
   override def get(
       key: String,
       project: Project,
@@ -22,8 +22,6 @@ class ScVariableNameIndex extends StringStubIndexExtension[ScVariable] {
     super.get(key, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey: StubIndexKey[String, ScVariable] = ScVariableNameIndex.KEY
-}
 
-object ScVariableNameIndex {
+object ScVariableNameIndex
   val KEY = ScalaIndexKeys.VARIABLE_NAME_KEY
-}

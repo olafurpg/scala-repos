@@ -26,14 +26,13 @@ import java.util.TimeZone
   * We commonly do Date/Time work in analysis jobs, so having these operations convenient
   * is very helpful.
   */
-object RichDate {
+object RichDate
   // Implicits to Java types:
   implicit def toDate(rd: RichDate) = rd.value
-  implicit def toCalendar(rd: RichDate)(implicit tz: TimeZone): Calendar = {
+  implicit def toCalendar(rd: RichDate)(implicit tz: TimeZone): Calendar =
     val cal = Calendar.getInstance(tz)
     cal.setTime(rd.value)
     cal
-  }
 
   implicit def apply(d: Date): RichDate = RichDate(d.getTime)
   implicit def apply(d: Calendar): RichDate = RichDate(d.getTime)
@@ -50,9 +49,9 @@ object RichDate {
   /* If the format is one of the truncated DateOps formats, we can do
    * the upper bound, else go to the end of the day
    */
-  def upperBound(s: String)(implicit tz: TimeZone, dp: DateParser) = {
+  def upperBound(s: String)(implicit tz: TimeZone, dp: DateParser) =
     val end = apply(s)
-    (DateOps.getFormatObject(s) match {
+    (DateOps.getFormatObject(s) match
       case Some(DateOps.Format.DATE_WITHOUT_DASH) => end + Days(1)
       case Some(DateOps.Format.DATE_WITH_DASH) => end + Days(1)
       case Some(DateOps.Format.DATEHOUR_WITHOUT_DASH) => end + Hours(1)
@@ -63,22 +62,19 @@ object RichDate {
       case Some(DateOps.Format.DATETIME_HMS_WITH_DASH) => end + Seconds(1)
       case Some(DateOps.Format.DATETIME_HMSM_WITH_DASH) => end + Millisecs(2)
       case None => Days(1).floorOf(end + Days(1))
-    }) - Millisecs(1)
-  }
+    ) - Millisecs(1)
 
   def now: RichDate = RichDate(System.currentTimeMillis())
 
-  implicit def richDateOrdering: Ordering[RichDate] = new Ordering[RichDate] {
+  implicit def richDateOrdering: Ordering[RichDate] = new Ordering[RichDate]
     def compare(a: RichDate, b: RichDate) =
       java.lang.Long.compare(a.timestamp, b.timestamp)
-  }
-}
 
 /**
   * A value class wrapper for milliseconds since the epoch. Its tempting to extend
   * this with AnyVal but this causes problem with Java code.
   */
-case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
+case class RichDate(val timestamp: Long) extends Ordered[RichDate]
   // these are mutable, don't keep them around
   def value: Date = new java.util.Date(timestamp)
 
@@ -94,11 +90,10 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
 
   //True of the other is a RichDate with equal value, or a Date equal to value
   override def equals(that: Any) =
-    that match {
+    that match
       case d: Date => d.getTime == timestamp
       case RichDate(ts) => ts == timestamp
       case _ => false
-    }
 
   /**
     * Use String.format to format the date, as opposed to toString, which uses SimpleDateFormat.
@@ -114,20 +109,17 @@ case class RichDate(val timestamp: Long) extends Ordered[RichDate] {
   override def hashCode =
     (timestamp.toInt) ^ ((timestamp >> 32).toInt)
 
-  def toCalendar(implicit tz: TimeZone) = {
+  def toCalendar(implicit tz: TimeZone) =
     val cal = Calendar.getInstance(tz)
     cal.setTime(value)
     cal
-  }
   override def toString = value.toString
 
   /**
     * Use SimpleDateFormat to print the string
     */
-  def toString(fmt: String)(implicit tz: TimeZone): String = {
+  def toString(fmt: String)(implicit tz: TimeZone): String =
     val cal = toCalendar(tz)
     val sdfmt = new SimpleDateFormat(fmt)
     sdfmt.setCalendar(cal)
     sdfmt.format(cal.getTime)
-  }
-}

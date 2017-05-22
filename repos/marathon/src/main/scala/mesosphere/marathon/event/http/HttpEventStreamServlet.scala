@@ -18,7 +18,7 @@ import scala.concurrent.blocking
   * @param emitter the emitter to emit data
   */
 class HttpEventSSEHandle(request: HttpServletRequest, emitter: Emitter)
-    extends HttpEventStreamHandle {
+    extends HttpEventStreamHandle
 
   lazy val id: String = UUID.randomUUID().toString
 
@@ -30,28 +30,23 @@ class HttpEventSSEHandle(request: HttpServletRequest, emitter: Emitter)
     blocking(emitter.event(event, message))
 
   override def toString: String = s"HttpEventSSEHandle($id on $remoteAddress)"
-}
 
 /**
   * Handle a server side event client stream by delegating events to the stream actor.
   */
 class HttpEventStreamServlet @Inject()(
     @Named(ModuleNames.HTTP_EVENT_STREAM) streamActor: ActorRef)
-    extends EventSourceServlet {
+    extends EventSourceServlet
 
   override def newEventSource(request: HttpServletRequest): EventSource =
-    new EventSource {
+    new EventSource
       @volatile private var handler: Option[HttpEventSSEHandle] = None
 
-      override def onOpen(emitter: Emitter): Unit = {
+      override def onOpen(emitter: Emitter): Unit =
         val handle = new HttpEventSSEHandle(request, emitter)
         this.handler = Some(handle)
         streamActor ! HttpEventStreamConnectionOpen(handle)
-      }
 
-      override def onClose(): Unit = {
+      override def onClose(): Unit =
         handler.foreach(streamActor ! HttpEventStreamConnectionClosed(_))
         handler = None
-      }
-    }
-}

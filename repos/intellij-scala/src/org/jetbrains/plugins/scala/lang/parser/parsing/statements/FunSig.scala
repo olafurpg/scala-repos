@@ -14,16 +14,13 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
   * Date: 11.02.2008
   */
 //TODO: rewrite this
-object FunSig {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    if (ScalaTokenTypes.tIDENTIFIER.equals(builder.getTokenType)) {
+object FunSig
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    if (ScalaTokenTypes.tIDENTIFIER.equals(builder.getTokenType))
       ParserUtils.eatElement(builder, ScalaTokenTypes.tIDENTIFIER)
       FunTypeParamClause parse builder
       ParamClauses parse builder
       true
-    } else {
+    else
       builder error "identifier expected"
       false
-    }
-  }
-}

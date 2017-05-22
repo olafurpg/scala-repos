@@ -17,7 +17,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import org.mockito.Mockito.{spy, times, verify}
 
-object OpTransport {
+object OpTransport
   sealed trait Op[In, Out]
   case class Write[In, Out](accept: In => Boolean, res: Future[Unit])
       extends Op[In, Out]
@@ -25,24 +25,22 @@ object OpTransport {
   case class Close[In, Out](res: Future[Unit]) extends Op[In, Out]
 
   def apply[In, Out](ops: Op[In, Out]*) = new OpTransport(ops.toList)
-}
 
 class OpTransport[In, Out](_ops: List[OpTransport.Op[In, Out]])
-    extends Transport[In, Out] {
+    extends Transport[In, Out]
   import org.scalatest.Assertions._
   import OpTransport._
 
   var ops = _ops
 
-  def read() = ops match {
+  def read() = ops match
     case Read(res) :: rest =>
       ops = rest
       res
     case _ =>
       fail(s"Expected ${ops.headOption}; got read()")
-  }
 
-  def write(in: In) = ops match {
+  def write(in: In) = ops match
     case Write(accept, res) :: rest =>
       if (!accept(in)) fail(s"Did not accept write $in")
 
@@ -50,36 +48,31 @@ class OpTransport[In, Out](_ops: List[OpTransport.Op[In, Out]])
       res
     case _ =>
       fail(s"Expected ${ops.headOption}; got write($in)")
-  }
 
-  def close(deadline: Time) = ops match {
+  def close(deadline: Time) = ops match
     case Close(res) :: rest =>
       ops = rest
       status = Status.Closed
-      res respond {
+      res respond
         case Return(()) =>
           onClose.setValue(new Exception("closed"))
         case Throw(exc) =>
           onClose.setValue(exc)
-      }
     case _ =>
       fail(s"Expected ${ops.headOption}; got close($deadline)")
-  }
 
   var status: Status = Status.Open
   val onClose = new Promise[Throwable]
   def localAddress = new java.net.SocketAddress {}
   def remoteAddress = new java.net.SocketAddress {}
   val peerCertificate = None
-}
 
 @RunWith(classOf[JUnitRunner])
-class HttpClientDispatcherTest extends FunSuite {
-  def mkPair[A, B] = {
+class HttpClientDispatcherTest extends FunSuite
+  def mkPair[A, B] =
     val inQ = new AsyncQueue[A]
     val outQ = new AsyncQueue[B]
     (new QueueTransport[A, B](inQ, outQ), new QueueTransport[B, A](outQ, inQ))
-  }
 
   def chunk(content: String) =
     new DefaultHttpChunk(
@@ -87,7 +80,7 @@ class HttpClientDispatcherTest extends FunSuite {
 
   private val timeout = Duration.fromSeconds(2)
 
-  test("streaming request body") {
+  test("streaming request body")
     val (in, out) = mkPair[Any, Any]
     val disp = new HttpClientDispatcher(in)
     val req = Request()
@@ -106,36 +99,31 @@ class HttpClientDispatcherTest extends FunSuite {
     val c = res.reader.read(Int.MaxValue)
     assert(!c.isDefined)
     req.writer.write(Buf.Utf8("a"))
-    out.read() flatMap { c =>
+    out.read() flatMap  c =>
       out.write(c)
-    }
     assert(Await.result(c, timeout) === Some(Buf.Utf8("a")))
 
     val cc = res.reader.read(Int.MaxValue)
     assert(!cc.isDefined)
     req.writer.write(Buf.Utf8("some other thing"))
-    out.read() flatMap { c =>
+    out.read() flatMap  c =>
       out.write(c)
-    }
     assert(Await.result(cc, timeout) === Some(Buf.Utf8("some other thing")))
 
     val last = res.reader.read(Int.MaxValue)
     assert(!last.isDefined)
     req.close()
-    out.read() flatMap { c =>
+    out.read() flatMap  c =>
       out.write(c)
-    }
     assert(Await.result(last, timeout).isEmpty)
-  }
 
-  test("invalid message") {
+  test("invalid message")
     val (in, out) = mkPair[Any, Any]
     val disp = new HttpClientDispatcher(in)
     out.write("invalid message")
     intercept[IllegalArgumentException] { Await.result(disp(Request())) }
-  }
 
-  test("not chunked") {
+  test("not chunked")
     val (in, out) = mkPair[Any, Any]
     val disp = new HttpClientDispatcher(in)
     val httpRes = new DefaultHttpResponse(HTTP_1_1, OK)
@@ -145,9 +133,8 @@ class HttpClientDispatcherTest extends FunSuite {
     out.write(httpRes)
     val res = Await.result(f, timeout)
     assert(res.httpResponse === httpRes)
-  }
 
-  test("chunked") {
+  test("chunked")
     val (in, out) = mkPair[Any, Any]
     val disp = new HttpClientDispatcher(in)
     val httpRes = new DefaultHttpResponse(HTTP_1_1, OK)
@@ -167,9 +154,8 @@ class HttpClientDispatcherTest extends FunSuite {
 
     out.write(HttpChunk.LAST_CHUNK)
     assert(Await.result(reader.read(Int.MaxValue), timeout).isEmpty)
-  }
 
-  test("error mid-chunk") {
+  test("error mid-chunk")
     val (in, out) = mkPair[Any, Any]
     val inSpy = spy(in)
     val disp = new HttpClientDispatcher(inSpy)
@@ -188,9 +174,8 @@ class HttpClientDispatcherTest extends FunSuite {
     out.write("something else")
     intercept[IllegalArgumentException] { Await.result(cc, timeout) }
     verify(inSpy, times(1)).close()
-  }
 
-  test("upstream interrupt: before write") {
+  test("upstream interrupt: before write")
     import OpTransport._
 
     val writep = new Promise[Unit]
@@ -215,9 +200,8 @@ class HttpClientDispatcherTest extends FunSuite {
 
     assert(g.isDefined)
     intercept[Reader.ReaderDiscarded] { Await.result(g, timeout) }
-  }
 
-  test("upstream interrupt: during req stream (read)") {
+  test("upstream interrupt: during req stream (read)")
     import OpTransport._
 
     val readp = new Promise[Nothing]
@@ -244,12 +228,10 @@ class HttpClientDispatcherTest extends FunSuite {
     readp.setException(new Exception)
 
     // The reader is now discarded
-    intercept[Reader.ReaderDiscarded] {
+    intercept[Reader.ReaderDiscarded]
       Await.result(req.writer.write(Buf.Utf8(".")), timeout)
-    }
-  }
 
-  test("upstream interrupt: during req stream (write)") {
+  test("upstream interrupt: during req stream (write)")
     import OpTransport._
 
     val chunkp = new Promise[Unit]
@@ -281,12 +263,10 @@ class HttpClientDispatcherTest extends FunSuite {
     chunkp.setException(new Exception)
 
     // The reader is now discarded
-    intercept[Reader.ReaderDiscarded] {
+    intercept[Reader.ReaderDiscarded]
       Await.result(req.writer.write(Buf.Utf8(".")), timeout)
-    }
-  }
 
-  test("ensure denial of new-style dtab headers") {
+  test("ensure denial of new-style dtab headers")
     // create a test dispatcher and its transport mechanism
     val (in, out) = mkPair[Any, Any]
     val dispatcher = new HttpClientDispatcher(in)
@@ -319,9 +299,8 @@ class HttpClientDispatcherTest extends FunSuite {
 
     // ensure that the sent and received http requests are identical
     assert(recvResult.httpResponse == sentResult)
-  }
 
-  test("ensure denial of old-style dtab headers") {
+  test("ensure denial of old-style dtab headers")
     // create a test dispatcher and its transport mechanism
     val (in, out) = mkPair[Any, Any]
     val dispatcher = new HttpClientDispatcher(in)
@@ -355,10 +334,9 @@ class HttpClientDispatcherTest extends FunSuite {
 
     // ensure that the sent and received http requests are identical
     assert(recvResult.httpResponse == sentResult)
-  }
 
-  test("ensure transmission of dtab local") {
-    Dtab.unwind {
+  test("ensure transmission of dtab local")
+    Dtab.unwind
       // create a test dispatcher and its transport mechanism
       val (in, out) = mkPair[Any, Any]
       val dispatcher = new HttpClientDispatcher(in)
@@ -392,6 +370,3 @@ class HttpClientDispatcherTest extends FunSuite {
 
       // ensure that the sent and received http requests are identical
       assert(recvResult.httpResponse == sentResult)
-    }
-  }
-}

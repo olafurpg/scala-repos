@@ -2,7 +2,7 @@ package scalaz
 
 import Id._
 
-object Tag {
+object Tag
 
   /** `subst` specialized to `Id`.
     *
@@ -40,7 +40,7 @@ object Tag {
   def unsubst[A, F[_], T](fa: F[A @@ T]): F[A] = fa.asInstanceOf[F[A]]
 
   /** @see `Tag.of` */
-  final class TagOf[T] private[Tag]() extends (Id.Id ~> (? @@ T)) {
+  final class TagOf[T] private[Tag]() extends (Id.Id ~> (? @@ T))
 
     /** Like `Tag.apply`, but specify only the `T`. */
     def apply[A](a: A): A @@ T = Tag.apply(a)
@@ -75,11 +75,9 @@ object Tag {
 
     /** Pattern match on a tagged value */
     def unapply[A](a: A @@ T): Option[A] = Some(unwrap(a))
-  }
 
   /** Variants of `apply`, `subst`, and `unsubst` that require
     * specifying the tag type but are more likely to infer the other
     * type parameters.
     */
   def of[T]: TagOf[T] = new TagOf[T]
-}

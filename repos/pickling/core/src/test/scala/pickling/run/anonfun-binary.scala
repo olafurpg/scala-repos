@@ -4,12 +4,10 @@ import org.scalatest.FunSuite
 import scala.pickling.Defaults._
 import scala.pickling.binary._
 
-class AnonfunBinaryTest extends FunSuite {
+class AnonfunBinaryTest extends FunSuite
   val fun: Int => Int = (x: Int) => x + 1
 
-  test("main") {
+  test("main")
     val p = fun.pickle
     val up = p.unpickle[Int => Int]
     assert(up(5) === 6)
-  }
-}

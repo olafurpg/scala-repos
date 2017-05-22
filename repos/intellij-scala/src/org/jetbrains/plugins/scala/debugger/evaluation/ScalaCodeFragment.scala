@@ -21,12 +21,12 @@ import scala.collection.mutable
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaCodeFragment(project: Project, text: String) extends {
+class ScalaCodeFragment(project: Project, text: String) extends
   private var vFile = new LightVirtualFile(
       "Dummy.scala", ScalaFileType.SCALA_FILE_TYPE, text)
   private var provider = new SingleRootFileViewProvider(
       PsiManager.getInstance(project), vFile, true)
-} with ScalaFileImpl(provider) with JavaCodeFragment {
+with ScalaFileImpl(provider) with JavaCodeFragment
   getViewProvider.forceCachedPsi(this)
 
   override def getViewProvider = provider
@@ -40,44 +40,37 @@ class ScalaCodeFragment(project: Project, text: String) extends {
 
   def getThisType: PsiType = thisType
 
-  def setThisType(psiType: PsiType) {
+  def setThisType(psiType: PsiType)
     thisType = psiType
-  }
 
   def getSuperType: PsiType = superType
 
-  def setSuperType(superType: PsiType) {
+  def setSuperType(superType: PsiType)
     this.superType = superType
-  }
 
-  def importsToString(): String = {
+  def importsToString(): String =
     imports.mkString(",")
-  }
 
-  def addImportsFromString(imports: String) {
+  def addImportsFromString(imports: String)
     this.imports ++= imports.split(',').filter(_.nonEmpty)
-  }
 
   def setVisibilityChecker(checker: VisibilityChecker) {}
 
   def getVisibilityChecker: VisibilityChecker =
     VisibilityChecker.EVERYTHING_VISIBLE
 
-  def setExceptionHandler(checker: ExceptionHandler) {
+  def setExceptionHandler(checker: ExceptionHandler)
     exceptionHandler = checker
-  }
 
   def getExceptionHandler: ExceptionHandler = exceptionHandler
 
-  def forceResolveScope(scope: GlobalSearchScope) {
+  def forceResolveScope(scope: GlobalSearchScope)
     resolveScope = scope
-  }
 
   def getForcedResolveScope: GlobalSearchScope = resolveScope
 
-  def setIntentionActionsFilter(filter: IntentionActionsFilter) {
+  def setIntentionActionsFilter(filter: IntentionActionsFilter)
     this.filter = filter
-  }
 
   def getIntentionActionsFilter: IntentionActionsFilter = filter
 
@@ -85,7 +78,7 @@ class ScalaCodeFragment(project: Project, text: String) extends {
 
   override def isScriptFile(withCashing: Boolean): Boolean = false
 
-  override def addImportForPath(path: String, ref: PsiElement) {
+  override def addImportForPath(path: String, ref: PsiElement)
     imports += path
     myManager.beforeChange(false)
     val project: Project = myManager.getProject
@@ -97,7 +90,7 @@ class ScalaCodeFragment(project: Project, text: String) extends {
           new ScalaCodeFragment.ImportClassUndoableAction(
               path, document, imports)
       )
-    val newRef = ref match {
+    val newRef = ref match
       case st: ScStableCodeReferenceElement if st.resolve() == null =>
         Some(
             ScalaPsiElementFactory.createReferenceFromText(
@@ -108,34 +101,28 @@ class ScalaCodeFragment(project: Project, text: String) extends {
               .createExpressionFromText(expr.getText, expr)
               .asInstanceOf[ScReferenceExpression])
       case _ => None
-    }
-    newRef match {
+    newRef match
       case Some(r) if r.resolve() != null => ref.replace(r)
       case _ =>
-    }
-  }
 
   override def addImportsForPaths(
-      paths: Seq[String], refsContainer: PsiElement): Unit = {
+      paths: Seq[String], refsContainer: PsiElement): Unit =
     paths.foreach(addImportForPath(_, refsContainer))
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
-    for (qName <- imports) {
+                                   place: PsiElement): Boolean =
+    for (qName <- imports)
       val imp = ScalaPsiElementFactory.createImportFromTextWithContext(
           "import _root_." + qName, this, this)
       if (!imp.processDeclarations(processor, state, lastParent, place))
         return false
-    }
     if (!super.processDeclarations(processor, state, lastParent, place))
       return false
     true
-  }
 
-  override def clone(): PsiFileImpl = {
+  override def clone(): PsiFileImpl =
     val clone = cloneImpl(calcTreeElement.clone.asInstanceOf[FileElement])
       .asInstanceOf[ScalaCodeFragment]
     clone.imports = this.imports
@@ -145,21 +132,15 @@ class ScalaCodeFragment(project: Project, text: String) extends {
         PsiManager.getInstance(project), clone.vFile, true)
     clone.provider.forceCachedPsi(clone)
     clone
-  }
-}
 
-object ScalaCodeFragment {
+object ScalaCodeFragment
 
   private class ImportClassUndoableAction(path: String,
                                           document: Document,
                                           imports: mutable.HashSet[String])
-      extends BasicUndoableAction {
-    def undo() {
+      extends BasicUndoableAction
+    def undo()
       imports -= path
-    }
 
-    def redo() {
+    def redo()
       imports += path
-    }
-  }
-}

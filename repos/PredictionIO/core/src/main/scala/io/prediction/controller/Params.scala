@@ -25,6 +25,5 @@ trait Params extends Serializable {}
   *
   * @group Helper
   */
-case class EmptyParams() extends Params {
+case class EmptyParams() extends Params
   override def toString(): String = "Empty"
-}

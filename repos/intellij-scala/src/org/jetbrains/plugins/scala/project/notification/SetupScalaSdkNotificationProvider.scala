@@ -22,20 +22,19 @@ import org.jetbrains.plugins.scala.project.template.ScalaSupportProvider
   */
 class SetupScalaSdkNotificationProvider(
     project: Project, notifications: EditorNotifications)
-    extends EditorNotifications.Provider[EditorNotificationPanel] {
+    extends EditorNotifications.Provider[EditorNotificationPanel]
 
   project.getMessageBus
     .connect(project)
-    .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter {
-      override def rootsChanged(event: ModuleRootEvent) {
+    .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter
+      override def rootsChanged(event: ModuleRootEvent)
         notifications.updateAllNotifications()
-      }
-    })
+    )
 
   override def getKey = ProviderKey
 
   override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor) = {
+      file: VirtualFile, fileEditor: FileEditor) =
     val hasSdk = Option(PsiManager.getInstance(project).findFile(file))
       .filter(_.getLanguage == ScalaLanguage.Instance)
       .filter(!_.getName.endsWith(".sbt")) // root SBT files belong to main (not *-build) modules
@@ -50,30 +49,23 @@ class SetupScalaSdkNotificationProvider(
     if (hasSdk.contains(false))
       createPanel(project, PsiManager.getInstance(project).findFile(file))
     else null
-  }
-}
 
-object SetupScalaSdkNotificationProvider {
+object SetupScalaSdkNotificationProvider
   private val ProviderKey =
     Key.create[EditorNotificationPanel]("Setup Scala SDK")
 
   private def createPanel(
-      project: Project, file: PsiFile): EditorNotificationPanel = {
+      project: Project, file: PsiFile): EditorNotificationPanel =
     val panel = new EditorNotificationPanel()
     panel.setText("No Scala SDK in module")
-    panel.createActionLabel("Setup Scala SDK", new Runnable {
-      override def run() {
+    panel.createActionLabel("Setup Scala SDK", new Runnable
+      override def run()
         setupSdk(panel, project, file)
-      }
-    })
+    )
     panel
-  }
 
-  private def setupSdk(parent: JComponent, project: Project, file: PsiFile) {
-    Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach { module =>
+  private def setupSdk(parent: JComponent, project: Project, file: PsiFile)
+    Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach  module =>
       val dialog = AddSupportForSingleFrameworkDialog.createDialog(
           module, new ScalaSupportProvider())
       dialog.showAndGet()
-    }
-  }
-}

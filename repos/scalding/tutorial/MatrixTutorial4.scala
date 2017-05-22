@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class ComputeCosineJob(args: Args) extends Job(args) {
+class ComputeCosineJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -26,4 +26,3 @@ class ComputeCosineJob(args: Args) extends Job(args) {
   // we compute the innerproduct of the normalized matrix with itself
   // which is equivalent with computing cosine: AA^T / ||A|| * ||A||
   (normMatrix * normMatrix.transpose).write(Tsv(args("output")))
-}

@@ -10,8 +10,8 @@ import com.twitter.finagle.{ClientConnection, Service, ServiceFactory, Status}
 import com.twitter.util.{Await, Future, Time}
 
 @RunWith(classOf[JUnitRunner])
-class BufferingPoolTest extends FunSuite with MockitoSugar {
-  class Helper {
+class BufferingPoolTest extends FunSuite with MockitoSugar
+  class Helper
     val underlying = mock[ServiceFactory[Int, Int]]
     when(underlying.close(any[Time])) thenReturn Future.Done
     val service = mock[Service[Int, Int]]
@@ -20,9 +20,8 @@ class BufferingPoolTest extends FunSuite with MockitoSugar {
     when(underlying(any[ClientConnection])) thenReturn Future.value(service)
     val N = 10
     val pool = new BufferingPool(underlying, N)
-  }
 
-  test("BufferingPool should buffer exactly N items") {
+  test("BufferingPool should buffer exactly N items")
     val h = new Helper
     import h._
 
@@ -37,9 +36,8 @@ class BufferingPoolTest extends FunSuite with MockitoSugar {
     verify(service, times(0)).close(any[Time])
     for (s <- n2 drop N) s.close()
     verify(service, times(N)).close(any[Time])
-  }
 
-  test("BufferingPool should drain services on close") {
+  test("BufferingPool should drain services on close")
     val h = new Helper
     import h._
 
@@ -56,9 +54,8 @@ class BufferingPoolTest extends FunSuite with MockitoSugar {
     verify(underlying, times(N + 1)).apply(any[ClientConnection])
     s.close()
     verify(service, times(N + 1)).close(any[Time])
-  }
 
-  test("BufferingPool should give back unhealthy services immediately") {
+  test("BufferingPool should give back unhealthy services immediately")
     val h = new Helper
     import h._
     val unhealthy = mock[Service[Int, Int]]
@@ -69,9 +66,8 @@ class BufferingPoolTest extends FunSuite with MockitoSugar {
     assert(!s1.isAvailable)
     s1.close()
     verify(unhealthy).close(any[Time])
-  }
 
-  test("BufferingPool should skip unhealthy services") {
+  test("BufferingPool should skip unhealthy services")
     val h = new Helper
     import h._
 
@@ -84,5 +80,3 @@ class BufferingPoolTest extends FunSuite with MockitoSugar {
     when(failing.status) thenReturn Status.Closed
     Await.result(pool())
     verify(failing).close(any[Time])
-  }
-}

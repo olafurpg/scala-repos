@@ -10,22 +10,20 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   */
 class StaticTraitScFunctionWrapper(
     val function: ScFunction, containingClass: PsiClassWrapper)
-    extends {
+    extends
   val elementFactory =
     JavaPsiFacade.getInstance(function.getProject).getElementFactory
   val methodText = StaticTraitScFunctionWrapper.methodText(
       function, containingClass: PsiClassWrapper)
-  val method: PsiMethod = {
-    try {
+  val method: PsiMethod =
+    try
       elementFactory.createMethodFromText(methodText, containingClass)
-    } catch {
+    catch
       case e: Exception =>
         elementFactory.createMethodFromText(
             "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
-    }
-  }
-} with LightMethodAdapter(function.getManager, method, containingClass)
-with LightScalaMethod {
+with LightMethodAdapter(function.getManager, method, containingClass)
+with LightScalaMethod
   override def getNavigationElement: PsiElement = function
 
   override def canNavigate: Boolean = function.canNavigate
@@ -33,23 +31,20 @@ with LightScalaMethod {
   override def canNavigateToSource: Boolean = function.canNavigateToSource
 
   override def getParent: PsiElement = containingClass
-}
 
-object StaticTraitScFunctionWrapper {
+object StaticTraitScFunctionWrapper
   def methodText(
-      function: ScFunction, containingClass: PsiClassWrapper): String = {
+      function: ScFunction, containingClass: PsiClassWrapper): String =
     val builder = new StringBuilder
 
     builder.append(JavaConversionUtil.annotationsAndModifiers(function, true))
 
-    if (!function.isConstructor) {
-      function.returnType match {
+    if (!function.isConstructor)
+      function.returnType match
         case Success(tp, _) =>
           builder.append(JavaConversionUtil.typeText(
                   tp, function.getProject, function.getResolveScope))
         case _ => builder.append("java.lang.Object")
-      }
-    }
 
     builder.append(" ")
     val name =
@@ -60,14 +55,14 @@ object StaticTraitScFunctionWrapper {
     val qualName = containingClass.getQualifiedName
     builder.append(
         ((qualName.substring(0, qualName.length() - 6) +
-                " This") +: function.parameters.map {
+                " This") +: function.parameters.map
           case param =>
             val builder = new StringBuilder
             val paramAnnotations =
               JavaConversionUtil.annotations(param).mkString(" ")
             if (!paramAnnotations.isEmpty)
               builder.append(paramAnnotations).append(" ")
-            param.getRealParameterType(TypingContext.empty) match {
+            param.getRealParameterType(TypingContext.empty) match
               case Success(tp, _) =>
                 if (param.isCallByNameParameter)
                   builder.append("scala.Function0<")
@@ -75,15 +70,12 @@ object StaticTraitScFunctionWrapper {
                         tp, function.getProject, function.getResolveScope))
                 if (param.isCallByNameParameter) builder.append(">")
               case _ => builder.append("java.lang.Object")
-            }
             builder.append(" ").append(param.getName)
             builder.toString()
-        }).mkString("(", ", ", ")"))
+        ).mkString("(", ", ", ")"))
 
     builder.append(LightUtil.getThrowsSection(function))
 
     builder.append(" {}")
 
     builder.toString()
-  }
-}

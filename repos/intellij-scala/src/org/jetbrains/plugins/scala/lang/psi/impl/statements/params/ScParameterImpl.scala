@@ -28,42 +28,38 @@ import scala.collection.mutable.ArrayBuffer
   */
 class ScParameterImpl protected (
     stub: StubElement[ScParameter], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameter {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameter
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScParameterStub) = {
+  def this(stub: ScParameterStub) =
     this(stub, ScalaElementTypes.PARAM, null)
-  }
 
   override def toString: String = "Parameter: " + name
 
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
-  def isCallByNameParameter: Boolean = {
+  def isCallByNameParameter: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isCallByNameParameter
-    }
-    paramType match {
+    paramType match
       case Some(paramType) =>
         paramType.isCallByNameParameter
       case _ => false
-    }
-  }
 
   override def getNameIdentifier: PsiIdentifier = new JavaIdentifier(nameId)
 
-  def deprecatedName: Option[String] = {
+  def deprecatedName: Option[String] =
     val stub = getStub
     if (stub != null) return stub.asInstanceOf[ScParameterStub].deprecatedName
-    annotations.find(_.typeElement.getText.contains("deprecatedName")) match {
+    annotations.find(_.typeElement.getText.contains("deprecatedName")) match
       case Some(deprecationAnnotation) =>
-        deprecationAnnotation.constructor.args.flatMap {
+        deprecationAnnotation.constructor.args.flatMap
           case args =>
             val exprs = args.exprs
             if (exprs.length != 1) None
-            else {
-              exprs(0) match {
+            else
+              exprs(0) match
                 case literal: ScLiteral
                     if literal.getNode.getFirstChildNode != null &&
                     literal.getNode.getFirstChildNode.getElementType == ScalaTokenTypes.tSYMBOL =>
@@ -71,37 +67,28 @@ class ScParameterImpl protected (
                   if (literalText.length < 2) None
                   else Some(literalText.substring(1))
                 case _ => None
-              }
-            }
-        }
       case None => None
-    }
-  }
 
-  def nameId: PsiElement = {
+  def nameId: PsiElement =
     val id = findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
     if (id == null) findChildByType[PsiElement](ScalaTokenTypes.tUNDER) else id
-  }
 
   def getTypeElement = null
 
-  def typeElement: Option[ScTypeElement] = {
+  def typeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].getTypeElement
-    }
-    paramType match {
+    paramType match
       case Some(x) if x.typeElement != null => Some(x.typeElement)
       case _ => None
-    }
-  }
 
-  def getType(ctx: TypingContext): TypeResult[ScType] = {
+  def getType(ctx: TypingContext): TypeResult[ScType] =
     //todo: this is very error prone way to calc type, when usually we need real parameter type
-    val computeType: ScType = {
+    val computeType: ScType =
       val stub = getStub
-      if (stub != null) {
-        stub.asInstanceOf[ScParameterStub].getTypeText match {
+      if (stub != null)
+        stub.asInstanceOf[ScParameterStub].getTypeText match
           case ""
               if stub.getParentStub != null &&
               stub.getParentStub.getParentStub != null &&
@@ -111,98 +98,72 @@ class ScParameterImpl protected (
           case "" =>
             return Failure("Wrong Stub problem", Some(this)) //shouldn't be
           case str: String =>
-            stub.asInstanceOf[ScParameterStub].getTypeElement match {
+            stub.asInstanceOf[ScParameterStub].getTypeElement match
               case Some(te) => return te.getType(TypingContext.empty)
               case None => return Failure("Wrong type element", Some(this))
-            }
-        }
-      } else {
-        typeElement match {
+      else
+        typeElement match
           case None if baseDefaultParam =>
-            getActualDefaultExpression match {
+            getActualDefaultExpression match
               case Some(t) => t.getType(TypingContext.empty).getOrNothing
               case None => lang.psi.types.Nothing
-            }
           case None =>
-            expectedParamType.map(_.unpackedType) match {
+            expectedParamType.map(_.unpackedType) match
               case Some(t) => t
               case None => lang.psi.types.Nothing
-            }
           case Some(e) => e.getType(TypingContext.empty).getOrAny
-        }
-      }
-    }
     Success(computeType, Some(this))
-  }
 
-  def baseDefaultParam: Boolean = {
+  def baseDefaultParam: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isDefaultParam
-    }
     findChildByType[PsiElement](ScalaTokenTypes.tASSIGN) != null
-  }
 
-  def isRepeatedParameter: Boolean = {
+  def isRepeatedParameter: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].isRepeated
-    }
-    paramType match {
+    paramType match
       case Some(p: ScParameterType) => p.isRepeatedParameter
       case None => false
-    }
-  }
 
-  def getActualDefaultExpression: Option[ScExpression] = {
+  def getActualDefaultExpression: Option[ScExpression] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScParameterStub].getDefaultExpr
-    }
     findChild(classOf[ScExpression])
-  }
 
-  def remove() {
+  def remove()
     val node = getNode
     val toRemove: ArrayBuffer[ASTNode] = ArrayBuffer.apply(node)
-    getParent match {
+    getParent match
       case clause: ScParameterClause =>
         val index = clause.parameters.indexOf(this)
         val length = clause.parameters.length
-        if (length != 1) {
-          if (index != length) {
+        if (length != 1)
+          if (index != length)
             var n = node.getTreeNext
             while (n != null &&
             n.getElementType != ScalaTokenTypes.tRPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+            !n.getPsi.isInstanceOf[ScParameter])
               toRemove += n
               n = n.getTreeNext
-            }
-          } else {
+          else
             var n = node.getTreePrev
             while (n != null &&
             n.getElementType != ScalaTokenTypes.tLPARENTHESIS &&
-            !n.getPsi.isInstanceOf[ScParameter]) {
+            !n.getPsi.isInstanceOf[ScParameter])
               toRemove += n
               n = n.getTreePrev
-            }
-          }
-        }
       case _ =>
-    }
-    for (elem <- toRemove) {
+    for (elem <- toRemove)
       elem.getTreeParent.removeChild(elem)
-    }
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitParameter(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitParameter(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

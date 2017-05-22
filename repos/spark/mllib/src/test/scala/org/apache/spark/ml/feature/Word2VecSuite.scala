@@ -28,16 +28,15 @@ import org.apache.spark.sql.Row
 
 class Word2VecSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new Word2Vec)
     val model =
       new Word2VecModel("w2v", new OldWord2VecModel(Map("a" -> Array(0.0f))))
     ParamsSuite.checkParams(model)
-  }
 
-  test("Word2Vec") {
+  test("Word2Vec")
 
     val sqlContext = this.sqlContext
     import sqlContext.implicits._
@@ -57,13 +56,12 @@ class Word2VecSuite
                      0.11731560528278351)
     )
 
-    val expected = doc.map { sentence =>
+    val expected = doc.map  sentence =>
       Vectors.dense(sentence
             .map(codes.apply)
             .reduce((word1,
                 word2) => word1.zip(word2).map { case (v1, v2) => v1 + v2 })
             .map(_ / numOfWords))
-    }
 
     val docDF = doc.zip(expected).toDF("text", "expected")
 
@@ -81,14 +79,12 @@ class Word2VecSuite
     // behavior.  The test needs to be updated to be more general, see SPARK-11502
     val magicExp = Vectors.dense(
         0.30153007534417237, -0.6833061711354689, 0.5116530778733167)
-    model.transform(docDF).select("result", "expected").collect().foreach {
+    model.transform(docDF).select("result", "expected").collect().foreach
       case Row(vector1: Vector, vector2: Vector) =>
         assert(vector1 ~== magicExp absTol 1E-5,
                "Transformed vector is different with expected.")
-    }
-  }
 
-  test("getVectors") {
+  test("getVectors")
 
     val sqlContext = this.sqlContext
     import sqlContext.implicits._
@@ -122,9 +118,8 @@ class Word2VecSuite
       .sort("word")
       .select("vector")
       .rdd
-      .map {
+      .map
         case Row(v: Vector) => v
-      }
       .collect()
     // These expectations are just magic values, characterizing the current
     // behavior.  The test needs to be updated to be more general, see SPARK-11502
@@ -137,14 +132,12 @@ class Word2VecSuite
             -0.27150997519493103, 0.4372006058692932, -0.13465698063373566)
     )
 
-    realVectors.zip(magicExpected).foreach {
+    realVectors.zip(magicExpected).foreach
       case (real, expected) =>
         assert(real ~== expected absTol 1E-5,
                "Actual vector is different from expected.")
-    }
-  }
 
-  test("findSynonyms") {
+  test("findSynonyms")
 
     val sqlContext = this.sqlContext
     import sqlContext.implicits._
@@ -165,20 +158,17 @@ class Word2VecSuite
     val (synonyms, similarity) = model
       .findSynonyms("a", 2)
       .rdd
-      .map {
+      .map
         case Row(w: String, sim: Double) => (w, sim)
-      }
       .collect()
       .unzip
 
     assert(synonyms.toArray === Array("b", "c"))
-    expectedSimilarity.zip(similarity).map {
+    expectedSimilarity.zip(similarity).map
       case (expected, actual) =>
         assert(math.abs((expected - actual) / expected) < 1E-5)
-    }
-  }
 
-  test("window size") {
+  test("window size")
 
     val sqlContext = this.sqlContext
     import sqlContext.implicits._
@@ -199,9 +189,8 @@ class Word2VecSuite
     val (synonyms, similarity) = model
       .findSynonyms("a", 6)
       .rdd
-      .map {
+      .map
         case Row(w: String, sim: Double) => (w, sim)
-      }
       .collect()
       .unzip
 
@@ -217,17 +206,15 @@ class Word2VecSuite
     val (synonymsLarger, similarityLarger) = model
       .findSynonyms("a", 6)
       .rdd
-      .map {
+      .map
         case Row(w: String, sim: Double) => (w, sim)
-      }
       .collect()
       .unzip
     // The similarity score should be very different with the larger window
     assert(
         math.abs(similarity(5) - similarityLarger(5) / similarity(5)) > 1E-5)
-  }
 
-  test("Word2Vec read/write") {
+  test("Word2Vec read/write")
     val t = new Word2Vec()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
@@ -238,9 +225,8 @@ class Word2VecSuite
       .setStepSize(0.01)
       .setVectorSize(100)
     testDefaultReadWrite(t)
-  }
 
-  test("Word2VecModel read/write") {
+  test("Word2VecModel read/write")
     val word2VecMap = Map(
         ("china", Array(0.50f, 0.50f, 0.50f, 0.50f)),
         ("japan", Array(0.40f, 0.50f, 0.50f, 0.50f)),
@@ -251,5 +237,3 @@ class Word2VecSuite
     val instance = new Word2VecModel("myWord2VecModel", oldModel)
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.getVectors.collect() === instance.getVectors.collect())
-  }
-}

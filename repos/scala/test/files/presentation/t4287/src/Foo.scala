@@ -1,5 +1,4 @@
 class Baz(val f: Int = B /*#*/ .a /*#*/ )
 
-object B {
+object B
   val a = 2
-}

@@ -28,7 +28,7 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
                                         val mailboxType: MailboxType,
                                         val supervisor: InternalActorRef,
                                         val path: ActorPath)
-    extends ActorRefWithCell with RepointableRef {
+    extends ActorRefWithCell with RepointableRef
 
   import AbstractActorRef.{cellOffset, lookupOffset}
 
@@ -50,17 +50,15 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
   def lookup =
     Unsafe.instance.getObjectVolatile(this, lookupOffset).asInstanceOf[Cell]
 
-  @tailrec final def swapCell(next: Cell): Cell = {
+  @tailrec final def swapCell(next: Cell): Cell =
     val old = underlying
     if (Unsafe.instance.compareAndSwapObject(this, cellOffset, old, next)) old
     else swapCell(next)
-  }
 
-  @tailrec final def swapLookup(next: Cell): Cell = {
+  @tailrec final def swapLookup(next: Cell): Cell =
     val old = lookup
     if (Unsafe.instance.compareAndSwapObject(this, lookupOffset, old, next))
       old else swapLookup(next)
-  }
 
   /**
     * Initialize: make a dummy cell which holds just a mailbox, then tell our
@@ -72,7 +70,7 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
     * This is protected so that others can have different initialization.
     */
   def initialize(async: Boolean): this.type =
-    underlying match {
+    underlying match
       case null ⇒
         swapCell(new UnstartedCell(system, this, props, supervisor))
         swapLookup(underlying)
@@ -81,7 +79,6 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
         this
       case other ⇒
         throw new IllegalStateException("initialize called more than once!")
-    }
 
   /**
     * This method is supposed to be called by the supervisor in handleSupervise()
@@ -90,14 +87,13 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
     * at any time.
     */
   def point(catchFailures: Boolean): this.type =
-    underlying match {
+    underlying match
       case u: UnstartedCell ⇒
-        val cell = try newCell(u) catch {
+        val cell = try newCell(u) catch
           case NonFatal(ex) if catchFailures ⇒
             val safeDispatcher = system.dispatchers.defaultGlobalDispatcher
             new ActorCell(system, this, props, safeDispatcher, supervisor)
               .initWithFailure(ex)
-        }
         /*
          * The problem here was that if the real actor (which will start running
          * at cell.start()) creates children in its constructor, then this may
@@ -112,7 +108,6 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
       case null ⇒ throw new IllegalStateException("underlying cell is null")
       case _ ⇒
         this // this happens routinely for things which were created async=false
-    }
 
   /**
     * This is called by activate() to obtain the cell which is to replace the
@@ -133,12 +128,11 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
 
   def restart(cause: Throwable): Unit = underlying.restart(cause)
 
-  def isStarted: Boolean = underlying match {
+  def isStarted: Boolean = underlying match
     case _: UnstartedCell ⇒ false
     case null ⇒
       throw new IllegalStateException("isStarted called before initialized")
     case _ ⇒ true
-  }
 
   @deprecated("Use context.watch(actor) and receive Terminated(actor)", "2.2")
   def isTerminated: Boolean = underlying.isTerminated
@@ -150,24 +144,21 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
   def getParent: InternalActorRef = underlying.parent
 
   def getChild(name: Iterator[String]): InternalActorRef =
-    if (name.hasNext) {
-      name.next match {
+    if (name.hasNext)
+      name.next match
         case ".." ⇒ getParent.getChild(name)
         case "" ⇒ getChild(name)
         case other ⇒
           val (childName, uid) = ActorCell.splitNameAndUid(other)
-          lookup.getChildByName(childName) match {
+          lookup.getChildByName(childName) match
             case Some(crs: ChildRestartStats)
                 if uid == ActorCell.undefinedUid || uid == crs.uid ⇒
               crs.child.asInstanceOf[InternalActorRef].getChild(name)
             case _ ⇒
-              lookup match {
+              lookup match
                 case ac: ActorCell ⇒ ac.getFunctionRefOrNobody(childName, uid)
                 case _ ⇒ Nobody
-              }
-          }
-      }
-    } else this
+    else this
 
   /**
     * Method for looking up a single child beneath this actor.
@@ -186,13 +177,12 @@ private[akka] class RepointableActorRef(val system: ActorSystemImpl,
 
   @throws(classOf[java.io.ObjectStreamException])
   protected def writeReplace(): AnyRef = SerializedActorRef(this)
-}
 
 private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
                                   val self: RepointableActorRef,
                                   val props: Props,
                                   val supervisor: InternalActorRef)
-    extends Cell {
+    extends Cell
 
   /*
    * This lock protects all accesses to this cell’s queues. It also ensures
@@ -209,33 +199,27 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
 
   import systemImpl.settings.UnstartedPushTimeout.{duration ⇒ timeout}
 
-  def replaceWith(cell: Cell): Unit = locked {
-    try {
-      def drainSysmsgQueue(): Unit = {
+  def replaceWith(cell: Cell): Unit = locked
+    try
+      def drainSysmsgQueue(): Unit =
         // using while in case a sys msg enqueues another sys msg
-        while (sysmsgQueue.nonEmpty) {
+        while (sysmsgQueue.nonEmpty)
           var sysQ = sysmsgQueue.reverse
           sysmsgQueue = SystemMessageList.LNil
-          while (sysQ.nonEmpty) {
+          while (sysQ.nonEmpty)
             val msg = sysQ.head
             sysQ = sysQ.tail
             msg.unlink()
             cell.sendSystemMessage(msg)
-          }
-        }
-      }
 
       drainSysmsgQueue()
 
-      while (!queue.isEmpty) {
+      while (!queue.isEmpty)
         cell.sendMessage(queue.poll())
         // drain sysmsgQueue in case a msg enqueues a sys msg
         drainSysmsgQueue()
-      }
-    } finally {
+    finally
       self.swapCell(cell)
-    }
-  }
 
   def system: ActorSystem = systemImpl
   def start(): this.type = this
@@ -244,23 +228,22 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
     sendSystemMessage(Resume(causedByFailure))
   def restart(cause: Throwable): Unit = sendSystemMessage(Recreate(cause))
   def stop(): Unit = sendSystemMessage(Terminate())
-  override private[akka] def isTerminated: Boolean = locked {
+  override private[akka] def isTerminated: Boolean = locked
     val cell = self.underlying
     if (cellIsReady(cell)) cell.isTerminated else false
-  }
   def parent: InternalActorRef = supervisor
   def childrenRefs: ChildrenContainer =
     ChildrenContainer.EmptyChildrenContainer
   def getChildByName(name: String): Option[ChildRestartStats] = None
   override def getSingleChild(name: String): InternalActorRef = Nobody
 
-  def sendMessage(msg: Envelope): Unit = {
-    if (lock.tryLock(timeout.length, timeout.unit)) {
-      try {
+  def sendMessage(msg: Envelope): Unit =
+    if (lock.tryLock(timeout.length, timeout.unit))
+      try
         val cell = self.underlying
-        if (cellIsReady(cell)) {
+        if (cellIsReady(cell))
           cell.sendMessage(msg)
-        } else if (!queue.offer(msg)) {
+        else if (!queue.offer(msg))
           system.eventStream.publish(
               Warning(self.path.toString,
                       getClass,
@@ -268,10 +251,10 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
                       " due to enqueue failure"))
           system.deadLetters.tell(
               DeadLetter(msg.message, msg.sender, self), msg.sender)
-        } else if (Mailbox.debug)
+        else if (Mailbox.debug)
           println(s"$self temp queueing ${msg.message} from ${msg.sender}")
-      } finally lock.unlock()
-    } else {
+      finally lock.unlock()
+    else
       system.eventStream.publish(
           Warning(self.path.toString,
                   getClass,
@@ -279,38 +262,30 @@ private[akka] class UnstartedCell(val systemImpl: ActorSystemImpl,
                   " due to lock timeout"))
       system.deadLetters.tell(
           DeadLetter(msg.message, msg.sender, self), msg.sender)
-    }
-  }
 
-  def sendSystemMessage(msg: SystemMessage): Unit = {
+  def sendSystemMessage(msg: SystemMessage): Unit =
     lock.lock // we cannot lose system messages, ever, and we cannot throw an Error from here as well
-    try {
+    try
       val cell = self.underlying
       if (cellIsReady(cell)) cell.sendSystemMessage(msg)
-      else {
+      else
         sysmsgQueue ::= msg
         if (Mailbox.debug) println(s"$self temp queueing system $msg")
-      }
-    } finally lock.unlock()
-  }
+    finally lock.unlock()
 
   def isLocal = true
 
   private[this] final def cellIsReady(cell: Cell): Boolean =
     (cell ne this) && (cell ne null)
 
-  def hasMessages: Boolean = locked {
+  def hasMessages: Boolean = locked
     val cell = self.underlying
     if (cellIsReady(cell)) cell.hasMessages else !queue.isEmpty
-  }
 
-  def numberOfMessages: Int = locked {
+  def numberOfMessages: Int = locked
     val cell = self.underlying
     if (cellIsReady(cell)) cell.numberOfMessages else queue.size
-  }
 
-  private[this] final def locked[T](body: ⇒ T): T = {
+  private[this] final def locked[T](body: ⇒ T): T =
     lock.lock()
     try body finally lock.unlock()
-  }
-}

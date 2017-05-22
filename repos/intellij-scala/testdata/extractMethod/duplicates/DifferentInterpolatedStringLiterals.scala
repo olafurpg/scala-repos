@@ -1,7 +1,7 @@
-object DifferentInterpolatedStringLiterals {
+object DifferentInterpolatedStringLiterals
 
-  def log(message: String, level: Int) {
-    level match {
+  def log(message: String, level: Int)
+    level match
       case 0 =>
         /*start*/
         println(s"info: $level")
@@ -9,9 +9,6 @@ object DifferentInterpolatedStringLiterals {
       case 1 =>
         println(s"warning: $level")
         println(message)
-    }
-  }
-}
 /*
 object DifferentInterpolatedStringLiterals {
 

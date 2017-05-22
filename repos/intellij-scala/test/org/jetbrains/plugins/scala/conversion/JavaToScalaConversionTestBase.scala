@@ -18,13 +18,13 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alexander Podkhalyuzin
   */
 abstract class JavaToScalaConversionTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
 
   def folderPath: String = baseRootPath() + "conversion/"
 
-  protected def doTest() {
+  protected def doTest()
     import org.junit.Assert._
 
     val filePath = folderPath + getTestName(false) + ".java"
@@ -45,32 +45,26 @@ abstract class JavaToScalaConversionTestBase
     var elem: PsiElement = javaFile.findElementAt(startOffset)
     assert(elem.getTextRange.getStartOffset == startOffset)
     while (elem.getParent != null && !elem.getParent.isInstanceOf[PsiFile] &&
-    elem.getParent.getTextRange.getStartOffset == startOffset) {
+    elem.getParent.getTextRange.getStartOffset == startOffset)
       elem = elem.getParent
-    }
     val buf = new ArrayBuffer[PsiElement]
     buf += elem
-    while (elem.getTextRange.getEndOffset < endOffset) {
+    while (elem.getTextRange.getEndOffset < endOffset)
       elem = elem.getNextSibling
       buf += elem
-    }
     var res = JavaToScala.convertPsisToText(buf.toArray)
     val newFile = PsiFileFactory
       .getInstance(getProjectAdapter)
       .createFileFromText(
           "dummyForJavaToScala.scala", ScalaFileType.SCALA_LANGUAGE, res)
-    res = inWriteAction {
+    res = inWriteAction
       CodeStyleManager.getInstance(getProjectAdapter).reformat(newFile).getText
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case JavaTokenType.END_OF_LINE_COMMENT => text.substring(2).trim
       case JavaTokenType.C_STYLE_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res.trim)
-  }
-}

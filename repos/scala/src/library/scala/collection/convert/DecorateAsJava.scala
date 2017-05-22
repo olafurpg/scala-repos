@@ -58,7 +58,7 @@ import scala.language.implicitConversions
   *}}}
   *  @since  2.8.1
   */
-trait DecorateAsJava {
+trait DecorateAsJava
 
   /**
     * Adds an `asJava` method that implicitly converts a Scala `Iterator` to a
@@ -309,4 +309,3 @@ trait DecorateAsJava {
   implicit def mapAsJavaConcurrentMapConverter[A, B](
       m: concurrent.Map[A, B]): AsJava[juc.ConcurrentMap[A, B]] =
     new AsJava(mapAsJavaConcurrentMap(m))
-}

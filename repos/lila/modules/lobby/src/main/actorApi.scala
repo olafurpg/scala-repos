@@ -11,11 +11,10 @@ private[lobby] case class LobbyUser(id: String,
                                     engine: Boolean,
                                     booster: Boolean,
                                     ratingMap: Map[String, Int],
-                                    blocking: Set[String]) {
+                                    blocking: Set[String])
   def lame = engine || booster
-}
 
-private[lobby] object LobbyUser {
+private[lobby] object LobbyUser
 
   def make(user: User, blocking: Set[String]) =
     LobbyUser(id = user.id,
@@ -25,19 +24,17 @@ private[lobby] object LobbyUser {
               booster = user.booster,
               ratingMap = user.perfs.ratingMap,
               blocking = blocking)
-}
 
 private[lobby] case class Member(channel: JsChannel,
                                  user: Option[LobbyUser],
                                  uid: String,
                                  mobile: Boolean)
-    extends SocketMember {
+    extends SocketMember
 
   val userId = user map (_.id)
   val troll = user ?? (_.troll)
-}
 
-private[lobby] object Member {
+private[lobby] object Member
 
   def apply(channel: JsChannel,
             user: Option[User],
@@ -48,7 +45,6 @@ private[lobby] object Member {
            user = user map { LobbyUser.make(_, blocking) },
            uid = uid,
            mobile = mobile)
-}
 
 private[lobby] case class HookMeta(hookId: Option[String] = None)
 

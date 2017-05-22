@@ -15,7 +15,7 @@ import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndexesManager}
   * @author Nikolay Obedin
   * @since 8/4/14.
   */
-class DependencyAnnotatorTest extends AnnotatorTestBase {
+class DependencyAnnotatorTest extends AnnotatorTestBase
 
   val testResolver = new SbtResolver(
       SbtResolver.Kind.Maven,
@@ -28,53 +28,43 @@ class DependencyAnnotatorTest extends AnnotatorTestBase {
   def testDoNotAnnotateIndexedDepWithDynamicVersion() =
     doTest(Seq.empty)
 
-  def testAnnotateUnresolvedDep() = {
+  def testAnnotateUnresolvedDep() =
     val msg = SbtBundle("sbt.annotation.unresolvedDependency")
     doTest(
         Seq(Error("\"org.jetbrains\"", msg),
             Error("\"unknown-lib\"", msg),
             Error("\"0.0.0\"", msg)))
-  }
 
-  def testAnnotateUnresolvedDepWithDynamicVersion() = {
+  def testAnnotateUnresolvedDepWithDynamicVersion() =
     val msg = SbtBundle("sbt.annotation.unresolvedDependency")
     doTest(
         Seq(Error("\"org.jetbrains\"", msg),
             Error("\"unknown-lib\"", msg),
             Error("\"latest.release\"", msg)))
-  }
 
-  override def setUp() = {
+  override def setUp() =
     super.setUp()
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
     SbtResolverIndexesManager().update(Seq(testResolver))
 
     val moduleManager = Option(ModuleManager.getInstance(getProject))
-    moduleManager.foreach { manager =>
-      manager.getModules.toSeq.foreach { module =>
+    moduleManager.foreach  manager =>
+      manager.getModules.toSeq.foreach  module =>
         val resolvers = SbtModule.getResolversFrom(module)
         SbtModule.setResolversTo(module, resolvers + testResolver)
-      }
-    }
-  }
 
-  override def tearDown() = {
+  override def tearDown() =
     super.tearDown()
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
-  }
 
-  private def doTest(messages: Seq[Message]) {
+  private def doTest(messages: Seq[Message])
     val element = loadTestFile()
     val mock = new AnnotatorHolderMock
     val annotator = new SbtDependencyAnnotator
 
-    val visitor = new ScalaRecursiveElementVisitor {
-      override def visitLiteral(lit: ScLiteral) {
+    val visitor = new ScalaRecursiveElementVisitor
+      override def visitLiteral(lit: ScLiteral)
         annotator.annotate(lit, mock)
         super.visitLiteral(lit)
-      }
-    }
     element.accept(visitor)
     assertEquals(messages, mock.annotations)
-  }
-}

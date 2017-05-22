@@ -8,22 +8,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScTemplateDefi
 /**
   * Pavel Fatin
   */
-object SealedClassInheritance extends AnnotatorPart[ScTemplateDefinition] {
+object SealedClassInheritance extends AnnotatorPart[ScTemplateDefinition]
   def kind = classOf[ScTemplateDefinition]
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
-    definition.containingScalaFile match {
+               typeAware: Boolean)
+    definition.containingScalaFile match
       case Some(a) if !a.isCompiled =>
       case _ => return
-    }
     val newInstance = definition.isInstanceOf[ScNewTemplateDefinition]
     val hasBody = definition.extendsBlock.templateBody.isDefined
 
     if (newInstance && !hasBody) return
 
-    definition.refs.foreach {
+    definition.refs.foreach
       case (refElement, Some((psiClass: ScTypeDefinition, _)))
           if psiClass.hasModifierProperty("sealed") &&
           psiClass.getContainingFile.getNavigationElement != refElement.getContainingFile.getNavigationElement =>
@@ -32,6 +31,3 @@ object SealedClassInheritance extends AnnotatorPart[ScTemplateDefinition] {
             "Illegal inheritance from sealed %s %s".format(
                 kindOf(psiClass).toLowerCase, psiClass.name))
       case _ =>
-    }
-  }
-}

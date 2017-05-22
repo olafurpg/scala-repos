@@ -28,7 +28,7 @@ import org.apache.spark.rdd.RDD
   */
 @Since("1.2.0")
 @DeveloperApi
-trait Loss extends Serializable {
+trait Loss extends Serializable
 
   /**
     * Method to calculate the gradients for the gradient boosting calculation.
@@ -48,11 +48,10 @@ trait Loss extends Serializable {
     * @return Measure of model error on data
     */
   @Since("1.2.0")
-  def computeError(model: TreeEnsembleModel, data: RDD[LabeledPoint]): Double = {
+  def computeError(model: TreeEnsembleModel, data: RDD[LabeledPoint]): Double =
     data
       .map(point => computeError(model.predict(point.features), point.label))
       .mean()
-  }
 
   /**
     * Method to calculate loss when the predictions are already known.
@@ -63,4 +62,3 @@ trait Loss extends Serializable {
     * @return Measure of model error on datapoint.
     */
   private[spark] def computeError(prediction: Double, label: Double): Double
-}

@@ -11,9 +11,9 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.impl.ScFileStubImpl
   * User: Alexander Podkhalyuzin
   * Date: 12.02.2010
   */
-class ScalaFileStubBuilder extends DefaultStubBuilder {
+class ScalaFileStubBuilder extends DefaultStubBuilder
   protected override def createStubForFile(
-      file: PsiFile): StubElement[_ <: PsiElement] = {
+      file: PsiFile): StubElement[_ <: PsiElement] =
     val s: ScalaFile = file.getViewProvider
       .getPsi(ScalaLanguage.Instance)
       .asInstanceOf[ScalaFile]
@@ -22,5 +22,3 @@ class ScalaFileStubBuilder extends DefaultStubBuilder {
                        StringRef.fromString(s.sourceName),
                        s.isCompiled,
                        s.isScriptFile(withCaching = false))
-  }
-}

@@ -21,7 +21,7 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 01.12.11
   */
 //todo: logic is too complicated, too many connections between classes. Rewrite?
-trait PrecedenceHelper[T] {
+trait PrecedenceHelper[T]
   this: BaseProcessor =>
 
   protected def getPlace: PsiElement
@@ -42,78 +42,65 @@ trait PrecedenceHelper[T] {
   private var fromHistory: Boolean = false
 
   protected def compareWithIgnoredSet(
-      set: mutable.HashSet[ScalaResolveResult]): Boolean = {
+      set: mutable.HashSet[ScalaResolveResult]): Boolean =
     import scala.collection.JavaConversions._
     if (ignoredSet.nonEmpty && set.isEmpty) return false
-    ignoredSet.forall { result =>
-      set.forall { otherResult =>
+    ignoredSet.forall  result =>
+      set.forall  otherResult =>
         if (!ScEquivalenceUtil.smartEquivalence(
-                result.getActualElement, otherResult.getActualElement)) {
-          (result.getActualElement, otherResult.getActualElement) match {
+                result.getActualElement, otherResult.getActualElement))
+          (result.getActualElement, otherResult.getActualElement) match
             case (ta: ScTypeAliasDefinition, cls: PsiClass) =>
               ta.isExactAliasFor(cls)
             case (cls: PsiClass, ta: ScTypeAliasDefinition) =>
               ta.isExactAliasFor(cls)
             case _ => false
-          }
-        } else true
-      }
-    }
-  }
+        else true
 
-  protected def restartFromHistory(): Unit = {
+  protected def restartFromHistory(): Unit =
     candidatesSet.clear()
     ignoredSet.clear()
     levelQualifiedNamesSet.clear()
     qualifiedNamesSet.clear()
     levelSet.clear()
     fromHistory = true
-    try {
-      history.foreach {
+    try
+      history.foreach
         case ChangedLevel => changedLevel
         case AddResult(results) => addResults(results)
-      }
-    } finally fromHistory = false
-  }
+    finally fromHistory = false
 
   def isUpdateHistory: Boolean = false
 
-  protected def addChangedLevelToHistory(): Unit = {
+  protected def addChangedLevelToHistory(): Unit =
     if (isUpdateHistory && !fromHistory &&
         history.lastOption != Some(ChangedLevel)) history += ChangedLevel
-  }
 
   protected def getQualifiedName(result: ScalaResolveResult): T
 
-  private lazy val suspiciousPackages: Set[String] = {
+  private lazy val suspiciousPackages: Set[String] =
     def collectPackages(
-        elem: PsiElement, res: Set[String] = Set.empty): Set[String] = {
-      PsiTreeUtil.getContextOfType(elem, true, classOf[ScPackaging]) match {
+        elem: PsiElement, res: Set[String] = Set.empty): Set[String] =
+      PsiTreeUtil.getContextOfType(elem, true, classOf[ScPackaging]) match
         case null => res
         case p: ScPackaging => collectPackages(p, res + p.fullPackageName)
-      }
-    }
     Set("scala", "java.lang", "scala", "scala.Predef") ++ collectPackages(
         getPlace)
-  }
-  protected def isSpecialResult(result: ScalaResolveResult): Boolean = {
+  protected def isSpecialResult(result: ScalaResolveResult): Boolean =
     val importsUsed = result.importsUsed.toSeq
-    if (importsUsed.length == 1) {
-      val importExpr = importsUsed.head match {
+    if (importsUsed.length == 1)
+      val importExpr = importsUsed.head match
         case ImportExprUsed(expr) => expr
         case ImportSelectorUsed(selector) =>
           PsiTreeUtil.getContextOfType(selector, true, classOf[ScImportExpr])
         case ImportWildcardSelectorUsed(expr) => expr
-      }
-      importExpr.qualifier.bind() match {
+      importExpr.qualifier.bind() match
         case Some(ScalaResolveResult(p: PsiPackage, _)) =>
           suspiciousPackages.contains(p.getQualifiedName)
         case Some(ScalaResolveResult(o: ScObject, _)) =>
           suspiciousPackages.contains(o.qualifiedName)
         case _ => false
-      }
-    } else false
-  }
+    else false
 
   /**
     * Returns highest precedence of all resolve results.
@@ -124,13 +111,11 @@ trait PrecedenceHelper[T] {
   protected def getTopPrecedence(result: ScalaResolveResult): Int
   protected def setTopPrecedence(result: ScalaResolveResult, i: Int)
   protected def filterNot(
-      p: ScalaResolveResult, n: ScalaResolveResult): Boolean = {
+      p: ScalaResolveResult, n: ScalaResolveResult): Boolean =
     getPrecedence(p) < getTopPrecedence(n)
-  }
   protected def isCheckForEqualPrecedence = true
-  protected def clearLevelQualifiedSet(result: ScalaResolveResult) {
+  protected def clearLevelQualifiedSet(result: ScalaResolveResult)
     levelQualifiedNamesSet.clear()
-  }
   protected def getLevelSet(
       result: ScalaResolveResult): util.HashSet[ScalaResolveResult] = levelSet
 
@@ -139,69 +124,58 @@ trait PrecedenceHelper[T] {
     */
   protected def addResult(result: ScalaResolveResult): Boolean =
     addResults(Seq(result))
-  protected def addResults(results: Seq[ScalaResolveResult]): Boolean = {
+  protected def addResults(results: Seq[ScalaResolveResult]): Boolean =
     if (isUpdateHistory && !fromHistory) history += AddResult(results)
     if (results.isEmpty) return true
     val result: ScalaResolveResult = results.head
     lazy val qualifiedName: T = getQualifiedName(result)
     lazy val levelSet = getLevelSet(result)
-    def addResults() {
+    def addResults()
       if (qualifiedName != null) levelQualifiedNamesSet.add(qualifiedName)
       val iterator = results.iterator
-      while (iterator.hasNext) {
+      while (iterator.hasNext)
         levelSet.add(iterator.next())
-      }
-    }
     val currentPrecedence = getPrecedence(result)
     val topPrecedence = getTopPrecedence(result)
     if (currentPrecedence < topPrecedence) return false
     else if (currentPrecedence == topPrecedence && levelSet.isEmpty)
       return false
-    else if (currentPrecedence == topPrecedence) {
+    else if (currentPrecedence == topPrecedence)
       if (isCheckForEqualPrecedence && qualifiedName != null &&
           (levelQualifiedNamesSet.contains(qualifiedName) ||
-              qualifiedNamesSet.contains(qualifiedName))) {
+              qualifiedNamesSet.contains(qualifiedName)))
         return false
-      } else if (qualifiedName != null &&
+      else if (qualifiedName != null &&
                  qualifiedNamesSet.contains(qualifiedName)) return false
-      if (!fromHistory && isUpdateHistory && isSpecialResult(result)) {
+      if (!fromHistory && isUpdateHistory && isSpecialResult(result))
         results.foreach(ignoredSet.add)
-      } else addResults()
-    } else {
-      if (qualifiedName != null && qualifiedNamesSet.contains(qualifiedName)) {
+      else addResults()
+    else
+      if (qualifiedName != null && qualifiedNamesSet.contains(qualifiedName))
         return false
-      } else {
-        if (!fromHistory && isUpdateHistory && isSpecialResult(result)) {
+      else
+        if (!fromHistory && isUpdateHistory && isSpecialResult(result))
           results.foreach(ignoredSet.add)
-        } else {
+        else
           setTopPrecedence(result, currentPrecedence)
           val levelSetIterator = levelSet.iterator()
-          while (levelSetIterator.hasNext) {
+          while (levelSetIterator.hasNext)
             val next = levelSetIterator.next()
-            if (filterNot(next, result)) {
+            if (filterNot(next, result))
               levelSetIterator.remove()
-            }
-          }
           clearLevelQualifiedSet(result)
           addResults()
-        }
-      }
-    }
     true
-  }
 
-  protected def getPrecedence(result: ScalaResolveResult): Int = {
-    specialPriority match {
+  protected def getPrecedence(result: ScalaResolveResult): Int =
+    specialPriority match
       case Some(priority) => priority
       case None if result.prefixCompletion =>
         PrecedenceHelper.PrecedenceTypes.PREFIX_COMPLETION
       case None => result.getPrecedence(getPlace, placePackageName)
-    }
-  }
-}
 
-object PrecedenceHelper {
-  object PrecedenceTypes {
+object PrecedenceHelper
+  object PrecedenceTypes
     val PREFIX_COMPLETION = 0
     val JAVA_LANG = 1
     val SCALA = 2
@@ -213,5 +187,3 @@ object PrecedenceHelper {
     val WILDCARD_IMPORT = 8
     val IMPORT = 9
     val OTHER_MEMBERS = 10
-  }
-}

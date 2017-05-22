@@ -27,7 +27,7 @@ import Helpers._
 import http.{S, SHtml}
 import S._
 
-object TimeZoneField {
+object TimeZoneField
   lazy val timeZoneList: List[(String, String)] =
     TimeZone.getAvailableIDs.toList
       .filter(!_.startsWith("SystemV/"))
@@ -35,9 +35,8 @@ object TimeZoneField {
       .filter(_.length > 3)
       .sortWith(_ < _)
       .map(tz => (tz, tz))
-}
 
-trait TimeZoneTypedField extends StringTypedField {
+trait TimeZoneTypedField extends StringTypedField
 
   /** Label for the selection item representing Empty, show when this field is optional. Defaults to the empty string. */
   def emptyOptionLabel: String = ""
@@ -53,22 +52,18 @@ trait TimeZoneTypedField extends StringTypedField {
     ("tabindex" -> tabIndex.toString)
 
   override def toForm: Box[NodeSeq] =
-    uniqueFieldId match {
+    uniqueFieldId match
       case Full(id) => Full(elem % ("id" -> id))
       case _ => Full(elem)
-    }
-}
 
 class TimeZoneField[OwnerType <: Record[OwnerType]](rec: OwnerType)
-    extends StringField(rec, 32) with TimeZoneTypedField {
+    extends StringField(rec, 32) with TimeZoneTypedField
 
   override def defaultValue = TimeZone.getDefault.getID
 
-  def isAsTimeZone: TimeZone = TimeZone.getTimeZone(value) match {
+  def isAsTimeZone: TimeZone = TimeZone.getTimeZone(value) match
     case null => TimeZone.getDefault
     case x => x
-  }
-}
 
 class OptionalTimeZoneField[OwnerType <: Record[OwnerType]](rec: OwnerType)
     extends OptionalStringField(rec, 32) with TimeZoneTypedField

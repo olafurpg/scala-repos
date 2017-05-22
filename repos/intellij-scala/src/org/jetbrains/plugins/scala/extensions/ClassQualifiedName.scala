@@ -5,6 +5,5 @@ import com.intellij.psi.PsiClass
 /**
   * Pavel Fatin
   */
-object ClassQualifiedName {
+object ClassQualifiedName
   def unapply(e: PsiClass): Some[String] = Some(e.qualifiedName)
-}

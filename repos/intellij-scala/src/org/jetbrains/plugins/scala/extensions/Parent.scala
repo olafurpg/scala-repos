@@ -5,6 +5,5 @@ import com.intellij.psi.PsiElement
 /**
   * Pavel Fatin
   */
-object Parent {
+object Parent
   def unapply(e: PsiElement): Option[PsiElement] = Option(e).map(_.getParent)
-}

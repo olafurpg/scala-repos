@@ -1,5 +1,5 @@
-object Test {
-  def meh: Unit = {
+object Test
+  def meh: Unit =
     trait TC[I]
     implicit val tci = new TC[Int] {}
 
@@ -7,5 +7,3 @@ object Test {
 
     baz
     // () // commenting or uncommenting this line should not affect compilation (visibly)
-  }
-}

@@ -25,30 +25,26 @@ import org.junit.{After, Before}
 import org.scalatest.junit.JUnitSuite
 import org.apache.kafka.common.security.JaasUtils
 
-object FourLetterWords {
-  def sendStat(host: String, port: Int, timeout: Int) {
+object FourLetterWords
+  def sendStat(host: String, port: Int, timeout: Int)
     val hostAddress =
       if (host != null) new InetSocketAddress(host, port)
       else new InetSocketAddress(InetAddress.getByName(null), port)
     val sock = new Socket()
     var reader: BufferedReader = null
     sock.connect(hostAddress, timeout)
-    try {
+    try
       val outstream = sock.getOutputStream
       outstream.write("stat".getBytes)
       outstream.flush
-    } catch {
-      case e: SocketTimeoutException => {
+    catch
+      case e: SocketTimeoutException =>
           throw new IOException("Exception while sending 4lw")
-        }
-    } finally {
+    finally
       sock.close
       if (reader != null) reader.close
-    }
-  }
-}
 
-trait ZooKeeperTestHarness extends JUnitSuite with Logging {
+trait ZooKeeperTestHarness extends JUnitSuite with Logging
   var zookeeper: EmbeddedZookeeper = null
   var zkPort: Int = -1
   var zkUtils: ZkUtils = null
@@ -59,31 +55,25 @@ trait ZooKeeperTestHarness extends JUnitSuite with Logging {
     System.getProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, "")
 
   @Before
-  def setUp() {
+  def setUp()
     zookeeper = new EmbeddedZookeeper()
     zkPort = zookeeper.port
     zkUtils = ZkUtils(zkConnect,
                       zkSessionTimeout,
                       zkConnectionTimeout,
                       JaasUtils.isZkSecurityEnabled())
-  }
 
   @After
-  def tearDown() {
+  def tearDown()
     if (zkUtils != null) CoreUtils.swallow(zkUtils.close())
     if (zookeeper != null) CoreUtils.swallow(zookeeper.shutdown())
 
     var isDown = false
-    while (!isDown) {
-      try {
+    while (!isDown)
+      try
         FourLetterWords.sendStat("127.0.0.1", zkPort, 3000)
-      } catch {
-        case _: Throwable => {
+      catch
+        case _: Throwable =>
             info("Server is down")
             isDown = true
-          }
-      }
-    }
     Configuration.setConfiguration(null)
-  }
-}

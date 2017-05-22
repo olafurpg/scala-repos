@@ -18,28 +18,24 @@ package org.saddle.buffer
 import it.unimi.dsi.fastutil.doubles.DoubleArrays
 import org.saddle.Buffer
 
-class BufferDouble(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Double] {
+class BufferDouble(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Double]
   var list = Array.ofDim[Double](sz)
   var count = 0
   var remain = sz
 
   def apply(loc: Int) = list(loc)
 
-  def add(i: Double) {
-    if (remain == 0) {
+  def add(i: Double)
+    if (remain == 0)
       remain = list.length
       list = DoubleArrays.setLength(list, remain * 2)
-    }
 
     list(count) = i
     count += 1
     remain -= 1
-  }
 
   def toArray: Array[Double] = DoubleArrays.copy(list, 0, count)
-}
 
-object BufferDouble {
+object BufferDouble
   def apply(sz: Int) = new BufferDouble(sz)
   def apply() = new BufferDouble()
-}

@@ -24,23 +24,19 @@ import scala.collection.mutable
 
 class EventServerPluginContext(
     val plugins: mutable.Map[String, mutable.Map[String, EventServerPlugin]],
-    val log: LoggingAdapter) {
+    val log: LoggingAdapter)
   def inputBlockers: Map[String, EventServerPlugin] =
     plugins.getOrElse(EventServerPlugin.inputBlocker, Map()).toMap
 
   def inputSniffers: Map[String, EventServerPlugin] =
     plugins.getOrElse(EventServerPlugin.inputSniffer, Map()).toMap
-}
 
-object EventServerPluginContext extends Logging {
-  def apply(log: LoggingAdapter): EventServerPluginContext = {
+object EventServerPluginContext extends Logging
+  def apply(log: LoggingAdapter): EventServerPluginContext =
     val plugins = mutable.Map[String, mutable.Map[String, EventServerPlugin]](
         EventServerPlugin.inputBlocker -> mutable.Map(),
         EventServerPlugin.inputSniffer -> mutable.Map())
     val serviceLoader = ServiceLoader.load(classOf[EventServerPlugin])
-    serviceLoader foreach { service =>
+    serviceLoader foreach  service =>
       plugins(service.pluginType) += service.pluginName -> service
-    }
     new EventServerPluginContext(plugins, log)
-  }
-}

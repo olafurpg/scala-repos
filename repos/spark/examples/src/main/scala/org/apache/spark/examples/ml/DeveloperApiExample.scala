@@ -35,9 +35,9 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
   * bin/run-example ml.DeveloperApiExample
   * }}}
   */
-object DeveloperApiExample {
+object DeveloperApiExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("DeveloperApiExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -72,25 +72,22 @@ object DeveloperApiExample {
       .transform(test.toDF())
       .select("features", "label", "prediction")
       .collect()
-      .map {
+      .map
         case Row(features: Vector, label: Double, prediction: Double) =>
           prediction
-      }
       .sum
     assert(
         sumPredictions == 0.0,
         "MyLogisticRegression predicted something other than 0, even though all coefficients are 0!")
 
     sc.stop()
-  }
-}
 
 /**
   * Example of defining a parameter trait for a user-defined type of [[Classifier]].
   *
   * NOTE: This is private since it is an example.  In practice, you may not want it to be private.
   */
-private trait MyLogisticRegressionParams extends ClassifierParams {
+private trait MyLogisticRegressionParams extends ClassifierParams
 
   /**
     * Param for max number of iterations
@@ -106,7 +103,6 @@ private trait MyLogisticRegressionParams extends ClassifierParams {
   val maxIter: IntParam = new IntParam(
       this, "maxIter", "max number of iterations")
   def getMaxIter: Int = $(maxIter)
-}
 
 /**
   * Example of defining a type of [[Classifier]].
@@ -115,7 +111,7 @@ private trait MyLogisticRegressionParams extends ClassifierParams {
   */
 private class MyLogisticRegression(override val uid: String)
     extends Classifier[Vector, MyLogisticRegression, MyLogisticRegressionModel]
-    with MyLogisticRegressionParams {
+    with MyLogisticRegressionParams
 
   def this() = this(Identifiable.randomUID("myLogReg"))
 
@@ -125,7 +121,7 @@ private class MyLogisticRegression(override val uid: String)
   def setMaxIter(value: Int): this.type = set(maxIter, value)
 
   // This method is used by fit()
-  override protected def train(dataset: DataFrame): MyLogisticRegressionModel = {
+  override protected def train(dataset: DataFrame): MyLogisticRegressionModel =
     // Extract columns from data using helper method.
     val oldDataset = extractLabeledPoints(dataset)
 
@@ -136,10 +132,8 @@ private class MyLogisticRegression(override val uid: String)
 
     // Create a model, and return it.
     new MyLogisticRegressionModel(uid, coefficients).setParent(this)
-  }
 
   override def copy(extra: ParamMap): MyLogisticRegression = defaultCopy(extra)
-}
 
 /**
   * Example of defining a type of [[ClassificationModel]].
@@ -149,7 +143,7 @@ private class MyLogisticRegression(override val uid: String)
 private class MyLogisticRegressionModel(
     override val uid: String, val coefficients: Vector)
     extends ClassificationModel[Vector, MyLogisticRegressionModel]
-    with MyLogisticRegressionParams {
+    with MyLogisticRegressionParams
 
   // This uses the default implementation of transform(), which reads column "features" and outputs
   // columns "prediction" and "rawPrediction."
@@ -167,12 +161,11 @@ private class MyLogisticRegressionModel(
     *          This raw prediction may be any real number, where a larger value indicates greater
     *          confidence for that label.
     */
-  override protected def predictRaw(features: Vector): Vector = {
+  override protected def predictRaw(features: Vector): Vector =
     val margin = BLAS.dot(features, coefficients)
     // There are 2 classes (binary classification), so we return a length-2 vector,
     // where index i corresponds to class i (i = 0, 1).
     Vectors.dense(-margin, margin)
-  }
 
   /** Number of classes the label can take.  2 indicates binary classification. */
   override val numClasses: Int = 2
@@ -186,9 +179,7 @@ private class MyLogisticRegressionModel(
     *
     * This is used for the default implementation of [[transform()]].
     */
-  override def copy(extra: ParamMap): MyLogisticRegressionModel = {
+  override def copy(extra: ParamMap): MyLogisticRegressionModel =
     copyValues(new MyLogisticRegressionModel(uid, coefficients), extra)
       .setParent(parent)
-  }
-}
 // scalastyle:on println

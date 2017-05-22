@@ -27,31 +27,28 @@ import org.scalajs.core.tools.logging._
 
 /** Checker for the validity of the IR. */
 private final class InfoChecker(
-    infoAndTrees: Traversable[(ClassInfo, ClassDef)], logger: Logger) {
+    infoAndTrees: Traversable[(ClassInfo, ClassDef)], logger: Logger)
 
   private var errorCount: Int = 0
 
-  def check(): Int = {
-    for ((info, classDef) <- infoAndTrees) {
+  def check(): Int =
+    for ((info, classDef) <- infoAndTrees)
       val generatedInfo = generateClassInfo(classDef)
       checkClassInfo(info, generatedInfo)
-    }
     errorCount
-  }
 
-  private def checkClassInfo(info: ClassInfo, expectedInfo: ClassInfo): Unit = {
+  private def checkClassInfo(info: ClassInfo, expectedInfo: ClassInfo): Unit =
     val className = expectedInfo.encodedName
 
     if (info.encodedName != expectedInfo.encodedName ||
         info.isExported != expectedInfo.isExported ||
         info.kind != expectedInfo.kind ||
         info.superClass != expectedInfo.superClass ||
-        info.interfaces.toSet != expectedInfo.interfaces.toSet) {
+        info.interfaces.toSet != expectedInfo.interfaces.toSet)
       errorCount += 1
       logger.error(s"Class info mismatch for $className")
       logger.error(s"Expected:\n${classInfoHeaderString(expectedInfo)}")
       logger.error(s"Got:\n${classInfoHeaderString(info)}")
-    }
 
     def methodID(methodInfo: MethodInfo) =
       (methodInfo.encodedName, methodInfo.isStatic)
@@ -62,30 +59,25 @@ private final class InfoChecker(
     val actualMethodIDs = actualMethods.keySet
     val expectedMethodIDs = expectedMethods.keySet
 
-    if (actualMethodIDs != expectedMethodIDs) {
+    if (actualMethodIDs != expectedMethodIDs)
       val missingMethods = expectedMethodIDs -- actualMethodIDs
-      if (missingMethods.nonEmpty) {
+      if (missingMethods.nonEmpty)
         errorCount += 1
         logger.error(s"Missing methods in $className: $missingMethods")
-      }
 
       val unexpectedMethods = actualMethodIDs -- expectedMethodIDs
-      if (unexpectedMethods.nonEmpty) {
+      if (unexpectedMethods.nonEmpty)
         errorCount += 1
         logger.error(s"Unexpected methods in $className: $unexpectedMethods")
-      }
-    }
 
-    for {
+    for
       (id, actualMethodInfo) <- actualMethods
       expectedMethodInfo <- expectedMethods.get(id)
-    } {
+    
       checkMethodInfo(className, actualMethodInfo, expectedMethodInfo)
-    }
-  }
 
   private def checkMethodInfo(
-      className: String, info: MethodInfo, expectedInfo: MethodInfo): Unit = {
+      className: String, info: MethodInfo, expectedInfo: MethodInfo): Unit =
 
     /* Note that it is fine for the actual info to contain *more* than the
      * expected info. It can produce non-optimal results, but it is still
@@ -95,20 +87,16 @@ private final class InfoChecker(
      * immediately to a js.FunctionN.
      */
 
-    def listIncludes(actual: List[String], expected: List[String]) = {
+    def listIncludes(actual: List[String], expected: List[String]) =
       val actualSet = actual.toSet
       expected.forall(actualSet)
-    }
 
     def mapIncludes(actual: Map[String, List[String]],
-                    expected: Map[String, List[String]]) = {
-      expected forall {
+                    expected: Map[String, List[String]]) =
+      expected forall
         case (cls, expectedMethods) =>
-          actual.get(cls) exists { actualMethods =>
+          actual.get(cls) exists  actualMethods =>
             listIncludes(actualMethods, expectedMethods)
-          }
-      }
-    }
 
     if (info.encodedName != expectedInfo.encodedName ||
         info.isStatic != expectedInfo.isStatic ||
@@ -122,39 +110,32 @@ private final class InfoChecker(
             info.instantiatedClasses, expectedInfo.instantiatedClasses) ||
         !listIncludes(info.accessedModules, expectedInfo.accessedModules) ||
         !listIncludes(info.usedInstanceTests, expectedInfo.usedInstanceTests) ||
-        !listIncludes(info.accessedClassData, expectedInfo.accessedClassData)) {
+        !listIncludes(info.accessedClassData, expectedInfo.accessedClassData))
       errorCount += 1
       logger.error(
           s"Method info mismatch for $className.${expectedInfo.encodedName}" +
           (if (expectedInfo.isStatic) " (static)" else ""))
       logger.error(s"Expected:\n${methodInfoString(expectedInfo)}")
       logger.error(s"Got:\n${methodInfoString(info)}")
-    }
-  }
 
-  private def classInfoHeaderString(info: ClassInfo): String = {
+  private def classInfoHeaderString(info: ClassInfo): String =
     val writer = new StringWriter
     val printer = new InfoPrinter(writer)
     printer.printClassInfoHeader(info)
     writer.toString()
-  }
 
-  private def methodInfoString(info: MethodInfo): String = {
+  private def methodInfoString(info: MethodInfo): String =
     val writer = new StringWriter
     val printer = new InfoPrinter(writer)
     printer.print(info)
     writer.toString()
-  }
-}
 
-object InfoChecker {
+object InfoChecker
 
   /** Checks that the `ClassInfo`s associated with `ClassDef`s are correct.
     *
     *  @return Count of info checking errors (0 in case of success)
     */
   def check(infoAndTrees: Traversable[(ClassInfo, ClassDef)],
-            logger: Logger): Int = {
+            logger: Logger): Int =
     new InfoChecker(infoAndTrees, logger).check()
-  }
-}

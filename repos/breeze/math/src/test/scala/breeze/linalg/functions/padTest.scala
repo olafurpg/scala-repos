@@ -9,13 +9,13 @@ import org.scalatest.FunSuite
   * @date 04/16/2014.
   */
 @RunWith(classOf[JUnitRunner])
-class padTest extends FunSuite {
+class padTest extends FunSuite
 
   val testDVI = DenseVector(1, 2, 3, 4, 5)
   val testDMI = DenseMatrix(1, 2, 3, 4, 5)
   val testDVD = DenseVector(1d, 2d, 3d, 4d, 5d)
 
-  test("padRight") {
+  test("padRight")
 
     import breeze.linalg.Options._
 
@@ -68,5 +68,3 @@ class padTest extends FunSuite {
                                                                 (0, 0, 5)))
     assert(padLeft(testDMI, dimensions = (3, 3), 0) == DenseMatrix(
             (0, 0, 3), (0, 0, 4), (0, 0, 5)))
-  }
-}

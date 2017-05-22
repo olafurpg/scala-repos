@@ -31,7 +31,7 @@ import org.apache.spark.util.{RedirectThread, Utils}
 
 private[spark] class PythonWorkerFactory(
     pythonExec: String, envVars: Map[String, String])
-    extends Logging {
+    extends Logging
 
   import PythonWorkerFactory._
 
@@ -56,44 +56,38 @@ private[spark] class PythonWorkerFactory(
       envVars.getOrElse("PYTHONPATH", ""),
       sys.env.getOrElse("PYTHONPATH", ""))
 
-  def create(): Socket = {
-    if (useDaemon) {
-      synchronized {
-        if (idleWorkers.size > 0) {
+  def create(): Socket =
+    if (useDaemon)
+      synchronized
+        if (idleWorkers.size > 0)
           return idleWorkers.dequeue()
-        }
-      }
       createThroughDaemon()
-    } else {
+    else
       createSimpleWorker()
-    }
-  }
 
   /**
     * Connect to a worker launched through pyspark/daemon.py, which forks python processes itself
     * to avoid the high cost of forking from Java. This currently only works on UNIX-based systems.
     */
-  private def createThroughDaemon(): Socket = {
+  private def createThroughDaemon(): Socket =
 
-    def createSocket(): Socket = {
+    def createSocket(): Socket =
       val socket = new Socket(daemonHost, daemonPort)
       val pid = new DataInputStream(socket.getInputStream).readInt()
-      if (pid < 0) {
+      if (pid < 0)
         throw new IllegalStateException(
             "Python daemon failed to launch worker with code " + pid)
-      }
       daemonWorkers.put(socket, pid)
       socket
-    }
 
-    synchronized {
+    synchronized
       // Start the daemon if it hasn't been started
       startDaemon()
 
       // Attempt to connect, restart and retry once if it fails
-      try {
+      try
         createSocket()
-      } catch {
+      catch
         case exc: SocketException =>
           logWarning("Failed to open socket to Python daemon:", exc)
           logWarning(
@@ -101,16 +95,13 @@ private[spark] class PythonWorkerFactory(
           stopDaemon()
           startDaemon()
           createSocket()
-      }
-    }
-  }
 
   /**
     * Launch a worker by executing worker.py directly and telling it to connect to us.
     */
-  private def createSimpleWorker(): Socket = {
+  private def createSimpleWorker(): Socket =
     var serverSocket: ServerSocket = null
-    try {
+    try
       serverSocket = new ServerSocket(
           0, 1, InetAddress.getByAddress(Array(127, 0, 0, 1)))
 
@@ -135,31 +126,26 @@ private[spark] class PythonWorkerFactory(
 
       // Wait for it to connect to our socket
       serverSocket.setSoTimeout(10000)
-      try {
+      try
         val socket = serverSocket.accept()
         simpleWorkers.put(socket, worker)
         return socket
-      } catch {
+      catch
         case e: Exception =>
           throw new SparkException(
               "Python worker did not connect back in time", e)
-      }
-    } finally {
-      if (serverSocket != null) {
+    finally
+      if (serverSocket != null)
         serverSocket.close()
-      }
-    }
     null
-  }
 
-  private def startDaemon() {
-    synchronized {
+  private def startDaemon()
+    synchronized
       // Is it already running?
-      if (daemon != null) {
+      if (daemon != null)
         return
-      }
 
-      try {
+      try
         // Create and start the daemon
         val pb =
           new ProcessBuilder(Arrays.asList(pythonExec, "-m", "pyspark.daemon"))
@@ -175,16 +161,16 @@ private[spark] class PythonWorkerFactory(
 
         // Redirect daemon stdout and stderr
         redirectStreamsToStderr(in, daemon.getErrorStream)
-      } catch {
+      catch
         case e: Exception =>
           // If the daemon exists, wait for it to finish and get its stderr
-          val stderr = Option(daemon).flatMap { d =>
+          val stderr = Option(daemon).flatMap  d =>
             Utils.getStderr(d, PROCESS_WAIT_TIMEOUT_MS)
-          }.getOrElse("")
+          .getOrElse("")
 
           stopDaemon()
 
-          if (stderr != "") {
+          if (stderr != "")
             val formattedStderr = stderr.replace("\n", "\n  ")
             val errorMessage = s"""
               |Error from python worker:
@@ -197,127 +183,97 @@ private[spark] class PythonWorkerFactory(
             val wrappedException = new SparkException(errorMessage.stripMargin)
             wrappedException.setStackTrace(e.getStackTrace)
             throw wrappedException
-          } else {
+          else
             throw e
-          }
-      }
 
       // Important: don't close daemon's stdin (daemon.getOutputStream) so it can correctly
       // detect our disappearance.
-    }
-  }
 
   /**
     * Redirect the given streams to our stderr in separate threads.
     */
   private def redirectStreamsToStderr(
-      stdout: InputStream, stderr: InputStream) {
-    try {
+      stdout: InputStream, stderr: InputStream)
+    try
       new RedirectThread(stdout, System.err, "stdout reader for " + pythonExec)
         .start()
       new RedirectThread(stderr, System.err, "stderr reader for " + pythonExec)
         .start()
-    } catch {
+    catch
       case e: Exception =>
         logError("Exception in redirecting streams", e)
-    }
-  }
 
   /**
     * Monitor all the idle workers, kill them after timeout.
     */
   private class MonitorThread
-      extends Thread(s"Idle Worker Monitor for $pythonExec") {
+      extends Thread(s"Idle Worker Monitor for $pythonExec")
 
     setDaemon(true)
 
-    override def run() {
-      while (true) {
-        synchronized {
+    override def run()
+      while (true)
+        synchronized
           if (lastActivity + IDLE_WORKER_TIMEOUT_MS < System.currentTimeMillis(
-                  )) {
+                  ))
             cleanupIdleWorkers()
             lastActivity = System.currentTimeMillis()
-          }
-        }
         Thread.sleep(10000)
-      }
-    }
-  }
 
-  private def cleanupIdleWorkers() {
-    while (idleWorkers.length > 0) {
+  private def cleanupIdleWorkers()
+    while (idleWorkers.length > 0)
       val worker = idleWorkers.dequeue()
-      try {
+      try
         // the worker will exit after closing the socket
         worker.close()
-      } catch {
+      catch
         case e: Exception =>
           logWarning("Failed to close worker socket", e)
-      }
-    }
-  }
 
-  private def stopDaemon() {
-    synchronized {
-      if (useDaemon) {
+  private def stopDaemon()
+    synchronized
+      if (useDaemon)
         cleanupIdleWorkers()
 
         // Request shutdown of existing daemon by sending SIGTERM
-        if (daemon != null) {
+        if (daemon != null)
           daemon.destroy()
-        }
 
         daemon = null
         daemonPort = 0
-      } else {
+      else
         simpleWorkers.mapValues(_.destroy())
-      }
-    }
-  }
 
-  def stop() {
+  def stop()
     stopDaemon()
-  }
 
-  def stopWorker(worker: Socket) {
-    synchronized {
-      if (useDaemon) {
-        if (daemon != null) {
-          daemonWorkers.get(worker).foreach { pid =>
+  def stopWorker(worker: Socket)
+    synchronized
+      if (useDaemon)
+        if (daemon != null)
+          daemonWorkers.get(worker).foreach  pid =>
             // tell daemon to kill worker by pid
             val output = new DataOutputStream(daemon.getOutputStream)
             output.writeInt(pid)
             output.flush()
             daemon.getOutputStream.flush()
-          }
-        }
-      } else {
+      else
         simpleWorkers.get(worker).foreach(_.destroy())
-      }
-    }
     worker.close()
-  }
 
-  def releaseWorker(worker: Socket) {
-    if (useDaemon) {
-      synchronized {
+  def releaseWorker(worker: Socket)
+    if (useDaemon)
+      synchronized
         lastActivity = System.currentTimeMillis()
         idleWorkers.enqueue(worker)
-      }
-    } else {
+    else
       // Cleanup the worker socket. This will also cause the Python worker to exit.
-      try {
+      try
         worker.close()
-      } catch {
+      catch
         case e: Exception =>
           logWarning("Failed to close worker socket", e)
-      }
-    }
-  }
-}
 
-private object PythonWorkerFactory {
+private object PythonWorkerFactory
   val PROCESS_WAIT_TIMEOUT_MS = 10000
   val IDLE_WORKER_TIMEOUT_MS = 60000 // kill idle workers after 1 minute
-}

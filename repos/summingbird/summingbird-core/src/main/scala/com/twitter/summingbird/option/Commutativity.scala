@@ -30,7 +30,7 @@ case object Commutative extends Commutativity
   * We do this so we can use the classOf[MonoidIsCommutative]
   * as the key for the option.
   */
-object MonoidIsCommutative {
+object MonoidIsCommutative
 
   /**
     * Assume false unless the user says otherwise
@@ -41,10 +41,8 @@ object MonoidIsCommutative {
     * True if the Monoid is commutative, false otherwise.
     */
   def apply(isCommutative: Boolean): MonoidIsCommutative =
-    if (isCommutative) {
+    if (isCommutative)
       MonoidIsCommutative(Commutative)
-    } else {
+    else
       default
-    }
-}
 case class MonoidIsCommutative(commutativity: Commutativity)

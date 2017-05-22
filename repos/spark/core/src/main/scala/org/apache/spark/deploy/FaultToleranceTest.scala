@@ -58,7 +58,7 @@ import org.apache.spark.util.Utils
   *   - The docker images tagged spark-test-master and spark-test-worker are built from the
   *     docker/ directory. Run 'docker/spark-test/build' to generate these.
   */
-private object FaultToleranceTest extends App with Logging {
+private object FaultToleranceTest extends App with Logging
 
   private val conf = new SparkConf()
   private val ZK_DIR = conf.get("spark.deploy.zookeeper.dir", "/spark")
@@ -80,33 +80,29 @@ private object FaultToleranceTest extends App with Logging {
 
   System.setProperty("spark.driver.host", "172.17.42.1") // default docker host ip
 
-  private def afterEach() {
-    if (sc != null) {
+  private def afterEach()
+    if (sc != null)
       sc.stop()
       sc = null
-    }
     terminateCluster()
 
     // Clear ZK directories in between tests (for speed purposes)
     SparkCuratorUtil.deleteRecursive(zk, ZK_DIR + "/spark_leader")
     SparkCuratorUtil.deleteRecursive(zk, ZK_DIR + "/master_status")
-  }
 
-  test("sanity-basic") {
+  test("sanity-basic")
     addMasters(1)
     addWorkers(1)
     createClient()
     assertValidClusterState()
-  }
 
-  test("sanity-many-masters") {
+  test("sanity-many-masters")
     addMasters(3)
     addWorkers(3)
     createClient()
     assertValidClusterState()
-  }
 
-  test("single-master-halt") {
+  test("single-master-halt")
     addMasters(3)
     addWorkers(2)
     createClient()
@@ -117,9 +113,8 @@ private object FaultToleranceTest extends App with Logging {
     assertValidClusterState()
     createClient()
     assertValidClusterState()
-  }
 
-  test("single-master-restart") {
+  test("single-master-restart")
     addMasters(1)
     addWorkers(2)
     createClient()
@@ -134,9 +129,8 @@ private object FaultToleranceTest extends App with Logging {
     addMasters(1)
     delay(30 seconds)
     assertValidClusterState()
-  }
 
-  test("cluster-failure") {
+  test("cluster-failure")
     addMasters(2)
     addWorkers(2)
     createClient()
@@ -146,9 +140,8 @@ private object FaultToleranceTest extends App with Logging {
     addMasters(2)
     addWorkers(2)
     assertValidClusterState()
-  }
 
-  test("all-but-standby-failure") {
+  test("all-but-standby-failure")
     addMasters(2)
     addWorkers(2)
     createClient()
@@ -160,9 +153,8 @@ private object FaultToleranceTest extends App with Logging {
     delay(30 seconds)
     addWorkers(2)
     assertValidClusterState()
-  }
 
-  test("rolling-outage") {
+  test("rolling-outage")
     addMasters(1)
     delay()
     addMasters(1)
@@ -173,50 +165,42 @@ private object FaultToleranceTest extends App with Logging {
     assertValidClusterState()
     assertTrue(getLeader == masters.head)
 
-    (1 to 3).foreach { _ =>
+    (1 to 3).foreach  _ =>
       killLeader()
       delay(30 seconds)
       assertValidClusterState()
       assertTrue(getLeader == masters.head)
       addMasters(1)
-    }
-  }
 
-  private def test(name: String)(fn: => Unit) {
-    try {
+  private def test(name: String)(fn: => Unit)
+    try
       fn
       numPassed += 1
       logInfo("==============================================")
       logInfo("Passed: " + name)
       logInfo("==============================================")
-    } catch {
+    catch
       case e: Exception =>
         numFailed += 1
         logInfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         logError("FAILED: " + name, e)
         logInfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         sys.exit(1)
-    }
     afterEach()
-  }
 
-  private def addMasters(num: Int) {
+  private def addMasters(num: Int)
     logInfo(s">>>>> ADD MASTERS $num <<<<<")
-    (1 to num).foreach { _ =>
+    (1 to num).foreach  _ =>
       masters += SparkDocker.startMaster(dockerMountDir)
-    }
-  }
 
-  private def addWorkers(num: Int) {
+  private def addWorkers(num: Int)
     logInfo(s">>>>> ADD WORKERS $num <<<<<")
     val masterUrls = getMasterUrls(masters)
-    (1 to num).foreach { _ =>
+    (1 to num).foreach  _ =>
       workers += SparkDocker.startWorker(dockerMountDir, masterUrls)
-    }
-  }
 
   /** Creates a SparkContext, which constructs a Client to interact with our cluster. */
-  private def createClient() = {
+  private def createClient() =
     logInfo(">>>>> CREATE CLIENT <<<<<")
     if (sc != null) { sc.stop() }
     // Counter-hack: Because of a hack in SparkEnv#create() that changes this
@@ -224,60 +208,52 @@ private object FaultToleranceTest extends App with Logging {
     System.setProperty("spark.driver.port", "0")
     sc = new SparkContext(
         getMasterUrls(masters), "fault-tolerance", containerSparkHome)
-  }
 
-  private def getMasterUrls(masters: Seq[TestMasterInfo]): String = {
+  private def getMasterUrls(masters: Seq[TestMasterInfo]): String =
     "spark://" + masters.map(master => master.ip + ":7077").mkString(",")
-  }
 
-  private def getLeader: TestMasterInfo = {
+  private def getLeader: TestMasterInfo =
     val leaders = masters.filter(_.state == RecoveryState.ALIVE)
     assertTrue(leaders.size == 1)
     leaders(0)
-  }
 
-  private def killLeader(): Unit = {
+  private def killLeader(): Unit =
     logInfo(">>>>> KILL LEADER <<<<<")
     masters.foreach(_.readState())
     val leader = getLeader
     masters -= leader
     leader.kill()
-  }
 
   private def delay(secs: Duration = 5.seconds) = Thread.sleep(secs.toMillis)
 
-  private def terminateCluster() {
+  private def terminateCluster()
     logInfo(">>>>> TERMINATE CLUSTER <<<<<")
     masters.foreach(_.kill())
     workers.foreach(_.kill())
     masters.clear()
     workers.clear()
-  }
 
   /** This includes Client retry logic, so it may take a while if the cluster is recovering. */
-  private def assertUsable() = {
-    val f = Future {
-      try {
+  private def assertUsable() =
+    val f = Future
+      try
         val res = sc.parallelize(0 until 10).collect()
         assertTrue(res.toList == (0 until 10).toList)
         true
-      } catch {
+      catch
         case e: Exception =>
           logError("assertUsable() had exception", e)
           e.printStackTrace()
           false
-      }
-    }
 
     // Avoid waiting indefinitely (e.g., we could register but get no executors).
     assertTrue(Await.result(f, 120 seconds))
-  }
 
   /**
     * Asserts that the cluster is usable and that the expected masters and workers
     * are all alive in a proper configuration (e.g., only one leader).
     */
-  private def assertValidClusterState() = {
+  private def assertValidClusterState() =
     logInfo(">>>>> ASSERT VALID CLUSTER STATE <<<<<")
     assertUsable()
     var numAlive = 0
@@ -285,14 +261,13 @@ private object FaultToleranceTest extends App with Logging {
     var numLiveApps = 0
     var liveWorkerIPs: Seq[String] = List()
 
-    def stateValid(): Boolean = {
+    def stateValid(): Boolean =
       (workers.map(_.ip) -- liveWorkerIPs).isEmpty && numAlive == 1 &&
       numStandby == masters.size - 1 && numLiveApps >= 1
-    }
 
-    val f = Future {
-      try {
-        while (!stateValid()) {
+    val f = Future
+      try
+        while (!stateValid())
           Thread.sleep(1000)
 
           numAlive = 0
@@ -301,30 +276,25 @@ private object FaultToleranceTest extends App with Logging {
 
           masters.foreach(_.readState())
 
-          for (master <- masters) {
-            master.state match {
+          for (master <- masters)
+            master.state match
               case RecoveryState.ALIVE =>
                 numAlive += 1
                 liveWorkerIPs = master.liveWorkerIPs
               case RecoveryState.STANDBY =>
                 numStandby += 1
               case _ => // ignore
-            }
 
             numLiveApps += master.numLiveApps
-          }
-        }
         true
-      } catch {
+      catch
         case e: Exception =>
           logError("assertValidClusterState() had exception", e)
           false
-      }
-    }
 
-    try {
+    try
       assertTrue(Await.result(f, 120 seconds))
-    } catch {
+    catch
       case e: TimeoutException =>
         logError("Master states: " + masters.map(_.state))
         logError("Num apps: " + numLiveApps)
@@ -333,23 +303,18 @@ private object FaultToleranceTest extends App with Logging {
             liveWorkerIPs)
         throw new RuntimeException(
             "Failed to get into acceptable cluster state after 2 min.", e)
-    }
-  }
 
-  private def assertTrue(bool: Boolean, message: String = "") {
-    if (!bool) {
+  private def assertTrue(bool: Boolean, message: String = "")
+    if (!bool)
       throw new IllegalStateException("Assertion failed: " + message)
-    }
-  }
 
   logInfo(
       "Ran %s tests, %s passed and %s failed".format(
           numPassed + numFailed, numPassed, numFailed))
-}
 
 private class TestMasterInfo(
     val ip: String, val dockerId: DockerId, val logFile: File)
-    extends Logging {
+    extends Logging
 
   implicit val formats = org.json4s.DefaultFormats
   var state: RecoveryState.Value = _
@@ -358,8 +323,8 @@ private class TestMasterInfo(
 
   logDebug("Created master: " + this)
 
-  def readState() {
-    try {
+  def readState()
+    try
       val masterStream = new InputStreamReader(
           new URL("http://%s:8080/json".format(ip)).openStream,
           StandardCharsets.UTF_8)
@@ -370,12 +335,11 @@ private class TestMasterInfo(
         workers.children.filter(w => (w \ "state").extract[String] == "ALIVE")
       // Extract the worker IP from "webuiaddress" (rather than "host") because the host name
       // on containers is a weird hash instead of the actual IP address.
-      liveWorkerIPs = liveWorkers.map { w =>
+      liveWorkerIPs = liveWorkers.map  w =>
         (w \ "webuiaddress")
           .extract[String]
           .stripPrefix("http://")
           .stripSuffix(":8081")
-      }
 
       numLiveApps = (json \ "activeapps").children.size
 
@@ -384,23 +348,20 @@ private class TestMasterInfo(
       state = RecoveryState.values
         .filter(state => state.toString == stateString)
         .head
-    } catch {
+    catch
       case e: Exception =>
         // ignore, no state update
         logWarning("Exception", e)
-    }
-  }
 
   def kill() { Docker.kill(dockerId) }
 
   override def toString: String =
     "[ip=%s, id=%s, logFile=%s, state=%s]".format(
         ip, dockerId.id, logFile.getAbsolutePath, state)
-}
 
 private class TestWorkerInfo(
     val ip: String, val dockerId: DockerId, val logFile: File)
-    extends Logging {
+    extends Logging
 
   implicit val formats = org.json4s.DefaultFormats
 
@@ -410,67 +371,55 @@ private class TestWorkerInfo(
 
   override def toString: String =
     "[ip=%s, id=%s, logFile=%s]".format(ip, dockerId, logFile.getAbsolutePath)
-}
 
-private object SparkDocker {
-  def startMaster(mountDir: String): TestMasterInfo = {
+private object SparkDocker
+  def startMaster(mountDir: String): TestMasterInfo =
     val cmd = Docker.makeRunCmd("spark-test-master", mountDir = mountDir)
     val (ip, id, outFile) = startNode(cmd)
     new TestMasterInfo(ip, id, outFile)
-  }
 
-  def startWorker(mountDir: String, masters: String): TestWorkerInfo = {
+  def startWorker(mountDir: String, masters: String): TestWorkerInfo =
     val cmd = Docker.makeRunCmd(
         "spark-test-worker", args = masters, mountDir = mountDir)
     val (ip, id, outFile) = startNode(cmd)
     new TestWorkerInfo(ip, id, outFile)
-  }
 
-  private def startNode(dockerCmd: ProcessBuilder): (String, DockerId, File) = {
+  private def startNode(dockerCmd: ProcessBuilder): (String, DockerId, File) =
     val ipPromise = Promise[String]()
     val outFile =
       File.createTempFile("fault-tolerance-test", "", Utils.createTempDir())
     val outStream: FileWriter = new FileWriter(outFile)
-    def findIpAndLog(line: String): Unit = {
-      if (line.startsWith("CONTAINER_IP=")) {
+    def findIpAndLog(line: String): Unit =
+      if (line.startsWith("CONTAINER_IP="))
         val ip = line.split("=")(1)
         ipPromise.success(ip)
-      }
 
       outStream.write(line + "\n")
       outStream.flush()
-    }
 
     dockerCmd.run(ProcessLogger(findIpAndLog _))
     val ip = Await.result(ipPromise.future, 30 seconds)
     val dockerId = Docker.getLastProcessId
     (ip, dockerId, outFile)
-  }
-}
 
-private class DockerId(val id: String) {
+private class DockerId(val id: String)
   override def toString: String = id
-}
 
-private object Docker extends Logging {
+private object Docker extends Logging
   def makeRunCmd(imageTag: String,
                  args: String = "",
-                 mountDir: String = ""): ProcessBuilder = {
+                 mountDir: String = ""): ProcessBuilder =
     val mountCmd = if (mountDir != "") { " -v " + mountDir } else ""
 
     val cmd =
       "docker run -privileged %s %s %s".format(mountCmd, imageTag, args)
     logDebug("Run command: " + cmd)
     cmd
-  }
 
-  def kill(dockerId: DockerId): Unit = {
+  def kill(dockerId: DockerId): Unit =
     "docker kill %s".format(dockerId.id).!
-  }
 
-  def getLastProcessId: DockerId = {
+  def getLastProcessId: DockerId =
     var id: String = null
     "docker ps -l -q".!(ProcessLogger(line => id = line))
     new DockerId(id)
-  }
-}

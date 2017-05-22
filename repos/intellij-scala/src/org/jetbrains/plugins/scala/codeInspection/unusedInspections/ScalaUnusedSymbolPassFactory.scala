@@ -8,7 +8,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 
 class ScalaUnusedSymbolPassFactory(project: Project)
-    extends TextEditorHighlightingPassFactory {
+    extends TextEditorHighlightingPassFactory
   TextEditorHighlightingPassRegistrar
     .getInstance(project)
     .registerTextEditorHighlightingPass(
@@ -19,13 +19,11 @@ class ScalaUnusedSymbolPassFactory(project: Project)
   def projectOpened() {}
 
   def createHighlightingPass(
-      file: PsiFile, editor: Editor): TextEditorHighlightingPass = {
+      file: PsiFile, editor: Editor): TextEditorHighlightingPass =
     new ScalaUnusedSymbolPass(file, editor)
-  }
 
   def initComponent() {}
 
   def disposeComponent() {}
 
   def getComponentName: String = "Scala Unused symbol pass factory"
-}

@@ -1,7 +1,7 @@
 import language.experimental.macros
 import scala.reflect.macros.blackbox.Context
 
-object Macros {
+object Macros
   def implUU(c: Context)(x: c.Tree): c.Tree = x
   def implTU(c: Context)(x: c.Expr[Int]): c.Tree = x.tree
   def implUT(c: Context)(x: c.Tree): c.Expr[Int] = c.Expr[Int](x)
@@ -11,4 +11,3 @@ object Macros {
   def fooTU(x: Int): Int = macro implTU
   def fooUT(x: Int): Int = macro implUT
   def fooTT(x: Int): Int = macro implTT
-}

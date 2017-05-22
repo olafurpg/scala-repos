@@ -24,43 +24,42 @@ import org.jetbrains.plugins.scala.project.settings.ScalaCompilerSettings
   * @author Pavel Fatin
   */
 class LanguageFeatureInspection
-    extends AbstractInspection("LanguageFeature", "Advanced language features") {
+    extends AbstractInspection("LanguageFeature", "Advanced language features")
   private val Features = Seq(Feature("postfix operator notation",
                                      "scala.language",
                                      "postfixOps",
                                      _.postfixOps,
-                                     _.postfixOps = true) {
+                                     _.postfixOps = true)
                                case e: ScPostfixExpr => e.operation
-                             },
+                             ,
                              Feature("reflective call",
                                      "scala.language",
                                      "reflectiveCalls",
                                      _.reflectiveCalls,
-                                     _.reflectiveCalls = true) {
+                                     _.reflectiveCalls = true)
                                case e @ ReferenceTarget(
                                    Parent(_: ScRefinement)) =>
-                                 e.getLastChild match {
+                                 e.getLastChild match
                                    case id @ ElementType(
                                        ScalaTokenTypes.tIDENTIFIER) =>
                                      id
                                    case _ => e
-                                 }
-                             },
+                             ,
                              Feature("dynamic member selection",
                                      "scala.language",
                                      "dynamics",
                                      _.dynamics,
-                                     _.dynamics = true) {
+                                     _.dynamics = true)
                                case e @ ReferenceTarget(ClassQualifiedName(
                                    "scala.Dynamic")) && Parent(
                                    Parent(Parent(_: ScClassParents))) =>
                                  e
-                             },
+                             ,
                              Feature("implicit conversion",
                                      "scala.language",
                                      "implicitConversions",
                                      _.implicitConversions,
-                                     _.implicitConversions = true) {
+                                     _.implicitConversions = true)
                                case e: ScFunctionDefinition
                                    if e.getModifierList.has(
                                        ScalaTokenTypes.kIMPLICIT) &&
@@ -70,60 +69,57 @@ class LanguageFeatureInspection
                                  Option(e.getModifierList.findFirstChildByType(
                                          ScalaTokenTypes.kIMPLICIT))
                                    .getOrElse(e)
-                             },
+                             ,
                              Feature("higher-kinded type",
                                      "scala.language",
                                      "higherKinds",
                                      _.higherKinds,
-                                     _.higherKinds = true) {
+                                     _.higherKinds = true)
                                case (e: ScTypeParamClause) && Parent(Parent(_: ScTypeParamClause)) =>
                                  e
                                case (e: ScTypeParamClause) && Parent(
                                    _: ScTypeAliasDeclaration) =>
                                  e
-                             },
+                             ,
                              Feature("existential type",
                                      "scala.language",
                                      "existentials",
                                      _.existentials,
-                                     _.existentials = true) {
+                                     _.existentials = true)
                                case e: ScExistentialClause =>
                                  e.firstChild.getOrElse(e) // TODO Exclude reducible existential types
-                             },
+                             ,
                              Feature("macro definition",
                                      "scala.language.experimental",
                                      "macros",
                                      _.macros,
-                                     _.macros = true) {
+                                     _.macros = true)
                                case e: ScMacroDefinition =>
                                  e.children
                                    .find(it => it.getText == "macro")
                                    .getOrElse(e)
-                             })
+                             )
 
-  override def actionFor(holder: ProblemsHolder) = PartialFunction.apply {
+  override def actionFor(holder: ProblemsHolder) = PartialFunction.apply
     e: PsiElement =>
       val module = ModuleUtilCore.findModuleForPsiElement(e)
 
       if (module != null &&
-          module.scalaSdk.exists(_.languageLevel >= Scala_2_10)) {
+          module.scalaSdk.exists(_.languageLevel >= Scala_2_10))
         Features.foreach(_.process(e, holder))
-      }
-  }
-}
 
 private case class Feature(name: String,
                            flagQualifier: String,
                            flagName: String,
                            isEnabled: ScalaCompilerSettings => Boolean,
                            enable: ScalaCompilerSettings => Unit)(
-    findIn: PartialFunction[PsiElement, PsiElement]) {
+    findIn: PartialFunction[PsiElement, PsiElement])
 
-  def process(e: PsiElement, holder: ProblemsHolder) {
-    e.module.foreach { module =>
-      if (!isEnabled(module.scalaCompilerSettings)) {
-        findIn.lift(e).foreach { it =>
-          if (!isFlagImportedFor(it)) {
+  def process(e: PsiElement, holder: ProblemsHolder)
+    e.module.foreach  module =>
+      if (!isEnabled(module.scalaCompilerSettings))
+        findIn.lift(e).foreach  it =>
+          if (!isFlagImportedFor(it))
             holder.registerProblem(
                 it,
                 "Advanced language feature: " + name,
@@ -131,40 +127,28 @@ private case class Feature(name: String,
                     it, name, flagQualifier + "." + flagName),
                 new EnableFeatureFix(
                     module.scalaCompilerSettings, it, name, enable))
-          }
-        }
-      }
-    }
-  }
 
-  private def isFlagImportedFor(e: PsiElement): Boolean = {
-    ScalaPsiElementFactory.createReferenceFromText(flagName, e, e).resolve() match {
+  private def isFlagImportedFor(e: PsiElement): Boolean =
+    ScalaPsiElementFactory.createReferenceFromText(flagName, e, e).resolve() match
       case e: ScReferencePattern =>
         Option(e.containingClass).exists(_.qualifiedName == flagQualifier)
       case _ => false
-    }
-  }
-}
 
 private class ImportFeatureFlagFix(e: PsiElement, name: String, flag: String)
     extends AbstractFixOnPsiElement(
-        "Import feature flag for %ss".format(name), e) {
+        "Import feature flag for %ss".format(name), e)
 
-  def doApplyFix(project: Project) {
+  def doApplyFix(project: Project)
     val elem = getElement
     val importsHolder =
       ScalaImportTypeFix.getImportHolder(elem, elem.getProject)
     importsHolder.addImportForPath(flag, elem)
-  }
-}
 
 private class EnableFeatureFix(settings: => ScalaCompilerSettings,
                                e: PsiElement,
                                name: String,
                                f: ScalaCompilerSettings => Unit)
-    extends AbstractFixOnPsiElement("Enable " + name + "s", e) {
+    extends AbstractFixOnPsiElement("Enable " + name + "s", e)
 
-  def doApplyFix(project: Project) {
+  def doApplyFix(project: Project)
     f(settings)
-  }
-}

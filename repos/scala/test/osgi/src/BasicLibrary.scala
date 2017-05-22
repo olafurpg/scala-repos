@@ -15,18 +15,16 @@ import org.osgi.framework.BundleContext
 
 @RunWith(classOf[PaxExam])
 @ExamReactorStrategy(Array(classOf[PerMethod]))
-class BasicLibraryTest extends ScalaOsgiHelper {
+class BasicLibraryTest extends ScalaOsgiHelper
   @Configuration
   def config(): Array[exam.Option] =
     justCoreLibraryOptions
 
   @Test
-  def everythingLoads(): Unit = {
+  def everythingLoads(): Unit =
     // Note - This tests sun.misc usage.
     import scala.concurrent._
     import scala.concurrent.duration.Duration.Inf
     import ExecutionContext.Implicits._
     val x = Future(2) map (_ + 1)
     assertEquals(3, Await.result(x, Inf))
-  }
-}

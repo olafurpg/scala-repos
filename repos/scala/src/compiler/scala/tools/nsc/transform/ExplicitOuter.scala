@@ -17,7 +17,7 @@ import scala.collection.mutable.ListBuffer
   *  @version 1.0
   */
 abstract class ExplicitOuter
-    extends InfoTransform with TypingTransformers with ast.TreeDSL {
+    extends InfoTransform with TypingTransformers with ast.TreeDSL
   import global._
   import definitions._
   import CODE._
@@ -38,16 +38,15 @@ abstract class ExplicitOuter
   private def isInner(clazz: Symbol) =
     !clazz.isPackageClass && !clazz.outerClass.isStaticOwner
 
-  private def haveSameOuter(parent: Type, clazz: Symbol) = {
+  private def haveSameOuter(parent: Type, clazz: Symbol) =
     val owner = clazz.owner
     val parentSym = parent.typeSymbol
 
     parentSym.isClass && owner.isClass && (owner isSubClass parentSym.owner) &&
     owner.thisType =:= parent.prefix
-  }
 
   /** Does given clazz define an outer field? */
-  def hasOuterField(clazz: Symbol) = {
+  def hasOuterField(clazz: Symbol) =
     val parent = clazz.info.firstParent
 
     // space optimization: inherit the $outer pointer from the parent class if
@@ -56,31 +55,26 @@ abstract class ExplicitOuter
       !parent.typeSymbol.isJavaDefined && haveSameOuter(parent, clazz)
 
     isInner(clazz) && !clazz.isTrait && !canReuseParentOuterField
-  }
 
-  private def outerField(clazz: Symbol): Symbol = {
+  private def outerField(clazz: Symbol): Symbol =
     val result = clazz.info.member(nme.OUTER_LOCAL)
     assert(result != NoSymbol, "no outer field in " + clazz + " at " + phase)
 
     result
-  }
 
   private val innerClassConstructorParamName: TermName = newTermName(
       "arg" + nme.OUTER)
 
-  class RemoveBindingsTransformer(toRemove: Set[Symbol]) extends Transformer {
-    override def transform(tree: Tree) = tree match {
+  class RemoveBindingsTransformer(toRemove: Set[Symbol]) extends Transformer
+    override def transform(tree: Tree) = tree match
       case Bind(_, body) if toRemove(tree.symbol) => super.transform(body)
       case _ => super.transform(tree)
-    }
-  }
 
-  def outerAccessor(clazz: Symbol): Symbol = {
+  def outerAccessor(clazz: Symbol): Symbol =
     val firstTry = clazz.info.decl(nme.expandedName(nme.OUTER, clazz))
     if (firstTry != NoSymbol && firstTry.outerSource == clazz) firstTry
     else findOrElse(clazz.info.decls)(_.outerSource == clazz)(NoSymbol)
-  }
-  def newOuterAccessor(clazz: Symbol) = {
+  def newOuterAccessor(clazz: Symbol) =
     val accFlags =
       SYNTHETIC | ARTIFACT | STABLE | (if (clazz.isTrait) DEFERRED else 0)
     val sym = clazz.newMethod(nme.OUTER, clazz.pos, accFlags)
@@ -90,15 +84,13 @@ abstract class ExplicitOuter
     sym expandName clazz
     sym.referenced = clazz
     sym setInfo MethodType(Nil, restpe)
-  }
-  def newOuterField(clazz: Symbol) = {
+  def newOuterField(clazz: Symbol) =
     val accFlags =
       SYNTHETIC | ARTIFACT | PARAMACCESSOR |
       (if (clazz.isEffectivelyFinal) PrivateLocal else PROTECTED)
     val sym = clazz.newValue(nme.OUTER_LOCAL, clazz.pos, accFlags)
 
     sym setInfo clazz.outerClass.thisType
-  }
 
   /**
     * Will the outer accessor of the `clazz` subsume the outer accessor of
@@ -116,12 +108,11 @@ abstract class ExplicitOuter
     * See SI-7242.
    }}
     */
-  private def skipMixinOuterAccessor(clazz: Symbol, mixin: Symbol) = {
+  private def skipMixinOuterAccessor(clazz: Symbol, mixin: Symbol) =
     // Reliant on the current scheme for name expansion, the expanded name
     // of the outer accessors in a trait and its companion object are the same.
     // If the assumption is one day falsified, run/t7424.scala will let us know.
     clazz.fullName == mixin.fullName
-  }
 
   /** <p>
     *    The type transformation method:
@@ -159,17 +150,16 @@ abstract class ExplicitOuter
     *  Note: this transformInfo need not be reflected as the JVM reflection already
     *  elides outer pointers.
     */
-  def transformInfo(sym: Symbol, tp: Type): Type = tp match {
+  def transformInfo(sym: Symbol, tp: Type): Type = tp match
     case MethodType(params, resTp) =>
       val resTpTransformed = transformInfo(sym, resTp)
 
       // juggle flags (and mangle names) after transforming info
-      if (sym.owner.isTrait) {
+      if (sym.owner.isTrait)
         // TODO: I don't believe any private accessors remain after the fields phase
         if ((sym hasFlag (ACCESSOR | SUPERACCESSOR)) || sym.isModule)
           sym.makeNotPrivate(sym.owner) // 5
         if (sym.isProtected) sym setFlag notPROTECTED // 6
-      }
 
       val paramsWithOuter =
         if (sym.isClassConstructor && isInner(sym.owner)) // 1
@@ -184,29 +174,24 @@ abstract class ExplicitOuter
 
     case ClassInfoType(parents, decls, clazz) =>
       var decls1 = decls
-      if (isInner(clazz) && !clazz.isInterface) {
+      if (isInner(clazz) && !clazz.isInterface)
         decls1 = decls.cloneScope
         decls1 enter newOuterAccessor(clazz) // 3
         if (hasOuterField(clazz)) //2
           decls1 enter newOuterField(clazz)
-      }
-      if (!clazz.isTrait && !parents.isEmpty) {
-        for (mc <- clazz.mixinClasses) {
+      if (!clazz.isTrait && !parents.isEmpty)
+        for (mc <- clazz.mixinClasses)
           val mixinOuterAcc: Symbol = exitingExplicitOuter(outerAccessor(mc))
-          if (mixinOuterAcc != NoSymbol) {
+          if (mixinOuterAcc != NoSymbol)
             if (skipMixinOuterAccessor(clazz, mc))
               debuglog(
                   s"Reusing outer accessor symbol of $clazz for the mixin outer accessor of $mc")
-            else {
+            else
               if (decls1 eq decls) decls1 = decls.cloneScope
               val newAcc = mixinOuterAcc.cloneSymbol(
                   clazz, mixinOuterAcc.flags & ~DEFERRED)
               newAcc setInfo (clazz.thisType memberType mixinOuterAcc)
               decls1 enter newAcc
-            }
-          }
-        }
-      }
       if (decls1 eq decls) tp else ClassInfoType(parents, decls1, clazz)
     case PolyType(tparams, restp) =>
       val restp1 = transformInfo(sym, restp)
@@ -221,14 +206,13 @@ abstract class ExplicitOuter
       if (sym.owner.isTrait && sym.isLocalToThis &&
           (sym.getterIn(sym.owner) == NoSymbol)) sym.makeNotPrivate(sym.owner)
       tp
-  }
 
   /** A base class for transformers that maintain outerParam
     *  values for outer parameters of constructors.
     *  The class provides methods for referencing via outer.
     */
   abstract class OuterPathTransformer(unit: CompilationUnit)
-      extends TypingTransformer(unit) with UnderConstructionTransformer {
+      extends TypingTransformer(unit) with UnderConstructionTransformer
 
     /** The directly enclosing outer parameter, if we are in a constructor */
     protected var outerParam: Symbol = NoSymbol
@@ -238,10 +222,9 @@ abstract class ExplicitOuter
       *
       * Will return `EmptyTree` if there is no outer accessor because of a premature self reference.
       */
-    protected def outerValue: Tree = outerParam match {
+    protected def outerValue: Tree = outerParam match
       case NoSymbol => outerSelect(gen.mkAttributedThis(currentClass))
       case outerParam => gen.mkAttributedIdent(outerParam)
-    }
 
     /** Select and apply outer accessor from 'base'
       *  The result is typed but not positioned.
@@ -250,21 +233,20 @@ abstract class ExplicitOuter
       *
       *  Will return `EmptyTree` if there is no outer accessor because of a premature self reference.
       */
-    private def outerSelect(base: Tree): Tree = {
+    private def outerSelect(base: Tree): Tree =
       val baseSym = base.tpe.typeSymbol
       val outerAcc = outerAccessor(baseSym)
-      if (outerAcc == NoSymbol) {
-        if (baseSym.ownersIterator.exists(isUnderConstruction)) {
+      if (outerAcc == NoSymbol)
+        if (baseSym.ownersIterator.exists(isUnderConstruction))
           // e.g neg/t6666.scala
           // The caller will report the error with more information.
           EmptyTree
-        } else {
+        else
           globalError(
               currentOwner.pos,
               s"Internal error: unable to find the outer accessor symbol of $baseSym")
           EmptyTree
-        }
-      } else {
+      else
         val currentClass =
           this.currentClass //todo: !!! if this line is removed, we get a build failure that protected$currentClass need an override modifier
         // outerFld is the $outer field of the current class, if the reference can
@@ -281,25 +263,22 @@ abstract class ExplicitOuter
           else Apply(Select(base, outerAcc), Nil)
 
         localTyper typed path
-      }
-    }
 
     /** The path
       *  <blockquote><pre>`base'.$outer$$C1 ... .$outer$$Cn</pre></blockquote>
       *  which refers to the outer instance of class to of
       *  value base. The result is typed but not positioned.
       */
-    protected def outerPath(base: Tree, from: Symbol, to: Symbol): Tree = {
+    protected def outerPath(base: Tree, from: Symbol, to: Symbol): Tree =
       //Console.println("outerPath from "+from+" to "+to+" at "+base+":"+base.tpe)
       if (from == to) base
       else outerPath(outerSelect(base), from.outerClass, to)
-    }
 
-    override def transform(tree: Tree): Tree = {
+    override def transform(tree: Tree): Tree =
       def sym = tree.symbol
       val savedOuterParam = outerParam
-      try {
-        tree match {
+      try
+        tree match
           case Template(_, _, _) =>
             outerParam = NoSymbol
           case DefDef(_, _, _, (param :: _) :: _, _, _)
@@ -307,11 +286,8 @@ abstract class ExplicitOuter
             outerParam = param.symbol
             assert(outerParam.name startsWith nme.OUTER, outerParam.name)
           case _ =>
-        }
         super.transform(tree)
-      } finally outerParam = savedOuterParam
-    }
-  }
+      finally outerParam = savedOuterParam
 
   /** <p>
     *    The phase performs the following transformations on terms:
@@ -369,7 +345,7 @@ abstract class ExplicitOuter
     *  </p>
     */
   class ExplicitOuterTransformer(unit: CompilationUnit)
-      extends OuterPathTransformer(unit) { transformer =>
+      extends OuterPathTransformer(unit)  transformer =>
 
     /** The definition tree of the outer accessor of current class
       */
@@ -377,13 +353,12 @@ abstract class ExplicitOuter
 
     /** The definition tree of the outer accessor of current class
       */
-    def outerAccessorDef: Tree = localTyper typed {
+    def outerAccessorDef: Tree = localTyper typed
       val acc = outerAccessor(currentClass)
       val rhs =
         if (acc.isDeferred) EmptyTree
         else Select(This(currentClass), outerField(currentClass))
       DefDef(acc, rhs)
-    }
 
     /** The definition tree of the outer accessor for class mixinClass.
       *
@@ -391,7 +366,7 @@ abstract class ExplicitOuter
       *                    accessor which is implemented by the generated one.
       *  @pre mixinClass is an inner class
       */
-    def mixinOuterAccessorDef(mixinClass: Symbol): Tree = {
+    def mixinOuterAccessorDef(mixinClass: Symbol): Tree =
       val outerAcc = outerAccessor(mixinClass) overridingSymbol currentClass
       def mixinPrefix = (currentClass.thisType baseType mixinClass).prefix
       assert(outerAcc != NoSymbol,
@@ -399,8 +374,8 @@ abstract class ExplicitOuter
              currentClass)
       assert(
           outerAcc.alternatives.size == 1,
-          s"Multiple outer accessors match inner mixin $mixinClass in $currentClass : ${outerAcc.alternatives
-            .map(_.defString)}")
+          s"Multiple outer accessors match inner mixin $mixinClass in $currentClass : $outerAcc.alternatives
+            .map(_.defString)")
       // I added the mixinPrefix.typeArgs.nonEmpty condition to address the
       // crash in SI-4970.  I feel quite sure this can be improved.
       val path =
@@ -413,62 +388,55 @@ abstract class ExplicitOuter
       localTyper typed DefDef(
           outerAcc,
           gen.mkCast(transformer.transform(path), outerAcc.info.resultType))
-    }
 
     /** The main transformation method */
-    override def transform(tree: Tree): Tree = {
+    override def transform(tree: Tree): Tree =
       val sym = tree.symbol
-      if (sym != null && sym.isType) {
+      if (sym != null && sym.isType)
         //(9)
         if (sym.isPrivate) sym setFlag notPRIVATE
         if (sym.isProtected) sym setFlag notPROTECTED
-      }
-      tree match {
+      tree match
         case Template(parents, self, decls) =>
           val newDefs = new ListBuffer[Tree]
-          atOwner(tree, currentOwner) {
-            if (!currentClass.isInterface) {
-              if (isInner(currentClass)) {
+          atOwner(tree, currentOwner)
+            if (!currentClass.isInterface)
+              if (isInner(currentClass))
                 if (hasOuterField(currentClass))
                   newDefs += outerFieldDef // (1a)
                 newDefs += outerAccessorDef // (1)
-              }
               if (!currentClass.isTrait)
                 for (mc <- currentClass.mixinClasses) if (outerAccessor(mc) != NoSymbol &&
                                                           !skipMixinOuterAccessor(
                                                               currentClass,
                                                               mc))
                   newDefs += mixinOuterAccessorDef(mc)
-            }
-          }
           super.transform(
               deriveTemplate(tree)(decls =>
                     if (newDefs.isEmpty) decls
                     else decls ::: newDefs.toList)
           )
         case DefDef(_, _, _, vparamss, _, rhs) =>
-          if (sym.isClassConstructor) {
-            rhs match {
+          if (sym.isClassConstructor)
+            rhs match
               case Literal(_) =>
                 sys.error("unexpected case") //todo: remove
               case _ =>
                 val clazz = sym.owner
                 val vparamss1 =
-                  if (isInner(clazz)) {
+                  if (isInner(clazz))
                     // (4)
-                    if (isUnderConstruction(clazz.outerClass)) {
+                    if (isUnderConstruction(clazz.outerClass))
                       reporter.error(
                           tree.pos,
                           s"Implementation restriction: ${clazz.fullLocationString} requires premature access to ${clazz.outerClass}.")
-                    }
                     val outerParam =
                       sym.newValueParameter(nme.OUTER, sym.pos) setInfo clazz.outerClass
                         .thisType
                     ((ValDef(outerParam) setType NoType) :: vparamss.head) :: vparamss.tail
-                  } else vparamss
+                  else vparamss
                 super.transform(copyDefDef(tree)(vparamss = vparamss1))
-            }
-          } else super.transform(tree)
+          else super.transform(tree)
 
         case This(qual) =>
           if (sym == currentClass || sym.hasModuleFlag && sym.isStatic) tree
@@ -498,17 +466,17 @@ abstract class ExplicitOuter
 
         case Apply(sel @ Select(qual, nme.CONSTRUCTOR), args)
             if isInner(sel.symbol.owner) =>
-          val outerVal = atPos(tree.pos)(qual match {
+          val outerVal = atPos(tree.pos)(qual match
             // it's a call between constructors of same class
             case _: This =>
               assert(outerParam != NoSymbol, tree)
               outerValue
             case _ =>
-              gen.mkAttributedQualifier(qual.tpe.prefix match {
+              gen.mkAttributedQualifier(qual.tpe.prefix match
                 case NoPrefix => sym.owner.outerClass.thisType
                 case x => x
-              })
-          })
+              )
+          )
           super.transform(treeCopy.Apply(tree, sel, outerVal :: args))
 
         // for the new pattern matcher
@@ -524,13 +492,13 @@ abstract class ExplicitOuter
           if (acc == NoSymbol ||
               // since we can't fix SI-4440 properly (we must drop the outer accessors of final classes when there's no immediate reference to them in sight)
               // at least don't crash... this duplicates maybeOmittable from constructors
-              (acc.owner.isEffectivelyFinal && !acc.isOverridingSymbol)) {
+              (acc.owner.isEffectivelyFinal && !acc.isOverridingSymbol))
             if (!base.tpe.hasAnnotation(UncheckedClass))
               currentRun.reporting.uncheckedWarning(
                   tree.pos,
                   "The outer reference in this type test cannot be checked at run time.")
             transform(TRUE) // urgh... drop condition if there's no accessor (or if it may disappear after constructors)
-          } else {
+          else
             // println("(base, acc)= "+(base, acc))
             val outerSelect = localTyper typed Apply(Select(base, acc), Nil)
             // achieves the same as: localTyper typed atPos(tree.pos)(outerPath(base, base.tpe.typeSymbol, outerFor.outerClass))
@@ -538,25 +506,18 @@ abstract class ExplicitOuter
             // println("outerSelect = "+ outerSelect)
             transform(treeCopy.Apply(
                     tree, treeCopy.Select(eqsel, outerSelect, eq), args))
-          }
 
         case _ =>
           val x = super.transform(tree)
           if (x.tpe eq null) x
           else x setType transformInfo(currentOwner, x.tpe)
-      }
-    }
 
     /** The transformation method for whole compilation units */
-    override def transformUnit(unit: CompilationUnit) {
+    override def transformUnit(unit: CompilationUnit)
       exitingExplicitOuter(super.transformUnit(unit))
-    }
-  }
 
   override def newPhase(prev: scala.tools.nsc.Phase): StdPhase =
     new Phase(prev)
 
-  class Phase(prev: scala.tools.nsc.Phase) extends super.Phase(prev) {
+  class Phase(prev: scala.tools.nsc.Phase) extends super.Phase(prev)
     override val checkable = false
-  }
-}

@@ -35,15 +35,15 @@ private[hive] case class DescribeHiveTableCommand(
     tableId: TableIdentifier,
     override val output: Seq[Attribute],
     isExtended: Boolean)
-    extends RunnableCommand {
+    extends RunnableCommand
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     // There are two modes here:
     // For metastore tables, create an output similar to Hive's.
     // For other tables, delegate to DescribeCommand.
 
     // In the future, we will consolidate the two and simply report what the catalog reports.
-    sqlContext.sessionState.catalog.lookupRelation(tableId) match {
+    sqlContext.sessionState.catalog.lookupRelation(tableId) match
       case table: MetastoreRelation =>
         // Trying to mimic the format of Hive's output. But not exactly the same.
         var results: Seq[(String, String, String)] = Nil
@@ -53,7 +53,7 @@ private[hive] case class DescribeHiveTableCommand(
           table.hiveQlTable.getPartCols.asScala
         results ++= columns.map(
             field => (field.getName, field.getType, field.getComment))
-        if (partitionColumns.nonEmpty) {
+        if (partitionColumns.nonEmpty)
           val partColumnInfo = partitionColumns.map(
               field => (field.getName, field.getType, field.getComment))
           results ++=
@@ -61,22 +61,16 @@ private[hive] case class DescribeHiveTableCommand(
                   s"# ${output(0).name}",
                   output(1).name,
                   output(2).name)) ++ partColumnInfo
-        }
 
-        if (isExtended) {
+        if (isExtended)
           results ++= Seq(
               ("Detailed Table Information",
                table.hiveQlTable.getTTable.toString,
                ""))
-        }
 
-        results.map {
+        results.map
           case (name, dataType, comment) =>
             Row(name, dataType, comment)
-        }
 
       case o: LogicalPlan =>
         DescribeCommand(tableId, output, isExtended).run(sqlContext)
-    }
-  }
-}

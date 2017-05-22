@@ -1,3 +1,2 @@
-class Test {
+class Test
   def x = Macros.foo
-}

@@ -9,13 +9,11 @@ import com.gravity.goose.text.StopWords
   * User: jim
   * Date: 8/16/11
   */
-class FileHelperTest {
+class FileHelperTest
 
   @Test
-  def loadFileContents() {
+  def loadFileContents()
     println("loading test")
     val txt =
       FileHelper.loadResourceFile("stopwords-en.txt", StopWords.getClass)
     assertTrue(txt.startsWith("a's"))
-  }
-}

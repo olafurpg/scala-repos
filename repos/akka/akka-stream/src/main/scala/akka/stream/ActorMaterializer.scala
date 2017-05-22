@@ -18,7 +18,7 @@ import akka.japi.function
 
 import scala.util.control.NoStackTrace
 
-object ActorMaterializer {
+object ActorMaterializer
 
   /**
     * Scala API: Creates a ActorMaterializer which will execute every step of a transformation
@@ -35,13 +35,12 @@ object ActorMaterializer {
     */
   def apply(materializerSettings: Option[ActorMaterializerSettings] = None,
             namePrefix: Option[String] = None)(
-      implicit context: ActorRefFactory): ActorMaterializer = {
+      implicit context: ActorRefFactory): ActorMaterializer =
     val system = actorSystemOf(context)
 
     val settings =
       materializerSettings getOrElse ActorMaterializerSettings(system)
     apply(settings, namePrefix.getOrElse("flow"))(context)
-  }
 
   /**
     * Scala API: Creates a ActorMaterializer which will execute every step of a transformation
@@ -56,7 +55,7 @@ object ActorMaterializer {
     */
   def apply(
       materializerSettings: ActorMaterializerSettings, namePrefix: String)(
-      implicit context: ActorRefFactory): ActorMaterializer = {
+      implicit context: ActorRefFactory): ActorMaterializer =
     val haveShutDown = new AtomicBoolean(false)
     val system = actorSystemOf(context)
 
@@ -70,7 +69,6 @@ object ActorMaterializer {
                         StreamSupervisor.nextName()),
         haveShutDown,
         FlowNames(system).name.copy(namePrefix))
-  }
 
   /**
     * Scala API: Creates a ActorMaterializer which will execute every step of a transformation
@@ -126,8 +124,8 @@ object ActorMaterializer {
              namePrefix: String): ActorMaterializer =
     apply(Option(settings), Option(namePrefix))(context)
 
-  private def actorSystemOf(context: ActorRefFactory): ActorSystem = {
-    val system = context match {
+  private def actorSystemOf(context: ActorRefFactory): ActorSystem =
+    val system = context match
       case s: ExtendedActorSystem ⇒ s
       case c: ActorContext ⇒ c.system
       case null ⇒
@@ -136,23 +134,19 @@ object ActorMaterializer {
       case _ ⇒
         throw new IllegalArgumentException(
             s"ActorRefFactory context must be a ActorSystem or ActorContext, got [${context.getClass.getName}]")
-    }
     system
-  }
 
   /**
     * INTERNAL API
     */
   private[akka] def downcast(materializer: Materializer): ActorMaterializer =
-    materializer match {
+    materializer match
       //FIXME this method is going to cause trouble for other Materializer implementations
       case m: ActorMaterializer ⇒ m
       case _ ⇒
         throw new IllegalArgumentException(
             s"required [${classOf[ActorMaterializer].getName}] " +
             s"but got [${materializer.getClass.getName}]")
-    }
-}
 
 /**
   * A ActorMaterializer takes the list of transformations comprising a
@@ -161,7 +155,7 @@ object ActorMaterializer {
   * steps are split up into asynchronous regions is implementation
   * dependent.
   */
-abstract class ActorMaterializer extends Materializer {
+abstract class ActorMaterializer extends Materializer
 
   def settings: ActorMaterializerSettings
 
@@ -197,7 +191,6 @@ abstract class ActorMaterializer extends Materializer {
 
   /** INTERNAL API */
   private[akka] def supervisor: ActorRef
-}
 
 /**
   * This exception or subtypes thereof should be used to signal materialization
@@ -215,7 +208,7 @@ final case class AbruptTerminationException(actor: ActorRef)
     extends RuntimeException(s"Processor actor [$actor] terminated abruptly")
     with NoStackTrace
 
-object ActorMaterializerSettings {
+object ActorMaterializerSettings
 
   /**
     * Create [[ActorMaterializerSettings]] from individual settings (Scala).
@@ -302,7 +295,6 @@ object ActorMaterializerSettings {
     apply(config)
 
   private val defaultMaxFixedBufferSize = 1000
-}
 
 /**
   * This class describes the configurable properties of the [[ActorMaterializer]].
@@ -319,7 +311,7 @@ final class ActorMaterializerSettings private (
     val fuzzingMode: Boolean,
     val autoFusing: Boolean,
     val maxFixedBufferSize: Int,
-    val syncProcessingLimit: Int) {
+    val syncProcessingLimit: Int)
 
   def this(initialInputBufferSize: Int,
            maxInputBufferSize: Int,
@@ -330,7 +322,7 @@ final class ActorMaterializerSettings private (
            outputBurstLimit: Int,
            fuzzingMode: Boolean,
            autoFusing: Boolean,
-           maxFixedBufferSize: Int) {
+           maxFixedBufferSize: Int)
     this(initialInputBufferSize,
          maxInputBufferSize,
          dispatcher,
@@ -342,7 +334,6 @@ final class ActorMaterializerSettings private (
          autoFusing,
          maxFixedBufferSize,
          defaultMaxFixedBufferSize)
-  }
 
   require(initialInputBufferSize > 0, "initialInputBufferSize must be > 0")
   require(syncProcessingLimit > 0, "syncProcessingLimit must be > 0")
@@ -363,7 +354,7 @@ final class ActorMaterializerSettings private (
       fuzzingMode: Boolean = this.fuzzingMode,
       autoFusing: Boolean = this.autoFusing,
       maxFixedBufferSize: Int = this.maxFixedBufferSize,
-      syncProcessingLimit: Int = this.syncProcessingLimit) = {
+      syncProcessingLimit: Int = this.syncProcessingLimit) =
     new ActorMaterializerSettings(initialInputBufferSize,
                                   maxInputBufferSize,
                                   dispatcher,
@@ -375,7 +366,6 @@ final class ActorMaterializerSettings private (
                                   autoFusing,
                                   maxFixedBufferSize,
                                   syncProcessingLimit)
-  }
 
   /**
     * Each asynchronous piece of a materialized stream topology is executed by one Actor
@@ -385,22 +375,20 @@ final class ActorMaterializerSettings private (
     * FIXME: Currently only the initialSize is used, auto-tuning is not yet implemented.
     */
   def withInputBuffer(
-      initialSize: Int, maxSize: Int): ActorMaterializerSettings = {
+      initialSize: Int, maxSize: Int): ActorMaterializerSettings =
     if (initialSize == this.initialInputBufferSize &&
         maxSize == this.maxInputBufferSize) this
     else
       copy(initialInputBufferSize = initialSize, maxInputBufferSize = maxSize)
-  }
 
   /**
     * This setting configures the default dispatcher to be used by streams materialized
     * with the [[ActorMaterializer]]. This can be overridden for individual parts of the
     * stream topology by using [[akka.stream.Attributes#dispatcher]].
     */
-  def withDispatcher(dispatcher: String): ActorMaterializerSettings = {
+  def withDispatcher(dispatcher: String): ActorMaterializerSettings =
     if (this.dispatcher == dispatcher) this
     else copy(dispatcher = dispatcher)
-  }
 
   /**
     * Scala API: Decides how exceptions from application code are to be handled, unless
@@ -408,10 +396,9 @@ final class ActorMaterializerSettings private (
     * [[akka.stream.Attributes#supervisionStrategy]].
     */
   def withSupervisionStrategy(
-      decider: Supervision.Decider): ActorMaterializerSettings = {
+      decider: Supervision.Decider): ActorMaterializerSettings =
     if (decider eq this.supervisionDecider) this
     else copy(supervisionDecider = decider)
-  }
 
   /**
     * Java API: Decides how exceptions from application code are to be handled, unless
@@ -420,16 +407,15 @@ final class ActorMaterializerSettings private (
     */
   def withSupervisionStrategy(
       decider: function.Function[Throwable, Supervision.Directive])
-    : ActorMaterializerSettings = {
+    : ActorMaterializerSettings =
     import Supervision._
     copy(
-        supervisionDecider = decider match {
+        supervisionDecider = decider match
       case `resumingDecider` ⇒ resumingDecider
       case `restartingDecider` ⇒ restartingDecider
       case `stoppingDecider` ⇒ stoppingDecider
       case other ⇒ other.apply _
-    })
-  }
+    )
 
   /**
     * Test utility: fuzzing mode means that GraphStage events are not processed
@@ -487,12 +473,11 @@ final class ActorMaterializerSettings private (
     if (settings == this.subscriptionTimeoutSettings) this
     else copy(subscriptionTimeoutSettings = settings)
 
-  private def requirePowerOfTwo(n: Integer, name: String): Unit = {
+  private def requirePowerOfTwo(n: Integer, name: String): Unit =
     require(n > 0, s"$name must be > 0")
     require((n & (n - 1)) == 0, s"$name must be a power of two")
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case s: ActorMaterializerSettings ⇒
       s.initialInputBufferSize == initialInputBufferSize &&
       s.maxInputBufferSize == maxInputBufferSize &&
@@ -504,13 +489,11 @@ final class ActorMaterializerSettings private (
       s.syncProcessingLimit == syncProcessingLimit &&
       s.fuzzingMode == fuzzingMode && s.autoFusing == autoFusing
     case _ ⇒ false
-  }
 
   override def toString: String =
     s"ActorMaterializerSettings($initialInputBufferSize,$maxInputBufferSize,$dispatcher,$supervisionDecider,$subscriptionTimeoutSettings,$debugLogging,$outputBurstLimit,$syncProcessingLimit,$fuzzingMode,$autoFusing)"
-}
 
-object StreamSubscriptionTimeoutSettings {
+object StreamSubscriptionTimeoutSettings
   import akka.stream.StreamSubscriptionTimeoutTerminationMode._
 
   /**
@@ -536,16 +519,14 @@ object StreamSubscriptionTimeoutSettings {
   /**
     * Create settings from a Config subsection (Scala).
     */
-  def apply(config: Config): StreamSubscriptionTimeoutSettings = {
+  def apply(config: Config): StreamSubscriptionTimeoutSettings =
     val c = config.getConfig("subscription-timeout")
     StreamSubscriptionTimeoutSettings(
-        mode = c.getString("mode").toLowerCase(Locale.ROOT) match {
+        mode = c.getString("mode").toLowerCase(Locale.ROOT) match
       case "no" | "off" | "false" | "noop" ⇒ NoopTermination
       case "warn" ⇒ WarnTermination
       case "cancel" ⇒ CancelTermination
-    }, timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis)
-  }
-}
+    , timeout = c.getDuration("timeout", TimeUnit.MILLISECONDS).millis)
 
 /**
   * Leaked publishers and subscribers are cleaned up when they are not used within a given
@@ -553,15 +534,13 @@ object StreamSubscriptionTimeoutSettings {
   */
 final class StreamSubscriptionTimeoutSettings(
     val mode: StreamSubscriptionTimeoutTerminationMode,
-    val timeout: FiniteDuration) {
-  override def equals(other: Any): Boolean = other match {
+    val timeout: FiniteDuration)
+  override def equals(other: Any): Boolean = other match
     case s: StreamSubscriptionTimeoutSettings ⇒
       s.mode == mode && s.timeout == timeout
     case _ ⇒ false
-  }
   override def toString: String =
     s"StreamSubscriptionTimeoutSettings($mode,$timeout)"
-}
 
 /**
   * This mode describes what shall happen when the subscription timeout expires for
@@ -569,7 +548,7 @@ final class StreamSubscriptionTimeoutSettings(
   */
 sealed abstract class StreamSubscriptionTimeoutTerminationMode
 
-object StreamSubscriptionTimeoutTerminationMode {
+object StreamSubscriptionTimeoutTerminationMode
   case object NoopTermination extends StreamSubscriptionTimeoutTerminationMode
   case object WarnTermination extends StreamSubscriptionTimeoutTerminationMode
   case object CancelTermination
@@ -589,4 +568,3 @@ object StreamSubscriptionTimeoutTerminationMode {
     * When the timeout expires attach a Subscriber that will immediately cancel its subscription.
     */
   def cancel: StreamSubscriptionTimeoutTerminationMode = CancelTermination
-}

@@ -15,14 +15,13 @@ import akka.actor.Actor
 import akka.cluster.MemberStatus._
 import akka.actor.Deploy
 
-object MembershipChangeListenerExitingMultiJvmSpec extends MultiNodeConfig {
+object MembershipChangeListenerExitingMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
 
   commonConfig(debugConfig(on = false).withFallback(
           MultiNodeClusterSpec.clusterConfigWithFailureDetectorPuppet))
-}
 
 class MembershipChangeListenerExitingMultiJvmNode1
     extends MembershipChangeListenerExitingSpec
@@ -33,27 +32,26 @@ class MembershipChangeListenerExitingMultiJvmNode3
 
 abstract class MembershipChangeListenerExitingSpec
     extends MultiNodeSpec(MembershipChangeListenerExitingMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import MembershipChangeListenerExitingMultiJvmSpec._
   import ClusterEvent._
 
-  "A registered MembershipChangeListener" must {
-    "be notified when new node is EXITING" taggedAs LongRunningTest in {
+  "A registered MembershipChangeListener" must
+    "be notified when new node is EXITING" taggedAs LongRunningTest in
 
       awaitClusterUp(first, second, third)
 
-      runOn(first) {
+      runOn(first)
         enterBarrier("registered-listener")
         cluster.leave(second)
-      }
 
-      runOn(second) {
+      runOn(second)
         val exitingLatch = TestLatch()
         val removedLatch = TestLatch()
         val secondAddress = address(second)
-        cluster.subscribe(system.actorOf(Props(new Actor {
-          def receive = {
+        cluster.subscribe(system.actorOf(Props(new Actor
+          def receive =
             case state: CurrentClusterState ⇒
               if (state.members.exists(
                       m ⇒ m.address == secondAddress && m.status == Exiting))
@@ -63,18 +61,16 @@ abstract class MembershipChangeListenerExitingSpec
             case MemberRemoved(m, Exiting) if m.address == secondAddress ⇒
               removedLatch.countDown()
             case _ ⇒ // ignore
-          }
-        }).withDeploy(Deploy.local)), classOf[MemberEvent])
+        ).withDeploy(Deploy.local)), classOf[MemberEvent])
         enterBarrier("registered-listener")
         exitingLatch.await
         removedLatch.await
-      }
 
-      runOn(third) {
+      runOn(third)
         val exitingLatch = TestLatch()
         val secondAddress = address(second)
-        cluster.subscribe(system.actorOf(Props(new Actor {
-          def receive = {
+        cluster.subscribe(system.actorOf(Props(new Actor
+          def receive =
             case state: CurrentClusterState ⇒
               if (state.members.exists(
                       m ⇒ m.address == secondAddress && m.status == Exiting))
@@ -82,13 +78,8 @@ abstract class MembershipChangeListenerExitingSpec
             case MemberExited(m) if m.address == secondAddress ⇒
               exitingLatch.countDown()
             case _ ⇒ // ignore
-          }
-        }).withDeploy(Deploy.local)), classOf[MemberEvent])
+        ).withDeploy(Deploy.local)), classOf[MemberEvent])
         enterBarrier("registered-listener")
         exitingLatch.await
-      }
 
       enterBarrier("finished")
-    }
-  }
-}

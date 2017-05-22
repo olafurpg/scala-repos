@@ -14,7 +14,7 @@ import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.AkkaSpec
 import akka.testkit.ImplicitSender
 
-object EventsByPersistenceIdSpec {
+object EventsByPersistenceIdSpec
   val config =
     """
     akka.loglevel = INFO
@@ -23,18 +23,17 @@ object EventsByPersistenceIdSpec {
     akka.test.single-expect-default = 10s
     akka.persistence.query.journal.leveldb.refresh-interval = 1s
     """
-}
 
 class EventsByPersistenceIdSpec
     extends AkkaSpec(EventsByPersistenceIdSpec.config) with Cleanup
-    with ImplicitSender {
+    with ImplicitSender
 
   implicit val mat = ActorMaterializer()(system)
 
   val queries = PersistenceQuery(system)
     .readJournalFor[LeveldbReadJournal](LeveldbReadJournal.Identifier)
 
-  def setup(persistenceId: String): ActorRef = {
+  def setup(persistenceId: String): ActorRef =
     val ref = setupEmpty(persistenceId)
     ref ! s"$persistenceId-1"
     ref ! s"$persistenceId-2"
@@ -43,19 +42,16 @@ class EventsByPersistenceIdSpec
     expectMsg(s"$persistenceId-2-done")
     expectMsg(s"$persistenceId-3-done")
     ref
-  }
 
-  def setupEmpty(persistenceId: String): ActorRef = {
+  def setupEmpty(persistenceId: String): ActorRef =
     system.actorOf(TestActor.props(persistenceId))
-  }
 
-  "Leveldb query EventsByPersistenceId" must {
+  "Leveldb query EventsByPersistenceId" must
 
-    "implement standard EventsByTagQuery" in {
+    "implement standard EventsByTagQuery" in
       queries.isInstanceOf[EventsByTagQuery] should ===(true)
-    }
 
-    "find existing events" in {
+    "find existing events" in
       val ref = setup("a")
 
       val src = queries.currentEventsByPersistenceId("a", 0L, Long.MaxValue)
@@ -68,9 +64,8 @@ class EventsByPersistenceIdSpec
         .request(2)
         .expectNext("a-3")
         .expectComplete()
-    }
 
-    "find existing events up to a sequence number" in {
+    "find existing events up to a sequence number" in
       val ref = setup("b")
       val src = queries.currentEventsByPersistenceId("b", 0L, 2L)
       src
@@ -79,9 +74,8 @@ class EventsByPersistenceIdSpec
         .request(5)
         .expectNext("b-1", "b-2")
         .expectComplete()
-    }
 
-    "not see new events after demand request" in {
+    "not see new events after demand request" in
       val ref = setup("f")
       val src = queries.currentEventsByPersistenceId("f", 0L, Long.MaxValue)
       val probe = src
@@ -99,9 +93,8 @@ class EventsByPersistenceIdSpec
         .request(5)
         .expectNext("f-3")
         .expectComplete() // f-4 not seen
-    }
 
-    "return empty stream for cleaned journal from 0 to MaxLong" in {
+    "return empty stream for cleaned journal from 0 to MaxLong" in
       val ref = setup("g1")
 
       ref ! TestActor.DeleteCmd(3L)
@@ -109,9 +102,8 @@ class EventsByPersistenceIdSpec
 
       val src = queries.currentEventsByPersistenceId("g1", 0L, Long.MaxValue)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
 
-    "return empty stream for cleaned journal from 0 to 0" in {
+    "return empty stream for cleaned journal from 0 to 0" in
       val ref = setup("g2")
 
       ref ! TestActor.DeleteCmd(3L)
@@ -119,9 +111,8 @@ class EventsByPersistenceIdSpec
 
       val src = queries.currentEventsByPersistenceId("g2", 0L, 0L)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
 
-    "return remaining values after partial journal cleanup" in {
+    "return remaining values after partial journal cleanup" in
       val ref = setup("h")
 
       ref ! TestActor.DeleteCmd(2L)
@@ -134,39 +125,33 @@ class EventsByPersistenceIdSpec
         .request(1)
         .expectNext("h-3")
         .expectComplete()
-    }
 
-    "return empty stream for empty journal" in {
+    "return empty stream for empty journal" in
       val ref = setupEmpty("i")
 
       val src = queries.currentEventsByPersistenceId("i", 0L, Long.MaxValue)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
 
-    "return empty stream for journal from 0 to 0" in {
+    "return empty stream for journal from 0 to 0" in
       val ref = setup("k1")
 
       val src = queries.currentEventsByPersistenceId("k1", 0L, 0L)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
 
-    "return empty stream for empty journal from 0 to 0" in {
+    "return empty stream for empty journal from 0 to 0" in
       val ref = setupEmpty("k2")
 
       val src = queries.currentEventsByPersistenceId("k2", 0L, 0L)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
 
-    "return empty stream for journal from seqNo greater than highestSeqNo" in {
+    "return empty stream for journal from seqNo greater than highestSeqNo" in
       val ref = setup("l")
 
       val src = queries.currentEventsByPersistenceId("l", 4L, 3L)
       src.map(_.event).runWith(TestSink.probe[Any]).request(1).expectComplete()
-    }
-  }
 
-  "Leveldb live query EventsByPersistenceId" must {
-    "find new events" in {
+  "Leveldb live query EventsByPersistenceId" must
+    "find new events" in
       val ref = setup("c")
       val src = queries.eventsByPersistenceId("c", 0L, Long.MaxValue)
       val probe = src
@@ -179,9 +164,8 @@ class EventsByPersistenceIdSpec
       expectMsg("c-4-done")
 
       probe.expectNext("c-4")
-    }
 
-    "find new events up to a sequence number" in {
+    "find new events up to a sequence number" in
       val ref = setup("d")
       val src = queries.eventsByPersistenceId("d", 0L, 4L)
       val probe = src
@@ -194,9 +178,8 @@ class EventsByPersistenceIdSpec
       expectMsg("d-4-done")
 
       probe.expectNext("d-4").expectComplete()
-    }
 
-    "find new events after demand request" in {
+    "find new events after demand request" in
       val ref = setup("e")
       val src = queries.eventsByPersistenceId("e", 0L, Long.MaxValue)
       val probe = src
@@ -214,6 +197,3 @@ class EventsByPersistenceIdSpec
         .request(5)
         .expectNext("e-3")
         .expectNext("e-4")
-    }
-  }
-}

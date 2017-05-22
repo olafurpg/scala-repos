@@ -16,15 +16,14 @@ import akka.event.DefaultLoggingFilter
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ConfigSpec
     extends AkkaSpec(
-        ConfigFactory.defaultReference(ActorSystem.findClassLoader())) {
+        ConfigFactory.defaultReference(ActorSystem.findClassLoader()))
 
-  "The default configuration file (i.e. reference.conf)" must {
-    "contain all configuration properties for akka-actor that are used in code with their correct defaults" in {
+  "The default configuration file (i.e. reference.conf)" must
+    "contain all configuration properties for akka-actor that are used in code with their correct defaults" in
 
       val settings = system.settings
       val config = settings.config
 
-      {
         import config._
 
         getString("akka.version") should ===(ActorSystem.Version)
@@ -74,14 +73,11 @@ class ConfigSpec
 
         getBoolean("akka.log-dead-letters-during-shutdown") should ===(true)
         settings.LogDeadLettersDuringShutdown should ===(true)
-      }
 
-      {
         val c = config.getConfig("akka.actor.default-dispatcher")
 
         //General dispatcher config
 
-        {
           c.getString("type") should ===("Dispatcher")
           c.getString("executor") should ===("default-executor")
           c.getDuration("shutdown-timeout", TimeUnit.MILLISECONDS) should ===(
@@ -90,27 +86,21 @@ class ConfigSpec
           c.getDuration("throughput-deadline-time", TimeUnit.MILLISECONDS) should ===(
               0)
           c.getBoolean("attempt-teamwork") should ===(true)
-        }
 
         //Default executor config
-        {
           val pool = c.getConfig("default-executor")
           pool.getString("fallback") should ===("fork-join-executor")
-        }
 
         //Fork join executor config
 
-        {
           val pool = c.getConfig("fork-join-executor")
           pool.getInt("parallelism-min") should ===(8)
           pool.getDouble("parallelism-factor") should ===(3.0)
           pool.getInt("parallelism-max") should ===(64)
           pool.getString("task-peeking-mode") should be("FIFO")
-        }
 
         //Thread pool executor config
 
-        {
           val pool = c.getConfig("thread-pool-executor")
           import pool._
           getDuration("keep-alive-time", TimeUnit.MILLISECONDS) should ===(
@@ -121,10 +111,8 @@ class ConfigSpec
           getString("task-queue-type") should ===("linked")
           getBoolean("allow-core-timeout") should ===(true)
           getString("fixed-pool-size") should ===("off")
-        }
 
         // Debug config
-        {
           val debug = config.getConfig("akka.actor.debug")
           import debug._
           getBoolean("receive") should ===(false)
@@ -147,22 +135,13 @@ class ConfigSpec
 
           getBoolean("router-misconfiguration") should ===(false)
           settings.DebugRouterMisconfiguration should ===(false)
-        }
-      }
 
-      {
         val c = config.getConfig("akka.actor.default-mailbox")
 
         // general mailbox config
 
-        {
           c.getInt("mailbox-capacity") should ===(1000)
           c.getDuration("mailbox-push-timeout-time", TimeUnit.MILLISECONDS) should ===(
               10 * 1000)
           c.getString("mailbox-type") should ===(
               "akka.dispatch.UnboundedMailbox")
-        }
-      }
-    }
-  }
-}

@@ -11,7 +11,7 @@ import com.typesafe.sbt.pgp.PgpKeys.publishSigned
 import com.typesafe.sbt.S3Plugin.S3
 import sbtunidoc.Plugin.UnidocKeys._
 
-object Release {
+object Release
   val releaseDirectory = SettingKey[File]("release-directory")
 
   lazy val settings: Seq[Setting[_]] =
@@ -23,7 +23,7 @@ object Release {
       commands ++= Seq(buildReleaseCommand, uploadReleaseCommand)
   )
 
-  def buildReleaseCommand = Command.command("buildRelease") { state =>
+  def buildReleaseCommand = Command.command("buildRelease")  state =>
     val extracted = Project.extract(state)
     val release = extracted.get(releaseDirectory)
     val dist = extracted.get(Dist.distDirectory)
@@ -54,11 +54,8 @@ object Release {
         f, release / "downloads" / f.name)
 
     state5
-  }
 
-  def uploadReleaseCommand = Command.command("uploadRelease") { state =>
+  def uploadReleaseCommand = Command.command("uploadRelease")  state =>
     val extracted = Project.extract(state)
     val (state1, _) = extracted.runTask(S3.upload, state)
     state1
-  }
-}

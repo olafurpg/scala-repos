@@ -38,7 +38,7 @@ import org.apache.spark.util.collection.OpenHashSet
 
 /** Private trait for params for VectorIndexer and VectorIndexerModel */
 private[ml] trait VectorIndexerParams
-    extends Params with HasInputCol with HasOutputCol {
+    extends Params with HasInputCol with HasOutputCol
 
   /**
     * Threshold for the number of values a categorical feature can take.
@@ -59,7 +59,6 @@ private[ml] trait VectorIndexerParams
 
   /** @group getParam */
   def getMaxCategories: Int = $(maxCategories)
-}
 
 /**
   * :: Experimental ::
@@ -99,7 +98,7 @@ private[ml] trait VectorIndexerParams
 @Experimental
 class VectorIndexer(override val uid: String)
     extends Estimator[VectorIndexerModel] with VectorIndexerParams
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("vecIdx"))
 
@@ -112,7 +111,7 @@ class VectorIndexer(override val uid: String)
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def fit(dataset: DataFrame): VectorIndexerModel = {
+  override def fit(dataset: DataFrame): VectorIndexerModel =
     transformSchema(dataset.schema, logging = true)
     val firstRow = dataset.select($(inputCol)).take(1)
     require(firstRow.length == 1,
@@ -122,18 +121,17 @@ class VectorIndexer(override val uid: String)
       dataset.select($(inputCol)).rdd.map { case Row(v: Vector) => v }
     val maxCats = $(maxCategories)
     val categoryStats: VectorIndexer.CategoryStats =
-      vectorDataset.mapPartitions { iter =>
+      vectorDataset.mapPartitions  iter =>
         val localCatStats =
           new VectorIndexer.CategoryStats(numFeatures, maxCats)
         iter.foreach(localCatStats.addVector)
         Iterator(localCatStats)
-      }.reduce((stats1, stats2) => stats1.merge(stats2))
+      .reduce((stats1, stats2) => stats1.merge(stats2))
     val model = new VectorIndexerModel(
         uid, numFeatures, categoryStats.getCategoryMaps).setParent(this)
     copyValues(model)
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     // We do not transfer feature metadata since we do not know what types of features we will
     // produce in transform().
     val dataType = new VectorUDT
@@ -143,13 +141,11 @@ class VectorIndexer(override val uid: String)
             s"VectorIndexer requires output column parameter: $outputCol")
     SchemaUtils.checkColumnType(schema, $(inputCol), dataType)
     SchemaUtils.appendColumn(schema, $(outputCol), dataType)
-  }
 
   override def copy(extra: ParamMap): VectorIndexer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
+object VectorIndexer extends DefaultParamsReadable[VectorIndexer]
 
   @Since("1.6.0")
   override def load(path: String): VectorIndexer = super.load(path)
@@ -164,35 +160,30 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
     */
   private class CategoryStats(
       private val numFeatures: Int, private val maxCategories: Int)
-      extends Serializable {
+      extends Serializable
 
     /** featureValueSets[feature index] = set of unique values */
     private val featureValueSets =
       Array.fill[OpenHashSet[Double]](numFeatures)(new OpenHashSet[Double]())
 
     /** Merge with another instance, modifying this instance. */
-    def merge(other: CategoryStats): CategoryStats = {
-      featureValueSets.zip(other.featureValueSets).foreach {
+    def merge(other: CategoryStats): CategoryStats =
+      featureValueSets.zip(other.featureValueSets).foreach
         case (thisValSet, otherValSet) =>
-          otherValSet.iterator.foreach { x =>
+          otherValSet.iterator.foreach  x =>
             // Once we have found > maxCategories values, we know the feature is continuous
             // and do not need to collect more values for it.
             if (thisValSet.size <= maxCategories) thisValSet.add(x)
-          }
-      }
       this
-    }
 
     /** Add a new vector to this index, updating sets of unique feature values */
-    def addVector(v: Vector): Unit = {
+    def addVector(v: Vector): Unit =
       require(v.size == numFeatures,
               s"VectorIndexer expected $numFeatures features but" +
               s" found vector of size ${v.size}.")
-      v match {
+      v match
         case dv: DenseVector => addDenseVector(dv)
         case sv: SparseVector => addSparseVector(sv)
-      }
-    }
 
     /**
       * Based on stats collected, decide which features are categorical,
@@ -204,58 +195,46 @@ object VectorIndexer extends DefaultParamsReadable[VectorIndexer] {
       * @return  Feature value index.  Keys are categorical feature indices (column indices).
       *          Values are mappings from original features values to 0-based category indices.
       */
-    def getCategoryMaps: Map[Int, Map[Double, Int]] = {
+    def getCategoryMaps: Map[Int, Map[Double, Int]] =
       // Filter out features which are declared continuous.
       featureValueSets.zipWithIndex
         .filter(_._1.size <= maxCategories)
-        .map {
+        .map
           case (featureValues: OpenHashSet[Double], featureIndex: Int) =>
             var sortedFeatureValues =
               featureValues.iterator.filter(_ != 0.0).toArray.sorted
             val zeroExists =
               sortedFeatureValues.length + 1 == featureValues.size
-            if (zeroExists) {
+            if (zeroExists)
               sortedFeatureValues = 0.0 +: sortedFeatureValues
-            }
             val categoryMap: Map[Double, Int] =
               sortedFeatureValues.zipWithIndex.toMap
             (featureIndex, categoryMap)
-        }
         .toMap
-    }
 
-    private def addDenseVector(dv: DenseVector): Unit = {
+    private def addDenseVector(dv: DenseVector): Unit =
       var i = 0
       val size = dv.size
-      while (i < size) {
-        if (featureValueSets(i).size <= maxCategories) {
+      while (i < size)
+        if (featureValueSets(i).size <= maxCategories)
           featureValueSets(i).add(dv(i))
-        }
         i += 1
-      }
-    }
 
-    private def addSparseVector(sv: SparseVector): Unit = {
+    private def addSparseVector(sv: SparseVector): Unit =
       // TODO: This might be able to handle 0's more efficiently.
       var vecIndex = 0 // index into vector
       var k = 0 // index into non-zero elements
       val size = sv.size
-      while (vecIndex < size) {
+      while (vecIndex < size)
         val featureValue =
-          if (k < sv.indices.length && vecIndex == sv.indices(k)) {
+          if (k < sv.indices.length && vecIndex == sv.indices(k))
             k += 1
             sv.values(k - 1)
-          } else {
+          else
             0.0
-          }
-        if (featureValueSets(vecIndex).size <= maxCategories) {
+        if (featureValueSets(vecIndex).size <= maxCategories)
           featureValueSets(vecIndex).add(featureValue)
-        }
         vecIndex += 1
-      }
-    }
-  }
-}
 
 /**
   * :: Experimental ::
@@ -279,75 +258,69 @@ class VectorIndexerModel private[ml](
     val numFeatures: Int,
     val categoryMaps: Map[Int, Map[Double, Int]])
     extends Model[VectorIndexerModel] with VectorIndexerParams
-    with MLWritable {
+    with MLWritable
 
   import VectorIndexerModel._
 
   /** Java-friendly version of [[categoryMaps]] */
-  def javaCategoryMaps: JMap[JInt, JMap[JDouble, JInt]] = {
+  def javaCategoryMaps: JMap[JInt, JMap[JDouble, JInt]] =
     categoryMaps
       .mapValues(_.asJava)
       .asJava
       .asInstanceOf[JMap[JInt, JMap[JDouble, JInt]]]
-  }
 
   /**
     * Pre-computed feature attributes, with some missing info.
     * In transform(), set attribute name and other info, if available.
     */
-  private val partialFeatureAttributes: Array[Attribute] = {
+  private val partialFeatureAttributes: Array[Attribute] =
     val attrs = new Array[Attribute](numFeatures)
     var categoricalFeatureCount =
       0 // validity check for numFeatures, categoryMaps
     var featureIndex = 0
-    while (featureIndex < numFeatures) {
-      if (categoryMaps.contains(featureIndex)) {
+    while (featureIndex < numFeatures)
+      if (categoryMaps.contains(featureIndex))
         // categorical feature
         val featureValues: Array[String] = categoryMaps(featureIndex).toArray
           .sortBy(_._1)
           .map(_._1)
           .map(_.toString)
-        if (featureValues.length == 2) {
+        if (featureValues.length == 2)
           attrs(featureIndex) = new BinaryAttribute(
               index = Some(featureIndex), values = Some(featureValues))
-        } else {
+        else
           attrs(featureIndex) = new NominalAttribute(
               index = Some(featureIndex),
               isOrdinal = Some(false),
               values = Some(featureValues))
-        }
         categoricalFeatureCount += 1
-      } else {
+      else
         // continuous feature
         attrs(featureIndex) = new NumericAttribute(index = Some(featureIndex))
-      }
       featureIndex += 1
-    }
     require(
         categoricalFeatureCount == categoryMaps.size,
         "VectorIndexerModel given categoryMaps" +
         s" with keys outside expected range [0,...,numFeatures), where numFeatures=$numFeatures")
     attrs
-  }
 
   // TODO: Check more carefully about whether this whole class will be included in a closure.
 
   /** Per-vector transform function */
-  private val transformFunc: Vector => Vector = {
+  private val transformFunc: Vector => Vector =
     val sortedCatFeatureIndices = categoryMaps.keys.toArray.sorted
     val localVectorMap = categoryMaps
     val localNumFeatures = numFeatures
-    val f: Vector => Vector = { (v: Vector) =>
+    val f: Vector => Vector =  (v: Vector) =>
       assert(v.size == localNumFeatures,
              "VectorIndexerModel expected vector of length" +
              s" $numFeatures but found length ${v.size}")
-      v match {
+      v match
         case dv: DenseVector =>
           val tmpv = dv.copy
-          localVectorMap.foreach {
+          localVectorMap.foreach
             case (featureIndex: Int, categoryMap: Map[Double, Int]) =>
               tmpv.values(featureIndex) = categoryMap(tmpv(featureIndex))
-          }
           tmpv
         case sv: SparseVector =>
           // We use the fact that categorical value 0 is always mapped to index 0.
@@ -355,23 +328,18 @@ class VectorIndexerModel private[ml](
           var catFeatureIdx = 0 // index into sortedCatFeatureIndices
           var k = 0 // index into non-zero elements of sparse vector
           while (catFeatureIdx < sortedCatFeatureIndices.length &&
-          k < tmpv.indices.length) {
+          k < tmpv.indices.length)
             val featureIndex = sortedCatFeatureIndices(catFeatureIdx)
-            if (featureIndex < tmpv.indices(k)) {
+            if (featureIndex < tmpv.indices(k))
               catFeatureIdx += 1
-            } else if (featureIndex > tmpv.indices(k)) {
+            else if (featureIndex > tmpv.indices(k))
               k += 1
-            } else {
+            else
               tmpv.values(k) = localVectorMap(featureIndex)(tmpv.values(k))
               catFeatureIdx += 1
               k += 1
-            }
-          }
           tmpv
-      }
-    }
     f
-  }
 
   /** @group setParam */
   def setInputCol(value: String): this.type = set(inputCol, value)
@@ -379,17 +347,15 @@ class VectorIndexerModel private[ml](
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
     val newField = prepOutputField(dataset.schema)
-    val transformUDF = udf { (vector: Vector) =>
+    val transformUDF = udf  (vector: Vector) =>
       transformFunc(vector)
-    }
     val newCol = transformUDF(dataset($(inputCol)))
     dataset.withColumn($(outputCol), newCol, newField.metadata)
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val dataType = new VectorUDT
     require(isDefined(inputCol),
             s"VectorIndexerModel requires input column parameter: $inputCol")
@@ -400,11 +366,10 @@ class VectorIndexerModel private[ml](
     // If the input metadata specifies numFeatures, compare with expected numFeatures.
     val origAttrGroup = AttributeGroup.fromStructField(schema($(inputCol)))
     val origNumFeatures: Option[Int] =
-      if (origAttrGroup.attributes.nonEmpty) {
+      if (origAttrGroup.attributes.nonEmpty)
         Some(origAttrGroup.attributes.get.length)
-      } else {
+      else
         origAttrGroup.numAttributes
-      }
     require(
         origNumFeatures.forall(_ == numFeatures),
         "VectorIndexerModel expected" +
@@ -414,64 +379,56 @@ class VectorIndexerModel private[ml](
     val newField = prepOutputField(schema)
     val outputFields = schema.fields :+ newField
     StructType(outputFields)
-  }
 
   /**
     * Prepare the output column field, including per-feature metadata.
     * @param schema  Input schema
     * @return  Output column field.  This field does not contain non-ML metadata.
     */
-  private def prepOutputField(schema: StructType): StructField = {
+  private def prepOutputField(schema: StructType): StructField =
     val origAttrGroup = AttributeGroup.fromStructField(schema($(inputCol)))
     val featureAttributes: Array[Attribute] =
-      if (origAttrGroup.attributes.nonEmpty) {
+      if (origAttrGroup.attributes.nonEmpty)
         // Convert original attributes to modified attributes
         val origAttrs: Array[Attribute] = origAttrGroup.attributes.get
-        origAttrs.zip(partialFeatureAttributes).map {
+        origAttrs.zip(partialFeatureAttributes).map
           case (origAttr: Attribute, featAttr: BinaryAttribute) =>
-            if (origAttr.name.nonEmpty) {
+            if (origAttr.name.nonEmpty)
               featAttr.withName(origAttr.name.get)
-            } else {
+            else
               featAttr
-            }
           case (origAttr: Attribute, featAttr: NominalAttribute) =>
-            if (origAttr.name.nonEmpty) {
+            if (origAttr.name.nonEmpty)
               featAttr.withName(origAttr.name.get)
-            } else {
+            else
               featAttr
-            }
           case (origAttr: Attribute, featAttr: NumericAttribute) =>
             origAttr.withIndex(featAttr.index.get)
           case (origAttr: Attribute, _) =>
             origAttr
-        }
-      } else {
+      else
         partialFeatureAttributes
-      }
     val newAttributeGroup = new AttributeGroup($(outputCol), featureAttributes)
     newAttributeGroup.toStructField()
-  }
 
-  override def copy(extra: ParamMap): VectorIndexerModel = {
+  override def copy(extra: ParamMap): VectorIndexerModel =
     val copied = new VectorIndexerModel(uid, numFeatures, categoryMaps)
     copyValues(copied, extra).setParent(parent)
-  }
 
   @Since("1.6.0")
   override def write: MLWriter = new VectorIndexerModelWriter(this)
-}
 
 @Since("1.6.0")
-object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
+object VectorIndexerModel extends MLReadable[VectorIndexerModel]
 
   private[VectorIndexerModel] class VectorIndexerModelWriter(
       instance: VectorIndexerModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(
         numFeatures: Int, categoryMaps: Map[Int, Map[Double, Int]])
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val data = Data(instance.numFeatures, instance.categoryMaps)
       val dataPath = new Path(path, "data").toString
@@ -480,14 +437,12 @@ object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class VectorIndexerModelReader extends MLReader[VectorIndexerModel] {
+  private class VectorIndexerModelReader extends MLReader[VectorIndexerModel]
 
     private val className = classOf[VectorIndexerModel].getName
 
-    override def load(path: String): VectorIndexerModel = {
+    override def load(path: String): VectorIndexerModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
       val data = sqlContext.read
@@ -500,8 +455,6 @@ object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
           metadata.uid, numFeatures, categoryMaps)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[VectorIndexerModel] =
@@ -509,4 +462,3 @@ object VectorIndexerModel extends MLReadable[VectorIndexerModel] {
 
   @Since("1.6.0")
   override def load(path: String): VectorIndexerModel = super.load(path)
-}

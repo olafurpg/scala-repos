@@ -1,14 +1,12 @@
-class A {
+class A
   def foo(a: Int) = 0
-}
 
-class RichA {
+class RichA
   def foo(a: String) = 0
   def foo(a: String, b: String) = 0
   def foo() = 0
-}
 
-object Test {
+object Test
 
   implicit def AToRichA(a: A) = new RichA
 
@@ -28,26 +26,20 @@ object Test {
   a.foo("a", "b") // Without implicits, a type error regarding invalid arity is generated at `foo(<error>"", "")`.
   // Typers#tryTypedApply:3274 only checks if the error is as the same position as `foo`, `"a"`, or `"b"`.
   // None of these po
-}
 
 // t0851 is essentially the same:
-object test1 {
-  case class Foo[T, T2](f: (T, T2) => String) extends (((T, T2)) => String) {
+object test1
+  case class Foo[T, T2](f: (T, T2) => String) extends (((T, T2)) => String)
     def apply(t: T) = (s: T2) => f(t, s)
     def apply(p: (T, T2)) = f(p._1, p._2)
-  }
   implicit def g[T](f: (T, String) => String) = Foo(f)
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val f = (x: Int, s: String) => s + x
     println(f(1))
     ()
-  }
-}
-object Main {
-  def main(args: Array[String]) {
+object Main
+  def main(args: Array[String])
     val fn = (a: Int, str: String) => "a: " + a + ", str: " + str
     implicit def fx[T](f: (T, String) => String) = (x: T) => f(x, null)
     println(fn(1))
     ()
-  }
-}

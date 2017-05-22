@@ -34,25 +34,23 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 
-object Accordion {
+object Accordion
   implicit def sfxAccordion2jfx(v: Accordion): jfxsc.Accordion =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Accordion.html]].
   */
 class Accordion(override val delegate: jfxsc.Accordion = new jfxsc.Accordion)
-    extends Control(delegate) with SFXDelegate[jfxsc.Accordion] {
+    extends Control(delegate) with SFXDelegate[jfxsc.Accordion]
 
   /**
     * The expanded TitledPane in the Accordion.
     */
   def expandedPane: ObjectProperty[jfxsc.TitledPane] =
     delegate.expandedPaneProperty
-  def expandedPane_=(v: TitledPane) {
+  def expandedPane_=(v: TitledPane)
     expandedPane() = v
-  }
 
   /**
     * The list of TitledPane in this Accordion.
@@ -65,7 +63,5 @@ class Accordion(override val delegate: jfxsc.Accordion = new jfxsc.Accordion)
     *
     * @param c list of TitledPane in this Accordion to replace prior content.
     */
-  def panes_=(c: Iterable[TitledPane]) {
+  def panes_=(c: Iterable[TitledPane])
     fillSFXCollection(this.panes, c)
-  }
-}

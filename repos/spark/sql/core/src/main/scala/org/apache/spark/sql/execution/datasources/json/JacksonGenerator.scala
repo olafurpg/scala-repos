@@ -23,7 +23,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.{ArrayData, DateTimeUtils, MapData}
 import org.apache.spark.sql.types._
 
-private[sql] object JacksonGenerator {
+private[sql] object JacksonGenerator
 
   /** Transforms a single InternalRow to JSON using Jackson
     *
@@ -34,8 +34,8 @@ private[sql] object JacksonGenerator {
     * @param row The row to convert
     */
   def apply(rowSchema: StructType, gen: JsonGenerator)(
-      row: InternalRow): Unit = {
-    def valWriter: (DataType, Any) => Unit = {
+      row: InternalRow): Unit =
+    def valWriter: (DataType, Any) => Unit =
       case (_, null) | (NullType, _) => gen.writeNull()
       case (StringType, v) => gen.writeString(v.toString)
       case (TimestampType, v: Long) =>
@@ -64,31 +64,26 @@ private[sql] object JacksonGenerator {
 
       case (MapType(kt, vt, _), v: MapData) =>
         gen.writeStartObject()
-        v.foreach(kt, vt, { (k, v) =>
+        v.foreach(kt, vt,  (k, v) =>
           gen.writeFieldName(k.toString)
           valWriter(vt, v)
-        })
+        )
         gen.writeEndObject()
 
       case (StructType(ty), v: InternalRow) =>
         gen.writeStartObject()
         var i = 0
-        while (i < ty.length) {
+        while (i < ty.length)
           val field = ty(i)
           val value = v.get(i, field.dataType)
-          if (value != null) {
+          if (value != null)
             gen.writeFieldName(field.name)
             valWriter(field.dataType, value)
-          }
           i += 1
-        }
         gen.writeEndObject()
 
       case (dt, v) =>
         sys.error(
             s"Failed to convert value $v (class of ${v.getClass}}) with the type of $dt to JSON.")
-    }
 
     valWriter(rowSchema, row)
-  }
-}

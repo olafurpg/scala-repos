@@ -10,10 +10,10 @@ package org.scalajs.testsuite.compiler
 import org.junit.Test
 import org.junit.Assert._
 
-class ByteTest {
+class ByteTest
 
   @Test
-  def `should_always_be_in_their_range`(): Unit = {
+  def `should_always_be_in_their_range`(): Unit =
     def test(x: Int, y: Byte): Unit =
       assertEquals(y, x.toByte)
 
@@ -33,5 +33,3 @@ class ByteTest {
 
     testC(-1.toChar, -1)
     testC(200.toChar, -56)
-  }
-}

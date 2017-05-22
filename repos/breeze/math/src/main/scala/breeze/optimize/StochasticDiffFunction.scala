@@ -7,7 +7,7 @@ import breeze.util.Isomorphism
   * across consecutive invocations.
   * @author dlwh
   */
-trait StochasticDiffFunction[T] extends (T => Double) { outer =>
+trait StochasticDiffFunction[T] extends (T => Double)  outer =>
 
   /** calculates the gradient at a point */
   def gradientAt(x: T): T = calculate(x)._2
@@ -26,11 +26,8 @@ trait StochasticDiffFunction[T] extends (T => Double) { outer =>
     */
   def throughLens[U](
       implicit l: Isomorphism[T, U]): StochasticDiffFunction[U] =
-    new StochasticDiffFunction[U] {
-      override def calculate(u: U) = {
+    new StochasticDiffFunction[U]
+      override def calculate(u: U) =
         val t = l.backward(u)
         val (obj, gu) = outer.calculate(t)
         (obj, l.forward(gu))
-      }
-    }
-}

@@ -23,65 +23,56 @@ import play.core.Execution.Implicits.internalContext
 /**
   * handles a scala websocket in a Java Context
   */
-object JavaWebSocket extends JavaHelpers {
+object JavaWebSocket extends JavaHelpers
 
   def webSocketWrapper[A](
       retrieveWebSocket: => CompletionStage[LegacyWebSocket[A]])(
       implicit transformer: MessageFlowTransformer[A, A]): WebSocket =
-    WebSocket { request =>
+    WebSocket  request =>
       val javaContext = createJavaContext(request)
 
-      val javaWebSocket = try {
+      val javaWebSocket = try
         JContext.current.set(javaContext)
         FutureConverters.toScala(retrieveWebSocket)
-      } finally {
+      finally
         JContext.current.remove()
-      }
 
-      javaWebSocket.map { jws =>
+      javaWebSocket.map  jws =>
         val reject = Option(jws.rejectWith())
-        reject.map { result =>
+        reject.map  result =>
           Left(createResult(javaContext, result))
-        } getOrElse {
+        getOrElse
           val current = play.api.Play.privateMaybeApplication.get
           implicit val system = current.actorSystem
           implicit val mat = current.materializer
 
           Right(
-              if (jws.isActor) {
+              if (jws.isActor)
                 transformer.transform(ActorFlow.actorRef(jws.actorProps))
-              } else {
+              else
 
                 val socketIn = new JWebSocket.In[A]
 
-                val sink = Flow[A].map { msg =>
+                val sink = Flow[A].map  msg =>
                   socketIn.callbacks.asScala.foreach(_.accept(msg))
-                }.to(Sink.onComplete { _ =>
+                .to(Sink.onComplete  _ =>
                   socketIn.closeCallbacks.asScala.foreach(_.run())
-                })
+                )
 
                 val source = Source
                   .actorRef[A](256, OverflowStrategy.dropNew)
-                  .mapMaterializedValue {
+                  .mapMaterializedValue
                     actor =>
-                      val socketOut = new JWebSocket.Out[A] {
-                        def write(frame: A) = {
+                      val socketOut = new JWebSocket.Out[A]
+                        def write(frame: A) =
                           actor ! frame
-                        }
-                        def close() = {
+                        def close() =
                           actor ! Status.Success(())
-                        }
-                      }
 
                       jws.onReady(socketIn, socketOut)
-                  }
 
                 transformer.transform(Flow.fromSinkAndSource(sink, source))
-              }
           )
-        }
-      }
-    }
 
   // -- Bytes
 
@@ -121,4 +112,3 @@ object JavaWebSocket extends JavaHelpers {
       retrieveWebSocket: => CompletionStage[LegacyWebSocket[JsonNode]])
     : WebSocket =
     webSocketWrapper[JsonNode](retrieveWebSocket)
-}

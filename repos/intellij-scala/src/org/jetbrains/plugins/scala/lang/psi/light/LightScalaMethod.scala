@@ -16,7 +16,7 @@ trait LightScalaMethod
 class LightMethodAdapter(
     manager: PsiManager, method: PsiMethod, containingClass: PsiClass)
     extends LightMethod(
-        manager, method, containingClass, containingClass.getLanguage) {
+        manager, method, containingClass, containingClass.getLanguage)
 
   override def findDeepestSuperMethods(): Array[PsiMethod] =
     PsiSuperMethodImplUtil.findDeepestSuperMethods(this)
@@ -40,4 +40,3 @@ class LightMethodAdapter(
 
   override def getHierarchicalMethodSignature: HierarchicalMethodSignature =
     PsiSuperMethodImplUtil.getHierarchicalMethodSignature(this)
-}

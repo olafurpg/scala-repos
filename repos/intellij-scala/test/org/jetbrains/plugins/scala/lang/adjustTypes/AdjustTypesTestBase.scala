@@ -20,7 +20,7 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * 7/11/13
   */
 abstract class AdjustTypesTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
 
@@ -28,7 +28,7 @@ abstract class AdjustTypesTestBase
 
   protected override def rootPath(): String = folderPath
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
@@ -58,30 +58,25 @@ abstract class AdjustTypesTestBase
     var res: String = null
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
 
-    try {
-      ScalaUtils.runWriteAction(new Runnable {
-        def run() {
+    try
+      ScalaUtils.runWriteAction(new Runnable
+        def run()
           ScalaPsiUtil.adjustTypes(element)
           UsefulTestCase.doPostponedFormatting(getProjectAdapter)
-        }
-      }, getProjectAdapter, "Test")
+      , getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    } catch {
+    catch
       case e: Exception =>
         println(e)
         assert(
             assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res)
-  }
-}

@@ -1,15 +1,10 @@
-package pkg {
+package pkg
   package object other
-  package other {
-    class Crash {
+  package other
+    class Crash
       AnyOps(0)
       ()
-    }
-  }
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     new pkg.other.Crash
-  }
-}

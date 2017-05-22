@@ -7,11 +7,9 @@ object A { implicit def a2b(a: A): B = ??? }
 class B
 class C extends A
 
-object Macros {
-  def impl(c: Context) = {
+object Macros
+  def impl(c: Context) =
     import c.universe._
     q"new C"
-  }
 
   def foo: A = macro impl
-}

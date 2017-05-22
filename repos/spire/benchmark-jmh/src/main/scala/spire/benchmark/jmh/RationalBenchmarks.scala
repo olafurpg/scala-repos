@@ -8,7 +8,7 @@ import org.openjdk.jmh.infra.Blackhole
 import spire.math.Rational
 import RationalUtil._
 
-object RationalUtil {
+object RationalUtil
   private def isBig(x: Rational) =
     x.getClass.getSimpleName.endsWith("BigRational")
 
@@ -21,26 +21,21 @@ object RationalUtil {
   def classify(a: Rational, b: Rational, a_op_b: Rational): String =
     classify(a) + "_" + classify(b) + "_" + classify(a_op_b)
 
-  def check(cases: Map[String, (Rational, Rational)]): Unit = {
-    for ((kind, (a, b)) ← cases) {
+  def check(cases: Map[String, (Rational, Rational)]): Unit =
+    for ((kind, (a, b)) ← cases)
       val c = classify(a, b)
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
-    }
-  }
 
   def check(cases: Map[String, (Rational, Rational)],
-            op: (Rational, Rational) ⇒ Rational): Unit = {
-    for ((kind, (a, b)) ← cases) {
+            op: (Rational, Rational) ⇒ Rational): Unit =
+    for ((kind, (a, b)) ← cases)
       val c = classify(a, b, op(a, b))
       require(kind.startsWith(c), s"Unexpected class $c for case $kind")
-    }
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class RationalMultiplyDivideBenchmark {
+class RationalMultiplyDivideBenchmark
 
   val pairs = Map(
       "li_li_li" → ((Rational(12345), Rational(67890))),
@@ -66,28 +61,24 @@ class RationalMultiplyDivideBenchmark {
   var c: Rational = Rational.zero
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
     c = b0.inverse
-  }
 
   @Benchmark
-  def product(x: Blackhole): Unit = {
+  def product(x: Blackhole): Unit =
     x.consume(a * b)
-  }
 
   @Benchmark
-  def quotient(x: Blackhole): Unit = {
+  def quotient(x: Blackhole): Unit =
     x.consume(a / b)
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class RationalAddSubtractBenchmark {
+class RationalAddSubtractBenchmark
 
   val pairs = Map(
       "li_li_li" → ((Rational(12345), Rational(67890))),
@@ -110,28 +101,24 @@ class RationalAddSubtractBenchmark {
   var c: Rational = Rational.zero
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
     c = -b0
-  }
 
   @Benchmark
-  def sum(x: Blackhole): Unit = {
+  def sum(x: Blackhole): Unit =
     x.consume(a + b)
-  }
 
   @Benchmark
-  def difference(x: Blackhole): Unit = {
+  def difference(x: Blackhole): Unit =
     x.consume(a - b)
-  }
-}
 
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class RationalCompareBenchmark {
+class RationalCompareBenchmark
   val pairs = Map("li_li" → ((Rational(12345), Rational(67890))),
                   "lf_lf" → ((Rational(12345, 67891), Rational(67890, 12347))),
                   "lf_lf_intermediateBig" →
@@ -150,14 +137,11 @@ class RationalCompareBenchmark {
   var b: Rational = Rational.zero
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val (a0, b0) = pairs(kind)
     a = a0
     b = b0
-  }
 
   @Benchmark
-  def compare(x: Blackhole): Unit = {
+  def compare(x: Blackhole): Unit =
     x.consume(a compare b)
-  }
-}

@@ -9,6 +9,5 @@ import scala.util.matching.Regex
 /**
   * INTERNAL API
   */
-private[http] class EnhancedRegex(val regex: Regex) extends AnyVal {
+private[http] class EnhancedRegex(val regex: Regex) extends AnyVal
   def groupCount = regex.pattern.matcher("").groupCount()
-}

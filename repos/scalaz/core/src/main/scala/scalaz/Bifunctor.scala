@@ -5,7 +5,7 @@ package scalaz
   * A type giving rise to two unrelated [[scalaz.Functor]]s.
   */
 ////
-trait Bifunctor[F[_, _]] { self =>
+trait Bifunctor[F[_, _]]  self =>
   ////
 
   /** `map` over both type parameters. */
@@ -14,18 +14,16 @@ trait Bifunctor[F[_, _]] { self =>
   /**The composition of Bifunctors `F` and `G`, `[x,y]F[G[x,y],G[x,y]]`, is a Bifunctor */
   def compose[G[_, _]](
       implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => F[G[α, β], G[α, β]]]] =
-    new CompositionBifunctor[F, G] {
+    new CompositionBifunctor[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The product of Bifunctors `F` and `G`, `[x,y](F[x,y], G[x,y])`, is a Bifunctor */
   def product[G[_, _]](
       implicit G0: Bifunctor[G]): Bifunctor[λ[(α, β) => (F[α, β], G[α, β])]] =
-    new ProductBifunctor[F, G] {
+    new ProductBifunctor[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /** Extract the Functor on the first param. */
   def leftFunctor[X]: Functor[F[?, X]] =
@@ -52,11 +50,10 @@ trait Bifunctor[F[_, _]] { self =>
   def embed[G[_], H[_]](
       implicit G0: Functor[G],
       H0: Functor[H]): Bifunctor[λ[(α, β) => F[G[α], H[β]]]] =
-    new CompositionBifunctorFunctors[F, G, H] {
+    new CompositionBifunctorFunctors[F, G, H]
       def F = self
       def G = G0
       def H = H0
-    }
 
   /** Embed one Functor to the left */
   def embedLeft[G[_]](
@@ -73,15 +70,12 @@ trait Bifunctor[F[_, _]] { self =>
     bimap(fab)(identity[C], identity[D])
 
   ////
-  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F] {
+  val bifunctorSyntax = new scalaz.syntax.BifunctorSyntax[F]
     def F = Bifunctor.this
-  }
-}
 
-object Bifunctor {
+object Bifunctor
   @inline def apply[F[_, _]](implicit F: Bifunctor[F]): Bifunctor[F] = F
 
   ////
 
   ////
-}

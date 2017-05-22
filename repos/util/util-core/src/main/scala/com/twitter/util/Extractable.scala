@@ -1,5 +1,4 @@
 package com.twitter.util
 
-trait Extractable[T] {
+trait Extractable[T]
   def apply(): T
-}

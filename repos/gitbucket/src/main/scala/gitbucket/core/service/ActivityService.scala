@@ -5,29 +5,26 @@ import gitbucket.core.model.Profile._
 import gitbucket.core.util.JGitUtil
 import profile.simple._
 
-trait ActivityService {
+trait ActivityService
 
-  def deleteOldActivities(limit: Int)(implicit s: Session): Int = {
-    Activities.map(_.activityId).sortBy(_ desc).drop(limit).firstOption.map {
+  def deleteOldActivities(limit: Int)(implicit s: Session): Int =
+    Activities.map(_.activityId).sortBy(_ desc).drop(limit).firstOption.map
       id =>
         Activities.filter(_.activityId <= id.bind).delete
-    } getOrElse 0
-  }
+    getOrElse 0
 
   def getActivitiesByUser(activityUserName: String, isPublic: Boolean)(
       implicit s: Session): List[Activity] =
     Activities
       .innerJoin(Repositories)
       .on((t1, t2) => t1.byRepository(t2.userName, t2.repositoryName))
-      .filter {
+      .filter
         case (t1, t2) =>
-          if (isPublic) {
+          if (isPublic)
             (t1.activityUserName === activityUserName.bind) &&
             (t2.isPrivate === false.bind)
-          } else {
+          else
             (t1.activityUserName === activityUserName.bind)
-          }
-      }
       .sortBy { case (t1, t2) => t1.activityId desc }
       .map { case (t1, t2) => t1 }
       .take(30)
@@ -48,10 +45,9 @@ trait ActivityService {
     Activities
       .innerJoin(Repositories)
       .on((t1, t2) => t1.byRepository(t2.userName, t2.repositoryName))
-      .filter {
+      .filter
         case (t1, t2) =>
           (t2.isPrivate === false.bind) || (t2.userName inSetBind owners)
-      }
       .sortBy { case (t1, t2) => t1.activityId desc }
       .map { case (t1, t2) => t1 }
       .take(30)
@@ -209,9 +205,9 @@ trait ActivityService {
         activityUserName,
         "push",
         s"[user:${activityUserName}] pushed to [branch:${userName}/${repositoryName}#${branchName}] at [repo:${userName}/${repositoryName}]",
-        Some(commits.map { commit =>
+        Some(commits.map  commit =>
           commit.id + ":" + commit.shortMessage
-        }.mkString("\n")),
+        .mkString("\n")),
         currentDate)
 
   def recordCreateTagActivity(
@@ -315,4 +311,3 @@ trait ActivityService {
 
   private def cut(value: String, length: Int): String =
     if (value.length > length) value.substring(0, length) + "..." else value
-}

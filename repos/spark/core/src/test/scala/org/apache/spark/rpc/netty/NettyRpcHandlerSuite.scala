@@ -29,7 +29,7 @@ import org.apache.spark.network.client.{TransportClient, TransportResponseHandle
 import org.apache.spark.network.server.StreamManager
 import org.apache.spark.rpc._
 
-class NettyRpcHandlerSuite extends SparkFunSuite {
+class NettyRpcHandlerSuite extends SparkFunSuite
 
   val env = mock(classOf[NettyRpcEnv])
   val sm = mock(classOf[StreamManager])
@@ -37,7 +37,7 @@ class NettyRpcHandlerSuite extends SparkFunSuite {
                        any(classOf[ByteBuffer]))(any()))
     .thenReturn(RequestMessage(RpcAddress("localhost", 12345), null, null))
 
-  test("receive") {
+  test("receive")
     val dispatcher = mock(classOf[Dispatcher])
     val nettyRpcHandler = new NettyRpcHandler(dispatcher, env, sm)
 
@@ -50,9 +50,8 @@ class NettyRpcHandlerSuite extends SparkFunSuite {
 
     verify(dispatcher, times(1))
       .postToAll(RemoteProcessConnected(RpcAddress("localhost", 40000)))
-  }
 
-  test("connectionTerminated") {
+  test("connectionTerminated")
     val dispatcher = mock(classOf[Dispatcher])
     val nettyRpcHandler = new NettyRpcHandler(dispatcher, env, sm)
 
@@ -71,5 +70,3 @@ class NettyRpcHandlerSuite extends SparkFunSuite {
       .postToAll(RemoteProcessConnected(RpcAddress("localhost", 40000)))
     verify(dispatcher, times(1))
       .postToAll(RemoteProcessDisconnected(RpcAddress("localhost", 40000)))
-  }
-}

@@ -33,32 +33,28 @@ import org.apache.spark.util.{SerializableConfiguration, Utils}
   * A trait for use with reading custom classes in PySpark. Implement this trait and add custom
   * transformation code by overriding the convert method.
   */
-trait Converter[T, +U] extends Serializable {
+trait Converter[T, +U] extends Serializable
   def convert(obj: T): U
-}
 
-private[python] object Converter extends Logging {
+private[python] object Converter extends Logging
 
   def getInstance(
       converterClass: Option[String],
-      defaultConverter: Converter[Any, Any]): Converter[Any, Any] = {
-    converterClass.map { cc =>
-      Try {
+      defaultConverter: Converter[Any, Any]): Converter[Any, Any] =
+    converterClass.map  cc =>
+      Try
         val c = Utils
           .classForName(cc)
           .newInstance()
           .asInstanceOf[Converter[Any, Any]]
         logInfo(s"Loaded converter: $cc")
         c
-      } match {
+      match
         case Success(c) => c
         case Failure(err) =>
           logError(s"Failed to load converter: $cc")
           throw err
-      }
-    }.getOrElse { defaultConverter }
-  }
-}
+    .getOrElse { defaultConverter }
 
 /**
   * A converter that handles conversion of common [[org.apache.hadoop.io.Writable]] objects.
@@ -66,14 +62,14 @@ private[python] object Converter extends Logging {
   */
 private[python] class WritableToJavaConverter(
     conf: Broadcast[SerializableConfiguration])
-    extends Converter[Any, Any] {
+    extends Converter[Any, Any]
 
   /**
     * Converts a [[org.apache.hadoop.io.Writable]] to the underlying primitive, String or
     * object representation
     */
-  private def convertWritable(writable: Writable): Any = {
-    writable match {
+  private def convertWritable(writable: Writable): Any =
+    writable match
       case iw: IntWritable => iw.get()
       case dw: DoubleWritable => dw.get()
       case lw: LongWritable => lw.get()
@@ -93,24 +89,18 @@ private[python] class WritableToJavaConverter(
         aw.get().map(convertWritable(_))
       case mw: MapWritable =>
         val map = new java.util.HashMap[Any, Any]()
-        mw.asScala.foreach {
+        mw.asScala.foreach
           case (k, v) => map.put(convertWritable(k), convertWritable(v))
-        }
         map
       case w: Writable => WritableUtils.clone(w, conf.value.value)
       case other => other
-    }
-  }
 
-  override def convert(obj: Any): Any = {
-    obj match {
+  override def convert(obj: Any): Any =
+    obj match
       case writable: Writable =>
         convertWritable(writable)
       case _ =>
         obj
-    }
-  }
-}
 
 /**
   * A converter that converts common types to [[org.apache.hadoop.io.Writable]]. Note that array
@@ -120,14 +110,14 @@ private[python] class WritableToJavaConverter(
   * PySpark RDD `saveAsNewAPIHadoopFile` doctest.
   */
 private[python] class JavaToWritableConverter
-    extends Converter[Any, Writable] {
+    extends Converter[Any, Writable]
 
   /**
     * Converts common data types to [[org.apache.hadoop.io.Writable]]. Note that array types are not
     * supported out-of-the-box.
     */
-  private def convertToWritable(obj: Any): Writable = {
-    obj match {
+  private def convertToWritable(obj: Any): Writable =
+    obj match
       case i: java.lang.Integer => new IntWritable(i)
       case d: java.lang.Double => new DoubleWritable(d)
       case l: java.lang.Long => new LongWritable(l)
@@ -138,49 +128,41 @@ private[python] class JavaToWritableConverter
       case null => NullWritable.get()
       case map: java.util.Map[_, _] =>
         val mapWritable = new MapWritable()
-        map.asScala.foreach {
+        map.asScala.foreach
           case (k, v) =>
             mapWritable.put(convertToWritable(k), convertToWritable(v))
-        }
         mapWritable
-      case array: Array[Any] => {
+      case array: Array[Any] =>
           val arrayWriteable = new ArrayWritable(classOf[Writable])
           arrayWriteable.set(array.map(convertToWritable(_)))
           arrayWriteable
-        }
       case other =>
         throw new SparkException(
             s"Data of type ${other.getClass.getName} cannot be used")
-    }
-  }
 
-  override def convert(obj: Any): Writable = obj match {
+  override def convert(obj: Any): Writable = obj match
     case writable: Writable => writable
     case other => convertToWritable(other)
-  }
-}
 
 /** Utilities for working with Python objects <-> Hadoop-related objects */
-private[python] object PythonHadoopUtil {
+private[python] object PythonHadoopUtil
 
   /**
     * Convert a [[java.util.Map]] of properties to a [[org.apache.hadoop.conf.Configuration]]
     */
-  def mapToConf(map: java.util.Map[String, String]): Configuration = {
+  def mapToConf(map: java.util.Map[String, String]): Configuration =
     val conf = new Configuration()
     map.asScala.foreach { case (k, v) => conf.set(k, v) }
     conf
-  }
 
   /**
     * Merges two configurations, returns a copy of left with keys from right overwriting
     * any matching keys in left
     */
-  def mergeConfs(left: Configuration, right: Configuration): Configuration = {
+  def mergeConfs(left: Configuration, right: Configuration): Configuration =
     val copy = new Configuration(left)
     right.asScala.foreach(entry => copy.set(entry.getKey, entry.getValue))
     copy
-  }
 
   /**
     * Converts an RDD of key-value pairs, where key and/or value could be instances of
@@ -189,9 +171,6 @@ private[python] object PythonHadoopUtil {
   def convertRDD[K, V](
       rdd: RDD[(K, V)],
       keyConverter: Converter[Any, Any],
-      valueConverter: Converter[Any, Any]): RDD[(Any, Any)] = {
-    rdd.map {
+      valueConverter: Converter[Any, Any]): RDD[(Any, Any)] =
+    rdd.map
       case (k, v) => (keyConverter.convert(k), valueConverter.convert(v))
-    }
-  }
-}

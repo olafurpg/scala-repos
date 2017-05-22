@@ -10,10 +10,10 @@ import akka.testkit.AkkaSpec
 import akka.stream.scaladsl.{Merge, Broadcast, Balance, Zip}
 import GraphInterpreter._
 
-class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
+class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit
   import GraphStages._
 
-  "GraphInterpreter" must {
+  "GraphInterpreter" must
 
     // Reusable components
     val identity = GraphStages.identity[Int]
@@ -23,7 +23,7 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
     val merge = Merge[Int](2)
     val balance = Balance[Int](2)
 
-    "implement identity" in new TestSetup {
+    "implement identity" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[Int]("sink")
 
@@ -39,9 +39,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       source.onNext(1)
       lastEvents() should ===(Set(OnNext(sink, 1)))
-    }
 
-    "implement chained identity" in new TestSetup {
+    "implement chained identity" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[Int]("sink")
 
@@ -66,9 +65,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       source.onNext(1)
       lastEvents() should ===(Set(OnNext(sink, 1)))
-    }
 
-    "implement detacher stage" in new TestSetup {
+    "implement detacher stage" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[Int]("sink")
 
@@ -100,9 +98,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       // "pushAndPull"
       source.onNext(3)
       lastEvents() should ===(Set(OnNext(sink, 3), RequestOne(source)))
-    }
 
-    "implement Zip" in new TestSetup {
+    "implement Zip" in new TestSetup
       val source1 = new UpstreamProbe[Int]("source1")
       val source2 = new UpstreamProbe[String]("source2")
       val sink = new DownstreamProbe[(Int, String)]("sink")
@@ -125,9 +122,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       lastEvents() should ===(Set(OnNext(sink, (42, "Meaning of life")),
                                   RequestOne(source1),
                                   RequestOne(source2)))
-    }
 
-    "implement Broadcast" in new TestSetup {
+    "implement Broadcast" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink1 = new DownstreamProbe[Int]("sink1")
       val sink2 = new DownstreamProbe[Int]("sink2")
@@ -148,9 +144,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       source.onNext(1)
       lastEvents() should ===(Set(OnNext(sink1, 1), OnNext(sink2, 1)))
-    }
 
-    "implement broadcast-zip" in new TestSetup {
+    "implement broadcast-zip" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[(Int, Int)]("sink")
       val zip = new Zip[Int, Int]
@@ -173,9 +168,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       sink.requestOne()
       source.onNext(2)
       lastEvents() should ===(Set(OnNext(sink, (2, 2)), RequestOne(source)))
-    }
 
-    "implement zip-broadcast" in new TestSetup {
+    "implement zip-broadcast" in new TestSetup
       val source1 = new UpstreamProbe[Int]("source1")
       val source2 = new UpstreamProbe[Int]("source2")
       val sink1 = new DownstreamProbe[(Int, Int)]("sink")
@@ -206,9 +200,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
                                   OnNext(sink2, (1, 2)),
                                   RequestOne(source1),
                                   RequestOne(source2)))
-    }
 
-    "implement merge" in new TestSetup {
+    "implement merge" in new TestSetup
       val source1 = new UpstreamProbe[Int]("source1")
       val source2 = new UpstreamProbe[Int]("source2")
       val sink = new DownstreamProbe[Int]("sink")
@@ -244,9 +237,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       source1.onNext(4)
       lastEvents() should ===(Set(OnNext(sink, 4), RequestOne(source1)))
-    }
 
-    "implement balance" in new TestSetup {
+    "implement balance" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink1 = new DownstreamProbe[Int]("sink1")
       val sink2 = new DownstreamProbe[Int]("sink2")
@@ -270,9 +262,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       source.onNext(2)
       lastEvents() should ===(Set(OnNext(sink2, 2)))
-    }
 
-    "implement non-divergent cycle" in new TestSetup {
+    "implement non-divergent cycle" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[Int]("sink")
 
@@ -298,9 +289,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
       // Unstuck it
       sink.requestOne()
       lastEvents() should ===(Set(OnNext(sink, 2)))
-    }
 
-    "implement divergent cycle" in new TestSetup {
+    "implement divergent cycle" in new TestSetup
       val source = new UpstreamProbe[Int]("source")
       val sink = new DownstreamProbe[Int]("sink")
 
@@ -336,9 +326,8 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       // The cycle is now empty
       interpreter.isSuspended should be(false)
-    }
 
-    "implement buffer" in new TestSetup {
+    "implement buffer" in new TestSetup
       val source = new UpstreamProbe[String]("source")
       val sink = new DownstreamProbe[String]("sink")
       val buffer = new PushPullGraphStage[String, String, NotUsed](
@@ -372,6 +361,3 @@ class GraphInterpreterSpec extends AkkaSpec with GraphInterpreterSpecKit {
 
       sink.requestOne()
       lastEvents() should ===(Set(OnComplete(sink)))
-    }
-  }
-}

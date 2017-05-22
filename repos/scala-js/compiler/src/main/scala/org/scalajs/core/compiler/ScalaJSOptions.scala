@@ -12,7 +12,7 @@ import java.net.URI
   *  Also see the help text in ScalaJSPlugin for information about particular
   *  options.
   */
-trait ScalaJSOptions {
+trait ScalaJSOptions
   import ScalaJSOptions.URIMap
 
   /** should calls to Predef.classOf[T] be fixed in the jsinterop phase.
@@ -22,8 +22,6 @@ trait ScalaJSOptions {
   /** which source locations in source maps should be relativized (or where
     *  should they be mapped to)? */
   def sourceURIMaps: List[URIMap]
-}
 
-object ScalaJSOptions {
+object ScalaJSOptions
   case class URIMap(from: URI, to: Option[URI])
-}

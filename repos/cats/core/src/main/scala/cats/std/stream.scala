@@ -4,10 +4,10 @@ package std
 import scala.collection.immutable.Stream.Empty
 import cats.syntax.show._
 
-trait StreamInstances {
+trait StreamInstances
   implicit val streamInstance: Traverse[Stream] with MonadCombine[Stream] with CoflatMap[
       Stream] = new Traverse[Stream] with MonadCombine[Stream]
-  with CoflatMap[Stream] {
+  with CoflatMap[Stream]
 
     def empty[A]: Stream[A] = Stream.Empty
 
@@ -33,14 +33,13 @@ trait StreamInstances {
 
     def foldRight[A, B](
         fa: Stream[A], lb: Eval[B])(f: (A, Eval[B]) => Eval[B]): Eval[B] =
-      Now(fa).flatMap { s =>
+      Now(fa).flatMap  s =>
         // Note that we don't use pattern matching to deconstruct the
         // stream, since that would needlessly force the tail.
         if (s.isEmpty) lb else f(s.head, Eval.defer(foldRight(s.tail, lb)(f)))
-      }
 
     def traverse[G[_], A, B](fa: Stream[A])(f: A => G[B])(
-        implicit G: Applicative[G]): G[Stream[B]] = {
+        implicit G: Applicative[G]): G[Stream[B]] =
       def init: G[Stream[B]] = G.pure(Stream.empty[B])
 
       // We use foldRight to avoid possible stack overflows. Since
@@ -49,10 +48,9 @@ trait StreamInstances {
       //
       // (We don't worry about internal laziness because traverse
       // has to evaluate the entire stream anyway.)
-      foldRight(fa, Later(init)) { (a, lgsb) =>
+      foldRight(fa, Later(init))  (a, lgsb) =>
         lgsb.map(gsb => G.map2(f(a), gsb)(_ #:: _))
-      }.value
-    }
+      .value
 
     override def exists[A](fa: Stream[A])(p: A => Boolean): Boolean =
       fa.exists(p)
@@ -61,30 +59,23 @@ trait StreamInstances {
       fa.forall(p)
 
     override def isEmpty[A](fa: Stream[A]): Boolean = fa.isEmpty
-  }
 
   implicit def streamShow[A : Show]: Show[Stream[A]] =
-    new Show[Stream[A]] {
+    new Show[Stream[A]]
       def show(fa: Stream[A]): String =
         if (fa.isEmpty) "Stream()" else s"Stream(${fa.head.show}, ?)"
-    }
 
   // TODO: eventually use algebra's instances (which will deal with
   // implicit priority between Eq/PartialOrder/Order).
 
   implicit def eqStream[A](implicit ev: Eq[A]): Eq[Stream[A]] =
-    new Eq[Stream[A]] {
-      def eqv(x: Stream[A], y: Stream[A]): Boolean = {
+    new Eq[Stream[A]]
+      def eqv(x: Stream[A], y: Stream[A]): Boolean =
         def loop(xs: Stream[A], ys: Stream[A]): Boolean =
-          xs match {
+          xs match
             case Empty => ys.isEmpty
             case a #:: xs =>
-              ys match {
+              ys match
                 case Empty => false
                 case b #:: ys => if (ev.neqv(a, b)) false else loop(xs, ys)
-              }
-          }
         loop(x, y)
-      }
-    }
-}

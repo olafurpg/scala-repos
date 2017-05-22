@@ -28,7 +28,7 @@ import akka.testkit.TestEvent
 import akka.testkit.EventFilter
 import akka.dispatch.sysmsg.{Failed, SystemMessage}
 
-object SystemMessageDeliveryStressTest {
+object SystemMessageDeliveryStressTest
   val msgCount = 5000
   val burstSize = 100
   val burstDelay = 500.millis
@@ -62,7 +62,7 @@ object SystemMessageDeliveryStressTest {
 
   private[akka] class SystemMessageSequenceVerifier(
       system: ActorSystem, testActor: ActorRef)
-      extends MinimalActorRef {
+      extends MinimalActorRef
     val provider = RARP(system).provider
     val path = provider.tempPath()
 
@@ -70,19 +70,16 @@ object SystemMessageDeliveryStressTest {
 
     override def getParent = provider.tempContainer
 
-    override def sendSystemMessage(message: SystemMessage): Unit = {
-      message match {
+    override def sendSystemMessage(message: SystemMessage): Unit =
+      message match
         case Failed(_, _, seq) ⇒ testActor ! seq
         case _ ⇒
-      }
-    }
-  }
 
   class SystemMessageSender(val msgCount: Int,
                             val burstSize: Int,
                             val burstDelay: FiniteDuration,
                             val target: ActorRef)
-      extends Actor {
+      extends Actor
     import context.dispatcher
 
     var counter = 0
@@ -91,29 +88,24 @@ object SystemMessageDeliveryStressTest {
 
     override def preStart(): Unit = self ! "sendnext"
 
-    override def receive = {
+    override def receive =
       case "sendnext" ⇒
         targetRef.sendSystemMessage(Failed(null, null, counter))
         counter += 1
         burstCounter += 1
 
-        if (counter < msgCount) {
+        if (counter < msgCount)
           if (burstCounter < burstSize) self ! "sendnext"
-          else {
+          else
             burstCounter = 0
             context.system.scheduler.scheduleOnce(burstDelay, self, "sendnext")
-          }
-        }
-    }
-  }
-}
 
 abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
     extends AkkaSpec(
         ConfigFactory
           .parseString(cfg)
           .withFallback(SystemMessageDeliveryStressTest.baseConfig))
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import SystemMessageDeliveryStressTest._
 
   override def expectedTestDuration: FiniteDuration = 120.seconds
@@ -138,7 +130,7 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
   val targetForB = RARP(systemB).provider.resolveActorRef(
       RootActorPath(addressA) / "temp" / sysMsgVerifierA.path.name)
 
-  override def atStartup() = {
+  override def atStartup() =
     systemA.eventStream.publish(
         TestEvent.Mute(EventFilter[EndpointException](),
                        EventFilter.error(start = "AssociationError"),
@@ -150,10 +142,9 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
 
     systemA.eventStream.subscribe(probeA.ref, classOf[QuarantinedEvent])
     systemB.eventStream.subscribe(probeB.ref, classOf[QuarantinedEvent])
-  }
 
-  "Remoting " + msg must {
-    "guaranteed delivery and message ordering despite packet loss " taggedAs TimingTest in {
+  "Remoting " + msg must
+    "guaranteed delivery and message ordering despite packet loss " taggedAs TimingTest in
       import systemA.dispatcher
 
       val transportA = RARP(systemA).provider.transport
@@ -165,15 +156,13 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
                    3.seconds.dilated)
 
       // Schedule peridodic disassociates
-      systemA.scheduler.schedule(3.second, 8.seconds) {
+      systemA.scheduler.schedule(3.second, 8.seconds)
         transportA.managementCommand(ForceDisassociateExplicitly(
                 addressB, reason = AssociationHandle.Unknown))
-      }
 
-      systemB.scheduler.schedule(7.seconds, 8.seconds) {
+      systemB.scheduler.schedule(7.seconds, 8.seconds)
         transportB.managementCommand(ForceDisassociateExplicitly(
                 addressA, reason = AssociationHandle.Unknown))
-      }
 
       systemB.actorOf(
           Props(classOf[SystemMessageSender],
@@ -191,17 +180,14 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
       val toSend = (0 until msgCount).toList
       var maxDelay = 0L
 
-      for (m ← 0 until msgCount) {
+      for (m ← 0 until msgCount)
         val start = System.currentTimeMillis()
         probeB.expectMsg(10.minutes, m)
         probeA.expectMsg(10.minutes, m)
         maxDelay = math.max(maxDelay,
                             (System.currentTimeMillis() - start) / 1000)
-      }
-    }
-  }
 
-  override def beforeTermination() {
+  override def beforeTermination()
     system.eventStream.publish(
         TestEvent.Mute(
             EventFilter.warning(
@@ -215,10 +201,8 @@ abstract class SystemMessageDeliveryStressTest(msg: String, cfg: String)
             EventFilter.error(start = "AssociationError"),
             EventFilter.warning(
                 pattern = "received dead letter.*(InboundPayload|Disassociate)")))
-  }
 
   override def afterTermination(): Unit = shutdown(systemB)
-}
 
 class SystemMessageDeliveryRetryGate
     extends SystemMessageDeliveryStressTest(

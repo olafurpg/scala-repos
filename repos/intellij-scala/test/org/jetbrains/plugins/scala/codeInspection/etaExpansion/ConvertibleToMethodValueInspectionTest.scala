@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.codeInspection.{InspectionBundle, ScalaLightI
   * 6/3/13
   */
 class ConvertibleToMethodValueInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   val annotation = InspectionBundle.message("convertible.to.method.value.name")
   val hintAnon =
     InspectionBundle.message("convertible.to.method.value.anonymous.hint")
@@ -19,7 +19,7 @@ class ConvertibleToMethodValueInspectionTest
   protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[ConvertibleToMethodValueInspection]
 
-  def test_methodCallUntyped() {
+  def test_methodCallUntyped()
     val selected = s"""object A {
                      |  def f(x: Int, y: Int) {
                      |  }
@@ -38,9 +38,8 @@ class ConvertibleToMethodValueInspectionTest
                    |  val f1 = A.f _
                    |}"""
     testFix(text, result, hintAnon)
-  }
 
-  def test_infixUntyped() {
+  def test_infixUntyped()
     val text = """object A {
                  |  def f(x: Int, y: Int) {
                  |  }
@@ -48,9 +47,8 @@ class ConvertibleToMethodValueInspectionTest
                  |}
                  |"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_methodCallEtaUntyped() {
+  def test_methodCallEtaUntyped()
     val text = """object A {
                  |  def f(x: Int, y: Int) {
                  |  }
@@ -58,9 +56,8 @@ class ConvertibleToMethodValueInspectionTest
                  |}
                  |"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_methodCallTyped() {
+  def test_methodCallTyped()
     val selected = s"""object A {
                        |  def f(x: Int, y: Int) {
                        |  }
@@ -78,9 +75,8 @@ class ConvertibleToMethodValueInspectionTest
                    |  val f1: (Int, Int) => Unit = A.f
                    |}"""
     testFix(text, result, hintAnon)
-  }
 
-  def test_methodCallEtaTyped() {
+  def test_methodCallEtaTyped()
     val selected = s"""object A {
                        |  def f(x: Int, y: Int) {
                        |  }
@@ -98,9 +94,8 @@ class ConvertibleToMethodValueInspectionTest
                    |  val f1: (Int, Int) => Unit = A.f
                    |}"""
     testFix(text, result, hintEta)
-  }
 
-  def test_methodCallWithDefaultUntyped() {
+  def test_methodCallWithDefaultUntyped()
     val selected = s"""object A {
                        |  def f(x: Int, y: Int = 0) {
                        |  }
@@ -118,9 +113,8 @@ class ConvertibleToMethodValueInspectionTest
                    |  val f1 = A.f _
                    |}"""
     testFix(text, result, hintAnon)
-  }
 
-  def test_methodCallWithDefaultTyped() {
+  def test_methodCallWithDefaultTyped()
     val text = """object A {
                  |  def f(x: Int, y: Int = 0) {
                  |  }
@@ -128,9 +122,8 @@ class ConvertibleToMethodValueInspectionTest
                  |}
                  |"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_infixWithDefaultTyped() {
+  def test_infixWithDefaultTyped()
     val text = """object A {
                  |  def f(x: Int, y: Int = 0) {
                  |  }
@@ -138,27 +131,24 @@ class ConvertibleToMethodValueInspectionTest
                  |}
                  |"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_methodCallTypedArgs() {
+  def test_methodCallTypedArgs()
     val text = """object A {
                  |  def f(x: Any, y: Int = 0) {
                  |  }
                  |  val f1 = A.f(_: Int, _)
                  |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_infixTypedArgs() {
+  def test_infixTypedArgs()
     val text = """object A {
                  |  def f(x: Any, y: Int = 0) {
                  |  }
                  |  val f1 = A f (_: Int, _: Int)
                  |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_AbstractExpectedType() {
+  def test_AbstractExpectedType()
     val text = """class A {
                  |  def foo() {
                  |    val (x, y) = (0, 1)
@@ -172,17 +162,15 @@ class ConvertibleToMethodValueInspectionTest
                  |}
                  |"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_SCL6000() {
+  def test_SCL6000()
     val text = """class A {
                  |  def inc(f: Int) = f+1
                  |  val set = Set(inc _)
                  |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def test_SCL6154() {
+  def test_SCL6154()
     val text = """class A {
         |def bar() = {
         |    val x = List(1, 2, 3)
@@ -191,17 +179,15 @@ class ConvertibleToMethodValueInspectionTest
         |}
       """
     checkTextHasNoErrors(text)
-  }
 
-  def test_SCL7428() {
+  def test_SCL7428()
     val text =
       """class InspectionTest1[T](translator: T => T = identity[T] _) {
         |  def translate(t: T): T = translator(t)
         |}"""
     checkTextHasNoErrors(text)
-  }
 
-  def testImplicits(): Unit = {
+  def testImplicits(): Unit =
     checkTextHasNoErrors("""
         |import scala.language.implicitConversions
         |
@@ -224,9 +210,8 @@ class ConvertibleToMethodValueInspectionTest
         |
         |}
       """.stripMargin)
-  }
 
-  def testNonStable(): Unit = {
+  def testNonStable(): Unit =
     checkTextHasNoErrors(
         """class A(s: String) {
         |  def foo(x: String) = x
@@ -256,9 +241,8 @@ class ConvertibleToMethodValueInspectionTest
         |}
       """.stripMargin
     )
-  }
 
-  def testStableFunParam(): Unit = {
+  def testStableFunParam(): Unit =
     val text = s"""class A(s: String) {
                    |  def foo(x: String) = x
                    |}
@@ -283,9 +267,8 @@ class ConvertibleToMethodValueInspectionTest
       """.stripMargin
     checkTextHasError(text)
     testFix(text, result, hintAnon)
-  }
 
-  def testStableVal(): Unit = {
+  def testStableVal(): Unit =
     val text = s"""class A(s: String) {
                    |  def foo(x: String) = x
                    |}
@@ -312,9 +295,8 @@ class ConvertibleToMethodValueInspectionTest
       """.stripMargin
     checkTextHasError(text)
     testFix(text, result, hintAnon)
-  }
 
-  def testStableObject(): Unit = {
+  def testStableObject(): Unit =
     val text = s"""class A(s: String) {
                    |  def foo(x: String) = x
                    |}
@@ -337,9 +319,8 @@ class ConvertibleToMethodValueInspectionTest
       """.stripMargin
     checkTextHasError(text)
     testFix(text, result, hintAnon)
-  }
 
-  def testStableSyntheticFun(): Unit = {
+  def testStableSyntheticFun(): Unit =
     val text = s"""val list = "a" :: "b" :: Nil
                   |list.filter($START("a" + "b").contains _$END)
                """.stripMargin
@@ -348,5 +329,3 @@ class ConvertibleToMethodValueInspectionTest
                  """.stripMargin
     checkTextHasError(text)
     testFix(text, result, hintEta)
-  }
-}

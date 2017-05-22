@@ -10,7 +10,7 @@ import play.api.libs.ws.ahc.{AhcWSClientConfig, AhcWSClient}
 
 import play.api.mvc.Call
 
-trait WsTestClient {
+trait WsTestClient
 
   type Port = Int
 
@@ -36,9 +36,8 @@ trait WsTestClient {
     */
   def wsUrl(url: String)(implicit port: Port,
                          client: WSClient = WS.client(
-                               play.api.Play.privateMaybeApplication.get)) = {
+                               play.api.Play.privateMaybeApplication.get)) =
     WS.clientUrl("http://localhost:" + port + url)
-  }
 
   /**
     * Run the given block of code with a client.
@@ -63,37 +62,30 @@ trait WsTestClient {
     * @return The result of the block of code
     */
   def withClient[T](block: WSClient => T)(
-      implicit port: play.api.http.Port = new play.api.http.Port(-1)) = {
+      implicit port: play.api.http.Port = new play.api.http.Port(-1)) =
     val name = "ws-test-client-" + WsTestClient.instanceNumber.getAndIncrement
     val system = ActorSystem(name)
     val materializer = ActorMaterializer(namePrefix = Some(name))(system)
     // Don't retry for tests
     val client =
       AhcWSClient(AhcWSClientConfig(maxRequestRetry = 0))(materializer)
-    val wrappedClient = new WSClient {
+    val wrappedClient = new WSClient
       def underlying[T] = client.underlying.asInstanceOf[T]
-      def url(url: String) = {
-        if (url.startsWith("/") && port.value != -1) {
+      def url(url: String) =
+        if (url.startsWith("/") && port.value != -1)
           client.url(s"http://localhost:$port$url")
-        } else {
+        else
           client.url(url)
-        }
-      }
       def close() = ()
-    }
 
-    try {
+    try
       block(wrappedClient)
-    } finally {
+    finally
       client.close()
       system.terminate()
-    }
-  }
-}
 
-object WsTestClient extends WsTestClient {
+object WsTestClient extends WsTestClient
   import java.util.concurrent.atomic.AtomicInteger
   // This is used to create fresh names when creating `ActorMaterializer` instances in `WsTestClient.withClient`.
   // The motivation is that it can be useful for debugging.
   private val instanceNumber = new AtomicInteger(1)
-}

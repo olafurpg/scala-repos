@@ -15,38 +15,33 @@ import com.intellij.util.containers.MultiMap
 /**
   * @author Alexander Podkhalyuzin
   */
-trait ConflictsReporter {
+trait ConflictsReporter
   def reportConflicts(
       project: Project, conflicts: MultiMap[PsiElement, String]): Boolean
-}
 
-trait EmptyConflictsReporter extends ConflictsReporter {
+trait EmptyConflictsReporter extends ConflictsReporter
   override def reportConflicts(
       project: Project, conflicts: MultiMap[PsiElement, String]) = false
-}
 
-trait DialogConflictsReporter extends ConflictsReporter {
+trait DialogConflictsReporter extends ConflictsReporter
   override def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean = {
+      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean =
     val conflictsDialog = new ConflictsDialog(
         project, conflicts, null, true, false)
     conflictsDialog.show()
     conflictsDialog.isOK
-  }
-}
 
-class BalloonConflictsReporter(editor: Editor) extends ConflictsReporter {
+class BalloonConflictsReporter(editor: Editor) extends ConflictsReporter
 
   def reportConflicts(
-      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean = {
+      project: Project, conflicts: MultiMap[PsiElement, String]): Boolean =
     val messages = conflicts.values().toArray.toSet
     createWarningBalloon(messages.mkString("\n"))
     true //this means that we do nothing, only show balloon
-  }
 
-  private def createWarningBalloon(message: String): Unit = {
-    SwingUtilities invokeLater new Runnable {
-      def run(): Unit = {
+  private def createWarningBalloon(message: String): Unit =
+    SwingUtilities invokeLater new Runnable
+      def run(): Unit =
         val popupFactory = JBPopupFactory.getInstance
         val bestLocation = popupFactory.guessBestPopupLocation(editor)
         val screenPoint: Point = bestLocation.getScreenPoint
@@ -57,7 +52,3 @@ class BalloonConflictsReporter(editor: Editor) extends ConflictsReporter {
           builder.setFadeoutTime(-1).setShowCallout(false).createBalloon
         balloon.show(new RelativePoint(new Point(screenPoint.x, y)),
                      Balloon.Position.above)
-      }
-    }
-  }
-}

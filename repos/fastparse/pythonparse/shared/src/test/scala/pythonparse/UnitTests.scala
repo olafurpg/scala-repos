@@ -7,8 +7,8 @@ import utest._
   * interactions between the constructs that will cause problems, but these
   * are just to make sure that at a basic level each construct is supported.
   */
-object UnitTests extends TestSuite {
-  val tests = TestSuite {
+object UnitTests extends TestSuite
+  val tests = TestSuite
     import Ast.expr._
     import Ast.stmt._
     import Ast.expr_context._
@@ -18,19 +18,18 @@ object UnitTests extends TestSuite {
     import Ast._
     implicit def strName(s: Symbol) = Name(identifier(s.name), Load)
     implicit def strIdent(s: Symbol) = identifier(s.name)
-    'exprs {
+    'exprs
       def expr(expected: Ast.expr, s: String*) =
         s.map(TestUtils.check(Expressions.test, expected, _)).head
 
-      'primitives {
+      'primitives
         'int - expr(Num(1.0), "1")
         'float - expr(Num(1.5), "1.5")
         'emptyTuple - expr(Tuple(Nil, Load), "()")
         'name - expr(Name(identifier("None"), Load), "None")
         'yield - expr(Yield(None), "(yield)")
         'string - expr(Str("Abc"), "'Abc'", "'Ab' b'c'")
-      }
-      'operators {
+      'operators
         'math - expr(BinOp(Num(1.0), Add, Num(2.0)), "1+2", "1 +  2")
         'ident_math - expr(BinOp(
                                'a,
@@ -72,8 +71,7 @@ object UnitTests extends TestSuite {
             ),
             "a < b <= c > d >= e == f != g in h not in i"
         )
-      }
-      'chained {
+      'chained
         'attributes - expr(
             Attribute(Attribute('a, 'b, Load), 'c, Load),
             "a.b.c"
@@ -102,8 +100,7 @@ object UnitTests extends TestSuite {
                       Load),
             "abc[d, e:f:]"
         )
-      }
-      'enclosed {
+      'enclosed
         'list - expr(
             List(Seq(Num(1.0), Num(2.0), Str("a")), Load),
             "[1, 2, 'a']",
@@ -162,13 +159,11 @@ object UnitTests extends TestSuite {
             GeneratorExp('x, Seq(comprehension('y, 'z, Seq('w)))),
             "(x for y in z if w)"
         )
-      }
-    }
-    'stmts {
+    'stmts
       def stmt(expected: Seq[Ast.stmt], s: String*) =
         s.map(TestUtils.check(Statements.file_input, expected, _)).head
       // Statements which only have expressions within them
-      'simple {
+      'simple
 
         'empty - stmt(Nil, "")
         'pass - stmt(Seq(Pass), "pass")
@@ -239,9 +234,8 @@ object UnitTests extends TestSuite {
             Seq(AugAssign('x, Add, Num(2))),
             "x += 2"
         )
-      }
       // Statements which can have other statements within them
-      'compound {
+      'compound
         'while - stmt(
             Seq(While('True, Seq(Pass), Nil)),
             """while True: pass"""
@@ -376,7 +370,3 @@ object UnitTests extends TestSuite {
                               Seq(Return(Some(Tuple(Seq('y, 'b), Load)))))))),
             "with x as y, a as b: return y, b"
         )
-      }
-    }
-  }
-}

@@ -23,11 +23,11 @@ import org.apache.spark.sql.{AnalysisException, Row}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.Utils
 
-class InsertSuite extends DataSourceTest with SharedSQLContext {
+class InsertSuite extends DataSourceTest with SharedSQLContext
   protected override lazy val sql = caseInsensitiveContext.sql _
   private var path: File = null
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     path = Utils.createTempDir()
     val rdd = sparkContext.parallelize(
@@ -40,19 +40,16 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
         |  path '${path.toString}'
         |)
       """.stripMargin)
-  }
 
-  override def afterAll(): Unit = {
-    try {
+  override def afterAll(): Unit =
+    try
       caseInsensitiveContext.dropTempTable("jsonTable")
       caseInsensitiveContext.dropTempTable("jt")
       Utils.deleteRecursively(path)
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  test("Simple INSERT OVERWRITE a JSONRelation") {
+  test("Simple INSERT OVERWRITE a JSONRelation")
     sql(s"""
         |INSERT OVERWRITE TABLE jsonTable SELECT a, b FROM jt
       """.stripMargin)
@@ -61,9 +58,8 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
         sql("SELECT a, b FROM jsonTable"),
         (1 to 10).map(i => Row(i, s"str$i"))
     )
-  }
 
-  test("PreInsert casting and renaming") {
+  test("PreInsert casting and renaming")
     sql(s"""
         |INSERT OVERWRITE TABLE jsonTable SELECT a * 2, a * 4 FROM jt
       """.stripMargin)
@@ -81,22 +77,20 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
         sql("SELECT a, b FROM jsonTable"),
         (1 to 10).map(i => Row(i * 4, s"${i * 6}"))
     )
-  }
 
   test(
-      "SELECT clause generating a different number of columns is not allowed.") {
-    val message = intercept[RuntimeException] {
+      "SELECT clause generating a different number of columns is not allowed.")
+    val message = intercept[RuntimeException]
       sql(s"""
         |INSERT OVERWRITE TABLE jsonTable SELECT a FROM jt
       """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(
         message.contains("generates the same number of columns as its schema"),
         "SELECT clause generating a different number of columns should not be not allowed."
     )
-  }
 
-  test("INSERT OVERWRITE a JSONRelation multiple times") {
+  test("INSERT OVERWRITE a JSONRelation multiple times")
     sql(s"""
          |INSERT OVERWRITE TABLE jsonTable SELECT a, b FROM jt
     """.stripMargin)
@@ -139,9 +133,8 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 
     caseInsensitiveContext.dropTempTable("jt1")
     caseInsensitiveContext.dropTempTable("jt2")
-  }
 
-  test("INSERT INTO JSONRelation for now") {
+  test("INSERT INTO JSONRelation for now")
     sql(s"""
       |INSERT OVERWRITE TABLE jsonTable SELECT a, b FROM jt
     """.stripMargin)
@@ -157,21 +150,19 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
         sql("SELECT a, b FROM jsonTable"),
         sql("SELECT a, b FROM jt UNION ALL SELECT a, b FROM jt").collect()
     )
-  }
 
-  test("it is not allowed to write to a table while querying it.") {
-    val message = intercept[AnalysisException] {
+  test("it is not allowed to write to a table while querying it.")
+    val message = intercept[AnalysisException]
       sql(s"""
         |INSERT OVERWRITE TABLE jsonTable SELECT a, b FROM jsonTable
       """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(
         message.contains(
             "Cannot overwrite a path that is also being read from."),
         "INSERT OVERWRITE to a table while querying it should not be allowed.")
-  }
 
-  test("Caching") {
+  test("Caching")
     // write something to the jsonTable
     sql(s"""
          |INSERT OVERWRITE TABLE jsonTable SELECT a, b FROM jt
@@ -215,10 +206,9 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
 //    // Verify uncaching
 //    caseInsensitiveContext.uncacheTable("jsonTable")
 //    assertCached(sql("SELECT * FROM jsonTable"), 0)
-  }
 
   test(
-      "it's not allowed to insert into a relation that is not an InsertableRelation") {
+      "it's not allowed to insert into a relation that is not an InsertableRelation")
     sql("""
         |CREATE TEMPORARY TABLE oneToTen
         |USING org.apache.spark.sql.sources.SimpleScanSource
@@ -233,16 +223,14 @@ class InsertSuite extends DataSourceTest with SharedSQLContext {
         (1 to 10).map(Row(_)).toSeq
     )
 
-    val message = intercept[AnalysisException] {
+    val message = intercept[AnalysisException]
       sql(s"""
         |INSERT OVERWRITE TABLE oneToTen SELECT CAST(a AS INT) FROM jt
         """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(
         message.contains("does not allow insertion."),
         "It is not allowed to insert into a table that is not an InsertableRelation."
     )
 
     caseInsensitiveContext.dropTempTable("oneToTen")
-  }
-}

@@ -16,7 +16,7 @@ private[finagle] class PayloadSizeFilter[Req, Rep](
     statsReceiver: StatsReceiver,
     reqSize: Req => Int,
     repSize: Rep => Int)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
 
   private[this] val requestBytes = statsReceiver.stat("request_payload_bytes")
   private[this] val responseBytes =
@@ -25,13 +25,11 @@ private[finagle] class PayloadSizeFilter[Req, Rep](
   private[this] val recordRepSize: Rep => Unit = rep =>
     responseBytes.add(repSize(rep).toFloat)
 
-  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
+  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
     requestBytes.add(reqSize(req).toFloat)
     service(req).onSuccess(recordRepSize)
-  }
-}
 
-private[finagle] object PayloadSizeFilter {
+private[finagle] object PayloadSizeFilter
 
   val Role: Stack.Role = Stack.Role("PayloadSize")
   val Description: String = "Reports request/response payload sizes"
@@ -40,7 +38,7 @@ private[finagle] object PayloadSizeFilter {
       reqSize: Req => Int,
       repSize: Rep => Int
   ): Stackable[ServiceFactory[Req, Rep]] =
-    new Module1[param.Stats, ServiceFactory[Req, Rep]] {
+    new Module1[param.Stats, ServiceFactory[Req, Rep]]
       override def role: Role = PayloadSizeFilter.Role
       override def description: String = PayloadSizeFilter.Description
 
@@ -49,5 +47,3 @@ private[finagle] object PayloadSizeFilter {
           next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] =
         new PayloadSizeFilter(stats.statsReceiver, reqSize, repSize)
           .andThen(next)
-    }
-}

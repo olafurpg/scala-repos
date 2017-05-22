@@ -1,9 +1,8 @@
-object SCL5180 {
-  object ErrorHighlightingBug extends App {
+object SCL5180
+  object ErrorHighlightingBug extends App
     val subscribersByType = Map("One" -> new OneWorker, "Two" -> new TwoWorker)
     /*start*/
     subscribersByType /*end*/
-  }
 
   abstract class Worker[A <: Auth, S <: AuthService[A]]
   class OneWorker extends Worker[OneAuth, OneAuthService]
@@ -16,7 +15,6 @@ object SCL5180 {
   class OneAuth extends Auth
   class TwoAuth extends Auth
   class Auth
-}
 /*
 Few variants:
 Map[String, SCL5180.Worker[_ >: SCL5180.OneAuth with SCL5180.TwoAuth <: SCL5180.Auth, _ >: SCL5180.OneAuthService with SCL5180.TwoAuthService <: SCL5180.AuthService[_ >: SCL5180.OneAuth with SCL5180.TwoAuth]]]

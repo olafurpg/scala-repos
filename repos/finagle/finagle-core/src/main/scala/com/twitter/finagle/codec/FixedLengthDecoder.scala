@@ -17,7 +17,7 @@ import scala.reflect.ClassTag
   */
 private[finagle] class FixedLengthDecoder[T : ClassTag](
     frameSize: Int, decodeFrame: Buf => T)
-    extends FrameDecoder[T] {
+    extends FrameDecoder[T]
 
   if (frameSize < 1)
     throw new IllegalArgumentException(
@@ -30,26 +30,22 @@ private[finagle] class FixedLengthDecoder[T : ClassTag](
     * Decode the buffer `b` along with accumulated data into as
     * many `T`-typed frames as possible.
     */
-  def apply(b: Buf): IndexedSeq[T] = {
+  def apply(b: Buf): IndexedSeq[T] =
     val merged = accumulated.concat(b)
     val length = merged.length
-    if (length < frameSize) {
+    if (length < frameSize)
       accumulated = merged
       NoFrames
-    } else {
+    else
       // length >= frameSize
       val result = new Array[T](length / frameSize)
       var sliceIdx = 0
       var resultIdx = 0
-      while (sliceIdx + frameSize <= length) {
+      while (sliceIdx + frameSize <= length)
         val slice = merged.slice(sliceIdx, sliceIdx + frameSize)
         result(resultIdx) = decodeFrame(slice)
         sliceIdx += frameSize
         resultIdx += 1
-      }
 
       accumulated = merged.slice(sliceIdx, sliceIdx + frameSize)
       result
-    }
-  }
-}

@@ -9,7 +9,7 @@ abstract class Factory[CC[X] <: Bip[X]] {}
 object Quux1 extends Factory[Foo]
 object Quux2 extends Factory[Bar]
 
-object Test {
+object Test
   // FAIL
   val xs = List(Quux1, Quux2)
   //   error: type mismatch;
@@ -18,9 +18,8 @@ object Test {
   //                   ^^     ^^       ^^     ^^ <-- QUIZ: what is missing from these types?
 
   // The type it should figure out, come on scalac
-  type F = Factory[CC] forSome {
+  type F = Factory[CC] forSome
     type X; type CC [X] >: Bar[X] with Foo[X] <: Bip[X]
-  }
 
   // No problem
   val ys = List[F](Quux1, Quux2)
@@ -36,4 +35,3 @@ object Test {
   val fn    = f.normalize.asInstanceOf[ExistentialType]
   val fn2   = fn.underlying.asInstanceOf[TypeRef]
  */
-}

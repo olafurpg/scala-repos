@@ -14,52 +14,43 @@ import breeze.math.Complex
   * To change this template use File | Settings | File Templates.
   */
 @RunWith(classOf[JUnitRunner])
-class FourierTrTest extends FunSuite {
+class FourierTrTest extends FunSuite
 
   // <editor-fold desc="FourierTr">
-  test("fft 1D of DenseVector[Complex]") {
+  test("fft 1D of DenseVector[Complex]")
     assert(norm(fourierTr(test16C) - test16fftC) < testNormThreshold)
-  }
 
-  test("fft 1D of DenseVector[Double]") {
+  test("fft 1D of DenseVector[Double]")
     assert(norm(fourierTr(test16) - test16fftC) < testNormThreshold)
-  }
 
-  test("ifft 1D of DenseVector[Complex]") {
+  test("ifft 1D of DenseVector[Complex]")
     assert(norm(iFourierTr(test16fftC) - test16C) < testNormThreshold)
-  }
 
-  test("ifft 1D of DenseVector[Double]") {
+  test("ifft 1D of DenseVector[Double]")
     assert(norm(iFourierTr(test16) - test16ifftC) < testNormThreshold)
-  }
 
-  test("fft 1D of DenseMatrix[Double] columns") {
+  test("fft 1D of DenseMatrix[Double] columns")
     val dm = test16.asDenseMatrix.t
     assert(dm.cols === 1)
     val transformed = fourierTr(dm(::, *))
     assert(norm(transformed(::, 0) - test16fftC) < testNormThreshold,
            s"$transformed $test16fftC")
-  }
 
-  test("fft 2D of DenseMatrix[Complex]") {
+  test("fft 2D of DenseMatrix[Complex]")
     assert(
         norm((fourierTr(test5x5C) - test5x5fftC).toDenseVector) < testNormThreshold)
-  }
 
-  test("fft 2D of DenseMatrix[Double]") {
+  test("fft 2D of DenseMatrix[Double]")
     assert(
         norm((fourierTr(test5x5) - test5x5fftC).toDenseVector) < testNormThreshold)
-  }
 
-  test("ifft 2D of DenseMatrix[Complex]") {
+  test("ifft 2D of DenseMatrix[Complex]")
     assert(
         norm((iFourierTr(test5x5fftC) - test5x5C).toDenseVector) < testNormThreshold)
-  }
 
-  test("ifft 2D of DenseMatrix[Double]") {
+  test("ifft 2D of DenseMatrix[Double]")
     assert(
         norm((iFourierTr(test5x5) - test5x5ifftC).toDenseVector) < testNormThreshold)
-  }
   // </editor-fold>
   // <editor-fold desc="Test Values">
 
@@ -250,22 +241,18 @@ class FourierTrTest extends FunSuite {
   ).t.reshape(5, 5).t
   // </editor-fold>
 
-  test("fft 1D of DenseVector[Double], spanned") {
+  test("fft 1D of DenseVector[Double], spanned")
 
     //assert( norm( fourierTr(test16, 0 to 4) - test16fftC(0 to 4)  ) < testNormThreshold )
-  }
 
-  test("fourierShift/iFourierShift") {
+  test("fourierShift/iFourierShift")
     val dvOdd = DenseVector.tabulate(5)((i: Int) => i)
     val dvEven = DenseVector.tabulate(6)((i: Int) => i)
     assert(fourierShift(dvOdd) == DenseVector(3, 4, 0, 1, 2))
     assert(iFourierShift(dvOdd) == DenseVector(2, 3, 4, 0, 1))
     assert(fourierShift(dvEven) == DenseVector(3, 4, 5, 0, 1, 2))
     assert(iFourierShift(dvEven) == DenseVector(3, 4, 5, 0, 1, 2))
-  }
 
-  test("fourierFreq") {
+  test("fourierFreq")
     assert(fourierFreq(5, dt = 0.1) == DenseVector(0.0, 2.0, 4.0, -4.0, -2.0))
     assert(fourierFreq(4, dt = 0.1) == DenseVector(0.0, 2.5, -5.0, -2.5))
-  }
-}

@@ -30,22 +30,18 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
                            nodeType: IElementType,
                            node: ASTNode)
     extends ScTypeDefinitionImpl(stub, nodeType, node) with ScTrait
-    with ScTypeParametersOwner with ScTemplateDefinition {
-  override def additionalJavaNames: Array[String] = {
+    with ScTypeParametersOwner with ScTemplateDefinition
+  override def additionalJavaNames: Array[String] =
     Array(fakeCompanionClass.getName) //do not add fakeCompanionModule => will build tree from stubs everywhere
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScTemplateDefinitionStub) = {
+  def this(stub: ScTemplateDefinitionStub) =
     this(stub, ScalaElementTypes.TRAIT_DEF, null)
-  }
 
   override def toString: String = "ScTrait: " + name
 
@@ -57,61 +53,51 @@ class ScTraitImpl private (stub: StubElement[ScTemplateDefinition],
       processor: PsiScopeProcessor,
       state: ResolveState,
       lastParent: PsiElement,
-      place: PsiElement): Boolean = {
+      place: PsiElement): Boolean =
     super [ScTypeParametersOwner].processDeclarations(
         processor, state, lastParent, place) && super [ScTemplateDefinition]
       .processDeclarationsForTemplateBody(processor, state, lastParent, place)
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     super [ScTemplateDefinition].processDeclarations(
         processor, state, lastParent, place)
-  }
 
   override def isInterface: Boolean = true
 
   def fakeCompanionClass: PsiClass =
     new PsiClassWrapper(this, getQualifiedName + "$class", getName + "$class")
 
-  override def getMethods: Array[PsiMethod] = {
+  override def getMethods: Array[PsiMethod] =
     getAllMethods.filter(_.containingClass == this)
-  }
 
-  override def hasModifierProperty(name: String): Boolean = name match {
+  override def hasModifierProperty(name: String): Boolean = name match
     case PsiModifier.ABSTRACT if isInterface => true
     case _ => super.hasModifierProperty(name)
-  }
 
-  override def getAllMethods: Array[PsiMethod] = {
+  override def getAllMethods: Array[PsiMethod] =
     val res = new ArrayBuffer[PsiMethod]()
     res ++= getConstructors
-    TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this) { node =>
+    TypeDefinitionMembers.SignatureNodes.forAllSignatureNodes(this)  node =>
       this.processPsiMethodsForNode(
           node, isStatic = false, isInterface = true)(res += _)
-    }
 
-    for (synthetic <- syntheticMethodsNoOverride) {
+    for (synthetic <- syntheticMethodsNoOverride)
       this.processPsiMethodsForNode(
           new SignatureNodes.Node(new PhysicalSignature(synthetic,
                                                         ScSubstitutor.empty),
                                   ScSubstitutor.empty),
           isStatic = false,
           isInterface = isInterface)(res += _)
-    }
     res.toArray
-  }
 
   override def getTypeParameterList: PsiTypeParameterList =
     typeParametersClause.orNull
 
-  override def getInterfaces: Array[PsiClass] = {
+  override def getInterfaces: Array[PsiClass] =
     getSupers.filter(_.isInterface)
-  }
 
-  override protected def syntheticMethodsNoOverrideImpl: Seq[PsiMethod] = {
+  override protected def syntheticMethodsNoOverrideImpl: Seq[PsiMethod] =
     SyntheticMembersInjector.inject(this, withOverride = false)
-  }
-}

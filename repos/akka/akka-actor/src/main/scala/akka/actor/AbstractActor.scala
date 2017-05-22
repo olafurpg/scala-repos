@@ -8,13 +8,12 @@ package akka.actor
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-object AbstractActor {
+object AbstractActor
 
   /**
     * emptyBehavior is a Receive-expression that matches no messages at all, ever.
     */
   final val emptyBehavior = Actor.emptyBehavior
-}
 
 /**
   * Java API: compatible with lambda expressions
@@ -44,7 +43,7 @@ object AbstractActor {
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-abstract class AbstractActor extends Actor {
+abstract class AbstractActor extends Actor
 
   private var _receive: Receive = null
 
@@ -74,7 +73,6 @@ abstract class AbstractActor extends Actor {
     else
       throw IllegalActorStateException(
           "Actor behavior has not been set with receive(...)")
-}
 
 /**
   * Java API: compatible with lambda expressions

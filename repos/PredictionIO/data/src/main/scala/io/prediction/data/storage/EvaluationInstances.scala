@@ -54,7 +54,7 @@ case class EvaluationInstance(id: String = "",
   * @group Meta Data
   */
 @DeveloperApi
-trait EvaluationInstances {
+trait EvaluationInstances
 
   /** Insert a new [[EvaluationInstance]] */
   def insert(i: EvaluationInstance): String
@@ -75,7 +75,6 @@ trait EvaluationInstances {
 
   /** Delete an [[EvaluationInstance]] */
   def delete(id: String): Unit
-}
 
 /** :: DeveloperApi ::
   * JSON4S serializer for [[EvaluationInstance]]
@@ -85,12 +84,12 @@ trait EvaluationInstances {
 class EvaluationInstanceSerializer
     extends CustomSerializer[EvaluationInstance](
         format =>
-          ({
+          (
             case JObject(fields) =>
               implicit val formats = DefaultFormats
-              fields.foldLeft(EvaluationInstance()) {
+              fields.foldLeft(EvaluationInstance())
                 case (i, field) =>
-                  field match {
+                  field match
                     case JField("id", JString(id)) => i.copy(id = id)
                     case JField("status", JString(status)) =>
                       i.copy(status = status)
@@ -122,9 +121,7 @@ class EvaluationInstanceSerializer
                                 JString(evaluatorResultsJSON)) =>
                       i.copy(evaluatorResultsJSON = evaluatorResultsJSON)
                     case _ => i
-                  }
-              }
-          }, {
+          ,
             case i: EvaluationInstance =>
               JObject(
                   JField("id", JString(i.id)) :: JField(
@@ -149,5 +146,5 @@ class EvaluationInstanceSerializer
                       "evaluatorResultsJSON",
                       JString(i.evaluatorResultsJSON)) :: Nil
               )
-          })
+          )
     )

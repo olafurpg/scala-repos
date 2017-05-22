@@ -6,7 +6,7 @@ import scala.concurrent.duration.Duration
 /**
   * side effect throttler that allows X ops per Y unit of time
   */
-final class RateLimit(nb: Int, duration: Duration, name: String) {
+final class RateLimit(nb: Int, duration: Duration, name: String)
 
   private type NbOps = Int
   private type ClearAt = Long
@@ -22,7 +22,7 @@ final class RateLimit(nb: Int, duration: Duration, name: String) {
 
   def apply[A](key: String, msg: => String = "")(op: => A)(
       implicit default: Zero[A]): A =
-    Option(storage getIfPresent key) match {
+    Option(storage getIfPresent key) match
       case None =>
         storage.put(key, 1 -> makeClearAt)
         op
@@ -35,5 +35,3 @@ final class RateLimit(nb: Int, duration: Duration, name: String) {
       case _ =>
         logger.info(s"$name ($nb/$duration) $key $msg")
         default.zero
-    }
-}

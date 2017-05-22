@@ -8,7 +8,7 @@ import breeze.math.Complex
   * @author ktakagaki
   * @date 04/17/2014.
   */
-object Options {
+object Options
 
   //Options for CanPad
 
@@ -46,4 +46,3 @@ object Options {
   implicit def tToOptModeValue[T](n: T): OptPadMode = Value(n)
 
   // </editor-fold>
-}

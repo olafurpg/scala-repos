@@ -6,13 +6,13 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FreeSpecP
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait FreeSpecPathSingleTestTest extends FreeSpecPathGenerator {
+trait FreeSpecPathSingleTestTest extends FreeSpecPathGenerator
   val freeSpecPathTestPath = List("[root]",
                                   "FreeSpecPathTest",
                                   "A FreeSpecTest",
                                   "should be able to run single test")
 
-  def testFreeSpecPath() {
+  def testFreeSpecPath()
     addPathFreeSpec()
 
     runTestByLocation(
@@ -28,5 +28,3 @@ trait FreeSpecPathSingleTestTest extends FreeSpecPathGenerator {
           checkResultTreeDoesNotHaveNodes(
               root, "should not run tests that are not selected"),
         debug = true)
-  }
-}

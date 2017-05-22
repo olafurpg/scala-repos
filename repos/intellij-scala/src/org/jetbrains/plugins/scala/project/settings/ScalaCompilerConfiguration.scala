@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
     storages = Array(new Storage("scala_compiler.xml"))
 )
 class ScalaCompilerConfiguration(project: Project)
-    extends PersistentStateComponent[Element] {
+    extends PersistentStateComponent[Element]
   var incrementalityType: IncrementalityType = IncrementalityType.IDEA
 
   var defaultProfile: ScalaCompilerSettingsProfile =
@@ -26,58 +26,51 @@ class ScalaCompilerConfiguration(project: Project)
 
   var customProfiles: Seq[ScalaCompilerSettingsProfile] = Seq.empty
 
-  def getSettingsForModule(module: Module): ScalaCompilerSettings = {
+  def getSettingsForModule(module: Module): ScalaCompilerSettings =
     val profile = customProfiles
       .find(_.getModuleNames.contains(module.getName))
       .getOrElse(defaultProfile)
     profile.getSettings
-  }
 
   def configureSettingsForModule(
-      module: Module, source: String, options: Seq[String]) {
-    customProfiles.foreach { profile =>
+      module: Module, source: String, options: Seq[String])
+    customProfiles.foreach  profile =>
       profile.removeModuleName(module.getName)
       if (profile.getName.startsWith(source) &&
-          profile.getModuleNames.isEmpty) {
+          profile.getModuleNames.isEmpty)
         customProfiles = customProfiles.filterNot(_ == profile)
-      }
-    }
 
     val settings = new ScalaCompilerSettings()
     settings.initFrom(options)
 
-    customProfiles.find(_.getSettings.getState == settings.getState) match {
+    customProfiles.find(_.getSettings.getState == settings.getState) match
       case Some(profile) => profile.addModuleName(module.getName)
       case None =>
         val profileNames = customProfiles.iterator
           .map(_.getName)
           .filter(_.startsWith(source))
           .toSet
-        @tailrec def firstFreeName(i: Int): String = {
+        @tailrec def firstFreeName(i: Int): String =
           val name = source + " " + i
           if (profileNames.contains(name)) firstFreeName(i + 1) else name
-        }
         val profile = new ScalaCompilerSettingsProfile(firstFreeName(1))
         profile.setSettings(settings)
         profile.addModuleName(module.getName)
         customProfiles = (customProfiles :+ profile).sortBy(_.getName)
-    }
-  }
 
-  def getState: Element = {
+  def getState: Element =
     val configurationElement = XmlSerializer.serialize(
         defaultProfile.getSettings.getState,
         new SkipDefaultValuesSerializationFilters())
 
-    if (incrementalityType != IncrementalityType.IDEA) {
+    if (incrementalityType != IncrementalityType.IDEA)
       val incrementalityTypeElement = new Element("option")
       incrementalityTypeElement.setAttribute("name", "incrementalityType")
       incrementalityTypeElement.setAttribute(
           "value", incrementalityType.toString)
       configurationElement.addContent(incrementalityTypeElement)
-    }
 
-    customProfiles.foreach { profile =>
+    customProfiles.foreach  profile =>
       val profileElement =
         XmlSerializer.serialize(profile.getSettings.getState,
                                 new SkipDefaultValuesSerializationFilters())
@@ -87,12 +80,10 @@ class ScalaCompilerConfiguration(project: Project)
           "modules", profile.getModuleNames.asScala.mkString(","))
 
       configurationElement.addContent(profileElement)
-    }
 
     configurationElement
-  }
 
-  def loadState(configurationElement: Element) {
+  def loadState(configurationElement: Element)
     incrementalityType = configurationElement
       .getChildren("option")
       .asScala
@@ -104,7 +95,7 @@ class ScalaCompilerConfiguration(project: Project)
         new ScalaCompilerSettings(XmlSerializer.deserialize(
                 configurationElement, classOf[ScalaCompilerSettingsState])))
 
-    customProfiles = configurationElement.getChildren("profile").asScala.map {
+    customProfiles = configurationElement.getChildren("profile").asScala.map
       profileElement =>
         val profile = new ScalaCompilerSettingsProfile(
             profileElement.getAttributeValue("name"))
@@ -120,11 +111,7 @@ class ScalaCompilerConfiguration(project: Project)
         moduleNames.foreach(profile.addModuleName)
 
         profile
-    }
-  }
-}
 
-object ScalaCompilerConfiguration {
+object ScalaCompilerConfiguration
   def instanceIn(project: Project): ScalaCompilerConfiguration =
     ServiceManager.getService(project, classOf[ScalaCompilerConfiguration])
-}

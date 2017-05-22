@@ -13,7 +13,7 @@ import java.net.InetSocketAddress
 import akka.testkit.AkkaSpec
 import scala.concurrent.duration._
 
-class DemoActor extends Actor {
+class DemoActor extends Actor
   //#manager
   import akka.io.{IO, Tcp}
   import context.system // implicitly used by IO(Tcp)
@@ -22,17 +22,16 @@ class DemoActor extends Actor {
   //#manager
 
   def receive = Actor.emptyBehavior
-}
 
 //#server
-class Server extends Actor {
+class Server extends Actor
 
   import Tcp._
   import context.system
 
   IO(Tcp) ! Bind(self, new InetSocketAddress("localhost", 0))
 
-  def receive = {
+  def receive =
     case b @ Bound(localAddress) =>
       //#do-some-logging-or-setup
       context.parent ! b
@@ -47,34 +46,29 @@ class Server extends Actor {
       val handler = context.actorOf(Props[SimplisticHandler])
       val connection = sender()
       connection ! Register(handler)
-  }
-}
 //#server
 
 //#simplistic-handler
-class SimplisticHandler extends Actor {
+class SimplisticHandler extends Actor
   import Tcp._
-  def receive = {
+  def receive =
     case Received(data) => sender() ! Write(data)
     case PeerClosed => context stop self
-  }
-}
 //#simplistic-handler
 
 //#client
-object Client {
+object Client
   def props(remote: InetSocketAddress, replies: ActorRef) =
     Props(classOf[Client], remote, replies)
-}
 
-class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
+class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor
 
   import Tcp._
   import context.system
 
   IO(Tcp) ! Connect(remote)
 
-  def receive = {
+  def receive =
     case CommandFailed(_: Connect) =>
       listener ! "connect failed"
       context stop self
@@ -83,7 +77,7 @@ class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
       listener ! c
       val connection = sender()
       connection ! Register(self)
-      context become {
+      context become
         case data: ByteString =>
           connection ! Write(data)
         case CommandFailed(w: Write) =>
@@ -96,21 +90,16 @@ class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
         case _: ConnectionClosed =>
           listener ! "connection closed"
           context stop self
-      }
-  }
-}
 //#client
 
-class IODocSpec extends AkkaSpec {
+class IODocSpec extends AkkaSpec
 
-  class Parent extends Actor {
+  class Parent extends Actor
     context.actorOf(Props[Server], "server")
-    def receive = {
+    def receive =
       case msg => testActor forward msg
-    }
-  }
 
-  "demonstrate connect" in {
+  "demonstrate connect" in
     val server = system.actorOf(Props(classOf[Parent], this), "parent")
     val listen = expectMsgType[Tcp.Bound].localAddress
     val client = system.actorOf(Client.props(listen, testActor), "client1")
@@ -127,5 +116,3 @@ class IODocSpec extends AkkaSpec {
     client ! "close"
     expectMsg("connection closed")
     expectTerminated(client, 1.second)
-  }
-}

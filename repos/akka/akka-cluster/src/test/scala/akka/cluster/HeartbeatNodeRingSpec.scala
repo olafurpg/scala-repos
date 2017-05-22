@@ -8,7 +8,7 @@ import org.scalatest.Matchers
 import akka.actor.Address
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class HeartbeatNodeRingSpec extends WordSpec with Matchers {
+class HeartbeatNodeRingSpec extends WordSpec with Matchers
 
   val aa = UniqueAddress(Address("akka.tcp", "sys", "aa", 2552), 1)
   val bb = UniqueAddress(Address("akka.tcp", "sys", "bb", 2552), 2)
@@ -19,20 +19,18 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
 
   val nodes = Set(aa, bb, cc, dd, ee, ff)
 
-  "A HashedNodeRing" must {
+  "A HashedNodeRing" must
 
-    "pick specified number of nodes as receivers" in {
+    "pick specified number of nodes as receivers" in
       val ring = HeartbeatNodeRing(cc, nodes, Set.empty, 3)
       ring.myReceivers should ===(ring.receivers(cc))
 
-      nodes foreach { n ⇒
+      nodes foreach  n ⇒
         val receivers = ring.receivers(n)
         receivers.size should ===(3)
         receivers should not contain (n)
-      }
-    }
 
-    "pick specified number of nodes + unreachable as receivers" in {
+    "pick specified number of nodes + unreachable as receivers" in
       val ring = HeartbeatNodeRing(
           cc, nodes, unreachable = Set(aa, dd, ee), monitoredByNrOfMembers = 3)
       ring.myReceivers should ===(ring.receivers(cc))
@@ -43,9 +41,8 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
       ring.receivers(dd) should ===(Set(ee, ff, aa, bb, cc))
       ring.receivers(ee) should ===(Set(ff, aa, bb, cc))
       ring.receivers(ff) should ===(Set(aa, bb, cc)) // unreachable dd and ee skipped
-    }
 
-    "pick all except own as receivers when less than total number of nodes" in {
+    "pick all except own as receivers when less than total number of nodes" in
       val expected = Set(aa, bb, dd, ee, ff)
       HeartbeatNodeRing(cc, nodes, Set.empty, 5).myReceivers should ===(
           expected)
@@ -53,11 +50,7 @@ class HeartbeatNodeRingSpec extends WordSpec with Matchers {
           expected)
       HeartbeatNodeRing(cc, nodes, Set.empty, 7).myReceivers should ===(
           expected)
-    }
 
-    "pick none when alone" in {
+    "pick none when alone" in
       val ring = HeartbeatNodeRing(cc, Set(cc), Set.empty, 3)
       ring.myReceivers should ===(Set())
-    }
-  }
-}

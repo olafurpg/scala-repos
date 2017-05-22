@@ -24,7 +24,7 @@ final class RelationApi(coll: Coll,
                         reporter: ActorSelection,
                         followable: ID => Fu[Boolean],
                         maxFollow: Int,
-                        maxBlock: Int) {
+                        maxBlock: Int)
 
   import RelationRepo.makeId
 
@@ -35,9 +35,8 @@ final class RelationApi(coll: Coll,
           BSONDocument("r" -> true, "_id" -> false)
       )
       .one[BSONDocument]
-      .map {
+      .map
         _.flatMap(_.getAs[Boolean]("r"))
-      }
 
   def fetchFollowing = RelationRepo following _
 
@@ -60,9 +59,8 @@ final class RelationApi(coll: Coll,
                           "$setIntersection" -> BSONArray("$u1", "$u2"))
                   ))
           ))
-      .map {
+      .map
         ~_.documents.headOption.flatMap(_.getAs[Set[String]]("_id")) - userId
-      }
 
   def fetchFollows(u1: ID, u2: ID) =
     coll
@@ -121,14 +119,14 @@ final class RelationApi(coll: Coll,
   def follow(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit
     else
-      followable(u2) flatMap {
+      followable(u2) flatMap
         case false => funit
         case true =>
-          fetchRelation(u1, u2) zip fetchRelation(u2, u1) flatMap {
+          fetchRelation(u1, u2) zip fetchRelation(u2, u1) flatMap
             case (Some(Follow), _) => funit
             case (_, Some(Block)) => funit
             case _ =>
-              RelationRepo.follow(u1, u2) >> limitFollow(u1) >>- {
+              RelationRepo.follow(u1, u2) >> limitFollow(u1) >>-
                 countFollowersCache remove u2
                 countFollowingCache remove u1
                 reloadOnlineFriends(u1, u2)
@@ -136,62 +134,49 @@ final class RelationApi(coll: Coll,
                   .toFriendsOf(u1)
                   .toUsers(List(u2))
                 lila.mon.relation.follow()
-              }
-          }
-      }
 
-  private def limitFollow(u: ID) = countFollowing(u) flatMap { nb =>
+  private def limitFollow(u: ID) = countFollowing(u) flatMap  nb =>
     (nb >= maxFollow) ?? RelationRepo.drop(u, true, nb - maxFollow + 1)
-  }
 
-  private def limitBlock(u: ID) = countBlocking(u) flatMap { nb =>
+  private def limitBlock(u: ID) = countBlocking(u) flatMap  nb =>
     (nb >= maxBlock) ?? RelationRepo.drop(u, false, nb - maxBlock + 1)
-  }
 
   def block(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit
     else
-      fetchBlocks(u1, u2) flatMap {
+      fetchBlocks(u1, u2) flatMap
         case true => funit
         case _ =>
-          RelationRepo.block(u1, u2) >> limitBlock(u1) >>- {
+          RelationRepo.block(u1, u2) >> limitBlock(u1) >>-
             reloadOnlineFriends(u1, u2)
             bus.publish(lila.hub.actorApi.relation.Block(u1, u2), 'relation)
             lila.mon.relation.block()
-          }
-      }
 
   def unfollow(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit
     else
-      fetchFollows(u1, u2) flatMap {
+      fetchFollows(u1, u2) flatMap
         case true =>
-          RelationRepo.unfollow(u1, u2) >>- {
+          RelationRepo.unfollow(u1, u2) >>-
             countFollowersCache remove u2
             countFollowingCache remove u1
             reloadOnlineFriends(u1, u2)
             lila.mon.relation.unfollow()
-          }
         case _ => funit
-      }
 
   def unfollowAll(u1: ID): Funit = RelationRepo.unfollowAll(u1)
 
   def unblock(u1: ID, u2: ID): Funit =
     if (u1 == u2) funit
     else
-      fetchBlocks(u1, u2) flatMap {
+      fetchBlocks(u1, u2) flatMap
         case true =>
-          RelationRepo.unblock(u1, u2) >>- {
+          RelationRepo.unblock(u1, u2) >>-
             reloadOnlineFriends(u1, u2)
             bus.publish(lila.hub.actorApi.relation.UnBlock(u1, u2), 'relation)
             lila.mon.relation.unblock()
-          }
         case _ => funit
-      }
 
-  private def reloadOnlineFriends(u1: ID, u2: ID) {
+  private def reloadOnlineFriends(u1: ID, u2: ID)
     import lila.hub.actorApi.relation.ReloadOnlineFriends
     List(u1, u2).foreach(actor ! ReloadOnlineFriends(_))
-  }
-}

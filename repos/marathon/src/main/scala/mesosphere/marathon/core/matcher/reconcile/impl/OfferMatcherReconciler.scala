@@ -29,43 +29,40 @@ import scala.concurrent.Future
   */
 private[reconcile] class OfferMatcherReconciler(
     taskTracker: TaskTracker, groupRepository: GroupRepository)
-    extends OfferMatcher {
+    extends OfferMatcher
 
   private val log = LoggerFactory.getLogger(getClass)
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   override def matchOffer(
-      deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] = {
+      deadline: Timestamp, offer: Offer): Future[MatchedTaskOps] =
 
     val frameworkId = FrameworkId("").mergeFromProto(offer.getFrameworkId)
 
-    val resourcesByTaskId: Map[Id, Iterable[Resource]] = {
+    val resourcesByTaskId: Map[Id, Iterable[Resource]] =
       import scala.collection.JavaConverters._
       offer.getResourcesList.asScala
         .groupBy(TaskLabels.taskIdForResource(frameworkId, _))
-        .collect {
+        .collect
           case (Some(taskId), resources) => taskId -> resources
-        }
-    }
 
     processResourcesByTaskId(offer, resourcesByTaskId)
-  }
 
   private[this] def processResourcesByTaskId(
       offer: Offer, resourcesByTaskId: Map[Id, Iterable[Resource]])
-    : Future[MatchedTaskOps] = {
+    : Future[MatchedTaskOps] =
     // do not query taskTracker in the common case
     if (resourcesByTaskId.isEmpty)
       Future.successful(MatchedTaskOps.noMatch(offer.getId))
-    else {
+    else
       def createTaskOps(
-          tasksByApp: TasksByApp, rootGroup: Group): MatchedTaskOps = {
+          tasksByApp: TasksByApp, rootGroup: Group): MatchedTaskOps =
         def spurious(taskId: Id): Boolean =
           tasksByApp.task(taskId).isEmpty ||
           rootGroup.app(taskId.appId).isEmpty
 
-        val taskOps = resourcesByTaskId.iterator.collect {
+        val taskOps = resourcesByTaskId.iterator.collect
           case (taskId, spuriousResources) if spurious(taskId) =>
             val unreserveAndDestroy = TaskOp.UnreserveAndDestroyVolumes(
                 taskId = taskId,
@@ -73,10 +70,9 @@ private[reconcile] class OfferMatcherReconciler(
                 resources = spuriousResources.to[Seq]
             )
             TaskOpWithSource(source(offer.getId), unreserveAndDestroy)
-        }.to[Seq]
+        .to[Seq]
 
         MatchedTaskOps(offer.getId, taskOps, resendThisOffer = true)
-      }
 
       // query in parallel
       val tasksByAppFuture = taskTracker.tasksByApp()
@@ -84,10 +80,8 @@ private[reconcile] class OfferMatcherReconciler(
 
       for { tasksByApp <- tasksByAppFuture; rootGroup <- rootGroupFuture } yield
         createTaskOps(tasksByApp, rootGroup)
-    }
-  }
 
-  private[this] def source(offerId: OfferID) = new TaskOpSource {
+  private[this] def source(offerId: OfferID) = new TaskOpSource
     override def taskOpAccepted(taskOp: TaskOp): Unit =
       log.info(
           s"accepted unreserveAndDestroy for ${taskOp.taskId} in offer [${offerId.getValue}]")
@@ -96,5 +90,3 @@ private[reconcile] class OfferMatcherReconciler(
                taskOp.taskId,
                offerId.getValue,
                reason)
-  }
-}

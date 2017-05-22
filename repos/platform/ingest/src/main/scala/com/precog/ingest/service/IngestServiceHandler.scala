@@ -66,18 +66,16 @@ import scalaz.syntax.std.boolean._
 import scalaz.syntax.std.option._
 import scala.annotation.tailrec
 
-sealed trait IngestStore {
+sealed trait IngestStore
   def store(apiKey: APIKey,
             path: Path,
             authorities: Authorities,
             data: Seq[JValue],
             jobId: Option[JobId],
             streamRef: StreamRef): Future[StoreFailure \/ PrecogUnit]
-}
 
-sealed trait ParseDirective {
+sealed trait ParseDirective
   def toMap: Map[String, String] // escape hatch for interacting with other systems
-}
 
 class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                            jobManager: JobManager[Response],
@@ -91,15 +89,15 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
     implicit val M: Monad[Future], executor: ExecutionContext)
     extends CustomHttpService[
         ByteChunk, (APIKey, Path) => Future[HttpResponse[JValue]]]
-    with IngestSupport with Logging {
+    with IngestSupport with Logging
 
-  object ingestStore extends IngestStore {
+  object ingestStore extends IngestStore
     def store(apiKey: APIKey,
               path: Path,
               authorities: Authorities,
               data: Seq[JValue],
               jobId: Option[JobId],
-              streamRef: StreamRef): Future[StoreFailure \/ PrecogUnit] = {
+              streamRef: StreamRef): Future[StoreFailure \/ PrecogUnit] =
       val eventInstance = Ingest(apiKey,
                                  path,
                                  Some(authorities),
@@ -109,8 +107,6 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                                  streamRef)
       logger.trace("Saving event: " + eventInstance)
       eventStore.save(eventInstance, ingestTimeout)
-    }
-  }
 
   private[this] val processingSelectors = new DefaultIngestProcessingSelectors(
       maxFields, batchSize, ingestTmpDir, ingestStore)
@@ -119,23 +115,19 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
       apiKey: APIKey,
       path: Path,
       authorities: Authorities,
-      request: HttpRequest[ByteChunk]): Future[Option[IngestProcessing]] = {
+      request: HttpRequest[ByteChunk]): Future[Option[IngestProcessing]] =
     val selectors = processingSelectors.selectors(apiKey, path, authorities)
 
-    request.content traverse {
+    request.content traverse
       case Left(bytes) =>
         Promise successful IngestProcessing.select(selectors, bytes, request)
 
       case Right(stream) =>
-        stream.headOption map {
-          _ flatMap { bytes =>
+        stream.headOption map
+          _ flatMap  bytes =>
             IngestProcessing.select(selectors, bytes, request)
-          }
-        }
-    } map {
+    map
       _.join
-    }
-  }
 
   def ingestBatch(apiKey: APIKey,
                   path: Path,
@@ -145,51 +137,44 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                   errorHandling: ErrorHandling,
                   storeMode: WriteMode)
     : EitherT[Future, NonEmptyList[String], IngestResult] =
-    right(chooseProcessing(apiKey, path, authorities, request)) flatMap {
+    right(chooseProcessing(apiKey, path, authorities, request)) flatMap
       case Some(processing) =>
-        EitherT {
+        EitherT
           (processing.forRequest(request) tuple request.content.toSuccess(
-                  nels("Ingest request missing body content."))) traverse {
+                  nels("Ingest request missing body content."))) traverse
             case (processor, data) =>
               processor.ingest(durability, errorHandling, storeMode, data)
-          } map {
+          map
             _.disjunction
-          }
-        }
 
       case None =>
         right(Promise successful NotIngested(
                 "Could not determine a data type for your batch ingest. Please set the Content-Type header."))
-    }
 
   def notifyJob(durability: Durability,
                 channel: String,
                 message: String): EitherT[Future, String, PrecogUnit] =
-    durability match {
+    durability match
       case GlobalDurability(jobId) =>
         jobManager
           .addMessage(jobId, channel, JString(message))
           .map(_ => PrecogUnit)
       case LocalDurability =>
         right(Promise successful PrecogUnit)
-    }
 
-  private def jobErrorResponse(message: String) = {
+  private def jobErrorResponse(message: String) =
     logger.error(
         "Internal error during ingest; got bad response from the jobs server: " +
         message)
     HttpResponse(
         InternalServerError,
         content = Some(JString("Internal error from job service: " + message)))
-  }
 
   val service: HttpRequest[ByteChunk] => Validation[
       NotServed, (APIKey, Path) => Future[HttpResponse[JValue]]] =
     (request: HttpRequest[ByteChunk]) =>
-      {
         logger.debug("Got request in ingest handler: " + request)
-        Success { (apiKey: APIKey, path: Path) =>
-          {
+        Success  (apiKey: APIKey, path: Path) =>
             val timestamp = clock.now()
             def createJob: EitherT[Future, String, JobId] =
               jobManager
@@ -198,11 +183,11 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                 .map(_.id)
 
             findRequestWriteAuthorities(
-                request, apiKey, path, Some(timestamp.toInstant)) {
+                request, apiKey, path, Some(timestamp.toInstant))
               authorities =>
                 logger.debug("Write permission granted for " + authorities +
                     " to " + path)
-                request.content map { content =>
+                request.content map  content =>
                   import MimeTypes._
                   import Validation._
 
@@ -213,15 +198,13 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                       IngestAllPossible
                     else StopOnFirstError
 
-                  val durabilityM = request.method match {
+                  val durabilityM = request.method match
                     case HttpMethods.POST =>
-                      createJob map { jobId =>
+                      createJob map  jobId =>
                         (GlobalDurability(jobId), postMode)
-                      }
                     case HttpMethods.PUT =>
-                      createJob map { jobId =>
+                      createJob map  jobId =>
                         (GlobalDurability(jobId), AccessMode.Replace)
-                      }
                     case HttpMethods.PATCH =>
                       right[Future, String, (Durability, WriteMode)](Promise
                             .successful((LocalDurability, AccessMode.Append)))
@@ -229,9 +212,8 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                       left[Future, String, (Durability, WriteMode)](
                           Promise.successful("HTTP method " + request.method +
                               " not supported for data ingest."))
-                  }
 
-                  durabilityM flatMap {
+                  durabilityM flatMap
                     case (durability, storeMode) =>
                       ingestBatch(apiKey,
                                   path,
@@ -239,7 +221,7 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                                   request,
                                   durability,
                                   errorHandling,
-                                  storeMode) flatMap {
+                                  storeMode) flatMap
                         case NotIngested(reason) =>
                           val message =
                             "Ingest to %s by %s failed with reason: %s "
@@ -247,12 +229,11 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                           logger.warn(message)
                           notifyJob(durability,
                                     JobManager.channels.Warning,
-                                    message) map { _ =>
+                                    message) map  _ =>
                             HttpResponse[JValue](
                                 BadRequest,
                                 content = Some(JObject("errors" -> JArray(
                                               JString(reason)))))
-                          }
 
                         case StreamingResult(ingested, None) =>
                           val message =
@@ -261,13 +242,12 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                           logger.info(message)
                           notifyJob(durability,
                                     JobManager.channels.Info,
-                                    message) map { _ =>
+                                    message) map  _ =>
                             val responseContent =
                               JObject("ingested" -> JNum(ingested),
                                       "errors" -> JArray())
                             HttpResponse[JValue](
                                 OK, content = Some(responseContent))
-                          }
 
                         case StreamingResult(ingested, Some(error)) =>
                           val message =
@@ -276,14 +256,13 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                           logger.error(message)
                           notifyJob(durability,
                                     JobManager.channels.Error,
-                                    message) map { _ =>
+                                    message) map  _ =>
                             val responseContent =
                               JObject("ingested" -> JNum(ingested),
                                       "errors" -> JArray(JString(error)))
                             HttpResponse[JValue](
                                 UnprocessableEntity,
                                 content = Some(responseContent))
-                          }
 
                         case BatchResult(total, ingested, errs) =>
                           val failed = errs.size
@@ -292,11 +271,11 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                               "ingested" -> JNum(ingested),
                               "failed" -> JNum(failed),
                               "skipped" -> JNum(total - ingested - failed),
-                              "errors" -> JArray(errs map {
+                              "errors" -> JArray(errs map
                                 case (line, msg) =>
                                   JObject("line" -> JNum(line),
                                           "reason" -> JString(msg))
-                              }: _*),
+                              : _*),
                               "ingestId" -> durability.jobId
                                 .map(JString(_))
                                 .getOrElse(JUndefined)
@@ -310,34 +289,26 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
                           logger.info(message)
                           notifyJob(durability,
                                     JobManager.channels.Info,
-                                    message) map { _ =>
+                                    message) map  _ =>
                             HttpResponse[JValue](
                                 if (ingested == 0 && total > 0) BadRequest
                                 else OK,
                                 content = Some(responseContent))
-                          }
-                      }
-                  } valueOr { errors =>
+                  valueOr  errors =>
                     HttpResponse(
                         BadRequest,
                         content = Some(JString(
                                   "Errors were encountered processing your ingest request: " +
                                   errors)))
-                  }
-                } getOrElse {
+                getOrElse
                   logger.warn(
                       "No event data found for ingest request from %s owner %s at path %s"
                         .format(apiKey, authorities, path))
                   M.point(HttpResponse[JValue](
                           BadRequest,
                           content = Some(JString("Missing event data."))))
-                }
-            }
-          }
-        }
-    }
 
-  val metadata = {
+  val metadata =
     import MimeTypes._
     import Metadata._
     and(
@@ -350,5 +321,3 @@ class IngestServiceHandler(val permissionsFinder: PermissionsFinder[Future],
         description(
             """This service can be used to store one or more records, supplied as either whitespace-delimited JSON or CSV.""")
     )
-  }
-}

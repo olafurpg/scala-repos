@@ -5,9 +5,8 @@ package breeze.stats.distributions
   *
   * @author dlwh
   **/
-trait Moments[Mean, Variance] {
+trait Moments[Mean, Variance]
   def mean: Mean
   def variance: Variance
   def entropy: Double
   def mode: Mean
-}

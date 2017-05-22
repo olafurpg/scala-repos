@@ -20,7 +20,7 @@ package org.apache.spark.ml.attribute
 /**
   * Keys used to store attributes.
   */
-private[attribute] object AttributeKeys {
+private[attribute] object AttributeKeys
   val ML_ATTR: String = "ml_attr"
   val TYPE: String = "type"
   val NAME: String = "name"
@@ -34,4 +34,3 @@ private[attribute] object AttributeKeys {
   val NUM_VALUES: String = "num_vals"
   val ATTRIBUTES: String = "attrs"
   val NUM_ATTRIBUTES: String = "num_attrs"
-}

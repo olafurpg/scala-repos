@@ -10,7 +10,7 @@
 //   scala -J-Dscala.process.debug
 // for process debugging output.
 //
-package scala.sys {
+package scala.sys
 
   /** This package handles the execution of external processes.  The contents of
     * this package can be divided in three groups, according to their
@@ -201,17 +201,16 @@ package scala.sys {
     *   - `destroy()`: this will kill the external process and close the streams
     *   associated with it.
     */
-  package object process extends ProcessImplicits {
+  package object process extends ProcessImplicits
 
     /** The arguments passed to `java` when creating this process */
-    def javaVmArguments: List[String] = {
+    def javaVmArguments: List[String] =
       import scala.collection.JavaConversions._
 
       java.lang.management.ManagementFactory
         .getRuntimeMXBean()
         .getInputArguments()
         .toList
-    }
 
     /** The input stream of this process */
     def stdin = java.lang.System.in
@@ -221,15 +220,14 @@ package scala.sys {
 
     /** The error stream of this process */
     def stderr = java.lang.System.err
-  }
   // private val shell: String => Array[String] =
   //   if (isWin) Array("cmd.exe", "/C", _)
   //   else Array("sh", "-c", _)
 
-  package process {
+  package process
     // These are in a nested object instead of at the package level
     // due to the issues described in tickets #3160 and #3836.
-    private[process] object processInternal {
+    private[process] object processInternal
       final val processDebug = props contains "scala.process.debug"
       dbg("Initializing process package.")
 
@@ -246,25 +244,17 @@ package scala.sys {
       type SyncVar[T] = scala.concurrent.SyncVar[T]
       type URL = java.net.URL
 
-      def onError[T](handler: Throwable => T): Throwable =?> T = {
+      def onError[T](handler: Throwable => T): Throwable =?> T =
         case e @ _ => handler(e)
-      }
 
-      def onIOInterrupt[T](handler: => T): Throwable =?> T = {
+      def onIOInterrupt[T](handler: => T): Throwable =?> T =
         case _: InterruptedIOException => handler
-      }
 
-      def onInterrupt[T](handler: => T): Throwable =?> T = {
+      def onInterrupt[T](handler: => T): Throwable =?> T =
         case _: InterruptedException => handler
-      }
 
-      def ioFailure[T](handler: IOException => T): Throwable =?> T = {
+      def ioFailure[T](handler: IOException => T): Throwable =?> T =
         case e: IOException => handler(e)
-      }
 
-      def dbg(msgs: Any*) = if (processDebug) {
+      def dbg(msgs: Any*) = if (processDebug)
         Console.println("[process] " + (msgs mkString " "))
-      }
-    }
-  }
-}

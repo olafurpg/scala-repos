@@ -10,7 +10,7 @@ import scala.reflect.runtime.universe._
   * A trait that allows an object to tell you about itself
   * rather than using reflection
   */
-trait SourceInfo {
+trait SourceInfo
 
   /**
     * Given a name, look up the field
@@ -24,20 +24,18 @@ trait SourceInfo {
     * @return a list of all the fields
     */
   def allFieldNames(): Seq[(String, SourceFieldMetadata)]
-}
 
 case class SourceFieldMetadataRep[A](
-    name: String, manifest: TypeTag[A], converter: FieldConverter {
+    name: String, manifest: TypeTag[A], converter: FieldConverter
   type T = A
-})
-    extends SourceFieldMetadata {
+)
+    extends SourceFieldMetadata
   type ST = A
-}
 
 /**
   * Metadata about a specific field
   */
-trait SourceFieldMetadata {
+trait SourceFieldMetadata
 
   /**
     * The field's type
@@ -61,7 +59,6 @@ trait SourceFieldMetadata {
     * @return
     */
   def converter: FieldConverter { type T = ST }
-}
 
 /**
   * An inplementation of SourceFieldInfo
@@ -70,17 +67,16 @@ trait SourceFieldMetadata {
   * @param metaData the metadata
   * @tparam A the type
   */
-case class SourceFieldInfoRep[A](value: A, metaData: SourceFieldMetadata {
+case class SourceFieldInfoRep[A](value: A, metaData: SourceFieldMetadata
   type ST = A
-})
-    extends SourceFieldInfo {
+)
+    extends SourceFieldInfo
   type T = A
-}
 
 /**
   * Value and metadata for a field
   */
-trait SourceFieldInfo {
+trait SourceFieldInfo
 
   /**
     * The type of the field
@@ -98,12 +94,11 @@ trait SourceFieldInfo {
     * @return
     */
   def metaData: SourceFieldMetadata { type ST = T }
-}
 
 /**
   * Convert the field into other representations
   */
-trait FieldConverter {
+trait FieldConverter
 
   /**
     * The type of the field
@@ -138,4 +133,3 @@ trait FieldConverter {
     * @return the field as a sequence of SourceFields
     */
   def asSeq(v: T): Box[Seq[SourceFieldInfo]]
-}

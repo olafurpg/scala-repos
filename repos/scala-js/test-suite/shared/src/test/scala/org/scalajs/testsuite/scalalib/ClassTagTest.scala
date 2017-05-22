@@ -14,11 +14,11 @@ import scala.reflect._
 import org.junit.Test
 import org.junit.Assert._
 
-class ClassTagTest {
+class ClassTagTest
 
   @Test
   def apply_should_get_the_existing_instances_for_predefined_ClassTags(
-      ): Unit = {
+      ): Unit =
     assertSame(ClassTag.Byte, ClassTag(classOf[Byte]))
     assertSame(ClassTag.Short, ClassTag(classOf[Short]))
     assertSame(ClassTag.Char, ClassTag(classOf[Char]))
@@ -47,9 +47,8 @@ class ClassTagTest {
     assertSame(ClassTag.AnyRef, classTag[AnyRef])
     assertSame(ClassTag.Nothing, classTag[Nothing])
     assertSame(ClassTag.Null, classTag[Null])
-  }
 
-  @Test def runtimeClass(): Unit = {
+  @Test def runtimeClass(): Unit =
     assertSame(classOf[Byte], ClassTag.Byte.runtimeClass)
     assertSame(classOf[Short], ClassTag.Short.runtimeClass)
     assertSame(classOf[Char], ClassTag.Char.runtimeClass)
@@ -109,5 +108,3 @@ class ClassTagTest {
                ClassTag(classOf[Array[Nothing]]).runtimeClass)
     assertSame(
         classOf[Array[Null]], ClassTag(classOf[Array[Null]]).runtimeClass)
-  }
-}

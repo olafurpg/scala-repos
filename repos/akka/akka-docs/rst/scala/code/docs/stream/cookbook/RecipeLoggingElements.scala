@@ -5,27 +5,25 @@ import akka.stream.Attributes
 import akka.stream.scaladsl.{Sink, Source}
 import akka.testkit.{EventFilter, TestProbe}
 
-class RecipeLoggingElements extends RecipeSpec {
+class RecipeLoggingElements extends RecipeSpec
 
-  "Simple logging recipe" must {
+  "Simple logging recipe" must
 
-    "work with println" in {
+    "work with println" in
       val printProbe = TestProbe()
       def println(s: String): Unit = printProbe.ref ! s
 
       val mySource = Source(List("1", "2", "3"))
 
       //#println-debug
-      val loggedSource = mySource.map { elem =>
+      val loggedSource = mySource.map  elem =>
         println(elem); elem
-      }
       //#println-debug
 
       loggedSource.runWith(Sink.ignore)
       printProbe.expectMsgAllOf("1", "2", "3")
-    }
 
-    "use log()" in {
+    "use log()" in
       val mySource = Source(List("1", "2", "3"))
       def analyse(s: String) = s
 
@@ -42,9 +40,5 @@ class RecipeLoggingElements extends RecipeSpec {
       //#log-custom
 
       val loggedSource = mySource.log("custom")
-      EventFilter.debug(start = "[custom] Element: ").intercept {
+      EventFilter.debug(start = "[custom] Element: ").intercept
         loggedSource.runWith(Sink.ignore)
-      }
-    }
-  }
-}

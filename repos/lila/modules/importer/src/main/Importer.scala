@@ -15,11 +15,11 @@ import lila.round.actorApi.round._
 
 final class Importer(roundMap: ActorRef,
                      delay: FiniteDuration,
-                     scheduler: akka.actor.Scheduler) {
+                     scheduler: akka.actor.Scheduler)
 
   def apply(data: ImportData,
             user: Option[String],
-            forceId: Option[String] = None): Fu[Game] = {
+            forceId: Option[String] = None): Fu[Game] =
 
     def gameExists(processing: => Fu[Game]): Fu[Game] =
       GameRepo.findPgnImport(data.pgn) flatMap { _.fold(processing)(fuccess) }
@@ -28,10 +28,10 @@ final class Importer(roundMap: ActorRef,
         game: Game, result: Option[Result], situation: Situation): Game =
       if (game.finished) game
       else
-        situation.status match {
+        situation.status match
           case Some(status) => game.finish(status, situation.winner).game
           case _ =>
-            result.fold(game) {
+            result.fold(game)
               case Result(Status.Draw, _) =>
                 game.finish(Status.Draw, None).game
               case Result(Status.Resign, winner) =>
@@ -39,29 +39,22 @@ final class Importer(roundMap: ActorRef,
               case Result(Status.UnknownFinish, winner) =>
                 game.finish(Status.UnknownFinish, winner).game
               case _ => game
-            }
-        }
 
-    gameExists {
-      (data preprocess user).future flatMap {
+    gameExists
+      (data preprocess user).future flatMap
         case Preprocessed(g, replay, result) =>
           val started = forceId.fold(g)(g.withId).start
           val game = applyResult(started, result, replay.state.situation)
-          (GameRepo insertDenormalized game) >> {
+          (GameRepo insertDenormalized game) >>
             game.pgnImport.flatMap(_.user).isDefined ?? GameRepo
               .setImportCreatedAt(game)
-          } >> {
+          >>
             GameRepo.finish(id = game.id,
                             winnerColor = game.winnerColor,
                             winnerId = None,
                             status = game.status)
-          } inject game
-      }
-    }
-  }
+          inject game
 
   def inMemory(data: ImportData): Valid[Game] =
-    data.preprocess(user = none).map {
+    data.preprocess(user = none).map
       case Preprocessed(game, replay, _) => game withId "synthetic"
-    }
-}

@@ -1,12 +1,10 @@
-object Test extends App {
+object Test extends App
 
-  object Color extends Enumeration {
+  object Color extends Enumeration
     val Red, Green, Blue = Value
-  }
 
-  class MyColor extends Enumeration {
+  class MyColor extends Enumeration
     val Red, Green, Blue = Value
-  }
 
   println(Color.Red)
   println(Color.Green)
@@ -15,4 +13,3 @@ object Test extends App {
   println(col.Blue)
   println(col.Green)
   println(col.Red)
-}

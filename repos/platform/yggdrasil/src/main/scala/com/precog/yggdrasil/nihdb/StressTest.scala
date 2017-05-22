@@ -47,7 +47,7 @@ import java.io._
 import java.nio.ByteBuffer
 import java.util.concurrent.ScheduledThreadPoolExecutor
 
-class StressTest {
+class StressTest
   import AsyncParser._
 
   val actorSystem = ActorSystem("NIHDBActorSystem")
@@ -57,9 +57,8 @@ class StressTest {
       VersionedSegmentFormat(Map(1 -> V1SegmentFormat))
   )
 
-  val chefs = (1 to 4).map { _ =>
+  val chefs = (1 to 4).map  _ =>
     actorSystem.actorOf(Props(makechef))
-  }
 
   val chef =
     actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
@@ -81,15 +80,14 @@ class StressTest {
               Duration(60, "seconds"),
               txLogScheduler)(actorSystem)
       .unsafePerformIO
-      .valueOr { e =>
+      .valueOr  e =>
         throw new Exception(e.message)
-      }
 
   implicit val M = new FutureMonad(actorSystem.dispatcher)
 
   def shutdown() = actorSystem.shutdown()
 
-  class TempContext {
+  class TempContext
     def fromFuture[A](f: Future[A]): A =
       Await.result(f, Duration(60, "seconds"))
 
@@ -98,29 +96,26 @@ class StressTest {
 
     def close(proj: NIHDB) = fromFuture(proj.close(actorSystem))
 
-    def finish() = {
-      (for {
+    def finish() =
+      (for
         _ <- IO { close(nihdb) }
         _ <- IOUtils.recursiveDelete(workDir)
-      } yield ()).unsafePerformIO
-    }
+      yield ()).unsafePerformIO
 
-    def runNihAsync(i: Int, f: File, bufSize: Int, _eventid: Long): Long = {
+    def runNihAsync(i: Int, f: File, bufSize: Int, _eventid: Long): Long =
       var t: Long = 0L
       def startit(): Unit = t = System.currentTimeMillis()
 
-      def timeit(s: String) {
+      def timeit(s: String)
         val tt = System.currentTimeMillis()
         println("%s in %.3fs" format (s, (tt - t) * 0.001))
         t = tt
-      }
 
-      def timeit2(s: String) {
+      def timeit2(s: String)
         val tt = System.currentTimeMillis()
         val d = (tt - t) * 0.001
         println("%s in %.3fs (%.3fs/M)" format (s, d, d / i))
         t = tt
-      }
 
       var eventid: Long = _eventid
 
@@ -130,7 +125,7 @@ class StressTest {
       val bb = ByteBuffer.allocate(bufSize)
 
       @tailrec
-      def loop(p: AsyncParser) {
+      def loop(p: AsyncParser)
         val n = ch.read(bb)
         bb.flip()
 
@@ -144,38 +139,32 @@ class StressTest {
         eventid += 1L
         bb.flip()
         if (n >= 0) loop(parser)
-      }
 
-      try {
+      try
         loop(AsyncParser.stream())
-      } finally {
+      finally
         ch.close()
-      }
       timeit("  finished ingesting")
 
       while (fromFuture(nihdb.status).pending > 0) Thread.sleep(100)
       timeit("  finished cooking")
 
       import scalaz._
-      val length = NIHDBProjection.wrap(nihdb).flatMap { projection =>
-        val stream = StreamT.unfoldM[Future, Unit, Option[Long]](None) { key =>
+      val length = NIHDBProjection.wrap(nihdb).flatMap  projection =>
+        val stream = StreamT.unfoldM[Future, Unit, Option[Long]](None)  key =>
           projection
             .getBlockAfter(key, None)
-            .map(_.map {
+            .map(_.map
               case BlockProjectionData(_, maxKey, _) => ((), Some(maxKey))
-            })
-        }
+            )
         stream.length
-      }
 
       Await.result(length, Duration(300, "seconds"))
       timeit2("  evaluated")
 
       eventid
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     var eventid: Long = 1L
     val ctxt = new TempContext()
     val f = new File("yggdrasil/src/test/resources/z1m_nl.json")
@@ -183,21 +172,16 @@ class StressTest {
 
     val t0 = System.currentTimeMillis()
 
-    try {
-      try {
-        for (i <- 1 to 100) {
+    try
+      try
+        for (i <- 1 to 100)
           println("iteration %d" format i)
           eventid = ctxt.runNihAsync(i, f, 8 * 1024 * 1024, eventid)
           val t = System.currentTimeMillis()
           println(
               "total rows: %dM, total time: %.3fs" format
               (i, (t - t0) / 1000.0))
-        }
-      } finally {
+      finally
         ctxt.finish()
-      }
-    } finally {
+    finally
       shutdown()
-    }
-  }
-}

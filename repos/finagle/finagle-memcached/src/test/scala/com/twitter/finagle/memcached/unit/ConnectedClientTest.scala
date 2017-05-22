@@ -13,7 +13,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class ConnectedClientTest extends FunSuite with MockitoSugar {
+class ConnectedClientTest extends FunSuite with MockitoSugar
 
   val service = mock[Service[Command, Response]]
   val client = Client.apply(service)
@@ -21,7 +21,7 @@ class ConnectedClientTest extends FunSuite with MockitoSugar {
   val key = "key"
   val value = Buf.Utf8("value")
 
-  test("cas correctly responds to return states of the service") {
+  test("cas correctly responds to return states of the service")
     when(service.apply(any[Command])).thenReturn(Future.value(Stored()))
     assert(Await.result(client.cas(key, value, casUnique)) == true)
 
@@ -30,9 +30,8 @@ class ConnectedClientTest extends FunSuite with MockitoSugar {
 
     when(service.apply(any[Command])).thenReturn(Future.value(NotFound()))
     assert(Await.result(client.cas(key, value, casUnique)) == false)
-  }
 
-  test("checkAndSet correctly responds to return states of the service") {
+  test("checkAndSet correctly responds to return states of the service")
     when(service.apply(any[Command])).thenReturn(Future.value(Stored()))
     assert(
         Await.result(client.checkAndSet(key, value, casUnique)) == CasResult.Stored)
@@ -44,31 +43,23 @@ class ConnectedClientTest extends FunSuite with MockitoSugar {
     when(service.apply(any[Command])).thenReturn(Future.value(NotFound()))
     assert(
         Await.result(client.checkAndSet(key, value, casUnique)) == CasResult.NotFound)
-  }
 
-  test("cas correctly responds to the error states of the service") {
+  test("cas correctly responds to the error states of the service")
     when(service.apply(any[Command]))
       .thenReturn(Future.value(Error(new IllegalAccessException("exception"))))
-    intercept[IllegalAccessException] {
+    intercept[IllegalAccessException]
       Await.result(client.cas(key, value, casUnique))
-    }
 
     when(service.apply(any[Command])).thenReturn(Future.value(Deleted()))
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       Await.result(client.cas(key, value, casUnique))
-    }
-  }
 
-  test("checkAndSet correctly responds to the error states of the service") {
+  test("checkAndSet correctly responds to the error states of the service")
     when(service.apply(any[Command]))
       .thenReturn(Future.value(Error(new IllegalAccessException("exception"))))
-    intercept[IllegalAccessException] {
+    intercept[IllegalAccessException]
       Await.result(client.checkAndSet(key, value, casUnique))
-    }
 
     when(service.apply(any[Command])).thenReturn(Future.value(Deleted()))
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       Await.result(client.checkAndSet(key, value, casUnique))
-    }
-  }
-}

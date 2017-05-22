@@ -26,7 +26,7 @@ import org.apache.spark.mllib.stat.correlation.{Correlations, PearsonCorrelation
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class CorrelationSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Logging {
+    extends SparkFunSuite with MLlibTestSparkContext with Logging
 
   // test input data
   val xData = Array(1.0, 0.0, -2.0)
@@ -39,18 +39,15 @@ class CorrelationSuite
       Vectors.dense(9.0, 0.0, 0.0, 1.0)
   )
 
-  test("corr(x, y) pearson, 1 value in data") {
+  test("corr(x, y) pearson, 1 value in data")
     val x = sc.parallelize(Array(1.0))
     val y = sc.parallelize(Array(4.0))
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       Statistics.corr(x, y, "pearson")
-    }
-    intercept[RuntimeException] {
+    intercept[RuntimeException]
       Statistics.corr(x, y, "spearman")
-    }
-  }
 
-  test("corr(x, y) default, pearson") {
+  test("corr(x, y) default, pearson")
     val x = sc.parallelize(xData)
     val y = sc.parallelize(yData)
     val expected = 0.6546537
@@ -60,19 +57,17 @@ class CorrelationSuite
     assert(approxEqual(expected, p1))
 
     // numPartitions >= size for input RDDs
-    for (numParts <- List(xData.size, xData.size * 2)) {
+    for (numParts <- List(xData.size, xData.size * 2))
       val x1 = sc.parallelize(xData, numParts)
       val y1 = sc.parallelize(yData, numParts)
       val p2 = Statistics.corr(x1, y1)
       assert(approxEqual(expected, p2))
-    }
 
     // RDD of zero variance
     val z = sc.parallelize(zeros)
     assert(Statistics.corr(x, z).isNaN)
-  }
 
-  test("corr(x, y) spearman") {
+  test("corr(x, y) spearman")
     val x = sc.parallelize(xData)
     val y = sc.parallelize(yData)
     val expected = 0.5
@@ -80,19 +75,17 @@ class CorrelationSuite
     assert(approxEqual(expected, s1))
 
     // numPartitions >= size for input RDDs
-    for (numParts <- List(xData.size, xData.size * 2)) {
+    for (numParts <- List(xData.size, xData.size * 2))
       val x1 = sc.parallelize(xData, numParts)
       val y1 = sc.parallelize(yData, numParts)
       val s2 = Statistics.corr(x1, y1, "spearman")
       assert(approxEqual(expected, s2))
-    }
 
     // RDD of zero variance => zero variance in ranks
     val z = sc.parallelize(zeros)
     assert(Statistics.corr(x, z, "spearman").isNaN)
-  }
 
-  test("corr(X) default, pearson") {
+  test("corr(X) default, pearson")
     val X = sc.parallelize(data)
     val defaultMat = Statistics.corr(X)
     val pearsonMat = Statistics.corr(X, "pearson")
@@ -104,9 +97,8 @@ class CorrelationSuite
     // scalastyle:on
     assert(matrixApproxEqual(defaultMat.toBreeze, expected))
     assert(matrixApproxEqual(pearsonMat.toBreeze, expected))
-  }
 
-  test("corr(X) spearman") {
+  test("corr(X) spearman")
     val X = sc.parallelize(data)
     val spearmanMat = Statistics.corr(X, "spearman")
     // scalastyle:off
@@ -116,9 +108,8 @@ class CorrelationSuite
                        (0.4000000, 0.9486833, Double.NaN, 1.0000000))
     // scalastyle:on
     assert(matrixApproxEqual(spearmanMat.toBreeze, expected))
-  }
 
-  test("method identification") {
+  test("method identification")
     val pearson = PearsonCorrelation
     val spearman = SpearmanCorrelation
 
@@ -126,32 +117,24 @@ class CorrelationSuite
     assert(Correlations.getCorrelationFromName("spearman") === spearman)
 
     // Should throw IllegalArgumentException
-    try {
+    try
       Correlations.getCorrelationFromName("kendall")
       assert(false)
-    } catch {
+    catch
       case ie: IllegalArgumentException =>
-    }
-  }
 
-  def approxEqual(v1: Double, v2: Double, threshold: Double = 1e-6): Boolean = {
-    if (v1.isNaN) {
+  def approxEqual(v1: Double, v2: Double, threshold: Double = 1e-6): Boolean =
+    if (v1.isNaN)
       v2.isNaN
-    } else {
+    else
       math.abs(v1 - v2) <= threshold
-    }
-  }
 
   def matrixApproxEqual(
-      A: BM[Double], B: BM[Double], threshold: Double = 1e-6): Boolean = {
-    for (i <- 0 until A.rows; j <- 0 until A.cols) {
-      if (!approxEqual(A(i, j), B(i, j), threshold)) {
+      A: BM[Double], B: BM[Double], threshold: Double = 1e-6): Boolean =
+    for (i <- 0 until A.rows; j <- 0 until A.cols)
+      if (!approxEqual(A(i, j), B(i, j), threshold))
         logInfo(
             "i, j = " + i + ", " + j + " actual: " + A(i, j) + " expected:" +
             B(i, j))
         return false
-      }
-    }
     true
-  }
-}

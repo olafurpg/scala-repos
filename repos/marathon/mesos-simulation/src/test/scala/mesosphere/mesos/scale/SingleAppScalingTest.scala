@@ -13,21 +13,20 @@ import play.api.libs.json._
 
 import scala.concurrent.duration._
 
-object SingleAppScalingTest {
+object SingleAppScalingTest
   val metricsFile = "scaleUp20s-metrics"
   val appInfosFile = "scaleUp20s-appInfos"
-}
 
 class SingleAppScalingTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    with Matchers with BeforeAndAfter with GivenWhenThen
 
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   //clean up state before running the test case
   before(cleanUp())
 
-  override def startMarathon(port: Int, args: String*): Unit = {
+  override def startMarathon(port: Int, args: String*): Unit =
     val cwd = new File(".")
 
     val maxTasksPerOffer =
@@ -47,9 +46,8 @@ class SingleAppScalingTest
              "--task_launch_confirm_timeout",
              "1000") ++ args.toList,
         mainClass = "mesosphere.mesos.simulation.SimulateMesosMain")
-  }
 
-  private[this] def createStopApp(instances: Int): Unit = {
+  private[this] def createStopApp(instances: Int): Unit =
     Given("a new app")
     val appIdPath: PathId = testBasePath / "/test/app"
     val app = appProxy(
@@ -71,17 +69,14 @@ class SingleAppScalingTest
 
     Then("the delete should finish eventually")
     waitForChange(deleteResult)
-  }
 
-  test("create/stop app with 1 instance (does it work?)") {
+  test("create/stop app with 1 instance (does it work?)")
     createStopApp(1)
-  }
 
-  test("create/stop app with 100 instances (warm up)") {
+  test("create/stop app with 100 instances (warm up)")
     createStopApp(100)
-  }
 
-  test("application scaling") {
+  test("application scaling")
     // This test has a lot of logging output. Thus all log statements are prefixed with XXX
     // for better grepability.
 
@@ -96,17 +91,15 @@ class SingleAppScalingTest
     var metrics = Seq.newBuilder[JsValue]
     var appInfos = Seq.newBuilder[JsValue]
 
-    for (i <- 1 to 20) {
+    for (i <- 1 to 20)
       val waitTime: Long = startTime + i * 1000 - System.currentTimeMillis()
-      if (waitTime > 0) {
+      if (waitTime > 0)
         Thread.sleep(waitTime)
-      }
       //      val currentApp = marathon.app(appIdPath)
       val appJson = (marathon.listAppsInBaseGroup.entityJson \ "apps")
         .as[Seq[JsObject]]
-        .filter { appJson =>
+        .filter  appJson =>
           (appJson \ "id").as[String] == appIdPath.toString
-        }
         .head
 
       val instances = (appJson \ "instances").as[Int]
@@ -119,7 +112,6 @@ class SingleAppScalingTest
       appInfos += ScalingTestResultFiles.addTimestamp(startTime)(appJson)
       metrics += ScalingTestResultFiles.addTimestamp(startTime)(
           marathon.metrics().entityJson)
-    }
 
     ScalingTestResultFiles.writeJson(
         SingleAppScalingTest.appInfosFile, appInfos.result())
@@ -134,7 +126,7 @@ class SingleAppScalingTest
       .originalResponse
     log.info(s"XXX ${result.status}: ${result.entity}")
 
-    WaitTestSupport.waitFor("app suspension", 10.seconds) {
+    WaitTestSupport.waitFor("app suspension", 10.seconds)
       val currentApp = marathon.app(appIdPath)
 
       val instances = (currentApp.entityJson \ "app" \ "instances").as[Int]
@@ -145,18 +137,14 @@ class SingleAppScalingTest
       log.info(
           s"XXX (suspendSuccessfully) Current instance count: staged $tasksStaged, running $tasksRunning / $instances")
 
-      if (instances == 0) {
+      if (instances == 0)
         Some(())
-      } else {
+      else
         // slow down
         Thread.sleep(1000)
         None
-      }
-    }
 
     log.info("XXX deleting")
     val deleteResult: RestResult[ITDeploymentResult] =
       marathon.deleteApp(appWithManyInstances.id, force = true)
     waitForChange(deleteResult)
-  }
-}

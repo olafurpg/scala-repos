@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScWhileStmt}
   * @author Ksenia.Sautina
   * @since 2/5/13
   */
-class ScalaMissingWhileBodyFixer extends ScalaFixer {
+class ScalaMissingWhileBodyFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+            psiElement: PsiElement): OperationPerformed =
     val whileStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScWhileStmt], false)
     if (whileStatement == null) return NoOperation
@@ -23,21 +23,18 @@ class ScalaMissingWhileBodyFixer extends ScalaFixer {
     val doc = editor.getDocument
     val body = whileStatement.body.orNull
 
-    whileStatement.body match {
+    whileStatement.body match
       case Some(_: ScBlockExpr) => NoOperation
       case Some(_)
           if startLine(doc, body) == startLine(doc, whileStatement) &&
           whileStatement.condition.isDefined =>
         NoOperation
       case _ =>
-        whileStatement.getRightParenthesis map {
+        whileStatement.getRightParenthesis map
           case rParenth =>
             moveToEnd(editor, rParenth)
 
             doc.insertString(rParenth.getTextRange.getEndOffset, " {}")
 
             WithEnter(2)
-        } getOrElse NoOperation
-    }
-  }
-}
+        getOrElse NoOperation

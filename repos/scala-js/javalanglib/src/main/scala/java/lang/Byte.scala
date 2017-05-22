@@ -5,7 +5,7 @@ import scala.scalajs.js
 /* This is a hijacked class. Its instances are primitive numbers.
  * Constructors are not emitted.
  */
-final class Byte private () extends Number with Comparable[Byte] {
+final class Byte private () extends Number with Comparable[Byte]
 
   def this(value: scala.Byte) = this()
   def this(s: String) = this()
@@ -30,9 +30,8 @@ final class Byte private () extends Number with Comparable[Byte] {
 
   @inline override def toString(): String =
     Byte.toString(byteValue)
-}
 
-object Byte {
+object Byte
   final val TYPE = classOf[scala.Byte]
   final val SIZE = 8
 
@@ -55,16 +54,14 @@ object Byte {
 
   @inline def parseByte(s: String): scala.Byte = parseByte(s, 10)
 
-  def parseByte(s: String, radix: Int): scala.Byte = {
+  def parseByte(s: String, radix: Int): scala.Byte =
     val r = Integer.parseInt(s, radix)
     if (r < MIN_VALUE || r > MAX_VALUE)
       throw new NumberFormatException(s"""For input string: "$s"""")
     else r.toByte
-  }
 
   @inline def toString(b: scala.Byte): String =
     "" + b
 
   @inline def compare(x: scala.Byte, y: scala.Byte): scala.Int =
     x - y
-}

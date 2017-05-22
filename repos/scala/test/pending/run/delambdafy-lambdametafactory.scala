@@ -5,37 +5,30 @@
 //
 import java.lang.invoke._
 
-class C {
-  def test1: Unit = { (x: String) =>
+class C
+  def test1: Unit =  (x: String) =>
     x.reverse
-  }
-  def test2: Unit = {
+  def test2: Unit =
     val capture1 = "capture1"
     (x: String) =>
       capture1 + " " + x.reverse
-  }
-  def test3: Unit = { (x: String) =>
+  def test3: Unit =  (x: String) =>
     C.this + " " + x.reverse
-  }
-}
-trait T {
-  def test4: Unit = { (x: String) =>
+trait T
+  def test4: Unit =  (x: String) =>
     x.reverse
-  }
-}
 
 // A functional interface. Function1 contains abstract methods that are filled in by mixin 
-trait Function1ish[A, B] {
+trait Function1ish[A, B]
   def apply(a: A): B
-}
 
-object Test {
+object Test
   def lambdaFactory[A, B](
       hostClass: Class[_],
       instantiatedParam: Class[A],
       instantiatedRet: Class[B],
       accessorName: String,
-      capturedParams: Array[(Class[_], AnyRef)] = Array()) = {
+      capturedParams: Array[(Class[_], AnyRef)] = Array()) =
     val caller = MethodHandles.lookup
     val methodType =
       MethodType.methodType(classOf[AnyRef], Array[Class[_]](classOf[AnyRef]))
@@ -56,8 +49,7 @@ object Test {
     site.getTarget
       .invokeWithArguments(captured: _*)
       .asInstanceOf[Function1ish[A, B]]
-  }
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     println(
         lambdaFactory(
             classOf[C], classOf[String], classOf[String], "accessor$1")
@@ -80,5 +72,3 @@ object Test {
                       classOf[String],
                       "accessor$4",
                       Array(classOf[T] -> new T {})).apply("abc"))
-  }
-}

@@ -8,7 +8,7 @@ package macros
   *  A slice of [[scala.reflect.macros.blackbox.Context the Scala macros context]] that
   *  partially exposes the type checker to macro writers.
   */
-trait Typers { self: blackbox.Context =>
+trait Typers  self: blackbox.Context =>
 
   /** Contexts that represent macros in-flight, including the current one. Very much like a stack trace, but for macros only.
     *  Can be useful for interoperating with other macros and for imposing compiler-friendly limits on macro expansion.
@@ -140,7 +140,6 @@ trait Typers { self: blackbox.Context =>
     *  @see [[http://stackoverflow.com/questions/20936509/scala-macros-what-is-the-difference-between-typed-aka-typechecked-an-untyped]]
     */
   def untypecheck(tree: Tree): Tree
-}
 
 /** Indicates an error during one of the methods in [[scala.reflect.macros.Typers]].
   */

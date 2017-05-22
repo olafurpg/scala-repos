@@ -21,7 +21,7 @@ class ScImportExprStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScImportExpr](parent, elemType)
-    with ScImportExprStub {
+    with ScImportExprStub
 
   var referenceText: StringRef = StringRef.fromString("")
   var singleWildcard: Boolean = _
@@ -32,35 +32,29 @@ class ScImportExprStubImpl[ParentPsi <: PsiElement](
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            refText: String,
-           singleWildcard: Boolean) {
+           singleWildcard: Boolean)
     this(
         parent,
         elemType
           .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     referenceText = StringRef.fromString(refText)
     this.singleWildcard = singleWildcard
-  }
 
-  def reference: Option[ScStableCodeReferenceElement] = {
-    if (myReference != null) {
+  def reference: Option[ScStableCodeReferenceElement] =
+    if (myReference != null)
       val referenceElement = myReference.get
       if (referenceElement != null &&
           (referenceElement.isEmpty ||
-              (referenceElement.get.getContext eq getPsi))) {
+              (referenceElement.get.getContext eq getPsi)))
         return referenceElement
-      }
-    }
     val res =
       if (referenceText == StringRef.fromString("")) None
-      else {
+      else
         val psi = ScalaPsiElementFactory.createReferenceFromText(
             StringRef.toString(referenceText), getPsi, null)
         Option(psi)
-      }
     myReference = new SofterReference[Option[ScStableCodeReferenceElement]](
         res)
     res
-  }
 
   def isSingleWildcard: Boolean = singleWildcard
-}

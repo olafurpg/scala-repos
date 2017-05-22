@@ -25,62 +25,52 @@ import test._
 import testutil._
 
 /** Polymorphic singleton function. */
-object singleton extends (Id ~> Set) {
+object singleton extends (Id ~> Set)
   def apply[T](t: T) = Set(t)
-}
 
 /** Polymorphic function selecting an arbitrary element from a non-empty `Set`. */
-object choose extends (Set ~> Option) {
+object choose extends (Set ~> Option)
   def apply[T](s: Set[T]) = s.headOption
-}
 
 /** Polymorphic function creating singleton `List`s. */
-object list extends (Id ~> List) {
+object list extends (Id ~> List)
   def apply[T](t: T) = List(t)
-}
 
 /** Polymorphic function returning the head of a `List`. */
-object headOption extends (List ~> Option) {
+object headOption extends (List ~> Option)
   def apply[T](l: List[T]) = l.headOption
-}
 
 /** Polymorphic function which injects a value into an `Option`. */
-object option extends (Id ~> Option) {
+object option extends (Id ~> Option)
   def apply[T](t: T) = Option(t)
-}
 
 /** Polymorphic function testing whether or not an `Option` is defined. */
-object isDefined extends (Option ~>> Boolean) {
+object isDefined extends (Option ~>> Boolean)
   def apply[T](o: Option[T]) = o.isDefined
-}
 
 /** Polymorphic function which opens an `Option`. */
-object get extends (Option ~> Id) {
+object get extends (Option ~> Id)
   def apply[T](o: Option[T]) = o.get
-}
 
 /** Polymorphic addition with type specific cases. */
-object plus extends Poly2 {
+object plus extends Poly2
   implicit val caseInt = at[Int, Int](_ + _)
   implicit val caseDouble = at[Double, Double](_ + _)
   implicit val caseString = at[String, String](_ + _)
   implicit def caseList[T] = at[List[T], List[T]](_ ::: _)
-}
 
 /** Polymorphic zero with type specific cases. */
-object zero extends Poly0 {
+object zero extends Poly0
   implicit val zeroInt = at(0)
   implicit val zeroDouble = at(0.0)
   implicit val zeroString = at("")
   implicit def zeroList[T] = at[List[T]](Nil)
-}
 
-class PolyTests {
-  object toInt extends (Id ~>> Int) {
+class PolyTests
+  object toInt extends (Id ~>> Int)
     def apply[T](t: T) = t.toString.toInt
-  }
 
-  object size extends Poly1 {
+  object size extends Poly1
     implicit def default[T] = at[T](_ => 1)
     implicit def caseInt = at[Int](_ => 1)
     implicit def caseString = at[String](_.length)
@@ -88,13 +78,11 @@ class PolyTests {
     implicit def caseOption[T](implicit st: Case.Aux[T, Int]) =
       at[Option[T]](t => 1 + (t map size).getOrElse(0))
     implicit def caseTuple[T, U](
-        implicit st: Case.Aux[T, Int], su: Case.Aux[U, Int]) = at[(T, U)] {
+        implicit st: Case.Aux[T, Int], su: Case.Aux[U, Int]) = at[(T, U)]
       case (t, u) => size(t) + size(u)
-    }
-  }
 
   @Test
-  def testHRFn {
+  def testHRFn
     implicitly[choose.Case[Set[Int]]]
 
     implicitly[size.Case[Int]]
@@ -235,10 +223,9 @@ class PolyTests {
     val hm2 = hlistMap(list)
     typed[List[Int] :: List[String] :: HNil](hm2)
     assertEquals(List(23) :: List("foo") :: HNil, hm2)
-  }
 
   @Test
-  def testCompose {
+  def testCompose
     val so = singleton compose option
 
     val sos = so("foo")
@@ -248,10 +235,9 @@ class PolyTests {
     val soi = so(23)
     typed[Set[Option[Int]]](soi)
     assertEquals(Set(Option(23)), soi)
-  }
 
   @Test
-  def testPolyVal {
+  def testPolyVal
     val i1 = zero[Int]
     typed[Int](i1)
     assertEquals(0, i1)
@@ -275,17 +261,15 @@ class PolyTests {
     val l2 = List(23) ++ zero[List[Int]]
     typed[List[Int]](l2)
     assertEquals(List(23), l2)
-  }
 
   // Polymophic function value with type-specific cases for two
   // argument types. Result type is dependent on argument type
-  object bidi extends Poly1 {
+  object bidi extends Poly1
     implicit val caseInt = at[Int](_.toString)
     implicit val caseString = at[String](_.toInt)
-  }
 
   @Test
-  def testBinary {
+  def testBinary
     val bi = bidi(23)
     typed[String](bi)
     assertEquals("23", bi)
@@ -298,15 +282,12 @@ class PolyTests {
     val blis = lis map bidi
     typed[String :: Int :: String :: Int :: HNil](blis)
     assertEquals("1" :: 2 :: "3" :: 4 :: HNil, blis)
-  }
 
   @Test
-  def testRotateLeft {
-    object isd extends Poly3 {
-      implicit val default = at[Int, String, Double] {
+  def testRotateLeft
+    object isd extends Poly3
+      implicit val default = at[Int, String, Double]
         case (i, s, d) => s"i: $i, s: $s, d: $d"
-      }
-    }
 
     val r1 = isd(1, "foo", 2.0)
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}", r1)
@@ -321,11 +302,9 @@ class PolyTests {
     val r3 = dis(2.0, 1, "foo")
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}", r3)
 
-    object isdc extends Poly4 {
-      implicit val default = at[Int, String, Double, Char] {
+    object isdc extends Poly4
+      implicit val default = at[Int, String, Double, Char]
         case (i, s, d, c) => s"i: $i, s: $s, d: $d, c: $c"
-      }
-    }
 
     val r4 = isdc(1, "foo", 2.0, 'a')
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}, c: a", r4)
@@ -339,15 +318,12 @@ class PolyTests {
 
     val r6 = dcis(2.0, 'a', 1, "foo")
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}, c: a", r6)
-  }
 
   @Test
-  def testRotateRight {
-    object isd extends Poly3 {
-      implicit val default = at[Int, String, Double] {
+  def testRotateRight
+    object isd extends Poly3
+      implicit val default = at[Int, String, Double]
         case (i, s, d) => s"i: $i, s: $s, d: $d"
-      }
-    }
 
     val r1 = isd(1, "foo", 2.0)
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}", r1)
@@ -362,11 +338,9 @@ class PolyTests {
     val r3 = sdi("foo", 2.0, 1)
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}", r3)
 
-    object isdc extends Poly4 {
-      implicit val default = at[Int, String, Double, Char] {
+    object isdc extends Poly4
+      implicit val default = at[Int, String, Double, Char]
         case (i, s, d, c) => s"i: $i, s: $s, d: $d, c: $c"
-      }
-    }
 
     val r4 = isdc(1, "foo", 2.0, 'a')
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}, c: a", r4)
@@ -380,5 +354,3 @@ class PolyTests {
 
     val r6 = dcis(2.0, 'a', 1, "foo")
     assertTypedEquals[String](s"i: 1, s: foo, d: ${2.0}, c: a", r6)
-  }
-}

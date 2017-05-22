@@ -22,7 +22,7 @@ package org.apache.spark.scheduler
   * TaskSchedulerImpl. We assume a Mesos-like model where the application gets resource offers as
   * machines become available and can launch tasks on them.
   */
-private[spark] trait SchedulerBackend {
+private[spark] trait SchedulerBackend
   private val appId = "spark-application-" + System.currentTimeMillis
 
   def start(): Unit
@@ -56,4 +56,3 @@ private[spark] trait SchedulerBackend {
     * @return Map containing the log names and their respective URLs
     */
   def getDriverLogUrls: Option[Map[String, String]] = None
-}

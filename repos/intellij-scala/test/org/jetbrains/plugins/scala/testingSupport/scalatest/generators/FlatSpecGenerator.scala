@@ -6,12 +6,12 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait FlatSpecGenerator extends ScalaTestTestCase {
+trait FlatSpecGenerator extends ScalaTestTestCase
   def flatSpecClassName = "FlatSpecTest"
 
   def flatSpecFileName = flatSpecClassName + ".scala"
 
-  def addFlatSpec() {
+  def addFlatSpec()
     addFileToProject(
         "FlatSpecTest.scala",
         """
@@ -35,9 +35,8 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         | }
         |}
       """.stripMargin.trim())
-  }
 
-  def addBehaviorFlatSpec() = {
+  def addBehaviorFlatSpec() =
     addFileToProject(
         "BehaviorFlatSpec.scala",
         """
@@ -55,5 +54,3 @@ trait FlatSpecGenerator extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
-}

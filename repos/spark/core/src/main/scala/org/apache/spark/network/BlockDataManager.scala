@@ -20,7 +20,7 @@ package org.apache.spark.network
 import org.apache.spark.network.buffer.ManagedBuffer
 import org.apache.spark.storage.{BlockId, StorageLevel}
 
-private[spark] trait BlockDataManager {
+private[spark] trait BlockDataManager
 
   /**
     * Interface to get local block data. Throws an exception if the block cannot be found or
@@ -41,4 +41,3 @@ private[spark] trait BlockDataManager {
     * Release locks acquired by [[putBlockData()]] and [[getBlockData()]].
     */
   def releaseLock(blockId: BlockId): Unit
-}

@@ -17,31 +17,28 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4ChannelInitializerTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite with Eventually with IntegrationPatience
 
-  val writeDiscardHandler = new ChannelOutboundHandlerAdapter {
+  val writeDiscardHandler = new ChannelOutboundHandlerAdapter
     override def write(ctx: ChannelHandlerContext,
                        msg: scala.Any,
                        promise: ChannelPromise): Unit = ()
-  }
 
-  val nop = new ChannelHandler {
+  val nop = new ChannelHandler
     def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable): Unit =
       ()
     def handlerRemoved(ctx: ChannelHandlerContext): Unit = ()
     def handlerAdded(ctx: ChannelHandlerContext): Unit = ()
-  }
 
-  trait Ctx {
+  trait Ctx
     val sr = new InMemoryStatsReceiver
     val srv: SocketChannel = new NioSocketChannel()
     val loop = new NioEventLoopGroup()
     loop.register(srv)
     val baseParams = Params.empty + Stats(sr)
-  }
 
-  test("Netty4ChannelInitializer channel writes can time out") {
-    new Ctx {
+  test("Netty4ChannelInitializer channel writes can time out")
+    new Ctx
       val params =
         baseParams + Transport.Liveness(
             readTimeout = Duration.Top,
@@ -58,14 +55,11 @@ class Netty4ChannelInitializerTest
       srv.writeAndFlush("hi")
 
       // ChannelExceptionHandler records it.
-      eventually {
+      eventually
         assert(sr.counters(Seq("write_timeout")) == 1)
-      }
-    }
-  }
 
-  test("Netty4ChannelInitializer channel reads can time out") {
-    new Ctx {
+  test("Netty4ChannelInitializer channel reads can time out")
+    new Ctx
       val params =
         baseParams + Transport.Liveness(
             readTimeout = Duration.fromMilliseconds(1),
@@ -82,9 +76,5 @@ class Netty4ChannelInitializerTest
       // to mark time so we're stuck sleeping.
       srv.pipeline.fireChannelReadComplete()
 
-      eventually {
+      eventually
         assert(sr.counters(Seq("read_timeout")) == 1)
-      }
-    }
-  }
-}

@@ -24,13 +24,12 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class SQLTransformerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new SQLTransformer())
-  }
 
-  test("transform numeric data") {
+  test("transform numeric data")
     val original = sqlContext
       .createDataFrame(Seq((0, 1.0, 3.0), (2, 2.0, 5.0)))
       .toDF("id", "v1", "v2")
@@ -44,10 +43,7 @@ class SQLTransformerSuite
     assert(result.schema.toString == resultSchema.toString)
     assert(resultSchema == expected.schema)
     assert(result.collect().toSeq == expected.collect().toSeq)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new SQLTransformer().setStatement("select * from __THIS__")
     testDefaultReadWrite(t)
-  }
-}

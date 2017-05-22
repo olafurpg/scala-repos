@@ -9,11 +9,11 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.{MissingFormFieldRejection, RoutingSpec}
 import akka.util.ByteString
 
-class FileUploadDirectivesSpec extends RoutingSpec {
+class FileUploadDirectivesSpec extends RoutingSpec
 
-  "the uploadedFile directive" should {
+  "the uploadedFile directive" should
 
-    "write a posted file to a temporary file on disk" in {
+    "write a posted file to a temporary file on disk" in
 
       val xml = "<int>42</int>"
 
@@ -25,46 +25,37 @@ class FileUploadDirectivesSpec extends RoutingSpec {
 
       @volatile var file: Option[File] = None
 
-      try {
-        Post("/", simpleMultipartUpload) ~> {
-          uploadedFile("fieldName") {
+      try
+        Post("/", simpleMultipartUpload) ~>
+          uploadedFile("fieldName")
             case (info, tmpFile) ⇒
               file = Some(tmpFile)
               complete(info.toString)
-          }
-        } ~> check {
+        ~> check
           file.isDefined === true
           responseAs[String] === FileInfo(
               "fieldName", "age.xml", ContentTypes.`text/xml(UTF-8)`).toString
           read(file.get) === xml
-        }
-      } finally {
+      finally
         file.foreach(_.delete())
-      }
-    }
-  }
 
-  "the fileUpload directive" should {
+  "the fileUpload directive" should
 
     def echoAsAService =
-      extractRequestContext { ctx ⇒
+      extractRequestContext  ctx ⇒
         implicit val mat = ctx.materializer
 
-        fileUpload("field1") {
+        fileUpload("field1")
           case (info, bytes) ⇒
             // stream the bytes somewhere
-            val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒
+            val allBytesF = bytes.runFold(ByteString())  (all, bytes) ⇒
               all ++ bytes
-            }
 
             // sum all individual file sizes
-            onSuccess(allBytesF) { allBytes ⇒
+            onSuccess(allBytesF)  allBytes ⇒
               complete(allBytes)
-            }
-        }
-      }
 
-    "stream the file upload" in {
+    "stream the file upload" in
       // byte count as a service ;)
       val route = echoAsAService
 
@@ -76,13 +67,11 @@ class FileUploadDirectivesSpec extends RoutingSpec {
               HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
               Map("filename" -> "data1.txt")))
 
-      Post("/", multipartForm) ~> route ~> check {
+      Post("/", multipartForm) ~> route ~> check
         status shouldEqual StatusCodes.OK
         responseAs[String] shouldEqual str1
-      }
-    }
 
-    "stream the first file upload if multiple with the same name are posted" in {
+    "stream the first file upload if multiple with the same name are posted" in
       // byte count as a service ;)
       val route = echoAsAService
 
@@ -99,30 +88,24 @@ class FileUploadDirectivesSpec extends RoutingSpec {
               HttpEntity(ContentTypes.`text/plain(UTF-8)`, str2),
               Map("filename" -> "data2.txt")))
 
-      Post("/", multipartForm) ~> route ~> check {
+      Post("/", multipartForm) ~> route ~> check
         status shouldEqual StatusCodes.OK
         responseAs[String] shouldEqual str1
-      }
-    }
 
-    "reject the file upload if the field name is missing" in {
+    "reject the file upload if the field name is missing" in
       // byte count as a service ;)
-      val route = extractRequestContext { ctx ⇒
+      val route = extractRequestContext  ctx ⇒
         implicit val mat = ctx.materializer
 
-        fileUpload("missing") {
+        fileUpload("missing")
           case (info, bytes) ⇒
             // stream the bytes somewhere
-            val allBytesF = bytes.runFold(ByteString()) { (all, bytes) ⇒
+            val allBytesF = bytes.runFold(ByteString())  (all, bytes) ⇒
               all ++ bytes
-            }
 
             // sum all individual file sizes
-            onSuccess(allBytesF) { allBytes ⇒
+            onSuccess(allBytesF)  allBytes ⇒
               complete(allBytes)
-            }
-        }
-      }
 
       // tests:
       val str1 = "some data"
@@ -132,20 +115,14 @@ class FileUploadDirectivesSpec extends RoutingSpec {
               HttpEntity(ContentTypes.`text/plain(UTF-8)`, str1),
               Map("filename" -> "data1.txt")))
 
-      Post("/", multipartForm) ~> route ~> check {
+      Post("/", multipartForm) ~> route ~> check
         rejection === MissingFormFieldRejection("missing")
-      }
-    }
-  }
 
-  private def read(file: File): String = {
+  private def read(file: File): String =
     val in = new FileInputStream(file)
-    try {
+    try
       val buffer = new Array[Byte](1024)
       in.read(buffer)
       new String(buffer, "UTF-8")
-    } finally {
+    finally
       in.close()
-    }
-  }
-}

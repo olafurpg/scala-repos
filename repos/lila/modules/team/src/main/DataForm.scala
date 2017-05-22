@@ -8,18 +8,17 @@ import lila.db.api.{$count, $select}
 import tube.teamTube
 
 private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm
 
   import lila.common.Form._
 
-  private object Fields {
+  private object Fields
     val name = "name" -> text(minLength = 3, maxLength = 60)
     val location = "location" -> optional(text(minLength = 3, maxLength = 80))
     val description = "description" -> text(minLength = 30, maxLength = 2000)
     val open = "open" -> number
     val gameId = "gameId" -> text
     val move = "move" -> text
-  }
 
   val create = Form(
       mapping(Fields.name,
@@ -66,14 +65,13 @@ private[team] final class DataForm(val captcher: akka.actor.ActorSelection)
 
   private def teamExists(setup: TeamSetup) =
     $count.exists[Team]($select(Team nameToId setup.trim.name))
-}
 
 private[team] case class TeamSetup(name: String,
                                    location: Option[String],
                                    description: String,
                                    open: Int,
                                    gameId: String,
-                                   move: String) {
+                                   move: String)
 
   def isOpen = open == 1
 
@@ -81,17 +79,15 @@ private[team] case class TeamSetup(name: String,
     copy(name = name.trim,
          location = location map (_.trim) filter (_.nonEmpty),
          description = description.trim)
-}
 
 private[team] case class TeamEdit(
-    location: Option[String], description: String, open: Int) {
+    location: Option[String], description: String, open: Int)
 
   def isOpen = open == 1
 
   def trim =
     copy(location = location map (_.trim) filter (_.nonEmpty),
          description = description.trim)
-}
 
 private[team] case class RequestSetup(
     message: String, gameId: String, move: String)

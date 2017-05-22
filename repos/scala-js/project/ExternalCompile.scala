@@ -4,7 +4,7 @@ import Keys._
 import org.scalajs.sbtplugin.ScalaJSPlugin
 import ScalaJSPlugin.autoImport.jsDependencyManifest
 
-object ExternalCompile {
+object ExternalCompile
 
   private val isWindows =
     System.getProperty("os.name").toLowerCase().indexOf("win") >= 0
@@ -16,7 +16,7 @@ object ExternalCompile {
         fork in compile := true,
         trapExit in compile := true,
         javaOptions in compile += "-Xmx512M",
-        compile := {
+        compile :=
           val inputs = (compileInputs in compile).value
           import inputs.config._
 
@@ -35,16 +35,15 @@ object ExternalCompile {
           // List all my dependencies (recompile if any of these changes)
 
           val allMyDependencies =
-            classpath filterNot (_ == classesDirectory) flatMap { cpFile =>
+            classpath filterNot (_ == classesDirectory) flatMap  cpFile =>
               if (cpFile.isDirectory) (cpFile ** "*.class").get
               else Seq(cpFile)
-            }
 
           // Compile
 
           val cachedCompile = FileFunction.cached(cacheDir / "compile",
                                                   FilesInfo.lastModified,
-                                                  FilesInfo.exists) {
+                                                  FilesInfo.exists)
             dependencies =>
               logger.info("Compiling %d Scala sources to %s..." format
                   (sources.size, classesDirectory))
@@ -59,48 +58,42 @@ object ExternalCompile {
                * which we do not want to see. We use this patched logger to
                * filter out that particular message.
                */
-              val patchedLogger = new Logger {
-                def log(level: Level.Value, message: => String) = {
+              val patchedLogger = new Logger
+                def log(level: Level.Value, message: => String) =
                   val msg = message
                   if (level != Level.Info ||
                       !msg.startsWith("Running scala.tools.nsc.Main"))
                     logger.log(level, msg)
-                }
                 def success(message: => String) = logger.success(message)
                 def trace(t: => Throwable) = logger.trace(t)
-              }
 
-              def doCompile(sourcesArgs: List[String]): Unit = {
+              def doCompile(sourcesArgs: List[String]): Unit =
                 val run = (runner in compile).value
                 run.run("scala.tools.nsc.Main",
                         compilerCp,
                         "-cp" :: cpStr :: "-d" :: classesDirectory
                           .getAbsolutePath() :: options ++: sourcesArgs,
                         patchedLogger) foreach sys.error
-              }
 
               /* Crude way of overcoming the Windows limitation on command line
                * length.
                */
               if ((fork in compile).value && isWindows &&
-                  (sourcesArgs.map(_.length).sum > 1536)) {
-                IO.withTemporaryFile("sourcesargs", ".txt") { sourceListFile =>
+                  (sourcesArgs.map(_.length).sum > 1536))
+                IO.withTemporaryFile("sourcesargs", ".txt")  sourceListFile =>
                   IO.writeLines(sourceListFile, sourcesArgs)
                   doCompile(List("@" + sourceListFile.getAbsolutePath()))
-                }
-              } else {
+              else
                 doCompile(sourcesArgs)
-              }
 
               // Output is all files in classesDirectory
               (classesDirectory ** AllPassFilter).get.toSet
-          }
 
           cachedCompile((sources ++ allMyDependencies).toSet)
 
           // We do not have dependency analysis when compiling externally
           sbt.inc.Analysis.Empty
-        },
+        ,
         // Make sure jsDependencyManifest runs after compile, otherwise compile
         // might remove the entire directory afterwards.
         jsDependencyManifest <<= jsDependencyManifest.dependsOn(compile)
@@ -109,4 +102,3 @@ object ExternalCompile {
   val scalaJSExternalCompileSettings =
     (inConfig(Compile)(scalaJSExternalCompileConfigSettings) ++ inConfig(Test)(
             scalaJSExternalCompileConfigSettings))
-}

@@ -5,7 +5,7 @@ package functor
   * A type class of types which give rise to two independent, covariant
   * functors.
   */
-trait Bifunctor[F[_, _]] extends Any with Serializable { self =>
+trait Bifunctor[F[_, _]] extends Any with Serializable  self =>
 
   /**
     * The quintessential method of the Bifunctor trait, it applies a
@@ -25,8 +25,6 @@ trait Bifunctor[F[_, _]] extends Any with Serializable { self =>
     */
   def rightMap[A, B, C](fab: F[A, B])(f: B => C): F[A, C] =
     bimap(fab)(identity, f)
-}
 
-object Bifunctor {
+object Bifunctor
   def apply[F[_, _]](implicit ev: Bifunctor[F]): Bifunctor[F] = ev
-}

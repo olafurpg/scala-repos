@@ -14,7 +14,7 @@ case class RemoteAddress(val hostname: String, val port: Int)
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Supervision {
+object Supervision
   sealed abstract class ConfigElement
 
   abstract class Server extends ConfigElement
@@ -27,10 +27,10 @@ object Supervision {
       restartStrategy: FaultHandlingStrategy,
       worker: List[Server],
       maxRestartsHandler: (ActorRef,
-      MaximumNumberOfRestartsWithinTimeRangeReached) => Unit = { (aRef, max) =>
+      MaximumNumberOfRestartsWithinTimeRangeReached) => Unit =  (aRef, max) =>
         ()
-      })
-      extends Server {
+      )
+      extends Server
     //Java API
     def this(restartStrategy: FaultHandlingStrategy, worker: Array[Server]) =
       this(restartStrategy, worker.toList)
@@ -38,21 +38,19 @@ object Supervision {
              worker: Array[Server],
              restartHandler: Procedure2[
                  ActorRef, MaximumNumberOfRestartsWithinTimeRangeReached]) =
-      this(restartStrategy, worker.toList, { (aRef, max) =>
+      this(restartStrategy, worker.toList,  (aRef, max) =>
         restartHandler.apply(aRef, max)
-      })
-  }
+      )
 
   class Supervise(val actorRef: ActorRef,
                   val lifeCycle: LifeCycle,
                   val registerAsRemoteService: Boolean = false)
-      extends Server {
+      extends Server
     //Java API
     def this(actorRef: ActorRef, lifeCycle: LifeCycle) =
       this(actorRef, lifeCycle, false)
-  }
 
-  object Supervise {
+  object Supervise
     def apply(actorRef: ActorRef,
               lifeCycle: LifeCycle,
               registerAsRemoteService: Boolean = false) =
@@ -64,9 +62,8 @@ object Supervision {
           (supervise.actorRef,
            supervise.lifeCycle,
            supervise.registerAsRemoteService))
-  }
 
-  object AllForOneStrategy {
+  object AllForOneStrategy
     def apply(trapExit: List[Class[_ <: Throwable]],
               maxNrOfRetries: Int,
               withinTimeRange: Int): AllForOneStrategy =
@@ -74,13 +71,12 @@ object Supervision {
           trapExit,
           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
           if (withinTimeRange < 0) None else Some(withinTimeRange))
-  }
 
   case class AllForOneStrategy(
       override val trapExit: List[Class[_ <: Throwable]],
       maxNrOfRetries: Option[Int] = None,
       withinTimeRange: Option[Int] = None)
-      extends FaultHandlingStrategy(trapExit) {
+      extends FaultHandlingStrategy(trapExit)
     def this(trapExit: List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
@@ -101,9 +97,8 @@ object Supervision {
       this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
            if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
            if (withinTimeRange < 0) None else Some(withinTimeRange))
-  }
 
-  object OneForOneStrategy {
+  object OneForOneStrategy
     def apply(trapExit: List[Class[_ <: Throwable]],
               maxNrOfRetries: Int,
               withinTimeRange: Int): OneForOneStrategy =
@@ -111,13 +106,12 @@ object Supervision {
           trapExit,
           if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
           if (withinTimeRange < 0) None else Some(withinTimeRange))
-  }
 
   case class OneForOneStrategy(
       override val trapExit: List[Class[_ <: Throwable]],
       maxNrOfRetries: Option[Int] = None,
       withinTimeRange: Option[Int] = None)
-      extends FaultHandlingStrategy(trapExit) {
+      extends FaultHandlingStrategy(trapExit)
     def this(trapExit: List[Class[_ <: Throwable]],
              maxNrOfRetries: Int,
              withinTimeRange: Int) =
@@ -138,7 +132,6 @@ object Supervision {
       this(trapExit.toArray.toList.asInstanceOf[List[Class[_ <: Throwable]]],
            if (maxNrOfRetries < 0) None else Some(maxNrOfRetries),
            if (withinTimeRange < 0) None else Some(withinTimeRange))
-  }
 
   case object NoFaultHandlingStrategy extends FaultHandlingStrategy(Nil)
 
@@ -162,7 +155,7 @@ object Supervision {
                                  _dispatcher: MessageDispatcher, // optional
                                  _remoteAddress: RemoteAddress // optional
   )
-      extends Server {
+      extends Server
     val intf: Option[Class[_]] = Option(_intf)
     val dispatcher: Option[MessageDispatcher] = Option(_dispatcher)
     val remoteAddress: Option[RemoteAddress] = Option(_remoteAddress)
@@ -238,5 +231,3 @@ object Supervision {
            timeout,
            dispatcher,
            remoteAddress)
-  }
-}

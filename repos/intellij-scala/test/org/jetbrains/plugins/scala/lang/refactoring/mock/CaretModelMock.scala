@@ -6,8 +6,7 @@ import com.intellij.openapi.editor.LogicalPosition
   * Pavel Fatin
   */
 class CaretModelMock(offset: Int, pos: LogicalPosition)
-    extends CaretModelStub {
+    extends CaretModelStub
   override def getOffset: Int = offset
 
   override def getLogicalPosition: LogicalPosition = pos
-}

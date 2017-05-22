@@ -1,16 +1,15 @@
 import scala.tools.partest._
 
 // java8 version of sammy_poly.scala
-object Test extends CompilerTest {
+object Test extends CompilerTest
   import global._
 
-  override lazy val units: List[CompilationUnit] = {
+  override lazy val units: List[CompilationUnit] =
     global.settings.Xexperimental.value = true
 
     // This test itself does not depend on JDK8.
     javaCompilationUnits(global)(samSource) ++ compilationUnits(global)(
         useSamSource)
-  }
 
   private def samSource = """
 //   trait F[T, U] { def apply(x: T): U }
@@ -31,4 +30,3 @@ class T {
 
   // We're only checking we can compile it.
   def check(source: String, unit: global.CompilationUnit): Unit = ()
-}

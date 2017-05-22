@@ -30,7 +30,7 @@ import scala.collection.mutable
   */
 case class Netty3ListenerTLSConfig(newEngine: () => Engine)
 
-object Netty3Listener {
+object Netty3Listener
   import com.twitter.finagle.param._
   import param._
 
@@ -38,7 +38,7 @@ object Netty3Listener {
     * Class Closer implements channel tracking and semi-graceful closing
     * of this group of channels.
     */
-  private class Closer(timer: com.twitter.util.Timer) {
+  private class Closer(timer: com.twitter.util.Timer)
     val activeChannels = new DefaultChannelGroup
 
     private implicit val implicitTimer = timer
@@ -57,7 +57,7 @@ object Netty3Listener {
       */
     def close(bootstrap: ServerBootstrap,
               serverCh: Channel,
-              deadline: Time): Future[Unit] = {
+              deadline: Time): Future[Unit] =
       // According to NETTY-256, the following sequence of operations
       // has no race conditions.
       //
@@ -86,22 +86,18 @@ object Netty3Listener {
 
       val p = new Promise[Unit]
       closing.addListener(
-          new ChannelGroupFutureListener {
-        def operationComplete(f: ChannelGroupFuture) {
+          new ChannelGroupFutureListener
+        def operationComplete(f: ChannelGroupFuture)
           p.setDone()
-        }
-      })
+      )
 
-      p.within(deadline - Time.now) transform { _ =>
+      p.within(deadline - Time.now) transform  _ =>
         activeChannels.close()
         // Force close any remaining connections. Don't wait for success.
         bootstrap.releaseExternalResources()
         Future.Done
-      }
-    }
-  }
 
-  def addTlsToPipeline(pipeline: ChannelPipeline, newEngine: () => Engine) {
+  def addTlsToPipeline(pipeline: ChannelPipeline, newEngine: () => Engine)
     val engine = newEngine()
     engine.self.setUseClientMode(false)
     engine.self.setEnableSessionCreation(true)
@@ -121,35 +117,30 @@ object Netty3Listener {
     // that define shutdown(): Unit. The SslListenerConnectionHandler also ensures that the SSL
     // handshake is complete before continuing.
     def onShutdown(): Unit =
-      try {
+      try
         val method = engine.getClass.getMethod("shutdown")
         method.invoke(engine)
-      } catch {
+      catch
         case _: NoSuchMethodException =>
-      }
 
     pipeline.addFirst(
         "sslConnect",
         new SslListenerConnectionHandler(handler, onShutdown)
     )
-  }
 
   val channelFactory: ServerChannelFactory = new NioServerSocketChannelFactory(
-      Executor, WorkerPool) {
+      Executor, WorkerPool)
     override def releaseExternalResources() = () // no-op
-  }
 
   /**
     * A [[com.twitter.finagle.Stack.Param]] used to configure
     * the ServerChannelFactory for a `Listener`.
     */
-  case class ChannelFactory(cf: ServerChannelFactory) {
+  case class ChannelFactory(cf: ServerChannelFactory)
     def mk(): (ChannelFactory, Stack.Param[ChannelFactory]) =
       (this, ChannelFactory.param)
-  }
-  object ChannelFactory {
+  object ChannelFactory
     implicit val param = Stack.Param(ChannelFactory(channelFactory))
-  }
 
   /**
     * Constructs a `Listener[In, Out]` given a netty3 `ChannelPipelineFactory`
@@ -163,7 +154,7 @@ object Netty3Listener {
   def apply[In, Out](
       pipeline: ChannelPipelineFactory,
       params: Stack.Params
-  ): Listener[In, Out] = {
+  ): Listener[In, Out] =
     val Label(label) = params[Label]
     val Logger(logger) = params[Logger]
     val Monitor(monitor) = params[Monitor]
@@ -179,11 +170,10 @@ object Netty3Listener {
     val Transport.Liveness(readTimeout, writeTimeout, keepAlive) =
       params[Transport.Liveness]
     val Transport.TLSServerEngine(engine) = params[Transport.TLSServerEngine]
-    val snooper = params[Transport.Verbose] match {
+    val snooper = params[Transport.Verbose] match
       case Transport.Verbose(true) =>
         Some(ChannelSnooper(label)(logger.log(Level.INFO, _, _)))
       case _ => None
-    }
     val Transport.Options(noDelay, reuseAddr) = params[Transport.Options]
 
     val opts = new mutable.HashMap[String, Object]()
@@ -196,10 +186,9 @@ object Netty3Listener {
     for (v <- recvBufSize) opts += "child.receiveBufferSize" ->
     (v: java.lang.Integer)
     for (v <- keepAlive) opts += "child.keepAlive" -> (v: java.lang.Boolean)
-    for (v <- params[Listener.TrafficClass].value) {
+    for (v <- params[Listener.TrafficClass].value)
       opts += "trafficClass" -> (v: java.lang.Integer)
       opts += "child.trafficClass" -> (v: java.lang.Integer)
-    }
 
     Netty3Listener[In, Out](
         label,
@@ -216,8 +205,6 @@ object Netty3Listener {
         monitor = monitor,
         logger = logger
     )
-  }
-}
 
 /**
   * A listener using Netty3 which is given a ChannelPipelineFactory
@@ -269,24 +256,22 @@ case class Netty3Listener[In, Out](
     monitor: com.twitter.util.Monitor = NullMonitor,
     logger: java.util.logging.Logger = DefaultLogger
 )
-    extends Listener[In, Out] {
+    extends Listener[In, Out]
   import Netty3Listener._
 
   private[this] val statsHandlers =
     new IdentityHashMap[StatsReceiver, ChannelHandler]
 
-  def channelStatsHandler(statsReceiver: StatsReceiver) = synchronized {
-    if (!(statsHandlers containsKey statsReceiver)) {
+  def channelStatsHandler(statsReceiver: StatsReceiver) = synchronized
+    if (!(statsHandlers containsKey statsReceiver))
       statsHandlers.put(statsReceiver, new ChannelStatsHandler(statsReceiver))
-    }
 
     statsHandlers.get(statsReceiver)
-  }
 
   def newServerPipelineFactory(
       statsReceiver: StatsReceiver, newBridge: () => ChannelHandler) =
-    new ChannelPipelineFactory {
-      def getPipeline() = {
+    new ChannelPipelineFactory
+      def getPipeline() =
         val pipeline = pipelineFactory.getPipeline()
 
         for (channelSnooper <- channelSnooper) pipeline.addFirst(
@@ -299,41 +284,35 @@ case class Netty3Listener[In, Out](
         // Apply read timeouts *after* request decoding, preventing
         // death from clients trying to DoS by slowly trickling in
         // bytes to our (accumulating) codec.
-        if (channelReadTimeout < Duration.Top) {
+        if (channelReadTimeout < Duration.Top)
           val (timeoutValue, timeoutUnit) = channelReadTimeout.inTimeUnit
           pipeline.addLast(
               "readTimeout",
               new ReadTimeoutHandler(nettyTimer, timeoutValue, timeoutUnit))
-        }
 
-        if (channelWriteCompletionTimeout < Duration.Top) {
+        if (channelWriteCompletionTimeout < Duration.Top)
           pipeline.addLast("writeCompletionTimeout",
                            new WriteCompletionTimeoutHandler(
                                timer, channelWriteCompletionTimeout))
-        }
 
         for (Netty3ListenerTLSConfig(newEngine) <- tlsConfig) addTlsToPipeline(
             pipeline, newEngine)
 
-        if (!statsReceiver.isNull) {
+        if (!statsReceiver.isNull)
           pipeline.addLast("channelRequestStatsHandler",
                            new ChannelRequestStatsHandler(statsReceiver))
-        }
 
         pipeline.addLast("finagleBridge", newBridge())
         pipeline
-      }
-    }
 
   def listen(addr: SocketAddress)(
       serveTransport: Transport[In, Out] => Unit): ListeningServer =
-    new ListeningServer with CloseAwaitably {
+    new ListeningServer with CloseAwaitably
       val serverLabel = ServerRegistry.nameOf(addr) getOrElse name
-      val scopedStatsReceiver = statsReceiver match {
+      val scopedStatsReceiver = statsReceiver match
         case ServerStatsReceiver if serverLabel.nonEmpty =>
           statsReceiver.scope(serverLabel)
         case sr => sr
-      }
 
       val closer = new Closer(timer)
 
@@ -350,20 +329,16 @@ case class Netty3Listener[In, Out](
           newServerPipelineFactory(scopedStatsReceiver, newBridge))
       val ch = bootstrap.bind(addr)
 
-      def closeServer(deadline: Time) = closeAwaitably {
+      def closeServer(deadline: Time) = closeAwaitably
         closer.close(bootstrap, ch, deadline)
-      }
       def boundAddress = ch.getLocalAddress()
-    }
-}
 
-private[netty3] object ServerBridge {
+private[netty3] object ServerBridge
   private val FinestIOExceptionMessages = Set("Connection reset by peer",
                                               "Broken pipe",
                                               "Connection timed out",
                                               "No route to host",
                                               "")
-}
 
 /**
   * Bridges a channel (pipeline) onto a transport. This must be
@@ -375,14 +350,14 @@ private[netty3] class ServerBridge[In, Out](
     statsReceiver: StatsReceiver,
     channels: ChannelGroup
 )
-    extends SimpleChannelHandler {
+    extends SimpleChannelHandler
   import ServerBridge.FinestIOExceptionMessages
 
   private[this] val readTimeoutCounter = statsReceiver.counter("read_timeout")
   private[this] val writeTimeoutCounter =
     statsReceiver.counter("write_timeout")
 
-  private[this] def severity(exc: Throwable): Level = exc match {
+  private[this] def severity(exc: Throwable): Level = exc match
     case e: HasLogLevel => e.logLevel
     case _: java.nio.channels.ClosedChannelException |
         _: javax.net.ssl.SSLException | _: ReadTimeoutException |
@@ -392,10 +367,9 @@ private[netty3] class ServerBridge[In, Out](
         if FinestIOExceptionMessages.contains(e.getMessage) =>
       Level.FINEST
     case _ => Level.WARNING
-  }
 
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
     val channel = e.getChannel
     channels.add(channel)
 
@@ -403,17 +377,15 @@ private[netty3] class ServerBridge[In, Out](
       Transport.cast[In, Out](new ChannelTransport[Any, Any](channel))
     serveTransport(transport)
     super.channelOpen(ctx, e)
-  }
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit =
     val cause = e.getCause
 
-    cause match {
+    cause match
       case e: ReadTimeoutException => readTimeoutCounter.incr()
       case e: WriteTimedOutException => writeTimeoutCounter.incr()
       case _ => ()
-    }
 
     val msg =
       "Unhandled exception in connection with " +
@@ -421,5 +393,3 @@ private[netty3] class ServerBridge[In, Out](
 
     log.log(severity(cause), msg, cause)
     if (e.getChannel.isOpen) Channels.close(e.getChannel)
-  }
-}

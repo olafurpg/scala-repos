@@ -39,7 +39,7 @@ import java.io.{BufferedOutputStream, OutputStream}
   * 3. Start time from when the logs should be merged
   * 4. End time until when the logs should be merged
   */
-object StateChangeLogMerger extends Logging {
+object StateChangeLogMerger extends Logging
 
   val dateFormatString = "yyyy-MM-dd HH:mm:ss,SSS"
   val topicPartitionRegex = new Regex(
@@ -53,7 +53,7 @@ object StateChangeLogMerger extends Logging {
   var startDate: Date = null
   var endDate: Date = null
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     // Parse input arguments.
     val parser = new OptionParser
@@ -105,24 +105,22 @@ object StateChangeLogMerger extends Logging {
 
     val options = parser.parse(args: _*)
     if ((!options.has(filesOpt) && !options.has(regexOpt)) ||
-        (options.has(filesOpt) && options.has(regexOpt))) {
+        (options.has(filesOpt) && options.has(regexOpt)))
       System.err.println(
           "Provide arguments to exactly one of the two options \"" + filesOpt +
           "\" or \"" + regexOpt + "\"")
       parser.printHelpOn(System.err)
       System.exit(1)
-    }
-    if (options.has(partitionsOpt) && !options.has(topicOpt)) {
+    if (options.has(partitionsOpt) && !options.has(topicOpt))
       System.err.println("The option \"" + topicOpt +
           "\" needs to be provided an argument when specifying partition ids")
       parser.printHelpOn(System.err)
       System.exit(1)
-    }
 
     // Populate data structures.
-    if (options.has(filesOpt)) {
+    if (options.has(filesOpt))
       files :::= options.valueOf(filesOpt).split(",").toList
-    } else if (options.has(regexOpt)) {
+    else if (options.has(regexOpt))
       val regex = options.valueOf(regexOpt)
       val fileNameIndex = regex.lastIndexOf('/') + 1
       val dirName =
@@ -132,24 +130,20 @@ object StateChangeLogMerger extends Logging {
         .filter(f => fileNameRegex.findFirstIn(f.getName) != None)
         .map(dirName + "/" + _.getName)
         .toList
-    }
-    if (options.has(topicOpt)) {
+    if (options.has(topicOpt))
       topic = options.valueOf(topicOpt)
-    }
-    if (options.has(partitionsOpt)) {
+    if (options.has(partitionsOpt))
       partitions = options
         .valueOf(partitionsOpt)
         .split(",")
         .toList
         .map(_.toInt)
       val duplicatePartitions = CoreUtils.duplicates(partitions)
-      if (duplicatePartitions.nonEmpty) {
+      if (duplicatePartitions.nonEmpty)
         System.err.println(
             "The list of partitions contains repeated entries: %s".format(
                 duplicatePartitions.mkString(",")))
         System.exit(1)
-      }
-    }
     startDate = dateFormat.parse(
         options.valueOf(startTimeOpt).replace('\"', ' ').trim)
     endDate = dateFormat.parse(
@@ -168,21 +162,18 @@ object StateChangeLogMerger extends Logging {
     val lineIterators = files.map(io.Source.fromFile(_).getLines)
     var lines: List[LineIterator] = List()
 
-    for (itr <- lineIterators) {
+    for (itr <- lineIterators)
       val lineItr = getNextLine(itr)
       if (!lineItr.isEmpty) lines ::= lineItr
-    }
     if (!lines.isEmpty) pqueue.enqueue(lines: _*)
 
-    while (!pqueue.isEmpty) {
+    while (!pqueue.isEmpty)
       val lineItr = pqueue.dequeue()
       output.write((lineItr.line + "\n").getBytes)
       val nextLineItr = getNextLine(lineItr.itr)
       if (!nextLineItr.isEmpty) pqueue.enqueue(nextLineItr)
-    }
 
     output.flush()
-  }
 
   /**
     * Returns the next line that matches the specified topic/partitions from the file that has the earliest date
@@ -190,39 +181,30 @@ object StateChangeLogMerger extends Logging {
     * @param itr Line iterator of a file
     * @return (line from a file, line iterator for the same file)
     */
-  def getNextLine(itr: Iterator[String]): LineIterator = {
-    while (itr != null && itr.hasNext) {
+  def getNextLine(itr: Iterator[String]): LineIterator =
+    while (itr != null && itr.hasNext)
       val nextLine = itr.next
-      dateRegex.findFirstIn(nextLine) match {
+      dateRegex.findFirstIn(nextLine) match
         case Some(d) =>
           val date = dateFormat.parse(d)
           if ((date.equals(startDate) || date.after(startDate)) &&
-              (date.equals(endDate) || date.before(endDate))) {
-            topicPartitionRegex.findFirstMatchIn(nextLine) match {
+              (date.equals(endDate) || date.before(endDate)))
+            topicPartitionRegex.findFirstMatchIn(nextLine) match
               case Some(matcher) =>
                 if ((topic == null || topic == matcher.group(1)) &&
                     (partitions.isEmpty ||
                         partitions.contains(matcher.group(3).toInt)))
                   return new LineIterator(nextLine, itr)
               case None =>
-            }
-          }
         case None =>
-      }
-    }
     new LineIterator()
-  }
 
-  class LineIterator(val line: String, val itr: Iterator[String]) {
+  class LineIterator(val line: String, val itr: Iterator[String])
     def this() = this("", null)
     def isEmpty = (line == "" && itr == null)
-  }
 
-  implicit object dateBasedOrdering extends Ordering[LineIterator] {
-    def compare(first: LineIterator, second: LineIterator) = {
+  implicit object dateBasedOrdering extends Ordering[LineIterator]
+    def compare(first: LineIterator, second: LineIterator) =
       val firstDate = dateRegex.findFirstIn(first.line).get
       val secondDate = dateRegex.findFirstIn(second.line).get
       secondDate.compareTo(firstDate)
-    }
-  }
-}

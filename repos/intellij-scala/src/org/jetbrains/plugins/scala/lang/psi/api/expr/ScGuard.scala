@@ -7,8 +7,7 @@ package expr
 /**
   * @author Alexander Podkhalyuzin
   */
-trait ScGuard extends ScalaPsiElement {
+trait ScGuard extends ScalaPsiElement
   def expr: Option[ScExpression]
 
   override def accept(visitor: ScalaElementVisitor) = visitor.visitGuard(this)
-}

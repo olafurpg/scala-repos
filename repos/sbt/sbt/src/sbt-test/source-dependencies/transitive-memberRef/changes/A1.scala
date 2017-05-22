@@ -1,5 +1,4 @@
 package test
 
-class A {
+class A
   def foo: Int = 23
-}

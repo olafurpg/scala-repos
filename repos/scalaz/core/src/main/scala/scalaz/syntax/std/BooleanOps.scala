@@ -5,7 +5,7 @@ package std
 import scalaz.std.{boolean => b}
 import scalaz.Tags.{Conjunction, Disjunction}
 
-final class BooleanOps(self: Boolean) {
+final class BooleanOps(self: Boolean)
 
   final def conjunction: Boolean @@ Conjunction = Conjunction(self)
 
@@ -237,9 +237,8 @@ final class BooleanOps(self: Boolean) {
     */
   final def fold[A](t: => A, f: => A): A = b.fold(self, t, f)
 
-  final class Conditional[X](t: => X) {
+  final class Conditional[X](t: => X)
     def |(f: => X) = if (self) t else f
-  }
 
   /**
     * Conditional operator that returns the first argument if this is `true`, the second argument otherwise.
@@ -257,10 +256,9 @@ final class BooleanOps(self: Boolean) {
   final def lazyOption[A](a: => A): LazyOption[A] =
     LazyOption.condLazyOption(self, a)
 
-  final class ConditionalEither[A](a: => A) {
+  final class ConditionalEither[A](a: => A)
     def or[B](b: => B) =
       if (self) \/-(a) else -\/(b)
-  }
 
   /**
     * Returns the first argument in `\/-` if this is `true`, otherwise the second argument in
@@ -281,22 +279,17 @@ final class BooleanOps(self: Boolean) {
     */
   final def !?[A](a: => A)(implicit z: Monoid[A]): A = b.zeroOrValue(self)(a)
 
-  sealed abstract class GuardPrevent[M[_]] {
+  sealed abstract class GuardPrevent[M[_]]
     def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]): M[A]
-  }
 
-  final def guard[M[_]] = new GuardPrevent[M] {
+  final def guard[M[_]] = new GuardPrevent[M]
     def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
       b.pointOrEmpty[M, A](self)(a)
-  }
 
-  final def prevent[M[_]] = new GuardPrevent[M] {
+  final def prevent[M[_]] = new GuardPrevent[M]
     def apply[A](a: => A)(implicit M: Applicative[M], M0: PlusEmpty[M]) =
       b.emptyOrPure[M, A](self)(a)
-  }
-}
 
-trait ToBooleanOps {
+trait ToBooleanOps
   implicit def ToBooleanOpsFromBoolean(a: Boolean): BooleanOps =
     new BooleanOps(a)
-}

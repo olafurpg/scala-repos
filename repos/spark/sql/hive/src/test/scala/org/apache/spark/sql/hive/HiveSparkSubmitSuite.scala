@@ -43,16 +43,15 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
   */
 class HiveSparkSubmitSuite
     extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    with ResetSystemProperties with Timeouts
 
   // TODO: rewrite these or mark them as slow tests to be run sparingly
 
-  override def beforeEach() {
+  override def beforeEach()
     super.beforeEach()
     System.setProperty("spark.testing", "true")
-  }
 
-  test("SPARK-8368: includes jars passed in through --jars") {
+  test("SPARK-8368: includes jars passed in through --jars")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val jar1 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassA"))
     val jar2 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassB"))
@@ -80,9 +79,8 @@ class HiveSparkSubmitSuite
           "SparkSubmitClassA",
           "SparkSubmitClassB")
     runSparkSubmit(args)
-  }
 
-  test("SPARK-8020: set sql conf in spark conf") {
+  test("SPARK-8020: set sql conf in spark conf")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val args = Seq("--class",
                    SparkSQLConfTest.getClass.getName.stripSuffix("$"),
@@ -102,19 +100,17 @@ class HiveSparkSubmitSuite
                    "-Dderby.system.durability=test",
                    unusedJar.toString)
     runSparkSubmit(args)
-  }
 
-  test("SPARK-8489: MissingRequirementError during reflection") {
+  test("SPARK-8489: MissingRequirementError during reflection")
     // This test uses a pre-built jar to test SPARK-8489. In a nutshell, this test creates
     // a HiveContext and uses it to create a data frame from an RDD using reflection.
     // Before the fix in SPARK-8470, this results in a MissingRequirementError because
     // the HiveContext code mistakenly overrides the class loader that contains user classes.
     // For more detail, see sql/hive/src/test/resources/regression-test-SPARK-8489/*scala.
-    val version = Properties.versionNumberString match {
+    val version = Properties.versionNumberString match
       case v if v.startsWith("2.10") || v.startsWith("2.11") =>
         v.substring(0, 4)
       case x => throw new Exception(s"Unsupported Scala Version: $x")
-    }
     val testJar =
       s"sql/hive/src/test/resources/regression-test-SPARK-8489/test-$version.jar"
     val args = Seq("--conf",
@@ -127,9 +123,8 @@ class HiveSparkSubmitSuite
                    "Main",
                    testJar)
     runSparkSubmit(args)
-  }
 
-  test("SPARK-9757 Persist Parquet relation with decimal column") {
+  test("SPARK-9757 Persist Parquet relation with decimal column")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val args = Seq("--class",
                    SPARK_9757.getClass.getName.stripSuffix("$"),
@@ -145,9 +140,8 @@ class HiveSparkSubmitSuite
                    "-Dderby.system.durability=test",
                    unusedJar.toString)
     runSparkSubmit(args)
-  }
 
-  test("SPARK-11009 fix wrong result of Window function in cluster mode") {
+  test("SPARK-11009 fix wrong result of Window function in cluster mode")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val args = Seq("--class",
                    SPARK_11009.getClass.getName.stripSuffix("$"),
@@ -163,11 +157,10 @@ class HiveSparkSubmitSuite
                    "-Dderby.system.durability=test",
                    unusedJar.toString)
     runSparkSubmit(args)
-  }
 
   // NOTE: This is an expensive operation in terms of time (10 seconds+). Use sparingly.
   // This is copied from org.apache.spark.deploy.SparkSubmitSuite
-  private def runSparkSubmit(args: Seq[String]): Unit = {
+  private def runSparkSubmit(args: Seq[String]): Unit =
     val sparkHome = sys.props.getOrElse(
         "spark.test.home", fail("spark.test.home is not set!"))
     val history = ArrayBuffer.empty[String]
@@ -180,7 +173,7 @@ class HiveSparkSubmitSuite
     env.put("SPARK_TESTING", "1")
     env.put("SPARK_HOME", sparkHome)
 
-    def captureOutput(source: String)(line: String): Unit = {
+    def captureOutput(source: String)(line: String): Unit =
       // This test suite has some weird behaviors when executed on Jenkins:
       //
       // 1. Sometimes it gets extremely slow out of unknown reason on Jenkins.  Here we add a
@@ -192,7 +185,6 @@ class HiveSparkSubmitSuite
       println(logLine)
       // scalastyle:on println
       history += logLine
-    }
 
     val process = builder.start()
     new ProcessOutputCapturer(process.getInputStream, captureOutput("stdout"))
@@ -200,39 +192,34 @@ class HiveSparkSubmitSuite
     new ProcessOutputCapturer(process.getErrorStream, captureOutput("stderr"))
       .start()
 
-    try {
+    try
       val exitCode = failAfter(300.seconds) { process.waitFor() }
-      if (exitCode != 0) {
+      if (exitCode != 0)
         // include logs in output. Note that logging is async and may not have completed
         // at the time this exception is raised
         Thread.sleep(1000)
         val historyLog = history.mkString("\n")
-        fail {
+        fail
           s"""spark-submit returned with exit code $exitCode.
              |Command line: $commandLine
              |
              |$historyLog
            """.stripMargin
-        }
-      }
-    } catch {
+    catch
       case to: TestFailedDueToTimeoutException =>
         val historyLog = history.mkString("\n")
         fail(s"Timeout of $commandLine" +
              s" See the log4j logs for more detail." + s"\n$historyLog",
              to)
       case t: Throwable => throw t
-    } finally {
+    finally
       // Ensure we still kill the process in case it timed out
       process.destroy()
-    }
-  }
-}
 
 // This object is used for testing SPARK-8368: https://issues.apache.org/jira/browse/SPARK-8368.
 // We test if we can load user jars in both driver and executors when HiveContext is used.
-object SparkSubmitClassLoaderTest extends Logging {
-  def main(args: Array[String]) {
+object SparkSubmitClassLoaderTest extends Logging
+  def main(args: Array[String])
     Utils.configTestLog4j("INFO")
     val conf = new SparkConf()
     conf.set("spark.ui.enabled", "false")
@@ -242,30 +229,27 @@ object SparkSubmitClassLoaderTest extends Logging {
       hiveContext.createDataFrame((1 to 100).map(i => (i, i))).toDF("i", "j")
     logInfo("Testing load classes at the driver side.")
     // First, we load classes at driver side.
-    try {
+    try
       Utils.classForName(args(0))
       Utils.classForName(args(1))
-    } catch {
+    catch
       case t: Throwable =>
         throw new Exception("Could not load user class from jar:\n", t)
-    }
     // Second, we load classes at the executor side.
     logInfo("Testing load classes at the executor side.")
-    val result = df.rdd.mapPartitions { x =>
+    val result = df.rdd.mapPartitions  x =>
       var exception: String = null
-      try {
+      try
         Utils.classForName(args(0))
         Utils.classForName(args(1))
-      } catch {
+      catch
         case t: Throwable =>
           exception = t + "\n" + Utils.exceptionString(t)
           exception = exception.replaceAll("\n", "\n\t")
-      }
       Option(exception).toSeq.iterator
-    }.collect()
-    if (result.nonEmpty) {
+    .collect()
+    if (result.nonEmpty)
       throw new Exception("Could not load user class from jar:\n" + result(0))
-    }
 
     // Load a Hive UDF from the jar.
     logInfo("Registering temporary Hive UDF provided in a jar.")
@@ -289,19 +273,16 @@ object SparkSubmitClassLoaderTest extends Logging {
         "INSERT INTO TABLE t1 SELECT example_max(key) as key, val FROM sourceTable GROUP BY val")
     logInfo("Running a simple query on the table.")
     val count = hiveContext.table("t1").orderBy("key", "val").count()
-    if (count != 10) {
+    if (count != 10)
       throw new Exception(
           s"table t1 should have 10 rows instead of $count rows")
-    }
     logInfo("Test finishes.")
     sc.stop()
-  }
-}
 
 // This object is used for testing SPARK-8020: https://issues.apache.org/jira/browse/SPARK-8020.
 // We test if we can correctly set spark sql configurations when HiveContext is used.
-object SparkSQLConfTest extends Logging {
-  def main(args: Array[String]) {
+object SparkSQLConfTest extends Logging
+  def main(args: Array[String])
     Utils.configTestLog4j("INFO")
     // We override the SparkConf to add spark.sql.hive.metastore.version and
     // spark.sql.hive.metastore.jars to the beginning of the conf entry array.
@@ -311,12 +292,11 @@ object SparkSQLConfTest extends Logging {
     // be used when hive execution version == hive metastore version.
     // Execution: 0.13.1 != Metastore: 0.12. Specify a valid path to the correct hive jars
     // using $HIVE_METASTORE_JARS or change spark.sql.hive.metastore.version to 0.13.1.
-    val conf = new SparkConf() {
-      override def getAll: Array[(String, String)] = {
-        def isMetastoreSetting(conf: String): Boolean = {
+    val conf = new SparkConf()
+      override def getAll: Array[(String, String)] =
+        def isMetastoreSetting(conf: String): Boolean =
           conf == "spark.sql.hive.metastore.version" ||
           conf == "spark.sql.hive.metastore.jars"
-        }
         // If there is any metastore settings, remove them.
         val filteredSettings =
           super.getAll.filterNot(e => isMetastoreSetting(e._1))
@@ -324,26 +304,22 @@ object SparkSQLConfTest extends Logging {
         // Always add these two metastore settings at the beginning.
         ("spark.sql.hive.metastore.version" -> "0.12") +:
         ("spark.sql.hive.metastore.jars" -> "maven") +: filteredSettings
-      }
 
       // For this simple test, we do not really clone this object.
       override def clone: SparkConf = this
-    }
     conf.set("spark.ui.enabled", "false")
     val sc = new SparkContext(conf)
     val hiveContext = new TestHiveContext(sc)
     // Run a simple command to make sure all lazy vals in hiveContext get instantiated.
     hiveContext.tables().collect()
     sc.stop()
-  }
-}
 
-object SPARK_9757 extends QueryTest {
+object SPARK_9757 extends QueryTest
   import org.apache.spark.sql.functions._
 
   protected var sqlContext: SQLContext = _
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     Utils.configTestLog4j("INFO")
 
     val sparkContext = new SparkContext(
@@ -359,8 +335,7 @@ object SPARK_9757 extends QueryTest {
     val dir = Utils.createTempDir()
     dir.delete()
 
-    try {
-      {
+    try
         val df = hiveContext
           .range(10)
           .select(('id + 0.1) cast DecimalType(10, 3) as 'dec)
@@ -369,9 +344,7 @@ object SPARK_9757 extends QueryTest {
           .mode("overwrite")
           .saveAsTable("t")
         checkAnswer(hiveContext.table("t"), df)
-      }
 
-      {
         val df = hiveContext
           .range(10)
           .select(
@@ -381,21 +354,17 @@ object SPARK_9757 extends QueryTest {
           .mode("overwrite")
           .saveAsTable("t")
         checkAnswer(hiveContext.table("t"), df)
-      }
-    } finally {
+    finally
       dir.delete()
       hiveContext.sql("DROP TABLE t")
       sparkContext.stop()
-    }
-  }
-}
 
-object SPARK_11009 extends QueryTest {
+object SPARK_11009 extends QueryTest
   import org.apache.spark.sql.functions._
 
   protected var sqlContext: SQLContext = _
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     Utils.configTestLog4j("INFO")
 
     val sparkContext = new SparkContext(
@@ -406,7 +375,7 @@ object SPARK_11009 extends QueryTest {
     val hiveContext = new TestHiveContext(sparkContext)
     sqlContext = hiveContext
 
-    try {
+    try
       val df = sqlContext.range(1 << 20)
       val df2 =
         df.select((df("id") % 1000).alias("A"), (df("id") / 1000).alias("B"))
@@ -414,11 +383,7 @@ object SPARK_11009 extends QueryTest {
       val df3 = df2
         .select(df2("A"), df2("B"), row_number().over(ws).alias("rn"))
         .filter("rn < 0")
-      if (df3.rdd.count() != 0) {
+      if (df3.rdd.count() != 0)
         throw new Exception("df3 should have 0 output row.")
-      }
-    } finally {
+    finally
       sparkContext.stop()
-    }
-  }
-}

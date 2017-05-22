@@ -12,24 +12,22 @@ import java.text.ParseException
 
 import play.api.data.validation.ValidationError
 
-object JsPathSpec extends Specification {
+object JsPathSpec extends Specification
 
-  "JsPath" should {
-    "retrieve simple path" in {
+  "JsPath" should
+    "retrieve simple path" in
       val obj =
         Json.obj("key1" -> Json.obj("key11" -> "value11"), "key2" -> "value2")
 
       (JsPath \ "key1" \ "key11")(obj) must equalTo(Seq(JsString("value11")))
-    }
 
-    "retrieve path with array index" in {
+    "retrieve path with array index" in
       val obj = Json.obj("key1" -> Json.arr(Json.obj("key11" -> "value11")))
 
       (JsPath \ "key1" \ 0 \ "key11")(obj) must equalTo(
           Seq(JsString("value11")))
-    }
 
-    "retrieve 1-level recursive path" in {
+    "retrieve 1-level recursive path" in
       val obj = Json.obj(
           "key1" -> Json.obj(
               "key11" -> Json.obj(
@@ -45,9 +43,8 @@ object JsPathSpec extends Specification {
       (JsPath \\ "tags")(obj) must equalTo(
           Seq(Json.arr("alpha1", "beta1", "gamma1"),
               Json.arr("alpha2", "beta2", "gamma2")))
-    }
 
-    "retrieve 2-level recursive path" in {
+    "retrieve 2-level recursive path" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.obj(
@@ -66,9 +63,8 @@ object JsPathSpec extends Specification {
       (JsPath \ "level1" \\ "tags")(obj) must equalTo(
           Seq(Json.arr("alpha1", "beta1", "gamma1"),
               Json.arr("alpha2", "beta2", "gamma2")))
-    }
 
-    "retrieve 2-level middle recursive path" in {
+    "retrieve 2-level middle recursive path" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.obj(
@@ -83,17 +79,15 @@ object JsPathSpec extends Specification {
 
       (JsPath \\ "tags" \ "sub")(obj) must equalTo(
           Seq(JsString("alpha1"), JsString("beta2")))
-    }
 
-    "retrieve simple indexed path" in {
+    "retrieve simple indexed path" in
       val obj = Json.obj(
           "level1" -> Json.arr(5, "alpha", true)
       )
 
       (JsPath \ "level1")(2)(obj) must equalTo(Seq(JsBoolean(true)))
-    }
 
-    "retrieve 2-level recursive indexed path" in {
+    "retrieve 2-level recursive indexed path" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.obj(
@@ -110,9 +104,8 @@ object JsPathSpec extends Specification {
 
       (JsPath \ "level1" \\ "tags")(1)(obj) must equalTo(
           Seq(JsString("beta1"), JsString("beta2")))
-    }
 
-    "retrieve 2-level recursive indexed path" in {
+    "retrieve 2-level recursive indexed path" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.arr(
@@ -131,9 +124,8 @@ object JsPathSpec extends Specification {
 
       ((JsPath \ "level1" \ "key1")(1) \\ "tags")(obj) must equalTo(
           Seq(Json.arr("alpha1", "beta1", "gamma1")))
-    }
 
-    "retrieve recursive in jsobject and jsarray" in {
+    "retrieve recursive in jsobject and jsarray" in
       val obj = Json
         .obj(
           "level1" -> Json.obj(
@@ -161,9 +153,8 @@ object JsPathSpec extends Specification {
 
       (JsPath \ "level1" \\ "alpha")(obj) must equalTo(
           Seq(JsString("value11111"), Json.arr("a", "b", "c")))
-    }
 
-    "retrieve recursive in jsobject and jsarray 2" in {
+    "retrieve recursive in jsobject and jsarray 2" in
       val obj = Json
         .obj(
           "nothing" -> "really",
@@ -179,9 +170,8 @@ object JsPathSpec extends Specification {
 
       (JsPath \ "array" \\ "beta")(obj) must equalTo(
           Seq(JsString("v12"), JsString("v22"), JsString("v32")))
-    }
 
-    "retrieve with symbol keys" in {
+    "retrieve with symbol keys" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.arr(
@@ -200,9 +190,8 @@ object JsPathSpec extends Specification {
 
       ((JsPath \ 'level1 \ 'key1)(1) \\ 'tags)(obj) must equalTo(
           Seq(Json.arr("alpha1", "beta1", "gamma1")))
-    }
 
-    "prune field from 1-level JsObject" in {
+    "prune field from 1-level JsObject" in
       val obj = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.arr(
@@ -262,9 +251,8 @@ object JsPathSpec extends Specification {
       (__ \ 'level1 \ 'key2 \ 'key21).prune(obj).get must beEqualTo(res3)
       (__ \\ 'key21).prune(obj) must beEqualTo(JsError(
               __ \\ "key21", ValidationError("error.expected.keypathnode")))
-    }
 
-    "get JsPath till last node" in {
+    "get JsPath till last node" in
       val res = Json.obj(
           "level1" -> Json.obj(
               "key1" -> Json.arr(
@@ -294,7 +282,6 @@ object JsPathSpec extends Specification {
           Left(JsError(__ \ 'level2 \ 'key3,
                        ValidationError("error.path.missing")))
       )
-    }
 
     /*"set 1-level field in simple jsobject" in {
       val obj = Json.obj("key" -> "value")
@@ -601,5 +588,3 @@ object JsPathSpec extends Specification {
       ))
 
     }*/
-  }
-}

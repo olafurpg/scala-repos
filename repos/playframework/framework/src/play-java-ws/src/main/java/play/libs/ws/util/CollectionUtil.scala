@@ -10,8 +10,7 @@ import scala.collection.convert.WrapAsJava._
   *  The reason why this source is written in Scala is that doing the conversion using Java is a lot more involved. 
   *  This utility class is used by `play.libs.ws.StreamedResponse`.
   */
-private[ws] object CollectionUtil {
+private[ws] object CollectionUtil
   def convert(
       headers: Map[String, Seq[String]]): ju.Map[String, ju.List[String]] =
     mapAsJavaMap(headers.map { case (k, v) => k -> seqAsJavaList(v) })
-}

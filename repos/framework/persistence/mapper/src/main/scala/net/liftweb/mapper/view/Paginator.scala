@@ -29,7 +29,7 @@ import net.liftweb.mapper.{Mapper, MetaMapper, MappedField, QueryParam, OrderBy,
   * Adds a dispatch that delegates the "paginate" snippet to the paginator member.
   * @author nafg and Timothy Perrett
   */
-trait PaginatedModelSnippet[T <: Mapper[T]] extends ModelSnippet[T] {
+trait PaginatedModelSnippet[T <: Mapper[T]] extends ModelSnippet[T]
   abstract override def dispatch: DispatchIt =
     super.dispatch orElse Map("paginate" -> paginator.paginate)
 
@@ -37,7 +37,6 @@ trait PaginatedModelSnippet[T <: Mapper[T]] extends ModelSnippet[T] {
     * The paginator to delegate to
     */
   val paginator: PaginatorSnippet[T]
-}
 
 /**
   * Paginate mapper instances by supplying the model you
@@ -47,7 +46,7 @@ trait PaginatedModelSnippet[T <: Mapper[T]] extends ModelSnippet[T] {
   * @author nafg and Timothy Perrett
   */
 class MapperPaginator[T <: Mapper[T]](val meta: MetaMapper[T])
-    extends Paginator[T] {
+    extends Paginator[T]
 
   /**
     * QueryParams to use always
@@ -58,7 +57,6 @@ class MapperPaginator[T <: Mapper[T]](val meta: MetaMapper[T])
   def page =
     meta.findAll(constantParams ++ Seq[QueryParam[T]](MaxRows(itemsPerPage),
                                                       StartAt(first)): _*)
-}
 
 /**
   * Convenience class that combines MapperPaginator with PaginatorSnippet
@@ -78,24 +76,22 @@ class SortedMapperPaginator[T <: Mapper[T]](
     initialSort: net.liftweb.mapper.MappedField[_, T],
     _headers: (String, MappedField[_, T])*)
     extends MapperPaginator[T](meta)
-    with SortedPaginator[T, MappedField[_, T]] {
+    with SortedPaginator[T, MappedField[_, T]]
 
   val headers = _headers.toList
-  sort = (headers.indexWhere {
+  sort = (headers.indexWhere
     case (_, `initialSort`) => true; case _ => false
-  }, true)
+  , true)
 
   override def page =
     meta.findAll(constantParams ++ Seq[QueryParam[T]](
             mapperSort, MaxRows(itemsPerPage), StartAt(first)): _*)
-  private def mapperSort = sort match {
+  private def mapperSort = sort match
     case (fieldIndex, ascending) =>
       OrderBy(
           headers(fieldIndex) match { case (_, f) => f },
           if (ascending) Ascending else Descending
       )
-  }
-}
 
 /**
   * Convenience class that combines SortedMapperPaginator and SortedPaginatorSnippet.

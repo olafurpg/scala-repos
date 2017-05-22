@@ -18,25 +18,22 @@ import scala.reflect.ClassTag
 /**
   * @author Pavel Fatin
   */
-package object sbt {
+package object sbt
   implicit def toIdeaFunction1[A, B](f: A => B): IdeaFunction[A, B] =
-    new IdeaFunction[A, B] {
+    new IdeaFunction[A, B]
       def fun(a: A) = f(a)
-    }
 
   implicit def toIdeaPredicate[A](
       f: A => Boolean): IdeaFunction[A, JavaBoolean] =
-    new IdeaFunction[A, JavaBoolean] {
+    new IdeaFunction[A, JavaBoolean]
       def fun(a: A) = JavaBoolean.valueOf(f(a))
-    }
 
   implicit def toIdeaFunction2[A, B, C](
       f: (A, B) => C): IdeaFunction[IdeaPair[A, B], C] =
-    new IdeaFunction[IdeaPair[A, B], C] {
+    new IdeaFunction[IdeaPair[A, B], C]
       def fun(pair: IdeaPair[A, B]) = f(pair.getFirst, pair.getSecond)
-    }
 
-  implicit class RichFile(val file: File) extends AnyVal {
+  implicit class RichFile(val file: File) extends AnyVal
     def /(path: String): File = new File(file, path)
 
     def `<<`: File = <<(1)
@@ -74,22 +71,18 @@ package object sbt {
     def isOutsideOf(root: File): Boolean =
       !FileUtil.isAncestor(root, file, false)
 
-    def write(lines: String*) {
+    def write(lines: String*)
       writeLinesTo(file, lines: _*)
-    }
 
-    def copyTo(destination: File) {
+    def copyTo(destination: File)
       copy(file, destination)
-    }
-  }
 
-  private object RichFile {
+  private object RichFile
     @tailrec
     def parent(file: File, level: Int): File =
       if (level > 0) parent(file.getParentFile, level - 1) else file
-  }
 
-  implicit class RichVirtualFile(val entry: VirtualFile) extends AnyVal {
+  implicit class RichVirtualFile(val entry: VirtualFile) extends AnyVal
     def containsDirectory(name: String): Boolean =
       find(name).exists(_.isDirectory)
 
@@ -98,100 +91,77 @@ package object sbt {
     def find(name: String): Option[VirtualFile] = Option(entry.findChild(name))
 
     def isFile: Boolean = !entry.isDirectory
-  }
 
-  implicit class RichString(val str: String) extends AnyVal {
+  implicit class RichString(val str: String) extends AnyVal
     def toFile: File = new File(str)
-    def shaDigest: String = {
+    def shaDigest: String =
       val digest = MessageDigest.getInstance("SHA1").digest(str.getBytes)
       digest.map("%02x".format(_)).mkString
-    }
-  }
 
-  implicit class RichBoolean(val b: Boolean) extends AnyVal {
+  implicit class RichBoolean(val b: Boolean) extends AnyVal
     def option[A](a: => A): Option[A] = if (b) Some(a) else None
 
     def either[A, B](right: => B)(left: => A): Either[A, B] =
       if (b) Right(right) else Left(left)
 
     def seq[A](a: A*): Seq[A] = if (b) Seq(a: _*) else Seq.empty
-  }
 
-  implicit class RichSeq[T](val xs: Seq[T]) extends AnyVal {
-    def distinctBy[A](f: T => A): Seq[T] = {
-      val (_, ys) = xs.foldLeft((Set.empty[A], Vector.empty[T])) {
+  implicit class RichSeq[T](val xs: Seq[T]) extends AnyVal
+    def distinctBy[A](f: T => A): Seq[T] =
+      val (_, ys) = xs.foldLeft((Set.empty[A], Vector.empty[T]))
         case ((set, acc), x) =>
           val v = f(x)
           if (set.contains(v)) (set, acc) else (set + v, acc :+ x)
-      }
       ys
-    }
-  }
 
-  implicit class RichOption[T](val opt: Option[T]) extends AnyVal {
+  implicit class RichOption[T](val opt: Option[T]) extends AnyVal
     // Use for safely checking for null in chained calls
     @inline def safeMap[A](f: T => A): Option[A] =
       if (opt.isEmpty) None else Option(f(opt.get))
-  }
 
-  def jarWith[T : ClassTag]: File = {
+  def jarWith[T : ClassTag]: File =
     val tClass = implicitly[ClassTag[T]].runtimeClass
 
-    Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse {
+    Option(PathUtil.getJarPathForClass(tClass)).map(new File(_)).getOrElse
       throw new RuntimeException(
           "Jar file not found for class " + tClass.getName)
-    }
-  }
 
-  def using[A <: Closeable, B](resource: A)(block: A => B): B = {
-    try {
+  def using[A <: Closeable, B](resource: A)(block: A => B): B =
+    try
       block(resource)
-    } finally {
+    finally
       resource.close()
-    }
-  }
 
-  def writeLinesTo(file: File, lines: String*) {
-    using(new PrintWriter(new FileWriter(file))) { writer =>
+  def writeLinesTo(file: File, lines: String*)
+    using(new PrintWriter(new FileWriter(file)))  writer =>
       lines.foreach(writer.println)
       writer.flush()
-    }
-  }
 
-  def copy(source: File, destination: File) {
-    using(new BufferedInputStream(new FileInputStream(source))) { in =>
-      using(new BufferedOutputStream(new FileOutputStream(destination))) {
+  def copy(source: File, destination: File)
+    using(new BufferedInputStream(new FileInputStream(source)))  in =>
+      using(new BufferedOutputStream(new FileOutputStream(destination)))
         out =>
           var eof = false
-          while (!eof) {
+          while (!eof)
             val b = in.read()
             if (b == -1) eof = true else out.write(b)
-          }
           out.flush()
-      }
-    }
-  }
 
   def usingTempFile[T](prefix: String, suffix: Option[String] = None)(
-      block: File => T): T = {
+      block: File => T): T =
     val file = FileUtil.createTempFile(prefix, suffix.orNull, true)
-    try {
+    try
       block(file)
-    } finally {
+    finally
       file.delete()
-    }
-  }
 
   private val NameWithExtension = """(.+)(\..+?)""".r
 
-  private def parse(fileName: String): (String, String) = fileName match {
+  private def parse(fileName: String): (String, String) = fileName match
     case NameWithExtension(name, extension) => (name, extension)
     case name => (name, "")
-  }
 
-  def inWriteAction[T](body: => T): T = {
-    ApplicationManager.getApplication.runWriteAction(new Computable[T] {
+  def inWriteAction[T](body: => T): T =
+    ApplicationManager.getApplication.runWriteAction(new Computable[T]
       def compute: T = body
-    })
-  }
-}
+    )

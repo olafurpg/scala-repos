@@ -1,5 +1,4 @@
 trait Monad[M[_]]
 
-object Test {
+object Test
   def x: Monad[M forSome { type M [_] }] = ???
-}

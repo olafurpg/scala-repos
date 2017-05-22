@@ -40,7 +40,7 @@ import org.apache.spark.rdd.RDD
   * @tparam P Output prediction class.
   * @group Algorithm
   */
-abstract class PAlgorithm[PD, M, Q, P] extends BaseAlgorithm[PD, M, Q, P] {
+abstract class PAlgorithm[PD, M, Q, P] extends BaseAlgorithm[PD, M, Q, P]
 
   def trainBase(sc: SparkContext, pd: PD): M = train(sc, pd)
 
@@ -68,9 +68,8 @@ abstract class PAlgorithm[PD, M, Q, P] extends BaseAlgorithm[PD, M, Q, P] {
   def batchPredict(m: M, qs: RDD[(Long, Q)]): RDD[(Long, P)] =
     throw new NotImplementedError("batchPredict not implemented")
 
-  def predictBase(baseModel: Any, query: Q): P = {
+  def predictBase(baseModel: Any, query: Q): P =
     predict(baseModel.asInstanceOf[M], query)
-  }
 
   /** Implement this method to produce a prediction from a query and trained
     * model.
@@ -105,17 +104,13 @@ abstract class PAlgorithm[PD, M, Q, P] extends BaseAlgorithm[PD, M, Q, P] {
     */
   @DeveloperApi
   override def makePersistentModel(
-      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any = {
+      sc: SparkContext, modelId: String, algoParams: Params, bm: Any): Any =
     val m = bm.asInstanceOf[M]
-    if (m.isInstanceOf[PersistentModel[_]]) {
+    if (m.isInstanceOf[PersistentModel[_]])
       if (m.asInstanceOf[PersistentModel[Params]]
-            .save(modelId, algoParams, sc)) {
+            .save(modelId, algoParams, sc))
         PersistentModelManifest(className = m.getClass.getName)
-      } else {
+      else
         Unit
-      }
-    } else {
+    else
       Unit
-    }
-  }
-}

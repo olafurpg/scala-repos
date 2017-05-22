@@ -29,7 +29,7 @@ import org.apache.spark.rdd.RDD
   * @param k number of principal components
   */
 @Since("1.4.0")
-class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
+class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int)
   require(
       k >= 1,
       s"PCA requires a number of principal components k >= 1 but was given $k")
@@ -40,7 +40,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
     * @param sources source vectors
     */
   @Since("1.4.0")
-  def fit(sources: RDD[Vector]): PCAModel = {
+  def fit(sources: RDD[Vector]): PCAModel =
     require(
         k <= sources.first().size,
         s"source vector size is ${sources.first().size} must be greater than k=$k")
@@ -48,7 +48,7 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
     val mat = new RowMatrix(sources)
     val (pc, explainedVariance) =
       mat.computePrincipalComponentsAndExplainedVariance(k)
-    val densePC = pc match {
+    val densePC = pc match
       case dm: DenseMatrix =>
         dm
       case sm: SparseMatrix =>
@@ -62,22 +62,18 @@ class PCA @Since("1.4.0")(@Since("1.4.0") val k: Int) {
         throw new IllegalArgumentException(
             "Unsupported matrix format. Expected " +
             s"SparseMatrix or DenseMatrix. Instead got: ${m.getClass}")
-    }
-    val denseExplainedVariance = explainedVariance match {
+    val denseExplainedVariance = explainedVariance match
       case dv: DenseVector =>
         dv
       case sv: SparseVector =>
         sv.toDense
-    }
     new PCAModel(k, densePC, denseExplainedVariance)
-  }
 
   /**
     * Java-friendly version of [[fit()]]
     */
   @Since("1.4.0")
   def fit(sources: JavaRDD[Vector]): PCAModel = fit(sources.rdd)
-}
 
 /**
   * Model fitted by [[PCA]] that can project vectors to a low-dimensional space using PCA.
@@ -90,7 +86,7 @@ class PCAModel private[spark](
     @Since("1.4.0") val k: Int,
     @Since("1.4.0") val pc: DenseMatrix,
     @Since("1.6.0") val explainedVariance: DenseVector)
-    extends VectorTransformer {
+    extends VectorTransformer
 
   /**
     * Transform a vector by computed Principal Components.
@@ -100,8 +96,8 @@ class PCAModel private[spark](
     * @return transformed vector. Vector will be of length k.
     */
   @Since("1.4.0")
-  override def transform(vector: Vector): Vector = {
-    vector match {
+  override def transform(vector: Vector): Vector =
+    vector match
       case dv: DenseVector =>
         pc.transpose.multiply(dv)
       case SparseVector(size, indices, values) =>
@@ -115,6 +111,3 @@ class PCAModel private[spark](
         throw new IllegalArgumentException(
             "Unsupported vector format. Expected " +
             s"SparseVector or DenseVector. Instead got: ${vector.getClass}")
-    }
-  }
-}

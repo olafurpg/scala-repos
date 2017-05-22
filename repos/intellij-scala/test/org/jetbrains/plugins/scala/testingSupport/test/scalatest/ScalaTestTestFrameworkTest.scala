@@ -5,11 +5,11 @@ import org.junit.Assert
 
 class ScalaTestTestFrameworkTest
     extends ScalaLightPlatformCodeInsightTestCaseAdapter
-    with TestScalaProjectSettings {
+    with TestScalaProjectSettings
 
   val scalaTestFramework = new ScalaTestTestFramework
 
-  def testDefaultSuperClass(): Unit = {
+  def testDefaultSuperClass(): Unit =
 
     scalaProjectSettings.setScalaTestDefaultSuperClass(
         "org.scalatest.FlatSpec")
@@ -20,5 +20,3 @@ class ScalaTestTestFrameworkTest
         "org.scalatest.WordSPec")
     Assert.assertEquals(
         "org.scalatest.WordSPec", scalaTestFramework.getDefaultSuperClass)
-  }
-}

@@ -11,7 +11,7 @@ import java.util.logging.Level
 /**
   * Global initialization of Finagle.
   */
-private[twitter] object Init {
+private[twitter] object Init
   private val log = DefaultLogger
 
   // Used to record Finagle versioning in trace info.
@@ -24,45 +24,40 @@ private[twitter] object Init {
 
   def finagleBuildRevision: String = _finagleBuildRevision.get
 
-  private def tryProps(path: String): Option[Properties] = {
-    try {
+  private def tryProps(path: String): Option[Properties] =
+    try
       val resourceOpt = Option(getClass.getResourceAsStream(path))
-      resourceOpt match {
+      resourceOpt match
         case None =>
           log.log(Level.FINER, s"Finagle's build.properties not found: $path")
           None
         case Some(resource) =>
-          try {
+          try
             val p = new Properties
             p.load(resource)
             Some(p)
-          } finally {
+          finally
             resource.close()
-          }
-      }
-    } catch {
+    catch
       case NonFatal(exc) =>
         log.log(Level.WARNING,
                 s"Exception while loading Finagle's build.properties: $path",
                 exc)
         None
-    }
-  }
 
   // package protected for testing
-  private[finagle] def loadBuildProperties: Option[Properties] = {
+  private[finagle] def loadBuildProperties: Option[Properties] =
     val candidates = Seq(
         "finagle-core",
         "finagle-core_2.10",
         "finagle-core_2.11",
         "finagle-core_2.12"
     )
-    candidates.flatMap { c =>
+    candidates.flatMap  c =>
       tryProps(s"/com/twitter/$c/build.properties")
-    }.headOption
-  }
+    .headOption
 
-  private[this] val once = Once {
+  private[this] val once = Once
     FinagleScheduler.init()
 
     val p = loadBuildProperties.getOrElse { new Properties() }
@@ -76,10 +71,8 @@ private[twitter] object Init {
             finagleBuildRevision,
             p.getProperty("build_name", "?")
         ))
-  }
 
   /**
     * Runs the initialization if it has not yet run.
     */
   def apply(): Unit = once()
-}

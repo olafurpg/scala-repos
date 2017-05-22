@@ -1,5 +1,5 @@
-class NoReturnOneOutput {
-  def foo(i: Int): Int = {
+class NoReturnOneOutput
+  def foo(i: Int): Int =
     /*start*/
     if (true) {}
     val x = 0
@@ -7,8 +7,6 @@ class NoReturnOneOutput {
     /*end*/
     println()
     x
-  }
-}
 /*
 class NoReturnOneOutput {
   def foo(i: Int): Int = {

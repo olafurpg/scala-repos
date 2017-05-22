@@ -10,20 +10,18 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScClass, ScObj
   * User: Alefas
   * Date: 27.03.12
   */
-class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
-  def withRelativeImports(body: => Unit): Unit = {
+class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase
+  def withRelativeImports(body: => Unit): Unit =
     val settings: ScalaCodeStyleSettings =
       ScalaCodeStyleSettings.getInstance(getProjectAdapter)
     val oldValue = settings.isAddFullQualifiedImports
     settings.setAddFullQualifiedImports(false)
-    try {
+    try
       body
-    } finally {
+    finally
       settings.setAddFullQualifiedImports(oldValue)
-    }
-  }
 
-  def testClassNameRenamed() {
+  def testClassNameRenamed()
     val fileText = """
         |import java.util.{ArrayList => BLLLL}
         |object Test extends App {
@@ -43,9 +41,8 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testExpressionSameName() {
+  def testExpressionSameName()
     val fileText = """
         |import collection.immutable.HashSet
         |
@@ -67,20 +64,18 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
         |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find {
+    completeLookupItem(activeLookup.find
       case le: ScalaLookupItem =>
-        le.element match {
+        le.element match
           case c: ScObject
               if c.qualifiedName == "scala.collection.mutable.HashSet" =>
             true
           case _ => false
-        }
       case _ => false
-    }.get, '\t')
+    .get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testClassSameName() {
+  def testClassSameName()
     val fileText = """
         |import collection.immutable.HashSet
         |
@@ -102,24 +97,22 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
         |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find {
+    completeLookupItem(activeLookup.find
       case le: ScalaLookupItem =>
-        le.element match {
+        le.element match
           case c: ScClass
               if c.qualifiedName == "scala.collection.mutable.HashSet" =>
             true
           case _ => false
-        }
       case _ => false
-    }.get, '\t')
+    .get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSmartJoining() {
+  def testSmartJoining()
     val settings = ScalaCodeStyleSettings.getInstance(getProjectAdapter)
     val oldValue = settings.getImportsWithPrefix
     settings.setImportsWithPrefix(Array.empty)
-    try {
+    try
       val fileText = """
           |import collection.mutable.{Builder, Queue}
           |import scala.collection.immutable.HashMap
@@ -142,23 +135,20 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
           |}
         """.stripMargin.replaceAll("\r", "").trim()
 
-      completeLookupItem(activeLookup.find {
+      completeLookupItem(activeLookup.find
         case le: ScalaLookupItem =>
-          le.element match {
+          le.element match
             case c: ScClass
                 if c.qualifiedName == "scala.collection.mutable.ListMap" =>
               true
             case _ => false
-          }
         case _ => false
-      }.get, '\t')
+      .get, '\t')
       checkResultByText(resultText)
-    } catch {
+    catch
       case t: Exception => settings.setImportsWithPrefix(oldValue)
-    }
-  }
 
-  def testImportsMess() {
+  def testImportsMess()
     val fileText =
       """
         |import scala.collection.immutable.{BitSet, HashSet, ListMap, SortedMap}
@@ -182,20 +172,18 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
         |}
       """.stripMargin.replaceAll("\r", "").trim()
 
-    completeLookupItem(activeLookup.find {
+    completeLookupItem(activeLookup.find
       case le: ScalaLookupItem =>
-        le.element match {
+        le.element match
           case c: ScClass
               if c.qualifiedName == "scala.collection.immutable.ListSet" =>
             true
           case _ => false
-        }
       case _ => false
-    }.get, '\t')
+    .get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testImplicitClass() {
+  def testImplicitClass()
     val fileText = """
         |package a
         |
@@ -234,10 +222,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
 
     completeLookupItem(activeLookup.find(_.getLookupString == "foo").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSCL4087() {
-    withRelativeImports {
+  def testSCL4087()
+    withRelativeImports
       val fileText = """
           |package a.b {
           |
@@ -272,11 +259,9 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(_.getLookupString == "XXXX").get, '\t')
       checkResultByText(resultText)
-    }
-  }
 
-  def testSCL4087_2() {
-    withRelativeImports {
+  def testSCL4087_2()
+    withRelativeImports
       val fileText = """
           |package a.b.z {
           |
@@ -311,6 +296,3 @@ class ScalaClassNameCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(_.getLookupString == "XXXX").get, '\t')
       checkResultByText(resultText)
-    }
-  }
-}

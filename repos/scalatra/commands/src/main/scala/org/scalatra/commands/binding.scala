@@ -12,35 +12,32 @@ import scalaz.syntax.std.option._
 
 class BindingException(message: String) extends ScalatraException(message)
 
-object Binding {
+object Binding
 
   def apply[I, A](fieldName: String,
                   cv: TypeConverter[I, A],
                   tcf: TypeConverterFactory[_])(
-      implicit mf: Manifest[I], mt: Manifest[A]): Binding = {
+      implicit mf: Manifest[I], mt: Manifest[A]): Binding =
     new DefaultBinding(FieldDescriptor[A](fieldName), tcf)(mf, mt, cv)
-  }
 
   def apply[I, A](prev: FieldDescriptor[A],
                   cv: TypeConverter[I, A],
                   tcf: TypeConverterFactory[_])(
-      implicit mf: Manifest[I], mt: Manifest[A]): Binding = {
+      implicit mf: Manifest[I], mt: Manifest[A]): Binding =
     new DefaultBinding(prev, tcf)(mf, mt, cv)
-  }
 
   def apply[A](initial: String)(
       implicit ma: Manifest[A], tcFactory: TypeConverterFactory[A]): Binding =
     apply(FieldDescriptor[A](initial))
   def apply[A](initial: FieldDescriptor[A])(
       implicit ma: Manifest[A],
-      tcFactory: TypeConverterFactory[A]): Binding = {
+      tcFactory: TypeConverterFactory[A]): Binding =
     new PartialBinding(initial)
-  }
 
   private class PartialBinding[A](val field: FieldDescriptor[A])(
       implicit val valueManifest: Manifest[A],
       val typeConverterFactory: TypeConverterFactory[A])
-      extends Binding {
+      extends Binding
     type T = A
     type S = Nothing
     implicit def sourceManifest: Manifest[S] = null
@@ -56,7 +53,6 @@ object Binding {
     def validate: Binding =
       throw new BindingException(
           "Databinding needs to happen before validation")
-  }
 
   private class DefaultBinding[I, A](
       val field: FieldDescriptor[A],
@@ -64,18 +60,17 @@ object Binding {
       implicit val sourceManifest: Manifest[I],
       val valueManifest: Manifest[A],
       val typeConverter: TypeConverter[I, A])
-      extends Binding {
+      extends Binding
     type T = A
     type S = I
 
-    override def toString() = {
+    override def toString() =
       "Binding[%s, %s](name: %s, value: %s, original: %s)".format(
           sourceManifest.erasure.getSimpleName,
           valueManifest.erasure.getSimpleName,
           name,
           validation,
           original)
-    }
 
     def transform(transformer: (T) => T): Binding =
       new DefaultBinding(field.transform(transformer), typeConverterFactory)(
@@ -90,15 +85,12 @@ object Binding {
       new DefaultBinding(field(toBind), typeConverterFactory)(
           sourceManifest, valueManifest, typeConverter)
 
-    def validate: Binding = {
+    def validate: Binding =
       val nwFld = field.asInstanceOf[DataboundFieldDescriptor[S, T]].validate
       new DefaultBinding(nwFld, typeConverterFactory)(
           sourceManifest, valueManifest, typeConverter)
-    }
-  }
-}
 
-sealed trait Binding {
+sealed trait Binding
   // We want to take advantage of compile time checking but we don't want the types
   // and potential changing of a type of a binding to be a problem
   // So we capture the type information in this trait taking the
@@ -128,10 +120,9 @@ sealed trait Binding {
   def validateWith(validators: BindingValidator[T]*): Binding
   def transform(transformer: T => T): Binding
 
-  def original: Option[S] = field match {
+  def original: Option[S] = field match
     case v: DataboundFieldDescriptor[_, _] => Some(v.original.asInstanceOf[S])
     case _ => None
-  }
 
   implicit def typeConverter: TypeConverter[S, T]
 
@@ -142,9 +133,8 @@ sealed trait Binding {
   override def toString() =
     "BindingContainer[%s](name: %s, value: %s, original: %s)".format(
         valueManifest.erasure.getSimpleName, name, validation, original)
-}
 
-trait BindingSyntax extends BindingValidatorImplicits {
+trait BindingSyntax extends BindingValidatorImplicits
 
   implicit def asType[T : Manifest](name: String): FieldDescriptor[T] =
     FieldDescriptor[T](name)
@@ -169,7 +159,6 @@ trait BindingSyntax extends BindingValidatorImplicits {
     FieldDescriptor[DateTime](name)
   def asSeq[T : Manifest](name: String): FieldDescriptor[Seq[T]] =
     FieldDescriptor[Seq[T]](name)
-}
 
 object BindingSyntax extends BindingSyntax
 
@@ -179,7 +168,7 @@ object BindingSyntax extends BindingSyntax
   * @author mmazzarolo
   */
 trait BindingImplicits
-    extends DefaultImplicitConversions with BindingValidatorImplicits {
+    extends DefaultImplicitConversions with BindingValidatorImplicits
 
   implicit def stringToDateTime(implicit df: DateParser = JodaDateFormats.Web)
     : TypeConverter[String, DateTime] =
@@ -197,6 +186,5 @@ trait BindingImplicits
   implicit def stringToSeqDate(implicit df: DateParser = JodaDateFormats.Web)
     : TypeConverter[String, Seq[Date]] =
     stringToSeq(stringToDate)
-}
 
 object BindingImplicits extends BindingImplicits

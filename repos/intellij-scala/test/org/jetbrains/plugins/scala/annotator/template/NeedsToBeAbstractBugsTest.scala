@@ -6,22 +6,18 @@ import com.intellij.openapi.extensions.Extensions
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembersInjector
 import org.jetbrains.plugins.scala.lang.typeInference.testInjectors.SCL9446Injector
 
-class NeedsToBeAbstractBugsTest extends AnnotatorTestBase(NeedsToBeAbstract) {
+class NeedsToBeAbstractBugsTest extends AnnotatorTestBase(NeedsToBeAbstract)
 
-  def testSCL2981(): Unit = {
+  def testSCL2981(): Unit =
     assertMatches(messages(
-            "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}")) {
+            "trait A { type T; def t(p: T)}; class B extends A { type T = Int; def t(p: T) = ()}"))
       case Nil =>
-    }
-  }
 
-  def testSCL3515(): Unit = {
-    assertMatches(messages("trait A { type T}; class B extends A")) {
+  def testSCL3515(): Unit =
+    assertMatches(messages("trait A { type T}; class B extends A"))
       case Nil =>
-    }
-  }
 
-  def testSCL3514(): Unit = {
+  def testSCL3514(): Unit =
     val code = """
 trait M[X]
 abstract class A {
@@ -34,12 +30,10 @@ class B extends A {
   def bar[A: M] = ()
 }
     """
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Nil =>
-    }
-  }
 
-  def testSCL4258(): Unit = {
+  def testSCL4258(): Unit =
     val code = """
         |abstract class Parent {
         |  def m(p: T forSome {type T})
@@ -48,17 +42,15 @@ class B extends A {
         |  def m(p: T forSome {type T}) { }
         |}
       """.stripMargin
-    assertMatches(messages(code)) {
+    assertMatches(messages(code))
       case Nil =>
-    }
-  }
 
-  def testSCL9446(): Unit = {
+  def testSCL9446(): Unit =
     val extensionPoint = Extensions.getRootArea.getExtensionPoint(
         SyntheticMembersInjector.EP_NAME)
     val injector = new SCL9446Injector
     extensionPoint.registerExtension(injector)
-    try {
+    try
       val code = """
           |object ppp {
           |trait A {
@@ -69,11 +61,7 @@ class B extends A {
           |}
           |}
         """.stripMargin
-      assertMatches(messages(code)) {
+      assertMatches(messages(code))
         case Nil =>
-      }
-    } finally {
+    finally
       extensionPoint.unregisterExtension(injector)
-    }
-  }
-}

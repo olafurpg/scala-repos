@@ -20,10 +20,10 @@ import java.util.jar.{Attributes, JarEntry, JarOutputStream, Manifest => JarMani
 
 import org.slf4j.LoggerFactory
 
-object MakeJar {
+object MakeJar
   private val LOG = LoggerFactory.getLogger(getClass)
 
-  def apply(classDir: File, jarName: Option[String] = None): File = {
+  def apply(classDir: File, jarName: Option[String] = None): File =
     val syntheticJar = new File(
         System.getProperty("java.io.tmpdir"),
         jarName.getOrElse(classDir.getAbsolutePath.replace("/", "_") + ".jar"))
@@ -35,36 +35,31 @@ object MakeJar {
     add(classDir, classDir, target)
     target.close()
     new File(syntheticJar.getAbsolutePath)
-  }
 
-  private[this] def add(parent: File, source: File, target: JarOutputStream) {
+  private[this] def add(parent: File, source: File, target: JarOutputStream)
     val name = getRelativeFileBetween(parent, source)
       .getOrElse(new File(""))
       .getPath
       .replace("\\", "/")
-    if (source.isDirectory) {
-      if (!name.isEmpty) {
+    if (source.isDirectory)
+      if (!name.isEmpty)
         val entry = new JarEntry(if (!name.endsWith("/")) name + "/" else name)
         entry.setTime(source.lastModified())
         target.putNextEntry(entry)
         target.closeEntry()
-      }
       source.listFiles.foreach { add(parent, _, target) }
-    } else {
+    else
       val entry = new JarEntry(name)
       entry.setTime(source.lastModified)
       target.putNextEntry(entry)
       val in = new BufferedInputStream(new FileInputStream(source))
       val buffer = new Array[Byte](1024)
       var count = in.read(buffer)
-      while (count > -1) {
+      while (count > -1)
         target.write(buffer, 0, count)
         count = in.read(buffer)
-      }
       target.closeEntry
       in.close()
-    }
-  }
 
   // Note that this assumes that parent and source are in absolute form if that's what we want
   @annotation.tailrec
@@ -72,21 +67,16 @@ object MakeJar {
       parent: File,
       source: File,
       result: List[String] = List.empty): Option[File] =
-    Option(source) match {
-      case Some(src) => {
-          if (parent == src) {
-            result.foldLeft(None: Option[File]) { (cum, part) =>
+    Option(source) match
+      case Some(src) =>
+          if (parent == src)
+            result.foldLeft(None: Option[File])  (cum, part) =>
               Some(
-                  cum match {
+                  cum match
                 case Some(p) => new File(p, part)
                 case None => new File(part)
-              })
-            }
-          } else {
+              )
+          else
             getRelativeFileBetween(
                 parent, src.getParentFile, src.getName :: result)
-          }
-        }
       case None => None
-    }
-}

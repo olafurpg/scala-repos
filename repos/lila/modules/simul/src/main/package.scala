@@ -2,9 +2,9 @@ package lila
 
 import lila.socket.WithSocket
 
-package object simul extends PackageObject with WithPlay with WithSocket {
+package object simul extends PackageObject with WithPlay with WithSocket
 
-  private[simul] object RandomName {
+  private[simul] object RandomName
 
     private val names = IndexedSeq(
         "Actinium",
@@ -126,7 +126,5 @@ package object simul extends PackageObject with WithPlay with WithSocket {
     private val size = names.size
 
     def apply(): String = names(scala.util.Random nextInt size)
-  }
 
   private[simul] def logger = lila.log("simul")
-}

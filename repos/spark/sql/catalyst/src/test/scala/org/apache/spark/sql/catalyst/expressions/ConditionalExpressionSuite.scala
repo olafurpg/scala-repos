@@ -25,9 +25,9 @@ import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types._
 
 class ConditionalExpressionSuite
-    extends SparkFunSuite with ExpressionEvalHelper {
+    extends SparkFunSuite with ExpressionEvalHelper
 
-  test("if") {
+  test("if")
     val testcases = Seq[(java.lang.Boolean, Integer, Integer, Integer)](
         (true, 1, 2, 1),
         (false, 1, 2, 2),
@@ -39,8 +39,8 @@ class ConditionalExpressionSuite
     )
 
     // dataType must match T.
-    def testIf(convert: (Integer => Any), dataType: DataType): Unit = {
-      for ((predicate, trueValue, falseValue, expected) <- testcases) {
+    def testIf(convert: (Integer => Any), dataType: DataType): Unit =
+      for ((predicate, trueValue, falseValue, expected) <- testcases)
         val trueValueConverted =
           if (trueValue == null) null else convert(trueValue)
         val falseValueConverted =
@@ -52,8 +52,6 @@ class ConditionalExpressionSuite
                            Literal.create(trueValueConverted, dataType),
                            Literal.create(falseValueConverted, dataType)),
                         expectedConverted)
-      }
-    }
 
     testIf(_ == 1, BooleanType)
     testIf(_.toShort, ShortType)
@@ -69,12 +67,10 @@ class ConditionalExpressionSuite
 
     testIf(_.toString, StringType)
 
-    DataTypeTestUtils.propertyCheckSupported.foreach { dt =>
+    DataTypeTestUtils.propertyCheckSupported.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(If, BooleanType, dt, dt)
-    }
-  }
 
-  test("case when") {
+  test("case when")
     val row = create_row(null, false, true, "a", "b", "c")
     val c1 = 'a.boolean.at(0)
     val c2 = 'a.boolean.at(1)
@@ -123,9 +119,8 @@ class ConditionalExpressionSuite
     assert(CaseWhen(Seq((c2, c4_notNull), (c3, c5_notNull))).nullable === true)
     assert(CaseWhen(Seq((c2, c4), (c3, c5_notNull))).nullable === true)
     assert(CaseWhen(Seq((c2, c4_notNull), (c3, c5))).nullable === true)
-  }
 
-  test("case key when") {
+  test("case key when")
     val row = create_row(null, 1, 2, "a", "b", "c")
     val c1 = 'a.int.at(0)
     val c2 = 'a.int.at(1)
@@ -150,9 +145,8 @@ class ConditionalExpressionSuite
     checkEvaluation(CaseKeyWhen(literalString, Seq(c5, c2, c4, c3)), 2, row)
     checkEvaluation(CaseKeyWhen(c6, Seq(c5, c2, c4, c3)), null, row)
     checkEvaluation(CaseKeyWhen(literalNull, Seq(c2, c5, c1, c6)), null, row)
-  }
 
-  test("function least") {
+  test("function least")
     val row = create_row(1, 2, "a", "b", "c")
     val c1 = 'a.int.at(0)
     val c2 = 'a.int.at(1)
@@ -202,12 +196,10 @@ class ConditionalExpressionSuite
         Timestamp.valueOf("2015-07-01 08:00:00"),
         InternalRow.empty)
 
-    DataTypeTestUtils.ordered.foreach { dt =>
+    DataTypeTestUtils.ordered.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Least, dt, 2)
-    }
-  }
 
-  test("function greatest") {
+  test("function greatest")
     val row = create_row(1, 2, "a", "b", "c")
     val c1 = 'a.int.at(0)
     val c2 = 'a.int.at(1)
@@ -262,8 +254,5 @@ class ConditionalExpressionSuite
         Timestamp.valueOf("2015-07-01 10:00:00"),
         InternalRow.empty)
 
-    DataTypeTestUtils.ordered.foreach { dt =>
+    DataTypeTestUtils.ordered.foreach  dt =>
       checkConsistencyBetweenInterpretedAndCodegen(Greatest, dt, 2)
-    }
-  }
-}

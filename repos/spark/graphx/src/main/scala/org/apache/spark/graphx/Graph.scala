@@ -38,7 +38,7 @@ import org.apache.spark.storage.StorageLevel
   * @tparam ED the edge attribute type
   */
 abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
-    extends Serializable {
+    extends Serializable
 
   /**
     * An RDD containing the vertices and their associated attributes.
@@ -187,9 +187,8 @@ abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
     * attributes.
     *
     */
-  def mapEdges[ED2 : ClassTag](map: Edge[ED] => ED2): Graph[VD, ED2] = {
+  def mapEdges[ED2 : ClassTag](map: Edge[ED] => ED2): Graph[VD, ED2] =
     mapEdges((pid, iter) => iter.map(map))
-  }
 
   /**
     * Transforms each edge attribute using the map function, passing it a whole partition at a
@@ -235,9 +234,8 @@ abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
     *
     */
   def mapTriplets[ED2 : ClassTag](
-      map: EdgeTriplet[VD, ED] => ED2): Graph[VD, ED2] = {
+      map: EdgeTriplet[VD, ED] => ED2): Graph[VD, ED2] =
     mapTriplets((pid, iter) => iter.map(map), TripletFields.All)
-  }
 
   /**
     * Transforms each edge attribute using the map function, passing it the adjacent vertex
@@ -265,9 +263,8 @@ abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
     */
   def mapTriplets[ED2 : ClassTag](
       map: EdgeTriplet[VD, ED] => ED2,
-      tripletFields: TripletFields): Graph[VD, ED2] = {
+      tripletFields: TripletFields): Graph[VD, ED2] =
     mapTriplets((pid, iter) => iter.map(map), tripletFields)
-  }
 
   /**
     * Transforms each edge attribute a partition at a time using the map function, passing it the
@@ -375,9 +372,8 @@ abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
   def aggregateMessages[A : ClassTag](
       sendMsg: EdgeContext[VD, ED, A] => Unit,
       mergeMsg: (A, A) => A,
-      tripletFields: TripletFields = TripletFields.All): VertexRDD[A] = {
+      tripletFields: TripletFields = TripletFields.All): VertexRDD[A] =
     aggregateMessagesWithActiveSet(sendMsg, mergeMsg, tripletFields, None)
-  }
 
   /**
     * Aggregates values from the neighboring edges and vertices of each vertex. The user-supplied
@@ -447,12 +443,12 @@ abstract class Graph[VD : ClassTag, ED : ClassTag] protected ()
   // Save a copy of the GraphOps object so there is always one unique GraphOps object
   // for a given Graph object, and thus the lazy vals in GraphOps would work as intended.
   val ops = new GraphOps(this)
-} // end of Graph
+// end of Graph
 
 /**
   * The Graph object contains a collection of routines used to construct graphs from RDDs.
   */
-object Graph {
+object Graph
 
   /**
     * Construct a graph from a collection of edges encoded as vertex id pairs.
@@ -474,15 +470,13 @@ object Graph {
       uniqueEdges: Option[PartitionStrategy] = None,
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
       vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
-    : Graph[VD, Int] = {
+    : Graph[VD, Int] =
     val edges = rawEdges.map(p => Edge(p._1, p._2, 1))
     val graph = GraphImpl(
         edges, defaultValue, edgeStorageLevel, vertexStorageLevel)
-    uniqueEdges match {
+    uniqueEdges match
       case Some(p) => graph.partitionBy(p).groupEdges((a, b) => a + b)
       case None => graph
-    }
-  }
 
   /**
     * Construct a graph from a collection of edges.
@@ -500,9 +494,8 @@ object Graph {
       defaultValue: VD,
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
       vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
-    : Graph[VD, ED] = {
+    : Graph[VD, ED] =
     GraphImpl(edges, defaultValue, edgeStorageLevel, vertexStorageLevel)
-  }
 
   /**
     * Construct a graph from a collection of vertices and
@@ -525,13 +518,12 @@ object Graph {
       defaultVertexAttr: VD = null.asInstanceOf[VD],
       edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
       vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
-    : Graph[VD, ED] = {
+    : Graph[VD, ED] =
     GraphImpl(vertices,
               edges,
               defaultVertexAttr,
               edgeStorageLevel,
               vertexStorageLevel)
-  }
 
   /**
     * Implicitly extracts the [[GraphOps]] member from a graph.
@@ -542,4 +534,4 @@ object Graph {
     */
   implicit def graphToGraphOps[VD : ClassTag, ED : ClassTag](
       g: Graph[VD, ED]): GraphOps[VD, ED] = g.ops
-} // end of Graph object
+// end of Graph object

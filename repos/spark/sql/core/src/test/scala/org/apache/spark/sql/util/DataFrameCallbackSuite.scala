@@ -25,24 +25,22 @@ import org.apache.spark.sql.catalyst.plans.logical.{Aggregate, Project}
 import org.apache.spark.sql.execution.{QueryExecution, WholeStageCodegen}
 import org.apache.spark.sql.test.SharedSQLContext
 
-class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
+class DataFrameCallbackSuite extends QueryTest with SharedSQLContext
   import testImplicits._
   import functions._
 
   test(
-      "execute callback functions when a DataFrame action finished successfully") {
+      "execute callback functions when a DataFrame action finished successfully")
     val metrics = ArrayBuffer.empty[(String, QueryExecution, Long)]
-    val listener = new QueryExecutionListener {
+    val listener = new QueryExecutionListener
       // Only test successful case here, so no need to implement `onFailure`
       override def onFailure(funcName: String,
                              qe: QueryExecution,
                              exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
+          funcName: String, qe: QueryExecution, duration: Long): Unit =
         metrics += ((funcName, qe, duration))
-      }
-    }
     sqlContext.listenerManager.register(listener)
 
     val df = Seq(1 -> "a").toDF("i", "j")
@@ -60,25 +58,21 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     assert(metrics(1)._3 > 0)
 
     sqlContext.listenerManager.unregister(listener)
-  }
 
-  test("execute callback functions when a DataFrame action failed") {
+  test("execute callback functions when a DataFrame action failed")
     val metrics = ArrayBuffer.empty[(String, QueryExecution, Exception)]
-    val listener = new QueryExecutionListener {
+    val listener = new QueryExecutionListener
       override def onFailure(
-          funcName: String, qe: QueryExecution, exception: Exception): Unit = {
+          funcName: String, qe: QueryExecution, exception: Exception): Unit =
         metrics += ((funcName, qe, exception))
-      }
 
       // Only test failed case here, so no need to implement `onSuccess`
       override def onSuccess(
           funcName: String, qe: QueryExecution, duration: Long): Unit = {}
-    }
     sqlContext.listenerManager.register(listener)
 
-    val errorUdf = udf[Int, Int] { _ =>
+    val errorUdf = udf[Int, Int]  _ =>
       throw new RuntimeException("udf error")
-    }
     val df = sparkContext.makeRDD(Seq(1 -> "a")).toDF("i", "j")
 
     // Ignore the log when we are expecting an exception.
@@ -91,25 +85,21 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     assert(metrics(0)._3.getMessage == e.getMessage)
 
     sqlContext.listenerManager.unregister(listener)
-  }
 
-  test("get numRows metrics by callback") {
+  test("get numRows metrics by callback")
     val metrics = ArrayBuffer.empty[Long]
-    val listener = new QueryExecutionListener {
+    val listener = new QueryExecutionListener
       // Only test successful case here, so no need to implement `onFailure`
       override def onFailure(funcName: String,
                              qe: QueryExecution,
                              exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
-        val metric = qe.executedPlan match {
+          funcName: String, qe: QueryExecution, duration: Long): Unit =
+        val metric = qe.executedPlan match
           case w: WholeStageCodegen => w.child.longMetric("numOutputRows")
           case other => other.longMetric("numOutputRows")
-        }
         metrics += metric.value.value
-      }
-    }
     sqlContext.listenerManager.register(listener)
 
     val df = Seq(1 -> "a").toDF("i", "j").groupBy("i").count()
@@ -123,28 +113,25 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     assert(metrics(2) === 2)
 
     sqlContext.listenerManager.unregister(listener)
-  }
 
   // TODO: Currently some LongSQLMetric use -1 as initial value, so if the accumulator is never
   // updated, we can filter it out later.  However, when we aggregate(sum) accumulator values at
   // driver side for SQL physical operators, these -1 values will make our result smaller.
   // A easy fix is to create a new SQLMetric(including new MetricValue, MetricParam, etc.), but we
   // can do it later because the impact is just too small (1048576 tasks for 1 MB).
-  ignore("get size metrics by callback") {
+  ignore("get size metrics by callback")
     val metrics = ArrayBuffer.empty[Long]
-    val listener = new QueryExecutionListener {
+    val listener = new QueryExecutionListener
       // Only test successful case here, so no need to implement `onFailure`
       override def onFailure(funcName: String,
                              qe: QueryExecution,
                              exception: Exception): Unit = {}
 
       override def onSuccess(
-          funcName: String, qe: QueryExecution, duration: Long): Unit = {
+          funcName: String, qe: QueryExecution, duration: Long): Unit =
         metrics += qe.executedPlan.longMetric("dataSize").value.value
         val bottomAgg = qe.executedPlan.children(0).children(0)
         metrics += bottomAgg.longMetric("dataSize").value.value
-      }
-    }
     sqlContext.listenerManager.register(listener)
 
     val sparkListener = new SaveInfoListener
@@ -153,7 +140,7 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     val df = (1 to 100).map(i => i -> i.toString).toDF("i", "j")
     df.groupBy("i").count().collect()
 
-    def getPeakExecutionMemory(stageId: Int): Long = {
+    def getPeakExecutionMemory(stageId: Int): Long =
       val peakMemoryAccumulator = sparkListener
         .getCompletedStageInfos(stageId)
         .accumulables
@@ -161,7 +148,6 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
 
       assert(peakMemoryAccumulator.size == 1)
       peakMemoryAccumulator.head._2.value.get.asInstanceOf[Long]
-    }
 
     assert(sparkListener.getCompletedStageInfos.length == 2)
     val bottomAggDataSize = getPeakExecutionMemory(0)
@@ -174,5 +160,3 @@ class DataFrameCallbackSuite extends QueryTest with SharedSQLContext {
     assert(metrics(1) == bottomAggDataSize)
 
     sqlContext.listenerManager.unregister(listener)
-  }
-}

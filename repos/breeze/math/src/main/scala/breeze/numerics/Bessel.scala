@@ -23,44 +23,36 @@ limitations under the License.
   *
   * @author dlwh
   */
-object Bessel {
+object Bessel
 
-  object i0 extends UFunc {
-    implicit object ImplInt extends Impl[Int, Double] {
+  object i0 extends UFunc
+    implicit object ImplInt extends Impl[Int, Double]
       def apply(x: Int): Double = ImplDouble(x.toDouble)
-    }
-    implicit object ImplDouble extends Impl[Double, Double] {
+    implicit object ImplDouble extends Impl[Double, Double]
 
-      def apply(x: Double): Double = {
+      def apply(x: Double): Double =
         val ax = x.abs
-        if (ax < 15.0) {
+        if (ax < 15.0)
           val y = x * x
           polyval(i0p, y) / polyval(i0q, 225.0 - y)
-        } else {
+        else
           val z = 1.0 - 15.0 / ax
           exp(ax) * polyval(i0pp, z) / (polyval(i0qq, z) * sqrt(ax))
-        }
-      }
-    }
-  }
 
-  object i1 extends UFunc {
-    def apply(x: Double): Double = {
+  object i1 extends UFunc
+    def apply(x: Double): Double =
       var y: Double = Double.NaN
       var z = x.abs
 
-      if (z <= 8.0) {
+      if (z <= 8.0)
         y = (z / 2.0) - 2.0
         z = chbevl(y, A_i1, 29) * z * math.exp(z)
-      } else {
+      else
         z = math.exp(z) * chbevl(32.0 / z - 2.0, B_i1, 25) / math.sqrt(z)
-      }
       if (x < 0.0) z = -z
       z
-    }
-  }
 
-  private def chbevl(x: Double, coef: Array[Double], N: Int) = {
+  private def chbevl(x: Double, coef: Array[Double], N: Int) =
     var b0 = 0.0
     var b1 = 0.0
     var b2 = 0.0
@@ -73,16 +65,15 @@ object Bessel {
     b1 = 0.0
     i = N - 1
 
-    do {
+    do
       b2 = b1
       b1 = b0
       b0 = x * b1 - b2 + coef(p)
       p += 1
       i -= 1
-    } while (i > 0)
+    while (i > 0)
 
     (0.5 * (b0 - b2))
-  }
 
   private val i0p = Array(9.999999999999997e-1,
                           2.466405579426905e-1,
@@ -174,4 +165,3 @@ object Bessel {
       -9.76109749136146840777E-3,
       7.78576235018280120474E-1
   )
-}

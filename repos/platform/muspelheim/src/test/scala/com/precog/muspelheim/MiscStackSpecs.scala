@@ -24,14 +24,14 @@ import com.precog.yggdrasil._
 
 import java.util.regex.Pattern
 
-trait MiscStackSpecs extends EvalStackSpecs {
+trait MiscStackSpecs extends EvalStackSpecs
   import stack._
 
   implicit def add_~=(d: Double) = new AlmostEqual(d)
   implicit val precision = Precision(0.000000001)
 
-  "the full stack" should {
-    "accept if-then-else inside user defined function" in {
+  "the full stack" should
+    "accept if-then-else inside user defined function" in
       val input =
         """
         | clicks := //clicks
@@ -53,15 +53,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
                          SString("page-3"),
                          SString("page-4"))
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(arr)) =>
           ids must haveSize(1)
           arr.head must beOneOf(pageIds: _*)
         case _ => ko
-      }
-    }
 
-    "return count of empty set as 0 in body of solve" in {
+    "return count of empty set as 0 in body of solve" in
       val input = """
         | data := new {a: "down", b: 13}
         |
@@ -73,14 +71,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
       result must haveSize(1)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(1)
           d mustEqual (0)
-      }
-    }
 
-    "return count of empty set as 0 in body of solve (2)" in {
+    "return count of empty set as 0 in body of solve (2)" in
       val input = """
         | data := new {a: "down", b: 13}
         |
@@ -89,9 +85,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       """.stripMargin
 
       evalE(input) must beEmpty
-    }
 
-    "join arrays after a relate" in {
+    "join arrays after a relate" in
       val input =
         """
         medals' := //summer_games/london_medals
@@ -114,16 +109,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must not(beEmpty)
       result must haveSize(result2.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(elems)) =>
           ids must haveSize(2)
 
           elems must haveSize(2)
           elems(0) mustEqual elems(1)
-      }
-    }
 
-    "join arrays with a nested operate, after a relate" in {
+    "join arrays with a nested operate, after a relate" in
       val input =
         """
         medals' := //summer_games/london_medals
@@ -146,16 +139,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must not(beEmpty)
       result must haveSize(result2.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(elems)) =>
           ids must haveSize(2)
 
           elems must haveSize(2)
           elems(0) mustEqual elems(1)
-      }
-    }
 
-    "ensure that we can call to `new` multiple times in a function and get fresh ids" in {
+    "ensure that we can call to `new` multiple times in a function and get fresh ids" in
       val input = """
         | f(x) := new x
         |
@@ -170,14 +161,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result.size mustEqual (1)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(2)
           d mustEqual (11)
-      }
-    }
 
-    "ensure that we can join after a join with the RHS" in {
+    "ensure that we can join after a join with the RHS" in
       val input = """
         | medals := //summer_games/london_medals
         | five := new 5 
@@ -197,14 +186,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result.size mustEqual (result2.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(elems)) =>
           ids must haveSize(2)
 
           elems.keys mustEqual (Set("weight", "increasedWeight"))
 
         case _ => ko
-      }
 
       val weights =
         result collect { case (_, SObject(elems)) => elems("weight") }
@@ -217,9 +205,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       weights mustEqual (expectedWeights)
       weightsPlus mustEqual (expectedWeightsPlus)
-    }
 
-    "ensure that we can join after a join with the LHS" in {
+    "ensure that we can join after a join with the LHS" in
       val input = """
         | medals := //summer_games/london_medals
         | five := new 5 
@@ -239,18 +226,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result.size mustEqual (result2.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(elems)) =>
           ids must haveSize(2)
 
           elems.keys mustEqual (Set("five", "increasedWeight"))
-      }
 
       val fives =
-        result collect {
+        result collect
           case (_, SObject(elems)) =>
             (elems("five"): @unchecked) match { case SDecimal(d) => d }
-        }
       val weights = result2 collect { case (_, w) => w }
 
       val weightsPlus =
@@ -260,9 +245,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       fives must contain(BigDecimal(5)).only
       weightsPlus mustEqual (expectedWeightsPlus)
-    }
 
-    "ensure that two array elements are not switched in a solve" in {
+    "ensure that two array elements are not switched in a solve" in
       val input =
         """
         | orders := //orders
@@ -278,23 +262,19 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val result = evalE(input)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(elems)) =>
           ids must haveSize(1)
 
           elems must haveSize(2)
 
-          elems(0) must beLike {
+          elems(0) must beLike
             case SDecimal(d0) =>
-              elems(1) must beLike {
+              elems(1) must beLike
                 case SDecimal(d1) =>
                   d0 must be_<(d1)
-              }
-          }
-      }
-    }
 
-    "ensure that more than two array elements are not scrambled in a solve" in {
+    "ensure that more than two array elements are not scrambled in a solve" in
       val input =
         """
         | orders := //orders
@@ -307,7 +287,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val result = evalE(input)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(elems)) =>
           ids must haveSize(1)
 
@@ -318,10 +298,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
           decimals(0) must be < (decimals(1))
           decimals(0) mustEqual decimals(2)
           decimals(1) mustEqual decimals(3)
-      }
-    }
 
-    "ensure that with operation uses inner-join semantics" in {
+    "ensure that with operation uses inner-join semantics" in
       val input = """
         | clicks := //clicks
         | a := {dummy: if clicks.time < 1329326691939 then 1 else 0}
@@ -330,12 +308,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val result = evalE(input)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(fields)) => fields must haveKey("a")
-      }
-    }
 
-    "filter set based on DateTime comparison using minTimeOf" in {
+    "filter set based on DateTime comparison using minTimeOf" in
       val input =
         """
         | clicks := //clicks
@@ -350,14 +326,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result collect
           case (ids, SString(str)) if ids.length == 1 => str
-        }
 
       actual mustEqual Set("2012-02-09T00:31:13.610-09:00")
-    }
 
-    "filter set based on DateTime comparison using reduction" in {
+    "filter set based on DateTime comparison using reduction" in
       val input =
         """
         | clicks := //clicks
@@ -372,14 +346,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result collect
           case (ids, SString(str)) if ids.length == 1 => str
-        }
 
       actual mustEqual Set("2012-02-09T00:31:13.610-09:00")
-    }
 
-    "return a DateTime to the user as an ISO8601 String" in {
+    "return a DateTime to the user as an ISO8601 String" in
       val input = """
         | clicks := //clicks
         | std::time::parseDateTimeFuzzy(clicks.timeString)
@@ -396,19 +368,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result.size mustEqual expectedResult.size
 
       val actual =
-        result collect {
+        result collect
           case (ids, SString(str)) if ids.length == 1 => str
-        }
 
       val expected =
-        expectedResult collect {
+        expectedResult collect
           case (ids, SString(str)) if ids.length == 1 => str
-        }
 
       actual mustEqual expected
-    }
 
-    "return a range of DateTime" in {
+    "return a range of DateTime" in
       val input = """
         | clicks := //clicks
         |
@@ -438,19 +407,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result.size mustEqual expectedResult.size
 
       val actual =
-        result collect {
+        result collect
           case (ids, SArray(arr)) if ids.length == 1 => arr
-        }
 
       val expected =
-        expectedResult collect {
+        expectedResult collect
           case (ids, SArray(arr)) if ids.length == 1 => arr
-        }
 
       actual mustEqual expected
-    }
 
-    "reduce sets" in {
+    "reduce sets" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -462,15 +428,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result collect
           case (ids, SDecimal(num)) if ids.length == 0 =>
             num.toDouble ~= 174257.3421888046
-        }
 
       actual must contain(true).only
-    }
 
-    "recognize the datetime parse function" in {
+    "recognize the datetime parse function" in
       val input =
         """
         | std::time::parseDateTime("2011-02-21 01:09:59", "yyyy-MM-dd HH:mm:ss")
@@ -481,14 +445,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(1)
 
       val actual =
-        result collect {
+        result collect
           case (ids, SString(time)) if ids.length == 0 => time
-        }
 
       actual mustEqual Set("2011-02-21T01:09:59.000Z")
-    }
 
-    "recognize and respect isNumber" in {
+    "recognize and respect isNumber" in
       val input1 = """
         | london := //summer_games/london_medals
         | u := london.Weight union london.Country
@@ -498,9 +460,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result1 = evalE(input1)
 
       val actual =
-        result1 collect {
+        result1 collect
           case (ids, value) if ids.length == 1 => value
-        }
 
       val input2 = """
         | london := //summer_games/london_medals
@@ -510,14 +471,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result2 = evalE(input2)
 
       val expected =
-        result2 collect {
+        result2 collect
           case (ids, SDecimal(d)) if ids.length == 1 => SDecimal(d)
-        }
 
       actual mustEqual expected
-    }
 
-    "timelib functions should accept ISO8601 with a space instead of a T" in {
+    "timelib functions should accept ISO8601 with a space instead of a T" in
       val input = """
         | std::time::year("2011-02-21 01:09:59")
       """.stripMargin
@@ -525,14 +484,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
 
       val actual =
-        result collect {
+        result collect
           case (ids, SDecimal(year)) if ids.length == 0 => year
-        }
 
       actual mustEqual Set(2011)
-    }
 
-    "return the left side of a true if/else operation" in {
+    "return the left side of a true if/else operation" in
       val input1 = """
         | if true then //clicks else //campaigns
       """.stripMargin
@@ -546,9 +503,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result2 = evalE(input2)
 
       result1 mustEqual result2
-    }
 
-    "return the right side of a false if/else operation" in {
+    "return the right side of a false if/else operation" in
       val input1 = """
         | if false then //clicks else //campaigns
       """.stripMargin
@@ -562,9 +518,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result2 = evalE(input2)
 
       result1 mustEqual result2
-    }
 
-    "accept division inside an object" in {
+    "accept division inside an object" in
       val input =
         """
         | data := //conversions
@@ -581,37 +536,31 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
           obj.keys mustEqual (Set("min", "max"))
-          obj("min") must beLike {
+          obj("min") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 862.7464285714286) must beTrue
-          }
-          obj("max") must beLike {
+          obj("max") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 941.0645161290323) must beTrue
-          }
-      }
-    }
 
-    "accept division of two BigDecimals" in {
+    "accept division of two BigDecimals" in
       val input = "92233720368547758073 / 12223372036854775807"
 
       val result = evalE(input)
 
       result must haveSize(1)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(num)) =>
           ids must haveSize(0)
           (num.toDouble ~= 7.54568543692) mustEqual true
-      }
-    }
 
-    "call the same function multiple times with different input" in {
+    "call the same function multiple times with different input" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -628,7 +577,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveSize(1)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SArray(Vector(SObject(map1), SObject(map2)))) =>
           ids must haveSize(0)
 
@@ -641,10 +590,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
           map2("min") mustEqual SDecimal(140)
           map2("max") mustEqual SDecimal(208)
           map2("sum") mustEqual SDecimal(175202)
-      }
-    }
 
-    "perform various reductions on transspecable sets" in {
+    "perform various reductions on transspecable sets" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -662,7 +609,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       result must haveSize(1)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
@@ -673,29 +620,21 @@ trait MiscStackSpecs extends EvalStackSpecs {
           obj must haveKey("count")
           obj must haveKey("minmax")
 
-          obj("sum") must beLike {
+          obj("sum") must beLike
             case SDecimal(num) => (num.toDouble ~= 4965) must beTrue
-          }
-          obj("max") must beLike {
+          obj("max") must beLike
             case SDecimal(num) => (num.toDouble ~= 208) must beTrue
-          }
-          obj("min") must beLike {
+          obj("min") must beLike
             case SDecimal(num) => (num.toDouble ~= 39) must beTrue
-          }
-          obj("stdDev") must beLike {
+          obj("stdDev") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 0.9076874907113496) must beTrue
-          }
-          obj("count") must beLike {
+          obj("count") must beLike
             case SDecimal(num) => (num.toDouble ~= 1019) must beTrue
-          }
-          obj("minmax") must beLike {
+          obj("minmax") must beLike
             case SDecimal(num) => (num.toDouble ~= 208) must beTrue
-          }
-      }
-    }
 
-    "solve on a union with a `with` clause" in {
+    "solve on a union with a `with` clause" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -712,16 +651,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(2)
 
       val results2 =
-        result collect {
+        result collect
           case (ids, obj) if ids.length == 1 => obj
-        }
 
       results2 mustEqual
       (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
            SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
-    }
 
-    "solve with a generic where inside a function" in {
+    "solve with a generic where inside a function" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -740,16 +677,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
       result must haveSize(2)
 
       val results2 =
-        result collect {
+        result collect
           case (ids, obj) if ids.length == 1 => obj
-        }
 
       results2 mustEqual
       (Set(SObject(Map("num" -> SDecimal(1018), "winner" -> SString("YES"))),
            SObject(Map("num" -> SDecimal(1), "winner" -> SString("YEs")))))
-    }
 
-    "solve the results of a set and a stdlib op1 function" in {
+    "solve the results of a set and a stdlib op1 function" in
       val input =
         """
         | clicks := //clicks
@@ -759,9 +694,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val result = evalE(input)
       result must not(beEmpty) // TODO
-    }
 
-    "solve involving extras with a stdlib op1 function" in {
+    "solve involving extras with a stdlib op1 function" in
       val input =
         """
         | import std::time::*
@@ -777,9 +711,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val results = evalE(input)
       results must not(beEmpty) // TODO
-    }
 
-    "perform a simple join by value sorting" in {
+    "perform a simple join by value sorting" in
       val input =
         """
         | clicks := //clicks
@@ -794,9 +727,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(473)
 
       val results =
-        resultsE collect {
+        resultsE collect
           case (ids, str) if ids.length == 2 => str
-        }
 
       results must contain(SString("page-2page-2"))
       results must contain(SString("page-2page-1"))
@@ -823,9 +755,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must contain(SString("page-2page-3"))
       results must contain(SString("page-2page-4"))
       results must contain(SString("page-2page-0"))
-    }
 
-    "union sets coming out of a solve" >> {
+    "union sets coming out of a solve" >>
       val input =
         """
         clicks := //clicks
@@ -838,23 +769,21 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(26)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj must haveSize(2)
           obj must haveKey("userId") or haveKey("pageId")
           obj must haveKey("size")
-      }
 
       val containsUserId =
-        results collect {
+        results collect
           case (_, SObject(obj)) if obj contains "userId" => obj
-        }
 
       containsUserId must haveSize(21)
-      containsUserId collect {
+      containsUserId collect
         case obj => obj("userId")
-      } mustEqual Set(SString("user-1000"),
+      mustEqual Set(SString("user-1000"),
                       SString("user-1001"),
                       SString("user-1002"),
                       SString("user-1003"),
@@ -877,21 +806,19 @@ trait MiscStackSpecs extends EvalStackSpecs {
                       SString("user-1020"))
 
       val containsPageId =
-        results collect {
+        results collect
           case (_, SObject(obj)) if obj contains "pageId" => obj
-        }
 
       containsPageId must haveSize(5)
-      containsPageId collect {
+      containsPageId collect
         case obj => obj("pageId")
-      } mustEqual Set(SString("page-0"),
+      mustEqual Set(SString("page-0"),
                       SString("page-1"),
                       SString("page-2"),
                       SString("page-3"),
                       SString("page-4"))
-    }
 
-    "accept a solve involving a tic-var as an actual" in {
+    "accept a solve involving a tic-var as an actual" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -908,14 +835,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
           obj mustEqual (Map("min" -> SDecimal(50), "max" -> SDecimal(2768)))
-      }
-    }
 
-    "accept a solve involving a formal in a where clause" in {
+    "accept a solve involving a formal in a where clause" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -930,15 +855,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
           obj mustEqual (Map("min" -> SDecimal(50), "max" -> SDecimal(2768)))
-      }
-    }
 
     // Regression test for #39652091
-    "call union on two dispatches of the same function" in {
+    "call union on two dispatches of the same function" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -958,18 +881,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(16 + 570)
 
       val maps =
-        results.toSeq collect {
+        results.toSeq collect
           case (ids, SObject(obj)) => obj
-        }
 
       val india = maps filter { _.values forall { _ == SString("India") } }
       india.size mustEqual (16)
 
       val canada = maps filter { _.values forall { _ == SString("Canada") } }
       canada.size mustEqual (570)
-    }
 
-    "return result for nested filters" in {
+    "return result for nested filters" in
       val input =
         """
         | medals := //summer_games/london_medals
@@ -986,15 +907,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(16)
 
       val maps =
-        results.toSeq collect {
+        results.toSeq collect
           case (ids, SObject(obj)) => obj
-        }
 
       val india = maps filter { _.values forall { _ == SString("India") } }
       india.size mustEqual (16)
-    }
 
-    "accept a solve involving formals of formals" in {
+    "accept a solve involving formals of formals" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -1012,14 +931,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
           obj mustEqual (Map("min" -> SDecimal(50), "max" -> SDecimal(2768)))
-      }
-    }
 
-    "correctly assign reductions to the correct field in an object" in {
+    "correctly assign reductions to the correct field in an object" in
       val input = """
         | medals := //summer_games/london_medals
         |
@@ -1034,14 +951,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
           obj mustEqual (Map("min" -> SDecimal(50), "max" -> SDecimal(2768)))
-      }
-    }
 
-    "correctly assign reductions to the correct field in an object with three reductions each on the same set" in {
+    "correctly assign reductions to the correct field in an object with three reductions each on the same set" in
       val input = """
         | medals := //summer_games/london_medals
         |
@@ -1056,26 +971,21 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
           obj.keys mustEqual Set("min", "max", "stdDev")
 
-          obj("min") must beLike {
+          obj("min") must beLike
             case SDecimal(num) => (num.toDouble ~= 50) must beTrue
-          }
-          obj("max") must beLike {
+          obj("max") must beLike
             case SDecimal(num) => (num.toDouble ~= 2768) must beTrue
-          }
-          obj("stdDev") must beLike {
+          obj("stdDev") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 917.6314704474534) must beTrue
-          }
-      }
-    }
 
-    "correctly assign reductions to the correct field in an object with three reductions each on the same set" in {
+    "correctly assign reductions to the correct field in an object with three reductions each on the same set" in
       val input = """
         | medals := //summer_games/london_medals
         |
@@ -1090,26 +1000,21 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
           obj.keys mustEqual Set("min", "max", "stdDev")
 
-          obj("min") must beLike {
+          obj("min") must beLike
             case SDecimal(num) => (num.toDouble ~= 50) must beTrue
-          }
-          obj("max") must beLike {
+          obj("max") must beLike
             case SDecimal(num) => (num.toDouble ~= 2768) must beTrue
-          }
-          obj("stdDev") must beLike {
+          obj("stdDev") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 917.6314704474534) must beTrue
-          }
-      }
-    }
 
-    "accept a solve involving a where as an actual" >> {
+    "accept a solve involving a where as an actual" >>
       val input = """
         | clicks := //clicks
         | f(x) := x
@@ -1124,15 +1029,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(81)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj must haveKey("covariance")
           obj must haveKey("count")
-      }
-    }
 
-    "accept a solve involving relation as an actual" >> {
+    "accept a solve involving relation as an actual" >>
       val input = """
         | clicks := //clicks
         | f(x) := x
@@ -1147,15 +1050,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(81)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj must haveKey("covariance")
           obj must haveKey("count")
-      }
-    }
 
-    "accept covariance inside an object with'd with another object" >> {
+    "accept covariance inside an object with'd with another object" >>
       val input = """
         clicks := //clicks
         counts := solve 'time
@@ -1169,16 +1070,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(81)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(1)
           obj must haveKey("covariance")
           obj must haveKey("count")
-      }
-    }
 
-    "have the correct number of identities and values in a relate" >> {
-      "with the sum plus the LHS" >> {
+    "have the correct number of identities and values in a relate" >>
+      "with the sum plus the LHS" >>
         val input = """
           | //clicks ~ //campaigns
           | sum := (//clicks).time + (//campaigns).cpm
@@ -1188,12 +1087,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(10000)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, _) => ids must haveSize(2)
-        }
-      }
 
-      "with the sum plus the RHS" >> {
+      "with the sum plus the RHS" >>
         val input = """
           | //clicks ~ //campaigns
           | sum := (//clicks).time + (//campaigns).cpm
@@ -1203,13 +1100,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(10000)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, _) => ids must haveSize(2)
-        }
-      }
-    }
 
-    "union two wheres of the same dynamic provenance" >> {
+    "union two wheres of the same dynamic provenance" >>
       val input = """
       | clicks := //clicks
       | clicks' := new clicks
@@ -1222,10 +1116,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = evalE(input)
 
       results must haveSize(200)
-    }
 
-    "use the where operator on a unioned set" >> {
-      "campaigns.gender" >> {
+    "use the where operator on a unioned set" >>
+      "campaigns.gender" >>
         val input = """
           | a := //campaigns union //clicks
           |   a where a.gender = "female" """.stripMargin
@@ -1234,15 +1127,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(46)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(5)
             obj must contain("gender" -> SString("female"))
-        }
-      }
 
-      "clicks.platform" >> {
+      "clicks.platform" >>
         val input = """
           | a := //campaigns union //clicks
           |   a where a.platform = "android" """.stripMargin
@@ -1251,68 +1142,57 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(72)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(5)
             obj must contain("platform" -> SString("android"))
-        }
-      }
-    }
 
-    "basic set difference queries" >> {
-      "clicks difference clicks" >> {
+    "basic set difference queries" >>
+      "clicks difference clicks" >>
         val input = "//clicks difference //clicks"
         val results = evalE(input)
 
         results must haveSize(0)
-      }
-      "clicks.timeString difference clicks.timeString" >> {
+      "clicks.timeString difference clicks.timeString" >>
         val input = "(//clicks).timeString difference (//clicks).timeString"
         val results = evalE(input)
 
         results must haveSize(0)
-      }
-    }
 
-    "basic intersect and union queries" >> {
-      "constant intersection" >> {
+    "basic intersect and union queries" >>
+      "constant intersection" >>
         val input = "4 intersect 4"
         val results = evalE(input)
 
         results must haveSize(1)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(d)) =>
             ids.length must_== 0
             d mustEqual 4
-        }
-      }
-      "constant union" >> {
+      "constant union" >>
         val input = "4 union 5"
         val results = evalE(input)
 
         results must haveSize(2)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(d)) =>
             ids.length must_== 0
             Set(4, 5) must contain(d)
-        }
-      }
-      "empty intersection" >> {
+      "empty intersection" >>
         val input = "4 intersect 5"
         val results = evalE(input)
 
         results must beEmpty
-      }
-      "heterogeneous union" >> {
+      "heterogeneous union" >>
         val input = "{foo: 3} union 9"
         val results = evalE(input)
 
         results must haveSize(2)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(d)) =>
             ids.length must_== 0
             d mustEqual 9
@@ -1320,62 +1200,51 @@ trait MiscStackSpecs extends EvalStackSpecs {
           case (ids, SObject(obj)) =>
             ids.length must_== 0
             obj must contain("foo" -> SDecimal(3))
-        }
-      }
-      "heterogeneous intersection" >> {
+      "heterogeneous intersection" >>
         val input = "obj := {foo: 5} obj.foo intersect 5"
         val results = evalE(input)
 
         results must haveSize(1)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(d)) =>
             ids.length must_== 0
             d mustEqual 5
-        }
-      }
-      "intersection of differently sized arrays" >> {
+      "intersection of differently sized arrays" >>
         val input = "arr := [1,2,3] arr[0] intersect 1"
         val results = evalE(input)
 
         results must haveSize(1)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(d)) =>
             ids.length must_== 0
             d mustEqual 1
-        }
-      }
-      "heterogeneous union doing strange things with identities" >> {
+      "heterogeneous union doing strange things with identities" >>
         val input =
           "{foo: (//clicks).pageId, bar: (//clicks).userId} union //views"
         val results = evalE(input)
 
         results must haveSize(200)
-      }
-      "union with operation against same coproduct" >> {
+      "union with operation against same coproduct" >>
         val input =
           "(//clicks union //views).time + (//clicks union //views).time"
         val results = evalE(input)
 
         results must haveSize(200)
-      }
-      "union with operation on left part of coproduct" >> {
+      "union with operation on left part of coproduct" >>
         val input = "(//clicks union //views).time + (//clicks).time"
         val results = evalE(input)
 
         results must haveSize(100)
-      }
-      "union with operation on right part of coproduct" >> {
+      "union with operation on right part of coproduct" >>
         val input = "(//clicks union //views).time + (//views).time"
         val results = evalE(input)
 
         results must haveSize(100)
-      }
-    }
 
-    "intersect a union" >> {
-      "campaigns.gender" >> {
+    "intersect a union" >>
+      "campaigns.gender" >>
         val input = """
           | campaign := (//campaigns).campaign
           | cpm := (//campaigns).cpm
@@ -1386,7 +1255,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(100)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SString(campaign)) =>
             ids.length must_== 1
             Set("c16",
@@ -1411,10 +1280,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                 "c24",
                 "c22",
                 "c20") must contain(campaign)
-        }
-      }
 
-      "union the same set when two different variables are assigned to it" >> {
+      "union the same set when two different variables are assigned to it" >>
         val input = """
             | a := //clicks
             | b := //clicks
@@ -1423,9 +1290,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         val results = evalE(input)
 
         results must haveSize(100)
-      }
 
-      "clicks.platform" >> {
+      "clicks.platform" >>
         val input = """
           | campaign := (//campaigns).campaign
           | cpm := (//campaigns).cpm
@@ -1436,7 +1302,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         results must haveSize(100)
 
-        results must haveAllElementsLike {
+        results must haveAllElementsLike
           case (ids, SDecimal(num)) =>
             ids.length must_== 1
             Set(100,
@@ -1484,11 +1350,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                 51,
                 89,
                 69) must contain(num)
-        }
-      }
-    }
 
-    "union with an object" >> {
+    "union with an object" >>
       val input = """
         campaigns := //campaigns
         clicks := //clicks
@@ -1498,66 +1361,57 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = evalE(input)
 
       results must haveSize(200)
-    }
 
-    "use the where operator on a key with string values" in {
+    "use the where operator on a key with string values" in
       val input = """//campaigns where (//campaigns).platform = "android" """
       val results = evalE(input)
 
       results must haveSize(72)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids.length must_== 1
           obj must haveSize(5)
           obj must contain("platform" -> SString("android"))
-      }
-    }
 
-    "use the where operator on a key with numeric values" in {
+    "use the where operator on a key with numeric values" in
       val input = "//campaigns where (//campaigns).cpm = 1 "
       val results = evalE(input)
 
       results must haveSize(34)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids.length must_== 1
           obj must haveSize(5)
           obj must contain("cpm" -> SDecimal(1))
-      }
-    }
 
-    "use the where operator on a key with array values" in {
+    "use the where operator on a key with array values" in
       val input = "//campaigns where (//campaigns).ageRange = [37, 48]"
       val results = evalE(input)
 
       results must haveSize(39)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids.length must_== 1
           obj must haveSize(5)
           obj must contain(
               "ageRange" -> SArray(Vector(SDecimal(37), SDecimal(48))))
-      }
-    }
 
-    "evaluate the with operator across the campaigns dataset" in {
+    "evaluate the with operator across the campaigns dataset" in
       val input = "count(//campaigns with { t: 42 })"
       eval(input) mustEqual Set(SDecimal(100))
-    }
 
-    "perform distinct" >> {
-      "on a homogenous set of numbers" >> {
+    "perform distinct" >>
+      "on a homogenous set of numbers" >>
         val input = """
           | a := //campaigns
           |   distinct(a.gender)""".stripMargin
 
         eval(input) mustEqual Set(SString("female"), SString("male"))
-      }
 
-      "on set of strings formed by a union" >> {
+      "on set of strings formed by a union" >>
         val input = """
           | gender := (//campaigns).gender
           | pageId := (//clicks).pageId
@@ -1570,25 +1424,20 @@ trait MiscStackSpecs extends EvalStackSpecs {
                                   SString("page-2"),
                                   SString("page-3"),
                                   SString("page-4"))
-      }
-    }
 
-    "map object creation over the campaigns dataset" in {
+    "map object creation over the campaigns dataset" in
       val input = "{ aa: (//campaigns).campaign }"
       val results = evalE(input)
 
       results must haveSize(100)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(1)
             obj must haveKey("aa")
-          }
-      }
-    }
 
-    "perform a naive cartesian product on the campaigns dataset" in {
+    "perform a naive cartesian product on the campaigns dataset" in
       val input = """
         | a := //campaigns
         | b := new a
@@ -1600,17 +1449,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(10000)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             ids.length must_== 2
             obj must haveSize(2)
             obj must haveKey("aa")
             obj must haveKey("bb")
-          }
-      }
-    }
 
-    "correctly handle cross-match situations" in {
+    "correctly handle cross-match situations" in
       val input = """
         | campaigns := //campaigns
         | clicks := //clicks
@@ -1624,35 +1470,28 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(100 * 100)
 
-      results must haveAllElementsLike {
-        case (ids, SBoolean(b)) => {
+      results must haveAllElementsLike
+        case (ids, SBoolean(b)) =>
             ids must haveSize(2)
             b mustEqual true
-          }
-      }
-    }
 
-    "add sets of different types" >> {
-      "a set of numbers and a set of strings" >> {
+    "add sets of different types" >>
+      "a set of numbers and a set of strings" >>
         val input = "(//campaigns).cpm + (//campaigns).gender"
 
         eval(input) mustEqual Set()
-      }
 
-      "a set of numbers and a set of arrays" >> {
+      "a set of numbers and a set of arrays" >>
         val input = "(//campaigns).cpm + (//campaigns).ageRange"
 
         eval(input) mustEqual Set()
-      }
 
-      "a set of arrays and a set of strings" >> {
+      "a set of arrays and a set of strings" >>
         val input = "(//campaigns).gender + (//campaigns).ageRange"
 
         eval(input) mustEqual Set()
-      }
-    }
 
-    "return all possible value results from an underconstrained solve" in {
+    "return all possible value results from an underconstrained solve" in
       val input = """
         | campaigns := //campaigns
         | solve 'a 
@@ -1662,14 +1501,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(100)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SString(gender)) =>
           ids.length must_== 1
           gender must beOneOf("male", "female")
-      }
-    }
 
-    "determine a histogram of genders on campaigns" in {
+    "determine a histogram of genders on campaigns" in
       val input =
         """
         | campaigns := //campaigns
@@ -1679,9 +1516,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       eval(input) mustEqual Set(
           SObject(Map("gender" -> SString("female"), "num" -> SDecimal(46))),
           SObject(Map("gender" -> SString("male"), "num" -> SDecimal(54))))
-    }
 
-    "determine a histogram of STATE on (tweets union tweets)" in {
+    "determine a histogram of STATE on (tweets union tweets)" in
       val input = """
         | tweets := //election/tweets 
         | 
@@ -1700,9 +1536,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(52)
 
       val results =
-        resultsE collect {
+        resultsE collect
           case (ids, sv) if ids.length == 1 => sv
-        }
 
       results must contain(SObject(Map("count" -> SDecimal(BigDecimal("319")),
                                        "state" -> SString("01"))))
@@ -1808,9 +1643,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                                        "state" -> SString("56"))))
       results must contain(SObject(Map("count" -> SDecimal(BigDecimal("153")),
                                        "state" -> SString("72"))))
-    }
 
-    "evaluate nathan's query, once and for all" in {
+    "evaluate nathan's query, once and for all" in
       val input =
         """
         | import std::time::*
@@ -1834,16 +1668,14 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(beEmpty)
-    }
 
-    "load a nonexistent dataset with a dot in the name" in {
+    "load a nonexistent dataset with a dot in the name" in
       val input = """
         | (//foo).bar""".stripMargin
 
       eval(input) mustEqual Set()
-    }
 
-    "deref an array with a where" in {
+    "deref an array with a where" in
       val input = """
         | a := [3,4,5]
         | a where a[0] = 1""".stripMargin
@@ -1851,9 +1683,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = eval(input)
 
       results must haveSize(0)
-    }
 
-    "deref an object with a where" in {
+    "deref an object with a where" in
       val input = """
         | a := {foo: 5}
         | a where a.foo = 1""".stripMargin
@@ -1861,9 +1692,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = eval(input)
 
       results must haveSize(0)
-    }
 
-    "evaluate reductions on filters" in {
+    "evaluate reductions on filters" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -1877,7 +1707,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val results = evalE(input)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(obj)) =>
           ids must haveSize(0)
 
@@ -1886,24 +1716,18 @@ trait MiscStackSpecs extends EvalStackSpecs {
           obj must haveKey("max")
           obj must haveKey("stdDev")
 
-          obj("sum") must beLike {
+          obj("sum") must beLike
             case SDecimal(num) => (num.toDouble ~= 1590) must beTrue
-          }
-          obj("mean") must beLike {
+          obj("mean") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 26.371933267909714) must beTrue
-          }
-          obj("max") must beLike {
+          obj("max") must beLike
             case SDecimal(num) => (num.toDouble ~= 2.5) must beTrue
-          }
-          obj("stdDev") must beLike {
+          obj("stdDev") must beLike
             case SDecimal(num) =>
               (num.toDouble ~= 0.36790736209203007) must beTrue
-          }
-      }
-    }
 
-    "evaluate single reduction on a filter" in {
+    "evaluate single reduction on a filter" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -1914,14 +1738,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SDecimal(num)) =>
           ids must haveSize(0)
           num mustEqual (2.5)
-      }
-    }
 
-    "evaluate single reduction on a object deref" in {
+    "evaluate single reduction on a object deref" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -1932,24 +1754,21 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SDecimal(num)) =>
           ids must haveSize(0)
           num mustEqual (2.5)
-      }
-    }
 
-    "evaluate functions from each library" >> {
-      "Stringlib" >> {
+    "evaluate functions from each library" >>
+      "Stringlib" >>
         val input = """
           | gender := distinct((//campaigns).gender)
           | std::string::concat("alpha ", gender)""".stripMargin
 
         eval(input) mustEqual Set(SString("alpha female"),
                                   SString("alpha male"))
-      }
 
-      "Mathlib" >> {
+      "Mathlib" >>
         val input = """
           | cpm := distinct((//campaigns).cpm)
           | selectCpm := cpm where cpm < 10
@@ -1960,9 +1779,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                                   SDecimal(36),
                                   SDecimal(81),
                                   SDecimal(16))
-      }
 
-      "Timelib" >> {
+      "Timelib" >>
         val input =
           """
           | time := (//clicks).timeString
@@ -1970,35 +1788,31 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         val results = evalE(input)
         val results2 =
-          results map {
+          results map
             case (ids, SDecimal(d)) =>
               ids.length must_== 1
               d.toInt
-          }
 
         results2 must contain(0).only
-      }
 
-      "Statslib" >> {
+      "Statslib" >>
         //note: there are no identities because these functions involve reductions
-        "Correlation" >> {
+        "Correlation" >>
           val input = """
             | cpm := (//campaigns).cpm
             | std::stats::corr(cpm, 10)""".stripMargin
 
           val results = evalE(input)
           val results2 =
-            results map {
+            results map
               case (ids, SDecimal(d)) =>
                 ids.length must_== 0
                 d.toDouble
-            }
 
           results2 must haveSize(0)
-        }
 
         // From bug #38535135
-        "Correlation on solve results" >> {
+        "Correlation on solve results" >>
           val input = """
             data := //summer_games/london_medals 
             byCountry := solve 'Country
@@ -2012,9 +1826,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
           val results = evalE(input)
           results must haveSize(1)
-        }
 
-        "Covariance" >> {
+        "Covariance" >>
           val input = """
             | cpm := (//campaigns).cpm
             | std::stats::cov(cpm, 10)""".stripMargin
@@ -2023,15 +1836,13 @@ trait MiscStackSpecs extends EvalStackSpecs {
           results must haveSize(1)
 
           val results2 =
-            results map {
+            results map
               case (ids, SDecimal(d)) =>
                 ids.length must_== 0
                 d.toDouble
-            }
           results2 must contain(0)
-        }
 
-        "Linear Regression" >> {
+        "Linear Regression" >>
           val input = """
             | cpm := (//campaigns).cpm
             | std::stats::linReg(cpm, 10)""".stripMargin
@@ -2040,42 +1851,34 @@ trait MiscStackSpecs extends EvalStackSpecs {
           results must haveSize(1)
 
           val results2 =
-            results map {
+            results map
               case (ids, SObject(fields)) =>
                 ids.length must_== 0
                 fields
-            }
           results2 must contain(
               Map("slope" -> SDecimal(0), "intercept" -> SDecimal(10)))
-        }
-      }
-    }
 
-    "set critical conditions given an empty set" in {
+    "set critical conditions given an empty set" in
       val input = """
         | solve 'a
         |   //campaigns where (//campaigns).foo = 'a""".stripMargin
 
       val results = evalE(input)
       results must beEmpty
-    }
 
-    "use NotEq correctly" in {
+    "use NotEq correctly" in
       val input =
         """//campaigns where (//campaigns).gender != "female" """.stripMargin
 
       val results = evalE(input)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(5)
             obj must contain("gender" -> SString("male"))
-          }
-      }
-    }
 
-    "evaluate a solve constrained by inclusion" in {
+    "evaluate a solve constrained by inclusion" in
       val input = """
         | clicks := //clicks
         | views := //views
@@ -2089,18 +1892,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must haveSize(5)
 
       val stripped =
-        results collect {
+        results collect
           case (ids, SDecimal(d)) if ids.length == 1 => d
-        }
 
       stripped must contain(12)
       stripped must contain(15)
       stripped must contain(19)
       stripped must contain(27)
-    }
 
-    "evaluate sliding window in a" >> {
-      "solve expression" >> {
+    "evaluate sliding window in a" >>
+      "solve expression" >>
         val input = """
           | campaigns := //campaigns
           | nums := distinct(campaigns.cpm where campaigns.cpm < 10)
@@ -2112,10 +1913,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                                   SDecimal(11),
                                   SDecimal(9),
                                   SDecimal(5))
-      }
-    }
 
-    "evaluate a function of two parameters" in {
+    "evaluate a function of two parameters" in
       val input =
         """
         | fun(a, b) := 
@@ -2125,18 +1924,15 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = evalE(input)
       results must haveSize(14)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             ids.length must_== 1
             obj must haveSize(5)
             obj must contain(
                 "ageRange" -> SArray(Vector(SDecimal(25), SDecimal(36))))
             obj must contain("gender" -> SString("female"))
-          }
-      }
-    }
 
-    "evaluate a solve of two parameters" in {
+    "evaluate a solve of two parameters" in
       val input = """
         | campaigns := //campaigns
         | gender := campaigns.gender
@@ -2147,9 +1943,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         |   campaigns where g = p""".stripMargin
 
       eval(input) mustEqual Set()
-    }
 
-    "determine a histogram of a composite key of revenue and campaign" in {
+    "determine a histogram of a composite key of revenue and campaign" in
       val input =
         """
         | campaigns := //campaigns
@@ -2163,9 +1958,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(63)
 
       val results =
-        resultsE collect {
+        resultsE collect
           case (ids, obj) if ids.length == 1 => obj
-        }
 
       results must contain(SObject(Map("revenue" -> SString("<500K"),
                                        "num" -> SDecimal(BigDecimal("4")))))
@@ -2235,9 +2029,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
                                        "num" -> SDecimal(BigDecimal("1")))))
       results must contain(SObject(Map("revenue" -> SString("500K-5M"),
                                        "num" -> SDecimal(BigDecimal("7")))))
-    }
 
-    "evaluate a function of multiple counts" in {
+    "evaluate a function of multiple counts" in
       val input =
         """
         | import std::math::floor
@@ -2287,9 +2080,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       results must contain(
           SObject(Map("timeZone" -> SString("-05:00"),
                       "ratio" -> SDecimal(BigDecimal("50.0")))))
-    }
 
-    "evaluate reductions inside and outside of solves" in {
+    "evaluate reductions inside and outside of solves" in
       val input =
         """
         | clicks := //clicks
@@ -2306,9 +2098,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val resultsE = evalE(input)
 
       resultsE must not beEmpty
-    }
 
-    "determine click times around each click" in {
+    "determine click times around each click" in
       val input = """
         | clicks := //clicks
         | 
@@ -2718,9 +2509,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
           SObject(Map("above" -> SDecimal(BigDecimal("1329643873609")),
                       "below" -> SDecimal(BigDecimal("1329589296943")),
                       "time" -> SDecimal(BigDecimal("1329629900716")))))
-    }
 
-    "determine most isolated clicks in time" in {
+    "determine most isolated clicks in time" in
       val input =
         """
         | clicks := //clicks
@@ -2746,9 +2536,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       resultsE must haveSize(20)
 
       val results =
-        resultsE collect {
+        resultsE collect
           case (ids, sv) if ids.length == 1 => sv
-        }
 
       results must contain(
           SObject(Map("time" -> SDecimal(BigDecimal("1329275667592")),
@@ -2870,10 +2659,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
                       "timeString" -> SString("2012-02-18T22:38:20.716-07:00"),
                       "pageId" -> SString("page-0"),
                       "userId" -> SString("user-1014"))))
-    }
 
     // Regression test for #39590007
-    "give empty results when relation body uses non-existant field" in {
+    "give empty results when relation body uses non-existant field" in
       val input =
         """
         | clicks := //clicks
@@ -2883,9 +2671,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         |   {timeString: clicks.timeString, nonexistant: clicks.nonexistant}""".stripMargin
 
       eval(input) must beEmpty
-    }
 
-    "not explode on a large query" in {
+    "not explode on a large query" in
       val input =
         """
         | import std::stats::*
@@ -2928,9 +2715,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(throwAn[Exception])
-    }
 
-    "solve on a constraint clause defined by an object with two non-const fields" in {
+    "solve on a constraint clause defined by an object with two non-const fields" in
       val input = """
         | clicks := //clicks
         | data := { user: clicks.user, page: clicks.page }
@@ -2940,9 +2726,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
 
-    "solve a chaining of user-defined functions involving repeated where clauses" in {
+    "solve a chaining of user-defined functions involving repeated where clauses" in
       val input =
         """
         | import std::time::*
@@ -2971,9 +2756,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
 
-    "evaluate a trivial inclusion filter" in {
+    "evaluate a trivial inclusion filter" in
       val input = """
         | t1 := //clicks
         | t2 := //views
@@ -2983,9 +2767,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(beEmpty)
-    }
 
-    "handle a non-trivial solve on an object concat" in {
+    "handle a non-trivial solve on an object concat" in
       val input =
         """
         | agents := //se/widget
@@ -2995,9 +2778,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
 
-    "handle array creation with constant dispatch" in {
+    "handle array creation with constant dispatch" in
       val input = """
         | a := 31
         |
@@ -3007,9 +2789,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
 
-    "handle object creation with constant dispatch" in {
+    "handle object creation with constant dispatch" in
       val input = """
         | a := 31
         |
@@ -3019,9 +2800,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(throwAn[Exception])
-    }
 
-    "return the non-empty set for a trivial cartesian" in {
+    "return the non-empty set for a trivial cartesian" in
       val input = """
         | jobs := //clicks
         | titles' := new "foo"
@@ -3031,9 +2811,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must not(beEmpty)
-    }
 
-    "produce a non-doubled result when counting the union of new sets" in {
+    "produce a non-doubled result when counting the union of new sets" in
       val input = """
         | clicks := //clicks
         | clicks' := new clicks
@@ -3042,9 +2821,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must contain(SDecimal(100))
-    }
 
-    "produce a non-doubled result when counting the union of new sets and a single set" in {
+    "produce a non-doubled result when counting the union of new sets and a single set" in
       val input = """
         | clicks := //clicks
         | clicks' := new clicks
@@ -3053,25 +2831,22 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must contain(SArray(Vector(SDecimal(100), SDecimal(100))))
-    }
 
-    "parse numbers correctly" in {
+    "parse numbers correctly" in
       val input = """
         | std::string::parseNum("123")
         | """.stripMargin
 
       evalE(input) mustEqual (Set((Vector(), SDecimal(BigDecimal("123")))))
-    }
 
-    "toString numbers correctly" in {
+    "toString numbers correctly" in
       val input = """
         | std::string::numToString(123)
         | """.stripMargin
 
       evalE(input) mustEqual (Set((Vector(), SString("123"))))
-    }
 
-    "correctly evaluate tautology on a filtered set" in {
+    "correctly evaluate tautology on a filtered set" in
       val input = """
         | medals := //summer_games/london_medals
         | 
@@ -3082,9 +2857,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = eval(input)
       results must contain(SBoolean(true))
       results must not(contain(SBoolean(false)))
-    }
 
-    "produce a non-empty set for a dereferenced join-optimized cartesian" in {
+    "produce a non-empty set for a dereferenced join-optimized cartesian" in
       val size = """
         | clicks := //clicks
         | counts := solve 'pageId 
@@ -3105,17 +2879,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       totalResult must haveSize(1)
 
-      val total = totalResult.collectFirst {
+      val total = totalResult.collectFirst
         case (_, SDecimal(d)) => d
-      }.get
+      .get
 
       val result = evalE(input)
 
       result must not(beEmpty)
       result must haveSize(total.toInt)
-    }
 
-    "produce a non-empty set for a ternary join-optimized cartesian" in {
+    "produce a non-empty set for a ternary join-optimized cartesian" in
       val size = """
         | clicks := //clicks
         | counts := solve 'pageId 
@@ -3136,17 +2909,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       totalResult must haveSize(1)
 
-      val total = totalResult.collectFirst {
+      val total = totalResult.collectFirst
         case (_, SDecimal(d)) => d
-      }.get
+      .get
 
       val result = evalE(input)
 
       result must not(beEmpty)
       result must haveSize(total.toInt)
-    }
 
-    "not produce out-of-order identities for simple cartesian and join with a reduction" in {
+    "not produce out-of-order identities for simple cartesian and join with a reduction" in
       val input =
         """
         athletes := load("/summer_games/athletes")
@@ -3159,19 +2931,17 @@ trait MiscStackSpecs extends EvalStackSpecs {
         """
 
       eval(input) must not(throwA[Exception])
-    }
 
-    "support both max and maxOf for deprecation cycle" >> {
-      "fqn" >> {
+    "support both max and maxOf for deprecation cycle" >>
+      "fqn" >>
         val input = """
           | [std::math::max(1, 2), std::math::maxOf(1, 2)]
           | """.stripMargin
 
         val results = eval(input)
         results must contain(SArray(Vector(SDecimal(2), SDecimal(2))))
-      }
 
-      "non-fqn" >> {
+      "non-fqn" >>
         val input = """
           | import std::math::*
           | [max(1, 2), maxOf(1, 2)]
@@ -3179,20 +2949,17 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         val results = eval(input)
         results must contain(SArray(Vector(SDecimal(2), SDecimal(2))))
-      }
-    }
 
-    "support both min and minOf for deprecation cycle" >> {
-      "fqn" >> {
+    "support both min and minOf for deprecation cycle" >>
+      "fqn" >>
         val input = """
           | [std::math::min(1, 2), std::math::minOf(1, 2)]
           | """.stripMargin
 
         val results = eval(input)
         results must contain(SArray(Vector(SDecimal(1), SDecimal(1))))
-      }
 
-      "non-fqn" >> {
+      "non-fqn" >>
         val input = """
           | import std::math::*
           | [min(1, 2), minOf(1, 2)]
@@ -3200,10 +2967,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
         val results = eval(input)
         results must contain(SArray(Vector(SDecimal(1), SDecimal(1))))
-      }
-    }
 
-    "concatenate object projections on medals with inner-join semantics" in {
+    "concatenate object projections on medals with inner-join semantics" in
       val input = """
         | medals := //summer_games/london_medals
         | { height: medals.HeightIncm, weight: medals.Weight }
@@ -3212,14 +2977,12 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val results = eval(input)
       results must not(beEmpty)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case SObject(fields) =>
           fields must haveKey("height")
           fields must haveKey("weight")
-      }
-    }
 
-    "work when tic-variable and reduction results are inlined" in {
+    "work when tic-variable and reduction results are inlined" in
       val input = """
         | clicks := //clicks
         | solve 'c
@@ -3228,11 +2991,10 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val results = eval(input)
       results must haveSize(100)
-    }
 
     // TODO: regression test for PLATFORM-951
 
-    "use string function on date columns" in {
+    "use string function on date columns" in
       val input = """
         | import std::string::*
         | indexOf((//clicks).timeString, "-")
@@ -3240,9 +3002,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
       val results = eval(input)
       results must_== Set(SDecimal(4))
-    }
 
-    "correctly filter the results of a non-trivial solve" in {
+    "correctly filter the results of a non-trivial solve" in
       val input =
         """
         | import std::time::*
@@ -3297,9 +3058,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(beEmpty)
-    }
 
-    "successfully complete a query with a lot of unions" in {
+    "successfully complete a query with a lot of unions" in
       val input =
         """
         | import std::time::*
@@ -3362,10 +3122,9 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(beEmpty)
-    }
 
     // regression test for PLATFORM-986
-    "not explode on mysterious error" in {
+    "not explode on mysterious error" in
       val input =
         """
         | import std::random::*
@@ -3393,7 +3152,6 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(throwA[Throwable])
-    }
 
     // commented out because SLOW
     // please uncomment when FAST
@@ -3464,7 +3222,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
     //  eval(input) must not(throwA[Throwable])
     //}
 
-    "produce something other than the empty set for join of conditional results" in {
+    "produce something other than the empty set for join of conditional results" in
       val input =
         """
         | clicks := //clicks
@@ -3476,9 +3234,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(beEmpty)
-    }
 
-    "produce non-empty results when defining a solve with a conditional in a constraint" in {
+    "produce non-empty results when defining a solve with a conditional in a constraint" in
       val input =
         """
         | data := //clicks
@@ -3495,9 +3252,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(beEmpty)
-    }
 
-    "not explode on multiply-used solve" in {
+    "not explode on multiply-used solve" in
       val input = """
         | travlex := //clicks
         | 
@@ -3509,9 +3265,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       eval(input) must not(throwA[Throwable])
-    }
 
-    "verify that results of flatten joinable with original dataset" in {
+    "verify that results of flatten joinable with original dataset" in
       val input = """
         | array := new [2, 3, 4]
         |
@@ -3525,26 +3280,22 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
       result must haveSize(3)
 
-      result must haveAllElementsLike {
-        case (ids, SArray(arr)) => {
+      result must haveAllElementsLike
+        case (ids, SArray(arr)) =>
             ids must haveSize(2)
             arr must haveSize(2)
 
             arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
             arr(1) mustEqual SArray(
                 Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
         case _ => ko
-      }
 
       val result2 =
-        result collect {
+        result collect
           case (_, SArray(arr)) if !(arr.isEmpty) => arr.head
-        }
       result2 mustEqual Set(SDecimal(2), SDecimal(3), SDecimal(4))
-    }
 
-    "verify that results of flatten joinable with original dataset when formal is partially inlined" in {
+    "verify that results of flatten joinable with original dataset when formal is partially inlined" in
       val input = """
         | array := new [2, 3, 4]
         |
@@ -3558,35 +3309,30 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
       result must haveSize(3)
 
-      result must haveAllElementsLike {
-        case (ids, SArray(arr)) => {
+      result must haveAllElementsLike
+        case (ids, SArray(arr)) =>
             ids must haveSize(2)
             arr must haveSize(2)
 
             arr(0) must beOneOf(SDecimal(2), SDecimal(3), SDecimal(4))
             arr(1) mustEqual SArray(
                 Vector(SDecimal(2), SDecimal(3), SDecimal(4)))
-          }
         case _ => ko
-      }
 
       val result2 =
-        result collect {
+        result collect
           case (_, SArray(arr)) if !(arr.isEmpty) => arr.head
-        }
       result2 mustEqual Set(SDecimal(2), SDecimal(3), SDecimal(4))
-    }
 
-    "reduce the size of a filtered flattened array" in {
+    "reduce the size of a filtered flattened array" in
       val input = """
         | foo := flatten([{ a: 1, b: 2 }, { a: 3, b: 4 }])
         | foo where foo.a = 1
         | """.stripMargin
 
       evalE(input) must haveSize(1)
-    }
 
-    "join result of flatten with conditional" in {
+    "join result of flatten with conditional" in
       val input = """
         | x := flatten([{foo: 5, bar: 9}, {foo: 6, bar: 10}])
         |
@@ -3598,8 +3344,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
       val result = evalE(input)
       result must haveSize(2)
 
-      result must haveAllElementsLike {
-        case (ids, SObject(obj)) => {
+      result must haveAllElementsLike
+        case (ids, SObject(obj)) =>
             // note that `ids` has size 1 because flatten retains the original ids
             // and adds a new synth id, and in this case there are no original ids
             ids must haveSize(1)
@@ -3607,20 +3353,16 @@ trait MiscStackSpecs extends EvalStackSpecs {
 
             if (obj("foo") == SDecimal(5)) obj("ack") mustEqual SDecimal(10000)
             else obj("ack") mustEqual SDecimal(0)
-          }
         case _ => ko
-      }
-    }
 
-    "compute edit distance of strings" in {
+    "compute edit distance of strings" in
       val input = """
         | std::string::editDistance("gruesome", "awesome")
         | """.stripMargin
 
       eval(input) must_== Set(SDecimal(3))
-    }
 
-    "evaluate a nonsense getMillis usage without exception" in {
+    "evaluate a nonsense getMillis usage without exception" in
       val input = """
         | import std::time::*
         | 
@@ -3630,27 +3372,23 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | """.stripMargin
 
       evalE(input) must beEmpty
-    }
 
-    "split a constant string along a constant delimiter" in {
+    "split a constant string along a constant delimiter" in
       val input = """std::string::split("abc # def", "#")"""
       eval(input) mustEqual Set(
           SArray(Vector(SString("abc "), SString(" def"))))
-    }
 
-    "split strings along a constant delimiter" in {
+    "split strings along a constant delimiter" in
       val input = """std::string::split((//clicks).userId, "1")"""
 
       val expected =
-        eval("(//clicks).userId") collect {
+        eval("(//clicks).userId") collect
           case SString(str) =>
             SArray(Vector(Pattern.compile("1").split(str, -1) map SString: _*))
-        }
 
       eval(input) must containTheSameElementsAs(expected.toSeq)
-    }
 
-    "evaluate the union of two group functions without exploding" in {
+    "evaluate the union of two group functions without exploding" in
       val input = """
         | data := new 12
         | 
@@ -3660,9 +3398,8 @@ trait MiscStackSpecs extends EvalStackSpecs {
         | f(data) union f(data with 24)""".stripMargin
 
       eval(input) mustEqual Set(SDecimal(1))
-    }
 
-    "evaluate the union of two group functions of different provenance without exploding" in {
+    "evaluate the union of two group functions of different provenance without exploding" in
       val input =
         """
         | clicks := //clicks
@@ -3683,11 +3420,7 @@ trait MiscStackSpecs extends EvalStackSpecs {
           SObject(Map("count" -> SDecimal(3231), "price" -> SDecimal(12.99))),
           SObject(Map("count" -> SDecimal(2501), "price" -> SDecimal(7.99))),
           SObject(Map("count" -> SDecimal(2313), "price" -> SDecimal(13.99))))
-    }
-  }
-}
 
 case class Precision(p: Double)
-class AlmostEqual(d: Double) {
+class AlmostEqual(d: Double)
   def ~=(d2: Double)(implicit p: Precision) = (d - d2).abs <= p.p
-}

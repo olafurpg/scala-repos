@@ -1,11 +1,10 @@
 package com.twitter.finagle.serverset2.client
 
 private[serverset2] sealed abstract class KeeperException(val name: String)
-    extends Throwable {
+    extends Throwable
   val path: Option[String]
-}
 
-private[serverset2] object KeeperException {
+private[serverset2] object KeeperException
   case class APIError(path: Option[String])
       extends KeeperException("api_error")
   case class AuthFailed(path: Option[String])
@@ -56,4 +55,3 @@ private[serverset2] object KeeperException {
       extends KeeperException("unimplemented")
   case class UnknownError(path: Option[String])
       extends KeeperException("unknown_error")
-}

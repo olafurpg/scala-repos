@@ -9,7 +9,6 @@ import scala.language.experimental.{macros => smacros}
   * if you use Scrooge classes as `key` in your scalding job.
   * @author Mansur Ashraf.
   */
-trait RequiredBinaryComparators extends RequiredBinaryComparatorsConfig {
+trait RequiredBinaryComparators extends RequiredBinaryComparatorsConfig
   implicit def ordSer[T]: OrderedSerialization[T] = macro ScroogeInternalOrderedSerializationImpl[
       T]
-}

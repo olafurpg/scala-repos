@@ -37,62 +37,54 @@ import JsonDSL._
 /**
   * Systems under specification for Record.
   */
-object RecordSpec extends Specification {
+object RecordSpec extends Specification
   "Record Specification".title
 
-  "Record field introspection" should {
+  "Record field introspection" should
     val rec = FieldTypeTestRecord.createRecord
-    val allExpectedFieldNames: List[String] = (for {
+    val allExpectedFieldNames: List[String] = (for
       typeName <- "Binary Boolean Country DateTime Decimal Double Email Enum Int Locale Long PostalCode String Textarea TimeZone JodaTime"
         .split(" ")
       flavor <- "mandatory legacyOptional optional".split(" ")
-    } yield flavor + typeName + "Field").toList
+    yield flavor + typeName + "Field").toList
 
-    "introspect only the expected fields" in {
+    "introspect only the expected fields" in
       rec.fields().map(_.name).sortWith(_ < _) must_==
         allExpectedFieldNames.sortWith(_ < _)
-    }
 
-    "correctly look up fields by name" in {
+    "correctly look up fields by name" in
       val fields = allExpectedFieldNames.flatMap(rec.fieldByName _)
 
       fields.length must_== allExpectedFieldNames.length
-    }
 
-    "not look up fields by bogus names" in {
-      val fields = allExpectedFieldNames.flatMap { name =>
+    "not look up fields by bogus names" in
+      val fields = allExpectedFieldNames.flatMap  name =>
         rec.fieldByName("x" + name + "y")
-      }
 
       fields.length must_== 0
-    }
 
-    "ignore synthetic methods" in {
+    "ignore synthetic methods" in
       SyntheticTestRecord.metaFields.size must_== 1
-    }
-  }
 
-  "Record lifecycle callbacks" should {
+  "Record lifecycle callbacks" should
     def testOneHarness(
         scope: String,
-        f: LifecycleTestRecord => HarnessedLifecycleCallbacks) = {
-      ("be called before validation when specified at " + scope) in {
+        f: LifecycleTestRecord => HarnessedLifecycleCallbacks) =
+      ("be called before validation when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).beforeValidationHarness = () => triggered = true
         rec.foreachCallback(_.beforeValidation)
         triggered must_== true
-      }
 
-      ("be called after validation when specified at " + scope) in {
+      ("be called after validation when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).afterValidationHarness = () => triggered = true
         rec.foreachCallback(_.afterValidation)
         triggered must_== true
-      }
 
-      ("be called around validate when specified at " + scope) in {
+      ("be called around validate when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggeredBefore = false
         var triggeredAfter = false
@@ -101,81 +93,70 @@ object RecordSpec extends Specification {
         rec.validate must_== Nil
         triggeredBefore must_== true
         triggeredAfter must_== true
-      }
 
-      ("be called before save when specified at " + scope) in {
+      ("be called before save when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).beforeSaveHarness = () => triggered = true
         rec.foreachCallback(_.beforeSave)
         triggered must_== true
-      }
 
-      ("be called before create when specified at " + scope) in {
+      ("be called before create when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).beforeCreateHarness = () => triggered = true
         rec.foreachCallback(_.beforeCreate)
         triggered must_== true
-      }
 
-      ("be called before update when specified at " + scope) in {
+      ("be called before update when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).beforeUpdateHarness = () => triggered = true
         rec.foreachCallback(_.beforeUpdate)
         triggered must_== true
-      }
 
-      ("be called after save when specified at " + scope) in {
+      ("be called after save when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).afterSaveHarness = () => triggered = true
         rec.foreachCallback(_.afterSave)
         triggered must_== true
-      }
 
-      ("be called after create when specified at " + scope) in {
+      ("be called after create when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).afterCreateHarness = () => triggered = true
         rec.foreachCallback(_.afterCreate)
         triggered must_== true
-      }
 
-      ("be called after update when specified at " + scope) in {
+      ("be called after update when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).afterUpdateHarness = () => triggered = true
         rec.foreachCallback(_.afterUpdate)
         triggered must_== true
-      }
 
-      ("be called before delete when specified at " + scope) in {
+      ("be called before delete when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).beforeDeleteHarness = () => triggered = true
         rec.foreachCallback(_.beforeDelete)
         triggered must_== true
-      }
 
-      ("be called after delete when specified at " + scope) in {
+      ("be called after delete when specified at " + scope) in
         val rec = LifecycleTestRecord.createRecord
         var triggered = false
         f(rec).afterDeleteHarness = () => triggered = true
         rec.foreachCallback(_.afterDelete)
         triggered must_== true
-      }
-    }
 
     testOneHarness(
         "the field level",
         rec => rec.stringFieldWithCallbacks: HarnessedLifecycleCallbacks)
-  }
 
-  "Record" should {
+  "Record" should
     val session = new LiftSession("", randomString(20), Empty)
-    S.initIfUninitted(session) {
+    S.initIfUninitted(session)
       val gu: Array[Byte] = Array(18, 19, 20)
       val cal = Calendar.getInstance
       val dt: DateTime = DateTime.now
@@ -266,18 +247,16 @@ object RecordSpec extends Specification {
           ("optionalJodaTimeField", JsNull)
       )
 
-      "convert to JsExp (via asJSON)" in {
-        S.initIfUninitted(new LiftSession("", randomString(20), Empty)) {
+      "convert to JsExp (via asJSON)" in
+        S.initIfUninitted(new LiftSession("", randomString(20), Empty))
           fttr.asJSON mustEqual fttrAsJsObj
-        }
-      }
 
       /*  Test broken
       "convert to JsExp (via asJsExp)" in {
         fttr.asJsExp mustEqual fttrAsJsObj
       }*/
 
-      "convert to JValue" in {
+      "convert to JValue" in
         fttr.asJValue mustEqual JObject(
             List(
                 JField("mandatoryBooleanField", JBool(false)),
@@ -330,23 +309,15 @@ object RecordSpec extends Specification {
                 JField("legacyOptionalJodaTimeField", JNothing),
                 JField("optionalJodaTimeField", JNothing)
             ))
-      }
 
-      "get set from json string using lift-json parser" in {
-        S.initIfUninitted(new LiftSession("", randomString(20), Empty)) {
+      "get set from json string using lift-json parser" in
+        S.initIfUninitted(new LiftSession("", randomString(20), Empty))
           val fttrFromJson = FieldTypeTestRecord.fromJsonString(fttrJson)
 
           fttrFromJson must_== Full(fttr)
-        }
-      }
-    }
-  }
 
-  "basic record" should {
-    "order fields according to fieldOrder" in {
+  "basic record" should
+    "order fields according to fieldOrder" in
       BasicTestRecord.metaFields must_== List(BasicTestRecord.field2,
                                               BasicTestRecord.field1,
                                               BasicTestRecord.fieldThree)
-    }
-  }
-}

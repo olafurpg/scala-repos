@@ -15,7 +15,7 @@ import com.intellij.openapi.util.Key
 /**
   * Pavel Fatin
   */
-class EditorStub extends Editor {
+class EditorStub extends Editor
   def putUserData[T](key: Key[T], value: T): Unit = {}
 
   def getUserData[T](key: Key[T]): T = null.asInstanceOf[T]
@@ -103,4 +103,3 @@ class EditorStub extends Editor {
 
   override def offsetToVisualPosition(
       i: Int, b: Boolean, b1: Boolean): VisualPosition = null
-}

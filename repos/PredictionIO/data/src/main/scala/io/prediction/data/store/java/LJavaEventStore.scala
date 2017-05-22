@@ -24,7 +24,7 @@ import scala.concurrent.duration.Duration
 /** This Java-friendly object provides a set of operation to access Event Store
   * without going through Spark's parallelization
   */
-object LJavaEventStore {
+object LJavaEventStore
 
   /** Reads events of the specified entity. May use this in Algorithm's predict()
     * or Serving logic to have fast event store access.
@@ -59,7 +59,7 @@ object LJavaEventStore {
                    untilTime: Option[DateTime],
                    limit: Option[Integer],
                    latest: Boolean,
-                   timeout: Duration): java.util.List[Event] = {
+                   timeout: Duration): java.util.List[Event] =
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
     val limitInt = limit.map(_.intValue())
@@ -81,7 +81,6 @@ object LJavaEventStore {
               timeout
           )
           .toSeq)
-  }
 
   /** Reads events generically. If entityType or entityId is not specified, it
     * results in table scan.
@@ -118,7 +117,7 @@ object LJavaEventStore {
            startTime: Option[DateTime],
            untilTime: Option[DateTime],
            limit: Option[Integer],
-           timeout: Duration): java.util.List[Event] = {
+           timeout: Duration): java.util.List[Event] =
 
     val eventNamesSeq = eventNames.map(JavaConversions.asScalaBuffer(_).toSeq)
     val limitInt = limit.map(_.intValue())
@@ -139,5 +138,3 @@ object LJavaEventStore {
               timeout
           )
           .toSeq)
-  }
-}

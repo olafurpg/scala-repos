@@ -8,7 +8,6 @@ package services
 import models._
 
 // #scalatest-repository
-trait UserRepository {
+trait UserRepository
   def roles(user: User): Set[Role]
-}
 // #scalatest-repository

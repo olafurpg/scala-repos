@@ -28,7 +28,7 @@ import cascading.scheme.Scheme
   */
 abstract class LzoGenericSource[T]
     extends FileSource with SingleMappable[T]
-    with TypedSink[T] with LocalTapSource {
+    with TypedSink[T] with LocalTapSource
   def clazz: Class[T]
   def conv: BinaryConverter[T]
   override def setter[U <: T] =
@@ -36,15 +36,12 @@ abstract class LzoGenericSource[T]
   override def hdfsScheme =
     HadoopSchemeInstance(
         LzoGenericScheme[T](conv, clazz).asInstanceOf[Scheme[_, _, _, _, _]])
-}
 
-object LzoGenericSource {
+object LzoGenericSource
   def apply[T](
       passedConv: BinaryConverter[T], passedClass: Class[T], paths: String*) =
-    new LzoGenericSource[T] {
+    new LzoGenericSource[T]
       override val conv: BinaryConverter[T] = passedConv
       override val clazz = passedClass
       override val hdfsPaths = paths
       override val localPaths = paths
-    }
-}

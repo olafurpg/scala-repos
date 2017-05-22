@@ -35,7 +35,7 @@ class StageInfo(val stageId: Int,
                 val parentIds: Seq[Int],
                 val details: String,
                 private[spark] val taskLocalityPreferences: Seq[Seq[
-                        TaskLocation]] = Seq.empty) {
+                        TaskLocation]] = Seq.empty)
 
   /** When this stage was submitted from the DAGScheduler to a TaskScheduler. */
   var submissionTime: Option[Long] = None
@@ -49,25 +49,20 @@ class StageInfo(val stageId: Int,
   /** Terminal values of accumulables updated during this stage. */
   val accumulables = HashMap[Long, AccumulableInfo]()
 
-  def stageFailed(reason: String) {
+  def stageFailed(reason: String)
     failureReason = Some(reason)
     completionTime = Some(System.currentTimeMillis)
-  }
 
-  private[spark] def getStatusString: String = {
-    if (completionTime.isDefined) {
-      if (failureReason.isDefined) {
+  private[spark] def getStatusString: String =
+    if (completionTime.isDefined)
+      if (failureReason.isDefined)
         "failed"
-      } else {
+      else
         "succeeded"
-      }
-    } else {
+    else
       "running"
-    }
-  }
-}
 
-private[spark] object StageInfo {
+private[spark] object StageInfo
 
   /**
     * Construct a StageInfo from a Stage.
@@ -81,7 +76,7 @@ private[spark] object StageInfo {
       attemptId: Int,
       numTasks: Option[Int] = None,
       taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty
-  ): StageInfo = {
+  ): StageInfo =
     val ancestorRddInfos = stage.rdd.getNarrowAncestors.map(RDDInfo.fromRdd)
     val rddInfos = Seq(RDDInfo.fromRdd(stage.rdd)) ++ ancestorRddInfos
     new StageInfo(stage.id,
@@ -92,5 +87,3 @@ private[spark] object StageInfo {
                   stage.parents.map(_.id),
                   stage.details,
                   taskLocalityPreferences)
-  }
-}

@@ -27,31 +27,26 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.{ExamplePointUDT, SQLTestUtils}
 import org.apache.spark.sql.types.{DecimalType, StringType, StructType}
 
-class HiveMetastoreCatalogSuite extends SparkFunSuite with TestHiveSingleton {
+class HiveMetastoreCatalogSuite extends SparkFunSuite with TestHiveSingleton
   import hiveContext.implicits._
 
-  test("struct field should accept underscore in sub-column name") {
+  test("struct field should accept underscore in sub-column name")
     val hiveTypeStr = "struct<a: int, b_1: string, c: string>"
     val dateType = HiveMetastoreTypes.toDataType(hiveTypeStr)
     assert(dateType.isInstanceOf[StructType])
-  }
 
-  test("udt to metastore type conversion") {
+  test("udt to metastore type conversion")
     val udt = new ExamplePointUDT
-    assertResult(HiveMetastoreTypes.toMetastoreType(udt.sqlType)) {
+    assertResult(HiveMetastoreTypes.toMetastoreType(udt.sqlType))
       HiveMetastoreTypes.toMetastoreType(udt)
-    }
-  }
 
-  test("duplicated metastore relations") {
+  test("duplicated metastore relations")
     val df = hiveContext.sql("SELECT * FROM src")
     logInfo(df.queryExecution.toString)
     df.as('a).join(df.as('b), $"a.key" === $"b.key")
-  }
-}
 
 class DataSourceWithHiveMetastoreCatalogSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest with SQLTestUtils with TestHiveSingleton
   import hiveContext._
   import testImplicits._
 
@@ -71,17 +66,16 @@ class DataSourceWithHiveMetastoreCatalogSuite
       ("org.apache.hadoop.hive.ql.io.orc.OrcInputFormat",
           "org.apache.hadoop.hive.ql.io.orc.OrcOutputFormat",
           "org.apache.hadoop.hive.ql.io.orc.OrcSerde")
-  ).foreach {
+  ).foreach
     case (provider, (inputFormat, outputFormat, serde)) =>
       test(
-          s"Persist non-partitioned $provider relation into metastore as managed table") {
-        withTable("t") {
-          withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "true") {
+          s"Persist non-partitioned $provider relation into metastore as managed table")
+        withTable("t")
+          withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "true")
             testDF.write
               .mode(SaveMode.Overwrite)
               .format(provider)
               .saveAsTable("t")
-          }
 
           val hiveTable = sessionState.catalog.client.getTable("default", "t")
           assert(hiveTable.storage.inputFormat === Some(inputFormat))
@@ -97,22 +91,19 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
           checkAnswer(table("t"), testDF)
           assert(runSqlHive("SELECT * FROM t") === Seq("1.1\t1", "2.1\t2"))
-        }
-      }
 
       test(
-          s"Persist non-partitioned $provider relation into metastore as external table") {
-        withTempPath { dir =>
-          withTable("t") {
+          s"Persist non-partitioned $provider relation into metastore as external table")
+        withTempPath  dir =>
+          withTable("t")
             val path = dir.getCanonicalFile
 
-            withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "true") {
+            withSQLConf(SQLConf.PARQUET_WRITE_LEGACY_FORMAT.key -> "true")
               testDF.write
                 .mode(SaveMode.Overwrite)
                 .format(provider)
                 .option("path", path.toString)
                 .saveAsTable("t")
-            }
 
             val hiveTable =
               sessionState.catalog.client.getTable("default", "t")
@@ -130,14 +121,11 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
             checkAnswer(table("t"), testDF)
             assert(runSqlHive("SELECT * FROM t") === Seq("1.1\t1", "2.1\t2"))
-          }
-        }
-      }
 
       test(
-          s"Persist non-partitioned $provider relation into metastore as managed table using CTAS") {
-        withTempPath { dir =>
-          withTable("t") {
+          s"Persist non-partitioned $provider relation into metastore as managed table using CTAS")
+        withTempPath  dir =>
+          withTable("t")
             val path = dir.getCanonicalPath
 
             sql(s"""CREATE TABLE t USING $provider
@@ -160,8 +148,3 @@ class DataSourceWithHiveMetastoreCatalogSuite
 
             checkAnswer(table("t"), Row(1, "val_1"))
             assert(runSqlHive("SELECT * FROM t") === Seq("1\tval_1"))
-          }
-        }
-      }
-  }
-}

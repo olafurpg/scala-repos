@@ -11,166 +11,132 @@ import com.typesafe.config.Config
 import scala.concurrent.duration._
 import scala.reflect.ClassTag
 
-object PersistentActorStashingSpec {
+object PersistentActorStashingSpec
   final case class Cmd(data: Any)
   final case class Evt(data: Any)
 
   abstract class StashExamplePersistentActor(name: String)
-      extends NamedPersistentActor(name) {
+      extends NamedPersistentActor(name)
     var events: List[Any] = Nil
     var askedForDelete: Option[ActorRef] = None
 
-    val updateState: Receive = {
+    val updateState: Receive =
       case Evt(data) ⇒ events = data :: events
       case d @ Some(ref: ActorRef) ⇒
         askedForDelete = d.asInstanceOf[Some[ActorRef]]
-    }
 
-    val commonBehavior: Receive = {
+    val commonBehavior: Receive =
       case "boom" ⇒ throw new TestException("boom")
       case GetState ⇒ sender() ! events.reverse
-    }
 
     def unstashBehavior: Receive
 
     def receiveRecover = updateState
-  }
 
   class UserStashPersistentActor(name: String)
-      extends StashExamplePersistentActor(name) {
+      extends StashExamplePersistentActor(name)
     var stashed = false
 
     val receiveCommand: Receive =
-      unstashBehavior orElse {
+      unstashBehavior orElse
         case Cmd("a") if !stashed ⇒ stash(); stashed = true
         case Cmd("a") ⇒ sender() ! "a"
         case Cmd("b") ⇒ persist(Evt("b"))(evt ⇒ sender() ! evt.data)
-      }
 
-    def unstashBehavior: Receive = {
+    def unstashBehavior: Receive =
       case Cmd("c") ⇒ unstashAll(); sender() ! "c"
-    }
-  }
 
   class UserStashWithinHandlerPersistentActor(name: String)
-      extends UserStashPersistentActor(name: String) {
-    override def unstashBehavior: Receive = {
+      extends UserStashPersistentActor(name: String)
+    override def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persist(Evt("c")) { evt ⇒
+        persist(Evt("c"))  evt ⇒
           sender() ! evt.data; unstashAll()
-        }
-    }
-  }
 
   class UserStashManyPersistentActor(name: String)
-      extends StashExamplePersistentActor(name) {
+      extends StashExamplePersistentActor(name)
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case Cmd("a") ⇒
-          persist(Evt("a")) { evt ⇒
+          persist(Evt("a"))  evt ⇒
             updateState(evt)
             context.become(processC)
-          }
         case Cmd("b-1") ⇒ persist(Evt("b-1"))(updateState)
         case Cmd("b-2") ⇒ persist(Evt("b-2"))(updateState)
-      }
 
     val processC: Receive =
-      unstashBehavior orElse {
+      unstashBehavior orElse
         case other ⇒ stash()
-      }
 
-    def unstashBehavior: Receive = {
+    def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persist(Evt("c")) { evt ⇒
+        persist(Evt("c"))  evt ⇒
           updateState(evt); context.unbecome()
-        }
         unstashAll()
-    }
-  }
 
   class UserStashWithinHandlerManyPersistentActor(name: String)
-      extends UserStashManyPersistentActor(name) {
-    override def unstashBehavior: Receive = {
+      extends UserStashManyPersistentActor(name)
+    override def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persist(Evt("c")) { evt ⇒
+        persist(Evt("c"))  evt ⇒
           updateState(evt); context.unbecome(); unstashAll()
-        }
-    }
-  }
 
   class UserStashFailurePersistentActor(name: String)
-      extends StashExamplePersistentActor(name) {
+      extends StashExamplePersistentActor(name)
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case Cmd(data) ⇒
           if (data == "b-2") throw new TestException("boom")
-          persist(Evt(data)) { evt ⇒
+          persist(Evt(data))  evt ⇒
             updateState(evt)
             if (data == "a") context.become(otherCommandHandler)
-          }
-      }
 
     val otherCommandHandler: Receive =
-      unstashBehavior orElse {
+      unstashBehavior orElse
         case other ⇒ stash()
-      }
 
-    def unstashBehavior: Receive = {
+    def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persist(Evt("c")) { evt ⇒
+        persist(Evt("c"))  evt ⇒
           updateState(evt)
           context.unbecome()
-        }
         unstashAll()
-    }
-  }
 
   class UserStashWithinHandlerFailureCallbackPersistentActor(name: String)
-      extends UserStashFailurePersistentActor(name) {
-    override def unstashBehavior: Receive = {
+      extends UserStashFailurePersistentActor(name)
+    override def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persist(Evt("c")) { evt ⇒
+        persist(Evt("c"))  evt ⇒
           updateState(evt)
           context.unbecome()
           unstashAll()
-        }
-    }
-  }
 
   class AsyncStashingPersistentActor(name: String)
-      extends StashExamplePersistentActor(name) {
+      extends StashExamplePersistentActor(name)
     var stashed = false
 
     val receiveCommand: Receive =
-      commonBehavior orElse unstashBehavior orElse {
+      commonBehavior orElse unstashBehavior orElse
         case Cmd("a") ⇒ persistAsync(Evt("a"))(updateState)
         case Cmd("b") if !stashed ⇒ stash(); stashed = true
         case Cmd("b") ⇒ persistAsync(Evt("b"))(updateState)
-      }
 
-    override def unstashBehavior: Receive = {
+    override def unstashBehavior: Receive =
       case Cmd("c") ⇒ persistAsync(Evt("c"))(updateState); unstashAll()
-    }
-  }
 
   class AsyncStashingWithinHandlerPersistentActor(name: String)
-      extends AsyncStashingPersistentActor(name) {
-    override def unstashBehavior: Receive = {
+      extends AsyncStashingPersistentActor(name)
+    override def unstashBehavior: Receive =
       case Cmd("c") ⇒
-        persistAsync(Evt("c")) { evt ⇒
+        persistAsync(Evt("c"))  evt ⇒
           updateState(evt); unstashAll()
-        }
-    }
-  }
-}
 
 abstract class PersistentActorStashingSpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config) with ImplicitSender
   import PersistentActorStashingSpec._
 
-  def stash[T <: NamedPersistentActor : ClassTag](): Unit = {
-    "support user stash operations" in {
+  def stash[T <: NamedPersistentActor : ClassTag](): Unit =
+    "support user stash operations" in
       val persistentActor = namedPersistentActor[T]
       persistentActor ! Cmd("a")
       persistentActor ! Cmd("b")
@@ -178,11 +144,9 @@ abstract class PersistentActorStashingSpec(config: Config)
       expectMsg("b")
       expectMsg("c")
       expectMsg("a")
-    }
-  }
 
-  def stashWithSeveralMessages[T <: NamedPersistentActor : ClassTag](): Unit = {
-    "support user stash operations with several stashed messages" in {
+  def stashWithSeveralMessages[T <: NamedPersistentActor : ClassTag](): Unit =
+    "support user stash operations with several stashed messages" in
       val persistentActor = namedPersistentActor[T]
       val n = 10
       val cmds =
@@ -192,11 +156,9 @@ abstract class PersistentActorStashingSpec(config: Config)
       cmds foreach (persistentActor ! _)
       persistentActor ! GetState
       expectMsg(evts)
-    }
-  }
 
-  def stashUnderFailures[T <: NamedPersistentActor : ClassTag](): Unit = {
-    "support user stash operations under failures" in {
+  def stashUnderFailures[T <: NamedPersistentActor : ClassTag](): Unit =
+    "support user stash operations under failures" in
       val persistentActor = namedPersistentActor[T]
       val bs = 1 to 10 map ("b-" + _)
       persistentActor ! Cmd("a")
@@ -204,23 +166,18 @@ abstract class PersistentActorStashingSpec(config: Config)
       persistentActor ! Cmd("c")
       persistentActor ! GetState
       expectMsg(List("a", "c") ++ bs.filter(_ != "b-2"))
-    }
-  }
 
-  "Stashing in a persistent actor" must {
+  "Stashing in a persistent actor" must
     behave like stash[UserStashPersistentActor]()
     behave like stashWithSeveralMessages[UserStashManyPersistentActor]()
     behave like stashUnderFailures[UserStashFailurePersistentActor]()
-  }
 
-  "Stashing(unstashAll called in handler) in a persistent actor" must {
+  "Stashing(unstashAll called in handler) in a persistent actor" must
     behave like stash[UserStashWithinHandlerPersistentActor]()
     behave like stashWithSeveralMessages[
         UserStashWithinHandlerManyPersistentActor]()
     behave like stashUnderFailures[
         UserStashWithinHandlerFailureCallbackPersistentActor]()
-  }
-}
 
 class SteppingInMemPersistentActorStashingSpec
     extends PersistenceSpec(
@@ -229,11 +186,11 @@ class SteppingInMemPersistentActorStashingSpec
           .withFallback(PersistenceSpec.config(
                   "stepping-inmem",
                   "SteppingInMemPersistentActorStashingSpec")))
-    with ImplicitSender {
+    with ImplicitSender
   import PersistentActorStashingSpec._
 
-  def stash[T <: NamedPersistentActor : ClassTag](): Unit = {
-    "handle async callback not happening until next message has been stashed" in {
+  def stash[T <: NamedPersistentActor : ClassTag](): Unit =
+    "handle async callback not happening until next message has been stashed" in
       val persistentActor = namedPersistentActor[T]
       awaitAssert(SteppingInmemJournal.getRef("persistence-stash"), 3.seconds)
       val journal = SteppingInmemJournal.getRef("persistence-stash")
@@ -252,23 +209,16 @@ class SteppingInMemPersistentActorStashingSpec
       SteppingInmemJournal.step(journal)
       SteppingInmemJournal.step(journal)
 
-      within(3.seconds) {
-        awaitAssert {
+      within(3.seconds)
+        awaitAssert
           persistentActor ! GetState
           expectMsg(List("a", "c", "b"))
-        }
-      }
-    }
-  }
 
-  "Stashing in a persistent actor mixed with persistAsync" must {
+  "Stashing in a persistent actor mixed with persistAsync" must
     behave like stash[AsyncStashingPersistentActor]()
-  }
 
-  "Stashing(unstashAll called in handler) in a persistent actor mixed with persistAsync" must {
+  "Stashing(unstashAll called in handler) in a persistent actor mixed with persistAsync" must
     behave like stash[AsyncStashingWithinHandlerPersistentActor]()
-  }
-}
 
 class LeveldbPersistentActorStashingSpec
     extends PersistentActorStashingSpec(

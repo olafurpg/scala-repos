@@ -14,10 +14,10 @@ import java.net.InetSocketAddress
 
 @RunWith(classOf[JUnitRunner])
 class ZipkinTracerTest
-    extends FunSuite with MockitoSugar with GeneratorDrivenPropertyChecks {
+    extends FunSuite with MockitoSugar with GeneratorDrivenPropertyChecks
   import ZipkinTracerTest._
 
-  test("ZipkinTracer should handle sampling") {
+  test("ZipkinTracer should handle sampling")
     val traceId =
       TraceId(Some(SpanId(123)), Some(SpanId(123)), SpanId(123), None)
 
@@ -26,10 +26,9 @@ class ZipkinTracerTest
     assert(tracer.sampleTrace(traceId) == Some(false))
     tracer.setSampleRate(1f)
     assert(tracer.sampleTrace(traceId) == Some(true))
-  }
 
   test(
-      "ZipkinTracer should pass through trace id with sampled true despite of sample rate") {
+      "ZipkinTracer should pass through trace id with sampled true despite of sample rate")
     val traceId =
       TraceId(Some(SpanId(123)), Some(SpanId(123)), SpanId(123), None)
 
@@ -40,23 +39,18 @@ class ZipkinTracerTest
     val record = Record(id, Time.now, Annotation.ClientSend())
     tracer.record(record)
     verify(underlying).record(record)
-  }
 
-  test("serialize andThen deserialize = identity") {
+  test("serialize andThen deserialize = identity")
     import ZipkinTracer.Trace
 
     def id(e: events.Event) = Trace.serialize(e).flatMap(Trace.deserialize).get
-    forAll(genEvent(Trace)) { event =>
-      event.objectVal match {
+    forAll(genEvent(Trace))  event =>
+      event.objectVal match
         case _: Annotation.BinaryAnnotation =>
           intercept[IllegalArgumentException] { id(event) }
         case _ => assert(id(event) == event)
-      }
-    }
-  }
-}
 
-private[twitter] object ZipkinTracerTest {
+private[twitter] object ZipkinTracerTest
   import Annotation._
   import Arbitrary.arbitrary
 
@@ -79,11 +73,10 @@ private[twitter] object ZipkinTracerTest {
   )
 
   def genEvent(etype: events.Event.Type): Gen[events.Event] =
-    for {
+    for
       ann <- genAnnotation
       tid <- arbitrary[Long]
       sid <- arbitrary[Long]
-    } yield
+    yield
       events.Event(
           etype, Time.now, objectVal = ann, traceIdVal = tid, spanIdVal = sid)
-}

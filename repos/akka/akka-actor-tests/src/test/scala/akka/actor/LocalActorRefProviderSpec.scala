@@ -12,7 +12,7 @@ import scala.concurrent.Future
 import scala.util.Success
 import scala.util.Failure
 
-object LocalActorRefProviderSpec {
+object LocalActorRefProviderSpec
   val config = """
     akka {
       log-dead-letters = on
@@ -27,40 +27,35 @@ object LocalActorRefProviderSpec {
       }
     }
   """
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class LocalActorRefProviderSpec
-    extends AkkaSpec(LocalActorRefProviderSpec.config) {
-  "An LocalActorRefProvider" must {
+    extends AkkaSpec(LocalActorRefProviderSpec.config)
+  "An LocalActorRefProvider" must
 
-    "find actor refs using actorFor" in {
+    "find actor refs using actorFor" in
       val a = system.actorOf(Props(new Actor { def receive = { case _ ⇒ } }))
       val b = system.actorFor(a.path)
       a should ===(b)
-    }
 
-    "find child actor with URL encoded name using actorFor" in {
+    "find child actor with URL encoded name using actorFor" in
       val childName = "akka%3A%2F%2FClusterSystem%40127.0.0.1%3A2552"
-      val a = system.actorOf(Props(new Actor {
+      val a = system.actorOf(Props(new Actor
         val child = context.actorOf(Props.empty, name = childName)
-        def receive = {
+        def receive =
           case "lookup" ⇒
             if (childName == child.path.name)
               sender() ! context.actorFor(childName)
             else sender() ! s"$childName is not ${child.path.name}!"
-        }
-      }))
+      ))
       a.tell("lookup", testActor)
       val b = expectMsgType[ActorRef]
       b.isTerminated should ===(false)
       b.path.name should ===(childName)
-    }
-  }
 
   // #16757: messages sent to /user should be UnhandledMessages instead of DeadLetters
-  "The root guardian in a LocalActorRefProvider" must {
-    "not handle messages other than those it will act upon" in {
+  "The root guardian in a LocalActorRefProvider" must
+    "not handle messages other than those it will act upon" in
 
       val message = "Hello, Mr. Root Guardian"
       val rootGuardian = system.actorSelection("/")
@@ -68,14 +63,11 @@ class LocalActorRefProviderSpec
 
       filterEvents(EventFilter.warning(
               s"unhandled message from Actor[$deadLettersPath]: $message",
-              occurrences = 1)) {
+              occurrences = 1))
         rootGuardian ! message
-      }
-    }
-  }
 
-  "The user guardian in a LocalActorRefProvider" must {
-    "not handle messages other than those it will act upon" in {
+  "The user guardian in a LocalActorRefProvider" must
+    "not handle messages other than those it will act upon" in
 
       val message = "Hello, Mr. User Guardian"
       val userGuardian = system.actorSelection("/user")
@@ -83,14 +75,11 @@ class LocalActorRefProviderSpec
 
       filterEvents(EventFilter.warning(
               s"unhandled message from Actor[$deadLettersPath]: $message",
-              occurrences = 1)) {
+              occurrences = 1))
         userGuardian ! message
-      }
-    }
-  }
 
-  "The system guardian in a LocalActorRefProvider" must {
-    "not handle messages other than those it will act upon" in {
+  "The system guardian in a LocalActorRefProvider" must
+    "not handle messages other than those it will act upon" in
 
       val message = "Hello, Mr. System Guardian"
       val systemGuardian = system.actorSelection("/system")
@@ -98,19 +87,16 @@ class LocalActorRefProviderSpec
 
       filterEvents(EventFilter.warning(
               s"unhandled message from Actor[$deadLettersPath]: $message",
-              occurrences = 1)) {
+              occurrences = 1))
         systemGuardian ! message
-      }
-    }
-  }
 
-  "A LocalActorRef's ActorCell" must {
-    "not retain its original Props when terminated" in {
+  "A LocalActorRef's ActorCell" must
+    "not retain its original Props when terminated" in
       val GetChild = "GetChild"
-      val a = watch(system.actorOf(Props(new Actor {
+      val a = watch(system.actorOf(Props(new Actor
         val child = context.actorOf(Props.empty)
         def receive = { case `GetChild` ⇒ sender() ! child }
-      })))
+      )))
       a.tell(GetChild, testActor)
       val child = expectMsgType[ActorRef]
       val childProps1 = child.asInstanceOf[LocalActorRef].underlying.props
@@ -119,23 +105,21 @@ class LocalActorRefProviderSpec
       expectTerminated(a)
       // the fields are cleared after the Terminated message has been sent,
       // so we need to check for a reasonable time after we receive it
-      awaitAssert({
+      awaitAssert(
         val childProps2 = child.asInstanceOf[LocalActorRef].underlying.props
         childProps2 should not be theSameInstanceAs(childProps1)
         childProps2 should be theSameInstanceAs ActorCell.terminatedProps
-      }, 1 second)
-    }
-  }
+      , 1 second)
 
-  "An ActorRefFactory" must {
+  "An ActorRefFactory" must
     implicit val ec = system.dispatcher
-    "only create one instance of an actor with a specific address in a concurrent environment" in {
+    "only create one instance of an actor with a specific address in a concurrent environment" in
       val impl = system.asInstanceOf[ActorSystemImpl]
       val provider = impl.provider
 
       provider.isInstanceOf[LocalActorRefProvider] should ===(true)
 
-      for (i ← 0 until 100) {
+      for (i ← 0 until 100)
         val address = "new-actor" + i
         implicit val timeout = Timeout(5 seconds)
         val actors = for (j ← 1 to 4) yield
@@ -143,29 +127,24 @@ class LocalActorRefProviderSpec
                   Props(new Actor { def receive = { case _ ⇒ } }), address))
         val set =
           Set() ++ actors.map(a ⇒
-                Await.ready(a, timeout.duration).value match {
+                Await.ready(a, timeout.duration).value match
               case Some(Success(a: ActorRef)) ⇒ 1
               case Some(Failure(ex: InvalidActorNameException)) ⇒ 2
               case x ⇒ x
-          })
+          )
         set should ===(Set[Any](1, 2))
-      }
-    }
 
-    "only create one instance of an actor from within the same message invocation" in {
+    "only create one instance of an actor from within the same message invocation" in
       val supervisor = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "" ⇒
             val a, b = context.actorOf(Props.empty, "duplicate")
-        }
-      }))
-      EventFilter[InvalidActorNameException](occurrences = 1) intercept {
+      ))
+      EventFilter[InvalidActorNameException](occurrences = 1) intercept
         supervisor ! ""
-      }
-    }
 
-    "throw suitable exceptions for malformed actor names" in {
+    "throw suitable exceptions for malformed actor names" in
       intercept[InvalidActorNameException](system.actorOf(Props.empty, null)).getMessage should include(
           "null")
       intercept[InvalidActorNameException](system.actorOf(Props.empty, "")).getMessage should include(
@@ -201,6 +180,3 @@ class LocalActorRefProviderSpec
       intercept[InvalidActorNameException](
           system.actorOf(Props.empty, """hell>o""")).getMessage should include(
           """[>] at position: 4""")
-    }
-  }
-}

@@ -14,31 +14,29 @@ import scala.collection.mutable
 import scala.reflect.internal.util.{NoPosition, Position, RangePosition}
 import scala.tools.nsc.io.AbstractFile
 
-trait ModelBuilders { self: RichPresentationCompiler =>
+trait ModelBuilders  self: RichPresentationCompiler =>
 
   import rootMirror.RootPackage
 
   def locateSymbolPos(
-      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] = {
-    _locateSymbolPos(sym, needPos).orElse({
+      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] =
+    _locateSymbolPos(sym, needPos).orElse(
       logger.debug(s"search $sym: Try Companion")
-      sym.companionSymbol match {
+      sym.companionSymbol match
         case NoSymbol => None
         case s: Symbol => _locateSymbolPos(s, needPos)
-      }
-    })
-  }
+    )
 
   def _locateSymbolPos(
-      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] = {
+      sym: Symbol, needPos: PosNeeded): Option[SourcePosition] =
     if (sym == NoSymbol || needPos == PosNeededNo) None
-    else if (sym.pos != NoPosition) {
-      if (needPos == PosNeededYes || needPos == PosNeededAvail) {
+    else if (sym.pos != NoPosition)
+      if (needPos == PosNeededYes || needPos == PosNeededAvail)
         OffsetSourcePositionHelper.fromPosition(sym.pos)
-      } else Some(EmptySourcePosition())
-    } else {
+      else Some(EmptySourcePosition())
+    else
       // only perform operations is actively requested - this is comparatively expensive
-      if (needPos == PosNeededYes) {
+      if (needPos == PosNeededYes)
         // we might need this for some Java fqns but we need some evidence
         // val name = genASM.jsymbol(sym).fullName
         val name = symbolIndexerName(sym)
@@ -46,53 +44,46 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         logger.debug(s"search: $name = $hit")
         hit
           .flatMap(LineSourcePositionHelper.fromFqnSymbol(_)(config, vfs))
-          .flatMap { sourcePos =>
+          .flatMap  sourcePos =>
             if (sourcePos.file.getName.endsWith(".scala"))
               askLinkPos(sym, AbstractFile.getFile(sourcePos.file))
                 .flatMap(pos => OffsetSourcePositionHelper.fromPosition(pos))
             else Some(sourcePos)
-          }
-      } else None
-    }
-  }
+      else None
 
   // When inspecting a type, transform a raw list of TypeMembers to a sorted
   // list of InterfaceInfo objects, each with its own list of sorted member infos.
   def prepareSortedInterfaceInfo(
       members: Iterable[Member],
-      parents: Iterable[Type]): Iterable[InterfaceInfo] = {
+      parents: Iterable[Type]): Iterable[InterfaceInfo] =
     // ...filtering out non-visible and non-type members
-    val visMembers: Iterable[TypeMember] = members.flatMap {
+    val visMembers: Iterable[TypeMember] = members.flatMap
       case m @ TypeMember(sym, tpe, true, _, _) => List(m)
       case _ => List.empty
-    }
 
     val parentMap = parents.map(_.typeSymbol -> List[TypeMember]()).toMap
-    val membersMap = visMembers.groupBy {
+    val membersMap = visMembers.groupBy
       case TypeMember(sym, _, _, _, _) => sym.owner
-    }
     // Create a list of pairs [(typeSym, membersOfSym)]
-    val membersByOwner = (parentMap ++ membersMap).toList.sortWith {
+    val membersByOwner = (parentMap ++ membersMap).toList.sortWith
       // Sort the pairs on the subtype relation
       case ((s1, _), (s2, _)) => s1.tpe <:< s2.tpe
-    }
 
-    membersByOwner.map {
+    membersByOwner.map
       case (ownerSym, members) =>
         // If all the members in this interface were
         // provided by the same view, remember that
         // view for later display to user.
         val byView = members.groupBy(_.viaView)
         val viaView =
-          if (byView.size == 1) {
+          if (byView.size == 1)
             byView.keys.headOption.filter(_ != NoSymbol)
-          } else { None }
+          else { None }
 
         // Do one top level sort by name on members, before
         // subdividing into kinds of members.
-        val sortedMembers = members.toList.sortWith { (a, b) =>
+        val sortedMembers = members.toList.sortWith  (a, b) =>
           a.sym.nameString <= b.sym.nameString
-        }
 
         // Convert type members into NamedTypeMemberInfos
         // and divide into different kinds..
@@ -102,95 +93,79 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         val fields = new mutable.ArrayBuffer[NamedTypeMemberInfo]()
         val methods = new mutable.ArrayBuffer[NamedTypeMemberInfo]()
 
-        for (tm <- sortedMembers) {
+        for (tm <- sortedMembers)
           val info = NamedTypeMemberInfo(tm)
           val decl = info.declAs
-          if (decl == DeclaredAs.Method) {
-            if (info.name == "this") {
+          if (decl == DeclaredAs.Method)
+            if (info.name == "this")
               constructors += info
-            } else {
+            else
               methods += info
-            }
-          } else if (decl == DeclaredAs.Field) {
+          else if (decl == DeclaredAs.Field)
             fields += info
-          } else if (decl == DeclaredAs.Class || decl == DeclaredAs.Trait ||
+          else if (decl == DeclaredAs.Class || decl == DeclaredAs.Trait ||
                      decl == DeclaredAs.Interface ||
-                     decl == DeclaredAs.Object) {
+                     decl == DeclaredAs.Object)
             nestedTypes += info
-          }
-        }
 
         val sortedInfos = nestedTypes ++ fields ++ constructors ++ methods
 
         new InterfaceInfo(TypeInfo(ownerSym.tpe, PosNeededAvail, sortedInfos),
                           viaView.map(_.name.toString))
-    }
-  }
 
-  object PackageInfo {
+  object PackageInfo
     def root: PackageInfo = fromSymbol(RootPackage)
 
-    def fromPath(path: String): PackageInfo = {
+    def fromPath(path: String): PackageInfo =
       val pack = packageSymFromPath(path)
-      pack match {
+      pack match
         case Some(packSym) => fromSymbol(packSym)
         case None => nullInfo
-      }
-    }
 
     // TODO THIS SHOULD NOT EXIST
     val nullInfo = new PackageInfo("NA", "NA", List.empty)
 
-    private def sortedMembers(items: Iterable[EntityInfo]) = {
+    private def sortedMembers(items: Iterable[EntityInfo]) =
       items.toList.sortBy(_.name)
-    }
 
-    def fromSymbol(sym: Symbol): PackageInfo = {
+    def fromSymbol(sym: Symbol): PackageInfo =
       val members = sortedMembers(
           packageMembers(sym).flatMap(packageMemberInfoFromSym))
-      if (sym.isRoot || sym.isRootPackage) {
+      if (sym.isRoot || sym.isRootPackage)
         new PackageInfo("root", "_root_", members)
-      } else {
+      else
         new PackageInfo(sym.name.toString, sym.fullName, members)
-      }
-    }
 
-    def packageMemberInfoFromSym(sym: Symbol): Option[EntityInfo] = {
-      try {
-        if (sym == RootPackage) {
+    def packageMemberInfoFromSym(sym: Symbol): Option[EntityInfo] =
+      try
+        if (sym == RootPackage)
           Some(root)
-        } else if (sym.hasPackageFlag) {
+        else if (sym.hasPackageFlag)
           Some(fromSymbol(sym))
-        } else if (!sym.nameString.contains("$") && (sym != NoSymbol) &&
-                   (sym.tpe != NoType)) {
+        else if (!sym.nameString.contains("$") && (sym != NoSymbol) &&
+                   (sym.tpe != NoType))
           if (sym.isClass || sym.isTrait || sym.isModule ||
-              sym.isModuleClass || sym.isPackageClass) {
+              sym.isModuleClass || sym.isPackageClass)
             Some(TypeInfo(sym.tpe, PosNeededAvail))
-          } else {
+          else
             None
-          }
-        } else {
+        else
           None
-        }
-      } catch {
+      catch
         case e: Throwable => None
-      }
-    }
-  }
 
-  object TypeInfo {
+  object TypeInfo
 
     // use needPos=PosNeededYes sparingly as it potentially causes lots of I/O
     def apply(typ: Type,
               needPos: PosNeeded = PosNeededNo,
-              members: Iterable[EntityInfo] = List.empty): TypeInfo = {
-      val tpe = typ match {
+              members: Iterable[EntityInfo] = List.empty): TypeInfo =
+      val tpe = typ match
         // TODO: Instead of throwing away this information, would be better to
         // alert the user that the type is existentially quantified.
         case et: ExistentialType => et.underlying
         case t => t
-      }
-      def basicTypeInfo(tpe: Type): BasicTypeInfo = {
+      def basicTypeInfo(tpe: Type): BasicTypeInfo =
         val typeSym = tpe.typeSymbol
         val symbolToLocate =
           if (typeSym.isModuleClass) typeSym.sourceModule else typeSym
@@ -203,52 +178,43 @@ trait ModelBuilders { self: RichPresentationCompiler =>
             members,
             symPos
         )
-      }
-      tpe match {
+      tpe match
         case tpe: MethodType => ArrowTypeInfo(tpe)
         case tpe: PolyType => ArrowTypeInfo(tpe)
         case tpe: NullaryMethodType => basicTypeInfo(tpe.resultType)
         case tpe: Type => basicTypeInfo(tpe)
         case _ => nullInfo
-      }
-    }
 
-    def nullInfo = {
+    def nullInfo =
       new BasicTypeInfo(
           "NA", DeclaredAs.Nil, "NA", List.empty, List.empty, None)
-    }
-  }
 
-  object ParamSectionInfo {
-    def apply(params: Iterable[Symbol]): ParamSectionInfo = {
+  object ParamSectionInfo
+    def apply(params: Iterable[Symbol]): ParamSectionInfo =
       new ParamSectionInfo(
-          params.map { s =>
+          params.map  s =>
             (s.nameString, TypeInfo(s.tpe))
-          },
+          ,
           params.exists(_.isImplicit)
       )
-    }
-  }
 
-  object SymbolInfo {
+  object SymbolInfo
 
-    def apply(sym: Symbol): SymbolInfo = {
-      val tpe = askOption(sym.tpe) match {
+    def apply(sym: Symbol): SymbolInfo =
+      val tpe = askOption(sym.tpe) match
         case None => NoType
         case Some(t) => t
-      }
       val nameString = sym.nameString
       val (name, localName) =
         if (sym.isClass || sym.isTrait || sym.isModule || sym.isModuleClass ||
-            sym.isPackageClass) {
+            sym.isPackageClass)
           (typeFullName(tpe), nameString)
-        } else {
+        else
           (nameString, nameString)
-        }
       val ownerTpe =
-        if (sym.owner != NoSymbol && sym.owner.tpe != NoType) {
+        if (sym.owner != NoSymbol && sym.owner.tpe != NoType)
           Some(sym.owner.tpe)
-        } else None
+        else None
       new SymbolInfo(
           name,
           localName,
@@ -256,10 +222,8 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           TypeInfo(tpe, PosNeededAvail),
           isArrowType(tpe)
       )
-    }
-  }
 
-  object CompletionInfo {
+  object CompletionInfo
 
     def apply(
         name: String,
@@ -279,7 +243,7 @@ trait ModelBuilders { self: RichPresentationCompiler =>
       CompletionInfo.fromSymbolAndType(sym, sym.tpe, relevance)
 
     def fromSymbolAndType(
-        sym: Symbol, tpe: Type, relevance: Int): CompletionInfo = {
+        sym: Symbol, tpe: Type, relevance: Int): CompletionInfo =
       CompletionInfo(
           sym.nameString,
           completionSignatureForType(tpe),
@@ -287,11 +251,9 @@ trait ModelBuilders { self: RichPresentationCompiler =>
           relevance,
           None
       )
-    }
-  }
 
-  object NamedTypeMemberInfo {
-    def apply(m: TypeMember): NamedTypeMemberInfo = {
+  object NamedTypeMemberInfo
+    def apply(m: TypeMember): NamedTypeMemberInfo =
       val decl = declaredAs(m.sym)
       val pos =
         if (m.sym.pos == NoPosition) None else Some(EmptySourcePosition())
@@ -299,13 +261,11 @@ trait ModelBuilders { self: RichPresentationCompiler =>
         if (decl == DeclaredAs.Method) Some(m.sym.signatureString) else None
       new NamedTypeMemberInfo(
           m.sym.nameString, TypeInfo(m.tpe), pos, signatureString, decl)
-    }
-  }
 
-  object ArrowTypeInfo {
+  object ArrowTypeInfo
 
-    def apply(tpe: Type): ArrowTypeInfo = {
-      tpe match {
+    def apply(tpe: Type): ArrowTypeInfo =
+      tpe match
         case tpe: MethodType =>
           apply(tpe,
                 tpe.paramss.map(ParamSectionInfo.apply),
@@ -315,26 +275,20 @@ trait ModelBuilders { self: RichPresentationCompiler =>
                 tpe.paramss.map(ParamSectionInfo.apply),
                 tpe.finalResultType)
         case _ => nullInfo()
-      }
-    }
 
     def apply(tpe: Type,
               paramSections: List[ParamSectionInfo],
-              finalResultType: Type): ArrowTypeInfo = {
+              finalResultType: Type): ArrowTypeInfo =
       new ArrowTypeInfo(
           tpe.toString(),
           TypeInfo(tpe.finalResultType),
           paramSections
       )
-    }
 
-    def nullInfo() = {
+    def nullInfo() =
       new ArrowTypeInfo("NA", TypeInfo.nullInfo, List.empty)
-    }
-  }
-}
 
-object LineSourcePositionHelper {
+object LineSourcePositionHelper
 
   // HACK: the emacs client currently can't open files in jars
   //       so we extract to the cache and report that as the source
@@ -344,44 +298,37 @@ object LineSourcePositionHelper {
 
   private def possiblyExtractFile(
       fo: FileObject)(implicit config: EnsimeConfig): File =
-    fo.pathWithinArchive match {
+    fo.pathWithinArchive match
       case None => fo.asLocalFile
       case Some(path) =>
         // subpath expected by the client
         val file = (config.cacheDir / "dep-src" / "source-jars" / path)
-        if (!file.exists) {
+        if (!file.exists)
           // create and populate the file if it does not exist
           // https://github.com/ensime/ensime-server/issues/761
           file.getParentFile.mkdirs()
           file.outputStream().drain(fo.getContent.getInputStream)
           file.setWritable(false)
-        }
         file
-    }
 
   def fromFqnSymbol(
       sym: FqnSymbol)(implicit config: EnsimeConfig,
                       vfs: EnsimeVFS): Option[LineSourcePosition] =
-    (sym.sourceFileObject, sym.line, sym.offset) match {
+    (sym.sourceFileObject, sym.line, sym.offset) match
       case (None, _, _) => None
       case (Some(fo), lineOpt, offsetOpt) =>
         val f = possiblyExtractFile(fo)
         Some(new LineSourcePosition(f, lineOpt.getOrElse(0)))
-    }
-}
 
-object OffsetSourcePositionHelper {
+object OffsetSourcePositionHelper
   import org.ensime.util.file._
 
-  def fromPosition(p: Position): Option[OffsetSourcePosition] = p match {
+  def fromPosition(p: Position): Option[OffsetSourcePosition] = p match
     case NoPosition => None
     case realPos =>
       Some(new OffsetSourcePosition(
               File(realPos.source.file.path).canon, realPos.point))
-  }
-}
 
-object ERangePositionHelper {
+object ERangePositionHelper
   def fromRangePosition(rp: RangePosition): ERangePosition =
     new ERangePosition(rp.source.path, rp.point, rp.start, rp.end)
-}

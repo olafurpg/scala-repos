@@ -12,7 +12,7 @@ import akka.stream.scaladsl.{Sink, Keep, Source, Flow}
   *
   * See https://github.com/akka/akka/issues/16985.
   */
-object ActorFlow {
+object ActorFlow
 
   /**
     * Create a flow that is handled by an actor.
@@ -34,7 +34,7 @@ object ActorFlow {
       bufferSize: Int = 16,
       overflowStrategy: OverflowStrategy = OverflowStrategy.dropNew)(
       implicit factory: ActorRefFactory,
-      mat: Materializer): Flow[In, Out, _] = {
+      mat: Materializer): Flow[In, Out, _] =
 
     val (outActor, publisher) = Source
       .actorRef[Out](bufferSize, overflowStrategy)
@@ -42,26 +42,22 @@ object ActorFlow {
       .run()
 
     Flow.fromSinkAndSource(
-        Sink.actorRef(factory.actorOf(Props(new Actor {
+        Sink.actorRef(factory.actorOf(Props(new Actor
           val flowActor =
             context.watch(context.actorOf(props(outActor), "flowActor"))
 
-          def receive = {
+          def receive =
             case Status.Success(_) | Status.Failure(_) =>
               flowActor ! PoisonPill
             case Terminated =>
               println("Child terminated, stopping")
               context.stop(self)
             case other => flowActor ! other
-          }
 
-          override def supervisorStrategy = OneForOneStrategy() {
+          override def supervisorStrategy = OneForOneStrategy()
             case _ =>
               println("Stopping actor due to exception")
               SupervisorStrategy.Stop
-          }
-        })), Status.Success(())),
+        )), Status.Success(())),
         Source.fromPublisher(publisher)
     )
-  }
-}

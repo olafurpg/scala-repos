@@ -2,7 +2,7 @@ package spire
 package algebra
 
 trait EuclideanRing[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with CRing[A] {
+    extends Any with CRing[A]
   def quot(a: A, b: A): A
   def mod(a: A, b: A): A
   def quotmod(a: A, b: A): (A, A) = (quot(a, b), mod(a, b))
@@ -13,9 +13,7 @@ trait EuclideanRing[@sp(Byte, Short, Int, Long, Float, Double) A]
   @tailrec protected[this] final def euclid(a: A, b: A)(
       implicit eq: Eq[A]): A =
     if (eq.eqv(b, zero)) a else euclid(b, mod(a, b))
-}
 
-object EuclideanRing {
+object EuclideanRing
   @inline final def apply[A](implicit e: EuclideanRing[A]): EuclideanRing[A] =
     e
-}

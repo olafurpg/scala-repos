@@ -25,27 +25,22 @@ package com.gravity.goose.text
   */
 import java.util.regex.Pattern
 
-object StringReplacement {
-  def compile(pattern: String, replaceWith: String): StringReplacement = {
+object StringReplacement
+  def compile(pattern: String, replaceWith: String): StringReplacement =
     if (string.isNullOrEmpty(pattern))
       throw new IllegalArgumentException("Patterns must not be null or empty!")
     var p: Pattern = Pattern.compile(pattern)
     return new StringReplacement(p, replaceWith)
-  }
-}
 
-class StringReplacement {
-  private def this(pattern: Pattern, replaceWith: String) {
+class StringReplacement
+  private def this(pattern: Pattern, replaceWith: String)
     this()
     this.pattern = pattern
     this.replaceWith = replaceWith
-  }
 
-  def replaceAll(input: String): String = {
+  def replaceAll(input: String): String =
     if (string.isNullOrEmpty(input)) return string.empty
     return pattern.matcher(input).replaceAll(replaceWith)
-  }
 
   private var pattern: Pattern = null
   private var replaceWith: String = null
-}

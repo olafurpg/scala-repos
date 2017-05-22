@@ -20,7 +20,7 @@ import scala.collection.convert.decorateAsScala._
 import scala.tools.nsc.backend.jvm.BTypes.InternalName
 import scala.tools.nsc.backend.jvm.analysis.InstructionStackEffect
 
-object BytecodeUtils {
+object BytecodeUtils
 
   // http://docs.oracle.com/javase/specs/jvms/se7/html/jvms-4.html#jvms-4.9.1
   final val maxJVMMethodSize = 65535
@@ -29,66 +29,53 @@ object BytecodeUtils {
   final val maxMethodSizeAfterInline =
     maxJVMMethodSize - (maxJVMMethodSize / 20)
 
-  object Goto {
-    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] = {
+  object Goto
+    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] =
       if (instruction.getOpcode == GOTO)
         Some(instruction.asInstanceOf[JumpInsnNode])
       else None
-    }
-  }
 
-  object JumpNonJsr {
-    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] = {
+  object JumpNonJsr
+    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] =
       if (isJumpNonJsr(instruction))
         Some(instruction.asInstanceOf[JumpInsnNode])
       else None
-    }
-  }
 
-  object ConditionalJump {
-    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] = {
+  object ConditionalJump
+    def unapply(instruction: AbstractInsnNode): Option[JumpInsnNode] =
       if (isConditionalJump(instruction))
         Some(instruction.asInstanceOf[JumpInsnNode])
       else None
-    }
-  }
 
-  object VarInstruction {
+  object VarInstruction
     def unapply(
-        instruction: AbstractInsnNode): Option[(AbstractInsnNode, Int)] = {
+        instruction: AbstractInsnNode): Option[(AbstractInsnNode, Int)] =
       if (isLoadStoreOrRet(instruction))
         Some((instruction, instruction.asInstanceOf[VarInsnNode].`var`))
       else if (instruction.getOpcode == IINC)
         Some((instruction, instruction.asInstanceOf[IincInsnNode].`var`))
       else None
-    }
-  }
 
-  def isJumpNonJsr(instruction: AbstractInsnNode): Boolean = {
+  def isJumpNonJsr(instruction: AbstractInsnNode): Boolean =
     val op = instruction.getOpcode
     // JSR is deprecated in classfile version 50, disallowed in 51. historically, it was used to implement finally.
     op == GOTO || isConditionalJump(instruction)
-  }
 
-  def isConditionalJump(instruction: AbstractInsnNode): Boolean = {
+  def isConditionalJump(instruction: AbstractInsnNode): Boolean =
     val op = instruction.getOpcode
     (op >= IFEQ && op <= IF_ACMPNE) || op == IFNULL || op == IFNONNULL
-  }
 
-  def isReturn(instruction: AbstractInsnNode): Boolean = {
+  def isReturn(instruction: AbstractInsnNode): Boolean =
     val op = instruction.getOpcode
     op >= IRETURN && op <= RETURN
-  }
 
-  def isLoad(instruction: AbstractInsnNode): Boolean = {
+  def isLoad(instruction: AbstractInsnNode): Boolean =
     val op = instruction.getOpcode
     op >= ILOAD && op <= ALOAD
-  }
 
-  def isStore(instruction: AbstractInsnNode): Boolean = {
+  def isStore(instruction: AbstractInsnNode): Boolean =
     val op = instruction.getOpcode
     op >= ISTORE && op <= ASTORE
-  }
 
   def isLoadStoreOrRet(instruction: AbstractInsnNode): Boolean =
     isLoad(instruction) || isStore(instruction) || instruction.getOpcode == RET
@@ -99,10 +86,9 @@ object BytecodeUtils {
   def isExecutable(instruction: AbstractInsnNode): Boolean =
     instruction.getOpcode >= 0
 
-  def isConstructor(methodNode: MethodNode): Boolean = {
+  def isConstructor(methodNode: MethodNode): Boolean =
     methodNode.name == INSTANCE_CONSTRUCTOR_NAME ||
     methodNode.name == CLASS_CONSTRUCTOR_NAME
-  }
 
   def isStaticMethod(methodNode: MethodNode): Boolean =
     (methodNode.access & ACC_STATIC) != 0
@@ -136,60 +122,53 @@ object BytecodeUtils {
   @tailrec
   def nextExecutableInstruction(
       insn: AbstractInsnNode, alsoKeep: AbstractInsnNode => Boolean = Set())
-    : Option[AbstractInsnNode] = {
+    : Option[AbstractInsnNode] =
     val next = insn.getNext
     if (next == null || isExecutable(next) || alsoKeep(next)) Option(next)
     else nextExecutableInstruction(next, alsoKeep)
-  }
 
   @tailrec
   def nextExecutableInstructionOrLabel(
-      insn: AbstractInsnNode): Option[AbstractInsnNode] = {
+      insn: AbstractInsnNode): Option[AbstractInsnNode] =
     val next = insn.getNext
     if (next == null || isExecutable(next) || next.isInstanceOf[LabelNode])
       Option(next)
     else nextExecutableInstructionOrLabel(next)
-  }
 
   def sameTargetExecutableInstruction(
-      a: JumpInsnNode, b: JumpInsnNode): Boolean = {
+      a: JumpInsnNode, b: JumpInsnNode): Boolean =
     // Compare next executable instead of the labels. Identifies a, b as the same target:
     //   LabelNode(a)
     //   LabelNode(b)
     //   Instr
     nextExecutableInstruction(a.label) == nextExecutableInstruction(b.label)
-  }
 
-  def removeJumpAndAdjustStack(method: MethodNode, jump: JumpInsnNode) {
+  def removeJumpAndAdjustStack(method: MethodNode, jump: JumpInsnNode)
     val instructions = method.instructions
     val op = jump.getOpcode
-    if ((op >= IFEQ && op <= IFLE) || op == IFNULL || op == IFNONNULL) {
+    if ((op >= IFEQ && op <= IFLE) || op == IFNULL || op == IFNONNULL)
       instructions.insert(jump, getPop(1))
-    } else if ((op >= IF_ICMPEQ && op <= IF_ICMPLE) || op == IF_ACMPEQ ||
-               op == IF_ACMPNE) {
+    else if ((op >= IF_ICMPEQ && op <= IF_ICMPLE) || op == IF_ACMPEQ ||
+               op == IF_ACMPNE)
       instructions.insert(jump, getPop(1))
       instructions.insert(jump, getPop(1))
-    } else {
+    else
       // we can't remove JSR: its execution does not only jump, it also adds a return address to the stack
       assert(jump.getOpcode == GOTO)
-    }
     instructions.remove(jump)
-  }
 
-  def finalJumpTarget(source: JumpInsnNode): LabelNode = {
+  def finalJumpTarget(source: JumpInsnNode): LabelNode =
     @tailrec
     def followGoto(label: LabelNode, seenLabels: Set[LabelNode]): LabelNode =
-      nextExecutableInstruction(label) match {
+      nextExecutableInstruction(label) match
         case Some(Goto(dest)) =>
           if (seenLabels(dest.label)) dest.label
           else followGoto(dest.label, seenLabels + dest.label)
 
         case _ => label
-      }
     followGoto(source.label, Set(source.label))
-  }
 
-  def negateJumpOpcode(jumpOpcode: Int): Int = (jumpOpcode: @switch) match {
+  def negateJumpOpcode(jumpOpcode: Int): Int = (jumpOpcode: @switch) match
     case IFEQ => IFNE
     case IFNE => IFEQ
 
@@ -213,44 +192,39 @@ object BytecodeUtils {
 
     case IFNULL => IFNONNULL
     case IFNONNULL => IFNULL
-  }
 
-  def isSize2LoadOrStore(opcode: Int): Boolean = (opcode: @switch) match {
+  def isSize2LoadOrStore(opcode: Int): Boolean = (opcode: @switch) match
     case LLOAD | DLOAD | LSTORE | DSTORE => true
     case _ => false
-  }
 
-  def getPop(size: Int): InsnNode = {
+  def getPop(size: Int): InsnNode =
     val op = if (size == 1) POP else POP2
     new InsnNode(op)
-  }
 
   def instructionResultSize(insn: AbstractInsnNode) =
     InstructionStackEffect.prod(InstructionStackEffect.forClassfile(insn))
 
-  def loadZeroForTypeSort(sort: Int) = (sort: @switch) match {
+  def loadZeroForTypeSort(sort: Int) = (sort: @switch) match
     case Type.BOOLEAN | Type.BYTE | Type.CHAR | Type.SHORT | Type.INT =>
       new InsnNode(ICONST_0)
     case Type.LONG => new InsnNode(LCONST_0)
     case Type.FLOAT => new InsnNode(FCONST_0)
     case Type.DOUBLE => new InsnNode(DCONST_0)
     case Type.OBJECT => new InsnNode(ACONST_NULL)
-  }
 
   /**
     * The number of local variable slots used for parameters and for the `this` reference.
     */
-  def parametersSize(methodNode: MethodNode): Int = {
+  def parametersSize(methodNode: MethodNode): Int =
     (Type.getArgumentsAndReturnSizes(methodNode.desc) >> 2) -
     (if (isStaticMethod(methodNode)) 1 else 0)
-  }
 
-  def labelReferences(method: MethodNode): Map[LabelNode, Set[AnyRef]] = {
+  def labelReferences(method: MethodNode): Map[LabelNode, Set[AnyRef]] =
     val res = mutable.Map.empty[LabelNode, Set[AnyRef]]
     def add(l: LabelNode, ref: AnyRef) =
       if (res contains l) res(l) = res(l) + ref else res(l) = Set(ref)
 
-    method.instructions.iterator().asScala foreach {
+    method.instructions.iterator().asScala foreach
       case jump: JumpInsnNode => add(jump.label, jump)
       case line: LineNumberNode => add(line.start, line)
       case switch: LookupSwitchInsnNode =>
@@ -258,32 +232,26 @@ object BytecodeUtils {
       case switch: TableSwitchInsnNode =>
         switch.labels.asScala.foreach(add(_, switch)); add(switch.dflt, switch)
       case _ =>
-    }
-    if (method.localVariables != null) {
+    if (method.localVariables != null)
       method.localVariables
         .iterator()
         .asScala
         .foreach(l => { add(l.start, l); add(l.end, l) })
-    }
-    if (method.tryCatchBlocks != null) {
+    if (method.tryCatchBlocks != null)
       method.tryCatchBlocks
         .iterator()
         .asScala
         .foreach(l => { add(l.start, l); add(l.handler, l); add(l.end, l) })
-    }
 
     res.toMap
-  }
 
   def substituteLabel(
-      reference: AnyRef, from: LabelNode, to: LabelNode): Unit = {
-    def substList(list: java.util.List[LabelNode]) = {
-      foreachWithIndex(list.asScala.toList) {
+      reference: AnyRef, from: LabelNode, to: LabelNode): Unit =
+    def substList(list: java.util.List[LabelNode]) =
+      foreachWithIndex(list.asScala.toList)
         case (l, i) =>
           if (l == from) list.set(i, to)
-      }
-    }
-    reference match {
+    reference match
       case jump: JumpInsnNode => jump.label = to
       case line: LineNumberNode => line.start = to
       case switch: LookupSwitchInsnNode =>
@@ -297,57 +265,48 @@ object BytecodeUtils {
         if (handler.start == from) handler.start = to
         if (handler.handler == from) handler.handler = to
         if (handler.end == from) handler.end = to
-    }
-  }
 
-  def codeSizeOKForInlining(caller: MethodNode, callee: MethodNode): Boolean = {
+  def codeSizeOKForInlining(caller: MethodNode, callee: MethodNode): Boolean =
     // Looking at the implementation of CodeSizeEvaluator, all instructions except tableswitch and
     // lookupswitch are <= 8 bytes. These should be rare enough for 8 to be an OK rough upper bound.
     def roughUpperBound(methodNode: MethodNode): Int =
       methodNode.instructions.size * 8
 
-    def maxSize(methodNode: MethodNode): Int = {
+    def maxSize(methodNode: MethodNode): Int =
       val eval = new CodeSizeEvaluator(null)
       methodNode.accept(eval)
       eval.getMaxSize
-    }
 
     (roughUpperBound(caller) +
         roughUpperBound(callee) > maxMethodSizeAfterInline) &&
     (maxSize(caller) + maxSize(callee) > maxMethodSizeAfterInline)
-  }
 
-  def removeLineNumberNodes(classNode: ClassNode): Unit = {
+  def removeLineNumberNodes(classNode: ClassNode): Unit =
     for (m <- classNode.methods.asScala) removeLineNumberNodes(m.instructions)
-  }
 
-  def removeLineNumberNodes(instructions: InsnList): Unit = {
+  def removeLineNumberNodes(instructions: InsnList): Unit =
     val iter = instructions.iterator()
-    while (iter.hasNext) iter.next() match {
+    while (iter.hasNext) iter.next() match
       case _: LineNumberNode => iter.remove()
       case _ =>
-    }
-  }
 
-  def cloneLabels(methodNode: MethodNode): Map[LabelNode, LabelNode] = {
+  def cloneLabels(methodNode: MethodNode): Map[LabelNode, LabelNode] =
     methodNode.instructions
       .iterator()
       .asScala
-      .collect({
+      .collect(
         case labelNode: LabelNode => (labelNode, newLabelNode)
-      })
+      )
       .toMap
-  }
 
   /**
     * Create a new [[LabelNode]] with a correctly associated [[Label]].
     */
-  def newLabelNode: LabelNode = {
+  def newLabelNode: LabelNode =
     val label = new Label
     val labelNode = new LabelNode(label)
     label.info = labelNode
     labelNode
-  }
 
   /**
     * Clone the local variable descriptors of `methodNode` and map their `start` and `end` labels
@@ -356,7 +315,7 @@ object BytecodeUtils {
   def cloneLocalVariableNodes(methodNode: MethodNode,
                               labelMap: Map[LabelNode, LabelNode],
                               prefix: String,
-                              shift: Int): List[LocalVariableNode] = {
+                              shift: Int): List[LocalVariableNode] =
     methodNode.localVariables
       .iterator()
       .asScala
@@ -371,7 +330,6 @@ object BytecodeUtils {
                 localVariable.index + shift
           ))
       .toList
-  }
 
   /**
     * Clone the local try/catch blocks of `methodNode` and map their `start` and `end` and `handler`
@@ -379,7 +337,7 @@ object BytecodeUtils {
     */
   def cloneTryCatchBlockNodes(
       methodNode: MethodNode,
-      labelMap: Map[LabelNode, LabelNode]): List[TryCatchBlockNode] = {
+      labelMap: Map[LabelNode, LabelNode]): List[TryCatchBlockNode] =
     methodNode.tryCatchBlocks
       .iterator()
       .asScala
@@ -391,7 +349,6 @@ object BytecodeUtils {
                 tryCatch.`type`
           ))
       .toList
-  }
 
   /**
     * This method is used by optimizer components to eliminate phantom values of instruction
@@ -407,24 +364,21 @@ object BytecodeUtils {
   def fixLoadedNothingOrNullValue(loadedType: Type,
                                   loadInstr: AbstractInsnNode,
                                   methodNode: MethodNode,
-                                  bTypes: BTypes): Unit = {
-    if (loadedType == bTypes.coreBTypes.srNothingRef.toASMType) {
+                                  bTypes: BTypes): Unit =
+    if (loadedType == bTypes.coreBTypes.srNothingRef.toASMType)
       methodNode.instructions.insert(loadInstr, new InsnNode(ATHROW))
-    } else if (loadedType == bTypes.coreBTypes.srNullRef.toASMType) {
+    else if (loadedType == bTypes.coreBTypes.srNullRef.toASMType)
       methodNode.instructions.insert(loadInstr, new InsnNode(ACONST_NULL))
       methodNode.instructions.insert(loadInstr, new InsnNode(POP))
-    }
-  }
 
   implicit class AnalyzerExtensions[V <: Value](val analyzer: Analyzer[V])
-      extends AnyVal {
+      extends AnyVal
     def frameAt(
         instruction: AbstractInsnNode, methodNode: MethodNode): Frame[V] =
       analyzer.getFrames()(methodNode.instructions.indexOf(instruction))
-  }
 
   implicit class FrameExtensions[V <: Value](val frame: Frame[V])
-      extends AnyVal {
+      extends AnyVal
 
     /**
       * The value `n` positions down the stack.
@@ -439,17 +393,13 @@ object BytecodeUtils {
     /**
       * Gets the value at slot i, where i may be a local or a stack index.
       */
-    def getValue(i: Int): V = {
+    def getValue(i: Int): V =
       if (i < frame.getLocals) frame.getLocal(i)
       else frame.getStack(i - frame.getLocals)
-    }
 
     /**
       * Sets the value at slot i, where i may be a local or a stack index.
       */
-    def setValue(i: Int, value: V): Unit = {
+    def setValue(i: Int, value: V): Unit =
       if (i < frame.getLocals) frame.setLocal(i, value)
       else frame.setStack(i - frame.getLocals, value)
-    }
-  }
-}

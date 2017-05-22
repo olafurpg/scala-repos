@@ -19,7 +19,7 @@ import javax.servlet.http.{HttpServletRequestWrapper, HttpServletRequest}
   */
 case class HttpServletRequestReadOnly(
     private val originalRequest: HttpServletRequest)
-    extends HttpServletRequestWrapper(originalRequest) {
+    extends HttpServletRequestWrapper(originalRequest)
 
   override val getAuthType: String = originalRequest.getAuthType
 
@@ -89,4 +89,3 @@ case class HttpServletRequestReadOnly(
   override val isAsyncStarted: Boolean = originalRequest.isAsyncStarted
 
   override val isAsyncSupported: Boolean = originalRequest.isAsyncSupported
-}

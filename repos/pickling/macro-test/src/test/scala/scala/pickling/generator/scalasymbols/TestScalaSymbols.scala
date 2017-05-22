@@ -5,34 +5,27 @@ package scalasymbols
 import org.scalatest.FunSuite
 
 case class Foo(x: Int, y: String)
-class Baz(x: Int) {
+class Baz(x: Int)
   var y: String = ""
   private[this] var z: Double = 0.0
-}
 
-class TransientFoo {
+class TransientFoo
   @transient var y: Int = 0
-}
 case class TransientFooCase(x: Int, @transient y: Int)
 
-object ParentTag {
-  trait Foo[X, Y] {
+object ParentTag
+  trait Foo[X, Y]
     var x: (X, Y)
     var y: Y
-  }
-  trait Baz[Y] extends Foo[Y, Int] {
+  trait Baz[Y] extends Foo[Y, Int]
     var z: (Y, Float)
-  }
   trait Biz extends Baz[String] {}
 
   case class Foo2(x: (Int, String))
-}
-object ValNames {
-  trait Foo {
+object ValNames
+  trait Foo
     val x: Int
     val z: String
-  }
-}
 
 /**
   * Tests the scala symbol loader for pickling.
@@ -42,14 +35,13 @@ object ValNames {
   * - Field detection (vars, vals, etc.)
   * - Generic Type handling (e.g.  Bar extends Foo[Int, String] leads to Int and String being remembered in symbols)
   */
-class TestScalaSymbols extends FunSuite {
+class TestScalaSymbols extends FunSuite
 
-  test("detectNames") {
+  test("detectNames")
     assert(Compat.paramNames[Foo] == Seq("x", "y"))
     assert(Compat.paramNames[TransientFooCase] == Seq("x", "y"))
-  }
 
-  test("fieldTypesWithTypeArgs") {
+  test("fieldTypesWithTypeArgs")
     assert(
         Compat.varTypes[ParentTag.Foo[String, Int]].toSet == Set(
             "scala.Tuple2[java.lang.String,scala.Int]",
@@ -67,14 +59,12 @@ class TestScalaSymbols extends FunSuite {
             "scala.Tuple2[java.lang.String,scala.Int]",
             "scala.Int"
         ))
-  }
 
-  test("constructorParamWithTypeArgs") {
+  test("constructorParamWithTypeArgs")
     assert(Compat.constructorParamTypes[ParentTag.Foo2] == Seq(
             "scala.Tuple2[scala.Int,java.lang.String]"))
-  }
 
-  test("parentClassesWithTypeArgs") {
+  test("parentClassesWithTypeArgs")
     val parentClassKeys = Compat.parentClassTags[ParentTag.Biz].toSet
     assert(
         parentClassKeys == Set(
@@ -82,9 +72,8 @@ class TestScalaSymbols extends FunSuite {
             "scala.pickling.generator.scalasymbols.ParentTag.Baz[java.lang.String]",
             "scala.Any",
             "java.lang.Object"))
-  }
 
-  test("detectTransient") {
+  test("detectTransient")
     val transientVars = Compat.getTransientVars[TransientFoo]
     assert(transientVars == Seq("y"))
 
@@ -98,9 +87,8 @@ class TestScalaSymbols extends FunSuite {
 
     val transientFields = Compat.getTransientFieldNames[TransientFoo]
     assert(transientFields == Seq("y"))
-  }
 
-  test("detectFieldNames") {
+  test("detectFieldNames")
     val fields = Compat.fieldNames[Foo]
     assert(fields.toSet == Set("y", "x"))
 
@@ -112,5 +100,3 @@ class TestScalaSymbols extends FunSuite {
 
     val fields4 = Compat.fieldNames[TransientFooCase]
     assert(fields4.toSet == Set("x", "y"))
-  }
-}

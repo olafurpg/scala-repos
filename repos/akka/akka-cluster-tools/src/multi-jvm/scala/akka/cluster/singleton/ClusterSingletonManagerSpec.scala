@@ -28,7 +28,7 @@ import akka.actor.ActorIdentity
 import akka.actor.ActorSelection
 import akka.cluster.MemberStatus
 
-object ClusterSingletonManagerSpec extends MultiNodeConfig {
+object ClusterSingletonManagerSpec extends MultiNodeConfig
   val controller = role("controller")
   val observer = role("observer")
   val first = role("first")
@@ -48,7 +48,7 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
   nodeConfig(first, second, third, fourth, fifth, sixth)(
       ConfigFactory.parseString("akka.cluster.roles =[worker]"))
 
-  object PointToPointChannel {
+  object PointToPointChannel
     case object RegisterConsumer
     case object UnregisterConsumer
     case object RegistrationOk
@@ -57,7 +57,6 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
     case object UnexpectedUnregistration
     case object Reset
     case object ResetOk
-  }
 
   /**
     * This channel is extremely strict with regards to
@@ -65,13 +64,13 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
     * be able to detect misbehaviour (e.g. two active
     * singleton instances).
     */
-  class PointToPointChannel extends Actor with ActorLogging {
+  class PointToPointChannel extends Actor with ActorLogging
 
     import PointToPointChannel._
 
     def receive = idle
 
-    def idle: Receive = {
+    def idle: Receive =
       case RegisterConsumer ⇒
         log.info("RegisterConsumer: [{}]", sender().path)
         sender() ! RegistrationOk
@@ -82,9 +81,8 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
         context stop self
       case Reset ⇒ sender() ! ResetOk
       case msg ⇒ // no consumer, drop
-    }
 
-    def active(consumer: ActorRef): Receive = {
+    def active(consumer: ActorRef): Receive =
       case UnregisterConsumer if sender() == consumer ⇒
         log.info("UnregistrationOk: [{}]", sender().path)
         sender() ! UnregistrationOk
@@ -105,21 +103,18 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
         context.become(idle)
         sender() ! ResetOk
       case msg ⇒ consumer ! msg
-    }
-  }
 
-  object Consumer {
+  object Consumer
     case object End
     case object GetCurrent
     case object Ping
     case object Pong
-  }
 
   /**
     * The Singleton actor
     */
   class Consumer(queue: ActorRef, delegateTo: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor with ActorLogging
 
     import Consumer._
     import PointToPointChannel._
@@ -129,12 +124,11 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
 
     override def preStart(): Unit = queue ! RegisterConsumer
 
-    override def postStop(): Unit = {
+    override def postStop(): Unit =
       if (stoppedBeforeUnregistration)
         log.warning("Stopped before unregistration")
-    }
 
-    def receive = {
+    def receive =
       case n: Int if n <= current ⇒
         context.stop(self)
       case n: Int ⇒
@@ -153,9 +147,6 @@ object ClusterSingletonManagerSpec extends MultiNodeConfig {
       case Ping ⇒
         sender() ! Pong
       //#consumer-end
-    }
-  }
-}
 
 class ClusterSingletonManagerMultiJvmNode1 extends ClusterSingletonManagerSpec
 class ClusterSingletonManagerMultiJvmNode2 extends ClusterSingletonManagerSpec
@@ -168,7 +159,7 @@ class ClusterSingletonManagerMultiJvmNode8 extends ClusterSingletonManagerSpec
 
 class ClusterSingletonManagerSpec
     extends MultiNodeSpec(ClusterSingletonManagerSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import ClusterSingletonManagerSpec._
   import ClusterSingletonManagerSpec.PointToPointChannel._
@@ -182,44 +173,36 @@ class ClusterSingletonManagerSpec
 
   var _msg = 0
 
-  def msg(): Int = {
+  def msg(): Int =
     _msg += 1
     _msg
-  }
 
-  def queue: ActorRef = {
+  def queue: ActorRef =
     // this is used from inside actor construction, i.e. other thread, and must therefore not call `node(controller`
     system
       .actorSelection(controllerRootActorPath / "user" / "queue")
       .tell(Identify("queue"), identifyProbe.ref)
     identifyProbe.expectMsgType[ActorIdentity].ref.get
-  }
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       Cluster(system) join node(to).address
-      if (Cluster(system).selfRoles.contains("worker")) {
+      if (Cluster(system).selfRoles.contains("worker"))
         createSingleton()
         createSingletonProxy()
-      }
-    }
-  }
 
-  def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
-    runOn(nodes.filterNot(_ == nodes.head): _*) {
+  def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit =
+    runOn(nodes.filterNot(_ == nodes.head): _*)
       memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
           node(nodes.head).address)
-    }
-    runOn(nodes.head) {
+    runOn(nodes.head)
       memberProbe
         .receiveN(nodes.size, 15.seconds)
         .collect { case MemberUp(m) ⇒ m.address }
         .toSet should ===(nodes.map(node(_).address).toSet)
-    }
     enterBarrier(nodes.head.name + "-up")
-  }
 
-  def createSingleton(): ActorRef = {
+  def createSingleton(): ActorRef =
     //#create-singleton-manager
     system.actorOf(
         ClusterSingletonManager.props(
@@ -229,9 +212,8 @@ class ClusterSingletonManagerSpec
                   "worker")),
         name = "consumer")
     //#create-singleton-manager
-  }
 
-  def createSingletonProxy(): ActorRef = {
+  def createSingletonProxy(): ActorRef =
     //#create-singleton-proxy
     system.actorOf(
         ClusterSingletonProxy.props(singletonManagerPath = "/user/consumer",
@@ -239,89 +221,73 @@ class ClusterSingletonManagerSpec
                                           system).withRole("worker")),
         name = "consumerProxy")
     //#create-singleton-proxy
-  }
 
-  def verifyProxyMsg(oldest: RoleName, proxyNode: RoleName, msg: Int): Unit = {
+  def verifyProxyMsg(oldest: RoleName, proxyNode: RoleName, msg: Int): Unit =
     enterBarrier("before-" + msg + "-proxy-verified")
 
     // send a message to the proxy
-    runOn(proxyNode) {
+    runOn(proxyNode)
       // make sure that the proxy has received membership changes
       // and points to the current singleton
       val p = TestProbe()
-      within(5.seconds) {
-        awaitAssert {
+      within(5.seconds)
+        awaitAssert
           system.actorSelection("/user/consumerProxy").tell(Ping, p.ref)
           p.expectMsg(1.second, Pong)
-        }
-      }
       // then send the real message
       system.actorSelection("/user/consumerProxy") ! msg
-    }
 
     // expect a message on the oldest node
-    runOn(oldest) {
+    runOn(oldest)
       expectMsg(5.seconds, msg)
-    }
 
     enterBarrier("after-" + msg + "-proxy-verified")
-  }
 
   def consumer(oldest: RoleName): ActorSelection =
     system.actorSelection(
         RootActorPath(node(oldest).address) / "user" / "consumer" / "singleton")
 
-  def verifyRegistration(oldest: RoleName): Unit = {
+  def verifyRegistration(oldest: RoleName): Unit =
     enterBarrier("before-" + oldest.name + "-registration-verified")
-    runOn(oldest) {
+    runOn(oldest)
       expectMsg(RegistrationOk)
       consumer(oldest) ! GetCurrent
       expectMsg(0)
-    }
     enterBarrier("after-" + oldest.name + "-registration-verified")
-  }
 
-  def verifyMsg(oldest: RoleName, msg: Int): Unit = {
+  def verifyMsg(oldest: RoleName, msg: Int): Unit =
     enterBarrier("before-" + msg + "-verified")
 
-    runOn(controller) {
+    runOn(controller)
       queue ! msg
       // make sure it's not terminated, which would be wrong
       expectNoMsg(1 second)
-    }
-    runOn(oldest) {
+    runOn(oldest)
       expectMsg(5.seconds, msg)
-    }
     runOn(
-        roles.filterNot(r ⇒ r == oldest || r == controller || r == observer): _*) {
+        roles.filterNot(r ⇒ r == oldest || r == controller || r == observer): _*)
       expectNoMsg(1 second)
-    }
     enterBarrier("after-" + msg + "-verified")
-  }
 
-  def crash(roles: RoleName*): Unit = {
-    runOn(controller) {
+  def crash(roles: RoleName*): Unit =
+    runOn(controller)
       queue ! Reset
       expectMsg(ResetOk)
-      roles foreach { r ⇒
+      roles foreach  r ⇒
         log.info("Shutdown [{}]", node(r).address)
         testConductor.exit(r, 0).await
-      }
-    }
-  }
 
-  "A ClusterSingletonManager" must {
+  "A ClusterSingletonManager" must
 
-    "startup 6 node cluster" in within(60 seconds) {
+    "startup 6 node cluster" in within(60 seconds)
 
       val memberProbe = TestProbe()
       Cluster(system).subscribe(memberProbe.ref, classOf[MemberUp])
       memberProbe.expectMsgClass(classOf[CurrentClusterState])
 
-      runOn(controller) {
+      runOn(controller)
         // watch that it is not terminated, which would indicate misbehaviour
         watch(system.actorOf(Props[PointToPointChannel], "queue"))
-      }
       enterBarrier("queue-started")
 
       join(first, first)
@@ -361,25 +327,22 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(first, sixth, msg = msg())
 
       enterBarrier("after-1")
-    }
 
     "let the proxy route messages to the singleton in a 6 node cluster" in within(
-        60 seconds) {
+        60 seconds)
       verifyProxyMsg(first, first, msg = msg())
       verifyProxyMsg(first, second, msg = msg())
       verifyProxyMsg(first, third, msg = msg())
       verifyProxyMsg(first, fourth, msg = msg())
       verifyProxyMsg(first, fifth, msg = msg())
       verifyProxyMsg(first, sixth, msg = msg())
-    }
 
-    "hand over when oldest leaves in 6 nodes cluster " in within(30 seconds) {
+    "hand over when oldest leaves in 6 nodes cluster " in within(30 seconds)
       val leaveRole = first
       val newOldestRole = second
 
-      runOn(leaveRole) {
+      runOn(leaveRole)
         Cluster(system) leave node(leaveRole).address
-      }
 
       verifyRegistration(second)
       verifyMsg(second, msg = msg())
@@ -389,22 +352,19 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(second, fifth, msg = msg())
       verifyProxyMsg(second, sixth, msg = msg())
 
-      runOn(leaveRole) {
+      runOn(leaveRole)
         system
           .actorSelection("/user/consumer")
           .tell(Identify("singleton"), identifyProbe.ref)
-        identifyProbe.expectMsgPF() {
+        identifyProbe.expectMsgPF()
           case ActorIdentity("singleton", None) ⇒ // already terminated
           case ActorIdentity("singleton", Some(singleton)) ⇒
             watch(singleton)
             expectTerminated(singleton)
-        }
-      }
 
       enterBarrier("after-leave")
-    }
 
-    "take over when oldest crashes in 5 nodes cluster" in within(60 seconds) {
+    "take over when oldest crashes in 5 nodes cluster" in within(60 seconds)
       // mute logging of deadLetters during shutdown of systems
       if (!log.isDebugEnabled)
         system.eventStream.publish(Mute(DeadLettersFilter[Any]))
@@ -417,21 +377,16 @@ class ClusterSingletonManagerSpec
       verifyProxyMsg(third, fourth, msg = msg())
       verifyProxyMsg(third, fifth, msg = msg())
       verifyProxyMsg(third, sixth, msg = msg())
-    }
 
-    "take over when two oldest crash in 3 nodes cluster" in within(60 seconds) {
+    "take over when two oldest crash in 3 nodes cluster" in within(60 seconds)
       crash(third, fourth)
       verifyRegistration(fifth)
       verifyMsg(fifth, msg = msg())
       verifyProxyMsg(fifth, fifth, msg = msg())
       verifyProxyMsg(fifth, sixth, msg = msg())
-    }
 
-    "take over when oldest crashes in 2 nodes cluster" in within(60 seconds) {
+    "take over when oldest crashes in 2 nodes cluster" in within(60 seconds)
       crash(fifth)
       verifyRegistration(sixth)
       verifyMsg(sixth, msg = msg())
       verifyProxyMsg(sixth, sixth, msg = msg())
-    }
-  }
-}

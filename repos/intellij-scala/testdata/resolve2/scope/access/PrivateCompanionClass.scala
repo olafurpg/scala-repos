@@ -1,11 +1,8 @@
-class Foo {
+class Foo
   private def f {}
-}
 
-object Foo {
+object Foo
   println(new Foo(). /* line: 2 */ f)
-}
 
-object Bar {
+object Bar
   println(new Foo(). /* line: 2, accessible: false */ f)
-}

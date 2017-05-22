@@ -26,83 +26,71 @@ import org.joda.time.{Instant, DateTime}
 
 import org.specs2.mutable.Specification
 
-package customserializersspecs {
+package customserializersspecs
 
   /*
    * ObjectId as String
    */
-  case class Person(_id: String) extends MongoDocument[Person] {
+  case class Person(_id: String) extends MongoDocument[Person]
     def meta = Person
-  }
   object Person extends MongoDocumentMeta[Person]
 
   /*
    * ObjectId as ObjectId
    */
   case class PersonWithObjectId(_id: ObjectId)
-      extends MongoDocument[PersonWithObjectId] {
+      extends MongoDocument[PersonWithObjectId]
     def meta = PersonWithObjectId
-  }
-  object PersonWithObjectId extends MongoDocumentMeta[PersonWithObjectId] {
+  object PersonWithObjectId extends MongoDocumentMeta[PersonWithObjectId]
     override def formats = allFormats
-  }
 
   /*
    * Pattern as Pattern
    */
   case class PersonWithPattern(_id: ObjectId, pattern: Pattern)
-      extends MongoDocument[PersonWithPattern] {
+      extends MongoDocument[PersonWithPattern]
     def meta = PersonWithPattern
-  }
-  object PersonWithPattern extends MongoDocumentMeta[PersonWithPattern] {
+  object PersonWithPattern extends MongoDocumentMeta[PersonWithPattern]
     override def formats = allFormats
-  }
 
   /*
    * Date as Date
    */
   case class PersonWithDate(_id: ObjectId, birthDate: Date)
-      extends MongoDocument[PersonWithDate] {
+      extends MongoDocument[PersonWithDate]
     def meta = PersonWithDate
-  }
-  object PersonWithDate extends MongoDocumentMeta[PersonWithDate] {
+  object PersonWithDate extends MongoDocumentMeta[PersonWithDate]
     override def formats = allFormats
-  }
 
   /*
    * DateTime as DateTime
    */
   case class PersonWithDateTime(_id: ObjectId, birthDate: DateTime)
-      extends MongoDocument[PersonWithDateTime] {
+      extends MongoDocument[PersonWithDateTime]
     def meta = PersonWithDateTime
-  }
-  object PersonWithDateTime extends MongoDocumentMeta[PersonWithDateTime] {
+  object PersonWithDateTime extends MongoDocumentMeta[PersonWithDateTime]
     override def formats = allFormats
-  }
 
   /*
    * UUID as UUID
    */
-  case class PersonWithUUID(_id: UUID) extends MongoDocument[PersonWithUUID] {
+  case class PersonWithUUID(_id: UUID) extends MongoDocument[PersonWithUUID]
     def meta = PersonWithUUID
-  }
-  object PersonWithUUID extends MongoDocumentMeta[PersonWithUUID] {
+  object PersonWithUUID extends MongoDocumentMeta[PersonWithUUID]
     override def formats = allFormats
-  }
-}
 
 /**
   * Systems under specification for CustomSerializers.
   */
-class CustomSerializersSpec extends Specification with MongoTestKit {
+class CustomSerializersSpec extends Specification with MongoTestKit
   "CustomSerializers Specification".title
 
   import customserializersspecs._
 
   val utc = TimeZone.getTimeZone("UTC")
 
-  "CustomSerializers" should {
-    "handle ObjectId as String value" in {
+  "CustomSerializers" should
+    "handle ObjectId as String value" in
       checkMongoIsRunning
 
       // test data
@@ -112,13 +100,11 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      Person.find(jack._id) must beLike {
+      Person.find(jack._id) must beLike
         case Some(j) =>
           j._id mustEqual jack._id
-      }
-    }
 
-    "handle ObjectId as ObjectId value using ObjectIdSerializer" in {
+    "handle ObjectId as ObjectId value using ObjectIdSerializer" in
       checkMongoIsRunning
 
       // test data
@@ -128,13 +114,11 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      PersonWithObjectId.find(jack._id) must beLike {
+      PersonWithObjectId.find(jack._id) must beLike
         case Some(j) =>
           j._id mustEqual jack._id
-      }
-    }
 
-    "handle Pattern as Pattern value using PatternSerializer" in {
+    "handle Pattern as Pattern value using PatternSerializer" in
       checkMongoIsRunning
 
       // test data
@@ -146,14 +130,12 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      PersonWithPattern.find(jack._id) must beLike {
+      PersonWithPattern.find(jack._id) must beLike
         case Some(j) =>
           j.pattern.pattern mustEqual jack.pattern.pattern
           j.pattern.flags mustEqual jack.pattern.flags
-      }
-    }
 
-    "handle DateTime as DateTime value using DateTimeSerializer" in {
+    "handle DateTime as DateTime value using DateTimeSerializer" in
       checkMongoIsRunning
 
       // test data
@@ -164,13 +146,11 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      PersonWithDateTime.find(jack._id) must beLike {
+      PersonWithDateTime.find(jack._id) must beLike
         case Some(j) =>
           j.birthDate mustEqual jack.birthDate
-      }
-    }
 
-    "handle Date as Date value using DateSerializer" in {
+    "handle Date as Date value using DateSerializer" in
       checkMongoIsRunning
 
       // test data
@@ -183,13 +163,11 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      PersonWithDate.find(jack._id) must beLike {
+      PersonWithDate.find(jack._id) must beLike
         case Some(j) =>
           j.birthDate mustEqual jack.birthDate
-      }
-    }
 
-    "handle UUID as UUID value using UUIDSerializer" in {
+    "handle UUID as UUID value using UUIDSerializer" in
       checkMongoIsRunning
 
       // test data
@@ -200,10 +178,6 @@ class CustomSerializersSpec extends Specification with MongoTestKit {
       jack.save
 
       // retrieve it and compare
-      PersonWithUUID.find(jack._id) must beLike {
+      PersonWithUUID.find(jack._id) must beLike
         case Some(j) =>
           j._id mustEqual jack._id
-      }
-    }
-  }
-}

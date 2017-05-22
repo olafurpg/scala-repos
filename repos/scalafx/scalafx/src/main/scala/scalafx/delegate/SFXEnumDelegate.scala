@@ -31,7 +31,7 @@ package scalafx.delegate
   *
   * @tparam E Original JavaFX `enum`
   */
-trait SFXEnumDelegate[E <: java.lang.Enum[E]] extends SFXDelegate[E] {
+trait SFXEnumDelegate[E <: java.lang.Enum[E]] extends SFXDelegate[E]
 
   /**
     * Return the same string value as enum `delegate`.
@@ -40,4 +40,3 @@ trait SFXEnumDelegate[E <: java.lang.Enum[E]] extends SFXDelegate[E] {
     * Default `toString` provided by the `SFXDelegate` prepends "[SFX]"
     */
   override def toString = delegate.toString
-}

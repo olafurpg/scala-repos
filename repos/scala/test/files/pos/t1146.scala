@@ -1,7 +1,4 @@
-class Code {
+class Code
   val _ = () =>
-    {
       val arr = Array[String]()
       null
-  }
-}

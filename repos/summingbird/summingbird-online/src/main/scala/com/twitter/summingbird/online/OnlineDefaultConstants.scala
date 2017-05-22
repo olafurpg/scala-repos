@@ -26,7 +26,7 @@ import com.twitter.util.Duration
  * This shouldn't be directly referred to by user code, hence private[summingbird]. The platform itself
  * should expose its customized set of Constants.
  */
-private[summingbird] trait OnlineDefaultConstants {
+private[summingbird] trait OnlineDefaultConstants
   val DEFAULT_SOURCE_PARALLELISM = SourceParallelism(1)
   val DEFAULT_FM_PARALLELISM = FlatMapParallelism(5)
   val DEFAULT_FM_CACHE = CacheSize(0)
@@ -46,7 +46,6 @@ private[summingbird] trait OnlineDefaultConstants {
   val DEFAULT_VALUE_COMBINER_CACHE_SIZE = ValueCombinerCacheSize(100)
   val DEFAULT_MAX_EMIT_PER_EXECUTE = MaxEmitPerExecute(Int.MaxValue)
   val DEFAULT_SUMMER_BATCH_MULTIPLIER = SummerBatchMultiplier(1)
-}
 
 private[summingbird] object OnlineDefaultConstants
     extends OnlineDefaultConstants

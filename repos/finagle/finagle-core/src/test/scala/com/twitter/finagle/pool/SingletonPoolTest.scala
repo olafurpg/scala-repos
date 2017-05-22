@@ -11,8 +11,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class SingletonPoolTest extends FunSuite with MockitoSugar {
-  class Ctx {
+class SingletonPoolTest extends FunSuite with MockitoSugar
+  class Ctx
     val underlying = mock[ServiceFactory[Int, Int]]
     val closeP = new Promise[Unit]
     when(underlying.close(any[Time])).thenReturn(closeP)
@@ -27,13 +27,11 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     when(underlying(any[ClientConnection])).thenReturn(underlyingP)
     val pool = new SingletonPool(underlying, NullStatsReceiver)
 
-    def assertClosed() {
+    def assertClosed()
       val Some(Throw(Failure(Some(cause)))) = pool().poll
       assert(cause.isInstanceOf[ServiceClosedException])
-    }
-  }
 
-  test("available when underlying is; unavailable when closed") {
+  test("available when underlying is; unavailable when closed")
     val ctx = new Ctx
     import ctx._
 
@@ -47,9 +45,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assert(pool.isAvailable)
     pool.close()
     assert(!pool.isAvailable)
-  }
 
-  test("underlying availability takes priority") {
+  test("underlying availability takes priority")
     val ctx = new Ctx
     import ctx._
 
@@ -60,9 +57,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assert(pool.isAvailable)
     when(underlying.status).thenReturn(Status.Closed)
     assert(!pool.isAvailable)
-  }
 
-  test("first attempt establishes a connection, subsequent attempts don't") {
+  test("first attempt establishes a connection, subsequent attempts don't")
     val ctx = new Ctx
     import ctx._
 
@@ -76,10 +72,9 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     underlyingP.setValue(service)
     assert(f.poll == Some(Return(service)))
     assert(g.poll == Some(Return(service)))
-  }
 
   test(
-      "reestablish connections when the service becomes unavailable, releasing dead service") {
+      "reestablish connections when the service becomes unavailable, releasing dead service")
     val ctx = new Ctx
     import ctx._
 
@@ -104,9 +99,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     verify(underlying, times(2)).apply(any[ClientConnection])
     Await.result(snd).close()
     verify(service2, never).close(any[Time])
-  }
 
-  test("return on failure") {
+  test("return on failure")
     val ctx = new Ctx
     import ctx._
 
@@ -116,9 +110,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     verify(underlying, times(1)).apply(any[ClientConnection])
     assert(pool().poll == Some(Throw(exc)))
     verify(underlying, times(2)).apply(any[ClientConnection])
-  }
 
-  test("fail when connected service is unavailable") {
+  test("fail when connected service is unavailable")
     val ctx = new Ctx
     import ctx._
 
@@ -127,20 +120,18 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assert(!f.isDefined)
     verify(service, never).close(any[Time])
     underlyingP.setValue(service)
-    f.poll match {
+    f.poll match
       case Some(Throw(exc: Failure)) =>
         assert(exc.getMessage == "Returned unavailable service")
       case _ => fail()
-    }
     verify(service, times(1)).close(any[Time])
 
     assert(pool.isAvailable)
     when(service.status).thenReturn(Status.Open)
     assert(pool().poll == Some(Return(service)))
     verify(service, times(1)).close(any[Time])
-  }
 
-  test("close(): before connection creation") {
+  test("close(): before connection creation")
     val ctx = new Ctx
     import ctx._
 
@@ -150,9 +141,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assertClosed()
 
     verify(underlying, never).apply(any[ClientConnection])
-  }
 
-  test("close(): after connection creation, before underlying") {
+  test("close(): after connection creation, before underlying")
     val ctx = new Ctx
     import ctx._
 
@@ -163,25 +153,22 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     verify(underlying, times(1)).apply(any[ClientConnection])
 
     var exc: Option[Throwable] = None
-    underlyingP.setInterruptHandler {
+    underlyingP.setInterruptHandler
       case exc1 => exc = Some(exc1)
-    }
 
     assert(pool.close().poll == Some(Return.Unit))
     assert(!f.isDefined)
-    exc match {
+    exc match
       case Some(_: ServiceClosedException) =>
       case _ => fail()
-    }
 
     verify(service, never).close(any[Time])
     underlyingP.setValue(service)
     verify(service, times(1)).close(any[Time])
 
     assertClosed()
-  }
 
-  test("close(): after connection creation, after underlying") {
+  test("close(): after connection creation, after underlying")
     val ctx = new Ctx
     import ctx._
 
@@ -198,9 +185,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     verify(service, never).close(any[Time])
     assert(Await.result(f).close().poll == Some(Return.Unit))
     verify(service, times(1)).close(any[Time])
-  }
 
-  test("close: closes underlying") {
+  test("close: closes underlying")
     val ctx = new Ctx
     import ctx._
 
@@ -222,9 +208,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
 
     closeP.setDone()
     assert(close.isDefined)
-  }
 
-  test("does not close, reuses idle connections") {
+  test("does not close, reuses idle connections")
     val ctx = new Ctx
     import ctx._
 
@@ -240,9 +225,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
 
     verify(underlying, times(1)).apply(any[ClientConnection])
     verify(service, never).close(any[Time])
-  }
 
-  test("composes pool and service status") {
+  test("composes pool and service status")
     val ctx = new Ctx
     import ctx._
 
@@ -271,9 +255,8 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     // After close, we're forever Closed.
     pool.close()
     assert(pool.status == Status.Closed)
-  }
 
-  test("ignore cached but Closed service status") {
+  test("ignore cached but Closed service status")
     val ctx = new Ctx
     import ctx._
 
@@ -288,5 +271,3 @@ class SingletonPoolTest extends FunSuite with MockitoSugar {
     assert(pool.status == Status.Open)
     when(underlying.status).thenReturn(Status.Closed)
     assert(pool.status == Status.Closed)
-  }
-}

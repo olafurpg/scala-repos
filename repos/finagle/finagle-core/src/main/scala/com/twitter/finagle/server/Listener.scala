@@ -13,24 +13,22 @@ import java.net.SocketAddress
   * The returned `ListeningServer` is used to inspect the server, and
   * is also used to shut it down.
   */
-trait Listener[In, Out] {
+trait Listener[In, Out]
   def listen(addr: SocketAddress)(
       serveTransport: Transport[In, Out] => Unit): ListeningServer
-}
 
 /**
   * An empty Listener that can be used as a placeholder.
   */
-object NullListener extends Listener[Any, Any] {
+object NullListener extends Listener[Any, Any]
   def listen(addr: SocketAddress)(
       serveTransport: Transport[Any, Any] => Unit) = NullServer
-}
 
 /**
   * A collection of [[com.twitter.finagle.Stack.Param Stack.Params]] useful for configuring
   * a [[com.twitter.finagle.server.Listener]].
   */
-object Listener {
+object Listener
 
   /**
     * A [[com.twitter.finagle.Stack.Param]] used to configure
@@ -39,13 +37,11 @@ object Listener {
     * @param value An option indicating the backlog size. If None,
     * the implementation default is used.
     */
-  case class Backlog(value: Option[Int]) {
+  case class Backlog(value: Option[Int])
     def mk(): (Backlog, Stack.Param[Backlog]) =
       (this, Backlog.param)
-  }
-  object Backlog {
+  object Backlog
     implicit val param = Stack.Param(Backlog(None))
-  }
 
   /**
     * Configures the traffic class to be used servers.
@@ -54,11 +50,8 @@ object Listener {
     * identifier and its meaning and interpretation are implementation specific.
     * Currently used to configure [[java.net.StandardSocketOptions.IP_TOS]].
     */
-  case class TrafficClass(value: Option[Int]) {
+  case class TrafficClass(value: Option[Int])
     def mk(): (TrafficClass, Stack.Param[TrafficClass]) =
       (this, TrafficClass.param)
-  }
-  object TrafficClass {
+  object TrafficClass
     implicit val param = Stack.Param(TrafficClass(None))
-  }
-}

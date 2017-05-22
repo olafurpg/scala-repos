@@ -5,20 +5,16 @@ import java.lang.reflect.InvocationTargetException
 
 class O { class I }
 
-object A extends O {
+object A extends O
   val x = new O
-  val code = reify {
+  val code = reify
     val v: x.I = ???
     v
-  }
   println(showRaw(code))
-}
 
-object Test extends App {
-  try {
+object Test extends App
+  try
     val v: A.x.I = A.code.eval
-  } catch {
+  catch
     case ex: InvocationTargetException
         if ex.getCause.isInstanceOf[NotImplementedError] =>
-  }
-}

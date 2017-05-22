@@ -23,45 +23,40 @@ package org.apache.spark.sql.catalyst
   * Format (unquoted): "name" or "db.name"
   * Format (quoted): "`name`" or "`db`.`name`"
   */
-sealed trait IdentifierWithDatabase {
+sealed trait IdentifierWithDatabase
   val name: String
   def database: Option[String]
   def quotedString: String =
     database.map(db => s"`$db`.`$name`").getOrElse(s"`$name`")
   def unquotedString: String = database.map(db => s"$db.$name").getOrElse(name)
   override def toString: String = quotedString
-}
 
 /**
   * Identifies a table in a database.
   * If `database` is not defined, the current database is used.
   */
 case class TableIdentifier(table: String, database: Option[String])
-    extends IdentifierWithDatabase {
+    extends IdentifierWithDatabase
 
   override val name: String = table
 
   def this(name: String) = this(name, None)
-}
 
-object TableIdentifier {
+object TableIdentifier
   def apply(tableName: String): TableIdentifier =
     new TableIdentifier(tableName)
-}
 
 /**
   * Identifies a function in a database.
   * If `database` is not defined, the current database is used.
   */
 case class FunctionIdentifier(funcName: String, database: Option[String])
-    extends IdentifierWithDatabase {
+    extends IdentifierWithDatabase
 
   override val name: String = funcName
 
   def this(name: String) = this(name, None)
-}
 
-object FunctionIdentifier {
+object FunctionIdentifier
   def apply(funcName: String): FunctionIdentifier =
     new FunctionIdentifier(funcName)
-}

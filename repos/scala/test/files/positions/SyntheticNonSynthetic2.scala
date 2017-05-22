@@ -1,3 +1,2 @@
-object SyntheticNonSynthetic2 {
+object SyntheticNonSynthetic2
   def foo[A >: Exception](a: A) {}
-}

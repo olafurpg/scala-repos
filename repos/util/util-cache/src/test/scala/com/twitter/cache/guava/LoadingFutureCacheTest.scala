@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class LoadingFutureCacheTest extends FunSuite {
+class LoadingFutureCacheTest extends FunSuite
 
   def name: String = "LoadingFutureCache"
 
@@ -15,31 +15,27 @@ class LoadingFutureCacheTest extends FunSuite {
   // loading cache semantics are sufficiently unique
   // to merit distinct tests.
 
-  trait Ctx {
+  trait Ctx
     var cacheLoaderCount = 0
     val cache = new LoadingFutureCache(
         CacheBuilder
           .newBuilder()
           .build(
-              new CacheLoader[String, Future[Int]] {
-                override def load(k: String): Future[Int] = {
+              new CacheLoader[String, Future[Int]]
+                override def load(k: String): Future[Int] =
                   cacheLoaderCount += 1
                   Future.value(k.hashCode)
-                }
-              }
           )
       )
-  }
 
-  test("return CacheLoader result for unset keys") {
+  test("return CacheLoader result for unset keys")
     val ctx = new Ctx {}
     import ctx._
     val Some(res) = cache.get("key")
     assert(Await.result(res) == "key".hashCode)
     assert(cacheLoaderCount == 1)
-  }
 
-  test("call CacheLoader one time for non-evicted keys") {
+  test("call CacheLoader one time for non-evicted keys")
     val ctx = new Ctx {}
     import ctx._
     val Some(res) = cache.get("key")
@@ -49,9 +45,8 @@ class LoadingFutureCacheTest extends FunSuite {
     assert(Await.result(res2) == "key".hashCode)
     assert(Await.result(res3) == "key".hashCode)
     assert(cacheLoaderCount == 1)
-  }
 
-  test("return set values") {
+  test("return set values")
     val ctx = new Ctx {}
     import ctx._
 
@@ -62,9 +57,8 @@ class LoadingFutureCacheTest extends FunSuite {
     assert(Await.result(res) == 1234)
     assert(Await.result(res2) == 1234)
     assert(cacheLoaderCount == 0)
-  }
 
-  test("eviction") {
+  test("eviction")
     val ctx = new Ctx {}
     import ctx._
 
@@ -77,9 +71,8 @@ class LoadingFutureCacheTest extends FunSuite {
     val Some(res2) = cache.get("key")
     assert(Await.result(res2) == "key".hashCode)
     assert(cacheLoaderCount == 1)
-  }
 
-  test("eviction should refuse to evict incorrectly") {
+  test("eviction should refuse to evict incorrectly")
     val ctx = new Ctx {}
     import ctx._
 
@@ -92,9 +85,8 @@ class LoadingFutureCacheTest extends FunSuite {
     val Some(res2) = cache.get("key")
     assert(Await.result(res2) === 1234)
     assert(cacheLoaderCount === 0)
-  }
 
-  test("don't update gettable keys") {
+  test("don't update gettable keys")
     val ctx = new Ctx {}
     import ctx._
 
@@ -102,21 +94,17 @@ class LoadingFutureCacheTest extends FunSuite {
     cache.set("key", f)
 
     var mod = false
-    val result = cache.getOrElseUpdate("key") {
+    val result = cache.getOrElseUpdate("key")
       mod = true
       Future.value(321)
-    }
     assert(Await.result(result) == 1234)
     assert(mod == false)
     assert(cacheLoaderCount == 0)
-  }
 
-  test("update if ungettable") {
+  test("update if ungettable")
     val ctx = new Ctx {}
     import ctx._
 
     val result = cache.getOrElseUpdate("key") { Future.value(1234) }
     assert(Await.result(result) == 1234)
     assert(cacheLoaderCount == 0)
-  }
-}

@@ -9,17 +9,12 @@ import org.scalatest.junit.JUnitRunner
 
 @Ignore
 @RunWith(classOf[JUnitRunner])
-final class ConnectionClientIntegrationSuite extends RedisClientTest {
+final class ConnectionClientIntegrationSuite extends RedisClientTest
 
-  test("Correctly perform the SELECT command", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly perform the SELECT command", RedisTest, ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.select(1).liftToTry) == Return.Unit)
-    }
-  }
 
-  test("Correctly perform the QUIT command", RedisTest, ClientTest) {
-    withRedisClient { client =>
+  test("Correctly perform the QUIT command", RedisTest, ClientTest)
+    withRedisClient  client =>
       assert(Await.result(client.quit().liftToTry) == Return.Unit)
-    }
-  }
-}

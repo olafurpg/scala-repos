@@ -10,9 +10,9 @@ import scala.concurrent.duration._
 import akka.testkit.{TimingTest, AkkaSpec, filterException}
 import docs.pattern.SchedulerPatternSpec.ScheduleInConstructor
 
-object SchedulerPatternSpec {
+object SchedulerPatternSpec
   //#schedule-constructor
-  class ScheduleInConstructor extends Actor {
+  class ScheduleInConstructor extends Actor
     import context.dispatcher
     val tick =
       context.system.scheduler.schedule(500 millis, 1000 millis, self, "tick")
@@ -24,7 +24,7 @@ object SchedulerPatternSpec {
 
     override def postStop() = tick.cancel()
 
-    def receive = {
+    def receive =
       case "tick" =>
         // do something useful here
         //#schedule-constructor
@@ -32,12 +32,10 @@ object SchedulerPatternSpec {
       case "restart" =>
         throw new ArithmeticException
       //#schedule-constructor
-    }
-  }
   //#schedule-constructor
 
   //#schedule-receive
-  class ScheduleInReceive extends Actor {
+  class ScheduleInReceive extends Actor
     import context._
     //#schedule-receive
     // this var and constructor is declared here to not show up in the docs
@@ -51,7 +49,7 @@ object SchedulerPatternSpec {
     // override postRestart so we don't call preStart and schedule a new message
     override def postRestart(reason: Throwable) = {}
 
-    def receive = {
+    def receive =
       case "tick" =>
         // send another periodic tick after the specified delay
         system.scheduler.scheduleOnce(1000 millis, self, "tick")
@@ -61,43 +59,33 @@ object SchedulerPatternSpec {
       case "restart" =>
         throw new ArithmeticException
       //#schedule-receive
-    }
-  }
   //#schedule-receive
-}
 
-class SchedulerPatternSpec extends AkkaSpec {
+class SchedulerPatternSpec extends AkkaSpec
 
   def testSchedule(actor: ActorRef,
                    startDuration: FiniteDuration,
-                   afterRestartDuration: FiniteDuration) = {
+                   afterRestartDuration: FiniteDuration) =
 
-    filterException[ArithmeticException] {
-      within(startDuration) {
+    filterException[ArithmeticException]
+      within(startDuration)
         expectMsg("tick")
         expectMsg("tick")
         expectMsg("tick")
-      }
       actor ! "restart"
-      within(afterRestartDuration) {
+      within(afterRestartDuration)
         expectMsg("tick")
         expectMsg("tick")
-      }
       system.stop(actor)
-    }
-  }
 
-  "send periodic ticks from the constructor" taggedAs TimingTest in {
+  "send periodic ticks from the constructor" taggedAs TimingTest in
     testSchedule(
         system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
         3000 millis,
         2000 millis)
-  }
 
-  "send ticks from the preStart and receive" taggedAs TimingTest in {
+  "send ticks from the preStart and receive" taggedAs TimingTest in
     testSchedule(
         system.actorOf(Props(classOf[ScheduleInConstructor], testActor)),
         3000 millis,
         2500 millis)
-  }
-}

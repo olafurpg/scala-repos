@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   println(" 1:" + List(1, 2, 3, 4).indexOfSlice(List(0, 1))) // -1
   println(" 2:" + List(1, 2, 3, 4).indexOfSlice(List(1, 2))) //  0
   println(" 3:" + List(1, 2, 3, 4).indexOfSlice(List(2, 3))) //  1
@@ -21,4 +21,3 @@ object Test extends App {
 
   println("17:" + List(1, 2, 3, 4).indexOfSlice(from(1))) // -1
   println("18:" + from(1).indexOfSlice(List(4, 5, 6))) // 3
-}

@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 21.04.2015.
   */
-trait FunSuiteFileStructureViewTest extends ScalaTestTestCase {
+trait FunSuiteFileStructureViewTest extends ScalaTestTestCase
   private val className = "FunSuiteViewTest"
 
-  def addFunSuiteViewTest(): Unit = {
+  def addFunSuiteViewTest(): Unit =
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -25,26 +25,20 @@ trait FunSuiteFileStructureViewTest extends ScalaTestTestCase {
         |  ignore("pending and ignore") (pending)
         |}
       """.stripMargin)
-  }
 
-  def testFunSuiteNormal(): Unit = {
+  def testFunSuiteNormal(): Unit =
     addFunSuiteViewTest()
     runFileStructureViewTest(className, normalStatusId, "test(\"test\")")
-  }
 
-  def testFunSuiteIgnored(): Unit = {
+  def testFunSuiteIgnored(): Unit =
     addFunSuiteViewTest()
     runFileStructureViewTest(className, ignoredStatusId, "ignore(\"ignore\")")
-  }
 
-  def testFunSuitePending(): Unit = {
+  def testFunSuitePending(): Unit =
     addFunSuiteViewTest()
     runFileStructureViewTest(className, pendingStatusId, "test(\"pending\")")
-  }
 
-  def testFunSuiteIgnoredAndPending(): Unit = {
+  def testFunSuiteIgnoredAndPending(): Unit =
     addFunSuiteViewTest()
     runFileStructureViewTest(
         className, ignoredStatusId, "ignore(\"pending and ignore\")")
-  }
-}

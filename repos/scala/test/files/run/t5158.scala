@@ -1,17 +1,12 @@
-case class B(var x: Int) {
-  def succ() {
+case class B(var x: Int)
+  def succ()
     x = x + 1
-  }
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val b = B(0)
-    b match {
+    b match
       case B(x) =>
         //println(x)
         b.succ()
         println(x)
-    }
-  }
-}

@@ -26,19 +26,17 @@ import org.apache.spark.sql.types.StructField
 /**
   * Helper utilities for algorithms using ML metadata
   */
-private[spark] object MetadataUtils {
+private[spark] object MetadataUtils
 
   /**
     * Examine a schema to identify the number of classes in a label column.
     * Returns None if the number of labels is not specified, or if the label column is continuous.
     */
-  def getNumClasses(labelSchema: StructField): Option[Int] = {
-    Attribute.fromStructField(labelSchema) match {
+  def getNumClasses(labelSchema: StructField): Option[Int] =
+    Attribute.fromStructField(labelSchema) match
       case binAttr: BinaryAttribute => Some(2)
       case nomAttr: NominalAttribute => nomAttr.getNumValues
       case _: NumericAttribute | UnresolvedAttribute => None
-    }
-  }
 
   /**
     * Examine a schema to identify categorical (Binary and Nominal) features.
@@ -50,32 +48,27 @@ private[spark] object MetadataUtils {
     * @return  Map: feature index --> number of categories.
     *          The map's set of keys will be the set of categorical feature indices.
     */
-  def getCategoricalFeatures(featuresSchema: StructField): Map[Int, Int] = {
+  def getCategoricalFeatures(featuresSchema: StructField): Map[Int, Int] =
     val metadata = AttributeGroup.fromStructField(featuresSchema)
-    if (metadata.attributes.isEmpty) {
+    if (metadata.attributes.isEmpty)
       HashMap.empty[Int, Int]
-    } else {
-      metadata.attributes.get.zipWithIndex.flatMap {
+    else
+      metadata.attributes.get.zipWithIndex.flatMap
         case (attr, idx) =>
-          if (attr == null) {
+          if (attr == null)
             Iterator()
-          } else {
-            attr match {
+          else
+            attr match
               case _: NumericAttribute | UnresolvedAttribute => Iterator()
               case binAttr: BinaryAttribute => Iterator(idx -> 2)
               case nomAttr: NominalAttribute =>
-                nomAttr.getNumValues match {
+                nomAttr.getNumValues match
                   case Some(numValues: Int) => Iterator(idx -> numValues)
                   case None =>
                     throw new IllegalArgumentException(
                         s"Feature $idx is marked as" +
                         " Nominal (categorical), but it does not have the number of values specified.")
-                }
-            }
-          }
-      }.toMap
-    }
-  }
+      .toMap
 
   /**
     * Takes a Vector column and a list of feature names, and returns the corresponding list of
@@ -84,16 +77,13 @@ private[spark] object MetadataUtils {
     * @param names  List of feature names
     */
   def getFeatureIndicesFromNames(
-      col: StructField, names: Array[String]): Array[Int] = {
+      col: StructField, names: Array[String]): Array[Int] =
     require(col.dataType.isInstanceOf[VectorUDT],
             s"getFeatureIndicesFromNames expected column $col" +
             s" to be Vector type, but it was type ${col.dataType} instead.")
     val inputAttr = AttributeGroup.fromStructField(col)
-    names.map { name =>
+    names.map  name =>
       require(
           inputAttr.hasAttr(name),
           s"getFeatureIndicesFromNames found no feature with name $name in column $col.")
       inputAttr.getAttr(name).index.get
-    }
-  }
-}

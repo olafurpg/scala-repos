@@ -1,6 +1,6 @@
 package gitbucket.core.model
 
-trait WebHookEventComponent extends TemplateComponent { self: Profile =>
+trait WebHookEventComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import gitbucket.core.model.Profile.WebHooks
 
@@ -10,7 +10,7 @@ trait WebHookEventComponent extends TemplateComponent { self: Profile =>
       _.name, WebHook.Event.valueOf(_))
 
   class WebHookEvents(tag: Tag)
-      extends Table[WebHookEvent](tag, "WEB_HOOK_EVENT") with BasicTemplate {
+      extends Table[WebHookEvent](tag, "WEB_HOOK_EVENT") with BasicTemplate
     val url = column[String]("URL")
     val event = column[WebHook.Event]("EVENT")
     def * =
@@ -29,8 +29,6 @@ trait WebHookEventComponent extends TemplateComponent { self: Profile =>
     def byPrimaryKey(
         owner: String, repository: String, url: String, event: WebHook.Event) =
       byWebHook(owner, repository, url) && (this.event === event.bind)
-  }
-}
 
 case class WebHookEvent(
     userName: String,

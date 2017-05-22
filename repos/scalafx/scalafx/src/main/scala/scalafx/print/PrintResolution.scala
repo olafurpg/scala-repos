@@ -34,7 +34,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.PrintResolution]].
   */
-object PrintResolution {
+object PrintResolution
 
   /**
     * Converts a ScalaFX PrintResolution to its JavaFX counterpart.
@@ -45,7 +45,6 @@ object PrintResolution {
   implicit def sfxPrintResolution2jfx(
       pr: PrintResolution): jfxp.PrintResolution =
     if (pr != null) pr.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintResolution.html JavaFx PrintResolution]].
@@ -54,7 +53,7 @@ object PrintResolution {
   * @param delegate JavaFX PrintResolution. Since there is no public constructor for it, there is not a default value.
   */
 final class PrintResolution(override val delegate: jfxp.PrintResolution)
-    extends SFXDelegate[jfxp.PrintResolution] {
+    extends SFXDelegate[jfxp.PrintResolution]
 
   /**
     * Returns the resolution in dpi. across the paper feed direction.
@@ -65,4 +64,3 @@ final class PrintResolution(override val delegate: jfxp.PrintResolution)
     * Returns the resolution in dpi. in the paper feed direction.
     */
   def feedResolution: Integer = delegate.getFeedResolution
-}

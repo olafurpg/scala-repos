@@ -6,7 +6,7 @@ import scala.scalajs.js
   *  An ArrayBufferView allows accessing the data of an [[ArrayBuffer]]
   */
 @js.native
-trait ArrayBufferView extends js.Object {
+trait ArrayBufferView extends js.Object
 
   /** The underlying buffer of this ArrayBufferView */
   val buffer: ArrayBuffer = js.native
@@ -16,4 +16,3 @@ trait ArrayBufferView extends js.Object {
 
   /** The offset of this ArrayBufferView in the underlying buffer */
   val byteOffset: Int = js.native
-}

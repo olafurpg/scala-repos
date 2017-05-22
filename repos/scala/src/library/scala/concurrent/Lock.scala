@@ -14,16 +14,13 @@ package scala.concurrent
   *  @version 1.0, 10/03/2003
   */
 @deprecated("Use java.util.concurrent.locks.Lock", "2.11.2")
-class Lock {
+class Lock
   var available = true
 
-  def acquire() = synchronized {
+  def acquire() = synchronized
     while (!available) wait()
     available = false
-  }
 
-  def release() = synchronized {
+  def release() = synchronized
     available = true
     notify()
-  }
-}

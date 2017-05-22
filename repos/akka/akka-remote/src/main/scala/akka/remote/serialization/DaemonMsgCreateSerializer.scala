@@ -23,7 +23,7 @@ import util.{Failure, Success}
   * INTERNAL API
   */
 private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
-    extends BaseSerializer {
+    extends BaseSerializer
   import ProtobufSerializer.serializeActorRef
   import ProtobufSerializer.deserializeActorRef
   import Deploy.NoDispatcherGiven
@@ -40,9 +40,9 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
 
   lazy val serialization = SerializationExtension(system)
 
-  def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  def toBinary(obj: AnyRef): Array[Byte] = obj match
     case DaemonMsgCreate(props, deploy, path, supervisor) ⇒
-      def deployProto(d: Deploy): DeployData = {
+      def deployProto(d: Deploy): DeployData =
         val builder = DeployData.newBuilder.setPath(d.path)
         if (d.config != ConfigFactory.empty)
           builder.setConfig(serialize(d.config))
@@ -52,16 +52,14 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
         if (d.dispatcher != NoDispatcherGiven)
           builder.setDispatcher(d.dispatcher)
         builder.build
-      }
 
-      def propsProto = {
+      def propsProto =
         val builder = PropsData.newBuilder
           .setClazz(props.clazz.getName)
           .setDeploy(deployProto(props.deploy))
         props.args map serialize foreach builder.addArgs
         props.args map (a ⇒ if (a == null) "null" else a.getClass.getName) foreach builder.addClasses
         builder.build
-      }
 
       DaemonMsgCreateData.newBuilder
         .setProps(propsProto)
@@ -75,12 +73,11 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
       throw new IllegalArgumentException(
           "Can't serialize a non-DaemonMsgCreate message using DaemonMsgCreateSerializer [%s]"
             .format(obj))
-  }
 
-  def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+  def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef =
     val proto = DaemonMsgCreateData.parseFrom(bytes)
 
-    def deploy(protoDeploy: DeployData): Deploy = {
+    def deploy(protoDeploy: DeployData): Deploy =
       val config =
         if (protoDeploy.hasConfig)
           deserialize(protoDeploy.getConfig, classOf[Config])
@@ -97,9 +94,8 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
         if (protoDeploy.hasDispatcher) protoDeploy.getDispatcher
         else NoDispatcherGiven
       Deploy(protoDeploy.getPath, config, routerConfig, scope, dispatcher)
-    }
 
-    def props = {
+    def props =
       import scala.collection.JavaConverters._
       val clazz =
         system.dynamicAccess.getClassFor[AnyRef](proto.getProps.getClazz).get
@@ -107,14 +103,12 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
         (proto.getProps.getArgsList.asScala zip proto.getProps.getClassesList.asScala)
           .map(deserialize)(collection.breakOut)
       Props(deploy(proto.getProps.getDeploy), clazz, args)
-    }
 
     DaemonMsgCreate(
         props = props,
         deploy = deploy(proto.getDeploy),
         path = proto.getPath,
         supervisor = deserializeActorRef(system, proto.getSupervisor))
-  }
 
   protected def serialize(any: Any): ByteString =
     ByteString.copyFrom(serialization.serialize(any.asInstanceOf[AnyRef]).get)
@@ -124,9 +118,9 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
     else deserialize(p._1, system.dynamicAccess.getClassFor[AnyRef](p._2).get)
 
   protected def deserialize[T : ClassTag](
-      data: ByteString, clazz: Class[T]): T = {
+      data: ByteString, clazz: Class[T]): T =
     val bytes = data.toByteArray
-    serialization.deserialize(bytes, clazz) match {
+    serialization.deserialize(bytes, clazz) match
       case Success(x: T) ⇒ x
       case Success(other) ⇒
         throw new IllegalArgumentException(
@@ -137,10 +131,6 @@ private[akka] class DaemonMsgCreateSerializer(val system: ExtendedActorSystem)
         // com.typesafe.config.Config
         // akka.routing.RouterConfig
         // akka.actor.Scope
-        serialization.deserialize(bytes, classOf[java.io.Serializable]) match {
+        serialization.deserialize(bytes, classOf[java.io.Serializable]) match
           case Success(x: T) ⇒ x
           case _ ⇒ throw e // the first exception
-        }
-    }
-  }
-}

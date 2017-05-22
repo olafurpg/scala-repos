@@ -9,7 +9,7 @@ import org.ensime.api.DebugOutputEvent
 import org.slf4j.LoggerFactory
 
 private class MonitorOutput(val inStream: InputStream, broadcaster: ActorRef)
-    extends Thread {
+    extends Thread
 
   val log = LoggerFactory.getLogger("MonitorOutput")
   val in = new InputStreamReader(inStream)
@@ -18,18 +18,14 @@ private class MonitorOutput(val inStream: InputStream, broadcaster: ActorRef)
 
   // TODO This should have a stop method
 
-  override def run(): Unit = {
+  override def run(): Unit =
     val buf = new Array[Char](512)
 
-    try {
+    try
       var i = in.read(buf, 0, buf.length)
-      while (!finished && i >= 0) {
+      while (!finished && i >= 0)
         broadcaster ! DebugOutputEvent(new String(buf, 0, i))
         i = in.read(buf, 0, buf.length)
-      }
-    } catch {
+    catch
       case t: Throwable =>
         log.info("Exception during execution", t)
-    }
-  }
-}

@@ -61,7 +61,7 @@ import language.implicitConversions
   *
   * [[https://github.com/pocorall/scaloid/#system-services]]
   */
-trait SystemServices {
+trait SystemServices
   @inline def accessibilityManager(implicit context: Context) =
     context
       .getSystemService(Context.ACCESSIBILITY_SERVICE)
@@ -89,10 +89,9 @@ trait SystemServices {
       .getSystemService(Context.CLIPBOARD_SERVICE)
       .asInstanceOf[android.text.ClipboardManager]
 
-  class RichClipboardManager(cm: android.text.ClipboardManager) {
+  class RichClipboardManager(cm: android.text.ClipboardManager)
     def text_=(txt: CharSequence) = cm.setText(txt)
     def text = cm.getText
-  }
 
   @inline implicit def richClipboardManager(
       cm: android.text.ClipboardManager): RichClipboardManager =
@@ -161,56 +160,41 @@ trait SystemServices {
       .asInstanceOf[android.telephony.TelephonyManager]
 
   def onCallForwardingIndicatorChanged(fun: Boolean => Any)(
-      implicit ctx: Context, reg: Registerable) {
-    val callStateListener = new PhoneStateListener() {
-      override def onCallForwardingIndicatorChanged(cfi: Boolean) {
+      implicit ctx: Context, reg: Registerable)
+    val callStateListener = new PhoneStateListener()
+      override def onCallForwardingIndicatorChanged(cfi: Boolean)
         fun(cfi)
-      }
-    }
-    reg.onRegister {
+    reg.onRegister
       telephonyManager.listen(
           callStateListener,
           PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR)
-    }
-    reg.onUnregister {
+    reg.onUnregister
       telephonyManager.listen(
           callStateListener, PhoneStateListener.LISTEN_NONE)
-    }
-  }
 
   def onCallStateChanged(fun: (Int, String) => Any)(
-      implicit ctx: Context, reg: Registerable) {
-    val callStateListener = new PhoneStateListener() {
-      override def onCallStateChanged(state: Int, incomingNumber: String) {
+      implicit ctx: Context, reg: Registerable)
+    val callStateListener = new PhoneStateListener()
+      override def onCallStateChanged(state: Int, incomingNumber: String)
         fun(state, incomingNumber)
-      }
-    }
-    reg.onRegister {
+    reg.onRegister
       telephonyManager.listen(
           callStateListener, PhoneStateListener.LISTEN_CALL_STATE)
-    }
-    reg.onUnregister {
+    reg.onUnregister
       telephonyManager.listen(
           callStateListener, PhoneStateListener.LISTEN_NONE)
-    }
-  }
 
   def onCellLocationChanged(fun: CellLocation => Any)(
-      implicit ctx: Context, reg: Registerable) {
-    val callStateListener = new PhoneStateListener() {
-      override def onCellLocationChanged(cellLocation: CellLocation) {
+      implicit ctx: Context, reg: Registerable)
+    val callStateListener = new PhoneStateListener()
+      override def onCellLocationChanged(cellLocation: CellLocation)
         fun(cellLocation)
-      }
-    }
-    reg.onRegister {
+    reg.onRegister
       telephonyManager.listen(
           callStateListener, PhoneStateListener.LISTEN_CELL_LOCATION)
-    }
-    reg.onUnregister {
+    reg.onUnregister
       telephonyManager.listen(
           callStateListener, PhoneStateListener.LISTEN_NONE)
-    }
-  }
 
   @inline def textServicesManager(implicit context: Context) =
     context
@@ -244,6 +228,5 @@ trait SystemServices {
     context
       .getSystemService(Context.WINDOW_SERVICE)
       .asInstanceOf[android.view.WindowManager]
-}
 
 object SystemServices extends SystemServices

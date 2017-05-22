@@ -19,7 +19,7 @@ import scala.concurrent.Future
 @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
 @Consumes(Array(MediaType.APPLICATION_JSON))
 class EventSubscriptionsResource @Inject()(val config: MarathonConf)
-    extends RestResource {
+    extends RestResource
 
   //scalastyle:off null
 
@@ -28,36 +28,31 @@ class EventSubscriptionsResource @Inject()(val config: MarathonConf)
 
   @GET
   @Timed
-  def listSubscribers(@Context req: HttpServletRequest): Response = {
+  def listSubscribers(@Context req: HttpServletRequest): Response =
     validateSubscriptionService()
     ok(jsonString(result(service.getSubscribers)))
-  }
 
   @POST
   @Timed
   def subscribe(@Context req: HttpServletRequest,
-                @QueryParam("callbackUrl") callbackUrl: String): Response = {
+                @QueryParam("callbackUrl") callbackUrl: String): Response =
     validateSubscriptionService()
     val future: Future[MarathonEvent] = service.handleSubscriptionEvent(
         Subscribe(req.getRemoteAddr, callbackUrl))
     ok(jsonString(eventToJson(result(future))))
-  }
 
   @DELETE
   @Timed
   def unsubscribe(@Context req: HttpServletRequest,
-                  @QueryParam("callbackUrl") callbackUrl: String): Response = {
+                  @QueryParam("callbackUrl") callbackUrl: String): Response =
     validateSubscriptionService()
     val future = service.handleSubscriptionEvent(
         Unsubscribe(req.getRemoteAddr, callbackUrl))
     ok(jsonString(eventToJson(result(future))))
-  }
 
-  private def validateSubscriptionService(): Unit = {
+  private def validateSubscriptionService(): Unit =
     if (service eq null)
       throw new BadRequestException(
           "http event callback system is not running on this Marathon instance. " +
           "Please re-start this instance with \"--event_subscriber http_callback\"."
       )
-  }
-}

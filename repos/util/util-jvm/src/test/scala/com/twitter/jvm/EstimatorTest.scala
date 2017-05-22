@@ -5,8 +5,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class EstimatorTest extends FunSuite {
-  test("LoadAverage") {
+class EstimatorTest extends FunSuite
+  test("LoadAverage")
     // This makes LoadAverage.a = 1/2 for easy testing.
     val interval = -1D / math.log(0.5)
     val e = new LoadAverage(interval)
@@ -20,8 +20,6 @@ class EstimatorTest extends FunSuite {
     assert(e.estimate == 0.75)
     e.measure(-0.75)
     assert(e.estimate == 0)
-  }
-}
 
 /**
   * Take a GC log produced by:
@@ -34,28 +32,26 @@ class EstimatorTest extends FunSuite {
   * indexed by the jstat output, and the columns are,
   * in order: current time, next gc, estimated next GC.
   */
-object EstimatorApp extends App {
+object EstimatorApp extends App
   import com.twitter.conversions.storage._
 
-  val estimator = args match {
+  val estimator = args match
     case Array("kalman", n, error) =>
       new KalmanGaussianError(n.toInt, error.toDouble)
     case Array("windowed", n, windows) =>
-      new WindowedMeans(n.toInt, windows.split(",") map { w =>
-        w.split(":") match {
+      new WindowedMeans(n.toInt, windows.split(",") map  w =>
+        w.split(":") match
           case Array(w, i) => (w.toInt, i.toInt)
           case _ =>
             throw new IllegalArgumentException("bad weight, count pair " + w)
-        }
-      })
+      )
     case Array("load", interval) =>
       new LoadAverage(interval.toDouble)
     case _ => throw new IllegalArgumentException("bad args ")
-  }
 
   val lines = scala.io.Source.stdin.getLines().drop(1)
   val states =
-    lines.toArray map (_.split(" ") filter (_ != "") map (_.toDouble)) collect {
+    lines.toArray map (_.split(" ") filter (_ != "") map (_.toDouble)) collect
       case Array(s0c,
                  s1c,
                  s0u,
@@ -72,10 +68,9 @@ object EstimatorApp extends App {
                  fgct,
                  gct) =>
         PoolState(ygc.toLong, ec.toLong.bytes, eu.toLong.bytes)
-    }
 
   var elapsed = 1
-  for (List(begin, end) <- states.toList.sliding(2)) {
+  for (List(begin, end) <- states.toList.sliding(2))
     val allocated = (end - begin).used
     estimator.measure(allocated.inBytes)
     val r = end.capacity - end.used
@@ -85,8 +80,6 @@ object EstimatorApp extends App {
     if (j > 0) println("%d %d %d".format(elapsed, j, i))
 
     elapsed += 1
-  }
-}
 
 /*
 

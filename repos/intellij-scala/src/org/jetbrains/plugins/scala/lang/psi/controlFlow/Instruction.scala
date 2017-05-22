@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.lang.psi.ScalaPsiElement
 /**
   * @author ilyas
   */
-trait Instruction {
+trait Instruction
   def succ( /*put call env here*/ ): Iterable[Instruction]
   def pred( /*put call env here*/ ): Iterable[Instruction]
 
@@ -17,4 +17,3 @@ trait Instruction {
 
   @Nullable
   def element: Option[ScalaPsiElement]
-}

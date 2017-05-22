@@ -19,7 +19,7 @@ package com.twitter.summingbird.online.executor
 import scala.util.Try
 import com.twitter.bijection.Injection
 
-trait OperationContainer[Input, Output, State, WireFmt, RuntimeContext] {
+trait OperationContainer[Input, Output, State, WireFmt, RuntimeContext]
   def decoder: Injection[Input, WireFmt]
   def encoder: Injection[Output, WireFmt]
   def executeTick: TraversableOnce[(Seq[State], Try[TraversableOnce[Output]])]
@@ -29,4 +29,3 @@ trait OperationContainer[Input, Output, State, WireFmt, RuntimeContext] {
   def init(ctx: RuntimeContext) {}
   def cleanup {}
   def notifyFailure(inputs: Seq[State], e: Throwable) {}
-}

@@ -25,14 +25,11 @@ import net.liftweb.common._
 /**
   * Sets the DocType to html5
   */
-object HTML5 extends DispatchSnippet {
+object HTML5 extends DispatchSnippet
 
-  def dispatch: DispatchIt = {
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
-  def render(xhtml: NodeSeq): NodeSeq = {
+  def render(xhtml: NodeSeq): NodeSeq =
     S.setDocType(Full(DocType.html5))
     xhtml
-  }
-}

@@ -16,31 +16,30 @@ import scala.concurrent.SyncVar
 import model._
 
 /** This class takes care of running the graphviz dot utility */
-class DotRunner(settings: doc.Settings) {
+class DotRunner(settings: doc.Settings)
 
   private[this] var dotAttempts = 0
   private[this] var dotProcess: DotProcess = null
 
-  def feedToDot(dotInput: String, template: DocTemplateEntity): String = {
+  def feedToDot(dotInput: String, template: DocTemplateEntity): String =
 
-    if (dotProcess == null) {
-      if (dotAttempts < settings.docDiagramsDotRestart.value + 1) {
+    if (dotProcess == null)
+      if (dotAttempts < settings.docDiagramsDotRestart.value + 1)
         if (dotAttempts > 0)
           settings.printMsg("Graphviz will be restarted...\n")
         dotAttempts += 1
         dotProcess = new DotProcess(settings)
-      } else return null
-    }
+      else return null
 
     val tStart = System.currentTimeMillis
     val result = dotProcess.feedToDot(dotInput, template.qualifiedName)
     val tFinish = System.currentTimeMillis
     DiagramStats.addDotRunningTime(tFinish - tStart)
 
-    if (result == null) {
+    if (result == null)
       dotProcess.cleanup()
       dotProcess = null
-      if (dotAttempts == 1 + settings.docDiagramsDotRestart.value) {
+      if (dotAttempts == 1 + settings.docDiagramsDotRestart.value)
         settings.printMsg("\n")
         settings.printMsg(
             "**********************************************************************")
@@ -62,17 +61,13 @@ class DotRunner(settings: doc.Settings) {
             "\nPlease note that graphviz package version 2.26 or above is required.")
         settings.printMsg(
             "**********************************************************************\n\n")
-      }
-    }
 
     result
-  }
 
   def cleanup() =
     if (dotProcess != null) dotProcess.cleanup()
-}
 
-class DotProcess(settings: doc.Settings) {
+class DotProcess(settings: doc.Settings)
 
   @volatile var error: Boolean = false // signal an error
   val inputString = new SyncVar[String] // used for the dot process input
@@ -85,20 +80,19 @@ class DotProcess(settings: doc.Settings) {
   var templateName: String = ""
   var templateInput: String = ""
 
-  def feedToDot(input: String, template: String): String = {
+  def feedToDot(input: String, template: String): String =
 
     templateName = template
     templateInput = input
 
-    try {
+    try
 
       // process creation
-      if (process == null) {
+      if (process == null)
         val procIO = new ProcessIO(inputFn(_), outputFn(_), errorFn(_))
         val processBuilder: ProcessBuilder = Seq(
             settings.docDiagramsDotPath.value, "-Tsvg")
         process = processBuilder.run(procIO)
-      }
 
       // pass the input and wait for the output
       assert(!inputString.isSet)
@@ -109,22 +103,20 @@ class DotProcess(settings: doc.Settings) {
       if (error) result = null
 
       result
-    } catch {
+    catch
       case exc: Throwable =>
         errorBuffer.append("  Main thread in " + templateName + ": " +
             (if (exc.isInstanceOf[NoSuchElementException]) "Timeout"
              else "Exception: " + exc))
         error = true
         return null
-    }
-  }
 
-  def cleanup(): Unit = {
+  def cleanup(): Unit =
 
     // we'll need to know if there was any error for reporting
     val _error = error
 
-    if (process != null) {
+    if (process != null)
       // if there's no error, this should exit cleanly
       if (!error) feedToDot("<finish>", "<finishing>")
 
@@ -134,10 +126,9 @@ class DotProcess(settings: doc.Settings) {
       // we'll need to unblock the input again
       if (!inputString.isSet) inputString.put("")
       if (outputString.isSet) outputString.take()
-    }
 
-    if (_error) {
-      if (settings.docDiagramsDebug.value) {
+    if (_error)
+      if (settings.docDiagramsDebug.value)
         settings.printMsg(
             "\n**********************************************************************")
         settings.printMsg(
@@ -153,7 +144,7 @@ class DotProcess(settings: doc.Settings) {
           settings.printMsg("  Cleanup: Dot exit code: " + process.exitValue)
         settings.printMsg(
             "**********************************************************************")
-      } else {
+      else
         // we shouldn't just sit there for 50s not reporting anything, no?
         settings.printMsg(
             "Graphviz dot encountered an error when generating the diagram for:")
@@ -163,82 +154,67 @@ class DotProcess(settings: doc.Settings) {
         settings.printMsg(
             "a diagram, please use the " + settings.docDiagramsDebug.name +
             " flag and report a bug with the output.")
-      }
-    }
-  }
 
   /* The standard input passing function */
-  private[this] def inputFn(stdin: OutputStream): Unit = {
+  private[this] def inputFn(stdin: OutputStream): Unit =
     val writer = new BufferedWriter(new OutputStreamWriter(stdin))
-    try {
+    try
       var input = inputString.take()
 
-      while (!error) {
-        if (input == "<finish>") {
+      while (!error)
+        if (input == "<finish>")
           // empty => signal to finish
           stdin.close()
           return
-        } else {
+        else
           // send output to dot
           writer.write(input + "\n\n")
           writer.flush()
-        }
 
         if (!error) input = inputString.take()
-      }
       stdin.close()
-    } catch {
+    catch
       case exc: Throwable =>
         error = true
         stdin.close()
         errorBuffer.append(
             "  Input thread in " + templateName + ": Exception: " + exc + "\n")
-    }
-  }
 
-  private[this] def outputFn(stdOut: InputStream): Unit = {
+  private[this] def outputFn(stdOut: InputStream): Unit =
     val reader = new BufferedReader(new InputStreamReader(stdOut))
     val buffer: StringBuilder = new StringBuilder()
-    try {
+    try
       var line = reader.readLine
-      while (!error && line != null) {
+      while (!error && line != null)
         buffer.append(line + "\n")
         // signal the last element in the svg (only for output)
-        if (line == "</svg>") {
+        if (line == "</svg>")
           outputString.put(buffer.toString)
           buffer.setLength(0)
-        }
         if (error) { stdOut.close(); return }
         line = reader.readLine
-      }
       assert(!outputString.isSet)
       outputString.put(buffer.toString)
       stdOut.close()
-    } catch {
+    catch
       case exc: Throwable =>
         error = true
         stdOut.close()
         errorBuffer.append("  Output thread in " + templateName +
             ": Exception: " + exc + "\n")
-    }
-  }
 
-  private[this] def errorFn(stdErr: InputStream): Unit = {
+  private[this] def errorFn(stdErr: InputStream): Unit =
     val reader = new BufferedReader(new InputStreamReader(stdErr))
-    try {
+    try
       var line = reader.readLine
-      while (line != null) {
+      while (line != null)
         errorBuffer.append("  DOT <error console>: " + line + "\n")
         error = true
         line = reader.readLine
-      }
       stdErr.close()
-    } catch {
+    catch
       case exc: Throwable =>
         error = true
         stdErr.close()
         errorBuffer.append(
             "  Error thread in " + templateName + ": Exception: " + exc + "\n")
-    }
-  }
-}

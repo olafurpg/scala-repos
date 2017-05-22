@@ -31,12 +31,10 @@ import org.apache.spark.rdd.RDD
 private[ml] class WeightedLeastSquaresModel(val coefficients: DenseVector,
                                             val intercept: Double,
                                             val diagInvAtWA: DenseVector)
-    extends Serializable {
+    extends Serializable
 
-  def predict(features: Vector): Double = {
+  def predict(features: Vector): Double =
     BLAS.dot(coefficients, features) + intercept
-  }
-}
 
 /**
   * Weighted least squares solver via normal equation.
@@ -65,19 +63,18 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
                                        val regParam: Double,
                                        val standardizeFeatures: Boolean,
                                        val standardizeLabel: Boolean)
-    extends Logging with Serializable {
+    extends Logging with Serializable
   import WeightedLeastSquares._
 
   require(regParam >= 0.0, s"regParam cannot be negative: $regParam")
-  if (regParam == 0.0) {
+  if (regParam == 0.0)
     logWarning(
         "regParam is zero, which might cause numerical instability and overfitting.")
-  }
 
   /**
     * Creates a [[WeightedLeastSquaresModel]] from an RDD of [[Instance]]s.
     */
-  def fit(instances: RDD[Instance]): WeightedLeastSquaresModel = {
+  def fit(instances: RDD[Instance]): WeightedLeastSquaresModel =
     val summary = instances.treeAggregate(new Aggregator)(_.add(_), _.merge(_))
     summary.validate()
     logInfo(s"Number of instances: ${summary.count}.")
@@ -92,8 +89,8 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
     val aaBar = summary.aaBar
     val aaValues = aaBar.values
 
-    if (bStd == 0) {
-      if (fitIntercept) {
+    if (bStd == 0)
+      if (fitIntercept)
         logWarning(
             s"The standard deviation of the label is zero, so the coefficients will be " +
             s"zeros and the intercept will be the mean of the label; as a result, " +
@@ -103,43 +100,36 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
         val diagInvAtWA = new DenseVector(Array(0D))
         return new WeightedLeastSquaresModel(
             coefficients, intercept, diagInvAtWA)
-      } else {
+      else
         require(!(regParam > 0.0 && standardizeLabel),
                 "The standard deviation of the label is zero. " +
                 "Model cannot be regularized with standardization=true")
         logWarning(s"The standard deviation of the label is zero. " +
             "Consider setting fitIntercept=true.")
-      }
-    }
 
     // add regularization to diagonals
     var i = 0
     var j = 2
-    while (i < triK) {
+    while (i < triK)
       var lambda = regParam
-      if (standardizeFeatures) {
+      if (standardizeFeatures)
         lambda *= aVar(j - 2)
-      }
-      if (standardizeLabel && bStd != 0) {
+      if (standardizeLabel && bStd != 0)
         lambda /= bStd
-      }
       aaValues(i) += lambda
       i += j
       j += 1
-    }
 
     val aa =
-      if (fitIntercept) {
+      if (fitIntercept)
         Array.concat(aaBar.values, aBar.values, Array(1.0))
-      } else {
+      else
         aaBar.values
-      }
     val ab =
-      if (fitIntercept) {
+      if (fitIntercept)
         Array.concat(abBar.values, Array(bBar))
-      } else {
+      else
         abBar.values
-      }
 
     val x = CholeskyDecomposition.solve(aa, ab)
 
@@ -147,22 +137,19 @@ private[ml] class WeightedLeastSquares(val fitIntercept: Boolean,
 
     // aaInv is a packed upper triangular matrix, here we get all elements on diagonal
     val diagInvAtWA = new DenseVector(
-        (1 to k).map { i =>
+        (1 to k).map  i =>
       aaInv(i + (i - 1) * i / 2 - 1) / wSum
-    }.toArray)
+    .toArray)
 
     val (coefficients, intercept) =
-      if (fitIntercept) {
+      if (fitIntercept)
         (new DenseVector(x.slice(0, x.length - 1)), x.last)
-      } else {
+      else
         (new DenseVector(x), 0.0)
-      }
 
     new WeightedLeastSquaresModel(coefficients, intercept, diagInvAtWA)
-  }
-}
 
-private[ml] object WeightedLeastSquares {
+private[ml] object WeightedLeastSquares
 
   /**
     * In order to take the normal equation approach efficiently, [[WeightedLeastSquares]]
@@ -174,7 +161,7 @@ private[ml] object WeightedLeastSquares {
     * Aggregator to provide necessary summary statistics for solving [[WeightedLeastSquares]].
     */
   // TODO: consolidate aggregates for summary statistics
-  private class Aggregator extends Serializable {
+  private class Aggregator extends Serializable
     var initialized: Boolean = false
     var k: Int = _
     var count: Long = _
@@ -187,7 +174,7 @@ private[ml] object WeightedLeastSquares {
     private var abSum: DenseVector = _
     private var aaSum: DenseVector = _
 
-    private def init(k: Int): Unit = {
+    private def init(k: Int): Unit =
       require(
           k <= MAX_NUM_FEATURES,
           "In order to take the normal equation approach efficiently, " +
@@ -203,17 +190,15 @@ private[ml] object WeightedLeastSquares {
       abSum = new DenseVector(Array.ofDim(k))
       aaSum = new DenseVector(Array.ofDim(triK))
       initialized = true
-    }
 
     /**
       * Adds an instance.
       */
-    def add(instance: Instance): this.type = {
+    def add(instance: Instance): this.type =
       val Instance(l, w, f) = instance
       val ak = f.size
-      if (!initialized) {
+      if (!initialized)
         init(ak)
-      }
       assert(ak == k,
              s"Dimension mismatch. Expect vectors of size $k but got $ak.")
       count += 1L
@@ -225,18 +210,16 @@ private[ml] object WeightedLeastSquares {
       BLAS.axpy(w * l, f, abSum)
       BLAS.spr(w, f, aaSum)
       this
-    }
 
     /**
       * Merges another [[Aggregator]].
       */
-    def merge(other: Aggregator): this.type = {
-      if (!other.initialized) {
+    def merge(other: Aggregator): this.type =
+      if (!other.initialized)
         this
-      } else {
-        if (!initialized) {
+      else
+        if (!initialized)
           init(other.k)
-        }
         assert(k == other.k,
                s"dimension mismatch: this.k = $k but other.k = ${other.k}")
         count += other.count
@@ -248,25 +231,21 @@ private[ml] object WeightedLeastSquares {
         BLAS.axpy(1.0, other.abSum, abSum)
         BLAS.axpy(1.0, other.aaSum, aaSum)
         this
-      }
-    }
 
     /**
       * Validates that we have seen observations.
       */
-    def validate(): Unit = {
+    def validate(): Unit =
       assert(initialized, "Training dataset is empty.")
       assert(wSum > 0.0, "Sum of weights cannot be zero.")
-    }
 
     /**
       * Weighted mean of features.
       */
-    def aBar: DenseVector = {
+    def aBar: DenseVector =
       val output = aSum.copy
       BLAS.scal(1.0 / wSum, output)
       output
-    }
 
     /**
       * Weighted mean of labels.
@@ -281,37 +260,31 @@ private[ml] object WeightedLeastSquares {
     /**
       * Weighted mean of (label * features).
       */
-    def abBar: DenseVector = {
+    def abBar: DenseVector =
       val output = abSum.copy
       BLAS.scal(1.0 / wSum, output)
       output
-    }
 
     /**
       * Weighted mean of (features * features^T^).
       */
-    def aaBar: DenseVector = {
+    def aaBar: DenseVector =
       val output = aaSum.copy
       BLAS.scal(1.0 / wSum, output)
       output
-    }
 
     /**
       * Weighted population variance of features.
       */
-    def aVar: DenseVector = {
+    def aVar: DenseVector =
       val variance = Array.ofDim[Double](k)
       var i = 0
       var j = 2
       val aaValues = aaSum.values
-      while (i < triK) {
+      while (i < triK)
         val l = j - 2
         val aw = aSum(l) / wSum
         variance(l) = aaValues(i) / wSum - aw * aw
         i += j
         j += 1
-      }
       new DenseVector(variance)
-    }
-  }
-}

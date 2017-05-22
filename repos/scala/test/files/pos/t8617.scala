@@ -1,4 +1,4 @@
-object Test {
+object Test
   def foo[A] =
     implicitly[OptManifest[A]] // was "unpositioned tree" under -Yrangepos
 
@@ -8,4 +8,3 @@ object Test {
 
   implicitly[reflect.ClassTag[String]]
   implicitly[reflect.runtime.universe.TypeTag[String]]
-}

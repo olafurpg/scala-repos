@@ -22,7 +22,7 @@ import locator.Locator
 /**
   * Helper class for Index instances
   */
-private[saddle] object IndexImpl {
+private[saddle] object IndexImpl
   case class IndexProperties(
       contiguous: Boolean, // if there are duplicates, are they all in the same place?
       monotonic: Boolean) // are the elements ordered (ascending)?
@@ -31,22 +31,18 @@ private[saddle] object IndexImpl {
     throw new ArrayIndexOutOfBoundsException("Cannot access index position -1")
 
   def keys2map[@spec(Boolean, Int, Long, Double) T : ST : ORD](
-      keys: Index[T]): (Locator[T], IndexProperties) = {
+      keys: Index[T]): (Locator[T], IndexProperties) =
     val map = Locator[T](keys.length)
     val sc = keys.scalarTag
     var i = 0
     var contiguous = true
     var monotonic = true
-    while (i < keys.length) {
+    while (i < keys.length)
       val k = keys.raw(i)
-      if (map.inc(k) == 0) {
+      if (map.inc(k) == 0)
         map.put(k, i)
-      } else {
+      else
         if (k != keys.raw(i - 1)) contiguous = false
-      }
       if (i > 0) monotonic &&= !sc.gt(keys.raw(i - 1), keys.raw(i))
       i += 1
-    }
     (map, IndexProperties(contiguous, monotonic))
-  }
-}

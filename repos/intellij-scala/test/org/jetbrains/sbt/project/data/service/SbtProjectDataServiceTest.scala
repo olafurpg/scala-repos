@@ -24,14 +24,13 @@ import org.junit.Assert._
   * @author Nikolay Obedin
   * @since 6/15/15.
   */
-class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
+class SbtProjectDataServiceTest extends ProjectDataServiceTestCase
 
   import ExternalSystemDataDsl._
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     super.setUp()
     setUpJdks()
-  }
 
   def testEmptyBasePackages(): Unit =
     doTestBasePackages(Seq.empty)
@@ -60,7 +59,7 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
   def testAbsentSdk(): Unit =
     doTestSdk(None, defaultJdk, LanguageLevel.JDK_1_7)
 
-  def testJavacOptions(): Unit = {
+  def testJavacOptions(): Unit =
     val options = Seq(
         "-g:none",
         "-nowarn",
@@ -80,9 +79,8 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
 
     val compilerConfiguration = CompilerConfiguration.getInstance(getProject)
     assertEquals("1.8", compilerConfiguration.getProjectBytecodeTarget)
-  }
 
-  def testSbtVersion(): Unit = {
+  def testSbtVersion(): Unit =
     val projectSettings = SbtProjectSettings.default
     projectSettings.setExternalProjectPath(
         ExternalSystemApiUtil.normalizePath(getProject.getBasePath))
@@ -96,62 +94,56 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
       .getLinkedProjectSettings(getProject.getBasePath)
       .sbtVersion
     assertEquals(expectedVersion, actualVersion)
-  }
 
-  def testIncrementalityTypeForSharedModules(): Unit = {
-    val testProject = new project {
+  def testIncrementalityTypeForSharedModules(): Unit =
+    val testProject = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      modules += new module {
+      modules += new module
         val typeId = SharedSourcesModuleType.instance.getId
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
-      }
 
       arbitraryNodes += new SbtProjectNode(
           Seq.empty, None, Seq.empty, "", getProject.getBasePath)
-    }.build.toDataNode
+    .build.toDataNode
 
     importProjectData(testProject)
     assertEquals(
         IncrementalityType.SBT,
         ScalaCompilerConfiguration.instanceIn(getProject).incrementalityType)
-  }
 
-  private def setUpJdks(): Unit = {
-    ApplicationManagerEx.getApplicationEx.runWriteAction(new Runnable {
-      def run(): Unit = {
+  private def setUpJdks(): Unit =
+    ApplicationManagerEx.getApplicationEx.runWriteAction(new Runnable
+      def run(): Unit =
         val projectJdkTable = ProjectJdkTable.getInstance()
         projectJdkTable.getAllJdks.foreach(projectJdkTable.removeJdk)
         projectJdkTable.addJdk(IdeaTestUtil.getMockJdk17)
         projectJdkTable.addJdk(IdeaTestUtil.getMockJdk18)
-      }
-    })
+    )
     // TODO: find a way to create mock Android SDK
-  }
 
   private def generateProject(basePackages: Seq[String],
                               jdk: Option[data.Sdk],
                               javacOptions: Seq[String],
                               sbtVersion: String): DataNode[ProjectData] =
-    new project {
+    new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
       arbitraryNodes += new SbtProjectNode(
           basePackages, jdk, javacOptions, sbtVersion, getProject.getBasePath)
-    }.build.toDataNode
+    .build.toDataNode
 
-  private def doTestBasePackages(basePackages: Seq[String]): Unit = {
+  private def doTestBasePackages(basePackages: Seq[String]): Unit =
     importProjectData(generateProject(basePackages, None, Seq.empty, ""))
     UsefulTestCase.assertContainsElements(
         ScalaProjectSettings.getInstance(getProject).getBasePackages,
         basePackages: _*)
-  }
 
   private def defaultJdk: Sdk =
     ProjectJdkTable.getInstance().getAllJdks.head
@@ -164,7 +156,7 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
   private def doTestSdk(sdk: Option[data.Sdk],
                         javacOptions: Seq[String],
                         expectedSdk: Sdk,
-                        expectedLanguageLevel: LanguageLevel): Unit = {
+                        expectedLanguageLevel: LanguageLevel): Unit =
     importProjectData(generateProject(Seq.empty, sdk, javacOptions, ""))
     assertEquals(
         expectedSdk, ProjectRootManager.getInstance(getProject).getProjectSdk)
@@ -176,5 +168,3 @@ class SbtProjectDataServiceTest extends ProjectDataServiceTestCase {
           .defaultJavaLanguageLevelIn(expectedSdk)
           .fold(false)(_ != expectedLanguageLevel))
       assertFalse(languageLevelProjectExtension.getDefault)
-  }
-}

@@ -23,7 +23,7 @@ import scala.scalajs.js.annotation._
   *  with a different meaning are prefixed by `js` in this trait.
   */
 @native
-trait JSStringOps extends Any {
+trait JSStringOps extends Any
 
   /**
     * Returns the index within the calling String object of the first occurrence
@@ -197,9 +197,7 @@ trait JSStringOps extends Any {
     * MDN
     */
   def toLocaleUpperCase(): String = native
-}
 
-object JSStringOps {
+object JSStringOps
   implicit def enableJSStringOps(x: String): JSStringOps =
     x.asInstanceOf[JSStringOps]
-}

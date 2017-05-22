@@ -25,9 +25,9 @@ import org.mockito.Mockito._
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.rpc.{RpcAddress, TestRpcEndpoint}
 
-class InboxSuite extends SparkFunSuite {
+class InboxSuite extends SparkFunSuite
 
-  test("post") {
+  test("post")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     when(endpointRef.name).thenReturn("hello")
@@ -47,9 +47,8 @@ class InboxSuite extends SparkFunSuite {
     assert(inbox.isEmpty)
     endpoint.verifyStarted()
     endpoint.verifyStopped()
-  }
 
-  test("post: with reply") {
+  test("post: with reply")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     val dispatcher = mock(classOf[Dispatcher])
@@ -61,9 +60,8 @@ class InboxSuite extends SparkFunSuite {
     assert(inbox.isEmpty)
 
     endpoint.verifySingleReceiveAndReplyMessage("hi")
-  }
 
-  test("post: multiple threads") {
+  test("post: multiple threads")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     when(endpointRef.name).thenReturn("hello")
@@ -71,25 +69,20 @@ class InboxSuite extends SparkFunSuite {
     val dispatcher = mock(classOf[Dispatcher])
 
     val numDroppedMessages = new AtomicInteger(0)
-    val inbox = new Inbox(endpointRef, endpoint) {
-      override def onDrop(message: InboxMessage): Unit = {
+    val inbox = new Inbox(endpointRef, endpoint)
+      override def onDrop(message: InboxMessage): Unit =
         numDroppedMessages.incrementAndGet()
-      }
-    }
 
     val exitLatch = new CountDownLatch(10)
 
-    for (_ <- 0 until 10) {
-      new Thread {
-        override def run(): Unit = {
-          for (_ <- 0 until 100) {
+    for (_ <- 0 until 10)
+      new Thread
+        override def run(): Unit =
+          for (_ <- 0 until 100)
             val message = OneWayMessage(null, "hi")
             inbox.post(message)
-          }
           exitLatch.countDown()
-        }
-      }.start()
-    }
+      .start()
     // Try to process some messages
     inbox.process(dispatcher)
     inbox.stop()
@@ -103,9 +96,8 @@ class InboxSuite extends SparkFunSuite {
     assert(1000 === endpoint.numReceiveMessages + numDroppedMessages.get)
     endpoint.verifyStarted()
     endpoint.verifyStopped()
-  }
 
-  test("post: Associated") {
+  test("post: Associated")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     val dispatcher = mock(classOf[Dispatcher])
@@ -117,9 +109,8 @@ class InboxSuite extends SparkFunSuite {
     inbox.process(dispatcher)
 
     endpoint.verifySingleOnConnectedMessage(remoteAddress)
-  }
 
-  test("post: Disassociated") {
+  test("post: Disassociated")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     val dispatcher = mock(classOf[Dispatcher])
@@ -131,9 +122,8 @@ class InboxSuite extends SparkFunSuite {
     inbox.process(dispatcher)
 
     endpoint.verifySingleOnDisconnectedMessage(remoteAddress)
-  }
 
-  test("post: AssociationError") {
+  test("post: AssociationError")
     val endpoint = new TestRpcEndpoint
     val endpointRef = mock(classOf[NettyRpcEndpointRef])
     val dispatcher = mock(classOf[Dispatcher])
@@ -146,5 +136,3 @@ class InboxSuite extends SparkFunSuite {
     inbox.process(dispatcher)
 
     endpoint.verifySingleOnNetworkErrorMessage(cause, remoteAddress)
-  }
-}

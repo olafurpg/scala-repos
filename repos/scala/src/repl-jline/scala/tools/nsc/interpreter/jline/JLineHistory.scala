@@ -17,7 +17,7 @@ import scala.tools.nsc.interpreter.session.{History, SimpleHistory}
 /** A straight scalafication of the jline interface which mixes
   *  in the sparse jline-independent one too.
   */
-trait JLineHistory extends JHistory with History {
+trait JLineHistory extends JHistory with History
   def size: Int
   def isEmpty: Boolean
   def index: Int
@@ -38,23 +38,19 @@ trait JLineHistory extends JHistory with History {
   def moveTo(index: Int): Boolean
   def moveToEnd(): Unit
 
-  override def historicize(text: String): Boolean = {
+  override def historicize(text: String): Boolean =
     text.lines foreach add
     moveToEnd()
     true
-  }
-}
 
-object JLineHistory {
-  class JLineFileHistory extends SimpleHistory with FileBackedHistory {
-    override def add(item: CharSequence): Unit = {
+object JLineHistory
+  class JLineFileHistory extends SimpleHistory with FileBackedHistory
+    override def add(item: CharSequence): Unit =
       if (!isEmpty && last == item)
         interpreter.repldbg("Ignoring duplicate entry '" + item + "'")
-      else {
+      else
         super.add(item)
         addLineToFile(item)
-      }
-    }
     override def toString =
       "History(size = " + size + ", index = " + index + ")"
 
@@ -63,20 +59,15 @@ object JLineHistory {
     override def asStrings(from: Int, to: Int): List[String] =
       entries(from).asScala.take(to - from).map(_.value.toString).toList
 
-    case class Entry(index: Int, value: CharSequence) extends JEntry {
+    case class Entry(index: Int, value: CharSequence) extends JEntry
       override def toString = value.toString
-    }
 
-    private def toEntries(): Seq[JEntry] = buf.zipWithIndex map {
+    private def toEntries(): Seq[JEntry] = buf.zipWithIndex map
       case (x, i) => Entry(i, x)
-    }
     def entries(idx: Int): JListIterator[JEntry] =
       toEntries().asJava.listIterator(idx)
     def entries(): JListIterator[JEntry] = toEntries().asJava.listIterator()
     def iterator: JIterator[JEntry] = toEntries().iterator.asJava
-  }
 
-  def apply(): History = try new JLineFileHistory catch {
+  def apply(): History = try new JLineFileHistory catch
     case x: Exception => new SimpleHistory()
-  }
-}

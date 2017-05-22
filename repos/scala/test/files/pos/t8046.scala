@@ -1,9 +1,8 @@
-trait One {
+trait One
   type Op [A]
   type Alias[A] = Op[A]
-}
 
-trait Two extends One {
+trait Two extends One
   trait Op[A] extends (A => A)
 
   // This compiles
@@ -17,4 +16,3 @@ trait Two extends One {
   //         ^
   // one error found
   class View2 extends Alias[Int] { def apply(xs: Int) = xs }
-}

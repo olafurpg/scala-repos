@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   def m1a: scala.reflect.Manifest[Int] = scala.reflect.Manifest.Int
   def m2a: scala.reflect.OptManifest[Int] = ???
   def m3a = scala.reflect.NoManifest
@@ -12,4 +12,3 @@ object Test extends App {
 
   val m4b = implicitly[Manifest[Int]]
   val m5b = implicitly[OptManifest[Int]]
-}

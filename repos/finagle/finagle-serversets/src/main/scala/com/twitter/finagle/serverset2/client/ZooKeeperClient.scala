@@ -3,7 +3,7 @@ package com.twitter.finagle.serverset2.client
 import com.twitter.io.Buf
 import com.twitter.util.{Closable, Duration, Future}
 
-private[serverset2] trait ZooKeeperClient extends Closable {
+private[serverset2] trait ZooKeeperClient extends Closable
 
   /**
     * The session id for this ZooKeeper client instance. The value returned is
@@ -61,9 +61,8 @@ private[serverset2] trait ZooKeeperClient extends Closable {
     * @return string representation of the current client
     */
   def toString: String
-}
 
-private[serverset2] trait ZooKeeperReader extends ZooKeeperClient {
+private[serverset2] trait ZooKeeperReader extends ZooKeeperClient
 
   /**
     * Check if a node exists.
@@ -120,10 +119,9 @@ private[serverset2] trait ZooKeeperReader extends ZooKeeperClient {
     * @return a Future[Unit]
     */
   def sync(path: String): Future[Unit]
-}
 
-object ZooKeeperReader {
-  def patToPathAndPrefix(pat: String): (String, String) = {
+object ZooKeeperReader
+  def patToPathAndPrefix(pat: String): (String, String) =
     if (pat.isEmpty || pat(0) != '/')
       throw new IllegalArgumentException("Invalid glob pattern")
 
@@ -134,23 +132,19 @@ object ZooKeeperReader {
     val prefix = pat.substring(slash + 1, pat.length)
 
     (path, prefix)
-  }
 
   /** An implementation helper for ZooKeeperReader.glob */
   def processGlob(path: String,
                   prefix: String,
-                  children: java.util.List[String]): Seq[String] = {
+                  children: java.util.List[String]): Seq[String] =
     val seq = Seq.newBuilder[String]
     val iter = children.iterator()
-    while (iter.hasNext()) {
+    while (iter.hasNext())
       val el = iter.next()
       if (el startsWith prefix) seq += path + "/" + el
-    }
     seq.result
-  }
-}
 
-private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
+private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient
 
   /**
     * Create a node of a given type with the given path. The node data will be the
@@ -211,9 +205,8 @@ private[serverset2] trait ZooKeeperWriter extends ZooKeeperClient {
   def setACL(path: String,
              acl: Seq[Data.ACL],
              version: Option[Int]): Future[Data.Stat]
-}
 
-private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
+private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient
 
   /**
     * Transactional operation. Execute all operations or none of them.
@@ -222,7 +215,6 @@ private[serverset2] trait ZooKeeperMulti extends ZooKeeperClient {
     * @return a Future[Seq[OpResult]]
     */
   def multi(ops: Seq[Op]): Future[Seq[OpResult]]
-}
 
 private[serverset2] trait ZooKeeperRW
     extends ZooKeeperReader with ZooKeeperWriter

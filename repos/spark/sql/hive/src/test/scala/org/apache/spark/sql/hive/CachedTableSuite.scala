@@ -25,27 +25,25 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.storage.RDDBlockId
 import org.apache.spark.util.Utils
 
-class CachedTableSuite extends QueryTest with TestHiveSingleton {
+class CachedTableSuite extends QueryTest with TestHiveSingleton
   import hiveContext._
 
-  def rddIdOf(tableName: String): Int = {
+  def rddIdOf(tableName: String): Int =
     val plan = table(tableName).queryExecution.sparkPlan
-    plan.collect {
+    plan.collect
       case InMemoryColumnarTableScan(_, _, relation) =>
         relation.cachedColumnBuffers.id
       case _ =>
         fail(s"Table $tableName is not cached\n" + plan)
-    }.head
-  }
+    .head
 
-  def isMaterialized(rddId: Int): Boolean = {
+  def isMaterialized(rddId: Int): Boolean =
     val maybeBlock = sparkContext.env.blockManager.get(RDDBlockId(rddId, 0))
     maybeBlock.foreach(
         _ => sparkContext.env.blockManager.releaseLock(RDDBlockId(rddId, 0)))
     maybeBlock.nonEmpty
-  }
 
-  test("cache table") {
+  test("cache table")
     val preCacheResults = sql("SELECT * FROM src").collect().toSeq
 
     cacheTable("src")
@@ -59,9 +57,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
 
     uncacheTable("src")
     assertCached(sql("SELECT * FROM src"), 0)
-  }
 
-  test("cache invalidation") {
+  test("cache invalidation")
     sql("CREATE TABLE cachedTable(key INT, value STRING)")
 
     sql("INSERT INTO TABLE cachedTable SELECT * FROM src")
@@ -75,29 +72,23 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
                 table("src").collect().toSeq ++ table("src").collect().toSeq)
 
     sql("DROP TABLE cachedTable")
-  }
 
-  test("Drop cached table") {
+  test("Drop cached table")
     sql("CREATE TABLE cachedTableTest(a INT)")
     cacheTable("cachedTableTest")
     sql("SELECT * FROM cachedTableTest").collect()
     sql("DROP TABLE cachedTableTest")
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       sql("SELECT * FROM cachedTableTest").collect()
-    }
-  }
 
-  test("DROP nonexistant table") {
+  test("DROP nonexistant table")
     sql("DROP TABLE IF EXISTS nonexistantTable")
-  }
 
-  test("correct error on uncache of non-cached table") {
-    intercept[IllegalArgumentException] {
+  test("correct error on uncache of non-cached table")
+    intercept[IllegalArgumentException]
       hiveContext.uncacheTable("src")
-    }
-  }
 
-  test("'CACHE TABLE' and 'UNCACHE TABLE' HiveQL statement") {
+  test("'CACHE TABLE' and 'UNCACHE TABLE' HiveQL statement")
     sql("CACHE TABLE src")
     assertCached(table("src"))
     assert(hiveContext.isCached("src"), "Table 'src' should be cached")
@@ -105,9 +96,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     sql("UNCACHE TABLE src")
     assertCached(table("src"), 0)
     assert(!hiveContext.isCached("src"), "Table 'src' should not be cached")
-  }
 
-  test("CACHE TABLE tableName AS SELECT * FROM anotherTable") {
+  test("CACHE TABLE tableName AS SELECT * FROM anotherTable")
     sql("CACHE TABLE testCacheTable AS SELECT * FROM src")
     assertCached(table("testCacheTable"))
 
@@ -119,9 +109,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     uncacheTable("testCacheTable")
     assert(!isMaterialized(rddId),
            "Uncached in-memory table should have been unpersisted")
-  }
 
-  test("CACHE TABLE tableName AS SELECT ...") {
+  test("CACHE TABLE tableName AS SELECT ...")
     sql("CACHE TABLE testCacheTable AS SELECT key FROM src LIMIT 10")
     assertCached(table("testCacheTable"))
 
@@ -133,9 +122,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     uncacheTable("testCacheTable")
     assert(!isMaterialized(rddId),
            "Uncached in-memory table should have been unpersisted")
-  }
 
-  test("CACHE LAZY TABLE tableName") {
+  test("CACHE LAZY TABLE tableName")
     sql("CACHE LAZY TABLE src")
     assertCached(table("src"))
 
@@ -150,15 +138,13 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
     uncacheTable("src")
     assert(!isMaterialized(rddId),
            "Uncached in-memory table should have been unpersisted")
-  }
 
-  test("CACHE TABLE with Hive UDF") {
+  test("CACHE TABLE with Hive UDF")
     sql("CACHE TABLE udfTest AS SELECT * FROM src WHERE floor(key) = 1")
     assertCached(table("udfTest"))
     uncacheTable("udfTest")
-  }
 
-  test("REFRESH TABLE also needs to recache the data (data source tables)") {
+  test("REFRESH TABLE also needs to recache the data (data source tables)")
     val tempPath: File = Utils.createTempDir()
     tempPath.delete()
     table("src").write.mode(SaveMode.Overwrite).parquet(tempPath.toString)
@@ -195,9 +181,8 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
 
     sql("DROP TABLE refreshTable")
     Utils.deleteRecursively(tempPath)
-  }
 
-  test("SPARK-11246 cache parquet table") {
+  test("SPARK-11246 cache parquet table")
     sql("CREATE TABLE cachedTable STORED AS PARQUET AS SELECT 1")
 
     cacheTable("cachedTable")
@@ -206,5 +191,3 @@ class CachedTableSuite extends QueryTest with TestHiveSingleton {
         sparkPlan.collect { case e: InMemoryColumnarTableScan => e }.size === 1)
 
     sql("DROP TABLE cachedTable")
-  }
-}

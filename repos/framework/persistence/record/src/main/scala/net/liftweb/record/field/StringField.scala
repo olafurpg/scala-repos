@@ -29,34 +29,30 @@ import http.S
 import S._
 import JE._
 
-trait StringTypedField extends TypedField[String] with StringValidators {
+trait StringTypedField extends TypedField[String] with StringValidators
   val maxLength: Int
 
   def maxLen = maxLength
 
-  def setFromAny(in: Any): Box[String] = in match {
+  def setFromAny(in: Any): Box[String] = in match
     case seq: Seq[_] if !seq.isEmpty => setFromAny(seq.head)
     case _ => genericSetFromAny(in)
-  }
 
-  def setFromString(s: String): Box[String] = s match {
+  def setFromString(s: String): Box[String] = s match
     case null | "" if optional_? => setBox(Empty)
     case null | "" => setBox(Failure(notOptionalErrorMessage))
     case _ => setBox(Full(s))
-  }
 
-  private def elem = S.fmapFunc(SFuncHolder(this.setFromAny(_))) { funcName =>
+  private def elem = S.fmapFunc(SFuncHolder(this.setFromAny(_)))  funcName =>
     <input type={formInputType} maxlength={maxLength.toString}
       name={funcName}
       value={valueBox openOr ""}
       tabindex={tabIndex.toString}/>
-  }
 
   def toForm: Box[NodeSeq] =
-    uniqueFieldId match {
+    uniqueFieldId match
       case Full(id) => Full(elem % ("id" -> id))
       case _ => Full(elem)
-    }
 
   def defaultValue = ""
 
@@ -64,61 +60,52 @@ trait StringTypedField extends TypedField[String] with StringValidators {
 
   def asJValue: JValue =
     valueBox.map(v => JString(v)) openOr (JNothing: JValue)
-  def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match {
+  def setFromJValue(jvalue: JValue): Box[MyType] = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case JString(s) => setFromString(s)
     case other => setBox(FieldHelpers.expectedA("JString", other))
-  }
-}
 
 class StringField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val maxLength: Int)
     extends Field[String, OwnerType] with MandatoryTypedField[String]
-    with StringTypedField {
+    with StringTypedField
 
-  def this(rec: OwnerType, maxLength: Int, value: String) = {
+  def this(rec: OwnerType, maxLength: Int, value: String) =
     this(rec, maxLength)
     set(value)
-  }
 
-  def this(rec: OwnerType, value: String) = {
+  def this(rec: OwnerType, value: String) =
     this(rec, 100)
     set(value)
-  }
 
   def owner = rec
 
   protected def valueTypeToBoxString(in: ValueType): Box[String] =
     toBoxMyType(in)
   protected def boxStrToValType(in: Box[String]): ValueType = toValueType(in)
-}
 
 abstract class UniqueIdField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, override val maxLength: Int)
-    extends StringField[OwnerType](rec, maxLength) {
+    extends StringField[OwnerType](rec, maxLength)
   override lazy val defaultValue = randomString(maxLen)
 
   def reset(): OwnerType = this(randomString(maxLen))
-}
 
 class OptionalStringField[OwnerType <: Record[OwnerType]](
     rec: OwnerType, val maxLength: Int)
     extends Field[String, OwnerType] with OptionalTypedField[String]
-    with StringTypedField {
+    with StringTypedField
 
-  def this(rec: OwnerType, maxLength: Int, value: Box[String]) = {
+  def this(rec: OwnerType, maxLength: Int, value: Box[String]) =
     this(rec, maxLength)
     setBox(value)
-  }
 
-  def this(rec: OwnerType, value: Box[String]) = {
+  def this(rec: OwnerType, value: Box[String]) =
     this(rec, 100)
     setBox(value)
-  }
 
   def owner = rec
 
   protected def valueTypeToBoxString(in: ValueType): Box[String] =
     toBoxMyType(in)
   protected def boxStrToValType(in: Box[String]): ValueType = toValueType(in)
-}

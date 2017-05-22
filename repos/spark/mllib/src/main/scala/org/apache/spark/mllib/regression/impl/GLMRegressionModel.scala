@@ -28,9 +28,9 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
 /**
   * Helper methods for import/export of GLM regression models.
   */
-private[regression] object GLMRegressionModel {
+private[regression] object GLMRegressionModel
 
-  object SaveLoadV1_0 {
+  object SaveLoadV1_0
 
     def thisFormatVersion: String = "1.0"
 
@@ -45,7 +45,7 @@ private[regression] object GLMRegressionModel {
              path: String,
              modelClass: String,
              weights: Vector,
-             intercept: Double): Unit = {
+             intercept: Double): Unit =
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
@@ -61,7 +61,6 @@ private[regression] object GLMRegressionModel {
       val dataRDD: DataFrame = sc.parallelize(Seq(data), 1).toDF()
       // TODO: repartition with 1 partition after SPARK-5532 gets fixed
       dataRDD.write.parquet(Loader.dataPath(path))
-    }
 
     /**
       * Helper method for loading GLM regression model data.
@@ -72,7 +71,7 @@ private[regression] object GLMRegressionModel {
     def loadData(sc: SparkContext,
                  path: String,
                  modelClass: String,
-                 numFeatures: Int): Data = {
+                 numFeatures: Int): Data =
       val datapath = Loader.dataPath(path)
       val sqlContext = SQLContext.getOrCreate(sc)
       val dataRDD = sqlContext.read.parquet(datapath)
@@ -82,14 +81,10 @@ private[regression] object GLMRegressionModel {
       val data = dataArray(0)
       assert(
           data.size == 2, s"Unable to load $modelClass data from: $datapath")
-      data match {
+      data match
         case Row(weights: Vector, intercept: Double) =>
           assert(
               weights.size == numFeatures,
               s"Expected $numFeatures features, but" +
               s" found ${weights.size} features when loading $modelClass weights from $datapath")
           Data(weights, intercept)
-      }
-    }
-  }
-}

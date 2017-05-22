@@ -31,7 +31,7 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Point3D {
+object Point3D
   implicit def sfxPoint3D2jfx(p: Point3D): jfxg.Point3D =
     if (p != null) p.delegate else null
 
@@ -39,10 +39,9 @@ object Point3D {
     * Point or vector with all three coordinates set to zero.
     */
   val Zero = new Point3D(jfxg.Point3D.ZERO)
-}
 
 class Point3D(override val delegate: jfxg.Point3D)
-    extends SFXDelegate[jfxg.Point3D] {
+    extends SFXDelegate[jfxg.Point3D]
 
   def this(x: Double, y: Double, z: Double) = this(new jfxg.Point3D(x, y, z))
 
@@ -71,4 +70,3 @@ class Point3D(override val delegate: jfxg.Point3D)
     * Computes the distance between this point and point p.
     */
   def distance(p: Point3D) = delegate.distance(p)
-}

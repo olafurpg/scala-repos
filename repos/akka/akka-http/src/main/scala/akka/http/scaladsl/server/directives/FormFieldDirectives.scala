@@ -16,7 +16,7 @@ import scala.collection.immutable
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 
-trait FormFieldDirectives extends ToNameReceptacleEnhancements {
+trait FormFieldDirectives extends ToNameReceptacleEnhancements
   import FormFieldDirectives._
 
   /**
@@ -56,80 +56,65 @@ trait FormFieldDirectives extends ToNameReceptacleEnhancements {
     * As a workaround add an `import FormFieldDirectives.FieldMagnet` or use Scala 2.11.x.
     */
   def formFields(pdm: FieldMagnet): pdm.Out = pdm()
-}
 
-object FormFieldDirectives extends FormFieldDirectives {
+object FormFieldDirectives extends FormFieldDirectives
 
-  private val _formFieldSeq: Directive1[immutable.Seq[(String, String)]] = {
+  private val _formFieldSeq: Directive1[immutable.Seq[(String, String)]] =
     import BasicDirectives._
     import FutureDirectives._
     import akka.http.scaladsl.unmarshalling._
 
-    extract { ctx ⇒
+    extract  ctx ⇒
       import ctx.{executionContext, materializer}
-      Unmarshal(ctx.request.entity).to[StrictForm].fast.flatMap { form ⇒
-        val fields = form.fields.collect {
+      Unmarshal(ctx.request.entity).to[StrictForm].fast.flatMap  form ⇒
+        val fields = form.fields.collect
           case (name, field) if name.nonEmpty ⇒
             Unmarshal(field).to[String].map(fieldString ⇒ (name, fieldString))
-        }
         Future.sequence(fields)
-      }
-    }.flatMap { sequenceF ⇒
-      onComplete(sequenceF).flatMap {
+    .flatMap  sequenceF ⇒
+      onComplete(sequenceF).flatMap
         case Success(x) ⇒ provide(x)
         case Failure(x: UnsupportedContentTypeException) ⇒
           reject(UnsupportedRequestContentTypeRejection(x.supported))
         case Failure(_) ⇒ reject // TODO Use correct rejections
-      }
-    }
-  }
 
-  private val _formFieldMultiMap: Directive1[Map[String, List[String]]] = {
+  private val _formFieldMultiMap: Directive1[Map[String, List[String]]] =
     @tailrec
     def append(
         map: Map[String, List[String]],
-        fields: immutable.Seq[(String, String)]): Map[String, List[String]] = {
-      if (fields.isEmpty) {
+        fields: immutable.Seq[(String, String)]): Map[String, List[String]] =
+      if (fields.isEmpty)
         map
-      } else {
+      else
         val (key, value) = fields.head
         append(map.updated(key, value :: map.getOrElse(key, Nil)), fields.tail)
-      }
-    }
 
-    _formFieldSeq.map {
+    _formFieldSeq.map
       case seq ⇒
         append(Map.empty, seq)
-    }
-  }
 
   private val _formFieldMap: Directive1[Map[String, String]] =
     _formFieldSeq.map(_.toMap)
 
-  sealed trait FieldMagnet {
+  sealed trait FieldMagnet
     type Out
     def apply(): Out
-  }
-  object FieldMagnet {
+  object FieldMagnet
     implicit def apply[T](value: T)(
         implicit fdef: FieldDef[T]): FieldMagnet { type Out = fdef.Out } =
-      new FieldMagnet {
+      new FieldMagnet
         type Out = fdef.Out
         def apply() = fdef(value)
-      }
-  }
 
   type FieldDefAux[A, B] = FieldDef[A] { type Out = B }
-  sealed trait FieldDef[T] {
+  sealed trait FieldDef[T]
     type Out
     def apply(value: T): Out
-  }
-  object FieldDef {
+  object FieldDef
     def fieldDef[A, B](f: A ⇒ B): FieldDefAux[A, B] =
-      new FieldDef[A] {
+      new FieldDef[A]
         type Out = B
         def apply(value: A) = f(value)
-      }
 
     import BasicDirectives._
     import FutureDirectives._
@@ -142,7 +127,7 @@ object FormFieldDirectives extends FormFieldDirectives {
         f: A ⇒ Directive1[B]): FieldDefAux[A, Directive1[B]] = fieldDef(f)
     private def handleFieldResult[T](
         fieldName: String, result: Future[T]): Directive1[T] =
-      onComplete(result).flatMap {
+      onComplete(result).flatMap
         case Success(x) ⇒ provide(x)
         case Failure(Unmarshaller.NoContentException) ⇒
           reject(MissingFormFieldRejection(fieldName))
@@ -151,16 +136,14 @@ object FormFieldDirectives extends FormFieldDirectives {
         case Failure(x) ⇒
           reject(MalformedFormFieldRejection(
                   fieldName, x.getMessage.nullAsEmpty, Option(x.getCause)))
-      }
 
     //////////////////// "regular" formField extraction ////////////////////
 
     private def fieldOfForm[T](
         fieldName: String, fu: Unmarshaller[Option[StrictForm.Field], T])(
-        implicit sfu: SFU): RequestContext ⇒ Future[T] = { ctx ⇒
+        implicit sfu: SFU): RequestContext ⇒ Future[T] =  ctx ⇒
       import ctx.{executionContext, materializer}
       sfu(ctx.request.entity).fast.flatMap(form ⇒ fu(form field fieldName))
-    }
     private def filter[T](
         fieldName: String, fu: FSFFOU[T])(implicit sfu: SFU): Directive1[T] =
       extract(fieldOfForm(fieldName, fu))
@@ -168,50 +151,42 @@ object FormFieldDirectives extends FormFieldDirectives {
     implicit def forString(
         implicit sfu: SFU,
         fu: FSFFU[String]): FieldDefAux[String, Directive1[String]] =
-      extractField[String, String] { fieldName ⇒
+      extractField[String, String]  fieldName ⇒
         filter(fieldName, fu)
-      }
     implicit def forSymbol(
         implicit sfu: SFU,
         fu: FSFFU[String]): FieldDefAux[Symbol, Directive1[String]] =
-      extractField[Symbol, String] { symbol ⇒
+      extractField[Symbol, String]  symbol ⇒
         filter(symbol.name, fu)
-      }
     implicit def forNR[T](
         implicit sfu: SFU,
         fu: FSFFU[T]): FieldDefAux[NameReceptacle[T], Directive1[T]] =
-      extractField[NameReceptacle[T], T] { nr ⇒
+      extractField[NameReceptacle[T], T]  nr ⇒
         filter(nr.name, fu)
-      }
     implicit def forNUR[T](implicit sfu: SFU)
       : FieldDefAux[NameUnmarshallerReceptacle[T], Directive1[T]] =
-      extractField[NameUnmarshallerReceptacle[T], T] { nr ⇒
+      extractField[NameUnmarshallerReceptacle[T], T]  nr ⇒
         filter(nr.name, StrictForm.Field.unmarshallerFromFSU(nr.um))
-      }
     implicit def forNOR[T](implicit sfu: SFU, fu: FSFFOU[T])
       : FieldDefAux[NameOptionReceptacle[T], Directive1[Option[T]]] =
-      extractField[NameOptionReceptacle[T], Option[T]] { nr ⇒
+      extractField[NameOptionReceptacle[T], Option[T]]  nr ⇒
         filter[Option[T]](nr.name, fu)
-      }
     implicit def forNDR[T](
         implicit sfu: SFU,
         fu: FSFFOU[T]): FieldDefAux[NameDefaultReceptacle[T], Directive1[T]] =
-      extractField[NameDefaultReceptacle[T], T] { nr ⇒
+      extractField[NameDefaultReceptacle[T], T]  nr ⇒
         filter(nr.name, fu withDefaultValue nr.default)
-      }
     implicit def forNOUR[T](implicit sfu: SFU): FieldDefAux[
         NameOptionUnmarshallerReceptacle[T], Directive1[Option[T]]] =
-      extractField[NameOptionUnmarshallerReceptacle[T], Option[T]] { nr ⇒
+      extractField[NameOptionUnmarshallerReceptacle[T], Option[T]]  nr ⇒
         filter[Option[T]](
             nr.name, StrictForm.Field.unmarshallerFromFSU(nr.um): FSFFOU[T])
-      }
     implicit def forNDUR[T](implicit sfu: SFU)
       : FieldDefAux[NameDefaultUnmarshallerReceptacle[T], Directive1[T]] =
-      extractField[NameDefaultUnmarshallerReceptacle[T], T] { nr ⇒
+      extractField[NameDefaultUnmarshallerReceptacle[T], T]  nr ⇒
         filter(
             nr.name,
             (StrictForm.Field.unmarshallerFromFSU(nr.um): FSFFOU[T]) withDefaultValue nr.default)
-      }
 
     //////////////////// required formField support ////////////////////
 
@@ -219,49 +194,42 @@ object FormFieldDirectives extends FormFieldDirectives {
         fieldName: String,
         fu: Unmarshaller[Option[StrictForm.Field], T],
         requiredValue: Any)(implicit sfu: SFU): Directive0 =
-      extract(fieldOfForm(fieldName, fu)).flatMap {
-        onComplete(_).flatMap {
+      extract(fieldOfForm(fieldName, fu)).flatMap
+        onComplete(_).flatMap
           case Success(value) if value == requiredValue ⇒ pass
           case _ ⇒ reject
-        }
-      }
     implicit def forRVR[T](
         implicit sfu: SFU,
         fu: FSFFU[T]): FieldDefAux[RequiredValueReceptacle[T], Directive0] =
-      fieldDef[RequiredValueReceptacle[T], Directive0] { rvr ⇒
+      fieldDef[RequiredValueReceptacle[T], Directive0]  rvr ⇒
         requiredFilter(rvr.name, fu, rvr.requiredValue)
-      }
     implicit def forRVDR[T](implicit sfu: SFU)
       : FieldDefAux[RequiredValueUnmarshallerReceptacle[T], Directive0] =
-      fieldDef[RequiredValueUnmarshallerReceptacle[T], Directive0] { rvr ⇒
+      fieldDef[RequiredValueUnmarshallerReceptacle[T], Directive0]  rvr ⇒
         requiredFilter(rvr.name,
                        StrictForm.Field.unmarshallerFromFSU(rvr.um),
                        rvr.requiredValue)
-      }
 
     //////////////////// repeated formField support ////////////////////
 
     private def repeatedFilter[T](fieldName: String, fu: FSFFU[T])(
         implicit sfu: SFU): Directive1[Iterable[T]] =
-      extract { ctx ⇒
+      extract  ctx ⇒
         import ctx.{executionContext, materializer}
         sfu(ctx.request.entity).fast.flatMap(form ⇒
-              Future.sequence(form.fields.collect {
+              Future.sequence(form.fields.collect
             case (`fieldName`, value) ⇒ fu(value)
-          }))
-      }.flatMap { result ⇒
+          ))
+      .flatMap  result ⇒
         handleFieldResult(fieldName, result)
-      }
     implicit def forRepVR[T](implicit sfu: SFU, fu: FSFFU[T])
       : FieldDefAux[RepeatedValueReceptacle[T], Directive1[Iterable[T]]] =
-      extractField[RepeatedValueReceptacle[T], Iterable[T]] { rvr ⇒
+      extractField[RepeatedValueReceptacle[T], Iterable[T]]  rvr ⇒
         repeatedFilter(rvr.name, fu)
-      }
     implicit def forRepVDR[T](implicit sfu: SFU): FieldDefAux[
         RepeatedValueUnmarshallerReceptacle[T], Directive1[Iterable[T]]] =
-      extractField[RepeatedValueUnmarshallerReceptacle[T], Iterable[T]] { rvr ⇒
+      extractField[RepeatedValueUnmarshallerReceptacle[T], Iterable[T]]  rvr ⇒
         repeatedFilter(rvr.name, StrictForm.Field.unmarshallerFromFSU(rvr.um))
-      }
 
     //////////////////// tuple support ////////////////////
 
@@ -274,16 +242,12 @@ object FormFieldDirectives extends FormFieldDirectives {
       : FieldDefAux[T, fold.Out] =
       fieldDef[T, fold.Out](fold(pass, _))
 
-    object ConvertFieldDefAndConcatenate extends BinaryPolyFunc {
+    object ConvertFieldDefAndConcatenate extends BinaryPolyFunc
       implicit def from[P, TA, TB](
           implicit fdef: FieldDefAux[P, Directive[TB]],
           ev: Join[TA, TB]): BinaryPolyFunc.Case[
-          Directive[TA], P, ConvertFieldDefAndConcatenate.type] {
+          Directive[TA], P, ConvertFieldDefAndConcatenate.type]
         type Out = Directive[ev.Out]
-      } =
-        at[Directive[TA], P] { (a, t) ⇒
+      =
+        at[Directive[TA], P]  (a, t) ⇒
           a & fdef(t)
-        }
-    }
-  }
-}

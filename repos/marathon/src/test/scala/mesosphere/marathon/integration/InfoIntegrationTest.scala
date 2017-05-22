@@ -5,8 +5,8 @@ import org.scalatest.{GivenWhenThen, Matchers}
 
 class InfoIntegrationTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with GivenWhenThen with Matchers {
-  test("v2/info returns the right values") {
+    with GivenWhenThen with Matchers
+  test("v2/info returns the right values")
     When("fetching the info")
     val response = marathon.info
 
@@ -38,5 +38,3 @@ class InfoIntegrationTest
 
     And("the leader should match the value returned by /v2/leader")
     (info \ "leader").as[String] should be(marathon.leader().value.leader)
-  }
-}

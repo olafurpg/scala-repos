@@ -62,7 +62,7 @@ import scalaz.syntax.std.option._
 import java.util.concurrent.{ArrayBlockingQueue, ExecutorService, ThreadPoolExecutor, TimeUnit}
 import com.precog.common.Path
 
-object EventService {
+object EventService
   case class State(
       accessControl: APIKeyFinder[Future],
       ingestHandler: IngestServiceHandler,
@@ -83,10 +83,10 @@ object EventService {
       deleteTimeout: Timeout
   )
 
-  object ServiceConfig {
-    def fromConfiguration(config: Configuration) = {
+  object ServiceConfig
+    def fromConfiguration(config: Configuration) =
       (ServiceLocation.fromConfig(config.detach("eventService")) |@| ServiceLocation
-            .fromConfig(config.detach("bifrost"))) { (serviceLoc, shardLoc) =>
+            .fromConfig(config.detach("bifrost")))  (serviceLoc, shardLoc) =>
         ServiceConfig(
             serviceLocation = serviceLoc,
             shardLocation = shardLoc,
@@ -104,14 +104,10 @@ object EventService {
             deleteTimeout = akka.util.Timeout(
                   config[Long]("delete.timeout", 10000l))
         )
-      }
-    }
-  }
-}
 
 trait EventService
     extends BlueEyesServiceBuilder with EitherServiceCombinators
-    with PathServiceCombinators with APIKeyServiceCombinators {
+    with PathServiceCombinators with APIKeyServiceCombinators
   import EventService._
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
@@ -124,7 +120,7 @@ trait EventService
       permissionsFinder: PermissionsFinder[Future],
       eventStore: EventStore[Future],
       jobManager: JobManager[Response],
-      stoppable: Stoppable): State = {
+      stoppable: Stoppable): State =
     import serviceConfig._
 
     val ingestHandler = new IngestServiceHandler(permissionsFinder,
@@ -165,85 +161,61 @@ trait EventService
                        archiveHandler,
                        shardClient,
                        stoppable)
-  }
 
   def eventOptionsResponse = CORSHeaders.apply[JValue, Future](M)
 
-  val eventService = this.service("ingest", "2.0") {
-    requestLogging {
-      help("/docs/api") {
+  val eventService = this.service("ingest", "2.0")
+    requestLogging
+      help("/docs/api")
         healthMonitor("/health",
                       defaultShutdownTimeout,
-                      List(blueeyes.health.metrics.eternity)) {
+                      List(blueeyes.health.metrics.eternity))
           monitor => context =>
-            startup {
+            startup
               import context._
               Future(configureEventService(config))
-            } -> request { (state: State) =>
+            -> request  (state: State) =>
               import CORSHeaderHandler.allowOrigin
               implicit val FR =
                 M.compose[({ type l[a] = Function2[APIKey, Path, a] })#l]
 
-              allowOrigin("*", executionContext) {
+              allowOrigin("*", executionContext)
                 encode[ByteChunk,
                        Future[HttpResponse[JValue]],
-                       Future[HttpResponse[ByteChunk]]] {
-                  produce(application / json) {
+                       Future[HttpResponse[ByteChunk]]]
+                  produce(application / json)
                     //jsonp {
                     fsService(state) ~ dataService(state)
                     //}
-                  }
-                } ~ shardProxy(state.shardClient)
-              }
-            } -> stop { state =>
+                ~ shardProxy(state.shardClient)
+            -> stop  state =>
               state.stop
-            }
-        }
-      }
-    }
-  }
 
-  def fsService(state: State): AsyncHttpService[ByteChunk, JValue] = {
-    jsonAPIKey(state.accessControl) {
-      dataPath("/fs") {
+  def fsService(state: State): AsyncHttpService[ByteChunk, JValue] =
+    jsonAPIKey(state.accessControl)
+      dataPath("/fs")
         post(state.ingestHandler) ~ delete(state.archiveHandler)
-      } ~ //legacy handler
-      path("/(?<sync>a?sync)") {
-        dataPath("/fs") {
+      ~ //legacy handler
+      path("/(?<sync>a?sync)")
+        dataPath("/fs")
           post(state.ingestHandler) ~ delete(state.archiveHandler)
-        }
-      }
-    }
-  }
 
-  def dataService(state: State): AsyncHttpService[ByteChunk, JValue] = {
+  def dataService(state: State): AsyncHttpService[ByteChunk, JValue] =
     import FileContent._
     import HttpRequestHandlerImplicits._
-    jsonAPIKey(state.accessControl) {
-      path("/data") {
-        dataPath("/fs") {
-          accept(ApplicationJson, XJsonStream) {
-            post { state.dataHandler } ~ put { state.dataHandler } ~ patch {
+    jsonAPIKey(state.accessControl)
+      path("/data")
+        dataPath("/fs")
+          accept(ApplicationJson, XJsonStream)
+            post { state.dataHandler } ~ put { state.dataHandler } ~ patch
               state.dataHandler
-            }
-          } ~ {
+          ~
             post { state.fileCreateHandler } ~ put { state.fileCreateHandler }
-          }
-        }
-      }
-    }
-  }
 
   def shardProxy(shardClient: HttpClient[ByteChunk])
-    : AsyncHttpService[ByteChunk, ByteChunk] = {
-    path("/data/fs/'path") {
-      get {
-        accept(FileContent.XQuirrelScript) {
-          proxy(shardClient) { _ =>
+    : AsyncHttpService[ByteChunk, ByteChunk] =
+    path("/data/fs/'path")
+      get
+        accept(FileContent.XQuirrelScript)
+          proxy(shardClient)  _ =>
             true
-          }
-        }
-      }
-    }
-  }
-}

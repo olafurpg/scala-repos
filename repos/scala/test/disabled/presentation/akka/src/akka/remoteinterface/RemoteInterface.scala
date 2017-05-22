@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.io.{PrintWriter, PrintStream}
 import java.lang.reflect.InvocationTargetException
 
-trait RemoteModule {
+trait RemoteModule
   val UUID_PREFIX = "uuid:".intern
 
   def optimizeLocalScoped_?(): Boolean //Apply optimizations for remote operations in local scope
@@ -48,25 +48,22 @@ trait RemoteModule {
   private[akka] def findTypedActorByUuid(uuid: String): AnyRef =
     typedActorsByUuid.get(uuid)
 
-  private[akka] def findActorByIdOrUuid(id: String, uuid: String): ActorRef = {
+  private[akka] def findActorByIdOrUuid(id: String, uuid: String): ActorRef =
     var actorRefOrNull =
       if (id.startsWith(UUID_PREFIX))
         findActorByUuid(id.substring(UUID_PREFIX.length))
       else findActorById(id)
     if (actorRefOrNull eq null) actorRefOrNull = findActorByUuid(uuid)
     actorRefOrNull
-  }
 
   private[akka] def findTypedActorByIdOrUuid(
-      id: String, uuid: String): AnyRef = {
+      id: String, uuid: String): AnyRef =
     var actorRefOrNull =
       if (id.startsWith(UUID_PREFIX))
         findTypedActorByUuid(id.substring(UUID_PREFIX.length))
       else findTypedActorById(id)
     if (actorRefOrNull eq null) actorRefOrNull = findTypedActorByUuid(uuid)
     actorRefOrNull
-  }
-}
 
 /**
   * Life-cycle events for RemoteClient.
@@ -150,32 +147,29 @@ case class CannotInstantiateRemoteExceptionDueToRemoteProtocolParsingErrorExcept
     cause: Throwable, originalClassName: String, originalMessage: String)
     extends AkkaException(
         "\nParsingError[%s]\nOriginalException[%s]\nOriginalMessage[%s]"
-          .format(cause.toString, originalClassName, originalMessage)) {
+          .format(cause.toString, originalClassName, originalMessage))
   override def printStackTrace = cause.printStackTrace
   override def printStackTrace(printStream: PrintStream) =
     cause.printStackTrace(printStream)
   override def printStackTrace(printWriter: PrintWriter) =
     cause.printStackTrace(printWriter)
-}
 
 abstract class RemoteSupport
     extends ListenerManagement with RemoteServerModule
-    with RemoteClientModule {
+    with RemoteClientModule
 
-  lazy val eventHandler: ActorRef = {
+  lazy val eventHandler: ActorRef =
     val handler = Actor.actorOf[RemoteEventHandler].start()
     // add the remote client and server listener that pipes the events to the event handler system
     addListener(handler)
     handler
-  }
 
-  def shutdown() {
+  def shutdown()
     eventHandler.stop()
     removeListener(eventHandler)
     this.shutdownClientModule()
     this.shutdownServerModule()
     clear
-  }
 
   /**
     * Creates a Client-managed ActorRef out of the Actor of the specified Class.
@@ -235,15 +229,14 @@ abstract class RemoteSupport
     clientManagedActorOf(
         () => createActorFromClass(classTag[T].erasure), host, port)
 
-  protected def createActorFromClass(clazz: Class[_]): Actor = {
+  protected def createActorFromClass(clazz: Class[_]): Actor =
     import ReflectiveAccess.{createInstance, noParams, noArgs}
-    createInstance[Actor](clazz, noParams, noArgs) match {
+    createInstance[Actor](clazz, noParams, noArgs) match
       case Right(actor) => actor
       case Left(exception) =>
-        val cause = exception match {
+        val cause = exception match
           case i: InvocationTargetException => i.getTargetException
           case _ => exception
-        }
 
         throw new ActorInitializationException(
             "Could not instantiate Actor of " +
@@ -251,8 +244,6 @@ abstract class RemoteSupport
             "\nif so put it outside the class/trait, f.e. in a companion object," +
             "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
             cause)
-    }
-  }
 
   protected override def manageLifeCycleOfListeners = false
   protected[akka] override def notifyListeners(message: => Any): Unit =
@@ -267,20 +258,18 @@ abstract class RemoteSupport
   private[akka] val typedActorsFactories =
     new ConcurrentHashMap[String, () => AnyRef]
 
-  def clear {
+  def clear
     actors.clear
     actorsByUuid.clear
     typedActors.clear
     typedActorsByUuid.clear
     actorsFactories.clear
     typedActorsFactories.clear
-  }
-}
 
 /**
   * This is the interface for the RemoteServer functionality, it's used in Actor.remote
   */
-trait RemoteServerModule extends RemoteModule {
+trait RemoteServerModule extends RemoteModule
   protected val guard = new ReentrantGuard
 
   /**
@@ -450,9 +439,8 @@ trait RemoteServerModule extends RemoteModule {
     * NOTE: You need to call this method if you have registered an actor by a custom ID.
     */
   def unregisterTypedPerSessionActor(id: String): Unit
-}
 
-trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
+trait RemoteClientModule extends RemoteModule  self: RemoteModule =>
 
   def actorFor(
       classNameOrServiceId: String, hostname: String, port: Int): ActorRef =
@@ -629,4 +617,3 @@ trait RemoteClientModule extends RemoteModule { self: RemoteModule =>
   @deprecated("Will be removed after 1.1", "1.1")
   private[akka] def unregisterClientManagedActor(
       hostname: String, port: Int, uuid: Uuid): Unit
-}

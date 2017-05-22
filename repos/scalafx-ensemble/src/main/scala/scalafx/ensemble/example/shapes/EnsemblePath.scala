@@ -33,13 +33,13 @@ import scalafx.scene.layout.HBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.{ArcTo, ClosePath, CubicCurveTo, HLineTo, LineTo, MoveTo, Path, QuadCurveTo, VLineTo}
 
-class EnsemblePath extends EnsembleExample {
+class EnsemblePath extends EnsembleExample
 
-  def getContent = new HBox {
+  def getContent = new HBox
     spacing = 20
     padding = Insets(20)
     children = List(
-        new Path {
+        new Path
           elements = List(MoveTo(35, 35),
                           HLineTo(75),
                           VLineTo(75),
@@ -48,8 +48,8 @@ class EnsemblePath extends EnsembleExample {
           fill = Color.Orange
           stroke = Color.Black
           strokeWidth = 1d
-        },
-        new Path {
+        ,
+        new Path
           elements = List(
               MoveTo(100, 55),
               CubicCurveTo(120, 20, 130, 80, 140, 45),
@@ -57,7 +57,4 @@ class EnsemblePath extends EnsembleExample {
               ArcTo(20, 40, 0, 180, 45, true, true)
           )
           fill = Color.Azure
-        }
     )
-  }
-}

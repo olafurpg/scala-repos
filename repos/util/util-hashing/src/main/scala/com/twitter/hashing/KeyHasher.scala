@@ -5,26 +5,23 @@ package com.twitter.hashing
   *
   * @see the companion object for common implementations.
   */
-trait KeyHasher {
+trait KeyHasher
   def hashKey(key: Array[Byte]): Long
-}
 
 /**
   * Commonly used key hashing algorithms.
   *
   * @see [[KeyHashers]] for Java compatible forwarders.
   */
-object KeyHasher {
+object KeyHasher
   def fromHashableInt(hashable: Hashable[Array[Byte], Int]): KeyHasher =
-    new KeyHasher {
+    new KeyHasher
       def hashKey(key: Array[Byte]) = hashable(key).toLong
       override def toString = hashable.toString
-    }
   def fromHashableLong(hashable: Hashable[Array[Byte], Long]): KeyHasher =
-    new KeyHasher {
+    new KeyHasher
       def hashKey(key: Array[Byte]) = hashable(key)
       override def toString = hashable.toString
-    }
 
   val FNV1_32 = fromHashableInt(Hashable.FNV1_32)
   val FNV1A_32 = fromHashableInt(Hashable.FNV1A_32)
@@ -44,8 +41,8 @@ object KeyHasher {
     * Return one of the key hashing algorithms by name. This is used to configure a memcache
     * client from a config file.
     */
-  def byName(name: String): KeyHasher = {
-    name match {
+  def byName(name: String): KeyHasher =
+    name match
       case "fnv" => FNV1_32
       case "fnv1" => FNV1_32
       case "fnv1-32" => FNV1_32
@@ -56,14 +53,11 @@ object KeyHasher {
       case "crc32-itu" => CRC32_ITU
       case "hsieh" => HSIEH
       case _ => throw new NoSuchElementException(name)
-    }
-  }
-}
 
 /**
   * Java compatible forwarders.
   */
-object KeyHashers {
+object KeyHashers
   val FNV1_32 = KeyHasher.FNV1_32
   val FNV1A_32 = KeyHasher.FNV1A_32
   val FNV1_64 = KeyHasher.FNV1_64
@@ -78,4 +72,3 @@ object KeyHashers {
     * client from a config file.
     */
   def byName(name: String): KeyHasher = KeyHasher.byName(name)
-}

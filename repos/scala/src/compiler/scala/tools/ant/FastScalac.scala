@@ -29,7 +29,7 @@ import scala.reflect.internal.util.ScalaClassLoader
   *
   *  @author Stephane Micheloud
   */
-class FastScalac extends Scalac {
+class FastScalac extends Scalac
 
   private var resetCaches: Boolean = false
 
@@ -83,7 +83,7 @@ class FastScalac extends Scalac {
     new FscSettings(error)
 
   /** Performs the compilation. */
-  override def execute() {
+  override def execute()
     val (settings, sourceFiles, javaOnly) = initialize
     if (sourceFiles.isEmpty || javaOnly) return
 
@@ -142,11 +142,10 @@ class FastScalac extends Scalac {
       ) filter (x => x.value != x.default) flatMap
       (x => List(x.name, x.value.toString))
 
-    val phaseSetting = {
+    val phaseSetting =
       val s = settings.log
       if (s.value.isEmpty) Nil
       else List("%s:%s".format(s.name, s.value.mkString(",")))
-    }
 
     val fscOptions =
       stringSettings ::: choiceSettings ::: booleanSettings ::: intSettings ::: phaseSetting
@@ -156,32 +155,29 @@ class FastScalac extends Scalac {
     // use same default memory options as in fsc script
     java.createJvmarg() setValue "-Xmx256M"
     java.createJvmarg() setValue "-Xms32M"
-    val scalacPath: Path = {
+    val scalacPath: Path =
       val path = new Path(getProject)
       if (compilerPath.isDefined) path add compilerPath.get
       else
-        getClass.getClassLoader match {
+        getClass.getClassLoader match
           case cl: AntClassLoader =>
             path add new Path(getProject, cl.getClasspath)
           case _ =>
             buildError(
                 "Compilation failed because of an internal compiler error;" +
                 " see the error output for details.")
-        }
       path
-    }
     java.createJvmarg() setValue ("-Xbootclasspath/a:" + scalacPath)
     s.jvmargs.value foreach (java.createJvmarg() setValue _)
 
-    val scalaHome: String = try {
+    val scalaHome: String = try
       val url = ScalaClassLoader.originOfClass(classOf[FastScalac]).get
       File(url.getFile).jfile.getParentFile.getParentFile.getAbsolutePath
-    } catch {
+    catch
       case _: Throwable =>
         buildError(
             "Compilation failed because of an internal compiler error;" +
             " couldn't determine value for -Dscala.home=<value>")
-    }
     java.createJvmarg() setValue "-Dscala.usejavacp=true"
     java.createJvmarg() setValue ("-Dscala.home=" + scalaHome)
     s.defines.value foreach (java.createJvmarg() setValue _)
@@ -191,12 +187,12 @@ class FastScalac extends Scalac {
 
     // Encode scalac/javac args for use in a file to be read back via "@file.txt"
     def encodeScalacArgsFile(t: Traversable[String]) =
-      t map { s =>
+      t map  s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
           s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
         else s
-      } mkString "\n"
+      mkString "\n"
 
     // dump the arguments to a file and do "java @file"
     val tempArgFile = File.makeTemp("fastscalac")
@@ -211,5 +207,3 @@ class FastScalac extends Scalac {
       buildError(
           "Compilation failed because of an internal compiler error;" +
           " see the error output for details.")
-  }
-}

@@ -30,17 +30,15 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * (private[spark]) Params for classification.
   */
 private[spark] trait ClassifierParams
-    extends PredictorParams with HasRawPredictionCol {
+    extends PredictorParams with HasRawPredictionCol
 
   override protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
-      featuresDataType: DataType): StructType = {
+      featuresDataType: DataType): StructType =
     val parentSchema =
       super.validateAndTransformSchema(schema, fitting, featuresDataType)
     SchemaUtils.appendColumn(parentSchema, $(rawPredictionCol), new VectorUDT)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -56,14 +54,13 @@ private[spark] trait ClassifierParams
 abstract class Classifier[FeaturesType,
                           E <: Classifier[FeaturesType, E, M],
                           M <: ClassificationModel[FeaturesType, M]]
-    extends Predictor[FeaturesType, E, M] with ClassifierParams {
+    extends Predictor[FeaturesType, E, M] with ClassifierParams
 
   /** @group setParam */
   def setRawPredictionCol(value: String): E =
     set(rawPredictionCol, value).asInstanceOf[E]
 
   // TODO: defaultEvaluator (follow-up PR)
-}
 
 /**
   * :: DeveloperApi ::
@@ -77,7 +74,7 @@ abstract class Classifier[FeaturesType,
 @DeveloperApi
 abstract class ClassificationModel[
     FeaturesType, M <: ClassificationModel[FeaturesType, M]]
-    extends PredictionModel[FeaturesType, M] with ClassifierParams {
+    extends PredictionModel[FeaturesType, M] with ClassifierParams
 
   /** @group setParam */
   def setRawPredictionCol(value: String): M =
@@ -95,41 +92,34 @@ abstract class ClassificationModel[
     * @param dataset input dataset
     * @return transformed dataset
     */
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
 
     // Output selected columns only.
     // This is a bit complicated since it tries to avoid repeated computation.
     var outputData = dataset
     var numColsOutput = 0
-    if (getRawPredictionCol != "") {
-      val predictRawUDF = udf { (features: Any) =>
+    if (getRawPredictionCol != "")
+      val predictRawUDF = udf  (features: Any) =>
         predictRaw(features.asInstanceOf[FeaturesType])
-      }
       outputData = outputData.withColumn(
           getRawPredictionCol, predictRawUDF(col(getFeaturesCol)))
       numColsOutput += 1
-    }
-    if (getPredictionCol != "") {
+    if (getPredictionCol != "")
       val predUDF =
-        if (getRawPredictionCol != "") {
+        if (getRawPredictionCol != "")
           udf(raw2prediction _).apply(col(getRawPredictionCol))
-        } else {
-          val predictUDF = udf { (features: Any) =>
+        else
+          val predictUDF = udf  (features: Any) =>
             predict(features.asInstanceOf[FeaturesType])
-          }
           predictUDF(col(getFeaturesCol))
-        }
       outputData = outputData.withColumn(getPredictionCol, predUDF)
       numColsOutput += 1
-    }
 
-    if (numColsOutput == 0) {
+    if (numColsOutput == 0)
       logWarning(s"$uid: ClassificationModel.transform() was called as NOOP" +
           " since no output columns were set.")
-    }
     outputData
-  }
 
   /**
     * Predict label for the given features.
@@ -138,9 +128,8 @@ abstract class ClassificationModel[
     * This default implementation for classification predicts the index of the maximum value
     * from [[predictRaw()]].
     */
-  override protected def predict(features: FeaturesType): Double = {
+  override protected def predict(features: FeaturesType): Double =
     raw2prediction(predictRaw(features))
-  }
 
   /**
     * Raw prediction for each possible label.
@@ -161,4 +150,3 @@ abstract class ClassificationModel[
     */
   protected def raw2prediction(rawPrediction: Vector): Double =
     rawPrediction.argmax
-}

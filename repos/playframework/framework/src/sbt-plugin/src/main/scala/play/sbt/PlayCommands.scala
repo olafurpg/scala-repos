@@ -12,36 +12,33 @@ import play.sbt.PlayInternalKeys._
 
 import com.typesafe.sbt.web.SbtWeb.autoImport._
 
-object PlayCommands {
+object PlayCommands
 
-  val playReloadTask = Def.task {
+  val playReloadTask = Def.task
     playCompileEverything.value.reduceLeft(_ ++ _)
-  }
 
   // ----- Play prompt
 
-  val playPrompt = { state: State =>
+  val playPrompt =  state: State =>
     val extracted = Project.extract(state)
     import extracted._
 
-    (name in currentRef get structure.data).map { name =>
+    (name in currentRef get structure.data).map  name =>
       "[" + Colors.cyan(name) + "] $ "
-    }.getOrElse("> ")
-  }
+    .getOrElse("> ")
 
   // ----- Play commands
 
   private[this] var commonClassLoader: ClassLoader = _
 
-  val playCommonClassloaderTask = Def.task {
+  val playCommonClassloaderTask = Def.task
     val classpath = (dependencyClasspath in Compile).value
     val log = streams.value.log
-    lazy val commonJars: PartialFunction[java.io.File, java.net.URL] = {
+    lazy val commonJars: PartialFunction[java.io.File, java.net.URL] =
       case jar if jar.getName.startsWith("h2-") || jar.getName == "h2.jar" =>
         jar.toURI.toURL
-    }
 
-    if (commonClassLoader == null) {
+    if (commonClassLoader == null)
 
       // The parent of the system classloader *should* be the extension classloader:
       // http://www.onjava.com/pub/a/onjava/2005/01/26/classloading.html
@@ -52,16 +49,13 @@ object PlayCommands {
       log.debug("Using parent loader for play common classloader: " + parent)
 
       commonClassLoader = new java.net.URLClassLoader(
-          classpath.map(_.data).collect(commonJars).toArray, parent) {
+          classpath.map(_.data).collect(commonJars).toArray, parent)
         override def toString =
           "Common ClassLoader: " + getURLs.map(_.toString).mkString(",")
-      }
-    }
 
     commonClassLoader
-  }
 
-  val playCompileEverythingTask = Def.taskDyn {
+  val playCompileEverythingTask = Def.taskDyn
     // Run playAssetsWithCompilation, or, if it doesn't exist (because it's not a Play project), just the compile task
     val compileTask =
       Def.taskDyn(playAssetsWithCompilation ?? (compile in Compile).value)
@@ -71,23 +65,20 @@ object PlayCommands {
             inDependencies(thisProjectRef.value)
         )
     )
-  }
 
-  val h2Command = Command.command("h2-browser") { state: State =>
-    try {
+  val h2Command = Command.command("h2-browser")  state: State =>
+    try
       val commonLoader =
         Project.runTask(playCommonClassloader, state).get._2.toEither.right.get
       val h2ServerClass = commonLoader.loadClass("org.h2.tools.Server")
       h2ServerClass
         .getMethod("main", classOf[Array[String]])
         .invoke(null, Array.empty[String])
-    } catch {
+    catch
       case e: Exception => e.printStackTrace
-    }
     state
-  }
 
-  val playMonitoredFilesTask: Def.Initialize[Task[Seq[File]]] = Def.taskDyn {
+  val playMonitoredFilesTask: Def.Initialize[Task[Seq[File]]] = Def.taskDyn
     val projectRef = thisProjectRef.value
 
     def filter = ScopeFilter(
@@ -95,7 +86,7 @@ object PlayCommands {
         inConfigurations(Compile, Assets)
     )
 
-    Def.task {
+    Def.task
 
       val allDirectories =
         (unmanagedSourceDirectories ?? Nil).all(filter).value.flatten ++
@@ -108,14 +99,9 @@ object PlayCommands {
       val distinctDirectories = existingDirectories
         .map(_.getCanonicalFile.toPath)
         .sorted
-        .foldLeft(List.empty[Path]) { (result, next) =>
-          result.headOption match {
+        .foldLeft(List.empty[Path])  (result, next) =>
+          result.headOption match
             case Some(previous) if next.startsWith(previous) => result
             case _ => next :: result
-          }
-        }
 
       distinctDirectories.map(_.toFile)
-    }
-  }
-}

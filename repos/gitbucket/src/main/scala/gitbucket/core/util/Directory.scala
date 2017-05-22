@@ -7,29 +7,26 @@ import org.apache.commons.io.FileUtils
 /**
   * Provides directories used by GitBucket.
   */
-object Directory {
+object Directory
 
-  val GitBucketHome = (System.getProperty("gitbucket.home") match {
+  val GitBucketHome = (System.getProperty("gitbucket.home") match
     // -Dgitbucket.home=<path>
     case path if (path != null) => new File(path)
     case _ =>
-      scala.util.Properties.envOrNone("GITBUCKET_HOME") match {
+      scala.util.Properties.envOrNone("GITBUCKET_HOME") match
         // environment variable GITBUCKET_HOME
         case Some(env) => new File(env)
         // default is HOME/.gitbucket
-        case None => {
+        case None =>
             val oldHome = new File(
                 System.getProperty("user.home"), "gitbucket")
             if (oldHome.exists && oldHome.isDirectory &&
-                new File(oldHome, "version").exists) {
+                new File(oldHome, "version").exists)
               //FileUtils.moveDirectory(oldHome, newHome)
               oldHome
-            } else {
+            else
               new File(System.getProperty("user.home"), ".gitbucket")
-            }
-          }
-      }
-  }).getAbsolutePath
+  ).getAbsolutePath
 
   val GitBucketConf = new File(GitBucketHome, "gitbucket.conf")
 
@@ -88,4 +85,3 @@ object Directory {
     */
   def getWikiRepositoryDir(owner: String, repository: String): File =
     new File(s"${RepositoryHome}/${owner}/${repository}.wiki.git")
-}

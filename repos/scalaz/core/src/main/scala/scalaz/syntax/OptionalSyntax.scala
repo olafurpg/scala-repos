@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Optional` */
 final class OptionalOps[F[_], A] private[syntax](
     val self: F[A])(implicit val F: Optional[F])
-    extends Ops[F[A]] {
+    extends Ops[F[A]]
   ////
 
   /** If the value has an `a`, return it; otherwise it must be
@@ -27,9 +27,8 @@ final class OptionalOps[F[_], A] private[syntax](
   /** Returns `true` if no value is defined within the context. */
   def isEmpty: Boolean = F.isEmpty(self)
 
-  final class Conditional[X](some: => X) {
+  final class Conditional[X](some: => X)
     def |(none: => X): X = F.?(self)(some, none)
-  }
 
   /** Returns `some` if this context is defined, otherwise `none`. */
   def ?[X](some: => X): Conditional[X] = new Conditional[X](some)
@@ -41,24 +40,21 @@ final class OptionalOps[F[_], A] private[syntax](
   def toMaybe: Maybe[A] = F.toMaybe(self)
 
   ////
-}
 
-sealed trait ToOptionalOps0 {
+sealed trait ToOptionalOps0
   implicit def ToOptionalOpsUnapply[FA](v: FA)(
       implicit F0: Unapply[Optional, FA]) =
     new OptionalOps[F0.M, F0.A](F0(v))(F0.TC)
-}
 
-trait ToOptionalOps extends ToOptionalOps0 {
+trait ToOptionalOps extends ToOptionalOps0
   implicit def ToOptionalOps[F[_], A](v: F[A])(implicit F0: Optional[F]) =
     new OptionalOps[F, A](v)
 
   ////
 
   ////
-}
 
-trait OptionalSyntax[F[_]] {
+trait OptionalSyntax[F[_]]
   implicit def ToOptionalOps[A](v: F[A]): OptionalOps[F, A] =
     new OptionalOps[F, A](v)(OptionalSyntax.this.F)
 
@@ -66,4 +62,3 @@ trait OptionalSyntax[F[_]] {
   ////
 
   ////
-}

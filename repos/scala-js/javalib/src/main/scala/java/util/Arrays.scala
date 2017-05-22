@@ -8,14 +8,12 @@ import scala.reflect.ClassTag
 
 import scala.collection.immutable
 
-object Arrays {
+object Arrays
 
   @inline
-  private final implicit def naturalOrdering[T <: AnyRef]: Ordering[T] = {
-    new Ordering[T] {
+  private final implicit def naturalOrdering[T <: AnyRef]: Ordering[T] =
+    new Ordering[T]
       def compare(x: T, y: T): Int = x.asInstanceOf[Comparable[T]].compareTo(y)
-    }
-  }
 
   @noinline def sort(a: Array[Int]): Unit =
     sortImpl(a)
@@ -67,35 +65,31 @@ object Arrays {
 
   @noinline
   def sort[T <: AnyRef](
-      array: Array[T], comparator: Comparator[_ >: T]): Unit = {
+      array: Array[T], comparator: Comparator[_ >: T]): Unit =
     implicit val ord = toOrdering(comparator).asInstanceOf[Ordering[AnyRef]]
     sortAnyRefImpl(array.asInstanceOf[Array[AnyRef]])
-  }
 
   @noinline
   def sort[T <: AnyRef](array: Array[T],
                         fromIndex: Int,
                         toIndex: Int,
-                        comparator: Comparator[_ >: T]): Unit = {
+                        comparator: Comparator[_ >: T]): Unit =
     implicit val ord = toOrdering(comparator).asInstanceOf[Ordering[AnyRef]]
     sortRangeAnyRefImpl(array.asInstanceOf[Array[AnyRef]], fromIndex, toIndex)
-  }
 
   @inline
   private def sortRangeImpl[@specialized T : ClassTag](
       a: Array[T], fromIndex: Int, toIndex: Int)(
-      implicit ord: Ordering[T]): Unit = {
+      implicit ord: Ordering[T]): Unit =
     checkIndicesForCopyOfRange(a.length, fromIndex, toIndex)
     quickSort[T](a, fromIndex, toIndex)
-  }
 
   @inline
   private def sortRangeAnyRefImpl(
       a: Array[AnyRef], fromIndex: Int, toIndex: Int)(
-      implicit ord: Ordering[AnyRef]): Unit = {
+      implicit ord: Ordering[AnyRef]): Unit =
     checkIndicesForCopyOfRange(a.length, fromIndex, toIndex)
     quickSortAnyRef(a, fromIndex, toIndex)
-  }
 
   @inline
   private def sortImpl[@specialized T : ClassTag : Ordering](
@@ -116,30 +110,27 @@ object Arrays {
     */
   @noinline
   private def quickSort[@specialized K](a: Array[K], i0: Int, iN: Int)(
-      implicit ord: Ordering[K]): Unit = {
-    if (iN - i0 < qSortThreshold) {
+      implicit ord: Ordering[K]): Unit =
+    if (iN - i0 < qSortThreshold)
       insertionSort(a, i0, iN)
-    } else {
+    else
       val iK = (i0 + iN) >>> 1 // Unsigned div by 2
       // Find index of median of first, central, and last elements
-      var pL = {
-        if (ord.compare(a(i0), a(iN - 1)) <= 0) {
+      var pL =
+        if (ord.compare(a(i0), a(iN - 1)) <= 0)
           if (ord.compare(a(i0), a(iK)) >= 0) i0
           else if (ord.compare(a(iN - 1), a(iK)) < 0) iN - 1
           else iK
-        } else {
+        else
           if (ord.compare(a(i0), a(iK)) < 0) i0
           else if (ord.compare(a(iN - 1), a(iK)) <= 0) iN - 1
           else iK
-        }
-      }
       val pivot = a(pL)
       // pL is the start of the pivot block; move it into the middle if needed
-      if (pL != iK) {
+      if (pL != iK)
         a(pL) = a(iK)
         a(iK) = pivot
         pL = iK
-      }
       // Elements equal to the pivot will be in range pL until pR
       var pR = pL + 1
       // Items known to be less than pivot are below iA (range i0 until iA)
@@ -147,9 +138,9 @@ object Arrays {
       // Items known to be greater than pivot are at or above iB (range iB until iN)
       var iB = iN
       // Scan through everything in the buffer before the pivot(s)
-      while (pL - iA > 0) {
+      while (pL - iA > 0)
         val current = a(iA)
-        ord.compare(current, pivot) match {
+        ord.compare(current, pivot) match
           case 0 =>
             // Swap current out with pivot block
             a(iA) = a(pL - 1)
@@ -171,12 +162,10 @@ object Arrays {
             pL -= 1
             pR -= 1
             iB -= 1
-        }
-      }
       // Get anything remaining in buffer after the pivot(s)
-      while (iB - pR > 0) {
+      while (iB - pR > 0)
         val current = a(iB - 1)
-        ord.compare(current, pivot) match {
+        ord.compare(current, pivot) match
           case 0 =>
             // Swap current out with pivot block
             a(iB - 1) = a(pR)
@@ -193,84 +182,69 @@ object Arrays {
             iA += 1
             pL += 1
             pR += 1
-        }
-      }
       // Use tail recursion on large half (Sedgewick's method) so we don't blow
       // up the stack if pivots are poorly chosen
-      if (iA - i0 < iN - iB) {
+      if (iA - i0 < iN - iB)
         quickSort(a, i0, iA) // True recursion
         quickSort(a, iB, iN) // Should be tail recursion
-      } else {
+      else
         quickSort(a, iB, iN) // True recursion
         quickSort(a, i0, iA) // Should be tail recursion
-      }
-    }
-  }
 
   // Ordering[T] might be slow especially for boxed primitives, so use binary
   // search variant of insertion sort
   // Caller must pass iN >= i0 or math will fail.  Also, i0 >= 0.
   @noinline
   private final def insertionSort[@specialized T](
-      a: Array[T], i0: Int, iN: Int)(implicit ord: Ordering[T]): Unit = {
+      a: Array[T], i0: Int, iN: Int)(implicit ord: Ordering[T]): Unit =
     val n = iN - i0
-    if (n >= 2) {
-      if (ord.compare(a(i0), a(i0 + 1)) > 0) {
+    if (n >= 2)
+      if (ord.compare(a(i0), a(i0 + 1)) > 0)
         val temp = a(i0)
         a(i0) = a(i0 + 1)
         a(i0 + 1) = temp
-      }
       var m = 2
-      while (m < n) {
+      while (m < n)
         // Speed up already-sorted case by checking last element first
         val next = a(i0 + m)
-        if (ord.compare(next, a(i0 + m - 1)) < 0) {
+        if (ord.compare(next, a(i0 + m - 1)) < 0)
           var iA = i0
           var iB = i0 + m - 1
-          while (iB - iA > 1) {
+          while (iB - iA > 1)
             val ix = (iA + iB) >>> 1 // Use bit shift to get unsigned div by 2
             if (ord.compare(next, a(ix)) < 0) iB = ix
             else iA = ix
-          }
           val ix = iA + (if (ord.compare(next, a(iA)) < 0) 0 else 1)
           var i = i0 + m
-          while (i > ix) {
+          while (i > ix)
             a(i) = a(i - 1)
             i -= 1
-          }
           a(ix) = next
-        }
         m += 1
-      }
-    }
-  }
 
   @noinline
   private def quickSortAnyRef(a: Array[AnyRef], i0: Int, iN: Int)(
-      implicit ord: Ordering[AnyRef]): Unit = {
-    if (iN - i0 < qSortThreshold) {
+      implicit ord: Ordering[AnyRef]): Unit =
+    if (iN - i0 < qSortThreshold)
       insertionSortAnyRef(a, i0, iN)
-    } else {
+    else
       val iK = (i0 + iN) >>> 1 // Unsigned div by 2
       // Find index of median of first, central, and last elements
-      var pL = {
-        if (ord.compare(a(i0), a(iN - 1)) <= 0) {
+      var pL =
+        if (ord.compare(a(i0), a(iN - 1)) <= 0)
           if (ord.compare(a(i0), a(iK)) >= 0) i0
           else if (ord.compare(a(iN - 1), a(iK)) < 0) iN - 1
           else iK
-        } else {
+        else
           if (ord.compare(a(i0), a(iK)) < 0) i0
           else if (ord.compare(a(iN - 1), a(iK)) <= 0) iN - 1
           else iK
-        }
-      }
       val pivot = a(pL)
       // pL is the start of the pivot block; move it into the middle if needed
-      if (pL != iK) {
+      if (pL != iK)
         a(pL) = a(iK)
         a(iK) = pivot
         pL = iK
-      }
       // Elements equal to the pivot will be in range pL until pR
       var pR = pL + 1
       // Items known to be less than pivot are below iA (range i0 until iA)
@@ -278,9 +252,9 @@ object Arrays {
       // Items known to be greater than pivot are at or above iB (range iB until iN)
       var iB = iN
       // Scan through everything in the buffer before the pivot(s)
-      while (pL - iA > 0) {
+      while (pL - iA > 0)
         val current = a(iA)
-        ord.compare(current, pivot) match {
+        ord.compare(current, pivot) match
           case 0 =>
             // Swap current out with pivot block
             a(iA) = a(pL - 1)
@@ -302,12 +276,10 @@ object Arrays {
             pL -= 1
             pR -= 1
             iB -= 1
-        }
-      }
       // Get anything remaining in buffer after the pivot(s)
-      while (iB - pR > 0) {
+      while (iB - pR > 0)
         val current = a(iB - 1)
-        ord.compare(current, pivot) match {
+        ord.compare(current, pivot) match
           case 0 =>
             // Swap current out with pivot block
             a(iB - 1) = a(pR)
@@ -324,134 +296,114 @@ object Arrays {
             iA += 1
             pL += 1
             pR += 1
-        }
-      }
       // Use tail recursion on large half (Sedgewick's method) so we don't blow
       // up the stack if pivots are poorly chosen
-      if (iA - i0 < iN - iB) {
+      if (iA - i0 < iN - iB)
         quickSortAnyRef(a, i0, iA) // True recursion
         quickSortAnyRef(a, iB, iN) // Should be tail recursion
-      } else {
+      else
         quickSortAnyRef(a, iB, iN) // True recursion
         quickSortAnyRef(a, i0, iA) // Should be tail recursion
-      }
-    }
-  }
 
   @noinline
   private final def insertionSortAnyRef(a: Array[AnyRef], i0: Int, iN: Int)(
-      implicit ord: Ordering[AnyRef]): Unit = {
+      implicit ord: Ordering[AnyRef]): Unit =
     val n = iN - i0
-    if (n >= 2) {
-      if (ord.compare(a(i0), a(i0 + 1)) > 0) {
+    if (n >= 2)
+      if (ord.compare(a(i0), a(i0 + 1)) > 0)
         val temp = a(i0)
         a(i0) = a(i0 + 1)
         a(i0 + 1) = temp
-      }
       var m = 2
-      while (m < n) {
+      while (m < n)
         // Speed up already-sorted case by checking last element first
         val next = a(i0 + m)
-        if (ord.compare(next, a(i0 + m - 1)) < 0) {
+        if (ord.compare(next, a(i0 + m - 1)) < 0)
           var iA = i0
           var iB = i0 + m - 1
-          while (iB - iA > 1) {
+          while (iB - iA > 1)
             val ix = (iA + iB) >>> 1 // Use bit shift to get unsigned div by 2
             if (ord.compare(next, a(ix)) < 0) iB = ix
             else iA = ix
-          }
           val ix = iA + (if (ord.compare(next, a(iA)) < 0) 0 else 1)
           var i = i0 + m
-          while (i > ix) {
+          while (i > ix)
             a(i) = a(i - 1)
             i -= 1
-          }
           a(ix) = next
-        }
         m += 1
-      }
-    }
-  }
 
   @noinline def binarySearch(a: Array[Long], key: Long): Int =
     binarySearchImpl[Long](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Long], startIndex: Int, endIndex: Int, key: Long): Int = {
+      a: Array[Long], startIndex: Int, endIndex: Int, key: Long): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Long](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Int], key: Int): Int =
     binarySearchImpl[Int](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Int], startIndex: Int, endIndex: Int, key: Int): Int = {
+      a: Array[Int], startIndex: Int, endIndex: Int, key: Int): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Int](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Short], key: Short): Int =
     binarySearchImpl[Short](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Short], startIndex: Int, endIndex: Int, key: Short): Int = {
+      a: Array[Short], startIndex: Int, endIndex: Int, key: Short): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Short](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Char], key: Char): Int =
     binarySearchImpl[Char](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Char], startIndex: Int, endIndex: Int, key: Char): Int = {
+      a: Array[Char], startIndex: Int, endIndex: Int, key: Char): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Char](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Byte], key: Byte): Int =
     binarySearchImpl[Byte](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Byte], startIndex: Int, endIndex: Int, key: Byte): Int = {
+      a: Array[Byte], startIndex: Int, endIndex: Int, key: Byte): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Byte](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Double], key: Double): Int =
     binarySearchImpl[Double](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Double], startIndex: Int, endIndex: Int, key: Double): Int = {
+      a: Array[Double], startIndex: Int, endIndex: Int, key: Double): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Double](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[Float], key: Float): Int =
     binarySearchImpl[Float](a, 0, a.length, key, _ < _)
 
   @noinline
   def binarySearch(
-      a: Array[Float], startIndex: Int, endIndex: Int, key: Float): Int = {
+      a: Array[Float], startIndex: Int, endIndex: Int, key: Float): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[Float](a, startIndex, endIndex, key, _ < _)
-  }
 
   @noinline def binarySearch(a: Array[AnyRef], key: AnyRef): Int =
     binarySearchImplRef(a, 0, a.length, key)
 
   @noinline
   def binarySearch(
-      a: Array[AnyRef], startIndex: Int, endIndex: Int, key: AnyRef): Int = {
+      a: Array[AnyRef], startIndex: Int, endIndex: Int, key: AnyRef): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImplRef(a, startIndex, endIndex, key)
-  }
 
   @noinline
   def binarySearch[T](a: Array[T], key: T, c: Comparator[_ >: T]): Int =
@@ -462,11 +414,10 @@ object Arrays {
                       startIndex: Int,
                       endIndex: Int,
                       key: T,
-                      c: Comparator[_ >: T]): Int = {
+                      c: Comparator[_ >: T]): Int =
     checkRangeIndices(a.length, startIndex, endIndex)
     binarySearchImpl[T](
         a, startIndex, endIndex, key, (a, b) => c.compare(a, b) < 0)
-  }
 
   @inline
   @tailrec
@@ -474,46 +425,40 @@ object Arrays {
                                   startIndex: Int,
                                   endIndex: Int,
                                   key: T,
-                                  lt: (T, T) => Boolean): Int = {
-    if (startIndex == endIndex) {
+                                  lt: (T, T) => Boolean): Int =
+    if (startIndex == endIndex)
       // Not found
       -startIndex - 1
-    } else {
+    else
       // Indices are unsigned 31-bit integer, so this does not overflow
       val mid = (startIndex + endIndex) >>> 1
       val elem = a(mid)
-      if (lt(key, elem)) {
+      if (lt(key, elem))
         binarySearchImpl(a, startIndex, mid, key, lt)
-      } else if (key == elem) {
+      else if (key == elem)
         // Found
         mid
-      } else {
+      else
         binarySearchImpl(a, mid + 1, endIndex, key, lt)
-      }
-    }
-  }
 
   @inline
   @tailrec
   def binarySearchImplRef(
-      a: Array[AnyRef], startIndex: Int, endIndex: Int, key: AnyRef): Int = {
-    if (startIndex == endIndex) {
+      a: Array[AnyRef], startIndex: Int, endIndex: Int, key: AnyRef): Int =
+    if (startIndex == endIndex)
       // Not found
       -startIndex - 1
-    } else {
+    else
       // Indices are unsigned 31-bit integer, so this does not overflow
       val mid = (startIndex + endIndex) >>> 1
       val cmp = key.asInstanceOf[Comparable[AnyRef]].compareTo(a(mid))
-      if (cmp < 0) {
+      if (cmp < 0)
         binarySearchImplRef(a, startIndex, mid, key)
-      } else if (cmp == 0) {
+      else if (cmp == 0)
         // Found
         mid
-      } else {
+      else
         binarySearchImplRef(a, mid + 1, endIndex, key)
-      }
-    }
-  }
 
   @noinline def equals(a: Array[Long], b: Array[Long]): Boolean =
     equalsImpl(a, b)
@@ -543,11 +488,10 @@ object Arrays {
     equalsImpl(a, b)
 
   @inline
-  private def equalsImpl[T](a: Array[T], b: Array[T]): Boolean = {
+  private def equalsImpl[T](a: Array[T], b: Array[T]): Boolean =
     (a eq b) ||
     (a != null && b != null && a.length == b.length &&
         a.indices.forall(i => a(i) == b(i)))
-  }
 
   @noinline def fill(a: Array[Long], value: Long): Unit =
     fillImpl(a, 0, a.length, value, checkIndices = false)
@@ -620,29 +564,25 @@ object Arrays {
                           fromIndex: Int,
                           toIndex: Int,
                           value: T,
-                          checkIndices: Boolean = true): Unit = {
+                          checkIndices: Boolean = true): Unit =
     if (checkIndices) checkRangeIndices(a.length, fromIndex, toIndex)
     var i = fromIndex
-    while (i != toIndex) {
+    while (i != toIndex)
       a(i) = value
       i += 1
-    }
-  }
 
   @noinline
-  def copyOf[T <: AnyRef](original: Array[T], newLength: Int): Array[T] = {
+  def copyOf[T <: AnyRef](original: Array[T], newLength: Int): Array[T] =
     implicit val tagT = ClassTag[T](original.getClass.getComponentType)
     copyOfImpl(original, newLength)
-  }
 
   @noinline
   def copyOf[T <: AnyRef, U <: AnyRef](
       original: Array[U],
       newLength: Int,
-      newType: Class[_ <: Array[T]]): Array[T] = {
+      newType: Class[_ <: Array[T]]): Array[T] =
     implicit val tag = ClassTag[T](newType.getComponentType)
     copyOfImpl(original, newLength)
-  }
 
   @noinline def copyOf(original: Array[Byte], newLength: Int): Array[Byte] =
     copyOfImpl(original, newLength)
@@ -672,30 +612,27 @@ object Arrays {
 
   @inline
   private def copyOfImpl[U, T : ClassTag](
-      original: Array[U], newLength: Int): Array[T] = {
+      original: Array[U], newLength: Int): Array[T] =
     checkArrayLength(newLength)
     val copyLength = Math.min(newLength, original.length)
     val ret = new Array[T](newLength)
     System.arraycopy(original, 0, ret, 0, copyLength)
     ret
-  }
 
   @noinline
   def copyOfRange[T <: AnyRef](
-      original: Array[T], from: Int, to: Int): Array[T] = {
+      original: Array[T], from: Int, to: Int): Array[T] =
     copyOfRangeImpl[T](original, from, to)(
         ClassTag(original.getClass.getComponentType)).asInstanceOf[Array[T]]
-  }
 
   @noinline
   def copyOfRange[T <: AnyRef, U <: AnyRef](
       original: Array[U],
       from: Int,
       to: Int,
-      newType: Class[_ <: Array[T]]): Array[T] = {
+      newType: Class[_ <: Array[T]]): Array[T] =
     copyOfRangeImpl[AnyRef](original.asInstanceOf[Array[AnyRef]], from, to)(
         ClassTag(newType.getComponentType)).asInstanceOf[Array[T]]
-  }
 
   @noinline
   def copyOfRange(original: Array[Byte], start: Int, end: Int): Array[Byte] =
@@ -733,40 +670,34 @@ object Arrays {
 
   @inline
   private def copyOfRangeImpl[T : ClassTag](
-      original: Array[T], start: Int, end: Int): Array[T] = {
+      original: Array[T], start: Int, end: Int): Array[T] =
     checkIndicesForCopyOfRange(original.length, start, end)
     val retLength = end - start
     val copyLength = Math.min(retLength, original.length - start)
     val ret = new Array[T](retLength)
     System.arraycopy(original, start, ret, 0, copyLength)
     ret
-  }
 
-  @inline private def checkArrayLength(len: Int): Unit = {
+  @inline private def checkArrayLength(len: Int): Unit =
     if (len < 0) throw new NegativeArraySizeException
-  }
 
   @inline private def checkIndicesForCopyOfRange(
-      len: Int, start: Int, end: Int): Unit = {
+      len: Int, start: Int, end: Int): Unit =
     if (start > end) throw new IllegalArgumentException(start + " > " + end)
     if (start < 0 || start > len) throw new ArrayIndexOutOfBoundsException
-  }
 
-  @noinline def asList[T](a: Array[T]): List[T] = {
-    new AbstractList[T] with RandomAccess {
+  @noinline def asList[T](a: Array[T]): List[T] =
+    new AbstractList[T] with RandomAccess
       def size(): Int =
         a.length
 
       def get(index: Int): T =
         a(index)
 
-      override def set(index: Int, element: T): T = {
+      override def set(index: Int, element: T): T =
         val ret = a(index)
         a(index) = element
         ret
-      }
-    }
-  }
 
   @noinline def hashCode(a: Array[Long]): Int =
     hashCodeImpl[Long](a)
@@ -798,17 +729,16 @@ object Arrays {
   @inline
   private def hashCodeImpl[T](a: Array[T],
                               elementHashCode: T => Int = (x: T) =>
-                                  x.asInstanceOf[AnyRef].hashCode): Int = {
+                                  x.asInstanceOf[AnyRef].hashCode): Int =
     if (a == null) 0
     else
       a.foldLeft(1)(
           (acc, x) => 31 * acc + (if (x == null) 0 else elementHashCode(x)))
-  }
 
-  @noinline def deepHashCode(a: Array[AnyRef]): Int = {
+  @noinline def deepHashCode(a: Array[AnyRef]): Int =
     @inline
-    def getHash(elem: AnyRef): Int = {
-      elem match {
+    def getHash(elem: AnyRef): Int =
+      elem match
         case elem: Array[AnyRef] => deepHashCode(elem)
         case elem: Array[Long] => hashCode(elem)
         case elem: Array[Int] => hashCode(elem)
@@ -819,16 +749,12 @@ object Arrays {
         case elem: Array[Float] => hashCode(elem)
         case elem: Array[Double] => hashCode(elem)
         case _ => elem.hashCode
-      }
-    }
     hashCodeImpl(a, getHash)
-  }
 
-  @noinline def deepEquals(a1: Array[AnyRef], a2: Array[AnyRef]): Boolean = {
+  @noinline def deepEquals(a1: Array[AnyRef], a2: Array[AnyRef]): Boolean =
     if (a1 eq a2) true
     else if (a1 == null || a2 == null || a1.length != a2.length) false
     else a1.indices.forall(i => Objects.deepEquals(a1(i), a2(i)))
-  }
 
   @noinline def toString(a: Array[Long]): String =
     toStringImpl[Long](a)
@@ -858,21 +784,20 @@ object Arrays {
     toStringImpl[AnyRef](a)
 
   @inline
-  private def toStringImpl[T](a: Array[T]): String = {
+  private def toStringImpl[T](a: Array[T]): String =
     if (a == null) "null"
     else a.mkString("[", ", ", "]")
-  }
 
   @noinline def deepToString(a: Array[AnyRef]): String =
     deepToStringImpl(a, immutable.HashSet.empty[AsRef])
 
   private def deepToStringImpl(
-      a: Array[AnyRef], branch: immutable.Set[AsRef]): String = {
+      a: Array[AnyRef], branch: immutable.Set[AsRef]): String =
     @inline
-    def valueToString(e: AnyRef): String = {
+    def valueToString(e: AnyRef): String =
       if (e == null) "null"
-      else {
-        e match {
+      else
+        e match
           case e: Array[AnyRef] => deepToStringImpl(e, branch + new AsRef(a))
           case e: Array[Long] => toString(e)
           case e: Array[Int] => toString(e)
@@ -883,16 +808,12 @@ object Arrays {
           case e: Array[Float] => toString(e)
           case e: Array[Double] => toString(e)
           case _ => String.valueOf(e)
-        }
-      }
-    }
     if (a == null) "null"
     else if (branch.contains(new AsRef(a))) "[...]"
     else a.iterator.map(valueToString).mkString("[", ", ", "]")
-  }
 
   @inline
-  private def checkRangeIndices(length: Int, start: Int, end: Int): Unit = {
+  private def checkRangeIndices(length: Int, start: Int, end: Int): Unit =
     if (start > end)
       throw new IllegalArgumentException(
           "fromIndex(" + start + ") > toIndex(" + end + ")")
@@ -902,24 +823,17 @@ object Arrays {
     if (end > length)
       throw new ArrayIndexOutOfBoundsException(
           "Array index out of range: " + end)
-  }
 
   @inline
-  private def toOrdering[T](cmp: Comparator[T]): Ordering[T] = {
-    new Ordering[T] {
+  private def toOrdering[T](cmp: Comparator[T]): Ordering[T] =
+    new Ordering[T]
       def compare(x: T, y: T): Int = cmp.compare(x, y)
-    }
-  }
 
-  private final class AsRef(val inner: AnyRef) {
+  private final class AsRef(val inner: AnyRef)
     override def hashCode(): Int =
       System.identityHashCode(inner)
 
-    override def equals(obj: Any): Boolean = {
-      obj match {
+    override def equals(obj: Any): Boolean =
+      obj match
         case obj: AsRef => obj.inner eq inner
         case _ => false
-      }
-    }
-  }
-}

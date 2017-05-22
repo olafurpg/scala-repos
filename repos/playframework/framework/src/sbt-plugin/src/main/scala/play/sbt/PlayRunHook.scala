@@ -11,21 +11,16 @@ import java.net.InetSocketAddress
   */
 trait PlayRunHook extends play.runsupport.RunHook
 
-object PlayRunHook {
+object PlayRunHook
 
   def makeRunHookFromOnStarted(
-      f: (java.net.InetSocketAddress) => Unit): PlayRunHook = {
+      f: (java.net.InetSocketAddress) => Unit): PlayRunHook =
     // We create an object for a named class...
-    object OnStartedPlayRunHook extends PlayRunHook {
+    object OnStartedPlayRunHook extends PlayRunHook
       override def afterStarted(addr: InetSocketAddress): Unit = f(addr)
-    }
     OnStartedPlayRunHook
-  }
 
-  def makeRunHookFromOnStopped(f: () => Unit): PlayRunHook = {
-    object OnStoppedPlayRunHook extends PlayRunHook {
+  def makeRunHookFromOnStopped(f: () => Unit): PlayRunHook =
+    object OnStoppedPlayRunHook extends PlayRunHook
       override def afterStopped(): Unit = f()
-    }
     OnStoppedPlayRunHook
-  }
-}

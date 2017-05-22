@@ -26,15 +26,15 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * 9/10/13
   */
 class OperatorAndBacktickedSearcher
-    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters] {
+    extends QueryExecutor[PsiReference, ReferencesSearch.SearchParameters]
   def execute(queryParameters: ReferencesSearch.SearchParameters,
-              consumer: Processor[PsiReference]): Boolean = {
+              consumer: Processor[PsiReference]): Boolean =
     val scope = inReadAction(queryParameters.getEffectiveSearchScope)
     val element = queryParameters.getElementToSearch
     val manager = PsiManager.getInstance(queryParameters.getProject)
 
-    val toProcess: Seq[(PsiElement, String)] = inReadAction {
-      element match {
+    val toProcess: Seq[(PsiElement, String)] = inReadAction
+      element match
         case e if !e.isValid => Nil
         case ScalaNamesUtil.isBackticked(name) =>
           if (name != "") Seq((element, name), (element, s"`$name`"))
@@ -43,77 +43,60 @@ class OperatorAndBacktickedSearcher
             if named.name.exists(ScalaNamesUtil.isOpCharacter) =>
           Seq((named, named.name))
         case _ => Nil
-      }
-    }
-    toProcess.foreach {
+    toProcess.foreach
       case (elem, name) =>
-        val processor = new TextOccurenceProcessor {
-          def execute(element: PsiElement, offsetInElement: Int): Boolean = {
+        val processor = new TextOccurenceProcessor
+          def execute(element: PsiElement, offsetInElement: Int): Boolean =
             val references = inReadAction(element.getReferences)
             for (ref <- references if ref.getRangeInElement.contains(
-                           offsetInElement)) {
-              inReadAction {
-                if (ref.isReferenceTo(elem) || ref.resolve() == elem) {
+                           offsetInElement))
+              inReadAction
+                if (ref.isReferenceTo(elem) || ref.resolve() == elem)
                   if (!consumer.process(ref)) return false
-                }
-              }
-            }
             true
-          }
-        }
         val helper: PsiSearchHelper =
           new ScalaPsiSearchHelper(manager.asInstanceOf[PsiManagerEx])
-        try {
+        try
           helper.processElementsWithWord(
               processor, scope, name, UsageSearchContext.IN_CODE, true)
-        } catch {
+        catch
           case ignore: IndexNotReadyException =>
-        }
-    }
     true
-  }
 
   private class ScalaPsiSearchHelper(manager: PsiManagerEx)
-      extends PsiSearchHelperImpl(manager) {
+      extends PsiSearchHelperImpl(manager)
     override def processFilesWithText(
         scope: GlobalSearchScope,
         searchContext: Short,
         caseSensitively: Boolean,
         text: String,
-        processor: Processor[VirtualFile]): Boolean = {
+        processor: Processor[VirtualFile]): Boolean =
       val entries = getWordEntries(text, caseSensitively)
       if (entries.isEmpty) return true
       val collectProcessor: CommonProcessors.CollectProcessor[VirtualFile] =
         new CommonProcessors.CollectProcessor[VirtualFile]
-      val checker = new Condition[Integer] {
+      val checker = new Condition[Integer]
         def value(integer: Integer): Boolean =
           (integer.intValue & searchContext) != 0
-      }
-      inReadAction {
+      inReadAction
         FileBasedIndex.getInstance.processFilesContainingAllKeys(
             IdIndex.NAME, entries, scope, checker, collectProcessor)
-      }
       val index: FileIndexFacade =
         FileIndexFacade.getInstance(manager.getProject)
       ContainerUtil.process(
-          collectProcessor.getResults, new ReadActionProcessor[VirtualFile] {
-        def processInReadAction(virtualFile: VirtualFile): Boolean = {
+          collectProcessor.getResults, new ReadActionProcessor[VirtualFile]
+        def processInReadAction(virtualFile: VirtualFile): Boolean =
           !index.shouldBeFound(scope, virtualFile) ||
           processor.process(virtualFile)
-        }
-      })
-    }
+      )
 
     /**
       * Only this method is actually differs from PsiSearchHelperImpl,
       * because it works only for java identifiers there.
       */
     private def getWordEntries(
-        name: String, caseSensitively: Boolean): util.List[IdIndexEntry] = {
+        name: String, caseSensitively: Boolean): util.List[IdIndexEntry] =
       val keys = new util.ArrayList[IdIndexEntry]
       if (ScalaNamesUtil.isIdentifier(name))
         keys.add(new IdIndexEntry(name, caseSensitively))
       keys
-    }
-  }
-}

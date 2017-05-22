@@ -19,7 +19,7 @@ package org.apache.spark.internal
 
 import org.apache.spark.launcher.SparkLauncher
 
-package object config {
+package object config
 
   private[spark] val DRIVER_CLASS_PATH = ConfigBuilder(
       SparkLauncher.DRIVER_EXTRA_CLASSPATH).stringConf.optional
@@ -77,4 +77,3 @@ package object config {
 
   private[spark] val EXECUTOR_INSTANCES = ConfigBuilder(
       "spark.executor.instances").intConf.optional
-}

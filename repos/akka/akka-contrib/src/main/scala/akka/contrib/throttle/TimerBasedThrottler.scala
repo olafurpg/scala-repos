@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
   * @see [[akka.contrib.throttle.Throttler.SetRate]]
   * @see [[akka.contrib.throttle.Throttler.SetTarget]]
   */
-object Throttler {
+object Throttler
 
   /**
     * A rate used for throttling.
@@ -38,13 +38,12 @@ object Throttler {
     * @param duration the length of the period
     * @see [[akka.contrib.throttle.Throttler]]
     */
-  final case class Rate(val numberOfCalls: Int, val duration: FiniteDuration) {
+  final case class Rate(val numberOfCalls: Int, val duration: FiniteDuration)
 
     /**
       * The duration in milliseconds.
       */
     def durationInMillis(): Long = duration.toMillis
-  }
 
   /**
     * Set the target of a throttler.
@@ -59,7 +58,7 @@ object Throttler {
     *  and eventually be delivered when a new target is set. If `target` is not `None`, the currently queued messages
     *  as well as any messages received in the future will be delivered to the new target at a rate not exceeding the current throttler's rate.
     */
-  final case class SetTarget(target: Option[ActorRef]) {
+  final case class SetTarget(target: Option[ActorRef])
 
     /**
       * Java API:
@@ -70,7 +69,6 @@ object Throttler {
       *  the current throttler's rate.
       */
     def this(target: ActorRef) = this(Option(target))
-  }
 
   /**
     * Set the rate of a throttler.
@@ -86,20 +84,18 @@ object Throttler {
     *
     * @see [[akka.contrib.throttle.Throttler.Rate]]
     */
-  implicit class RateInt(val numberOfCalls: Int) extends AnyVal {
+  implicit class RateInt(val numberOfCalls: Int) extends AnyVal
     def msgsPer(duration: Int, timeUnit: TimeUnit) =
       Rate(numberOfCalls, Duration(duration, timeUnit))
     def msgsPer(duration: FiniteDuration) = Rate(numberOfCalls, duration)
     def msgsPerSecond = Rate(numberOfCalls, Duration(1, TimeUnit.SECONDS))
     def msgsPerMinute = Rate(numberOfCalls, Duration(1, TimeUnit.MINUTES))
     def msgsPerHour = Rate(numberOfCalls, Duration(1, TimeUnit.HOURS))
-  }
-}
 
 /**
   * INTERNAL API
   */
-private[throttle] object TimerBasedThrottler {
+private[throttle] object TimerBasedThrottler
   case object Tick
 
   // States of the FSM: A `TimerBasedThrottler` is in state `Active` iff the timer is running.
@@ -114,7 +110,6 @@ private[throttle] object TimerBasedThrottler {
   final case class Data(target: Option[ActorRef],
                         callsLeftInThisPeriod: Int,
                         queue: Q[Message])
-}
 
 /**
   * A throttler that uses a timer to control the message delivery rate.
@@ -215,11 +210,11 @@ private[throttle] object TimerBasedThrottler {
   *
   * @see [[akka.contrib.throttle.Throttler]]
   */
-class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
+class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data]
   startWith(Idle, Data(None, rate.numberOfCalls, Q()))
 
   // Idle: no messages, or target not set
-  when(Idle) {
+  when(Idle)
     // Set the rate
     case Event(SetRate(rate), d) ⇒
       this.rate = rate
@@ -238,9 +233,8 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
       goto(Active) using deliverMessages(
           d.copy(queue = Q(Message(msg, context.sender()))))
     // Note: The case Event(msg, t @ Data(Some(_), _, _, Seq(_*))) should never happen here.
-  }
 
-  when(Active) {
+  when(Active)
     // Set the rate
     case Event(SetRate(rate), d) ⇒
       this.rate = rate
@@ -279,12 +273,10 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
     case Event(msg, d @ Data(_, _, queue)) ⇒
       stay using deliverMessages(
           d.copy(queue = queue.enqueue(Message(msg, context.sender()))))
-  }
 
-  onTransition {
+  onTransition
     case Idle -> Active ⇒ startTimer(rate)
     case Active -> Idle ⇒ stopTimer()
-  }
 
   initialize()
 
@@ -296,7 +288,7 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
     * Send as many messages as we can (while respecting the rate) to the target and
     * return the state data (with the queue containing the remaining ones).
     */
-  private def deliverMessages(data: Data): Data = {
+  private def deliverMessages(data: Data): Data =
     val queue = data.queue
     val nrOfMsgToSend =
       scala.math.min(queue.length, data.callsLeftInThisPeriod)
@@ -308,5 +300,3 @@ class TimerBasedThrottler(var rate: Rate) extends Actor with FSM[State, Data] {
     data.copy(
         queue = queue.drop(nrOfMsgToSend),
         callsLeftInThisPeriod = data.callsLeftInThisPeriod - nrOfMsgToSend)
-  }
-}

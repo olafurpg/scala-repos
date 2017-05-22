@@ -30,7 +30,7 @@ package scala
   * See the [[http://docs.scala-lang.org/overviews/core/value-classes.html Value Classes and Universal Traits]] for more
   * details on the interplay of universal traits and value classes.
   */
-abstract class Any {
+abstract class Any
 
   /** Compares the receiver object (`this`) with the argument object (`that`) for equivalence.
     *
@@ -131,4 +131,3 @@ abstract class Any {
     *  @return the receiver object.
     */
   final def asInstanceOf[T0]: T0 = sys.error("asInstanceOf")
-}

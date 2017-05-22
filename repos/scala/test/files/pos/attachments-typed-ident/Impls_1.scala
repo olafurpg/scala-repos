@@ -3,8 +3,8 @@ import language.experimental.macros
 
 object MyAttachment
 
-object Macros {
-  def impl(c: Context) = {
+object Macros
+  def impl(c: Context) =
     import c.universe._
     import internal._
     val ident = updateAttachment(Ident(TermName("bar")), MyAttachment)
@@ -14,7 +14,5 @@ object Macros {
     assert(attachments(typed).get[MyAttachment.type].isDefined,
            attachments(typed))
     c.Expr[Int](typed)
-  }
 
   def foo = macro impl
-}

@@ -37,7 +37,7 @@ package org.scaloid.support.v4
 
 import scala.language.implicitConversions
 
-trait AppImplicits {
+trait AppImplicits
   @inline implicit def fragment2RichFragment[
       V <: android.support.v4.app.Fragment](fragment: V) =
     new RichFragment[V](fragment)
@@ -57,7 +57,6 @@ trait AppImplicits {
   @inline implicit def dialogFragment2RichDialogFragment[
       V <: android.support.v4.app.DialogFragment](dialogFragment: V) =
     new RichDialogFragment[V](dialogFragment)
-}
 object AppImplicits extends AppImplicits
 
 trait Implicits extends AppImplicits with ViewImplicits with WidgetImplicits

@@ -28,35 +28,33 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.HadoopFsRelationTest
 import org.apache.spark.sql.types._
 
-class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
+class OrcHadoopFsRelationSuite extends HadoopFsRelationTest
   import testImplicits._
 
   override val dataSourceName: String = classOf[DefaultSource].getCanonicalName
 
   // ORC does not play well with NullType and UDT.
   override protected def supportsDataType(dataType: DataType): Boolean =
-    dataType match {
+    dataType match
       case _: NullType => false
       case _: CalendarIntervalType => false
       case _: UserDefinedType[_] => false
       case _ => true
-    }
 
   test(
-      "save()/load() - partitioned table - simple queries - partition columns in data") {
-    withTempDir { file =>
+      "save()/load() - partitioned table - simple queries - partition columns in data")
+    withTempDir  file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
       val qualifiedBasePath = fs.makeQualified(basePath)
 
-      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar")) {
+      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
         val partitionDir = new Path(qualifiedBasePath, s"p1=$p1/p2=$p2")
         sparkContext
           .parallelize(for (i <- 1 to 3) yield (i, s"val_$i", p1))
           .toDF("a", "b", "p1")
           .write
           .orc(partitionDir.toString)
-      }
 
       val dataSchemaWithPartition = StructType(
           dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
@@ -67,14 +65,12 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
                          "dataSchema" -> dataSchemaWithPartition.json))
             .format(dataSourceName)
             .load())
-    }
-  }
 
-  test("SPARK-12218: 'Not' is included in ORC filter pushdown") {
+  test("SPARK-12218: 'Not' is included in ORC filter pushdown")
     import testImplicits._
 
-    withSQLConf(SQLConf.ORC_FILTER_PUSHDOWN_ENABLED.key -> "true") {
-      withTempPath { dir =>
+    withSQLConf(SQLConf.ORC_FILTER_PUSHDOWN_ENABLED.key -> "true")
+      withTempPath  dir =>
         val path = s"${dir.getCanonicalPath}/table1"
         (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b").write.orc(path)
 
@@ -85,13 +81,10 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
         checkAnswer(
             sqlContext.read.orc(path).where("not (a = 2 and b in ('1'))"),
             (1 to 5).map(i => Row(i, (i % 2).toString)))
-      }
-    }
-  }
 
   test(
-      "SPARK-13543: Support for specifying compression codec for ORC via option()") {
-    withTempPath { dir =>
+      "SPARK-13543: Support for specifying compression codec for ORC via option()")
+    withTempPath  dir =>
       val path = s"${dir.getCanonicalPath}/table1"
       val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")
       df.write.option("compression", "ZlIb").orc(path)
@@ -109,6 +102,3 @@ class OrcHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       val copyDf = sqlContext.read.orc(path)
       checkAnswer(df, copyDf)
-    }
-  }
-}

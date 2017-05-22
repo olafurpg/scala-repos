@@ -28,7 +28,7 @@ import blueeyes.json.serialization.{Extractor, Decomposer}
 import blueeyes.json.serialization.DefaultSerialization._
 import blueeyes.json.serialization.Extractor._
 
-object ServiceHandlerUtil {
+object ServiceHandlerUtil
   def forbidden(message: String): HttpResponse[JValue] =
     HttpResponse[JValue](
         HttpStatus(Forbidden), content = Some(JString(message)))
@@ -57,6 +57,5 @@ object ServiceHandlerUtil {
     HttpResponse(
         HttpStatus(InternalServerError, message),
         content = Some(jobject(jfield("error", details getOrElse message))))
-}
 
 // vim: set ts=4 sw=4 et:

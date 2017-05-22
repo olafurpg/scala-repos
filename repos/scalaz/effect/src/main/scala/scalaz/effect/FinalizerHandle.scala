@@ -6,16 +6,13 @@ package effect
   * Duplicating a finalizer means that instead of being performed when the current region
   * terminates, it is performed when the parent region terminates.
   */
-sealed abstract class FinalizerHandle[R[_]] {
+sealed abstract class FinalizerHandle[R[_]]
   val finalizer: RefCountedFinalizer
-}
 
-object FinalizerHandle {
+object FinalizerHandle
   def apply[R[_]](r: RefCountedFinalizer): FinalizerHandle[R] =
     finalizerHandle[R](r)
 
   def finalizerHandle[R[_]](r: RefCountedFinalizer): FinalizerHandle[R] =
-    new FinalizerHandle[R] {
+    new FinalizerHandle[R]
       val finalizer = r
-    }
-}

@@ -6,7 +6,7 @@ import play.api.libs.json._
 import reactivemongo.bson._
 import reactivemongo.api._
 
-object $find {
+object $find
 
   def one[A : TubeInColl](
       q: JsObject,
@@ -27,20 +27,18 @@ object $find {
 
   def byOrderedIds[ID : Writes, A <: Identified[ID]: TubeInColl](
       ids: Iterable[ID]): Fu[List[A]] =
-    byIds(ids) map { docs =>
+    byIds(ids) map  docs =>
       val docsMap = docs.map(u => u.id -> u).toMap
       ids.flatMap(docsMap.get).toList
-    }
   def byOrderedIds[A <: Identified[String]: TubeInColl](
       ids: Iterable[String]): Fu[List[A]] =
     byOrderedIds[String, A](ids)
 
   def optionsByOrderedIds[ID : Writes, A <: Identified[ID]: TubeInColl](
       ids: Iterable[ID]): Fu[List[Option[A]]] =
-    byIds(ids) map { docs =>
+    byIds(ids) map  docs =>
       val docsMap = docs.map(u => u.id -> u).toMap
       ids.map(docsMap.get).toList
-    }
   def opByOrderedIds[A <: Identified[String]: TubeInColl](
       ids: Iterable[String]): Fu[List[Option[A]]] =
     optionsByOrderedIds[String, A](ids)
@@ -62,4 +60,3 @@ object $find {
   def apply[A : TubeInColl](
       b: QueryBuilder, nb: Int, readPreference: ReadPreference): Fu[List[A]] =
     b.toList[Option[A]](nb.some, readPreference) map (_.flatten)
-}

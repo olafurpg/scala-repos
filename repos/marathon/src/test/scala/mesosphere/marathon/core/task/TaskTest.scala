@@ -8,10 +8,10 @@ import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 import scala.collection.immutable.Seq
 
-class TaskTest extends FunSuite with Mockito with GivenWhenThen with Matchers {
+class TaskTest extends FunSuite with Mockito with GivenWhenThen with Matchers
   import scala.collection.JavaConverters._
 
-  class Fixture {
+  class Fixture
     val appWithoutIpAddress = AppDefinition(
         id = PathId("/foo/bar"), ipAddress = None)
     val appWithIpAddress = AppDefinition(id = PathId("/foo/bar"),
@@ -75,79 +75,66 @@ class TaskTest extends FunSuite with Mockito with GivenWhenThen with Matchers {
       .withAgentInfo(_.copy(host = host))
       .withNetworking(
           Task.NetworkInfoList(networkWithOneIp1, networkWithOneIp2))
-  }
 
   test(
-      "effectiveIpAddress returns the agent address for MarathonTask instances without their own IP addresses") {
+      "effectiveIpAddress returns the agent address for MarathonTask instances without their own IP addresses")
     val f = new Fixture
     f.taskWithoutIp.effectiveIpAddress(f.appWithIpAddress) should equal(f.host)
     f.taskWithoutIp.effectiveIpAddress(f.appWithoutIpAddress) should equal(
         f.host)
-  }
 
   test(
-      "effectiveIpAddress returns the container ip for MarathonTask instances with one NetworkInfo (if the app requests an IP)") {
+      "effectiveIpAddress returns the container ip for MarathonTask instances with one NetworkInfo (if the app requests an IP)")
     val f = new Fixture
     f.taskWithOneIp.effectiveIpAddress(f.appWithIpAddress) should equal(
         f.ipString1)
-  }
 
   test(
-      "effectiveIpAddress returns the first container ip for for MarathonTask instances with multiple NetworkInfos (if the app requests an IP)") {
+      "effectiveIpAddress returns the first container ip for for MarathonTask instances with multiple NetworkInfos (if the app requests an IP)")
     val f = new Fixture
     f.taskWithMultipleNetworksAndOneIp.effectiveIpAddress(f.appWithIpAddress) should equal(
         f.ipString1)
-  }
 
-  test("effectiveIpAddress falls back to the agent IP") {
+  test("effectiveIpAddress falls back to the agent IP")
     val f = new Fixture
     f.taskWithMultipleNetworkAndNoIp.effectiveIpAddress(f.appWithIpAddress) should equal(
         f.host)
-  }
 
   test(
-      "effectiveIpAddress returns the agent ip for MarathonTask instances with one NetworkInfo (if the app does NOT request an IP)") {
+      "effectiveIpAddress returns the agent ip for MarathonTask instances with one NetworkInfo (if the app does NOT request an IP)")
     val f = new Fixture
     f.taskWithOneIp.effectiveIpAddress(f.appWithoutIpAddress) should equal(
         f.host)
-  }
 
   test(
-      "ipAddresses returns an empty list for MarathonTask instances with no IPs") {
+      "ipAddresses returns an empty list for MarathonTask instances with no IPs")
     val f = new Fixture
     f.taskWithoutIp.ipAddresses should be(empty)
-  }
 
   test(
-      "ipAddresses returns an empty list for MarathonTask instances with no IPs and multiple NetworkInfos") {
+      "ipAddresses returns an empty list for MarathonTask instances with no IPs and multiple NetworkInfos")
     val f = new Fixture
     f.taskWithMultipleNetworkAndNoIp.ipAddresses should be(empty)
-  }
 
   test(
-      "ipAddresses returns all IPs for MarathonTask instances with multiple IPs") {
+      "ipAddresses returns all IPs for MarathonTask instances with multiple IPs")
     val f = new Fixture
     f.taskWithMultipleNetworkAndMultipleIPs.ipAddresses should equal(
         Seq(f.ipAddress1, f.ipAddress2))
-  }
 
   test(
-      "ipAddresses returns all IPs for MarathonTask instances with multiple IPs and multiple NetworkInfos") {
+      "ipAddresses returns all IPs for MarathonTask instances with multiple IPs and multiple NetworkInfos")
     val f = new Fixture
     f.taskWithMultipleNetworkAndMultipleIPs.ipAddresses should equal(
         Seq(f.ipAddress1, f.ipAddress2))
-  }
 
   test(
-      "ipAddresses returns one IP for MarathonTask instances with one IP and one NetworkInfo") {
+      "ipAddresses returns one IP for MarathonTask instances with one IP and one NetworkInfo")
     val f = new Fixture
     f.taskWithOneIp.ipAddresses should equal(Seq(f.ipAddress1))
-  }
 
   test(
-      "ipAddresses returns one IP for MarathonTask instances with one IP and multiple NetworkInfo") {
+      "ipAddresses returns one IP for MarathonTask instances with one IP and multiple NetworkInfo")
     val f = new Fixture
     f.taskWithMultipleNetworksAndOneIp.ipAddresses should equal(
         Seq(f.ipAddress1))
-  }
-}

@@ -21,22 +21,20 @@ import com.twitter.scrooge.ThriftEnum
 import scala.language.experimental.macros
 import scala.reflect.macros.Context
 
-object ScroogeEnumOrderedBuf {
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object ScroogeEnumOrderedBuf
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     import c.universe._
 
-    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
       case tpe if tpe <:< typeOf[ThriftEnum] => ScroogeEnumOrderedBuf(c)(tpe)
-    }
     pf
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(s"fresh_$id"))
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -62,6 +60,3 @@ object ScroogeEnumOrderedBuf {
         CompileTimeLengthTypes.FastLengthCalculation(c)(
             q"posVarIntSize($element.value)")
       override val lazyOuterVariables: Map[String, ctx.Tree] = Map.empty
-    }
-  }
-}

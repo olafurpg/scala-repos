@@ -14,34 +14,27 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * User: Alexander Podkhalyuzin
   * Date: 29.09.2008
   */
-class ScalaWithIfConditionSurrounder extends ScalaExpressionSurrounder {
+class ScalaWithIfConditionSurrounder extends ScalaExpressionSurrounder
   override def getTemplateAsString(elements: Array[PsiElement]): String =
     "if (" + super.getTemplateAsString(elements) + ") {}"
   override def getTemplateDescription: String = "if (expr) {...}"
-  override def isApplicable(elements: Array[PsiElement]): Boolean = {
+  override def isApplicable(elements: Array[PsiElement]): Boolean =
     if (elements.length != 1) return false
-    elements(0) match {
+    elements(0) match
       case x: ScExpression
           if x.getTypeIgnoreBaseType(TypingContext.empty).getOrAny == psi.types.Boolean =>
         return true
       case _ => return false
-    }
-  }
-  override def getSurroundSelectionRange(withIfNode: ASTNode): TextRange = {
-    val element: PsiElement = withIfNode.getPsi match {
+  override def getSurroundSelectionRange(withIfNode: ASTNode): TextRange =
+    val element: PsiElement = withIfNode.getPsi match
       case x: ScParenthesisedExpr =>
-        x.expr match {
+        x.expr match
           case Some(y) => y
           case _ => return x.getTextRange
-        }
       case x => x
-    }
 
     val ifStmt: ScIfStmt = element.asInstanceOf[ScIfStmt]
-    val body = (ifStmt.thenBranch: @unchecked) match {
+    val body = (ifStmt.thenBranch: @unchecked) match
       case Some(x) => x
-    }
     val offset = body.getTextRange.getStartOffset + 1
     new TextRange(offset, offset)
-  }
-}

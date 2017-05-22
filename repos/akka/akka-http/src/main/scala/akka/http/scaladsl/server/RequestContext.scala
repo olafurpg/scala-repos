@@ -15,7 +15,7 @@ import akka.http.scaladsl.settings.{RoutingSettings, ParserSettings}
   * Immutable object encapsulating the context of an [[akka.http.scaladsl.model.HttpRequest]]
   * as it flows through a akka-http Route structure.
   */
-trait RequestContext {
+trait RequestContext
 
   /** The request this context represents. Modelled as a `val` so as to enable an `import ctx.request._`. */
   val request: HttpRequest
@@ -123,4 +123,3 @@ trait RequestContext {
     * Removes a potentially existing Accept header from the request headers.
     */
   def withAcceptAll: RequestContext
-}

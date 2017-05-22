@@ -36,7 +36,7 @@ class ConsumerFetcherThread(
         clientId = config.clientId,
         sourceBroker = sourceBroker,
         fetchBackOffMs = config.refreshLeaderBackoffMs,
-        isInterruptible = true) {
+        isInterruptible = true)
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -58,22 +58,20 @@ class ConsumerFetcherThread(
     .minBytes(config.fetchMinBytes)
     .requestVersion(kafka.api.FetchRequest.CurrentVersion)
 
-  override def initiateShutdown(): Boolean = {
+  override def initiateShutdown(): Boolean =
     val justShutdown = super.initiateShutdown()
     if (justShutdown && isInterruptible)
       simpleConsumer.disconnectToHandleJavaIOBug()
     justShutdown
-  }
 
-  override def shutdown(): Unit = {
+  override def shutdown(): Unit =
     super.shutdown()
     simpleConsumer.close()
-  }
 
   // process fetched data
   def processPartitionData(topicAndPartition: TopicAndPartition,
                            fetchOffset: Long,
-                           partitionData: PartitionData) {
+                           partitionData: PartitionData)
     val pti = partitionMap(topicAndPartition)
     if (pti.getFetchOffset != fetchOffset)
       throw new RuntimeException(
@@ -84,63 +82,54 @@ class ConsumerFetcherThread(
                     fetchOffset))
     pti.enqueue(
         partitionData.underlying.messages.asInstanceOf[ByteBufferMessageSet])
-  }
 
   // handle a partition whose offset is out of range and return a new fetch offset
-  def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long = {
-    val startTimestamp = config.autoOffsetReset match {
+  def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long =
+    val startTimestamp = config.autoOffsetReset match
       case OffsetRequest.SmallestTimeString => OffsetRequest.EarliestTime
       case OffsetRequest.LargestTimeString => OffsetRequest.LatestTime
       case _ => OffsetRequest.LatestTime
-    }
     val newOffset = simpleConsumer.earliestOrLatestOffset(
         topicAndPartition, startTimestamp, Request.OrdinaryConsumerId)
     val pti = partitionMap(topicAndPartition)
     pti.resetFetchOffset(newOffset)
     pti.resetConsumeOffset(newOffset)
     newOffset
-  }
 
   // any logic for partitions whose leader has changed
-  def handlePartitionsWithErrors(partitions: Iterable[TopicAndPartition]) {
+  def handlePartitionsWithErrors(partitions: Iterable[TopicAndPartition])
     removePartitions(partitions.toSet)
     consumerFetcherManager.addPartitionsWithError(partitions)
-  }
 
   protected def buildFetchRequest(
       partitionMap: collection.Map[TopicAndPartition, PartitionFetchState])
-    : FetchRequest = {
-    partitionMap.foreach {
+    : FetchRequest =
+    partitionMap.foreach
       case ((topicAndPartition, partitionFetchState)) =>
         if (partitionFetchState.isActive)
           fetchRequestBuilder.addFetch(topicAndPartition.topic,
                                        topicAndPartition.partition,
                                        partitionFetchState.offset,
                                        fetchSize)
-    }
 
     new FetchRequest(fetchRequestBuilder.build())
-  }
 
   protected def fetch(fetchRequest: FetchRequest)
     : collection.Map[TopicAndPartition, PartitionData] =
-    simpleConsumer.fetch(fetchRequest.underlying).data.map {
+    simpleConsumer.fetch(fetchRequest.underlying).data.map
       case (key, value) =>
         key -> new PartitionData(value)
-    }
-}
 
-object ConsumerFetcherThread {
+object ConsumerFetcherThread
 
   class FetchRequest(val underlying: kafka.api.FetchRequest)
-      extends AbstractFetcherThread.FetchRequest {
+      extends AbstractFetcherThread.FetchRequest
     def isEmpty: Boolean = underlying.requestInfo.isEmpty
     def offset(topicAndPartition: TopicAndPartition): Long =
       underlying.requestInfo(topicAndPartition).offset
-  }
 
   class PartitionData(val underlying: FetchResponsePartitionData)
-      extends AbstractFetcherThread.PartitionData {
+      extends AbstractFetcherThread.PartitionData
     def errorCode: Short = underlying.error
     def toByteBufferMessageSet: ByteBufferMessageSet =
       underlying.messages.asInstanceOf[ByteBufferMessageSet]
@@ -148,5 +137,3 @@ object ConsumerFetcherThread {
     def exception: Option[Throwable] =
       if (errorCode == ErrorMapping.NoError) None
       else Some(ErrorMapping.exceptionFor(errorCode))
-  }
-}

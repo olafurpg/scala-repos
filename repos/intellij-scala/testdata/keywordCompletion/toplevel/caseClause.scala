@@ -1,8 +1,5 @@
-class a {
-  {
+class a
     case t => /*caret*/
-  }
-}
 /*
 abstract
 case

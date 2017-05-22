@@ -14,7 +14,7 @@ import akka.stream.scaladsl.{Sink, Source, Flow}
 
 import scala.concurrent.Future
 
-trait Decoder {
+trait Decoder
   def encoding: HttpEncoding
 
   def decode[T <: HttpMessage](message: T)(
@@ -37,27 +37,23 @@ trait Decoder {
       .single(input)
       .via(decoderFlow)
       .runWith(Sink.fold(ByteString.empty)(_ ++ _))
-}
-object Decoder {
+object Decoder
   val MaxBytesPerChunkDefault: Int = 65536
-}
 
 /** A decoder that is implemented in terms of a [[Stage]] */
-trait StreamDecoder extends Decoder { outer ⇒
+trait StreamDecoder extends Decoder  outer ⇒
   protected def newDecompressorStage(maxBytesPerChunk: Int)
     : () ⇒ GraphStage[FlowShape[ByteString, ByteString]]
 
   def maxBytesPerChunk: Int = Decoder.MaxBytesPerChunkDefault
   def withMaxBytesPerChunk(newMaxBytesPerChunk: Int): Decoder =
-    new StreamDecoder {
+    new StreamDecoder
       def encoding: HttpEncoding = outer.encoding
       override def maxBytesPerChunk: Int = newMaxBytesPerChunk
 
       def newDecompressorStage(maxBytesPerChunk: Int)
         : () ⇒ GraphStage[FlowShape[ByteString, ByteString]] =
         outer.newDecompressorStage(maxBytesPerChunk)
-    }
 
   def decoderFlow: Flow[ByteString, ByteString, NotUsed] =
     Flow.fromGraph(newDecompressorStage(maxBytesPerChunk)())
-}

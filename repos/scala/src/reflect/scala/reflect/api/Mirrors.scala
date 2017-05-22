@@ -206,7 +206,7 @@ package api
   *  @contentDiagram hideNodes "*Api"
   *  @group ReflectionAPI
   */
-trait Mirrors { self: Universe =>
+trait Mirrors  self: Universe =>
 
   /** The base type of all mirrors of this universe.
     *
@@ -240,7 +240,7 @@ trait Mirrors { self: Universe =>
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait InstanceMirror {
+  trait InstanceMirror
 
     /** The instance value reflected by this mirror */
     def instance: Any
@@ -311,13 +311,12 @@ trait Mirrors { self: Universe =>
       *  It must be a member (declared or inherited) of the instance underlying this mirror.
       */
     def reflectModule(mod: ModuleSymbol): ModuleMirror
-  }
 
   /** A mirror that reflects a field.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait FieldMirror {
+  trait FieldMirror
 
     /** The object containing the field */
     def receiver: Any
@@ -361,13 +360,12 @@ trait Mirrors { self: Universe =>
       *  This is significantly faster than recreating the mirror from scratch.
       */
     def bind(newReceiver: Any): FieldMirror
-  }
 
   /** A mirror that reflects a method.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait MethodMirror {
+  trait MethodMirror
 
     /** The receiver object of the method */
     def receiver: Any
@@ -387,13 +385,12 @@ trait Mirrors { self: Universe =>
       *  This is significantly faster than recreating the mirror from scratch.
       */
     def bind(newReceiver: Any): MethodMirror
-  }
 
   /** A mirror that reflects the instance or static parts of a runtime class.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait TemplateMirror {
+  trait TemplateMirror
 
     /** True if the mirror represents the static part
       *  of a runtime class or the companion object of a Scala class.
@@ -406,13 +403,12 @@ trait Mirrors { self: Universe =>
 
     /** The Scala symbol corresponding to the reflected runtime class or object */
     def symbol: Symbol
-  }
 
   /** A mirror that reflects a Scala object definition or the static parts of a runtime class.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait ModuleMirror extends TemplateMirror {
+  trait ModuleMirror extends TemplateMirror
 
     /** The Scala module symbol corresponding to the reflected object */
     override def symbol: ModuleSymbol
@@ -422,13 +418,12 @@ trait Mirrors { self: Universe =>
       *  If this mirror reflects the static part of a runtime class, returns `null`.
       */
     def instance: Any
-  }
 
   /** A mirror that reflects the instance parts of a runtime class.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait ClassMirror extends TemplateMirror {
+  trait ClassMirror extends TemplateMirror
 
     /** The Scala class symbol corresponding to the reflected class */
     override def symbol: ClassSymbol
@@ -444,13 +439,12 @@ trait Mirrors { self: Universe =>
       *  It must be a member (declared or inherited) of the class underlying this mirror.
       */
     def reflectConstructor(constructor: MethodSymbol): MethodMirror
-  }
 
   /** A mirror that reflects instances and static classes.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait ReflectiveMirror extends scala.reflect.api.Mirror[Mirrors.this.type] {
+  trait ReflectiveMirror extends scala.reflect.api.Mirror[Mirrors.this.type]
 
     /** A reflective mirror for the given object.
       *
@@ -482,13 +476,12 @@ trait Mirrors { self: Universe =>
       *  It must be static, i.e. either top-level or nested within one or several static objects.
       */
     def reflectModule(mod: ModuleSymbol): ModuleMirror
-  }
 
   /** The API of a mirror for a reflective universe.
     *  See [[scala.reflect.api.package the overview page]] for details on how to use runtime reflection.
     *  @group Mirrors
     */
-  trait RuntimeMirror extends ReflectiveMirror { self =>
+  trait RuntimeMirror extends ReflectiveMirror  self =>
 
     /** Maps a Scala type to the corresponding Java class object */
     def runtimeClass(tpe: Type): RuntimeClass
@@ -516,5 +509,3 @@ trait Mirrors { self: Universe =>
       *  to do: throws anything else?
       */
     def moduleSymbol(rtcls: RuntimeClass): ModuleSymbol
-  }
-}

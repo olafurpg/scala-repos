@@ -34,18 +34,17 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 @Since("0.8.0")
-object SVMDataGenerator {
+object SVMDataGenerator
 
   @Since("0.8.0")
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+  def main(args: Array[String])
+    if (args.length < 2)
       // scalastyle:off println
       println(
           "Usage: SVMGenerator " +
           "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
       // scalastyle:on println
       System.exit(1)
-    }
 
     val sparkMaster: String = args(0)
     val outputPath: String = args(1)
@@ -60,21 +59,17 @@ object SVMDataGenerator {
       Array.fill[Double](nfeatures + 1)(globalRnd.nextGaussian())
 
     val data: RDD[LabeledPoint] =
-      sc.parallelize(0 until nexamples, parts).map { idx =>
+      sc.parallelize(0 until nexamples, parts).map  idx =>
         val rnd = new Random(42 + idx)
 
-        val x = Array.fill[Double](nfeatures) {
+        val x = Array.fill[Double](nfeatures)
           rnd.nextDouble() * 2.0 - 1.0
-        }
         val yD =
           blas.ddot(trueWeights.length, x, 1, trueWeights, 1) +
           rnd.nextGaussian() * 0.1
         val y = if (yD < 0) 0.0 else 1.0
         LabeledPoint(y, Vectors.dense(x))
-      }
 
     data.saveAsTextFile(outputPath)
 
     sc.stop()
-  }
-}

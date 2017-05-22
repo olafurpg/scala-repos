@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package scalaguide.xml.scalaxmlrequests {
+package scalaguide.xml.scalaxmlrequests
 
   import play.api.inject.guice.GuiceApplicationBuilder
   import play.api.mvc._
@@ -10,78 +10,60 @@ package scalaguide.xml.scalaxmlrequests {
   import org.specs2.runner.JUnitRunner
 
   @RunWith(classOf[JUnitRunner])
-  class ScalaXmlRequestsSpec extends PlaySpecification with Controller {
+  class ScalaXmlRequestsSpec extends PlaySpecification with Controller
 
-    "A scala XML request" should {
+    "A scala XML request" should
 
-      "request body as xml" in {
+      "request body as xml" in
 
         //#xml-request-body-asXml
-        def sayHello = Action { request =>
-          request.body.asXml.map { xml =>
+        def sayHello = Action  request =>
+          request.body.asXml.map  xml =>
             (xml \\ "name" headOption)
               .map(_.text)
-              .map { name =>
+              .map  name =>
                 Ok("Hello " + name)
-              }
-              .getOrElse {
+              .getOrElse
                 BadRequest("Missing parameter [name]")
-              }
-          }.getOrElse {
+          .getOrElse
             BadRequest("Expecting Xml data")
-          }
-        }
         //#xml-request-body-asXml
 
         testAction(sayHello, FakeRequest().withXmlBody(<name>XF</name>))
-      }
 
-      "request body as xml body parser" in {
+      "request body as xml body parser" in
 
         //#xml-request-body-parser
-        def sayHello = Action(parse.xml) { request =>
+        def sayHello = Action(parse.xml)  request =>
           (request.body \\ "name" headOption)
             .map(_.text)
-            .map { name =>
+            .map  name =>
               Ok("Hello " + name)
-            }
-            .getOrElse {
+            .getOrElse
               BadRequest("Missing parameter [name]")
-            }
-        }
         //#xml-request-body-parser
 
         testAction(sayHello,
                    FakeRequest().withXmlBody(<name>XF</name>).map(_.xml))
-      }
 
-      "request body as xml body parser and xml response" in {
+      "request body as xml body parser and xml response" in
 
         //#xml-request-body-parser-xml-response
-        def sayHello = Action(parse.xml) { request =>
+        def sayHello = Action(parse.xml)  request =>
           (request.body \\ "name" headOption)
             .map(_.text)
-            .map { name =>
+            .map  name =>
               Ok(<message status="OK">Hello {name}</message>)
-            }
-            .getOrElse {
+            .getOrElse
               BadRequest(
                   <message status="KO">Missing parameter [name]</message>)
-            }
-        }
         //#xml-request-body-parser-xml-response
 
         testAction(sayHello,
                    FakeRequest().withXmlBody(<name>XF</name>).map(_.xml))
-      }
-    }
 
-    def testAction[T](action: Action[T], req: Request[T]) = {
+    def testAction[T](action: Action[T], req: Request[T]) =
 
-      running(GuiceApplicationBuilder().build()) {
+      running(GuiceApplicationBuilder().build())
         val result = action(req)
         status(result) must_== OK
-      }
-    }
-  }
-}

@@ -2,7 +2,7 @@ package java.util
 
 import scala.reflect.ClassTag
 
-object Objects {
+object Objects
 
   @inline
   def equals(a: AnyRef, b: AnyRef): Boolean =
@@ -10,11 +10,11 @@ object Objects {
     else a.equals(b)
 
   @inline
-  def deepEquals(a: AnyRef, b: AnyRef): Boolean = {
+  def deepEquals(a: AnyRef, b: AnyRef): Boolean =
     if (a eq b) true
     else if (a == null || b == null) false
-    else {
-      (a, b) match {
+    else
+      (a, b) match
         case (a1: Array[AnyRef], a2: Array[AnyRef]) =>
           Arrays.deepEquals(a1, a2)
         case (a1: Array[Long], a2: Array[Long]) => Arrays.equals(a1, a2)
@@ -26,9 +26,6 @@ object Objects {
         case (a1: Array[Float], a2: Array[Float]) => Arrays.equals(a1, a2)
         case (a1: Array[Double], a2: Array[Double]) => Arrays.equals(a1, a2)
         case _ => a === b
-      }
-    }
-  }
 
   @inline
   def hashCode(o: AnyRef): Int =
@@ -76,4 +73,3 @@ object Objects {
   // def requireNonNull[T](obj: T, messageSupplier: Supplier[String]): T =
   //   if (obj == null) throw new NullPointerException(messageSupplier.get())
   //   else obj
-}

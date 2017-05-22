@@ -8,10 +8,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 5/14/12
   */
-class AddNameToArgumentIntentionTest extends ScalaIntentionTestBase {
+class AddNameToArgumentIntentionTest extends ScalaIntentionTestBase
   def familyName = AddNameToArgumentIntention.familyName
 
-  def test() {
+  def test()
     val text = """
         |class NameParameters {
         |  def doSomething(flag: Boolean) {}
@@ -28,9 +28,8 @@ class AddNameToArgumentIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test2() {
+  def test2()
     val text = """
         |class NameParameters {
         |  def doSomething(flag: Boolean, a: Int) {}
@@ -47,9 +46,8 @@ class AddNameToArgumentIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test3() {
+  def test3()
     val text = """
         |class NameParameters {
         |  def doSomething(flag: Boolean, a: Int, b: Int) {}
@@ -66,5 +64,3 @@ class AddNameToArgumentIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

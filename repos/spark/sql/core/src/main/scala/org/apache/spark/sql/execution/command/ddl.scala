@@ -31,16 +31,13 @@ import org.apache.spark.sql.types._
 /**
   * A DDL command expected to be parsed and run in an underlying system instead of in Spark.
   */
-abstract class NativeDDLCommand(val sql: String) extends RunnableCommand {
+abstract class NativeDDLCommand(val sql: String) extends RunnableCommand
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     sqlContext.runNativeSql(sql)
-  }
 
-  override val output: Seq[Attribute] = {
+  override val output: Seq[Attribute] =
     Seq(AttributeReference("result", StringType, nullable = false)())
-  }
-}
 
 case class CreateDatabase(databaseName: String,
                           ifNotExists: Boolean,
@@ -91,12 +88,11 @@ case class AlterTableSkewed(tableName: TableIdentifier,
                             // e.g. ('2008-08-08', 'us), ('2009-09-09', 'uk')
                             skewedValues: Seq[Seq[String]],
                             storedAsDirs: Boolean)(sql: String)
-    extends NativeDDLCommand(sql) with Logging {
+    extends NativeDDLCommand(sql) with Logging
 
   require(
       skewedValues.forall(_.size == skewedCols.size),
       "number of columns in skewed values do not match number of skewed columns provided")
-}
 
 case class AlterTableNotSkewed(tableName: TableIdentifier)(sql: String)
     extends NativeDDLCommand(sql) with Logging

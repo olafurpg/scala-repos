@@ -28,7 +28,7 @@ import org.junit.Test
 import scala.collection.Map
 
 class RackAwareAutoTopicCreationTest
-    extends KafkaServerTestHarness with RackAwareTest {
+    extends KafkaServerTestHarness with RackAwareTest
   val numServers = 4
   val numPartitions = 8
   val replicationFactor = 2
@@ -38,19 +38,19 @@ class RackAwareAutoTopicCreationTest
       KafkaConfig.DefaultReplicationFactorProp, replicationFactor.toString)
 
   def generateConfigs() =
-    (0 until numServers) map { node =>
+    (0 until numServers) map  node =>
       TestUtils.createBrokerConfig(node,
                                    zkConnect,
                                    enableControlledShutdown = false,
                                    rack = Some((node / 2).toString))
-    } map (KafkaConfig.fromProps(_, overridingProps))
+    map (KafkaConfig.fromProps(_, overridingProps))
 
   private val topic = "topic"
 
   @Test
-  def testAutoCreateTopic() {
+  def testAutoCreateTopic()
     val producer = TestUtils.createNewProducer(brokerList, retries = 5)
-    try {
+    try
       // Send a message to auto-create the topic
       val record = new ProducerRecord(
           topic, null, "key".getBytes, "value".getBytes)
@@ -59,10 +59,9 @@ class RackAwareAutoTopicCreationTest
 
       // double check that the topic is created with leader elected
       TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0)
-      val assignment = zkUtils.getReplicaAssignmentForTopics(Seq(topic)).map {
+      val assignment = zkUtils.getReplicaAssignmentForTopics(Seq(topic)).map
         case (topicPartition, replicas) =>
           topicPartition.partition -> replicas
-      }
       val brokerMetadatas =
         AdminUtils.getBrokerMetadatas(zkUtils, RackAwareMode.Enforced)
       val expectedMap = Map(0 -> "0", 1 -> "0", 2 -> "1", 3 -> "1")
@@ -73,6 +72,4 @@ class RackAwareAutoTopicCreationTest
                                numServers,
                                numPartitions,
                                replicationFactor)
-    } finally producer.close()
-  }
-}
+    finally producer.close()

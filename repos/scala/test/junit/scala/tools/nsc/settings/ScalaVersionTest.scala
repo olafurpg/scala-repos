@@ -8,19 +8,18 @@ import org.junit.runners.JUnit4
 import scala.tools.testing.AssertUtil.assertThrows
 
 @RunWith(classOf[JUnit4])
-class ScalaVersionTest {
+class ScalaVersionTest
   // SI-8711
   @Test
-  def versionUnparse() {
+  def versionUnparse()
     val v = "2.11.3"
 
     assertEquals(v, ScalaVersion(v).unparse)
     assertEquals("2.11.3-RC4", ScalaVersion("2.11.3-rc4").unparse)
-  }
 
   // SI-9167
   @Test
-  def `version parses with rigor`() {
+  def `version parses with rigor`()
     import settings.{SpecificScalaVersion => V}
     import ScalaVersion._
 
@@ -68,11 +67,8 @@ class ScalaVersionTest {
     assertThrows[NumberFormatException](
         ScalaVersion("2.11-ok"),
         _ == "Bad version (2.11-ok) not major[.minor[.revision[-suffix]]]")
-  }
 
   // SI-9377
   @Test
-  def `missing version is as good as none`() {
+  def `missing version is as good as none`()
     assertEquals(NoScalaVersion, ScalaVersion(""))
-  }
-}

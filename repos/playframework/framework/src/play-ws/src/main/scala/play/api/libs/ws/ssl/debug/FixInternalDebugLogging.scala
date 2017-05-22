@@ -13,13 +13,13 @@ import scala.util.control.NonFatal
 /**
   * This fixes logging for the SSL Debug class.  It will worth for both Java 1.6 and Java 1.7 VMs.
   */
-object FixInternalDebugLogging {
+object FixInternalDebugLogging
 
   private val logger = org.slf4j.LoggerFactory
     .getLogger("play.api.libs.ws.ssl.debug.FixInternalDebugLogging")
 
   class MonkeyPatchInternalSslDebugAction(val newOptions: String)
-      extends FixLoggingAction {
+      extends FixLoggingAction
 
     val logger = org.slf4j.LoggerFactory.getLogger(
         "play.api.libs.ws.ssl.debug.FixInternalDebugLogging.MonkeyPatchInternalSslDebugAction")
@@ -40,11 +40,10 @@ object FixInternalDebugLogging {
       * @param className the name of the class.
       * @return true if this class should be returned in the set of findClasses, false otherwise.
       */
-    def isValidClass(className: String): Boolean = {
+    def isValidClass(className: String): Boolean =
       if (className.startsWith("com.sun.net.ssl.internal.ssl")) return true
       if (className.startsWith("sun.security.ssl")) return true
       false
-    }
 
     /**
       * Returns true if newOptions is not null and newOptions is not empty.  If false, then debug values
@@ -52,7 +51,7 @@ object FixInternalDebugLogging {
       */
     def isUsingDebug: Boolean = (newOptions != null) && (!newOptions.isEmpty)
 
-    def run() {
+    def run()
       System.setProperty("javax.net.debug", newOptions)
 
       val debugType: Class[_] =
@@ -64,36 +63,28 @@ object FixInternalDebugLogging {
 
       var isPatched = false
       for (debugClass <- findClasses;
-      debugField <- debugClass.getDeclaredFields) {
-        if (isValidField(debugField, debugType)) {
+      debugField <- debugClass.getDeclaredFields)
+        if (isValidField(debugField, debugType))
           logger.debug(s"run: patching $debugClass with $debugValue")
           monkeyPatchField(debugField, debugValue)
           isPatched = true
-        }
-      }
 
       // Add an assertion here in case the class location changes, so the tests fail...
-      if (!isPatched) {
+      if (!isPatched)
         throw new IllegalStateException("No debug classes found!")
-      }
 
       // Switch out the args (for certpath loggers that AREN'T static and final)
       // This will result in those classes using the base Debug class which will write to System.out, but
       // I don't know how to switch out the Debug.getInstance method itself without using a java agent.
       val argsField = debugType.getDeclaredField("args")
       monkeyPatchField(argsField, newOptions)
-    }
-  }
 
-  def apply(newOptions: String) {
+  def apply(newOptions: String)
     logger.trace(s"apply: newOptions = ${newOptions}")
 
-    try {
+    try
       val action = new MonkeyPatchInternalSslDebugAction(newOptions)
       AccessController.doPrivileged(action)
-    } catch {
+    catch
       case NonFatal(e) =>
         throw new IllegalStateException("InternalDebug configuration error", e)
-    }
-  }
-}

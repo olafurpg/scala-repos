@@ -28,8 +28,8 @@ import scala.collection.JavaConverters._
   * 9/26/13
   */
 class MatchToPartialFunctionInspection
-    extends AbstractInspection(inspectionId) {
-  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+    extends AbstractInspection(inspectionId)
+  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case fun @ ScFunctionExpr(
         Seq(param), Some(ms @ ScMatchStmt(ref: ScReferenceExpression, _)))
         if ref.resolve() == param && !(param.typeElement.isDefined &&
@@ -44,27 +44,22 @@ class MatchToPartialFunctionInspection
     case ms @ ScMatchStmt(und: ScUnderscoreSection, _)
         if checkSameResolve(ms) =>
       registerProblem(holder, ms, ms)
-  }
 
-  private def notExpectedType(expr: ScExpression) = {
-    (expr.getType(), expr.expectedType()) match {
+  private def notExpectedType(expr: ScExpression) =
+    (expr.getType(), expr.expectedType()) match
       case (Success(tpe: ScType, _), Some(expType: ScType)) =>
         !expType.equiv(tpe)
       case _ => true
-    }
-  }
 
   private def registerProblem(holder: ProblemsHolder,
                               ms: ScMatchStmt,
-                              fExprToReplace: ScExpression) = {
-    def leftBraceOffset(ms: ScMatchStmt): Option[Int] = {
+                              fExprToReplace: ScExpression) =
+    def leftBraceOffset(ms: ScMatchStmt): Option[Int] =
       val leftBrace = ms.findFirstChildByType(ScalaTokenTypes.tLBRACE)
-      leftBrace match {
+      leftBrace match
         case elem: PsiElement => Option(elem.getTextRange.getStartOffset)
         case _ => None
-      }
-    }
-    for (offset <- leftBraceOffset(ms)) {
+    for (offset <- leftBraceOffset(ms))
       val endOffsetInParent =
         offset - fExprToReplace.getTextRange.getStartOffset
       val rangeInParent = new TextRange(0, endOffsetInParent)
@@ -74,48 +69,40 @@ class MatchToPartialFunctionInspection
                              ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                              rangeInParent,
                              fix)
-    }
-  }
 
-  private def checkSameResolve(argExpr: ScExpression): Boolean = {
+  private def checkSameResolve(argExpr: ScExpression): Boolean =
     def dummyCaseClauses = "{case _ => }"
 
     val call = PsiTreeUtil.getParentOfType(argExpr, classOf[MethodInvocation])
-    val arg = argExpr match {
+    val arg = argExpr match
       case _ childOf (x childOf (_: ScArgumentExprList)) => x
       case _ childOf (x childOf (_: ScInfixExpr)) => x
       case _ => argExpr
-    }
     if (call == null || !call.argumentExpressions.contains(arg)) return true
-    val (refText, oldResolve) = call match {
+    val (refText, oldResolve) = call match
       case ScInfixExpr(qual, r, _) =>
         (s"${qual.getText}.${r.refName}", r.resolve())
       case ScMethodCall(r: ScReferenceExpression, _) =>
         (r.getText, r.resolve())
       case _ => return true
-    }
 
     val newCall = ScalaPsiElementFactory.createExpressionWithContextFromText(
         refText + dummyCaseClauses, call.getContext, call)
-    newCall match {
+    newCall match
       case ScMethodCall(ref: ScReferenceExpression, _) =>
         ref.resolve() == oldResolve
       case _ => true
-    }
-  }
-}
 
-object MatchToPartialFunctionInspection {
+object MatchToPartialFunctionInspection
   val inspectionId = "MatchToPartialFunction"
   val inspectionName =
     "Convert match statement to pattern matching anonymous function"
-}
 
 class MatchToPartialFunctionQuickFix(
     matchStmt: ScMatchStmt, fExprToReplace: ScExpression)
     extends AbstractFixOnTwoPsiElements(
-        inspectionName, matchStmt, fExprToReplace) {
-  def doApplyFix(project: Project) {
+        inspectionName, matchStmt, fExprToReplace)
+  def doApplyFix(project: Project)
     val mStmt = getFirstElement
     val fExpr = getSecondElement
     val matchStmtCopy = mStmt.copy.asInstanceOf[ScMatchStmt]
@@ -130,8 +117,8 @@ class MatchToPartialFunctionQuickFix(
     CodeEditUtil.setOldIndentation(
         newBlock.getNode.asInstanceOf[TreeElement],
         CodeEditUtil.getOldIndentation(matchStmtCopy.getNode))
-    extensions.inWriteAction {
-      fExpr.getParent match {
+    extensions.inWriteAction
+      fExpr.getParent match
         case (argList: ScArgumentExprList) childOf (call: ScMethodCall)
             if argList.exprs.size == 1 =>
           val newMethCall = ScalaPsiElementFactory.createExpressionFromText(
@@ -142,13 +129,10 @@ class MatchToPartialFunctionQuickFix(
           block.replace(newBlock)
         case _ =>
           fExpr.replace(newBlock)
-      }
       PsiDocumentManager.getInstance(project).commitAllDocuments()
-    }
-  }
 
-  private def needNamingPattern(matchStmt: ScMatchStmt): Seq[Int] = {
-    matchStmt match {
+  private def needNamingPattern(matchStmt: ScMatchStmt): Seq[Int] =
+    matchStmt match
       case ScMatchStmt(expr: ScReferenceExpression, _) =>
         val arg = expr.resolve()
         if (arg == null) return Nil
@@ -156,21 +140,19 @@ class MatchToPartialFunctionQuickFix(
           .search(arg, new LocalSearchScope(matchStmt))
           .findAll()
           .asScala
-        for {
+        for
           (clause, index) <- matchStmt.caseClauses.zipWithIndex if refs.exists(
                                 ref =>
                                   PsiTreeUtil.isAncestor(
                                       clause, ref.getElement, false))
-        } yield index
+        yield index
       case _ => Nil
-    }
-  }
 
   private def addNamingPatterns(
-      matchStmt: ScMatchStmt, indexes: Seq[Int]): Unit = {
+      matchStmt: ScMatchStmt, indexes: Seq[Int]): Unit =
     val clauses = matchStmt.caseClauses
     val name = matchStmt.expr.map(_.getText).getOrElse(return )
-    indexes.map(i => clauses(i).pattern).foreach {
+    indexes.map(i => clauses(i).pattern).foreach
       case Some(w: ScWildcardPattern) =>
         w.replace(ScalaPsiElementFactory.createPatternFromText(
                 name, matchStmt.getManager))
@@ -181,14 +163,10 @@ class MatchToPartialFunctionQuickFix(
         p.replace(ScalaPsiElementFactory.createPatternFromText(
                 newPatternText, matchStmt.getManager))
       case _ =>
-    }
-  }
 
-  private def needParentheses(p: ScPattern): Boolean = p match {
+  private def needParentheses(p: ScPattern): Boolean = p match
     case _: ScReferencePattern | _: ScLiteralPattern |
         _: ScConstructorPattern | _: ScParenthesisedPattern |
         _: ScTuplePattern | _: ScStableReferenceElementPattern =>
       false
     case _ => true
-  }
-}

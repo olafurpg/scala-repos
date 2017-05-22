@@ -5,7 +5,7 @@ import play.api.data.Forms._
 
 import lila.user.User
 
-private[pref] final class DataForm {
+private[pref] final class DataForm
 
   val pref = Form(
       mapping(
@@ -58,7 +58,7 @@ private[pref] final class DataForm {
                       submitMove: Int,
                       insightShare: Int,
                       confirmResign: Int,
-                      captured: Int) {
+                      captured: Int)
 
     def apply(pref: Pref) =
       pref.copy(autoQueen = autoQueen,
@@ -81,9 +81,8 @@ private[pref] final class DataForm {
                 insightShare = insightShare,
                 confirmResign = confirmResign,
                 captured = captured == 1)
-  }
 
-  object PrefData {
+  object PrefData
     def apply(pref: Pref): PrefData =
       PrefData(autoQueen = pref.autoQueen,
                autoThreefold = pref.autoThreefold,
@@ -105,7 +104,6 @@ private[pref] final class DataForm {
                insightShare = pref.insightShare,
                confirmResign = pref.confirmResign,
                captured = pref.captured.fold(1, 0))
-  }
 
   def prefOf(p: Pref): Form[PrefData] = pref fill PrefData(p)
 
@@ -124,21 +122,19 @@ private[pref] final class DataForm {
   case class MiniPrefData(autoQueen: Int,
                           blindfold: Int,
                           clockTenths: Int,
-                          submitMove: Int) {
+                          submitMove: Int)
     def apply(pref: Pref) =
       pref.copy(autoQueen = autoQueen,
                 blindfold = blindfold,
                 clockTenths = clockTenths,
                 submitMove = submitMove)
-  }
 
-  object MiniPrefData {
+  object MiniPrefData
     def apply(pref: Pref): MiniPrefData =
       MiniPrefData(autoQueen = pref.autoQueen,
                    blindfold = pref.blindfold,
                    clockTenths = pref.clockTenths,
                    submitMove = pref.submitMove)
-  }
 
   def miniPrefOf(p: Pref): Form[MiniPrefData] = miniPref fill MiniPrefData(p)
 
@@ -181,4 +177,3 @@ private[pref] final class DataForm {
       single(
           "is3d" -> text.verifying(List("true", "false") contains _)
       ))
-}

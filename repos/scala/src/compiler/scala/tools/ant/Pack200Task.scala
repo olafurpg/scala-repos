@@ -26,7 +26,7 @@ import java.util.jar.Pack200.Packer._
   *
   * @author  James Matlik
   */
-class Pack200Task extends ScalaMatchingTask {
+class Pack200Task extends ScalaMatchingTask
 
   /*============================================================================*\
    **                             Ant user-properties                            **
@@ -47,18 +47,16 @@ class Pack200Task extends ScalaMatchingTask {
    **                             Properties setters                             **
 \*============================================================================*/
 
-  def setDir(dir: File) {
+  def setDir(dir: File)
     if (dir.exists && dir.isDirectory) srcdir = Some(dir)
     else
       buildError(
           "Please specify a valid directory with Jar files for packing.")
-  }
 
   /** A level from 0 (none) to 9 (max) of effort for applying Pack200 */
-  def setEffort(x: Int) {
+  def setEffort(x: Int)
     if (effort < 10 && effort > -1) effort = x
     else buildError("The effort level must be a value from 0 to 9")
-  }
 
   /** Set the flag to specify if file reordering should be performed. Reordering
     * is used to remove empty packages and improve pack200 optimization.
@@ -79,12 +77,11 @@ class Pack200Task extends ScalaMatchingTask {
   def setSegmentLimit(size: Int) { segmentLimit = size }
 
   /** Set the output directory */
-  def setDestdir(file: File) {
+  def setDestdir(file: File)
     if (file != null && file.exists && file.isDirectory) destdir = Some(file)
     else
       buildError(
           "The destination directory is invalid: " + file.getAbsolutePath)
-  }
 
   def setSuffix(s: String) { packFileSuffix = s }
 
@@ -94,18 +91,16 @@ class Pack200Task extends ScalaMatchingTask {
 
   /** Gets the list of individual JAR files for processing.
     * @return The list of JAR files */
-  private def getFileList: List[File] = {
+  private def getFileList: List[File] =
     var files: List[File] = Nil
     val fs = getImplicitFileSet
     val ds = fs.getDirectoryScanner(getProject())
     val dir = fs.getDir(getProject())
     for (filename <- ds.getIncludedFiles()
-                        if filename.toLowerCase.endsWith(".jar")) {
+                        if filename.toLowerCase.endsWith(".jar"))
       val file = new File(dir, filename)
       if (files.exists(file.equals(_)) == false) files = file :: files
-    }
     files.reverse
-  }
 
   /*============================================================================*\
    **                       Compilation and support methods                      **
@@ -122,7 +117,7 @@ class Pack200Task extends ScalaMatchingTask {
 \*============================================================================*/
 
   /** Performs the tool creation. */
-  override def execute() = {
+  override def execute() =
     // Audits
     val packDir =
       destdir.getOrElse(buildError("No output directory specified"))
@@ -141,10 +136,10 @@ class Pack200Task extends ScalaMatchingTask {
     p.put(KEEP_FILE_ORDER, if (keepFileOrder) TRUE else FALSE)
     p.put(MODIFICATION_TIME, if (keepModificationTime) LATEST else KEEP)
 
-    for (file <- files) {
-      if (repack) {
+    for (file <- files)
+      if (repack)
         val repackedFile = new File(packDir, file.getName)
-        if (file.lastModified > repackedFile.lastModified) {
+        if (file.lastModified > repackedFile.lastModified)
           println(
               "Repacking " + file.toString + " to " + repackedFile.toString)
           val tmpFile = new File(packDir, file.getName + ".tmp")
@@ -155,18 +150,11 @@ class Pack200Task extends ScalaMatchingTask {
           Pack200.newUnpacker.unpack(tmpFile, jos)
           jos.close()
           tmpFile.delete()
-        }
-      } else {
-        val packFile: File = {
+      else
+        val packFile: File =
           val name = file.getName.substring(0, file.getName.lastIndexOf("."))
           new File(packDir, name + packFileSuffix)
-        }
-        if (file.lastModified > packFile.lastModified) {
+        if (file.lastModified > packFile.lastModified)
           println("Packing " + file.toString + " to " + packFile.toString)
           val os = makeOutputStream(packFile)
           packer.pack(new JarFile(file), os)
-        }
-      }
-    }
-  }
-}

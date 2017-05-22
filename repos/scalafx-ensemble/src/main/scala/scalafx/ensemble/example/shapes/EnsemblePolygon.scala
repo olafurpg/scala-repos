@@ -33,18 +33,16 @@ import scalafx.scene.layout.HBox
 import scalafx.scene.paint.{Color, Paint}
 import scalafx.scene.shape.Polygon
 
-class EnsemblePolygon extends EnsembleExample {
+class EnsemblePolygon extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     val polyObj = (poly: Polygon, color: Paint) =>
-      {
         poly.setFill(color)
         poly.setStroke(Color.Black)
         poly.setStrokeWidth(1d)
         poly
-    }
 
-    new HBox {
+    new HBox
       spacing = 25
       padding = Insets(20)
       children = List(
@@ -53,6 +51,3 @@ class EnsemblePolygon extends EnsembleExample {
               Polygon(135, 15, 160, 30, 160, 60, 135, 75, 110, 60, 110, 30),
               Color.Orange)
       )
-    }
-  }
-}

@@ -8,10 +8,10 @@ import akka.stream.scaladsl.Flow
 import org.reactivestreams.Processor
 import akka.stream.impl.VirtualProcessor
 
-class VirtualProcessorTest extends AkkaIdentityProcessorVerification[Int] {
+class VirtualProcessorTest extends AkkaIdentityProcessorVerification[Int]
 
   override def createIdentityProcessor(
-      maxBufferSize: Int): Processor[Int, Int] = {
+      maxBufferSize: Int): Processor[Int, Int] =
     implicit val materializer = ActorMaterializer()(system)
 
     val identity =
@@ -20,17 +20,14 @@ class VirtualProcessorTest extends AkkaIdentityProcessorVerification[Int] {
     left.subscribe(identity)
     identity.subscribe(right)
     processorFromSubscriberAndPublisher(left, right)
-  }
 
   override def createElement(element: Int): Int = element
-}
 
 class VirtualProcessorSingleTest
-    extends AkkaIdentityProcessorVerification[Int] {
+    extends AkkaIdentityProcessorVerification[Int]
 
   override def createIdentityProcessor(
       maxBufferSize: Int): Processor[Int, Int] =
     new VirtualProcessor[Int]
 
   override def createElement(element: Int): Int = element
-}

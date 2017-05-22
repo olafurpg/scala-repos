@@ -15,7 +15,7 @@ import scala.collection.mutable
 import java.net.URI
 
 private[closure] class ClosureAstBuilder(relativizeBaseURI: Option[URI] = None)
-    extends JSTreeBuilder {
+    extends JSTreeBuilder
 
   private val transformer = new ClosureAstTransformer(relativizeBaseURI)
   private val treeBuf = mutable.ListBuffer.empty[Node]
@@ -23,19 +23,17 @@ private[closure] class ClosureAstBuilder(relativizeBaseURI: Option[URI] = None)
   def addJSTree(tree: Tree): Unit =
     treeBuf += transformer.transformStat(tree)(NoPosition)
 
-  lazy val closureAST: SourceAst = {
+  lazy val closureAST: SourceAst =
     val root = transformer.setNodePosition(IR.script(treeBuf: _*), NoPosition)
 
     treeBuf.clear()
 
     new ClosureAstBuilder.ScalaJSSourceAst(root)
-  }
-}
 
-private object ClosureAstBuilder {
+private object ClosureAstBuilder
   // Dummy Source AST class
 
-  private class ScalaJSSourceAst(root: Node) extends SourceAst {
+  private class ScalaJSSourceAst(root: Node) extends SourceAst
     def getAstRoot(compiler: AbstractCompiler): Node = root
     def clearAst(): Unit = () // Just for GC. Nonsensical here.
     def getInputId(): InputId = root.getInputId()
@@ -43,5 +41,3 @@ private object ClosureAstBuilder {
       root.getStaticSourceFile().asInstanceOf[SourceFile]
     def setSourceFile(file: SourceFile): Unit =
       if (getSourceFile() ne file) throw new IllegalStateException
-  }
-}

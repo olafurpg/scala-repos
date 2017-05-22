@@ -21,9 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext {
+class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("hashing tf on a single doc") {
+  test("hashing tf on a single doc")
     val hashingTF = new HashingTF(1000)
     val doc = "a a b b c d".split(" ")
     val n = hashingTF.numFeatures
@@ -36,9 +36,8 @@ class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(termFreqs.map(_._1).toSet.size === 4, "expecting perfect hashing")
     val expected = Vectors.sparse(n, termFreqs)
     assert(hashingTF.transform(doc) === expected)
-  }
 
-  test("hashing tf on an RDD") {
+  test("hashing tf on an RDD")
     val hashingTF = new HashingTF
     val localDocs: Seq[Seq[String]] = Seq("a a b b b c d".split(" "),
                                           "a b c d a b c".split(" "),
@@ -47,5 +46,3 @@ class HashingTFSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(hashingTF.transform(docs).collect().toSet === localDocs
           .map(hashingTF.transform)
           .toSet)
-  }
-}

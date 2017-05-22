@@ -8,16 +8,15 @@ import org.jetbrains.plugins.scala.codeInsight.template.util.MacroUtil
   * @author Roman.Shein
   * @since 29.09.2015.
   */
-class ScalaTypeOfVariableMacro extends Macro {
+class ScalaTypeOfVariableMacro extends Macro
   override def calculateResult(
-      params: Array[Expression], context: ExpressionContext): Result = {
+      params: Array[Expression], context: ExpressionContext): Result =
     if (params.length == 0) return null
     Option(params(0).calculateResult(context))
       .flatMap(MacroUtil.resultToScExpr(_, context))
       .flatMap(_.getType().toOption)
       .map(new ScalaTypeResult(_))
       .orNull
-  }
 
   override def calculateQuickResult(
       params: Array[Expression], context: ExpressionContext) =
@@ -32,4 +31,3 @@ class ScalaTypeOfVariableMacro extends Macro {
     MacroUtil.scalaPresentablePrefix + "typeOfVariable"
 
   override def getDefaultValue: String = "A"
-}

@@ -4,7 +4,7 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import scala.util.DynamicVariable
 
-trait RequestResponseScope {
+trait RequestResponseScope
 
   /**
     * The currently scoped request.  Valid only inside the `handle` method.
@@ -30,7 +30,6 @@ trait RequestResponseScope {
     * method.
     */
   protected def withResponse[A](response: HttpServletResponse)(f: => A): A
-}
 
 /**
   * The Scalatra DSL requires a dynamically scoped request and response.
@@ -39,7 +38,7 @@ trait RequestResponseScope {
   *
   * http://www.riffraff.info/2009/4/11/step-a-scala-web-picoframework
   */
-trait DynamicScope extends RequestResponseScope {
+trait DynamicScope extends RequestResponseScope
 
   /**
     * The currently scoped request.  Valid only inside the `handle` method.
@@ -58,31 +57,26 @@ trait DynamicScope extends RequestResponseScope {
     new DynamicVariable[HttpServletResponse](null)
 
   protected[scalatra] def withRequestResponse[A](
-      request: HttpServletRequest, response: HttpServletResponse)(f: => A) = {
-    withRequest(request) {
-      withResponse(response) {
+      request: HttpServletRequest, response: HttpServletResponse)(f: => A) =
+    withRequest(request)
+      withResponse(response)
         f
-      }
-    }
-  }
 
   /**
     * Executes the block with the given request bound to the `request`
     * method.
     */
   protected def withRequest[A](request: HttpServletRequest)(f: => A) =
-    dynamicRequest.withValue(request) {
+    dynamicRequest.withValue(request)
       f
-    }
 
   /**
     * Executes the block with the given response bound to the `response`
     * method.
     */
   protected def withResponse[A](response: HttpServletResponse)(f: => A) =
-    dynamicResponse.withValue(response) {
+    dynamicResponse.withValue(response)
       f
-    }
 
   @deprecated(
       "Do not invoke directly. Use `withRequest` to change the binding, or request to get the value",
@@ -93,4 +87,3 @@ trait DynamicScope extends RequestResponseScope {
       "Do not invoke directly. Use `withResponse` to change the binding, or `response` to get the value",
       "2.1.0")
   protected def _response = dynamicResponse
-}

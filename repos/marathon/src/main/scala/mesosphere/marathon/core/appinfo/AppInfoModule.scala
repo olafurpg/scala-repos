@@ -18,7 +18,7 @@ class AppInfoModule @Inject()(
     taskTracker: TaskTracker,
     healthCheckManager: HealthCheckManager,
     marathonSchedulerService: MarathonSchedulerService,
-    taskFailureRepository: TaskFailureRepository) {
+    taskFailureRepository: TaskFailureRepository)
   private[this] def appInfoBaseData(): AppInfoBaseData =
     new AppInfoBaseData(clock,
                         taskTracker,
@@ -31,4 +31,3 @@ class AppInfoModule @Inject()(
 
   private[this] lazy val infoService = new DefaultInfoService(
       groupManager, appRepository, appInfoBaseData)
-}

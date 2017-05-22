@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
     |import scala.language.experimental.macros
@@ -13,4 +13,3 @@ object Test extends ReplTest {
     |""".stripMargin.trim
 
   override def extraSettings: String = "-Yrangepos"
-}

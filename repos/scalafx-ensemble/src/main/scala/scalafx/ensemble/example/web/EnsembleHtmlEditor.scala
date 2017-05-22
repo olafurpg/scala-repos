@@ -35,9 +35,9 @@ import scalafx.scene.control.{Button, Label, ScrollPane}
 import scalafx.scene.layout.{Priority, VBox}
 import scalafx.scene.web.HTMLEditor
 
-class EnsembleHtmlEditor extends EnsembleExample {
+class EnsembleHtmlEditor extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // Initial Text in the html editor
     val initialText =
       """<html><body>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -47,34 +47,28 @@ class EnsembleHtmlEditor extends EnsembleExample {
             pulvinar. Integer congue faucibus dapibus. Integer id nisl ut elit aliquam sagittis
             gravida eu dolor. Etiam sit amet ipsum sem.</body></html>"""
 
-    val htmlEditor = new HTMLEditor {
+    val htmlEditor = new HTMLEditor
       prefHeight = 250
       hgrow = Priority.Always
       vgrow = Priority.Always
       htmlText = initialText
-    }
 
-    val htmlLabel = new Label {
+    val htmlLabel = new Label
       wrapText = true
-    }
 
-    new VBox {
+    new VBox
       spacing = 5
       padding = Insets(5)
       children = List(
           htmlEditor,
-          new Button {
+          new Button
             text = "Display Html below"
             onAction = (ae: ActionEvent) =>
               htmlLabel.text = htmlEditor.htmlText
-          },
-          new ScrollPane {
+          ,
+          new ScrollPane
             prefHeight = 200
             hgrow = Priority.Always
             vgrow = Priority.Always
             children = htmlLabel
-          }
       )
-    }
-  }
-}

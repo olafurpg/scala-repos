@@ -9,7 +9,7 @@ import com.intellij.openapi.editor.markup.TextAttributes
 /**
   * Pavel Fatin
   */
-class CaretModelStub extends CaretModel {
+class CaretModelStub extends CaretModel
   override def setCaretsAndSelections(
       caretStates: util.List[CaretState]): Unit = ???
 
@@ -75,4 +75,3 @@ class CaretModelStub extends CaretModel {
 
   override def runForEachCaret(
       action: CaretAction, reverseOrder: Boolean): Unit = ???
-}

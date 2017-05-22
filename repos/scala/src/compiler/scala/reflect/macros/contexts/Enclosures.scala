@@ -3,7 +3,7 @@ package contexts
 
 import scala.reflect.{ClassTag, classTag}
 
-trait Enclosures { self: Context =>
+trait Enclosures  self: Context =>
 
   import universe._
 
@@ -35,4 +35,3 @@ trait Enclosures { self: Context =>
     if (enclPoses.isEmpty) NoPosition else enclPoses.head.pos
   val enclosingUnit: CompilationUnit = universe.currentRun.currentUnit
   val enclosingRun: Run = universe.currentRun
-}

@@ -37,7 +37,7 @@ object GeometryIncludes extends GeometryIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/package-summary.html `javafx.geometry`]]
   * Classes to their ScalaFX counterparts.
   */
-trait GeometryIncludes {
+trait GeometryIncludes
 
   /**
     * Converts a
@@ -202,4 +202,3 @@ trait GeometryIncludes {
     * @return ScalaFX VPos
     */
   implicit def jfxVPos2sfx(v: jfxg.VPos): VPos = VPos.jfxEnum2sfx(v)
-}

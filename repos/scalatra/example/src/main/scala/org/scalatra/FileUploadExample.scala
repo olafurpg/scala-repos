@@ -5,7 +5,7 @@ import org.scalatra.servlet.{FileUploadSupport, MultipartConfig, SizeConstraintE
 import scala.xml.Node
 
 class FileUploadExample
-    extends ScalatraServlet with FileUploadSupport with FlashMapSupport {
+    extends ScalatraServlet with FileUploadSupport with FlashMapSupport
   configureMultipartHandling(
       MultipartConfig(maxFileSize = Some(3 * 1024 * 1024)))
 
@@ -13,13 +13,12 @@ class FileUploadExample
     Template.page(
         "File upload example", content, url(_, includeServletPath = false))
 
-  error {
+  error
     case e: SizeConstraintExceededException =>
       RequestEntityTooLarge(
           displayPage(<p>The file you uploaded exceeded the 3 MB limit.</p>))
-  }
 
-  get("/") {
+  get("/")
     displayPage(
         <form action={ url("/upload", includeServletPath = false) } method="post" enctype="multipart/form-data">
         <p>File to upload: <input type="file" name="file"/></p>
@@ -33,10 +32,9 @@ class FileUploadExample
       <p>
         The maximum file size accepted is 3 MB.
       </p>)
-  }
 
-  post("/") {
-    fileParams.get("file") match {
+  post("/")
+    fileParams.get("file") match
       case Some(file) =>
         Ok(file.get(),
            Map(
@@ -50,6 +48,3 @@ class FileUploadExample
         BadRequest(displayPage(<p>
             Hey! You forgot to select a file.
           </p>))
-    }
-  }
-}

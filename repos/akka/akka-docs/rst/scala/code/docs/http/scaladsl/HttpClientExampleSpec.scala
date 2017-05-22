@@ -9,9 +9,9 @@ import akka.stream.{ActorMaterializerSettings}
 import akka.util.ByteString
 import org.scalatest.{Matchers, WordSpec}
 
-class HttpClientExampleSpec extends WordSpec with Matchers {
+class HttpClientExampleSpec extends WordSpec with Matchers
 
-  "outgoing-connection-example" in {
+  "outgoing-connection-example" in
     pending // compile-time only test
     //#outgoing-connection-example
     import akka.http.scaladsl.Http
@@ -32,9 +32,8 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
       .via(connectionFlow)
       .runWith(Sink.head)
     //#outgoing-connection-example
-  }
 
-  "host-level-example" in {
+  "host-level-example" in
     pending // compile-time only test
     //#host-level-example
     import akka.http.scaladsl.Http
@@ -54,9 +53,8 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
       .via(poolClientFlow)
       .runWith(Sink.head)
     //#host-level-example
-  }
 
-  "single-request-example" in {
+  "single-request-example" in
     pending // compile-time only test
     //#single-request-example
     import akka.http.scaladsl.Http
@@ -71,9 +69,8 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
     val responseFuture: Future[HttpResponse] =
       Http().singleRequest(HttpRequest(uri = "http://akka.io"))
     //#single-request-example
-  }
 
-  "single-request-in-actor-example" in {
+  "single-request-in-actor-example" in
     pending // compile-time only test
     //#single-request-in-actor-example
     import akka.actor.Actor
@@ -82,7 +79,7 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
     import akka.stream.ActorMaterializer
     import akka.stream.ActorMaterializerSettings
 
-    class Myself extends Actor with ActorLogging {
+    class Myself extends Actor with ActorLogging
 
       import akka.pattern.pipe
       import context.dispatcher
@@ -92,18 +89,13 @@ class HttpClientExampleSpec extends WordSpec with Matchers {
 
       val http = Http(context.system)
 
-      override def preStart() = {
+      override def preStart() =
         http.singleRequest(HttpRequest(uri = "http://akka.io")).pipeTo(self)
-      }
 
-      def receive = {
+      def receive =
         case HttpResponse(StatusCodes.OK, headers, entity, _) =>
           log.info("Got response, body: " +
               entity.dataBytes.runFold(ByteString(""))(_ ++ _))
         case HttpResponse(code, _, _, _) =>
           log.info("Request failed, response code: " + code)
-      }
-    }
     //#single-request-in-actor-example
-  }
-}

@@ -15,9 +15,9 @@ final class Env(config: Config,
                 lightUserApi: lila.user.LightUserApi,
                 userSpy: String => Fu[UserSpy],
                 securityApi: lila.security.Api,
-                emailAddress: lila.security.EmailAddress) {
+                emailAddress: lila.security.EmailAddress)
 
-  private object settings {
+  private object settings
     val CollectionPlayerAssessment =
       config getString "collection.player_assessment"
     val CollectionBoosting = config getString "collection.boosting"
@@ -26,7 +26,6 @@ final class Env(config: Config,
     val ActorName = config getString "actor.name"
     val NbGamesToMark = config getInt "boosting.nb_games_to_mark"
     val RatioGamesToMark = config getDouble "boosting.ratio_games_to_mark"
-  }
   import settings._
 
   private[mod] lazy val logColl = db(CollectionModlog)
@@ -62,26 +61,22 @@ final class Env(config: Config,
       securityApi = securityApi, emailAddress = emailAddress)
 
   // api actor
-  private val actorApi = system.actorOf(Props(new Actor {
-    override def preStart {
+  private val actorApi = system.actorOf(Props(new Actor
+    override def preStart
       context.system.lilaBus.subscribe(self, 'finishGame, 'analysisReady)
-    }
-    def receive = {
+    def receive =
       case lila.hub.actorApi.mod.MarkCheater(userId) => api autoAdjust userId
       case lila.analyse.actorApi.AnalysisReady(game, analysis) =>
         assessApi.onAnalysisReady(game, analysis)
       case lila.game.actorApi
             .FinishGame(game, whiteUserOption, blackUserOption) =>
-        (whiteUserOption |@| blackUserOption) apply {
+        (whiteUserOption |@| blackUserOption) apply
           case (whiteUser, blackUser) =>
             boosting.check(game, whiteUser, blackUser) >> assessApi
               .onGameReady(game, whiteUser, blackUser)
-        }
-    }
-  }), name = ActorName)
-}
+  ), name = ActorName)
 
-object Env {
+object Env
 
   lazy val current =
     "mod" boot new Env(config = lila.common.PlayApp loadConfig "mod",
@@ -94,4 +89,3 @@ object Env {
                        lightUserApi = lila.user.Env.current.lightUserApi,
                        securityApi = lila.security.Env.current.api,
                        emailAddress = lila.security.Env.current.emailAddress)
-}

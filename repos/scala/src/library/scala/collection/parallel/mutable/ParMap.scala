@@ -26,7 +26,7 @@ import scala.collection.parallel.Combiner
 trait ParMap[K, V]
     extends GenMap[K, V] with parallel.ParMap[K, V] with ParIterable[(K, V)]
     with GenericParMapTemplate[K, V, ParMap]
-    with ParMapLike[K, V, ParMap[K, V], mutable.Map[K, V]] {
+    with ParMapLike[K, V, ParMap[K, V], mutable.Map[K, V]]
 
   protected[this] override def newCombiner: Combiner[(K, V), ParMap[K, V]] =
     ParMap.newCombiner[K, V]
@@ -60,9 +60,8 @@ trait ParMap[K, V]
     */
   def withDefaultValue(d: V): scala.collection.parallel.mutable.ParMap[K, V] =
     new ParMap.WithDefault[K, V](this, x => d)
-}
 
-object ParMap extends ParMapFactory[ParMap] {
+object ParMap extends ParMapFactory[ParMap]
   def empty[K, V]: ParMap[K, V] = new ParHashMap[K, V]
 
   def newCombiner[K, V]: Combiner[(K, V), ParMap[K, V]] =
@@ -73,7 +72,7 @@ object ParMap extends ParMapFactory[ParMap] {
 
   class WithDefault[K, V](underlying: ParMap[K, V], d: K => V)
       extends scala.collection.parallel.ParMap.WithDefault(underlying, d)
-      with ParMap[K, V] {
+      with ParMap[K, V]
     override def +=(kv: (K, V)) = { underlying += kv; this }
     def -=(key: K) = { underlying -= key; this }
     override def empty = new WithDefault(underlying.empty, d)
@@ -94,5 +93,3 @@ object ParMap extends ParMapFactory[ParMap] {
       new WithDefault[K, V](underlying, d)
     override def withDefaultValue(d: V): ParMap[K, V] =
       new WithDefault[K, V](underlying, x => d)
-  }
-}

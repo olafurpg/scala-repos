@@ -28,13 +28,12 @@ import org.apache.spark.util.Utils
 
 class HashingTFSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new HashingTF)
-  }
 
-  test("hashingTF") {
+  test("hashingTF")
     val df = sqlContext
       .createDataFrame(Seq(
               (0, "a a b b c d".split(" ").toSeq)
@@ -57,13 +56,10 @@ class HashingTFSuite
                                       (idx("c"), 1.0),
                                       (idx("d"), 1.0)))
     assert(features ~== expected absTol 1e-14)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new HashingTF()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setNumFeatures(10)
     testDefaultReadWrite(t)
-  }
-}

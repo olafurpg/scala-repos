@@ -22,13 +22,13 @@ import org.mockito.Mockito._
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.storage._
 
-class StoragePageSuite extends SparkFunSuite {
+class StoragePageSuite extends SparkFunSuite
 
   val storageTab = mock(classOf[StorageTab])
   when(storageTab.basePath).thenReturn("http://localhost:4040")
   val storagePage = new StoragePage(storageTab)
 
-  test("rddTable") {
+  test("rddTable")
     val rdd1 = new RDDInfo(1, "rdd1", 10, StorageLevel.MEMORY_ONLY, Seq.empty)
     rdd1.memSize = 100
     rdd1.numCachedPartitions = 10
@@ -92,13 +92,11 @@ class StoragePageSuite extends SparkFunSuite {
     assert(((xmlNodes \\ "tr")(2) \\ "td" \ "a")(0)
           .attribute("href")
           .map(_.text) === Some("http://localhost:4040/storage/rdd?id=3"))
-  }
 
-  test("empty rddTable") {
+  test("empty rddTable")
     assert(storagePage.rddTable(Seq.empty).isEmpty)
-  }
 
-  test("streamBlockStorageLevelDescriptionAndSize") {
+  test("streamBlockStorageLevelDescriptionAndSize")
     val memoryBlock = BlockUIData(StreamBlockId(0, 0),
                                   "localhost:1111",
                                   StorageLevel.MEMORY_ONLY,
@@ -122,9 +120,8 @@ class StoragePageSuite extends SparkFunSuite {
                                 diskSize = 100)
     assert(("Disk", 100) === storagePage
           .streamBlockStorageLevelDescriptionAndSize(diskBlock))
-  }
 
-  test("receiverBlockTables") {
+  test("receiverBlockTables")
     val blocksForExecutor0 = Seq(
         BlockUIData(StreamBlockId(0, 0),
                     "localhost:10000",
@@ -204,14 +201,11 @@ class StoragePageSuite extends SparkFunSuite {
 
     assert(((blockTable \\ "tr")(3) \\ "td").map(_.text.trim) === Seq(
             "localhost:10001", "Memory Serialized", "100.0 B"))
-  }
 
-  test("empty receiverBlockTables") {
+  test("empty receiverBlockTables")
     assert(storagePage.receiverBlockTables(Seq.empty).isEmpty)
     val executor0 =
       ExecutorStreamBlockStatus("0", "localhost:10000", Seq.empty)
     val executor1 =
       ExecutorStreamBlockStatus("1", "localhost:10001", Seq.empty)
     assert(storagePage.receiverBlockTables(Seq(executor0, executor1)).isEmpty)
-  }
-}

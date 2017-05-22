@@ -28,8 +28,8 @@ import org.junit.runner.RunWith
 import scala.reflect.ClassTag
 
 @RunWith(classOf[JUnitRunner])
-class CSCMatrixTest extends FunSuite with Checkers {
-  test("Multiply") {
+class CSCMatrixTest extends FunSuite with Checkers
+  test("Multiply")
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val ad = DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = CSCMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
@@ -57,9 +57,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
 //    val z : DenseMatrix[Double] = b * (b + 1.0)
 //    assert(z === DenseMatrix((164.0,5.0,107.0),(-5.0,10.0,-27.0),(161.0,-7.0,138.0)))
-  }
 
-  test("Multiply Int") {
+  test("Multiply Int")
     val a = CSCMatrix((1, 2, 3), (4, 5, 6))
     val b = CSCMatrix((7, -2, 8), (-3, -3, 1), (12, 0, 5))
     val bd = DenseMatrix((7, -2, 8), (-3, -3, 1), (12, 0, 5))
@@ -85,9 +84,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
 //    val z : DenseMatrix[Double] = b * (b + 1.0)
 //    assert(z === DenseMatrix((164,5,107),(-5,10,-27),(161,-7,138)))
-  }
 
-  test("Multiply Complex") {
+  test("Multiply Complex")
 
     val a = CSCMatrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
                       (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
@@ -106,9 +104,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
             Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
     assert(b.t * c === DenseVector(
             Complex(72, -72), Complex(-18, 18), Complex(65, -65)))
-  }
 
-  test("Transpose") {
+  test("Transpose")
     val a = CSCMatrix.zeros[Int](2, 3)
     a(0, 0) = 1
     a(1, 2) = 2
@@ -118,9 +115,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     expected(2, 1) = 2
 
     assert(a.t === expected)
-  }
 
-  test("Transpose Complex") {
+  test("Transpose Complex")
     val a = CSCMatrix.zeros[Complex](2, 3)
     a(0, 0) = Complex(1, 1)
     a(1, 2) = Complex(-2, -2)
@@ -130,30 +126,25 @@ class CSCMatrixTest extends FunSuite with Checkers {
     expected(2, 1) = Complex(-2, 2)
 
     assert(a.t === expected)
-  }
 
-  test("Generic CSC ops") {
+  test("Generic CSC ops")
     // mostly for coverage
     val a = CSCMatrix.create[String](1, 1, Array("SSS"))
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3) = ":("
       assert(false, "Shouldn't be here!")
-    }
     assert(a(0, 0) === "SSS")
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3)
       assert(false, "Shouldn't be here!")
-    }
     a(0, 0) = ":("
     assert(a(0, 0) === ":(")
-  }
 
-  test("Builder, simple") {
+  test("Builder, simple")
     val builder = new CSCMatrix.Builder[Double](3, 3)
     builder.add(1, 1, 2.0)
-  }
 
-  test("Builder, full") {
+  test("Builder, full")
     val builder = new CSCMatrix.Builder[Double](2, 3)
     builder.add(0, 1, 2.0)
     builder.add(1, 1, 5.0)
@@ -164,9 +155,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val cs = builder.result()
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     assert(cs === a)
-  }
 
-  test("Builder, repeated full") {
+  test("Builder, repeated full")
     val builder = new CSCMatrix.Builder[Double](2, 3)
     builder.add(0, 1, 2.0)
     builder.add(1, 2, 3.0)
@@ -178,9 +168,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val cs = builder.result()
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     assert(cs === a)
-  }
 
-  test("MapValues") {
+  test("MapValues")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
 
     val b1: CSCMatrix[Int] = a.mapValues(_ + 1)
@@ -188,24 +177,21 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
     val b2: CSCMatrix[Double] = a.mapValues(_ + 1.0)
     assert(b2 === CSCMatrix((2.0, 1.0, 1.0), (3.0, 4.0, 0.0)))
-  }
 
-  test("addition/subtraction") {
+  test("addition/subtraction")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
     val b: CSCMatrix[Int] = CSCMatrix((0, 1, 0), (2, 3, -1))
     assert(a + b === CSCMatrix((1, 1, 0), (4, 6, -2)))
     assert(a - b === CSCMatrix((1, -1, 0), (0, 0, 0)))
-  }
 
-  test("addition/subtraction csc/dm") {
+  test("addition/subtraction csc/dm")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
     val b: DenseMatrix[Int] = DenseMatrix((0, 1, 0), (2, 3, -1))
     assert(a + b === DenseMatrix((1, 1, 0), (4, 6, -2)))
     assert(a - b === DenseMatrix((1, -1, 0), (0, 0, 0)))
     assert(b - a === -DenseMatrix((1, -1, 0), (0, 0, 0)))
-  }
 
-  test("inplace addition/subtraction") {
+  test("inplace addition/subtraction")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
     val b: CSCMatrix[Int] = CSCMatrix((0, 1, 0), (2, 3, -1))
     a += b
@@ -215,16 +201,14 @@ class CSCMatrixTest extends FunSuite with Checkers {
     a -= b
     assert(a === CSCMatrix((1, -1, 0), (0, 0, 0)))
     assert(a.activeSize === 2)
-  }
 
-  test("inplace set dm/csc") {
+  test("inplace set dm/csc")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
     val b: DenseMatrix[Int] = DenseMatrix((0, 1, 0), (2, 3, -1))
     b := a
     assert(a == b)
-  }
 
-  test("InPlace Ops") {
+  test("InPlace Ops")
     var a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = CSCMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0))
 
@@ -235,9 +219,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     a :/= b
     assert(a === CSCMatrix((1.0 / 7.0, -1.0, 3.0 / 8.0),
                            (4.0 / (-3.0), 5.0 / (-3.0), 6.0)))
-  }
 
-  test("csc scalar \"bad\" ops") {
+  test("csc scalar \"bad\" ops")
     val a: CSCMatrix[Int] = CSCMatrix((1, 0, 0), (2, 3, -1))
     assert(a :/ 3 === CSCMatrix((0, 0, 0), (0, 1, 0)))
 
@@ -247,9 +230,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(b :/ Complex(3, 0) === CSCMatrix(
             (Complex(1.0 / 3.0, 0), Complex(0, 0), Complex(0, 0)),
             (Complex(2.0 / 3.0, 0), Complex(1, 0), Complex(-1.0 / 3.0, 0))))
-  }
 
-  test("csc scalar \"bad\" pow ops") {
+  test("csc scalar \"bad\" pow ops")
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = CSCMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0))
 
@@ -257,9 +239,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val ac = convert(a, Complex)
     val bc = convert(b, Complex)
     assert(ac :^ bc === ac.toDense :^ bc.toDense)
-  }
 
-  test("csc scalar \"bad\" mod ops") {
+  test("csc scalar \"bad\" mod ops")
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = CSCMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0))
 
@@ -268,9 +249,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val ac = convert(a, Complex)
     val bc = convert(b, Complex)
     assert(ac :% bc === ac.toDense :% bc.toDense)
-  }
 
-  test("flatten") {
+  test("flatten")
     val a = CSCMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = CSCMatrix.zeros[Double](3, 2)
     b(0, 1) = 1.0; b(2, 1) = 3.0
@@ -278,15 +258,13 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(a.flatten() === SparseVector(1.0, 2.0, 3.0, 4.0, 5.0, 6.0))
     assert(z.flatten() === SparseVector.zeros[Double](15))
     assert(b.flatten() === SparseVector(6)((1, 1.0), (5, 3.0)))
-  }
 
-  test("CSCxCSC: OpAddInPlace2:Field") {
+  test("CSCxCSC: OpAddInPlace2:Field")
     def testAddInPlace[T : Field : Zero : ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+        a: CSCMatrix[T], b: CSCMatrix[T]) =
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a += b
-    }
     val cscA = CSCMatrix.zeros[Double](3, 4)
     val cscB = CSCMatrix.zeros[Double](3, 4)
     cscB(1, 1) = 1.3
@@ -299,15 +277,13 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === cscB * 2.0)
     testAddInPlace[Double](cscA, CSCMatrix.zeros[Double](3, 4))
     assert(cscA === cscB * 2.0)
-  }
 
-  test("CSCxCSC: OpSubInPlace2:Field") {
+  test("CSCxCSC: OpSubInPlace2:Field")
     def testSubInPlace[T : Field : Zero : ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+        a: CSCMatrix[T], b: CSCMatrix[T]) =
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a -= b
-    }
     val cscA = CSCMatrix.zeros[Double](3, 4)
     val cscB = CSCMatrix.zeros[Double](3, 4)
     cscB(1, 1) = 1.3
@@ -320,14 +296,12 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === cscB * -2.0)
     testSubInPlace[Double](cscA, CSCMatrix.zeros[Double](3, 4))
     assert(cscA === cscB * -2.0)
-  }
-  test("CSCxCSC: OpMulScalarInPlace2:Field") {
+  test("CSCxCSC: OpMulScalarInPlace2:Field")
     def testMulScalarInPlace[T : Field : Zero : ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]) = {
+        a: CSCMatrix[T], b: CSCMatrix[T]) =
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a *= b
-    }
     val cscA = CSCMatrix.zeros[Double](3, 4)
     val cscB = CSCMatrix.zeros[Double](3, 4)
     cscB(1, 1) = 1.3
@@ -346,31 +320,27 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscA === cscR)
     testMulScalarInPlace[Double](cscA, CSCMatrix.zeros[Double](3, 4))
     assert(cscA === CSCMatrix.zeros[Double](3, 4))
-  }
 
-  test("CSCxCSC: OpSetInPlace:Scalar:Field") {
-    def testSetInPlace[T : Field : Zero : ClassTag](a: CSCMatrix[T], b: T) = {
+  test("CSCxCSC: OpSetInPlace:Scalar:Field")
+    def testSetInPlace[T : Field : Zero : ClassTag](a: CSCMatrix[T], b: T) =
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       a := b
-    }
     val cscA = CSCMatrix.zeros[Double](3, 4)
     val b = 4
     testSetInPlace[Double](cscA, b)
     assert(cscA === CSCMatrix.fill(3, 4)(b))
     testSetInPlace[Double](cscA, 0)
     assert(cscA === CSCMatrix.zeros[Double](3, 4))
-  }
-  test("ZipMapVals Test") {
+  test("ZipMapVals Test")
     def testZipMap[T : Field : Zero : ClassTag](
-        a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] = {
+        a: CSCMatrix[T], b: CSCMatrix[T]): CSCMatrix[T] =
       val f = implicitly[Field[T]]
       val optspace = SparseFieldOptimizationSpace.sparseOptSpace[T]
       import optspace._
       val addMapFn = (t1: T, t2: T) => f.+(t1, t2)
 
       zipMapValuesM.map(a, b, addMapFn)
-    }
     val cscA = CSCMatrix.zeros[Double](3, 4)
     val cscB = CSCMatrix.zeros[Double](3, 4)
     cscB(1, 1) = 1.3
@@ -390,16 +360,14 @@ class CSCMatrixTest extends FunSuite with Checkers {
     assert(cscR2 === cscR3)
     val cscR4 = testZipMap(cscB, cscA)
     assert(cscR4 === cscB)
-  }
 
-  test("axpy") {
+  test("axpy")
     val a = CSCMatrix((1, 0, 0), (2, 3, -1))
     val b = CSCMatrix((0, 1, 0), (2, 3, -1))
     axpy(2, b, a)
     assert(a === CSCMatrix((1, 2, 0), (6, 9, -3)))
-  }
 
-  test("#344") {
+  test("#344")
     val builder = new CSCMatrix.Builder[Double](rows = 10, cols = 10)
     builder.add(0, 0, 1.0)
     builder.add(1, 0, 1.0)
@@ -408,15 +376,13 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
     a.update(0, 0, 0.0)
     assert(a.t.rows === a.cols)
-  }
 
-  test("#348") {
+  test("#348")
     val a = DenseMatrix((2, 2), (3, 3))
     val b = CSCMatrix((2, 2), (3, 3))
     assert(a + b === a + b.toDense)
-  }
 
-  test("#313") {
+  test("#313")
     val builder = new CSCMatrix.Builder[Double](rows = -1, cols = -1)
     builder.add(0, 0, 1.0)
     builder.add(1, 0, 1.0)
@@ -425,9 +391,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
 
     assert(a.rows == 2)
     assert(a.cols == 1)
-  }
 
-  test("#479") {
+  test("#479")
     val m1: Matrix[Double] = new CSCMatrix[Double](
         Array(1.0, 1, 1), 3, 3, Array(0, 1, 2, 3), Array(0, 1, 2))
     val m2: Matrix[Double] = new CSCMatrix[Double](
@@ -436,9 +401,8 @@ class CSCMatrixTest extends FunSuite with Checkers {
     val sum = (m1 + m2).asInstanceOf[CSCMatrix[Double]]
     require(sum.colPtrs.last == sum.rowIndices.length,
             s"${sum.colPtrs.last} not equal to ${sum.rowIndices.length}")
-  }
 
-  test("CSCMatrix Solve") {
+  test("CSCMatrix Solve")
     val r2: DenseVector[Double] =
       CSCMatrix((1.0, 3.0, 4.0), (2.0, 0.0, 6.0)) \ DenseVector(1.0, 3.0)
     import breeze.numerics.inf
@@ -446,5 +410,3 @@ class CSCMatrixTest extends FunSuite with Checkers {
         norm(r2 - DenseVector(
                  0.1813186813186811, -0.3131868131868131, 0.43956043956043944),
              inf) < 1E-5)
-  }
-}

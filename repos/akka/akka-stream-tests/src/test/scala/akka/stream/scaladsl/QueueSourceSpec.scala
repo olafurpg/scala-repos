@@ -19,47 +19,43 @@ import akka.stream.testkit.TestSourceStage
 import akka.stream.testkit.GraphStageMessages
 import akka.stream.testkit.scaladsl.TestSink
 
-class QueueSourceSpec extends AkkaSpec {
+class QueueSourceSpec extends AkkaSpec
   implicit val materializer = ActorMaterializer()
   implicit val ec = system.dispatcher
   val pause = 300.millis
 
-  def assertSuccess(f: Future[QueueOfferResult]): Unit = {
+  def assertSuccess(f: Future[QueueOfferResult]): Unit =
     f.futureValue should ===(QueueOfferResult.Enqueued)
-  }
 
-  "A QueueSource" must {
+  "A QueueSource" must
 
-    "emit received messages to the stream" in {
+    "emit received messages to the stream" in
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(10, OverflowStrategy.fail)
         .to(Sink.fromSubscriber(s))
         .run()
       val sub = s.expectSubscription
-      for (i ← 1 to 3) {
+      for (i ← 1 to 3)
         sub.request(1)
         assertSuccess(queue.offer(i))
         s.expectNext(i)
-      }
 
       queue.watchCompletion().pipeTo(testActor)
       expectNoMsg(pause)
 
       sub.cancel()
       expectMsg(Done)
-    }
 
-    "be reusable" in {
+    "be reusable" in
       val source = Source.queue(0, OverflowStrategy.backpressure)
       val q1 = source.to(Sink.ignore).run()
       q1.complete()
       q1.watchCompletion().futureValue should ===(Done)
       val q2 = source.to(Sink.ignore).run()
       q2.watchCompletion().value should ===(None)
-    }
 
-    "reject elements when back-pressuring with maxBuffer=0" in {
+    "reject elements when back-pressuring with maxBuffer=0" in
       val (source, probe) = Source
         .queue[Int](0, OverflowStrategy.backpressure)
         .toMat(TestSink.probe)(Keep.both)
@@ -70,9 +66,8 @@ class QueueSourceSpec extends AkkaSpec {
       ex.getMessage should include("have to wait")
       probe.requestNext() should ===(42)
       f.futureValue should ===(QueueOfferResult.Enqueued)
-    }
 
-    "buffer when needed" in {
+    "buffer when needed" in
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(100, OverflowStrategy.dropHead)
@@ -89,9 +84,8 @@ class QueueSourceSpec extends AkkaSpec {
       sub.request(100)
       for (n ← 300 to 399) assertSuccess(queue.offer(n))
       sub.cancel()
-    }
 
-    "not fail when 0 buffer space and demand is signalled" in assertAllStagesStopped {
+    "not fail when 0 buffer space and demand is signalled" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(0, OverflowStrategy.dropHead)
@@ -103,9 +97,8 @@ class QueueSourceSpec extends AkkaSpec {
       assertSuccess(queue.offer(1))
 
       sub.cancel()
-    }
 
-    "wait for demand when buffer is 0" in assertAllStagesStopped {
+    "wait for demand when buffer is 0" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(0, OverflowStrategy.dropHead)
@@ -118,9 +111,8 @@ class QueueSourceSpec extends AkkaSpec {
       expectMsg(QueueOfferResult.Enqueued)
       s.expectNext(1)
       sub.cancel()
-    }
 
-    "finish offer and complete futures when stream completed" in assertAllStagesStopped {
+    "finish offer and complete futures when stream completed" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(0, OverflowStrategy.dropHead)
@@ -135,9 +127,8 @@ class QueueSourceSpec extends AkkaSpec {
       sub.cancel()
 
       expectMsgAllOf(QueueOfferResult.QueueClosed, Done)
-    }
 
-    "fail stream on buffer overflow in fail mode" in assertAllStagesStopped {
+    "fail stream on buffer overflow in fail mode" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue =
         Source.queue(1, OverflowStrategy.fail).to(Sink.fromSubscriber(s)).run()
@@ -146,9 +137,8 @@ class QueueSourceSpec extends AkkaSpec {
       queue.offer(1)
       queue.offer(2)
       s.expectError()
-    }
 
-    "remember pull from downstream to send offered element immediately" in assertAllStagesStopped {
+    "remember pull from downstream to send offered element immediately" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val probe = TestProbe()
       val queue =
@@ -161,9 +151,8 @@ class QueueSourceSpec extends AkkaSpec {
       assertSuccess(queue.offer(1))
       s.expectNext(1)
       sub.cancel()
-    }
 
-    "fail offer future if user does not wait in backpressure mode" in assertAllStagesStopped {
+    "fail offer future if user does not wait in backpressure mode" in assertAllStagesStopped
       val (queue, probe) = Source
         .queue[Int](5, OverflowStrategy.backpressure)
         .toMat(TestSink.probe)(Keep.both)
@@ -181,9 +170,8 @@ class QueueSourceSpec extends AkkaSpec {
       queue.complete()
 
       probe.request(6).expectNext(2, 3, 4, 5, 6).expectComplete()
-    }
 
-    "complete watching future with failure if stream failed" in assertAllStagesStopped {
+    "complete watching future with failure if stream failed" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue =
         Source.queue(1, OverflowStrategy.fail).to(Sink.fromSubscriber(s)).run()
@@ -191,9 +179,8 @@ class QueueSourceSpec extends AkkaSpec {
       queue.offer(1) //need to wait when first offer is done as initialization can be done in this moment
       queue.offer(2)
       expectMsgClass(classOf[Status.Failure])
-    }
 
-    "return false when elemen was not added to buffer" in assertAllStagesStopped {
+    "return false when elemen was not added to buffer" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(1, OverflowStrategy.dropNew)
@@ -208,9 +195,8 @@ class QueueSourceSpec extends AkkaSpec {
       sub.request(1)
       s.expectNext(1)
       sub.cancel()
-    }
 
-    "wait when buffer is full and backpressure is on" in assertAllStagesStopped {
+    "wait when buffer is full and backpressure is on" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(1, OverflowStrategy.backpressure)
@@ -230,9 +216,8 @@ class QueueSourceSpec extends AkkaSpec {
       expectMsg(QueueOfferResult.Enqueued)
 
       sub.cancel()
-    }
 
-    "fail offer future when stream is completed" in assertAllStagesStopped {
+    "fail offer future when stream is completed" in assertAllStagesStopped
       val s = TestSubscriber.manualProbe[Int]()
       val queue = Source
         .queue(1, OverflowStrategy.dropNew)
@@ -243,12 +228,10 @@ class QueueSourceSpec extends AkkaSpec {
       sub.cancel()
       expectMsg(Done)
 
-      queue.offer(1).onFailure {
+      queue.offer(1).onFailure
         case e ⇒ e.isInstanceOf[IllegalStateException] should ===(true)
-      }
-    }
 
-    "not share future across materializations" in {
+    "not share future across materializations" in
       val source = Source.queue[String](1, OverflowStrategy.fail)
 
       val mat1subscriber = TestSubscriber.probe[String]()
@@ -267,11 +250,10 @@ class QueueSourceSpec extends AkkaSpec {
       expectMsg(Done)
 
       sourceQueue2.watchCompletion().isCompleted should ===(false)
-    }
 
-    "complete the stream" when {
+    "complete the stream" when
 
-      "buffer is empty" in {
+      "buffer is empty" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -279,9 +261,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.complete()
         source.watchCompletion().futureValue should ===(Done)
         probe.ensureSubscription().expectComplete()
-      }
 
-      "buffer is full" in {
+      "buffer is full" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -290,9 +271,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.complete()
         probe.requestNext(1).expectComplete()
         source.watchCompletion().futureValue should ===(Done)
-      }
 
-      "buffer is full and element is pending" in {
+      "buffer is full and element is pending" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.backpressure)
           .toMat(TestSink.probe)(Keep.both)
@@ -302,9 +282,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.complete()
         probe.requestNext(1).requestNext(2).expectComplete()
         source.watchCompletion().futureValue should ===(Done)
-      }
 
-      "no buffer is used" in {
+      "no buffer is used" in
         val (source, probe) = Source
           .queue[Int](0, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -312,9 +291,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.complete()
         source.watchCompletion().futureValue should ===(Done)
         probe.ensureSubscription().expectComplete()
-      }
 
-      "no buffer is used and element is pending" in {
+      "no buffer is used and element is pending" in
         val (source, probe) = Source
           .queue[Int](0, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -323,13 +301,11 @@ class QueueSourceSpec extends AkkaSpec {
         source.complete()
         probe.requestNext(1).expectComplete()
         source.watchCompletion().futureValue should ===(Done)
-      }
-    }
 
-    "fail the stream" when {
+    "fail the stream" when
       val ex = new Exception("BUH")
 
-      "buffer is empty" in {
+      "buffer is empty" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -337,9 +313,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.fail(ex)
         source.watchCompletion().failed.futureValue should ===(ex)
         probe.ensureSubscription().expectError(ex)
-      }
 
-      "buffer is full" in {
+      "buffer is full" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -348,9 +323,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.fail(ex)
         source.watchCompletion().failed.futureValue should ===(ex)
         probe.ensureSubscription().expectError(ex)
-      }
 
-      "buffer is full and element is pending" in {
+      "buffer is full and element is pending" in
         val (source, probe) = Source
           .queue[Int](1, OverflowStrategy.backpressure)
           .toMat(TestSink.probe)(Keep.both)
@@ -360,9 +334,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.fail(ex)
         source.watchCompletion().failed.futureValue should ===(ex)
         probe.ensureSubscription().expectError(ex)
-      }
 
-      "no buffer is used" in {
+      "no buffer is used" in
         val (source, probe) = Source
           .queue[Int](0, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -370,9 +343,8 @@ class QueueSourceSpec extends AkkaSpec {
         source.fail(ex)
         source.watchCompletion().failed.futureValue should ===(ex)
         probe.ensureSubscription().expectError(ex)
-      }
 
-      "no buffer is used and element is pending" in {
+      "no buffer is used and element is pending" in
         val (source, probe) = Source
           .queue[Int](0, OverflowStrategy.fail)
           .toMat(TestSink.probe)(Keep.both)
@@ -381,7 +353,3 @@ class QueueSourceSpec extends AkkaSpec {
         source.fail(ex)
         source.watchCompletion().failed.futureValue should ===(ex)
         probe.ensureSubscription().expectError(ex)
-      }
-    }
-  }
-}

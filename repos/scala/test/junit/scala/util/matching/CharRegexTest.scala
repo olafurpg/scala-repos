@@ -12,15 +12,14 @@ import PartialFunction._
   *  always return a single char.
   */
 @RunWith(classOf[JUnit4])
-class CharRegexTest {
-  implicit class Averrable(val b: Boolean) /*extends AnyVal*/ {
+class CharRegexTest
+  implicit class Averrable(val b: Boolean) /*extends AnyVal*/
     def yes = assert(b)
     def no = assert(!b)
-  }
   val c: Char = 'c' // "cat"(0)
   val d: Char = 'D' // "Dog"(0)
 
-  @Test def comparesGroupCorrectly(): Unit = {
+  @Test def comparesGroupCorrectly(): Unit =
     val r = """(\p{Lower})""".r
     cond(c) { case r(x) => true }.yes
     cond(c) { case r(_) => true }.yes
@@ -31,9 +30,8 @@ class CharRegexTest {
     cond(d) { case r(_) => true }.no
     cond(d) { case r(_ *) => true }.no
     cond(d) { case r() => true }.no
-  }
 
-  @Test def comparesNoGroupCorrectly(): Unit = {
+  @Test def comparesNoGroupCorrectly(): Unit =
     val rnc = """\p{Lower}""".r
     cond(c) { case rnc(x) => true }.no
     cond(c) { case rnc(_) => true }.no
@@ -44,14 +42,10 @@ class CharRegexTest {
     cond(d) { case rnc(_) => true }.no
     cond(d) { case rnc(_ *) => true }.no
     cond(d) { case rnc() => true }.no
-  }
 
   @Test(expected = classOf[MatchError])
-  def failCorrectly(): Unit = {
+  def failCorrectly(): Unit =
     val headAndTail = """(\p{Lower})([a-z]+)""".r
-    val n = "cat" (0) match {
+    val n = "cat" (0) match
       case headAndTail(ht @ _ *) => ht.size
-    }
     assert(false, s"Match size $n")
-  }
-}

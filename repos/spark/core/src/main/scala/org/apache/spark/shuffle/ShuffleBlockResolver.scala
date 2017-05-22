@@ -27,7 +27,7 @@ private[spark]
   * encapsulate shuffle data. This is used by the BlockStore to abstract over different shuffle
   * implementations when shuffle data is retrieved.
   */
-trait ShuffleBlockResolver {
+trait ShuffleBlockResolver
   type ShuffleId = Int
 
   /**
@@ -37,4 +37,3 @@ trait ShuffleBlockResolver {
   def getBlockData(blockId: ShuffleBlockId): ManagedBuffer
 
   def stop(): Unit
-}

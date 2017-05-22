@@ -26,16 +26,13 @@ import scala.reflect.macros.whitebox
  *
  * See corresponding definition for 2.10
  */
-class LazyMacrosRef(val c: whitebox.Context) {
+class LazyMacrosRef(val c: whitebox.Context)
   import c.universe._
 
-  def mkLazyImpl[I : WeakTypeTag]: Tree = {
+  def mkLazyImpl[I : WeakTypeTag]: Tree =
     val i = new LazyMacros(c)
     i.mkLazyImpl[I].asInstanceOf[Tree]
-  }
 
-  def mkStrictImpl[I : WeakTypeTag]: Tree = {
+  def mkStrictImpl[I : WeakTypeTag]: Tree =
     val i = new LazyMacros(c)
     i.mkStrictImpl[I].asInstanceOf[Tree]
-  }
-}

@@ -19,29 +19,26 @@ import java.lang.reflect.InvocationTargetException
 sealed trait LifeCycleMessage extends Serializable
 
 /* Marker trait to show which Messages are automatically handled by Akka */
-sealed trait AutoReceivedMessage { self: LifeCycleMessage =>
-}
+sealed trait AutoReceivedMessage  self: LifeCycleMessage =>
 
 case class HotSwap(code: ActorRef => Actor.Receive, discardOld: Boolean = true)
-    extends AutoReceivedMessage with LifeCycleMessage {
+    extends AutoReceivedMessage with LifeCycleMessage
 
   /** Java API
     */
   def this(code: akka.japi.Function[ActorRef, Procedure[Any]],
            discardOld: Boolean) =
     this((self: ActorRef) =>
-           {
              val behavior = code(self)
              val result: Actor.Receive = { case msg => behavior(msg) }
              result
-         },
+         ,
          discardOld)
 
   /** Java API with default non-stacking behavior
     */
   def this(code: akka.japi.Function[ActorRef, Procedure[Any]]) =
     this(code, true)
-}
 
 case object RevertHotSwap extends AutoReceivedMessage with LifeCycleMessage
 
@@ -96,42 +93,37 @@ class InvalidMessageException private[akka](
 /** This message is thrown by default when an Actors behavior doesn't match a message
   */
 case class UnhandledMessageException(msg: Any, ref: ActorRef)
-    extends Exception {
+    extends Exception
   override def getMessage() = "Actor %s does not handle [%s]".format(ref, msg)
   override def fillInStackTrace() =
     this //Don't waste cycles generating stack trace
-}
 
 /** Actor factory module with factory methods for creating various kinds of Actors.
   *
   *  @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Actor extends ListenerManagement {
+object Actor extends ListenerManagement
 
   /** Add shutdown cleanups
     */
-  private[akka] lazy val shutdownHook = {
-    val hook = new Runnable {
-      override def run {
+  private[akka] lazy val shutdownHook =
+    val hook = new Runnable
+      override def run
         // Clear Thread.subclassAudits
         val tf = classOf[java.lang.Thread].getDeclaredField("subclassAudits")
         tf.setAccessible(true)
         val subclassAudits = tf.get(null).asInstanceOf[java.util.Map[_, _]]
         subclassAudits synchronized { subclassAudits.clear }
-      }
-    }
     Runtime.getRuntime.addShutdownHook(new Thread(hook))
     hook
-  }
 
   val registry = new ActorRegistry
 
-  lazy val remote: RemoteSupport = {
+  lazy val remote: RemoteSupport =
     ReflectiveAccess.Remote.defaultRemoteSupport
       .map(_ ())
       .getOrElse(throw new UnsupportedOperationException(
               "You need to have akka-remote.jar on classpath"))
-  }
 
   private[akka] val TIMEOUT = Duration(
       config.getInt("akka.actor.timeout", 5), TIME_UNIT).toMillis
@@ -143,9 +135,8 @@ object Actor extends ListenerManagement {
     */
   type Receive = PartialFunction[Any, Unit]
 
-  private[actor] val actorRefInCreation = new ThreadLocal[Option[ActorRef]] {
+  private[actor] val actorRefInCreation = new ThreadLocal[Option[ActorRef]]
     override def initialValue = None
-  }
 
   /** Creates an ActorRef out of the Actor with type T.
     *  <pre>
@@ -179,16 +170,14 @@ object Actor extends ListenerManagement {
   def actorOf(clazz: Class[_ <: Actor]): ActorRef =
     new LocalActorRef(
         () =>
-          {
             import ReflectiveAccess.{createInstance, noParams, noArgs}
             createInstance[Actor](
-                clazz.asInstanceOf[Class[_]], noParams, noArgs) match {
+                clazz.asInstanceOf[Class[_]], noParams, noArgs) match
               case Right(actor) => actor
               case Left(exception) =>
-                val cause = exception match {
+                val cause = exception match
                   case i: InvocationTargetException => i.getTargetException
                   case _ => exception
-                }
 
                 throw new ActorInitializationException(
                     "Could not instantiate Actor of " + clazz +
@@ -196,8 +185,7 @@ object Actor extends ListenerManagement {
                     "\nif so put it outside the class/trait, f.e. in a companion object," +
                     "\nOR try to change: 'actorOf[MyActor]' to 'actorOf(new MyActor)'.",
                     cause)
-            }
-        },
+        ,
         None)
 
   /** Creates an ActorRef out of the Actor. Allows you to pass in a factory function
@@ -246,16 +234,14 @@ object Actor extends ListenerManagement {
     */
   def spawn(body: => Unit)(
       implicit dispatcher: MessageDispatcher = Dispatchers.defaultGlobalDispatcher)
-    : Unit = {
+    : Unit =
     case object Spawn
     actorOf(
-        new Actor() {
+        new Actor()
       self.dispatcher = dispatcher
-      def receive = {
+      def receive =
         case Spawn => try { body } finally { self.stop() }
-      }
-    }).start() ! Spawn
-  }
+    ).start() ! Spawn
 
   /** Implicitly converts the given Option[Any] to a AnyOptionAsTypedOption which offers the method <code>as[T]</code>
     *  to convert an Option[Any] to an Option[T].
@@ -271,11 +257,10 @@ object Actor extends ListenerManagement {
     *   (actor !!! "foo").as[Int] (Recommended)
     */
   implicit def futureToAnyOptionAsTypedOption(anyFuture: Future[_]) =
-    new AnyOptionAsTypedOption({
+    new AnyOptionAsTypedOption(
       try { anyFuture.await } catch { case t: FutureTimeoutException => }
       anyFuture.resultOrException
-    })
-}
+    )
 
 /** Actor base trait that should be extended by or mixed to create an Actor with the semantics of the 'Actor Model':
   *  <a href="http://en.wikipedia.org/wiki/Actor_model">http://en.wikipedia.org/wiki/Actor_model</a>
@@ -324,7 +309,7 @@ object Actor extends ListenerManagement {
   *
   *  @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-trait Actor {
+trait Actor
 
   /** Type alias because traits cannot have companion objects.
     */
@@ -337,7 +322,7 @@ trait Actor {
    * the 'forward' function.
    */
   @transient
-  implicit val someSelf: Some[ActorRef] = {
+  implicit val someSelf: Some[ActorRef] =
     val optRef = Actor.actorRefInCreation.get
     if (optRef.isEmpty)
       throw new ActorInitializationException(
@@ -351,7 +336,6 @@ trait Actor {
     Actor.actorRefInCreation.set(None)
     optRef.asInstanceOf[Some[ActorRef]].get.id = getClass.getName //FIXME: Is this needed?
     optRef.asInstanceOf[Some[ActorRef]]
-  }
 
   /*
    * Option[ActorRef] representation of the 'self' ActorRef reference.
@@ -441,15 +425,14 @@ trait Actor {
     *  Is called when a message isn't handled by the current behavior of the actor
     *  by default it throws an UnhandledMessageException
     */
-  def unhandled(msg: Any) {
+  def unhandled(msg: Any)
     throw new UnhandledMessageException(msg, self)
-  }
 
   /** Is the actor able to handle the message passed in as arguments?
     */
-  def isDefinedAt(message: Any): Boolean = {
+  def isDefinedAt(message: Any): Boolean =
     val behaviorStack = self.hotswap
-    message match {
+    message match
       //Same logic as apply(msg) but without the unhandled catch-all
       case l: AutoReceivedMessage => true
       case msg
@@ -459,36 +442,32 @@ trait Actor {
           if behaviorStack.isEmpty && processingBehavior.isDefinedAt(msg) =>
         true
       case _ => false
-    }
-  }
 
   /** Changes the Actor's behavior to become the new 'Receive' (PartialFunction[Any, Unit]) handler.
     *  Puts the behavior on top of the hotswap stack.
     *  If "discardOld" is true, an unbecome will be issued prior to pushing the new behavior to the stack
     */
-  def become(behavior: Receive, discardOld: Boolean = true) {
+  def become(behavior: Receive, discardOld: Boolean = true)
     if (discardOld) unbecome()
     self.hotswap = self.hotswap.push(behavior)
-  }
 
   /** Reverts the Actor behavior to the previous one in the hotswap stack.
     */
-  def unbecome(): Unit = {
+  def unbecome(): Unit =
     val h = self.hotswap
     if (h.nonEmpty) self.hotswap = h.pop
-  }
 
   // =========================================
   // ==== INTERNAL IMPLEMENTATION DETAILS ====
   // =========================================
 
-  private[akka] final def apply(msg: Any) = {
+  private[akka] final def apply(msg: Any) =
     if (msg.isInstanceOf[AnyRef] && (msg.asInstanceOf[AnyRef] eq null))
       throw new InvalidMessageException(
           "Message from [" + self.sender + "] to [" + self.toString +
           "] is null")
     val behaviorStack = self.hotswap
-    msg match {
+    msg match
       case l: AutoReceivedMessage => autoReceiveMessage(l)
       case msg
           if behaviorStack.nonEmpty && behaviorStack.head.isDefinedAt(msg) =>
@@ -498,11 +477,9 @@ trait Actor {
         processingBehavior.apply(msg)
       case unknown =>
         unhandled(unknown) //This is the only line that differs from processingbehavior
-    }
-  }
 
   private final def autoReceiveMessage(msg: AutoReceivedMessage): Unit =
-    msg match {
+    msg match
       case HotSwap(code, discardOld) => become(code(self), discardOld)
       case RevertHotSwap => unbecome()
       case Exit(dead, reason) => self.handleTrapExit(dead, reason)
@@ -516,13 +493,11 @@ trait Actor {
         self.stop()
         if (f.isDefined)
           f.get.completeWithException(new ActorKilledException("PoisonPill"))
-    }
 
   private lazy val processingBehavior =
     receive //ProcessingBehavior is the original behavior
-}
 
-private[actor] class AnyOptionAsTypedOption(anyOption: Option[Any]) {
+private[actor] class AnyOptionAsTypedOption(anyOption: Option[Any])
 
   /** Convenience helper to cast the given Option of Any to an Option of the given type. Will throw a ClassCastException
     *  if the actual type is not assignable from the given one.
@@ -533,22 +508,19 @@ private[actor] class AnyOptionAsTypedOption(anyOption: Option[Any]) {
     *  ClassCastException and return None in that case.
     */
   def asSilently[T : ClassTag]: Option[T] = narrowSilently[T](anyOption)
-}
 
 /** Marker interface for proxyable actors (such as typed actor).
   *
   *  @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-trait Proxyable {
+trait Proxyable
   private[actor] def swapProxiedActor(newInstance: Actor)
-}
 
 /** Represents the different Actor types.
   *
   *  @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
 sealed trait ActorType
-object ActorType {
+object ActorType
   case object ScalaActor extends ActorType
   case object TypedActor extends ActorType
-}

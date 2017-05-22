@@ -46,7 +46,7 @@ import org.apache.spark.sql.types._
 @Experimental
 class Interaction @Since("1.6.0")(override val uid: String)
     extends Transformer with HasInputCols with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("interaction"))
@@ -61,7 +61,7 @@ class Interaction @Since("1.6.0")(override val uid: String)
 
   // optimistic schema; does not contain any ML attributes
   @Since("1.6.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     require(get(inputCols).isDefined, "Input cols must be defined first.")
     require(get(outputCol).isDefined, "Output col must be defined first.")
     require($(inputCols).length > 0, "Input cols must have non-zero length.")
@@ -69,22 +69,21 @@ class Interaction @Since("1.6.0")(override val uid: String)
             "Input cols must be distinct.")
     StructType(
         schema.fields :+ StructField($(outputCol), new VectorUDT, false))
-  }
 
   @Since("1.6.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val inputFeatures = $(inputCols).map(c => dataset.schema(c))
     val featureEncoders = getFeatureEncoders(inputFeatures)
     val featureAttrs = getFeatureAttrs(inputFeatures)
 
-    def interactFunc = udf { row: Row =>
+    def interactFunc = udf  row: Row =>
       var indices = ArrayBuilder.make[Int]
       var values = ArrayBuilder.make[Double]
       var size = 1
       indices += 0
       values += 1.0
       var featureIndex = row.length - 1
-      while (featureIndex >= 0) {
+      while (featureIndex >= 0)
         val prevIndices = indices.result()
         val prevValues = values.result()
         val prevSize = size
@@ -95,30 +94,23 @@ class Interaction @Since("1.6.0")(override val uid: String)
         currentEncoder.foreachNonzeroOutput(
             row(featureIndex),
             (i, a) =>
-              {
                 var j = 0
-                while (j < prevIndices.length) {
+                while (j < prevIndices.length)
                   indices += prevIndices(j) + i * prevSize
                   values += prevValues(j) * a
                   j += 1
-                }
-            })
+            )
         featureIndex -= 1
-      }
       Vectors.sparse(size, indices.result(), values.result()).compressed
-    }
 
-    val featureCols = inputFeatures.map { f =>
-      f.dataType match {
+    val featureCols = inputFeatures.map  f =>
+      f.dataType match
         case DoubleType => dataset(f.name)
         case _: VectorUDT => dataset(f.name)
         case _: NumericType | BooleanType => dataset(f.name).cast(DoubleType)
-      }
-    }
     dataset.select(col("*"),
                    interactFunc(struct(featureCols: _*))
                      .as($(outputCol), featureAttrs.toMetadata()))
-  }
 
   /**
     * Creates a feature encoder for each input column, which supports efficient iteration over
@@ -127,9 +119,9 @@ class Interaction @Since("1.6.0")(override val uid: String)
     * @param features The input feature columns to create encoders for.
     */
   private def getFeatureEncoders(
-      features: Seq[StructField]): Array[FeatureEncoder] = {
-    def getNumFeatures(attr: Attribute): Int = {
-      attr match {
+      features: Seq[StructField]): Array[FeatureEncoder] =
+    def getNumFeatures(attr: Attribute): Int =
+      attr match
         case nominal: NominalAttribute =>
           math.max(
               1,
@@ -137,10 +129,8 @@ class Interaction @Since("1.6.0")(override val uid: String)
                       "Nominal features must have attr numValues defined.")))
         case _ =>
           1 // numeric feature
-      }
-    }
-    features.map { f =>
-      val numFeatures = f.dataType match {
+    features.map  f =>
+      val numFeatures = f.dataType match
         case _: NumericType | BooleanType =>
           Array(getNumFeatures(Attribute.fromStructField(f)))
         case _: VectorUDT =>
@@ -150,10 +140,8 @@ class Interaction @Since("1.6.0")(override val uid: String)
             .getOrElse(throw new SparkException(
                     "Vector attributes must be defined for interaction."))
           attrs.map(getNumFeatures).toArray
-      }
       new FeatureEncoder(numFeatures)
-    }.toArray
-  }
+    .toArray
 
   /**
     * Generates ML attributes for the output vector of all feature interactions. We make a best
@@ -164,37 +152,30 @@ class Interaction @Since("1.6.0")(override val uid: String)
     *
     * @param features The input feature columns to the Interaction transformer.
     */
-  private def getFeatureAttrs(features: Seq[StructField]): AttributeGroup = {
+  private def getFeatureAttrs(features: Seq[StructField]): AttributeGroup =
     var featureAttrs: Seq[Attribute] = Nil
-    features.reverse.foreach { f =>
-      val encodedAttrs = f.dataType match {
+    features.reverse.foreach  f =>
+      val encodedAttrs = f.dataType match
         case _: NumericType | BooleanType =>
           val attr = Attribute.decodeStructField(f, preserveName = true)
-          if (attr == UnresolvedAttribute) {
+          if (attr == UnresolvedAttribute)
             encodedFeatureAttrs(
                 Seq(NumericAttribute.defaultAttr.withName(f.name)), None)
-          } else if (!attr.name.isDefined) {
+          else if (!attr.name.isDefined)
             encodedFeatureAttrs(Seq(attr.withName(f.name)), None)
-          } else {
+          else
             encodedFeatureAttrs(Seq(attr), None)
-          }
         case _: VectorUDT =>
           val group = AttributeGroup.fromStructField(f)
           encodedFeatureAttrs(group.attributes.get, Some(group.name))
-      }
-      if (featureAttrs.isEmpty) {
+      if (featureAttrs.isEmpty)
         featureAttrs = encodedAttrs
-      } else {
-        featureAttrs = encodedAttrs.flatMap { head =>
-          featureAttrs.map { tail =>
+      else
+        featureAttrs = encodedAttrs.flatMap  head =>
+          featureAttrs.map  tail =>
             NumericAttribute.defaultAttr.withName(
                 head.name.get + ":" + tail.name.get)
-          }
-        }
-      }
-    }
     new AttributeGroup($(outputCol), featureAttrs.toArray)
-  }
 
   /**
     * Generates the output ML attributes for a single input feature. Each output feature name has
@@ -206,42 +187,36 @@ class Interaction @Since("1.6.0")(override val uid: String)
     */
   private def encodedFeatureAttrs(
       inputAttrs: Seq[Attribute],
-      groupName: Option[String]): Seq[Attribute] = {
+      groupName: Option[String]): Seq[Attribute] =
 
     def format(index: Int,
                attrName: Option[String],
-               categoryName: Option[String]): String = {
+               categoryName: Option[String]): String =
       val parts = Seq(
           groupName, Some(attrName.getOrElse(index.toString)), categoryName)
       parts.flatten.mkString("_")
-    }
 
-    inputAttrs.zipWithIndex.flatMap {
+    inputAttrs.zipWithIndex.flatMap
       case (nominal: NominalAttribute, i) =>
-        if (nominal.values.isDefined) {
+        if (nominal.values.isDefined)
           nominal.values.get.map(v =>
                 BinaryAttribute.defaultAttr.withName(
                     format(i, nominal.name, Some(v))))
-        } else {
+        else
           Array.tabulate(nominal.getNumValues.get)(j =>
                 BinaryAttribute.defaultAttr.withName(
                     format(i, nominal.name, Some(j.toString))))
-        }
       case (a: Attribute, i) =>
         Seq(NumericAttribute.defaultAttr.withName(format(i, a.name, None)))
-    }
-  }
 
   @Since("1.6.0")
   override def copy(extra: ParamMap): Interaction = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object Interaction extends DefaultParamsReadable[Interaction] {
+object Interaction extends DefaultParamsReadable[Interaction]
 
   @Since("1.6.0")
   override def load(path: String): Interaction = super.load(path)
-}
 
 /**
   * This class performs on-the-fly one-hot encoding of features as you iterate over them. To
@@ -253,22 +228,20 @@ object Interaction extends DefaultParamsReadable[Interaction] {
   *                    should be set to 1.
   */
 private[ml] class FeatureEncoder(numFeatures: Array[Int])
-    extends Serializable {
+    extends Serializable
   assert(numFeatures.forall(_ > 0), "Features counts must all be positive.")
 
   /** The size of the output vector. */
   val outputSize = numFeatures.sum
 
   /** Precomputed offsets for the location of each output feature. */
-  private val outputOffsets = {
+  private val outputOffsets =
     val arr = new Array[Int](numFeatures.length)
     var i = 1
-    while (i < arr.length) {
+    while (i < arr.length)
       arr(i) = arr(i - 1) + numFeatures(i - 1)
       i += 1
-    }
     arr
-  }
 
   /**
     * Given an input row of features, invokes the specific function for every non-zero output.
@@ -277,36 +250,31 @@ private[ml] class FeatureEncoder(numFeatures: Array[Int])
     * @param f The callback to invoke on each non-zero (index, value) output pair.
     */
   def foreachNonzeroOutput(value: Any, f: (Int, Double) => Unit): Unit =
-    value match {
+    value match
       case d: Double =>
         assert(numFeatures.length == 1,
                "DoubleType columns should only contain one feature.")
         val numOutputCols = numFeatures.head
-        if (numOutputCols > 1) {
+        if (numOutputCols > 1)
           assert(d >= 0.0 && d == d.toInt && d < numOutputCols,
                  s"Values from column must be indices, but got $d.")
           f(d.toInt, 1.0)
-        } else {
+        else
           f(0, d)
-        }
       case vec: Vector =>
         assert(
             numFeatures.length == vec.size,
             s"Vector column size was ${vec.size}, expected ${numFeatures.length}")
-        vec.foreachActive { (i, v) =>
+        vec.foreachActive  (i, v) =>
           val numOutputCols = numFeatures(i)
-          if (numOutputCols > 1) {
+          if (numOutputCols > 1)
             assert(v >= 0.0 && v == v.toInt && v < numOutputCols,
                    s"Values from column must be indices, but got $v.")
             f(outputOffsets(i) + v.toInt, 1.0)
-          } else {
+          else
             f(outputOffsets(i), v)
-          }
-        }
       case null =>
         throw new SparkException("Values to interact cannot be null.")
       case o =>
         throw new SparkException(
             s"$o of type ${o.getClass.getName} is not supported.")
-    }
-}

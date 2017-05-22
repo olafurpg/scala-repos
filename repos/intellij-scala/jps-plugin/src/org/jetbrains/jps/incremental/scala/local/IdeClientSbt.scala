@@ -23,45 +23,37 @@ class IdeClientSbt(
     modules: Seq[String],
     consumer: OutputConsumer,
     sourceToTarget: File => Option[BuildTarget[_ <: BuildRootDescriptor]])
-    extends IdeClient(compilerName, context, modules, consumer) {
+    extends IdeClient(compilerName, context, modules, consumer)
 
-  def generated(source: File, outputFile: File, name: String) {
+  def generated(source: File, outputFile: File, name: String)
     invalidateBoundForms(source)
-    val target = sourceToTarget(source).getOrElse {
+    val target = sourceToTarget(source).getOrElse
       throw new RuntimeException("Unknown source file: " + source)
-    }
     val compiledClass = new LazyCompiledClass(outputFile, source, name)
     consumer.registerCompiledClass(target, compiledClass)
-  }
 
   def processed(source: File): Unit = {}
 
   // TODO Expect JPS compiler in UI-designer to take generated class events into account
   private val FormsToCompileKey = catching(
-      classOf[ClassNotFoundException], classOf[NoSuchFieldException]).opt {
+      classOf[ClassNotFoundException], classOf[NoSuchFieldException]).opt
     val field = Class
       .forName("org.jetbrains.jps.uiDesigner.compiler.FormsBuilder")
       .getDeclaredField("FORMS_TO_COMPILE")
     field.setAccessible(true)
     field.get(null).asInstanceOf[Key[util.Map[File, util.Collection[File]]]]
-  }
 
-  private def invalidateBoundForms(source: File) {
-    FormsToCompileKey.foreach { key =>
-      val boundForms: Option[Iterable[File]] = {
+  private def invalidateBoundForms(source: File)
+    FormsToCompileKey.foreach  key =>
+      val boundForms: Option[Iterable[File]] =
         val sourceToForm =
           context.getProjectDescriptor.dataManager.getSourceToFormMap
         val sourcePath = FileUtil.toCanonicalPath(source.getPath)
         Option(sourceToForm.getState(sourcePath))
           .map(_.asScala.map(new File(_)))
-      }
 
-      boundForms.foreach { forms =>
+      boundForms.foreach  forms =>
         val formsToCompile = Option(key.get(context))
           .getOrElse(new util.HashMap[File, util.Collection[File]]())
         formsToCompile.put(source, forms.toVector.asJava)
         key.set(context, formsToCompile)
-      }
-    }
-  }
-}

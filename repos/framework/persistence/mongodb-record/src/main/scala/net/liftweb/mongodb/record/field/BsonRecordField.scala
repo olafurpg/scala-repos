@@ -36,48 +36,41 @@ class BsonRecordField[OwnerType <: BsonRecord[OwnerType],
     rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(
     implicit subRecordType: Manifest[SubRecordType])
     extends Field[SubRecordType, OwnerType]
-    with MandatoryTypedField[SubRecordType] {
+    with MandatoryTypedField[SubRecordType]
   def this(rec: OwnerType,
            valueMeta: BsonMetaRecord[SubRecordType],
            value: SubRecordType)(
-      implicit subRecordType: Manifest[SubRecordType]) = {
+      implicit subRecordType: Manifest[SubRecordType]) =
     this(rec, value.meta)
     set(value)
-  }
 
   def this(rec: OwnerType,
            valueMeta: BsonMetaRecord[SubRecordType],
            value: Box[SubRecordType])(
-      implicit subRecordType: Manifest[SubRecordType]) = {
+      implicit subRecordType: Manifest[SubRecordType]) =
     this(rec, valueMeta)
     setBox(value)
-  }
 
   def owner = rec
-  def asJs = asJValue match {
+  def asJs = asJValue match
     case JNothing => JsNull
     case jv =>
-      new JsExp {
+      new JsExp
         lazy val toJsCmd = compactRender(jv)
-      }
-  }
   def toForm: Box[NodeSeq] = Empty
   def defaultValue = valueMeta.createRecord
 
   def setFromString(s: String): Box[SubRecordType] =
     valueMeta.fromJsonString(s)
 
-  def setFromAny(in: Any): Box[SubRecordType] = in match {
+  def setFromAny(in: Any): Box[SubRecordType] = in match
     case dbo: DBObject => setBox(Full(valueMeta.fromDBObject(dbo)))
     case _ => genericSetFromAny(in)
-  }
 
   def asJValue: JValue = valueBox.map(_.asJValue) openOr (JNothing: JValue)
-  def setFromJValue(jvalue: JValue): Box[SubRecordType] = jvalue match {
+  def setFromJValue(jvalue: JValue): Box[SubRecordType] = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case _ => setBox(valueMeta.fromJValue(jvalue))
-  }
-}
 
 /*
  * List of BsonRecords
@@ -86,38 +79,32 @@ class BsonRecordListField[OwnerType <: BsonRecord[OwnerType],
                           SubRecordType <: BsonRecord[SubRecordType]](
     rec: OwnerType, valueMeta: BsonMetaRecord[SubRecordType])(
     implicit mf: Manifest[SubRecordType])
-    extends MongoListField[OwnerType, SubRecordType](rec: OwnerType) {
+    extends MongoListField[OwnerType, SubRecordType](rec: OwnerType)
 
   import scala.collection.JavaConversions._
 
   override def validations =
     ((elems: ValueType) => elems.flatMap(_.validate)) :: super.validations
 
-  override def asDBObject: DBObject = {
+  override def asDBObject: DBObject =
     val dbl = new BasicDBList
-    value.foreach { v =>
+    value.foreach  v =>
       dbl.add(v.asDBObject)
-    }
     dbl
-  }
 
   override def setFromDBObject(dbo: DBObject): Box[List[SubRecordType]] =
     setBox(
         Full(dbo.keySet.toList.map(k =>
-                  {
         valueMeta.fromDBObject(dbo.get(k.toString).asInstanceOf[DBObject])
-    })))
+    )))
 
   override def asJValue: JValue = JArray(value.map(_.asJValue))
 
-  override def setFromJValue(jvalue: JValue) = jvalue match {
+  override def setFromJValue(jvalue: JValue) = jvalue match
     case JNothing | JNull if optional_? => setBox(Empty)
     case JArray(arr) =>
       setBox(
           Full(arr.map(jv =>
-                    {
           valueMeta.fromJValue(jv) openOr valueMeta.createRecord
-      })))
+      )))
     case other => setBox(FieldHelpers.expectedA("JArray", other))
-  }
-}

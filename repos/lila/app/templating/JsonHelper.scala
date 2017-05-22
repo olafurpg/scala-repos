@@ -3,17 +3,13 @@ package templating
 
 import play.api.libs.json._
 
-trait JsonHelper {
+trait JsonHelper
 
-  def toJson[A : Writes](map: Map[Int, A]): String = Json stringify {
-    Json toJson {
+  def toJson[A : Writes](map: Map[Int, A]): String = Json stringify
+    Json toJson
       map mapKeys (_.toString)
-    }
-  }
 
-  def toJson[A : Writes](a: A): String = Json stringify {
+  def toJson[A : Writes](a: A): String = Json stringify
     Json toJson a
-  }
 
   def J = Json
-}

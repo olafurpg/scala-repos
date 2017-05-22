@@ -26,11 +26,10 @@ import org.apache.commons.math3.random.{EmpiricalDistribution => ApacheEmpirical
 class VariableKernelEmpiricalDistribution(
     data: Array[Double],
     binCount: Int = ApacheEmpiricalDistribution.DEFAULT_BIN_COUNT)
-    extends ApacheContinuousDistribution {
+    extends ApacheContinuousDistribution
   def this(data: breeze.linalg.DenseVector[Double]) = this(data.data)
   protected final val inner = new ApacheEmpiricalDistribution(binCount)
   inner.load(data)
-}
 
 object VariableKernelEmpiricalDistribution
     extends ContinuousDistributionUFuncProvider[

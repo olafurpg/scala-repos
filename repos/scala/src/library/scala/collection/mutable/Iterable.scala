@@ -20,23 +20,21 @@ trait Iterable[A]
 //                     with GenIterable[A]
     with scala.collection.Iterable[A]
     with GenericTraversableTemplate[A, Iterable]
-    with IterableLike[A, Iterable[A]] with Parallelizable[A, ParIterable[A]] {
+    with IterableLike[A, Iterable[A]] with Parallelizable[A, ParIterable[A]]
   override def companion: GenericCompanion[Iterable] = Iterable
   protected[this] override def parCombiner =
     ParIterable.newCombiner[A] // if `mutable.IterableLike` gets introduced, please move this there!
   override def seq: Iterable[A] = this
-}
 
 /** $factoryInfo
   *  The current default implementation of a $Coll is an `ArrayBuffer`.
   *  @define coll mutable iterable collection
   *  @define Coll `mutable.Iterable`
   */
-object Iterable extends TraversableFactory[Iterable] {
+object Iterable extends TraversableFactory[Iterable]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Iterable[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, Iterable[A]] = new ArrayBuffer
-}
 
 /** Explicit instantiation of the `Iterable` trait to reduce class file size in subclasses. */
 abstract class AbstractIterable[A]

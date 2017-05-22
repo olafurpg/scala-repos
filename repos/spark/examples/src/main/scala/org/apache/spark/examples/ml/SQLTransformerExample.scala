@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.SQLTransformer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object SQLTransformerExample {
-  def main(args: Array[String]) {
+object SQLTransformerExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("SQLTransformerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -40,6 +40,4 @@ object SQLTransformerExample {
 
     sqlTrans.transform(df).show()
     // $example off$
-  }
-}
 // scalastyle:on println

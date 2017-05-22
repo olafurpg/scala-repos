@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.twitter.util.Time
 
-private object JsonGenerator {
-  private[this] val writer = {
+private object JsonGenerator
+  private[this] val writer =
     val mapper = new ObjectMapper
     mapper.registerModule(DefaultScalaModule)
     mapper.writer
-  }
 
   def generate(in: Any): String = writer.writeValueAsString(in)
-}
 
 /**
   * Model classes for exception serialization to JSON
@@ -27,7 +25,7 @@ private object JsonGenerator {
   * TraceId is from Zipkin.
   */
 sealed private[exception] case class ServiceException private[ServiceException](
-    private val jsonValue: Map[String, Any]) {
+    private val jsonValue: Map[String, Any])
 
   /**
     * Create a map with all of the elements required by a chickadee service.
@@ -70,12 +68,11 @@ sealed private[exception] case class ServiceException private[ServiceException](
     * Generate a json representation of this using jerkson
     */
   def toJson: String = JsonGenerator.generate(jsonValue)
-}
 
 /**
   * The contents of a java throwable, in the model format for json serialization
   */
-sealed private[exception] case class ExceptionContents(e: Throwable) {
+sealed private[exception] case class ExceptionContents(e: Throwable)
 
   /**
     * Generate the stack trace as a string of the concatenated java.lang.StackTraceElements
@@ -90,4 +87,3 @@ sealed private[exception] case class ExceptionContents(e: Throwable) {
       "message" -> e.getMessage,
       "stackTrace" -> generateStackTrace(e.getStackTrace)
   )
-}

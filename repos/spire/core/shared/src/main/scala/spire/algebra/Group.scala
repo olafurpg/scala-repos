@@ -5,7 +5,7 @@ package algebra
   * A group is a monoid where each element has an inverse.
   */
 trait Group[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Monoid[A] {
+    extends Any with Monoid[A]
 
   /**
     * Return the inverse of `a`.
@@ -26,15 +26,13 @@ trait Group[@sp(Byte, Short, Int, Long, Float, Double) A]
     else if (n == 0) id
     else if (n == 1) a
     else combinenAboveOne(a, n)
-}
 
-object Group {
+object Group
   @inline final def apply[A](implicit ev: Group[A]): Group[A] = ev
   @inline final def additive[A](implicit A: AdditiveGroup[A]): Group[A] =
     A.additive
   @inline final def multiplicative[A](
       implicit A: MultiplicativeGroup[A]): Group[A] = A.multiplicative
-}
 
 /**
   * An abelian group is a group whose operation is commutative.
@@ -42,10 +40,9 @@ object Group {
 trait AbGroup[@sp(Byte, Short, Int, Long, Float, Double) A]
     extends Any with Group[A] with CMonoid[A]
 
-object AbGroup {
+object AbGroup
   @inline final def apply[A](implicit ev: AbGroup[A]): AbGroup[A] = ev
   @inline final def additive[A](implicit A: AdditiveAbGroup[A]): AbGroup[A] =
     A.additive
   @inline final def multiplicative[A](
       implicit A: MultiplicativeAbGroup[A]): AbGroup[A] = A.multiplicative
-}

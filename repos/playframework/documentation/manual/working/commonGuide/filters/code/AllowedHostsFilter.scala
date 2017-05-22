@@ -10,7 +10,6 @@ import play.api.http.HttpFilters
 import play.filters.hosts.AllowedHostsFilter
 
 class Filters @Inject()(allowedHostsFilter: AllowedHostsFilter)
-    extends HttpFilters {
+    extends HttpFilters
   def filters = Seq(allowedHostsFilter)
-}
 //#filters

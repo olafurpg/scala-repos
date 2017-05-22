@@ -14,24 +14,20 @@ import org.jetbrains.jps.incremental.{BinaryContent, CompiledClass}
 private class LazyCompiledClass(
     outputFile: File, sourceFile: File, className: String)
     extends CompiledClass(
-        outputFile, sourceFile, className, new BinaryContent(Array.empty)) {
+        outputFile, sourceFile, className, new BinaryContent(Array.empty))
 
   private var loadedContent: Option[BinaryContent] = None
   private var contentIsSet = false
 
-  override def getContent = {
+  override def getContent =
     if (contentIsSet) super.getContent
     else
-      loadedContent.getOrElse {
+      loadedContent.getOrElse
         val content = new BinaryContent(FileUtil.loadFileBytes(outputFile))
         loadedContent = Some(content)
         content
-      }
-  }
 
-  override def setContent(content: BinaryContent) {
+  override def setContent(content: BinaryContent)
     super.setContent(content)
     loadedContent = None
     contentIsSet = true
-  }
-}

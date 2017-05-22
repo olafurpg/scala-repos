@@ -8,11 +8,11 @@ import Trees._
 import Types._
 import Tags._
 
-object Hashers {
+object Hashers
 
-  def hashMethodDef(methodDef: MethodDef): MethodDef = {
+  def hashMethodDef(methodDef: MethodDef): MethodDef =
     if (methodDef.hash.isDefined) methodDef
-    else {
+    else
       val hasher = new TreeHasher()
       val MethodDef(static, name, args, resultType, body) = methodDef
 
@@ -28,54 +28,45 @@ object Hashers {
 
       MethodDef(static, name, args, resultType, body)(
           methodDef.optimizerHints, Some(hash))(methodDef.pos)
-    }
-  }
 
   /** Hash definitions from a ClassDef where applicable */
-  def hashDefs(defs: List[Tree]): List[Tree] = defs map {
+  def hashDefs(defs: List[Tree]): List[Tree] = defs map
     case methodDef: MethodDef => hashMethodDef(methodDef)
     case otherDef => otherDef
-  }
 
   /** Hash the definitions in a ClassDef (where applicable) */
-  def hashClassDef(classDef: ClassDef): ClassDef = {
+  def hashClassDef(classDef: ClassDef): ClassDef =
     classDef.copy(defs = hashDefs(classDef.defs))(classDef.optimizerHints)(
         classDef.pos)
-  }
 
-  def hashesEqual(x: TreeHash, y: TreeHash, considerPos: Boolean): Boolean = {
+  def hashesEqual(x: TreeHash, y: TreeHash, considerPos: Boolean): Boolean =
     Arrays.equals(x.treeHash, y.treeHash) &&
     (!considerPos || Arrays.equals(x.posHash, y.posHash))
-  }
 
-  def hashAsVersion(hash: TreeHash, considerPos: Boolean): String = {
+  def hashAsVersion(hash: TreeHash, considerPos: Boolean): String =
     // 2 chars per byte, 20 bytes per hash
     val size = 2 * (if (considerPos) 2 else 1) * 20
     val builder = new StringBuilder(size)
 
     def hexDigit(digit: Int): Char = Character.forDigit(digit, 16)
 
-    def append(hash: Array[Byte]): Unit = {
+    def append(hash: Array[Byte]): Unit =
       for (b <- hash) builder
         .append(hexDigit(b >> 4))
         .append(hexDigit(b & 0xF))
-    }
     append(hash.treeHash)
 
     if (considerPos) append(hash.posHash)
 
     builder.toString
-  }
 
-  private final class TreeHasher {
+  private final class TreeHasher
     private def newDigest = MessageDigest.getInstance("SHA-1")
-    private def newDigestStream(digest: MessageDigest) = {
-      val out = new OutputStream {
+    private def newDigestStream(digest: MessageDigest) =
+      val out = new OutputStream
         def write(b: Int): Unit = ()
-      }
       val digOut = new DigestOutputStream(out, digest)
       new DataOutputStream(digOut)
-    }
 
     private[this] val treeDigest = newDigest
     private[this] val treeStream = newDigestStream(treeDigest)
@@ -86,9 +77,9 @@ object Hashers {
     def finalizeHash(): TreeHash =
       new TreeHash(treeDigest.digest(), posDigest.digest())
 
-    def mixTree(tree: Tree): Unit = {
+    def mixTree(tree: Tree): Unit =
       mixPos(tree.pos)
-      tree match {
+      tree match
         case EmptyTree =>
           mixTag(TagEmptyTree)
 
@@ -172,11 +163,10 @@ object Hashers {
         case Match(selector, cases, default) =>
           mixTag(TagMatch)
           mixTree(selector)
-          cases foreach {
+          cases foreach
             case (patterns, body) =>
               mixTrees(patterns)
               mixTree(body)
-          }
           mixTree(default)
           mixType(tree.tpe)
 
@@ -369,11 +359,10 @@ object Hashers {
 
         case JSObjectConstr(fields) =>
           mixTag(TagJSObjectConstr)
-          fields foreach {
+          fields foreach
             case (pn, value) =>
               mixPropertyName(pn)
               mixTree(value)
-          }
 
         case JSLinkingInfo() =>
           mixTag(TagJSLinkingInfo)
@@ -434,8 +423,6 @@ object Hashers {
 
         case _ =>
           sys.error(s"Unable to hash tree of class ${tree.getClass}")
-      }
-    }
 
     def mixTrees(trees: List[Tree]): Unit =
       trees.foreach(mixTree)
@@ -443,7 +430,7 @@ object Hashers {
     def mixRefType(tpe: ReferenceType): Unit =
       mixType(tpe.asInstanceOf[Type])
 
-    def mixType(tpe: Type): Unit = tpe match {
+    def mixType(tpe: Type): Unit = tpe match
       case AnyType => mixTag(TagAnyType)
       case NothingType => mixTag(TagNothingType)
       case UndefType => mixTag(TagUndefType)
@@ -467,32 +454,27 @@ object Hashers {
 
       case RecordType(fields) =>
         mixTag(TagRecordType)
-        for (RecordType.Field(name, originalName, tpe, mutable) <- fields) {
+        for (RecordType.Field(name, originalName, tpe, mutable) <- fields)
           mixString(name)
           originalName.foreach(mixString)
           mixType(tpe)
           mixBoolean(mutable)
-        }
-    }
 
-    def mixIdent(ident: Ident): Unit = {
+    def mixIdent(ident: Ident): Unit =
       mixPos(ident.pos)
       mixString(ident.name)
       ident.originalName.foreach(mixString)
-    }
 
     def mixOptIdent(optIdent: Option[Ident]): Unit = optIdent.foreach(mixIdent)
 
-    def mixPropertyName(name: PropertyName): Unit = name match {
+    def mixPropertyName(name: PropertyName): Unit = name match
       case name: Ident => mixIdent(name)
       case name: StringLiteral => mixTree(name)
-    }
 
-    def mixPos(pos: Position): Unit = {
+    def mixPos(pos: Position): Unit =
       posStream.writeUTF(pos.source.toString)
       posStream.writeInt(pos.line)
       posStream.writeInt(pos.column)
-    }
 
     @inline
     final def mixTag(tag: Int): Unit = mixInt(tag)
@@ -514,5 +496,3 @@ object Hashers {
 
     @inline
     final def mixDouble(d: Double): Unit = treeStream.writeDouble(d)
-  }
-}

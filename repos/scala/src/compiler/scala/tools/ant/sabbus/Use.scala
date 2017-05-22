@@ -14,30 +14,26 @@ import java.io.File
 
 import org.apache.tools.ant.util.{GlobPatternMapper, SourceFileScanner}
 
-class Use extends ScalaMatchingTask {
+class Use extends ScalaMatchingTask
 
-  def setId(input: String) {
+  def setId(input: String)
     id = Some(input)
-  }
 
-  def setSrcdir(input: File) {
+  def setSrcdir(input: File)
     sourceDir = Some(input)
-  }
 
-  def setDestdir(input: File) {
+  def setDestdir(input: File)
     destinationDir = Some(input)
-  }
 
-  def setFailOnError(input: Boolean) {
+  def setFailOnError(input: Boolean)
     failOnError = input
-  }
 
   private var id: Option[String] = None
   private var sourceDir: Option[File] = None
   private var destinationDir: Option[File] = None
   private var failOnError: Boolean = true
 
-  override def execute() {
+  override def execute()
     if (id.isEmpty) sys.error("Mandatory attribute 'id' is not set.")
     if (sourceDir.isEmpty)
       sys.error("Mandatory attribute 'srcdir' is not set.")
@@ -54,7 +50,7 @@ class Use extends ScalaMatchingTask {
           mapper
       ) map (new File(sourceDir.get, _))
     if (includedFiles.length > 0)
-      try {
+      try
         log(
             "Compiling " + includedFiles.length + " file" +
             (if (includedFiles.length > 1)
@@ -66,13 +62,10 @@ class Use extends ScalaMatchingTask {
         else if (warnings > 0)
           log("Compilation succeeded with " + warnings + " warning" +
               (if (warnings > 1) "s" else "") + ".")
-      } catch {
+      catch
         case CompilationFailure(msg, ex) =>
           ex.printStackTrace
           val errorMsg =
             "Compilation failed because of an internal compiler error (" +
             msg + "); see the error output for details."
           if (failOnError) sys.error(errorMsg) else log(errorMsg)
-      }
-  }
-}

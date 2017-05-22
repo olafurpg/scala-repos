@@ -32,8 +32,8 @@ import com.typesafe.tools.mima.core.ProblemFilters._
  *
  * For a new Spark version, please update MimaBuild.scala to reflect the previous version.
  */
-object MimaExcludes {
-  def excludes(version: String) = version match {
+object MimaExcludes
+  def excludes(version: String) = version match
     case v if v.startsWith("2.0") =>
       Seq(
         excludePackage("org.apache.spark.rpc"),
@@ -563,11 +563,10 @@ object MimaExcludes {
       ) ++ Seq(
         // [SPARK-13928] Move org.apache.spark.Logging into org.apache.spark.internal.Logging
         ProblemFilters.exclude[MissingClassProblem]("org.apache.spark.Logging"),
-        (problem: Problem) => problem match {
+        (problem: Problem) => problem match
           case MissingTypesProblem(_, missing)
             if missing.map(_.fullName).sameElements(Seq("org.apache.spark.Logging")) => false
           case _ => true
-        }
       )
     case v if v.startsWith("1.6") =>
       Seq(
@@ -1352,5 +1351,3 @@ object MimaExcludes {
       MimaBuild.excludeSparkClass("mllib.regression.LassoWithSGD") ++
       MimaBuild.excludeSparkClass("mllib.regression.LinearRegressionWithSGD")
     case _ => Seq()
-  }
-}

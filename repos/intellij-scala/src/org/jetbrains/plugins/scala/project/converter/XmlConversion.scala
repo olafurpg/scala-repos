@@ -11,22 +11,18 @@ import scala.xml.{Elem, PrettyPrinter}
 /**
   * @author Pavel Fatin
   */
-trait XmlConversion {
-  protected def formatXml(element: Element): String = {
+trait XmlConversion
+  protected def formatXml(element: Element): String =
     val outputter = new XMLOutputter(Format.getPrettyFormat)
     outputter.outputString(element)
-  }
 
-  protected def formatXml(element: Elem): String = {
+  protected def formatXml(element: Elem): String =
     val printer = new PrettyPrinter(180, 2)
     printer.format(element)
-  }
 
-  protected def parseXml(xml: String): Element = {
+  protected def parseXml(xml: String): Element =
     val builder = new SAXBuilder()
     val document = builder.build(new StringReader(xml))
     document.detachRootElement()
-  }
 
   protected def asJava(element: Elem): Element = parseXml(formatXml(element))
-}

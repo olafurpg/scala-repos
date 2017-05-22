@@ -10,28 +10,21 @@ import org.scalatest.WordSpec
 import akka.actor.{Actor, Props}
 
 class ActorEndpointPathTest
-    extends WordSpec with SharedCamelSystem with Matchers with MockitoSugar {
+    extends WordSpec with SharedCamelSystem with Matchers with MockitoSugar
 
   def find(path: String) =
     ActorEndpointPath.fromCamelPath(path).findActorIn(system)
 
-  "findActorIn returns Some(actor ref) if actor exists" in {
+  "findActorIn returns Some(actor ref) if actor exists" in
     val path = system
       .actorOf(Props(new Actor { def receive = { case _ ⇒ } }), "knownactor")
       .path
     find(path.toString) should be('defined)
-  }
 
-  "findActorIn returns None" when {
-    "non existing valid path" in {
+  "findActorIn returns None" when
+    "non existing valid path" in
       find("akka://system/user/unknownactor") should ===(None)
-    }
-  }
-  "fromCamelPath throws IllegalArgumentException" when {
-    "invalid path" in {
-      intercept[IllegalArgumentException] {
+  "fromCamelPath throws IllegalArgumentException" when
+    "invalid path" in
+      intercept[IllegalArgumentException]
         find("invalidpath")
-      }
-    }
-  }
-}

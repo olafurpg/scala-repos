@@ -15,127 +15,99 @@ import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
 /**
   * See com.intellij.codeInsight.daemon.impl.RefCountHolder
   */
-class ScalaRefCountHolder private () {
+class ScalaRefCountHolder private ()
   private final val myState: AtomicReference[Integer] =
     new AtomicReference[Integer](State.VIRGIN)
-  private object State {
+  private object State
     val VIRGIN = 0; val WRITE = 1; val READY = 2; val READ = 3;
-  }
   private val myImportUsed = ContainerUtil.newConcurrentSet[ImportUsed]()
   private val myValueUsed = ContainerUtil.newConcurrentSet[ValueUsed]()
 
-  private def clear() {
+  private def clear()
     assertIsAnalyzing()
     myImportUsed.clear()
     myValueUsed.clear()
-  }
 
-  def registerImportUsed(used: ImportUsed) {
+  def registerImportUsed(used: ImportUsed)
     myImportUsed.add(used)
-  }
 
-  def registerValueUsed(used: ValueUsed) {
+  def registerValueUsed(used: ValueUsed)
     myValueUsed.add(used)
-  }
 
-  def isRedundant(used: ImportUsed): Boolean = {
+  def isRedundant(used: ImportUsed): Boolean =
     assertIsRetrieving()
     !myImportUsed.contains(used)
-  }
 
-  def isValueWriteUsed(e: PsiNamedElement): Boolean = {
+  def isValueWriteUsed(e: PsiNamedElement): Boolean =
     assertIsRetrieving()
     myValueUsed.contains(WriteValueUsed(e))
-  }
 
-  def isValueReadUsed(e: PsiNamedElement): Boolean = {
+  def isValueReadUsed(e: PsiNamedElement): Boolean =
     assertIsRetrieving()
     myValueUsed.contains(ReadValueUsed(e))
-  }
 
-  def isValueUsed(e: PsiNamedElement): Boolean = {
+  def isValueUsed(e: PsiNamedElement): Boolean =
     assertIsRetrieving()
     isValueReadUsed(e) || isValueWriteUsed(e)
-  }
 
-  private def removeInvalidRefs() {
+  private def removeInvalidRefs()
     assertIsAnalyzing()
-    myImportUsed synchronized {
+    myImportUsed synchronized
       val iterator: java.util.Iterator[ImportUsed] = myImportUsed.iterator
-      while (iterator.hasNext) {
+      while (iterator.hasNext)
         val ref: ImportUsed = iterator.next
-        if (!ref.e.isValid) {
+        if (!ref.e.isValid)
           iterator.remove()
-        }
-      }
-    }
-    myValueUsed synchronized {
+    myValueUsed synchronized
       val valuesIterator: java.util.Iterator[ValueUsed] =
         myValueUsed.iterator()
-      while (valuesIterator.hasNext) {
+      while (valuesIterator.hasNext)
         val ref: ValueUsed = valuesIterator.next
-        if (!ref.e.isValid) {
+        if (!ref.e.isValid)
           valuesIterator.remove()
-        }
-      }
-    }
-  }
 
   def analyze(
-      analyze: Runnable, dirtyScope: TextRange, file: PsiFile): Boolean = {
+      analyze: Runnable, dirtyScope: TextRange, file: PsiFile): Boolean =
     myState.compareAndSet(State.READY, State.VIRGIN)
     if (!myState.compareAndSet(State.VIRGIN, State.WRITE)) return false
-    try {
-      if (dirtyScope != null) {
-        if (dirtyScope.equals(file.getTextRange)) {
+    try
+      if (dirtyScope != null)
+        if (dirtyScope.equals(file.getTextRange))
           clear()
-        } else {
+        else
           removeInvalidRefs()
-        }
-      }
       analyze.run()
-    } finally {
+    finally
       val set: Boolean = myState.compareAndSet(State.WRITE, State.READY)
       assert(set, myState.get)
-    }
     true
-  }
 
-  def retrieveUnusedReferencesInfo(analyze: Runnable): Boolean = {
-    if (!myState.compareAndSet(State.READY, State.READ)) {
+  def retrieveUnusedReferencesInfo(analyze: Runnable): Boolean =
+    if (!myState.compareAndSet(State.READY, State.READ))
       return false
-    }
-    try {
+    try
       analyze.run()
-    } finally {
+    finally
       val set: Boolean = myState.compareAndSet(State.READ, State.READY)
       assert(set, myState.get)
-    }
     true
-  }
 
-  private def assertIsAnalyzing() {
+  private def assertIsAnalyzing()
     assert(myState.get == State.WRITE, myState.get)
-  }
 
-  private def assertIsRetrieving() {
+  private def assertIsRetrieving()
     assert(myState.get == State.READ, myState.get)
-  }
-}
 
-object ScalaRefCountHolder {
+object ScalaRefCountHolder
   private val SCALA_REF_COUNT_HOLDER_IN_FILE_KEY: Key[ScalaRefCountHolder] =
     Key.create("scala.ref.count.holder.in.file.key")
 
-  def getInstance(file: PsiFile): ScalaRefCountHolder = {
+  def getInstance(file: PsiFile): ScalaRefCountHolder =
     val myFile =
       /*Option(file.getViewProvider getPsi ScalaFileType.SCALA_LANGUAGE) getOrElse file
     val file2 = */ Option(
           ScalaLanguageDerivative getScalaFileOnDerivative file) getOrElse file
 
-    Option(myFile getUserData SCALA_REF_COUNT_HOLDER_IN_FILE_KEY) getOrElse {
+    Option(myFile getUserData SCALA_REF_COUNT_HOLDER_IN_FILE_KEY) getOrElse
       myFile.asInstanceOf[UserDataHolderEx] putUserDataIfAbsent
       (SCALA_REF_COUNT_HOLDER_IN_FILE_KEY, new ScalaRefCountHolder)
-    }
-  }
-}

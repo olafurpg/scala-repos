@@ -13,10 +13,10 @@ import org.ensime.fixture.SharedTestKitFixture
 import org.ensime.util.EnsimeSpec
 import spray.json._
 
-class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
+class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture
   import WebSocketBoilerplate._
 
-  "WebSocketBoilerplate" should "produce Flow[In, Out]" in withTestKit { tk =>
+  "WebSocketBoilerplate" should "produce Flow[In, Out]" in withTestKit  tk =>
     import tk.system
     import tk.system.dispatcher
     implicit val mat = ActorMaterializer()
@@ -24,10 +24,9 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
     val service = TestProbe()
 
     var target: ActorRef = null
-    val flow = actorRefAsFlow[String, Long] { t =>
+    val flow = actorRefAsFlow[String, Long]  t =>
       target = t
       service.ref
-    }
 
     val client = TestProbe()
 
@@ -42,7 +41,6 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
   // actor but that's perhaps testing the framework.
 
   // TODO: use Streams TestKit as much as possible here
-  }
 
   case class Foo(a: String)
   case class Bar(b: Long)
@@ -52,7 +50,7 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
   val foo = Foo("hello")
   val bar = Bar(13L)
 
-  it should "produce a marshalled Flow that accepts valid messages" in withTestKit {
+  it should "produce a marshalled Flow that accepts valid messages" in withTestKit
     tk =>
       import tk.system
       import tk.system.dispatcher
@@ -61,10 +59,9 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
       // This is quite horrible and really highlights why a BidiFlow
       // model would be better. WebSockets are *not* request / response
       // (like this).
-      val user = Flow[Foo].map { f =>
+      val user = Flow[Foo].map  f =>
         f shouldBe foo
         bar
-      }
       val endpoints = jsonMarshalledMessageFlow(user)
 
       val input = TextMessage(foo.toJson.compactPrint)
@@ -73,18 +70,16 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
       Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
       client.expectMsg(TextMessage(bar.toJson.prettyPrint))
-  }
 
-  it should "produce a marshalled Flow that errors on bad message" in withTestKit {
+  it should "produce a marshalled Flow that errors on bad message" in withTestKit
     tk =>
       import tk.system
       import tk.system.dispatcher
       implicit val mat = ActorMaterializer()
 
-      val user = Flow[Foo].map { f =>
+      val user = Flow[Foo].map  f =>
         f shouldBe foo
         bar
-      }
       val endpoints = jsonMarshalledMessageFlow(user)
 
       val input = BinaryMessage(ByteString(0, 1, 2))
@@ -92,20 +87,17 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
 
       Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
-      client.expectMsgPF() {
+      client.expectMsgPF()
         case Status.Failure(_) =>
-      }
-  }
 
-  it should "produce a marshalled Flow that errors on bad inbound JSON" in withTestKit {
+  it should "produce a marshalled Flow that errors on bad inbound JSON" in withTestKit
     tk =>
       import tk.system
       import tk.system.dispatcher
       implicit val mat = ActorMaterializer()
 
-      val user = Flow[Foo].map { _ =>
+      val user = Flow[Foo].map  _ =>
         bar
-      }
       val endpoints = jsonMarshalledMessageFlow(user)
 
       val input = TextMessage.Strict("""{}""")
@@ -113,8 +105,5 @@ class WebSocketBoilerplateSpec extends EnsimeSpec with SharedTestKitFixture {
 
       Source.single(input).via(endpoints).runWith(Sink.head).pipeTo(client.ref)
 
-      client.expectMsgPF() {
+      client.expectMsgPF()
         case Status.Failure(e: DeserializationException) =>
-      }
-  }
-}

@@ -39,11 +39,10 @@ import scala.collection.mutable
   */
 class ScImportStmtImpl private (
     stub: StubElement[ScImportStmt], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportStmt {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScImportStmt
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScImportStmtStub) = {
+  def this(stub: ScImportStmtStub) =
     this(stub, ScalaElementTypes.IMPORT_STMT, null)
-  }
 
   override def toString: String = "ScImportStatement"
 
@@ -56,46 +55,41 @@ class ScImportStmtImpl private (
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     val importsIterator =
       importExprs.takeWhile(_ != lastParent).reverseIterator
-    while (importsIterator.hasNext) {
+    while (importsIterator.hasNext)
       val importExpr = importsIterator.next()
       ProgressManager.checkCanceled()
-      def workWithImportExpr: Boolean = {
-        val ref = importExpr.reference match {
+      def workWithImportExpr: Boolean =
+        val ref = importExpr.reference match
           case Some(element) => element
           case _ => return true
-        }
         val nameHint = processor.getHint(NameHint.KEY)
         val name = if (nameHint == null) "" else nameHint.getName(state)
-        if (name != "" && !importExpr.singleWildcard) {
+        if (name != "" && !importExpr.singleWildcard)
           val decodedName = ScalaPsiUtil.convertMemberName(name)
-          importExpr.selectorSet match {
+          importExpr.selectorSet match
             case Some(set) =>
               set.selectors.exists(selector =>
                     ScalaPsiUtil.convertMemberName(selector.reference.refName) == decodedName)
             case None =>
               if (ScalaPsiUtil.convertMemberName(ref.refName) != decodedName)
                 return true
-          }
-        }
-        val checkWildcardImports = processor match {
+        val checkWildcardImports = processor match
           case r: ResolveProcessor =>
             if (!r.checkImports()) return false
             r.checkWildcardImports()
           case _ => true
-        }
         val exprQual: ScStableCodeReferenceElement =
-          importExpr.selectorSet match {
+          importExpr.selectorSet match
             case Some(_) => ref
             case None if importExpr.singleWildcard => ref
             case None => ref.qualifier.getOrElse(return true)
-          }
 
-        val resolve: Array[ResolveResult] = processor match {
+        val resolve: Array[ResolveResult] = processor match
           case p: ResolveProcessor =>
-            ref match {
+            ref match
               // do not process methodrefs when importing a type from a type
               case ref: ResolvableStableCodeReferenceElement
                   if p.kinds.contains(ResolveTargets.CLASS) && ref
@@ -108,13 +102,11 @@ class ScImportStmtImpl private (
                   if p.kinds.contains(ResolveTargets.METHOD) =>
                 ref.resolveMethodsOnly(false)
               case _ => ref.multiResolve(false)
-            }
           case _ => ref.multiResolve(false)
-        }
 
         //todo: making lazy next two definitions leads to compiler failure
         val poOpt = () =>
-          exprQual.bind() match {
+          exprQual.bind() match
             case Some(ScalaResolveResult(p: PsiPackage, _)) =>
               Option(
                   ScalaShortNamesCacheManager
@@ -122,50 +114,41 @@ class ScImportStmtImpl private (
                     .getPackageObjectByName(
                         p.getQualifiedName, getResolveScope))
             case _ => None
-        }
 
         val exprQualRefType = () =>
           ScSimpleTypeElementImpl.calculateReferenceType(
               exprQual, shapesOnly = false)
 
-        def checkResolve(resolve: ResolveResult): Boolean = {
-          resolve match {
+        def checkResolve(resolve: ResolveResult): Boolean =
+          resolve match
             case ScalaResolveResult(elem, _) =>
               PsiTreeUtil.getContextOfType(
-                  elem, true, classOf[ScTypeDefinition]) match {
+                  elem, true, classOf[ScTypeDefinition]) match
                 case obj: ScObject if obj.isPackageObject => true
                 case _ => false
-              }
             case _ => false
-          }
-        }
-        def calculateRefType(checkPo: => Boolean) = {
-          exprQual.bind() match {
+        def calculateRefType(checkPo: => Boolean) =
+          exprQual.bind() match
             case Some(ScalaResolveResult(p: PsiPackage, _)) =>
-              poOpt() match {
+              poOpt() match
                 case Some(po) =>
-                  if (checkPo) {
+                  if (checkPo)
                     po.getType(TypingContext.empty)
-                  } else Failure("no failure", Some(this))
+                  else Failure("no failure", Some(this))
                 case _ => Failure("no failure", Some(this))
-              }
             case _ => exprQualRefType()
-          }
-        }
 
         val resolveIterator = resolve.iterator
-        while (resolveIterator.hasNext) {
+        while (resolveIterator.hasNext)
           val next = resolveIterator.next()
-          val (elem, importsUsed, s) = next match {
+          val (elem, importsUsed, s) = next match
             case s: ScalaResolveResult =>
               @tailrec
               def getFirstReference(ref: ScStableCodeReferenceElement)
-                : ScStableCodeReferenceElement = {
-                ref.qualifier match {
+                : ScStableCodeReferenceElement =
+                ref.qualifier match
                   case Some(qual) => getFirstReference(qual)
                   case _ => ref
-                }
-              }
               (s.getElement,
                getFirstReference(exprQual)
                  .bind()
@@ -173,8 +156,7 @@ class ScImportStmtImpl private (
                s.substitutor)
             case r: ResolveResult =>
               (r.getElement, Set[ImportUsed](), ScSubstitutor.empty)
-          }
-          (elem, processor) match {
+          (elem, processor) match
             case (pack: PsiPackage, complProc: CompletionProcessor)
                 if complProc.includePrefixImports =>
               val settings: ScalaCodeStyleSettings =
@@ -187,45 +169,39 @@ class ScImportStmtImpl private (
                     s.substring(ScalaCodeStyleSettings.EXCLUDE_PREFIX.length,
                                 s.lastIndexOf(".")) == pack.getQualifiedName)
               val names = new mutable.HashSet[String]()
-              for (prefixImport <- prefixImports) {
+              for (prefixImport <- prefixImports)
                 names +=
                   prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
-              }
               val excludeNames = new mutable.HashSet[String]()
-              for (prefixImport <- excludeImports) {
+              for (prefixImport <- excludeImports)
                 excludeNames +=
                   prefixImport.substring(prefixImport.lastIndexOf('.') + 1)
-              }
               val wildcard = names.contains("_")
-              def isOK(name: String): Boolean = {
+              def isOK(name: String): Boolean =
                 if (wildcard) !excludeNames.contains(name)
                 else names.contains(name)
-              }
               val newImportsUsed =
                 Set(importsUsed.toSeq: _*) + ImportExprUsed(importExpr)
               val newState = state
                 .put(ScalaCompletionUtil.PREFIX_COMPLETION_KEY, true)
                 .put(ImportUsed.key, newImportsUsed)
               elem.processDeclarations(
-                  new BaseProcessor(StdKinds.stableImportSelector) {
+                  new BaseProcessor(StdKinds.stableImportSelector)
                 def execute(
-                    element: PsiElement, state: ResolveState): Boolean = {
-                  element match {
+                    element: PsiElement, state: ResolveState): Boolean =
+                  element match
                     case elem: PsiNamedElement if isOK(elem.name) =>
                       processor.execute(element, state)
                     case _ => true
-                  }
-                }
-              }, newState, this, place)
+              , newState, this, place)
             case _ =>
-          }
           val subst = state
             .get(ScSubstitutor.key)
             .toOption
             .getOrElse(ScSubstitutor.empty)
             .followed(s)
           ProgressManager.checkCanceled()
-          importExpr.selectorSet match {
+          importExpr.selectorSet match
             case None =>
               // Update the set of used imports
               val newImportsUsed =
@@ -235,12 +211,11 @@ class ScImportStmtImpl private (
                 .put(ScSubstitutor.key, subst)
 
               val refType = calculateRefType(checkResolve(next))
-              refType.foreach { tp =>
+              refType.foreach  tp =>
                 newState = newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
-              }
-              if (importExpr.singleWildcard) {
+              if (importExpr.singleWildcard)
                 if (!checkWildcardImports) return true
-                (elem, processor) match {
+                (elem, processor) match
                   case (cl: PsiClass, processor: BaseProcessor)
                       if !cl.isInstanceOf[ScTemplateDefinition] =>
                     if (!processor.processType(
@@ -252,18 +227,17 @@ class ScImportStmtImpl private (
                   case _ =>
                     if (!elem.processDeclarations(
                             processor, newState, this, place)) return false
-                }
-              } else if (!processor.execute(elem, newState)) return false
+              else if (!processor.execute(elem, newState)) return false
             case Some(set) =>
               val shadowed: mutable.HashSet[(ScImportSelector, PsiElement)] =
                 mutable.HashSet.empty
-              set.selectors foreach { selector =>
+              set.selectors foreach  selector =>
                 ProgressManager.checkCanceled()
                 val selectorResolve: Array[ResolveResult] =
                   selector.reference.multiResolve(false)
-                selectorResolve foreach { result =>
+                selectorResolve foreach  result =>
                   if (selector.isAliasedImport &&
-                      selector.importedName != selector.reference.refName) {
+                      selector.importedName != selector.reference.refName)
                     //Resolve the name imported by selector
                     //Collect shadowed elements
                     shadowed += ((selector, result.getElement))
@@ -275,24 +249,19 @@ class ScImportStmtImpl private (
                            Set(importsUsed.toSeq: _*) +
                            ImportSelectorUsed(selector))
                       .put(ScSubstitutor.key, subst)
-                    calculateRefType(checkResolve(result)).foreach { tp =>
+                    calculateRefType(checkResolve(result)).foreach  tp =>
                       newState = newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
-                    }
-                    if (!processor.execute(result.getElement, newState)) {
+                    if (!processor.execute(result.getElement, newState))
                       return false
-                    }
-                  }
-                }
-              }
 
               // There is total import from stable id
               // import a.b.c.{d=>e, f=>_, _}
-              if (set.hasWildcard) {
+              if (set.hasWildcard)
                 if (!checkWildcardImports) return true
-                processor match {
+                processor match
                   case bp: BaseProcessor =>
                     ProgressManager.checkCanceled()
-                    val p1 = new BaseProcessor(bp.kinds) {
+                    val p1 = new BaseProcessor(bp.kinds)
                       override def getHint[T](hintKey: Key[T]): T =
                         processor.getHint(hintKey)
 
@@ -300,39 +269,32 @@ class ScImportStmtImpl private (
                         bp.isImplicitProcessor
 
                       override def handleEvent(
-                          event: PsiScopeProcessor.Event, associated: Object) {
+                          event: PsiScopeProcessor.Event, associated: Object)
                         processor.handleEvent(event, associated)
-                      }
 
                       override def getClassKind: Boolean = bp.getClassKind
 
-                      override def setClassKind(b: Boolean) {
+                      override def setClassKind(b: Boolean)
                         bp.setClassKind(b)
-                      }
 
                       override def execute(element: PsiElement,
-                                           state: ResolveState): Boolean = {
+                                           state: ResolveState): Boolean =
                         if (shadowed.exists(p =>
                                   ScEquivalenceUtil.smartEquivalence(
                                       element, p._2))) return true
 
                         var newState = state.put(ScSubstitutor.key, subst)
 
-                        def isElementInPo: Boolean = {
+                        def isElementInPo: Boolean =
                           PsiTreeUtil.getContextOfType(
-                              element, true, classOf[ScTypeDefinition]) match {
+                              element, true, classOf[ScTypeDefinition]) match
                             case obj: ScObject if obj.isPackageObject => true
                             case _ => false
-                          }
-                        }
-                        calculateRefType(isElementInPo).foreach { tp =>
+                        calculateRefType(isElementInPo).foreach  tp =>
                           newState = newState.put(
                               BaseProcessor.FROM_TYPE_KEY, tp)
-                        }
 
                         processor.execute(element, newState)
-                      }
-                    }
 
                     val newImportsUsed: Set[ImportUsed] =
                       Set(importsUsed.toSeq: _*) + ImportWildcardSelectorUsed(
@@ -341,13 +303,12 @@ class ScImportStmtImpl private (
                       .put(ImportUsed.key, newImportsUsed)
                       .put(ScSubstitutor.key, subst)
 
-                      (elem, processor) match {
+                      (elem, processor) match
                       case (cl: PsiClass, processor: BaseProcessor)
                           if !cl.isInstanceOf[ScTemplateDefinition] =>
-                        calculateRefType(checkResolve(next)).foreach { tp =>
+                        calculateRefType(checkResolve(next)).foreach  tp =>
                           newState = newState.put(
                               BaseProcessor.FROM_TYPE_KEY, tp)
-                        }
                         if (!processor.processType(
                                 new ScDesignatorType(cl, true),
                                 place,
@@ -358,44 +319,29 @@ class ScImportStmtImpl private (
                                                       newState,
                                                       this,
                                                       place)) return false
-                    }
                   case _ => true
-                }
-              }
 
               //wildcard import first, to show that this imports are unused if they really are
-              set.selectors foreach { selector =>
+              set.selectors foreach  selector =>
                 ProgressManager.checkCanceled()
                 val selectorResolve: Array[ResolveResult] =
                   selector.reference.multiResolve(false)
-                selectorResolve foreach { result =>
+                selectorResolve foreach  result =>
                   var newState: ResolveState = state
                   if (!selector.isAliasedImport ||
-                      selector.importedName == selector.reference.refName) {
-                    val rSubst = result match {
+                      selector.importedName == selector.reference.refName)
+                    val rSubst = result match
                       case result: ScalaResolveResult => result.substitutor
                       case _ => ScSubstitutor.empty
-                    }
                     newState = newState
                       .put(ImportUsed.key,
                            Set(importsUsed.toSeq: _*) +
                            ImportSelectorUsed(selector))
                       .put(ScSubstitutor.key, subst.followed(rSubst))
-                    calculateRefType(checkResolve(result)).foreach { tp =>
+                    calculateRefType(checkResolve(result)).foreach  tp =>
                       newState = newState.put(BaseProcessor.FROM_TYPE_KEY, tp)
-                    }
-                    if (!processor.execute(result.getElement, newState)) {
+                    if (!processor.execute(result.getElement, newState))
                       return false
-                    }
-                  }
-                }
-              }
-          }
-        }
         true
-      }
       if (!workWithImportExpr) return false
-    }
     true
-  }
-}

@@ -32,7 +32,7 @@ import org.apache.spark.mllib.util.MLUtils
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object SparseNaiveBayes {
+object SparseNaiveBayes
 
   case class Params(input: String = null,
                     minPartitions: Int = 0,
@@ -40,10 +40,10 @@ object SparseNaiveBayes {
                     lambda: Double = 1.0)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("SparseNaiveBayes") {
+    val parser = new OptionParser[Params]("SparseNaiveBayes")
       head("SparseNaiveBayes: an example naive Bayes app for LIBSVM data.")
       opt[Int]("numPartitions")
         .text("min number of partitions")
@@ -58,19 +58,15 @@ object SparseNaiveBayes {
         .text("input paths to labeled examples in LIBSVM format")
         .required()
         .action((x, c) => c.copy(input = x))
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"SparseNaiveBayes with $params")
     val sc = new SparkContext(conf)
 
@@ -104,6 +100,4 @@ object SparseNaiveBayes {
     println(s"Test accuracy = $accuracy.")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

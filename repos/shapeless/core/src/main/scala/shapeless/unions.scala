@@ -21,7 +21,7 @@ import scala.language.experimental.macros
 
 import scala.reflect.macros.whitebox
 
-object union {
+object union
   import syntax.UnionOps
 
   implicit def unionOps[C <: Coproduct](u: C): UnionOps[C] = new UnionOps(u)
@@ -50,16 +50,14 @@ object union {
     * y.get('y) // == Some("foo")
     * }}}
     */
-  object Union extends Dynamic {
+  object Union extends Dynamic
     def applyDynamicNamed[U <: Coproduct](method: String)(elems: Any*): U = macro UnionMacros
       .mkUnionNamedImpl[U]
 
     def selectDynamic(tpeSelector: String): Any = macro LabelledMacros.unionTypeImpl
-  }
-}
 
 @macrocompat.bundle
-class UnionMacros(val c: whitebox.Context) {
+class UnionMacros(val c: whitebox.Context)
   import c.universe._
   import internal.constantType
   import labelled.FieldType
@@ -69,7 +67,7 @@ class UnionMacros(val c: whitebox.Context) {
   val atatTpe = typeOf[tag.@@[_, _]].typeConstructor
 
   def mkUnionNamedImpl[U <: Coproduct : WeakTypeTag](method: Tree)(
-      elems: Tree*): Tree = {
+      elems: Tree*): Tree =
     def mkSingletonSymbolType(c: Constant): Type =
       appliedType(atatTpe, List(SymTpe, constantType(c)))
 
@@ -79,26 +77,22 @@ class UnionMacros(val c: whitebox.Context) {
     def mkElem(keyTpe: Type, value: Tree): Tree =
       q"$value.asInstanceOf[${mkFieldTpe(keyTpe, value.tpe)}]"
 
-    def promoteElem(elem: Tree): Tree = elem match {
+    def promoteElem(elem: Tree): Tree = elem match
       case q""" $prefix(${ Literal(k: Constant) }, $v) """ =>
         mkElem(mkSingletonSymbolType(k), v)
       case _ =>
         c.abort(c.enclosingPosition,
                 s"$elem has the wrong shape for a record field")
-    }
 
     val q"${ methodString: String }" = method
     if (methodString != "apply")
       c.abort(c.enclosingPosition,
               s"this method must be called as 'apply' not '$methodString'")
 
-    val elem = elems match {
+    val elem = elems match
       case Seq(e) => e
       case _ =>
         c.abort(c.enclosingPosition,
                 s"only one branch of a union may be inhabited")
-    }
 
     q""" _root_.shapeless.Coproduct[${weakTypeOf[U]}](${promoteElem(elem)}) """
-  }
-}

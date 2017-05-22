@@ -9,15 +9,14 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DeadlineSpanMapTest extends FunSuite {
+class DeadlineSpanMapTest extends FunSuite
 
-  test("DeadlineSpanMap should expire and log spans") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("DeadlineSpanMap should expire and log spans")
+    Time.withCurrentTimeFrozen  tc =>
       var spansLogged: Boolean = false
-      val logger: Seq[Span] => Future[Unit] = { _ =>
+      val logger: Seq[Span] => Future[Unit] =  _ =>
         spansLogged = true
         Future.Done
-      }
 
       val timer = new MockTimer
       val map =
@@ -32,6 +31,3 @@ class DeadlineSpanMapTest extends FunSuite {
 
       // span must have been logged
       assert(spansLogged)
-    }
-  }
-}

@@ -1,7 +1,6 @@
 package injar
 
-object Test {
+object Test
   def other = Class.forName("injar.OtherTest")
-}
 
 class OtherTest

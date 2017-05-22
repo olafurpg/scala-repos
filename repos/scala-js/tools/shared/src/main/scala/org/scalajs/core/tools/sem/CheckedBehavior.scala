@@ -8,16 +8,13 @@
 
 package org.scalajs.core.tools.sem
 
-sealed abstract class CheckedBehavior {
+sealed abstract class CheckedBehavior
   import CheckedBehavior._
-  def optimized: CheckedBehavior = this match {
+  def optimized: CheckedBehavior = this match
     case Fatal => Unchecked
     case _ => this
-  }
-}
 
-object CheckedBehavior {
+object CheckedBehavior
   case object Compliant extends CheckedBehavior
   case object Fatal extends CheckedBehavior
   case object Unchecked extends CheckedBehavior
-}

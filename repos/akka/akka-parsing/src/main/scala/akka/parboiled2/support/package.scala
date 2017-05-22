@@ -16,7 +16,6 @@
 
 package akka.parboiled2
 
-package object support {
+package object support
   private[parboiled2] def `n/a` =
     throw new IllegalStateException("Untranslated compile-time only call")
-}

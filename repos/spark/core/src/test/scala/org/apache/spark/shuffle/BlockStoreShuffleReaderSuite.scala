@@ -37,7 +37,7 @@ import org.apache.spark.storage.{BlockManager, BlockManagerId, ShuffleBlockId}
   * is final (final classes cannot be spied on).
   */
 class RecordingManagedBuffer(underlyingBuffer: NioManagedBuffer)
-    extends ManagedBuffer {
+    extends ManagedBuffer
   var callsToRetain = 0
   var callsToRelease = 0
 
@@ -47,24 +47,21 @@ class RecordingManagedBuffer(underlyingBuffer: NioManagedBuffer)
     underlyingBuffer.createInputStream()
   override def convertToNetty(): AnyRef = underlyingBuffer.convertToNetty()
 
-  override def retain(): ManagedBuffer = {
+  override def retain(): ManagedBuffer =
     callsToRetain += 1
     underlyingBuffer.retain()
-  }
-  override def release(): ManagedBuffer = {
+  override def release(): ManagedBuffer =
     callsToRelease += 1
     underlyingBuffer.release()
-  }
-}
 
 class BlockStoreShuffleReaderSuite
-    extends SparkFunSuite with LocalSparkContext {
+    extends SparkFunSuite with LocalSparkContext
 
   /**
     * This test makes sure that, when data is read from a HashShuffleReader, the underlying
     * ManagedBuffers that contain the data are eventually released.
     */
-  test("read() releases resources on completion") {
+  test("read() releases resources on completion")
     val testConf = new SparkConf(false)
     // Create a SparkContext as a convenient way of setting SparkEnv (needed because some of the
     // shuffle code calls SparkEnv.get()).
@@ -82,10 +79,9 @@ class BlockStoreShuffleReaderSuite
 
     // Create a return function to use for the mocked wrapForCompression method that just returns
     // the original input stream.
-    val dummyCompressionFunction = new Answer[InputStream] {
+    val dummyCompressionFunction = new Answer[InputStream]
       override def answer(invocation: InvocationOnMock): InputStream =
         invocation.getArguments()(1).asInstanceOf[InputStream]
-    }
 
     // Create a buffer with some randomly generated key-value pairs to use as the shuffle data
     // from each mappers (all mappers return the same shuffle data).
@@ -93,15 +89,14 @@ class BlockStoreShuffleReaderSuite
     val serializationStream = serializer
       .newInstance()
       .serializeStream(byteOutputStream)
-      (0 until keyValuePairsPerMap).foreach { i =>
+      (0 until keyValuePairsPerMap).foreach  i =>
       serializationStream.writeKey(i)
       serializationStream.writeValue(2 * i)
-    }
 
     // Setup the mocked BlockManager to return RecordingManagedBuffers.
     val localBlockManagerId = BlockManagerId("test-client", "test-client", 1)
     when(blockManager.blockManagerId).thenReturn(localBlockManagerId)
-    val buffers = (0 until numMaps).map { mapId =>
+    val buffers = (0 until numMaps).map  mapId =>
       // Create a ManagedBuffer with the shuffle data.
       val nioBuffer =
         new NioManagedBuffer(ByteBuffer.wrap(byteOutputStream.toByteArray))
@@ -116,30 +111,26 @@ class BlockStoreShuffleReaderSuite
         .thenAnswer(dummyCompressionFunction)
 
       managedBuffer
-    }
 
     // Make a mocked MapOutputTracker for the shuffle reader to use to determine what
     // shuffle data to read.
     val mapOutputTracker = mock(classOf[MapOutputTracker])
     when(mapOutputTracker.getMapSizesByExecutorId(
-            shuffleId, reduceId, reduceId + 1)).thenReturn {
+            shuffleId, reduceId, reduceId + 1)).thenReturn
       // Test a scenario where all data is local, to avoid creating a bunch of additional mocks
       // for the code to read data over the network.
-      val shuffleBlockIdsAndSizes = (0 until numMaps).map { mapId =>
+      val shuffleBlockIdsAndSizes = (0 until numMaps).map  mapId =>
         val shuffleBlockId = ShuffleBlockId(shuffleId, mapId, reduceId)
         (shuffleBlockId, byteOutputStream.size().toLong)
-      }
       Seq((localBlockManagerId, shuffleBlockIdsAndSizes))
-    }
 
     // Create a mocked shuffle handle to pass into HashShuffleReader.
-    val shuffleHandle = {
+    val shuffleHandle =
       val dependency = mock(classOf[ShuffleDependency[Int, Int, Int]])
       when(dependency.serializer).thenReturn(serializer)
       when(dependency.aggregator).thenReturn(None)
       when(dependency.keyOrdering).thenReturn(None)
       new BaseShuffleHandle(shuffleId, numMaps, dependency)
-    }
 
     val shuffleReader = new BlockStoreShuffleReader(shuffleHandle,
                                                     reduceId,
@@ -152,9 +143,6 @@ class BlockStoreShuffleReaderSuite
 
     // Calling .length above will have exhausted the iterator; make sure that exhausting the
     // iterator caused retain and release to be called on each buffer.
-    buffers.foreach { buffer =>
+    buffers.foreach  buffer =>
       assert(buffer.callsToRetain === 1)
       assert(buffer.callsToRelease === 1)
-    }
-  }
-}

@@ -37,7 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * A basic WebSocketClient.  Basically wraps Netty's WebSocket support into something that's much easier to use and much
   * more Scala friendly.
   */
-trait WebSocketClient {
+trait WebSocketClient
 
   /**
     * Connect to the given URI.
@@ -51,17 +51,14 @@ trait WebSocketClient {
     * Shutdown the client and release all associated resources.
     */
   def shutdown()
-}
 
-object WebSocketClient {
+object WebSocketClient
 
-  trait ExtendedMessage {
+  trait ExtendedMessage
     def finalFragment: Boolean
-  }
-  object ExtendedMessage {
+  object ExtendedMessage
     implicit def messageToExtendedMessage(message: Message): ExtendedMessage =
       SimpleMessage(message, finalFragment = true)
-  }
   case class SimpleMessage(message: Message, finalFragment: Boolean)
       extends ExtendedMessage
   case class ContinuationMessage(data: ByteString, finalFragment: Boolean)
@@ -69,69 +66,62 @@ object WebSocketClient {
 
   def create(): WebSocketClient = new DefaultWebSocketClient
 
-  def apply[T](block: WebSocketClient => T) = {
+  def apply[T](block: WebSocketClient => T) =
     val client = WebSocketClient.create()
-    try {
+    try
       block(client)
-    } finally {
+    finally
       client.shutdown()
-    }
-  }
 
-  private implicit class ToFuture(chf: ChannelFuture) {
-    def toScala: Future[Channel] = {
+  private implicit class ToFuture(chf: ChannelFuture)
+    def toScala: Future[Channel] =
       val promise = Promise[Channel]()
-      chf.addListener(new ChannelFutureListener {
-        def operationComplete(future: ChannelFuture) = {
-          if (future.isSuccess) {
+      chf.addListener(new ChannelFutureListener
+        def operationComplete(future: ChannelFuture) =
+          if (future.isSuccess)
             promise.success(future.channel())
-          } else if (future.isCancelled) {
+          else if (future.isCancelled)
             promise.failure(new RuntimeException("Future cancelled"))
-          } else {
+          else
             promise.failure(future.cause())
-          }
-        }
-      })
+      )
       promise.future
-    }
-  }
 
-  private class DefaultWebSocketClient extends WebSocketClient {
+  private class DefaultWebSocketClient extends WebSocketClient
 
     val eventLoop = new NioEventLoopGroup()
     val client = new Bootstrap()
       .group(eventLoop)
       .channel(classOf[NioSocketChannel])
       .option(ChannelOption.AUTO_READ, java.lang.Boolean.FALSE)
-      .handler(new ChannelInitializer[SocketChannel] {
-        def initChannel(ch: SocketChannel) = {
+      .handler(new ChannelInitializer[SocketChannel]
+        def initChannel(ch: SocketChannel) =
           ch.pipeline()
             .addLast(new HttpClientCodec, new HttpObjectAggregator(8192))
-        }
-      })
+      )
 
     /**
       * Connect to the given URI
       */
     def connect(url: URI, version: WebSocketVersion)(
-        onConnected: (Flow[ExtendedMessage, ExtendedMessage, _]) => Unit) = {
+        onConnected: (Flow[ExtendedMessage, ExtendedMessage, _]) => Unit) =
 
       val normalized = url.normalize()
       val tgt =
-        if (normalized.getPath == null || normalized.getPath.trim().isEmpty) {
+        if (normalized.getPath == null || normalized.getPath.trim().isEmpty)
           new URI(normalized.getScheme,
                   normalized.getAuthority,
                   "/",
                   normalized.getQuery,
                   normalized.getFragment)
-        } else normalized
+        else normalized
 
       val disconnected = Promise[Unit]()
 
       client
         .connect(tgt.getHost, tgt.getPort)
         .toScala
-        .map { channel =>
+        .map  channel =>
           val handshaker = WebSocketClientHandshakerFactory.newHandshaker(
               tgt, version, null, false, new DefaultHttpHeaders())
           channel
@@ -141,24 +131,20 @@ object WebSocketClient {
                 new WebSocketSupervisor(disconnected, handshaker, onConnected))
           handshaker.handshake(channel)
           channel.read()
-        }
-        .onFailure {
+        .onFailure
           case t => disconnected.tryFailure(t)
-        }
 
       disconnected.future
-    }
 
     def shutdown() = eventLoop.shutdownGracefully()
-  }
 
   private class WebSocketSupervisor(
       disconnected: Promise[Unit],
       handshaker: WebSocketClientHandshaker,
       onConnected: Flow[ExtendedMessage, ExtendedMessage, _] => Unit)
-      extends ChannelInboundHandlerAdapter {
-    override def channelRead(ctx: ChannelHandlerContext, msg: Object) {
-      msg match {
+      extends ChannelInboundHandlerAdapter
+    override def channelRead(ctx: ChannelHandlerContext, msg: Object)
+      msg match
         case resp: HttpResponse if handshaker.isHandshakeComplete =>
           throw new WebSocketException(
               "Unexpected HttpResponse (status=" + resp.getStatus + ")")
@@ -183,29 +169,26 @@ object WebSocketClient {
           onConnected(webSocketProtocol(clientConnection))
 
         case _ => throw new WebSocketException("Unexpected message: " + msg)
-      }
-    }
 
     val serverInitiatedClose = new AtomicBoolean
 
     def webSocketProtocol(
         clientConnection: Flow[WebSocketFrame, WebSocketFrame, _])
-      : Flow[ExtendedMessage, ExtendedMessage, _] = {
+      : Flow[ExtendedMessage, ExtendedMessage, _] =
       val clientInitiatedClose = new AtomicBoolean
 
       val captureClientClose = Flow[WebSocketFrame].transform(() =>
-            new PushStage[WebSocketFrame, WebSocketFrame] {
+            new PushStage[WebSocketFrame, WebSocketFrame]
           def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
-            elem match {
+            elem match
               case close: CloseWebSocketFrame =>
                 clientInitiatedClose.set(true)
                 ctx.push(close)
               case other =>
                 ctx.push(other)
-            }
-      })
+      )
 
-      val messagesToFrames = Flow[ExtendedMessage].map {
+      val messagesToFrames = Flow[ExtendedMessage].map
         case SimpleMessage(TextMessage(data), finalFragment) =>
           new TextWebSocketFrame(finalFragment, 0, data)
         case SimpleMessage(BinaryMessage(data), finalFragment) =>
@@ -225,10 +208,9 @@ object WebSocketClient {
         case ContinuationMessage(data, finalFragment) =>
           new ContinuationWebSocketFrame(
               finalFragment, 0, Unpooled.wrappedBuffer(data.asByteBuffer))
-      }
 
-      val framesToMessages = Flow[WebSocketFrame].map { frame =>
-        val message = frame match {
+      val framesToMessages = Flow[WebSocketFrame].map  frame =>
+        val message = frame match
           case text: TextWebSocketFrame =>
             SimpleMessage(TextMessage(text.text()), text.isFinalFragment)
           case binary: BinaryWebSocketFrame =>
@@ -247,93 +229,77 @@ object WebSocketClient {
           case continuation: ContinuationWebSocketFrame =>
             ContinuationMessage(
                 toByteString(continuation), continuation.isFinalFragment)
-        }
         ReferenceCountUtil.release(frame)
         message
-      }
 
       messagesToFrames via captureClientClose via Flow.fromGraph(
-          GraphDSL.create[FlowShape[WebSocketFrame, WebSocketFrame]]() {
+          GraphDSL.create[FlowShape[WebSocketFrame, WebSocketFrame]]()
         implicit b =>
           import GraphDSL.Implicits._
 
           val broadcast = b.add(Broadcast[WebSocketFrame](2))
           val merge = b.add(Merge[WebSocketFrame](2, eagerComplete = true))
 
-          val handleServerClose = Flow[WebSocketFrame].filter {
+          val handleServerClose = Flow[WebSocketFrame].filter
             frame =>
               if (frame.isInstanceOf[CloseWebSocketFrame] &&
-                  !clientInitiatedClose.get()) {
+                  !clientInitiatedClose.get())
                 serverInitiatedClose.set(true)
                 true
-              } else {
+              else
                 // If we're going to drop it, we need to release it first
                 ReferenceCountUtil.release(frame)
                 false
-              }
-          }
 
           val handleConnectionTerminated = Flow[WebSocketFrame].transform(() =>
-                new PushStage[WebSocketFrame, WebSocketFrame] {
+                new PushStage[WebSocketFrame, WebSocketFrame]
               def onPush(elem: WebSocketFrame, ctx: Context[WebSocketFrame]) =
                 ctx.push(elem)
-              override def onUpstreamFinish(ctx: Context[WebSocketFrame]) = {
+              override def onUpstreamFinish(ctx: Context[WebSocketFrame]) =
                 disconnected.trySuccess(())
                 super.onUpstreamFinish(ctx)
-              }
               override def onUpstreamFailure(cause: Throwable,
-                                             ctx: Context[WebSocketFrame]) = {
-                if (serverInitiatedClose.get()) {
+                                             ctx: Context[WebSocketFrame]) =
+                if (serverInitiatedClose.get())
                   disconnected.trySuccess(())
                   ctx.finish()
-                } else {
+                else
                   disconnected.tryFailure(cause)
                   ctx.fail(cause)
-                }
-              }
-          })
+          )
 
           /**
             * Since we've got two consumers of the messages when we broadcast, we need to ensure that they get retained for each.
             */
-          val retainForBroadcast = Flow[WebSocketFrame].map { frame =>
+          val retainForBroadcast = Flow[WebSocketFrame].map  frame =>
             ReferenceCountUtil.retain(frame)
             frame
-          }
 
           merge.out ~> clientConnection ~> handleConnectionTerminated ~> retainForBroadcast ~> broadcast.in
           merge.in(0) <~ handleServerClose <~ broadcast.out(0)
 
           FlowShape(merge.in(1), broadcast.out(1))
-      }) via framesToMessages
-    }
+      ) via framesToMessages
 
-    def toByteString(data: ByteBufHolder) = {
+    def toByteString(data: ByteBufHolder) =
       val builder = ByteString.newBuilder
       data
         .content()
         .readBytes(builder.asOutputStream, data.content().readableBytes())
       val bytes = builder.result()
       bytes
-    }
 
-    override def exceptionCaught(ctx: ChannelHandlerContext, e: Throwable) {
-      if (serverInitiatedClose.get()) {
+    override def exceptionCaught(ctx: ChannelHandlerContext, e: Throwable)
+      if (serverInitiatedClose.get())
         disconnected.trySuccess(())
-      } else {
+      else
         disconnected.tryFailure(e)
-      }
       ctx.channel.close()
       ctx.fireExceptionCaught(e)
-    }
 
-    override def channelInactive(ctx: ChannelHandlerContext) = {
+    override def channelInactive(ctx: ChannelHandlerContext) =
       disconnected.trySuccess(())
-    }
-  }
 
   class WebSocketException(s: String, th: Throwable)
-      extends java.io.IOException(s, th) {
+      extends java.io.IOException(s, th)
     def this(s: String) = this(s, null)
-  }
-}

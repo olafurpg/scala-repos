@@ -1,4 +1,4 @@
-class A[V] {
+class A[V]
   val x: Class[V]
   def g(x: Class[_ <: V]): Int = 1
   def g(x: Int): Boolean = false
@@ -7,5 +7,4 @@ class A[V] {
 
   /*start*/
   g(x) + gg(x) /*end*/
-}
 //Int

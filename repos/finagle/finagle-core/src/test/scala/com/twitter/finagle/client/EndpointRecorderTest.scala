@@ -9,7 +9,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class EndpointRecorderTest extends FunSuite {
+class EndpointRecorderTest extends FunSuite
 
   val name = "fooClient"
   val path = "/foo"
@@ -22,18 +22,17 @@ class EndpointRecorderTest extends FunSuite {
 
   val dtab = Dtab.read("/foo => /bar")
 
-  val neverFactory = ServiceFactory.const(new Service[Int, Int] {
+  val neverFactory = ServiceFactory.const(new Service[Int, Int]
     def apply(req: Int) = Future.never
-  })
+  )
 
   def getEndpoints(registry: EndpointRegistry,
                    name: String,
                    dtab: Dtab,
-                   path: String): Option[Addr] = {
+                   path: String): Option[Addr] =
     registry.endpoints(name).get(dtab).flatMap(_.get(path))
-  }
 
-  test("EndpointRecorder is disabled if BindingFactory.Dest is not bound") {
+  test("EndpointRecorder is disabled if BindingFactory.Dest is not bound")
     val stk: StackBuilder[ServiceFactory[Int, Int]] = new StackBuilder(
         Stack.Leaf(Stack.Role("never"), neverFactory)
     )
@@ -43,17 +42,15 @@ class EndpointRecorderTest extends FunSuite {
     val factory = stk.make(Stack.Params.empty)
 
     assert(factory == neverFactory)
-  }
 
-  test("EndpointRecorder registers in EndpointRegistry") {
+  test("EndpointRecorder registers in EndpointRegistry")
     val registry = new EndpointRegistry()
     val factory =
       new EndpointRecorder(neverFactory, registry, name, dtab, path, endpoints)
 
     assert(getEndpoints(registry, name, dtab, path) == Some(bound))
-  }
 
-  test("EndpointRecorder deregisters on close()") {
+  test("EndpointRecorder deregisters on close()")
     val registry = new EndpointRegistry()
     val factory =
       new EndpointRecorder(neverFactory, registry, name, dtab, path, endpoints)
@@ -61,5 +58,3 @@ class EndpointRecorderTest extends FunSuite {
     assert(getEndpoints(registry, name, dtab, path) == Some(bound))
     factory.close()
     assert(getEndpoints(registry, name, dtab, path) == None)
-  }
-}

@@ -2,7 +2,7 @@ package sbt
 
 import Def.ScopedKey
 
-final case class ScopedKeyData[A](scoped: ScopedKey[A], value: Any) {
+final case class ScopedKeyData[A](scoped: ScopedKey[A], value: Any)
   import sbt.internal.util.Types.const
   val key = scoped.key
   val scope = scoped.scope
@@ -21,4 +21,3 @@ final case class ScopedKeyData[A](scoped: ScopedKey[A], value: Any) {
       itarg(key.manifest.typeArguments.head)
     else s
   def fmtMf(s: String): OptManifest[_] => String = s format _
-}

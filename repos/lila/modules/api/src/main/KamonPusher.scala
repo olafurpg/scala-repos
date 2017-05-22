@@ -7,14 +7,13 @@ import scala.concurrent.duration._
 import lila.hub.actorApi.round.NbRounds
 import lila.socket.actorApi.NbMembers
 
-private final class KamonPusher(countUsers: () => Int) extends Actor {
+private final class KamonPusher(countUsers: () => Int) extends Actor
 
   import KamonPusher._
 
-  override def preStart() {
+  override def preStart()
     context.system.lilaBus.subscribe(self, 'nbMembers, 'nbRounds)
     scheduleTick
-  }
 
   private val threadStats = ManagementFactory.getThreadMXBean
   private val app = lila.common.PlayApp
@@ -22,7 +21,7 @@ private final class KamonPusher(countUsers: () => Int) extends Actor {
   private def scheduleTick =
     context.system.scheduler.scheduleOnce(1 second, self, Tick)
 
-  def receive = {
+  def receive =
 
     case NbMembers(nb) =>
       lila.mon.socket.member(nb)
@@ -36,13 +35,10 @@ private final class KamonPusher(countUsers: () => Int) extends Actor {
       lila.mon.jvm.uptime(app.uptime.toStandardSeconds.getSeconds)
       lila.mon.user.online(countUsers())
       scheduleTick
-  }
-}
 
-object KamonPusher {
+object KamonPusher
 
   private case object Tick
-}
 
 import com.typesafe.config.Config
 import kamon.metric.{MetricKey, Entity}
@@ -51,13 +47,11 @@ import kamon.statsd._
 // don't replace . with _
 // replace / with .
 class KeepDotsMetricKeyGenerator(config: Config)
-    extends SimpleMetricKeyGenerator(config) {
+    extends SimpleMetricKeyGenerator(config)
 
   override def createNormalizer(strategy: String): Normalizer =
-    strategy match {
+    strategy match
       case "keep-dots" =>
         (s: String) ⇒
           s.replace(": ", "-").replace(" ", "_").replace("/", ".")
         case _ => super.createNormalizer(strategy)
-    }
-}

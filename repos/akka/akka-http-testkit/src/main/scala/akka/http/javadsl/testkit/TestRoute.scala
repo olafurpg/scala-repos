@@ -15,7 +15,6 @@ import akka.http.javadsl.server.Route
   * testing framework (like [[JUnitRouteTest]] for JUnit) and then using its `testRoute` method to wrap
   * a route with testing support.
   */
-trait TestRoute {
+trait TestRoute
   def underlying: Route
   def run(request: HttpRequest): TestResponse
-}

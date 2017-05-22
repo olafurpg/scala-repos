@@ -11,14 +11,14 @@ import com.twitter.util.registry.GlobalRegistry
 object ostrichFilterRegex
     extends GlobalFlag(Seq.empty[String], "Ostrich filter regex")
 
-class OstrichExporter extends HttpMuxHandler {
+class OstrichExporter extends HttpMuxHandler
   val pattern = "/stats.json"
 
   val regexes = ostrichFilterRegex().toList.map(_.r)
 
   GlobalRegistry.get.put(Seq("stats", "ostrich", "counters_latched"), "true")
 
-  def apply(request: Request): Future[Response] = {
+  def apply(request: Request): Future[Response] =
     val params = new RequestParamMap(request)
     val period = params.get("period")
     val namespace = params.get("namespace")
@@ -28,14 +28,13 @@ class OstrichExporter extends HttpMuxHandler {
     val response = Response()
     response.content = Buf.Utf8(content)
     Future.value(response)
-  }
 
   def json(period: Option[String],
            namespace: Option[String],
-           filtered: Boolean): String = {
+           filtered: Boolean): String =
 
     // TODO: read command line args (minPeriod, filterRegex)?
-    val summary = (period, namespace) match {
+    val summary = (period, namespace) match
       case (Some(period), _) =>
         val duration = period.toInt.seconds
         StatsListener(duration, Stats, regexes).get(filtered)
@@ -43,8 +42,5 @@ class OstrichExporter extends HttpMuxHandler {
         StatsListener(namespace, Stats).get(filtered)
       case _ =>
         Stats.get()
-    }
 
     summary.toJson
-  }
-}

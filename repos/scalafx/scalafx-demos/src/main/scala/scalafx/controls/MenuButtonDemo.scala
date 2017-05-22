@@ -36,37 +36,30 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{MenuButton, MenuItem}
 import scalafx.scene.layout.VBox
 
-object MenuButtonDemo extends JFXApp {
+object MenuButtonDemo extends JFXApp
 
-  stage = new PrimaryStage {
-    scene = new Scene(200, 200) {
-      content = new VBox {
+  stage = new PrimaryStage
+    scene = new Scene(200, 200)
+      content = new VBox
         padding = Insets(10)
         spacing = 10
         children = List(
-            new MenuButton("MenuButton 1") {
+            new MenuButton("MenuButton 1")
               items = List(
-                  new MenuItem("MenuItem A") {
-                    onAction = { ae: ActionEvent =>
+                  new MenuItem("MenuItem A")
+                    onAction =  ae: ActionEvent =>
                       { println(ae.eventType + " occurred on Menu Item A") }
-                    }
-                  },
+                  ,
                   new MenuItem("MenuItem B")
               )
-            },
-            new MenuButton {
+            ,
+            new MenuButton
               text = "MenuButton 2"
               items = List(
-                  new MenuItem("MenuItem C") {
-                    onAction = { ae: ActionEvent =>
+                  new MenuItem("MenuItem C")
+                    onAction =  ae: ActionEvent =>
                       { println(ae.eventType + " occurred on Menu Item C") }
-                    }
-                  },
+                  ,
                   new MenuItem("MenuItem D")
               )
-            }
         )
-      }
-    }
-  }
-}

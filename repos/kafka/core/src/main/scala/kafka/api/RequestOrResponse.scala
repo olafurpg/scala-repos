@@ -20,16 +20,15 @@ import java.nio._
 import kafka.network.RequestChannel
 import kafka.utils.Logging
 
-object Request {
+object Request
   val OrdinaryConsumerId: Int = -1
   val DebuggingConsumerId: Int = -2
 
   // Broker ids are non-negative int.
   def isValidBrokerId(brokerId: Int): Boolean = (brokerId >= 0)
-}
 
 abstract class RequestOrResponse(val requestId: Option[Short] = None)
-    extends Logging {
+    extends Logging
 
   def sizeInBytes: Int
 
@@ -44,4 +43,3 @@ abstract class RequestOrResponse(val requestId: Option[Short] = None)
    * @param details If this is false, omit the parts of the request description that are proportional to the number of
    *                topics or partitions. This is mainly to control the amount of request logging. */
   def describe(details: Boolean): String
-}

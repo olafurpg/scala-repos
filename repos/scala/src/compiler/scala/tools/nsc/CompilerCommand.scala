@@ -8,7 +8,7 @@ package scala.tools.nsc
 import io.File
 
 /** A class representing command line info for scalac */
-class CompilerCommand(arguments: List[String], val settings: Settings) {
+class CompilerCommand(arguments: List[String], val settings: Settings)
   def this(arguments: List[String], error: String => Unit) =
     this(arguments, new Settings(error))
   def this(
@@ -47,19 +47,17 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
   def shortUsage = "Usage: %s <options> <source files>" format cmdName
 
   /** Creates a help message for a subset of options based on cond */
-  def createUsageMsg(cond: Setting => Boolean): String = {
+  def createUsageMsg(cond: Setting => Boolean): String =
     val baseList =
       (settings.visibleSettings filter cond).toList sortBy (_.name)
     val width = (baseList map (_.helpSyntax.length)).max
     def format(s: String) = ("%-" + width + "s") format s
-    def helpStr(s: Setting) = {
+    def helpStr(s: Setting) =
       val str = format(s.helpSyntax) + "  " + s.helpDescription
-      val suffix = s.deprecationMessage match {
+      val suffix = s.deprecationMessage match
         case Some(msg) => "\n" + format("") + "      deprecated: " + msg
         case _ => ""
-      }
       str + suffix
-    }
     val debugs = baseList filter (_.isForDebug)
     val deprecateds = baseList filter (_.isDeprecated)
     val theRest = baseList filterNot (debugs.toSet ++ deprecateds)
@@ -72,11 +70,10 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
         sstring("\nAdditional debug settings:", debugs),
         sstring("\nDeprecated settings:", deprecateds)
     ).flatten mkString "\n"
-  }
 
   def createUsageMsg(label: String,
                      shouldExplain: Boolean,
-                     cond: Setting => Boolean): String = {
+                     cond: Setting => Boolean): String =
     val prefix =
       List(
           Some(shortUsage),
@@ -85,7 +82,6 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
       ).flatten mkString "\n"
 
     prefix + createUsageMsg(cond)
-  }
 
   /** Messages explaining usage and options */
   def usageMsg =
@@ -99,7 +95,7 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
   /** For info settings, compiler should just print a message and quit. */
   def shouldStopWithInfo = settings.isInfo
 
-  def getInfoMessage(global: Global): String = {
+  def getInfoMessage(global: Global): String =
     import settings._
     import Properties.{versionString, copyrightString} //versionFor
     def versionFor(command: String) =
@@ -113,27 +109,23 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
     else if (showPhases)
       global.phaseDescriptions +
       (if (debug) "\n" + global.phaseFlagDescriptions else "")
-    else if (genPhaseGraph.isSetByUser) {
+    else if (genPhaseGraph.isSetByUser)
       val components =
         global.phaseNames // global.phaseDescriptors // one initializes
       s"Phase graph of ${components.size} components output to ${genPhaseGraph.value}*.dot."
-    }
     // would be nicer if we could ask all the options for their helpful messages
-    else {
+    else
       val sb = new StringBuilder
-      allSettings foreach {
+      allSettings foreach
         case s: MultiChoiceSetting[_] if s.isHelping => sb append s.help
         case _ =>
-      }
       sb.toString
-    }
-  }
 
   /**
     * Expands all arguments starting with @ to the contents of the
     * file named like each argument.
     */
-  def expandArg(arg: String): List[String] = {
+  def expandArg(arg: String): List[String] =
     def stripComment(s: String) = s takeWhile (_ != '#')
     val file = File(arg stripPrefix "@")
     if (!file.exists)
@@ -141,19 +133,15 @@ class CompilerCommand(arguments: List[String], val settings: Settings) {
           "argument file %s could not be found" format file.name)
 
     settings splitParams (file.lines() map stripComment mkString " ")
-  }
 
   // override this if you don't want arguments processed here
   def shouldProcessArguments: Boolean = true
 
-  def processArguments: (Boolean, List[String]) = {
+  def processArguments: (Boolean, List[String]) =
     // expand out @filename to the contents of that filename
     val expandedArguments =
-      arguments flatMap {
+      arguments flatMap
         case x if x startsWith "@" => expandArg(x)
         case x => List(x)
-      }
 
     settings.processArguments(expandedArguments, processAll = true)
-  }
-}

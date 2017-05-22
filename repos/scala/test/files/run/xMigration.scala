@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
 Map(1 -> "eis").values    // no warn
 :setting -Xmigration:none
@@ -16,4 +16,3 @@ Map(1 -> "eis").values    // no warn
 :setting -Xmigration      // same as :any
 Map(1 -> "eis").values    // warn
   """
-}

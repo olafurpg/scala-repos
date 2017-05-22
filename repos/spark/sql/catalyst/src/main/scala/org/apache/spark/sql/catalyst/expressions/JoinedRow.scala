@@ -26,40 +26,35 @@ import org.apache.spark.unsafe.types.{CalendarInterval, UTF8String}
   * A mutable wrapper that makes two rows appear as a single concatenated row.  Designed to
   * be instantiated once per thread and reused.
   */
-class JoinedRow extends InternalRow {
+class JoinedRow extends InternalRow
   private[this] var row1: InternalRow = _
   private[this] var row2: InternalRow = _
 
-  def this(left: InternalRow, right: InternalRow) = {
+  def this(left: InternalRow, right: InternalRow) =
     this()
     row1 = left
     row2 = right
-  }
 
   /** Updates this JoinedRow to used point at two new base rows.  Returns itself. */
-  def apply(r1: InternalRow, r2: InternalRow): JoinedRow = {
+  def apply(r1: InternalRow, r2: InternalRow): JoinedRow =
     row1 = r1
     row2 = r2
     this
-  }
 
   /** Updates this JoinedRow by updating its left base row.  Returns itself. */
-  def withLeft(newLeft: InternalRow): JoinedRow = {
+  def withLeft(newLeft: InternalRow): JoinedRow =
     row1 = newLeft
     this
-  }
 
   /** Updates this JoinedRow by updating its right base row.  Returns itself. */
-  def withRight(newRight: InternalRow): JoinedRow = {
+  def withRight(newRight: InternalRow): JoinedRow =
     row2 = newRight
     this
-  }
 
-  override def toSeq(fieldTypes: Seq[DataType]): Seq[Any] = {
+  override def toSeq(fieldTypes: Seq[DataType]): Seq[Any] =
     assert(fieldTypes.length == row1.numFields + row2.numFields)
     val (left, right) = fieldTypes.splitAt(row1.numFields)
     row1.toSeq(left) ++ row2.toSeq(right)
-  }
 
   override def numFields: Int = row1.numFields + row2.numFields
 
@@ -98,13 +93,11 @@ class JoinedRow extends InternalRow {
     if (i < row1.numFields) row1.getDouble(i)
     else row2.getDouble(i - row1.numFields)
 
-  override def getDecimal(i: Int, precision: Int, scale: Int): Decimal = {
-    if (i < row1.numFields) {
+  override def getDecimal(i: Int, precision: Int, scale: Int): Decimal =
+    if (i < row1.numFields)
       row1.getDecimal(i, precision, scale)
-    } else {
+    else
       row2.getDecimal(i - row1.numFields, precision, scale)
-    }
-  }
 
   override def getUTF8String(i: Int): UTF8String =
     if (i < row1.numFields) row1.getUTF8String(i)
@@ -125,32 +118,26 @@ class JoinedRow extends InternalRow {
   override def getMap(i: Int): MapData =
     if (i < row1.numFields) row1.getMap(i) else row2.getMap(i - row1.numFields)
 
-  override def getStruct(i: Int, numFields: Int): InternalRow = {
-    if (i < row1.numFields) {
+  override def getStruct(i: Int, numFields: Int): InternalRow =
+    if (i < row1.numFields)
       row1.getStruct(i, numFields)
-    } else {
+    else
       row2.getStruct(i - row1.numFields, numFields)
-    }
-  }
 
   override def anyNull: Boolean = row1.anyNull || row2.anyNull
 
-  override def copy(): InternalRow = {
+  override def copy(): InternalRow =
     val copy1 = row1.copy()
     val copy2 = row2.copy()
     new JoinedRow(copy1, copy2)
-  }
 
-  override def toString: String = {
+  override def toString: String =
     // Make sure toString never throws NullPointerException.
-    if ((row1 eq null) && (row2 eq null)) {
+    if ((row1 eq null) && (row2 eq null))
       "[ empty row ]"
-    } else if (row1 eq null) {
+    else if (row1 eq null)
       row2.toString
-    } else if (row2 eq null) {
+    else if (row2 eq null)
       row1.toString
-    } else {
+    else
       s"{${row1.toString} + ${row2.toString}}"
-    }
-  }
-}

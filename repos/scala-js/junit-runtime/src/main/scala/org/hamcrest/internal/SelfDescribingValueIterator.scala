@@ -8,7 +8,7 @@ import org.hamcrest.SelfDescribing
 import java.{util => ju}
 
 class SelfDescribingValueIterator[T](values: ju.Iterator[T])
-    extends ju.Iterator[SelfDescribing] {
+    extends ju.Iterator[SelfDescribing]
   override def hasNext(): Boolean =
     values.hasNext
 
@@ -17,4 +17,3 @@ class SelfDescribingValueIterator[T](values: ju.Iterator[T])
 
   override def remove(): Unit =
     values.remove()
-}

@@ -14,15 +14,13 @@ case class SwimmingRecord(
     name: String,
     nationality: String,
     date: Date
-) {
-  override def toString = {
+)
+  override def toString =
     def q(s: String) = "'" + s + "'"
     "(" + q(event) + "," + time + "," + q(name) + "," + q(nationality) + "," +
     q(date.toString) + ")"
-  }
-}
 
-object SwimmingRecord {
+object SwimmingRecord
   val schema = """CREATE TEMPORARY TABLE IF NOT EXISTS `finagle-mysql-test` (
     `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
     `event` varchar(30) DEFAULT NULL,
@@ -65,33 +63,28 @@ object SwimmingRecord {
                      "United States",
                      Date.valueOf("2009-07-29"))
   )
-}
 
 @RunWith(classOf[JUnitRunner])
-class ClientTest extends FunSuite with IntegrationClient {
+class ClientTest extends FunSuite with IntegrationClient
   import SwimmingRecord._
-  for (c <- client) {
-    test("failed auth") {
-      try {
+  for (c <- client)
+    test("failed auth")
+      try
         Await.result(Mysql.newRichClient("localhost:3306").ping)
         fail("Expected an error when using an unauthenticated client")
-      } catch {
+      catch
         // Expected Access Denied Error Code
         case ServerError(code, _, _) => assert(code == 1045)
-      }
-    }
 
-    test("ping") {
+    test("ping")
       val pingResult = Await.result(c.ping)
       assert(pingResult.isInstanceOf[OK])
-    }
 
-    test("query: create a table") {
+    test("query: create a table")
       val createResult = Await.result(c.query(schema))
       assert(createResult.isInstanceOf[OK])
-    }
 
-    test("query: insert values") {
+    test("query: insert values")
       val sql =
         """INSERT INTO `finagle-mysql-test` (`event`, `time`, `name`, `nationality`, `date`)
          VALUES %s;""".format(allRecords.mkString(", "))
@@ -100,32 +93,29 @@ class ClientTest extends FunSuite with IntegrationClient {
       val OK(_, insertid, _, _, _) = insertResult.asInstanceOf[OK]
       assert(insertResult.isInstanceOf[OK])
       assert(insertid == 1)
-    }
 
-    test("query: select values") {
+    test("query: select values")
       val selectResult = Await.result(
-          c.select("SELECT * FROM `finagle-mysql-test`") { row =>
+          c.select("SELECT * FROM `finagle-mysql-test`")  row =>
         val StringValue(event) = row("event").get
         val FloatValue(time) = row("time").get
         val StringValue(name) = row("name").get
         val StringValue(nation) = row("nationality").get
         val DateValue(date) = row("date").get
         SwimmingRecord(event, time, name, nation, date)
-      })
+      )
 
       var i = 0
-      for (res <- selectResult) {
+      for (res <- selectResult)
         assert(allRecords(i) == res)
         i += 1
-      }
-    }
 
-    test("prepared statement") {
+    test("prepared statement")
       val prepareQuery =
         "SELECT COUNT(*) AS 'numRecords' FROM `finagle-mysql-test` WHERE `name` LIKE ?"
       def extractRow(r: Result) = r.asInstanceOf[ResultSet].rows(0)
       val ps = c.prepare(prepareQuery)
-      for (i <- 0 to 10) {
+      for (i <- 0 to 10)
         val randomIdx = math.floor(math.random * (allRecords.size - 1)).toInt
         val recordName = allRecords(randomIdx).name
         val expectedRes =
@@ -133,7 +123,3 @@ class ClientTest extends FunSuite with IntegrationClient {
         val res = ps.select(recordName)(identity)
         val row = Await.result(res)(0)
         assert(row("numRecords").get == expectedRes)
-      }
-    }
-  }
-}

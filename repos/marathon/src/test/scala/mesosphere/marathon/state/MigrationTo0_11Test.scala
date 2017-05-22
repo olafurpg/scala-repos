@@ -11,10 +11,10 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 
 class MigrationTo0_11Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
   import mesosphere.FutureTestSupport._
 
-  class Fixture {
+  class Fixture
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val store = new InMemoryStore()
 
@@ -28,14 +28,13 @@ class MigrationTo0_11Test
 
     lazy val migration = new MigrationTo0_11(
         groupRepository = groupRepo, appRepository = appRepo)
-  }
 
   val emptyGroup = Group.empty
 
   implicit val patienceConfig: PatienceConfig = PatienceConfig(
       timeout = Span(3, Seconds))
 
-  test("empty migration does (nearly) nothing") {
+  test("empty migration does (nearly) nothing")
     Given("no apps/groups")
     val f = new Fixture
 
@@ -47,9 +46,8 @@ class MigrationTo0_11Test
     maybeGroup.map(_.copy(version = emptyGroup.version)) should be(
         Some(emptyGroup))
     f.appRepo.allPathIds().futureValue should be('empty)
-  }
 
-  test("if an app only exists in the appRepo, it is expunged") {
+  test("if an app only exists in the appRepo, it is expunged")
     Given("one app in appRepo, none in groupRepo")
     val f = new Fixture
     f.appRepo.store(AppDefinition(PathId("/test"))).futureValue
@@ -63,9 +61,8 @@ class MigrationTo0_11Test
     maybeGroup.map(_.copy(version = emptyGroup.version)) should be(
         Some(emptyGroup))
     f.appRepo.allPathIds().futureValue should be('empty)
-  }
 
-  test("if an app only exists in the groupRepo, it is created in the appRepo") {
+  test("if an app only exists in the groupRepo, it is created in the appRepo")
     Given("one app in appRepo, none in groupRepo")
     val f = new Fixture
     val versionInfo = AppDefinition.VersionInfo.OnlyVersion(Timestamp(10))
@@ -93,13 +90,12 @@ class MigrationTo0_11Test
     f.appRepo.currentVersion(PathId("/test")).futureValue should be(
         Some(appWithFullVersion))
     f.appRepo.listVersions(PathId("/test")).futureValue should have size (1)
-  }
 
   private[this] def onlyVersion(ts: Long) =
     AppDefinition.VersionInfo.OnlyVersion(Timestamp(ts))
 
   test(
-      "if an app has (different) revisions in the appRepo and the groupRepo, they are combined") {
+      "if an app has (different) revisions in the appRepo and the groupRepo, they are combined")
     Given(
         "one app with multiple versions in appRepo and the newest version in groupRepo")
     val f = new Fixture
@@ -152,10 +148,9 @@ class MigrationTo0_11Test
         Some(correctedAppV2))
     f.appRepo.app(PathId("/test"), correctedAppV3.version).futureValue should be(
         Some(correctedAppV3))
-  }
 
   test(
-      "if an app has revisions in the appRepo and the latest in the groupRepo, they are combined correctly") {
+      "if an app has revisions in the appRepo and the latest in the groupRepo, they are combined correctly")
     Given(
         "one app with multiple versions in appRepo and the newest version in groupRepo")
     val f = new Fixture
@@ -210,5 +205,3 @@ class MigrationTo0_11Test
         Some(correctedAppV2))
     f.appRepo.app(PathId("/test"), correctedAppV3.version).futureValue should be(
         Some(correctedAppV3))
-  }
-}

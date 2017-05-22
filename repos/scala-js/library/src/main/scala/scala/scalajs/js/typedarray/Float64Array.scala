@@ -6,7 +6,7 @@ import scala.scalajs.js
   *  A [[TypedArray]] of double precision floats
   */
 @js.native
-class Float64Array private extends TypedArray[Double, Float64Array] {
+class Float64Array private extends TypedArray[Double, Float64Array]
 
   /** Constructs a Float64Array with the given length. Initialized to all 0 */
   def this(length: Int) = this()
@@ -23,7 +23,6 @@ class Float64Array private extends TypedArray[Double, Float64Array] {
   /** Creates a Float64Array view on the given ArrayBuffer */
   def this(buffer: ArrayBuffer, byteOffset: Int = 0, length: Int = ???) =
     this()
-}
 
 /** <span class="badge badge-ecma6" style="float: right;">ECMAScript 6</span>
   *  [[Float64Array]] companion

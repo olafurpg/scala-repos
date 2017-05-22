@@ -28,7 +28,7 @@ import org.apache.spark.internal.Logging
   */
 class ExtensionServiceIntegrationSuite
     extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
-    with Logging {
+    with Logging
 
   val applicationId = new StubApplicationId(0, 1111L)
   val attemptId = new StubApplicationAttemptId(applicationId, 1)
@@ -36,26 +36,23 @@ class ExtensionServiceIntegrationSuite
   /*
    * Setup phase creates the spark context
    */
-  before {
+  before
     val sparkConf = new SparkConf()
     sparkConf.set(
         SCHEDULER_SERVICES, Seq(classOf[SimpleExtensionService].getName()))
     sparkConf.setMaster("local").setAppName("ExtensionServiceIntegrationSuite")
     sc = new SparkContext(sparkConf)
-  }
 
-  test("Instantiate") {
+  test("Instantiate")
     val services = new SchedulerExtensionServices()
-    assertResult(Nil, "non-nil service list") {
+    assertResult(Nil, "non-nil service list")
       services.getServices
-    }
     services.start(SchedulerExtensionServiceBinding(sc, applicationId))
     services.stop()
-  }
 
-  test("Contains SimpleExtensionService Service") {
+  test("Contains SimpleExtensionService Service")
     val services = new SchedulerExtensionServices()
-    try {
+    try
       services.start(SchedulerExtensionServiceBinding(sc, applicationId))
       val serviceList = services.getServices
       assert(serviceList.nonEmpty, "empty service list")
@@ -64,8 +61,5 @@ class ExtensionServiceIntegrationSuite
       assert(simpleService.started.get, "service not started")
       services.stop()
       assert(!simpleService.started.get, "service not stopped")
-    } finally {
+    finally
       services.stop()
-    }
-  }
-}

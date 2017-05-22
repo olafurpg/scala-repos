@@ -1,13 +1,11 @@
-class Lift {
+class Lift
   def apply(f: F0) {}
 
   class F0
-  object F0 {
+  object F0
     implicit def f2f0(fn: String): F0 = ???
-  }
-}
 
-object Test {
+object Test
   val l = new Lift
   val f = ""
 
@@ -15,10 +13,8 @@ object Test {
 
   l.apply("") // okay
 
-  {
     val l = new Lift
     l.apply("") // okay
-  }
 
   // fails trying to mkAttributedQualifier for pre = Skolem(_1 <: Lift with Singletom).F0
   // should this even have shown up in `companionImplicitMap`? It says that:
@@ -29,4 +25,3 @@ object Test {
   //
   // The skolem is stable, but it does not seem much good to us
   (new Lift).apply("")
-}

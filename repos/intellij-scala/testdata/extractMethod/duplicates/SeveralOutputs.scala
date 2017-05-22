@@ -1,5 +1,5 @@
-object SeveralOutputs {
-  def foo(i: Int) {
+object SeveralOutputs
+  def foo(i: Int)
     val q = i
     /*start*/
     println(q)
@@ -9,15 +9,12 @@ object SeveralOutputs {
     /*end*/
 
     zzz + zz + z
-  }
 
-  def foofoo(y: Int) {
+  def foofoo(y: Int)
     println(y)
     val x = y + 1
     val xx = y + 2
     var xxx = y + 3
-  }
-}
 /*
 object SeveralOutputs {
   def foo(i: Int) {

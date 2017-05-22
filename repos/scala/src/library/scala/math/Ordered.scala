@@ -54,7 +54,7 @@ import scala.language.implicitConversions
   *  @author  Martin Odersky
   *  @version 1.1, 2006-07-24
   */
-trait Ordered[A] extends Any with java.lang.Comparable[A] {
+trait Ordered[A] extends Any with java.lang.Comparable[A]
 
   /** Result of comparing `this` with operand `that`.
     *
@@ -90,12 +90,10 @@ trait Ordered[A] extends Any with java.lang.Comparable[A] {
   /** Result of comparing `this` with operand `that`.
     */
   def compareTo(that: A): Int = compare(that)
-}
 
-object Ordered {
+object Ordered
 
   /** Lens from `Ordering[T]` to `Ordered[T]` */
   implicit def orderingToOrdered[T](x: T)(
       implicit ord: Ordering[T]): Ordered[T] =
     new Ordered[T] { def compare(that: T): Int = ord.compare(x, that) }
-}

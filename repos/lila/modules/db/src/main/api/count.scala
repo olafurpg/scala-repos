@@ -6,7 +6,7 @@ import play.modules.reactivemongo.json.ImplicitBSONHandlers.JsObjectWriter
 import reactivemongo.core.commands.Count
 import Types._
 
-object $count {
+object $count
 
   def apply[A : InColl](q: JsObject): Fu[Int] =
     implicitly[InColl[A]].coll |> { _.count(JsObjectWriter.write(q).some) }
@@ -19,4 +19,3 @@ object $count {
   def exists[ID : Writes, A : InColl](id: ID): Fu[Boolean] =
     exists($select(id))
   def exists[A : InColl](id: String): Fu[Boolean] = exists[String, A](id)
-}

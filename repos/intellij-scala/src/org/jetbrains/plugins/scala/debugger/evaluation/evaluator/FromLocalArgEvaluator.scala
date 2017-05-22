@@ -8,7 +8,7 @@ import scala.util.Try
 /**
   * @author Nikolay.Tropin
   */
-case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator {
+case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator
   override def evaluate(context: EvaluationContextImpl): AnyRef =
     evaluateNotFromField(delegate, context).getOrElse(
         FromLocalArgEvaluator.skipMarker)
@@ -17,8 +17,8 @@ case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator {
 
   //it is hard to distinguish fields from local vars in async block
   private def evaluateNotFromField(
-      evaluator: Evaluator, context: EvaluationContextImpl): Option[AnyRef] = {
-    evaluator match {
+      evaluator: Evaluator, context: EvaluationContextImpl): Option[AnyRef] =
+    evaluator match
       case ScalaBoxingEvaluator(inner) =>
         evaluateNotFromField(inner, context).map(
             ScalaBoxingEvaluator.box(_, context))
@@ -32,10 +32,6 @@ case class FromLocalArgEvaluator(delegate: Evaluator) extends Evaluator {
       case ScalaDuplexEvaluator(first, second: ScalaFieldEvaluator) =>
         Try(first.evaluate(context)).toOption
       case _ => Some(evaluator.evaluate(context))
-    }
-  }
-}
 
-object FromLocalArgEvaluator {
+object FromLocalArgEvaluator
   val skipMarker = "skip_marker"
-}

@@ -24,7 +24,7 @@ import com.twitter.util.Future
   * jobs. This sink can be implemented using, for example, a kestrel
   * fanout or kafka topic.
   */
-trait OnlineSink[-Event] extends (Event => Future[Unit]) {
+trait OnlineSink[-Event] extends (Event => Future[Unit])
 
   /**
     * Note that the flatMap operation WILL error if this future errors, so be sure
@@ -32,12 +32,9 @@ trait OnlineSink[-Event] extends (Event => Future[Unit]) {
     */
   def write(event: Event): Future[Unit]
   final def apply(e: Event) = write(e)
-}
 
-object OnlineSink {
+object OnlineSink
   val unit: OnlineSink[Any] = EmptyOnlineSink
-}
 
-object EmptyOnlineSink extends OnlineSink[Any] {
+object EmptyOnlineSink extends OnlineSink[Any]
   def write(event: Any) = Future.Unit
-}

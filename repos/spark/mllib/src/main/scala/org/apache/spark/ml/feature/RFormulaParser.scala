@@ -26,16 +26,16 @@ import org.apache.spark.sql.types._
 /**
   * Represents a parsed R formula.
   */
-private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
+private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term])
 
   /**
     * Resolves formula terms into column names. A schema is necessary for inferring the meaning
     * of the special '.' term. Duplicate terms will be removed during resolution.
     */
-  def resolve(schema: StructType): ResolvedRFormula = {
+  def resolve(schema: StructType): ResolvedRFormula =
     val dotTerms = expandDot(schema)
     var includedTerms = Seq[Seq[String]]()
-    terms.foreach {
+    terms.foreach
       case col: ColumnRef =>
         includedTerms :+= Seq(col.value)
       case ColumnInteraction(cols) =>
@@ -43,7 +43,7 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
       case Dot =>
         includedTerms ++= dotTerms.map(Seq(_))
       case Deletion(term: Term) =>
-        term match {
+        term match
           case inner: ColumnRef =>
             includedTerms = includedTerms.filter(_ != Seq(inner.value))
           case ColumnInteraction(cols) =>
@@ -52,73 +52,61 @@ private[ml] case class ParsedRFormula(label: ColumnRef, terms: Seq[Term]) {
                 t => !fromInteraction.contains(t.toSet))
           case Dot =>
             // e.g. "- .", which removes all first-order terms
-            includedTerms = includedTerms.filter {
+            includedTerms = includedTerms.filter
               case Seq(t) => !dotTerms.contains(t)
               case _ => true
-            }
           case _: Deletion =>
             throw new RuntimeException("Deletion terms cannot be nested")
           case _: Intercept =>
-        }
       case _: Intercept =>
-    }
     ResolvedRFormula(label.value, includedTerms.distinct, hasIntercept)
-  }
 
   /** Whether this formula specifies fitting with an intercept term. */
-  def hasIntercept: Boolean = {
+  def hasIntercept: Boolean =
     var intercept = true
-    terms.foreach {
+    terms.foreach
       case Intercept(enabled) =>
         intercept = enabled
       case Deletion(Intercept(enabled)) =>
         intercept = !enabled
       case _ =>
-    }
     intercept
-  }
 
   // expands the Dot operators in interaction terms
   private def expandInteraction(
-      schema: StructType, terms: Seq[InteractableTerm]): Seq[Seq[String]] = {
-    if (terms.isEmpty) {
+      schema: StructType, terms: Seq[InteractableTerm]): Seq[Seq[String]] =
+    if (terms.isEmpty)
       return Seq(Nil)
-    }
 
     val rest = expandInteraction(schema, terms.tail)
-    val validInteractions = (terms.head match {
+    val validInteractions = (terms.head match
       case Dot =>
-        expandDot(schema).flatMap { t =>
-          rest.map { r =>
+        expandDot(schema).flatMap  t =>
+          rest.map  r =>
             Seq(t) ++ r
-          }
-        }
       case ColumnRef(value) =>
         rest.map(Seq(value) ++ _)
-    }).map(_.distinct)
+    ).map(_.distinct)
 
     // Deduplicates feature interactions, for example, a:b is the same as b:a.
     var seen = mutable.Set[Set[String]]()
-    validInteractions.flatMap {
+    validInteractions.flatMap
       case t if seen.contains(t.toSet) =>
         None
       case t =>
         seen += t.toSet
         Some(t)
-    }.sortBy(_.length)
-  }
+    .sortBy(_.length)
 
   // the dot operator excludes complex column types
-  private def expandDot(schema: StructType): Seq[String] = {
+  private def expandDot(schema: StructType): Seq[String] =
     schema.fields
-      .filter(_.dataType match {
+      .filter(_.dataType match
         case _: NumericType | StringType | BooleanType | _: VectorUDT => true
         case _ => false
-      })
+      )
       .map(_.name)
       .filter(_ != label.value)
-  }
-}
 
 /**
   * Represents a fully evaluated and simplified R formula.
@@ -158,7 +146,7 @@ private[ml] case class Deletion(term: Term) extends Term
 /**
   * Limited implementation of R formula parsing. Currently supports: '~', '+', '-', '.', ':'.
   */
-private[ml] object RFormulaParser extends RegexParsers {
+private[ml] object RFormulaParser extends RegexParsers
   private val intercept: Parser[Intercept] =
     "([01])".r ^^ { case a => Intercept(a == "1") }
 
@@ -174,20 +162,16 @@ private[ml] object RFormulaParser extends RegexParsers {
     intercept | interaction ^^ { case terms => ColumnInteraction(terms) } | dot | columnRef
 
   private val terms: Parser[List[Term]] =
-    (term ~ rep("+" ~ term | "-" ~ term)) ^^ {
+    (term ~ rep("+" ~ term | "-" ~ term)) ^^
       case op ~ list =>
-        list.foldLeft(List(op)) {
+        list.foldLeft(List(op))
           case (left, "+" ~ right) => left ++ Seq(right)
           case (left, "-" ~ right) => left ++ Seq(Deletion(right))
-        }
-    }
 
   private val formula: Parser[ParsedRFormula] =
     (columnRef ~ "~" ~ terms) ^^ { case r ~ "~" ~ t => ParsedRFormula(r, t) }
 
-  def parse(value: String): ParsedRFormula = parseAll(formula, value) match {
+  def parse(value: String): ParsedRFormula = parseAll(formula, value) match
     case Success(result, _) => result
     case failure: NoSuccess =>
       throw new IllegalArgumentException("Could not parse formula: " + value)
-  }
-}

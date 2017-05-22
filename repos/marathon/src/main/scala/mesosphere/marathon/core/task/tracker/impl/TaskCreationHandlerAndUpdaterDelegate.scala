@@ -18,36 +18,30 @@ import scala.util.control.NonFatal
   */
 private[tracker] class TaskCreationHandlerAndUpdaterDelegate(
     clock: Clock, conf: TaskTrackerConfig, taskTrackerRef: ActorRef)
-    extends TaskCreationHandler with TaskUpdater {
+    extends TaskCreationHandler with TaskUpdater
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private[impl] implicit val timeout: Timeout =
     conf.internalTaskUpdateRequestTimeout().milliseconds
 
-  override def created(task: Task): Future[Task] = {
+  override def created(task: Task): Future[Task] =
     taskUpdate(task.taskId, TaskOpProcessor.Action.Update(task)).map(_ => task)
-  }
-  override def terminated(taskId: Task.Id): Future[_] = {
+  override def terminated(taskId: Task.Id): Future[_] =
     taskUpdate(taskId, TaskOpProcessor.Action.Expunge)
-  }
-  override def statusUpdate(appId: PathId, status: TaskStatus): Future[_] = {
+  override def statusUpdate(appId: PathId, status: TaskStatus): Future[_] =
     val taskId = Task.Id(status.getTaskId.getValue)
     taskUpdate(taskId, TaskOpProcessor.Action.UpdateStatus(status))
-  }
 
   private[this] def taskUpdate(
-      taskId: Task.Id, action: TaskOpProcessor.Action): Future[Unit] = {
+      taskId: Task.Id, action: TaskOpProcessor.Action): Future[Unit] =
 
     import akka.pattern.ask
     val deadline = clock.now + timeout.duration
     val op: ForwardTaskOp = TaskTrackerActor.ForwardTaskOp(
         deadline, taskId, action)
-    (taskTrackerRef ? op).mapTo[Unit].recover {
+    (taskTrackerRef ? op).mapTo[Unit].recover
       case NonFatal(e) =>
         throw new RuntimeException(
             s"while asking for $action on app [${taskId.appId}] and $taskId",
             e)
-    }
-  }
-}

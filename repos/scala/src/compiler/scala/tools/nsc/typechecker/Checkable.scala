@@ -63,7 +63,7 @@ import scala.language.postfixOps
   *  like from the point of view of one of its base classes, we ask what it looks
   *  like from the point of view of one of its subclasses.
   */
-trait Checkable { self: Analyzer =>
+trait Checkable  self: Analyzer =>
 
   import global._
   import definitions._
@@ -73,13 +73,13 @@ trait Checkable { self: Analyzer =>
     *  possible from the knowledge that 'to' must also be of the
     *  type given in 'from'.
     */
-  def propagateKnownTypes(from: Type, to: Symbol): Type = {
+  def propagateKnownTypes(from: Type, to: Symbol): Type =
     def tparams = to.typeParams
     val tvars = tparams map (p => TypeVar(p))
     val tvarType = appliedType(to, tvars: _*)
     val bases = from.baseClasses filter (to.baseClasses contains _)
 
-    bases foreach { bc =>
+    bases foreach  bc =>
       val tps1 = (from baseType bc).typeArgs
       val tps2 = (tvarType baseType bc).typeArgs
       if (tps1.size != tps2.size)
@@ -98,15 +98,12 @@ trait Checkable { self: Analyzer =>
     //   else if (tparam.isContravariant) tp2 <:< tp1
     //   else tp1 =:= tp2
     // )
-    }
 
     val resArgs =
-      tparams zip tvars map {
+      tparams zip tvars map
         case (_, tvar) if tvar.instValid => tvar.constr.inst
         case (tparam, _) => tparam.tpeHK
-      }
     appliedType(to, resArgs: _*)
-  }
 
   private def isUnwarnableTypeArgSymbol(sym: Symbol) =
     (sym.isTypeParameter // dummy
@@ -120,8 +117,8 @@ trait Checkable { self: Analyzer =>
         )
   private def uncheckedOk(tp: Type) = tp hasAnnotation UncheckedClass
 
-  private def typeArgsInTopLevelType(tp: Type): List[Type] = {
-    val tps = tp match {
+  private def typeArgsInTopLevelType(tp: Type): List[Type] =
+    val tps = tp match
       case RefinedType(parents, _) => parents flatMap typeArgsInTopLevelType
       case TypeRef(_, ArrayClass, arg :: Nil) =>
         if (arg.typeSymbol.isAbstractType) arg :: Nil
@@ -130,29 +127,23 @@ trait Checkable { self: Analyzer =>
       case ExistentialType(tparams, underlying) =>
         tparams.map(_.tpe) ++ typeArgsInTopLevelType(underlying)
       case _ => Nil
-    }
     tps filterNot isUnwarnableTypeArg
-  }
 
-  private def scrutConformsToPatternType(scrut: Type, pattTp: Type): Boolean = {
-    def typeVarToWildcard(tp: Type) = {
+  private def scrutConformsToPatternType(scrut: Type, pattTp: Type): Boolean =
+    def typeVarToWildcard(tp: Type) =
       // The need for typeSymbolDirect is demonstrated in neg/t8597b.scala
       if (tp.typeSymbolDirect.isPatternTypeVariable) WildcardType else tp
-    }
     val pattTpWild = pattTp.map(typeVarToWildcard)
     scrut <:< pattTpWild
-  }
 
-  private class CheckabilityChecker(val X: Type, val P: Type) {
+  private class CheckabilityChecker(val X: Type, val P: Type)
     def Xsym = X.typeSymbol
     def Psym = P.typeSymbol
-    def PErased = {
-      P match {
+    def PErased =
+      P match
         case erasure.GenericArray(n, core) =>
           existentialAbstraction(core.typeSymbol :: Nil, P)
         case _ => existentialAbstraction(Psym.typeParams, Psym.tpe_*)
-      }
-    }
     def XR = if (Xsym == AnyClass) PErased else propagateKnownTypes(X, Psym)
 
     // sadly the spec says (new java.lang.Boolean(true)).isInstanceOf[scala.Boolean]
@@ -174,19 +165,19 @@ trait Checkable { self: Analyzer =>
        else if (P1) StaticallyTrue
        else if (P2) StaticallyFalse
        else if (P3) RuntimeCheckable
-       else if (uncheckableType == NoType) {
+       else if (uncheckableType == NoType)
          // Avoid warning (except ourselves) if we can't pinpoint the uncheckable type
          debuglog(
              "Checkability checker says 'Uncheckable', but uncheckable type cannot be found:\n" +
              summaryString)
          CheckabilityError
-       } else Uncheckable)
+       else Uncheckable)
     lazy val uncheckableType =
       if (Psym.isAbstractType) P
-      else {
+      else
         val possibles = typeArgsInTopLevelType(P).toSet
         val opt =
-          possibles find { targ =>
+          possibles find  targ =>
             // Create a derived type with every possibly uncheckable type replaced
             // with a WildcardType, except for 'targ'. If !(XR <: derived) then
             // 'targ' is uncheckable.
@@ -194,26 +185,22 @@ trait Checkable { self: Analyzer =>
               P map
               (tp => if (possibles(tp) && !(tp =:= targ)) WildcardType else tp)
             !(XR <:< derived)
-          }
         opt getOrElse NoType
-      }
 
     def neverSubClass = isNeverSubClass(Xsym, Psym)
     def neverMatches = result == StaticallyFalse
     def isUncheckable = result == Uncheckable
     def isCheckable = !isUncheckable
-    def uncheckableMessage = uncheckableType match {
+    def uncheckableMessage = uncheckableType match
       case NoType => "something"
       case tp @ RefinedType(_, _) => "refinement " + tp
       case TypeRef(_, sym, _) if sym.isAbstractType =>
         "abstract type " + sym.name
       case tp => "non-variable type argument " + tp
-    }
-  }
 
   /** X, P, [P1], etc. are all explained at the top of the file.
     */
-  private object CheckabilityChecker {
+  private object CheckabilityChecker
 
     /** Are these symbols classes with no subclass relationship? */
     def areUnrelatedClasses(sym1: Symbol, sym2: Symbol) = (sym1.isClass &&
@@ -260,48 +247,43 @@ trait Checkable { self: Analyzer =>
 
     private def isNeverSubArgs(
         tps1: List[Type], tps2: List[Type], tparams: List[Symbol]): Boolean =
-      /*logResult(s"isNeverSubArgs($tps1, $tps2, $tparams)")*/ {
+      /*logResult(s"isNeverSubArgs($tps1, $tps2, $tparams)")*/
         def isNeverSubArg(t1: Type, t2: Type, variance: Variance) =
           (if (variance.isInvariant) isNeverSameType(t1, t2)
            else if (variance.isCovariant) isNeverSubType(t2, t1)
            else if (variance.isContravariant) isNeverSubType(t1, t2)
            else false)
         exists3(tps1, tps2, tparams map (_.variance))(isNeverSubArg)
-      }
     private def isNeverSameType(tp1: Type, tp2: Type): Boolean =
-      (tp1, tp2) match {
+      (tp1, tp2) match
         case (TypeRef(_, sym1, args1), TypeRef(_, sym2, args2)) =>
           isNeverSubClass(sym1, sym2) ||
           ((sym1 == sym2) && isNeverSubArgs(args1, args2, sym1.typeParams))
         case _ =>
           false
-      }
     // Important to dealias at any entry point (this is the only one at this writing.)
     def isNeverSubType(tp1: Type, tp2: Type): Boolean =
-      /*logResult(s"isNeverSubType($tp1, $tp2)")*/ ((tp1.dealias, tp2.dealias) match {
+      /*logResult(s"isNeverSubType($tp1, $tp2)")*/ ((tp1.dealias, tp2.dealias) match
         case (TypeRef(_, sym1, args1), TypeRef(_, sym2, args2)) =>
-          isNeverSubClass(sym1, sym2) || {
-            (sym1 isSubClass sym2) && {
+          isNeverSubClass(sym1, sym2) ||
+            (sym1 isSubClass sym2) &&
               val tp1seen = tp1 baseType sym2
               isNeverSubArgs(tp1seen.typeArgs, args2, sym2.typeParams)
-            }
-          }
         case _ => false
-      })
-  }
+      )
 
-  trait InferCheckable { self: Inferencer =>
+  trait InferCheckable  self: Inferencer =>
 
     def isUncheckable(P0: Type) = !isCheckable(P0)
 
     def isCheckable(P0: Type): Boolean = (uncheckedOk(P0) ||
-        (P0.widen match {
+        (P0.widen match
               case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
                 false
               case RefinedType(_, decls) if !decls.isEmpty => false
               case RefinedType(parents, _) => parents forall isCheckable
               case p => new CheckabilityChecker(AnyTpe, p) isCheckable
-            }))
+            ))
 
     /** TODO: much better error positions.
       *  Kind of stuck right now because they just pass us the one tree.
@@ -311,7 +293,7 @@ trait Checkable { self: Analyzer =>
                        P0: Type,
                        X0: Type,
                        inPattern: Boolean,
-                       canRemedy: Boolean = false) {
+                       canRemedy: Boolean = false)
       if (uncheckedOk(P0)) return
       def where = if (inPattern) "pattern " else ""
 
@@ -321,7 +303,7 @@ trait Checkable { self: Analyzer =>
 
       def PString = if (P eq P0) P.toString else s"$P (the underlying of $P0)"
 
-      P match {
+      P match
         // Prohibit top-level type tests for these, but they are ok nested (e.g. case Foldable[Nothing] => ... )
         case TypeRef(_, NothingClass | NullClass | AnyValClass, _) =>
           InferErrorGen.TypePatternOrIsInstanceTestError(tree, P)
@@ -339,14 +321,14 @@ trait Checkable { self: Analyzer =>
           val checker = new CheckabilityChecker(X, P)
           if (checker.result == RuntimeCheckable) log(checker.summaryString)
 
-          if (checker.neverMatches) {
+          if (checker.neverMatches)
             val addendum =
               if (checker.neverSubClass) ""
               else " (but still might match its erasure)"
             reporter.warning(
                 tree.pos,
                 s"fruitless type test: a value of type $X cannot also be a $PString$addendum")
-          } else if (checker.isUncheckable) {
+          else if (checker.isUncheckable)
             val msg =
               (if (checker.uncheckableType =:= P)
                  s"abstract type $where$PString"
@@ -354,17 +336,11 @@ trait Checkable { self: Analyzer =>
             reporter.warning(
                 tree.pos,
                 s"$msg is unchecked since it is eliminated by erasure")
-          }
-      }
-    }
-  }
-}
 
 private[typechecker] final class Checkability(val value: Int) extends AnyVal {}
-private[typechecker] object Checkability {
+private[typechecker] object Checkability
   val StaticallyTrue = new Checkability(0)
   val StaticallyFalse = new Checkability(1)
   val RuntimeCheckable = new Checkability(2)
   val Uncheckable = new Checkability(3)
   val CheckabilityError = new Checkability(4)
-}

@@ -5,7 +5,7 @@ import scala.collection.generic._
 
 class RingBuffer[A](m: Int)
     extends Buffer[A] with GenericTraversableTemplate[A, RingBuffer]
-    with BufferLike[A, RingBuffer[A]] with Builder[A, List[A]] {
+    with BufferLike[A, RingBuffer[A]] with Builder[A, List[A]]
   private val buf = new ListBuffer[A]
 
   private def resize(): Unit = while (buf.size > m) buf.remove(0)
@@ -30,11 +30,9 @@ class RingBuffer[A](m: Int)
   override def clone(): RingBuffer[A] = new RingBuffer(m) ++= this
   override def stringPrefix: String = "RingBuffer"
   override def companion: GenericCompanion[RingBuffer] = RingBuffer
-}
 
-object RingBuffer extends SeqFactory[RingBuffer] {
+object RingBuffer extends SeqFactory[RingBuffer]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, RingBuffer[A]] =
     new GenericCanBuildFrom[A]
   def newBuilder[A]: Builder[A, RingBuffer[A]] =
     new GrowingBuilder(new RingBuffer[A](Int.MaxValue))
-}

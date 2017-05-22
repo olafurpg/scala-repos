@@ -9,19 +9,19 @@ import mesosphere.marathon.state.EntityStore
 import scala.concurrent.Future
 
 class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
-  override def receive: Receive = {
+  override def receive: Receive =
 
     case event @ Subscribe(_, callbackUrl, _, _) =>
       val addResult: Future[EventSubscribers] = add(callbackUrl)
 
-      val subscription: Future[MarathonSubscriptionEvent] = addResult.map {
+      val subscription: Future[MarathonSubscriptionEvent] = addResult.map
         subscribers =>
           if (subscribers.urls.contains(callbackUrl))
             log.info("Callback {} subscribed.", callbackUrl)
           event
-      }(context.dispatcher)
+      (context.dispatcher)
 
       import context.dispatcher
       subscription pipeTo sender()
@@ -29,12 +29,12 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
     case event @ Unsubscribe(_, callbackUrl, _, _) =>
       val removeResult: Future[EventSubscribers] = remove(callbackUrl)
 
-      val subscription: Future[MarathonSubscriptionEvent] = removeResult.map {
+      val subscription: Future[MarathonSubscriptionEvent] = removeResult.map
         subscribers =>
           if (!subscribers.urls.contains(callbackUrl))
             log.info("Callback {} unsubscribed.", callbackUrl)
           event
-      }(context.dispatcher)
+      (context.dispatcher)
 
       import context.dispatcher
       subscription pipeTo sender()
@@ -46,34 +46,28 @@ class SubscribersKeeperActor(val store: EntityStore[EventSubscribers])
 
       import context.dispatcher
       subscription pipeTo sender()
-  }
 
   protected[this] def add(callbackUrl: String): Future[EventSubscribers] =
-    store.modify(Subscribers) { deserialize =>
+    store.modify(Subscribers)  deserialize =>
       val existingSubscribers = deserialize()
-      if (existingSubscribers.urls.contains(callbackUrl)) {
+      if (existingSubscribers.urls.contains(callbackUrl))
         log.info("Existing callback {} resubscribed.", callbackUrl)
         existingSubscribers
-      } else EventSubscribers(existingSubscribers.urls + callbackUrl)
-    }
+      else EventSubscribers(existingSubscribers.urls + callbackUrl)
 
   protected[this] def remove(callbackUrl: String): Future[EventSubscribers] =
-    store.modify(Subscribers) { deserialize =>
+    store.modify(Subscribers)  deserialize =>
       val existingSubscribers = deserialize()
 
       if (existingSubscribers.urls.contains(callbackUrl))
         EventSubscribers(existingSubscribers.urls - callbackUrl)
-      else {
+      else
         log.warning(
             "Attempted to unsubscribe nonexistent callback {}", callbackUrl)
         existingSubscribers
-      }
-    }
-}
 
-object SubscribersKeeperActor {
+object SubscribersKeeperActor
 
   case object GetSubscribers
 
   final val Subscribers = "http_event_subscribers"
-}

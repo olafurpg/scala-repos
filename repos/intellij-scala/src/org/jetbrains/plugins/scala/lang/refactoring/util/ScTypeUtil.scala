@@ -14,20 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScDesignatorType, ScParameter
   * User: Alexander Podkhalyuzin
   * Date: 30.03.2009
   */
-object ScTypeUtil {
+object ScTypeUtil
   //for java
   def presentableText(typez: ScType) = ScType.presentableText(typez)
 
-  def stripTypeArgs(tp: ScType): ScType = tp match {
+  def stripTypeArgs(tp: ScType): ScType = tp match
     case ScParameterizedType(designator, _) => designator
     case t => t
-  }
 
   case class AliasType(
       ta: ScTypeAlias, lower: TypeResult[ScType], upper: TypeResult[ScType])
 
-  def removeTypeDesignator(tp: ScType): Option[ScType] = {
-    tp match {
+  def removeTypeDesignator(tp: ScType): Option[ScType] =
+    tp match
       case ScDesignatorType(v: ScBindingPattern) =>
         v.getType(TypingContext.empty).toOption.flatMap(removeTypeDesignator)
       case ScDesignatorType(v: ScFieldId) =>
@@ -35,7 +34,7 @@ object ScTypeUtil {
       case ScDesignatorType(p: ScParameter) =>
         p.getType(TypingContext.empty).toOption.flatMap(removeTypeDesignator)
       case p: ScProjectionType =>
-        p.actualElement match {
+        p.actualElement match
           case v: ScBindingPattern =>
             v.getType(TypingContext.empty)
               .map(p.actualSubst.subst)
@@ -52,8 +51,4 @@ object ScTypeUtil {
               .toOption
               .flatMap(removeTypeDesignator)
           case _ => Some(tp)
-        }
       case _ => Some(tp)
-    }
-  }
-}

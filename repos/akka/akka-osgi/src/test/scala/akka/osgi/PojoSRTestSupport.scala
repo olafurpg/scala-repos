@@ -22,7 +22,7 @@ import scala.annotation.tailrec
 /**
   * Trait that provides support for building akka-osgi tests using PojoSR
   */
-trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
+trait PojoSRTestSupport extends Suite with BeforeAndAfterAll
 
   val MaxWaitDuration = 12800.millis
   val SleepyTime = 50.millis
@@ -35,7 +35,7 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
 
   val bufferedLoadingErrors = new ByteArrayOutputStream()
 
-  lazy val context: BundleContext = {
+  lazy val context: BundleContext =
     val config = new HashMap[String, AnyRef]()
     System.setProperty("org.osgi.framework.storage",
                        "target/akka-osgi/" + UUID.randomUUID().toString)
@@ -46,20 +46,18 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
 
     val oldErr = System.err
     System.setErr(new PrintStream(bufferedLoadingErrors))
-    try {
+    try
       ServiceLoader
         .load(classOf[PojoServiceRegistryFactory])
         .iterator
         .next
         .newPojoServiceRegistry(config)
         .getBundleContext
-    } catch {
+    catch
       case e: Throwable ⇒
         oldErr.write(bufferedLoadingErrors.toByteArray); throw e
-    } finally {
+    finally
       System.setErr(oldErr)
-    }
-  }
 
   // Ensure bundles get stopped at the end of the test to release resources and stop threads
   override protected def afterAll() = context.getBundles.foreach(_.stop)
@@ -84,24 +82,21 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
     awaitReference(serviceType, SleepyTime)
 
   def awaitReference[T](
-      serviceType: Class[T], wait: FiniteDuration): ServiceReference[T] = {
+      serviceType: Class[T], wait: FiniteDuration): ServiceReference[T] =
 
     @tailrec
     def poll(step: Duration, deadline: Deadline): ServiceReference[T] =
-      context.getServiceReference(serviceType.getName) match {
+      context.getServiceReference(serviceType.getName) match
         case null ⇒
           if (deadline.isOverdue())
             fail("Gave up waiting for service of type %s".format(serviceType))
-          else {
+          else
             Thread.sleep(
                 (step min deadline.timeLeft max Duration.Zero).toMillis)
             poll(step, deadline)
-          }
         case some ⇒ some.asInstanceOf[ServiceReference[T]]
-      }
 
     poll(wait, Deadline.now + MaxWaitDuration)
-  }
 
   protected def buildTestBundles(
       builders: immutable.Seq[BundleDescriptorBuilder])
@@ -109,24 +104,21 @@ trait PojoSRTestSupport extends Suite with BeforeAndAfterAll {
     builders map (_.build)
 
   def filterErrors()(block: ⇒ Unit): Unit =
-    try block catch {
+    try block catch
       case e: Throwable ⇒
         System.err.write(bufferedLoadingErrors.toByteArray); throw e
-    }
-}
 
-object PojoSRTestSupport {
+object PojoSRTestSupport
 
   /**
     * Convenience method to define additional test bundles
     */
   def bundle(name: String) = new BundleDescriptorBuilder(name)
-}
 
 /**
   * Helper class to make it easier to define test bundles
   */
-class BundleDescriptorBuilder(name: String) {
+class BundleDescriptorBuilder(name: String)
 
   import org.ops4j.pax.tinybundles.core.TinyBundles
 
@@ -135,55 +127,48 @@ class BundleDescriptorBuilder(name: String) {
   /**
     * Add a Blueprint XML file to our test bundle
     */
-  def withBlueprintFile(name: String, contents: URL): BundleDescriptorBuilder = {
+  def withBlueprintFile(name: String, contents: URL): BundleDescriptorBuilder =
     tinybundle.add("OSGI-INF/blueprint/%s".format(name), contents)
     this
-  }
 
   /**
     * Add a Blueprint XML file to our test bundle
     */
-  def withBlueprintFile(contents: URL): BundleDescriptorBuilder = {
+  def withBlueprintFile(contents: URL): BundleDescriptorBuilder =
     val filename = contents.getFile.split("/").last
     withBlueprintFile(filename, contents)
-  }
 
   /**
     * Add a Bundle activator to our test bundle
     */
   def withActivator(
-      activator: Class[_ <: BundleActivator]): BundleDescriptorBuilder = {
+      activator: Class[_ <: BundleActivator]): BundleDescriptorBuilder =
     tinybundle.set(Constants.BUNDLE_ACTIVATOR, activator.getName)
     this
-  }
 
   /**
     * Build the actual PojoSR BundleDescriptor instance
     */
-  def build: BundleDescriptor = {
+  def build: BundleDescriptor =
     val file: File = tinybundleToJarFile(name)
     new BundleDescriptor(getClass().getClassLoader(),
                          new URL("jar:" + file.toURI().toString() + "!/"),
                          extractHeaders(file))
-  }
 
-  def extractHeaders(file: File): HashMap[String, String] = {
+  def extractHeaders(file: File): HashMap[String, String] =
     import scala.collection.JavaConverters.iterableAsScalaIterableConverter
     val headers = new HashMap[String, String]()
     val jis = new JarInputStream(new FileInputStream(file))
-    try {
+    try
       for (entry ← jis.getManifest.getMainAttributes.entrySet.asScala) headers
         .put(entry.getKey.toString, entry.getValue.toString)
-    } finally jis.close()
+    finally jis.close()
 
     headers
-  }
 
-  def tinybundleToJarFile(name: String): File = {
+  def tinybundleToJarFile(name: String): File =
     val file = new File("target/%s-%tQ.jar".format(name, new Date()))
     val fos = new FileOutputStream(file)
     try copy(tinybundle.build(), fos) finally fos.close()
 
     file
-  }
-}

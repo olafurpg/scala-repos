@@ -25,15 +25,14 @@ import scala.util.control.NoStackTrace
 import akka.stream.impl.fusing.GraphInterpreterShell
 import akka.testkit.AkkaSpec
 
-object FlowSpec {
+object FlowSpec
   class Fruit
   class Apple extends Fruit
   val apples = () ⇒ Iterator.continually(new Apple)
-}
 
 class FlowSpec
     extends AkkaSpec(ConfigFactory.parseString(
-            "akka.actor.debug.receive=off\nakka.loglevel=INFO")) {
+            "akka.actor.debug.receive=off\nakka.loglevel=INFO"))
   import FlowSpec._
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
@@ -48,23 +47,20 @@ class FlowSpec
 
   class BrokenActorInterpreter(
       _shell: GraphInterpreterShell, brokenMessage: Any)
-      extends ActorGraphInterpreter(_shell) {
+      extends ActorGraphInterpreter(_shell)
 
-    override protected[akka] def aroundReceive(receive: Receive, msg: Any) = {
-      msg match {
+    override protected[akka] def aroundReceive(receive: Receive, msg: Any) =
+      msg match
         case ActorGraphInterpreter.OnNext(_, 0, m) if m == brokenMessage ⇒
           throw new NullPointerException(s"I'm so broken [$m]")
         case _ ⇒ super.aroundReceive(receive, msg)
-      }
-    }
-  }
 
   val faultyFlow: Flow[Any, Any, NotUsed] ⇒ Flow[Any, Any, NotUsed] = in ⇒
-    in.via({
+    in.via(
       val stage = new PushPullGraphStage((_) ⇒
-                                           fusing.Map({ x: Any ⇒
+                                           fusing.Map( x: Any ⇒
                                              x
-                                           }, stoppingDecider),
+                                           , stoppingDecider),
                                          Attributes.none)
 
       val assembly = new GraphAssembly(Array(stage),
@@ -96,16 +92,15 @@ class FlowSpec
 
       val subscriber =
         new ActorGraphInterpreter.BoundarySubscriber(impl, shell, 0)
-      val publisher = new ActorPublisher[Any](impl) {
+      val publisher = new ActorPublisher[Any](impl)
         override val wakeUpMsg =
           ActorGraphInterpreter.SubscribePending(shell, 0)
-      }
 
       impl ! ActorGraphInterpreter.ExposedPublisher(shell, 0, publisher)
 
       Flow.fromSinkAndSource(
           Sink.fromSubscriber(subscriber), Source.fromPublisher(publisher))
-    })
+    )
 
   val toPublisher: (Source[Any, _], ActorMaterializer) ⇒ Publisher[Any] = (f,
   m) ⇒ f.runWith(Sink.asPublisher(false))(m)
@@ -118,26 +113,22 @@ class FlowSpec
             .withAttributes(Attributes.inputBuffer(elasticity, elasticity)))(m)
 
   def materializeIntoSubscriberAndPublisher[In, Out](
-      flow: Flow[In, Out, _]): (Subscriber[In], Publisher[Out]) = {
+      flow: Flow[In, Out, _]): (Subscriber[In], Publisher[Out]) =
     flow.runWith(Source.asSubscriber[In], Sink.asPublisher[Out](false))
-  }
 
-  "A Flow" must {
+  "A Flow" must
 
     for ((name, op) ← List("identity" -> identity, "identity2" -> identity2);
-    n ← List(1, 2, 4)) {
-      s"request initial elements from upstream ($name, $n)" in {
+    n ← List(1, 2, 4))
+      s"request initial elements from upstream ($name, $n)" in
         new ChainSetup(op,
                        settings.withInputBuffer(initialSize = n, maxSize = n),
-                       toPublisher) {
+                       toPublisher)
           upstream.expectRequest(upstreamSubscription,
                                  settings.maxInputBufferSize)
-        }
-      }
-    }
 
-    "request more elements from upstream when downstream requests more elements" in {
-      new ChainSetup(identity, settings, toPublisher) {
+    "request more elements from upstream when downstream requests more elements" in
+      new ChainSetup(identity, settings, toPublisher)
         upstream.expectRequest(upstreamSubscription,
                                settings.maxInputBufferSize)
         downstreamSubscription.request(1)
@@ -153,38 +144,30 @@ class FlowSpec
         upstreamSubscription.sendNext("d")
         downstream.expectNext("b")
         downstream.expectNext("c")
-      }
-    }
 
-    "deliver events when publisher sends elements and then completes" in {
-      new ChainSetup(identity, settings, toPublisher) {
+    "deliver events when publisher sends elements and then completes" in
+      new ChainSetup(identity, settings, toPublisher)
         downstreamSubscription.request(1)
         upstreamSubscription.sendNext("test")
         upstreamSubscription.sendComplete()
         downstream.expectNext("test")
         downstream.expectComplete()
-      }
-    }
 
-    "deliver complete signal when publisher immediately completes" in {
-      new ChainSetup(identity, settings, toPublisher) {
+    "deliver complete signal when publisher immediately completes" in
+      new ChainSetup(identity, settings, toPublisher)
         upstreamSubscription.sendComplete()
         downstream.expectComplete()
-      }
-    }
 
-    "deliver error signal when publisher immediately fails" in {
-      new ChainSetup(identity, settings, toPublisher) {
+    "deliver error signal when publisher immediately fails" in
+      new ChainSetup(identity, settings, toPublisher)
         object WeirdError extends RuntimeException("weird test exception")
         upstreamSubscription.sendError(WeirdError)
         downstream.expectError(WeirdError)
-      }
-    }
 
-    "cancel upstream when single subscriber cancels subscription while receiving data" in {
+    "cancel upstream when single subscriber cancels subscription while receiving data" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toPublisher) {
+                     toPublisher)
         downstreamSubscription.request(5)
         upstreamSubscription.expectRequest(1)
         upstreamSubscription.sendNext("test")
@@ -197,10 +180,8 @@ class FlowSpec
 
         // because of the "must cancel its upstream Subscription if its last downstream Subscription has been canceled" rule
         upstreamSubscription.expectCancellation()
-      }
-    }
 
-    "materialize into Publisher/Subscriber" in {
+    "materialize into Publisher/Subscriber" in
       val flow = Flow[String]
       val (flowIn: Subscriber[String], flowOut: Publisher[String]) =
         materializeIntoSubscriberAndPublisher(flow)
@@ -218,9 +199,8 @@ class FlowSpec
       c1.expectNext("2")
       c1.expectNext("3")
       c1.expectComplete()
-    }
 
-    "materialize into Publisher/Subscriber and transformation processor" in {
+    "materialize into Publisher/Subscriber and transformation processor" in
       val flow = Flow[Int].map((i: Int) ⇒ i.toString)
       val (flowIn: Subscriber[Int], flowOut: Publisher[String]) =
         materializeIntoSubscriberAndPublisher(flow)
@@ -239,9 +219,8 @@ class FlowSpec
       c1.expectNext("2")
       c1.expectNext("3")
       c1.expectComplete()
-    }
 
-    "materialize into Publisher/Subscriber and multiple transformation processors" in {
+    "materialize into Publisher/Subscriber and multiple transformation processors" in
       val flow = Flow[Int].map(_.toString).map("elem-" + _)
       val (flowIn, flowOut) = materializeIntoSubscriberAndPublisher(flow)
 
@@ -259,9 +238,8 @@ class FlowSpec
       c1.expectNext("elem-2")
       c1.expectNext("elem-3")
       c1.expectComplete()
-    }
 
-    "subscribe Subscriber" in {
+    "subscribe Subscriber" in
       val flow: Flow[String, String, _] = Flow[String]
       val c1 = TestSubscriber.manualProbe[String]()
       val sink: Sink[String, _] = flow.to(Sink.fromSubscriber(c1))
@@ -275,9 +253,8 @@ class FlowSpec
       c1.expectNext("2")
       c1.expectNext("3")
       c1.expectComplete()
-    }
 
-    "perform transformation operation" in {
+    "perform transformation operation" in
       val flow = Flow[Int].map(i ⇒ { testActor ! i.toString; i.toString })
 
       val publisher = Source(List(1, 2, 3)).runWith(Sink.asPublisher(false))
@@ -286,9 +263,8 @@ class FlowSpec
       expectMsg("1")
       expectMsg("2")
       expectMsg("3")
-    }
 
-    "perform transformation operation and subscribe Subscriber" in {
+    "perform transformation operation and subscribe Subscriber" in
       val flow = Flow[Int].map(_.toString)
       val c1 = TestSubscriber.manualProbe[String]()
       val sink: Sink[Int, _] = flow.to(Sink.fromSubscriber(c1))
@@ -302,9 +278,8 @@ class FlowSpec
       c1.expectNext("2")
       c1.expectNext("3")
       c1.expectComplete()
-    }
 
-    "be materializable several times with fanout publisher" in assertAllStagesStopped {
+    "be materializable several times with fanout publisher" in assertAllStagesStopped
       val flow = Source(List(1, 2, 3)).map(_.toString)
       val p1 = flow.runWith(Sink.asPublisher(true))
       val p2 = flow.runWith(Sink.asPublisher(true))
@@ -335,9 +310,8 @@ class FlowSpec
       s3.expectNext("2")
       s3.expectNext("3")
       s3.expectComplete()
-    }
 
-    "be covariant" in {
+    "be covariant" in
       val f1: Source[Fruit, _] = Source.fromIterator[Fruit](apples)
       val p1: Publisher[Fruit] =
         Source.fromIterator[Fruit](apples).runWith(Sink.asPublisher(false))
@@ -353,9 +327,8 @@ class FlowSpec
         Flow[String].map(_ ⇒ new Apple).groupBy(2, _ ⇒ true)
       val d3: Flow[String, (immutable.Seq[Apple], Source[Fruit, _]), _] =
         Flow[String].map(_ ⇒ new Apple).prefixAndTail(1)
-    }
 
-    "be possible to convert to a processor, and should be able to take a Processor" in {
+    "be possible to convert to a processor, and should be able to take a Processor" in
       val identity1 = Flow[Int].toProcessor
       val identity2 = Flow.fromProcessor(() ⇒ identity1.run())
       Await.result(Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
@@ -364,14 +337,12 @@ class FlowSpec
       // Reusable:
       Await.result(Source(1 to 10).via(identity2).limit(100).runWith(Sink.seq),
                    3.seconds) should ===(1 to 10)
-    }
-  }
 
-  "A Flow with multiple subscribers (FanOutBox)" must {
-    "adapt speed to the currently slowest subscriber" in {
+  "A Flow with multiple subscribers (FanOutBox)" must
+    "adapt speed to the currently slowest subscriber" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+                     toFanoutPublisher(1))
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -393,13 +364,11 @@ class FlowSpec
 
         downstream2Subscription.request(1)
         downstream2.expectNext("element2")
-      }
-    }
 
-    "support slow subscriber with fan-out 2" in {
+    "support slow subscriber with fan-out 2" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(2)) {
+                     toFanoutPublisher(2))
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -434,13 +403,11 @@ class FlowSpec
         upstreamSubscription.sendComplete()
         downstream.expectComplete()
         downstream2.expectComplete()
-      }
-    }
 
-    "support incoming subscriber while elements were requested before" in {
+    "support incoming subscriber while elements were requested before" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+                     toFanoutPublisher(1))
         downstreamSubscription.request(5)
         upstream.expectRequest(upstreamSubscription, 1)
         upstreamSubscription.sendNext("a1")
@@ -473,13 +440,11 @@ class FlowSpec
         // buffer should be empty so we should be requesting one new element
 
         upstream.expectRequest(upstreamSubscription, 1) // because of buffer size 1
-      }
-    }
 
-    "be unblocked when blocking subscriber cancels subscription" in {
+    "be unblocked when blocking subscriber cancels subscription" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+                     toFanoutPublisher(1))
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
         val downstream2Subscription = downstream2.expectSubscription()
@@ -511,13 +476,11 @@ class FlowSpec
 
         upstreamSubscription.sendComplete()
         downstream.expectComplete()
-      }
-    }
 
-    "call future subscribers' onError after onSubscribe if initial upstream was completed" in {
+    "call future subscribers' onError after onSubscribe if initial upstream was completed" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(1)) {
+                     toFanoutPublisher(1))
         val downstream2 = TestSubscriber.manualProbe[Any]()
         // don't link it just yet
 
@@ -552,14 +515,12 @@ class FlowSpec
         downstream3.expectSubscription()
         downstream3.expectError() should ===(
             ActorPublisher.NormalShutdownReason)
-      }
-    }
 
-    "call future subscribers' onError should be called instead of onSubscribed after initial upstream reported an error" in {
+    "call future subscribers' onError should be called instead of onSubscribed after initial upstream reported an error" in
       new ChainSetup[Int, String, NotUsed](
           _.map(_ ⇒ throw TestException),
           settings.withInputBuffer(initialSize = 1, maxSize = 1),
-          toFanoutPublisher(1)) {
+          toFanoutPublisher(1))
         downstreamSubscription.request(1)
         upstreamSubscription.expectRequest(1)
 
@@ -571,13 +532,11 @@ class FlowSpec
         val downstream2 = TestSubscriber.manualProbe[String]()
         publisher.subscribe(downstream2)
         downstream2.expectSubscriptionAndError() should be(TestException)
-      }
-    }
 
-    "call future subscribers' onError when all subscriptions were cancelled" in {
+    "call future subscribers' onError when all subscriptions were cancelled" in
       new ChainSetup(identity,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(16)) {
+                     toFanoutPublisher(16))
         upstreamSubscription.expectRequest(1)
         downstreamSubscription.cancel()
         upstreamSubscription.expectCancellation()
@@ -588,28 +547,23 @@ class FlowSpec
         downstream2
           .expectSubscriptionAndError()
           .isInstanceOf[IllegalStateException] should be(true)
-      }
-    }
 
-    "should be created from a function easily" in {
+    "should be created from a function easily" in
       Source(0 to 9)
         .via(Flow.fromFunction(_ + 1))
         .runWith(Sink.seq)
         .futureValue should ===(1 to 10)
-    }
-  }
 
-  "A broken Flow" must {
-    "cancel upstream and call onError on current and future downstream subscribers if an internal error occurs" in {
+  "A broken Flow" must
+    "cancel upstream and call onError on current and future downstream subscribers if an internal error occurs" in
       new ChainSetup(faultyFlow,
                      settings.withInputBuffer(initialSize = 1, maxSize = 1),
-                     toFanoutPublisher(16)) {
+                     toFanoutPublisher(16))
 
-        def checkError(sprobe: TestSubscriber.ManualProbe[Any]): Unit = {
+        def checkError(sprobe: TestSubscriber.ManualProbe[Any]): Unit =
           val error = sprobe.expectError()
           error.isInstanceOf[AbruptTerminationException] should be(true)
           error.getMessage should startWith("Processor actor")
-        }
 
         val downstream2 = TestSubscriber.manualProbe[Any]()
         publisher.subscribe(downstream2)
@@ -631,7 +585,7 @@ class FlowSpec
             EventFilter[NullPointerException](),
             EventFilter[IllegalStateException](),
             EventFilter[PostRestartException]()) // This is thrown because we attach the dummy failing actor to toplevel
-        try {
+        try
           system.eventStream.publish(Mute(filters))
 
           upstream.expectRequest(upstreamSubscription, 1)
@@ -647,18 +601,12 @@ class FlowSpec
           downstream3.expectSubscription()
           // IllegalStateException terminated abruptly
           checkError(downstream3)
-        } finally {
+        finally
           system.eventStream.publish(UnMute(filters))
-        }
-      }
-    }
 
-    "suitably override attribute handling methods" in {
+    "suitably override attribute handling methods" in
       import Attributes._
       val f: Flow[Int, Int, NotUsed] =
         Flow[Int].async.addAttributes(none).named("")
-    }
-  }
 
   object TestException extends RuntimeException with NoStackTrace
-}

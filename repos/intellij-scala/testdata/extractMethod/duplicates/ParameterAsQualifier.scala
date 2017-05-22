@@ -1,10 +1,8 @@
-object ParameterAsQualifier {
-  def foo(first: String, second: String) {
+object ParameterAsQualifier
+  def foo(first: String, second: String)
     val i = 0
     /*start*/
     first.charAt(i).isUpper /*end*/ || second.charAt(1).isUpper
-  }
-}
 /*
 object ParameterAsQualifier {
   def foo(first: String, second: String) {

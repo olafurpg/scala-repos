@@ -3,7 +3,7 @@
   */
 package akka.util
 
-object BoxedType {
+object BoxedType
   import java.{lang ⇒ jl}
 
   private val toBoxed = Map[Class[_], Class[_]](
@@ -18,4 +18,3 @@ object BoxedType {
       classOf[Unit] -> classOf[scala.runtime.BoxedUnit])
 
   final def apply(c: Class[_]): Class[_] = if (c.isPrimitive) toBoxed(c) else c
-}

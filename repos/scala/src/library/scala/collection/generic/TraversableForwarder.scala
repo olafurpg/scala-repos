@@ -30,7 +30,7 @@ import scala.reflect.ClassTag
 @deprecated(
     "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
     "2.11.0")
-trait TraversableForwarder[+A] extends Traversable[A] {
+trait TraversableForwarder[+A] extends Traversable[A]
 
   /** The traversable object to which calls are forwarded. */
   protected def underlying: Traversable[A]
@@ -97,4 +97,3 @@ trait TraversableForwarder[+A] extends Traversable[A] {
     underlying.addString(b, sep)
   override def addString(b: StringBuilder): StringBuilder =
     underlying.addString(b)
-}

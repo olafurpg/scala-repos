@@ -11,10 +11,10 @@ import org.junit.runner.RunWith
   * @author dlwh
   */
 @RunWith(classOf[JUnitRunner])
-class LPMaxFlowTest extends FunSuite {
+class LPMaxFlowTest extends FunSuite
 
-  test("LPMaxFlowTest") {
-    val g = new FlowGraph[Int] {
+  test("LPMaxFlowTest")
+    val g = new FlowGraph[Int]
 
       def source = 0
 
@@ -33,10 +33,7 @@ class LPMaxFlowTest extends FunSuite {
                       4 -> Seq(E(4, 5, 2, 1)))
 
       def edgesFrom(n: Int) = edges(n).iterator
-    }
 
     val lpm = new LPMaxFlow(g)
     assert((lpm.maxFlow._2 - 4).abs < 1E-5, lpm)
     assert((lpm.minCostFlow()._2 - 20).abs < 1E-5, lpm)
-  }
-}

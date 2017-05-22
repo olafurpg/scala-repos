@@ -7,7 +7,7 @@ import org.jetbrains.sbt.resolvers.SbtResolver
 /**
   * @author Pavel Fatin
   */
-object SbtModule {
+object SbtModule
   private val ImportsKey = "sbt.imports"
 
   private val Delimiter = ", "
@@ -23,18 +23,16 @@ object SbtModule {
     Option(module.setOption(ImportsKey, imports.mkString(Delimiter)))
 
   def getResolversFrom(module: Module): Set[SbtResolver] =
-    Option(module.getOptionValue(ResolversKey)).map { str =>
+    Option(module.getOptionValue(ResolversKey)).map  str =>
       str
         .split(Delimiter)
         .map(SbtResolver.fromString)
-        .collect {
+        .collect
           case Some(r) => r
-        }
         .toSet
-    }.getOrElse(Set.empty)
+    .getOrElse(Set.empty)
 
   def setResolversTo(module: Module, resolvers: Set[SbtResolver]) =
     Option(
         module.setOption(
             ResolversKey, resolvers.map(_.toString).mkString(Delimiter)))
-}

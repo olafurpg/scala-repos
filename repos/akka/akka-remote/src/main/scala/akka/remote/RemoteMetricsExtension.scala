@@ -20,7 +20,7 @@ import akka.routing.RouterEnvelope
   * as max size of different message types.
   */
 private[akka] object RemoteMetricsExtension
-    extends ExtensionId[RemoteMetrics] with ExtensionIdProvider {
+    extends ExtensionId[RemoteMetrics] with ExtensionIdProvider
   override def get(system: ActorSystem): RemoteMetrics = super.get(system)
 
   override def lookup = RemoteMetricsExtension
@@ -30,12 +30,11 @@ private[akka] object RemoteMetricsExtension
           .getString("akka.remote.log-frame-size-exceeding")
           .toLowerCase == "off") new RemoteMetricsOff
     else new RemoteMetricsOn(system)
-}
 
 /**
   * INTERNAL API
   */
-private[akka] trait RemoteMetrics extends Extension {
+private[akka] trait RemoteMetrics extends Extension
 
   /**
     * Logging of the size of different message types.
@@ -43,20 +42,18 @@ private[akka] trait RemoteMetrics extends Extension {
     * and increase threshold of 10%.
     */
   def logPayloadBytes(msg: Any, payloadBytes: Int): Unit
-}
 
 /**
   * INTERNAL API
   */
-private[akka] class RemoteMetricsOff extends RemoteMetrics {
+private[akka] class RemoteMetricsOff extends RemoteMetrics
   override def logPayloadBytes(msg: Any, payloadBytes: Int): Unit = ()
-}
 
 /**
   * INTERNAL API
   */
 private[akka] class RemoteMetricsOn(system: ExtendedActorSystem)
-    extends RemoteMetrics {
+    extends RemoteMetrics
 
   private val logFrameSizeExceeding: Int = system.settings.config
     .getBytes("akka.remote.log-frame-size-exceeding")
@@ -66,32 +63,27 @@ private[akka] class RemoteMetricsOn(system: ExtendedActorSystem)
     new ConcurrentHashMap
 
   override def logPayloadBytes(msg: Any, payloadBytes: Int): Unit =
-    if (payloadBytes >= logFrameSizeExceeding) {
-      val clazz = msg match {
+    if (payloadBytes >= logFrameSizeExceeding)
+      val clazz = msg match
         case x: ActorSelectionMessage ⇒ x.msg.getClass
         case x: RouterEnvelope ⇒ x.message.getClass
         case _ ⇒ msg.getClass
-      }
 
       // 10% threshold until next log
       def newMax = (payloadBytes * 1.1).toInt
 
-      @tailrec def check(): Unit = {
+      @tailrec def check(): Unit =
         val max = maxPayloadBytes.get(clazz)
-        if (max eq null) {
+        if (max eq null)
           if (maxPayloadBytes.putIfAbsent(clazz, newMax) eq null)
             log.info("Payload size for [{}] is [{}] bytes",
                      clazz.getName,
                      payloadBytes)
           else check()
-        } else if (payloadBytes > max) {
+        else if (payloadBytes > max)
           if (maxPayloadBytes.replace(clazz, max, newMax))
             log.info("New maximum payload size for [{}] is [{}] bytes",
                      clazz.getName,
                      payloadBytes)
           else check()
-        }
-      }
       check()
-    }
-}

@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class ComputeMatrixIntersectionJob(args: Args) extends Job(args) {
+class ComputeMatrixIntersectionJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -30,4 +30,3 @@ class ComputeMatrixIntersectionJob(args: Args) extends Job(args) {
     .write(Tsv(args("intersection")))
     (adjacencyMatrix1 - intersection).write(Tsv(args("leftDiff")))
   (adjacencyMatrix2 - intersection).write(Tsv(args("rightDiff")))
-}

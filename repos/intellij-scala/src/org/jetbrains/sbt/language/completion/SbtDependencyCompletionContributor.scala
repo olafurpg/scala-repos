@@ -15,7 +15,7 @@ import org.jetbrains.sbt.resolvers.{SbtResolverIndexesManager, SbtResolverUtils}
   * @author Nikolay Obedin
   * @since 7/31/14.
   */
-class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
+class SbtDependencyCompletionContributor extends ScalaCompletionContributor
 
   val insideInfixExpr =
     PlatformPatterns.psiElement().withSuperParent(2, classOf[ScInfixExpr])
@@ -23,10 +23,10 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
   extend(
       CompletionType.BASIC,
       insideInfixExpr,
-      new CompletionProvider[CompletionParameters] {
+      new CompletionProvider[CompletionParameters]
         override def addCompletions(parameters: CompletionParameters,
                                     context: ProcessingContext,
-                                    results: CompletionResultSet) {
+                                    results: CompletionResultSet)
           if (parameters.getOriginalFile.getFileType.getName != Sbt.Name)
             return
 
@@ -42,32 +42,27 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
           def addResult(result: String) =
             results.addElement(LookupElementBuilder.create(result))
 
-          def completeGroup(artifact: String) = {
-            indexes foreach { index =>
+          def completeGroup(artifact: String) =
+            indexes foreach  index =>
               if (artifact.nonEmpty) index.groups(artifact) foreach addResult
               else index.groups foreach addResult
-            }
             results.stopHere()
-          }
 
-          def completeArtifact(group: String) = {
-            indexes foreach { index =>
+          def completeArtifact(group: String) =
+            indexes foreach  index =>
               if (group.nonEmpty) index.artifacts(group) foreach addResult
               else index.groups flatMap index.artifacts foreach addResult
-            }
             results.stopHere()
-          }
 
-          def completeVersion(group: String, artifact: String): Unit = {
+          def completeVersion(group: String, artifact: String): Unit =
             if (group.isEmpty || artifact.isEmpty) return
             indexes foreach (_.versions(group, artifact) foreach addResult)
             results.stopHere()
-          }
 
           def isValidOperation(operation: String) =
             operation == "%" || operation == "%%"
 
-          (infixExpr.lOp, infixExpr.operation, infixExpr.rOp) match {
+          (infixExpr.lOp, infixExpr.operation, infixExpr.rOp) match
             case (lop, oper, ScLiteralImpl.string(artifact))
                 if lop == place.getContext && isValidOperation(oper.getText) =>
               completeGroup(artifact)
@@ -77,12 +72,9 @@ class SbtDependencyCompletionContributor extends ScalaCompletionContributor {
             case (ScInfixExpr(llop, loper, lrop), oper, rop)
                 if rop == place.getContext &&
                 oper.getText == "%" && isValidOperation(loper.getText) =>
-              for {
+              for
                 ScLiteralImpl.string(group) <- Option(llop)
                 ScLiteralImpl.string(artifact) <- Option(lrop)
-              } yield completeVersion(group, artifact)
+              yield completeVersion(group, artifact)
             case _ => // do nothing
-          }
-        }
-      })
-}
+      )

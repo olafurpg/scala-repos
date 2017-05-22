@@ -21,57 +21,47 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScParamClausesStub
   */
 class ScParametersImpl private (
     stub: StubElement[ScParameters], nodeType: IElementType, node: ASTNode)
-    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameters {
+    extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScParameters
 
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScParamClausesStub) = {
+  def this(stub: ScParamClausesStub) =
     this(stub, ScalaElementTypes.PARAM_CLAUSES, null)
-  }
 
   override def toString: String = "Parameters"
 
-  def clauses: Seq[ScParameterClause] = {
+  def clauses: Seq[ScParameterClause] =
     getStubOrPsiChildren(ScalaElementTypes.PARAM_CLAUSE,
                          JavaArrayFactoryUtil.ScParameterClauseFactory).toSeq
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
-    if (lastParent != null) {
+                                   place: PsiElement): Boolean =
+    if (lastParent != null)
       val clausesIterator = clauses.iterator
       var break = false
-      while (clausesIterator.hasNext && !break) {
+      while (clausesIterator.hasNext && !break)
         val clause = clausesIterator.next()
         if (clause == lastParent) break = true
-        else {
+        else
           val paramsIterator = clause.parameters.iterator
-          while (paramsIterator.hasNext) {
+          while (paramsIterator.hasNext)
             val param = paramsIterator.next()
             if (!processor.execute(param, state)) return false
-          }
-        }
-      }
-    }
     true
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitParameters(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitParameters(this)
       case _ => super.accept(visitor)
-    }
-  }
 
-  override def add(element: PsiElement): PsiElement = {
-    element match {
+  override def add(element: PsiElement): PsiElement =
+    element match
       case param: ScParameter =>
-        clauses.lastOption match {
+        clauses.lastOption match
           case Some(clause) =>
             clause.addParameter(param).parameters.last
           case _ =>
@@ -80,8 +70,4 @@ class ScParametersImpl private (
             val newClause = clause.addParameter(param)
             super.add(clause)
             newClause.parameters.last
-        }
       case _ => super.add(element)
-    }
-  }
-}

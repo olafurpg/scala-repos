@@ -18,11 +18,11 @@ package com.twitter.scalding
 import java.io.File
 import java.nio.file.Path
 
-object ExpandLibJarsGlobs {
-  def apply(inputArgs: Array[String]): Array[String] = {
+object ExpandLibJarsGlobs
+  def apply(inputArgs: Array[String]): Array[String] =
     // First we are going to expand out the libjars if we find it
     val libJarsIdx = inputArgs.indexOf("-libjars") + 1
-    if (libJarsIdx > 0 && libJarsIdx < inputArgs.length) {
+    if (libJarsIdx > 0 && libJarsIdx < inputArgs.length)
       // 0 would mean we never found -libjars
       val newArgs = new Array[String](inputArgs.length)
       System.arraycopy(inputArgs, 0, newArgs, 0, inputArgs.length)
@@ -30,15 +30,13 @@ object ExpandLibJarsGlobs {
       val existing = newArgs(libJarsIdx)
       val replacement = existing
         .split(",")
-        .flatMap { element =>
+        .flatMap  element =>
           fromGlob(element).map(_.toString)
-        }
         .mkString(",")
 
       newArgs(libJarsIdx) = replacement
       newArgs
-    } else inputArgs
-  }
+    else inputArgs
 
   //tree from Duncan McGregor @ http://stackoverflow.com/questions/2637643/how-do-i-list-all-files-in-a-subdirectory-in-scala
   private[this] def tree(
@@ -46,12 +44,12 @@ object ExpandLibJarsGlobs {
     if (!root.exists || (skipHidden && root.isHidden)) Stream.empty
     else
       root #::
-      (root.listFiles match {
+      (root.listFiles match
             case null => Stream.empty
             case files => files.toStream.flatMap(tree(_, skipHidden))
-          })
+          )
 
-  def fromGlob(glob: String, filesOnly: Boolean = true): Stream[Path] = {
+  def fromGlob(glob: String, filesOnly: Boolean = true): Stream[Path] =
     import java.nio._
     import java.nio.file._
     val fs = FileSystems.getDefault()
@@ -69,5 +67,3 @@ object ExpandLibJarsGlobs {
 
     if (filesOnly) globMatchingPaths.filter(_.toFile.isFile)
     else globMatchingPaths
-  }
-}

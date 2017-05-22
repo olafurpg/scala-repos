@@ -1,24 +1,20 @@
 trait Foo[T] { val foo: T }
 
-class A extends Foo[Unit] {
+class A extends Foo[Unit]
   lazy val foo = println("Unit: called A.foo")
-}
 
-class B extends Foo[Unit] {
+class B extends Foo[Unit]
   val foo = println("Unit: called B.foo")
-}
 
 trait Bar[T] { def foo: T }
 
-class C extends Bar[Unit] {
+class C extends Bar[Unit]
   lazy val foo = println("Unit: called C.foo")
-}
 
-class D extends Bar[Unit] {
+class D extends Bar[Unit]
   def foo = println("Unit: called D.foo")
-}
 
-object Test extends App {
+object Test extends App
   val a: Foo[Unit] = new A
   a.foo
   a.foo
@@ -31,4 +27,3 @@ object Test extends App {
   val d: Bar[Unit] = new D
   d.foo
   d.foo
-}

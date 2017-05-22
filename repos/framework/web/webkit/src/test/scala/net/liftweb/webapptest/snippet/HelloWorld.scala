@@ -18,21 +18,17 @@ package net.liftweb
 package webapptest
 package snippet
 
-class HelloWorld {
+class HelloWorld
   def howdy = <span>Welcome to webtest1 at {new java.util.Date}</span>
-}
 
 import scala.xml._
 import net.liftweb.http._
 
-class Meow extends Function1[NodeSeq, NodeSeq] {
+class Meow extends Function1[NodeSeq, NodeSeq]
   def apply(in: NodeSeq): NodeSeq = <yak/>
-}
 
-class Meower {
+class Meower
   def render: Meow = new Meow
-}
 
-class Splunker {
+class Splunker
   def render = SHtml.onSubmit(s => ())
-}

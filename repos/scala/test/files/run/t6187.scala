@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def code =
     """
 import scala.language.experimental.macros, scala.reflect.macros.blackbox.Context
@@ -16,4 +16,3 @@ m(List(1))
 List(1) collect { case x => x }
 List("") collect { case x => x }
   """.trim
-}

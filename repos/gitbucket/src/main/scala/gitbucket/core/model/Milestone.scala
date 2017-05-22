@@ -1,13 +1,13 @@
 package gitbucket.core.model
 
-trait MilestoneComponent extends TemplateComponent { self: Profile =>
+trait MilestoneComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
   lazy val Milestones = TableQuery[Milestones]
 
   class Milestones(tag: Tag)
-      extends Table[Milestone](tag, "MILESTONE") with MilestoneTemplate {
+      extends Table[Milestone](tag, "MILESTONE") with MilestoneTemplate
     override val milestoneId = column[Int]("MILESTONE_ID", O AutoInc)
     val title = column[String]("TITLE")
     val description = column[String]("DESCRIPTION")
@@ -28,8 +28,6 @@ trait MilestoneComponent extends TemplateComponent { self: Profile =>
                      repositoryName: Column[String],
                      milestoneId: Column[Int]) =
       byMilestone(userName, repositoryName, milestoneId)
-  }
-}
 
 case class Milestone(
     userName: String,

@@ -32,9 +32,9 @@ import org.apache.spark.sql.{Row, SQLContext}
   * bin/run-example ml.SimpleParamsExample
   * }}}
   */
-object SimpleParamsExample {
+object SimpleParamsExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("SimpleParamsExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -97,15 +97,12 @@ object SimpleParamsExample {
       .transform(test.toDF())
       .select("features", "label", "myProbability", "prediction")
       .collect()
-      .foreach {
+      .foreach
         case Row(features: Vector,
                  label: Double,
                  prob: Vector,
                  prediction: Double) =>
           println(s"($features, $label) -> prob=$prob, prediction=$prediction")
-      }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

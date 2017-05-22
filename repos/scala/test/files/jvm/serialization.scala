@@ -2,54 +2,49 @@
 // Serialization
 //############################################################################
 
-object Serialize {
+object Serialize
   @throws(classOf[java.io.IOException])
-  def write[A](o: A): Array[Byte] = {
+  def write[A](o: A): Array[Byte] =
     val ba = new java.io.ByteArrayOutputStream(512)
     val out = new java.io.ObjectOutputStream(ba)
     out.writeObject(o)
     out.close()
     ba.toByteArray()
-  }
   @throws(classOf[java.io.IOException])
   @throws(classOf[ClassNotFoundException])
-  def read[A](buffer: Array[Byte]): A = {
+  def read[A](buffer: Array[Byte]): A =
     val in =
       new java.io.ObjectInputStream(new java.io.ByteArrayInputStream(buffer))
     in.readObject().asInstanceOf[A]
-  }
-  def check[A, B](x: A, y: B) {
+  def check[A, B](x: A, y: B)
     println("x = " + x)
     println("y = " + y)
     println("x equals y: " + (x equals y) + ", y equals x: " + (y equals x))
     assert((x equals y) && (y equals x))
     println()
-  }
-}
 import Serialize._
 
 //############################################################################
 // Test classes in package "scala"
 
-object Test1_scala {
+object Test1_scala
 
   private def arrayToString[A](arr: Array[A]): String =
     arr.mkString("Array[", ",", "]")
 
   private def arrayEquals[A, B](a1: Array[A], a2: Array[B]): Boolean =
     (a1.length == a2.length) &&
-    (Iterator.range(0, a1.length) forall { i =>
+    (Iterator.range(0, a1.length) forall  i =>
           a1(i) == a2(i)
-        })
+        )
 
-  object WeekDay extends Enumeration {
+  object WeekDay extends Enumeration
     type WeekDay = Value
     val Monday, Tuesday, Wednesday, Thusday, Friday, Saturday, Sunday = Value
-  }
   import WeekDay._, BigDecimal._, RoundingMode._
 
   // in alphabetic order
-  try {
+  try
     // Array
     val a1 = Array(1, 2, 3)
     val _a1: Array[Int] = read(write(a1))
@@ -115,9 +110,8 @@ object Test1_scala {
     println()
 
     // Function
-    val f1 = { x: Int =>
+    val f1 =  x: Int =>
       2 * x
-    }
     val _f1: Function[Int, Int] = read(write(f1))
     println("f1 = <na>")
     println("_f1 = <na>")
@@ -185,31 +179,28 @@ object Test1_scala {
     println("t1 equals _t1: " + (t1 equals _t1) + ", _t1 equals t1: " +
         (_t1 equals t1))
     println()
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test1_scala: " + e)
       throw e
-  }
-}
 
 //############################################################################
 // Test classes in package "scala.collection.immutable"
 
-object Test2_immutable {
+object Test2_immutable
   import scala.collection.immutable.{BitSet, HashMap, HashSet, ListMap, ListSet, Queue, Range, SortedMap, SortedSet, Stack, Stream, TreeMap, TreeSet, Vector}
 
   // in alphabetic order
-  try {
+  try
     // BitSet
     val bs1 = BitSet.empty + 1 + 2
     val _bs1: BitSet = read(write(bs1))
     check(bs1, _bs1)
 
-    val bs2 = {
+    val bs2 =
       val bs = new collection.mutable.BitSet()
       bs += 2; bs += 3
       bs.toImmutable
-    }
     val _bs2: BitSet = read(write(bs2))
     check(bs2, _bs2)
 
@@ -287,24 +278,22 @@ object Test2_immutable {
     val v1 = Vector('a, 'b, 'c)
     val _v1: Vector[Symbol] = read(write(v1))
     check(v1, _v1)
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test2_immutable: " + e)
       throw e
-  }
-}
 
 //############################################################################
 // Test classes in package "scala.collection.mutable"
 
 @deprecated("Suppress warnings", since = "2.11")
-object Test3_mutable {
+object Test3_mutable
   import scala.reflect.ClassManifest
   import scala.collection.mutable.{ArrayBuffer, ArrayBuilder, ArraySeq, ArrayStack, BitSet, DoubleLinkedList, HashMap, HashSet, History, LinkedHashMap, LinkedHashSet, LinkedList, ListBuffer, Publisher, Queue, Stack, StringBuilder, WrappedArray, TreeSet}
   import scala.collection.concurrent.TrieMap
 
   // in alphabetic order
-  try {
+  try
     // ArrayBuffer
     val ab1 = new ArrayBuffer[String]
     ab1 ++= List("one", "two")
@@ -362,7 +351,6 @@ object Test3_mutable {
     check(h1, _h1)
 
     // LinkedHashMap
-    {
       val lhm1 = new LinkedHashMap[String, Int]
       val list = List(("Linked", 1), ("Hash", 2), ("Map", 3))
       lhm1 ++= list.iterator
@@ -370,10 +358,8 @@ object Test3_mutable {
       check(lhm1, _lhm1)
       check(lhm1.toSeq, _lhm1.toSeq) // check elements order
       check(lhm1.toSeq, list) // check elements order
-    }
 
     // LinkedHashSet
-    {
       val lhs1 = new LinkedHashSet[String]
       val list = List("layers", "buffers", "title")
       lhs1 ++= list.iterator
@@ -381,7 +367,6 @@ object Test3_mutable {
       check(lhs1, _lhs1)
       check(lhs1.toSeq, _lhs1.toSeq) // check elements order
       check(lhs1.toSeq, list) // check elements order
-    }
     /*
     // LinkedList
     val ll1 = new LinkedList[Int](2, null)
@@ -428,61 +413,53 @@ object Test3_mutable {
       TrieMap[Int, String]() ++= Array(1 -> "one", 2 -> "two", 3 -> "three")
     val _ct1: TrieMap[Int, String] = read(write(ct1))
     check(ct1, _ct1)
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test3_mutable: " + e)
       throw e
-  }
-}
 
 //############################################################################
 // Test user-defined classes WITHOUT nesting
 
-class Person(_name: String) extends Serializable {
+class Person(_name: String) extends Serializable
   private var name = _name
   override def toString() = name
   override def equals(that: Any): Boolean =
     that.isInstanceOf[Person] && (name == that.asInstanceOf[Person].name)
-}
 
-class Employee(_name: String) extends Serializable {
+class Employee(_name: String) extends Serializable
   private var name = _name
   override def toString() = name
-}
 
 object bob extends Employee("Bob")
 
-object Test5 {
+object Test5
   val x1 = new Person("Tim")
   val x2 = bob
 
-  try {
+  try
     val y1: Person = read(write(x1))
     val y2: Employee = read(write(x2))
 
     check(x1, y1)
     check(x2, y2)
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test5: " + e)
-  }
-}
 
 //############################################################################
 // Test user-defined classes WITH nesting
 
-object Test6 {
-  object bill extends Employee("Bill") {
+object Test6
+  object bill extends Employee("Bill")
     val x = paul
-  }
-  object paul extends Person("Paul") {
+  object paul extends Person("Paul")
     val x = 4 //  bill; => StackOverflowException !!!
-  }
   val x1 = new Person("John")
   val x2 = bill
   val x3 = paul
 
-  try {
+  try
     val y1: Person = read(write(x1))
     val y2: Employee = read(write(x2))
     val y3: Person = read(write(x3))
@@ -490,59 +467,51 @@ object Test6 {
     check(x1, y1)
     check(x2, y2)
     check(x3, y3)
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test6: " + e)
-  }
-}
 
 //############################################################################
 // Nested objects cannot get readresolve automatically because after deserialization
 // they would be null (they are treated as lazy vals)
-class Outer extends Serializable {
+class Outer extends Serializable
   object Inner extends Serializable
-}
 
-object Test7 {
+object Test7
   val x = new Outer
   x.Inner // initialize
   val y: Outer = read(write(x))
   if (y.Inner == null) println("Inner object is null")
-}
 
 // Verify that transient lazy vals don't get serialized
-class WithTransient extends Serializable {
+class WithTransient extends Serializable
   @transient lazy val a1 = 1
   @transient private lazy val a2 = 2
   @transient object B extends Serializable
   @transient private object C extends Serializable
 
-  def test = {
+  def test =
     println(a1)
     println(a2)
     if (B == null || C == null)
       println("Transient nested object failed to serialize properly")
-  }
-}
 
-object Test8 {
+object Test8
   val x = new WithTransient
   x.test
-  try {
+  try
     val y: WithTransient = read(write(x))
     y.test
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test8: " + e)
-  }
-}
 
 //############################################################################
 // Test code
 
 @deprecated("Suppress warnings", since = "2.11")
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     Test1_scala
     Test2_immutable
     Test3_mutable
@@ -552,17 +521,15 @@ object Test {
     Test8
     Test9_parallel
     Test10_util
-  }
-}
 
 //############################################################################
 
 //############################################################################
 // Test classes in package "scala.collection.parallel" and subpackages
-object Test9_parallel {
+object Test9_parallel
   import scala.collection.parallel._
 
-  try {
+  try
     println()
 
     // UnrolledBuffer
@@ -609,23 +576,18 @@ object Test9_parallel {
     val ips = immutable.ParHashSet("one", "two")
     val _ips: immutable.ParHashSet[String] = read(write(ips))
     check(ips, _ips)
-  } catch {
+  catch
     case e: Exception =>
       println("Error in Test5_parallel: " + e)
       throw e
-  }
-}
 
 //############################################################################
 // Test classes in package scala.util
 
-object Test10_util {
+object Test10_util
   import scala.util.Random
   def rep[A](n: Int)(f: => A) { if (n > 0) { f; rep(n - 1)(f) } }
 
-  {
     val random = new Random(345)
     val random2: Random = read(write(random))
     rep(5) { assert(random.nextInt == random2.nextInt) }
-  }
-}

@@ -8,27 +8,22 @@ import org.jboss.netty.handler.codec.http.{HttpRequest, HttpResponse}
 
 class SpdyServerDispatcher(trans: Transport[HttpResponse, HttpRequest],
                            service: Service[HttpRequest, HttpResponse])
-    extends Closable {
-  private[this] def loop(): Unit = {
-    trans.read() onFailure { exc =>
+    extends Closable
+  private[this] def loop(): Unit =
+    trans.read() onFailure  exc =>
       service.close()
-    } flatMap { req =>
+    flatMap  req =>
       loop()
-      trans.peerCertificate match {
+      trans.peerCertificate match
         case None => service(req)
         case Some(cert) =>
-          Contexts.local.let(Transport.peerCertCtx, cert) {
+          Contexts.local.let(Transport.peerCertCtx, cert)
             service(req)
-          }
-      }
-    } flatMap { rep =>
+    flatMap  rep =>
       trans.write(rep)
-    } onFailure { _ =>
+    onFailure  _ =>
       trans.close()
-    }
-  }
 
   Local.letClear { loop() }
 
   def close(deadline: Time) = trans.close(deadline)
-}

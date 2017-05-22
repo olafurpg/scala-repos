@@ -21,11 +21,11 @@ import org.json4s.native.JsonMethods.parse
 
 import org.joda.time.DateTime
 
-class LEventAggregatorSpec extends Specification with TestEvents {
+class LEventAggregatorSpec extends Specification with TestEvents
 
-  "LEventAggregator.aggregateProperties()" should {
+  "LEventAggregator.aggregateProperties()" should
 
-    "aggregate two entities' properties as DataMap correctly" in {
+    "aggregate two entities' properties as DataMap correctly" in
       val events = Vector(u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2)
       val result: Map[String, DataMap] =
         LEventAggregator.aggregateProperties(events.toIterator)
@@ -36,9 +36,8 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       )
 
       result must beEqualTo(expected)
-    }
 
-    "aggregate two entities' properties as PropertyMap correctly" in {
+    "aggregate two entities' properties as PropertyMap correctly" in
       val events = Vector(u1e5, u2e2, u1e3, u1e1, u2e3, u2e1, u1e4, u1e2)
       val result: Map[String, PropertyMap] =
         LEventAggregator.aggregateProperties(events.toIterator)
@@ -49,9 +48,8 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       )
 
       result must beEqualTo(expected)
-    }
 
-    "aggregate deleted entity correctly" in {
+    "aggregate deleted entity correctly" in
       val events = Vector(u1e5, u2e2, u1e3, u1ed, u1e1, u2e3, u2e1, u1e4, u1e2)
 
       val result = LEventAggregator.aggregateProperties(events.toIterator)
@@ -60,12 +58,10 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       )
 
       result must beEqualTo(expected)
-    }
-  }
 
-  "LEventAggregator.aggregatePropertiesSingle()" should {
+  "LEventAggregator.aggregatePropertiesSingle()" should
 
-    "aggregate single entity properties as DataMap correctly" in {
+    "aggregate single entity properties as DataMap correctly" in
       val events = Vector(u1e5, u1e3, u1e1, u1e4, u1e2)
       val eventsIt = events.toIterator
 
@@ -74,9 +70,8 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       val expected = DataMap(u1)
 
       result must beEqualTo(Some(expected))
-    }
 
-    "aggregate single entity properties as PropertyMap correctly" in {
+    "aggregate single entity properties as PropertyMap correctly" in
       val events = Vector(u1e5, u1e3, u1e1, u1e4, u1e2)
       val eventsIt = events.toIterator
 
@@ -85,9 +80,8 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       val expected = PropertyMap(u1, u1BaseTime, u1LastTime)
 
       result must beEqualTo(Some(expected))
-    }
 
-    "aggregate deleted entity correctly" in {
+    "aggregate deleted entity correctly" in
       // put the delete event in the middle
       val events = Vector(u1e4, u1e2, u1ed, u1e3, u1e1, u1e5)
       val eventsIt = events.toIterator
@@ -95,6 +89,3 @@ class LEventAggregatorSpec extends Specification with TestEvents {
       val result = LEventAggregator.aggregatePropertiesSingle(eventsIt)
 
       result must beEqualTo(None)
-    }
-  }
-}

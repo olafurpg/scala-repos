@@ -8,7 +8,7 @@ import org.scalacheck.Prop
 import Prop._
 import org.typelevel.discipline.Laws
 
-trait ComposeTests[F[_, _]] extends Laws {
+trait ComposeTests[F[_, _]] extends Laws
   def laws: ComposeLaws[F]
 
   def compose[A, B, C, D](implicit ArbFAB: Arbitrary[F[A, B]],
@@ -19,9 +19,7 @@ trait ComposeTests[F[_, _]] extends Laws {
                        parent = None,
                        "compose associativity" -> forAll(
                            laws.composeAssociativity[A, B, C, D] _))
-}
 
-object ComposeTests {
+object ComposeTests
   def apply[F[_, _]: Compose]: ComposeTests[F] =
     new ComposeTests[F] { def laws: ComposeLaws[F] = ComposeLaws[F] }
-}

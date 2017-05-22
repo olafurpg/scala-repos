@@ -1,16 +1,13 @@
-object Test {
-  def f {
+object Test
+  def f
     var b = false
     if (b) return 5
-  }
 
   // no warning
-  def g {
+  def g
     return println("hello")
-  }
-}
 
-class UnusedValues {
+class UnusedValues
   var i1 = 2
   val i2 = 2
   lazy val i3 = 2
@@ -18,7 +15,7 @@ class UnusedValues {
   def i5 = 2
   final def i6 = 2
 
-  def x = {
+  def x =
     i1 // warn
     i2 // warn
     i3 // no warn
@@ -27,5 +24,3 @@ class UnusedValues {
     i6 // could warn someday, if i6 returned 2.type instead of Int
 
     5
-  }
-}

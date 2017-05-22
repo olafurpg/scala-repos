@@ -44,7 +44,7 @@ import mocks.MockHttpServletRequest
   * is to just point this at your Boostrap.boot method.
   */
 abstract class WebSpec(boot: () => Any = () => {})
-    extends Specification with XmlMatchers {
+    extends Specification with XmlMatchers
 
   /**
     * This is our private spec instance of Liftrules. Everything we run will
@@ -52,9 +52,8 @@ abstract class WebSpec(boot: () => Any = () => {})
     */
   private val liftRules = new LiftRules()
 
-  LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
+  LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules)
     boot()
-  }
 
   /**
     * A class that bridges between the description string
@@ -64,7 +63,7 @@ abstract class WebSpec(boot: () => Any = () => {})
     * Box[LiftSession], an Empty Box will result in the
     * creation of a new Session.
     */
-  class WebSpecBridge(description: String) {
+  class WebSpecBridge(description: String)
     def withSFor(url: String,
                  session: Box[LiftSession] = Empty,
                  contextPath: String = "") =
@@ -104,7 +103,6 @@ abstract class WebSpec(boot: () => Any = () => {})
 
     def withTemplateFor(req: HttpServletRequest, session: LiftSession) =
       new TemplateSpecification(description, req, Box.!!(session))
-  }
 
   /**
     * Converts a String description into a WebSpecBridge that can
@@ -117,7 +115,7 @@ abstract class WebSpec(boot: () => Any = () => {})
     * A comon trait to provide utility methods for mutating the
     * underlying HttpServletRequest.
     */
-  trait ModifiableRequest[T <: ModifiableRequest[T]] {
+  trait ModifiableRequest[T <: ModifiableRequest[T]]
     // Make sure that our return values are for the supertype, not ModifiableRequest
     self: T =>
 
@@ -128,66 +126,58 @@ abstract class WebSpec(boot: () => Any = () => {})
       * you can set the content type (defaults to "text/plain")
       */
     def withPost(text: String, contentType: String = "text/plain"): T =
-      withMods { mockReq =>
+      withMods  mockReq =>
         mockReq.body = text
         mockReq.contentType = contentType
         mockReq.method = "POST"
-      }
 
     /**
       * Modifies the request to POST the given request body JSON.
       */
-    def withPost(jval: JValue) = withMods { mockReq =>
+    def withPost(jval: JValue) = withMods  mockReq =>
       mockReq.body = jval
       mockReq.method = "POST"
-    }
 
     /**
       * Modifies the request to POST the given request body XML.
       */
-    def withPost(node: NodeSeq) = withMods { mockReq =>
+    def withPost(node: NodeSeq) = withMods  mockReq =>
       mockReq.body = node
       mockReq.method = "POST"
-    }
 
     /**
       * Modifies the request to PUT the given request body text. Optionally,
       * you can set the content type (defaults to "text/plain")
       */
     def withPut(text: String, contentType: String = "text/plain") =
-      withMods { mockReq =>
+      withMods  mockReq =>
         mockReq.body = text
         mockReq.contentType = contentType
         mockReq.method = "PUT"
-      }
 
     /**
       * Modifies the request to PUT the given request body JSON.
       */
-    def withPut(jval: JValue) = withMods { mockReq =>
+    def withPut(jval: JValue) = withMods  mockReq =>
       mockReq.body = jval
       mockReq.method = "PUT"
-    }
 
     /**
       * Modifies the request to PUT the given request body XML.
       */
-    def withPut(node: NodeSeq) = withMods { mockReq =>
+    def withPut(node: NodeSeq) = withMods  mockReq =>
       mockReq.body = node
       mockReq.method = "PUT"
-    }
 
     /**
       * Allows you to specify your own modification function for the servlet request
       * prior to initialization.
       */
-    def withMods(f: MockHttpServletRequest => Unit): T = req match {
+    def withMods(f: MockHttpServletRequest => Unit): T = req match
       case r: MockHttpServletRequest => f(r); this
       case _ =>
         throw new IllegalArgumentException(
             "We can only mutate MockHttpServletRequest instances")
-    }
-  }
 
   /**
     * This class provides a wrapper to test methods that require an
@@ -196,50 +186,40 @@ abstract class WebSpec(boot: () => Any = () => {})
   class SessionSpecification(description: String,
                              val req: HttpServletRequest,
                              session: Box[LiftSession])
-      extends ModifiableRequest[SessionSpecification] {
+      extends ModifiableRequest[SessionSpecification]
     def this(description: String,
              url: String,
              session: Box[LiftSession],
-             contextPath: String) = {
+             contextPath: String) =
       this(description, new MockHttpServletRequest(url, contextPath), session)
-    }
 
-    def in(expectations: => Result) = {
+    def in(expectations: => Result) =
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testS(req, session) {
+          fragmentFactory.example(description,
+            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules)
+              MockWeb.useLiftRules.doWith(true)
+                MockWeb.testS(req, session)
                   expectations
-                }
-              }
-            }
-          }) ^ fragmentFactory.break
+          ) ^ fragmentFactory.break
       )
-    }
-  }
 
   /**
     * This class provides a wrapper to test methods that require an
     * initialized Req.
     */
   class ReqSpecification(description: String, val req: HttpServletRequest)
-      extends ModifiableRequest[ReqSpecification] {
+      extends ModifiableRequest[ReqSpecification]
     def this(description: String, url: String, contextPath: String) =
       this(description, new MockHttpServletRequest(url, contextPath))
 
-    def in(expectations: Req => Result) = {
+    def in(expectations: Req => Result) =
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
+          fragmentFactory.example(description,
+            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules)
+              MockWeb.useLiftRules.doWith(true)
                 MockWeb.testReq(req)(expectations)
-              }
-            }
-          }) ^ fragmentFactory.break
+          ) ^ fragmentFactory.break
       )
-    }
-  }
 
   /**
     * This class provides a wrapper to test methods that require
@@ -248,32 +228,25 @@ abstract class WebSpec(boot: () => Any = () => {})
   class TemplateSpecification(description: String,
                               val req: HttpServletRequest,
                               session: Box[LiftSession])
-      extends ModifiableRequest[TemplateSpecification] {
+      extends ModifiableRequest[TemplateSpecification]
     def this(description: String,
              url: String,
              session: Box[LiftSession],
              contextPath: String) =
       this(description, new MockHttpServletRequest(url, contextPath), session)
 
-    def in(expectations: Box[NodeSeq] => Result) = {
+    def in(expectations: Box[NodeSeq] => Result) =
       addFragments(
-          fragmentFactory.example(description, {
-            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules) {
-              MockWeb.useLiftRules.doWith(true) {
-                MockWeb.testS(req, session) {
-                  S.request match {
+          fragmentFactory.example(description,
+            LiftRulesMocker.devTestLiftRulesInstance.doWith(liftRules)
+              MockWeb.useLiftRules.doWith(true)
+                MockWeb.testS(req, session)
+                  S.request match
                     case Full(sReq) =>
                       expectations(S.runTemplate(sReq.path.partPath))
                     case other =>
                       failure(
                           "Error: withTemplateFor call did not result in " +
                           "request initialization (S.request = " + other + ")")
-                  }
-                }
-              }
-            }
-          }) ^ fragmentFactory.break
+          ) ^ fragmentFactory.break
       )
-    }
-  }
-}

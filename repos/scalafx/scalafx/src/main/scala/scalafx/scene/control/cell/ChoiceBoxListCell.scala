@@ -48,7 +48,7 @@ import scalafx.util.StringConverter
   * @define FTVRET A Function that will return a ListCell that is able to work on the type of element contained within 
   *         the ListView.
   */
-object ChoiceBoxListCell {
+object ChoiceBoxListCell
 
   /**
     * Converts a ScalaFX $CBLC to its JavaFX counterpart.
@@ -141,7 +141,6 @@ object ChoiceBoxListCell {
   @deprecated(message = "Use forListView[T](T*)", since = "1.0")
   def forListView[T](items: Array[T]) =
     jfxscc.ChoiceBoxListCell.forListView[T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxListCell.html $CBLC]]
@@ -162,7 +161,7 @@ class ChoiceBoxListCell[T](
     with ConvertableCell[jfxscc.ChoiceBoxListCell[T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxListCell[T], T]
     with ItemableCell[jfxscc.ChoiceBoxListCell[T], T]
-    with SFXDelegate[jfxscc.ChoiceBoxListCell[T]] {
+    with SFXDelegate[jfxscc.ChoiceBoxListCell[T]]
 
   /**
     * Creates a default $CBLC instance with the given items being used to populate the ChoiceBox when it is shown.
@@ -199,4 +198,3 @@ class ChoiceBoxListCell[T](
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ChoiceBoxListCell[T](items: _*))
-}

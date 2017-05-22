@@ -25,37 +25,33 @@ import play.api.http.Status._
   * }}}
   */
 @deprecated("Use dependency injection", "2.5.0")
-trait GlobalSettings {
+trait GlobalSettings
 
   private val dhehCache = Application.instanceCache[DefaultHttpErrorHandler]
 
   /**
     * Note, this should only be used for the default implementations of onError, onHandlerNotFound and onBadRequest.
     */
-  private def defaultErrorHandler: HttpErrorHandler = {
+  private def defaultErrorHandler: HttpErrorHandler =
     Play.privateMaybeApplication
       .fold[HttpErrorHandler](DefaultHttpErrorHandler)(dhehCache)
-  }
 
   /**
     * This should be used for all invocations of error handling in Global.
     */
-  private def configuredErrorHandler: HttpErrorHandler = {
+  private def configuredErrorHandler: HttpErrorHandler =
     Play.privateMaybeApplication
       .fold[HttpErrorHandler](DefaultHttpErrorHandler)(_.errorHandler)
-  }
 
   private val jchrhCache =
     Application.instanceCache[JavaCompatibleHttpRequestHandler]
-  private def defaultRequestHandler: Option[DefaultHttpRequestHandler] = {
+  private def defaultRequestHandler: Option[DefaultHttpRequestHandler] =
     Play.privateMaybeApplication.map(jchrhCache)
-  }
 
   private val httpFiltersCache = Application.instanceCache[HttpFilters]
-  private def filters: HttpFilters = {
+  private def filters: HttpFilters =
     Play.privateMaybeApplication
       .fold[HttpFilters](NoHttpFilters)(httpFiltersCache)
-  }
 
   /**
     * Called before the application starts.
@@ -84,64 +80,55 @@ trait GlobalSettings {
     * Retrieve the (RequestHeader,Handler) to use to serve this request.
     * Default is: route, tag request, then apply filters
     */
-  def onRequestReceived(request: RequestHeader): (RequestHeader, Handler) = {
+  def onRequestReceived(request: RequestHeader): (RequestHeader, Handler) =
     def notFoundHandler =
       Action.async(BodyParsers.parse.empty)(
           req => configuredErrorHandler.onClientError(req, NOT_FOUND))
 
     val (routedRequest, handler) =
-      onRouteRequest(request) map {
+      onRouteRequest(request) map
         case handler: RequestTaggingHandler =>
           (handler.tagRequest(request), handler)
         case otherHandler => (request, otherHandler)
-      } getOrElse {
+      getOrElse
 
         // We automatically permit HEAD requests against any GETs without the need to
         // add an explicit mapping in Routes
-        request.method match {
+        request.method match
           case HttpVerbs.HEAD =>
-            onRouteRequest(request.copy(method = HttpVerbs.GET)) match {
+            onRouteRequest(request.copy(method = HttpVerbs.GET)) match
               case Some(action: EssentialAction) =>
-                action match {
+                action match
                   case handler: RequestTaggingHandler =>
                     (handler.tagRequest(request), action)
                   case _ => (request, action)
-                }
               case None => (request, notFoundHandler)
-            }
           case _ =>
             (request, notFoundHandler)
-        }
-      }
 
     (routedRequest, doFilter(rh => handler)(routedRequest))
-  }
 
   val httpConfigurationCache = Application.instanceCache[HttpConfiguration]
 
   /**
     * Filters.
     */
-  def doFilter(next: RequestHeader => Handler): (RequestHeader => Handler) = {
+  def doFilter(next: RequestHeader => Handler): (RequestHeader => Handler) =
     (request: RequestHeader) =>
-      val context = Play.privateMaybeApplication.fold("") { app =>
+      val context = Play.privateMaybeApplication.fold("")  app =>
         httpConfigurationCache(app).context.stripSuffix("/")
-      }
       val inContext =
         context.isEmpty || request.path == context ||
         request.path.startsWith(context + "/")
-      next(request) match {
+      next(request) match
         case action: EssentialAction if inContext => doFilter(action)
         case handler => handler
-      }
-  }
 
   /**
     * Filters for EssentialAction.
     */
-  def doFilter(next: EssentialAction): EssentialAction = {
+  def doFilter(next: EssentialAction): EssentialAction =
     filters.filters.foldRight(next)(_ apply _)
-  }
 
   /**
     * Called when an HTTP request has been received.
@@ -153,9 +140,8 @@ trait GlobalSettings {
     * @see onHandlerNotFound
     */
   def onRouteRequest(request: RequestHeader): Option[Handler] =
-    defaultRequestHandler.flatMap { handler =>
+    defaultRequestHandler.flatMap  handler =>
       handler.routeRequest(request)
-    }
 
   /**
     * Called when an exception occurred.
@@ -191,14 +177,13 @@ trait GlobalSettings {
   def onBadRequest(request: RequestHeader, error: String): Future[Result] =
     defaultErrorHandler.onClientError(
         request, play.api.http.Status.BAD_REQUEST, error)
-}
 
 /**
   * The default global settings if not defined in the application.
   */
 object DefaultGlobal extends GlobalSettings.Deprecated
 
-object GlobalSettings {
+object GlobalSettings
 
   type Deprecated = GlobalSettings
 
@@ -211,44 +196,41 @@ object GlobalSettings {
     */
   @deprecated("Use dependency injection", "2.5.0")
   def apply(configuration: Configuration,
-            environment: Environment): GlobalSettings.Deprecated = {
+            environment: Environment): GlobalSettings.Deprecated =
     val globalClass =
       configuration.getString("application.global").getOrElse("Global")
 
     def javaGlobal: Option[play.GlobalSettings] =
-      try {
+      try
         Option(
             environment.classLoader
               .loadClass(globalClass)
               .newInstance()
               .asInstanceOf[play.GlobalSettings])
-      } catch {
+      catch
         case e: InstantiationException => None
         case e: ClassNotFoundException => None
-      }
 
     def scalaGlobal: GlobalSettings =
-      try {
+      try
         environment.classLoader
           .loadClass(globalClass + "$")
           .getDeclaredField("MODULE$")
           .get(null)
           .asInstanceOf[GlobalSettings]
-      } catch {
+      catch
         case e: ClassNotFoundException
             if !configuration.getString("application.global").isDefined =>
           DefaultGlobal
-        case e if configuration.getString("application.global").isDefined => {
+        case e if configuration.getString("application.global").isDefined =>
             throw configuration.reportError(
                 "application.global",
                 s"Cannot initialize the custom Global object ($globalClass) (perhaps it's a wrong reference?)",
                 Some(e))
-          }
-      }
 
-    try {
+    try
       javaGlobal.map(new j.JavaGlobalSettingsAdapter(_)).getOrElse(scalaGlobal)
-    } catch {
+    catch
       case e: PlayException => throw e
       case e: ThreadDeath => throw e
       case e: VirtualMachineError => throw e
@@ -258,6 +240,3 @@ object GlobalSettings {
             e.getMessage,
             e
         )
-    }
-  }
-}

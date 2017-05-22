@@ -9,7 +9,7 @@ import java.io.File
   */
 sealed abstract class AddSettings
 
-object AddSettings {
+object AddSettings
   private[sbt] final class Sequence(val sequence: Seq[AddSettings])
       extends AddSettings
   private[sbt] final object User extends AddSettings
@@ -63,29 +63,25 @@ object AddSettings {
                                      defaultSbtFiles)
 
   /** Combines two automatic setting configurations. */
-  def append(a: AddSettings, b: AddSettings): AddSettings = (a, b) match {
+  def append(a: AddSettings, b: AddSettings): AddSettings = (a, b) match
     case (sa: Sequence, sb: Sequence) => seq(sa.sequence ++ sb.sequence: _*)
     case (sa: Sequence, _) => seq(sa.sequence :+ b: _*)
     case (_, sb: Sequence) => seq(a +: sb.sequence: _*)
     case _ => seq(a, b)
-  }
 
   def clearSbtFiles(a: AddSettings): AddSettings =
-    tx(a) {
+    tx(a)
       case _: DefaultSbtFiles | _: SbtFiles => None
       case x => Some(x)
-    } getOrElse seq()
+    getOrElse seq()
 
   private[sbt] def tx(a: AddSettings)(
-      f: AddSettings => Option[AddSettings]): Option[AddSettings] = a match {
+      f: AddSettings => Option[AddSettings]): Option[AddSettings] = a match
     case s: Sequence =>
-      s.sequence.flatMap { b =>
+      s.sequence.flatMap  b =>
         tx(b)(f)
-      } match {
+      match
         case Seq() => None
         case Seq(x) => Some(x)
         case ss => Some(new Sequence(ss))
-      }
     case x => f(x)
-  }
-}

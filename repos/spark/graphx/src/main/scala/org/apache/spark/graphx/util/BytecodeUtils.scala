@@ -31,58 +31,50 @@ import org.apache.spark.util.Utils
   * Includes an utility function to test whether a function accesses a specific attribute
   * of an object.
   */
-private[graphx] object BytecodeUtils {
+private[graphx] object BytecodeUtils
 
   /**
     * Test whether the given closure invokes the specified method in the specified class.
     */
   def invokedMethod(closure: AnyRef,
                     targetClass: Class[_],
-                    targetMethod: String): Boolean = {
-    if (_invokedMethod(closure.getClass, "apply", targetClass, targetMethod)) {
+                    targetMethod: String): Boolean =
+    if (_invokedMethod(closure.getClass, "apply", targetClass, targetMethod))
       true
-    } else {
+    else
       // look at closures enclosed in this closure
       for (f <- closure.getClass.getDeclaredFields
-                   if f.getType.getName.startsWith("scala.Function")) {
+                   if f.getType.getName.startsWith("scala.Function"))
         f.setAccessible(true)
-        if (invokedMethod(f.get(closure), targetClass, targetMethod)) {
+        if (invokedMethod(f.get(closure), targetClass, targetMethod))
           return true
-        }
-      }
       return false
-    }
-  }
 
   private def _invokedMethod(cls: Class[_],
                              method: String,
                              targetClass: Class[_],
-                             targetMethod: String): Boolean = {
+                             targetMethod: String): Boolean =
 
     val seen = new HashSet[(Class[_], String)]
     var stack = List[(Class[_], String)]((cls, method))
 
-    while (stack.nonEmpty) {
+    while (stack.nonEmpty)
       val (c, m) = stack.head
       stack = stack.tail
       seen.add((c, m))
       val finder = new MethodInvocationFinder(c.getName, m)
       getClassReader(c).accept(finder, 0)
-      for (classMethod <- finder.methodsInvoked) {
-        if (classMethod._1 == targetClass && classMethod._2 == targetMethod) {
+      for (classMethod <- finder.methodsInvoked)
+        if (classMethod._1 == targetClass && classMethod._2 == targetMethod)
           return true
-        } else if (!seen.contains(classMethod)) {
+        else if (!seen.contains(classMethod))
           stack = classMethod :: stack
-        }
-      }
-    }
     return false
-  }
 
   /**
     * Get an ASM class reader for a given class from the JAR that loaded it.
     */
-  private def getClassReader(cls: Class[_]): ClassReader = {
+  private def getClassReader(cls: Class[_]): ClassReader =
     // Copy data over, before delegating to ClassReader - else we can run out of open file handles.
     val className = cls.getName.replaceFirst("^.*\\.", "") + ".class"
     val resourceStream = cls.getResourceAsStream(className)
@@ -92,17 +84,15 @@ private[graphx] object BytecodeUtils {
     val baos = new ByteArrayOutputStream(128)
     Utils.copyStream(resourceStream, baos, true)
     new ClassReader(new ByteArrayInputStream(baos.toByteArray))
-  }
 
   /**
     * Given the class name, return whether we should look into the class or not. This is used to
     * skip examining a large quantity of Java or Scala classes that we know for sure wouldn't access
     * the closures. Note that the class name is expected in ASM style (i.e. use "/" instead of ".").
     */
-  private def skipClass(className: String): Boolean = {
+  private def skipClass(className: String): Boolean =
     val c = className
     c.startsWith("java/") || c.startsWith("scala/") || c.startsWith("javax/")
-  }
 
   /**
     * Find the set of methods invoked by the specified method in the specified class.
@@ -113,7 +103,7 @@ private[graphx] object BytecodeUtils {
     * determine the actual method invoked by inspecting the bytecode.
     */
   private class MethodInvocationFinder(className: String, methodName: String)
-      extends ClassVisitor(ASM5) {
+      extends ClassVisitor(ASM5)
 
     val methodsInvoked = new HashSet[(Class[_], String)]
 
@@ -121,26 +111,18 @@ private[graphx] object BytecodeUtils {
                              name: String,
                              desc: String,
                              sig: String,
-                             exceptions: Array[String]): MethodVisitor = {
-      if (name == methodName) {
-        new MethodVisitor(ASM5) {
+                             exceptions: Array[String]): MethodVisitor =
+      if (name == methodName)
+        new MethodVisitor(ASM5)
           override def visitMethodInsn(op: Int,
                                        owner: String,
                                        name: String,
                                        desc: String,
-                                       itf: Boolean) {
+                                       itf: Boolean)
             if (op == INVOKEVIRTUAL || op == INVOKESPECIAL ||
-                op == INVOKESTATIC) {
-              if (!skipClass(owner)) {
+                op == INVOKESTATIC)
+              if (!skipClass(owner))
                 methodsInvoked.add(
                     (Utils.classForName(owner.replace("/", ".")), name))
-              }
-            }
-          }
-        }
-      } else {
+      else
         null
-      }
-    }
-  }
-}

@@ -10,7 +10,7 @@ package descriptors
   */
 import com.intellij.lang.surroundWith.SurroundDescriptor
 
-class ScalaSurroundDescriptors extends SurroundDescriptors {
+class ScalaSurroundDescriptors extends SurroundDescriptors
   private val SURROUND_DESCRIPTORS: Array[SurroundDescriptor] = Array.apply(
       new ScalaExpressionSurroundDescriptor(),
       new ScalaDocCommentDataSurroundDescriptor(),
@@ -19,4 +19,3 @@ class ScalaSurroundDescriptors extends SurroundDescriptors {
 
   override def getSurroundDescriptors: Array[SurroundDescriptor] =
     SURROUND_DESCRIPTORS
-}

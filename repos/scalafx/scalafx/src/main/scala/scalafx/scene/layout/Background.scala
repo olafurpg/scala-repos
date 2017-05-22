@@ -34,7 +34,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Insets
 
-object Background {
+object Background
   implicit def sfxBackground2jfx(v: Background): jfxsl.Background =
     if (v != null) v.delegate else null
 
@@ -47,10 +47,9 @@ object Background {
   def classCssMetaData: Seq[
       javafx.css.CssMetaData[_ <: javafx.css.Styleable, _]] =
     jfxsl.Background.getClassCssMetaData
-}
 
 class Background(override val delegate: jfxsl.Background)
-    extends SFXDelegate[jfxsl.Background] {
+    extends SFXDelegate[jfxsl.Background]
 
   /** Create a new Background by supplying an array of BackgroundFills. */
   def this(fills: Array[BackgroundFill]) =
@@ -82,4 +81,3 @@ class Background(override val delegate: jfxsl.Background)
     * The outsets of this Background.
     */
   def outsets: Insets = delegate.getOutsets
-}

@@ -10,7 +10,7 @@ import com.typesafe.config.Config
   * Public API but not intended for subclassing
   */
 abstract class RoutingSettings private[akka]()
-    extends akka.http.javadsl.settings.RoutingSettings {
+    extends akka.http.javadsl.settings.RoutingSettings
   self: RoutingSettingsImpl ⇒
   def verboseErrorMessages: Boolean
   def fileGetConditional: Boolean
@@ -49,11 +49,9 @@ abstract class RoutingSettings private[akka]()
   override def withFileIODispatcher(
       fileIODispatcher: String): RoutingSettings =
     self.copy(fileIODispatcher = fileIODispatcher)
-}
 
-object RoutingSettings extends SettingsCompanion[RoutingSettings] {
+object RoutingSettings extends SettingsCompanion[RoutingSettings]
   override def apply(config: Config): RoutingSettings =
     RoutingSettingsImpl(config)
   override def apply(configOverrides: String): RoutingSettings =
     RoutingSettingsImpl(configOverrides)
-}

@@ -13,12 +13,10 @@ import scala.concurrent.Future
   * Update task tracker corresponding to the event.
   */
 class UpdateTaskTrackerStepImpl @Inject()(taskUpdater: TaskUpdater)
-    extends TaskStatusUpdateStep {
+    extends TaskStatusUpdateStep
 
   def name: String = "updateTaskTracker"
 
   def processUpdate(
-      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] = {
+      timestamp: Timestamp, task: Task, status: TaskStatus): Future[_] =
     taskUpdater.statusUpdate(task.taskId.appId, status)
-  }
-}

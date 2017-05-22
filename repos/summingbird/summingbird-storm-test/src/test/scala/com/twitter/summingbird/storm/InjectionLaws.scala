@@ -23,16 +23,13 @@ import Gen._
 import Arbitrary._
 import org.scalacheck.Prop._
 
-object InjectionLaws extends Properties("InjectionTests") {
+object InjectionLaws extends Properties("InjectionTests")
   implicit def ts: Arbitrary[Timestamp] =
     Arbitrary(Arbitrary.arbitrary[Long].map(Timestamp(_)))
 
-  property("Single injection works") = forAll { in: String =>
+  property("Single injection works") = forAll  in: String =>
     val inj = new SingleItemInjection[String]
     inj.invert(inj(in)).get == in
-  }
-  property("KV injection works") = forAll { in: (String, List[Int]) =>
+  property("KV injection works") = forAll  in: (String, List[Int]) =>
     val inj = new KeyValueInjection[String, List[Int]]
     inj.invert(inj(in)).get == in
-  }
-}

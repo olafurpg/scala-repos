@@ -15,11 +15,10 @@ import scala.collection.immutable
   *
   * In essence it is either an [[NonPersistentRepr]] or [[AtomicWrite]].
   */
-private[persistence] sealed trait PersistentEnvelope {
+private[persistence] sealed trait PersistentEnvelope
   def payload: Any
   def sender: ActorRef
   def size: Int
-}
 
 /**
   * INTERNAL API
@@ -27,24 +26,22 @@ private[persistence] sealed trait PersistentEnvelope {
   */
 private[persistence] final case class NonPersistentRepr(
     payload: Any, sender: ActorRef)
-    extends PersistentEnvelope {
+    extends PersistentEnvelope
   override def size: Int = 1
-}
 
-object AtomicWrite {
+object AtomicWrite
   def apply(event: PersistentRepr): AtomicWrite = apply(List(event))
-}
 
 final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
-    extends PersistentEnvelope with Message {
+    extends PersistentEnvelope with Message
   require(payload.nonEmpty, "payload of AtomicWrite must not be empty!")
 
   // only check that all persistenceIds are equal when there's more than one in the Seq
-  if (payload match {
+  if (payload match
         case l: List[PersistentRepr] ⇒ l.tail.nonEmpty // avoids calling .size
         case v: Vector[PersistentRepr] ⇒ v.size > 1
         case _ ⇒ true // some other collection type, let's just check
-      })
+      )
     require(
         payload.forall(_.persistenceId == payload.head.persistenceId),
         "AtomicWrite must contain messages for the same persistenceId, " +
@@ -58,7 +55,6 @@ final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
 
   override def sender: ActorRef = ActorRef.noSender
   override def size: Int = payload.size
-}
 
 /**
   * Plugin API: representation of a persistent message in the journal plugin API.
@@ -66,7 +62,7 @@ final case class AtomicWrite(payload: immutable.Seq[PersistentRepr])
   * @see [[akka.persistence.journal.AsyncWriteJournal]]
   * @see [[akka.persistence.journal.AsyncRecovery]]
   */
-trait PersistentRepr extends Message {
+trait PersistentRepr extends Message
 
   /**
     * This persistent message's payload.
@@ -125,9 +121,8 @@ trait PersistentRepr extends Message {
              deleted: Boolean = deleted,
              sender: ActorRef = sender,
              writerUuid: String = writerUuid): PersistentRepr
-}
 
-object PersistentRepr {
+object PersistentRepr
 
   /** Plugin API: value of an undefined persistenceId or manifest. */
   val Undefined = ""
@@ -163,7 +158,6 @@ object PersistentRepr {
     */
   def unapply(persistent: PersistentRepr): Option[(Any, Long)] =
     Some((persistent.payload, persistent.sequenceNr))
-}
 
 /**
   * INTERNAL API.
@@ -176,7 +170,7 @@ private[persistence] final case class PersistentImpl(
     override val deleted: Boolean,
     override val sender: ActorRef,
     override val writerUuid: String)
-    extends PersistentRepr with NoSerializationVerificationNeeded {
+    extends PersistentRepr with NoSerializationVerificationNeeded
 
   def withPayload(payload: Any): PersistentRepr =
     copy(payload = payload)
@@ -195,4 +189,3 @@ private[persistence] final case class PersistentImpl(
          deleted = deleted,
          sender = sender,
          writerUuid = writerUuid)
-}

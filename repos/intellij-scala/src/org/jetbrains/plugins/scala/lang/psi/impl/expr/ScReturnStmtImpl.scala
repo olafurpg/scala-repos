@@ -18,13 +18,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   * @author Alexander Podkhalyuzin
   */
 class ScReturnStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScReturnStmt {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScReturnStmt
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "ReturnStatement"
 
@@ -35,8 +33,6 @@ class ScReturnStmtImpl(node: ASTNode)
   def returnKeyword: PsiElement =
     findChildByType[PsiElement](ScalaTokenTypes.kRETURN)
 
-  def returnFunction: Option[ScFunctionDefinition] = {
+  def returnFunction: Option[ScFunctionDefinition] =
     val o = PsiTreeUtil.getParentOfType(this, classOf[ScFunctionDefinition])
     if (o == null) None else Some(o)
-  }
-}

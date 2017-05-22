@@ -19,11 +19,11 @@ case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val eventsDb = Storage.getPEvents()
     val gendersMap = Map("Male" -> 0.0, "Female" -> 1.0)
     val educationMap = Map(
@@ -36,9 +36,9 @@ class DataSource(val dsp: DataSourceParams)
           required = Some(List("plan", "gender", "age", "education")))(sc)
       // aggregateProperties() returns RDD pair of
       // entity ID and its aggregated properties
-      .map {
+      .map
         case (entityId, properties) =>
-          try {
+          try
             LabeledPoint(
                 properties.get[Double]("plan"),
                 Vectors.dense(Array(
@@ -46,19 +46,14 @@ class DataSource(val dsp: DataSourceParams)
                         properties.get[Double]("age"),
                         educationMap(properties.get[String]("education"))
                     )))
-          } catch {
-            case e: Exception => {
+          catch
+            case e: Exception =>
                 logger.error(s"Failed to get properties ${properties} of" +
                     s" ${entityId}. Exception: ${e}.")
                 throw e
-              }
-          }
-      }
       .cache()
 
     new TrainingData(labeledPoints, gendersMap, educationMap)
-  }
-}
 
 class TrainingData(
     val labeledPoints: RDD[LabeledPoint],

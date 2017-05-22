@@ -9,10 +9,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.JavaConverters._
 
 class MigrationTo0_16Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
   import mesosphere.FutureTestSupport._
 
-  class Fixture {
+  class Fixture
     lazy val metrics = new Metrics(new MetricRegistry)
     lazy val store = new InMemoryStore()
 
@@ -26,14 +26,13 @@ class MigrationTo0_16Test
 
     lazy val migration = new MigrationTo0_16(
         groupRepository = groupRepo, appRepository = appRepo)
-  }
 
   val emptyGroup = Group.empty
 
   implicit val patienceConfig: PatienceConfig = PatienceConfig(
       timeout = Span(3, Seconds))
 
-  test("empty migration does nothing") {
+  test("empty migration does nothing")
     Given("no apps/groups")
     val f = new Fixture
 
@@ -44,42 +43,36 @@ class MigrationTo0_16Test
     val maybeGroup: Option[Group] = f.groupRepo.rootGroup().futureValue
     maybeGroup should be(None)
     f.appRepo.allPathIds().futureValue should be('empty)
-  }
 
-  test("an app and all its revisions are migrated") {
+  test("an app and all its revisions are migrated")
     val f = new Fixture
 
-    def appProtoInNewFormatAsserts(proto: Protos.ServiceDefinition) = {
+    def appProtoInNewFormatAsserts(proto: Protos.ServiceDefinition) =
       assert(Seq(1000, 1001) == proto.getPortDefinitionsList.asScala
                .map(_.getNumber),
              proto.toString)
       assert(proto.getPortsCount == 0)
-    }
 
-    def appProtoIsInNewFormat(version: Option[Long]): Unit = {
-      def fetchAppProto(version: Option[Long]): Protos.ServiceDefinition = {
-        val suffix = version.map { version =>
+    def appProtoIsInNewFormat(version: Option[Long]): Unit =
+      def fetchAppProto(version: Option[Long]): Protos.ServiceDefinition =
+        val suffix = version.map  version =>
           s":${Timestamp(version)}"
-        }.getOrElse("")
+        .getOrElse("")
         val entity = f.store.load(s"app:test$suffix").futureValue.get
         Protos.ServiceDefinition.parseFrom(entity.bytes.toArray)
-      }
 
       appProtoInNewFormatAsserts(fetchAppProto(version))
-    }
 
-    def groupProtoIsInNewFormat(version: Option[Long]): Unit = {
-      def fetchGroupProto(version: Option[Long]): Protos.GroupDefinition = {
-        val suffix = version.map { version =>
+    def groupProtoIsInNewFormat(version: Option[Long]): Unit =
+      def fetchGroupProto(version: Option[Long]): Protos.GroupDefinition =
+        val suffix = version.map  version =>
           s":${Timestamp(version)}"
-        }.getOrElse("")
+        .getOrElse("")
         val entity = f.store.load(s"group:root$suffix").futureValue.get
         Protos.GroupDefinition.parseFrom(entity.bytes.toArray)
-      }
 
       val proto = fetchGroupProto(version)
       proto.getAppsList.asScala.foreach(appProtoInNewFormatAsserts)
-    }
 
     val appV1 = deprecatedAppDefinition(1)
     val appV2 = deprecatedAppDefinition(2)
@@ -102,18 +95,16 @@ class MigrationTo0_16Test
     Then("the apps in the group proto must be in the new format")
     groupProtoIsInNewFormat(None)
     groupProtoIsInNewFormat(Some(2))
-  }
 
-  test("A deprecatedAppDefinition serializes in the deprecated format") {
+  test("A deprecatedAppDefinition serializes in the deprecated format")
     val app = deprecatedAppDefinition()
 
     val proto = app.toProto
 
     proto.getPortDefinitionsCount should be(0)
     proto.getPortsList.asScala.map(_.toInt).toSet should be(Set(1000, 1001))
-  }
 
-  private[this] def deprecatedAppDefinition(version: Long = 0) = {
+  private[this] def deprecatedAppDefinition(version: Long = 0) =
     class T
         extends AppDefinition(
             PathId("/test"),
@@ -124,10 +115,9 @@ class MigrationTo0_16Test
         ) with DeprecatedSerialization
 
     new T()
-  }
 
-  private[this] trait DeprecatedSerialization extends AppDefinition {
-    override def toProto: Protos.ServiceDefinition = {
+  private[this] trait DeprecatedSerialization extends AppDefinition
+    override def toProto: Protos.ServiceDefinition =
       val builder = super.toProto.toBuilder
 
       builder.getPortDefinitionsList.asScala
@@ -136,6 +126,3 @@ class MigrationTo0_16Test
       builder.clearPortDefinitions()
 
       builder.build
-    }
-  }
-}

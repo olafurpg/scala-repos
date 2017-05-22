@@ -17,19 +17,17 @@ class ScParamClauseStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScParameterClause](parent, elemType)
-    with ScParamClauseStub {
+    with ScParamClauseStub
   var implic: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           implic: Boolean) = {
+           implic: Boolean) =
     this(
         parent,
         elemType
           .asInstanceOf[IStubElementType[StubElement[PsiElement], PsiElement]])
     this.implic = implic
-  }
 
   def isImplicit: Boolean = implic
-}

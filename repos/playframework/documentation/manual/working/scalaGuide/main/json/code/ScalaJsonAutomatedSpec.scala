@@ -11,7 +11,7 @@ import org.specs2.mutable.Specification
 import org.specs2.runner.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ScalaJsonAutomatedSpec extends Specification {
+class ScalaJsonAutomatedSpec extends Specification
 
   //#model
   case class Resident(name: String, age: Int, role: Option[String])
@@ -25,8 +25,8 @@ class ScalaJsonAutomatedSpec extends Specification {
   )
   val sampleData = Resident("Fiver", 4, None)
 
-  "Scala JSON automated" should {
-    "produce a working Reads" in {
+  "Scala JSON automated" should
+    "produce a working Reads" in
 
       //#auto-reads
       import play.api.libs.json._
@@ -35,8 +35,7 @@ class ScalaJsonAutomatedSpec extends Specification {
       //#auto-reads
 
       sampleJson.as[Resident] must_=== sampleData
-    }
-    "do the same thing as a manual Reads" in {
+    "do the same thing as a manual Reads" in
 
       //#manual-reads
       import play.api.libs.json._
@@ -47,8 +46,7 @@ class ScalaJsonAutomatedSpec extends Specification {
       //#manual-reads
 
       sampleJson.as[Resident] must_=== sampleData
-    }
-    "produce a working Writes" in {
+    "produce a working Writes" in
 
       //#auto-writes
       import play.api.libs.json._
@@ -57,8 +55,7 @@ class ScalaJsonAutomatedSpec extends Specification {
       //#auto-writes
 
       Json.toJson(sampleData) must_=== sampleJson
-    }
-    "produce a working Format" in {
+    "produce a working Format" in
 
       //#auto-format
       import play.api.libs.json._
@@ -68,6 +65,3 @@ class ScalaJsonAutomatedSpec extends Specification {
 
       sampleJson.as[Resident] must_=== sampleData
       Json.toJson(sampleData) must_=== sampleJson
-    }
-  }
-}

@@ -47,15 +47,14 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class JobSettingsSpec
     extends SimpleSFXDelegateSpec[jfxp.JobSettings, JobSettings](
-        classOf[jfxp.JobSettings], classOf[JobSettings]) {
+        classOf[jfxp.JobSettings], classOf[JobSettings])
 
   val skipingMessage: String =
     if (jfxp.PrinterJob.createPrinterJob == null ||
-        jfxp.PrinterJob.createPrinterJob.getJobSettings == null) {
+        jfxp.PrinterJob.createPrinterJob.getJobSettings == null)
       "Neither Default Printer Job nor Job Settings defined."
-    } else {
+    else
       ""
-    }
 
   override val skipJfxToSfxCause = skipingMessage
 
@@ -66,4 +65,3 @@ class JobSettingsSpec
 
   override protected def getJavaClassInstance =
     jfxp.PrinterJob.createPrinterJob.getJobSettings
-}

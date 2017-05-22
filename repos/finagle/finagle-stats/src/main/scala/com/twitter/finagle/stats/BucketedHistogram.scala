@@ -3,7 +3,7 @@ package com.twitter.finagle.stats
 import com.twitter.common.stats
 import java.util
 
-private[twitter] object BucketedHistogram {
+private[twitter] object BucketedHistogram
 
   /**
     * Given an error, compute all the bucket values from 1 until we run out of positive
@@ -18,12 +18,11 @@ private[twitter] object BucketedHistogram {
     *
     * The last bucket tracks up to `Int.MaxValue`.
     */
-  private[this] def makeLimitsFor(error: Double): Array[Int] = {
-    def build(maxValue: Double, factor: Double, n: Double): Stream[Double] = {
+  private[this] def makeLimitsFor(error: Double): Array[Int] =
+    def build(maxValue: Double, factor: Double, n: Double): Stream[Double] =
       val next = n * factor
       if (next >= maxValue) Stream.empty
       else Stream.cons(next, build(maxValue, factor, next))
-    }
     require(error > 0.0 && error <= 1.0, error)
 
     val values = build(Int.MaxValue.toDouble, 1.0 + (error * 2), 1.0)
@@ -31,7 +30,6 @@ private[twitter] object BucketedHistogram {
       .distinct
       .force
       (Seq(1) ++ values).toArray
-  }
 
   // 0.5% error => 1797 buckets, 7188 bytes, max 11 compares on binary search
   private[stats] val DefaultErrorPercent = 0.005
@@ -40,24 +38,21 @@ private[twitter] object BucketedHistogram {
       DefaultErrorPercent)
 
   /** check all the limits are non-negative and increasing in value. */
-  private def assertLimits(limits: Array[Int]): Unit = {
+  private def assertLimits(limits: Array[Int]): Unit =
     require(limits.length > 0)
     var i = 0
     var prev = -1L
-    while (i < limits.length) {
+    while (i < limits.length)
       val value = limits(i)
       require(value >= 0 && value > prev, i)
       prev = value
       i += 1
-    }
-  }
 
   /**
     * Creates an instance using the default bucket limits.
     */
   def apply(): BucketedHistogram =
     new BucketedHistogram(DefaultLimits)
-}
 
 /**
   * Allows for computing approximate percentiles from a stream of
@@ -98,7 +93,7 @@ private[twitter] object BucketedHistogram {
   * @see [[BucketedHistogram.apply()]] for creation.
   */
 private[stats] class BucketedHistogram(limits: Array[Int])
-    extends stats.Histogram {
+    extends stats.Histogram
   BucketedHistogram.assertLimits(limits)
 
   private[this] def countsLength: Int = limits.length + 1
@@ -117,31 +112,27 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     *
     * @inheritdoc
     */
-  def add(value: Long): Unit = {
+  def add(value: Long): Unit =
     val index =
-      if (value >= Int.MaxValue) {
+      if (value >= Int.MaxValue)
         total += Int.MaxValue
         countsLength - 1
-      } else {
+      else
         total += value
         val asInt = value.toInt
         // recall that limits represent upper bounds, exclusive — so take the next position (+1).
         // we assume that no inputs can be larger than the largest value in the limits array.
         Math.abs(util.Arrays.binarySearch(limits, asInt) + 1)
-      }
     counts(index) += 1
     num += 1
-  }
 
-  override def clear(): Unit = {
+  override def clear(): Unit =
     var i = 0
-    while (i < countsLength) {
+    while (i < countsLength)
       counts(i) = 0
       i += 1
-    }
     num = 0
     total = 0
-  }
 
   /**
     * Calculate the value of the percentile rank, `p`, for the added data points
@@ -152,7 +143,7 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     *         The returned value will be within
     *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
     */
-  def percentile(p: Double): Long = {
+  def percentile(p: Double): Long =
     if (p < 0.0 || p > 1.0)
       throw new AssertionError(
           s"percentile must be within 0.0 to 1.0 inclusive: $p")
@@ -160,16 +151,13 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     val target = Math.round(p * num)
     var total = 0L
     var i = 0
-    while (i < countsLength && total < target) {
+    while (i < countsLength && total < target)
       total += counts(i)
       i += 1
-    }
-    i match {
+    i match
       case 0 => 0
       case _ if i == countsLength => maximum
       case _ => limitMidpoint(i - 1)
-    }
-  }
 
   /**
     * The maximum value seen by calls to [[add]].
@@ -178,20 +166,17 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     *         The returned value will be within
     *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
     */
-  def maximum: Long = {
-    if (num == 0) {
+  def maximum: Long =
+    if (num == 0)
       0L
-    } else if (counts(countsLength - 1) > 0) {
+    else if (counts(countsLength - 1) > 0)
       Int.MaxValue
-    } else {
+    else
       var i = countsLength - 2 // already checked the last, start 1 before
-      while (i >= 0 && counts(i) == 0) {
+      while (i >= 0 && counts(i) == 0)
         i -= 1
-      }
       if (i == 0) 0
       else limitMidpoint(i)
-    }
-  }
 
   /**
     * The minimum value seen by calls to [[add]].
@@ -200,43 +185,36 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     *         The returned value will be within
     *         [[BucketedHistogram.DefaultErrorPercent]] of the actual value.
     */
-  def minimum: Long = {
-    if (num == 0) {
+  def minimum: Long =
+    if (num == 0)
       0L
-    } else {
+    else
       var i = 0
-      while (i < countsLength && counts(i) == 0) {
+      while (i < countsLength && counts(i) == 0)
         i += 1
-      }
       limitMidpoint(i)
-    }
-  }
 
   /** Get the midpoint of bucket `i` */
-  private[this] def limitMidpoint(i: Int): Long = {
-    i match {
+  private[this] def limitMidpoint(i: Int): Long =
+    i match
       case 0 => 0
       case _ if i >= limits.length => Int.MaxValue
       case _ => (limits(i - 1).toLong + limits(i)) / 2
-    }
-  }
 
   override def getQuantile(quantile: Double): Long =
     percentile(quantile)
 
-  override def getQuantiles(quantiles: Array[Double]): Array[Long] = {
+  override def getQuantiles(quantiles: Array[Double]): Array[Long] =
     val ps = new Array[Long](quantiles.length)
     var i = 0
-    while (i < ps.length) {
+    while (i < ps.length)
       // Note: we could speed this up via just one pass over `counts` instead of
       // of a pass per quantile.
       // We could speed up calls to `percentile` by tracking the maximum
       // bucket used during `add()`s to minimize how much of `counts` to scan.
       ps(i) = percentile(quantiles(i))
       i += 1
-    }
     ps
-  }
 
   /**
     * The total of all the values seen by calls to [[add]].
@@ -256,4 +234,3 @@ private[stats] class BucketedHistogram(limits: Array[Int])
     */
   def average: Double =
     if (num == 0) 0.0 else total / num.toDouble
-}

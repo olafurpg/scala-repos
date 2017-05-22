@@ -33,7 +33,7 @@ import org.apache.kafka.common.protocol.{Errors, ApiKeys, SecurityProtocol}
 import org.apache.kafka.common.utils.SystemTime
 import org.junit.{Test, After, Before}
 
-class LeaderElectionTest extends ZooKeeperTestHarness {
+class LeaderElectionTest extends ZooKeeperTestHarness
   val brokerId1 = 0
   val brokerId2 = 1
 
@@ -42,7 +42,7 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
   var staleControllerEpochDetected = false
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     val configProps1 = TestUtils.createBrokerConfig(
@@ -54,17 +54,15 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
     val server1 = TestUtils.createServer(KafkaConfig.fromProps(configProps1))
     val server2 = TestUtils.createServer(KafkaConfig.fromProps(configProps2))
     servers ++= List(server1, server2)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     servers.foreach(_.shutdown())
     servers.foreach(server => CoreUtils.rm(server.config.logDirs))
     super.tearDown()
-  }
 
   @Test
-  def testLeaderElectionAndEpoch {
+  def testLeaderElectionAndEpoch
     // start 2 brokers
     val topic = "new-topic"
     val partitionId = 0
@@ -125,10 +123,9 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
       assertEquals("Second epoch value should be %d".format(leaderEpoch2 + 1),
                    leaderEpoch2 + 1,
                    leaderEpoch3)
-  }
 
   @Test
-  def testLeaderElectionWithStaleControllerEpoch() {
+  def testLeaderElectionWithStaleControllerEpoch()
     // start 2 brokers
     val topic = "new-topic"
     val partitionId = 0
@@ -155,11 +152,10 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
         TestUtils.createBrokerConfig(controllerId, zkConnect))
     val brokers = servers.map(
         s => new Broker(s.config.brokerId, "localhost", s.boundPort()))
-    val brokerEndPoints = brokers.map { b =>
+    val brokerEndPoints = brokers.map  b =>
       val brokerEndPoint = b.getBrokerEndPoint(SecurityProtocol.PLAINTEXT)
       new BrokerEndPoint(
           brokerEndPoint.id, brokerEndPoint.host, brokerEndPoint.port)
-    }
 
     val controllerContext = new ControllerContext(zkUtils, 6000)
     controllerContext.liveBrokers = brokers.toSet
@@ -167,7 +163,7 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
     val controllerChannelManager = new ControllerChannelManager(
         controllerContext, controllerConfig, new SystemTime, metrics)
     controllerChannelManager.startup()
-    try {
+    try
       val staleControllerEpoch = 0
       val partitionStates = Map(
           new TopicPartition(topic, partitionId) -> new PartitionState(
@@ -193,19 +189,14 @@ class LeaderElectionTest extends ZooKeeperTestHarness {
                               "Controller epoch should be stale")
       assertTrue("Stale controller epoch not detected by the broker",
                  staleControllerEpochDetected)
-    } finally {
+    finally
       controllerChannelManager.shutdown()
       metrics.close()
-    }
-  }
 
   private def staleControllerEpochCallback(
-      response: AbstractRequestResponse): Unit = {
+      response: AbstractRequestResponse): Unit =
     val leaderAndIsrResponse = response.asInstanceOf[LeaderAndIsrResponse]
     staleControllerEpochDetected = Errors.forCode(
-        leaderAndIsrResponse.errorCode) match {
+        leaderAndIsrResponse.errorCode) match
       case Errors.STALE_CONTROLLER_EPOCH => true
       case _ => false
-    }
-  }
-}

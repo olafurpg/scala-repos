@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
   * @author Alefas
   * @since 03/09/14.
   */
-class ScalaReferenceAdjuster extends ReferenceAdjuster {
+class ScalaReferenceAdjuster extends ReferenceAdjuster
   //todo: expression adjuster
   //todo: process returns element, should return element after replacement
   //todo: support useFqInJavadoc
@@ -23,7 +23,7 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                        addImports: Boolean,
                        incompleteCode: Boolean,
                        useFqInJavadoc: Boolean,
-                       useFqInCode: Boolean): ASTNode = {
+                       useFqInCode: Boolean): ASTNode =
     processRange(element,
                  element.getTextRange.getStartOffset,
                  element.getTextRange.getEndOffset,
@@ -32,13 +32,12 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                  useFqInJavadoc,
                  useFqInCode)
     element
-  }
 
   override def processRange(element: ASTNode,
                             startOffset: Int,
                             endOffset: Int,
                             useFqInJavadoc: Boolean,
-                            useFqInCode: Boolean): Unit = {
+                            useFqInCode: Boolean): Unit =
     processRange(element,
                  startOffset,
                  endOffset,
@@ -46,7 +45,6 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                  incompleteCode = false,
                  useFqInJavadoc = useFqInJavadoc,
                  useFqInCode = useFqInCode)
-  }
 
   def processRange(element: ASTNode,
                    startOffset: Int,
@@ -54,44 +52,38 @@ class ScalaReferenceAdjuster extends ReferenceAdjuster {
                    addImports: Boolean,
                    incompleteCode: Boolean,
                    useFqInJavadoc: Boolean,
-                   useFqInCode: Boolean): Unit = {
+                   useFqInCode: Boolean): Unit =
     val psi = element.getPsi
     if (psi.getLanguage != ScalaFileType.SCALA_LANGUAGE)
       return //do not process other languages
     val buffer = new ArrayBuffer[ScalaPsiElement]()
-    val visitor = new ScalaRecursiveElementVisitor {
-      override def visitElement(element: ScalaPsiElement): Unit = {
+    val visitor = new ScalaRecursiveElementVisitor
+      override def visitElement(element: ScalaPsiElement): Unit =
         if (element.getTextRange.getStartOffset >= startOffset &&
-            element.getTextRange.getEndOffset <= endOffset) {
+            element.getTextRange.getEndOffset <= endOffset)
           buffer += element
-        } else super.visitElement(element)
-      }
-    }
+        else super.visitElement(element)
     psi.accept(visitor)
     TypeAdjuster.adjustFor(buffer, addImports)
-  }
 
   override def processRange(element: ASTNode,
                             startOffset: Int,
                             endOffset: Int,
-                            project: Project): Unit = {
+                            project: Project): Unit =
     val settings = CodeStyleSettingsManager.getSettings(project)
     processRange(element,
                  startOffset,
                  endOffset,
                  settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
                  settings.USE_FQ_CLASS_NAMES)
-  }
 
   override def process(element: ASTNode,
                        addImports: Boolean,
                        incompleteCode: Boolean,
-                       project: Project): ASTNode = {
+                       project: Project): ASTNode =
     val settings = CodeStyleSettingsManager.getSettings(project)
     process(element,
             addImports,
             incompleteCode,
             settings.USE_FQ_CLASS_NAMES_IN_JAVADOC,
             settings.USE_FQ_CLASS_NAMES)
-  }
-}

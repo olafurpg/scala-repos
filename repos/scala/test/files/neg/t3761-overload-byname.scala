@@ -1,4 +1,4 @@
-object t {
+object t
   def m1(x: => AnyVal, s: String) = 0
   def m1(x: => Int, s: Object) = 1
 
@@ -9,4 +9,3 @@ object t {
   m1(1d, "")
   m2(1, "")
   m2("", "")
-}

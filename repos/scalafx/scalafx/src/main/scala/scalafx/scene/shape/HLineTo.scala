@@ -33,21 +33,18 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object HLineTo {
+object HLineTo
   implicit def sfxHLineTo2jfx(v: HLineTo): jfxss.HLineTo =
     if (v != null) v.delegate else null
 
   def apply(x: Double) = new HLineTo(new jfxss.HLineTo(x))
-}
 
 class HLineTo(override val delegate: jfxss.HLineTo = new jfxss.HLineTo())
-    extends PathElement(delegate) with SFXDelegate[jfxss.HLineTo] {
+    extends PathElement(delegate) with SFXDelegate[jfxss.HLineTo]
 
   /**
     * Defines the X coordinate.
     */
   def x: DoubleProperty = delegate.xProperty
-  def x_=(v: Double) {
+  def x_=(v: Double)
     x() = v
-  }
-}

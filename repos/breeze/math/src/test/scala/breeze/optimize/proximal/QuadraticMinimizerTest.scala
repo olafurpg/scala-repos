@@ -11,15 +11,14 @@ import breeze.optimize.proximal.Constraint._
 import breeze.numerics._
 
 @RunWith(classOf[JUnitRunner])
-class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
+class QuadraticMinimizerTest extends OptimizeTestBase with Matchers
   def matricesNearlyEqual(A: DenseMatrix[Double],
                           B: DenseMatrix[Double],
-                          threshold: Double = 1E-6) {
+                          threshold: Double = 1E-6)
     for (i <- 0 until A.rows; j <- 0 until A.cols) A(i, j) should be(
         B(i, j) +- threshold)
-  }
 
-  test("Randomly generated matrix vector solve") {
+  test("Randomly generated matrix vector solve")
     val H = DenseMatrix((2.4779, 1.9284, 1.4078),
                         (1.9284, 3.0218, 2.2968),
                         (1.4078, 2.2968, 2.2033))
@@ -27,9 +26,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     val x = H \ q
 
     assert(norm(x - DenseVector(-0.0035577, -0.6592646, 1.0135739), 2) < 1e-4)
-  }
 
-  test("cholesky factorization based forward-backward solve") {
+  test("cholesky factorization based forward-backward solve")
     val H = QpGenerator.getGram(3)
     val R = cholesky(H)
     val q = DenseVector.rand[Double](3)
@@ -40,9 +38,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     assert(norm(goldenBefore.toDenseVector - x, inf) < 1E-5)
     assert(norm(goldenAfter.toDenseVector - x, inf) < 1E-5)
-  }
 
-  test("lu factorization based forward-backward solve") {
+  test("lu factorization based forward-backward solve")
     val H = QpGenerator.getGram(5)
     val lu = LU(H)
     val q = DenseVector.rand[Double](5)
@@ -50,7 +47,6 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     QuadraticMinimizer.dgetrs(lu._1, lu._2, x)
     val golden = H \ q
     assert(norm(golden - x) < 1E-8)
-  }
 
   val n = 5
   val gram = new DenseMatrix[Double](n,
@@ -84,21 +80,19 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
   val eigs = eigSym(gram)
 
   test(
-      "min eigen computed using inverse power law approximately same as min eigen") {
+      "min eigen computed using inverse power law approximately same as min eigen")
     val eigs = eigSym(gram)
     val eigenMin = min(eigs.eigenvalues)
     val approxEigenMin = QuadraticMinimizer.approximateMinEigen(gram)
     assert(abs(eigenMin - approxEigenMin) < 1e-3)
-  }
 
-  test("max eigen computed using power law approximately same as max eigen") {
+  test("max eigen computed using power law approximately same as max eigen")
     val eigs = eigSym(gram)
     val eigenMax = max(eigs.eigenvalues)
     val approxEigenMax = QuadraticMinimizer.approximateMaxEigen(gram)
     assert(abs(eigenMax - approxEigenMax) < 1e-3)
-  }
 
-  test("Unconstrained Quadratic Minimization compared to LU Solve") {
+  test("Unconstrained Quadratic Minimization compared to LU Solve")
     val problemSize = 10
 
     val H = DenseMatrix.eye[Double](problemSize) :* 2.0
@@ -110,20 +104,16 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     val result = qpSolver.minimize(H, f :* (-1.0))
 
     assert(norm(result - dposvResult, 2) < 1E-4)
-  }
 
-  test("Unconstrained Quadratic Minimization compared to BFGS") {
+  test("Unconstrained Quadratic Minimization compared to BFGS")
     val problemSize = 10
     val lbfgs = new LBFGS[DenseVector[Double]](-1, 7)
 
-    def optimizeWithLBFGS(init: DenseVector[Double]) = {
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    def optimizeWithLBFGS(init: DenseVector[Double]) =
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
-        }
-      }
       lbfgs.minimize(f, init)
-    }
 
     val init = DenseVector.zeros[Double](problemSize)
     init(0 until init.length by 2) := -1.2
@@ -138,22 +128,18 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     val result = qpSolver.minimize(H, f :* (-1.0))
 
     assert(norm(result - bfgsResult, 2) < 1E-4)
-  }
 
-  test("Quadratic Minimization with L1 compared to OWLQN") {
+  test("Quadratic Minimization with L1 compared to OWLQN")
     val problemSize = 10
 
     val owlqn = new OWLQN[Int, DenseVector[Double]](100, 4)
 
-    def optimizeWithOWLQN(init: DenseVector[Double]) = {
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    def optimizeWithOWLQN(init: DenseVector[Double]) =
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
-        }
-      }
       val result = owlqn.minimize(f, init)
       norm(result - 2.5, 2) < 1E-10
-    }
 
     val init = DenseVector.zeros[Double](problemSize)
     init(0 until init.length by 2) := -1.2
@@ -170,9 +156,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     val normL1 = norm(l1Result - 2.5, 2)
     assert(normL1 < 1E-3)
-  }
 
-  test("Quadratic Minimization with positivity compared to NNLS") {
+  test("Quadratic Minimization with positivity compared to NNLS")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -211,10 +196,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     val posResult = qpSolverPos.minimizeAndReturnState(ata, atb)
     assert(posResult.converged)
     assert(norm(posResult.x - goodx, 2) < 1E-3)
-  }
 
   test(
-      "Quadratic Minimization with bounds compared to Octave with NNLS Example") {
+      "Quadratic Minimization with bounds compared to Octave with NNLS Example")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -258,10 +242,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     assert(boundsResult.converged)
     assert(norm(boundsResult.x - goodBounds) < 1E-4)
-  }
 
   test(
-      "Quadratic Minimization with Equality compared to Octave MovieLens Example") {
+      "Quadratic Minimization with Equality compared to Octave MovieLens Example")
     val Hml = new DenseMatrix(25,
                               25,
                               Array(
@@ -949,10 +932,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     assert(directQpResult.converged)
     assert(norm(directQpResult.x - golden) < 1e-3)
     assert(abs(sum(directQpResult.x) - 1.0) < 1e-4)
-  }
 
   test(
-      "Quadratic Minimization with ProbabilitySimplex compared to Octave MovieLens Example") {
+      "Quadratic Minimization with ProbabilitySimplex compared to Octave MovieLens Example")
     val Hml = new DenseMatrix(25,
                               25,
                               Array(
@@ -1640,10 +1622,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     assert(directQpResult.converged)
     assert(norm(directQpResult.z - golden) < 1e-3)
     assert(abs(sum(directQpResult.z) - 1.0) < 1e-4)
-  }
 
   test(
-      "Quadratic Minimization with L1 Proximal compared to Octave MovieLens Example") {
+      "Quadratic Minimization with L1 Proximal compared to Octave MovieLens Example")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -2330,9 +2311,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     assert(qpMlL1Result.converged)
     assert(norm(qpMlL1Result.x - octaveL1, 2) < 1e-4)
-  }
 
-  test("Quadratic Minimization with L1 projection compared to Octave") {
+  test("Quadratic Minimization with L1 projection compared to Octave")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -3023,10 +3003,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     assert(norm(qpResultProximal.x - octaveL1, 2) < 1e-4)
     assert(norm(qpResultProject.x - octaveL1, 2) < 1e-4)
-  }
 
   test(
-      "Quadratic Minimization with Positivity High Iterations compared to NNLS") {
+      "Quadratic Minimization with Positivity High Iterations compared to NNLS")
     //Movielens Positive/Bounds high iterations
     val P1 = new DenseMatrix[Double](20,
                                      20,
@@ -4558,10 +4537,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     assert(abs(qpObj - nnlsObj) < 1e-4)
     assert(qpItersResult.converged)
     assert(norm(qpItersResult.x - nnlsResult, 2) < 1e-4)
-  }
 
   test(
-      "Quadratic Minimization consistency with multiple updates to proximal operator") {
+      "Quadratic Minimization consistency with multiple updates to proximal operator")
     //Ill conditioned problems
     //ALS: Diagnosing userOrProduct 34 lambdaL2 6.500000000000006E-4 lambdaL1 0.06435
     val data = Array(
@@ -5422,9 +5400,8 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     val qpSparseResult = qpSparse.minimize(Psparse, qsparse)
     assert(norm(qpSparseResult - qpSparseGold, 2) < 1E-4)
-  }
 
-  test("minimize API using updateGram should generate identical answers") {
+  test("minimize API using updateGram should generate identical answers")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -5464,10 +5441,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     qpSolverPosTest.updateGram(ata)
     val posResultTest = qpSolverPosTest.minimize(atb)
     assert(norm(posResult - posResultTest, inf) < 1E-6)
-  }
 
   test(
-      "minimize API using triangular updateGram should generate identical answers") {
+      "minimize API using triangular updateGram should generate identical answers")
     val n = 5
     val ata = new DenseMatrix[Double](5,
                                       5,
@@ -5509,10 +5485,9 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
 
     val posResultTest = qpSolverPosTest.minimize(atb)
     assert(norm(posResult - posResultTest, inf) < 1E-6)
-  }
 
   test(
-      "Quadratic Minimization with Equality Quasi definite system validation over multiple runs") {
+      "Quadratic Minimization with Equality Quasi definite system validation over multiple runs")
     val Hml = new DenseMatrix(25,
                               25,
                               Array(
@@ -6203,5 +6178,3 @@ class QuadraticMinimizerTest extends OptimizeTestBase with Matchers {
     assert(directQpResult.converged)
     assert(norm(directQpResult.x - golden) < 1e-3)
     assert(abs(sum(directQpResult.x) - 1.0) < 1e-4)
-  }
-}

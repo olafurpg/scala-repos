@@ -10,22 +10,17 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
   * Date: 20.10.11
   */
 class ScalaDoStmtEvaluator(cond: Evaluator, expr: Evaluator)
-    extends Evaluator {
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+    extends Evaluator
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     expr.evaluate(context)
-    var condition: Boolean = cond.evaluate(context) match {
+    var condition: Boolean = cond.evaluate(context) match
       case b: BooleanValue => b.value()
       case _ => throw EvaluationException("condition has wrong type")
-    }
-    while (condition) {
+    while (condition)
       expr.evaluate(context)
-      condition = cond.evaluate(context) match {
+      condition = cond.evaluate(context) match
         case b: BooleanValue => b.value()
         case _ => throw EvaluationException("condition has wrong type")
-      }
-    }
     context.getDebugProcess.getVirtualMachineProxy.mirrorOfVoid()
-  }
 
   def getModifier: Modifier = null
-}

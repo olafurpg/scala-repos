@@ -11,12 +11,12 @@ import com.intellij.psi.PsiFile
 import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScClass
 import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 
-object CaseClassWithoutParamList extends AnnotatorPart[ScClass] {
+object CaseClassWithoutParamList extends AnnotatorPart[ScClass]
   def kind: Class[ScClass] = classOf[ScClass]
 
   def annotate(
-      element: ScClass, holder: AnnotationHolder, typeAware: Boolean) {
-    if (element.isCase && !element.clauses.exists(_.clauses.nonEmpty)) {
+      element: ScClass, holder: AnnotationHolder, typeAware: Boolean)
+    if (element.isCase && !element.clauses.exists(_.clauses.nonEmpty))
       val nameId = element.nameId
       val annotation = holder.createWarningAnnotation(
           nameId, "case classes without a parameter list have been deprecated")
@@ -24,12 +24,9 @@ object CaseClassWithoutParamList extends AnnotatorPart[ScClass] {
       val fixes = Seq(new ConvertToObjectFix(element),
                       new AddEmptyParenthesesToPrimaryConstructorFix(element))
       fixes.foreach(fix => annotation.registerFix(fix, nameId.getTextRange))
-    }
-  }
-}
 
 class AddEmptyParenthesesToPrimaryConstructorFix(c: ScClass)
-    extends IntentionAction {
+    extends IntentionAction
   def getText: String = "Add empty parentheses"
 
   def getFamilyName: String = getText
@@ -39,12 +36,10 @@ class AddEmptyParenthesesToPrimaryConstructorFix(c: ScClass)
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     c.isValid && c.getManager.isInProject(file)
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     c.addEmptyParens()
-  }
-}
 
-class ConvertToObjectFix(c: ScClass) extends IntentionAction {
+class ConvertToObjectFix(c: ScClass) extends IntentionAction
   def getText: String = "Convert to object"
 
   def getFamilyName: String = getText
@@ -54,7 +49,7 @@ class ConvertToObjectFix(c: ScClass) extends IntentionAction {
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     c.isValid && c.getManager.isInProject(file)
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     val classKeywordTextRange = c.getClassToken.getTextRange
     val classTextRange = c.getTextRange
     val start =
@@ -68,5 +63,3 @@ class ConvertToObjectFix(c: ScClass) extends IntentionAction {
     // TODO update references to class.
     // new X  -> X
     // x: X   -> x: X.type
-  }
-}

@@ -21,7 +21,7 @@ import org.scalatest.exceptions.TestFailedException
 
 import org.apache.spark.mllib.linalg.{Matrix, Vector}
 
-object TestingUtils {
+object TestingUtils
 
   val ABS_TOL_MSG = " using absolute tolerance"
   val REL_TOL_MSG = " using relative tolerance"
@@ -32,29 +32,26 @@ object TestingUtils {
     * the relative tolerance is meaningless, so the exception will be raised to warn users.
     */
   private def RelativeErrorComparison(
-      x: Double, y: Double, eps: Double): Boolean = {
+      x: Double, y: Double, eps: Double): Boolean =
     val absX = math.abs(x)
     val absY = math.abs(y)
     val diff = math.abs(x - y)
-    if (x == y) {
+    if (x == y)
       true
-    } else if (absX < Double.MinPositiveValue ||
-               absY < Double.MinPositiveValue) {
+    else if (absX < Double.MinPositiveValue ||
+               absY < Double.MinPositiveValue)
       throw new TestFailedException(
           s"$x or $y is extremely close to zero, so the relative tolerance is meaningless.",
           0)
-    } else {
+    else
       diff < eps * math.min(absX, absY)
-    }
-  }
 
   /**
     * Private helper function for comparing two values using absolute tolerance.
     */
   private def AbsoluteErrorComparison(
-      x: Double, y: Double, eps: Double): Boolean = {
+      x: Double, y: Double, eps: Double): Boolean =
     math.abs(x - y) < eps
-  }
 
   case class CompareDoubleRightSide(fun: (Double, Double, Double) => Boolean,
                                     y: Double,
@@ -64,7 +61,7 @@ object TestingUtils {
   /**
     * Implicit class for comparing two double values using relative tolerance or absolute tolerance.
     */
-  implicit class DoubleWithAlmostEquals(val x: Double) {
+  implicit class DoubleWithAlmostEquals(val x: Double)
 
     /**
       * When the difference of two values are within eps, returns true; otherwise, returns false.
@@ -80,25 +77,21 @@ object TestingUtils {
       * Throws exception when the difference of two values are NOT within eps;
       * otherwise, returns true.
       */
-    def ~==(r: CompareDoubleRightSide): Boolean = {
-      if (!r.fun(x, r.y, r.eps)) {
+    def ~==(r: CompareDoubleRightSide): Boolean =
+      if (!r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Expected $x and ${r.y} to be within ${r.eps}${r.method}.", 0)
-      }
       true
-    }
 
     /**
       * Throws exception when the difference of two values are within eps; otherwise, returns true.
       */
-    def !~==(r: CompareDoubleRightSide): Boolean = {
-      if (r.fun(x, r.y, r.eps)) {
+    def !~==(r: CompareDoubleRightSide): Boolean =
+      if (r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Did not expect $x and ${r.y} to be within ${r.eps}${r.method}.",
             0)
-      }
       true
-    }
 
     /**
       * Comparison using absolute tolerance.
@@ -113,7 +106,6 @@ object TestingUtils {
       CompareDoubleRightSide(RelativeErrorComparison, x, eps, REL_TOL_MSG)
 
     override def toString: String = x.toString
-  }
 
   case class CompareVectorRightSide(fun: (Vector, Vector, Double) => Boolean,
                                     y: Vector,
@@ -123,7 +115,7 @@ object TestingUtils {
   /**
     * Implicit class for comparing two vectors using relative tolerance or absolute tolerance.
     */
-  implicit class VectorWithAlmostEquals(val x: Vector) {
+  implicit class VectorWithAlmostEquals(val x: Vector)
 
     /**
       * When the difference of two vectors are within eps, returns true; otherwise, returns false.
@@ -139,26 +131,22 @@ object TestingUtils {
       * Throws exception when the difference of two vectors are NOT within eps;
       * otherwise, returns true.
       */
-    def ~==(r: CompareVectorRightSide): Boolean = {
-      if (!r.fun(x, r.y, r.eps)) {
+    def ~==(r: CompareVectorRightSide): Boolean =
+      if (!r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Expected $x and ${r.y} to be within ${r.eps}${r.method} for all elements.",
             0)
-      }
       true
-    }
 
     /**
       * Throws exception when the difference of two vectors are within eps; otherwise, returns true.
       */
-    def !~==(r: CompareVectorRightSide): Boolean = {
-      if (r.fun(x, r.y, r.eps)) {
+    def !~==(r: CompareVectorRightSide): Boolean =
+      if (r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Did not expect $x and ${r.y} to be within ${r.eps}${r.method} for all elements.",
             0)
-      }
       true
-    }
 
     /**
       * Comparison using absolute tolerance.
@@ -166,9 +154,8 @@ object TestingUtils {
     def absTol(eps: Double): CompareVectorRightSide =
       CompareVectorRightSide(
           (x: Vector, y: Vector, eps: Double) =>
-            {
               x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
-          },
+          ,
           x,
           eps,
           ABS_TOL_MSG)
@@ -181,15 +168,13 @@ object TestingUtils {
     def relTol(eps: Double): CompareVectorRightSide =
       CompareVectorRightSide(
           (x: Vector, y: Vector, eps: Double) =>
-            {
               x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
-          },
+          ,
           x,
           eps,
           REL_TOL_MSG)
 
     override def toString: String = x.toString
-  }
 
   case class CompareMatrixRightSide(fun: (Matrix, Matrix, Double) => Boolean,
                                     y: Matrix,
@@ -199,7 +184,7 @@ object TestingUtils {
   /**
     * Implicit class for comparing two matrices using relative tolerance or absolute tolerance.
     */
-  implicit class MatrixWithAlmostEquals(val x: Matrix) {
+  implicit class MatrixWithAlmostEquals(val x: Matrix)
 
     /**
       * When the difference of two matrices are within eps, returns true; otherwise, returns false.
@@ -215,27 +200,23 @@ object TestingUtils {
       * Throws exception when the difference of two matrices are NOT within eps;
       * otherwise, returns true.
       */
-    def ~==(r: CompareMatrixRightSide): Boolean = {
-      if (!r.fun(x, r.y, r.eps)) {
+    def ~==(r: CompareMatrixRightSide): Boolean =
+      if (!r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Expected \n$x\n and \n${r.y}\n to be within ${r.eps}${r.method} for all elements.",
             0)
-      }
       true
-    }
 
     /**
       * Throws exception when the difference of two matrices are within eps; otherwise, returns true.
       */
-    def !~==(r: CompareMatrixRightSide): Boolean = {
-      if (r.fun(x, r.y, r.eps)) {
+    def !~==(r: CompareMatrixRightSide): Boolean =
+      if (r.fun(x, r.y, r.eps))
         throw new TestFailedException(
             s"Did not expect \n$x\n and \n${r.y}\n to be within " +
             "${r.eps}${r.method} for all elements.",
             0)
-      }
       true
-    }
 
     /**
       * Comparison using absolute tolerance.
@@ -243,9 +224,8 @@ object TestingUtils {
     def absTol(eps: Double): CompareMatrixRightSide =
       CompareMatrixRightSide(
           (x: Matrix, y: Matrix, eps: Double) =>
-            {
               x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 absTol eps)
-          },
+          ,
           x,
           eps,
           ABS_TOL_MSG)
@@ -258,13 +238,10 @@ object TestingUtils {
     def relTol(eps: Double): CompareMatrixRightSide =
       CompareMatrixRightSide(
           (x: Matrix, y: Matrix, eps: Double) =>
-            {
               x.toArray.zip(y.toArray).forall(x => x._1 ~= x._2 relTol eps)
-          },
+          ,
           x,
           eps,
           REL_TOL_MSG)
 
     override def toString: String = x.toString
-  }
-}

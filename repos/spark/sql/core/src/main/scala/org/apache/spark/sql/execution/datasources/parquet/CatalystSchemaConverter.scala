@@ -55,7 +55,7 @@ import org.apache.spark.sql.types._
 private[parquet] class CatalystSchemaConverter(
     assumeBinaryIsString: Boolean = SQLConf.PARQUET_BINARY_AS_STRING.defaultValue.get,
     assumeInt96IsTimestamp: Boolean = SQLConf.PARQUET_INT96_AS_TIMESTAMP.defaultValue.get,
-    writeLegacyParquetFormat: Boolean = SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get) {
+    writeLegacyParquetFormat: Boolean = SQLConf.PARQUET_WRITE_LEGACY_FORMAT.defaultValue.get)
 
   def this(conf: SQLConf) =
     this(assumeBinaryIsString = conf.isParquetBinaryAsString,
@@ -81,9 +81,9 @@ private[parquet] class CatalystSchemaConverter(
   def convert(parquetSchema: MessageType): StructType =
     convert(parquetSchema.asGroupType())
 
-  private def convert(parquetSchema: GroupType): StructType = {
-    val fields = parquetSchema.getFields.asScala.map { field =>
-      field.getRepetition match {
+  private def convert(parquetSchema: GroupType): StructType =
+    val fields = parquetSchema.getFields.asScala.map  field =>
+      field.getRepetition match
         case OPTIONAL =>
           StructField(field.getName, convertField(field), nullable = true)
 
@@ -96,21 +96,17 @@ private[parquet] class CatalystSchemaConverter(
           // elements where the element type is the type of the field.
           val arrayType = ArrayType(convertField(field), containsNull = false)
           StructField(field.getName, arrayType, nullable = false)
-      }
-    }
 
     StructType(fields)
-  }
 
   /**
     * Converts a Parquet [[Type]] to a Spark SQL [[DataType]].
     */
-  def convertField(parquetType: Type): DataType = parquetType match {
+  def convertField(parquetType: Type): DataType = parquetType match
     case t: PrimitiveType => convertPrimitiveField(t)
     case t: GroupType => convertGroupField(t.asGroupType())
-  }
 
-  private def convertPrimitiveField(field: PrimitiveType): DataType = {
+  private def convertPrimitiveField(field: PrimitiveType): DataType =
     val typeName = field.getPrimitiveTypeName
     val originalType = field.getOriginalType
 
@@ -130,7 +126,7 @@ private[parquet] class CatalystSchemaConverter(
     // When maxPrecision = -1, we skip precision range check, and always respect the precision
     // specified in field.getDecimalMetadata.  This is useful when interpreting decimal types stored
     // as binaries with variable lengths.
-    def makeDecimalType(maxPrecision: Int = -1): DecimalType = {
+    def makeDecimalType(maxPrecision: Int = -1): DecimalType =
       val precision = field.getDecimalMetadata.getPrecision
       val scale = field.getDecimalMetadata.getScale
 
@@ -139,9 +135,8 @@ private[parquet] class CatalystSchemaConverter(
           s"Invalid decimal precision: $typeName cannot store $precision digits (max $maxPrecision)")
 
       DecimalType(precision, scale)
-    }
 
-    typeName match {
+    typeName match
       case BOOLEAN => BooleanType
 
       case FLOAT => FloatType
@@ -149,7 +144,7 @@ private[parquet] class CatalystSchemaConverter(
       case DOUBLE => DoubleType
 
       case INT32 =>
-        originalType match {
+        originalType match
           case INT_8 => ByteType
           case INT_16 => ShortType
           case INT_32 | null => IntegerType
@@ -160,16 +155,14 @@ private[parquet] class CatalystSchemaConverter(
           case UINT_32 => typeNotSupported()
           case TIME_MILLIS => typeNotImplemented()
           case _ => illegalType()
-        }
 
       case INT64 =>
-        originalType match {
+        originalType match
           case INT_64 | null => LongType
           case DECIMAL => makeDecimalType(Decimal.MAX_LONG_DIGITS)
           case UINT_64 => typeNotSupported()
           case TIMESTAMP_MILLIS => typeNotImplemented()
           case _ => illegalType()
-        }
 
       case INT96 =>
         CatalystSchemaConverter.checkConversionRequirement(
@@ -179,29 +172,25 @@ private[parquet] class CatalystSchemaConverter(
         TimestampType
 
       case BINARY =>
-        originalType match {
+        originalType match
           case UTF8 | ENUM | JSON => StringType
           case null if assumeBinaryIsString => StringType
           case null => BinaryType
           case BSON => BinaryType
           case DECIMAL => makeDecimalType()
           case _ => illegalType()
-        }
 
       case FIXED_LEN_BYTE_ARRAY =>
-        originalType match {
+        originalType match
           case DECIMAL =>
             makeDecimalType(maxPrecisionForBytes(field.getTypeLength))
           case INTERVAL => typeNotImplemented()
           case _ => illegalType()
-        }
 
       case _ => illegalType()
-    }
-  }
 
-  private def convertGroupField(field: GroupType): DataType = {
-    Option(field.getOriginalType).fold(convert(field): DataType) {
+  private def convertGroupField(field: GroupType): DataType =
+    Option(field.getOriginalType).fold(convert(field): DataType)
       // A Parquet list is represented as a 3-level structure:
       //
       //   <list-repetition> group <name> (LIST) {
@@ -223,13 +212,12 @@ private[parquet] class CatalystSchemaConverter(
         CatalystSchemaConverter.checkConversionRequirement(
             repeatedType.isRepetition(REPEATED), s"Invalid list type $field")
 
-        if (isElementType(repeatedType, field.getName)) {
+        if (isElementType(repeatedType, field.getName))
           ArrayType(convertField(repeatedType), containsNull = false)
-        } else {
+        else
           val elementType = repeatedType.asGroupType().getType(0)
           val optional = elementType.isRepetition(OPTIONAL)
           ArrayType(convertField(elementType), containsNull = optional)
-        }
 
       // scalastyle:off
       // `MAP_KEY_VALUE` is for backwards-compatibility
@@ -259,15 +247,12 @@ private[parquet] class CatalystSchemaConverter(
 
       case _ =>
         throw new AnalysisException(s"Unrecognized Parquet type: $field")
-    }
-  }
 
   // scalastyle:off
   // Here we implement Parquet LIST backwards-compatibility rules.
   // See: https://github.com/apache/parquet-format/blob/master/LogicalTypes.md#backward-compatibility-rules
   // scalastyle:on
-  private def isElementType(repeatedType: Type, parentName: String): Boolean = {
-    {
+  private def isElementType(repeatedType: Type, parentName: String): Boolean =
       // For legacy 2-level list types with primitive element type, e.g.:
       //
       //    // List<Integer> (nullable list, non-null elements)
@@ -276,7 +261,7 @@ private[parquet] class CatalystSchemaConverter(
       //    }
       //
       repeatedType.isPrimitive
-    } || {
+    ||
       // For legacy 2-level list types whose element type is a group type with 2 or more fields,
       // e.g.:
       //
@@ -289,7 +274,7 @@ private[parquet] class CatalystSchemaConverter(
       //    }
       //
       repeatedType.asGroupType().getFieldCount > 1
-    } || {
+    ||
       // For legacy 2-level list types generated by parquet-avro (Parquet version < 1.6.0), e.g.:
       //
       //    // List<OneTuple<String>> (nullable list, non-null elements)
@@ -300,7 +285,7 @@ private[parquet] class CatalystSchemaConverter(
       //    }
       //
       repeatedType.getName == "array"
-    } || {
+    ||
       // For Parquet data generated by parquet-thrift, e.g.:
       //
       //    // List<OneTuple<String>> (nullable list, non-null elements)
@@ -311,31 +296,27 @@ private[parquet] class CatalystSchemaConverter(
       //    }
       //
       repeatedType.getName == s"${parentName}_tuple"
-    }
-  }
 
   /**
     * Converts a Spark SQL [[StructType]] to a Parquet [[MessageType]].
     */
-  def convert(catalystSchema: StructType): MessageType = {
+  def convert(catalystSchema: StructType): MessageType =
     Types
       .buildMessage()
       .addFields(catalystSchema.map(convertField): _*)
       .named(CatalystSchemaConverter.SPARK_PARQUET_SCHEMA_NAME)
-  }
 
   /**
     * Converts a Spark SQL [[StructField]] to a Parquet [[Type]].
     */
-  def convertField(field: StructField): Type = {
+  def convertField(field: StructField): Type =
     convertField(field, if (field.nullable) OPTIONAL else REQUIRED)
-  }
 
   private def convertField(
-      field: StructField, repetition: Type.Repetition): Type = {
+      field: StructField, repetition: Type.Repetition): Type =
     CatalystSchemaConverter.checkFieldName(field.name)
 
-    field.dataType match {
+    field.dataType match
       // ===================
       // Simple atomic types
       // ===================
@@ -545,9 +526,8 @@ private[parquet] class CatalystSchemaConverter(
 
       case StructType(fields) =>
         fields
-          .foldLeft(Types.buildGroup(repetition)) { (builder, field) =>
+          .foldLeft(Types.buildGroup(repetition))  (builder, field) =>
             builder.addField(convertField(field))
-          }
           .named(field.name)
 
       case udt: UserDefinedType[_] =>
@@ -555,52 +535,41 @@ private[parquet] class CatalystSchemaConverter(
 
       case _ =>
         throw new AnalysisException(s"Unsupported data type $field.dataType")
-    }
-  }
-}
 
-private[parquet] object CatalystSchemaConverter {
+private[parquet] object CatalystSchemaConverter
   val SPARK_PARQUET_SCHEMA_NAME = "spark_schema"
 
-  def checkFieldName(name: String): Unit = {
+  def checkFieldName(name: String): Unit =
     // ,;{}()\n\t= and space are special characters in Parquet schema
     checkConversionRequirement(
         !name.matches(".*[ ,;{}()\n\t=].*"),
         s"""Attribute name "$name" contains invalid character(s) among " ,;{}()\\n\\t=".
          |Please use alias to rename it.
        """.stripMargin.split("\n").mkString(" ").trim)
-  }
 
-  def checkFieldNames(schema: StructType): StructType = {
+  def checkFieldNames(schema: StructType): StructType =
     schema.fieldNames.foreach(checkFieldName)
     schema
-  }
 
-  def checkConversionRequirement(f: => Boolean, message: String): Unit = {
-    if (!f) {
+  def checkConversionRequirement(f: => Boolean, message: String): Unit =
+    if (!f)
       throw new AnalysisException(message)
-    }
-  }
 
-  private def computeMinBytesForPrecision(precision: Int): Int = {
+  private def computeMinBytesForPrecision(precision: Int): Int =
     var numBytes = 1
-    while (math.pow(2.0, 8 * numBytes - 1) < math.pow(10.0, precision)) {
+    while (math.pow(2.0, 8 * numBytes - 1) < math.pow(10.0, precision))
       numBytes += 1
-    }
     numBytes
-  }
 
   // Returns the minimum number of bytes needed to store a decimal with a given `precision`.
   val minBytesForPrecision =
     Array.tabulate[Int](39)(computeMinBytesForPrecision)
 
   // Max precision of a decimal value stored in `numBytes` bytes
-  def maxPrecisionForBytes(numBytes: Int): Int = {
+  def maxPrecisionForBytes(numBytes: Int): Int =
     Math
       .round( // convert double to long
           Math.floor(Math.log10( // number of base-10 digits
                   Math.pow(2, 8 * numBytes - 1) -
                   1))) // max value stored in numBytes
       .asInstanceOf[Int]
-  }
-}

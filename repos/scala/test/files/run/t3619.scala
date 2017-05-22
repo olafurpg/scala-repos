@@ -1,6 +1,6 @@
 class Dep(x: Int)(implicit val nameClash: String)
 
-object Test extends App {
+object Test extends App
   implicit val nameClash: String = "meh"
 
   def meth(implicit w: String) = 1
@@ -19,7 +19,6 @@ object Test extends App {
    */
 
   new Meh
-}
 /*
   {
     def this(a: String, b: Int) {

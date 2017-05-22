@@ -25,10 +25,10 @@ import kafka.network.{RequestOrResponseSend, RequestChannel}
 import kafka.network.RequestChannel.Response
 import org.apache.kafka.common.protocol.{ApiKeys, Errors}
 
-object ProducerRequest {
+object ProducerRequest
   val CurrentVersion = 2.shortValue
 
-  def readFrom(buffer: ByteBuffer): ProducerRequest = {
+  def readFrom(buffer: ByteBuffer): ProducerRequest =
     val versionId: Short = buffer.getShort
     val correlationId: Int = buffer.getInt
     val clientId: String = readShortString(buffer)
@@ -37,20 +37,18 @@ object ProducerRequest {
     //build the topic structure
     val topicCount = buffer.getInt
     val partitionDataPairs = (1 to topicCount).flatMap(_ =>
-          {
         // process topic
         val topic = readShortString(buffer)
         val partitionCount = buffer.getInt
         (1 to partitionCount).map(_ =>
-              {
             val partition = buffer.getInt
             val messageSetSize = buffer.getInt
             val messageSetBuffer = new Array[Byte](messageSetSize)
             buffer.get(messageSetBuffer, 0, messageSetSize)
             (TopicAndPartition(topic, partition),
              new ByteBufferMessageSet(ByteBuffer.wrap(messageSetBuffer)))
-        })
-    })
+        )
+    )
 
     ProducerRequest(versionId,
                     correlationId,
@@ -58,8 +56,6 @@ object ProducerRequest {
                     requiredAcks,
                     ackTimeoutMs,
                     collection.mutable.Map(partitionDataPairs: _*))
-  }
-}
 
 case class ProducerRequest(
     versionId: Short = ProducerRequest.CurrentVersion,
@@ -68,7 +64,7 @@ case class ProducerRequest(
     requiredAcks: Short,
     ackTimeoutMs: Int,
     data: collection.mutable.Map[TopicAndPartition, ByteBufferMessageSet])
-    extends RequestOrResponse(Some(ApiKeys.PRODUCE.id)) {
+    extends RequestOrResponse(Some(ApiKeys.PRODUCE.id))
 
   /**
     * Partitions the data into a map of maps (one for each topic).
@@ -90,7 +86,7 @@ case class ProducerRequest(
          ackTimeoutMs,
          data)
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putShort(versionId)
     buffer.putInt(correlationId)
     writeShortString(buffer, clientId)
@@ -99,12 +95,11 @@ case class ProducerRequest(
 
     //save the topic structure
     buffer.putInt(dataGroupedByTopic.size) //the number of topics
-    dataGroupedByTopic.foreach {
+    dataGroupedByTopic.foreach
       case (topic, topicAndPartitionData) =>
         writeShortString(buffer, topic) //write the topic
         buffer.putInt(topicAndPartitionData.size) //the number of partitions
         topicAndPartitionData.foreach(partitionAndData =>
-              {
             val partition = partitionAndData._1.partition
             val partitionMessageData = partitionAndData._2
             val bytes = partitionMessageData.buffer
@@ -112,11 +107,9 @@ case class ProducerRequest(
             buffer.putInt(bytes.limit)
             buffer.put(bytes)
             bytes.rewind
-        })
-    }
-  }
+        )
 
-  def sizeInBytes: Int = {
+  def sizeInBytes: Int =
     2 + /* versionId */
     4 + /* correlationId */
     shortStringLength(clientId) + /* client id */
@@ -124,47 +117,39 @@ case class ProducerRequest(
     4 + /* ackTimeoutMs */
     4 + /* number of topics */
     dataGroupedByTopic.foldLeft(0)((foldedTopics, currTopic) =>
-          {
         foldedTopics + shortStringLength(currTopic._1) + 4 +
-        /* the number of partitions */ {
+        /* the number of partitions */
           currTopic._2.foldLeft(0)((foldedPartitions, currPartition) =>
-                {
               foldedPartitions + 4 + /* partition id */
               4 + /* byte-length of serialized messages */
               currPartition._2.sizeInBytes
-          })
-        }
-    })
-  }
+          )
+    )
 
   def numPartitions = data.size
 
-  override def toString(): String = {
+  override def toString(): String =
     describe(true)
-  }
 
   override def handleError(e: Throwable,
                            requestChannel: RequestChannel,
-                           request: RequestChannel.Request): Unit = {
-    if (request.requestObj.asInstanceOf[ProducerRequest].requiredAcks == 0) {
+                           request: RequestChannel.Request): Unit =
+    if (request.requestObj.asInstanceOf[ProducerRequest].requiredAcks == 0)
       requestChannel.closeConnection(request.processor, request)
-    } else {
-      val producerResponseStatus = data.map {
+    else
+      val producerResponseStatus = data.map
         case (topicAndPartition, data) =>
           (topicAndPartition,
            ProducerResponseStatus(
                Errors.forException(e).code, -1l, Message.NoTimestamp))
-      }
       val errorResponse = ProducerResponse(
           correlationId, producerResponseStatus)
       requestChannel.sendResponse(
           new Response(
               request,
               new RequestOrResponseSend(request.connectionId, errorResponse)))
-    }
-  }
 
-  override def describe(details: Boolean): String = {
+  override def describe(details: Boolean): String =
     val producerRequest = new StringBuilder
     producerRequest.append("Name: " + this.getClass.getSimpleName)
     producerRequest.append("; Version: " + versionId)
@@ -176,9 +161,6 @@ case class ProducerRequest(
       producerRequest.append(
           "; TopicAndPartition: " + topicPartitionMessageSizeMap.mkString(","))
     producerRequest.toString()
-  }
 
-  def emptyData() {
+  def emptyData()
     data.clear()
-  }
-}

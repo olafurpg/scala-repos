@@ -4,48 +4,41 @@ import java.io.{ByteArrayOutputStream, File, FileInputStream}
 
 import scala.annotation.tailrec
 
-abstract class Uploadable {
+abstract class Uploadable
   def content: Array[Byte]
   def fileName: String
   def contentType: String
   def contentLength: Long
-}
 
 case class FilePart(
     file: File, contentType: String = "application/octet-stream")
-    extends Uploadable {
+    extends Uploadable
 
-  lazy val content = {
+  lazy val content =
     val fin = new FileInputStream(file)
     val bos = new ByteArrayOutputStream()
     val buf = new Array[Byte](4096)
 
     @tailrec
-    def copyStream() {
+    def copyStream()
       val bytesRead = fin.read(buf)
-      if (bytesRead > 0) {
+      if (bytesRead > 0)
         bos.write(buf, 0, bytesRead)
         copyStream()
-      }
-    }
 
-    try {
+    try
       copyStream()
       bos.toByteArray
-    } finally {
+    finally
       fin.close()
-    }
-  }
 
   def contentLength = file.length()
 
   def fileName = file.getName
-}
 
 case class BytesPart(fileName: String,
                      content: Array[Byte],
                      contentType: String = "application/octet-stream")
-    extends Uploadable {
+    extends Uploadable
 
   def contentLength = content.length.toLong
-}

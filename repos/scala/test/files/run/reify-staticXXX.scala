@@ -4,18 +4,16 @@ import scala.tools.reflect.Eval
 object B { override def toString = "object" }
 class C { override def toString = "class" }
 
-package foo1 {
+package foo1
   object B { override def toString = "package > object" }
   class C { override def toString = "package > class" }
-}
 
-object Foo2 {
+object Foo2
   object B { override def toString = "object > object" }
   class C { override def toString = "object > class" }
-}
 
-object packageless {
-  def test = {
+object packageless
+  def test =
     println(B)
     println(reify(B).eval)
     println(new C)
@@ -28,12 +26,10 @@ object packageless {
     println(reify(_root_.foo1.B).eval)
     println(new _root_.foo1.C)
     println(reify(new _root_.foo1.C).eval)
-  }
-}
 
-package packageful {
-  object Test {
-    def test = {
+package packageful
+  object Test
+    def test =
       println(B)
       println(reify(B).eval)
       println(new C)
@@ -46,11 +42,7 @@ package packageful {
       println(reify(_root_.foo1.B).eval)
       println(new _root_.foo1.C)
       println(reify(new _root_.foo1.C).eval)
-    }
-  }
-}
 
-object Test extends App {
+object Test extends App
   packageless.test
   packageful.Test.test
-}

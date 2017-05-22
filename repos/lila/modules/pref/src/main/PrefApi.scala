@@ -10,13 +10,13 @@ import lila.memo.AsyncCache
 import lila.user.User
 import reactivemongo.bson._
 
-final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
+final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus)
 
   private def fetchPref(id: String): Fu[Option[Pref]] =
     coll.find(BSONDocument("_id" -> id)).one[Pref]
   private val cache = AsyncCache(fetchPref, timeToLive = cacheTtl)
 
-  private implicit val prefBSONHandler = new BSON[Pref] {
+  private implicit val prefBSONHandler = new BSON[Pref]
 
     import lila.db.BSON.MapValue.{MapReader, MapWriter}
     implicit val tagsReader = MapReader[String]
@@ -92,7 +92,6 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
                    "confirmResign" -> o.confirmResign,
                    "insightShare" -> o.insightShare,
                    "tags" -> o.tags)
-  }
 
   def saveTag(user: User, name: String, value: String) =
     coll
@@ -115,9 +114,8 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
   def followable(userId: String): Fu[Boolean] =
     coll
       .find(BSONDocument("_id" -> userId), BSONDocument("follow" -> true))
-      .one[BSONDocument] map {
+      .one[BSONDocument] map
       _ flatMap (_.getAs[Boolean]("follow")) getOrElse Pref.default.follow
-    }
 
   def unfollowableIds(userIds: List[String]): Fu[Set[String]] =
     coll.distinct("_id",
@@ -130,16 +128,14 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
     unfollowableIds(userIds) map userIds.toSet.diff
 
   def followables(userIds: List[String]): Fu[List[Boolean]] =
-    followableIds(userIds) map { followables =>
+    followableIds(userIds) map  followables =>
       userIds map followables.contains
-    }
 
   def setPref(pref: Pref, notifyChange: Boolean): Funit =
-    coll.update(BSONDocument("_id" -> pref.id), pref, upsert = true).void >>- {
+    coll.update(BSONDocument("_id" -> pref.id), pref, upsert = true).void >>-
       cache remove pref.id
       if (notifyChange)
         bus.publish(SendTo(pref.id, "prefChange", true), 'users)
-    }
 
   def setPref(user: User, change: Pref => Pref, notifyChange: Boolean): Funit =
     getPref(user) map change flatMap { setPref(_, notifyChange) }
@@ -150,7 +146,5 @@ final class PrefApi(coll: Coll, cacheTtl: Duration, bus: lila.common.Bus) {
 
   def setPrefString(
       user: User, name: String, value: String, notifyChange: Boolean): Funit =
-    getPref(user) map { _.set(name, value) } flatten s"Bad pref ${user.id} $name -> $value" flatMap {
+    getPref(user) map { _.set(name, value) } flatten s"Bad pref ${user.id} $name -> $value" flatMap
       setPref(_, notifyChange)
-    }
-}

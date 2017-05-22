@@ -4,7 +4,7 @@ import com.twitter.finagle.benchmark.StdBenchAnnotations
 import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
-class PathBenchmark extends StdBenchAnnotations {
+class PathBenchmark extends StdBenchAnnotations
 
   @Param(Array("/"))
   var path: String = "/"
@@ -12,4 +12,3 @@ class PathBenchmark extends StdBenchAnnotations {
   @Benchmark
   def read(): Path =
     Path.read(path)
-}

@@ -43,7 +43,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class LightSpotSpec
     extends SimpleSFXDelegateSpec[jfxse.Light.Spot, Light.Spot](
         classOf[jfxse.Light.Spot], classOf[Light.Spot])
-    with ColorDelegateSpec[Light.Spot] {
+    with ColorDelegateSpec[Light.Spot]
 
   val colorDelegate = getScalaClassInstance
-}

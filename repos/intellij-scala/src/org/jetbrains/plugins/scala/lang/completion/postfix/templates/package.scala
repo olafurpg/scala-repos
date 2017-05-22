@@ -8,8 +8,7 @@ import scala.language.implicitConversions
   * @author Roman.Shein
   * @since 11.09.2015.
   */
-package object templates {
+package object templates
   implicit def toExpandedCondition[T](
       condition: Condition[T]): ExpandedCondition[T] =
     new ExpandedCondition(condition)
-}

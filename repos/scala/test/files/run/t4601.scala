@@ -1,14 +1,10 @@
 class A
 
-trait B { self: A =>
+trait B  self: A =>
 
-  def test {
+  def test
     println('blubber)
-  }
-}
 
-object Test extends A with B {
-  def main(args: Array[String]) {
+object Test extends A with B
+  def main(args: Array[String])
     test
-  }
-}

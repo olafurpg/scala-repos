@@ -4,7 +4,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object LazyTupleTest extends SpecLite {
+object LazyTupleTest extends SpecLite
 
   type A = Int
   type B = Int
@@ -26,4 +26,3 @@ object LazyTupleTest extends SpecLite {
   checkAll("LazyTuple4", monad.laws[LazyTuple4[B, C, D, ?]])
 
   checkAll("LazyTuple2", associative.laws[LazyTuple2])
-}

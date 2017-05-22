@@ -31,12 +31,11 @@ import javafx.scene.{shape => jfxss}
 import scala.language.implicitConversions
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
-object MoveTo {
+object MoveTo
   implicit def sfxMoveTo2jfx(v: MoveTo): jfxss.MoveTo =
     if (v != null) v.delegate else null
 
   def apply(x: Double, y: Double) = new MoveTo(new jfxss.MoveTo(x, y))
-}
 
 class MoveTo(override val delegate: jfxss.MoveTo = new jfxss.MoveTo())
     extends PathElement(delegate) with PositionDelegate[jfxss.MoveTo]

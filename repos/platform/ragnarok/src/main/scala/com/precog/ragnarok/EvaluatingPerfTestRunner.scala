@@ -47,13 +47,12 @@ import scalaz._
 import scalaz.syntax.monad._
 
 trait PerfTestRunnerConfig
-    extends BaseConfig with IdSourceConfig with ColumnarTableModuleConfig {
+    extends BaseConfig with IdSourceConfig with ColumnarTableModuleConfig
 
   def optimize: Boolean
   def apiKey: APIKey
-}
 
-trait EvaluatingPerfTestRunnerConfig extends PerfTestRunnerConfig {
+trait EvaluatingPerfTestRunnerConfig extends PerfTestRunnerConfig
 
   // TODO Get configuration from somewhere...
   val config = Configuration parse ""
@@ -64,11 +63,10 @@ trait EvaluatingPerfTestRunnerConfig extends PerfTestRunnerConfig {
   val smallSliceSize = 8
 
   val idSource = new FreshAtomicIdSource
-}
 
 trait EvaluatingPerfTestRunner[M[+ _], T]
     extends ParseEvalStack[M] with IdSourceScannerModule
-    with PerfTestRunner[M, T] {
+    with PerfTestRunner[M, T]
 
   type Result = Int
 
@@ -89,47 +87,41 @@ trait EvaluatingPerfTestRunner[M[+ _], T]
         yggConfig.apiKey, dummyAccount, Path.Root, Path.Root, new DateTime)
 
   def eval(query: String): M[Result] =
-    try {
+    try
       val forest = Timing.time("Compiling query")(compile(query))
       val valid = forest filter { _.errors forall isWarning }
 
-      if (valid.isEmpty) {
+      if (valid.isEmpty)
         sys.error("Error parsing query:\n" +
             (forest flatMap { _.errors } map { _.toString } mkString "\n"))
-      } else if (valid.size > 1) {
+      else if (valid.size > 1)
         sys.error("Ambiguous parse tree.")
-      }
 
       val tree = valid.head
 
       val instructions = Timing.time("Emitting instructions")(emit(tree))
       val decorated = Timing.time("Decorating tree")(decorate(instructions))
-      decorated match {
+      decorated match
         case Left(stackError) =>
           sys.error("Failed to construct DAG.")
 
         case Right(dag) =>
-          for {
+          for
             table <- Evaluator(M).eval(
                 dag, dummyEvaluationContext, yggConfig.optimize)
             size <- Timing.timeM("Counting stream")(
                 countStream(table.renderJson("", ",", "")))
-          } yield size
-      }
-    } catch {
+          yield size
+    catch
       case e: com.precog.quirrel.parser.Parser$ParseException =>
         sys.error(
             "Error parsing query:\n\n%s\n\n%s" format (query, e.getMessage()))
-    }
 
-  private def countStream[A](str: StreamT[M, A]): M[Int] = {
-    for {
+  private def countStream[A](str: StreamT[M, A]): M[Int] =
+    for
       optTail <- str.uncons
-      res = optTail map { _._2 } map { tail =>
+      res = optTail map { _._2 } map  tail =>
         countStream(tail) map (1 +)
-      }
 
       back <- res getOrElse M.point(0)
-    } yield back
-  }
-}
+    yield back

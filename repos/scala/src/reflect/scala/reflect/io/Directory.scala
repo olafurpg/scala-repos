@@ -15,7 +15,7 @@ import java.io.{File => JFile}
 /**
   * ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
-object Directory {
+object Directory
   import scala.util.Properties.userDir
 
   private def normalizePath(s: String) = Some(apply(Path(s).normalize))
@@ -27,12 +27,10 @@ object Directory {
   // Like File.makeTemp but creates a directory instead
   def makeTemp(prefix: String = Path.randomPrefix,
                suffix: String = null,
-               dir: JFile = null): Directory = {
+               dir: JFile = null): Directory =
     val path = File.makeTemp(prefix, suffix, dir)
     path.delete()
     path.createDirectory()
-  }
-}
 
 /** An abstraction for directories.
   *
@@ -41,7 +39,7 @@ object Directory {
   *
   *  ''Note:  This is library is considered experimental and should not be used unless you know what you are doing.''
   */
-class Directory(jfile: JFile) extends Path(jfile) {
+class Directory(jfile: JFile) extends Path(jfile)
   override def toAbsolute: Directory =
     if (isAbsolute) this else super.toAbsolute.toDirectory
   override def toDirectory: Directory = this
@@ -51,10 +49,9 @@ class Directory(jfile: JFile) extends Path(jfile) {
   /** An iterator over the contents of this directory.
     */
   def list: Iterator[Path] =
-    jfile.listFiles match {
+    jfile.listFiles match
       case null => Iterator.empty
       case xs => xs.iterator map Path.apply
-    }
 
   def dirs: Iterator[Directory] = list collect { case x: Directory => x }
   def files: Iterator[File] = list collect { case x: File => x }
@@ -71,4 +68,3 @@ class Directory(jfile: JFile) extends Path(jfile) {
     if (depth < 0) list ++ (dirs flatMap (_ deepList (depth)))
     else if (depth == 0) Iterator.empty
     else list ++ (dirs flatMap (_ deepList (depth - 1)))
-}

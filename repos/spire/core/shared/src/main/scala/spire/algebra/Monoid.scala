@@ -8,7 +8,7 @@ package algebra
   * with `op` as string concatenation, then `id = ""`.
   */
 trait Monoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Semigroup[A] {
+    extends Any with Semigroup[A]
 
   /**
     * Return the identity element for this monoid.
@@ -35,9 +35,8 @@ trait Monoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
     *  Given a sequence of `as`, combine them using the monoid and return the total.
     */
   def combine(as: TraversableOnce[A]): A = as.aggregate(id)(op, op)
-}
 
-object Monoid {
+object Monoid
   @inline final def apply[A](implicit m: Monoid[A]): Monoid[A] = m
 
   /**
@@ -53,7 +52,6 @@ object Monoid {
     */
   @inline final def multiplicative[A](
       implicit A: MultiplicativeMonoid[A]): Monoid[A] = A.multiplicative
-}
 
 /**
   * CMonoid represents a commutative monoid.
@@ -63,10 +61,9 @@ object Monoid {
 trait CMonoid[@sp(Boolean, Byte, Short, Int, Long, Float, Double) A]
     extends Any with Monoid[A] with CSemigroup[A]
 
-object CMonoid {
+object CMonoid
   @inline final def apply[A](implicit ev: CMonoid[A]): CMonoid[A] = ev
   @inline final def additive[A](implicit A: AdditiveCMonoid[A]): CMonoid[A] =
     A.additive
   @inline final def multiplicative[A](
       implicit A: MultiplicativeCMonoid[A]): CMonoid[A] = A.multiplicative
-}

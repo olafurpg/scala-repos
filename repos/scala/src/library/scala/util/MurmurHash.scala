@@ -29,7 +29,7 @@ import scala.collection.Iterator
   */
 @deprecated("Use the object MurmurHash3 instead.", "2.10.0")
 class MurmurHash[@specialized(Int, Long, Float, Double) T](seed: Int)
-    extends (T => Unit) {
+    extends (T => Unit)
   import MurmurHash._
 
   private var h = startHash(seed)
@@ -39,39 +39,33 @@ class MurmurHash[@specialized(Int, Long, Float, Double) T](seed: Int)
   private var hashvalue = h
 
   /** Begin a new hash using the same seed. */
-  def reset() {
+  def reset()
     h = startHash(seed)
     c = hiddenMagicA
     k = hiddenMagicB
     hashed = false
-  }
 
   /** Incorporate the hash value of one item. */
-  def apply(t: T) {
+  def apply(t: T)
     h = extendHash(h, t.##, c, k)
     c = nextMagicA(c)
     k = nextMagicB(k)
     hashed = false
-  }
 
   /** Incorporate a known hash value. */
-  def append(i: Int) {
+  def append(i: Int)
     h = extendHash(h, i, c, k)
     c = nextMagicA(c)
     k = nextMagicB(k)
     hashed = false
-  }
 
   /** Retrieve the hash value */
-  def hash = {
-    if (!hashed) {
+  def hash =
+    if (!hashed)
       hashvalue = finalizeHash(h)
       hashed = true
-    }
     hashvalue
-  }
   override def hashCode = hash
-}
 
 /** An object designed to generate well-distributed non-cryptographic
   *  hashes.  It is designed to hash a collection of integers; along with
@@ -83,7 +77,7 @@ class MurmurHash[@specialized(Int, Long, Float, Double) T](seed: Int)
   */
 @deprecated("Use the object MurmurHash3 instead.", "2.10.0")
 // NOTE: Used by SBT 0.13.0-M2 and below
-object MurmurHash {
+object MurmurHash
   // Magic values used for MurmurHash's 32 bit hash.
   // Don't change these without consulting a hashing expert!
   final private val visibleMagic = 0x971e137b
@@ -124,9 +118,8 @@ object MurmurHash {
     *  @param magicB    a magic integer from a different stream
     *  @return          the updated hash value
     */
-  def extendHash(hash: Int, value: Int, magicA: Int, magicB: Int) = {
+  def extendHash(hash: Int, value: Int, magicA: Int, magicB: Int) =
     (hash ^ rotl(value * magicA, 11) * magicB) * 3 + visibleMixer
-  }
 
   /** Given a magic integer from the first stream, compute the next */
   def nextMagicA(magicA: Int) = magicA * 5 + hiddenMixerA
@@ -135,67 +128,59 @@ object MurmurHash {
   def nextMagicB(magicB: Int) = magicB * 5 + hiddenMixerB
 
   /** Once all hashes have been incorporated, this performs a final mixing */
-  def finalizeHash(hash: Int) = {
+  def finalizeHash(hash: Int) =
     var i = (hash ^ (hash >>> 16))
     i *= finalMixer1
     i ^= (i >>> 13)
     i *= finalMixer2
     i ^= (i >>> 16)
     i
-  }
 
   /** Compute a high-quality hash of an array */
-  def arrayHash[@specialized T](a: Array[T]) = {
+  def arrayHash[@specialized T](a: Array[T]) =
     var h = startHash(a.length * seedArray)
     var c = hiddenMagicA
     var k = hiddenMagicB
     var j = 0
-    while (j < a.length) {
+    while (j < a.length)
       h = extendHash(h, a(j).##, c, k)
       c = nextMagicA(c)
       k = nextMagicB(k)
       j += 1
-    }
     finalizeHash(h)
-  }
 
   /** Compute a high-quality hash of a string */
-  def stringHash(s: String) = {
+  def stringHash(s: String) =
     var h = startHash(s.length * seedString)
     var c = hiddenMagicA
     var k = hiddenMagicB
     var j = 0
-    while (j + 1 < s.length) {
+    while (j + 1 < s.length)
       val i = (s.charAt(j) << 16) + s.charAt(j + 1)
       h = extendHash(h, i, c, k)
       c = nextMagicA(c)
       k = nextMagicB(k)
       j += 2
-    }
     if (j < s.length) h = extendHash(h, s.charAt(j).toInt, c, k)
     finalizeHash(h)
-  }
 
   /** Compute a hash that is symmetric in its arguments--that is,
     *  where the order of appearance of elements does not matter.
     *  This is useful for hashing sets, for example.
     */
-  def symmetricHash[T](xs: scala.collection.TraversableOnce[T], seed: Int) = {
+  def symmetricHash[T](xs: scala.collection.TraversableOnce[T], seed: Int) =
     var a, b, n = 0
     var c = 1
     xs.seq.foreach(
         i =>
-          {
         val h = i.##
         a += h
         b ^= h
         if (h != 0) c *= h
         n += 1
-    })
+    )
     var h = startHash(seed * n)
     h = extendHash(h, a, storedMagicA(0), storedMagicB(0))
     h = extendHash(h, b, storedMagicA(1), storedMagicB(1))
     h = extendHash(h, c, storedMagicA(2), storedMagicB(2))
     finalizeHash(h)
-  }
-}

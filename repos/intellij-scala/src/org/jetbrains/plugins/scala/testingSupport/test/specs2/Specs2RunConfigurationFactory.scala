@@ -10,10 +10,8 @@ import org.jetbrains.plugins.scala.testingSupport.test.AbstractTestRunConfigurat
   * Date: 03.05.2009
   */
 class Specs2RunConfigurationFactory(override val typez: ConfigurationType)
-    extends AbstractTestRunConfigurationFactory(typez) {
+    extends AbstractTestRunConfigurationFactory(typez)
 
-  def createTemplateConfiguration(project: Project): RunConfiguration = {
+  def createTemplateConfiguration(project: Project): RunConfiguration =
     val configuration = new Specs2RunConfiguration(project, this, "")
     configuration
-  }
-}

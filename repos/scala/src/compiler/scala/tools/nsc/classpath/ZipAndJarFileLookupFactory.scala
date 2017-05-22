@@ -18,43 +18,38 @@ import FileUtils._
   * It allows us to e.g. reduce significantly memory used by PresentationCompilers in Scala IDE
   * when there are a lot of projects having a lot of common dependencies.
   */
-sealed trait ZipAndJarFileLookupFactory {
+sealed trait ZipAndJarFileLookupFactory
 
   private val cache = collection.mutable.Map.empty[AbstractFile, FlatClassPath]
 
-  def create(zipFile: AbstractFile, settings: Settings): FlatClassPath = {
+  def create(zipFile: AbstractFile, settings: Settings): FlatClassPath =
     if (settings.YdisableFlatCpCaching) createForZipFile(zipFile)
     else createUsingCache(zipFile, settings)
-  }
 
   protected def createForZipFile(zipFile: AbstractFile): FlatClassPath
 
   private def createUsingCache(
       zipFile: AbstractFile, settings: Settings): FlatClassPath =
-    cache.synchronized {
-      def newClassPathInstance = {
+    cache.synchronized
+      def newClassPathInstance =
         if (settings.verbose || settings.Ylogcp)
           println(s"$zipFile is not yet in the classpath cache")
         createForZipFile(zipFile)
-      }
       cache.getOrElseUpdate(zipFile, newClassPathInstance)
-    }
-}
 
 /**
   * Manages creation of flat classpath for class files placed in zip and jar files.
   * It should be the only way of creating them as it provides caching.
   */
-object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
+object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory
 
   private case class ZipArchiveFlatClassPath(zipFile: File)
-      extends ZipArchiveFileLookup[ClassFileEntryImpl] with NoSourcePaths {
+      extends ZipArchiveFileLookup[ClassFileEntryImpl] with NoSourcePaths
 
-    override def findClassFile(className: String): Option[AbstractFile] = {
+    override def findClassFile(className: String): Option[AbstractFile] =
       val (pkg, simpleClassName) =
         PackageNameUtils.separatePkgAndClassNames(className)
       classes(pkg).find(_.name == simpleClassName).map(_.file)
-    }
 
     override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] =
       files(inPackage)
@@ -64,7 +59,6 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       ClassFileEntryImpl(file)
     override protected def isRequiredFileType(file: AbstractFile): Boolean =
       file.isClass
-  }
 
   /**
     * This type of classpath is closely related to the support for JSR-223.
@@ -74,13 +68,12 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
     * Name: scala/Function2$mcFJD$sp.class
     */
   private case class ManifestResourcesFlatClassPath(file: ManifestResources)
-      extends FlatClassPath with NoSourcePaths {
+      extends FlatClassPath with NoSourcePaths
 
-    override def findClassFile(className: String): Option[AbstractFile] = {
+    override def findClassFile(className: String): Option[AbstractFile] =
       val (pkg, simpleClassName) =
         PackageNameUtils.separatePkgAndClassNames(className)
       classes(pkg).find(_.name == simpleClassName).map(_.file)
-    }
 
     override def asClassPathStrings: Seq[String] = Seq(file.path)
 
@@ -102,7 +95,7 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       * Classes for given package can be then easily loaded when they are needed.
       */
     private lazy val cachedPackages: collection.mutable.HashMap[
-        String, PackageFileInfo] = {
+        String, PackageFileInfo] =
       val packages = collection.mutable.HashMap[String, PackageFileInfo]()
 
       def getSubpackages(dir: AbstractFile): List[AbstractFile] =
@@ -113,7 +106,7 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
           packagePrefix: String,
           filesForPrefix: List[AbstractFile],
           subpackagesQueue: collection.mutable.Queue[PackageInfo]): Unit =
-        filesForPrefix match {
+        filesForPrefix match
           case pkgFile :: remainingFiles =>
             val subpackages = getSubpackages(pkgFile)
             val fullPkgName = packagePrefix + pkgFile.name
@@ -127,7 +120,6 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
               subpackagesQueue.dequeue()
             traverse(packagePrefix, filesForPrefix, subpackagesQueue)
           case _ =>
-        }
 
       val subpackages = getSubpackages(file)
       packages.put(
@@ -135,35 +127,30 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
       traverse(
           FlatClassPath.RootPackage, subpackages, collection.mutable.Queue())
       packages
-    }
 
     override private[nsc] def packages(inPackage: String): Seq[PackageEntry] =
-      cachedPackages.get(inPackage) match {
+      cachedPackages.get(inPackage) match
         case None => Seq.empty
         case Some(PackageFileInfo(_, subpackages)) =>
           val prefix = PackageNameUtils.packagePrefix(inPackage)
           subpackages.map(
               packageFile => PackageEntryImpl(prefix + packageFile.name))
-      }
 
     override private[nsc] def classes(inPackage: String): Seq[ClassFileEntry] =
-      cachedPackages.get(inPackage) match {
+      cachedPackages.get(inPackage) match
         case None => Seq.empty
         case Some(PackageFileInfo(pkg, _)) =>
           (for (file <- pkg if file.isClass) yield
             ClassFileEntryImpl(file))(collection.breakOut)
-      }
 
     override private[nsc] def list(inPackage: String): FlatClassPathEntries =
       FlatClassPathEntries(packages(inPackage), classes(inPackage))
-  }
 
-  private object ManifestResourcesFlatClassPath {
+  private object ManifestResourcesFlatClassPath
     case class PackageFileInfo(
         packageFile: AbstractFile, subpackages: Seq[AbstractFile])
     case class PackageInfo(
         packageName: String, subpackages: List[AbstractFile])
-  }
 
   override protected def createForZipFile(
       zipFile: AbstractFile): FlatClassPath =
@@ -171,24 +158,22 @@ object ZipAndJarFlatClassPathFactory extends ZipAndJarFileLookupFactory {
     else ZipArchiveFlatClassPath(zipFile.file)
 
   private def createWithoutUnderlyingFile(zipFile: AbstractFile) =
-    zipFile match {
+    zipFile match
       case manifestRes: ManifestResources =>
         ManifestResourcesFlatClassPath(manifestRes)
       case _ =>
         val errorMsg =
           s"Abstract files which don't have an underlying file and are not ManifestResources are not supported. There was $zipFile"
         throw new IllegalArgumentException(errorMsg)
-    }
-}
 
 /**
   * Manages creation of flat classpath for source files placed in zip and jar files.
   * It should be the only way of creating them as it provides caching.
   */
-object ZipAndJarFlatSourcePathFactory extends ZipAndJarFileLookupFactory {
+object ZipAndJarFlatSourcePathFactory extends ZipAndJarFileLookupFactory
 
   private case class ZipArchiveFlatSourcePath(zipFile: File)
-      extends ZipArchiveFileLookup[SourceFileEntryImpl] with NoClassPaths {
+      extends ZipArchiveFileLookup[SourceFileEntryImpl] with NoClassPaths
 
     override def asSourcePathString: String = asClassPathString
 
@@ -200,9 +185,7 @@ object ZipAndJarFlatSourcePathFactory extends ZipAndJarFileLookupFactory {
       SourceFileEntryImpl(file)
     override protected def isRequiredFileType(file: AbstractFile): Boolean =
       file.isScalaOrJavaSource
-  }
 
   override protected def createForZipFile(
       zipFile: AbstractFile): FlatClassPath =
     ZipArchiveFlatSourcePath(zipFile.file)
-}

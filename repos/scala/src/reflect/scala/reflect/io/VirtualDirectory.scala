@@ -17,12 +17,11 @@ import scala.collection.mutable
   */
 class VirtualDirectory(
     val name: String, maybeContainer: Option[VirtualDirectory])
-    extends AbstractFile {
+    extends AbstractFile
   def path: String =
-    maybeContainer match {
+    maybeContainer match
       case None => name
       case Some(parent) => parent.path + '/' + name
-    }
 
   def absolute = this
 
@@ -57,20 +56,16 @@ class VirtualDirectory(
     (files get name filter (_.isDirectory == directory)).orNull
 
   override def fileNamed(name: String): AbstractFile =
-    Option(lookupName(name, directory = false)) getOrElse {
+    Option(lookupName(name, directory = false)) getOrElse
       val newFile = new VirtualFile(name, path + '/' + name)
       files(name) = newFile
       newFile
-    }
 
   override def subdirectoryNamed(name: String): AbstractFile =
-    Option(lookupName(name, directory = true)) getOrElse {
+    Option(lookupName(name, directory = true)) getOrElse
       val dir = new VirtualDirectory(name, Some(this))
       files(name) = dir
       dir
-    }
 
-  def clear() {
+  def clear()
     files.clear()
-  }
-}

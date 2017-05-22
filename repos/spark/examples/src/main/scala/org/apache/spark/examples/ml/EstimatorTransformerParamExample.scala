@@ -27,9 +27,9 @@ import org.apache.spark.sql.Row
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object EstimatorTransformerParamExample {
+object EstimatorTransformerParamExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("EstimatorTransformerParamExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -97,16 +97,13 @@ object EstimatorTransformerParamExample {
       .transform(test)
       .select("features", "label", "myProbability", "prediction")
       .collect()
-      .foreach {
+      .foreach
         case Row(features: Vector,
                  label: Double,
                  prob: Vector,
                  prediction: Double) =>
           println(s"($features, $label) -> prob=$prob, prediction=$prediction")
-      }
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

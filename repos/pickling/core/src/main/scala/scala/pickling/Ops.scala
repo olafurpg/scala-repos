@@ -4,7 +4,7 @@ import scala.language.experimental.macros
 import scala.language.implicitConversions
 
 /** Appends the pickle/pickleTo/pickleInto operations onto any type, assuming implicits picklers are available. */
-final case class PickleOps[T](picklee: T) {
+final case class PickleOps[T](picklee: T)
   def pickle(
       implicit format: PickleFormat, pickler: Pickler[T]): format.PickleType =
     functions.pickle[T](picklee)(format, pickler)
@@ -16,17 +16,14 @@ final case class PickleOps[T](picklee: T) {
     .PickleMacros_pickleTo[T, S]
   //def pickleTo[S](output: S)(implicit format: PickleFormat, pickler: Pickler[T]): Unit =
   //  functions.pickleTo(picklee, output)(pickler, format)
-}
 
-final case class UnpickleOps(val thePickle: Pickle) {
+final case class UnpickleOps(val thePickle: Pickle)
   def unpickle[T](implicit unpickler: Unpickler[T], format: PickleFormat): T =
     // TODO - Ideally we get a compiler error if pickle type doesn't match.
     functions.unpickle(thePickle.asInstanceOf[format.PickleType])(
         unpickler, format)
-}
 
-trait Ops {
+trait Ops
   implicit def pickleOps[T](picklee: T): PickleOps[T] = PickleOps(picklee)
   implicit def unpickleOps(thePickle: Pickle): UnpickleOps =
     UnpickleOps(thePickle)
-}

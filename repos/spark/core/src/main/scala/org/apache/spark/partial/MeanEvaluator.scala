@@ -25,38 +25,32 @@ import org.apache.spark.util.StatCounter
   * An ApproximateEvaluator for means.
   */
 private[spark] class MeanEvaluator(totalOutputs: Int, confidence: Double)
-    extends ApproximateEvaluator[StatCounter, BoundedDouble] {
+    extends ApproximateEvaluator[StatCounter, BoundedDouble]
 
   var outputsMerged = 0
   var counter = new StatCounter
 
-  override def merge(outputId: Int, taskResult: StatCounter) {
+  override def merge(outputId: Int, taskResult: StatCounter)
     outputsMerged += 1
     counter.merge(taskResult)
-  }
 
-  override def currentResult(): BoundedDouble = {
-    if (outputsMerged == totalOutputs) {
+  override def currentResult(): BoundedDouble =
+    if (outputsMerged == totalOutputs)
       new BoundedDouble(counter.mean, 1.0, counter.mean, counter.mean)
-    } else if (outputsMerged == 0) {
+    else if (outputsMerged == 0)
       new BoundedDouble(
           0, 0.0, Double.NegativeInfinity, Double.PositiveInfinity)
-    } else {
+    else
       val mean = counter.mean
       val stdev = math.sqrt(counter.sampleVariance / counter.count)
-      val confFactor = {
-        if (counter.count > 100) {
+      val confFactor =
+        if (counter.count > 100)
           new NormalDistribution()
             .inverseCumulativeProbability(1 - (1 - confidence) / 2)
-        } else {
+        else
           val degreesOfFreedom = (counter.count - 1).toInt
           new TDistribution(degreesOfFreedom)
             .inverseCumulativeProbability(1 - (1 - confidence) / 2)
-        }
-      }
       val low = mean - confFactor * stdev
       val high = mean + confFactor * stdev
       new BoundedDouble(mean, confidence, low, high)
-    }
-  }
-}

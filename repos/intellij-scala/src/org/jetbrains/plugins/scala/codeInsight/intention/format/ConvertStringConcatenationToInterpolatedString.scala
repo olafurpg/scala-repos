@@ -15,13 +15,11 @@ class ConvertStringConcatenationToInterpolatedString
     extends AbstractFormatConversionIntention("Convert to interpolated string",
                                               StringConcatenationParser,
                                               InterpolatedStringFormatter,
-                                              eager = true) {
+                                              eager = true)
 
   override def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     if (!super.isAvailable(
             project: Project, editor: Editor, element: PsiElement))
       return false
     element.scalaLanguageLevel.getOrElse(ScalaLanguageLevel.Default) >= Scala_2_10
-  }
-}

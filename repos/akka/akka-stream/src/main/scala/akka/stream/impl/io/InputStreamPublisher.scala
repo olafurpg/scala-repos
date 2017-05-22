@@ -15,24 +15,22 @@ import scala.concurrent.Promise
 import scala.util.{Failure, Success}
 
 /** INTERNAL API */
-private[akka] object InputStreamPublisher {
+private[akka] object InputStreamPublisher
 
   def props(is: InputStream,
             completionPromise: Promise[IOResult],
-            chunkSize: Int): Props = {
+            chunkSize: Int): Props =
     require(chunkSize > 0, s"chunkSize must be > 0 (was $chunkSize)")
 
     Props(classOf[InputStreamPublisher], is, completionPromise, chunkSize)
       .withDeploy(Deploy.local)
-  }
 
   private final case object Continue extends DeadLetterSuppression
-}
 
 /** INTERNAL API */
 private[akka] class InputStreamPublisher(
     is: InputStream, completionPromise: Promise[IOResult], chunkSize: Int)
-    extends akka.stream.actor.ActorPublisher[ByteString] with ActorLogging {
+    extends akka.stream.actor.ActorPublisher[ByteString] with ActorLogging
 
   // TODO possibly de-duplicate with FilePublisher?
 
@@ -41,25 +39,23 @@ private[akka] class InputStreamPublisher(
   val arr = Array.ofDim[Byte](chunkSize)
   var readBytesTotal = 0L
 
-  def receive = {
+  def receive =
     case ActorPublisherMessage.Request(elements) ⇒ readAndSignal()
     case Continue ⇒ readAndSignal()
     case ActorPublisherMessage.Cancel ⇒ context.stop(self)
-  }
 
   def readAndSignal(): Unit =
-    if (isActive) {
+    if (isActive)
       readAndEmit()
       if (totalDemand > 0 && isActive) self ! Continue
-    }
 
   def readAndEmit(): Unit =
     if (totalDemand > 0)
-      try {
+      try
         // blocking read
         val readBytes = is.read(arr)
 
-        readBytes match {
+        readBytes match
           case -1 ⇒
             // had nothing to read into this chunk
             log.debug("No more bytes available to read (got `-1` from `read`)")
@@ -70,22 +66,17 @@ private[akka] class InputStreamPublisher(
 
             // emit immediately, as this is the only chance to do it before we might block again
             onNext(ByteString.fromArray(arr, 0, readBytes))
-        }
-      } catch {
+      catch
         case ex: Exception ⇒
           onErrorThenStop(ex)
-      }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     super.postStop()
 
-    try {
+    try
       if (is ne null) is.close()
-    } catch {
+    catch
       case ex: Exception ⇒
         completionPromise.success(IOResult(readBytesTotal, Failure(ex)))
-    }
 
     completionPromise.trySuccess(IOResult(readBytesTotal, Success(Done)))
-  }
-}

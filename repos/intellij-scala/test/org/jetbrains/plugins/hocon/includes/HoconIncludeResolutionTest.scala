@@ -13,7 +13,7 @@ import org.junit.Assert._
 /**
   * @author ghik
   */
-trait HoconIncludeResolutionTest {
+trait HoconIncludeResolutionTest
   this: UsefulTestCase =>
 
   protected def project: Project
@@ -34,10 +34,10 @@ trait HoconIncludeResolutionTest {
       .asOptionOf[HoconPsiFile]
       .getOrElse(throw new Exception("Could not find HOCON file " + path))
 
-  protected def checkFile(path: String): Unit = {
+  protected def checkFile(path: String): Unit =
     val psiFile = findHoconFile(path)
 
-    psiFile.depthFirst.foreach {
+    psiFile.depthFirst.foreach
       case it: HIncludeTarget =>
         val prevComments = it.parent
           .map(_.parent.map(_.nonWhitespaceChildren).getOrElse(Iterator.empty))
@@ -50,15 +50,14 @@ trait HoconIncludeResolutionTest {
         @inline def parentText =
           it.parent.map(_.getText).getOrElse("[No parent]")
 
-        if (prevComments.nonEmpty) {
+        if (prevComments.nonEmpty)
           assertTrue("No references in " + parentText, references.nonEmpty)
           val resolveResults = references.last.multiResolve(false)
-          resolveResults.sliding(2).foreach {
+          resolveResults.sliding(2).foreach
             case Array(rr1, rr2) =>
               assertTrue(
                   IncludedFileReference.ResolveResultOrdering.lteq(rr1, rr2))
             case _ =>
-          }
 
           val expectedFiles = prevComments
             .map(_.getText.stripPrefix("#"))
@@ -75,11 +74,7 @@ trait HoconIncludeResolutionTest {
             .toSet
 
           assertEquals(parentText, expectedFiles, actualFiles)
-        } else {
+        else
           assertTrue(
               "Expected no references in " + parentText, references.isEmpty)
-        }
       case _ =>
-    }
-  }
-}

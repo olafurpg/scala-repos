@@ -4,7 +4,7 @@ package internal
 
 import Depth._
 
-final class Depth private (val depth: Int) extends AnyVal with Ordered[Depth] {
+final class Depth private (val depth: Int) extends AnyVal with Ordered[Depth]
   def max(that: Depth): Depth = if (this < that) that else this
   def decr(n: Int): Depth = if (isAnyDepth) this else Depth(depth - n)
   def incr(n: Int): Depth = if (isAnyDepth) this else Depth(depth + n)
@@ -18,9 +18,8 @@ final class Depth private (val depth: Int) extends AnyVal with Ordered[Depth] {
   def compare(that: Depth): Int =
     if (depth < that.depth) -1 else if (this == that) 0 else 1
   override def toString = s"Depth($depth)"
-}
 
-object Depth {
+object Depth
   // A don't care value for the depth parameter in lubs/glbs and related operations.
   // When passed this value, the recursion budget will be inferred from the shape of
   // the `typeDepth` of the list of types.
@@ -34,8 +33,6 @@ object Depth {
   //
   // We only really need one of these, but we allow representation of Depth(-1) and Depth(-2)
   // to mimic the historical choice of 2.10.4.
-  @inline final def apply(depth: Int): Depth = {
+  @inline final def apply(depth: Int): Depth =
     if (depth < AnyDepthValue) AnyDepth
     else new Depth(depth)
-  }
-}

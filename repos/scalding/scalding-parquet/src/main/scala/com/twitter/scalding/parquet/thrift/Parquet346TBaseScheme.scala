@@ -32,20 +32,18 @@ import scala.collection.JavaConverters._
   */
 class Parquet346TBaseScheme[T <: TBase[_, _]](
     config: ParquetValueScheme.Config[T])
-    extends ParquetTBaseScheme[T](config) {
+    extends ParquetTBaseScheme[T](config)
 
   override def sourceConfInit(
       fp: FlowProcess[JobConf],
       tap: Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]],
-      jobConf: JobConf): Unit = {
+      jobConf: JobConf): Unit =
 
     super.sourceConfInit(fp, tap, jobConf)
 
     // Use the fixed record converter instead of the one set in super
     ThriftReadSupport.setRecordConverterClass(
         jobConf, classOf[Parquet346TBaseRecordConverter[_]])
-  }
-}
 
 /**
   * Same as TBaseRecordConverter with one important (subtle) difference.
@@ -62,22 +60,20 @@ class Parquet346TBaseRecordConverter[T <: TBase[_, _]](
         // this is a little confusing because it's all being passed to the super constructor
 
         // this thrift reader is the same as what's in ScroogeRecordConverter's constructor
-        new ThriftReader[T] {
-          override def readOneRecord(protocol: TProtocol): T = {
-            try {
+        new ThriftReader[T]
+          override def readOneRecord(protocol: TProtocol): T =
+            try
               val thriftObject: T = thriftClass.newInstance
               thriftObject.read(protocol)
               thriftObject
-            } catch {
+            catch
               case e: InstantiationException =>
                 throw new ParquetDecodingException(
                     "Could not instantiate Thrift " + thriftClass, e)
               case e: IllegalAccessException =>
                 throw new ParquetDecodingException(
                     "Thrift class or constructor not public " + thriftClass, e)
-            }
-          }
-        },
+        ,
         thriftClass.getSimpleName,
         requestedParquetSchema,
         // this is the fix -- we add in the missing structOrUnionType metadata
@@ -88,25 +84,22 @@ class Parquet346TBaseRecordConverter[T <: TBase[_, _]](
   * Takes a ThriftType with potentially missing structOrUnionType metadata,
   * and makes a copy that sets all StructOrUnionType metadata to UNION
   */
-object Parquet346StructTypeRepairer extends StateVisitor[ThriftType, Unit] {
+object Parquet346StructTypeRepairer extends StateVisitor[ThriftType, Unit]
 
-  def repair(fromMetadata: StructType): StructType = {
+  def repair(fromMetadata: StructType): StructType =
     visit(fromMetadata, ())
-  }
 
-  def copyRecurse(field: ThriftField): ThriftField = {
+  def copyRecurse(field: ThriftField): ThriftField =
     new ThriftField(field.getName,
                     field.getFieldId,
                     field.getRequirement,
                     field.getType.accept(this, ()))
-  }
 
-  override def visit(structType: StructType, state: Unit): StructType = {
+  override def visit(structType: StructType, state: Unit): StructType =
     val repairedChildren =
       structType.getChildren.asScala.iterator.map(copyRecurse)
 
     new StructType(repairedChildren.toBuffer.asJava, StructOrUnionType.UNION)
-  }
 
   override def visit(mapType: MapType, state: Unit): MapType =
     new MapType(copyRecurse(mapType.getKey), copyRecurse(mapType.getValue))
@@ -134,4 +127,3 @@ object Parquet346StructTypeRepairer extends StateVisitor[ThriftType, Unit] {
 
   override def visit(stringType: StringType, state: Unit): StringType =
     stringType
-}

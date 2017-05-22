@@ -9,7 +9,7 @@ import lila.db.Implicits.LilaBSONDocumentZero
 import lila.db.Types.Coll
 import lila.user.{User, UserRepo}
 
-private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
+private final class ChallengeRepo(coll: Coll, maxPerUser: Int)
 
   import BSONHandlers._
   import Challenge._
@@ -19,13 +19,11 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
   def exists(id: Challenge.ID) = coll.count(selectId(id).some).map(0 <)
 
   def insert(c: Challenge): Funit =
-    coll.insert(c) >> c.challenger.right.toOption.?? { challenger =>
-      createdByChallengerId(challenger.id).flatMap {
+    coll.insert(c) >> c.challenger.right.toOption.??  challenger =>
+      createdByChallengerId(challenger.id).flatMap
         case challenges if challenges.size <= maxPerUser => funit
         case challenges =>
           challenges.drop(maxPerUser).map(_.id).map(remove).sequenceFu.void
-      }
-    }
 
   def createdByChallengerId(userId: String): Fu[List[Challenge]] =
     coll
@@ -50,10 +48,10 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
       .void
 
   def like(c: Challenge) =
-    ~(for {
+    ~(for
       challengerId <- c.challengerUserId
       destUserId <- c.destUserId if c.active
-    } yield
+    yield
       coll
         .find(selectCreated ++ BSONDocument("challenger.id" -> challengerId,
                                             "destUser.id" -> destUserId))
@@ -122,9 +120,8 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
           BSONDocument(
               "$set" -> BSONDocument(
                   "status" -> status.id,
-                  "expiresAt" -> expiresAt.fold(inTwoWeeks) {
+                  "expiresAt" -> expiresAt.fold(inTwoWeeks)
                 _ (DateTime.now)
-              }
               ))
       )
       .void
@@ -136,4 +133,3 @@ private final class ChallengeRepo(coll: Coll, maxPerUser: Int) {
   private val selectCreated = BSONDocument("status" -> Status.Created.id)
   private val selectClock = BSONDocument(
       "timeControl.l" -> BSONDocument("$exists" -> true))
-}

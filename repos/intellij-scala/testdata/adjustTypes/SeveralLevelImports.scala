@@ -1,17 +1,14 @@
-package testing.a {
+package testing.a
 
-  object AA {
+  object AA
     trait AAA {}
-  }
-}
 
 import testing.a
 import a.AA
 import AA.{AAA => A3}
 
-class B {
+class B
   val aaa: /*start*/ testing.a.AA.AAA /*end*/ = null
-}
 
 /*
 package testing.a {

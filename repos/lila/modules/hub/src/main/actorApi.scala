@@ -8,17 +8,15 @@ import play.twirl.api.Html
 
 case class SendTo(userId: String, message: JsObject)
 
-object SendTo {
+object SendTo
   def apply[A : Writes](userId: String, typ: String, data: A): SendTo =
     SendTo(userId, Json.obj("t" -> typ, "d" -> data))
-}
 
 case class SendTos(userIds: Set[String], message: JsObject)
 
-object SendTos {
+object SendTos
   def apply[A : Writes](userIds: Set[String], typ: String, data: A): SendTos =
     SendTos(userIds, Json.obj("t" -> typ, "d" -> data))
-}
 
 sealed abstract class RemindDeploy(val key: String)
 case object RemindDeployPre extends RemindDeploy("deployPre")
@@ -26,20 +24,19 @@ case object RemindDeployPost extends RemindDeploy("deployPost")
 case class Deploy(event: RemindDeploy, html: String)
 case class StreamsOnAir(html: String)
 
-package map {
+package map
   case class Get(id: String)
   case class Tell(id: String, msg: Any)
   case class TellIds(ids: Seq[String], msg: Any)
   case class TellAll(msg: Any)
   case class Ask(id: String, msg: Any)
-}
 
 case class WithUserIds(f: Iterable[String] => Unit)
 
 case object GetUids
 case class SocketUids(uids: Set[String])
 
-package report {
+package report
   case class Cheater(userId: String, text: String)
   case class Clean(userId: String)
   case class Check(userId: String)
@@ -47,48 +44,41 @@ package report {
   case class MarkTroll(userId: String, by: String)
   case class Shutup(userId: String, text: String)
   case class Booster(userId: String, accomplice: String)
-}
 
-package shutup {
+package shutup
   case class RecordPublicForumMessage(userId: String, text: String)
   case class RecordTeamForumMessage(userId: String, text: String)
   case class RecordPrivateMessage(
       userId: String, toUserId: String, text: String)
   case class RecordPrivateChat(chatId: String, userId: String, text: String)
   case class RecordPublicChat(chatId: String, userId: String, text: String)
-}
 
-package mod {
+package mod
   case class MarkCheater(userId: String)
   case class MarkBooster(userId: String)
-}
 
-package captcha {
+package captcha
   case object AnyCaptcha
   case class GetCaptcha(id: String)
   case class ValidCaptcha(id: String, solution: String)
-}
 
-package lobby {
+package lobby
   case class ReloadTournaments(html: String)
   case class ReloadSimuls(html: String)
   case object NewForumPost
-}
 
-package simul {
+package simul
   case object GetHostIds
   case class PlayerMove(gameId: String)
-}
 
-package slack {
+package slack
   sealed trait Event
   case class Error(msg: String) extends Event
   case class Warning(msg: String) extends Event
   case class Info(msg: String) extends Event
   case class Victory(msg: String) extends Event
-}
 
-package timeline {
+package timeline
   case class ReloadTimeline(user: String)
 
   sealed abstract class Atom(val channel: String, val okForKid: Boolean)
@@ -122,7 +112,7 @@ package timeline {
   case class SimulJoin(userId: String, simulId: String, simulName: String)
       extends Atom(s"simulJoin", true)
 
-  object atomFormat {
+  object atomFormat
     implicit val followFormat = Json.format[Follow]
     implicit val teamJoinFormat = Json.format[TeamJoin]
     implicit val teamCreateFormat = Json.format[TeamCreate]
@@ -135,20 +125,18 @@ package timeline {
     implicit val gameEndFormat = Json.format[GameEnd]
     implicit val simulCreateFormat = Json.format[SimulCreate]
     implicit val simulJoinFormat = Json.format[SimulJoin]
-  }
 
-  object propagation {
+  object propagation
     sealed trait Propagation
     case class Users(users: List[String]) extends Propagation
     case class Followers(user: String) extends Propagation
     case class Friends(user: String) extends Propagation
     case class StaffFriends(user: String) extends Propagation
     case class ExceptUser(user: String) extends Propagation
-  }
 
   import propagation._
 
-  case class Propagate(data: Atom, propagations: List[Propagation] = Nil) {
+  case class Propagate(data: Atom, propagations: List[Propagation] = Nil)
     def toUsers(ids: List[String]) = add(Users(ids))
     def toUser(id: String) = add(Users(List(id)))
     def toFollowersOf(id: String) = add(Followers(id))
@@ -156,40 +144,32 @@ package timeline {
     def toStaffFriendsOf(id: String) = add(StaffFriends(id))
     def exceptUser(id: String) = add(ExceptUser(id))
     private def add(p: Propagation) = copy(propagations = p :: propagations)
-  }
-}
 
-package game {
+package game
   case class ChangeFeatured(id: String, msg: JsObject)
   case object Count
-}
 
-package tv {
+package tv
   case class Select(msg: JsObject)
-}
 
-package message {
+package message
   case class LichessThread(
       from: String, to: String, subject: String, message: String)
-}
 
-package router {
+package router
   case class Abs(route: Any)
   case class Nolang(route: Any)
   case class TeamShow(id: String)
   case class Pgn(gameId: String)
   case class Puzzle(id: Int)
-}
 
-package forum {
+package forum
   case class MakeTeam(id: String, name: String)
-}
 
-package fishnet {
+package fishnet
   case class AutoAnalyse(gameId: String)
-}
 
-package round {
+package round
   case class MoveEvent(gameId: String,
                        fen: String,
                        move: String,
@@ -202,32 +182,27 @@ package round {
   case class Berserk(gameId: String, userId: String)
   case class IsOnGame(color: chess.Color)
   sealed trait SocketEvent
-  object SocketEvent {
+  object SocketEvent
     case class OwnerJoin(gameId: String, color: chess.Color, ip: String)
         extends SocketEvent
     case class Stop(gameId: String) extends SocketEvent
-  }
   case class FishnetPlay(uci: chess.format.Uci, currentFen: chess.format.FEN)
   case object AnalysisAvailable
-}
 
-package evaluation {
+package evaluation
   case class AutoCheck(userId: String)
   case class Refresh(userId: String)
-}
 
-package bookmark {
+package bookmark
   case class Toggle(gameId: String, userId: String)
   case class Remove(gameId: String)
-}
 
-package relation {
+package relation
   case class ReloadOnlineFriends(userId: String)
   case class GetOnlineFriends(userId: String)
   case class OnlineFriends(users: List[LightUser])
   case class Block(u1: String, u2: String)
   case class UnBlock(u1: String, u2: String)
-}
 
 case class DonationEvent(userId: Option[String],
                          gross: Int,

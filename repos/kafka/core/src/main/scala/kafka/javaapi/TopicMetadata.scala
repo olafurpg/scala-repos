@@ -19,58 +19,49 @@ package kafka.javaapi
 import kafka.cluster.BrokerEndPoint
 import scala.collection.JavaConversions
 
-private[javaapi] object MetadataListImplicits {
+private[javaapi] object MetadataListImplicits
   implicit def toJavaTopicMetadataList(
       topicMetadataSeq: Seq[kafka.api.TopicMetadata])
-    : java.util.List[kafka.javaapi.TopicMetadata] = {
+    : java.util.List[kafka.javaapi.TopicMetadata] =
     import JavaConversions._
     topicMetadataSeq.map(new kafka.javaapi.TopicMetadata(_))
-  }
 
   implicit def toPartitionMetadataList(
       partitionMetadataSeq: Seq[kafka.api.PartitionMetadata])
-    : java.util.List[kafka.javaapi.PartitionMetadata] = {
+    : java.util.List[kafka.javaapi.PartitionMetadata] =
     import JavaConversions._
     partitionMetadataSeq.map(new kafka.javaapi.PartitionMetadata(_))
-  }
-}
 
-class TopicMetadata(private val underlying: kafka.api.TopicMetadata) {
+class TopicMetadata(private val underlying: kafka.api.TopicMetadata)
   def topic: String = underlying.topic
 
-  def partitionsMetadata: java.util.List[PartitionMetadata] = {
+  def partitionsMetadata: java.util.List[PartitionMetadata] =
     import kafka.javaapi.MetadataListImplicits._
     underlying.partitionsMetadata
-  }
 
   def errorCode: Short = underlying.errorCode
 
   def sizeInBytes: Int = underlying.sizeInBytes
 
   override def toString = underlying.toString
-}
 
-class PartitionMetadata(private val underlying: kafka.api.PartitionMetadata) {
+class PartitionMetadata(private val underlying: kafka.api.PartitionMetadata)
   def partitionId: Int = underlying.partitionId
 
-  def leader: BrokerEndPoint = {
+  def leader: BrokerEndPoint =
     import kafka.javaapi.Implicits._
     underlying.leader
-  }
 
-  def replicas: java.util.List[BrokerEndPoint] = {
+  def replicas: java.util.List[BrokerEndPoint] =
     import JavaConversions._
     underlying.replicas
-  }
 
-  def isr: java.util.List[BrokerEndPoint] = {
+  def isr: java.util.List[BrokerEndPoint] =
     import JavaConversions._
     underlying.isr
-  }
 
   def errorCode: Short = underlying.errorCode
 
   def sizeInBytes: Int = underlying.sizeInBytes
 
   override def toString = underlying.toString
-}

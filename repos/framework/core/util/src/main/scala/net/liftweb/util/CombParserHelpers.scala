@@ -24,7 +24,7 @@ import Helpers._
 /**
   * The CombParserHelpers trait provides parser combinators helpers.
   */
-trait CombParserHelpers { self: Parsers =>
+trait CombParserHelpers  self: Parsers =>
 
   def EOF = '\u001a'
 
@@ -86,9 +86,8 @@ trait CombParserHelpers { self: Parsers =>
     * of the case (uppercase or lowercase)
     */
   def acceptCI[ES <% List[Elem]](es: ES): Parser[List[Elem]] =
-    es.foldRight[Parser[List[Elem]]](success(Nil)) { (x, pxs) =>
+    es.foldRight[Parser[List[Elem]]](success(Nil))  (x, pxs) =>
       acceptCIChar(x) ~ pxs ^^ mkList
-    }
 
   def xform(in: Char): Char = Character.toUpperCase(in)
 
@@ -137,9 +136,8 @@ trait CombParserHelpers { self: Parsers =>
   /**
     * @return a parser returning an Int if succeeding
     */
-  def aNumber: Parser[Int] = rep1(elem("Number", isNum)) ^^ {
+  def aNumber: Parser[Int] = rep1(elem("Number", isNum)) ^^
     case xs => xs.mkString("").toInt
-  }
 
   /**
     * @return a parser which tries the permutations of a list of parsers
@@ -160,27 +158,24 @@ trait CombParserHelpers { self: Parsers =>
   def permute[T](func: List[Parser[T]] => List[List[Parser[T]]],
                  p: (Parser[T])*): Parser[List[T]] =
     if (p.isEmpty) success(Nil);
-    else {
+    else
       val right: Parser[List[T]] = success(Nil)
 
-      p.toList match {
+      p.toList match
         case Nil => right
         case x :: Nil => x ~ right ^^ { case ~(x, xs) => x :: xs }
         case xs =>
           func(xs)
             .map(_.foldRight(right)(_ ~ _ ^^ { case ~(x, xs) => x :: xs }))
             .reduceLeft((a: Parser[List[T]], b: Parser[List[T]]) => a | b)
-      }
-    }
 
   /**
     * @return a parser which parses the input using p a number of times
     */
   def repNN[T](n: Int, p: => Parser[T]): Parser[List[T]] =
     if (n == 0) rep(p) else p ~ repNN(n - 1, p) ^^ { case ~(x, xs) => x :: xs }
-}
 
-trait SafeSeqParser extends Parsers {
+trait SafeSeqParser extends Parsers
 
   /** A parser generator for non-empty repetitions.
     *
@@ -194,23 +189,20 @@ trait SafeSeqParser extends Parsers {
     *         repeatedly `p' to the input (it only succeeds if `f' matches).
     */
   override def rep1[T](first: => Parser[T], p: => Parser[T]): Parser[List[T]] =
-    new Parser[List[T]] {
-      def apply(in0: Input) = {
+    new Parser[List[T]]
+      def apply(in0: Input) =
         val xs = new scala.collection.mutable.ListBuffer[T]
         var in = in0
 
         var res = first(in)
 
-        while (res.successful) {
+        while (res.successful)
           xs += res.get
           in = res.next
           res = p(in)
-        }
 
         if (!xs.isEmpty) Success(xs.toList, res.next)
         else Failure("TODO", in0)
-      }
-    }
 
   /** A parser generator for non-empty repetitions.
     *
@@ -228,24 +220,19 @@ trait SafeSeqParser extends Parsers {
     */
   override def rep1sep[T](
       p: => Parser[T], q: => Parser[Any]): Parser[List[T]] =
-    new Parser[List[T]] {
-      def apply(in0: Input) = {
+    new Parser[List[T]]
+      def apply(in0: Input) =
         val xs = new scala.collection.mutable.ListBuffer[T]
         var in = in0
         var gotQ = true
         var res = p(in)
-        while (res.successful && gotQ) {
+        while (res.successful && gotQ)
           xs += res.get
           in = res.next
           val r2 = q(in)
           gotQ = r2.successful
-          if (gotQ) {
+          if (gotQ)
             in = r2.next
             res = p(in)
-          }
-        }
         if (!xs.isEmpty) Success(xs.toList, res.next)
         else Failure("TODO", in0)
-      }
-    }
-}

@@ -2,12 +2,9 @@ package source
 
 import target.A
 
-object UtilS {
+object UtilS
   def foo() {}
-  def bar() {
+  def bar()
     A.a()
-  }
-  def baz() {
+  def baz()
     (new A).a()
-  }
-}

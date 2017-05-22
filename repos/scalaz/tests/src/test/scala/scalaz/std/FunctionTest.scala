@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object FunctionTest extends SpecLite {
+object FunctionTest extends SpecLite
   type A = Int
   type B = Int
   type C = Int
@@ -54,31 +54,28 @@ object FunctionTest extends SpecLite {
   checkAll("Function1", zip.laws[Int => ?])
 
   // Likely could be made to cover all the FunctionN types.
-  "Function0 map eagerness" ! forAll { (number: Int) =>
+  "Function0 map eagerness" ! forAll  (number: Int) =>
     var modifiableNumber: Int = number
     val methodCall: () => Int = () => modifiableNumber
     val mappedCall: () => Int = Monad[Function0].map(methodCall)(_ + 3)
     modifiableNumber += 1
     mappedCall() must_=== (number + 4)
-  }
 
   // Likely could be made to cover all the FunctionN types.
-  "Function0 bind eagerness" ! forAll { (number: Int) =>
+  "Function0 bind eagerness" ! forAll  (number: Int) =>
     var modifiableNumber: Int = number
     val methodCall: () => Int = () => modifiableNumber
     val mappedCall =
       Monad[Function0].bind(methodCall)((value: Int) => () => value + 3)
     modifiableNumber += 1
     mappedCall() must_=== (number + 4)
-  }
 
-  "fix" ! forAll { (n: Int) =>
+  "fix" ! forAll  (n: Int) =>
     fix[Int](_ => n) must_=== (n)
     (fix[Stream[Int]](ns => n #:: (2 * n) #:: ns).take(4).toList must_===
         (List(n, 2 * n, n, 2 * n)))
-  }
 
-  object instances {
+  object instances
     def equal[A, R : Equal] = Equal[() => R]
     def semigroup[A, R : Semigroup] = Semigroup[A => R]
     def monad0 = Monad[() => ?]
@@ -123,5 +120,3 @@ object FunctionTest extends SpecLite {
 
     // checking absence of ambiguity
     def semigroup[A, R : Monoid] = Semigroup[A => R]
-  }
-}

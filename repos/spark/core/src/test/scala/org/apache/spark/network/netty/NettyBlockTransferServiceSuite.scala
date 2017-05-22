@@ -24,55 +24,47 @@ import org.apache.spark.{SecurityManager, SparkConf, SparkFunSuite}
 import org.apache.spark.network.BlockDataManager
 
 class NettyBlockTransferServiceSuite
-    extends SparkFunSuite with BeforeAndAfterEach with ShouldMatchers {
+    extends SparkFunSuite with BeforeAndAfterEach with ShouldMatchers
 
   private var service0: NettyBlockTransferService = _
   private var service1: NettyBlockTransferService = _
 
-  override def afterEach() {
-    try {
-      if (service0 != null) {
+  override def afterEach()
+    try
+      if (service0 != null)
         service0.close()
         service0 = null
-      }
 
-      if (service1 != null) {
+      if (service1 != null)
         service1.close()
         service1 = null
-      }
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  test("can bind to a random port") {
+  test("can bind to a random port")
     service0 = createService(port = 0)
     service0.port should not be 0
-  }
 
-  test("can bind to two random ports") {
+  test("can bind to two random ports")
     service0 = createService(port = 0)
     service1 = createService(port = 0)
     service0.port should not be service1.port
-  }
 
-  test("can bind to a specific port") {
+  test("can bind to a specific port")
     val port = 17634
     service0 = createService(port)
     service0.port should be >= port
     service0.port should be <= (port + 10) // avoid testing equality in case of simultaneous tests
-  }
 
-  test("can bind to a specific port twice and the second increments") {
+  test("can bind to a specific port twice and the second increments")
     val port = 17634
     service0 = createService(port)
     service1 = createService(port)
     service0.port should be >= port
     service0.port should be <= (port + 10)
     service1.port should be(service0.port + 1)
-  }
 
-  private def createService(port: Int): NettyBlockTransferService = {
+  private def createService(port: Int): NettyBlockTransferService =
     val conf = new SparkConf()
       .set("spark.app.id", s"test-${getClass.getName}")
       .set("spark.blockManager.port", port.toString)
@@ -82,5 +74,3 @@ class NettyBlockTransferServiceSuite
         conf, securityManager, numCores = 1)
     service.init(blockDataManager)
     service
-  }
-}

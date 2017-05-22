@@ -35,9 +35,9 @@ import org.scalacheck.Gen._
 import org.scalacheck.Arbitrary
 import org.scalacheck.Arbitrary.arbitrary
 
-object TableSpec extends Specification with ArbitrarySlice {
-  "a table" should {
-    "cogroup" in {
+object TableSpec extends Specification with ArbitrarySlice
+  "a table" should
+    "cogroup" in
       todo
       /*
       "a static full dataset" >> {
@@ -143,6 +143,3 @@ object TableSpec extends Specification with ArbitrarySlice {
       }
 
      */
-    }
-  }
-}

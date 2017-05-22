@@ -21,9 +21,8 @@ import org.saddle.Index
   * Slice provides a methodology so that when it is applied to an index,
   * it produces an upper and lower integer offset at which to slice.
   */
-trait Slice[+T] {
+trait Slice[+T]
   def apply[U >: T](idx: Index[U]): (Int, Int)
-}
 
 // implementations
 
@@ -33,50 +32,42 @@ trait Slice[+T] {
   * @param k2 Second key
   * @tparam T Type of Key
   */
-class SliceDefault[T](k1: T, k2: T) extends Slice[T] {
+class SliceDefault[T](k1: T, k2: T) extends Slice[T]
   def apply[U >: T](idx: Index[U]): (Int, Int) =
     (idx.lsearch(k1), idx.rsearch(k2))
-}
 
 /**
   * Represent a slice from zero to a key.
   * @param k Key to slice to
   * @tparam T Type of Key
   */
-class SliceTo[T](k: T) extends Slice[T] {
+class SliceTo[T](k: T) extends Slice[T]
   def apply[U >: T](idx: Index[U]): (Int, Int) = (0, idx.rsearch(k))
-}
 
 /**
   * Represent a slice from key to end of index
   * @param k Key to slice from
   * @tparam T Type of Key
   */
-class SliceFrom[T](k: T) extends Slice[T] {
+class SliceFrom[T](k: T) extends Slice[T]
   def apply[U >: T](idx: Index[U]): (Int, Int) = (idx.lsearch(k), idx.length)
-}
 
 /**
   * Represent a slice over the entire index
   */
-class SliceAll extends Slice[Nothing] {
+class SliceAll extends Slice[Nothing]
   def apply[U](idx: Index[U]): (Int, Int) = (0, idx.length)
-}
 
 // companion objects
 
-object Slice {
+object Slice
   def apply[T](k1: T, k2: T) = new SliceDefault(k1, k2)
-}
 
-object SliceFrom {
+object SliceFrom
   def apply[T](k: T) = new SliceFrom(k)
-}
 
-object SliceTo {
+object SliceTo
   def apply[T](k: T) = new SliceTo(k)
-}
 
-object SliceAll {
+object SliceAll
   def apply[T](k: T) = new SliceAll()
-}

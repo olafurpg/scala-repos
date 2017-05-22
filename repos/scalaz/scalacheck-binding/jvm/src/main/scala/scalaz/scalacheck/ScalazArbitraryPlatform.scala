@@ -7,7 +7,7 @@ import org.scalacheck.Arbitrary.arbitrary
 /**
   * Instances of {@link scalacheck.Arbitrary} for JVM-only parts of Scalaz.
   */
-abstract class ScalazArbitraryPlatform {
+abstract class ScalazArbitraryPlatform
 
   import scalaz.concurrent.Future
   implicit def FutureArbitrary[A : Arbitrary]: Arbitrary[Future[A]] =
@@ -16,4 +16,3 @@ abstract class ScalazArbitraryPlatform {
   import scalaz.concurrent.Task
   implicit def TaskArbitrary[A : Arbitrary]: Arbitrary[Task[A]] =
     Arbitrary(arbitrary[A] map ((x: A) => Task.now(x)))
-}

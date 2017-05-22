@@ -3,7 +3,7 @@ package arrow
 
 import cats.functor.Strong
 
-trait Arrow[F[_, _]] extends Split[F] with Strong[F] with Category[F] { self =>
+trait Arrow[F[_, _]] extends Split[F] with Strong[F] with Category[F]  self =>
 
   /**
     * Lift a function into the context of an Arrow
@@ -57,12 +57,10 @@ trait Arrow[F[_, _]] extends Split[F] with Strong[F] with Category[F] { self =>
     * res0: (Int, Int) = (2,6)
     * }}}
     */
-  def second[A, B, C](fa: F[A, B]): F[(C, A), (C, B)] = {
-    def swap[X, Y]: F[(X, Y), (Y, X)] = lift[(X, Y), (Y, X)] {
+  def second[A, B, C](fa: F[A, B]): F[(C, A), (C, B)] =
+    def swap[X, Y]: F[(X, Y), (Y, X)] = lift[(X, Y), (Y, X)]
       case (x, y) => (y, x)
-    }
     compose(swap, compose(first[A, B, C](fa), swap))
-  }
 
   /**
     * Create a new arrow that splits its input between the `f` and `g` arrows
@@ -81,8 +79,6 @@ trait Arrow[F[_, _]] extends Split[F] with Strong[F] with Category[F] { self =>
     */
   def split[A, B, C, D](f: F[A, B], g: F[C, D]): F[(A, C), (B, D)] =
     andThen(first(f), second(g))
-}
 
-object Arrow {
+object Arrow
   def apply[F[_, _]](implicit ev: Arrow[F]): Arrow[F] = ev
-}

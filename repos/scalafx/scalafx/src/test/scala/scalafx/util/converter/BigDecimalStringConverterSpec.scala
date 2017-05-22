@@ -46,10 +46,9 @@ class BigDecimalStringConverterSpec
         BigDecimal,
         BigDecimalStringConverter](classOf[jfxuc.BigDecimalStringConverter],
                                    classOf[BigDecimalStringConverter],
-                                   classOf[BigDecimal]) {
+                                   classOf[BigDecimal])
 
   val examples = List((BigDecimal(0), "0"),
                       (BigDecimal(12345), "12345"),
                       (BigDecimal(-12345), "-12345"),
                       (BigDecimal(12.345), "12.345"))
-}

@@ -13,17 +13,16 @@ import slick.jdbc.H2Profile.api._
   * H2 database. The example data comes from Oracle's JDBC tutorial at
   * http://docs.oracle.com/javase/tutorial/jdbc/basics/tables.html.
   */
-object GettingStartedOverview extends App {
+object GettingStartedOverview extends App
 //#quick-imports
   import slick.jdbc.H2Profile.api._
 //#quick-imports
 
 //#quick-schema
-  class Coffees(tag: Tag) extends Table[(String, Double)](tag, "COFFEES") {
+  class Coffees(tag: Tag) extends Table[(String, Double)](tag, "COFFEES")
     def name = column[String]("COF_NAME", O.PrimaryKey)
     def price = column[Double]("PRICE")
     def * = (name, price)
-  }
   val coffees = TableQuery[Coffees]
 //#quick-schema
 
@@ -45,7 +44,7 @@ object GettingStartedOverview extends App {
   val f2 = Database
     .forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
     .run(
-        coffees.schema.create andThen {
+        coffees.schema.create andThen
           //#what-is-slick-micro-example
           val limit = 10.0
 
@@ -54,7 +53,7 @@ object GettingStartedOverview extends App {
 
           // Equivalent SQL: select COF_NAME from COFFEES where PRICE < 10.0
           //#what-is-slick-micro-example
-        } andThen {
+        andThen
           //#what-is-slick-micro-example-plainsql
           val limit = 10.0
 
@@ -63,7 +62,6 @@ object GettingStartedOverview extends App {
           // Automatically using a bind variable to be safe from SQL injection:
           // select COF_NAME from COFFEES where PRICE < ?
           //#what-is-slick-micro-example-plainsql
-        }
     )
   Await.result(f2, Duration.Inf)
 
@@ -77,9 +75,8 @@ object GettingStartedOverview extends App {
   coffees.filter(_.price < 10.0)
   //#features-scala-collections
 
-  {
     val db = Database.forURL("jdbc:h2:mem:test1", driver = "org.h2.Driver")
-    val f4 = {
+    val f4 =
       //#features-type-safe
       // The result of "select PRICE from COFFEES" is a Seq of Double
       // because of the type safe column definitions
@@ -94,9 +91,7 @@ object GettingStartedOverview extends App {
       // Using a string in the filter would result in a compilation error
       //#features-type-safe
       coffeeNames
-    }
     Await.result(f4, Duration.Inf)
-  }
 
   //#features-composable
   // Create a query for coffee names with a price less than 10, sorted by name
@@ -104,4 +99,3 @@ object GettingStartedOverview extends App {
   // The generated SQL is equivalent to:
   // select name from COFFEES where PRICE < 10.0 order by NAME
   //#features-composable
-}

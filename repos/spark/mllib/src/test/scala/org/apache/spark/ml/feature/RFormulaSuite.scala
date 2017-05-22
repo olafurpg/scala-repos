@@ -26,12 +26,11 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class RFormulaSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
-  test("params") {
+    with DefaultReadWriteTest
+  test("params")
     ParamsSuite.checkParams(new RFormula())
-  }
 
-  test("transform numeric data") {
+  test("transform numeric data")
     val formula = new RFormula().setFormula("id ~ v1 + v2")
     val original = sqlContext
       .createDataFrame(Seq((0, 1.0, 3.0), (2, 2.0, 5.0)))
@@ -49,21 +48,17 @@ class RFormulaSuite
     assert(result.schema.toString == resultSchema.toString)
     assert(resultSchema == expected.schema)
     assert(result.collect() === expected.collect())
-  }
 
-  test("features column already exists") {
+  test("features column already exists")
     val formula = new RFormula().setFormula("y ~ x").setFeaturesCol("x")
     val original =
       sqlContext.createDataFrame(Seq((0, 1.0), (2, 2.0))).toDF("x", "y")
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       formula.fit(original)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       formula.fit(original)
-    }
-  }
 
-  test("label column already exists") {
+  test("label column already exists")
     val formula = new RFormula().setFormula("y ~ x").setLabelCol("y")
     val original =
       sqlContext.createDataFrame(Seq((0, 1.0), (2, 2.0))).toDF("x", "y")
@@ -71,22 +66,18 @@ class RFormulaSuite
     val resultSchema = model.transformSchema(original.schema)
     assert(resultSchema.length == 3)
     assert(resultSchema.toString == model.transform(original).schema.toString)
-  }
 
-  test("label column already exists but is not double type") {
+  test("label column already exists but is not double type")
     val formula = new RFormula().setFormula("y ~ x").setLabelCol("y")
     val original =
       sqlContext.createDataFrame(Seq((0, 1), (2, 2))).toDF("x", "y")
     val model = formula.fit(original)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       model.transformSchema(original.schema)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       model.transform(original)
-    }
-  }
 
-  test("allow missing label column for test datasets") {
+  test("allow missing label column for test datasets")
     val formula = new RFormula().setFormula("y ~ x").setLabelCol("label")
     val original =
       sqlContext.createDataFrame(Seq((0, 1.0), (2, 2.0))).toDF("x", "_not_y")
@@ -95,9 +86,8 @@ class RFormulaSuite
     assert(resultSchema.length == 3)
     assert(!resultSchema.exists(_.name == "label"))
     assert(resultSchema.toString == model.transform(original).schema.toString)
-  }
 
-  test("encodes string terms") {
+  test("encodes string terms")
     val formula = new RFormula().setFormula("id ~ a + b")
     val original = sqlContext
       .createDataFrame(
@@ -117,9 +107,8 @@ class RFormulaSuite
       .toDF("id", "a", "b", "features", "label")
     assert(result.schema.toString == resultSchema.toString)
     assert(result.collect() === expected.collect())
-  }
 
-  test("index string label") {
+  test("index string label")
     val formula = new RFormula().setFormula("id ~ a + b")
     val original = sqlContext
       .createDataFrame(
@@ -142,9 +131,8 @@ class RFormulaSuite
       .toDF("id", "a", "b", "features", "label")
     // assert(result.schema.toString == resultSchema.toString)
     assert(result.collect() === expected.collect())
-  }
 
-  test("attribute generation") {
+  test("attribute generation")
     val formula = new RFormula().setFormula("id ~ a + b")
     val original = sqlContext
       .createDataFrame(
@@ -160,9 +148,8 @@ class RFormulaSuite
                                new BinaryAttribute(Some("a_foo"), Some(2)),
                                new NumericAttribute(Some("b"), Some(3))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("vector attribute generation") {
+  test("vector attribute generation")
     val formula = new RFormula().setFormula("id ~ vec")
     val original = sqlContext
       .createDataFrame(
@@ -177,9 +164,8 @@ class RFormulaSuite
         Array[Attribute](new NumericAttribute(Some("vec_0"), Some(1)),
                          new NumericAttribute(Some("vec_1"), Some(2))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("vector attribute generation with unnamed input attrs") {
+  test("vector attribute generation with unnamed input attrs")
     val formula = new RFormula().setFormula("id ~ vec2")
     val base = sqlContext
       .createDataFrame(
@@ -200,9 +186,8 @@ class RFormulaSuite
         Array[Attribute](new NumericAttribute(Some("vec2_0"), Some(1)),
                          new NumericAttribute(Some("vec2_1"), Some(2))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("numeric interaction") {
+  test("numeric interaction")
     val formula = new RFormula().setFormula("a ~ b:c:d")
     val original = sqlContext
       .createDataFrame(
@@ -223,9 +208,8 @@ class RFormulaSuite
         "features",
         Array[Attribute](new NumericAttribute(Some("b:c:d"), Some(1))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("factor numeric interaction") {
+  test("factor numeric interaction")
     val formula = new RFormula().setFormula("id ~ a:b")
     val original = sqlContext
       .createDataFrame(
@@ -257,9 +241,8 @@ class RFormulaSuite
                          new NumericAttribute(Some("a_bar:b"), Some(2)),
                          new NumericAttribute(Some("a_foo:b"), Some(3))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("factor factor interaction") {
+  test("factor factor interaction")
     val formula = new RFormula().setFormula("id ~ a:b")
     val original = sqlContext
       .createDataFrame(
@@ -284,19 +267,17 @@ class RFormulaSuite
                          new NumericAttribute(Some("a_foo:b_zq"), Some(3)),
                          new NumericAttribute(Some("a_foo:b_zz"), Some(4))))
     assert(attrs === expectedAttrs)
-  }
 
-  test("read/write: RFormula") {
+  test("read/write: RFormula")
     val rFormula = new RFormula()
       .setFormula("id ~ a:b")
       .setFeaturesCol("myFeatures")
       .setLabelCol("myLabels")
 
     testDefaultReadWrite(rFormula)
-  }
 
-  test("read/write: RFormulaModel") {
-    def checkModelData(model: RFormulaModel, model2: RFormulaModel): Unit = {
+  test("read/write: RFormulaModel")
+    def checkModelData(model: RFormulaModel, model2: RFormulaModel): Unit =
       assert(model.uid === model2.uid)
 
       assert(model.resolvedFormula.label === model2.resolvedFormula.label)
@@ -306,12 +287,10 @@ class RFormulaSuite
 
       assert(model.pipelineModel.uid === model2.pipelineModel.uid)
 
-      model.pipelineModel.stages.zip(model2.pipelineModel.stages).foreach {
+      model.pipelineModel.stages.zip(model2.pipelineModel.stages).foreach
         case (transformer1, transformer2) =>
           assert(transformer1.uid === transformer2.uid)
           assert(transformer1.params === transformer2.params)
-      }
-    }
 
     val dataset = sqlContext
       .createDataFrame(
@@ -324,5 +303,3 @@ class RFormulaSuite
     val model = rFormula.fit(dataset)
     val newModel = testDefaultReadWrite(model)
     checkModelData(model, newModel)
-  }
-}

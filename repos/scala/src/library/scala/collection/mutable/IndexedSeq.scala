@@ -20,18 +20,16 @@ import generic._
 trait IndexedSeq[A]
     extends Seq[A] with scala.collection.IndexedSeq[A]
     with GenericTraversableTemplate[A, IndexedSeq]
-    with IndexedSeqLike[A, IndexedSeq[A]] {
+    with IndexedSeqLike[A, IndexedSeq[A]]
   override def companion: GenericCompanion[IndexedSeq] = IndexedSeq
   override def seq: IndexedSeq[A] = this
-}
 
 /** $factoryInfo
   *  The current default implementation of a $Coll is an `ArrayBuffer`.
   *  @define coll mutable indexed sequence
   *  @define Coll `mutable.IndexedSeq`
   */
-object IndexedSeq extends SeqFactory[IndexedSeq] {
+object IndexedSeq extends SeqFactory[IndexedSeq]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, IndexedSeq[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
   def newBuilder[A]: Builder[A, IndexedSeq[A]] = new ArrayBuffer[A]
-}

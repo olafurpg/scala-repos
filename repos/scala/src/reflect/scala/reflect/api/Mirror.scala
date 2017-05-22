@@ -17,7 +17,7 @@ package api
 // so that it can be referenced from outside. For example, [[scala.reflect.api.TypeCreator]] and [[scala.reflect.api.TreeCreator]]
 // reference `Mirror` and also need to be defined outside the cake as they are used by type tags, which can be migrated between
 // different universes and consequently cannot be bound to a fixed one.
-abstract class Mirror[U <: Universe with Singleton] {
+abstract class Mirror[U <: Universe with Singleton]
 
   /** The universe this mirror belongs to.
     *  @group Mirror
@@ -138,4 +138,3 @@ abstract class Mirror[U <: Universe with Singleton] {
     * @group TypeTags
     */
   def symbolOf[T : universe.WeakTypeTag]: U#TypeSymbol
-}

@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def extraSettings = "-Xlog-free-types"
   def code = """
 def foo[T]{
@@ -10,4 +10,3 @@ def foo[T]{
 }
 foo[Int]
   """
-}

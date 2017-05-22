@@ -17,19 +17,17 @@
 package kafka.javaapi
 
 class TopicMetadataResponse(
-    private val underlying: kafka.api.TopicMetadataResponse) {
+    private val underlying: kafka.api.TopicMetadataResponse)
   def sizeInBytes: Int = underlying.sizeInBytes
 
-  def topicsMetadata: java.util.List[kafka.javaapi.TopicMetadata] = {
+  def topicsMetadata: java.util.List[kafka.javaapi.TopicMetadata] =
     import kafka.javaapi.MetadataListImplicits._
     underlying.topicsMetadata
-  }
 
-  override def equals(other: Any) = canEqual(other) && {
+  override def equals(other: Any) = canEqual(other) &&
     val otherTopicMetadataResponse =
       other.asInstanceOf[kafka.javaapi.TopicMetadataResponse]
     this.underlying.equals(otherTopicMetadataResponse.underlying)
-  }
 
   def canEqual(other: Any) =
     other.isInstanceOf[kafka.javaapi.TopicMetadataResponse]
@@ -37,4 +35,3 @@ class TopicMetadataResponse(
   override def hashCode = underlying.hashCode
 
   override def toString = underlying.toString
-}

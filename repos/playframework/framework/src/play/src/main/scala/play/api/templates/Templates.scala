@@ -4,7 +4,7 @@
 package play.api.templates
 
 /** Defines a magic helper for Play templates. */
-object PlayMagic {
+object PlayMagic
 
   /**
     * Generates a set of valid HTML attributes.
@@ -17,11 +17,10 @@ object PlayMagic {
   def toHtmlArgs(args: Map[Symbol, Any]) =
     play.twirl.api.Html(
         args
-          .map({
+          .map(
         case (s, None) => s.name
         case (s, v) =>
           s.name +
           "=\"" + play.twirl.api.HtmlFormat.escape(v.toString).body + "\""
-      })
+      )
           .mkString(" "))
-}

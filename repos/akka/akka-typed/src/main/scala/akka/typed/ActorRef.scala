@@ -16,7 +16,7 @@ import language.implicitConversions
   * [[akka.event.EventStream]] on a best effort basis
   * (i.e. this delivery is not reliable).
   */
-abstract class ActorRef[-T] extends java.lang.Comparable[ActorRef[Any]] {
+abstract class ActorRef[-T] extends java.lang.Comparable[ActorRef[Any]]
   this: ScalaActorRef[T] ⇒
 
   /**
@@ -50,24 +50,21 @@ abstract class ActorRef[-T] extends java.lang.Comparable[ActorRef[Any]] {
   def path: ActorPath = untypedRef.path
 
   override def toString = untypedRef.toString
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case a: ActorRef[_] ⇒ a.untypedRef == untypedRef
     case _ ⇒ false
-  }
   override def hashCode = untypedRef.hashCode
   override def compareTo(other: ActorRef[Any]) =
     untypedRef.compareTo(other.untypedRef)
-}
 
 /**
   * This trait is used to hide the `!` method from Java code.
   */
-trait ScalaActorRef[-T] {
+trait ScalaActorRef[-T]
   this: ActorRef[T] ⇒
   def !(msg: T): Unit = tell(msg)
-}
 
-object ActorRef {
+object ActorRef
   private class Combined[T](val untypedRef: akka.actor.ActorRef)
       extends ActorRef[T] with ScalaActorRef[T]
 
@@ -81,4 +78,3 @@ object ActorRef {
     * protocol.
     */
   def apply[T](ref: akka.actor.ActorRef): ActorRef[T] = new Combined[T](ref)
-}

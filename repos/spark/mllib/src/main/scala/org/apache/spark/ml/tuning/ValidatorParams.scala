@@ -28,7 +28,7 @@ import org.apache.spark.sql.types.StructType
   * Common params for [[TrainValidationSplitParams]] and [[CrossValidatorParams]].
   */
 @DeveloperApi
-private[ml] trait ValidatorParams extends Params {
+private[ml] trait ValidatorParams extends Params
 
   /**
     * param for the estimator to be validated
@@ -65,14 +65,11 @@ private[ml] trait ValidatorParams extends Params {
   /** @group getParam */
   def getEvaluator: Evaluator = $(evaluator)
 
-  protected def transformSchemaImpl(schema: StructType): StructType = {
+  protected def transformSchemaImpl(schema: StructType): StructType =
     require($(estimatorParamMaps).nonEmpty,
             s"Validator requires non-empty estimatorParamMaps")
     val firstEstimatorParamMap = $(estimatorParamMaps).head
     val est = $(estimator)
-    for (paramMap <- $(estimatorParamMaps).tail) {
+    for (paramMap <- $(estimatorParamMaps).tail)
       est.copy(paramMap).transformSchema(schema)
-    }
     est.copy(firstEstimatorParamMap).transformSchema(schema)
-  }
-}

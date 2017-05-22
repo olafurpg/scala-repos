@@ -13,10 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScForStatemen
   * @since 1/29/13
   */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
-class ScalaForStatementFixer extends ScalaFixer {
+class ScalaForStatementFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+            psiElement: PsiElement): OperationPerformed =
     val forStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScForStatement], false)
     if (forStatement == null) return NoOperation
@@ -25,7 +25,7 @@ class ScalaForStatementFixer extends ScalaFixer {
     val leftParenthesis = forStatement.getLeftParenthesis.orNull
     val rightParenthesis = forStatement.getRightParenthesis.orNull
 
-    forStatement.enumerators match {
+    forStatement.enumerators match
       case None if leftParenthesis == null && rightParenthesis == null =>
         val forStartOffset = forStatement.getTextRange.getStartOffset
         val stopOffset =
@@ -51,6 +51,3 @@ class ScalaForStatementFixer extends ScalaFixer {
         placeInWholeBlock(
             forStatement.body.get.asInstanceOf[ScBlockExpr], editor)
       case _ => NoOperation
-    }
-  }
-}

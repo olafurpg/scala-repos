@@ -61,7 +61,7 @@ case class EngineInstance(id: String,
   * @group Meta Data
   */
 @DeveloperApi
-trait EngineInstances {
+trait EngineInstances
 
   /** Insert a new [[EngineInstance]] */
   def insert(i: EngineInstance): String
@@ -89,7 +89,6 @@ trait EngineInstances {
 
   /** Delete an [[EngineInstance]] */
   def delete(id: String): Unit
-}
 
 /** :: DeveloperApi ::
   * JSON4S serializer for [[EngineInstance]]
@@ -99,7 +98,7 @@ trait EngineInstances {
 @DeveloperApi
 class EngineInstanceSerializer
     extends CustomSerializer[EngineInstance](format =>
-          ({
+          (
         case JObject(fields) =>
           implicit val formats = DefaultFormats
           val seed = EngineInstance(id = "",
@@ -117,9 +116,9 @@ class EngineInstanceSerializer
                                     preparatorParams = "",
                                     algorithmsParams = "",
                                     servingParams = "")
-          fields.foldLeft(seed) {
+          fields.foldLeft(seed)
             case (i, field) =>
-              field match {
+              field match
                 case JField("id", JString(id)) => i.copy(id = id)
                 case JField("status", JString(status)) =>
                   i.copy(status = status)
@@ -150,9 +149,7 @@ class EngineInstanceSerializer
                 case JField("servingParams", JString(servingParams)) =>
                   i.copy(servingParams = servingParams)
                 case _ => i
-              }
-          }
-      }, {
+      ,
         case i: EngineInstance =>
           JObject(JField("id", JString(i.id)) :: JField(
                   "status", JString(i.status)) :: JField(
@@ -174,4 +171,4 @@ class EngineInstanceSerializer
                   "preparatorParams", JString(i.preparatorParams)) :: JField(
                   "algorithmsParams", JString(i.algorithmsParams)) :: JField(
                   "servingParams", JString(i.servingParams)) :: Nil)
-      }))
+      ))

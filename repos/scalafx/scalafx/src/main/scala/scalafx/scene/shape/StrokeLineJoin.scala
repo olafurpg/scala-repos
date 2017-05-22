@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/StrokeLineJoin.html javafx.scene.shape.StrokeLineJoin]] */
 object StrokeLineJoin
-    extends SFXEnumDelegateCompanion[jfxss.StrokeLineJoin, StrokeLineJoin] {
+    extends SFXEnumDelegateCompanion[jfxss.StrokeLineJoin, StrokeLineJoin]
 
   val Miter = new StrokeLineJoin(jfxss.StrokeLineJoin.MITER)
   @deprecated(
@@ -52,7 +52,6 @@ object StrokeLineJoin
 
   protected override def unsortedValues: Array[StrokeLineJoin] =
     Array(Miter, Bevel, Round)
-}
 
 sealed case class StrokeLineJoin(override val delegate: jfxss.StrokeLineJoin)
     extends SFXEnumDelegate[jfxss.StrokeLineJoin]

@@ -2,62 +2,51 @@ package org.scalatra
 
 import org.scalatra.test.specs2.ScalatraSpec
 
-class HaltTestServlet extends ScalatraServlet {
-  before() {
+class HaltTestServlet extends ScalatraServlet
+  before()
     status = 501
     response.setHeader("Before-Header", "before")
-    if (params.isDefinedAt("haltBefore")) {
+    if (params.isDefinedAt("haltBefore"))
       halt(503)
-    }
-  }
 
-  get("/no-args") {
+  get("/no-args")
     halt()
     "this content must not be returned"
-  }
 
-  get("/status") {
+  get("/status")
     halt(403)
     "this content must not be returned"
-  }
 
-  get("/body") {
+  get("/body")
     halt(body = <h1>Go away</h1>)
     "this content must not be returned"
-  }
 
-  get("/status-and-body") {
+  get("/status-and-body")
     halt(404, <h1>Not Here</h1>)
     "this content must not be returned"
-  }
 
-  get("/all-args") {
+  get("/all-args")
     halt(status = 403,
          reason = "Go away",
          headers = Map("X-Your-Mother-Was-A" -> "hamster",
                        "X-Your-Father-Smelt-Of" -> "elderberries"),
          body = <h1>Go away or I shall taunt you a second time!</h1>)
     "this content must not be returned"
-  }
 
-  get("/halt-before") {
+  get("/halt-before")
     "this content must not be returned"
-  }
 
-  get("/action-result") {
+  get("/action-result")
     halt(
         ActionResult(status = new ResponseStatus(406, "Not Acceptable"),
                      headers = Map("X-Action-Result" -> "present"),
                      body = "body sent using ActionResult"))
     "this content must not be returned"
-  }
 
-  after() {
+  after()
     response.setHeader("After-Header", "after")
-  }
-}
 
-class HaltSpec extends ScalatraSpec {
+class HaltSpec extends ScalatraSpec
   def is =
     "halt with no arguments should" ^ "behave like a common halt" ^ commonHalt(
         "/no-args") ^ "not alter the status" ! status("/no-args", 501) ^ "retain the headers" ! retainsHeaders(
@@ -94,34 +83,27 @@ class HaltSpec extends ScalatraSpec {
         uri, "After-Header", "after")
 
   def haltsAction(uri: String) =
-    get(uri) {
+    get(uri)
       body must not contain ("this content must not be returned")
-    }
 
   def status(uri: String, status: Int) =
-    get(uri) {
+    get(uri)
       status must_== status
-    }
 
   def retainsHeaders(uri: String) = hasHeader(uri, "Before-Header", "before")
 
   def reason(uri: String, reason: String) =
-    get(uri) {
+    get(uri)
       response.getReason must_== reason
-    }
 
   def bodyContains(uri: String, text: String) =
-    get(uri) {
+    get(uri)
       body must contain(text)
-    }
 
   def bodyEquals(uri: String, text: String) =
-    get(uri) {
+    get(uri)
       body must_== (text)
-    }
 
   def hasHeader(uri: String, name: String, value: String) =
-    get(uri) {
+    get(uri)
       header(name) must_== value
-    }
-}

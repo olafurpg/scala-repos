@@ -24,7 +24,7 @@ package org.apache.spark.deploy.client
   *
   * Users of this API should *not* block inside the callback methods.
   */
-private[spark] trait AppClientListener {
+private[spark] trait AppClientListener
   def connected(appId: String): Unit
 
   /** Disconnection may be a temporary state, as we fail over to a new Master. */
@@ -41,4 +41,3 @@ private[spark] trait AppClientListener {
 
   def executorRemoved(
       fullId: String, message: String, exitStatus: Option[Int]): Unit
-}

@@ -20,6 +20,5 @@ package kafka.common
   * Indicates that offsets are currently being loaded from disk into the cache so offset fetch requests cannot be satisfied.
   */
 class OffsetsLoadInProgressException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

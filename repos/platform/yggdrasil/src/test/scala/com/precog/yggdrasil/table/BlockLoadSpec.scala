@@ -52,66 +52,56 @@ import SampleData._
 import CValueGenerators._
 
 trait BlockLoadSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+    extends BlockStoreTestSupport[M] with Specification with ScalaCheck
   self =>
   class BlockStoreLoadTestModule(sampleData: SampleData)
-      extends BlockStoreTestModule[M] {
+      extends BlockStoreTestModule[M]
 
     val M = self.M
     val Some((idCount, schema)) = sampleData.schema
     val actualSchema = inferSchema(sampleData.data map { _ \ "value" })
 
-    val projections = List(actualSchema).map { subschema =>
+    val projections = List(actualSchema).map  subschema =>
       val stream =
-        sampleData.data flatMap { jv =>
+        sampleData.data flatMap  jv =>
           val back = subschema.foldLeft[JValue](
-              JObject(JField("key", jv \ "key") :: Nil)) {
-            case (obj, (jpath, ctype)) => {
+              JObject(JField("key", jv \ "key") :: Nil))
+            case (obj, (jpath, ctype)) =>
                 val vpath = JPath(JPathField("value") :: jpath.nodes)
                 val valueAtPath = jv.get(vpath)
 
-                if (compliesWithSchema(valueAtPath, ctype)) {
+                if (compliesWithSchema(valueAtPath, ctype))
                   obj.set(vpath, valueAtPath)
-                } else {
+                else
                   obj
-                }
-              }
-          }
 
           if (back \ "value" == JUndefined) None
           else Some(back)
-        }
 
       Path("/test") -> Projection(stream)
-    } toMap
-  }
+    toMap
 
-  def testLoadDense(sample: SampleData) = {
+  def testLoadDense(sample: SampleData) =
     val module = new BlockStoreLoadTestModule(sample)
 
     val expected =
-      sample.data flatMap { jv =>
+      sample.data flatMap  jv =>
         val back = module.schema
-          .foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil)) {
-          case (obj, (jpath, ctype)) => {
+          .foldLeft[JValue](JObject(JField("key", jv \ "key") :: Nil))
+          case (obj, (jpath, ctype)) =>
               val vpath = JPath(JPathField("value") :: jpath.nodes)
               val valueAtPath = jv.get(vpath)
 
-              if (module.compliesWithSchema(valueAtPath, ctype)) {
+              if (module.compliesWithSchema(valueAtPath, ctype))
                 obj.set(vpath, valueAtPath)
-              } else {
+              else
                 obj
-              }
-            }
-        }
 
         (back \ "value" != JUndefined).option(back)
-      }
 
     val cschema =
-      module.schema map {
+      module.schema map
         case (jpath, ctype) => ColumnRef(CPath(jpath), ctype)
-      }
 
     val result = module.Table
       .constString(Set("/test"))
@@ -120,16 +110,13 @@ trait BlockLoadSpec[M[+ _]]
       .run
       .copoint
     result.map(_.toList) must_== \/.right(expected.toList)
-  }
 
-  def checkLoadDense = {
+  def checkLoadDense =
     implicit val gen = sample(objectSchema(_, 3))
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       testLoadDense(sample)
-    }
-  }
 
-  def testLoadSample1 = {
+  def testLoadSample1 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -150,9 +137,8 @@ trait BlockLoadSpec[M[+ _]]
     )
 
     testLoadDense(sampleData)
-  }
 
-  def testLoadSample2 = {
+  def testLoadSample2 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -173,9 +159,8 @@ trait BlockLoadSpec[M[+ _]]
     )
 
     testLoadDense(sampleData)
-  }
 
-  def testLoadSample3 = {
+  def testLoadSample3 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
          {
@@ -214,9 +199,8 @@ trait BlockLoadSpec[M[+ _]]
     )
 
     testLoadDense(sampleData)
-  }
 
-  def testLoadSample4 = {
+  def testLoadSample4 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -247,9 +231,8 @@ trait BlockLoadSpec[M[+ _]]
     )
 
     testLoadDense(sampleData)
-  }
 
-  def testLoadSample5 = {
+  def testLoadSample5 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -353,7 +336,5 @@ trait BlockLoadSpec[M[+ _]]
     )
 
     testLoadDense(sampleData)
-  }
-}
 
 // vim: set ts=4 sw=4 et:

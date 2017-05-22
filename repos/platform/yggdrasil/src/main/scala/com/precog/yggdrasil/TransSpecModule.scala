@@ -30,28 +30,26 @@ import scalaz.{Monad, Monoid, StreamT}
 
 import java.nio.CharBuffer
 
-object TransSpecModule {
-  object paths {
+object TransSpecModule
+  object paths
     val Key = CPathField("key")
     val Value = CPathField("value")
     val Group = CPathField("group")
     val SortKey = CPathField("sortkey")
     val SortGlobalId = CPathField("globalid")
-  }
 
   sealed trait Definedness
   case object AnyDefined extends Definedness
   case object AllDefined extends Definedness
-}
 
-trait TransSpecModule extends FNModule {
+trait TransSpecModule extends FNModule
   import TransSpecModule._
 
   type GroupId
   type Scanner
   type Mapper
 
-  object trans {
+  object trans
     sealed trait TransSpec[+A <: SourceType]
     sealed trait SourceType
 
@@ -183,15 +181,15 @@ trait TransSpecModule extends FNModule {
 
     type TransSpec1 = TransSpec[Source1]
 
-    object TransSpec {
+    object TransSpec
       import CPath._
 
       def concatChildren[A <: SourceType](
           tree: CPathTree[Int],
-          leaf: TransSpec[A] = Leaf(Source)): TransSpec[A] = {
+          leaf: TransSpec[A] = Leaf(Source)): TransSpec[A] =
         def createSpecs(trees: Seq[CPathTree[Int]]): Seq[TransSpec[A]] =
-          trees.map { child =>
-            child match {
+          trees.map  child =>
+            child match
               case node @ RootNode(seq) => concatChildren(node, leaf)
               case node @ FieldNode(CPathField(name), _) =>
                 trans.WrapObject(concatChildren(node, leaf), name)
@@ -199,33 +197,27 @@ trait TransSpecModule extends FNModule {
                 trans.WrapArray(concatChildren(node, leaf)) //assuming that indices received in order
               case LeafNode(idx) =>
                 trans.DerefArrayStatic(leaf, CPathIndex(idx))
-            }
-          }
 
-        val initialSpecs = tree match {
+        val initialSpecs = tree match
           case RootNode(children) => createSpecs(children)
           case FieldNode(_, children) => createSpecs(children)
           case IndexNode(_, children) => createSpecs(children)
           case LeafNode(_) => Seq()
-        }
 
         val result =
-          initialSpecs reduceOption { (t1, t2) =>
-            (t1, t2) match {
+          initialSpecs reduceOption  (t1, t2) =>
+            (t1, t2) match
               case (t1: ObjectSpec[_], t2: ObjectSpec[_]) =>
                 trans.InnerObjectConcat(t1, t2)
               case (t1: ArraySpec[_], t2: ArraySpec[_]) =>
                 trans.InnerArrayConcat(t1, t2)
               case _ => sys.error("cannot have this")
-            }
-          }
 
         result getOrElse leaf
-      }
 
       def mapSources[A <: SourceType, B <: SourceType](spec: TransSpec[A])(
-          f: A => B): TransSpec[B] = {
-        spec match {
+          f: A => B): TransSpec[B] =
+        spec match
           case Leaf(source) => Leaf(f(source))
           case trans.ConstLiteral(value, target) =>
             trans.ConstLiteral(value, mapSources(target)(f))
@@ -292,12 +284,10 @@ trait TransSpecModule extends FNModule {
           case trans.Cond(pred, left, right) =>
             trans.Cond(
                 mapSources(pred)(f), mapSources(left)(f), mapSources(right)(f))
-        }
-      }
 
       def deepMap[A <: SourceType](spec: TransSpec[A])(
           f: PartialFunction[TransSpec[A], TransSpec[A]]): TransSpec[A] =
-        spec match {
+        spec match
           case x if f isDefinedAt x => f(x)
 
           case x @ Leaf(source) => x
@@ -363,10 +353,8 @@ trait TransSpecModule extends FNModule {
 
           case trans.Cond(pred, left, right) =>
             trans.Cond(deepMap(pred)(f), deepMap(left)(f), deepMap(right)(f))
-        }
-    }
 
-    object TransSpec1 {
+    object TransSpec1
       import constants._
 
       val Id = Leaf(Source)
@@ -381,19 +369,17 @@ trait TransSpecModule extends FNModule {
 
       val DeleteKeyValue = ObjectDelete(
           Leaf(Source), Set(paths.Key, paths.Value))
-    }
 
     type TransSpec2 = TransSpec[Source2]
 
-    object TransSpec2 {
+    object TransSpec2
       val LeftId = Leaf(SourceLeft)
       val RightId = Leaf(SourceRight)
 
       /** Flips all `SourceLeft`s to `SourceRight`s and vice versa. */
-      def flip(spec: TransSpec2): TransSpec2 = TransSpec.mapSources(spec) {
+      def flip(spec: TransSpec2): TransSpec2 = TransSpec.mapSources(spec)
         case SourceLeft => SourceRight
         case SourceRight => SourceLeft
-      }
 
       def DerefArray0(source: Source2) =
         DerefArrayStatic(Leaf(source), CPathIndex(0))
@@ -406,7 +392,6 @@ trait TransSpecModule extends FNModule {
           Leaf(SourceLeft), Set(paths.Key, paths.Value))
       val DeleteKeyValueRight = ObjectDelete(
           Leaf(SourceRight), Set(paths.Key, paths.Value))
-    }
 
     sealed trait GroupKeySpec
 
@@ -424,9 +409,9 @@ trait TransSpecModule extends FNModule {
     case class GroupKeySpecOr(left: GroupKeySpec, right: GroupKeySpec)
         extends GroupKeySpec
 
-    object GroupKeySpec {
-      def dnf(keySpec: GroupKeySpec): GroupKeySpec = {
-        keySpec match {
+    object GroupKeySpec
+      def dnf(keySpec: GroupKeySpec): GroupKeySpec =
+        keySpec match
           case GroupKeySpecSource(key, spec) => GroupKeySpecSource(key, spec)
           case GroupKeySpecAnd(GroupKeySpecOr(ol, or), right) =>
             GroupKeySpecOr(dnf(GroupKeySpecAnd(ol, right)),
@@ -446,49 +431,38 @@ trait TransSpecModule extends FNModule {
             val rightdnf = dnf(right)
             if (leftdnf == left && rightdnf == right) gor
             else dnf(GroupKeySpecOr(leftdnf, rightdnf))
-        }
-      }
 
-      def toVector(keySpec: GroupKeySpec): Vector[GroupKeySpec] = {
-        keySpec match {
+      def toVector(keySpec: GroupKeySpec): Vector[GroupKeySpec] =
+        keySpec match
           case GroupKeySpecOr(left, right) => toVector(left) ++ toVector(right)
           case x => Vector(x)
-        }
-      }
-    }
 
-    object constants {
+    object constants
       import paths._
 
-      object SourceKey {
+      object SourceKey
         val Single = DerefObjectStatic(Leaf(Source), Key)
 
         val Left = DerefObjectStatic(Leaf(SourceLeft), Key)
         val Right = DerefObjectStatic(Leaf(SourceRight), Key)
-      }
 
-      object SourceValue {
+      object SourceValue
         val Single = DerefObjectStatic(Leaf(Source), Value)
 
         val Left = DerefObjectStatic(Leaf(SourceLeft), Value)
         val Right = DerefObjectStatic(Leaf(SourceRight), Value)
-      }
 
-      object SourceGroup {
+      object SourceGroup
         val Single = DerefObjectStatic(Leaf(Source), Group)
 
         val Left = DerefObjectStatic(Leaf(SourceLeft), Group)
         val Right = DerefObjectStatic(Leaf(SourceRight), Group)
-      }
 
-      object SourceSortKey {
+      object SourceSortKey
         val Single = DerefObjectStatic(Leaf(Source), SortKey)
 
         val Left = DerefObjectStatic(Leaf(SourceLeft), SortKey)
         val Right = DerefObjectStatic(Leaf(SourceRight), SortKey)
-      }
-    }
-  }
 
   import trans._
 
@@ -496,35 +470,28 @@ trait TransSpecModule extends FNModule {
   type TableTransSpec1 = TableTransSpec[Source1]
   type TableTransSpec2 = TableTransSpec[Source2]
 
-  def makeTableTrans(tableTrans: TableTransSpec1): TransSpec1 = {
+  def makeTableTrans(tableTrans: TableTransSpec1): TransSpec1 =
     val wrapped =
-      for ((key @ CPathField(fieldName), value) <- tableTrans) yield {
-        val mapped = TransSpec.deepMap(value) {
+      for ((key @ CPathField(fieldName), value) <- tableTrans) yield
+        val mapped = TransSpec.deepMap(value)
           case Leaf(_) => DerefObjectStatic(Leaf(Source), key)
-        }
 
         trans.WrapObject(mapped, fieldName)
-      }
 
     wrapped.foldLeft[TransSpec1](
-        ObjectDelete(Leaf(Source), Set(tableTrans.keys.toSeq: _*))) {
+        ObjectDelete(Leaf(Source), Set(tableTrans.keys.toSeq: _*)))
       (acc, ts) =>
         trans.InnerObjectConcat(acc, ts)
-    }
-  }
 
   def liftToValues(trans: TransSpec1): TransSpec1 =
     makeTableTrans(Map(paths.Value -> trans))
 
   def buildConstantWrapSpec[A <: SourceType](
-      source: TransSpec[A]): TransSpec[A] = {
+      source: TransSpec[A]): TransSpec[A] =
     val bottomWrapped =
       trans.WrapObject(trans.ConstLiteral(CEmptyArray, source), paths.Key.name)
     trans.InnerObjectConcat(
         bottomWrapped, trans.WrapObject(source, paths.Value.name))
-  }
 
-  def buildValueWrapSpec[A <: SourceType](source: TransSpec[A]): TransSpec[A] = {
+  def buildValueWrapSpec[A <: SourceType](source: TransSpec[A]): TransSpec[A] =
     trans.WrapObject(source, paths.Value.name)
-  }
-}

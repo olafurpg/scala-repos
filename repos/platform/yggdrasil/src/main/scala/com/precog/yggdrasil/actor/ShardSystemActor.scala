@@ -48,7 +48,7 @@ import scalaz.std.vector._
 
 // type ShardSystemActor
 
-trait ShardConfig extends BaseConfig {
+trait ShardConfig extends BaseConfig
   type IngestConfig
 
   def shardId: String
@@ -63,29 +63,25 @@ trait ShardConfig extends BaseConfig {
     config[Long]("actors.store.idle_millis", 1000) millis
   def batchShutdownCheckInterval: Duration =
     config[Int]("actors.store.shutdown_check_seconds", 1) seconds
-}
 
 // The ingest system consists of the ingest supervisor and ingest actor(s)
 case class IngestSystem(ingestActor: ActorRef, stoppable: Stoppable)
 
-object IngestSystem extends Logging {
+object IngestSystem extends Logging
   def actorStop(config: ShardConfig, actor: ActorRef, name: String)(
       implicit system: ActorSystem,
-      executor: ExecutionContext): Future[Unit] = {
-    for {
+      executor: ExecutionContext): Future[Unit] =
+    for
       _ <- Future(logger.debug(config.logPrefix + " Stopping " + name +
               " actor within " + config.stopTimeout.duration))
       b <- gracefulStop(actor, config.stopTimeout.duration)
-    } yield {
+    yield
       logger.debug(
           config.logPrefix + " Stop call for " + name + " actor returned " + b)
-    }
-  } recover {
+  recover
     case e => logger.error("Error stopping " + name + " actor", e)
-  }
-}
 
-trait ShardSystemActorModule extends YggConfigComponent with Logging {
+trait ShardSystemActorModule extends YggConfigComponent with Logging
   type YggConfig <: ShardConfig
 
   protected def checkpointCoordination: CheckpointCoordination
@@ -98,20 +94,18 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
       permissionsFinder: PermissionsFinder[Future]): Option[ActorRef]
 
   def initShardActors(permissionsFinder: PermissionsFinder[Future],
-                      routingActor: ActorRef): Option[IngestSystem] = {
+                      routingActor: ActorRef): Option[IngestSystem] =
     val ingestActorSystem: ActorSystem = ActorSystem("Ingest")
 
     def loadCheckpoint(): Option[YggCheckpoint] =
-      yggConfig.ingestConfig flatMap { _ =>
-        checkpointCoordination.loadYggCheckpoint(yggConfig.shardId) match {
+      yggConfig.ingestConfig flatMap  _ =>
+        checkpointCoordination.loadYggCheckpoint(yggConfig.shardId) match
           case Some(Failure(errors)) =>
             logger.error("Unable to load Kafka checkpoint: " + errors)
             sys.error("Unable to load Kafka checkpoint: " + errors)
 
           case Some(Success(checkpoint)) => Some(checkpoint)
           case None => None
-        }
-      }
 
     val initialCheckpoint = loadCheckpoint()
 
@@ -122,20 +116,17 @@ trait ShardSystemActorModule extends YggConfigComponent with Logging {
                             checkpointCoordination,
                             permissionsFinder)) yield init
 
-    val stoppable = Stoppable.fromFuture({
+    val stoppable = Stoppable.fromFuture(
       import IngestSystem.actorStop
       logger.info("Stopping bifrost system")
-      for {
-        _ <- ingestActor map {
+      for
+        _ <- ingestActor map
           actorStop(yggConfig, _, "ingestActor")(ingestActorSystem,
                                                  ingestActorSystem.dispatcher)
-        } getOrElse { Future(())(ingestActorSystem.dispatcher) }
-      } yield {
+        getOrElse { Future(())(ingestActorSystem.dispatcher) }
+      yield
         ingestActorSystem.shutdown()
         logger.info("Shard system stopped.")
-      }
-    })
+    )
 
     ingestActor map { IngestSystem(_, stoppable) }
-  }
-}

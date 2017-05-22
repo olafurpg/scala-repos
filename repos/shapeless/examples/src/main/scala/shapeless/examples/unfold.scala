@@ -16,44 +16,38 @@
 
 package shapeless.examples
 
-object UnfoldExamples extends App {
+object UnfoldExamples extends App
   import shapeless._
   import nat._
   import ops.nat._
   import poly._
   import test._
 
-  trait Unfold[F <: Poly, E, S] {
+  trait Unfold[F <: Poly, E, S]
     type Out <: HList
     def apply(s: S): Out
-  }
 
-  object Unfold {
+  object Unfold
     implicit def unfold1[F <: Poly, E, S, Out0 <: HList](
         implicit unfold: UnfoldAux[F, E, S, E, Out0]): Unfold[F, E, S] =
-      new Unfold[F, E, S] {
+      new Unfold[F, E, S]
         type Out = Out0
         def apply(s: S) = unfold(s)
-      }
 
-    trait ApplyUnfold[E] {
+    trait ApplyUnfold[E]
       def apply[S, L <: HList](f: Poly)(s: S)(
           implicit unfold: UnfoldAux[f.type, E, S, E, L]) = unfold(s)
-    }
 
     def unfold[E] = new ApplyUnfold[E] {}
     def unfold[E](e: E) = new ApplyUnfold[E] {}
-  }
 
-  trait UnfoldAux[F <: Poly, E, S, CoS, Out <: HList] {
+  trait UnfoldAux[F <: Poly, E, S, CoS, Out <: HList]
     def apply(s: S): Out
-  }
 
-  object UnfoldAux {
+  object UnfoldAux
     implicit def unfold1[F <: Poly, S, CoS]: UnfoldAux[F, S, S, CoS, HNil] =
-      new UnfoldAux[F, S, S, CoS, HNil] {
+      new UnfoldAux[F, S, S, CoS, HNil]
         def apply(s: S) = HNil
-      }
 
     // The trick to prevent diverging implicits here is to have the term CoS (read: co-seed)
     // shrink at the same time as the term S (read: seed) grows. The only structure assumed
@@ -64,28 +58,24 @@ object UnfoldExamples extends App {
         f: Case1.Aux[F, S, (OutH, SS)],
         ut: UnfoldAux[F, E, SS, PCoS, OutT])
       : UnfoldAux[F, E, S, CoS, OutH :: OutT] =
-      new UnfoldAux[F, E, S, CoS, OutH :: OutT] {
-        def apply(s: S): OutH :: OutT = {
+      new UnfoldAux[F, E, S, CoS, OutH :: OutT]
+        def apply(s: S): OutH :: OutT =
           val (outH, sn) = f(s :: HNil)
           outH :: ut(sn)
-        }
-      }
-  }
 
   import Unfold.unfold
 
-  object unfoldMisc extends Poly1 {
+  object unfoldMisc extends Poly1
     implicit def case0 = at[_0](_ => (23, _1))
     implicit def case1 = at[_1](_ => ("foo", _2))
     implicit def case2 = at[_2](_ => (true, _3))
     implicit def case3 = at[_3](_ => (1.0, _4))
-  }
 
   val l1 = unfold(Nat(3))(unfoldMisc)(Nat(0))
   typed[Int :: String :: Boolean :: HNil](l1)
   println(l1)
 
-  object unfoldFibs extends Poly1 {
+  object unfoldFibs extends Poly1
     implicit def case0 = at[_0](_ => (_0, _1))
     implicit def case1 = at[_1](_ => (_1, _2))
     implicit def caseN[N <: Nat, FN <: Nat, FSN <: Nat, FSSN <: Nat](
@@ -94,14 +84,11 @@ object UnfoldExamples extends App {
         sum: Sum.Aux[FN, FSN, FSSN],
         fssn: Witness.Aux[FSSN]) =
       at[Succ[Succ[N]]](_ => ((fssn.value: FSSN), Succ[Succ[Succ[N]]]))
-  }
 
-  object toInt extends Poly1 {
+  object toInt extends Poly1
     implicit def default[N <: Nat](implicit toInt: ToInt[N]) =
       at[N](_ => toInt())
-  }
 
   val l2 = unfold(_6)(unfoldFibs)(Nat(0))
   typed[_0 :: _1 :: _1 :: _2 :: _3 :: _5 :: HNil](l2)
   println(l2 map toInt)
-}

@@ -1,4 +1,4 @@
-object Test {
+object Test
   M.noop(List(1) match { case Nil => 0; case (x :: xs) => x })
 
   case class Foo(a: Int)
@@ -8,4 +8,3 @@ object Test {
   case class Bar()
   val BarAlias: Bar.type = Bar
   M.noop(Bar() match { case BarAlias() => 0 })
-}

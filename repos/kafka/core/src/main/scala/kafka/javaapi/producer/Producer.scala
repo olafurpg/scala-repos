@@ -25,7 +25,6 @@ import scala.collection.mutable
     "Please use org.apache.kafka.clients.producer.KafkaProducer instead.",
     "0.10.0.0")
 class Producer[K, V](private val underlying: kafka.producer.Producer[K, V]) // for testing only
-{
   def this(config: ProducerConfig) =
     this(new kafka.producer.Producer[K, V](config))
 
@@ -34,22 +33,19 @@ class Producer[K, V](private val underlying: kafka.producer.Producer[K, V]) // f
     * synchronous or the asynchronous producer
     * @param message the producer data object that encapsulates the topic, key and message data
     */
-  def send(message: KeyedMessage[K, V]) {
+  def send(message: KeyedMessage[K, V])
     underlying.send(message)
-  }
 
   /**
     * Use this API to send data to multiple topics
     * @param messages list of producer data objects that encapsulate the topic, key and message data
     */
-  def send(messages: java.util.List[KeyedMessage[K, V]]) {
+  def send(messages: java.util.List[KeyedMessage[K, V]])
     import collection.JavaConversions._
     underlying.send((messages: mutable.Buffer[KeyedMessage[K, V]]).toSeq: _*)
-  }
 
   /**
     * Close API to close the producer pool connections to all Kafka brokers. Also closes
     * the zookeeper client connection if one exists
     */
   def close = underlying.close
-}

@@ -26,31 +26,27 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.Utils
 
 class CreateTableAsSelectSuite
-    extends DataSourceTest with SharedSQLContext with BeforeAndAfter {
+    extends DataSourceTest with SharedSQLContext with BeforeAndAfter
   protected override lazy val sql = caseInsensitiveContext.sql _
   private var path: File = null
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     path = Utils.createTempDir()
     val rdd = sparkContext.parallelize(
         (1 to 10).map(i => s"""{"a":$i, "b":"str${i}"}"""))
     caseInsensitiveContext.read.json(rdd).registerTempTable("jt")
-  }
 
-  override def afterAll(): Unit = {
-    try {
+  override def afterAll(): Unit =
+    try
       caseInsensitiveContext.dropTempTable("jt")
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
-  after {
+  after
     Utils.deleteRecursively(path)
-  }
 
-  test("CREATE TEMPORARY TABLE AS SELECT") {
+  test("CREATE TEMPORARY TABLE AS SELECT")
     sql(s"""
         |CREATE TEMPORARY TABLE jsonTable
         |USING json
@@ -64,16 +60,15 @@ class CreateTableAsSelectSuite
                 sql("SELECT a, b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
-  }
 
   test(
-      "CREATE TEMPORARY TABLE AS SELECT based on the file without write permission") {
+      "CREATE TEMPORARY TABLE AS SELECT based on the file without write permission")
     val childPath = new File(path.toString, "child")
     path.mkdir()
     childPath.createNewFile()
     path.setWritable(false)
 
-    val e = intercept[IOException] {
+    val e = intercept[IOException]
       sql(s"""
            |CREATE TEMPORARY TABLE jsonTable
            |USING json
@@ -83,13 +78,11 @@ class CreateTableAsSelectSuite
            |SELECT a, b FROM jt
         """.stripMargin)
       sql("SELECT a, b FROM jsonTable").collect()
-    }
     assert(e.getMessage().contains("Unable to clear output directory"))
 
     path.setWritable(true)
-  }
 
-  test("create a table, drop it and create another one with the same name") {
+  test("create a table, drop it and create another one with the same name")
     sql(s"""
         |CREATE TEMPORARY TABLE jsonTable
         |USING json
@@ -102,7 +95,7 @@ class CreateTableAsSelectSuite
     checkAnswer(sql("SELECT a, b FROM jsonTable"),
                 sql("SELECT a, b FROM jt").collect())
 
-    val message = intercept[AnalysisException] {
+    val message = intercept[AnalysisException]
       sql(s"""
         |CREATE TEMPORARY TABLE IF NOT EXISTS jsonTable
         |USING json
@@ -111,7 +104,7 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a * 4 FROM jt
       """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(
         message.contains(
             s"a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause."),
@@ -146,10 +139,9 @@ class CreateTableAsSelectSuite
         sql("SELECT * FROM jsonTable"), sql("SELECT b FROM jt").collect())
 
     caseInsensitiveContext.dropTempTable("jsonTable")
-  }
 
-  test("CREATE TEMPORARY TABLE AS SELECT with IF NOT EXISTS is not allowed") {
-    val message = intercept[AnalysisException] {
+  test("CREATE TEMPORARY TABLE AS SELECT with IF NOT EXISTS is not allowed")
+    val message = intercept[AnalysisException]
       sql(s"""
         |CREATE TEMPORARY TABLE IF NOT EXISTS jsonTable
         |USING json
@@ -158,15 +150,14 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT b FROM jt
       """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(
         message.contains(
             "a CREATE TEMPORARY TABLE statement does not allow IF NOT EXISTS clause."),
         "CREATE TEMPORARY TABLE IF NOT EXISTS should not be allowed.")
-  }
 
-  test("a CTAS statement with column definitions is not allowed") {
-    intercept[AnalysisException] {
+  test("a CTAS statement with column definitions is not allowed")
+    intercept[AnalysisException]
       sql(s"""
         |CREATE TEMPORARY TABLE jsonTable (a int, b string)
         |USING json
@@ -175,10 +166,8 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a, b FROM jt
       """.stripMargin)
-    }
-  }
 
-  test("it is not allowed to write to a table while querying it.") {
+  test("it is not allowed to write to a table while querying it.")
     sql(s"""
         |CREATE TEMPORARY TABLE jsonTable
         |USING json
@@ -188,7 +177,7 @@ class CreateTableAsSelectSuite
         |SELECT a, b FROM jt
       """.stripMargin)
 
-    val message = intercept[AnalysisException] {
+    val message = intercept[AnalysisException]
       sql(s"""
         |CREATE TEMPORARY TABLE jsonTable
         |USING json
@@ -197,8 +186,6 @@ class CreateTableAsSelectSuite
         |) AS
         |SELECT a, b FROM jsonTable
       """.stripMargin)
-    }.getMessage
+    .getMessage
     assert(message.contains("Cannot overwrite table "),
            "Writing to a table while querying it should not be allowed.")
-  }
-}

@@ -24,7 +24,7 @@ import scala.util.{Failure, Success, Try}
   * During integration tests, several services and processes have to be launched.
   * The ProcessKeeper knows about them and can handle their lifecycle.
   */
-object ProcessKeeper {
+object ProcessKeeper
 
   private[this] val log = LoggerFactory.getLogger(getClass.getName)
   private[this] var processes = ListMap.empty[String, Process]
@@ -32,8 +32,8 @@ object ProcessKeeper {
 
   private[this] val ENV_MESOS_WORK_DIR: String = "MESOS_WORK_DIR"
 
-  def startHttpService(port: Int, assetPath: String) = {
-    startService {
+  def startHttpService(port: Int, assetPath: String) =
+    startService
       log.info(s"Start Http Service on port $port")
       val conf = new ScallopConf(
           Array("--http_port", port.toString, "--assets_path", assetPath))
@@ -42,26 +42,22 @@ object ProcessKeeper {
       val injector = Guice.createInjector(
           new MetricsModule, new HttpModule(conf), new HttpServiceTestModule)
       injector.getInstance(classOf[HttpService])
-    }
-  }
 
-  def startZooKeeper(port: Int, workDir: String, wipeWorkDir: Boolean = true) {
+  def startZooKeeper(port: Int, workDir: String, wipeWorkDir: Boolean = true)
     val args =
       "-Dzookeeper.jmx.log4j.disable=true" :: "org.apache.zookeeper.server.ZooKeeperServerMain" :: port.toString :: workDir :: Nil
     val workDirFile = new File(workDir)
-    if (wipeWorkDir) {
+    if (wipeWorkDir)
       FileUtils.deleteDirectory(workDirFile)
       FileUtils.forceMkdir(workDirFile)
-    }
     startJavaProcess("zookeeper",
                      heapInMegs = 256,
                      args,
                      new File("."),
                      sys.env,
                      _.contains("binding to port"))
-  }
 
-  def startMesosLocal(): Process = {
+  def startMesosLocal(): Process =
     val mesosWorkDirForMesos: String = "/tmp/marathon-itest-mesos"
     val mesosWorkDirFile: File = new File(mesosWorkDirForMesos)
     FileUtils.deleteDirectory(mesosWorkDirFile)
@@ -107,14 +103,13 @@ object ProcessKeeper {
         Process(
             Seq("mesos-local", "--ip=127.0.0.1"), cwd = None, mesosEnv: _*),
         upWhen = _.toLowerCase.contains("registered with master"))
-  }
 
   def startMarathon(cwd: File,
                     env: Map[String, String],
                     arguments: List[String],
                     mainClass: String = "mesosphere.marathon.Main",
                     startupLine: String = "Started ServerConnector",
-                    processName: String = "marathon"): Process = {
+                    processName: String = "marathon"): Process =
 
     val debugArgs = List(
         "-Dakka.loglevel=DEBUG",
@@ -146,43 +141,40 @@ object ProcessKeeper {
                      cwd,
                      env + (ENV_MESOS_WORK_DIR -> marathonWorkDir),
                      upWhen = _.contains(startupLine))
-  }
 
   private[this] def write(
-      dir: File, fileName: String, content: String): String = {
+      dir: File, fileName: String, content: String): String =
     val file = File.createTempFile(fileName, "", dir)
     file.deleteOnExit()
     FileUtils.write(file, content)
     file.setReadable(true)
     file.getAbsolutePath
-  }
 
   def startJavaProcess(name: String,
                        heapInMegs: Int,
                        arguments: List[String],
                        cwd: File = new File("."),
                        env: Map[String, String] = Map.empty,
-                       upWhen: String => Boolean): Process = {
+                       upWhen: String => Boolean): Process =
     val javaExecutable =
       sys.props.get("java.home").fold("java")(_ + "/bin/java")
     val classPath = sys.props.getOrElse("java.class.path", "target/classes")
     val memSettings = s"-Xmx${heapInMegs}m"
     // Omit the classpath in order to avoid cluttering the tests output
     log.info(
-        s"Start java process $name with command: ${(javaExecutable :: memSettings :: arguments)
-      .mkString(" ")}")
+        s"Start java process $name with command: $(javaExecutable :: memSettings :: arguments)
+      .mkString(" ")")
     val command: List[String] =
       javaExecutable :: memSettings :: "-classpath" :: classPath :: arguments
     val builder = Process(command, cwd, env.toList: _*)
     val process = startProcess(name, builder, upWhen)
     log.info(s"Java process $name up and running!")
     process
-  }
 
   def startProcess(name: String,
                    processBuilder: ProcessBuilder,
                    upWhen: String => Boolean,
-                   timeout: Duration = 30.seconds): Process = {
+                   timeout: Duration = 30.seconds): Process =
     require(!processes.contains(name), s"Process with $name already started")
 
     sealed trait ProcessState
@@ -190,20 +182,17 @@ object ProcessKeeper {
     case object ProcessExited extends ProcessState
 
     val up = Promise[ProcessIsUp.type]()
-    val logger = new ProcessLogger {
-      def checkUp(out: String) = {
+    val logger = new ProcessLogger
+      def checkUp(out: String) =
         log.info(s"$name: $out")
         if (!up.isCompleted && upWhen(out)) up.trySuccess(ProcessIsUp)
-      }
       override def buffer[T](f: => T): T = f
       override def out(s: => String) = checkUp(s)
       override def err(s: => String) = checkUp(s)
-    }
     val process = processBuilder.run(logger)
-    val processExitCode: Future[ProcessExited.type] = Future {
-      val exitCode = scala.concurrent.blocking {
+    val processExitCode: Future[ProcessExited.type] = Future
+      val exitCode = scala.concurrent.blocking
         process.exitValue()
-      }
       log.info(s"Process $name finished with exit code $exitCode")
 
       // Sometimes this finishes before the other future finishes parsing the output
@@ -211,12 +200,12 @@ object ProcessKeeper {
       Await.result(up.future, 1.second)
 
       ProcessExited
-    }(ExecutionContext.fromExecutor(Executors.newCachedThreadPool()))
+    (ExecutionContext.fromExecutor(Executors.newCachedThreadPool()))
     val upOrExited = Future.firstCompletedOf(Seq(up.future, processExitCode))(
         ExecutionContext.global)
-    Try(Await.result(upOrExited, timeout)) match {
+    Try(Await.result(upOrExited, timeout)) match
       case Success(result) =>
-        result match {
+        result match
           case ProcessExited =>
             throw new IllegalStateException(
                 s"Process $name exited before coming up. Give up. $processBuilder")
@@ -224,92 +213,70 @@ object ProcessKeeper {
             processes += name -> process
             log.info(
                 s"Process $name is up and running. ${processes.size} processes in total.")
-        }
       case Failure(_) =>
         process.destroy()
         throw new IllegalStateException(
             s"Process $name does not came up within time bounds ($timeout). Give up. $processBuilder")
-    }
     process
-  }
 
-  def onStopServices(block: => Unit): Unit = {
-    services ::= new AbstractIdleService {
-      override def shutDown(): Unit = {
+  def onStopServices(block: => Unit): Unit =
+    services ::= new AbstractIdleService
+      override def shutDown(): Unit =
         block
-      }
 
       override def startUp(): Unit = {}
-    }
-  }
 
   val PIDRE = """^\s*(\d+)\s+(\S*)$""".r
 
-  def stopJavaProcesses(wantedMainClass: String): Unit = {
-    val pids = "jps -l".!!.split("\n").collect {
+  def stopJavaProcesses(wantedMainClass: String): Unit =
+    val pids = "jps -l".!!.split("\n").collect
       case PIDRE(pid, mainClass) if mainClass.contains(wantedMainClass) => pid
-    }
-    if (pids.nonEmpty) {
+    if (pids.nonEmpty)
       val killCommand = s"kill -9 ${pids.mkString(" ")}"
       log.warn(s"Left over processes, executing: $killCommand")
       val ret = killCommand.!
-      if (ret != 0) {
+      if (ret != 0)
         log.error(s"kill returned $ret")
-      }
-    }
-  }
 
-  def stopProcess(name: String): Unit = {
+  def stopProcess(name: String): Unit =
     import mesosphere.util.ThreadPoolContext.ioContext
     log.info(s"Stop Process $name")
     val process = processes(name)
-    def killProcess: Int = {
+    def killProcess: Int =
       // Unfortunately, there seem to be race conditions in Process.exitValue.
       // Thus this ugly workaround.
-      Await.result(Future {
-        scala.concurrent.blocking {
+      Await.result(Future
+        scala.concurrent.blocking
           Try(process.destroy())
           process.exitValue()
-        }
-      }, 5.seconds)
-    }
+      , 5.seconds)
     //retry on fail
-    Try(killProcess) recover { case _ => killProcess } match {
+    Try(killProcess) recover { case _ => killProcess } match
       case Success(value) => processes -= name
       case Failure(NonFatal(e)) =>
         log.error("giving up waiting for processes to finish", e)
-    }
     log.info(s"Stop Process $name: Done")
-  }
 
-  def stopAllProcesses(): Unit = {
+  def stopAllProcesses(): Unit =
     processes.keys.toSeq.reverse.foreach(stopProcess)
     processes = ListMap.empty
-  }
 
-  def startService(service: Service): Unit = {
+  def startService(service: Service): Unit =
     services ::= service
     service.startAsync().awaitRunning()
-  }
 
-  def stopAllServices(): Unit = {
+  def stopAllServices(): Unit =
     services.foreach(_.stopAsync())
-    services.par.foreach { service =>
-      try { service.awaitTerminated(5, TimeUnit.SECONDS) } catch {
+    services.par.foreach  service =>
+      try { service.awaitTerminated(5, TimeUnit.SECONDS) } catch
         case NonFatal(ex) => log.error(s"Could not stop service $service", ex)
-      }
-    }
     services = Nil
-  }
 
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     log.info(s"Cleaning up Processes $processes and Services $services")
     stopAllProcesses()
     stopAllServices()
     log.info(s"Cleaning up Processes $processes and Services $services: Done")
-  }
 
-  val shutDownHook: ShutdownHookThread = sys.addShutdownHook {
+  val shutDownHook: ShutdownHookThread = sys.addShutdownHook
     shutdown()
-  }
-}

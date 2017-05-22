@@ -9,7 +9,7 @@
 
 package scala
 
-object Product19 {
+object Product19
   def unapply[
       T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19](
       x: Product19[T1,
@@ -50,7 +50,6 @@ object Product19 {
                                            T18,
                                            T19]] =
     Some(x)
-}
 
 /** Product19 is a cartesian product of 19 components.
   *  @since 2.3
@@ -74,7 +73,7 @@ trait Product19[+T1,
                 +T17,
                 +T18,
                 +T19]
-    extends Any with Product {
+    extends Any with Product
 
   /** The arity of this product.
     *  @return 19
@@ -89,7 +88,7 @@ trait Product19[+T1,
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
@@ -110,7 +109,6 @@ trait Product19[+T1,
     case 17 => _18
     case 18 => _19
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -206,4 +204,3 @@ trait Product19[+T1,
     *  @return   A projection of element 19.
     */
   def _19: T19
-}

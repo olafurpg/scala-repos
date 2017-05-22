@@ -8,10 +8,10 @@ import org.junit.Assert._
   * User: jim
   * Date: 8/14/11
   */
-class URLHelperTest {
+class URLHelperTest
 
   @Test
-  def finalUrlGetCleaned() {
+  def finalUrlGetCleaned()
     val normalUrl = "http://techcrunch.com/test/url1"
     assertEquals(
         normalUrl, URLHelper.getCleanedUrl(normalUrl).get.url.toString)
@@ -24,5 +24,3 @@ class URLHelperTest {
         expectedUrl, URLHelper.getCleanedUrl(escapedFragment).get.url.toString)
     assertEquals(
         expectedUrl, URLHelper.getCleanedUrl(escapedFragment).get.urlString)
-  }
-}

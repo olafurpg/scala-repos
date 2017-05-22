@@ -6,35 +6,31 @@ package play.api.libs.json
 import org.specs2.mutable._
 import play.api.libs.json.Json._
 
-object JsObjectSpec extends Specification {
+object JsObjectSpec extends Specification
 
-  "JsObject.deepMerge" should {
-    "not fail when the objects are empty" in {
+  "JsObject.deepMerge" should
+    "not fail when the objects are empty" in
       Json.obj().deepMerge(Json.obj()) must beEqualTo(Json.obj())
-    }
 
-    "merge correctly when the source object is empty" in {
+    "merge correctly when the source object is empty" in
       val populatedObj = Json.obj(
           "field1" -> 123,
           "field2" -> "abc",
           "field3" -> JsNull
       )
       populatedObj.deepMerge(Json.obj()) must beEqualTo(populatedObj)
-    }
 
-    "merge correctly when the incoming object is empty" in {
+    "merge correctly when the incoming object is empty" in
       val populatedObj = Json.obj(
           "field1" -> 123,
           "field2" -> "abc",
           "field3" -> JsNull
       )
       Json.obj().deepMerge(populatedObj) must beEqualTo(populatedObj)
-    }
-  }
 
-  "JsObject.deepMerge should keep existing attributes where there is no collision and" should {
+  "JsObject.deepMerge should keep existing attributes where there is no collision and" should
 
-    "overwrite existing attributes on collision when value is not a JsArray or JsObject" in {
+    "overwrite existing attributes on collision when value is not a JsArray or JsObject" in
       Json
         .obj(
             "field1" -> 123,
@@ -58,9 +54,8 @@ object JsObjectSpec extends Specification {
               "field6" -> JsNull
           )
       )
-    }
 
-    "recursively merge where elements are both of type JsArray or both of type JsObject" in {
+    "recursively merge where elements are both of type JsArray or both of type JsObject" in
       Json
         .obj(
             "field1" -> 123,
@@ -104,9 +99,8 @@ object JsObjectSpec extends Specification {
               )
           )
       )
-    }
 
-    "properly merge a deep structure" in {
+    "properly merge a deep structure" in
       Json
         .obj(
             "field1a" -> Json.obj(
@@ -171,6 +165,3 @@ object JsObjectSpec extends Specification {
               )
           )
       )
-    }
-  }
-}

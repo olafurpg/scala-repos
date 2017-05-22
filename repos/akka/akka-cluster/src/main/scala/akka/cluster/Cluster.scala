@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 /**
   * Cluster Extension Id and factory for creating Cluster extension.
   */
-object Cluster extends ExtensionId[Cluster] with ExtensionIdProvider {
+object Cluster extends ExtensionId[Cluster] with ExtensionIdProvider
   override def get(system: ActorSystem): Cluster = super.get(system)
 
   override def lookup = Cluster
@@ -37,11 +37,9 @@ object Cluster extends ExtensionId[Cluster] with ExtensionIdProvider {
     * INTERNAL API
     */
   private[cluster] final val isAssertInvariantsEnabled: Boolean =
-    System.getProperty("akka.cluster.assert", "off").toLowerCase match {
+    System.getProperty("akka.cluster.assert", "off").toLowerCase match
       case "on" | "true" ⇒ true
       case _ ⇒ false
-    }
-}
 
 /**
   * This module is responsible cluster membership information. Changes to the cluster
@@ -52,7 +50,7 @@ object Cluster extends ExtensionId[Cluster] with ExtensionIdProvider {
   * the cluster address of this actor system is [[#selfAddress]]. A member also has a status;
   * initially [[MemberStatus]] `Joining` followed by [[MemberStatus]] `Up`.
   */
-class Cluster(val system: ExtendedActorSystem) extends Extension {
+class Cluster(val system: ExtendedActorSystem) extends Extension
 
   import ClusterEvent._
 
@@ -65,14 +63,13 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     * The `uid` is needed to be able to distinguish different
     * incarnations of a member with same hostname and port.
     */
-  val selfUniqueAddress: UniqueAddress = system.provider match {
+  val selfUniqueAddress: UniqueAddress = system.provider match
     case c: ClusterActorRefProvider ⇒
       UniqueAddress(
           c.transport.defaultAddress, AddressUidExtension(system).addressUid)
     case other ⇒
       throw new ConfigurationException(
           s"ActorSystem [${system}] needs to have a 'ClusterActorRefProvider' enabled in the configuration, currently uses [${other.getClass.getName}]")
-  }
 
   /**
     * The address of this cluster member.
@@ -97,14 +94,13 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
 
   logInfo("Starting up...")
 
-  val failureDetector: FailureDetectorRegistry[Address] = {
+  val failureDetector: FailureDetectorRegistry[Address] =
     def createFailureDetector(): FailureDetector =
       FailureDetectorLoader.load(settings.FailureDetectorImplementationClass,
                                  settings.FailureDetectorConfig,
                                  system)
 
     new DefaultFailureDetectorRegistry(() ⇒ createFailureDetector())
-  }
 
   // ========================================================
   // ===================== WORK DAEMONS =====================
@@ -113,8 +109,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   /**
     * INTERNAL API
     */
-  private[cluster] val scheduler: Scheduler = {
-    if (system.scheduler.maxFrequency < 1.second / SchedulerTickDuration) {
+  private[cluster] val scheduler: Scheduler =
+    if (system.scheduler.maxFrequency < 1.second / SchedulerTickDuration)
       logInfo(
           "Using a dedicated scheduler for cluster. Default scheduler can be used if configured " +
           "with 'akka.scheduler.tick-duration' [{} ms] <=  'akka.cluster.scheduler.tick-duration' [{} ms].",
@@ -125,11 +121,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
         .parseString(
             s"akka.scheduler.tick-duration=${SchedulerTickDuration.toMillis}ms")
         .withFallback(system.settings.config)
-      val threadFactory = system.threadFactory match {
+      val threadFactory = system.threadFactory match
         case tf: MonitorableThreadFactory ⇒
           tf.withName(tf.name + "-cluster-scheduler")
         case tf ⇒ tf
-      }
       system.dynamicAccess
         .createInstanceFor[Scheduler](
             system.settings.SchedulerClass,
@@ -137,10 +132,10 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
                           classOf[LoggingAdapter] -> log,
                           classOf[ThreadFactory] -> threadFactory))
         .get
-    } else {
+    else
       // delegate to system.scheduler, but don't close over system
       val systemScheduler = system.scheduler
-      new Scheduler with Closeable {
+      new Scheduler with Closeable
         override def close(): Unit =
           () // we are using system.scheduler, which we are not responsible for closing
 
@@ -155,28 +150,24 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
         override def scheduleOnce(delay: FiniteDuration, runnable: Runnable)(
             implicit executor: ExecutionContext): Cancellable =
           systemScheduler.scheduleOnce(delay, runnable)
-      }
-    }
-  }
 
   // create supervisor for daemons under path "/system/cluster"
-  private val clusterDaemons: ActorRef = {
+  private val clusterDaemons: ActorRef =
     system.systemActorOf(Props(classOf[ClusterDaemon], settings)
                            .withDispatcher(UseDispatcher)
                            .withDeploy(Deploy.local),
                          name = "cluster")
-  }
 
   /**
     * INTERNAL API
     */
-  private[cluster] val clusterCore: ActorRef = {
+  private[cluster] val clusterCore: ActorRef =
     implicit val timeout = system.settings.CreationTimeout
-    try {
+    try
       Await.result((clusterDaemons ? InternalClusterAction.GetClusterCoreRef)
                      .mapTo[ActorRef],
                    timeout.duration)
-    } catch {
+    catch
       case NonFatal(e) ⇒
         log.error(
             e,
@@ -186,19 +177,16 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
         // from shutdown() or other places, which may result in
         // InvalidActorNameException: actor name [cluster] is not unique
         system.deadLetters
-    }
-  }
 
   private[cluster] val readView: ClusterReadView = new ClusterReadView(this)
 
   system.registerOnTermination(shutdown())
 
   if (JmxEnabled)
-    clusterJmx = {
+    clusterJmx =
       val jmx = new ClusterJmx(this, log)
       jmx.createMBean()
       Some(jmx)
-    }
 
   logInfo("Started up successfully")
 
@@ -245,7 +233,7 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   @varargs
   def subscribe(subscriber: ActorRef,
                 initialStateMode: SubscriptionInitialStateMode,
-                to: Class[_]*): Unit = {
+                to: Class[_]*): Unit =
     require(
         to.length > 0, "at least one `ClusterDomainEvent` class is required")
     require(
@@ -253,7 +241,6 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
         s"subscribe to `akka.cluster.ClusterEvent.ClusterDomainEvent` or subclasses, was [${to.map(_.getName).mkString(", ")}]")
     clusterCore ! InternalClusterAction.Subscribe(
         subscriber, initialStateMode, to.toSet)
-  }
 
   /**
     * Unsubscribe to all cluster domain events.
@@ -288,12 +275,11 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
   def join(address: Address): Unit =
     clusterCore ! ClusterUserAction.JoinTo(fillLocal(address))
 
-  private def fillLocal(address: Address): Address = {
+  private def fillLocal(address: Address): Address =
     // local address might be used if grabbed from actorRef.path.address
     if (address.hasLocalScope && address.system == selfAddress.system)
       selfAddress
     else address
-  }
 
   /**
     * Join the specified seed nodes without defining them in config.
@@ -377,25 +363,22 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     * If the cluster has already been shutdown the thunk will run on the caller thread immediately.
     * Typically used together `cluster.leave(cluster.selfAddress)` and then `system.terminate()`.
     */
-  def registerOnMemberRemoved(callback: Runnable): Unit = {
+  def registerOnMemberRemoved(callback: Runnable): Unit =
     if (_isTerminated.get()) callback.run()
     else
       clusterDaemons ! InternalClusterAction.AddOnMemberRemovedListener(
           callback)
-  }
 
   /**
     * Generate the remote actor path by replacing the Address in the RootActor Path for the given
     * ActorRef with the cluster's `selfAddress`, unless address' host is already defined
     */
-  def remotePathOf(actorRef: ActorRef): ActorPath = {
+  def remotePathOf(actorRef: ActorRef): ActorPath =
     val path = actorRef.path
-    if (path.address.host.isDefined) {
+    if (path.address.host.isDefined)
       path
-    } else {
+    else
       path.root.copy(selfAddress) / path.elements withUid path.uid
-    }
-  }
 
   // ========================================================
   // ===================== INTERNAL API =====================
@@ -409,8 +392,8 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     * Should not called by the user. The user can issue a LEAVE command which will tell the node
     * to go through graceful handoff process `LEAVE -&gt; EXITING -&gt; REMOVED -&gt; SHUTDOWN`.
     */
-  private[cluster] def shutdown(): Unit = {
-    if (_isTerminated.compareAndSet(false, true)) {
+  private[cluster] def shutdown(): Unit =
+    if (_isTerminated.compareAndSet(false, true))
       logInfo("Shutting down...")
 
       system.stop(clusterDaemons)
@@ -423,18 +406,15 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
       clusterJmx foreach { _.unregisterMBean() }
 
       logInfo("Successfully shut down")
-    }
-  }
 
-  private def closeScheduler(): Unit = scheduler match {
+  private def closeScheduler(): Unit = scheduler match
     case x: Closeable ⇒ x.close()
     case _ ⇒
-  }
 
   /**
     * INTERNAL API
     */
-  private[cluster] object InfoLogger {
+  private[cluster] object InfoLogger
 
     def logInfo(message: String): Unit =
       if (LogInfo) log.info("Cluster Node [{}] - {}", selfAddress, message)
@@ -446,5 +426,3 @@ class Cluster(val system: ExtendedActorSystem) extends Extension {
     def logInfo(template: String, arg1: Any, arg2: Any): Unit =
       if (LogInfo)
         log.info("Cluster Node [{}] - " + template, selfAddress, arg1, arg2)
-  }
-}

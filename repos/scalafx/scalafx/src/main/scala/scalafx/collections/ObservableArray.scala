@@ -38,7 +38,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define OA `ObservableArray`
   */
-object ObservableArray {
+object ObservableArray
 
   // TODO: Enter link when JavaFX 8 API Docs are available on-line.
   /**
@@ -53,7 +53,6 @@ object ObservableArray {
     *            less than `start`.
     */
   case class Change(sizeChanged: Boolean, start: Int, end: Int)
-}
 
 /**
   * Abstract $OA base class.
@@ -72,25 +71,23 @@ abstract class ObservableArray[
     V : ClassTag, T <: ObservableArray[V, T, D], D <: jfxc.ObservableArray[D]](
     override val delegate: D)
     extends ArrayLike[V, T] with Builder[V, T] with Observable
-    with SFXDelegate[D] {
+    with SFXDelegate[D]
 
   // ObservableArray[D] interface functions, allow class to act like it implements the JavaFX ObservableArray
   // interface, without actually being interchangeable with one.
   /**
     * Shrinks capacity to current length of data in this array.
     */
-  def trimToSize() {
+  def trimToSize()
     delegate.trimToSize()
-  }
 
   /**
     * Grow array capacity if currently smaller than given `capacity`; do nothing otherwise.
     *
     * @param capacity Required capacity.
     */
-  def ensureCapacity(capacity: Int) {
+  def ensureCapacity(capacity: Int)
     delegate.ensureCapacity(capacity)
-  }
 
   // Observable<X>Array interface functions.  Note: These functions are present in ObservableFloatArray and
   // ObservableIntegerArray, but they are not in ObservableArray[T].
@@ -327,9 +324,8 @@ abstract class ObservableArray[
     * @param value New value for element at `idx`.
     * @throws java.lang.ArrayIndexOutOfBoundsException if `idx` does not satisfy `0 <= idx < length`.
     */
-  def update(idx: Int, value: V) {
+  def update(idx: Int, value: V)
     set(idx, value)
-  }
 
   /**
     * Retrieve length of data in this array.
@@ -358,10 +354,9 @@ abstract class ObservableArray[
     * @param src Array to be appended to this array.
     * @return This array, expanded to contain the indicated array.
     */
-  def ++(src: Array[V]): T = {
+  def ++(src: Array[V]): T =
     addAll(src: _*)
     this.asInstanceOf[T]
-  }
 
   /**
     * Append another observable array to this array.
@@ -369,10 +364,9 @@ abstract class ObservableArray[
     * @param src Array to be appended to this array.
     * @return This array, expanded to contain the indicated array.
     */
-  def ++(src: T): T = {
+  def ++(src: T): T =
     addAll(src)
     this.asInstanceOf[T]
-  }
 
   // Builder[V, T] abstract member function implementations.
   /**
@@ -380,9 +374,8 @@ abstract class ObservableArray[
     *
     * Capacity is unchanged.
     */
-  override def clear() {
+  override def clear()
     delegate.clear()
-  }
 
   /**
     * Produces collection from builder.
@@ -397,10 +390,9 @@ abstract class ObservableArray[
     * @param elem Element to be added to end of this array.
     * @return This $OA.
     */
-  override def +=(elem: V) = {
+  override def +=(elem: V) =
     addAll(elem)
     this
-  }
 
   /**
     * Add a listener function to $ARY's changes.
@@ -410,17 +402,13 @@ abstract class ObservableArray[
     *
     * @param op Function that will handle this $OA's modifications data, to be activated when some change is made.
     */
-  def onChange(op: (T, ObservableArray.Change) => Unit) {
-    delegate.addListener {
-      new jfxc.ArrayChangeListener[D] {
+  def onChange(op: (T, ObservableArray.Change) => Unit)
+    delegate.addListener
+      new jfxc.ArrayChangeListener[D]
         override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+            array: D, sizeChanged: Boolean, start: Int, end: Int)
           op(ObservableArray.this.asInstanceOf[T],
              ObservableArray.Change(sizeChanged, start, end))
-        }
-      }
-    }
-  }
 
   /**
     * Add a listener function to $ARY's changes.
@@ -430,14 +418,9 @@ abstract class ObservableArray[
     *
     * @param op Function that will handle this $OA's modifications data, to be activated when some change is made.
     */
-  def onChange(op: => Unit) {
-    delegate.addListener {
-      new jfxc.ArrayChangeListener[D] {
+  def onChange(op: => Unit)
+    delegate.addListener
+      new jfxc.ArrayChangeListener[D]
         override def onChanged(
-            array: D, sizeChanged: Boolean, start: Int, end: Int) {
+            array: D, sizeChanged: Boolean, start: Int, end: Int)
           op
-        }
-      }
-    }
-  }
-}

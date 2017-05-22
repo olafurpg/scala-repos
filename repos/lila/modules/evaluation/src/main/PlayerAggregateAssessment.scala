@@ -17,19 +17,18 @@ case class PlayerAssessment(_id: String,
                             mtAvg: Int,
                             mtSd: Int,
                             blurs: Int,
-                            hold: Boolean) {
+                            hold: Boolean)
   val color = Color.apply(white)
-}
 
 case class PlayerAggregateAssessment(user: User,
                                      playerAssessments: List[PlayerAssessment],
                                      relatedUsers: List[String],
-                                     relatedCheaters: List[String]) {
+                                     relatedCheaters: List[String])
   import Statistics._
   import AccountAction._
   import GameAssessment.{Cheating, LikelyCheating}
 
-  def action = {
+  def action =
     val markable: Boolean =
       !isGreatUser && isWorthLookingAt &&
       ((cheatingSum >= 3 || cheatingSum + likelyCheatingSum >= 6)
@@ -61,48 +60,42 @@ case class PlayerAggregateAssessment(user: User,
                     (sfAvgLowVar, sfAvgHighVar),
                     (sfAvgHold, sfAvgNoHold))
 
-    val actionable: Boolean = {
+    val actionable: Boolean =
       val difFlags = difs map (sigDif(10) _).tupled
       difFlags.forall(_.isEmpty) || difFlags.exists(~_) ||
       assessmentsCount < 50
-    }
 
     val exceptionalDif: Boolean = difs map (sigDif(30) _).tupled exists (~_)
 
-    if (actionable) {
+    if (actionable)
       if (markable && bannable) EngineAndBan
       else if (markable) Engine
       else if (reportable && exceptionalDif && cheatingSum >= 1) Engine
       else if (reportable) Report
       else Nothing
-    } else {
+    else
       if (markable) Report
       else if (reportable) Report
       else Nothing
-    }
-  }
 
   def countAssessmentValue(assessment: GameAssessment) =
-    playerAssessments count {
+    playerAssessments count
       _.assessment == assessment
-    }
 
   val relatedCheatersCount = relatedCheaters.distinct.size
   val relatedUsersCount = relatedUsers.distinct.size
-  val assessmentsCount = playerAssessments.size match {
+  val assessmentsCount = playerAssessments.size match
     case 0 => 1
     case a => a
-  }
   val relationModifier = if (relatedUsersCount >= 1) 0.02 else 0
   val cheatingSum = countAssessmentValue(Cheating)
   val likelyCheatingSum = countAssessmentValue(LikelyCheating)
 
   // Some statistics
-  def sfAvgGiven(predicate: PlayerAssessment => Boolean): Option[Int] = {
+  def sfAvgGiven(predicate: PlayerAssessment => Boolean): Option[Int] =
     val avg =
       listAverage(playerAssessments.filter(predicate).map(_.sfAvg)).toInt
     if (playerAssessments.exists(predicate)) Some(avg) else none
-  }
 
   // Average SF Avg given blur rate
   val sfAvgBlurs = sfAvgGiven(_.blurs > 70)
@@ -120,36 +113,31 @@ case class PlayerAggregateAssessment(user: User,
 
   def isNewRatedUser = user.count.rated < 10
 
-  def isWorthLookingAt = {
+  def isWorthLookingAt =
     user.perfs.bestRating > 1600 && user.count.rated >= 2
-  } || user.perfs.bestProgress > 200
+  || user.perfs.bestProgress > 200
 
-  def reportText(maxGames: Int = 10): String = {
+  def reportText(maxGames: Int = 10): String =
     val gameLinks: String = (playerAssessments
       .sortBy(-_.assessment.id)
       .take(maxGames)
-      .map { a =>
+      .map  a =>
         a.assessment.emoticon + " http://lichess.org/" + a.gameId +
         "/" + a.color.name
-      })
+      )
       .mkString("\n")
 
     s"""[AUTOREPORT]
     Cheating Games: $cheatingSum
     Likely Cheating Games: $likelyCheatingSum
     $gameLinks"""
-  }
-}
 
-object PlayerAggregateAssessment {
+object PlayerAggregateAssessment
 
   case class WithGames(
-      pag: PlayerAggregateAssessment, games: List[lila.game.Game]) {
-    def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map {
+      pag: PlayerAggregateAssessment, games: List[lila.game.Game])
+    def pov(pa: PlayerAssessment) = games find (_.id == pa.gameId) map
       lila.game.Pov(_, pa.color)
-    }
-  }
-}
 
 case class PlayerFlags(suspiciousErrorRate: Boolean,
                        alwaysHasAdvantage: Boolean,
@@ -159,12 +147,12 @@ case class PlayerFlags(suspiciousErrorRate: Boolean,
                        noFastMoves: Boolean,
                        suspiciousHoldAlert: Boolean)
 
-object PlayerFlags {
+object PlayerFlags
 
   import reactivemongo.bson._
   import lila.db.BSON
 
-  implicit val playerFlagsBSONHandler = new BSON[PlayerFlags] {
+  implicit val playerFlagsBSONHandler = new BSON[PlayerFlags]
 
     def reads(r: BSON.Reader): PlayerFlags =
       PlayerFlags(suspiciousErrorRate = r boolD "ser",
@@ -183,5 +171,3 @@ object PlayerFlags {
                    "cmt" -> w.boolO(o.consistentMoveTimes),
                    "nfm" -> w.boolO(o.noFastMoves),
                    "sha" -> w.boolO(o.suspiciousHoldAlert))
-  }
-}

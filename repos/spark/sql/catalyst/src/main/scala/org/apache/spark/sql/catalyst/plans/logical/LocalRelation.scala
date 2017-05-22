@@ -22,28 +22,24 @@ import org.apache.spark.sql.catalyst.{analysis, CatalystTypeConverters, Internal
 import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.types.{StructField, StructType}
 
-object LocalRelation {
+object LocalRelation
   def apply(output: Attribute*): LocalRelation = new LocalRelation(output)
 
-  def apply(output1: StructField, output: StructField*): LocalRelation = {
+  def apply(output1: StructField, output: StructField*): LocalRelation =
     new LocalRelation(StructType(output1 +: output).toAttributes)
-  }
 
-  def fromExternalRows(output: Seq[Attribute], data: Seq[Row]): LocalRelation = {
+  def fromExternalRows(output: Seq[Attribute], data: Seq[Row]): LocalRelation =
     val schema = StructType.fromAttributes(output)
     val converter = CatalystTypeConverters.createToCatalystConverter(schema)
     LocalRelation(output, data.map(converter(_).asInstanceOf[InternalRow]))
-  }
 
-  def fromProduct(output: Seq[Attribute], data: Seq[Product]): LocalRelation = {
+  def fromProduct(output: Seq[Attribute], data: Seq[Product]): LocalRelation =
     val schema = StructType.fromAttributes(output)
     val converter = CatalystTypeConverters.createToCatalystConverter(schema)
     LocalRelation(output, data.map(converter(_).asInstanceOf[InternalRow]))
-  }
-}
 
 case class LocalRelation(output: Seq[Attribute], data: Seq[InternalRow] = Nil)
-    extends LeafNode with analysis.MultiInstanceRelation {
+    extends LeafNode with analysis.MultiInstanceRelation
 
   // A local relation must have resolved output.
   require(output.forall(_.resolved),
@@ -54,19 +50,16 @@ case class LocalRelation(output: Seq[Attribute], data: Seq[InternalRow] = Nil)
     * attributes are required when a relation is going to be included multiple times in the same
     * query.
     */
-  override final def newInstance(): this.type = {
+  override final def newInstance(): this.type =
     LocalRelation(output.map(_.newInstance()), data).asInstanceOf[this.type]
-  }
 
   override protected def stringArgs = Iterator(output)
 
-  override def sameResult(plan: LogicalPlan): Boolean = plan match {
+  override def sameResult(plan: LogicalPlan): Boolean = plan match
     case LocalRelation(otherOutput, otherData) =>
       otherOutput.map(_.dataType) == output.map(_.dataType) &&
       otherData == data
     case _ => false
-  }
 
   override lazy val statistics = Statistics(
       sizeInBytes = output.map(_.dataType.defaultSize).sum * data.length)
-}

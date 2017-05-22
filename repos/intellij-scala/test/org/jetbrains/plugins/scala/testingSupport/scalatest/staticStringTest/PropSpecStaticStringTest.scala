@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 26.06.2015.
   */
-trait PropSpecStaticStringTest extends ScalaTestTestCase {
+trait PropSpecStaticStringTest extends ScalaTestTestCase
   val propSpecClassName = "PropSpecStringTest"
   val propSpecFileName = propSpecClassName + ".scala"
 
-  def addPropSpec() = {
+  def addPropSpec() =
     addFileToProject(propSpecFileName,
                      """
         |import org.scalatest._
@@ -30,9 +30,8 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
-  def testPropSpecSum() = {
+  def testPropSpecSum() =
     addPropSpec()
 
     assert(
@@ -40,32 +39,27 @@ trait PropSpecStaticStringTest extends ScalaTestTestCase {
             createTestFromLocation(10, 10, propSpecFileName),
             propSpecClassName,
             "string sum"))
-  }
 
-  def testPropSpecVal() = {
+  def testPropSpecVal() =
     addPropSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(4, 10, propSpecFileName),
                                propSpecClassName,
                                "const"))
-  }
 
-  def testPropSpecValSum() = {
+  def testPropSpecValSum() =
     addPropSpec()
 
     assert(
         checkConfigAndSettings(createTestFromLocation(7, 10, propSpecFileName),
                                propSpecClassName,
                                "const test name"))
-  }
 
-  def testPropSpecNonConst() = {
+  def testPropSpecNonConst() =
     addPropSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(13, 10, propSpecFileName),
             propSpecClassName))
-  }
-}

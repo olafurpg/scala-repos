@@ -10,14 +10,14 @@ import org.ensime.util.file._
 // a pure java project, checking that how things behave without scala
 class JavaWorkflow
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.JavaTestProject
 
-  "ensime-server" should "open the pure Java test project" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit testkit =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "open the pure Java test project" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit testkit =>
+        withProject  (project, asyncHelper) =>
           import testkit._
 
           val sourceRoot = javaMain(config)
@@ -35,8 +35,3 @@ class JavaWorkflow
                             Nil,
                             Nil,
                             Some(EmptySourcePosition())))
-        }
-      }
-    }
-  }
-}

@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.Word2Vec
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object Word2VecExample {
-  def main(args: Array[String]) {
+object Word2VecExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("Word2Vec example")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -50,6 +50,4 @@ object Word2VecExample {
     val result = model.transform(documentDF)
     result.select("result").take(3).foreach(println)
     // $example off$
-  }
-}
 // scalastyle:on println

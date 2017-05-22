@@ -8,18 +8,17 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 /**
   * @author Nikolay.Tropin
   */
-class DropTakeToSliceInspection extends OperationOnCollectionInspection {
+class DropTakeToSliceInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(DropTakeToSlice)
-}
 
-object DropTakeToSlice extends SimplificationType {
+object DropTakeToSlice extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.drop.take.with.slice")
   val takeDropHint = InspectionBundle.message("replace.take.drop.with.slice")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case qual `.drop` (m) `.take` (n) =>
         Some(
             replace(expr)
@@ -32,10 +31,9 @@ object DropTakeToSlice extends SimplificationType {
               .highlightFrom(qual)
               .withHint(takeDropHint))
       case _ => None
-    }
 
-  private def sum(left: ScExpression, right: ScExpression): ScExpression = {
-    val sumText = (left, right) match {
+  private def sum(left: ScExpression, right: ScExpression): ScExpression =
+    val sumText = (left, right) match
       case (intLiteral(l), intLiteral(r)) => s"${l + r}"
       case (intLiteral(a) `+` q, intLiteral(b)) => s"${q.getText} + ${a + b}"
       case (intLiteral(a), intLiteral(b) `+` q) => s"${q.getText} + ${a + b}"
@@ -44,20 +42,13 @@ object DropTakeToSlice extends SimplificationType {
       case (q, intLiteral(b)) => s"${q.getText} + $b"
       case (intLiteral(a), q) => s"${q.getText} + $a"
       case _ => s"${left.getText} + ${right.getText}"
-    }
     ScalaPsiElementFactory.createExpressionFromText(sumText, left.getManager)
-  }
 
-  object intLiteral {
-    def unapply(expr: ScExpression): Option[Int] = {
-      expr match {
+  object intLiteral
+    def unapply(expr: ScExpression): Option[Int] =
+      expr match
         case l: ScLiteral =>
-          l.getValue match {
+          l.getValue match
             case int: java.lang.Integer => Some(int)
             case _ => None
-          }
         case _ => None
-      }
-    }
-  }
-}

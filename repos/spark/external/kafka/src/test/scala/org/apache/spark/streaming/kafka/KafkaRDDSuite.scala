@@ -26,7 +26,7 @@ import org.scalatest.BeforeAndAfterAll
 
 import org.apache.spark._
 
-class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
+class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll
 
   private var kafkaTestUtils: KafkaTestUtils = _
 
@@ -35,25 +35,21 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     .setAppName(this.getClass.getSimpleName)
   private var sc: SparkContext = _
 
-  override def beforeAll {
+  override def beforeAll
     sc = new SparkContext(sparkConf)
     kafkaTestUtils = new KafkaTestUtils
     kafkaTestUtils.setup()
-  }
 
-  override def afterAll {
-    if (sc != null) {
+  override def afterAll
+    if (sc != null)
       sc.stop
       sc = null
-    }
 
-    if (kafkaTestUtils != null) {
+    if (kafkaTestUtils != null)
       kafkaTestUtils.teardown()
       kafkaTestUtils = null
-    }
-  }
 
-  test("basic usage") {
+  test("basic usage")
     val topic = s"topicbasic-${Random.nextInt}"
     kafkaTestUtils.createTopic(topic)
     val messages = Array("the", "quick", "brown", "fox")
@@ -88,13 +84,11 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     // invalid offset ranges throw exceptions
     val badRanges = Array(OffsetRange(topic, 0, 0, messages.size + 1))
-    intercept[SparkException] {
+    intercept[SparkException]
       KafkaUtils.createRDD[String, String, StringDecoder, StringDecoder](
           sc, kafkaParams, badRanges)
-    }
-  }
 
-  test("iterator boundary conditions") {
+  test("iterator boundary conditions")
     // the idea is to find e.g. off-by-one errors between what kafka has available and the rdd
     val topic = s"topicboundary-${Random.nextInt}"
     val sent = Map("a" -> 5, "b" -> 3, "c" -> 10)
@@ -151,12 +145,11 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(rdd3.isDefined)
     assert(rdd3.get.count === sentOnlyOne.values.sum,
            "didn't get exactly one message")
-  }
 
   // get an rdd from the committed consumer offsets until the latest leader offsets,
-  private def getRdd(kc: KafkaCluster, topics: Set[String]) = {
+  private def getRdd(kc: KafkaCluster, topics: Set[String]) =
     val groupId = kc.kafkaParams("group.id")
-    def consumerOffsets(topicPartitions: Set[TopicAndPartition]) = {
+    def consumerOffsets(topicPartitions: Set[TopicAndPartition]) =
       kc.getConsumerOffsets(groupId, topicPartitions)
         .right
         .toOption
@@ -164,25 +157,23 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
             kc.getEarliestLeaderOffsets(topicPartitions)
               .right
               .toOption
-              .map { offs =>
+              .map  offs =>
                 offs.map(kv => kv._1 -> kv._2.offset)
-              }
           )
-    }
-    kc.getPartitions(topics).right.toOption.flatMap { topicPartitions =>
-      consumerOffsets(topicPartitions).flatMap { from =>
-        kc.getLatestLeaderOffsets(topicPartitions).right.toOption.map {
+    kc.getPartitions(topics).right.toOption.flatMap  topicPartitions =>
+      consumerOffsets(topicPartitions).flatMap  from =>
+        kc.getLatestLeaderOffsets(topicPartitions).right.toOption.map
           until =>
-            val offsetRanges = from.map {
+            val offsetRanges = from.map
               case (tp: TopicAndPartition, fromOffset: Long) =>
                 OffsetRange(
                     tp.topic, tp.partition, fromOffset, until(tp).offset)
-            }.toArray
+            .toArray
 
-            val leaders = until.map {
+            val leaders = until.map
               case (tp: TopicAndPartition, lo: KafkaCluster.LeaderOffset) =>
                 tp -> Broker(lo.host, lo.port)
-            }.toMap
+            .toMap
 
             KafkaUtils
               .createRDD[String, String, StringDecoder, StringDecoder, String](
@@ -192,8 +183,3 @@ class KafkaRDDSuite extends SparkFunSuite with BeforeAndAfterAll {
                 leaders,
                 (mmd: MessageAndMetadata[String, String]) =>
                   s"${mmd.offset} ${mmd.message}")
-        }
-      }
-    }
-  }
-}

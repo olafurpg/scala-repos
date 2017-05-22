@@ -22,7 +22,7 @@ import org.apache.spark.sql.catalyst.trees.TreeNode
 import org.apache.spark.sql.types.{DataType, StructType}
 
 abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
-    extends TreeNode[PlanType] { self: PlanType =>
+    extends TreeNode[PlanType]  self: PlanType =>
 
   def output: Seq[Attribute]
 
@@ -31,14 +31,13 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * appear in the [[outputSet]].
     */
   protected def getRelevantConstraints(
-      constraints: Set[Expression]): Set[Expression] = {
+      constraints: Set[Expression]): Set[Expression] =
     constraints
       .union(inferAdditionalConstraints(constraints))
       .union(constructIsNotNullConstraints(constraints))
       .filter(constraint =>
             constraint.references.nonEmpty &&
             constraint.references.subsetOf(outputSet))
-  }
 
   /**
     * Infers a set of `isNotNull` constraints from a given set of equality/comparison expressions.
@@ -46,10 +45,10 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * `isNotNull(a)`
     */
   private def constructIsNotNullConstraints(
-      constraints: Set[Expression]): Set[Expression] = {
+      constraints: Set[Expression]): Set[Expression] =
     // Currently we only propagate constraints if the condition consists of equality
     // and ranges. For all other cases, we return an empty set of constraints
-    constraints.map {
+    constraints.map
       case EqualTo(l, r) =>
         Set(IsNotNull(l), IsNotNull(r))
       case GreaterThan(l, r) =>
@@ -64,8 +63,7 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
         Set(IsNotNull(l), IsNotNull(r))
       case _ =>
         Set.empty[Expression]
-    }.foldLeft(Set.empty[Expression])(_ union _.toSet)
-  }
+    .foldLeft(Set.empty[Expression])(_ union _.toSet)
 
   /**
     * Infers an additional set of constraints from a given set of equality constraints.
@@ -73,20 +71,18 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * additional constraint of the form `b = 5`
     */
   private def inferAdditionalConstraints(
-      constraints: Set[Expression]): Set[Expression] = {
+      constraints: Set[Expression]): Set[Expression] =
     var inferredConstraints = Set.empty[Expression]
-    constraints.foreach {
+    constraints.foreach
       case eq @ EqualTo(l: Attribute, r: Attribute) =>
-        inferredConstraints ++= (constraints - eq).map(_ transform {
+        inferredConstraints ++= (constraints - eq).map(_ transform
           case a: Attribute if a.semanticEquals(l) => r
-        })
-        inferredConstraints ++= (constraints - eq).map(_ transform {
+        )
+        inferredConstraints ++= (constraints - eq).map(_ transform
           case a: Attribute if a.semanticEquals(r) => l
-        })
+        )
       case _ => // No inference
-    }
     inferredConstraints -- constraints
-  }
 
   /**
     * An [[ExpressionSet]] that contains invariants about the rows output by this operator. For
@@ -144,9 +140,8 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * @param rule the rule to be applied to every expression in this operator.
     */
   def transformExpressions(
-      rule: PartialFunction[Expression, Expression]): this.type = {
+      rule: PartialFunction[Expression, Expression]): this.type =
     transformExpressionsDown(rule)
-  }
 
   /**
     * Runs [[transformDown]] with `rule` on all expressions present in this query operator.
@@ -154,20 +149,18 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * @param rule the rule to be applied to every expression in this operator.
     */
   def transformExpressionsDown(
-      rule: PartialFunction[Expression, Expression]): this.type = {
+      rule: PartialFunction[Expression, Expression]): this.type =
     var changed = false
 
-    @inline def transformExpressionDown(e: Expression): Expression = {
+    @inline def transformExpressionDown(e: Expression): Expression =
       val newE = e.transformDown(rule)
-      if (newE.fastEquals(e)) {
+      if (newE.fastEquals(e))
         e
-      } else {
+      else
         changed = true
         newE
-      }
-    }
 
-    def recursiveTransform(arg: Any): AnyRef = arg match {
+    def recursiveTransform(arg: Any): AnyRef = arg match
       case e: Expression => transformExpressionDown(e)
       case Some(e: Expression) => Some(transformExpressionDown(e))
       case m: Map[_, _] => m
@@ -175,12 +168,10 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       case seq: Traversable[_] => seq.map(recursiveTransform)
       case other: AnyRef => other
       case null => null
-    }
 
     val newArgs = productIterator.map(recursiveTransform).toArray
 
     if (changed) makeCopy(newArgs).asInstanceOf[this.type] else this
-  }
 
   /**
     * Runs [[transformUp]] with `rule` on all expressions present in this query operator.
@@ -189,20 +180,18 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * @return
     */
   def transformExpressionsUp(
-      rule: PartialFunction[Expression, Expression]): this.type = {
+      rule: PartialFunction[Expression, Expression]): this.type =
     var changed = false
 
-    @inline def transformExpressionUp(e: Expression): Expression = {
+    @inline def transformExpressionUp(e: Expression): Expression =
       val newE = e.transformUp(rule)
-      if (newE.fastEquals(e)) {
+      if (newE.fastEquals(e))
         e
-      } else {
+      else
         changed = true
         newE
-      }
-    }
 
-    def recursiveTransform(arg: Any): AnyRef = arg match {
+    def recursiveTransform(arg: Any): AnyRef = arg match
       case e: Expression => transformExpressionUp(e)
       case Some(e: Expression) => Some(transformExpressionUp(e))
       case m: Map[_, _] => m
@@ -210,40 +199,35 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       case seq: Traversable[_] => seq.map(recursiveTransform)
       case other: AnyRef => other
       case null => null
-    }
 
     val newArgs = productIterator.map(recursiveTransform).toArray
 
     if (changed) makeCopy(newArgs).asInstanceOf[this.type] else this
-  }
 
   /** Returns the result of running [[transformExpressions]] on this node
     * and all its children. */
   def transformAllExpressions(
-      rule: PartialFunction[Expression, Expression]): this.type = {
-    transform {
+      rule: PartialFunction[Expression, Expression]): this.type =
+    transform
       case q: QueryPlan[_] =>
         q.transformExpressions(rule).asInstanceOf[PlanType]
-    }.asInstanceOf[this.type]
-  }
+    .asInstanceOf[this.type]
 
   /** Returns all of the expressions present in this query plan operator. */
-  final def expressions: Seq[Expression] = {
+  final def expressions: Seq[Expression] =
     // Recursively find all expressions from a traversable.
     def seqToExpressions(seq: Traversable[Any]): Traversable[Expression] =
-      seq.flatMap {
+      seq.flatMap
         case e: Expression => e :: Nil
         case s: Traversable[_] => seqToExpressions(s)
         case other => Nil
-      }
 
-    productIterator.flatMap {
+    productIterator.flatMap
       case e: Expression => e :: Nil
       case Some(e: Expression) => e :: Nil
       case seq: Traversable[_] => seqToExpressions(seq)
       case other => Nil
-    }.toSeq
-  }
+    .toSeq
 
   lazy val schema: StructType = StructType.fromAttributes(output)
 
@@ -268,12 +252,11 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
   /**
     * All the subqueries of current plan.
     */
-  def subqueries: Seq[PlanType] = {
+  def subqueries: Seq[PlanType] =
     expressions.flatMap(
-        _.collect {
+        _.collect
       case e: SubqueryExpression => e.plan.asInstanceOf[PlanType]
-    })
-  }
+    )
 
   override def innerChildren: Seq[PlanType] = subqueries
 
@@ -295,21 +278,20 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
     * differences like attribute naming and or expression id differences. Operators that
     * can do better should override this function.
     */
-  def sameResult(plan: PlanType): Boolean = {
+  def sameResult(plan: PlanType): Boolean =
     val left = this.canonicalized
     val right = plan.canonicalized
     left.getClass == right.getClass &&
     left.children.size == right.children.size &&
     left.cleanArgs == right.cleanArgs &&
     (left.children, right.children).zipped.forall(_ sameResult _)
-  }
 
   /**
     * All the attributes that are used for this plan.
     */
   lazy val allAttributes: Seq[Attribute] = children.flatMap(_.output)
 
-  private def cleanExpression(e: Expression): Expression = e match {
+  private def cleanExpression(e: Expression): Expression = e match
     case a: Alias =>
       // As the root of the expression, Alias will always take an arbitrary exprId, we need
       // to erase that for equality testing.
@@ -319,16 +301,14 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
           cleanedExprId, allAttributes, allowFailures = true)
     case other =>
       BindReferences.bindReference(other, allAttributes, allowFailures = true)
-  }
 
   /** Args that have cleaned such that differences in expression id should not affect equality */
-  protected lazy val cleanArgs: Seq[Any] = {
-    def cleanArg(arg: Any): Any = arg match {
+  protected lazy val cleanArgs: Seq[Any] =
+    def cleanArg(arg: Any): Any = arg match
       case e: Expression => cleanExpression(e).canonicalized
       case other => other
-    }
 
-    productIterator.map {
+    productIterator.map
       // Children are checked using sameResult above.
       case tn: TreeNode[_] if containsChild(tn) => null
       case e: Expression => cleanArg(e)
@@ -336,6 +316,4 @@ abstract class QueryPlan[PlanType <: QueryPlan[PlanType]]
       case s: Seq[_] => s.map(cleanArg)
       case m: Map[_, _] => m.mapValues(cleanArg)
       case other => other
-    }.toSeq
-  }
-}
+    .toSeq

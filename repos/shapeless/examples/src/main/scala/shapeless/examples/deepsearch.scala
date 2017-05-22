@@ -21,53 +21,44 @@ package shapeless.examples
   *
   * @author Travis Brown
   */
-object DeepSearchExamples extends App {
+object DeepSearchExamples extends App
   import shapeless._
 
   // Evidence that an A is something that we can look around in for Qs that
   // satisfy some predicate.
-  trait Searchable[A, Q] {
+  trait Searchable[A, Q]
     def find(p: Q => Boolean)(a: A): Option[Q]
-  }
 
-  trait LowPrioritySearchable {
+  trait LowPrioritySearchable
     implicit def hlistishSearchable[A, L <: HList, Q](
         implicit gen: Generic.Aux[A, L],
         s: Searchable[L, Q]
-    ): Searchable[A, Q] = new Searchable[A, Q] {
+    ): Searchable[A, Q] = new Searchable[A, Q]
       def find(p: Q => Boolean)(a: A) = s.find(p)(gen to a)
-    }
-  }
 
-  object Searchable extends LowPrioritySearchable {
-    implicit def elemSearchable[A]: Searchable[A, A] = new Searchable[A, A] {
+  object Searchable extends LowPrioritySearchable
+    implicit def elemSearchable[A]: Searchable[A, A] = new Searchable[A, A]
       def find(p: A => Boolean)(a: A) = if (p(a)) Some(a) else None
-    }
 
     implicit def listSearchable[A, Q](
         implicit s: Searchable[A, Q]): Searchable[List[A], Q] =
-      new Searchable[List[A], Q] {
+      new Searchable[List[A], Q]
         def find(p: Q => Boolean)(a: List[A]) = a.flatMap(s.find(p)).headOption
-      }
 
     implicit def hnilSearchable[Q]: Searchable[HNil, Q] =
-      new Searchable[HNil, Q] {
+      new Searchable[HNil, Q]
         def find(p: Q => Boolean)(a: HNil) = None
-      }
 
     implicit def hlistSearchable[H, T <: HList, Q](
         implicit hs: Searchable[H, Q] = null,
         ts: Searchable[T, Q]
-    ): Searchable[H :: T, Q] = new Searchable[H :: T, Q] {
+    ): Searchable[H :: T, Q] = new Searchable[H :: T, Q]
       def find(p: Q => Boolean)(a: H :: T) =
         Option(hs).flatMap(_.find(p)(a.head)) orElse ts.find(p)(a.tail)
-    }
-  }
 
-  case class SearchableWrapper[A](a: A) {
+  case class SearchableWrapper[A](a: A)
     def deepFind[Q](p: Q => Boolean)(implicit s: Searchable[A, Q]) =
       s.find(p)(a)
-  }
 
   implicit def wrapSearchable[A](a: A): SearchableWrapper[A] =
     SearchableWrapper(a)
@@ -98,4 +89,3 @@ object DeepSearchExamples extends App {
   // And it works:
   assert(Foo("four", "three", List("two", "one")).deepFind(p) == Some("two"))
   assert(Foo("a", "b", "c" :: Nil).deepFind(p) == None)
-}

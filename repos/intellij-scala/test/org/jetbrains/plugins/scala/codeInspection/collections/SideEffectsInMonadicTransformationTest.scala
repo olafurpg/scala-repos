@@ -6,20 +6,19 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
   * @author Nikolay.Tropin
   */
 class SideEffectsInMonadicTransformationTest
-    extends OperationsOnCollectionInspectionTest {
+    extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[SideEffectsInMonadicTransformationInspection]
   override def hint: String =
     InspectionBundle.message("side.effects.in.monadic")
 
-  def testInfixAssignment(): Unit = {
+  def testInfixAssignment(): Unit =
     check(s"""
         |var a = 0
         |Seq(1, 2).map(${START}a += _$END)
       """.stripMargin)
-  }
 
-  def testAssignment(): Unit = {
+  def testAssignment(): Unit =
     check(s"""
          |var filtered = 0
          |Seq(1, 2).filter { x =>
@@ -30,9 +29,8 @@ class SideEffectsInMonadicTransformationTest
          |  else false
          |}
        """.stripMargin)
-  }
 
-  def testInnerVar(): Unit = {
+  def testInnerVar(): Unit =
     checkTextHasNoErrors("""
         |Seq(1, 2).map { x =>
         |  var b = true
@@ -42,9 +40,8 @@ class SideEffectsInMonadicTransformationTest
         |  x + 1
         |}
       """.stripMargin)
-  }
 
-  def testIteratorNext(): Unit = {
+  def testIteratorNext(): Unit =
     check(
         s"""
         |val it = Iterator(1, 2)
@@ -54,9 +51,8 @@ class SideEffectsInMonadicTransformationTest
         |}
       """.stripMargin
     )
-  }
 
-  def testCollectionMethods(): Unit = {
+  def testCollectionMethods(): Unit =
     check(
         s"""
          |import scala.collection.mutable.ArrayBuffer
@@ -116,9 +112,8 @@ class SideEffectsInMonadicTransformationTest
          |}
       """.stripMargin
     )
-  }
 
-  def testUpdateMethod(): Unit = {
+  def testUpdateMethod(): Unit =
     check(s"""
        |import scala.collection.mutable.ArrayBuffer
        |val buf = ArrayBuffer(1, 2)
@@ -142,9 +137,8 @@ class SideEffectsInMonadicTransformationTest
          |}
       """.stripMargin
     )
-  }
 
-  def testUnitTypeMethod(): Unit = {
+  def testUnitTypeMethod(): Unit =
     check(s"""
           |val s = ""
           |Seq(1, 2).map {x =>
@@ -165,9 +159,8 @@ class SideEffectsInMonadicTransformationTest
         |}
         |val x: Seq[(Int) => Unit] = Seq(1, 2).map(x => foo _)
       """.stripMargin)
-  }
 
-  def testScalaSetter(): Unit = {
+  def testScalaSetter(): Unit =
     check(
         s"""
         |class A {
@@ -186,9 +179,8 @@ class SideEffectsInMonadicTransformationTest
        |Seq(1).map(x => ${START}a.z = x$END)
       """.stripMargin
     )
-  }
 
-  def testJavaSetter(): Unit = {
+  def testJavaSetter(): Unit =
     check(
         s"""
        |class A {
@@ -216,9 +208,8 @@ class SideEffectsInMonadicTransformationTest
          |}
       """.stripMargin
     )
-  }
 
-  def testExpressionsInOtherClasses(): Unit = {
+  def testExpressionsInOtherClasses(): Unit =
     checkTextHasNoErrors("""
         |Seq(1, 2).filter { x =>
         |  Seq(3, 4).foreach {
@@ -236,5 +227,3 @@ class SideEffectsInMonadicTransformationTest
         |  true
         |}
       """.stripMargin)
-  }
-}

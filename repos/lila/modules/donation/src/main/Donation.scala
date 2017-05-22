@@ -14,12 +14,11 @@ case class Donation(_id: String, // random ID
                     net: Int, // $ cents
                     message: String,
                     public: Boolean,
-                    publicAmount: Boolean) {
+                    publicAmount: Boolean)
 
   def nonEmptyMessage = Some(message.trim) filter (_.nonEmpty)
-}
 
-object Donation {
+object Donation
 
   def make(payPalTnx: Option[String],
            payPalSub: Option[String],
@@ -42,4 +41,3 @@ object Donation {
              message = message,
              public = true,
              publicAmount = false)
-}

@@ -2,7 +2,6 @@ package test
 
 import idea.Tag
 
-class O {
+class O
   val t = new Tag
   t.< ref > tag
-}

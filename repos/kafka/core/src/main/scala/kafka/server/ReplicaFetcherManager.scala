@@ -28,16 +28,15 @@ class ReplicaFetcherManager(brokerConfig: KafkaConfig,
     extends AbstractFetcherManager(
         "ReplicaFetcherManager on broker " + brokerConfig.brokerId,
         "Replica",
-        brokerConfig.numReplicaFetchers) {
+        brokerConfig.numReplicaFetchers)
 
   override def createFetcherThread(
-      fetcherId: Int, sourceBroker: BrokerEndPoint): AbstractFetcherThread = {
-    val threadName = threadNamePrefix match {
+      fetcherId: Int, sourceBroker: BrokerEndPoint): AbstractFetcherThread =
+    val threadName = threadNamePrefix match
       case None =>
         "ReplicaFetcherThread-%d-%d".format(fetcherId, sourceBroker.id)
       case Some(p) =>
         "%s:ReplicaFetcherThread-%d-%d".format(p, fetcherId, sourceBroker.id)
-    }
     new ReplicaFetcherThread(threadName,
                              fetcherId,
                              sourceBroker,
@@ -45,11 +44,8 @@ class ReplicaFetcherManager(brokerConfig: KafkaConfig,
                              replicaMgr,
                              metrics,
                              time)
-  }
 
-  def shutdown() {
+  def shutdown()
     info("shutting down")
     closeAllFetchers()
     info("shutdown completed")
-  }
-}

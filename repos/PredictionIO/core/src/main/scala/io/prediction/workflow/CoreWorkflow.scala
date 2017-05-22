@@ -32,7 +32,7 @@ import scala.language.existentials
 /** CoreWorkflow handles PredictionIO metadata and environment variables of
   * training and evaluation.
   */
-object CoreWorkflow {
+object CoreWorkflow
   @transient lazy val logger = Logger[this.type]
   @transient lazy val engineInstances = Storage.getMetaDataEngineInstances
   @transient lazy val evaluationInstances =
@@ -43,20 +43,19 @@ object CoreWorkflow {
       engineParams: EngineParams,
       engineInstance: EngineInstance,
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      params: WorkflowParams = WorkflowParams()) {
+      params: WorkflowParams = WorkflowParams())
     logger.debug("Starting SparkContext")
     val mode = "training"
     WorkflowUtils.checkUpgrade(mode, engineInstance.engineFactory)
 
     val batch =
-      if (params.batch.nonEmpty) {
+      if (params.batch.nonEmpty)
         s"{engineInstance.engineFactory} (${params.batch}})"
-      } else {
+      else
         engineInstance.engineFactory
-      }
     val sc = WorkflowContext(batch, env, params.sparkEnv, mode.capitalize)
 
-    try {
+    try
 
       val models: Seq[Any] = engine.train(
           sc = sc,
@@ -82,16 +81,13 @@ object CoreWorkflow {
           ))
 
       logger.info("Training completed successfully.")
-    } catch {
+    catch
       case e @ (_: StopAfterReadInterruption |
-          _: StopAfterPrepareInterruption) => {
+          _: StopAfterPrepareInterruption) =>
           logger.info(s"Training interrupted by $e.")
-        }
-    } finally {
+    finally
       logger.debug("Stopping SparkContext")
       sc.stop()
-    }
-  }
 
   def runEvaluation[EI, Q, P, A, R <: BaseEvaluatorResult](
       evaluation: Evaluation,
@@ -100,7 +96,7 @@ object CoreWorkflow {
       evaluationInstance: EvaluationInstance,
       evaluator: BaseEvaluator[EI, Q, P, A, R],
       env: Map[String, String] = WorkflowUtils.pioEnvVars,
-      params: WorkflowParams = WorkflowParams()) {
+      params: WorkflowParams = WorkflowParams())
     logger.info("runEvaluation started")
     logger.debug("Start SparkContext")
 
@@ -109,11 +105,10 @@ object CoreWorkflow {
     WorkflowUtils.checkUpgrade(mode, engine.getClass.getName)
 
     val batch =
-      if (params.batch.nonEmpty) {
+      if (params.batch.nonEmpty)
         s"{evaluation.getClass.getName} (${params.batch}})"
-      } else {
+      else
         evaluation.getClass.getName
-      }
     val sc = WorkflowContext(batch, env, params.sparkEnv, mode.capitalize)
     val evaluationInstanceId = evaluationInstances.insert(evaluationInstance)
 
@@ -127,10 +122,10 @@ object CoreWorkflow {
                                        evaluator,
                                        params)
 
-    if (evaluatorResult.noSave) {
+    if (evaluatorResult.noSave)
       logger.info(
           s"This evaluation result is not inserted into database: $evaluatorResult")
-    } else {
+    else
       val evaluatedEvaluationInstance = evaluationInstance.copy(
           status = "EVALCOMPLETED",
           id = evaluationInstanceId,
@@ -144,12 +139,9 @@ object CoreWorkflow {
           s"Updating evaluation instance with result: $evaluatorResult")
 
       evaluationInstances.update(evaluatedEvaluationInstance)
-    }
 
     logger.debug("Stop SparkContext")
 
     sc.stop()
 
     logger.info("runEvaluation completed")
-  }
-}

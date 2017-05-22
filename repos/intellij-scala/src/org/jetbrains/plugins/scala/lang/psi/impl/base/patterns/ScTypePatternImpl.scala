@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * Date: 28.02.2008
   */
 class ScTypePatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypePattern {
+    extends ScalaPsiElementImpl(node) with ScTypePattern
   override def toString: String = "TypePattern"
-}

@@ -9,8 +9,7 @@ package types
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-trait ScTupleTypeElement extends ScTypeElement {
+trait ScTupleTypeElement extends ScTypeElement
   def typeList = findChildByClassScala(classOf[ScTypes])
 
   def components = typeList.types
-}

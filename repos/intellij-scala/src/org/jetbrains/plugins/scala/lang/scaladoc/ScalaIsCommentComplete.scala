@@ -11,16 +11,15 @@ import org.jetbrains.plugins.scala.ScalaFileType
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaIsCommentComplete extends CommentCompleteHandler {
+class ScalaIsCommentComplete extends CommentCompleteHandler
   def isApplicable(comment: PsiComment,
-                   commenter: CodeDocumentationAwareCommenter): Boolean = {
+                   commenter: CodeDocumentationAwareCommenter): Boolean =
     comment.getParent.getLanguage == ScalaFileType.SCALA_LANGUAGE
-  }
 
   //same code in com.intellij.codeInsight.editorActions.EnterHandler
   def isCommentComplete(comment: PsiComment,
                         commenter: CodeDocumentationAwareCommenter,
-                        editor: Editor): Boolean = {
+                        editor: Editor): Boolean =
     val commentText: String = comment.getText
     val docComment: Boolean = isDocComment(comment, commenter)
     val expectedCommentEnd: String =
@@ -40,70 +39,56 @@ class ScalaIsCommentComplete extends CommentCompleteHandler {
                 commentText.length)
     val fileTypeHandler: QuoteHandler =
       TypedHandler.getQuoteHandler(containingFile, editor)
-    val javaLikeQuoteHandler: JavaLikeQuoteHandler = fileTypeHandler match {
+    val javaLikeQuoteHandler: JavaLikeQuoteHandler = fileTypeHandler match
       case quoteHandler: JavaLikeQuoteHandler => quoteHandler
       case _ => null
-    }
-    while (true) {
+    while (true)
       val tokenType: IElementType = lexer.getTokenType
-      if (tokenType eq null) {
+      if (tokenType eq null)
         return false
-      }
       if (javaLikeQuoteHandler != null &&
           javaLikeQuoteHandler.getStringTokenTypes != null &&
-          javaLikeQuoteHandler.getStringTokenTypes.contains(tokenType)) {
+          javaLikeQuoteHandler.getStringTokenTypes.contains(tokenType))
         val text: String =
           commentText.substring(lexer.getTokenStart, lexer.getTokenEnd)
         val endOffset: Int = comment.getTextRange.getEndOffset
         if (text.endsWith(expectedCommentEnd) &&
             endOffset < containingFile.getTextLength &&
-            containingFile.getText.charAt(endOffset) == '\n') {
+            containingFile.getText.charAt(endOffset) == '\n')
           return true
-        }
-      }
       var continue = false
-      if (lexer.getTokenEnd == commentText.length) {
-        if (lexer.getTokenType eq commenter.getLineCommentTokenType) {
+      if (lexer.getTokenEnd == commentText.length)
+        if (lexer.getTokenType eq commenter.getLineCommentTokenType)
           lexer.start(
               commentText,
               lexer.getTokenStart + commenter.getLineCommentPrefix.length,
               commentText.length)
           lexer.advance()
           continue = true
-        } else if (isInvalidPsi(comment)) {
+        else if (isInvalidPsi(comment))
           return false
-        } else {
+        else
           return lexer.getTokenEnd -
           lexer.getTokenStart == 2 //difference from EnterHandler
-        }
-      }
       if (!continue &&
           (tokenType == commenter.getDocumentationCommentTokenType ||
-              tokenType == commenter.getBlockCommentTokenType)) {
+              tokenType == commenter.getBlockCommentTokenType))
         return false
-      } else if (!continue) {
+      else if (!continue)
         lexer.advance()
-      }
-    }
     false
-  }
 
   private def isDocComment(
       element: PsiElement,
-      commenter: CodeDocumentationAwareCommenter): Boolean = {
+      commenter: CodeDocumentationAwareCommenter): Boolean =
     if (!element.isInstanceOf[PsiComment]) return false
     val comment: PsiComment = element.asInstanceOf[PsiComment]
     commenter.isDocumentationComment(comment)
-  }
 
-  private def isInvalidPsi(base: PsiElement): Boolean = {
+  private def isInvalidPsi(base: PsiElement): Boolean =
     var current: PsiElement = base.getNextSibling
-    while (current != null) {
-      if (current.getTextLength != 0) {
+    while (current != null)
+      if (current.getTextLength != 0)
         return current.isInstanceOf[PsiErrorElement]
-      }
       current = current.getNextSibling
-    }
     false
-  }
-}

@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author Miles Sabin
   */
-object RecordExamples extends App {
+object RecordExamples extends App
   import shapeless._
   import record._
   import ops.hlist.ToList
@@ -32,12 +32,10 @@ object RecordExamples extends App {
       implicit keys: Keys.Aux[B, K],
       values: Values.Aux[B, V],
       ktl: ToList[K, Any],
-      vtl: ToList[V, Any]) = {
-    (b.keys.toList zip b.values.toList) foreach {
+      vtl: ToList[V, Any]) =
+    (b.keys.toList zip b.values.toList) foreach
       case (field, value) => println(field + ": " + value)
-    }
     println
-  }
 
   val book =
     ("author" ->> "Benjamin Pierce") ::
@@ -62,4 +60,3 @@ object RecordExamples extends App {
   // Remove a field
   val noId = extended - "id"
   printBook(noId)
-}

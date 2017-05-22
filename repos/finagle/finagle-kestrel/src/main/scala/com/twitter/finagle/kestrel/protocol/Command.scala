@@ -5,10 +5,9 @@ import com.twitter.util.{Time, Duration}
 
 sealed abstract class Command(val name: String)
 
-sealed abstract class GetCommand(name: String) extends Command(name) {
+sealed abstract class GetCommand(name: String) extends Command(name)
   val queueName: Buf
   val timeout: Option[Duration]
-}
 
 case class Get(val queueName: Buf, val timeout: Option[Duration] = None)
     extends GetCommand("Get")

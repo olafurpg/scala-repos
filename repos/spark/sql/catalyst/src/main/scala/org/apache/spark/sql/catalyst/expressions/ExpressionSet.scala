@@ -20,15 +20,13 @@ package org.apache.spark.sql.catalyst.expressions
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
-object ExpressionSet {
+object ExpressionSet
 
   /** Constructs a new [[ExpressionSet]] by applying [[Canonicalize]] to `expressions`. */
-  def apply(expressions: TraversableOnce[Expression]): ExpressionSet = {
+  def apply(expressions: TraversableOnce[Expression]): ExpressionSet =
     val set = new ExpressionSet()
     expressions.foreach(set.add)
     set
-  }
-}
 
 /**
   * A [[Set]] where membership is determined based on a canonical representation of an [[Expression]]
@@ -51,30 +49,26 @@ object ExpressionSet {
 class ExpressionSet protected (
     protected val baseSet: mutable.Set[Expression] = new mutable.HashSet,
     protected val originals: mutable.Buffer[Expression] = new ArrayBuffer)
-    extends Set[Expression] {
+    extends Set[Expression]
 
-  protected def add(e: Expression): Unit = {
-    if (!baseSet.contains(e.canonicalized)) {
+  protected def add(e: Expression): Unit =
+    if (!baseSet.contains(e.canonicalized))
       baseSet.add(e.canonicalized)
       originals.append(e)
-    }
-  }
 
   override def contains(elem: Expression): Boolean =
     baseSet.contains(elem.canonicalized)
 
-  override def +(elem: Expression): ExpressionSet = {
+  override def +(elem: Expression): ExpressionSet =
     val newSet = new ExpressionSet(baseSet.clone(), originals.clone())
     newSet.add(elem)
     newSet
-  }
 
-  override def -(elem: Expression): ExpressionSet = {
+  override def -(elem: Expression): ExpressionSet =
     val newBaseSet = baseSet.clone().filterNot(_ == elem.canonicalized)
     val newOriginals =
       originals.clone().filterNot(_.canonicalized == elem.canonicalized)
     new ExpressionSet(newBaseSet, newOriginals)
-  }
 
   override def iterator: Iterator[Expression] = originals.iterator
 
@@ -87,4 +81,3 @@ class ExpressionSet protected (
        |baseSet: ${baseSet.mkString(", ")}
        |originals: ${originals.mkString(", ")}
      """.stripMargin
-}

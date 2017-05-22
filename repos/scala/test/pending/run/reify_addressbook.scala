@@ -1,14 +1,14 @@
 import scala.reflect.runtime.universe._
 import scala.tools.reflect.Eval
 
-object Test extends App {
-  reify {
+object Test extends App
+  reify
     case class Person(name: String, age: Int)
 
     /** An AddressBook takes a variable number of arguments
       *  which are accessed as a Sequence
       */
-    class AddressBook(a: Person*) {
+    class AddressBook(a: Person*)
       private val people: List[Person] = a.toList
 
       /** Serialize to XHTML. Scala supports XML literals
@@ -21,14 +21,13 @@ object Test extends App {
             <th>Name</th>
             <th>Age</th>
           </tr>
-          { for (p <- people) yield
+           for (p <- people) yield
               <tr>
                 <td> { p.name } </td>
                 <td> { p.age.toString() } </td>
               </tr>
-          }
+          
         </table>;
-    }
 
     /** We introduce CSS using raw strings (between triple
       *  quotes). Raw strings may contain newlines and special
@@ -38,11 +37,11 @@ object Test extends App {
         <title>
           { "My Address Book" }
         </title>
-        <style type="text/css"> {
+        <style type="text/css"> 
        """table { border-right: 1px solid #cccccc; }
           th { background-color: #cccccc; }
           td { border-left: 1px solid #acacac; }
-          td { border-bottom: 1px solid #acacac;"""}
+          td { border-bottom: 1px solid #acacac;"""
         </style>
       </head>;
 
@@ -57,5 +56,4 @@ object Test extends App {
       </html>;
 
     println(page)
-  }.eval
-}
+  .eval

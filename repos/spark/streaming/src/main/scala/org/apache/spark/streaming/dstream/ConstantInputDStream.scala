@@ -26,7 +26,7 @@ import org.apache.spark.streaming.{StreamingContext, Time}
   * An input stream that always returns the same RDD on each timestep. Useful for testing.
   */
 class ConstantInputDStream[T : ClassTag](_ssc: StreamingContext, rdd: RDD[T])
-    extends InputDStream[T](_ssc) {
+    extends InputDStream[T](_ssc)
 
   require(
       rdd != null,
@@ -36,7 +36,5 @@ class ConstantInputDStream[T : ClassTag](_ssc: StreamingContext, rdd: RDD[T])
 
   override def stop() {}
 
-  override def compute(validTime: Time): Option[RDD[T]] = {
+  override def compute(validTime: Time): Option[RDD[T]] =
     Some(rdd)
-  }
-}

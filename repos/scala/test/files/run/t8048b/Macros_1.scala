@@ -8,30 +8,26 @@
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
-object Macros {
-  def impl1(c: Context) = {
+object Macros
+  def impl1(c: Context) =
     import c.universe._
     q"""
       trait Foo { def x = 2 }
       new Foo {}
     """
-  }
   def foo1: Any = macro impl1
 
-  def impl2(c: Context) = {
+  def impl2(c: Context) =
     import c.universe._
     q"""
       class Foo { def x = 2 }
       new Foo
     """
-  }
   def foo2: Any = macro impl2
 
-  def impl3(c: Context) = {
+  def impl3(c: Context) =
     import c.universe._
     q"""
       new { def x = 2 }
     """
-  }
   def foo3: Any = macro impl3
-}

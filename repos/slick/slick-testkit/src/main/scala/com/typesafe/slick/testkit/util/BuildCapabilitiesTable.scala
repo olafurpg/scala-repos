@@ -8,13 +8,12 @@ import slick.relational.RelationalCapabilities
 import slick.sql.SqlCapabilities
 
 /** Build a table of supported capability flags for the user manual. */
-object BuildCapabilitiesTable extends App {
+object BuildCapabilitiesTable extends App
   // testkit/runMain com.typesafe.slick.testkit.util.BuildCapabilitiesTable ../src/sphinx/capabilities.csv
-  if (args.length < 1 || args.length > 2) {
+  if (args.length < 1 || args.length > 2)
     println(
         "Syntax: com.typesafe.slick.testkit.util.BuildCapabilitiesTable OUTPUTFILE [PROFILELIST]")
     System.exit(1)
-  }
 
   val profileNames =
     if (args.length > 1) args(1).split(",")
@@ -31,13 +30,12 @@ object BuildCapabilitiesTable extends App {
           "slick.jdbc.SQLServerProfile"
       )
 
-  val profiles = profileNames.map { n =>
+  val profiles = profileNames.map  n =>
     Class
       .forName(n + "$")
       .getField("MODULE$")
       .get(null)
       .asInstanceOf[BasicProfile]
-  }
 
   val profileCapabilities = Vector(
       RelationalCapabilities.all -> "slick.relational.RelationalCapabilities$@",
@@ -45,26 +43,24 @@ object BuildCapabilitiesTable extends App {
       JdbcCapabilities.all -> "slick.jdbc.JdbcCapabilities$@"
   )
 
-  val capabilities = for {
+  val capabilities = for
     (caps, linkBase) <- profileCapabilities
     cap <- caps.toVector
       .sortBy(c => if (c.toString.endsWith(".other")) "" else c.toString)
-  } yield
+  yield
     (cap,
      linkBase + cap.toString.replaceFirst(".*\\.", "") +
      ":slick.basic.Capability")
 
   val out = new FileOutputStream(args(0))
-  try {
+  try
     val wr = new PrintWriter(
         new BufferedWriter(new OutputStreamWriter(out, "UTF-8")))
     wr.println(
         "Capability," + profileNames.map(n => s":api:`$n`").mkString(","))
-    for ((cap, link) <- capabilities) {
+    for ((cap, link) <- capabilities)
       val flags = profiles.map(d => d.capabilities.contains(cap))
       wr.println(s":api:`$cap <$link>`," +
           flags.map(b => if (b) "Yes" else "").mkString(","))
-    }
     wr.flush()
-  } finally out.close()
-}
+  finally out.close()

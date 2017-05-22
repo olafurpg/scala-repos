@@ -32,8 +32,8 @@ import org.apache.spark.util.{RedirectThread, Utils}
   * A main class used to launch Python applications. It executes python as a
   * subprocess and then has it connect back to the JVM to access system properties, etc.
   */
-object PythonRunner {
-  def main(args: Array[String]) {
+object PythonRunner
+  def main(args: Array[String])
     val pythonFile = args(0)
     val pyFiles = args(1)
     val otherArgs = args.slice(2, args.length)
@@ -48,11 +48,10 @@ object PythonRunner {
     // Java system properties and such
     val gatewayServer = new py4j.GatewayServer(null, 0)
     val thread = new Thread(
-        new Runnable() {
-      override def run(): Unit = Utils.logUncaughtExceptions {
+        new Runnable()
+      override def run(): Unit = Utils.logUncaughtExceptions
         gatewayServer.start()
-      }
-    })
+    )
     thread.setName("py4j-gateway-init")
     thread.setDaemon(true)
     thread.start()
@@ -80,20 +79,17 @@ object PythonRunner {
     env.put("PYTHONUNBUFFERED", "YES") // value is needed to be set to a non-empty string
     env.put("PYSPARK_GATEWAY_PORT", "" + gatewayServer.getListeningPort)
     builder.redirectErrorStream(true) // Ugly but needed for stdout and stderr to synchronize
-    try {
+    try
       val process = builder.start()
 
       new RedirectThread(process.getInputStream, System.out, "redirect output")
         .start()
 
       val exitCode = process.waitFor()
-      if (exitCode != 0) {
+      if (exitCode != 0)
         throw new SparkUserAppException(exitCode)
-      }
-    } finally {
+    finally
       gatewayServer.shutdown()
-    }
-  }
 
   /**
     * Format the python file path so that it can be added to the PYTHONPATH correctly.
@@ -102,41 +98,33 @@ object PythonRunner {
     * PYTHONPATH, we need to extract the path from the URI. This is safe to do because we
     * currently only support local python files.
     */
-  def formatPath(path: String, testWindows: Boolean = false): String = {
-    if (Utils.nonLocalPaths(path, testWindows).nonEmpty) {
+  def formatPath(path: String, testWindows: Boolean = false): String =
+    if (Utils.nonLocalPaths(path, testWindows).nonEmpty)
       throw new IllegalArgumentException(
           "Launching Python applications through " +
           s"spark-submit is currently only supported for local files: $path")
-    }
     // get path when scheme is file.
     val uri = Try(new URI(path)).getOrElse(new File(path).toURI)
-    var formattedPath = uri.getScheme match {
+    var formattedPath = uri.getScheme match
       case null => path
       case "file" | "local" => uri.getPath
       case _ => null
-    }
 
     // Guard against malformed paths potentially throwing NPE
-    if (formattedPath == null) {
+    if (formattedPath == null)
       throw new IllegalArgumentException(
           s"Python file path is malformed: $path")
-    }
 
     // In Windows, the drive should not be prefixed with "/"
     // For instance, python does not understand "/C:/path/to/sheep.py"
-    if (Utils.isWindows && formattedPath.matches("/[a-zA-Z]:/.*")) {
+    if (Utils.isWindows && formattedPath.matches("/[a-zA-Z]:/.*"))
       formattedPath = formattedPath.stripPrefix("/")
-    }
     formattedPath
-  }
 
   /**
     * Format each python file path in the comma-delimited list of paths, so it can be
     * added to the PYTHONPATH correctly.
     */
-  def formatPaths(paths: String, testWindows: Boolean = false): Array[String] = {
-    Option(paths).getOrElse("").split(",").filter(_.nonEmpty).map { p =>
+  def formatPaths(paths: String, testWindows: Boolean = false): Array[String] =
+    Option(paths).getOrElse("").split(",").filter(_.nonEmpty).map  p =>
       formatPath(p, testWindows)
-    }
-  }
-}

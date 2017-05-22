@@ -32,16 +32,16 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Side
 import scalafx.scene.Scene
 
-object BubbleChartDemo extends JFXApp {
+object BubbleChartDemo extends JFXApp
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "BubbleChartDemo"
-    scene = new Scene {
+    scene = new Scene
       val xAxis = NumberAxis(
           "X", lowerBound = 0, upperBound = 150, tickUnit = 20)
       val yAxis = NumberAxis(
           "Y", lowerBound = 0, upperBound = 150, tickUnit = 20)
-      root = new BubbleChart(xAxis, yAxis) {
+      root = new BubbleChart(xAxis, yAxis)
         title = "Bubble Chart"
         legendSide = Side.Right
         data = ObservableBuffer(
@@ -58,17 +58,13 @@ object BubbleChartDemo extends JFXApp {
                           (30, 40, 6),
                           (50, 20, 12)))
         )
-      }
-    }
-  }
 
   /** Create XYChart.Series from a sequence of number triplets (x, y, radius). */
   def xyrSeries(name: String, data: Seq[(Int, Int, Int)]) =
     XYChart.Series[Number, Number](
         name,
         ObservableBuffer(
-            data.map {
+            data.map
           case (x, y, r) => XYChart.Data[Number, Number](x, y, r)
-        })
+        )
     )
-}

@@ -26,7 +26,7 @@ import org.apache.spark.rdd.RDD
 /** This object provides a set of operation to access Event Store
   * with Spark's parallelization
   */
-object PEventStore {
+object PEventStore
 
   @transient lazy private val eventsDb = Storage.getPEvents()
 
@@ -60,7 +60,7 @@ object PEventStore {
       eventNames: Option[Seq[String]] = None,
       targetEntityType: Option[Option[String]] = None,
       targetEntityId: Option[Option[String]] = None
-  )(sc: SparkContext): RDD[Event] = {
+  )(sc: SparkContext): RDD[Event] =
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
@@ -75,7 +75,6 @@ object PEventStore {
         targetEntityType = targetEntityType,
         targetEntityId = targetEntityId
     )(sc)
-  }
 
   /** Aggregate properties of entities based on these special events:
     * \$set, \$unset, \$delete events.
@@ -95,7 +94,7 @@ object PEventStore {
                           startTime: Option[DateTime] = None,
                           untilTime: Option[DateTime] = None,
                           required: Option[Seq[String]] = None)(
-      sc: SparkContext): RDD[(String, PropertyMap)] = {
+      sc: SparkContext): RDD[(String, PropertyMap)] =
 
     val (appId, channelId) = Common.appNameToId(appName, channelName)
 
@@ -107,5 +106,3 @@ object PEventStore {
         untilTime = untilTime,
         required = required
     )(sc)
-  }
-}

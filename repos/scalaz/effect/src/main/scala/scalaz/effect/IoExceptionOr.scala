@@ -1,7 +1,7 @@
 package scalaz
 package effect
 
-sealed abstract class IoExceptionOr[A] {
+sealed abstract class IoExceptionOr[A]
 
   import IoExceptionOr._
 
@@ -24,28 +24,23 @@ sealed abstract class IoExceptionOr[A] {
 
   def valueOr(a: => A): A =
     fold(_ => a, x => x)
-}
 
-object IoExceptionOr {
+object IoExceptionOr
   def apply[A](a: => A): IoExceptionOr[A] =
-    try {
+    try
       ioExceptionOr(a)
-    } catch {
+    catch
       case e: java.io.IOException => ioException(e)
-    }
   def unapply[A](ioExceptionOr: IoExceptionOr[A]) = ioExceptionOr.toOption
 
   type IoException = java.io.IOException
 
   def ioException[A]: IoException => IoExceptionOr[A] =
     e =>
-      new IoExceptionOr[A] {
+      new IoExceptionOr[A]
         def fold[X](ioException: IoException => X, or: A => X) =
           ioException(e)
-    }
 
-  def ioExceptionOr[A](a: A): IoExceptionOr[A] = new IoExceptionOr[A] {
+  def ioExceptionOr[A](a: A): IoExceptionOr[A] = new IoExceptionOr[A]
     def fold[X](ioException: IoException => X, or: A => X) =
       or(a)
-  }
-}

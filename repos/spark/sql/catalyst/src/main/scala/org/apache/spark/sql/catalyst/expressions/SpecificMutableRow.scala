@@ -59,132 +59,107 @@ import org.apache.spark.sql.types._
   * }.foreach(println)
   * }}}
   */
-abstract class MutableValue extends Serializable {
+abstract class MutableValue extends Serializable
   var isNull: Boolean = true
   def boxed: Any
   def update(v: Any)
   def copy(): MutableValue
-}
 
-final class MutableInt extends MutableValue {
+final class MutableInt extends MutableValue
   var value: Int = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = {
+  override def update(v: Any): Unit =
     isNull = false
     value = v.asInstanceOf[Int]
-  }
-  override def copy(): MutableInt = {
+  override def copy(): MutableInt =
     val newCopy = new MutableInt
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableFloat extends MutableValue {
+final class MutableFloat extends MutableValue
   var value: Float = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = {
+  override def update(v: Any): Unit =
     isNull = false
     value = v.asInstanceOf[Float]
-  }
-  override def copy(): MutableFloat = {
+  override def copy(): MutableFloat =
     val newCopy = new MutableFloat
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableBoolean extends MutableValue {
+final class MutableBoolean extends MutableValue
   var value: Boolean = false
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = {
+  override def update(v: Any): Unit =
     isNull = false
     value = v.asInstanceOf[Boolean]
-  }
-  override def copy(): MutableBoolean = {
+  override def copy(): MutableBoolean =
     val newCopy = new MutableBoolean
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableDouble extends MutableValue {
+final class MutableDouble extends MutableValue
   var value: Double = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = {
+  override def update(v: Any): Unit =
     isNull = false
     value = v.asInstanceOf[Double]
-  }
-  override def copy(): MutableDouble = {
+  override def copy(): MutableDouble =
     val newCopy = new MutableDouble
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableShort extends MutableValue {
+final class MutableShort extends MutableValue
   var value: Short = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = value = {
+  override def update(v: Any): Unit = value =
     isNull = false
     v.asInstanceOf[Short]
-  }
-  override def copy(): MutableShort = {
+  override def copy(): MutableShort =
     val newCopy = new MutableShort
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableLong extends MutableValue {
+final class MutableLong extends MutableValue
   var value: Long = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = value = {
+  override def update(v: Any): Unit = value =
     isNull = false
     v.asInstanceOf[Long]
-  }
-  override def copy(): MutableLong = {
+  override def copy(): MutableLong =
     val newCopy = new MutableLong
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableByte extends MutableValue {
+final class MutableByte extends MutableValue
   var value: Byte = 0
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = value = {
+  override def update(v: Any): Unit = value =
     isNull = false
     v.asInstanceOf[Byte]
-  }
-  override def copy(): MutableByte = {
+  override def copy(): MutableByte =
     val newCopy = new MutableByte
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
-final class MutableAny extends MutableValue {
+final class MutableAny extends MutableValue
   var value: Any = _
   override def boxed: Any = if (isNull) null else value
-  override def update(v: Any): Unit = {
+  override def update(v: Any): Unit =
     isNull = false
     value = v.asInstanceOf[Any]
-  }
-  override def copy(): MutableAny = {
+  override def copy(): MutableAny =
     val newCopy = new MutableAny
     newCopy.isNull = isNull
     newCopy.value = value
     newCopy
-  }
-}
 
 /**
   * A row type that holds an array specialized container objects, of type [[MutableValue]], chosen
@@ -192,10 +167,10 @@ final class MutableAny extends MutableValue {
   * values of primitive columns.
   */
 final class SpecificMutableRow(val values: Array[MutableValue])
-    extends MutableRow with BaseGenericInternalRow {
+    extends MutableRow with BaseGenericInternalRow
 
   def this(dataTypes: Seq[DataType]) =
-    this(dataTypes.map {
+    this(dataTypes.map
       case BooleanType => new MutableBoolean
       case ByteType => new MutableByte
       case ShortType => new MutableShort
@@ -206,7 +181,7 @@ final class SpecificMutableRow(val values: Array[MutableValue])
       case FloatType => new MutableFloat
       case DoubleType => new MutableDouble
       case _ => new MutableAny
-    }.toArray)
+    .toArray)
 
   def this() = this(Seq.empty)
 
@@ -214,100 +189,80 @@ final class SpecificMutableRow(val values: Array[MutableValue])
 
   override def numFields: Int = values.length
 
-  override def setNullAt(i: Int): Unit = {
+  override def setNullAt(i: Int): Unit =
     values(i).isNull = true
-  }
 
   override def isNullAt(i: Int): Boolean = values(i).isNull
 
-  override def copy(): InternalRow = {
+  override def copy(): InternalRow =
     val newValues = new Array[Any](values.length)
     var i = 0
-    while (i < values.length) {
+    while (i < values.length)
       newValues(i) = values(i).boxed
       i += 1
-    }
 
     new GenericInternalRow(newValues)
-  }
 
   override protected def genericGet(i: Int): Any = values(i).boxed
 
-  override def update(ordinal: Int, value: Any) {
-    if (value == null) {
+  override def update(ordinal: Int, value: Any)
+    if (value == null)
       setNullAt(ordinal)
-    } else {
+    else
       values(ordinal).update(value)
-    }
-  }
 
-  override def setInt(ordinal: Int, value: Int): Unit = {
+  override def setInt(ordinal: Int, value: Int): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableInt]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getInt(i: Int): Int = {
+  override def getInt(i: Int): Int =
     values(i).asInstanceOf[MutableInt].value
-  }
 
-  override def setFloat(ordinal: Int, value: Float): Unit = {
+  override def setFloat(ordinal: Int, value: Float): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableFloat]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getFloat(i: Int): Float = {
+  override def getFloat(i: Int): Float =
     values(i).asInstanceOf[MutableFloat].value
-  }
 
-  override def setBoolean(ordinal: Int, value: Boolean): Unit = {
+  override def setBoolean(ordinal: Int, value: Boolean): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableBoolean]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getBoolean(i: Int): Boolean = {
+  override def getBoolean(i: Int): Boolean =
     values(i).asInstanceOf[MutableBoolean].value
-  }
 
-  override def setDouble(ordinal: Int, value: Double): Unit = {
+  override def setDouble(ordinal: Int, value: Double): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableDouble]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getDouble(i: Int): Double = {
+  override def getDouble(i: Int): Double =
     values(i).asInstanceOf[MutableDouble].value
-  }
 
-  override def setShort(ordinal: Int, value: Short): Unit = {
+  override def setShort(ordinal: Int, value: Short): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableShort]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getShort(i: Int): Short = {
+  override def getShort(i: Int): Short =
     values(i).asInstanceOf[MutableShort].value
-  }
 
-  override def setLong(ordinal: Int, value: Long): Unit = {
+  override def setLong(ordinal: Int, value: Long): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableLong]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getLong(i: Int): Long = {
+  override def getLong(i: Int): Long =
     values(i).asInstanceOf[MutableLong].value
-  }
 
-  override def setByte(ordinal: Int, value: Byte): Unit = {
+  override def setByte(ordinal: Int, value: Byte): Unit =
     val currentValue = values(ordinal).asInstanceOf[MutableByte]
     currentValue.isNull = false
     currentValue.value = value
-  }
 
-  override def getByte(i: Int): Byte = {
+  override def getByte(i: Int): Byte =
     values(i).asInstanceOf[MutableByte].value
-  }
-}

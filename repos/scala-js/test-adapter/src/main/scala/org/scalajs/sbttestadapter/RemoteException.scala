@@ -18,24 +18,21 @@ final class RemoteException private (msg: String,
                                      _toString: String,
                                      cause: Throwable,
                                      val originalClass: String)
-    extends Exception(msg, cause) {
+    extends Exception(msg, cause)
   override def toString(): String = _toString
-}
 
-object RemoteException {
+object RemoteException
   implicit object StackTraceDeserializer
-      extends JSONDeserializer[StackTraceElement] {
-    def deserialize(x: JSON): StackTraceElement = {
+      extends JSONDeserializer[StackTraceElement]
+    def deserialize(x: JSON): StackTraceElement =
       val obj = new JSONObjExtractor(x)
       new StackTraceElement(obj.fld[String]("className"),
                             obj.fld[String]("methodName"),
                             obj.fld[String]("fileName"),
                             obj.fld[Int]("lineNumber"))
-    }
-  }
 
-  implicit object Deserializer extends JSONDeserializer[RemoteException] {
-    def deserialize(x: JSON): RemoteException = {
+  implicit object Deserializer extends JSONDeserializer[RemoteException]
+    def deserialize(x: JSON): RemoteException =
       val obj = new JSONObjExtractor(x)
 
       val e = new RemoteException(obj.fld[String]("message"),
@@ -46,6 +43,3 @@ object RemoteException {
       e.setStackTrace(obj.fld[List[StackTraceElement]]("stackTrace").toArray)
 
       e
-    }
-  }
-}

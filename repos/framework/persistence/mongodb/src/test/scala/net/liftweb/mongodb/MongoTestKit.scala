@@ -24,7 +24,7 @@ import org.specs2.specification.BeforeAfterEach
 
 import com.mongodb.MongoClient
 
-trait MongoTestKit extends Specification with BeforeAfterEach {
+trait MongoTestKit extends Specification with BeforeAfterEach
   sequential
 
   def dbName =
@@ -42,42 +42,32 @@ trait MongoTestKit extends Specification with BeforeAfterEach {
 
   def debug = false
 
-  def before = {
+  def before =
     // define the dbs
-    dbs foreach {
+    dbs foreach
       case (id, db) =>
         MongoDB.defineDb(id, mongo, db)
-    }
-  }
 
   def isMongoRunning: Boolean =
-    try {
+    try
       if (dbs.length < 1) false
-      else {
-        dbs foreach {
+      else
+        dbs foreach
           case (id, _) =>
             MongoDB.use(id)(db => { db.getCollectionNames })
-        }
         true
-      }
-    } catch {
+    catch
       case e: Exception => false
-    }
 
   def checkMongoIsRunning = isMongoRunning must beEqualTo(true).orSkip
 
-  def after = {
-    if (!debug && isMongoRunning) {
+  def after =
+    if (!debug && isMongoRunning)
       // drop the databases
-      dbs foreach {
+      dbs foreach
         case (id, _) =>
-          MongoDB.use(id) { db =>
+          MongoDB.use(id)  db =>
             db.dropDatabase
-          }
-      }
-    }
 
     // clear the mongo instances
     MongoDB.closeAll()
-  }
-}

@@ -23,127 +23,109 @@ import org.scalatest.junit.JUnitSuite
 /**
   * Test group state transitions and other GroupMetadata functionality
   */
-class GroupMetadataTest extends JUnitSuite {
+class GroupMetadataTest extends JUnitSuite
   var group: GroupMetadata = null
 
   @Before
-  def setUp() {
+  def setUp()
     group = new GroupMetadata("groupId", "consumer")
-  }
 
   @Test
-  def testCanRebalanceWhenStable() {
+  def testCanRebalanceWhenStable()
     assertTrue(group.canRebalance)
-  }
 
   @Test
-  def testCanRebalanceWhenAwaitingSync() {
+  def testCanRebalanceWhenAwaitingSync()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(AwaitingSync)
     assertTrue(group.canRebalance)
-  }
 
   @Test
-  def testCannotRebalanceWhenPreparingRebalance() {
+  def testCannotRebalanceWhenPreparingRebalance()
     group.transitionTo(PreparingRebalance)
     assertFalse(group.canRebalance)
-  }
 
   @Test
-  def testCannotRebalanceWhenDead() {
+  def testCannotRebalanceWhenDead()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     assertFalse(group.canRebalance)
-  }
 
   @Test
-  def testStableToPreparingRebalanceTransition() {
+  def testStableToPreparingRebalanceTransition()
     group.transitionTo(PreparingRebalance)
     assertState(group, PreparingRebalance)
-  }
 
   @Test
-  def testAwaitingSyncToPreparingRebalanceTransition() {
+  def testAwaitingSyncToPreparingRebalanceTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(AwaitingSync)
     group.transitionTo(PreparingRebalance)
     assertState(group, PreparingRebalance)
-  }
 
   @Test
-  def testPreparingRebalanceToDeadTransition() {
+  def testPreparingRebalanceToDeadTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     assertState(group, Dead)
-  }
 
   @Test
-  def testAwaitingSyncToStableTransition() {
+  def testAwaitingSyncToStableTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(AwaitingSync)
     group.transitionTo(Stable)
     assertState(group, Stable)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testStableToStableIllegalTransition() {
+  def testStableToStableIllegalTransition()
     group.transitionTo(Stable)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testStableToAwaitingSyncIllegalTransition() {
+  def testStableToAwaitingSyncIllegalTransition()
     group.transitionTo(AwaitingSync)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testPreparingRebalanceToPreparingRebalanceIllegalTransition() {
+  def testPreparingRebalanceToPreparingRebalanceIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(PreparingRebalance)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testPreparingRebalanceToStableIllegalTransition() {
+  def testPreparingRebalanceToStableIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Stable)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testAwaitingSyncToAwaitingSyncIllegalTransition() {
+  def testAwaitingSyncToAwaitingSyncIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(AwaitingSync)
     group.transitionTo(AwaitingSync)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testDeadToDeadIllegalTransition() {
+  def testDeadToDeadIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     group.transitionTo(Dead)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testDeadToStableIllegalTransition() {
+  def testDeadToStableIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     group.transitionTo(Stable)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testDeadToPreparingRebalanceIllegalTransition() {
+  def testDeadToPreparingRebalanceIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     group.transitionTo(PreparingRebalance)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testDeadToAwaitingSyncIllegalTransition() {
+  def testDeadToAwaitingSyncIllegalTransition()
     group.transitionTo(PreparingRebalance)
     group.transitionTo(Dead)
     group.transitionTo(AwaitingSync)
-  }
 
   @Test
-  def testSelectProtocol() {
+  def testSelectProtocol()
     val groupId = "groupId"
     val clientId = "clientId"
     val clientHost = "clientHost"
@@ -186,16 +168,14 @@ class GroupMetadataTest extends JUnitSuite {
     group.add(lastMemberId, lastMember)
     // now we should prefer 'roundrobin'
     assertEquals("roundrobin", group.selectProtocol)
-  }
 
   @Test(expected = classOf[IllegalStateException])
-  def testSelectProtocolRaisesIfNoMembers() {
+  def testSelectProtocolRaisesIfNoMembers()
     group.selectProtocol
     fail()
-  }
 
   @Test
-  def testSelectProtocolChoosesCompatibleProtocol() {
+  def testSelectProtocolChoosesCompatibleProtocol()
     val groupId = "groupId"
     val clientId = "clientId"
     val clientHost = "clientHost"
@@ -222,10 +202,9 @@ class GroupMetadataTest extends JUnitSuite {
     group.add(memberId, member)
     group.add(otherMemberId, otherMember)
     assertEquals("roundrobin", group.selectProtocol)
-  }
 
   @Test
-  def testSupportsProtocols() {
+  def testSupportsProtocols()
     val groupId = "groupId"
     val clientId = "clientId"
     val clientHost = "clientHost"
@@ -261,15 +240,11 @@ class GroupMetadataTest extends JUnitSuite {
 
     assertTrue(group.supportsProtocols(Set("roundrobin", "foo")))
     assertFalse(group.supportsProtocols(Set("range", "foo")))
-  }
 
-  private def assertState(group: GroupMetadata, targetState: GroupState) {
+  private def assertState(group: GroupMetadata, targetState: GroupState)
     val states: Set[GroupState] = Set(
         Stable, PreparingRebalance, AwaitingSync, Dead)
     val otherStates = states - targetState
-    otherStates.foreach { otherState =>
+    otherStates.foreach  otherState =>
       assertFalse(group.is(otherState))
-    }
     assertTrue(group.is(targetState))
-  }
-}

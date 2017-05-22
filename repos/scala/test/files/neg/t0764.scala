@@ -1,17 +1,14 @@
-class Top[A] {
+class Top[A]
   type AType = A
-}
 
-trait Node { outer =>
+trait Node  outer =>
   type T <: Node
   def prepend = new Node { type T = outer.type }
-}
 
 class Main[NextType <: Node](value: Node { type T = NextType })
-    extends Top[Node { type T = NextType }] {
+    extends Top[Node { type T = NextType }]
 
   new Main[AType]((value: AType).prepend)
-}
 
 /* we've been back-and-forth on this one -- see PRs on SI-8177 for the reasoning
 I think it should compile and that the following error is due to broken =:= on existentials

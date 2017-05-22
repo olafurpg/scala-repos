@@ -1,5 +1,4 @@
 import scala.reflect.macros.blackbox.Context
 
-object Macros {
+object Macros
   def crash(c: Context): c.Expr[Unit] = c.universe.reify(())
-}

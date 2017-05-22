@@ -34,11 +34,11 @@ import org.apache.spark.util.collection.unsafe.sort.UnsafeExternalSorter
   */
 private[spark] class UnsafeCartesianRDD(
     left: RDD[UnsafeRow], right: RDD[UnsafeRow], numFieldsOfRight: Int)
-    extends CartesianRDD[UnsafeRow, UnsafeRow](left.sparkContext, left, right) {
+    extends CartesianRDD[UnsafeRow, UnsafeRow](left.sparkContext, left, right)
 
   override def compute(
       split: Partition,
-      context: TaskContext): Iterator[(UnsafeRow, UnsafeRow)] = {
+      context: TaskContext): Iterator[(UnsafeRow, UnsafeRow)] =
     // We will not sort the rows, so prefixComparator and recordComparator are null.
     val sorter = UnsafeExternalSorter.create(
         context.taskMemoryManager(),
@@ -50,45 +50,38 @@ private[spark] class UnsafeCartesianRDD(
         SparkEnv.get.memoryManager.pageSizeBytes)
 
     val partition = split.asInstanceOf[CartesianPartition]
-    for (y <- rdd2.iterator(partition.s2, context)) {
+    for (y <- rdd2.iterator(partition.s2, context))
       sorter.insertRecord(
           y.getBaseObject, y.getBaseOffset, y.getSizeInBytes, 0)
-    }
 
     // Create an iterator from sorter and wrapper it as Iterator[UnsafeRow]
-    def createIter(): Iterator[UnsafeRow] = {
+    def createIter(): Iterator[UnsafeRow] =
       val iter = sorter.getIterator
       val unsafeRow = new UnsafeRow(numFieldsOfRight)
-      new Iterator[UnsafeRow] {
-        override def hasNext: Boolean = {
+      new Iterator[UnsafeRow]
+        override def hasNext: Boolean =
           iter.hasNext
-        }
-        override def next(): UnsafeRow = {
+        override def next(): UnsafeRow =
           iter.loadNext()
           unsafeRow.pointTo(
               iter.getBaseObject, iter.getBaseOffset, iter.getRecordLength)
           unsafeRow
-        }
-      }
-    }
 
     val resultIter = for (x <- rdd1.iterator(partition.s1, context);
     y <- createIter()) yield (x, y)
     CompletionIterator[
         (UnsafeRow, UnsafeRow), Iterator[(UnsafeRow, UnsafeRow)]](
         resultIter, sorter.cleanupResources)
-  }
-}
 
 case class CartesianProduct(left: SparkPlan, right: SparkPlan)
-    extends BinaryNode {
+    extends BinaryNode
   override def output: Seq[Attribute] = left.output ++ right.output
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
                                                      "number of output rows"))
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val numOutputRows = longMetric("numOutputRows")
 
     val leftResults = left.execute().asInstanceOf[RDD[UnsafeRow]]
@@ -96,12 +89,8 @@ case class CartesianProduct(left: SparkPlan, right: SparkPlan)
 
     val pair = new UnsafeCartesianRDD(
         leftResults, rightResults, right.output.size)
-    pair.mapPartitionsInternal { iter =>
+    pair.mapPartitionsInternal  iter =>
       val joiner = GenerateUnsafeRowJoiner.create(left.schema, right.schema)
-      iter.map { r =>
+      iter.map  r =>
         numOutputRows += 1
         joiner.join(r._1, r._2)
-      }
-    }
-  }
-}

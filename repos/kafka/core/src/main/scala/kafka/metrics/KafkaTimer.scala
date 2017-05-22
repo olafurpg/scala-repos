@@ -24,14 +24,11 @@ import com.yammer.metrics.core.Timer
   * package.
   * @param metric The underlying timer object.
   */
-class KafkaTimer(metric: Timer) {
+class KafkaTimer(metric: Timer)
 
-  def time[A](f: => A): A = {
+  def time[A](f: => A): A =
     val ctx = metric.time
-    try {
+    try
       f
-    } finally {
+    finally
       ctx.stop()
-    }
-  }
-}

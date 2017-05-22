@@ -28,7 +28,7 @@ class Replica(val brokerId: Int,
               time: Time = SystemTime,
               initialHighWatermarkValue: Long = 0L,
               val log: Option[Log] = None)
-    extends Logging {
+    extends Logging
   // the high watermark offset value, in non-leader replicas only its message offsets are kept
   @volatile private[this] var highWatermarkMetadata: LogOffsetMetadata =
     new LogOffsetMetadata(initialHighWatermarkValue)
@@ -40,86 +40,74 @@ class Replica(val brokerId: Int,
   val topic = partition.topic
   val partitionId = partition.partitionId
 
-  def isLocal: Boolean = {
-    log match {
+  def isLocal: Boolean =
+    log match
       case Some(l) => true
       case None => false
-    }
-  }
 
   private[this] val lastCaughtUpTimeMsUnderlying = new AtomicLong(
       time.milliseconds)
 
   def lastCaughtUpTimeMs = lastCaughtUpTimeMsUnderlying.get()
 
-  def updateLogReadResult(logReadResult: LogReadResult) {
+  def updateLogReadResult(logReadResult: LogReadResult)
     logEndOffset = logReadResult.info.fetchOffsetMetadata
 
     /* If the request read up to the log end offset snapshot when the read was initiated,
      * set the lastCaughtUpTimeMsUnderlying to the current time.
      * This means that the replica is fully caught up.
      */
-    if (logReadResult.isReadFromLogEnd) {
+    if (logReadResult.isReadFromLogEnd)
       lastCaughtUpTimeMsUnderlying.set(time.milliseconds)
-    }
-  }
 
-  private def logEndOffset_=(newLogEndOffset: LogOffsetMetadata) {
-    if (isLocal) {
+  private def logEndOffset_=(newLogEndOffset: LogOffsetMetadata)
+    if (isLocal)
       throw new KafkaException(
           "Should not set log end offset on partition [%s,%d]'s local replica %d"
             .format(topic, partitionId, brokerId))
-    } else {
+    else
       logEndOffsetMetadata = newLogEndOffset
       trace(
           "Setting log end offset for replica %d for partition [%s,%d] to [%s]"
             .format(brokerId, topic, partitionId, logEndOffsetMetadata))
-    }
-  }
 
   def logEndOffset =
     if (isLocal) log.get.logEndOffsetMetadata
     else logEndOffsetMetadata
 
-  def highWatermark_=(newHighWatermark: LogOffsetMetadata) {
-    if (isLocal) {
+  def highWatermark_=(newHighWatermark: LogOffsetMetadata)
+    if (isLocal)
       highWatermarkMetadata = newHighWatermark
       trace(
           "Setting high watermark for replica %d partition [%s,%d] on broker %d to [%s]"
             .format(brokerId, topic, partitionId, brokerId, newHighWatermark))
-    } else {
+    else
       throw new KafkaException(
           "Should not set high watermark on partition [%s,%d]'s non-local replica %d"
             .format(topic, partitionId, brokerId))
-    }
-  }
 
   def highWatermark = highWatermarkMetadata
 
-  def convertHWToLocalOffsetMetadata() = {
-    if (isLocal) {
+  def convertHWToLocalOffsetMetadata() =
+    if (isLocal)
       highWatermarkMetadata = log.get.convertToOffsetMetadata(
           highWatermarkMetadata.messageOffset)
-    } else {
+    else
       throw new KafkaException(
           "Should not construct complete high watermark on partition [%s,%d]'s non-local replica %d"
             .format(topic, partitionId, brokerId))
-    }
-  }
 
-  override def equals(that: Any): Boolean = {
+  override def equals(that: Any): Boolean =
     if (!(that.isInstanceOf[Replica])) return false
     val other = that.asInstanceOf[Replica]
     if (topic.equals(other.topic) && brokerId == other.brokerId &&
         partition.equals(other.partition)) return true
     false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     31 + topic.hashCode() + 17 * brokerId + partition.hashCode()
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     val replicaString = new StringBuilder
     replicaString.append("ReplicaId: " + brokerId)
     replicaString.append("; Topic: " + topic)
@@ -127,5 +115,3 @@ class Replica(val brokerId: Int,
     replicaString.append("; isLocal: " + isLocal)
     if (isLocal) replicaString.append("; Highwatermark: " + highWatermark)
     replicaString.toString()
-  }
-}

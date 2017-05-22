@@ -14,11 +14,9 @@ class PreparedData(
 )
     extends Serializable
 
-class Preparator extends PPreparator[TrainingData, PreparedData] {
+class Preparator extends PPreparator[TrainingData, PreparedData]
 
-  def prepare(sc: SparkContext, trainingData: TrainingData): PreparedData = {
+  def prepare(sc: SparkContext, trainingData: TrainingData): PreparedData =
     new PreparedData(trainingData.labeledPoints,
                      trainingData.gendersMap,
                      trainingData.educationMap)
-  }
-}

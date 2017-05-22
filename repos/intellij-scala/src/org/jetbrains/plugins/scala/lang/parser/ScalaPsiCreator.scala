@@ -21,9 +21,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef._
 import org.jetbrains.plugins.scala.lang.scaladoc.lexer.ScalaDocElementType
 import org.jetbrains.plugins.scala.lang.scaladoc.psi.ScalaDocPsiCreator
 
-object ScalaPsiCreator {
+object ScalaPsiCreator
   def createElement(node: ASTNode): PsiElement =
-    node.getElementType match {
+    node.getElementType match
       case s: SelfPsiCreator => s.createElement(node)
 
       case _: ScalaDocElementType => ScalaDocPsiCreator.createElement(node)
@@ -141,10 +141,9 @@ object ScalaPsiCreator {
       case ScalaElementTypes.NAME_VALUE_PAIR => new ScNameValuePairImpl(node)
 
       case _ => inner(node)
-    }
 
   //to prevent stack overflow in type checker let's introduce helper method
-  private def inner(node: ASTNode): PsiElement = node.getElementType match {
+  private def inner(node: ASTNode): PsiElement = node.getElementType match
 
     /********************** TOKENS **********************/
     /********************* LITERALS *********************/
@@ -183,10 +182,9 @@ object ScalaPsiCreator {
     case ScalaElementTypes.TYPE_VARIABLE =>
       new ScTypeVariableTypeElementImpl(node)
     case _ => inner1(node)
-  }
 
   //to prevent stack overflow in type checker let's introduce helper method
-  private def inner1(node: ASTNode): PsiElement = node.getElementType match {
+  private def inner1(node: ASTNode): PsiElement = node.getElementType match
 
     /******************* EXPRESSIONS*********************/
     case ScalaElementTypes.PARENT_EXPR => new ScParenthesisedExprImpl(node)
@@ -232,10 +230,9 @@ object ScalaPsiCreator {
     case ScalaElementTypes.NEW_TEMPLATE =>
       new ScNewTemplateDefinitionImpl(node)
     case _ => inner2(node)
-  }
 
   //to prevent stack overflow in type checker let's introduce helper method
-  private def inner2(node: ASTNode): PsiElement = node.getElementType match {
+  private def inner2(node: ASTNode): PsiElement = node.getElementType match
 
     /******************* PATTERNS *********************/
     case ScalaElementTypes.TUPLE_PATTERN => new ScTuplePatternImpl(node)
@@ -276,9 +273,6 @@ object ScalaPsiCreator {
     case ScalaElementTypes.XML_COMMENT => new ScXmlCommentImpl(node)
     case ScalaElementTypes.XML_ELEMENT => new ScXmlElementImpl(node)
     case _ => new ASTWrapperPsiElement(node)
-  }
 
-  trait SelfPsiCreator {
+  trait SelfPsiCreator
     def createElement(node: ASTNode): PsiElement
-  }
-}

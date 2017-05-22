@@ -1,27 +1,22 @@
-object test {
+object test
   case class T1(val source: String)
 
-  object T1 {
+  object T1
     implicit def T1FromT2(implicit t2: T2): T1 = T1("implicit def T1FromT2")
     implicit def T1FromT3(implicit t3: T3): T1 = T1("implicit def T1FromT3")
-  }
 
   trait T2 {}
 
-  object T2 {
+  object T2
     implicit val t2: T2 = new T2 {}
-  }
 
   trait T3
 
   def requireT1(implicit t1: T1) = t1
 
-  {
     val t1 = requireT1
     assert(t1.source == "implicit def T1FromT2")
-  }
 
-  {
     implicit def t3: T3 = new T3 {}
     val t1 = requireT1
     assert(t1.source == "implicit def T1FromT2")
@@ -36,5 +31,3 @@ object test {
     //    val t1 = requireT1
     //              ^
     // one error found
-  }
-}

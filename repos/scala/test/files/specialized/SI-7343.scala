@@ -1,6 +1,6 @@
 class Parent[@specialized(Int) T]
 
-object Test extends App {
+object Test extends App
 
   /**
     * This method will check if specialization is correctly rewiring parents
@@ -15,7 +15,7 @@ object Test extends App {
     *    ...
     *  }
     */
-  def checkSuperClass[@specialized(Int) T](t: T, expectedXSuper: String) = {
+  def checkSuperClass[@specialized(Int) T](t: T, expectedXSuper: String) =
     // test target:
     //  - in checkSuperClass, X should extend Parent
     //  - in checkSuperClass$mIc$sp, X should extend Parent$mcI$sp
@@ -25,7 +25,6 @@ object Test extends App {
     val actualXSuper = (new X).getClass().getSuperclass().getSimpleName()
     assert(
         actualXSuper == expectedXSuper, actualXSuper + " != " + expectedXSuper)
-  }
 
   checkSuperClass("x", "Parent")
   checkSuperClass(101, "Parent$mcI$sp")
@@ -34,8 +33,8 @@ object Test extends App {
     * This is the same check, but in value. It should work exactly the same
     * as its method counterpart.
     */
-  class Val[@specialized(Int) T](t: T, expectedXSuper: String) {
-    val check: T = {
+  class Val[@specialized(Int) T](t: T, expectedXSuper: String)
+    val check: T =
       class X extends Parent[T]()
 
       // get the superclass for X and make sure it's correct
@@ -43,8 +42,6 @@ object Test extends App {
       assert(actualXSuper == expectedXSuper,
              actualXSuper + " != " + expectedXSuper)
       t
-    }
-  }
 
   new Val("x", "Parent")
   new Val(101, "Parent$mcI$sp")
@@ -54,4 +51,3 @@ object Test extends App {
   * work since the class X definition will always be lifted to become a
   * member of the class, making it impossible to force its duplication.
   */
-}

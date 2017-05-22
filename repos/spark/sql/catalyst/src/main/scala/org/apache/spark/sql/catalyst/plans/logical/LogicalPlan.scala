@@ -25,7 +25,7 @@ import org.apache.spark.sql.catalyst.plans.QueryPlan
 import org.apache.spark.sql.catalyst.trees.{CurrentOrigin, TreeNode}
 import org.apache.spark.sql.types.StructType
 
-abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
+abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging
 
   private var _analyzed: Boolean = false
 
@@ -50,34 +50,27 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * @param rule the function use to transform this nodes children
     */
   def resolveOperators(
-      rule: PartialFunction[LogicalPlan, LogicalPlan]): LogicalPlan = {
-    if (!analyzed) {
+      rule: PartialFunction[LogicalPlan, LogicalPlan]): LogicalPlan =
+    if (!analyzed)
       val afterRuleOnChildren = transformChildren(
           rule, (t, r) => t.resolveOperators(r))
-      if (this fastEquals afterRuleOnChildren) {
-        CurrentOrigin.withOrigin(origin) {
+      if (this fastEquals afterRuleOnChildren)
+        CurrentOrigin.withOrigin(origin)
           rule.applyOrElse(this, identity[LogicalPlan])
-        }
-      } else {
-        CurrentOrigin.withOrigin(origin) {
+      else
+        CurrentOrigin.withOrigin(origin)
           rule.applyOrElse(afterRuleOnChildren, identity[LogicalPlan])
-        }
-      }
-    } else {
+    else
       this
-    }
-  }
 
   /**
     * Recursively transforms the expressions of a tree, skipping nodes that have already
     * been analyzed.
     */
   def resolveExpressions(
-      r: PartialFunction[Expression, Expression]): LogicalPlan = {
-    this resolveOperators {
+      r: PartialFunction[Expression, Expression]): LogicalPlan =
+    this resolveOperators
       case p => p.transformExpressions(r)
-    }
-  }
 
   /**
     * Computes [[Statistics]] for this plan. The default implementation assumes the output
@@ -86,13 +79,11 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     *
     * [[LeafNode]]s must override this.
     */
-  def statistics: Statistics = {
-    if (children.size == 0) {
+  def statistics: Statistics =
+    if (children.size == 0)
       throw new UnsupportedOperationException(
           s"LeafNode $nodeName must implement statistics.")
-    }
     Statistics(sizeInBytes = children.map(_.statistics.sizeInBytes).product)
-  }
 
   /**
     * Returns the maximum number of rows that this plan may compute.
@@ -127,18 +118,15 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * should only be called on analyzed plans since it will throw [[AnalysisException]] for
     * unresolved [[Attribute]]s.
     */
-  def resolve(schema: StructType, resolver: Resolver): Seq[Attribute] = {
-    schema.map { field =>
-      resolveQuoted(field.name, resolver).map {
+  def resolve(schema: StructType, resolver: Resolver): Seq[Attribute] =
+    schema.map  field =>
+      resolveQuoted(field.name, resolver).map
         case a: AttributeReference => a
         case other =>
           sys.error(s"can not handle nested schema yet...  plan $this")
-      }.getOrElse {
+      .getOrElse
         throw new AnalysisException(
             s"Unable to resolve ${field.name} given [${output.map(_.name).mkString(", ")}]")
-      }
-    }
-  }
 
   /**
     * Optionally resolves the given strings to a [[NamedExpression]] using the input from all child
@@ -164,9 +152,8 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     * `ab.cd`.`efg` should be split into two parts "ab.cd" and "efg".
     */
   def resolveQuoted(
-      name: String, resolver: Resolver): Option[NamedExpression] = {
+      name: String, resolver: Resolver): Option[NamedExpression] =
     resolve(UnresolvedAttribute.parseAttributeName(name), output, resolver)
-  }
 
   /**
     * Resolve the given `name` string against the given attribute, returning either 0 or 1 match.
@@ -178,16 +165,14 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
   private def resolveAsTableColumn(
       nameParts: Seq[String],
       resolver: Resolver,
-      attribute: Attribute): Option[(Attribute, List[String])] = {
+      attribute: Attribute): Option[(Attribute, List[String])] =
     assert(nameParts.length > 1)
-    if (attribute.qualifiers.exists(resolver(_, nameParts.head))) {
+    if (attribute.qualifiers.exists(resolver(_, nameParts.head)))
       // At least one qualifier matches. See if remaining parts match.
       val remainingParts = nameParts.tail
       resolveAsColumn(remainingParts, resolver, attribute)
-    } else {
+    else
       None
-    }
-  }
 
   /**
     * Resolve the given `name` string against the given attribute, returning either 0 or 1 match.
@@ -198,18 +183,16 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
   private def resolveAsColumn(
       nameParts: Seq[String],
       resolver: Resolver,
-      attribute: Attribute): Option[(Attribute, List[String])] = {
-    if (!attribute.isGenerated && resolver(attribute.name, nameParts.head)) {
+      attribute: Attribute): Option[(Attribute, List[String])] =
+    if (!attribute.isGenerated && resolver(attribute.name, nameParts.head))
       Option((attribute.withName(nameParts.head), nameParts.tail.toList))
-    } else {
+    else
       None
-    }
-  }
 
   /** Performs attribute resolution given a name and a sequence of possible attributes. */
   protected def resolve(nameParts: Seq[String],
                         input: Seq[Attribute],
-                        resolver: Resolver): Option[NamedExpression] = {
+                        resolver: Resolver): Option[NamedExpression] =
 
     // A sequence of possible candidate matches.
     // Each candidate is a tuple. The first element is a resolved attribute, followed by a list
@@ -217,27 +200,22 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
     // For example, consider an example where "a" is the table name, "b" is the column name,
     // and "c" is the struct field name, i.e. "a.b.c". In this case, Attribute will be "a.b",
     // and the second element will be List("c").
-    var candidates: Seq[(Attribute, List[String])] = {
+    var candidates: Seq[(Attribute, List[String])] =
       // If the name has 2 or more parts, try to resolve it as `table.column` first.
-      if (nameParts.length > 1) {
-        input.flatMap { option =>
+      if (nameParts.length > 1)
+        input.flatMap  option =>
           resolveAsTableColumn(nameParts, resolver, option)
-        }
-      } else {
+      else
         Seq.empty
-      }
-    }
 
     // If none of attributes match `table.column` pattern, we try to resolve it as a column.
-    if (candidates.isEmpty) {
-      candidates = input.flatMap { candidate =>
+    if (candidates.isEmpty)
+      candidates = input.flatMap  candidate =>
         resolveAsColumn(nameParts, resolver, candidate)
-      }
-    }
 
     def name = UnresolvedAttribute(nameParts).name
 
-    candidates.distinct match {
+    candidates.distinct match
       // One match, no nested fields, use it.
       case Seq((a, Nil)) => Some(a)
 
@@ -262,22 +240,18 @@ abstract class LogicalPlan extends QueryPlan[LogicalPlan] with Logging {
         val referenceNames = ambiguousReferences.map(_._1).mkString(", ")
         throw new AnalysisException(
             s"Reference '$name' is ambiguous, could be: $referenceNames.")
-    }
-  }
-}
 
 /**
   * A logical plan node with no children.
   */
-abstract class LeafNode extends LogicalPlan {
+abstract class LeafNode extends LogicalPlan
   override def children: Seq[LogicalPlan] = Nil
   override def producedAttributes: AttributeSet = outputSet
-}
 
 /**
   * A logical plan node with single child.
   */
-abstract class UnaryNode extends LogicalPlan {
+abstract class UnaryNode extends LogicalPlan
   def child: LogicalPlan
 
   override def children: Seq[LogicalPlan] = child :: Nil
@@ -287,23 +261,22 @@ abstract class UnaryNode extends LogicalPlan {
     * expressions with the corresponding alias
     */
   protected def getAliasedConstraints(
-      projectList: Seq[NamedExpression]): Set[Expression] = {
-    projectList.flatMap {
+      projectList: Seq[NamedExpression]): Set[Expression] =
+    projectList.flatMap
       case a @ Alias(e, _) =>
         child.constraints
-          .map(_ transform {
+          .map(_ transform
             case expr: Expression if expr.semanticEquals(e) =>
               a.toAttribute
-          })
+          )
           .union(Set(EqualNullSafe(e, a.toAttribute)))
       case _ =>
         Set.empty[Expression]
-    }.toSet
-  }
+    .toSet
 
   override protected def validConstraints: Set[Expression] = child.constraints
 
-  override def statistics: Statistics = {
+  override def statistics: Statistics =
     // There should be some overhead in Row object, the size should not be zero when there is
     // no columns, this help to prevent divide-by-zero error.
     val childRowSize = child.output.map(_.dataType.defaultSize).sum + 8
@@ -311,21 +284,17 @@ abstract class UnaryNode extends LogicalPlan {
     // Assume there will be the same number of rows as child has.
     var sizeInBytes =
       (child.statistics.sizeInBytes * outputRowSize) / childRowSize
-    if (sizeInBytes == 0) {
+    if (sizeInBytes == 0)
       // sizeInBytes can't be zero, or sizeInBytes of BinaryNode will also be zero
       // (product of children).
       sizeInBytes = 1
-    }
     Statistics(sizeInBytes = sizeInBytes)
-  }
-}
 
 /**
   * A logical plan node with a left and right child.
   */
-abstract class BinaryNode extends LogicalPlan {
+abstract class BinaryNode extends LogicalPlan
   def left: LogicalPlan
   def right: LogicalPlan
 
   override def children: Seq[LogicalPlan] = Seq(left, right)
-}

@@ -22,10 +22,10 @@ package muspelheim
 
 import com.precog.yggdrasil._
 
-trait LogisticRegressionSpecs extends EvalStackSpecs {
+trait LogisticRegressionSpecs extends EvalStackSpecs
   import stack._
-  "logistic regression" should {
-    "return correctly structured results in simple case of logistic regression" in {
+  "logistic regression" should
+    "return correctly structured results in simple case of logistic regression" in
       val input =
         """
           medals := //summer_games/london_medals
@@ -38,7 +38,7 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(elems)) =>
           ids must haveSize(0)
           elems.keys mustEqual Set("model1")
@@ -46,28 +46,22 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
           val SObject(fields) = elems("model1")
           val SArray(arr) = fields("coefficients")
 
-          arr(0) must beLike {
+          arr(0) must beLike
             case SObject(elems) =>
               elems.keys mustEqual Set("height")
 
-              elems("height") must beLike {
+              elems("height") must beLike
                 case SObject(obj) =>
-                  obj("estimate") must beLike {
+                  obj("estimate") must beLike
                     case SDecimal(d) =>
                       elems must haveSize(1)
-                  }
-              }
-          }
-          arr(1) must beLike {
+          arr(1) must beLike
             case SObject(obj) =>
               obj.keys mustEqual Set("estimate")
 
               obj("estimate") must beLike { case SDecimal(d) => ok }
-          }
-      }
-    }
 
-    "predict logistic regression" in {
+    "predict logistic regression" in
       val input =
         """
         medals := //summer_games/london_medals
@@ -82,52 +76,42 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(elems)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(elems)) =>
             ids must haveSize(0)
             elems.keys mustEqual Set("model1")
 
-            elems("model1") must beLike {
+            elems("model1") must beLike
               case SObject(obj) =>
                 obj.keySet mustEqual Set("fit")
                 obj("fit") must beLike { case SDecimal(_) => ok }
-            }
-          }
-      }
-    }
 
-    def testJoinLogistic(input: String, input2: String, idJoin: Boolean) = {
+    def testJoinLogistic(input: String, input2: String, idJoin: Boolean) =
       val results = evalE(input)
       val resultsCount = evalE(input2)
 
-      val count = resultsCount.collectFirst {
+      val count = resultsCount.collectFirst
         case (_, SDecimal(d)) => d.toInt
-      }.get
+      .get
       results must haveSize(count)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(elems)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(elems)) =>
             if (idJoin) ids must haveSize(2)
             else ids must haveSize(1)
 
             elems.keys must contain("predictedGender")
 
-            elems("predictedGender") must beLike {
+            elems("predictedGender") must beLike
               case SObject(obj) =>
                 obj.keys mustEqual Set("model1")
-                obj("model1") must beLike {
+                obj("model1") must beLike
                   case SObject(obj2) =>
                     obj2.keySet mustEqual Set("fit")
-                    obj2("fit") must beLike {
+                    obj2("fit") must beLike
                       case SDecimal(d) =>
                         (d must be_>=(BigDecimal(0))) and
                         (d must be_<=(BigDecimal(1)))
-                    }
-                }
-            }
-          }
-      }
-    }
 
     //"join predicted results with original dataset" in {
     //  val input = """
@@ -151,7 +135,7 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
     //  testJoinLogistic(input, input2, false)
     //}
 
-    "join predicted results with original dataset when model is `new`ed" in {
+    "join predicted results with original dataset when model is `new`ed" in
       val input =
         """
         medals := //summer_games/london_medals
@@ -173,9 +157,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
       """
 
       testJoinLogistic(input, input2, true)
-    }
 
-    "join predicted results with model when model is `new`ed" in {
+    "join predicted results with model when model is `new`ed" in
       val input =
         """
         medals := //summer_games/london_medals
@@ -199,35 +182,29 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
       val results = evalE(input)
       val resultsCount = evalE(input2)
 
-      val count = resultsCount.collectFirst {
+      val count = resultsCount.collectFirst
         case (_, SDecimal(d)) => d.toInt
-      }.get
+      .get
       results must haveSize(count)
 
-      results must haveAllElementsLike {
-        case (ids, SObject(elems)) => {
+      results must haveAllElementsLike
+        case (ids, SObject(elems)) =>
             ids must haveSize(2)
 
             elems.keys mustEqual Set("model1", "predictedGender")
 
-            elems("predictedGender") must beLike {
+            elems("predictedGender") must beLike
               case SObject(obj) =>
                 obj.keys mustEqual Set("model1")
-                obj("model1") must beLike {
+                obj("model1") must beLike
                   case SObject(obj2) =>
                     obj2.keySet mustEqual Set("fit")
-                    obj2("fit") must beLike {
+                    obj2("fit") must beLike
                       case SDecimal(d) =>
                         (d must be_>=(BigDecimal(0))) and
                         (d must be_<=(BigDecimal(1)))
-                    }
-                }
-            }
-          }
-      }
-    }
 
-    "predict logistic regression when no field names in model are present in data" in {
+    "predict logistic regression when no field names in model are present in data" in
       val input =
         """
         medals := //summer_games/london_medals
@@ -241,9 +218,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
       val results = evalE(input)
 
       results must haveSize(0)
-    }
 
-    "return correct number of results in more complex case of logistic regression" in {
+    "return correct number of results in more complex case of logistic regression" in
       val input = """
           medals := //summer_games/london_medals
           
@@ -254,14 +230,12 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
 
       results must haveSize(1)
 
-      results must haveAllElementsLike {
+      results must haveAllElementsLike
         case (ids, SObject(elems)) =>
           ids must haveSize(0)
           elems.keys mustEqual Set("model1", "model2", "model3", "model4")
-      }
-    }
 
-    "return something when fed constants" in {
+    "return something when fed constants" in
       val input = """
           std::stats::logisticRegression(0, 4)
         """.stripMargin
@@ -269,9 +243,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
       val results = evalE(input)
 
       results must haveSize(1)
-    }
 
-    "return empty set when the classification variable is not at the root path" in {
+    "return empty set when the classification variable is not at the root path" in
       val input =
         """
                medals := //summer_games/london_medals
@@ -281,9 +254,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
                """.stripMargin
 
       evalE(input) must beEmpty
-    }
 
-    "return empty set when none of the classification values are 0 or 1" in {
+    "return empty set when none of the classification values are 0 or 1" in
       val input =
         """
                medals := //summer_games/london_medals
@@ -293,9 +265,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
                """.stripMargin
 
       evalE(input) must beEmpty
-    }
 
-    "return empty set when given feature values of wrong type" in {
+    "return empty set when given feature values of wrong type" in
       val input =
         """
           medals := //summer_games/london_medals
@@ -304,9 +275,8 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
         """.stripMargin
 
       evalE(input) must beEmpty
-    }
 
-    "return empty set when given classication values of wrong type" in {
+    "return empty set when given classication values of wrong type" in
       val input =
         """
           medals := //summer_games/london_medals
@@ -315,6 +285,3 @@ trait LogisticRegressionSpecs extends EvalStackSpecs {
         """.stripMargin
 
       evalE(input) must beEmpty
-    }
-  }
-}

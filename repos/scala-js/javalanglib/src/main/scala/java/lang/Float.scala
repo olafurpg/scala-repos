@@ -3,7 +3,7 @@ package java.lang
 /* This is a hijacked class. Its instances are primitive numbers.
  * Constructors are not emitted.
  */
-final class Float private () extends Number with Comparable[Float] {
+final class Float private () extends Number with Comparable[Float]
 
   def this(value: scala.Float) = this()
   def this(s: String) = this()
@@ -17,14 +17,13 @@ final class Float private () extends Number with Comparable[Float] {
   @inline def longValue(): scala.Long = floatValue.toLong
   @inline def doubleValue(): scala.Double = floatValue.toDouble
 
-  override def equals(that: Any): scala.Boolean = that match {
+  override def equals(that: Any): scala.Boolean = that match
     case that: Double => // yes, Double
       val a = doubleValue
       val b = that.doubleValue
       (a == b) || (Double.isNaN(a) && Double.isNaN(b))
     case _ =>
       false
-  }
 
   // Uses the hashCode of Doubles. See Bits.numberHashCode for the rationale.
   @inline override def hashCode(): Int =
@@ -41,9 +40,8 @@ final class Float private () extends Number with Comparable[Float] {
 
   @inline def isInfinite(): scala.Boolean =
     Float.isInfinite(floatValue)
-}
 
-object Float {
+object Float
   final val TYPE = classOf[scala.Float]
   final val POSITIVE_INFINITY = 1.0f / 0.0f
   final val NEGATIVE_INFINITY = 1.0f / -0.0f
@@ -81,4 +79,3 @@ object Float {
 
   @inline def floatToIntBits(value: scala.Float): scala.Int =
     scala.scalajs.runtime.Bits.floatToIntBits(value)
-}

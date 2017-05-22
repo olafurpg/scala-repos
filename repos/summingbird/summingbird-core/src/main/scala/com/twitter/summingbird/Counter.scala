@@ -25,7 +25,7 @@ case class Name(getString: String) extends AnyVal
 /*
  User-defined Counter
  */
-case class Counter(group: Group, name: Name)(implicit jobID: JobId) {
+case class Counter(group: Group, name: Name)(implicit jobID: JobId)
   // Need to register the counter for this job,
   // this is used to pass counter info to the Storm platform during initialization
   JobCounters.registerCounter(jobID, group, name)
@@ -36,4 +36,3 @@ case class Counter(group: Group, name: Name)(implicit jobID: JobId) {
   def incrBy(amount: Long): Unit = incrCounter.incrBy(amount)
 
   def incr(): Unit = incrBy(1L)
-}

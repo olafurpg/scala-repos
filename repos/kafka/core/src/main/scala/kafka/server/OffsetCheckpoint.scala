@@ -26,86 +26,78 @@ import kafka.utils.Logging
 import kafka.common._
 import java.io._
 
-object OffsetCheckpoint {
+object OffsetCheckpoint
   private val WhiteSpacesPattern = Pattern.compile("\\s+")
   private val CurrentVersion = 0
-}
 
 /**
   * This class saves out a map of topic/partition=>offsets to a file
   */
-class OffsetCheckpoint(val file: File) extends Logging {
+class OffsetCheckpoint(val file: File) extends Logging
   import OffsetCheckpoint._
   private val path = file.toPath.toAbsolutePath
   private val tempPath = Paths.get(path.toString + ".tmp")
   private val lock = new Object()
   file.createNewFile() // in case the file doesn't exist
 
-  def write(offsets: Map[TopicAndPartition, Long]) {
-    lock synchronized {
+  def write(offsets: Map[TopicAndPartition, Long])
+    lock synchronized
       // write to temp file and then swap with the existing file
       val fileOutputStream = new FileOutputStream(tempPath.toFile)
       val writer = new BufferedWriter(new OutputStreamWriter(fileOutputStream))
-      try {
+      try
         writer.write(CurrentVersion.toString)
         writer.newLine()
 
         writer.write(offsets.size.toString)
         writer.newLine()
 
-        offsets.foreach {
+        offsets.foreach
           case (topicPart, offset) =>
             writer.write(s"${topicPart.topic} ${topicPart.partition} $offset")
             writer.newLine()
-        }
 
         writer.flush()
         fileOutputStream.getFD().sync()
-      } catch {
+      catch
         case e: FileNotFoundException =>
-          if (FileSystems.getDefault.isReadOnly) {
+          if (FileSystems.getDefault.isReadOnly)
             fatal(
                 "Halting writes to offset checkpoint file because the underlying file system is inaccessible : ",
                 e)
             Runtime.getRuntime.halt(1)
-          }
           throw e
-      } finally {
+      finally
         writer.close()
-      }
 
       Utils.atomicMoveWithFallback(tempPath, path)
-    }
-  }
 
-  def read(): Map[TopicAndPartition, Long] = {
+  def read(): Map[TopicAndPartition, Long] =
 
     def malformedLineException(line: String) =
       new IOException(s"Malformed line in offset checkpoint file: $line'")
 
-    lock synchronized {
+    lock synchronized
       val reader = new BufferedReader(new FileReader(file))
       var line: String = null
-      try {
+      try
         line = reader.readLine()
         if (line == null) return Map.empty
         val version = line.toInt
-        version match {
+        version match
           case CurrentVersion =>
             line = reader.readLine()
             if (line == null) return Map.empty
             val expectedSize = line.toInt
             val offsets = mutable.Map[TopicAndPartition, Long]()
             line = reader.readLine()
-            while (line != null) {
-              WhiteSpacesPattern.split(line) match {
+            while (line != null)
+              WhiteSpacesPattern.split(line) match
                 case Array(topic, partition, offset) =>
                   offsets +=
                     TopicAndPartition(topic, partition.toInt) -> offset.toLong
                   line = reader.readLine()
                 case _ => throw malformedLineException(line)
-              }
-            }
             if (offsets.size != expectedSize)
               throw new IOException(
                   s"Expected $expectedSize entries but found only ${offsets.size}")
@@ -114,12 +106,7 @@ class OffsetCheckpoint(val file: File) extends Logging {
             throw new IOException(
                 "Unrecognized version of the highwatermark checkpoint file: " +
                 version)
-        }
-      } catch {
+      catch
         case e: NumberFormatException => throw malformedLineException(line)
-      } finally {
+      finally
         reader.close()
-      }
-    }
-  }
-}

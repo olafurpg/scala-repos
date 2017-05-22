@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
-trait ScForStatement extends ScExpression {
+trait ScForStatement extends ScExpression
   def getDesugarizedExpr: Option[ScExpression]
 
   /**
@@ -27,10 +27,7 @@ trait ScForStatement extends ScExpression {
   def getRightParenthesis: Option[PsiElement]
   override def accept(visitor: ScalaElementVisitor) =
     visitor.visitForExpression(this)
-}
 
-object ScForStatement {
-  def unapply(forStmt: ScForStatement): Option[(ScEnumerators, ScExpression)] = {
+object ScForStatement
+  def unapply(forStmt: ScForStatement): Option[(ScEnumerators, ScExpression)] =
     forStmt.enumerators.zip(forStmt.body).headOption
-  }
-}

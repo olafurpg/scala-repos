@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Double]] => [[scala.runtime.RichDouble]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Double private extends AnyVal {
+final abstract class Double private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -268,9 +268,8 @@ final abstract class Double private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Double] = null
-}
 
-object Double extends AnyValCompanion {
+object Double extends AnyValCompanion
 
   /** The smallest positive value greater than 0.0d which is
     *  representable as a Double.
@@ -314,4 +313,3 @@ object Double extends AnyValCompanion {
 
   /** The String representation of the scala.Double companion object. */
   override def toString = "object scala.Double"
-}

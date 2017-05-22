@@ -6,8 +6,8 @@ import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.formatter.{FormattingDocumentModelImpl, PsiBasedFormattingModel}
 import com.intellij.psi.{PsiElement, PsiFile}
 
-class HoconFormattingModelBuilder extends FormattingModelBuilder {
-  def createModel(element: PsiElement, settings: CodeStyleSettings) = {
+class HoconFormattingModelBuilder extends FormattingModelBuilder
+  def createModel(element: PsiElement, settings: CodeStyleSettings) =
     val containingFile = element.getContainingFile
     val block = new HoconBlock(
         new HoconFormatter(settings), element.getNode, null, null, null)
@@ -15,9 +15,7 @@ class HoconFormattingModelBuilder extends FormattingModelBuilder {
         containingFile,
         block,
         FormattingDocumentModelImpl.createOn(containingFile))
-  }
 
   def getRangeAffectingIndent(
       file: PsiFile, offset: Int, elementAtOffset: ASTNode) =
     elementAtOffset.getTextRange
-}

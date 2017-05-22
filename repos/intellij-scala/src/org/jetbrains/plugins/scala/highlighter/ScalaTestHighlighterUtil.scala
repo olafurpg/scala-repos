@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.settings.{ScalaProjectSettings, ScalaProjectS
   * @author Roman.Shein
   *         Date: 11.01.2016
   */
-object ScalaTestHighlighterUtil {
+object ScalaTestHighlighterUtil
 
   private val scalaTestKeywords = Set("in",
                                       "ignore",
@@ -40,4 +40,3 @@ object ScalaTestHighlighterUtil {
       .isCustomScalatestSyntaxHighlighting &&
     classFqn.startsWith("org.scalatest") &&
     scalaTestKeywords.contains(methodName)
-}

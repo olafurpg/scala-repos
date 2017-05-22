@@ -4,6 +4,5 @@
 
 package akka.http.javadsl.server
 
-trait ExceptionHandler {
+trait ExceptionHandler
   def handle(exception: RuntimeException): Route
-}

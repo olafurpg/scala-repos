@@ -30,51 +30,42 @@ package scalafx.controls.controls
 import scalafx.scene.control.{Control, Label, TextField, Tooltip}
 
 class ControlControls(target: Control)
-    extends PropertiesNodes[Control](target, "Control Properties") {
+    extends PropertiesNodes[Control](target, "Control Properties")
 
-  val lblHeight = new Label {
+  val lblHeight = new Label
     text <== target.height.asString()
-  }
 
-  val lblWidth = new Label {
+  val lblWidth = new Label
     text <== target.width.asString()
-  }
 
   val originalMaxHeight = target.maxHeight
-  val sldMaxHeight = new SliderLabelControl(target.maxHeight) {
+  val sldMaxHeight = new SliderLabelControl(target.maxHeight)
     min = -10
-  }
 
   val originalPrefHeight = target.prefHeight
-  val sldPrefHeight = new SliderLabelControl(target.prefHeight) {
+  val sldPrefHeight = new SliderLabelControl(target.prefHeight)
     min = -10
-  }
 
   val originalMinHeight = target.minHeight
-  val sldMinHeight = new SliderLabelControl(target.minHeight) {
+  val sldMinHeight = new SliderLabelControl(target.minHeight)
     min = -10
-  }
 
   val originalMinWidth = target.minWidth
-  val sldMinWidth = new SliderLabelControl(target.minWidth) {
+  val sldMinWidth = new SliderLabelControl(target.minWidth)
     min = -10
-  }
 
   val originalPrefWidth = target.prefWidth
-  val sldPrefWidth = new SliderLabelControl(target.prefWidth) {
+  val sldPrefWidth = new SliderLabelControl(target.prefWidth)
     min = -10
-  }
 
   val originalMaxWidth = target.maxWidth
-  val sldMaxWidth = new SliderLabelControl(target.maxWidth) {
+  val sldMaxWidth = new SliderLabelControl(target.maxWidth)
     min = -10
-  }
 
   val txfTooltip = new TextField
-  txfTooltip.text.onChange {
+  txfTooltip.text.onChange
     target.tooltip = if (txfTooltip.text.get.isEmpty) null
     else Tooltip(txfTooltip.text())
-  }
 
   super.addNode("Max Height", sldMaxHeight)
   super.addNode("Pref Height", sldPrefHeight)
@@ -87,15 +78,13 @@ class ControlControls(target: Control)
   super.addNode("Width", lblWidth)
   //  super.addNode(btnReset)
 
-  override def resetProperties() {
+  override def resetProperties()
     target.maxHeight = originalMaxHeight.get
     target.prefHeight = originalPrefHeight.get
     target.minHeight = originalMinHeight.get
     target.minWidth = originalMinWidth.get
     target.prefWidth = originalPrefWidth.get
     target.maxWidth = originalMaxWidth.get
-  }
-}
 
 /*
 ObjectProperty<ContextMenu>	contextMenu

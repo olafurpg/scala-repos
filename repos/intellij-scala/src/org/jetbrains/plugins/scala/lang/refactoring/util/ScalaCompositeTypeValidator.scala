@@ -12,14 +12,14 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Created by Kate Ustyuzhanina on 8/25/15.
   */
-object ScalaCompositeTypeValidator {
+object ScalaCompositeTypeValidator
   def apply(validators: List[ScalaValidator],
             conflictsReporter: ConflictsReporter,
             myProject: Project,
             selectedElement: PsiElement,
             noOccurrences: Boolean,
             enclosingContainerAll: PsiElement,
-            enclosingOne: PsiElement): ScalaCompositeTypeValidator = {
+            enclosingOne: PsiElement): ScalaCompositeTypeValidator =
     new ScalaCompositeTypeValidator(conflictsReporter,
                                     myProject,
                                     selectedElement,
@@ -27,8 +27,6 @@ object ScalaCompositeTypeValidator {
                                     enclosingContainerAll,
                                     enclosingOne,
                                     validators)
-  }
-}
 
 class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
                                   myProject: Project,
@@ -42,46 +40,38 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
                                selectedElement,
                                noOccurrences,
                                enclosingContainerAll,
-                               enclosingOne) {
+                               enclosingOne)
 
   override def findConflicts(
-      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] = {
+      name: String, allOcc: Boolean): Array[(PsiNamedElement, String)] =
     //returns declaration and message
     val buf = new ArrayBuffer[(PsiNamedElement, String)]
 
-    val filesToSearchIn = enclosingContainerAll match {
+    val filesToSearchIn = enclosingContainerAll match
       case directory: PsiDirectory =>
         findFilesForDownConflictFindings(directory, name)
       case _ => null
-    }
 
-    for (file <- filesToSearchIn) {
-      if (buf.isEmpty) {
+    for (file <- filesToSearchIn)
+      if (buf.isEmpty)
         buf ++= getForbiddenNamesInBlock(file, name)
-      }
-    }
 
-    for (validator <- validators) {
-      if (buf.isEmpty) {
+    for (validator <- validators)
+      if (buf.isEmpty)
         buf ++= getForbiddenNames(validator.enclosingContainer(allOcc), name)
-      }
-    }
 
     buf.toArray
-  }
 
   //TODO iliminate duplication
   private def findFilesForDownConflictFindings(
-      directory: PsiDirectory, name: String): Array[PsiFile] = {
-    def oneRound(word: String) = {
+      directory: PsiDirectory, name: String): Array[PsiFile] =
+    def oneRound(word: String) =
       val buffer = new ArrayBuffer[PsiFile]()
 
-      val processor = new Processor[PsiFile] {
-        override def process(file: PsiFile): Boolean = {
+      val processor = new Processor[PsiFile]
+        override def process(file: PsiFile): Boolean =
           buffer += file
           true
-        }
-      }
 
       val helper: PsiSearchHelper =
         PsiSearchHelper.SERVICE.getInstance(directory.getProject)
@@ -92,16 +82,13 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
           true)
 
       buffer
-    }
 
     val resultBuffer = oneRound(name)
     resultBuffer.toArray
-  }
 
-  override def validateName(name: String, increaseNumber: Boolean): String = {
+  override def validateName(name: String, increaseNumber: Boolean): String =
     val newName = name.capitalize
     super.validateName(newName, increaseNumber)
-  }
 
   private def messageForTypeAliasMember(name: String) =
     ScalaBundle.message(
@@ -110,4 +97,3 @@ class ScalaCompositeTypeValidator(conflictsReporter: ConflictsReporter,
   private def messageForClassMember(name: String) =
     ScalaBundle.message(
         "introduced.typealias.will.conflict.with.class.name", name)
-}

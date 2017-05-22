@@ -31,21 +31,19 @@ import org.apache.spark.sql.execution.metric.{LongSQLMetricValue, SQLMetrics}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.ui.SparkUI
 
-class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
+class SQLListenerSuite extends SparkFunSuite with SharedSQLContext
   import testImplicits._
 
-  private def createTestDataFrame: DataFrame = {
+  private def createTestDataFrame: DataFrame =
     Seq(
         (1, 1),
         (2, 2)
     ).toDF().filter("_1 > 1")
-  }
 
-  private def createProperties(executionId: Long): Properties = {
+  private def createProperties(executionId: Long): Properties =
     val properties = new Properties()
     properties.setProperty(SQLExecution.EXECUTION_ID_KEY, executionId.toString)
     properties
-  }
 
   private def createStageInfo(stageId: Int, attemptId: Int): StageInfo =
     new StageInfo(
@@ -73,10 +71,10 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     )
 
   private def createTaskMetrics(
-      accumulatorUpdates: Map[Long, Long]): TaskMetrics = {
+      accumulatorUpdates: Map[Long, Long]): TaskMetrics =
     val metrics = mock(classOf[TaskMetrics])
     when(metrics.accumulatorUpdates()).thenReturn(
-        accumulatorUpdates.map {
+        accumulatorUpdates.map
       case (id, update) =>
         new AccumulableInfo(id,
                             Some(""),
@@ -84,15 +82,13 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
                             value = None,
                             internal = true,
                             countFailedValues = true)
-    }.toSeq)
+    .toSeq)
     metrics
-  }
 
-  test("basic") {
+  test("basic")
     def checkAnswer(
-        actual: Map[Long, String], expected: Map[Long, Long]): Unit = {
+        actual: Map[Long, String], expected: Map[Long, Long]): Unit =
       assert(actual === expected.mapValues(_.toString))
-    }
 
     val listener = new SQLListener(sqlContext.sparkContext.conf)
     val executionId = 0
@@ -102,10 +98,10 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
       .flatMap(_.metrics.map(_.accumulatorId))
     // Assume all accumulators are long
     var accumulatorValue = 0L
-    val accumulatorUpdates = accumulatorIds.map { id =>
+    val accumulatorUpdates = accumulatorIds.map  id =>
       accumulatorValue += 1L
       (id, accumulatorValue)
-    }.toMap
+    .toMap
 
     listener.onOtherEvent(
         SparkListenerSQLExecutionStart(
@@ -286,9 +282,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
 
     checkAnswer(
         listener.getExecutionMetrics(0), accumulatorUpdates.mapValues(_ * 11))
-  }
 
-  test("onExecutionEnd happens before onJobEnd(JobSucceeded)") {
+  test("onExecutionEnd happens before onJobEnd(JobSucceeded)")
     val listener = new SQLListener(sqlContext.sparkContext.conf)
     val executionId = 0
     val df = createTestDataFrame
@@ -318,9 +313,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     assert(executionUIData.runningJobs.isEmpty)
     assert(executionUIData.succeededJobs === Seq(0))
     assert(executionUIData.failedJobs.isEmpty)
-  }
 
-  test("onExecutionEnd happens before multiple onJobEnd(JobSucceeded)s") {
+  test("onExecutionEnd happens before multiple onJobEnd(JobSucceeded)s")
     val listener = new SQLListener(sqlContext.sparkContext.conf)
     val executionId = 0
     val df = createTestDataFrame
@@ -362,9 +356,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     assert(executionUIData.runningJobs.isEmpty)
     assert(executionUIData.succeededJobs.sorted === Seq(0, 1))
     assert(executionUIData.failedJobs.isEmpty)
-  }
 
-  test("onExecutionEnd happens before onJobEnd(JobFailed)") {
+  test("onExecutionEnd happens before onJobEnd(JobFailed)")
     val listener = new SQLListener(sqlContext.sparkContext.conf)
     val executionId = 0
     val df = createTestDataFrame
@@ -394,9 +387,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     assert(executionUIData.runningJobs.isEmpty)
     assert(executionUIData.succeededJobs.isEmpty)
     assert(executionUIData.failedJobs === Seq(0))
-  }
 
-  test("SPARK-11126: no memory leak when running non SQL jobs") {
+  test("SPARK-11126: no memory leak when running non SQL jobs")
     val previousStageNumber = sqlContext.listener.stageIdToStageMetrics.size
     sqlContext.sparkContext.parallelize(1 to 10).foreach(i => ())
     sqlContext.sparkContext.listenerBus.waitUntilEmpty(10000)
@@ -410,9 +402,8 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     assert(
         sqlContext.listener.stageIdToStageMetrics.size == previousStageNumber +
         1)
-  }
 
-  test("SPARK-13055: history listener only tracks SQL metrics") {
+  test("SPARK-13055: history listener only tracks SQL metrics")
     val listener =
       new SQLHistoryListener(sparkContext.conf, mock(classOf[SparkUI]))
     // We need to post other events for the listener to track our accumulators.
@@ -447,44 +438,39 @@ class SQLListenerSuite extends SparkFunSuite with SharedSQLContext {
     // assume that the accumulator value is of type Long, but this may not be true for
     // accumulators that are not SQL metrics.
     listener.onTaskEnd(taskEnd)
-    val trackedAccums = listener.stageIdToStageMetrics.values.flatMap {
+    val trackedAccums = listener.stageIdToStageMetrics.values.flatMap
       stageMetrics =>
         stageMetrics.taskIdToMetricUpdates.values.flatMap(_.accumulatorUpdates)
-    }
     // Listener tracks only SQL metrics, not other accumulators
     assert(trackedAccums.size === 1)
     assert(trackedAccums.head === sqlMetricInfo)
-  }
-}
 
-class SQLListenerMemoryLeakSuite extends SparkFunSuite {
+class SQLListenerMemoryLeakSuite extends SparkFunSuite
 
-  test("no memory leak") {
-    quietly {
+  test("no memory leak")
+    quietly
       val conf = new SparkConf()
         .setMaster("local")
         .setAppName("test")
         .set("spark.task.maxFailures", "1") // Don't retry the tasks to run this test quickly
         .set("spark.sql.ui.retainedExecutions", "50") // Set it to 50 to run this test quickly
       val sc = new SparkContext(conf)
-      try {
+      try
         SQLContext.clearSqlListener()
         val sqlContext = new SQLContext(sc)
         import sqlContext.implicits._
         // Run 100 successful executions and 100 failed executions.
         // Each execution only has one job and one stage.
-        for (i <- 0 until 100) {
+        for (i <- 0 until 100)
           val df = Seq(
               (1, 1),
               (2, 2)
           ).toDF()
           df.collect()
-          try {
+          try
             df.foreach(_ => throw new RuntimeException("Oops"))
-          } catch {
+          catch
             case e: SparkException => // This is expected for a failed job
-          }
-        }
         sc.listenerBus.waitUntilEmpty(10000)
         assert(sqlContext.listener.getCompletedExecutions.size <= 50)
         assert(sqlContext.listener.getFailedExecutions.size <= 50)
@@ -492,9 +478,5 @@ class SQLListenerMemoryLeakSuite extends SparkFunSuite {
         assert(sqlContext.listener.executionIdToData.size <= 100)
         assert(sqlContext.listener.jobIdToExecutionId.size <= 100)
         assert(sqlContext.listener.stageIdToStageMetrics.size <= 100)
-      } finally {
+      finally
         sc.stop()
-      }
-    }
-  }
-}

@@ -30,7 +30,7 @@ import org.apache.spark.sql.catalyst.InternalRow
   * iterator to consume the next row, whereas RowIterator combines these calls into a single
   * [[advanceNext()]] method.
   */
-private[sql] abstract class RowIterator {
+private[sql] abstract class RowIterator
 
   /**
     * Advance this iterator by a single row. Returns `false` if this iterator has no more rows
@@ -49,48 +49,37 @@ private[sql] abstract class RowIterator {
     * Convert this RowIterator into a [[scala.collection.Iterator]].
     */
   def toScala: Iterator[InternalRow] = new RowIteratorToScala(this)
-}
 
-object RowIterator {
-  def fromScala(scalaIter: Iterator[InternalRow]): RowIterator = {
-    scalaIter match {
+object RowIterator
+  def fromScala(scalaIter: Iterator[InternalRow]): RowIterator =
+    scalaIter match
       case wrappedRowIter: RowIteratorToScala => wrappedRowIter.rowIter
       case _ => new RowIteratorFromScala(scalaIter)
-    }
-  }
-}
 
 private final class RowIteratorToScala(val rowIter: RowIterator)
-    extends Iterator[InternalRow] {
+    extends Iterator[InternalRow]
   private[this] var hasNextWasCalled: Boolean = false
   private[this] var _hasNext: Boolean = false
-  override def hasNext: Boolean = {
+  override def hasNext: Boolean =
     // Idempotency:
-    if (!hasNextWasCalled) {
+    if (!hasNextWasCalled)
       _hasNext = rowIter.advanceNext()
       hasNextWasCalled = true
-    }
     _hasNext
-  }
-  override def next(): InternalRow = {
+  override def next(): InternalRow =
     if (!hasNext) throw new NoSuchElementException
     hasNextWasCalled = false
     rowIter.getRow
-  }
-}
 
 private final class RowIteratorFromScala(scalaIter: Iterator[InternalRow])
-    extends RowIterator {
+    extends RowIterator
   private[this] var _next: InternalRow = null
-  override def advanceNext(): Boolean = {
-    if (scalaIter.hasNext) {
+  override def advanceNext(): Boolean =
+    if (scalaIter.hasNext)
       _next = scalaIter.next()
       true
-    } else {
+    else
       _next = null
       false
-    }
-  }
   override def getRow: InternalRow = _next
   override def toScala: Iterator[InternalRow] = scalaIter
-}

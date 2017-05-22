@@ -17,7 +17,7 @@ package io.prediction.data.storage
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone
 
-trait TestEvents {
+trait TestEvents
 
   val u1BaseTime = new DateTime(654321)
   val u2BaseTime = new DateTime(6543210)
@@ -255,4 +255,3 @@ trait TestEvents {
       eventTime = new DateTime(12345678, DateTimeZone.forID("+08:00")),
       prId = Some("my_prid")
   )
-}

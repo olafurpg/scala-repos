@@ -38,7 +38,7 @@ import scalafx.scene.Scene
 /**
   * Companion Object for [[scalafx.embed.swing.SFXPanel]].
   */
-object SFXPanel {
+object SFXPanel
 
   /**
     * Converts a ScalaFX JFXPanel to its JavaFX counterpart.
@@ -48,7 +48,6 @@ object SFXPanel {
     */
   implicit def sfxPanel2jfx(panel: SFXPanel): jfxes.JFXPanel =
     if (panel != null) panel.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/embed/swing/JFXPanel.html JavaFX 
@@ -60,7 +59,7 @@ object SFXPanel {
   * @since 8.0
   */
 class SFXPanel(override val delegate: jfxes.JFXPanel = new jfxes.JFXPanel)
-    extends SFXDelegate[jfxes.JFXPanel] {
+    extends SFXDelegate[jfxes.JFXPanel]
 
   /**
     *
@@ -79,9 +78,8 @@ class SFXPanel(override val delegate: jfxes.JFXPanel = new jfxes.JFXPanel)
     * the ScalaFX scene attached to this JFXPanel.
     */
   def scene: Scene = delegate.getScene
-  def scene_=(s: Scene) {
+  def scene_=(s: Scene)
     delegate.setScene(s)
-  }
 
   /**
     * SFXPanel's opacity is controlled by the JavaFX content which is displayed in this component,
@@ -93,9 +91,8 @@ class SFXPanel(override val delegate: jfxes.JFXPanel = new jfxes.JFXPanel)
     * SFXPanel's opacity is controlled by the JavaFX content which is displayed in this component,
     * so this method overrides JComponent.setOpaque(boolean) to only accept a false value.
     */
-  def opaque_=(b: Boolean) {
+  def opaque_=(b: Boolean)
     delegate.setOpaque(b)
-  }
 
   /**
     * Notifies this component that it now has a parent component.
@@ -106,4 +103,3 @@ class SFXPanel(override val delegate: jfxes.JFXPanel = new jfxes.JFXPanel)
     * Notifies this component that it no longer has a parent component.
     */
   def removeNotify: Unit = delegate.removeNotify
-}

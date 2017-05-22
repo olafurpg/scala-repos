@@ -34,36 +34,29 @@ import scalafx.scene.control._
   *
   */
 class ComboBoxControls(target: ComboBox[String])
-    extends PropertiesNodes[ComboBox[String]](target, "ComboBox Properties") {
+    extends PropertiesNodes[ComboBox[String]](target, "ComboBox Properties")
 
   var itemIndex = 0
 
-  def addNewTab() {
+  def addNewTab()
     itemIndex += 1
     target += "Item %d".format(itemIndex)
-  }
 
-  def removeCurrentItem() {
+  def removeCurrentItem()
     target -= target.value.get
-  }
 
-  val txfVisibleRowCount = new TextField {
+  val txfVisibleRowCount = new TextField
     text = target.visibleRowCount.get.toString
-  }
-  txfVisibleRowCount.onAction = handle {
+  txfVisibleRowCount.onAction = handle
     fillIntPropertyFromText(target.visibleRowCount, txfVisibleRowCount, false)
-  }
 
-  val btnAddItem = new Button {
+  val btnAddItem = new Button
     text = "Add new Item"
     onAction = handle { addNewTab() }
-  }
 
-  val btnRemoveItem = new Button {
+  val btnRemoveItem = new Button
     text = "Remove Item"
     onAction = handle { removeCurrentItem() }
-  }
 
   super.addNode("Visible Rows", txfVisibleRowCount)
   super.addNodes(btnAddItem, btnRemoveItem)
-}

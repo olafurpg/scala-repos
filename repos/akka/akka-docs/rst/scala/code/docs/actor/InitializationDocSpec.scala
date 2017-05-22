@@ -6,17 +6,15 @@ package docs.actor
 import akka.actor.{Props, Actor}
 import akka.testkit.{ImplicitSender, AkkaSpec}
 
-object InitializationDocSpec {
+object InitializationDocSpec
 
-  class PreStartInitExample extends Actor {
-    override def receive = {
+  class PreStartInitExample extends Actor
+    override def receive =
       case _ => // Ignore
-    }
 
     //#preStartInit
-    override def preStart(): Unit = {
+    override def preStart(): Unit =
       // Initialize children here
-    }
 
     // Overriding postRestart to disable the call to preStart()
     // after restarts
@@ -25,36 +23,30 @@ object InitializationDocSpec {
     // The default implementation of preRestart() stops all the children
     // of the actor. To opt-out from stopping the children, we
     // have to override preRestart()
-    override def preRestart(reason: Throwable, message: Option[Any]): Unit = {
+    override def preRestart(reason: Throwable, message: Option[Any]): Unit =
       // Keep the call to postStop(), but no stopping of children
       postStop()
-    }
     //#preStartInit
-  }
 
-  class MessageInitExample extends Actor {
+  class MessageInitExample extends Actor
     //#messageInit
     var initializeMe: Option[String] = None
 
-    override def receive = {
+    override def receive =
       case "init" =>
         initializeMe = Some("Up and running")
         context.become(initialized, discardOld = true)
-    }
 
-    def initialized: Receive = {
+    def initialized: Receive =
       case "U OK?" => initializeMe foreach { sender() ! _ }
-    }
     //#messageInit
-  }
-}
 
-class InitializationDocSpec extends AkkaSpec with ImplicitSender {
+class InitializationDocSpec extends AkkaSpec with ImplicitSender
   import InitializationDocSpec._
 
-  "Message based initialization example" must {
+  "Message based initialization example" must
 
-    "work correctly" in {
+    "work correctly" in
       val example =
         system.actorOf(Props[MessageInitExample], "messageInitExample")
       val probe = "U OK?"
@@ -65,6 +57,3 @@ class InitializationDocSpec extends AkkaSpec with ImplicitSender {
       example ! "init"
       example ! probe
       expectMsg("Up and running")
-    }
-  }
-}

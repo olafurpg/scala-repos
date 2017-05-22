@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.settings.ParserSettings
 import com.typesafe.config.{ConfigFactory, Config}
 
-object HttpHeaderParserTestBed extends App {
+object HttpHeaderParserTestBed extends App
 
   val testConf: Config =
     ConfigFactory.parseString("""
@@ -15,13 +15,12 @@ object HttpHeaderParserTestBed extends App {
     akka.http.parsing.header-cache.Host = 300""")
   val system = ActorSystem("HttpHeaderParserTestBed", testConf)
 
-  val parser = HttpHeaderParser.prime {
+  val parser = HttpHeaderParser.prime
     HttpHeaderParser.unprimed(
         ParserSettings(system),
         warnOnIllegalHeader = info ⇒ system.log.warning(info.formatPretty))
-  }
 
-  println {
+  println
     s"""
        |HttpHeaderParser primed Trie
        |----------------------------
@@ -29,10 +28,8 @@ object HttpHeaderParserTestBed extends App {
        |%TRIE%
        |
        |formatSizes: ${parser.formatSizes}
-       |contentHistogram: ${parser.contentHistogram.mkString(
-           "\n  ", "\n  ", "\n")}
+       |contentHistogram: $parser.contentHistogram.mkString(
+           "\n  ", "\n  ", "\n")
      """.stripMargin.replace("%TRIE%", parser.formatTrie)
-  }
 
   system.terminate()
-}

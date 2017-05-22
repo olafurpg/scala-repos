@@ -5,23 +5,22 @@ import akka.stream._
 import akka.stream.scaladsl._
 import akka.testkit.AkkaSpec
 
-class StreamBuffersRateSpec extends AkkaSpec {
+class StreamBuffersRateSpec extends AkkaSpec
   implicit val materializer = ActorMaterializer()
 
-  "Demonstrate pipelining" in {
+  "Demonstrate pipelining" in
     def println(s: Any) = ()
     //#pipelining
-    Source(1 to 3).map { i =>
+    Source(1 to 3).map  i =>
       println(s"A: $i"); i
-    }.map { i =>
+    .map  i =>
       println(s"B: $i"); i
-    }.map { i =>
+    .map  i =>
       println(s"C: $i"); i
-    }.runWith(Sink.ignore)
+    .runWith(Sink.ignore)
     //#pipelining
-  }
 
-  "Demonstrate buffer sizes" in {
+  "Demonstrate buffer sizes" in
     //#materializer-buffer
     val materializer = ActorMaterializer(ActorMaterializerSettings(system)
           .withInputBuffer(initialSize = 64, maxSize = 64))
@@ -34,15 +33,14 @@ class StreamBuffersRateSpec extends AkkaSpec {
     val flow =
       section.via(Flow[Int].map(_ / 2)) // the buffer size of this map is the default
     //#section-buffer
-  }
 
-  "buffering abstraction leak" in {
+  "buffering abstraction leak" in
     //#buffering-abstraction-leak
     import scala.concurrent.duration._
     case class Tick()
 
     RunnableGraph.fromGraph(
-        GraphDSL.create() { implicit b =>
+        GraphDSL.create()  implicit b =>
       import GraphDSL.Implicits._
 
       val zipper = b.add(ZipWith[Tick, Int, Int]((tick, count) => count))
@@ -55,11 +53,10 @@ class StreamBuffersRateSpec extends AkkaSpec {
 
       zipper.out ~> Sink.foreach(println)
       ClosedShape
-    })
+    )
     //#buffering-abstraction-leak
-  }
 
-  "explcit buffers" in {
+  "explcit buffers" in
     trait Job
     def inboundJobsConnector(): Source[Job, NotUsed] = Source.empty
     //#explicit-buffers-backpressure
@@ -87,5 +84,3 @@ class StreamBuffersRateSpec extends AkkaSpec {
     //#explicit-buffers-fail
     jobs.buffer(1000, OverflowStrategy.fail)
     //#explicit-buffers-fail
-  }
-}

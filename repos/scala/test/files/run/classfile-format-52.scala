@@ -12,12 +12,12 @@ import Opcodes._
 //
 // By its nature the test can only work on JDK 8+ because under JDK 7- the
 // interface won't verify.
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String =
     "-Yopt:l:classpath -usejavacp -d " + testOutput.path + " -cp " +
     testOutput.path
 
-  def generateInterface() {
+  def generateInterface()
     val interfaceName = "HasDefaultMethod"
     val methodType = "()Ljava/lang/String;"
 
@@ -29,14 +29,13 @@ object Test extends DirectTest {
              "java/lang/Object",
              null)
 
-    def createMethod(flags: Int, name: String) {
+    def createMethod(flags: Int, name: String)
       val method = cw.visitMethod(flags, name, methodType, null, null)
       method.visitCode()
       method.visitLdcInsn(s"hello from $name")
       method.visitInsn(ARETURN)
       method.visitMaxs(1, 1)
       method.visitEnd()
-    }
 
     createMethod(ACC_PUBLIC, "publicMethod")
     createMethod(ACC_PUBLIC + ACC_STATIC, "staticMethod")
@@ -48,7 +47,6 @@ object Test extends DirectTest {
     val fos = new FileOutputStream(
         new File(s"${testOutput.path}/$interfaceName.class"))
     try fos write bytes finally fos.close()
-  }
 
   def code =
     """
@@ -58,23 +56,20 @@ class Driver extends HasDefaultMethod {
 }
 """
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
-    try {
+    try
       // this test is only valid under JDK 1.8+
-      testUnderJavaAtLeast("1.8") {
+      testUnderJavaAtLeast("1.8")
         generateInterface()
         compile()
         Class
           .forName("Driver")
           .newInstance()
           ()
-      } otherwise {
+      otherwise
         println("hello from publicMethod")
         println("hello from staticMethod")
-      }
-    } finally System.setErr(prevErr)
-  }
-}
+    finally System.setErr(prevErr)

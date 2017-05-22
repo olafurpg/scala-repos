@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import org.scalacheck.Prop.forAll
 
-object DListTest extends SpecLite {
+object DListTest extends SpecLite
 
   checkAll(equal.laws[DList[Int]])
   checkAll(monoid.laws[DList[Int]])
@@ -19,7 +19,7 @@ object DListTest extends SpecLite {
   "DList append" !
   ((0 to 100000).foldLeft(DList[Int]())(_ :+ _).toList must_== (0 to 100000).toList)
 
-  "headOption, tailOption" ! forAll { (n: Int, d: DList[Int]) =>
+  "headOption, tailOption" ! forAll  (n: Int, d: DList[Int]) =>
     // Defined when appropriate?
     val nonempty = d.uncons(false, (_, _) => true)
     d.headOption.isDefined must_=== nonempty
@@ -29,9 +29,8 @@ object DListTest extends SpecLite {
     val d0 = n +: d
     check(d0.headOption === Some(n)) // no Show instance, can't use must_===
     check(d0.tailOption === Some(d))
-  }
 
-  object instances {
+  object instances
     def equal[A : Equal] = Equal[DList[A]]
     def monoid[A] = Monoid[DList[A]]
     def monadPlus = MonadPlus[DList]
@@ -39,5 +38,3 @@ object DListTest extends SpecLite {
     def traverse = Traverse[DList]
     def zip = Zip[DList]
     def isEmpty = IsEmpty[DList]
-  }
-}

@@ -65,38 +65,34 @@ import org.slf4j.LoggerFactory
 import akka.actor.ActorSystem
 import akka.dispatch.ExecutionContext
 
-trait ParseEvalStackSpecs[M[+ _]] extends Specification {
+trait ParseEvalStackSpecs[M[+ _]] extends Specification
   type TestStack <: TestStackLike[M]
-}
 
-object TestStack {
+object TestStack
   val testAPIKey = "dummyAPIKey"
   val testAccount = "dummyAccount"
-}
 
-trait ActorPlatformSpecs {
+trait ActorPlatformSpecs
   implicit val actorSystem = ActorSystem("platformSpecsActorSystem")
   implicit val executor = ExecutionContext.defaultExecutionContext(actorSystem)
-}
 
 trait TestStackLike[M[+ _]]
     extends ParseEvalStack[M] with EchoHttpClientModule[M]
     with MemoryDatasetConsumer[M] with IdSourceScannerModule
-    with EvalStackLike {
+    with EvalStackLike
   self =>
   import TestStack._
 
   protected lazy val parseEvalLogger =
     LoggerFactory.getLogger("com.precog.muspelheim.ParseEvalStackSpecs")
 
-  class ParseEvalStackSpecConfig extends BaseConfig with IdSourceConfig {
+  class ParseEvalStackSpecConfig extends BaseConfig with IdSourceConfig
     parseEvalLogger.trace("Init yggConfig")
     val config =
-      Configuration parse {
-        Option(System.getProperty("precog.storage.root")) map {
+      Configuration parse
+        Option(System.getProperty("precog.storage.root")) map
           "precog.storage.root = " + _
-        } getOrElse { "" }
-      }
+        getOrElse { "" }
 
     val sortWorkDir = scratchDir
     val memoizationBufferSize = sortBufferSize
@@ -111,7 +107,6 @@ trait TestStackLike[M[+ _]]
     val smallSliceSize = 3
 
     val idSource = new FreshAtomicIdSource
-  }
 
   private val dummyAccount = AccountDetails("dummyAccount",
                                             "nobody@precog.com",
@@ -126,7 +121,7 @@ trait TestStackLike[M[+ _]]
   def eval(str: String, debug: Boolean = false): Set[SValue] =
     evalE(str, debug) map { _._2 }
 
-  def evalE(str: String, debug: Boolean = false): Set[SEvent] = {
+  def evalE(str: String, debug: Boolean = false): Set[SEvent] =
     parseEvalLogger.debug("Beginning evaluation of query: " + str)
 
     val preForest = compile(str)
@@ -137,11 +132,8 @@ trait TestStackLike[M[+ _]]
     val tree = forest.head
 
     val Right(dag) = decorate(emit(tree))
-    consumeEval(dag, dummyEvaluationContext) match {
+    consumeEval(dag, dummyEvaluationContext) match
       case Success(result) =>
         parseEvalLogger.debug("Evaluation complete for query: " + str)
         result
       case Failure(error) => throw error
-    }
-  }
-}

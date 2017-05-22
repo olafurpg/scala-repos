@@ -15,73 +15,65 @@ import org.scalatest.{BeforeAndAfterAll, Matchers}
 
 class HistoryActorTest
     extends MarathonActorSupport with MarathonSpec with MockitoSugar
-    with BeforeAndAfterAll with Matchers with ImplicitSender {
+    with BeforeAndAfterAll with Matchers with ImplicitSender
   import org.apache.mesos.Protos.TaskState._
 
   var historyActor: ActorRef = _
   var failureRepo: TaskFailureRepository = _
 
-  before {
+  before
     failureRepo = mock[TaskFailureRepository]
     historyActor = TestActorRef(
         Props(
             new HistoryActor(system.eventStream, failureRepo)
         ))
-  }
 
-  test("Store TASK_FAILED") {
+  test("Store TASK_FAILED")
     val message = statusMessage(TASK_FAILED)
     historyActor ! message
 
     verify(failureRepo).store(
         message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
-  }
 
-  test("Store TASK_ERROR") {
+  test("Store TASK_ERROR")
     val message = statusMessage(TASK_ERROR)
     historyActor ! message
 
     verify(failureRepo).store(
         message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
-  }
 
-  test("Store TASK_LOST") {
+  test("Store TASK_LOST")
     val message = statusMessage(TASK_LOST)
     historyActor ! message
 
     verify(failureRepo).store(
         message.appId, TaskFailure.FromMesosStatusUpdateEvent(message).get)
-  }
 
-  test("Ignore TASK_RUNNING") {
+  test("Ignore TASK_RUNNING")
     val message = statusMessage(TASK_RUNNING)
     historyActor ! message
 
     verify(failureRepo, times(0)).store(any(), any())
-  }
 
-  test("Ignore TASK_FINISHED") {
+  test("Ignore TASK_FINISHED")
     val message = statusMessage(TASK_FINISHED)
     historyActor ! message
 
     verify(failureRepo, times(0)).store(any(), any())
-  }
 
-  test("Ignore TASK_KILLED") {
+  test("Ignore TASK_KILLED")
     val message = statusMessage(TASK_KILLED)
     historyActor ! message
 
     verify(failureRepo, times(0)).store(any(), any())
-  }
 
-  test("Ignore TASK_STAGING") {
+  test("Ignore TASK_STAGING")
     val message = statusMessage(TASK_STAGING)
     historyActor ! message
 
     verify(failureRepo, times(0)).store(any(), any())
-  }
 
-  private def statusMessage(state: TaskState) = {
+  private def statusMessage(state: TaskState) =
     val ipAddress: NetworkInfo.IPAddress = NetworkInfo.IPAddress
       .newBuilder()
       .setIpAddress("123.123.123.123")
@@ -99,5 +91,3 @@ class HistoryActorTest
         ports = Nil,
         version = Timestamp.now().toString
     )
-  }
-}

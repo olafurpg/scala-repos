@@ -26,67 +26,55 @@ class ScSelfTypeElementImpl private (stub: StubElement[ScSelfTypeElement],
                                      nodeType: IElementType,
                                      node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScSelfTypeElement {
+    with ScSelfTypeElement
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScSelfTypeElementStub) = {
+  def this(stub: ScSelfTypeElementStub) =
     this(stub, ScalaElementTypes.SELF_TYPE, null)
-  }
 
   override def toString: String = "SelfType: " + name
 
   def nameId: PsiElement = findChildByType[PsiElement](TokenSets.SELF_TYPE_ID)
 
-  def getType(ctx: TypingContext): TypeResult[ScType] = {
+  def getType(ctx: TypingContext): TypeResult[ScType] =
     val parent =
       PsiTreeUtil.getParentOfType(this, classOf[ScTemplateDefinition])
     assert(parent != null)
-    typeElement match {
+    typeElement match
       case Some(ste) =>
-        for {
+        for
           templateType <- parent.getType(ctx)
           selfType <- ste.getType(ctx)
           ct = ScCompoundType(
               Seq(templateType, selfType), Map.empty, Map.empty)
-        } yield ct
+        yield ct
       case None => parent.getType(ctx)
-    }
-  }
 
-  def typeElement: Option[ScTypeElement] = {
+  def typeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
-      return stub.asInstanceOf[ScSelfTypeElementStub].getTypeElementText match {
+    if (stub != null)
+      return stub.asInstanceOf[ScSelfTypeElementStub].getTypeElementText match
         case "" => None
         case text =>
           Some(
               ScalaPsiElementFactory.createTypeElementFromText(
                   text, this, this))
-      }
-    }
     findChild(classOf[ScTypeElement])
-  }
 
-  def getClassNames: Array[String] = {
+  def getClassNames: Array[String] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScSelfTypeElementStub].getClassNames
-    }
     val names = new ArrayBuffer[String]()
-    def fillNames(typeElement: ScTypeElement) {
-      typeElement match {
+    def fillNames(typeElement: ScTypeElement)
+      typeElement match
         case s: ScSimpleTypeElement =>
-          s.reference match {
+          s.reference match
             case Some(ref) => names += ref.refName
             case _ =>
-          }
         case p: ScParameterizedTypeElement => fillNames(p.typeElement)
         case c: ScCompoundTypeElement =>
           c.components.foreach(fillNames)
         case _ => //do nothing
-      }
-    }
     typeElement.foreach(fillNames)
     names.toArray
-  }
-}

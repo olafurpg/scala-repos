@@ -26,12 +26,12 @@ import org.scalatest.{Matchers, FreeSpec}
 import akka.http.impl.util._
 
 class WebSocketClientSpec
-    extends FreeSpec with Matchers with WithMaterializerSpec {
-  "The client-side WebSocket implementation should" - {
+    extends FreeSpec with Matchers with WithMaterializerSpec
+  "The client-side WebSocket implementation should" -
     "establish a websocket connection when the user requests it" in new EstablishedConnectionSetup
     with ClientEchoes
     "establish connection with case insensitive header values" in new TestSetup
-    with ClientEchoes {
+    with ClientEchoes
       expectWireData(UpgradeRequestBytes)
       sendWireData("""HTTP/1.1 101 Switching Protocols
                      |Upgrade: wEbSOckET
@@ -45,9 +45,8 @@ class WebSocketClientSpec
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
       expectMaskedFrameOnNetwork(
           Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
-    }
-    "reject invalid handshakes" - {
-      "other status code" in new TestSetup with ClientEchoes {
+    "reject invalid handshakes" -
+      "other status code" in new TestSetup with ClientEchoes
         expectWireData(UpgradeRequestBytes)
 
         sendWireData("""HTTP/1.1 404 Not Found
@@ -59,8 +58,7 @@ class WebSocketClientSpec
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
             "WebSocket server at ws://example.org/ws returned unexpected status code: 404 Not Found")
-      }
-      "missing Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes {
+      "missing Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes
         expectWireData(UpgradeRequestBytes)
 
         sendWireData("""HTTP/1.1 101 Switching Protocols
@@ -74,8 +72,7 @@ class WebSocketClientSpec
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
             "WebSocket server at ws://example.org/ws returned response that was missing required `Sec-WebSocket-Accept` header.")
-      }
-      "wrong Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes {
+      "wrong Sec-WebSocket-Accept hash" in new TestSetup with ClientEchoes
         expectWireData(UpgradeRequestBytes)
 
         sendWireData("""HTTP/1.1 101 Switching Protocols
@@ -90,8 +87,7 @@ class WebSocketClientSpec
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
             "WebSocket server at ws://example.org/ws returned response with invalid `Sec-WebSocket-Accept` header.")
-      }
-      "missing `Upgrade` header" in new TestSetup with ClientEchoes {
+      "missing `Upgrade` header" in new TestSetup with ClientEchoes
         expectWireData(UpgradeRequestBytes)
 
         sendWireData("""HTTP/1.1 101 Switching Protocols
@@ -105,9 +101,8 @@ class WebSocketClientSpec
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
             "WebSocket server at ws://example.org/ws returned response that was missing required `Upgrade` header.")
-      }
       "missing `Connection: upgrade` header" in new TestSetup
-      with ClientEchoes {
+      with ClientEchoes
         expectWireData(UpgradeRequestBytes)
 
         sendWireData("""HTTP/1.1 101 Switching Protocols
@@ -121,10 +116,8 @@ class WebSocketClientSpec
         expectNetworkAbort()
         expectInvalidUpgradeResponseCause(
             "WebSocket server at ws://example.org/ws returned response that was missing required `Connection` header.")
-      }
-    }
 
-    "don't send out frames before handshake was finished successfully" in new TestSetup {
+    "don't send out frames before handshake was finished successfully" in new TestSetup
       def clientImplementation: Flow[Message, Message, NotUsed] =
         Flow.fromSinkAndSourceMat(
             Sink.ignore, Source.single(TextMessage("fast message")))(Keep.none)
@@ -141,9 +134,8 @@ class WebSocketClientSpec
 
       closeNetworkInput()
       expectNetworkClose()
-    }
     "receive first frame in same chunk as HTTP upgrade response" in new TestSetup
-    with ClientProbes {
+    with ClientProbes
       expectWireData(UpgradeRequestBytes)
 
       val firstFrame = WSTestUtils.frame(
@@ -151,10 +143,9 @@ class WebSocketClientSpec
       sendWireData(UpgradeResponseBytes ++ firstFrame)
 
       messagesIn.requestNext(TextMessage("fast"))
-    }
 
     "manual scenario client sends first" in new EstablishedConnectionSetup
-    with ClientProbes {
+    with ClientProbes
       messagesOut.sendNext(TextMessage("Message 1"))
 
       expectMaskedFrameOnNetwork(
@@ -166,9 +157,8 @@ class WebSocketClientSpec
                   mask = false)
 
       messagesIn.requestNext(BinaryMessage(ByteString("Response")))
-    }
     "client echoes scenario" in new EstablishedConnectionSetup
-    with ClientEchoes {
+    with ClientEchoes
       sendWSFrame(Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
       expectMaskedFrameOnNetwork(
           Protocol.Opcode.Text, ByteString("Message 1"), fin = true)
@@ -190,10 +180,9 @@ class WebSocketClientSpec
 
       closeNetworkInput()
       expectNetworkClose()
-    }
-    "support subprotocols" - {
+    "support subprotocols" -
       "accept if server supports subprotocol" in new TestSetup
-      with ClientEchoes {
+      with ClientEchoes
         override protected def requestedSubProtocol: Option[String] =
           Some("v2")
 
@@ -221,9 +210,8 @@ class WebSocketClientSpec
         expectMaskedFrameOnNetwork(Protocol.Opcode.Text,
                                    ByteString("Message 1"),
                                    fin = true)
-      }
-      "send error on user flow if server doesn't support subprotocol" - {
-        "if no protocol was selected" in new TestSetup with ClientProbes {
+      "send error on user flow if server doesn't support subprotocol" -
+        "if no protocol was selected" in new TestSetup with ClientProbes
           override protected def requestedSubProtocol: Option[String] =
             Some("v2")
 
@@ -249,9 +237,8 @@ class WebSocketClientSpec
           expectNetworkAbort()
           expectInvalidUpgradeResponseCause(
               "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: None)")
-        }
         "if different protocol was selected" in new TestSetup
-        with ClientProbes {
+        with ClientProbes
           override protected def requestedSubProtocol: Option[String] =
             Some("v2")
 
@@ -278,12 +265,8 @@ class WebSocketClientSpec
           expectNetworkAbort()
           expectInvalidUpgradeResponseCause(
               "WebSocket server at ws://example.org/ws returned response that indicated that the given subprotocol was not supported. (client supported: v2, server supported: Some(v3))")
-        }
-      }
-    }
-  }
 
-  def UpgradeRequestBytes = ByteString {
+  def UpgradeRequestBytes = ByteString
     """GET /ws HTTP/1.1
       |Upgrade: websocket
       |Connection: upgrade
@@ -293,9 +276,8 @@ class WebSocketClientSpec
       |User-Agent: akka-http/test
       |
       |""".stripMarginWithNewline("\r\n")
-  }
 
-  def UpgradeResponseBytes = ByteString {
+  def UpgradeResponseBytes = ByteString
     """HTTP/1.1 101 Switching Protocols
       |Upgrade: websocket
       |Sec-WebSocket-Accept: ujmZX4KXZqjwy6vi1aQFH5p4Ygk=
@@ -304,14 +286,12 @@ class WebSocketClientSpec
       |Connection: upgrade
       |
       |""".stripMarginWithNewline("\r\n")
-  }
 
-  abstract class EstablishedConnectionSetup extends TestSetup {
+  abstract class EstablishedConnectionSetup extends TestSetup
     expectWireData(UpgradeRequestBytes)
     sendWireData(UpgradeResponseBytes)
-  }
 
-  abstract class TestSetup extends WSTestSetupBase {
+  abstract class TestSetup extends WSTestSetupBase
     protected def noMsgTimeout: FiniteDuration = 100.millis
     protected def clientImplementation: Flow[Message, Message, NotUsed]
     protected def requestedSubProtocol: Option[String] = None
@@ -330,37 +310,35 @@ class WebSocketClientSpec
           WebSocketRequest(targetUri, subprotocol = requestedSubProtocol),
           settings = settings)
 
-    val (netOut, netIn, response) = {
+    val (netOut, netIn, response) =
       val netOut = ByteStringSinkProbe()
       val netIn = TestPublisher.probe[ByteString]()
 
       val graph =
-        RunnableGraph.fromGraph(GraphDSL.create(clientLayer) {
+        RunnableGraph.fromGraph(GraphDSL.create(clientLayer)
           implicit b ⇒ client ⇒
             import GraphDSL.Implicits._
             Source.fromPublisher(netIn) ~> Flow[ByteString]
               .map(SessionBytes(null, _)) ~> client.in2
-            client.out1 ~> Flow[SslTlsOutbound].collect {
+            client.out1 ~> Flow[SslTlsOutbound].collect
               case SendBytes(x) ⇒ x
-            } ~> netOut.sink
+            ~> netOut.sink
             client.out2 ~> clientImplementation ~> client.in1
             ClosedShape
-        })
+        )
 
       val response = graph.run()
 
       (netOut, netIn, response)
-    }
     def expectBytes(length: Int): ByteString = netOut.expectBytes(length)
     def expectBytes(bytes: ByteString): Unit = netOut.expectBytes(bytes)
 
     def wipeDate(string: String) =
       string
         .fastSplit('\n')
-        .map {
+        .map
           case s if s.startsWith("Date:") ⇒ "Date: XXXX\r"
           case s ⇒ s
-        }
         .mkString("\n")
 
     def sendWireData(data: String): Unit =
@@ -374,10 +352,9 @@ class WebSocketClientSpec
     def expectWireData(bs: ByteString) = netOut.expectBytes(bs)
     def expectNoWireData() = netOut.expectNoBytes(noMsgTimeout)
 
-    def expectNetworkClose(): Unit = {
+    def expectNetworkClose(): Unit =
       netOut.request(1)
       netOut.expectComplete()
-    }
     def expectNetworkAbort(): Unit = netOut.expectError()
     def closeNetworkInput(): Unit = netIn.sendComplete()
 
@@ -389,19 +366,15 @@ class WebSocketClientSpec
     import akka.http.impl.util._
     def expectInvalidUpgradeResponse(): InvalidUpgradeResponse =
       response.awaitResult(1.second).asInstanceOf[InvalidUpgradeResponse]
-  }
 
-  trait ClientEchoes extends TestSetup {
+  trait ClientEchoes extends TestSetup
     override def clientImplementation: Flow[Message, Message, NotUsed] =
       echoServer
     def echoServer: Flow[Message, Message, NotUsed] = Flow[Message]
-  }
-  trait ClientProbes extends TestSetup {
+  trait ClientProbes extends TestSetup
     lazy val messagesOut = TestPublisher.probe[Message]()
     lazy val messagesIn = TestSubscriber.probe[Message]()
 
     override def clientImplementation: Flow[Message, Message, NotUsed] =
       Flow.fromSinkAndSourceMat(Sink.fromSubscriber(messagesIn),
                                 Source.fromPublisher(messagesOut))(Keep.none)
-  }
-}

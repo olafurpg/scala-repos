@@ -23,7 +23,7 @@ import scala.util.DynamicVariable
   *
   * @see ScalatraServlet
   */
-trait ScalatraFilter extends Filter with ServletBase {
+trait ScalatraFilter extends Filter with ServletBase
 
   private[this] val _filterChain: DynamicVariable[FilterChain] =
     new DynamicVariable[FilterChain](null)
@@ -32,66 +32,54 @@ trait ScalatraFilter extends Filter with ServletBase {
 
   def doFilter(request: ServletRequest,
                response: ServletResponse,
-               chain: FilterChain): Unit = {
+               chain: FilterChain): Unit =
     val httpRequest = request.asInstanceOf[HttpServletRequest]
     val httpResponse = response.asInstanceOf[HttpServletResponse]
 
-    _filterChain.withValue(chain) {
+    _filterChain.withValue(chain)
       handle(httpRequest, httpResponse)
-    }
-  }
 
   // What goes in servletPath and what goes in pathInfo depends on how the underlying servlet is mapped.
   // Unlike the Scalatra servlet, we'll use both here by default.  Don't like it?  Override it.
-  def requestPath(implicit request: HttpServletRequest): String = {
-    def getRequestPath: String = request.getRequestURI match {
+  def requestPath(implicit request: HttpServletRequest): String =
+    def getRequestPath: String = request.getRequestURI match
       case requestURI: String =>
         var uri = requestURI
         if (request.getContextPath.length > 0)
           uri = uri.substring(request.getContextPath.length)
-        if (uri.length == 0) {
+        if (uri.length == 0)
           uri = "/"
-        } else {
+        else
           val pos = uri.indexOf(';')
           if (pos >= 0) uri = uri.substring(0, pos)
-        }
         UriDecoder.firstStep(uri)
       case null => "/"
-    }
 
-    request.get("org.scalatra.ScalatraFilter.requestPath") match {
+    request.get("org.scalatra.ScalatraFilter.requestPath") match
       case Some(uri) => uri.toString
-      case _ => {
+      case _ =>
           val requestPath = getRequestPath
           request.setAttribute(
               "org.scalatra.ScalatraFilter.requestPath", requestPath)
           requestPath.toString
-        }
-    }
-  }
 
-  protected def routeBasePath(implicit request: HttpServletRequest): String = {
+  protected def routeBasePath(implicit request: HttpServletRequest): String =
     if (servletContext == null)
       throw new IllegalStateException(
           "routeBasePath requires an initialized servlet context to determine the context path")
     servletContext.getContextPath
-  }
 
   protected var doNotFound: Action = () =>
     filterChain.doFilter(request, response)
 
-  methodNotAllowed { _ =>
+  methodNotAllowed  _ =>
     filterChain.doFilter(request, response)
-  }
 
   type ConfigT = FilterConfig
 
   // see Initializable.initialize for why
-  def init(filterConfig: FilterConfig): Unit = {
+  def init(filterConfig: FilterConfig): Unit =
     initialize(filterConfig)
-  }
 
-  def destroy: Unit = {
+  def destroy: Unit =
     shutdown()
-  }
-}

@@ -44,9 +44,9 @@ import scala.language.experimental.macros
   * }}}
   */
 package object sird
-    extends RequestMethodExtractors with PathBindableExtractors {
+    extends RequestMethodExtractors with PathBindableExtractors
 
-  implicit class UrlContext(sc: StringContext) {
+  implicit class UrlContext(sc: StringContext)
 
     /**
       * String interpolator for extracting parameters out of URL paths.
@@ -98,15 +98,13 @@ package object sird
       * interpolator methods.
       */
     def q_s: SeqQueryStringParameter = macro macroimpl.QueryStringParameterMacros.seq
-  }
 
   /**
     * Allow multiple parameters to be extracted
     */
-  object & {
+  object &
     def unapply[A](a: A): Option[(A, A)] =
       Some((a, a))
-  }
 
   /**
     * Same as &, but for convenience to make the dsl look nicer when extracting query strings
@@ -117,4 +115,3 @@ package object sird
     * The query string type
     */
   type QueryString = Map[String, Seq[String]]
-}

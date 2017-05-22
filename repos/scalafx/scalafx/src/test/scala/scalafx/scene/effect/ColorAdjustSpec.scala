@@ -43,7 +43,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class ColorAdjustSpec
     extends SimpleSFXDelegateSpec[jfxse.ColorAdjust, ColorAdjust](
         classOf[jfxse.ColorAdjust], classOf[ColorAdjust])
-    with InputDelegateSpec[ColorAdjust] {
+    with InputDelegateSpec[ColorAdjust]
 
   val inputDelegate = getScalaClassInstance
-}

@@ -1,5 +1,5 @@
-object Test {
-  def testMethodLocalCaseClass {
+object Test
+  def testMethodLocalCaseClass
     object MethodLocalWide
     case class MethodLocalWide(f01: Int,
                                f02: Int,
@@ -27,7 +27,7 @@ object Test {
 
     val instance = MethodLocalWide(
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-    val result = instance match {
+    val result = instance match
       case MethodLocalWide(0,
                            0,
                            0,
@@ -53,10 +53,6 @@ object Test {
                            0) =>
         true
       case _ => false
-    }
     assert(result)
-  }
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     testMethodLocalCaseClass
-  }
-}

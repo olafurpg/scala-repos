@@ -22,17 +22,15 @@ import org.apache.kafka.common.TopicPartition
 /**
   * Keys used for delayed operation metrics recording
   */
-trait DelayedOperationKey {
+trait DelayedOperationKey
   def keyLabel: String
-}
 
-object DelayedOperationKey {
+object DelayedOperationKey
   val globalLabel = "All"
-}
 
 /* used by delayed-produce and delayed-fetch operations */
 case class TopicPartitionOperationKey(topic: String, partition: Int)
-    extends DelayedOperationKey {
+    extends DelayedOperationKey
 
   def this(topicPartition: TopicPartition) =
     this(topicPartition.topic, topicPartition.partition)
@@ -41,17 +39,14 @@ case class TopicPartitionOperationKey(topic: String, partition: Int)
     this(topicAndPartition.topic, topicAndPartition.partition)
 
   override def keyLabel = "%s-%d".format(topic, partition)
-}
 
 /* used by delayed-join-group operations */
 case class MemberKey(groupId: String, consumerId: String)
-    extends DelayedOperationKey {
+    extends DelayedOperationKey
 
   override def keyLabel = "%s-%s".format(groupId, consumerId)
-}
 
 /* used by delayed-rebalance operations */
-case class GroupKey(groupId: String) extends DelayedOperationKey {
+case class GroupKey(groupId: String) extends DelayedOperationKey
 
   override def keyLabel = groupId
-}

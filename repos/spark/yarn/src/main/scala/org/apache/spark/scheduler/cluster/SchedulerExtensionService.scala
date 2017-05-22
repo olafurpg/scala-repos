@@ -35,7 +35,7 @@ import org.apache.spark.util.Utils
   * 2. The `stop()` operation MUST be idempotent, and succeed even if `start()` was
   * never invoked.
   */
-trait SchedulerExtensionService {
+trait SchedulerExtensionService
 
   /**
     * Start the extension service. This should be a no-op if
@@ -50,7 +50,6 @@ trait SchedulerExtensionService {
     * never invoked.
     */
   def stop(): Unit
-}
 
 /**
   * Binding information for a [[SchedulerExtensionService]].
@@ -80,7 +79,7 @@ case class SchedulerExtensionServiceBinding(
   * is undefined.
   */
 private[spark] class SchedulerExtensionServices
-    extends SchedulerExtensionService with Logging {
+    extends SchedulerExtensionService with Logging
   private var serviceOption: Option[String] = None
   private var services: List[SchedulerExtensionService] = Nil
   private val started = new AtomicBoolean(false)
@@ -92,11 +91,10 @@ private[spark] class SchedulerExtensionServices
     *
     * @param binding binding to the spark application and YARN
     */
-  def start(binding: SchedulerExtensionServiceBinding): Unit = {
-    if (started.getAndSet(true)) {
+  def start(binding: SchedulerExtensionServiceBinding): Unit =
+    if (started.getAndSet(true))
       logWarning("Ignoring re-entrant start operation")
       return
-    }
     require(binding.sparkContext != null, "Null context parameter")
     require(binding.applicationId != null, "Null appId parameter")
     this.binding = binding
@@ -108,7 +106,7 @@ private[spark] class SchedulerExtensionServices
 
     services = sparkContext.conf
       .get(SCHEDULER_SERVICES)
-      .map { sClass =>
+      .map  sClass =>
         val instance = Utils
           .classForName(sClass)
           .newInstance()
@@ -117,9 +115,7 @@ private[spark] class SchedulerExtensionServices
         instance.start(binding)
         logInfo(s"Service $sClass started")
         instance
-      }
       .toList
-  }
 
   /**
     * Get the list of services.
@@ -132,17 +128,13 @@ private[spark] class SchedulerExtensionServices
     * Stop the services; idempotent.
     *
     */
-  override def stop(): Unit = {
-    if (started.getAndSet(false)) {
+  override def stop(): Unit =
+    if (started.getAndSet(false))
       logInfo(s"Stopping $this")
-      services.foreach { s =>
+      services.foreach  s =>
         Utils.tryLogNonFatalError(s.stop())
-      }
-    }
-  }
 
   override def toString(): String = s"""SchedulerExtensionServices
     |(serviceOption=$serviceOption,
     | services=$services,
     | started=$started)""".stripMargin
-}

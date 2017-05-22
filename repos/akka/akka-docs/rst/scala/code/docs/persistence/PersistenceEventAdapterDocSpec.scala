@@ -12,9 +12,9 @@ import com.google.gson.{Gson, JsonElement}
 
 import scala.collection.immutable
 
-class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config) {
+class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config)
 
-  def this() {
+  def this()
     this("""
       akka.persistence.snapshot-store.plugin = "akka.persistence.snapshot-store.local"
 
@@ -65,29 +65,25 @@ class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config) {
         }
       }
     """)
-  }
 
-  "MyAutomaticJsonEventAdapter" must {
-    "demonstrate how to implement a JSON adapter" in {
+  "MyAutomaticJsonEventAdapter" must
+    "demonstrate how to implement a JSON adapter" in
       val p = TestProbe()
 
-      val props = Props(new PersistentActor {
+      val props = Props(new PersistentActor
         override def persistenceId: String = "json-actor"
         override def journalPluginId: String =
           "akka.persistence.journal.auto-json-store"
 
-        override def receiveRecover: Receive = {
+        override def receiveRecover: Receive =
           case RecoveryCompleted => // ignore...
           case e => p.ref ! e
-        }
 
-        override def receiveCommand: Receive = {
+        override def receiveCommand: Receive =
           case c =>
-            persist(c) { e =>
+            persist(c)  e =>
               p.ref ! e
-            }
-        }
-      })
+      )
 
       val p1 = system.actorOf(props)
       val m1 = Person("Caplin", 42)
@@ -100,30 +96,25 @@ class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config) {
       val p2 = system.actorOf(props)
       p.expectMsg(m1)
       p.expectMsg(m2)
-    }
-  }
 
-  "MyManualJsonEventAdapter" must {
-    "demonstrate how to implement a JSON adapter" in {
+  "MyManualJsonEventAdapter" must
+    "demonstrate how to implement a JSON adapter" in
       val p = TestProbe()
 
-      val props = Props(new PersistentActor {
+      val props = Props(new PersistentActor
         override def persistenceId: String = "json-actor"
         override def journalPluginId: String =
           "akka.persistence.journal.manual-json-store"
 
-        override def receiveRecover: Receive = {
+        override def receiveRecover: Receive =
           case RecoveryCompleted => // ignore...
           case e => p.ref ! e
-        }
 
-        override def receiveCommand: Receive = {
+        override def receiveCommand: Receive =
           case c =>
-            persist(c) { e =>
+            persist(c)  e =>
               p.ref ! e
-            }
-        }
-      })
+      )
 
       val p1 = system.actorOf(props)
       val m1 = Person("Caplin", 42)
@@ -136,9 +127,6 @@ class PersistenceEventAdapterDocSpec(config: String) extends AkkaSpec(config) {
       val p2 = system.actorOf(props)
       p.expectMsg(m1)
       p.expectMsg(m2)
-    }
-  }
-}
 
 trait DomainEvent
 case class Person(name: String, age: Int) extends DomainEvent
@@ -147,7 +135,7 @@ case class Box(length: Int) extends DomainEvent
 case class MyTaggingJournalModel(payload: Any, tags: Set[String])
 
 //#identity-event-adapter
-class MyEventAdapter(system: ExtendedActorSystem) extends EventAdapter {
+class MyEventAdapter(system: ExtendedActorSystem) extends EventAdapter
   override def manifest(event: Any): String =
     "" // when no manifest needed, return ""
 
@@ -156,7 +144,6 @@ class MyEventAdapter(system: ExtendedActorSystem) extends EventAdapter {
 
   override def fromJournal(event: Any, manifest: String): EventSeq =
     EventSeq.single(event) // identity
-}
 //#identity-event-adapter
 
 /**
@@ -164,7 +151,7 @@ class MyEventAdapter(system: ExtendedActorSystem) extends EventAdapter {
   * It allows the journal to take care of the manifest handling, which is the FQN of the serialized class.
   */
 class MyAutoJsonEventAdapter(system: ExtendedActorSystem)
-    extends EventAdapter {
+    extends EventAdapter
   private val gson = new Gson
 
   override def manifest(event: Any): String =
@@ -173,23 +160,19 @@ class MyAutoJsonEventAdapter(system: ExtendedActorSystem)
   override def toJournal(event: Any): Any = gson.toJsonTree(event)
 
   override def fromJournal(event: Any, manifest: String): EventSeq =
-    EventSeq.single {
-      event match {
+    EventSeq.single
+      event match
         case json: JsonElement =>
           val clazz = system.dynamicAccess.getClassFor[Any](manifest).get
           gson.fromJson(json, clazz)
-      }
-    }
-}
 
 class MyUpcastingEventAdapter(system: ExtendedActorSystem)
-    extends EventAdapter {
+    extends EventAdapter
   override def manifest(event: Any): String = ""
 
   override def toJournal(event: Any): Any = ???
 
   override def fromJournal(event: Any, manifest: String): EventSeq = ???
-}
 
 /**
   * This is an example adapter which completely takes care of domain<->json translation.
@@ -197,13 +180,13 @@ class MyUpcastingEventAdapter(system: ExtendedActorSystem)
   * which is the case in this example since we're persisting to the inmem journal, which does nothing in terms of manifest.
   */
 class MyManualJsonEventAdapter(system: ExtendedActorSystem)
-    extends EventAdapter {
+    extends EventAdapter
 
   private val gson = new Gson
 
   override def manifest(event: Any): String = event.getClass.getCanonicalName
 
-  override def toJournal(event: Any): Any = {
+  override def toJournal(event: Any): Any =
     val out = gson.toJsonTree(event).getAsJsonObject
 
     // optionally can include manifest in the adapted event.
@@ -211,37 +194,29 @@ class MyManualJsonEventAdapter(system: ExtendedActorSystem)
     out.addProperty("_manifest", manifest(event))
 
     out
-  }
 
-  override def fromJournal(event: Any, m: String): EventSeq = event match {
+  override def fromJournal(event: Any, m: String): EventSeq = event match
     case json: JsonElement =>
       val manifest = json.getAsJsonObject.get("_manifest").getAsString
 
       val clazz = system.dynamicAccess.getClassFor[Any](manifest).get
       EventSeq.single(gson.fromJson(json, clazz))
-  }
-}
 
-class MyTaggingEventAdapter(system: ExtendedActorSystem) extends EventAdapter {
+class MyTaggingEventAdapter(system: ExtendedActorSystem) extends EventAdapter
   override def manifest(event: Any): String = ""
 
   override def fromJournal(event: Any, manifest: String): EventSeq =
-    event match {
+    event match
       case j: MyTaggingJournalModel => EventSeq.single(j)
-    }
 
-  override def toJournal(event: Any): Any = {
-    event match {
+  override def toJournal(event: Any): Any =
+    event match
       case Person(_, age) if age >= 18 =>
         MyTaggingJournalModel(event, tags = Set("adult"))
       case Person(_, age) => MyTaggingJournalModel(event, tags = Set("minor"))
       case _ => MyTaggingJournalModel(event, tags = Set.empty)
-    }
-  }
-}
 
-object v1 {
+object v1
   trait Event
   trait UserEvent extends v1.Event
   trait ItemEvent extends v1.Event
-}

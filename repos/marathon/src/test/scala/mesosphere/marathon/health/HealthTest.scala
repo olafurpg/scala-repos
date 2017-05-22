@@ -8,9 +8,9 @@ import mesosphere.marathon.api.v2.json.Formats
 import org.scalatest.Matchers
 import play.api.libs.json._
 
-class HealthTest extends MarathonSpec with Formats with Matchers {
+class HealthTest extends MarathonSpec with Formats with Matchers
 
-  object Fixture {
+  object Fixture
     val h1 = Health(taskId = Task.Id("abcd-1234"))
 
     val h2 = Health(
@@ -28,9 +28,8 @@ class HealthTest extends MarathonSpec with Formats with Matchers {
         lastSuccess = Some(Timestamp(2)),
         lastFailure = Some(Timestamp(3))
     )
-  }
 
-  test("ToJson") {
+  test("ToJson")
     import Fixture._
 
     val j1 = Json.toJson(h1)
@@ -56,5 +55,3 @@ class HealthTest extends MarathonSpec with Formats with Matchers {
     (j3 \ "firstSuccess").as[String] should equal("1970-01-01T00:00:00.001Z")
     (j3 \ "lastFailure").as[String] should equal("1970-01-01T00:00:00.003Z")
     (j3 \ "lastSuccess").as[String] should equal("1970-01-01T00:00:00.002Z")
-  }
-}

@@ -1,10 +1,10 @@
 import scala.reflect.macros.blackbox.Context
 
-object Macros {
+object Macros
   def foo(s: String) = macro Impls.foo
 
-  object Impls {
-    def foo(c: Context)(s: c.Expr[String]) = {
+  object Impls
+    def foo(c: Context)(s: c.Expr[String]) =
       import c.universe._
       import internal._
 
@@ -17,9 +17,5 @@ object Macros {
                     List(c.unreifyTree(world)))))
       val typedGreeting = c.Expr[String](greeting)
 
-      c.universe.reify {
+      c.universe.reify
         println("hello " + s.splice + " = " + typedGreeting.splice)
-      }
-    }
-  }
-}

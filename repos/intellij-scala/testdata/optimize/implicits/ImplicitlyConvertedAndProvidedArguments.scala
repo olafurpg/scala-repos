@@ -1,4 +1,4 @@
-trait Scratch[T] {
+trait Scratch[T]
   case object T
   case object U
   case object V
@@ -7,7 +7,7 @@ trait Scratch[T] {
   case object Y
   case class Z[A]
 
-  object Implicits {
+  object Implicits
     implicit def TToInt(t: T.type): Int = 0
     implicit def UToInt(u: U.type): Int = 0
     implicit def VToInt(v: V.type): Int = 0
@@ -18,7 +18,6 @@ trait Scratch[T] {
     implicit val y = Y
     implicit val zInt: Z[Int] = Z[Int]
     implicit val zString: Z[String] = Z[String]
-  }
   import Implicits.{TToInt, UToInt, VToInt, WToInt}
 
   def useT(t: Int) = error("stub")
@@ -33,22 +32,18 @@ trait Scratch[T] {
   useV(v = V, s = "")
   useW("")(W)
 
-  def testUseXY {
+  def testUseXY
     import Implicits.{x, y}
     useXY("")
-  }
 
   def useZ[A](a: A)(implicit za: Z[A]): A = a
 
-  def testUseZInt {
+  def testUseZInt
     import Implicits.{zInt}
     useZ(1)
-  }
-  def testUseZString {
+  def testUseZString
     import Implicits.{zString}
     useZ("") + 1
-  }
-}
 /*trait Scratch[T] {
   case object T
   case object U

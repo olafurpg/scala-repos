@@ -6,12 +6,11 @@ import reactivemongo.bson._
 
 sealed trait SortOrder
 
-object SortOrder {
+object SortOrder
   object Ascending extends SortOrder
   object Descending extends SortOrder
-}
 
-object $sort {
+object $sort
   def asc: SortOrder = SortOrder.Ascending
   def desc: SortOrder = SortOrder.Descending
 
@@ -28,4 +27,3 @@ object $sort {
   val createdAsc = asc("createdAt")
   val createdDesc = desc("createdAt")
   val updatedDesc = desc("updatedAt")
-}

@@ -16,7 +16,7 @@ package transform
   *  @author Martin Odersky
   *  @version 1.0
   */
-trait Transform extends SubComponent {
+trait Transform extends SubComponent
 
   /** The transformer factory */
   protected def newTransformer(
@@ -26,9 +26,6 @@ trait Transform extends SubComponent {
   def newPhase(prev: scala.tools.nsc.Phase): StdPhase = new Phase(prev)
 
   /** The phase defined by this transform */
-  class Phase(prev: scala.tools.nsc.Phase) extends StdPhase(prev) {
-    def apply(unit: global.CompilationUnit) {
+  class Phase(prev: scala.tools.nsc.Phase) extends StdPhase(prev)
+    def apply(unit: global.CompilationUnit)
       newTransformer(unit).transformUnit(unit)
-    }
-  }
-}

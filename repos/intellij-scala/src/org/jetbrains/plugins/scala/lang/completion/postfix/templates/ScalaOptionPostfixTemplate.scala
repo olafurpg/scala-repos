@@ -12,7 +12,6 @@ class ScalaOptionPostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "Option",
         "Option(expr)",
-        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All))
   override def getTemplateString(element: PsiElement): String =
     "Option($expr$)"
-}

@@ -11,7 +11,7 @@ import org.apache.mesos.SchedulerDriver
 
 import scala.concurrent.duration._
 
-trait StartingBehavior {
+trait StartingBehavior
   this: Actor with ActorLogging =>
   import context.dispatcher
   import mesosphere.marathon.upgrade.StartingBehavior._
@@ -35,35 +35,31 @@ trait StartingBehavior {
 
   def initializeStart(): Unit
 
-  final override def preStart(): Unit = {
-    if (withHealthChecks) {
+  final override def preStart(): Unit =
+    if (withHealthChecks)
       eventBus.subscribe(self, classOf[MarathonHealthCheckEvent])
-    } else {
+    else
       eventBus.subscribe(self, classOf[MesosStatusUpdateEvent])
-    }
 
     initializeStart()
     checkFinished()
 
     context.system.scheduler.scheduleOnce(5.seconds, self, Sync)
-  }
 
-  final override def receive: Receive = {
+  final override def receive: Receive =
     val behavior =
       if (withHealthChecks) checkForHealthy
       else checkForRunning
     behavior orElse commonBehavior: PartialFunction[Any, Unit] // type annotation makes Intellij happy
-  }
 
-  final def checkForHealthy: Receive = {
+  final def checkForHealthy: Receive =
     case HealthStatusChanged(AppId, taskId, Version, true, _, _)
         if !atLeastOnceHealthyTasks(taskId.idString) =>
       atLeastOnceHealthyTasks += taskId.idString
       log.info(s"$taskId is now healthy")
       checkFinished()
-  }
 
-  final def checkForRunning: Receive = {
+  final def checkForRunning: Receive =
     case MesosStatusUpdateEvent(
         _, taskId, "TASK_RUNNING", _, app.`id`, _, _, _, VersionString, _, _)
         if !startedRunningTasks(taskId.idString) =>
@@ -73,9 +69,8 @@ trait StartingBehavior {
           s"New task $taskId now running during app ${app.id.toString} scaling, " +
           s"${nrToStart - startedRunningTasks.size} more to go")
       checkFinished()
-  }
 
-  def commonBehavior: Receive = {
+  def commonBehavior: Receive =
     case MesosStatusUpdateEvent(_,
                                 taskId,
                                 StartErrorState(_),
@@ -98,34 +93,26 @@ trait StartingBehavior {
         .map(_.finalTaskCount)
         .getOrElse(taskTracker.countLaunchedAppTasksSync(app.id))
       val tasksToStartNow = Math.max(scaleTo - actualSize, 0)
-      if (tasksToStartNow > 0) {
+      if (tasksToStartNow > 0)
         log.info(
             s"Reconciling tasks during app ${app.id.toString} scaling: queuing $tasksToStartNow new tasks")
         taskQueue.add(app, tasksToStartNow)
-      }
       context.system.scheduler.scheduleOnce(5.seconds, self, Sync)
-  }
 
-  def checkFinished(): Unit = {
+  def checkFinished(): Unit =
     val started =
       if (withHealthChecks) atLeastOnceHealthyTasks.size
       else startedRunningTasks.size
-    if (started == nrToStart) {
+    if (started == nrToStart)
       success()
-    }
-  }
 
   def success(): Unit
-}
 
-object StartingBehavior {
+object StartingBehavior
   case object Sync
-}
 
-private object StartErrorState {
-  def unapply(state: String): Option[String] = state match {
+private object StartErrorState
+  def unapply(state: String): Option[String] = state match
     case "TASK_ERROR" | "TASK_FAILED" | "TASK_KILLED" | "TASK_LOST" =>
       Some(state)
     case _ => None
-  }
-}

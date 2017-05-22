@@ -13,23 +13,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * @author Alexander Podkhalyuzin
   * Date: 28.04.2008
   */
-class ScalaWithTryFinallySurrounder extends ScalaExpressionSurrounder {
-  override def getTemplateAsString(elements: Array[PsiElement]): String = {
+class ScalaWithTryFinallySurrounder extends ScalaExpressionSurrounder
+  override def getTemplateAsString(elements: Array[PsiElement]): String =
     return "try {\n" + super.getTemplateAsString(elements) + "\n} finally a"
-  }
 
   override def getTemplateDescription = "try / finally"
 
   override def getSurroundSelectionRange(
-      withTryCatchNode: ASTNode): TextRange = {
-    val element: PsiElement = withTryCatchNode.getPsi match {
+      withTryCatchNode: ASTNode): TextRange =
+    val element: PsiElement = withTryCatchNode.getPsi match
       case x: ScParenthesisedExpr =>
-        x.expr match {
+        x.expr match
           case Some(y) => y
           case _ => return x.getTextRange
-        }
       case x => x
-    }
 
     val tryCatchStmt = element.asInstanceOf[ScTryStmt]
     val caseClause =
@@ -39,5 +36,3 @@ class ScalaWithTryFinallySurrounder extends ScalaExpressionSurrounder {
     tryCatchStmt.getNode.removeChild(caseClause.getNode)
 
     new TextRange(offset, offset)
-  }
-}

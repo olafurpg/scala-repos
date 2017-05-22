@@ -37,52 +37,44 @@ import org.apache.spark.util.Utils
   * Only streaming (openStream) is supported.
   */
 private[netty] class NettyStreamManager(rpcEnv: NettyRpcEnv)
-    extends StreamManager with RpcEnvFileServer {
+    extends StreamManager with RpcEnvFileServer
 
   private val files = new ConcurrentHashMap[String, File]()
   private val jars = new ConcurrentHashMap[String, File]()
   private val dirs = new ConcurrentHashMap[String, File]()
 
-  override def getChunk(streamId: Long, chunkIndex: Int): ManagedBuffer = {
+  override def getChunk(streamId: Long, chunkIndex: Int): ManagedBuffer =
     throw new UnsupportedOperationException()
-  }
 
-  override def openStream(streamId: String): ManagedBuffer = {
+  override def openStream(streamId: String): ManagedBuffer =
     val Array(ftype, fname) = streamId.stripPrefix("/").split("/", 2)
-    val file = ftype match {
+    val file = ftype match
       case "files" => files.get(fname)
       case "jars" => jars.get(fname)
       case other =>
         val dir = dirs.get(ftype)
         require(dir != null, s"Invalid stream URI: $ftype not found.")
         new File(dir, fname)
-    }
 
-    if (file != null && file.isFile()) {
+    if (file != null && file.isFile())
       new FileSegmentManagedBuffer(
           rpcEnv.transportConf, file, 0, file.length())
-    } else {
+    else
       null
-    }
-  }
 
-  override def addFile(file: File): String = {
+  override def addFile(file: File): String =
     require(files.putIfAbsent(file.getName(), file) == null,
             s"File ${file.getName()} already registered.")
-    s"${rpcEnv.address.toSparkURL}/files/${Utils.encodeFileNameToURIRawPath(
-        file.getName())}"
-  }
+    s"${rpcEnv.address.toSparkURL}/files/$Utils.encodeFileNameToURIRawPath(
+        file.getName())"
 
-  override def addJar(file: File): String = {
+  override def addJar(file: File): String =
     require(jars.putIfAbsent(file.getName(), file) == null,
             s"JAR ${file.getName()} already registered.")
     s"${rpcEnv.address.toSparkURL}/jars/${Utils.encodeFileNameToURIRawPath(file.getName())}"
-  }
 
-  override def addDirectory(baseUri: String, path: File): String = {
+  override def addDirectory(baseUri: String, path: File): String =
     val fixedBaseUri = validateDirectoryUri(baseUri)
     require(dirs.putIfAbsent(fixedBaseUri.stripPrefix("/"), path) == null,
             s"URI '$fixedBaseUri' already registered.")
     s"${rpcEnv.address.toSparkURL}$fixedBaseUri"
-  }
-}

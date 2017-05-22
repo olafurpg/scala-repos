@@ -34,15 +34,14 @@ import org.apache.spark.mllib.pmml.export.PMMLModelExportFactory
   */
 @DeveloperApi
 @Since("1.4.0")
-trait PMMLExportable {
+trait PMMLExportable
 
   /**
     * Export the model to the stream result in PMML format
     */
-  private def toPMML(streamResult: StreamResult): Unit = {
+  private def toPMML(streamResult: StreamResult): Unit =
     val pmmlModelExport = PMMLModelExportFactory.createPMMLModelExport(this)
     JAXBUtil.marshalPMML(pmmlModelExport.getPmml, streamResult)
-  }
 
   /**
     * :: Experimental ::
@@ -50,9 +49,8 @@ trait PMMLExportable {
     */
   @Experimental
   @Since("1.4.0")
-  def toPMML(localPath: String): Unit = {
+  def toPMML(localPath: String): Unit =
     toPMML(new StreamResult(new File(localPath)))
-  }
 
   /**
     * :: Experimental ::
@@ -60,10 +58,9 @@ trait PMMLExportable {
     */
   @Experimental
   @Since("1.4.0")
-  def toPMML(sc: SparkContext, path: String): Unit = {
+  def toPMML(sc: SparkContext, path: String): Unit =
     val pmml = toPMML()
     sc.parallelize(Array(pmml), 1).saveAsTextFile(path)
-  }
 
   /**
     * :: Experimental ::
@@ -71,9 +68,8 @@ trait PMMLExportable {
     */
   @Experimental
   @Since("1.4.0")
-  def toPMML(outputStream: OutputStream): Unit = {
+  def toPMML(outputStream: OutputStream): Unit =
     toPMML(new StreamResult(outputStream))
-  }
 
   /**
     * :: Experimental ::
@@ -81,9 +77,7 @@ trait PMMLExportable {
     */
   @Experimental
   @Since("1.4.0")
-  def toPMML(): String = {
+  def toPMML(): String =
     val writer = new StringWriter
     toPMML(new StreamResult(writer))
     writer.toString
-  }
-}

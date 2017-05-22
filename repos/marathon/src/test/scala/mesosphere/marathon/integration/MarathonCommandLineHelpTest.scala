@@ -7,13 +7,12 @@ import org.scalatest.{GivenWhenThen, BeforeAndAfter, Matchers}
 
 class MarathonCommandLineHelpTest
     extends IntegrationFunSuite with Matchers with BeforeAndAfter
-    with GivenWhenThen {
+    with GivenWhenThen
 
-  after {
+  after
     ProcessKeeper.stopAllProcesses()
-  }
 
-  test("marathon --help shouldn't crash") {
+  test("marathon --help shouldn't crash")
     val cwd = new File(".")
     val process =
       ProcessKeeper.startMarathon(cwd,
@@ -21,5 +20,3 @@ class MarathonCommandLineHelpTest
                                   arguments = List("--help"),
                                   startupLine = "Show help message")
     assert(process.exitValue() == 0)
-  }
-}

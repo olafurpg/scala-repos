@@ -24,15 +24,13 @@ package mutable
 class MapBuilder[
     A, B, Coll <: scala.collection.GenMap[A, B] with scala.collection.GenMapLike[
         A, B, Coll]](empty: Coll)
-    extends ReusableBuilder[(A, B), Coll] {
+    extends ReusableBuilder[(A, B), Coll]
   protected var elems: Coll = empty
-  def +=(x: (A, B)): this.type = {
+  def +=(x: (A, B)): this.type =
     elems = (elems + x).asInstanceOf[Coll]
     // the cast is necessary because right now we cannot enforce statically that
     // for every map of type Coll, `+` yields again a Coll. With better support
     // for hk-types we might be able to enforce this in the future, though.
     this
-  }
   def clear() { elems = empty }
   def result: Coll = elems
-}

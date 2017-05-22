@@ -1,19 +1,17 @@
 import scala.tools.partest.ReplTest
 import scala.tools.nsc.Settings
 
-object Test extends ReplTest {
+object Test extends ReplTest
 
-  override def transformSettings(s: Settings): Settings = {
+  override def transformSettings(s: Settings): Settings =
     s.Yreplclassbased.value = true
     s
-  }
 
   // replace indylambda function names by <function0>
-  override def eval() = {
+  override def eval() =
     val lines = super.eval
     val r = """\$Lambda.*""".r
     lines.map(l => r.replaceAllIn(l, "<function0>"))
-  }
 
   def code =
     """
@@ -80,4 +78,3 @@ object Test extends ReplTest {
     |:power
     |intp.lastRequest
     |""".stripMargin
-}

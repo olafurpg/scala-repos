@@ -13,7 +13,7 @@ import lila.user.{User, UidNb}
 import tube.gameTube
 import UidNb.UidNbBSONHandler
 
-final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
+final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration)
 
   def nbImportedBy(userId: String): Fu[Int] = count(Query imported userId)
   def clearNbImportedByCache(userId: String) =
@@ -41,7 +41,7 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
                                  f = (o: JsObject) => $count(o),
                                  timeToLive = defaultTtl)
 
-  object Divider {
+  object Divider
 
     private val cache = Builder.size[String, chess.Division](5000)
 
@@ -49,7 +49,7 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
       if (!Variant.divisionSensibleVariants.contains(game.variant))
         chess.Division.empty
       else
-        Option(cache getIfPresent game.id) | {
+        Option(cache getIfPresent game.id) |
           val div = chess.Replay
             .boards(
                 moveStrs = game.pgnMoves,
@@ -60,6 +60,3 @@ final class Cached(mongoCache: MongoCache.Builder, defaultTtl: FiniteDuration) {
             .fold(chess.Division.empty)(chess.Divider.apply)
           cache.put(game.id, div)
           div
-        }
-  }
-}

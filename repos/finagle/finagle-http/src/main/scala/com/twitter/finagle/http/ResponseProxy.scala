@@ -2,7 +2,7 @@ package com.twitter.finagle.http
 
 import org.jboss.netty.handler.codec.http.HttpResponse
 
-abstract class ResponseProxy extends Response {
+abstract class ResponseProxy extends Response
   def response: Response
   override def isRequest = response.isRequest
   override def status: Status = response.status
@@ -14,4 +14,3 @@ abstract class ResponseProxy extends Response {
   override def encodeString(): String = response.encodeString()
 
   protected[finagle] def httpResponse: HttpResponse = response.httpResponse
-}

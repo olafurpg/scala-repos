@@ -16,36 +16,32 @@ import lila.game.{GameRepo, Pov}
 import lila.round.Forecast.{forecastStepJsonFormat, forecastJsonWriter}
 import views._
 
-object UserAnalysis extends LilaController with TheftPrevention {
+object UserAnalysis extends LilaController with TheftPrevention
 
   def index = load("", Standard)
 
-  def parse(arg: String) = arg.split("/", 2) match {
+  def parse(arg: String) = arg.split("/", 2) match
     case Array(key) => load("", Variant orDefault key)
     case Array(key, fen) =>
-      Variant.byKey get key match {
+      Variant.byKey get key match
         case Some(variant) => load(fen, variant)
         case _ => load(arg, Standard)
-      }
     case _ => load("", Standard)
-  }
 
-  def load(urlFen: String, variant: Variant) = Open { implicit ctx =>
+  def load(urlFen: String, variant: Variant) = Open  implicit ctx =>
     val fenStr =
       Some(urlFen.trim.replace("_", " ")).filter(_.nonEmpty) orElse get("fen")
     val decodedFen = fenStr.map { java.net.URLDecoder.decode(_, "UTF-8").trim }
       .filter(_.nonEmpty)
     val situation =
-      decodedFen.flatMap {
+      decodedFen.flatMap
         Forsyth.<<<@(variant, _)
-      } | SituationPlus(Situation(variant), 1)
+      | SituationPlus(Situation(variant), 1)
     val pov = makePov(situation)
     val orientation = get("color").flatMap(chess.Color.apply) | pov.color
     Env.api.roundApi.userAnalysisJson(
-        pov, ctx.pref, decodedFen, orientation, owner = false) map { data =>
+        pov, ctx.pref, decodedFen, orientation, owner = false) map  data =>
       Ok(html.board.userAnalysis(data, pov))
-    }
-  }
 
   private def makePov(from: SituationPlus) =
     lila.game.Pov(lila.game.Game
@@ -61,23 +57,20 @@ object UserAnalysis extends LilaController with TheftPrevention {
                     .copy(id = "synthetic"),
                   from.situation.color)
 
-  def game(id: String, color: String) = Open { implicit ctx =>
-    OptionFuResult(GameRepo game id) { game =>
-      GameRepo initialFen game.id flatMap { initialFen =>
+  def game(id: String, color: String) = Open  implicit ctx =>
+    OptionFuResult(GameRepo game id)  game =>
+      GameRepo initialFen game.id flatMap  initialFen =>
         val pov = Pov(game, chess.Color(color == "white"))
         Env.api.roundApi.userAnalysisJson(pov,
                                           ctx.pref,
                                           initialFen,
                                           pov.color,
-                                          owner = isMyPov(pov)) map { data =>
+                                          owner = isMyPov(pov)) map  data =>
           Ok(html.board.userAnalysis(data, pov))
-        }
-      } map NoCache
-    }
-  }
+      map NoCache
 
   // XHR only
-  def pgn = OpenBody { implicit ctx =>
+  def pgn = OpenBody  implicit ctx =>
     implicit val req = ctx.body
     Env.importer.forms.importForm.bindFromRequest
       .fold(
@@ -87,25 +80,22 @@ object UserAnalysis extends LilaController with TheftPrevention {
               .inMemory(data)
               .fold(err => BadRequest(jsonError(err.shows)).fuccess,
                     game =>
-                      {
                         val pov = Pov(game, chess.Color(true))
                         Env.api.roundApi.userAnalysisJson(pov,
                                                           ctx.pref,
                                                           initialFen = none,
                                                           pov.color,
-                                                          owner = false) map {
+                                                          owner = false) map
                           data =>
                             Ok(data)
-                        }
-                    })
+                    )
         )
       .map(_ as JSON)
-  }
 
-  def forecasts(fullId: String) = AuthBody(BodyParsers.parse.json) {
+  def forecasts(fullId: String) = AuthBody(BodyParsers.parse.json)
     implicit ctx => me =>
       import lila.round.Forecast
-      OptionFuResult(GameRepo pov fullId) { pov =>
+      OptionFuResult(GameRepo pov fullId)  pov =>
         if (isTheft(pov)) fuccess(theftResponse)
         else
           ctx.body.body
@@ -113,35 +103,26 @@ object UserAnalysis extends LilaController with TheftPrevention {
             .fold(err => BadRequest(err.toString).fuccess,
                   forecasts =>
                     Env.round.forecastApi.save(pov, forecasts) >> Env.round.forecastApi
-                      .loadForDisplay(pov) map {
+                      .loadForDisplay(pov) map
                       case None => Ok(Json.obj("none" -> true))
                       case Some(fc) => Ok(Json toJson fc) as JSON
-                    } recover {
+                    recover
                       case Forecast.OutOfSync => Ok(Json.obj("reload" -> true))
-                  })
-      }
-  }
+                  )
 
   def forecastsOnMyTurn(fullId: String, uci: String) =
-    AuthBody(BodyParsers.parse.json) { implicit ctx => me =>
+    AuthBody(BodyParsers.parse.json)  implicit ctx => me =>
       import lila.round.Forecast
-      OptionFuResult(GameRepo pov fullId) { pov =>
+      OptionFuResult(GameRepo pov fullId)  pov =>
         if (isTheft(pov)) fuccess(theftResponse)
-        else {
+        else
           ctx.body.body
             .validate[Forecast.Steps]
             .fold(
                 err => BadRequest(err.toString).fuccess,
                 forecasts =>
-                  {
                     def wait = 50 + (Forecast maxPlies forecasts min 10) * 50
                     Env.round.forecastApi.playAndSave(pov, uci, forecasts) >> Env.current.scheduler
-                      .after(wait.millis) {
+                      .after(wait.millis)
                       Ok(Json.obj("reload" -> true))
-                    }
-                }
             )
-        }
-      }
-    }
-}

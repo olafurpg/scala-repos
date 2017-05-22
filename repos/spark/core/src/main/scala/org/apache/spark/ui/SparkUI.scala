@@ -55,7 +55,7 @@ private[spark] class SparkUI private (
                   SparkUI.getUIPort(conf),
                   conf,
                   basePath,
-                  "SparkUI") with Logging with UIRoot {
+                  "SparkUI") with Logging with UIRoot
 
   val killEnabled =
     sc.map(_.conf.getBoolean("spark.ui.killEnabled", true)).getOrElse(false)
@@ -65,7 +65,7 @@ private[spark] class SparkUI private (
   var appId: String = _
 
   /** Initialize all components of the server. */
-  def initialize() {
+  def initialize()
     attachTab(new JobsTab(this))
     attachTab(stagesTab)
     attachTab(new StorageTab(this))
@@ -80,20 +80,17 @@ private[spark] class SparkUI private (
                               "/stages/",
                               stagesTab.handleKillRequest,
                               httpMethods = Set("GET", "POST")))
-  }
   initialize()
 
   def getAppName: String = appName
 
-  def setAppId(id: String): Unit = {
+  def setAppId(id: String): Unit =
     appId = id
-  }
 
   /** Stop the server behind this web interface. Only valid after bind(). */
-  override def stop() {
+  override def stop()
     super.stop()
     logInfo("Stopped Spark web UI at %s".format(appUIAddress))
-  }
 
   /**
     * Return the application UI host:port. This does not include the scheme (http://).
@@ -102,11 +99,10 @@ private[spark] class SparkUI private (
 
   private[spark] def appUIAddress = s"http://$appUIHostPort"
 
-  def getSparkUI(appId: String): Option[SparkUI] = {
+  def getSparkUI(appId: String): Option[SparkUI] =
     if (appId == this.appId) Some(this) else None
-  }
 
-  def getApplicationInfoList: Iterator[ApplicationInfo] = {
+  def getApplicationInfoList: Iterator[ApplicationInfo] =
     Iterator(
         new ApplicationInfo(
             id = appId,
@@ -126,25 +122,21 @@ private[spark] class SparkUI private (
                       completed = false
                   ))
         ))
-  }
-}
 
 private[spark] abstract class SparkUITab(parent: SparkUI, prefix: String)
-    extends WebUITab(parent, prefix) {
+    extends WebUITab(parent, prefix)
 
   def appName: String = parent.getAppName
-}
 
-private[spark] object SparkUI {
+private[spark] object SparkUI
   val DEFAULT_PORT = 4040
   val STATIC_RESOURCE_DIR = "org/apache/spark/ui/static"
   val DEFAULT_POOL_NAME = "default"
   val DEFAULT_RETAINED_STAGES = 1000
   val DEFAULT_RETAINED_JOBS = 1000
 
-  def getUIPort(conf: SparkConf): Int = {
+  def getUIPort(conf: SparkConf): Int =
     conf.getInt("spark.ui.port", SparkUI.DEFAULT_PORT)
-  }
 
   def createLiveUI(sc: SparkContext,
                    conf: SparkConf,
@@ -152,7 +144,7 @@ private[spark] object SparkUI {
                    jobProgressListener: JobProgressListener,
                    securityManager: SecurityManager,
                    appName: String,
-                   startTime: Long): SparkUI = {
+                   startTime: Long): SparkUI =
     create(Some(sc),
            conf,
            listenerBus,
@@ -160,14 +152,13 @@ private[spark] object SparkUI {
            appName,
            jobProgressListener = Some(jobProgressListener),
            startTime = startTime)
-  }
 
   def createHistoryUI(conf: SparkConf,
                       listenerBus: SparkListenerBus,
                       securityManager: SecurityManager,
                       appName: String,
                       basePath: String,
-                      startTime: Long): SparkUI = {
+                      startTime: Long): SparkUI =
     val sparkUI = create(None,
                          conf,
                          listenerBus,
@@ -180,12 +171,10 @@ private[spark] object SparkUI {
       .load(classOf[SparkHistoryListenerFactory],
             Utils.getContextOrSparkClassLoader)
       .asScala
-    listenerFactories.foreach { listenerFactory =>
+    listenerFactories.foreach  listenerFactory =>
       val listeners = listenerFactory.createListeners(conf, sparkUI)
       listeners.foreach(listenerBus.addListener)
-    }
     sparkUI
-  }
 
   /**
     * Create a new Spark UI.
@@ -201,14 +190,13 @@ private[spark] object SparkUI {
                      appName: String,
                      basePath: String = "",
                      jobProgressListener: Option[JobProgressListener] = None,
-                     startTime: Long): SparkUI = {
+                     startTime: Long): SparkUI =
 
     val _jobProgressListener: JobProgressListener =
-      jobProgressListener.getOrElse {
+      jobProgressListener.getOrElse
         val listener = new JobProgressListener(conf)
         listenerBus.addListener(listener)
         listener
-      }
 
     val environmentListener = new EnvironmentListener
     val storageStatusListener = new StorageStatusListener(conf)
@@ -234,5 +222,3 @@ private[spark] object SparkUI {
                 appName,
                 basePath,
                 startTime)
-  }
-}

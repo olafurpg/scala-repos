@@ -3,13 +3,12 @@ package slick.util
 import scala.language.experimental.macros
 import scala.language.implicitConversions
 
-object MacroSupport {
+object MacroSupport
   implicit def macroSupportInterpolation(
       s: StringContext): MacroSupportInterpolation =
     new MacroSupportInterpolation(s)
-}
 
-class MacroSupportInterpolation(context: StringContext) {
+class MacroSupportInterpolation(context: StringContext)
 
   /**
     * String interpolation using the "b" prefix to build SQL statements. In
@@ -45,4 +44,3 @@ class MacroSupportInterpolation(context: StringContext) {
     * symbolName are resolved *dynamically* at the call site.
     */
   def b(args: Any*): Unit = macro MacroSupportInterpolationImpl.b
-}

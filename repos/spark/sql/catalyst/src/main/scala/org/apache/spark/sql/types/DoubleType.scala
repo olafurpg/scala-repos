@@ -30,20 +30,18 @@ import org.apache.spark.util.Utils
   * The data type representing `Double` values. Please use the singleton [[DataTypes.DoubleType]].
   */
 @DeveloperApi
-class DoubleType private () extends FractionalType {
+class DoubleType private () extends FractionalType
   // The companion object and this class is separated so the companion object also subclasses
   // this type. Otherwise, the companion object would be of type "DoubleType$" in byte code.
   // Defined with a private constructor so the companion object is the only possible instantiation.
   private[sql] type InternalType = Double
-  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized {
+  @transient private[sql] lazy val tag = ScalaReflectionLock.synchronized
     typeTag[InternalType]
-  }
   private[sql] val numeric = implicitly[Numeric[Double]]
   private[sql] val fractional = implicitly[Fractional[Double]]
-  private[sql] val ordering = new Ordering[Double] {
+  private[sql] val ordering = new Ordering[Double]
     override def compare(x: Double, y: Double): Int =
       Utils.nanSafeCompareDoubles(x, y)
-  }
   private[sql] val asIntegral = DoubleAsIfIntegral
 
   /**
@@ -52,6 +50,5 @@ class DoubleType private () extends FractionalType {
   override def defaultSize: Int = 8
 
   private[spark] override def asNullable: DoubleType = this
-}
 
 case object DoubleType extends DoubleType

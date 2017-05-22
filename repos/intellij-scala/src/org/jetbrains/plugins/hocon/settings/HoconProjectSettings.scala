@@ -16,7 +16,7 @@ import scala.beans.BeanProperty
 )
 class HoconProjectSettings
     extends PersistentStateComponent[HoconProjectSettings]
-    with ExportableComponent {
+    with ExportableComponent
   def getState = this
 
   def loadState(state: HoconProjectSettings) =
@@ -29,9 +29,7 @@ class HoconProjectSettings
 
   @BeanProperty var classReferencesOnUnquotedStrings = true
   @BeanProperty var classReferencesOnQuotedStrings = true
-}
 
-object HoconProjectSettings {
+object HoconProjectSettings
   def getInstance(project: Project) =
     ServiceManager.getService(project, classOf[HoconProjectSettings])
-}

@@ -1,7 +1,5 @@
-class Module { self =>
+class Module  self =>
   type settingsType <: Any
-  final type commonModuleType = Module {
+  final type commonModuleType = Module
     type settingsType = self.settingsType
-  }
   def foo(s: self.type): commonModuleType = s
-}

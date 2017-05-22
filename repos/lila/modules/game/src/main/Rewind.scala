@@ -2,20 +2,19 @@ package lila.game
 
 import chess.format.{pgn => chessPgn}
 
-object Rewind {
+object Rewind
 
-  private def createTags(fen: Option[String], game: Game) = {
+  private def createTags(fen: Option[String], game: Game) =
     val variantTag = Some(chessPgn.Tag(_.Variant, game.variant.name))
     val fenTag = fen map (fenString => chessPgn.Tag(_.FEN, fenString))
 
     List(variantTag, fenTag).flatten
-  }
 
   def apply(game: Game, initialFen: Option[String]): Valid[Progress] =
     chessPgn.Reader.movesWithSans(
         moveStrs = game.pgnMoves,
         op = sans => sans.isEmpty.fold(sans, sans.init),
-        tags = createTags(initialFen, game)) map { replay =>
+        tags = createTags(initialFen, game)) map  replay =>
       val rewindedGame = replay.state
       val rewindedHistory = rewindedGame.board.history
       val rewindedSituation = rewindedGame.situation
@@ -47,5 +46,3 @@ object Rewind {
                    newGame.playableCorrespondenceClock.map(
                        Event.CorrespondenceClock.apply)
                ).flatten)
-    }
-}

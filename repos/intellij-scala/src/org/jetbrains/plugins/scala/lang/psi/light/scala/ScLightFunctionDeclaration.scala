@@ -22,7 +22,7 @@ class ScLightFunctionDeclaration(pTypes: List[List[ScType]],
                                  rt: ScType,
                                  val fun: ScFunctionDeclaration)
     extends LightElement(fun.getManager, fun.getLanguage)
-    with ScFunctionDeclaration {
+    with ScFunctionDeclaration
   setNavigationElement(fun)
 
   override def getParent: PsiElement = fun.getParent
@@ -94,4 +94,3 @@ class ScLightFunctionDeclaration(pTypes: List[List[ScType]],
   override protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light function")
-}

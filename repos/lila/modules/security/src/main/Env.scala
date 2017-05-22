@@ -15,9 +15,9 @@ final class Env(config: Config,
                 messenger: akka.actor.ActorSelection,
                 system: ActorSystem,
                 scheduler: lila.common.Scheduler,
-                db: lila.db.Env) {
+                db: lila.db.Env)
 
-  private val settings = new {
+  private val settings = new
     val CollectionSecurity = config getString "collection.security"
     val FirewallEnabled = config getBoolean "firewall.enabled"
     val FirewallCookieName = config getString "firewall.cookie.name"
@@ -56,7 +56,6 @@ final class Env(config: Config,
     val RecaptchaPrivateKey = config getString "recaptcha.private_key"
     val RecaptchaEndpoint = config getString "recaptcha.endpoint"
     val RecaptchaEnabled = config getBoolean "recaptcha.enabled"
-  }
   import settings._
 
   val RecaptchaPublicKey = config getString "recaptcha.public_key"
@@ -123,9 +122,8 @@ final class Env(config: Config,
 
   private[security] lazy val storeColl = db(CollectionSecurity)
   private[security] lazy val firewallColl = db(FirewallCollectionFirewall)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "security" boot new Env(config = lila.common.PlayApp loadConfig "security",
@@ -134,4 +132,3 @@ object Env {
                             scheduler = lila.common.PlayApp.scheduler,
                             captcher = lila.hub.Env.current.actor.captcher,
                             messenger = lila.hub.Env.current.actor.messenger)
-}

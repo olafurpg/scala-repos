@@ -8,10 +8,10 @@ import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodePro
   * @author Roman.Shein
   * @since 20.04.2015.
   */
-trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
+trait FreeSpecFileStructureViewTest extends ScalaTestTestCase
   private val className = "FreeSpecViewTest"
 
-  def addFreeSpecViewTest(): Unit = {
+  def addFreeSpecViewTest(): Unit =
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -38,9 +38,8 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
         |  "level3" ignore pending
         |}
       """.stripMargin)
-  }
 
-  def testFreeSpecNormal(): Unit = {
+  def testFreeSpecNormal(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(className,
                              normalStatusId,
@@ -48,15 +47,13 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
                              "\"level1_1\"",
                              "\"level1_2\"",
                              "\"level1_2_1\"")
-  }
 
-  def testFreeSpecHierarchy(): Unit = {
+  def testFreeSpecHierarchy(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(className, "\"level1_1\"", Some("\"level1\""))
     runFileStructureViewTest(className, "\"level1_2_1\"", Some("\"level1_2\""))
-  }
 
-  def testFreeSpecIgnoredHierarchy(): Unit = {
+  def testFreeSpecIgnoredHierarchy(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(
         className,
@@ -67,22 +64,17 @@ trait FreeSpecFileStructureViewTest extends ScalaTestTestCase {
         "\"level2_2\"" + TestNodeProvider.ignoredSuffix,
         Some("\"level2\"" + TestNodeProvider.ignoredSuffix),
         ignoredStatusId)
-  }
 
-  def testFreeSpecIgnored(): Unit = {
+  def testFreeSpecIgnored(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(
         className, ignoredStatusId, "\"level2\"", "\"level2_2\"")
-  }
 
-  def testFreeSpecIgnoredAndPending(): Unit = {
+  def testFreeSpecIgnoredAndPending(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(className, ignoredStatusId, "\"level3\"")
-  }
 
-  def testFreeSpecPending(): Unit = {
+  def testFreeSpecPending(): Unit =
     addFreeSpecViewTest()
     runFileStructureViewTest(
         className, pendingStatusId, "\"level1_2\"", "\"level1_3\"")
-  }
-}

@@ -34,19 +34,19 @@ import org.apache.spark.sql.functions.lit
 
 class LogisticRegressionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   @transient var dataset: DataFrame = _
   @transient var binaryDataset: DataFrame = _
   private val eps: Double = 1e-5
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
 
     dataset = sqlContext.createDataFrame(
         generateLogisticInput(1.0, 1.0, nPoints = 100, seed = 42))
 
-    binaryDataset = {
+    binaryDataset =
       val nPoints = 10000
       val coefficients = Array(
           -0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
@@ -57,28 +57,24 @@ class LogisticRegressionSuite
           coefficients, xMean, xVariance, addIntercept = true, nPoints, 42)
 
       sqlContext.createDataFrame(sc.parallelize(testData, 4))
-    }
-  }
 
   /**
     * Enable the ignored test to export the dataset into CSV format,
     * so we can validate the training accuracy compared with R's glmnet package.
     */
-  ignore("export test data into CSV format") {
-    binaryDataset.rdd.map {
+  ignore("export test data into CSV format")
+    binaryDataset.rdd.map
       case Row(label: Double, features: Vector) =>
         label + "," + features.toArray.mkString(",")
-    }.repartition(1)
+    .repartition(1)
       .saveAsTextFile("target/tmp/LogisticRegressionSuite/binaryDataset")
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new LogisticRegression)
     val model = new LogisticRegressionModel("logReg", Vectors.dense(0.0), 0.0)
     ParamsSuite.checkParams(model)
-  }
 
-  test("logistic regression: default params") {
+  test("logistic regression: default params")
     val lr = new LogisticRegression
     assert(lr.getLabelCol === "label")
     assert(lr.getFeaturesCol === "features")
@@ -100,9 +96,8 @@ class LogisticRegressionSuite
     assert(model.getProbabilityCol === "probability")
     assert(model.intercept !== 0.0)
     assert(model.hasParent)
-  }
 
-  test("empty probabilityCol") {
+  test("empty probabilityCol")
     val lr = new LogisticRegression().setProbabilityCol("")
     val model = lr.fit(dataset)
     assert(model.hasSummary)
@@ -110,19 +105,16 @@ class LogisticRegressionSuite
     val fieldNames = model.summary.predictions.schema.fieldNames
     assert((dataset.schema.fieldNames.toSet).subsetOf(fieldNames.toSet))
     assert(fieldNames.exists(s => s.startsWith("probability_")))
-  }
 
-  test("setThreshold, getThreshold") {
+  test("setThreshold, getThreshold")
     val lr = new LogisticRegression
     // default
     assert(lr.getThreshold === 0.5,
            "LogisticRegression.threshold should default to 0.5")
-    withClue("LogisticRegression should not have thresholds set by default.") {
-      intercept[java.util.NoSuchElementException] {
+    withClue("LogisticRegression should not have thresholds set by default.")
+      intercept[java.util.NoSuchElementException]
         // Note: The exception type may change in future
         lr.getThresholds
-      }
-    }
     // Set via threshold.
     // Intuition: Large threshold or large thresholds(1) makes class 0 more likely.
     lr.setThreshold(1.0)
@@ -138,24 +130,19 @@ class LogisticRegressionSuite
     assert(lr2.getThreshold ~== expectedThreshold relTol 1E-7)
     // thresholds and threshold must be consistent
     lr2.setThresholds(Array(0.1, 0.2, 0.3))
-    withClue("getThreshold should throw error if thresholds has length != 2.") {
-      intercept[IllegalArgumentException] {
+    withClue("getThreshold should throw error if thresholds has length != 2.")
+      intercept[IllegalArgumentException]
         lr2.getThreshold
-      }
-    }
     // thresholds and threshold must be consistent: values
     withClue(
-        "fit with ParamMap should throw error if threshold, thresholds do not match.") {
-      intercept[IllegalArgumentException] {
+        "fit with ParamMap should throw error if threshold, thresholds do not match.")
+      intercept[IllegalArgumentException]
         val lr2model = lr2.fit(dataset,
                                lr2.thresholds -> Array(0.3, 0.7),
                                lr2.threshold -> (expectedThreshold / 2.0))
         lr2model.getThreshold
-      }
-    }
-  }
 
-  test("logistic regression doesn't fit intercept when fitIntercept is off") {
+  test("logistic regression doesn't fit intercept when fitIntercept is off")
     val lr = new LogisticRegression
     lr.setFitIntercept(false)
     val model = lr.fit(dataset)
@@ -163,9 +150,8 @@ class LogisticRegressionSuite
 
     // copied model must have the same parent.
     MLTestingUtils.checkCopy(model)
-  }
 
-  test("logistic regression with setters") {
+  test("logistic regression with setters")
     // Set params, train, and check as many params as we can.
     val lr = new LogisticRegression()
       .setMaxIter(10)
@@ -210,9 +196,8 @@ class LogisticRegressionSuite
     assert(parent2.getThreshold === 0.4)
     assert(model2.getThreshold === 0.4)
     assert(model2.getProbabilityCol === "theProb")
-  }
 
-  test("logistic regression: Predictor, Classifier methods") {
+  test("logistic regression: Predictor, Classifier methods")
     val sqlContext = this.sqlContext
     val lr = new LogisticRegression
 
@@ -225,24 +210,21 @@ class LogisticRegressionSuite
     val results = model.transform(dataset)
 
     // Compare rawPrediction with probability
-    results.select("rawPrediction", "probability").collect().foreach {
+    results.select("rawPrediction", "probability").collect().foreach
       case Row(raw: Vector, prob: Vector) =>
         assert(raw.size === 2)
         assert(prob.size === 2)
         val probFromRaw1 = 1.0 / (1.0 + math.exp(-raw(1)))
         assert(prob(1) ~== probFromRaw1 relTol eps)
         assert(prob(0) ~== 1.0 - probFromRaw1 relTol eps)
-    }
 
     // Compare prediction with probability
-    results.select("prediction", "probability").collect().foreach {
+    results.select("prediction", "probability").collect().foreach
       case Row(pred: Double, prob: Vector) =>
         val predFromProb = prob.toArray.zipWithIndex.maxBy(_._1)._2
         assert(pred == predFromProb)
-    }
-  }
 
-  test("MultiClassSummarizer") {
+  test("MultiClassSummarizer")
     val summarizer1 =
       (new MultiClassSummarizer).add(0.0).add(3.0).add(4.0).add(3.0).add(6.0)
     assert(summarizer1.histogram === Array[Double](1, 0, 0, 2, 1, 0, 1))
@@ -293,9 +275,8 @@ class LogisticRegressionSuite
     assert(summarizerB.histogram === Array[Double](1, 2, 2, 1, 3))
     assert(summarizerB.countInvalid === 5)
     assert(summarizerB.numClasses === 5)
-  }
 
-  test("MultiClassSummarizer with weighted samples") {
+  test("MultiClassSummarizer with weighted samples")
     val summarizer1 = (new MultiClassSummarizer)
       .add(label = 0.0, weight = 0.2)
       .add(3.0, 0.8)
@@ -325,9 +306,8 @@ class LogisticRegressionSuite
           Vectors.dense(Array(1.2, 2.1, 0.0, 3.1, 4.2, 2.3, 3.1)) absTol 1E-10)
     assert(summarizer.countInvalid === 0)
     assert(summarizer.numClasses === 7)
-  }
 
-  test("binary logistic regression with intercept without regularization") {
+  test("binary logistic regression with intercept without regularization")
     val trainer1 =
       (new LogisticRegression).setFitIntercept(true).setStandardization(true)
     val trainer2 =
@@ -364,9 +344,8 @@ class LogisticRegressionSuite
     // Without regularization, with or without standardization will converge to the same solution.
     assert(model2.intercept ~== interceptR relTol 1E-3)
     assert(model2.coefficients ~= coefficientsR relTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept without regularization") {
+  test("binary logistic regression without intercept without regularization")
     val trainer1 =
       (new LogisticRegression).setFitIntercept(false).setStandardization(true)
     val trainer2 =
@@ -404,9 +383,8 @@ class LogisticRegressionSuite
     // Without regularization, with or without standardization should converge to the same solution.
     assert(model2.intercept ~== interceptR relTol 1E-3)
     assert(model2.coefficients ~= coefficientsR relTol 1E-2)
-  }
 
-  test("binary logistic regression with intercept with L1 regularization") {
+  test("binary logistic regression with intercept with L1 regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(1.0)
@@ -469,9 +447,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 relTol 1E-2)
     assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept with L1 regularization") {
+  test("binary logistic regression without intercept with L1 regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(false)
       .setElasticNetParam(1.0)
@@ -535,9 +512,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 absTol 1E-3)
     assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
-  }
 
-  test("binary logistic regression with intercept with L2 regularization") {
+  test("binary logistic regression with intercept with L2 regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(0.0)
@@ -602,9 +578,8 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 relTol 1E-3)
     assert(model2.coefficients ~= coefficientsR2 relTol 1E-3)
-  }
 
-  test("binary logistic regression without intercept with L2 regularization") {
+  test("binary logistic regression without intercept with L2 regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(false)
       .setElasticNetParam(0.0)
@@ -670,10 +645,9 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 absTol 1E-3)
     assert(model2.coefficients ~= coefficientsR2 relTol 1E-2)
-  }
 
   test(
-      "binary logistic regression with intercept with ElasticNet regularization") {
+      "binary logistic regression with intercept with ElasticNet regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(0.38)
@@ -737,10 +711,9 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 relTol 6E-3)
     assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
-  }
 
   test(
-      "binary logistic regression without intercept with ElasticNet regularization") {
+      "binary logistic regression without intercept with ElasticNet regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(false)
       .setElasticNetParam(0.38)
@@ -805,10 +778,9 @@ class LogisticRegressionSuite
 
     assert(model2.intercept ~== interceptR2 absTol 1E-3)
     assert(model2.coefficients ~= coefficientsR2 absTol 1E-3)
-  }
 
   test(
-      "binary logistic regression with intercept with strong L1 regularization") {
+      "binary logistic regression with intercept with strong L1 regularization")
     val trainer1 = (new LogisticRegression)
       .setFitIntercept(true)
       .setElasticNetParam(1.0)
@@ -823,20 +795,20 @@ class LogisticRegressionSuite
     val model1 = trainer1.fit(binaryDataset)
     val model2 = trainer2.fit(binaryDataset)
 
-    val histogram = binaryDataset.rdd.map {
+    val histogram = binaryDataset.rdd.map
       case Row(label: Double, features: Vector) => label
-    }.treeAggregate(new MultiClassSummarizer)(
+    .treeAggregate(new MultiClassSummarizer)(
           seqOp = (c, v) =>
-              (c, v) match {
+              (c, v) match
               case (classSummarizer: MultiClassSummarizer, label: Double) =>
                 classSummarizer.add(label)
-          },
+          ,
           combOp = (c1, c2) =>
-              (c1, c2) match {
+              (c1, c2) match
               case (classSummarizer1: MultiClassSummarizer,
                     classSummarizer2: MultiClassSummarizer) =>
                 classSummarizer1.merge(classSummarizer2)
-          })
+          )
       .histogram
 
     /*
@@ -882,9 +854,8 @@ class LogisticRegressionSuite
 
     assert(model1.intercept ~== interceptR relTol 1E-5)
     assert(model1.coefficients ~== coefficientsR absTol 1E-6)
-  }
 
-  test("evaluate on test set") {
+  test("evaluate on test set")
     // Evaluate on test set should be same as that of the transformed training data.
     val lr = new LogisticRegression()
       .setMaxIter(10)
@@ -907,9 +878,8 @@ class LogisticRegressionSuite
     assert(
         summary.precisionByThreshold.collect() === sameSummary.precisionByThreshold
           .collect())
-  }
 
-  test("statistics on training data") {
+  test("statistics on training data")
     // Test that loss is monotonically decreasing.
     val lr = new LogisticRegression()
       .setMaxIter(10)
@@ -917,10 +887,9 @@ class LogisticRegressionSuite
       .setThreshold(0.6)
     val model = lr.fit(dataset)
     assert(model.summary.objectiveHistory.sliding(2).forall(x => x(0) >= x(1)))
-  }
 
-  test("binary logistic regression with weighted samples") {
-    val (dataset, weightedDataset) = {
+  test("binary logistic regression with weighted samples")
+    val (dataset, weightedDataset) =
       val nPoints = 1000
       val coefficients =
         Array(-0.57997, 0.912083, -0.371077, -0.819866, 2.688191)
@@ -930,41 +899,34 @@ class LogisticRegressionSuite
           coefficients, xMean, xVariance, true, nPoints, 42)
 
       // Let's over-sample the positive samples twice.
-      val data1 = testData.flatMap {
+      val data1 = testData.flatMap
         case labeledPoint: LabeledPoint =>
-          if (labeledPoint.label == 1.0) {
+          if (labeledPoint.label == 1.0)
             Iterator(labeledPoint, labeledPoint)
-          } else {
+          else
             Iterator(labeledPoint)
-          }
-      }
 
       val rnd = new Random(8392)
-      val data2 = testData.flatMap {
+      val data2 = testData.flatMap
         case LabeledPoint(label: Double, features: Vector) =>
-          if (rnd.nextGaussian() > 0.0) {
-            if (label == 1.0) {
+          if (rnd.nextGaussian() > 0.0)
+            if (label == 1.0)
               Iterator(Instance(label, 1.2, features),
                        Instance(label, 0.8, features),
                        Instance(0.0, 0.0, features))
-            } else {
+            else
               Iterator(Instance(label, 0.3, features),
                        Instance(1.0, 0.0, features),
                        Instance(label, 0.1, features),
                        Instance(label, 0.6, features))
-            }
-          } else {
-            if (label == 1.0) {
+          else
+            if (label == 1.0)
               Iterator(Instance(label, 2.0, features))
-            } else {
+            else
               Iterator(Instance(label, 1.0, features))
-            }
-          }
-      }
 
       (sqlContext.createDataFrame(sc.parallelize(data1, 4)),
        sqlContext.createDataFrame(sc.parallelize(data2, 4)))
-    }
 
     val trainer1a = (new LogisticRegression)
       .setFitIntercept(true)
@@ -982,9 +944,8 @@ class LogisticRegressionSuite
     assert(model1a0.intercept !~= model1a1.intercept absTol 1E-3)
     assert(model1a0.coefficients ~== model1b.coefficients absTol 1E-3)
     assert(model1a0.intercept ~== model1b.intercept absTol 1E-3)
-  }
 
-  test("logistic regression with all labels the same") {
+  test("logistic regression with all labels the same")
     val sameLabels = dataset
       .withColumn("zeroLabel", lit(0.0))
       .withColumn("oneLabel", lit(1.0))
@@ -1020,23 +981,19 @@ class LogisticRegressionSuite
       lrNoIntercept.setLabelCol("oneLabel").fit(sameLabels)
     assert(allOneNoInterceptModel.intercept === 0.0)
     assert(allOneNoInterceptModel.summary.totalIterations > 0)
-  }
 
-  test("read/write") {
+  test("read/write")
     def checkModelData(model: LogisticRegressionModel,
-                       model2: LogisticRegressionModel): Unit = {
+                       model2: LogisticRegressionModel): Unit =
       assert(model.intercept === model2.intercept)
       assert(model.coefficients.toArray === model2.coefficients.toArray)
       assert(model.numClasses === model2.numClasses)
       assert(model.numFeatures === model2.numFeatures)
-    }
     val lr = new LogisticRegression()
     testEstimatorAndModelReadWrite(
         lr, dataset, LogisticRegressionSuite.allParamSettings, checkModelData)
-  }
-}
 
-object LogisticRegressionSuite {
+object LogisticRegressionSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -1055,4 +1012,3 @@ object LogisticRegressionSuite {
         "standardization" -> false,
         "threshold" -> 0.6
     )
-}

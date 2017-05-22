@@ -15,7 +15,7 @@ import akka.ConfigurationException
   * type parameter A:
   *  - The type of the key that identifies a resource to be monitored by a failure detector
   */
-trait FailureDetectorRegistry[A] {
+trait FailureDetectorRegistry[A]
 
   /**
     * Returns true if the resource is considered to be up and healthy and returns false otherwise.
@@ -44,14 +44,13 @@ trait FailureDetectorRegistry[A] {
     * Removes all resources and any associated failure detector state.
     */
   def reset(): Unit
-}
 
 /**
   * INTERNAL API
   *
   * Utility class to create [[FailureDetector]] instances reflectively.
   */
-private[akka] object FailureDetectorLoader {
+private[akka] object FailureDetectorLoader
 
   /**
     * Loads and instantiates a given [[FailureDetector]] implementation. The class to be loaded must have a constructor
@@ -64,7 +63,7 @@ private[akka] object FailureDetectorLoader {
     * @return A configured instance of the given [[FailureDetector]] implementation
     */
   def load(
-      fqcn: String, config: Config, system: ActorSystem): FailureDetector = {
+      fqcn: String, config: Config, system: ActorSystem): FailureDetector =
     system
       .asInstanceOf[ExtendedActorSystem]
       .dynamicAccess
@@ -72,14 +71,13 @@ private[akka] object FailureDetectorLoader {
           fqcn,
           List(classOf[Config] -> config,
                classOf[EventStream] -> system.eventStream))
-      .recover({
+      .recover(
         case e ⇒
           throw new ConfigurationException(
               s"Could not create custom failure detector [$fqcn] due to: ${e.toString}",
               e)
-      })
+      )
       .get
-  }
 
   /**
     * Loads and instantiates a given [[FailureDetector]] implementation. The class to be loaded must have a constructor
@@ -93,4 +91,3 @@ private[akka] object FailureDetectorLoader {
     */
   def apply(fqcn: String, config: Config)(implicit ctx: ActorContext) =
     load(fqcn, config, ctx.system)
-}

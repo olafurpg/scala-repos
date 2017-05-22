@@ -1,9 +1,8 @@
-object Test {
+object Test
   case class Foo[+T[_]](activity: T[Long])
   type Cell[T] = T
   def insertCell(u: Foo[Cell]) = ???
   insertCell(Foo(5))
-}
 
 /* If SI-8230 is fixed, and `viewExists` is changed to no longer leak
    ambiguity errors, you might expect the check file for this test to

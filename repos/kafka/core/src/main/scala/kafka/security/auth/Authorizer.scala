@@ -29,7 +29,7 @@ import org.apache.kafka.common.security.auth.KafkaPrincipal
   * From that point onwards, every client request will first be routed to authorize method and the request will only be
   * authorized if the method returns true.
   */
-trait Authorizer extends Configurable {
+trait Authorizer extends Configurable
 
   /**
     * @param session The session being authenticated.
@@ -86,4 +86,3 @@ trait Authorizer extends Configurable {
     * Closes this instance.
     */
   def close(): Unit
-}

@@ -12,21 +12,19 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ShardingServiceTest extends FunSuite with MockitoSugar {
+class ShardingServiceTest extends FunSuite with MockitoSugar
 
   class MockRequest
-  class ShardingRequest(key: Long) extends MockRequest {
+  class ShardingRequest(key: Long) extends MockRequest
     def shardingKey = key
-  }
 
-  class ShardingServiceHelper {
+  class ShardingServiceHelper
     val distributor = mock[Distributor[Service[MockRequest, String]]]
-    val service = new ShardingService(distributor, { request: MockRequest =>
-      request match {
+    val service = new ShardingService(distributor,  request: MockRequest =>
+      request match
         case req: ShardingRequest => Some(req.shardingKey)
         case _ => None
-      }
-    })
+    )
 
     val reqA = new ShardingRequest(1L)
     val serviceForA = mock[Service[MockRequest, String]]
@@ -34,9 +32,8 @@ class ShardingServiceTest extends FunSuite with MockitoSugar {
 
     val unshardableReq = new MockRequest
     val reply = Future.value("hello")
-  }
 
-  test("ShardingService should distribute requests between two shards") {
+  test("ShardingService should distribute requests between two shards")
     val h = new ShardingServiceHelper
     import h._
 
@@ -55,29 +52,23 @@ class ShardingServiceTest extends FunSuite with MockitoSugar {
     when(serviceForB.apply(reqB)) thenReturn reply
     service(reqB)
     verify(serviceForB).apply(reqB)
-  }
 
   test(
-      "ShardingService should thenReturn an exception if the shard picked is unavailable") {
+      "ShardingService should thenReturn an exception if the shard picked is unavailable")
     val h = new ShardingServiceHelper
     import h._
 
     when(distributor.nodeForHash(1L)) thenReturn serviceForA
     when(serviceForA.status) thenReturn Status.Closed
-    intercept[ShardNotAvailableException] {
+    intercept[ShardNotAvailableException]
       Await.result(service(reqA))
-    }
     verify(serviceForA, times(0)).apply(reqA)
-  }
 
   test(
-      "ShardingService should thenReturn an unshardable if the request is not shardable") {
+      "ShardingService should thenReturn an unshardable if the request is not shardable")
     val h = new ShardingServiceHelper
     import h._
 
-    intercept[NotShardableException] {
+    intercept[NotShardableException]
       Await.result(service(unshardableReq))
-    }
     verify(distributor, times(0)).nodeForHash(anyLong)
-  }
-}

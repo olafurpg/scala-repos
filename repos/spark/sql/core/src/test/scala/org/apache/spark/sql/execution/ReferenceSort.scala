@@ -31,17 +31,17 @@ import org.apache.spark.util.collection.ExternalSorter
   */
 case class ReferenceSort(
     sortOrder: Seq[SortOrder], global: Boolean, child: SparkPlan)
-    extends UnaryNode {
+    extends UnaryNode
 
   override def requiredChildDistribution: Seq[Distribution] =
     if (global) OrderedDistribution(sortOrder) :: Nil
     else UnspecifiedDistribution :: Nil
 
   protected override def doExecute(): RDD[InternalRow] =
-    attachTree(this, "sort") {
+    attachTree(this, "sort")
       child
         .execute()
-        .mapPartitions({ iterator =>
+        .mapPartitions( iterator =>
           val ordering = newOrdering(sortOrder, child.output)
           val sorter = new ExternalSorter[InternalRow, Null, InternalRow](
               TaskContext.get(), ordering = Some(ordering))
@@ -57,10 +57,8 @@ case class ReferenceSort(
             .incPeakExecutionMemory(sorter.peakMemoryUsedBytes)
           CompletionIterator[InternalRow, Iterator[InternalRow]](baseIterator,
                                                                  sorter.stop())
-        }, preservesPartitioning = true)
-    }
+        , preservesPartitioning = true)
 
   override def output: Seq[Attribute] = child.output
 
   override def outputOrdering: Seq[SortOrder] = sortOrder
-}

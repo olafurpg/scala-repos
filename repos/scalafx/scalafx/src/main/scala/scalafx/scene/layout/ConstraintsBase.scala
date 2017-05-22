@@ -32,7 +32,7 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object ConstraintsBase {
+object ConstraintsBase
   implicit def sfxConstraintsBase2jfx(
       v: ConstraintsBase): jfxsl.ConstraintsBase =
     if (v != null) v.delegate else null
@@ -45,7 +45,6 @@ object ConstraintsBase {
       "Use ConstrainToPref; CONSTRAIN_TO_PREF will be removed in a future release",
       "8.0.60-R10")
   val CONSTRAIN_TO_PREF = ConstrainToPref
-}
 
 abstract class ConstraintsBase(override val delegate: jfxsl.ConstraintsBase)
     extends SFXDelegate[jfxsl.ConstraintsBase] {}

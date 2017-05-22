@@ -23,28 +23,25 @@ import kafka.utils.VerifiableProperties
   * An implementation is required to provide a constructor that
   * takes a VerifiableProperties instance.
   */
-trait Encoder[T] {
+trait Encoder[T]
   def toBytes(t: T): Array[Byte]
-}
 
 /**
   * The default implementation is a no-op, it just returns the same array it takes in
   */
 class DefaultEncoder(props: VerifiableProperties = null)
-    extends Encoder[Array[Byte]] {
+    extends Encoder[Array[Byte]]
   override def toBytes(value: Array[Byte]): Array[Byte] = value
-}
 
-class NullEncoder[T](props: VerifiableProperties = null) extends Encoder[T] {
+class NullEncoder[T](props: VerifiableProperties = null) extends Encoder[T]
   override def toBytes(value: T): Array[Byte] = null
-}
 
 /**
   * The string encoder takes an optional parameter serializer.encoding which controls
   * the character set used in encoding the string into bytes.
   */
 class StringEncoder(props: VerifiableProperties = null)
-    extends Encoder[String] {
+    extends Encoder[String]
   val encoding =
     if (props == null) "UTF8"
     else props.getString("serializer.encoding", "UTF8")
@@ -52,4 +49,3 @@ class StringEncoder(props: VerifiableProperties = null)
   override def toBytes(s: String): Array[Byte] =
     if (s == null) null
     else s.getBytes(encoding)
-}

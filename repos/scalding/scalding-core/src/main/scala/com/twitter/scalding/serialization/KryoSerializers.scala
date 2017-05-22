@@ -24,80 +24,65 @@ import com.twitter.scalding._
 /**
   * This is a runtime check for types we should never be serializing
   */
-class ThrowingSerializer[T] extends KSerializer[T] {
-  override def write(kryo: Kryo, output: Output, t: T) {
+class ThrowingSerializer[T] extends KSerializer[T]
+  override def write(kryo: Kryo, output: Output, t: T)
     sys.error(s"Kryo should never be used to serialize an instance: $t")
-  }
   override def read(kryo: Kryo, input: Input, t: Class[T]): T =
     sys.error("Kryo should never be used to serialize an instance, class: $t")
-}
 
 /**
   * *
   * Below are some serializers for objects in the scalding project.
   */
-class RichDateSerializer extends KSerializer[RichDate] {
+class RichDateSerializer extends KSerializer[RichDate]
   // RichDates are immutable, no need to copy them
   setImmutable(true)
-  def write(kser: Kryo, out: Output, date: RichDate) {
+  def write(kser: Kryo, out: Output, date: RichDate)
     out.writeLong(date.timestamp, true);
-  }
 
   def read(kser: Kryo, in: Input, cls: Class[RichDate]): RichDate =
     RichDate(in.readLong(true))
-}
 
-class DateRangeSerializer extends KSerializer[DateRange] {
+class DateRangeSerializer extends KSerializer[DateRange]
   // DateRanges are immutable, no need to copy them
   setImmutable(true)
-  def write(kser: Kryo, out: Output, range: DateRange) {
+  def write(kser: Kryo, out: Output, range: DateRange)
     out.writeLong(range.start.timestamp, true);
     out.writeLong(range.end.timestamp, true);
-  }
 
-  def read(kser: Kryo, in: Input, cls: Class[DateRange]): DateRange = {
+  def read(kser: Kryo, in: Input, cls: Class[DateRange]): DateRange =
     DateRange(RichDate(in.readLong(true)), RichDate(in.readLong(true)));
-  }
-}
 
-class ArgsSerializer extends KSerializer[Args] {
+class ArgsSerializer extends KSerializer[Args]
   // Args are immutable, no need to copy them
   setImmutable(true)
-  def write(kser: Kryo, out: Output, a: Args) {
+  def write(kser: Kryo, out: Output, a: Args)
     out.writeString(a.toString)
-  }
   def read(kser: Kryo, in: Input, cls: Class[Args]): Args =
     Args(in.readString)
-}
 
-class IntFieldSerializer extends KSerializer[IntField[_]] {
+class IntFieldSerializer extends KSerializer[IntField[_]]
   //immutable, no need to copy them
   setImmutable(true)
-  def write(kser: Kryo, out: Output, a: IntField[_]) {
+  def write(kser: Kryo, out: Output, a: IntField[_])
     out.writeInt(a.id)
     kser.writeClassAndObject(out, a.ord)
     kser.writeClassAndObject(out, a.mf)
-  }
-  def read(kser: Kryo, in: Input, cls: Class[IntField[_]]): IntField[_] = {
+  def read(kser: Kryo, in: Input, cls: Class[IntField[_]]): IntField[_] =
     val id = in.readInt
     val ord = kser.readClassAndObject(in).asInstanceOf[Ordering[Any]]
     val mf = kser.readClassAndObject(in).asInstanceOf[Option[Manifest[Any]]]
     IntField[Any](id)(ord, mf)
-  }
-}
 
-class StringFieldSerializer extends KSerializer[StringField[_]] {
+class StringFieldSerializer extends KSerializer[StringField[_]]
   //immutable, no need to copy them
   setImmutable(true)
-  def write(kser: Kryo, out: Output, a: StringField[_]) {
+  def write(kser: Kryo, out: Output, a: StringField[_])
     out.writeString(a.id)
     kser.writeClassAndObject(out, a.ord)
     kser.writeClassAndObject(out, a.mf)
-  }
-  def read(kser: Kryo, in: Input, cls: Class[StringField[_]]): StringField[_] = {
+  def read(kser: Kryo, in: Input, cls: Class[StringField[_]]): StringField[_] =
     val id = in.readString
     val ord = kser.readClassAndObject(in).asInstanceOf[Ordering[Any]]
     val mf = kser.readClassAndObject(in).asInstanceOf[Option[Manifest[Any]]]
     StringField[Any](id)(ord, mf)
-  }
-}

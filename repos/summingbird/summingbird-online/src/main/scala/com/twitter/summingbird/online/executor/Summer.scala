@@ -67,7 +67,7 @@ class Summer[Key, Value : Semigroup, Event, S, D, RC](
     pDecoder: Injection[(Int, CMap[Key, Value]), D],
     pEncoder: Injection[Event, D])
     extends AsyncBase[(Int, CMap[Key, Value]), Event, InputState[S], D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures, maxWaitingTime, maxEmitPerExec)
 
   val lockedOp = Externalizer(flatMapOp)
   val encoder = pEncoder
@@ -86,54 +86,47 @@ class Summer[Key, Value : Semigroup, Event, S, D, RC](
   val successHandlerBox = Externalizer(successHandler)
   var successHandlerOpt: Option[OnlineSuccessHandler] = null
 
-  override def init(runtimeContext: RC) {
+  override def init(runtimeContext: RC)
     super.init(runtimeContext)
     storePromise.setValue(storeBox.get.mergeableStore())
     store.toString // Do the lazy evaluation now so we can connect before tuples arrive.
 
     successHandlerOpt = if (includeSuccessHandler.get)
       Some(successHandlerBox.get) else None
-  }
 
   override def notifyFailure(
-      inputs: Seq[InputState[S]], error: Throwable): Unit = {
+      inputs: Seq[InputState[S]], error: Throwable): Unit =
     super.notifyFailure(inputs, error)
     exceptionHandlerBox.get.apply(error)
-  }
 
   private def handleResult(kvs: Map[Key, (Seq[InputState[S]], Value)])
     : TraversableOnce[(Seq[InputState[S]], Future[TraversableOnce[Event]])] =
     store
       .multiMerge(kvs.mapValues(_._2))
       .iterator
-      .map {
+      .map
         case (k, beforeF) =>
           val (tups, delta) = kvs(k)
-          (tups, beforeF.flatMap { before =>
+          (tups, beforeF.flatMap  before =>
             lockedOp.get.apply((k, (before, delta)))
-          }.onSuccess { _ =>
+          .onSuccess  _ =>
             successHandlerOpt.get.handlerFn.apply()
-          })
-      }
+          )
       .toList
 
   override def tick = sSummer.tick.map(handleResult(_))
 
-  override def apply(state: InputState[S], tupList: (Int, CMap[Key, Value])) = {
-    try {
+  override def apply(state: InputState[S], tupList: (Int, CMap[Key, Value])) =
+    try
       val (_, innerTuples) = tupList
       assert(innerTuples.size > 0, "Maps coming in must not be empty")
       state.fanOut(innerTuples.size)
-      val cacheEntries = innerTuples.map {
+      val cacheEntries = innerTuples.map
         case (k, v) =>
           (k, (List(state), v))
-      }
 
       sSummer.addAll(cacheEntries).map(handleResult(_))
-    } catch {
+    catch
       case NonFatal(e) => Future.exception(e)
-    }
-  }
 
   override def cleanup = Await.result(store.close)
-}

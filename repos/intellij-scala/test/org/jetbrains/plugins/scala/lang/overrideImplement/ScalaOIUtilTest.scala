@@ -12,7 +12,7 @@ import org.junit.Assert
 /**
   * Pavel Fatin
   */
-class ScalaOIUtilTest extends SimpleTestCase {
+class ScalaOIUtilTest extends SimpleTestCase
   private final val Prefix = "object Holder {\n  "
 
   private final val Suffix = "\n}"
@@ -29,24 +29,21 @@ class ScalaOIUtilTest extends SimpleTestCase {
   // implemented as mixin
   // abstract override
 
-  def testSOE() {
+  def testSOE()
     assertUnimplemented(
         "trait A; trait B extends D; " +
         "trait C extends A with B; trait D extends B with C;" +
         "object X extends D {}")
-  }
 
-  def testEmpty() {
+  def testEmpty()
     assertUnimplemented("trait T { }; new T {}")
     assertUnimplemented("abstract case class C; new C {}")
-  }
 
-  def testSelf() {
+  def testSelf()
     assertUnimplemented("trait T { }")
     assertUnimplemented("trait T { def f }")
-  }
 
-  def testConvertedName() {
+  def testConvertedName()
     assertUnimplemented(
         """
         |1
@@ -58,9 +55,8 @@ class ScalaOIUtilTest extends SimpleTestCase {
         |}
       """.replace("\r", "").stripMargin
     )
-  }
 
-  def testOverAbstract() {
+  def testOverAbstract()
     assertUnimplemented(
         """
         |1
@@ -74,20 +70,17 @@ class ScalaOIUtilTest extends SimpleTestCase {
         |}
       """.replace("\r", "").stripMargin
     )
-  }
 
-  def testMembers() {
+  def testMembers()
     assertUnimplemented("trait T { def f }; new T {}", "f: Unit")
     assertUnimplemented("trait T { var f }; new T {}", "f: Any")
     assertUnimplemented("trait T { type X }; new T {}", "X")
-  }
 
-  def testSources() {
+  def testSources()
     assertUnimplemented("trait T { def f }; new T {}", "f: Unit")
     assertUnimplemented("abstract class T { def f }; new T {}", "f: Unit")
-  }
 
-  def testTargets() {
+  def testTargets()
     //todo: important: in script file resolve is ok. In any other file problems with resolve to T,
     //todo: because of wrong package structure.
     assertUnimplemented("trait T { def f }; new T {}", "f: Unit")
@@ -99,17 +92,15 @@ class ScalaOIUtilTest extends SimpleTestCase {
         "1; trait T { def f }; trait H extends T {}", "f: Unit")
     assertUnimplemented(
         "1; trait T { def f }; object H extends T {}", "f: Unit")
-  }
 
   private def assertUnimplemented(@Language(value = "Scala",
                                             prefix = Prefix,
                                             suffix = Suffix) code: String,
-                                  names: String*) {
+                                  names: String*)
     Assert.assertEquals(names.toList, unimplementedIn(code).toList)
-  }
 
   private def unimplementedIn(@Language(
-          value = "Scala", prefix = Prefix, suffix = Suffix) code: String) = {
+          value = "Scala", prefix = Prefix, suffix = Suffix) code: String) =
     val text: String = "" + code + Suffix
     val file: ScalaFile = text.parse
     val templateDefinitions: Seq[ScTemplateDefinition] =
@@ -117,5 +108,3 @@ class ScalaOIUtilTest extends SimpleTestCase {
     val lastDefinition: ScTemplateDefinition = templateDefinitions.last
     val members = ScalaOIUtil.getMembersToImplement(lastDefinition)
     members.map(_.getText)
-  }
-}

@@ -10,16 +10,15 @@ import scala.concurrent.{ExecutionContextExecutor, ExecutionContext}
 /**
   * Contains the default ExecutionContext used by Iteratees.
   */
-object Execution {
+object Execution
 
   def defaultExecutionContext: ExecutionContext =
     Implicits.defaultExecutionContext
 
-  object Implicits {
+  object Implicits
     implicit def defaultExecutionContext: ExecutionContext =
       Execution.trampoline
     implicit def trampoline: ExecutionContextExecutor = Execution.trampoline
-  }
 
   /**
     * Executes in the current thread. Uses a thread local trampoline to make sure the stack
@@ -30,7 +29,7 @@ object Execution {
     * Blocking should be strictly avoided as it could hog the current thread.
     * Also, since we're running on a single thread, blocking code risks deadlock.
     */
-  object trampoline extends ExecutionContextExecutor {
+  object trampoline extends ExecutionContextExecutor
 
     /*
      * A ThreadLocal value is used to track the state of the trampoline in the current
@@ -61,21 +60,20 @@ object Execution {
     /** Marks an empty queue (see docs for `local`). */
     private object Empty
 
-    def execute(runnable: Runnable): Unit = {
-      local.get match {
+    def execute(runnable: Runnable): Unit =
+      local.get match
         case null =>
           // Trampoline is inactive in this thread so start it up!
-          try {
+          try
             // The queue of Runnables to run after this one
             // is initially empty.
             local.set(Empty)
             runnable.run()
             executeScheduled()
-          } finally {
+          finally
             // We've run all the Runnables, so show that the 
             // trampoline has been shut down.
             local.set(null)
-          }
         case Empty =>
           // Add this Runnable to our empty queue
           local.set(runnable)
@@ -93,15 +91,13 @@ object Execution {
         case illegal =>
           throw new IllegalStateException(
               s"Unsupported trampoline ThreadLocal value: $illegal")
-      }
-    }
 
     /**
       * Run all tasks that have been scheduled in the ThreadLocal.
       */
     @tailrec
-    private def executeScheduled(): Unit = {
-      local.get match {
+    private def executeScheduled(): Unit =
+      local.get match
         case Empty =>
           // Nothing to run
           ()
@@ -118,16 +114,11 @@ object Execution {
           // while loop. The value of the ThreadLocal will stay as
           // an ArrayDeque until all the scheduled Runnables have been
           // run.
-          while (!runnables.isEmpty) {
+          while (!runnables.isEmpty)
             val runnable = runnables.removeFirst()
             runnable.run()
-          }
         case illegal =>
           throw new IllegalStateException(
               s"Unsupported trampoline ThreadLocal value: $illegal")
-      }
-    }
 
     def reportFailure(t: Throwable): Unit = t.printStackTrace()
-  }
-}

@@ -36,35 +36,30 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object DataFrameExample {
+object DataFrameExample
 
   case class Params(input: String = "data/mllib/sample_libsvm_data.txt")
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("DataFrameExample") {
+    val parser = new OptionParser[Params]("DataFrameExample")
       head("DataFrameExample: an example app using DataFrame for ML.")
       opt[String]("input")
         .text(s"input path to dataframe")
         .action((x, c) => c.copy(input = x))
-      checkConfig { params =>
+      checkConfig  params =>
         success
-      }
-    }
 
     parser
       .parse(args, defaultParams)
-      .map { params =>
+      .map  params =>
         run(params)
-      }
-      .getOrElse {
+      .getOrElse
         sys.exit(1)
-      }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
 
     val conf = new SparkConf().setAppName(s"DataFrameExample with $params")
     val sc = new SparkContext(conf)
@@ -105,6 +100,4 @@ object DataFrameExample {
     newDF.printSchema()
 
     sc.stop()
-  }
-}
 // scalastyle:on println

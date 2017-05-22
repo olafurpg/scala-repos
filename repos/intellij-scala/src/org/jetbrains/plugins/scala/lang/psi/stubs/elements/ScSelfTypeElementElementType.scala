@@ -17,31 +17,28 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScSelfTypeInheritorsInde
   */
 class ScSelfTypeElementElementType[Func <: ScSelfTypeElement]
     extends ScStubElementType[ScSelfTypeElementStub, ScSelfTypeElement](
-        "self type element") {
-  def serialize(stub: ScSelfTypeElementStub, dataStream: StubOutputStream) {
+        "self type element")
+  def serialize(stub: ScSelfTypeElementStub, dataStream: StubOutputStream)
     dataStream.writeName(stub.getName)
     dataStream.writeName(stub.getTypeElementText)
     val names = stub.getClassNames
     dataStream.writeInt(names.length)
     names.foreach(dataStream.writeName(_))
-  }
 
-  def createPsi(stub: ScSelfTypeElementStub): ScSelfTypeElement = {
+  def createPsi(stub: ScSelfTypeElementStub): ScSelfTypeElement =
     new ScSelfTypeElementImpl(stub)
-  }
 
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScSelfTypeElement,
-      parentStub: StubElement[ParentPsi]): ScSelfTypeElementStub = {
+      parentStub: StubElement[ParentPsi]): ScSelfTypeElementStub =
     new ScSelfTypeElementStubImpl(
-        parentStub, this, psi.name, psi.typeElement match {
+        parentStub, this, psi.name, psi.typeElement match
       case None => ""
       case Some(x) => x.getText
-    }, psi.getClassNames)
-  }
+    , psi.getClassNames)
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScSelfTypeElementStub = {
+      dataStream: StubInputStream, parentStub: Any): ScSelfTypeElementStub =
     val name = dataStream.readName
     val typeElementText = dataStream.readName
     val n = dataStream.readInt()
@@ -52,11 +49,7 @@ class ScSelfTypeElementElementType[Func <: ScSelfTypeElement]
         name.toString,
         typeElementText.toString,
         names)
-  }
 
-  def indexStub(stub: ScSelfTypeElementStub, sink: IndexSink) {
-    for (name <- stub.getClassNames) {
+  def indexStub(stub: ScSelfTypeElementStub, sink: IndexSink)
+    for (name <- stub.getClassNames)
       sink.occurrence(ScSelfTypeInheritorsIndex.KEY, name)
-    }
-  }
-}

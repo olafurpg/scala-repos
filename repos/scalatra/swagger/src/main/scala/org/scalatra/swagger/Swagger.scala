@@ -14,7 +14,7 @@ import org.scalatra.swagger.runtime.annotations.{ApiModel, ApiModelProperty}
 
 import scala.collection.JavaConverters._
 
-trait SwaggerEngine[T <: SwaggerApi[_]] {
+trait SwaggerEngine[T <: SwaggerApi[_]]
   def swaggerVersion: String
   def apiVersion: String
   def apiInfo: ApiInfo
@@ -49,9 +49,8 @@ trait SwaggerEngine[T <: SwaggerApi[_]] {
                produces: List[String],
                protocols: List[String],
                authorizations: List[String])
-}
 
-object Swagger {
+object Swagger
 
   val baseTypes = Set("byte",
                       "boolean",
@@ -84,20 +83,20 @@ object Swagger {
   private[swagger] def collectModels(
       tpe: ScalaType,
       alreadyKnown: Set[Model],
-      known: Set[ScalaType] = Set.empty): Set[Model] = {
+      known: Set[ScalaType] = Set.empty): Set[Model] =
     if (tpe.isMap)
       collectModels(tpe.typeArgs.head, alreadyKnown, tpe.typeArgs.toSet) ++ collectModels(
           tpe.typeArgs.last, alreadyKnown, tpe.typeArgs.toSet)
-    else if (tpe.isCollection || tpe.isOption) {
+    else if (tpe.isCollection || tpe.isOption)
       val ntpe = tpe.typeArgs.head
       if (!known.contains(ntpe))
         collectModels(ntpe, alreadyKnown, known + ntpe)
       else Set.empty
-    } else {
+    else
       if (alreadyKnown.map(_.id).contains(tpe.simpleName)) Set.empty
-      else {
+      else
         val descr = Reflector.describe(tpe)
-        descr match {
+        descr match
           case descriptor: ClassDescriptor =>
             val ctorModels =
               descriptor.mostComprehensive.filterNot(_.isPrimitive).toVector
@@ -105,24 +104,19 @@ object Swagger {
                 p => p.isPrimitive || ctorModels.exists(_.name == p.name))
             val subModels =
               (ctorModels.map(_.argType) ++ propModels.map(_.returnType)).toSet -- known
-            val topLevel = for {
+            val topLevel = for
               tl <- subModels + descriptor.erasure if !(tl.isCollection ||
                        tl.isMap || tl.isOption)
               m <- modelToSwagger(tl)
-            } yield m
+            yield m
 
             val nested =
-              subModels.foldLeft((topLevel, known + descriptor.erasure)) {
+              subModels.foldLeft((topLevel, known + descriptor.erasure))
                 (acc, b) =>
                   val m = collectModels(b, alreadyKnown, acc._2)
                   (acc._1 ++ m, acc._2 + b)
-              }
             nested._1
           case _ => Set.empty
-        }
-      }
-    }
-  }
 
   import org.scalatra.util.RicherString._
   def modelToSwagger[T](implicit mf: Manifest[T]): Option[Model] =
@@ -133,7 +127,7 @@ object Swagger {
                                     required: Boolean = true,
                                     description: Option[String] = None,
                                     allowableValues: String = "")(
-      prop: PropertyDescriptor) = {
+      prop: PropertyDescriptor) =
     val ctorParam =
       if (!prop.returnType.isOption)
         descr.mostComprehensive.find(_.name == prop.name) else None
@@ -148,18 +142,17 @@ object Swagger {
         allowableValues = convertToAllowableValues(allowableValues))
     //    if (descr.simpleName == "Pet") println("The property is: " + mp)
     prop.name -> mp
-  }
-  def modelToSwagger(klass: ScalaType): Option[Model] = {
+  def modelToSwagger(klass: ScalaType): Option[Model] =
     if (Reflector.isPrimitive(klass.erasure) ||
         Reflector.isExcluded(klass.erasure, excludes.toSeq)) None
-    else {
+    else
       val name = klass.simpleName
 
       val descr = Reflector.describe(klass).asInstanceOf[ClassDescriptor]
       val apiModel = Option(klass.erasure.getAnnotation(classOf[ApiModel]))
 
       val fields =
-        klass.erasure.getDeclaredFields.toList collect {
+        klass.erasure.getDeclaredFields.toList collect
           case f: Field
               if f.getAnnotation(classOf[ApiModelProperty]) != null =>
             val annot = f.getAnnotation(classOf[ApiModelProperty])
@@ -174,86 +167,74 @@ object Swagger {
           case f: Field =>
             val asModelProperty = toModelProperty(descr) _
             descr.properties.find(_.mangledName == f.getName) map asModelProperty
-        }
 
       val result =
-        apiModel map { am =>
+        apiModel map  am =>
           Model(name,
                 name,
                 klass.fullName.blankOption,
                 properties = fields.flatten,
                 baseModel = am.parent.getName.blankOption,
                 discriminator = am.discriminator.blankOption)
-        } orElse Some(
+        orElse Some(
             Model(name,
                   name,
                   klass.fullName.blankOption,
                   properties = fields.flatten))
       //      if (descr.simpleName == "Pet") println("The collected fields:\n" + result)
       result
-    }
-  }
 
   private def convertToAllowableValues(
-      csvString: String, paramType: String = null): AllowableValues = {
-    if (csvString.toLowerCase.startsWith("range[")) {
+      csvString: String, paramType: String = null): AllowableValues =
+    if (csvString.toLowerCase.startsWith("range["))
       val ranges = csvString.substring(6, csvString.length() - 1).split(",")
       buildAllowableRangeValues(ranges, csvString, inclusive = true)
-    } else if (csvString.toLowerCase.startsWith("rangeexclusive[")) {
+    else if (csvString.toLowerCase.startsWith("rangeexclusive["))
       val ranges = csvString.substring(15, csvString.length() - 1).split(",")
       buildAllowableRangeValues(ranges, csvString, inclusive = false)
-    } else {
-      if (csvString.isBlank) {
+    else
+      if (csvString.isBlank)
         AllowableValues.AnyValue
-      } else {
+      else
         val params = csvString.split(",").toList
         implicit val format = DefaultJsonFormats.GenericFormat(
             DefaultReaders.StringReader, DefaultWriters.StringWriter)
-        paramType match {
+        paramType match
           case null => AllowableValues.AllowableValuesList(params)
           case "string" => AllowableValues.AllowableValuesList(params)
-        }
-      }
-    }
-  }
 
   private def buildAllowableRangeValues(
       ranges: Array[String],
       inputStr: String,
-      inclusive: Boolean = true): AllowableValues.AllowableRangeValues = {
+      inclusive: Boolean = true): AllowableValues.AllowableRangeValues =
     var min: java.lang.Float = 0
     var max: java.lang.Float = 0
-    if (ranges.size < 2) {
+    if (ranges.size < 2)
       throw new RuntimeException(
           "Allowable values format " + inputStr + "is incorrect")
-    }
-    if (ranges(0).equalsIgnoreCase("Infinity")) {
+    if (ranges(0).equalsIgnoreCase("Infinity"))
       min = Float.PositiveInfinity
-    } else if (ranges(0).equalsIgnoreCase("-Infinity")) {
+    else if (ranges(0).equalsIgnoreCase("-Infinity"))
       min = Float.NegativeInfinity
-    } else {
+    else
       min = ranges(0).toFloat
-    }
-    if (ranges(1).equalsIgnoreCase("Infinity")) {
+    if (ranges(1).equalsIgnoreCase("Infinity"))
       max = Float.PositiveInfinity
-    } else if (ranges(1).equalsIgnoreCase("-Infinity")) {
+    else if (ranges(1).equalsIgnoreCase("-Infinity"))
       max = Float.NegativeInfinity
-    } else {
+    else
       max = ranges(1).toFloat
-    }
     val allowableValues = AllowableValues.AllowableRangeValues(
         if (inclusive) Range.inclusive(min.toInt, max.toInt)
         else Range(min.toInt, max.toInt))
     allowableValues
-  }
-}
 
 /**
   * An instance of this class is used to hold the API documentation.
   */
 class Swagger(
     val swaggerVersion: String, val apiVersion: String, val apiInfo: ApiInfo)
-    extends SwaggerEngine[Api] {
+    extends SwaggerEngine[Api]
   private[this] val logger = Logger[this.type]
 
   /**
@@ -266,7 +247,7 @@ class Swagger(
                consumes: List[String],
                produces: List[String],
                protocols: List[String],
-               authorizations: List[String]) = {
+               authorizations: List[String]) =
     logger.debug(
         s"registering swagger api with: { listingPath: $listingPath, resourcePath: $resourcePath, description: $resourcePath, servlet: ${s.getClass} }")
     val endpoints: List[Endpoint] =
@@ -287,10 +268,8 @@ class Swagger(
                          (authorizations ::: endpoints.flatMap(_.operations
                                    .flatMap(_.authorizations))).distinct,
                          0)
-  }
-}
 
-trait SwaggerApi[T <: SwaggerEndpoint[_]] {
+trait SwaggerApi[T <: SwaggerEndpoint[_]]
 
   def apiVersion: String
   def swaggerVersion: String
@@ -305,7 +284,6 @@ trait SwaggerApi[T <: SwaggerEndpoint[_]] {
   def models: Map[String, Model]
 
   def model(name: String) = models.get(name)
-}
 
 case class ResourceListing(apiVersion: String,
                            swaggerVersion: String = Swagger.SpecVersion,
@@ -329,7 +307,7 @@ case class Api(apiVersion: String,
                position: Int = 0)
     extends SwaggerApi[Endpoint] {}
 
-object ParamType extends Enumeration {
+object ParamType extends Enumeration
   type ParamType = Value
 
   /** A parameter carried in a POST body. **/
@@ -356,12 +334,10 @@ object ParamType extends Enumeration {
   val File = Value("file")
 
   val Form = Value("form")
-}
 
-sealed trait DataType {
+sealed trait DataType
   def name: String
-}
-object DataType {
+object DataType
 
   case class ValueDataType(name: String,
                            format: Option[String] = None,
@@ -383,21 +359,18 @@ object DataType {
   val Date = DataType("string", Some("date"))
   val DateTime = DataType("string", Some("date-time"))
 
-  object GenList {
+  object GenList
     def apply(): DataType = ContainerDataType("List")
     def apply(v: DataType): DataType = new ContainerDataType("List", Some(v))
-  }
 
-  object GenSet {
+  object GenSet
     def apply(): DataType = ContainerDataType("Set", uniqueItems = true)
     def apply(v: DataType): DataType =
       new ContainerDataType("Set", Some(v), uniqueItems = true)
-  }
 
-  object GenArray {
+  object GenArray
     def apply(): DataType = ContainerDataType("Array")
     def apply(v: DataType): DataType = new ContainerDataType("Array", Some(v))
-  }
 
   //  object GenMap {
   //    def apply(): DataType = Map
@@ -417,12 +390,11 @@ object DataType {
     Set[Class[_]](classOf[Boolean], classOf[java.lang.Boolean])
   private[this] def isBool(klass: Class[_]) = BoolTypes contains klass
 
-  private[swagger] def fromManifest[T](implicit mf: Manifest[T]): DataType = {
+  private[swagger] def fromManifest[T](implicit mf: Manifest[T]): DataType =
     fromScalaType(Reflector.scalaTypeOf[T])
-  }
   private[swagger] def fromClass(klass: Class[_]): DataType =
     fromScalaType(Reflector.scalaTypeOf(klass))
-  private[swagger] def fromScalaType(st: ScalaType): DataType = {
+  private[swagger] def fromScalaType(st: ScalaType): DataType =
     val klass =
       if (st.isOption && st.typeArgs.size > 0) st.typeArgs.head.erasure
       else st.erasure
@@ -448,21 +420,19 @@ object DataType {
     //      } else GenMap()
     //    }
     else if (classOf[scala.collection.Set[_]].isAssignableFrom(klass) ||
-             classOf[java.util.Set[_]].isAssignableFrom(klass)) {
+             classOf[java.util.Set[_]].isAssignableFrom(klass))
       if (st.typeArgs.nonEmpty) GenSet(fromScalaType(st.typeArgs.head))
       else GenSet()
-    } else if (classOf[collection.Seq[_]].isAssignableFrom(klass) ||
-               classOf[java.util.List[_]].isAssignableFrom(klass)) {
+    else if (classOf[collection.Seq[_]].isAssignableFrom(klass) ||
+               classOf[java.util.List[_]].isAssignableFrom(klass))
       if (st.typeArgs.nonEmpty) GenList(fromScalaType(st.typeArgs.head))
       else GenList()
-    } else if (st.isArray || isCollection(klass)) {
+    else if (st.isArray || isCollection(klass))
       if (st.typeArgs.nonEmpty) GenArray(fromScalaType(st.typeArgs.head))
       else GenArray()
-    } else {
+    else
       val stt = if (st.isOption) st.typeArgs.head else st
       new ValueDataType(stt.simpleName, qualifiedName = Option(stt.fullName))
-    }
-  }
 
   private[this] val IntTypes = Set[Class[_]](classOf[Int],
                                              classOf[java.lang.Integer],
@@ -493,7 +463,6 @@ object DataType {
   private[this] def isCollection(klass: Class[_]) =
     classOf[collection.Traversable[_]].isAssignableFrom(klass) ||
     classOf[java.util.Collection[_]].isAssignableFrom(klass)
-}
 
 case class ApiInfo(title: String,
                    description: String,
@@ -504,7 +473,7 @@ case class ApiInfo(title: String,
 
 trait AllowableValues
 
-object AllowableValues {
+object AllowableValues
   case object AnyValue extends AllowableValues
   case class AllowableValuesList[T](values: List[T]) extends AllowableValues
   case class AllowableRangeValues(values: Range) extends AllowableValues
@@ -514,7 +483,6 @@ object AllowableValues {
   def apply[T](values: List[T]): AllowableValues = AllowableValuesList(values)
   def apply(values: Range): AllowableValues = AllowableRangeValues(values)
   def empty = AnyValue
-}
 
 case class Parameter(
     name: String,
@@ -543,14 +511,12 @@ case class Model(id: String,
                  description: Option[String] = None,
                  properties: List[(String, ModelProperty)] = Nil,
                  baseModel: Option[String] = None,
-                 discriminator: Option[String] = None) {
+                 discriminator: Option[String] = None)
 
-  def setRequired(property: String, required: Boolean): Model = {
+  def setRequired(property: String, required: Boolean): Model =
     val prop = properties.find(_._1 == property).get
     copy(
         properties = (property -> prop._2.copy(required = required)) :: properties)
-  }
-}
 
 case class ModelRef(`type`: String,
                     ref: Option[String] = None,
@@ -561,31 +527,25 @@ case class TokenRequestEndpoint(
     url: String, clientIdName: String, clientSecretName: String)
 case class TokenEndpoint(url: String, tokenName: String)
 
-trait AuthorizationType {
+trait AuthorizationType
   def `type`: String
-}
 case class OAuth(scopes: List[String], grantTypes: List[GrantType])
-    extends AuthorizationType {
+    extends AuthorizationType
   override val `type` = "oauth2"
-}
 case class ApiKey(keyname: String, passAs: String = "header")
-    extends AuthorizationType {
+    extends AuthorizationType
   override val `type` = "apiKey"
-}
 
-trait GrantType {
+trait GrantType
   def `type`: String
-}
 case class ImplicitGrant(loginEndpoint: LoginEndpoint, tokenName: String)
-    extends GrantType {
+    extends GrantType
   def `type` = "implicit"
-}
 case class AuthorizationCodeGrant(
     tokenRequestEndpoint: TokenRequestEndpoint, tokenEndpoint: TokenEndpoint)
-    extends GrantType {
+    extends GrantType
   def `type` = "authorization_code"
-}
-trait SwaggerOperation {
+trait SwaggerOperation
   @deprecated("Swagger spec 1.2 renamed `httpMethod` to `method`.", "2.2.2")
   def httpMethod: HttpMethod = method
   def method: HttpMethod
@@ -606,7 +566,6 @@ trait SwaggerOperation {
   def responseMessages: List[ResponseMessage[_]]
   //  def supportedContentTypes: List[String]
   def position: Int
-}
 case class Operation(method: HttpMethod,
                      responseClass: DataType,
                      summary: String,
@@ -623,20 +582,18 @@ case class Operation(method: HttpMethod,
                      authorizations: List[String] = Nil)
     extends SwaggerOperation
 
-trait SwaggerEndpoint[T <: SwaggerOperation] {
+trait SwaggerEndpoint[T <: SwaggerOperation]
   def path: String
   def description: Option[String]
   def operations: List[T]
-}
 
 case class Endpoint(path: String,
                     description: Option[String] = None,
                     operations: List[Operation] = Nil)
     extends SwaggerEndpoint[Operation]
 
-trait ResponseMessage[T] {
+trait ResponseMessage[T]
   def code: Int
   def message: T
-}
 case class StringResponseMessage(code: Int, message: String)
     extends ResponseMessage[String]

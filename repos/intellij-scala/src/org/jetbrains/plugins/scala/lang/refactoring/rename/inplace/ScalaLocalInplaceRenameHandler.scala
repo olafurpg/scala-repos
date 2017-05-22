@@ -14,40 +14,33 @@ import com.intellij.refactoring.rename.inplace.{InplaceRefactoring, VariableInpl
   * 1/20/14
   */
 class ScalaLocalInplaceRenameHandler
-    extends VariableInplaceRenameHandler with ScalaInplaceRenameHandler {
+    extends VariableInplaceRenameHandler with ScalaInplaceRenameHandler
 
   override def isAvailable(
-      element: PsiElement, editor: Editor, file: PsiFile): Boolean = {
+      element: PsiElement, editor: Editor, file: PsiFile): Boolean =
     val processor = renameProcessor(element)
     editor.getSettings.isVariableInplaceRenameEnabled && processor != null &&
     processor.canProcessElement(element) &&
     element.getUseScope.isInstanceOf[LocalSearchScope]
-  }
 
   override def createRenamer(
-      elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer = {
-    elementToRename match {
+      elementToRename: PsiElement, editor: Editor): VariableInplaceRenamer =
+    elementToRename match
       case named: PsiNamedElement =>
         new ScalaLocalInplaceRenamer(named, editor)
       case _ =>
         throw new IllegalArgumentException(
             s"Cannot rename element: \n${elementToRename.getText}")
-    }
-  }
 
   override def invoke(project: Project,
                       editor: Editor,
                       file: PsiFile,
-                      dataContext: DataContext) = {
+                      dataContext: DataContext) =
     UsageTrigger.trigger(ScalaBundle.message("rename.local.id"))
     super.invoke(project, editor, file, dataContext)
-  }
 
   override def doRename(elementToRename: PsiElement,
                         editor: Editor,
-                        dataContext: DataContext): InplaceRefactoring = {
-    afterElementSubstitution(elementToRename, editor, dataContext) {
+                        dataContext: DataContext): InplaceRefactoring =
+    afterElementSubstitution(elementToRename, editor, dataContext)
       super.doRename(_, editor, dataContext)
-    }
-  }
-}

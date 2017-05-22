@@ -1,12 +1,10 @@
-class C1 {
+class C1
   def a {}
-}
 
-class C2 extends C1 {
+class C2 extends C1
   def b {}
-}
 
-object O extends C2 {
+object O extends C2
   override def a {}
   override def b {}
 
@@ -15,4 +13,3 @@ object O extends C2 {
 
   println(super. /* line: 2 */ a)
   println(super. /* line: 6 */ b)
-}

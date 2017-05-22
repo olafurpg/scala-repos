@@ -7,7 +7,7 @@ class Implicit1[T](b: Implicit2[T])
 class Implicit2[T](c: Implicit3[T])
 class Implicit3[T]( /* and so on */ )
 
-object Test extends App {
+object Test extends App
   // the base conversion
   implicit def convertToZ[T](a: A[T])(implicit b: Implicit1[T]): Z[A[T]] = Z(a)
 
@@ -32,4 +32,3 @@ object Test extends App {
 
   (new A).a
   (new A[Nothing]).a
-}

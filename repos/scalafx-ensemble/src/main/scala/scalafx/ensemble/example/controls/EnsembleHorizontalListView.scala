@@ -43,11 +43,11 @@ import scalafx.scene.layout.StackPane
   * @see scalafx.scene.control.SelectionModel
   * @related controls/SimpleListView
   */
-class EnsembleHorizontalListView extends EnsembleExample {
+class EnsembleHorizontalListView extends EnsembleExample
 
   // @stage-property width = 500
 
-  def getContent = {
+  def getContent =
     val seq = Seq("Row 1",
                   "Row 2",
                   "Long Row 3",
@@ -69,14 +69,10 @@ class EnsembleHorizontalListView extends EnsembleExample {
                   "Row 19",
                   "Row 20")
 
-    val listView = new ListView[String] {
+    val listView = new ListView[String]
       items = ObservableBuffer(seq)
       orientation = Orientation.HORIZONTAL
-    }
 
-    new StackPane {
+    new StackPane
       padding = Insets(10)
       children = listView
-    }
-  }
-}

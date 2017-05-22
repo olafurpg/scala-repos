@@ -31,14 +31,12 @@ import scala.language.higherKinds
   *    @see GenericCanBuildFrom
   */
 abstract class GenSetFactory[CC[X] <: GenSet[X] with GenSetLike[X, CC[X]]]
-    extends GenericCompanion[CC] {
+    extends GenericCompanion[CC]
 
   def newBuilder[A]: Builder[A, CC[A]]
 
   /** $setCanBuildFromInfo
     */
-  def setCanBuildFrom[A] = new CanBuildFrom[CC[_], A, CC[A]] {
+  def setCanBuildFrom[A] = new CanBuildFrom[CC[_], A, CC[A]]
     def apply(from: CC[_]) = newBuilder[A]
     def apply() = newBuilder[A]
-  }
-}

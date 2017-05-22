@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import slick.jdbc.H2Profile.api._
 import slick.jdbc.H2Profile
 
-object CodeGenerator extends App {
+object CodeGenerator extends App
   val profile = "slick.jdbc.H2Profile"
   val jdbcDriver = "org.h2.Driver"
   val url = "jdbc:postgresql://localhost/test"
@@ -12,7 +12,7 @@ object CodeGenerator extends App {
   val pkg = "demo"
   val user = ""
   val password = ""
-  if (false) {
+  if (false)
     val db = Database.forURL(
         "jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1", driver = "org.h2.Driver")
     //#default-runner
@@ -34,7 +34,7 @@ object CodeGenerator extends App {
     // customize code generator
     val codegenFuture = modelFuture.map(
         model =>
-          new SourceCodeGenerator(model) {
+          new SourceCodeGenerator(model)
         // override mapped table and class name
         override def entityName =
           dbTableName => dbTableName.dropRight(1).toLowerCase.toCamelCase
@@ -46,23 +46,20 @@ object CodeGenerator extends App {
           "import foo.{MyCustomType,MyCustomTypeMapper}" + "\n" + super.code
 
         // override table generator
-        override def Table = new Table(_) {
+        override def Table = new Table(_)
           // disable entity class generation and mapping
-          override def EntityType = new EntityType {
+          override def EntityType = new EntityType
             override def classEnabled = false
-          }
 
           // override contained column generator
-          override def Column = new Column(_) {
+          override def Column = new Column(_)
             // use the data model member of this column to change the Scala type,
             // e.g. to a custom enum or anything else
             override def rawType =
               if (model.name == "SOME_SPECIAL_COLUMN_NAME") "MyCustomType"
               else super.rawType
-          }
-        }
-    })
-    codegenFuture.onSuccess {
+    )
+    codegenFuture.onSuccess
       case codegen =>
         codegen.writeToFile(
             "slick.jdbc.H2Profile",
@@ -71,7 +68,4 @@ object CodeGenerator extends App {
             "Tables",
             "Tables.scala"
         )
-    }
     //#customization
-  }
-}

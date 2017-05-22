@@ -1,16 +1,14 @@
-object Test extends Application {
+object Test extends Application
   InnerClassTest1
   InnerClassTest2
-}
 
-object InnerClassTest1 extends Test1 {
+object InnerClassTest1 extends Test1
   printClass(anonymousFunctions.getClass)
   printClass(anonymousFunctions.bar.getClass)
   println(anonymousClasses.x) // see run/t1167.scala
   printClass(anonymousClasses.getClass)
-}
 
-object InnerClassTest2 extends Test2 {
+object InnerClassTest2 extends Test2
   printClass(anonymousFunctions.getClass)
   printClass(anonymousFunctions.bar.getClass)
   printClass(anonymousClasses.getClass)
@@ -19,9 +17,8 @@ object InnerClassTest2 extends Test2 {
   printClass("anonymousFunctions$$anonfun$foo$1")
   printClass("anonymousFunctions$bar$$anonfun$4")
   printClass("anonymousClasses$$anon$1")
-}
 
-object anonymousFunctions {
+object anonymousFunctions
   //InnerClass:
   // public final #_ of #_; //class anonymousFunctions$$anonfun$1 of class InnerClass$
   val twice = (x: Int) => 2 * x
@@ -30,7 +27,7 @@ object anonymousFunctions {
   // public final #_ of #_; //class anonymousFunctions$$anonfun$2
   List(0).map(x => x + 1)
 
-  def foo {
+  def foo
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$$anonfun$3
     val square = (x: Int) => x * x
@@ -38,9 +35,8 @@ object anonymousFunctions {
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$$anonfun$foo$1
     Array(1).filter(_ % 2 == 0)
-  }
 
-  object bar {
+  object bar
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$bar$$anonfun$4 of class anonymousFunctions$bar$
     val cube = (x: Int) => x * x * x
@@ -48,45 +44,36 @@ object anonymousFunctions {
     //InnerClass:
     // public final #_ of #_; class anonymousFunctions$bar$$anonfun$5
     Set(1, 2, 3).exists(_ == 2)
-  }
-}
 
-object anonymousClasses {
+object anonymousClasses
   //InnerClass:
   // public abstract #_= #_ of #_; //Foo=class anonymousClasses$Foo of class anonymousClasses$
   // public abstract #_= #_ of #_; //Foo$class=class anonymousClasses$Foo$class of class anonymousClasses$
-  trait Foo {
+  trait Foo
     def foo() { println("foo"); }
     override def toString = getClass.getName
-  }
   //InnerClass:
   // public final #_; //class anonymousClasses$$anon$1 of class anonymousClasses$
-  val x = new Foo() {
+  val x = new Foo()
     override def foo() { println("foo (overridden)"); }
     def dummy = 0
-  }
-}
 
 // Auxiliary functions
 
-trait Test1 {
+trait Test1
   private var kind: String = _
   private var mods: String = _
-  def printInnerClasses(cls: Class[_]) {
-    for (c <- cls.getDeclaredClasses) {
+  def printInnerClasses(cls: Class[_])
+    for (c <- cls.getDeclaredClasses)
       mods = AccessFlags.asString(c.getModifiers)
       kind = if (c.isInterface) "interface" else "class"
       println("  " + mods + kind + " " + c.getName + " of class " +
           c.getEnclosingClass.getName)
-    }
-  }
-  def printClass(cls: Class[_]) {
+  def printClass(cls: Class[_])
     println("\n{{ " + cls.getName + " }}")
     printInnerClasses(cls)
-  }
-}
 
-trait Test2 {
+trait Test2
   @throws(classOf[Exception])
   // def printInnerClasses(cls: Class[_]) {
   //   import java.io._, ch.epfl.lamp.fjbg._
@@ -98,18 +85,14 @@ trait Test2 {
   //   println(jclass.getInnerClasses)
   //   in.close()
   // }
-  def printClass(name: String) {
-    try { printClass(Class.forName(name)) } catch {
+  def printClass(name: String)
+    try { printClass(Class.forName(name)) } catch
       case e: Exception => println(e)
-    }
-  }
-  def printClass(cls: Class[_]) {
+  def printClass(cls: Class[_])
     println("\n[[ " + cls.getName + " ]]");
     try { printInnerClasses(cls) } catch { case e: Exception => println(e) }
-  }
-}
 
-object AccessFlags {
+object AccessFlags
   val ACC_PUBLIC = 0x0001
   val ACC_PRIVATE = 0x0002
   val ACC_PROTECTED = 0x0004
@@ -117,7 +100,7 @@ object AccessFlags {
   val ACC_FINAL = 0x0010
   val ACC_ABSTRACT = 0x0400
 
-  def asString(accessFlags: Int): String = {
+  def asString(accessFlags: Int): String =
     val buf = new StringBuilder()
     if ((accessFlags & ACC_PUBLIC) != 0) buf.append("public ")
     else if ((accessFlags & ACC_PROTECTED) != 0) buf.append("protected ")
@@ -125,8 +108,6 @@ object AccessFlags {
     if ((accessFlags & ACC_ABSTRACT) != 0) buf.append("abstract ")
     else if ((accessFlags & ACC_FINAL) != 0) buf.append("final ")
     buf.toString
-  }
-}
 
 /*
   implicit def stringToLines(s: String) = new {

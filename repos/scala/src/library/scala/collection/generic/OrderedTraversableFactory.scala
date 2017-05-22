@@ -14,11 +14,9 @@ import scala.language.higherKinds
 
 abstract class OrderedTraversableFactory[
     CC[X] <: Traversable[X] with GenericOrderedTraversableTemplate[X, CC]]
-    extends GenericOrderedCompanion[CC] {
+    extends GenericOrderedCompanion[CC]
 
   class GenericCanBuildFrom[A](implicit ord: Ordering[A])
-      extends CanBuildFrom[CC[_], A, CC[A]] {
+      extends CanBuildFrom[CC[_], A, CC[A]]
     def apply(from: CC[_]) = from.genericOrderedBuilder[A]
     def apply = newBuilder[A]
-  }
-}

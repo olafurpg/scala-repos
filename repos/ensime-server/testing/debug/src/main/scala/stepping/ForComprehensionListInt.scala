@@ -2,42 +2,33 @@ package stepping
 
 import debug.Helper._
 
-object ForComprehensionListInt {
+object ForComprehensionListInt
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val l = List(1, 2, 3, 4)
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
       noop(n)
-    }
 
     foo(l)
     new ForComprehensionListInt(l).bar
-  }
 
-  def foo(l: List[Int]) {
+  def foo(l: List[Int])
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
       noop(n)
-    }
-  }
-}
 
-class ForComprehensionListInt(l: List[Int]) {
+class ForComprehensionListInt(l: List[Int])
 
-  for (n <- l) {
+  for (n <- l)
     noop(n)
     noop(n)
-  }
 
-  def bar() {
+  def bar()
 
-    for (n <- l) {
+    for (n <- l)
       noop(n)
       noop(n)
-    }
-  }
-}

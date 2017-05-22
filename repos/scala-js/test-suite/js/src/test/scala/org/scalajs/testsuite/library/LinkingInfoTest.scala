@@ -13,27 +13,22 @@ import org.junit.Test
 
 import org.scalajs.testsuite.utils.Platform._
 
-class LinkingInfoTest {
+class LinkingInfoTest
 
   import scala.scalajs.LinkingInfo
 
-  @Test def productionMode_when_in_production_mode(): Unit = {
+  @Test def productionMode_when_in_production_mode(): Unit =
     assumeTrue(isInProductionMode)
     assertTrue(LinkingInfo.productionMode)
-  }
 
-  @Test def productionMode_when_in_development_mode(): Unit = {
+  @Test def productionMode_when_in_development_mode(): Unit =
     assumeTrue(isInDevelopmentMode)
     assertFalse(LinkingInfo.productionMode)
-  }
 
-  @Test def developmentMode_when_in_production_mode(): Unit = {
+  @Test def developmentMode_when_in_production_mode(): Unit =
     assumeTrue(isInProductionMode)
     assertFalse(LinkingInfo.developmentMode)
-  }
 
-  @Test def developmentMode_when_in_development_mode(): Unit = {
+  @Test def developmentMode_when_in_development_mode(): Unit =
     assumeTrue(isInDevelopmentMode)
     assertTrue(LinkingInfo.developmentMode)
-  }
-}

@@ -10,19 +10,19 @@ import scalaz.syntax.monad._
 
 case class FreeTListOption[A](f: FreeT[List, Option, A])
 
-object FreeTListOption {
+object FreeTListOption
   implicit def freeTListOptionMonad =
     new MonadPlus[FreeTListOption] with Traverse[FreeTListOption]
-    with BindRec[FreeTListOption] {
+    with BindRec[FreeTListOption]
       def point[A](a: => A): FreeTListOption[A] =
         FreeTListOption(Monad[FreeT[List, Option, ?]].point(a))
 
       def bind[A, B](fa: FreeTListOption[A])(
           f: A => FreeTListOption[B]): FreeTListOption[B] =
         FreeTListOption(
-            Monad[FreeT[List, Option, ?]].bind(fa.f) { a =>
+            Monad[FreeT[List, Option, ?]].bind(fa.f)  a =>
           f(a).f
-        })
+        )
 
       def tailrecM[A, B](
           f: A => FreeTListOption[A \/ B])(a: A): FreeTListOption[B] =
@@ -45,7 +45,6 @@ object FreeTListOption {
 
       override def foldMap[A, B : Monoid](fa: FreeTListOption[A])(f: A => B) =
         Foldable[FreeT[List, Option, ?]].foldMap(fa.f)(f)
-    }
 
   implicit def freeTListOptionArb[A](
       implicit A: Arbitrary[A]): Arbitrary[FreeTListOption[A]] =
@@ -61,13 +60,11 @@ object FreeTListOption {
 
   implicit def freeTListOptionEq[A](
       implicit A: Equal[A]): Equal[FreeTListOption[A]] =
-    new Equal[FreeTListOption[A]] {
+    new Equal[FreeTListOption[A]]
       def equal(a: FreeTListOption[A], b: FreeTListOption[A]) =
         Equal[Option[A]].equal(a.f.runM(_.headOption), b.f.runM(_.headOption))
-    }
-}
 
-object FreeTTest extends SpecLite {
+object FreeTTest extends SpecLite
   def freeTGen[F[_], G[_], A](
       g: Gen[F[FreeT[F, G, A]]])(implicit F: Functor[F],
                                  G: Applicative[G],
@@ -80,11 +77,11 @@ object FreeTTest extends SpecLite {
                FreeT.liftF[F, G, FreeT[F, G, A]](_).flatMap(x => x))
            .arbitrary)
       )
-  "ListOption" should {
+  "ListOption" should
     checkAll(monadPlus.laws[FreeTListOption])
     checkAll(traverse.laws[FreeTListOption])
 
-    "not stack overflow with 50k binds" in {
+    "not stack overflow with 50k binds" in
       val expected = Applicative[FreeTListOption].point(())
       val result = BindRec[FreeTListOption].tailrecM((i: Int) =>
             if (i < 50000)
@@ -93,9 +90,8 @@ object FreeTTest extends SpecLite {
               Applicative[FreeTListOption].point(\/.right[Int, Unit](())))(0)
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
-    }
 
-    "not stack overflow with 50k left-associated binds" in {
+    "not stack overflow with 50k left-associated binds" in
       val expected = Applicative[FreeTListOption].point(())
       val result =
         (0 until 50000).foldLeft(Applicative[FreeTListOption].point(()))(
@@ -103,9 +99,8 @@ object FreeTTest extends SpecLite {
         )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
-    }
 
-    "not stack overflow with bind followed by 50k maps" in {
+    "not stack overflow with bind followed by 50k maps" in
       val expected = Applicative[FreeTListOption].point(())
       val result = (0 until 50000).foldLeft(
           ().point[FreeTListOption].flatMap(u => u.point[FreeTListOption]))(
@@ -113,30 +108,24 @@ object FreeTTest extends SpecLite {
       )
 
       Equal[FreeTListOption[Unit]].equal(expected, result)
-    }
 
-    "hoist" ! forAll { a: FreeTListOption[Int] =>
+    "hoist" ! forAll  a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.hoist(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
-    }
 
-    "interpret" ! forAll { a: FreeTListOption[Int] =>
+    "interpret" ! forAll  a: FreeTListOption[Int] =>
       val b = FreeTListOption(a.f.interpret(NaturalTransformation.refl))
       Equal[FreeTListOption[Int]].equal(a, b)
-    }
-  }
 
-  "isoFree" ! forAll { a: FreeOption[Int] =>
+  "isoFree" ! forAll  a: FreeOption[Int] =>
     val iso = FreeT.isoFree[Option]
     Equal[FreeOption[Int]].equal(FreeOption(iso.to(iso.from(a.f))), a)
-  }
 
-  private def compilationTest = {
+  private def compilationTest =
     val a: String \/ Int = \/-(42)
     val b: FreeT[Maybe, String \/ ?, Int] = FreeT.liftMU(a)
-  }
 
-  object instances {
+  object instances
     def bind[S[_]: Functor, F[_]: Applicative] = Bind[FreeT[S, F, ?]]
     def foldable[
         S[_]: Foldable : Functor, F[_]: Foldable : Applicative : BindRec] =
@@ -167,5 +156,3 @@ object FreeTTest extends SpecLite {
       Monad[FreeT[S, F, ?]]
     def plus[S[_]: Functor, F[_]: ApplicativePlus : BindRec] =
       Plus[FreeT[S, F, ?]]
-  }
-}

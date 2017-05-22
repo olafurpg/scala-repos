@@ -25,31 +25,26 @@ import scala.io.Source
 import Properties.{versionString, copyrightString}
 import GenericRunnerCommand._
 
-class ScalaConsoleJSConsole extends JSConsole {
+class ScalaConsoleJSConsole extends JSConsole
   def log(msg: Any) = scala.Console.out.println(msg.toString)
-}
 
-class MainGenericRunner {
-  def errorFn(ex: Throwable): Boolean = {
+class MainGenericRunner
+  def errorFn(ex: Throwable): Boolean =
     ex.printStackTrace()
     false
-  }
-  def errorFn(str: String): Boolean = {
+  def errorFn(str: String): Boolean =
     scala.Console.err println str
     false
-  }
 
   val optMode = OptMode.fromId(sys.props("scalajs.partest.optMode"))
 
-  def readSemantics() = {
+  def readSemantics() =
     val opt = sys.props.get("scalajs.partest.compliantSems")
-    opt.fold(Semantics.Defaults) { str =>
+    opt.fold(Semantics.Defaults)  str =>
       val sems = str.split(',')
       Semantics.compliantTo(sems.toList)
-    }
-  }
 
-  def process(args: Array[String]): Boolean = {
+  def process(args: Array[String]): Boolean =
     val command = new GenericRunnerCommand(
         args.toList, (x: String) => errorFn(x))
 
@@ -76,34 +71,30 @@ class MainGenericRunner {
                         withSourceMap = false,
                         useClosureCompiler = optMode == FullOpt)
 
-    val libJSEnv = {
+    val libJSEnv =
       /* Historically, we used Rhino in NoOpt and NodeJS in FastOpt and FullOpt.
        * This is not necessary anymore: Rhino can run in FastOpt.
        * We keep this for now, mainly to not change too many things at once.
        */
-      if (optMode == NoOpt) {
+      if (optMode == NoOpt)
         val env = new RhinoJSEnv(semantics).withSourceMap(false)
         val unit = linker.linkUnit(ir, env.symbolRequirements, logger)
         env.loadLinkingUnit(unit)
-      } else {
+      else
         val output = WritableMemVirtualJSFile("partest-fastOpt.js")
         linker.link(ir, output, logger)
         new NodeJSEnv().loadLibs(ResolvedJSDependency.minimal(output) :: Nil)
-      }
-    }
 
     libJSEnv.jsRunner(jsRunner).run(logger, jsConsole)
 
     true
-  }
 
-  private def loadIR(classpathURLs: Seq[URL]) = {
+  private def loadIR(classpathURLs: Seq[URL]) =
     val irContainers = IRContainer.fromClasspath(classpathURLs.map(urlToFile))
     val cache = (new IRFileCache).newCache
     cache.cached(irContainers)
-  }
 
-  private def runnerIR(mainObj: String, args: List[String]) = {
+  private def runnerIR(mainObj: String, args: List[String]) =
     import ir.Infos._
     import ir.ClassKind
     import ir.Trees._
@@ -114,7 +105,7 @@ class MainGenericRunner {
     val exportName = "PartestLauncher"
     val encodedClassName = ir.Definitions.encodeClassName(className)
 
-    val definition = {
+    val definition =
       implicit val DummyPos = ir.Position.NoPosition
       ClassDef(
           Ident(encodedClassName, Some(className)),
@@ -140,30 +131,22 @@ class MainGenericRunner {
               ModuleExportDef(exportName)
           )
       )(OptimizerHints.empty)
-    }
 
     val info = generateClassInfo(definition)
 
     val infoAndDefinition = (info, definition)
 
-    new VirtualScalaJSIRFile {
+    new VirtualScalaJSIRFile
       def exists: Boolean = true
       def path: String = "PartestLauncher$.sjsir"
       def infoAndTree: (ClassInfo, ClassDef) = infoAndDefinition
-    }
-  }
 
-  private def urlToFile(url: java.net.URL) = {
-    try {
+  private def urlToFile(url: java.net.URL) =
+    try
       new File(url.toURI())
-    } catch {
+    catch
       case e: java.net.URISyntaxException => new File(url.getPath())
-    }
-  }
-}
 
-object MainGenericRunner extends MainGenericRunner {
-  def main(args: Array[String]) {
+object MainGenericRunner extends MainGenericRunner
+  def main(args: Array[String])
     if (!process(args)) sys.exit(1)
-  }
-}

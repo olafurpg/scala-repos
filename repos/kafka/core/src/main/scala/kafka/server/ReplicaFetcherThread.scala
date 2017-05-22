@@ -50,7 +50,7 @@ class ReplicaFetcherThread(name: String,
         clientId = name,
         sourceBroker = sourceBroker,
         fetchBackOffMs = brokerConfig.replicaFetchBackoffMs,
-        isInterruptible = false) {
+        isInterruptible = false)
 
   type REQ = FetchRequest
   type PD = PartitionData
@@ -73,7 +73,7 @@ class ReplicaFetcherThread(name: String,
   // we need to include both the broker id and the fetcher id
   // as the metrics tag to avoid metric name conflicts with
   // more than one fetcher thread to the same broker
-  private val networkClient = {
+  private val networkClient =
     val selector = new Selector(
         NetworkReceive.UNLIMITED,
         brokerConfig.connectionsMaxIdleMs,
@@ -99,18 +99,16 @@ class ReplicaFetcherThread(name: String,
         brokerConfig.requestTimeoutMs,
         time
     )
-  }
 
-  override def shutdown(): Unit = {
+  override def shutdown(): Unit =
     super.shutdown()
     networkClient.close()
-  }
 
   // process fetched data
   def processPartitionData(topicAndPartition: TopicAndPartition,
                            fetchOffset: Long,
-                           partitionData: PartitionData) {
-    try {
+                           partitionData: PartitionData)
+    try
       val TopicAndPartition(topic, partitionId) = topicAndPartition
       val replica = replicaMgr.getReplica(topic, partitionId).get
       val messageSet = partitionData.toByteBufferMessageSet
@@ -147,26 +145,23 @@ class ReplicaFetcherThread(name: String,
             "Follower %d set replica high watermark for partition [%s,%d] to %s"
               .format(
                 replica.brokerId, topic, partitionId, followerHighWatermark))
-    } catch {
+    catch
       case e: KafkaStorageException =>
         fatal("Disk error while replicating data.", e)
         Runtime.getRuntime.halt(1)
-    }
-  }
 
-  def warnIfMessageOversized(messageSet: ByteBufferMessageSet): Unit = {
+  def warnIfMessageOversized(messageSet: ByteBufferMessageSet): Unit =
     if (messageSet.sizeInBytes > 0 && messageSet.validBytes <= 0)
       error(
           "Replication is failing due to a message that is greater than replica.fetch.max.bytes. This " +
           "generally occurs when the max.message.bytes has been overridden to exceed this value and a suitably large " +
           "message has also been sent. To fix this problem increase replica.fetch.max.bytes in your broker config to be " +
           "equal or larger than your settings for max.message.bytes, both at a broker and topic level.")
-  }
 
   /**
     * Handle a partition whose offset is out of range and return a new fetch offset.
     */
-  def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long = {
+  def handleOffsetOutOfRange(topicAndPartition: TopicAndPartition): Long =
     val replica = replicaMgr
       .getReplica(topicAndPartition.topic, topicAndPartition.partition)
       .get
@@ -186,7 +181,7 @@ class ReplicaFetcherThread(name: String,
         ListOffsetRequest.LATEST_TIMESTAMP,
         brokerConfig.brokerId)
 
-    if (leaderEndOffset < replica.logEndOffset.messageOffset) {
+    if (leaderEndOffset < replica.logEndOffset.messageOffset)
       // Prior to truncating the follower's log, ensure that doing so is not disallowed by the configuration for unclean leader election.
       // This situation could only happen if the unclean election configuration for a topic changes while a replica is down. Otherwise,
       // we should never encounter this situation since a non-ISR leader cannot be elected if disallowed by the broker configuration.
@@ -195,7 +190,7 @@ class ReplicaFetcherThread(name: String,
                        AdminUtils.fetchEntityConfig(replicaMgr.zkUtils,
                                                     ConfigType.Topic,
                                                     topicAndPartition.topic))
-            .uncleanLeaderElectionEnable) {
+            .uncleanLeaderElectionEnable)
         // Log a fatal error and shutdown the broker to ensure that data loss does not unexpectedly occur.
         fatal(
             "Halting because log truncation is not allowed for topic %s,"
@@ -206,7 +201,6 @@ class ReplicaFetcherThread(name: String,
                       brokerConfig.brokerId,
                       replica.logEndOffset.messageOffset))
         Runtime.getRuntime.halt(1)
-      }
 
       warn(
           "Replica %d for partition %s reset its fetch offset from %d to current leader %d's latest offset %d"
@@ -218,7 +212,7 @@ class ReplicaFetcherThread(name: String,
       replicaMgr.logManager.truncateTo(
           Map(topicAndPartition -> leaderEndOffset))
       leaderEndOffset
-    } else {
+    else
 
       /**
         * If the leader's log end offset is greater than the follower's log end offset, there are two possibilities:
@@ -260,56 +254,47 @@ class ReplicaFetcherThread(name: String,
         replicaMgr.logManager.truncateFullyAndStartAt(
             topicAndPartition, leaderStartOffset)
       offsetToFetch
-    }
-  }
 
   // any logic for partitions whose leader has changed
-  def handlePartitionsWithErrors(partitions: Iterable[TopicAndPartition]) {
+  def handlePartitionsWithErrors(partitions: Iterable[TopicAndPartition])
     delayPartitions(partitions, brokerConfig.replicaFetchBackoffMs.toLong)
-  }
 
   protected def fetch(
-      fetchRequest: FetchRequest): Map[TopicAndPartition, PartitionData] = {
+      fetchRequest: FetchRequest): Map[TopicAndPartition, PartitionData] =
     val clientResponse = sendRequest(
         ApiKeys.FETCH, Some(fetchRequestVersion), fetchRequest.underlying)
-    new FetchResponse(clientResponse.responseBody).responseData.asScala.map {
+    new FetchResponse(clientResponse.responseBody).responseData.asScala.map
       case (key, value) =>
         TopicAndPartition(key.topic, key.partition) -> new PartitionData(value)
-    }
-  }
 
   private def sendRequest(apiKey: ApiKeys,
                           apiVersion: Option[Short],
-                          request: AbstractRequest): ClientResponse = {
+                          request: AbstractRequest): ClientResponse =
     import kafka.utils.NetworkClientBlockingOps._
     val header = apiVersion.fold(networkClient.nextRequestHeader(apiKey))(
         networkClient.nextRequestHeader(apiKey, _))
-    try {
+    try
       if (!networkClient.blockingReady(sourceNode, socketTimeout)(time))
         throw new SocketTimeoutException(
             s"Failed to connect within $socketTimeout ms")
-      else {
+      else
         val send = new RequestSend(
             sourceBroker.id.toString, header, request.toStruct)
         val clientRequest = new ClientRequest(
             time.milliseconds(), true, send, null)
         networkClient
           .blockingSendAndReceive(clientRequest, socketTimeout)(time)
-          .getOrElse {
+          .getOrElse
             throw new SocketTimeoutException(
                 s"No response received within $socketTimeout ms")
-          }
-      }
-    } catch {
+    catch
       case e: Throwable =>
         networkClient.close(sourceBroker.id.toString)
         throw e
-    }
-  }
 
   private def earliestOrLatestOffset(topicAndPartition: TopicAndPartition,
                                      earliestOrLatest: Long,
-                                     consumerId: Int): Long = {
+                                     consumerId: Int): Long =
     val topicPartition = new TopicPartition(
         topicAndPartition.topic, topicAndPartition.partition)
     val partitions = Map(
@@ -320,45 +305,39 @@ class ReplicaFetcherThread(name: String,
     val clientResponse = sendRequest(ApiKeys.LIST_OFFSETS, None, request)
     val response = new ListOffsetResponse(clientResponse.responseBody)
     val partitionData = response.responseData.get(topicPartition)
-    Errors.forCode(partitionData.errorCode) match {
+    Errors.forCode(partitionData.errorCode) match
       case Errors.NONE => partitionData.offsets.asScala.head
       case errorCode => throw errorCode.exception
-    }
-  }
 
   protected def buildFetchRequest(
       partitionMap: Map[TopicAndPartition, PartitionFetchState])
-    : FetchRequest = {
+    : FetchRequest =
     val requestMap =
       mutable.Map.empty[TopicPartition, JFetchRequest.PartitionData]
 
-    partitionMap.foreach {
+    partitionMap.foreach
       case ((TopicAndPartition(topic, partition), partitionFetchState)) =>
         if (partitionFetchState.isActive)
           requestMap(new TopicPartition(topic, partition)) = new JFetchRequest.PartitionData(
               partitionFetchState.offset, fetchSize)
-    }
 
     new FetchRequest(
         new JFetchRequest(replicaId, maxWait, minBytes, requestMap.asJava))
-  }
-}
 
-object ReplicaFetcherThread {
+object ReplicaFetcherThread
 
   private[server] class FetchRequest(val underlying: JFetchRequest)
-      extends AbstractFetcherThread.FetchRequest {
+      extends AbstractFetcherThread.FetchRequest
     def isEmpty: Boolean = underlying.fetchData.isEmpty
     def offset(topicAndPartition: TopicAndPartition): Long =
       underlying.fetchData
         .asScala(new TopicPartition(
                 topicAndPartition.topic, topicAndPartition.partition))
         .offset
-  }
 
   private[server] class PartitionData(
       val underlying: FetchResponse.PartitionData)
-      extends AbstractFetcherThread.PartitionData {
+      extends AbstractFetcherThread.PartitionData
 
     def errorCode: Short = underlying.errorCode
 
@@ -367,9 +346,6 @@ object ReplicaFetcherThread {
 
     def highWatermark: Long = underlying.highWatermark
 
-    def exception: Option[Throwable] = Errors.forCode(errorCode) match {
+    def exception: Option[Throwable] = Errors.forCode(errorCode) match
       case Errors.NONE => None
       case e => Some(e.exception)
-    }
-  }
-}

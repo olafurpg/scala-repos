@@ -40,9 +40,9 @@ case class Document(id: Long, text: String)
   * bin/run-example ml.SimpleTextClassificationPipeline
   * }}}
   */
-object SimpleTextClassificationPipeline {
+object SimpleTextClassificationPipeline
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("SimpleTextClassificationPipeline")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -79,12 +79,9 @@ object SimpleTextClassificationPipeline {
       .transform(test.toDF())
       .select("id", "text", "probability", "prediction")
       .collect()
-      .foreach {
+      .foreach
         case Row(id: Long, text: String, prob: Vector, prediction: Double) =>
           println(s"($id, $text) --> prob=$prob, prediction=$prediction")
-      }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

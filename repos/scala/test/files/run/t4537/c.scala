@@ -3,6 +3,5 @@ package c
 
 import a._
 
-object Unambiguous {
+object Unambiguous
   println(Settings.Y)
-}

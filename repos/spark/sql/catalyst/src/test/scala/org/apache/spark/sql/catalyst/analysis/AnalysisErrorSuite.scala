@@ -32,39 +32,35 @@ import org.apache.spark.sql.types._
 @BeanInfo
 private[sql] case class GroupableData(@BeanProperty data: Int)
 
-private[sql] class GroupableUDT extends UserDefinedType[GroupableData] {
+private[sql] class GroupableUDT extends UserDefinedType[GroupableData]
 
   override def sqlType: DataType = IntegerType
 
   override def serialize(groupableData: GroupableData): Int =
     groupableData.data
 
-  override def deserialize(datum: Any): GroupableData = {
-    datum match {
+  override def deserialize(datum: Any): GroupableData =
+    datum match
       case data: Int => GroupableData(data)
-    }
-  }
 
   override def userClass: Class[GroupableData] = classOf[GroupableData]
 
   private[spark] override def asNullable: GroupableUDT = this
-}
 
 @BeanInfo
 private[sql] case class UngroupableData(@BeanProperty data: Map[Int, Int])
 
-private[sql] class UngroupableUDT extends UserDefinedType[UngroupableData] {
+private[sql] class UngroupableUDT extends UserDefinedType[UngroupableData]
 
   override def sqlType: DataType = MapType(IntegerType, IntegerType)
 
-  override def serialize(ungroupableData: UngroupableData): MapData = {
+  override def serialize(ungroupableData: UngroupableData): MapData =
     val keyArray = new GenericArrayData(ungroupableData.data.keys.toSeq)
     val valueArray = new GenericArrayData(ungroupableData.data.values.toSeq)
     new ArrayBasedMapData(keyArray, valueArray)
-  }
 
-  override def deserialize(datum: Any): UngroupableData = {
-    datum match {
+  override def deserialize(datum: Any): UngroupableData =
+    datum match
       case data: MapData =>
         val keyArray = data.keyArray().array
         val valueArray = data.valueArray().array
@@ -72,37 +68,30 @@ private[sql] class UngroupableUDT extends UserDefinedType[UngroupableData] {
         val mapData =
           keyArray.zip(valueArray).toMap.asInstanceOf[Map[Int, Int]]
         UngroupableData(mapData)
-    }
-  }
 
   override def userClass: Class[UngroupableData] = classOf[UngroupableData]
 
   private[spark] override def asNullable: UngroupableUDT = this
-}
 
 case class TestFunction(
     children: Seq[Expression], inputTypes: Seq[AbstractDataType])
-    extends Expression with ImplicitCastInputTypes with Unevaluable {
+    extends Expression with ImplicitCastInputTypes with Unevaluable
   override def nullable: Boolean = true
   override def dataType: DataType = StringType
-}
 
-case class UnresolvedTestPlan() extends LeafNode {
+case class UnresolvedTestPlan() extends LeafNode
   override lazy val resolved = false
   override def output: Seq[Attribute] = Nil
-}
 
-class AnalysisErrorSuite extends AnalysisTest {
+class AnalysisErrorSuite extends AnalysisTest
   import TestRelations._
 
   def errorTest(name: String,
                 plan: LogicalPlan,
                 errorMessages: Seq[String],
-                caseSensitive: Boolean = true): Unit = {
-    test(name) {
+                caseSensitive: Boolean = true): Unit =
+    test(name)
       assertAnalysisError(plan, errorMessages, caseSensitive)
-    }
-  }
 
   val dateLit = Literal.create(null, DateType)
 
@@ -258,7 +247,7 @@ class AnalysisErrorSuite extends AnalysisTest {
               .groupBy('a)(UnresolvedAlias(max('b))),
             "cannot resolve '`bad_column`'" :: Nil)
 
-  test("SPARK-6452 regression test") {
+  test("SPARK-6452 regression test")
     // CheckAnalysis should throw AnalysisException when Aggregate contains missing attribute(s)
     // Since we manually construct the logical plan at here and Sum only accept
     // LongType, DoubleType, and DecimalType. We use LongType as the type of a.
@@ -273,20 +262,17 @@ class AnalysisErrorSuite extends AnalysisTest {
 
     assertAnalysisError(
         plan, "resolved attribute(s) a#1L missing from a#2L" :: Nil)
-  }
 
-  test("error test for self-join") {
+  test("error test for self-join")
     val join = Join(testRelation, testRelation, Inner, None)
-    val error = intercept[AnalysisException] {
+    val error = intercept[AnalysisException]
       SimpleAnalyzer.checkAnalysis(join)
-    }
     assert(error.message.contains(
             "Failure when resolving conflicting references in Join"))
     assert(error.message.contains("Conflicting attributes"))
-  }
 
-  test("check grouping expression data types") {
-    def checkDataType(dataType: DataType, shouldSuccess: Boolean): Unit = {
+  test("check grouping expression data types")
+    def checkDataType(dataType: DataType, shouldSuccess: Boolean): Unit =
       val plan = Aggregate(
           AttributeReference("a", dataType)(exprId = ExprId(2)) :: Nil,
           Alias(sum(AttributeReference("b", IntegerType)(exprId = ExprId(1))),
@@ -295,15 +281,13 @@ class AnalysisErrorSuite extends AnalysisTest {
               AttributeReference("a", dataType)(exprId = ExprId(2)),
               AttributeReference("b", IntegerType)(exprId = ExprId(1))))
 
-      shouldSuccess match {
+      shouldSuccess match
         case true =>
           assertAnalysisSuccess(plan, true)
         case false =>
           assertAnalysisError(
               plan,
               "expression `a` cannot be used as a grouping expression" :: Nil)
-      }
-    }
 
     val supportedDataTypes =
       Seq(StringType,
@@ -330,9 +314,8 @@ class AnalysisErrorSuite extends AnalysisTest {
                  ArrayType(BooleanType, containsNull = true),
                  nullable = true),
           new GroupableUDT())
-    supportedDataTypes.foreach { dataType =>
+    supportedDataTypes.foreach  dataType =>
       checkDataType(dataType, shouldSuccess = true)
-    }
 
     val unsupportedDataTypes =
       Seq(MapType(StringType, LongType),
@@ -340,12 +323,10 @@ class AnalysisErrorSuite extends AnalysisTest {
             .add("f1", FloatType, nullable = true)
             .add("f2", MapType(StringType, LongType), nullable = true),
           new UngroupableUDT())
-    unsupportedDataTypes.foreach { dataType =>
+    unsupportedDataTypes.foreach  dataType =>
       checkDataType(dataType, shouldSuccess = false)
-    }
-  }
 
-  test("we should fail analysis when we find nested aggregate functions") {
+  test("we should fail analysis when we find nested aggregate functions")
     val plan = Aggregate(
         AttributeReference("a", IntegerType)(exprId = ExprId(2)) :: Nil,
         Alias(
@@ -359,9 +340,8 @@ class AnalysisErrorSuite extends AnalysisTest {
         plan,
         "It is not allowed to use an aggregate function in the argument of " +
         "another aggregate function." :: Nil)
-  }
 
-  test("Join can't work on binary and map types") {
+  test("Join can't work on binary and map types")
     val plan = Join(
         LocalRelation(
             AttributeReference("a", BinaryType)(exprId = ExprId(2)),
@@ -395,5 +375,3 @@ class AnalysisErrorSuite extends AnalysisTest {
     assertAnalysisError(
         plan2,
         "map type expression `a` cannot be used in join conditions" :: Nil)
-  }
-}

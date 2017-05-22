@@ -33,11 +33,11 @@ import scalafx.Includes._
 import scalafx.beans.property._
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 
-object Worker {
+object Worker
   implicit def sfxWorker2jfx[T](w: Worker[T]): jfxc.Worker[T] =
     if (w != null) w.delegate else null
 
-  object State extends SFXEnumDelegateCompanion[jfxc.Worker.State, State] {
+  object State extends SFXEnumDelegateCompanion[jfxc.Worker.State, State]
 
     /**
       * Indicates that this Worker has been cancelled via the Worker.cancel() method. 
@@ -90,17 +90,15 @@ object Worker {
 
     protected override def unsortedValues: Array[State] =
       Array(Cancelled, Failed, Ready, Running, Scheduled, Succeeded)
-  }
 
   sealed case class State(override val delegate: jfxc.Worker.State)
       extends SFXEnumDelegate[jfxc.Worker.State]
-}
 
 /**
   * Wrapper trait for [[http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/Worker.html Worker]]
   * Interface.
   */
-trait Worker[T] extends SFXDelegate[jfxc.Worker[T]] {
+trait Worker[T] extends SFXDelegate[jfxc.Worker[T]]
 
   /**
     * Gets the ReadOnlyObjectProperty representing any exception which occurred.
@@ -151,4 +149,3 @@ trait Worker[T] extends SFXDelegate[jfxc.Worker[T]] {
     * Terminates execution of this Worker.
     */
   def cancel = delegate.cancel
-}

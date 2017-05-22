@@ -23,37 +23,37 @@ import org.scalacheck._
 import Arbitrary.arbitrary
 import Gen._
 
-trait RandomLibrary extends Library {
+trait RandomLibrary extends Library
 
-  private lazy val genMorphism1 = for {
+  private lazy val genMorphism1 = for
     op <- choose(0, 1000)
     n <- identifier
     ns <- listOfN(2, identifier)
-  } yield Morphism1(Vector(ns: _*), n, op)
+  yield Morphism1(Vector(ns: _*), n, op)
 
-  private lazy val genMorphism2 = for {
+  private lazy val genMorphism2 = for
     op <- choose(0, 1000)
     n <- identifier
     ns <- listOfN(2, identifier)
-  } yield Morphism2(Vector(ns: _*), n, op)
+  yield Morphism2(Vector(ns: _*), n, op)
 
-  private lazy val genOp1 = for {
+  private lazy val genOp1 = for
     op <- choose(0, 1000)
     n <- identifier
     ns <- listOfN(2, identifier)
-  } yield Op1(Vector(ns: _*), n, op)
+  yield Op1(Vector(ns: _*), n, op)
 
-  private lazy val genOp2 = for {
+  private lazy val genOp2 = for
     op <- choose(0, 1000)
     n <- identifier
     ns <- listOfN(2, identifier)
-  } yield Op2(Vector(ns: _*), n, op)
+  yield Op2(Vector(ns: _*), n, op)
 
-  private lazy val genReduction = for {
+  private lazy val genReduction = for
     op <- choose(0, 1000)
     n <- identifier
     ns <- listOfN(2, identifier)
-  } yield Reduction(Vector(ns: _*), n, op)
+  yield Reduction(Vector(ns: _*), n, op)
 
   val reductions = Set(Reduction(Vector(), "count", 0x2000),
                        Reduction(Vector(), "max", 0x2001),
@@ -99,34 +99,28 @@ trait RandomLibrary extends Library {
   lazy val expandGlob = Morphism1(Vector("std", "fs"), "expandGlob", 0x0004)
 
   case class Morphism1(namespace: Vector[String], name: String, opcode: Int)
-      extends Morphism1Like {
+      extends Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
 
   case class Morphism2(namespace: Vector[String], name: String, opcode: Int)
-      extends Morphism2Like {
+      extends Morphism2Like
     val tpe = BinaryOperationType(
         JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
 
   case class Op1(namespace: Vector[String], name: String, opcode: Int)
-      extends Op1Like with Morphism1Like {
+      extends Op1Like with Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
-  }
 
   case class Op2(namespace: Vector[String], name: String, opcode: Int)
-      extends Op2Like with Morphism2Like {
+      extends Op2Like with Morphism2Like
     val tpe = BinaryOperationType(
         JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = true
-  }
 
   case class Reduction(namespace: Vector[String], name: String, opcode: Int)
-      extends ReductionLike with Morphism1Like {
+      extends ReductionLike with Morphism1Like
     val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
     val rowLevel: Boolean = false
-  }
-}

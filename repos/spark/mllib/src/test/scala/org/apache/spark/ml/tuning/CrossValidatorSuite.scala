@@ -34,17 +34,16 @@ import org.apache.spark.sql.types.{StructField, StructType}
 
 class CrossValidatorSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   @transient var dataset: DataFrame = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     dataset = sqlContext.createDataFrame(
         sc.parallelize(generateLogisticInput(1.0, 1.0, 100, 42), 2))
-  }
 
-  test("cross validation with logistic regression") {
+  test("cross validation with logistic regression")
     val lr = new LogisticRegression
     val lrParamMaps = new ParamGridBuilder()
       .addGrid(lr.regParam, Array(0.001, 1000.0))
@@ -65,9 +64,8 @@ class CrossValidatorSuite
     assert(parent.getRegParam === 0.001)
     assert(parent.getMaxIter === 10)
     assert(cvModel.avgMetrics.length === lrParamMaps.length)
-  }
 
-  test("cross validation with linear regression") {
+  test("cross validation with linear regression")
     val dataset = sqlContext.createDataFrame(
         sc.parallelize(
             LinearDataGenerator.generateLinearInput(6.3,
@@ -102,9 +100,8 @@ class CrossValidatorSuite
     assert(parent2.getRegParam === 0.001)
     assert(parent2.getMaxIter === 10)
     assert(cvModel2.avgMetrics.length === lrParamMaps.length)
-  }
 
-  test("transformSchema should check estimatorParamMaps") {
+  test("transformSchema should check estimatorParamMaps")
     import CrossValidatorSuite.{MyEstimator, MyEvaluator}
 
     val est = new MyEstimator("est")
@@ -122,12 +119,10 @@ class CrossValidatorSuite
 
     val invalidParamMaps = paramMaps :+ ParamMap(est.inputCol -> "")
     cv.setEstimatorParamMaps(invalidParamMaps)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       cv.transformSchema(new StructType())
-    }
-  }
 
-  test("read/write: CrossValidator with simple estimator") {
+  test("read/write: CrossValidator with simple estimator")
     val lr = new LogisticRegression().setMaxIter(3)
     val evaluator = new BinaryClassificationEvaluator()
       .setMetricName("areaUnderPR") // not default metric
@@ -150,7 +145,7 @@ class CrossValidatorSuite
     assert(evaluator.uid === evaluator2.uid)
     assert(evaluator.getMetricName === evaluator2.getMetricName)
 
-    cv2.getEstimator match {
+    cv2.getEstimator match
       case lr2: LogisticRegression =>
         assert(lr.uid === lr2.uid)
         assert(lr.getMaxIter === lr2.getMaxIter)
@@ -158,13 +153,11 @@ class CrossValidatorSuite
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
             s" LogisticRegression but found ${other.getClass.getName}")
-    }
 
     CrossValidatorSuite.compareParamMaps(
         cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
-  }
 
-  test("read/write: CrossValidator with complex estimator") {
+  test("read/write: CrossValidator with complex estimator")
     // workflow: CrossValidator[Pipeline[HashingTF, CrossValidator[LogisticRegression]]]
     val lrEvaluator = new BinaryClassificationEvaluator()
       .setMetricName("areaUnderPR") // not default metric
@@ -202,13 +195,13 @@ class CrossValidatorSuite
     CrossValidatorSuite.compareParamMaps(
         cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
 
-    cv2.getEstimator match {
+    cv2.getEstimator match
       case pipeline2: Pipeline =>
         assert(pipeline.uid === pipeline2.uid)
-        pipeline2.getStages match {
+        pipeline2.getStages match
           case Array(hashingTF2: HashingTF, lrcv2: CrossValidator) =>
             assert(hashingTF.uid === hashingTF2.uid)
-            lrcv2.getEstimator match {
+            lrcv2.getEstimator match
               case lr2: LogisticRegression =>
                 assert(lr.uid === lr2.uid)
                 assert(lr.getMaxIter === lr2.getMaxIter)
@@ -216,7 +209,6 @@ class CrossValidatorSuite
                 throw new AssertionError(
                     s"Loaded internal CrossValidator expected to be" +
                     s" LogisticRegression but found type ${other.getClass.getName}")
-            }
             assert(lrcv.uid === lrcv2.uid)
             assert(
                 lrcv2.getEvaluator.isInstanceOf[BinaryClassificationEvaluator])
@@ -227,15 +219,12 @@ class CrossValidatorSuite
             throw new AssertionError(
                 "Loaded Pipeline expected stages (HashingTF, CrossValidator)" +
                 " but found: " + other.map(_.getClass.getName).mkString(", "))
-        }
       case other =>
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
             s" CrossValidator but found ${other.getClass.getName}")
-    }
-  }
 
-  test("read/write: CrossValidator fails for extraneous Param") {
+  test("read/write: CrossValidator fails for extraneous Param")
     val lr = new LogisticRegression()
     val lr2 = new LogisticRegression()
     val evaluator = new BinaryClassificationEvaluator()
@@ -247,14 +236,11 @@ class CrossValidatorSuite
       .setEstimator(lr)
       .setEvaluator(evaluator)
       .setEstimatorParamMaps(paramMaps)
-    withClue("CrossValidator.write failed to catch extraneous Param error") {
-      intercept[IllegalArgumentException] {
+    withClue("CrossValidator.write failed to catch extraneous Param error")
+      intercept[IllegalArgumentException]
         cv.write
-      }
-    }
-  }
 
-  test("read/write: CrossValidatorModel") {
+  test("read/write: CrossValidatorModel")
     val lr = new LogisticRegression().setThreshold(0.6)
     val lrModel = new LogisticRegressionModel(
         lr.uid, Vectors.dense(1.0, 2.0), 1.2).setThreshold(0.6)
@@ -279,7 +265,7 @@ class CrossValidatorSuite
     assert(evaluator.uid === evaluator2.uid)
     assert(evaluator.getMetricName === evaluator2.getMetricName)
 
-    cv2.getEstimator match {
+    cv2.getEstimator match
       case lr2: LogisticRegression =>
         assert(lr.uid === lr2.uid)
         assert(lr.getThreshold === lr2.getThreshold)
@@ -287,12 +273,11 @@ class CrossValidatorSuite
         throw new AssertionError(
             s"Loaded CrossValidator expected estimator of type" +
             s" LogisticRegression but found ${other.getClass.getName}")
-    }
 
     CrossValidatorSuite.compareParamMaps(
         cv.getEstimatorParamMaps, cv2.getEstimatorParamMaps)
 
-    cv2.bestModel match {
+    cv2.bestModel match
       case lrModel2: LogisticRegressionModel =>
         assert(lrModel.uid === lrModel2.uid)
         assert(lrModel.getThreshold === lrModel2.getThreshold)
@@ -302,57 +287,45 @@ class CrossValidatorSuite
         throw new AssertionError(
             s"Loaded CrossValidator expected bestModel of type" +
             s" LogisticRegressionModel but found ${other.getClass.getName}")
-    }
     assert(cv.avgMetrics === cv2.avgMetrics)
-  }
-}
 
-object CrossValidatorSuite extends SparkFunSuite {
+object CrossValidatorSuite extends SparkFunSuite
 
   /**
     * Assert sequences of estimatorParamMaps are identical.
     * Params must be simple types comparable with `===`.
     */
-  def compareParamMaps(pMaps: Array[ParamMap], pMaps2: Array[ParamMap]): Unit = {
+  def compareParamMaps(pMaps: Array[ParamMap], pMaps2: Array[ParamMap]): Unit =
     assert(pMaps.length === pMaps2.length)
-    pMaps.zip(pMaps2).foreach {
+    pMaps.zip(pMaps2).foreach
       case (pMap, pMap2) =>
         assert(pMap.size === pMap2.size)
-        pMap.toSeq.foreach {
+        pMap.toSeq.foreach
           case ParamPair(p, v) =>
             assert(pMap2.contains(p))
             assert(pMap2(p) === v)
-        }
-    }
-  }
 
   abstract class MyModel extends Model[MyModel]
 
   class MyEstimator(override val uid: String)
-      extends Estimator[MyModel] with HasInputCol {
+      extends Estimator[MyModel] with HasInputCol
 
-    override def fit(dataset: DataFrame): MyModel = {
+    override def fit(dataset: DataFrame): MyModel =
       throw new UnsupportedOperationException
-    }
 
-    override def transformSchema(schema: StructType): StructType = {
+    override def transformSchema(schema: StructType): StructType =
       require($(inputCol).nonEmpty)
       schema
-    }
 
     override def copy(extra: ParamMap): MyEstimator = defaultCopy(extra)
-  }
 
-  class MyEvaluator extends Evaluator {
+  class MyEvaluator extends Evaluator
 
-    override def evaluate(dataset: DataFrame): Double = {
+    override def evaluate(dataset: DataFrame): Double =
       throw new UnsupportedOperationException
-    }
 
     override def isLargerBetter: Boolean = true
 
     override val uid: String = "eval"
 
     override def copy(extra: ParamMap): MyEvaluator = defaultCopy(extra)
-  }
-}

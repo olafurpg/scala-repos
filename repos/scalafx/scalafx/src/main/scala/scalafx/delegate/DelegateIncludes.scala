@@ -34,7 +34,7 @@ import scalafx.beans.property.{ObjectProperty, ReadOnlyObjectWrapper}
 
 object DelegateIncludes extends DelegateIncludes
 
-trait DelegateIncludes {
+trait DelegateIncludes
 
   /**
     * Converts a Scala's [[scalafx.beans.property.ObjectProperty]] that wraps a
@@ -63,4 +63,3 @@ trait DelegateIncludes {
       D <: Object, S <: SFXDelegate[D]](
       obj: ReadOnlyObjectWrapper[S]): jfxbp.ReadOnlyObjectWrapper[D] =
     new jfxbp.ReadOnlyObjectWrapper[D](obj.get.delegate)
-}

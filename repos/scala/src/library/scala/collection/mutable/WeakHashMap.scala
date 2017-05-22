@@ -40,16 +40,14 @@ import convert.Wrappers._
   */
 class WeakHashMap[A, B]
     extends JMapWrapper[A, B](new java.util.WeakHashMap)
-    with JMapWrapperLike[A, B, WeakHashMap[A, B]] {
+    with JMapWrapperLike[A, B, WeakHashMap[A, B]]
   override def empty = new WeakHashMap[A, B]
-}
 
 /** $factoryInfo
   *  @define Coll `WeakHashMap`
   *  @define coll weak hash map
   */
-object WeakHashMap extends MutableMapFactory[WeakHashMap] {
+object WeakHashMap extends MutableMapFactory[WeakHashMap]
   implicit def canBuildFrom[A, B]: CanBuildFrom[
       Coll, (A, B), WeakHashMap[A, B]] = new MapCanBuildFrom[A, B]
   def empty[A, B]: WeakHashMap[A, B] = new WeakHashMap[A, B]
-}

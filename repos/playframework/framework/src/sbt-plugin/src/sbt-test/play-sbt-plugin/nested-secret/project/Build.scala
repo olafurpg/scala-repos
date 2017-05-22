@@ -7,7 +7,7 @@ import play.sbt.PlayScala
 import sbt._
 import Keys._
 
-object ApplicationBuild extends Build {
+object ApplicationBuild extends Build
 
   val appName = "secret-sample"
   val appVersion = "1.0-SNAPSHOT"
@@ -16,18 +16,14 @@ object ApplicationBuild extends Build {
     .enablePlugins(PlayScala)
     .settings(
         version := appVersion,
-        TaskKey[Unit]("checkSecret") := {
+        TaskKey[Unit]("checkSecret") :=
           val file: File = baseDirectory.value / "conf/application.conf"
           val config: Config = ConfigFactory.parseFileAnySyntax(file)
-          if (!config.hasPath("play.crypto.secret")) {
+          if (!config.hasPath("play.crypto.secret"))
             throw new RuntimeException("secret not found!!\n" + file)
-          } else {
-            config.getString("play.crypto.secret") match {
+          else
+            config.getString("play.crypto.secret") match
               case "changeme" =>
                 throw new RuntimeException("secret not changed!!\n" + file)
               case _ =>
-            }
-          }
-        }
     )
-}

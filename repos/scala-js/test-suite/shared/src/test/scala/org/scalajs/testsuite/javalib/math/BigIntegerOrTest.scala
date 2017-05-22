@@ -12,9 +12,9 @@ import java.math.BigInteger
 import org.junit.Test
 import org.junit.Assert._
 
-class BigIntegerOrTest {
+class BigIntegerOrTest
 
-  @Test def testNegNegFirstLonger(): Unit = {
+  @Test def testNegNegFirstLonger(): Unit =
     val aBytes = Array[Byte](-128,
                              9,
                              56,
@@ -44,13 +44,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegNegFirstShorter(): Unit = {
+  @Test def testNegNegFirstShorter(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](-128,
@@ -80,13 +78,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegNegSameLength(): Unit = {
+  @Test def testNegNegSameLength(): Unit =
     val aBytes =
       Array[Byte](-128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, -117)
     val bBytes =
@@ -100,13 +96,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegPos(): Unit = {
+  @Test def testNegPos(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](0)
@@ -119,13 +113,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegPosFirstLonger(): Unit = {
+  @Test def testNegPosFirstLonger(): Unit =
     val aBytes = Array[Byte](-128,
                              9,
                              56,
@@ -172,13 +164,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegPosFirstShorter(): Unit = {
+  @Test def testNegPosFirstShorter(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](-128,
@@ -208,13 +198,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testNegPosSameLength(): Unit = {
+  @Test def testNegPosSameLength(): Unit =
     val aBytes =
       Array[Byte](-128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, -117)
     val bBytes =
@@ -227,13 +215,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testOneOne(): Unit = {
+  @Test def testOneOne(): Unit =
     val aBytes = Array[Byte](1)
     val bBytes = Array[Byte](1)
     val aSign = 1
@@ -244,13 +230,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPosNegFirstLonger(): Unit = {
+  @Test def testPosNegFirstLonger(): Unit =
     val aBytes = Array[Byte](-128,
                              9,
                              56,
@@ -280,13 +264,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testPosNegFirstShorter(): Unit = {
+  @Test def testPosNegFirstShorter(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](-128,
@@ -333,13 +315,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testPosNegSameLength(): Unit = {
+  @Test def testPosNegSameLength(): Unit =
     val aBytes =
       Array[Byte](-128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, -117)
     val bBytes =
@@ -353,13 +333,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testPosPosFirstLonger(): Unit = {
+  @Test def testPosPosFirstLonger(): Unit =
     val aBytes = Array[Byte](-128,
                              9,
                              56,
@@ -406,13 +384,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPosPosFirstShorter(): Unit = {
+  @Test def testPosPosFirstShorter(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](-128,
@@ -459,13 +435,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPosPosSameLength(): Unit = {
+  @Test def testPosPosSameLength(): Unit =
     val aBytes =
       Array[Byte](-128, 56, 100, -2, -76, 89, 45, 91, 3, -15, 35, 26, -117)
     val bBytes =
@@ -479,13 +453,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPosZero(): Unit = {
+  @Test def testPosZero(): Unit =
     val aBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
     val bBytes = Array[Byte](0)
@@ -498,21 +470,18 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testRegression(): Unit = {
+  @Test def testRegression(): Unit =
     val x = new BigInteger("-1023")
     val r1 = x.and((BigInteger.ZERO.not()).shiftLeft(32))
     val r3 = x.and((BigInteger.ZERO.not().shiftLeft(32)).not())
     val result = r1.or(r3)
     assertTrue(x == result)
-  }
 
-  @Test def testZeroNeg(): Unit = {
+  @Test def testZeroNeg(): Unit =
     val aBytes = Array[Byte](0)
     val bBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
@@ -525,13 +494,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testZeroOne(): Unit = {
+  @Test def testZeroOne(): Unit =
     val aBytes = Array[Byte](0)
     val bBytes = Array[Byte](1)
     val aSign = 0
@@ -542,13 +509,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testZeroPos(): Unit = {
+  @Test def testZeroPos(): Unit =
     val aBytes = Array[Byte](0)
     val bBytes =
       Array[Byte](-2, -3, -4, -4, 5, 14, 23, 39, 48, 57, 66, 5, 14, 23)
@@ -561,13 +526,11 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testZeroZero(): Unit = {
+  @Test def testZeroZero(): Unit =
     val aBytes = Array[Byte](0)
     val bBytes = Array[Byte](0)
     val aSign = 0
@@ -578,9 +541,6 @@ class BigIntegerOrTest {
     val result = aNumber.or(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(0, result.signum())
-  }
-}

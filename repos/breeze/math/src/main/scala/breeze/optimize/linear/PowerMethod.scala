@@ -12,7 +12,7 @@ import breeze.util.Implicits._
   * @author debasish83
   */
 class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
-    extends SerializableLogging {
+    extends SerializableLogging
 
   import PowerMethod.BDM
   import PowerMethod.BDV
@@ -24,19 +24,17 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
                                         converged: Boolean)
 
   //memory allocation for the eigen vector result
-  def normalize(ynorm: BDV, y: BDV) = {
+  def normalize(ynorm: BDV, y: BDV) =
     val normInit = norm(y)
     ynorm := y
     ynorm *= 1.0 / normInit
-  }
 
-  def initialState(n: Int): State = {
+  def initialState(n: Int): State =
     val ynorm = DenseVector.zeros[Double](n)
     val ay = DenseVector.zeros[Double](n)
     State(0, ynorm, ay, 0, false)
-  }
 
-  def reset(A: BDM, y: BDV, init: State): State = {
+  def reset(A: BDM, y: BDV, init: State): State =
     import init._
     require(eigenVector.length == y.length,
             s"PowerMethod:reset mismatch in state dimension")
@@ -44,26 +42,23 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
     QuadraticMinimizer.gemv(1.0, A, eigenVector, 0.0, ay)
     val lambda = nextEigen(eigenVector, ay)
     State(lambda, eigenVector, ay, 0, false)
-  }
 
   //in-place modification of eigen vector
-  def nextEigen(eigenVector: BDV, ay: BDV) = {
+  def nextEigen(eigenVector: BDV, ay: BDV) =
     val lambda = eigenVector dot ay
     eigenVector := ay
     val norm1 = norm(ay)
     eigenVector *= 1.0 / norm1
     if (lambda < 0.0) eigenVector *= -1.0
     lambda
-  }
 
-  def iterations(A: BDM, y: BDV): Iterator[State] = {
+  def iterations(A: BDM, y: BDV): Iterator[State] =
     val init = initialState(y.length)
     iterations(A, y, init)
-  }
 
   def iterations(A: BDM, y: BDV, initialState: State): Iterator[State] =
     Iterator
-      .iterate(reset(A, y, initialState)) { state =>
+      .iterate(reset(A, y, initialState))  state =>
         import state._
         QuadraticMinimizer.gemv(1.0, A, eigenVector, 0.0, ay)
         val lambda = nextEigen(eigenVector, ay)
@@ -71,26 +66,22 @@ class PowerMethod(maxIters: Int = 10, tolerance: Double = 1E-5)
         if (val_dif <= tolerance || iter > maxIters)
           State(lambda, eigenVector, ay, iter + 1, true)
         else State(lambda, eigenVector, ay, iter + 1, false)
-      }
       .takeUpToWhere(_.converged)
 
-  def iterateAndReturnState(A: BDM, y: BDV): State = {
+  def iterateAndReturnState(A: BDM, y: BDV): State =
     iterations(A, y).last
-  }
 
-  def eigen(A: BDM, y: BDV): Double = {
+  def eigen(A: BDM, y: BDV): Double =
     iterateAndReturnState(A, y).eigenValue
-  }
-}
 
-object PowerMethod {
+object PowerMethod
 
   type BDV = DenseVector[Double]
   type BDM = DenseMatrix[Double]
 
   def inverse(maxIters: Int = 10, tolerance: Double = 1E-5): PowerMethod =
-    new PowerMethod(maxIters, tolerance) {
-      override def reset(A: BDM, y: BDV, init: State): State = {
+    new PowerMethod(maxIters, tolerance)
+      override def reset(A: BDM, y: BDV, init: State): State =
         import init._
         require(eigenVector.length == y.length,
                 s"InversePowerMethod:reset mismatch in state dimension")
@@ -99,12 +90,11 @@ object PowerMethod {
         QuadraticMinimizer.dpotrs(A, ay)
         val lambda = nextEigen(eigenVector, ay)
         State(lambda, eigenVector, ay, 0, false)
-      }
 
       override def iterations(
           A: BDM, y: BDV, initialState: State): Iterator[State] =
         Iterator
-          .iterate(reset(A, y, initialState)) { state =>
+          .iterate(reset(A, y, initialState))  state =>
             import state._
             ay := eigenVector
             QuadraticMinimizer.dpotrs(A, ay)
@@ -113,7 +103,4 @@ object PowerMethod {
             if (val_dif <= tolerance || iter > maxIters)
               State(lambda, eigenVector, ay, iter + 1, true)
             else State(lambda, eigenVector, ay, iter + 1, false)
-          }
           .takeUpToWhere(_.converged)
-    }
-}

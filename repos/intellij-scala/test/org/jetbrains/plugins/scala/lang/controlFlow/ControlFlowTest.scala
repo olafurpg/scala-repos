@@ -13,16 +13,15 @@ import org.junit.Assert
 /**
   * @author ilyas
   */
-class ControlFlowTest extends LightCodeInsightFixtureTestCase {
+class ControlFlowTest extends LightCodeInsightFixtureTestCase
   protected override def getBasePath =
     TestUtils.getTestDataPath + "/controlFlow/"
 
-  override def setUp() {
+  override def setUp()
     super.setUp()
     myFixture.setTestDataPath(getBasePath)
-  }
 
-  def doTest() {
+  def doTest()
     val input: java.util.List[String] =
       TestUtils.readInput(getBasePath + getTestName(true) + ".test")
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, input.get(0))
@@ -39,7 +38,6 @@ class ControlFlowTest extends LightCodeInsightFixtureTestCase {
     val instructions = owner.getControlFlow()
     val cf: String = dumpControlFlow(instructions)
     Assert.assertEquals(input.get(1).trim, cf.trim)
-  }
 
   protected def dumpControlFlow(instructions: Seq[Instruction]) =
     instructions.mkString("\n")
@@ -64,4 +62,3 @@ class ControlFlowTest extends LightCodeInsightFixtureTestCase {
   def testNoneThrow() = doTest()
   def testScl_7393() = doTest()
   def testUnresolvedParamThrow() = doTest()
-}

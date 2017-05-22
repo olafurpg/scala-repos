@@ -4,7 +4,7 @@ package std
 
 import Leibniz.===
 
-final class Function1Ops[T, R](val self: T => R) extends AnyVal {
+final class Function1Ops[T, R](val self: T => R) extends AnyVal
 
   def on[X](f: (R, R) => X, t1: T, t2: T): X = f(self(t1), self(t2))
 
@@ -62,9 +62,7 @@ final class Function1Ops[T, R](val self: T => R) extends AnyVal {
 
   def predStateMax[Y](k: R => Y)(implicit e: Enum[T]): Option[Y] =
     e.predStateMax(self, k)
-}
 
-trait ToFunction1Ops {
+trait ToFunction1Ops
   implicit def ToFunction1OpsFromBoolean[A, B](f: A => B): Function1Ops[A, B] =
     new Function1Ops(f)
-}

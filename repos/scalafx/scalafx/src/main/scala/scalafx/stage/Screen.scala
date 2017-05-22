@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.geometry.Rectangle2D
 
-object Screen {
+object Screen
   implicit def sfxScreen2jfx(v: Screen): jfxs.Screen =
     if (v != null) v.delegate else null
 
@@ -59,10 +59,9 @@ object Screen {
     */
   def screensForRectangle(r: Rectangle2D) =
     jfxs.Screen.getScreensForRectangle(r)
-}
 
 class Screen(override val delegate: jfxs.Screen)
-    extends SFXDelegate[jfxs.Screen] {
+    extends SFXDelegate[jfxs.Screen]
 
   /**
     * Gets the bounds of this Screen.
@@ -78,4 +77,3 @@ class Screen(override val delegate: jfxs.Screen)
     * Gets the visual bounds of this Screen.
     */
   def visualBounds: Rectangle2D = delegate.getVisualBounds
-}

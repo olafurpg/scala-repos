@@ -42,7 +42,7 @@ import scala.collection.mutable.{ArrayBuffer, HashMap => MutableHashMap, Map => 
 /**
   * Tests for Summingbird's Storm planner.
   */
-class TopologyTests extends WordSpec {
+class TopologyTests extends WordSpec
   import MapAlgebra.sparseEquiv
 
   // This is dangerous, obviously. The Storm platform graphs tested
@@ -56,9 +56,8 @@ class TopologyTests extends WordSpec {
     * ScalaCheck, as we need to know the number of tuples that the
     * flatMap will produce.
     */
-  val testFn = { i: Int =>
+  val testFn =  i: Int =>
     List((i -> i))
-  }
 
   implicit val storm = Storm.local()
 
@@ -70,7 +69,7 @@ class TopologyTests extends WordSpec {
     */
   def funcToPlan(
       mkJob: (Producer[Storm, Int],
-      Storm#Store[Int, Int]) => TailProducer[Storm, Any]): StormTopology = {
+      Storm#Store[Int, Int]) => TailProducer[Storm, Any]): StormTopology =
     val original = sample[List[Int]]
 
     val job = mkJob(
@@ -79,25 +78,22 @@ class TopologyTests extends WordSpec {
     )
 
     storm.plan(job).topology
-  }
 
-  "Number of bolts should be as expected" in {
+  "Number of bolts should be as expected" in
     val stormTopo = funcToPlan(
         TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
     )
     // Final Flatmap + summer
     assert(stormTopo.get_bolts_size() == 2)
-  }
 
-  "Number of spouts in simple task should be 1" in {
+  "Number of spouts in simple task should be 1" in
     val stormTopo = funcToPlan(
         TestGraphs.singleStepJob[Storm, Int, Int, Int](_, _)(testFn)
     )
     // Source producer
     assert(stormTopo.get_spouts_size() == 1)
-  }
 
-  "A named node after a flat map should imply its options" in {
+  "A named node after a flat map should imply its options" in
     val nodeName = "super dooper node"
     val p = Storm
       .source(TraversableSpout(sample[List[Int]]))
@@ -115,9 +111,8 @@ class TopologyTests extends WordSpec {
     val TDistMap = bolts.map { case (k, v) => (k.split("-").size - 1, v) }
 
     assert(TDistMap(1).get_common.get_parallelism_hint == 50)
-  }
 
-  "With 2 names in a row we take the closest name" in {
+  "With 2 names in a row we take the closest name" in
     val nodeName = "super dooper node"
     val otherNodeName = "super dooper node"
     val p = Storm
@@ -139,9 +134,8 @@ class TopologyTests extends WordSpec {
     val TDistMap = bolts.map { case (k, v) => (k.split("-").size - 1, v) }
 
     assert(TDistMap(1).get_common.get_parallelism_hint == 50)
-  }
 
-  "If the closes doesnt contain the option we keep going" in {
+  "If the closes doesnt contain the option we keep going" in
     val nodeName = "super dooper node"
     val otherNodeName = "super dooper node"
     val p = Storm
@@ -162,9 +156,8 @@ class TopologyTests extends WordSpec {
     val TDistMap = bolts.map { case (k, v) => (k.split("-").size - 1, v) }
 
     assert(TDistMap(1).get_common.get_parallelism_hint == 50)
-  }
 
-  "Options propagate backwards" in {
+  "Options propagate backwards" in
     val nodeName = "super dooper node"
     val p = Storm
       .source(TraversableSpout(sample[List[Int]]))
@@ -184,9 +177,8 @@ class TopologyTests extends WordSpec {
     val spout = spouts.head._2
 
     assert(spout.get_common.get_parallelism_hint == 30)
-  }
 
-  "Options don't propagate forwards" in {
+  "Options don't propagate forwards" in
     val nodeName = "super dooper node"
     val otherNodeName = "super dooper node"
     val p = Storm
@@ -209,5 +201,3 @@ class TopologyTests extends WordSpec {
     val TDistMap = bolts.map { case (k, v) => (k.split("-").size - 1, v) }
 
     assert(TDistMap(0).get_common.get_parallelism_hint == 5)
-  }
-}

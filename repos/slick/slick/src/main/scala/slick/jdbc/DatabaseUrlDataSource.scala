@@ -4,7 +4,7 @@ package slick.jdbc
   * both stand-alone and as a source for a connection pool. This implementation is design
   * specifically to handle a non-JDBC Database URL in the format defined by the libpq standard.
   */
-class DatabaseUrlDataSource extends DriverDataSource(null) {
+class DatabaseUrlDataSource extends DriverDataSource(null)
 
   private val PostgresFullUrl =
     "^postgres://([a-zA-Z0-9_]+):([^@]+)@([^/]+)/([^\\s]+)$".r
@@ -14,7 +14,7 @@ class DatabaseUrlDataSource extends DriverDataSource(null) {
 
   @volatile private[this] var initialized = false
 
-  override def init: Unit = if (!initialized) {
+  override def init: Unit = if (!initialized)
     val (jdbcUrl, userAndPass) = extractUrl(
         Some(if (url == null) defaultUrl else url))
     url = jdbcUrl.orNull
@@ -22,11 +22,10 @@ class DatabaseUrlDataSource extends DriverDataSource(null) {
     password = userAndPass.map(_._2).getOrElse(password)
     initialized = true
     super.init
-  }
 
   private[this] def extractUrl(databaseUrl: Option[String])
-    : (Option[String], Option[(String, String)]) = {
-    databaseUrl match {
+    : (Option[String], Option[(String, String)]) =
+    databaseUrl match
       case Some(PostgresFullUrl(username, password, host, dbname)) =>
         Some(s"jdbc:postgresql://$host/$dbname") -> Some(username -> password)
 
@@ -45,10 +44,6 @@ class DatabaseUrlDataSource extends DriverDataSource(null) {
 
       case None =>
         None -> None
-    }
-  }
 
-  private[this] def defaultUrl(): String = {
+  private[this] def defaultUrl(): String =
     System.getenv("DATABASE_URL")
-  }
-}

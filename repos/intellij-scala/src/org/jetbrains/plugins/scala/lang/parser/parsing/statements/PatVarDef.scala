@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Annotation
  *               {Annotation} {Modifier} 'var' VarDef
  */
 
-object PatVarDef {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object PatVarDef
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val patVarMarker = builder.mark
     val annotationsMarker = builder.mark
     while (Annotation.parse(builder)) {}
@@ -28,28 +28,23 @@ object PatVarDef {
     val modifierMarker = builder.mark
     while (Modifier.parse(builder)) {}
     modifierMarker.done(ScalaElementTypes.MODIFIERS)
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kVAL =>
         builder.advanceLexer //Ate val
-        if (PatDef parse builder) {
+        if (PatDef parse builder)
           patVarMarker.done(ScalaElementTypes.PATTERN_DEFINITION)
           return true
-        } else {
+        else
           patVarMarker.rollbackTo
           return false
-        }
       case ScalaTokenTypes.kVAR =>
         builder.advanceLexer //Ate var
-        if (VarDef parse builder) {
+        if (VarDef parse builder)
           patVarMarker.done(ScalaElementTypes.VARIABLE_DEFINITION)
           return true
-        } else {
+        else
           patVarMarker.rollbackTo
           return false
-        }
       case _ =>
         patVarMarker.rollbackTo
         return false
-    }
-  }
-}

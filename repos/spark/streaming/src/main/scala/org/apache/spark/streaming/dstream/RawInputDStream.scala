@@ -42,20 +42,18 @@ private[streaming] class RawInputDStream[T : ClassTag](
     port: Int,
     storageLevel: StorageLevel
 )
-    extends ReceiverInputDStream[T](_ssc) with Logging {
+    extends ReceiverInputDStream[T](_ssc) with Logging
 
-  def getReceiver(): Receiver[T] = {
+  def getReceiver(): Receiver[T] =
     new RawNetworkReceiver(host, port, storageLevel).asInstanceOf[Receiver[T]]
-  }
-}
 
 private[streaming] class RawNetworkReceiver(
     host: String, port: Int, storageLevel: StorageLevel)
-    extends Receiver[Any](storageLevel) with Logging {
+    extends Receiver[Any](storageLevel) with Logging
 
   var blockPushingThread: Thread = null
 
-  def onStart() {
+  def onStart()
     // Open a socket to the target address and keep reading from it
     logInfo("Connecting to " + host + ":" + port)
     val channel = SocketChannel.open()
@@ -65,21 +63,18 @@ private[streaming] class RawNetworkReceiver(
 
     val queue = new ArrayBlockingQueue[ByteBuffer](2)
 
-    blockPushingThread = new Thread {
+    blockPushingThread = new Thread
       setDaemon(true)
-      override def run() {
+      override def run()
         var nextBlockNumber = 0
-        while (true) {
+        while (true)
           val buffer = queue.take()
           nextBlockNumber += 1
           store(buffer)
-        }
-      }
-    }
     blockPushingThread.start()
 
     val lengthBuffer = ByteBuffer.allocate(4)
-    while (true) {
+    while (true)
       lengthBuffer.clear()
       readFully(channel, lengthBuffer)
       lengthBuffer.flip()
@@ -89,19 +84,12 @@ private[streaming] class RawNetworkReceiver(
       dataBuffer.flip()
       logInfo("Read a block with " + length + " bytes")
       queue.put(dataBuffer)
-    }
-  }
 
-  def onStop() {
+  def onStop()
     if (blockPushingThread != null) blockPushingThread.interrupt()
-  }
 
   /** Read a buffer fully from a given Channel */
-  private def readFully(channel: ReadableByteChannel, dest: ByteBuffer) {
-    while (dest.position < dest.limit) {
-      if (channel.read(dest) == -1) {
+  private def readFully(channel: ReadableByteChannel, dest: ByteBuffer)
+    while (dest.position < dest.limit)
+      if (channel.read(dest) == -1)
         throw new EOFException("End of channel")
-      }
-    }
-  }
-}

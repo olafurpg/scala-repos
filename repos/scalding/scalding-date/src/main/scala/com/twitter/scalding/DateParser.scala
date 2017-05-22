@@ -20,24 +20,20 @@ import scala.util.{Try, Failure}
 import java.util.TimeZone
 import java.text.DateFormat
 
-trait DateParser extends java.io.Serializable { self =>
+trait DateParser extends java.io.Serializable  self =>
   def parse(s: String)(implicit tz: TimeZone): Try[RichDate]
 
   // Map the input before parsing (name from functional programming: contravariant map)
-  def contramap(fn: String => String): DateParser = new DateParser {
+  def contramap(fn: String => String): DateParser = new DateParser
     def parse(s: String)(implicit tz: TimeZone): Try[RichDate] =
       self.parse(fn(s))
-  }
 
   def rescueWith(second: DateParser): DateParser =
-    new DateParser {
-      def parse(s: String)(implicit tz: TimeZone) = {
+    new DateParser
+      def parse(s: String)(implicit tz: TimeZone) =
         self.parse(s) orElse second.parse(s)
-      }
-    }
-}
 
-object DateParser {
+object DateParser
 
   /**
     * This is scalding's default date parser. You can choose this
@@ -46,16 +42,14 @@ object DateParser {
     * not thread-safe, thus the def here. You can cache the result
     * if you are sure
     */
-  def default: DateParser = new DateParser {
+  def default: DateParser = new DateParser
     def parse(s: String)(implicit tz: TimeZone) =
       DateOps
         .getDateParser(s)
-        .map { p =>
+        .map  p =>
           p.parse(s)
-        }
         .getOrElse(Failure(new IllegalArgumentException(
                     "Could not find parser for: " + s)))
-  }
 
   /** Try these Parsers in order */
   def apply(items: Iterable[DateParser]): DateParser =
@@ -69,23 +63,18 @@ object DateParser {
     * Note that DateFormats in Java are generally not thread-safe,
     * so you should not share the result here across threads
     */
-  implicit def from(df: DateFormat): DateParser = new DateParser {
-    def parse(s: String)(implicit tz: TimeZone) = Try {
+  implicit def from(df: DateFormat): DateParser = new DateParser
+    def parse(s: String)(implicit tz: TimeZone) = Try
       df.setTimeZone(tz)
       RichDate(df.parse(s))
-    }
-  }
 
   /**
     * This ignores the time-zone assuming it must be in the String
     */
-  def from(fn: String => RichDate) = new DateParser {
+  def from(fn: String => RichDate) = new DateParser
     def parse(s: String)(implicit tz: TimeZone) = Try(fn(s))
-  }
-  def from(fn: (String, TimeZone) => RichDate) = new DateParser {
+  def from(fn: (String, TimeZone) => RichDate) = new DateParser
     def parse(s: String)(implicit tz: TimeZone) = Try(fn(s, tz))
-  }
-}
 
 /**
   * //Scalding used to support Natty, this is removed. To add it back, use something like this in your code,

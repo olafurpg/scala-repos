@@ -35,7 +35,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventType
 
-object TouchEvent {
+object TouchEvent
   implicit def sfxTouchEvent2jfx(se: TouchEvent): jfxsi.TouchEvent =
     if (se != null) se.delegate else null
 
@@ -84,13 +84,12 @@ object TouchEvent {
       "Use TouchStationary; TOUCH_STATIONARY will be removed in a future release",
       "8.0.60-R10")
   val TOUCH_STATIONARY = TouchStationary
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/TouchEvent.html]]
   */
 class TouchEvent(override val delegate: jfxsi.TouchEvent)
-    extends InputEvent(delegate) with SFXDelegate[jfxsi.TouchEvent] {
+    extends InputEvent(delegate) with SFXDelegate[jfxsi.TouchEvent]
 
   /**
     * Returns number of touch points represented by this touch event set.
@@ -138,4 +137,3 @@ class TouchEvent(override val delegate: jfxsi.TouchEvent)
     * Indicates whether or not the Shift modifier is down on this event.
     */
   def shiftDown: Boolean = delegate.isShiftDown
-}

@@ -7,16 +7,15 @@ import scala.util.Try
 /**
   * A minimal symbol set to allow us to construct our mini-pickle-behavior language
   */
-private[pickling] sealed trait IrSymbol {
+private[pickling] sealed trait IrSymbol
   // TODO - isJava
-}
-private[pickling] object IrSymbol {
+private[pickling] object IrSymbol
   // TODO - This helper method should be available elsewhere.
-  def allDeclaredMethodIncludingSubclasses(cls: IrClass): Seq[IrMethod] = {
+  def allDeclaredMethodIncludingSubclasses(cls: IrClass): Seq[IrMethod] =
     def allmethods(clss: List[IrClass],
                    mthds: Seq[IrMethod],
                    visitedClasses: Set[String]): Seq[IrMethod] =
-      clss match {
+      clss match
         case hd :: tail if visitedClasses(hd.className) =>
           allmethods(tail, mthds, visitedClasses)
         case hd :: tail =>
@@ -25,17 +24,15 @@ private[pickling] object IrSymbol {
                      newMthds ++ mthds,
                      visitedClasses + hd.className)
         case Nil => mthds
-      }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe
     //       allow serializing transient fields...
     allmethods(List(cls), Nil, Set())
-  }
 
-  def allDeclaredFieldsIncludingSubclasses(cls: IrClass): Seq[IrField] = {
+  def allDeclaredFieldsIncludingSubclasses(cls: IrClass): Seq[IrField] =
     def allfields(clss: List[IrClass],
                   fields: Seq[IrField],
                   visitedClasses: Set[String]): Seq[IrField] =
-      clss match {
+      clss match
         case hd :: tail if visitedClasses(hd.className) =>
           allfields(tail, fields, visitedClasses)
         case hd :: tail =>
@@ -44,15 +41,12 @@ private[pickling] object IrSymbol {
                     newFields ++ fields,
                     visitedClasses + hd.className)
         case Nil => fields
-      }
     // TODO - We should maybe warn if we see transient fields that cause us not to compile correctly, or maybe
     //       allow serializing transient fields...
     allfields(List(cls), Nil, Set())
-  }
-}
 
 /** Represents a java class. */
-private[pickling] trait IrClass extends IrSymbol {
+private[pickling] trait IrClass extends IrSymbol
 
   /** The class name represented by this symbol. */
   def className: String
@@ -97,16 +91,14 @@ private[pickling] trait IrClass extends IrSymbol {
 
   /** Returns the companion of this class, if known. */
   def companion: Option[IrClass]
-}
 
-private[pickling] sealed trait IrInnerClass extends IrSymbol with IrClass {
+private[pickling] sealed trait IrInnerClass extends IrSymbol with IrClass
   def outerClass: IrClass
-}
 
 /** Represents a member of a particular class.
   * This might be a Constructor, Field or Member.
   */
-private[pickling] sealed trait IrMember extends IrSymbol {
+private[pickling] sealed trait IrMember extends IrSymbol
 
   /** The class that this member belongs to. */
   def owner: IrClass
@@ -135,8 +127,7 @@ private[pickling] sealed trait IrMember extends IrSymbol {
   /** This is true if the field is marked transient (either by scala or java serialization). */
   def isMarkedTransient: Boolean
   // TODO - Signatures
-}
-private[pickling] trait IrField extends IrMember {
+private[pickling] trait IrField extends IrMember
 
   /** The name of the field, as we'd use to lookup via reflection. */
   def fieldName: String
@@ -149,8 +140,7 @@ private[pickling] trait IrField extends IrMember {
     */
   def isParameter: Boolean
   override final def isField: Boolean = true
-}
-private[pickling] trait IrMethod extends IrMember {
+private[pickling] trait IrMethod extends IrMember
 
   /** The code-names of the constructor parameters.  Note: There is an algorithm which will try to
     * align the constructor parameters with getter methods by symbol name.
@@ -182,15 +172,13 @@ private[pickling] trait IrMethod extends IrMember {
   def setter: Option[IrMethod]
 
   override final def isField: Boolean = false
-}
 
 /** The symbol representing a constructor. */
 private[pickling] trait IrConstructor extends IrMethod {}
 
 /** A symbol loader for Java/Scala Symbols. */
 private[pickling] abstract class IrSymbolLoader[U <: Universe with Singleton](
-    val u: U) {
+    val u: U)
 
   /** Loads the symbols for a given Type using this symbol loader. */
   def newClass(tpe: u.Type): IrClass
-}

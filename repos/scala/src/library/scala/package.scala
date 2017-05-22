@@ -10,7 +10,7 @@
   * Core Scala types. They are always available without an explicit import.
   * @contentDiagram hideNodes "scala.Serializable"
   */
-package object scala {
+package object scala
   type Throwable = java.lang.Throwable
   type Exception = java.lang.Exception
   type Error = java.lang.Error
@@ -29,9 +29,8 @@ package object scala {
   type InterruptedException = java.lang.InterruptedException
 
   // A dummy used by the specialization annotation.
-  val AnyRef = new Specializable {
+  val AnyRef = new Specializable
     override def toString = "object AnyRef"
-  }
 
   type TraversableOnce[+A] = scala.collection.TraversableOnce[A]
 
@@ -129,4 +128,3 @@ package object scala {
   type unchecked = annotation.unchecked.unchecked
   type volatile = annotation.volatile
  */
-}

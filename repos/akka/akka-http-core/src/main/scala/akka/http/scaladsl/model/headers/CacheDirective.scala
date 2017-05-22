@@ -8,21 +8,18 @@ import scala.collection.immutable
 import akka.http.impl.util._
 import akka.http.javadsl.{model ⇒ jm}
 
-sealed trait CacheDirective extends Renderable with jm.headers.CacheDirective {
+sealed trait CacheDirective extends Renderable with jm.headers.CacheDirective
   def value: String
-}
 
-object CacheDirective {
+object CacheDirective
   sealed trait RequestDirective extends CacheDirective
   sealed trait ResponseDirective extends CacheDirective
 
   final case class CustomCacheDirective(name: String, content: Option[String])
-      extends RequestDirective with ResponseDirective with ValueRenderable {
-    def render[R <: Rendering](r: R): r.type = content match {
+      extends RequestDirective with ResponseDirective with ValueRenderable
+    def render[R <: Rendering](r: R): r.type = content match
       case Some(s) ⇒ r ~~ name ~~ '=' ~~# s
       case None ⇒ r ~~ name
-    }
-  }
 
   def custom(
       name: String,
@@ -30,56 +27,49 @@ object CacheDirective {
     CustomCacheDirective(name, content)
 
   sealed abstract class FieldNamesDirective
-      extends Product with ValueRenderable {
+      extends Product with ValueRenderable
     def fieldNames: immutable.Seq[String]
     final def render[R <: Rendering](r: R): r.type =
-      if (fieldNames.nonEmpty) {
+      if (fieldNames.nonEmpty)
         r ~~ productPrefix ~~ '=' ~~ '"'
         @tailrec def rec(i: Int = 0): r.type =
-          if (i < fieldNames.length) {
+          if (i < fieldNames.length)
             if (i > 0) r ~~ ','
             r.putEscaped(fieldNames(i))
             rec(i + 1)
-          } else r ~~ '"'
+          else r ~~ '"'
         rec()
-      } else r ~~ productPrefix
-  }
-}
+      else r ~~ productPrefix
 
-object CacheDirectives {
+object CacheDirectives
   import CacheDirective._
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.1.1
   // http://tools.ietf.org/html/rfc7234#section-5.2.2.8
   final case class `max-age`(deltaSeconds: Long)
-      extends RequestDirective with ResponseDirective with ValueRenderable {
+      extends RequestDirective with ResponseDirective with ValueRenderable
     def render[R <: Rendering](r: R): r.type =
       r ~~ productPrefix ~~ '=' ~~ deltaSeconds
-  }
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.1.2
   final case class `max-stale`(deltaSeconds: Option[Long])
-      extends RequestDirective with ValueRenderable {
-    def render[R <: Rendering](r: R): r.type = deltaSeconds match {
+      extends RequestDirective with ValueRenderable
+    def render[R <: Rendering](r: R): r.type = deltaSeconds match
       case Some(s) ⇒ r ~~ productPrefix ~~ '=' ~~ s
       case None ⇒ r ~~ productPrefix
-    }
-  }
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.1.3
   final case class `min-fresh`(deltaSeconds: Long)
-      extends RequestDirective with ValueRenderable {
+      extends RequestDirective with ValueRenderable
     def render[R <: Rendering](r: R): r.type =
       r ~~ productPrefix ~~ '=' ~~ deltaSeconds
-  }
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.1.4
   case object `no-cache`
       extends SingletonValueRenderable with RequestDirective
-      with ResponseDirective {
+      with ResponseDirective
     def apply(fieldNames: String*): `no-cache` =
       new `no-cache`(immutable.Seq(fieldNames: _*))
-  }
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.1.5
   // http://tools.ietf.org/html/rfc7234#section-5.2.2.3
@@ -114,10 +104,9 @@ object CacheDirectives {
   // http://tools.ietf.org/html/rfc7234#section-5.2.2.6
   final case class `private`(fieldNames: immutable.Seq[String])
       extends FieldNamesDirective with ResponseDirective
-  object `private` {
+  object `private`
     def apply(fieldNames: String*): `private` =
       new `private`(immutable.Seq(fieldNames: _*))
-  }
 
   /** Java API */
   @varargs def createPrivate(fieldNames: String*): ResponseDirective =
@@ -129,8 +118,6 @@ object CacheDirectives {
 
   // http://tools.ietf.org/html/rfc7234#section-5.2.2.9
   final case class `s-maxage`(deltaSeconds: Long)
-      extends ResponseDirective with ValueRenderable {
+      extends ResponseDirective with ValueRenderable
     def render[R <: Rendering](r: R): r.type =
       r ~~ productPrefix ~~ '=' ~~ deltaSeconds
-  }
-}

@@ -4,9 +4,9 @@ import mesosphere.marathon.MarathonSpec
 import mesosphere.marathon.state.AppDefinition
 import org.scalatest.Matchers
 
-class LabelSelectorParsersTest extends MarathonSpec with Matchers {
+class LabelSelectorParsersTest extends MarathonSpec with Matchers
 
-  test("A valid existence label query can be parsed") {
+  test("A valid existence label query can be parsed")
     val parser = new LabelSelectorParsers
     val existence = parser.parsed("existence")
 
@@ -17,9 +17,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
         true)
     existence.matches(AppDefinition(labels = Map("none" -> "one"))) should be(
         false)
-  }
 
-  test("A valid label equals query can be parsed") {
+  test("A valid label equals query can be parsed")
     val parser = new LabelSelectorParsers
     val in = parser.parsed("foo == one")
     val in2 = parser.parsed("foo==one")
@@ -31,9 +30,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     in.matches(AppDefinition(labels = Map("foo" -> "one"))) should be(true)
     in.matches(AppDefinition(labels = Map("foo" -> "four"))) should be(false)
     in.matches(AppDefinition(labels = Map("bla" -> "one"))) should be(false)
-  }
 
-  test("A valid label not equals query can be parsed") {
+  test("A valid label not equals query can be parsed")
     val parser = new LabelSelectorParsers
     val in = parser.parsed("foo != one")
     val in2 = parser.parsed("foo!=one")
@@ -44,9 +42,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     in.matches(AppDefinition(labels = Map("foo" -> "one"))) should be(false)
     in.matches(AppDefinition(labels = Map("foo" -> "four"))) should be(true)
     in.matches(AppDefinition(labels = Map("bla" -> "one"))) should be(false)
-  }
 
-  test("A valid label set query can be parsed") {
+  test("A valid label set query can be parsed")
     val parser = new LabelSelectorParsers
     val in = parser.parsed("""foo in (one, two, three\ is\ cool)""")
 
@@ -56,9 +53,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     in.matches(AppDefinition(labels = Map("foo" -> "one"))) should be(true)
     in.matches(AppDefinition(labels = Map("foo" -> "four"))) should be(false)
     in.matches(AppDefinition(labels = Map("bla" -> "one"))) should be(false)
-  }
 
-  test("A valid notin label set query can be parsed") {
+  test("A valid notin label set query can be parsed")
     val parser = new LabelSelectorParsers
     val notin = parser.parsed("bla notin (one, two, three)")
     notin.selectors should have size 1
@@ -68,9 +64,8 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
     notin.matches(AppDefinition(labels = Map("bla" -> "four"))) should be(true)
     notin.matches(AppDefinition(labels = Map("rest" -> "one"))) should be(
         false)
-  }
 
-  test("A valid combined label query can be parsed") {
+  test("A valid combined label query can be parsed")
     val parser = new LabelSelectorParsers
     val combined = parser.parsed(
         "foo==one, bla!=one, foo in (one, two, three), bla notin (one, two, three), existence")
@@ -83,10 +78,9 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
         false)
     combined.matches(AppDefinition(labels = Map("bla" -> "four"))) should be(
         false)
-  }
 
   test(
-      "A valid combined label query without alphanumeric characters can be parsed") {
+      "A valid combined label query without alphanumeric characters can be parsed")
     val parser = new LabelSelectorParsers
     val combined = parser.parsed(
         """\{\{\{ in (\*\*\*, \&\&\&, \$\$\$), \^\^\^ notin (\-\-\-, \!\!\!, \@\@\@), \#\#\#""")
@@ -98,17 +92,11 @@ class LabelSelectorParsersTest extends MarathonSpec with Matchers {
         false)
     combined.matches(AppDefinition(labels = Map("###" -> "four"))) should be(
         false)
-  }
 
-  test("An invalid combined label query can not be parsed") {
-    intercept[IllegalArgumentException] {
+  test("An invalid combined label query can not be parsed")
+    intercept[IllegalArgumentException]
       new LabelSelectorParsers().parsed("foo some (one, two, three)")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LabelSelectorParsers().parsed("foo in one")
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new LabelSelectorParsers().parsed("foo test")
-    }
-  }
-}

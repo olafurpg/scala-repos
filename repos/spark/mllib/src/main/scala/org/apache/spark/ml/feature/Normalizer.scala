@@ -32,7 +32,7 @@ import org.apache.spark.sql.types.DataType
 @Experimental
 class Normalizer(override val uid: String)
     extends UnaryTransformer[Vector, Vector, Normalizer]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("normalizer"))
 
@@ -52,17 +52,14 @@ class Normalizer(override val uid: String)
   /** @group setParam */
   def setP(value: Double): this.type = set(p, value)
 
-  override protected def createTransformFunc: Vector => Vector = {
+  override protected def createTransformFunc: Vector => Vector =
     val normalizer = new feature.Normalizer($(p))
     normalizer.transform
-  }
 
   override protected def outputDataType: DataType = new VectorUDT()
-}
 
 @Since("1.6.0")
-object Normalizer extends DefaultParamsReadable[Normalizer] {
+object Normalizer extends DefaultParamsReadable[Normalizer]
 
   @Since("1.6.0")
   override def load(path: String): Normalizer = super.load(path)
-}

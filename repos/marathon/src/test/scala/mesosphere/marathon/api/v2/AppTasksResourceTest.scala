@@ -21,9 +21,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AppTasksResourceTest
-    extends MarathonSpec with Matchers with GivenWhenThen with Mockito {
+    extends MarathonSpec with Matchers with GivenWhenThen with Mockito
 
-  test("deleteMany") {
+  test("deleteMany")
     val appId = "/my/app"
     val host = "host"
     val toKill = Set(MarathonTestHelper.stagedTaskForApp(PathId(appId)))
@@ -39,9 +39,8 @@ class AppTasksResourceTest
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
       .correspondsToJsonOf(Json.obj("tasks" -> toKill))
-  }
 
-  test("deleteOne") {
+  test("deleteOne")
     import MarathonTestHelper.Implicits._
     val appId = PathId("/my/app")
     val slaveId = SlaveID("some slave ID")
@@ -72,9 +71,8 @@ class AppTasksResourceTest
       .correspondsToJsonOf(Json.obj("task" -> toKill.head))
     verify(taskKiller).kill(equalTo(appId), any)(any)
     verifyNoMoreInteractions(taskKiller)
-  }
 
-  test("get tasks") {
+  test("get tasks")
     val appId = PathId("/my/app")
 
     val task1 = MarathonTestHelper.mininimalTask("task1")
@@ -90,21 +88,19 @@ class AppTasksResourceTest
 
     val response = appsTaskResource.indexJson("/my/app", auth.request)
     response.getStatus shouldEqual 200
-    def toEnrichedTask(task: Task): EnrichedTask = {
+    def toEnrichedTask(task: Task): EnrichedTask =
       EnrichedTask(
           appId = appId,
           task = task,
           healthCheckResults = Seq(),
           servicePorts = Seq()
       )
-    }
     JsonTestHelper
       .assertThatJsonString(response.getEntity.asInstanceOf[String])
       .correspondsToJsonOf(
           Json.obj("tasks" -> Seq(task1, task2).map(toEnrichedTask)))
-  }
 
-  test("access without authentication is denied") {
+  test("access without authentication is denied")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -131,10 +127,9 @@ class AppTasksResourceTest
       appsTaskResource.deleteMany("appId", "host", false, false, req)
     Then("we receive a NotAuthenticated response")
     deleteMany.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
   test(
-      "access to indexJson without authorization leads to a 404 if the app does not exist") {
+      "access to indexJson without authorization leads to a 404 if the app does not exist")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -147,10 +142,9 @@ class AppTasksResourceTest
     val indexJson = appsTaskResource.indexJson("/app", req)
     Then("we receive a 404")
     indexJson.getStatus should be(404)
-  }
 
   test(
-      "access to indexJson without authorization is not allowed if the app exists") {
+      "access to indexJson without authorization is not allowed if the app exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -164,10 +158,9 @@ class AppTasksResourceTest
     val indexJson = appsTaskResource.indexJson("/app", req)
     Then("we receive a not authorized response")
     indexJson.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access to indexJson without authorization leads to a 404 if the group does not exist") {
+      "access to indexJson without authorization leads to a 404 if the group does not exist")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -180,10 +173,9 @@ class AppTasksResourceTest
     val indexJson = appsTaskResource.indexJson("/group/*", req)
     Then("we receive a 404")
     indexJson.getStatus should be(404)
-  }
 
   test(
-      "access to indexJson without authorization is not allowed if the group exists") {
+      "access to indexJson without authorization is not allowed if the group exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -198,10 +190,9 @@ class AppTasksResourceTest
     val indexJson = appsTaskResource.indexJson("/group/*", req)
     Then("we receive a not authorized response")
     indexJson.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access to indexTxt without authorization is not allowed if the app exists") {
+      "access to indexTxt without authorization is not allowed if the app exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -215,10 +206,9 @@ class AppTasksResourceTest
     val indexTxt = appsTaskResource.indexTxt("/app", req)
     Then("we receive a not authorized response")
     indexTxt.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access to indexTxt without authorization leads to a 404 if the the app does not exist") {
+      "access to indexTxt without authorization leads to a 404 if the the app does not exist")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -231,10 +221,9 @@ class AppTasksResourceTest
     val indexTxt = appsTaskResource.indexTxt("/app", req)
     Then("we receive a not authorized response")
     indexTxt.getStatus should be(404)
-  }
 
   test(
-      "access to deleteOne without authorization is not allowed if the app exists") {
+      "access to deleteOne without authorization is not allowed if the app exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -250,10 +239,9 @@ class AppTasksResourceTest
       appsTaskResource.deleteOne("app", "taskId", false, false, req)
     Then("we receive a not authorized response")
     deleteOne.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access to deleteOne without authorization leads to a 404 if the the app does not exist") {
+      "access to deleteOne without authorization leads to a 404 if the the app does not exist")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -268,10 +256,9 @@ class AppTasksResourceTest
       appsTaskResource.deleteOne("app", "taskId", false, false, req)
     Then("we receive a not authorized response")
     deleteOne.getStatus should be(404)
-  }
 
   test(
-      "access to deleteMany without authorization is not allowed if the app exists") {
+      "access to deleteMany without authorization is not allowed if the app exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -287,10 +274,9 @@ class AppTasksResourceTest
       appsTaskResource.deleteMany("app", "host", false, false, req)
     Then("we receive a not authorized response")
     deleteMany.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access to deleteMany without authorization leads to a 404 if the the app does not exist") {
+      "access to deleteMany without authorization leads to a 404 if the the app does not exist")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -305,7 +291,6 @@ class AppTasksResourceTest
       appsTaskResource.deleteMany("app", "host", false, false, req)
     Then("we receive a not authorized response")
     deleteMany.getStatus should be(404)
-  }
 
   var service: MarathonSchedulerService = _
   var taskTracker: TaskTracker = _
@@ -317,7 +302,7 @@ class AppTasksResourceTest
   var auth: TestAuthFixture = _
   implicit var identity: Identity = _
 
-  before {
+  before
     auth = new TestAuthFixture
     service = mock[MarathonSchedulerService]
     taskTracker = mock[TaskTracker]
@@ -338,9 +323,8 @@ class AppTasksResourceTest
     )
 
     config.zkTimeoutDuration returns 1.second
-  }
 
-  private[this] def useRealTaskKiller(): Unit = {
+  private[this] def useRealTaskKiller(): Unit =
     taskKiller = new TaskKiller(
         taskTracker, groupManager, service, config, auth.auth, auth.auth)
     appsTaskResource = new AppTasksResource(
@@ -353,5 +337,3 @@ class AppTasksResourceTest
         auth.auth,
         auth.auth
     )
-  }
-}

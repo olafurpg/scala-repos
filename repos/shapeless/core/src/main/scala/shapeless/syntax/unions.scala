@@ -26,7 +26,7 @@ import tag.@@
   * @author Miles Sabin
   */
 final class UnionOps[C <: Coproduct](val c: C)
-    extends AnyVal with Serializable {
+    extends AnyVal with Serializable
   import shapeless.union._
   import ops.union._
 
@@ -79,14 +79,13 @@ final class UnionOps[C <: Coproduct](val c: C)
     * Returns a wrapped version of this union that provides `selectDynamic` access to fields.
     */
   def union: DynamicUnionOps[C] = DynamicUnionOps(c)
-}
 
 /**
   * Discriminated union wrapper providing `selectDynamic` access to fields.
   * 
   * @author Cody Allen
   */
-final case class DynamicUnionOps[C <: Coproduct](c: C) extends Dynamic {
+final case class DynamicUnionOps[C <: Coproduct](c: C) extends Dynamic
   import ops.union.Selector
 
   /**
@@ -95,4 +94,3 @@ final case class DynamicUnionOps[C <: Coproduct](c: C) extends Dynamic {
   def selectDynamic(key: String)(
       implicit selector: Selector[C, Symbol @@ key.type]): selector.Out =
     selector(c)
-}

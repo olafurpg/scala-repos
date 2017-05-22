@@ -27,15 +27,15 @@ import util.Helpers.secureXML
 /**
   * System under specification for Msgs.
   */
-object MsgsSpec extends Specification with XmlMatchers {
+object MsgsSpec extends Specification with XmlMatchers
   "Msgs Specification".title
 
   def withSession[T](f: => T): T =
     S.initIfUninitted(new LiftSession("test", "", Empty))(f)
 
-  "The built-in Msgs snippet" should {
-    "Properly render static content" in {
-      val result = withSession {
+  "The built-in Msgs snippet" should
+    "Properly render static content" in
+      val result = withSession
         // Set some notices
         S.error("Error")
         S.warning("Warning")
@@ -47,7 +47,6 @@ object MsgsSpec extends Specification with XmlMatchers {
                   <lift:warning_msg>Warning:</lift:warning_msg><lift:notice_class>funky</lift:notice_class>
               )
               .toString)
-      }
 
       result must ==/(<div id="lift__noticesContainer__">
           <div id="lift__noticesContainer___error">
@@ -66,11 +65,7 @@ object MsgsSpec extends Specification with XmlMatchers {
             </ul>
           </div>
         </div>)
-    }
 
-    "Properly render AJAX content" in {
+    "Properly render AJAX content" in
       // TODO : Figure out how to test this
       pending
-    }
-  }
-}

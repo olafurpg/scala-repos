@@ -45,9 +45,8 @@ class StackedAreaChartSpec
                                   StackedAreaChart[Number, Number]](
         classOf[jfxsc.StackedAreaChart[Number, Number]],
         classOf[StackedAreaChart[Number, Number]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override def getJavaClassInstance =
     new jfxsc.StackedAreaChart[Number, Number](
         new jfxsc.NumberAxis, new jfxsc.NumberAxis)
-}

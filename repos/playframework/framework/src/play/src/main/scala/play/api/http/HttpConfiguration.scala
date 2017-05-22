@@ -34,24 +34,19 @@ case class HttpConfiguration(
   * @param strict Whether strict cookie parsing should be used. If true, will cause the entire cookie header to be
   *               discarded if a single cookie is found to be invalid.
   */
-case class CookiesConfiguration(strict: Boolean = true) {
-  def serverEncoder: ServerCookieEncoder = strict match {
+case class CookiesConfiguration(strict: Boolean = true)
+  def serverEncoder: ServerCookieEncoder = strict match
     case true => ServerCookieEncoder.STRICT
     case false => ServerCookieEncoder.LAX
-  }
-  def clientEncoder: ClientCookieEncoder = strict match {
+  def clientEncoder: ClientCookieEncoder = strict match
     case true => ClientCookieEncoder.STRICT
     case false => ClientCookieEncoder.LAX
-  }
-  def serverDecoder: ServerCookieDecoder = strict match {
+  def serverDecoder: ServerCookieDecoder = strict match
     case true => ServerCookieDecoder.STRICT
     case false => ServerCookieDecoder.LAX
-  }
-  def clientDecoder: ClientCookieDecoder = strict match {
+  def clientDecoder: ClientCookieDecoder = strict match
     case true => ClientCookieDecoder.STRICT
     case false => ClientCookieDecoder.LAX
-  }
-}
 
 /**
   * The session configuration
@@ -99,25 +94,22 @@ case class ActionCompositionConfiguration(
     controllerAnnotationsFirst: Boolean = false,
     executeActionCreatorActionFirst: Boolean = false)
 
-object HttpConfiguration {
+object HttpConfiguration
 
   @Singleton
   class HttpConfigurationProvider @Inject()(configuration: Configuration)
-      extends Provider[HttpConfiguration] {
+      extends Provider[HttpConfiguration]
     lazy val get = fromConfiguration(configuration)
-  }
 
-  def fromConfiguration(configuration: Configuration) = {
+  def fromConfiguration(configuration: Configuration) =
     val config = PlayConfig(configuration)
-    val context = {
+    val context =
       val ctx = config.getDeprecated[String](
           "play.http.context", "application.context")
-      if (!ctx.startsWith("/")) {
+      if (!ctx.startsWith("/"))
         throw configuration.globalError(
             "play.http.context must start with a /")
-      }
       ctx
-    }
 
     HttpConfiguration(
         context = context,
@@ -160,7 +152,6 @@ object HttpConfiguration {
               httpOnly = config.get[Boolean]("play.http.flash.httpOnly")
           )
     )
-  }
 
   private val httpConfigurationCache =
     Application.instanceCache[HttpConfiguration]
@@ -171,4 +162,3 @@ object HttpConfiguration {
   private[play] def current =
     Play.privateMaybeApplication.fold(HttpConfiguration())(
         httpConfigurationCache)
-}

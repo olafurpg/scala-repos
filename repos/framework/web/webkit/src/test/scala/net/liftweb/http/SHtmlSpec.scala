@@ -23,7 +23,7 @@ import util._
 import Helpers._
 import net.liftweb.mockweb.MockWeb._
 
-object SHtmlSpec extends Specification with XmlMatchers {
+object SHtmlSpec extends Specification with XmlMatchers
   "SHtmlSpec Specification".title
 
   val html1 = <span><input id="number"></input></span>
@@ -37,23 +37,18 @@ object SHtmlSpec extends Specification with XmlMatchers {
       ("#number" #> SHtml.number(0, println(_: Double), 0, 100, 1))
         .apply(html1))
 
-  "SHtml" should {
-    "create a number input field" in {
+  "SHtml" should
+    "create a number input field" in
       inputField1 must \("input", "type" -> "number")
-    }
-    "create a number input field with min='0'" in {
+    "create a number input field with min='0'" in
       inputField1 must \("input", "min" -> "0")
-    }
-    "create a number input field with max='100'" in {
+    "create a number input field with max='100'" in
       inputField1 must \("input", "max" -> "100")
-    }
-    "create a number input field with step='0.1'" in {
+    "create a number input field with step='0.1'" in
       inputField2 must \("input", "step" -> "0.1")
-    }
-    "create a number input field with step='1.0'" in {
+    "create a number input field with step='1.0'" in
       inputField3 must \("input", "step" -> "1.0")
-    }
-    "Use the implicit from tuple to SelectableOption" in {
+    "Use the implicit from tuple to SelectableOption" in
       testS("/")(
           ("#number" #> SHtml.select(Seq("Yes" -> "Yes", "No" -> "No"),
                                      Some("value"),
@@ -61,6 +56,3 @@ object SHtmlSpec extends Specification with XmlMatchers {
                                      "class" -> "form-control")).apply(html1))
       //compiling is enough for this test
       1 must_== 1
-    }
-  }
-}

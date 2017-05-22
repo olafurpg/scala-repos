@@ -5,13 +5,10 @@ import com.intellij.psi.{PsiFile, PsiMember}
 /**
   * Pavel Fatin
   */
-object ContainingFile {
-  def unapply(e: PsiMember): Option[PsiFile] = {
-    if (e == null) {
+object ContainingFile
+  def unapply(e: PsiMember): Option[PsiFile] =
+    if (e == null)
       None
-    } else {
+    else
       val file = e.getContainingFile
       Option(file)
-    }
-  }
-}

@@ -27,7 +27,7 @@ private[streaming] class TransformedDStream[U : ClassTag](
     parents: Seq[DStream[_]],
     transformFunc: (Seq[RDD[_]], Time) => RDD[U]
 )
-    extends DStream[U](parents.head.ssc) {
+    extends DStream[U](parents.head.ssc)
 
   require(parents.length > 0, "List of DStreams to transform is empty")
   require(parents.map(_.ssc).distinct.size == 1,
@@ -39,24 +39,21 @@ private[streaming] class TransformedDStream[U : ClassTag](
 
   override def slideDuration: Duration = parents.head.slideDuration
 
-  override def compute(validTime: Time): Option[RDD[U]] = {
-    val parentRDDs = parents.map { parent =>
+  override def compute(validTime: Time): Option[RDD[U]] =
+    val parentRDDs = parents.map  parent =>
       parent
         .getOrCompute(validTime)
         .getOrElse(
             // Guard out against parent DStream that return None instead of Some(rdd) to avoid NPE
             throw new SparkException(
                 s"Couldn't generate RDD from parent at time $validTime"))
-    }
     val transformedRDD = transformFunc(parentRDDs, validTime)
-    if (transformedRDD == null) {
+    if (transformedRDD == null)
       throw new SparkException(
           "Transform function must not return null. " +
           "Return SparkContext.emptyRDD() instead to represent no element " +
           "as the result of transformation.")
-    }
     Some(transformedRDD)
-  }
 
   /**
     * Wrap a body of code such that the call site and operation scope
@@ -66,7 +63,5 @@ private[streaming] class TransformedDStream[U : ClassTag](
     * displayed in the UI.
     */
   override protected[streaming] def createRDDWithLocalProperties[U](
-      time: Time, displayInnerRDDOps: Boolean)(body: => U): U = {
+      time: Time, displayInnerRDDOps: Boolean)(body: => U): U =
     super.createRDDWithLocalProperties(time, displayInnerRDDOps = true)(body)
-  }
-}

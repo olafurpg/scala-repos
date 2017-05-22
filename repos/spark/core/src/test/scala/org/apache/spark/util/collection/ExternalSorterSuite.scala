@@ -24,7 +24,7 @@ import org.apache.spark._
 import org.apache.spark.memory.MemoryTestingUtils
 import org.apache.spark.serializer.{JavaSerializer, KryoSerializer}
 
-class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
+class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext
   import TestUtils.{assertNotSpilled, assertSpilled}
 
   testWithMultipleSer("empty data stream")(emptyDataStream)
@@ -35,95 +35,81 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
       emptyPartitionsWithSpilling)
 
   // Load defaults, otherwise SPARK_HOME is not found
-  testWithMultipleSer("spilling in local cluster", loadDefaults = true) {
+  testWithMultipleSer("spilling in local cluster", loadDefaults = true)
     (conf: SparkConf) =>
       testSpillingInLocalCluster(conf, 2)
-  }
 
   testWithMultipleSer("spilling in local cluster with many reduce tasks",
-                      loadDefaults = true) { (conf: SparkConf) =>
+                      loadDefaults = true)  (conf: SparkConf) =>
     testSpillingInLocalCluster(conf, 100)
-  }
 
-  test("cleanup of intermediate files in sorter") {
+  test("cleanup of intermediate files in sorter")
     cleanupIntermediateFilesInSorter(withFailures = false)
-  }
 
-  test("cleanup of intermediate files in sorter with failures") {
+  test("cleanup of intermediate files in sorter with failures")
     cleanupIntermediateFilesInSorter(withFailures = true)
-  }
 
-  test("cleanup of intermediate files in shuffle") {
+  test("cleanup of intermediate files in shuffle")
     cleanupIntermediateFilesInShuffle(withFailures = false)
-  }
 
-  test("cleanup of intermediate files in shuffle with failures") {
+  test("cleanup of intermediate files in shuffle with failures")
     cleanupIntermediateFilesInShuffle(withFailures = true)
-  }
 
-  testWithMultipleSer("no sorting or partial aggregation") {
+  testWithMultipleSer("no sorting or partial aggregation")
     (conf: SparkConf) =>
       basicSorterTest(conf,
                       withPartialAgg = false,
                       withOrdering = false,
                       withSpilling = false)
-  }
 
-  testWithMultipleSer("no sorting or partial aggregation with spilling") {
+  testWithMultipleSer("no sorting or partial aggregation with spilling")
     (conf: SparkConf) =>
       basicSorterTest(conf,
                       withPartialAgg = false,
                       withOrdering = false,
                       withSpilling = true)
-  }
 
-  testWithMultipleSer("sorting, no partial aggregation") { (conf: SparkConf) =>
+  testWithMultipleSer("sorting, no partial aggregation")  (conf: SparkConf) =>
     basicSorterTest(conf,
                     withPartialAgg = false,
                     withOrdering = true,
                     withSpilling = false)
-  }
 
-  testWithMultipleSer("sorting, no partial aggregation with spilling") {
+  testWithMultipleSer("sorting, no partial aggregation with spilling")
     (conf: SparkConf) =>
       basicSorterTest(conf,
                       withPartialAgg = false,
                       withOrdering = true,
                       withSpilling = true)
-  }
 
-  testWithMultipleSer("partial aggregation, no sorting") { (conf: SparkConf) =>
+  testWithMultipleSer("partial aggregation, no sorting")  (conf: SparkConf) =>
     basicSorterTest(conf,
                     withPartialAgg = true,
                     withOrdering = false,
                     withSpilling = false)
-  }
 
-  testWithMultipleSer("partial aggregation, no sorting with spilling") {
+  testWithMultipleSer("partial aggregation, no sorting with spilling")
     (conf: SparkConf) =>
       basicSorterTest(conf,
                       withPartialAgg = true,
                       withOrdering = false,
                       withSpilling = true)
-  }
 
-  testWithMultipleSer("partial aggregation and sorting") { (conf: SparkConf) =>
+  testWithMultipleSer("partial aggregation and sorting")  (conf: SparkConf) =>
     basicSorterTest(
         conf, withPartialAgg = true, withOrdering = true, withSpilling = false)
-  }
 
-  testWithMultipleSer("partial aggregation and sorting with spilling") {
+  testWithMultipleSer("partial aggregation and sorting with spilling")
     (conf: SparkConf) =>
       basicSorterTest(conf,
                       withPartialAgg = true,
                       withOrdering = true,
                       withSpilling = true)
-  }
 
   testWithMultipleSer("sort without breaking sorting contracts",
                       loadDefaults = true)(sortWithoutBreakingSortingContracts)
 
-  test("spilling with hash collisions") {
+  test("spilling with hash collisions")
     val size = 1000
     val conf = createSparkConf(loadDefaults = true, kryo = false)
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
@@ -160,11 +146,10 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
         ("pomatoes", "eructation") // 568647356
     )
 
-    collisionPairs.foreach {
+    collisionPairs.foreach
       case (w1, w2) =>
         // String.hashCode is documented to use a specific algorithm, but check just in case
         assert(w1.hashCode === w2.hashCode)
-    }
 
     val toInsert =
       (1 to size).iterator.map(_.toString).map(s => (s, s)) ++ collisionPairs.iterator ++ collisionPairs.iterator
@@ -181,17 +166,15 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     var count = 0
 
     val it = sorter.iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       val kv = it.next()
       val expectedValue =
         ArrayBuffer[String](collisionPairsMap.getOrElse(kv._1, kv._1))
       assert(kv._2.equals(expectedValue))
       count += 1
-    }
     assert(count === size + collisionPairs.size * 2)
-  }
 
-  test("spilling with many hash collisions") {
+  test("spilling with many hash collisions")
     val size = 1000
     val conf = createSparkConf(loadDefaults = true, kryo = false)
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
@@ -209,15 +192,13 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     assert(sorter.numSpills > 0, "sorter did not spill")
     val it = sorter.iterator
     var count = 0
-    while (it.hasNext) {
+    while (it.hasNext)
       val kv = it.next()
       assert(kv._2 === 10)
       count += 1
-    }
     assert(count === size)
-  }
 
-  test("spilling with hash collisions using the Int.MaxValue key") {
+  test("spilling with hash collisions using the Int.MaxValue key")
     val size = 1000
     val conf = createSparkConf(loadDefaults = true, kryo = false)
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
@@ -229,9 +210,8 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     def mergeValue(buffer: ArrayBuffer[Int], i: Int): ArrayBuffer[Int] =
       buffer += i
     def mergeCombiners(
-        buf1: ArrayBuffer[Int], buf2: ArrayBuffer[Int]): ArrayBuffer[Int] = {
+        buf1: ArrayBuffer[Int], buf2: ArrayBuffer[Int]): ArrayBuffer[Int] =
       buf1 ++= buf2
-    }
 
     val agg = new Aggregator[Int, Int, ArrayBuffer[Int]](
         createCombiner, mergeValue, mergeCombiners)
@@ -241,13 +221,11 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
             (Int.MaxValue, Int.MaxValue)))
     assert(sorter.numSpills > 0, "sorter did not spill")
     val it = sorter.iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       // Should not throw NoSuchElementException
       it.next()
-    }
-  }
 
-  test("spilling with null keys and values") {
+  test("spilling with null keys and values")
     val size = 1000
     val conf = createSparkConf(loadDefaults = true, kryo = false)
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
@@ -277,52 +255,45 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
         ))
     assert(sorter.numSpills > 0, "sorter did not spill")
     val it = sorter.iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       // Should not throw NullPointerException
       it.next()
-    }
-  }
 
   /* ============================= *
    |  Helper test utility methods  |
    * ============================= */
 
   private def createSparkConf(
-      loadDefaults: Boolean, kryo: Boolean): SparkConf = {
+      loadDefaults: Boolean, kryo: Boolean): SparkConf =
     val conf = new SparkConf(loadDefaults)
-    if (kryo) {
+    if (kryo)
       conf.set("spark.serializer", classOf[KryoSerializer].getName)
-    } else {
+    else
       // Make the Java serializer write a reset instruction (TC_RESET) after each object to test
       // for a bug we had with bytes written past the last object in a batch (SPARK-2792)
       conf.set("spark.serializer.objectStreamReset", "1")
       conf.set("spark.serializer", classOf[JavaSerializer].getName)
-    }
     conf.set("spark.shuffle.sort.bypassMergeThreshold", "0")
     // Ensure that we actually have multiple batches per spill file
     conf.set("spark.shuffle.spill.batchSize", "10")
     conf.set("spark.shuffle.spill.initialMemoryThreshold", "512")
     conf
-  }
 
   /**
     * Run a test multiple times, each time with a different serializer.
     */
   private def testWithMultipleSer(name: String, loadDefaults: Boolean = false)(
-      body: (SparkConf => Unit)): Unit = {
-    test(name + " with kryo ser") {
+      body: (SparkConf => Unit)): Unit =
+    test(name + " with kryo ser")
       body(createSparkConf(loadDefaults, kryo = true))
-    }
-    test(name + " with java ser") {
+    test(name + " with java ser")
       body(createSparkConf(loadDefaults, kryo = false))
-    }
-  }
 
   /* =========================================== *
    |  Helper methods that contain the test body  |
    * =========================================== */
 
-  private def emptyDataStream(conf: SparkConf) {
+  private def emptyDataStream(conf: SparkConf)
     conf.set("spark.shuffle.manager", "sort")
     sc = new SparkContext("local", "test", conf)
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
@@ -354,9 +325,8 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
         context, None, Some(new HashPartitioner(3)), None)
     assert(sorter4.iterator.toSeq === Seq())
     sorter4.stop()
-  }
 
-  private def fewElementsPerPartition(conf: SparkConf) {
+  private def fewElementsPerPartition(conf: SparkConf)
     conf.set("spark.shuffle.manager", "sort")
     sc = new SparkContext("local", "test", conf)
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
@@ -404,9 +374,8 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     assert(
         sorter4.partitionedIterator.map(p => (p._1, p._2.toSet)).toSet === expected)
     sorter4.stop()
-  }
 
-  private def emptyPartitionsWithSpilling(conf: SparkConf) {
+  private def emptyPartitionsWithSpilling(conf: SparkConf)
     val size = 1000
     conf.set("spark.shuffle.manager", "sort")
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
@@ -431,61 +400,52 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     assert(iter.next() === (5, List((5, 5))))
     assert(iter.next() === (6, Nil))
     sorter.stop()
-  }
 
   private def testSpillingInLocalCluster(
-      conf: SparkConf, numReduceTasks: Int) {
+      conf: SparkConf, numReduceTasks: Int)
     val size = 5000
     conf.set("spark.shuffle.manager", "sort")
     conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
              (size / 4).toString)
     sc = new SparkContext("local-cluster[1,1,1024]", "test", conf)
 
-    assertSpilled(sc, "reduceByKey") {
+    assertSpilled(sc, "reduceByKey")
       val result = sc
         .parallelize(0 until size)
-        .map { i =>
+        .map  i =>
           (i / 2, i)
-        }
         .reduceByKey(math.max _, numReduceTasks)
         .collect()
       assert(result.length === size / 2)
-      result.foreach {
+      result.foreach
         case (k, v) =>
           val expected = k * 2 + 1
           assert(v === expected,
                  s"Value for $k was wrong: expected $expected, got $v")
-      }
-    }
 
-    assertSpilled(sc, "groupByKey") {
+    assertSpilled(sc, "groupByKey")
       val result = sc
         .parallelize(0 until size)
-        .map { i =>
+        .map  i =>
           (i / 2, i)
-        }
         .groupByKey(numReduceTasks)
         .collect()
       assert(result.length == size / 2)
-      result.foreach {
+      result.foreach
         case (i, seq) =>
           val actual = seq.toSet
           val expected = Set(i * 2, i * 2 + 1)
           assert(actual === expected,
                  s"Value for $i was wrong: expected $expected, got $actual")
-      }
-    }
 
-    assertSpilled(sc, "cogroup") {
-      val rdd1 = sc.parallelize(0 until size).map { i =>
+    assertSpilled(sc, "cogroup")
+      val rdd1 = sc.parallelize(0 until size).map  i =>
         (i / 2, i)
-      }
-      val rdd2 = sc.parallelize(0 until size).map { i =>
+      val rdd2 = sc.parallelize(0 until size).map  i =>
         (i / 2, i)
-      }
       val result = rdd1.cogroup(rdd2, numReduceTasks).collect()
       assert(result.length === size / 2)
-      result.foreach {
+      result.foreach
         case (i, (seq1, seq2)) =>
           val actual1 = seq1.toSet
           val actual2 = seq2.toSet
@@ -494,31 +454,25 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
                  s"Value 1 for $i was wrong: expected $expected, got $actual1")
           assert(actual2 === expected,
                  s"Value 2 for $i was wrong: expected $expected, got $actual2")
-      }
-    }
 
-    assertSpilled(sc, "sortByKey") {
+    assertSpilled(sc, "sortByKey")
       val result = sc
         .parallelize(0 until size)
-        .map { i =>
+        .map  i =>
           (i / 2, i)
-        }
         .sortByKey(numPartitions = numReduceTasks)
         .collect()
-      val expected = (0 until size).map { i =>
+      val expected = (0 until size).map  i =>
         (i / 2, i)
-      }.toArray
+      .toArray
       assert(result.length === size)
-      result.zipWithIndex.foreach {
+      result.zipWithIndex.foreach
         case ((k, _), i) =>
           val (expectedKey, _) = expected(i)
           assert(k === expectedKey,
                  s"Value for $i was wrong: expected $expectedKey, got $k")
-      }
-    }
-  }
 
-  private def cleanupIntermediateFilesInSorter(withFailures: Boolean): Unit = {
+  private def cleanupIntermediateFilesInSorter(withFailures: Boolean): Unit =
     val size = 1200
     val conf = createSparkConf(loadDefaults = false, kryo = false)
     conf.set("spark.shuffle.manager", "sort")
@@ -531,19 +485,16 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
     val sorter = new ExternalSorter[Int, Int, Int](
         context, None, Some(new HashPartitioner(3)), Some(ord))
-    if (withFailures) {
-      intercept[SparkException] {
+    if (withFailures)
+      intercept[SparkException]
         sorter.insertAll(
-            (0 until size).iterator.map { i =>
-          if (i == size - 1) {
+            (0 until size).iterator.map  i =>
+          if (i == size - 1)
             throw new SparkException("intentional failure")
-          }
           (i, i)
-        })
-      }
-    } else {
+        )
+    else
       sorter.insertAll((0 until size).iterator.map(i => (i, i)))
-    }
     assert(
         sorter.iterator.toSet === (0 until expectedSize)
           .map(i => (i, i))
@@ -553,9 +504,8 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     sorter.stop()
     assert(diskBlockManager.getAllFiles().isEmpty,
            "spilled files were not cleaned up")
-  }
 
-  private def cleanupIntermediateFilesInShuffle(withFailures: Boolean): Unit = {
+  private def cleanupIntermediateFilesInShuffle(withFailures: Boolean): Unit =
     val size = 1200
     val conf = createSparkConf(loadDefaults = false, kryo = false)
     conf.set("spark.shuffle.manager", "sort")
@@ -563,83 +513,71 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
              (size / 4).toString)
     sc = new SparkContext("local", "test", conf)
     val diskBlockManager = sc.env.blockManager.diskBlockManager
-    val data = sc.parallelize(0 until size, 2).map { i =>
-      if (withFailures && i == size - 1) {
+    val data = sc.parallelize(0 until size, 2).map  i =>
+      if (withFailures && i == size - 1)
         throw new SparkException("intentional failure")
-      }
       (i, i)
-    }
 
-    assertSpilled(sc, "test shuffle cleanup") {
-      if (withFailures) {
-        intercept[SparkException] {
+    assertSpilled(sc, "test shuffle cleanup")
+      if (withFailures)
+        intercept[SparkException]
           data.reduceByKey(_ + _).count()
-        }
         // After the shuffle, there should be only 2 files on disk: the output of task 1 and
         // its index. All other files (map 2's output and intermediate merge files) should
         // have been deleted.
         assert(diskBlockManager.getAllFiles().length === 2)
-      } else {
+      else
         assert(data.reduceByKey(_ + _).count() === size)
         // After the shuffle, there should be only 4 files on disk: the output of both tasks
         // and their indices. All intermediate merge files should have been deleted.
         assert(diskBlockManager.getAllFiles().length === 4)
-      }
-    }
-  }
 
   private def basicSorterTest(conf: SparkConf,
                               withPartialAgg: Boolean,
                               withOrdering: Boolean,
-                              withSpilling: Boolean) {
+                              withSpilling: Boolean)
     val size = 1000
-    if (withSpilling) {
+    if (withSpilling)
       conf.set("spark.shuffle.spill.numElementsForceSpillThreshold",
                (size / 2).toString)
-    }
     conf.set("spark.shuffle.manager", "sort")
     sc = new SparkContext("local", "test", conf)
     val agg =
-      if (withPartialAgg) {
+      if (withPartialAgg)
         Some(new Aggregator[Int, Int, Int](
                 i => i, (i, j) => i + j, (i, j) => i + j))
-      } else {
+      else
         None
-      }
     val ord = if (withOrdering) Some(implicitly[Ordering[Int]]) else None
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
     val sorter = new ExternalSorter[Int, Int, Int](
         context, agg, Some(new HashPartitioner(3)), ord)
     sorter.insertAll(
-        (0 until size).iterator.map { i =>
+        (0 until size).iterator.map  i =>
       (i / 4, i)
-    })
-    if (withSpilling) {
+    )
+    if (withSpilling)
       assert(sorter.numSpills > 0, "sorter did not spill")
-    } else {
+    else
       assert(sorter.numSpills === 0, "sorter spilled")
-    }
-    val results = sorter.partitionedIterator.map {
+    val results = sorter.partitionedIterator.map
       case (p, vs) => (p, vs.toSet)
-    }.toSet
-    val expected = (0 until 3).map { p =>
-      var v = (0 until size).map { i =>
+    .toSet
+    val expected = (0 until 3).map  p =>
+      var v = (0 until size).map  i =>
         (i / 4, i)
-      }.filter { case (k, _) => k % 3 == p }.toSet
-      if (withPartialAgg) {
+      .filter { case (k, _) => k % 3 == p }.toSet
+      if (withPartialAgg)
         v = v
           .groupBy(_._1)
-          .mapValues { s =>
+          .mapValues  s =>
             s.map(_._2).sum
-          }
           .toSet
-      }
       (p, v.toSet)
-    }.toSet
+    .toSet
     assert(results === expected)
-  }
 
-  private def sortWithoutBreakingSortingContracts(conf: SparkConf) {
+  private def sortWithoutBreakingSortingContracts(conf: SparkConf)
     val size = 100000
     val conf = createSparkConf(loadDefaults = true, kryo = false)
     conf.set("spark.shuffle.manager", "sort")
@@ -649,26 +587,22 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
 
     // Using wrongOrdering to show integer overflow introduced exception.
     val rand = new Random(100L)
-    val wrongOrdering = new Ordering[String] {
-      override def compare(a: String, b: String): Int = {
+    val wrongOrdering = new Ordering[String]
+      override def compare(a: String, b: String): Int =
         val h1 = if (a == null) 0 else a.hashCode()
         val h2 = if (b == null) 0 else b.hashCode()
         h1 - h2
-      }
-    }
 
-    val testData = Array.tabulate(size) { _ =>
+    val testData = Array.tabulate(size)  _ =>
       rand.nextInt().toString
-    }
 
     val context = MemoryTestingUtils.fakeTaskContext(sc.env)
     val sorter1 = new ExternalSorter[String, String, String](
         context, None, None, Some(wrongOrdering))
-    val thrown = intercept[IllegalArgumentException] {
+    val thrown = intercept[IllegalArgumentException]
       sorter1.insertAll(testData.iterator.map(i => (i, i)))
       assert(sorter1.numSpills > 0, "sorter did not spill")
       sorter1.iterator
-    }
 
     assert(thrown.getClass === classOf[IllegalArgumentException])
     assert(thrown.getMessage.contains(
@@ -694,17 +628,15 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
 
     // To validate the hash ordering of key
     var minKey = Int.MinValue
-    sorter2.iterator.foreach {
+    sorter2.iterator.foreach
       case (k, v) =>
         val h = k.hashCode()
         assert(h >= minKey)
         minKey = h
-    }
 
     sorter2.stop()
-  }
 
-  test("sorting updates peak execution memory") {
+  test("sorting updates peak execution memory")
     val spillThreshold = 1000
     val conf = createSparkConf(loadDefaults = false, kryo = false)
       .set("spark.shuffle.manager", "sort")
@@ -714,17 +646,11 @@ class ExternalSorterSuite extends SparkFunSuite with LocalSparkContext {
     // Avoid aggregating here to make sure we're not also using ExternalAppendOnlyMap
     // No spilling
     AccumulatorSuite.verifyPeakExecutionMemorySet(
-        sc, "external sorter without spilling") {
-      assertNotSpilled(sc, "verify peak memory") {
+        sc, "external sorter without spilling")
+      assertNotSpilled(sc, "verify peak memory")
         sc.parallelize(1 to spillThreshold / 2, 2).repartition(100).count()
-      }
-    }
     // With spilling
     AccumulatorSuite.verifyPeakExecutionMemorySet(
-        sc, "external sorter with spilling") {
-      assertSpilled(sc, "verify peak memory") {
+        sc, "external sorter with spilling")
+      assertSpilled(sc, "verify peak memory")
         sc.parallelize(1 to spillThreshold * 3, 2).repartition(100).count()
-      }
-    }
-  }
-}

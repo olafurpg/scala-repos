@@ -1,3 +1,2 @@
-object User {
+object User
   println(Common.name)
-}

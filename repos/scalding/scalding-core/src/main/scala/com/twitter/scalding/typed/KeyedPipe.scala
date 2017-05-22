@@ -20,7 +20,6 @@ package com.twitter.scalding.typed
   * the value type has been erased. Acts as proof that the K in the tuple
   * has an Ordering
   */
-trait KeyedPipe[K] {
+trait KeyedPipe[K]
   def keyOrdering: Ordering[K]
   def mapped: TypedPipe[(K, Any)]
-}

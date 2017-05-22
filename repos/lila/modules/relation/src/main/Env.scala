@@ -13,15 +13,14 @@ final class Env(config: Config,
                 lightUser: String => Option[lila.common.LightUser],
                 followable: String => Fu[Boolean],
                 system: ActorSystem,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val CollectionRelation = config getString "collection.relation"
     val ActorNotifyFreq = config duration "actor.notify_freq"
     val ActorName = config getString "actor.name"
     val MaxFollow = config getInt "limit.follow"
     val MaxBlock = config getInt "limit.block"
-  }
   import settings._
 
   lazy val api = new RelationApi(coll = relationColl,
@@ -42,20 +41,15 @@ final class Env(config: Config,
           )),
       name = ActorName)
 
-  {
     import scala.concurrent.duration._
 
-    scheduler.once(15 seconds) {
-      scheduler.message(ActorNotifyFreq) {
+    scheduler.once(15 seconds)
+      scheduler.message(ActorNotifyFreq)
         actor -> actorApi.NotifyMovement
-      }
-    }
-  }
 
   private[relation] lazy val relationColl = db(CollectionRelation)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "relation" boot new Env(
@@ -67,4 +61,3 @@ object Env {
         followable = lila.pref.Env.current.api.followable _,
         system = lila.common.PlayApp.system,
         scheduler = lila.common.PlayApp.scheduler)
-}

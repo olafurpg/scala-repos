@@ -32,18 +32,16 @@ import javafx.{event => jfxe}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object InputMethodTextRun {
+object InputMethodTextRun
   implicit def sfxInputMethodTextRun2jfx(
       imtr: InputMethodTextRun): jfxsi.InputMethodTextRun =
     if (imtr != null) imtr.delegate else null
-}
 
 class InputMethodTextRun(override val delegate: jfxsi.InputMethodTextRun)
-    extends SFXDelegate[jfxsi.InputMethodTextRun] {
+    extends SFXDelegate[jfxsi.InputMethodTextRun]
 
-  def this(text: String, highlight: InputMethodHighlight) {
+  def this(text: String, highlight: InputMethodHighlight)
     this(new jfxsi.InputMethodTextRun(text, highlight))
-  }
 
   /**
     * Gets the highlight used for displaying this text.
@@ -54,4 +52,3 @@ class InputMethodTextRun(override val delegate: jfxsi.InputMethodTextRun)
     * Gets the text in this run.
     */
   def text = delegate.getText
-}

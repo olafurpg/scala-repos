@@ -34,7 +34,7 @@ import org.apache.spark.sql.execution.QueryExecution
   * multiple different threads.
   */
 @Experimental
-trait QueryExecutionListener {
+trait QueryExecutionListener
 
   /**
     * A callback function that will be called when a query executed successfully.
@@ -60,7 +60,6 @@ trait QueryExecutionListener {
   @DeveloperApi
   def onFailure(
       funcName: String, qe: QueryExecution, exception: Exception): Unit
-}
 
 /**
   * :: Experimental ::
@@ -68,81 +67,64 @@ trait QueryExecutionListener {
   * Manager for [[QueryExecutionListener]]. See [[org.apache.spark.sql.SQLContext.listenerManager]].
   */
 @Experimental
-class ExecutionListenerManager private[sql]() extends Logging {
+class ExecutionListenerManager private[sql]() extends Logging
 
   /**
     * Registers the specified [[QueryExecutionListener]].
     */
   @DeveloperApi
-  def register(listener: QueryExecutionListener): Unit = writeLock {
+  def register(listener: QueryExecutionListener): Unit = writeLock
     listeners += listener
-  }
 
   /**
     * Unregisters the specified [[QueryExecutionListener]].
     */
   @DeveloperApi
-  def unregister(listener: QueryExecutionListener): Unit = writeLock {
+  def unregister(listener: QueryExecutionListener): Unit = writeLock
     listeners -= listener
-  }
 
   /**
     * Removes all the registered [[QueryExecutionListener]].
     */
   @DeveloperApi
-  def clear(): Unit = writeLock {
+  def clear(): Unit = writeLock
     listeners.clear()
-  }
 
   private[sql] def onSuccess(
-      funcName: String, qe: QueryExecution, duration: Long): Unit = {
-    readLock {
-      withErrorHandling { listener =>
+      funcName: String, qe: QueryExecution, duration: Long): Unit =
+    readLock
+      withErrorHandling  listener =>
         listener.onSuccess(funcName, qe, duration)
-      }
-    }
-  }
 
   private[sql] def onFailure(
-      funcName: String, qe: QueryExecution, exception: Exception): Unit = {
-    readLock {
-      withErrorHandling { listener =>
+      funcName: String, qe: QueryExecution, exception: Exception): Unit =
+    readLock
+      withErrorHandling  listener =>
         listener.onFailure(funcName, qe, exception)
-      }
-    }
-  }
 
   private[this] val listeners = ListBuffer.empty[QueryExecutionListener]
 
   /** A lock to prevent updating the list of listeners while we are traversing through them. */
   private[this] val lock = new ReentrantReadWriteLock()
 
-  private def withErrorHandling(f: QueryExecutionListener => Unit): Unit = {
-    for (listener <- listeners) {
-      try {
+  private def withErrorHandling(f: QueryExecutionListener => Unit): Unit =
+    for (listener <- listeners)
+      try
         f(listener)
-      } catch {
+      catch
         case NonFatal(e) =>
           logWarning("Error executing query execution listener", e)
-      }
-    }
-  }
 
   /** Acquires a read lock on the cache for the duration of `f`. */
-  private def readLock[A](f: => A): A = {
+  private def readLock[A](f: => A): A =
     val rl = lock.readLock()
     rl.lock()
-    try f finally {
+    try f finally
       rl.unlock()
-    }
-  }
 
   /** Acquires a write lock on the cache for the duration of `f`. */
-  private def writeLock[A](f: => A): A = {
+  private def writeLock[A](f: => A): A =
     val wl = lock.writeLock()
     wl.lock()
-    try f finally {
+    try f finally
       wl.unlock()
-    }
-  }
-}

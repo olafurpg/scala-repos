@@ -21,13 +21,13 @@ import org.apache.spark.SparkConf
 import scala.language.existentials
 
 // FIXME: move to better location.
-object WorkflowContext extends Logging {
+object WorkflowContext extends Logging
   def apply(
       batch: String = "",
       executorEnv: Map[String, String] = Map(),
       sparkEnv: Map[String, String] = Map(),
       mode: String = ""
-  ): SparkContext = {
+  ): SparkContext =
     val conf = new SparkConf()
     val prefix = if (mode == "") "PredictionIO" else s"PredictionIO ${mode}"
     conf.setAppName(s"${prefix}: ${batch}")
@@ -39,5 +39,3 @@ object WorkflowContext extends Logging {
     val sparkConfString = conf.getAll.toSeq
     debug(s"SparkConf environment: $sparkConfString")
     new SparkContext(conf)
-  }
-}

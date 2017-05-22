@@ -28,7 +28,7 @@ import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, Project, Union}
 import org.apache.spark.sql.types._
 
-class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
+class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter
   val conf = new SimpleCatalystConf(caseSensitiveAnalysis = true)
   val catalog = new SimpleCatalog(conf)
   val analyzer = new Analyzer(catalog, EmptyFunctionRegistry, conf)
@@ -49,44 +49,38 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
   val f: Expression = UnresolvedAttribute("f")
   val b: Expression = UnresolvedAttribute("b")
 
-  before {
+  before
     catalog.registerTable(TableIdentifier("table"), relation)
-  }
 
-  private def checkType(expression: Expression, expectedType: DataType): Unit = {
+  private def checkType(expression: Expression, expectedType: DataType): Unit =
     val plan = Project(Seq(Alias(expression, "c")()), relation)
     assert(analyzer.execute(plan).schema.fields(0).dataType === expectedType)
-  }
 
   private def checkComparison(
-      expression: Expression, expectedType: DataType): Unit = {
+      expression: Expression, expectedType: DataType): Unit =
     val plan = Project(Alias(expression, "c")() :: Nil, relation)
     val comparison = analyzer
       .execute(plan)
-      .collect {
+      .collect
         case Project(Alias(e: BinaryComparison, _) :: Nil, _) => e
-      }
       .head
     assert(comparison.left.dataType === expectedType)
     assert(comparison.right.dataType === expectedType)
-  }
 
   private def checkUnion(
-      left: Expression, right: Expression, expectedType: DataType): Unit = {
+      left: Expression, right: Expression, expectedType: DataType): Unit =
     val plan = Union(Project(Seq(Alias(left, "l")()), relation),
                      Project(Seq(Alias(right, "r")()), relation))
     val (l, r) = analyzer
       .execute(plan)
-      .collect {
+      .collect
         case Union(Seq(child1, child2)) =>
           (child1.output.head, child2.output.head)
-      }
       .head
     assert(l.dataType === expectedType)
     assert(r.dataType === expectedType)
-  }
 
-  test("basic operations") {
+  test("basic operations")
     checkType(Add(d1, d2), DecimalType(6, 2))
     checkType(Subtract(d1, d2), DecimalType(6, 2))
     checkType(Multiply(d1, d2), DecimalType(8, 3))
@@ -100,9 +94,8 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     checkType(Add(Add(d1, d2), d1), DecimalType(7, 2))
     checkType(Add(Add(Add(d1, d2), d1), d2), DecimalType(8, 2))
     checkType(Add(Add(d1, d2), Add(d1, d2)), DecimalType(7, 2))
-  }
 
-  test("Comparison operations") {
+  test("Comparison operations")
     checkComparison(EqualTo(i, d1), DecimalType(11, 1))
     checkComparison(EqualNullSafe(d2, d1), DecimalType(5, 2))
     checkComparison(LessThan(i, d1), DecimalType(11, 1))
@@ -110,9 +103,8 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     checkComparison(GreaterThan(d2, u), DecimalType.SYSTEM_DEFAULT)
     checkComparison(GreaterThanOrEqual(d1, f), DoubleType)
     checkComparison(GreaterThan(d2, d2), DecimalType(5, 2))
-  }
 
-  test("decimal precision for union") {
+  test("decimal precision for union")
     checkUnion(d1, i, DecimalType(11, 1))
     checkUnion(i, d2, DecimalType(12, 2))
     checkUnion(d1, d2, DecimalType(5, 2))
@@ -123,9 +115,8 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     checkUnion(b, d2, DoubleType)
     checkUnion(d1, u, DecimalType.SYSTEM_DEFAULT)
     checkUnion(u, d2, DecimalType.SYSTEM_DEFAULT)
-  }
 
-  test("bringing in primitive types") {
+  test("bringing in primitive types")
     checkType(Add(d1, i), DecimalType(12, 1))
     checkType(Add(d1, f), DoubleType)
     checkType(Add(i, d1), DecimalType(12, 1))
@@ -134,13 +125,11 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     checkType(Add(d1, Cast(i, ShortType)), DecimalType(7, 1))
     checkType(Add(d1, Cast(i, ByteType)), DecimalType(5, 1))
     checkType(Add(d1, Cast(i, DoubleType)), DoubleType)
-  }
 
-  test("maximum decimals") {
-    for (expr <- Seq(d1, d2, i, u)) {
+  test("maximum decimals")
+    for (expr <- Seq(d1, d2, i, u))
       checkType(Add(expr, u), DecimalType.SYSTEM_DEFAULT)
       checkType(Subtract(expr, u), DecimalType.SYSTEM_DEFAULT)
-    }
 
     checkType(Multiply(d1, u), DecimalType(38, 19))
     checkType(Multiply(d2, u), DecimalType(38, 20))
@@ -157,16 +146,14 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     checkType(Remainder(i, u), DecimalType(28, 18))
     checkType(Remainder(u, u), DecimalType.SYSTEM_DEFAULT)
 
-    for (expr <- Seq(f, b)) {
+    for (expr <- Seq(f, b))
       checkType(Add(expr, u), DoubleType)
       checkType(Subtract(expr, u), DoubleType)
       checkType(Multiply(expr, u), DoubleType)
       checkType(Divide(expr, u), DoubleType)
       checkType(Remainder(expr, u), DoubleType)
-    }
-  }
 
-  test("DecimalType.isWiderThan") {
+  test("DecimalType.isWiderThan")
     val d0 = DecimalType(2, 0)
     val d1 = DecimalType(2, 1)
     val d2 = DecimalType(5, 2)
@@ -190,10 +177,9 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
     assert(d4.isWiderThan(LongType) === true)
     assert(d4.isWiderThan(FloatType) === false)
     assert(d4.isWiderThan(DoubleType) === false)
-  }
 
-  test("strength reduction for integer/decimal comparisons - basic test") {
-    Seq(ByteType, ShortType, IntegerType, LongType).foreach { dt =>
+  test("strength reduction for integer/decimal comparisons - basic test")
+    Seq(ByteType, ShortType, IntegerType, LongType).foreach  dt =>
       val int = AttributeReference("a", dt)()
 
       ruleTest(int > Literal(Decimal(4)), int > Literal(4L))
@@ -219,16 +205,14 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
 
       ruleTest(Literal(Decimal(4)) <= int, Literal(4L) <= int)
       ruleTest(Literal(Decimal(4.7)) <= int, Literal(5L) <= int)
-    }
-  }
 
-  test("strength reduction for integer/decimal comparisons - overflow test") {
+  test("strength reduction for integer/decimal comparisons - overflow test")
     val maxValue = Literal(Decimal(Long.MaxValue))
     val overflow = Literal(Decimal(Long.MaxValue) + Decimal(0.1))
     val minValue = Literal(Decimal(Long.MinValue))
     val underflow = Literal(Decimal(Long.MinValue) - Decimal(0.1))
 
-    Seq(ByteType, ShortType, IntegerType, LongType).foreach { dt =>
+    Seq(ByteType, ShortType, IntegerType, LongType).foreach  dt =>
       val int = AttributeReference("a", dt)()
 
       ruleTest(int > maxValue, int > Literal(Long.MaxValue))
@@ -270,14 +254,10 @@ class DecimalPrecisionSuite extends PlanTest with BeforeAndAfter {
       ruleTest(overflow <= int, FalseLiteral)
       ruleTest(minValue <= int, Literal(Long.MinValue) <= int)
       ruleTest(underflow <= int, TrueLiteral)
-    }
-  }
 
   /** strength reduction for integer/decimal comparisons */
-  def ruleTest(initial: Expression, transformed: Expression): Unit = {
+  def ruleTest(initial: Expression, transformed: Expression): Unit =
     val testRelation = LocalRelation(AttributeReference("a", IntegerType)())
     comparePlans(
         DecimalPrecision(Project(Seq(Alias(initial, "a")()), testRelation)),
         Project(Seq(Alias(transformed, "a")()), testRelation))
-  }
-}

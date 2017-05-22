@@ -13,13 +13,13 @@ import scala.concurrent.Future
 
 class AhcCurlRequestLoggerSpec
     extends PlaySpecification with WsTestClient with Mockito
-    with org.specs2.specification.mutable.ExecutionEnvironment {
+    with org.specs2.specification.mutable.ExecutionEnvironment
 
-  def is(implicit ee: ExecutionEnv) = {
+  def is(implicit ee: ExecutionEnv) =
 
-    "AhcCurlRequestLogger" should {
+    "AhcCurlRequestLogger" should
 
-      "log a request with custom headers" in new WithServer {
+      "log a request with custom headers" in new WithServer
         val client = wsUrl("/")
         val logger = mock[Logger]
 
@@ -41,9 +41,8 @@ class AhcCurlRequestLoggerSpec
                               |  --header 'user-agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.94 Safari/537.36' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
         there was one(logger).info(curlStatement)
-      }
 
-      "log a request with POST" in new WithServer() {
+      "log a request with POST" in new WithServer()
         val client = wsUrl("/")
         val logger = mock[Logger]
 
@@ -59,9 +58,8 @@ class AhcCurlRequestLoggerSpec
                               |  --data 'key=value' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
         there was one(logger).info(curlStatement)
-      }
 
-      "log a request with POST with an explicit content type" in new WithServer() {
+      "log a request with POST with an explicit content type" in new WithServer()
         val client = wsUrl("/")
         val logger = mock[Logger]
         val headers = Seq("Content-Type" -> "text/plain; charset=utf-8")
@@ -79,9 +77,8 @@ class AhcCurlRequestLoggerSpec
                               |  --data 'this is plain text' \\
                               |  'http://localhost:$testServerPort/'""".stripMargin
         there was one(logger).info(curlStatement)
-      }
 
-      "log a query string" in new WithServer() {
+      "log a query string" in new WithServer()
         val client = wsUrl("/")
         val logger = mock[Logger]
         val requestLogger = AhcCurlRequestLogger(logger)
@@ -97,9 +94,8 @@ class AhcCurlRequestLoggerSpec
                               |  --request GET \\
                               |  'http://localhost:$testServerPort/?search=%26%3F%24HOME%27'""".stripMargin
         there was one(logger).info(curlStatement)
-      }
 
-      "log a request with POST with a hanging quote" in new WithServer() {
+      "log a request with POST with a hanging quote" in new WithServer()
         val client = wsUrl("/")
         val logger = mock[Logger]
         val requestLogger = AhcCurlRequestLogger(logger)
@@ -121,9 +117,8 @@ class AhcCurlRequestLoggerSpec
                               |  'http://localhost:$testServerPort/'""".stripMargin
 
         there was one(logger).info(curlStatement)
-      }
 
-      "log a request with PUT" in new WithServer {
+      "log a request with PUT" in new WithServer
         val client = wsUrl("/")
         val logger = mock[Logger]
 
@@ -141,7 +136,6 @@ class AhcCurlRequestLoggerSpec
                               |  'http://localhost:$testServerPort/'""".stripMargin
 
         there was one(logger).info(curlStatement)
-      }
       //
       //      "log a request with a proxy" in new WithServer {
       //        val client = wsUrl("/")
@@ -162,6 +156,3 @@ class AhcCurlRequestLoggerSpec
       //
       //        there was one(logger).info(curlStatement)
       //      }
-    }
-  }
-}

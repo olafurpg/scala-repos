@@ -41,7 +41,7 @@ import spire.algebra.lattice.Heyting
   * only have the overhead of a single Int. However, in some situations
   * it will be boxed.
   */
-class Trilean(val value: Int) extends AnyVal { lhs =>
+class Trilean(val value: Int) extends AnyVal  lhs =>
   def isTrue: Boolean = value == -1
   def isFalse: Boolean = value == 0
   def isUnknown: Boolean = value == 1
@@ -124,9 +124,8 @@ class Trilean(val value: Int) extends AnyVal { lhs =>
     if (lhs.value == 1) lhs
     else if (rhs.value == 1) rhs
     else new Trilean(~(lhs.value ^ rhs.value))
-}
 
-object Trilean {
+object Trilean
   final val True: Trilean = new Trilean(-1)
   final val False: Trilean = new Trilean(0)
   final val Unknown: Trilean = new Trilean(1)
@@ -140,11 +139,10 @@ object Trilean {
   final def apply(t: scala.util.Try[Boolean]): Trilean =
     t.map(Trilean(_)).getOrElse(Unknown)
 
-  final def liftPf[A](p0: PartialFunction[A, Boolean]): A => Trilean = {
+  final def liftPf[A](p0: PartialFunction[A, Boolean]): A => Trilean =
     val p = p0.andThen(Trilean(_))
     (a: A) =>
       p.applyOrElse(a, (_: A) => Unknown)
-  }
 
   final def testRef[A <: AnyRef](a: A)(f: A => Boolean): Trilean =
     if (a == null) Unknown else Trilean(f(a))
@@ -156,20 +154,17 @@ object Trilean {
     if (java.lang.Double.isNaN(n)) Unknown else Trilean(f(n))
 
   final def run(body: => Boolean): Trilean =
-    try {
+    try
       apply(body)
-    } catch {
+    catch
       case _: Exception => Unknown
-    }
 
   implicit val algebra = new TrileanAlgebra
-}
 
-class TrileanAlgebra extends Heyting[Trilean] {
+class TrileanAlgebra extends Heyting[Trilean]
   def one: Trilean = Trilean.True
   def zero: Trilean = Trilean.False
   def complement(a: Trilean): Trilean = !a
   def and(a: Trilean, b: Trilean): Trilean = a & b
   def or(a: Trilean, b: Trilean): Trilean = a | b
   def imp(a: Trilean, b: Trilean): Trilean = a imp b
-}

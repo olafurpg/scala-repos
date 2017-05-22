@@ -33,14 +33,13 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object Glow {
+object Glow
   implicit def sfxGlow2jfx(g: Glow): jfxse.Glow =
     if (g != null) g.delegate else null
-}
 
 class Glow(override val delegate: jfxse.Glow = new jfxse.Glow)
     extends Effect(delegate) with InputDelegate[jfxse.Glow]
-    with SFXDelegate[jfxse.Glow] {
+    with SFXDelegate[jfxse.Glow]
 
   /**
     * Creates a new instance of Glow with specified level.
@@ -51,7 +50,5 @@ class Glow(override val delegate: jfxse.Glow = new jfxse.Glow)
     * The level value, which controls the intensity of the glow effect.
     */
   def level: DoubleProperty = delegate.levelProperty
-  def level_=(v: Double) {
+  def level_=(v: Double)
     level() = v
-  }
-}

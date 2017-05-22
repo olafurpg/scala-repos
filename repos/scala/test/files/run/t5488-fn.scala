@@ -4,8 +4,8 @@ class C[
     @specialized(Int, AnyRef) A, @specialized(Int, AnyRef) B, @specialized(Int, AnyRef) C](
     f: (A, B) => C)
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     def show(x: Any) = println(x.getClass.getName)
 
     show(new B((x: Int) => 1))
@@ -26,5 +26,3 @@ object Test {
     show(new C((x: AnyRef, y: Int) => "abc"))
     show(new C((x: AnyRef, y: AnyRef) => 1))
     show(new C((x: AnyRef, y: AnyRef) => "abc"))
-  }
-}

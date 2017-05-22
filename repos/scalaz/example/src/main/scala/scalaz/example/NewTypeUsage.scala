@@ -1,6 +1,6 @@
 package scalaz.example
 
-object NewTypeUsage extends App {
+object NewTypeUsage extends App
 
   import scalaz._
   import std.anyVal.{booleanInstance, booleanDisjunctionNewTypeInstance, booleanConjunctionNewTypeInstance}
@@ -20,4 +20,3 @@ object NewTypeUsage extends App {
 
   val boolConjunctions: List[Boolean @@ Conjunction] = Tag.subst(bools)
   assert(!Tag.unwrap(listInstance.fold(boolConjunctions)))
-}

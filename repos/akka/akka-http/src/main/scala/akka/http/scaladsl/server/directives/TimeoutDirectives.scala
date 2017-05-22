@@ -10,7 +10,7 @@ import akka.http.scaladsl.server.{Directive, Directive0}
 
 import scala.concurrent.duration.Duration
 
-trait TimeoutDirectives {
+trait TimeoutDirectives
 
   def withoutRequestTimeout: Directive0 =
     withRequestTimeout(Duration.Inf)
@@ -47,19 +47,16 @@ trait TimeoutDirectives {
   def withRequestTimeout(
       timeout: Duration,
       handler: Option[HttpRequest ⇒ HttpResponse]): Directive0 =
-    Directive { inner ⇒ ctx ⇒
-      ctx.request.header[`Timeout-Access`] match {
+    Directive  inner ⇒ ctx ⇒
+      ctx.request.header[`Timeout-Access`] match
         case Some(t) ⇒
-          handler match {
+          handler match
             case Some(h) ⇒ t.timeoutAccess.update(timeout, h)
             case _ ⇒ t.timeoutAccess.updateTimeout(timeout)
-          }
         case _ ⇒
           ctx.log.warning(
               "withRequestTimeout was used in route however no request-timeout is set!")
-      }
       inner()(ctx)
-    }
 
   /**
     * Tries to set a new request timeout handler, which produces the timeout response for a
@@ -70,15 +67,12 @@ trait TimeoutDirectives {
     */
   def withRequestTimeoutResponse(
       handler: HttpRequest ⇒ HttpResponse): Directive0 =
-    Directive { inner ⇒ ctx ⇒
-      ctx.request.header[`Timeout-Access`] match {
+    Directive  inner ⇒ ctx ⇒
+      ctx.request.header[`Timeout-Access`] match
         case Some(t) ⇒ t.timeoutAccess.updateHandler(handler)
         case _ ⇒
           ctx.log.warning(
               "withRequestTimeoutResponse was used in route however no request-timeout is set!")
-      }
       inner()(ctx)
-    }
-}
 
 object TimeoutDirectives extends TimeoutDirectives

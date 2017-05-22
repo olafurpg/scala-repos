@@ -42,9 +42,9 @@ import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, Produce
   * Then we compare the final message in both logs for each key. If this final message is not the same for all keys we
   * print an error and exit with exit code 1, otherwise we print the size reduction and exit with exit code 0.
   */
-object TestLogCleaning {
+object TestLogCleaning
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val parser = new OptionParser
     val numMessagesOpt = parser
       .accepts("messages", "The number of messages to send or consume.")
@@ -107,10 +107,9 @@ object TestLogCleaning {
       CommandLineUtils.printUsageAndDie(
           parser, "An integration test for log cleaning.")
 
-    if (options.has(dumpOpt)) {
+    if (options.has(dumpOpt))
       dumpLog(new File(options.valueOf(dumpOpt)))
       System.exit(0)
-    }
 
     CommandLineUtils.checkRequiredArgs(
         parser, options, brokerOpt, zkConnectOpt, numMessagesOpt)
@@ -148,13 +147,12 @@ object TestLogCleaning {
     validateOutput(producedDataFile, consumedDataFile)
     producedDataFile.delete()
     consumedDataFile.delete()
-  }
 
-  def dumpLog(dir: File) {
+  def dumpLog(dir: File)
     require(dir.exists, "Non-existent directory: " + dir.getAbsolutePath)
-    for (file <- dir.list.sorted; if file.endsWith(Log.LogFileSuffix)) {
+    for (file <- dir.list.sorted; if file.endsWith(Log.LogFileSuffix))
       val ms = new FileMessageSet(new File(dir, file))
-      for (entry <- ms) {
+      for (entry <- ms)
         val key = TestUtils.readString(entry.message.key)
         val content =
           if (entry.message.isNull) null
@@ -162,13 +160,10 @@ object TestLogCleaning {
         println(
             "offset = %s, key = %s, content = %s".format(
                 entry.offset, key, content))
-      }
-    }
-  }
 
   def lineCount(file: File): Int = io.Source.fromFile(file).getLines.size
 
-  def validateOutput(producedDataFile: File, consumedDataFile: File) {
+  def validateOutput(producedDataFile: File, consumedDataFile: File)
     val producedReader = externalSort(producedDataFile)
     val consumedReader = externalSort(consumedDataFile)
     val produced = valuesIterator(producedReader)
@@ -183,7 +178,7 @@ object TestLogCleaning {
         new FileWriter(consumedDedupedFile), 1024 * 1024)
     var total = 0
     var mismatched = 0
-    while (produced.hasNext && consumed.hasNext) {
+    while (produced.hasNext && consumed.hasNext)
       val p = produced.next()
       producedDeduped.write(p.toString)
       producedDeduped.newLine()
@@ -192,7 +187,6 @@ object TestLogCleaning {
       consumedDeduped.newLine()
       if (p != c) mismatched += 1
       total += 1
-    }
     producedDeduped.close()
     consumedDeduped.close()
     println("Validated " + total + " values, " + mismatched + " mismatches.")
@@ -204,42 +198,35 @@ object TestLogCleaning {
     // if all the checks worked out we can delete the deduped files
     producedDedupedFile.delete()
     consumedDedupedFile.delete()
-  }
 
-  def valuesIterator(reader: BufferedReader) = {
-    new IteratorTemplate[TestRecord] {
-      def makeNext(): TestRecord = {
+  def valuesIterator(reader: BufferedReader) =
+    new IteratorTemplate[TestRecord]
+      def makeNext(): TestRecord =
         var next = readNext(reader)
         while (next != null && next.delete) next = readNext(reader)
         if (next == null) allDone()
         else next
-      }
-    }
-  }
 
-  def readNext(reader: BufferedReader): TestRecord = {
+  def readNext(reader: BufferedReader): TestRecord =
     var line = reader.readLine()
     if (line == null) return null
     var curr = new TestRecord(line)
-    while (true) {
+    while (true)
       line = peekLine(reader)
       if (line == null) return curr
       val next = new TestRecord(line)
       if (next == null || next.topicAndKey != curr.topicAndKey) return curr
       curr = next
       reader.readLine()
-    }
     null
-  }
 
-  def peekLine(reader: BufferedReader) = {
+  def peekLine(reader: BufferedReader) =
     reader.mark(4096)
     val line = reader.readLine
     reader.reset()
     line
-  }
 
-  def externalSort(file: File): BufferedReader = {
+  def externalSort(file: File): BufferedReader =
     val builder = new ProcessBuilder(
         "sort",
         "--key=1,2",
@@ -248,27 +235,23 @@ object TestLogCleaning {
         "--temporary-directory=" + System.getProperty("java.io.tmpdir"),
         file.getAbsolutePath)
     val process = builder.start()
-    new Thread() {
-      override def run() {
+    new Thread()
+      override def run()
         val exitCode = process.waitFor()
-        if (exitCode != 0) {
+        if (exitCode != 0)
           System.err.println("Process exited abnormally.")
-          while (process.getErrorStream.available > 0) {
+          while (process.getErrorStream.available > 0)
             System.err.write(process.getErrorStream().read())
-          }
-        }
-      }
-    }.start()
+    .start()
     new BufferedReader(
         new InputStreamReader(process.getInputStream()), 10 * 1024 * 1024)
-  }
 
   def produceMessages(brokerUrl: String,
                       topics: Array[String],
                       messages: Long,
                       compressionType: String,
                       dups: Int,
-                      percentDeletes: Int): File = {
+                      percentDeletes: Int): File =
     val producerProps = new Properties
     producerProps.setProperty(
         ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MaxValue.toString)
@@ -290,7 +273,7 @@ object TestLogCleaning {
     println("Logging produce requests to " + producedFile.getAbsolutePath)
     val producedWriter = new BufferedWriter(
         new FileWriter(producedFile), 1024 * 1024)
-    for (i <- 0L until (messages * topics.length)) {
+    for (i <- 0L until (messages * topics.length))
       val topic = topics((i % topics.length).toInt)
       val key = rand.nextInt(keyCount)
       val delete = i % 100 < percentDeletes
@@ -304,14 +287,12 @@ object TestLogCleaning {
       producer.send(msg)
       producedWriter.write(TestRecord(topic, key, i, delete).toString)
       producedWriter.newLine()
-    }
     producedWriter.close()
     producer.close()
     producedFile
-  }
 
   def makeConsumer(
-      zkUrl: String, topics: Array[String]): ZookeeperConsumerConnector = {
+      zkUrl: String, topics: Array[String]): ZookeeperConsumerConnector =
     val consumerProps = new Properties
     consumerProps.setProperty(
         "group.id", "log-cleaner-test-" + new Random().nextInt(Int.MaxValue))
@@ -319,9 +300,8 @@ object TestLogCleaning {
     consumerProps.setProperty("consumer.timeout.ms", (20 * 1000).toString)
     consumerProps.setProperty("auto.offset.reset", "smallest")
     new ZookeeperConsumerConnector(new ConsumerConfig(consumerProps))
-  }
 
-  def consumeMessages(zkUrl: String, topics: Array[String]): File = {
+  def consumeMessages(zkUrl: String, topics: Array[String]): File =
     val connector = makeConsumer(zkUrl, topics)
     val streams = connector.createMessageStreams(
         topics.map(topic => (topic, 1)).toMap,
@@ -331,32 +311,26 @@ object TestLogCleaning {
       File.createTempFile("kafka-log-cleaner-consumed-", ".txt")
     println("Logging consumed messages to " + consumedFile.getAbsolutePath)
     val consumedWriter = new BufferedWriter(new FileWriter(consumedFile))
-    for (topic <- topics) {
+    for (topic <- topics)
       val stream = streams(topic).head
-      try {
-        for (item <- stream) {
+      try
+        for (item <- stream)
           val delete = item.message == null
           val value = if (delete) -1L else item.message.toLong
           consumedWriter.write(
               TestRecord(topic, item.key.toInt, value, delete).toString)
           consumedWriter.newLine()
-        }
-      } catch {
+      catch
         case e: ConsumerTimeoutException =>
-      }
-    }
     consumedWriter.close()
     connector.shutdown()
     consumedFile
-  }
-}
 
 case class TestRecord(
-    val topic: String, val key: Int, val value: Long, val delete: Boolean) {
+    val topic: String, val key: Int, val value: Long, val delete: Boolean)
   def this(pieces: Array[String]) =
     this(pieces(0), pieces(1).toInt, pieces(2).toLong, pieces(3) == "d")
   def this(line: String) = this(line.split("\t"))
   override def toString() =
     topic + "\t" + key + "\t" + value + "\t" + (if (delete) "d" else "u")
   def topicAndKey = topic + key
-}

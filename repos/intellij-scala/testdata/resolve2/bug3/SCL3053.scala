@@ -1,4 +1,4 @@
-object test {
+object test
   case class Device(name: String)
 
   type ProfileMappings = PartialFunction[Device, String]
@@ -8,11 +8,9 @@ object test {
 
   def profileMappings_=(mappings: ProfileMappings) {}
 
-  profileMappings = {
+  profileMappings =
     case device if device. /*line: 2*/ name.endsWith("PFH") => "profile_A"
-  }: ProfileMappings
+  : ProfileMappings
 
-  profileMappings = {
+  profileMappings =
     case device if device. /*line: 2*/ name.endsWith("PFH") => "profile_A"
-  }
-}

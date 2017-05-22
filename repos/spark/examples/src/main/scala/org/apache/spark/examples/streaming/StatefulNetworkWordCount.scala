@@ -34,12 +34,11 @@ import org.apache.spark.streaming._
   *    `$ bin/run-example
   *      org.apache.spark.examples.streaming.StatefulNetworkWordCount localhost 9999`
   */
-object StatefulNetworkWordCount {
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+object StatefulNetworkWordCount
+  def main(args: Array[String])
+    if (args.length < 2)
       System.err.println("Usage: StatefulNetworkWordCount <hostname> <port>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -61,18 +60,14 @@ object StatefulNetworkWordCount {
     // Update the cumulative count using mapWithState
     // This will give a DStream made of state (which is the cumulative count of the words)
     val mappingFunc = (word: String, one: Option[Int], state: State[Int]) =>
-      {
         val sum = one.getOrElse(0) + state.getOption.getOrElse(0)
         val output = (word, sum)
         state.update(sum)
         output
-    }
 
     val stateDstream = wordDstream.mapWithState(
         StateSpec.function(mappingFunc).initialState(initialRDD))
     stateDstream.print()
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 // scalastyle:on println

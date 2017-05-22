@@ -24,21 +24,20 @@ import breeze.linalg.{DenseMatrix => BDM, DenseVector => BDV}
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.TestingUtils._
 
-class NNLSSuite extends SparkFunSuite {
+class NNLSSuite extends SparkFunSuite
 
   /** Generate an NNLS problem whose optimal solution is the all-ones vector. */
-  def genOnesData(n: Int, rand: Random): (BDM[Double], BDV[Double]) = {
+  def genOnesData(n: Int, rand: Random): (BDM[Double], BDV[Double]) =
     val A = new BDM(n, n, Array.fill(n * n)(rand.nextDouble()))
     val b = A * new BDV(Array.fill(n)(1.0))
     (A.t * A, A.t * b)
-  }
 
   /** Compute the objective value */
   def computeObjectiveValue(
       ata: BDM[Double], atb: BDV[Double], x: BDV[Double]): Double =
     (x.t * ata * x) / 2.0 - atb.dot(x)
 
-  test("NNLS: exact solution cases") {
+  test("NNLS: exact solution cases")
     val n = 20
     val rand = new Random(12346)
     val ws = NNLS.createWorkspace(n)
@@ -48,7 +47,7 @@ class NNLSSuite extends SparkFunSuite {
     // can legitimately fail to solve these anywhere close to exactly.  So we grab a considerable
     // sample of these matrices and make sure that we solved a substantial fraction of them.
 
-    for (k <- 0 until 100) {
+    for (k <- 0 until 100)
       val (ata, atb) = genOnesData(n, rand)
       val x = new BDV(NNLS.solve(ata.data, atb.data, ws))
       assert(x.length === n)
@@ -56,15 +55,12 @@ class NNLSSuite extends SparkFunSuite {
       val solved =
         (breeze.linalg.norm(x - answer) < 0.01) && // L2 norm
         ((x - answer).toArray.map(_.abs).max < 0.001) // inf norm
-      if (solved) {
+      if (solved)
         numSolved += 1
-      }
-    }
 
     assert(numSolved > 50)
-  }
 
-  test("NNLS: nonnegativity constraint active") {
+  test("NNLS: nonnegativity constraint active")
     val n = 5
     val ata = Array(4.377,
                     -3.531,
@@ -97,13 +93,11 @@ class NNLSSuite extends SparkFunSuite {
 
     val ws = NNLS.createWorkspace(n)
     val x = NNLS.solve(ata, atb, ws)
-    for (i <- 0 until n) {
+    for (i <- 0 until n)
       assert(x(i) ~== goodx(i) absTol 1E-3)
       assert(x(i) >= 0)
-    }
-  }
 
-  test("NNLS: objective value test") {
+  test("NNLS: objective value test")
     val n = 5
     val ata = new BDM(5,
                       5,
@@ -144,5 +138,3 @@ class NNLSSuite extends SparkFunSuite {
     val obj = computeObjectiveValue(ata, atb, x)
 
     assert(obj < refObj + 1E-5)
-  }
-}

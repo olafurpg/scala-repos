@@ -1,4 +1,4 @@
-object SCL9429 {
+object SCL9429
 
   case class UnneccessarillyGiantCaseClass23(val a1: Int,
                                              val b2: Int,
@@ -24,8 +24,8 @@ object SCL9429 {
                                              val f22: Int,
                                              val f23: String)
 
-  def foo(i: Any) {
-    i match {
+  def foo(i: Any)
+    i match
       case UnneccessarillyGiantCaseClass23(protection,
                                            friends,
                                            autoEnableGps,
@@ -51,8 +51,5 @@ object SCL9429 {
                                            sendSimChangeBySms) =>
         val s = /*start*/ sendSimChangeBySms /*end*/
       case _ =>
-    }
-  }
-}
 
 //String

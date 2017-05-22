@@ -9,14 +9,12 @@ import org.jetbrains.sbt.project.SbtProjectSystem
   * @author Nikolay Obedin
   * @since 12/18/15.
   */
-class StartupRoutine extends ApplicationComponent.Adapter {
-  override def initComponent(): Unit = {
+class StartupRoutine extends ApplicationComponent.Adapter
+  override def initComponent(): Unit =
     setUpExternalSystemToPerformImportInIdeaProcess()
-  }
 
   private def setUpExternalSystemToPerformImportInIdeaProcess(): Unit =
     Registry
       .get(SbtProjectSystem.Id +
           ExternalSystemConstants.USE_IN_PROCESS_COMMUNICATION_REGISTRY_KEY_SUFFIX)
       .setValue(true)
-}

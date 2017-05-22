@@ -17,36 +17,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 import scala.scalajs.runtime.genTraversableOnce2jsArray
 
-sealed abstract class JSConvertersLowPrioImplicits {
+sealed abstract class JSConvertersLowPrioImplicits
   this: JSConverters.type =>
 
   @inline
   implicit def JSRichFutureNonThenable[A](f: Future[A]): JSRichFuture[A] =
     new JSRichFuture[A](f.asInstanceOf[Future[A | Thenable[A]]])
-}
 
 /** A collection of decorators that allow converting Scala types to
   *  corresponding JS facade types
   */
-object JSConverters extends JSConvertersLowPrioImplicits {
+object JSConverters extends JSConvertersLowPrioImplicits
 
-  implicit class JSRichOption[T](val opt: Option[T]) extends AnyVal {
+  implicit class JSRichOption[T](val opt: Option[T]) extends AnyVal
     @inline final def orUndefined: UndefOr[T] =
       opt.fold[UndefOr[T]](undefined)(v => v)
-  }
 
   implicit class JSRichGenTraversableOnce[T](val col: GenTraversableOnce[T])
-      extends AnyVal {
+      extends AnyVal
     @inline final def toJSArray: Array[T] = genTraversableOnce2jsArray(col)
-  }
 
-  implicit class JSRichGenMap[T](val map: GenMap[String, T]) extends AnyVal {
-    @inline final def toJSDictionary: Dictionary[T] = {
+  implicit class JSRichGenMap[T](val map: GenMap[String, T]) extends AnyVal
+    @inline final def toJSDictionary: Dictionary[T] =
       val result = Dictionary.empty[T]
       map.foreach { case (key, value) => result(key) = value }
       result
-    }
-  }
 
   @inline
   implicit def genTravConvertible2JSRichGenTrav[T, C](coll: C)(
@@ -67,7 +62,7 @@ object JSConverters extends JSConvertersLowPrioImplicits {
     new JSRichFuture[A](f.asInstanceOf[Future[A | Thenable[A]]])
 
   final class JSRichFuture[A](val self: Future[A | Thenable[A]])
-      extends AnyVal {
+      extends AnyVal
 
     /** Converts the Future to a JavaScript [[Promise]].
       *
@@ -78,21 +73,17 @@ object JSConverters extends JSConvertersLowPrioImplicits {
       *  The signature of the `toJSPromise` method is only valid
       *  <i>provided that</i> the values of `A` do not have a `then` method.
       */
-    def toJSPromise(implicit executor: ExecutionContext): Promise[A] = {
-      new Promise[A]({
+    def toJSPromise(implicit executor: ExecutionContext): Promise[A] =
+      new Promise[A](
         (resolve: js.Function1[A | Thenable[A], _],
         reject: js.Function1[scala.Any, _]) =>
-          self onComplete {
+          self onComplete
             case scala.util.Success(value) =>
               resolve(value)
 
             case scala.util.Failure(th) =>
-              reject(th match {
+              reject(th match
                 case JavaScriptException(e) => e
                 case _ => th
-              })
-          }
-      })
-    }
-  }
-}
+              )
+      )

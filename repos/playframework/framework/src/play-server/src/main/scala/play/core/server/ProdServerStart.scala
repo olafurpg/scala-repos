@@ -12,15 +12,14 @@ import scala.util.control.NonFatal
   * used in production. The application is loaded and started
   * immediately.
   */
-object ProdServerStart {
+object ProdServerStart
 
   /**
     * Start a prod mode server from the command line.
     */
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val process = new RealServerProcess(args)
     start(process)
-  }
 
   /**
     * Starts a Play server and application for the given process. The settings
@@ -30,8 +29,8 @@ object ProdServerStart {
     * @param process The process (real or abstract) to use for starting the
     * server.
     */
-  def start(process: ServerProcess): ServerWithStop = {
-    try {
+  def start(process: ServerProcess): ServerWithStop =
+    try
 
       // Read settings
       val config: ServerConfig = readServerConfigSettings(process)
@@ -40,69 +39,59 @@ object ProdServerStart {
       val pidFile = createPidFile(process, config.configuration)
 
       // Start the application
-      val application: Application = {
+      val application: Application =
         val environment = Environment(
             config.rootDir, process.classLoader, Mode.Prod)
         val context = ApplicationLoader.createContext(environment)
         val loader = ApplicationLoader(context)
         loader.load(context)
-      }
       Play.start(application)
 
       // Start the server
       val serverProvider: ServerProvider = ServerProvider.fromConfiguration(
           process.classLoader, config.configuration)
       val server = serverProvider.createServer(config, application)
-      process.addShutdownHook {
+      process.addShutdownHook
         server.stop()
         pidFile.foreach(_.delete())
         assert(!pidFile.exists(_.exists), "PID file should not exist!")
-      }
       server
-    } catch {
+    catch
       case ServerStartException(message, cause) =>
         process.exit(message, cause)
       case NonFatal(e) =>
         process.exit("Oops, cannot start the server.", cause = Some(e))
-    }
-  }
 
   /**
     * Read the server config from the current process's command
     * line args and system properties.
     */
-  def readServerConfigSettings(process: ServerProcess): ServerConfig = {
-    val configuration: Configuration = {
+  def readServerConfigSettings(process: ServerProcess): ServerConfig =
+    val configuration: Configuration =
       val rootDirArg: Option[File] = process.args.headOption.map(new File(_))
       val rootDirConfig = rootDirArg.fold(Map.empty[String, String])(
           dir => ServerConfig.rootDirConfig(dir))
       Configuration.load(
           process.classLoader, process.properties, rootDirConfig, true)
-    }
 
-    val rootDir: File = {
+    val rootDir: File =
       val path = configuration
         .getString("play.server.dir")
         .getOrElse(throw ServerStartException("No root server path supplied"))
       val file = new File(path)
-      if (!(file.exists && file.isDirectory)) {
+      if (!(file.exists && file.isDirectory))
         throw ServerStartException(s"Bad root server path: $path")
-      }
       file
-    }
 
-    def parsePort(portType: String): Option[Int] = {
-      configuration.getString(s"play.server.${portType}.port").flatMap {
+    def parsePort(portType: String): Option[Int] =
+      configuration.getString(s"play.server.${portType}.port").flatMap
         case "disabled" => None
         case str =>
-          val i = try Integer.parseInt(str) catch {
+          val i = try Integer.parseInt(str) catch
             case _: NumberFormatException =>
               throw ServerStartException(
                   s"Invalid ${portType.toUpperCase} port: $str")
-          }
           Some(i)
-      }
-    }
 
     val httpPort = parsePort("http")
     val httpsPort = parsePort("https")
@@ -121,24 +110,22 @@ object ProdServerStart {
         properties = process.properties,
         configuration = configuration
     )
-  }
 
   /**
     * Create a pid file for the current process.
     */
   def createPidFile(
-      process: ServerProcess, configuration: Configuration): Option[File] = {
+      process: ServerProcess, configuration: Configuration): Option[File] =
     val pidFilePath = configuration
       .getString("play.server.pidfile.path")
       .getOrElse(throw ServerStartException("Pid file path not configured"))
     if (pidFilePath == "/dev/null") None
-    else {
+    else
       val pidFile = new File(pidFilePath).getAbsoluteFile
 
-      if (pidFile.exists) {
+      if (pidFile.exists)
         throw ServerStartException(
             s"This application is already running (Or delete ${pidFile.getPath} file).")
-      }
 
       val pid =
         process.pid getOrElse
@@ -148,6 +135,3 @@ object ProdServerStart {
       try out.write(pid.getBytes) finally out.close()
 
       Some(pidFile)
-    }
-  }
-}

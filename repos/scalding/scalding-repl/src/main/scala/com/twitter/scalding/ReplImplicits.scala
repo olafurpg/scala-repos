@@ -27,7 +27,7 @@ import scala.concurrent.{Future, ExecutionContext => ConcurrentExecutionContext}
   * Object containing various implicit conversions required to create Scalding flows in the REPL.
   * Most of these conversions come from the [[com.twitter.scalding.Job]] class.
   */
-trait BaseReplState {
+trait BaseReplState
 
   /** required for switching to hdfs local mode */
   private val mr1Key = "mapred.job.tracker"
@@ -47,66 +47,53 @@ trait BaseReplState {
   private[scalding] var storedHdfsMode: Option[Hdfs] = None
 
   /** Switch to Local mode */
-  def useLocalMode() {
+  def useLocalMode()
     mode = Local(false)
     printModeBanner()
-  }
 
-  def useStrictLocalMode() {
+  def useStrictLocalMode()
     mode = Local(true)
     printModeBanner()
-  }
 
   /** Switch to Hdfs mode */
-  private def useHdfsMode_() {
-    storedHdfsMode match {
+  private def useHdfsMode_()
+    storedHdfsMode match
       case Some(hdfsMode) => mode = hdfsMode
       case None =>
         println(
             "To use HDFS/Hadoop mode, you must *start* the repl in hadoop mode to get the hadoop configuration from the hadoop command.")
-    }
-  }
 
-  def useHdfsMode() {
+  def useHdfsMode()
     useHdfsMode_()
     customConfig -= mr1Key
     customConfig -= mr2Key
     printModeBanner()
-  }
 
-  def useHdfsLocalMode() {
+  def useHdfsLocalMode()
     useHdfsMode_()
     customConfig += mr1Key -> mrLocal
     customConfig += mr2Key -> mrLocal
     printModeBanner()
-  }
 
-  private[scalding] def printModeBanner(): Unit = {
-    val (modeString, homeDir) = mode match {
-      case localMode: Local => {
+  private[scalding] def printModeBanner(): Unit =
+    val (modeString, homeDir) = mode match
+      case localMode: Local =>
           (localMode.toString, System.getProperty("user.dir"))
-        }
-      case hdfsMode: Hdfs => {
+      case hdfsMode: Hdfs =>
           val defaultFs = FileSystem.get(hdfsMode.jobConf)
-          val m = customConfig.get(mr2Key) match {
+          val m = customConfig.get(mr2Key) match
             case Some("local") =>
               s"${hdfsMode.getClass.getSimpleName}Local(${hdfsMode.strict})"
             case _ =>
               s"${hdfsMode.getClass.getSimpleName}(${hdfsMode.strict})"
-          }
           (m, defaultFs.getWorkingDirectory.toString)
-        }
-    }
     println(s"${Console.GREEN}#### Scalding mode: ${modeString}")
     println(s"#### User home: ${homeDir}${Console.RESET}")
-  }
 
-  private def modeHadoopConf: Configuration = {
-    mode match {
+  private def modeHadoopConf: Configuration =
+    mode match
       case hdfsMode: Hdfs => hdfsMode.jobConf
       case _ => new Configuration(false)
-    }
-  }
 
   /**
     * Access to Hadoop FsShell
@@ -114,9 +101,8 @@ trait BaseReplState {
     * @param cmdArgs list of command line parameters for FsShell, one per method argument
     * @return
     */
-  def fsShellExp(cmdArgs: String*): Int = {
+  def fsShellExp(cmdArgs: String*): Int =
     new FsShell(modeHadoopConf).run(cmdArgs.toArray)
-  }
 
   /**
     * Access to Hadoop FsShell
@@ -124,9 +110,8 @@ trait BaseReplState {
     * @param cmdLine command line parameters for FsShell as a single string
     * @return
     */
-  def fsShell(cmdLine: String): Int = {
+  def fsShell(cmdLine: String): Int =
     new FsShell(modeHadoopConf).run(cmdLine.trim.split(" "))
-  }
 
   /**
     * Configuration to use for REPL executions.
@@ -143,14 +128,14 @@ trait BaseReplState {
   protected def shell: BaseScaldingShell = ScaldingShell
 
   /** Create config for execution. Tacks on a new jar for each execution. */
-  private[scalding] def executionConfig: Config = {
+  private[scalding] def executionConfig: Config =
     // Create a jar to hold compiled code for this REPL session in addition to
     // "tempjars" which can be passed in from the command line, allowing code
     // in the repl to be distributed for the Hadoop job to run.
     val replCodeJar: Option[java.io.File] = shell.createReplCodeJar()
-    val tmpJarsConfig: Map[String, String] = replCodeJar match {
+    val tmpJarsConfig: Map[String, String] = replCodeJar match
       case Some(jar) =>
-        Map("tmpjars" -> {
+        Map("tmpjars" ->
           // Use tmpjars already in the configuration.
           config
             .get("tmpjars")
@@ -158,31 +143,27 @@ trait BaseReplState {
             .getOrElse("")
             // And a jar of code compiled by the REPL.
             .concat("file://" + jar.getAbsolutePath)
-        })
+        )
       case None =>
         // No need to add the tmpjars to the configuration
         Map()
-    }
     config ++ tmpJarsConfig
-  }
 
   /**
     * Sets the flow definition in implicit scope to an empty flow definition.
     */
-  def resetFlowDef() {
+  def resetFlowDef()
     flowDef = getEmptyFlowDef
-  }
 
   /**
     * Gets a new, empty, flow definition.
     *
     * @return a new, empty flow definition.
     */
-  def getEmptyFlowDef: FlowDef = {
+  def getEmptyFlowDef: FlowDef =
     val fd = new FlowDef
     fd.setName("ScaldingShell")
     fd
-  }
 
   /**
     * Runs this pipe as a Scalding job.
@@ -190,13 +171,12 @@ trait BaseReplState {
     * Automatically cleans up the flowDef to include only sources upstream from tails.
     */
   def run(implicit fd: FlowDef, md: Mode): Option[JobStats] =
-    ExecutionContext.newContext(executionConfig)(fd, md).waitFor match {
+    ExecutionContext.newContext(executionConfig)(fd, md).waitFor match
       case Success(stats) => Some(stats)
       case Failure(e) =>
         println("Flow execution failed!")
         e.printStackTrace()
         None
-    }
 
   /*
    * Starts the Execution, but does not wait for the result
@@ -210,9 +190,8 @@ trait BaseReplState {
    */
   def execute[T](execution: Execution[T]): T =
     execution.waitFor(executionConfig, mode).get
-}
 
-object ReplImplicits extends FieldConversions {
+object ReplImplicits extends FieldConversions
 
   /**
     * Converts a Cascading Pipe to a Scalding RichPipe. This method permits implicit conversions from
@@ -253,9 +232,8 @@ object ReplImplicits extends FieldConversions {
     */
   implicit def iterableToSource[T](iterable: Iterable[T])(
       implicit setter: TupleSetter[T],
-      converter: TupleConverter[T]): Source = {
+      converter: TupleConverter[T]): Source =
     IterableSource[T](iterable)(setter, converter)
-  }
 
   /**
     * Converts an iterable into a Pipe with index (int-based) fields.
@@ -269,9 +247,8 @@ object ReplImplicits extends FieldConversions {
       implicit setter: TupleSetter[T],
       converter: TupleConverter[T],
       flowDef: FlowDef,
-      mode: Mode): Pipe = {
+      mode: Mode): Pipe =
     iterableToSource(iterable)(setter, converter).read
-  }
 
   /**
     * Converts an iterable into a RichPipe with index (int-based) fields.
@@ -286,9 +263,8 @@ object ReplImplicits extends FieldConversions {
       implicit setter: TupleSetter[T],
       converter: TupleConverter[T],
       flowDef: FlowDef,
-      mode: Mode): RichPipe = {
+      mode: Mode): RichPipe =
     RichPipe(iterableToPipe(iterable)(setter, converter, flowDef, mode))
-  }
 
   /**
     * Convert KeyedListLike to enriched ShellTypedPipe
@@ -314,7 +290,6 @@ object ReplImplicits extends FieldConversions {
   implicit def valuePipeToShellValuePipe[T](pipe: ValuePipe[T])(
       implicit state: BaseReplState): ShellValuePipe[T] =
     new ShellValuePipe[T](pipe)(state)
-}
 
 object ReplState extends BaseReplState
 
@@ -322,7 +297,7 @@ object ReplState extends BaseReplState
   * Implicit FlowDef and Mode, import in the REPL to have the global context implicitly
   * used everywhere.
   */
-object ReplImplicitContext {
+object ReplImplicitContext
 
   /** Implicit execution context for using the Execution monad */
   implicit val executionContext = ConcurrentExecutionContext.global
@@ -336,4 +311,3 @@ object ReplImplicitContext {
   /** Defaults to running in local mode if no mode is specified. */
   implicit def modeImpl = ReplState.mode
   implicit def configImpl = ReplState.config
-}

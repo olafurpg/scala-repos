@@ -50,8 +50,8 @@ import scalafx.beans.property.IntegerProperty
   *         http://docs.oracle.com/javafx/2.0/binding/jfxpub-binding.htm
   *
   */
-object ScalaFX_Properties_And_Binding_02 {
-  def main(args: Array[String]) {
+object ScalaFX_Properties_And_Binding_02
+  def main(args: Array[String])
     val num1 = new IntegerProperty(null, "num1")
     val num2 = new IntegerProperty(null, "num2")
     val sum: NumberBinding = num1 + num2
@@ -59,5 +59,3 @@ object ScalaFX_Properties_And_Binding_02 {
     num1() = 1
     num2() = 2
     println("after  property changes: sum = " + sum())
-  }
-}

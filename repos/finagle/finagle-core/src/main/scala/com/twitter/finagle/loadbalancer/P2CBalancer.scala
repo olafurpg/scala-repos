@@ -35,11 +35,10 @@ private class P2CBalancer[Req, Rep](
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
     extends Balancer[Req, Rep] with LeastLoaded[Req, Rep]
-    with P2C[Req, Rep] with Updating[Req, Rep] {
+    with P2C[Req, Rep] with Updating[Req, Rep]
 
   protected[this] val maxEffortExhausted =
     statsReceiver.counter("max_effort_exhausted")
-}
 
 /**
   * Like [[com.twitter.finagle.loadbalancer.P2CBalancer]] but
@@ -76,13 +75,12 @@ private class P2CBalancerPeakEwma[Req, Rep](
     protected val statsReceiver: StatsReceiver,
     protected val emptyException: NoBrokersAvailableException)
     extends Balancer[Req, Rep] with PeakEwma[Req, Rep]
-    with P2C[Req, Rep] with Updating[Req, Rep] {
+    with P2C[Req, Rep] with Updating[Req, Rep]
 
   protected[this] val maxEffortExhausted =
     statsReceiver.counter("max_effort_exhausted")
-}
 
-private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
+private trait PeakEwma[Req, Rep]  self: Balancer[Req, Rep] =>
 
   protected def rng: Rng
 
@@ -90,7 +88,7 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
 
   protected def nanoTime(): Long = System.nanoTime()
 
-  protected class Metric(sr: StatsReceiver, name: String) {
+  protected class Metric(sr: StatsReceiver, name: String)
     private[this] val epoch = nanoTime()
     private[this] val Penalty: Double = Long.MaxValue >> 16
     // The mean lifetime of `cost`, it reaches its half-life after Tau*ln(2).
@@ -112,16 +110,15 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
     // unevenly spaced time-series[1], we consider the time between
     // observations when calculating our weight.
     // [1] http://www.eckner.com/papers/ts_alg.pdf
-    private[this] def observe(rtt: Double): Unit = {
+    private[this] def observe(rtt: Double): Unit =
       val t = nanoTime()
       val td = math.max(t - stamp, 0)
       val w = math.exp(-td / Tau)
       if (rtt > cost) cost = rtt
       else cost = cost * w + rtt * (1.0 - w)
       stamp = t
-    }
 
-    def get(): Double = synchronized {
+    def get(): Double = synchronized
       // update our view of the decay on `cost`
       observe(0.0)
 
@@ -130,46 +127,38 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
       // assuming we were to schedule an additional request.
       if (cost == 0.0 && pending != 0) Penalty + pending
       else cost * (pending + 1)
-    }
 
-    def start(): Long = synchronized {
+    def start(): Long = synchronized
       pending += 1
       nanoTime()
-    }
 
-    def end(ts: Long): Unit = synchronized {
+    def end(ts: Long): Unit = synchronized
       val rtt = math.max(nanoTime() - ts, 0)
       pending -= 1
       observe(rtt)
-    }
-  }
 
   protected case class Node(
       factory: ServiceFactory[Req, Rep], metric: Metric, token: Int)
-      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep] {
+      extends ServiceFactoryProxy[Req, Rep](factory) with NodeT[Req, Rep]
     type This = Node
 
     def load: Double = metric.get()
     def pending: Int = metric.rate()
 
-    override def apply(conn: ClientConnection) = {
+    override def apply(conn: ClientConnection) =
       val ts = metric.start()
-      super.apply(conn).transform {
+      super.apply(conn).transform
         case Return(svc) =>
           Future.value(
-              new ServiceProxy(svc) {
+              new ServiceProxy(svc)
             override def close(deadline: Time) =
-              super.close(deadline).ensure {
+              super.close(deadline).ensure
                 metric.end(ts)
-              }
-          })
+          )
 
         case t @ Throw(_) =>
           metric.end(ts)
           Future.const(t)
-      }
-    }
-  }
 
   protected def newNode(
       factory: ServiceFactory[Req, Rep], statsReceiver: StatsReceiver): Node =
@@ -180,4 +169,3 @@ private trait PeakEwma[Req, Rep] { self: Balancer[Req, Rep] =>
       new Metric(NullStatsReceiver, "failing"),
       0
   )
-}

@@ -13,7 +13,7 @@ import scala.collection.concurrent.{Map => ConcurrentMap}
   * Support for [[org.scalatra.commands.Command]] binding and validation.
   */
 trait CommandSupport
-    extends ParamsValueReaderProperties with CommandExecutors {
+    extends ParamsValueReaderProperties with CommandExecutors
   this: ScalatraBase =>
 
   type CommandType <: Command
@@ -21,9 +21,8 @@ trait CommandSupport
   private[this] val commandFactories: ConcurrentMap[Class[_], () => Command] =
     new ConcurrentHashMap[Class[_], () => Command].asScala
 
-  def registerCommand[T <: Command](cmd: => T)(implicit mf: Manifest[T]) {
+  def registerCommand[T <: Command](cmd: => T)(implicit mf: Manifest[T])
     commandFactories += (mf.erasure -> (() => cmd))
-  }
 
   /**
     * Create and bind a [[org.scalatra.commands.Command]] of the given type with the current Scalatra params.
@@ -32,7 +31,7 @@ trait CommandSupport
     * a request attribute.
     */
   def command[T <: CommandType](
-      implicit request: HttpServletRequest, mf: Manifest[T]): T = {
+      implicit request: HttpServletRequest, mf: Manifest[T]): T =
     def createCommand =
       commandFactories
         .get(mf.erasure)
@@ -40,7 +39,6 @@ trait CommandSupport
         .getOrElse(mf.erasure.newInstance())
         .asInstanceOf[T]
     commandOption[T] getOrElse bindCommand(createCommand)
-  }
 
   /**
     * Create and bind a [[org.scalatra.commands.Command]] of the given type with the current Scalatra params.
@@ -49,15 +47,13 @@ trait CommandSupport
     * a request attribute.
     */
   def commandOrElse[T <: CommandType](factory: ⇒ T)(
-      implicit request: HttpServletRequest, mf: Manifest[T]): T = {
+      implicit request: HttpServletRequest, mf: Manifest[T]): T =
     commandOption[T] getOrElse bindCommand(factory)
-  }
 
   protected def bindCommand[T <: CommandType](newCommand: T)(
-      implicit request: HttpServletRequest, mf: Manifest[T]): T = {
+      implicit request: HttpServletRequest, mf: Manifest[T]): T =
     newCommand.bindTo(params(request), multiParams(request), request.headers)
     newCommand
-  }
 
   def commandOption[T <: CommandType](
       implicit request: HttpServletRequest, mf: Manifest[T]): Option[T] =
@@ -68,20 +64,17 @@ trait CommandSupport
     "_command_" + manifest[T].erasure.getName
 
   private class CommandRouteMatcher[T <: CommandType](implicit mf: Manifest[T])
-      extends RouteMatcher {
+      extends RouteMatcher
 
     override def apply(requestPath: String) =
       if (command[T].isValid) Some(MultiMap()) else None
-  }
 
   /**
     * Create a [[org.scalatra.RouteMatcher]] that evaluates '''true''' only if a command is valid.
     */
   def ifValid[T <: CommandType](implicit mf: Manifest[T]): RouteMatcher =
     new CommandRouteMatcher[T]
-}
 
-trait ParamsOnlyCommandSupport extends CommandSupport {
+trait ParamsOnlyCommandSupport extends CommandSupport
   this: ScalatraBase =>
   type CommandType = ParamsOnlyCommand
-}

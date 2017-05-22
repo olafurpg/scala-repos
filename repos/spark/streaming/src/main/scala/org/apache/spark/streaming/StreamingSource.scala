@@ -23,7 +23,7 @@ import org.apache.spark.metrics.source.Source
 import org.apache.spark.streaming.ui.StreamingJobProgressListener
 
 private[streaming] class StreamingSource(ssc: StreamingContext)
-    extends Source {
+    extends Source
   override val metricRegistry = new MetricRegistry
   override val sourceName =
     "%s.StreamingMetrics".format(ssc.sparkContext.appName)
@@ -32,22 +32,20 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
 
   private def registerGauge[T](name: String,
                                f: StreamingJobProgressListener => T,
-                               defaultValue: T): Unit = {
+                               defaultValue: T): Unit =
     registerGaugeWithOption[T](
         name,
         (l: StreamingJobProgressListener) => Option(f(streamingListener)),
         defaultValue)
-  }
 
   private def registerGaugeWithOption[T](
       name: String,
       f: StreamingJobProgressListener => Option[T],
-      defaultValue: T): Unit = {
+      defaultValue: T): Unit =
     metricRegistry.register(
-        MetricRegistry.name("streaming", name), new Gauge[T] {
+        MetricRegistry.name("streaming", name), new Gauge[T]
       override def getValue: T = f(streamingListener).getOrElse(defaultValue)
-    })
-  }
+    )
 
   // Gauge for number of network receivers
   registerGauge("receivers", _.numReceivers, 0)
@@ -112,4 +110,3 @@ private[streaming] class StreamingSource(ssc: StreamingContext)
   // Gauge for last received batch records.
   registerGauge(
       "lastReceivedBatch_records", _.lastReceivedBatchRecords.values.sum, 0L)
-}

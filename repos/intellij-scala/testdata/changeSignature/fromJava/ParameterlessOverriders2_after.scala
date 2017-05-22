@@ -1,28 +1,23 @@
-object Test {
+object Test
 
-  class Test1 extends ParameterlessOverriders2 {
+  class Test1 extends ParameterlessOverriders2
     override def bar(b: Boolean) = 1
 
     val x = bar(true)
     this.bar(true)
-  }
 
-  object Test2 extends ParameterlessOverriders2 {
+  object Test2 extends ParameterlessOverriders2
     override def bar(b: Boolean) = 1
 
     val x = bar(true)
     this.bar(true)
-  }
 
-  class Test3 extends ParameterlessOverriders2 {
+  class Test3 extends ParameterlessOverriders2
     override def bar(b: Boolean) = 1
 
     val x = bar(true)
-  }
 
-  trait Test4 extends ParameterlessOverriders2 {
+  trait Test4 extends ParameterlessOverriders2
     override def bar(b: Boolean) = 1
 
     val x = bar(true)
-  }
-}

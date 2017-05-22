@@ -13,17 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-object MergeElseIfIntention {
+object MergeElseIfIntention
   def familyName = "Merge Else If"
-}
 
-class MergeElseIfIntention extends PsiElementBaseIntentionAction {
+class MergeElseIfIntention extends PsiElementBaseIntentionAction
   def getFamilyName = MergeElseIfIntention.familyName
 
   override def getText: String = "Merge 'else if'"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -37,17 +36,14 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
             offset <= elseBranch.getTextRange.getStartOffset)) return false
 
     val blockExpr = ifStmt.elseBranch.orNull
-    if (blockExpr != null && blockExpr.isInstanceOf[ScBlockExpr]) {
+    if (blockExpr != null && blockExpr.isInstanceOf[ScBlockExpr])
       val exprs = blockExpr.asInstanceOf[ScBlockExpr].exprs
-      if (exprs.size == 1 && exprs(0).isInstanceOf[ScIfStmt]) {
+      if (exprs.size == 1 && exprs(0).isInstanceOf[ScIfStmt])
         return true
-      }
-    }
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null || !ifStmt.isValid) return
@@ -81,12 +77,9 @@ class MergeElseIfIntention extends PsiElementBaseIntentionAction {
       newIfStmt.asInstanceOf[ScIfStmt].thenBranch.get.getTextRange.getEndOffset -
       newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       ifStmt.replaceExpression(newIfStmt, true)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

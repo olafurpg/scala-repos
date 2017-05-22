@@ -15,24 +15,21 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class HttpNackFilterTest extends FunSuite {
-  class ClientCtx {
+class HttpNackFilterTest extends FunSuite
+  class ClientCtx
     val n = new AtomicInteger()
-    val flakyService = new Service[Request, Response] {
-      def apply(req: Request): Future[Response] = {
+    val flakyService = new Service[Request, Response]
+      def apply(req: Request): Future[Response] =
         if (n.get < 0) Future.exception(new Exception)
         else if (n.getAndIncrement == 0)
           Future.exception(Failure.rejected("unhappy"))
         else Future.value(Response(Status.Ok))
-      }
-    }
     val request = Request("/")
     val serverSr = new InMemoryStatsReceiver
     val clientSr = new InMemoryStatsReceiver
-  }
 
-  test("automatically retries with HttpNack") {
-    new ClientCtx {
+  test("automatically retries with HttpNack")
+    new ClientCtx
       val server = Http.server
         .configured(Stats(serverSr))
         .configured(Label("myservice"))
@@ -54,11 +51,9 @@ class HttpNackFilterTest extends FunSuite {
       assert(serverSr.counters(Seq("myservice", "nacks")) == 1)
 
       Closable.all(client, server).close()
-    }
-  }
 
-  test("HttpNack works with ClientBuilder") {
-    new ClientCtx {
+  test("HttpNack works with ClientBuilder")
+    new ClientCtx
       val server = Http.server
         .configured(Stats(serverSr))
         .configured(Label("myservice"))
@@ -77,11 +72,9 @@ class HttpNackFilterTest extends FunSuite {
       assert(serverSr.counters(Seq("myservice", "nacks")) == 1)
 
       Closable.all(client, server).close()
-    }
-  }
 
-  test("HttpNack works with ServerBuilder") {
-    new ClientCtx {
+  test("HttpNack works with ServerBuilder")
+    new ClientCtx
       val serverLabel = "myservice"
       val server = ServerBuilder()
         .codec(http.Http(_statsReceiver = serverSr.scope(serverLabel)))
@@ -102,11 +95,9 @@ class HttpNackFilterTest extends FunSuite {
       assert(serverSr.counters(Seq("myservice", "nacks")) == 1)
 
       Closable.all(client, server).close()
-    }
-  }
 
-  test("a server that doesn't support HttpNack fails the request") {
-    new ClientCtx {
+  test("a server that doesn't support HttpNack fails the request")
+    new ClientCtx
       val server = Http.server
         .withStack(StackServer.newStack)
         .configured(Stats(serverSr))
@@ -130,11 +121,9 @@ class HttpNackFilterTest extends FunSuite {
       assert(serverSr.counters(Seq("myservice", "failures")) == 1)
       assert(serverSr.counters.get(Seq("myservice", "nacks")) == None)
       Closable.all(client, server).close()
-    }
-  }
 
-  test("HttpNack does not convert non-retryable failures") {
-    new ClientCtx {
+  test("HttpNack does not convert non-retryable failures")
+    new ClientCtx
       n.set(-1)
       val server = Http.server
         .configured(Stats(serverSr))
@@ -158,6 +147,3 @@ class HttpNackFilterTest extends FunSuite {
       assert(serverSr.counters.get(Seq("myservice", "nacks")) == None)
 
       Closable.all(client, server).close()
-    }
-  }
-}

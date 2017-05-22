@@ -45,7 +45,7 @@ import cascading.tuple.Fields
   * @author Oscar Boykin
   * @author Kevin Lin
   */
-abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
+abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver
 
   // Override the following three members when you extend this class
   val tableName: TableName
@@ -74,7 +74,7 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
   def fields: Fields = new Fields(columnNames.map(_.get).toSeq: _*)
 
   protected def createJDBCTap =
-    try {
+    try
       val ConnectionSpec(url, uName, passwd) = currentConfig
       val tap = new JDBCTap(
           url.get,
@@ -87,30 +87,26 @@ abstract class JDBCSource extends Source with ColumnDefiner with JdbcDriver {
       tap.setConcurrentReads(maxConcurrentReads)
       tap.setBatchSize(batchSize)
       tap
-    } catch {
+    catch
       case e: NullPointerException =>
         sys.error("Could not find DB credential information.")
-    }
 
   override def createTap(
       readOrWrite: AccessMode)(implicit mode: Mode): Tap[_, _, _] =
-    mode match {
+    mode match
       case Hdfs(_, _) => createJDBCTap.asInstanceOf[Tap[_, _, _]]
       // TODO: support Local mode here, and better testing.
       case _ => TestTapFactory(this, fields).createTap(readOrWrite)
-    }
 
   // Generate SQL statement to create the DB table if not existing.
-  def toSqlCreateString: String = {
+  def toSqlCreateString: String =
     def addBackTicks(str: String) = "`" + str + "`"
-    val allCols = columns.map {
+    val allCols = columns.map
       case ColumnDefinition(ColumnName(name), Definition(defn)) =>
         addBackTicks(name) + " " + defn
-    }.mkString(",\n")
+    .mkString(",\n")
 
     "CREATE TABLE " + addBackTicks(tableName.get) + " (\n" + allCols +
     ",\n PRIMARY KEY HERE!!!!"
-  }
-}
 
 case class TableName(get: String)

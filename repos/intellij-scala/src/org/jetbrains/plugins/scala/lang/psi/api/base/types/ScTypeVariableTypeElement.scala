@@ -8,7 +8,6 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * @author Alefas
   * @since 26/09/14.
   */
-trait ScTypeVariableTypeElement extends ScTypeElement with ScNamedElement {
+trait ScTypeVariableTypeElement extends ScTypeElement with ScNamedElement
   override def accept(visitor: ScalaElementVisitor): Unit =
     visitor.visitTypeVariableTypeElement(this)
-}

@@ -22,15 +22,15 @@ import scala.collection.JavaConverters._
   * @author Nikolay.Tropin
   */
 abstract class ScalaSuppressByLineCommentFix(key: HighlightDisplayKey)
-    extends SuppressByCommentFix(key, classOf[ScalaPsiElement]) {
+    extends SuppressByCommentFix(key, classOf[ScalaPsiElement])
   override def createSuppression(
-      project: Project, element: PsiElement, container: PsiElement): Unit = {
+      project: Project, element: PsiElement, container: PsiElement): Unit =
     val text: String =
       SuppressionUtilCore.SUPPRESS_INSPECTIONS_TAG_NAME + " " + key.getID
     val comment: PsiComment =
       SuppressionUtil.createComment(project, text, ScalaLanguage.Instance)
     val newLine = ScalaPsiElementFactory.createNewLine(element.getManager)
-    container match {
+    container match
       case owner: ScDocCommentOwner if owner.docComment.isDefined =>
         val docComment = owner.docComment.get
         container.addAfter(comment, docComment)
@@ -43,23 +43,19 @@ abstract class ScalaSuppressByLineCommentFix(key: HighlightDisplayKey)
         val parent = container.getParent
         parent.addBefore(comment, container)
         parent.addBefore(newLine, container)
-    }
-  }
 
   override def getCommentsFor(
-      container: PsiElement): util.List[_ <: PsiElement] = {
+      container: PsiElement): util.List[_ <: PsiElement] =
     ScalaSuppressableInspectionTool.commentsFor(container).asJava
-  }
-}
 
 class ScalaSuppressForStatementFix(key: HighlightDisplayKey)
-    extends ScalaSuppressByLineCommentFix(key) {
+    extends ScalaSuppressByLineCommentFix(key)
 
   override def getText: String =
     InspectionsBundle.message("suppress.inspection.statement")
 
   override def getContainer(context: PsiElement): PsiElement =
-    ScalaRefactoringUtil.findEnclosingBlockStatement(context) match {
+    ScalaRefactoringUtil.findEnclosingBlockStatement(context) match
       case None => null
       case Some(
           _: ScFunctionDefinition | _: ScVariableDefinition |
@@ -67,20 +63,17 @@ class ScalaSuppressForStatementFix(key: HighlightDisplayKey)
           _: ScMacroDefinition) =>
         null
       case Some(stmt) => stmt
-    }
-}
 
 abstract class ScalaSuppressForDefinitionFix(
     key: HighlightDisplayKey,
     text: String,
     defClasses: Class[_ <: PsiElement]*)
-    extends ScalaSuppressByLineCommentFix(key) {
+    extends ScalaSuppressByLineCommentFix(key)
 
   override def getText: String = text
 
   override def getContainer(context: PsiElement): PsiElement =
     PsiTreeUtil.getParentOfType(context, defClasses: _*)
-}
 
 class ScalaSuppressForClassFix(key: HighlightDisplayKey)
     extends ScalaSuppressForDefinitionFix(

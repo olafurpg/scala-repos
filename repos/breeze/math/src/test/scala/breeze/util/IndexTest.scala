@@ -22,40 +22,34 @@ import org.scalatest.prop._
 import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class IndexTest extends FunSuite with Checkers {
+class IndexTest extends FunSuite with Checkers
 
-  test("CompositeIndex") {
+  test("CompositeIndex")
     val index = Index(List("a", "b", "c", "d"))
     val index2 = Index(List("e", "f", "g", "h"))
     val comp = new CompositeIndex(index, index2)
     assert(comp(1 -> "e") === 4)
     assert(comp(0 -> "e") === -1)
-  }
 
-  test("PairIndex") {
+  test("PairIndex")
     val index = Index(List("a", "b", "c", "d"))
     val index2 = Index(List("e", "f", "g", "h"))
     val comp = new PairIndex(index, index2)
     assert(comp("a" -> "e") === 0)
     assert(comp("e" -> "e") === -1)
-  }
 
-  test("EitherIndex") {
+  test("EitherIndex")
     val index = Index(List("a", "b", "c", "d"))
     val index2 = Index(List("e", "f", "g", "h"))
     val comp = new EitherIndex(index, index2)
     assert(comp(Right("e")) === 4)
     assert(comp(Left("e")) === -1)
-  }
 
-  test("EnumerationIndex") {
-    object E extends Enumeration {
+  test("EnumerationIndex")
+    object E extends Enumeration
       val A, B, C, D = Value
-    }
     val index: Index[E.Value] = EnumerationIndex(E)
 
     assert(index.get(0) === E.A)
     assert(index.get(1) === E.B)
     assert(index(E.A) === 0)
-  }
-}

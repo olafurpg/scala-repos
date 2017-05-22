@@ -1,6 +1,6 @@
 import scala.util.control.NonFatal
 
-trait NonFatalTests {
+trait NonFatalTests
 
   //NonFatals
   val nonFatals: Seq[Throwable] = Seq(new RuntimeException,
@@ -17,36 +17,26 @@ trait NonFatalTests {
                                    new Throwable
                                    with scala.util.control.ControlThrowable)
 
-  def testFatalsUsingApply(): Unit = {
-    fatals foreach { t =>
+  def testFatalsUsingApply(): Unit =
+    fatals foreach  t =>
       assert(NonFatal(t) == false)
-    }
-  }
 
-  def testNonFatalsUsingApply(): Unit = {
-    nonFatals foreach { t =>
+  def testNonFatalsUsingApply(): Unit =
+    nonFatals foreach  t =>
       assert(NonFatal(t) == true)
-    }
-  }
 
-  def testFatalsUsingUnapply(): Unit = {
-    fatals foreach { t =>
+  def testFatalsUsingUnapply(): Unit =
+    fatals foreach  t =>
       assert(NonFatal.unapply(t).isEmpty)
-    }
-  }
 
-  def testNonFatalsUsingUnapply(): Unit = {
-    nonFatals foreach { t =>
+  def testNonFatalsUsingUnapply(): Unit =
+    nonFatals foreach  t =>
       assert(NonFatal.unapply(t).isDefined)
-    }
-  }
 
   testFatalsUsingApply()
   testNonFatalsUsingApply()
   testFatalsUsingUnapply()
   testNonFatalsUsingUnapply()
-}
 
-object Test extends App with NonFatalTests {
+object Test extends App with NonFatalTests
   System.exit(0)
-}

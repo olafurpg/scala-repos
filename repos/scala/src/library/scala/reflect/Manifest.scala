@@ -42,44 +42,39 @@ import scala.collection.mutable.{ArrayBuilder, WrappedArray}
 @scala.annotation.implicitNotFound(msg = "No Manifest available for ${T}.")
 // TODO undeprecated until Scala reflection becomes non-experimental
 // @deprecated("Use scala.reflect.ClassTag (to capture erasures) or scala.reflect.runtime.universe.TypeTag (to capture types) or both instead", "2.10.0")
-trait Manifest[T] extends ClassManifest[T] with Equals {
+trait Manifest[T] extends ClassManifest[T] with Equals
   override def typeArguments: List[Manifest[_]] = Nil
 
   override def arrayManifest: Manifest[Array[T]] =
     Manifest.classType[Array[T]](arrayClass[T](runtimeClass), this)
 
-  override def canEqual(that: Any): Boolean = that match {
+  override def canEqual(that: Any): Boolean = that match
     case _: Manifest[_] => true
     case _ => false
-  }
 
   /** Note: testing for erasure here is important, as it is many times
     *  faster than <:< and rules out most comparisons.
     */
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case m: Manifest[_] =>
       (m canEqual this) && (this.runtimeClass == m.runtimeClass) &&
       (this <:< m) && (m <:< this)
     case _ => false
-  }
   override def hashCode = this.runtimeClass.##
-}
 
 // TODO undeprecated until Scala reflection becomes non-experimental
 // @deprecated("Use type tags and manually check the corresponding class or type instead", "2.10.0")
 @SerialVersionUID(1L)
 abstract class AnyValManifest[T <: AnyVal](override val toString: String)
-    extends Manifest[T] with Equals {
+    extends Manifest[T] with Equals
   override def <:<(that: ClassManifest[_]): Boolean =
     (that eq this) || (that eq Manifest.Any) || (that eq Manifest.AnyVal)
-  override def canEqual(other: Any) = other match {
+  override def canEqual(other: Any) = other match
     case _: AnyValManifest[_] => true
     case _ => false
-  }
   override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
   @transient
   override val hashCode = System.identityHashCode(this)
-}
 
 /** `ManifestFactory` defines factory methods for manifests.
   *  It is intended for use by the compiler and should not be used in client code.
@@ -88,11 +83,11 @@ abstract class AnyValManifest[T <: AnyVal](override val toString: String)
   *  This is done to prevent avalanches of deprecation warnings in the code that calls methods with manifests.
   *  Why so complicated? Read up the comments for `ClassManifestFactory`.
   */
-object ManifestFactory {
+object ManifestFactory
   def valueManifests: List[AnyValManifest[_]] =
     List(Byte, Short, Char, Int, Long, Float, Double, Boolean, Unit)
 
-  val Byte: AnyValManifest[Byte] = new AnyValManifest[scala.Byte]("Byte") {
+  val Byte: AnyValManifest[Byte] = new AnyValManifest[scala.Byte]("Byte")
     def runtimeClass = java.lang.Byte.TYPE
     override def newArray(len: Int): Array[Byte] = new Array[Byte](len)
     override def newWrappedArray(len: Int): WrappedArray[Byte] =
@@ -100,9 +95,8 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Byte] =
       new ArrayBuilder.ofByte()
     private def readResolve(): Any = Manifest.Byte
-  }
 
-  val Short: AnyValManifest[Short] = new AnyValManifest[scala.Short]("Short") {
+  val Short: AnyValManifest[Short] = new AnyValManifest[scala.Short]("Short")
     def runtimeClass = java.lang.Short.TYPE
     override def newArray(len: Int): Array[Short] = new Array[Short](len)
     override def newWrappedArray(len: Int): WrappedArray[Short] =
@@ -110,9 +104,8 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Short] =
       new ArrayBuilder.ofShort()
     private def readResolve(): Any = Manifest.Short
-  }
 
-  val Char: AnyValManifest[Char] = new AnyValManifest[scala.Char]("Char") {
+  val Char: AnyValManifest[Char] = new AnyValManifest[scala.Char]("Char")
     def runtimeClass = java.lang.Character.TYPE
     override def newArray(len: Int): Array[Char] = new Array[Char](len)
     override def newWrappedArray(len: Int): WrappedArray[Char] =
@@ -120,9 +113,8 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Char] =
       new ArrayBuilder.ofChar()
     private def readResolve(): Any = Manifest.Char
-  }
 
-  val Int: AnyValManifest[Int] = new AnyValManifest[scala.Int]("Int") {
+  val Int: AnyValManifest[Int] = new AnyValManifest[scala.Int]("Int")
     def runtimeClass = java.lang.Integer.TYPE
     override def newArray(len: Int): Array[Int] = new Array[Int](len)
     override def newWrappedArray(len: Int): WrappedArray[Int] =
@@ -130,9 +122,8 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Int] =
       new ArrayBuilder.ofInt()
     private def readResolve(): Any = Manifest.Int
-  }
 
-  val Long: AnyValManifest[Long] = new AnyValManifest[scala.Long]("Long") {
+  val Long: AnyValManifest[Long] = new AnyValManifest[scala.Long]("Long")
     def runtimeClass = java.lang.Long.TYPE
     override def newArray(len: Int): Array[Long] = new Array[Long](len)
     override def newWrappedArray(len: Int): WrappedArray[Long] =
@@ -140,9 +131,8 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Long] =
       new ArrayBuilder.ofLong()
     private def readResolve(): Any = Manifest.Long
-  }
 
-  val Float: AnyValManifest[Float] = new AnyValManifest[scala.Float]("Float") {
+  val Float: AnyValManifest[Float] = new AnyValManifest[scala.Float]("Float")
     def runtimeClass = java.lang.Float.TYPE
     override def newArray(len: Int): Array[Float] = new Array[Float](len)
     override def newWrappedArray(len: Int): WrappedArray[Float] =
@@ -150,10 +140,9 @@ object ManifestFactory {
     override def newArrayBuilder(): ArrayBuilder[Float] =
       new ArrayBuilder.ofFloat()
     private def readResolve(): Any = Manifest.Float
-  }
 
   val Double: AnyValManifest[Double] =
-    new AnyValManifest[scala.Double]("Double") {
+    new AnyValManifest[scala.Double]("Double")
       def runtimeClass = java.lang.Double.TYPE
       override def newArray(len: Int): Array[Double] = new Array[Double](len)
       override def newWrappedArray(len: Int): WrappedArray[Double] =
@@ -161,10 +150,9 @@ object ManifestFactory {
       override def newArrayBuilder(): ArrayBuilder[Double] =
         new ArrayBuilder.ofDouble()
       private def readResolve(): Any = Manifest.Double
-    }
 
   val Boolean: AnyValManifest[Boolean] =
-    new AnyValManifest[scala.Boolean]("Boolean") {
+    new AnyValManifest[scala.Boolean]("Boolean")
       def runtimeClass = java.lang.Boolean.TYPE
       override def newArray(len: Int): Array[Boolean] = new Array[Boolean](len)
       override def newWrappedArray(len: Int): WrappedArray[Boolean] =
@@ -172,9 +160,8 @@ object ManifestFactory {
       override def newArrayBuilder(): ArrayBuilder[Boolean] =
         new ArrayBuilder.ofBoolean()
       private def readResolve(): Any = Manifest.Boolean
-    }
 
-  val Unit: AnyValManifest[Unit] = new AnyValManifest[scala.Unit]("Unit") {
+  val Unit: AnyValManifest[Unit] = new AnyValManifest[scala.Unit]("Unit")
     def runtimeClass = java.lang.Void.TYPE
     override def newArray(len: Int): Array[Unit] = new Array[Unit](len)
     override def newWrappedArray(len: Int): WrappedArray[Unit] =
@@ -186,58 +173,51 @@ object ManifestFactory {
         classOf[Array[scala.runtime.BoxedUnit]].asInstanceOf[Class[Array[T]]]
       else super.arrayClass(tp)
     private def readResolve(): Any = Manifest.Unit
-  }
 
   private val ObjectTYPE = classOf[java.lang.Object]
   private val NothingTYPE = classOf[scala.runtime.Nothing$]
   private val NullTYPE = classOf[scala.runtime.Null$]
 
   val Any: Manifest[scala.Any] =
-    new PhantomManifest[scala.Any](ObjectTYPE, "Any") {
+    new PhantomManifest[scala.Any](ObjectTYPE, "Any")
       override def newArray(len: Int) = new Array[scala.Any](len)
       override def <:<(that: ClassManifest[_]): Boolean = (that eq this)
       private def readResolve(): Any = Manifest.Any
-    }
 
   val Object: Manifest[java.lang.Object] =
-    new PhantomManifest[java.lang.Object](ObjectTYPE, "Object") {
+    new PhantomManifest[java.lang.Object](ObjectTYPE, "Object")
       override def newArray(len: Int) = new Array[java.lang.Object](len)
       override def <:<(that: ClassManifest[_]): Boolean =
         (that eq this) || (that eq Any)
       private def readResolve(): Any = Manifest.Object
-    }
 
   val AnyRef: Manifest[scala.AnyRef] =
     Object.asInstanceOf[Manifest[scala.AnyRef]]
 
   val AnyVal: Manifest[scala.AnyVal] =
-    new PhantomManifest[scala.AnyVal](ObjectTYPE, "AnyVal") {
+    new PhantomManifest[scala.AnyVal](ObjectTYPE, "AnyVal")
       override def newArray(len: Int) = new Array[scala.AnyVal](len)
       override def <:<(that: ClassManifest[_]): Boolean =
         (that eq this) || (that eq Any)
       private def readResolve(): Any = Manifest.AnyVal
-    }
 
   val Null: Manifest[scala.Null] =
-    new PhantomManifest[scala.Null](NullTYPE, "Null") {
+    new PhantomManifest[scala.Null](NullTYPE, "Null")
       override def newArray(len: Int) = new Array[scala.Null](len)
       override def <:<(that: ClassManifest[_]): Boolean =
         (that ne null) && (that ne Nothing) && !(that <:< AnyVal)
       private def readResolve(): Any = Manifest.Null
-    }
 
   val Nothing: Manifest[scala.Nothing] =
-    new PhantomManifest[scala.Nothing](NothingTYPE, "Nothing") {
+    new PhantomManifest[scala.Nothing](NothingTYPE, "Nothing")
       override def newArray(len: Int) = new Array[scala.Nothing](len)
       override def <:<(that: ClassManifest[_]): Boolean = (that ne null)
       private def readResolve(): Any = Manifest.Nothing
-    }
 
   private class SingletonTypeManifest[T <: AnyRef](value: AnyRef)
-      extends Manifest[T] {
+      extends Manifest[T]
     lazy val runtimeClass = value.getClass
     override lazy val toString = value.toString + ".type"
-  }
 
   /** Manifest for the singleton type `value.type`. */
   def singleType[T <: AnyRef](value: AnyRef): Manifest[T] =
@@ -270,11 +250,10 @@ object ManifestFactory {
 
   private abstract class PhantomManifest[T](_runtimeClass: Predef.Class[_],
                                             override val toString: String)
-      extends ClassTypeManifest[T](None, _runtimeClass, Nil) {
+      extends ClassTypeManifest[T](None, _runtimeClass, Nil)
     override def equals(that: Any): Boolean = this eq that.asInstanceOf[AnyRef]
     @transient
     override val hashCode = System.identityHashCode(this)
-  }
 
   /** Manifest for the class type `clazz[args]`, where `clazz` is
     * a top-level or static class. */
@@ -282,11 +261,10 @@ object ManifestFactory {
       prefix: Option[Manifest[_]],
       val runtimeClass: Predef.Class[_],
       override val typeArguments: List[Manifest[_]])
-      extends Manifest[T] {
+      extends Manifest[T]
     override def toString =
       (if (prefix.isEmpty) "" else prefix.get.toString + "#") +
       (if (runtimeClass.isArray) "Array" else runtimeClass.getName) + argString
-  }
 
   def arrayType[T](arg: Manifest[_]): Manifest[Array[T]] =
     arg.asInstanceOf[Manifest[T]].arrayManifest
@@ -298,27 +276,23 @@ object ManifestFactory {
                       name: String,
                       upperBound: Predef.Class[_],
                       args: Manifest[_]*): Manifest[T] =
-    new Manifest[T] {
+    new Manifest[T]
       def runtimeClass = upperBound
       override val typeArguments = args.toList
       override def toString = prefix.toString + "#" + name + argString
-    }
 
   /** Manifest for the unknown type `_ >: L <: U` in an existential.
     */
   def wildcardType[T](
       lowerBound: Manifest[_], upperBound: Manifest[_]): Manifest[T] =
-    new Manifest[T] {
+    new Manifest[T]
       def runtimeClass = upperBound.runtimeClass
       override def toString =
         "_" + (if (lowerBound eq Nothing) "" else " >: " + lowerBound) +
         (if (upperBound eq Nothing) "" else " <: " + upperBound)
-    }
 
   /** Manifest for the intersection type `parents_0 with ... with parents_n`. */
   def intersectionType[T](parents: Manifest[_]*): Manifest[T] =
-    new Manifest[T] {
+    new Manifest[T]
       def runtimeClass = parents.head.runtimeClass
       override def toString = parents.mkString(" with ")
-    }
-}

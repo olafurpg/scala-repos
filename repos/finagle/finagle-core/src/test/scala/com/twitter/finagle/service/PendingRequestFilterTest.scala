@@ -8,12 +8,11 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class PendingRequestFilterTest extends FunSuite {
+class PendingRequestFilterTest extends FunSuite
 
-  test("it rejects excessive requests with restartable failures") {
-    val svc = Service.mk { p: Future[Unit] =>
+  test("it rejects excessive requests with restartable failures")
+    val svc = Service.mk  p: Future[Unit] =>
       p
-    }
 
     val (p1, p2, p3) =
       (new Promise[Unit], new Promise[Unit], new Promise[Unit])
@@ -24,9 +23,8 @@ class PendingRequestFilterTest extends FunSuite {
     assert(!r2.isDefined)
     assert(!r3.isDefined)
 
-    val rejected = intercept[Failure] {
+    val rejected = intercept[Failure]
       Await.result(filteredSvc(Future.Done), 3.seconds)
-    }
 
     assert(rejected.isFlagged(Failure.Restartable))
 
@@ -39,5 +37,3 @@ class PendingRequestFilterTest extends FunSuite {
     // and a subsequent request is permitted
     val r4 = filteredSvc(Future.Done)
     assert(r4.isDefined)
-  }
-}

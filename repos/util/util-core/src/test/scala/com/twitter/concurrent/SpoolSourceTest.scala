@@ -7,13 +7,12 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class SpoolSourceTest extends WordSpec {
-  "SpoolSource" should {
-    class SpoolSourceHelper {
+class SpoolSourceTest extends WordSpec
+  "SpoolSource" should
+    class SpoolSourceHelper
       val source = new SpoolSource[Int]
-    }
 
-    "add values to the spool, ignoring values after close" in {
+    "add values to the spool, ignoring values after close" in
       val h = new SpoolSourceHelper
       import h._
 
@@ -25,9 +24,8 @@ class SpoolSourceTest extends WordSpec {
       source.offer(4)
       source.offer(5)
       assert(Await.result(futureSpool flatMap (_.toSeq)) == Seq(1, 2, 3))
-    }
 
-    "add values to the spool, ignoring values after offerAndClose" in {
+    "add values to the spool, ignoring values after offerAndClose" in
       val h = new SpoolSourceHelper
       import h._
 
@@ -39,9 +37,8 @@ class SpoolSourceTest extends WordSpec {
       source.offer(5)
       assert(Await.result(futureSpool flatMap (_.toSeq)) == Seq(1, 2, 3))
       assert(Await.result(source.closed.liftToTry) == Return(()))
-    }
 
-    "return multiple Future Spools that only see values added later" in {
+    "return multiple Future Spools that only see values added later" in
       val h = new SpoolSourceHelper
       import h._
 
@@ -57,9 +54,8 @@ class SpoolSourceTest extends WordSpec {
       assert(Await.result(futureSpool2 flatMap (_.toSeq)) == Seq(2, 3))
       assert(Await.result(futureSpool3 flatMap (_.toSeq)) == Seq(3))
       assert(Await.result(futureSpool4).isEmpty == true)
-    }
 
-    "throw exception and close spool when exception is raised" in {
+    "throw exception and close spool when exception is raised" in
       val h = new SpoolSourceHelper
       import h._
 
@@ -68,21 +64,19 @@ class SpoolSourceTest extends WordSpec {
       source.raise(new Exception("sad panda"))
       val futureSpool2 = source()
       source.offer(1)
-      intercept[Exception] {
+      intercept[Exception]
         Await.result(futureSpool1 flatMap (_.toSeq))
-      }
       assert(Await.result(futureSpool2).isEmpty == true)
-    }
 
-    "invoke registered interrupt handlers" in {
+    "invoke registered interrupt handlers" in
       val h = new SpoolSourceHelper
 
       val fired = new AtomicInteger(0)
 
-      val isource = new SpoolSource[Int]({
+      val isource = new SpoolSource[Int](
         case exc =>
           fired.addAndGet(1)
-      })
+      )
 
       val a = isource()
       val b = a.flatMap(_.tail)
@@ -108,6 +102,3 @@ class SpoolSourceTest extends WordSpec {
       assert(fired.get() == 3)
 
       assert(Await.result(a flatMap (_.toSeq)) == Seq(1, 2, 3))
-    }
-  }
-}

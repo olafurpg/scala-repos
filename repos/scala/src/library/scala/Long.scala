@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Long]] => [[scala.runtime.RichLong]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Long private extends AnyVal {
+final abstract class Long private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -520,9 +520,8 @@ final abstract class Long private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Long] = null
-}
 
-object Long extends AnyValCompanion {
+object Long extends AnyValCompanion
 
   /** The smallest value representable as a Long. */
   final val MinValue = java.lang.Long.MIN_VALUE
@@ -559,4 +558,3 @@ object Long extends AnyValCompanion {
   import scala.language.implicitConversions
   implicit def long2float(x: Long): Float = x.toFloat
   implicit def long2double(x: Long): Double = x.toDouble
-}

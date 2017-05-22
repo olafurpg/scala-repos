@@ -25,79 +25,71 @@ import scala.collection.JavaConverters._
   * @since 6/4/15.
   */
 class ScalaGradleDataServiceTest
-    extends ProjectDataServiceTestCase with UsefulTestCaseHelper {
+    extends ProjectDataServiceTestCase with UsefulTestCaseHelper
 
   private def generateProject(scalaVersion: Option[String],
                               scalaCompilerClasspath: Set[File],
                               compilerOptions: Option[ScalaCompileOptionsData])
     : DataNode[ProjectData] =
-    new project {
+    new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      val scalaLibrary = scalaVersion.map { version =>
+      val scalaLibrary = scalaVersion.map  version =>
         new library { name := "org.scala-lang:scala-library:" + version }
-      }
 
       scalaLibrary.foreach(libraries += _)
 
-      modules += new javaModule {
+      modules += new javaModule
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
 
         scalaLibrary.foreach(libraryDependencies += _)
 
-        arbitraryNodes += new Node[ScalaModelData] {
+        arbitraryNodes += new Node[ScalaModelData]
           override protected val data: ScalaModelData =
             new ScalaModelData(SbtProjectSystem.Id)
           override protected def key: Key[ScalaModelData] = ScalaModelData.KEY
 
-          def asSerializableJavaSet[T](scalaSet: Set[T]): util.Set[T] = {
+          def asSerializableJavaSet[T](scalaSet: Set[T]): util.Set[T] =
             val classpath = new util.HashSet[T]()
             util.Collections.addAll(classpath, scalaSet.toSeq: _*)
             classpath
-          }
 
           data.setScalaClasspath(asSerializableJavaSet(scalaCompilerClasspath))
           data.setScalaCompileOptions(
               compilerOptions.getOrElse(new ScalaCompileOptionsData))
           data.setTargetCompatibility("1.5")
-        }
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
-  def testEmptyScalaCompilerClasspath(): Unit = {
+  def testEmptyScalaCompilerClasspath(): Unit =
     importProjectData(generateProject(None, Set.empty, None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
-  }
 
-  def testScalaCompilerClasspathWithoutScala(): Unit = {
+  def testScalaCompilerClasspathWithoutScala(): Unit =
     importProjectData(generateProject(
             None, Set(new File("/tmp/test/not-a-scala-library.jar")), None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
-  }
 
-  def testWithoutScalaLibrary(): Unit = {
+  def testWithoutScalaLibrary(): Unit =
     importProjectData(generateProject(
             None, Set(new File("/tmp/test/scala-library-2.10.4.jar")), None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
-  }
 
-  def testWithDifferentVersionOfScalaLibrary(): Unit = {
+  def testWithDifferentVersionOfScalaLibrary(): Unit =
     importProjectData(
         generateProject(Some("2.11.5"),
                         Set(new File("/tmp/test/scala-library-2.10.4.jar")),
                         None))
     // FIXME: can't check notification count for Gradle because tool window is uninitialized
     // assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, GradleConstants.SYSTEM_ID, 1)
-  }
 
-  def testWithTheSameVersionOfScalaLibrary(): Unit = {
+  def testWithTheSameVersionOfScalaLibrary(): Unit =
     importProjectData(
         generateProject(Some("2.10.4"),
                         Set(new File("/tmp/test/scala-library-2.10.4.jar")),
@@ -110,9 +102,8 @@ class ScalaGradleDataServiceTest
       .filter(_.getName.contains("scala-library"))
       .exists(_.isScalaSdk)
     assert(isLibrarySetUp, "Scala library is not set up")
-  }
 
-  def testCompilerOptionsSetup(): Unit = {
+  def testCompilerOptionsSetup(): Unit =
     val additionalOptions = Seq(
         "-Xplugin:test-plugin.jar",
         "-Xexperimental",
@@ -169,21 +160,17 @@ class ScalaGradleDataServiceTest
     assert(!compilerConfiguration.specialization)
     assert(compilerConfiguration.uncheckedWarnings)
     assert(!compilerConfiguration.warnings)
-  }
 
-  def testModuleIsNull(): Unit = {
-    val testProject = new project {
+  def testModuleIsNull(): Unit =
+    val testProject = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
 
-      arbitraryNodes += new Node[ScalaModelData] {
+      arbitraryNodes += new Node[ScalaModelData]
         override protected val data: ScalaModelData =
           new ScalaModelData(SbtProjectSystem.Id)
         override protected def key: Key[ScalaModelData] = ScalaModelData.KEY
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
     importProjectData(testProject)
-  }
-}

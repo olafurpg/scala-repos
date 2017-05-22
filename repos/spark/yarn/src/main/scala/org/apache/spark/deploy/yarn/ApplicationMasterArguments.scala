@@ -21,7 +21,7 @@ import scala.collection.mutable.ArrayBuffer
 
 import org.apache.spark.util.{IntParam, MemoryParam}
 
-class ApplicationMasterArguments(val args: Array[String]) {
+class ApplicationMasterArguments(val args: Array[String])
   var userJar: String = null
   var userClass: String = null
   var primaryPyFile: String = null
@@ -33,15 +33,15 @@ class ApplicationMasterArguments(val args: Array[String]) {
 
   parseArgs(args.toList)
 
-  private def parseArgs(inputArgs: List[String]): Unit = {
+  private def parseArgs(inputArgs: List[String]): Unit =
     val userArgsBuffer = new ArrayBuffer[String]()
 
     var args = inputArgs
 
-    while (!args.isEmpty) {
+    while (!args.isEmpty)
       // --num-workers, --worker-memory, and --worker-cores are deprecated since 1.0,
       // the properties with executor in their names are preferred.
-      args match {
+      args match
         case ("--jar") :: value :: tail =>
           userJar = value
           args = tail
@@ -76,25 +76,20 @@ class ApplicationMasterArguments(val args: Array[String]) {
 
         case _ =>
           printUsageAndExit(1, args)
-      }
-    }
 
-    if (primaryPyFile != null && primaryRFile != null) {
+    if (primaryPyFile != null && primaryRFile != null)
       // scalastyle:off println
       System.err.println(
           "Cannot have primary-py-file and primary-r-file at the same time")
       // scalastyle:on println
       System.exit(-1)
-    }
 
     userArgs = userArgsBuffer.toList
-  }
 
-  def printUsageAndExit(exitCode: Int, unknownParam: Any = null) {
+  def printUsageAndExit(exitCode: Int, unknownParam: Any = null)
     // scalastyle:off println
-    if (unknownParam != null) {
+    if (unknownParam != null)
       System.err.println("Unknown/unsupported param " + unknownParam)
-    }
     System.err.println("""
       |Usage: org.apache.spark.deploy.yarn.ApplicationMaster [options]
       |Options:
@@ -112,9 +107,6 @@ class ApplicationMasterArguments(val args: Array[String]) {
       """.stripMargin)
     // scalastyle:on println
     System.exit(exitCode)
-  }
-}
 
-object ApplicationMasterArguments {
+object ApplicationMasterArguments
   val DEFAULT_NUMBER_EXECUTORS = 2
-}

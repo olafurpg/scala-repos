@@ -1,4 +1,4 @@
-class A {
+class A
   def f(xs: List[Int], ys: AnyRef*) = ()
   def f(xs: AnyRef*) = ()
 
@@ -11,4 +11,3 @@ class A {
   f(List(1))
   f(List(1), Nil: _*)
   f(List(1), Array(): _*)
-}

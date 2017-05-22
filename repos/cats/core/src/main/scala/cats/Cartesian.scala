@@ -13,8 +13,7 @@ import simulacrum.typeclass
   * [[Cartesian]] and [[Functor]] to illustrate this.
   */
 @typeclass
-trait Cartesian[F[_]] {
+trait Cartesian[F[_]]
   def product[A, B](fa: F[A], fb: F[B]): F[(A, B)]
-}
 
 object Cartesian extends CartesianArityFunctions

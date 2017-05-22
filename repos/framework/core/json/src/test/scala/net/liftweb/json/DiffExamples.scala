@@ -19,14 +19,13 @@ package json
 
 import org.specs2.mutable.Specification
 
-object DiffExamples extends Specification {
+object DiffExamples extends Specification
   import MergeExamples.{scala1, scala2, lotto1, lotto2, mergedLottoResult}
 
-  "Diff example" in {
+  "Diff example" in
     val Diff(changed, added, deleted) = scala1 diff scala2
     (changed mustEqual expectedChanges) and (added mustEqual expectedAdditions) and
     (deleted mustEqual expectedDeletions)
-  }
 
   val expectedChanges = parse("""
     {
@@ -50,13 +49,12 @@ object DiffExamples extends Specification {
       "features":{ "key1":"val1" }
     }""")
 
-  "Lotto example" in {
+  "Lotto example" in
     val Diff(changed, added, deleted) = mergedLottoResult diff lotto1
     (changed mustEqual JNothing) and (added mustEqual JNothing) and
     (deleted mustEqual lotto2)
-  }
 
-  "Example from http://tlrobinson.net/projects/js/jsondiff/" in {
+  "Example from http://tlrobinson.net/projects/js/jsondiff/" in
     val json1 = read("/diff-example-json1.json")
     val json2 = read("/diff-example-json2.json")
     val expectedChanges = read("/diff-example-expected-changes.json")
@@ -65,7 +63,6 @@ object DiffExamples extends Specification {
 
     json1 diff json2 mustEqual Diff(
         expectedChanges, expectedAdditions, expectedDeletions)
-  }
 
   private def read(resource: String) =
     parse(
@@ -73,4 +70,3 @@ object DiffExamples extends Specification {
           .fromInputStream(getClass.getResourceAsStream(resource))
           .getLines()
           .mkString)
-}

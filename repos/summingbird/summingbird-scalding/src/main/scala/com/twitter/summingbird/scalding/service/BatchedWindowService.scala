@@ -34,7 +34,7 @@ import cascading.flow.FlowDef
   * ordering
   * reducers
   */
-trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
+trait BatchedWindowService[K, V] extends batch.BatchedService[K, V]
 
   /**
     * A request must come in LESS than this window since the last
@@ -47,7 +47,7 @@ trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
     * an empty pipe that is outside the window.
     */
   def readLast(exclusiveUB: BatchID,
-               mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
+               mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] =
     val earliestInput = batcher.earliestTimeOf(exclusiveUB)
     val earliestNeededKey = earliestInput - windowSize
     // We may need values from this batch:
@@ -55,7 +55,6 @@ trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
     // But all of these values are definitly too old:
     val firstZeroBatch = earliestNeededBatch.prev
     Right((firstZeroBatch, Scalding.emptyFlowProducer))
-  }
 
   /**
     * This executes the join algortihm on the streams.
@@ -64,17 +63,14 @@ trait BatchedWindowService[K, V] extends batch.BatchedService[K, V] {
     */
   override def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
                          servStream: TypedPipe[(Timestamp, (K, Option[V]))])
-    : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
+    : TypedPipe[(Timestamp, (K, (W, Option[V])))] =
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)
 
     implicit val ord = ordering
     val win = windowSize // call this once so scala makes a smarter closure
     LookupJoin
-      .withWindow(incoming, servStream, reducers) {
+      .withWindow(incoming, servStream, reducers)
         (l: Timestamp, r: Timestamp) =>
           (l - r) < win
-      }
       .map { case (t, (k, (w, optoptv))) => (t, (k, (w, flatOpt(optoptv)))) }
-  }
-}

@@ -50,7 +50,7 @@ private[spark] class Executor(executorId: String,
                               env: SparkEnv,
                               userClassPath: Seq[URL] = Nil,
                               isLocal: Boolean = false)
-    extends Logging {
+    extends Logging
 
   logInfo(s"Starting executor ID $executorId on host $executorHostname")
 
@@ -71,22 +71,20 @@ private[spark] class Executor(executorId: String,
   // Make sure the local hostname we report matches the cluster scheduler's name for this host
   Utils.setCustomHostname(executorHostname)
 
-  if (!isLocal) {
+  if (!isLocal)
     // Setup an uncaught exception handler for non-local mode.
     // Make any thread terminations due to uncaught exceptions kill the entire
     // executor process to avoid surprising stalls.
     Thread.setDefaultUncaughtExceptionHandler(SparkUncaughtExceptionHandler)
-  }
 
   // Start worker thread pool
   private val threadPool =
     ThreadUtils.newDaemonCachedThreadPool("Executor task launch worker")
   private val executorSource = new ExecutorSource(threadPool, executorId)
 
-  if (!isLocal) {
+  if (!isLocal)
     env.metricsSystem.registerSource(executorSource)
     env.blockManager.initialize(conf.getAppId)
-  }
 
   // Whether to load classes in user jars before those in Spark jars
   private val userClassPathFirst =
@@ -140,7 +138,7 @@ private[spark] class Executor(executorId: String,
                  taskId: Long,
                  attemptNumber: Int,
                  taskName: String,
-                 serializedTask: ByteBuffer): Unit = {
+                 serializedTask: ByteBuffer): Unit =
     val tr = new TaskRunner(context,
                             taskId = taskId,
                             attemptNumber = attemptNumber,
@@ -148,38 +146,32 @@ private[spark] class Executor(executorId: String,
                             serializedTask)
     runningTasks.put(taskId, tr)
     threadPool.execute(tr)
-  }
 
-  def killTask(taskId: Long, interruptThread: Boolean): Unit = {
+  def killTask(taskId: Long, interruptThread: Boolean): Unit =
     val tr = runningTasks.get(taskId)
-    if (tr != null) {
+    if (tr != null)
       tr.kill(interruptThread)
-    }
-  }
 
-  def stop(): Unit = {
+  def stop(): Unit =
     env.metricsSystem.report()
     heartbeater.shutdown()
     heartbeater.awaitTermination(10, TimeUnit.SECONDS)
     threadPool.shutdown()
-    if (!isLocal) {
+    if (!isLocal)
       env.stop()
-    }
-  }
 
   /** Returns the total amount of time this JVM process has spent in garbage collection. */
-  private def computeTotalGcTime(): Long = {
+  private def computeTotalGcTime(): Long =
     ManagementFactory.getGarbageCollectorMXBeans.asScala
       .map(_.getCollectionTime)
       .sum
-  }
 
   class TaskRunner(execBackend: ExecutorBackend,
                    val taskId: Long,
                    val attemptNumber: Int,
                    taskName: String,
                    serializedTask: ByteBuffer)
-      extends Runnable {
+      extends Runnable
 
     /** Whether this task has been killed. */
     @volatile private var killed = false
@@ -193,15 +185,13 @@ private[spark] class Executor(executorId: String,
       */
     @volatile var task: Task[Any] = _
 
-    def kill(interruptThread: Boolean): Unit = {
+    def kill(interruptThread: Boolean): Unit =
       logInfo(s"Executor is trying to kill $taskName (TID $taskId)")
       killed = true
-      if (task != null) {
+      if (task != null)
         task.kill(interruptThread)
-      }
-    }
 
-    override def run(): Unit = {
+    override def run(): Unit =
       val taskMemoryManager = new TaskMemoryManager(env.memoryManager, taskId)
       val deserializeStartTime = System.currentTimeMillis()
       Thread.currentThread.setContextClassLoader(replClassLoader)
@@ -211,7 +201,7 @@ private[spark] class Executor(executorId: String,
       var taskStart: Long = 0
       startGCTime = computeTotalGcTime()
 
-      try {
+      try
         val (taskFiles, taskJars, taskBytes) =
           Task.deserializeWithDependencies(serializedTask)
         updateDependencies(taskFiles, taskJars)
@@ -221,13 +211,12 @@ private[spark] class Executor(executorId: String,
 
         // If this task has been killed before we deserialized it, let's quit now. Otherwise,
         // continue executing the task.
-        if (killed) {
+        if (killed)
           // Throw an exception rather than returning, because returning within a try{} block
           // causes a NonLocalReturnControl exception to be thrown. The NonLocalReturnControl
           // exception will be caught by the catch block, leading to an incorrect ExceptionFailure
           // for the task.
           throw new TaskKilledException
-        }
 
         logDebug("Task " + taskId + "'s epoch is " + task.epoch)
         env.mapOutputTracker.updateEpoch(task.epoch)
@@ -235,52 +224,46 @@ private[spark] class Executor(executorId: String,
         // Run the actual task and measure its runtime.
         taskStart = System.currentTimeMillis()
         var threwException = true
-        val value = try {
+        val value = try
           val res = task.run(taskAttemptId = taskId,
                              attemptNumber = attemptNumber,
                              metricsSystem = env.metricsSystem)
           threwException = false
           res
-        } finally {
+        finally
           val releasedLocks = env.blockManager.releaseAllLocksForTask(taskId)
           val freedMemory = taskMemoryManager.cleanUpAllAllocatedMemory()
 
-          if (freedMemory > 0) {
+          if (freedMemory > 0)
             val errMsg =
               s"Managed memory leak detected; size = $freedMemory bytes, TID = $taskId"
             if (conf.getBoolean("spark.unsafe.exceptionOnMemoryLeak", false) &&
-                !threwException) {
+                !threwException)
               throw new SparkException(errMsg)
-            } else {
+            else
               logError(errMsg)
-            }
-          }
 
-          if (releasedLocks.nonEmpty) {
+          if (releasedLocks.nonEmpty)
             val errMsg =
               s"${releasedLocks.size} block locks were not released by TID = $taskId:\n" +
               releasedLocks.mkString("[", ", ", "]")
             if (conf.getBoolean("spark.storage.exceptionOnPinLeak", false) &&
-                !threwException) {
+                !threwException)
               throw new SparkException(errMsg)
-            } else {
+            else
               logError(errMsg)
-            }
-          }
-        }
         val taskFinish = System.currentTimeMillis()
 
         // If the task has been killed, let's fail it.
-        if (task.killed) {
+        if (task.killed)
           throw new TaskKilledException
-        }
 
         val resultSer = env.serializer.newInstance()
         val beforeSerialization = System.currentTimeMillis()
         val valueBytes = resultSer.serialize(value)
         val afterSerialization = System.currentTimeMillis()
 
-        for (m <- task.metrics) {
+        for (m <- task.metrics)
           // Deserialization happens in two parts: first, we deserialize a Task object, which
           // includes the Partition. Second, Task.run() deserializes the RDD and function to be run.
           m.setExecutorDeserializeTime((taskStart - deserializeStartTime) +
@@ -291,7 +274,6 @@ private[spark] class Executor(executorId: String,
           m.setJvmGCTime(computeTotalGcTime() - startGCTime)
           m.setResultSerializationTime(
               afterSerialization - beforeSerialization)
-        }
 
         // Note: accumulator updates must be collected after TaskMetrics is updated
         val accumUpdates = task.collectAccumulatorUpdates()
@@ -301,15 +283,15 @@ private[spark] class Executor(executorId: String,
         val resultSize = serializedDirectResult.limit
 
         // directSend = sending directly back to the driver
-        val serializedResult: ByteBuffer = {
-          if (maxResultSize > 0 && resultSize > maxResultSize) {
+        val serializedResult: ByteBuffer =
+          if (maxResultSize > 0 && resultSize > maxResultSize)
             logWarning(
                 s"Finished $taskName (TID $taskId). Result is larger than maxResultSize " +
                 s"(${Utils.bytesToString(resultSize)} > ${Utils.bytesToString(maxResultSize)}), " +
                 s"dropping it.")
             ser.serialize(new IndirectTaskResult[Any](
                     TaskResultBlockId(taskId), resultSize))
-          } else if (resultSize > maxDirectResultSize) {
+          else if (resultSize > maxDirectResultSize)
             val blockId = TaskResultBlockId(taskId)
             env.blockManager.putBytes(
                 blockId,
@@ -318,15 +300,13 @@ private[spark] class Executor(executorId: String,
             logInfo(
                 s"Finished $taskName (TID $taskId). $resultSize bytes result sent via BlockManager)")
             ser.serialize(new IndirectTaskResult[Any](blockId, resultSize))
-          } else {
+          else
             logInfo(
                 s"Finished $taskName (TID $taskId). $resultSize bytes result sent to driver")
             serializedDirectResult
-          }
-        }
 
         execBackend.statusUpdate(taskId, TaskState.FINISHED, serializedResult)
-      } catch {
+      catch
         case ffe: FetchFailedException =>
           val reason = ffe.toTaskEndReason
           execBackend.statusUpdate(
@@ -350,75 +330,63 @@ private[spark] class Executor(executorId: String,
 
           // Collect latest accumulator values to report back to the driver
           val accumulatorUpdates: Seq[AccumulableInfo] =
-            if (task != null) {
-              task.metrics.foreach { m =>
+            if (task != null)
+              task.metrics.foreach  m =>
                 m.setExecutorRunTime(System.currentTimeMillis() - taskStart)
                 m.setJvmGCTime(computeTotalGcTime() - startGCTime)
-              }
               task.collectAccumulatorUpdates(taskFailed = true)
-            } else {
+            else
               Seq.empty[AccumulableInfo]
-            }
 
-          val serializedTaskEndReason = {
-            try {
+          val serializedTaskEndReason =
+            try
               ser.serialize(new ExceptionFailure(t, accumulatorUpdates))
-            } catch {
+            catch
               case _: NotSerializableException =>
                 // t is not serializable so just send the stacktrace
                 ser.serialize(new ExceptionFailure(
                         t, accumulatorUpdates, preserveCause = false))
-            }
-          }
           execBackend.statusUpdate(
               taskId, TaskState.FAILED, serializedTaskEndReason)
 
           // Don't forcibly exit unless the exception was inherently fatal, to avoid
           // stopping other tasks unnecessarily.
-          if (Utils.isFatalError(t)) {
+          if (Utils.isFatalError(t))
             SparkUncaughtExceptionHandler.uncaughtException(t)
-          }
-      } finally {
+      finally
         runningTasks.remove(taskId)
-      }
-    }
-  }
 
   /**
     * Create a ClassLoader for use in tasks, adding any JARs specified by the user or any classes
     * created by the interpreter to the search path
     */
-  private def createClassLoader(): MutableURLClassLoader = {
+  private def createClassLoader(): MutableURLClassLoader =
     // Bootstrap the list of jars with the user class path.
     val now = System.currentTimeMillis()
-    userClassPath.foreach { url =>
+    userClassPath.foreach  url =>
       currentJars(url.getPath().split("/").last) = now
-    }
 
     val currentLoader = Utils.getContextOrSparkClassLoader
 
     // For each of the jars in the jarSet, add them to the class loader.
     // We assume each of the files has already been fetched.
     val urls =
-      userClassPath.toArray ++ currentJars.keySet.map { uri =>
+      userClassPath.toArray ++ currentJars.keySet.map  uri =>
         new File(uri.split("/").last).toURI.toURL
-      }
-    if (userClassPathFirst) {
+    if (userClassPathFirst)
       new ChildFirstURLClassLoader(urls, currentLoader)
-    } else {
+    else
       new MutableURLClassLoader(urls, currentLoader)
-    }
-  }
 
   /**
     * If the REPL is in use, add another ClassLoader that will read
     * new classes defined by the REPL as the user types code
     */
-  private def addReplClassLoaderIfNeeded(parent: ClassLoader): ClassLoader = {
+  private def addReplClassLoaderIfNeeded(parent: ClassLoader): ClassLoader =
     val classUri = conf.get("spark.repl.class.uri", null)
-    if (classUri != null) {
+    if (classUri != null)
       logInfo("Using REPL class URI: " + classUri)
-      try {
+      try
         val _userClassPathFirst: java.lang.Boolean = userClassPathFirst
         val klass = Utils
           .classForName("org.apache.spark.repl.ExecutorClassLoader")
@@ -430,29 +398,26 @@ private[spark] class Executor(executorId: String,
                                                classOf[Boolean])
         constructor.newInstance(
             conf, env, classUri, parent, _userClassPathFirst)
-      } catch {
+      catch
         case _: ClassNotFoundException =>
           logError(
               "Could not find org.apache.spark.repl.ExecutorClassLoader on classpath!")
           System.exit(1)
           null
-      }
-    } else {
+    else
       parent
-    }
-  }
 
   /**
     * Download any missing dependencies if we receive a new set of files and JARs from the
     * SparkContext. Also adds any new JARs we fetched to the class loader.
     */
   private def updateDependencies(
-      newFiles: HashMap[String, Long], newJars: HashMap[String, Long]) {
+      newFiles: HashMap[String, Long], newJars: HashMap[String, Long])
     lazy val hadoopConf = SparkHadoopUtil.get.newConfiguration(conf)
-    synchronized {
+    synchronized
       // Fetch missing dependencies
       for ((name, timestamp) <- newFiles
-                                   if currentFiles.getOrElse(name, -1L) < timestamp) {
+                                   if currentFiles.getOrElse(name, -1L) < timestamp)
         logInfo("Fetching " + name + " with timestamp " + timestamp)
         // Fetch file with useCache mode, close cache for local mode.
         Utils.fetchFile(name,
@@ -463,14 +428,13 @@ private[spark] class Executor(executorId: String,
                         timestamp,
                         useCache = !isLocal)
         currentFiles(name) = timestamp
-      }
-      for ((name, timestamp) <- newJars) {
+      for ((name, timestamp) <- newJars)
         val localName = name.split("/").last
         val currentTimeStamp = currentJars
           .get(name)
           .orElse(currentJars.get(localName))
           .getOrElse(-1L)
-        if (currentTimeStamp < timestamp) {
+        if (currentTimeStamp < timestamp)
           logInfo("Fetching " + name + " with timestamp " + timestamp)
           // Fetch file with useCache mode, close cache for local mode.
           Utils.fetchFile(name,
@@ -484,58 +448,46 @@ private[spark] class Executor(executorId: String,
           // Add it to our class loader
           val url =
             new File(SparkFiles.getRootDirectory(), localName).toURI.toURL
-          if (!urlClassLoader.getURLs().contains(url)) {
+          if (!urlClassLoader.getURLs().contains(url))
             logInfo("Adding " + url + " to class loader")
             urlClassLoader.addURL(url)
-          }
-        }
-      }
-    }
-  }
 
   /** Reports heartbeat and metrics for active tasks to the driver. */
-  private def reportHeartBeat(): Unit = {
+  private def reportHeartBeat(): Unit =
     // list of (task id, accumUpdates) to send back to the driver
     val accumUpdates = new ArrayBuffer[(Long, Seq[AccumulableInfo])]()
     val curGCTime = computeTotalGcTime()
 
-    for (taskRunner <- runningTasks.values().asScala) {
-      if (taskRunner.task != null) {
-        taskRunner.task.metrics.foreach { metrics =>
+    for (taskRunner <- runningTasks.values().asScala)
+      if (taskRunner.task != null)
+        taskRunner.task.metrics.foreach  metrics =>
           metrics.mergeShuffleReadMetrics()
           metrics.setJvmGCTime(curGCTime - taskRunner.startGCTime)
           accumUpdates += ((taskRunner.taskId, metrics.accumulatorUpdates()))
-        }
-      }
-    }
 
     val message = Heartbeat(
         executorId, accumUpdates.toArray, env.blockManager.blockManagerId)
-    try {
+    try
       val response = heartbeatReceiverRef.askWithRetry[HeartbeatResponse](
           message, RpcTimeout(conf, "spark.executor.heartbeatInterval", "10s"))
-      if (response.reregisterBlockManager) {
+      if (response.reregisterBlockManager)
         logInfo("Told to re-register on heartbeat")
         env.blockManager.reregister()
-      }
       heartbeatFailures = 0
-    } catch {
+    catch
       case NonFatal(e) =>
         logWarning("Issue communicating with driver in heartbeater", e)
         heartbeatFailures += 1
-        if (heartbeatFailures >= HEARTBEAT_MAX_FAILURES) {
+        if (heartbeatFailures >= HEARTBEAT_MAX_FAILURES)
           logError(
               s"Exit as unable to send heartbeats to driver " +
               s"more than $HEARTBEAT_MAX_FAILURES times")
           System.exit(ExecutorExitCode.HEARTBEAT_FAILURE)
-        }
-    }
-  }
 
   /**
     * Schedules a task to report heartbeat and partial metrics for active tasks to driver.
     */
-  private def startDriverHeartbeater(): Unit = {
+  private def startDriverHeartbeater(): Unit =
     val intervalMs =
       conf.getTimeAsMs("spark.executor.heartbeatInterval", "10s")
 
@@ -543,10 +495,7 @@ private[spark] class Executor(executorId: String,
     val initialDelay =
       intervalMs + (math.random * intervalMs).asInstanceOf[Int]
 
-    val heartbeatTask = new Runnable() {
+    val heartbeatTask = new Runnable()
       override def run(): Unit = Utils.logUncaughtExceptions(reportHeartBeat())
-    }
     heartbeater.scheduleAtFixedRate(
         heartbeatTask, initialDelay, intervalMs, TimeUnit.MILLISECONDS)
-  }
-}

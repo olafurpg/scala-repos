@@ -14,7 +14,7 @@ import java.lang.Math
 
 object NaturalBenchmarks extends MyRunner(classOf[NaturalBenchmarks])
 
-class NaturalBenchmarks extends MyBenchmark {
+class NaturalBenchmarks extends MyBenchmark
   import spire.math.SafeLong.SafeLongAlgebra
 
   //@Param(Array("8", "16", "32", "64", "96", "128", "192", "256"))
@@ -32,12 +32,11 @@ class NaturalBenchmarks extends MyBenchmark {
   var bigints: Array[BigInt] = _
   var safes: Array[SafeLong] = _
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     size = Math.pow(2, pow).toInt
     bigints = init(size)(BigInt(bits, Random))
     nats = bigints.map(Natural(_))
     safes = bigints.map(SafeLong(_))
-  }
 
   def timeNaturalSum(reps: Int) = run(reps)(nats.qsum)
   def timeBigIntSum(reps: Int) = run(reps)(bigints.qsum)
@@ -62,4 +61,3 @@ class NaturalBenchmarks extends MyBenchmark {
   def timeNaturalMin(reps: Int) = run(reps)(nats.qmin)
   def timeBigIntMin(reps: Int) = run(reps)(bigints.qmin)
   def timeSafeLongMin(reps: Int) = run(reps)(safes.qmin)
-}

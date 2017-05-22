@@ -7,7 +7,7 @@ import java.io.{Reader, Writer}
   *
   *  Further, it can write/read a value of this type to a string.
   */
-private[json] trait AbstractJSONImpl {
+private[json] trait AbstractJSONImpl
 
   type Repr
 
@@ -28,4 +28,3 @@ private[json] trait AbstractJSONImpl {
 
   def deserialize(str: String): Repr
   def deserialize(reader: Reader): Repr
-}

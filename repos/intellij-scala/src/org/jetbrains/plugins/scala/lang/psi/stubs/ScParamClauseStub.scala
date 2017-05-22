@@ -10,6 +10,5 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterCla
   * User: Alexander Podkhalyuzin
   * Date: 19.10.2008
   */
-trait ScParamClauseStub extends StubElement[ScParameterClause] {
+trait ScParamClauseStub extends StubElement[ScParameterClause]
   def isImplicit: Boolean
-}

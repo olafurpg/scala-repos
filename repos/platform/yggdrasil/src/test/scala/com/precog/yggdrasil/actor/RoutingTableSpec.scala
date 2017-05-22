@@ -31,8 +31,6 @@ import org.specs2.matcher.{Matcher, MatchResult, Expectable}
 import scala.collection.immutable.ListMap
 import scala.math.BigDecimal
 
-class RoutingTableSpec extends Specification {
-  "SinglePathProjectionRoutingTable" should {
+class RoutingTableSpec extends Specification
+  "SinglePathProjectionRoutingTable" should
     "test something" in todo
-  }
-}

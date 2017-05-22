@@ -21,7 +21,7 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
   *   Cluster(system).subscribe(actorRef, classOf[ClusterDomainEvent])
   * }}}
   */
-object ClusterEvent {
+object ClusterEvent
 
   sealed abstract class SubscriptionInitialStateMode
 
@@ -62,15 +62,14 @@ object ClusterEvent {
       unreachable: Set[Member] = Set.empty,
       seenBy: Set[Address] = Set.empty,
       leader: Option[Address] = None,
-      roleLeaderMap: Map[String, Option[Address]] = Map.empty) {
+      roleLeaderMap: Map[String, Option[Address]] = Map.empty)
 
     /**
       * Java API: get current member list.
       */
-    def getMembers: java.lang.Iterable[Member] = {
+    def getMembers: java.lang.Iterable[Member] =
       import scala.collection.JavaConverters._
       members.asJava
-    }
 
     /**
       * Java API: get current unreachable set.
@@ -112,7 +111,6 @@ object ClusterEvent {
       */
     def getRoleLeader(role: String): Address =
       roleLeaderMap.get(role).flatten.orNull
-  }
 
   /**
     * Marker interface for membership events.
@@ -121,18 +119,16 @@ object ClusterEvent {
     * convergence on the leader node, i.e. all members had seen previous
     * state.
     */
-  sealed trait MemberEvent extends ClusterDomainEvent {
+  sealed trait MemberEvent extends ClusterDomainEvent
     def member: Member
-  }
 
   /**
     * Member status changed to Joining.
     */
-  final case class MemberJoined(member: Member) extends MemberEvent {
+  final case class MemberJoined(member: Member) extends MemberEvent
     if (member.status != Joining)
       throw new IllegalArgumentException(
           "Expected Joining status, got: " + member)
-  }
 
   /**
     * Member status changed to WeaklyUp.
@@ -140,38 +136,34 @@ object ClusterEvent {
     * cannot be reached, i.e. there are unreachable nodes.
     * It will be moved to `Up` when convergence is reached.
     */
-  final case class MemberWeaklyUp(member: Member) extends MemberEvent {
+  final case class MemberWeaklyUp(member: Member) extends MemberEvent
     if (member.status != WeaklyUp)
       throw new IllegalArgumentException(
           "Expected WeaklyUp status, got: " + member)
-  }
 
   /**
     * Member status changed to Up.
     */
-  final case class MemberUp(member: Member) extends MemberEvent {
+  final case class MemberUp(member: Member) extends MemberEvent
     if (member.status != Up)
       throw new IllegalArgumentException("Expected Up status, got: " + member)
-  }
 
   /**
     * Member status changed to Leaving.
     */
-  final case class MemberLeft(member: Member) extends MemberEvent {
+  final case class MemberLeft(member: Member) extends MemberEvent
     if (member.status != Leaving)
       throw new IllegalArgumentException(
           "Expected Leaving status, got: " + member)
-  }
 
   /**
     * Member status changed to `MemberStatus.Exiting` and will be removed
     * when all members have seen the `Exiting` status.
     */
-  final case class MemberExited(member: Member) extends MemberEvent {
+  final case class MemberExited(member: Member) extends MemberEvent
     if (member.status != Exiting)
       throw new IllegalArgumentException(
           "Expected Exiting status, got: " + member)
-  }
 
   /**
     * Member completely removed from the cluster.
@@ -181,39 +173,36 @@ object ClusterEvent {
     * after graceful leaving and exiting.
     */
   final case class MemberRemoved(member: Member, previousStatus: MemberStatus)
-      extends MemberEvent {
+      extends MemberEvent
     if (member.status != Removed)
       throw new IllegalArgumentException(
           "Expected Removed status, got: " + member)
-  }
 
   /**
     * Leader of the cluster members changed. Published when the state change
     * is first seen on a node.
     */
   final case class LeaderChanged(leader: Option[Address])
-      extends ClusterDomainEvent {
+      extends ClusterDomainEvent
 
     /**
       * Java API
       * @return address of current leader, or null if none
       */
     def getLeader: Address = leader orNull
-  }
 
   /**
     * First member (leader) of the members within a role set changed.
     * Published when the state change is first seen on a node.
     */
   final case class RoleLeaderChanged(role: String, leader: Option[Address])
-      extends ClusterDomainEvent {
+      extends ClusterDomainEvent
 
     /**
       * Java API
       * @return address of current leader, or null if none
       */
     def getLeader: Address = leader orNull
-  }
 
   /**
     * This event is published when the cluster node is shutting down,
@@ -251,7 +240,7 @@ object ClusterEvent {
       "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)",
       "2.4")
   final case class ClusterMetricsChanged(nodeMetrics: Set[NodeMetrics])
-      extends ClusterDomainEvent {
+      extends ClusterDomainEvent
 
     /**
       * Java API
@@ -260,7 +249,6 @@ object ClusterEvent {
       scala.collection.JavaConverters
         .asJavaIterableConverter(nodeMetrics)
         .asJava
-  }
 
   /**
     * INTERNAL API
@@ -292,16 +280,15 @@ object ClusterEvent {
       newGossip: Gossip,
       selfUniqueAddress: UniqueAddress): immutable.Seq[UnreachableMember] =
     if (newGossip eq oldGossip) Nil
-    else {
+    else
       val oldUnreachableNodes =
         oldGossip.overview.reachability.allUnreachableOrTerminated
-      (newGossip.overview.reachability.allUnreachableOrTerminated.collect {
+      (newGossip.overview.reachability.allUnreachableOrTerminated.collect
         case node
             if !oldUnreachableNodes.contains(node) &&
             node != selfUniqueAddress ⇒
           UnreachableMember(newGossip.member(node))
-      })(collection.breakOut)
-    }
+      )(collection.breakOut)
 
   /**
     * INTERNAL API
@@ -311,15 +298,14 @@ object ClusterEvent {
       newGossip: Gossip,
       selfUniqueAddress: UniqueAddress): immutable.Seq[ReachableMember] =
     if (newGossip eq oldGossip) Nil
-    else {
-      (oldGossip.overview.reachability.allUnreachable.collect {
+    else
+      (oldGossip.overview.reachability.allUnreachable.collect
         case node
             if newGossip.hasMember(node) &&
             newGossip.overview.reachability.isReachable(node) &&
             node != selfUniqueAddress ⇒
           ReachableMember(newGossip.member(node))
-      })(collection.breakOut)
-    }
+      )(collection.breakOut)
 
   /**
     * INTERNAL API.
@@ -327,27 +313,25 @@ object ClusterEvent {
   private[cluster] def diffMemberEvents(
       oldGossip: Gossip, newGossip: Gossip): immutable.Seq[MemberEvent] =
     if (newGossip eq oldGossip) Nil
-    else {
+    else
       val newMembers = newGossip.members diff oldGossip.members
       val membersGroupedByAddress =
         List(newGossip.members, oldGossip.members).flatten
           .groupBy(_.uniqueAddress)
       val changedMembers =
-        membersGroupedByAddress collect {
+        membersGroupedByAddress collect
           case (_, newMember :: oldMember :: Nil)
               if newMember.status != oldMember.status ||
               newMember.upNumber != oldMember.upNumber ⇒
             newMember
-        }
       val memberEvents =
-        (newMembers ++ changedMembers) collect {
+        (newMembers ++ changedMembers) collect
           case m if m.status == Joining ⇒ MemberJoined(m)
           case m if m.status == WeaklyUp ⇒ MemberWeaklyUp(m)
           case m if m.status == Up ⇒ MemberUp(m)
           case m if m.status == Leaving ⇒ MemberLeft(m)
           case m if m.status == Exiting ⇒ MemberExited(m)
           // no events for other transitions
-        }
 
       val removedMembers = oldGossip.members diff newGossip.members
       val removedEvents = removedMembers.map(
@@ -355,7 +339,6 @@ object ClusterEvent {
 
       (new VectorBuilder[MemberEvent]() ++= memberEvents ++= removedEvents)
         .result()
-    }
 
   /**
     * INTERNAL API
@@ -363,12 +346,11 @@ object ClusterEvent {
   private[cluster] def diffLeader(
       oldGossip: Gossip,
       newGossip: Gossip,
-      selfUniqueAddress: UniqueAddress): immutable.Seq[LeaderChanged] = {
+      selfUniqueAddress: UniqueAddress): immutable.Seq[LeaderChanged] =
     val newLeader = newGossip.leader(selfUniqueAddress)
     if (newLeader != oldGossip.leader(selfUniqueAddress))
       List(LeaderChanged(newLeader.map(_.address)))
     else Nil
-  }
 
   /**
     * INTERNAL API
@@ -376,13 +358,12 @@ object ClusterEvent {
   private[cluster] def diffRolesLeader(
       oldGossip: Gossip,
       newGossip: Gossip,
-      selfUniqueAddress: UniqueAddress): Set[RoleLeaderChanged] = {
-    for {
+      selfUniqueAddress: UniqueAddress): Set[RoleLeaderChanged] =
+    for
       role ← (oldGossip.allRoles union newGossip.allRoles)
       newLeader = newGossip.roleLeader(role, selfUniqueAddress)
           if newLeader != oldGossip.roleLeader(role, selfUniqueAddress)
-    } yield RoleLeaderChanged(role, newLeader.map(_.address))
-  }
+    yield RoleLeaderChanged(role, newLeader.map(_.address))
 
   /**
     * INTERNAL API
@@ -392,14 +373,13 @@ object ClusterEvent {
       newGossip: Gossip,
       selfUniqueAddress: UniqueAddress): immutable.Seq[SeenChanged] =
     if (newGossip eq oldGossip) Nil
-    else {
+    else
       val newConvergence = newGossip.convergence(selfUniqueAddress)
       val newSeenBy = newGossip.seenBy
       if (newConvergence != oldGossip.convergence(selfUniqueAddress) ||
           newSeenBy != oldGossip.seenBy)
         List(SeenChanged(newConvergence, newSeenBy.map(_.address)))
       else Nil
-    }
 
   /**
     * INTERNAL API
@@ -409,7 +389,6 @@ object ClusterEvent {
       newGossip: Gossip): immutable.Seq[ReachabilityChanged] =
     if (newGossip.overview.reachability eq oldGossip.overview.reachability) Nil
     else List(ReachabilityChanged(newGossip.overview.reachability))
-}
 
 /**
   * INTERNAL API.
@@ -418,23 +397,21 @@ object ClusterEvent {
   */
 private[cluster] final class ClusterDomainEventPublisher
     extends Actor with ActorLogging
-    with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    with RequiresMessageQueue[UnboundedMessageQueueSemantics]
   import InternalClusterAction._
 
   val selfUniqueAddress = Cluster(context.system).selfUniqueAddress
   var latestGossip: Gossip = Gossip.empty
 
-  override def preRestart(reason: Throwable, message: Option[Any]) {
+  override def preRestart(reason: Throwable, message: Option[Any])
     // don't postStop when restarted, no children to stop
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     // publish the final removed state before shutting down
     publish(ClusterShuttingDown)
     publishChanges(Gossip.empty)
-  }
 
-  def receive = {
+  def receive =
     case PublishChanges(newGossip) ⇒ publishChanges(newGossip)
     case currentStats: CurrentInternalStats ⇒
       publishInternalStats(currentStats)
@@ -443,7 +420,6 @@ private[cluster] final class ClusterDomainEventPublisher
       subscribe(subscriber, initMode, to)
     case Unsubscribe(subscriber, to) ⇒ unsubscribe(subscriber, to)
     case PublishEvent(event) ⇒ publish(event)
-  }
 
   def eventStream: EventStream = context.system.eventStream
 
@@ -451,11 +427,10 @@ private[cluster] final class ClusterDomainEventPublisher
     * The current snapshot state corresponding to latest gossip
     * to mimic what you would have seen if you were listening to the events.
     */
-  def sendCurrentClusterState(receiver: ActorRef): Unit = {
+  def sendCurrentClusterState(receiver: ActorRef): Unit =
     val unreachable: Set[Member] =
-      latestGossip.overview.reachability.allUnreachableOrTerminated.collect {
+      latestGossip.overview.reachability.allUnreachableOrTerminated.collect
         case node if node != selfUniqueAddress ⇒ latestGossip.member(node)
-      }
     val state = CurrentClusterState(
         members = latestGossip.members,
         unreachable = unreachable,
@@ -466,39 +441,33 @@ private[cluster] final class ClusterDomainEventPublisher
                   .roleLeader(r, selfUniqueAddress)
                   .map(_.address))(collection.breakOut))
     receiver ! state
-  }
 
   def subscribe(subscriber: ActorRef,
                 initMode: SubscriptionInitialStateMode,
-                to: Set[Class[_]]): Unit = {
-    initMode match {
+                to: Set[Class[_]]): Unit =
+    initMode match
       case InitialStateAsEvents ⇒
-        def pub(event: AnyRef): Unit = {
+        def pub(event: AnyRef): Unit =
           if (to.exists(_.isAssignableFrom(event.getClass))) subscriber ! event
-        }
         publishDiff(Gossip.empty, latestGossip, pub)
       case InitialStateAsSnapshot ⇒
         sendCurrentClusterState(subscriber)
-    }
 
     to foreach { eventStream.subscribe(subscriber, _) }
-  }
 
   def unsubscribe(subscriber: ActorRef, to: Option[Class[_]]): Unit =
-    to match {
+    to match
       case None ⇒ eventStream.unsubscribe(subscriber)
       case Some(c) ⇒ eventStream.unsubscribe(subscriber, c)
-    }
 
-  def publishChanges(newGossip: Gossip): Unit = {
+  def publishChanges(newGossip: Gossip): Unit =
     val oldGossip = latestGossip
     // keep the latestGossip to be sent to new subscribers
     latestGossip = newGossip
     publishDiff(oldGossip, newGossip, publish)
-  }
 
   def publishDiff(
-      oldGossip: Gossip, newGossip: Gossip, pub: AnyRef ⇒ Unit): Unit = {
+      oldGossip: Gossip, newGossip: Gossip, pub: AnyRef ⇒ Unit): Unit =
     diffMemberEvents(oldGossip, newGossip) foreach pub
     diffUnreachable(oldGossip, newGossip, selfUniqueAddress) foreach pub
     diffReachable(oldGossip, newGossip, selfUniqueAddress) foreach pub
@@ -507,14 +476,11 @@ private[cluster] final class ClusterDomainEventPublisher
     // publish internal SeenState for testing purposes
     diffSeen(oldGossip, newGossip, selfUniqueAddress) foreach pub
     diffReachability(oldGossip, newGossip) foreach pub
-  }
 
   def publishInternalStats(currentStats: CurrentInternalStats): Unit =
     publish(currentStats)
 
   def publish(event: AnyRef): Unit = eventStream publish event
 
-  def clearState(): Unit = {
+  def clearState(): Unit =
     latestGossip = Gossip.empty
-  }
-}

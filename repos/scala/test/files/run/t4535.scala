@@ -1,9 +1,9 @@
 import collection._
 
 // #4535
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val as = new mutable.ArrayStack[Int]
     as push 1
     as push 2
@@ -16,14 +16,11 @@ object Test {
     println(as.reverse)
 
     println(
-        as map { x =>
+        as map  x =>
       x
-    })
+    )
 
-    for (i <- 0 until 100) {
+    for (i <- 0 until 100)
       as push i
       assert(as == as.map(x => x))
       assert(as == as.reverse.reverse)
-    }
-  }
-}

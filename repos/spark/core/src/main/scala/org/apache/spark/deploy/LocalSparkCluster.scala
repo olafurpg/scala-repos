@@ -36,7 +36,7 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
                                        coresPerWorker: Int,
                                        memoryPerWorker: Int,
                                        conf: SparkConf)
-    extends Logging {
+    extends Logging
 
   private val localHostname = Utils.localHostName()
   private val masterRpcEnvs = ArrayBuffer[RpcEnv]()
@@ -44,7 +44,7 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
   // exposed for testing
   var masterWebUIPort = -1
 
-  def start(): Array[String] = {
+  def start(): Array[String] =
     logInfo("Starting a local Spark cluster with " + numWorkers + " workers.")
 
     // Disable REST server on Master in this mode unless otherwise specified
@@ -63,7 +63,7 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
     val masters = Array(masterUrl)
 
     /* Start the Workers */
-    for (workerNum <- 1 to numWorkers) {
+    for (workerNum <- 1 to numWorkers)
       val workerEnv = Worker.startRpcEnvAndEndpoint(localHostname,
                                                     0,
                                                     0,
@@ -74,12 +74,10 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
                                                     Some(workerNum),
                                                     _conf)
       workerRpcEnvs += workerEnv
-    }
 
     masters
-  }
 
-  def stop() {
+  def stop()
     logInfo("Shutting down local Spark cluster.")
     // Stop the workers before the master so they don't get upset that it disconnected
     workerRpcEnvs.foreach(_.shutdown())
@@ -88,5 +86,3 @@ private[spark] class LocalSparkCluster(numWorkers: Int,
     masterRpcEnvs.foreach(_.awaitTermination())
     masterRpcEnvs.clear()
     workerRpcEnvs.clear()
-  }
-}

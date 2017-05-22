@@ -7,26 +7,21 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TwitterDateFormatTest extends WordSpec {
-  "TwitterDateFormat" should {
-    "disallow Y without w" in {
-      intercept[IllegalArgumentException] {
+class TwitterDateFormatTest extends WordSpec
+  "TwitterDateFormat" should
+    "disallow Y without w" in
+      intercept[IllegalArgumentException]
         TwitterDateFormat("YYYYMMDD")
-      }
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         TwitterDateFormat("YMD", Locale.GERMAN)
-      }
-    }
 
-    "allow Y with w" in {
+    "allow Y with w" in
       TwitterDateFormat("YYYYww")
-    }
 
-    "allow Y when quoted" in {
+    "allow Y when quoted" in
       TwitterDateFormat("yyyy 'Year'")
-    }
 
-    "stripSingleQuoted" in {
+    "stripSingleQuoted" in
       import TwitterDateFormat._
       assert(stripSingleQuoted("") == "")
       assert(stripSingleQuoted("YYYY") == "YYYY")
@@ -36,12 +31,7 @@ class TwitterDateFormatTest extends WordSpec {
       assert(stripSingleQuoted("'abc'x") == "x")
       assert(stripSingleQuoted("'abc'def'ghi'") == "def")
 
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         stripSingleQuoted("'abc")
-      }
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         stripSingleQuoted("'abc'def'ghi")
-      }
-    }
-  }
-}

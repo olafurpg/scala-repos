@@ -15,7 +15,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 final class RedisScalatraBroadcaster(
     )(implicit wireFormat: WireFormat, protected var _actorSystem: ActorSystem)
-    extends RedisBroadcaster with ScalatraBroadcaster {
+    extends RedisBroadcaster with ScalatraBroadcaster
 
   private[this] val logger: Logger = Logger[RedisScalatraBroadcaster]
   protected var _resources: ConcurrentLinkedQueue[AtmosphereResource] =
@@ -26,7 +26,7 @@ final class RedisScalatraBroadcaster(
 
   override def broadcast[T <: OutboundMessage](
       msg: T, clientFilter: ClientFilter)(
-      implicit executionContext: ExecutionContext): Future[T] = {
+      implicit executionContext: ExecutionContext): Future[T] =
     logger.info(
         "Resource [%s] sending message to [%s] with contents:  [%s]".format(
             clientFilter.uuid, clientFilter, msg))
@@ -39,17 +39,16 @@ final class RedisScalatraBroadcaster(
     val wrappedMessageString = write(wrappedMessage)
 
     broadcast(wrappedMessageString).map(_ => msg)
-  }
 
-  override protected def broadcastReceivedMessage(message: AnyRef) {
-    try {
+  override protected def broadcastReceivedMessage(message: AnyRef)
+    try
       val messageString = message.asInstanceOf[String]
       val redisMessage = read[Message](messageString)
       val embeddedMsg = redisMessage.msg
       val clientFilter = redisMessage.clientFilter
       val newMsg = filter(embeddedMsg)
 
-      if (newMsg != null) {
+      if (newMsg != null)
         val selectedResources = _resources.asScala filter clientFilter
         val selectedSet = selectedResources.toSet.asJava
         push(
@@ -57,12 +56,8 @@ final class RedisScalatraBroadcaster(
                         selectedSet,
                         new BroadcasterFuture[Any](newMsg),
                         embeddedMsg))
-      }
-    } catch {
+    catch
       case t: Throwable =>
         logger.error("failed to push message: " + message, t)
-    }
-  }
-}
 
 class Message(val msg: String, val clientFilter: ClientFilter)

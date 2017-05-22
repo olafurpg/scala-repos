@@ -28,9 +28,8 @@ import org.apache.spark.annotation.DeveloperApi
   * Listener providing a callback function to invoke when a task's execution completes.
   */
 @DeveloperApi
-trait TaskCompletionListener extends EventListener {
+trait TaskCompletionListener extends EventListener
   def onTaskCompletion(context: TaskContext): Unit
-}
 
 /**
   * :: DeveloperApi ::
@@ -39,26 +38,23 @@ trait TaskCompletionListener extends EventListener {
   * Operations defined here must be idempotent, as `onTaskFailure` can be called multiple times.
   */
 @DeveloperApi
-trait TaskFailureListener extends EventListener {
+trait TaskFailureListener extends EventListener
   def onTaskFailure(context: TaskContext, error: Throwable): Unit
-}
 
 /**
   * Exception thrown when there is an exception in executing the callback in TaskCompletionListener.
   */
 private[spark] class TaskCompletionListenerException(
     errorMessages: Seq[String], val previousError: Option[Throwable] = None)
-    extends RuntimeException {
+    extends RuntimeException
 
-  override def getMessage: String = {
-    if (errorMessages.size == 1) {
+  override def getMessage: String =
+    if (errorMessages.size == 1)
       errorMessages.head
-    } else {
+    else
       errorMessages.zipWithIndex.map { case (msg, i) => s"Exception $i: $msg" }
         .mkString("\n")
-    } + previousError.map { e =>
+    + previousError.map  e =>
       "\n\nPrevious exception in task: " + e.getMessage + "\n" +
       e.getStackTrace.mkString("\t", "\n\t", "")
-    }.getOrElse("")
-  }
-}
+    .getOrElse("")

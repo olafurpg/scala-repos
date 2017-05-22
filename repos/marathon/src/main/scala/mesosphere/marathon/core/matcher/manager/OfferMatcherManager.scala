@@ -4,7 +4,7 @@ import mesosphere.marathon.core.matcher.base.OfferMatcher
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait OfferMatcherManager {
+trait OfferMatcherManager
   def addSubscription(offerMatcher: OfferMatcher)(
       implicit ec: ExecutionContext): Future[Unit]
   def removeSubscription(offerMatcher: OfferMatcher)(
@@ -15,4 +15,3 @@ trait OfferMatcherManager {
 
   /** Sets the number of allowed future task matches to the given number. */
   def setLaunchTokens(tokens: Int): Unit
-}

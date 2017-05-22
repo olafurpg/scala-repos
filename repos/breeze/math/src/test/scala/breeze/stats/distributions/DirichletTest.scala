@@ -25,20 +25,16 @@ import breeze.linalg.{softmax, DenseVector, SparseVector}
 import math.{abs, exp}
 
 @RunWith(classOf[JUnitRunner])
-class DirichletTest extends FunSuite with Checkers {
+class DirichletTest extends FunSuite with Checkers
 
-  test("logDraw for small values") {
+  test("logDraw for small values")
     val g = new Dirichlet(DenseVector(1E-5, 5.0, 50.0))
     assert(
         Array.fill(1000)(g.logDraw()).forall(_ (0) > Double.NegativeInfinity))
-  }
 
-  test("logDraw of SparseVector") {
+  test("logDraw of SparseVector")
     val g = new Dirichlet(SparseVector(7)(1 -> 1E-5, 3 -> 5.0, 5 -> 50.0))
-    Array.fill(1000)(g.logDraw()).foreach { (d: SparseVector[Double]) =>
+    Array.fill(1000)(g.logDraw()).foreach  (d: SparseVector[Double]) =>
       assert(d(1) > Double.NegativeInfinity)
       assert(d.activeSize == 3)
       assert(abs(exp(softmax(d.activeValuesIterator)) - 1.0) < 0.0000001, d)
-    }
-  }
-}

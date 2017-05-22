@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
-class RequestBuilderTest extends FunSuite {
+class RequestBuilderTest extends FunSuite
   val URL0 = new URL("http://joe:blow@www.google.com:77/xxx?foo=bar#xxx")
   val URL1 = new URL("https://www.google.com/")
   val URL2 = new URL(
@@ -41,13 +41,11 @@ v3
 
   val FORMPOST0 = "k1=v1&k2=v2&k3=v3"
 
-  test("reject non-http urls") {
-    intercept[IllegalArgumentException] {
+  test("reject non-http urls")
+    intercept[IllegalArgumentException]
       RequestBuilder().url(new URL("ftp:///blah"))
-    }
-  }
 
-  test("set the HOST header") {
+  test("set the HOST header")
     val get = RequestBuilder().url(URL0).buildGet
     val head = RequestBuilder().url(URL0).buildHead
     val delete = RequestBuilder().url(URL0).buildDelete
@@ -60,9 +58,8 @@ v3
     assert(delete.headers.get(Fields.Host) == expected)
     assert(put.headers.get(Fields.Host) == expected)
     assert(post.headers.get(Fields.Host) == expected)
-  }
 
-  test("set the Authorization header when userInfo is present") {
+  test("set the Authorization header when userInfo is present")
     val req0 = RequestBuilder().url(URL0).buildGet
     val req1 = RequestBuilder().url(URL1).buildGet
     val req2 = RequestBuilder().url(URL0).buildHead
@@ -88,17 +85,15 @@ v3
     assert(req8.headers.get(Fields.Authorization) == expected)
     assert(req9.headers.get(Fields.Authorization) == null)
     assert(req10.headers.get(Fields.Authorization) == expectedSpecial)
-  }
 
-  test("replace the empty path with /") {
+  test("replace the empty path with /")
     val req0 = RequestBuilder().url(new URL("http://a.com")).buildGet
     val req1 = RequestBuilder().url(new URL("http://a.com?xxx")).buildGet
 
     req0.getUri == "/"
     req1.getUri == "/?xxx"
-  }
 
-  test("not include the fragment in the resource") {
+  test("not include the fragment in the resource")
     val u0 = new URL("http://a.com#xxx")
     val u1 = new URL("http://a.com/#xxx")
     val u2 = new URL("http://a.com/?abc=def#xxx")
@@ -134,9 +129,8 @@ v3
     assert(post0.getUri == "/")
     assert(post1.getUri == "/")
     assert(post2.getUri == "/?abc=def")
-  }
 
-  test("not include the empty query string") {
+  test("not include the empty query string")
     val u0 = new URL("http://a.com?")
     val u1 = new URL("http://a.com/?")
     val u2 = new URL("http://a.com/?#xxx")
@@ -172,9 +166,8 @@ v3
     assert(post0.getUri == "/")
     assert(post1.getUri == "/")
     assert(post2.getUri == "/")
-  }
 
-  test("set the correct protocol version") {
+  test("set the correct protocol version")
     val get0 = RequestBuilder().url(URL0).buildGet
     val get1 = RequestBuilder().url(URL0).http10.buildGet
     val head0 = RequestBuilder().url(URL0).buildHead
@@ -196,9 +189,8 @@ v3
     assert(put1.version == Version.Http10)
     assert(post0.version == Version.Http11)
     assert(post1.version == Version.Http10)
-  }
 
-  test("set the correct method") {
+  test("set the correct method")
     val get = RequestBuilder().url(URL0).buildGet
     val head = RequestBuilder().url(URL0).buildHead
     val del = RequestBuilder().url(URL0).buildDelete
@@ -210,9 +202,8 @@ v3
     assert(del.method == Method.Delete)
     assert(put.method == Method.Put)
     assert(post.method == Method.Post)
-  }
 
-  test("set headers") {
+  test("set headers")
     val A = "A"
     val B = "B"
     val C = "C"
@@ -258,17 +249,15 @@ v3
     assert(builder4.buildDelete.headers.getAll(A) == triple)
     assert(builder4.buildPut(BODY0).headers.getAll(A) == triple)
     assert(builder4.buildPost(BODY0).headers.getAll(A) == triple)
-  }
 
-  test("build form") {
+  test("build form")
     val builder0 = RequestBuilder().url(URL0).addFormElement(FORM0: _*)
 
     val req0 = builder0.buildFormPost(false)
     val content = req0.contentString.replace("\r\n", "\n")
     assert(content == FORMPOST0)
-  }
 
-  test("build multipart form") {
+  test("build multipart form")
     val builder0 = RequestBuilder().url(URL0).addFormElement(FORM0: _*)
 
     val req0 = builder0.buildFormPost(true)
@@ -276,5 +265,3 @@ v3
       .replaceAllIn(req0.contentString, "--Boundary")
       .replace("\r\n", "\n")
     assert(content == MULTIPART0)
-  }
-}

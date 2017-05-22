@@ -7,8 +7,8 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ConcurrentBijectionTest extends WordSpec {
-  "maintain a bijective map" in {
+class ConcurrentBijectionTest extends WordSpec
+  "maintain a bijective map" in
     val b = new ConcurrentBijection[Int, Int]
     b ++= (1 -> 1) :: (2 -> 3) :: (100 -> 2) :: Nil
 
@@ -20,9 +20,8 @@ class ConcurrentBijectionTest extends WordSpec {
 
     assert(b.get(100) == Some(2))
     assert(b.getReverse(2) == Some(100))
-  }
 
-  "maintain the bijective property" in {
+  "maintain the bijective property" in
     val b = new ConcurrentBijection[Int, Int]
 
     b += (1 -> 2)
@@ -43,9 +42,8 @@ class ConcurrentBijectionTest extends WordSpec {
     assert(b.getReverse(3) == Some(100))
     assert(b.get(1) == None) // the old forward mapping was killed.
     assert(b.get(100) == Some(3))
-  }
 
-  "delete mappings" in {
+  "delete mappings" in
     val b = new ConcurrentBijection[Int, Int]
 
     b += (1 -> 2)
@@ -53,13 +51,10 @@ class ConcurrentBijectionTest extends WordSpec {
     assert(b.isEmpty == false)
     b -= 1
     assert(b.isEmpty == true)
-  }
 
-  "iterate over mappings" in {
+  "iterate over mappings" in
     val b = new ConcurrentBijection[Int, Int]
 
     for (i <- 0 until 100) b += (i -> i)
 
     assert(b.toSet == (for (i <- 0 until 100) yield (i, i)).toSet)
-  }
-}

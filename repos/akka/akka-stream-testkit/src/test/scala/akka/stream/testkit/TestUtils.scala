@@ -11,25 +11,22 @@ import java.net.SocketAddress
 import java.net.DatagramSocket
 import java.net.ServerSocket
 
-object TestUtils {
+object TestUtils
   // FIXME: remove once going back to project dependencies
-  trait GeneralSocket extends Any {
+  trait GeneralSocket extends Any
     def bind(sa: SocketAddress): Unit
     def close(): Unit
     def getLocalPort: Int
-  }
   implicit class GeneralDatagramSocket(val s: DatagramSocket)
-      extends GeneralSocket {
+      extends GeneralSocket
     def bind(sa: SocketAddress): Unit = s.bind(sa)
     def close(): Unit = s.close()
     def getLocalPort: Int = s.getLocalPort
-  }
   implicit class GeneralServerSocket(val s: ServerSocket)
-      extends GeneralSocket {
+      extends GeneralSocket
     def bind(sa: SocketAddress): Unit = s.bind(sa)
     def close(): Unit = s.close()
     def getLocalPort: Int = s.getLocalPort
-  }
 
   def temporaryServerAddress(
       address: String = "127.0.0.1", udp: Boolean = false): InetSocketAddress =
@@ -38,8 +35,8 @@ object TestUtils {
   def temporaryServerAddresses(
       numberOfAddresses: Int,
       hostname: String = "127.0.0.1",
-      udp: Boolean = false): immutable.IndexedSeq[InetSocketAddress] = {
-    Vector.fill(numberOfAddresses) {
+      udp: Boolean = false): immutable.IndexedSeq[InetSocketAddress] =
+    Vector.fill(numberOfAddresses)
       val serverSocket: GeneralSocket =
         if (udp) DatagramChannel.open().socket()
         else ServerSocketChannel.open().socket()
@@ -47,6 +44,4 @@ object TestUtils {
       serverSocket.bind(new InetSocketAddress(hostname, 0))
       (serverSocket,
        new InetSocketAddress(hostname, serverSocket.getLocalPort))
-    } collect { case (socket, address) ⇒ socket.close(); address }
-  }
-}
+    collect { case (socket, address) ⇒ socket.close(); address }

@@ -5,128 +5,102 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class RecordSchemaTest extends FunSuite {
+class RecordSchemaTest extends FunSuite
 
   val schema = new RecordSchema
   val field = schema.newField[Object]()
   val fieldWithDefault = schema.newField[Object](new Object)
   val fields = Seq(field, fieldWithDefault)
 
-  test("apply should throw IllegalStateException when field is uninitialized") {
+  test("apply should throw IllegalStateException when field is uninitialized")
     val record = schema.newRecord()
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       record(field)
-    }
-  }
 
   test(
-      "apply should compute, store and return default when field is initialized with default") {
+      "apply should compute, store and return default when field is initialized with default")
     val record = schema.newRecord()
     assert(record(fieldWithDefault) eq record(fieldWithDefault))
-  }
 
-  test("apply should return field value when field is explicitly initialized") {
+  test("apply should return field value when field is explicitly initialized")
     val record = schema.newRecord()
     val value = new Object
 
-    for (f <- fields) {
+    for (f <- fields)
       record(f) = value
       assert(record(f) eq value)
-    }
-  }
 
-  test("lock should throw IllegalStateException when field is uninitialized") {
+  test("lock should throw IllegalStateException when field is uninitialized")
     val record = schema.newRecord()
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       record.lock(field)
-    }
-  }
 
   test(
-      "lock should compute and store default when field is initialized with default") {
+      "lock should compute and store default when field is initialized with default")
     val record = schema.newRecord()
     record.lock(fieldWithDefault)
     assert(record(fieldWithDefault) ne null)
-  }
 
-  test("update should reassign when field is not locked") {
+  test("update should reassign when field is not locked")
     val record = schema.newRecord()
     val value = new Object
 
-    for (f <- fields) {
+    for (f <- fields)
       record(f) = new Object
       record(f) = value
       assert(record(f) eq value)
-    }
-  }
 
-  test("update should throw IllegalStateException when field is locked") {
+  test("update should throw IllegalStateException when field is locked")
     val record = schema.newRecord()
     val value = new Object
 
-    for (f <- fields) {
+    for (f <- fields)
       record(f) = value
       record.lock(f)
-      intercept[IllegalStateException] {
+      intercept[IllegalStateException]
         record(f) = value
-      }
-    }
-  }
 
-  test("updateAndLock should update and lock") {
+  test("updateAndLock should update and lock")
     val record = schema.newRecord()
     val value = new Object
 
-    for (f <- fields) {
+    for (f <- fields)
       record.updateAndLock(f, value)
-      intercept[IllegalStateException] {
+      intercept[IllegalStateException]
         record(f) = value
-      }
-    }
-  }
 
-  test("copy should copy") {
+  test("copy should copy")
     val record = schema.newRecord()
     val value = new Object
 
-    for (f <- fields) {
+    for (f <- fields)
       record.update(f, value)
       val copy = record.copy()
       assert(record(f) eq copy(f))
-    }
-  }
 
-  test("copy should not be modified when the original is updated") {
+  test("copy should not be modified when the original is updated")
     val record = schema.newRecord()
     val copy = record.copy
 
-    for (f <- fields) {
+    for (f <- fields)
       record.update(f, new Object)
       val copy = record.copy()
       record.update(f, new Object)
       assert(record(f) ne copy(f))
-    }
-  }
 
-  test("locked state should be copied") {
+  test("locked state should be copied")
     val record = schema.newRecord()
 
-    for (f <- fields) {
+    for (f <- fields)
       record.updateAndLock(f, new Object)
-      intercept[IllegalStateException] {
+      intercept[IllegalStateException]
         record.copy().update(f, new Object)
-      }
-    }
-  }
 
-  test("copy should be able to overwrite a locked field") {
+  test("copy should be able to overwrite a locked field")
     val record = schema.newRecord()
 
-    for (f <- fields) {
+    for (f <- fields)
       record.updateAndLock(f, new Object)
       val value = new Object
       val copy = record.copy(f, value)
       assert(copy(f) eq value)
-    }
-  }
-}

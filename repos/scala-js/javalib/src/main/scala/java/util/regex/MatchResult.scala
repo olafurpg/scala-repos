@@ -1,6 +1,6 @@
 package java.util.regex
 
-trait MatchResult {
+trait MatchResult
   def groupCount(): Int
 
   def start(): Int
@@ -10,4 +10,3 @@ trait MatchResult {
   def start(group: Int): Int
   def end(group: Int): Int
   def group(group: Int): String
-}

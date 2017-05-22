@@ -28,39 +28,32 @@ final class Broker private (
                             val host: String,
                             /** Broker's port */
                             val port: Int)
-    extends Serializable {
-  override def equals(obj: Any): Boolean = obj match {
+    extends Serializable
+  override def equals(obj: Any): Boolean = obj match
     case that: Broker =>
       this.host == that.host && this.port == that.port
     case _ => false
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     41 * (41 + host.hashCode) + port
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     s"Broker($host, $port)"
-  }
-}
 
 /**
   * :: Experimental ::
   * Companion object that provides methods to create instances of [[Broker]].
   */
 @Experimental
-object Broker {
+object Broker
   def create(host: String, port: Int): Broker =
     new Broker(host, port)
 
   def apply(host: String, port: Int): Broker =
     new Broker(host, port)
 
-  def unapply(broker: Broker): Option[(String, Int)] = {
-    if (broker == null) {
+  def unapply(broker: Broker): Option[(String, Int)] =
+    if (broker == null)
       None
-    } else {
+    else
       Some((broker.host, broker.port))
-    }
-  }
-}

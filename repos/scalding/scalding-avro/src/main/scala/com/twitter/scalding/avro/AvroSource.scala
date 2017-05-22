@@ -28,7 +28,7 @@ import cascading.tuple.Fields
 import collection.JavaConverters._
 import org.apache.hadoop.mapred.{OutputCollector, RecordReader, JobConf}
 
-trait UnpackedAvroFileScheme extends FileSource {
+trait UnpackedAvroFileScheme extends FileSource
   def schema: Option[Schema]
 
   // HadoopSchemeInstance gives compile errors in 2.10 for some reason
@@ -39,9 +39,8 @@ trait UnpackedAvroFileScheme extends FileSource {
   override def localScheme =
     (new LAvroScheme(schema.getOrElse(null)))
       .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
-}
 
-trait PackedAvroFileScheme[T] extends FileSource {
+trait PackedAvroFileScheme[T] extends FileSource
   def schema: Schema
 
   // HadoopSchemeInstance gives compile errors for this in 2.10 for some reason
@@ -52,9 +51,8 @@ trait PackedAvroFileScheme[T] extends FileSource {
   override def localScheme =
     (new LPackedAvroScheme[T](schema))
       .asInstanceOf[Scheme[Properties, InputStream, OutputStream, _, _]]
-}
 
-object UnpackedAvroSource {
+object UnpackedAvroSource
 
   def apply[T](path: String, schema: Schema) =
     new UnpackedAvroSource[T](Seq(path), Some(schema))
@@ -70,31 +68,26 @@ object UnpackedAvroSource {
 
   def apply[T](path: String, schema: Option[Schema]) =
     new UnpackedAvroSource[T](Seq(path), schema)
-}
 
 case class UnpackedAvroSource[T](paths: Seq[String], schema: Option[Schema])(
     implicit val conv: TupleConverter[T], tset: TupleSetter[T])
     extends FixedPathSource(paths: _*) with UnpackedAvroFileScheme
-    with Mappable[T] with TypedSink[T] {
+    with Mappable[T] with TypedSink[T]
 
-  override def sinkFields: Fields = {
-    val outFields = schema.map { schema =>
+  override def sinkFields: Fields =
+    val outFields = schema.map  schema =>
       val schemaFields = schema.getFields
       schemaFields.asScala.foldLeft(new Fields())(
           (cFields, sField) => cFields.append(new Fields(sField.name())))
-    }
     outFields.getOrElse(Dsl.intFields(0 until setter.arity))
-  }
 
   override def converter[U >: T] = TupleConverter.asSuperConverter[T, U](conv)
 
   override def setter[U <: T] = TupleSetter.asSubSetter[T, U](tset)
-}
 
-object PackedAvroSource {
+object PackedAvroSource
   def apply[T : AvroSchemaType : Manifest : TupleConverter](path: String) =
     new PackedAvroSource[T](Seq(path))
-}
 
 case class PackedAvroSource[T](paths: Seq[String])(
     implicit val mf: Manifest[T],
@@ -102,10 +95,9 @@ case class PackedAvroSource[T](paths: Seq[String])(
     tset: TupleSetter[T],
     avroType: AvroSchemaType[T])
     extends FixedPathSource(paths: _*)
-    with PackedAvroFileScheme[T] with Mappable[T] with TypedSink[T] {
+    with PackedAvroFileScheme[T] with Mappable[T] with TypedSink[T]
   override def converter[U >: T] = TupleConverter.asSuperConverter[T, U](conv)
 
   override def setter[U <: T] = TupleSetter.asSubSetter[T, U](tset)
 
   override def schema = avroType.schema
-}

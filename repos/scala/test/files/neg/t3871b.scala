@@ -19,24 +19,21 @@ if one of the following applies:
      or O.this, for some class O enclosing the reference. In addition, the restrictions
      for unqualified protected apply.
   */
-object E {
+object E
   val e = new E
   import e._
-  def n(a: A, b: B, c: C) = {
+  def n(a: A, b: B, c: C) =
     b.protE // 1c
     c.protE // 1c
     a.protE // 1c
     A.protOE // 1c
-  }
-}
 
-class E {
-  object A {
+class E
+  object A
     protected def protO = 2
     protected[E] def protOE = 3
     protected[this] def protOT = 3
-  }
-  class A {
+  class A
     protected def prot = 2
     protected[E] def protE = 3
     protected[this] def protT = 4
@@ -46,11 +43,10 @@ class E {
     def foo = { prot; protE; protT }
     new { prot; protE }
     def this(a: Any) = { this(); prot; protE; protT }
-    object B extends A {
+    object B extends A
       A.this.prot
       A.this.protE
       A.this.protT
-    }
 
     import A._
     // 0a
@@ -58,9 +54,8 @@ class E {
     // 3
     protOE
     protOT // not allowed
-  }
 
-  class B extends A {
+  class B extends A
     // 1b
     this.prot; this.protE;
     super.prot; super.protE;
@@ -70,7 +65,7 @@ class E {
     // 4 !!! "or the super keyword"
     super.protT
 
-    def n(a: A, b: B, c: C) = {
+    def n(a: A, b: B, c: C) =
       b.prot // 3
       c.prot // 3
       a.prot // not allowed, prefix type `A` does not conform to `B`
@@ -78,10 +73,8 @@ class E {
       b.protT // not allowed
       c.protT // not allowed
       a.protT // not allowed
-    }
-  }
-  object B {
-    def n(a: A, b: B, c: C) = {
+  object B
+    def n(a: A, b: B, c: C) =
       b.prot // 3 !!!
       c.prot // 3 !!!
       // Wording of 3 seems insufficient, missing:
@@ -92,12 +85,10 @@ class E {
       b.protT // not allowed
       c.protT // not allowed
       a.protT // not allowed
-    }
-  }
   class C extends B
 
-  class Z {
-    def n(a: A, b: B, c: C) = {
+  class Z
+    def n(a: A, b: B, c: C) =
       b.prot // not allowed
       c.prot // not allowed
       a.prot // not allowed
@@ -108,19 +99,14 @@ class E {
       b.protT // not allowed
       c.protT // not allowed
       a.protT // not allowed
-    }
-  }
-}
 
-class Other {
+class Other
   val e = new E
   import e._
-  def n(a: A, b: B, c: C) = {
+  def n(a: A, b: B, c: C) =
     b.prot // not allowed
     c.prot // not allowed
     a.prot // not allowed
     b.protE // not allowed
     a.protE // not allowed
     c.protE // not allowed
-  }
-}

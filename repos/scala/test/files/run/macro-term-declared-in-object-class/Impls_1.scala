@@ -1,7 +1,7 @@
 import scala.reflect.macros.blackbox.Context
 
-object Impls {
-  def foo(c: Context) = {
+object Impls
+  def foo(c: Context) =
     import c.{prefix => prefix}
     import c.universe._
     val printPrefix = Apply(
@@ -12,5 +12,3 @@ object Impls {
         Apply(Select(Ident(definitions.PredefModule), TermName("println")),
               List(Literal(Constant("it works")))))
     c.Expr[Unit](body)
-  }
-}

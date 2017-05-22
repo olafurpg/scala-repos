@@ -11,7 +11,7 @@ import com.twitter.util.Duration
   *
   * @see [[https://twitter.github.io/finagle/guide/Clients.html]]
   */
-trait ClientParams[A <: Stack.Parameterized[A]] {
+trait ClientParams[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -41,4 +41,3 @@ trait ClientParams[A <: Stack.Parameterized[A]] {
   def withRetryBackoff(backoff: Stream[Duration]): A =
     self.configured(
         self.params[Retries.Budget].copy(requeueBackoffs = backoff))
-}

@@ -24,7 +24,7 @@ import twitter4j.Status
 import twitter4j.TwitterStreamFactory
 import twitter4j.conf.ConfigurationBuilder
 
-object StatusStreamer {
+object StatusStreamer
 
   /**
     * These two items are required to run Summingbird in
@@ -48,8 +48,6 @@ object StatusStreamer {
       source: Producer[P, Status], store: P#Store[String, Long]) =
     source
       .filter(_.getText != null)
-      .flatMap { tweet: Status =>
+      .flatMap  tweet: Status =>
         tokenize(tweet.getText).map(_ -> 1L)
-      }
       .sumByKey(store)
-}

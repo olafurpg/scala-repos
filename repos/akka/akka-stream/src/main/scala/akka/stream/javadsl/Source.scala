@@ -27,7 +27,7 @@ import akka.stream.impl.SourceQueueAdapter
 import akka.stream.scaladsl.SourceQueueWithComplete
 
 /** Java API */
-object Source {
+object Source
   private[this] val _empty = new Source[Any, NotUsed](scaladsl.Source.empty)
 
   /**
@@ -47,19 +47,18 @@ object Source {
     * If the downstream of this source cancels before the promise has been completed, then the promise will be completed
     * with an empty Optional.
     */
-  def maybe[T]: Source[T, CompletableFuture[Optional[T]]] = {
+  def maybe[T]: Source[T, CompletableFuture[Optional[T]]] =
     new Source(
         scaladsl.Source
           .maybe[T]
-          .mapMaterializedValue { scalaOptionPromise: Promise[Option[T]] ⇒
+          .mapMaterializedValue  scalaOptionPromise: Promise[Option[T]] ⇒
         val javaOptionPromise = new CompletableFuture[Optional[T]]()
         scalaOptionPromise.completeWith(
             javaOptionPromise.toScala.map(_.asScala)(
                 akka.dispatch.ExecutionContexts.sameThreadExecutionContext))
 
         javaOptionPromise
-      })
-  }
+      )
 
   /**
     * Helper to create [[Source]] from `Publisher`.
@@ -114,18 +113,16 @@ object Source {
     * being used as a `Source`. Otherwise the stream may fail with
     * `ConcurrentModificationException` or other more subtle errors may occur.
     */
-  def from[O](iterable: java.lang.Iterable[O]): javadsl.Source[O, NotUsed] = {
+  def from[O](iterable: java.lang.Iterable[O]): javadsl.Source[O, NotUsed] =
     // this adapter is not immutable if the underlying java.lang.Iterable is modified
     // but there is not anything we can do to prevent that from happening.
     // ConcurrentModificationException will be thrown in some cases.
-    val scalaIterable = new immutable.Iterable[O] {
+    val scalaIterable = new immutable.Iterable[O]
 
       import collection.JavaConverters._
 
       override def iterator: Iterator[O] = iterable.iterator().asScala
-    }
     new Source(scaladsl.Source(scalaIterable))
-  }
 
   /**
     * Creates [[Source]] that represents integer values in range ''[start;end]'', step equals to 1.
@@ -149,13 +146,13 @@ object Source {
   def range(
       start: Int, end: Int, step: Int): javadsl.Source[Integer, NotUsed] =
     fromIterator[Integer](
-        new function.Creator[util.Iterator[Integer]]() {
+        new function.Creator[util.Iterator[Integer]]()
       def create(): util.Iterator[Integer] =
-        new Inclusive(start, end, step) {
+        new Inclusive(start, end, step)
           override def toString: String =
             s"Range($start to $end, step = $step)"
-        }.iterator.asJava.asInstanceOf[util.Iterator[Integer]]
-    })
+        .iterator.asJava.asInstanceOf[util.Iterator[Integer]]
+    )
 
   /**
     * Start a new `Source` from the given `Future`. The stream will consist of
@@ -280,11 +277,10 @@ object Source {
     * it so also in type.
     */
   def fromGraph[T, M](g: Graph[SourceShape[T], M]): Source[T, M] =
-    g match {
+    g match
       case s: Source[T, M] ⇒ s
       case s if s eq scaladsl.Source.empty ⇒ empty().asInstanceOf[Source[T, M]]
       case other ⇒ new Source(scaladsl.Source.fromGraph(other))
-    }
 
   /**
     * Combines several sources with fan-in strategy like `Merge` or `Concat` and returns `Source`.
@@ -295,13 +291,12 @@ object Source {
       rest: java.util.List[Source[T, _ <: Any]],
       strategy: function.Function[
           java.lang.Integer, _ <: Graph[UniformFanInShape[T, U], NotUsed]])
-    : Source[U, NotUsed] = {
+    : Source[U, NotUsed] =
     import scala.collection.JavaConverters._
     val seq = if (rest != null) rest.asScala.map(_.asScala) else Seq()
     new Source(
         scaladsl.Source.combine(first.asScala, second.asScala, seq: _*)(
             num ⇒ strategy.apply(num)))
-  }
 
   /**
     * Creates a `Source` that is materialized as an [[akka.stream.SourceQueue]].
@@ -338,7 +333,6 @@ object Source {
         scaladsl.Source
           .queue[T](bufferSize, overflowStrategy)
           .mapMaterializedValue(new SourceQueueAdapter(_)))
-}
 
 /**
   * Java API
@@ -347,7 +341,7 @@ object Source {
   * Can be used as a `Publisher`
   */
 final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
-    extends Graph[SourceShape[Out], Mat] {
+    extends Graph[SourceShape[Out], Mat]
 
   import scala.collection.JavaConverters._
 
@@ -902,11 +896,11 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : javadsl.Source[T, Mat] =
     new Source(
-        delegate.statefulMapConcat { () ⇒
+        delegate.statefulMapConcat  () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
-    })
+    )
 
   /**
     * Transform this stream by applying the given function to each of the elements
@@ -1086,9 +1080,8 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     * See also [[Flow.take]], [[Flow.takeWithin]], [[Flow.takeWhile]]
     */
   def limitWeighted(n: Long)(
-      costFn: function.Function[Out, Long]): javadsl.Source[Out, Mat] = {
+      costFn: function.Function[Out, Long]): javadsl.Source[Out, Mat] =
     new Source(delegate.limitWeighted(n)(costFn.apply))
-  }
 
   /**
     * Apply a sliding window over the stream and return the windows as groups of elements, with the last group
@@ -1594,9 +1587,9 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     new Source(
         delegate
           .prefixAndTail(n)
-          .map {
+          .map
         case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+      )
 
   /**
     * This operation demultiplexes the incoming stream into separate output
@@ -2064,4 +2057,3 @@ final class Source[+Out, +Mat](delegate: scaladsl.Source[Out, Mat])
     */
   def log(name: String): javadsl.Source[Out, Mat] =
     this.log(name, ConstantFun.javaIdentityFunction[Out], null)
-}

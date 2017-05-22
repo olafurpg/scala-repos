@@ -26,20 +26,17 @@ import org.saddle.index.IndexTime
 /**
   * DateTime ScalarTag
   */
-object ScalarTagTime extends ScalarTagAny[DateTime] {
-  def time2LongArray(arr: Array[DateTime]): Array[Long] = {
+object ScalarTagTime extends ScalarTagAny[DateTime]
+  def time2LongArray(arr: Array[DateTime]): Array[Long] =
     val sz = arr.length
     val larr = Array.ofDim[Long](sz)
     var i = 0
-    while (i < sz) {
-      larr(i) = Option(arr(i)) match {
+    while (i < sz)
+      larr(i) = Option(arr(i)) match
         case Some(x) => x.getMillis
         case None => ScalarTagLong.missing
-      }
       i += 1
-    }
     larr
-  }
 
   override def makeVec(arr: Array[DateTime]): Vec[DateTime] =
     new VecTime(Vec(time2LongArray(arr)))
@@ -64,4 +61,3 @@ object ScalarTagTime extends ScalarTagAny[DateTime] {
 
   override def concat(vecs: IndexedSeq[Vec[DateTime]]): VecTime =
     VecTime.concat(vecs)
-}

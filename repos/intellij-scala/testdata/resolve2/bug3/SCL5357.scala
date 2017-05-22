@@ -1,7 +1,6 @@
-trait Test {
-  trait SettingValue {
+trait Test
+  trait SettingValue
     def value: Any = 0
-  }
 
   type Setting <: SettingValue
   type S1 = Setting
@@ -15,4 +14,3 @@ trait Test {
   // okay
   def foo(x: SettingValue {}) = x. /* line: 3 */ value
   def foo(x: Setting) = x. /* line: 3 */ value
-}

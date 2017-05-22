@@ -34,39 +34,35 @@ import org.apache.spark.util.Utils
 /**
   * Trait for [[MLWriter]] and [[MLReader]].
   */
-private[util] sealed trait BaseReadWrite {
+private[util] sealed trait BaseReadWrite
   private var optionSQLContext: Option[SQLContext] = None
 
   /**
     * Sets the SQL context to use for saving/loading.
     */
   @Since("1.6.0")
-  def context(sqlContext: SQLContext): this.type = {
+  def context(sqlContext: SQLContext): this.type =
     optionSQLContext = Option(sqlContext)
     this
-  }
 
   /**
     * Returns the user-specified SQL context or the default.
     */
-  protected final def sqlContext: SQLContext = {
-    if (optionSQLContext.isEmpty) {
+  protected final def sqlContext: SQLContext =
+    if (optionSQLContext.isEmpty)
       optionSQLContext = Some(
           SQLContext.getOrCreate(SparkContext.getOrCreate()))
-    }
     optionSQLContext.get
-  }
 
   /** Returns the [[SparkContext]] underlying [[sqlContext]] */
   protected final def sc: SparkContext = sqlContext.sparkContext
-}
 
 /**
   * Abstract class for utility classes that can save ML instances.
   */
 @Experimental
 @Since("1.6.0")
-abstract class MLWriter extends BaseReadWrite with Logging {
+abstract class MLWriter extends BaseReadWrite with Logging
 
   protected var shouldOverwrite: Boolean = false
 
@@ -76,24 +72,21 @@ abstract class MLWriter extends BaseReadWrite with Logging {
   @Since("1.6.0")
   @throws[IOException](
       "If the input path already exists but overwrite is not enabled.")
-  def save(path: String): Unit = {
+  def save(path: String): Unit =
     val hadoopConf = sc.hadoopConfiguration
     val outputPath = new Path(path)
     val fs = outputPath.getFileSystem(hadoopConf)
     val qualifiedOutputPath =
       outputPath.makeQualified(fs.getUri, fs.getWorkingDirectory)
-    if (fs.exists(qualifiedOutputPath)) {
-      if (shouldOverwrite) {
+    if (fs.exists(qualifiedOutputPath))
+      if (shouldOverwrite)
         logInfo(s"Path $path already exists. It will be overwritten.")
         // TODO: Revert back to the original content if save is not successful.
         fs.delete(qualifiedOutputPath, true)
-      } else {
+      else
         throw new IOException(
             s"Path $path already exists. Please use write.overwrite().save(path) to overwrite it.")
-      }
-    }
     saveImpl(path)
-  }
 
   /**
     * [[save()]] handles overwriting and then calls this method.  Subclasses should override this
@@ -106,21 +99,19 @@ abstract class MLWriter extends BaseReadWrite with Logging {
     * Overwrites if the output path already exists.
     */
   @Since("1.6.0")
-  def overwrite(): this.type = {
+  def overwrite(): this.type =
     shouldOverwrite = true
     this
-  }
 
   // override for Java compatibility
   override def context(sqlContext: SQLContext): this.type =
     super.context(sqlContext)
-}
 
 /**
   * Trait for classes that provide [[MLWriter]].
   */
 @Since("1.6.0")
-trait MLWritable {
+trait MLWritable
 
   /**
     * Returns an [[MLWriter]] instance for this ML instance.
@@ -135,12 +126,10 @@ trait MLWritable {
   @throws[IOException](
       "If the input path already exists but overwrite is not enabled.")
   def save(path: String): Unit = write.save(path)
-}
 
-private[ml] trait DefaultParamsWritable extends MLWritable { self: Params =>
+private[ml] trait DefaultParamsWritable extends MLWritable  self: Params =>
 
   override def write: MLWriter = new DefaultParamsWriter(this)
-}
 
 /**
   * Abstract class for utility classes that can load ML instances.
@@ -148,7 +137,7 @@ private[ml] trait DefaultParamsWritable extends MLWritable { self: Params =>
   */
 @Experimental
 @Since("1.6.0")
-abstract class MLReader[T] extends BaseReadWrite {
+abstract class MLReader[T] extends BaseReadWrite
 
   /**
     * Loads the ML component from the input path.
@@ -159,7 +148,6 @@ abstract class MLReader[T] extends BaseReadWrite {
   // override for Java compatibility
   override def context(sqlContext: SQLContext): this.type =
     super.context(sqlContext)
-}
 
 /**
   * Trait for objects that provide [[MLReader]].
@@ -167,7 +155,7 @@ abstract class MLReader[T] extends BaseReadWrite {
   */
 @Experimental
 @Since("1.6.0")
-trait MLReadable[T] {
+trait MLReadable[T]
 
   /**
     * Returns an [[MLReader]] instance for this class.
@@ -182,12 +170,10 @@ trait MLReadable[T] {
     */
   @Since("1.6.0")
   def load(path: String): T = read.load(path)
-}
 
-private[ml] trait DefaultParamsReadable[T] extends MLReadable[T] {
+private[ml] trait DefaultParamsReadable[T] extends MLReadable[T]
 
   override def read: MLReader[T] = new DefaultParamsReader
-}
 
 /**
   * Default [[MLWriter]] implementation for transformers and estimators that contain basic
@@ -195,14 +181,12 @@ private[ml] trait DefaultParamsReadable[T] extends MLReadable[T] {
   * data (e.g., models with coefficients).
   * @param instance object to save
   */
-private[ml] class DefaultParamsWriter(instance: Params) extends MLWriter {
+private[ml] class DefaultParamsWriter(instance: Params) extends MLWriter
 
-  override protected def saveImpl(path: String): Unit = {
+  override protected def saveImpl(path: String): Unit =
     DefaultParamsWriter.saveMetadata(instance, path, sc)
-  }
-}
 
-private[ml] object DefaultParamsWriter {
+private[ml] object DefaultParamsWriter
 
   /**
     * Saves metadata + Params to: path + "/metadata"
@@ -221,31 +205,28 @@ private[ml] object DefaultParamsWriter {
                    path: String,
                    sc: SparkContext,
                    extraMetadata: Option[JObject] = None,
-                   paramMap: Option[JValue] = None): Unit = {
+                   paramMap: Option[JValue] = None): Unit =
     val uid = instance.uid
     val cls = instance.getClass.getName
     val params =
       instance.extractParamMap().toSeq.asInstanceOf[Seq[ParamPair[Any]]]
     val jsonParams = paramMap.getOrElse(
-        render(params.map {
+        render(params.map
       case ParamPair(p, v) =>
         p.name -> parse(p.jsonEncode(v))
-    }.toList))
+    .toList))
     val basicMetadata =
       ("class" -> cls) ~ ("timestamp" -> System.currentTimeMillis()) ~
       ("sparkVersion" -> sc.version) ~ ("uid" -> uid) ~
       ("paramMap" -> jsonParams)
-    val metadata = extraMetadata match {
+    val metadata = extraMetadata match
       case Some(jObject) =>
         basicMetadata ~ jObject
       case None =>
         basicMetadata
-    }
     val metadataPath = new Path(path, "metadata").toString
     val metadataJson = compact(render(metadata))
     sc.parallelize(Seq(metadataJson), 1).saveAsTextFile(metadataPath)
-  }
-}
 
 /**
   * Default [[MLReader]] implementation for transformers and estimators that contain basic
@@ -254,9 +235,9 @@ private[ml] object DefaultParamsWriter {
   * @tparam T ML instance type
   * TODO: Consider adding check for correct class name.
   */
-private[ml] class DefaultParamsReader[T] extends MLReader[T] {
+private[ml] class DefaultParamsReader[T] extends MLReader[T]
 
-  override def load(path: String): T = {
+  override def load(path: String): T =
     val metadata = DefaultParamsReader.loadMetadata(path, sc)
     val cls = Utils.classForName(metadata.className)
     val instance = cls
@@ -265,10 +246,8 @@ private[ml] class DefaultParamsReader[T] extends MLReader[T] {
       .asInstanceOf[Params]
     DefaultParamsReader.getAndSetParams(instance, metadata)
     instance.asInstanceOf[T]
-  }
-}
 
-private[ml] object DefaultParamsReader {
+private[ml] object DefaultParamsReader
 
   /**
     * All info from metadata file.
@@ -282,21 +261,21 @@ private[ml] object DefaultParamsReader {
                       sparkVersion: String,
                       params: JValue,
                       metadata: JValue,
-                      metadataJson: String) {
+                      metadataJson: String)
 
     /**
       * Get the JSON value of the [[org.apache.spark.ml.param.Param]] of the given name.
       * This can be useful for getting a Param value before an instance of [[Params]]
       * is available.
       */
-    def getParamValue(paramName: String): JValue = {
+    def getParamValue(paramName: String): JValue =
       implicit val format = DefaultFormats
-      params match {
+      params match
         case JObject(pairs) =>
-          val values = pairs.filter {
+          val values = pairs.filter
             case (pName, jsonValue) =>
               pName == paramName
-          }.map(_._2)
+          .map(_._2)
           assert(values.length == 1,
                  s"Expected one instance of Param '$paramName' but found" +
                  s" ${values.length} in JSON Params: " +
@@ -305,9 +284,6 @@ private[ml] object DefaultParamsReader {
         case _ =>
           throw new IllegalArgumentException(
               s"Cannot recognize JSON metadata: $metadataJson.")
-      }
-    }
-  }
 
   /**
     * Load metadata from file.
@@ -316,7 +292,7 @@ private[ml] object DefaultParamsReader {
     */
   def loadMetadata(path: String,
                    sc: SparkContext,
-                   expectedClassName: String = ""): Metadata = {
+                   expectedClassName: String = ""): Metadata =
     val metadataPath = new Path(path, "metadata").toString
     val metadataStr = sc.textFile(metadataPath, 1).first()
     val metadata = parse(metadataStr)
@@ -327,44 +303,37 @@ private[ml] object DefaultParamsReader {
     val timestamp = (metadata \ "timestamp").extract[Long]
     val sparkVersion = (metadata \ "sparkVersion").extract[String]
     val params = metadata \ "paramMap"
-    if (expectedClassName.nonEmpty) {
+    if (expectedClassName.nonEmpty)
       require(className == expectedClassName,
               s"Error loading metadata: Expected class name" +
               s" $expectedClassName but found class name $className")
-    }
 
     Metadata(
         className, uid, timestamp, sparkVersion, params, metadata, metadataStr)
-  }
 
   /**
     * Extract Params from metadata, and set them in the instance.
     * This works if all Params implement [[org.apache.spark.ml.param.Param.jsonDecode()]].
     * TODO: Move to [[Metadata]] method
     */
-  def getAndSetParams(instance: Params, metadata: Metadata): Unit = {
+  def getAndSetParams(instance: Params, metadata: Metadata): Unit =
     implicit val format = DefaultFormats
-    metadata.params match {
+    metadata.params match
       case JObject(pairs) =>
-        pairs.foreach {
+        pairs.foreach
           case (paramName, jsonValue) =>
             val param = instance.getParam(paramName)
             val value = param.jsonDecode(compact(render(jsonValue)))
             instance.set(param, value)
-        }
       case _ =>
         throw new IllegalArgumentException(
             s"Cannot recognize JSON metadata: ${metadata.metadataJson}.")
-    }
-  }
 
   /**
     * Load a [[Params]] instance from the given path, and return it.
     * This assumes the instance implements [[MLReadable]].
     */
-  def loadParamsInstance[T](path: String, sc: SparkContext): T = {
+  def loadParamsInstance[T](path: String, sc: SparkContext): T =
     val metadata = DefaultParamsReader.loadMetadata(path, sc)
     val cls = Utils.classForName(metadata.className)
     cls.getMethod("read").invoke(null).asInstanceOf[MLReader[T]].load(path)
-  }
-}

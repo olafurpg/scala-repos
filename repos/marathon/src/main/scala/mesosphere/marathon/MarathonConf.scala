@@ -18,7 +18,7 @@ trait MarathonConf
     with OfferProcessorConfig with ReviveOffersConfig
     with MarathonSchedulerServiceConfig with LaunchQueueConfig
     with PluginManagerConfiguration with TaskStatusUpdateConfig
-    with TaskTrackerConfig {
+    with TaskTrackerConfig
 
   //scalastyle:off magic.number
 
@@ -115,10 +115,9 @@ trait MarathonConf
         "resources with the role designation '*'.",
       default = None)
 
-  def expectedResourceRoles: Set[String] = mesosRole.get match {
+  def expectedResourceRoles: Set[String] = mesosRole.get match
     case Some(role) => Set(role, "*")
     case None => Set("*")
-  }
 
   lazy val defaultAcceptedResourceRolesSet =
     defaultAcceptedResourceRoles.get.getOrElse(expectedResourceRoles)
@@ -137,7 +136,7 @@ trait MarathonConf
     str.split(',').map(_.trim).toSet
 
   private[this] def validateDefaultAcceptedResourceRoles(
-      str: String): Boolean = {
+      str: String): Boolean =
     val parsed = parseDefaultAcceptedResourceRoles(str)
 
     // throw exceptions for better error messages
@@ -149,7 +148,6 @@ trait MarathonConf
         (parsed -- expectedResourceRoles).mkString(", "))
 
     true
-  }
 
   lazy val taskLaunchConfirmTimeout = opt[Long](
       "task_launch_confirm_timeout",
@@ -210,8 +208,8 @@ trait MarathonConf
   lazy val artifactStore = opt[String](
       "artifact_store",
       descr = "URL to the artifact store. " +
-        s"""Supported store types ${StorageProvider.examples.keySet
-        .mkString(", ")}. """ +
+        s"""Supported store types $StorageProvider.examples.keySet
+        .mkString(", "). """ +
         s"""Example: ${StorageProvider.examples.values.mkString(", ")}""",
       validate = StorageProvider.isValidUrl,
       noshort = true)
@@ -265,4 +263,3 @@ trait MarathonConf
       noshort = true,
       hidden = true,
       default = Some(500))
-}

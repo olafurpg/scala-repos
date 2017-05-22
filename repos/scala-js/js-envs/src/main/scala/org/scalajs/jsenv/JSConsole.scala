@@ -9,6 +9,5 @@
 package org.scalajs.jsenv
 
 /** Trait representing a JS console */
-trait JSConsole {
+trait JSConsole
   def log(msg: Any): Unit
-}

@@ -1,9 +1,8 @@
-class MailBox {
+class MailBox
   //class Message
   type Message = AnyRef
-}
 
-abstract class Actor {
+abstract class Actor
   private val in = new MailBox
 
   def send(msg: in.Message) = sys.error("foo")
@@ -12,4 +11,3 @@ abstract class Actor {
 
   def dubiousSend(msg: MailBox#Message) =
     unstable.send(msg) // in.Message becomes unstable.Message, but that's ok since Message is a concrete type member
-}

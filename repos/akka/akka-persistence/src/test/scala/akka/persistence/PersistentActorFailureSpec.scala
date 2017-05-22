@@ -12,7 +12,7 @@ import scala.util.{Failure, Try}
 import akka.persistence.journal.inmem.InmemJournal
 import scala.concurrent.Future
 
-object PersistentActorFailureSpec {
+object PersistentActorFailureSpec
   import PersistentActorSpec.{Cmd, Evt, ExamplePersistentActor}
 
   class SimulatedException(msg: String)
@@ -20,24 +20,22 @@ object PersistentActorFailureSpec {
   class SimulatedSerializationException(msg: String)
       extends RuntimeException(msg) with NoStackTrace
 
-  class FailingInmemJournal extends InmemJournal {
+  class FailingInmemJournal extends InmemJournal
 
     override def asyncWriteMessages(messages: immutable.Seq[AtomicWrite])
-      : Future[immutable.Seq[Try[Unit]]] = {
+      : Future[immutable.Seq[Try[Unit]]] =
       if (isWrong(messages))
         throw new SimulatedException("Simulated Store failure")
-      else {
+      else
         val ser = checkSerializable(messages)
         if (ser.exists(_.isFailure)) Future.successful(ser)
         else super.asyncWriteMessages(messages)
-      }
-    }
 
     override def asyncReplayMessages(persistenceId: String,
                                      fromSequenceNr: Long,
                                      toSequenceNr: Long,
                                      max: Long)(
-        recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] = {
+        recoveryCallback: PersistentRepr ⇒ Unit): Future[Unit] =
       val highest = highestSequenceNr(persistenceId)
       val readFromStore = read(
           persistenceId, fromSequenceNr, toSequenceNr, max)
@@ -45,116 +43,92 @@ object PersistentActorFailureSpec {
       else if (isCorrupt(readFromStore))
         Future.failed(
             new SimulatedException(s"blahonga $fromSequenceNr $toSequenceNr"))
-      else {
+      else
         readFromStore.foreach(recoveryCallback)
         Future.successful(())
-      }
-    }
 
     def isWrong(messages: immutable.Seq[AtomicWrite]): Boolean =
-      messages.exists {
+      messages.exists
         case a: AtomicWrite ⇒
-          a.payload.exists {
+          a.payload.exists
             case PersistentRepr(Evt(s: String), _) ⇒ s.contains("wrong")
-          }
         case _ ⇒ false
-      }
 
     def checkSerializable(
         messages: immutable.Seq[AtomicWrite]): immutable.Seq[Try[Unit]] =
-      messages.collect {
+      messages.collect
         case a: AtomicWrite ⇒
-          a.payload.collectFirst {
+          a.payload.collectFirst
             case PersistentRepr(Evt(s: String), _: Long)
                 if s.contains("not serializable") ⇒
               s
-          } match {
+          match
             case Some(s) ⇒ Failure(new SimulatedSerializationException(s))
             case None ⇒ AsyncWriteJournal.successUnit
-          }
-      }
 
     def isCorrupt(events: Seq[PersistentRepr]): Boolean =
-      events.exists {
+      events.exists
         case PersistentRepr(Evt(s: String), _) ⇒ s.contains("corrupt")
-      }
-  }
 
   class OnRecoveryFailurePersistentActor(name: String, probe: ActorRef)
-      extends ExamplePersistentActor(name) {
+      extends ExamplePersistentActor(name)
     val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case c @ Cmd(txt) ⇒ persist(Evt(txt))(updateState)
-      }
 
     override protected def onRecoveryFailure(
         cause: Throwable, event: Option[Any]): Unit =
       probe ! "recovery-failure:" + cause.getMessage
-  }
 
-  class Supervisor(testActor: ActorRef) extends Actor {
+  class Supervisor(testActor: ActorRef) extends Actor
     override def supervisorStrategy =
-      OneForOneStrategy(loggingEnabled = false) {
+      OneForOneStrategy(loggingEnabled = false)
         case e ⇒
           testActor ! e
           SupervisorStrategy.Restart
-      }
 
-    def receive = {
+    def receive =
       case props: Props ⇒ sender() ! context.actorOf(props)
       case m ⇒ sender() ! m
-    }
-  }
 
-  class ResumingSupervisor(testActor: ActorRef) extends Supervisor(testActor) {
+  class ResumingSupervisor(testActor: ActorRef) extends Supervisor(testActor)
     override def supervisorStrategy =
-      OneForOneStrategy(loggingEnabled = false) {
+      OneForOneStrategy(loggingEnabled = false)
         case e ⇒
           testActor ! e
           SupervisorStrategy.Resume
-      }
-  }
 
   class FailingRecovery(name: String, recoveryFailureProbe: Option[ActorRef])
-      extends ExamplePersistentActor(name) {
+      extends ExamplePersistentActor(name)
     def this(name: String) = this(name, None)
 
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case Cmd(data) ⇒ persist(Evt(s"${data}"))(updateState)
-      }
 
-    val failingRecover: Receive = {
+    val failingRecover: Receive =
       case Evt(data) if data == "bad" ⇒
         throw new SimulatedException("Simulated exception from receiveRecover")
-    }
 
     override def receiveRecover: Receive =
       failingRecover.orElse[Any, Unit](super.receiveRecover)
-  }
 
-  class ThrowingActor1(name: String) extends ExamplePersistentActor(name) {
+  class ThrowingActor1(name: String) extends ExamplePersistentActor(name)
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case Cmd(data) ⇒
           persist(Evt(s"${data}"))(updateState)
           if (data == "err")
             throw new SimulatedException("Simulated exception 1")
-      }
-  }
 
-  class ThrowingActor2(name: String) extends ExamplePersistentActor(name) {
+  class ThrowingActor2(name: String) extends ExamplePersistentActor(name)
     override val receiveCommand: Receive =
-      commonBehavior orElse {
+      commonBehavior orElse
         case Cmd(data) ⇒
-          persist(Evt(s"${data}")) { evt ⇒
+          persist(Evt(s"${data}"))  evt ⇒
             if (data == "err")
               throw new SimulatedException("Simulated exception 1")
             updateState(evt)
-          }
-      }
-  }
-}
 
 class PersistentActorFailureSpec
     extends PersistenceSpec(
@@ -163,7 +137,7 @@ class PersistentActorFailureSpec
             "SnapshotFailureRobustnessSpec",
             extraConfig = Some("""
   akka.persistence.journal.inmem.class = "akka.persistence.PersistentActorFailureSpec$FailingInmemJournal"
-  """))) with ImplicitSender {
+  """))) with ImplicitSender
 
   import PersistentActorFailureSpec._
   import PersistentActorSpec._
@@ -171,7 +145,7 @@ class PersistentActorFailureSpec
   system.eventStream.publish(
       TestEvent.Mute(EventFilter[akka.pattern.AskTimeoutException]()))
 
-  def prepareFailingRecovery(): Unit = {
+  def prepareFailingRecovery(): Unit =
     val persistentActor = namedPersistentActor[FailingRecovery]
     persistentActor ! Cmd("a")
     persistentActor ! Cmd("b")
@@ -179,10 +153,9 @@ class PersistentActorFailureSpec
     persistentActor ! Cmd("c")
     persistentActor ! GetState
     expectMsg(List("a", "b", "bad", "c"))
-  }
 
-  "A persistent actor" must {
-    "stop if recovery from persisted events fail" in {
+  "A persistent actor" must
+    "stop if recovery from persisted events fail" in
       val persistentActor = namedPersistentActor[Behavior1PersistentActor]
       persistentActor ! Cmd("corrupt")
       persistentActor ! GetState
@@ -194,8 +167,7 @@ class PersistentActorFailureSpec
       val ref = expectMsgType[ActorRef]
       watch(ref)
       expectTerminated(ref)
-    }
-    "call onRecoveryFailure when recovery from persisted events fails" in {
+    "call onRecoveryFailure when recovery from persisted events fails" in
       val props =
         Props(classOf[OnRecoveryFailurePersistentActor], name, testActor)
 
@@ -210,8 +182,7 @@ class PersistentActorFailureSpec
       expectMsg("recovery-failure:blahonga 1 1")
       watch(ref)
       expectTerminated(ref)
-    }
-    "call onPersistFailure and stop when persist fails" in {
+    "call onPersistFailure and stop when persist fails" in
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
           classOf[Behavior1PersistentActor], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -219,8 +190,7 @@ class PersistentActorFailureSpec
       persistentActor ! Cmd("wrong")
       expectMsg("Failure: wrong-1")
       expectTerminated(persistentActor)
-    }
-    "call onPersistFailure and stop if persistAsync fails" in {
+    "call onPersistFailure and stop if persistAsync fails" in
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
           classOf[AsyncPersistPersistentActor], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -232,8 +202,7 @@ class PersistentActorFailureSpec
       expectMsg("wrong") // reply before persistAsync
       expectMsg("Failure: wrong-2") // onPersistFailure sent message
       expectTerminated(persistentActor)
-    }
-    "call onPersistRejected and continue if persist rejected" in {
+    "call onPersistRejected and continue if persist rejected" in
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
           classOf[Behavior1PersistentActor], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -244,8 +213,7 @@ class PersistentActorFailureSpec
       persistentActor ! Cmd("a")
       persistentActor ! GetState
       expectMsg(List("a-1", "a-2"))
-    }
-    "stop if receiveRecover fails" in {
+    "stop if receiveRecover fails" in
       prepareFailingRecovery()
 
       // recover by creating another with same name
@@ -254,9 +222,8 @@ class PersistentActorFailureSpec
       val ref = expectMsgType[ActorRef]
       watch(ref)
       expectTerminated(ref)
-    }
 
-    "support resume when persist followed by exception" in {
+    "support resume when persist followed by exception" in
       system.actorOf(Props(classOf[ResumingSupervisor], testActor)) ! Props(
           classOf[ThrowingActor1], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -267,9 +234,8 @@ class PersistentActorFailureSpec
       persistentActor ! Cmd("c")
       persistentActor ! GetState
       expectMsg(List("a", "err", "b", "c"))
-    }
 
-    "support restart when persist followed by exception" in {
+    "support restart when persist followed by exception" in
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
           classOf[ThrowingActor1], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -280,9 +246,8 @@ class PersistentActorFailureSpec
       persistentActor ! Cmd("c")
       persistentActor ! GetState
       expectMsg(List("a", "err", "b", "c"))
-    }
 
-    "support resume when persist handler throws exception" in {
+    "support resume when persist handler throws exception" in
       system.actorOf(Props(classOf[ResumingSupervisor], testActor)) ! Props(
           classOf[ThrowingActor2], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -294,9 +259,8 @@ class PersistentActorFailureSpec
       persistentActor ! Cmd("d")
       persistentActor ! GetState
       expectMsg(List("a", "b", "c", "d"))
-    }
 
-    "support restart when persist handler throws exception" in {
+    "support restart when persist handler throws exception" in
       system.actorOf(Props(classOf[Supervisor], testActor)) ! Props(
           classOf[ThrowingActor2], name)
       val persistentActor = expectMsgType[ActorRef]
@@ -309,9 +273,8 @@ class PersistentActorFailureSpec
       persistentActor ! GetState
       // err was stored, and was be replayed
       expectMsg(List("a", "b", "err", "c", "d"))
-    }
 
-    "detect overlapping writers during replay" in {
+    "detect overlapping writers during replay" in
       val p1 = namedPersistentActor[Behavior1PersistentActor]
       p1 ! Cmd("a")
       p1 ! GetState
@@ -332,11 +295,7 @@ class PersistentActorFailureSpec
       expectMsg(List("a-1", "a-2", "c-1", "c-2"))
 
       // Create yet another one with same persistenceId, b-1 and b-2 discarded during replay
-      EventFilter.warning(start = "Invalid replayed event", occurrences = 2) intercept {
+      EventFilter.warning(start = "Invalid replayed event", occurrences = 2) intercept
         val p3 = namedPersistentActor[Behavior1PersistentActor]
         p3 ! GetState
         expectMsg(List("a-1", "a-2", "c-1", "c-2"))
-      }
-    }
-  }
-}

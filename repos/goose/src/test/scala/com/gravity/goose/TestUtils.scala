@@ -10,7 +10,7 @@ import org.jsoup.nodes.Element
   * User: jim
   * Date: 8/19/11
   */
-object TestUtils {
+object TestUtils
 
   val staticHtmlDir = "/com/gravity/goose/statichtml/"
   private val NL = '\n';
@@ -22,14 +22,12 @@ object TestUtils {
   val NO_IMAGE_CONFIG: Configuration = new Configuration
   NO_IMAGE_CONFIG.enableImageFetching = false
 
-  object additionalExt extends AdditionalDataExtractor {
-    override def extract(rootElement: Element) = {
+  object additionalExt extends AdditionalDataExtractor
+    override def extract(rootElement: Element) =
       println()
       println("ADDITIONAL DATA EXTRACTOR CALLED")
       println()
       Map("test" -> "success")
-    }
-  }
 
   val ADDITIONAL_DATA_CONFIG = new Configuration
   ADDITIONAL_DATA_CONFIG.setAdditionalDataExtractor(additionalExt)
@@ -38,19 +36,18 @@ object TestUtils {
     * returns an article object from a crawl
     */
   def getArticle(url: String, rawHTML: String = null)(
-      implicit config: Configuration): Article = {
+      implicit config: Configuration): Article =
     val goose = new Goose(config)
     val article = goose.extractContent(url, rawHTML)
 //    goose.shutdownNetwork()
     article
-  }
 
   def runArticleAssertions(article: Article,
                            expectedTitle: String = null,
                            expectedStart: String = null,
                            expectedImage: String = null,
                            expectedDescription: String = null,
-                           expectedKeywords: String = null): Unit = {
+                           expectedKeywords: String = null): Unit =
     articleReport
       .append("URL:      ")
       .append(TAB)
@@ -114,12 +111,11 @@ object TestUtils {
 
     assertNotNull("Resulting article was NULL!", article)
 
-    if (expectedTitle != null) {
+    if (expectedTitle != null)
       val title: String = article.title
       assertNotNull("Title was NULL!", title)
       assertEquals("Expected title was not returned!", expectedTitle, title)
-    }
-    if (expectedStart != null) {
+    if (expectedStart != null)
       val articleText: String = article.cleanedArticleText
       assertNotNull("Resulting article text was NULL!", articleText)
       assertTrue("Article text was not as long as expected beginning!",
@@ -128,30 +124,23 @@ object TestUtils {
       assertEquals("The beginning of the article text was not as expected!",
                    expectedStart,
                    actual)
-    }
-    if (expectedImage != null) {
+    if (expectedImage != null)
       val image: Image = article.topImage
       assertNotNull("Top image was NULL!", image)
       val src: String = image.getImageSrc
       assertNotNull("Image src was NULL!", src)
       assertEquals("Image src was not as expected!", expectedImage, src)
-    }
-    if (expectedDescription != null) {
+    if (expectedDescription != null)
       val description: String = article.metaDescription
       assertNotNull("Meta Description was NULL!", description)
       assertEquals("Meta Description was not as expected!",
                    expectedDescription,
                    description)
-    }
-    if (expectedKeywords != null) {
+    if (expectedKeywords != null)
       val keywords: String = article.metaDescription
       assertNotNull("Meta Keywords was NULL!", keywords)
       assertEquals(
           "Meta Keywords was not as expected!", expectedKeywords, keywords)
-    }
-  }
 
-  def printReport() {
+  def printReport()
     println(articleReport)
-  }
-}

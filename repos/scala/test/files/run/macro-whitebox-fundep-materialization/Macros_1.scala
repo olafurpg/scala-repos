@@ -1,15 +1,14 @@
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
-trait Iso[T, U] {
+trait Iso[T, U]
   def to(t: T): U
   // def from(u : U) : T
-}
 
-object Iso {
+object Iso
   implicit def materializeIso[T, U]: Iso[T, U] = macro impl[T, U]
   def impl[T : c.WeakTypeTag, U : c.WeakTypeTag](
-      c: Context): c.Expr[Iso[T, U]] = {
+      c: Context): c.Expr[Iso[T, U]] =
     import c.universe._
     import definitions._
     import Flag._
@@ -17,17 +16,15 @@ object Iso {
     val sym = c.weakTypeOf[T].typeSymbol
     if (!sym.isClass || !sym.asClass.isCaseClass)
       c.abort(c.enclosingPosition, s"$sym is not a case class")
-    val fields = sym.info.decls.toList.collect {
+    val fields = sym.info.decls.toList.collect
       case x: TermSymbol if x.isVal && x.isCaseAccessor => x
-    }
 
-    def mkTpt() = {
+    def mkTpt() =
       val core = Ident(TupleClass(fields.length) orElse UnitClass)
       if (fields.length == 0) core
       else AppliedTypeTree(core, fields map (f => TypeTree(f.info)))
-    }
 
-    def mkFrom() = {
+    def mkFrom() =
       if (fields.length == 0) Literal(Constant(Unit))
       else
         Apply(Ident(newTermName("Tuple" + fields.length)),
@@ -35,7 +32,6 @@ object Iso {
               (f =>
                     Select(Ident(newTermName("f")),
                            newTermName(f.name.toString.trim))))
-    }
 
     val evidenceClass = ClassDef(
         Modifiers(FINAL),
@@ -69,5 +65,3 @@ object Iso {
               Apply(Select(New(Ident(newTypeName("$anon"))),
                            termNames.CONSTRUCTOR),
                     List())))
-  }
-}

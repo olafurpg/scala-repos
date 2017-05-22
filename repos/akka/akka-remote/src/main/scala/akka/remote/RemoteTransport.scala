@@ -37,7 +37,7 @@ class RemoteTransportExceptionNoStackTrace(message: String, cause: Throwable)
   * received or when the start() method returns, whatever happens first.
   */
 private[akka] abstract class RemoteTransport(
-    val system: ExtendedActorSystem, val provider: RemoteActorRefProvider) {
+    val system: ExtendedActorSystem, val provider: RemoteActorRefProvider)
 
   /**
     * Shuts down the remoting
@@ -80,9 +80,8 @@ private[akka] abstract class RemoteTransport(
     * @param cmd Command message to send to the transports.
     * @return A Future that indicates when the message was successfully handled or dropped.
     */
-  def managementCommand(cmd: Any): Future[Boolean] = {
+  def managementCommand(cmd: Any): Future[Boolean] =
     Future.successful(false)
-  }
 
   /**
     * A Logger that can be used to log issues that may occur
@@ -101,4 +100,3 @@ private[akka] abstract class RemoteTransport(
     * When this method returns true, some functionality will be turned off for security purposes.
     */
   protected def useUntrustedMode: Boolean
-}

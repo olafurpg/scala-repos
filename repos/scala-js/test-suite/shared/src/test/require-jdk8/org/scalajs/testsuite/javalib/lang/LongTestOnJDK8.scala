@@ -14,7 +14,7 @@ import org.scalajs.testsuite.utils.AssertThrows._
 
 import java.lang.{Long => JLong}
 
-class LongTestOnJDK8 {
+class LongTestOnJDK8
 
   final val MinRadix = Character.MIN_RADIX
   final val MaxRadix = Character.MAX_RADIX
@@ -23,13 +23,12 @@ class LongTestOnJDK8 {
   val MaxValue: Long = Long.MaxValue
   val MinValue: Long = Long.MinValue
 
-  @Test def parseUnsignedLong(): Unit = {
-    def test(s: String, v: Long, radix: Int = 10): Unit = {
+  @Test def parseUnsignedLong(): Unit =
+    def test(s: String, v: Long, radix: Int = 10): Unit =
       assertEquals(v, JLong.parseUnsignedLong(s, radix))
       if (radix == 10) assertEquals(v, JLong.parseUnsignedLong(s))
-    }
 
-    for (radix <- MinRadix to MaxRadix) {
+    for (radix <- MinRadix to MaxRadix)
       test("0", 0L, radix)
       test("000", 0L, radix)
       test("1", 1L, radix)
@@ -39,7 +38,6 @@ class LongTestOnJDK8 {
 
       test("10", radix, radix)
       test("101", radix * radix + 1, radix)
-    }
 
     test("16124664", 16124664L)
     test("7813704539", 7813704539L)
@@ -234,9 +232,8 @@ class LongTestOnJDK8 {
     test("ox", 897L, 36)
     test("gm0bq", 27900710L, 36)
     test("3w5e0eru6osu5", -1746501839363L, 36)
-  }
 
-  @Test def parseUnsignedLong_failure_cases(): Unit = {
+  @Test def parseUnsignedLong_failure_cases(): Unit =
     def test(s: String, radix: Int = 10): Unit =
       expectThrows(
           classOf[NumberFormatException], JLong.parseUnsignedLong(s, radix))
@@ -263,9 +260,8 @@ class LongTestOnJDK8 {
     test("3w5e11264sgsg", 36)
     test("18446744073709551616654831357465413214984684321486984")
     test("3w5e11264sgsgvmqoijs34qsdf1ssfmlkjesl", 36)
-  }
 
-  @Test def hashCode_test(): Unit = {
+  @Test def hashCode_test(): Unit =
     assertEquals(0, JLong.hashCode(0L))
     assertEquals(1, JLong.hashCode(1L))
     assertEquals(0, JLong.hashCode(-1L))
@@ -280,9 +276,8 @@ class LongTestOnJDK8 {
     assertEquals(-614637591, JLong.hashCode(7053247622210876606L))
     assertEquals(1345794172, JLong.hashCode(4113526825251053222L))
     assertEquals(-575359500, JLong.hashCode(7285869072471305893L))
-  }
 
-  @Test def compareUnsigned(): Unit = {
+  @Test def compareUnsigned(): Unit =
     def compare(x: Long, y: Long): Int =
       JLong.compareUnsigned(x, y)
 
@@ -294,9 +289,8 @@ class LongTestOnJDK8 {
     assertTrue(compare(-1L, 0xe6b28004865df12L) > 0)
     assertTrue(compare(0xe6b28004865df12L, 3) > 0)
     assertTrue(compare(3, 0xe6b28004865df12L) < 0)
-  }
 
-  @Test def divideUnsigned(): Unit = {
+  @Test def divideUnsigned(): Unit =
     def test(dividend: Long, divisor: Long, result: Long): Unit =
       assertEquals(result, JLong.divideUnsigned(dividend, divisor))
 
@@ -354,9 +348,8 @@ class LongTestOnJDK8 {
     test(89731974104L, 1173247030L, 76L)
     test(385847542338318L, 7846L, 49177611819L)
     test(-9223372026066135207L, 480301980L, 19203277170L)
-  }
 
-  @Test def remainderUnsigned(): Unit = {
+  @Test def remainderUnsigned(): Unit =
     def test(dividend: Long, divisor: Long, result: Long): Unit =
       assertEquals(result, JLong.remainderUnsigned(dividend, divisor))
 
@@ -417,23 +410,19 @@ class LongTestOnJDK8 {
     test(-9223372036846154797L, 11L, 0L)
     test(-9212519596031121696L, 1L, 0L)
     test(0L, 2L, 0L)
-  }
 
-  @Test def toUnsignedString(): Unit = {
-    def test(x: Long, s: String, radix: Int = 10): Unit = {
+  @Test def toUnsignedString(): Unit =
+    def test(x: Long, s: String, radix: Int = 10): Unit =
       assertEquals(s, JLong.toUnsignedString(x, radix))
-      if (radix == 10) {
+      if (radix == 10)
         assertEquals(s, JLong.toUnsignedString(x))
         assertEquals(s, JLong.toUnsignedString(x, MinRadix - 1))
         assertEquals(s, JLong.toUnsignedString(x, MaxRadix + 1))
-      }
-    }
 
-    for (radix <- MinRadix to MaxRadix) {
+    for (radix <- MinRadix to MaxRadix)
       test(0L, "0", radix)
       test(1L, "1", radix)
       test(radix * radix + 1, "101", radix)
-    }
 
     test(-111L,
          "1111111111111111111111111111111111111111111111111111111110010001",
@@ -630,9 +619,8 @@ class LongTestOnJDK8 {
     test(325L, "91", 36)
     test(-5110L, "3w5e11264scui", 36)
     test(156326L, "3cme", 36)
-  }
 
-  @Test def sum(): Unit = {
+  @Test def sum(): Unit =
     assertEquals(6122341414771019357L,
                  JLong.sum(1740786198414632467L, 4381555216356386890L))
     assertEquals(-4889886762367205395L,
@@ -653,9 +641,8 @@ class LongTestOnJDK8 {
                  JLong.sum(1334542450932789748L, 2640867309238202409L))
     assertEquals(-2306898384481193161L,
                  JLong.sum(-1061157332600512189L, -1245741051880680972L))
-  }
 
-  @Test def max(): Unit = {
+  @Test def max(): Unit =
     assertEquals(1956883243420738449L,
                  JLong.max(1956883243420738449L, -1904419562216591909L))
     assertEquals(117913687706178681L,
@@ -676,9 +663,8 @@ class LongTestOnJDK8 {
                  JLong.max(-9074221864918600272L, 1144435567075440595L))
     assertEquals(7404961600946325433L,
                  JLong.max(7404961600946325433L, -8938012685848048741L))
-  }
 
-  @Test def min(): Unit = {
+  @Test def min(): Unit =
     assertEquals(-5271417849589228545L,
                  JLong.min(8336468579144700312L, -5271417849589228545L))
     assertEquals(-3894917472223405446L,
@@ -699,5 +685,3 @@ class LongTestOnJDK8 {
                  JLong.min(-1221988382269503479L, 8379347185457460903L))
     assertEquals(-354972413230950652L,
                  JLong.min(5755640173859541328L, -354972413230950652L))
-  }
-}

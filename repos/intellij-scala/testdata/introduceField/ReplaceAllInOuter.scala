@@ -1,17 +1,14 @@
 /*selectedClassNumber = 1*/
 /*replaceAll*/
-class Test {
-  object A {
+class Test
+  object A
     /*start*/
     1 /*end*/
-  }
 
-  def foo() {
+  def foo()
     1
-  }
 
   1
-}
 
 /*
 /*selectedClassNumber = 1*/

@@ -44,9 +44,9 @@ class MultipleSelectionModelSpec[T]
     extends SimpleSFXDelegateSpec[
         jfxsc.MultipleSelectionModel[T], MultipleSelectionModel[T]](
         classOf[jfxsc.MultipleSelectionModel[T]],
-        classOf[MultipleSelectionModel[T]]) {
+        classOf[MultipleSelectionModel[T]])
 
-  class SimpleMultipleSelectionModel extends jfxsc.MultipleSelectionModel[T] {
+  class SimpleMultipleSelectionModel extends jfxsc.MultipleSelectionModel[T]
     def getSelectedIndices: jfxc.ObservableList[java.lang.Integer] = null
     def getSelectedItems: jfxc.ObservableList[T] = null
     def selectAll() {}
@@ -62,11 +62,9 @@ class MultipleSelectionModelSpec[T]
     def select(obj: T) {}
     def selectNext() {}
     def selectPrevious() {}
-  }
 
   override protected def getScalaClassInstance =
     new MultipleSelectionModel[T](getJavaClassInstance) {}
 
   override protected def getJavaClassInstance =
     new SimpleMultipleSelectionModel
-}

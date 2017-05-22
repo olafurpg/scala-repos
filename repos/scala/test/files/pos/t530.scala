@@ -4,7 +4,7 @@ package test;
 /** The main class for NSC, a compiler for the programming
   *  language Scala.
   */
-object Test {
+object Test
   /*
   def process(): AnyRef = {
     class Compiler;
@@ -18,11 +18,8 @@ object Test {
     generator()
   }
    */
-  def process1(): AnyRef = {
-    object generator {
+  def process1(): AnyRef =
+    object generator
       val c = compiler
-    }
     object compiler;
     generator
-  }
-}

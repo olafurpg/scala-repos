@@ -30,9 +30,8 @@ case class FileData[M[+ _]](
 /**
   * An abstraction for storing/manipulating/retrieving files.
   */
-trait FileStorage[M[+ _]] {
+trait FileStorage[M[+ _]]
   def exists(file: String): M[Boolean]
   def save(file: String, data: FileData[M]): M[Unit]
   def load(file: String): M[Option[FileData[M]]]
   def remove(file: String): M[Unit]
-}

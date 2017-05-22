@@ -18,48 +18,39 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
  *  ValDef ::= PatDef |
  *             ids ':' Type '=' '_'
  */
-object VarDef {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    if (PatDef parse builder) {
+object VarDef
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    if (PatDef parse builder)
       return true
-    }
 
     // Parsing specifig wildcard definition
     val valDefMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
         Ids parse builder
         var hasTypeDcl = false
 
-        if (ScalaTokenTypes.tCOLON.equals(builder.getTokenType)) {
+        if (ScalaTokenTypes.tCOLON.equals(builder.getTokenType))
           ParserUtils.eatElement(builder, ScalaTokenTypes.tCOLON)
-          if (!Type.parse(builder)) {
+          if (!Type.parse(builder))
             builder error "type declaration expected"
-          }
           hasTypeDcl = true
-        } else {
+        else
           valDefMarker.rollbackTo
           return false
-        }
-        if (!ScalaTokenTypes.tASSIGN.equals(builder.getTokenType)) {
+        if (!ScalaTokenTypes.tASSIGN.equals(builder.getTokenType))
           valDefMarker.rollbackTo
           return false
-        } else {
+        else
           ParserUtils.eatElement(builder, ScalaTokenTypes.tASSIGN)
-          builder.getTokenType match {
+          builder.getTokenType match
             case ScalaTokenTypes.tUNDER => builder.advanceLexer
             //Ate _
-            case _ => {
+            case _ =>
                 valDefMarker.rollbackTo
                 return false
-              }
-          }
           valDefMarker.drop
           return true
-        }
       case _ =>
         valDefMarker.drop
         return false
-    }
-  }
-}

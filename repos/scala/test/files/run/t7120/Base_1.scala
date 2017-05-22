@@ -4,7 +4,6 @@
 
 case class Container(v: String)
 
-trait Base[T <: AnyRef] {
+trait Base[T <: AnyRef]
   type UserType = T
   protected def defect: PartialFunction[UserType, String]
-}

@@ -30,7 +30,7 @@ import org.apache.kafka.common.protocol.{Errors, SecurityProtocol}
 import org.junit.Assert._
 import org.junit.{Test, After, Before}
 
-abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
+abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness
   private var server1: KafkaServer = null
   var brokerEndPoints: Seq[BrokerEndPoint] = null
   var adHocConfigs: Seq[KafkaConfig] = null
@@ -41,7 +41,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
   protected def securityProtocol: SecurityProtocol
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val props = createBrokerConfigs(
         numConfigs,
@@ -58,16 +58,14 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                            server1.config.hostName,
                            server1.boundPort(SecurityProtocol.PLAINTEXT))
     )
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     server1.shutdown()
     super.tearDown()
-  }
 
   @Test
-  def testBasicTopicMetadata {
+  def testBasicTopicMetadata
     // create topic
     val topic = "test"
     createTopic(zkUtils,
@@ -97,10 +95,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                  0,
                  partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
-  }
 
   @Test
-  def testGetAllTopicMetadata {
+  def testGetAllTopicMetadata
     // create topic
     val topic1 = "testGetAllTopicMetadata1"
     val topic2 = "testGetAllTopicMetadata2"
@@ -143,10 +140,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                  0,
                  partitionMetadataTopic2.head.partitionId)
     assertEquals(1, partitionMetadataTopic2.head.replicas.size)
-  }
 
   @Test
-  def testAutoCreateTopic {
+  def testAutoCreateTopic
     // auto create topic
     val topic = "testAutoCreateTopic"
     var topicsMetadata = ClientUtils
@@ -187,10 +183,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                  partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
     assertTrue(partitionMetadata.head.leader.isDefined)
-  }
 
   @Test
-  def testAutoCreateTopicWithCollision {
+  def testAutoCreateTopicWithCollision
     // auto create topic
     val topic1 = "testAutoCreate_Topic"
     val topic2 = "testAutoCreate.Topic"
@@ -235,9 +230,8 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                  partitionMetadata.head.partitionId)
     assertEquals(1, partitionMetadata.head.replicas.size)
     assertTrue(partitionMetadata.head.leader.isDefined)
-  }
 
-  private def checkIsr(servers: Seq[KafkaServer]): Unit = {
+  private def checkIsr(servers: Seq[KafkaServer]): Unit =
     val activeBrokers: Seq[KafkaServer] =
       servers.filter(x => x.brokerState.currentState != NotRunning.state)
     val expectedIsr: Seq[BrokerEndPoint] = activeBrokers.map(
@@ -251,11 +245,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     // Assert that topic metadata at new brokers is updated correctly
     activeBrokers.foreach(
         x =>
-          {
         var metadata: TopicMetadataResponse =
           new TopicMetadataResponse(Seq(), Seq(), -1)
         waitUntilTrue(() =>
-                        {
                           metadata = ClientUtils.fetchTopicMetadata(
                               Set.empty,
                               Seq(new BrokerEndPoint(
@@ -270,7 +262,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                           metadata.topicsMetadata.head.partitionsMetadata.nonEmpty && expectedIsr
                             .sortBy(_.id) == metadata.topicsMetadata.head.partitionsMetadata.head.isr
                             .sortBy(_.id)
-                      },
+                      ,
                       "Topic metadata is not correctly updated for broker " +
                       x + ".\n" + "Expected ISR: " + expectedIsr + "\n" +
                       "Actual ISR  : " +
@@ -279,11 +271,10 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                          metadata.topicsMetadata.head.partitionsMetadata.head.isr
                        else ""),
                       8000L)
-    })
-  }
+    )
 
   @Test
-  def testIsrAfterBrokerShutDownAndJoinsBack {
+  def testIsrAfterBrokerShutDownAndJoinsBack
     val numBrokers = 2 //just 2 brokers are enough for the test
 
     // start adHoc brokers
@@ -307,10 +298,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
 
     // shutdown adHoc brokers
     adHocServers.map(p => p.shutdown())
-  }
 
   private def checkMetadata(
-      servers: Seq[KafkaServer], expectedBrokersCount: Int): Unit = {
+      servers: Seq[KafkaServer], expectedBrokersCount: Int): Unit =
     var topicMetadata: TopicMetadataResponse = new TopicMetadataResponse(
         Seq(), Seq(), -1)
 
@@ -318,7 +308,6 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     // Wait for metadata to get updated by checking metadata from a new broker
     waitUntilTrue(
         () =>
-          {
             topicMetadata = ClientUtils.fetchTopicMetadata(
                 Set.empty,
                 brokerEndPoints,
@@ -326,7 +315,7 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                 2000,
                 0)
             topicMetadata.brokers.size == expectedBrokersCount
-        },
+        ,
         "Alive brokers list is not correctly propagated by coordinator to brokers")
 
     // Assert that topic metadata at new brokers is updated correctly
@@ -334,7 +323,6 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
       .filter(x => x.brokerState.currentState != NotRunning.state)
       .foreach(x =>
             waitUntilTrue(() =>
-                            {
                           val foundMetadata = ClientUtils.fetchTopicMetadata(
                               Set.empty,
                               Seq(new Broker(x.config.brokerId,
@@ -348,17 +336,15 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
                             .sortBy(_.id) && topicMetadata.topicsMetadata
                             .sortBy(_.topic) == foundMetadata.topicsMetadata
                             .sortBy(_.topic)
-                      },
+                      ,
                           s"Topic metadata is not correctly updated"))
-  }
 
   @Test
-  def testAliveBrokerListWithNoTopics {
+  def testAliveBrokerListWithNoTopics
     checkMetadata(Seq(server1), 1)
-  }
 
   @Test
-  def testAliveBrokersListWithNoTopicsAfterNewBrokerStartup {
+  def testAliveBrokersListWithNoTopicsAfterNewBrokerStartup
     var adHocServers =
       adHocConfigs.takeRight(adHocConfigs.size - 1).map(p => createServer(p))
 
@@ -369,10 +355,9 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
 
     checkMetadata(adHocServers, numConfigs)
     adHocServers.map(p => p.shutdown())
-  }
 
   @Test
-  def testAliveBrokersListWithNoTopicsAfterABrokerShutdown {
+  def testAliveBrokersListWithNoTopicsAfterABrokerShutdown
     val adHocServers = adHocConfigs.map(p => createServer(p))
 
     checkMetadata(adHocServers, numConfigs)
@@ -384,5 +369,3 @@ abstract class BaseTopicMetadataTest extends ZooKeeperTestHarness {
     checkMetadata(adHocServers, numConfigs - 1)
 
     adHocServers.map(p => p.shutdown())
-  }
-}

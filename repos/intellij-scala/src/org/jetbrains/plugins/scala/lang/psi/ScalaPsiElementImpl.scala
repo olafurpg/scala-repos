@@ -16,53 +16,40 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaElementVisitor
 @author ven
   */
 abstract class ScalaPsiElementImpl(node: ASTNode)
-    extends ASTWrapperPsiElement(node) with ScalaPsiElement {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    extends ASTWrapperPsiElement(node) with ScalaPsiElement
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
-  private val _locked = new ThreadLocal[Boolean] {
+  private val _locked = new ThreadLocal[Boolean]
     override def initialValue: Boolean = false
-  }
 
-  override def getContext: PsiElement = {
-    context match {
+  override def getContext: PsiElement =
+    context match
       case null => super.getContext
       case _ => context
-    }
-  }
 
-  override def getStartOffsetInParent: Int = {
-    child match {
+  override def getStartOffsetInParent: Int =
+    child match
       case null => super.getStartOffsetInParent
       case _ => child.getStartOffsetInParent
-    }
-  }
 
-  override def getPrevSibling: PsiElement = {
-    child match {
+  override def getPrevSibling: PsiElement =
+    child match
       case null => super.getPrevSibling
       case _ => child.getPrevSibling
-    }
-  }
 
-  override def getNextSibling: PsiElement = {
-    child match {
+  override def getNextSibling: PsiElement =
+    child match
       case null => super.getNextSibling
       case _ => child.getNextSibling
-    }
-  }
 
-  override def findLastChildByType[T <: PsiElement](t: IElementType): T = {
+  override def findLastChildByType[T <: PsiElement](t: IElementType): T =
     super [ScalaPsiElement].findLastChildByType(t)
-  }
 
-  override def findLastChildByType(t: TokenSet) = {
+  override def findLastChildByType(t: TokenSet) =
     super [ScalaPsiElement].findLastChildByType(t)
-  }
 
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): Array[T] =
@@ -71,97 +58,74 @@ abstract class ScalaPsiElementImpl(node: ASTNode)
   protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T = findChildByClass[T](clazz)
 
-  override protected def lock(handler: => Unit) {
-    if (!_locked.get) {
+  override protected def lock(handler: => Unit)
+    if (!_locked.get)
       _locked.set(true)
       handler
       _locked.set(false)
-    }
-  }
 
   // todo override in more specific cases
-  override def replace(newElement: PsiElement): PsiElement = {
+  override def replace(newElement: PsiElement): PsiElement =
     val newElementCopy = newElement.copy
     getParent.getNode.replaceChild(getNode, newElementCopy.getNode)
     newElementCopy
-  }
 
-  override def delete() {
-    getParent match {
+  override def delete()
+    getParent match
       case x: LazyParseablePsiElement =>
         CheckUtil.checkWritable(this)
         x.deleteChildInternal(getNode)
       case _ => super.delete()
-    }
-  }
-}
 
 abstract class ScalaStubBasedElementImpl[T <: PsiElement](
     stub: StubElement[T], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBaseElementImplJavaRawTypeHack[T](stub, nodeType, node)
-    with ScalaPsiElement {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    with ScalaPsiElement
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
-  override def getContext: PsiElement = {
-    context match {
+  override def getContext: PsiElement =
+    context match
       case null => super.getContext
       case _ => context
-    }
-  }
 
-  override def getStartOffsetInParent: Int = {
-    child match {
+  override def getStartOffsetInParent: Int =
+    child match
       case null => super.getStartOffsetInParent
       case _ => child.getStartOffsetInParent
-    }
-  }
 
-  override def getPrevSibling: PsiElement = {
-    child match {
+  override def getPrevSibling: PsiElement =
+    child match
       case null => super.getPrevSibling
       case _ => ScalaPsiUtil.getPrevStubOrPsiElement(child)
-    }
-  }
 
-  override def getNextSibling: PsiElement = {
-    child match {
+  override def getNextSibling: PsiElement =
+    child match
       case null => super.getNextSibling
       case _ => ScalaPsiUtil.getNextStubOrPsiElement(child)
-    }
-  }
 
-  override def getParent: PsiElement = {
+  override def getParent: PsiElement =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.getParentStub.getPsi
-    }
-    inReadAction {
+    inReadAction
       SharedImplUtil.getParent(getNode)
-    }
-  }
 
-  def getLastChildStub: PsiElement = {
+  def getLastChildStub: PsiElement =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       val children = stub.getChildrenStubs
       if (children.size() == 0) return null
       return children.get(children.size() - 1).getPsi
-    }
     getLastChild
-  }
 
-  override def findLastChildByType[T <: PsiElement](t: IElementType): T = {
+  override def findLastChildByType[T <: PsiElement](t: IElementType): T =
     super [ScalaPsiElement].findLastChildByType(t)
-  }
 
-  override def findLastChildByType(t: TokenSet) = {
+  override def findLastChildByType(t: TokenSet) =
     super [ScalaPsiElement].findLastChildByType(t)
-  }
 
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): Array[T] =
@@ -170,12 +134,9 @@ abstract class ScalaStubBasedElementImpl[T <: PsiElement](
   protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
       clazz: Class[T]): T = findChildByClass[T](clazz)
 
-  override def delete() {
-    getParent match {
+  override def delete()
+    getParent match
       case x: LazyParseablePsiElement =>
         CheckUtil.checkWritable(this)
         x.deleteChildInternal(getNode)
       case _ => super.delete()
-    }
-  }
-}

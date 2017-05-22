@@ -16,7 +16,7 @@ import nsc.Properties.envOrNone
   *
   *  @see    Instance
   */
-trait Reference extends Spec {
+trait Reference extends Spec
   lazy val options = new Reference.Accumulators()
   import options._
 
@@ -43,12 +43,11 @@ trait Reference extends Spec {
   type OptionMagic = Opt.Reference
   protected implicit def optionMagicAdditions(name: String) =
     new Opt.Reference(programInfo, options, name)
-}
 
-object Reference {
+object Reference
   val MaxLine = 80
 
-  class Accumulators() {
+  class Accumulators()
     private val _help = new ListBuffer[() => String]
     private var _unary = List[String]()
     private var _binary = List[String]()
@@ -63,34 +62,30 @@ object Reference {
     def addExpand(opt: String, expanded: List[String]) =
       _expand += (opt -> expanded)
 
-    def mapHelp(g: String => String): Unit = {
+    def mapHelp(g: String => String): Unit =
       val idx = _help.length - 1
       val f = _help(idx)
 
       _help(idx) = () => g(f())
-    }
 
     def addHelp(f: () => String): Unit = _help += f
-    def addHelpAlias(f: () => String) = mapHelp { s =>
+    def addHelpAlias(f: () => String) = mapHelp  s =>
       val str = "alias for '%s'" format f()
       def noHelp = (helpFormatStr.format("", "")).length == s.length
       val str2 = if (noHelp) str else " (" + str + ")"
 
       s + str2
-    }
-    def addHelpDefault(f: () => String): Unit = mapHelp { s =>
+    def addHelpDefault(f: () => String): Unit = mapHelp  s =>
       val str = "(default: %s)" format f()
 
       if (s.length + str.length < MaxLine) s + " " + str
       else defaultFormatStr.format(s, str)
-    }
-    def addHelpEnvDefault(name: String): Unit = mapHelp { s =>
+    def addHelpEnvDefault(name: String): Unit = mapHelp  s =>
       val line1 = "%s (default: %s)".format(s, name)
       val envNow = envOrNone(name) map ("'" + _ + "'") getOrElse "unset"
       val line2 = defaultFormatStr.format("Currently " + envNow)
 
       line1 + "\n" + line2
-    }
 
     lazy val unary = (_unary ++ _expand.keys).distinct
     lazy val binary = _binary.distinct
@@ -98,5 +93,3 @@ object Reference {
     lazy val expansionMap = _expand
     lazy val helpMsg = _help map (f => f() + "\n") mkString
     lazy val longestArg = all map (_.length) max
-  }
-}

@@ -17,13 +17,13 @@ class ScalaCastPostfixTemplate
     extends PostfixTemplateWithExpressionSelector(
         "cast",
         "expr.asInstanceOf[SomeType]",
-        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All))
 
   def getTemplateString(expression: PsiElement): String =
     "$expr$.asInstanceOf[$END$]"
 
   override def expandForChooseExpression(
-      expression: PsiElement, editor: Editor): Unit = {
+      expression: PsiElement, editor: Editor): Unit =
     val document: Document = editor.getDocument
     document.deleteString(expression.getTextRange.getStartOffset,
                           expression.getTextRange.getEndOffset)
@@ -31,10 +31,9 @@ class ScalaCastPostfixTemplate
       TemplateManager.getInstance(expression.getProject)
 
     val templateString = getTemplateString(expression)
-    if (templateString == null) {
+    if (templateString == null)
       PostfixTemplatesUtils.showErrorHint(expression.getProject, editor)
       return
-    }
 
     val template = manager.createTemplate("", "", templateString)
     template.setToReformat(true)
@@ -42,15 +41,13 @@ class ScalaCastPostfixTemplate
     template.addVariable(
         "expr",
         new TextExpression(
-            expression match {
+            expression match
           case _: ScSugarCallExpr | _: ScDoStmt | _: ScIfStmt | _: ScTryStmt |
               _: ScForStatement |
               _: ScWhileStmt | _: ScThrowStmt | _: ScReturnStmt =>
             "(" + expression.getText + ")"
           case _ => expression.getText
-        }),
+        ),
         false)
 
     manager.startTemplate(editor, template)
-  }
-}

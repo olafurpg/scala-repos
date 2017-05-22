@@ -5,7 +5,7 @@ import org.rogach.scallop.ScallopConf
 /**
   * Configuration for proxying to the current leader.
   */
-trait LeaderProxyConf extends ScallopConf {
+trait LeaderProxyConf extends ScallopConf
 
   //scalastyle:off magic.number
 
@@ -19,4 +19,3 @@ trait LeaderProxyConf extends ScallopConf {
       "leader_proxy_read_timeout",
       descr = "Maximum time, in milliseconds, for reading from the current Marathon leader.",
       default = Some(10000)) // 10 seconds
-}

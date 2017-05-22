@@ -10,18 +10,17 @@ import scala.concurrent.duration._
 
 class PromiseActorTest
     extends MarathonActorSupport with MarathonSpec with BeforeAndAfterAll
-    with Matchers {
+    with Matchers
 
-  test("Success") {
+  test("Success")
     val promise = Promise[Any]()
     val ref = TestActorRef(Props(classOf[PromiseActor], promise))
 
     ref ! 'Test
 
     Await.result(promise.future, 2.seconds) should equal('Test)
-  }
 
-  test("Success with askWithoutTimeout") {
+  test("Success with askWithoutTimeout")
     val probe = TestProbe()
     val future: Future[Symbol] =
       PromiseActor.askWithoutTimeout(system, probe.ref, 'Question)
@@ -29,18 +28,16 @@ class PromiseActorTest
     probe.reply('Answer)
 
     Await.result(future, 2.seconds) should equal('Answer)
-  }
 
-  test("Status.Success") {
+  test("Status.Success")
     val promise = Promise[Any]()
     val ref = TestActorRef(Props(classOf[PromiseActor], promise))
 
     ref ! Status.Success('Test)
 
     Await.result(promise.future, 2.seconds) should equal('Test)
-  }
 
-  test("State.Success with askWithoutTimeout") {
+  test("State.Success with askWithoutTimeout")
     val probe = TestProbe()
     val future: Future[Symbol] =
       PromiseActor.askWithoutTimeout(system, probe.ref, 'Question)
@@ -48,29 +45,25 @@ class PromiseActorTest
     probe.reply(Status.Success('Answer))
 
     Await.result(future, 2.seconds) should equal('Answer)
-  }
 
-  test("Status.Failure") {
+  test("Status.Failure")
     val promise = Promise[Any]()
     val ref = TestActorRef(Props(classOf[PromiseActor], promise))
     val ex = new Exception("test")
 
     ref ! Status.Failure(ex)
 
-    intercept[Exception] {
+    intercept[Exception]
       Await.result(promise.future, 2.seconds)
-    }.getMessage should be("test")
-  }
+    .getMessage should be("test")
 
-  test("State.Failure with askWithoutTimeout") {
+  test("State.Failure with askWithoutTimeout")
     val probe = TestProbe()
     val future: Future[Symbol] =
       PromiseActor.askWithoutTimeout(system, probe.ref, 'Question)
     probe.expectMsg('Question)
     probe.reply(Status.Failure(new IllegalStateException("error")))
 
-    intercept[IllegalStateException] {
+    intercept[IllegalStateException]
       Await.result(future, 2.seconds)
-    }.getMessage should be("error")
-  }
-}
+    .getMessage should be("error")

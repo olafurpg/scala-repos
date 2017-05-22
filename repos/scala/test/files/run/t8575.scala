@@ -3,7 +3,7 @@ class A
 class B
 class C
 
-trait TypeMember {
+trait TypeMember
   type X
 
   // This call throws an AbstractMethodError, because it invokes the erasure of
@@ -13,9 +13,8 @@ trait TypeMember {
 
   def value: X
   def consume(x: X): Unit
-}
 
-object Test extends TypeMember {
+object Test extends TypeMember
   type F = A with B
 
   // works if replaced by type X = E[A with B with C]
@@ -26,7 +25,5 @@ object Test extends TypeMember {
   // This call passes, since it invokes consume(E): Unit
   def consume(x: X) {}
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     consume(value)
-  }
-}

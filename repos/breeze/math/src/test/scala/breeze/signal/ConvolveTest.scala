@@ -13,9 +13,9 @@ import org.scalatest.junit.JUnitRunner
   * To change this template use File | Settings | File Templates.
   */
 @RunWith(classOf[JUnitRunner])
-class ConvolveTest extends FunSuite {
+class ConvolveTest extends FunSuite
 
-  test("convolve/correlate double") {
+  test("convolve/correlate double")
     val kernelEven = DenseVector(1.0, 2.0)
     val kernelOdd = DenseVector(1.0, 2.0, 3.0)
     val data = DenseVector(2.0, 3.0, 4.0, 5.0)
@@ -58,11 +58,10 @@ class ConvolveTest extends FunSuite {
                      kernelEven,
                      2 to -1 by 2,
                      overhang = OptOverhang.Full) == DenseVector(11.0, 5.0))
-  }
   //MatLab: conv(2 : 5, 1 : 2)
   //Mathematica: ListConvolve[{1, 2}, {2, 3, 4, 5}]
 
-  test("convolve/correlate long") {
+  test("convolve/correlate long")
     val kernelEven = DenseVector(1L, 2L)
     //val kernelOdd = DenseVector(1L, 2L, 3L)
     val data = DenseVector(2L, 3L, 4L, 5L)
@@ -71,5 +70,3 @@ class ConvolveTest extends FunSuite {
     assert(
         correlate(data, kernelEven, range = (0 to 2 by 2)) == DenseVector(8L,
                                                                           14L))
-  }
-}

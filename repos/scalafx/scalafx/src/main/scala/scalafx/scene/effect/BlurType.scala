@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[scalafx.scene.effect.BlurType]] */
-object BlurType extends SFXEnumDelegateCompanion[jfxse.BlurType, BlurType] {
+object BlurType extends SFXEnumDelegateCompanion[jfxse.BlurType, BlurType]
 
   val Gaussian = new BlurType(jfxse.BlurType.GAUSSIAN)
   @deprecated("Use Gaussian; GAUSSIAN will be removed in a future release",
@@ -63,7 +63,6 @@ object BlurType extends SFXEnumDelegateCompanion[jfxse.BlurType, BlurType] {
       ThreePassBox,
       Gaussian
   )
-}
 
 sealed case class BlurType(override val delegate: jfxse.BlurType)
     extends SFXEnumDelegate[jfxse.BlurType]

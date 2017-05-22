@@ -16,24 +16,22 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.Block
  *  CaseClause ::= 'case' Pattern [Guard] '=>' Block
  */
 
-object CaseClause {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object CaseClause
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val caseClauseMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kCASE =>
         builder.advanceLexer()
         builder.disableNewlines
       case _ =>
         caseClauseMarker.drop()
         return false
-    }
     if (!Pattern.parse(builder)) builder error ErrMsg("pattern.expected")
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kIF =>
         Guard parse builder
       case _ =>
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tFUNTYPE =>
         builder.advanceLexer()
         builder.restoreNewlinesState
@@ -42,11 +40,7 @@ object CaseClause {
         builder error ErrMsg("fun.sign.expected")
         caseClauseMarker.done(ScalaElementTypes.CASE_CLAUSE)
         return true
-    }
-    if (!Block.parse(builder, hasBrace = false, needNode = true)) {
+    if (!Block.parse(builder, hasBrace = false, needNode = true))
       builder error ErrMsg("wrong.expression")
-    }
     caseClauseMarker.done(ScalaElementTypes.CASE_CLAUSE)
     true
-  }
-}

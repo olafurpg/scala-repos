@@ -22,33 +22,28 @@ import akka.remote.testkit.STMultiNodeSpec
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 import akka.testkit._
 
-object ClusterShardingFailureSpec {
+object ClusterShardingFailureSpec
   case class Get(id: String)
   case class Add(id: String, i: Int)
   case class Value(id: String, n: Int)
 
-  class Entity extends Actor {
+  class Entity extends Actor
     var n = 0
 
-    def receive = {
+    def receive =
       case Get(id) ⇒ sender() ! Value(id, n)
       case Add(id, i) ⇒ n += i
-    }
-  }
 
-  val extractEntityId: ShardRegion.ExtractEntityId = {
+  val extractEntityId: ShardRegion.ExtractEntityId =
     case m @ Get(id) ⇒ (id, m)
     case m @ Add(id, _) ⇒ (id, m)
-  }
 
-  val extractShardId: ShardRegion.ExtractShardId = {
+  val extractShardId: ShardRegion.ExtractShardId =
     case Get(id) ⇒ id.charAt(0).toString
     case Add(id, _) ⇒ id.charAt(0).toString
-  }
-}
 
 abstract class ClusterShardingFailureSpecConfig(val mode: String)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -77,7 +72,6 @@ abstract class ClusterShardingFailureSpecConfig(val mode: String)
     """))
 
   testTransport(on = true)
-}
 
 object PersistentClusterShardingFailureSpecConfig
     extends ClusterShardingFailureSpecConfig("persistence")
@@ -106,7 +100,7 @@ class DDataClusterShardingFailureMultiJvmNode3
 
 abstract class ClusterShardingFailureSpec(
     config: ClusterShardingFailureSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender
   import ClusterShardingFailureSpec._
   import config._
 
@@ -118,64 +112,54 @@ abstract class ClusterShardingFailureSpec(
          "akka.persistence.snapshot-store.local.dir").map(
         s ⇒ new File(system.settings.config.getString(s)))
 
-  override protected def atStartup() {
-    runOn(controller) {
+  override protected def atStartup()
+    runOn(controller)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
-  override protected def afterTermination() {
-    runOn(controller) {
+  override protected def afterTermination()
+    runOn(controller)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       Cluster(system) join node(to).address
       startSharding()
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  def startSharding(): Unit = {
+  def startSharding(): Unit =
     ClusterSharding(system).start(
         typeName = "Entity",
         entityProps = Props[Entity],
         settings = ClusterShardingSettings(system).withRememberEntities(true),
         extractEntityId = extractEntityId,
         extractShardId = extractShardId)
-  }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
 
-  s"Cluster sharding ($mode) with flaky journal" must {
+  s"Cluster sharding ($mode) with flaky journal" must
 
-    "setup shared journal" in {
+    "setup shared journal" in
       // start the Persistence extension
       Persistence(system)
-      runOn(controller) {
+      runOn(controller)
         system.actorOf(Props[SharedLeveldbStore], "store")
-      }
       enterBarrier("peristence-started")
 
-      runOn(first, second) {
+      runOn(first, second)
         system.actorSelection(node(controller) / "user" / "store") ! Identify(
             None)
         val sharedStore = expectMsgType[ActorIdentity].ref.get
         SharedLeveldbJournal.setStore(sharedStore, system)
-      }
 
       enterBarrier("after-1")
-    }
 
-    "join cluster" in within(20.seconds) {
+    "join cluster" in within(20.seconds)
       join(first, first)
       join(second, first)
 
-      runOn(first) {
+      runOn(first)
         region ! Add("10", 1)
         region ! Add("20", 2)
         region ! Add("21", 3)
@@ -185,35 +169,30 @@ abstract class ClusterShardingFailureSpec(
         expectMsg(Value("20", 2))
         region ! Get("21")
         expectMsg(Value("21", 3))
-      }
 
       enterBarrier("after-2")
-    }
 
-    "recover after journal failure" in within(20.seconds) {
-      runOn(controller) {
+    "recover after journal failure" in within(20.seconds)
+      runOn(controller)
         testConductor.blackhole(controller, first, Direction.Both).await
         testConductor.blackhole(controller, second, Direction.Both).await
-      }
       enterBarrier("journal-blackholed")
 
-      runOn(first) {
+      runOn(first)
         // try with a new shard, will not reply until journal is available again
         region ! Add("40", 4)
         val probe = TestProbe()
         region.tell(Get("40"), probe.ref)
         probe.expectNoMsg(1.second)
-      }
 
       enterBarrier("first-delayed")
 
-      runOn(controller) {
+      runOn(controller)
         testConductor.passThrough(controller, first, Direction.Both).await
         testConductor.passThrough(controller, second, Direction.Both).await
-      }
       enterBarrier("journal-ok")
 
-      runOn(first) {
+      runOn(first)
         region ! Get("21")
         expectMsg(Value("21", 3))
         val entity21 = lastSender
@@ -240,11 +219,10 @@ abstract class ClusterShardingFailureSpec(
 
         region ! Get("40")
         expectMsg(Value("40", 4))
-      }
 
       enterBarrier("verified-first")
 
-      runOn(second) {
+      runOn(second)
         region ! Add("10", 1)
         region ! Add("20", 2)
         region ! Add("30", 3)
@@ -257,9 +235,5 @@ abstract class ClusterShardingFailureSpec(
         expectMsg(Value("20", 4))
         region ! Get("30")
         expectMsg(Value("30", 6))
-      }
 
       enterBarrier("after-3")
-    }
-  }
-}

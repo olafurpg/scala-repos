@@ -15,30 +15,26 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
   */
 sealed trait StringPart
 
-case class Text(s: String) extends StringPart {
-  def withEscapedPercent(manager: PsiManager): List[StringPart] = {
+case class Text(s: String) extends StringPart
+  def withEscapedPercent(manager: PsiManager): List[StringPart] =
     val literal =
       ScalaPsiElementFactory.createExpressionFromText("\"%\"", manager)
     if (s == "%") List(Text(""), Injection(literal, None), Text(""))
-    else {
+    else
       val splitted = s.split('%')
       val list = splitted
         .flatMap(text => List(Injection(literal, None), Text(text)))
         .toList
       if (list.nonEmpty) list.tail else Nil
-    }
-  }
-}
 
 case class Injection(expression: ScExpression, specifier: Option[Specifier])
-    extends StringPart {
+    extends StringPart
   def text = expression.getText
 
-  def value = expression match {
+  def value = expression match
     case literal: ScLiteral => literal.getValue.toString
     case block: ScBlockExpr => block.exprs.headOption.map(_.getText).mkString
     case element => element.getText
-  }
 
   def format = specifier.map(_.format).getOrElse("")
 
@@ -52,32 +48,26 @@ case class Injection(expression: ScExpression, specifier: Option[Specifier])
 
   def isFormattingRequired = specifier.exists(_.format.length > 2)
 
-  def isComplexBlock = expression match {
+  def isComplexBlock = expression match
     case block: ScBlockExpr => block.exprs.length > 1
     case _ => false
-  }
 
-  def problem: Option[InjectionProblem] = specifier.flatMap { it =>
+  def problem: Option[InjectionProblem] = specifier.flatMap  it =>
     val _type =
       expressionType.map(ScType.expandAliases(_)).getOrElse(new Object())
-    _type match {
+    _type match
       case Success(result, _) =>
-        result match {
+        result match
           case res: ScType =>
-            try {
+            try
               val value = Types.valueOf(res)
               value.formatted(it.format)
               None
-            } catch {
+            catch
               case e: IllegalFormatConversionException => Some(Inapplicable)
               case e: IllegalFormatException => Some(Malformed)
-            }
           case _ => Some(Malformed)
-        }
       case _ => Some(Malformed)
-    }
-  }
-}
 
 case class UnboundSpecifier(specifier: Specifier) extends StringPart
 

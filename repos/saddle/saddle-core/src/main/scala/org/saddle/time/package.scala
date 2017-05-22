@@ -24,7 +24,7 @@ import scala.Some
 /**
   * Functionality to assist in TimeSeries related operations
   */
-package object time {
+package object time
   val ISO_CHRONO = ISOChronology.getInstance
   val ISO_CHRONO_UTC = ISOChronology.getInstanceUTC
 
@@ -41,7 +41,7 @@ package object time {
                t: Int = 0,
                s: Int = 0,
                ms: Int = 0,
-               zone: DateTimeZone = TZ_LOCAL): DateTime = {
+               zone: DateTimeZone = TZ_LOCAL): DateTime =
 
     val dt = new DateTime(zone)
 
@@ -50,7 +50,6 @@ package object time {
     val D = if (d == 0) dt.getDayOfMonth else d
 
     new DateTime(Y, M, D, h, t, s, ms, zone)
-  }
 
   private val dfmt1 = "(\\d\\d\\d\\d)(\\d\\d)(\\d\\d)".r // eg 20120205
   private val dfmt2 = "(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)".r // eg 2012-02-05
@@ -62,8 +61,8 @@ package object time {
     * @param s    String representing the date
     * @param euro Whether to use the european format, eg 2/5/2012 => 2nd of May, 2012
     */
-  def parsedate(s: String, euro: Boolean = false): Option[DateTime] = {
-    s match {
+  def parsedate(s: String, euro: Boolean = false): Option[DateTime] =
+    s match
       case dfmt1(y, m, d) =>
         Some(new DateTime(y.toInt, m.toInt, d.toInt, 0, 0, 0, 0))
       case dfmt2(y, m, d) =>
@@ -73,14 +72,12 @@ package object time {
       case dfmt3(d, m, y) if euro =>
         Some(new DateTime(y.toInt, m.toInt, d.toInt, 0, 0, 0, 0))
       case _ => None
-    }
-  }
 
   /**
     * Class providing time accessor methods for Vec and Index containing DateTimes
     */
   protected[saddle] class TimeAccessors[T](
-      times: Vec[Long], chrono: Chronology, cast: Vec[Int] => T) {
+      times: Vec[Long], chrono: Chronology, cast: Vec[Int] => T)
     def millisOfSecond = cast(extractor(1L, 1000L))
     def secondOfMinute = cast(extractor(1000L, 60L))
     def minuteOfHour = cast(extractor(60000L, 60L))
@@ -142,18 +139,16 @@ package object time {
     protected def getField(
         field: DateTimeField, isTime: Boolean = false): Vec[Int] =
       if (chrono != ISO_CHRONO_UTC || !isTime)
-        times.map { (ms: Long) =>
+        times.map  (ms: Long) =>
           field.get(ms)
-        } else getFieldFast(field)
+        else getFieldFast(field)
 
-    protected def extractor(unit: Long, range: Long): Vec[Int] = times.map {
+    protected def extractor(unit: Long, range: Long): Vec[Int] = times.map
       (t: Long) =>
-        if (t >= 0L) {
+        if (t >= 0L)
           ((t / unit) % range).toInt
-        } else {
+        else
           (range - 1L + (((t + 1L) / unit) % range)).toInt
-        }
-    }
 
     /**
       * Using Joda time's PreciseDateTimeField logic directly allows much faster extraction of the
@@ -161,42 +156,34 @@ package object time {
       *
       * e.g., extract the minute of the current hour.
       */
-    protected def getFieldFast(fld: DateTimeField): Vec[Int] = {
+    protected def getFieldFast(fld: DateTimeField): Vec[Int] =
       val unit: Long = fld.getDurationField.getUnitMillis
       val range: Long =
         fld.getRangeDurationField.getUnitMillis / fld.getDurationField.getUnitMillis
       extractor(unit, range)
-    }
-  }
 
   /**
     * Enrichment methods for Vec[DateTime]
     */
-  implicit def vecTimeAccessors(vec: Vec[DateTime]): TimeAccessors[Vec[Int]] = {
-    val (times, chrono: Chronology) = vec match {
+  implicit def vecTimeAccessors(vec: Vec[DateTime]): TimeAccessors[Vec[Int]] =
+    val (times, chrono: Chronology) = vec match
       case tv: VecTime => (tv.times, tv.chrono)
-      case _ => {
+      case _ =>
           val tmp = new VecTime(vec.map(_.getMillis)); (tmp.times, tmp.chrono)
-        }
-    }
     new TimeAccessors(times, chrono, identity)
-  }
 
   /**
     * Enrichment methods for Index[DateTime]
     */
   implicit def indexTimeAccessors(
-      ix: Index[DateTime]): TimeAccessors[Index[Int]] = {
-    val (times, chrono: Chronology) = ix match {
+      ix: Index[DateTime]): TimeAccessors[Index[Int]] =
+    val (times, chrono: Chronology) = ix match
       case tv: IndexTime => (tv.times.toVec, tv.chrono)
-      case _ => {
+      case _ =>
           val tmp = new IndexTime(ix.map(_.getMillis));
           (tmp.times.toVec, tmp.chrono)
-        }
-    }
 
     new TimeAccessors(times, chrono, Index(_))
-  }
 
   // Establish isomorphism between joda DateTime and RichDT
 
@@ -206,9 +193,8 @@ package object time {
   /**
     * Provides an implicit ordering for DateTime
     */
-  implicit def dtOrdering = new Ordering[DateTime] {
+  implicit def dtOrdering = new Ordering[DateTime]
     def compare(x: DateTime, y: DateTime) = x.compareTo(y)
-  }
 
   // Convenience methods for constructing ReadablePeriod instances
 
@@ -217,4 +203,3 @@ package object time {
   def months(i: Int) = Months.months(i)
   def weeks(i: Int) = Weeks.weeks(i)
   def days(i: Int) = Days.days(i)
-}

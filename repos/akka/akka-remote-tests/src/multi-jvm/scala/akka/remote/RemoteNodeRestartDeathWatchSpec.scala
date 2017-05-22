@@ -23,7 +23,7 @@ import akka.actor.ExtendedActorSystem
 import akka.actor.ActorSystem
 import akka.actor.RootActorPath
 
-object RemoteNodeRestartDeathWatchMultiJvmSpec extends MultiNodeConfig {
+object RemoteNodeRestartDeathWatchMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -36,15 +36,12 @@ object RemoteNodeRestartDeathWatchMultiJvmSpec extends MultiNodeConfig {
 
   testTransport(on = true)
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "shutdown" ⇒
         sender() ! "shutdown-ack"
         context.system.terminate()
       case msg ⇒ sender() ! msg
-    }
-  }
-}
 
 // Several different variations of the test
 
@@ -55,22 +52,21 @@ class RemoteNodeRestartDeathWatchMultiJvmNode2
 
 abstract class RemoteNodeRestartDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeRestartDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
 
   import RemoteNodeRestartDeathWatchMultiJvmSpec._
 
   override def initialParticipants = roles.size
 
-  def identify(role: RoleName, actorName: String): ActorRef = {
+  def identify(role: RoleName, actorName: String): ActorRef =
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
         actorName)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "RemoteNodeRestartDeathWatch" must {
+  "RemoteNodeRestartDeathWatch" must
 
-    "receive Terminated when remote actor system is restarted" taggedAs LongRunningTest in {
-      runOn(first) {
+    "receive Terminated when remote actor system is restarted" taggedAs LongRunningTest in
+      runOn(first)
         val secondAddress = node(second).address
         enterBarrier("actors-started")
 
@@ -86,17 +82,14 @@ abstract class RemoteNodeRestartDeathWatchSpec
 
         expectTerminated(subject, 15.seconds)
 
-        within(5.seconds) {
+        within(5.seconds)
           // retry because the Subject actor might not be started yet
-          awaitAssert {
+          awaitAssert
             system.actorSelection(
                 RootActorPath(secondAddress) / "user" / "subject") ! "shutdown"
             expectMsg(1.second, "shutdown-ack")
-          }
-        }
-      }
 
-      runOn(second) {
+      runOn(second)
         val addr =
           system.asInstanceOf[ExtendedActorSystem].provider.getDefaultAddress
         system.actorOf(Props[Subject], "subject")
@@ -116,7 +109,3 @@ abstract class RemoteNodeRestartDeathWatchSpec
         freshSystem.actorOf(Props[Subject], "subject")
 
         Await.ready(freshSystem.whenTerminated, 30.seconds)
-      }
-    }
-  }
-}

@@ -25,12 +25,12 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class WeightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite with MLlibTestSparkContext
 
   private var instances: RDD[Instance] = _
   private var instancesConstLabel: RDD[Instance] = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     /*
        R code:
@@ -63,9 +63,8 @@ class WeightedLeastSquaresSuite
             Instance(17.0, 4.0, Vectors.dense(3.0, 13.0))
         ),
         2)
-  }
 
-  test("WLS against lm") {
+  test("WLS against lm")
     /*
        R code:
 
@@ -83,8 +82,8 @@ class WeightedLeastSquaresSuite
                        Vectors.dense(18.08, 6.08, -0.60))
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true)) {
-      for (standardization <- Seq(false, true)) {
+    for (fitIntercept <- Seq(false, true))
+      for (standardization <- Seq(false, true))
         val wls = new WeightedLeastSquares(
             fitIntercept,
             regParam = 0.0,
@@ -93,12 +92,9 @@ class WeightedLeastSquaresSuite
         val actual = Vectors.dense(
             wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
-      }
       idx += 1
-    }
-  }
 
-  test("WLS against lm when label is constant and no regularization") {
+  test("WLS against lm when label is constant and no regularization")
     /*
        R code:
 
@@ -116,8 +112,8 @@ class WeightedLeastSquaresSuite
                        Vectors.dense(17.0, 0.0, 0.0))
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true)) {
-      for (standardization <- Seq(false, true)) {
+    for (fitIntercept <- Seq(false, true))
+      for (standardization <- Seq(false, true))
         val wls = new WeightedLeastSquares(
             fitIntercept,
             regParam = 0.0,
@@ -126,24 +122,19 @@ class WeightedLeastSquaresSuite
         val actual = Vectors.dense(
             wls.intercept, wls.coefficients(0), wls.coefficients(1))
         assert(actual ~== expected(idx) absTol 1e-4)
-      }
       idx += 1
-    }
-  }
 
-  test("WLS with regularization when label is constant") {
+  test("WLS with regularization when label is constant")
     // if regParam is non-zero and standardization is true, the problem is ill-defined and
     // an exception is thrown.
     val wls = new WeightedLeastSquares(fitIntercept = false,
                                        regParam = 0.1,
                                        standardizeFeatures = true,
                                        standardizeLabel = true)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       wls.fit(instancesConstLabel)
-    }
-  }
 
-  test("WLS against glmnet") {
+  test("WLS against glmnet")
     /*
        R code:
 
@@ -189,7 +180,7 @@ class WeightedLeastSquaresSuite
     var idx = 0
     for (fitIntercept <- Seq(false, true);
     regParam <- Seq(0.0, 0.1, 1.0);
-    standardizeFeatures <- Seq(false, true)) {
+    standardizeFeatures <- Seq(false, true))
       val wls =
         new WeightedLeastSquares(fitIntercept,
                                  regParam,
@@ -199,6 +190,3 @@ class WeightedLeastSquaresSuite
         Vectors.dense(wls.intercept, wls.coefficients(0), wls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
-    }
-  }
-}

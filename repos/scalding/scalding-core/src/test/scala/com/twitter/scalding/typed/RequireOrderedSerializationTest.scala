@@ -21,7 +21,7 @@ import com.twitter.scalding.serialization.StringOrderedSerialization
 
 import org.scalatest.{Matchers, WordSpec}
 
-class NoOrderdSerJob(args: Args) extends Job(args) {
+class NoOrderdSerJob(args: Args) extends Job(args)
 
   override def config =
     super.config + (Config.ScaldingRequireOrderedSerialization -> "true")
@@ -31,9 +31,8 @@ class NoOrderdSerJob(args: Args) extends Job(args) {
     .group
     .max
     .write(TypedTsv[(String, String)]("output"))
-}
 
-class OrderdSerJob(args: Args) extends Job(args) {
+class OrderdSerJob(args: Args) extends Job(args)
 
   implicit def stringOS: OrderedSerialization[String] =
     new StringOrderedSerialization
@@ -47,39 +46,30 @@ class OrderdSerJob(args: Args) extends Job(args) {
     .sorted
     .max
     .write(TypedTsv[(String, String)]("output"))
-}
 
-class RequireOrderedSerializationTest extends WordSpec with Matchers {
-  "A NoOrderedSerJob" should {
+class RequireOrderedSerializationTest extends WordSpec with Matchers
+  "A NoOrderedSerJob" should
     // throw if we try to run in:
-    "throw when run" in {
+    "throw when run" in
       val ex =
-        the[Exception] thrownBy {
+        the[Exception] thrownBy
           JobTest(new NoOrderdSerJob(_))
             .source(TypedTsv[(String, String)]("input"),
                     List(("a", "a"), ("b", "b")))
-            .sink[(String, String)](TypedTsv[(String, String)]("output")) {
+            .sink[(String, String)](TypedTsv[(String, String)]("output"))
               outBuf =>
                 ()
-            }
             .run
             .finish
-        }
       ex.getMessage should include("SerializationTest.scala:29")
-    }
-  }
-  "A OrderedSerJob" should {
+  "A OrderedSerJob" should
     // throw if we try to run in:
-    "run" in {
+    "run" in
       JobTest(new OrderdSerJob(_))
         .source(TypedTsv[(String, String)]("input"),
                 List(("a", "a"), ("a", "b"), ("b", "b")))
-        .sink[(String, String)](TypedTsv[(String, String)]("output")) {
+        .sink[(String, String)](TypedTsv[(String, String)]("output"))
           outBuf =>
             outBuf.toSet shouldBe Set(("a", "b"), ("b", "b"))
-        }
         .run
         .finish
-    }
-  }
-}

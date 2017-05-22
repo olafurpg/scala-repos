@@ -14,7 +14,7 @@ import akka.testkit.AkkaSpec
 
 import scala.concurrent.Future
 
-class StreamFileDocSpec extends AkkaSpec(UnboundedMailboxConfig) {
+class StreamFileDocSpec extends AkkaSpec(UnboundedMailboxConfig)
 
   implicit val ec = system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -26,20 +26,16 @@ class StreamFileDocSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
   override def afterTermination() = file.delete()
 
-  {
     //#file-source
     import akka.stream.scaladsl._
     //#file-source
     Thread.sleep(0) // needs a statement here for valid syntax and to avoid "unused" warnings
-  }
 
-  {
     //#file-source
     val file = new File("example.csv")
     //#file-source
-  }
 
-  "read data from a file" in {
+  "read data from a file" in
     //#file-source
     def handle(b: ByteString): Unit //#file-source
     = ()
@@ -48,14 +44,11 @@ class StreamFileDocSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
     val foreach: Future[IOResult] = FileIO.fromFile(file).to(Sink.ignore).run()
     //#file-source
-  }
 
-  "configure dispatcher in code" in {
+  "configure dispatcher in code" in
     //#custom-dispatcher-code
     FileIO
       .fromFile(file)
       .withAttributes(
           ActorAttributes.dispatcher("custom-blocking-io-dispatcher"))
     //#custom-dispatcher-code
-  }
-}

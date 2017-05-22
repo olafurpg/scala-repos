@@ -60,7 +60,7 @@ final class NIHDBPerfTestRunner[T](
     extends EvaluatingPerfTestRunner[Future, T]
     with SecureVFSModule[Future, Slice] with ActorVFSModule
     with VFSColumnarTableModule
-    with XLightWebHttpClientModule[Future] with NIHDBIngestSupport {
+    with XLightWebHttpClientModule[Future] with NIHDBIngestSupport
   self =>
   // with StandaloneActorProjectionSystem
   // with SliceColumnarTableModule[Future, Array[Byte]] { self =>
@@ -73,22 +73,21 @@ final class NIHDBPerfTestRunner[T](
   implicit val M = new UnsafeFutureComonad(actorSystem.dispatcher, testTimeout)
 
   type YggConfig = NIHDBPerfTestRunnerConfig
-  object yggConfig extends NIHDBPerfTestRunnerConfig {
+  object yggConfig extends NIHDBPerfTestRunnerConfig
     val ingestConfig = None
     val apiKey = self.apiKey
     val optimize = self.optimize
     val commandLineConfig = Configuration.parse(
         _rootDir map ("precog.storage.root = " + _) getOrElse "")
     override val config =
-      (Configuration parse {
+      (Configuration parse
             Option(System.getProperty("precog.storage.root")) map
             ("precog.storage.root = " + _) getOrElse ""
-          }) ++ commandLineConfig
+          ) ++ commandLineConfig
     val cookThreshold = 10000
     val clock = blueeyes.util.Clock.System
     val storageTimeout = Timeout(Duration(120, "seconds"))
     val quiescenceTimeout = Duration(300, "seconds")
-  }
 
   yggConfig.dataDir.mkdirs()
 
@@ -107,9 +106,8 @@ final class NIHDBPerfTestRunner[T](
     Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
          VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))
 
-  val chefs = (1 to 4).map { _ =>
+  val chefs = (1 to 4).map  _ =>
     actorSystem.actorOf(Props(makeChef))
-  }
   val masterChef =
     actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
@@ -132,18 +130,16 @@ final class NIHDBPerfTestRunner[T](
       actorVFS, permissionsFinder, jobManager, yggConfig.clock)
 
   def Evaluator[N[+ _]](N0: Monad[N])(
-      implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] = {
-    new Evaluator[N](N0) {
+      implicit mn: Future ~> N, nm: N ~> Future): EvaluatorLike[N] =
+    new Evaluator[N](N0)
       type YggConfig = self.YggConfig
       val yggConfig = self.yggConfig
       val report = LoggingQueryLogger[N](N0)
       def freshIdScanner = self.freshIdScanner
-    }
-  }
 
   def startup() {}
 
-  def shutdown() {
+  def shutdown()
     val stopWait = yggConfig.storageTimeout.duration
     Await.result(chefs.toList.traverse(gracefulStop(_, stopWait)), stopWait)
 
@@ -153,5 +149,3 @@ final class NIHDBPerfTestRunner[T](
     logger.info("Waiting for bifrost shutdown")
     Await.result(gracefulStop(projectionsActor, stopWait), stopWait)
     actorSystem.shutdown()
-  }
-}

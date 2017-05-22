@@ -4,7 +4,7 @@
 
 //############################################################################
 
-object Ops {
+object Ops
   def - = 0;
   def -(c: Char) = c;
   def -(i: Int) = i;
@@ -12,28 +12,24 @@ object Ops {
   def -- = 0;
   def --(c: Char) = c;
   def --(i: Int) = i;
-}
 
-object Funcs {
+object Funcs
   def foo = 0;
 //  def foo() = 1;
   def foo(c: Char) = 2;
   def foo(i: Int) = 3;
-}
 
-object M1 {
+object M1
   def f[A](x: A) = 11;
   def f[A <: Ordered[A]](x: Ordered[A]) = 12;
-}
 
-object M2 {
+object M2
   def f[A <: Ordered[A]](x: Ordered[A]) = 21;
   def f[A](x: A) = 22;
-}
 
-object overloads {
+object overloads
 
-  def check(what: String, actual: Any, expected: Any): Unit = {
+  def check(what: String, actual: Any, expected: Any): Unit =
     val success: Boolean = actual == expected;
     Console.print(if (success) "ok" else "KO");
     var value: String = if (actual == null) "null" else actual.toString();
@@ -42,7 +38,6 @@ object overloads {
     if (!success) Console.print(" != " + expected);
     Console.println;
     Console.flush;
-  }
 
   def - = 0;
   def -(c: Char) = c;
@@ -52,7 +47,7 @@ object overloads {
   def --(c: Char) = c;
   def --(i: Int) = i;
 
-  def test: Unit = {
+  def test: Unit =
     check("-('a')", -('a'), -97);
     check("-(97)", -(97), -97);
 
@@ -78,16 +73,12 @@ object overloads {
 //       val y = new scala.collection.mutable.Stack[Int];
 //      check("M1.f(" + y +")", M1.f(y), 12);
 //      check("M2.f(" + y +")", M2.f(y), 21);
-  }
-}
 
 //############################################################################
 
-object Test {
+object Test
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     overloads.test;
-  }
-}
 
 //############################################################################

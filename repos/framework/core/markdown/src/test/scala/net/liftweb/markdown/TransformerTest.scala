@@ -28,9 +28,9 @@ import org.scalatest.junit.JUnitRunner
   * Tests the behavior of the complete parser, i.e. all parsing steps together.
   */
 @RunWith(classOf[JUnitRunner])
-class TransformerTest extends FlatSpec with ShouldMatchers with Transformer {
+class TransformerTest extends FlatSpec with ShouldMatchers with Transformer
 
-  "The Transformer" should "create xhtml fragments from markdown" in {
+  "The Transformer" should "create xhtml fragments from markdown" in
     apply("") should equal("")
     apply("\n") should equal("")
     apply("Paragraph1\n") should equal("<p>Paragraph1</p>\n")
@@ -39,9 +39,8 @@ class TransformerTest extends FlatSpec with ShouldMatchers with Transformer {
     apply("Paragraph1 *italic*\n") should equal(
         "<p>Paragraph1 <em>italic</em></p>\n")
     apply("\n\nParagraph1\n") should equal("<p>Paragraph1</p>\n")
-  }
 
-  it should "parse code blocks" in {
+  it should "parse code blocks" in
     apply("    foo\n") should equal("<pre><code>foo\n</code></pre>\n")
     apply("\tfoo\n") should equal("<pre><code>foo\n</code></pre>\n")
     apply("    foo\n    bar\n") should equal(
@@ -52,9 +51,8 @@ class TransformerTest extends FlatSpec with ShouldMatchers with Transformer {
         "<pre><code>foo\nbaz\n  \nbar\n</code></pre>\n")
     apply("    public static void main(String[] args)\n") should equal(
         "<pre><code>public static void main(String[] args)\n</code></pre>\n")
-  }
 
-  it should "parse paragraphs" in {
+  it should "parse paragraphs" in
     apply("""Lorem ipsum dolor sit amet,
 consetetur sadipscing elitr,
 sed diam nonumy eirmod tempor invidunt ut
@@ -62,9 +60,8 @@ sed diam nonumy eirmod tempor invidunt ut
 consetetur sadipscing elitr,
 sed diam nonumy eirmod tempor invidunt ut</p>
 """)
-  }
 
-  it should "parse multiple paragraphs" in {
+  it should "parse multiple paragraphs" in
     apply("test1\n\ntest2\n") should equal("<p>test1</p>\n<p>test2</p>\n")
     apply(
         """test
@@ -78,14 +75,12 @@ test"""
 <p>test</p>
 """
     )
-  }
 
-  it should "parse block quotes" in {
+  it should "parse block quotes" in
     apply("> quote\n> quote2\n") should equal(
         "<blockquote><p>quote\nquote2</p>\n</blockquote>\n")
-  }
 
-  it should "parse ordered and unordered lists" in {
+  it should "parse ordered and unordered lists" in
     apply("* foo\n* bar\n* baz\n") should equal(
         """<ul>
 <li>foo</li>
@@ -183,9 +178,8 @@ test"""
 </ul>
 """
     )
-  }
 
-  it should "stop a list after an empty line" in {
+  it should "stop a list after an empty line" in
     apply("""1. a
 2. b
 
@@ -197,9 +191,8 @@ paragraph""") should equal(
 <p>paragraph</p>
 """
     )
-  }
 
-  it should "recursively evaluate quotes" in {
+  it should "recursively evaluate quotes" in
     apply("> foo\n> > bar\n> \n> baz\n") should equal(
         """<blockquote><p>foo</p>
 <blockquote><p>bar</p>
@@ -208,18 +201,16 @@ paragraph""") should equal(
 </blockquote>
 """
     )
-  }
 
-  it should "handle corner cases for bold and italic in paragraphs" in {
+  it should "handle corner cases for bold and italic in paragraphs" in
     apply("*foo * bar *\n") should equal("<p>*foo * bar *</p>\n")
     apply("*foo * bar*\n") should equal("<p><em>foo * bar</em></p>\n")
     apply("*foo* bar*\n") should equal("<p><em>foo</em> bar*</p>\n")
     apply("**foo* bar*\n") should equal("<p>*<em>foo</em> bar*</p>\n")
     apply("**foo* bar**\n") should equal("<p><strong>foo* bar</strong></p>\n")
     apply("** foo* bar **\n") should equal("<p>** foo* bar **</p>\n")
-  }
 
-  it should "resolve referenced links" in {
+  it should "resolve referenced links" in
     apply("""An [example][id]. Then, anywhere
 else in the doc, define the link:
 
@@ -227,9 +218,8 @@ else in the doc, define the link:
 """) should equal("""<p>An <a href="http://example.com/" title="Title">example</a>. Then, anywhere
 else in the doc, define the link:</p>
 """)
-  }
 
-  it should "parse atx style headings" in {
+  it should "parse atx style headings" in
     apply("#A Header\n") should equal("<h1>A Header</h1>\n")
     apply("###A Header\n") should equal("<h3>A Header</h3>\n")
     apply("### A Header  \n") should equal("<h3>A Header</h3>\n")
@@ -238,31 +228,27 @@ else in the doc, define the link:</p>
     apply("### A Header  ##  \n") should equal("<h3>A Header</h3>\n")
     apply("### A Header ## foo ## \n") should equal(
         "<h3>A Header ## foo</h3>\n")
-  }
 
-  it should "parse setext style level 1 headings" in {
+  it should "parse setext style level 1 headings" in
     apply("A Header\n===\n") should equal("<h1>A Header</h1>\n")
     apply("A Header\n=\n") should equal("<h1>A Header</h1>\n")
     apply("  A Header \n========\n") should equal("<h1>A Header</h1>\n")
     apply("  A Header \n===  \n") should equal("<h1>A Header</h1>\n")
     apply("  ==A Header== \n======\n") should equal("<h1>==A Header==</h1>\n")
     apply("##Header 1==\n=     \n") should equal("<h1>##Header 1==</h1>\n")
-  }
 
-  it should "parse setext style level 2 headings" in {
+  it should "parse setext style level 2 headings" in
     apply("A Header\n---\n") should equal("<h2>A Header</h2>\n")
     apply("A Header\n-\n") should equal("<h2>A Header</h2>\n")
     apply("  A Header \n--------\n") should equal("<h2>A Header</h2>\n")
     apply("  A Header \n---  \n") should equal("<h2>A Header</h2>\n")
     apply("  --A Header-- \n------\n") should equal("<h2>--A Header--</h2>\n")
-  }
 
-  it should "parse xml-like blocks as is" in {
+  it should "parse xml-like blocks as is" in
     apply("<foo> bla\nblub <bar>hallo</bar>\n</foo>\n") should equal(
         "<foo> bla\nblub <bar>hallo</bar>\n</foo>\n")
-  }
 
-  it should "parse fenced code blocks" in {
+  it should "parse fenced code blocks" in
     apply(
         """```  foobar
 System.out.println("Hello World!");
@@ -349,5 +335,3 @@ And now to something completely different.
 </code></pre>
 """
     )
-  }
-}

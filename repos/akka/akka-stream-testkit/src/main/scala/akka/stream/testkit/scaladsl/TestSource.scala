@@ -13,7 +13,7 @@ import akka.actor.ActorSystem;
 /**
   * Factory methods for test sources.
   */
-object TestSource {
+object TestSource
 
   /**
     * A Source that materializes to a [[akka.stream.testkit.TestPublisher.Probe]].
@@ -21,4 +21,3 @@ object TestSource {
   def probe[T](implicit system: ActorSystem) =
     new Source[T, TestPublisher.Probe[T]](new StreamTestKit.ProbeSource(
             none, SourceShape(Outlet("ProbeSource.out"))))
-}

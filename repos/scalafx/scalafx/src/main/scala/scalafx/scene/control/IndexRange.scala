@@ -31,7 +31,7 @@ import javafx.scene.{control => jfxsc}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object IndexRange {
+object IndexRange
   implicit def sfxIndexRange(r: IndexRange): jfxsc.IndexRange =
     if (r != null) r.delegate else null
 
@@ -57,10 +57,9 @@ object IndexRange {
     */
   def valueOf(value: String): IndexRange =
     new IndexRange(jfxsc.IndexRange.valueOf(value))
-}
 
 class IndexRange(override val delegate: jfxsc.IndexRange)
-    extends SFXDelegate[jfxsc.IndexRange] {
+    extends SFXDelegate[jfxsc.IndexRange]
 
   /**
     * Creates an instance of IndexRange by copying the values from the given IndexRange object.
@@ -86,4 +85,3 @@ class IndexRange(override val delegate: jfxsc.IndexRange)
     * Returns the length of the range.
     */
   def length = delegate.getLength
-}

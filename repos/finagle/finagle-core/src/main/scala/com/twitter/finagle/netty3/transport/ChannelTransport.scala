@@ -11,26 +11,24 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.ssl.SslHandler
 
 class ChannelTransport[In, Out](ch: Channel)
-    extends Transport[In, Out] with ChannelUpstreamHandler {
+    extends Transport[In, Out] with ChannelUpstreamHandler
   private[this] var nneed = 0
-  private[this] def need(n: Int): Unit = synchronized {
+  private[this] def need(n: Int): Unit = synchronized
     nneed += n
     // Note: we buffer 1 message here so that we receive socket
     // closes proactively.
     val r = nneed >= 0
     if (ch.isReadable != r && ch.isOpen) ch.setReadable(r)
-  }
 
   ch.getPipeline.addLast("finagleTransportBridge", this)
 
   private[this] val readq = new AsyncQueue[Out]
   private[this] val failed = new AtomicBoolean(false)
 
-  private[this] val readInterruptHandler: PartialFunction[Throwable, Unit] = {
+  private[this] val readInterruptHandler: PartialFunction[Throwable, Unit] =
     case e => fail(e)
-  }
 
-  private[this] def fail(exc: Throwable) {
+  private[this] def fail(exc: Throwable)
     if (!failed.compareAndSet(false, true)) return
 
     // Do not discard existing queue items. Doing so causes a race
@@ -44,10 +42,9 @@ class ChannelTransport[In, Out](ch: Channel)
     // which should be illegal after failure.
     close()
     closep.updateIfEmpty(Return(exc))
-  }
 
-  override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent) {
-    e match {
+  override def handleUpstream(ctx: ChannelHandlerContext, e: ChannelEvent)
+    e match
       case msg: MessageEvent =>
         readq.offer(msg.getMessage.asInstanceOf[Out])
         need(-1)
@@ -81,28 +78,24 @@ class ChannelTransport[In, Out](ch: Channel)
         fail(ChannelException(e.getCause, ch.getRemoteAddress))
 
       case _ => // drop.
-    }
 
     // We terminate the upstream here on purpose: this must always
     // be the last handler.
-  }
 
-  def write(msg: In): Future[Unit] = {
+  def write(msg: In): Future[Unit] =
     val p = new Promise[Unit]
 
     // This is not cancellable because write operations in netty3
     // are note cancellable. That is, there is no way to interrupt or
     // preempt them once the write event has been sent into the pipeline.
     val writeFuture = new DefaultChannelFuture(ch, false /* cancellable */ )
-    writeFuture.addListener(new ChannelFutureListener {
-      def operationComplete(f: ChannelFuture): Unit = {
+    writeFuture.addListener(new ChannelFutureListener
+      def operationComplete(f: ChannelFuture): Unit =
         if (f.isSuccess) p.setDone()
-        else {
+        else
           // since we can't cancel, `f` must be an exception.
           p.setException(ChannelException(f.getCause, ch.getRemoteAddress))
-        }
-      }
-    })
+    )
 
     // Ordering here is important. We want to call `addListener` on
     // `writeFuture` before giving it a chance to be satisfied, since
@@ -116,9 +109,8 @@ class ChannelTransport[In, Out](ch: Channel)
     // We avoid setting an interrupt handler on the future exposed
     // because the backing opertion isn't interruptible.
     p
-  }
 
-  def read(): Future[Out] = {
+  def read(): Future[Out] =
     need(1)
 
     // This is fine, but we should consider being a little more fine-grained
@@ -137,33 +129,28 @@ class ChannelTransport[In, Out](ch: Channel)
     // raise on the "other" side of the become indiscriminately in all cases.
     p.setInterruptHandler(readInterruptHandler)
     p
-  }
 
   def status: Status =
     if (failed.get || !ch.isOpen) Status.Closed
     else Status.Open
 
-  def close(deadline: Time): Future[Unit] = {
+  def close(deadline: Time): Future[Unit] =
     if (ch.isOpen) Channels.close(ch)
     closep.unit
-  }
 
   def localAddress: SocketAddress = ch.getLocalAddress()
   def remoteAddress: SocketAddress = ch.getRemoteAddress()
 
   val peerCertificate: Option[Certificate] =
-    ch.getPipeline.get(classOf[SslHandler]) match {
+    ch.getPipeline.get(classOf[SslHandler]) match
       case null => None
       case handler =>
-        try {
+        try
           handler.getEngine.getSession.getPeerCertificates.headOption
-        } catch {
+        catch
           case NonFatal(_) => None
-        }
-    }
 
   private[this] val closep = new Promise[Throwable]
   val onClose: Future[Throwable] = closep
 
   override def toString = s"Transport<channel=$ch, onClose=$closep>"
-}

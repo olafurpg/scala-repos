@@ -41,7 +41,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define OS `ObservableSet`
   */
-object ObservableSet extends MutableSetFactory[ObservableSet] {
+object ObservableSet extends MutableSetFactory[ObservableSet]
 
   /**
     * Extracts a JavaFX's $OS from a ScalaFX's $OS.
@@ -105,13 +105,11 @@ object ObservableSet extends MutableSetFactory[ObservableSet] {
     * @return new [[scalafx.collections.ObservableHashSet]] wrapping ''set''
     */
   def apply[T](set: Set[T]): ObservableSet[T] =
-    new ObservableSet[T] {
+    new ObservableSet[T]
       override val delegate =
         jfxc.FXCollections.observableSet(mutableSetAsJavaSet(set))
-    }
 
   // CREATION METHODS - END
-}
 
 /**
   * Wrapper class to JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableSet.html $OS]] .
@@ -124,7 +122,7 @@ object ObservableSet extends MutableSetFactory[ObservableSet] {
 trait ObservableSet[T]
     extends Set[T] with SetLike[T, ObservableSet[T]]
     with GenericSetTemplate[T, ObservableSet] with Builder[T, ObservableSet[T]]
-    with Observable with SFXDelegate[jfxc.ObservableSet[T]] {
+    with Observable with SFXDelegate[jfxc.ObservableSet[T]]
 
   /**
     * The factory companion object that builds instances of class $OS.
@@ -149,10 +147,9 @@ trait ObservableSet[T]
     * @param elem the element to be added.
     * @return The $SET itself
     */
-  def +=(elem: T) = {
+  def +=(elem: T) =
     delegate.add(elem)
     this
-  }
 
   /**
     * Removes a single element from this mutable set.
@@ -160,26 +157,23 @@ trait ObservableSet[T]
     * @param elem the element to be removed.
     * @return The $SET itself
     */
-  def -=(elem: T) = {
+  def -=(elem: T) =
     delegate.remove(elem)
     this
-  }
 
   /**
     * Removes all elements from the $SET. After this operation has completed, the $SET will be empty.
     */
-  override def clear() {
+  override def clear()
     delegate.clear()
-  }
 
   /**
     * Creates a new iterator over elements of this set
     */
-  def iterator = new Iterator[T] {
+  def iterator = new Iterator[T]
     val it = delegate.iterator
     def hasNext = it.hasNext
     def next() = it.next()
-  }
 
   /**
     * @return This $SET's size.
@@ -201,11 +195,11 @@ trait ObservableSet[T]
     *
     * @param op Function that will handle this $OS's modifications data to be activated when some change was made.
     */
-  def onChange[J >: T](op: (ObservableSet[T], Change[J]) => Unit) {
-    delegate.addListener(new jfxc.SetChangeListener[T] {
-      def onChanged(change: jfxc.SetChangeListener.Change[_ <: T]) {
+  def onChange[J >: T](op: (ObservableSet[T], Change[J]) => Unit)
+    delegate.addListener(new jfxc.SetChangeListener[T]
+      def onChanged(change: jfxc.SetChangeListener.Change[_ <: T])
         val changeEvent: Change[J] =
-          (change.wasAdded, change.wasRemoved) match {
+          (change.wasAdded, change.wasRemoved) match
             case (true, false) => ObservableSet.Add(change.getElementAdded)
             case (false, true) =>
               ObservableSet.Remove(change.getElementRemoved)
@@ -213,27 +207,21 @@ trait ObservableSet[T]
               throw new IllegalStateException(
                   "Irregular Change. Added: " + change.getElementAdded +
                   ", Removed: " + change.getElementRemoved)
-          }
 
         op(ObservableSet.this, changeEvent)
-      }
-    })
-  }
+    )
 
   /**
     * Add a listener function to $SET's changes. This function '''will not handle''' this $SET's modifications data.
     *
     * @param op No-argument function to be activated when some change in this $OS was made.
     */
-  def onChange(op: => Unit) {
+  def onChange(op: => Unit)
     delegate.addListener(
-        new jfxc.SetChangeListener[T] {
-      def onChanged(change: jfxc.SetChangeListener.Change[_ <: T]) {
+        new jfxc.SetChangeListener[T]
+      def onChanged(change: jfxc.SetChangeListener.Change[_ <: T])
         op
-      }
-    })
-  }
-}
+    )
 
 /**
   * [[scalafx.collections.ObservableSet]] implementation backed for a

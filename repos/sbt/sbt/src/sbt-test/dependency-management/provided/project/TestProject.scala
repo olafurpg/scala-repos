@@ -3,7 +3,7 @@ import Import._
 import Keys._
 import complete.DefaultParsers._
 
-object TestProject extends Build {
+object TestProject extends Build
   val provided = SettingKey[Boolean]("provided")
   val check = InputKey[Unit]("check")
 
@@ -12,18 +12,18 @@ object TestProject extends Build {
     (provided <<= baseDirectory(_ / "useProvided" exists), configuration <<=
           provided(p => if (p) Provided else Compile), libraryDependencies <+=
           configuration(c => "javax.servlet" % "servlet-api" % "2.5" % c.name),
-        managedClasspath in Provided <<= (classpathTypes, update) map {
+        managedClasspath in Provided <<= (classpathTypes, update) map
           (cpts, report) =>
             Classpaths.managedJars(Provided, cpts, report)
-        }, check <<= InputTask(_ =>
+        , check <<= InputTask(_ =>
               Space ~> token(
                   Compile.name.id | Runtime.name | Provided.name | Test.name) ~ token(
-                  Space ~> Bool)) { result =>
+                  Space ~> Bool))  result =>
           (result,
            managedClasspath in Provided,
            fullClasspath in Runtime,
            fullClasspath in Compile,
-           fullClasspath in Test) map {
+           fullClasspath in Test) map
             case ((conf, expected), p, r, c, t) =>
               val cp =
                 if (conf == Compile.name) c
@@ -32,17 +32,14 @@ object TestProject extends Build {
                 else if (conf == Test.name) t
                 else sys.error("Invalid config: " + conf)
               checkServletAPI(cp.files, expected, conf)
-          }
-        })
+        )
 
   private def checkServletAPI(
-      paths: Seq[File], shouldBeIncluded: Boolean, label: String) = {
+      paths: Seq[File], shouldBeIncluded: Boolean, label: String) =
     val servletAPI = paths.find(_.getName contains "servlet-api")
-    if (shouldBeIncluded) {
+    if (shouldBeIncluded)
       if (servletAPI.isEmpty)
         sys.error("Servlet API should have been included in " + label + ".")
-    } else
+    else
       servletAPI.foreach(
           s => sys.error(s + " incorrectly included in " + label + "."))
-  }
-}

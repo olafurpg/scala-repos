@@ -5,8 +5,8 @@ import org.jetbrains.plugins.scala.annotator.{AnnotatorTestBase, Error}
 /**
   * Pavel Fatin
   */
-class NeedsToBeAbstractTest extends AnnotatorTestBase(NeedsToBeAbstract) {
-  def testFine() {
+class NeedsToBeAbstractTest extends AnnotatorTestBase(NeedsToBeAbstract)
+  def testFine()
     assertNothing(messages("class C"))
     assertNothing(messages("class C {}"))
     assertNothing(messages("trait T"))
@@ -15,55 +15,42 @@ class NeedsToBeAbstractTest extends AnnotatorTestBase(NeedsToBeAbstract) {
     assertNothing(messages("abstract class C {}"))
     assertNothing(messages("abstract class C { def f }"))
     assertNothing(messages("trait T { def f }"))
-  }
 
-  def testSkipNew() {
+  def testSkipNew()
     assertNothing(messages("trait T { def f }; new Object with T"))
-  }
 
-  def testSkipObject() {
+  def testSkipObject()
     assertNothing(messages("trait T { def f }; object O extends T"))
-  }
 
-  def testUndefinedMember() {
+  def testUndefinedMember()
     val Message =
       NeedsToBeAbstract.message("Class", "C", ("f: Unit", "Holder.C"))
 
-    assertMatches(messages("class C { def f }")) {
+    assertMatches(messages("class C { def f }"))
       case Error("C", Message) :: Nil =>
-    }
-  }
 
-  def testUndefinedInheritedMember() {
+  def testUndefinedInheritedMember()
     val Message =
       NeedsToBeAbstract.message("Class", "C", ("f: Unit", "Holder.T"))
 
-    assertMatches(messages("trait T { def f }; class C extends T")) {
+    assertMatches(messages("trait T { def f }; class C extends T"))
       case Error("C", Message) :: Nil =>
-    }
 
-    assertMatches(messages("trait T { def f }; class C extends T {}")) {
+    assertMatches(messages("trait T { def f }; class C extends T {}"))
       case Error("C", Message) :: Nil =>
-    }
-  }
 
-  def testNeedsToBeAbstractPlaceDiffer() {
+  def testNeedsToBeAbstractPlaceDiffer()
     val Message =
       NeedsToBeAbstract.message("Class", "C", ("b: Unit", "Holder.B"))
     val ReversedMessage =
       NeedsToBeAbstract.message("Class", "C", ("a: Unit", "Holder.A"))
 
     assertMatches(messages(
-            "trait A { def a }; trait B { def b }; class C extends A with B {}")) {
+            "trait A { def a }; trait B { def b }; class C extends A with B {}"))
       case Error("C", Message) :: Nil =>
       case Error("C", ReversedMessage) :: Nil =>
-    }
-  }
 
-  def testObjectOverrideDef() {
+  def testObjectOverrideDef()
     assertMatches(
-        messages("trait A { def a }; class D extends A { object a };")) {
+        messages("trait A { def a }; class D extends A { object a };"))
       case Nil =>
-    }
-  }
-}

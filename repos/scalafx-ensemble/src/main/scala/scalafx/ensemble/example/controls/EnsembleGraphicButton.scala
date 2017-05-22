@@ -41,19 +41,15 @@ import scalafx.scene.layout.StackPane
   * @related controls/RadioButtons
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleGraphicButton extends EnsembleExample {
-  def getContent = new StackPane {
+class EnsembleGraphicButton extends EnsembleExample
+  def getContent = new StackPane
     padding = Insets(20)
-    children = new Button {
+    children = new Button
       maxWidth = 170
       maxHeight = 50
       text = "Graphic Button"
-      graphic = new ImageView {
+      graphic = new ImageView
         image = new Image(
             this.getClass
               .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
         margin = Insets(0, 0, 0, 10)
-      }
-    }
-  }
-}

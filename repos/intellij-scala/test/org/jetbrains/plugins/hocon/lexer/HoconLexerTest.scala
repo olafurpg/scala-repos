@@ -7,13 +7,12 @@ import org.junit.runners.AllTests
 object HoconLexerTest extends TestSuiteCompanion[HoconLexerTest]
 
 @RunWith(classOf[AllTests])
-class HoconLexerTest extends HoconFileSetTestCase("lexer") {
-  def advance(lexer: HoconLexer) = {
+class HoconLexerTest extends HoconFileSetTestCase("lexer")
+  def advance(lexer: HoconLexer) =
     lexer.advance()
     lexer
-  }
 
-  override def transform(data: Seq[String]) = {
+  override def transform(data: Seq[String]) =
     val fileContents = data.head
     val lexer = new HoconLexer
 
@@ -25,8 +24,6 @@ class HoconLexerTest extends HoconFileSetTestCase("lexer") {
             (l.getTokenType,
              fileContents.substring(l.getTokenStart, l.getTokenEnd)))
 
-    tokenIterator.map {
+    tokenIterator.map
       case (token, str) => s"$token {$str}"
-    }.mkString("\n")
-  }
-}
+    .mkString("\n")

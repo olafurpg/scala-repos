@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScDeclaredElementsHol
 
 trait ScPackaging
     extends ScToplevelElement with ScImportsHolder with ScPackageContainer
-    with ScDeclaredElementsHolder with ScPackageLike {
+    with ScDeclaredElementsHolder with ScPackageLike
   def fullPackageName: String
 
   def getPackageName: String
@@ -18,4 +18,3 @@ trait ScPackaging
   def getBodyText: String
 
   def reference: Option[ScStableCodeReferenceElement]
-}

@@ -13,17 +13,16 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ClientDispatcherTest extends FunSuite with MockitoSugar {
-  class DispatchHelper {
+class ClientDispatcherTest extends FunSuite with MockitoSugar
+  class DispatchHelper
     val closeP = new Promise[Exception]
     val stats = new InMemoryStatsReceiver()
     val trans = mock[Transport[String, String]]
     when(trans.onClose).thenReturn(closeP)
 
     val disp = new SerialClientDispatcher[String, String](trans, stats)
-  }
 
-  test("ClientDispatcher should dispatch requests") {
+  test("ClientDispatcher should dispatch requests")
     val h = new DispatchHelper
     import h._
 
@@ -37,9 +36,8 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     assert(!f.isDefined)
     p.setValue("ok: one")
     assert(f.poll == Some(Return("ok: one")))
-  }
 
-  test("ClientDispatcher should dispatch requests one-at-a-time") {
+  test("ClientDispatcher should dispatch requests one-at-a-time")
     val h = new DispatchHelper
     import h._
 
@@ -65,10 +63,9 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     assert(!f1.isDefined)
     p1.setValue("ok: two")
     assert(p1.poll == Some(Return("ok: two")))
-  }
 
   test(
-      "ClientDispatcher should interrupt when close transport and cancel pending requests") {
+      "ClientDispatcher should interrupt when close transport and cancel pending requests")
     val h = new DispatchHelper
     import h._
 
@@ -86,9 +83,8 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     f0.raise(intr)
     verify(trans).close()
     assert(f0.poll == Some(Throw(intr)))
-  }
 
-  test("ClientDispatcher should interrupt when ignore pending") {
+  test("ClientDispatcher should interrupt when ignore pending")
     val h = new DispatchHelper
     import h._
 
@@ -112,9 +108,8 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     assert(f0.poll == Some(Return("ok")))
     assert(f1.poll == Some(Throw(Failure(intr, Failure.Interrupted))))
     verify(trans).write(any[String])
-  }
 
-  test("ClientDispatcher should rewrite WriteExceptions") {
+  test("ClientDispatcher should rewrite WriteExceptions")
     val h = new DispatchHelper
     import h._
 
@@ -128,12 +123,11 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     val result: Throwable = resultOpt.get.asInstanceOf[Throw[String]].e
     assert(result.isInstanceOf[WriteException])
     assert(result.getCause == exc)
-  }
 
   def assertGaugeSize(stats: InMemoryStatsReceiver, size: Int): Unit =
     assert(stats.gauges(Seq("serial", "queue_size"))() == size)
 
-  test("ClientDispatcher queue_size gauge") {
+  test("ClientDispatcher queue_size gauge")
     val h = new DispatchHelper
     import h._
 
@@ -152,9 +146,8 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
 
     p.setValue("done")
     assertGaugeSize(stats, 0)
-  }
 
-  test("pending dispatches are failed on transport close") {
+  test("pending dispatches are failed on transport close")
     val h = new DispatchHelper
     import h._
 
@@ -173,9 +166,8 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
 
     assert(e1.getMessage == "fin")
     assert(e2.getMessage == "fin")
-  }
 
-  test("dispatcher with a closed transport fails fast") {
+  test("dispatcher with a closed transport fails fast")
     val h = new DispatchHelper
     import h._
 
@@ -194,5 +186,3 @@ class ClientDispatcherTest extends FunSuite with MockitoSugar {
     // transport never sees write
     verify(trans, never).write(any[String])
     verify(trans, never).read()
-  }
-}

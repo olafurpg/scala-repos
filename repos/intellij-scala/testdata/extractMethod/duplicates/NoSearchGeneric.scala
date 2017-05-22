@@ -1,19 +1,16 @@
-object NoSearchGeneric {
+object NoSearchGeneric
 
-  abstract class GenericParamInput[T] {
+  abstract class GenericParamInput[T]
 
     val x: T
 
-    def foo {
+    def foo
       val y = x
       /*start*/
       println(y)
       /*end*/
 
       println("a")
-    }
-  }
-}
 /*
 object NoSearchGeneric {
 

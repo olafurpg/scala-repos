@@ -27,37 +27,31 @@ import akka.shapeless._
   *
   *  You can `import Unpack.dontUnpack` if you'd like to circumvent this unpacking logic.
   */
-sealed trait Unpack[L <: HList] {
+sealed trait Unpack[L <: HList]
   type Out
   def apply(hlist: L): Out
-}
 
-object Unpack extends AlternativeUnpacks {
+object Unpack extends AlternativeUnpacks
 
   implicit def fromAux[L <: HList, Out0](implicit aux: Aux[L, Out0]) =
-    new Unpack[L] {
+    new Unpack[L]
       type Out = Out0
       def apply(hlist: L) = aux(hlist)
-    }
 
-  sealed trait Aux[L <: HList, Out0] {
+  sealed trait Aux[L <: HList, Out0]
     def apply(hlist: L): Out0
-  }
 
   implicit def hnil[L <: HNil]: Aux[L, Unit] =
     HNilUnpack.asInstanceOf[Aux[L, Unit]]
-  implicit object HNilUnpack extends Aux[HNil, Unit] {
+  implicit object HNilUnpack extends Aux[HNil, Unit]
     def apply(hlist: HNil): Unit = ()
-  }
 
   implicit def single[T]: Aux[T :: HNil, T] =
     SingleUnpack.asInstanceOf[Aux[T :: HNil, T]]
-  private object SingleUnpack extends Aux[Any :: HList, Any] {
+  private object SingleUnpack extends Aux[Any :: HList, Any]
     def apply(hlist: Any :: HList): Any = hlist.head
-  }
-}
 
-sealed abstract class AlternativeUnpacks {
+sealed abstract class AlternativeUnpacks
 
   /**
     * Import if you'd like to *always* deliver the valueStack as an `HList`
@@ -65,7 +59,5 @@ sealed abstract class AlternativeUnpacks {
     */
   implicit def dontUnpack[L <: HList]: Unpack.Aux[L, L] =
     DontUnpack.asInstanceOf[Unpack.Aux[L, L]]
-  private object DontUnpack extends Unpack.Aux[HList, HList] {
+  private object DontUnpack extends Unpack.Aux[HList, HList]
     def apply(hlist: HList): HList = hlist
-  }
-}

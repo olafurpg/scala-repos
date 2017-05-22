@@ -31,23 +31,19 @@ import org.scalacheck._
 
 import scala.collection.mutable
 
-abstract class cleanup(f: File) extends After {
-  def after = {
-    try {
+abstract class cleanup(f: File) extends After
+  def after =
+    try
       f.delete()
-    } catch {
+    catch
       case _: Exception => ()
-    }
-  }
-}
 
-object RawHandlerSpecs extends Specification with ScalaCheck {
+object RawHandlerSpecs extends Specification with ScalaCheck
   def blockid = 999
-  def tempfile(): File = {
+  def tempfile(): File =
     val f = File.createTempFile("niflheim", ".rawlog")
     f.delete()
     f
-  }
 
   implicit val ordering =
     scala.math.Ordering.by[(String, CType), String](_.toString)
@@ -58,18 +54,17 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
   def json(s: String): Seq[JValue] =
     JParser.parseManyFromString(s).valueOr(throw _)
 
-  def bitset(ns: Int*) = {
+  def bitset(ns: Int*) =
     val bs = new BitSet
     ns.foreach(bs.set)
     bs
-  }
 
   def decs(ns: Double*): Array[BigDecimal] = ns.map(BigDecimal(_)).toArray
 
   def makeps(f: File) =
     new PrintStream(new FileOutputStream(f, true), false, "UTF-8")
 
-  "raw handler" should {
+  "raw handler" should
 
     /**
       * Just tests the most basic functionality: generating snapshots
@@ -77,7 +72,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * normally be doing.
       */
     val tmp1 = tempfile()
-    "generate snapshots from writes" in new cleanup(tmp1) {
+    "generate snapshots from writes" in new cleanup(tmp1)
       val h = RawHandler.empty(blockid, tmp1)
       h.length must_== 0
 
@@ -124,7 +119,6 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
 
       val segs2R = h.snapshotRef(None).segments
       segs2R mustEqual segs2
-    }
 
     /**
       * Test log file writing/reading.
@@ -134,7 +128,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * but just whether the data written can be read back in correctly.
       */
     val tmp2 = tempfile()
-    "correctly read log files" in new cleanup(tmp2) {
+    "correctly read log files" in new cleanup(tmp2)
       val h1 = RawHandler.empty(blockid, tmp2)
 
       val js =
@@ -159,7 +153,6 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       events.toSet must_== Set(18)
       s2.sorted must_== s1.sorted
       s2R.sorted must_== s1R.sorted
-    }
 
     /**
       * Test recovery from corrupted rawlog file.
@@ -170,7 +163,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * (indicating the file has been cleaned).
       */
     val tmp3 = tempfile()
-    "recover from errors" in new cleanup(tmp3) {
+    "recover from errors" in new cleanup(tmp3)
 
       // write a valid event, then a mal-formed event
       val ps = makeps(tmp3)
@@ -194,7 +187,6 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       h2.length must_== 1
       events2.toSet must_== Set(100)
       ok2 must_== true
-    }
 
     /**
       * Test missing files.
@@ -202,9 +194,8 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * In case the log is not there, load() must throw an Exception.
       */
     val tmp4 = tempfile()
-    "throw an exception when loading empty logs" in new cleanup(tmp4) {
+    "throw an exception when loading empty logs" in new cleanup(tmp4)
       RawHandler.load(blockid, tmp4) must throwA[Exception]
-    }
 
     /**
       * Test file collisions.
@@ -213,10 +204,9 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       */
     val tmp5 = tempfile()
     "throw an exception when creating already-present logs " in new cleanup(
-        tmp5) {
+        tmp5)
       RawHandler.empty(blockid, tmp5).close()
       RawHandler.empty(blockid, tmp5) must throwA[Exception]
-    }
 
     /**
       * Empty rawlog.
@@ -224,13 +214,12 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * It is fine to have a rawlog without any actual events in it.
       */
     val tmp6 = tempfile()
-    "load empty files " in new cleanup(tmp6) {
+    "load empty files " in new cleanup(tmp6)
       RawHandler.empty(blockid, tmp6).close()
       val (h, es, ok) = RawHandler.load(blockid, tmp6)
       ok must_== true
       es.isEmpty must_== true
       h.length must_== 0
-    }
 
     /**
       * Test recovery from totally corrupted rawlog file #2.
@@ -238,12 +227,11 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * In this case the log is full of garbage; load() should throw an error.
       */
     val tmp7 = tempfile()
-    "throw errors when totally corrupted" in new cleanup(tmp7) {
+    "throw errors when totally corrupted" in new cleanup(tmp7)
       val ps = makeps(tmp7)
       ps.println("jwgeigjewaijgweigjweijew")
       ps.close()
       RawHandler.load(blockid, tmp7) must throwA[Exception]
-    }
 
     /**
       * Test recovery from partially-corrupted rawlog file #3.
@@ -251,7 +239,7 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       * In this case the log is OK until an event ends up full of garbage.
       */
     val tmp8 = tempfile()
-    "recover when partially corrupted" in new cleanup(tmp8) {
+    "recover when partially corrupted" in new cleanup(tmp8)
       val range = (0 until 20)
 
       val ps = makeps(tmp8)
@@ -296,10 +284,9 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
 
       h.snapshotRef(Some(Set(ColumnRef(cpa, CString)))).segments must beEmpty
       h.snapshotRef(Some(Set(ColumnRef(cpb, CString)))).segments must beEmpty
-    }
 
     val tmp9 = tempfile()
-    "make sure we defensively copy" in new cleanup(tmp9) {
+    "make sure we defensively copy" in new cleanup(tmp9)
       val h = RawHandler.empty(blockid, tmp9)
       val cpa = CPath(".a")
       val cpb = CPath(".b")
@@ -391,6 +378,3 @@ object RawHandlerSpecs extends Specification with ScalaCheck {
       a3 mustEqual a3R
 
       a3REmpty.toSet must_== Set()
-    }
-  }
-}

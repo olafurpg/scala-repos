@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object B extends Build {
+object B extends Build
   lazy val root =
     Project("root", file(".")) settings
     (autoScalaLibrary := false, libraryDependencies +=
@@ -13,31 +13,25 @@ object B extends Build {
             checkExtra
         ))
   def addExtra(name: String, f: (State, Seq[File]) => State) =
-    Command.command(name) { s =>
+    Command.command(name)  s =>
       f(s, (file("lib_managed") ** "*.jar").get)
-    }
-  def checkExtra = Command.command("check") { s =>
+  def checkExtra = Command.command("check")  s =>
     val loader = Class.forName("org.apache.log4j.Level").getClassLoader
     val sbtLoader = classOf[sbt.Build].getClassLoader
     assert(
         loader eq sbtLoader,
         "Different loader for sbt and extra: " + sbtLoader + " and " + loader)
     s
-  }
-  def addExtra1(s: State, extra: Seq[File]): State = {
+  def addExtra1(s: State, extra: Seq[File]): State =
     val cs = s.configuration.provider.components()
     val copied = cs.addToComponent("extra", extra.toArray)
     if (copied) s.reload else s
-  }
-  def addExtra2(s: State, extra: Seq[File]): State = {
+  def addExtra2(s: State, extra: Seq[File]): State =
     val reload = State.defaultReload(s)
     val currentID = reload.app
     val currentExtra = currentID.classpathExtra
     val newExtra = (currentExtra ++ extra).distinct
     if (newExtra.length == currentExtra.length) s
-    else {
+    else
       val newID = ApplicationID(currentID).copy(extra = extra)
       s.setResult(Some(reload.copy(app = newID)))
-    }
-  }
-}

@@ -10,11 +10,11 @@ import scala.concurrent.Await
 import scala.util.Random
 import akka.testkit.DefaultTimeout
 
-class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
+class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout
   implicit val ec = system.dispatcher
   private def emptyIndex = new Index[String, Int](100, _ compareTo _)
 
-  private def indexWithValues = {
+  private def indexWithValues =
     val index = emptyIndex
     index.put("s1", 1)
     index.put("s1", 2)
@@ -24,16 +24,14 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
     index.put("s3", 2)
 
     index
-  }
 
-  "An Index" must {
+  "An Index" must
 
-    "take and return a value" in {
+    "take and return a value" in
       val index = emptyIndex
       index.put("s1", 1)
       index.valueIterator("s1").toSet should be(Set(1))
-    }
-    "take and return several values" in {
+    "take and return several values" in
       val index = emptyIndex
       index.put("s1", 1) should ===(true)
       index.put("s1", 1) should ===(false)
@@ -42,8 +40,7 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       index.put("s2", 4)
       index.valueIterator("s1").toSet should ===(Set(1, 2, 3))
       index.valueIterator("s2").toSet should ===(Set(4))
-    }
-    "remove values" in {
+    "remove values" in
       val index = emptyIndex
       index.put("s1", 1)
       index.put("s1", 2)
@@ -54,14 +51,12 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       index.remove("s1", 1) should ===(false)
       index.valueIterator("s1").toSet should ===(Set(2))
       //Remove key
-      index.remove("s2") match {
+      index.remove("s2") match
         case Some(iter) ⇒ iter.toSet should ===(Set(1, 2))
         case None ⇒ fail()
-      }
       index.remove("s2") should ===(None)
       index.valueIterator("s2").toSet should ===(Set.empty[Int])
-    }
-    "remove the specified value" in {
+    "remove the specified value" in
       val index = emptyIndex
       index.put("s1", 1)
       index.put("s1", 2)
@@ -74,25 +69,21 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       index.valueIterator("s1").toSet should ===(Set(2, 3))
       index.valueIterator("s2").toSet should ===(Set(2))
       index.valueIterator("s3").toSet should ===(Set(2))
-    }
-    "apply a function for all key-value pairs and find every value" in {
+    "apply a function for all key-value pairs and find every value" in
       val index = indexWithValues
 
       var valueCount = 0
       index.foreach((key, value) ⇒
-            {
           valueCount = valueCount + 1
           index.findValue(key)(_ == value) should ===(Some(value))
-      })
+      )
       valueCount should ===(6)
-    }
-    "be cleared" in {
+    "be cleared" in
       val index = indexWithValues
       index.isEmpty should ===(false)
       index.clear()
       index.isEmpty should ===(true)
-    }
-    "be able to be accessed in parallel" in {
+    "be able to be accessed in parallel" in
       val index = new Index[Int, Int](100, _ compareTo _)
       val nrOfTasks = 10000
       val nrOfKeys = 10
@@ -101,33 +92,24 @@ class IndexSpec extends AkkaSpec with Matchers with DefaultTimeout {
       for (key ← 0 until nrOfKeys; value ← 0 until nrOfValues) index.put(key,
                                                                          value)
       //Tasks to be executed in parallel
-      def putTask() = Future {
+      def putTask() = Future
         index.put(Random.nextInt(nrOfKeys), Random.nextInt(nrOfValues))
-      }
-      def removeTask1() = Future {
+      def removeTask1() = Future
         index.remove(Random.nextInt(nrOfKeys / 2), Random.nextInt(nrOfValues))
-      }
-      def removeTask2() = Future {
+      def removeTask2() = Future
         index.remove(Random.nextInt(nrOfKeys / 2))
-      }
-      def readTask() = Future {
+      def readTask() = Future
         val key = Random.nextInt(nrOfKeys)
         val values = index.valueIterator(key)
-        if (key >= nrOfKeys / 2) {
+        if (key >= nrOfKeys / 2)
           values.isEmpty should ===(false)
-        }
-      }
 
-      def executeRandomTask() = Random.nextInt(4) match {
+      def executeRandomTask() = Random.nextInt(4) match
         case 0 ⇒ putTask()
         case 1 ⇒ removeTask1()
         case 2 ⇒ removeTask2()
         case 3 ⇒ readTask()
-      }
 
       val tasks = List.fill(nrOfTasks)(executeRandomTask)
 
       tasks.foreach(Await.result(_, timeout.duration))
-    }
-  }
-}

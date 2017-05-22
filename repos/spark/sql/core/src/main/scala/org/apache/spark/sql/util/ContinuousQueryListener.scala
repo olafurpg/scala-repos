@@ -27,7 +27,7 @@ import org.apache.spark.sql.util.ContinuousQueryListener._
   * @note The methods are not thread-safe as they may be called from different threads.
   */
 @Experimental
-abstract class ContinuousQueryListener {
+abstract class ContinuousQueryListener
 
   /**
     * Called when a query is started.
@@ -43,14 +43,13 @@ abstract class ContinuousQueryListener {
 
   /** Called when a query is stopped, with or without error */
   def onQueryTerminated(queryTerminated: QueryTerminated)
-}
 
 /**
   * :: Experimental ::
   * Companion object of [[ContinuousQueryListener]] that defines the listener events.
   */
 @Experimental
-object ContinuousQueryListener {
+object ContinuousQueryListener
 
   /** Base type of [[ContinuousQueryListener]] events */
   trait Event
@@ -63,4 +62,3 @@ object ContinuousQueryListener {
 
   /** Event representing that termination of a query */
   class QueryTerminated private[sql](val query: ContinuousQuery) extends Event
-}

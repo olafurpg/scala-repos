@@ -27,8 +27,8 @@ import scalaz.syntax.comonad._
 import blueeyes.json._
 
 trait ConcatSpec[M[+ _]]
-    extends ColumnarTableModuleTestSupport[M] with Specification {
-  def testConcat = {
+    extends ColumnarTableModuleTestSupport[M] with Specification
+  def testConcat =
     val json1 = """{ "a": 1, "b": "x", "c": null }"""
     val json2 = """[4, "foo", null, true]"""
 
@@ -42,5 +42,3 @@ trait ConcatSpec[M[+ _]]
     val expected = data1 ++ data2
 
     results.copoint must_== expected
-  }
-}

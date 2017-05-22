@@ -13,7 +13,7 @@ abstract class ScalaValidator(conflictsReporter: ConflictsReporter,
                               noOccurrences: Boolean,
                               enclosingContainerAll: PsiElement,
                               enclosingOne: PsiElement)
-    extends NameValidator {
+    extends NameValidator
 
   def getProject(): Project =
     myProject
@@ -24,45 +24,37 @@ abstract class ScalaValidator(conflictsReporter: ConflictsReporter,
   def isOK(dialog: NamedDialog): Boolean =
     isOK(dialog.getEnteredName, dialog.isReplaceAllOccurrences)
 
-  def isOK(newName: String, isReplaceAllOcc: Boolean): Boolean = {
+  def isOK(newName: String, isReplaceAllOcc: Boolean): Boolean =
     if (noOccurrences) return true
     val conflicts = isOKImpl(newName, isReplaceAllOcc)
     conflicts.isEmpty ||
     conflictsReporter.reportConflicts(myProject, conflicts)
-  }
 
-  def isOKImpl(name: String, allOcc: Boolean): MultiMap[PsiElement, String] = {
+  def isOKImpl(name: String, allOcc: Boolean): MultiMap[PsiElement, String] =
     val result = MultiMap.createSet[PsiElement, String]()
-    for {
+    for
       (namedElem, message) <- findConflicts(name, allOcc)
                                  if namedElem != selectedElement
-    } {
+    
       result.putValue(namedElem, message)
-    }
     result
-  }
 
   def findConflicts(
       name: String, allOcc: Boolean): Array[(PsiNamedElement, String)]
 
-  def validateName(name: String, increaseNumber: Boolean): String = {
+  def validateName(name: String, increaseNumber: Boolean): String =
     if (noOccurrences) return name
     var res = name
     if (isOKImpl(res, allOcc = false).isEmpty) return res
     if (!increaseNumber) return ""
     var i = 1
     res = name + i
-    if (!ScalaNamesUtil.isIdentifier(res)) {
+    if (!ScalaNamesUtil.isIdentifier(res))
       res = name + name.last
-      while (!isOKImpl(res, allOcc = true).isEmpty) {
+      while (!isOKImpl(res, allOcc = true).isEmpty)
         res = name + name.last
-      }
-    } else {
-      while (!isOKImpl(res, allOcc = true).isEmpty) {
+    else
+      while (!isOKImpl(res, allOcc = true).isEmpty)
         i = i + 1
         res = name + i
-      }
-    }
     res
-  }
-}

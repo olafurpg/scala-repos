@@ -29,7 +29,7 @@ import java.lang.{Iterable ⇒ JIterable}
   *
   * The Java API for generating TCP commands is available at [[TcpMessage]].
   */
-object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
+object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider
 
   override def lookup = Tcp
 
@@ -46,7 +46,7 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     *
     * For the Java API see [[TcpSO]].
     */
-  object SO extends Inet.SoForwarders {
+  object SO extends Inet.SoForwarders
 
     // general socket options
 
@@ -55,9 +55,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       *
       * For more information see `java.net.Socket.setKeepAlive`
       */
-    final case class KeepAlive(on: Boolean) extends SocketOption {
+    final case class KeepAlive(on: Boolean) extends SocketOption
       override def afterConnect(s: Socket): Unit = s.setKeepAlive(on)
-    }
 
     /**
       * [[akka.io.Inet.SocketOption]] to enable or disable OOBINLINE (receipt
@@ -66,9 +65,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       *
       * For more information see `java.net.Socket.setOOBInline`
       */
-    final case class OOBInline(on: Boolean) extends SocketOption {
+    final case class OOBInline(on: Boolean) extends SocketOption
       override def afterConnect(s: Socket): Unit = s.setOOBInline(on)
-    }
 
     // SO_LINGER is handled by the Close code
 
@@ -80,10 +78,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       *
       * For more information see `java.net.Socket.setTcpNoDelay`
       */
-    final case class TcpNoDelay(on: Boolean) extends SocketOption {
+    final case class TcpNoDelay(on: Boolean) extends SocketOption
       override def afterConnect(s: Socket): Unit = s.setTcpNoDelay(on)
-    }
-  }
 
   /**
     * The common interface for [[Command]] and [[Event]].
@@ -95,9 +91,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
   /**
     * This is the common trait for all commands understood by TCP actors.
     */
-  trait Command extends Message with SelectionHandler.HasFailureMessage {
+  trait Command extends Message with SelectionHandler.HasFailureMessage
     def failureMessage = CommandFailed(this)
-  }
 
   /**
     * The Connect message is sent to the TCP manager actor, which is obtained via
@@ -175,14 +170,13 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
   /**
     * Common interface for all commands which aim to close down an open connection.
     */
-  sealed trait CloseCommand extends Command with DeadLetterSuppression {
+  sealed trait CloseCommand extends Command with DeadLetterSuppression
 
     /**
       * The corresponding event which is sent as an acknowledgment once the
       * close operation is finished.
       */
     def event: ConnectionClosed
-  }
 
   /**
     * A normal close operation will first flush pending writes and then close the
@@ -190,14 +184,13 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * data will both be notified once the socket is closed using a `Closed`
     * message.
     */
-  case object Close extends CloseCommand {
+  case object Close extends CloseCommand
 
     /**
       * The corresponding event which is sent as an acknowledgment once the
       * close operation is finished.
       */
     override def event = Closed
-  }
 
   /**
     * A confirmed close operation will flush pending writes and half-close the
@@ -205,14 +198,13 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * command and the registered handler for incoming data will both be notified
     * once the socket is closed using a `ConfirmedClosed` message.
     */
-  case object ConfirmedClose extends CloseCommand {
+  case object ConfirmedClose extends CloseCommand
 
     /**
       * The corresponding event which is sent as an acknowledgment once the
       * close operation is finished.
       */
     override def event = ConfirmedClosed
-  }
 
   /**
     * An abort operation will not flush pending writes and will issue a TCP ABORT
@@ -221,14 +213,13 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * incoming data will both be notified once the socket is closed using a
     * `Aborted` message.
     */
-  case object Abort extends CloseCommand {
+  case object Abort extends CloseCommand
 
     /**
       * The corresponding event which is sent as an acknowledgment once the
       * close operation is finished.
       */
     override def event = Aborted
-  }
 
   /**
     * Each [[WriteCommand]] can optionally request a positive acknowledgment to be sent
@@ -247,7 +238,7 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
   /**
     * Common interface for all write commands.
     */
-  sealed abstract class WriteCommand extends Command {
+  sealed abstract class WriteCommand extends Command
 
     /**
       * Prepends this command with another `Write` or `WriteFile` to form
@@ -262,10 +253,9 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       * created `CompoundWrite`.
       */
     def ++:(writes: Iterable[WriteCommand]): WriteCommand =
-      writes.foldRight(this) {
+      writes.foldRight(this)
         case (a: SimpleWriteCommand, b) ⇒ a +: b
         case (a: CompoundWrite, b) ⇒ a ++: b
-      }
 
     /**
       * Java API: prepends this command with another `Write` or `WriteFile` to form
@@ -280,9 +270,8 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       */
     def prepend(writes: JIterable[WriteCommand]): WriteCommand =
       writes.asScala ++: this
-  }
 
-  object WriteCommand {
+  object WriteCommand
 
     /**
       * Combines the given number of write commands into one atomic `WriteCommand`.
@@ -295,12 +284,11 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       */
     def create(writes: JIterable[WriteCommand]): WriteCommand =
       apply(writes.asScala)
-  }
 
   /**
     * Common supertype of [[Write]] and [[WriteFile]].
     */
-  sealed abstract class SimpleWriteCommand extends WriteCommand {
+  sealed abstract class SimpleWriteCommand extends WriteCommand
     require(
         ack != null, "ack must be non-null. Use NoAck if you don't want acks.")
 
@@ -319,7 +307,6 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       * Java API: appends this command with another `WriteCommand` to form a `CompoundWrite`.
       */
     def append(that: WriteCommand): CompoundWrite = this +: that
-  }
 
   /**
     * Write data to the TCP connection. If no ack is needed use the special
@@ -333,7 +320,7 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     */
   final case class Write(data: ByteString, ack: Event)
       extends SimpleWriteCommand
-  object Write {
+  object Write
 
     /**
       * The empty Write doesn't write anything and isn't acknowledged.
@@ -348,7 +335,6 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       */
     def apply(data: ByteString): Write =
       if (data.isEmpty) empty else Write(data, NoAck)
-  }
 
   /**
     * Write `count` bytes starting at `position` from file at `filePath` to the connection.
@@ -362,10 +348,9 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     */
   final case class WriteFile(
       filePath: String, position: Long, count: Long, ack: Event)
-      extends SimpleWriteCommand {
+      extends SimpleWriteCommand
     require(position >= 0, "WriteFile.position must be >= 0")
     require(count > 0, "WriteFile.count must be > 0")
-  }
 
   /**
     * A write command which aggregates two other write commands. Using this construct
@@ -377,20 +362,17 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     */
   final case class CompoundWrite(
       override val head: SimpleWriteCommand, tailCommand: WriteCommand)
-      extends WriteCommand with immutable.Iterable[SimpleWriteCommand] {
+      extends WriteCommand with immutable.Iterable[SimpleWriteCommand]
 
     def iterator: Iterator[SimpleWriteCommand] =
-      new Iterator[SimpleWriteCommand] {
+      new Iterator[SimpleWriteCommand]
         private[this] var current: WriteCommand = CompoundWrite.this
         def hasNext: Boolean = current ne null
         def next(): SimpleWriteCommand =
-          current match {
+          current match
             case null ⇒ Iterator.empty.next()
             case CompoundWrite(h, t) ⇒ { current = t; h }
             case x: SimpleWriteCommand ⇒ { current = null; x }
-          }
-      }
-  }
 
   /**
     * When `useResumeWriting` is in effect as was indicated in the [[Register]] message
@@ -477,7 +459,7 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
     * This is the common interface for all events which indicate that a connection
     * has been closed or half-closed.
     */
-  sealed trait ConnectionClosed extends Event with DeadLetterSuppression {
+  sealed trait ConnectionClosed extends Event with DeadLetterSuppression
 
     /**
       * `true` iff the connection has been closed in response to an `Abort` command.
@@ -507,7 +489,6 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
       * retrieved by this method.
       */
     def getErrorCause: String = null
-  }
 
   /**
     * The connection has been closed normally in response to a `Close` command.
@@ -517,39 +498,34 @@ object Tcp extends ExtensionId[TcpExt] with ExtensionIdProvider {
   /**
     * The connection has been aborted in response to an `Abort` command.
     */
-  case object Aborted extends ConnectionClosed {
+  case object Aborted extends ConnectionClosed
     override def isAborted = true
-  }
 
   /**
     * The connection has been half-closed by us and then half-close by the peer
     * in response to a `ConfirmedClose` command.
     */
-  case object ConfirmedClosed extends ConnectionClosed {
+  case object ConfirmedClosed extends ConnectionClosed
     override def isConfirmed = true
-  }
 
   /**
     * The peer has closed its writing half of the connection.
     */
-  case object PeerClosed extends ConnectionClosed {
+  case object PeerClosed extends ConnectionClosed
     override def isPeerClosed = true
-  }
 
   /**
     * The connection has been closed due to an IO error.
     */
-  final case class ErrorClosed(cause: String) extends ConnectionClosed {
+  final case class ErrorClosed(cause: String) extends ConnectionClosed
     override def isErrorClosed = true
     override def getErrorCause = cause
-  }
-}
 
-class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
+class TcpExt(system: ExtendedActorSystem) extends IO.Extension
 
   val Settings = new Settings(system.settings.config.getConfig("akka.io.tcp"))
   class Settings private[TcpExt](_config: Config)
-      extends SelectionHandlerSettings(_config) {
+      extends SelectionHandlerSettings(_config)
     import akka.util.Helpers.ConfigOps
     import _config._
 
@@ -562,21 +538,18 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
       (_ > 0, "batch-accept-limit must be > 0")
     val DirectBufferSize: Int = getIntBytes("direct-buffer-size")
     val MaxDirectBufferPoolSize: Int = getInt("direct-buffer-pool-limit")
-    val RegisterTimeout: Duration = getString("register-timeout") match {
+    val RegisterTimeout: Duration = getString("register-timeout") match
       case "infinite" ⇒ Duration.Undefined
       case x ⇒ _config.getMillisDuration("register-timeout")
-    }
     val ReceivedMessageSizeLimit: Int =
-      getString("max-received-message-size") match {
+      getString("max-received-message-size") match
         case "unlimited" ⇒ Int.MaxValue
         case x ⇒ getIntBytes("max-received-message-size")
-      }
     val ManagementDispatcher: String = getString("management-dispatcher")
     val FileIODispatcher: String = getString("file-io-dispatcher")
-    val TransferToLimit: Int = getString("file-io-transferTo-limit") match {
+    val TransferToLimit: Int = getString("file-io-transferTo-limit") match
       case "unlimited" ⇒ Int.MaxValue
       case _ ⇒ getIntBytes("file-io-transferTo-limit")
-    }
 
     val MaxChannelsPerSelector: Int =
       if (MaxChannels == -1) -1 else math.max(MaxChannels / NrOfSelectors, 1)
@@ -585,28 +558,24 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
       (_ > 0, "finish-connect-retries must be > 0")
 
     val WindowsConnectionAbortWorkaroundEnabled: Boolean = getString(
-        "windows-connection-abort-workaround-enabled") match {
+        "windows-connection-abort-workaround-enabled") match
       case "auto" ⇒ Helpers.isWindows
       case _ ⇒ getBoolean("windows-connection-abort-workaround-enabled")
-    }
 
-    private[this] def getIntBytes(path: String): Int = {
+    private[this] def getIntBytes(path: String): Int =
       val size = getBytes(path)
       require(size < Int.MaxValue, s"$path must be < 2 GiB")
       require(size >= 0, s"$path must be non-negative")
       size.toInt
-    }
-  }
 
   /**
     *
     */
-  val manager: ActorRef = {
+  val manager: ActorRef =
     system.systemActorOf(props = Props(classOf[TcpManager], this)
                              .withDispatcher(Settings.ManagementDispatcher)
                              .withDeploy(Deploy.local),
                          name = "IO-TCP")
-  }
 
   /**
     * Java API: retrieve a reference to the manager actor.
@@ -616,12 +585,11 @@ class TcpExt(system: ExtendedActorSystem) extends IO.Extension {
   val bufferPool: BufferPool = new DirectByteBufferPool(
       Settings.DirectBufferSize, Settings.MaxDirectBufferPoolSize)
   val fileIoDispatcher = system.dispatchers.lookup(Settings.FileIODispatcher)
-}
 
 /**
   * Java API for accessing socket options.
   */
-object TcpSO extends SoJavaFactories {
+object TcpSO extends SoJavaFactories
   import Tcp.SO._
 
   /**
@@ -649,9 +617,8 @@ object TcpSO extends SoJavaFactories {
     * For more information see `java.net.Socket.setTcpNoDelay`
     */
   def tcpNoDelay(on: Boolean) = TcpNoDelay(on)
-}
 
-object TcpMessage {
+object TcpMessage
   import language.implicitConversions
   import Tcp._
 
@@ -856,7 +823,5 @@ object TcpMessage {
   def resumeAccepting(batchSize: Int): Command = ResumeAccepting(batchSize)
 
   implicit private def fromJava[T](
-      coll: JIterable[T]): immutable.Traversable[T] = {
+      coll: JIterable[T]): immutable.Traversable[T] =
     akka.japi.Util.immutableSeq(coll)
-  }
-}

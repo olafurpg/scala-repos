@@ -21,7 +21,7 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.types.IntegerType
 
-class ExpressionSetSuite extends SparkFunSuite {
+class ExpressionSetSuite extends SparkFunSuite
 
   val aUpper = AttributeReference("A", IntegerType)(exprId = ExprId(1))
   val aLower = AttributeReference("a", IntegerType)(exprId = ExprId(1))
@@ -32,14 +32,11 @@ class ExpressionSetSuite extends SparkFunSuite {
 
   val aAndBSet = AttributeSet(aUpper :: bUpper :: Nil)
 
-  def setTest(size: Int, exprs: Expression*): Unit = {
-    test(s"expect $size: ${exprs.mkString(", ")}") {
+  def setTest(size: Int, exprs: Expression*): Unit =
+    test(s"expect $size: ${exprs.mkString(", ")}")
       val set = ExpressionSet(exprs)
-      if (set.size != size) {
+      if (set.size != size)
         fail(set.toDebugString)
-      }
-    }
-  }
 
   def setTestIgnore(size: Int, exprs: Expression*): Unit =
     ignore(s"expect $size: ${exprs.mkString(", ")}") {}
@@ -73,7 +70,7 @@ class ExpressionSetSuite extends SparkFunSuite {
   setTest(1, aUpper > bUpper, bUpper < aUpper)
   setTest(1, aUpper >= bUpper, bUpper <= aUpper)
 
-  test("add to / remove from set") {
+  test("add to / remove from set")
     val initialSet = ExpressionSet(aUpper + 1 :: Nil)
 
     assert((initialSet + (aUpper + 1)).size == 1)
@@ -83,5 +80,3 @@ class ExpressionSetSuite extends SparkFunSuite {
 
     assert((initialSet + (aLower + 1)).size == 1)
     assert((initialSet - (aLower + 1)).size == 0)
-  }
-}

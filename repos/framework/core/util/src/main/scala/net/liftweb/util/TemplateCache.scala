@@ -21,7 +21,7 @@ import scala.xml.{NodeSeq}
 import java.util.{Locale}
 import common._
 
-trait TemplateCache[K, V] {
+trait TemplateCache[K, V]
 
   type T = K
 
@@ -42,47 +42,39 @@ trait TemplateCache[K, V] {
     * Removes a template from the cache
     */
   def delete(key: K): Unit
-}
 
 /**
   * A cache that caches nothing
   */
-object NoCache extends TemplateCache[(Locale, List[String]), NodeSeq] {
+object NoCache extends TemplateCache[(Locale, List[String]), NodeSeq]
 
   def get(key: T): Box[NodeSeq] = Empty
 
   def set(key: T, node: NodeSeq): NodeSeq = node
 
   def delete(key: T) {}
-}
 
 /**
   * Companion module for InMemoryCache
   */
-object InMemoryCache {
+object InMemoryCache
   def apply(templatesCount: Int) = new InMemoryCache(templatesCount)
-}
 
 /**
   * Caches templates in a LRU map
   */
 class InMemoryCache(templatesCount: Int)
-    extends TemplateCache[(Locale, List[String]), NodeSeq] {
+    extends TemplateCache[(Locale, List[String]), NodeSeq]
   private val cache: LRU[(Locale, List[String]), NodeSeq] = new LRU(
       templatesCount)
 
-  def get(key: T): Box[NodeSeq] = {
-    cache.synchronized {
+  def get(key: T): Box[NodeSeq] =
+    cache.synchronized
       cache.get(key)
-    }
-  }
 
-  def set(key: T, node: NodeSeq): NodeSeq = cache.synchronized {
+  def set(key: T, node: NodeSeq): NodeSeq = cache.synchronized
     cache(key) = node
     node
-  }
 
-  override def delete(key: T) {
+  override def delete(key: T)
     cache.synchronized(cache.remove(key))
-  }
-}

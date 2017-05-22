@@ -5,8 +5,8 @@ package refactoring.extractTrait
   * Nikolay.Tropin
   * 2014-06-04
   */
-class ExtractTraitTestConflicts extends ExtractTraitTestBase {
-  def testPrivateMember() {
+class ExtractTraitTestConflicts extends ExtractTraitTestBase
+  def testPrivateMember()
     val text = """
         |class A {<caret>
         |
@@ -37,9 +37,8 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         |}
       """.stripMargin
     checkResult(text, result, onlyDeclarations = true, onlyFirstMember = true)
-  }
 
-  def testFromAnonymousClass() {
+  def testFromAnonymousClass()
     val text = """
         |object A {
         |  val x = new Runnable {<caret>
@@ -72,9 +71,8 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
       """.stripMargin
     checkResult(
         text, result, onlyDeclarations = false, onlyFirstMember = false)
-  }
 
-  def testSuperReference() {
+  def testSuperReference()
     val text = """
         |class A extends AA {<caret>
         |  def foo() = super.bar()
@@ -88,9 +86,8 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
         "super.reference.used.in.extracted.member", "foo(): Unit")
     checkException(
         text, message, onlyDeclarations = false, onlyFirstMember = true)
-  }
 
-  def testClassTypeParams() {
+  def testClassTypeParams()
     val text = """
         |class A extends AA[Int] {<caret>
         |  def foo() = bar()
@@ -104,5 +101,3 @@ class ExtractTraitTestConflicts extends ExtractTraitTestBase {
       ScalaBundle.message("type.parameters.for.self.type.not.supported", "AA")
     checkException(
         text, message, onlyDeclarations = false, onlyFirstMember = true)
-  }
-}

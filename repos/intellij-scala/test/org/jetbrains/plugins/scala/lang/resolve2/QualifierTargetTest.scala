@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class QualifierTargetTest extends ResolveTestBase {
-  override def folderPath: String = {
+class QualifierTargetTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "qualifier/target/"
-  }
 
   def testCaseClass() = doTest()
   def testCaseObject() = doTest()
@@ -20,4 +19,3 @@ class QualifierTargetTest extends ResolveTestBase {
   def testObject() = doTest()
   def testTrait() = doTest()
   def testTypeAlias() = doTest()
-}

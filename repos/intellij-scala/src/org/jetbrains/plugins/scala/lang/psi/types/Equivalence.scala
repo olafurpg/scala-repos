@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScTypeUtil.AliasType
   * User: Alexander Podkhalyuzin
   * Date: 28.04.2010
   */
-object Equivalence {
+object Equivalence
   def equiv(l: ScType, r: ScType): Boolean =
     equivInner(l, r, new ScUndefinedSubstitutor)._1
 
@@ -18,9 +18,8 @@ object Equivalence {
     equivInner(l, r, new ScUndefinedSubstitutor)._2
 
   val guard = RecursionManager.createGuard("equivalence.guard")
-  val eval = new ThreadLocal[Boolean] {
+  val eval = new ThreadLocal[Boolean]
     override def initialValue(): Boolean = false
-  }
 
   val cache: ConcurrentWeakHashMap[
       (ScType, ScType, Boolean), (Boolean, ScUndefinedSubstitutor)] =
@@ -34,7 +33,7 @@ object Equivalence {
       l: ScType,
       r: ScType,
       subst: ScUndefinedSubstitutor,
-      falseUndef: Boolean = true): (Boolean, ScUndefinedSubstitutor) = {
+      falseUndef: Boolean = true): (Boolean, ScUndefinedSubstitutor) =
     ProgressManager.checkCanceled()
 
     if (l == r) return (true, subst)
@@ -44,46 +43,38 @@ object Equivalence {
     val nowEval = eval.get()
     val tuple =
       if (nowEval) null
-      else {
-        try {
+      else
+        try
           eval.set(true)
           cache.get(key)
-        } finally {
+        finally
           eval.set(false)
-        }
-      }
-    if (tuple != null) {
+    if (tuple != null)
       if (subst.isEmpty) return tuple
       return tuple.copy(_2 = subst + tuple._2)
-    }
 
-    if (guard.currentStack().contains(key)) {
+    if (guard.currentStack().contains(key))
       return (false, new ScUndefinedSubstitutor())
-    }
 
     val uSubst = new ScUndefinedSubstitutor()
 
-    def comp(): (Boolean, ScUndefinedSubstitutor) = {
-      if (l.isInstanceOf[ScDesignatorType] && l.getValType.isDefined) {
+    def comp(): (Boolean, ScUndefinedSubstitutor) =
+      if (l.isInstanceOf[ScDesignatorType] && l.getValType.isDefined)
         return equivInner(l.getValType.get, r, subst, falseUndef)
-      }
-      if (r.isInstanceOf[ScDesignatorType] && r.getValType.isDefined) {
+      if (r.isInstanceOf[ScDesignatorType] && r.getValType.isDefined)
         return equivInner(l, r.getValType.get, subst, falseUndef)
-      }
 
-      r.isAliasType match {
+      r.isAliasType match
         case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
           return r.equivInner(l, subst, falseUndef)
         case _ =>
-      }
 
-      l.isAliasType match {
+      l.isAliasType match
         case Some(AliasType(ta: ScTypeAliasDefinition, _, _)) =>
           return l.equivInner(r, subst, falseUndef)
         case _ =>
-      }
 
-      (l, r) match {
+      (l, r) match
         case (_, _: ScUndefinedType) => r.equivInner(l, subst, falseUndef)
         case (_: ScUndefinedType, _) => l.equivInner(r, subst, falseUndef)
         case (_, _: ScAbstractType) => r.equivInner(l, subst, falseUndef)
@@ -103,22 +94,16 @@ object Equivalence {
         case (_, proj: ScCompoundType) => r.equivInner(l, subst, falseUndef)
         case (_, ex: ScExistentialType) => r.equivInner(l, subst, falseUndef)
         case _ => l.equivInner(r, subst, falseUndef)
-      }
-    }
     val res = guard.doPreventingRecursion(
-        key, false, new Computable[(Boolean, ScUndefinedSubstitutor)] {
+        key, false, new Computable[(Boolean, ScUndefinedSubstitutor)]
       def compute(): (Boolean, ScUndefinedSubstitutor) = comp()
-    })
+    )
     if (res == null) return (false, new ScUndefinedSubstitutor())
-    if (!nowEval) {
-      try {
+    if (!nowEval)
+      try
         eval.set(true)
         cache.put(key, res)
-      } finally {
+      finally
         eval.set(false)
-      }
-    }
     if (subst.isEmpty) return res
     res.copy(_2 = subst + res._2)
-  }
-}

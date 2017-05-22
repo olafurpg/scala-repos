@@ -23,23 +23,19 @@ import scala.reflect.ClassTag
   *
   * @author dlwh
   */
-trait CanCopy[V] {
+trait CanCopy[V]
   def apply(t: V): V
-}
 
-object CanCopy {
+object CanCopy
 
-  class OpArray[@specialized V] extends CanCopy[Array[V]] {
-    override def apply(from: Array[V]) = {
+  class OpArray[@specialized V] extends CanCopy[Array[V]]
+    override def apply(from: Array[V]) =
       ArrayUtil.copyOf(from, from.length)
-    }
-  }
 
   class OpMapValues[From, V](
       implicit op: CanCopy[V], map: CanMapValues[From, V, V, From])
-      extends CanCopy[From] {
+      extends CanCopy[From]
     def apply(v: From) = map(v, op.apply(_))
-  }
 
   // <editor-fold defaultstate="collapsed" desc=" implicit CanCopy[V] implementations ">
 
@@ -55,9 +51,7 @@ object CanCopy {
   implicit object OpArrayF extends OpArray[Float]
   implicit object OpArrayD extends OpArray[Double]
 
-  implicit def canCopyField[V : Field]: CanCopy[V] = new CanCopy[V] {
+  implicit def canCopyField[V : Field]: CanCopy[V] = new CanCopy[V]
     def apply(v1: V) = v1
-  }
 
   // </editor-fold>
-}

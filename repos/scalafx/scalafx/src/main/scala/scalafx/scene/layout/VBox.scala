@@ -36,16 +36,15 @@ import scalafx.delegate.{AlignmentDelegate, SFXDelegate}
 import scalafx.geometry.Insets
 import scalafx.scene.Node
 
-object VBox {
+object VBox
   implicit def sfxVBox2jfx(v: VBox): jfxsl.VBox =
     if (v != null) v.delegate else null
 
   /**
     * Removes all vbox constraints from the child node.
     */
-  def clearConstraints(child: jfxs.Node) {
+  def clearConstraints(child: jfxs.Node)
     jfxsl.VBox.clearConstraints(child)
-  }
 
   /**
     * Returns the child's margin constraint if set.
@@ -55,9 +54,8 @@ object VBox {
   /**
     * Sets the margin for the child when contained by a vbox.
     */
-  def setMargin(child: Node, value: Insets) {
+  def setMargin(child: Node, value: Insets)
     jfxsl.VBox.setMargin(child, value)
-  }
 
   /**
     * Returns the child's vgrow constraint if set.
@@ -67,17 +65,15 @@ object VBox {
   /**
     * Sets the vertical grow priority for the child when contained by a vbox.
     */
-  def setVgrow(child: Node, value: Priority) {
+  def setVgrow(child: Node, value: Priority)
     jfxsl.VBox.setVgrow(child, value)
-  }
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/VBox.html]]
   */
 class VBox(override val delegate: jfxsl.VBox = new jfxsl.VBox)
     extends Pane(delegate) with AlignmentDelegate[jfxsl.VBox]
-    with SFXDelegate[jfxsl.VBox] {
+    with SFXDelegate[jfxsl.VBox]
 
   /**
     * Creates a VBox layout with the specified spacing between children.
@@ -103,18 +99,16 @@ class VBox(override val delegate: jfxsl.VBox = new jfxsl.VBox)
     * The amount of vertical space between each child in the vbox.
     */
   def spacing: DoubleProperty = delegate.spacingProperty
-  def spacing_=(v: Double) {
+  def spacing_=(v: Double)
     spacing() = v
-  }
 
   /**
     * Whether or not resizable children will be resized to fill the full width of the vbox or be
     * kept to their preferred width and aligned according to the alignment hpos value.
     */
   def fillWidth: BooleanProperty = delegate.fillWidthProperty
-  def fillWidth_=(v: Boolean) {
+  def fillWidth_=(v: Boolean)
     fillWidth() = v
-  }
 
   /**
     * Returns the orientation of a node's resizing bias for layout purposes.
@@ -124,7 +118,5 @@ class VBox(override val delegate: jfxsl.VBox = new jfxsl.VBox)
   /**
     * Requests a layout pass to be performed before the next scene is rendered.
     */
-  def requestLayout() {
+  def requestLayout()
     delegate.requestLayout()
-  }
-}

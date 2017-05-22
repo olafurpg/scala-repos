@@ -2,7 +2,7 @@ package spire
 package random
 package rng
 
-final class SyncGenerator(gen: Generator) extends Generator {
+final class SyncGenerator(gen: Generator) extends Generator
   def copyInit: SyncGenerator = new SyncGenerator(gen.copy)
 
   override def sync: SyncGenerator = this
@@ -14,8 +14,6 @@ final class SyncGenerator(gen: Generator) extends Generator {
   def nextInt(): Int = this.synchronized { gen.nextInt() }
 
   def nextLong(): Long = this.synchronized { gen.nextLong() }
-}
 
-object SyncGenerator {
+object SyncGenerator
   def apply(gen: Generator): SyncGenerator = new SyncGenerator(gen)
-}

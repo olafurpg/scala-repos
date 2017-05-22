@@ -7,7 +7,7 @@ import com.twitter.finagle.exp.mysql.transport.{Buffer, BufferReader, Packet}
   * Specific [[Value]]'s based on mysql column name can be accessed
   * via the `apply` method.
   */
-trait Row {
+trait Row
 
   /**
     * Contains a Field object for each
@@ -43,7 +43,6 @@ trait Row {
     for (idx <- columnIndex) yield values(idx)
 
   override def toString = (fields zip values).toString
-}
 
 /**
   * Defines a row where the data is presumed to be encoded with the mysql
@@ -52,7 +51,7 @@ trait Row {
   */
 class StringEncodedRow(
     rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
-    extends Row {
+    extends Row
   val buffer = BufferReader(rawRow)
 
   /**
@@ -60,15 +59,15 @@ class StringEncodedRow(
     * into an appropriate Value object.
     * [[http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::ResultsetRow]]
     */
-  lazy val values: IndexedSeq[Value] = for (field <- fields) yield {
+  lazy val values: IndexedSeq[Value] = for (field <- fields) yield
     val bytes = buffer.readLengthCodedBytes()
     if (bytes == null) NullValue
     else if (bytes.isEmpty) EmptyValue
     else if (!Charset.isCompatible(field.charset))
       RawValue(field.fieldType, field.charset, false, bytes)
-    else {
+    else
       val str = new String(bytes, Charset(field.charset))
-      field.fieldType match {
+      field.fieldType match
         case Type.Tiny => ByteValue(str.toByte)
         case Type.Short => ShortValue(str.toShort)
         case Type.Int24 => IntValue(str.toInt)
@@ -87,12 +86,8 @@ class StringEncodedRow(
         case Type.LongBlob =>
           throw new UnsupportedOperationException("LongBlob is not supported!")
         case typ => RawValue(typ, field.charset, false, bytes)
-      }
-    }
-  }
 
   def indexOf(name: String) = indexMap.get(name)
-}
 
 /**
   * Defines a Row where the data is presumed to be encoded with the
@@ -101,7 +96,7 @@ class StringEncodedRow(
   */
 class BinaryEncodedRow(
     rawRow: Buffer, val fields: IndexedSeq[Field], indexMap: Map[String, Int])
-    extends Row {
+    extends Row
   val buffer = BufferReader(rawRow, offset = 1)
 
   /**
@@ -110,11 +105,10 @@ class BinaryEncodedRow(
     * each bit corresponds to the index of the column. If the bit
     * is set, the value is null.
     */
-  val nullBitmap: BigInt = {
+  val nullBitmap: BigInt =
     val len = ((fields.size + 7 + 2) / 8).toInt
     val bytesAsBigEndian = buffer.take(len).reverse
     BigInt(bytesAsBigEndian)
-  }
 
   /**
     * Check if the bit is set. Note, the
@@ -127,10 +121,10 @@ class BinaryEncodedRow(
     * into an appropriate Value object.
     */
   lazy val values: IndexedSeq[Value] =
-    for ((field, idx) <- fields.zipWithIndex) yield {
+    for ((field, idx) <- fields.zipWithIndex) yield
       if (isNull(idx)) NullValue
       else
-        field.fieldType match {
+        field.fieldType match
           case Type.Tiny => ByteValue(buffer.readByte())
           case Type.Short => ShortValue(buffer.readShort())
           case Type.Int24 => IntValue(buffer.readInt())
@@ -151,8 +145,5 @@ class BinaryEncodedRow(
                 "LongBlob is not supported!")
           case typ =>
             RawValue(typ, field.charset, true, buffer.readLengthCodedBytes())
-        }
-    }
 
   def indexOf(name: String) = indexMap.get(name)
-}

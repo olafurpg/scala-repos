@@ -20,11 +20,11 @@ import org.apache.thrift.TByteArrayOutputStream
 import scala.collection.mutable.{ArrayBuffer, HashMap, SynchronizedMap}
 import scala.language.reflectiveCalls
 
-object RawZipkinTracer {
+object RawZipkinTracer
   private[this] def newClient(
       scribeHost: String,
       scribePort: Int
-  ): Scribe.FutureIface = {
+  ): Scribe.FutureIface =
     val transport = ClientBuilder()
       .name("zipkin-tracer")
       .hosts(new InetSocketAddress(scribeHost, scribePort))
@@ -40,7 +40,6 @@ object RawZipkinTracer {
 
     new Scribe.FinagledClient(
         new TracelessFilter andThen transport, Protocols.binaryFactory())
-  }
 
   // to make sure we only create one instance of the tracer per host and port
   private[this] val map = new HashMap[String, RawZipkinTracer]
@@ -56,11 +55,10 @@ object RawZipkinTracer {
       scribePort: Int = 1463,
       statsReceiver: StatsReceiver = NullStatsReceiver,
       timer: Timer = DefaultTimer.twitter
-  ): RawZipkinTracer = synchronized {
+  ): RawZipkinTracer = synchronized
     map.getOrElseUpdate(
         scribeHost + ":" + scribePort,
         apply(newClient(scribeHost, scribePort), statsReceiver, timer))
-  }
 
   def apply(client: Scribe.FutureIface,
             statsReceiver: StatsReceiver,
@@ -71,20 +69,17 @@ object RawZipkinTracer {
   // down. We give it 100ms.
   Runtime
     .getRuntime()
-    .addShutdownHook(new Thread {
+    .addShutdownHook(new Thread
       setName("RawZipkinTracer-ShutdownHook")
-      override def run() {
+      override def run()
         val tracers = RawZipkinTracer.synchronized(map.values.toSeq)
         val joined = Future.join(tracers map (_.flush()))
-        try {
+        try
           Await.result(joined, 100.milliseconds)
-        } catch {
+        catch
           case _: TimeoutException =>
             System.err.println("Failed to flush all traces before quitting")
-        }
-      }
-    })
-}
+    )
 
 /**
   * Receives the Finagle generated traces and sends them off to Zipkin via scribe.
@@ -104,7 +99,7 @@ private[thrift] class RawZipkinTracer(
     initialBufferSize: StorageUnit = 512.bytes,
     maxBufferSize: StorageUnit = 1.megabyte
 )
-    extends Tracer {
+    extends Tracer
   private[this] val TraceCategory = "zipkin" // scribe category
 
   private[this] val ErrorAnnotation = "%s: %s" // annotation: errorMessage
@@ -134,98 +129,83 @@ private[thrift] class RawZipkinTracer(
     * than `maxBufferSize`
     */
   private[this] val encoder = BaseEncoding.base64()
-  private class ReusableTransport {
-    private[this] val baos = new TByteArrayOutputStream(initialSizeInBytes) {
-      private[this] val writer = new CharArrayWriter(initialSizeInBytes) {
-        override def reset(): Unit = {
+  private class ReusableTransport
+    private[this] val baos = new TByteArrayOutputStream(initialSizeInBytes)
+      private[this] val writer = new CharArrayWriter(initialSizeInBytes)
+        override def reset(): Unit =
           super.reset()
-          if (buf.length > maxSizeInBytes) {
+          if (buf.length > maxSizeInBytes)
             buf = new Array[Char](initialSizeInBytes)
-          }
-        }
-      }
       @volatile private[this] var outStream = encoder.encodingStream(writer)
 
-      override def reset(): Unit = {
+      override def reset(): Unit =
         writer.reset()
         outStream = encoder.encodingStream(writer)
         super.reset()
-      }
 
-      override def write(bytes: Array[Byte], off: Int, len: Int): Unit = {
+      override def write(bytes: Array[Byte], off: Int, len: Int): Unit =
         outStream.write(bytes, off, len)
-      }
 
-      def toBase64Line(): String = {
+      def toBase64Line(): String =
         outStream.close()
         writer.write('\n')
         writer.toString()
-      }
-    }
 
     private[this] val transport = new TReusableMemoryTransport(baos)
     val protocol = Protocols.binaryFactory().getProtocol(transport)
 
     def reset() = transport.reset()
     def toBase64Line(): String = baos.toBase64Line()
-  }
 
   private[this] val bufferPool =
     new ArrayBlockingQueue[ReusableTransport](poolSize)
-  (0 until poolSize) foreach { _ =>
+  (0 until poolSize) foreach  _ =>
     bufferPool.add(new ReusableTransport)
-  }
 
   /**
     * Serialize the span, base64 encode and shove it all in a list.
     */
-  private[this] def createLogEntries(spans: Seq[Span]): Seq[LogEntry] = {
+  private[this] def createLogEntries(spans: Seq[Span]): Seq[LogEntry] =
     val entries = new ArrayBuffer[LogEntry](spans.size)
 
-    spans foreach { span =>
+    spans foreach  span =>
       val transport = bufferPool.take()
-      try {
+      try
         span.toThrift.write(transport.protocol)
         entries.append(LogEntry(category = TraceCategory,
                                 message = transport.toBase64Line()))
-      } catch {
+      catch
         case NonFatal(e) => errorReceiver.counter(e.getClass.getName).incr()
-      } finally {
+      finally
         transport.reset()
         bufferPool.add(transport)
-      }
-    }
 
     entries
-  }
 
   /**
     * Log the span data via Scribe.
     */
-  def logSpans(spans: Seq[Span]): Future[Unit] = {
+  def logSpans(spans: Seq[Span]): Future[Unit] =
     client
       .log(createLogEntries(spans))
-      .respond {
+      .respond
         case Return(ResultCode.Ok) => okCounter.incr()
         case Return(ResultCode.TryLater) => tryLaterCounter.incr()
         case Throw(e) => errorReceiver.counter(e.getClass.getName).incr()
-      }
       .unit
-  }
 
   /**
     * Mutate the Span with whatever new info we have.
     * If we see an "end" annotation we remove the span and send it off.
     */
-  protected def mutate(traceId: TraceId)(f: MutableSpan => Unit) {
+  protected def mutate(traceId: TraceId)(f: MutableSpan => Unit)
     spanMap.update(traceId)(f)
-  }
 
   private[this] val TrueBB: ByteBuffer = ByteBuffer.wrap(Array[Byte](1))
   private[this] val FalseBB: ByteBuffer = ByteBuffer.wrap(Array[Byte](0))
 
-  def record(record: Record) {
-    record.annotation match {
+  def record(record: Record)
+    record.annotation match
       case tracing.Annotation.WireSend =>
         annotate(record, thrift.Constants.WIRE_SEND)
       case tracing.Annotation.WireRecv =>
@@ -309,63 +289,50 @@ private[thrift] class RawZipkinTracer(
         setEndpoint(record, ia)
       case tracing.Annotation.ClientAddr(ia: InetSocketAddress) =>
         // use a binary annotation over a regular annotation to avoid a misleading timestamp
-        spanMap.update(record.traceId) {
+        spanMap.update(record.traceId)
           _.addBinaryAnnotation(
               BinaryAnnotation(thrift.Constants.CLIENT_ADDR,
                                TrueBB.duplicate(),
                                thrift.AnnotationType.BOOL,
                                Endpoint.fromSocketAddress(ia)))
-        }
       case tracing.Annotation.ServerAddr(ia: InetSocketAddress) =>
-        spanMap.update(record.traceId) {
+        spanMap.update(record.traceId)
           _.addBinaryAnnotation(
               BinaryAnnotation(thrift.Constants.SERVER_ADDR,
                                TrueBB.duplicate(),
                                thrift.AnnotationType.BOOL,
                                Endpoint.fromSocketAddress(ia)))
-        }
-    }
-  }
 
   /**
     * Sets the endpoint in the span for any future annotations. Also
     * sets the endpoint in any previous annotations that lack one.
     */
-  protected def setEndpoint(record: Record, ia: InetSocketAddress) {
+  protected def setEndpoint(record: Record, ia: InetSocketAddress)
     spanMap.update(record.traceId)(
         _.setEndpoint(Endpoint.fromSocketAddress(ia).boundEndpoint))
-  }
 
   protected def binaryAnnotation(
       record: Record,
       key: String,
       value: ByteBuffer,
       annotationType: thrift.AnnotationType
-  ) {
-    spanMap.update(record.traceId) { span =>
+  )
+    spanMap.update(record.traceId)  span =>
       span.addBinaryAnnotation(
           BinaryAnnotation(key, value, annotationType, span.endpoint))
-    }
-  }
 
   /**
     * Add this record as a time based annotation.
     */
-  protected def annotate(record: Record, value: String) {
-    spanMap.update(record.traceId) { span =>
+  protected def annotate(record: Record, value: String)
+    spanMap.update(record.traceId)  span =>
       span.addAnnotation(
           ZipkinAnnotation(record.timestamp, value, span.endpoint))
-    }
-  }
-}
 
 /**
   * Makes sure we don't trace the Scribe logging.
   */
-private class TracelessFilter[Req, Rep] extends SimpleFilter[Req, Rep] {
-  def apply(request: Req, service: Service[Req, Rep]) = {
-    Trace.letClear {
+private class TracelessFilter[Req, Rep] extends SimpleFilter[Req, Rep]
+  def apply(request: Req, service: Service[Req, Rep]) =
+    Trace.letClear
       service(request)
-    }
-  }
-}

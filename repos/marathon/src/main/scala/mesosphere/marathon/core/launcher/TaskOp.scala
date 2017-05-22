@@ -9,7 +9,7 @@ import org.apache.mesos.{Protos => MesosProtos}
 /**
   * An operation which relates to a task and is send to Mesos for execution in an `acceptOffers` API call.
   */
-sealed trait TaskOp {
+sealed trait TaskOp
 
   /** The ID of the affected task. */
   def taskId: Task.Id
@@ -28,26 +28,23 @@ sealed trait TaskOp {
 
   /** To which Offer.Operations does this task op relate? */
   def offerOperations: Iterable[org.apache.mesos.Protos.Offer.Operation]
-}
 
-object TaskOp {
+object TaskOp
 
   /** Launch a task on the offer. */
   case class Launch(taskInfo: MesosProtos.TaskInfo,
                     newTask: Task,
                     oldTask: Option[Task] = None,
                     offerOperations: Iterable[MesosProtos.Offer.Operation])
-      extends TaskOp {
+      extends TaskOp
 
     override def taskId: Task.Id = newTask.taskId
     override def maybeNewTask: Option[Task] = Some(newTask)
 
-    def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer = {
+    def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer =
       import scala.collection.JavaConverters._
       ResourceUtil.consumeResourcesFromOffer(
           offer, taskInfo.getResourcesList.asScala)
-    }
-  }
 
   case class ReserveAndCreateVolumes(
       newTask: Task,
@@ -55,30 +52,29 @@ object TaskOp {
       localVolumes: Iterable[LocalVolume],
       oldTask: Option[Task] = None,
       offerOperations: Iterable[MesosProtos.Offer.Operation])
-      extends TaskOp {
+      extends TaskOp
 
     override def taskId: Task.Id = newTask.taskId
     override def maybeNewTask: Option[Task] = Some(newTask)
 
     override def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer =
       ResourceUtil.consumeResourcesFromOffer(offer, resources)
-  }
 
   case class UnreserveAndDestroyVolumes(
       taskId: Task.Id,
       maybeNewTask: Option[Task] = None,
       resources: Iterable[MesosProtos.Resource],
       oldTask: Option[Task] = None)
-      extends TaskOp {
+      extends TaskOp
 
-    override lazy val offerOperations: Iterable[MesosProtos.Offer.Operation] = {
+    override lazy val offerOperations: Iterable[MesosProtos.Offer.Operation] =
       val (withDisk, withoutDisk) = resources.partition(_.hasDisk)
       val reservationsForDisks = withDisk.map(_.toBuilder.clearDisk().build())
 
       import scala.collection.JavaConverters._
 
       val maybeDestroyVolumes: Option[MesosProtos.Offer.Operation] =
-        if (withDisk.nonEmpty) {
+        if (withDisk.nonEmpty)
           val destroyOp = MesosProtos.Offer.Operation.Destroy
             .newBuilder()
             .addAllVolumes(withDisk.asJava)
@@ -90,10 +86,10 @@ object TaskOp {
             .build()
 
           Some(op)
-        } else None
+        else None
 
       val maybeUnreserve: Option[MesosProtos.Offer.Operation] =
-        if (withDisk.nonEmpty || reservationsForDisks.nonEmpty) {
+        if (withDisk.nonEmpty || reservationsForDisks.nonEmpty)
           val unreserveOp = MesosProtos.Offer.Operation.Unreserve
             .newBuilder()
             .addAllResources(withoutDisk.asJava)
@@ -105,12 +101,9 @@ object TaskOp {
             .setUnreserve(unreserveOp)
             .build()
           Some(op)
-        } else None
+        else None
 
       Iterable(maybeDestroyVolumes, maybeUnreserve).flatten
-    }
 
     override def applyToOffer(offer: MesosProtos.Offer): MesosProtos.Offer =
       ResourceUtil.consumeResourcesFromOffer(offer, resources)
-  }
-}

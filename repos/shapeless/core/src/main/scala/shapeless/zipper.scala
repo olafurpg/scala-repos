@@ -24,7 +24,7 @@ import ops.hlist.{IsHCons, ReversePrepend, Split, SplitLeft}
   * @author Miles Sabin
   */
 case class Zipper[C, L <: HList, R <: HList, P](
-    prefix: L, suffix: R, parent: P) {
+    prefix: L, suffix: R, parent: P)
   import ops.zipper._
 
   type Self = Zipper[C, L, R, P]
@@ -93,9 +93,8 @@ case class Zipper[C, L <: HList, R <: HList, P](
 
   /** Reifies the current level of this `Zipper`. */
   def reify(implicit reify: Reify[Self]): reify.Out = reify(this)
-}
 
-object Zipper {
+object Zipper
   def apply[C, CL <: HList](c: C)(
       implicit gen: Generic.Aux[C, CL]): Zipper[C, HNil, CL, None.type] =
     Zipper[C, HNil, CL, None.type](HNil, gen.to(c), None)
@@ -105,12 +104,10 @@ object Zipper {
 
   implicit class Modifier[C, L <: HList, RH, RT <: HList, P](
       val zipper: Zipper[C, L, RH :: RT, P])
-      extends AnyVal {
+      extends AnyVal
     import ops.zipper._
 
     /** Modifies the element at the cursor by the use of function f. Available only if the underlying `HList` is non-empty. */
     def modify[E](f: RH => E)(
         implicit modify: Modify[zipper.Self, RH, E]): modify.Out =
       modify(zipper, f)
-  }
-}

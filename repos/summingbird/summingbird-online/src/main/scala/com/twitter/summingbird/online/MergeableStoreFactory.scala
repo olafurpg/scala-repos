@@ -24,32 +24,27 @@ import com.twitter.summingbird.batch.{Batcher, BatchID}
  *
  * We use Function1 since it makes daisy chaining operations much cleaner with .andThen
  */
-object MergeableStoreFactory {
+object MergeableStoreFactory
 
-  def apply[K, V](store: () => Mergeable[K, V], batcher: Batcher) = {
-    new MergeableStoreFactory[K, V] {
+  def apply[K, V](store: () => Mergeable[K, V], batcher: Batcher) =
+    new MergeableStoreFactory[K, V]
       def mergeableStore = store
       def mergeableBatcher = batcher
-    }
-  }
 
   def from[K, V](store: => Mergeable[(K, BatchID), V])(
       implicit batcher: Batcher): MergeableStoreFactory[(K, BatchID), V] =
-    apply({ () =>
+    apply( () =>
       store
-    }, batcher)
+    , batcher)
 
   def fromOnlineOnly[K, V](store: => MergeableStore[K, V])
-    : MergeableStoreFactory[(K, BatchID), V] = {
+    : MergeableStoreFactory[(K, BatchID), V] =
     implicit val batcher = Batcher.unit
     from(
-        store.convert { k: (K, BatchID) =>
+        store.convert  k: (K, BatchID) =>
       k._1
-    })
-  }
-}
+    )
 
-trait MergeableStoreFactory[-K, V] extends java.io.Serializable {
+trait MergeableStoreFactory[-K, V] extends java.io.Serializable
   def mergeableStore: () => Mergeable[K, V]
   def mergeableBatcher: Batcher
-}

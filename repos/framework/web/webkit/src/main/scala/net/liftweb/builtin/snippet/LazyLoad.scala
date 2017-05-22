@@ -35,10 +35,9 @@ import comet.AsyncRenderComet
   * Enclose your snippet tags on your template with LazyLoad and the snippet will execute
   * on a different thread, which avoids blocking the page render.
   */
-object LazyLoad extends DispatchSnippet {
-  def dispatch: DispatchIt = {
+object LazyLoad extends DispatchSnippet
+  def dispatch: DispatchIt =
     case _ => render _
-  }
 
   /**
     * If you need to provide a custom `renderer` function, perhaps because you
@@ -58,29 +57,25 @@ object LazyLoad extends DispatchSnippet {
     * wrapping their snippet invocation in a `data-lift="lazy-load"` snippet.
     */
   def render(renderer: (String) => JsCmd,
-             placeholderTemplate: Box[NodeSeq] = Empty): NodeSeq = {
+             placeholderTemplate: Box[NodeSeq] = Empty): NodeSeq =
     val placeholderId = Helpers.nextFuncName
 
     handleMarkupBox(
         AsyncRenderComet
           .asyncRender(() => renderer(placeholderId))
-          .map { _ =>
+          .map  _ =>
             ("^ [id]" #> placeholderId).apply(
-                placeholderTemplate or {
-                  for {
+                placeholderTemplate or
+                  for
                     templatePath <- S.attr("template")
                     renderedTemplate <- S.eval(
                         <lift:embed what={templatePath} />)
-                  } yield {
+                  yield
                     renderedTemplate
-                  }
-                } openOr {
+                openOr
                   <div><img src="/images/ajax-loader.gif" alt="Loading"/></div>
-                }
             )
-          }
       )
-  }
 
   /**
     * Enclose your snippet like this:
@@ -107,22 +102,17 @@ object LazyLoad extends DispatchSnippet {
     * provide a `placeholderTemplate` that is a `NodeSeq` that should be used
     * while the async rendering takes place.
     */
-  def render(xhtml: NodeSeq, placeholderTemplate: Box[NodeSeq]): NodeSeq = {
+  def render(xhtml: NodeSeq, placeholderTemplate: Box[NodeSeq]): NodeSeq =
     render(Replace(_, xhtml), placeholderTemplate)
-  }
 
-  def render(xhtml: NodeSeq): NodeSeq = {
+  def render(xhtml: NodeSeq): NodeSeq =
     render(xhtml, Empty)
-  }
 
   // Helper to deal with Boxed markup.
-  private def handleMarkupBox(markup: Box[NodeSeq]): NodeSeq = {
-    markup match {
+  private def handleMarkupBox(markup: Box[NodeSeq]): NodeSeq =
+    markup match
       case Full(html) => html
       case Failure(msg, _, _) => Comment(msg)
       case Empty =>
         Comment(
             "FIX" + "ME: Asynchronous rendering failed for unknown reason.")
-    }
-  }
-}

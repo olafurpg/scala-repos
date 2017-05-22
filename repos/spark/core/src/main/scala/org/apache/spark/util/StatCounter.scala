@@ -25,7 +25,7 @@ package org.apache.spark.util
   *
   * @constructor Initialize the StatCounter with the given values.
   */
-class StatCounter(values: TraversableOnce[Double]) extends Serializable {
+class StatCounter(values: TraversableOnce[Double]) extends Serializable
   private var n: Long = 0 // Running count of our values
   private var mu: Double = 0 // Running mean of our values
   private var m2: Double =
@@ -41,7 +41,7 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   def this() = this(Nil)
 
   /** Add a value into this StatCounter, updating the internal statistics. */
-  def merge(value: Double): StatCounter = {
+  def merge(value: Double): StatCounter =
     val delta = value - mu
     n += 1
     mu += delta / n
@@ -49,45 +49,39 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
     maxValue = math.max(maxValue, value)
     minValue = math.min(minValue, value)
     this
-  }
 
   /** Add multiple values into this StatCounter, updating the internal statistics. */
-  def merge(values: TraversableOnce[Double]): StatCounter = {
+  def merge(values: TraversableOnce[Double]): StatCounter =
     values.foreach(v => merge(v))
     this
-  }
 
   /** Merge another StatCounter into this one, adding up the internal statistics. */
-  def merge(other: StatCounter): StatCounter = {
-    if (other == this) {
+  def merge(other: StatCounter): StatCounter =
+    if (other == this)
       merge(other.copy()) // Avoid overwriting fields in a weird order
-    } else {
-      if (n == 0) {
+    else
+      if (n == 0)
         mu = other.mu
         m2 = other.m2
         n = other.n
         maxValue = other.maxValue
         minValue = other.minValue
-      } else if (other.n != 0) {
+      else if (other.n != 0)
         val delta = other.mu - mu
-        if (other.n * 10 < n) {
+        if (other.n * 10 < n)
           mu = mu + (delta * other.n) / (n + other.n)
-        } else if (n * 10 < other.n) {
+        else if (n * 10 < other.n)
           mu = other.mu - (delta * n) / (n + other.n)
-        } else {
+        else
           mu = (mu * n + other.mu * other.n) / (n + other.n)
-        }
         m2 += other.m2 + (delta * delta * n * other.n) / (n + other.n)
         n += other.n
         maxValue = math.max(maxValue, other.maxValue)
         minValue = math.min(minValue, other.minValue)
-      }
       this
-    }
-  }
 
   /** Clone this StatCounter */
-  def copy(): StatCounter = {
+  def copy(): StatCounter =
     val other = new StatCounter
     other.n = n
     other.mu = mu
@@ -95,7 +89,6 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
     other.maxValue = maxValue
     other.minValue = minValue
     other
-  }
 
   def count: Long = n
 
@@ -108,25 +101,21 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
   def min: Double = minValue
 
   /** Return the variance of the values. */
-  def variance: Double = {
-    if (n == 0) {
+  def variance: Double =
+    if (n == 0)
       Double.NaN
-    } else {
+    else
       m2 / n
-    }
-  }
 
   /**
     * Return the sample variance, which corrects for bias in estimating the variance by dividing
     * by N-1 instead of N.
     */
-  def sampleVariance: Double = {
-    if (n <= 1) {
+  def sampleVariance: Double =
+    if (n <= 1)
       Double.NaN
-    } else {
+    else
       m2 / (n - 1)
-    }
-  }
 
   /** Return the standard deviation of the values. */
   def stdev: Double = math.sqrt(variance)
@@ -137,13 +126,11 @@ class StatCounter(values: TraversableOnce[Double]) extends Serializable {
     */
   def sampleStdev: Double = math.sqrt(sampleVariance)
 
-  override def toString: String = {
+  override def toString: String =
     "(count: %d, mean: %f, stdev: %f, max: %f, min: %f)".format(
         count, mean, stdev, max, min)
-  }
-}
 
-object StatCounter {
+object StatCounter
 
   /** Build a StatCounter from a list of values. */
   def apply(values: TraversableOnce[Double]): StatCounter =
@@ -151,4 +138,3 @@ object StatCounter {
 
   /** Build a StatCounter from a list of values passed as variable-length arguments. */
   def apply(values: Double*): StatCounter = new StatCounter(values)
-}

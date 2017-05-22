@@ -17,7 +17,7 @@
 
 package org.apache.spark.deploy.master
 
-private[deploy] object DriverState extends Enumeration {
+private[deploy] object DriverState extends Enumeration
 
   type DriverState = Value
 
@@ -31,4 +31,3 @@ private[deploy] object DriverState extends Enumeration {
   // ERROR: Unable to run or restart due to an unrecoverable error (e.g. missing jar file)
   val SUBMITTED, RUNNING, FINISHED, RELAUNCHING, UNKNOWN, KILLED, FAILED,
   ERROR = Value
-}

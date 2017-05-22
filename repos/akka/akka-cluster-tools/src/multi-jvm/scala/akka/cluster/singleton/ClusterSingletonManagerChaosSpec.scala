@@ -26,7 +26,7 @@ import akka.testkit.TestEvent._
 import akka.actor.Terminated
 import akka.actor.ActorSelection
 
-object ClusterSingletonManagerChaosSpec extends MultiNodeConfig {
+object ClusterSingletonManagerChaosSpec extends MultiNodeConfig
   val controller = role("controller")
   val first = role("first")
   val second = role("second")
@@ -47,14 +47,11 @@ object ClusterSingletonManagerChaosSpec extends MultiNodeConfig {
   /**
     * The singleton actor
     */
-  class Echo(testActor: ActorRef) extends Actor {
+  class Echo(testActor: ActorRef) extends Actor
     testActor ! EchoStarted
 
-    def receive = {
+    def receive =
       case _ ⇒ sender() ! self
-    }
-  }
-}
 
 class ClusterSingletonManagerChaosMultiJvmNode1
     extends ClusterSingletonManagerChaosSpec
@@ -73,65 +70,55 @@ class ClusterSingletonManagerChaosMultiJvmNode7
 
 class ClusterSingletonManagerChaosSpec
     extends MultiNodeSpec(ClusterSingletonManagerChaosSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
   import ClusterSingletonManagerChaosSpec._
 
   override def initialParticipants = roles.size
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       Cluster(system) join node(to).address
       createSingleton()
-    }
-  }
 
-  def createSingleton(): ActorRef = {
+  def createSingleton(): ActorRef =
     system.actorOf(ClusterSingletonManager.props(
                        singletonProps = Props(classOf[Echo], testActor),
                        terminationMessage = PoisonPill,
                        settings = ClusterSingletonManagerSettings(system)),
                    name = "echo")
-  }
 
-  def crash(roles: RoleName*): Unit = {
-    runOn(controller) {
-      roles foreach { r ⇒
+  def crash(roles: RoleName*): Unit =
+    runOn(controller)
+      roles foreach  r ⇒
         log.info("Shutdown [{}]", node(r).address)
         testConductor.exit(r, 0).await
-      }
-    }
-  }
 
   def echo(oldest: RoleName): ActorSelection =
     system.actorSelection(
         RootActorPath(node(oldest).address) / "user" / "echo" / "singleton")
 
-  def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit = {
-    runOn(nodes.filterNot(_ == nodes.head): _*) {
+  def awaitMemberUp(memberProbe: TestProbe, nodes: RoleName*): Unit =
+    runOn(nodes.filterNot(_ == nodes.head): _*)
       memberProbe.expectMsgType[MemberUp](15.seconds).member.address should ===(
           node(nodes.head).address)
-    }
-    runOn(nodes.head) {
+    runOn(nodes.head)
       memberProbe
         .receiveN(nodes.size, 15.seconds)
         .collect { case MemberUp(m) ⇒ m.address }
         .toSet should ===(nodes.map(node(_).address).toSet)
-    }
     enterBarrier(nodes.head.name + "-up")
-  }
 
-  "A ClusterSingletonManager in chaotic cluster" must {
+  "A ClusterSingletonManager in chaotic cluster" must
 
-    "startup 6 node cluster" in within(60 seconds) {
+    "startup 6 node cluster" in within(60 seconds)
       val memberProbe = TestProbe()
       Cluster(system).subscribe(memberProbe.ref, classOf[MemberUp])
       memberProbe.expectMsgClass(classOf[CurrentClusterState])
 
       join(first, first)
       awaitMemberUp(memberProbe, first)
-      runOn(first) {
+      runOn(first)
         expectMsg(EchoStarted)
-      }
       enterBarrier("first-started")
 
       join(second, first)
@@ -149,16 +136,14 @@ class ClusterSingletonManagerChaosSpec
       join(sixth, first)
       awaitMemberUp(memberProbe, sixth, fifth, fourth, third, second, first)
 
-      runOn(controller) {
+      runOn(controller)
         echo(first) ! "hello"
         expectMsgType[ActorRef](3.seconds).path.address should ===(
             node(first).address)
-      }
       enterBarrier("first-verified")
-    }
 
     "take over when three oldest nodes crash in 6 nodes cluster" in within(
-        90 seconds) {
+        90 seconds)
       // mute logging of deadLetters during shutdown of systems
       if (!log.isDebugEnabled)
         system.eventStream.publish(Mute(DeadLettersFilter[Any]))
@@ -166,17 +151,12 @@ class ClusterSingletonManagerChaosSpec
 
       crash(first, second, third)
       enterBarrier("after-crash")
-      runOn(fourth) {
+      runOn(fourth)
         expectMsg(EchoStarted)
-      }
       enterBarrier("fourth-active")
 
-      runOn(controller) {
+      runOn(controller)
         echo(fourth) ! "hello"
         expectMsgType[ActorRef](3.seconds).path.address should ===(
             node(fourth).address)
-      }
       enterBarrier("fourth-verified")
-    }
-  }
-}

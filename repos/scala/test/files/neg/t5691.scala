@@ -1,4 +1,4 @@
-class B {
+class B
 
   type T = Int
   trait D
@@ -10,10 +10,9 @@ class B {
   type MySeq[D] = Seq[D]
 
   // class parameter shadows some other type
-  class Foo[T](t: T) {
+  class Foo[T](t: T)
     // a type parameter shadows another type parameter
     def bar[T](w: T) = w.toString
-  }
 
   // even deeply nested...
   class C[M[List[_]]]
@@ -24,4 +23,3 @@ class B {
   class F[A, M[L[A]]] // no warning!
   type G[A, M[L[A]]] = Int // no warning!
   def bar[A, N[M[L[A]]]] = ??? // no warning!
-}

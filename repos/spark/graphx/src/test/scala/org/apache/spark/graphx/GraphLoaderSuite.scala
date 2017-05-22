@@ -25,24 +25,20 @@ import java.nio.charset.StandardCharsets
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.util.Utils
 
-class GraphLoaderSuite extends SparkFunSuite with LocalSparkContext {
+class GraphLoaderSuite extends SparkFunSuite with LocalSparkContext
 
-  test("GraphLoader.edgeListFile") {
-    withSpark { sc =>
+  test("GraphLoader.edgeListFile")
+    withSpark  sc =>
       val tmpDir = Utils.createTempDir()
       val graphFile = new File(tmpDir.getAbsolutePath, "graph.txt")
       val writer = new OutputStreamWriter(new FileOutputStream(graphFile),
                                           StandardCharsets.UTF_8)
       for (i <- (1 until 101)) writer.write(s"$i 0\n")
       writer.close()
-      try {
+      try
         val graph = GraphLoader.edgeListFile(sc, tmpDir.getAbsolutePath)
         val neighborAttrSums = graph.aggregateMessages[Int](
             ctx => ctx.sendToDst(ctx.srcAttr), _ + _)
         assert(neighborAttrSums.collect.toSet === Set((0: VertexId, 100)))
-      } finally {
+      finally
         Utils.deleteRecursively(tmpDir)
-      }
-    }
-  }
-}

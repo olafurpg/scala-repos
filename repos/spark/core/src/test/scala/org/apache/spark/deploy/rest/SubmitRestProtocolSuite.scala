@@ -27,9 +27,9 @@ import org.apache.spark.util.Utils
 /**
   * Tests for the REST application submission protocol.
   */
-class SubmitRestProtocolSuite extends SparkFunSuite {
+class SubmitRestProtocolSuite extends SparkFunSuite
 
-  test("validate") {
+  test("validate")
     val request = new DummyRequest
     intercept[SubmitRestProtocolException] { request.validate() } // missing everything
     request.clientSparkVersion = "1.2.3"
@@ -47,9 +47,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     intercept[SubmitRestProtocolException] { request.validate() } // missing only name
     request.message = "not-setting-name"
     intercept[SubmitRestProtocolException] { request.validate() } // still missing name
-  }
 
-  test("request to and from JSON") {
+  test("request to and from JSON")
     val request = new DummyRequest
     intercept[SubmitRestProtocolException] { request.toJson } // implicit validation
     request.clientSparkVersion = "1.2.3"
@@ -66,9 +65,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newRequest.age === 25)
     assert(newRequest.name === "jung")
     assert(newRequest.message === null)
-  }
 
-  test("response to and from JSON") {
+  test("response to and from JSON")
     val response = new DummyResponse
     response.serverSparkVersion = "3.3.4"
     response.success = true
@@ -80,9 +78,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newResponse.serverSparkVersion === "3.3.4")
     assert(newResponse.success)
     assert(newResponse.message === null)
-  }
 
-  test("CreateSubmissionRequest") {
+  test("CreateSubmissionRequest")
     val message = new CreateSubmissionRequest
     intercept[SubmitRestProtocolException] { message.validate() }
     message.clientSparkVersion = "1.2.3"
@@ -145,9 +142,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newMessage.appArgs === message.appArgs)
     assert(newMessage.sparkProperties === message.sparkProperties)
     assert(newMessage.environmentVariables === message.environmentVariables)
-  }
 
-  test("CreateSubmissionResponse") {
+  test("CreateSubmissionResponse")
     val message = new CreateSubmissionResponse
     intercept[SubmitRestProtocolException] { message.validate() }
     message.serverSparkVersion = "1.2.3"
@@ -162,9 +158,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newMessage.serverSparkVersion === "1.2.3")
     assert(newMessage.submissionId === "driver_123")
     assert(newMessage.success)
-  }
 
-  test("KillSubmissionResponse") {
+  test("KillSubmissionResponse")
     val message = new KillSubmissionResponse
     intercept[SubmitRestProtocolException] { message.validate() }
     message.serverSparkVersion = "1.2.3"
@@ -179,9 +174,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newMessage.serverSparkVersion === "1.2.3")
     assert(newMessage.submissionId === "driver_123")
     assert(newMessage.success)
-  }
 
-  test("SubmissionStatusResponse") {
+  test("SubmissionStatusResponse")
     val message = new SubmissionStatusResponse
     intercept[SubmitRestProtocolException] { message.validate() }
     message.serverSparkVersion = "1.2.3"
@@ -203,9 +197,8 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(newMessage.success)
     assert(newMessage.workerId === "worker_123")
     assert(newMessage.workerHostPort === "1.2.3.4:7780")
-  }
 
-  test("ErrorResponse") {
+  test("ErrorResponse")
     val message = new ErrorResponse
     intercept[SubmitRestProtocolException] { message.validate() }
     message.serverSparkVersion = "1.2.3"
@@ -218,7 +211,6 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
       SubmitRestProtocolMessage.fromJson(json, classOf[ErrorResponse])
     assert(newMessage.serverSparkVersion === "1.2.3")
     assert(newMessage.message === "Field not found in submit request: X")
-  }
 
   private val dummyRequestJson = """
       |{
@@ -307,7 +299,7 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
 
   /** Assert that the contents in the two JSON strings are equal after ignoring whitespace. */
   private def assertJsonEquals(
-      jsonString1: String, jsonString2: String): Unit = {
+      jsonString1: String, jsonString2: String): Unit =
     val trimmedJson1 = jsonString1.trim
     val trimmedJson2 = jsonString2.trim
     val json1 = compact(render(parse(trimmedJson1)))
@@ -317,18 +309,14 @@ class SubmitRestProtocolSuite extends SparkFunSuite {
     assert(
         equals,
         "\"[%s]\" did not equal \"[%s]\"".format(trimmedJson1, trimmedJson2))
-  }
-}
 
 private class DummyResponse extends SubmitRestProtocolResponse
-private class DummyRequest extends SubmitRestProtocolRequest {
+private class DummyRequest extends SubmitRestProtocolRequest
   var active: Boolean = null
   var age: Integer = null
   var name: String = null
-  protected override def doValidate(): Unit = {
+  protected override def doValidate(): Unit =
     super.doValidate()
     assertFieldIsSet(name, "name")
     assertFieldIsSet(age, "age")
     assert(age > 5, "Not old enough!")
-  }
-}

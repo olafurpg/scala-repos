@@ -35,44 +35,39 @@ import org.streum.configrity.Configuration
 
 import scalaz._
 
-object GridFSFileStorage {
+object GridFSFileStorage
   val MaxChunkSize = 10 * 1024 * 1024
 
   private val ServerAndPortPattern = "(.+):(.+)".r
 
-  def apply[M[+ _]: Monad](config: Configuration): GridFSFileStorage[M] = {
+  def apply[M[+ _]: Monad](config: Configuration): GridFSFileStorage[M] =
 
     // Shamefully ripped off from BlueEyes.
 
     val servers =
-      config[List[String]]("servers").toList map {
+      config[List[String]]("servers").toList map
         case ServerAndPortPattern(host, port) =>
           new ServerAddress(host.trim(), port.trim().toInt)
         case server => new ServerAddress(server, ServerAddress.defaultPort())
-      }
 
-    val mongo = servers match {
+    val mongo = servers match
       case x :: Nil => new com.mongodb.Mongo(x)
       case x :: xs => new com.mongodb.Mongo(servers.asJava)
       case Nil =>
         sys.error(
             """MongoServers are not configured. Configure the value 'servers'. Format is '["host1:port1", "host2:port2", ...]'""")
-    }
 
     apply(mongo.getDB(config[String]("database")))
-  }
 
-  def apply[M[+ _]](db: DB)(implicit M0: Monad[M]) = new GridFSFileStorage[M] {
+  def apply[M[+ _]](db: DB)(implicit M0: Monad[M]) = new GridFSFileStorage[M]
     val M = M0
     val gridFS = new GridFS(db)
-  }
-}
 
 /**
   * A `FileStorage` implementation that uses Mongo's GridFS to store and
   * retrieve files.
   */
-trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
+trait GridFSFileStorage[M[+ _]] extends FileStorage[M]
   import GridFSFileStorage._
   import scalaz.syntax.monad._
 
@@ -80,59 +75,49 @@ trait GridFSFileStorage[M[+ _]] extends FileStorage[M] {
 
   def gridFS: GridFS
 
-  def exists(file: String): M[Boolean] = M.point {
+  def exists(file: String): M[Boolean] = M.point
     gridFS.findOne(file) != null
-  }
 
   def save(file: String, data: FileData[M]): M[Unit] =
-    M.point {
+    M.point
       gridFS.remove(file) // Ugly hack to get around Mongo not respecting new content-type.
       val inFile = gridFS.createFile(file)
-      data.mimeType foreach { contentType =>
+      data.mimeType foreach  contentType =>
         inFile.setContentType(contentType.toString)
-      }
       inFile.getOutputStream()
-    } flatMap { out =>
-      def save(data: StreamT[M, Array[Byte]]): M[Unit] = data.uncons flatMap {
+    flatMap  out =>
+      def save(data: StreamT[M, Array[Byte]]): M[Unit] = data.uncons flatMap
         case Some((bytes, tail)) =>
           out.write(bytes)
           save(tail)
 
         case None =>
           M.point { out.close() }
-      }
 
       save(data.data)
-    }
 
-  def load(filename: String): M[Option[FileData[M]]] = M.point {
-    Option(gridFS.findOne(filename)) map { file =>
+  def load(filename: String): M[Option[FileData[M]]] = M.point
+    Option(gridFS.findOne(filename)) map  file =>
       val idealChunkSize = file.getChunkSize
       val chunkSize =
         if (idealChunkSize > MaxChunkSize) MaxChunkSize
         else idealChunkSize.toInt
       val mimeType =
-        Option(file.getContentType) flatMap { ct =>
+        Option(file.getContentType) flatMap  ct =>
           MimeTypes.parseMimeTypes(ct).headOption
-        }
       val in0 = file.getInputStream()
 
-      FileData(mimeType, StreamT.unfoldM[M, Array[Byte], InputStream](in0) {
+      FileData(mimeType, StreamT.unfoldM[M, Array[Byte], InputStream](in0)
         in =>
-          M.point {
+          M.point
             val buffer = new Array[Byte](chunkSize)
             val len = in.read(buffer)
-            if (len < 0) {
+            if (len < 0)
               None
-            } else if (len < buffer.length) {
+            else if (len < buffer.length)
               Some((java.util.Arrays.copyOf(buffer, len), in))
-            } else {
+            else
               Some((buffer, in))
-            }
-          }
-      })
-    }
-  }
+      )
 
   def remove(file: String): M[Unit] = M.point(gridFS.remove(file))
-}

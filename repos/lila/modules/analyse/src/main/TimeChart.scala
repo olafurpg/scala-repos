@@ -7,20 +7,18 @@ import play.api.libs.json.Json
 
 import lila.game.{Game, Namer}
 
-final class TimeChart(game: Game, moves: List[String]) {
+final class TimeChart(game: Game, moves: List[String])
 
   private val pgnMoves = moves.toIndexedSeq
 
-  def series = (moves.size > 3) option {
-    Json stringify {
+  def series = (moves.size > 3) option
+    Json stringify
       Json.obj(
           "white" -> points(true),
           "black" -> points(false)
       )
-    }
-  }
 
-  private def points(white: Boolean) = indexedMoveTimes collect {
+  private def points(white: Boolean) = indexedMoveTimes collect
     case (m, ply) if (white ^ (ply % 2 == 1)) =>
       val index = (ply - game.startedAtTurn)
       val mt = if (m < 0.5) 0 else m
@@ -32,15 +30,11 @@ final class TimeChart(game: Game, moves: List[String]) {
           "x" -> index,
           "y" -> (if (white) mt else -mt)
       )
-  }
 
-  def maxTime = moveTimes.foldLeft(0f) {
+  def maxTime = moveTimes.foldLeft(0f)
     case (x, y) => if (y > x) y else x
-  }
 
   private val moveTimes = game.moveTimesInSeconds
   private val indexedMoveTimes =
-    game.moveTimesInSeconds.zipWithIndex map {
+    game.moveTimesInSeconds.zipWithIndex map
       case (mt, i) => (mt, i + game.startedAtTurn)
-    }
-}

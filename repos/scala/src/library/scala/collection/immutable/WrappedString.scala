@@ -31,7 +31,7 @@ import mutable.{Builder, StringBuilder}
     "Inherit from StringLike instead of WrappedString.", "2.11.0")
 class WrappedString(val self: String)
     extends AbstractSeq[Char] with IndexedSeq[Char]
-    with StringLike[WrappedString] {
+    with StringLike[WrappedString]
 
   override protected[this] def thisCollection: WrappedString = this
   override protected[this] def toCollection(
@@ -40,28 +40,24 @@ class WrappedString(val self: String)
   /** Creates a string builder buffer as builder for this class */
   override protected[this] def newBuilder = WrappedString.newBuilder
 
-  override def slice(from: Int, until: Int): WrappedString = {
+  override def slice(from: Int, until: Int): WrappedString =
     val start = if (from < 0) 0 else from
     if (until <= start || start >= repr.length) return new WrappedString("")
 
     val end = if (until > length) length else until
     new WrappedString(repr.substring(start, end))
-  }
   override def length = self.length
   override def toString = self
-}
 
 /** A companion object for wrapped strings.
   *
   *  @since 2.8
   */
-object WrappedString {
+object WrappedString
   implicit def canBuildFrom: CanBuildFrom[WrappedString, Char, WrappedString] =
-    new CanBuildFrom[WrappedString, Char, WrappedString] {
+    new CanBuildFrom[WrappedString, Char, WrappedString]
       def apply(from: WrappedString) = newBuilder
       def apply() = newBuilder
-    }
 
   def newBuilder: Builder[Char, WrappedString] =
     StringBuilder.newBuilder mapResult (x => new WrappedString(x))
-}

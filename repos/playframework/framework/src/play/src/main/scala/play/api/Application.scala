@@ -40,7 +40,7 @@ import scala.reflect.ClassTag
   */
 @implicitNotFound(
     msg = "You do not have an implicit Application in scope. If you want to bring the current running Application into context, please use dependency injection.")
-trait Application {
+trait Application
 
   /**
     * The absolute path hosting this application, mainly used by the `getFile(path)` helper method
@@ -89,14 +89,12 @@ trait Application {
     */
   @deprecated(
       "Either use HttpRequestHandler, or have the router injected", "2.4.0")
-  def routes: Router = {
+  def routes: Router =
     // Use a cached value because the injector might be slow
     if (cachedRoutes != null) cachedRoutes
-    else {
+    else
       cachedRoutes = injector.instanceOf[Router]
       cachedRoutes
-    }
-  }
 
   /**
     * The HTTP request handler
@@ -156,10 +154,9 @@ trait Application {
     * @param name the absolute name of the resource (from the classpath root)
     * @return the resource URL, if found
     */
-  def resource(name: String): Option[java.net.URL] = {
+  def resource(name: String): Option[java.net.URL] =
     val n = name.stripPrefix("/")
     Option(classloader.getResource(n))
-  }
 
   /**
     * Scans the application classloader to retrieve a resource’s contents as a stream.
@@ -175,10 +172,9 @@ trait Application {
     * @param name the absolute name of the resource (from the classpath root)
     * @return a stream, if found
     */
-  def resourceAsStream(name: String): Option[InputStream] = {
+  def resourceAsStream(name: String): Option[InputStream] =
     val n = name.stripPrefix("/")
     Option(classloader.getResourceAsStream(n))
-  }
 
   /**
     * Stop the application.  The returned future will be redeemed when all stop hooks have been run.
@@ -191,9 +187,8 @@ trait Application {
     * @return The injector.
     */
   def injector: Injector = NewInstanceInjector
-}
 
-object Application {
+object Application
 
   /**
     * Creates a function that caches results of calls to
@@ -219,7 +214,6 @@ object Application {
     */
   def instanceCache[T : ClassTag]: Application => T =
     new InlineCache((app: Application) => app.injector.instanceOf[T])
-}
 
 class OptionalSourceMapper(val sourceMapper: Option[SourceMapper])
 
@@ -233,7 +227,7 @@ class DefaultApplication @Inject()(
     override val errorHandler: HttpErrorHandler,
     override val actorSystem: ActorSystem,
     override val materializer: Materializer)
-    extends Application {
+    extends Application
 
   def path = environment.rootPath
 
@@ -242,12 +236,11 @@ class DefaultApplication @Inject()(
   def mode = environment.mode
 
   def stop() = applicationLifecycle.stop()
-}
 
 /**
   * Helper to provide the Play built in components.
   */
-trait BuiltInComponents {
+trait BuiltInComponents
   def environment: Environment
   def sourceMapper: Option[SourceMapper]
   def webCommands: WebCommands
@@ -302,4 +295,3 @@ trait BuiltInComponents {
 
   lazy val tempFileCreator: TemporaryFileCreator =
     new DefaultTemporaryFileCreator(applicationLifecycle)
-}

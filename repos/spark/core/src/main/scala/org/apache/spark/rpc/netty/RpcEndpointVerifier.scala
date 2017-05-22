@@ -26,18 +26,15 @@ import org.apache.spark.rpc.{RpcCallContext, RpcEndpoint, RpcEnv}
   */
 private[netty] class RpcEndpointVerifier(
     override val rpcEnv: RpcEnv, dispatcher: Dispatcher)
-    extends RpcEndpoint {
+    extends RpcEndpoint
 
   override def receiveAndReply(
-      context: RpcCallContext): PartialFunction[Any, Unit] = {
+      context: RpcCallContext): PartialFunction[Any, Unit] =
     case RpcEndpointVerifier.CheckExistence(name) =>
       context.reply(dispatcher.verify(name))
-  }
-}
 
-private[netty] object RpcEndpointVerifier {
+private[netty] object RpcEndpointVerifier
   val NAME = "endpoint-verifier"
 
   /** A message used to ask the remote [[RpcEndpointVerifier]] if an [[RpcEndpoint]] exists. */
   case class CheckExistence(name: String)
-}

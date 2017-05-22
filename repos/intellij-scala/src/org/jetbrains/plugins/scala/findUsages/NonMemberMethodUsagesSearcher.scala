@@ -14,21 +14,16 @@ import org.jetbrains.annotations.NotNull
   */
 class NonMemberMethodUsagesSearcher
     extends QueryExecutorBase[
-        PsiReference, MethodReferencesSearch.SearchParameters] {
+        PsiReference, MethodReferencesSearch.SearchParameters]
   def processQuery(@NotNull p: MethodReferencesSearch.SearchParameters,
-                   @NotNull consumer: Processor[PsiReference]) {
-    extensions.inReadAction {
+                   @NotNull consumer: Processor[PsiReference])
+    extensions.inReadAction
       val method: PsiMethod = p.getMethod
       val collector: SearchRequestCollector = p.getOptimizer
       val searchScope: SearchScope = p.getEffectiveSearchScope
-      val newConsumer = new Processor[PsiReference] {
-        def process(t: PsiReference): Boolean = {
+      val newConsumer = new Processor[PsiReference]
+        def process(t: PsiReference): Boolean =
           if (method.isConstructor) return true
           consumer.process(t)
-        }
-      }
       ReferencesSearch.searchOptimized(
           method, searchScope, false, collector, newConsumer)
-    }
-  }
-}

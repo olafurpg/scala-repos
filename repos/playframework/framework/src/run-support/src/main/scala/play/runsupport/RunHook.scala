@@ -11,7 +11,7 @@ import scala.util.control.NonFatal
   * The represents an object which "hooks into" play run, and is used to
   * apply startup/cleanup actions around a play application.
   */
-trait RunHook {
+trait RunHook
 
   /**
     * Called before the play application is started,
@@ -35,7 +35,6 @@ trait RunHook {
     * Useful to implement to clean up any open resources for this hook.
     */
   def onError(): Unit = ()
-}
 
 case class RunHookCompositeThrowable(val throwables: Set[Throwable])
     extends Exception(
@@ -45,40 +44,33 @@ case class RunHookCompositeThrowable(val throwables: Set[Throwable])
           .mkString("\n\n")
       )
 
-object RunHook {
+object RunHook
 
   // A bit of a magic hack to clean up the PlayRun file
-  implicit class RunHooksRunner(val hooks: Seq[RunHook]) extends AnyVal {
+  implicit class RunHooksRunner(val hooks: Seq[RunHook]) extends AnyVal
 
     /**
       * Runs all the hooks in the sequence of hooks.
       * Reports last failure if any have failure.
       */
     def run(f: RunHook => Unit, suppressFailure: Boolean = false): Unit =
-      try {
+      try
 
         val failures: LinkedHashMap[RunHook, Throwable] = LinkedHashMap.empty
 
-        hooks foreach { hook =>
-          try {
+        hooks foreach  hook =>
+          try
             f(hook)
-          } catch {
+          catch
             case NonFatal(e) =>
               failures += hook -> e
-          }
-        }
 
         // Throw failure if it occurred....
-        if (!suppressFailure && failures.nonEmpty) {
-          if (failures.size == 1) {
+        if (!suppressFailure && failures.nonEmpty)
+          if (failures.size == 1)
             throw failures.values.head
-          } else {
+          else
             throw RunHookCompositeThrowable(failures.values.toSet)
-          }
-        }
-      } catch {
+      catch
         case NonFatal(e) if suppressFailure =>
         // Ignoring failure in running hooks... (CCE thrown here)
-      }
-  }
-}

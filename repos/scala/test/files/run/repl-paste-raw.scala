@@ -1,6 +1,6 @@
 import scala.tools.partest.SessionTest
 
-object Test extends SessionTest {
+object Test extends SessionTest
   def session =
     s"""|
     |scala> :paste -raw $pastie
@@ -14,4 +14,3 @@ object Test extends SessionTest {
     |
     |scala> :quit"""
   def pastie = testPath changeExtension "pastie"
-}

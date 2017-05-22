@@ -18,7 +18,7 @@ package org.saddle
 /**
   * Additional utilities that need a home
   */
-package object util {
+package object util
 
   /**
     * Creates a string out of ''count'' number of elements extracted from ''total'' elements
@@ -32,28 +32,23 @@ package object util {
   def buildStr(count: Int,
                total: Int,
                callback: Int => String,
-               break: => String = " ... "): String = {
+               break: => String = " ... "): String =
     var i = 0
     val buf = new StringBuilder()
-    if (total <= count) {
-      while (i < total) {
+    if (total <= count)
+      while (i < total)
         buf.append(callback(i))
         i += 1
-      }
-    } else {
-      while (i < count / 2) {
+    else
+      while (i < count / 2)
         buf.append(callback(i))
         i += 1
-      }
       buf append break
       i = total - count / 2
-      while (i < total) {
+      while (i < total)
         buf.append(callback(i))
         i += 1
-      }
-    }
     buf.toString()
-  }
 
   /**
     * Takes n elements from the front and from the back of array
@@ -61,4 +56,3 @@ package object util {
     * @param n Number of elements to take
     */
   def grab[T](arr: Seq[T], n: Int): Seq[T] = arr.take(n) ++ arr.takeRight(n)
-}

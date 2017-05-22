@@ -22,7 +22,7 @@ package breeze.stats.distributions
   * @author dlwh
   */
 trait HasConjugatePrior[Likelihood <: Density[T], T]
-    extends ExponentialFamily[Likelihood, T] {
+    extends ExponentialFamily[Likelihood, T]
 
   type ConjugatePrior <: Density[Parameter]
   val conjugateFamily: ExponentialFamily[ConjugatePrior, Parameter]
@@ -37,4 +37,3 @@ trait HasConjugatePrior[Likelihood <: Density[T], T]
     */
   def posterior(prior: conjugateFamily.Parameter,
                 evidence: TraversableOnce[T]): conjugateFamily.Parameter
-}

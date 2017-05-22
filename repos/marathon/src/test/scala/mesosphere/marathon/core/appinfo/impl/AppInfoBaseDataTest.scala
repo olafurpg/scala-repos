@@ -18,10 +18,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class AppInfoBaseDataTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
   import mesosphere.FutureTestSupport._
 
-  class Fixture {
+  class Fixture
     lazy val clock = ConstantClock()
     lazy val taskTracker = mock[TaskTracker]
     lazy val healthCheckManager = mock[HealthCheckManager]
@@ -36,18 +36,16 @@ class AppInfoBaseDataTest
         taskFailureRepository
     )
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(taskTracker)
       noMoreInteractions(healthCheckManager)
       noMoreInteractions(marathonSchedulerService)
       noMoreInteractions(taskFailureRepository)
-    }
-  }
 
   val app = AppDefinition(PathId("/test"))
   val other = AppDefinition(PathId("/other"))
 
-  test("not embedding anything results in no calls") {
+  test("not embedding anything results in no calls")
     val f = new Fixture
 
     When("getting AppInfos without embeds")
@@ -58,9 +56,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting tasks retrieves tasks from taskTracker and health infos") {
+  test("requesting tasks retrieves tasks from taskTracker and health infos")
     val f = new Fixture
     Given("three tasks in the task tracker")
     val running1 = MarathonTestHelper.runningTask("task1")
@@ -111,10 +108,9 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
   test(
-      "requesting task counts only retrieves tasks from taskTracker and health stats") {
+      "requesting task counts only retrieves tasks from taskTracker and health stats")
     val f = new Fixture
     Given("one staged and two running tasks in the taskTracker")
     val staged = MarathonTestHelper.stagedTaskProto("task1")
@@ -158,9 +154,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting deployments does not request anything else") {
+  test("requesting deployments does not request anything else")
     val f = new Fixture
     Given("One related and one unrelated deployment")
     val emptyGroup = Group.empty
@@ -193,9 +188,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting deployments does work if no deployments are running") {
+  test("requesting deployments does work if no deployments are running")
     val f = new Fixture
     Given("No deployments")
     f.marathonSchedulerService.listRunningDeployments() returns Future
@@ -219,9 +213,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting lastTaskFailure when one exists") {
+  test("requesting lastTaskFailure when one exists")
     val f = new Fixture
     Given("One last taskFailure")
     f.taskFailureRepository.current(app.id) returns Future.successful(
@@ -244,9 +237,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting lastTaskFailure when None exist") {
+  test("requesting lastTaskFailure when None exist")
     val f = new Fixture
     Given("no taskFailure")
     f.taskFailureRepository.current(app.id) returns Future.successful(None)
@@ -264,9 +256,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("requesting taskStats") {
+  test("requesting taskStats")
     val f = new Fixture
     Given("one staged and two running tasks in the taskTracker")
     val staged = MarathonTestHelper.stagedTask(
@@ -299,7 +290,7 @@ class AppInfoBaseDataTest
     // we check the calculation of the stats in TaskStatsByVersionTest, so we only check some basic stats
 
     import mesosphere.marathon.api.v2.json.Formats._
-    withClue(Json.prettyPrint(Json.toJson(appInfo))) {
+    withClue(Json.prettyPrint(Json.toJson(appInfo)))
       appInfo.maybeTaskStats should not be empty
       appInfo.maybeTaskStats.get.maybeTotalSummary should not be empty
       appInfo.maybeTaskStats.get.maybeTotalSummary.get.counts.tasksStaged should be(
@@ -312,7 +303,6 @@ class AppInfoBaseDataTest
               maybeTaskStats = Some(TaskStatsByVersion(
                         f.clock.now(), app.versionInfo, tasks, statuses))
           ))
-    }
 
     And("the taskTracker should have been called")
     verify(f.taskTracker, times(1)).tasksByApp()(global)
@@ -322,9 +312,8 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("Combining embed options work") {
+  test("Combining embed options work")
     val f = new Fixture
     Given("One last taskFailure and no deployments")
     f.taskFailureRepository.current(app.id) returns Future.successful(
@@ -356,5 +345,3 @@ class AppInfoBaseDataTest
 
     And("we have no more interactions")
     f.verifyNoMoreInteractions()
-  }
-}

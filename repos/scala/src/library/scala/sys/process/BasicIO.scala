@@ -28,7 +28,7 @@ import scala.annotation.tailrec
   * It is used by other classes in the package in the implementation of various
   * features, but can also be used by client code.
   */
-object BasicIO {
+object BasicIO
 
   /** Size of the buffer used in all the functions that copy data */
   final val BufferSize = 8192
@@ -42,25 +42,21 @@ object BasicIO {
       val stream: () => Stream[T]
   )
 
-  private[process] object Streamed {
-    def apply[T](nonzeroException: Boolean): Streamed[T] = {
+  private[process] object Streamed
+    def apply[T](nonzeroException: Boolean): Streamed[T] =
       val q = new LinkedBlockingQueue[Either[Int, T]]
-      def next(): Stream[T] = q.take match {
+      def next(): Stream[T] = q.take match
         case Left(0) => Stream.empty
         case Left(code) =>
           if (nonzeroException) scala.sys.error("Nonzero exit code: " + code)
           else Stream.empty
         case Right(s) => Stream.cons(s, next())
-      }
       new Streamed(
           (s: T) => q put Right(s), code => q put Left(code), () => next())
-    }
-  }
 
-  private[process] trait Uncloseable extends Closeable {
+  private[process] trait Uncloseable extends Closeable
     final override def close() {}
-  }
-  private[process] object Uncloseable {
+  private[process] object Uncloseable
     def apply(in: InputStream): InputStream =
       new FilterInputStream(in) with Uncloseable {}
     def apply(out: OutputStream): OutputStream =
@@ -69,7 +65,6 @@ object BasicIO {
       if (in eq stdin) Uncloseable(in) else in
     def protect(out: OutputStream): OutputStream =
       if ((out eq stdout) || (out eq stderr)) Uncloseable(out) else out
-  }
 
   /** Creates a `ProcessIO` from a function `String => Unit`. It can attach the
     * process input to stdin, and it will either send the error stream to
@@ -137,10 +132,9 @@ object BasicIO {
     *          [[scala.sys.process.ProcessIO]]) which will send the data to
     *          either the provided `ProcessLogger` or, if `None`, to stderr.
     */
-  def getErr(log: Option[ProcessLogger]) = log match {
+  def getErr(log: Option[ProcessLogger]) = log match
     case Some(lg) => processErrFully(lg)
     case None => toStdErr
-  }
 
   private def processErrFully(log: ProcessLogger) = processFully(log err _)
   private def processOutFully(log: ProcessLogger) = processFully(log out _)
@@ -173,31 +167,25 @@ object BasicIO {
     */
   def processFully(processLine: String => Unit): InputStream => Unit =
     in =>
-      {
         val reader = new BufferedReader(new InputStreamReader(in))
         try processLinesFully(processLine)(reader.readLine) finally reader
           .close()
-    }
 
   /** Calls `processLine` with the result of `readLine` until the latter returns
     *  `null` or the current thread is interrupted.
     */
-  def processLinesFully(processLine: String => Unit)(readLine: () => String) {
+  def processLinesFully(processLine: String => Unit)(readLine: () => String)
     def working = (Thread.currentThread.isInterrupted == false)
     def halting = { Thread.currentThread.interrupt(); null }
     def readFully(): Unit =
-      if (working) {
-        val line = try readLine() catch {
+      if (working)
+        val line = try readLine() catch
           case _: InterruptedException => halting
           case e: IOException if !working => halting
-        }
-        if (line != null) {
+        if (line != null)
           processLine(line)
           readFully()
-        }
-      }
     readFully()
-  }
 
   /** Copy contents of stdin to the `OutputStream`. */
   def connectToIn(o: OutputStream): Unit =
@@ -207,10 +195,9 @@ object BasicIO {
     * from stdin or does nothing. This function can be used by
     * [[scala.sys.process.ProcessIO]].
     */
-  def input(connect: Boolean): OutputStream => Unit = { outputToProcess =>
+  def input(connect: Boolean): OutputStream => Unit =  outputToProcess =>
     if (connect) connectToIn(outputToProcess)
     outputToProcess.close()
-  }
 
   /** Returns a `ProcessIO` connected to stdout and stderr, and, optionally, stdin. */
   def standard(connectInput: Boolean): ProcessIO =
@@ -238,26 +225,19 @@ object BasicIO {
 
   private[this] def appendLine(buffer: Appendable): String => Unit =
     line =>
-      {
         buffer append line
         buffer append Newline
-    }
 
-  private[this] def transferFullyImpl(in: InputStream, out: OutputStream) {
+  private[this] def transferFullyImpl(in: InputStream, out: OutputStream)
     val buffer = new Array[Byte](BufferSize)
     @tailrec
-    def loop() {
+    def loop()
       val byteCount = in.read(buffer)
-      if (byteCount > 0) {
+      if (byteCount > 0)
         out.write(buffer, 0, byteCount)
         // flush() will throw an exception once the process has terminated
-        val available = try { out.flush(); true } catch {
+        val available = try { out.flush(); true } catch
           case _: IOException => false
-        }
         if (available) loop()
-      }
-    }
     loop()
     in.close()
-  }
-}

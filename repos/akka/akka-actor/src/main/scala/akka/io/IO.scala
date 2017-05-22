@@ -10,11 +10,10 @@ import akka.actor._
   *
   * @see <a href="http://doc.akka.io/">the Akka online documentation</a>
   */
-object IO {
+object IO
 
-  trait Extension extends akka.actor.Extension {
+  trait Extension extends akka.actor.Extension
     def manager: ActorRef
-  }
 
   /**
     * Scala API: obtain a reference to the manager actor for the given IO extension,
@@ -24,4 +23,3 @@ object IO {
     */
   def apply[T <: Extension](key: ExtensionId[T])(
       implicit system: ActorSystem): ActorRef = key(system).manager
-}

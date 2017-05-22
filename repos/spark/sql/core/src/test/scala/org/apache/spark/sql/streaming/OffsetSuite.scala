@@ -20,11 +20,11 @@ package org.apache.spark.sql.streaming
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, Offset}
 
-trait OffsetSuite extends SparkFunSuite {
+trait OffsetSuite extends SparkFunSuite
 
   /** Creates test to check all the comparisons of offsets given a `one` that is less than `two`. */
-  def compare(one: Offset, two: Offset): Unit = {
-    test(s"comparison $one <=> $two") {
+  def compare(one: Offset, two: Offset): Unit =
+    test(s"comparison $one <=> $two")
       assert(one < two)
       assert(one <= two)
       assert(one <= one)
@@ -35,43 +35,33 @@ trait OffsetSuite extends SparkFunSuite {
       assert(two == two)
       assert(one != two)
       assert(two != one)
-    }
-  }
 
   /** Creates test to check that non-equality comparisons throw exception. */
-  def compareInvalid(one: Offset, two: Offset): Unit = {
-    test(s"invalid comparison $one <=> $two") {
-      intercept[IllegalArgumentException] {
+  def compareInvalid(one: Offset, two: Offset): Unit =
+    test(s"invalid comparison $one <=> $two")
+      intercept[IllegalArgumentException]
         assert(one < two)
-      }
 
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         assert(one <= two)
-      }
 
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         assert(one > two)
-      }
 
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         assert(one >= two)
-      }
 
       assert(!(one == two))
       assert(!(two == one))
       assert(one != two)
       assert(two != one)
-    }
-  }
-}
 
-class LongOffsetSuite extends OffsetSuite {
+class LongOffsetSuite extends OffsetSuite
   val one = LongOffset(1)
   val two = LongOffset(2)
   compare(one, two)
-}
 
-class CompositeOffsetSuite extends OffsetSuite {
+class CompositeOffsetSuite extends OffsetSuite
   compare(one = CompositeOffset(Some(LongOffset(1)) :: Nil),
           two = CompositeOffset(Some(LongOffset(2)) :: Nil))
 
@@ -91,4 +81,3 @@ class CompositeOffsetSuite extends OffsetSuite {
   compareInvalid(
       one = CompositeOffset.fill(LongOffset(2), LongOffset(1)), // vector time inconsistent
       two = CompositeOffset.fill(LongOffset(1), LongOffset(2)))
-}

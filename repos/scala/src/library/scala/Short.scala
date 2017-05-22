@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Short]] => [[scala.runtime.RichShort]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Short private extends AnyVal {
+final abstract class Short private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -520,9 +520,8 @@ final abstract class Short private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Short] = null
-}
 
-object Short extends AnyValCompanion {
+object Short extends AnyValCompanion
 
   /** The smallest value representable as a Short. */
   final val MinValue = java.lang.Short.MIN_VALUE
@@ -561,4 +560,3 @@ object Short extends AnyValCompanion {
   implicit def short2long(x: Short): Long = x.toLong
   implicit def short2float(x: Short): Float = x.toFloat
   implicit def short2double(x: Short): Double = x.toDouble
-}

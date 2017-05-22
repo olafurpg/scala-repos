@@ -11,22 +11,18 @@ import lila.socket._
 import lila.socket.actorApi.SendToFlag
 
 private[site] final class Socket(timeout: Duration)
-    extends SocketActor[Member](timeout) {
+    extends SocketActor[Member](timeout)
 
   override val startsOnApplicationBoot = true
 
-  def receiveSpecific = {
+  def receiveSpecific =
 
-    case Join(uid, username, tags) => {
+    case Join(uid, username, tags) =>
         val (enumerator, channel) = Concurrent.broadcast[JsValue]
         val member = Member(channel, username, tags)
         addMember(uid, member)
         sender ! Connected(enumerator, member)
-      }
 
     case SendToFlag(flag, message) =>
-      members.values filter (_ hasFlag flag) foreach {
+      members.values filter (_ hasFlag flag) foreach
         _.channel push message
-      }
-  }
-}

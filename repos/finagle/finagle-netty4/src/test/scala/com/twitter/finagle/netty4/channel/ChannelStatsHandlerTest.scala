@@ -15,8 +15,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
-  def mkAttr[T](initial: T): Attribute[T] = new Attribute[T] {
+class ChannelStatsHandlerTest extends FunSuite with MockitoSugar
+  def mkAttr[T](initial: T): Attribute[T] = new Attribute[T]
     var _v = initial
     def set(value: T): Unit = _v = value
     def key(): AttributeKey[T] = ???
@@ -26,9 +26,8 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
     def compareAndSet(oldValue: T, newValue: T): Boolean = ???
     def setIfAbsent(value: T): T = ???
     def getAndSet(value: T): T = ???
-  }
 
-  trait SocketTest {
+  trait SocketTest
     val chan = mock[Channel]
     val ctx = mock[ChannelHandlerContext]
 
@@ -38,16 +37,14 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
       .thenReturn(mkAttr(true))
     when(ctx.attr(ChannelStatsHandler.ChannelWritableDurationKey))
       .thenReturn(mkAttr(Stopwatch.start()))
-  }
 
-  trait InMemoryStatsTest extends SocketTest {
+  trait InMemoryStatsTest extends SocketTest
     val sr = new InMemoryStatsReceiver()
     val handler = new ChannelStatsHandler(sr)
-  }
 
-  test("counters are collected correctly") {
-    Time.withCurrentTimeFrozen { control =>
-      new InMemoryStatsTest {
+  test("counters are collected correctly")
+    Time.withCurrentTimeFrozen  control =>
+      new InMemoryStatsTest
         control.advance(5.minutes)
         handler.channelWritabilityChanged(ctx)
         assert(sr.counters(Seq("socket_writable_ms")) == 5.minutes.inMillis)
@@ -60,21 +57,17 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
         handler.channelWritabilityChanged(ctx)
         assert(sr.counters(Seq("socket_writable_ms")) == 25.minutes.inMillis)
         assert(sr.counters(Seq("socket_unwritable_ms")) == 10.minutes.inMillis)
-      }
-    }
-  }
 
-  trait TestContext {
+  trait TestContext
     val sr = new InMemoryStatsReceiver
     val handler = new ChannelStatsHandler(sr)
     val ctx = mock[ChannelHandlerContext]
     val bytesWritten = new AtomicLong(0)
     val bytesReceived = new AtomicLong(0)
 
-    def resetConnection(): Unit = {
+    def resetConnection(): Unit =
       bytesReceived.set(0)
       bytesWritten.set(0)
-    }
 
     val start = Time.now
     val statsAttr = mock[Attribute[ChannelStats]]
@@ -90,15 +83,13 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
       .thenReturn(mkAttr(true))
     when(ctx.attr(ChannelStatsHandler.ChannelWritableDurationKey))
       .thenReturn(mkAttr(Stopwatch.start()))
-  }
 
-  test("ChannelStatsHandler counts connections") {
+  test("ChannelStatsHandler counts connections")
     val c = new TestContext {}
     import c._
 
-    def connectionCountEquals(sr: InMemoryStatsReceiver, num: Float) {
+    def connectionCountEquals(sr: InMemoryStatsReceiver, num: Float)
       assert(sr.gauges(Seq("connections"))() == num)
-    }
 
     connectionCountEquals(sr, 0)
 
@@ -113,19 +104,17 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
 
     handler.channelInactive(ctx)
     connectionCountEquals(sr, 0)
-  }
 
   def channelLifeCycleTest(
       counterName: String,
       f: (ChannelDuplexHandler, ChannelHandlerContext) => Unit
-  ) = test(s"ChannelStatsHandler counts $counterName") {
+  ) = test(s"ChannelStatsHandler counts $counterName")
     val tc = new TestContext {}
     import tc._
 
     assert(!sr.counters.contains(Seq(counterName)))
     f(handler, ctx)
     assert(sr.counters(Seq(counterName)) == 1)
-  }
 
   channelLifeCycleTest(
       "closes",
@@ -142,8 +131,8 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
       (handler, ctx) => handler.channelActive(ctx)
   )
 
-  test("ChannelStatsHandler records connection duration") {
-    Time.withCurrentTimeFrozen { control =>
+  test("ChannelStatsHandler records connection duration")
+    Time.withCurrentTimeFrozen  control =>
       val tc = new TestContext {}
       import tc._
       handler.channelActive(ctx)
@@ -154,10 +143,8 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
       control.advance(Duration.fromMilliseconds(200))
       handler.channelInactive(ctx)
       assert(sr.stat("connection_duration")() == Seq(100.0, 300.0))
-    }
-  }
 
-  test("ChannelStatsHandler counts exceptions") {
+  test("ChannelStatsHandler counts exceptions")
     val tc = new TestContext {}
     import tc._
 
@@ -168,9 +155,8 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
     assert(sr.counters(Seq("exn", "java.lang.Exception")) == 1)
     assert(
         sr.counters(Seq("exn", "java.util.concurrent.TimeoutException")) == 1)
-  }
 
-  test("ChannelStatsHandler counts sent and received bytes") {
+  test("ChannelStatsHandler counts sent and received bytes")
     val tc = new TestContext {}
     import tc._
 
@@ -194,5 +180,3 @@ class ChannelStatsHandlerTest extends FunSuite with MockitoSugar {
     assert(bytesReceived.get == 123)
     assert(sr.stat("connection_received_bytes")() == Seq(0.0, 123.0))
     assert(sr.stat("connection_sent_bytes")() == Seq(42.0, 0.0))
-  }
-}

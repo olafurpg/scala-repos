@@ -27,9 +27,9 @@ import org.apache.spark.sql.catalyst.plans.{Inner, PlanTest}
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 
-class JoinOptimizationSuite extends PlanTest {
+class JoinOptimizationSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("Subqueries", Once, EliminateSubqueryAliases) :: Batch(
           "Filter Pushdown",
@@ -43,20 +43,18 @@ class JoinOptimizationSuite extends PlanTest {
           PushPredicateThroughAggregate,
           ColumnPruning,
           CollapseProject) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
   val testRelation1 = LocalRelation('d.int)
 
-  test("extract filters and joins") {
+  test("extract filters and joins")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
     val z = testRelation.subquery('z)
 
     def testExtract(plan: LogicalPlan,
-                    expected: Option[(Seq[LogicalPlan], Seq[Expression])]) {
+                    expected: Option[(Seq[LogicalPlan], Seq[Expression])])
       assert(ExtractFiltersAndInnerJoins.unapply(plan) === expected)
-    }
 
     testExtract(x, None)
     testExtract(x.where("x.b".attr === 1), None)
@@ -71,18 +69,16 @@ class JoinOptimizationSuite extends PlanTest {
     testExtract(x.join(y).join(x.join(z)), Some(Seq(x, y, x.join(z)), Seq()))
     testExtract(x.join(y).join(x.join(z)).where("x.b".attr === "y.d".attr),
                 Some(Seq(x, y, x.join(z)), Seq("x.b".attr === "y.d".attr)))
-  }
 
-  test("reorder inner joins") {
+  test("reorder inner joins")
     val x = testRelation.subquery('x)
     val y = testRelation1.subquery('y)
     val z = testRelation.subquery('z)
 
-    val originalQuery = {
+    val originalQuery =
       x.join(y)
         .join(z)
         .where(("x.b".attr === "z.b".attr) && ("y.d".attr === "z.a".attr))
-    }
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer = x
@@ -91,9 +87,8 @@ class JoinOptimizationSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, analysis.EliminateSubqueryAliases(correctAnswer))
-  }
 
-  test("broadcasthint sets relation statistics to smallest value") {
+  test("broadcasthint sets relation statistics to smallest value")
     val input = LocalRelation('key.int, 'value.string)
 
     val query = Project(Seq($"x.key", $"y.key"),
@@ -112,9 +107,6 @@ class JoinOptimizationSuite extends PlanTest {
 
     comparePlans(optimized, expected)
 
-    val broadcastChildren = optimized.collect {
+    val broadcastChildren = optimized.collect
       case Join(_, r, _, _) if r.statistics.sizeInBytes == 1 => r
-    }
     assert(broadcastChildren.size == 1)
-  }
-}

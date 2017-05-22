@@ -10,7 +10,7 @@ import scala.collection._
   *  - A `Universer` provides a `Universe` data structure representing the interfaces and comments of the documented
   *    program.
   * To implement this class only requires defining method `generateImpl`. */
-abstract class Generator {
+abstract class Generator
 
   /** A series of tests that must be true before generation can be done. This is used by data provider traits to
     * confirm that they have been correctly initialised before allowing generation to proceed. */
@@ -18,14 +18,12 @@ abstract class Generator {
     mutable.Set.empty[() => Boolean]
 
   /** Outputs documentation (as a side effect). */
-  def generate(): Unit = {
+  def generate(): Unit =
     assert(
-        checks forall { check =>
+        checks forall  check =>
       check()
-    })
+    )
     generateImpl()
-  }
 
   /** Outputs documentation (as a side effect). This method is called only if all `checks` are true. */
   protected def generateImpl(): Unit
-}

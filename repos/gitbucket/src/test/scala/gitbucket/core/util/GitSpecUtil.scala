@@ -14,47 +14,40 @@ import org.eclipse.jgit.errors._
 import java.nio.file._
 import java.io.File
 
-object GitSpecUtil {
-  def withTestFolder[U](f: File => U): U = {
+object GitSpecUtil
+  def withTestFolder[U](f: File => U): U =
     val folder = new File(
         System.getProperty("java.io.tmpdir"), "test-" + System.nanoTime)
-    if (!folder.mkdirs()) {
+    if (!folder.mkdirs())
       throw new java.io.IOException(
           "can't create folder " + folder.getAbsolutePath)
-    }
-    try {
+    try
       f(folder)
-    } finally {
+    finally
       FileUtils.deleteQuietly(folder)
-    }
-  }
   def withTestRepository[U](f: Git => U): U =
     withTestFolder(folder => using(Git.open(createTestRepository(folder)))(f))
-  def createTestRepository(dir: File): File = {
+  def createTestRepository(dir: File): File =
     RepositoryCache.clear()
     FileUtils.deleteQuietly(dir)
     Files.createDirectories(dir.toPath())
     JGitUtil.initRepository(dir)
     dir
-  }
   def createFile(git: Git,
                  branch: String,
                  name: String,
                  content: String,
                  autorName: String = "dummy",
                  autorEmail: String = "dummy@example.com",
-                 message: String = "test commit") {
+                 message: String = "test commit")
     val builder = DirCache.newInCore.builder()
     val inserter = git.getRepository.newObjectInserter()
     val headId = git.getRepository.resolve(branch + "^{commit}")
-    if (headId != null) {
-      JGitUtil.processTree(git, headId) { (path, tree) =>
-        if (name != path) {
+    if (headId != null)
+      JGitUtil.processTree(git, headId)  (path, tree) =>
+        if (name != path)
           builder.add(JGitUtil.createDirCacheEntry(
                   path, tree.getEntryFileMode, tree.getEntryObjectId))
-        }
-      }
-    }
     builder.add(
         JGitUtil.createDirCacheEntry(
             name,
@@ -71,37 +64,31 @@ object GitSpecUtil {
                              message)
     inserter.flush()
     inserter.close()
-  }
-  def getFile(git: Git, branch: String, path: String) = {
+  def getFile(git: Git, branch: String, path: String) =
     val revCommit =
       JGitUtil.getRevCommitFromId(git, git.getRepository.resolve(branch))
-    val objectId = using(new TreeWalk(git.getRepository)) { walk =>
+    val objectId = using(new TreeWalk(git.getRepository))  walk =>
       walk.addTree(revCommit.getTree)
       walk.setRecursive(true)
       @scala.annotation.tailrec
-      def _getPathObjectId: ObjectId = walk.next match {
+      def _getPathObjectId: ObjectId = walk.next match
         case true if (walk.getPathString == path) => walk.getObjectId(0)
         case true => _getPathObjectId
         case false => throw new Exception(s"not found ${branch} / ${path}")
-      }
       _getPathObjectId
-    }
     JGitUtil.getContentInfo(git, path, objectId)
-  }
   def mergeAndCommit(
-      git: Git, into: String, branch: String, message: String = null): Unit = {
+      git: Git, into: String, branch: String, message: String = null): Unit =
     val repository = git.getRepository
     val merger = MergeStrategy.RECURSIVE.newMerger(repository, true)
     val mergeBaseTip = repository.resolve(into)
     val mergeTip = repository.resolve(branch)
-    val conflicted = try {
+    val conflicted = try
       !merger.merge(mergeBaseTip, mergeTip)
-    } catch {
+    catch
       case e: NoMergeBaseException => true
-    }
-    if (conflicted) {
+    if (conflicted)
       throw new RuntimeException("conflict!")
-    }
     val mergeTipCommit =
       using(new RevWalk(repository))(_.parseCommit(mergeTip))
     val committer = mergeTipCommit.getCommitterIdent;
@@ -123,5 +110,3 @@ object GitSpecUtil {
     refUpdate.setForceUpdate(true)
     refUpdate.setRefLogIdent(committer)
     refUpdate.update()
-  }
-}

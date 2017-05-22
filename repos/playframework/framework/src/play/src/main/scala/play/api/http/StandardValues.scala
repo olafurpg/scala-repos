@@ -9,7 +9,7 @@ package play.api.http
 object ContentTypes extends ContentTypes
 
 /** Defines common HTTP Content-Type header values, according to the current available Codec. */
-trait ContentTypes {
+trait ContentTypes
 
   import play.api.mvc.Codec
 
@@ -68,7 +68,6 @@ trait ContentTypes {
     */
   def withCharset(mimeType: String)(implicit codec: Codec) =
     s"$mimeType; charset=${codec.charset}"
-}
 
 /**
   * Standard HTTP Verbs
@@ -78,7 +77,7 @@ object HttpVerbs extends HttpVerbs
 /**
   * Standard HTTP Verbs
   */
-trait HttpVerbs {
+trait HttpVerbs
   val GET = "GET"
   val POST = "POST"
   val PUT = "PUT"
@@ -86,13 +85,12 @@ trait HttpVerbs {
   val DELETE = "DELETE"
   val HEAD = "HEAD"
   val OPTIONS = "OPTIONS"
-}
 
 /** Common HTTP MIME types */
 object MimeTypes extends MimeTypes
 
 /** Common HTTP MIME types */
-trait MimeTypes {
+trait MimeTypes
 
   /**
     * Content-Type of text.
@@ -143,7 +141,6 @@ trait MimeTypes {
     * Content-Type of application cache.
     */
   val CACHE_MANIFEST = "text/cache-manifest"
-}
 
 /**
   * Defines all standard HTTP Status.
@@ -153,7 +150,7 @@ object Status extends Status
 /**
   * Defines all standard HTTP status codes.
   */
-trait Status {
+trait Status
 
   val CONTINUE = 100
   val SWITCHING_PROTOCOLS = 101
@@ -209,13 +206,12 @@ trait Status {
   val GATEWAY_TIMEOUT = 504
   val HTTP_VERSION_NOT_SUPPORTED = 505
   val INSUFFICIENT_STORAGE = 507
-}
 
 /** Defines all standard HTTP headers. */
 object HeaderNames extends HeaderNames
 
 /** Defines all standard HTTP headers. */
-trait HeaderNames {
+trait HeaderNames
 
   val ACCEPT = "Accept"
   val ACCEPT_CHARSET = "Accept-Charset"
@@ -304,7 +300,6 @@ trait HeaderNames {
   val ORIGIN = "Origin"
   val ACCESS_CONTROL_REQUEST_METHOD = "Access-Control-Request-Method"
   val ACCESS_CONTROL_REQUEST_HEADERS = "Access-Control-Request-Headers"
-}
 
 /**
   * Defines HTTP protocol constants
@@ -314,11 +309,10 @@ object HttpProtocol extends HttpProtocol
 /**
   * Defines HTTP protocol constants
   */
-trait HttpProtocol {
+trait HttpProtocol
   // Versions
   val HTTP_1_0 = "HTTP/1.0"
   val HTTP_1_1 = "HTTP/1.1"
 
   // Other HTTP protocol values
   val CHUNKED = "chunked"
-}

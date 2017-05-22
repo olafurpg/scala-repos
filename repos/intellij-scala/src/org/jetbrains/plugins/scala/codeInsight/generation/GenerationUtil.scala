@@ -18,7 +18,7 @@ import scala.collection.mutable.ListBuffer
   * Nikolay.Tropin
   * 8/19/13
   */
-object GenerationUtil {
+object GenerationUtil
   def classOrTraitAtCaret(
       editor: Editor, file: PsiFile): Option[ScTemplateDefinition] =
     elementOfTypeAtCaret(editor, file, classOf[ScClass], classOf[ScTrait])
@@ -26,33 +26,29 @@ object GenerationUtil {
   def classAtCaret(editor: Editor, file: PsiFile): Option[ScClass] =
     elementOfTypeAtCaret(editor, file, classOf[ScClass])
 
-  def findAnchor(aClass: PsiClass): Option[PsiElement] = aClass match {
+  def findAnchor(aClass: PsiClass): Option[PsiElement] = aClass match
     case cl: ScTemplateDefinition =>
-      cl.extendsBlock match {
+      cl.extendsBlock match
         case ScExtendsBlock.TemplateBody(body) => body.lastChild
         case _ => None
-      }
     case _ => None
-  }
 
   def addMembers(aClass: ScTemplateDefinition,
                  members: Seq[ScMember],
                  document: Document,
-                 anchor: Option[PsiElement] = None): Unit = {
+                 anchor: Option[PsiElement] = None): Unit =
     val addedMembers = ListBuffer[PsiElement]()
     val psiDocManager = PsiDocumentManager.getInstance(aClass.getProject)
-    for {
+    for
       anch <- anchor orElse findAnchor(aClass)
       parent <- Option(anch.getParent)
-    } {
-      members.foldLeft(anch) { (anchor, member) =>
+    
+      members.foldLeft(anch)  (anchor, member) =>
         val added = parent.addBefore(member, anchor)
         addedMembers += added
         added
-      }
-    }
 
-    if (addedMembers.nonEmpty) {
+    if (addedMembers.nonEmpty)
       psiDocManager.doPostponedOperationsAndUnblockDocument(document)
       val styleManager = CodeStyleManager.getInstance(aClass.getProject)
       val ranges = addedMembers.map(_.getTextRange)
@@ -60,58 +56,46 @@ object GenerationUtil {
       val maxOffset = ranges.map(_.getEndOffset).max
       val minLine = document.getLineNumber(minOffset)
       val maxLine = document.getLineNumber(maxOffset)
-      for {
+      for
         file <- aClass.containingFile
         line <- minLine to maxLine
-      } {
+      
         psiDocManager.commitDocument(document)
         styleManager.adjustLineIndent(file, document.getLineStartOffset(line))
-      }
-    }
-  }
 
-  def isVar(elem: ScNamedElement) = ScalaPsiUtil.nameContext(elem) match {
+  def isVar(elem: ScNamedElement) = ScalaPsiUtil.nameContext(elem) match
     case _: ScVariable => true
     case param: ScClassParameter if param.isVar => true
     case _ => false
-  }
 
-  def getAllFields(aClass: PsiClass): Seq[ScNamedElement] = {
-    val memberProcessor: (ScMember) => Seq[ScNamedElement] = {
+  def getAllFields(aClass: PsiClass): Seq[ScNamedElement] =
+    val memberProcessor: (ScMember) => Seq[ScNamedElement] =
       case classParam: ScClassParameter
           if classParam.isVal || classParam.isVar =>
         Seq(classParam)
       case value: ScValue => value.declaredElements
       case variable: ScVariable => variable.declaredElements
       case _ => Seq.empty
-    }
 
     allMembers(aClass).flatMap(memberProcessor)
-  }
 
-  def getAllParameterlessMethods(aClass: PsiClass): Seq[ScNamedElement] = {
-    val memberProcessor: (ScMember) => Seq[ScNamedElement] = {
+  def getAllParameterlessMethods(aClass: PsiClass): Seq[ScNamedElement] =
+    val memberProcessor: (ScMember) => Seq[ScNamedElement] =
       case method: ScFunction if method.parameters.isEmpty =>
         method.declaredElements
       case _ => Seq.empty
-    }
 
     allMembers(aClass).flatMap(memberProcessor)
-  }
 
   def elementOfTypeAtCaret[T <: PsiElement](
-      editor: Editor, file: PsiFile, types: Class[_ <: T]*): Option[T] = {
+      editor: Editor, file: PsiFile, types: Class[_ <: T]*): Option[T] =
     val elem = file.findElementAt(editor.getCaretModel.getOffset)
     Option(PsiTreeUtil.getParentOfType(elem, types: _*))
-  }
 
-  private def allMembers(aClass: PsiClass): Seq[ScMember] = {
-    aClass match {
+  private def allMembers(aClass: PsiClass): Seq[ScMember] =
+    aClass match
       case scClass: ScClass =>
         scClass.members ++ scClass.constructor.toSeq.flatMap(_.parameters)
       case scObject: ScObject => scObject.members
       case scTrait: ScTrait => scTrait.members
       case _ => Seq.empty
-    }
-  }
-}

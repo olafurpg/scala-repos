@@ -23,7 +23,7 @@ import scala.compat.java8.OptionConverters._
 /**
   * Common base class of HttpRequest and HttpResponse.
   */
-sealed trait HttpMessage extends jm.HttpMessage {
+sealed trait HttpMessage extends jm.HttpMessage
   type Self <: HttpMessage
   def self: Self
 
@@ -52,13 +52,11 @@ sealed trait HttpMessage extends jm.HttpMessage {
     * exist (by case-insensitive header name) in this message.
     */
   def withDefaultHeaders(defaultHeaders: immutable.Seq[HttpHeader]): Self =
-    withHeaders {
+    withHeaders
       if (headers.isEmpty) defaultHeaders
       else
-        defaultHeaders.foldLeft(headers) { (acc, h) ⇒
+        defaultHeaders.foldLeft(headers)  (acc, h) ⇒
           if (headers.exists(_ is h.lowercaseName)) acc else h +: acc
-        }
-    }
 
   /** Returns a copy of this message with the entity set to the given one. */
   def withEntity(entity: MessageEntity): Self
@@ -81,16 +79,14 @@ sealed trait HttpMessage extends jm.HttpMessage {
     * The content encoding as specified by the Content-Encoding header. If no Content-Encoding header is present the
     * default value 'identity' is returned.
     */
-  def encoding: HttpEncoding = header[`Content-Encoding`] match {
+  def encoding: HttpEncoding = header[`Content-Encoding`] match
     case Some(x) ⇒ x.encodings.head
     case None ⇒ HttpEncodings.identity
-  }
 
   /** Returns the first header of the given type if there is one */
-  def header[T <: jm.HttpHeader : ClassTag]: Option[T] = {
+  def header[T <: jm.HttpHeader : ClassTag]: Option[T] =
     val erasure = classTag[T].runtimeClass
     headers.find(erasure.isInstance).asInstanceOf[Option[T]]
-  }
 
   /**
     * Returns true if this message is an:
@@ -104,10 +100,9 @@ sealed trait HttpMessage extends jm.HttpMessage {
     mapHeaders(_ :+ header.asInstanceOf[HttpHeader])
 
   /** Removes the header with the given name (case-insensitive) */
-  def removeHeader(headerName: String): Self = {
+  def removeHeader(headerName: String): Self =
     val lowerHeaderName = headerName.toRootLowerCase
     mapHeaders(_.filterNot(_.is(lowerHeaderName)))
-  }
 
   def withEntity(string: String): Self = withEntity(HttpEntity(string))
   def withEntity(bytes: Array[Byte]): Self = withEntity(HttpEntity(bytes))
@@ -133,26 +128,22 @@ sealed trait HttpMessage extends jm.HttpMessage {
     header(ClassTag(headerClass)).asJava
 
   /** Java API */
-  def getHeader(headerName: String): Optional[jm.HttpHeader] = {
+  def getHeader(headerName: String): Optional[jm.HttpHeader] =
     val lowerCased = headerName.toRootLowerCase
     Util.convertOption(headers.find(_.is(lowerCased))) // Upcast because of invariance
-  }
 
   /** Java API */
   def addHeaders(headers: JIterable[jm.HttpHeader]): Self =
     mapHeaders(_ ++ headers.asScala.asInstanceOf[Iterable[HttpHeader]])
-}
 
-object HttpMessage {
+object HttpMessage
   private[http] def connectionCloseExpected(
       protocol: HttpProtocol, connectionHeader: Option[Connection]): Boolean =
-    protocol match {
+    protocol match
       case HttpProtocols.`HTTP/1.1` ⇒
         connectionHeader.isDefined && connectionHeader.get.hasClose
       case HttpProtocols.`HTTP/1.0` ⇒
         connectionHeader.isEmpty || !connectionHeader.get.hasKeepAlive
-    }
-}
 
 /**
   * The immutable model HTTP request model.
@@ -162,7 +153,7 @@ final class HttpRequest(val method: HttpMethod,
                         val headers: immutable.Seq[HttpHeader],
                         val entity: RequestEntity,
                         val protocol: HttpProtocol)
-    extends jm.HttpRequest with HttpMessage {
+    extends jm.HttpRequest with HttpMessage
 
   HttpRequest.verifyUri(uri)
   require(entity.isKnownEmpty || method.isEntityAccepted,
@@ -248,7 +239,7 @@ final class HttpRequest(val method: HttpMethod,
            protocol: HttpProtocol = protocol) =
     new HttpRequest(method, uri, headers, entity, protocol)
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     var result = HashCode.SEED
     result = HashCode.hash(result, _1)
     result = HashCode.hash(result, _2)
@@ -256,14 +247,12 @@ final class HttpRequest(val method: HttpMethod,
     result = HashCode.hash(result, _4)
     result = HashCode.hash(result, _5)
     result
-  }
 
-  override def equals(obj: scala.Any): Boolean = obj match {
+  override def equals(obj: scala.Any): Boolean = obj match
     case HttpRequest(_method, _uri, _headers, _entity, _protocol) =>
       method == _method && uri == _uri && headers == _headers &&
       entity == _entity && protocol == _protocol
     case _ => false
-  }
 
   override def toString = s"""HttpRequest(${_1},${_2},${_3},${_4},${_5})"""
 
@@ -273,9 +262,8 @@ final class HttpRequest(val method: HttpMethod,
   def _3 = headers
   def _4 = entity
   def _5 = protocol
-}
 
-object HttpRequest {
+object HttpRequest
 
   /**
     * Determines the effective request URI according to the logic defined at
@@ -287,13 +275,13 @@ object HttpRequest {
   def effectiveUri(uri: Uri,
                    headers: immutable.Seq[HttpHeader],
                    securedConnection: Boolean,
-                   defaultHostHeader: Host): Uri = {
+                   defaultHostHeader: Host): Uri =
     val hostHeader = headers.collectFirst { case x: Host ⇒ x }
-    if (uri.isRelative) {
+    if (uri.isRelative)
       def fail(detail: String) =
         throw IllegalUriException(
             s"Cannot establish effective URI of request to `$uri`, request has a relative URI and $detail")
-      val Host(host, port) = hostHeader match {
+      val Host(host, port) = hostHeader match
         case None ⇒
           if (defaultHostHeader.isEmpty) fail("is missing a `Host` header")
           else defaultHostHeader
@@ -301,9 +289,8 @@ object HttpRequest {
           if (defaultHostHeader.isEmpty) fail("an empty `Host` header")
           else defaultHostHeader
         case Some(x) ⇒ x
-      }
       uri.toEffectiveHttpRequestUri(host, port, securedConnection)
-    } else // http://tools.ietf.org/html/rfc7230#section-5.4
+    else // http://tools.ietf.org/html/rfc7230#section-5.4
     if (hostHeader.isEmpty || uri.authority.isEmpty &&
         hostHeader.get.isEmpty ||
         hostHeader.get.host.equalsIgnoreCase(uri.authority.host) &&
@@ -312,7 +299,6 @@ object HttpRequest {
       throw IllegalUriException(
           s"'Host' header value of request to `$uri` doesn't match request target authority",
           s"Host header: $hostHeader\nrequest target authority: ${uri.authority}")
-  }
 
   /**
     * Verifies that the given [[Uri]] is non-empty and has either scheme `http`, `https` or no scheme at all.
@@ -321,9 +307,9 @@ object HttpRequest {
   def verifyUri(uri: Uri): Unit =
     if (uri.isEmpty)
       throw new IllegalArgumentException("`uri` must not be empty")
-    else {
+    else
       def c(i: Int) = CharUtils.toLowerCase(uri.scheme charAt i)
-      uri.scheme.length match {
+      uri.scheme.length match
         case 0 ⇒ // ok
         case 4 if c(0) == 'h' && c(1) == 't' && c(2) == 't' && c(3) == 'p' ⇒
         // ok
@@ -333,8 +319,6 @@ object HttpRequest {
         case _ ⇒
           throw new IllegalArgumentException(
               """`uri` must have scheme "http", "https" or no scheme""")
-      }
-    }
 
   /* Manual Case Class things, to easen bin-compat */
 
@@ -346,7 +330,6 @@ object HttpRequest {
     new HttpRequest(method, uri, headers, entity, protocol)
 
   def unapply(any: HttpRequest) = new OptHttpRequest(any)
-}
 
 /**
   * The immutable HTTP response model.
@@ -355,7 +338,7 @@ final class HttpResponse(val status: StatusCode,
                          val headers: immutable.Seq[HttpHeader],
                          val entity: ResponseEntity,
                          val protocol: HttpProtocol)
-    extends jm.HttpResponse with HttpMessage {
+    extends jm.HttpResponse with HttpMessage
 
   require(entity.isKnownEmpty || status.allowsEntity,
           "Responses with this status code must have an empty entity")
@@ -406,21 +389,19 @@ final class HttpResponse(val status: StatusCode,
            protocol: HttpProtocol = protocol) =
     new HttpResponse(status, headers, entity, protocol)
 
-  override def equals(obj: scala.Any): Boolean = obj match {
+  override def equals(obj: scala.Any): Boolean = obj match
     case HttpResponse(_status, _headers, _entity, _protocol) =>
       status == _status && headers == _headers && entity == _entity &&
       protocol == _protocol
     case _ => false
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     var result = HashCode.SEED
     result = HashCode.hash(result, _1)
     result = HashCode.hash(result, _2)
     result = HashCode.hash(result, _3)
     result = HashCode.hash(result, _4)
     result
-  }
 
   override def toString = s"""HttpResponse(${_1},${_2},${_3},${_4})"""
 
@@ -429,9 +410,8 @@ final class HttpResponse(val status: StatusCode,
   def _2 = this.headers
   def _3 = this.entity
   def _4 = this.protocol
-}
 
-object HttpResponse {
+object HttpResponse
   /* Manual Case Class things, to easen bin-compat */
 
   def apply(status: StatusCode = StatusCodes.OK,
@@ -441,12 +421,9 @@ object HttpResponse {
     new HttpResponse(status, headers, entity, protocol)
 
   def unapply(any: HttpResponse): OptHttpResponse = new OptHttpResponse(any)
-}
 
-final class OptHttpRequest(val get: HttpRequest) extends AnyVal {
+final class OptHttpRequest(val get: HttpRequest) extends AnyVal
   def isEmpty: Boolean = get == null
-}
 
-final class OptHttpResponse(val get: HttpResponse) extends AnyVal {
+final class OptHttpResponse(val get: HttpResponse) extends AnyVal
   def isEmpty: Boolean = get == null
-}

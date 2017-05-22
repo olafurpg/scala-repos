@@ -21,8 +21,8 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class RankingMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
-  test("Ranking metrics: map, ndcg") {
+class RankingMetricsSuite extends SparkFunSuite with MLlibTestSparkContext
+  test("Ranking metrics: map, ndcg")
     val predictionAndLabels = sc.parallelize(
         Seq(
             (Array[Int](1, 6, 2, 7, 8, 3, 9, 10, 4, 5),
@@ -50,5 +50,3 @@ class RankingMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(metrics.ndcgAt(5) ~== 0.328788 absTol eps)
     assert(metrics.ndcgAt(10) ~== 0.487913 absTol eps)
     assert(metrics.ndcgAt(15) ~== metrics.ndcgAt(10) absTol eps)
-  }
-}

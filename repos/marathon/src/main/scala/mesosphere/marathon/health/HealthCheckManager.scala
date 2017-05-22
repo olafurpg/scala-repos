@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.Future
 import scala.collection.immutable.{Seq, Map}
 
-trait HealthCheckManager {
+trait HealthCheckManager
 
   protected[this] val log = LoggerFactory.getLogger(getClass.getName)
 
@@ -63,4 +63,3 @@ trait HealthCheckManager {
     * Returns the health status of all tasks of the supplied app.
     */
   def statuses(appId: PathId): Future[Map[Task.Id, Seq[Health]]]
-}

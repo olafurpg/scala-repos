@@ -19,16 +19,15 @@ class ExactBreakpointTest
 class ExactBreakpointTest_212
     extends ExactBreakpointTestBase with ScalaVersion_2_12
 
-abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
+abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase
 
-  case class Breakpoint(line: Int, ordinal: Integer) {
+  case class Breakpoint(line: Int, ordinal: Integer)
     override def toString: String = s"line = $line, ordinal=$ordinal"
-  }
 
   private def addBreakpoint(b: Breakpoint): Unit =
     addBreakpoint(b.line, mainFileName, b.ordinal)
 
-  protected def checkVariants(lineNumber: Int, variants: String*) = {
+  protected def checkVariants(lineNumber: Int, variants: String*) =
     val xSourcePosition = XDebuggerUtil
       .getInstance()
       .createPosition(getVirtualFile(getFileInSrc(mainFileName)), lineNumber)
@@ -38,26 +37,23 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       .map(_.getText)
     Assert.assertEquals(
         "Wrong set of variants found: ", variants, foundVariants)
-  }
 
   protected def checkStoppedAtBreakpointAt(breakpoints: Breakpoint*)(
-      sourcePositionText: String) = {
+      sourcePositionText: String) =
     checkStopResumeSeveralTimes(breakpoints: _*)(sourcePositionText)
-  }
 
   protected def checkStopResumeSeveralTimes(breakpoints: Breakpoint*)(
-      sourcePositions: String*) = {
-    def message(expected: String, actual: String) = {
+      sourcePositions: String*) =
+    def message(expected: String, actual: String) =
       s"Wrong source position. Expected: $expected, actual: $actual"
-    }
     clearBreakpoints()
     breakpoints.foreach(addBreakpoint)
-    runDebugger() {
-      for (expected <- sourcePositions) {
+    runDebugger()
+      for (expected <- sourcePositions)
         waitForBreakpoint()
-        managed {
+        managed
           val location = suspendContext.getFrameProxy.getStackFrame.location
-          inReadAction {
+          inReadAction
             val sourcePosition = ScalaPositionManager
               .instance(getDebugProcess)
               .get
@@ -65,14 +61,9 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
             val text: String = highlightedText(sourcePosition)
             Assert.assertTrue(message(expected, text),
                               text.startsWith(expected.stripSuffix("...")))
-          }
-        }
         resume()
-      }
-    }
-  }
 
-  private def highlightedText(sourcePosition: SourcePosition): String = {
+  private def highlightedText(sourcePosition: SourcePosition): String =
     val elemRange =
       SourcePositionHighlighter.getHighlightRangeFor(sourcePosition)
     val document = PsiDocumentManager
@@ -83,16 +74,13 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     val textRange =
       if (elemRange != null) elemRange.intersection(lineRange) else lineRange
     document.getText(textRange).trim
-  }
 
-  protected def checkNotStoppedAtBreakpointAt(breakpoint: Breakpoint) = {
+  protected def checkNotStoppedAtBreakpointAt(breakpoint: Breakpoint) =
     clearBreakpoints()
     addBreakpoint(breakpoint)
-    runDebugger() {
+    runDebugger()
       Assert.assertTrue(s"Stopped at breakpoint: $breakpoint",
                         processTerminatedNoBreakpoints())
-    }
-  }
 
   addSourceFile("OneLine.scala",
                 """object OneLine {
@@ -100,7 +88,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |    Seq(1).map(x => x + 1).filter(_ > 10).foreach(println)
       |  }
       |}""".stripMargin.trim)
-  def testOneLine(): Unit = {
+  def testOneLine(): Unit =
     checkVariants(lineNumber = 2,
                   "All",
                   "line in function main",
@@ -114,7 +102,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     checkStoppedAtBreakpointAt(Breakpoint(2, 0))("x => x + 1")
     checkStoppedAtBreakpointAt(Breakpoint(2, 1))("_ > 10")
     checkNotStoppedAtBreakpointAt(Breakpoint(2, 2))
-  }
 
   addSourceFile("Either.scala",
                 """object Either {
@@ -126,7 +113,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |    y.fold(_.substring(2), _ + 2)
       |  }
       |}""".stripMargin.trim)
-  def testEither(): Unit = {
+  def testEither(): Unit =
     checkVariants(lineNumber = 5,
                   "All",
                   "line in function main",
@@ -138,7 +125,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     checkStoppedAtBreakpointAt(Breakpoint(6, 0))("_.substring(2)")
     checkNotStoppedAtBreakpointAt(Breakpoint(5, 0))
     checkNotStoppedAtBreakpointAt(Breakpoint(6, 1))
-  }
 
   addSourceFile("SeveralLines.scala",
                 """object SeveralLines {
@@ -147,7 +133,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |      .find(c => c.isDigit).getOrElse('0')
       |  }
       |}""".stripMargin.trim)
-  def testSeveralLines(): Unit = {
+  def testSeveralLines(): Unit =
     checkVariants(2, "All", "line in function main", "_.headOption")
     checkVariants(3, "All", "line in function main", "c => c.isDigit", "'0'")
 
@@ -161,7 +147,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
         "Option(...", ".find(...")
     checkStopResumeSeveralTimes(Breakpoint(2, 0), Breakpoint(3, 0))(
         "_.headOption", "c => c.isDigit")
-  }
 
   addSourceFile(
       "NestedLambdas.scala",
@@ -170,7 +155,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |    Seq("a").flatMap(x => x.find(_ == 'a').getOrElse('a').toString).foreach(c => println(Some(c).filter(_ == 'a').getOrElse('b')))
       |  }
       |}""".stripMargin.trim)
-  def testNestedLambdas(): Unit = {
+  def testNestedLambdas(): Unit =
     checkVariants(2,
                   "All",
                   "line in function main",
@@ -188,7 +173,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
                                                      "_ == 'a'")
     checkNotStoppedAtBreakpointAt(Breakpoint(2, 2))
     checkNotStoppedAtBreakpointAt(Breakpoint(2, 5))
-  }
 
   addSourceFile(
       "NestedLambdas2.scala",
@@ -197,7 +181,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |    Seq("b").flatMap(x => x.find(_ == 'a').getOrElse('a').toString).foreach(c => println(Some(c).filter(_ == 'b').getOrElse('a')))
       |  }
       |}""".stripMargin.trim)
-  def testNestedLambdas2(): Unit = {
+  def testNestedLambdas2(): Unit =
     checkVariants(2,
                   "All",
                   "line in function main",
@@ -219,7 +203,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     checkStoppedAtBreakpointAt(Breakpoint(2, 2))("'a'")
     checkStoppedAtBreakpointAt(Breakpoint(2, 4))("_ == 'b'")
     checkStoppedAtBreakpointAt(Breakpoint(2, 5))("'a'")
-  }
 
   addSourceFile("ConstructorAndClassParam.scala",
                 """object ConstructorAndClassParam {
@@ -233,11 +216,10 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |}
       |
       |class AAA(s: String)""".stripMargin.trim)
-  def testConstructorAndClassParam(): Unit = {
+  def testConstructorAndClassParam(): Unit =
     checkVariants(6, "All", "constructor of BBB", "_.isDigit")
     checkStopResumeSeveralTimes(Breakpoint(6, null), Breakpoint(10, null))(
         "class BBB ...", "_.isDigit", "_.isDigit", "class AAA(...")
-  }
 
   addSourceFile("EarlyDefAndTemplateBody.scala",
                 """object EarlyDefAndTemplateBody {
@@ -253,7 +235,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |}
       |
       |class DDD(s: String)""".stripMargin.trim)
-  def testEarlyDefAndTemplateBody(): Unit = {
+  def testEarlyDefAndTemplateBody(): Unit =
     checkVariants(7, "All", "early definitions of CCC", "Seq(1)", "_ > 0")
     checkVariants(9, "All", "line in containing block", "x => x + 1", "_ > 10")
 
@@ -264,7 +246,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
         "Seq(1).map...",
         "x => x + 1",
         "_ > 10")
-  }
 
   addSourceFile(
       "NewTemplateDefinitionAsLambda.scala",
@@ -275,7 +256,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |}
       |
       |class ZZZ(s: String)""".stripMargin.trim)
-  def testNewTemplateDefinitionAsLambda(): Unit = {
+  def testNewTemplateDefinitionAsLambda(): Unit =
     checkVariants(2,
                   "All",
                   "line in function main",
@@ -284,7 +265,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
                   "new ZZZ(\"1\")")
     checkStopResumeSeveralTimes(Breakpoint(2, null))(
         "Seq(\"a\")...", "new ZZZ(_)", "_ => false", "new ZZZ(\"1\")")
-  }
 
   addSourceFile("LineStartsWithDot.scala",
                 """object LineStartsWithDot {
@@ -295,7 +275,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
       |      .foreach(println)
       |  }
       |}""".stripMargin)
-  def testLineStartsWithDot(): Unit = {
+  def testLineStartsWithDot(): Unit =
     checkVariants(2) //no variants
     checkVariants(3, "All", "line in function main", "_ + 1")
     checkVariants(4, "All", "line in function main", "i => i % 2 == 0")
@@ -311,7 +291,6 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
         ".foreach...",
         "println"
     )
-  }
 
   addSourceFile("PartialFunctionArg.scala",
                 """object PartialFunctionArg {
@@ -325,12 +304,11 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
     """.stripMargin.trim)
-  def testPartialFunctionArg(): Unit = {
+  def testPartialFunctionArg(): Unit =
     checkStopResumeSeveralTimes(Breakpoint(5, null), Breakpoint(6, null))(
         "case Some(i) =>",
         "false"
     )
-  }
 
   addSourceFile("LikeDefaultArgName.scala",
                 """object LikeDefaultArgName {
@@ -343,9 +321,7 @@ abstract class ExactBreakpointTestBase extends ScalaDebuggerTestCase {
     |  }
     |}""".stripMargin)
 
-  def testLikeDefaultArgName(): Unit = {
+  def testLikeDefaultArgName(): Unit =
     checkStopResumeSeveralTimes(Breakpoint(3, null))(
         "\"stop here\""
     )
-  }
-}

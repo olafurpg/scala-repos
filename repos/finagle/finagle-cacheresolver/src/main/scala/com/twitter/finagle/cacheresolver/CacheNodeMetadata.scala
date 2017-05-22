@@ -21,7 +21,7 @@ import com.twitter.finagle.Addr
 private[cacheresolver] case class CacheNodeMetadata(
     weight: Int, key: Option[String])
 
-private[cacheresolver] object CacheNodeMetadata {
+private[cacheresolver] object CacheNodeMetadata
   private val key = "cache_node_metadata"
 
   /**
@@ -36,19 +36,16 @@ private[cacheresolver] object CacheNodeMetadata {
     * [[CacheNodeMetadata]].
     */
   def fromAddrMetadata(metadata: Addr.Metadata): Option[CacheNodeMetadata] =
-    metadata.get(key) match {
+    metadata.get(key) match
       case some @ Some(metadata: CacheNodeMetadata) =>
         some.asInstanceOf[Option[CacheNodeMetadata]]
       case _ => None
-    }
 
   /**
     * A variant of `fromAddrMetadata` that pattern matches against weight
     * and key of the [[CacheNodeMetadata]].
     */
   def unapply(metadata: Addr.Metadata): Option[(Int, Option[String])] =
-    fromAddrMetadata(metadata).map {
+    fromAddrMetadata(metadata).map
       case CacheNodeMetadata(weight, key) =>
         (weight, key)
-    }
-}

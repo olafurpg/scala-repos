@@ -1,3 +1,2 @@
-package foo {
+package foo
   class Bippy
-}

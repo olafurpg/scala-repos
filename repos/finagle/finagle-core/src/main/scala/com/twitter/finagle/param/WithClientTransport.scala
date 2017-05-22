@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[ClientTransportParams]]
   */
-trait WithClientTransport[A <: Stack.Parameterized[A]] {
+trait WithClientTransport[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -16,4 +16,3 @@ trait WithClientTransport[A <: Stack.Parameterized[A]] {
     * `Transport` is a Finagle abstraction over the network connection (i.e., a TCP connection).
     */
   val withTransport: ClientTransportParams[A] = new ClientTransportParams(self)
-}

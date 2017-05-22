@@ -18,30 +18,27 @@ import scala.util.Try
   * @author Alefas
   * @since 15.05.12
   */
-class ScalaEditorTextProvider extends EditorTextProvider {
-  def getEditorText(elementAtCaret: PsiElement): TextWithImports = {
+class ScalaEditorTextProvider extends EditorTextProvider
+  def getEditorText(elementAtCaret: PsiElement): TextWithImports =
     val result: String = findExpressionInner(
         elementAtCaret, allowMethodCalls = true).map(_.getText).getOrElse("")
     new TextWithImportsImpl(CodeFragmentKind.EXPRESSION, result)
-  }
 
   def findExpression(
       element: PsiElement,
-      allowMethodCalls: Boolean): Pair[PsiElement, TextRange] = {
-    findExpressionInner(element, allowMethodCalls) match {
+      allowMethodCalls: Boolean): Pair[PsiElement, TextRange] =
+    findExpressionInner(element, allowMethodCalls) match
       case None => null
       case Some(elem) =>
-        Try {
+        Try
           val expressionCopy =
             ScalaPsiElementFactory.createExpressionWithContextFromText(
                 elem.getText, elem.getContext, elem)
           new Pair[PsiElement, TextRange](expressionCopy, elem.getTextRange)
-        }.toOption.orNull
-    }
-  }
+        .toOption.orNull
 
   private def findExpressionInner(
-      element: PsiElement, allowMethodCalls: Boolean): Option[PsiElement] = {
+      element: PsiElement, allowMethodCalls: Boolean): Option[PsiElement] =
     def allowed(expr: ScExpression) =
       if (SideEffectsUtil.hasNoSideEffects(expr) || allowMethodCalls)
         Some(expr) else None
@@ -49,7 +46,7 @@ class ScalaEditorTextProvider extends EditorTextProvider {
     PsiTreeUtil.getParentOfType(element,
                                 classOf[ScExpression],
                                 classOf[ScParameter],
-                                classOf[ScBindingPattern]) match {
+                                classOf[ScBindingPattern]) match
       case (ref: ScReferenceExpression) childOf (mc: ScMethodCall) =>
         allowed(mc)
       case (ref: ScReferenceExpression) childOf (inf: ScInfixExpr)
@@ -60,6 +57,3 @@ class ScalaEditorTextProvider extends EditorTextProvider {
       case p: ScParameter if !p.isCallByNameParameter || allowMethodCalls =>
         Some(p.nameId)
       case _ => None
-    }
-  }
-}

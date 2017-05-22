@@ -23,11 +23,10 @@ import shapeless.test._
 import shapeless.test.illTyped
 import shapeless.testutil.assertTypedEquals
 
-package SingletonTypeTestsDefns {
+package SingletonTypeTestsDefns
   class ValueTest(val x: Int) extends AnyVal
-}
 
-class SingletonTypesTests {
+class SingletonTypesTests
   import SingletonTypeTestsDefns._
   import syntax.singleton._
 
@@ -51,7 +50,7 @@ class SingletonTypesTests {
   type Bar = wBar.T
 
   @Test
-  def testRefine {
+  def testRefine
     val sTrue = true.narrow
     val sFalse = false.narrow
 
@@ -95,13 +94,11 @@ class SingletonTypesTests {
       sameTyped(sFooSym)(sBarSym)
       sameTyped(sFooSym)('bar)
     """)
-  }
 
-  trait Show[T] {
+  trait Show[T]
     def show: String
-  }
 
-  object Show {
+  object Show
     implicit val showTrue = new Show[True] { def show = "true" }
     implicit val showFalse = new Show[False] { def show = "false" }
 
@@ -111,12 +108,11 @@ class SingletonTypesTests {
 
     implicit val showFoo = new Show[Foo] { def show = "'foo" }
     implicit val showBar = new Show[Bar] { def show = "'bar" }
-  }
 
   def show[T](t: T)(implicit s: Show[T]) = s.show
 
   @Test
-  def testRefinedTypeClass {
+  def testRefinedTypeClass
     val sTrue = show(true.narrow)
     assertEquals("true", sTrue)
 
@@ -141,38 +137,30 @@ class SingletonTypesTests {
 
     val sBar = show('bar.narrow)
     assertEquals("'bar", sBar)
-  }
 
-  trait LiteralShow[T] {
+  trait LiteralShow[T]
     def show: String
-  }
 
-  object LiteralShow {
-    implicit val showTrue = new LiteralShow[Witness.`true`.T] {
+  object LiteralShow
+    implicit val showTrue = new LiteralShow[Witness.`true`.T]
       def show = "true"
-    }
-    implicit val showFalse = new LiteralShow[Witness.`false`.T] {
+    implicit val showFalse = new LiteralShow[Witness.`false`.T]
       def show = "false"
-    }
 
     implicit val showOne = new LiteralShow[Witness.`1`.T] { def show = "One" }
     implicit val showTwo = new LiteralShow[Witness.`2`.T] { def show = "Two" }
-    implicit val showThree = new LiteralShow[Witness.`3`.T] {
+    implicit val showThree = new LiteralShow[Witness.`3`.T]
       def show = "Three"
-    }
 
-    implicit val showFoo = new LiteralShow[Witness.`'foo`.T] {
+    implicit val showFoo = new LiteralShow[Witness.`'foo`.T]
       def show = "'foo"
-    }
-    implicit val showBar = new LiteralShow[Witness.`'bar`.T] {
+    implicit val showBar = new LiteralShow[Witness.`'bar`.T]
       def show = "'bar"
-    }
-  }
 
   def literalShow[T](t: T)(implicit s: LiteralShow[T]) = s.show
 
   @Test
-  def testRefinedLiteralTypeClass {
+  def testRefinedLiteralTypeClass
     val sTrue = literalShow(true.narrow)
     assertEquals("true", sTrue)
 
@@ -197,29 +185,23 @@ class SingletonTypesTests {
 
     val sBar = literalShow('bar.narrow)
     assertEquals("'bar", sBar)
-  }
 
-  trait LiteralsShow[-T] {
+  trait LiteralsShow[-T]
     def show: String
-  }
 
-  object LiteralsShow {
-    implicit val showTrueFalse = new LiteralsShow[HList.`true, false`.T] {
+  object LiteralsShow
+    implicit val showTrueFalse = new LiteralsShow[HList.`true, false`.T]
       def show = "true, false"
-    }
     implicit val showOneOrTwoOrThree =
-      new LiteralsShow[Coproduct.`1, 2, 3`.T] {
+      new LiteralsShow[Coproduct.`1, 2, 3`.T]
         def show = "One | Two | Three"
-      }
-    implicit val showFooBar = new LiteralsShow[HList.`'foo, 'bar`.T] {
+    implicit val showFooBar = new LiteralsShow[HList.`'foo, 'bar`.T]
       def show = "'foo, 'bar"
-    }
-  }
 
   def literalsShow[T](t: T)(implicit s: LiteralsShow[T]) = s.show
 
   @Test
-  def testRefinedLiteralsTypeClass {
+  def testRefinedLiteralsTypeClass
     val sTrueFalse = literalsShow(true.narrow :: false.narrow :: HNil)
     assertEquals("true, false", sTrueFalse)
 
@@ -238,10 +220,9 @@ class SingletonTypesTests {
 
     val sFooBar = literalsShow('foo.narrow :: 'bar.narrow :: HNil)
     assertEquals("'foo, 'bar", sFooBar)
-  }
 
   @Test
-  def testWitness {
+  def testWitness
     val wTrue = Witness(true)
     val wFalse = Witness(false)
 
@@ -277,13 +258,12 @@ class SingletonTypesTests {
     illTyped("""
       sameTyped(wFooSym)(wBarSym)
     """)
-  }
 
   def convert(w: Witness): Witness.Aux[w.T] = w
 
   def boundedConvert2[B](w: Witness.Lt[B]): Witness.Aux[w.T] = w
 
-  def testSingletonWitness {
+  def testSingletonWitness
     trait Bound
     object Foo extends Bound
     val bar = "bar"
@@ -303,10 +283,9 @@ class SingletonTypesTests {
 
     sameTyped(bcFoo)(Witness(Foo))
     sameTyped(bcBar)(Witness(bar))
-  }
 
   @Test
-  def testWitnessConversion {
+  def testWitnessConversion
     val cTrue = convert(true)
     val cFalse = convert(false)
 
@@ -358,12 +337,11 @@ class SingletonTypesTests {
     illTyped("""
       sameTyped(cBarSym)(Witness('foo))
     """)
-  }
 
   def boundedConvert(w: Witness.Lt[Int]): Witness.Aux[w.T] = w
 
   @Test
-  def testBoundedWitnessConversion {
+  def testBoundedWitnessConversion
     val c13 = boundedConvert(13)
     sameTyped(c13)(Witness(13))
     illTyped("""
@@ -381,12 +359,11 @@ class SingletonTypesTests {
     illTyped("""
       boundedConvert('foo)
     """)
-  }
 
   def showLiteral(t: Witness)(implicit s: Show[t.T]) = s.show
 
   @Test
-  def testLiteralTypeClass {
+  def testLiteralTypeClass
     val sTrue = showLiteral(true)
     assertEquals("true", sTrue)
 
@@ -411,23 +388,19 @@ class SingletonTypesTests {
     illTyped("""
       showLiteral(0)
     """)
-  }
 
-  trait ShowWitness[T] {
+  trait ShowWitness[T]
     def show: String
-  }
 
-  object ShowWitness {
+  object ShowWitness
     implicit def showWitness[T](implicit w: Witness.Aux[T]) =
-      new ShowWitness[T] {
+      new ShowWitness[T]
         def show = w.value.toString
-      }
-  }
 
   def showWitness(w: Witness)(implicit s: ShowWitness[w.T]) = s.show
 
   @Test
-  def testWitnessTypeClass {
+  def testWitnessTypeClass
     val sTrue = showWitness(true)
     assertEquals("true", sTrue)
 
@@ -448,12 +421,11 @@ class SingletonTypesTests {
 
     val sBarSym = showWitness('bar)
     assertEquals("'bar", sBarSym)
-  }
 
   def showWitnessWith(w: WitnessWith[Show]) = w.instance.show
 
   @Test
-  def testWitnessWith {
+  def testWitnessWith
     val sTrue = showWitnessWith(true)
     assertEquals("true", sTrue)
 
@@ -474,25 +446,20 @@ class SingletonTypesTests {
 
     val sBarSym = showWitnessWith('bar)
     assertEquals("'bar", sBarSym)
-  }
 
-  trait Rel[T] {
+  trait Rel[T]
     type Out
-  }
 
-  object Rel {
-    implicit def relTrue: Rel[True] { type Out = Int } = new Rel[True] {
+  object Rel
+    implicit def relTrue: Rel[True] { type Out = Int } = new Rel[True]
       type Out = Int
-    }
-    implicit def relFalse: Rel[False] { type Out = String } = new Rel[False] {
+    implicit def relFalse: Rel[False] { type Out = String } = new Rel[False]
       type Out = String
-    }
-  }
 
   def check(w: WitnessWith[Rel])(v: w.instance.Out) = v
 
   @Test
-  def testWitnessWithOut {
+  def testWitnessWithOut
     val relTrue = check(true)(23)
     typed[Int](relTrue)
 
@@ -510,19 +477,16 @@ class SingletonTypesTests {
     illTyped("""
       check(23)(23)
     """)
-  }
 
   @Test
-  def testValueClass {
+  def testValueClass
     val x = new ValueTest(5)
     illTyped("""
     val wX = Witness(x)
     """)
-  }
 
   @Test
-  def primitiveWiden {
-    {
+  def primitiveWiden
       val w = Widen[Witness.`2`.T]
       illTyped(" w(3) ", "type mismatch;.*")
       val n = w(2)
@@ -530,9 +494,7 @@ class SingletonTypesTests {
       illTyped(" val n1: Witness.`2`.T = n ", "type mismatch;.*")
 
       assertTypedEquals[Int](2, n)
-    }
 
-    {
       val w = Widen[Witness.`true`.T]
       illTyped(" w(false) ", "type mismatch;.*")
       val b = w(true)
@@ -540,9 +502,7 @@ class SingletonTypesTests {
       illTyped(" val b1: Witness.`true`.T = b ", "type mismatch;.*")
 
       assertTypedEquals[Boolean](true, b)
-    }
 
-    {
       val w = Widen[Witness.`"ab"`.T]
       illTyped(""" w("s") """, "type mismatch;.*")
       val s = w("ab")
@@ -550,11 +510,9 @@ class SingletonTypesTests {
       illTyped(""" val s1: Witness.`"ab"`.T = s """, "type mismatch;.*")
 
       assertTypedEquals[String]("ab", s)
-    }
-  }
 
   @Test
-  def symbolWiden {
+  def symbolWiden
     // Masks shapeless.syntax.singleton.narrowSymbol.
     // Having it in scope makes the illTyped tests fail in an unexpected way.
     def narrowSymbol = ???
@@ -566,10 +524,9 @@ class SingletonTypesTests {
     illTyped(" val s1: Witness.`'ab`.T = s ", "type mismatch;.*")
 
     assertTypedEquals[Symbol]('ab, s)
-  }
 
   @Test
-  def aliasWiden {
+  def aliasWiden
     type T = Witness.`2`.T
     val w = Widen[T]
     illTyped(" w(3) ", "type mismatch;.*")
@@ -578,25 +535,19 @@ class SingletonTypesTests {
     illTyped(" val n1: Witness.`2`.T = n ", "type mismatch;.*")
 
     assertTypedEquals[Int](2, n)
-  }
 
   trait B
   case object A extends B
 
   @Test
-  def singletonWiden {
+  def singletonWiden
     illTyped(" Widen[A.type] ",
              "could not find implicit value for parameter widen:.*")
-  }
-}
 
-package SingletonTypeTestsAux {
-  class Wrapper {
+package SingletonTypeTestsAux
+  class Wrapper
     sealed trait Sealed
-    object Sealed {
+    object Sealed
       case object A extends Sealed
-    }
 
     implicitly[Witness.Aux[Sealed.A.type]]
-  }
-}

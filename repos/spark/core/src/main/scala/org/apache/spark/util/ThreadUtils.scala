@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
 
 import com.google.common.util.concurrent.{MoreExecutors, ThreadFactoryBuilder}
 
-private[spark] object ThreadUtils {
+private[spark] object ThreadUtils
 
   private val sameThreadExecutionContext =
     ExecutionContext.fromExecutorService(MoreExecutors.sameThreadExecutor())
@@ -40,23 +40,21 @@ private[spark] object ThreadUtils {
   /**
     * Create a thread factory that names threads with a prefix and also sets the threads to daemon.
     */
-  def namedThreadFactory(prefix: String): ThreadFactory = {
+  def namedThreadFactory(prefix: String): ThreadFactory =
     new ThreadFactoryBuilder()
       .setDaemon(true)
       .setNameFormat(prefix + "-%d")
       .build()
-  }
 
   /**
     * Wrapper over newCachedThreadPool. Thread names are formatted as prefix-ID, where ID is a
     * unique, sequentially assigned integer.
     */
-  def newDaemonCachedThreadPool(prefix: String): ThreadPoolExecutor = {
+  def newDaemonCachedThreadPool(prefix: String): ThreadPoolExecutor =
     val threadFactory = namedThreadFactory(prefix)
     Executors
       .newCachedThreadPool(threadFactory)
       .asInstanceOf[ThreadPoolExecutor]
-  }
 
   /**
     * Create a cached thread pool whose max number of threads is `maxThreadNumber`. Thread names
@@ -65,7 +63,7 @@ private[spark] object ThreadUtils {
   def newDaemonCachedThreadPool(
       prefix: String,
       maxThreadNumber: Int,
-      keepAliveSeconds: Int = 60): ThreadPoolExecutor = {
+      keepAliveSeconds: Int = 60): ThreadPoolExecutor =
     val threadFactory = namedThreadFactory(prefix)
     val threadPool = new ThreadPoolExecutor(
         maxThreadNumber, // corePoolSize: the max number of threads to create before queuing the tasks
@@ -76,36 +74,33 @@ private[spark] object ThreadUtils {
         threadFactory)
     threadPool.allowCoreThreadTimeOut(true)
     threadPool
-  }
 
   /**
     * Wrapper over newFixedThreadPool. Thread names are formatted as prefix-ID, where ID is a
     * unique, sequentially assigned integer.
     */
   def newDaemonFixedThreadPool(
-      nThreads: Int, prefix: String): ThreadPoolExecutor = {
+      nThreads: Int, prefix: String): ThreadPoolExecutor =
     val threadFactory = namedThreadFactory(prefix)
     Executors
       .newFixedThreadPool(nThreads, threadFactory)
       .asInstanceOf[ThreadPoolExecutor]
-  }
 
   /**
     * Wrapper over newSingleThreadExecutor.
     */
-  def newDaemonSingleThreadExecutor(threadName: String): ExecutorService = {
+  def newDaemonSingleThreadExecutor(threadName: String): ExecutorService =
     val threadFactory = new ThreadFactoryBuilder()
       .setDaemon(true)
       .setNameFormat(threadName)
       .build()
     Executors.newSingleThreadExecutor(threadFactory)
-  }
 
   /**
     * Wrapper over ScheduledThreadPoolExecutor.
     */
   def newDaemonSingleThreadScheduledExecutor(
-      threadName: String): ScheduledExecutorService = {
+      threadName: String): ScheduledExecutorService =
     val threadFactory = new ThreadFactoryBuilder()
       .setDaemon(true)
       .setNameFormat(threadName)
@@ -115,7 +110,6 @@ private[spark] object ThreadUtils {
     // elapses. We have to enable it manually.
     executor.setRemoveOnCancelPolicy(true)
     executor
-  }
 
   /**
     * Run a piece of code in a new thread and return the result. Exception in the new thread is
@@ -129,25 +123,22 @@ private[spark] object ThreadUtils {
     *   ...
     */
   def runInNewThread[T](threadName: String, isDaemon: Boolean = true)(
-      body: => T): T = {
+      body: => T): T =
     @volatile var exception: Option[Throwable] = None
     @volatile var result: T = null.asInstanceOf[T]
 
-    val thread = new Thread(threadName) {
-      override def run(): Unit = {
-        try {
+    val thread = new Thread(threadName)
+      override def run(): Unit =
+        try
           result = body
-        } catch {
+        catch
           case NonFatal(e) =>
             exception = Some(e)
-        }
-      }
-    }
     thread.setDaemon(isDaemon)
     thread.start()
     thread.join()
 
-    exception match {
+    exception match
       case Some(realException) =>
         // Remove the part of the stack that shows method calls into this helper method
         // This means drop everything from the top until the stack element
@@ -177,24 +168,18 @@ private[spark] object ThreadUtils {
         throw realException
       case None =>
         result
-    }
-  }
 
   /**
     * Construct a new Scala ForkJoinPool with a specified max parallelism and name prefix.
     */
-  def newForkJoinPool(prefix: String, maxThreadNumber: Int): SForkJoinPool = {
+  def newForkJoinPool(prefix: String, maxThreadNumber: Int): SForkJoinPool =
     // Custom factory to set thread names
-    val factory = new SForkJoinPool.ForkJoinWorkerThreadFactory {
+    val factory = new SForkJoinPool.ForkJoinWorkerThreadFactory
       override def newThread(pool: SForkJoinPool) =
-        new SForkJoinWorkerThread(pool) {
+        new SForkJoinWorkerThread(pool)
           setName(prefix + "-" + super.getName)
-        }
-    }
     new SForkJoinPool(maxThreadNumber,
                       factory,
                       null, // handler
                       false // asyncMode
     )
-  }
-}

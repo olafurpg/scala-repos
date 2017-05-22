@@ -11,41 +11,33 @@ import scala.concurrent.{Await, ExecutionContext}
 import akka.testkit._
 import scala.concurrent.Future
 
-class AgentDocSpec extends AkkaSpec {
-  "create" in {
+class AgentDocSpec extends AkkaSpec
+  "create" in
     //#create
     import scala.concurrent.ExecutionContext.Implicits.global
     import akka.agent.Agent
     val agent = Agent(5)
     //#create
-  }
 
-  "read value" in {
+  "read value" in
     import scala.concurrent.ExecutionContext.Implicits.global
     val agent = Agent(0)
 
-    {
       //#read-apply
       val result = agent()
       //#read-apply
       result should be(0)
-    }
-    {
       //#read-get
       val result = agent.get
       //#read-get
       result should be(0)
-    }
 
-    {
       //#read-future
       val future = agent.future
       //#read-future
       Await.result(future, 5 seconds) should be(0)
-    }
-  }
 
-  "send and sendOff" in {
+  "send and sendOff" in
     val agent = Agent(0)(ExecutionContext.global)
     //#send
     // send a value, enqueues this change
@@ -70,9 +62,8 @@ class AgentDocSpec extends AkkaSpec {
     //#send-off
 
     Await.result(agent.future, 5 seconds) should be(16)
-  }
 
-  "alter and alterOff" in {
+  "alter and alterOff" in
     val agent = Agent(0)(ExecutionContext.global)
     //#alter
     // alter a value
@@ -96,25 +87,21 @@ class AgentDocSpec extends AkkaSpec {
     //#alter-off
 
     Await.result(f4, 5 seconds) should be(16)
-  }
 
-  "transfer example" in {
+  "transfer example" in
     //#transfer-example
     import scala.concurrent.ExecutionContext.Implicits.global
     import akka.agent.Agent
     import scala.concurrent.duration._
     import scala.concurrent.stm._
 
-    def transfer(from: Agent[Int], to: Agent[Int], amount: Int): Boolean = {
-      atomic { txn =>
+    def transfer(from: Agent[Int], to: Agent[Int], amount: Int): Boolean =
+      atomic  txn =>
         if (from.get < amount) false
-        else {
+        else
           from send (_ - amount)
           to send (_ + amount)
           true
-        }
-      }
-    }
 
     val from = Agent(100)
     val to = Agent(20)
@@ -127,9 +114,8 @@ class AgentDocSpec extends AkkaSpec {
     Await.result(fromValue, 5 seconds) should be(50)
     Await.result(toValue, 5 seconds) should be(70)
     ok should be(true)
-  }
 
-  "monadic example" in {
+  "monadic example" in
     def println(a: Any) = ()
     //#monadic-example
     import scala.concurrent.ExecutionContext.Implicits.global
@@ -146,14 +132,12 @@ class AgentDocSpec extends AkkaSpec {
     val agent4 = agent1 map (_ + 1)
 
     // uses flatMap
-    val agent5 = for {
+    val agent5 = for
       value1 <- agent1
       value2 <- agent2
-    } yield value1 + value2
+    yield value1 + value2
     //#monadic-example
 
     agent3() should be(4)
     agent4() should be(4)
     agent5() should be(8)
-  }
-}

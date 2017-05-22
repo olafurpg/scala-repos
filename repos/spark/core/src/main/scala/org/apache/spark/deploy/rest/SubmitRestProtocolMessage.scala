@@ -40,7 +40,7 @@ import org.apache.spark.util.Utils
 @JsonAutoDetect(
     getterVisibility = Visibility.ANY, setterVisibility = Visibility.ANY)
 @JsonPropertyOrder(alphabetic = true)
-private[rest] abstract class SubmitRestProtocolMessage {
+private[rest] abstract class SubmitRestProtocolMessage
   @JsonIgnore
   val messageType = Utils.getFormattedClassName(this)
 
@@ -54,54 +54,45 @@ private[rest] abstract class SubmitRestProtocolMessage {
     * Serialize the message to JSON.
     * This also ensures that the message is valid and its fields are in the expected format.
     */
-  def toJson: String = {
+  def toJson: String =
     validate()
     SubmitRestProtocolMessage.mapper.writeValueAsString(this)
-  }
 
   /**
     * Assert the validity of the message.
     * If the validation fails, throw a [[SubmitRestProtocolException]].
     */
-  final def validate(): Unit = {
-    try {
+  final def validate(): Unit =
+    try
       doValidate()
-    } catch {
+    catch
       case e: Exception =>
         throw new SubmitRestProtocolException(
             s"Validation of message $messageType failed!", e)
-    }
-  }
 
   /** Assert the validity of the message */
-  protected def doValidate(): Unit = {
-    if (action == null) {
+  protected def doValidate(): Unit =
+    if (action == null)
       throw new SubmitRestMissingFieldException(
           s"The action field is missing in $messageType")
-    }
-  }
 
   /** Assert that the specified field is set in this message. */
-  protected def assertFieldIsSet[T](value: T, name: String): Unit = {
-    if (value == null) {
+  protected def assertFieldIsSet[T](value: T, name: String): Unit =
+    if (value == null)
       throw new SubmitRestMissingFieldException(
           s"'$name' is missing in message $messageType.")
-    }
-  }
 
   /**
     * Assert a condition when validating this message.
     * If the assertion fails, throw a [[SubmitRestProtocolException]].
     */
-  protected def assert(condition: Boolean, failMessage: String): Unit = {
+  protected def assert(condition: Boolean, failMessage: String): Unit =
     if (!condition) { throw new SubmitRestProtocolException(failMessage) }
-  }
-}
 
 /**
   * Helper methods to process serialized [[SubmitRestProtocolMessage]]s.
   */
-private[spark] object SubmitRestProtocolMessage {
+private[spark] object SubmitRestProtocolMessage
   private val packagePrefix = this.getClass.getPackage.getName
   private val mapper = new ObjectMapper()
     .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
@@ -112,19 +103,15 @@ private[spark] object SubmitRestProtocolMessage {
     * Parse the value of the action field from the given JSON.
     * If the action field is not found, throw a [[SubmitRestMissingFieldException]].
     */
-  def parseAction(json: String): String = {
-    val value: Option[String] = parse(json) match {
+  def parseAction(json: String): String =
+    val value: Option[String] = parse(json) match
       case JObject(fields) =>
-        fields.collectFirst { case ("action", v) => v }.collect {
+        fields.collectFirst { case ("action", v) => v }.collect
           case JString(s) => s
-        }
       case _ => None
-    }
-    value.getOrElse {
+    value.getOrElse
       throw new SubmitRestMissingFieldException(
           s"Action field not found in JSON:\n$json")
-    }
-  }
 
   /**
     * Construct a [[SubmitRestProtocolMessage]] from its JSON representation.
@@ -133,14 +120,13 @@ private[spark] object SubmitRestProtocolMessage {
     * Note that the action must represent one of the [[SubmitRestProtocolMessage]]s defined in
     * this package. Otherwise, a [[ClassNotFoundException]] will be thrown.
     */
-  def fromJson(json: String): SubmitRestProtocolMessage = {
+  def fromJson(json: String): SubmitRestProtocolMessage =
     val className = parseAction(json)
     val clazz = Utils
       .classForName(packagePrefix + "." + className)
       .asSubclass[SubmitRestProtocolMessage](
           classOf[SubmitRestProtocolMessage])
     fromJson(json, clazz)
-  }
 
   /**
     * Construct a [[SubmitRestProtocolMessage]] from its JSON representation.
@@ -150,7 +136,5 @@ private[spark] object SubmitRestProtocolMessage {
     * represents custom user-defined messages.
     */
   def fromJson[T <: SubmitRestProtocolMessage](
-      json: String, clazz: Class[T]): T = {
+      json: String, clazz: Class[T]): T =
     mapper.readValue(json, clazz)
-  }
-}

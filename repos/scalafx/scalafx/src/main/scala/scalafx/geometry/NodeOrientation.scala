@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/NodeOrientation.html javafx.geometry.NodeOrientation]] */
 object NodeOrientation
-    extends SFXEnumDelegateCompanion[jfxg.NodeOrientation, NodeOrientation] {
+    extends SFXEnumDelegateCompanion[jfxg.NodeOrientation, NodeOrientation]
 
   val Inherit = new NodeOrientation(jfxg.NodeOrientation.INHERIT)
   @deprecated(
@@ -54,7 +54,6 @@ object NodeOrientation
 
   protected override def unsortedValues: Array[NodeOrientation] =
     Array(Inherit, LeftToRight, RightToLeft)
-}
 
 sealed case class NodeOrientation(override val delegate: jfxg.NodeOrientation)
     extends SFXEnumDelegate[jfxg.NodeOrientation]

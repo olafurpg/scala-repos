@@ -11,71 +11,60 @@ import lila.user.User
 final class InsightApi(storage: Storage,
                        userCacheApi: UserCacheApi,
                        pipeline: AggregationPipeline,
-                       indexer: Indexer) {
+                       indexer: Indexer)
 
   import lila.insight.{Dimension => D, Metric => M}
   import InsightApi._
 
   def userCache(user: User): Fu[UserCache] =
-    userCacheApi find user.id flatMap {
+    userCacheApi find user.id flatMap
       case Some(c) => fuccess(c)
       case None =>
-        for {
+        for
           count <- storage count user.id
           ecos <- storage ecos user.id
           c = UserCache(user.id, count, ecos, DateTime.now)
           _ <- userCacheApi save c
-        } yield c
-    }
+        yield c
 
   def ask[X](question: Question[X], user: User): Fu[Answer[X]] =
     storage
       .aggregate(pipeline(question, user.id))
-      .flatMap { res =>
+      .flatMap  res =>
         val clusters = AggregationClusters(question, res)
         val gameIds =
           scala.util.Random.shuffle(clusters.flatMap(_.gameIds)) take 4
-        GameRepo.userPovsByGameIds(gameIds, user) map { povs =>
+        GameRepo.userPovsByGameIds(gameIds, user) map  povs =>
           Answer(question, clusters, povs)
-        }
-      }
       .mon(_.insight.request.time) >>- lila.mon.insight.request.count()
 
   def userStatus(user: User): Fu[UserStatus] =
-    GameRepo lastFinishedRatedNotFromPosition user flatMap {
+    GameRepo lastFinishedRatedNotFromPosition user flatMap
       case None => fuccess(UserStatus.NoGame)
       case Some(game) =>
-        storage fetchLast user map {
+        storage fetchLast user map
           case None => UserStatus.Empty
           case Some(entry) if entry.date isBefore game.createdAt =>
             UserStatus.Stale
           case _ => UserStatus.Fresh
-        }
-    }
 
   def indexAll(user: User) =
     indexer.all(user).mon(_.insight.index.time) >> userCacheApi.remove(user.id) >>- lila.mon.insight.index
       .count()
 
   def updateGame(g: Game) =
-    Pov(g).map { pov =>
-      pov.player.userId ?? { userId =>
-        storage find Entry.povToId(pov) flatMap {
-          _ ?? { old =>
+    Pov(g).map  pov =>
+      pov.player.userId ??  userId =>
+        storage find Entry.povToId(pov) flatMap
+          _ ??  old =>
             indexer.update(g, userId, old)
-          }
-        }
-      }
-    }.sequenceFu.void
-}
+    .sequenceFu.void
 
-object InsightApi {
+object InsightApi
 
   sealed trait UserStatus
-  object UserStatus {
+  object UserStatus
     case object NoGame extends UserStatus
     case object Empty extends UserStatus
     case object Stale extends UserStatus
     case object Fresh extends UserStatus
-  }
-}

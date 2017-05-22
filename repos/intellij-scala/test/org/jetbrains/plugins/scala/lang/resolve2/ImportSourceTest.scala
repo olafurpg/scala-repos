@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ImportSourceTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ImportSourceTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "import/source/"
-  }
 
   //TODO caseclass
 //  def testCaseClass = doTest
@@ -22,4 +21,3 @@ class ImportSourceTest extends ResolveTestBase {
   def testFunction() = doTest()
   def testValue() = doTest()
   def testVariable() = doTest()
-}

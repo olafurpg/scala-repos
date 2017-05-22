@@ -18,29 +18,27 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class KetamaClientTest extends FunSuite with MockitoSugar {
+class KetamaClientTest extends FunSuite with MockitoSugar
 
-  test("load known good results (key, hash(?), continuum ceiling(?), IP)") {
+  test("load known good results (key, hash(?), continuum ceiling(?), IP)")
     val stream = getClass.getClassLoader.getResourceAsStream("ketama_results")
     val reader = new BufferedReader(new InputStreamReader(stream))
     val expected = new mutable.ListBuffer[Array[String]]
     var line: String = null
-    do {
+    do
       line = reader.readLine
-      if (line != null) {
+      if (line != null)
         val segments = line.split(" ")
         assert(segments.length == 4)
         expected += segments
-      }
-    } while (line != null)
+    while (line != null)
     assert(expected.size == 99)
 
     // Build Ketama client
-    def newMock() = {
+    def newMock() =
       val s = mock[Service[Command, Response]]
       when(s.close(any())) thenReturn Future.Done
       s
-    }
     val clients = Map(
         CacheNode("10.0.1.1", 11211, 600) -> newMock(),
         CacheNode("10.0.1.2", 11211, 300) -> newMock(),
@@ -57,11 +55,11 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       new KetamaPartitionedClient(Group(clients.keys.toSeq: _*), newService)
 
     info("pick the correct node")
-    val ipToService = clients.map {
+    val ipToService = clients.map
       case (key, service) => key.host -> service
-    }.toMap
+    .toMap
     val rng = new scala.util.Random
-    for (testcase <- expected) {
+    for (testcase <- expected)
       val mockClient = ketamaClient.clientOf(testcase(0))
       val expectedService = ipToService(testcase(3))
       val randomResponse = Number(rng.nextLong)
@@ -70,16 +68,13 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
           randomResponse)
 
       assert(Await.result(mockClient.incr("foo")).get == randomResponse.value)
-    }
 
     info("release")
     ketamaClient.release()
-    clients.values foreach { client =>
+    clients.values foreach  client =>
       verify(client, times(1)).close(any())
-    }
-  }
 
-  test("interrupted request does not change ready") {
+  test("interrupted request does not change ready")
     val mockService = mock[Service[Command, Response]]
     val client1 = CacheNode("10.0.1.1", 11211, 600)
     def newService(node: CacheNode) = mockService
@@ -91,12 +86,11 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
     val r = ketamaClient.getResult(Seq("key"))
     assert(r.poll == None)
     r.raise(new CancelledRequestException())
-    try {
+    try
       Await.result(r)
       assert(false)
-    } catch {
+    catch
       case e: Throwable => Unit
-    }
 
     // a second request must not be resolved yet
     val r2 = ketamaClient.incr("key")
@@ -107,10 +101,9 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
     when(mockService.apply(any[Incr])) thenReturn Future.value(Number(42))
     backends.update(scala.collection.immutable.Set(client1))
     assert(Await.result(r2).get == 42)
-  }
 
-  test("ejects dead clients") {
-    trait KetamaClientBuilder {
+  test("ejects dead clients")
+    trait KetamaClientBuilder
       val serviceA = mock[Service[Command, Response]](RETURNS_SMART_NULLS)
       val serviceB = mock[Service[Command, Response]](RETURNS_SMART_NULLS)
       val nodeA = CacheNode("10.0.1.1", 11211, 100)
@@ -137,34 +130,29 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       verify(serviceA, times(1)).apply(any())
 
       broker !! NodeMarkedDead(nodeKeyA)
-    }
 
     info("goes to secondary if primary is down")
-    new KetamaClientBuilder {
+    new KetamaClientBuilder
       when(serviceB(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
       Await.result(ketamaClient.get("foo"))
       verify(serviceB, times(1)).apply(any())
-    }
 
     info("throws ShardNotAvailableException when no nodes available")
-    new KetamaClientBuilder {
+    new KetamaClientBuilder
       broker !! NodeMarkedDead(nodeKeyB)
-      intercept[ShardNotAvailableException] {
+      intercept[ShardNotAvailableException]
         Await.result(ketamaClient.get("foo"))
-      }
-    }
 
     info("brings back the dead node")
-    new KetamaClientBuilder {
+    new KetamaClientBuilder
       when(serviceA(any())) thenReturn Future.value(Values(Seq(value)))
       broker !! NodeRevived(nodeKeyA)
       Await.result(ketamaClient.get("foo"))
       verify(serviceA, times(2)).apply(any())
       broker !! NodeRevived(nodeKeyB)
-    }
 
     info("primary leaves and rejoins")
-    new KetamaClientBuilder {
+    new KetamaClientBuilder
       mutableGroup.update(immutable.Set(nodeB)) // nodeA leaves
       when(serviceB(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
       Await.result(ketamaClient.get("foo"))
@@ -174,6 +162,3 @@ class KetamaClientTest extends FunSuite with MockitoSugar {
       when(serviceA(Get(Seq(key)))) thenReturn Future.value(Values(Seq(value)))
       Await.result(ketamaClient.get("foo"))
       verify(serviceA, times(2)).apply(any())
-    }
-  }
-}

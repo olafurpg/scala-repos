@@ -23,14 +23,14 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * Date: 15.03.2009
   */
 abstract class AutoImportTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val refMarker = "/*ref*/"
 
   protected def folderPath = baseRootPath() + "autoImport/"
 
   protected override def rootPath(): String = folderPath
 
-  protected def doTest() {
+  protected def doTest()
     import org.junit.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.refreshAndFindFileByPath(
@@ -50,11 +50,10 @@ abstract class AutoImportTestBase
         scalaFile.findElementAt(offset), classOf[ScReferenceElement])
     assert(ref != null, "Not specified reference at marker.")
 
-    ref.resolve() match {
+    ref.resolve() match
       case null =>
       case _ =>
         assert(assertion = false, message = "Reference must be unresolved.")
-    }
     val refPointer = SmartPointerManager
       .getInstance(getProjectAdapter)
       .createSmartPsiElementPointer(ref)
@@ -63,10 +62,10 @@ abstract class AutoImportTestBase
     assert(classes.length > 0, "Haven't classes to import")
     var res: String = null
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
-    try {
-      ScalaUtils.runWriteAction(new Runnable {
-        def run() {
-          classes(0) match {
+    try
+      ScalaUtils.runWriteAction(new Runnable
+        def run()
+          classes(0) match
             case ClassTypeToImport(clazz) =>
               org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
                 .getImportHolder(ref, getProjectAdapter)
@@ -75,29 +74,23 @@ abstract class AutoImportTestBase
               org.jetbrains.plugins.scala.annotator.intention.ScalaImportTypeFix
                 .getImportHolder(ref, getProjectAdapter)
                 .addImportForPath(ta.qualifiedName, ref)
-          }
           UsefulTestCase.doPostponedFormatting(getProjectAdapter)
-        }
-      }, getProjectAdapter, "Test")
+      , getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
       assert(refPointer.getElement.resolve != null,
              "reference is unresolved after import action")
-    } catch {
+    catch
       case e: Exception =>
         println(e)
         assert(
             assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res)
-  }
-}

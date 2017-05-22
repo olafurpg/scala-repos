@@ -36,7 +36,7 @@ import org.quartz.CronExpression
 
 import scalaz._
 
-trait Scheduler[M[+ _]] {
+trait Scheduler[M[+ _]]
   def enabled: Boolean
 
   def addTask(repeat: Option[CronExpression],
@@ -51,10 +51,9 @@ trait Scheduler[M[+ _]] {
 
   def statusForTask(id: UUID, limit: Option[Int])
     : EitherT[M, String, Option[(ScheduledTask, Seq[ScheduledRunReport])]]
-}
 
 class ActorScheduler(scheduler: ActorRef, timeout: Timeout)
-    extends Scheduler[Future] {
+    extends Scheduler[Future]
   implicit val requestTimeout = timeout
   val enabled = true
 
@@ -65,27 +64,22 @@ class ActorScheduler(scheduler: ActorRef, timeout: Timeout)
       context: EvaluationContext,
       source: Path,
       sink: Path,
-      timeoutMillis: Option[Long]): EitherT[Future, String, UUID] = EitherT {
+      timeoutMillis: Option[Long]): EitherT[Future, String, UUID] = EitherT
     (scheduler ? AddTask(
             repeat, apiKey, authorities, context, source, sink, timeoutMillis))
       .mapTo[String \/ UUID]
-  }
 
-  def deleteTask(id: UUID) = EitherT {
+  def deleteTask(id: UUID) = EitherT
     (scheduler ? DeleteTask(id)).mapTo[String \/ PrecogUnit]
-  }
 
-  def statusForTask(id: UUID, limit: Option[Int]) = EitherT {
+  def statusForTask(id: UUID, limit: Option[Int]) = EitherT
     (scheduler ? StatusForTask(id, limit))
       .mapTo[String \/ Option[(ScheduledTask, Seq[ScheduledRunReport])]]
-  }
-}
 
-object NoopScheduler {
+object NoopScheduler
   def apply[M[+ _]: Monad] = new NoopScheduler[M]
-}
 
-class NoopScheduler[M[+ _]](implicit M: Monad[M]) extends Scheduler[M] {
+class NoopScheduler[M[+ _]](implicit M: Monad[M]) extends Scheduler[M]
   val enabled = false
 
   def addTask(repeat: Option[CronExpression],
@@ -101,4 +95,3 @@ class NoopScheduler[M[+ _]](implicit M: Monad[M]) extends Scheduler[M] {
 
   def statusForTask(id: UUID, limit: Option[Int]) =
     sys.error("No scheduling available")
-}

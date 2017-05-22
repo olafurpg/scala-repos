@@ -7,22 +7,21 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
   * Nikolay.Tropin
   * 5/30/13
   */
-class MapGetOrElseBooleanTest extends OperationsOnCollectionInspectionTest {
+class MapGetOrElseBooleanTest extends OperationsOnCollectionInspectionTest
   val hint: String = InspectionBundle.message("map.getOrElse.false.hint")
   val hintTrue: String = InspectionBundle.message("map.getOrElse.true.hint")
 
-  def test_1() {
+  def test_1()
     val selected = s"None.${START}map(x => true).getOrElse(false)$END"
     check(selected)
 
     val text = "None.map(x => true).getOrElse(false)"
     val result = "None.exists(x => true)"
     testFix(text, result, hint)
-  }
 
   "aaa ".split(' ')
 
-  def test_2() {
+  def test_2()
     val selected = s"""class Test {
           |  Some(0) ${START}map (_ => true) getOrElse false$END
           |}""".stripMargin
@@ -35,9 +34,8 @@ class MapGetOrElseBooleanTest extends OperationsOnCollectionInspectionTest {
         |  Some(0) exists (_ => true)
         |}""".stripMargin
     testFix(text, result, hint)
-  }
 
-  def test_3() {
+  def test_3()
     val selected = s"""val valueIsGoodEnough: (Any) => Boolean = _ => true
           |(None ${START}map valueIsGoodEnough).getOrElse(false)$END""".stripMargin
     check(selected)
@@ -46,9 +44,8 @@ class MapGetOrElseBooleanTest extends OperationsOnCollectionInspectionTest {
     val result = """val valueIsGoodEnough: (Any) => Boolean = _ => true
         |None exists valueIsGoodEnough""".stripMargin
     testFix(text, result, hint)
-  }
 
-  def test_4() {
+  def test_4()
     val selected = s"""val valueIsGoodEnough: (Any) => Boolean = _ => true
           |(None ${START}map valueIsGoodEnough).getOrElse(true)$END""".stripMargin
     check(selected, hintTrue)
@@ -57,7 +54,5 @@ class MapGetOrElseBooleanTest extends OperationsOnCollectionInspectionTest {
     val result = """val valueIsGoodEnough: (Any) => Boolean = _ => true
         |None forall valueIsGoodEnough""".stripMargin
     testFix(text, result, hintTrue)
-  }
 
   override val inspectionClass = classOf[MapGetOrElseBooleanInspection]
-}

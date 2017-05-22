@@ -1,9 +1,7 @@
 package test
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     A.actOnX(_ + 1)
-  }
-}

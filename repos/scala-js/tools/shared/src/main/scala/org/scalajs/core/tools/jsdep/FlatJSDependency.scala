@@ -18,12 +18,12 @@ final class FlatJSDependency(val origin: Origin,
                              val relPath: String,
                              val dependencies: List[String] = Nil,
                              val commonJSName: Option[String] = None,
-                             val relPathMinified: Option[String] = None) {
+                             val relPathMinified: Option[String] = None)
 
   require(commonJSName.forall(isValidIdentifier),
           "commonJSName must be a valid JavaScript identifier")
 
-  override def toString(): String = {
+  override def toString(): String =
     val b = new StringBuilder
     b ++= s"FlatJSDependency(origin=$origin, relPath=$relPath"
     if (dependencies.nonEmpty) b ++= s", dependencies=$dependencies"
@@ -31,5 +31,3 @@ final class FlatJSDependency(val origin: Origin,
     if (relPathMinified.nonEmpty) b ++= s", relPathMinified=$relPathMinified"
     b ++= ")"
     b.result()
-  }
-}

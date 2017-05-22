@@ -17,7 +17,7 @@ import ArbitrarySupport._
 import Ordinal._
 
 class RealCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
   val pi200 =
     "3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196"
@@ -32,141 +32,100 @@ class RealCheck
   property("e") { Real.e.getString(200) shouldBe e200 }
   property("sqrt(2)") { Real(2).sqrt.getString(200) shouldBe sqrtTwo200 }
 
-  property("Rational(n) = Real(n).toRational") {
-    forAll { (n: BigInt) =>
+  property("Rational(n) = Real(n).toRational")
+    forAll  (n: BigInt) =>
       Rational(n) shouldBe Real(n).toRational
-    }
-  }
 
-  property("Real(n)/Real(d) = Real(n/d)") {
-    forAll { (r: Rational) =>
+  property("Real(n)/Real(d) = Real(n/d)")
+    forAll  (r: Rational) =>
       Real(r.numerator) / Real(r.denominator) shouldBe Real(r)
-    }
-  }
 
-  property("x + 0 = x") {
-    forAll { (x: Real) =>
+  property("x + 0 = x")
+    forAll  (x: Real) =>
       x + Real.zero shouldBe x
-    }
-  }
 
-  property("x * 0 = 0") {
-    forAll { (x: Real) =>
+  property("x * 0 = 0")
+    forAll  (x: Real) =>
       x * Real.zero shouldBe Real.zero
-    }
-  }
 
-  property("x * 1 = x") {
-    forAll { (x: Real) =>
+  property("x * 1 = x")
+    forAll  (x: Real) =>
       x + Real.zero shouldBe x
-    }
-  }
 
-  property("x + y = y + x") {
-    forAll { (x: Real, y: Real) =>
+  property("x + y = y + x")
+    forAll  (x: Real, y: Real) =>
       x + y shouldBe y + x
-    }
-  }
 
-  property("x + (-x) = 0") {
-    forAll { (x: Real) =>
+  property("x + (-x) = 0")
+    forAll  (x: Real) =>
       x + (-x) shouldBe Real.zero
-    }
-  }
 
-  property("x / x = 1") {
-    forAll { (x: Real) =>
+  property("x / x = 1")
+    forAll  (x: Real) =>
       if (x != 0) x / x shouldBe Real.one
-    }
-  }
 
-  property("x * y = y * x") {
-    forAll { (x: Real, y: Real) =>
+  property("x * y = y * x")
+    forAll  (x: Real, y: Real) =>
       x * y shouldBe y * x
-    }
-  }
 
-  property("x + x = 2x") {
-    forAll { (x: Real) =>
+  property("x + x = 2x")
+    forAll  (x: Real) =>
       x + x shouldBe x * Real(2)
-    }
-  }
 
-  property("x * (y + z) = xy + xz") {
-    forAll { (x: Real, y: Real, z: Real) =>
+  property("x * (y + z) = xy + xz")
+    forAll  (x: Real, y: Real, z: Real) =>
       x * (y + z) shouldBe x * y + x * z
-    }
-  }
 
-  property("x.pow(2) = x * x") {
-    forAll { (x: Real) =>
+  property("x.pow(2) = x * x")
+    forAll  (x: Real) =>
       x.pow(2) shouldBe x * x
-    }
-  }
 
-  property("x.pow(3) = x * x * x") {
-    forAll { (x: Real) =>
+  property("x.pow(3) = x * x * x")
+    forAll  (x: Real) =>
       x.pow(2) shouldBe x * x
-    }
-  }
 
-  property("x.pow(k).nroot(k) = x") {
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
+  property("x.pow(k).nroot(k) = x")
+    forAll  (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.pow(k.num).nroot(k.num) shouldBe x
-    }
-  }
 
-  property("x.nroot(k).pow(k) = x") {
-    forAll { (x0: Real, k: Sized[Int, _1, _10]) =>
+  property("x.nroot(k).pow(k) = x")
+    forAll  (x0: Real, k: Sized[Int, _1, _10]) =>
       val x = x0.abs
       x.nroot(k.num).pow(k.num) shouldBe x
-    }
-  }
 
-  property("pythagorean theorem") {
-    forAll { (y: Real, x: Real) =>
-      if (x.signum != 0 || y.signum != 0) {
+  property("pythagorean theorem")
+    forAll  (y: Real, x: Real) =>
+      if (x.signum != 0 || y.signum != 0)
         val mag = (x.pow(2) + y.pow(2)).sqrt
         val x0 = x / mag
         val y0 = y / mag
         x0.pow(2) + y0.pow(2) shouldBe Real(1)
-      }
-    }
-  }
 
   // since atan2 has branch cuts, we limit the magnitue of x and y
-  property("sin(atan2(y, x)) = y/mag, cos(atan2(y, x)) = x/mag") {
-    forAll { (yn: Long, yd: Long, xn: Long, xd: Long) =>
-      if (xd != 0 && yd != 0 && (xn != 0 || yn != 0)) {
+  property("sin(atan2(y, x)) = y/mag, cos(atan2(y, x)) = x/mag")
+    forAll  (yn: Long, yd: Long, xn: Long, xd: Long) =>
+      if (xd != 0 && yd != 0 && (xn != 0 || yn != 0))
         val x = Real(Rational(xn, xd))
         val y = Real(Rational(yn, yd))
         val mag = (x ** 2 + y ** 2).sqrt
         Real.sin(Real.atan2(y, x)) shouldBe (y / mag)
         Real.cos(Real.atan2(y, x)) shouldBe (x / mag)
-      }
-    }
-  }
 
-  property("x.round = (((x * 2).floor + 1) / 2).floor") {
-    forAll { (x0: Rational) =>
+  property("x.round = (((x * 2).floor + 1) / 2).floor")
+    forAll  (x0: Rational) =>
       val x = Real(x0)
-      if (x.signum >= 0) {
+      if (x.signum >= 0)
         x.round shouldBe (((x * 2).floor + 1) / 2).floor
-      } else {
+      else
         x.round shouldBe (((x * 2).ceil - 1) / 2).ceil
-      }
-    }
-  }
 
   import spire.compat.ordering
 
-  property("x.floor <= x.round <= x.ceil") {
-    forAll { (x: Real) =>
+  property("x.floor <= x.round <= x.ceil")
+    forAll  (x: Real) =>
       x.floor should be <= x.round
       x.round should be <= x.ceil
-    }
-  }
 
   // property("complex multiplication") {
   //   // too slow to use irrational numbers to test here
@@ -209,23 +168,20 @@ class RealCheck
 
   def arcSample(f: Rational => Rational)(
       g: Double => Double, h: Real => Real): String =
-    (-8 to 8).map { i =>
+    (-8 to 8).map  i =>
       val x = Real(f(Rational(i)))
       if ((g(x.toDouble) - h(x).toDouble).abs < 0.00001) "." else "!"
-    }.mkString
+    .mkString
 
   // useful for visually debugging atan/asin
-  property("atan sample") {
+  property("atan sample")
     arcSample(_ / 2)(scala.math.atan, Real.atan)
-  }
 
-  property("asin sample") {
+  property("asin sample")
     arcSample(_ / 8)(scala.math.asin, Real.asin)
-  }
 
-  property("acos sample") {
+  property("acos sample")
     arcSample(_ / 8)(scala.math.acos, Real.acos)
-  }
 
   // // TODO: this doesn't really work due to the kind of rounding that
   // // even computable reals introduce when computing 1/3.
@@ -239,4 +195,3 @@ class RealCheck
   //     }
   //   }
   // }
-}

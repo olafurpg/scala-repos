@@ -21,79 +21,65 @@ import java.io.IOException
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
 
-private[streaming] object HdfsUtils {
+private[streaming] object HdfsUtils
 
-  def getOutputStream(path: String, conf: Configuration): FSDataOutputStream = {
+  def getOutputStream(path: String, conf: Configuration): FSDataOutputStream =
     val dfsPath = new Path(path)
     val dfs = getFileSystemForPath(dfsPath, conf)
     // If the file exists and we have append support, append instead of creating a new file
-    val stream: FSDataOutputStream = {
-      if (dfs.isFile(dfsPath)) {
+    val stream: FSDataOutputStream =
+      if (dfs.isFile(dfsPath))
         if (conf.getBoolean("hdfs.append.support", false) ||
-            dfs.isInstanceOf[RawLocalFileSystem]) {
+            dfs.isInstanceOf[RawLocalFileSystem])
           dfs.append(dfsPath)
-        } else {
+        else
           throw new IllegalStateException(
               "File exists and there is no append support!")
-        }
-      } else {
+      else
         dfs.create(dfsPath)
-      }
-    }
     stream
-  }
 
-  def getInputStream(path: String, conf: Configuration): FSDataInputStream = {
+  def getInputStream(path: String, conf: Configuration): FSDataInputStream =
     val dfsPath = new Path(path)
     val dfs = getFileSystemForPath(dfsPath, conf)
-    if (dfs.isFile(dfsPath)) {
-      try {
+    if (dfs.isFile(dfsPath))
+      try
         dfs.open(dfsPath)
-      } catch {
+      catch
         case e: IOException =>
           // If we are really unlucky, the file may be deleted as we're opening the stream.
           // This can happen as clean up is performed by daemon threads that may be left over from
           // previous runs.
           if (!dfs.isFile(dfsPath)) null else throw e
-      }
-    } else {
+    else
       null
-    }
-  }
 
-  def checkState(state: Boolean, errorMsg: => String) {
-    if (!state) {
+  def checkState(state: Boolean, errorMsg: => String)
+    if (!state)
       throw new IllegalStateException(errorMsg)
-    }
-  }
 
   /** Get the locations of the HDFS blocks containing the given file segment. */
   def getFileSegmentLocations(path: String,
                               offset: Long,
                               length: Long,
-                              conf: Configuration): Array[String] = {
+                              conf: Configuration): Array[String] =
     val dfsPath = new Path(path)
     val dfs = getFileSystemForPath(dfsPath, conf)
     val fileStatus = dfs.getFileStatus(dfsPath)
     val blockLocs = Option(
         dfs.getFileBlockLocations(fileStatus, offset, length))
     blockLocs.map(_.flatMap(_.getHosts)).getOrElse(Array.empty)
-  }
 
-  def getFileSystemForPath(path: Path, conf: Configuration): FileSystem = {
+  def getFileSystemForPath(path: Path, conf: Configuration): FileSystem =
     // For local file systems, return the raw local file system, such calls to flush()
     // actually flushes the stream.
     val fs = path.getFileSystem(conf)
-    fs match {
+    fs match
       case localFs: LocalFileSystem => localFs.getRawFileSystem
       case _ => fs
-    }
-  }
 
   /** Check if the file exists at the given path. */
-  def checkFileExists(path: String, conf: Configuration): Boolean = {
+  def checkFileExists(path: String, conf: Configuration): Boolean =
     val hdpPath = new Path(path)
     val fs = getFileSystemForPath(hdpPath, conf)
     fs.isFile(hdpPath)
-  }
-}

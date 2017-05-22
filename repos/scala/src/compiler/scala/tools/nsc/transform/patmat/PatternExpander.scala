@@ -26,7 +26,7 @@ package patmat
   *  value for aligning and typing the patterns is elementArity, as it
   *  is derived from both sets of information.
   */
-trait PatternExpander[Pattern, Type] {
+trait PatternExpander[Pattern, Type]
 
   /** You'll note we're not inside the cake. "Pattern" and "Type" are
     *  arbitrary types here, and NoPattern and NoType arbitrary values.
@@ -41,7 +41,7 @@ trait PatternExpander[Pattern, Type] {
     *  sequenceType is Seq[T], elementType is T, repeatedType is T*.
     */
   sealed case class Repeated(
-      sequenceType: Type, elementType: Type, repeatedType: Type) {
+      sequenceType: Type, elementType: Type, repeatedType: Type)
     def exists = elementType != NoType
 
     def elementList = if (exists) elementType :: Nil else Nil
@@ -49,12 +49,10 @@ trait PatternExpander[Pattern, Type] {
     def repeatedList = if (exists) repeatedType :: Nil else Nil
 
     override def toString = s"${elementType}*"
-  }
-  object NoRepeated extends Repeated(NoType, NoType, NoType) {
+  object NoRepeated extends Repeated(NoType, NoType, NoType)
     override def toString = "<none>"
-  }
 
-  final case class Patterns(fixed: List[Pattern], star: Pattern) {
+  final case class Patterns(fixed: List[Pattern], star: Pattern)
     def hasStar = star != NoPattern
     def starArity = if (hasStar) 1 else 0
     def nonStarArity = fixed.length
@@ -63,7 +61,6 @@ trait PatternExpander[Pattern, Type] {
     def all = fixed ::: starPatterns
 
     override def toString = all mkString ", "
-  }
 
   /** An 'extractor' can be a case class or an unapply or unapplySeq method.
     *  Decoding what it is that they extract takes place before we arrive here,
@@ -91,7 +88,7 @@ trait PatternExpander[Pattern, Type] {
   final case class Extractor(whole: Type,
                              fixed: List[Type],
                              repeated: Repeated,
-                             typeOfSinglePattern: Type) {
+                             typeOfSinglePattern: Type)
     require(whole != NoType, s"expandTypes($whole, $fixed, $repeated)")
 
     /** A pattern with arity-1 that doesn't match the arity of the Product-like result of the `get` method,
@@ -124,17 +121,14 @@ trait PatternExpander[Pattern, Type] {
     def offeringString =
       if (isErroneous) "<error>"
       else
-        typeStrings match {
+        typeStrings match
           case Nil => "Boolean"
           case tp :: Nil => tp
           case tps => tps.mkString("(", ", ", ")")
-        }
     override def toString = "%s => %s".format(whole, offeringString)
-  }
 
-  final case class TypedPat(pat: Pattern, tpe: Type) {
+  final case class TypedPat(pat: Pattern, tpe: Type)
     override def toString = s"$pat: $tpe"
-  }
 
   /** If elementArity is...
     *    0: A perfect match between extractor and the fixed patterns.
@@ -143,7 +137,7 @@ trait PatternExpander[Pattern, Type] {
     *       sequence which can populate at least <elementArity> patterns.
     *  < 0: There are more products than patterns: compile time error.
     */
-  final case class Aligned(patterns: Patterns, extractor: Extractor) {
+  final case class Aligned(patterns: Patterns, extractor: Extractor)
     def elementArity = patterns.nonStarArity - productArity
     def productArity = extractor.productArity
     def starArity = patterns.starArity
@@ -178,5 +172,3 @@ trait PatternExpander[Pattern, Type] {
       |    arities  $productArity/$elementArity/$starArity  // product/element/star
       |      typed  ${typedPatterns mkString ", "}
       |}""".stripMargin.trim
-  }
-}

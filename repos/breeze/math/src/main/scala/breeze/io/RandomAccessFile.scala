@@ -50,7 +50,7 @@ import spire.math.ULong
 class RandomAccessFile(file: File, arg0: String = "r")(
     implicit converter: ByteConverter = ByteConverterBigEndian)
     extends DataInput with DataOutput
-    with Closeable /*extends java.io.RandomAccessFile(file, arg0)*/ {
+    with Closeable /*extends java.io.RandomAccessFile(file, arg0)*/
 
   def this(filename: String, arg0: String)(implicit converter: ByteConverter) =
     this(new File(filename), arg0)(converter)
@@ -72,11 +72,10 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readInt8(n: Int): Array[Byte] = {
+  final def readInt8(n: Int): Array[Byte] =
     val tempret = new Array[Byte](n)
     rafObj.readFully(tempret)
     tempret
-  }
   //(for(i <- 0 until calculateN(n) ) yield readByte() ).toArray
   //</editor-fold>
 
@@ -85,17 +84,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write an Int8 (Byte) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt8(v: Byte): Unit = {
+  final def writeInt8(v: Byte): Unit =
     rafObj.write(v)
-  }
 
   /** Tries to write n Int8s (Bytes) to the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def writeInt8(v: Array[Byte]): Unit = {
+  final def writeInt8(v: Array[Byte]): Unit =
     rafObj.write(v)
-  }
   //</editor-fold>
 
   //<editor-fold desc="Aliases">
@@ -134,18 +131,16 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt8(n: Int): Array[Short] = {
+  final def readUInt8(n: Int): Array[Short] =
     val tr = new Array[Short](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       tr(c) = readUnsignedByte().toShort
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
     //    (for(i <- 0 until n ) yield readUnsignedByte() ).toArray
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -160,9 +155,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def writeUInt8(values: Array[Short]): Unit = {
+  final def writeUInt8(values: Array[Short]): Unit =
     rafObj.write(values.map(converter.uInt8ToByte(_)))
-  }
   //</editor-fold>
 
   //<editor-fold desc="Aliases">
@@ -196,28 +190,25 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  def readInt16() = {
+  def readInt16() =
     val ba = readByte(2)
     converter.bytesToInt16(ba(0), ba(1))
-  }
 
   /** Tries to read n Int16s from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readInt16(n: Int): Array[Short] = {
+  final def readInt16(n: Int): Array[Short] =
     val ba = new Array[Byte](n * 2)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Short](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       tr(c) = converter.bytesToInt16(ba(c * 2), ba(c * 2 + 1))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -225,24 +216,21 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write an Int16 (Short) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt16(v: Short): Unit = {
+  final def writeInt16(v: Short): Unit =
     rafObj.write(converter.int16ToBytes(v))
-  }
 
   /** Tries to write an array of Int16s (Shorts) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt16(v: Array[Short]): Unit = {
+  final def writeInt16(v: Array[Short]): Unit =
     val writeArr = new Array[Byte](v.length * 2)
     var currIndex = 0
-    for (cnt <- 0 until v.length) {
+    for (cnt <- 0 until v.length)
       val x = converter.int16ToBytes(v(cnt))
       writeArr(currIndex) = x(0); currIndex += 1
       writeArr(currIndex) = x(1); currIndex += 1
-    }
     rafObj.write(writeArr)
 //    rafObj.write( v.flatMap(converter.int16ToBytes(_)) )
-  }
   //</editor-fold>
 
   //<editor-fold desc="Aliases">
@@ -281,28 +269,25 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  def readUInt16(): Char = {
+  def readUInt16(): Char =
     val ba = readByte(2)
     converter.bytesToUInt16(ba(0), ba(1))
-  }
 
   /** Tries to read n UInt16s (Chars) from the current getFilePointer() as Int32.
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt16(n: Int): Array[Char] = {
+  final def readUInt16(n: Int): Array[Char] =
     val ba = new Array[Byte](n * 2)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Char](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       tr(c) = converter.bytesToUInt16(ba(c * 2), ba(c * 2 + 1))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -310,16 +295,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write a UInt16 (Char) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt16(v: Char): Unit = {
+  final def writeUInt16(v: Char): Unit =
     rafObj.write(converter.uInt16ToBytes(v))
-  }
 
   /** Tries to write an array of UInt16s (Chars) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt16(v: Array[Char]): Unit = {
+  final def writeUInt16(v: Array[Char]): Unit =
     rafObj.write(v.flatMap(converter.uInt16ToBytes(_)))
-  }
   //</editor-fold>
 
   //<editor-fold desc="Aliases">
@@ -394,29 +377,26 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readInt32(): Int = {
+  final def readInt32(): Int =
     val ba = readByte(4)
     converter.bytesToInt32(ba(0), ba(1), ba(2), ba(3))
-  }
 
   /** Tries to read n Int32s from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readInt32(n: Int): Array[Int] = {
+  final def readInt32(n: Int): Array[Int] =
     val ba = new Array[Byte](n * 4)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Int](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       tr(c) = converter.bytesToInt32(
           ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -424,16 +404,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write an Int32 (Int) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt32(v: Int): Unit = {
+  final def writeInt32(v: Int): Unit =
     rafObj.write(converter.int32ToBytes(v))
-  }
 
   /** Tries to write an array of Int32s (Ints) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt32(v: Array[Int]): Unit = {
+  final def writeInt32(v: Array[Int]): Unit =
     rafObj.write(v.flatMap(converter.int32ToBytes(_)))
-  }
 
   //</editor-fold>
 
@@ -469,29 +447,26 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt32(): Long = {
+  final def readUInt32(): Long =
     val ba = readByte(4)
     converter.bytesToUInt32(ba(0), ba(1), ba(2), ba(3))
-  }
 
   /** Tries to read n UInt32s as Longs from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt32(n: Int): Array[Long] = {
+  final def readUInt32(n: Int): Array[Long] =
     val ba = new Array[Byte](n * 4)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Long](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       tr(c) = converter.bytesToUInt32(
           ba(c * 4), ba(c * 4 + 1), ba(c * 4 + 2), ba(c * 4 + 3))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -499,16 +474,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write a UInt32 (represented by Int) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt32(v: Long): Unit = {
+  final def writeUInt32(v: Long): Unit =
     rafObj.write(converter.uInt32ToBytes(v))
-  }
 
   /** Tries to write an array of Int32s (Ints) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt32(v: Array[Long]): Unit = {
+  final def writeUInt32(v: Array[Long]): Unit =
     rafObj.write(v.flatMap(converter.uInt32ToBytes(_)))
-  }
   //</editor-fold>
 
   ///// Int64 (Long) /////
@@ -519,23 +492,22 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  def readInt64(): Long = {
+  def readInt64(): Long =
     val ba = readByte(8)
     converter.bytesToInt64(
         ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
-  }
 
   /** Tries to read n Int64s from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readInt64(n: Int): Array[Long] = {
+  final def readInt64(n: Int): Array[Long] =
     val ba = new Array[Byte](n * 8)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Long](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       val c8 = c * 8
       tr(c) = converter.bytesToInt64(ba(c8),
                                      ba(c8 + 1),
@@ -546,10 +518,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
                                      ba(c8 + 6),
                                      ba(c8 + 7))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //    (for(i <- 0 until n ) yield readInt64).toArray
   //</editor-fold>
 
@@ -558,16 +528,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write an Int64 (Long) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt64(v: Long): Unit = {
+  final def writeInt64(v: Long): Unit =
     rafObj.write(converter.int64ToBytes(v))
-  }
 
   /** Tries to write an array of Int64s (Longs) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeInt64(v: Array[Long]): Unit = {
+  final def writeInt64(v: Array[Long]): Unit =
     rafObj.write(v.flatMap(converter.int64ToBytes(_)))
-  }
   //</editor-fold>
 
   //<editor-fold desc="Aliases">
@@ -603,24 +571,23 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt64(): ULong = {
+  final def readUInt64(): ULong =
     val ba = readByte(8)
     converter.bytesToUInt64(
         ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
-  }
 
   /** Tries to read n UInt64s from the current getFilePointer().
     * Will throw an exception for UInt64 values which are larger than the maximum Long.
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt64(n: Int): Array[ULong] = {
+  final def readUInt64(n: Int): Array[ULong] =
     val ba = new Array[Byte](n * 8)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[ULong](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       val c8 = c * 8
       tr(c) = converter.bytesToUInt64(ba(c8),
                                       ba(c8 + 1),
@@ -631,10 +598,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
                                       ba(c8 + 6),
                                       ba(c8 + 7))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
 
   //</editor-fold>
 
@@ -644,17 +609,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw error if value < 0.
     */
   @throws(classOf[IOException])
-  final def writeUInt64(v: ULong): Unit = {
+  final def writeUInt64(v: ULong): Unit =
     rafObj.write(converter.uInt64ToBytes(v))
-  }
 
   /** Tries to write an array of UInt64s (input as [[spire.math.ULong]]) to the current getFilePointer().
     * Will throw error if value < 0.
     */
   @throws(classOf[IOException])
-  final def writeUInt64(v: Array[ULong]): Unit = {
+  final def writeUInt64(v: Array[ULong]): Unit =
     rafObj.write(v.flatMap(converter.uInt64ToBytes(_)))
-  }
 
   //</editor-fold>
 
@@ -666,23 +629,22 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt64Shifted(): Long = {
+  final def readUInt64Shifted(): Long =
     val ba = readByte(8)
     converter.bytesToUInt64Shifted(
         ba(0), ba(1), ba(2), ba(3), ba(4), ba(5), ba(6), ba(7))
-  }
 
   /** Tries to read n UInt64s, shifted down in value to fit into Int64/Longs from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readUInt64Shifted(n: Int): Array[Long] = {
+  final def readUInt64Shifted(n: Int): Array[Long] =
     val ba = new Array[Byte](n * 8)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Long](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       val c8 = c * 8
       tr(c) = converter.bytesToUInt64Shifted(ba(c8),
                                              ba(c8 + 1),
@@ -693,10 +655,8 @@ class RandomAccessFile(file: File, arg0: String = "r")(
                                              ba(c8 + 6),
                                              ba(c8 + 7))
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
@@ -704,16 +664,14 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Tries to write an UInt64Shifted (shifted down to Long range) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt64Shifted(v: Long): Unit = {
+  final def writeUInt64Shifted(v: Long): Unit =
     rafObj.write(converter.uInt64ShiftedToBytes(v))
-  }
 
   /** Tries to write an array of UInt64Shifted (shifted down to Long range) to the current getFilePointer().
     */
   @throws(classOf[IOException])
-  final def writeUInt64Shifted(v: Array[Long]): Unit = {
+  final def writeUInt64Shifted(v: Array[Long]): Unit =
     rafObj.write(v.flatMap(converter.uInt64ShiftedToBytes(_)))
-  }
   //</editor-fold>
 
   ///// Floating Point /////
@@ -724,29 +682,27 @@ class RandomAccessFile(file: File, arg0: String = "r")(
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  override def readDouble(): Double = {
+  override def readDouble(): Double =
     java.lang.Double.longBitsToDouble(readLong())
-  }
 
   /** Tries to read a Float at the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  override def readFloat(): Float = {
+  override def readFloat(): Float =
     java.lang.Float.intBitsToFloat(readInt())
-  }
 
   /** Tries to read n Doubles from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readDouble(n: Int): Array[Double] = {
+  final def readDouble(n: Int): Array[Double] =
     val ba = new Array[Byte](n * 8)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Double](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       val c8 = c * 8
       tr(c) = java.lang.Double.longBitsToDouble(
           converter.bytesToInt64(ba(c8),
@@ -759,68 +715,58 @@ class RandomAccessFile(file: File, arg0: String = "r")(
                                  ba(c8 + 7))
       )
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
 
   /** Tries to read n Floats from the current getFilePointer().
     * Will throw an exception if it encounters an end of file.
     */
   @throws(classOf[IOException])
-  final def readFloat(n: Int): Array[Float] = {
+  final def readFloat(n: Int): Array[Float] =
     val ba = new Array[Byte](n * 4)
     rafObj.readFully(ba) //reading is much faster if many bytes are read simultaneously
     val tr = new Array[Float](n)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < n) {
+    while (c < n)
       val c4 = c * 4
       tr(c) = java.lang.Float.intBitsToFloat(
           converter.bytesToInt32(ba(c4), ba(c4 + 1), ba(c4 + 2), ba(c4 + 3))
       )
       c += 1
-    }
     //for(c <- 0 until n) tr(c) = bytesToInt16(ba(c), ba(c + 1))
     tr
-  }
   //</editor-fold>
 
   //<editor-fold desc="Writing">
 
   @throws(classOf[IOException])
-  def writeFloat(v: Float) = {
+  def writeFloat(v: Float) =
     writeInt32(java.lang.Float.floatToRawIntBits(v))
-  }
 
   @throws(classOf[IOException])
-  def writeDouble(v: Double) = {
+  def writeDouble(v: Double) =
     writeInt64(java.lang.Double.doubleToRawLongBits(v))
-  }
 
   @throws(classOf[IOException])
-  def writeDouble(v: Array[Double]): Unit = {
+  def writeDouble(v: Array[Double]): Unit =
     val la = new Array[Long](v.length)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < v.length) {
+    while (c < v.length)
       la(c) = java.lang.Double.doubleToRawLongBits(v(c))
       c += 1
-    }
     writeLong(la)
-  }
 
   @throws(classOf[IOException])
-  def writeFloat(v: Array[Float]): Unit = {
+  def writeFloat(v: Array[Float]): Unit =
     val ia = new Array[Int](v.length)
     //the following is a hack to avoid the heavier Scala for loop
     var c = 0
-    while (c < v.length) {
+    while (c < v.length)
       ia(c) = java.lang.Float.floatToRawIntBits(v(c))
       c += 1
-    }
     writeInt(ia)
-  }
 
   //</editor-fold>
 
@@ -860,11 +806,10 @@ class RandomAccessFile(file: File, arg0: String = "r")(
 
   /** like [[skipBytes]] but just jumps, does not return. For speed
     */
-  def jumpBytes(n: Int): Unit = {
+  def jumpBytes(n: Int): Unit =
     //Speed optimization
     //rafObj.skipBytes(n)
     rafObj.seek(rafObj.getFilePointer + n)
-  }
 
   /** Pass on to [[java.io.RandomAccessFile]]
     */
@@ -914,17 +859,15 @@ class RandomAccessFile(file: File, arg0: String = "r")(
   /** Pass on to [[java.io.RandomAccessFile]]
     */
   def writeBytes(s: String): Unit = rafObj.writeBytes(s)
-}
 
 /** Reads and writes data from byte values.
   */
-abstract class ByteConverter {
+abstract class ByteConverter
 
   ///// bytesToXXX /////
   /**Takes 1 Byte and returns a UInt8 (as Short)*/
-  def byteToUInt8(b0: Byte): Short = {
+  def byteToUInt8(b0: Byte): Short =
     if (b0 < 0) (b0 + 256).toShort else b0.toShort
-  }
 
   /**Takes 2 Bytes and returns an Int16 (Short)*/
   def bytesToInt16(b0: Byte, b1: Byte): Short
@@ -946,9 +889,8 @@ abstract class ByteConverter {
                           b4: Byte,
                           b5: Byte,
                           b6: Byte,
-                          b7: Byte): ULong = {
+                          b7: Byte): ULong =
     ULong(bytesToInt64(b0, b1, b2, b3, b4, b5, b6, b7))
-  }
 
   /**Takes 8 Bytes and returns a Int64 (Long)*/
   def bytesToInt64(b0: Byte,
@@ -974,11 +916,10 @@ abstract class ByteConverter {
 
   ///// XXXToByte /////
   /**Takes an UInt8 (as Sort), and returns a bytes*/
-  def uInt8ToByte(value: Short): Byte = {
+  def uInt8ToByte(value: Short): Byte =
     require(value <= 255 && value >= 0,
             "Value " + value + " is out of range of 1-byte unsigned integer.")
     if (value >= 128) (value - 256.toShort).toByte else value.toByte
-  }
 
   /**Takes an Int16 (Short), and returns an array of 2 bytes*/
   def int16ToBytes(value: Short): Array[Byte]
@@ -1001,29 +942,24 @@ abstract class ByteConverter {
   /**Takes an Int64 (Long), and returns an array of 8 bytes, shifted up to a UInt64.
     * See [[breeze.io.ByteConverter.bytesToUInt64Shifted()]]*/
   def uInt64ShiftedToBytes(value: Long): Array[Byte]
-}
 
 /** See [[breeze.io.ByteConverter]], reads big endian.
   */
-object ByteConverterBigEndian extends ByteConverter {
+object ByteConverterBigEndian extends ByteConverter
 
   ///// bytesToXXX /////
-  def bytesToInt16(b0: Byte, b1: Byte): Short = {
+  def bytesToInt16(b0: Byte, b1: Byte): Short =
     (b0 << 8 | b1 & 0xFF).toShort
-  }
 
-  def bytesToUInt16(b0: Byte, b1: Byte): Char = {
+  def bytesToUInt16(b0: Byte, b1: Byte): Char =
     ((b0.toInt & 0xFF) << 8 | (b1.toInt & 0xFF)).toChar
-  }
 
-  def bytesToInt32(b0: Byte, b1: Byte, b2: Byte, b3: Byte): Int = {
+  def bytesToInt32(b0: Byte, b1: Byte, b2: Byte, b3: Byte): Int =
     b0.toInt << 24 | (b1 & 0xFF) << 16 | (b2 & 0xFF) << 8 | (b3 & 0xFF)
-  }
 
-  def bytesToUInt32(b0: Byte, b1: Byte, b2: Byte, b3: Byte): Long = {
+  def bytesToUInt32(b0: Byte, b1: Byte, b2: Byte, b3: Byte): Long =
     (b0.toLong & 0xFFL) << 24 | (b1.toLong & 0xFFL) << 16 | (b2.toLong & 0xFFL) << 8 |
     (b3.toLong & 0xFFL)
-  }
 
 //  def bytesToUInt64(b0: Byte, b1: Byte, b2: Byte, b3: Byte, b4: Byte, b5: Byte, b6: Byte, b7: Byte): ULong = {
 ////    if ((b0/*.toInt*/ & 0x80) != 0x00) {
@@ -1041,11 +977,10 @@ object ByteConverterBigEndian extends ByteConverter {
                    b4: Byte,
                    b5: Byte,
                    b6: Byte,
-                   b7: Byte): Long = {
+                   b7: Byte): Long =
     b0.toLong << 56 | (b1.toLong & 0xFFL) << 48 | (b2.toLong & 0xFFL) << 40 |
     (b3.toLong & 0xFFL) << 32 | (b4.toLong & 0xFFL) << 24 | (b5.toLong & 0xFFL) << 16 |
     (b6.toLong & 0xFFL) << 8 | (b7.toLong & 0xFFL)
-  }
 
   def bytesToUInt64Shifted(b0: Byte,
                            b1: Byte,
@@ -1054,20 +989,18 @@ object ByteConverterBigEndian extends ByteConverter {
                            b4: Byte,
                            b5: Byte,
                            b6: Byte,
-                           b7: Byte): Long = {
+                           b7: Byte): Long =
     (b0 ^ 0x80).toLong << 56 | (b1.toLong & 0xFFL) << 48 | (b2.toLong & 0xFFL) << 40 |
     (b3.toLong & 0xFFL) << 32 | (b4.toLong & 0xFFL) << 24 | (b5.toLong & 0xFFL) << 16 |
     (b6.toLong & 0xFFL) << 8 | (b7.toLong & 0xFFL)
-  }
   ///// XXXToByte /////
-  def int16ToBytes(value: Short): Array[Byte] = {
+  def int16ToBytes(value: Short): Array[Byte] =
     val tempret = new Array[Byte](2)
     tempret(0) = (value >> 8).toByte
     tempret(1) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt16ToBytes(value: Char): Array[Byte] = {
+  def uInt16ToBytes(value: Char): Array[Byte] =
     require(value <= 65535 && value >= 0,
             "Value " + value + " is out of range of 2-byte unsigned array.")
 
@@ -1075,18 +1008,16 @@ object ByteConverterBigEndian extends ByteConverter {
     tempret(0) = ((value >> 8) & 0xFF).toByte
     tempret(1) = (value & 0xFF).toByte
     tempret
-  }
 
-  def int32ToBytes(value: Int): Array[Byte] = {
+  def int32ToBytes(value: Int): Array[Byte] =
     val tempret = new Array[Byte](4)
     tempret(0) = (value >> 24).toByte
     tempret(1) = ((value >> 16) & 0xFF).toByte
     tempret(2) = ((value >> 8) & 0xFF).toByte
     tempret(3) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt32ToBytes(value: Long): Array[Byte] = {
+  def uInt32ToBytes(value: Long): Array[Byte] =
     require(value <= 4294967295L && value >= 0L,
             "Value " + value + " is out of range of 4-byte unsigned array.")
 
@@ -1096,9 +1027,8 @@ object ByteConverterBigEndian extends ByteConverter {
     tempret(2) = ((value >> 8) & 0xFF).toByte
     tempret(3) = (value & 0xFF).toByte
     tempret
-  }
 
-  def int64ToBytes(value: Long): Array[Byte] = {
+  def int64ToBytes(value: Long): Array[Byte] =
     val tempret = new Array[Byte](8)
     tempret(0) = (value >> 56).toByte
     tempret(1) = ((value >> 48) & 0xFF).toByte
@@ -1109,9 +1039,8 @@ object ByteConverterBigEndian extends ByteConverter {
     tempret(6) = ((value >> 8) & 0xFF).toByte
     tempret(7) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt64ToBytes(value: ULong): Array[Byte] = {
+  def uInt64ToBytes(value: ULong): Array[Byte] =
 //    require(value >= ZERO, s"Value $value is out of range of 8-byte unsigned array.")
 //    require(value <= uInt64Max, s"Value $value is out of range of 8-byte unsigned array.")
 
@@ -1127,9 +1056,8 @@ object ByteConverterBigEndian extends ByteConverter {
     tempret(6) = ((longValue >> 8) & 0xFF).toByte
     tempret(7) = (longValue & 0xFF).toByte
     tempret
-  }
 
-  def uInt64ShiftedToBytes(value: Long): Array[Byte] = {
+  def uInt64ShiftedToBytes(value: Long): Array[Byte] =
 
     val tempret = new Array[Byte](8)
     tempret(0) = (((value >> 56) & 0xFF) ^ 0x80).toByte
@@ -1141,12 +1069,10 @@ object ByteConverterBigEndian extends ByteConverter {
     tempret(6) = ((value >> 8) & 0xFF).toByte
     tempret(7) = (value & 0xFF).toByte
     tempret
-  }
-}
 
 /** See [[breeze.io.ByteConverter]], reads little endian.
   */
-object ByteConverterLittleEndian extends ByteConverter {
+object ByteConverterLittleEndian extends ByteConverter
 
   override def bytesToInt16(b0: Byte, b1: Byte) =
     ByteConverterBigEndian.bytesToInt16(b1, b0)
@@ -1187,14 +1113,13 @@ object ByteConverterLittleEndian extends ByteConverter {
 //  override def uInt64ShiftedToBytes(value: Long): Array[Byte] = ByteConverterBigEndian.uInt64ShiftedToBytes(value).reverse
 
   ///// XXXToByte /////
-  def int16ToBytes(value: Short): Array[Byte] = {
+  def int16ToBytes(value: Short): Array[Byte] =
     val tempret = new Array[Byte](2)
     tempret(1) = (value >> 8).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt16ToBytes(value: Char): Array[Byte] = {
+  def uInt16ToBytes(value: Char): Array[Byte] =
     require(value <= 65535 && value >= 0,
             "Value " + value + " is out of range of 2-byte unsigned array.")
 
@@ -1202,18 +1127,16 @@ object ByteConverterLittleEndian extends ByteConverter {
     tempret(1) = ((value >> 8) & 0xFF).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
 
-  def int32ToBytes(value: Int): Array[Byte] = {
+  def int32ToBytes(value: Int): Array[Byte] =
     val tempret = new Array[Byte](4)
     tempret(3) = (value >> 24).toByte
     tempret(2) = ((value >> 16) & 0xFF).toByte
     tempret(1) = ((value >> 8) & 0xFF).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt32ToBytes(value: Long): Array[Byte] = {
+  def uInt32ToBytes(value: Long): Array[Byte] =
     require(value <= 4294967295L && value >= 0L,
             "Value " + value + " is out of range of 4-byte unsigned array.")
 
@@ -1223,9 +1146,8 @@ object ByteConverterLittleEndian extends ByteConverter {
     tempret(1) = ((value >> 8) & 0xFF).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
 
-  def int64ToBytes(value: Long): Array[Byte] = {
+  def int64ToBytes(value: Long): Array[Byte] =
     val tempret = new Array[Byte](8)
     tempret(7) = (value >> 56).toByte
     tempret(6) = ((value >> 48) & 0xFF).toByte
@@ -1236,9 +1158,8 @@ object ByteConverterLittleEndian extends ByteConverter {
     tempret(1) = ((value >> 8) & 0xFF).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
 
-  def uInt64ToBytes(value: ULong): Array[Byte] = {
+  def uInt64ToBytes(value: ULong): Array[Byte] =
 //    require(value >= ZERO, s"Value $value is out of range of 8-byte unsigned array.")
 //    require(value <= uInt64Max, s"Value $value is out of range of 8-byte unsigned array.")
 
@@ -1253,9 +1174,8 @@ object ByteConverterLittleEndian extends ByteConverter {
     tempret(1) = ((longValue >> 8) & 0xFF).toByte
     tempret(0) = (longValue & 0xFF).toByte
     tempret
-  }
 
-  def uInt64ShiftedToBytes(value: Long): Array[Byte] = {
+  def uInt64ShiftedToBytes(value: Long): Array[Byte] =
 
     val tempret = new Array[Byte](8)
     tempret(7) = (((value >> 56) & 0xFF) ^ 0x80).toByte
@@ -1267,5 +1187,3 @@ object ByteConverterLittleEndian extends ByteConverter {
     tempret(1) = ((value >> 8) & 0xFF).toByte
     tempret(0) = (value & 0xFF).toByte
     tempret
-  }
-}

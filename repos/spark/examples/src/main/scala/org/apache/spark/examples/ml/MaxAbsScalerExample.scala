@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.MaxAbsScaler
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object MaxAbsScalerExample {
-  def main(args: Array[String]): Unit = {
+object MaxAbsScalerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("MaxAbsScalerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -45,6 +45,4 @@ object MaxAbsScalerExample {
     scaledData.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

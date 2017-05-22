@@ -22,13 +22,10 @@ import org.specs2.mutable.Specification
 /**
   * Systems under specification for ConnectionIdentifier.
   */
-object ConnectionIdentifierSpec extends Specification {
+object ConnectionIdentifierSpec extends Specification
   "ConnectionIdentifier Specification".title
 
-  "Connection identifier" should {
+  "Connection identifier" should
 
-    "be set by property" in {
+    "be set by property" in
       DefaultConnectionIdentifier.jndiName must_== "from_props"
-    }
-  }
-}

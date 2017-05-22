@@ -24,55 +24,47 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScImportSelectorStub
 class ScImportSelectorImpl private (
     stub: StubElement[ScImportSelector], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScImportSelector {
+    with ScImportSelector
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScImportSelectorStub) = {
+  def this(stub: ScImportSelectorStub) =
     this(stub, ScalaElementTypes.IMPORT_SELECTOR, null)
-  }
 
   override def toString: String = "ImportSelector"
 
-  def importedName: String = {
+  def importedName: String =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScImportSelectorStub].importedName
-    }
     val id = findChildByType[PsiElement](TokenSets.ID_SET)
     if (id == null) reference.refName else id.getText
-  }
 
-  def reference: ScStableCodeReferenceElement = {
+  def reference: ScStableCodeReferenceElement =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScImportSelectorStub].reference
-    }
-    getFirstChild match {
+    getFirstChild match
       case s: ScStableCodeReferenceElement => s
       case _ => null
-    }
-  }
 
-  def deleteSelector() {
+  def deleteSelector()
     val expr: ScImportExpr =
       PsiTreeUtil.getParentOfType(this, classOf[ScImportExpr])
-    if (expr.selectors.length + expr.singleWildcard.toInt == 1) {
+    if (expr.selectors.length + expr.singleWildcard.toInt == 1)
       expr.deleteExpr()
-    }
     val forward: Boolean = expr.selectors.head == this
     var node = this.getNode
     var prev = if (forward) node.getTreeNext else node.getTreePrev
     var t: IElementType = null
-    do {
+    do
       node.getTreeParent.removeChild(node)
       node = prev
-      if (node != null) {
+      if (node != null)
         prev = if (forward) node.getTreeNext else node.getTreePrev
         t = node.getElementType
-      }
-    } while (node != null && !(t == ScalaElementTypes.IMPORT_SELECTOR ||
+    while (node != null && !(t == ScalaElementTypes.IMPORT_SELECTOR ||
         t == ScalaTokenTypes.tUNDER))
 
-    expr.selectors match {
+    expr.selectors match
       case Seq(sel: ScImportSelector) if !sel.isAliasedImport =>
         val withoutBracesText =
           expr.qualifier.getText + "." + sel.reference.getText
@@ -80,17 +72,12 @@ class ScImportSelectorImpl private (
             withoutBracesText, expr.getManager)
         expr.replace(newImportExpr)
       case _ =>
-    }
-  }
 
-  def isAliasedImport: Boolean = {
-    getStub match {
+  def isAliasedImport: Boolean =
+    getStub match
       case stub: ScImportSelectorStub => stub.isAliasedImport
       case _ =>
         PsiTreeUtil
           .getParentOfType(this, classOf[ScImportExpr])
           .selectors
           .nonEmpty && !getLastChild.isInstanceOf[ScStableCodeReferenceElement]
-    }
-  }
-}

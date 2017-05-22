@@ -7,7 +7,7 @@ import sbt._
 import sbt.Keys._
 import java.io.File
 
-object Publish extends AutoPlugin {
+object Publish extends AutoPlugin
 
   val defaultPublishTo = settingKey[File]("Default publish directory")
 
@@ -21,13 +21,13 @@ object Publish extends AutoPlugin {
       organizationName := "Lightbend Inc.",
       organizationHomepage := Some(url("http://www.lightbend.com")),
       publishMavenStyle := true,
-      pomIncludeRepository := { x =>
+      pomIncludeRepository :=  x =>
         false
-      },
+      ,
       defaultPublishTo := crossTarget.value / "repository"
   )
 
-  def akkaPomExtra = {
+  def akkaPomExtra =
     <inceptionYear>2009</inceptionYear>
     <scm>
       <url>git://github.com/akka/akka.git</url>
@@ -41,20 +41,17 @@ object Publish extends AutoPlugin {
         <url>https://github.com/akka/akka/graphs/contributors</url>
       </developer>
     </developers>
-  }
 
-  private def akkaPublishTo = Def.setting {
+  private def akkaPublishTo = Def.setting
     sonatypeRepo(version.value) orElse localRepo(defaultPublishTo.value)
-  }
 
   private def sonatypeRepo(version: String): Option[Resolver] =
-    Option(sys.props("publish.maven.central")) filter (_.toLowerCase == "true") map {
+    Option(sys.props("publish.maven.central")) filter (_.toLowerCase == "true") map
       _ =>
         val nexus = "https://oss.sonatype.org/"
         if (version endsWith "-SNAPSHOT")
           "snapshots" at nexus + "content/repositories/snapshots"
         else "releases" at nexus + "service/local/staging/deploy/maven2"
-    }
 
   private def localRepo(repository: File) =
     Some(Resolver.file("Default Local Repository", repository))
@@ -63,4 +60,3 @@ object Publish extends AutoPlugin {
     Option(System.getProperty("akka.publish.credentials", null))
       .map(f => Credentials(new File(f)))
       .toSeq
-}

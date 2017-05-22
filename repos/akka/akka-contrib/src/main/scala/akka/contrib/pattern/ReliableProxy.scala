@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.util.Try
 import java.util.concurrent.TimeUnit
 
-object ReliableProxy {
+object ReliableProxy
 
   /**
     * Scala API Props.  Arguments are detailed in the [[akka.contrib.pattern.ReliableProxy]]
@@ -18,10 +18,9 @@ object ReliableProxy {
   def props(targetPath: ActorPath,
             retryAfter: FiniteDuration,
             reconnectAfter: Option[FiniteDuration],
-            maxReconnects: Option[Int]): Props = {
+            maxReconnects: Option[Int]): Props =
     Props(new ReliableProxy(
             targetPath, retryAfter, reconnectAfter, maxReconnects))
-  }
 
   /**
     * Java API Props.  Arguments are detailed in the [[akka.contrib.pattern.ReliableProxy]]
@@ -30,12 +29,11 @@ object ReliableProxy {
   def props(targetPath: ActorPath,
             retryAfter: FiniteDuration,
             reconnectAfter: FiniteDuration,
-            maxReconnects: Int): Props = {
+            maxReconnects: Int): Props =
     props(targetPath,
           retryAfter,
           Option(reconnectAfter),
           if (maxReconnects > 0) Some(maxReconnects) else None)
-  }
 
   /**
     * Props with no limit on reconnections.  Arguments are detailed in the [[akka.contrib.pattern.ReliableProxy]]
@@ -43,51 +41,44 @@ object ReliableProxy {
     */
   def props(targetPath: ActorPath,
             retryAfter: FiniteDuration,
-            reconnectAfter: FiniteDuration): Props = {
+            reconnectAfter: FiniteDuration): Props =
     props(targetPath, retryAfter, Option(reconnectAfter), None)
-  }
 
   /**
     * Props with no reconnections.  Arguments are detailed in the [[akka.contrib.pattern.ReliableProxy]]
     * constructor.
     */
-  def props(targetPath: ActorPath, retryAfter: FiniteDuration): Props = {
+  def props(targetPath: ActorPath, retryAfter: FiniteDuration): Props =
     props(targetPath, retryAfter, None, None)
-  }
 
   class Receiver(target: ActorRef, initialSerial: Int)
-      extends Actor with ReliableProxyDebugLogging {
+      extends Actor with ReliableProxyDebugLogging
     var lastSerial = initialSerial
 
     context.watch(target)
 
-    def receive = {
+    def receive =
       case Message(msg, snd, serial) ⇒
-        if (serial == lastSerial + 1) {
+        if (serial == lastSerial + 1)
           target.tell(msg, snd)
           sender() ! Ack(serial)
           lastSerial = serial
-        } else if (compare(serial, lastSerial) <= 0) {
+        else if (compare(serial, lastSerial) <= 0)
           sender() ! Ack(serial)
-        } else {
+        else
           logDebug("Received message from {} with wrong serial: {}", snd, msg)
-        }
       case Terminated(`target`) ⇒ context stop self
-    }
-  }
 
   /**
     * Wrap-around aware comparison of integers: differences limited to 2**31-1
     * in magnitude will work correctly.
     */
-  def compare(a: Int, b: Int): Int = {
+  def compare(a: Int, b: Int): Int =
     val c = a - b
-    c match {
+    c match
       case x if x < 0 ⇒ -1
       case x if x == 0 ⇒ 0
       case x if x > 0 ⇒ 1
-    }
-  }
 
   def receiver(target: ActorRef, currentSerial: Int): Props =
     Props(classOf[Receiver], target, currentSerial)
@@ -121,12 +112,11 @@ object ReliableProxy {
   val idle = Idle
   val active = Active
   val reconnecting = Connecting
-}
 
 /**
   * INTERNAL API
   */
-private[akka] trait ReliableProxyDebugLogging extends ActorLogging {
+private[akka] trait ReliableProxyDebugLogging extends ActorLogging
   this: Actor ⇒
   val debug: Boolean =
     Try(context.system.settings.config.getBoolean("akka.reliable-proxy.debug")) getOrElse false
@@ -140,7 +130,6 @@ private[akka] trait ReliableProxyDebugLogging extends ActorLogging {
 
   def logDebug(template: String, arg1: Any): Unit =
     if (enabled) log.debug(addSelf(template), arg1)
-}
 
 import ReliableProxy._
 
@@ -241,7 +230,7 @@ class ReliableProxy(targetPath: ActorPath,
                     reconnectAfter: Option[FiniteDuration],
                     maxConnectAttempts: Option[Int])
     extends Actor with LoggingFSM[State, Vector[Message]]
-    with ReliableProxyDebugLogging {
+    with ReliableProxyDebugLogging
 
   var tunnel: ActorRef = _
   var currentSerial: Int = 0
@@ -268,7 +257,7 @@ class ReliableProxy(targetPath: ActorPath,
 
   self ! ReconnectTick
 
-  def createTunnel(target: ActorRef): Unit = {
+  def createTunnel(target: ActorRef): Unit =
     logDebug("Creating new tunnel for {}", target)
     tunnel = context.actorOf(
         receiver(target, lastAckSerial).withDeploy(
@@ -279,41 +268,35 @@ class ReliableProxy(targetPath: ActorPath,
     currentTarget = target
     attemptedReconnects = 0
     resetBackoff()
-  }
 
   if (targetPath.address.host.isEmpty &&
-      self.path.address == targetPath.address) {
+      self.path.address == targetPath.address)
     logDebug(
         "Unnecessary to use ReliableProxy for local target: {}", targetPath)
-  }
 
-  override def supervisorStrategy = OneForOneStrategy() {
+  override def supervisorStrategy = OneForOneStrategy()
     case _ ⇒ SupervisorStrategy.Escalate
-  }
 
-  override def postStop() {
+  override def postStop()
     logDebug("Stopping proxy and sending {} messages to subscribers in Unsent",
              stateData.size)
     gossip(ProxyTerminated(self, Unsent(stateData)))
     super.postStop()
-  }
 
   startWith(initialState, Vector.empty)
 
-  when(Idle) {
+  when(Idle)
     case Event(Terminated(_), _) ⇒ terminated()
     case Event(Ack(_), _) ⇒ stay()
     case Event(Unsent(msgs), _) ⇒ goto(Active) using resend(updateSerial(msgs))
     case Event(msg, _) ⇒ goto(Active) using Vector(send(msg, sender()))
-  }
 
-  onTransition {
+  onTransition
     case _ -> Active ⇒ scheduleTick()
     case Active -> Idle ⇒ cancelTimer(resendTimer)
     case _ -> Connecting ⇒ scheduleReconnectTick()
-  }
 
-  when(Active) {
+  when(Active)
     case Event(Terminated(_), _) ⇒
       terminated()
     case Event(Ack(serial), queue) ⇒
@@ -331,9 +314,8 @@ class ReliableProxy(targetPath: ActorPath,
       stay using queue ++ resend(updateSerial(msgs))
     case Event(msg, queue) ⇒
       stay using (queue :+ send(msg, sender()))
-  }
 
-  when(Connecting) {
+  when(Connecting)
     case Event(Terminated(_), _) ⇒
       stay()
     case Event(ActorIdentity(_, Some(actor)), queue) ⇒
@@ -345,10 +327,10 @@ class ReliableProxy(targetPath: ActorPath,
     case Event(ActorIdentity(_, None), _) ⇒
       stay()
     case Event(ReconnectTick, _) ⇒
-      if (maxConnectAttempts exists (_ == attemptedReconnects)) {
+      if (maxConnectAttempts exists (_ == attemptedReconnects))
         logDebug("Failed to reconnect after {}", attemptedReconnects)
         stop()
-      } else {
+      else
         logDebug("{} ! {}",
                  context.actorSelection(targetPath),
                  Identify(targetPath))
@@ -356,49 +338,42 @@ class ReliableProxy(targetPath: ActorPath,
         scheduleReconnectTick()
         attemptedReconnects += 1
         stay()
-      }
     case Event(Unsent(msgs), queue) ⇒
       stay using queue ++ updateSerial(msgs)
     case Event(msg, queue) ⇒
       stay using (queue :+ Message(msg, sender(), nextSerial()))
-  }
 
   def scheduleTick(): Unit =
     setTimer(resendTimer, Tick, retryAfter, repeat = false)
 
-  def nextSerial(): Int = {
+  def nextSerial(): Int =
     currentSerial += 1
     currentSerial
-  }
 
-  def send(msg: Any, snd: ActorRef): Message = {
+  def send(msg: Any, snd: ActorRef): Message =
     val m = Message(msg, snd, nextSerial())
     tunnel ! m
     m
-  }
 
   def updateSerial(q: Vector[Message]) = q map (_.copy(serial = nextSerial()))
 
-  def resend(q: Vector[Message]): Vector[Message] = {
+  def resend(q: Vector[Message]): Vector[Message] =
     logResend(q.size)
     q foreach { tunnel ! _ }
     q
-  }
 
   def logResend(size: Int): Unit =
     logDebug("Resending {} messages through tunnel", size)
 
-  def terminated(): State = {
+  def terminated(): State =
     logDebug("Terminated: {}", targetPath)
     if (reconnectAfter.isDefined) goto(Connecting)
     else stop()
-  }
 
-  def scheduleReconnectTick(): Unit = {
+  def scheduleReconnectTick(): Unit =
     val delay = nextBackoff()
     logDebug("Will attempt to reconnect to {} in {}", targetPath, delay)
     setTimer(reconnectTimer, ReconnectTick, delay, repeat = false)
-  }
 
   /**
     * Reset backoff interval.
@@ -412,4 +387,3 @@ class ReliableProxy(targetPath: ActorPath,
     */
   def nextBackoff(): FiniteDuration =
     reconnectAfter getOrElse defaultConnectInterval
-}

@@ -2,6 +2,5 @@ package test
 
 class Box[T]
 
-class Foo {
+class Foo
   def foo: Box[_] = null
-}

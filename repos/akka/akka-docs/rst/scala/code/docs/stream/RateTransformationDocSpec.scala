@@ -14,21 +14,20 @@ import scala.concurrent.duration._
 import scala.collection.immutable
 import akka.testkit.{AkkaSpec, TestLatch}
 
-class RateTransformationDocSpec extends AkkaSpec {
+class RateTransformationDocSpec extends AkkaSpec
 
   type Seq[+A] = immutable.Seq[A]
   val Seq = immutable.Seq
 
   implicit val materializer = ActorMaterializer()
 
-  "conflate should summarize" in {
+  "conflate should summarize" in
     //#conflate-summarize
-    val statsFlow = Flow[Double].conflateWithSeed(Seq(_))(_ :+ _).map { s =>
+    val statsFlow = Flow[Double].conflateWithSeed(Seq(_))(_ :+ _).map  s =>
       val μ = s.sum / s.size
       val se = s.map(x => pow(x - μ, 2))
       val σ = sqrt(se.sum / se.size)
       (σ, μ, s.size)
-    }
     //#conflate-summarize
 
     val fut = Source
@@ -38,16 +37,14 @@ class RateTransformationDocSpec extends AkkaSpec {
       .runWith(Sink.head)
 
     Await.result(fut, 100.millis)
-  }
 
-  "conflate should sample" in {
+  "conflate should sample" in
     //#conflate-sample
     val p = 0.01
     val sampleFlow = Flow[Double]
-      .conflateWithSeed(Seq(_)) {
+      .conflateWithSeed(Seq(_))
         case (acc, elem) if Random.nextDouble < p => acc :+ elem
         case (acc, _) => acc
-      }
       .mapConcat(identity)
     //#conflate-sample
 
@@ -57,9 +54,8 @@ class RateTransformationDocSpec extends AkkaSpec {
       .runWith(Sink.fold(Seq.empty[Double])(_ :+ _))
 
     val count = Await.result(fut, 1000.millis).size
-  }
 
-  "expand should repeat last" in {
+  "expand should repeat last" in
     //#expand-last
     val lastFlow = Flow[Double].expand(Iterator.continually(_))
     //#expand-last
@@ -75,9 +71,8 @@ class RateTransformationDocSpec extends AkkaSpec {
     val expanded = Await.result(fut, 100.millis)
     expanded.size shouldBe 10
     expanded.sum shouldBe 10
-  }
 
-  "expand should track drift" in {
+  "expand should track drift" in
     //#expand-drift
     val driftFlow = Flow[Double].expand(i => Iterator.from(0).map(i -> _))
     //#expand-drift
@@ -101,5 +96,3 @@ class RateTransformationDocSpec extends AkkaSpec {
     pub.sendNext(2.0)
     Await.ready(latch, 1.second)
     sub.requestNext((2.0, 0))
-  }
-}

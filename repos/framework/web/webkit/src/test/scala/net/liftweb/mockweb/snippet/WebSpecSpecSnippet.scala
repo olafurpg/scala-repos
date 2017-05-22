@@ -17,6 +17,5 @@ package net.liftweb.mockweb.snippet
  */
 import xml.NodeSeq
 
-class WebSpecSpecSnippet {
+class WebSpecSpecSnippet
   def render: NodeSeq = <h1>Hello, WebSpec!</h1>
-}

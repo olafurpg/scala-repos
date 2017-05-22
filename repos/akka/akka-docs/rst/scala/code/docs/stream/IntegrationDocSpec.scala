@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.stream.Supervision
 import akka.stream.scaladsl.Flow
 
-object IntegrationDocSpec {
+object IntegrationDocSpec
   import TwitterStreamQuickstartDocSpec._
 
   val config =
@@ -43,7 +43,7 @@ object IntegrationDocSpec {
     akka.actor.default-mailbox.mailbox-type = akka.dispatch.UnboundedMailbox
     """)
 
-  class AddressSystem {
+  class AddressSystem
     //#email-address-lookup
     def lookupEmail(handle: String): Future[Option[String]] =
       //#email-address-lookup
@@ -53,80 +53,68 @@ object IntegrationDocSpec {
     def lookupPhoneNumber(handle: String): Future[Option[String]] =
       //#phone-lookup
       Future.successful(Some(handle.hashCode.toString))
-  }
 
-  class AddressSystem2 {
+  class AddressSystem2
     //#email-address-lookup2
     def lookupEmail(handle: String): Future[String] =
       //#email-address-lookup2
       Future.successful(handle + "@somewhere.com")
-  }
 
   final case class Email(to: String, title: String, body: String)
   final case class TextMessage(to: String, body: String)
 
-  class EmailServer(probe: ActorRef) {
+  class EmailServer(probe: ActorRef)
     //#email-server-send
-    def send(email: Email): Future[Unit] = {
+    def send(email: Email): Future[Unit] =
       // ...
       //#email-server-send
       probe ! email.to
       Future.successful(())
       //#email-server-send
-    }
     //#email-server-send
-  }
 
-  class SmsServer(probe: ActorRef) {
+  class SmsServer(probe: ActorRef)
     //#sms-server-send
-    def send(text: TextMessage): Unit = {
+    def send(text: TextMessage): Unit =
       // ...
       //#sms-server-send
       probe ! text.to
       //#sms-server-send
-    }
     //#sms-server-send
-  }
 
   final case class Save(tweet: Tweet)
   final case object SaveDone
 
-  class DatabaseService(probe: ActorRef) extends Actor {
-    override def receive = {
+  class DatabaseService(probe: ActorRef) extends Actor
+    override def receive =
       case Save(tweet: Tweet) =>
         probe ! tweet.author.handle
         sender() ! SaveDone
-    }
-  }
 
   //#sometimes-slow-service
-  class SometimesSlowService(implicit ec: ExecutionContext) {
+  class SometimesSlowService(implicit ec: ExecutionContext)
     //#sometimes-slow-service
     def println(s: String): Unit = ()
     //#sometimes-slow-service
 
     private val runningCount = new AtomicInteger
 
-    def convert(s: String): Future[String] = {
+    def convert(s: String): Future[String] =
       println(s"running: $s (${runningCount.incrementAndGet()})")
-      Future {
+      Future
         if (s.nonEmpty && s.head.isLower) Thread.sleep(500)
         else Thread.sleep(20)
         println(s"completed: $s (${runningCount.decrementAndGet()})")
         s.toUpperCase
-      }
-    }
-  }
   //#sometimes-slow-service
-}
 
-class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
+class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config)
   import TwitterStreamQuickstartDocSpec._
   import IntegrationDocSpec._
 
   implicit val materializer = ActorMaterializer()
 
-  "calling external service with mapAsync" in {
+  "calling external service with mapAsync" in
     val probe = TestProbe()
     val addressSystem = new AddressSystem
     val emailServer = new EmailServer(probe.ref)
@@ -145,10 +133,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     //#send-emails
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
       .mapAsync(4)(address =>
-            {
           emailServer.send(
               Email(to = address, title = "Akka", body = "I like your tweet"))
-      })
+      )
       .to(Sink.ignore)
 
     sendEmails.run()
@@ -161,9 +148,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     probe.expectMsg("ktosopl@somewhere.com")
     probe.expectMsg("mmartynas@somewhere.com")
     probe.expectMsg("akkateam@somewhere.com")
-  }
 
-  "lookup email with mapAsync and supervision" in {
+  "lookup email with mapAsync and supervision" in
     val addressSystem = new AddressSystem2
     val authors: Source[Author, NotUsed] =
       tweets.filter(_.hashtags.contains(akka)).map(_.author)
@@ -176,9 +162,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
           .mapAsync(4)(author => addressSystem.lookupEmail(author.handle))
           .withAttributes(supervisionStrategy(resumingDecider)))
     //#email-addresses-mapAsync-supervision
-  }
 
-  "calling external service with mapAsyncUnordered" in {
+  "calling external service with mapAsyncUnordered" in
     val probe = TestProbe()
     val addressSystem = new AddressSystem
     val emailServer = new EmailServer(probe.ref)
@@ -193,10 +178,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
 
     val sendEmails: RunnableGraph[NotUsed] = emailAddresses
       .mapAsyncUnordered(4)(address =>
-            {
           emailServer.send(
               Email(to = address, title = "Akka", body = "I like your tweet"))
-      })
+      )
       .to(Sink.ignore)
 
     sendEmails.run()
@@ -210,9 +194,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
             "ktosopl@somewhere.com",
             "mmartynas@somewhere.com",
             "akkateam@somewhere.com"))
-  }
 
-  "careful managed blocking with mapAsync" in {
+  "careful managed blocking with mapAsync" in
     val probe = TestProbe()
     val addressSystem = new AddressSystem
     val smsServer = new SmsServer(probe.ref)
@@ -229,12 +212,11 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
 
     val sendTextMessages: RunnableGraph[NotUsed] = phoneNumbers
       .mapAsync(4)(phoneNo =>
-            {
-          Future {
+          Future
             smsServer.send(
                 TextMessage(to = phoneNo, body = "I like your tweet"))
-          }(blockingExecutionContext)
-      })
+          (blockingExecutionContext)
+      )
       .to(Sink.ignore)
 
     sendTextMessages.run()
@@ -248,9 +230,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
             "ktosopl".hashCode.toString,
             "mmartynas".hashCode.toString,
             "akkateam".hashCode.toString))
-  }
 
-  "careful managed blocking with map" in {
+  "careful managed blocking with map" in
     val probe = TestProbe()
     val addressSystem = new AddressSystem
     val smsServer = new SmsServer(probe.ref)
@@ -262,9 +243,9 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
       .collect { case Some(phoneNo) => phoneNo }
 
     //#blocking-map
-    val send = Flow[String].map { phoneNo =>
+    val send = Flow[String].map  phoneNo =>
       smsServer.send(TextMessage(to = phoneNo, body = "I like your tweet"))
-    }.withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
+    .withAttributes(ActorAttributes.dispatcher("blocking-dispatcher"))
     val sendTextMessages: RunnableGraph[NotUsed] =
       phoneNumbers.via(send).to(Sink.ignore)
 
@@ -278,9 +259,8 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     probe.expectMsg("ktosopl".hashCode.toString)
     probe.expectMsg("mmartynas".hashCode.toString)
     probe.expectMsg("akkateam".hashCode.toString)
-  }
 
-  "calling actor service with mapAsync" in {
+  "calling actor service with mapAsync" in
     val probe = TestProbe()
     val database =
       system.actorOf(Props(classOf[DatabaseService], probe.ref), "db")
@@ -303,13 +283,11 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     probe.expectMsg("ktosopl")
     probe.expectMsg("mmartynas")
     probe.expectMsg("akkateam")
-  }
 
-  "illustrate ordering and parallelism of mapAsync" in {
+  "illustrate ordering and parallelism of mapAsync" in
     val probe = TestProbe()
-    def println(s: String): Unit = {
+    def println(s: String): Unit =
       if (s.startsWith("after:")) probe.ref ! s
-    }
 
     //#sometimes-slow-mapAsync
     implicit val blockingExecutionContext =
@@ -335,13 +313,11 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
     probe.expectMsg("after: H")
     probe.expectMsg("after: I")
     probe.expectMsg("after: J")
-  }
 
-  "illustrate ordering and parallelism of mapAsyncUnordered" in {
+  "illustrate ordering and parallelism of mapAsyncUnordered" in
     val probe = TestProbe()
-    def println(s: String): Unit = {
+    def println(s: String): Unit =
       if (s.startsWith("after:")) probe.ref ! s
-    }
 
     //#sometimes-slow-mapAsyncUnordered
     implicit val blockingExecutionContext =
@@ -368,5 +344,3 @@ class IntegrationDocSpec extends AkkaSpec(IntegrationDocSpec.config) {
             "after: H",
             "after: I",
             "after: J"))
-  }
-}

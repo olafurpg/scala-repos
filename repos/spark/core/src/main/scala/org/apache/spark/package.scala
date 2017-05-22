@@ -40,7 +40,6 @@ package org.apache
   * Developer API</span> are intended for advanced users want to extend Spark through lower
   * level interfaces. These are subject to changes or removal in minor releases.
   */
-package object spark {
+package object spark
   // For package docs only
   val SPARK_VERSION = "2.0.0-SNAPSHOT"
-}

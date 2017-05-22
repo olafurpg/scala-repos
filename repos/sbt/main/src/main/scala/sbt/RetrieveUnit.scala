@@ -8,9 +8,9 @@ import java.net.URI
 import BuildLoader.ResolveInfo
 import Def.{ScopedKey, Setting}
 
-object RetrieveUnit {
-  def apply(info: ResolveInfo): Option[() => File] = {
-    info.uri match {
+object RetrieveUnit
+  def apply(info: ResolveInfo): Option[() => File] =
+    info.uri match
       case Scheme("svn") | Scheme("svn+ssh") => Resolvers.subversion(info)
       case Scheme("hg") => Resolvers.mercurial(info)
       case Scheme("git") => Resolvers.git(info)
@@ -19,16 +19,11 @@ object RetrieveUnit {
         Resolvers.remote(info)
       case Scheme("file") => Resolvers.local(info)
       case _ => None
-    }
-  }
 
-  object Scheme {
+  object Scheme
     def unapply(uri: URI) = Option(uri.getScheme)
-  }
 
-  object Path {
+  object Path
     import RichURI.fromURI
 
     def unapply(uri: URI) = Option(uri.withoutMarkerScheme.getPath)
-  }
-}

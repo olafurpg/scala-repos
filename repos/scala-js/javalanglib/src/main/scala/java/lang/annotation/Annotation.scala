@@ -1,5 +1,4 @@
 package java.lang.annotation
 
-trait Annotation {
+trait Annotation
   def annotationType(): Class[_ <: Annotation]
-}

@@ -13,7 +13,7 @@ package example
   runtime boxing/unboxing of your value, which incurs a runtime
   cost. The scalaz tagged types will never cause boxing of a value.
   */
-object TagUsage extends App {
+object TagUsage extends App
   import Tags._
   import syntax.monoid._
   import syntax.foldable._
@@ -104,7 +104,5 @@ object TagUsage extends App {
   assert(minOption(sortList(List(3, 2, 1, 5, 3))) === Some(1))
 
   // we can also use pattern matching:
-  def minOption_v2[A]: List[A] @@ Sorted ⇒ Option[A] = {
+  def minOption_v2[A]: List[A] @@ Sorted ⇒ Option[A] =
     case Sorted(list) ⇒ list.headOption
-  }
-}

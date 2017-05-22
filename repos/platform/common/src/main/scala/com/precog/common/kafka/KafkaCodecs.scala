@@ -39,7 +39,7 @@ import scalaz.syntax.id._
 import scalaz.Validation._
 import scalaz.syntax.bifunctor._
 
-trait EncodingFlags {
+trait EncodingFlags
   val charset = Charset.forName("UTF-8")
 
   val stopByte: Byte = 0x00
@@ -50,31 +50,26 @@ trait EncodingFlags {
   val storeFileFlag: Byte = 0x06
   val magicByte: Byte = -123
 
-  def writeHeader(buffer: ByteBuffer, encodingFlag: Byte): ByteBuffer = {
+  def writeHeader(buffer: ByteBuffer, encodingFlag: Byte): ByteBuffer =
     buffer.put(magicByte).put(encodingFlag).put(stopByte)
-  }
 
-  def readHeader(buffer: ByteBuffer): Validation[Error, Byte] = {
+  def readHeader(buffer: ByteBuffer): Validation[Error, Byte] =
     val magic = buffer.get()
-    if (magic == magicByte) {
+    if (magic == magicByte)
       val msgType = buffer.get()
       val stop = buffer.get()
 
-      if (stop == stopByte) {
+      if (stop == stopByte)
         success(msgType)
-      } else {
+      else
         failure(Error.invalid(
                 "Invalid message: bad stop byte. Found [" + stop + "]"))
-      }
-    } else {
+    else
       failure(Error.invalid(
               "Invalid message: bad magic byte. Found [" + magic + "]"))
-    }
-  }
-}
 
-class KafkaEventCodec extends Encoder[Event] {
-  def toMessage(event: Event) = {
+class KafkaEventCodec extends Encoder[Event]
+  def toMessage(event: Event) =
     val msgBuf = EventEncoding.toMessageBytes(event)
     val byteArray = new Array[Byte](msgBuf.limit)
     msgBuf.get(byteArray)
@@ -83,11 +78,9 @@ class KafkaEventCodec extends Encoder[Event] {
     // and checksum do not get integrated, so things blow up deep in the internals
     // of Kafka. Demand PETA action now to save the kittens!
     new Message(byteArray)
-  }
-}
 
-object EventEncoding extends EncodingFlags with Logging {
-  def toMessageBytes(event: Event) = {
+object EventEncoding extends EncodingFlags with Logging
+  def toMessageBytes(event: Event) =
     val serialized = event.serialize.renderCompact
     logger.trace("Serialized event " + event + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
@@ -99,29 +92,24 @@ object EventEncoding extends EncodingFlags with Logging {
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
-  }
 
-  def write(buffer: ByteBuffer, event: Event) = {
+  def write(buffer: ByteBuffer, event: Event) =
     buffer.put(toMessageBytes(event))
-  }
 
-  def read(buffer: ByteBuffer): Validation[Error, Event] = {
-    for {
+  def read(buffer: ByteBuffer): Validation[Error, Event] =
+    for
       msgType <- readHeader(buffer)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
-      event <- msgType match {
+      event <- msgType match
         case `jsonIngestFlag` => jv.validated[Ingest]
         case `jsonArchiveFlag` => jv.validated[Archive]
         case `jsonIngestMessageFlag` => jv.validated[Ingest]("ingest")
         case `jsonArchiveMessageFlag` => jv.validated[Archive]("archive")
         case `storeFileFlag` => jv.validated[StoreFile]
-      }
-    } yield event
-  }
-}
+    yield event
 
-class KafkaEventMessageCodec extends Encoder[EventMessage] {
-  def toMessage(msg: EventMessage) = {
+class KafkaEventMessageCodec extends Encoder[EventMessage]
+  def toMessage(msg: EventMessage) =
     val msgBuf = EventMessageEncoding.toMessageBytes(msg)
     val byteArray = new Array[Byte](msgBuf.limit)
     msgBuf.get(byteArray)
@@ -130,11 +118,9 @@ class KafkaEventMessageCodec extends Encoder[EventMessage] {
     // and checksum do not get integrated, so things blow up deep in the internals
     // of Kafka. Demand PETA action now to save the kittens!
     new Message(byteArray)
-  }
-}
 
-object EventMessageEncoding extends EncodingFlags with Logging {
-  def toMessageBytes(msg: EventMessage) = {
+object EventMessageEncoding extends EncodingFlags with Logging
+  def toMessageBytes(msg: EventMessage) =
     val serialized = msg.serialize.renderCompact
     logger.trace("Serialized event " + msg + " to " + serialized)
     val msgBuffer = charset.encode(serialized)
@@ -146,26 +132,21 @@ object EventMessageEncoding extends EncodingFlags with Logging {
     bytes.put(msgBuffer)
     bytes.flip()
     bytes
-  }
 
-  def write(buffer: ByteBuffer, msg: EventMessage) {
+  def write(buffer: ByteBuffer, msg: EventMessage)
     buffer.put(toMessageBytes(msg))
-  }
 
   import EventMessage.EventMessageExtraction
 
-  def read(buffer: ByteBuffer): Validation[Error, EventMessageExtraction] = {
-    for {
+  def read(buffer: ByteBuffer): Validation[Error, EventMessageExtraction] =
+    for
       msgType <- readHeader(buffer)
       //_ = println(java.nio.charset.Charset.forName("UTF-8").decode(buffer).toString)
       jv <- ((Error.thrown _) <-: JParser.parseFromByteBuffer(buffer))
-      message <- msgType match {
+      message <- msgType match
         case `jsonIngestMessageFlag` =>
           jv.validated[EventMessageExtraction](IngestMessage.Extractor)
         case `jsonArchiveMessageFlag` =>
           jv.validated[ArchiveMessage].map(\/.right(_))
         case `storeFileFlag` => jv.validated[StoreFileMessage].map(\/.right(_))
-      }
-    } yield message
-  }
-}
+    yield message

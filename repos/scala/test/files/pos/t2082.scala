@@ -11,9 +11,8 @@ trait IdPK
 
 class TestSubject extends KeyedMapper[Long, TestSubject] with IdPK
 
-class TestRun extends KeyedMapper[Long, TestRun] with IdPK {
+class TestRun extends KeyedMapper[Long, TestRun] with IdPK
   object testSubject extends MappedForeignKey[Long, TestRun, TestSubject]
-}
 
 object TestRun extends TestRun with KeyedMetaMapper[Long, TestRun]
 
@@ -21,7 +20,7 @@ class MetaTestSubject
     extends TestSubject with KeyedMetaMapper[Long, TestSubject]
 object TestSubject extends MetaTestSubject
 
-object Main {
+object Main
 
   def oneToOneJoin[PType <: KeyedMapper[Long, PType] with IdPK,
                    CType <: KeyedMapper[Long, CType] with IdPK,
@@ -31,11 +30,9 @@ object Main {
       metaMapper: CMetaType,
       keyGetter: (PType) => FKType): Map[Long, CType] = Map.empty
 
-  def callIt {
+  def callIt
     oneToOneJoin[TestRun,
                  TestSubject,
                  MetaTestSubject,
                  MappedForeignKey[Long, TestRun, TestSubject]](
         List(), TestSubject, (tr: TestRun) => tr.testSubject)
-  }
-}

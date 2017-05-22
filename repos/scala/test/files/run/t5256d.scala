@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{currentMirror => cm}
@@ -10,4 +10,3 @@ println(c)
 println(c.fullName)
 println(c.info)
   """
-}

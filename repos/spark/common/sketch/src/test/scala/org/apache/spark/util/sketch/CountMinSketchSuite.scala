@@ -24,7 +24,7 @@ import scala.util.Random
 
 import org.scalatest.FunSuite // scalastyle:ignore funsuite
 
-class CountMinSketchSuite extends FunSuite {
+class CountMinSketchSuite extends FunSuite
   // scalastyle:ignore funsuite
   private val epsOfTotalCount = 0.0001
 
@@ -34,7 +34,7 @@ class CountMinSketchSuite extends FunSuite {
 
   // Serializes and deserializes a given `CountMinSketch`, then checks whether the deserialized
   // version is equivalent to the original one.
-  private def checkSerDe(sketch: CountMinSketch): Unit = {
+  private def checkSerDe(sketch: CountMinSketch): Unit =
     val out = new ByteArrayOutputStream()
     sketch.writeTo(out)
 
@@ -42,11 +42,10 @@ class CountMinSketchSuite extends FunSuite {
     val deserialized = CountMinSketch.readFrom(in)
 
     assert(sketch === deserialized)
-  }
 
   def testAccuracy[T : ClassTag](typeName: String)(
-      itemGenerator: Random => T): Unit = {
-    test(s"accuracy - $typeName") {
+      itemGenerator: Random => T): Unit =
+    test(s"accuracy - $typeName")
       // Uses fixed seed to ensure reproducible test execution
       val r = new Random(31)
 
@@ -56,10 +55,9 @@ class CountMinSketchSuite extends FunSuite {
       val numSamples = numAllItems / 10
       val sampledItemIndices = Array.fill(numSamples)(r.nextInt(numAllItems))
 
-      val exactFreq = {
+      val exactFreq =
         val sampledItems = sampledItemIndices.map(allItems)
         sampledItems.groupBy(identity).mapValues(_.length.toLong)
-      }
 
       val sketch = CountMinSketch.create(epsOfTotalCount, confidence, seed)
       checkSerDe(sketch)
@@ -67,37 +65,33 @@ class CountMinSketchSuite extends FunSuite {
       sampledItemIndices.foreach(i => sketch.add(allItems(i)))
       checkSerDe(sketch)
 
-      val probCorrect = {
-        val numErrors = allItems.map { item =>
+      val probCorrect =
+        val numErrors = allItems.map  item =>
           val count = exactFreq.getOrElse(item, 0L)
           val ratio =
             (sketch.estimateCount(item) - count).toDouble / numAllItems
           if (ratio > epsOfTotalCount) 1 else 0
-        }.sum
+        .sum
 
         1D - numErrors.toDouble / numAllItems
-      }
 
       assert(
           probCorrect > confidence,
           s"Confidence not reached: required $confidence, reached $probCorrect"
       )
-    }
-  }
 
   def testMergeInPlace[T : ClassTag](typeName: String)(
-      itemGenerator: Random => T): Unit = {
-    test(s"mergeInPlace - $typeName") {
+      itemGenerator: Random => T): Unit =
+    test(s"mergeInPlace - $typeName")
       // Uses fixed seed to ensure reproducible test execution
       val r = new Random(31)
 
       val numToMerge = 5
       val numItemsPerSketch = 100000
-      val perSketchItems = Array.fill(numToMerge, numItemsPerSketch) {
+      val perSketchItems = Array.fill(numToMerge, numItemsPerSketch)
         itemGenerator(r)
-      }
 
-      val sketches = perSketchItems.map { items =>
+      val sketches = perSketchItems.map  items =>
         val sketch = CountMinSketch.create(epsOfTotalCount, confidence, seed)
         checkSerDe(sketch)
 
@@ -105,31 +99,24 @@ class CountMinSketchSuite extends FunSuite {
         checkSerDe(sketch)
 
         sketch
-      }
 
       val mergedSketch = sketches.reduce(_ mergeInPlace _)
       checkSerDe(mergedSketch)
 
-      val expectedSketch = {
+      val expectedSketch =
         val sketch = CountMinSketch.create(epsOfTotalCount, confidence, seed)
         perSketchItems.foreach(_.foreach(sketch.add))
         sketch
-      }
 
-      perSketchItems.foreach {
-        _.foreach { item =>
+      perSketchItems.foreach
+        _.foreach  item =>
           assert(mergedSketch.estimateCount(item) === expectedSketch
                 .estimateCount(item))
-        }
-      }
-    }
-  }
 
   def testItemType[T : ClassTag](typeName: String)(
-      itemGenerator: Random => T): Unit = {
+      itemGenerator: Random => T): Unit =
     testAccuracy[T](typeName)(itemGenerator)
     testMergeInPlace[T](typeName)(itemGenerator)
-  }
 
   testItemType[Byte]("Byte") { _.nextInt().toByte }
 
@@ -139,25 +126,19 @@ class CountMinSketchSuite extends FunSuite {
 
   testItemType[Long]("Long") { _.nextLong() }
 
-  testItemType[String]("String") { r =>
+  testItemType[String]("String")  r =>
     r.nextString(r.nextInt(20))
-  }
 
-  test("incompatible merge") {
-    intercept[IncompatibleMergeException] {
+  test("incompatible merge")
+    intercept[IncompatibleMergeException]
       CountMinSketch.create(10, 10, 1).mergeInPlace(null)
-    }
 
-    intercept[IncompatibleMergeException] {
+    intercept[IncompatibleMergeException]
       val sketch1 = CountMinSketch.create(10, 20, 1)
       val sketch2 = CountMinSketch.create(10, 20, 2)
       sketch1.mergeInPlace(sketch2)
-    }
 
-    intercept[IncompatibleMergeException] {
+    intercept[IncompatibleMergeException]
       val sketch1 = CountMinSketch.create(10, 10, 1)
       val sketch2 = CountMinSketch.create(10, 20, 2)
       sketch1.mergeInPlace(sketch2)
-    }
-  }
-}

@@ -10,7 +10,7 @@ import org.jetbrains.sbt.project.settings.SbtExecutionSettings
 /**
   * @author Pavel Fatin
   */
-class SbtTaskManager extends ExternalSystemTaskManager[SbtExecutionSettings] {
+class SbtTaskManager extends ExternalSystemTaskManager[SbtExecutionSettings]
   def executeTasks(id: ExternalSystemTaskId,
                    taskNames: util.List[String],
                    projectPath: String,
@@ -22,4 +22,3 @@ class SbtTaskManager extends ExternalSystemTaskManager[SbtExecutionSettings] {
 
   def cancelTask(id: ExternalSystemTaskId,
                  listener: ExternalSystemTaskNotificationListener) = false
-}

@@ -11,7 +11,7 @@ final case class PluginManagement(overrides: Set[ModuleID],
                                   applyOverrides: Set[ModuleID],
                                   loader: PluginClassLoader,
                                   initialLoader: ClassLoader,
-                                  context: Context) {
+                                  context: Context)
   def shift: PluginManagement =
     PluginManagement(Set.empty,
                      overrides,
@@ -38,8 +38,7 @@ final case class PluginManagement(overrides: Set[ModuleID],
     copy(
         context = context.copy(
               pluginProjectDepth = context.pluginProjectDepth + 1))
-}
-object PluginManagement {
+object PluginManagement
   final case class Context private[sbt](
       globalPluginProject: Boolean, pluginProjectDepth: Int)
   val emptyContext: Context = Context(false, 0)
@@ -58,11 +57,8 @@ object PluginManagement {
     ModuleID(m.organization, m.name, m.revision, crossVersion = m.crossVersion)
 
   final class PluginClassLoader(p: ClassLoader)
-      extends URLClassLoader(Array(), p) {
+      extends URLClassLoader(Array(), p)
     private[this] val urlSet =
       new collection.mutable.HashSet[URI] // remember: don't use hashCode/equals on URL
-    def add(urls: Seq[URL]): Unit = synchronized {
+    def add(urls: Seq[URL]): Unit = synchronized
       for (url <- urls) if (urlSet.add(url.toURI)) addURL(url)
-    }
-  }
-}

@@ -4,7 +4,7 @@ import com.twitter.finagle.benchmark.StdBenchAnnotations
 import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
-class DtabBenchmark extends StdBenchAnnotations {
+class DtabBenchmark extends StdBenchAnnotations
 
   private[this] val baseDtab = """
       |    /zk       => /$/com.foobar.serverset;
@@ -26,10 +26,9 @@ class DtabBenchmark extends StdBenchAnnotations {
   private[this] var parsedDtab: Dtab = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     parsedDtab = if (dtab == "") Dtab.read(baseDtab)
     else Dtab.read(dtab)
-  }
 
   @Benchmark
   def show(): String =
@@ -38,4 +37,3 @@ class DtabBenchmark extends StdBenchAnnotations {
   @Benchmark
   def read(): Dtab =
     Dtab.read(dtab)
-}

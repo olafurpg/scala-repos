@@ -1,4 +1,4 @@
-abstract class AbsFun[@specialized T, @specialized U] {
+abstract class AbsFun[@specialized T, @specialized U]
   // abstract function, fully specialized
   def apply(x: T): U
 
@@ -13,9 +13,8 @@ abstract class AbsFun[@specialized T, @specialized U] {
 
   // abstract function, not specialized
   def abs(m: Int): Int
-}
 
-class Square extends AbsFun[Int, Int] {
+class Square extends AbsFun[Int, Int]
   def apply(x: Int): Int = x * x
 
   def sum(xs: List[Int]): Int =
@@ -23,4 +22,3 @@ class Square extends AbsFun[Int, Int] {
 
   def abs(m: Int): Int =
     sum(List(1, 2, 3))
-}

@@ -38,10 +38,10 @@ import blueeyes.json._
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
-trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
-  "routing actor" should {
+trait RoutingPerformanceSpec extends Specification with PerformanceSpec
+  "routing actor" should
 
-    "route" in {
+    "route" in
       implicit val stopTimeout: Timeout = Duration(60, "seconds")
 
       val benchParams = BenchmarkParameters(5, 500, Some(500), false)
@@ -57,18 +57,16 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         DistributedSampleSet(0, sampler = AdSamples.adCampaignSample)
 
       val samples =
-        0.until(batchSize) map { _ =>
+        0.until(batchSize) map  _ =>
           sampler.next._1
-        }
 
       val seq = new AtomicInteger(0)
 
       val batch: Seq[IngestMessage] =
-        samples map { jval =>
+        samples map  jval =>
           Event(Path("/"), "apiKey", jval, Map())
-        } map { event =>
+        map  event =>
           EventMessage(0, seq.getAndIncrement, event)
-        }
 
       val metadataActor: ActorRef =
         system.actorOf(Props(new MockMetadataActor()), "mock_metadata_actor")
@@ -86,7 +84,7 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         system.actorOf(Props(new MockIngestActor(inserts / batchSize, batch)),
                        "mock_shard_ingest")
 
-      val routingActor: ActorRef = {
+      val routingActor: ActorRef =
         val routingTable = new SingleColumnProjectionRoutingTable
         val eventStore =
           new EventStore(routingTable,
@@ -99,9 +97,8 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
             Props(new BatchStoreActor(
                     eventStore, 1000, Some(ingestActor), system.scheduler)),
             "router")
-      }
 
-      def testIngest() = {
+      def testIngest() =
         val barrier = new CountDownLatch(1)
 
         ingestActor ! MockIngestReset(barrier)
@@ -112,9 +109,8 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         val fut = routingActor ? ControlledStop
 
         Await.result(fut, Duration(60, "seconds"))
-      }
 
-      try {
+      try
         println("routing actor performance")
         val result =
           Performance().benchmark(testIngest(), benchParams, benchParams)
@@ -124,67 +120,53 @@ trait RoutingPerformanceSpec extends Specification with PerformanceSpec {
         result.report("routing actor", System.out)
 
         true must_== true
-      } finally {
+      finally
         system.shutdown
-      }
-    }
-  }
-}
 
 case class MockIngestReset(barrier: CountDownLatch)
 
-class MockMetadataActor extends Actor {
-  def receive = {
+class MockMetadataActor extends Actor
+  def receive =
     case UpdateMetadata(_) => sender ! ()
     case _ => println("Unplanned metadata actor action")
-  }
-}
 
 class MockIngestActor(toSend: Int, messageBatch: Seq[IngestMessage])
-    extends Actor {
+    extends Actor
   private var barrier: CountDownLatch = null
   private var sent = 0
 
-  def receive = {
+  def receive =
     case MockIngestReset(b) =>
       barrier = b
       sent = 0
     case GetMessages(replyTo) =>
       sent += 1
-      if (sent < toSend) {
+      if (sent < toSend)
         replyTo ! IngestData(messageBatch)
-      } else {
+      else
         barrier.countDown
         replyTo ! NoIngestData
-      }
     case () =>
     case x => println("Unplanned ingest actor action: " + x.getClass.getName)
-  }
-}
 
-class MockProjectionActors(projectionActor: ActorRef) extends Actor {
-  def receive = {
+class MockProjectionActors(projectionActor: ActorRef) extends Actor
+  def receive =
     case AcquireProjection(desc) =>
       sender ! ProjectionAcquired(projectionActor)
     case AcquireProjectionBatch(descs) =>
       var map = Map.empty[ProjectionDescriptor, ActorRef]
       val descItr = descs.iterator
-      while (descItr.hasNext) {
+      while (descItr.hasNext)
         map += (descItr.next -> projectionActor)
-      }
       sender ! ProjectionBatchAcquired(map)
     case ReleaseProjection(_) =>
     case ReleaseProjectionBatch(_) => sender ! ()
     case _ => println("Unplanned projection actors action")
-  }
-}
 
-class MockProjectionActor extends Actor {
-  def receive = {
+class MockProjectionActor extends Actor
+  def receive =
     case ProjectionInsert(_, _) =>
       sender ! ()
     case ProjectionBatchInsert(_) =>
       sender ! ()
     case _ => println("Unplanned projection actor action")
-  }
-}

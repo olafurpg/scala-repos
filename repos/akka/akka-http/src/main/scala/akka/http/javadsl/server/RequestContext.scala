@@ -14,7 +14,7 @@ import java.util.concurrent.CompletionStage
   * The RequestContext represents the state of the request while it is routed through
   * the route structure.
   */
-trait RequestContext {
+trait RequestContext
 
   /**
     * The incoming request.
@@ -88,4 +88,3 @@ trait RequestContext {
     * Reject this request with an application-defined CustomRejection.
     */
   def reject(customRejection: CustomRejection): RouteResult
-}

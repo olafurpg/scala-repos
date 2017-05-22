@@ -13,20 +13,19 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScFunctionType, Unit}
 /**
   * @author Nikolay.Tropin
   */
-class UnitInMapInspection extends OperationOnCollectionInspection {
+class UnitInMapInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] = Array()
 
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case MethodRepr(call, _, Some(ref), Seq(arg @ lambdaWithBody(body)))
         if ref.refName == "map" &&
         checkResolve(ref, getLikeCollectionClasses) =>
-      val isInBlock = call.getParent match {
+      val isInBlock = call.getParent match
         case _: ScBlock | _: ScTemplateBody | _: ScEarlyDefinitions |
             _: ScalaFile =>
           true
         case _ => false
-      }
       val fixes =
         if (isInBlock)
           Seq(
@@ -37,31 +36,24 @@ class UnitInMapInspection extends OperationOnCollectionInspection {
         else Seq.empty
       val unitTypeReturns = body
         .calculateReturns()
-        .collect {
+        .collect
           case expr @ ExpressionType(ft @ ScFunctionType(Unit, _))
               if arg.getType().getOrAny.equiv(ft) =>
             expr
           case expr @ ExpressionType(Unit) => expr
-        }
         .filter(_.getTextLength > 0)
 
-      unitTypeReturns.foreach { e =>
+      unitTypeReturns.foreach  e =>
         if (e.isPhysical)
           holder.registerProblem(
               e,
               InspectionBundle.message("expression.unit.return.in.map"),
               highlightType,
               fixes: _*)
-      }
-  }
 
-  object lambdaWithBody {
-    def unapply(expr: ScExpression): Option[ScExpression] = {
-      expr match {
+  object lambdaWithBody
+    def unapply(expr: ScExpression): Option[ScExpression] =
+      expr match
         case ScBlock(ScFunctionExpr(_, res)) => res
         case ScFunctionExpr(_, res) => res
         case e => Some(e)
-      }
-    }
-  }
-}

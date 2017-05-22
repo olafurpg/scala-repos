@@ -9,7 +9,7 @@ import play.twirl.api.JavaScript
 /**
   * Contains helpers intended to be used in JavaScript templates
   */
-package object helper {
+package object helper
 
   /**
     * Generates a JavaScript value from a Scala value.
@@ -24,4 +24,3 @@ package object helper {
     */
   def json[A : Writes](a: A): JavaScript =
     JavaScript(Json.stringify(Json.toJson(a)))
-}

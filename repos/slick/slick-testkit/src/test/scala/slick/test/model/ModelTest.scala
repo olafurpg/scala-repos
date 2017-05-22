@@ -5,10 +5,10 @@ import org.junit.Assert._
 import slick.model._
 
 /** Test case for the SQL schema support in table definitions */
-class ModelTest {
+class ModelTest
 
   @Test
-  def testConsistencyCheck {
+  def testConsistencyCheck
     Model(Seq()).assertConsistency
 
     val A = QualifiedName("A")
@@ -45,5 +45,3 @@ class ModelTest {
                   Seq()),
             Table(A, Seq(a_id), None, Seq(), Seq())
         )).assertConsistency
-  }
-}

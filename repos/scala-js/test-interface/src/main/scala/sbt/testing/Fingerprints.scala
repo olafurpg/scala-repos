@@ -12,7 +12,7 @@ trait Fingerprint
   *  least one top level method or on the class or module itself, should be
   *  discovered as test classes.
   */
-trait AnnotatedFingerprint extends Fingerprint {
+trait AnnotatedFingerprint extends Fingerprint
 
   /** Indicates whether modules with the annotation should be considered during
     *  discovery, or just classes.
@@ -28,13 +28,12 @@ trait AnnotatedFingerprint extends Fingerprint {
     *  modules as test classes or modules to be discovered.
     */
   def annotationName(): String
-}
 
 /** Indicates that classes (and possibly modules) that extend a particular
   *  superclass, or mix in a particular supertrait, should be discovered as test
   *  classes.
   */
-trait SubclassFingerprint extends Fingerprint {
+trait SubclassFingerprint extends Fingerprint
 
   /** Indicates whether modules (singleton objects) that extend the superclass
     *  or supertrait should be considered during discovery, or just classes.
@@ -59,4 +58,3 @@ trait SubclassFingerprint extends Fingerprint {
     *  arguments.
     */
   def requireNoArgConstructor(): Boolean
-}

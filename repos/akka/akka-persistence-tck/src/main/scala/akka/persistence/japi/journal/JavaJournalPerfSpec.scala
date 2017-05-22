@@ -44,12 +44,10 @@ import org.scalatest.junit.JUnitRunner
   * @param config configures the Journal plugin to be tested
   */
 @RunWith(classOf[JUnitRunner])
-class JavaJournalPerfSpec(config: Config) extends JournalPerfSpec(config) {
-  override protected def info: Informer = new Informer {
+class JavaJournalPerfSpec(config: Config) extends JournalPerfSpec(config)
+  override protected def info: Informer = new Informer
     override def apply(message: String, payload: Option[Any]): Unit =
       System.out.println(message)
-  }
 
   override protected def supportsRejectingNonSerializableObjects: CapabilityFlag =
     CapabilityFlag.on
-}

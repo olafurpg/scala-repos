@@ -16,7 +16,7 @@ import org.apache.zookeeper.CreateMode
   * to isolate benchmarking the client. If you don't kill it, it will automatically
   * exit after 1 hr. See the flags for toggle-able settings.
   */
-private[serverset2] object LocalServerSetService extends App {
+private[serverset2] object LocalServerSetService extends App
 
   private val initialMembers = flag(
       "members.init", 500, "Number of members to start with in the serverset")
@@ -46,11 +46,10 @@ private[serverset2] object LocalServerSetService extends App {
   @volatile private var nextMemberId = 0
 
   def createServerSetPaths(num: Int): Seq[String] =
-    (1 to num).map { id =>
+    (1 to num).map  id =>
       s"/twitter/service/testset_$id/staging/job"
-    }
 
-  def main(): Unit = {
+  def main(): Unit =
     logger.info(s"Starting zookeeper on localhost:${zkListenPort()}")
 
     // Use Curator's built in testing server to start zookeeper on the
@@ -67,29 +66,26 @@ private[serverset2] object LocalServerSetService extends App {
     zkClient.start()
 
     // initialize each serverset to `initialMembers` members
-    (0 until numberOfServersets()).foreach { id =>
+    (0 until numberOfServersets()).foreach  id =>
       membersets(id) = Seq.empty[String]
       addMembers(id, initialMembers())
-    }
 
     scheduleUpdate()
 
-    postmain {
+    postmain
       logger.info("Shutting down")
 
       timer.stop()
       zkClient.close()
       zkServer.close()
-    }
 
     // User must manually kill this app
     Await.result(Future.never)
-  }
 
   private def scheduleUpdate(): Unit =
     timer.doLater(churnFrequency()) { update() }
 
-  private def update(): Unit = {
+  private def update(): Unit =
     // choose the single serverset to update, advance
     // the next id for future updates.
     val setToUpdate = nextServerSetToChurn
@@ -107,27 +103,22 @@ private[serverset2] object LocalServerSetService extends App {
 
     logger.info(
         s"ServerSet ${setToUpdate + 1} now has ${membersets(setToUpdate).size} members.")
-  }
 
-  private def addMembers(serversetIndex: Int, toAdd: Int): Unit = {
-    (1 to toAdd).foreach { _ =>
+  private def addMembers(serversetIndex: Int, toAdd: Int): Unit =
+    (1 to toAdd).foreach  _ =>
       membersets(serversetIndex) :+= zkClient
         .create()
         .creatingParentsIfNeeded()
         .withMode(CreateMode.EPHEMERAL_SEQUENTIAL)
         .forPath(serversets(serversetIndex) + "/member_", nextJsonMember())
-    }
-  }
 
-  private def removeMembers(index: Int, toRemove: Int): Unit = {
-    (1 to toRemove).foreach { _ =>
+  private def removeMembers(index: Int, toRemove: Int): Unit =
+    (1 to toRemove).foreach  _ =>
       val removeMe = membersets(index).head
       membersets(index) = membersets(index).tail
       zkClient.delete().forPath(removeMe)
-    }
-  }
 
-  private def nextJsonMember(): Array[Byte] = {
+  private def nextJsonMember(): Array[Byte] =
     val id = nextMemberId
     nextMemberId += 1
 
@@ -145,5 +136,3 @@ private[serverset2] object LocalServerSetService extends App {
        |  "serviceEndpoint": {"host": "$someIp", "port": 31324},
        |  "shard": 6
        |}""".stripMargin.getBytes("UTF-8")
-  }
-}

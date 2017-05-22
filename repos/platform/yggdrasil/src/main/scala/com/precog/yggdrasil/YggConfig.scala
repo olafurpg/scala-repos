@@ -26,13 +26,12 @@ import common.Config
 
 import java.io.File
 
-trait YggConfigComponent {
+trait YggConfigComponent
   type YggConfig
 
   val yggConfig: YggConfig
-}
 
-trait BaseConfig extends Config {
+trait BaseConfig extends Config
   private val localDefaults = Configuration.parse("""
     precog {
       storage {
@@ -58,13 +57,11 @@ trait BaseConfig extends Config {
   lazy val cacheDir = new File(rootDir, "cache")
   lazy val scratchDir = new File(rootDir, "scratch")
 
-  def newWorkDir = {
+  def newWorkDir =
     if (!scratchDir.exists) scratchDir.mkdirs
     val tempFile = File.createTempFile("ygg", "workdir", scratchDir)
     tempFile.delete
     tempFile.mkdir
     tempFile
-  }
 
   lazy val sortBufferSize: Int = cfg[Int]("precog.storage.sortBufferSize")
-}

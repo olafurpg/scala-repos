@@ -11,10 +11,8 @@
 //
 // In a single mixed compilation, `flop` cannot be inlined, see JUnit InlinerTest.scala, def mixedCompilationNoInline.
 
-class B {
+class B
   @inline final def flop = A_1.bar
   def g = flop
-}
-class C {
+class C
   def h(b: B) = b.flop
-}

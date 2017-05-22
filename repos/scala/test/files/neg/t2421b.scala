@@ -1,4 +1,4 @@
-object Test {
+object Test
   class A
   class B
   class C
@@ -10,7 +10,6 @@ object Test {
   implicit def b[X <: B] = new F[X]()
 
   f
-}
 
 /* bug:
 error: type arguments [Test2.A] do not conform to method b's type parameter bounds [X <: Test2.B]

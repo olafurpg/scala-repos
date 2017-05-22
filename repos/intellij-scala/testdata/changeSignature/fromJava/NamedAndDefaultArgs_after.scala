@@ -1,4 +1,4 @@
-class NamedAndDefaultArgsTest extends NamedAndDefaultArgs {
+class NamedAndDefaultArgsTest extends NamedAndDefaultArgs
   override def foo(s: String = "aaa", b: Boolean, b2: Boolean) =
     super.foo(s, b, true)
 
@@ -8,4 +8,3 @@ class NamedAndDefaultArgsTest extends NamedAndDefaultArgs {
   foo(b = true, b2 = true)
 
   super.foo("", true, true)
-}

@@ -21,19 +21,19 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
                                          val reset: BackoffReset,
                                          randomFactor: Double,
                                          strategy: OneForOneStrategy)
-    extends Actor with HandleBackoff with ActorLogging {
+    extends Actor with HandleBackoff with ActorLogging
 
   import context._
   import BackoffSupervisor._
   override val supervisorStrategy =
     OneForOneStrategy(strategy.maxNrOfRetries,
                       strategy.withinTimeRange,
-                      strategy.loggingEnabled) {
+                      strategy.loggingEnabled)
       case ex ⇒
         val defaultDirective: Directive =
           super.supervisorStrategy.decider.applyOrElse(ex, (_: Any) ⇒ Escalate)
 
-        strategy.decider.applyOrElse(ex, (_: Any) ⇒ defaultDirective) match {
+        strategy.decider.applyOrElse(ex, (_: Any) ⇒ defaultDirective) match
 
           // Whatever the final Directive is, we will translate all Restarts
           // to our own Restarts, which involves stopping the child.
@@ -44,10 +44,8 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
             Stop
 
           case other ⇒ other
-        }
-    }
 
-  def waitChildTerminatedBeforeBackoff(childRef: ActorRef): Receive = {
+  def waitChildTerminatedBeforeBackoff(childRef: ActorRef): Receive =
     case Terminated(`childRef`) ⇒
       become(receive)
       child = None
@@ -59,13 +57,10 @@ private class BackoffOnRestartSupervisor(val childProps: Props,
 
     case StartChild ⇒
     // Ignore it, we will schedule a new one once current child terminated.
-  }
 
-  def onTerminated: Receive = {
+  def onTerminated: Receive =
     case Terminated(child) ⇒
       log.debug(s"Terminating, because child [$child] terminated itself")
       stop(self)
-  }
 
   def receive = onTerminated orElse handleBackoff
-}

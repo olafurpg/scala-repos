@@ -24,26 +24,24 @@ import java.util.concurrent.TimeUnit
   *
   * @author Garrick Evans
   */
-object ActorPool {
+object ActorPool
   case object Stat
   case class Stats(size: Int)
-}
 
 /**
   * Defines the nature of an actor pool.
   */
-trait ActorPool {
+trait ActorPool
   def instance(): ActorRef //Question, Instance of what?
   def capacity(delegates: Seq[ActorRef]): Int //Question, What is the semantics of this return value?
   def select(delegates: Seq[ActorRef]): Tuple2[Iterator[ActorRef], Int] //Question, Why does select return this instead of an ordered Set?
-}
 
 /**
   * A default implementation of a pool, on each message to route,
   *      - checks the current capacity and adjusts accordingly if needed
   *      - routes the incoming message to a selection set of delegate actors
   */
-trait DefaultActorPool extends ActorPool {
+trait DefaultActorPool extends ActorPool
   this: Actor =>
   import ActorPool._
   import collection.mutable.LinkedList
@@ -53,13 +51,12 @@ trait DefaultActorPool extends ActorPool {
   private var _lastCapacityChange = 0
   private var _lastSelectorCount = 0
 
-  override def postStop() = _delegates foreach { delegate =>
-    try {
+  override def postStop() = _delegates foreach  delegate =>
+    try
       delegate ! PoisonPill
-    } catch { case e: Exception => } //Ignore any exceptions here
-  }
+    catch { case e: Exception => } //Ignore any exceptions here
 
-  protected def _route(): Receive = {
+  protected def _route(): Receive =
     // for testing...
     case Stat =>
       self reply_? Stats(_delegates length)
@@ -68,37 +65,29 @@ trait DefaultActorPool extends ActorPool {
     case msg =>
       resizeIfAppropriate()
 
-      select(_delegates) match {
+      select(_delegates) match
         case (selectedDelegates, count) =>
           _lastSelectorCount = count
           selectedDelegates foreach { _ forward msg } //Should we really send the same message to several actors?
-      }
-  }
 
-  private def resizeIfAppropriate() {
+  private def resizeIfAppropriate()
     val requestedCapacity = capacity(_delegates)
-    val newDelegates = requestedCapacity match {
+    val newDelegates = requestedCapacity match
       case qty if qty > 0 =>
-        _delegates ++ {
-          for (i ← 0 until requestedCapacity) yield {
+        _delegates ++
+          for (i ← 0 until requestedCapacity) yield
             val delegate = instance()
             self startLink delegate
             delegate
-          }
-        }
       case qty if qty < 0 =>
-        _delegates.splitAt(_delegates.length + requestedCapacity) match {
+        _delegates.splitAt(_delegates.length + requestedCapacity) match
           case (keep, abandon) =>
             abandon foreach { _ ! PoisonPill }
             keep
-        }
       case _ => _delegates //No change
-    }
 
     _lastCapacityChange = requestedCapacity
     _delegates = newDelegates
-  }
-}
 
 /**
   * Selectors
@@ -107,48 +96,42 @@ trait DefaultActorPool extends ActorPool {
 /**
   * Returns the set of delegates with the least amount of message backlog.
   */
-trait SmallestMailboxSelector {
+trait SmallestMailboxSelector
   def selectionCount: Int
   def partialFill: Boolean
 
-  def select(delegates: Seq[ActorRef]): Tuple2[Iterator[ActorRef], Int] = {
+  def select(delegates: Seq[ActorRef]): Tuple2[Iterator[ActorRef], Int] =
     var set: Seq[ActorRef] = Nil
     var take =
       if (partialFill) math.min(selectionCount, delegates.length)
       else selectionCount
 
-    while (take > 0) {
+    while (take > 0)
       set = delegates.sortWith(_.mailboxSize < _.mailboxSize).take(take) ++ set //Question, doesn't this risk selecting the same actor multiple times?
       take -= set.size
-    }
 
     (set.iterator, set.size)
-  }
-}
 
 /**
   * Returns the set of delegates that occur sequentially 'after' the last delegate from the previous selection
   */
-trait RoundRobinSelector {
+trait RoundRobinSelector
   private var _last: Int = -1;
 
   def selectionCount: Int
   def partialFill: Boolean
 
-  def select(delegates: Seq[ActorRef]): Tuple2[Iterator[ActorRef], Int] = {
+  def select(delegates: Seq[ActorRef]): Tuple2[Iterator[ActorRef], Int] =
     val length = delegates.length
     val take =
       if (partialFill) math.min(selectionCount, length)
       else selectionCount
 
-    val set = for (i ← 0 until take) yield {
+    val set = for (i ← 0 until take) yield
       _last = (_last + 1) % length
       delegates(_last)
-    }
 
     (set.iterator, set.size)
-  }
-}
 
 /**
   * Capacitors
@@ -157,19 +140,18 @@ trait RoundRobinSelector {
 /**
   * Ensures a fixed number of delegates in the pool
   */
-trait FixedSizeCapacitor {
+trait FixedSizeCapacitor
   def limit: Int
   def capacity(delegates: Seq[ActorRef]): Int = (limit - delegates.size) max 0
-}
 
 /**
   * Constrains the pool capacity to a bounded range
   */
-trait BoundedCapacitor {
+trait BoundedCapacitor
   def lowerBound: Int
   def upperBound: Int
 
-  def capacity(delegates: Seq[ActorRef]): Int = {
+  def capacity(delegates: Seq[ActorRef]): Int =
     val current = delegates length
     val delta = _eval(delegates)
     val proposed = current + delta
@@ -177,31 +159,27 @@ trait BoundedCapacitor {
     if (proposed < lowerBound) delta + (lowerBound - proposed)
     else if (proposed > upperBound) delta - (proposed - upperBound)
     else delta
-  }
 
   protected def _eval(delegates: Seq[ActorRef]): Int
-}
 
 /**
   * Returns the number of delegates required to manage the current message backlogs
   */
-trait MailboxPressureCapacitor {
+trait MailboxPressureCapacitor
   def pressureThreshold: Int
   def pressure(delegates: Seq[ActorRef]): Int =
     delegates count { _.mailboxSize > pressureThreshold }
-}
 
 /**
   * Returns the number of delegates required to respond to the number of pending futures
   */
-trait ActiveFuturesPressureCapacitor {
+trait ActiveFuturesPressureCapacitor
   def pressure(delegates: Seq[ActorRef]): Int =
     delegates count { _.senderFuture.isDefined }
-}
 
 /**
   */
-trait CapacityStrategy {
+trait CapacityStrategy
   import ActorPool._
 
   def pressure(delegates: Seq[ActorRef]): Int
@@ -209,7 +187,6 @@ trait CapacityStrategy {
 
   protected def _eval(delegates: Seq[ActorRef]): Int =
     filter(pressure(delegates), delegates.size)
-}
 
 trait FixedCapacityStrategy extends FixedSizeCapacitor
 trait BoundedCapacityStrategy extends CapacityStrategy with BoundedCapacitor
@@ -221,7 +198,7 @@ trait BoundedCapacityStrategy extends CapacityStrategy with BoundedCapacitor
 /**
   * The basic filter trait that composes ramp-up and back-off subfiltering.
   */
-trait Filter {
+trait Filter
   def rampup(pressure: Int, capacity: Int): Int
   def backoff(pressure: Int, capacity: Int): Int
 
@@ -230,38 +207,34 @@ trait Filter {
   // is always - and each should return 0 otherwise...
   def filter(pressure: Int, capacity: Int): Int =
     rampup(pressure, capacity) + backoff(pressure, capacity)
-}
 
 trait BasicFilter extends Filter with BasicRampup with BasicBackoff
 
 /**
   * Filter performs steady incremental growth using only the basic ramp-up subfilter
   */
-trait BasicNoBackoffFilter extends BasicRampup {
+trait BasicNoBackoffFilter extends BasicRampup
   def filter(pressure: Int, capacity: Int): Int = rampup(pressure, capacity)
-}
 
 /**
   * Basic incremental growth as a percentage of the current pool capacity
   */
-trait BasicRampup {
+trait BasicRampup
   def rampupRate: Double
 
   def rampup(pressure: Int, capacity: Int): Int =
     if (pressure < capacity) 0 else math.ceil(rampupRate * capacity) toInt
-}
 
 /**
   * Basic decrement as a percentage of the current pool capacity
   */
-trait BasicBackoff {
+trait BasicBackoff
   def backoffThreshold: Double
   def backoffRate: Double
 
   def backoff(pressure: Int, capacity: Int): Int =
     if (capacity > 0 && pressure / capacity < backoffThreshold)
       math.ceil(-1.0 * backoffRate * capacity) toInt else 0
-}
 
 /**
   * This filter tracks the average pressure over the lifetime of the pool (or since last reset) and
@@ -269,14 +242,14 @@ trait BasicBackoff {
   * delegates to cull from the pool is determined by some scaling factor (the backoffRate) multiplied
   * by the difference in capacity and pressure.
   */
-trait RunningMeanBackoff {
+trait RunningMeanBackoff
   def backoffThreshold: Double
   def backoffRate: Double
 
   private var _pressure: Double = 0.0
   private var _capacity: Double = 0.0
 
-  def backoff(pressure: Int, capacity: Int): Int = {
+  def backoff(pressure: Int, capacity: Int): Int =
     _pressure += pressure
     _capacity += capacity
 
@@ -285,10 +258,7 @@ trait RunningMeanBackoff {
         _pressure / _capacity < backoffThreshold) //Why does the entire clause need to be true?
       math.floor(-1.0 * backoffRate * (capacity - pressure)).toInt
     else 0
-  }
 
-  def backoffReset {
+  def backoffReset
     _pressure = 0.0
     _capacity = 0.0
-  }
-}

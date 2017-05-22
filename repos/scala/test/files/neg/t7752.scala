@@ -1,4 +1,4 @@
-object Test {
+object Test
   def foo[A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V](
       heading: (String, String, String, String, String, String, String, String,
       String, String, String, String, String, String, String, String, String,
@@ -100,4 +100,3 @@ object Test {
   def foo[A](heading: String, rows: A*): Tuple1[A] = null
 
   foo((1))
-}

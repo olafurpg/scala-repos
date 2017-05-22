@@ -7,7 +7,7 @@ import org.jboss.netty.buffer.{ChannelBuffer, ChannelBuffers}
   * server and client. A packet consists of a header
   * (size, sequence number) and a body.
   */
-trait Packet {
+trait Packet
 
   /**
     * Size of packet body. Encoded in the first 3
@@ -28,22 +28,18 @@ trait Packet {
     * Encodes this packet using the mysql spec
     * for a packet into a netty3 ChannelBuffer.
     */
-  def toChannelBuffer: ChannelBuffer = {
+  def toChannelBuffer: ChannelBuffer =
     val header = BufferWriter(new Array[Byte](Packet.HeaderSize))
     header.writeInt24(size)
     header.writeByte(seq)
     ChannelBuffers.wrappedBuffer(header.underlying, body.underlying)
-  }
-}
 
-object Packet {
+object Packet
   val HeaderSize = 0x04
   val OkByte = 0x00.toByte
   val ErrorByte = 0xFF.toByte
   val EofByte = 0xFE.toByte
 
-  def apply(s: Short, b: Buffer): Packet = new Packet {
+  def apply(s: Short, b: Buffer): Packet = new Packet
     val seq = s
     val body = b
-  }
-}

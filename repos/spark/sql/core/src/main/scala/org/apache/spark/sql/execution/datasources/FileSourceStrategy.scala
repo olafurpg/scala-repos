@@ -54,8 +54,8 @@ import org.apache.spark.sql.types._
   *     is under the threshold with the addition of the next file, add it.  If not, open a new bucket
   *     and add it.  Proceed to the next file.
   */
-private[sql] object FileSourceStrategy extends Strategy with Logging {
-  def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match {
+private[sql] object FileSourceStrategy extends Strategy with Logging
+  def apply(plan: LogicalPlan): Seq[SparkPlan] = plan match
     case PhysicalOperation(
         projects, filters, l @ LogicalRelation(files: HadoopFsRelation, _, _))
         if files.fileFormat.toString == "TestFileFormat" =>
@@ -114,32 +114,30 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
           filters = pushedDownFilters,
           options = files.options)
 
-      val plannedPartitions = files.bucketSpec match {
+      val plannedPartitions = files.bucketSpec match
         case Some(bucketing) if files.sqlContext.conf.bucketingEnabled =>
           logInfo(s"Planning with ${bucketing.numBuckets} buckets")
-          val bucketed = selectedPartitions.flatMap { p =>
+          val bucketed = selectedPartitions.flatMap  p =>
             p.files.map(f =>
                   PartitionedFile(
                       p.values, f.getPath.toUri.toString, 0, f.getLen))
-          }.groupBy { f =>
+          .groupBy  f =>
             BucketingUtils
               .getBucketId(new Path(f.filePath).getName)
               .getOrElse(sys.error(s"Invalid bucket file ${f.filePath}"))
-          }
 
-          (0 until bucketing.numBuckets).map { bucketId =>
+          (0 until bucketing.numBuckets).map  bucketId =>
             FilePartition(bucketId, bucketed.getOrElse(bucketId, Nil))
-          }
 
         case _ =>
           val maxSplitBytes = files.sqlContext.conf.filesMaxPartitionBytes
           logInfo(
               s"Planning scan with bin packing, max size: $maxSplitBytes bytes")
 
-          val splitFiles = selectedPartitions.flatMap { partition =>
-            partition.files.flatMap { file =>
+          val splitFiles = selectedPartitions.flatMap  partition =>
+            partition.files.flatMap  file =>
               assert(file.getLen != 0)
-              (0L to file.getLen by maxSplitBytes).map { offset =>
+              (0L to file.getLen by maxSplitBytes).map  offset =>
                 val remaining = file.getLen - offset
                 val size =
                   if (remaining > maxSplitBytes) maxSplitBytes else remaining
@@ -147,45 +145,37 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
                                 file.getPath.toUri.toString,
                                 offset,
                                 size)
-              }
-            }
-          }.toArray.sortBy(_.length)(implicitly[Ordering[Long]].reverse)
+          .toArray.sortBy(_.length)(implicitly[Ordering[Long]].reverse)
 
           val partitions = new ArrayBuffer[FilePartition]
           val currentFiles = new ArrayBuffer[PartitionedFile]
           var currentSize = 0L
 
           /** Add the given file to the current partition. */
-          def addFile(file: PartitionedFile): Unit = {
+          def addFile(file: PartitionedFile): Unit =
             currentSize += file.length
             currentFiles.append(file)
-          }
 
           /** Close the current partition and move to the next. */
-          def closePartition(): Unit = {
-            if (currentFiles.nonEmpty) {
+          def closePartition(): Unit =
+            if (currentFiles.nonEmpty)
               val newPartition = FilePartition(
                   partitions.size,
                   currentFiles.toArray.toSeq) // Copy to a new Array.
               partitions.append(newPartition)
-            }
             currentFiles.clear()
             currentSize = 0
-          }
 
           // Assign files to partitions using "First Fit Decreasing" (FFD)
           // TODO: consider adding a slop factor here?
-          splitFiles.foreach { file =>
-            if (currentSize + file.length > maxSplitBytes) {
+          splitFiles.foreach  file =>
+            if (currentSize + file.length > maxSplitBytes)
               closePartition()
               addFile(file)
-            } else {
+            else
               addFile(file)
-            }
-          }
           closePartition()
           partitions
-      }
 
       val scan = DataSourceScan(
           l.output,
@@ -198,14 +188,11 @@ private[sql] object FileSourceStrategy extends Strategy with Logging {
       val withFilter =
         afterScanFilter.map(execution.Filter(_, scan)).getOrElse(scan)
       val withProjections =
-        if (projects.forall(_.isInstanceOf[AttributeReference])) {
+        if (projects.forall(_.isInstanceOf[AttributeReference]))
           withFilter
-        } else {
+        else
           execution.Project(projects, withFilter)
-        }
 
       withProjections :: Nil
 
     case _ => Nil
-  }
-}

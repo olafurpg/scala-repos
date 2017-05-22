@@ -15,7 +15,7 @@ import com.twitter.util.{Duration, Monitor}
   * Supplements a [[com.twitter.finagle.Client]] with convenient
   * builder methods for constructing a mysql client.
   */
-trait MysqlRichClient { self: com.twitter.finagle.Client[Request, Result] =>
+trait MysqlRichClient  self: com.twitter.finagle.Client[Request, Result] =>
 
   /**
     * Creates a new `RichClient` connected to the logical
@@ -32,26 +32,23 @@ trait MysqlRichClient { self: com.twitter.finagle.Client[Request, Result] =>
     */
   def newRichClient(dest: String): mysql.Client with mysql.Transactions =
     mysql.Client(newClient(dest))
-}
 
-object MySqlClientTracingFilter {
+object MySqlClientTracingFilter
   object Stackable
-      extends Stack.Module1[param.Label, ServiceFactory[Request, Result]] {
+      extends Stack.Module1[param.Label, ServiceFactory[Request, Result]]
     val role = ClientTracingFilter.role
     val description = "Add MySql client specific annotations to the trace"
-    def make(_label: param.Label, next: ServiceFactory[Request, Result]) = {
+    def make(_label: param.Label, next: ServiceFactory[Request, Result]) =
       val param.Label(label) = _label
       // TODO(jeff): should be able to get this directly from ClientTracingFilter
       val annotations = new AnnotatingTracingFilter[Request, Result](
           label, Annotation.ClientSend(), Annotation.ClientRecv())
       annotations andThen TracingFilter andThen next
-    }
-  }
 
-  object TracingFilter extends SimpleFilter[Request, Result] {
-    def apply(request: Request, service: Service[Request, Result]) = {
-      if (Trace.isActivelyTracing) {
-        request match {
+  object TracingFilter extends SimpleFilter[Request, Result]
+    def apply(request: Request, service: Service[Request, Result]) =
+      if (Trace.isActivelyTracing)
+        request match
           case QueryRequest(sqlStatement) =>
             Trace.recordBinary("mysql.query", sqlStatement)
           case PrepareRequest(sqlStatement) =>
@@ -62,12 +59,7 @@ object MySqlClientTracingFilter {
           case _ =>
             Trace.record(
                 "mysql." + request.getClass.getSimpleName.replace("$", ""))
-        }
-      }
       service(request)
-    }
-  }
-}
 
 /**
   * @example {{{
@@ -78,7 +70,7 @@ object MySqlClientTracingFilter {
   * }}}
   */
 object Mysql
-    extends com.twitter.finagle.Client[Request, Result] with MysqlRichClient {
+    extends com.twitter.finagle.Client[Request, Result] with MysqlRichClient
 
   /**
     * Implements a mysql client in terms of a
@@ -101,7 +93,7 @@ object Mysql
             maxWaiters = Int.MaxValue) + ProtocolLibrary("mysql"))
       extends StdStackClient[Request, Result, Client]
       with WithSessionPool[Client] with WithDefaultLoadBalancer[Client]
-      with MysqlRichClient {
+      with MysqlRichClient
 
     protected def copy1(
         stack: Stack[ServiceFactory[Request, Result]] = this.stack,
@@ -172,7 +164,6 @@ object Mysql
     override def filtered(
         filter: Filter[Request, Result, Request, Result]): Client =
       super.filtered(filter)
-  }
 
   val client = Client()
 
@@ -210,4 +201,3 @@ object Mysql
   @deprecated("Use client.configured", "6.22.0")
   def configured[P : Stack.Param](p: P): Client =
     client.configured(p)
-}

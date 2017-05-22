@@ -13,12 +13,12 @@ import org.scalajs.testsuite.javalib.util.concurrent.CopyOnWriteArrayListFactory
 
 import scala.reflect.ClassTag
 
-trait CollectionsSynchronizedListTest extends CollectionsOnListTest {
+trait CollectionsSynchronizedListTest extends CollectionsOnListTest
 
   def originalFactory: ListFactory
 
-  def factory: ListFactory = {
-    new ListFactory {
+  def factory: ListFactory =
+    new ListFactory
       override def implementationName: String =
         s"synchronizedList(${originalFactory.implementationName})"
 
@@ -30,26 +30,19 @@ trait CollectionsSynchronizedListTest extends CollectionsOnListTest {
 
       override def sortableUsingCollections: Boolean =
         originalFactory.sortableUsingCollections
-    }
-  }
-}
 
 class CollectionsOnSynchronizedListAbstractListTest
-    extends CollectionsSynchronizedCollectionTest {
+    extends CollectionsSynchronizedCollectionTest
   def originalFactory: ListFactory = new AbstractListFactory
-}
 
 class CollectionsOnSynchronizedListArrayListTest
-    extends CollectionsSynchronizedListTest {
+    extends CollectionsSynchronizedListTest
   def originalFactory: ListFactory = new ArrayListFactory
-}
 
 class CollectionsOnSynchronizedListLinkedListTest
-    extends CollectionsSynchronizedListTest {
+    extends CollectionsSynchronizedListTest
   def originalFactory: ListFactory = new LinkedListFactory
-}
 
 class CollectionsOnSynchronizedListCopyOnWriteArrayListTest
-    extends CollectionsSynchronizedListTest {
+    extends CollectionsSynchronizedListTest
   def originalFactory: ListFactory = new CopyOnWriteArrayListFactory
-}

@@ -34,7 +34,7 @@ import org.apache.spark.util.random.XORShiftRandom
   * Params for [[QuantileDiscretizer]].
   */
 private[feature] trait QuantileDiscretizerBase
-    extends Params with HasInputCol with HasOutputCol with HasSeed {
+    extends Params with HasInputCol with HasOutputCol with HasSeed
 
   /**
     * Maximum number of buckets (quantiles, or categories) into which data points are grouped. Must
@@ -52,7 +52,6 @@ private[feature] trait QuantileDiscretizerBase
 
   /** @group getParam */
   def getNumBuckets: Int = getOrDefault(numBuckets)
-}
 
 /**
   * :: Experimental ::
@@ -65,7 +64,7 @@ private[feature] trait QuantileDiscretizerBase
 @Experimental
 final class QuantileDiscretizer(override val uid: String)
     extends Estimator[Bucketizer] with QuantileDiscretizerBase
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("quantileDiscretizer"))
 
@@ -81,7 +80,7 @@ final class QuantileDiscretizer(override val uid: String)
   /** @group setParam */
   def setSeed(value: Long): this.type = set(seed, value)
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     SchemaUtils.checkColumnType(schema, $(inputCol), DoubleType)
     val inputFields = schema.fields
     require(inputFields.forall(_.name != $(outputCol)),
@@ -89,9 +88,8 @@ final class QuantileDiscretizer(override val uid: String)
     val attr = NominalAttribute.defaultAttr.withName($(outputCol))
     val outputFields = inputFields :+ attr.toStructField()
     StructType(outputFields)
-  }
 
-  override def fit(dataset: DataFrame): Bucketizer = {
+  override def fit(dataset: DataFrame): Bucketizer =
     val samples = QuantileDiscretizer
       .getSampledInput(dataset.select($(inputCol)), $(numBuckets), $(seed))
       .map { case Row(feature: Double) => feature }
@@ -100,14 +98,12 @@ final class QuantileDiscretizer(override val uid: String)
     val splits = QuantileDiscretizer.getSplits(candidates)
     val bucketizer = new Bucketizer(uid).setSplits(splits)
     copyValues(bucketizer.setParent(this))
-  }
 
   override def copy(extra: ParamMap): QuantileDiscretizer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
 object QuantileDiscretizer
-    extends DefaultParamsReadable[QuantileDiscretizer] with Logging {
+    extends DefaultParamsReadable[QuantileDiscretizer] with Logging
 
   /**
     * Minimum number of samples required for finding splits, regardless of number of bins.  If
@@ -119,7 +115,7 @@ object QuantileDiscretizer
     * Sampling from the given dataset to collect quantile statistics.
     */
   private[feature] def getSampledInput(
-      dataset: DataFrame, numBins: Int, seed: Long): Array[Row] = {
+      dataset: DataFrame, numBins: Int, seed: Long): Array[Row] =
     val totalSamples = dataset.count()
     require(
         totalSamples > 0,
@@ -131,22 +127,20 @@ object QuantileDiscretizer
               fraction,
               new XORShiftRandom(seed).nextInt())
       .collect()
-  }
 
   /**
     * Compute split points with respect to the sample distribution.
     */
   private[feature] def findSplitCandidates(
-      samples: Array[Double], numSplits: Int): Array[Double] = {
-    val valueCountMap = samples.foldLeft(Map.empty[Double, Int]) { (m, x) =>
+      samples: Array[Double], numSplits: Int): Array[Double] =
+    val valueCountMap = samples.foldLeft(Map.empty[Double, Int])  (m, x) =>
       m + ((x, m.getOrElse(x, 0) + 1))
-    }
     val valueCounts =
       valueCountMap.toSeq.sortBy(_._1).toArray ++ Array((Double.MaxValue, 1))
     val possibleSplits = valueCounts.length - 1
-    if (possibleSplits <= numSplits) {
+    if (possibleSplits <= numSplits)
       valueCounts.dropRight(1).map(_._1)
-    } else {
+    else
       val stride: Double = math.ceil(samples.length.toDouble / (numSplits + 1))
       val splitsBuilder = mutable.ArrayBuilder.make[Double]
       var index = 1
@@ -156,52 +150,43 @@ object QuantileDiscretizer
       // `targetCount`, then current value is a split threshold. After finding a split threshold,
       // `targetCount` is added by stride.
       var targetCount = stride
-      while (index < valueCounts.length) {
+      while (index < valueCounts.length)
         val previousCount = currentCount
         currentCount += valueCounts(index)._2
         val previousGap = math.abs(previousCount - targetCount)
         val currentGap = math.abs(currentCount - targetCount)
         // If adding count of current value to currentCount makes the gap between currentCount and
         // targetCount smaller, previous value is a split threshold.
-        if (previousGap < currentGap) {
+        if (previousGap < currentGap)
           splitsBuilder += valueCounts(index - 1)._1
           targetCount += stride
-        }
         index += 1
-      }
       splitsBuilder.result()
-    }
-  }
 
   /**
     * Adjust split candidates to proper splits by: adding positive/negative infinity to both sides as
     * needed, and adding a default split value of 0 if no good candidates are found.
     */
-  private[feature] def getSplits(candidates: Array[Double]): Array[Double] = {
+  private[feature] def getSplits(candidates: Array[Double]): Array[Double] =
     val effectiveValues =
-      if (candidates.nonEmpty) {
+      if (candidates.nonEmpty)
         if (candidates.head == Double.NegativeInfinity &&
-            candidates.last == Double.PositiveInfinity) {
+            candidates.last == Double.PositiveInfinity)
           candidates.drop(1).dropRight(1)
-        } else if (candidates.head == Double.NegativeInfinity) {
+        else if (candidates.head == Double.NegativeInfinity)
           candidates.drop(1)
-        } else if (candidates.last == Double.PositiveInfinity) {
+        else if (candidates.last == Double.PositiveInfinity)
           candidates.dropRight(1)
-        } else {
+        else
           candidates
-        }
-      } else {
+      else
         candidates
-      }
 
-    if (effectiveValues.isEmpty) {
+    if (effectiveValues.isEmpty)
       Array(Double.NegativeInfinity, 0, Double.PositiveInfinity)
-    } else {
+    else
       Array(Double.NegativeInfinity) ++ effectiveValues ++ Array(
           Double.PositiveInfinity)
-    }
-  }
 
   @Since("1.6.0")
   override def load(path: String): QuantileDiscretizer = super.load(path)
-}

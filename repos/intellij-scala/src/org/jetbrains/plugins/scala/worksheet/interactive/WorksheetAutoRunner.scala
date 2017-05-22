@@ -19,7 +19,7 @@ import org.jetbrains.plugins.scala.worksheet.server.WorksheetProcessManager
   * User: Dmitry.Naydanov
   * Date: 01.04.14.
   */
-object WorksheetAutoRunner extends WorksheetPerFileConfig {
+object WorksheetAutoRunner extends WorksheetPerFileConfig
   val RUN_DELAY_MS_MAXIMUM = 3000
   val RUN_DELAY_MS_MINIMUM = 700
 
@@ -31,16 +31,14 @@ object WorksheetAutoRunner extends WorksheetPerFileConfig {
   def isSetDisabled(file: PsiFile): Boolean =
     FileAttributeUtilCache.readAttribute(AUTORUN, file) contains disabled
 
-  def setAutorun(file: PsiFile, autorun: Boolean) {
+  def setAutorun(file: PsiFile, autorun: Boolean)
     setEnabled(file, AUTORUN, autorun)
-  }
 
   def getInstance(project: Project) =
     project.getComponent(classOf[WorksheetAutoRunner])
-}
 
 class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
-    extends ProjectComponent {
+    extends ProjectComponent
   private val listeners =
     ContainerUtil.createConcurrentWeakMap[Document, DocumentListener]()
   private val myAlarm = new Alarm(Alarm.ThreadToUse.SWING_THREAD, project)
@@ -59,29 +57,25 @@ class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
   def getAutoRunDelay =
     ScalaProjectSettings.getInstance(project).getAutoRunDelay
 
-  def addListener(document: Document) {
-    if (listeners.get(document) == null) {
+  def addListener(document: Document)
+    if (listeners.get(document) == null)
       val listener = new MyDocumentAdapter(document)
 
       document addDocumentListener listener
       listeners.put(document, listener)
-    }
-  }
 
-  def removeListener(document: Document) {
+  def removeListener(document: Document)
     val listener = listeners remove document
     if (listener != null) document removeDocumentListener listener
-  }
 
-  private class MyDocumentAdapter(document: Document) extends DocumentAdapter {
+  private class MyDocumentAdapter(document: Document) extends DocumentAdapter
     val documentManager = PsiDocumentManager getInstance project
 
-    @inline private def isDisabledOn(file: PsiFile) = {
+    @inline private def isDisabledOn(file: PsiFile) =
       WorksheetAutoRunner.isSetDisabled(file) || !settings.isInteractiveMode &&
       !WorksheetAutoRunner.isSetEnabled(file)
-    }
 
-    override def documentChanged(e: DocumentEvent) {
+    override def documentChanged(e: DocumentEvent)
       if (project.isDisposed) return
 
       val psiFile = documentManager getPsiFile document
@@ -93,13 +87,9 @@ class WorksheetAutoRunner(project: Project, woof: WolfTheProblemSolver)
       if (woof.hasSyntaxErrors(virtualFile) ||
           WorksheetProcessManager.running(virtualFile)) return
 
-      myAlarm.addRequest(new Runnable {
-        override def run() {
+      myAlarm.addRequest(new Runnable
+        override def run()
           if (!woof.hasSyntaxErrors(virtualFile) &&
               !WorksheetProcessManager.running(virtualFile))
             RunWorksheetAction.runCompiler(project, auto = true)
-        }
-      }, getAutoRunDelay, true)
-    }
-  }
-}
+      , getAutoRunDelay, true)

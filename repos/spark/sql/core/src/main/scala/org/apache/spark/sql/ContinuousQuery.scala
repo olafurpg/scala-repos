@@ -26,7 +26,7 @@ import org.apache.spark.annotation.Experimental
   * @since 2.0.0
   */
 @Experimental
-trait ContinuousQuery {
+trait ContinuousQuery
 
   /**
     * Returns the name of the query.
@@ -97,4 +97,3 @@ trait ContinuousQuery {
     * @since 2.0.0
     */
   def stop(): Unit
-}

@@ -21,7 +21,7 @@ import it.unimi.dsi.fastutil.objects.{Object2IntLinkedOpenHashMap, Object2IntOpe
 /**
   * An object-to-integer hash map, backed by fastutil implementation
   */
-class LocatorAny[T : ST](sz: Int = Locator.INIT_CAPACITY) extends Locator[T] {
+class LocatorAny[T : ST](sz: Int = Locator.INIT_CAPACITY) extends Locator[T]
   val map = new Object2IntLinkedOpenHashMap[T](sz)
   val cts = new Object2IntOpenHashMap[T](sz)
 
@@ -30,10 +30,9 @@ class LocatorAny[T : ST](sz: Int = Locator.INIT_CAPACITY) extends Locator[T] {
 
   def get(key: T): Int = map.getInt(key)
 
-  def put(key: T, value: Int) {
+  def put(key: T, value: Int)
     // prevents unboxing!
     val tmp: Int = map.put(key, value)
-  }
 
   def contains(key: T) = map.containsKey(key)
 
@@ -43,27 +42,22 @@ class LocatorAny[T : ST](sz: Int = Locator.INIT_CAPACITY) extends Locator[T] {
 
   def count(key: T) = cts.getInt(key)
 
-  def counts() = {
+  def counts() =
     val iter = map.keySet().iterator()
     val res = Array.ofDim[Int](size)
     var i = 0
-    while (iter.hasNext) {
+    while (iter.hasNext)
       res(i) = cts.getInt(iter.next())
       i += 1
-    }
     res
-  }
 
-  def keys() = {
+  def keys() =
     val ks = map.keySet()
     val it = ks.iterator()
     val sz = ks.size()
     val newArr = implicitly[ST[T]].newArray(sz)
     var i = 0
-    while (i < sz) {
+    while (i < sz)
       newArr(i) = it.next()
       i += 1
-    }
     newArr
-  }
-}

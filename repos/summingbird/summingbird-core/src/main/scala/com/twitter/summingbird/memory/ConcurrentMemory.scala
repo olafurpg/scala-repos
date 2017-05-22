@@ -27,60 +27,51 @@ import scala.collection.mutable.Buffer
 import scala.concurrent.{ExecutionContext, Future}
 import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue, ConcurrentHashMap}
 
-object ConcurrentMemory {
+object ConcurrentMemory
   implicit def toSource[T](
       traversable: TraversableOnce[T]): Producer[ConcurrentMemory, T] =
     Producer.source[ConcurrentMemory, T](traversable)
-}
 
-object ConcurrentMemoryPlan {
+object ConcurrentMemoryPlan
   implicit def monoid: Monoid[ConcurrentMemoryPlan] =
-    new Monoid[ConcurrentMemoryPlan] {
+    new Monoid[ConcurrentMemoryPlan]
       def zero = NullPlan
       def plus(left: ConcurrentMemoryPlan, right: ConcurrentMemoryPlan) =
-        new ConcurrentMemoryPlan {
+        new ConcurrentMemoryPlan
           def run(implicit ec: ExecutionContext) =
             left.run.zip(right.run).map(_ => ())
-        }
-    }
-}
 
-trait ConcurrentMemoryPlan {
+trait ConcurrentMemoryPlan
   def run(implicit ec: ExecutionContext): Future[Unit]
-}
 
-object NullPlan extends ConcurrentMemoryPlan {
+object NullPlan extends ConcurrentMemoryPlan
   def run(implicit ec: ExecutionContext) = Future.successful(())
-}
 
 /**
   * This type is what we model the summingbird graphs into.
   * Below, inside PhysicalNode, you will see several implementations
   */
-sealed trait PhysicalNode[-I] {
+sealed trait PhysicalNode[-I]
   def push(item: I)(implicit ec: ExecutionContext): Future[Unit]
-}
 
-object PhysicalNode {
+object PhysicalNode
   case class SourceNode[O](data: TraversableOnce[O], next: PhysicalNode[O])
-      extends ConcurrentMemoryPlan with PhysicalNode[Nothing] {
+      extends ConcurrentMemoryPlan with PhysicalNode[Nothing]
     def run(implicit ec: ExecutionContext): Future[Unit] =
       Future
-        .sequence(data.map { o =>
+        .sequence(data.map  o =>
           next.push(o)
-        })
+        )
         .map(_ => ())
 
     def push(item: Nothing)(implicit ec: ExecutionContext) =
       Future.successful(())
-  }
 
   /**
     * This target is the end of the line for a target that has no dependants.
     */
-  case object NullTarget extends PhysicalNode[Any] {
+  case object NullTarget extends PhysicalNode[Any]
     def push(item: Any)(implicit ec: ExecutionContext) = Future.successful(())
-  }
 
   /**
     * This is a convenience that pushes each item it receieves a sequence of other
@@ -88,10 +79,9 @@ object PhysicalNode {
     * on the summingbird graph (multiple consumers from a single node) in each type
     * of node.
     */
-  case class FanOut[T](targets: Seq[PhysicalNode[T]]) extends PhysicalNode[T] {
+  case class FanOut[T](targets: Seq[PhysicalNode[T]]) extends PhysicalNode[T]
     def push(item: T)(implicit ec: ExecutionContext) =
       Future.sequence(targets.map(_.push(item))).map(_ => ())
-  }
 
   /**
     * This is the PhysicalNode that implements flatMap and sends it on to the next
@@ -99,57 +89,49 @@ object PhysicalNode {
     */
   case class FlatMap[I, O](
       fn: I => TraversableOnce[O], target: PhysicalNode[O])
-      extends PhysicalNode[I] {
+      extends PhysicalNode[I]
 
     def push(item: I)(implicit ec: ExecutionContext) =
       Future.sequence(fn(item).map(target.push(_))).map(_ => ())
-  }
   case class Join[K, V, W](
       service: K => Option[W], target: PhysicalNode[(K, (V, Option[W]))])
-      extends PhysicalNode[(K, V)] {
-    def push(item: (K, V))(implicit ec: ExecutionContext) = {
+      extends PhysicalNode[(K, V)]
+    def push(item: (K, V))(implicit ec: ExecutionContext) =
       val (k, v) = item
       val toPush = (k, (v, service(k)))
       target.push(toPush)
-    }
-  }
   case class Sum[K, V](store: ConcurrentHashMap[K, V],
                        sg: Semigroup[V],
                        target: PhysicalNode[(K, (Option[V], V))])
-      extends PhysicalNode[(K, V)] {
-    def push(item: (K, V))(implicit ec: ExecutionContext) = {
+      extends PhysicalNode[(K, V)]
+    def push(item: (K, V))(implicit ec: ExecutionContext) =
       val (k, v) = item
       @annotation.tailrec
       def go: Option[V] =
-        Option(store.get(k)) match {
+        Option(store.get(k)) match
           case None =>
             if (store.putIfAbsent(k, v) == null) None
             else go
           case s @ Some(oldV) =>
             if (store.replace(k, oldV, sg.plus(oldV, v))) s
             else go
-        }
       target.push((k, (go, v)))
-    }
-  }
 
   /**
     * This does a write and after that succeeds, pushes
     * onto the next node (which may be the NullTarget)
     */
   case class Writer[T](queue: BlockingQueue[T], target: PhysicalNode[T])
-      extends PhysicalNode[T] {
+      extends PhysicalNode[T]
     def push(item: T)(implicit ec: ExecutionContext) =
-      for {
+      for
         _ <- Future(queue.put(item))
         _ <- target.push(item)
-      } yield ()
-  }
-}
+      yield ()
 
 class ConcurrentMemory(
     implicit jobID: JobId = JobId("default.concurrent.memory.jobId"))
-    extends Platform[ConcurrentMemory] with DagOptimizer[ConcurrentMemory] {
+    extends Platform[ConcurrentMemory] with DagOptimizer[ConcurrentMemory]
 
   type Source[T] = TraversableOnce[T]
   type Store[K, V] = ConcurrentHashMap[K, V]
@@ -162,9 +144,8 @@ class ConcurrentMemory(
   type ProdCons[T] = Prod[Any]
 
   def counter(group: Group, name: Name): Option[Long] =
-    MemoryStatProvider.getCountersForJob(jobID).flatMap {
+    MemoryStatProvider.getCountersForJob(jobID).flatMap
       _.get(group.getString + "/" + name.getString).map { _.get }
-    }
 
   /**
     * This is the main recursive function that plans "that" to
@@ -175,91 +156,79 @@ class ConcurrentMemory(
       deps: Dependants[ConcurrentMemory],
       planned0: HMap[ProdCons, PhysicalNode],
       that: Prod[Any]): (HMap[ProdCons, PhysicalNode], PhysicalNode[T]) =
-    planned0.get(that) match {
+    planned0.get(that) match
       case Some(s) => (planned0, s)
       case None =>
         def maybeFanout[U]: (HMap[ProdCons, PhysicalNode], PhysicalNode[U]) =
-          deps.dependantsAfterMerge(that) match {
+          deps.dependantsAfterMerge(that) match
             case Nil => (planned0, NullTarget)
             case single :: Nil => toPhys[U](deps, planned0, single)
             case many =>
               val res =
-                many.scanLeft((planned0, None: Option[PhysicalNode[U]])) {
+                many.scanLeft((planned0, None: Option[PhysicalNode[U]]))
                   (hm, p) =>
                     val (post, phys) = toPhys[U](deps, hm._1, p)
                     (post, Some(phys))
-                }
               (res.last._1,
                FanOut[U](res.collect { case (_, Some(phys)) => phys }))
-          }
 
         def cast[A](out: (HMap[ProdCons, PhysicalNode], PhysicalNode[A]))
-          : (HMap[ProdCons, PhysicalNode], PhysicalNode[T]) = {
+          : (HMap[ProdCons, PhysicalNode], PhysicalNode[T]) =
           out.asInstanceOf[(HMap[ProdCons, PhysicalNode], PhysicalNode[T])]
-        }
 
-        that match {
+        that match
           case Source(source) =>
-            def go[A](in: Source[A]) = {
+            def go[A](in: Source[A]) =
               val (planned, targets) = maybeFanout[A]
               // We can only call this on sources if T == U, which we do
               val phys = SourceNode(in, targets)
               (planned + (that -> phys), phys)
-            }
             cast(go(source))
 
           case FlatMappedProducer(_, fn) =>
-            def go[A, B](fn: A => TraversableOnce[B]) = {
+            def go[A, B](fn: A => TraversableOnce[B]) =
               val (planned, targets) = maybeFanout[B]
               val phys = FlatMap(fn, targets)
               (planned + (that -> phys), phys)
-            }
             go(fn)
 
           case WrittenProducer(prod, queue) =>
-            def go[T](in: Prod[T], sink: Sink[T]) = {
+            def go[T](in: Prod[T], sink: Sink[T]) =
               val (planned, targets) = maybeFanout[T]
               val phys = Writer(sink, targets)
               (planned + (that -> phys), phys)
-            }
             go(prod, queue)
 
           case LeftJoinedProducer(prod, service) =>
-            def go[K, V, U](in: Prod[(K, U)], service: Service[K, V]) = {
+            def go[K, V, U](in: Prod[(K, U)], service: Service[K, V]) =
               val (planned, targets) = maybeFanout[(K, (U, Option[V]))]
               val phys = Join(service, targets)
               (planned + (that -> phys), phys)
-            }
             cast(go(prod, service))
 
-          case Summer(producer, store, sg) => {
+          case Summer(producer, store, sg) =>
               def go[K, V](
-                  in: Prod[(K, V)], str: Store[K, V], semi: Semigroup[V]) = {
+                  in: Prod[(K, V)], str: Store[K, V], semi: Semigroup[V]) =
                 val (planned, targets) = maybeFanout[(K, (Option[V], V))]
                 val phys = Sum(str, semi, targets)
                 (planned + (that -> phys), phys)
-              }
               cast(go(producer, store, sg))
-            }
 
           case other =>
             sys.error(
                 "%s encountered, which should have been optimized away".format(
                     other))
-        }
-    }
 
-  def plan[T](prod: TailProducer[ConcurrentMemory, T]): ConcurrentMemoryPlan = {
+  def plan[T](prod: TailProducer[ConcurrentMemory, T]): ConcurrentMemoryPlan =
     /*
      * Register the counters
      */
     val registeredCounters: Seq[(Group, Name)] =
       JobCounters.getCountersForJob(jobID).getOrElse(Nil)
 
-    if (!registeredCounters.isEmpty) {
+    if (!registeredCounters.isEmpty)
       MemoryStatProvider.registerCounters(jobID, registeredCounters)
       SummingbirdRuntimeStats.addPlatformStatProvider(MemoryStatProvider)
-    }
     /*
      * These rules should normalize the graph into a plannable state by the toPhys
      * recursive function (removing no-op nodes and converting optionMap and KeyFlatMap to just
@@ -276,14 +245,11 @@ class ConcurrentMemory(
     val heads = deps.nodes.collect { case s @ Source(_) => s }
     heads
       .foldLeft((HMap.empty[ProdCons, PhysicalNode],
-                 NullPlan: ConcurrentMemoryPlan)) {
+                 NullPlan: ConcurrentMemoryPlan))
         case ((hm, plan), head) =>
           val (nextHm, plannedSource) = toPhys(deps, hm, head)
           // All sources should be planned to source nodes
           val sourceNode = plannedSource.asInstanceOf[SourceNode[_]]
           val nextPlan = Monoid.plus(plan, sourceNode)
           (nextHm, nextPlan)
-      }
       ._2
-  }
-}

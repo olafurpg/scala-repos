@@ -1,6 +1,5 @@
-trait PartialType[T[_, _], A] {
+trait PartialType[T[_, _], A]
   type Apply[B] = T[A, B]
-}
 
 sealed trait State[S, +A]
 trait Pure[P[_]]

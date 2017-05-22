@@ -3,7 +3,7 @@ package scalaz
 import scala.annotation.tailrec
 
 /** Mixed into object `Id` in the package object [[scalaz]]. */
-trait IdInstances {
+trait IdInstances
 
   // Declaring here instead of the scalaz package object in order to avoid compiler crash in 2.9.2.
 
@@ -19,7 +19,7 @@ trait IdInstances {
       Id] with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[
       Id] = new Traverse1[Id]
   with Monad[Id] with BindRec[Id] with Comonad[Id] with Distributive[Id]
-  with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id] {
+  with Zip[Id] with Unzip[Id] with Align[Id] with Cozip[Id] with Optional[Id]
     def point[A](a: => A): A = a
 
     def bind[A, B](a: A)(f: A => B): B = f(a)
@@ -78,11 +78,8 @@ trait IdInstances {
 
     @tailrec
     def tailrecM[A, B](f: A => A \/ B)(a: A): B =
-      f(a) match {
+      f(a) match
         case -\/(a0) => tailrecM(f)(a0)
         case \/-(b) => b
-      }
-  }
-}
 
 object Id extends IdInstances

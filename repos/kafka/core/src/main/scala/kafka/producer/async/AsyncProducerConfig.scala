@@ -22,7 +22,7 @@ import kafka.utils.VerifiableProperties
     "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
-trait AsyncProducerConfig {
+trait AsyncProducerConfig
   val props: VerifiableProperties
 
   /* maximum time, in milliseconds, for buffering data on the producer queue */
@@ -50,4 +50,3 @@ trait AsyncProducerConfig {
   /** the serializer class for keys (defaults to the same as for values) */
   val keySerializerClass =
     props.getString("key.serializer.class", serializerClass)
-}

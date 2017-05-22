@@ -11,13 +11,12 @@ import org.jetbrains.sbt.SbtBundle
   * @author Nikolay Obedin
   * @since 3/24/15.
   */
-object SbtNoImportNotificationProvider {
+object SbtNoImportNotificationProvider
   val ProviderKey = Key.create[EditorNotificationPanel](this.getClass.getName)
-}
 
 class SbtNoImportNotificationProvider(
     project: Project, notifications: EditorNotifications)
-    extends SbtImportNotificationProvider(project, notifications) {
+    extends SbtImportNotificationProvider(project, notifications)
 
   override def getKey: Key[EditorNotificationPanel] =
     SbtNoImportNotificationProvider.ProviderKey
@@ -26,23 +25,19 @@ class SbtNoImportNotificationProvider(
       file: VirtualFile, fileEditor: FileEditor): Boolean =
     getProjectSettings(file).isEmpty
 
-  override def createPanel(file: VirtualFile): EditorNotificationPanel = {
+  override def createPanel(file: VirtualFile): EditorNotificationPanel =
     val panel = new EditorNotificationPanel()
     panel.setText(SbtBundle("sbt.notification.noimport.msg", file.getName))
     panel.createActionLabel(
-        SbtBundle("sbt.notification.importProject"), new Runnable {
-      override def run() = {
+        SbtBundle("sbt.notification.importProject"), new Runnable
+      override def run() =
         importProject(file)
         notifications.updateAllNotifications()
-      }
-    })
+    )
     panel.createActionLabel(
-        SbtBundle("sbt.notification.ignore"), new Runnable {
-      override def run() = {
+        SbtBundle("sbt.notification.ignore"), new Runnable
+      override def run() =
         ignoreFile(file)
         notifications.updateAllNotifications()
-      }
-    })
+    )
     panel
-  }
-}

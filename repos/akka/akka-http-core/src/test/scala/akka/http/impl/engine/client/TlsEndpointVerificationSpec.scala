@@ -22,7 +22,7 @@ class TlsEndpointVerificationSpec
     akka.loglevel = INFO
     akka.io.tcp.trace-logging = off
     akka.http.parsing.tls-session-info-header = on
-  """) {
+  """)
   implicit val materializer = ActorMaterializer()
 
   /*
@@ -32,52 +32,45 @@ class TlsEndpointVerificationSpec
 
   val timeout = Timeout(Span(3, Seconds))
 
-  "The client implementation" should {
-    "not accept certificates signed by unknown CA" in {
+  "The client implementation" should
+    "not accept certificates signed by unknown CA" in
       val pipe = pipeline(
           Http().defaultClientHttpsContext,
           hostname = "akka.example.org") // default context doesn't include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://akka.example.org/")).failed,
-                timeout) { e ⇒
+                timeout)  e ⇒
         e shouldBe an[Exception]
-      }
-    }
-    "accept certificates signed by known CA" in {
+    "accept certificates signed by known CA" in
       val pipe = pipeline(
           ExampleHttpContexts.exampleClientContext,
           hostname = "akka.example.org") // example context does include custom CA
 
       whenReady(pipe(HttpRequest(uri = "https://akka.example.org:8080/")),
-                timeout) { response ⇒
+                timeout)  response ⇒
         response.status shouldEqual StatusCodes.OK
         val tlsInfo = response.header[`Tls-Session-Info`].get
         tlsInfo.peerPrincipal.get.getName shouldEqual "CN=akka.example.org,O=Internet Widgits Pty Ltd,ST=Some-State,C=AU"
-      }
-    }
-    "not accept certificates for foreign hosts" in {
+    "not accept certificates for foreign hosts" in
       val pipe = pipeline(
           ExampleHttpContexts.exampleClientContext,
           hostname = "hijack.de") // example context does include custom CA
 
-      whenReady(pipe(HttpRequest(uri = "https://hijack.de/")).failed, timeout) {
+      whenReady(pipe(HttpRequest(uri = "https://hijack.de/")).failed, timeout)
         e ⇒
           e shouldBe an[Exception]
-      }
-    }
 
-    if (includeTestsHittingActualWebsites) {
+    if (includeTestsHittingActualWebsites)
       /*
        * Requires the following DNS spoof to be running:
        * sudo /usr/local/bin/python ./dnschef.py --fakedomains www.howsmyssl.com --fakeip 54.173.126.144
        *
        * Read up about it on: https://tersesystems.com/2014/03/31/testing-hostname-verification/
        */
-      "fail hostname verification on spoofed https://www.howsmyssl.com/" in {
+      "fail hostname verification on spoofed https://www.howsmyssl.com/" in
         val req = HttpRequest(uri = "https://www.howsmyssl.com/")
-        val ex = intercept[Exception] {
+        val ex = intercept[Exception]
           Http().singleRequest(req).futureValue
-        }
         // JDK built-in verification
         val expectedMsg =
           "No subject alternative DNS name matching www.howsmyssl.com found"
@@ -87,15 +80,11 @@ class TlsEndpointVerificationSpec
 
         info("TLS failure cause: " + e.getMessage)
         e.getMessage should include(expectedMsg)
-      }
 
-      "pass hostname verification on https://www.playframework.com/" in {
+      "pass hostname verification on https://www.playframework.com/" in
         val req = HttpRequest(uri = "https://www.playframework.com/")
         val res = Http().singleRequest(req).futureValue
         res.status should ===(StatusCodes.OK)
-      }
-    }
-  }
 
   def pipeline(clientContext: ConnectionContext,
                hostname: String): HttpRequest ⇒ Future[HttpResponse] =
@@ -107,8 +96,8 @@ class TlsEndpointVerificationSpec
 
   def pipelineFlow(
       clientContext: ConnectionContext,
-      hostname: String): Flow[HttpRequest, HttpResponse, NotUsed] = {
-    val handler: HttpRequest ⇒ HttpResponse = { req ⇒
+      hostname: String): Flow[HttpRequest, HttpResponse, NotUsed] =
+    val handler: HttpRequest ⇒ HttpResponse =  req ⇒
       // verify Tls-Session-Info header information
       val name =
         req.header[`Tls-Session-Info`].flatMap(_.localPrincipal).map(_.getName)
@@ -118,7 +107,6 @@ class TlsEndpointVerificationSpec
       else
         HttpResponse(StatusCodes.BadRequest,
                      entity = "Tls-Session-Info header verification failed")
-    }
 
     val serverSideTls =
       Http().sslTlsStage(ExampleHttpContexts.exampleServerContext, Server)
@@ -134,5 +122,3 @@ class TlsEndpointVerificationSpec
     val client = Http().clientLayer(Host(hostname, 8080)).atop(clientSideTls)
 
     client.join(server)
-  }
-}

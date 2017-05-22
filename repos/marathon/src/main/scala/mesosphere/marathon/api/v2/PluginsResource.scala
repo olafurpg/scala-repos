@@ -15,15 +15,14 @@ import mesosphere.marathon.plugin.http.{HttpRequest, HttpRequestHandler, HttpRes
 class PluginsResource @Inject()(val config: MarathonConf,
                                 requestHandlers: Seq[HttpRequestHandler],
                                 definitions: PluginDefinitions)
-    extends RestResource {
+    extends RestResource
 
   val pluginIdToHandler = definitions.plugins
     .filter(_.plugin == classOf[HttpRequestHandler].getName)
-    .flatMap { d =>
+    .flatMap  d =>
       requestHandlers
         .find(_.getClass.getName == d.implementation)
         .map(d.id -> _)
-    }
     .toMap
 
   @GET
@@ -66,15 +65,12 @@ class PluginsResource @Inject()(val config: MarathonConf,
     handleRequest(pluginId, path, req)
 
   private[this] def handleRequest(
-      pluginId: String, path: String, req: HttpServletRequest): Response = {
+      pluginId: String, path: String, req: HttpServletRequest): Response =
     pluginIdToHandler
       .get(pluginId)
-      .map { handler =>
+      .map  handler =>
         val request = new RequestFacade(req, path)
         val response = new ResponseFacade
         handler.serve(request, response)
         response.response
-      }
       .getOrElse(notFound(s"No plugin with this pluginId: $pluginId"))
-  }
-}

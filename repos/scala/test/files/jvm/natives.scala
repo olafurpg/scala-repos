@@ -1,4 +1,4 @@
-object Test {
+object Test
 
   //println("java.library.path=" + System.getProperty("java.library.path"))
 
@@ -14,8 +14,6 @@ object Test {
   @native
   def sayHello(s: String): String = null
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val s = sayHello("Scala is great!")
     println("Invocation returned \"" + s + "\"")
-  }
-}

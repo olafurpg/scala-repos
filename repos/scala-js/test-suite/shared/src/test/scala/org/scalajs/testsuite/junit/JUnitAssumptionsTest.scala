@@ -6,22 +6,20 @@ import org.junit.Assume._
 import org.junit._
 import org.junit.internal.AssumptionViolatedException
 
-class JUnitAssumptionsTest {
+class JUnitAssumptionsTest
 
   private val ShallNotPass = false
 
-  def testIfAssumePass(assumption: => Unit, shouldPass: Boolean = true): Unit = {
-    try {
+  def testIfAssumePass(assumption: => Unit, shouldPass: Boolean = true): Unit =
+    try
       assumption
       if (!shouldPass) fail("Assumption should have failed")
-    } catch {
+    catch
       case assVio: AssumptionViolatedException =>
         if (shouldPass) throw assVio
-    }
-  }
 
   @Test
-  def testAssumeTrue(): Unit = {
+  def testAssumeTrue(): Unit =
     testIfAssumePass(assumeTrue("true be assumed to be true", true))
     testIfAssumePass(assumeTrue(true))
     testIfAssumePass(
@@ -33,10 +31,9 @@ class JUnitAssumptionsTest {
     testIfAssumePass(
         assumeFalse("true be assumed to be false", true), ShallNotPass)
     testIfAssumePass(assumeFalse(true), ShallNotPass)
-  }
 
   @Test
-  def testAssumeNotNull(): Unit = {
+  def testAssumeNotNull(): Unit =
     testIfAssumePass(assumeNotNull())
     testIfAssumePass(assumeNotNull(new Object))
     testIfAssumePass(assumeNotNull("", new Object, " "))
@@ -44,10 +41,9 @@ class JUnitAssumptionsTest {
     testIfAssumePass(assumeNotNull(null), ShallNotPass)
     testIfAssumePass(assumeNotNull(new Object, null), ShallNotPass)
     testIfAssumePass(assumeNotNull(null, new Object), ShallNotPass)
-  }
 
   @Test
-  def testAssumeThat(): Unit = {
+  def testAssumeThat(): Unit =
     testIfAssumePass(assumeThat(null, nullValue()))
     testIfAssumePass(assumeThat(null, notNullValue()), ShallNotPass)
 
@@ -67,10 +63,9 @@ class JUnitAssumptionsTest {
 
     testIfAssumePass(assumeThat(1, not(2)))
     testIfAssumePass(assumeThat(1, not(1)), ShallNotPass)
-  }
 
   @Test
-  def testAssumesNoException(): Unit = {
+  def testAssumesNoException(): Unit =
     testIfAssumePass(
         assumeNoException("assumeNoException(null) should succeed", null))
     testIfAssumePass(assumeNoException(null))
@@ -80,5 +75,3 @@ class JUnitAssumptionsTest {
             "assumeNoException(new Throwable) should succeed", new Throwable),
         ShallNotPass)
     testIfAssumePass(assumeNoException(new Throwable), ShallNotPass)
-  }
-}

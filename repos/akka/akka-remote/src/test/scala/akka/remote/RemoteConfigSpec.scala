@@ -16,11 +16,11 @@ class RemoteConfigSpec
     extends AkkaSpec("""
     akka.actor.provider = "akka.remote.RemoteActorRefProvider"
     akka.remote.netty.tcp.port = 0
-  """) {
+  """)
 
-  "Remoting" should {
+  "Remoting" should
 
-    "contain correct configuration values in reference.conf" in {
+    "contain correct configuration values in reference.conf" in
       val remoteSettings = RARP(system).provider.remoteSettings
       import remoteSettings._
 
@@ -67,9 +67,8 @@ class RemoteConfigSpec
 
       remoteSettings.config.getString("akka.remote.log-frame-size-exceeding") should ===(
           "off")
-    }
 
-    "be able to parse AkkaProtocol related config elements" in {
+    "be able to parse AkkaProtocol related config elements" in
       val settings =
         new AkkaProtocolSettings(RARP(system).provider.remoteSettings.config)
       import settings._
@@ -82,9 +81,8 @@ class RemoteConfigSpec
       TransportHeartBeatInterval should ===(4.seconds)
       TransportFailureDetectorConfig.getMillisDuration(
           "acceptable-heartbeat-pause") should ===(16.seconds)
-    }
 
-    "contain correct netty.tcp values in reference.conf" in {
+    "contain correct netty.tcp values in reference.conf" in
       val c = RARP(system).provider.remoteSettings.config
         .getConfig("akka.remote.netty.tcp")
       val s = new NettyTransportSettings(c)
@@ -107,31 +105,25 @@ class RemoteConfigSpec
       c.getString("bind-port") should ===("")
       ServerSocketWorkerPoolSize should ===(2)
       ClientSocketWorkerPoolSize should ===(2)
-    }
 
-    "contain correct socket worker pool configuration values in reference.conf" in {
+    "contain correct socket worker pool configuration values in reference.conf" in
       val c = RARP(system).provider.remoteSettings.config
         .getConfig("akka.remote.netty.tcp")
 
       // server-socket-worker-pool
-      {
         val pool = c.getConfig("server-socket-worker-pool")
         pool.getInt("pool-size-min") should ===(2)
 
         pool.getDouble("pool-size-factor") should ===(1.0)
         pool.getInt("pool-size-max") should ===(2)
-      }
 
       // client-socket-worker-pool
-      {
         val pool = c.getConfig("client-socket-worker-pool")
         pool.getInt("pool-size-min") should ===(2)
         pool.getDouble("pool-size-factor") should ===(1.0)
         pool.getInt("pool-size-max") should ===(2)
-      }
-    }
 
-    "contain correct ssl configuration values in reference.conf" in {
+    "contain correct ssl configuration values in reference.conf" in
       val sslSettings = new SSLSettings(
           system.settings.config.getConfig("akka.remote.netty.ssl.security"))
       sslSettings.SSLKeyStore should ===(Some("keystore"))
@@ -143,12 +135,8 @@ class RemoteConfigSpec
       sslSettings.SSLEnabledAlgorithms should ===(
           Set("TLS_RSA_WITH_AES_128_CBC_SHA"))
       sslSettings.SSLRandomNumberGenerator should ===(None)
-    }
 
-    "have debug logging of the failure injector turned off in reference.conf" in {
+    "have debug logging of the failure injector turned off in reference.conf" in
       val c = RARP(system).provider.remoteSettings.config
         .getConfig("akka.remote.gremlin")
       c.getBoolean("debug") should ===(false)
-    }
-  }
-}

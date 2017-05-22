@@ -1,4 +1,4 @@
-class Unchecked[C] {
+class Unchecked[C]
   def nowarn[T] = (null: Any) match { case _: Some[T] => } // warn (did not warn due to SI-8597)
 
   // These warned before.
@@ -20,16 +20,15 @@ class Unchecked[C] {
 
   def nowarnArrayTypeVar[T] = (null: Any) match { case _: Array[t] => } // nowarn
 
-  def noWarnArrayErasure1 = (null: Any) match {
+  def noWarnArrayErasure1 = (null: Any) match
     case Some(_: Array[String]) =>
-  } // nowarn
-  def noWarnArrayErasure2 = (null: Any) match {
+  // nowarn
+  def noWarnArrayErasure2 = (null: Any) match
     case Some(_: Array[List[_]]) =>
-  } // nowarn
-  def noWarnArrayErasure3 = (null: Any) match {
+  // nowarn
+  def noWarnArrayErasure3 = (null: Any) match
     case Some(_: Array[Array[List[_]]]) =>
-  } // nowarn
-  def warnArrayErasure2 = (null: Any) match {
+  // nowarn
+  def warnArrayErasure2 = (null: Any) match
     case Some(_: Array[Array[List[String]]]) =>
-  } // warn
-}
+  // warn

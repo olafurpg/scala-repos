@@ -21,29 +21,25 @@ class ALSModel(override val rank: Int,
                val itemStringIntMap: BiMap[String, Int],
                val categoryItemsMap: Map[String, Set[Int]])
     extends MatrixFactorizationModel(rank, userFeatures, productFeatures)
-    with IPersistentModel[ALSAlgorithmParams] {
+    with IPersistentModel[ALSAlgorithmParams]
 
   def recommendProductsFromCategory(
-      user: Int, num: Int, categoryItems: Array[Set[Int]]) = {
-    val filteredProductFeatures = productFeatures.filter {
+      user: Int, num: Int, categoryItems: Array[Set[Int]]) =
+    val filteredProductFeatures = productFeatures.filter
       case (id, _) => categoryItems.exists(_.contains(id))
-    }
     recommend(userFeatures.lookup(user).head, filteredProductFeatures, num)
       .map(t => Rating(user, t._1, t._2))
-  }
 
   private def recommend(recommendToFeatures: Array[Double],
                         recommendableFeatures: RDD[(Int, Array[Double])],
-                        num: Int): Array[(Int, Double)] = {
+                        num: Int): Array[(Int, Double)] =
     val recommendToVector = new DoubleMatrix(recommendToFeatures)
-    val scored = recommendableFeatures.map {
+    val scored = recommendableFeatures.map
       case (id, features) =>
         (id, recommendToVector.dot(new DoubleMatrix(features)))
-    }
     scored.top(num)(Ordering.by(_._2))
-  }
 
-  def save(id: String, params: ALSAlgorithmParams, sc: SparkContext): Boolean = {
+  def save(id: String, params: ALSAlgorithmParams, sc: SparkContext): Boolean =
 
     sc.parallelize(Seq(rank)).saveAsObjectFile(s"/tmp/${id}/rank")
     userFeatures.saveAsObjectFile(s"/tmp/${id}/userFeatures")
@@ -55,9 +51,8 @@ class ALSModel(override val rank: Int,
     sc.parallelize(Seq(categoryItemsMap))
       .saveAsObjectFile(s"/tmp/${id}/categoryItemsMap")
     true
-  }
 
-  override def toString = {
+  override def toString =
     s"userFeatures: [${userFeatures.count()}]" +
     s"(${userFeatures.take(2).toList}...)" +
     s" productFeatures: [${productFeatures.count()}]" +
@@ -66,11 +61,9 @@ class ALSModel(override val rank: Int,
     s"(${userStringIntMap.take(2)}...)" +
     s" itemStringIntMap: [${itemStringIntMap.size}]" +
     s"(${itemStringIntMap.take(2)}...)"
-  }
-}
 
-object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
-  def apply(id: String, params: ALSAlgorithmParams, sc: Option[SparkContext]) = {
+object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel]
+  def apply(id: String, params: ALSAlgorithmParams, sc: Option[SparkContext]) =
     new ALSModel(
         rank = sc.get.objectFile[Int](s"/tmp/${id}/rank").first,
         userFeatures = sc.get.objectFile(s"/tmp/${id}/userFeatures"),
@@ -84,5 +77,3 @@ object ALSModel extends IPersistentModelLoader[ALSAlgorithmParams, ALSModel] {
         categoryItemsMap = sc.get
             .objectFile[Map[String, Set[Int]]](s"/tmp/${id}/categoryItemsMap")
             .first)
-  }
-}

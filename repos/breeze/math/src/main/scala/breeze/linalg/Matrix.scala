@@ -32,20 +32,18 @@ import breeze.stats.distributions.Rand
   * @author dlwh
   */
 trait MatrixLike[@spec(Double, Int, Float, Long) V, +Self <: Matrix[V]]
-    extends Tensor[(Int, Int), V] with TensorLike[(Int, Int), V, Self] {
+    extends Tensor[(Int, Int), V] with TensorLike[(Int, Int), V, Self]
   def map[V2, That](
       fn: V => V2)(implicit canMapValues: CanMapValues[
                        Self @uncheckedVariance, V, V2, That]): That =
     values map fn
-}
 
 trait Matrix[@spec(Double, Int, Float, Long) V]
-    extends MatrixLike[V, Matrix[V]] {
+    extends MatrixLike[V, Matrix[V]]
 
   final def apply(i: (Int, Int)) = apply(i._1, i._2)
-  final def update(i: (Int, Int), e: V): Unit = {
+  final def update(i: (Int, Int), e: V): Unit =
     update(i._1, i._2, e)
-  }
 
   def apply(i: Int, j: Int): V
   def update(i: Int, j: Int, e: V): Unit
@@ -54,7 +52,7 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
   def rows: Int
   def cols: Int
 
-  def keySet: Set[(Int, Int)] = new Set[(Int, Int)] {
+  def keySet: Set[(Int, Int)] = new Set[(Int, Int)]
     def contains(elem: (Int, Int)): Boolean =
       elem._1 >= 0 && elem._1 < rows && elem._2 >= 0 && elem._2 < cols
 
@@ -64,7 +62,6 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
     def iterator: Iterator[(Int, Int)] =
       for { j <- Iterator.range(0, cols); i <- Iterator.range(0, rows) } yield
         (i, j)
-  }
 
   def iterator =
     for (i <- Iterator.range(0, rows); j <- Iterator.range(0, cols)) yield
@@ -79,7 +76,7 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
     (i -> j)
 
   def toString(maxLines: Int = Terminal.terminalHeight - 3,
-               maxWidth: Int = Terminal.terminalWidth): String = {
+               maxWidth: Int = Terminal.terminalWidth): String =
     val showRows = if (rows > maxLines) maxLines - 1 else rows
 
     def colWidth(col: Int) =
@@ -92,78 +89,63 @@ trait Matrix[@spec(Double, Int, Float, Long) V]
 
     val colWidths = new scala.collection.mutable.ArrayBuffer[Int]
     var col = 0
-    while (col < cols && colWidths.sum < maxWidth) {
+    while (col < cols && colWidths.sum < maxWidth)
       colWidths += colWidth(col)
       col += 1
-    }
 
     // make space for "... (K total)"
-    if (colWidths.size < cols) {
-      while (colWidths.sum + cols.toString.length + 12 >= maxWidth) {
-        if (colWidths.isEmpty) {
+    if (colWidths.size < cols)
+      while (colWidths.sum + cols.toString.length + 12 >= maxWidth)
+        if (colWidths.isEmpty)
           return "%d x %d matrix".format(rows, cols)
-        }
         colWidths.remove(colWidths.length - 1)
-      }
-    }
 
     val newline = Terminal.newline
 
     val rv = new scala.StringBuilder
-    for (row <- 0 until showRows; col <- 0 until colWidths.length) {
+    for (row <- 0 until showRows; col <- 0 until colWidths.length)
       val cell = if (this(row, col) != null) this(row, col).toString else "--"
       rv.append(cell)
       rv.append(" " * (colWidths(col) - cell.length))
-      if (col == colWidths.length - 1) {
-        if (col < cols - 1) {
+      if (col == colWidths.length - 1)
+        if (col < cols - 1)
           rv.append("...")
-          if (row == 0) {
+          if (row == 0)
             rv.append(" (")
             rv.append(cols)
             rv.append(" total)")
-          }
-        }
-        if (row + 1 < showRows) {
+        if (row + 1 < showRows)
           rv.append(newline)
-        }
-      }
-    }
 
-    if (rows > showRows) {
+    if (rows > showRows)
       rv.append(newline)
       rv.append("... (")
       rv.append(rows)
       rv.append(" total)")
-    }
 
     rv.toString
-  }
 
   override def toString: String =
     toString(Terminal.terminalHeight, Terminal.terminalWidth)
 
-  def toDenseMatrix(implicit cm: ClassTag[V], zero: Zero[V]) = {
-    DenseMatrix.tabulate(rows, cols) { (i, j) =>
+  def toDenseMatrix(implicit cm: ClassTag[V], zero: Zero[V]) =
+    DenseMatrix.tabulate(rows, cols)  (i, j) =>
       apply(i, j)
-    }
-  }
 
   def copy: Matrix[V]
 
   def flatten(view: View = View.Prefer): Vector[V]
 
-  override def equals(p1: Any): Boolean = p1 match {
+  override def equals(p1: Any): Boolean = p1 match
     case x: Matrix[_] =>
       this.rows == x.rows && this.cols == x.cols &&
       keysIterator.forall(k => this(k) == x(k))
     case _ =>
       return false
-  }
-}
 
 object Matrix
     extends MatrixConstructors[Matrix] with MatrixGenericOps
-    with MatrixOpsLowPrio with MatrixOps with MatrixMultOps {
+    with MatrixOpsLowPrio with MatrixOps with MatrixMultOps
 
   def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
       rows: Int, cols: Int): Matrix[V] = DenseMatrix.zeros(rows, cols)
@@ -178,7 +160,7 @@ object Matrix
     emptyMatrix(rows, 0)
 
   private[linalg] def emptyMatrix[V : ClassTag](
-      _rows: Int, _cols: Int): Matrix[V] = new Matrix[V] {
+      _rows: Int, _cols: Int): Matrix[V] = new Matrix[V]
     def activeIterator: Iterator[((Int, Int), V)] = Iterator.empty
 
     def activeValuesIterator: Iterator[V] = Iterator.empty
@@ -188,9 +170,8 @@ object Matrix
     def apply(i: Int, j: Int): V =
       throw new IndexOutOfBoundsException("Empty matrix!")
 
-    def update(i: Int, j: Int, e: V) {
+    def update(i: Int, j: Int, e: V)
       throw new IndexOutOfBoundsException("Empty matrix!")
-    }
 
     def rows: Int = _rows
 
@@ -203,36 +184,28 @@ object Matrix
     def repr: Matrix[V] = this
 
     def flatten(view: View) = Vector[V]()
-  }
 
   implicit def canTraverseKeyValuePairs[V]: CanTraverseKeyValuePairs[
-      Matrix[V], (Int, Int), V] = {
-    new CanTraverseKeyValuePairs[Matrix[V], (Int, Int), V] {
+      Matrix[V], (Int, Int), V] =
+    new CanTraverseKeyValuePairs[Matrix[V], (Int, Int), V]
       def isTraversableAgain(from: Matrix[V]): Boolean = true
 
       /** Iterates all key-value pairs from the given collection. */
       def traverse(
           from: Matrix[V],
           fn: CanTraverseKeyValuePairs.KeyValuePairsVisitor[(Int, Int), V])
-        : Unit = {
+        : Unit =
         from.iterator.foreach((fn.visit _).tupled)
-      }
-    }
-  }
 
-  implicit def canTraverseValues[V]: CanTraverseValues[Matrix[V], V] = {
-    new CanTraverseValues[Matrix[V], V] {
+  implicit def canTraverseValues[V]: CanTraverseValues[Matrix[V], V] =
+    new CanTraverseValues[Matrix[V], V]
       def isTraversableAgain(from: Matrix[V]): Boolean = true
 
       /** Iterates all key-value pairs from the given collection. */
-      def traverse(from: Matrix[V], fn: ValuesVisitor[V]): Unit = {
+      def traverse(from: Matrix[V], fn: ValuesVisitor[V]): Unit =
         from.valuesIterator.foreach(fn.visit)
-      }
-    }
-  }
-}
 
-trait MatrixConstructors[Mat[T] <: Matrix[T]] {
+trait MatrixConstructors[Mat[T] <: Matrix[T]]
   def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
       rows: Int, cols: Int): Mat[V]
   def create[@spec(Double, Int, Float, Long) V : Zero](
@@ -246,61 +219,50 @@ trait MatrixConstructors[Mat[T] <: Matrix[T]] {
     * @return
     */
   def ones[@spec(Double, Int, Float, Long) V : ClassTag : Zero : Semiring](
-      rows: Int, cols: Int): Mat[V] = {
+      rows: Int, cols: Int): Mat[V] =
     fill(rows, cols)(implicitly[Semiring[V]].one)
-  }
 
   def fill[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
       rows: Int, cols: Int)(v: => V): Mat[V] =
     create(rows, cols, Array.fill(rows * cols)(v))
   def tabulate[@spec(Double, Int, Float, Long) V : ClassTag : Zero](
-      rows: Int, cols: Int)(f: (Int, Int) => V): Mat[V] = {
+      rows: Int, cols: Int)(f: (Int, Int) => V): Mat[V] =
     val z = zeros(rows, cols)
-    for (c <- 0 until cols; r <- 0 until rows) {
+    for (c <- 0 until cols; r <- 0 until rows)
       z(r, c) = f(r, c)
-    }
     z
-  }
 
   def rand[T : ClassTag : Zero](
-      rows: Int, cols: Int, rand: Rand[T] = Rand.uniform): Mat[T] = {
+      rows: Int, cols: Int, rand: Rand[T] = Rand.uniform): Mat[T] =
     fill(rows, cols)(rand.draw())
-  }
 
   // @specialized() R because of https://issues.scala-lang.org/browse/SI-8886
   /** Static constructor for a literal matrix. */
   def apply[@specialized( /* Don't remove until SI-8886 is closed*/ ) R,
             @spec(Double, Int, Float, Long) V](rows: R*)(
-      implicit rl: LiteralRow[R, V], man: ClassTag[V], zero: Zero[V]) = {
+      implicit rl: LiteralRow[R, V], man: ClassTag[V], zero: Zero[V]) =
     val nRows = rows.length
     val ns = rl.length(rows(0))
     val rv = zeros(nRows, ns)
     finishLiteral(rv, rl, rows)
     rv
-  }
 
   implicit def canCreateZeros[T : ClassTag : Zero]: CanCreateZeros[
       Mat[T], (Int, Int)] =
-    new CanCreateZeros[Mat[T], (Int, Int)] {
-      def apply(dims: (Int, Int)): Mat[T] = {
+    new CanCreateZeros[Mat[T], (Int, Int)]
+      def apply(dims: (Int, Int)): Mat[T] =
         zeros[T](dims._1, dims._2)
-      }
-    }
 
   implicit def canTabulate[T : ClassTag : Zero] =
-    new CanTabulate[(Int, Int), Mat[T], T] {
+    new CanTabulate[(Int, Int), Mat[T], T]
       def apply(d: (Int, Int), f: ((Int, Int)) => T): Mat[T] =
         tabulate[T](d._1, d._2)((r: Int, c: Int) => f((r, c)))
-    }
 
   // This method only exists because of trouble in Scala-specialization land.
   // basically, we turn off specialization for this loop, since it's not going to be fast anyway.
   private def finishLiteral[V, R](
-      rv: Matrix[V], rl: LiteralRow[R, V], rows: Seq[R]) {
-    for ((row, i) <- rows.zipWithIndex) {
-      rl.foreach(row, { (j, v) =>
+      rv: Matrix[V], rl: LiteralRow[R, V], rows: Seq[R])
+    for ((row, i) <- rows.zipWithIndex)
+      rl.foreach(row,  (j, v) =>
         rv(i, j) = v
-      })
-    }
-  }
-}
+      )

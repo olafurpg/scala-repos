@@ -30,9 +30,9 @@ final class Env(config: Config,
                 prefApi: lila.pref.PrefApi,
                 chatApi: lila.chat.ChatApi,
                 historyApi: lila.history.HistoryApi,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val UidTimeout = config duration "uid.timeout"
     val PlayerDisconnectTimeout = config duration "player.disconnect.timeout"
     val PlayerRagequitTimeout = config duration "player.ragequit.timeout"
@@ -49,7 +49,6 @@ final class Env(config: Config,
     val CollectionHistory = config getString "collection.history"
     val CollectionForecast = config getString "collection.forecast"
     val ChannelMoveTime = config getString "channel.move_time.name "
-  }
   import settings._
 
   private val moveTimeChannel =
@@ -59,7 +58,7 @@ final class Env(config: Config,
 
   lazy val eventHistory = History(db(CollectionHistory)) _
 
-  val roundMap = system.actorOf(Props(new lila.hub.ActorMap {
+  val roundMap = system.actorOf(Props(new lila.hub.ActorMap
     def mkActor(id: String) =
       new Round(gameId = id,
                 messenger = messenger,
@@ -74,19 +73,19 @@ final class Env(config: Config,
                 moretimeDuration = Moretime,
                 activeTtl = ActiveTtl)
     def receive: Receive =
-      ({
+      (
         case actorApi.GetNbRounds =>
           nbRounds = size
           system.lilaBus.publish(lila.hub.actorApi.round.NbRounds(nbRounds),
                                  'nbRounds)
-      }: Receive) orElse actorMapReceive
-  }), name = ActorMapName)
+      : Receive) orElse actorMapReceive
+  ), name = ActorMapName)
 
   private var nbRounds = 0
   def count() = nbRounds
 
-  private val socketHub = {
-    val actor = system.actorOf(Props(new lila.socket.SocketHubActor[Socket] {
+  private val socketHub =
+    val actor = system.actorOf(Props(new lila.socket.SocketHubActor[Socket]
       private var historyPersistenceEnabled = false
       def mkActor(id: String) =
         new Socket(gameId = id,
@@ -98,24 +97,22 @@ final class Env(config: Config,
                    ragequitTimeout = PlayerRagequitTimeout,
                    simulActor = hub.actor.simul)
       def receive: Receive =
-        ({
+        (
           case msg @ lila.chat.actorApi.ChatLine(id, line) =>
             self ! Tell(id take 8, msg)
           case _: lila.hub.actorApi.Deploy =>
             logger.warn("Enable history persistence")
             historyPersistenceEnabled = true
             // if the deploy didn't go through, cancel persistence
-            system.scheduler.scheduleOnce(10.minutes) {
+            system.scheduler.scheduleOnce(10.minutes)
               logger.warn("Disabling round history persistence!")
               historyPersistenceEnabled = false
-            }
           case msg: lila.game.actorApi.StartGame =>
             self ! Tell(msg.game.id, msg)
-        }: Receive) orElse socketHubReceive
-    }), name = SocketName)
+        : Receive) orElse socketHubReceive
+    ), name = SocketName)
     system.lilaBus.subscribe(actor, 'tvSelect, 'startGame, 'deploy)
     actor
-  }
 
   lazy val socketHandler = new SocketHandler(hub = hub,
                                              roundMap = roundMap,
@@ -184,20 +181,17 @@ final class Env(config: Config,
 
   lazy val tvBroadcast = system.actorOf(Props(classOf[TvBroadcast]))
 
-  def checkOutoftime(game: lila.game.Game) {
+  def checkOutoftime(game: lila.game.Game)
     if (game.playable && game.started && !game.isUnlimited)
       roundMap ! Tell(game.id, actorApi.round.Outoftime)
-  }
 
-  def resign(pov: lila.game.Pov) {
+  def resign(pov: lila.game.Pov)
     if (pov.game.abortable)
       roundMap ! Tell(pov.game.id, actorApi.round.Abort(pov.playerId))
     else if (pov.game.playable)
       roundMap ! Tell(pov.game.id, actorApi.round.Resign(pov.playerId))
-  }
-}
 
-object Env {
+object Env
 
   lazy val current =
     "round" boot new Env(
@@ -221,4 +215,3 @@ object Env {
         chatApi = lila.chat.Env.current.api,
         historyApi = lila.history.Env.current.api,
         scheduler = lila.common.PlayApp.scheduler)
-}

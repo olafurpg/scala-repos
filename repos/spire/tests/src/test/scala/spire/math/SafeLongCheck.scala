@@ -10,119 +10,95 @@ import prop._
 import spire.util.Opt
 
 class SafeLongCheck
-    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks {
+    extends PropSpec with Matchers with GeneratorDrivenPropertyChecks
 
   import SafeLong.zero
 
   val smin = SafeLong(Long.MinValue)
   val smax = SafeLong(Long.MaxValue)
 
-  def invariant(z: SafeLong): SafeLong = {
-    z match {
+  def invariant(z: SafeLong): SafeLong =
+    z match
       case SafeLongLong(_) => ()
       case SafeLongBigInteger(n) => BigInt(n).isValidLong shouldBe false
-    }
     z
-  }
 
-  property("x + y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x + y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) + SafeLong(y)) shouldBe x + y
       invariant(SafeLong(x) + y) shouldBe x + y
       invariant(SafeLong(x) + y.toLong) shouldBe x + y.toLong
-    }
-  }
 
-  property("x - y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x - y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) - SafeLong(y)) shouldBe x - y
       invariant(SafeLong(x) - y) shouldBe x - y
       invariant(SafeLong(x) - y.toLong) shouldBe x - y.toLong
-    }
-  }
 
-  property("x * y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x * y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) * SafeLong(y)) shouldBe x * y
       invariant(SafeLong(x) * y) shouldBe x * y
       invariant(SafeLong(x) * y.toLong) shouldBe x * y.toLong
-    }
-  }
 
-  property("x / y") {
-    forAll { (x: BigInt, y: BigInt) =>
-      if (y != 0) {
+  property("x / y")
+    forAll  (x: BigInt, y: BigInt) =>
+      if (y != 0)
         val expected = x / y
         invariant(SafeLong(x) /~ SafeLong(y)) shouldBe x / y
         invariant(SafeLong(x) / SafeLong(y)) shouldBe x / y
         invariant(SafeLong(x) / y) shouldBe x / y
-      }
-    }
 
     invariant(smin / SafeLong(-1)) shouldBe -smin
     invariant(smin / -1L) shouldBe -smin
     invariant(smin / BigInt(-1)) shouldBe -smin
-  }
 
-  property("x % y") {
-    forAll { (x: BigInt, y: BigInt) =>
-      if (y != 0) {
+  property("x % y")
+    forAll  (x: BigInt, y: BigInt) =>
+      if (y != 0)
         invariant(SafeLong(x) % SafeLong(y)) shouldBe x % y
         invariant(SafeLong(x) % y) shouldBe x % y
-      }
-    }
 
     invariant(smin % SafeLong(-1)) shouldBe zero
     invariant(smin % -1L) shouldBe zero
     invariant(smin % BigInt(-1)) shouldBe zero
-  }
 
-  property("x /% y") {
-    forAll { (x: BigInt, y: BigInt) =>
-      if (y != 0) {
+  property("x /% y")
+    forAll  (x: BigInt, y: BigInt) =>
+      if (y != 0)
         val sx = SafeLong(x)
         val sy = SafeLong(y)
         sx /% sy shouldBe x /% y
         sx /% y shouldBe x /% y
         sx /% sy shouldBe ((invariant(sx / sy), invariant(sx % sy)))
-      }
-    }
 
     (smin /% SafeLong(-1)) shouldBe ((-smin, zero))
     (smin /% -1L) shouldBe ((-smin, zero))
     (smin /% BigInt(-1)) shouldBe ((-smin, zero))
-  }
 
-  property("x ** y") {
-    forAll { (x: BigInt, k: Byte) =>
+  property("x ** y")
+    forAll  (x: BigInt, k: Byte) =>
       val sx = SafeLong(x)
-      if (k < 0) {
+      if (k < 0)
         intercept[IllegalArgumentException] { sx pow k }
         true shouldBe true
-      } else {
+      else
         invariant(sx ** k) shouldBe (x pow k)
         invariant(sx pow k) shouldBe (x pow k)
-      }
-    }
-  }
 
-  property("x.modPow(y, m) == (x ** y) % m") {
-    forAll { (x: BigInt, k: Byte, m: BigInt) =>
+  property("x.modPow(y, m) == (x ** y) % m")
+    forAll  (x: BigInt, k: Byte, m: BigInt) =>
       val sx = SafeLong(x)
       val sm = SafeLong(m)
-      if (!sm.isZero) {
-        if (k < 0) {
+      if (!sm.isZero)
+        if (k < 0)
           intercept[IllegalArgumentException] { sx.modPow(k, sm) }
-        } else {
+        else
           invariant(sx.modPow(k, sm)) shouldBe (sx pow k) % m
-        }
-      }
       true shouldBe true
-    }
-  }
 
-  property("comparisons") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("comparisons")
+    forAll  (x: BigInt, y: BigInt) =>
       val sx = SafeLong(x)
       val sy = SafeLong(y)
       invariant(sx min sy) shouldBe (x min y)
@@ -130,46 +106,34 @@ class SafeLongCheck
       sx compare sy shouldBe (x compare y)
       sx.signum shouldBe (sx compare zero)
       sx.isZero shouldBe (sx == zero)
-    }
-  }
 
-  property("x & y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x & y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) & SafeLong(y)) shouldBe SafeLong(x & y)
       invariant(SafeLong(x) & y) shouldBe SafeLong(x & y)
       invariant(SafeLong(x) & y.toLong) shouldBe SafeLong(x & y.toLong)
-    }
-  }
 
-  property("x | y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x | y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) | SafeLong(y)) shouldBe SafeLong(x | y)
       invariant(SafeLong(x) & y) shouldBe SafeLong(x & y)
       invariant(SafeLong(x) & y.toLong) shouldBe SafeLong(x & y.toLong)
-    }
-  }
 
-  property("x ^ y") {
-    forAll { (x: BigInt, y: BigInt) =>
+  property("x ^ y")
+    forAll  (x: BigInt, y: BigInt) =>
       invariant(SafeLong(x) ^ SafeLong(y)) shouldBe SafeLong(x ^ y)
-    }
-  }
 
-  property("x << k") {
-    forAll { (x: BigInt, k: Byte) =>
+  property("x << k")
+    forAll  (x: BigInt, k: Byte) =>
       invariant(SafeLong(x) << k) shouldBe SafeLong(x << k)
-    }
-  }
 
-  property("x >> k") {
-    forAll { (x: BigInt, k: Byte) =>
+  property("x >> k")
+    forAll  (x: BigInt, k: Byte) =>
       intercept[ArithmeticException] { SafeLong(x) >> Int.MinValue }
       invariant(SafeLong(x) >> k) shouldBe SafeLong(x >> k)
-    }
-  }
 
-  property("long safelongs") {
-    forAll { (x: Long) =>
+  property("long safelongs")
+    forAll  (x: Long) =>
       val sx = SafeLong(x)
 
       intercept[IllegalArgumentException] { sx pow -1 }
@@ -181,11 +145,9 @@ class SafeLongCheck
       sx.isValidLong shouldBe true
 
       (x == Long.MinValue || (-sx).isValidLong) shouldBe true
-    }
-  }
 
-  property("conversions, etc.") {
-    forAll { (x: BigInt) =>
+  property("conversions, etc.")
+    forAll  (x: BigInt) =>
       val sx = SafeLong(x)
       sx.toString shouldBe x.toString
       sx.toByte shouldBe x.toByte
@@ -195,11 +157,9 @@ class SafeLongCheck
       sx.toFloat shouldBe x.toFloat
       sx.toDouble shouldBe x.toDouble
       sx.isWhole shouldBe true
-    }
-  }
 
-  property("mixed size tests") {
-    forAll { (ex: Either[Long, BigInt], ey: Either[Long, BigInt]) =>
+  property("mixed size tests")
+    forAll  (ex: Either[Long, BigInt], ey: Either[Long, BigInt]) =>
       val x = ex.fold(BigInt(_), identity)
       val y = ey.fold(BigInt(_), identity)
       val sx = ex.fold(SafeLong(_), SafeLong(_))
@@ -210,10 +170,8 @@ class SafeLongCheck
       sx == sy shouldBe x == y
       sx <= sy shouldBe x <= y
       sx < sy shouldBe x < y
-    }
-  }
 
-  property("special cases") {
+  property("special cases")
     val firstBig = smax + 1
 
     // equality
@@ -244,13 +202,10 @@ class SafeLongCheck
 
     (SafeLong(-13) gcd SafeLong(0)) shouldBe SafeLong(13)
     (smin gcd SafeLong(0)) shouldBe firstBig
-  }
 
-  property("regressions") {
+  property("regressions")
     val bx = BigInt(8796093022208L)
     val sx = SafeLong(8796093022208L)
     sx << 23 shouldBe bx << 23
     sx >> -23 shouldBe sx << 23
     sx >> -23 shouldBe bx >> -23
-  }
-}

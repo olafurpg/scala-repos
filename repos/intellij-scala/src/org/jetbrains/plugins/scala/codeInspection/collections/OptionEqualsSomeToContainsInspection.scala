@@ -8,16 +8,15 @@ import org.jetbrains.plugins.scala.project.{ProjectPsiElementExt, ScalaLanguageL
   * @author Nikolay.Tropin
   */
 class OptionEqualsSomeToContainsInspection
-    extends OperationOnCollectionInspection {
+    extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(OptionEqualsSomeToContains, OptionNotEqualsSomeToNotContains)
-}
 
-object OptionEqualsSomeToContains extends SimplificationType {
+object OptionEqualsSomeToContains extends SimplificationType
   override def hint: String = InspectionBundle.message("replace.with.contains")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case _
           if expr.scalaLanguageLevel.exists(
               _ <= ScalaLanguageLevel.Scala_2_10) =>
@@ -33,15 +32,13 @@ object OptionEqualsSomeToContains extends SimplificationType {
               .withText(s"${qual.getText}.contains(${elem.getText})")
               .highlightAll)
       case _ => None
-    }
-}
 
-object OptionNotEqualsSomeToNotContains extends SimplificationType {
+object OptionNotEqualsSomeToNotContains extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.not.contains")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case _
           if expr.scalaLanguageLevel.exists(
               _ <= ScalaLanguageLevel.Scala_2_10) =>
@@ -57,5 +54,3 @@ object OptionNotEqualsSomeToNotContains extends SimplificationType {
               .withText(s"!${qual.getText}.contains(${elem.getText})")
               .highlightAll)
       case _ => None
-    }
-}

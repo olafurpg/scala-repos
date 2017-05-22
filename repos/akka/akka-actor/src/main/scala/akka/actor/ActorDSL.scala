@@ -65,10 +65,10 @@ import akka.util.Helpers.ConfigOps
   * `ActWithStash` trait in order to have the actor get the necessary deque-based
   * mailbox setting.
   */
-object ActorDSL extends dsl.Inbox with dsl.Creators {
+object ActorDSL extends dsl.Inbox with dsl.Creators
 
   protected object Extension
-      extends ExtensionId[Extension] with ExtensionIdProvider {
+      extends ExtensionId[Extension] with ExtensionIdProvider
 
     override def lookup = Extension
 
@@ -79,20 +79,18 @@ object ActorDSL extends dsl.Inbox with dsl.Creators {
       * Java API: retrieve the ActorDSL extension for the given system.
       */
     override def get(system: ActorSystem): Extension = super.get(system)
-  }
 
   protected class Extension(val system: ExtendedActorSystem)
-      extends akka.actor.Extension with InboxExtension {
+      extends akka.actor.Extension with InboxExtension
 
     private case class MkChild(props: Props, name: String)
         extends NoSerializationVerificationNeeded
     private val boss = system
-      .systemActorOf(Props(new Actor {
-        def receive = {
+      .systemActorOf(Props(new Actor
+        def receive =
           case MkChild(props, name) ⇒ sender() ! context.actorOf(props, name)
           case any ⇒ sender() ! any
-        }
-      }), "dsl")
+      ), "dsl")
       .asInstanceOf[RepointableActorRef]
 
     lazy val config = system.settings.config.getConfig("akka.actor.dsl")
@@ -104,21 +102,18 @@ object ActorDSL extends dsl.Inbox with dsl.Creators {
         boss.underlying
           .asInstanceOf[ActorCell]
           .attachChild(p, name, systemService = true)
-      else {
+      else
         implicit val timeout = system.settings.CreationTimeout
         Await
           .result(boss ? MkChild(p, name), timeout.duration)
           .asInstanceOf[ActorRef]
-      }
-  }
-}
 
 /**
   * An Inbox is an actor-like object which is interrogated from the outside.
   * It contains an actor whose reference can be passed to other actors as
   * usual and it can watch other actors’ lifecycle.
   */
-abstract class Inbox {
+abstract class Inbox
 
   /**
     * Receive the next message from this Inbox. This call will return immediately
@@ -148,12 +143,10 @@ abstract class Inbox {
     * then those replies will be received by this Inbox.
     */
   def send(target: ActorRef, msg: AnyRef): Unit
-}
 
-object Inbox {
+object Inbox
 
   /**
     * Create a new Inbox within the given system.
     */
   def create(system: ActorSystem): Inbox = ActorDSL.inbox()(system)
-}

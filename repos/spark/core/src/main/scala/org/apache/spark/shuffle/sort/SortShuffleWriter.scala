@@ -30,7 +30,7 @@ private[spark] class SortShuffleWriter[K, V, C](
     handle: BaseShuffleHandle[K, V, C],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V] with Logging
 
   private val dep = handle.dependency
 
@@ -49,8 +49,8 @@ private[spark] class SortShuffleWriter[K, V, C](
     context.taskMetrics().registerShuffleWriteMetrics()
 
   /** Write a bunch of records to this task's output */
-  override def write(records: Iterator[Product2[K, V]]): Unit = {
-    sorter = if (dep.mapSideCombine) {
+  override def write(records: Iterator[Product2[K, V]]): Unit =
+    sorter = if (dep.mapSideCombine)
       require(dep.aggregator.isDefined,
               "Map-side combine without Aggregator specified!")
       new ExternalSorter[K, V, C](context,
@@ -58,7 +58,7 @@ private[spark] class SortShuffleWriter[K, V, C](
                                   Some(dep.partitioner),
                                   dep.keyOrdering,
                                   dep.serializer)
-    } else {
+    else
       // In this case we pass neither an aggregator nor an ordering to the sorter, because we don't
       // care whether the keys get sorted in each partition; that will be done on the reduce side
       // if the operation being run is sortByKey.
@@ -67,7 +67,6 @@ private[spark] class SortShuffleWriter[K, V, C](
                                   Some(dep.partitioner),
                                   ordering = None,
                                   dep.serializer)
-    }
     sorter.insertAll(records)
 
     // Don't bother including the time to open the merged output file in the shuffle write time,
@@ -81,46 +80,36 @@ private[spark] class SortShuffleWriter[K, V, C](
     shuffleBlockResolver.writeIndexFileAndCommit(
         dep.shuffleId, mapId, partitionLengths, tmp)
     mapStatus = MapStatus(blockManager.shuffleServerId, partitionLengths)
-  }
 
   /** Close this writer, passing along whether the map completed */
-  override def stop(success: Boolean): Option[MapStatus] = {
-    try {
-      if (stopping) {
+  override def stop(success: Boolean): Option[MapStatus] =
+    try
+      if (stopping)
         return None
-      }
       stopping = true
-      if (success) {
+      if (success)
         return Option(mapStatus)
-      } else {
+      else
         // The map task failed, so delete our output data.
         shuffleBlockResolver.removeDataByMap(dep.shuffleId, mapId)
         return None
-      }
-    } finally {
+    finally
       // Clean up our sorter, which may have its own intermediate files
-      if (sorter != null) {
+      if (sorter != null)
         val startTime = System.nanoTime()
         sorter.stop()
         writeMetrics.incWriteTime(System.nanoTime - startTime)
         sorter = null
-      }
-    }
-  }
-}
 
-private[spark] object SortShuffleWriter {
+private[spark] object SortShuffleWriter
   def shouldBypassMergeSort(
-      conf: SparkConf, dep: ShuffleDependency[_, _, _]): Boolean = {
+      conf: SparkConf, dep: ShuffleDependency[_, _, _]): Boolean =
     // We cannot bypass sorting if we need to do map-side aggregation.
-    if (dep.mapSideCombine) {
+    if (dep.mapSideCombine)
       require(dep.aggregator.isDefined,
               "Map-side combine without Aggregator specified!")
       false
-    } else {
+    else
       val bypassMergeThreshold: Int =
         conf.getInt("spark.shuffle.sort.bypassMergeThreshold", 200)
       dep.partitioner.numPartitions <= bypassMergeThreshold
-    }
-  }
-}

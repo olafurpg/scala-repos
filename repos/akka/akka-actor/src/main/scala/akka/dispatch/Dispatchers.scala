@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 /**
   * DispatcherPrerequisites represents useful contextual pieces when constructing a MessageDispatcher
   */
-trait DispatcherPrerequisites {
+trait DispatcherPrerequisites
   def threadFactory: ThreadFactory
   def eventStream: EventStream
   def scheduler: Scheduler
@@ -23,7 +23,6 @@ trait DispatcherPrerequisites {
   def settings: ActorSystem.Settings
   def mailboxes: Mailboxes
   def defaultExecutionContext: Option[ExecutionContext]
-}
 
 /**
   * INTERNAL API
@@ -38,14 +37,13 @@ private[akka] final case class DefaultDispatcherPrerequisites(
     val defaultExecutionContext: Option[ExecutionContext])
     extends DispatcherPrerequisites
 
-object Dispatchers {
+object Dispatchers
 
   /**
     * The id of the default dispatcher, also the full key of the
     * configuration of the default dispatcher.
     */
   final val DefaultDispatcherId = "akka.actor.default-dispatcher"
-}
 
 /**
   * Dispatchers are to be defined in configuration to allow for tuning
@@ -56,7 +54,7 @@ object Dispatchers {
   * for documentation of dispatcher options.
   */
 class Dispatchers(val settings: ActorSystem.Settings,
-                  val prerequisites: DispatcherPrerequisites) {
+                  val prerequisites: DispatcherPrerequisites)
 
   import Dispatchers._
 
@@ -91,8 +89,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
   def hasDispatcher(id: String): Boolean =
     dispatcherConfigurators.containsKey(id) || cachingConfig.hasPath(id)
 
-  private def lookupConfigurator(id: String): MessageDispatcherConfigurator = {
-    dispatcherConfigurators.get(id) match {
+  private def lookupConfigurator(id: String): MessageDispatcherConfigurator =
+    dispatcherConfigurators.get(id) match
       case null ⇒
         // It doesn't matter if we create a dispatcher configurator that isn't used due to concurrent lookup.
         // That shouldn't happen often and in case it does the actual ExecutorService isn't
@@ -103,14 +101,11 @@ class Dispatchers(val settings: ActorSystem.Settings,
             throw new ConfigurationException(
                 s"Dispatcher [$id] not configured")
 
-        dispatcherConfigurators.putIfAbsent(id, newConfigurator) match {
+        dispatcherConfigurators.putIfAbsent(id, newConfigurator) match
           case null ⇒ newConfigurator
           case existing ⇒ existing
-        }
 
       case existing ⇒ existing
-    }
-  }
 
   /**
     * Register a [[MessageDispatcherConfigurator]] that will be
@@ -131,26 +126,23 @@ class Dispatchers(val settings: ActorSystem.Settings,
   /**
     * INTERNAL API
     */
-  private[akka] def config(id: String): Config = {
+  private[akka] def config(id: String): Config =
     config(id, settings.config.getConfig(id))
-  }
 
   /**
     * INTERNAL API
     */
-  private[akka] def config(id: String, appConfig: Config): Config = {
+  private[akka] def config(id: String, appConfig: Config): Config =
     import scala.collection.JavaConverters._
     def simpleName = id.substring(id.lastIndexOf('.') + 1)
     idConfig(id)
       .withFallback(appConfig)
       .withFallback(ConfigFactory.parseMap(Map("name" -> simpleName).asJava))
       .withFallback(defaultDispatcherConfig)
-  }
 
-  private def idConfig(id: String): Config = {
+  private def idConfig(id: String): Config =
     import scala.collection.JavaConverters._
     ConfigFactory.parseMap(Map("id" -> id).asJava)
-  }
 
   /**
     * INTERNAL API
@@ -177,12 +169,12 @@ class Dispatchers(val settings: ActorSystem.Settings,
     * Throws: IllegalArgumentException if the value of "type" is not valid
     *         IllegalArgumentException if it cannot create the MessageDispatcherConfigurator
     */
-  private def configuratorFrom(cfg: Config): MessageDispatcherConfigurator = {
+  private def configuratorFrom(cfg: Config): MessageDispatcherConfigurator =
     if (!cfg.hasPath("id"))
       throw new ConfigurationException(
           "Missing dispatcher 'id' property in config: " + cfg.root.render)
 
-    cfg.getString("type") match {
+    cfg.getString("type") match
       case "Dispatcher" ⇒ new DispatcherConfigurator(cfg, prerequisites)
       case "BalancingDispatcher" ⇒
         // FIXME remove this case in 2.4
@@ -197,7 +189,7 @@ class Dispatchers(val settings: ActorSystem.Settings,
                         classOf[DispatcherPrerequisites] -> prerequisites)
         prerequisites.dynamicAccess
           .createInstanceFor[MessageDispatcherConfigurator](fqn, args)
-          .recover({
+          .recover(
             case exception ⇒
               throw new ConfigurationException(
                   ("Cannot instantiate MessageDispatcherConfigurator type [%s], defined in [%s], " +
@@ -205,11 +197,8 @@ class Dispatchers(val settings: ActorSystem.Settings,
                       "[akka.dispatch.DispatcherPrerequisites] parameters")
                     .format(fqn, cfg.getString("id")),
                   exception)
-          })
+          )
           .get
-    }
-  }
-}
 
 /**
   * Configurator for creating [[akka.dispatch.Dispatcher]].
@@ -218,7 +207,7 @@ class Dispatchers(val settings: ActorSystem.Settings,
   */
 class DispatcherConfigurator(
     config: Config, prerequisites: DispatcherPrerequisites)
-    extends MessageDispatcherConfigurator(config, prerequisites) {
+    extends MessageDispatcherConfigurator(config, prerequisites)
 
   private val instance = new Dispatcher(
       this,
@@ -232,19 +221,17 @@ class DispatcherConfigurator(
     * Returns the same dispatcher instance for each invocation
     */
   override def dispatcher(): MessageDispatcher = instance
-}
 
 /**
   * INTERNAL API
   */
-private[akka] object BalancingDispatcherConfigurator {
+private[akka] object BalancingDispatcherConfigurator
   private val defaultRequirement = ConfigFactory.parseString(
       "mailbox-requirement = akka.dispatch.MultipleConsumerSemantics")
   def amendConfig(config: Config): Config =
     if (config.getString("mailbox-requirement") != Mailboxes.NoMailboxRequirement)
       config
     else defaultRequirement.withFallback(config)
-}
 
 /**
   * Configurator for creating [[akka.dispatch.BalancingDispatcher]].
@@ -254,9 +241,9 @@ private[akka] object BalancingDispatcherConfigurator {
 class BalancingDispatcherConfigurator(
     _config: Config, _prerequisites: DispatcherPrerequisites)
     extends MessageDispatcherConfigurator(
-        BalancingDispatcherConfigurator.amendConfig(_config), _prerequisites) {
+        BalancingDispatcherConfigurator.amendConfig(_config), _prerequisites)
 
-  private val instance = {
+  private val instance =
     val mailboxes = prerequisites.mailboxes
     val id = config.getString("id")
     val requirement = mailboxes.getMailboxRequirement(config)
@@ -265,23 +252,22 @@ class BalancingDispatcherConfigurator(
           "BalancingDispatcher must have 'mailbox-requirement' which implements akka.dispatch.MultipleConsumerSemantics; " +
           s"dispatcher [$id] has [$requirement]")
     val mailboxType =
-      if (config.hasPath("mailbox")) {
+      if (config.hasPath("mailbox"))
         val mt = mailboxes.lookup(config.getString("mailbox"))
         if (!requirement.isAssignableFrom(
                 mailboxes.getProducedMessageQueueType(mt)))
           throw new IllegalArgumentException(
               s"BalancingDispatcher [$id] has 'mailbox' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
         mt
-      } else if (config.hasPath("mailbox-type")) {
+      else if (config.hasPath("mailbox-type"))
         val mt = mailboxes.lookup(id)
         if (!requirement.isAssignableFrom(
                 mailboxes.getProducedMessageQueueType(mt)))
           throw new IllegalArgumentException(
               s"BalancingDispatcher [$id] has 'mailbox-type' [${mt.getClass}] which is incompatible with 'mailbox-requirement' [$requirement]")
         mt
-      } else mailboxes.lookupByQueueType(requirement)
+      else mailboxes.lookupByQueueType(requirement)
     create(mailboxType)
-  }
 
   protected def create(mailboxType: MailboxType): BalancingDispatcher =
     new BalancingDispatcher(
@@ -298,7 +284,6 @@ class BalancingDispatcherConfigurator(
     * Returns the same dispatcher instance for each invocation
     */
   override def dispatcher(): MessageDispatcher = instance
-}
 
 /**
   * Configurator for creating [[akka.dispatch.PinnedDispatcher]].
@@ -307,9 +292,9 @@ class BalancingDispatcherConfigurator(
   */
 class PinnedDispatcherConfigurator(
     config: Config, prerequisites: DispatcherPrerequisites)
-    extends MessageDispatcherConfigurator(config, prerequisites) {
+    extends MessageDispatcherConfigurator(config, prerequisites)
 
-  private val threadPoolConfig: ThreadPoolConfig = configureExecutor() match {
+  private val threadPoolConfig: ThreadPoolConfig = configureExecutor() match
     case e: ThreadPoolExecutorConfigurator ⇒ e.threadPoolConfig
     case other ⇒
       prerequisites.eventStream.publish(
@@ -318,7 +303,6 @@ class PinnedDispatcherConfigurator(
                   "PinnedDispatcher [%s] not configured to use ThreadPoolExecutor, falling back to default config."
                     .format(config.getString("id"))))
       ThreadPoolConfig()
-  }
 
   /**
     * Creates new dispatcher for each invocation.
@@ -329,4 +313,3 @@ class PinnedDispatcherConfigurator(
                          config.getString("id"),
                          config.getMillisDuration("shutdown-timeout"),
                          threadPoolConfig)
-}

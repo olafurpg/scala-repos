@@ -4,7 +4,7 @@ package tests
 import cats.laws.discipline.{TraverseTests, FlatMapTests, SerializableTests, CartesianTests}
 import cats.laws.discipline.eq._
 
-class MapTests extends CatsSuite {
+class MapTests extends CatsSuite
   implicit val iso = CartesianTests.Isomorphisms.invariant[Map[Int, ?]]
 
   checkAll(
@@ -22,11 +22,8 @@ class MapTests extends CatsSuite {
   checkAll("Traverse[Map[Int, ?]]",
            SerializableTests.serializable(Traverse[Map[Int, ?]]))
 
-  test("show isn't empty and is formatted as expected") {
-    forAll { (map: Map[Int, String]) =>
+  test("show isn't empty and is formatted as expected")
+    forAll  (map: Map[Int, String]) =>
       map.show.nonEmpty should ===(true)
       map.show.startsWith("Map(") should ===(true)
       map.show should ===(implicitly[Show[Map[Int, String]]].show(map))
-    }
-  }
-}

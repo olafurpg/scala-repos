@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class InheritanceOverrideTest extends ResolveTestBase {
-  override def folderPath: String = {
+class InheritanceOverrideTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "inheritance/override/"
-  }
 
   //TODO answer?
 //  def testCaseClass = doTest
@@ -26,4 +25,3 @@ class InheritanceOverrideTest extends ResolveTestBase {
   def testTrait() = doTest()
   def testValue() = doTest()
   def testVariable() = doTest()
-}

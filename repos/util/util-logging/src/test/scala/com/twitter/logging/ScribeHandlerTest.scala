@@ -31,7 +31,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.time.{Millis, Minutes, Span}
 
 @RunWith(classOf[JUnitRunner])
-class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
+class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually
   val record1 = new javalog.LogRecord(Level.INFO, "This is a message.")
   record1.setMillis(1206769996722L)
   record1.setLoggerName("hello")
@@ -43,10 +43,10 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
   // while test is running even though SO_REUSEADDR is true
   val portWithoutListener = RandomSocket.nextPort()
 
-  "ScribeHandler" should {
+  "ScribeHandler" should
 
-    "build a scribe RPC call" in {
-      Time.withCurrentTimeFrozen { _ =>
+    "build a scribe RPC call" in
+      Time.withCurrentTimeFrozen  _ =>
         val scribe = ScribeHandler(
             // Hack to make sure that the buffer doesn't get flushed.
             port = portWithoutListener,
@@ -72,11 +72,9 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
                 "740b00020000003c494e46205b32303038303332392d" +
                 "30353a35333a31362e3732325d2068656c6c6f3a2054" +
                 "68697320697320616e6f74686572206d657373616765" + "2e0a0000"))
-      }
-    }
 
-    "be able to log binary data" in {
-      Time.withCurrentTimeFrozen { _ =>
+    "be able to log binary data" in
+      Time.withCurrentTimeFrozen  _ =>
         val scribe = ScribeHandler(
             port = portWithoutListener,
             bufferTime = 100.milliseconds,
@@ -92,10 +90,8 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
         scribe.publish(bytes)
 
         assert(scribe.queue.peek() == bytes)
-      }
-    }
 
-    "throw away log messages if scribe is too busy" in {
+    "throw away log messages if scribe is too busy" in
       val statsReceiver = new InMemoryStatsReceiver
 
       val scribe = ScribeHandler(
@@ -113,9 +109,8 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
 
       assert(statsReceiver.counter("dropped_records")() == 1l)
       assert(statsReceiver.counter("sent_records")() == 0l)
-    }
 
-    "have backoff on connection errors" in {
+    "have backoff on connection errors" in
       val statsReceiver = new InMemoryStatsReceiver
 
       // Use a mock ThreadPoolExecutor to force syncronize execution,
@@ -125,14 +120,13 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
                                      1,
                                      0L,
                                      TimeUnit.MILLISECONDS,
-                                     new ArrayBlockingQueue[Runnable](5)) {
+                                     new ArrayBlockingQueue[Runnable](5))
         override def execute(command: Runnable): Unit = command.run()
-      }
 
       // In a loaded test environment, we can't reliably assume the port is not used,
       // although the test just checked a short moment ago.
       // Solution: try multiple times until it gets a connection failure.
-      def scribeWithConnectionFailure(retries: Int): ScribeHandler = {
+      def scribeWithConnectionFailure(retries: Int): ScribeHandler =
         val scribe = new ScribeHandler(hostname = "localhost",
                                        port = portWithoutListener,
                                        category = "test",
@@ -142,14 +136,12 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
                                        maxMessagesToBuffer = 4,
                                        formatter = BareFormatter,
                                        level = None,
-                                       statsReceiver = statsReceiver) {
+                                       statsReceiver = statsReceiver)
           override private[logging] val flusher = new MockThreadPoolExecutor
-        }
         scribe.publish(record1)
         if (retries > 0 && statsReceiver.counter("connection_failed")() < 1l)
           scribeWithConnectionFailure(retries - 1)
         else scribe
-      }
       val scribe = scribeWithConnectionFailure(2)
 
       assert(statsReceiver.counter("connection_failed")() == 1l)
@@ -162,10 +154,9 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       scribe.flusher.awaitTermination(5, TimeUnit.SECONDS)
 
       assert(statsReceiver.counter("connection_skipped")() == 3l)
-    }
 
     // TODO rewrite deterministically when we rewrite ScribeHandler
-    "avoid unbounded flush queue growth" in {
+    "avoid unbounded flush queue growth" in
       val statsReceiver = new InMemoryStatsReceiver
 
       val scribe = ScribeHandler(
@@ -179,27 +170,23 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
 
       // Set up a rejectedExecutionHandler to count number of rejected tasks.
       val rejected = new AtomicInteger(0)
-      scribe.flusher.setRejectedExecutionHandler(new RejectedExecutionHandler {
+      scribe.flusher.setRejectedExecutionHandler(new RejectedExecutionHandler
         val inner = scribe.flusher.getRejectedExecutionHandler()
         def rejectedExecution(r: Runnable,
-                              executor: ThreadPoolExecutor): Unit = {
+                              executor: ThreadPoolExecutor): Unit =
           rejected.getAndIncrement()
           inner.rejectedExecution(r, executor)
-        }
-      })
+      )
 
       // crude form to allow all 100 submission and get predictable dropping of tasks
-      scribe.synchronized {
+      scribe.synchronized
         scribe.publish(record1)
         // wait till the ThreadPoolExecutor dequeue the first tast.
-        eventually(timeout(Span(2, Minutes)), interval(Span(100, Millis))) {
+        eventually(timeout(Span(2, Minutes)), interval(Span(100, Millis)))
           assert(scribe.flusher.getQueue().size() == 0)
-        }
         // publish the rest.
-        for (i <- 1 until 100) {
+        for (i <- 1 until 100)
           scribe.publish(record1)
-        }
-      }
       scribe.flusher.shutdown()
       scribe.flusher.awaitTermination(15, TimeUnit.SECONDS)
 
@@ -209,6 +196,3 @@ class ScribeHandlerTest extends WordSpec with BeforeAndAfter with Eventually {
       // There will be 1 task dequeued by the executor.
       // That leaves either 94 rejected tasks.
       assert(rejected.get() == 94)
-    }
-  }
-}

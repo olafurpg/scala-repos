@@ -28,7 +28,7 @@ import scala.annotation.switch
 final class RoundingMode private (name: String, ordinal: Int)
     extends Enum[RoundingMode](name, ordinal)
 
-object RoundingMode {
+object RoundingMode
 
   final val UP = new RoundingMode("UP", BigDecimal.ROUND_UP)
 
@@ -54,13 +54,11 @@ object RoundingMode {
 
   def values(): Array[RoundingMode] = _values.clone()
 
-  def valueOf(name: String): RoundingMode = {
-    _values.find(_.name == name).getOrElse {
+  def valueOf(name: String): RoundingMode =
+    _values.find(_.name == name).getOrElse
       throw new IllegalArgumentException("No enum const RoundingMode." + name)
-    }
-  }
 
-  def valueOf(mode: Int): RoundingMode = (mode: @switch) match {
+  def valueOf(mode: Int): RoundingMode = (mode: @switch) match
     case BigDecimal.ROUND_CEILING => CEILING
     case BigDecimal.ROUND_DOWN => DOWN
     case BigDecimal.ROUND_FLOOR => FLOOR
@@ -71,5 +69,3 @@ object RoundingMode {
     case BigDecimal.ROUND_UP => UP
     case _ =>
       throw new IllegalArgumentException("Invalid rounding mode")
-  }
-}

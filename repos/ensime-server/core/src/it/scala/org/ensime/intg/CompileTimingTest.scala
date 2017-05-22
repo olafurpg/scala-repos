@@ -15,14 +15,14 @@ import org.ensime.util.file._
   */
 class CompileTimingTest
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.TimingTestProject
 
-  "ensime-server" should "handle multiple sbt clean / compile" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit testkit =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "handle multiple sbt clean / compile" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit testkit =>
+        withProject  (project, asyncHelper) =>
           import testkit._
 
           val sourceRoot = scalaMain(config)
@@ -88,8 +88,3 @@ class CompileTimingTest
                                           70,
                                           SourceSymbol.allSymbols)
           expectMsgType[SymbolDesignations]
-        }
-      }
-    }
-  }
-}

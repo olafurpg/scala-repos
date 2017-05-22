@@ -16,14 +16,14 @@ import js.typedarray._
 
 object TypedArrayConversionTest extends Requires.TypedArray
 
-class TypedArrayConversionTest {
+class TypedArrayConversionTest
 
   def data(factor: Double): js.Array[Double] =
     js.Array(-1, 1, 2, 3, 4, 5, 6, 7, 8).map((_: Int) * factor)
 
   def sum(factor: Double): Double = (8 * 9 / 2 - 1) * factor
 
-  @Test def convert_an_Int8Array_to_a_scala_Array_Byte(): Unit = {
+  @Test def convert_an_Int8Array_to_a_scala_Array_Byte(): Unit =
     val x = new Int8Array(data(1))
     val y = x.toArray
 
@@ -33,9 +33,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum(1), y.sum)
-  }
 
-  @Test def convert_an_Int16Array_to_a_scala_Array_Short(): Unit = {
+  @Test def convert_an_Int16Array_to_a_scala_Array_Short(): Unit =
     val x = new Int16Array(data(100))
     val y = x.toArray
 
@@ -45,9 +44,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum(100), y.sum)
-  }
 
-  @Test def convert_an_Uint16Array_to_a_scala_Array_Char(): Unit = {
+  @Test def convert_an_Uint16Array_to_a_scala_Array_Char(): Unit =
     val data = js.Array((1 to 6).map(_ * 10000): _*)
     val sum = (6 * 7 / 2 * 10000).toChar
 
@@ -60,9 +58,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum, y.sum)
-  }
 
-  @Test def convert_an_Int32Array_to_a_scala_Array_Int(): Unit = {
+  @Test def convert_an_Int32Array_to_a_scala_Array_Int(): Unit =
     val x = new Int32Array(data(10000))
     val y = x.toArray
 
@@ -72,9 +69,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum(10000), y.sum)
-  }
 
-  @Test def convert_a_Float32Array_to_a_scala_Array_Float(): Unit = {
+  @Test def convert_a_Float32Array_to_a_scala_Array_Float(): Unit =
     val x = new Float32Array(data(0.2))
     val y = x.toArray
 
@@ -84,9 +80,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum(0.2), y.sum, 1E-6)
-  }
 
-  @Test def convert_a_Float64Array_to_a_scala_Array_Double(): Unit = {
+  @Test def convert_a_Float64Array_to_a_scala_Array_Double(): Unit =
     val x = new Float64Array(data(0.2))
     val y = x.toArray
 
@@ -96,9 +91,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(sum(0.2), y.sum)
-  }
 
-  @Test def convert_a_scala_Array_Byte__to_an_Int8Array(): Unit = {
+  @Test def convert_a_scala_Array_Byte__to_an_Int8Array(): Unit =
     val x = (Byte.MinValue to Byte.MaxValue).map(_.toByte).toArray
     val y = x.toTypedArray
 
@@ -110,9 +104,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(Byte.MinValue, y(0))
-  }
 
-  @Test def convert_a_scala_Array_Short__to_an_Int16Array(): Unit = {
+  @Test def convert_a_scala_Array_Short__to_an_Int16Array(): Unit =
     val x = ((Short.MinValue to (Short.MinValue + 1000)) ++
         ((Short.MaxValue - 1000) to Short.MaxValue)).map(_.toShort).toArray
     val y = x.toTypedArray
@@ -125,9 +118,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(Short.MinValue, y(0))
-  }
 
-  @Test def convert_a_scala_Array_Char__to_an_Uint16Array(): Unit = {
+  @Test def convert_a_scala_Array_Char__to_an_Uint16Array(): Unit =
     val x = ((Char.MaxValue - 1000) to Char.MaxValue).map(_.toChar).toArray
     val y = x.toTypedArray
 
@@ -139,9 +131,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(Char.MaxValue - 1000, y(0))
-  }
 
-  @Test def convert_a_scala_Array_Int__to_an_Int32Array(): Unit = {
+  @Test def convert_a_scala_Array_Int__to_an_Int32Array(): Unit =
     val x = ((Int.MinValue to (Int.MinValue + 1000)) ++
         ((Int.MaxValue - 1000) to Int.MaxValue)).toArray
     val y = x.toTypedArray
@@ -154,9 +145,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(Int.MinValue, y(0))
-  }
 
-  @Test def convert_a_scala_Array_Float__to_a_Float32Array(): Unit = {
+  @Test def convert_a_scala_Array_Float__to_a_Float32Array(): Unit =
     val x = Array[Float](1.0f, 2.0f, -2.3f, 5.3f)
     val y = x.toTypedArray
 
@@ -168,9 +158,8 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(1.0f, y(0))
-  }
 
-  @Test def convert_a_scala_Array_Double__to_a_Float64Array(): Unit = {
+  @Test def convert_a_scala_Array_Double__to_a_Float64Array(): Unit =
     val x = Array[Double](1.0, 2.0, -2.3, 5.3)
     val y = x.toTypedArray
 
@@ -182,5 +171,3 @@ class TypedArrayConversionTest {
     // Ensure its a copy
     x(0) = 0
     assertEquals(1.0, y(0))
-  }
-}

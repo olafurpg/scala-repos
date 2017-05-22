@@ -9,23 +9,19 @@ import org.jetbrains.plugins.scala.compiler.CompilationProcess
   * User: Dmitry Naydanov
   * Date: 2/20/14
   */
-object WorksheetProcessManager {
+object WorksheetProcessManager
   private val processes =
     new ConcurrentWeakHashMap[VirtualFile, CompilationProcess]()
 
-  def add(file: VirtualFile, process: CompilationProcess) {
+  def add(file: VirtualFile, process: CompilationProcess)
     process.addTerminationCallback({ remove(file) })
     processes.put(file, process)
-  }
 
-  def remove(file: VirtualFile) {
+  def remove(file: VirtualFile)
     processes.remove(file)
-  }
 
-  def stop(file: VirtualFile) {
+  def stop(file: VirtualFile)
     val p = processes.get(file)
     if (p != null) p.stop()
-  }
 
   def running(file: VirtualFile) = processes containsKey file
-}

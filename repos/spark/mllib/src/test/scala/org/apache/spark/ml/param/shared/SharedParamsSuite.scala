@@ -20,17 +20,14 @@ package org.apache.spark.ml.param.shared
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.ml.param.{ParamMap, Params}
 
-class SharedParamsSuite extends SparkFunSuite {
+class SharedParamsSuite extends SparkFunSuite
 
-  test("outputCol") {
+  test("outputCol")
 
-    class Obj(override val uid: String) extends Params with HasOutputCol {
+    class Obj(override val uid: String) extends Params with HasOutputCol
       override def copy(extra: ParamMap): Obj = defaultCopy(extra)
-    }
 
     val obj = new Obj("obj")
 
     assert(obj.hasDefault(obj.outputCol))
     assert(obj.getOrDefault(obj.outputCol) === "obj__output")
-  }
-}

@@ -10,16 +10,16 @@ class DashboardController
     extends DashboardControllerBase with IssuesService with PullRequestService
     with RepositoryService with AccountService with UsersAuthenticator
 
-trait DashboardControllerBase extends ControllerBase {
+trait DashboardControllerBase extends ControllerBase
   self: IssuesService with PullRequestService with RepositoryService with AccountService with UsersAuthenticator =>
 
-  get("/dashboard/issues")(usersOnly {
+  get("/dashboard/issues")(usersOnly
     val q = request.getParameter("q")
     val account = context.loginAccount.get
-    Option(q).map {
+    Option(q).map
       q =>
         val condition = IssueSearchCondition(q, Map[String, Int]())
-        q match {
+        q match
           case q if (q.contains("is:pr")) =>
             redirect(s"/dashboard/pulls?q=${StringUtil.urlEncode(q)}")
           case q if (q.contains(s"author:${account.userName}")) =>
@@ -29,31 +29,29 @@ trait DashboardControllerBase extends ControllerBase {
           case q if (q.contains(s"mentions:${account.userName}")) =>
             redirect(s"/dashboard/issues/mentioned${condition.toURL}")
           case _ => searchIssues("created_by")
-        }
-    } getOrElse {
+    getOrElse
       searchIssues("created_by")
-    }
-  })
+  )
 
-  get("/dashboard/issues/assigned")(usersOnly {
+  get("/dashboard/issues/assigned")(usersOnly
     searchIssues("assigned")
-  })
+  )
 
-  get("/dashboard/issues/created_by")(usersOnly {
+  get("/dashboard/issues/created_by")(usersOnly
     searchIssues("created_by")
-  })
+  )
 
-  get("/dashboard/issues/mentioned")(usersOnly {
+  get("/dashboard/issues/mentioned")(usersOnly
     searchIssues("mentioned")
-  })
+  )
 
-  get("/dashboard/pulls")(usersOnly {
+  get("/dashboard/pulls")(usersOnly
     val q = request.getParameter("q")
     val account = context.loginAccount.get
-    Option(q).map {
+    Option(q).map
       q =>
         val condition = IssueSearchCondition(q, Map[String, Int]())
-        q match {
+        q match
           case q if (q.contains("is:issue")) =>
             redirect(s"/dashboard/issues?q=${StringUtil.urlEncode(q)}")
           case q if (q.contains(s"author:${account.userName}")) =>
@@ -63,41 +61,38 @@ trait DashboardControllerBase extends ControllerBase {
           case q if (q.contains(s"mentions:${account.userName}")) =>
             redirect(s"/dashboard/pulls/mentioned${condition.toURL}")
           case _ => searchPullRequests("created_by")
-        }
-    } getOrElse {
+    getOrElse
       searchPullRequests("created_by")
-    }
-  })
+  )
 
-  get("/dashboard/pulls/created_by")(usersOnly {
+  get("/dashboard/pulls/created_by")(usersOnly
     searchPullRequests("created_by")
-  })
+  )
 
-  get("/dashboard/pulls/assigned")(usersOnly {
+  get("/dashboard/pulls/assigned")(usersOnly
     searchPullRequests("assigned")
-  })
+  )
 
-  get("/dashboard/pulls/mentioned")(usersOnly {
+  get("/dashboard/pulls/mentioned")(usersOnly
     searchPullRequests("mentioned")
-  })
+  )
 
   private def getOrCreateCondition(
-      key: String, filter: String, userName: String) = {
+      key: String, filter: String, userName: String) =
     val condition = session.putAndGet(
         key,
-        if (request.hasQueryString) {
+        if (request.hasQueryString)
           val q = request.getParameter("q")
-          if (q == null) {
+          if (q == null)
             IssueSearchCondition(request)
-          } else {
+          else
             IssueSearchCondition(q, Map[String, Int]())
-          }
-        } else
+        else
           session
             .getAs[IssueSearchCondition](key)
             .getOrElse(IssueSearchCondition()))
 
-    filter match {
+    filter match
       case "assigned" =>
         condition.copy(
             assigned = Some(userName), author = None, mentioned = None)
@@ -107,10 +102,8 @@ trait DashboardControllerBase extends ControllerBase {
       case _ =>
         condition.copy(
             assigned = None, author = Some(userName), mentioned = None)
-    }
-  }
 
-  private def searchIssues(filter: String) = {
+  private def searchIssues(filter: String) =
     import IssuesService._
 
     val userName = context.loginAccount.get.userName
@@ -129,16 +122,15 @@ trait DashboardControllerBase extends ControllerBase {
         page,
         countIssue(condition.copy(state = "open"), false, userRepos: _*),
         countIssue(condition.copy(state = "closed"), false, userRepos: _*),
-        filter match {
+        filter match
           case "assigned" => condition.copy(assigned = Some(userName))
           case "mentioned" => condition.copy(mentioned = Some(userName))
           case _ => condition.copy(author = Some(userName))
-        },
+        ,
         filter,
         getGroupNames(userName))
-  }
 
-  private def searchPullRequests(filter: String) = {
+  private def searchPullRequests(filter: String) =
     import IssuesService._
     import PullRequestService._
 
@@ -157,12 +149,10 @@ trait DashboardControllerBase extends ControllerBase {
         page,
         countIssue(condition.copy(state = "open"), true, allRepos: _*),
         countIssue(condition.copy(state = "closed"), true, allRepos: _*),
-        filter match {
+        filter match
           case "assigned" => condition.copy(assigned = Some(userName))
           case "mentioned" => condition.copy(mentioned = Some(userName))
           case _ => condition.copy(author = Some(userName))
-        },
+        ,
         filter,
         getGroupNames(userName))
-  }
-}

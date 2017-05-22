@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations.{Benchmark, Scope, State}
   * In other words, it's best run with "-prof gc".
   */
 @State(Scope.Benchmark)
-class BackupRequestFilterBenchmark extends StdBenchAnnotations {
+class BackupRequestFilterBenchmark extends StdBenchAnnotations
 
   private[this] val i = new AtomicInteger()
   private[this] val timer = new JavaTimer(true) // we need high resolution
@@ -31,10 +31,10 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
   private[this] val svc = backupReqFilter.andThen(Service.const(Response))
 
   private[this] val sometimesSleepySvc = backupReqFilter.andThen(
-      Service.mk[String, Int] { _ =>
+      Service.mk[String, Int]  _ =>
     if (i.incrementAndGet() % 100 == 0) Thread.sleep(2)
     Response
-  })
+  )
 
   @Benchmark
   def noBackups(): Int =
@@ -43,4 +43,3 @@ class BackupRequestFilterBenchmark extends StdBenchAnnotations {
   @Benchmark
   def onePercentBackups(): Int =
     Await.result(sometimesSleepySvc(""))
-}

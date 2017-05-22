@@ -6,7 +6,7 @@ import org.saddle.Vec
 /**
   * Enrich Vec with stats
   */
-trait VecStatsImplicits {
+trait VecStatsImplicits
   type Vec2Stats[A] = Vec[A] => VecStats[A]
 
   implicit def vecToIntStats(s: Vec[Int]): VecStats[Int] = new IntStats(s)
@@ -27,4 +27,3 @@ trait VecStatsImplicits {
     new VecRollingStats[Long](s)
   implicit def vecToDoubleRollingStats(
       s: Vec[Double]): VecRollingStats[Double] = new VecRollingStats[Double](s)
-}

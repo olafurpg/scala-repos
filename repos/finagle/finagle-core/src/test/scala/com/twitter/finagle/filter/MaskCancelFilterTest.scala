@@ -11,36 +11,29 @@ import org.scalatest.mock.MockitoSugar
 import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
-class MaskCancelFilterTest extends FunSuite with MockitoSugar {
-  trait MaskHelper {
+class MaskCancelFilterTest extends FunSuite with MockitoSugar
+  trait MaskHelper
     val service = mock[Service[Int, Int]]
     when(service.close(anyObject)).thenReturn(Future.Done)
     val filter = new MaskCancelFilter[Int, Int]
 
     val filtered = filter andThen service
-    val p = new Promise[Int] {
+    val p = new Promise[Int]
       @volatile var interrupted: Option[Throwable] = None
       setInterruptHandler { case exc => interrupted = Some(exc) }
-    }
     when(service(1)).thenReturn(p)
 
     val f = filtered(1)
     verify(service).apply(1)
-  }
 
-  test("MaskCancelFilter should mask interrupts") {
-    new MaskHelper {
+  test("MaskCancelFilter should mask interrupts")
+    new MaskHelper
       assert(p.interrupted == None)
       f.raise(new Exception)
       assert(p.interrupted == None)
-    }
-  }
 
-  test("MaskCancelFilter should propagate results") {
-    new MaskHelper {
+  test("MaskCancelFilter should propagate results")
+    new MaskHelper
       assert(f.poll == None)
       p.setValue(123)
       assert(p.poll == Some(Return(123)))
-    }
-  }
-}

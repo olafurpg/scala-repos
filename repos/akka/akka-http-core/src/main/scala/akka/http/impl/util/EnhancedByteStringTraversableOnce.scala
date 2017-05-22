@@ -11,6 +11,5 @@ import akka.util.ByteString
   */
 private[http] class EnhancedByteStringTraversableOnce(
     val byteStrings: TraversableOnce[ByteString])
-    extends AnyVal {
+    extends AnyVal
   def join: ByteString = byteStrings.foldLeft(ByteString.empty)(_ ++ _)
-}

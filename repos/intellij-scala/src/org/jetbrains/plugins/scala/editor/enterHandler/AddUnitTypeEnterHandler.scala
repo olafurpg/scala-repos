@@ -16,9 +16,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
   * User: Dmitry.Naydanov
   * Date: 09.07.14.
   */
-class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
+class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter
   override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
+      file: PsiFile, editor: Editor, dataContext: DataContext): Result =
     val project = file.getProject
     val scalaSettings = ScalaCodeStyleSettings.getInstance(project)
     if (!scalaSettings.ENFORCE_FUNCTIONAL_SYNTAX_FOR_UNIT)
@@ -31,29 +31,23 @@ class AddUnitTypeEnterHandler extends EnterHandlerDelegateAdapter {
 
     if (element == null) return Result.Continue
 
-    @inline def checkBlock2(block: ScBlockExpr) = {
+    @inline def checkBlock2(block: ScBlockExpr) =
       val children: Array[PsiElement] = block.getChildren
       children.length == 3 && children.apply(1).isInstanceOf[PsiWhiteSpace] &&
       children.apply(1).getText.count(_ == '\n') == 2
-    }
 
-    element.getParent match {
+    element.getParent match
       case block: ScBlockExpr if checkBlock2(block) =>
-        (block.getParent, block.getPrevSiblingNotWhitespace) match {
+        (block.getParent, block.getPrevSiblingNotWhitespace) match
           case (funDef: ScFunctionDefinition, prev: ScalaPsiElement) =>
             if (funDef.findFirstChildByType(ScalaTokenTypes.tASSIGN) == null)
-              extensions.inWriteAction {
+              extensions.inWriteAction
                 document.insertString(
                     prev.getTextRange.getEndOffset, ": Unit =")
                 PsiDocumentManager
                   .getInstance(project)
                   .commitDocument(document)
-              }
           case _ =>
-        }
       case _ =>
-    }
 
     Result.Default
-  }
-}

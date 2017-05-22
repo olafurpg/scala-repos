@@ -22,14 +22,14 @@ import java.util.Properties
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.sources.{BaseRelation, DataSourceRegister, RelationProvider}
 
-class DefaultSource extends RelationProvider with DataSourceRegister {
+class DefaultSource extends RelationProvider with DataSourceRegister
 
   override def shortName(): String = "jdbc"
 
   /** Returns a new base relation with the given parameters. */
   override def createRelation(
       sqlContext: SQLContext,
-      parameters: Map[String, String]): BaseRelation = {
+      parameters: Map[String, String]): BaseRelation =
     val url =
       parameters.getOrElse("url", sys.error("Option 'url' not specified"))
     val table = parameters.getOrElse(
@@ -40,23 +40,19 @@ class DefaultSource extends RelationProvider with DataSourceRegister {
     val numPartitions = parameters.getOrElse("numPartitions", null)
 
     if (partitionColumn != null &&
-        (lowerBound == null || upperBound == null || numPartitions == null)) {
+        (lowerBound == null || upperBound == null || numPartitions == null))
       sys.error("Partitioning incompletely specified")
-    }
 
     val partitionInfo =
-      if (partitionColumn == null) {
+      if (partitionColumn == null)
         null
-      } else {
+      else
         JDBCPartitioningInfo(partitionColumn,
                              lowerBound.toLong,
                              upperBound.toLong,
                              numPartitions.toInt)
-      }
     val parts = JDBCRelation.columnPartition(partitionInfo)
     val properties =
       new Properties() // Additional properties that we will pass to getConnection
     parameters.foreach(kv => properties.setProperty(kv._1, kv._2))
     JDBCRelation(url, table, parts, properties)(sqlContext)
-  }
-}

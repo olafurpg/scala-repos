@@ -4,7 +4,7 @@ class One[A]
 class Two[A, B]
 class Fix[Op[A]](x: Op[Fix[Op]])
 
-class FixTest {
+class FixTest
   // works
   // val zero = new Fix[One](new One)
 
@@ -28,4 +28,3 @@ class FixTest {
   //   val zero = new Fix(new One)   // this seems like something which could plausibly work  
   //              ^
   // two errors found    
-}

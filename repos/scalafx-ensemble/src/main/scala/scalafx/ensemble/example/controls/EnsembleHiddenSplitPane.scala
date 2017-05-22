@@ -39,12 +39,12 @@ import scalafx.scene.layout.{Region, StackPane}
   * @see javafx.scene.control.SplitPane
   * @resource /scalafx/ensemble/css/HiddenSplitPane.css
   */
-class EnsembleHiddenSplitPane extends EnsembleExample {
+class EnsembleHiddenSplitPane extends EnsembleExample
 
   // @stage-property width = 600
   // @stage-property height = 400
 
-  def getContent = {
+  def getContent =
 
     //Style Sheet loaded from external 
     val hiddenSplitPaneCss = this.getClass
@@ -52,25 +52,18 @@ class EnsembleHiddenSplitPane extends EnsembleExample {
       .toExternalForm
 
     // Region that will be used in the split pane
-    val reg1 = new Region {
+    val reg1 = new Region
       styleClass = List("rounded")
-    }
-    val reg2 = new Region {
+    val reg2 = new Region
       styleClass = List("rounded")
-    }
-    val reg3 = new Region {
+    val reg3 = new Region
       styleClass = List("rounded")
-    }
 
-    new StackPane {
+    new StackPane
       padding = Insets(20)
-      children = new SplitPane {
+      children = new SplitPane
         padding = Insets(20)
         dividerPositions_=(0.20, 0.80)
         items ++= Seq(reg1, reg2, reg3)
         id = "hiddenSplitter"
         stylesheets += hiddenSplitPaneCss
-      }
-    }
-  }
-}

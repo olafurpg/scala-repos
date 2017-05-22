@@ -1,9 +1,9 @@
 import scala.language.experimental.macros
 import scala.reflect.macros.whitebox.Context
 
-object Macros {
+object Macros
   def foo(name: String): Any = macro foo_impl
-  def foo_impl(c: Context)(name: c.Expr[String]) = {
+  def foo_impl(c: Context)(name: c.Expr[String]) =
     import c.universe._
 
     val Literal(Constant(lit: String)) = name.tree
@@ -35,10 +35,9 @@ object Macros {
             ),
             Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil)
         ))
-  }
 
   def bar(name: String): Any = macro bar_impl
-  def bar_impl(c: Context)(name: c.Expr[String]) = {
+  def bar_impl(c: Context)(name: c.Expr[String]) =
     import c.universe._
 
     val Literal(Constant(lit: String)) = name.tree
@@ -74,10 +73,9 @@ object Macros {
             ),
             Apply(Select(New(Ident(anon)), termNames.CONSTRUCTOR), Nil)
         ))
-  }
 
   def baz(name: String): Any = macro baz_impl
-  def baz_impl(c: Context)(name: c.Expr[String]) = {
+  def baz_impl(c: Context)(name: c.Expr[String]) =
     import c.universe._
 
     val Literal(Constant(lit: String)) = name.tree
@@ -128,5 +126,3 @@ object Macros {
             ),
             Apply(Select(New(Ident(wrapper)), termNames.CONSTRUCTOR), Nil)
         ))
-  }
-}

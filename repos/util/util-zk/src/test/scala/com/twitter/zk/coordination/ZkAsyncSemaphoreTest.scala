@@ -20,16 +20,16 @@ import com.twitter.zk.{NativeConnector, RetryPolicy, ZkClient}
 
 @RunWith(classOf[JUnitRunner])
 class ZkAsyncSemaphoreTest
-    extends WordSpec with MockitoSugar with AsyncAssertions {
+    extends WordSpec with MockitoSugar with AsyncAssertions
 
-  "ZkAsyncSemaphore" should {
+  "ZkAsyncSemaphore" should
 
     val path = "/testing/twitter/service/charm/semaphore/test"
     val permits = new ConcurrentLinkedQueue[Permit]
 
-    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") } foreach {
+    Option { System.getProperty("com.twitter.zk.TEST_CONNECT") } foreach
       connectString =>
-        def withClient(f: (ZkClient) => Unit) = {
+        def withClient(f: (ZkClient) => Unit) =
           implicit val timer = new JavaTimer(true)
           val connector = NativeConnector(connectString, 5.seconds, 10.minutes)
           val zk = ZkClient(connector)
@@ -37,27 +37,23 @@ class ZkAsyncSemaphoreTest
             .withAcl(OPEN_ACL_UNSAFE.asScala)
 
           Await.result(Future { f(zk) } ensure { zk.release })
-        }
 
-        def acquire(sem: ZkAsyncSemaphore) = {
-          sem.acquire() onSuccess { permit =>
+        def acquire(sem: ZkAsyncSemaphore) =
+          sem.acquire() onSuccess  permit =>
             permits add permit
-          }
-        }
 
-        "provide a shared 2-permit semaphore and" should {
-          withClient { zk =>
+        "provide a shared 2-permit semaphore and" should
+          withClient  zk =>
             val sem1 = new ZkAsyncSemaphore(zk, path, 2)
             val sem2 = new ZkAsyncSemaphore(zk, path, 2)
 
-            "have correct initial values" in {
+            "have correct initial values" in
               assert(sem1.numPermitsAvailable == 2)
               assert(sem1.numWaiters == 0)
               assert(sem2.numPermitsAvailable == 2)
               assert(sem2.numWaiters == 0)
-            }
 
-            "execute immediately while permits are available" in {
+            "execute immediately while permits are available" in
               Await.result(
                   acquire(sem1) within (new JavaTimer(true), 2.second))
               assert(sem1.numPermitsAvailable == 1)
@@ -71,12 +67,11 @@ class ZkAsyncSemaphoreTest
               assert(sem1.numWaiters == 0)
               assert(sem2.numPermitsAvailable == 0)
               assert(sem2.numWaiters == 0)
-            }
 
             var awaiting1: Future[Permit] = null
             var awaiting2: Future[Permit] = null
 
-            "queue waiters when no permits are available" in {
+            "queue waiters when no permits are available" in
               implicit val config =
                 PatienceConfig(timeout = scaled(Span(1, Seconds)),
                                interval = scaled(Span(100, Millis)))
@@ -84,25 +79,22 @@ class ZkAsyncSemaphoreTest
               awaiting1 = acquire(sem1)
               assert(awaiting1.poll == (None))
               assert(awaiting1.isDefined == (false))
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 0)
                 assert(sem1.numWaiters == 1)
                 assert(sem2.numPermitsAvailable == 0)
                 assert(sem2.numWaiters == 1)
-              }
 
               awaiting2 = acquire(sem2)
               assert(awaiting2.poll == (None))
               assert(awaiting2.isDefined == (false))
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 0)
                 assert(sem1.numWaiters == 2)
                 assert(sem2.numPermitsAvailable == 0)
                 assert(sem2.numWaiters == 2)
-              }
-            }
 
-            "have correct gauges as permit holders release" in {
+            "have correct gauges as permit holders release" in
               implicit val config =
                 PatienceConfig(timeout = scaled(Span(1, Seconds)),
                                interval = scaled(Span(100, Millis)))
@@ -112,43 +104,33 @@ class ZkAsyncSemaphoreTest
               permits.poll().release()
               Await.result(awaiting1 within (new JavaTimer(true), 2.second))
 
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 0)
                 assert(sem1.numWaiters == 1)
                 assert(sem2.numPermitsAvailable == 0)
                 assert(sem2.numWaiters == 1)
-              }
 
               permits.poll().release()
               Await.result(awaiting2 within (new JavaTimer(true), 2.second))
 
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 0)
                 assert(sem1.numWaiters == 0)
                 assert(sem2.numPermitsAvailable == 0)
                 assert(sem2.numWaiters == 0)
-              }
 
               permits.poll().release()
 
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 1)
                 assert(sem1.numWaiters == 0)
                 assert(sem2.numPermitsAvailable == 1)
                 assert(sem2.numWaiters == 0)
-              }
 
               permits.poll().release()
 
-              eventually {
+              eventually
                 assert(sem1.numPermitsAvailable == 2)
                 assert(sem1.numWaiters == 0)
                 assert(sem2.numPermitsAvailable == 2)
                 assert(sem2.numWaiters == 0)
-              }
-            }
-          }
-        }
-    }
-  }
-}

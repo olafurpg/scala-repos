@@ -11,14 +11,13 @@ import akka.testkit.TestProbe
 
 import scala.concurrent.duration._
 
-object DeadLetterSupressionSpec {
+object DeadLetterSupressionSpec
 
   case object NormalMsg
 
   case object SuppressedMsg extends DeadLetterSuppression
-}
 
-class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
+class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender
   import DeadLetterSupressionSpec._
 
   val deadActor = system.actorOf(TestActors.echoActorProps)
@@ -26,8 +25,8 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
   deadActor ! PoisonPill
   expectTerminated(deadActor)
 
-  s"must suppress message from default dead-letters logging (sent to dead: ${Logging
-    .simpleName(deadActor)})" in {
+  s"must suppress message from default dead-letters logging (sent to dead: $Logging
+    .simpleName(deadActor))" in
     val deadListener = TestProbe()
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
@@ -52,10 +51,9 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
         SuppressedDeadLetter(SuppressedMsg, testActor, system.deadLetters))
     allListener.expectMsg(DeadLetter(NormalMsg, testActor, deadActor))
     allListener.expectNoMsg(200.millis)
-  }
 
-  s"must suppress message from default dead-letters logging (sent to dead: ${Logging
-    .simpleName(system.deadLetters)})" in {
+  s"must suppress message from default dead-letters logging (sent to dead: $Logging
+    .simpleName(system.deadLetters))" in
     val deadListener = TestProbe()
     system.eventStream.subscribe(deadListener.ref, classOf[DeadLetter])
 
@@ -86,5 +84,3 @@ class DeadLetterSupressionSpec extends AkkaSpec with ImplicitSender {
     deadListener.expectNoMsg(Duration.Zero)
     suppressedListener.expectNoMsg(Duration.Zero)
     allListener.expectNoMsg(Duration.Zero)
-  }
-}

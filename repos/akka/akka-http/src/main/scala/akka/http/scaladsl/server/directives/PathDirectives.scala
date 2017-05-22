@@ -11,7 +11,7 @@ import akka.http.scaladsl.model.Uri.Path
 
 trait PathDirectives
     extends PathMatchers with ImplicitPathMatcherConstruction
-    with ToNameReceptacleEnhancements {
+    with ToNameReceptacleEnhancements
   import BasicDirectives._
   import RouteDirectives._
   import PathMatcher._
@@ -37,14 +37,12 @@ trait PathDirectives
     * The matcher has to match a prefix of the remaining path.
     * If matched the value extracted by the PathMatcher is extracted on the directive level.
     */
-  def rawPathPrefix[L](pm: PathMatcher[L]): Directive[L] = {
+  def rawPathPrefix[L](pm: PathMatcher[L]): Directive[L] =
     implicit val LIsTuple = pm.ev
-    extract(ctx ⇒ pm(ctx.unmatchedPath)).flatMap {
+    extract(ctx ⇒ pm(ctx.unmatchedPath)).flatMap
       case Matched(rest, values) ⇒
         tprovide(values) & mapRequestContext(_ withUnmatchedPath rest)
       case Unmatched ⇒ reject
-    }
-  }
 
   /**
     * Checks whether the unmatchedPath of the [[RequestContext]] has a prefix matched by the
@@ -58,13 +56,11 @@ trait PathDirectives
     * given PathMatcher. However, as opposed to the `pathPrefix` directive the matched path is not
     * actually "consumed".
     */
-  def rawPathPrefixTest[L](pm: PathMatcher[L]): Directive[L] = {
+  def rawPathPrefixTest[L](pm: PathMatcher[L]): Directive[L] =
     implicit val LIsTuple = pm.ev
-    extract(ctx ⇒ pm(ctx.unmatchedPath)).flatMap {
+    extract(ctx ⇒ pm(ctx.unmatchedPath)).flatMap
       case Matched(_, values) ⇒ tprovide(values)
       case Unmatched ⇒ reject
-    }
-  }
 
   /**
     * Applies the given [[PathMatcher]] to a suffix of the remaining unmatchedPath of the [[RequestContext]].
@@ -72,14 +68,12 @@ trait PathDirectives
     * Note that, for efficiency reasons, the given [[PathMatcher]] must match the desired suffix in reversed-segment
     * order, i.e. `pathSuffix("baz" / "bar")` would match `/foo/bar/baz`!
     */
-  def pathSuffix[L](pm: PathMatcher[L]): Directive[L] = {
+  def pathSuffix[L](pm: PathMatcher[L]): Directive[L] =
     implicit val LIsTuple = pm.ev
-    extract(ctx ⇒ pm(ctx.unmatchedPath.reverse)).flatMap {
+    extract(ctx ⇒ pm(ctx.unmatchedPath.reverse)).flatMap
       case Matched(rest, values) ⇒
         tprovide(values) & mapRequestContext(_.withUnmatchedPath(rest.reverse))
       case Unmatched ⇒ reject
-    }
-  }
 
   /**
     * Checks whether the unmatchedPath of the [[RequestContext]] has a suffix matched by the
@@ -88,13 +82,11 @@ trait PathDirectives
     * Note that, for efficiency reasons, the given PathMatcher must match the desired suffix in reversed-segment
     * order, i.e. `pathSuffixTest("baz" / "bar")` would match `/foo/bar/baz`!
     */
-  def pathSuffixTest[L](pm: PathMatcher[L]): Directive[L] = {
+  def pathSuffixTest[L](pm: PathMatcher[L]): Directive[L] =
     implicit val LIsTuple = pm.ev
-    extract(ctx ⇒ pm(ctx.unmatchedPath.reverse)).flatMap {
+    extract(ctx ⇒ pm(ctx.unmatchedPath.reverse)).flatMap
       case Matched(_, values) ⇒ tprovide(values)
       case Unmatched ⇒ reject
-    }
-  }
 
   /**
     * Rejects the request if the unmatchedPath of the [[RequestContext]] is non-empty,
@@ -146,14 +138,12 @@ trait PathDirectives
     */
   def redirectToTrailingSlashIfMissing(
       redirectionType: StatusCodes.Redirection): Directive0 =
-    extractUri.flatMap { uri ⇒
+    extractUri.flatMap  uri ⇒
       if (uri.path.endsWithSlash) pass
-      else {
+      else
         val newPath = uri.path ++ Path.SingleSlash
         val newUri = uri.withPath(newPath)
         redirect(newUri, redirectionType)
-      }
-    }
 
   /**
     * If the request path ends with a slash, redirect to the same uri without trailing slash in the path.
@@ -162,13 +152,11 @@ trait PathDirectives
     */
   def redirectToNoTrailingSlashIfPresent(
       redirectionType: StatusCodes.Redirection): Directive0 =
-    extractUri.flatMap { uri ⇒
-      if (uri.path.endsWithSlash) {
+    extractUri.flatMap  uri ⇒
+      if (uri.path.endsWithSlash)
         val newPath = uri.path.reverse.tail.reverse
         val newUri = uri.withPath(newPath)
         redirect(newUri, redirectionType)
-      } else pass
-    }
-}
+      else pass
 
 object PathDirectives extends PathDirectives

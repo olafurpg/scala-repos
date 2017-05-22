@@ -11,7 +11,7 @@ import akka.testkit.AkkaSpec
 
 import scala.concurrent.{Promise, Future}
 
-class FlowDocSpec extends AkkaSpec {
+class FlowDocSpec extends AkkaSpec
 
   implicit val ec = system.dispatcher
 
@@ -21,7 +21,7 @@ class FlowDocSpec extends AkkaSpec {
 
   implicit val materializer = ActorMaterializer()
 
-  "source is immutable" in {
+  "source is immutable" in
     //#source-immutable
     val source = Source(1 to 10)
     source.map(_ => 0) // has no effect on source, since it's immutable
@@ -31,9 +31,8 @@ class FlowDocSpec extends AkkaSpec {
       source.map(_ => 0) // returns new Source[Int], with `map()` appended
     zeroes.runWith(Sink.fold(0)(_ + _)) // 0
     //#source-immutable
-  }
 
-  "materialization in steps" in {
+  "materialization in steps" in
     //#materialization-in-steps
     val source = Source(1 to 10)
     val sink = Sink.fold[Int, Int](0)(_ + _)
@@ -45,9 +44,8 @@ class FlowDocSpec extends AkkaSpec {
     val sum: Future[Int] = runnable.run()
 
     //#materialization-in-steps
-  }
 
-  "materialization runWith" in {
+  "materialization runWith" in
     //#materialization-runWith
     val source = Source(1 to 10)
     val sink = Sink.fold[Int, Int](0)(_ + _)
@@ -55,9 +53,8 @@ class FlowDocSpec extends AkkaSpec {
     // materialize the flow, getting the Sinks materialized value
     val sum: Future[Int] = source.runWith(sink)
     //#materialization-runWith
-  }
 
-  "materialization is unique" in {
+  "materialization is unique" in
     //#stream-reuse
     // connect the Source to the Sink, obtaining a RunnableGraph
     val sink = Sink.fold[Int, Int](0)(_ + _)
@@ -70,9 +67,8 @@ class FlowDocSpec extends AkkaSpec {
 
     // sum1 and sum2 are different Futures!
     //#stream-reuse
-  }
 
-  "compound source cannot be used as key" in {
+  "compound source cannot be used as key" in
     // FIXME #16902 This example is now turned around
     // The WRONG case has been switched
     //#compound-source-is-not-keyed-runWith
@@ -95,9 +91,8 @@ class FlowDocSpec extends AkkaSpec {
     val timerCancellable2 = timerMap.to(Sink.ignore).run()
     timerCancellable2.cancel()
     //#compound-source-is-not-keyed-run
-  }
 
-  "creating sources, sinks" in {
+  "creating sources, sinks" in
     //#source-sink
     // Create a source from an Iterable
     Source(List(1, 2, 3))
@@ -125,9 +120,8 @@ class FlowDocSpec extends AkkaSpec {
     // A Sink that executes a side-effecting call for every element of the stream
     Sink.foreach[String](println(_))
     //#source-sink
-  }
 
-  "various ways of connecting source, sink, flow" in {
+  "various ways of connecting source, sink, flow" in
     //#flow-connecting
     // Explicitly creating and wiring up a Source, Sink and Flow
     Source(1 to 6).via(Flow[Int].map(_ * 2)).to(Sink.foreach(println(_)))
@@ -147,19 +141,18 @@ class FlowDocSpec extends AkkaSpec {
     Source(1 to 6).to(otherSink)
 
     //#flow-connecting
-  }
 
-  "various ways of transforming materialized values" in {
+  "various ways of transforming materialized values" in
     import scala.concurrent.duration._
 
     val throttler = Flow.fromGraph(
-        GraphDSL.create(Source.tick(1.second, 1.second, "test")) {
+        GraphDSL.create(Source.tick(1.second, 1.second, "test"))
       implicit builder => tickSource =>
         import GraphDSL.Implicits._
         val zip = builder.add(ZipWith[String, Int, Int](Keep.right))
         tickSource ~> zip.in0
         FlowShape(zip.in1, zip.out)
-    })
+    )
 
     //#flow-mat-combine
     // An source that can be signalled explicitly from the outside
@@ -203,10 +196,9 @@ class FlowDocSpec extends AkkaSpec {
     // It is also possible to map over the materialized values. In r9 we had a
     // doubly nested pair, but we want to flatten it out
     val r11: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
-      r9.mapMaterializedValue {
+      r9.mapMaterializedValue
         case ((promise, cancellable), future) =>
           (promise, cancellable, future)
-      }
 
     // Now we can use pattern matching to get the resulting materialized values
     val (promise, cancellable, future) = r11.run()
@@ -219,32 +211,28 @@ class FlowDocSpec extends AkkaSpec {
     // The result of r11 can be also achieved by using the Graph API
     val r12: RunnableGraph[(Promise[Option[Int]], Cancellable, Future[Int])] =
       RunnableGraph.fromGraph(
-          GraphDSL.create(source, flow, sink)((_, _, _)) {
+          GraphDSL.create(source, flow, sink)((_, _, _))
         implicit builder => (src, f, dst) =>
           import GraphDSL.Implicits._
           src ~> f ~> dst
           ClosedShape
-      })
+      )
 
     //#flow-mat-combine
-  }
 
-  "explicit fusing" in {
+  "explicit fusing" in
     //#explicit-fusing
     import akka.stream.Fusing
 
     val flow = Flow[Int].map(_ * 2).filter(_ > 500)
     val fused = Fusing.aggressive(flow)
 
-    Source.fromIterator { () =>
+    Source.fromIterator  () =>
       Iterator from 0
-    }.via(fused).take(1000)
+    .via(fused).take(1000)
     //#explicit-fusing
-  }
 
-  "defining asynchronous boundaries" in {
+  "defining asynchronous boundaries" in
     //#flow-async
     Source(List(1, 2, 3)).map(_ + 1).async.map(_ * 2).to(Sink.ignore)
     //#flow-async
-  }
-}

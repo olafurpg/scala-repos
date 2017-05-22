@@ -21,7 +21,7 @@ final case class DateTime private (
     clicks: Long, // milliseconds since January 1, 1970, 00:00:00 GMT
     isLeapYear: Boolean)
     extends akka.http.javadsl.model.DateTime with Ordered[DateTime]
-    with Renderable {
+    with Renderable
 
   /**
     * The day of the week as a 3 letter abbreviation:
@@ -116,13 +116,11 @@ final case class DateTime private (
 
   override def hashCode() = clicks.##
 
-  override def equals(obj: Any) = obj match {
+  override def equals(obj: Any) = obj match
     case x: DateTime ⇒ x.clicks == clicks
     case _ ⇒ false
-  }
-}
 
-object DateTime {
+object DateTime
   private[this] val WEEKDAYS = Array(
       "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat")
   private[this] val MONTHS = Array("Jan",
@@ -160,7 +158,7 @@ object DateTime {
             day: Int,
             hour: Int = 0,
             minute: Int = 0,
-            second: Int = 0): DateTime = {
+            second: Int = 0): DateTime =
     require(1800 <= year && year <= 9999, "year must be >= 1800 and <= 9999")
     require(1 <= month && month <= 12, "month must be >= 1 and <= 12")
     require(1 <= day && day <= 31, "day must be >= 1 and <= 31")
@@ -195,14 +193,13 @@ object DateTime {
                  weekday = d % 7,
                  clicks = c * 1000,
                  isLeapYear = isLeap)
-  }
 
   /**
     * Creates a new `DateTime` from the number of milli seconds
     * since the start of "the epoch", namely January 1, 1970, 00:00:00 GMT.
     * Note that this implementation discards milliseconds (i.e. rounds down to full seconds).
     */
-  def apply(clicks: Long): DateTime = {
+  def apply(clicks: Long): DateTime =
     require(DateTime.MinValue.clicks <= clicks &&
             clicks <= DateTime.MaxValue.clicks,
             "DateTime value must be >= " + DateTime.MinValue + " and <= " +
@@ -225,17 +222,15 @@ object DateTime {
     var y = 400 * (dn / 146097) + 1
     var d = dn % 146097
     if (d == 146096) { y += 399; d = 365 } // last year of 400 is long
-    else {
+    else
       y += 100 * (d / 36524)
       d %= 36524
       y += (d / 1461) << 2
       d %= 1461
       if (d == 1460) { y += 3; d = 365 } // last year out of 4 is long
-      else {
+      else
         y += d / 365
         d %= 365
-      }
-    }
 
     val isLeap = isLeapYear(y)
 
@@ -264,14 +259,12 @@ object DateTime {
                  weekday = w,
                  clicks = c,
                  isLeapYear = isLeap)
-  }
 
   private def isLeapYear(year: Int): Boolean =
-    ((year & 0x03) == 0) && {
+    ((year & 0x03) == 0) &&
       val q = year / 100
       val r = year % 100
       r != 0 || (q & 0x03) == 0
-    }
 
   /**
     * Creates a new `DateTime` instance for the current point in time.
@@ -284,16 +277,15 @@ object DateTime {
     * if it adheres to the format `yyyy-mm-ddThh:mm:ss[.SSSZ]`.
     * Note that this implementation discards milliseconds (i.e. rounds down to full seconds).
     */
-  def fromIsoDateTimeString(string: String): Option[DateTime] = {
+  def fromIsoDateTimeString(string: String): Option[DateTime] =
     def c(ix: Int) = string.charAt(ix)
     def isDigit(c: Char) = '0' <= c && c <= '9'
-    def i(ix: Int) = {
+    def i(ix: Int) =
       val x = c(ix)
       require(isDigit(x))
       x - '0'
-    }
     def check(len: Int): Boolean =
-      len match {
+      len match
         case 19 ⇒
           c(4) == '-' && c(7) == '-' && c(10) == 'T' && c(13) == ':' &&
           c(16) == ':'
@@ -301,10 +293,9 @@ object DateTime {
           check(19) && c(19) == '.' && isDigit(c(20)) && isDigit(c(21)) &&
           isDigit(c(22)) && c(23) == 'Z'
         case _ ⇒ false
-      }
     def mul10(i: Int) = (i << 3) + (i << 1)
-    if (check(string.length)) {
-      try {
+    if (check(string.length))
+      try
         val year = i(0) * 1000 + i(1) * 100 + mul10(i(2)) + i(3)
         val month = mul10(i(5)) + i(6)
         val day = mul10(i(8)) + i(9)
@@ -312,7 +303,5 @@ object DateTime {
         val min = mul10(i(14)) + i(15)
         val sec = mul10(i(17)) + i(18)
         Some(DateTime(year, month, day, hour, min, sec))
-      } catch { case _: IllegalArgumentException ⇒ None }
-    } else None
-  }
-}
+      catch { case _: IllegalArgumentException ⇒ None }
+    else None

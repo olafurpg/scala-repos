@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object P extends Build {
+object P extends Build
   override def settings = super.settings ++ Seq(
       scalaBinaryVersion in update := "2.9.0"
   )
@@ -24,4 +24,3 @@ object P extends Build {
                 Seq("org.scala-tools.sbinary" %% "sbinary" % "0.4.0" % "provided")
               else Nil), declared <<= baseDirectory(_ / "declare.lib" exists),
         configIvyScala)
-}

@@ -1,6 +1,6 @@
 package cats
 
-package object free {
+package object free
 
   /** Alias for the free monad over the `Function0` functor. */
   type Trampoline[A] = Free[Function0, A]
@@ -11,4 +11,3 @@ package object free {
 
   /** [[cats.free.Inject]][F, G] */
   type :≺:[F[_], G[_]] = Inject[F, G]
-}

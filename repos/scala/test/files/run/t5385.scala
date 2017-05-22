@@ -1,6 +1,6 @@
 import scala.tools.partest._
 
-object Test extends CompilerTest {
+object Test extends CompilerTest
   import global._
   override def extraSettings = super.extraSettings + " -Yrangepos"
   override def sources = List(
@@ -13,11 +13,8 @@ object Test extends CompilerTest {
       "class Gzz { }",
       "class Hzz { }            "
   )
-  def check(source: String, unit: CompilationUnit) {
-    unit.body foreach {
+  def check(source: String, unit: CompilationUnit)
+    unit.body foreach
       case cdef: ClassDef =>
         println("%-15s class %s".format(cdef.pos.show, cdef.name))
       case _ =>
-    }
-  }
-}

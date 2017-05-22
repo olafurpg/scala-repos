@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-class SplitElseIfIntentionTest extends ScalaIntentionTestBase {
+class SplitElseIfIntentionTest extends ScalaIntentionTestBase
   val familyName = SplitElseIfIntention.familyName
 
-  def testSplitElseIf() {
+  def testSplitElseIf()
     val text = """
         |class SplitElseIf {
         |  def mthd {
@@ -43,9 +43,8 @@ class SplitElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitElseIf2() {
+  def testSplitElseIf2()
     val text = """
         |class SplitElseIf {
         |  def mthd {
@@ -75,9 +74,8 @@ class SplitElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitElseIf3() {
+  def testSplitElseIf3()
     val text = """
         |class SplitElseIf {
         |  def mthd {
@@ -103,9 +101,8 @@ class SplitElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testSplitElseIf4() {
+  def testSplitElseIf4()
     val text = """
         |class SplitElseIf {
         |  def mthd {
@@ -132,5 +129,3 @@ class SplitElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

@@ -23,7 +23,7 @@
 
 package java.math
 
-object MathContext {
+object MathContext
 
   val DECIMAL128 = MathContext(34, RoundingMode.HALF_EVEN)
 
@@ -36,7 +36,7 @@ object MathContext {
   private def apply(precision: Int, roundingMode: RoundingMode): MathContext =
     new MathContext(precision, roundingMode)
 
-  private def getArgs(s: String): (Int, RoundingMode) = {
+  private def getArgs(s: String): (Int, RoundingMode) =
     checkNotNull(s, "null string")
     val precisionLength = "precision=".length
     val roundingModeLength = "roundingMode=".length
@@ -46,13 +46,11 @@ object MathContext {
       invalidMathContext("Missing precision", s)
 
     val precisionString = s.substring(precisionLength, spaceIndex)
-    val precision = {
-      try {
+    val precision =
+      try
         java.lang.Integer.parseInt(precisionString)
-      } catch {
+      catch
         case _: NumberFormatException => invalidMathContext("Bad precision", s)
-      }
-    }
 
     val roundingModeStrStart = spaceIndex + 1
     if (!s.regionMatches(
@@ -63,19 +61,15 @@ object MathContext {
     val roundingMode = RoundingMode.valueOf(s.substring(roundingModeStart))
 
     (precision, roundingMode)
-  }
 
-  private def invalidMathContext(reason: String, s: String): Nothing = {
+  private def invalidMathContext(reason: String, s: String): Nothing =
     throw new IllegalArgumentException(reason + ": " + s)
-  }
 
-  private def checkNotNull(reference: AnyRef, errorMessage: AnyRef): Unit = {
+  private def checkNotNull(reference: AnyRef, errorMessage: AnyRef): Unit =
     if (reference == null)
       throw new NullPointerException(String.valueOf(errorMessage))
-  }
-}
 
-class MathContext(setPrecision: Int, setRoundingMode: RoundingMode) {
+class MathContext(setPrecision: Int, setRoundingMode: RoundingMode)
 
   private[math] val precision = setPrecision
 
@@ -85,36 +79,30 @@ class MathContext(setPrecision: Int, setRoundingMode: RoundingMode) {
 
   def getRoundingMode(): RoundingMode = roundingMode
 
-  def this(setPrecision: Int) = {
+  def this(setPrecision: Int) =
     this(setPrecision, RoundingMode.HALF_UP)
-  }
 
-  private def this(args: (Int, RoundingMode)) = {
+  private def this(args: (Int, RoundingMode)) =
     this(args._1, args._2)
-  }
 
-  def this(s: String) = {
+  def this(s: String) =
     this(MathContext.getArgs(s))
     checkValid()
-  }
 
-  override def equals(x: Any): Boolean = x match {
+  override def equals(x: Any): Boolean = x match
     case that: MathContext =>
       this.precision == that.precision &&
       this.roundingMode == that.roundingMode
     case _ =>
       false
-  }
 
   override def hashCode(): Int = (precision << 3) | roundingMode.ordinal()
 
   override def toString(): String =
     "precision=" + precision + " roundingMode=" + roundingMode
 
-  private def checkValid(): Unit = {
+  private def checkValid(): Unit =
     if (precision < 0)
       throw new IllegalArgumentException("Negative precision: " + precision)
     if (roundingMode == null)
       throw new NullPointerException("roundingMode == null")
-  }
-}

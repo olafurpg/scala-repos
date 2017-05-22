@@ -8,7 +8,7 @@ import akka.persistence.{Persistence, PersistentEnvelope, PersistentRepr}
 import scala.collection.immutable
 import akka.persistence.AtomicWrite
 
-private[akka] trait WriteJournalBase {
+private[akka] trait WriteJournalBase
   this: Actor ⇒
 
   val persistence = Persistence(context.system)
@@ -16,13 +16,12 @@ private[akka] trait WriteJournalBase {
 
   protected def preparePersistentBatch(
       rb: immutable.Seq[PersistentEnvelope]): immutable.Seq[AtomicWrite] =
-    rb.collect {
+    rb.collect
       // collect instead of flatMap to avoid Some allocations
       case a: AtomicWrite ⇒
         // don't store sender
         a.copy(payload = a.payload.map(
                   p ⇒ adaptToJournal(p.update(sender = Actor.noSender))))
-    }
 
   /** INTERNAL API */
   private[akka] final def adaptFromJournal(
@@ -30,13 +29,12 @@ private[akka] trait WriteJournalBase {
     eventAdapters
       .get(repr.payload.getClass)
       .fromJournal(repr.payload, repr.manifest)
-      .events map { adaptedPayload ⇒
+      .events map  adaptedPayload ⇒
       repr.withPayload(adaptedPayload)
-    }
 
   /** INTERNAL API */
   private[akka] final def adaptToJournal(
-      repr: PersistentRepr): PersistentRepr = {
+      repr: PersistentRepr): PersistentRepr =
     val payload = repr.payload
     val adapter = eventAdapters.get(payload.getClass)
 
@@ -46,10 +44,7 @@ private[akka] trait WriteJournalBase {
     // letting IdentityEventAdapter clearing it out.
     if (adapter == IdentityEventAdapter ||
         adapter.isInstanceOf[NoopWriteEventAdapter]) repr
-    else {
+    else
       repr
         .withPayload(adapter.toJournal(payload))
         .withManifest(adapter.manifest(payload))
-    }
-  }
-}

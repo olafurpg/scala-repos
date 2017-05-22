@@ -14,13 +14,12 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class BackupRequestFilterTest
-    extends FunSuite with MockitoSugar with Matchers {
-  def quantile(ds: Seq[Duration], which: Int) = {
+    extends FunSuite with MockitoSugar with Matchers
+  def quantile(ds: Seq[Duration], which: Int) =
     val sorted = ds.sorted
     sorted(which * sorted.size / 100)
-  }
 
-  def newCtx() = new {
+  def newCtx() = new
     val maxDuration = 10.seconds
     val timer = new MockTimer
     val statsReceiver = new InMemoryStatsReceiver
@@ -40,17 +39,15 @@ class BackupRequestFilterTest
       Duration.fromMilliseconds(filter.cutoffMs())
 
     val rng = new Random(123)
-    val latencies = Seq.fill(100) {
+    val latencies = Seq.fill(100)
       Duration.fromMilliseconds(rng.nextInt()).abs % (maxDuration / 2)
-    }
-  }
 
-  test("maintain cutoffs") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("maintain cutoffs")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
-      for ((l, i) <- latencies.zipWithIndex) {
+      for ((l, i) <- latencies.zipWithIndex)
         val p = new Promise[String]
         when(underlying("ok")).thenReturn(p)
         verify(underlying, times(i)).apply("ok")
@@ -61,30 +58,25 @@ class BackupRequestFilterTest
         assert(f.poll == Some(Return("ok")))
         val ideal = quantile(latencies take i + 1, 95)
         val actual = cutoff()
-        BackupRequestFilter.defaultError(maxDuration) match {
+        BackupRequestFilter.defaultError(maxDuration) match
           case 0.0 =>
             assert(ideal == actual)
           case error =>
             val epsilon = maxDuration.inMillis * error
             actual.inMillis.toDouble should be(
                 ideal.inMillis.toDouble +- epsilon)
-        }
-      }
-    }
-  }
 
-  test("issue backup request") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("issue backup request")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
-      for (l <- latencies) {
+      for (l <- latencies)
         val p = new Promise[String]
         when(underlying("ok")).thenReturn(p)
         val f = service("ok")
         tc.advance(l)
         p.setValue("ok")
-      }
 
       // flush
       timer.tick()
@@ -119,21 +111,18 @@ class BackupRequestFilterTest
       assert(statsReceiver.counters(Seq("lost")) == 1)
       // original request takes longer than cutoff
       assert(statsReceiver.counters(Seq("timeouts")) == 1)
-    }
-  }
 
-  test("cancels backup when original wins") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("cancels backup when original wins")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
-      for (l <- latencies) {
+      for (l <- latencies)
         val p = new Promise[String]
         when(underlying("ok")).thenReturn(p)
         val f = service("ok")
         tc.advance(l)
         p.setValue("ok")
-      }
 
       // flush
       timer.tick()
@@ -158,22 +147,19 @@ class BackupRequestFilterTest
       assert(timer.tasks.isEmpty)
       // original request succeeds within cutoff
       assert(!statsReceiver.counters.contains(Seq("timeouts")))
-    }
-  }
 
-  test("sends backup request when original fails before backup timer") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("sends backup request when original fails before backup timer")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
       // make a bunch of "requests" that complete before the maxDuration
-      for (l <- latencies) {
+      for (l <- latencies)
         val p = new Promise[String]
         when(underlying("ok")).thenReturn(p)
         val f = service("ok")
         tc.advance(l)
         p.setValue("ok")
-      }
 
       // flush
       timer.tick()
@@ -182,9 +168,8 @@ class BackupRequestFilterTest
       assert(cutoff() > Duration.Zero)
 
       val origPromise = new Promise[String]
-      origPromise.setInterruptHandler {
+      origPromise.setInterruptHandler
         case t => origPromise.updateIfEmpty(Throw(t))
-      }
       when(underlying("c")).thenReturn(origPromise)
       verify(underlying, times(0)).apply("c")
 
@@ -213,23 +198,20 @@ class BackupRequestFilterTest
       assert(statsReceiver.counters(Seq("lost")) == 1)
       // original request fails instead of timing out
       assert(!statsReceiver.counters.contains(Seq("timeouts")))
-    }
-  }
 
   test(
-      "return backup request response when original fails after backup is issued") {
-    Time.withCurrentTimeFrozen { tc =>
+      "return backup request response when original fails after backup is issued")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = newCtx()
       import ctx._
 
       // make a bunch of "requests" under the
-      for (l <- latencies) {
+      for (l <- latencies)
         val p = new Promise[String]
         when(underlying("ok")).thenReturn(p)
         val f = service("ok")
         tc.advance(l)
         p.setValue("ok")
-      }
 
       // flush
       timer.tick()
@@ -238,9 +220,8 @@ class BackupRequestFilterTest
       assert(cutoff() > Duration.Zero)
 
       val origPromise = new Promise[String]
-      origPromise.setInterruptHandler {
+      origPromise.setInterruptHandler
         case t => origPromise.updateIfEmpty(Throw(t))
-      }
       when(underlying("d")).thenReturn(origPromise)
       verify(underlying, times(0)).apply("d")
 
@@ -271,6 +252,3 @@ class BackupRequestFilterTest
       assert(statsReceiver.counters(Seq("lost")) == 1)
       // original request takes longer than cutoff
       assert(statsReceiver.counters(Seq("timeouts")) == 1)
-    }
-  }
-}

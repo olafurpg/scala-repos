@@ -9,10 +9,10 @@ import org.scalatest.{GivenWhenThen, Matchers}
 import scala.collection.immutable.Seq
 
 class PersistentVolumeMatcherTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
   import scala.collection.JavaConverters._
 
-  test("Missing volumes result in NO match") {
+  test("Missing volumes result in NO match")
     val f = new Fixture
 
     Given(
@@ -31,9 +31,8 @@ class PersistentVolumeMatcherTest
 
     Then("We receive a None")
     matchOpt shouldBe empty
-  }
 
-  test("Correct available volumes result in a match") {
+  test("Correct available volumes result in a match")
     val f = new Fixture
 
     Given(
@@ -54,10 +53,9 @@ class PersistentVolumeMatcherTest
     matchOpt.get.persistentVolumeResources should have size 1
     matchOpt.get.persistentVolumeResources.head shouldEqual offer.getResources(
         0)
-  }
 
   test(
-      "Multiple correct available volumes for multiple tasks result in the correct task as a match") {
+      "Multiple correct available volumes for multiple tasks result in the correct task as a match")
     val f = new Fixture
 
     Given("a resident app with 2 tasks and an offer with 3 persistent volumes")
@@ -97,9 +95,8 @@ class PersistentVolumeMatcherTest
     matchOpt.get.persistentVolumeResources should have size 1
     matchOpt.get.persistentVolumeResources.head shouldEqual offer.getResources(
         1)
-  }
 
-  test("Unwanted available volumes result in NO match") {
+  test("Unwanted available volumes result in NO match")
     val f = new Fixture
 
     Given(
@@ -119,9 +116,8 @@ class PersistentVolumeMatcherTest
 
     Then("We receive a None")
     matchOpt shouldBe empty
-  }
 
-  class Fixture {
+  class Fixture
     def makeTask(appId: PathId) = MarathonTestHelper.mininimalTask(appId)
     def makeTask(appId: PathId, reservation: Task.Reservation) =
       MarathonTestHelper.minimalReservedTask(appId, reservation)
@@ -131,5 +127,3 @@ class PersistentVolumeMatcherTest
     def appWithPersistentVolume(): AppDefinition =
       MarathonTestHelper.appWithPersistentVolume()
     val taskReservationStateNew = MarathonTestHelper.taskReservationStateNew
-  }
-}

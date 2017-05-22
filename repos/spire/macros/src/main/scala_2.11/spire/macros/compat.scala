@@ -1,7 +1,7 @@
 package spire
 package macros
 
-object compat {
+object compat
 
   type Context = scala.reflect.macros.whitebox.Context
 
@@ -19,4 +19,3 @@ object compat {
 
   def setOrig[C <: Context](c: C)(tt: c.universe.TypeTree, t: c.Tree) =
     c.universe.internal.setOriginal(tt, t)
-}

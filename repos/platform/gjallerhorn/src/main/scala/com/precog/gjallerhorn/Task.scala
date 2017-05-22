@@ -27,7 +27,7 @@ import java.io._
 import org.specs2.mutable.Specification
 import specs2._
 
-abstract class Task(settings: Settings) extends Specification {
+abstract class Task(settings: Settings) extends Specification
   val Settings(serviceHost,
                id,
                token,
@@ -44,9 +44,9 @@ abstract class Task(settings: Settings) extends Specification {
                secure) = settings
 
   def http(rb: RequestBuilder): Promise[ApiResult] =
-    Http(rb).map { r =>
+    Http(rb).map  r =>
       val s = r.getResponseBody
-      r.getStatusCode match {
+      r.getStatusCode match
         case 200 =>
           JParser.parseFromString(s).fold(ApiBadJson, ApiResponse)
         case n if 200 < n && n < 300 =>
@@ -55,8 +55,6 @@ abstract class Task(settings: Settings) extends Specification {
           else JParser.parseFromString(s).fold(ApiBadJson, ApiResponse)
         case n =>
           ApiFailure(n, s)
-      }
-    }
 
   def text(n: Int) = scala.util.Random.alphanumeric.take(12).mkString
 
@@ -76,14 +74,13 @@ abstract class Task(settings: Settings) extends Specification {
   def analytics =
     host0(serviceHost, shardPort) / "analytics" / "v2" / "analytics"
 
-  def getjson(rb: RequestBuilder, setContentType: Boolean = true) = {
+  def getjson(rb: RequestBuilder, setContentType: Boolean = true) =
     val rb2 =
       if (setContentType) rb <:< List("Content-Type" -> "application/json")
       else rb
     JParser.parseFromString(Http(rb2 OK as.String)()).valueOr(throw _)
-  }
 
-  def createAccount: Account = {
+  def createAccount: Account =
     val (user, pass) = generateUserAndPassword
 
     val body = """{ "email": "%s", "password": "%s" }""".format(user, pass)
@@ -95,76 +92,67 @@ abstract class Task(settings: Settings) extends Specification {
     val rootPath = (json2 \ "rootPath").deserialize[String]
 
     Account(user, pass, accountId, apiKey, rootPath)
-  }
 
-  def deriveAPIKey(parent: Account, subPath: String = ""): String = {
+  def deriveAPIKey(parent: Account, subPath: String = ""): String =
     val body =
       """{"grants":[{"permissions":[{"accessType":"read","path":"%s","ownerAccountIds":["%s"]}]}]}"""
     val req =
-      (security / "").addQueryParameter("apiKey", parent.apiKey) << {
+      (security / "").addQueryParameter("apiKey", parent.apiKey) <<
         body.format(parent.rootPath + subPath, parent.accountId)
-      }
     val result = Http(req OK as.String)
     val json = JParser
       .parseFromString(result())
       .valueOr(throw _)
       (json \ "apiKey").deserialize[String]
-  }
 
-  def deleteAPIKey(apiKey: String) {
+  def deleteAPIKey(apiKey: String)
     val req = (security / apiKey).DELETE
     val res = Http(req OK as.String)
     res()
-  }
 
   def ingestFile(
-      account: Account, path: String, file: File, contentType: String) {
+      account: Account, path: String, file: File, contentType: String)
     val req =
       ((ingest / "sync" / "fs" / path).POST <:< List(
               "Content-Type" -> contentType) <<? List(
               "apiKey" -> account.apiKey /*,
                         "ownerAccountId" -> account.accountId*/ ) <<< file)
     Http(req OK as.String)()
-  }
 
   def ingestString(account: Account, data: String, contentType: String)(
-      f: Req => Req) {
+      f: Req => Req)
     val req =
       (f(ingest / "sync" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
               "apiKey" -> account.apiKey,
               "ownerAccountId" -> account.accountId) << data)
     Http(req OK as.String)()
-  }
 
   def asyncIngestString(account: Account, data: String, contentType: String)(
-      f: Req => Req) {
+      f: Req => Req)
     val req =
       (f(ingest / "async" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
               "apiKey" -> account.apiKey,
               "ownerAccountId" -> account.accountId) << data)
     Http(req OK as.String)()
-  }
 
   def ingestString(authAPIKey: String,
                    ownerAccount: Account,
                    data: String,
-                   contentType: String)(f: Req => Req) = {
+                   contentType: String)(f: Req => Req) =
     val req =
       (f(ingest / "sync" / "fs").POST <:< List("Content-Type" -> contentType) <<? List(
               "apiKey" -> authAPIKey,
               "ownerAccountId" -> ownerAccount.accountId) << data)
 
     Http(req OK as.String).either()
-  }
 
-  def deletePath(auth: String)(f: Req => Req) {
+  def deletePath(auth: String)(f: Req => Req)
     val req = f(ingest / "sync" / "fs").DELETE <<? List("apiKey" -> auth)
     Http(req OK as.String)()
-  }
 
   def metadataFor(
       apiKey: String, tpe: Option[String] = None, prop: Option[String] = None)(
-      f: Req => Req): JValue = {
+      f: Req => Req): JValue =
     val params = List(
         Some("apiKey" -> apiKey),
         tpe map ("type" -> _),
@@ -177,20 +165,19 @@ abstract class Task(settings: Settings) extends Specification {
           error => JUndefined,
           json => JParser.parseFromString(json).valueOr(throw _)
       )
-  }
 
   def listGrantsFor(targetApiKey: String, authApiKey: String): ApiResult =
     http((security / targetApiKey / "grants" / "")
           .addQueryParameter("apiKey", authApiKey))()
 
   def grantBody(perms: List[(String, String, List[String])]): String =
-    JObject("permissions" -> JArray(perms.map {
+    JObject("permissions" -> JArray(perms.map
       case (accessType, path, owners) =>
         val ids = JArray(owners.map(JString(_)))
         JObject("accessType" -> JString(accessType),
                 "path" -> JString(path),
                 "ownerAccountIds" -> ids)
-    })).renderCompact
+    )).renderCompact
 
   def createGrant(
       apiKey: String, perms: List[(String, String, List[String])]): ApiResult =
@@ -205,26 +192,22 @@ abstract class Task(settings: Settings) extends Specification {
           .addQueryParameter("apiKey", apiKey) << grantBody(perms))()
 
   def addToGrant(
-      targetApiKey: String, authApiKey: String, grantId: String): ApiResult = {
+      targetApiKey: String, authApiKey: String, grantId: String): ApiResult =
     val body = JObject("grantId" -> JString(grantId)).renderCompact
     val url = security / targetApiKey / "grants" / ""
     val req = (url).addQueryParameter("apiKey", authApiKey) << body
     http(req)()
-  }
 
   def removeGrant(
-      targetApiKey: String, authApiKey: String, grantId: String): ApiResult = {
+      targetApiKey: String, authApiKey: String, grantId: String): ApiResult =
     val url = security / targetApiKey / "grants" / grantId
     val req = (url).DELETE.addQueryParameter("apiKey", authApiKey)
     http(req)()
-  }
 
   def describeGrant(apiKey: String, grantId: String): ApiResult =
     http((grants / grantId).addQueryParameter("apiKey", apiKey))()
 
-  private def host0(domain: String, port: Int) = {
+  private def host0(domain: String, port: Int) =
     val back = host(domain, port)
     // port check is a hack to allow just accounts to run over https
     if (secure && port != 80) back.secure else back
-  }
-}

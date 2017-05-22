@@ -42,23 +42,21 @@ import scalafx.scene.layout.{Priority, VBox}
   * @resource /scalafx/ensemble/images/icon-48x48.png
   * @resource /scalafx/ensemble/images/scala-logo.png
   */
-class EnsembleImageCreation extends EnsembleExample {
-  def getContent = new VBox {
+class EnsembleImageCreation extends EnsembleExample
+  def getContent = new VBox
     vgrow = Priority.Always
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(new ImageView {
+    children = List(new ImageView
       image = new Image(this.getClass
             .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
       fitHeight = 50
       fitWidth = 150
       preserveRatio = true
       smooth = true
-    }, new ImageView {
+    , new ImageView
       // image = new Image("/scalafx/ensemble/images/scala-logo.png")
       image = new Image(
           "http://www.scala-lang.org/resources/img/scala-logo.png")
-    })
-  }
-}
+    )

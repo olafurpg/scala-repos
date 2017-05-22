@@ -16,16 +16,15 @@ import scala.util.control.NonFatal
 abstract class RelationalPublisherTest[P <: RelationalProfile](
     val profile: P, timeout: Long)
     extends PublisherVerification[Int](new TestEnvironment(timeout), 1000L)
-    with TestNGSuiteLike {
+    with TestNGSuiteLike
   import profile.api._
 
   override def maxElementsFromPublisher = 73L
   override def boundedDepthOfOnNextAndRequestRecursion = 1
 
-  class Data(tableName: String)(tag: Tag) extends Table[Int](tag, tableName) {
+  class Data(tableName: String)(tag: Tag) extends Table[Int](tag, tableName)
     def id = column[Int]("id")
     def * = id
-  }
   lazy val data = TableQuery(new Data("data")(_))
   lazy val dataErr = TableQuery(new Data("data_err")(_))
 
@@ -34,12 +33,11 @@ abstract class RelationalPublisherTest[P <: RelationalProfile](
 
   def createDB: Database
 
-  @BeforeClass def setUpDB: Unit = {
+  @BeforeClass def setUpDB: Unit =
     db = createDB
     Await.result(db.run(data.schema.create >>
                      (data ++= (1 to maxElementsFromPublisher.toInt))),
                  Duration.Inf)
-  }
 
   @AfterClass def tearDownDB: Unit =
     db.close()
@@ -49,4 +47,3 @@ abstract class RelationalPublisherTest[P <: RelationalProfile](
 
   def createFailedPublisher =
     db.stream(dataErr.result)
-}

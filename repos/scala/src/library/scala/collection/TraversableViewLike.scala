@@ -14,7 +14,7 @@ import mutable.{Builder, ArrayBuffer}
 import scala.annotation.migration
 import scala.language.implicitConversions
 
-trait ViewMkString[+A] { self: Traversable[A] =>
+trait ViewMkString[+A]  self: Traversable[A] =>
 
   // It is necessary to use thisSeq rather than toSeq to avoid cycles in the
   // eager evaluation of vals in transformed view subclasses, see #4558.
@@ -24,23 +24,19 @@ trait ViewMkString[+A] { self: Traversable[A] =>
   // is because mkString should force a view but toString should not.
   override def mkString: String = mkString("")
   override def mkString(sep: String): String = mkString("", sep, "")
-  override def mkString(start: String, sep: String, end: String): String = {
+  override def mkString(start: String, sep: String, end: String): String =
     thisSeq.addString(new StringBuilder(), start, sep, end).toString
-  }
   override def addString(b: StringBuilder,
                          start: String,
                          sep: String,
-                         end: String): StringBuilder = {
+                         end: String): StringBuilder =
     var first = true
     b append start
-    for (x <- self) {
+    for (x <- self)
       if (first) first = false else b append sep
       b append x
-    }
     b append end
     b
-  }
-}
 
 /** A template trait for non-strict views of traversable collections.
   *  $traversableViewInfo
@@ -73,7 +69,7 @@ trait TraversableViewLike[
     +A,
     +Coll,
     +This <: TraversableView[A, Coll] with TraversableViewLike[A, Coll, This]]
-    extends Traversable[A] with TraversableLike[A, This] with ViewMkString[A] {
+    extends Traversable[A] with TraversableLike[A, This] with ViewMkString[A]
   self =>
 
   protected def underlying: Coll
@@ -85,11 +81,10 @@ trait TraversableViewLike[
   override protected[this] def newBuilder: Builder[A, This] =
     throw new UnsupportedOperationException(this + ".newBuilder")
 
-  def force[B >: A, That](implicit bf: CanBuildFrom[Coll, B, That]) = {
+  def force[B >: A, That](implicit bf: CanBuildFrom[Coll, B, That]) =
     val b = bf(underlying)
     b ++= this
     b.result()
-  }
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
   private[collection] abstract class AbstractTransformed[+B]
@@ -99,7 +94,7 @@ trait TraversableViewLike[
     *  This trait and all its subtraits has to be re-implemented for each
     *  ViewLike class.
     */
-  trait Transformed[+B] extends TraversableView[B, Coll] {
+  trait Transformed[+B] extends TraversableView[B, Coll]
     def foreach[U](f: B => U): Unit
 
     lazy val underlying = self.underlying
@@ -109,125 +104,99 @@ trait TraversableViewLike[
     // Methods whose standard implementations use "isEmpty" need to be rewritten
     // for views, else they will end up traversing twice in a situation like:
     //   xs.view.flatMap(f).headOption
-    override def headOption: Option[B] = {
+    override def headOption: Option[B] =
       for (x <- this) return Some(x)
 
       None
-    }
-    override def lastOption: Option[B] = {
+    override def lastOption: Option[B] =
       // (Should be) better than allocating a Some for every element.
       var empty = true
       var result: B = null.asInstanceOf[B]
-      for (x <- this) {
+      for (x <- this)
         empty = false
         result = x
-      }
       if (empty) None else Some(result)
-    }
 
     // XXX: As yet not dealt with, tail and init both call isEmpty.
     override def stringPrefix = self.stringPrefix
     override def toString = viewToString
-  }
 
-  trait EmptyView extends Transformed[Nothing] {
+  trait EmptyView extends Transformed[Nothing]
     final override def isEmpty = true
     final override def foreach[U](f: Nothing => U): Unit = ()
-  }
 
   /** A fall back which forces everything into a vector and then applies an operation
     *  on it. Used for those operations which do not naturally lend themselves to a view
     */
-  trait Forced[B] extends Transformed[B] {
+  trait Forced[B] extends Transformed[B]
     protected[this] val forced: GenSeq[B]
     def foreach[U](f: B => U) = forced foreach f
     final override protected[this] def viewIdentifier = "C"
-  }
 
-  trait Sliced extends Transformed[A] {
+  trait Sliced extends Transformed[A]
     protected[this] val endpoints: SliceInterval
     protected[this] def from = endpoints.from
     protected[this] def until = endpoints.until
     // protected def newSliced(_endpoints: SliceInterval): Transformed[A] =
     //   self.newSliced(endpoints.recalculate(_endpoints))
 
-    def foreach[U](f: A => U) {
+    def foreach[U](f: A => U)
       var index = 0
-      for (x <- self) {
-        if (from <= index) {
+      for (x <- self)
+        if (from <= index)
           if (until <= index) return
           f(x)
-        }
         index += 1
-      }
-    }
     final override protected[this] def viewIdentifier = "S"
-  }
 
-  trait Mapped[B] extends Transformed[B] {
+  trait Mapped[B] extends Transformed[B]
     protected[this] val mapping: A => B
-    def foreach[U](f: B => U) {
+    def foreach[U](f: B => U)
       for (x <- self) f(mapping(x))
-    }
     final override protected[this] def viewIdentifier = "M"
-  }
 
-  trait FlatMapped[B] extends Transformed[B] {
+  trait FlatMapped[B] extends Transformed[B]
     protected[this] val mapping: A => GenTraversableOnce[B]
-    def foreach[U](f: B => U) {
+    def foreach[U](f: B => U)
       for (x <- self) for (y <- mapping(x).seq) f(y)
-    }
     final override protected[this] def viewIdentifier = "N"
-  }
 
-  trait Appended[B >: A] extends Transformed[B] {
+  trait Appended[B >: A] extends Transformed[B]
     protected[this] val rest: GenTraversable[B]
-    def foreach[U](f: B => U) {
+    def foreach[U](f: B => U)
       self foreach f
       rest foreach f
-    }
     final override protected[this] def viewIdentifier = "A"
-  }
 
-  trait Prepended[B >: A] extends Transformed[B] {
+  trait Prepended[B >: A] extends Transformed[B]
     protected[this] val fst: GenTraversable[B]
-    def foreach[U](f: B => U) {
+    def foreach[U](f: B => U)
       fst foreach f
       self foreach f
-    }
     final override protected[this] def viewIdentifier = "A"
-  }
 
-  trait Filtered extends Transformed[A] {
+  trait Filtered extends Transformed[A]
     protected[this] val pred: A => Boolean
-    def foreach[U](f: A => U) {
+    def foreach[U](f: A => U)
       for (x <- self) if (pred(x)) f(x)
-    }
     final override protected[this] def viewIdentifier = "F"
-  }
 
-  trait TakenWhile extends Transformed[A] {
+  trait TakenWhile extends Transformed[A]
     protected[this] val pred: A => Boolean
-    def foreach[U](f: A => U) {
-      for (x <- self) {
+    def foreach[U](f: A => U)
+      for (x <- self)
         if (!pred(x)) return
         f(x)
-      }
-    }
     final override protected[this] def viewIdentifier = "T"
-  }
 
-  trait DroppedWhile extends Transformed[A] {
+  trait DroppedWhile extends Transformed[A]
     protected[this] val pred: A => Boolean
-    def foreach[U](f: A => U) {
+    def foreach[U](f: A => U)
       var go = false
-      for (x <- self) {
+      for (x <- self)
         if (!go && !pred(x)) go = true
         if (go) f(x)
-      }
-    }
     final override protected[this] def viewIdentifier = "D"
-  }
 
   override def ++[B >: A, That](xs: GenTraversableOnce[B])(
       implicit bf: CanBuildFrom[This, B, That]): That =
@@ -243,24 +212,22 @@ trait TraversableViewLike[
     newPrepended(xs).asInstanceOf[That]
 
   override def map[B, That](f: A => B)(
-      implicit bf: CanBuildFrom[This, B, That]): That = {
+      implicit bf: CanBuildFrom[This, B, That]): That =
     newMapped(f).asInstanceOf[That]
 //    val b = bf(repr)
 //          if (b.isInstanceOf[NoBuilder[_]]) newMapped(f).asInstanceOf[That]
 //    else super.map[B, That](f)(bf)
-  }
 
   override def collect[B, That](pf: PartialFunction[A, B])(
       implicit bf: CanBuildFrom[This, B, That]): That =
     filter(pf.isDefinedAt).map(pf)(bf)
 
   override def flatMap[B, That](f: A => GenTraversableOnce[B])(
-      implicit bf: CanBuildFrom[This, B, That]): That = {
+      implicit bf: CanBuildFrom[This, B, That]): That =
     newFlatMapped(f).asInstanceOf[That]
 // was:    val b = bf(repr)
 //     if (b.isInstanceOf[NoBuilder[_]]) newFlatMapped(f).asInstanceOf[That]
 //    else super.flatMap[B, That](f)(bf)
-  }
   override def flatten[B](
       implicit asTraversable: A => /*<:<!!!*/ GenTraversableOnce[B]) =
     newFlatMapped(asTraversable)
@@ -347,4 +314,3 @@ trait TraversableViewLike[
     if (isEmpty) super.tail else newDropped(1)
 
   override def toString = viewToString
-}

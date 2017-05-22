@@ -3,7 +3,7 @@ package pickler
 
 /** Picklers for primitive arrays.
   */
-trait PrimitiveArrayPicklers {
+trait PrimitiveArrayPicklers
   implicit val byteArrayPickler: Pickler[Array[Byte]] with Unpickler[Array[
           Byte]] = PrimitivePickler[Array[Byte]]
   implicit val shortArrayPickler: Pickler[Array[Short]] with Unpickler[Array[
@@ -20,4 +20,3 @@ trait PrimitiveArrayPicklers {
           Float]] = PrimitivePickler[Array[Float]]
   implicit val doubleArrayPickler: Pickler[Array[Double]] with Unpickler[Array[
           Double]] = PrimitivePickler[Array[Double]]
-}

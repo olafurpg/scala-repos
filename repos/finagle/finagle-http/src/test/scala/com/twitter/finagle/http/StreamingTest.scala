@@ -17,7 +17,7 @@ import org.scalatest.concurrent.Eventually
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StreamingTest extends FunSuite with Eventually {
+class StreamingTest extends FunSuite with Eventually
 
   import StreamingTest._
 
@@ -45,16 +45,15 @@ class StreamingTest extends FunSuite with Eventually {
   def writeLots(writer: Writer, buf: Buf): Future[Unit] =
     writer.write(buf) before writeLots(writer, buf)
 
-  class ClientCtx {
+  class ClientCtx
     val fail = new Promise[Unit]
 
     val server = startServer(echo, identity)
     val client = connect(server.boundAddress,
                          transport =>
-                           {
                              if (!fail.isDefined) fail ensure transport.close()
                              transport
-                         })
+                         )
 
     val buf = Buf.Utf8(".")
     val req = get("/")
@@ -71,15 +70,13 @@ class StreamingTest extends FunSuite with Eventually {
 
     // Assert previously queued request is now processed, and not interrupted
     // midstream.
-    def assertSecondRequestOk() = {
+    def assertSecondRequestOk() =
       val reader = await(res2).reader
       req2.writer.close()
       await(Reader.readAll(reader))
       Closable.all(server, client).close()
-    }
-  }
 
-  test("client: request stream fails on write")(new ClientCtx {
+  test("client: request stream fails on write")(new ClientCtx
     // Simulate network failure by closing the transport.
     fail.setDone()
 
@@ -88,9 +85,9 @@ class StreamingTest extends FunSuite with Eventually {
     intercept[ChannelClosedException] { await(res.reader.read(1)) }
 
     assertSecondRequestOk()
-  })
+  )
 
-  test("client: response stream fails on read")(new ClientCtx {
+  test("client: response stream fails on read")(new ClientCtx
     // Reader should be suspended in a reading state.
     val f = res.reader.read(1)
     assert(!f.isDefined)
@@ -103,25 +100,25 @@ class StreamingTest extends FunSuite with Eventually {
     intercept[Reader.ReaderDiscarded] { await(writeLots(req.writer, buf)) }
 
     assertSecondRequestOk()
-  })
+  )
 
   test("client: fail request writer")(
-      new ClientCtx {
+      new ClientCtx
     val exc = new Exception
     req.writer.fail(exc)
     assert(!res2.isDefined)
     res.reader.discard()
 
     assertSecondRequestOk()
-  })
+  )
 
   test("client: discard respond reader")(
-      new ClientCtx {
+      new ClientCtx
     res.reader.discard()
     assertSecondRequestOk()
-  })
+  )
 
-  test("server: request stream fails read") {
+  test("server: request stream fails read")
     val buf = Buf.Utf8(".")
     val n = new AtomicInteger(0)
     val setFail = new AtomicBoolean(false)
@@ -129,8 +126,8 @@ class StreamingTest extends FunSuite with Eventually {
     val readp = new Promise[Unit]
     val writer = Reader.writable()
 
-    val service = new Service[Request, Response] {
-      def apply(req: Request) = n.getAndIncrement() match {
+    val service = new Service[Request, Response]
+      def apply(req: Request) = n.getAndIncrement() match
         case 0 =>
           req.reader.read(1).unit proxyTo readp
           Future.value(ok(writer))
@@ -138,16 +135,13 @@ class StreamingTest extends FunSuite with Eventually {
           val writer = Reader.writable()
           fail ensure (writer.write(buf) ensure writer.close())
           Future.value(ok(writer))
-      }
-    }
 
     val server = startServer(service,
                              transport =>
-                               {
                                  if (!setFail.getAndSet(true))
                                    fail ensure transport.close()
                                  transport
-                             })
+                             )
     val client1 = connect(server.boundAddress, identity, "client1")
     val client2 = connect(server.boundAddress, identity, "client2")
 
@@ -157,9 +151,8 @@ class StreamingTest extends FunSuite with Eventually {
     // note: while the server is configured with a max concurrency of 1,
     // the requests flow through the transport before that. this means
     // that these requests must be sequenced.
-    val f2 = f1.flatMap { _ =>
+    val f2 = f1.flatMap  _ =>
       client2(req2)
-    }
 
     val res = await(f1)
 
@@ -173,9 +166,8 @@ class StreamingTest extends FunSuite with Eventually {
     val res2 = await(f2)
     await(Reader.readAll(res2.reader))
     Closable.all(server, client1, client2).close()
-  }
 
-  test("server: response stream fails write") {
+  test("server: response stream fails write")
     val buf = Buf.Utf8(".")
     val n = new AtomicInteger(0)
     val setFail = new AtomicBoolean(false)
@@ -185,8 +177,8 @@ class StreamingTest extends FunSuite with Eventually {
     val writep = new Promise[Unit]
     (fail before writeLots(writer, buf)) proxyTo writep
 
-    val service = new Service[Request, Response] {
-      def apply(req: Request) = n.getAndIncrement() match {
+    val service = new Service[Request, Response]
+      def apply(req: Request) = n.getAndIncrement() match
         case 0 =>
           writep ensure req.reader.read(1).unit proxyTo readp
           Future.value(ok(writer))
@@ -194,16 +186,13 @@ class StreamingTest extends FunSuite with Eventually {
           val writer = Reader.writable()
           fail ensure (writer.write(buf) ensure writer.close())
           Future.value(ok(writer))
-      }
-    }
 
     val server = startServer(service,
                              transport =>
-                               {
                                  if (!setFail.getAndSet(true))
                                    fail ensure transport.close()
                                  transport
-                             })
+                             )
     val client1 = connect(server.boundAddress, identity, "client1")
     val client2 = connect(server.boundAddress, identity, "client2")
 
@@ -213,9 +202,8 @@ class StreamingTest extends FunSuite with Eventually {
     // note: while the server is configured with a max concurrency of 1,
     // the requests flow through the transport before that. this means
     // that these requests must be sequenced.
-    val f2 = f1.flatMap { _ =>
+    val f2 = f1.flatMap  _ =>
       client2(req2)
-    }
 
     val res = await(f1)
 
@@ -230,15 +218,14 @@ class StreamingTest extends FunSuite with Eventually {
     val res2 = await(f2)
     await(Reader.readAll(res2.reader))
     Closable.all(server, client1, client2).close()
-  }
 
-  test("server: fail response writer") {
+  test("server: fail response writer")
     val buf = Buf.Utf8(".")
     val n = new AtomicInteger(0)
     val fail = new Promise[Unit]
 
-    val service = new Service[Request, Response] {
-      def apply(req: Request) = n.getAndIncrement() match {
+    val service = new Service[Request, Response]
+      def apply(req: Request) = n.getAndIncrement() match
         case 0 =>
           val writer = Reader.writable()
           fail ensure writer.fail(new Exception)
@@ -247,8 +234,6 @@ class StreamingTest extends FunSuite with Eventually {
           val writer = Reader.writable()
           fail ensure (writer.write(buf) ensure writer.close())
           Future.value(ok(writer))
-      }
-    }
 
     val server = startServer(service, identity)
     val client1 = connect(server.boundAddress, identity, "client1")
@@ -257,9 +242,8 @@ class StreamingTest extends FunSuite with Eventually {
     val req1 = get("/")
     val req2 = get("abc")
     val f1 = client1(req1)
-    val f2 = f1.flatMap { _ =>
+    val f2 = f1.flatMap  _ =>
       client2(req2)
-    }
 
     val res = await(f1)
 
@@ -270,15 +254,14 @@ class StreamingTest extends FunSuite with Eventually {
     val res2 = await(f2)
     await(Reader.readAll(res2.reader))
     Closable.all(server, client1, client2).close()
-  }
 
-  test("server: fail request reader") {
+  test("server: fail request reader")
     val buf = Buf.Utf8(".")
     val n = new AtomicInteger(0)
     val fail = new Promise[Unit]
 
-    val service = new Service[Request, Response] {
-      def apply(req: Request) = n.getAndIncrement() match {
+    val service = new Service[Request, Response]
+      def apply(req: Request) = n.getAndIncrement() match
         case 0 =>
           fail ensure req.reader.discard()
           val writer = Reader.writable()
@@ -288,8 +271,6 @@ class StreamingTest extends FunSuite with Eventually {
           val writer = Reader.writable()
           fail ensure (writer.write(buf) ensure writer.close())
           Future.value(ok(writer))
-      }
-    }
 
     val server = startServer(service, identity)
     val client1 = connect(server.boundAddress, identity, "client1")
@@ -298,9 +279,8 @@ class StreamingTest extends FunSuite with Eventually {
     val req1 = get("/")
     val req2 = get("abc")
     val f1 = client1(req1)
-    val f2 = f1.flatMap { _ =>
+    val f2 = f1.flatMap  _ =>
       client2(req2)
-    }
 
     val res = await(f1)
 
@@ -311,26 +291,21 @@ class StreamingTest extends FunSuite with Eventually {
     val res2 = await(f2)
     await(Reader.readAll(res2.reader))
     Closable.all(server, client1, client2).close()
-  }
-}
 
-object StreamingTest {
+object StreamingTest
 
-  val echo = new Service[Request, Response] {
+  val echo = new Service[Request, Response]
     def apply(req: Request) = Future.value(ok(req.reader))
-  }
 
-  def get(uri: String) = {
+  def get(uri: String) =
     val req = Request(uri)
     req.setChunked(true)
     req
-  }
 
-  def ok(readerIn: Reader) = {
+  def ok(readerIn: Reader) =
     val res = Response(Version.Http11, Status.Ok, readerIn)
     res.headers.set("Connection", "close")
     res
-  }
 
   type Modifier = Transport[Any, Any] => Transport[Any, Any]
 
@@ -353,10 +328,10 @@ object StreamingTest {
       .build()
 
   class Custom(cmod: Modifier, smod: Modifier)
-      extends CodecFactory[Request, Response] {
+      extends CodecFactory[Request, Response]
 
     def customize(codec: Codec[Request, Response]) =
-      new Codec[Request, Response] {
+      new Codec[Request, Response]
         val pipelineFactory = codec.pipelineFactory
         override def prepareServiceFactory(
             sf: ServiceFactory[Request, Response]) =
@@ -376,10 +351,7 @@ object StreamingTest {
             transport: Transport[Any, Any],
             service: Service[Request, Response]
         ) = codec.newServerDispatcher(smod(transport), service)
-      }
 
     val factory = Http().streaming(true)
     val client: Client = config => customize(factory.client(config))
     val server: Server = config => customize(factory.server(config))
-  }
-}

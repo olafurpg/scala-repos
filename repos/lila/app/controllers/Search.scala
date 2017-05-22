@@ -7,37 +7,33 @@ import lila.game.{Game => GameModel, GameRepo}
 import play.api.http.ContentTypes
 import views._
 
-object Search extends LilaController {
+object Search extends LilaController
 
   private def paginator = Env.game.paginator
   private def env = Env.gameSearch
   def searchForm = env.forms.search
 
-  def index(page: Int) = OpenBody { implicit ctx =>
-    NoBot {
-      Reasonable(page, 100) {
+  def index(page: Int) = OpenBody  implicit ctx =>
+    NoBot
+      Reasonable(page, 100)
         implicit def req = ctx.body
         searchForm.bindFromRequest.fold(
             failure => Ok(html.search.index(failure)).fuccess,
             data =>
-              data.nonEmptyQuery ?? { query =>
+              data.nonEmptyQuery ??  query =>
                 env.paginator(query, page) map (_.some)
-              } map { pager =>
+              map  pager =>
                 Ok(html.search.index(searchForm fill data, pager))
-            }
         )
-      }
-    }
-  }
 
-  def export = OpenBody { implicit ctx =>
-    NoBot {
+  def export = OpenBody  implicit ctx =>
+    NoBot
       implicit def req = ctx.body
       searchForm.bindFromRequest.fold(
           failure => Ok(html.search.index(failure)).fuccess,
           data =>
-            data.nonEmptyQuery ?? { query =>
-              env.api.ids(query, 5000) map {
+            data.nonEmptyQuery ??  query =>
+              env.api.ids(query, 5000) map
                 ids =>
                   import org.joda.time.DateTime
                   import org.joda.time.format.DateTimeFormat
@@ -48,13 +44,8 @@ object Search extends LilaController {
                                  CONTENT_DISPOSITION ->
                                  ("attachment; filename=" +
                                      s"lichess_search_$date.pgn"))
-              }
-          }
       )
-    }
-  }
 
   private def NoBot(res: => Fu[play.api.mvc.Result])(implicit ctx: Context) =
     if (HTTPRequest.isBot(ctx.req)) notFound
     else res
-}

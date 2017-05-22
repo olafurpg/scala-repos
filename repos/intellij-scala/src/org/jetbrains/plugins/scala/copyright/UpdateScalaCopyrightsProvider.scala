@@ -12,29 +12,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 /**
   * @author Alexander Podkhalyuzin
   */
-class UpdateScalaCopyrightsProvider extends UpdateCopyrightsProvider {
+class UpdateScalaCopyrightsProvider extends UpdateCopyrightsProvider
   def createInstance(project: Project,
                      module: Module,
                      file: VirtualFile,
                      base: FileType,
-                     options: CopyrightProfile): UpdateCopyright = {
-    new UpdateJavaFileCopyright(project, module, file, options) {
+                     options: CopyrightProfile): UpdateCopyright =
+    new UpdateJavaFileCopyright(project, module, file, options)
       override def accept: Boolean = getFile.isInstanceOf[ScalaFile]
 
-      override def getPackageStatement: PsiElement = {
+      override def getPackageStatement: PsiElement =
         val file = getFile.asInstanceOf[ScalaFile]
         if (file.isScriptFile()) return file.getFirstChild
         val packs = file.packagings
         if (packs.isEmpty) return null
         packs.head
-      }
 
-      override def getImportsList: Array[PsiElement] = {
+      override def getImportsList: Array[PsiElement] =
         val file = getFile.asInstanceOf[ScalaFile]
 
         val arr: Array[PsiElement] = file.importStatementsInHeader.toArray
         if (arr.length == 0) null else arr
-      }
-    }
-  }
-}

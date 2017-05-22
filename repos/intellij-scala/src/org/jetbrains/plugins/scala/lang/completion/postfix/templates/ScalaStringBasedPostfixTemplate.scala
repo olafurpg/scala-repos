@@ -10,6 +10,5 @@ abstract class ScalaStringBasedPostfixTemplate(
     val name: String,
     val example: String,
     val selector: PostfixTemplateExpressionSelectorBase)
-    extends StringBasedPostfixTemplate(name, example, selector) {
+    extends StringBasedPostfixTemplate(name, example, selector)
   override def shouldRemoveParent = false
-}

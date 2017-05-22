@@ -6,6 +6,5 @@ package lang.rearranger
   * Date: 31.07.13
   */
 class ScalaPropertyInfo(val getter: ScalaArrangementEntry,
-                        val setter: ScalaArrangementEntry) {
+                        val setter: ScalaArrangementEntry)
   def isComplete = getter != null && setter != null
-}

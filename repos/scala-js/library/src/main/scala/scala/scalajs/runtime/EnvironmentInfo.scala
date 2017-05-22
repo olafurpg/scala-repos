@@ -23,7 +23,7 @@ import StackTrace.JSStackTraceElem
   *  @groupprio envInfo 1
   */
 @js.native
-trait EnvironmentInfo extends js.Object {
+trait EnvironmentInfo extends js.Object
 
   /** The global JavaScript scope (corresponds to js.Dynamic.global)
     *
@@ -58,4 +58,3 @@ trait EnvironmentInfo extends js.Object {
     *  @group envInfo
     */
   def javaSystemProperties: js.UndefOr[js.Dictionary[String]]
-}

@@ -155,10 +155,9 @@ case class RefactorFailure(
 )
     extends RpcResponse
 
-trait RefactorProcedure {
+trait RefactorProcedure
   def procedureId: Int
   def refactorType: RefactorType
-}
 
 case class RefactorEffect(
     procedureId: Int,
@@ -206,9 +205,8 @@ case class OrganiseImportsRefactorDesc(file: File)
 case class AddImportRefactorDesc(qualifiedName: String, file: File)
     extends RefactorDesc(RefactorType.AddImport)
 
-sealed trait PatchOp {
+sealed trait PatchOp
   def start: Int
-}
 
 case class PatchInsert(
     start: Int,
@@ -229,12 +227,11 @@ case class PatchReplace(
 )
     extends PatchOp
 
-sealed trait EntityInfo extends RpcResponse {
+sealed trait EntityInfo extends RpcResponse
   def name: String
   def members: Iterable[EntityInfo]
-}
 
-object SourceSymbol {
+object SourceSymbol
   val allSymbols: List[SourceSymbol] = List(
       ObjectSymbol,
       ClassSymbol,
@@ -254,7 +251,6 @@ object SourceSymbol {
       ImplicitParamsSymbol,
       DeprecatedSymbol
   )
-}
 
 sealed trait SourceSymbol
 
@@ -292,17 +288,15 @@ case class PackageInfo(
     // n.b. members should be sorted by name for consistency
     members: Seq[EntityInfo]
 )
-    extends EntityInfo {
+    extends EntityInfo
   require(
       members == members.sortBy(_.name), "members should be sorted by name")
-}
 
-sealed trait SymbolSearchResult extends RpcResponse {
+sealed trait SymbolSearchResult extends RpcResponse
   def name: String
   def localName: String
   def declAs: DeclaredAs
   def pos: Option[SourcePosition]
-}
 
 case class TypeSearchResult(
     name: String,
@@ -346,9 +340,8 @@ case class SymbolInfo(
     `type`: TypeInfo,
     isCallable: Boolean
 )
-    extends RpcResponse {
+    extends RpcResponse
   def tpe = `type`
-}
 
 case class Op(
     op: String,
@@ -391,49 +384,43 @@ case class BreakpointList(active: List[Breakpoint], pending: List[Breakpoint])
 
 case class OffsetRange(from: Int, to: Int)
 
-object OffsetRange extends ((Int, Int) => OffsetRange) {
+object OffsetRange extends ((Int, Int) => OffsetRange)
   def apply(fromTo: Int): OffsetRange = new OffsetRange(fromTo, fromTo)
-}
 
 /**
   * A debugger thread id.
   */
 case class DebugThreadId(id: Long)
 
-object DebugThreadId {
+object DebugThreadId
 
   /**
     * Create a ThreadId from a String representation
     * @param s A Long encoded as a string
     * @return A ThreadId
     */
-  def apply(s: String): DebugThreadId = {
+  def apply(s: String): DebugThreadId =
     new DebugThreadId(s.toLong)
-  }
-}
 
 case class DebugObjectId(id: Long)
 
-object DebugObjectId {
+object DebugObjectId
 
   /**
     * Create a DebugObjectId from a String representation
     * @param s A Long encoded as a string
     * @return A DebugObjectId
     */
-  def apply(s: String): DebugObjectId = {
+  def apply(s: String): DebugObjectId =
     new DebugObjectId(s.toLong)
-  }
-}
 
 sealed trait DebugLocation extends RpcResponse
 
 case class DebugObjectReference(objectId: DebugObjectId) extends DebugLocation
 
-object DebugObjectReference {
+object DebugObjectReference
   def apply(objId: Long): DebugObjectReference =
     new DebugObjectReference(DebugObjectId(objId))
-}
 
 case class DebugStackSlot(threadId: DebugThreadId, frame: Int, offset: Int)
     extends DebugLocation
@@ -444,9 +431,8 @@ case class DebugArrayElement(objectId: DebugObjectId, index: Int)
 case class DebugObjectField(objectId: DebugObjectId, field: String)
     extends DebugLocation
 
-sealed trait DebugValue extends RpcResponse {
+sealed trait DebugValue extends RpcResponse
   def typeName: String
-}
 
 case class DebugNullValue(
     typeName: String
@@ -524,12 +510,11 @@ case class NamedTypeMemberInfo(
     signatureString: Option[String],
     declAs: DeclaredAs
 )
-    extends EntityInfo {
+    extends EntityInfo
   override def members = List.empty
   def tpe = `type`
-}
 
-sealed trait TypeInfo extends EntityInfo {
+sealed trait TypeInfo extends EntityInfo
   def name: String
   def declAs: DeclaredAs
   def fullName: String
@@ -539,7 +524,6 @@ sealed trait TypeInfo extends EntityInfo {
 
   final def declaredAs = declAs
   final def args = typeArgs
-}
 
 case class BasicTypeInfo(
     name: String,
@@ -556,13 +540,12 @@ case class ArrowTypeInfo(
     resultType: TypeInfo,
     paramSections: Iterable[ParamSectionInfo]
 )
-    extends TypeInfo {
+    extends TypeInfo
   def declAs = DeclaredAs.Nil
   def fullName = name
   def typeArgs = List.empty
   def members = List.empty
   def pos = None
-}
 
 case class ParamSectionInfo(
     params: Iterable[(String, TypeInfo)],
@@ -573,18 +556,16 @@ case class InterfaceInfo(
     `type`: TypeInfo,
     viaView: Option[String]
 )
-    extends RpcResponse {
+    extends RpcResponse
   def tpe = `type`
-}
 
 case class TypeInspectInfo(
     `type`: TypeInfo,
     interfaces: Iterable[InterfaceInfo],
     infoType: scala.Symbol = 'typeInspect // redundant field in protocol
 )
-    extends RpcResponse {
+    extends RpcResponse
   def supers = interfaces
-}
 
 /** ERangePosition is a mirror of scala compiler internal RangePosition as a case class to */
 case class ERangePosition(file: String, offset: Int, start: Int, end: Int)

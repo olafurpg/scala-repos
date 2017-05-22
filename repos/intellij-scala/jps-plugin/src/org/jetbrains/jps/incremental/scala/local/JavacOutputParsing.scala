@@ -10,7 +10,7 @@ import xsbti.{F0, Logger}
 /**
   * @author Pavel Fatin
   */
-trait JavacOutputParsing extends Logger {
+trait JavacOutputParsing extends Logger
   private case class Header(file: File, line: Long, kind: Kind)
 
   private var header: Option[Header] = None
@@ -18,17 +18,15 @@ trait JavacOutputParsing extends Logger {
 
   protected def client: Client
 
-  abstract override def error(msg: F0[String]) {
+  abstract override def error(msg: F0[String])
     process(msg(), Kind.ERROR)
-  }
 
-  abstract override def warn(msg: F0[String]) {
+  abstract override def warn(msg: F0[String])
     process(msg(), Kind.PROGRESS)
-  }
 
   // Move Javac output parsing to SBT compiler
-  private def process(line: String, kind: Kind) {
-    line match {
+  private def process(line: String, kind: Kind)
+    line match
       case HeaderPattern(path, row, modifier, message) =>
         header = Some(
             Header(new File(path),
@@ -49,18 +47,13 @@ trait JavacOutputParsing extends Logger {
       case TotalsPattern() =>
       // do nothing
       case _ =>
-        if (header.isDefined) {
+        if (header.isDefined)
           lines :+= line
-        } else {
+        else
           client.message(kind, line)
-        }
-    }
-  }
-}
 
-object JavacOutputParsing {
+object JavacOutputParsing
   val HeaderPattern = "(.*?):(\\d+):( warning:)?(.*)".r
   val PointerPattern = "(\\s*)\\^".r
   val NotePattern = "Note: (.*)".r
   val TotalsPattern = "\\d+ (errors?|warnings?)".r
-}

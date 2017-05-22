@@ -3,9 +3,9 @@ import Keys._
 import complete.DefaultParsers._
 import Util._
 
-object Benchmark {
+object Benchmark
   // http://www.scala-sbt.org/0.13/docs/Input-Tasks.html
-  def benchTask(benchClass: String, config: Traversable[Int]) = Def.inputTask {
+  def benchTask(benchClass: String, config: Traversable[Int]) = Def.inputTask
     val args: Seq[String] = spaceDelimited("<arg>").parsed
     val wrappedProjectCP = (dependencyClasspath in Runtime).value
     val projectCP = wrappedProjectCP
@@ -15,7 +15,7 @@ object Benchmark {
       projectCP // TODO: segregate compiler jars from the rest of dependencies
     val libraryCP = projectCP
 
-    for (len <- config) {
+    for (len <- config)
       val jdkOptions =
         if (javaVersion.startsWith("1.8")) Seq("-XX:+UseParallelGC")
         else Seq("-XX:MaxPermSize=512M", "-XX:+UseParallelGC")
@@ -32,8 +32,6 @@ object Benchmark {
                                            benchClass,
                                            "10")
       shellCommand.!
-    }
-  }
 
   lazy val listInt = inputKey[Unit]("")
   lazy val vectorKryo = inputKey[Unit]("")
@@ -123,4 +121,3 @@ object Benchmark {
         graphKryo :=
           benchTask("WikiGraphKryoBench", 5000 to 14000 by 1000).evaluated
     )
-}

@@ -26,20 +26,18 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization._
   A fall back ordered bufferable to look for the user to have an implicit in scope to satisfy the missing
   type. This is for the case where its an opaque class to our macros where we can't figure out the fields
  */
-object ImplicitOrderedBuf {
+object ImplicitOrderedBuf
   val macroMarker = "MACROASKEDORDEREDSER"
 
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     import c.universe._
 
-    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
       case tpe if !tpe.toString.contains(macroMarker) =>
         ImplicitOrderedBuf(c)(tpe)
-    }
     pf
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -52,7 +50,7 @@ object ImplicitOrderedBuf {
       type $typeAlias = $outerType
       implicitly[_root_.com.twitter.scalding.serialization.OrderedSerialization[$typeAlias]]"""
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -86,6 +84,3 @@ object ImplicitOrderedBuf {
         q"$variableName.compare($elementA, $elementB)"
       override val lazyOuterVariables = Map(
           variableNameStr -> implicitInstanciator)
-    }
-  }
-}

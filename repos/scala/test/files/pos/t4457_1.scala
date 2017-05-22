@@ -1,4 +1,4 @@
-object ImplicitConvAmbiguity2 {
+object ImplicitConvAmbiguity2
 
   class N[T]
   class NE[T] extends N[T]
@@ -18,11 +18,8 @@ object ImplicitConvAmbiguity2 {
 
   def bFunc[T](e1: N[T]) = {}
 
-  def typeMe1 {
+  def typeMe1
     val x = aFunc(4F)
     bFunc(x)
-  }
-  def typeMe2 {
+  def typeMe2
     bFunc(aFunc(4F))
-  }
-}

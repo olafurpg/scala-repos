@@ -9,23 +9,18 @@ import scala.concurrent.duration.Duration
   *  resulting in a speedy OutOfMemoryError. Now, each array should be freed soon
   *  after it is created and the test should complete without problems.
   */
-object Test {
-  def main(args: Array[String]) {
-    def loop(i: Int, arraySize: Int): Future[Unit] = {
+object Test
+  def main(args: Array[String])
+    def loop(i: Int, arraySize: Int): Future[Unit] =
       val array = new Array[Byte](arraySize)
-      Future.successful(i).flatMap { i =>
-        if (i == 0) {
+      Future.successful(i).flatMap  i =>
+        if (i == 0)
           Future.successful(())
-        } else {
+        else
           array.size // Force closure to refer to array
           loop(i - 1, arraySize)
-        }
-      }
-    }
 
     val arraySize = 1000000
     val tooManyArrays =
       (Runtime.getRuntime().totalMemory() / arraySize).toInt + 1
     Await.ready(loop(tooManyArrays, arraySize), Duration.Inf)
-  }
-}

@@ -3,7 +3,7 @@ package slick.sql
 import slick.basic.Capability
 
 /** Capabilities for [[slick.profile.SqlProfile]]. */
-object SqlCapabilities {
+object SqlCapabilities
 
   /** Supports sequences (real or emulated) */
   val sequence = Capability("sql.sequence")
@@ -34,4 +34,3 @@ object SqlCapabilities {
                 sequenceLimited,
                 sequenceMax,
                 sequenceMin)
-}

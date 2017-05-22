@@ -1,15 +1,12 @@
-object Test {
+object Test
   def main(args: Array[String]): Unit = Foo.foo()
-}
 
-trait CommonTrait {
+trait CommonTrait
   def foo(): String = null
-}
 
 class Foo
 
-object Foo {
+object Foo
   def goo() = new Foo() with CommonTrait
 
   def foo(): String = null
-}

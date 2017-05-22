@@ -36,7 +36,7 @@ import scala.collection.mutable.ListBuffer
   *  @author  Martin Odersky
   *  @version 2.1, 15/02/2011
   */
-trait App extends DelayedInit {
+trait App extends DelayedInit
 
   /** The time when the execution of this program started, in milliseconds since 1
     * January 1970 UTC. */
@@ -60,9 +60,8 @@ trait App extends DelayedInit {
     *  @param body the initialization code to be stored for later execution
     */
   @deprecated("The delayedInit mechanism will disappear.", "2.11.0")
-  override def delayedInit(body: => Unit) {
+  override def delayedInit(body: => Unit)
     initCode += (() => body)
-  }
 
   /** The main method.
     *  This stores all arguments so that they can be retrieved with `args`
@@ -71,12 +70,9 @@ trait App extends DelayedInit {
     *  @param args the arguments passed to the main method
     */
   @deprecatedOverriding("main should not be overridden", "2.11.0")
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) =
     this._args = args
     for (proc <- initCode) proc()
-    if (util.Properties.propIsSet("scala.time")) {
+    if (util.Properties.propIsSet("scala.time"))
       val total = currentTime - executionStart
       Console.println("[total " + total + "ms]")
-    }
-  }
-}

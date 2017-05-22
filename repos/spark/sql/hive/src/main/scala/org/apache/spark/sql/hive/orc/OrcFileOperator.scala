@@ -28,7 +28,7 @@ import org.apache.spark.sql.AnalysisException
 import org.apache.spark.sql.hive.HiveMetastoreTypes
 import org.apache.spark.sql.types.StructType
 
-private[orc] object OrcFileOperator extends Logging {
+private[orc] object OrcFileOperator extends Logging
 
   /**
     * Retrieves a ORC file reader from a given path.  The path can point to either a directory or a
@@ -49,9 +49,9 @@ private[orc] object OrcFileOperator extends Logging {
     * @todo Needs to consider all files when schema evolution is taken into account.
     */
   def getFileReader(basePath: String,
-                    config: Option[Configuration] = None): Option[Reader] = {
-    def isWithNonEmptySchema(path: Path, reader: Reader): Boolean = {
-      reader.getObjectInspector match {
+                    config: Option[Configuration] = None): Option[Reader] =
+    def isWithNonEmptySchema(path: Path, reader: Reader): Boolean =
+      reader.getObjectInspector match
         case oi: StructObjectInspector
             if oi.getAllStructFieldRefs.size() == 0 =>
           logInfo(
@@ -59,44 +59,36 @@ private[orc] object OrcFileOperator extends Logging {
               "Trying to read another ORC file to figure out the schema.")
           false
         case _ => true
-      }
-    }
 
     val conf = config.getOrElse(new Configuration)
-    val fs = {
+    val fs =
       val hdfsPath = new Path(basePath)
       hdfsPath.getFileSystem(conf)
-    }
 
-    listOrcFiles(basePath, conf).iterator.map { path =>
+    listOrcFiles(basePath, conf).iterator.map  path =>
       path -> OrcFile.createReader(fs, path)
-    }.collectFirst {
+    .collectFirst
       case (path, reader) if isWithNonEmptySchema(path, reader) => reader
-    }
-  }
 
   def readSchema(
-      paths: Seq[String], conf: Option[Configuration]): Option[StructType] = {
+      paths: Seq[String], conf: Option[Configuration]): Option[StructType] =
     // Take the first file where we can open a valid reader if we can find one.  Otherwise just
     // return None to indicate we can't infer the schema.
-    paths.flatMap(getFileReader(_, conf)).headOption.map { reader =>
+    paths.flatMap(getFileReader(_, conf)).headOption.map  reader =>
       val readerInspector =
         reader.getObjectInspector.asInstanceOf[StructObjectInspector]
       val schema = readerInspector.getTypeName
       logDebug(
           s"Reading schema from file $paths, got Hive schema string: $schema")
       HiveMetastoreTypes.toDataType(schema).asInstanceOf[StructType]
-    }
-  }
 
   def getObjectInspector(
       path: String,
-      conf: Option[Configuration]): Option[StructObjectInspector] = {
+      conf: Option[Configuration]): Option[StructObjectInspector] =
     getFileReader(path, conf).map(
         _.getObjectInspector.asInstanceOf[StructObjectInspector])
-  }
 
-  def listOrcFiles(pathStr: String, conf: Configuration): Seq[Path] = {
+  def listOrcFiles(pathStr: String, conf: Configuration): Seq[Path] =
     // TODO: Check if the paths coming in are already qualified and simplify.
     val origPath = new Path(pathStr)
     val fs = origPath.getFileSystem(conf)
@@ -108,5 +100,3 @@ private[orc] object OrcFileOperator extends Logging {
       .filterNot(_.getName.startsWith("_"))
       .filterNot(_.getName.startsWith("."))
     paths
-  }
-}

@@ -5,150 +5,113 @@
 //############################################################################
 // Calibration
 
-class Calibrator {
+class Calibrator
   def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-}
 
 //############################################################################
 // Tail calls in different contexts
 
-class Class {
+class Class
   def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-}
 
-class SubClass extends Class {
+class SubClass extends Class
   override def f(n: Int, v: Int): Int = v;
-}
 
-sealed class Sealed {
+sealed class Sealed
   def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-}
 
-class SubSealed extends Sealed {
+class SubSealed extends Sealed
   override def f(n: Int, v: Int): Int = v;
-}
 
-final class Final {
+final class Final
   def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-}
 
-object Object {
+object Object
   def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-}
 
 //############################################################################
 // Tail calls in nested objects/classes
 
-object O {
+object O
   final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-  object O {
+  object O
     final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-    object O {
+    object O
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
-    class C {
+    class C
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
     val c: C = new C;
-  }
-  class C {
+  class C
     final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-    object O {
+    object O
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
-    class C {
+    class C
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
     val c: C = new C;
-  }
   val c: C = new C;
-}
 
-class C {
+class C
   final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-  object O {
+  object O
     final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-    object O {
+    object O
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
-    class C {
+    class C
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
     val c: C = new C;
-  }
-  class C {
+  class C
     final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-    object O {
+    object O
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
-    class C {
+    class C
       final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      object O {
+      object O
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
-      class C {
+      class C
         final def f(n: Int, v: Int): Int = if (n == 0) v else f(n - 1, v - 1);
-      }
       val c: C = new C;
-    }
     val c: C = new C;
-  }
   val c: C = new C;
-}
 
 //############################################################################
 // Tail calls with different signatures
 
-class TailCall[S](s: S) {
+class TailCall[S](s: S)
   def getS: S = s;
 
   final def f1(n: Int, v: Int): Int =
@@ -158,21 +121,18 @@ class TailCall[S](s: S) {
   final def f3[T](n: Int, v: Int, ls: List[T]): Int =
     if (n == 0) v else f3(n - 1, v - 1, ls);
 
-  final def g1(x: Int, y: Int): Int = {
+  final def g1(x: Int, y: Int): Int =
     def aux(n: Int, v: Int): Int =
       if (n == 0) v else aux(n - 1, v - 1);
     aux(x, y);
-  }
-  final def g2[T](x: Int, y: Int): Int = {
+  final def g2[T](x: Int, y: Int): Int =
     def aux[U](n: Int, v: Int): Int =
       if (n == 0) v else aux[U](n - 1, v - 1);
     aux[T](x, y);
-  }
-  final def g3[T](x: Int, y: Int, zs: List[T]): Int = {
+  final def g3[T](x: Int, y: Int, zs: List[T]): Int =
     def aux[U](n: Int, v: Int, ls: List[Tuple2[T, U]]): Int =
       if (n == 0) v else aux(n - 1, v - 1, ls);
     aux(x, y, Nil);
-  }
 
   final def b1(x: Int): Boolean =
     (x == 1) || b1(x - 1)
@@ -185,149 +145,120 @@ class TailCall[S](s: S) {
   // !!! test return in non-tail-call position
   // !!! test non-same-instance calls
   // !!! test non-same-type calls
-}
 
-object FancyTailCalls {
+object FancyTailCalls
   val f1 = new FancyTailCalls
   val f2 = new FancyTailCalls
-}
 
-object PolyObject extends App {
+object PolyObject extends App
   def tramp[A](x: Int): Int =
     if (x > 0) tramp[A](x - 1)
     else 0
-}
 
-class FancyTailCalls {
+class FancyTailCalls
 
-  def tcTryLocal(x: Int, v: Int): Int = {
-    try {
-      def loop(n: Int): Int = {
+  def tcTryLocal(x: Int, v: Int): Int =
+    try
+      def loop(n: Int): Int =
         if (n == 0) v else loop(n - 1)
-      }
       loop(x)
-    } finally {}
-  }
+    finally {}
 
-  def tcInBooleanExprFirstOp(x: Int, v: Int): Boolean = {
-    {
+  def tcInBooleanExprFirstOp(x: Int, v: Int): Boolean =
       def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
       loop(x)
-    } == v && true
-  }
-  def tcInBooleanExprSecondOp(x: Int, v: Int): Boolean = {
-    true && {
+    == v && true
+  def tcInBooleanExprSecondOp(x: Int, v: Int): Boolean =
+    true &&
       def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
       loop(x)
-    } == v
-  }
-  def tcInIfCond(x: Int, v: Int): Boolean = {
-    if ({
+    == v
+  def tcInIfCond(x: Int, v: Int): Boolean =
+    if (
       def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
       loop(x)
-    } == v) true else false
-  }
+    == v) true else false
   def tcInPatternGuard(x: Int, v: Int): Boolean =
-    v match {
-      case _ if {
+    v match
+      case _ if
             def loop(n: Int): Int = if (n == 0) v else loop(n - 1)
             loop(x) == v
-          } =>
+          =>
         true
-    }
 
   import FancyTailCalls._
-  final def differentInstance(n: Int, v: Int): Int = {
+  final def differentInstance(n: Int, v: Int): Int =
     if (n == 0) v
     else if ((n % 2) == 0) f1.differentInstance(n - 1, v)
     else f2.differentInstance(n - 1, v)
-  }
-}
 
-class NonTailCall {
+class NonTailCall
   final def f1(n: Int): Int =
-    try {
+    try
       if (n == 0) 0
       else f1(n - 1)
-    } finally {
+    finally
       Console.print(" " + n)
-    }
 
-  final def f2(n: Int): Int = synchronized {
+  final def f2(n: Int): Int = synchronized
     if (n == 0) 0
     else f2(n - 1)
-  }
-}
 
 //############################################################################
 // Test code
 
-object Test {
-  def check_success(name: String, closure: => Int, expected: Int) {
+object Test
+  def check_success(name: String, closure: => Int, expected: Int)
     print("test " + name)
-    try {
+    try
       val actual: Int = closure
-      if (actual == expected) {
+      if (actual == expected)
         print(" was successful")
-      } else {
+      else
         print(" failed: expected " + expected + ", found " + actual)
-      }
-    } catch {
-      case exception: Throwable => {
+    catch
+      case exception: Throwable =>
           print(" raised exception " + exception)
-        }
-    }
     println
-  }
 
-  def check_success_b(name: String, closure: => Boolean, expected: Boolean) {
+  def check_success_b(name: String, closure: => Boolean, expected: Boolean)
     print("test " + name)
-    try {
+    try
       val actual: Boolean = closure
-      if (actual == expected) {
+      if (actual == expected)
         print(" was successful")
-      } else {
+      else
         print(" failed: expected " + expected + ", found " + actual)
-      }
-    } catch {
-      case exception: Throwable => {
+    catch
+      case exception: Throwable =>
           Console.print(" raised exception " + exception);
-        }
-    }
     println
-  }
 
-  def check_overflow(name: String, closure: => Int) {
+  def check_overflow(name: String, closure: => Int)
     print("test " + name)
-    try {
+    try
       val actual: Int = closure;
-    } catch {
+    catch
       case exception: compat.Platform.StackOverflowError =>
         println(" was successful")
-      case exception: Throwable => {
+      case exception: Throwable =>
           print(" raised exception " + exception)
-        }
-    }
     println
-  }
 
-  def calibrate: Int = {
+  def calibrate: Int =
     val calibrator = new Calibrator();
     var stop = false;
     var n = 1;
-    while (!stop) {
-      try {
+    while (!stop)
+      try
         calibrator.f(n, n);
         if (n >= Int.MaxValue / 2) sys.error("calibration failure");
         n = 2 * n;
-      } catch {
+      catch
         case exception: compat.Platform.StackOverflowError => stop = true
-      }
-    }
     4 * n
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     // compute min and max iteration number
     val min = 16;
     val max =
@@ -417,7 +348,6 @@ object Test {
                   FancyTailCalls.differentInstance(max, 42),
                   42)
     check_success("PolyObject.tramp", PolyObject.tramp[Int](max), 0)
-  }
 
   // testing explicit tailcalls.
 
@@ -432,21 +362,20 @@ object Test {
   def fib(n: Int): TailRec[Int] =
     if (n < 2) done(n)
     else
-      for {
+      for
         x <- tailcall(fib(n - 1))
         y <- tailcall(fib(n - 2))
-      } yield (x + y)
+      yield (x + y)
 
   def rec(n: Int): TailRec[Int] =
     if (n == 1) done(n)
     else
-      for {
+      for
         x <- tailcall(rec(n - 1))
-      } yield x
+      yield x
 
   assert(isEven((1 to 100000).toList).result)
   //assert(fib(40).result == 102334155) // Commented out, as it takes a long time
   assert(rec(100000).result == 1)
-}
 
 //############################################################################

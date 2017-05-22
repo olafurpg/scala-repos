@@ -23,7 +23,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 
-case class Average(child: Expression) extends DeclarativeAggregate {
+case class Average(child: Expression) extends DeclarativeAggregate
 
   override def prettyName: String = "avg"
 
@@ -39,16 +39,14 @@ case class Average(child: Expression) extends DeclarativeAggregate {
   override def checkInputDataTypes(): TypeCheckResult =
     TypeUtils.checkForNumericExpr(child.dataType, "function average")
 
-  private lazy val resultType = child.dataType match {
+  private lazy val resultType = child.dataType match
     case DecimalType.Fixed(p, s) =>
       DecimalType.bounded(p + 4, s + 4)
     case _ => DoubleType
-  }
 
-  private lazy val sumDataType = child.dataType match {
+  private lazy val sumDataType = child.dataType match
     case _ @DecimalType.Fixed(p, s) => DecimalType.bounded(p + 10, s)
     case _ => DoubleType
-  }
 
   private lazy val sum = AttributeReference("sum", sumDataType)()
   private lazy val count = AttributeReference("count", LongType)()
@@ -74,12 +72,10 @@ case class Average(child: Expression) extends DeclarativeAggregate {
   )
 
   // If all input are nulls, count will be 0 and we will get null after the division.
-  override lazy val evaluateExpression = child.dataType match {
+  override lazy val evaluateExpression = child.dataType match
     case DecimalType.Fixed(p, s) =>
       // increase the precision and scale to prevent precision loss
       val dt = DecimalType.bounded(p + 14, s + 4)
       Cast(Cast(sum, dt) / Cast(count, dt), resultType)
     case _ =>
       Cast(sum, resultType) / Cast(count, resultType)
-  }
-}

@@ -11,22 +11,20 @@ import org.scalatest.Matchers
 import akka.actor.Address
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class NodeMetricsSpec extends WordSpec with Matchers {
+class NodeMetricsSpec extends WordSpec with Matchers
 
   val node1 = Address("akka.tcp", "sys", "a", 2554)
   val node2 = Address("akka.tcp", "sys", "a", 2555)
 
-  "NodeMetrics must" must {
+  "NodeMetrics must" must
 
-    "return correct result for 2 'same' nodes" in {
+    "return correct result for 2 'same' nodes" in
       (NodeMetrics(node1, 0) sameAs NodeMetrics(node1, 0)) should ===(true)
-    }
 
-    "return correct result for 2 not 'same' nodes" in {
+    "return correct result for 2 not 'same' nodes" in
       (NodeMetrics(node1, 0) sameAs NodeMetrics(node2, 0)) should ===(false)
-    }
 
-    "merge 2 NodeMetrics by most recent" in {
+    "merge 2 NodeMetrics by most recent" in
       val sample1 = NodeMetrics(node1,
                                 1,
                                 Set(Metric.create("a", 10, None),
@@ -41,9 +39,8 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       merged.metric("a").map(_.value) should ===(Some(11))
       merged.metric("b").map(_.value) should ===(Some(20))
       merged.metric("c").map(_.value) should ===(Some(30))
-    }
 
-    "not merge 2 NodeMetrics if master is more recent" in {
+    "not merge 2 NodeMetrics if master is more recent" in
       val sample1 = NodeMetrics(node1,
                                 1,
                                 Set(Metric.create("a", 10, None),
@@ -56,6 +53,3 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       val merged = sample1 merge sample2 // older and not same
       merged.timestamp should ===(sample1.timestamp)
       merged.metrics should ===(sample1.metrics)
-    }
-  }
-}

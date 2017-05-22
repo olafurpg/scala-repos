@@ -12,19 +12,14 @@ import scala.concurrent.Future
 import play.api.inject.bind
 
 //#load
-class SirdAppLoader extends ApplicationLoader {
-  def load(context: Context) = {
+class SirdAppLoader extends ApplicationLoader
+  def load(context: Context) =
     new SirdComponents(context).application
-  }
-}
 
 class SirdComponents(context: Context)
-    extends BuiltInComponentsFromContext(context) {
-  lazy val router = Router.from {
+    extends BuiltInComponentsFromContext(context)
+  lazy val router = Router.from
     case GET(p"/hello/$to") =>
-      Action {
+      Action
         Ok(s"Hello $to")
-      }
-  }
-}
 //#load

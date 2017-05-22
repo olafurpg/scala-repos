@@ -13,7 +13,7 @@ import scala.util.control.NoStackTrace
 import akka.testkit.EventFilter
 import akka.testkit.AkkaSpec
 
-class GraphUnzipWithSpec extends AkkaSpec {
+class GraphUnzipWithSpec extends AkkaSpec
 
   import GraphDSL.Implicits._
 
@@ -27,15 +27,14 @@ class GraphUnzipWithSpec extends AkkaSpec {
   type LeftOutput = Int
   type RightOutput = String
 
-  abstract class Fixture(b: GraphDSL.Builder[_]) {
+  abstract class Fixture(b: GraphDSL.Builder[_])
     def in: Inlet[Int]
     def left: Outlet[LeftOutput]
     def right: Outlet[RightOutput]
-  }
 
   val f: (Int ⇒ (Int, String)) = b ⇒ (b + b, b + "+" + b)
 
-  def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b) {
+  def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b)
     val unzip = b.add(UnzipWith[Int, Int, String](f))
 
     override def in: Inlet[Int] = unzip.in
@@ -43,15 +42,14 @@ class GraphUnzipWithSpec extends AkkaSpec {
     override def left: Outlet[Int] = unzip.out0
 
     override def right: Outlet[String] = unzip.out1
-  }
 
-  def setup(p: Publisher[Int]) = {
+  def setup(p: Publisher[Int]) =
     val leftSubscriber = TestSubscriber.probe[LeftOutput]()
     val rightSubscriber = TestSubscriber.probe[RightOutput]()
 
     RunnableGraph
       .fromGraph(
-          GraphDSL.create() { implicit b ⇒
+          GraphDSL.create()  implicit b ⇒
         val f = fixture(b)
 
         Source.fromPublisher(p) ~> f.in
@@ -59,53 +57,46 @@ class GraphUnzipWithSpec extends AkkaSpec {
         f.right ~> Sink.fromSubscriber(rightSubscriber)
 
         ClosedShape
-      })
+      )
       .run()
 
       (leftSubscriber, rightSubscriber)
-  }
 
   def validateSubscriptionAndComplete(
-      subscribers: (Probe[LeftOutput], Probe[RightOutput])): Unit = {
+      subscribers: (Probe[LeftOutput], Probe[RightOutput])): Unit =
     subscribers._1.expectSubscriptionAndComplete()
     subscribers._2.expectSubscriptionAndComplete()
-  }
 
   def validateSubscriptionAndError(
-      subscribers: (Probe[LeftOutput], Probe[RightOutput])): Unit = {
+      subscribers: (Probe[LeftOutput], Probe[RightOutput])): Unit =
     subscribers._1.expectSubscriptionAndError(TestException)
     subscribers._2.expectSubscriptionAndError(TestException)
-  }
 
-  "UnzipWith" must {
+  "UnzipWith" must
 
-    "work with immediately completed publisher" in assertAllStagesStopped {
+    "work with immediately completed publisher" in assertAllStagesStopped
       val subscribers = setup(TestPublisher.empty[Int])
       validateSubscriptionAndComplete(subscribers)
-    }
 
-    "work with delayed completed publisher" in assertAllStagesStopped {
+    "work with delayed completed publisher" in assertAllStagesStopped
       val subscribers = setup(TestPublisher.lazyEmpty)
       validateSubscriptionAndComplete(subscribers)
-    }
 
-    "work with two immediately failed publishers" in assertAllStagesStopped {
+    "work with two immediately failed publishers" in assertAllStagesStopped
       val subscribers = setup(TestPublisher.error(TestException))
       validateSubscriptionAndError(subscribers)
-    }
 
-    "work with two delayed failed publishers" in assertAllStagesStopped {
+    "work with two delayed failed publishers" in assertAllStagesStopped
       val subscribers = setup(TestPublisher.lazyError(TestException))
       validateSubscriptionAndError(subscribers)
-    }
 
-    "work in the happy case" in {
+    "work in the happy case" in
       val leftProbe = TestSubscriber.manualProbe[LeftOutput]()
       val rightProbe = TestSubscriber.manualProbe[RightOutput]()
 
       RunnableGraph
         .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+            GraphDSL.create()  implicit b ⇒
           val unzip = b.add(UnzipWith(f))
           Source(1 to 4) ~> unzip.in
 
@@ -117,7 +108,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
               OverflowStrategy.backpressure) ~> Sink.fromSubscriber(rightProbe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val leftSubscription = leftProbe.expectSubscription()
@@ -151,9 +142,8 @@ class GraphUnzipWithSpec extends AkkaSpec {
 
       leftProbe.expectComplete()
       rightProbe.expectComplete()
-    }
 
-    "work in the sad case" in {
+    "work in the sad case" in
       val settings = ActorMaterializerSettings(system).withInputBuffer(
           initialSize = 1, maxSize = 1)
 
@@ -161,7 +151,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
       val rightProbe = TestSubscriber.manualProbe[RightOutput]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val unzip =
             b.add(UnzipWith[Int, Int, String]((b: Int) ⇒ (1 / b, 1 + "/" + b)))
 
@@ -171,16 +161,15 @@ class GraphUnzipWithSpec extends AkkaSpec {
           unzip.out1 ~> Sink.fromSubscriber(rightProbe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val leftSubscription = leftProbe.expectSubscription()
       val rightSubscription = rightProbe.expectSubscription()
 
-      def requestFromBoth(): Unit = {
+      def requestFromBoth(): Unit =
         leftSubscription.request(1)
         rightSubscription.request(1)
-      }
 
       requestFromBoth()
       leftProbe.expectNext(1 / -2)
@@ -190,21 +179,18 @@ class GraphUnzipWithSpec extends AkkaSpec {
       leftProbe.expectNext(1 / -1)
       rightProbe.expectNext("1/-1")
 
-      EventFilter[ArithmeticException](occurrences = 1).intercept {
+      EventFilter[ArithmeticException](occurrences = 1).intercept
         requestFromBoth()
-      }
 
-      leftProbe.expectError() match {
+      leftProbe.expectError() match
         case a: java.lang.ArithmeticException ⇒
           a.getMessage should be("/ by zero")
-      }
       rightProbe.expectError()
 
       leftProbe.expectNoMsg(100.millis)
       rightProbe.expectNoMsg(100.millis)
-    }
 
-    "unzipWith expanded Person.unapply (3 outputs)" in {
+    "unzipWith expanded Person.unapply (3 outputs)" in
       val probe0 = TestSubscriber.manualProbe[String]()
       val probe1 = TestSubscriber.manualProbe[String]()
       val probe2 = TestSubscriber.manualProbe[Int]()
@@ -212,7 +198,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
       case class Person(name: String, surname: String, int: Int)
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val unzip = b.add(UnzipWith((a: Person) ⇒ Person.unapply(a).get))
 
           Source.single(Person("Caplin", "Capybara", 3)) ~> unzip.in
@@ -222,7 +208,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
           unzip.out2 ~> Sink.fromSubscriber(probe2)
 
           ClosedShape
-        })
+        )
         .run()
 
       val subscription0 = probe0.expectSubscription()
@@ -240,9 +226,8 @@ class GraphUnzipWithSpec extends AkkaSpec {
       probe0.expectComplete()
       probe1.expectComplete()
       probe2.expectComplete()
-    }
 
-    "work with up to 20 outputs" in {
+    "work with up to 20 outputs" in
       val probe0 = TestSubscriber.manualProbe[Int]()
       val probe5 = TestSubscriber.manualProbe[String]()
       val probe10 = TestSubscriber.manualProbe[Int]()
@@ -251,7 +236,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
 
       RunnableGraph
         .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+            GraphDSL.create()  implicit b ⇒
           val split20 = (a: (List[Int])) ⇒
             (a(0),
              a(0).toString,
@@ -309,7 +294,7 @@ class GraphUnzipWithSpec extends AkkaSpec {
           unzip.out19 ~> Sink.fromSubscriber(probe19)
 
           ClosedShape
-        })
+        )
         .run()
 
       probe0.expectSubscription().request(1)
@@ -329,6 +314,3 @@ class GraphUnzipWithSpec extends AkkaSpec {
       probe10.expectComplete()
       probe15.expectComplete()
       probe19.expectComplete()
-    }
-  }
-}

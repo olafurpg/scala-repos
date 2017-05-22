@@ -44,7 +44,7 @@ import org.apache.spark.util.Utils
   * prone to leaving multiple overlapping [[org.apache.spark.SparkContext]]s in the same JVM.
   */
 private[sql] trait SQLTestUtils
-    extends SparkFunSuite with BeforeAndAfterAll with SQLTestData { self =>
+    extends SparkFunSuite with BeforeAndAfterAll with SQLTestData  self =>
 
   protected def sparkContext = sqlContext.sparkContext
 
@@ -61,38 +61,31 @@ private[sql] trait SQLTestUtils
     * This is because we create the [[SQLContext]] immediately before the first test is run,
     * but the implicits import is needed in the constructor.
     */
-  protected object testImplicits extends SQLImplicits {
+  protected object testImplicits extends SQLImplicits
     protected override def _sqlContext: SQLContext = self.sqlContext
 
     // This must live here to preserve binary compatibility with Spark < 1.5.
-    implicit class StringToColumn(val sc: StringContext) {
-      def $(args: Any*): ColumnName = {
+    implicit class StringToColumn(val sc: StringContext)
+      def $(args: Any*): ColumnName =
         new ColumnName(sc.s(args: _*))
-      }
-    }
-  }
 
   /**
     * Materialize the test data immediately after the [[SQLContext]] is set up.
     * This is necessary if the data is accessed by name but not through direct reference.
     */
-  protected def setupTestData(): Unit = {
+  protected def setupTestData(): Unit =
     loadTestDataBeforeTests = true
-  }
 
-  protected override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit =
     super.beforeAll()
-    if (loadTestDataBeforeTests) {
+    if (loadTestDataBeforeTests)
       loadTestData()
-    }
-  }
 
   /**
     * The Hadoop configuration used by the active [[SQLContext]].
     */
-  protected def hadoopConfiguration: Configuration = {
+  protected def hadoopConfiguration: Configuration =
     sparkContext.hadoopConfiguration
-  }
 
   /**
     * Sets all SQL configurations specified in `pairs`, calls `f`, and then restore all SQL
@@ -100,18 +93,15 @@ private[sql] trait SQLTestUtils
     *
     * @todo Probably this method should be moved to a more general place
     */
-  protected def withSQLConf(pairs: (String, String)*)(f: => Unit): Unit = {
+  protected def withSQLConf(pairs: (String, String)*)(f: => Unit): Unit =
     val (keys, values) = pairs.unzip
     val currentValues =
       keys.map(key => Try(sqlContext.conf.getConfString(key)).toOption)
     (keys, values).zipped.foreach(sqlContext.conf.setConfString)
-    try f finally {
-      keys.zip(currentValues).foreach {
+    try f finally
+      keys.zip(currentValues).foreach
         case (key, Some(value)) => sqlContext.conf.setConfString(key, value)
         case (key, None) => sqlContext.conf.unsetConf(key)
-      }
-    }
-  }
 
   /**
     * Generates a temporary path without creating the actual file/directory, then pass it to `f`. If
@@ -119,11 +109,10 @@ private[sql] trait SQLTestUtils
     *
     * @todo Probably this method should be moved to a more general place
     */
-  protected def withTempPath(f: File => Unit): Unit = {
+  protected def withTempPath(f: File => Unit): Unit =
     val path = Utils.createTempDir()
     path.delete()
     try f(path) finally Utils.deleteRecursively(path)
-  }
 
   /**
     * Creates a temporary directory, which is then passed to `f` and will be deleted after `f`
@@ -131,45 +120,35 @@ private[sql] trait SQLTestUtils
     *
     * @todo Probably this method should be moved to a more general place
     */
-  protected def withTempDir(f: File => Unit): Unit = {
+  protected def withTempDir(f: File => Unit): Unit =
     val dir = Utils.createTempDir().getCanonicalFile
     try f(dir) finally Utils.deleteRecursively(dir)
-  }
 
   /**
     * Drops temporary table `tableName` after calling `f`.
     */
-  protected def withTempTable(tableNames: String*)(f: => Unit): Unit = {
-    try f finally {
+  protected def withTempTable(tableNames: String*)(f: => Unit): Unit =
+    try f finally
       // If the test failed part way, we don't want to mask the failure by failing to remove
       // temp tables that never got created.
-      try tableNames.foreach(sqlContext.dropTempTable) catch {
+      try tableNames.foreach(sqlContext.dropTempTable) catch
         case _: NoSuchTableException =>
-      }
-    }
-  }
 
   /**
     * Drops table `tableName` after calling `f`.
     */
-  protected def withTable(tableNames: String*)(f: => Unit): Unit = {
-    try f finally {
-      tableNames.foreach { name =>
+  protected def withTable(tableNames: String*)(f: => Unit): Unit =
+    try f finally
+      tableNames.foreach  name =>
         sqlContext.sql(s"DROP TABLE IF EXISTS $name")
-      }
-    }
-  }
 
   /**
     * Drops view `viewName` after calling `f`.
     */
-  protected def withView(viewNames: String*)(f: => Unit): Unit = {
-    try f finally {
-      viewNames.foreach { name =>
+  protected def withView(viewNames: String*)(f: => Unit): Unit =
+    try f finally
+      viewNames.foreach  name =>
         sqlContext.sql(s"DROP VIEW IF EXISTS $name")
-      }
-    }
-  }
 
   /**
     * Creates a temporary database and switches current database to it before executing `f`.  This
@@ -177,32 +156,29 @@ private[sql] trait SQLTestUtils
     *
     * Note that this method doesn't switch current database before executing `f`.
     */
-  protected def withTempDatabase(f: String => Unit): Unit = {
+  protected def withTempDatabase(f: String => Unit): Unit =
     val dbName = s"db_${UUID.randomUUID().toString.replace('-', '_')}"
 
-    try {
+    try
       sqlContext.sql(s"CREATE DATABASE $dbName")
-    } catch {
+    catch
       case cause: Throwable =>
         fail("Failed to create temporary database", cause)
-    }
 
     try f(dbName) finally sqlContext.sql(s"DROP DATABASE $dbName CASCADE")
-  }
 
   /**
     * Activates database `db` before executing `f`, then switches back to `default` database after
     * `f` returns.
     */
-  protected def activateDatabase(db: String)(f: => Unit): Unit = {
+  protected def activateDatabase(db: String)(f: => Unit): Unit =
     sqlContext.sql(s"USE $db")
     try f finally sqlContext.sql(s"USE default")
-  }
 
   /**
     * Strip Spark-side filtering in order to check if a datasource filters rows correctly.
     */
-  protected def stripSparkFilter(df: DataFrame): DataFrame = {
+  protected def stripSparkFilter(df: DataFrame): DataFrame =
     val schema = df.schema
     val childRDD = df.queryExecution.sparkPlan
       .asInstanceOf[org.apache.spark.sql.execution.Filter]
@@ -211,16 +187,14 @@ private[sql] trait SQLTestUtils
       .map(row => Row.fromSeq(row.copy().toSeq(schema)))
 
     sqlContext.createDataFrame(childRDD, schema)
-  }
 
   /**
     * Turn a logical plan into a [[DataFrame]]. This should be removed once we have an easier
     * way to construct [[DataFrame]] directly out of local data without relying on implicits.
     */
   protected implicit def logicalPlanToSparkQuery(
-      plan: LogicalPlan): DataFrame = {
+      plan: LogicalPlan): DataFrame =
     Dataset.newDataFrame(sqlContext, plan)
-  }
 
   /**
     * Disable stdout and stderr when running the test. To not output the logs to the console,
@@ -228,54 +202,44 @@ private[sql] trait SQLTestUtils
     * System.out or System.err. Otherwise, ConsoleAppender will still output to the console even if
     * we change System.out and System.err.
     */
-  protected def testQuietly(name: String)(f: => Unit): Unit = {
-    test(name) {
-      quietly {
+  protected def testQuietly(name: String)(f: => Unit): Unit =
+    test(name)
+      quietly
         f
-      }
-    }
-  }
-}
 
-private[sql] object SQLTestUtils {
+private[sql] object SQLTestUtils
 
   def compareAnswers(sparkAnswer: Seq[Row],
                      expectedAnswer: Seq[Row],
-                     sort: Boolean): Option[String] = {
-    def prepareAnswer(answer: Seq[Row]): Seq[Row] = {
+                     sort: Boolean): Option[String] =
+    def prepareAnswer(answer: Seq[Row]): Seq[Row] =
       // Converts data to types that we can do equality comparison using Scala collections.
       // For BigDecimal type, the Scala type has a better definition of equality test (similar to
       // Java's java.math.BigDecimal.compareTo).
       // For binary arrays, we convert it to Seq to avoid of calling java.util.Arrays.equals for
       // equality test.
       // This function is copied from Catalyst's QueryTest
-      val converted: Seq[Row] = answer.map { s =>
+      val converted: Seq[Row] = answer.map  s =>
         Row.fromSeq(
-            s.toSeq.map {
+            s.toSeq.map
           case d: java.math.BigDecimal => BigDecimal(d)
           case b: Array[Byte] => b.toSeq
           case o => o
-        })
-      }
-      if (sort) {
+        )
+      if (sort)
         converted.sortBy(_.toString())
-      } else {
+      else
         converted
-      }
-    }
-    if (prepareAnswer(expectedAnswer) != prepareAnswer(sparkAnswer)) {
+    if (prepareAnswer(expectedAnswer) != prepareAnswer(sparkAnswer))
       val errorMessage =
         s"""
            | == Results ==
-           | ${sideBySide(
+           | $sideBySide(
                s"== Expected Answer - ${expectedAnswer.size} ==" +: prepareAnswer(
                    expectedAnswer).map(_.toString()),
                s"== Actual Answer - ${sparkAnswer.size} ==" +: prepareAnswer(
-                   sparkAnswer).map(_.toString())).mkString("\n")}
+                   sparkAnswer).map(_.toString())).mkString("\n")
       """.stripMargin
       Some(errorMessage)
-    } else {
+    else
       None
-    }
-  }
-}

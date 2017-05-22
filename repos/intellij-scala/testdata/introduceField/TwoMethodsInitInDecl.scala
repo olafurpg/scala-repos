@@ -1,15 +1,12 @@
 /*initInDeclaration*/
 /*replaceAll*/
-class Test {
-  def foo() {
+class Test
+  def foo()
     1
-  }
 
-  def bar() {
+  def bar()
     /*start*/
     1 /*end*/
-  }
-}
 /*
 /*initInDeclaration*/
 /*replaceAll*/

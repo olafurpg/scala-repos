@@ -14,7 +14,7 @@ import simulacrum.typeclass
   * See: [[https://www.cs.ox.ac.uk/jeremy.gibbons/publications/iterator.pdf The Essence of the Iterator Pattern]]
   */
 @typeclass
-trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
+trait Traverse[F[_]] extends Functor[F] with Foldable[F]  self =>
 
   /**
     * Given a function which returns a G effect, thread this effect
@@ -48,4 +48,3 @@ trait Traverse[F[_]] extends Functor[F] with Foldable[F] { self =>
 
   override def map[A, B](fa: F[A])(f: A => B): F[B] =
     traverse[Id, A, B](fa)(f)
-}

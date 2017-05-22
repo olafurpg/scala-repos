@@ -1,8 +1,7 @@
 import y.geom.c.t
 
-class a {
+class a
   for (i <- t) /*caret*/ true
-}
 /*
 do
 false

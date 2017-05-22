@@ -1,10 +1,9 @@
 import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{currentMirror => cm}
 
-object Test extends App {
-  class A {
+object Test extends App
+  class A
     private[this] var x: Int = 42
-  }
 
   val a = new A
 
@@ -16,4 +15,3 @@ object Test extends App {
   println(fm.get)
   fm.set(2)
   println(fm.get)
-}

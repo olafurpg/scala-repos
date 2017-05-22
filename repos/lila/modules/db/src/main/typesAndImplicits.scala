@@ -9,7 +9,7 @@ import ornicar.scalalib.Zero
 object Types extends Types
 object Implicits extends Implicits
 
-trait Types {
+trait Types
   type Coll = reactivemongo.api.collections.bson.BSONCollection
 
   type QueryBuilder = GenericQueryBuilder[BSONSerializationPack.type]
@@ -20,9 +20,8 @@ trait Types {
 
   type BSONValueReader[A] = BSONReader[_ <: BSONValue, A]
   type BSONValueHandler[A] = BSONHandler[_ <: BSONValue, A]
-}
 
-trait Implicits extends Types {
+trait Implicits extends Types
 
   implicit val LilaBSONDocumentZero: Zero[BSONDocument] =
     Zero.instance(BSONDocument())
@@ -32,19 +31,18 @@ trait Implicits extends Types {
   def pimpQB(b: QueryBuilder) = new LilaPimpedQueryBuilder(b)
 
   // hack, this should be in reactivemongo
-  implicit final class LilaPimpedQueryBuilder(b: QueryBuilder) {
+  implicit final class LilaPimpedQueryBuilder(b: QueryBuilder)
 
     def sort(sorters: (String, api.SortOrder)*): QueryBuilder =
       if (sorters.size == 0) b
       else
-        b sort {
+        b sort
           BSONDocument(
               (for (sorter ← sorters) yield
-                sorter._1 -> BSONInteger(sorter._2 match {
+                sorter._1 -> BSONInteger(sorter._2 match
               case api.SortOrder.Ascending => 1
               case api.SortOrder.Descending => -1
-            })).toStream)
-        }
+            )).toStream)
 
     def skip(nb: Int): QueryBuilder = b.options(b.options skip nb)
 
@@ -54,12 +52,9 @@ trait Implicits extends Types {
         limit: Option[Int],
         readPreference: ReadPreference = ReadPreference.primary): Fu[List[A]] =
       limit
-        .fold(b.cursor[A](readPreference = readPreference).collect[List]()) {
+        .fold(b.cursor[A](readPreference = readPreference).collect[List]())
         l =>
           batch(l).cursor[A](readPreference = readPreference).collect[List](l)
-      }
 
     def toListFlatten[A : Tube](limit: Option[Int]): Fu[List[A]] =
       toList[Option[A]](limit) map (_.flatten)
-  }
-}

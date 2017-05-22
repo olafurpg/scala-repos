@@ -34,14 +34,13 @@ import scalafx.Includes._
 import scalafx.beans.property.{BooleanProperty, ReadOnlyIntegerProperty, ReadOnlyObjectProperty, ReadOnlyStringProperty, StringProperty, _}
 import scalafx.delegate.SFXDelegate
 
-object TextInputControl {
+object TextInputControl
   implicit def sfxTextInputControl2jfx(
       v: TextInputControl): jfxsc.TextInputControl =
     if (v != null) v.delegate else null
-}
 
 abstract class TextInputControl(override val delegate: jfxsc.TextInputControl)
-    extends Control(delegate) with SFXDelegate[jfxsc.TextInputControl] {
+    extends Control(delegate) with SFXDelegate[jfxsc.TextInputControl]
 
   /**
     * The anchor of the text selection.
@@ -57,17 +56,15 @@ abstract class TextInputControl(override val delegate: jfxsc.TextInputControl)
     * Indicates whether this TextInputControl can be edited by the user.
     */
   def editable: BooleanProperty = delegate.editableProperty
-  def editable_=(v: Boolean) {
+  def editable_=(v: Boolean)
     editable() = v
-  }
 
   /**
     * The default font to use for text in the TextInputControl.
     */
   def font: ObjectProperty[jfxst.Font] = delegate.fontProperty()
-  def font_=(v: jfxst.Font) {
+  def font_=(v: jfxst.Font)
     ObjectProperty.fillProperty[jfxst.Font](font, v)
-  }
 
   /**
     * The number of characters in the text input.
@@ -99,18 +96,16 @@ abstract class TextInputControl(override val delegate: jfxsc.TextInputControl)
     * The textual content of this TextInputControl.
     */
   def text: StringProperty = delegate.textProperty
-  def text_=(v: String) {
+  def text_=(v: String)
     text() = v
-  }
 
   /**
     * The prompt text to display in the TextInputControl, or null if no prompt text is displayed.
     * @since 2.2
     */
   def promptText: StringProperty = delegate.promptTextProperty()
-  def promptText_=(v: String) {
+  def promptText_=(v: String)
     promptText() = v
-  }
 
   /**
     * The property contains currently attached `TextFormatter`.
@@ -118,7 +113,5 @@ abstract class TextInputControl(override val delegate: jfxsc.TextInputControl)
     */
   def textFormatter: ObjectProperty[jfxsc.TextFormatter[_]] =
     delegate.textFormatterProperty()
-  def textFormatter_=(v: TextFormatter[_]): Unit = {
+  def textFormatter_=(v: TextFormatter[_]): Unit =
     ObjectProperty.fillProperty(textFormatter, v)
-  }
-}

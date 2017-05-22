@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   // illegal
   val err1 = "" match { case Seq(f @ _ *, ',') => f }
 
@@ -14,4 +14,3 @@ object Test extends App {
     case <p> { _* } </p> =>
   }
  */
-}

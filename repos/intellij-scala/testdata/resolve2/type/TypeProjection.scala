@@ -1,7 +1,5 @@
-class Outer {
+class Outer
   class Inner {}
-}
 
-object O {
+object O
   def createInner: Q.type# /* line: 2 */ Inner forSome { val Q: Outer } = null
-}

@@ -18,14 +18,12 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScAnnotationsStub
 class ScAnnotationsImpl private (
     stub: StubElement[ScAnnotations], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScAnnotations {
+    with ScAnnotations
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScAnnotationsStub) = {
+  def this(stub: ScAnnotationsStub) =
     this(stub, ScalaElementTypes.ANNOTATIONS, null)
-  }
   override def toString: String = "AnnotationsList"
 
   def getAnnotations: Array[ScAnnotation] =
     getStubOrPsiChildren(
         ScalaElementTypes.ANNOTATION, JavaArrayFactoryUtil.ScAnnotationFactory)
-}

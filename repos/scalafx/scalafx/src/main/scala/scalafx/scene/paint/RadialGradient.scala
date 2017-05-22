@@ -32,7 +32,7 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object RadialGradient {
+object RadialGradient
   implicit def sfxRadialGradient2jfx(
       rg: RadialGradient): jfxsp.RadialGradient =
     if (rg != null) rg.delegate else null
@@ -49,7 +49,7 @@ object RadialGradient {
             radius: Double,
             proportional: Boolean,
             cycleMethod: CycleMethod,
-            stops: List[Stop]): RadialGradient = {
+            stops: List[Stop]): RadialGradient =
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
@@ -61,7 +61,6 @@ object RadialGradient {
                                  proportional,
                                  cycleMethod,
                                  stopsList))
-  }
 
   /* This should work but it looks like it calls the constructor that
    * uses List instead of the one that uses variable arguments
@@ -75,7 +74,7 @@ object RadialGradient {
             radius: Double,
             proportional: Boolean,
             cycleMethod: CycleMethod,
-            stops: Stop*): RadialGradient = {
+            stops: Stop*): RadialGradient =
     val stopsList = new java.util.ArrayList[jfxsp.Stop](stops.length)
     for (stop <- stops) stopsList.add(stop)
     new RadialGradient(
@@ -87,11 +86,9 @@ object RadialGradient {
                                  proportional,
                                  cycleMethod,
                                  stopsList))
-  }
-}
 
 class RadialGradient(override val delegate: jfxsp.RadialGradient)
-    extends Paint(delegate) with SFXDelegate[jfxsp.RadialGradient] {
+    extends Paint(delegate) with SFXDelegate[jfxsp.RadialGradient]
 
   def this(focusAngle: Double,
            focusDistance: Double,
@@ -150,4 +147,3 @@ class RadialGradient(override val delegate: jfxsp.RadialGradient)
     * A sequence of 2 or more Stop values specifying how to distribute the colors along the gradient.
     */
   def stops = delegate.getStops
-}

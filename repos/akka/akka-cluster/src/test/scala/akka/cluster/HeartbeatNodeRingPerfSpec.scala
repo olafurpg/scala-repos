@@ -8,7 +8,7 @@ import org.scalatest.Matchers
 import akka.actor.Address
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers {
+class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers
 
   val nodesSize = sys.props
     .get("akka.cluster.HeartbeatNodeRingPerfSpec.nodesSize")
@@ -19,12 +19,11 @@ class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers {
     .getOrElse("10000")
     .toInt
 
-  def createHeartbeatNodeRingOfSize(size: Int): HeartbeatNodeRing = {
+  def createHeartbeatNodeRingOfSize(size: Int): HeartbeatNodeRing =
     val nodes = (1 to size).map(
         n ⇒ UniqueAddress(Address("akka.tcp", "sys", "node-" + n, 2552), n))
     val selfAddress = nodes(size / 2)
     HeartbeatNodeRing(selfAddress, nodes.toSet, Set.empty, 5)
-  }
 
   val heartbeatNodeRing = createHeartbeatNodeRingOfSize(nodesSize)
 
@@ -33,20 +32,15 @@ class HeartbeatNodeRingPerfSpec extends WordSpec with Matchers {
                                 times: Int): Unit =
     for (i ← 1 to times) thunk(ring)
 
-  private def myReceivers(ring: HeartbeatNodeRing): Unit = {
+  private def myReceivers(ring: HeartbeatNodeRing): Unit =
     val r = HeartbeatNodeRing(
         ring.selfAddress, ring.nodes, Set.empty, ring.monitoredByNrOfMembers)
     r.myReceivers.isEmpty should ===(false)
-  }
 
-  s"HeartbeatNodeRing of size $nodesSize" must {
+  s"HeartbeatNodeRing of size $nodesSize" must
 
-    s"do a warm up run, $iterations times" in {
+    s"do a warm up run, $iterations times" in
       checkThunkForRing(heartbeatNodeRing, myReceivers, iterations)
-    }
 
-    s"produce myReceivers, $iterations times" in {
+    s"produce myReceivers, $iterations times" in
       checkThunkForRing(heartbeatNodeRing, myReceivers, iterations)
-    }
-  }
-}

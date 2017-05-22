@@ -1,4 +1,4 @@
-object Example {
+object Example
   class A[T]
   class B extends A[B]
   def goo[T <: A[T]](y: T): T = y
@@ -6,4 +6,3 @@ object Example {
 
   /* line: 4 */
   goo(new B)
-}

@@ -31,7 +31,7 @@ import scalaz.std.option.optionFirst
 import scalaz.syntax.comonad._
 
 trait DAGRewriterSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification with EvaluatorTestSupport[M]
 
   import dag._
   import instructions._
@@ -42,8 +42,8 @@ trait DAGRewriterSpecs[M[+ _]]
   import evaluator._
   import library._
 
-  "DAG rewriting" should {
-    "compute identities given a relative path" in {
+  "DAG rewriting" should
+    "compute identities given a relative path" in
       val line = Line(1, 1, "")
 
       val input = dag.AbsoluteLoad(Const(CString("/numbers"))(line))(line)
@@ -52,9 +52,8 @@ trait DAGRewriterSpecs[M[+ _]]
       val result = fullRewriteDAG(true, ctx)(input)
 
       result.identities mustEqual Identities.Specs(Vector(LoadIds("/numbers")))
-    }
 
-    "rewrite to have constant" in {
+    "rewrite to have constant" in
       /*
        * foo := //foo
        * foo.a + count(foo) + foo.c
@@ -83,27 +82,23 @@ trait DAGRewriterSpecs[M[+ _]]
 
       // The should be a MegaReduce for the Count reduction
       val optimizedDAG = fullRewriteDAG(optimize, ctx)(input)
-      val megaReduce = optimizedDAG.foldDown(true) {
+      val megaReduce = optimizedDAG.foldDown(true)
         case m @ MegaReduce(_, _) => Tag(Some(m)): FirstOption[DepGraph]
-      }
 
       megaReduce must beSome
 
       val rewritten = inlineNodeValue(optimizedDAG, megaReduce.get, CNum(42))
 
-      val hasMegaReduce = rewritten.foldDown(false) {
+      val hasMegaReduce = rewritten.foldDown(false)
         case m @ MegaReduce(_, _) => true
-      }(disjunction)
-      val hasConst = rewritten.foldDown(false) {
+      (disjunction)
+      val hasConst = rewritten.foldDown(false)
         case m @ Const(CNum(n)) if n == 42 => true
-      }(disjunction)
+      (disjunction)
 
       // Must be turned into a Const node
       hasMegaReduce must beFalse
       hasConst must beTrue
-    }
-  }
-}
 
 object DAGRewriterSpecs
     extends DAGRewriterSpecs[test.YId] with test.YIdInstances

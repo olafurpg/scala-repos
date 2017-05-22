@@ -37,7 +37,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion object for [[scalafx.css.Styleable]].
   */
-object Styleable {
+object Styleable
 
   /**
     * Converts a ScalaFX Styleable to its JavaFX counterpart.
@@ -47,14 +47,13 @@ object Styleable {
     */
   implicit def sfxStyleable2jfx(s: Styleable): jfxcss.Styleable =
     if (s != null) s.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/Styleable.html JavaFX Styleable]].
   *
   * @since 8.0
   */
-trait Styleable extends SFXDelegate[jfxcss.Styleable] {
+trait Styleable extends SFXDelegate[jfxcss.Styleable]
 
   /**
     * The CssMetaData of this Styleable.
@@ -101,4 +100,3 @@ trait Styleable extends SFXDelegate[jfxcss.Styleable] {
     * The type of this `Styleable` that is to be used in selector matching.
     */
   def typeSelector: String = delegate.getTypeSelector
-}

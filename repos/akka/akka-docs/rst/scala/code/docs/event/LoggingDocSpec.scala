@@ -6,36 +6,32 @@ package docs.event
 import akka.actor.{Actor, Props}
 import akka.testkit.AkkaSpec
 
-object LoggingDocSpec {
+object LoggingDocSpec
 
   //#my-actor
   import akka.event.Logging
 
-  class MyActor extends Actor {
+  class MyActor extends Actor
     val log = Logging(context.system, this)
-    override def preStart() = {
+    override def preStart() =
       log.debug("Starting")
-    }
-    override def preRestart(reason: Throwable, message: Option[Any]) {
+    override def preRestart(reason: Throwable, message: Option[Any])
       log.error(reason,
                 "Restarting due to [{}] when processing [{}]",
                 reason.getMessage,
                 message.getOrElse(""))
-    }
-    def receive = {
+    def receive =
       case "test" => log.info("Received test")
       case x => log.warning("Received unknown message: {}", x)
-    }
-  }
   //#my-actor
 
   import akka.event.Logging
 
-  class MdcActor extends Actor {
+  class MdcActor extends Actor
     val log = Logging(this)
-    def receive = {
+    def receive =
 
-      case _ => {
+      case _ =>
           //#mdc
           val mdc = Map("requestId" -> 1234, "visitorId" -> 5678)
           log.mdc(mdc)
@@ -45,34 +41,26 @@ object LoggingDocSpec {
 
           log.clearMDC()
           //#mdc
-        }
-    }
-  }
 
   //#mdc-actor
   import Logging.MDC
 
   final case class Req(work: String, visitorId: Int)
 
-  class MdcActorMixin extends Actor with akka.actor.DiagnosticActorLogging {
+  class MdcActorMixin extends Actor with akka.actor.DiagnosticActorLogging
     var reqId = 0
 
-    override def mdc(currentMessage: Any): MDC = {
+    override def mdc(currentMessage: Any): MDC =
       reqId += 1
       val always = Map("requestId" -> reqId)
-      val perMessage = currentMessage match {
+      val perMessage = currentMessage match
         case r: Req => Map("visitorId" -> r.visitorId)
         case _ => Map()
-      }
       always ++ perMessage
-    }
 
-    def receive: Receive = {
-      case r: Req => {
+    def receive: Receive =
+      case r: Req =>
           log.info(s"Starting new request: ${r.work}")
-        }
-    }
-  }
 
   //#mdc-actor
 
@@ -84,89 +72,74 @@ object LoggingDocSpec {
   import akka.event.Logging.LoggerInitialized
   import akka.event.Logging.Warning
 
-  class MyEventListener extends Actor {
-    def receive = {
+  class MyEventListener extends Actor
+    def receive =
       case InitializeLogger(_) => sender() ! LoggerInitialized
       case Error(cause, logSource, logClass, message) => // ...
       case Warning(logSource, logClass, message) => // ...
       case Info(logSource, logClass, message) => // ...
       case Debug(logSource, logClass, message) => // ...
-    }
-  }
   //#my-event-listener
 
   //#my-source
   import akka.actor.ActorSystem
   import akka.event.LogSource
 
-  object MyType {
-    implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef] {
+  object MyType
+    implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef]
       def genString(o: AnyRef): String = o.getClass.getName
       override def getClazz(o: AnyRef): Class[_] = o.getClass
-    }
-  }
 
-  class MyType(system: ActorSystem) {
+  class MyType(system: ActorSystem)
     import MyType._
     import akka.event.Logging
 
     val log = Logging(system, this)
-  }
   //#my-source
-}
 
-class LoggingDocSpec extends AkkaSpec {
+class LoggingDocSpec extends AkkaSpec
 
   import LoggingDocSpec.{MdcActor, MdcActorMixin, MyActor, Req}
 
-  "use a logging actor" in {
+  "use a logging actor" in
     val myActor = system.actorOf(Props[MyActor])
     myActor ! "test"
-  }
 
-  "use a MDC logging actor" in {
+  "use a MDC logging actor" in
     val mdcActor = system.actorOf(Props[MdcActor])
     mdcActor ! "some request"
-  }
 
-  "use a MDC logging actor by mixin" in {
+  "use a MDC logging actor by mixin" in
     val mdcActor = system.actorOf(Props[MdcActorMixin])
     mdcActor ! Req("some request", 5678)
-  }
 
-  "allow registration to dead letters" in {
-    new AnyRef {
+  "allow registration to dead letters" in
+    new AnyRef
       //#deadletters
       import akka.actor.{Actor, DeadLetter, Props}
 
-      class Listener extends Actor {
-        def receive = {
+      class Listener extends Actor
+        def receive =
           case d: DeadLetter => println(d)
-        }
-      }
 
       val listener = system.actorOf(Props(classOf[Listener], this))
       system.eventStream.subscribe(listener, classOf[DeadLetter])
       //#deadletters
-    }
-  }
 
-  "demonstrate superclass subscriptions on eventStream" in {
+  "demonstrate superclass subscriptions on eventStream" in
     def println(s: String) = ()
     //#superclass-subscription-eventstream
     abstract class AllKindsOfMusic { def artist: String }
     case class Jazz(artist: String) extends AllKindsOfMusic
     case class Electronic(artist: String) extends AllKindsOfMusic
 
-    new AnyRef {
-      class Listener extends Actor {
-        def receive = {
+    new AnyRef
+      class Listener extends Actor
+        def receive =
           case m: Jazz =>
             println(s"${self.path.name} is listening to: ${m.artist}")
           case m: Electronic =>
             println(s"${self.path.name} is listening to: ${m.artist}")
-        }
-      }
 
       val jazzListener = system.actorOf(Props(classOf[Listener], this))
       val musicListener = system.actorOf(Props(classOf[Listener], this))
@@ -179,11 +152,9 @@ class LoggingDocSpec extends AkkaSpec {
       // jazzListener and musicListener will be notified about Jazz:
       system.eventStream.publish(Jazz("Sonny Rollins"))
       //#superclass-subscription-eventstream
-    }
-  }
 
-  "allow registration to suppressed dead letters" in {
-    new AnyRef {
+  "allow registration to suppressed dead letters" in
+    new AnyRef
       import akka.actor.Props
       val listener = system.actorOf(Props[MyActor])
 
@@ -196,13 +167,9 @@ class LoggingDocSpec extends AkkaSpec {
       import akka.actor.AllDeadLetters
       system.eventStream.subscribe(listener, classOf[AllDeadLetters])
       //#all-deadletters
-    }
-  }
 
-  "demonstrate logging more arguments" in {
+  "demonstrate logging more arguments" in
     //#array
     val args = Array("The", "brown", "fox", "jumps", 42)
     system.log.debug("five parameters: {}, {}, {}, {}, {}", args)
     //#array
-  }
-}

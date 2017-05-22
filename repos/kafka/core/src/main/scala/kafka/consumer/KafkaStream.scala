@@ -26,7 +26,7 @@ class KafkaStream[K, V](private val queue: BlockingQueue[FetchedDataChunk],
                         private val valueDecoder: Decoder[V],
                         val clientId: String)
     extends Iterable[MessageAndMetadata[K, V]]
-    with java.lang.Iterable[MessageAndMetadata[K, V]] {
+    with java.lang.Iterable[MessageAndMetadata[K, V]]
 
   private val iter: ConsumerIterator[K, V] = new ConsumerIterator[K, V](
       queue, consumerTimeoutMs, keyDecoder, valueDecoder, clientId)
@@ -40,11 +40,8 @@ class KafkaStream[K, V](private val queue: BlockingQueue[FetchedDataChunk],
     * This method clears the queue being iterated during the consumer rebalancing. This is mainly
     * to reduce the number of duplicates received by the consumer
     */
-  def clear() {
+  def clear()
     iter.clearCurrentChunk()
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     "%s kafka stream".format(clientId)
-  }
-}

@@ -24,7 +24,7 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-trait ArbitraryJValue {
+trait ArbitraryJValue
   def genJValue: Gen[JValue] =
     frequency((10, genSimple),
               (1, wrap(choose(0, 5) flatMap genArray)),
@@ -71,7 +71,7 @@ trait ArbitraryJValue {
 
   // BigDecimal *isn't* arbitrary precision!  AWESOME!!!
   implicit def arbBigDecimal: Arbitrary[BigDecimal] =
-    Arbitrary(for {
+    Arbitrary(for
       mantissa <- arbitrary[Long]
       exponent <- arbitrary[Int]
 
@@ -82,5 +82,4 @@ trait ArbitraryJValue {
                mantissa.toString.length <= Int.MinValue.toLong)
         exponent + mantissa.toString.length
       else exponent
-    } yield BigDecimal(mantissa, adjusted, java.math.MathContext.UNLIMITED))
-}
+    yield BigDecimal(mantissa, adjusted, java.math.MathContext.UNLIMITED))

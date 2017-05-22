@@ -8,7 +8,7 @@ import akka.http.scaladsl.model._
 
 class EmptyValue[+T] private (val emptyValue: T)
 
-object EmptyValue {
+object EmptyValue
   implicit def emptyEntity: EmptyValue[UniversalEntity] =
     new EmptyValue[UniversalEntity](HttpEntity.Empty)
 
@@ -19,4 +19,3 @@ object EmptyValue {
 
   implicit val emptyResponse: EmptyValue[HttpResponse] =
     new EmptyValue[HttpResponse](HttpResponse(entity = emptyEntity.emptyValue))
-}

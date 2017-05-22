@@ -28,7 +28,7 @@ import org.apache.spark.sql.DataFrame
   * Abstract class for estimators that fit models to data.
   */
 @DeveloperApi
-abstract class Estimator[M <: Model[M]] extends PipelineStage {
+abstract class Estimator[M <: Model[M]] extends PipelineStage
 
   /**
     * Fits a single model to the input data with optional parameters.
@@ -42,10 +42,9 @@ abstract class Estimator[M <: Model[M]] extends PipelineStage {
   @varargs
   def fit(dataset: DataFrame,
           firstParamPair: ParamPair[_],
-          otherParamPairs: ParamPair[_]*): M = {
+          otherParamPairs: ParamPair[_]*): M =
     val map = new ParamMap().put(firstParamPair).put(otherParamPairs: _*)
     fit(dataset, map)
-  }
 
   /**
     * Fits a single model to the input data with provided parameter map.
@@ -55,9 +54,8 @@ abstract class Estimator[M <: Model[M]] extends PipelineStage {
     *                 These values override any specified in this Estimator's embedded ParamMap.
     * @return fitted model
     */
-  def fit(dataset: DataFrame, paramMap: ParamMap): M = {
+  def fit(dataset: DataFrame, paramMap: ParamMap): M =
     copy(paramMap).fit(dataset)
-  }
 
   /**
     * Fits a model to the input data.
@@ -74,9 +72,7 @@ abstract class Estimator[M <: Model[M]] extends PipelineStage {
     *                  These values override any specified in this Estimator's embedded ParamMap.
     * @return fitted models, matching the input parameter maps
     */
-  def fit(dataset: DataFrame, paramMaps: Array[ParamMap]): Seq[M] = {
+  def fit(dataset: DataFrame, paramMaps: Array[ParamMap]): Seq[M] =
     paramMaps.map(fit(dataset, _))
-  }
 
   override def copy(extra: ParamMap): Estimator[M]
-}

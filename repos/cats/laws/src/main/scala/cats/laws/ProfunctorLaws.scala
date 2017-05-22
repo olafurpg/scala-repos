@@ -7,7 +7,7 @@ import cats.syntax.profunctor._
 /**
   * Laws that must be obeyed by any `cats.functor.Profunctor`.
   */
-trait ProfunctorLaws[F[_, _]] {
+trait ProfunctorLaws[F[_, _]]
   implicit def F: Profunctor[F]
 
   def profunctorIdentity[A, B](fab: F[A, B]): IsEq[F[A, B]] =
@@ -36,9 +36,7 @@ trait ProfunctorLaws[F[_, _]] {
                                                f: B0 => B1,
                                                g: B1 => B2): IsEq[F[A, B2]] =
     fab.rmap(f).rmap(g) <-> fab.rmap(g compose f)
-}
 
-object ProfunctorLaws {
+object ProfunctorLaws
   def apply[F[_, _]](implicit ev: Profunctor[F]): ProfunctorLaws[F] =
     new ProfunctorLaws[F] { def F: Profunctor[F] = ev }
-}

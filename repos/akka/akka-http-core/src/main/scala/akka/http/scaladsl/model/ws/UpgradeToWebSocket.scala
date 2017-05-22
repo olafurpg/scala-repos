@@ -17,7 +17,7 @@ import akka.http.scaladsl.model.HttpResponse
   * enables a request handler to upgrade this connection to a WebSocket connection and
   * registers a WebSocket handler.
   */
-trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
+trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket
 
   /**
     * A sequence of protocols the client accepts.
@@ -104,4 +104,3 @@ trait UpgradeToWebSocket extends jm.ws.UpgradeToWebSocket {
     JavaMapping.toScala(scaladsl.Flow.fromSinkAndSourceMat(inSink, outSource)(
             scaladsl.Keep.none): Graph[
             FlowShape[jm.ws.Message, jm.ws.Message], NotUsed])
-}

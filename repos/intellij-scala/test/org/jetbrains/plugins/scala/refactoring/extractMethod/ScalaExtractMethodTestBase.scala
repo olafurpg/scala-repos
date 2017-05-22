@@ -19,13 +19,13 @@ import org.junit.Assert._
   * Date: 06.04.2010
   */
 abstract class ScalaExtractMethodTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startMarker = "/*start*/"
   private val endMarker = "/*end*/"
 
   def folderPath: String = baseRootPath() + "extractMethod/"
 
-  protected def doTest() {
+  protected def doTest()
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
@@ -57,27 +57,23 @@ abstract class ScalaExtractMethodTestBase
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
 
     //start to inline
-    try {
+    try
       val handler = new ScalaExtractMethodHandler
       handler.invoke(getProjectAdapter, editor, scalaFile, null)
       UsefulTestCase.doPostponedFormatting(getProjectAdapter)
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim
-    } catch {
+    catch
       case e: Exception =>
         assert(assertion = false,
                message = e.getMessage + "\n" +
                  e.getStackTrace.map(_.toString).mkString("  \n"))
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res)
-  }
-}

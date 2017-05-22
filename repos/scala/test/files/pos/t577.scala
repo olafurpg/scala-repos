@@ -1,4 +1,4 @@
-trait PriorityTree {
+trait PriorityTree
   type Node <: BasicTreeNode;
 
   val top = initTree;
@@ -7,12 +7,10 @@ trait PriorityTree {
 
   def initTree: Node;
 
-  trait BasicTreeNode {
+  trait BasicTreeNode
     private[PriorityTree] var next: Node = _;
     private[PriorityTree] var prev: Node = _;
     private[PriorityTree] var chld: Node = _;
     //var next  : Node = _;
     //var prev  : Node = _;
     //var chld : Node = _;
-  }
-}

@@ -34,16 +34,15 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object MultipleSelectionModel {
+object MultipleSelectionModel
   implicit def sfxMultipleSelectionModel2jfx[T](
       v: MultipleSelectionModel[T]): jfxsc.MultipleSelectionModel[T] =
     if (v != null) v.delegate else null
-}
 
 abstract class MultipleSelectionModel[T](
     override val delegate: jfxsc.MultipleSelectionModel[T])
     extends SelectionModel[T](delegate)
-    with SFXDelegate[jfxsc.MultipleSelectionModel[T]] {
+    with SFXDelegate[jfxsc.MultipleSelectionModel[T]]
 
   /**
     * Specifies the selection mode to use in this selection model. 
@@ -55,9 +54,8 @@ abstract class MultipleSelectionModel[T](
     */
   def selectionMode: ObjectProperty[jfxsc.SelectionMode] =
     delegate.selectionModeProperty
-  def selectionMode_=(v: SelectionMode) {
+  def selectionMode_=(v: SelectionMode)
     selectionMode() = v
-  }
 
   /**
     * Returns a read-only ObservableList of all selected indices. The 
@@ -89,9 +87,8 @@ abstract class MultipleSelectionModel[T](
     *
     */
   // To convert Scala varargs to Java varargs, see http://stackoverflow.com/questions/2334200/transforming-scala-varargs-into-java-object-varargs
-  def selectIndices(index: Int, indices: Int*): Unit = {
+  def selectIndices(index: Int, indices: Int*): Unit =
     delegate.selectIndices(index, indices.map(_.asInstanceOf[Int]): _*)
-  }
 
   /**
     * Selects all indices from the given start index to the item before the 
@@ -107,14 +104,11 @@ abstract class MultipleSelectionModel[T](
     * @param start The first index to select - this index will be selected.
     * @param end The last index of the selection - this index will not be selected.
     */
-  def selectRange(start: Int, end: Int): Unit = {
+  def selectRange(start: Int, end: Int): Unit =
     delegate.selectRange(start, end)
-  }
 
   /**
     * Convenience method to select all available indices.
     */
-  def selectAll() {
+  def selectAll()
     delegate.selectAll()
-  }
-}

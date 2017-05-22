@@ -18,9 +18,9 @@ import scala.concurrent.Future
   */
 class TaskTrackerActorTest
     extends MarathonActorSupport with FunSuiteLike with GivenWhenThen
-    with Mockito with Matchers {
+    with Mockito with Matchers
 
-  test("failures while loading the initial data are escalated") {
+  test("failures while loading the initial data are escalated")
     val f = new Fixture
 
     Given("a failing task loader")
@@ -36,13 +36,11 @@ class TaskTrackerActorTest
     And("it will eventuall die")
     watch(f.taskTrackerActor)
     expectMsgClass(classOf[Terminated]).getActor should be(f.taskTrackerActor)
-  }
 
-  test("failures of the taskUpdateActor are escalated") {
+  test("failures of the taskUpdateActor are escalated")
     Given("an always failing updater")
-    val f = new Fixture {
+    val f = new Fixture
       override def updaterProps(trackerRef: ActorRef): Props = failProps
-    }
     And("an empty task loader result")
     f.taskLoader.loadTasks() returns Future.successful(
         TaskTracker.TasksByApp.empty)
@@ -58,9 +56,8 @@ class TaskTrackerActorTest
     Then("it will eventuall die")
     watch(f.taskTrackerActor)
     expectMsgClass(classOf[Terminated]).getActor should be(f.taskTrackerActor)
-  }
 
-  test("taskTrackerActor answers with loaded data (empty)") {
+  test("taskTrackerActor answers with loaded data (empty)")
     val f = new Fixture
     Given("an empty task loader result")
     val appDataMap = TaskTracker.TasksByApp.empty
@@ -72,9 +69,8 @@ class TaskTrackerActorTest
 
     Then("it will eventually answer")
     probe.expectMsg(appDataMap)
-  }
 
-  test("taskTrackerActor answers with loaded data (some data)") {
+  test("taskTrackerActor answers with loaded data (some data)")
     val f = new Fixture
     Given("an empty task loader result")
     val appId: PathId = PathId("/app")
@@ -89,9 +85,8 @@ class TaskTrackerActorTest
 
     Then("it will eventually answer")
     probe.expectMsg(appDataMap)
-  }
 
-  test("taskTrackerActor correctly calculates metrics for loaded data") {
+  test("taskTrackerActor correctly calculates metrics for loaded data")
     val f = new Fixture
     Given("an empty task loader result")
     val appId: PathId = PathId("/app")
@@ -112,9 +107,8 @@ class TaskTrackerActorTest
     Then("it will have set the correct metric counts")
     f.actorMetrics.runningCount.getValue should be(2)
     f.actorMetrics.stagedCount.getValue should be(1)
-  }
 
-  test("taskTrackerActor correctly updates metrics for deleted tasks") {
+  test("taskTrackerActor correctly updates metrics for deleted tasks")
     val f = new Fixture
     Given("an empty task loader result")
     val appId: PathId = PathId("/app")
@@ -149,9 +143,8 @@ class TaskTrackerActorTest
     Then("it will have set the correct metric counts")
     f.actorMetrics.runningCount.getValue should be(1)
     f.actorMetrics.stagedCount.getValue should be(0)
-  }
 
-  test("taskTrackerActor correctly updates metrics for updated tasks") {
+  test("taskTrackerActor correctly updates metrics for updated tasks")
     val f = new Fixture
     Given("an empty task loader result")
     val appId: PathId = PathId("/app")
@@ -177,9 +170,8 @@ class TaskTrackerActorTest
     Then("it will have set the correct metric counts")
     f.actorMetrics.runningCount.getValue should be(3)
     f.actorMetrics.stagedCount.getValue should be(0)
-  }
 
-  test("taskTrackerActor correctly updates metrics for created tasks") {
+  test("taskTrackerActor correctly updates metrics for created tasks")
     val f = new Fixture
     Given("an empty task loader result")
     val appId: PathId = PathId("/app")
@@ -204,26 +196,23 @@ class TaskTrackerActorTest
     Then("it will have set the correct metric counts")
     f.actorMetrics.runningCount.getValue should be(2)
     f.actorMetrics.stagedCount.getValue should be(2)
-  }
 
-  class Fixture {
+  class Fixture
     def failProps =
       Props(
-          new Actor {
-        override def receive: Receive = {
+          new Actor
+        override def receive: Receive =
           case _: Any => throw new RuntimeException("severe simulated failure")
-        }
-      })
+      )
 
     lazy val spyProbe = TestProbe()
 
     def spyActor =
       Props(
-          new Actor {
-        override def receive: Receive = {
+          new Actor
+        override def receive: Receive =
           case msg: Any => spyProbe.ref.forward(msg)
-        }
-      })
+      )
 
     def updaterProps(trackerRef: ActorRef): Props = spyActor
     lazy val taskLoader = mock[TaskLoader]
@@ -233,9 +222,6 @@ class TaskTrackerActorTest
     lazy val taskTrackerActor = TestActorRef(
         TaskTrackerActor.props(actorMetrics, taskLoader, updaterProps))
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(taskLoader)
       reset(taskLoader)
-    }
-  }
-}

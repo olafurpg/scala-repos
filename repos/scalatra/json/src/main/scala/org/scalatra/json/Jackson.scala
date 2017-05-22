@@ -8,36 +8,28 @@ import org.json4s._
 import org.scalatra.util.RicherString._
 
 trait JacksonJsonSupport
-    extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult {
+    extends JsonSupport[JValue] with JacksonJsonOutput with JValueResult
 
-  override def initialize(config: ConfigT): Unit = {
+  override def initialize(config: ConfigT): Unit =
     super.initialize(config)
     mapper.configure(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS,
                      jsonFormats.wantsBigDecimal)
-  }
 
   protected def readJsonFromStreamWithCharset(
-      stream: InputStream, charset: String): JValue = {
+      stream: InputStream, charset: String): JValue =
     val rdr = new InputStreamReader(stream, charset)
     if (rdr.ready()) mapper.readValue(rdr, classOf[JValue])
-    else {
+    else
       rdr.close()
       JNothing
-    }
-  }
 
-  protected def readJsonFromBody(bd: String): JValue = {
+  protected def readJsonFromBody(bd: String): JValue =
     if (bd.nonBlank) mapper.readValue(bd, classOf[JValue])
     else JNothing
-  }
-}
 
-trait JacksonJsonValueReaderProperty extends JsonValueReaderProperty[JValue] {
+trait JacksonJsonValueReaderProperty extends JsonValueReaderProperty[JValue]
   self: jackson.JsonMethods =>
-}
 
-trait JacksonJsonOutput extends JsonOutput[JValue] with jackson.JsonMethods {
-  protected def writeJson(json: JValue, writer: Writer) {
+trait JacksonJsonOutput extends JsonOutput[JValue] with jackson.JsonMethods
+  protected def writeJson(json: JValue, writer: Writer)
     if (json != JNothing) mapper.writeValue(writer, json)
-  }
-}

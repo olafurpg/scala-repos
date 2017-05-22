@@ -18,9 +18,9 @@ import scala.concurrent.{Future, Promise}
 
 class TaskUpdateActorTest
     extends MarathonActorSupport with FunSuiteLike with Mockito
-    with GivenWhenThen with Matchers {
+    with GivenWhenThen with Matchers
 
-  test("process failures are escalated") {
+  test("process failures are escalated")
     val f = new Fixture
 
     Given("an op")
@@ -50,9 +50,8 @@ class TaskUpdateActorTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("process timeouts are checked") {
+  test("process timeouts are checked")
     val f = new Fixture
 
     Given("an op with an already reached deadline")
@@ -90,9 +89,8 @@ class TaskUpdateActorTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("first op for a task is directly processed") {
+  test("first op for a task is directly processed")
     val f = new Fixture
 
     Given("an op")
@@ -120,9 +118,8 @@ class TaskUpdateActorTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("currently processed ops are visible in the metrics") {
+  test("currently processed ops are visible in the metrics")
     val f = new Fixture
 
     Given("an op")
@@ -150,9 +147,8 @@ class TaskUpdateActorTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  test("ops for different tasks are processed concurrently") {
+  test("ops for different tasks are processed concurrently")
     val f = new Fixture
 
     Given("an op")
@@ -205,9 +201,8 @@ class TaskUpdateActorTest
 
     And("but the first task still does have a queue")
     f.updateActor.underlyingActor.operationsByTaskId(task1Id) should have size 1
-  }
 
-  test("ops for the same task are processed sequentially") {
+  test("ops for the same task are processed sequentially")
     val f = new Fixture
 
     Given("an op")
@@ -271,9 +266,8 @@ class TaskUpdateActorTest
 
     And("there are no more interactions")
     f.verifyNoMoreInteractions()
-  }
 
-  class Fixture {
+  class Fixture
     lazy val clock = ConstantClock()
     lazy val opInitiator = TestProbe()
     lazy val metrics = new Metrics(new MetricRegistry)
@@ -284,9 +278,6 @@ class TaskUpdateActorTest
 
     def oneSecondInFuture: Timestamp = clock.now() + 1.second
 
-    def verifyNoMoreInteractions(): Unit = {
+    def verifyNoMoreInteractions(): Unit =
       noMoreInteractions(processor)
       reset(processor)
-    }
-  }
-}

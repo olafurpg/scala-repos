@@ -5,7 +5,7 @@ package refactoring.rename3
   * Nikolay.Tropin
   * 9/13/13
   */
-class ScalaRenameTest extends ScalaRenameTestBase {
+class ScalaRenameTest extends ScalaRenameTestBase
 
   def testObjectAndTraitToOpChars() = doTest("+++")
 
@@ -23,19 +23,15 @@ class ScalaRenameTest extends ScalaRenameTestBase {
 
   def testVarAndSetters() = doTest()
 
-  def testSettersWithoutVar() = {
-    try { doTest() } catch {
+  def testSettersWithoutVar() =
+    try { doTest() } catch
       case e: RuntimeException
           if e.getMessage endsWith "is not an identifier." =>
-    }
-  }
 
-  def testSettersWithoutVar2() = {
-    try { doTest("NameAfterRename_=") } catch {
+  def testSettersWithoutVar2() =
+    try { doTest("NameAfterRename_=") } catch
       case e: RuntimeException
           if e.getMessage endsWith "is not an identifier." =>
-    }
-  }
 
   def testOverridenVal() = doTest()
 
@@ -50,4 +46,3 @@ class ScalaRenameTest extends ScalaRenameTestBase {
   def testTypeAlias() = doTest()
 
   def testOverridenFromJava() = doTest()
-}

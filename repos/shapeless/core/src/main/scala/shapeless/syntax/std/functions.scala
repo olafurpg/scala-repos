@@ -26,25 +26,20 @@ package std
   * 
   * @author Miles Sabin
   */
-object function {
+object function
   import ops.function._
 
   implicit def fnHListOps[F, T <: HList, R](
       t: F)(implicit fnHLister: FnToProduct.Aux[F, T => R]) =
-    new FnHListOps[T => R] {
+    new FnHListOps[T => R]
       def toProduct = fnHLister(t)
-    }
 
   implicit def fnUnHListOps[F](t: F)(implicit fnUnHLister: FnFromProduct[F]) =
-    new FnUnHListOps[fnUnHLister.Out] {
+    new FnUnHListOps[fnUnHLister.Out]
       def fromProduct = fnUnHLister(t)
-    }
-}
 
-trait FnHListOps[HLFn] {
+trait FnHListOps[HLFn]
   def toProduct: HLFn
-}
 
-trait FnUnHListOps[F] {
+trait FnUnHListOps[F]
   def fromProduct: F
-}

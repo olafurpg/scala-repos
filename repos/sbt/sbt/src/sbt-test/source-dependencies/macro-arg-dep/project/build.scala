@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object build extends Build {
+object build extends Build
   val defaultSettings = Seq(
       libraryDependencies <+=
         scalaVersion("org.scala-lang" % "scala-reflect" % _),
@@ -28,4 +28,3 @@ object build extends Build {
       dependencies = Seq(macroProvider),
       settings = Defaults.defaultSettings ++ defaultSettings
   )
-}

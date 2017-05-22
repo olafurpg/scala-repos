@@ -1,3 +1,2 @@
-class C extends B {
+class C extends B
   def x(s: String) = s + "5"
-}

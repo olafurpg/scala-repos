@@ -1,8 +1,8 @@
 // ticket #3829
-object Test {
+object Test
   import collection.{mutable, immutable}
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val map = immutable.Map(1 -> 2, 3 -> 4)
     assert(map.get(0) == None)
 
@@ -35,5 +35,3 @@ object Test {
     defmutmap += 1 -> 2
     assert(defmutmap(1) == 2)
     assert(mutmap(1) == 2)
-  }
-}

@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/TransferMode.html javafx.scene.input.TransferMode]] */
 object TransferMode
-    extends SFXEnumDelegateCompanion[jfxsi.TransferMode, TransferMode] {
+    extends SFXEnumDelegateCompanion[jfxsi.TransferMode, TransferMode]
 
   val Copy = new TransferMode(jfxsi.TransferMode.COPY)
   @deprecated(
@@ -70,7 +70,6 @@ object TransferMode
 
   protected override def unsortedValues: Array[TransferMode] =
     Array(Copy, Move, Link)
-}
 
 sealed case class TransferMode(override val delegate: jfxsi.TransferMode)
     extends SFXEnumDelegate[jfxsi.TransferMode]

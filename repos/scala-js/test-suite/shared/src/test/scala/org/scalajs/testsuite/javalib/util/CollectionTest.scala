@@ -18,11 +18,11 @@ import org.scalajs.testsuite.utils.AssertThrows._
 
 import scala.reflect.ClassTag
 
-trait CollectionTest {
+trait CollectionTest
 
   def factory: CollectionFactory
 
-  def testCollectionApi(): Unit = {
+  def testCollectionApi(): Unit =
     shouldStoreStrings()
     shouldStoreIntegers()
     shouldStoreDoubles()
@@ -33,9 +33,8 @@ trait CollectionTest {
     shouldCheckContainedPresence()
     shouldCheckContainedPresenceForDoubleCornerCases()
     shouldGiveProperIteratorOverElements()
-  }
 
-  @Test def shouldStoreStrings(): Unit = {
+  @Test def shouldStoreStrings(): Unit =
     val coll = factory.empty[String]
 
     assertEquals(0, coll.size())
@@ -53,9 +52,8 @@ trait CollectionTest {
     coll.clear()
     assertTrue(coll.addAll(Seq("one", "two", "one")))
     assertTrue(coll.size() >= 1)
-  }
 
-  @Test def shouldStoreIntegers(): Unit = {
+  @Test def shouldStoreIntegers(): Unit =
     val coll = factory.empty[Int]
 
     assertEquals(0, coll.size())
@@ -73,9 +71,8 @@ trait CollectionTest {
     coll.clear()
     assertTrue(coll.addAll(Seq(1, 2, 1)))
     assertTrue(coll.size() >= 1)
-  }
 
-  @Test def shouldStoreDoubles(): Unit = {
+  @Test def shouldStoreDoubles(): Unit =
     val coll = factory.empty[Double]
 
     assertEquals(0, coll.size())
@@ -108,13 +105,11 @@ trait CollectionTest {
     coll.add(Double.NaN)
     assertEquals(1, coll.size())
     assertTrue(coll.contains(Double.NaN))
-  }
 
-  @Test def shouldStoreCustomObjects(): Unit = {
-    case class TestObj(num: Int) extends jl.Comparable[TestObj] {
+  @Test def shouldStoreCustomObjects(): Unit =
+    case class TestObj(num: Int) extends jl.Comparable[TestObj]
       def compareTo(o: TestObj): Int =
         o.num.compareTo(num)
-    }
 
     val coll = factory.empty[TestObj]
 
@@ -122,9 +117,8 @@ trait CollectionTest {
     assertEquals(1, coll.size())
     assertTrue(coll.contains(TestObj(100)))
     assertFalse(coll.contains(TestObj(200)))
-  }
 
-  @Test def shouldRemoveStoredElements(): Unit = {
+  @Test def shouldRemoveStoredElements(): Unit =
     val coll = factory.empty[String]
 
     coll.add("one")
@@ -139,9 +133,8 @@ trait CollectionTest {
     assertEquals(initialSize - 1, coll.size())
     assertTrue(coll.remove("one"))
     assertEquals(initialSize - 2, coll.size())
-  }
 
-  @Test def shouldRemoveStoredElementsOnDoubleCornerCases(): Unit = {
+  @Test def shouldRemoveStoredElementsOnDoubleCornerCases(): Unit =
     val coll = factory.empty[Double]
 
     coll.add(1.234)
@@ -167,9 +160,8 @@ trait CollectionTest {
     coll.clear()
 
     assertTrue(coll.isEmpty)
-  }
 
-  @Test def shouldBeClearedWithOneOperation(): Unit = {
+  @Test def shouldBeClearedWithOneOperation(): Unit =
     val coll = factory.empty[String]
 
     coll.add("one")
@@ -177,22 +169,19 @@ trait CollectionTest {
     assertEquals(2, coll.size)
     coll.clear()
     assertEquals(0, coll.size)
-  }
 
-  @Test def shouldCheckContainedPresence(): Unit = {
+  @Test def shouldCheckContainedPresence(): Unit =
     val coll = factory.empty[String]
 
     coll.add("one")
     assertTrue(coll.contains("one"))
     assertFalse(coll.contains("two"))
-    if (factory.allowsNullElementQuery) {
+    if (factory.allowsNullElementQuery)
       assertFalse(coll.contains(null))
-    } else {
+    else
       expectThrows(classOf[Exception], coll.contains(null))
-    }
-  }
 
-  @Test def shouldCheckContainedPresenceForDoubleCornerCases(): Unit = {
+  @Test def shouldCheckContainedPresenceForDoubleCornerCases(): Unit =
     val coll = factory.empty[Double]
 
     coll.add(-0.0)
@@ -204,9 +193,8 @@ trait CollectionTest {
     coll.add(+0.0)
     assertFalse(coll.contains(-0.0))
     assertTrue(coll.contains(+0.0))
-  }
 
-  @Test def shouldGiveProperIteratorOverElements(): Unit = {
+  @Test def shouldGiveProperIteratorOverElements(): Unit =
     val coll = factory.empty[String]
     coll.add("one")
     coll.add("two")
@@ -215,17 +203,13 @@ trait CollectionTest {
     coll.add("three")
 
     assertEquals(coll.iterator().toSet, Set("one", "two", "three"))
-  }
-}
 
-object CollectionFactory {
+object CollectionFactory
   def allFactories: Iterator[CollectionFactory] =
     ListFactory.allFactories ++ SetFactory.allFactories
-}
 
-trait CollectionFactory {
+trait CollectionFactory
   def implementationName: String
   def empty[E : ClassTag]: ju.Collection[E]
   def allowsMutationThroughIterator: Boolean = true
   def allowsNullElementQuery: Boolean = true
-}

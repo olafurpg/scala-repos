@@ -5,7 +5,7 @@ package discipline
 import org.scalacheck.Arbitrary
 import org.scalacheck.Prop.forAll
 
-trait ReducibleTests[F[_]] extends FoldableTests[F] {
+trait ReducibleTests[F[_]] extends FoldableTests[F]
   def laws: ReducibleLaws[F]
 
   def reducible[A : Arbitrary, B : Arbitrary](
@@ -18,9 +18,7 @@ trait ReducibleTests[F[_]] extends FoldableTests[F] {
         "reduceRightTo consistent with reduceMap" -> forAll(
             laws.reduceRightToConsistentWithReduceMap[A, B] _)
     )
-}
 
-object ReducibleTests {
+object ReducibleTests
   def apply[F[_]: Reducible]: ReducibleTests[F] =
     new ReducibleTests[F] { def laws: ReducibleLaws[F] = ReducibleLaws[F] }
-}

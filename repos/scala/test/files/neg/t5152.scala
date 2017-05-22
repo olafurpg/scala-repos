@@ -1,4 +1,4 @@
-object Test {
+object Test
   new C
   new C1
   new C2
@@ -14,4 +14,3 @@ object Test {
   class A2[E[_]] {}
   class B2[E] extends A2[B2] {} // this one is correct
   class C2 extends B2 {}
-}

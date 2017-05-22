@@ -12,15 +12,14 @@ import scala.util.matching.Regex.Match
 /** A class for testing repl code.
   *  It filters the line of output that mentions a version number.
   */
-abstract class ReplTest extends DirectTest {
+abstract class ReplTest extends DirectTest
   // override to transform Settings object immediately before the finish
   def transformSettings(s: Settings): Settings = s
   // final because we need to enforce the existence of a couple settings.
-  final override def settings: Settings = {
+  final override def settings: Settings =
     val s = super.settings
     s.Xnojline.value = true
     transformSettings(s)
-  }
   def normalize(s: String) = s
 
   /** True for SessionTest to preserve session text. */
@@ -29,42 +28,38 @@ abstract class ReplTest extends DirectTest {
   /** True to preserve welcome header, eliding version number. */
   def welcoming: Boolean = false
   lazy val header = replProps.welcome
-  def eval() = {
+  def eval() =
     val s = settings
     log("eval(): settings = " + s)
     val lines = ILoop
       .runForTranscript(code, s, inSession = inSession)
       .lines
-      (if (welcoming) {
+      (if (welcoming)
          val welcome = "(Welcome to Scala).*".r
          //val welcome = Regex.quote(header.lines.next).r
          //val version = "(.*version).*".r   // version on separate line?
          //var inHead  = false
-         lines map {
+         lines map
            //case s @ welcome()        => inHead = true  ; s
            //case version(s) if inHead => inHead = false ; s
            case welcome(s) => s
            case s => s
-         }
-       } else {
+       else
          lines drop header.lines.size
-       }) map normalize
-  }
+       ) map normalize
   def show() = eval() foreach println
-}
 
 /** Retain and normalize the welcome message. */
-trait Welcoming {
+trait Welcoming
   this: ReplTest =>
   override def welcoming = true
-}
 
 /** Run a REPL test from a session transcript.
   *  The `session` should be a triple-quoted String starting
   *  with the `Type in expressions` message and ending
   *  after the final `prompt`, including the last space.
   */
-abstract class SessionTest extends ReplTest {
+abstract class SessionTest extends ReplTest
 
   /** Session transcript, as a triple-quoted, multiline, marginalized string. */
   def session: String
@@ -85,22 +80,21 @@ abstract class SessionTest extends ReplTest {
   import SessionTest._
   lazy val pasted = input(prompt)
   override final def code =
-    pasted findAllMatchIn (expected mkString ("", "\n", "\n")) map {
+    pasted findAllMatchIn (expected mkString ("", "\n", "\n")) map
       case pasted(null, null, prompted) =>
-        def continued(m: Match): Option[String] = m match {
+        def continued(m: Match): Option[String] = m match
           case margin(text) => Some(text)
           case _ => None
-        }
         margin.replaceSomeIn(prompted, continued)
       case pasted(cmd, pasted, null) =>
         cmd + pasted + "\u0004"
-    } mkString
+    mkString
 
   // Just the last line of the interactive prompt
   def prompt = "scala> "
 
   /** Default test is to compare expected and actual output and emit the diff on a failed comparison. */
-  override def show() = {
+  override def show() =
     val evaled = eval().toList
     val wanted = expected.toList
     if (evaled.size != wanted.size)
@@ -108,12 +102,9 @@ abstract class SessionTest extends ReplTest {
     if (evaled != wanted)
       Console print nest.FileManager.compareContents(
           wanted, evaled, "expected", "actual")
-  }
-}
-object SessionTest {
+object SessionTest
   // \R for line break is Java 8, \v for vertical space might suffice
   def input(prompt: String) =
     s"""(?m)^$prompt(:pa.*\u000A)// Entering paste mode.*\u000A\u000A((?:.*\u000A)*)\u000A// Exiting paste mode.*\u000A|^scala> (.*\u000A(?:\\s*\\| .*\u000A)*)""".r
 
   val margin = """(?m)^\s*\| (.*)$""".r
-}

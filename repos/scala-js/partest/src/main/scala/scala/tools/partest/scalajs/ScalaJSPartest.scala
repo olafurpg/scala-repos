@@ -21,54 +21,43 @@ import sbt.testing.{EventHandler, Logger, Fingerprint}
 import java.io.File
 import java.net.URLClassLoader
 
-trait ScalaJSDirectCompiler extends DirectCompiler {
+trait ScalaJSDirectCompiler extends DirectCompiler
   override def newGlobal(
-      settings: Settings, reporter: Reporter): PartestGlobal = {
-    new PartestGlobal(settings, reporter) {
-      override protected def loadRoughPluginsList(): List[Plugin] = {
+      settings: Settings, reporter: Reporter): PartestGlobal =
+    new PartestGlobal(settings, reporter)
+      override protected def loadRoughPluginsList(): List[Plugin] =
         (super.loadRoughPluginsList() :+ Plugin.instantiate(
                 classOf[ScalaJSPlugin], this))
-      }
-    }
-  }
-}
 
 class ScalaJSRunner(testFile: File,
                     suiteRunner: SuiteRunner,
                     scalaJSOverridePath: String,
                     options: ScalaJSPartestOptions)
-    extends nest.Runner(testFile, suiteRunner) {
+    extends nest.Runner(testFile, suiteRunner)
 
-  private val compliantSems: List[String] = {
-    scalaJSConfigFile("sem").fold(List.empty[String]) { file =>
+  private val compliantSems: List[String] =
+    scalaJSConfigFile("sem").fold(List.empty[String])  file =>
       Source.fromFile(file).getLines.toList
-    }
-  }
 
-  override val checkFile: File = {
-    scalaJSConfigFile("check") getOrElse {
+  override val checkFile: File =
+    scalaJSConfigFile("check") getOrElse
       // this is super.checkFile, but apparently we can't do that
       new FileOps(testFile).changeExtension("check")
-    }
-  }
 
-  private def scalaJSConfigFile(ext: String): Option[File] = {
+  private def scalaJSConfigFile(ext: String): Option[File] =
     val overrideFile = s"$scalaJSOverridePath/$kind/$fileBase.$ext"
     val url = getClass.getResource(overrideFile)
     Option(url).map(url => new File(url.toURI))
-  }
 
   override def newCompiler =
     new DirectCompiler(this) with ScalaJSDirectCompiler
-  override def extraJavaOptions = {
+  override def extraJavaOptions =
     super.extraJavaOptions ++ Seq(
         s"-Dscalajs.partest.optMode=${options.optMode.id}",
         s"-Dscalajs.partest.compliantSems=${compliantSems.mkString(",")}"
     )
-  }
-}
 
-trait ScalaJSSuiteRunner extends SuiteRunner {
+trait ScalaJSSuiteRunner extends SuiteRunner
 
   // Stuff to mix in
 
@@ -79,7 +68,7 @@ trait ScalaJSSuiteRunner extends SuiteRunner {
 
   // Stuff we provide
 
-  override def banner: String = {
+  override def banner: String =
     import org.scalajs.core.ir.ScalaJSVersions.{current => currentVersion}
 
     super.banner.trim + s"""
@@ -88,9 +77,8 @@ trait ScalaJSSuiteRunner extends SuiteRunner {
     |optimizer:           ${options.optMode.shortStr}
     |testFilter:          ${options.testFilter.descr}
     """.stripMargin
-  }
 
-  override def runTest(testFile: File): TestState = {
+  override def runTest(testFile: File): TestState =
     // Mostly copy-pasted from SuiteRunner.runTest(), unfortunately :-(
     val runner = new ScalaJSRunner(testFile, this, listDir, options)
 
@@ -98,22 +86,18 @@ trait ScalaJSSuiteRunner extends SuiteRunner {
     // is present (which means it failed before)
     val state =
       if (failed && !runner.logFile.canRead) runner.genPass()
-      else {
-        val (state, elapsed) = try timed(runner.run()) catch {
+      else
+        val (state, elapsed) = try timed(runner.run()) catch
           case t: Throwable =>
             throw new RuntimeException(s"Error running $testFile", t)
-        }
         NestUI.reportTest(state)
         runner.cleanup()
         state
-      }
     onFinishTest(testFile, state)
-  }
 
   override def runTestsForFiles(
-      kindFiles: Array[File], kind: String): Array[TestState] = {
+      kindFiles: Array[File], kind: String): Array[TestState] =
     super.runTestsForFiles(kindFiles.filter(shouldUseTest), kind)
-  }
 
   private lazy val listDir = s"/scala/tools/partest/scalajs/$scalaVersion"
 
@@ -126,42 +110,35 @@ trait ScalaJSSuiteRunner extends SuiteRunner {
   private lazy val whitelistedTestFileNames = readTestList(
       s"$listDir/WhitelistedTests.txt")
 
-  private def readTestList(resourceName: String): Set[String] = {
+  private def readTestList(resourceName: String): Set[String] =
     val source = scala.io.Source.fromURL(getClass.getResource(resourceName))
 
-    val fileNames = for {
+    val fileNames = for
       line <- source.getLines
       trimmed = line.trim if trimmed != "" && !trimmed.startsWith("#")
-    } yield extendShortTestName(trimmed)
+    yield extendShortTestName(trimmed)
 
     fileNames.toSet
-  }
 
-  private def extendShortTestName(testName: String) = {
+  private def extendShortTestName(testName: String) =
     val srcDir = PathSettings.srcDir
     (srcDir / testName).toCanonical.getAbsolutePath
-  }
 
-  private lazy val testFilter: String => Boolean = {
+  private lazy val testFilter: String => Boolean =
     import ScalaJSPartestOptions._
-    options.testFilter match {
-      case UnknownTests => { absPath =>
+    options.testFilter match
+      case UnknownTests =>  absPath =>
           !blacklistedTestFileNames.contains(absPath) &&
           !whitelistedTestFileNames.contains(absPath) &&
           !buglistedTestFileNames.contains(absPath)
-        }
       case BlacklistedTests => blacklistedTestFileNames
       case BuglistedTests => buglistedTestFileNames
       case WhitelistedTests => whitelistedTestFileNames
       case SomeTests(names) => names.map(extendShortTestName _).toSet
-    }
-  }
 
-  private def shouldUseTest(testFile: File): Boolean = {
+  private def shouldUseTest(testFile: File): Boolean =
     val absPath = testFile.toCanonical.getAbsolutePath
     testFilter(absPath)
-  }
-}
 
 /* Pre-mixin ScalaJSSuiteRunner in SBTRunner, because this is looked up
  * via reflection from the sbt partest interface of Scala.js
@@ -187,7 +164,7 @@ class ScalaJSSBTRunner(
         javaCmd,
         javacCmd,
         scalacArgs
-    ) with ScalaJSSuiteRunner {
+    ) with ScalaJSSuiteRunner
 
   // The test root for partest is read out through the system properties,
   // not passed as an argument
@@ -198,4 +175,3 @@ class ScalaJSSBTRunner(
 
   // Set showDiff on global UI module
   if (options.showDiff) NestUI.setDiffOnFail()
-}

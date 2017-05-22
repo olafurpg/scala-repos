@@ -34,7 +34,7 @@ import org.apache.spark.sql.types.DataType
 @Experimental
 class ElementwiseProduct(override val uid: String)
     extends UnaryTransformer[Vector, Vector, ElementwiseProduct]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("elemProd"))
 
@@ -51,19 +51,16 @@ class ElementwiseProduct(override val uid: String)
   /** @group getParam */
   def getScalingVec: Vector = getOrDefault(scalingVec)
 
-  override protected def createTransformFunc: Vector => Vector = {
+  override protected def createTransformFunc: Vector => Vector =
     require(params.contains(scalingVec),
             s"transformation requires a weight vector")
     val elemScaler = new feature.ElementwiseProduct($(scalingVec))
     elemScaler.transform
-  }
 
   override protected def outputDataType: DataType = new VectorUDT()
-}
 
 @Since("2.0.0")
-object ElementwiseProduct extends DefaultParamsReadable[ElementwiseProduct] {
+object ElementwiseProduct extends DefaultParamsReadable[ElementwiseProduct]
 
   @Since("2.0.0")
   override def load(path: String): ElementwiseProduct = super.load(path)
-}

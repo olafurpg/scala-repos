@@ -18,13 +18,13 @@ import scala.concurrent.Await
 @Threads(1)
 @Warmup(iterations = 10, batchSize = TellOnlyBenchmark.numMessages)
 @Measurement(iterations = 10, batchSize = TellOnlyBenchmark.numMessages)
-class TellOnlyBenchmark {
+class TellOnlyBenchmark
   import TellOnlyBenchmark._
 
   implicit var system: ActorSystem = _
 
   @Setup(Level.Trial)
-  def setup(): Unit = {
+  def setup(): Unit =
     system = ActorSystem("TellOnlyBenchmark",
                          ConfigFactory.parseString(s"""| akka {
           |   log-dead-letters = off
@@ -46,19 +46,17 @@ class TellOnlyBenchmark {
           |   mailbox-type = "akka.actor.TellOnlyBenchmark$$UnboundedDroppingMailbox"
           | }
           | """.stripMargin))
-  }
 
   @TearDown(Level.Trial)
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
-  }
 
   var actor: ActorRef = _
   var probe: TestProbe = _
 
   @Setup(Level.Iteration)
-  def setupIteration(): Unit = {
+  def setupIteration(): Unit =
     actor = system.actorOf(
         Props[TellOnlyBenchmark.Echo].withDispatcher("dropping-dispatcher"))
     probe = TestProbe()
@@ -68,58 +66,49 @@ class TellOnlyBenchmark {
     probe.send(actor, flipDrop)
     probe.expectNoMsg(200.millis)
     System.gc()
-  }
 
   @TearDown(Level.Iteration)
-  def shutdownIteration(): Unit = {
+  def shutdownIteration(): Unit =
     probe.send(actor, flipDrop)
     probe.expectNoMsg(200.millis)
     actor ! stop
     probe.expectTerminated(actor, timeout)
     actor = null
     probe = null
-  }
 
   @Benchmark
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  def tell(): Unit = {
+  def tell(): Unit =
     probe.send(actor, message)
-  }
-}
 
-object TellOnlyBenchmark {
+object TellOnlyBenchmark
   final val stop = "stop"
   final val message = "message"
   final val flipDrop = "flipDrop"
   final val timeout = 5.seconds
   final val numMessages = 1000000
 
-  class Echo extends Actor {
-    def receive = {
+  class Echo extends Actor
+    def receive =
       case s @ `stop` ⇒
         context stop self
       case m ⇒ sender ! m
-    }
-  }
 
-  class DroppingMessageQueue extends UnboundedMailbox.MessageQueue {
+  class DroppingMessageQueue extends UnboundedMailbox.MessageQueue
     @volatile var dropping = false
 
-    override def enqueue(receiver: ActorRef, handle: Envelope): Unit = {
+    override def enqueue(receiver: ActorRef, handle: Envelope): Unit =
       if (handle.message == flipDrop) dropping = !dropping
       else if (!dropping) super.enqueue(receiver, handle)
-    }
-  }
 
   case class UnboundedDroppingMailbox()
-      extends MailboxType with ProducesMessageQueue[DroppingMessageQueue] {
+      extends MailboxType with ProducesMessageQueue[DroppingMessageQueue]
 
     def this(settings: ActorSystem.Settings, config: Config) = this()
 
     final override def create(
         owner: Option[ActorRef], system: Option[ActorSystem]): MessageQueue =
       new DroppingMessageQueue
-  }
 
   class DroppingDispatcher(
       _configurator: MessageDispatcherConfigurator,
@@ -133,22 +122,19 @@ object TellOnlyBenchmark {
                          _throughput,
                          _throughputDeadlineTime,
                          _executorServiceFactoryProvider,
-                         _shutdownTimeout) {
+                         _shutdownTimeout)
 
     override protected[akka] def dispatch(
-        receiver: ActorCell, invocation: Envelope): Unit = {
+        receiver: ActorCell, invocation: Envelope): Unit =
       val mbox = receiver.mailbox
       mbox.enqueue(receiver.self, invocation)
-      mbox.messageQueue match {
+      mbox.messageQueue match
         case mb: DroppingMessageQueue if mb.dropping ⇒ // do nothing
         case _ ⇒ registerForExecution(mbox, true, false)
-      }
-    }
-  }
 
   class DroppingDispatcherConfigurator(
       config: Config, prerequisites: DispatcherPrerequisites)
-      extends MessageDispatcherConfigurator(config, prerequisites) {
+      extends MessageDispatcherConfigurator(config, prerequisites)
 
     override def dispatcher(): MessageDispatcher =
       new DroppingDispatcher(
@@ -158,5 +144,3 @@ object TellOnlyBenchmark {
           config.getNanosDuration("throughput-deadline-time"),
           configureExecutor(),
           config.getMillisDuration("shutdown-timeout"))
-  }
-}

@@ -25,7 +25,7 @@ import scala.util.control.NonFatal
   *
   * @since 2.4.0
   */
-trait HttpErrorHandler {
+trait HttpErrorHandler
 
   /**
     * Invoked when a client error occurs, that is, an error in the 4xx series.
@@ -46,16 +46,15 @@ trait HttpErrorHandler {
     */
   def onServerError(
       request: RequestHeader, exception: Throwable): Future[Result]
-}
 
-object HttpErrorHandler {
+object HttpErrorHandler
 
   /**
     * Get the bindings for the error handler from the configuration
     */
   def bindingsFromConfiguration(
       environment: Environment,
-      configuration: Configuration): Seq[Binding[_]] = {
+      configuration: Configuration): Seq[Binding[_]] =
     Reflect.bindingsFromConfiguration[HttpErrorHandler,
                                       play.http.HttpErrorHandler,
                                       JavaHttpErrorHandlerAdapter,
@@ -65,8 +64,6 @@ object HttpErrorHandler {
         PlayConfig(configuration),
         "play.http.errorHandler",
         "ErrorHandler")
-  }
-}
 
 /**
   * HTTP error handler that delegates to legacy GlobalSettings methods.
@@ -81,7 +78,7 @@ object HttpErrorHandler {
 @Singleton
 private[play] class GlobalSettingsHttpErrorHandler @Inject()(
     global: Provider[GlobalSettings])
-    extends HttpErrorHandler {
+    extends HttpErrorHandler
 
   /**
     * Invoked when a client error occurs, that is, an error in the 4xx series.
@@ -90,8 +87,8 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
     * @param statusCode The error status code.  Must be greater or equal to 400, and less than 500.
     * @param message The error message.
     */
-  def onClientError(request: RequestHeader, statusCode: Int, message: String) = {
-    statusCode match {
+  def onClientError(request: RequestHeader, statusCode: Int, message: String) =
+    statusCode match
       case BAD_REQUEST => global.get.onBadRequest(request, message)
       case FORBIDDEN =>
         Future.successful(Forbidden(views.html.defaultpages.unauthorized()))
@@ -102,8 +99,6 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
       case nonClientError =>
         throw new IllegalArgumentException(
             s"onClientError invoked with non client error status code $statusCode: $message")
-    }
-  }
 
   /**
     * Invoked when a server error occurs.
@@ -113,7 +108,6 @@ private[play] class GlobalSettingsHttpErrorHandler @Inject()(
     */
   def onServerError(request: RequestHeader, exception: Throwable) =
     global.get.onError(request, exception)
-}
 
 /**
   * The default HTTP error handler.
@@ -131,7 +125,7 @@ class DefaultHttpErrorHandler(environment: Environment,
                               configuration: Configuration,
                               sourceMapper: Option[SourceMapper] = None,
                               router: => Option[Router] = None)
-    extends HttpErrorHandler {
+    extends HttpErrorHandler
 
   @Inject
   def this(environment: Environment,
@@ -154,7 +148,7 @@ class DefaultHttpErrorHandler(environment: Environment,
     */
   def onClientError(request: RequestHeader,
                     statusCode: Int,
-                    message: String): Future[Result] = statusCode match {
+                    message: String): Future[Result] = statusCode match
     case BAD_REQUEST => onBadRequest(request, message)
     case FORBIDDEN => onForbidden(request, message)
     case NOT_FOUND => onNotFound(request, message)
@@ -163,7 +157,6 @@ class DefaultHttpErrorHandler(environment: Environment,
     case nonClientError =>
       throw new IllegalArgumentException(
           s"onClientError invoked with non client error status code $statusCode: $message")
-  }
 
   /**
     * Invoked when a client makes a bad request.
@@ -195,16 +188,15 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param message A message.
     */
   protected def onNotFound(
-      request: RequestHeader, message: String): Future[Result] = {
+      request: RequestHeader, message: String): Future[Result] =
     Future.successful(
-        NotFound(environment.mode match {
+        NotFound(environment.mode match
       case Mode.Prod =>
         views.html.defaultpages.notFound(request.method, request.uri)
       case _ =>
         views.html.defaultpages
           .devNotFound(request.method, request.uri, router)
-    }))
-  }
+    ))
 
   /**
     * Invoked when a client error occurs, that is, an error in the 4xx series, which is not handled by any of
@@ -216,10 +208,9 @@ class DefaultHttpErrorHandler(environment: Environment,
     */
   protected def onOtherClientError(request: RequestHeader,
                                    statusCode: Int,
-                                   message: String): Future[Result] = {
+                                   message: String): Future[Result] =
     Future.successful(Results.Status(statusCode)(views.html.defaultpages
               .badRequest(request.method, request.uri, message)))
-  }
 
   /**
     * Invoked when a server error occurs.
@@ -232,24 +223,21 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param exception The server error.
     */
   def onServerError(
-      request: RequestHeader, exception: Throwable): Future[Result] = {
-    try {
+      request: RequestHeader, exception: Throwable): Future[Result] =
+    try
       val usefulException =
         HttpErrorHandlerExceptions.throwableToUsefulException(
             sourceMapper, environment.mode == Mode.Prod, exception)
 
       logServerError(request, usefulException)
 
-      environment.mode match {
+      environment.mode match
         case Mode.Prod => onProdServerError(request, usefulException)
         case _ => onDevServerError(request, usefulException)
-      }
-    } catch {
+    catch
       case NonFatal(e) =>
         Logger.error("Error while handling error", e)
         Future.successful(InternalServerError)
-    }
-  }
 
   /**
     * Responsible for logging server errors.
@@ -260,14 +248,13 @@ class DefaultHttpErrorHandler(environment: Environment,
     * @param usefulException The server error.
     */
   protected def logServerError(
-      request: RequestHeader, usefulException: UsefulException) {
+      request: RequestHeader, usefulException: UsefulException)
     Logger.error("""
                     |
                     |! @%s - Internal server error, for (%s) [%s] ->
                     | """.stripMargin.format(
                      usefulException.id, request.method, request.uri),
                  usefulException)
-  }
 
   /**
     * Invoked in dev mode when a server error occurs.
@@ -293,12 +280,11 @@ class DefaultHttpErrorHandler(environment: Environment,
       request: RequestHeader, exception: UsefulException): Future[Result] =
     Future.successful(
         InternalServerError(views.html.defaultpages.error(exception)))
-}
 
 /**
   * Extracted so the Java default error handler can reuse this functionality
   */
-object HttpErrorHandlerExceptions {
+object HttpErrorHandlerExceptions
 
   /**
     * Convert the given exception to an exception that Play can report more information about.
@@ -309,7 +295,7 @@ object HttpErrorHandlerExceptions {
   def throwableToUsefulException(
       sourceMapper: Option[SourceMapper],
       isProd: Boolean,
-      throwable: Throwable): UsefulException = throwable match {
+      throwable: Throwable): UsefulException = throwable match
     case useful: UsefulException => useful
     case e: ExecutionException =>
       throwableToUsefulException(sourceMapper, isProd, e.getCause)
@@ -321,15 +307,12 @@ object HttpErrorHandlerExceptions {
       new PlayException.ExceptionSource(
           "Execution exception",
           "[%s: %s]".format(other.getClass.getSimpleName, other.getMessage),
-          other) {
+          other)
         def line =
           source.flatMap(_._2).map(_.asInstanceOf[java.lang.Integer]).orNull
         def position = null
         def input = source.map(_._1).map(PlayIO.readFileAsString).orNull
         def sourceName = source.map(_._1.getAbsolutePath).orNull
-      }
-  }
-}
 
 /**
   * A default HTTP error handler that can be used when there's no application available
@@ -341,7 +324,7 @@ object DefaultHttpErrorHandler
 /**
   * A lazy HTTP error handler, that looks up the error handler from the current application
   */
-object LazyHttpErrorHandler extends HttpErrorHandler {
+object LazyHttpErrorHandler extends HttpErrorHandler
 
   private def errorHandler =
     Play.privateMaybeApplication
@@ -352,7 +335,6 @@ object LazyHttpErrorHandler extends HttpErrorHandler {
 
   def onServerError(request: RequestHeader, exception: Throwable) =
     errorHandler.onServerError(request, exception)
-}
 
 /**
   * A Java error handler that's provided when a Scala one is configured, so that Java code can still have the error
@@ -360,7 +342,7 @@ object LazyHttpErrorHandler extends HttpErrorHandler {
   */
 private[play] class JavaHttpErrorHandlerDelegate @Inject()(
     delegate: HttpErrorHandler)
-    extends play.http.HttpErrorHandler {
+    extends play.http.HttpErrorHandler
   import play.api.libs.iteratee.Execution.Implicits.trampoline
 
   def onClientError(
@@ -374,4 +356,3 @@ private[play] class JavaHttpErrorHandlerDelegate @Inject()(
     FutureConverters.toJava(delegate
           .onServerError(request._underlyingHeader(), exception)
           .map(_.asJava))
-}

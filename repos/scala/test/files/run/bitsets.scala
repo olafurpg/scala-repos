@@ -6,7 +6,7 @@
 
 import scala.language.postfixOps
 
-object TestMutable {
+object TestMutable
   import scala.collection.mutable.BitSet
 
   val ms0 = new BitSet
@@ -43,19 +43,17 @@ object TestMutable {
   val N = 257
   val gen = 3
   val bs = BitSet((1 until N): _*)
-  (1 until N).foldLeft(gen) {
+  (1 until N).foldLeft(gen)
     case (acc, i) =>
       assert(bs.size == N - i,
              s"Bad size for $bs, expected ${N - i} actual ${bs.size}")
       assert(!bs.isEmpty, s"Unexpected isEmpty for $bs")
       bs -= acc
       acc * gen % N
-  }
   assert(bs.size == 0, s"Expected size == 0 for $bs")
   assert(bs.isEmpty, s"Expected isEmpty for $bs")
-}
 
-object TestMutable2 {
+object TestMutable2
   import scala.collection.mutable.BitSet
   import scala.collection.immutable.TreeSet
 
@@ -95,9 +93,8 @@ object TestMutable2 {
   println("m2_r2 = " + (t2.range(43, 194) == b2.range(43, 194)))
   println("m2_r3 = " + (t3.range(43, 194) == b3.range(43, 194)))
   println
-}
 
-object TestMutable3 {
+object TestMutable3
   import scala.collection.mutable.BitSet
 
   val b0 = BitSet(5, 6)
@@ -116,7 +113,6 @@ object TestMutable3 {
   println(s"b4:$b4")
   b0 ^= b0 |= b1
   println(s"b0:$b0")
-}
 
 /***
 The memory requirements here are way beyond
@@ -135,7 +131,7 @@ object TestMutable4 {
   println(bMax == bLarge)
 }
   ***/
-object TestImmutable {
+object TestImmutable
   import scala.collection.immutable.BitSet
 
   val is0 = BitSet()
@@ -163,9 +159,8 @@ object TestImmutable {
   Console.println("ia2 = " + is2.toList)
   Console.println("ia3 = " + is3.toList)
   Console.println
-}
 
-object TestImmutable2 {
+object TestImmutable2
   import scala.collection.immutable.{BitSet, TreeSet}
 
   val l0 = 0 to 24 by 2 toList
@@ -204,15 +199,13 @@ object TestImmutable2 {
   println("i2_r2 = " + (t2.range(77, 194) == b2.range(77, 194)))
   println("i2_r3 = " + (t3.range(77, 194) == b3.range(77, 194)))
   println
-}
 
-object Test extends App {
+object Test extends App
   TestMutable
   TestMutable2
   TestMutable3
   // TestMutable4
   TestImmutable
   TestImmutable2
-}
 
 //############################################################################

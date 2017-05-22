@@ -9,17 +9,16 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class PHPMemCacheClientTest extends FunSuite with MockitoSugar {
+class PHPMemCacheClientTest extends FunSuite with MockitoSugar
 
-  class Context {
+  class Context
     val client1 = mock[Client]
     val client2 = mock[Client]
     val client3 = mock[Client]
     val phpMemCacheClient = new PHPMemCacheClient(
         Array(client1, client2, client3), KeyHasher.FNV1_32)
-  }
 
-  test("pick the correct node") {
+  test("pick the correct node")
     val context = new Context
     import context._
 
@@ -28,9 +27,8 @@ class PHPMemCacheClientTest extends FunSuite with MockitoSugar {
     assert(phpMemCacheClient.clientOf("cow") == (client3))
     assert(phpMemCacheClient.clientOf("dog") == (client2))
     assert(phpMemCacheClient.clientOf("elephant") == (client2))
-  }
 
-  test("release") {
+  test("release")
     val context = new Context
     import context._
 
@@ -38,5 +36,3 @@ class PHPMemCacheClientTest extends FunSuite with MockitoSugar {
     verify(client1).release()
     verify(client2).release()
     verify(client3).release()
-  }
-}

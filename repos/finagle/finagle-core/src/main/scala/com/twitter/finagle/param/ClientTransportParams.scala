@@ -17,7 +17,7 @@ import javax.net.ssl.SSLContext
   */
 class ClientTransportParams[A <: Stack.Parameterized[A]](
     self: Stack.Parameterized[A])
-    extends TransportParams(self) {
+    extends TransportParams(self)
 
   /**
     * Configures the TCP connection `timeout` of this client (default: 1 second).
@@ -32,45 +32,39 @@ class ClientTransportParams[A <: Stack.Parameterized[A]](
     * Enables the TLS/SSL support (connection encrypting) on this client.
     * Hostname verification will be provided against the given `hostname`.
     */
-  def tls(hostname: String): A = {
-    val socketAddressToEngine: SocketAddress => Engine = {
+  def tls(hostname: String): A =
+    val socketAddressToEngine: SocketAddress => Engine =
       case sa: InetSocketAddress => Ssl.client(hostname, sa.getPort)
       case _ => Ssl.client()
-    }
 
     self
       .configured(Transport.TLSClientEngine(Some(socketAddressToEngine)))
       .configured(Transporter.TLSHostname(Some(hostname)))
-  }
 
   /**
     * Enables the TLS/SSL support (connection encrypting) with no hostname validation
     * on this client. The TLS/SSL sessions are configured using the given `context`.
     */
-  def tls(context: SSLContext): A = {
-    val socketAddressToEngine: SocketAddress => Engine = {
+  def tls(context: SSLContext): A =
+    val socketAddressToEngine: SocketAddress => Engine =
       case sa: InetSocketAddress =>
         Ssl.client(context, sa.getHostName, sa.getPort)
       case _ => Ssl.client(context)
-    }
 
     self.configured(Transport.TLSClientEngine(Some(socketAddressToEngine)))
-  }
 
   /**
     * Enables the TLS/SSL support (connection encrypting) with no hostname validation
     * on this client.
     */
-  def tlsWithoutValidation: A = {
-    val socketAddressToEngine: SocketAddress => Engine = {
+  def tlsWithoutValidation: A =
+    val socketAddressToEngine: SocketAddress => Engine =
       case sa: InetSocketAddress =>
         Ssl.clientWithoutCertificateValidation(sa.getHostName, sa.getPort)
       case _ =>
         Ssl.clientWithoutCertificateValidation()
-    }
 
     self.configured(Transport.TLSClientEngine(Some(socketAddressToEngine)))
-  }
 
   /**
     * Enables the SOCKS proxy on this client (default: global flags).
@@ -88,4 +82,3 @@ class ClientTransportParams[A <: Stack.Parameterized[A]](
             Some(socketAddress),
             credentials.map(c => (c.username, c.password))
         ))
-}

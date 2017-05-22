@@ -4,19 +4,17 @@ import sbt.complete.Parser._
 import sbt.complete.Parsers._
 import sbt.complete._
 
-object ScalaOptionParser {
+object ScalaOptionParser
 
   /** A SBT parser for the Scala command line runners (scala, scalac, etc) */
-  def scalaParser(entryPoint: String, globalBase: File): Parser[String] = {
+  def scalaParser(entryPoint: String, globalBase: File): Parser[String] =
     def BooleanSetting(name: String): Parser[String] =
       token(name)
-    def StringSetting(name: String): Parser[String] = {
-      val valueParser = name match {
+    def StringSetting(name: String): Parser[String] =
+      val valueParser = name match
         case "-d" => JarOrDirectoryParser
         case _ => token(StringBasic, TokenCompletions.displayOnly("<value>"))
-      }
       concat(concat(token(name ~ Space.string)) ~ valueParser)
-    }
     def MultiStringSetting(name: String): Parser[String] =
       concat(
           concat(token(name ~ ":")) ~ repsep(
@@ -37,27 +35,23 @@ object ScalaOptionParser {
           token(concat(name ~ ":")) ~ rep1sep(
               token(StringBasic.examples(choices: _*)),
               token(",")).map(_.mkString))
-    def PathSetting(name: String): Parser[String] = {
+    def PathSetting(name: String): Parser[String] =
       concat(
           concat(token(name) ~ Space.string) ~ rep1sep(
               JarOrDirectoryParser.filter(!_.contains(":"), x => x),
               token(java.io.File.pathSeparator)).map(_.mkString))
-    }
-    def FileSetting(name: String): Parser[String] = {
+    def FileSetting(name: String): Parser[String] =
       concat(
           concat(token(name) ~ Space.string) ~ rep1sep(
               JarOrDirectoryParser.filter(!_.contains(":"), x => x),
               token(java.io.File.pathSeparator)).map(_.mkString))
-    }
     val Phase = token(NotSpace.examples(phases: _*))
-    def PhaseSettingParser(name: String): Parser[String] = {
+    def PhaseSettingParser(name: String): Parser[String] =
       MultiChoiceSetting(name, phases)
-    }
-    def ScalaVersionSetting(name: String): Parser[String] = {
+    def ScalaVersionSetting(name: String): Parser[String] =
       concat(concat(token(name ~ Space.string)) ~ token(
               StringBasic, TokenCompletions.displayOnly("<scala version>")))
-    }
-    val Property: Parser[String] = {
+    val Property: Parser[String] =
       val PropName = concat(
           token("-D" ~ oneOrMore(NotSpaceClass & not('=', "not =")).string,
                 TokenCompletions.displayOnly("-D<property name>")))
@@ -65,7 +59,6 @@ object ScalaOptionParser {
           "=" ~ token(OptNotSpace,
                       TokenCompletions.displayOnly("<property value>")))
       concat(PropName ~ EqualsValue.?.map(_.getOrElse("")))
-    }
 
     val sourceFile = FileParser(GlobFilter("*.scala") | GlobFilter("*.java"))
 
@@ -75,30 +68,30 @@ object ScalaOptionParser {
           pathSettingNames.map(PathSetting) ++ phaseSettings.map(
               PhaseSettingParser) ++ booleanSettingNames.map(BooleanSetting) ++ stringSettingNames
             .map(StringSetting) ++ multiStringSettingNames.map(MultiStringSetting) ++ intSettingNames
-            .map(IntSetting) ++ choiceSettingNames.map {
+            .map(IntSetting) ++ choiceSettingNames.map
         case (k, v) => ChoiceSetting(k, v)
-      } ++ multiChoiceSettingNames.map {
+      ++ multiChoiceSettingNames.map
         case (k, v) => MultiChoiceSetting(k, v)
-      } ++ scalaVersionSettings.map(ScalaVersionSetting))
+      ++ scalaVersionSettings.map(ScalaVersionSetting))
     val ScalacOpt = sourceFile | UniversalOpt
 
-    val ScalaExtraSettings = oneOf(scalaChoiceSettingNames.map {
+    val ScalaExtraSettings = oneOf(scalaChoiceSettingNames.map
       case (k, v) => ChoiceSetting(k, v)
-    }.toList ++ scalaStringSettingNames.map(StringSetting) ++ scalaBooleanSettingNames
+    .toList ++ scalaStringSettingNames.map(StringSetting) ++ scalaBooleanSettingNames
           .map(BooleanSetting))
     val ScalaOpt = UniversalOpt | ScalaExtraSettings
 
     val ScalaDocExtraSettings = oneOf(
         scalaDocBooleanSettingNames.map(BooleanSetting) ++ scalaDocIntSettingNames
-          .map(IntSetting) ++ scalaDocChoiceSettingNames.map {
+          .map(IntSetting) ++ scalaDocChoiceSettingNames.map
           case (k, v) => ChoiceSetting(k, v)
-        } ++ scaladocStringSettingNames.map(StringSetting) ++ scaladocPathSettingNames
+        ++ scaladocStringSettingNames.map(StringSetting) ++ scaladocPathSettingNames
           .map(PathSetting) ++ scaladocMultiStringSettingNames.map(
             MultiStringSetting)
     )
     val ScalaDocOpt = ScalacOpt | ScalaDocExtraSettings
 
-    val P = entryPoint match {
+    val P = entryPoint match
       case "scala" =>
         val runnable =
           token(StringBasicNotStartingWithDash,
@@ -119,9 +112,7 @@ object ScalaOptionParser {
         Opt(Space ~> Opt(repsep(ScalaDocOpt, Space).map(_.mkString(" "))))
       case "scalac" =>
         Opt(Space ~> repsep(ScalacOpt, Space).map(_.mkString(" ")))
-    }
     P <~ token(OptSpace)
-  }
 
   // TODO retrieve this data programmatically, ala https://github.com/scala/scala-tool-support/blob/master/bash-completion/src/main/scala/BashCompletion.scala
   private def booleanSettingNames =
@@ -373,4 +364,3 @@ object ScalaOptionParser {
   private def scaladocPathSettingNames =
     List("-doc-root-content", "-diagrams-dot-path")
   private def scaladocMultiStringSettingNames = List("-doc-external-doc")
-}

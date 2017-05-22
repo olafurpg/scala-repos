@@ -24,36 +24,31 @@ import com.twitter.summingbird.batch._
 import com.twitter.algebird.{Interval, ExclusiveUpper, Empty}
 import java.util.concurrent.TimeUnit
 
-object BatcherLaws extends Properties("Batcher") {
+object BatcherLaws extends Properties("Batcher")
   import Generators._
   import OrderedFromOrderingExt._
 
-  def batchIdIdentity(batcher: Batcher) = { (b: BatchID) =>
+  def batchIdIdentity(batcher: Batcher) =  (b: BatchID) =>
     batcher.batchOf(batcher.earliestTimeOf(b))
-  }
 
-  def earliestIs_<=(batcher: Batcher) = forAll { (d: Timestamp) =>
+  def earliestIs_<=(batcher: Batcher) = forAll  (d: Timestamp) =>
     val ord = implicitly[Ordering[Timestamp]]
     ord.compare(batcher.earliestTimeOf(batcher.batchOf(d)), d) <= 0
-  }
 
-  def batchesAreWeakOrderings(batcher: Batcher) = forAll {
+  def batchesAreWeakOrderings(batcher: Batcher) = forAll
     (d1: Timestamp, d2: Timestamp) =>
       val ord = implicitly[Ordering[BatchID]]
       val ordT = implicitly[Ordering[Timestamp]]
-      ord.compare(batcher.batchOf(d1), batcher.batchOf(d2)) match {
+      ord.compare(batcher.batchOf(d1), batcher.batchOf(d2)) match
         case 0 => true // can't say much
         case x => ordT.compare(d1, d2) == x
-      }
-  }
 
-  def batchesIncreaseByAtMostOne(batcher: Batcher) = forAll { (d: Timestamp) =>
+  def batchesIncreaseByAtMostOne(batcher: Batcher) = forAll  (d: Timestamp) =>
     val nextTimeB = batcher.batchOf(d.next)
     batcher.batchOf(d) == nextTimeB || batcher.batchOf(d) == nextTimeB.prev
-  }
 
   def batchesCoveredByIdent(batcher: Batcher) =
-    forAll { (d: Timestamp) =>
+    forAll  (d: Timestamp) =>
       val b = batcher.batchOf(d)
       val list = BatchID
         .toIterable(
@@ -61,12 +56,11 @@ object BatcherLaws extends Properties("Batcher") {
         )
         .toList
       list == List(b)
-    }
 
   def batchIntervalTransformToTs(batcher: Batcher,
                                  intervalGenerator: (BatchID,
                                  BatchID) => Interval[BatchID]) =
-    forAll { (tsA: Timestamp, tsB: Timestamp, deltaMs: Long) =>
+    forAll  (tsA: Timestamp, tsB: Timestamp, deltaMs: Long) =>
       val (tsLower, tsUpper) = if (tsA < tsB) (tsA, tsB) else (tsB, tsA)
 
       val deltaBounded = Milliseconds(deltaMs % 1000 * 86000 * 365L)
@@ -81,7 +75,6 @@ object BatcherLaws extends Properties("Batcher") {
       // Granularity of the batcher interval is bigger
       // So we can't correctly do both intersections together
       int.contains(generatedBatch) == tsInterval.contains(generatedTS)
-    }
 
   def batcherLaws(batcher: Batcher) =
     earliestIs_<=(batcher) && batchesAreWeakOrderings(batcher) &&
@@ -89,13 +82,11 @@ object BatcherLaws extends Properties("Batcher") {
     batchIntervalTransformToTs(batcher, Interval.leftOpenRightClosed(_, _)) &&
     batchIntervalTransformToTs(batcher, Interval.leftClosedRightOpen(_, _))
 
-  property("UnitBatcher should always return the same batch") = {
+  property("UnitBatcher should always return the same batch") =
     val batcher = Batcher.unit
     val ident = batchIdIdentity(batcher)
-    forAll { batchID: BatchID =>
+    forAll  batchID: BatchID =>
       ident(batchID) == BatchID(0)
-    }
-  }
 
   property("Unit obeys laws") = batcherLaws(Batcher.unit)
 
@@ -116,7 +107,7 @@ object BatcherLaws extends Properties("Batcher") {
 
   val hourlyBatcher = Batcher.ofHours(1)
 
-  property("DurationBatcher should batch correctly") = forAll { millis: Long =>
+  property("DurationBatcher should batch correctly") = forAll  millis: Long =>
     val hourIndex: Long = millis / millisPerHour
 
     // Long division rounds toward zero. Add a correction to make
@@ -126,49 +117,39 @@ object BatcherLaws extends Properties("Batcher") {
     (hourlyBatcher.batchOf(Timestamp(millis)) == flooredBatch) &&
     (hourlyBatcher.earliestTimeOf(flooredBatch).milliSinceEpoch == hourlyBatchFloor(
             flooredBatch.id))
-  }
 
   property(
-      "DurationBatcher should fully enclose each batch with a single batch") = forAll {
+      "DurationBatcher should fully enclose each batch with a single batch") = forAll
     i: Int =>
       hourlyBatcher.enclosedBy(BatchID(i), hourlyBatcher).toList == List(
           BatchID(i))
-  }
 
-  property("batchesCoveredBy is a subset of covers") = forAll {
+  property("batchesCoveredBy is a subset of covers") = forAll
     (int: Interval[Timestamp]) =>
       val coveredBy = hourlyBatcher.batchesCoveredBy(int)
       val covers = hourlyBatcher.cover(int)
       (covers && coveredBy) == coveredBy
-  }
 
-  property("Lower batch edge should align") = {
+  property("Lower batch edge should align") =
     implicit val tenSecondBatcher = Batcher(10, TimeUnit.SECONDS)
-    forAll { initialTime: Int =>
-      initialTime > 0 ==> {
+    forAll  initialTime: Int =>
+      initialTime > 0 ==>
         Stream
           .iterate(Timestamp(initialTime * 1000L))(_.incrementSeconds(1))
           .take(100)
-          .forall { t =>
+          .forall  t =>
             if (t.milliSinceEpoch % (1000 * 10) == 0)
               tenSecondBatcher.isLowerBatchEdge(t)
             else !tenSecondBatcher.isLowerBatchEdge(t)
-          }
-      }
-    }
-  }
 
-  property("batchesCoveredBy produces has times in the interval") = forAll {
+  property("batchesCoveredBy produces has times in the interval") = forAll
     (d: Timestamp, sl: SmallLong) =>
       // Make sure we cover at least an hour in the usual case by multiplying by ms per hour
       val int = Interval.leftClosedRightOpen(d, d.incrementHours(sl.get))
       val covered = hourlyBatcher.batchesCoveredBy(int)
       // If we have empty, we have to have <= 1 hour blocks, 2 or more must cover a 1 hour block
-      ((covered == Empty[BatchID]()) && (sl.get <= 1)) || {
+      ((covered == Empty[BatchID]()) && (sl.get <= 1)) ||
         val minBatch = BatchID.toIterable(covered).min
         val maxBatch = BatchID.toIterable(covered).max
         int.contains(hourlyBatcher.earliestTimeOf(minBatch)) &&
         int.contains(hourlyBatcher.earliestTimeOf(maxBatch.next).prev)
-      }
-  }
-}

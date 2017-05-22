@@ -12,17 +12,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElemen
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */
-trait ScImportExpr extends ScalaPsiElement {
+trait ScImportExpr extends ScalaPsiElement
   def reference: Option[ScStableCodeReferenceElement]
 
   def selectorSet: Option[ScImportSelectors]
 
-  def selectors: Seq[ScImportSelector] = {
-    selectorSet match {
+  def selectors: Seq[ScImportSelector] =
+    selectorSet match
       case None => Seq.empty
       case Some(s) => s.selectors
-    }
-  }
 
   def singleWildcard: Boolean
 
@@ -32,18 +30,15 @@ trait ScImportExpr extends ScalaPsiElement {
 
   def deleteExpr()
 
-  def getNames: Array[String] = getLastChild match {
+  def getNames: Array[String] = getLastChild match
     case s: ScImportSelectors =>
       (for (selector <- selectors) yield selector.getText).toArray
     case _ =>
-      getNode.getLastChildNode.getText match {
+      getNode.getLastChildNode.getText match
         case "_" => Array[String]("_")
         case _ if getNode.getLastChildNode.getLastChildNode != null =>
           Array[String](getNode.getLastChildNode.getLastChildNode.getText)
         case _ => Array[String]()
-      }
-  }
 
   override def accept(visitor: ScalaElementVisitor) =
     visitor.visitImportExpr(this)
-}

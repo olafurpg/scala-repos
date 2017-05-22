@@ -9,7 +9,7 @@ import akka.actor.Actor
 /*
  * This class is responsible for booting up a stack of bundles and then shutting them down
  */
-class AkkaLoader {
+class AkkaLoader
   private val hasBooted = new Switch(false)
 
   @volatile
@@ -20,29 +20,26 @@ class AkkaLoader {
   /*
    * Boot initializes the specified bundles
    */
-  def boot(withBanner: Boolean, b: Bootable): Unit = hasBooted switchOn {
+  def boot(withBanner: Boolean, b: Bootable): Unit = hasBooted switchOn
     if (withBanner) printBanner()
     println("Starting Akka...")
     b.onLoad
     Thread.currentThread.setContextClassLoader(getClass.getClassLoader)
     _bundles = Some(b)
     println("Akka started successfully")
-  }
 
   /*
    * Shutdown, well, shuts down the bundles used in boot
    */
-  def shutdown() {
-    hasBooted switchOff {
+  def shutdown()
+    hasBooted switchOff
       println("Shutting down Akka...")
       _bundles.foreach(_.onUnload)
       _bundles = None
       Actor.shutdownHook.run
       println("Akka succesfully shut down")
-    }
-  }
 
-  private def printBanner() {
+  private def printBanner()
     println("""
 ==============================================================================
 
@@ -89,5 +86,3 @@ class AkkaLoader {
                       Running version %s
 ==============================================================================
 """.format(Config.VERSION))
-  }
-}

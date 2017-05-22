@@ -5,7 +5,7 @@ package scalaz
   *
   */
 ////
-trait ComonadStore[F[_], S] extends Comonad[F] { self =>
+trait ComonadStore[F[_], S] extends Comonad[F]  self =>
   ////
   def pos[A](w: F[A]): S
   def peek[A](s: S, w: F[A]): A
@@ -23,13 +23,11 @@ trait ComonadStore[F[_], S] extends Comonad[F] { self =>
       implicit FG: Functor[G]): G[A] =
     FG.map(s(pos(w)))(peek(_, w))
   ////
-}
 
-object ComonadStore {
+object ComonadStore
   @inline
   def apply[F[_], S](implicit F: ComonadStore[F, S]): ComonadStore[F, S] = F
 
   ////
 
   ////
-}

@@ -7,7 +7,7 @@ import com.intellij.openapi.editor.{LogicalPosition, RangeMarker, SelectionModel
 /**
   * Pavel Fatin
   */
-class SelectionModelStub extends SelectionModel {
+class SelectionModelStub extends SelectionModel
   def getTextAttributes: TextAttributes = null
 
   def getBlockSelectionGuard: RangeMarker = null
@@ -72,4 +72,3 @@ class SelectionModelStub extends SelectionModel {
   override def hasSelection(anyCaret: Boolean): Boolean = ???
 
   override def getSelectedText(allCarets: Boolean): String = ???
-}

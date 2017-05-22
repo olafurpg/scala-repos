@@ -17,13 +17,12 @@ class ScaladocConfiguration(
     private val form: ScaladocConsoleRunConfigurationForm,
     private val project: Project,
     private val scope: AnalysisScope)
-    extends ModuleRunProfile {
-  def getModules: Array[Module] = {
+    extends ModuleRunProfile
+  def getModules: Array[Module] =
     Module.EMPTY_ARRAY
-  }
 
   def getState(
-      executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+      executor: Executor, env: ExecutionEnvironment): RunProfileState =
     val state: ScaladocCommandLineState = new ScaladocCommandLineState(
         env, project)
     state.setAdditionalScaladocFlags(form.getAdditionalFlags)
@@ -35,11 +34,9 @@ class ScaladocConfiguration(
     state.setOutputDir(form.getOutputDir)
 
     state
-  }
 
   def getName: String = "Generate Scaladoc"
 
   def getIcon: Icon = null
 
   def checkConfiguration() {}
-}

@@ -9,14 +9,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTemplateDefin
 /**
   * Pavel Fatin
   */
-object AbstractInstantiation extends AnnotatorPart[ScTemplateDefinition] {
+object AbstractInstantiation extends AnnotatorPart[ScTemplateDefinition]
   def THIS = this
 
   def kind = classOf[ScTemplateDefinition]
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
+               typeAware: Boolean)
     val newObject = definition.isInstanceOf[ScNewTemplateDefinition]
     val hasBody = definition.extendsBlock.templateBody.isDefined
     val hasEarlyBody =
@@ -29,13 +29,10 @@ object AbstractInstantiation extends AnnotatorPart[ScTemplateDefinition] {
     if (refs.isEmpty) return
     if (refs.tail.nonEmpty) return
 
-    refs.headOption.foreach {
+    refs.headOption.foreach
       case (refElement, Some((psiClass, _))) if isAbstract(psiClass) =>
         holder.createErrorAnnotation(
             refElement,
             "%s %s is abstract; cannot be instantiated".format(
                 kindOf(psiClass), psiClass.name))
       case _ =>
-    }
-  }
-}

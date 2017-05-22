@@ -14,55 +14,48 @@ import mesosphere.marathon.{LeaderProxyConf, ModuleNames}
 import org.rogach.scallop.ScallopConf
 import org.slf4j.LoggerFactory
 
-object ForwarderService {
+object ForwarderService
   private val log = LoggerFactory.getLogger(getClass)
-  val className = {
+  val className =
     val withDollar = getClass.getName
     withDollar.substring(0, withDollar.length - 1)
-  }
 
   @Path("hello")
-  class PingResource @Inject()() {
+  class PingResource @Inject()()
     @GET
-    def index(): Response = {
+    def index(): Response =
       Response.ok().entity("Hi").build()
-    }
 
     @GET
     @Path("/crash")
-    def crash(): Response = {
+    def crash(): Response =
       Response.serverError().entity("Error").build()
-    }
-  }
 
   class LeaderInfoModule(elected: Boolean, leaderHostPort: Option[String])
-      extends AbstractModule {
+      extends AbstractModule
     log.info(
         s"Leader configuration: elected=$elected leaderHostPort=$leaderHostPort")
 
-    override def configure(): Unit = {
+    override def configure(): Unit =
       val electedAlias = elected
-      val leaderInfo = new LeaderInfo {
+      val leaderInfo = new LeaderInfo
         override def elected: Boolean = electedAlias
         override def currentLeaderHostPort(): Option[String] = leaderHostPort
 
         override def subscribe(self: ActorRef): Unit = ???
         override def unsubscribe(self: ActorRef): Unit = ???
-      }
 
       bind(classOf[LeaderInfo]).toInstance(leaderInfo)
-    }
-  }
 
   class ForwarderAppModule(
       myHostPort: String, httpConf: HttpConf, leaderProxyConf: LeaderProxyConf)
-      extends BaseRestModule {
+      extends BaseRestModule
     @Named(ModuleNames.HOST_PORT)
     @Provides
     @Singleton
     def provideHostPort(httpConf: HttpConf): String = myHostPort
 
-    override def configureServlets(): Unit = {
+    override def configureServlets(): Unit =
       super.configureServlets()
 
       bind(classOf[HttpConf]).toInstance(httpConf)
@@ -70,13 +63,11 @@ object ForwarderService {
       bind(classOf[PingResource]).in(Scopes.SINGLETON)
 
       install(new LeaderProxyFilterModule)
-    }
-  }
 
   class ForwarderConf(args: Seq[String])
       extends ScallopConf(args) with HttpConf with LeaderProxyConf
 
-  def startHelloAppProcess(args: String*): Unit = {
+  def startHelloAppProcess(args: String*): Unit =
     val conf = createConf(args: _*)
 
     ProcessKeeper.startJavaProcess(
@@ -84,9 +75,8 @@ object ForwarderService {
         heapInMegs = 128,
         arguments = List(ForwarderService.className, "helloApp") ++ args,
         upWhen = _.contains("Started ServerConnector"))
-  }
 
-  def startForwarderProcess(forwardToPort: Int, args: String*): Unit = {
+  def startForwarderProcess(forwardToPort: Int, args: String*): Unit =
     val conf = createConf(args: _*)
 
     ProcessKeeper.startJavaProcess(
@@ -96,27 +86,23 @@ object ForwarderService {
                          "forwarder",
                          forwardToPort.toString) ++ args,
         upWhen = _.contains("ServerConnector@"))
-  }
 
-  def main(args: Array[String]) {
-    val service = args(0) match {
+  def main(args: Array[String])
+    val service = args(0) match
       case "helloApp" =>
         createHelloApp(args.tail: _*)
       case "forwarder" =>
         createForwarder(forwardToPort = args(1).toInt, args.drop(2): _*)
-    }
     service.startAsync().awaitRunning()
     service.awaitTerminated()
-  }
 
-  def createHelloApp(args: String*): Service = {
+  def createHelloApp(args: String*): Service =
     val conf = createConf(args: _*)
     log.info(s"Start hello app at ${conf.httpPort()}")
     startImpl(
         conf, new LeaderInfoModule(elected = true, leaderHostPort = None))
-  }
 
-  def createForwarder(forwardToPort: Int, args: String*): Service = {
+  def createForwarder(forwardToPort: Int, args: String*): Service =
     val conf = createConf(args: _*)
     log.info(
         s"Start forwarder on port  ${conf.httpPort()}, forwarding to $forwardToPort")
@@ -124,18 +110,16 @@ object ForwarderService {
               new LeaderInfoModule(
                   elected = false,
                   leaderHostPort = Some(s"localhost:$forwardToPort")))
-  }
 
-  private[this] def createConf(args: String*): ForwarderConf = {
+  private[this] def createConf(args: String*): ForwarderConf =
     val conf = new ForwarderConf(
         Array[String]("--assets_path", "/tmp") ++ args.map(_.toString))
     conf.afterInit()
     conf
-  }
 
   private def startImpl(conf: ForwarderConf,
                         leaderModule: Module,
-                        assetPath: String = "/tmp"): Service = {
+                        assetPath: String = "/tmp"): Service =
     val injector = Guice.createInjector(
         new MetricsModule,
         new HttpModule(conf),
@@ -148,5 +132,3 @@ object ForwarderService {
     )
     val http = injector.getInstance(classOf[HttpService])
     http
-  }
-}

@@ -6,7 +6,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop
 import Prop._
 
-trait ComonadTests[F[_]] extends CoflatMapTests[F] {
+trait ComonadTests[F[_]] extends CoflatMapTests[F]
 
   def laws: ComonadLaws[F]
 
@@ -16,7 +16,7 @@ trait ComonadTests[F[_]] extends CoflatMapTests[F] {
       EqFFA: Eq[F[F[A]]],
       EqFFFA: Eq[F[F[F[A]]]],
       EqFB: Eq[F[B]],
-      EqFC: Eq[F[C]]): RuleSet = {
+      EqFC: Eq[F[C]]): RuleSet =
     new DefaultRuleSet(
         name = "comonad",
         parent = Some(coflatMap[A, B, C]),
@@ -29,12 +29,8 @@ trait ComonadTests[F[_]] extends CoflatMapTests[F] {
         "mapCoflatMapCoherence" -> forAll(laws.mapCoflatMapCoherence[A, B] _),
         "comonad left identity" -> forAll(laws.comonadLeftIdentity[A] _),
         "comonad right identity" -> forAll(laws.comonadRightIdentity[A, B] _))
-  }
-}
 
-object ComonadTests {
+object ComonadTests
   def apply[F[_]: Comonad]: ComonadTests[F] =
-    new ComonadTests[F] {
+    new ComonadTests[F]
       def laws: ComonadLaws[F] = ComonadLaws[F]
-    }
-}

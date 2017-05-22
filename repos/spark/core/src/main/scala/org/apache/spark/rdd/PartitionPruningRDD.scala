@@ -24,9 +24,8 @@ import org.apache.spark.annotation.DeveloperApi
 
 private[spark] class PartitionPruningRDDPartition(
     idx: Int, val parentSplit: Partition)
-    extends Partition {
+    extends Partition
   override val index = idx
-}
 
 /**
   * Represents a dependency between the PartitionPruningRDD and its parent. In this
@@ -34,23 +33,20 @@ private[spark] class PartitionPruningRDDPartition(
   */
 private[spark] class PruneDependency[T](
     rdd: RDD[T], partitionFilterFunc: Int => Boolean)
-    extends NarrowDependency[T](rdd) {
+    extends NarrowDependency[T](rdd)
 
   @transient
   val partitions: Array[Partition] =
-    rdd.partitions.filter(s => partitionFilterFunc(s.index)).zipWithIndex.map {
+    rdd.partitions.filter(s => partitionFilterFunc(s.index)).zipWithIndex.map
       case (split, idx) =>
         new PartitionPruningRDDPartition(idx, split): Partition
-    }
 
-  override def getParents(partitionId: Int): List[Int] = {
+  override def getParents(partitionId: Int): List[Int] =
     List(
         partitions(partitionId)
           .asInstanceOf[PartitionPruningRDDPartition]
           .parentSplit
           .index)
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -63,19 +59,17 @@ private[spark] class PruneDependency[T](
 class PartitionPruningRDD[T : ClassTag](
     prev: RDD[T], partitionFilterFunc: Int => Boolean)
     extends RDD[T](
-        prev.context, List(new PruneDependency(prev, partitionFilterFunc))) {
+        prev.context, List(new PruneDependency(prev, partitionFilterFunc)))
 
-  override def compute(split: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[T] =
     firstParent[T].iterator(
         split.asInstanceOf[PartitionPruningRDDPartition].parentSplit, context)
-  }
 
   override protected def getPartitions: Array[Partition] =
     dependencies.head.asInstanceOf[PruneDependency[T]].partitions
-}
 
 @DeveloperApi
-object PartitionPruningRDD {
+object PartitionPruningRDD
 
   /**
     * Create a PartitionPruningRDD. This function can be used to create the PartitionPruningRDD
@@ -83,7 +77,5 @@ object PartitionPruningRDD {
     */
   def create[T](
       rdd: RDD[T],
-      partitionFilterFunc: Int => Boolean): PartitionPruningRDD[T] = {
+      partitionFilterFunc: Int => Boolean): PartitionPruningRDD[T] =
     new PartitionPruningRDD[T](rdd, partitionFilterFunc)(rdd.elementClassTag)
-  }
-}

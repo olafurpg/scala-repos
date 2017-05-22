@@ -20,9 +20,9 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 class TasksResourceTest
-    extends MarathonSpec with GivenWhenThen with Matchers with Mockito {
+    extends MarathonSpec with GivenWhenThen with Matchers with Mockito
 
-  test("killTasks") {
+  test("killTasks")
     Given("two apps and 1 task each")
     val app1 = "/my/app-1".toRootPath
     val app2 = "/my/app-2".toRootPath
@@ -58,9 +58,8 @@ class TasksResourceTest
 
     And("nothing else should be called on the TaskKiller")
     noMoreInteractions(taskKiller)
-  }
 
-  test("killTasks with force") {
+  test("killTasks with force")
     Given("two apps and 1 task each")
     val app1 = "/my/app-1".toRootPath
     val app2 = "/my/app-2".toRootPath
@@ -102,10 +101,9 @@ class TasksResourceTest
 
     And("nothing else should be called on the TaskKiller")
     noMoreInteractions(taskKiller)
-  }
 
   test(
-      "killTask without authentication is denied when the affected app exists") {
+      "killTask without authentication is denied when the affected app exists")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -124,10 +122,9 @@ class TasksResourceTest
       taskResource.killTasks(scale = true, force = false, body, req)
     Then("we receive a NotAuthenticated response")
     killTasks.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
   test(
-      "killTask without authentication is not allowed when the affected app does not exist") {
+      "killTask without authentication is not allowed when the affected app does not exist")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -145,9 +142,8 @@ class TasksResourceTest
       taskResource.killTasks(scale = true, force = false, body, req)
     Then("we receive a NotAuthenticated response")
     killTasks.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("indexTxt and IndexJson without authentication aren't allowed") {
+  test("indexTxt and IndexJson without authentication aren't allowed")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -162,9 +158,8 @@ class TasksResourceTest
     val cancel = taskResource.indexTxt(req)
     Then("we receive a NotAuthenticated response")
     cancel.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("access without authorization is denied if the affected app exists") {
+  test("access without authorization is denied if the affected app exists")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -198,9 +193,8 @@ class TasksResourceTest
       taskResource.killTasks(scale = false, force = false, body, req)
     Then("we receive a not authorized response")
     killTasks.getStatus should be(auth.UnauthorizedStatus)
-  }
 
-  test("killTasks fails for invalid taskId") {
+  test("killTasks fails for invalid taskId")
     Given("a valid and an invalid taskId")
     val app1 = "/my/app-1".toRootPath
     val taskId1 = Task.Id.forApp(app1).idString
@@ -208,17 +202,15 @@ class TasksResourceTest
     val bodyBytes = body.toCharArray.map(_.toByte)
 
     When("we ask to kill those two tasks")
-    val ex = intercept[BadRequestException] {
+    val ex = intercept[BadRequestException]
       taskResource.killTasks(
           scale = false, force = false, body = bodyBytes, auth.request)
-    }
 
     Then("An exception should be thrown that points to the invalid taskId")
     ex.getMessage should include("invalidTaskId")
 
     And("the taskKiller should not be called at all")
     verifyNoMoreInteractions(taskKiller)
-  }
 
   var service: MarathonSchedulerService = _
   var taskTracker: TaskTracker = _
@@ -230,7 +222,7 @@ class TasksResourceTest
   var auth: TestAuthFixture = _
   implicit var identity: Identity = _
 
-  before {
+  before
     auth = new TestAuthFixture
     service = mock[MarathonSchedulerService]
     taskTracker = mock[TaskTracker]
@@ -249,5 +241,3 @@ class TasksResourceTest
         auth.auth,
         auth.auth
     )
-  }
-}

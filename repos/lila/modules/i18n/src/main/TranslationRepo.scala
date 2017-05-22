@@ -6,7 +6,7 @@ import lila.db.api._
 import lila.db.Implicits._
 import tube.translationTube
 
-private[i18n] object TranslationRepo {
+private[i18n] object TranslationRepo
 
   type ID = Int
 
@@ -19,4 +19,3 @@ private[i18n] object TranslationRepo {
 
   def findFrom(id: ID): Fu[List[Translation]] =
     $find($query(Json.obj("_id" -> $gte(id))) sort $sort.ascId)
-}

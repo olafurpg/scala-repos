@@ -44,7 +44,7 @@ import org.apache.spark.util.Utils
 
 class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     implicit val kClassTag: ClassTag[K], implicit val vClassTag: ClassTag[V])
-    extends AbstractJavaRDDLike[(K, V), JavaPairRDD[K, V]] {
+    extends AbstractJavaRDDLike[(K, V), JavaPairRDD[K, V]]
 
   override def wrapRDD(rdd: RDD[(K, V)]): JavaPairRDD[K, V] =
     JavaPairRDD.fromRDD(rdd)
@@ -241,7 +241,7 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
                       mergeCombiners: JFunction2[C, C, C],
                       partitioner: Partitioner,
                       mapSideCombine: Boolean,
-                      serializer: Serializer): JavaPairRDD[K, C] = {
+                      serializer: Serializer): JavaPairRDD[K, C] =
     implicit val ctag: ClassTag[C] = fakeClassTag
     fromRDD(
         rdd.combineByKeyWithClassTag(
@@ -252,7 +252,6 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
             mapSideCombine,
             serializer
         ))
-  }
 
   /**
     * Generic function to combine the elements for each key using a custom set of aggregation
@@ -271,10 +270,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def combineByKey[C](createCombiner: JFunction[V, C],
                       mergeValue: JFunction2[C, V, C],
                       mergeCombiners: JFunction2[C, C, C],
-                      partitioner: Partitioner): JavaPairRDD[K, C] = {
+                      partitioner: Partitioner): JavaPairRDD[K, C] =
     combineByKey(
         createCombiner, mergeValue, mergeCombiners, partitioner, true, null)
-  }
 
   /**
     * Simplified version of combineByKey that hash-partitions the output RDD and uses map-side
@@ -339,10 +337,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def aggregateByKey[U](zeroValue: U,
                         partitioner: Partitioner,
                         seqFunc: JFunction2[U, V, U],
-                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] = {
+                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] =
     implicit val ctag: ClassTag[U] = fakeClassTag
     fromRDD(rdd.aggregateByKey(zeroValue, partitioner)(seqFunc, combFunc))
-  }
 
   /**
     * Aggregate the values of each key, using given combine functions and a neutral "zero value".
@@ -356,10 +353,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def aggregateByKey[U](zeroValue: U,
                         numPartitions: Int,
                         seqFunc: JFunction2[U, V, U],
-                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] = {
+                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] =
     implicit val ctag: ClassTag[U] = fakeClassTag
     fromRDD(rdd.aggregateByKey(zeroValue, numPartitions)(seqFunc, combFunc))
-  }
 
   /**
     * Aggregate the values of each key, using given combine functions and a neutral "zero value".
@@ -371,10 +367,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def aggregateByKey[U](zeroValue: U,
                         seqFunc: JFunction2[U, V, U],
-                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] = {
+                        combFunc: JFunction2[U, U, U]): JavaPairRDD[K, U] =
     implicit val ctag: ClassTag[U] = fakeClassTag
     fromRDD(rdd.aggregateByKey(zeroValue)(seqFunc, combFunc))
-  }
 
   /**
     * Merge the values for each key using an associative function and a neutral "zero value" which
@@ -463,24 +458,21 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * Uses `this` partitioner/partition size, because even if `other` is huge, the resulting
     * RDD will be &lt;= us.
     */
-  def subtractByKey[W](other: JavaPairRDD[K, W]): JavaPairRDD[K, V] = {
+  def subtractByKey[W](other: JavaPairRDD[K, W]): JavaPairRDD[K, V] =
     implicit val ctag: ClassTag[W] = fakeClassTag
     fromRDD(rdd.subtractByKey(other))
-  }
 
   /** Return an RDD with the pairs from `this` whose keys are not in `other`. */
   def subtractByKey[W](
-      other: JavaPairRDD[K, W], numPartitions: Int): JavaPairRDD[K, V] = {
+      other: JavaPairRDD[K, W], numPartitions: Int): JavaPairRDD[K, V] =
     implicit val ctag: ClassTag[W] = fakeClassTag
     fromRDD(rdd.subtractByKey(other, numPartitions))
-  }
 
   /** Return an RDD with the pairs from `this` whose keys are not in `other`. */
   def subtractByKey[W](
-      other: JavaPairRDD[K, W], p: Partitioner): JavaPairRDD[K, V] = {
+      other: JavaPairRDD[K, W], p: Partitioner): JavaPairRDD[K, V] =
     implicit val ctag: ClassTag[W] = fakeClassTag
     fromRDD(rdd.subtractByKey(other, p))
-  }
 
   /**
     * Return a copy of the RDD partitioned using the specified partitioner.
@@ -505,13 +497,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def leftOuterJoin[W](
       other: JavaPairRDD[K, W],
-      partitioner: Partitioner): JavaPairRDD[K, (V, Optional[W])] = {
+      partitioner: Partitioner): JavaPairRDD[K, (V, Optional[W])] =
     val joinResult = rdd.leftOuterJoin(other, partitioner)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (v, JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Perform a right outer join of `this` and `other`. For each element (k, w) in `other`, the
@@ -521,13 +512,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def rightOuterJoin[W](
       other: JavaPairRDD[K, W],
-      partitioner: Partitioner): JavaPairRDD[K, (Optional[V], W)] = {
+      partitioner: Partitioner): JavaPairRDD[K, (Optional[V], W)] =
     val joinResult = rdd.rightOuterJoin(other, partitioner)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (JavaUtils.optionToOptional(v), w)
-    })
-  }
+    )
 
   /**
     * Perform a full outer join of `this` and `other`. For each element (k, v) in `this`, the
@@ -539,14 +529,13 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def fullOuterJoin[W](
       other: JavaPairRDD[K, W],
-      partitioner: Partitioner): JavaPairRDD[K, (Optional[V], Optional[W])] = {
+      partitioner: Partitioner): JavaPairRDD[K, (Optional[V], Optional[W])] =
     val joinResult = rdd.fullOuterJoin(other, partitioner)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Simplified version of combineByKey that hash-partitions the resulting RDD using the existing
@@ -555,14 +544,13 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
   def combineByKey[C](
       createCombiner: JFunction[V, C],
       mergeValue: JFunction2[C, V, C],
-      mergeCombiners: JFunction2[C, C, C]): JavaPairRDD[K, C] = {
+      mergeCombiners: JFunction2[C, C, C]): JavaPairRDD[K, C] =
     implicit val ctag: ClassTag[C] = fakeClassTag
     fromRDD(
         combineByKey(createCombiner,
                      mergeValue,
                      mergeCombiners,
                      defaultPartitioner(rdd)))
-  }
 
   /**
     * Merge the values for each key using an associative and commutative reduce function. This will
@@ -570,9 +558,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * to a "combiner" in MapReduce. Output will be hash-partitioned with the existing partitioner/
     * parallelism level.
     */
-  def reduceByKey(func: JFunction2[V, V, V]): JavaPairRDD[K, V] = {
+  def reduceByKey(func: JFunction2[V, V, V]): JavaPairRDD[K, V] =
     fromRDD(reduceByKey(defaultPartitioner(rdd), func))
-  }
 
   /**
     * Group the values for each key in the RDD into a single sequence. Hash-partitions the
@@ -609,13 +596,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * using the existing partitioner/parallelism level.
     */
   def leftOuterJoin[W](
-      other: JavaPairRDD[K, W]): JavaPairRDD[K, (V, Optional[W])] = {
+      other: JavaPairRDD[K, W]): JavaPairRDD[K, (V, Optional[W])] =
     val joinResult = rdd.leftOuterJoin(other)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (v, JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Perform a left outer join of `this` and `other`. For each element (k, v) in `this`, the
@@ -625,13 +611,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def leftOuterJoin[W](
       other: JavaPairRDD[K, W],
-      numPartitions: Int): JavaPairRDD[K, (V, Optional[W])] = {
+      numPartitions: Int): JavaPairRDD[K, (V, Optional[W])] =
     val joinResult = rdd.leftOuterJoin(other, numPartitions)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (v, JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Perform a right outer join of `this` and `other`. For each element (k, w) in `other`, the
@@ -640,13 +625,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * RDD using the existing partitioner/parallelism level.
     */
   def rightOuterJoin[W](
-      other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], W)] = {
+      other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], W)] =
     val joinResult = rdd.rightOuterJoin(other)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (JavaUtils.optionToOptional(v), w)
-    })
-  }
+    )
 
   /**
     * Perform a right outer join of `this` and `other`. For each element (k, w) in `other`, the
@@ -656,13 +640,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def rightOuterJoin[W](
       other: JavaPairRDD[K, W],
-      numPartitions: Int): JavaPairRDD[K, (Optional[V], W)] = {
+      numPartitions: Int): JavaPairRDD[K, (Optional[V], W)] =
     val joinResult = rdd.rightOuterJoin(other, numPartitions)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) => (JavaUtils.optionToOptional(v), w)
-    })
-  }
+    )
 
   /**
     * Perform a full outer join of `this` and `other`. For each element (k, v) in `this`, the
@@ -674,14 +657,13 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * parallelism level.
     */
   def fullOuterJoin[W](
-      other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], Optional[W])] = {
+      other: JavaPairRDD[K, W]): JavaPairRDD[K, (Optional[V], Optional[W])] =
     val joinResult = rdd.fullOuterJoin(other)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Perform a full outer join of `this` and `other`. For each element (k, v) in `this`, the
@@ -693,14 +675,13 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def fullOuterJoin[W](
       other: JavaPairRDD[K, W],
-      numPartitions: Int): JavaPairRDD[K, (Optional[V], Optional[W])] = {
+      numPartitions: Int): JavaPairRDD[K, (Optional[V], Optional[W])] =
     val joinResult = rdd.fullOuterJoin(other, numPartitions)
     fromRDD(
-        joinResult.mapValues {
+        joinResult.mapValues
       case (v, w) =>
         (JavaUtils.optionToOptional(v), JavaUtils.optionToOptional(w))
-    })
-  }
+    )
 
   /**
     * Return the key-value pairs in this RDD to the master as a Map.
@@ -715,21 +696,19 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * Pass each value in the key-value pair RDD through a map function without changing the keys;
     * this also retains the original RDD's partitioning.
     */
-  def mapValues[U](f: JFunction[V, U]): JavaPairRDD[K, U] = {
+  def mapValues[U](f: JFunction[V, U]): JavaPairRDD[K, U] =
     implicit val ctag: ClassTag[U] = fakeClassTag
     fromRDD(rdd.mapValues(f))
-  }
 
   /**
     * Pass each value in the key-value pair RDD through a flatMap function without changing the
     * keys; this also retains the original RDD's partitioning.
     */
   def flatMapValues[U](
-      f: JFunction[V, java.lang.Iterable[U]]): JavaPairRDD[K, U] = {
+      f: JFunction[V, java.lang.Iterable[U]]): JavaPairRDD[K, U] =
     def fn: (V) => Iterable[U] = (x: V) => f.call(x).asScala
     implicit val ctag: ClassTag[U] = fakeClassTag
     fromRDD(rdd.flatMapValues(fn))
-  }
 
   /**
     * For each key k in `this` or `other`, return a resulting RDD that contains a tuple with the
@@ -850,17 +829,15 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
                                                 keyClass: Class[_],
                                                 valueClass: Class[_],
                                                 outputFormatClass: Class[F],
-                                                conf: JobConf) {
+                                                conf: JobConf)
     rdd.saveAsHadoopFile(path, keyClass, valueClass, outputFormatClass, conf)
-  }
 
   /** Output the RDD to any Hadoop-supported file system. */
   def saveAsHadoopFile[F <: OutputFormat[_, _]](path: String,
                                                 keyClass: Class[_],
                                                 valueClass: Class[_],
-                                                outputFormatClass: Class[F]) {
+                                                outputFormatClass: Class[F])
     rdd.saveAsHadoopFile(path, keyClass, valueClass, outputFormatClass)
-  }
 
   /** Output the RDD to any Hadoop-supported file system, compressing with the supplied codec. */
   def saveAsHadoopFile[F <: OutputFormat[_, _]](
@@ -868,9 +845,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       keyClass: Class[_],
       valueClass: Class[_],
       outputFormatClass: Class[F],
-      codec: Class[_ <: CompressionCodec]) {
+      codec: Class[_ <: CompressionCodec])
     rdd.saveAsHadoopFile(path, keyClass, valueClass, outputFormatClass, codec)
-  }
 
   /** Output the RDD to any Hadoop-supported file system. */
   def saveAsNewAPIHadoopFile[F <: NewOutputFormat[_, _]](
@@ -878,27 +854,24 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
       keyClass: Class[_],
       valueClass: Class[_],
       outputFormatClass: Class[F],
-      conf: Configuration) {
+      conf: Configuration)
     rdd.saveAsNewAPIHadoopFile(
         path, keyClass, valueClass, outputFormatClass, conf)
-  }
 
   /**
     * Output the RDD to any Hadoop-supported storage system, using
     * a Configuration object for that storage system.
     */
-  def saveAsNewAPIHadoopDataset(conf: Configuration) {
+  def saveAsNewAPIHadoopDataset(conf: Configuration)
     rdd.saveAsNewAPIHadoopDataset(conf)
-  }
 
   /** Output the RDD to any Hadoop-supported file system. */
   def saveAsNewAPIHadoopFile[F <: NewOutputFormat[_, _]](
       path: String,
       keyClass: Class[_],
       valueClass: Class[_],
-      outputFormatClass: Class[F]) {
+      outputFormatClass: Class[F])
     rdd.saveAsNewAPIHadoopFile(path, keyClass, valueClass, outputFormatClass)
-  }
 
   /**
     * Output the RDD to any Hadoop-supported storage system, using a Hadoop JobConf object for
@@ -906,9 +879,8 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * (e.g. a table name to write to) in the same way as it would be configured for a Hadoop
     * MapReduce job.
     */
-  def saveAsHadoopDataset(conf: JobConf) {
+  def saveAsHadoopDataset(conf: JobConf)
     rdd.saveAsHadoopDataset(conf)
-  }
 
   /**
     * Repartition the RDD according to the given partitioner and, within each resulting partition,
@@ -918,11 +890,10 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * because it can push the sorting down into the shuffle machinery.
     */
   def repartitionAndSortWithinPartitions(
-      partitioner: Partitioner): JavaPairRDD[K, V] = {
+      partitioner: Partitioner): JavaPairRDD[K, V] =
     val comp =
       com.google.common.collect.Ordering.natural().asInstanceOf[Comparator[K]]
     repartitionAndSortWithinPartitions(partitioner, comp)
-  }
 
   /**
     * Repartition the RDD according to the given partitioner and, within each resulting partition,
@@ -932,13 +903,12 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * because it can push the sorting down into the shuffle machinery.
     */
   def repartitionAndSortWithinPartitions(
-      partitioner: Partitioner, comp: Comparator[K]): JavaPairRDD[K, V] = {
+      partitioner: Partitioner, comp: Comparator[K]): JavaPairRDD[K, V] =
     implicit val ordering =
       comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(
         new OrderedRDDFunctions[K, V, (K, V)](rdd)
           .repartitionAndSortWithinPartitions(partitioner))
-  }
 
   /**
     * Sort the RDD by key, so that each partition contains a sorted range of the elements in
@@ -954,11 +924,10 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * (in the `save` case, they will be written to multiple `part-X` files in the filesystem, in
     * order of the keys).
     */
-  def sortByKey(ascending: Boolean): JavaPairRDD[K, V] = {
+  def sortByKey(ascending: Boolean): JavaPairRDD[K, V] =
     val comp =
       com.google.common.collect.Ordering.natural().asInstanceOf[Comparator[K]]
     sortByKey(comp, ascending)
-  }
 
   /**
     * Sort the RDD by key, so that each partition contains a sorted range of the elements. Calling
@@ -966,11 +935,10 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * (in the `save` case, they will be written to multiple `part-X` files in the filesystem, in
     * order of the keys).
     */
-  def sortByKey(ascending: Boolean, numPartitions: Int): JavaPairRDD[K, V] = {
+  def sortByKey(ascending: Boolean, numPartitions: Int): JavaPairRDD[K, V] =
     val comp =
       com.google.common.collect.Ordering.natural().asInstanceOf[Comparator[K]]
     sortByKey(comp, ascending, numPartitions)
-  }
 
   /**
     * Sort the RDD by key, so that each partition contains a sorted range of the elements. Calling
@@ -986,11 +954,10 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * (in the `save` case, they will be written to multiple `part-X` files in the filesystem, in
     * order of the keys).
     */
-  def sortByKey(comp: Comparator[K], ascending: Boolean): JavaPairRDD[K, V] = {
+  def sortByKey(comp: Comparator[K], ascending: Boolean): JavaPairRDD[K, V] =
     implicit val ordering =
       comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(new OrderedRDDFunctions[K, V, (K, V)](rdd).sortByKey(ascending))
-  }
 
   /**
     * Sort the RDD by key, so that each partition contains a sorted range of the elements. Calling
@@ -1000,12 +967,11 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def sortByKey(comp: Comparator[K],
                 ascending: Boolean,
-                numPartitions: Int): JavaPairRDD[K, V] = {
+                numPartitions: Int): JavaPairRDD[K, V] =
     implicit val ordering =
       comp // Allow implicit conversion of Comparator to Ordering.
     fromRDD(new OrderedRDDFunctions[K, V, (K, V)](rdd)
           .sortByKey(ascending, numPartitions))
-  }
 
   /**
     * Return an RDD with the keys of each tuple.
@@ -1030,10 +996,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     */
   def countApproxDistinctByKey(
       relativeSD: Double,
-      partitioner: Partitioner): JavaPairRDD[K, jl.Long] = {
+      partitioner: Partitioner): JavaPairRDD[K, jl.Long] =
     fromRDD(rdd.countApproxDistinctByKey(relativeSD, partitioner))
       .asInstanceOf[JavaPairRDD[K, jl.Long]]
-  }
 
   /**
     * Return approximate number of distinct values for each key in this RDD.
@@ -1047,10 +1012,9 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * @param numPartitions number of partitions of the resulting RDD.
     */
   def countApproxDistinctByKey(
-      relativeSD: Double, numPartitions: Int): JavaPairRDD[K, jl.Long] = {
+      relativeSD: Double, numPartitions: Int): JavaPairRDD[K, jl.Long] =
     fromRDD(rdd.countApproxDistinctByKey(relativeSD, numPartitions))
       .asInstanceOf[JavaPairRDD[K, jl.Long]]
-  }
 
   /**
     * Return approximate number of distinct values for each key in this RDD.
@@ -1062,55 +1026,46 @@ class JavaPairRDD[K, V](val rdd: RDD[(K, V)])(
     * @param relativeSD Relative accuracy. Smaller values create counters that require more space.
     *                   It must be greater than 0.000017.
     */
-  def countApproxDistinctByKey(relativeSD: Double): JavaPairRDD[K, jl.Long] = {
+  def countApproxDistinctByKey(relativeSD: Double): JavaPairRDD[K, jl.Long] =
     fromRDD(rdd.countApproxDistinctByKey(relativeSD))
       .asInstanceOf[JavaPairRDD[K, jl.Long]]
-  }
 
   /** Assign a name to this RDD */
-  def setName(name: String): JavaPairRDD[K, V] = {
+  def setName(name: String): JavaPairRDD[K, V] =
     rdd.setName(name)
     this
-  }
-}
 
-object JavaPairRDD {
+object JavaPairRDD
   private[spark] def groupByResultToJava[K : ClassTag, T](
-      rdd: RDD[(K, Iterable[T])]): RDD[(K, JIterable[T])] = {
+      rdd: RDD[(K, Iterable[T])]): RDD[(K, JIterable[T])] =
     rddToPairRDDFunctions(rdd).mapValues(_.asJava)
-  }
 
   private[spark] def cogroupResultToJava[K : ClassTag, V, W](
       rdd: RDD[(K, (Iterable[V], Iterable[W]))])
-    : RDD[(K, (JIterable[V], JIterable[W]))] = {
+    : RDD[(K, (JIterable[V], JIterable[W]))] =
     rddToPairRDDFunctions(rdd).mapValues(x => (x._1.asJava, x._2.asJava))
-  }
 
   private[spark] def cogroupResult2ToJava[K : ClassTag, V, W1, W2](
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2]))])
-    : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2]))] = {
+    : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2]))] =
     rddToPairRDDFunctions(rdd).mapValues(
         x => (x._1.asJava, x._2.asJava, x._3.asJava))
-  }
 
   private[spark] def cogroupResult3ToJava[K : ClassTag, V, W1, W2, W3](
       rdd: RDD[(K, (Iterable[V], Iterable[W1], Iterable[W2], Iterable[W3]))])
-    : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3]))] = {
+    : RDD[(K, (JIterable[V], JIterable[W1], JIterable[W2], JIterable[W3]))] =
     rddToPairRDDFunctions(rdd).mapValues(
         x => (x._1.asJava, x._2.asJava, x._3.asJava, x._4.asJava))
-  }
 
   def fromRDD[K : ClassTag, V : ClassTag](
-      rdd: RDD[(K, V)]): JavaPairRDD[K, V] = {
+      rdd: RDD[(K, V)]): JavaPairRDD[K, V] =
     new JavaPairRDD[K, V](rdd)
-  }
 
   implicit def toRDD[K, V](rdd: JavaPairRDD[K, V]): RDD[(K, V)] = rdd.rdd
 
   private[spark] implicit def toScalaFunction2[T1, T2, R](
-      fun: JFunction2[T1, T2, R]): Function2[T1, T2, R] = { (x: T1, x1: T2) =>
+      fun: JFunction2[T1, T2, R]): Function2[T1, T2, R] =  (x: T1, x1: T2) =>
     fun.call(x, x1)
-  }
 
   private[spark] implicit def toScalaFunction[T, R](
       fun: JFunction[T, R]): T => R = x => fun.call(x)
@@ -1119,9 +1074,7 @@ object JavaPairRDD {
       x: PairFunction[A, B, C]): A => (B, C) = y => x.call(y)
 
   /** Convert a JavaRDD of key-value pairs to JavaPairRDD. */
-  def fromJavaRDD[K, V](rdd: JavaRDD[(K, V)]): JavaPairRDD[K, V] = {
+  def fromJavaRDD[K, V](rdd: JavaRDD[(K, V)]): JavaPairRDD[K, V] =
     implicit val ctagK: ClassTag[K] = fakeClassTag
     implicit val ctagV: ClassTag[V] = fakeClassTag
     new JavaPairRDD[K, V](rdd.rdd)
-  }
-}

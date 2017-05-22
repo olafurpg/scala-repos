@@ -6,7 +6,7 @@ import play.api.i18n.Lang
 
 private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
                                  detectLanguage: lila.common.DetectLanguage)
-    extends lila.hub.CaptchedForm {
+    extends lila.hub.CaptchedForm
 
   lazy val question = Form(
       mapping(
@@ -64,17 +64,15 @@ private[qa] final class DataForm(val captcher: akka.actor.ActorSelection,
 
   private def validateLanguage(str: String) =
     detectLanguage(str).awaitSeconds(5).??(_ == Lang("en"))
-}
 
 private[qa] case class QuestionData(title: String,
                                     body: String,
                                     `hidden-tags`: String,
                                     gameId: String,
-                                    move: String) {
+                                    move: String)
 
   def tags =
     `hidden-tags`.split(',').toList.map(_.trim.toLowerCase).filter(_.nonEmpty)
-}
 
 private[qa] case class AnswerData(body: String, gameId: String, move: String)
 

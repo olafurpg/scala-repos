@@ -1,12 +1,10 @@
-trait Ctx {
+trait Ctx
   trait Tree
-}
 
-trait Lst[+A] {
+trait Lst[+A]
   def zip[A1 >: A, B](that: Lst[B]): Nothing
-}
 
-object Test {
+object Test
 
   // both of these methods should be transformed by uncurry
   // such that List[c.Tree] becomes List[Ctx#Tree]:
@@ -15,4 +13,3 @@ object Test {
 
   // if this doesn't happen for the 2nd method, the specialization
   // transformation fails
-}

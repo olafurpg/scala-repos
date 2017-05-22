@@ -5,7 +5,7 @@ import Import._
 import sbt.Keys.{name, resolvedScoped, organization}
 import java.util.concurrent.atomic.{AtomicInteger => AInt}
 
-object Imports {
+object Imports
   object A extends AutoPlugin
   object B extends AutoPlugin
   object E extends AutoPlugin
@@ -17,31 +17,26 @@ object Imports {
   lazy val del = settingKey[String]("Another demo setting.")
 
   lazy val check = taskKey[Unit]("Verifies settings are as they should be.")
-}
 
-object OrgPlugin extends AutoPlugin {
+object OrgPlugin extends AutoPlugin
   override def trigger = allRequirements
   override def projectSettings = Seq(
       organization := "override"
   )
-}
 
-object X extends AutoPlugin {
+object X extends AutoPlugin
   val autoImport = Imports
-}
 
 import Imports._
 
-object D extends AutoPlugin {
+object D extends AutoPlugin
   override def requires: Plugins = E
   override def trigger = allRequirements
 
-  object autoImport {
+  object autoImport
     lazy val keyTest = settingKey[String]("Another demo setting.")
-  }
-}
 
-object Q extends AutoPlugin {
+object Q extends AutoPlugin
   override def requires: Plugins = A && B
   override def trigger = allRequirements
 
@@ -60,9 +55,8 @@ object Q extends AutoPlugin {
   // used to ensure the build-level and global settings are only added once
   private[this] val buildCount = new AInt(0)
   private[this] val globalCount = new AInt(0)
-}
 
-object R extends AutoPlugin {
+object R extends AutoPlugin
   // NOTE - Only plugins themselves support exclusions...
   override def requires = Q
   override def trigger = allRequirements
@@ -73,11 +67,10 @@ object R extends AutoPlugin {
       // tests that configurations are properly registered, enabling delegation from p to q
       demo += (del in p).value
   )
-}
 
 // This is an opt-in plugin with a requirement
 // Unless explicitly loaded by the build user, this will not be activated.
-object S extends AutoPlugin {
+object S extends AutoPlugin
   override def requires = Q
   override def trigger = noTrigger
 
@@ -85,4 +78,3 @@ object S extends AutoPlugin {
       del in q += " S",
       organization := "S"
   )
-}

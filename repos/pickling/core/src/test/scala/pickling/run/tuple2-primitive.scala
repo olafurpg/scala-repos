@@ -3,8 +3,8 @@ package scala.pickling.tuple2.primitive
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, binary._
 
-class Tuple2PrimitiveTest extends FunSuite {
-  test("main") {
+class Tuple2PrimitiveTest extends FunSuite
+  test("main")
     val tup2 = ("hewrow", 2)
     val pckl = tup2.pickle
     assert(
@@ -14,5 +14,3 @@ class Tuple2PrimitiveTest extends FunSuite {
     val tup3 = ("hewrow", 2, "bye")
     val pckl3 = tup3.pickle
     assert(pckl3.unpickle[(String, Int, String)] === tup3)
-  }
-}

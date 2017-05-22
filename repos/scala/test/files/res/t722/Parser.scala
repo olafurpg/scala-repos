@@ -1,6 +1,4 @@
 package t722;
-trait Parser {
-  trait Link {
+trait Parser
+  trait Link
     def foo() = {}
-  }
-}

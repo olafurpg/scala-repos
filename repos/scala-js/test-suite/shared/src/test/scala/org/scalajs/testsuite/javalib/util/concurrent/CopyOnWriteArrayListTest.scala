@@ -20,11 +20,11 @@ import org.scalajs.testsuite.utils.Platform.executingInJVM
 
 import scala.reflect.ClassTag
 
-class CopyOnWriteArrayListTest extends ListTest {
+class CopyOnWriteArrayListTest extends ListTest
 
   def factory: CopyOnWriteArrayListFactory = new CopyOnWriteArrayListFactory
 
-  @Test def should_implement_addIfAbsent(): Unit = {
+  @Test def should_implement_addIfAbsent(): Unit =
     val list = factory.empty[Int]
 
     assertTrue(list.addIfAbsent(0))
@@ -39,9 +39,8 @@ class CopyOnWriteArrayListTest extends ListTest {
     assertEquals(2, list.size)
     assertEquals(0, list.get(0))
     assertEquals(1, list.get(1))
-  }
 
-  @Test def should_implement_addAllAbsent(): Unit = {
+  @Test def should_implement_addAllAbsent(): Unit =
     val list = factory.empty[Int]
 
     assertEquals(3, list.addAllAbsent(0 until 3))
@@ -64,9 +63,8 @@ class CopyOnWriteArrayListTest extends ListTest {
     assertEquals(11, list.size)
     for (i <- 0 until 10) assertEquals(i, list.get(i))
     assertEquals(42, list.get(10))
-  }
 
-  @Test def should_implement_a_snapshot_iterator(): Unit = {
+  @Test def should_implement_a_snapshot_iterator(): Unit =
     val list = factory.empty[Int]
     list.addAll(0 to 10)
 
@@ -75,27 +73,22 @@ class CopyOnWriteArrayListTest extends ListTest {
     val iter2 = list.iterator()
     list.addAll(0 to 5)
 
-    for (i <- 0 to 10) {
+    for (i <- 0 to 10)
       assertTrue(iter.hasNext)
       if (iter.hasNext) assertEquals(i, iter.next())
-    }
     assertFalse(iter2.hasNext)
-  }
 
-  @Test def `should_have_accessible_array_constructor_-_#2023`(): Unit = {
-    def test[T <: AnyRef](arr: Array[T]): Unit = {
+  @Test def `should_have_accessible_array_constructor_-_#2023`(): Unit =
+    def test[T <: AnyRef](arr: Array[T]): Unit =
       val cowal1 = factory.newFrom(arr)
       assertEquals(arr.length, cowal1.length)
       for (i <- arr.indices) assertEquals(arr(i), cowal1.get(i))
-    }
 
     test(Array("a", "", "da", "23"))
     test(Array[Integer](1, 7, 2, 5, 3))
     test(Array[Character]('a', '3', '5', 'g', 'a'))
-  }
-}
 
-class CopyOnWriteArrayListFactory extends ListFactory {
+class CopyOnWriteArrayListFactory extends ListFactory
 
   override def allowsMutationThroughIterator: Boolean = false
 
@@ -112,4 +105,3 @@ class CopyOnWriteArrayListFactory extends ListFactory {
   // Sorting a CopyOnWriteArrayListFactory was not supported until JDK8.
   // See CollectionsOnCopyOnWriteArrayListTestOnJDK8.
   override def sortableUsingCollections: Boolean = false
-}

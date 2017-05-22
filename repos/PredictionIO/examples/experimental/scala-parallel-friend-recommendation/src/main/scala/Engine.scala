@@ -20,13 +20,11 @@ case class ProductScore(
 )
     extends Serializable
 
-object PSimRankEngineFactory extends IEngineFactory {
-  def apply() = {
+object PSimRankEngineFactory extends IEngineFactory
+  def apply() =
     Engine(Map("default" -> classOf[DataSource],
                "node" -> classOf[NodeSamplingDataSource],
                "forest" -> classOf[ForestFireSamplingDataSource]),
            classOf[IdentityPreparator],
            Map("simrank" -> classOf[SimRankAlgorithm]),
            classOf[Serving])
-  }
-}

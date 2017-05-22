@@ -2,7 +2,7 @@ package cats
 package laws
 
 // Taken from http://functorial.com/psc-pages/docs/Control/Monad/Reader/Class/index.html
-trait MonadReaderLaws[F[_], R] extends MonadLaws[F] {
+trait MonadReaderLaws[F[_], R] extends MonadLaws[F]
   implicit override def F: MonadReader[F, R]
 
   val monadReaderAskIdempotent: IsEq[F[R]] =
@@ -18,9 +18,7 @@ trait MonadReaderLaws[F[_], R] extends MonadLaws[F] {
       fra: F[A], f: A => F[B], g: R => R): IsEq[F[B]] =
     F.local(g)(F.flatMap(fra)(f)) <-> F
       .flatMap(F.local(g)(fra))(a => F.local(g)(f(a)))
-}
 
-object MonadReaderLaws {
+object MonadReaderLaws
   def apply[F[_], R](implicit FR: MonadReader[F, R]): MonadReaderLaws[F, R] =
     new MonadReaderLaws[F, R] { def F: MonadReader[F, R] = FR }
-}

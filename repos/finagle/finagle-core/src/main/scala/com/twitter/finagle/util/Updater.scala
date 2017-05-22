@@ -18,7 +18,7 @@ import scala.collection.mutable.ArrayBuffer
   * updates, the hapless handler thread may be stuck with the job
   * indefinitely.
   */
-private[finagle] trait Updater[T] extends (T => Unit) {
+private[finagle] trait Updater[T] extends (T => Unit)
   private[this] val n = new AtomicInteger(0)
   private[this] val q = new ConcurrentLinkedQueue[T]
 
@@ -34,20 +34,17 @@ private[finagle] trait Updater[T] extends (T => Unit) {
     */
   protected def handle(elem: T): Unit
 
-  def apply(t: T) {
+  def apply(t: T)
     q.offer(t)
     if (n.getAndIncrement() > 0) return
 
-    do {
+    do
       val elems = new ArrayBuffer[T](1 + n.get)
-      while (n.get > 1) {
+      while (n.get > 1)
         n.decrementAndGet()
         elems += q.poll()
-      }
 
       elems += q.poll()
 
       for (elem <- preprocess(elems.result)) handle(elem)
-    } while (n.decrementAndGet() > 0)
-  }
-}
+    while (n.decrementAndGet() > 0)

@@ -30,9 +30,8 @@ class date() extends annotation.StaticAnnotation with ScaldingDBAnnotation
 
 // This is the entry point to explicitly calling the JDBC macros.
 // Most often the implicits will be used in the package however
-object DBMacro {
+object DBMacro
   def toColumnDefinitionProvider[T]: ColumnDefinitionProvider[T] = macro ColumnDefinitionProviderImpl[
       T]
   def toDBTypeDescriptor[T]: DBTypeDescriptor[T] = macro DBTypeDescriptorImpl[
       T]
-}

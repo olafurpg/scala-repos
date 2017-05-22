@@ -27,47 +27,40 @@ import java.io._
 
 import scala.collection.generic.CanBuildFrom
 
-object WriterReaderProperties extends Properties("WriterReaderProperties") {
+object WriterReaderProperties extends Properties("WriterReaderProperties")
 
   def output = new ByteArrayOutputStream
 
   // The default Array[Equiv] is reference. WAT!?
-  implicit def aeq[T : Equiv]: Equiv[Array[T]] = new Equiv[Array[T]] {
-    def equiv(a: Array[T], b: Array[T]): Boolean = {
+  implicit def aeq[T : Equiv]: Equiv[Array[T]] = new Equiv[Array[T]]
+    def equiv(a: Array[T], b: Array[T]): Boolean =
       val teq = Equiv[T]
       @annotation.tailrec
       def go(pos: Int): Boolean =
         if (pos == a.length) true
-        else {
+        else
           teq.equiv(a(pos), b(pos)) && go(pos + 1)
-        }
 
       (a.length == b.length) && go(0)
-    }
-  }
   implicit def teq[T1 : Equiv, T2 : Equiv]: Equiv[(T1, T2)] =
-    new Equiv[(T1, T2)] {
-      def equiv(a: (T1, T2), b: (T1, T2)) = {
+    new Equiv[(T1, T2)]
+      def equiv(a: (T1, T2), b: (T1, T2)) =
         Equiv[T1].equiv(a._1, b._1) && Equiv[T2].equiv(a._2, b._2)
-      }
-    }
 
   def writerReader[T : Writer : Reader : Equiv](g: Gen[T]): Prop =
-    forAll(g) { t =>
+    forAll(g)  t =>
       val test = output
       Writer.write(test, t)
       Equiv[T].equiv(Reader.read(test.toInputStream), t)
-    }
   def writerReader[T : Writer : Reader : Equiv : Arbitrary]: Prop =
     writerReader(implicitly[Arbitrary[T]].arbitrary)
 
   def writerReaderCollection[
       T : Writer : Reader, C <: Iterable[T]: Arbitrary : Equiv](
-      implicit cbf: CanBuildFrom[Nothing, T, C]): Prop = {
+      implicit cbf: CanBuildFrom[Nothing, T, C]): Prop =
     implicit val cwriter = Writer.collection[T, C]
     implicit val creader = Reader.collection[T, C]
     writerReader(implicitly[Arbitrary[C]].arbitrary)
-  }
 
   /*
    * Test the Writer/Reader type-classes
@@ -100,4 +93,3 @@ object WriterReaderProperties extends Properties("WriterReaderProperties") {
 
   property("Map[Long, Byte] Writer/Reader") = writerReaderCollection[
       (Long, Byte), Map[Long, Byte]]
-}

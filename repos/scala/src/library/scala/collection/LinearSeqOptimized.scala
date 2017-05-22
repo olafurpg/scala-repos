@@ -31,7 +31,7 @@ import scala.annotation.tailrec
   *
   */
 trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
-    extends LinearSeqLike[A, Repr] { self: Repr =>
+    extends LinearSeqLike[A, Repr]  self: Repr =>
 
   def isEmpty: Boolean
 
@@ -45,85 +45,70 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
     *
     *  Note: the execution of `length` may take time proportional to the length of the sequence.
     */
-  def length: Int = {
+  def length: Int =
     var these = self
     var len = 0
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       len += 1
       these = these.tail
-    }
     len
-  }
 
   /** Selects an element by its index in the $coll.
     *  Note: the execution of `apply` may take time proportional to the index value.
     *  @throws IndexOutOfBoundsException if `idx` does not satisfy `0 <= idx < length`.
     */
-  def apply(n: Int): A = {
+  def apply(n: Int): A =
     val rest = drop(n)
     if (n < 0 || rest.isEmpty) throw new IndexOutOfBoundsException("" + n)
     rest.head
-  }
 
   override /*IterableLike*/
-  def foreach[U](f: A => U) {
+  def foreach[U](f: A => U)
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       f(these.head)
       these = these.tail
-    }
-  }
 
   override /*IterableLike*/
-  def forall(p: A => Boolean): Boolean = {
+  def forall(p: A => Boolean): Boolean =
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (!p(these.head)) return false
       these = these.tail
-    }
     true
-  }
 
   override /*IterableLike*/
-  def exists(p: A => Boolean): Boolean = {
+  def exists(p: A => Boolean): Boolean =
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (p(these.head)) return true
       these = these.tail
-    }
     false
-  }
 
   override /*SeqLike*/
-  def contains[A1 >: A](elem: A1): Boolean = {
+  def contains[A1 >: A](elem: A1): Boolean =
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (these.head == elem) return true
       these = these.tail
-    }
     false
-  }
 
   override /*IterableLike*/
-  def find(p: A => Boolean): Option[A] = {
+  def find(p: A => Boolean): Option[A] =
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (p(these.head)) return Some(these.head)
       these = these.tail
-    }
     None
-  }
 
   override /*TraversableLike*/
-  def foldLeft[B](z: B)(@deprecatedName('f) op: (B, A) => B): B = {
+  def foldLeft[B](z: B)(@deprecatedName('f) op: (B, A) => B): B =
     var acc = z
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       acc = op(acc, these.head)
       these = these.tail
-    }
     acc
-  }
 
   override /*IterableLike*/
   def foldRight[B](z: B)(@deprecatedName('f) op: (A, B) => B): B =
@@ -142,38 +127,33 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
     else op(head, tail.reduceRight(op))
 
   override /*TraversableLike*/
-  def last: A = {
+  def last: A =
     if (isEmpty) throw new NoSuchElementException
     var these = this
     var nx = these.tail
-    while (!nx.isEmpty) {
+    while (!nx.isEmpty)
       these = nx
       nx = nx.tail
-    }
     these.head
-  }
 
   override /*IterableLike*/
-  def take(n: Int): Repr = {
+  def take(n: Int): Repr =
     val b = newBuilder
     var i = 0
     var these = repr
-    while (!these.isEmpty && i < n) {
+    while (!these.isEmpty && i < n)
       i += 1
       b += these.head
       these = these.tail
-    }
     b.result()
-  }
 
   override /*TraversableLike*/
-  def drop(n: Int): Repr = {
+  def drop(n: Int): Repr =
     var these: Repr = repr
     var count = n
-    while (!these.isEmpty && count > 0) {
+    while (!these.isEmpty && count > 0)
       these = these.tail
       count -= 1
-    }
     // !!! This line should actually be something like:
     //   newBuilder ++= these result
     // since we are in collection.*, not immutable.*.
@@ -186,128 +166,106 @@ trait LinearSeqOptimized[+A, +Repr <: LinearSeqOptimized[A, Repr]]
     // Upshot: MutableList is broken and passes part of the
     // original list as the result of drop.
     these
-  }
 
   override /*IterableLike*/
-  def dropRight(n: Int): Repr = {
+  def dropRight(n: Int): Repr =
     val b = newBuilder
     var these = this
     var lead = this drop n
-    while (!lead.isEmpty) {
+    while (!lead.isEmpty)
       b += these.head
       these = these.tail
       lead = lead.tail
-    }
     b.result()
-  }
 
   override /*IterableLike*/
-  def slice(from: Int, until: Int): Repr = {
+  def slice(from: Int, until: Int): Repr =
     var these: Repr = repr
     var count = from max 0
     if (until <= count) return newBuilder.result()
 
     val b = newBuilder
     var sliceElems = until - count
-    while (these.nonEmpty && count > 0) {
+    while (these.nonEmpty && count > 0)
       these = these.tail
       count -= 1
-    }
-    while (these.nonEmpty && sliceElems > 0) {
+    while (these.nonEmpty && sliceElems > 0)
       sliceElems -= 1
       b += these.head
       these = these.tail
-    }
     b.result()
-  }
 
   override /*IterableLike*/
-  def takeWhile(p: A => Boolean): Repr = {
+  def takeWhile(p: A => Boolean): Repr =
     val b = newBuilder
     var these = this
-    while (!these.isEmpty && p(these.head)) {
+    while (!these.isEmpty && p(these.head))
       b += these.head
       these = these.tail
-    }
     b.result()
-  }
 
   override /*TraversableLike*/
-  def span(p: A => Boolean): (Repr, Repr) = {
+  def span(p: A => Boolean): (Repr, Repr) =
     var these: Repr = repr
     val b = newBuilder
-    while (!these.isEmpty && p(these.head)) {
+    while (!these.isEmpty && p(these.head))
       b += these.head
       these = these.tail
-    }
     (b.result(), these)
-  }
 
   override /*IterableLike*/
-  def sameElements[B >: A](that: GenIterable[B]): Boolean = that match {
+  def sameElements[B >: A](that: GenIterable[B]): Boolean = that match
     case that1: LinearSeq[_] =>
       // Probably immutable, so check reference identity first (it's quick anyway)
-      (this eq that1) || {
+      (this eq that1) ||
         var these = this
         var those = that1
-        while (!these.isEmpty && !those.isEmpty && these.head == those.head) {
+        while (!these.isEmpty && !those.isEmpty && these.head == those.head)
           these = these.tail
           those = those.tail
-        }
         these.isEmpty && those.isEmpty
-      }
     case _ =>
       super.sameElements(that)
-  }
 
   override /*SeqLike*/
-  def lengthCompare(len: Int): Int = {
-    @tailrec def loop(i: Int, xs: Repr): Int = {
+  def lengthCompare(len: Int): Int =
+    @tailrec def loop(i: Int, xs: Repr): Int =
       if (i == len) if (xs.isEmpty) 0 else 1
       else if (xs.isEmpty) -1
       else loop(i + 1, xs.tail)
-    }
     if (len < 0) 1
     else loop(0, this)
-  }
 
   override /*SeqLike*/
   def isDefinedAt(x: Int): Boolean = x >= 0 && lengthCompare(x) > 0
 
   override /*SeqLike*/
-  def segmentLength(p: A => Boolean, from: Int): Int = {
+  def segmentLength(p: A => Boolean, from: Int): Int =
     var i = 0
     var these = this drop from
-    while (!these.isEmpty && p(these.head)) {
+    while (!these.isEmpty && p(these.head))
       i += 1
       these = these.tail
-    }
     i
-  }
 
   override /*SeqLike*/
-  def indexWhere(p: A => Boolean, from: Int): Int = {
+  def indexWhere(p: A => Boolean, from: Int): Int =
     var i = from
     var these = this drop from
-    while (these.nonEmpty) {
+    while (these.nonEmpty)
       if (p(these.head)) return i
 
       i += 1
       these = these.tail
-    }
     -1
-  }
 
   override /*SeqLike*/
-  def lastIndexWhere(p: A => Boolean, end: Int): Int = {
+  def lastIndexWhere(p: A => Boolean, end: Int): Int =
     var i = 0
     var these = this
     var last = -1
-    while (!these.isEmpty && i <= end) {
+    while (!these.isEmpty && i <= end)
       if (p(these.head)) last = i
       these = these.tail
       i += 1
-    }
     last
-  }
-}

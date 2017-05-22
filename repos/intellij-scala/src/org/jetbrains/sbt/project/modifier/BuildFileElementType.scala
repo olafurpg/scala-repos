@@ -8,8 +8,7 @@ package org.jetbrains.sbt.project.modifier
   */
 case class BuildFileElementType(id: String)
 
-object BuildFileElementType {
+object BuildFileElementType
   val libraryDependencyElementId = BuildFileElementType("LIBRARY_DEPENDENCY")
   val resolverElementId = BuildFileElementType("RESOLVER")
   val scalacOptionsElementId = BuildFileElementType("SCALAC_OPTIONS")
-}

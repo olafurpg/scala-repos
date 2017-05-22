@@ -23,28 +23,24 @@ import scala.compat.java8.OptionConverters._
   */
 private[http] class ParameterImpl[T, U](receptacle: NameReceptacle[T])(
     implicit fu: FromStringUnmarshaller[T], tTag: ClassTag[U], conv: T ⇒ U)
-    extends StandaloneExtractionImpl[U] with Parameter[U] {
+    extends StandaloneExtractionImpl[U] with Parameter[U]
 
   import ParameterDirectives._
   def directive: Directive1[U] = parameter(receptacle).map(conv)
 
   def optional: RequestVal[Optional[U]] =
-    new StandaloneExtractionImpl[Optional[U]] {
+    new StandaloneExtractionImpl[Optional[U]]
       def directive: Directive1[Optional[U]] = optionalDirective
-    }
 
   private def optionalDirective: Directive1[Optional[U]] =
-    extractMaterializer.flatMap { implicit fm ⇒
+    extractMaterializer.flatMap  implicit fm ⇒
       parameter(receptacle.?).map(v ⇒ v.map(conv).asJava)
-    }
 
   def withDefault(defaultValue: U): RequestVal[U] =
-    new StandaloneExtractionImpl[U] {
+    new StandaloneExtractionImpl[U]
       def directive: Directive1[U] =
         optionalDirective.map(_.orElse(defaultValue))
-    }
-}
-private[http] object ParameterImpl {
+private[http] object ParameterImpl
   def apply[T, U](
       receptacle: NameReceptacle[T])(implicit fu: FromStringUnmarshaller[T],
                                      tTag: ClassTag[U],
@@ -55,4 +51,3 @@ private[http] object ParameterImpl {
       implicit tTag: ClassTag[U], conv: T ⇒ U): Parameter[U] =
     new ParameterImpl(new NameReceptacle(receptacle.name))(
         receptacle.um, tTag, conv)
-}

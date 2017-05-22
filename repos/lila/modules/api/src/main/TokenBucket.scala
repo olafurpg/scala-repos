@@ -21,9 +21,8 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * For mocking the current time.
   */
-trait Clock {
+trait Clock
   def now: Long
-}
 
 /**
   * Actor message for consuming tokens
@@ -37,7 +36,7 @@ private case class TokenRequest(key: Any)
   * @param rate refill rate in tokens per second
   * @param clock for mocking the current time.
   */
-private class TokenBucket(size: Int, rate: Float, clock: Clock) extends Actor {
+private class TokenBucket(size: Int, rate: Float, clock: Clock) extends Actor
 
   private val intervalMillis: Int = (1000 / rate).toInt
 
@@ -47,7 +46,7 @@ private class TokenBucket(size: Int, rate: Float, clock: Clock) extends Actor {
 
   private var buckets = Map.empty[Any, Int]
 
-  def receive = {
+  def receive =
 
     /**
       * First refills all buckets at the given rate, then tries to consume 1.
@@ -58,32 +57,27 @@ private class TokenBucket(size: Int, rate: Float, clock: Clock) extends Actor {
       val newLevel = buckets.getOrElse(key, size) - 1
       if (newLevel >= 0) buckets = buckets + (key -> newLevel)
       sender ! newLevel
-  }
 
   /**
     * Refills all buckets at the given rate. Full buckets are removed.
     */
-  private def refillAll() {
+  private def refillAll()
     val now: Long = clock.now
     val diff: Long = now - lastRefill
     val tokensToAdd: Int = (diff * ratePerMilli).toInt
-    if (tokensToAdd > 0) {
+    if (tokensToAdd > 0)
       buckets = buckets.mapValues(tokensToAdd +).filterNot(_._2 >= size)
       lastRefill = now - diff % intervalMillis
-    }
-  }
-}
 
-object TokenBucket {
+object TokenBucket
 
   private val defaultTimeout = Timeout(100, TimeUnit.MILLISECONDS)
 
-  final class Consumer(actor: ActorRef) {
+  final class Consumer(actor: ActorRef)
 
     def apply(key: Any)(
         implicit timeout: Timeout = defaultTimeout): Future[Int] =
       consume(actor, key)
-  }
 
   /**
     * Creates the actor and bucket group.
@@ -95,15 +89,14 @@ object TokenBucket {
     * @return actorRef, needed to call consume later.
     */
   def create(
-      system: ActorSystem, size: Int, rate: Float, clock: Clock = new Clock {
+      system: ActorSystem, size: Int, rate: Float, clock: Clock = new Clock
     override def now: Long = System.currentTimeMillis
-  })(implicit context: ExecutionContext): Consumer = {
+  )(implicit context: ExecutionContext): Consumer =
     require(size > 0)
     require(size <= 1000)
     require(rate >= 0.000001f)
     require(rate <= 1000)
     new Consumer(system.actorOf(Props(new TokenBucket(size, rate, clock))))
-  }
 
   /**
     * Try to consume 1 token. If the returned value is negative, no tokens are consumed.
@@ -115,4 +108,3 @@ object TokenBucket {
   def consume(actor: ActorRef, key: Any)(
       implicit timeout: Timeout = defaultTimeout): Future[Int] =
     (actor ? TokenRequest(key)).mapTo[Int]
-}

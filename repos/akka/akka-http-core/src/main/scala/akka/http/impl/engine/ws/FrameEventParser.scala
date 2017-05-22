@@ -35,19 +35,18 @@ import akka.stream.Attributes
   *
   * INTERNAL API
   */
-private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
+private[http] object FrameEventParser extends ByteStringParser[FrameEvent]
   import ByteStringParser._
 
-  override def createLogic(attr: Attributes) = new ParsingLogic {
+  override def createLogic(attr: Attributes) = new ParsingLogic
     startWith(ReadFrameHeader)
 
-    trait Step extends ParseStep[FrameEvent] {
+    trait Step extends ParseStep[FrameEvent]
       override def onTruncation(): Unit =
         failStage(new ProtocolException("Data truncated"))
-    }
 
-    object ReadFrameHeader extends Step {
-      override def parse(reader: ByteReader): ParseResult[FrameEvent] = {
+    object ReadFrameHeader extends Step
+      override def parse(reader: ByteReader): ParseResult[FrameEvent] =
         import Protocol._
 
         val flagsAndOp = reader.readByte()
@@ -59,11 +58,10 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
         val maskBit = (maskAndLength & MASK_MASK) != 0
         val length7 = maskAndLength & LENGTH_MASK
 
-        val length = length7 match {
+        val length = length7 match
           case 126 ⇒ reader.readShortBE().toLong
           case 127 ⇒ reader.readLongBE()
           case x ⇒ x.toLong
-        }
 
         if (length < 0)
           throw new ProtocolException("Highest bit of 64bit length was set")
@@ -91,54 +89,46 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
 
         ParseResult(
             Some(FrameStart(header, thisFrameData.compact)), nextState, true)
-      }
-    }
 
-    class ReadData(_remaining: Long) extends Step {
+    class ReadData(_remaining: Long) extends Step
       override def canWorkWithPartialData = true
       var remaining = _remaining
       override def parse(reader: ByteReader): ParseResult[FrameEvent] =
-        if (reader.remainingSize < remaining) {
+        if (reader.remainingSize < remaining)
           remaining -= reader.remainingSize
           ParseResult(
               Some(FrameData(reader.takeAll(), lastPart = false)), this, true)
-        } else {
+        else
           ParseResult(
               Some(FrameData(reader.take(remaining.toInt), lastPart = true)),
               ReadFrameHeader,
               true)
-        }
-    }
-  }
 
   def mask(bytes: ByteString, _mask: Option[Int]): ByteString =
-    _mask match {
+    _mask match
       case Some(m) ⇒ mask(bytes, m)._1
       case None ⇒ bytes
-    }
 
-  def mask(bytes: ByteString, mask: Int): (ByteString, Int) = {
+  def mask(bytes: ByteString, mask: Int): (ByteString, Int) =
     @tailrec def rec(bytes: Array[Byte], offset: Int, mask: Int): Int =
       if (offset >= bytes.length) mask
-      else {
+      else
         val newMask =
           Integer.rotateLeft(mask, 8) // we cycle through the mask in BE order
         bytes(offset) = (bytes(offset) ^ (newMask & 0xff)).toByte
         rec(bytes, offset + 1, newMask)
-      }
 
     val buffer = bytes.toArray[Byte]
     val newMask = rec(buffer, 0, mask)
     (ByteString(buffer), newMask)
-  }
 
-  def parseCloseCode(data: ByteString): Option[(Int, String)] = {
+  def parseCloseCode(data: ByteString): Option[(Int, String)] =
     def invalid(reason: String) =
       Some(
           (Protocol.CloseCodes.ProtocolError,
            s"Peer sent illegal close frame ($reason)."))
 
-    if (data.length >= 2) {
+    if (data.length >= 2)
       val code = ((data(0) & 0xff) << 8) | (data(1) & 0xff)
       val message = Utf8Decoder.decode(data.drop(2))
       if (!Protocol.CloseCodes.isValid(code))
@@ -146,10 +136,8 @@ private[http] object FrameEventParser extends ByteStringParser[FrameEvent] {
       else if (message.isFailure)
         invalid("close reason message is invalid UTF8")
       else Some((code, message.get))
-    } else if (data.length == 1)
+    else if (data.length == 1)
       invalid("close code must be length 2 but was 1") // must be >= length 2 if not empty
     else None
-  }
 
   override def toString: String = "FrameEventParser"
-}

@@ -33,14 +33,11 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 class SparkCommandLine(args: List[String], override val settings: Settings)
-    extends CompilerCommand(args, settings) {
-  def this(args: List[String], error: String => Unit) {
+    extends CompilerCommand(args, settings)
+  def this(args: List[String], error: String => Unit)
     this(args, new SparkRunnerSettings(error))
-  }
 
-  def this(args: List[String]) {
+  def this(args: List[String])
     // scalastyle:off println
     this(args, str => Console.println("Error: " + str))
     // scalastyle:on println
-  }
-}

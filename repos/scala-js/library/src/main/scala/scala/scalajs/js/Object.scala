@@ -15,7 +15,7 @@ package scala.scalajs.js
 
 /** Base class of all JavaScript objects. */
 @native
-class Object extends Any {
+class Object extends Any
   def this(value: Any) = this()
 
   def toLocaleString(): String = native
@@ -41,11 +41,10 @@ class Object extends Any {
     *  MDN
     */
   def propertyIsEnumerable(v: String): Boolean = native
-}
 
 /** The top-level `Object` JavaScript object. */
 @native
-object Object extends Object {
+object Object extends Object
   def apply(): Object = native
   def apply(value: Any): Object = native
 
@@ -218,4 +217,3 @@ object Object extends Object {
     *  this method (not just a subset).
     */
   def properties(o: Any): Array[String] = sys.error("stub")
-}

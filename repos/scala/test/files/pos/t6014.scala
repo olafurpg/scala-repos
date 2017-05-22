@@ -1,4 +1,4 @@
-object Test {
+object Test
   case class CC[T](key: T)
   type Alias[T] = Seq[CC[T]]
 
@@ -10,4 +10,3 @@ object Test {
   //   def g(xs: Alias[_])   = xs map { case CC(x) => CC(x) }    // fails
   //                                  ^
   // one error found
-}

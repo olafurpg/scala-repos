@@ -27,32 +27,30 @@ import org.jetbrains.plugins.scala.worksheet.ui.{WorksheetEditorPrinter, Workshe
   * Date: 1/24/14
   */
 class WorksheetFileHook(private val project: Project)
-    extends ProjectComponent {
+    extends ProjectComponent
   private var statusDisplay: Option[InteractiveStatusDisplay] = None
 
   override def disposeComponent() {}
 
   override def initComponent() {}
 
-  override def projectClosed() {
-    ApplicationManager.getApplication.invokeAndWait(new Runnable {
-      def run() {
+  override def projectClosed()
+    ApplicationManager.getApplication.invokeAndWait(new Runnable
+      def run()
         WorksheetViewerInfo.invalidate()
-      }
-    }, ModalityState.any())
-  }
+    , ModalityState.any())
 
-  override def projectOpened() {
+  override def projectOpened()
     project.getMessageBus
       .connect(project)
       .subscribe(FileEditorManagerListener.FILE_EDITOR_MANAGER,
                  WorksheetEditorListener)
     project.getMessageBus
       .connect(project)
-      .subscribe(DumbService.DUMB_MODE, new DumbModeListener {
+      .subscribe(DumbService.DUMB_MODE, new DumbModeListener
         override def enteredDumbMode() {}
 
-        override def exitDumbMode() {
+        override def exitDumbMode()
           val editor =
             FileEditorManager.getInstance(project).getSelectedTextEditor
           if (editor == null) return
@@ -64,92 +62,76 @@ class WorksheetFileHook(private val project: Project)
           val vFile = file.getVirtualFile
           if (vFile == null) return
 
-          WorksheetFileHook getPanel vFile foreach {
+          WorksheetFileHook getPanel vFile foreach
             case ref =>
               val panel = ref.get()
-              if (panel != null) {
-                panel.getComponents.foreach {
+              if (panel != null)
+                panel.getComponents.foreach
                   case ab: ActionButton => ab.addNotify()
                   case _ =>
-                }
-              }
-          }
-        }
-      })
-  }
+      )
 
   override def getComponentName: String = "Clean worksheet on editor close"
 
   def initTopComponent(file: VirtualFile,
                        run: Boolean,
-                       exec: Option[CompilationProcess] = None) {
+                       exec: Option[CompilationProcess] = None)
     if (project.isDisposed) return
 
     val myFileEditorManager = FileEditorManager.getInstance(project)
     val editors = myFileEditorManager.getAllEditors(file)
 
-    for (editor <- editors) {
-      WorksheetFileHook.getAndRemovePanel(file) foreach {
+    for (editor <- editors)
+      WorksheetFileHook.getAndRemovePanel(file) foreach
         case ref =>
           val p = ref.get()
 
           ApplicationManager.getApplication.invokeLater(
-              new Runnable {
-            override def run() {
+              new Runnable
+            override def run()
               if (p != null) myFileEditorManager.removeTopComponent(editor, p)
-            }
-          })
-      }
+          )
 
       val panel = new WorksheetFileHook.MyPanel(file)
       val constructor = new WorksheetUiConstructor(panel, project)
 
-      extensions.inReadAction {
+      extensions.inReadAction
         statusDisplay = constructor.initTopPanel(panel, file, run, exec)
-      }
 
       myFileEditorManager.addTopComponent(editor, panel)
-    }
-  }
 
-  def disableRun(file: VirtualFile, exec: Option[CompilationProcess]) {
+  def disableRun(file: VirtualFile, exec: Option[CompilationProcess])
     cleanAndAdd(file, exec map (new StopWorksheetAction(_)))
     statusDisplay.foreach(_.onStartCompiling())
-  }
 
-  def enableRun(file: VirtualFile, hasErrors: Boolean) {
+  def enableRun(file: VirtualFile, hasErrors: Boolean)
     cleanAndAdd(file, Some(new RunWorksheetAction))
     statusDisplay.foreach(display =>
           if (hasErrors) display.onFailedCompiling()
           else display.onSuccessfulCompiling())
-  }
 
   private def cleanAndAdd(
-      file: VirtualFile, action: Option[TopComponentDisplayable]) {
-    WorksheetFileHook getPanel file foreach {
+      file: VirtualFile, action: Option[TopComponentDisplayable])
+    WorksheetFileHook getPanel file foreach
       case panelRef =>
         val panel = panelRef.get()
-        if (panel != null) {
+        if (panel != null)
           val c = panel getComponent 0
           if (c != null) panel remove c
           action foreach (_.init(panel))
-        }
-    }
-  }
 
-  private object WorksheetEditorListener extends FileEditorManagerListener {
+  private object WorksheetEditorListener extends FileEditorManagerListener
     private def doc(source: FileEditorManager, file: VirtualFile) =
-      source getSelectedEditor file match {
+      source getSelectedEditor file match
         case txtEditor: TextEditor if txtEditor.getEditor != null =>
           txtEditor.getEditor.getDocument
         case _ => null
-      }
 
-    private def isPluggable(file: VirtualFile): Boolean = {
+    private def isPluggable(file: VirtualFile): Boolean =
       if (ScalaFileType.WORKSHEET_EXTENSION == file.getExtension) return true
       if (!file.isValid) return false
 
-      PsiManager.getInstance(project).findFile(file) match {
+      PsiManager.getInstance(project).findFile(file) match
         case _: ScalaFile
             if ScratchFileService
               .getInstance()
@@ -157,20 +139,17 @@ class WorksheetFileHook(private val project: Project)
               .isInstanceOf[ScratchRootType] =>
           true
         case _ => false
-      }
-    }
 
     override def selectionChanged(event: FileEditorManagerEvent) {}
 
-    override def fileClosed(source: FileEditorManager, file: VirtualFile) {
+    override def fileClosed(source: FileEditorManager, file: VirtualFile)
       if (!isPluggable(file)) return
 
       val d = doc(source, file)
       if (d != null)
         WorksheetAutoRunner.getInstance(source.getProject) removeListener d
-    }
 
-    override def fileOpened(source: FileEditorManager, file: VirtualFile) {
+    override def fileOpened(source: FileEditorManager, file: VirtualFile)
       if (!isPluggable(file)) return
 
       WorksheetFileHook.this.initTopComponent(file, run = true)
@@ -178,17 +157,16 @@ class WorksheetFileHook(private val project: Project)
 
       WorksheetAutoRunner.getInstance(source.getProject) addListener doc(
           source, file)
-    }
 
     private def loadEvaluationResult(
-        source: FileEditorManager, file: VirtualFile) {
-      source getSelectedEditor file match {
+        source: FileEditorManager, file: VirtualFile)
+      source getSelectedEditor file match
         case txt: TextEditor =>
-          txt.getEditor match {
+          txt.getEditor match
             case ext: EditorEx =>
-              PsiDocumentManager getInstance project getPsiFile ext.getDocument match {
+              PsiDocumentManager getInstance project getPsiFile ext.getDocument match
                 case scalaFile: ScalaFile =>
-                  WorksheetEditorPrinter.loadWorksheetEvaluation(scalaFile) foreach {
+                  WorksheetEditorPrinter.loadWorksheetEvaluation(scalaFile) foreach
                     case (result, ratio) if !result.isEmpty =>
                       val viewer =
                         WorksheetEditorPrinter.createRightSideViewer(
@@ -201,42 +179,32 @@ class WorksheetFileHook(private val project: Project)
                       val splitter =
                         WorksheetEditorPrinter.DIFF_SPLITTER_KEY.get(viewer)
 
-                      extensions.inWriteAction {
+                      extensions.inWriteAction
                         document setText result
                         PsiDocumentManager
                           .getInstance(project)
                           .commitDocument(document)
 
-                        if (splitter != null) {
+                        if (splitter != null)
                           splitter setProportion ratio
                           WorksheetFoldGroup.load(
                               viewer, ext, project, splitter, scalaFile)
-                        }
-                      }
                     case _ =>
-                  }
                 case _ =>
-              }
             case _ =>
-          }
         case _ =>
-      }
-    }
-  }
-}
 
-object WorksheetFileHook {
+object WorksheetFileHook
   private val file2panel =
     new util.WeakHashMap[VirtualFile, WeakReference[MyPanel]]()
 
-  private class MyPanel(file: VirtualFile) extends JPanel {
+  private class MyPanel(file: VirtualFile) extends JPanel
 
     file2panel.put(file, new WeakReference[MyPanel](this))
 
     override def equals(obj: Any) = obj.isInstanceOf[MyPanel]
 
     override def hashCode() = Integer.MAX_VALUE
-  }
 
   private def getAndRemovePanel(
       file: VirtualFile): Option[WeakReference[MyPanel]] =
@@ -247,4 +215,3 @@ object WorksheetFileHook {
 
   def instance(project: Project) =
     project.getComponent(classOf[WorksheetFileHook])
-}

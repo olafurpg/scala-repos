@@ -48,7 +48,7 @@ import java.util.Date
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object SourceBuilder {
+object SourceBuilder
   type PlatformPair = OptionalPlatform2[Scalding, Storm]
   type Node[T] = Producer[PlatformPair, T]
 
@@ -64,7 +64,7 @@ object SourceBuilder {
     "%s_%d".format(manifest[T], nextId.getAndIncrement)
 
   def apply[T](eventSource: EventSource[T], timeOf: T => Date)(
-      implicit mf: Manifest[T], eventCodec: Codec[T]) = {
+      implicit mf: Manifest[T], eventCodec: Codec[T]) =
     implicit val te = TimeExtractor[T](timeOf(_).getTime)
     val newID = nextName[T]
     val scaldingSource =
@@ -75,15 +75,13 @@ object SourceBuilder {
         CompletedBuilder.injectionRegistrar[T](eventCodec),
         newID
     )
-  }
-}
 
 case class SourceBuilder[T : Manifest] private (
     @transient node: SourceBuilder.Node[T],
     @transient registrar: IKryoRegistrar,
     id: String,
     @transient opts: Map[String, Options] = Map.empty)
-    extends Serializable {
+    extends Serializable
   import SourceBuilder.{adjust, Node, nextName}
 
   def map[U : Manifest](fn: T => U): SourceBuilder[U] =
@@ -108,33 +106,29 @@ case class SourceBuilder[T : Manifest] private (
     flatMap(newFlatMapper(_))
 
   def write[U](sink: CompoundSink[U])(conversion: T => TraversableOnce[U])(
-      implicit batcher: Batcher, mf: Manifest[U]): SourceBuilder[T] = {
+      implicit batcher: Batcher, mf: Manifest[U]): SourceBuilder[T] =
     val newNode = node
       .flatMap(conversion)
       .write(
           sink.offline.map(new BatchedSinkFromOffline[U](batcher, _)),
-          sink.online.map { supplier =>
+          sink.online.map  supplier =>
             new StormSink[U] { lazy val toFn = supplier() }
-          }
       )
     copy(
         node = node
             .either(newNode)
-            .flatMap[T] {
+            .flatMap[T]
             case Left(t) => Some(t)
             case Right(u) => None
-          }
       )
-  }
 
   def write(
       sink: CompoundSink[T])(implicit batcher: Batcher): SourceBuilder[T] =
     copy(
         node = node.write(
               sink.offline.map(new BatchedSinkFromOffline[T](batcher, _)),
-              sink.online.map { supplier =>
+              sink.online.map  supplier =>
               new StormSink[T] { lazy val toFn = supplier() }
-            }
           )
     )
 
@@ -149,10 +143,9 @@ case class SourceBuilder[T : Manifest] private (
             .asInstanceOf[Node[(K, V)]]
             .leftJoin((
                     service.offline,
-                    service.online.map {
+                    service.online.map
                 fn: Function0[ReadableStore[K, JoinedValue]] =>
                   ReadableServiceFactory(fn)
-              }
                 ))
       )
 
@@ -202,9 +195,9 @@ case class SourceBuilder[T : Manifest] private (
       keyCodec: Codec[K],
       valCodec: Codec[V],
       batcher: Batcher,
-      monoid: Monoid[V]): CompletedBuilder[_, K, V] = {
+      monoid: Monoid[V]): CompletedBuilder[_, K, V] =
 
-    val cb = env match {
+    val cb = env match
       case scalding: ScaldingEnv =>
         val givenStore = store.offlineStore.getOrElse(
             sys.error("No offline store given in Scalding mode"))
@@ -214,9 +207,9 @@ case class SourceBuilder[T : Manifest] private (
           .map { givenStore.withInitialBatch(_) }
           .getOrElse(givenStore)
 
-        val newNode = OptionalUnzip2[Scalding, Storm]()(node)._1.map { p =>
+        val newNode = OptionalUnzip2[Scalding, Storm]()(node)._1.map  p =>
           Producer.evToKeyed(p.name(id)).sumByKey(batchSetStore)
-        }.getOrElse(sys.error(
+        .getOrElse(sys.error(
                 "Scalding mode specified alongside some online-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
@@ -231,9 +224,9 @@ case class SourceBuilder[T : Manifest] private (
             sys.error("No online store given in Storm mode"))
         val givenStore = MergeableStoreFactory.from(supplier())
 
-        val newNode = OptionalUnzip2[Scalding, Storm]()(node)._2.map { p =>
+        val newNode = OptionalUnzip2[Scalding, Storm]()(node)._2.map  p =>
           Producer.evToKeyed(p.name(id)).sumByKey(givenStore)
-        }.getOrElse(sys.error(
+        .getOrElse(sys.error(
                 "Storm mode specified alongside some offline-only Source, Service or Sink."))
         CompletedBuilder(newNode,
                          registrar,
@@ -244,10 +237,8 @@ case class SourceBuilder[T : Manifest] private (
                          opts)
 
       case _ => sys.error("Unknown environment: " + env)
-    }
     env.builder = cb
     cb
-  }
 
   // useful when you need to merge two different Event sources
   def ++(other: SourceBuilder[T]): SourceBuilder[T] =
@@ -257,4 +248,3 @@ case class SourceBuilder[T : Manifest] private (
         id = "merge_" + nextName[T],
         opts = opts ++ other.opts
     )
-}

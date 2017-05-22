@@ -20,8 +20,8 @@ import scala.concurrent.duration._
 
 class OffersWantedForReconciliationActorTest
     extends FunSuite with MarathonActorSupport with Mockito with GivenWhenThen
-    with Matchers with ScalaFutures {
-  test("want offers on startup but times out") {
+    with Matchers with ScalaFutures
+  test("want offers on startup but times out")
     val f = new Fixture()
 
     When("starting up")
@@ -46,9 +46,8 @@ class OffersWantedForReconciliationActorTest
     verify(f.cancellable).cancel()
 
     f.stop()
-  }
 
-  test("becomes interested when resident app is stopped") {
+  test("becomes interested when resident app is stopped")
     val f = new Fixture()
 
     Given("an actor that has already started up and timed out")
@@ -84,46 +83,39 @@ class OffersWantedForReconciliationActorTest
     verify(f.cancellable).cancel()
 
     f.stop()
-  }
 
-  class Fixture {
+  class Fixture
     lazy val reviveOffersConfig: ReviveOffersConfig =
       MarathonTestHelper.defaultConfig()
     lazy val clock: ConstantClock = ConstantClock()
     lazy val eventStream: EventStream = system.eventStream
     lazy val offersWanted: Subject[Boolean] = PublishSubject()
 
-    def futureOffersWanted(drop: Int = 0) = {
+    def futureOffersWanted(drop: Int = 0) =
       val promise = Promise[Boolean]()
       offersWanted.drop(drop).head.foreach(promise.success(_))
       promise.future
-    }
 
     lazy val cancellable = mock[Cancellable]
 
     private[this] var scheduleNextCheckCalls_ = 0
     def scheduleNextCheckCalls = synchronized(scheduleNextCheckCalls_)
-    def scheduleNextCheck: Cancellable = synchronized {
+    def scheduleNextCheck: Cancellable = synchronized
       scheduleNextCheckCalls_ += 1
       cancellable
-    }
 
     lazy val actorInstance = new OffersWantedForReconciliationActor(
         reviveOffersConfig,
         clock,
         eventStream,
         offersWanted
-    ) {
+    )
       override protected def scheduleNextCheck: Cancellable =
         Fixture.this.scheduleNextCheck
-    }
     lazy val actor = TestActorRef(actorInstance)
 
-    def stop(): Unit = {
+    def stop(): Unit =
       val probe = TestProbe()
       probe.watch(actor)
       actor.stop()
       probe.expectMsgClass(classOf[Terminated])
-    }
-  }
-}

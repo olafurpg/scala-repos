@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object B extends Build {
+object B extends Build
 
   override def settings = super.settings ++ Seq(
       organization := "org.example",
@@ -14,4 +14,3 @@ object B extends Build {
   lazy val b = proj("b", "b")
   private[this] def proj(id: String, f: String): Project =
     Project(id, file(f)).settings(ivyPaths <<= ivyPaths in ThisBuild)
-}

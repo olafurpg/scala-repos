@@ -37,7 +37,7 @@ import js._
 abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
     val fieldOwner: T, val enum: ENUM)(
     implicit val manifest: TypeTag[ENUM#Value])
-    extends MappedField[ENUM#Value, T] {
+    extends MappedField[ENUM#Value, T]
   private var data: ENUM#Value = defaultValue
   private var orgData: ENUM#Value = defaultValue
   def defaultValue: ENUM#Value = enum.values.iterator.next
@@ -54,16 +54,15 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
   /**
     * Called after the field is saved to the database
     */
-  override protected[mapper] def doneWithSave() {
+  override protected[mapper] def doneWithSave()
     orgData = data
-  }
 
   /**
     * Get the source field metadata for the field
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = ENUM#Value } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -98,15 +97,13 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
-  protected def real_i_set_!(value: ENUM#Value): ENUM#Value = {
-    if (value != data) {
+  protected def real_i_set_!(value: ENUM#Value): ENUM#Value =
+    if (value != data)
       data = value
       dirty_?(true)
-    }
     data
-  }
   override def readPermission_? = true
   override def writePermission_? = true
 
@@ -123,8 +120,8 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
 
   def asJsonValue: Box[JsonAST.JValue] = Full(JsonAST.JInt(get.id))
 
-  override def setFromAny(in: Any): ENUM#Value = {
-    in match {
+  override def setFromAny(in: Any): ENUM#Value =
+    in match
       case JsonAST.JInt(bi) => this.set(fromInt(bi.intValue))
       case n: Int => this.set(fromInt(n))
       case n: Long => this.set(fromInt(n.toInt))
@@ -138,56 +135,53 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
       case null => this.set(defaultValue)
       case s: String => this.set(fromInt(Helpers.toInt(s)))
       case o => this.set(fromInt(Helpers.toInt(o)))
-    }
-  }
 
   protected def i_obscure_!(in: ENUM#Value) = defaultValue
 
-  private def st(in: ENUM#Value) {
+  private def st(in: ENUM#Value)
     data = in
     orgData = in
-  }
 
   def buildSetActualValue(accessor: Method,
                           data: AnyRef,
                           columnName: String): (T, AnyRef) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedEnum[T, ENUM] =>
           f.st(if (v eq null) defaultValue
               else fromInt(Helpers.toInt(v.toString)))
-      })
+      )
 
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedEnum[T, ENUM] =>
           f.st(if (isNull) defaultValue else fromInt(v.toInt))
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedEnum[T, ENUM] =>
           f.st(if (v eq null) defaultValue else fromInt(Helpers.toInt(v)))
-      })
+      )
 
   def buildSetDateValue(
       accessor: Method, columnName: String): (T, Date) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedEnum[T, ENUM] =>
           f.st(if (v eq null) defaultValue else fromInt(Helpers.toInt(v)))
-      })
+      )
 
   def buildSetBooleanValue(
       accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedEnum[T, ENUM] => f.st(defaultValue)
-      })
+      )
 
   /**
     * Given the driver type, return the string required to create the column in the database
@@ -226,10 +220,9 @@ abstract class MappedEnum[T <: Mapper[T], ENUM <: Enumeration](
         SHtml.selectObj[Int](buildDisplayList,
                              Full(toInt),
                              v => this.set(fromInt(v))))
-}
 
 abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
-    extends MappedInt[T](owner) with IndexedField[Int] {
+    extends MappedInt[T](owner) with IndexedField[Int]
 
   override def writePermission_? = false // not writable
 
@@ -243,46 +236,39 @@ abstract class MappedIntIndex[T <: Mapper[T]](owner: T)
 
   def makeKeyJDBCFriendly(in: Int) = new java.lang.Integer(in)
 
-  def convertKey(in: String): Box[Int] = {
+  def convertKey(in: String): Box[Int] =
     if (in eq null) Empty
-    try {
+    try
       val what =
         if (in.startsWith(name + "=")) in.substring((name + "=").length)
         else in
       Full(Integer.parseInt(what))
-    } catch {
+    catch
       case _: Exception => Empty
-    }
-  }
 
   override def dbDisplay_? = false
 
-  def convertKey(in: Int): Box[Int] = {
+  def convertKey(in: Int): Box[Int] =
     if (in < 0) Empty
     else Full(in)
-  }
 
-  def convertKey(in: Long): Box[Int] = {
+  def convertKey(in: Long): Box[Int] =
     if (in < 0 || in > Integer.MAX_VALUE) Empty
     else Full(in.asInstanceOf[Int])
-  }
 
-  def convertKey(in: AnyRef): Box[Int] = {
+  def convertKey(in: AnyRef): Box[Int] =
     if ((in eq null) || (in eq None)) None
-    try {
+    try
       convertKey(in.toString)
-    } catch {
+    catch
       case _: Exception => Empty
-    }
-  }
 
   override def fieldCreatorString(
       dbType: DriverType, colName: String): String =
     colName + " " + dbType.integerIndexColumnType + notNullAppender()
-}
 
 abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
-    extends MappedField[Int, T] {
+    extends MappedField[Int, T]
   private var data: Int = defaultValue
   private var orgData: Int = defaultValue
 
@@ -302,7 +288,7 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Int } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -337,7 +323,7 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
   protected def i_is_! = data
   protected def i_was_! = orgData
@@ -345,21 +331,18 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
   /**
     * Called after the field is saved to the database
     */
-  override protected[mapper] def doneWithSave() {
+  override protected[mapper] def doneWithSave()
     orgData = data
-  }
 
   def asJsExp: JsExp = JE.Num(get)
 
   def asJsonValue: Box[JsonAST.JValue] = Full(JsonAST.JInt(get))
 
-  protected def real_i_set_!(value: Int): Int = {
-    if (value != data) {
+  protected def real_i_set_!(value: Int): Int =
+    if (value != data)
       data = value
       this.dirty_?(true)
-    }
     data
-  }
   override def readPermission_? = true
   override def writePermission_? = true
 
@@ -370,8 +353,8 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
 
   def jdbcFriendly(field: String) = new java.lang.Integer(get)
 
-  override def setFromAny(in: Any): Int = {
-    in match {
+  override def setFromAny(in: Any): Int =
+    in match
       case n: Int => this.set(n)
       case JsonAST.JInt(bigint) => this.set(bigint.intValue)
       case n: Number => this.set(n.intValue)
@@ -383,15 +366,12 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
       case null => this.set(0)
       case s: String => this.set(toInt(s))
       case o => this.set(toInt(o))
-    }
-  }
 
   protected def i_obscure_!(in: Int) = 0
 
-  private def st(in: Int) {
+  private def st(in: Int)
     data = in
     orgData = in
-  }
 
   def buildSetActualValue(
       accessor: Method, v: AnyRef, columnName: String): (T, AnyRef) => Unit =
@@ -401,9 +381,9 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedInt[T] => f.st(if (isNull) 0 else v.toInt)
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
@@ -418,13 +398,12 @@ abstract class MappedInt[T <: Mapper[T]](val fieldOwner: T)
   def buildSetBooleanValue(
       accessor: Method, columnName: String): (T, Boolean, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedInt[T] => f.st(if (isNull || !v) 0 else 1)
-      })
+      )
 
   /**
     * Given the driver type, return the string required to create the column in the database
     */
   def fieldCreatorString(dbType: DriverType, colName: String): String =
     colName + " " + dbType.integerColumnType + notNullAppender()
-}

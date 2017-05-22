@@ -19,7 +19,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
                               tolerance: Double = 1E-5)(
     implicit space: MutableInnerProductVectorSpace[T, Double],
     mult: OpMulMatrix.Impl2[M, T, T])
-    extends SerializableLogging {
+    extends SerializableLogging
   import space._
 
   def minimize(a: T, B: M): T = minimize(a, B, zeroLike(a))
@@ -31,9 +31,8 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
       residual: T,
       private[ConjugateGradient] val direction: T,
       iter: Int,
-      converged: Boolean) {
+      converged: Boolean)
     lazy val rtr = residual dot residual
-  }
 
   /**
     * Returns the vector x and the vector r. x is the minimizer, while r is the residual error (which
@@ -43,14 +42,13 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
     * @param initX
     * @return
     */
-  def minimizeAndReturnResidual(a: T, B: M, initX: T): (T, T) = {
+  def minimizeAndReturnResidual(a: T, B: M, initX: T): (T, T) =
     val state = iterations(a, B, initX).last
     state.x -> state.residual
-  }
 
   def iterations(a: T, B: M, initX: T): Iterator[State] =
     Iterator
-      .iterate(initialState(a, B, initX)) { state =>
+      .iterate(initialState(a, B, initX))  state =>
         import state._
         var r = residual
         var d = direction
@@ -62,7 +60,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
         val nextX = x + d * alpha
 
         val xnorm: Double = norm(nextX)
-        if (xnorm >= maxNormValue) {
+        if (xnorm >= maxNormValue)
           // reached the edge. We're done.
           logger.info(
               f"$iter boundary reached! norm(x): $xnorm%.3f >= maxNormValue $maxNormValue")
@@ -73,11 +71,10 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
 
           val radius = math.sqrt(xtd * xtd + dtd * (normSquare - xtx))
           val alphaNext =
-            if (xtd >= 0) {
+            if (xtd >= 0)
               (normSquare - xtx) / (xtd + radius)
-            } else {
+            else
               (radius - xtd) / dtd
-            }
 
           assert(!alphaNext.isNaN,
                  xtd + " " + normSquare + " " + xtx + "  " + xtd + " " +
@@ -86,7 +83,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
           axpy(-alphaNext, Bd + (d :* normSquaredPenalty), r)
 
           State(x, r, d, iter + 1, converged = true)
-        } else {
+        else
           x := nextX
           r -= (Bd + (d :* normSquaredPenalty)) :* alpha
           val newrtr = r dot r
@@ -97,7 +94,7 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
           val normr = norm(r)
           val converged =
             normr <= tolerance || (iter > maxIterations && maxIterations > 0)
-          if (converged) {
+          if (converged)
             val done = iter > maxIterations && maxIterations > 0
             if (done)
               logger.info(
@@ -105,19 +102,14 @@ class ConjugateGradient[T, M](maxNormValue: Double = Double.PositiveInfinity,
             else
               logger.info(
                   f"$iter converged! norm(residual): $normr%.3f <= tolerance $tolerance.")
-          } else {
+          else
             logger.info(
                 f"$iter: norm(residual): $normr%.3f > tolerance $tolerance.")
-          }
           State(x, r, d, iter + 1, converged)
-        }
-      }
       .takeUpToWhere(_.converged)
 
-  private def initialState(a: T, B: M, initX: T) = {
+  private def initialState(a: T, B: M, initX: T) =
     val r = a - mult(B, initX) - (initX :* normSquaredPenalty)
     val d = copy(r)
     val rnorm = norm(r)
     State(initX, r, d, 0, rnorm <= tolerance)
-  }
-}

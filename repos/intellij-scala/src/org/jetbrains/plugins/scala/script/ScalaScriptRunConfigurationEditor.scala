@@ -12,7 +12,7 @@ import com.intellij.openapi.project.Project
   */
 class ScalaScriptRunConfigurationEditor(
     project: Project, configuration: ScalaScriptRunConfiguration)
-    extends SettingsEditor[ScalaScriptRunConfiguration] {
+    extends SettingsEditor[ScalaScriptRunConfiguration]
   val form = new ScalaScriptRunConfigurationForm(project, configuration)
 
   def resetEditorFrom(s: ScalaScriptRunConfiguration): Unit = form(s)
@@ -20,4 +20,3 @@ class ScalaScriptRunConfigurationEditor(
   def applyEditorTo(s: ScalaScriptRunConfiguration): Unit = s(form)
 
   def createEditor: JComponent = form.getPanel
-}

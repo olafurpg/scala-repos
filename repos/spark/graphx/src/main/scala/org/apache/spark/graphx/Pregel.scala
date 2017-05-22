@@ -53,7 +53,7 @@ import org.apache.spark.internal.Logging
   * }}}
   *
   */
-object Pregel extends Logging {
+object Pregel extends Logging
 
   /**
     * Execute a Pregel-like iterative vertex-parallel abstraction.  The
@@ -116,7 +116,7 @@ object Pregel extends Logging {
       activeDirection: EdgeDirection = EdgeDirection.Either)(
       vprog: (VertexId, VD, A) => VD,
       sendMsg: EdgeTriplet[VD, ED] => Iterator[(VertexId, A)],
-      mergeMsg: (A, A) => A): Graph[VD, ED] = {
+      mergeMsg: (A, A) => A): Graph[VD, ED] =
     require(maxIterations > 0,
             s"Maximum of iterations must be greater than 0," +
             s" but got ${maxIterations}")
@@ -129,7 +129,7 @@ object Pregel extends Logging {
     // Loop
     var prevG: Graph[VD, ED] = null
     var i = 0
-    while (activeMessages > 0 && i < maxIterations) {
+    while (activeMessages > 0 && i < maxIterations)
       // Receive the messages and update the vertices.
       prevG = g
       g = g.joinVertices(messages)(vprog).cache()
@@ -155,8 +155,7 @@ object Pregel extends Logging {
       prevG.edges.unpersist(blocking = false)
       // count the iteration
       i += 1
-    }
     messages.unpersist(blocking = false)
     g
-  } // end of apply
-} // end of class Pregel
+  // end of apply
+// end of class Pregel

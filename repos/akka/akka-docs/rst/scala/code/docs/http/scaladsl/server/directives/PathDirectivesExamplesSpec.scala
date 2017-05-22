@@ -7,7 +7,7 @@ package docs.http.scaladsl.server.directives
 import akka.http.scaladsl.server._
 import docs.http.scaladsl.server.RoutingSpec
 
-class PathDirectivesExamplesSpec extends RoutingSpec {
+class PathDirectivesExamplesSpec extends RoutingSpec
 
   //# path-matcher
   val matcher: PathMatcher1[Option[Int]] =
@@ -41,288 +41,224 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
   //#
 
   //# pathPrefixTest-, rawPathPrefix-, rawPathPrefixTest-, pathSuffix-, pathSuffixTest-
-  val completeWithUnmatchedPath = extractUnmatchedPath { p =>
+  val completeWithUnmatchedPath = extractUnmatchedPath  p =>
     complete(p.toString)
-  }
 
   //#
 
-  "path-example" in {
+  "path-example" in
     val route =
-      path("foo") {
+      path("foo")
         complete("/foo")
-      } ~ path("foo" / "bar") {
+      ~ path("foo" / "bar")
         complete("/foo/bar")
-      } ~ pathPrefix("ball") {
-        pathEnd {
+      ~ pathPrefix("ball")
+        pathEnd
           complete("/ball")
-        } ~ path(IntNumber) { int =>
+        ~ path(IntNumber)  int =>
           complete(if (int % 2 == 0) "even ball" else "odd ball")
-        }
-      }
 
     // tests:
-    Get("/") ~> route ~> check {
+    Get("/") ~> route ~> check
       handled shouldEqual false
-    }
 
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       responseAs[String] shouldEqual "/foo"
-    }
 
-    Get("/foo/bar") ~> route ~> check {
+    Get("/foo/bar") ~> route ~> check
       responseAs[String] shouldEqual "/foo/bar"
-    }
 
-    Get("/ball/1337") ~> route ~> check {
+    Get("/ball/1337") ~> route ~> check
       responseAs[String] shouldEqual "odd ball"
-    }
-  }
 
-  "pathEnd-" in {
-    val route = pathPrefix("foo") {
-      pathEnd {
+  "pathEnd-" in
+    val route = pathPrefix("foo")
+      pathEnd
         complete("/foo")
-      } ~ path("bar") {
+      ~ path("bar")
         complete("/foo/bar")
-      }
-    }
 
     // tests:
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       responseAs[String] shouldEqual "/foo"
-    }
 
-    Get("/foo/") ~> route ~> check {
+    Get("/foo/") ~> route ~> check
       handled shouldEqual false
-    }
 
-    Get("/foo/bar") ~> route ~> check {
+    Get("/foo/bar") ~> route ~> check
       responseAs[String] shouldEqual "/foo/bar"
-    }
-  }
 
-  "pathEndOrSingleSlash-" in {
-    val route = pathPrefix("foo") {
-      pathEndOrSingleSlash {
+  "pathEndOrSingleSlash-" in
+    val route = pathPrefix("foo")
+      pathEndOrSingleSlash
         complete("/foo")
-      } ~ path("bar") {
+      ~ path("bar")
         complete("/foo/bar")
-      }
-    }
 
     // tests:
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       responseAs[String] shouldEqual "/foo"
-    }
 
-    Get("/foo/") ~> route ~> check {
+    Get("/foo/") ~> route ~> check
       responseAs[String] shouldEqual "/foo"
-    }
 
-    Get("/foo/bar") ~> route ~> check {
+    Get("/foo/bar") ~> route ~> check
       responseAs[String] shouldEqual "/foo/bar"
-    }
-  }
 
-  "pathPrefix-" in {
-    val route = pathPrefix("ball") {
-      pathEnd {
+  "pathPrefix-" in
+    val route = pathPrefix("ball")
+      pathEnd
         complete("/ball")
-      } ~ path(IntNumber) { int =>
+      ~ path(IntNumber)  int =>
         complete(if (int % 2 == 0) "even ball" else "odd ball")
-      }
-    }
 
     // tests:
-    Get("/") ~> route ~> check {
+    Get("/") ~> route ~> check
       handled shouldEqual false
-    }
 
-    Get("/ball") ~> route ~> check {
+    Get("/ball") ~> route ~> check
       responseAs[String] shouldEqual "/ball"
-    }
 
-    Get("/ball/1337") ~> route ~> check {
+    Get("/ball/1337") ~> route ~> check
       responseAs[String] shouldEqual "odd ball"
-    }
-  }
 
-  "pathPrefixTest-" in {
-    val route = pathPrefixTest("foo" | "bar") {
-      pathPrefix("foo") { completeWithUnmatchedPath } ~ pathPrefix("bar") {
+  "pathPrefixTest-" in
+    val route = pathPrefixTest("foo" | "bar")
+      pathPrefix("foo") { completeWithUnmatchedPath } ~ pathPrefix("bar")
         completeWithUnmatchedPath
-      }
-    }
 
     // tests:
-    Get("/foo/doo") ~> route ~> check {
+    Get("/foo/doo") ~> route ~> check
       responseAs[String] shouldEqual "/doo"
-    }
 
-    Get("/bar/yes") ~> route ~> check {
+    Get("/bar/yes") ~> route ~> check
       responseAs[String] shouldEqual "/yes"
-    }
-  }
 
-  "pathSingleSlash-" in {
+  "pathSingleSlash-" in
     val route =
-      pathSingleSlash {
+      pathSingleSlash
         complete("root")
-      } ~ pathPrefix("ball") {
-        pathSingleSlash {
+      ~ pathPrefix("ball")
+        pathSingleSlash
           complete("/ball/")
-        } ~ path(IntNumber) { int =>
+        ~ path(IntNumber)  int =>
           complete(if (int % 2 == 0) "even ball" else "odd ball")
-        }
-      }
 
     // tests:
-    Get("/") ~> route ~> check {
+    Get("/") ~> route ~> check
       responseAs[String] shouldEqual "root"
-    }
 
-    Get("/ball") ~> route ~> check {
+    Get("/ball") ~> route ~> check
       handled shouldEqual false
-    }
 
-    Get("/ball/") ~> route ~> check {
+    Get("/ball/") ~> route ~> check
       responseAs[String] shouldEqual "/ball/"
-    }
 
-    Get("/ball/1337") ~> route ~> check {
+    Get("/ball/1337") ~> route ~> check
       responseAs[String] shouldEqual "odd ball"
-    }
-  }
 
-  "pathSuffix-" in {
-    val route = pathPrefix("start") {
-      pathSuffix("end") {
+  "pathSuffix-" in
+    val route = pathPrefix("start")
+      pathSuffix("end")
         completeWithUnmatchedPath
-      } ~ pathSuffix("foo" / "bar" ~ "baz") {
+      ~ pathSuffix("foo" / "bar" ~ "baz")
         completeWithUnmatchedPath
-      }
-    }
 
     // tests:
-    Get("/start/middle/end") ~> route ~> check {
+    Get("/start/middle/end") ~> route ~> check
       responseAs[String] shouldEqual "/middle/"
-    }
 
-    Get("/start/something/barbaz/foo") ~> route ~> check {
+    Get("/start/something/barbaz/foo") ~> route ~> check
       responseAs[String] shouldEqual "/something/"
-    }
-  }
 
-  "pathSuffixTest-" in {
+  "pathSuffixTest-" in
     val route =
-      pathSuffixTest(Slash) {
+      pathSuffixTest(Slash)
         complete("slashed")
-      } ~ complete("unslashed")
+      ~ complete("unslashed")
 
     // tests:
-    Get("/foo/") ~> route ~> check {
+    Get("/foo/") ~> route ~> check
       responseAs[String] shouldEqual "slashed"
-    }
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       responseAs[String] shouldEqual "unslashed"
-    }
-  }
 
-  "rawPathPrefix-" in {
-    val route = pathPrefix("foo") {
-      rawPathPrefix("bar") { completeWithUnmatchedPath } ~ rawPathPrefix("doo") {
+  "rawPathPrefix-" in
+    val route = pathPrefix("foo")
+      rawPathPrefix("bar") { completeWithUnmatchedPath } ~ rawPathPrefix("doo")
         completeWithUnmatchedPath
-      }
-    }
 
     // tests:
-    Get("/foobar/baz") ~> route ~> check {
+    Get("/foobar/baz") ~> route ~> check
       responseAs[String] shouldEqual "/baz"
-    }
 
-    Get("/foodoo/baz") ~> route ~> check {
+    Get("/foodoo/baz") ~> route ~> check
       responseAs[String] shouldEqual "/baz"
-    }
-  }
 
-  "rawPathPrefixTest-" in {
-    val route = pathPrefix("foo") {
-      rawPathPrefixTest("bar") {
+  "rawPathPrefixTest-" in
+    val route = pathPrefix("foo")
+      rawPathPrefixTest("bar")
         completeWithUnmatchedPath
-      }
-    }
 
     // tests:
-    Get("/foobar") ~> route ~> check {
+    Get("/foobar") ~> route ~> check
       responseAs[String] shouldEqual "bar"
-    }
 
-    Get("/foobaz") ~> route ~> check {
+    Get("/foobaz") ~> route ~> check
       handled shouldEqual false
-    }
-  }
 
-  "redirectToTrailingSlashIfMissing-0" in {
+  "redirectToTrailingSlashIfMissing-0" in
     import akka.http.scaladsl.model.StatusCodes
 
     val route =
-      redirectToTrailingSlashIfMissing(StatusCodes.MovedPermanently) {
-        path("foo"./) {
+      redirectToTrailingSlashIfMissing(StatusCodes.MovedPermanently)
+        path("foo"./)
           // We require the explicit trailing slash in the path
           complete("OK")
-        } ~ path("bad-1") {
+        ~ path("bad-1")
           // MISTAKE!
           // Missing `/` in path, causes this path to never match,
           // because it is inside a `redirectToTrailingSlashIfMissing`
           ???
-        } ~ path("bad-2/") {
+        ~ path("bad-2/")
           // MISTAKE!
           // / should be explicit as path element separator and not *in* the path element
           // So it should be: "bad-1" /
           ???
-        }
-      }
 
     // tests:
     // Redirected:
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       status shouldEqual StatusCodes.MovedPermanently
 
       // results in nice human readable message,
       // in case the redirect can't be followed automatically:
-      responseAs[String] shouldEqual {
+      responseAs[String] shouldEqual
         "This and all future requests should be directed to " +
         "<a href=\"http://example.com/foo/\">this URI</a>."
-      }
-    }
 
     // Properly handled:
-    Get("/foo/") ~> route ~> check {
+    Get("/foo/") ~> route ~> check
       status shouldEqual StatusCodes.OK
       responseAs[String] shouldEqual "OK"
-    }
 
     // MISTAKE! will never match - reason explained in routes
-    Get("/bad-1/") ~> route ~> check {
+    Get("/bad-1/") ~> route ~> check
       handled shouldEqual false
-    }
 
     // MISTAKE! will never match - reason explained in routes
-    Get("/bad-2/") ~> route ~> check {
+    Get("/bad-2/") ~> route ~> check
       handled shouldEqual false
-    }
-  }
 
-  "redirectToNoTrailingSlashIfPresent-0" in {
+  "redirectToNoTrailingSlashIfPresent-0" in
     import akka.http.scaladsl.model.StatusCodes
 
     val route =
-      redirectToNoTrailingSlashIfPresent(StatusCodes.MovedPermanently) {
-        path("foo") {
+      redirectToNoTrailingSlashIfPresent(StatusCodes.MovedPermanently)
+        path("foo")
           // We require the explicit trailing slash in the path
           complete("OK")
-        } ~ path("bad"./) {
+        ~ path("bad"./)
           // MISTAKE!
           // Since inside a `redirectToNoTrailingSlashIfPresent` directive
           // the matched path here will never contain a trailing slash,
@@ -330,31 +266,23 @@ class PathDirectivesExamplesSpec extends RoutingSpec {
           //
           // It should be `path("bad")` instead.
           ???
-        }
-      }
 
     // tests:
     // Redirected:
-    Get("/foo/") ~> route ~> check {
+    Get("/foo/") ~> route ~> check
       status shouldEqual StatusCodes.MovedPermanently
 
       // results in nice human readable message,
       // in case the redirect can't be followed automatically:
-      responseAs[String] shouldEqual {
+      responseAs[String] shouldEqual
         "This and all future requests should be directed to " +
         "<a href=\"http://example.com/foo\">this URI</a>."
-      }
-    }
 
     // Properly handled:
-    Get("/foo") ~> route ~> check {
+    Get("/foo") ~> route ~> check
       status shouldEqual StatusCodes.OK
       responseAs[String] shouldEqual "OK"
-    }
 
     // MISTAKE! will never match - reason explained in routes
-    Get("/bad") ~> route ~> check {
+    Get("/bad") ~> route ~> check
       handled shouldEqual false
-    }
-  }
-}

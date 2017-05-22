@@ -50,7 +50,7 @@ import org.joda.time.Instant
 import scalaz._
 import scalaz.syntax.id._
 
-trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
+trait KafkaIngestActorProjectionSystemConfig extends ShardConfig
   case class IngestConfig(bufferSize: Int,
                           maxParallel: Int,
                           batchTimeout: Timeout,
@@ -64,19 +64,17 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
     config[Long]("kafka.socket_timeout", 5000) millis
   def kafkaBufferSize: Int = config[Int]("kafka.buffer_size", 64 * 1024)
 
-  def ingestConfig = config.detach("ingest") |> { config =>
-    for {
+  def ingestConfig = config.detach("ingest") |>  config =>
+    for
       failureLogRoot <- config.get[File]("failure_log_root")
                            if config[Boolean]("enabled", false)
-    } yield {
+    yield
       IngestConfig(bufferSize = config[Int]("buffer_size", 1024 * 1024),
                    maxParallel = config[Int]("max_parallel", 5),
                    batchTimeout = config[Int]("timeout", 120) seconds,
                    maxConsecutiveFailures = config[Int](
                          "ingest.max_consecutive_failures", 3),
                    failureLogRoot = failureLogRoot)
-    }
-  }
 
   def createYggCheckpointFlag =
     config.get[String]("ingest.createCheckpointFlag")
@@ -88,15 +86,13 @@ trait KafkaIngestActorProjectionSystemConfig extends ShardConfig {
   def serviceUID: ServiceUID =
     ZookeeperSystemCoordination.extractServiceUID(config)
 
-  lazy val shardId = {
+  lazy val shardId =
     val suid = serviceUID
     serviceUID.hostId + serviceUID.serviceId
-  }
 
   val logPrefix = "[Production Yggdrasil Shard]"
-}
 
-trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
+trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule
   type YggConfig <: KafkaIngestActorProjectionSystemConfig
 
   def ingestFailureLog(
@@ -107,8 +103,8 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
       routingActor: ActorRef,
       checkpoint: YggCheckpoint,
       checkpointCoordination: CheckpointCoordination,
-      permissionsFinder: PermissionsFinder[Future]) = {
-    yggConfig.ingestConfig map { conf =>
+      permissionsFinder: PermissionsFinder[Future]) =
+    yggConfig.ingestConfig map  conf =>
       val consumer =
         new SimpleConsumer(yggConfig.kafkaHost,
                            yggConfig.kafkaPort,
@@ -130,34 +126,29 @@ trait KafkaIngestActorProjectionSystem extends ShardSystemActorModule {
                   idleDelay = yggConfig.batchStoreDelay,
                   ingestTimeout = conf.batchTimeout,
                   maxCacheSize = conf.maxParallel,
-                  maxConsecutiveFailures = conf.maxConsecutiveFailures) {
+                  maxConsecutiveFailures = conf.maxConsecutiveFailures)
 
             implicit val M = new FutureMonad(
                 ExecutionContext.defaultExecutionContext(actorSystem))
 
-            def handleBatchComplete(ck: YggCheckpoint) {
+            def handleBatchComplete(ck: YggCheckpoint)
               logger.debug("Complete up to " + ck)
               checkpointCoordination.saveYggCheckpoint(yggConfig.shardId, ck)
               logger.info("Saved checkpoint: " + ck)
-            }
-          }),
+          ),
           "ingest")
-    }
-  }
 
   override def checkpointCoordination =
     ZookeeperSystemCoordination(yggConfig.zookeeperHosts,
                                 yggConfig.serviceUID,
                                 yggConfig.ingestConfig.isDefined,
                                 yggConfig.createYggCheckpointFlag)
-}
 
-trait StandaloneShardSystemConfig extends ShardConfig {
+trait StandaloneShardSystemConfig extends ShardConfig
   def shardId = "standalone"
   def logPrefix = "[Standalone Yggdrasil Shard]"
-}
 
-trait StandaloneActorProjectionSystem extends ShardSystemActorModule {
+trait StandaloneActorProjectionSystem extends ShardSystemActorModule
   type YggConfig <: StandaloneShardSystemConfig
   override def initIngestActor(actorSystem: ActorSystem,
                                routingActor: ActorRef,
@@ -166,7 +157,6 @@ trait StandaloneActorProjectionSystem extends ShardSystemActorModule {
                                permissionsFinder: PermissionsFinder[Future]) =
     None
   override def checkpointCoordination = CheckpointCoordination.Noop
-}
 
 // vim: set ts=4 sw=4 et:
 /* tmux

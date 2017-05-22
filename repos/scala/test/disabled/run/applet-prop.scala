@@ -2,11 +2,10 @@ import scala.tools.partest._
 import java.util.PropertyPermission
 import java.security.AccessControlException
 
-class S extends javax.swing.JApplet {
+class S extends javax.swing.JApplet
   scala.collection.Traversable
-}
 
-object Test extends SecurityTest {
+object Test extends SecurityTest
   val s = new S
   // lazy val TestKey = sys.SystemProperties.noTraceSuppression.key
   // def hitPerm() = new Throwable with scala.util.control.ControlThrowable { }
@@ -36,4 +35,3 @@ object Test extends SecurityTest {
   // 
   // val xs = new Traversable[Int] { def foreach[U](f: Int => U) = 1 to 3 foreach f }
   // xs foreach println
-}

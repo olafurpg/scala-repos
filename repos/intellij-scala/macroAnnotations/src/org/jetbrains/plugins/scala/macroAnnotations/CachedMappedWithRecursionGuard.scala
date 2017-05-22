@@ -16,13 +16,12 @@ import scala.reflect.macros.whitebox
   */
 class CachedMappedWithRecursionGuard(
     psiElement: Any, defaultValue: => Any, dependencyItem: Object)
-    extends StaticAnnotation {
+    extends StaticAnnotation
   def macroTransform(annottees: Any*) = macro CachedMappedWithRecursionGuard.cachedMappedWithRecursionGuardImpl
-}
 
-object CachedMappedWithRecursionGuard {
+object CachedMappedWithRecursionGuard
   def cachedMappedWithRecursionGuardImpl(c: whitebox.Context)(
-      annottees: c.Tree*): c.Expr[Any] = {
+      annottees: c.Tree*): c.Expr[Any] =
     import CachedMacroUtil._
     import c.universe._
     implicit val x: c.type = c
@@ -33,23 +32,21 @@ object CachedMappedWithRecursionGuard {
     val dataTypeName: c.universe.TypeName = generateTypeName("Data")
 
     //noinspection ZeroIndexToHead
-    def parameters: (Tree, Tree, Tree) = c.prefix.tree match {
+    def parameters: (Tree, Tree, Tree) = c.prefix.tree match
       case q"new CachedMappedWithRecursionGuard(..$params)"
           if params.length == 3 =>
         (params(0),
          params(1),
          modCountParamToModTracker(c)(params(2), params(0)))
       case _ => abort("Wrong annotation parameters!")
-    }
 
     //annotation parameters
     val (element, defaultValue, dependencyItem) = parameters
 
-    annottees.toList match {
+    annottees.toList match
       case DefDef(mods, name, tpParams, paramss, retTp, rhs) :: Nil =>
-        if (retTp.isEmpty) {
+        if (retTp.isEmpty)
           abort("You must specify return type")
-        }
 
         //some more generated names
         val keyId: String = c.freshName(name + "cacheKey")
@@ -63,18 +60,16 @@ object CachedMappedWithRecursionGuard {
         val flatParams = paramss.flatten
         val parameterTypes = flatParams.map(_.tpt)
         val parameterNames: List[c.universe.TermName] = flatParams.map(_.name)
-        val parameterDefinitions: List[c.universe.Tree] = flatParams match {
+        val parameterDefinitions: List[c.universe.Tree] = flatParams match
           case param :: Nil =>
             List(ValDef(NoMods, param.name, param.tpt, q"$dataName"))
           case _ =>
-            flatParams.zipWithIndex.map {
+            flatParams.zipWithIndex.map
               case (param, i) =>
                 ValDef(NoMods,
                        param.name,
                        param.tpt,
                        q"$dataName.${TermName("_" + (i + 1))}")
-            }
-        }
 
         val actualCalculation =
           transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
@@ -87,8 +82,8 @@ object CachedMappedWithRecursionGuard {
           """
 
         val updatedRhs = q"""
-          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
-        else EmptyTree}
+          $if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree
           type $dataTypeName = (..$parameterTypes)
           val $dataName = (..$parameterNames)
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
@@ -173,9 +168,9 @@ object CachedMappedWithRecursionGuard {
         """
 
         val cacheStatsField =
-          if (analyzeCaches) {
+          if (analyzeCaches)
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
-          } else EmptyTree
+          else EmptyTree
 
         val updatedDef = DefDef(
             mods, name, tpParams, paramss, retTp, updatedRhs)
@@ -188,6 +183,3 @@ object CachedMappedWithRecursionGuard {
         println(res)
         c.Expr(res)
       case _ => abort("You can only annotate one function!")
-    }
-  }
-}

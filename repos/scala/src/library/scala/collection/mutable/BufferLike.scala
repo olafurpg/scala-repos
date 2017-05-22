@@ -59,7 +59,7 @@ import scala.annotation.migration
   */
 trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     extends Growable[A] with Shrinkable[A] with Scriptable[A]
-    with Subtractable[A, This] with SeqLike[A, This] with scala.Cloneable {
+    with Subtractable[A, This] with SeqLike[A, This] with scala.Cloneable
   self: This =>
 
   // Abstract methods from Seq:
@@ -109,12 +109,11 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *            `0 <= n <= length - count` (with `count > 0`).
     *  @throws   IllegalArgumentException if `count < 0`.
     */
-  def remove(n: Int, count: Int) {
+  def remove(n: Int, count: Int)
     if (count < 0)
       throw new IllegalArgumentException(
           "removing negative number of elements: " + count.toString)
     for (i <- 0 until count) remove(n)
-  }
 
   /** Removes a single element from this buffer, at its first occurrence.
     *  If the buffer does not contain that element, it is unchanged.
@@ -122,20 +121,18 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @param x  the element to remove.
     *  @return   the buffer itself
     */
-  def -=(x: A): this.type = {
+  def -=(x: A): this.type =
     val i = indexOf(x)
     if (i != -1) remove(i)
     this
-  }
 
   /** Prepends elements to this buffer.
     *
     *  @param xs  the TraversableOnce containing the elements to prepend.
     *  @return the buffer itself.
     */
-  def ++=:(xs: TraversableOnce[A]): this.type = {
+  def ++=:(xs: TraversableOnce[A]): this.type =
     insertAll(0, xs.toTraversable); this
-  }
 
   /** Appends the given elements to this buffer.
     *
@@ -186,7 +183,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *  @param cmd  the message to send.
     */
   @deprecated("Scripting is deprecated.", "2.11.0")
-  def <<(cmd: Message[A]): Unit = cmd match {
+  def <<(cmd: Message[A]): Unit = cmd match
     case Include(Start, x) => prepend(x)
     case Include(End, x) => append(x)
     case Include(Index(n), x) => insert(n, x)
@@ -206,7 +203,6 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     case _ =>
       throw new UnsupportedOperationException(
           "message " + cmd + " not understood")
-  }
 
   /** Defines the prefix of this object's `toString` representation.
     *  @return  a string representation which starts the result of `toString` applied to this set.
@@ -266,9 +262,7 @@ trait BufferLike[A, +This <: BufferLike[A, This] with Buffer[A]]
     *
     *  @return a `Buffer` with the same elements.
     */
-  override def clone(): This = {
+  override def clone(): This =
     val bf = newBuilder
     bf ++= this
     bf.result().asInstanceOf[This]
-  }
-}

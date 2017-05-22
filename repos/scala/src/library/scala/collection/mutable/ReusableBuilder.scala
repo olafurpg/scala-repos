@@ -29,7 +29,7 @@ import generic._
   *
   *  @since 2.12
   */
-trait ReusableBuilder[-Elem, +To] extends Builder[Elem, To] {
+trait ReusableBuilder[-Elem, +To] extends Builder[Elem, To]
 
   /** Clears the contents of this builder.
     *  After execution of this method, the builder will contain no elements.
@@ -48,4 +48,3 @@ trait ReusableBuilder[-Elem, +To] extends Builder[Elem, To] {
     *  @return a collection containing the elements added to this builder.
     */
   override def result(): To // Note: overriding for scaladoc only!
-}

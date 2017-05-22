@@ -25,66 +25,51 @@ import org.junit.runner.RunWith
 import breeze.linalg._
 
 @RunWith(classOf[JUnitRunner])
-class OWLQNTest extends OptimizeTestBase {
-  test("super simple") {
+class OWLQNTest extends OptimizeTestBase
+  test("super simple")
     val lbfgs = new OWLQN[Int, DenseVector[Double]](100, 4)
 
-    def optimizeThis(init: DenseVector[Double]) = {
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    def optimizeThis(init: DenseVector[Double]) =
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (norm((x - 3.0) :^ 2.0, 1), (x * 2.0) - 6.0)
-        }
-      }
 
       val result = lbfgs.minimize(f, init)
       result
-    }
 
     val result = optimizeThis(DenseVector(-1.1053, 0.0, 0.0))
     assert((result(0) - 2.5) < 1E-4, result)
-  }
 
-  test("optimize a simple multivariate gaussian") {
+  test("optimize a simple multivariate gaussian")
     val lbfgs = new OWLQN[Int, DenseVector[Double]](100, 4, 1.0)
 
-    def optimizeThis(init: DenseVector[Double]) = {
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    def optimizeThis(init: DenseVector[Double]) =
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           ((math.pow(norm(x - 3.0, 2), 2)), (x * 2.0) - 6.0)
-        }
-      }
 
       val result = lbfgs.minimize(f, init)
       val closeish = norm(result - 2.5, 2) < 1E-4
-      if (closeish) {
+      if (closeish)
         true
-      } else {
+      else
         throw new Exception(result.toString + " is not close enough to 2.5")
-      }
-    }
 
     check(Prop.forAll(optimizeThis _))
-  }
 
-  test("optimize a simple multivariate gaussian, sparse") {
+  test("optimize a simple multivariate gaussian, sparse")
     val lbfgs = new OWLQN[Int, SparseVector[Double]](100, 4, 1.0)
 
-    def optimizeThis(init: SparseVector[Double]) = {
-      val f = new DiffFunction[SparseVector[Double]] {
-        def calculate(x: SparseVector[Double]) = {
+    def optimizeThis(init: SparseVector[Double]) =
+      val f = new DiffFunction[SparseVector[Double]]
+        def calculate(x: SparseVector[Double]) =
           ((math.pow(norm(x - 3.0, 2), 2)), (x * 2.0) - 6.0)
-        }
-      }
 
       val result = lbfgs.minimize(f, init)
       val closeish = norm(result - 2.5, 2) < 1E-4
-      if (closeish) {
+      if (closeish)
         true
-      } else {
+      else
         throw new Exception(result.toString + " is not close enough to 2.5")
-      }
-    }
 
     check(Prop.forAll(optimizeThis _))
-  }
-}

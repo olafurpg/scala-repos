@@ -8,14 +8,12 @@ package scala.tools.partest.instrumented
 import scala.collection.JavaConverters._
 
 case class MethodCallTrace(
-    className: String, methodName: String, methodDescriptor: String) {
+    className: String, methodName: String, methodDescriptor: String)
   override def toString(): String =
     className + "." + methodName + methodDescriptor
-}
-object MethodCallTrace {
+object MethodCallTrace
   implicit val ordering: Ordering[MethodCallTrace] =
     Ordering.by(x => (x.className, x.methodName, x.methodDescriptor))
-}
 
 /**
   * An object that controls profiling of instrumented byte-code. The instrumentation is achieved
@@ -50,7 +48,7 @@ object MethodCallTrace {
   * scala/runtime/BoxesRunTime.boxToBoolean(Z)Ljava/lang/Boolean;: 1
   * }}}
   */
-object Instrumentation {
+object Instrumentation
 
   type Statistics = Map[MethodCallTrace, Int]
 
@@ -59,43 +57,34 @@ object Instrumentation {
   def resetProfiling(): Unit = Profiler.resetProfiling()
   def isProfiling(): Boolean = Profiler.isProfiling()
 
-  def getStatistics: Statistics = {
+  def getStatistics: Statistics =
     val isProfiling = Profiler.isProfiling()
-    if (isProfiling) {
+    if (isProfiling)
       Profiler.stopProfiling()
-    }
-    val stats = Profiler.getStatistics().asScala.toSeq.map {
+    val stats = Profiler.getStatistics().asScala.toSeq.map
       case (trace, count) =>
         MethodCallTrace(trace.className,
                         trace.methodName,
                         trace.methodDescriptor) -> count.intValue
-    }
     val res = Map(stats: _*)
-    if (isProfiling) {
+    if (isProfiling)
       Profiler.startProfiling()
-    }
     res
-  }
 
   val standardFilter: MethodCallTrace => Boolean = t =>
-    {
       // ignore all calls to Console trigger by printing
       t.className != "scala/Console$" &&
       // console accesses DynamicVariable, let's discard it too
       !t.className.startsWith("scala/util/DynamicVariable")
-  }
 
   // Used in tests.
   def printStatistics(
       stats: Statistics = getStatistics,
-      filter: MethodCallTrace => Boolean = standardFilter): Unit = {
+      filter: MethodCallTrace => Boolean = standardFilter): Unit =
     val stats = getStatistics
     println("Method call statistics:")
     val toBePrinted = stats.toSeq.filter(p => filter(p._1)).sortBy(_._1)
     // <count> <trace>
     val format = "%5d  %s\n"
-    toBePrinted foreach {
+    toBePrinted foreach
       case (trace, count) => printf(format, count, trace)
-    }
-  }
-}

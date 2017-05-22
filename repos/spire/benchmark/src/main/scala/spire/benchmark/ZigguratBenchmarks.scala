@@ -29,7 +29,7 @@ import spire.implicits._
   */
 object ZigguratBenchmarks extends MyRunner(classOf[ZigguratBenchmarks])
 
-class ZigguratBenchmarks extends MyBenchmark with BenchmarkData {
+class ZigguratBenchmarks extends MyBenchmark with BenchmarkData
 
   val well512aRng: spire.random.Generator =
     spire.random.rng.Well512a.fromTime()
@@ -38,27 +38,22 @@ class ZigguratBenchmarks extends MyBenchmark with BenchmarkData {
 
   @inline final def nextLen = 10000000
 
-  def timePolarRNORGenerator(reps: Int) = run(reps) {
+  def timePolarRNORGenerator(reps: Int) = run(reps)
     val rng = well512aRng
     var t = 0d
     cfor(0)(_ < nextLen, _ + 1)(_ => t += rng.nextGaussian())
-  }
 
-  def timePolarRNORDist(reps: Int) = run(reps) {
+  def timePolarRNORDist(reps: Int) = run(reps)
     val rng = well512aRng
     var t = 0d
     cfor(0)(_ < nextLen, _ + 1)(_ => t += gaussDist(rng))
-  }
 
-  def timeZigguratRNOR(reps: Int) = run(reps) {
+  def timeZigguratRNOR(reps: Int) = run(reps)
     val rng = well512aRng
     var t = 0d
     cfor(0)(_ < nextLen, _ + 1)(_ => t += spire.random.Ziggurat.rnor(rng))
-  }
 
-  def timeZigguratREXP(reps: Int) = run(reps) {
+  def timeZigguratREXP(reps: Int) = run(reps)
     val rng = well512aRng
     var t = 0d
     cfor(0)(_ < nextLen, _ + 1)(_ => t += spire.random.Ziggurat.rexp(rng))
-  }
-}

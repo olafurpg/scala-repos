@@ -30,7 +30,7 @@ import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.io.Charsets
 import com.twitter.util.{Duration, NonFatal, Time}
 
-object ScribeHandler {
+object ScribeHandler
   private sealed trait ServerType
   private case object Unknown extends ServerType
   private case object Archaic extends ServerType
@@ -106,7 +106,6 @@ object ScribeHandler {
           formatter,
           level,
           NullStatsReceiver)
-}
 
 /**
   * NOTE: ScribeHandler is usually used to write structured binary data.
@@ -123,7 +122,7 @@ class ScribeHandler(hostname: String,
                     formatter: Formatter,
                     level: Option[Level],
                     statsReceiver: StatsReceiver)
-    extends Handler(formatter, level) {
+    extends Handler(formatter, level)
   import ScribeHandler._
 
   def this(
@@ -168,7 +167,7 @@ class ScribeHandler(hostname: String,
 
   // Could be rewritten using a simple Condition (await/notify) or producer/consumer
   // with timed batching
-  private[logging] val flusher = {
+  private[logging] val flusher =
     val threadFactory = new NamedPoolThreadFactory(
         "ScribeFlusher-" + category, true)
     // should be 1, but this is a crude form of retry
@@ -181,48 +180,43 @@ class ScribeHandler(hostname: String,
                            queue,
                            threadFactory,
                            rejectionHandler)
-  }
 
   private[logging] val queue =
     new LinkedBlockingQueue[Array[Byte]](maxMessagesToBuffer)
 
   def queueSize: Int = queue.size()
 
-  override def flush() {
+  override def flush()
 
-    def connect() {
-      if (!socket.isDefined) {
-        if (Time.now.since(lastConnectAttempt) > connectBackoff) {
-          try {
+    def connect()
+      if (!socket.isDefined)
+        if (Time.now.since(lastConnectAttempt) > connectBackoff)
+          try
             lastConnectAttempt = Time.now
             socket = Some(new Socket(hostname, port))
 
             stats.incrConnection()
             serverType = Unknown
-          } catch {
+          catch
             case e: Exception =>
               log.error("Unable to open socket to scribe server at %s:%d: %s",
                         hostname,
                         port,
                         e)
               stats.incrConnectionFailure()
-          }
-        } else {
+        else
           stats.incrConnectionSkipped()
-        }
-      }
-    }
 
-    def detectArchaicServer(): Unit = {
+    def detectArchaicServer(): Unit =
       if (serverType != Unknown) return
 
-      serverType = socket match {
+      serverType = socket match
         case None => Unknown
-        case Some(s) => {
+        case Some(s) =>
             val outStream = s.getOutputStream()
 
-            try {
-              val fakeMessageWithOldScribePrefix: Array[Byte] = {
+            try
+              val fakeMessageWithOldScribePrefix: Array[Byte] =
                 val prefix = OLD_SCRIBE_PREFIX
                 val messageSize = prefix.length + 5
                 val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
@@ -232,7 +226,6 @@ class ScribeHandler(hostname: String,
                 buffer.putInt(0)
                 buffer.put(0: Byte)
                 buffer.array
-              }
 
               outStream.write(fakeMessageWithOldScribePrefix)
               readResponseExpecting(s, OLD_SCRIBE_REPLY)
@@ -241,29 +234,25 @@ class ScribeHandler(hostname: String,
               log.debug(
                   "Scribe server is archaic; changing to old protocol for future requests.")
               Archaic
-            } catch {
+            catch
               case NonFatal(_) => Modern
-            }
-          }
-      }
-    }
 
     // TODO we should send any remaining messages before the app terminates
-    def sendBatch() {
-      synchronized {
+    def sendBatch()
+      synchronized
         connect()
         detectArchaicServer()
-        socket.foreach { s =>
+        socket.foreach  s =>
           val outStream = s.getOutputStream()
           var remaining = queue.size
           // try to send the log records in batch
           // need to check if socket is closed due to exception
-          while (remaining > 0 && socket.isDefined) {
+          while (remaining > 0 && socket.isDefined)
             val count = maxMessagesPerTransaction min remaining
             val buffer = makeBuffer(count)
             var offset = 0
 
-            try {
+            try
               outStream.write(buffer.array)
               val expectedReply =
                 if (isArchaicServer()) OLD_SCRIBE_REPLY else SCRIBE_REPLY
@@ -272,7 +261,7 @@ class ScribeHandler(hostname: String,
 
               stats.incrSentRecords(count)
               remaining -= count
-            } catch {
+            catch
               case e: Exception =>
                 stats.incrDroppedRecords(count)
                 log.error(
@@ -283,43 +272,33 @@ class ScribeHandler(hostname: String,
                     hostname,
                     port)
                 closeSocket()
-            }
-          }
           updateLastTransmission()
-        }
         stats.log()
-      }
-    }
 
     def readResponseExpecting(
-        socket: Socket, expectedReply: Array[Byte]): Unit = {
+        socket: Socket, expectedReply: Array[Byte]): Unit =
       var offset = 0
 
       val inStream = socket.getInputStream()
 
       // read response:
       val response = new Array[Byte](expectedReply.length)
-      while (offset < response.length) {
+      while (offset < response.length)
         val n = inStream.read(response, offset, response.length - offset)
-        if (n < 0) {
+        if (n < 0)
           throw new IOException("End of stream")
-        }
         offset += n
-      }
-      if (!Arrays.equals(response, expectedReply)) {
+      if (!Arrays.equals(response, expectedReply))
         throw new IOException(
             "Error response from scribe server: " + response.hexlify)
-      }
-    }
 
     flusher.execute(
-        new Runnable {
+        new Runnable
       def run() { sendBatch() }
-    })
-  }
+    )
 
   // should be private, make it visible to tests
-  private[logging] def makeBuffer(count: Int): ByteBuffer = {
+  private[logging] def makeBuffer(count: Int): ByteBuffer =
     val texts = for (i <- 0 until count) yield queue.poll()
 
     val recordHeader = ByteBuffer.wrap(new Array[Byte](10 + category.length))
@@ -333,58 +312,49 @@ class ScribeHandler(hostname: String,
 
     val prefix = if (isArchaicServer()) OLD_SCRIBE_PREFIX else SCRIBE_PREFIX
     val messageSize =
-      (count * (recordHeader.capacity + 5)) + texts.foldLeft(0) {
+      (count * (recordHeader.capacity + 5)) + texts.foldLeft(0)
         _ + _.length
-      } + prefix.length + 5
+      + prefix.length + 5
     val buffer = ByteBuffer.wrap(new Array[Byte](messageSize + 4))
     buffer.order(ByteOrder.BIG_ENDIAN)
     // "framing":
     buffer.putInt(messageSize)
     buffer.put(prefix)
     buffer.putInt(count)
-    for (text <- texts) {
+    for (text <- texts)
       buffer.put(recordHeader.array)
       buffer.putInt(text.length)
       buffer.put(text)
       buffer.put(0: Byte)
-    }
     buffer.put(0: Byte)
     buffer
-  }
 
-  private def closeSocket() {
-    synchronized {
-      socket.foreach { s =>
-        try {
+  private def closeSocket()
+    synchronized
+      socket.foreach  s =>
+        try
           s.close()
-        } catch {
+        catch
           case _: Throwable =>
-        }
-      }
       socket = None
-    }
-  }
 
-  override def close() {
+  override def close()
     stats.incrCloses()
     // TODO consider draining the flusher queue before returning
     // nothing stops a pending flush from opening a new socket
     closeSocket()
     flusher.shutdown()
-  }
 
-  override def publish(record: javalog.LogRecord) {
+  override def publish(record: javalog.LogRecord)
     if (record.getLoggerName == loggerName) return
     publish(getFormatter.format(record).getBytes("UTF-8"))
-  }
 
-  def publish(record: Array[Byte]) {
+  def publish(record: Array[Byte])
     stats.incrPublished()
     if (!queue.offer(record)) stats.incrDroppedRecords()
     if (Time.now.since(_lastTransmission) >= bufferTime) flush()
-  }
 
-  override def toString = {
+  override def toString =
     ("<%s level=%s hostname=%s port=%d scribe_buffer=%s " +
         "scribe_backoff=%s scribe_max_packet_size=%d formatter=%s>").format(
         getClass.getName,
@@ -395,7 +365,6 @@ class ScribeHandler(hostname: String,
         connectBackoff,
         maxMessagesPerTransaction,
         formatter.toString)
-  }
 
   private[this] val SCRIBE_PREFIX: Array[Byte] = Array[Byte](
       // version 1, call, "Log", reqid=0
@@ -497,7 +466,7 @@ class ScribeHandler(hostname: String,
       0
   )
 
-  private class ScribeHandlerStats(statsReceiver: StatsReceiver) {
+  private class ScribeHandlerStats(statsReceiver: StatsReceiver)
     private var _lastLogStats = Time.epoch
 
     private val sentRecords = new AtomicLong()
@@ -515,25 +484,21 @@ class ScribeHandler(hostname: String,
     val instances = statsReceiver.addGauge("instances") { 1 }
     val unsentQueue = statsReceiver.addGauge("unsent_queue") { queueSize }
 
-    def incrSentRecords(count: Int): Unit = {
+    def incrSentRecords(count: Int): Unit =
       sentRecords.addAndGet(count)
       totalSentRecords.incr(count)
-    }
 
-    def incrDroppedRecords(count: Int = 1): Unit = {
+    def incrDroppedRecords(count: Int = 1): Unit =
       droppedRecords.incrementAndGet()
       totalDroppedRecords.incr()
-    }
 
-    def incrConnectionFailure(): Unit = {
+    def incrConnectionFailure(): Unit =
       connectionFailure.incrementAndGet()
       totalConnectionFailure.incr()
-    }
 
-    def incrConnectionSkipped(): Unit = {
+    def incrConnectionSkipped(): Unit =
       connectionSkipped.incrementAndGet()
       totalConnectionSkipped.incr()
-    }
 
     def incrPublished(): Unit = totalPublished.incr()
 
@@ -541,10 +506,10 @@ class ScribeHandler(hostname: String,
 
     def incrCloses(): Unit = totalCloses.incr()
 
-    def log(): Unit = {
-      synchronized {
+    def log(): Unit =
+      synchronized
         val period = Time.now.since(_lastLogStats)
-        if (period > ScribeHandler.DefaultStatsReportPeriod) {
+        if (period > ScribeHandler.DefaultStatsReportPeriod)
           val sent = sentRecords.getAndSet(0)
           val dropped = droppedRecords.getAndSet(0)
           val failed = connectionFailure.getAndSet(0)
@@ -558,8 +523,3 @@ class ScribeHandler(hostname: String,
               skipped)
 
           _lastLogStats = Time.now
-        }
-      }
-    }
-  }
-}

@@ -9,13 +9,13 @@ import akka.cluster.ddata.Replicator.Changed
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-class PNCounterSpec extends WordSpec with Matchers {
+class PNCounterSpec extends WordSpec with Matchers
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)
 
-  "A PNCounter" must {
+  "A PNCounter" must
 
-    "be able to increment each node's record by one" in {
+    "be able to increment each node's record by one" in
       val c1 = PNCounter()
 
       val c2 = c1 increment node1
@@ -27,9 +27,8 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       c6.increments.state(node1) should be(2)
       c6.increments.state(node2) should be(3)
-    }
 
-    "be able to decrement each node's record by one" in {
+    "be able to decrement each node's record by one" in
       val c1 = PNCounter()
 
       val c2 = c1 decrement node1
@@ -41,9 +40,8 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       c6.decrements.state(node1) should be(2)
       c6.decrements.state(node2) should be(3)
-    }
 
-    "be able to increment each node's record by arbitrary delta" in {
+    "be able to increment each node's record by arbitrary delta" in
       val c1 = PNCounter()
 
       val c2 = c1 increment (node1, 3)
@@ -55,9 +53,8 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       c6.increments.state(node1) should be(7)
       c6.increments.state(node2) should be(10)
-    }
 
-    "be able to decrement each node's record by arbitrary delta" in {
+    "be able to decrement each node's record by arbitrary delta" in
       val c1 = PNCounter()
 
       val c2 = c1 decrement (node1, 3)
@@ -69,9 +66,8 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       c6.decrements.state(node1) should be(7)
       c6.decrements.state(node2) should be(10)
-    }
 
-    "be able to increment and decrement each node's record by arbitrary delta" in {
+    "be able to increment and decrement each node's record by arbitrary delta" in
       val c1 = PNCounter()
 
       val c2 = c1 increment (node1, 3)
@@ -83,9 +79,8 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       c6.increments.value should be(9)
       c6.decrements.value should be(4)
-    }
 
-    "be able to summarize the history to the correct aggregated value of increments and decrements" in {
+    "be able to summarize the history to the correct aggregated value of increments and decrements" in
       val c1 = PNCounter()
 
       val c2 = c1 increment (node1, 3)
@@ -99,9 +94,8 @@ class PNCounterSpec extends WordSpec with Matchers {
       c6.decrements.value should be(4)
 
       c6.value should be(5)
-    }
 
-    "be able to have its history correctly merged with another GCounter" in {
+    "be able to have its history correctly merged with another GCounter" in
       // counter 1
       val c11 = PNCounter()
       val c12 = c11 increment (node1, 3)
@@ -136,9 +130,8 @@ class PNCounterSpec extends WordSpec with Matchers {
       merged2.increments.value should be(9)
       merged2.decrements.value should be(5)
       merged2.value should be(4)
-    }
 
-    "have support for pruning" in {
+    "have support for pruning" in
       val c1 = PNCounter()
       val c2 = c1 increment node1
       val c3 = c2 decrement node2
@@ -153,19 +146,14 @@ class PNCounterSpec extends WordSpec with Matchers {
 
       val c5 = (c4 increment node1).pruningCleanup(node1)
       c5.needPruningFrom(node1) should be(false)
-    }
 
-    "have unapply extractor" in {
+    "have unapply extractor" in
       val c1 =
         PNCounter.empty.increment(node1).increment(node1).decrement(node2)
       val PNCounter(value1) = c1
       val value2: BigInt = value1
-      Changed(PNCounterKey("key"))(c1) match {
+      Changed(PNCounterKey("key"))(c1) match
         case c @ Changed(PNCounterKey("key")) ⇒
           val PNCounter(value3) = c.dataValue
           val value4: BigInt = value3
           value4 should be(1L)
-      }
-    }
-  }
-}

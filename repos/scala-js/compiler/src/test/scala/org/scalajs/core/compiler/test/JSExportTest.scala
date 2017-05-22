@@ -5,14 +5,14 @@ import org.junit.Test
 
 // scalastyle:off line.size.limit
 
-class JSExportTest extends DirectTest with TestHelpers {
+class JSExportTest extends DirectTest with TestHelpers
 
   override def preamble: String =
     """import scala.scalajs.js, js.annotation._
     """
 
   @Test
-  def noDoubleUnderscoreExport: Unit = {
+  def noDoubleUnderscoreExport: Unit =
     // Normal exports
     """
     class A {
@@ -102,10 +102,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @ScalaJSDefined class B(x: Int) extends A
       |                            ^
     """
-  }
 
   @Test
-  def noConflictingExport: Unit = {
+  def noConflictingExport: Unit =
     """
     class Confl {
       @JSExport("value")
@@ -186,10 +185,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       def a(x: Any) = 2
     }
     """ fails () // Error message depends on Scala version
-  }
 
   @Test
-  def noExportLocal: Unit = {
+  def noExportLocal: Unit =
     // Local class
     """
     class A {
@@ -271,10 +269,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |        @JSExport
       |         ^
     """
-  }
 
   @Test
-  def infoExportLocal: Unit = {
+  def infoExportLocal: Unit =
 
     """
     class A(@JSExport val x: Int)
@@ -283,10 +280,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    class A(@JSExport val x: Int)
       |             ^
     """
-  }
 
   @Test
-  def noMiddleVarArg: Unit = {
+  def noMiddleVarArg: Unit =
 
     """
     class A {
@@ -298,10 +294,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noMiddleDefaultParam: Unit = {
+  def noMiddleDefaultParam: Unit =
 
     """
     class A {
@@ -313,10 +308,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noExportAbstractClass: Unit = {
+  def noExportAbstractClass: Unit =
 
     """
     @JSExport
@@ -340,10 +334,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExport
       |     ^
     """
-  }
 
   @Test
-  def noExportTrait: Unit = {
+  def noExportTrait: Unit =
 
     """
     @JSExport
@@ -366,10 +359,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExport
       |     ^
     """
-  }
 
   @Test
-  def noExportNonPublicClassOrObject: Unit = {
+  def noExportNonPublicClassOrObject: Unit =
 
     """
     @JSExport
@@ -424,10 +416,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExport
       |     ^
     """
-  }
 
   @Test
-  def noExportNonPublicMember: Unit = {
+  def noExportNonPublicMember: Unit =
 
     """
     class A {
@@ -445,10 +436,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noExportNestedClass: Unit = {
+  def noExportNestedClass: Unit =
 
     """
     class A {
@@ -483,10 +473,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noExportNestedObject: Unit = {
+  def noExportNestedObject: Unit =
 
     """
     class A {
@@ -521,10 +510,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noExportJSRaw: Unit = {
+  def noExportJSRaw: Unit =
 
     """
     import scala.scalajs.js
@@ -567,10 +555,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noExportJSRawMember: Unit = {
+  def noExportJSRawMember: Unit =
 
     """
     import scala.scalajs.js
@@ -599,10 +586,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noBadSetterType: Unit = {
+  def noBadSetterType: Unit =
 
     // Bad param list
     """
@@ -651,10 +637,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport
       |       ^
     """
-  }
 
   @Test
-  def noBadToStringExport: Unit = {
+  def noBadToStringExport: Unit =
 
     """
     class A {
@@ -666,10 +651,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport("toString")
       |       ^
     """
-  }
 
   @Test
-  def noBadNameExportAll: Unit = {
+  def noBadNameExportAll: Unit =
 
     """
     @JSExportAll
@@ -685,10 +669,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExportAll
       |     ^
     """
-  }
 
   @Test
-  def noConflictingMethodAndProperty: Unit = {
+  def noConflictingMethodAndProperty: Unit =
 
     // Basic case
     """
@@ -727,10 +710,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport("a")
       |       ^
     """
-  }
 
   @Test
-  def noOverrideNamedExport: Unit = {
+  def noOverrideNamedExport: Unit =
 
     """
     class A {
@@ -748,10 +730,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExportNamed
       |       ^
     """
-  }
 
   @Test
-  def noConflictNamedExport: Unit = {
+  def noConflictNamedExport: Unit =
 
     // Normal method
     """
@@ -777,10 +758,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       def this(x: Long) = this()
     }
     """ fails () // No error test, Scala version dependent error messages
-  }
 
   @Test
-  def noNamedExportObject: Unit = {
+  def noNamedExportObject: Unit =
 
     """
     @JSExportNamed
@@ -796,10 +776,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExportNamed
       |     ^
     """
-  }
 
   @Test
-  def noNamedExportSJSDefinedClass: Unit = {
+  def noNamedExportSJSDefinedClass: Unit =
 
     """
     @JSExportNamed
@@ -809,10 +788,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |    @JSExportNamed
       |     ^
     """
-  }
 
   @Test
-  def noNamedExportVarArg: Unit = {
+  def noNamedExportVarArg: Unit =
 
     """
     class A {
@@ -824,10 +802,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExportNamed
       |       ^
     """
-  }
 
   @Test
-  def noNamedExportProperty: Unit = {
+  def noNamedExportProperty: Unit =
 
     // Getter
     """
@@ -852,10 +829,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExportNamed
       |       ^
     """
-  }
 
   @Test
-  def gracefulDoubleDefaultFail: Unit = {
+  def gracefulDoubleDefaultFail: Unit =
     // This used to blow up (i.e. not just fail), because PrepJSExports asked
     // for the symbol of the default parameter getter of [[y]], and asserted its
     // not overloaded. Since the Scala compiler only fails later on this, the
@@ -867,10 +843,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       def foo(x: Int, y: String = "bar") = x
     }
     """ fails ()
-  }
 
   @Test
-  def noNonLiteralExportNames: Unit = {
+  def noNonLiteralExportNames: Unit =
 
     """
     object A {
@@ -889,10 +864,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      @JSExport(A.a)
       |       ^
     """
-  }
 
   @Test
-  def noInheritIgnoreInvalidDescendants: Unit = {
+  def noInheritIgnoreInvalidDescendants: Unit =
 
     """
     @JSExportDescendentClasses
@@ -910,10 +884,9 @@ class JSExportTest extends DirectTest with TestHelpers {
       |      def foo = { new A with B }
       |                      ^
     """
-  }
 
   @Test
-  def noExportImplicitApply: Unit = {
+  def noExportImplicitApply: Unit =
 
     """
     class A {
@@ -957,14 +930,11 @@ class JSExportTest extends DirectTest with TestHelpers {
       def apply(): Int = 1
     }
     """.hasNoWarns
-  }
 
   @Test
-  def exportObjectAsToString: Unit = {
+  def exportObjectAsToString: Unit =
 
     """
     @JSExport("toString")
     object ExportAsToString
     """.succeeds
-  }
-}

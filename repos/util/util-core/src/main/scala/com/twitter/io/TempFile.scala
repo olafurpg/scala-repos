@@ -2,7 +2,7 @@ package com.twitter.io
 
 import java.io._
 
-object TempFile {
+object TempFile
 
   /**
     * Create a temporary file from the given (resource) path. The
@@ -51,7 +51,7 @@ object TempFile {
     fromStream(path, ClassLoader.getSystemResourceAsStream(path))
 
   private[this] def fromStream(path: String, stream: InputStream): File =
-    stream match {
+    stream match
       case null =>
         throw new FileNotFoundException(path)
       case stream =>
@@ -64,11 +64,8 @@ object TempFile {
         fos.close()
         stream.close()
         file
-    }
 
   private[this] def parsePath(path: String) =
-    path.split(File.separatorChar).last.split('.').reverse match {
+    path.split(File.separatorChar).last.split('.').reverse match
       case Array(basename) => (basename, "")
       case Array(ext, base @ _ *) => (base.reverse.mkString("."), ext)
-    }
-}

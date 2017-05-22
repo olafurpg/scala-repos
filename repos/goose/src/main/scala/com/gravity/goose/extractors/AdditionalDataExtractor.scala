@@ -22,8 +22,6 @@ import org.jsoup.nodes.Element
 /**
   * Implement this abstract class to extract anything not currently contained within the {@link com.jimplush.goose.Article} class
   */
-class AdditionalDataExtractor extends Extractor[Map[String, String]] {
-  def extract(rootElement: Element): Map[String, String] = {
+class AdditionalDataExtractor extends Extractor[Map[String, String]]
+  def extract(rootElement: Element): Map[String, String] =
     Map.empty
-  }
-}

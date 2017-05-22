@@ -19,86 +19,66 @@ import StatusCodes._
 
 // format: OFF
 
-class FutureDirectivesExamplesSpec extends RoutingSpec {
+class FutureDirectivesExamplesSpec extends RoutingSpec
   object TestException extends Throwable
 
   implicit val myExceptionHandler =
-    ExceptionHandler {
+    ExceptionHandler
       case TestException => ctx =>
         ctx.complete((InternalServerError, "Unsuccessful future!"))
-    }
 
   implicit val responseTimeout = Timeout(2, TimeUnit.SECONDS)
 
-  "onComplete" in {
-    def divide(a: Int, b: Int): Future[Int] = Future {
+  "onComplete" in
+    def divide(a: Int, b: Int): Future[Int] = Future
       a / b
-    }
 
     val route =
-      path("divide" / IntNumber / IntNumber) { (a, b) =>
-        onComplete(divide(a, b)) {
+      path("divide" / IntNumber / IntNumber)  (a, b) =>
+        onComplete(divide(a, b))
           case Success(value) => complete(s"The result was $value")
           case Failure(ex)    => complete((InternalServerError, s"An error occurred: ${ex.getMessage}"))
-        }
-      }
 
     // tests:
-    Get("/divide/10/2") ~> route ~> check {
+    Get("/divide/10/2") ~> route ~> check
       responseAs[String] shouldEqual "The result was 5"
-    }
 
-    Get("/divide/10/0") ~> Route.seal(route) ~> check {
+    Get("/divide/10/0") ~> Route.seal(route) ~> check
       status shouldEqual InternalServerError
       responseAs[String] shouldEqual "An error occurred: / by zero"
-    }
-  }
 
-  "onSuccess" in {
+  "onSuccess" in
     val route =
-      path("success") {
-        onSuccess(Future { "Ok" }) { extraction =>
+      path("success")
+        onSuccess(Future { "Ok" })  extraction =>
           complete(extraction)
-        }
-      } ~
-      path("failure") {
-        onSuccess(Future.failed[String](TestException)) { extraction =>
+      ~
+      path("failure")
+        onSuccess(Future.failed[String](TestException))  extraction =>
           complete(extraction)
-        }
-      }
 
     // tests:
-    Get("/success") ~> route ~> check {
+    Get("/success") ~> route ~> check
       responseAs[String] shouldEqual "Ok"
-    }
 
-    Get("/failure") ~> Route.seal(route) ~> check {
+    Get("/failure") ~> Route.seal(route) ~> check
       status shouldEqual InternalServerError
       responseAs[String] shouldEqual "Unsuccessful future!"
-    }
-  }
 
-  "completeOrRecoverWith" in {
+  "completeOrRecoverWith" in
     val route =
-      path("success") {
-        completeOrRecoverWith(Future { "Ok" }) { extraction =>
+      path("success")
+        completeOrRecoverWith(Future { "Ok" })  extraction =>
           failWith(extraction) // not executed.
-        }
-      } ~
-      path("failure") {
-        completeOrRecoverWith(Future.failed[String](TestException)) { extraction =>
+      ~
+      path("failure")
+        completeOrRecoverWith(Future.failed[String](TestException))  extraction =>
           failWith(extraction)
-        }
-      }
 
     // tests:
-    Get("/success") ~> route ~> check {
+    Get("/success") ~> route ~> check
       responseAs[String] shouldEqual "Ok"
-    }
 
-    Get("/failure") ~> Route.seal(route) ~> check {
+    Get("/failure") ~> Route.seal(route) ~> check
       status shouldEqual InternalServerError
       responseAs[String] shouldEqual "Unsuccessful future!"
-    }
-  }
-}

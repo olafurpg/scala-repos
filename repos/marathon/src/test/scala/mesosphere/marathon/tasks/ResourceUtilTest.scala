@@ -9,16 +9,15 @@ import scala.collection.JavaConverters._
 import mesosphere.marathon.{MarathonTestHelper => MTH}
 
 class ResourceUtilTest
-    extends FunSuite with GivenWhenThen with Assertions with Matchers {
-  test("no base resources") {
+    extends FunSuite with GivenWhenThen with Assertions with Matchers
+  test("no base resources")
     val leftOvers = ResourceUtil.consumeResources(
         Seq(),
         Seq(ports("ports", 2 to 12))
     )
     assert(leftOvers == Seq())
-  }
 
-  test("resource mix") {
+  test("resource mix")
     val leftOvers = ResourceUtil.consumeResources(
         Seq(MTH.scalarResource("cpus", 3),
             ports("ports", 2 to 20),
@@ -31,17 +30,15 @@ class ResourceUtilTest
         leftOvers == Seq(MTH.scalarResource("cpus", 1),
                          ports("ports", 13 to 20),
                          set("labels", Set("b"))))
-  }
 
-  test("resource repeated consumed resources with the same name/role") {
+  test("resource repeated consumed resources with the same name/role")
     val leftOvers = ResourceUtil.consumeResources(
         Seq(MTH.scalarResource("cpus", 3)),
         Seq(MTH.scalarResource("cpus", 2), MTH.scalarResource("cpus", 1))
     )
     assert(leftOvers == Seq())
-  }
 
-  test("resource consumption considers roles") {
+  test("resource consumption considers roles")
     val leftOvers = ResourceUtil.consumeResources(
         Seq(MTH.scalarResource("cpus", 2),
             MTH.scalarResource("cpus", 2, role = "marathon")),
@@ -52,9 +49,8 @@ class ResourceUtilTest
     assert(
         leftOvers == Seq(MTH.scalarResource("cpus", 1.5),
                          MTH.scalarResource("cpus", 0.5, role = "marathon")))
-  }
 
-  test("resource consumption considers reservation state") {
+  test("resource consumption considers reservation state")
     val reservationInfo =
       ReservationInfo.newBuilder().setPrincipal("principal").build()
 
@@ -116,9 +112,8 @@ class ResourceUtilTest
         resources = Iterable(resourceWithReservation),
         usedResources = Iterable(resourceWithoutReservation)
     ) should be(Seq(resourceWithReservation))
-  }
 
-  test("resource consumption considers reservation labels") {
+  test("resource consumption considers reservation labels")
     val reservationInfo1 =
       ReservationInfo.newBuilder().setPrincipal("principal").build()
     val labels = Protos.Labels
@@ -184,9 +179,8 @@ class ResourceUtilTest
         resources = Iterable(resourceWithReservation1),
         usedResources = Iterable(resourceWithReservation2)
     ) should be(Seq(resourceWithReservation1))
-  }
 
-  test("display resources indicates reservation") {
+  test("display resources indicates reservation")
     val reservationInfo =
       ReservationInfo.newBuilder().setPrincipal("principal").build()
     val resource =
@@ -194,9 +188,8 @@ class ResourceUtilTest
     val resourceString =
       ResourceUtil.displayResources(Seq(resource), maxRanges = 10)
     resourceString should equal("disk(role, RESERVED for principal) 1024.0")
-  }
 
-  test("display resources displays disk and reservation info") {
+  test("display resources displays disk and reservation info")
     val reservationInfo =
       ReservationInfo.newBuilder().setPrincipal("principal").build()
     val disk = DiskInfo
@@ -209,7 +202,6 @@ class ResourceUtilTest
       ResourceUtil.displayResources(Seq(resource), maxRanges = 10)
     resourceString should equal(
         "disk(role, RESERVED for principal, diskId persistenceId) 1024.0")
-  }
 
   // in the middle
   portsTest(consumedResource = Seq(10 to 10),
@@ -273,43 +265,38 @@ class ResourceUtilTest
   private[this] def setResourceTest(
       consumedResource: Set[String],
       baseResource: Set[String],
-      expectedResult: Option[Set[String]]): Unit = {
+      expectedResult: Option[Set[String]]): Unit =
 
     test(
-        s"consuming sets resource $consumedResource from $baseResource results in $expectedResult") {
+        s"consuming sets resource $consumedResource from $baseResource results in $expectedResult")
       val r1 = set("cpus", consumedResource)
       val r2 = set("cpus", baseResource)
       val r3 = expectedResult.map(set("cpus", _))
       val result = ResourceUtil.consumeResource(r2, r1)
       assert(result == r3)
-    }
-  }
 
-  private[this] def set(name: String, labels: Set[String]): Resource = {
+  private[this] def set(name: String, labels: Set[String]): Resource =
     Resource
       .newBuilder()
       .setName(name)
       .setType(Value.Type.SET)
       .setSet(Value.Set.newBuilder().addAllItem(labels.asJava))
       .build()
-  }
 
   private[this] def portsTest(
       consumedResource: Seq[Range.Inclusive],
       baseResource: Seq[Range.Inclusive],
-      expectedResult: Option[Seq[Range.Inclusive]]): Unit = {
+      expectedResult: Option[Seq[Range.Inclusive]]): Unit =
 
     test(
-        s"consuming ports resource $consumedResource from $baseResource results in $expectedResult") {
+        s"consuming ports resource $consumedResource from $baseResource results in $expectedResult")
       val r1 = ports("cpus", consumedResource: _*)
       val r2 = ports("cpus", baseResource: _*)
       val r3 = expectedResult.map(ports("cpus", _: _*))
       val result = ResourceUtil.consumeResource(r2, r1)
       assert(result == r3)
-    }
-  }
 
-  private[this] def ports(name: String, ranges: Range.Inclusive*): Resource = {
+  private[this] def ports(name: String, ranges: Range.Inclusive*): Resource =
     def toRange(range: Range.Inclusive): Value.Range =
       Value.Range
         .newBuilder()
@@ -324,18 +311,14 @@ class ResourceUtilTest
       .setRanges(
           Value.Ranges.newBuilder().addAllRange(ranges.map(toRange).asJava))
       .build()
-  }
 
   private[this] def scalarTest(consumedResource: Double,
                                baseResource: Double,
-                               expectedResult: Option[Double]): Unit = {
+                               expectedResult: Option[Double]): Unit =
     test(
-        s"consuming scalar resource $consumedResource from $baseResource results in $expectedResult") {
+        s"consuming scalar resource $consumedResource from $baseResource results in $expectedResult")
       val r1 = MTH.scalarResource("cpus", consumedResource)
       val r2 = MTH.scalarResource("cpus", baseResource)
       val r3 = expectedResult.map(MTH.scalarResource("cpus", _))
       val result = ResourceUtil.consumeResource(r2, r1)
       assert(result == r3)
-    }
-  }
-}

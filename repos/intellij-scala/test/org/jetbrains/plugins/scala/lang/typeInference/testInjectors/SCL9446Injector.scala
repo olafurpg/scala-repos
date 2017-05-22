@@ -7,9 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.typedef.SyntheticMembe
   * @author Alefas
   * @since  27/11/15
   */
-class SCL9446Injector extends SyntheticMembersInjector {
-  override def injectFunctions(source: ScTypeDefinition): Seq[String] = {
+class SCL9446Injector extends SyntheticMembersInjector
+  override def injectFunctions(source: ScTypeDefinition): Seq[String] =
     if (source.name == "B") Seq("override def foo(): Int = 1")
     else Seq.empty
-  }
-}

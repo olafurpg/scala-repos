@@ -1,9 +1,7 @@
 import scala.language.experimental.macros
 
-class Bundle {
+class Bundle
   def impl = ???
-}
 
-object Macros {
+object Macros
   def foo = Bundle.impl
-}

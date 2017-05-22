@@ -37,7 +37,7 @@ import scalafx.event.{Event, EventType}
 /**
   * Companion object for [[scalafx.scene.web.WebErrorEvent]].
   */
-object WebErrorEvent {
+object WebErrorEvent
 
   /**
     * Converts a ScalaFX WebErrorEvent to its JavaFX counterpart.
@@ -87,7 +87,6 @@ object WebErrorEvent {
       "Use UserDataDirectorySecurityError; USER_DATA_DIRECTORY_SECURITY_ERROR will be removed in a future release",
       "8.0.60-R10")
   val USER_DATA_DIRECTORY_SECURITY_ERROR = UserDataDirectorySecurityError
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/web/WebEvent.html JavaFX WebEvent]].
@@ -97,7 +96,7 @@ object WebErrorEvent {
   * @since 8.0
   */
 final class WebErrorEvent(override val delegate: jfxsw.WebErrorEvent)
-    extends Event(delegate) with SFXDelegate[jfxsw.WebErrorEvent] {
+    extends Event(delegate) with SFXDelegate[jfxsw.WebErrorEvent]
 
   /**
     * Creates a new WebErrorEvent.
@@ -122,4 +121,3 @@ final class WebErrorEvent(override val delegate: jfxsw.WebErrorEvent)
     * The text message associated with this event.
     */
   def message: String = delegate.getMessage
-}

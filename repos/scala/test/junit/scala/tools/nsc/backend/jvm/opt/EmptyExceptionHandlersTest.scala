@@ -13,17 +13,15 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object EmptyExceptionHandlersTest extends ClearAfterClass.Clearable {
+object EmptyExceptionHandlersTest extends ClearAfterClass.Clearable
   var noOptCompiler = newCompiler(extraArgs = "-Yopt:l:none")
   var dceCompiler = newCompiler(extraArgs = "-Yopt:unreachable-code")
-  def clear(): Unit = {
+  def clear(): Unit =
     noOptCompiler = null
     dceCompiler = null
-  }
-}
 
 @RunWith(classOf[JUnit4])
-class EmptyExceptionHandlersTest extends ClearAfterClass {
+class EmptyExceptionHandlersTest extends ClearAfterClass
   ClearAfterClass.stateToClear = EmptyExceptionHandlersTest
 
   val noOptCompiler = EmptyExceptionHandlersTest.noOptCompiler
@@ -32,7 +30,7 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
   val exceptionDescriptor = "java/lang/Exception"
 
   @Test
-  def eliminateEmpty(): Unit = {
+  def eliminateEmpty(): Unit =
     val handlers = List(
         ExceptionHandler(
             Label(1), Label(2), Label(2), Some(exceptionDescriptor)))
@@ -44,10 +42,9 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
     assertTrue(convertMethod(asmMethod).handlers.length == 1)
     LocalOptImpls.removeEmptyExceptionHandlers(asmMethod)
     assertTrue(convertMethod(asmMethod).handlers.isEmpty)
-  }
 
   @Test
-  def eliminateHandlersGuardingNops(): Unit = {
+  def eliminateHandlersGuardingNops(): Unit =
     val handlers = List(
         ExceptionHandler(
             Label(1), Label(2), Label(2), Some(exceptionDescriptor)))
@@ -65,10 +62,9 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
     assertTrue(convertMethod(asmMethod).handlers.length == 1)
     LocalOptImpls.removeEmptyExceptionHandlers(asmMethod)
     assertTrue(convertMethod(asmMethod).handlers.isEmpty)
-  }
 
   @Test
-  def eliminateUnreachableHandler(): Unit = {
+  def eliminateUnreachableHandler(): Unit =
     val code =
       "def f: Unit = try { } catch { case _: Exception => println(0) }; println(1)"
 
@@ -86,10 +82,9 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
         |}""".stripMargin
 
     assertTrue(singleMethod(dceCompiler)(code2).handlers.isEmpty)
-  }
 
   @Test
-  def keepAliveHandlers(): Unit = {
+  def keepAliveHandlers(): Unit =
     val code = """def f: Int = {
         |  println(0)
         |  try { 1 }
@@ -97,5 +92,3 @@ class EmptyExceptionHandlersTest extends ClearAfterClass {
         |}""".stripMargin
 
     assertTrue(singleMethod(dceCompiler)(code).handlers.length == 1)
-  }
-}

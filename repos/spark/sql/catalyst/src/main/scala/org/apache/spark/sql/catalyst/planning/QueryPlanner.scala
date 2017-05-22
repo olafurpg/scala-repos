@@ -27,9 +27,8 @@ import org.apache.spark.sql.catalyst.trees.TreeNode
   * empty list should be returned.
   */
 abstract class GenericStrategy[PhysicalPlan <: TreeNode[PhysicalPlan]]
-    extends Logging {
+    extends Logging
   def apply(plan: LogicalPlan): Seq[PhysicalPlan]
-}
 
 /**
   * Abstract class for transforming [[plans.logical.LogicalPlan LogicalPlan]]s into physical plans.
@@ -43,7 +42,7 @@ abstract class GenericStrategy[PhysicalPlan <: TreeNode[PhysicalPlan]]
   *
   * @tparam PhysicalPlan The type of physical plan produced by this [[QueryPlanner]]
   */
-abstract class QueryPlanner[PhysicalPlan <: TreeNode[PhysicalPlan]] {
+abstract class QueryPlanner[PhysicalPlan <: TreeNode[PhysicalPlan]]
 
   /** A list of execution strategies that can be used by the planner */
   def strategies: Seq[GenericStrategy[PhysicalPlan]]
@@ -56,10 +55,8 @@ abstract class QueryPlanner[PhysicalPlan <: TreeNode[PhysicalPlan]] {
   protected def planLater(plan: LogicalPlan): PhysicalPlan =
     this.plan(plan).next()
 
-  def plan(plan: LogicalPlan): Iterator[PhysicalPlan] = {
+  def plan(plan: LogicalPlan): Iterator[PhysicalPlan] =
     // Obviously a lot to do here still...
     val iter = strategies.view.flatMap(_ (plan)).toIterator
     assert(iter.hasNext, s"No plan for $plan")
     iter
-  }
-}

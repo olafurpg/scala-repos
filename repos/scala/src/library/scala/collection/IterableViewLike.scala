@@ -32,7 +32,7 @@ trait IterableViewLike[
     +Coll,
     +This <: IterableView[A, Coll] with IterableViewLike[A, Coll, This]]
     extends Iterable[A] with IterableLike[A, This]
-    with TraversableView[A, Coll] with TraversableViewLike[A, Coll, This] {
+    with TraversableView[A, Coll] with TraversableViewLike[A, Coll, This]
   self =>
 
   /** Explicit instantiation of the `Transformed` trait to reduce class file size in subclasses. */
@@ -41,67 +41,54 @@ trait IterableViewLike[
       with Transformed[B]
 
   trait Transformed[+B]
-      extends IterableView[B, Coll] with super.Transformed[B] {
+      extends IterableView[B, Coll] with super.Transformed[B]
     def iterator: Iterator[B]
     override def foreach[U](f: B => U): Unit = iterator foreach f
     override def toString = viewToString
     override def isEmpty = !iterator.hasNext
-  }
 
-  trait EmptyView extends Transformed[Nothing] with super.EmptyView {
+  trait EmptyView extends Transformed[Nothing] with super.EmptyView
     final def iterator: Iterator[Nothing] = Iterator.empty
-  }
 
-  trait Forced[B] extends super.Forced[B] with Transformed[B] {
+  trait Forced[B] extends super.Forced[B] with Transformed[B]
     def iterator = forced.iterator
-  }
 
-  trait Sliced extends super.Sliced with Transformed[A] {
+  trait Sliced extends super.Sliced with Transformed[A]
     def iterator: Iterator[A] = self.iterator.slice(from, until)
-  }
 
-  trait Mapped[B] extends super.Mapped[B] with Transformed[B] {
+  trait Mapped[B] extends super.Mapped[B] with Transformed[B]
     def iterator = self.iterator map mapping
-  }
 
-  trait FlatMapped[B] extends super.FlatMapped[B] with Transformed[B] {
+  trait FlatMapped[B] extends super.FlatMapped[B] with Transformed[B]
     def iterator: Iterator[B] = self.iterator flatMap mapping
-  }
 
-  trait Appended[B >: A] extends super.Appended[B] with Transformed[B] {
+  trait Appended[B >: A] extends super.Appended[B] with Transformed[B]
     def iterator = self.iterator ++ rest
-  }
 
-  trait Prepended[B >: A] extends super.Prepended[B] with Transformed[B] {
+  trait Prepended[B >: A] extends super.Prepended[B] with Transformed[B]
     def iterator = fst.toIterator ++ self
-  }
 
-  trait Filtered extends super.Filtered with Transformed[A] {
+  trait Filtered extends super.Filtered with Transformed[A]
     def iterator = self.iterator filter pred
-  }
 
-  trait TakenWhile extends super.TakenWhile with Transformed[A] {
+  trait TakenWhile extends super.TakenWhile with Transformed[A]
     def iterator = self.iterator takeWhile pred
-  }
 
-  trait DroppedWhile extends super.DroppedWhile with Transformed[A] {
+  trait DroppedWhile extends super.DroppedWhile with Transformed[A]
     def iterator = self.iterator dropWhile pred
-  }
 
-  trait Zipped[B] extends Transformed[(A, B)] {
+  trait Zipped[B] extends Transformed[(A, B)]
     protected[this] val other: GenIterable[B]
     def iterator: Iterator[(A, B)] = self.iterator zip other.iterator
     final override protected[this] def viewIdentifier = "Z"
-  }
 
-  trait ZippedAll[A1 >: A, B] extends Transformed[(A1, B)] {
+  trait ZippedAll[A1 >: A, B] extends Transformed[(A1, B)]
     protected[this] val other: GenIterable[B]
     protected[this] val thisElem: A1
     protected[this] val thatElem: B
     final override protected[this] def viewIdentifier = "Z"
     def iterator: Iterator[(A1, B)] =
       self.iterator.zipAll(other.iterator, thisElem, thatElem)
-  }
 
   private[this] implicit def asThis(xs: Transformed[A]): This =
     xs.asInstanceOf[This]
@@ -114,11 +101,11 @@ trait IterableViewLike[
   protected def newZippedAll[A1 >: A, B](that: GenIterable[B],
                                          _thisElem: A1,
                                          _thatElem: B): Transformed[(A1, B)] =
-    new {
+    new
       val other: GenIterable[B] = that
       val thisElem = _thisElem
       val thatElem = _thatElem
-    } with AbstractTransformed[(A1, B)] with ZippedAll[A1, B]
+    with AbstractTransformed[(A1, B)] with ZippedAll[A1, B]
   protected override def newForced[B](xs: => GenSeq[B]): Transformed[B] =
     new { val forced = xs } with AbstractTransformed[B] with Forced[B]
   protected override def newAppended[B >: A](
@@ -154,12 +141,11 @@ trait IterableViewLike[
   override def take(n: Int): This = newTaken(n)
 
   override def zip[A1 >: A, B, That](that: GenIterable[B])(
-      implicit bf: CanBuildFrom[This, (A1, B), That]): That = {
+      implicit bf: CanBuildFrom[This, (A1, B), That]): That =
     newZipped(that).asInstanceOf[That]
 // was:    val b = bf(repr)
 //    if (b.isInstanceOf[NoBuilder[_]]) newZipped(that).asInstanceOf[That]
 //    else super.zip[A1, B, That](that)(bf)
-  }
 
   override def zipWithIndex[A1 >: A, That](
       implicit bf: CanBuildFrom[This, (A1, Int), That]): That =
@@ -187,4 +173,3 @@ trait IterableViewLike[
     drop(thisSeq.length - math.max(n, 0))
 
   override def stringPrefix = "IterableView"
-}

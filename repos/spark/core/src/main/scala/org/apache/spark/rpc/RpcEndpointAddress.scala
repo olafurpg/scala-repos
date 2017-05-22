@@ -29,30 +29,26 @@ import org.apache.spark.SparkException
   * @param name Name of the endpoint.
   */
 private[spark] case class RpcEndpointAddress(
-    val rpcAddress: RpcAddress, val name: String) {
+    val rpcAddress: RpcAddress, val name: String)
 
   require(name != null, "RpcEndpoint name must be provided.")
 
-  def this(host: String, port: Int, name: String) = {
+  def this(host: String, port: Int, name: String) =
     this(RpcAddress(host, port), name)
-  }
 
   override val toString =
-    if (rpcAddress != null) {
+    if (rpcAddress != null)
       s"spark://$name@${rpcAddress.host}:${rpcAddress.port}"
-    } else {
+    else
       s"spark-client://$name"
-    }
-}
 
-private[spark] object RpcEndpointAddress {
+private[spark] object RpcEndpointAddress
 
-  def apply(host: String, port: Int, name: String): RpcEndpointAddress = {
+  def apply(host: String, port: Int, name: String): RpcEndpointAddress =
     new RpcEndpointAddress(host, port, name)
-  }
 
-  def apply(sparkUrl: String): RpcEndpointAddress = {
-    try {
+  def apply(sparkUrl: String): RpcEndpointAddress =
+    try
       val uri = new java.net.URI(sparkUrl)
       val host = uri.getHost
       val port = uri.getPort
@@ -60,13 +56,9 @@ private[spark] object RpcEndpointAddress {
       if (uri.getScheme != "spark" || host == null || port < 0 ||
           name == null || (uri.getPath != null && !uri.getPath.isEmpty) ||
           // uri.getPath returns "" instead of null
-          uri.getFragment != null || uri.getQuery != null) {
+          uri.getFragment != null || uri.getQuery != null)
         throw new SparkException("Invalid Spark URL: " + sparkUrl)
-      }
       new RpcEndpointAddress(host, port, name)
-    } catch {
+    catch
       case e: java.net.URISyntaxException =>
         throw new SparkException("Invalid Spark URL: " + sparkUrl, e)
-    }
-  }
-}

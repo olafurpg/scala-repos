@@ -23,12 +23,11 @@ import scala.collection.Seq
 trait ScTypeDefinition
     extends ScTemplateDefinition with ScMember with NavigationItem
     with PsiClass with ScTypeParametersOwner with Iconable
-    with ScDocCommentOwner with ScAnnotationsHolder with ScCommentOwner {
+    with ScDocCommentOwner with ScAnnotationsHolder with ScCommentOwner
   private var synthNavElement: Option[PsiElement] = None
   var syntheticContainingClass: Option[ScTypeDefinition] = None
-  def setSynthetic(navElement: PsiElement) {
+  def setSynthetic(navElement: PsiElement)
     synthNavElement = Some(navElement)
-  }
   def isSynthetic: Boolean = synthNavElement.nonEmpty
 
   def isCase: Boolean = false
@@ -37,11 +36,10 @@ trait ScTypeDefinition
 
   def isTopLevel = !parentsInFile.exists(_.isInstanceOf[ScTypeDefinition])
 
-  def getPath: String = {
+  def getPath: String =
     val qualName = qualifiedName
     val index = qualName.lastIndexOf('.')
     if (index < 0) "" else qualName.substring(0, index)
-  }
 
   def getQualifiedNameForDebugger: String
 
@@ -54,21 +52,18 @@ trait ScTypeDefinition
 
   def isPackageObject = false
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitTypeDefinition(this)
-  }
 
   def getObjectClassOrTraitToken: PsiElement
 
   def getSourceMirrorClass: PsiClass
 
-  override def isEquivalentTo(another: PsiElement): Boolean = {
+  override def isEquivalentTo(another: PsiElement): Boolean =
     PsiClassImplUtil.isClassEquivalentTo(this, another)
-  }
 
-  def allInnerTypeDefinitions: Seq[ScTypeDefinition] = members.collect {
+  def allInnerTypeDefinitions: Seq[ScTypeDefinition] = members.collect
     case td: ScTypeDefinition => td
-  }
 
   override def syntheticTypeDefinitionsImpl: Seq[ScTypeDefinition] =
     SyntheticMembersInjector.injectInners(this)
@@ -76,55 +71,49 @@ trait ScTypeDefinition
   override protected def syntheticMethodsWithOverrideImpl: scala.Seq[PsiMethod] =
     SyntheticMembersInjector.inject(this, withOverride = true)
 
-  def fakeCompanionModule: Option[ScObject] = {
+  def fakeCompanionModule: Option[ScObject] =
     if (this.isInstanceOf[ScObject]) return None
     val baseCompanion = ScalaPsiUtil.getBaseCompanionModule(this)
-    baseCompanion match {
+    baseCompanion match
       case Some(td: ScObject) => return None
       case _ if !isCase && !SyntheticMembersInjector.needsCompanion(this) =>
         return None
       case _ =>
-    }
 
     calcFakeCompanionModule()
-  }
 
   @Cached(synchronized = true, ModCount.getBlockModificationCount, this)
-  def calcFakeCompanionModule(): Option[ScObject] = {
+  def calcFakeCompanionModule(): Option[ScObject] =
     val accessModifier =
       getModifierList.accessModifier.fold("")(_.modifierFormattedText + " ")
-    val objText = this match {
+    val objText = this match
       case clazz: ScClass if clazz.isCase =>
         val texts = clazz.getSyntheticMethodsText
 
-        val extendsText = {
-          try {
+        val extendsText =
+          try
             if (typeParameters.isEmpty &&
-                clazz.constructor.get.effectiveParameterClauses.length == 1) {
+                clazz.constructor.get.effectiveParameterClauses.length == 1)
               val typeElementText =
-                clazz.constructor.get.effectiveParameterClauses.map { clause =>
+                clazz.constructor.get.effectiveParameterClauses.map  clause =>
                   clause.effectiveParameters
                     .map(parameter =>
-                          {
                         val parameterText = parameter.typeElement.fold(
                             "_root_.scala.Nothing")(_.getText)
                         if (parameter.isRepeatedParameter)
                           s"_root_.scala.Seq[$parameterText]"
                         else parameterText
-                    })
+                    )
                     .mkString("(", ", ", ")")
-                }.mkString("(", " => ", s" => $name)")
+                .mkString("(", " => ", s" => $name)")
               val typeElement =
                 ScalaPsiElementFactory.createTypeElementFromText(
                     typeElementText, getManager)
               s" extends ${typeElement.getText}"
-            } else {
+            else
               ""
-            }
-          } catch {
+          catch
             case e: Exception => ""
-          }
-        }
 
         s"""${accessModifier}object ${clazz.name}$extendsText{
            |  ${texts.mkString("\n  ")}
@@ -133,26 +122,20 @@ trait ScTypeDefinition
         s"""${accessModifier}object $name {
            |  //Generated synthetic object
            |}""".stripMargin
-    }
 
     val next = ScalaPsiUtil.getNextStubOrPsiElement(this)
     val obj: ScObject = ScalaPsiElementFactory.createObjectWithContext(
         objText, getContext, if (next != null) next else this)
     import org.jetbrains.plugins.scala.extensions._
     val objOption: Option[ScObject] = obj.toOption
-    objOption.foreach { (obj: ScObject) =>
+    objOption.foreach  (obj: ScObject) =>
       obj.setSyntheticObject()
-      obj.members.foreach {
+      obj.members.foreach
         case s: ScFunctionDefinition =>
           s.setSynthetic(this) // So we find the `apply` method in ScalaPsiUtil.syntheticParamForParam
-          this match {
+          this match
             case clazz: ScClass if clazz.isCase =>
               s.syntheticCaseClass = Some(clazz)
             case _ =>
-          }
         case _ =>
-      }
-    }
     objOption
-  }
-}

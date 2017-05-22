@@ -10,7 +10,7 @@ import akka.http.javadsl.server.Route
 
 import scala.annotation.varargs
 
-abstract class CookieDirectives extends CodingDirectives {
+abstract class CookieDirectives extends CodingDirectives
 
   /**
     * Adds a Set-Cookie header with the given cookies to all responses of its inner route.
@@ -19,4 +19,3 @@ abstract class CookieDirectives extends CodingDirectives {
   def setCookie(
       cookie: HttpCookie, innerRoute: Route, moreInnerRoutes: Route*): Route =
     RouteStructure.SetCookie(cookie)(innerRoute, moreInnerRoutes.toList)
-}

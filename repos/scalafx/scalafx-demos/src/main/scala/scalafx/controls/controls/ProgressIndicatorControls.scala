@@ -31,26 +31,22 @@ import scalafx.scene.control.{Label, ProgressIndicator, TextField}
 
 class ProgressIndicatorControls(target: ProgressIndicator)
     extends PropertiesNodes[ProgressIndicator](
-        target, target.getClass.getSimpleName + " Properties") {
+        target, target.getClass.getSimpleName + " Properties")
 
   val txfValue = new TextField
-  txfValue.onAction = handle {
+  txfValue.onAction = handle
     fillDoublePropertyFromText(
         target.progress,
         txfValue,
         true,
         () => (target.progress = ProgressIndicator.IndeterminateProgress))
-  }
 
-  val lblRealValue = new Label {
+  val lblRealValue = new Label
     text <== target.progress.asString()
-  }
 
-  val lblIndeterminate = new Label {
+  val lblIndeterminate = new Label
     text <== target.indeterminate.asString()
-  }
 
   super.addNode("Value", txfValue)
   super.addNode("Real Value", lblRealValue)
   super.addNode("Indeterminate", lblIndeterminate)
-}

@@ -1,24 +1,20 @@
-class Foo[@specialized T] {
+class Foo[@specialized T]
   var v: T = _
 
   def foo(x: T): T = x
 
   println("abc")
 
-  class Bar[@specialized U] {
+  class Bar[@specialized U]
     def bar(x: U): T = v
 //    def barInt(x: Int): T = bar(x.asInstanceOf[U])
-  }
-}
 
-class Test {
-  def test {
+class Test
+  def test
     val a = new Foo[Int]
     val b = new a.Bar[Int]
     a.foo(10)
     b.bar(11)
-  }
-}
 
 /*
 abstract class Foo[@specialized T] {

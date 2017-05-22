@@ -12,11 +12,11 @@ import akka.routing.ConsistentHash
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteConsistentHashingRouterSpec
     extends AkkaSpec("""
-    akka.actor.provider = "akka.remote.RemoteActorRefProvider" """) {
+    akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
 
-  "ConsistentHashingGroup" must {
+  "ConsistentHashingGroup" must
 
-    "use same hash ring indepenent of self address" in {
+    "use same hash ring indepenent of self address" in
       // simulating running router on two different nodes (a1, a2) with target routees on 3 other nodes (s1, s2, s3) 
       val a1 = Address("akka.tcp", "Sys", "client1", 2552)
       val a2 = Address("akka.tcp", "Sys", "client2", 2552)
@@ -38,6 +38,3 @@ class RemoteConsistentHashingRouterSpec
       val result1 = keys collect { case k ⇒ consistentHash1.nodeFor(k).routee }
       val result2 = keys collect { case k ⇒ consistentHash2.nodeFor(k).routee }
       result1 should ===(result2)
-    }
-  }
-}

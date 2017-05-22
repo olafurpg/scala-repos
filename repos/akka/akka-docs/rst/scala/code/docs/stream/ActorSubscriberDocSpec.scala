@@ -17,37 +17,33 @@ import akka.stream.scaladsl.Sink
 import akka.stream.scaladsl.Source
 import akka.testkit.AkkaSpec
 
-object ActorSubscriberDocSpec {
+object ActorSubscriberDocSpec
   //#worker-pool
-  object WorkerPool {
+  object WorkerPool
     case class Msg(id: Int, replyTo: ActorRef)
     case class Work(id: Int)
     case class Reply(id: Int)
     case class Done(id: Int)
 
     def props: Props = Props(new WorkerPool)
-  }
 
-  class WorkerPool extends ActorSubscriber {
+  class WorkerPool extends ActorSubscriber
     import WorkerPool._
     import ActorSubscriberMessage._
 
     val MaxQueueSize = 10
     var queue = Map.empty[Int, ActorRef]
 
-    val router = {
-      val routees = Vector.fill(3) {
+    val router =
+      val routees = Vector.fill(3)
         ActorRefRoutee(context.actorOf(Props[Worker]))
-      }
       Router(RoundRobinRoutingLogic(), routees)
-    }
 
     override val requestStrategy = new MaxInFlightRequestStrategy(
-        max = MaxQueueSize) {
+        max = MaxQueueSize)
       override def inFlightInternally: Int = queue.size
-    }
 
-    def receive = {
+    def receive =
       case OnNext(Msg(id, replyTo)) =>
         queue += (id -> replyTo)
         assert(queue.size <= MaxQueueSize, s"queued too many: ${queue.size}")
@@ -55,26 +51,21 @@ object ActorSubscriberDocSpec {
       case Reply(id) =>
         queue(id) ! Done(id)
         queue -= id
-    }
-  }
 
-  class Worker extends Actor {
+  class Worker extends Actor
     import WorkerPool._
-    def receive = {
+    def receive =
       case Work(id) =>
         // ...
         sender() ! Reply(id)
-    }
-  }
   //#worker-pool
-}
 
-class ActorSubscriberDocSpec extends AkkaSpec {
+class ActorSubscriberDocSpec extends AkkaSpec
   import ActorSubscriberDocSpec._
 
   implicit val materializer = ActorMaterializer()
 
-  "illustrate usage of ActorSubscriber" in {
+  "illustrate usage of ActorSubscriber" in
     val replyTo = testActor
 
     //#actor-subscriber-usage
@@ -85,5 +76,3 @@ class ActorSubscriberDocSpec extends AkkaSpec {
     //#actor-subscriber-usage
 
     receiveN(N).toSet should be((1 to N).map(WorkerPool.Done).toSet)
-  }
-}

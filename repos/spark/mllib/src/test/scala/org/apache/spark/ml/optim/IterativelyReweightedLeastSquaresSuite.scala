@@ -25,12 +25,12 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.rdd.RDD
 
 class IterativelyReweightedLeastSquaresSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite with MLlibTestSparkContext
 
   private var instances1: RDD[Instance] = _
   private var instances2: RDD[Instance] = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     /*
        R code:
@@ -62,9 +62,8 @@ class IterativelyReweightedLeastSquaresSuite
             Instance(9.0, 4.0, Vectors.dense(3.0, 13.0))
         ),
         2)
-  }
 
-  test("IRLS against GLM with Binomial errors") {
+  test("IRLS against GLM with Binomial errors")
     /*
        R code:
 
@@ -83,12 +82,11 @@ class IterativelyReweightedLeastSquaresSuite
     import IterativelyReweightedLeastSquaresSuite._
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true)) {
-      val newInstances = instances1.map { instance =>
+    for (fitIntercept <- Seq(false, true))
+      val newInstances = instances1.map  instance =>
         val mu = (instance.label + 0.5) / 2.0
         val eta = math.log(mu / (1.0 - mu))
         Instance(eta, instance.weight, instance.features)
-      }
       val initial =
         new WeightedLeastSquares(fitIntercept,
                                  regParam = 0.0,
@@ -105,10 +103,8 @@ class IterativelyReweightedLeastSquaresSuite
           irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
-    }
-  }
 
-  test("IRLS against GLM with Poisson errors") {
+  test("IRLS against GLM with Poisson errors")
     /*
        R code:
 
@@ -127,13 +123,12 @@ class IterativelyReweightedLeastSquaresSuite
     import IterativelyReweightedLeastSquaresSuite._
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true)) {
+    for (fitIntercept <- Seq(false, true))
       val yMean = instances2.map(_.label).mean
-      val newInstances = instances2.map { instance =>
+      val newInstances = instances2.map  instance =>
         val mu = (instance.label + yMean) / 2.0
         val eta = math.log(mu)
         Instance(eta, instance.weight, instance.features)
-      }
       val initial =
         new WeightedLeastSquares(fitIntercept,
                                  regParam = 0.0,
@@ -150,10 +145,8 @@ class IterativelyReweightedLeastSquaresSuite
           irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
-    }
-  }
 
-  test("IRLS against L1Regression") {
+  test("IRLS against L1Regression")
     /*
        R code:
 
@@ -174,7 +167,7 @@ class IterativelyReweightedLeastSquaresSuite
     import IterativelyReweightedLeastSquaresSuite._
 
     var idx = 0
-    for (fitIntercept <- Seq(false, true)) {
+    for (fitIntercept <- Seq(false, true))
       val initial =
         new WeightedLeastSquares(fitIntercept,
                                  regParam = 0.0,
@@ -191,39 +184,32 @@ class IterativelyReweightedLeastSquaresSuite
           irls.intercept, irls.coefficients(0), irls.coefficients(1))
       assert(actual ~== expected(idx) absTol 1e-4)
       idx += 1
-    }
-  }
-}
 
-object IterativelyReweightedLeastSquaresSuite {
+object IterativelyReweightedLeastSquaresSuite
 
   def BinomialReweightFunc(
       instance: Instance,
-      model: WeightedLeastSquaresModel): (Double, Double) = {
+      model: WeightedLeastSquaresModel): (Double, Double) =
     val eta = model.predict(instance.features)
     val mu = 1.0 / (1.0 + math.exp(-1.0 * eta))
     val z = eta + (instance.label - mu) / (mu * (1.0 - mu))
     val w = mu * (1 - mu) * instance.weight
     (z, w)
-  }
 
   def PoissonReweightFunc(
       instance: Instance,
-      model: WeightedLeastSquaresModel): (Double, Double) = {
+      model: WeightedLeastSquaresModel): (Double, Double) =
     val eta = model.predict(instance.features)
     val mu = math.exp(eta)
     val z = eta + (instance.label - mu) / mu
     val w = mu * instance.weight
     (z, w)
-  }
 
   def L1RegressionReweightFunc(
       instance: Instance,
-      model: WeightedLeastSquaresModel): (Double, Double) = {
+      model: WeightedLeastSquaresModel): (Double, Double) =
     val eta = model.predict(instance.features)
     val e = math.max(math.abs(eta - instance.label), 1e-7)
     val w = 1 / e
     val y = instance.label
     (y, w)
-  }
-}

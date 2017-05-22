@@ -8,9 +8,8 @@ import javax.inject._
   * into a controller. The trait represents a counter that returns a
   * incremented number each time it is called.
   */
-trait Counter {
+trait Counter
   def nextCount(): Int
-}
 
 /**
   * This class is a concrete implementation of the [[Counter]] trait.
@@ -23,7 +22,6 @@ trait Counter {
   * injected.
   */
 @Singleton
-class AtomicCounter extends Counter {
+class AtomicCounter extends Counter
   private val atomicCounter = new AtomicInteger()
   override def nextCount(): Int = atomicCounter.getAndIncrement()
-}

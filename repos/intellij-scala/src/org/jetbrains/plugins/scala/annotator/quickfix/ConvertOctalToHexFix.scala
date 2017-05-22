@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 /**
   * @author Ye Xianjin
   */
-class ConvertOctalToHexFix(literal: ScLiteral) extends IntentionAction {
+class ConvertOctalToHexFix(literal: ScLiteral) extends IntentionAction
   val getText: String = "convert Octal string to Hex string"
 
   def getFamilyName: String = "Change ScLiteral"
@@ -23,21 +23,18 @@ class ConvertOctalToHexFix(literal: ScLiteral) extends IntentionAction {
     literal.isValid && literal.getManager.isInProject(file)
 
   // the input text should be legal octal string
-  private def convertOctalToHex(text: String): String = {
+  private def convertOctalToHex(text: String): String =
     import scala.math.BigInt
     val endsWithL = text.endsWith("l") || text.endsWith("L")
     val textWithoutL =
       if (endsWithL) text.substring(0, text.length - 1) else text
     val hexString = "0x" + BigInt(textWithoutL, 8).toString(16)
     if (endsWithL) hexString + "L" else hexString
-  }
 
-  def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
+  def invoke(project: Project, editor: Editor, file: PsiFile): Unit =
     if (!literal.isValid) return
     val text = literal.getText
     if (!(text.length >= 2 && text(0) == '0' && text(1).toLower != 'x')) return
     val psi = ScalaPsiElementFactory.createExpressionFromText(
         convertOctalToHex(text), literal.getManager)
     literal.replace(psi)
-  }
-}

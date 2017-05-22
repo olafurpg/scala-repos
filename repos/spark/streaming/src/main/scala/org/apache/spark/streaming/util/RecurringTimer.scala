@@ -22,12 +22,11 @@ import org.apache.spark.util.{Clock, SystemClock}
 
 private[streaming] class RecurringTimer(
     clock: Clock, period: Long, callback: (Long) => Unit, name: String)
-    extends Logging {
+    extends Logging
 
-  private val thread = new Thread("RecurringTimer - " + name) {
+  private val thread = new Thread("RecurringTimer - " + name)
     setDaemon(true)
     override def run() { loop }
-  }
 
   @volatile private var prevTime = -1L
   @volatile private var nextTime = -1L
@@ -38,9 +37,8 @@ private[streaming] class RecurringTimer(
     * The time will be a multiple of this timer's period and more than
     * current system time.
     */
-  def getStartTime(): Long = {
+  def getStartTime(): Long =
     (math.floor(clock.getTimeMillis().toDouble / period) + 1).toLong * period
-  }
 
   /**
     * Get the time when the timer will fire if it is restarted right now.
@@ -48,27 +46,24 @@ private[streaming] class RecurringTimer(
     * for whatever reason. The time must be a multiple of this timer's period and
     * more than current time.
     */
-  def getRestartTime(originalStartTime: Long): Long = {
+  def getRestartTime(originalStartTime: Long): Long =
     val gap = clock.getTimeMillis() - originalStartTime
     (math.floor(gap.toDouble / period).toLong + 1) * period + originalStartTime
-  }
 
   /**
     * Start at the given start time.
     */
-  def start(startTime: Long): Long = synchronized {
+  def start(startTime: Long): Long = synchronized
     nextTime = startTime
     thread.start()
     logInfo("Started timer for " + name + " at time " + nextTime)
     nextTime
-  }
 
   /**
     * Start at the earliest time it can start based on the period.
     */
-  def start(): Long = {
+  def start(): Long =
     start(getStartTime())
-  }
 
   /**
     * Stop the timer, and return the last time the callback was made.
@@ -77,55 +72,44 @@ private[streaming] class RecurringTimer(
     *                       give correct time in this case). False guarantees that there will be at
     *                       least one callback after `stop` has been called.
     */
-  def stop(interruptTimer: Boolean): Long = synchronized {
-    if (!stopped) {
+  def stop(interruptTimer: Boolean): Long = synchronized
+    if (!stopped)
       stopped = true
-      if (interruptTimer) {
+      if (interruptTimer)
         thread.interrupt()
-      }
       thread.join()
       logInfo("Stopped timer for " + name + " after time " + prevTime)
-    }
     prevTime
-  }
 
-  private def triggerActionForNextInterval(): Unit = {
+  private def triggerActionForNextInterval(): Unit =
     clock.waitTillTime(nextTime)
     callback(nextTime)
     prevTime = nextTime
     nextTime += period
     logDebug("Callback for " + name + " called at time " + prevTime)
-  }
 
   /**
     * Repeatedly call the callback every interval.
     */
-  private def loop() {
-    try {
-      while (!stopped) {
+  private def loop()
+    try
+      while (!stopped)
         triggerActionForNextInterval()
-      }
       triggerActionForNextInterval()
-    } catch {
+    catch
       case e: InterruptedException =>
-    }
-  }
-}
 
-private[streaming] object RecurringTimer extends Logging {
+private[streaming] object RecurringTimer extends Logging
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     var lastRecurTime = 0L
     val period = 1000
 
-    def onRecur(time: Long) {
+    def onRecur(time: Long)
       val currentTime = System.currentTimeMillis()
       logInfo("" + currentTime + ": " + (currentTime - lastRecurTime))
       lastRecurTime = currentTime
-    }
     val timer = new RecurringTimer(new SystemClock(), period, onRecur, "Test")
     timer.start()
     Thread.sleep(30 * 1000)
     timer.stop(true)
-  }
-}

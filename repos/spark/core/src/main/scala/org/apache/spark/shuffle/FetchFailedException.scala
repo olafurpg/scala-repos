@@ -33,20 +33,18 @@ private[spark] class FetchFailedException(bmAddress: BlockManagerId,
                                           reduceId: Int,
                                           message: String,
                                           cause: Throwable = null)
-    extends Exception(message, cause) {
+    extends Exception(message, cause)
 
   def this(bmAddress: BlockManagerId,
            shuffleId: Int,
            mapId: Int,
            reduceId: Int,
-           cause: Throwable) {
+           cause: Throwable)
     this(bmAddress, shuffleId, mapId, reduceId, cause.getMessage, cause)
-  }
 
   def toTaskEndReason: TaskEndReason =
     FetchFailed(
         bmAddress, shuffleId, mapId, reduceId, Utils.exceptionString(this))
-}
 
 /**
   * Failed to get shuffle metadata from [[org.apache.spark.MapOutputTracker]].

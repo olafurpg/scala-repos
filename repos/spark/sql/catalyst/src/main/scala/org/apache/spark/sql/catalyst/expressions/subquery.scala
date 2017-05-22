@@ -25,7 +25,7 @@ import org.apache.spark.sql.types.DataType
 /**
   * An interface for subquery that is used in expressions.
   */
-abstract class SubqueryExpression extends LeafExpression {
+abstract class SubqueryExpression extends LeafExpression
 
   /**
     * The logical plan of the query.
@@ -42,7 +42,6 @@ abstract class SubqueryExpression extends LeafExpression {
     * Updates the query with new logical plan.
     */
   def withNewPlan(plan: LogicalPlan): SubqueryExpression
-}
 
 /**
   * A subquery that will return only one row and one column. This will be converted into a physical
@@ -52,7 +51,7 @@ abstract class SubqueryExpression extends LeafExpression {
   */
 case class ScalarSubquery(
     query: LogicalPlan, exprId: ExprId = NamedExpression.newExprId)
-    extends SubqueryExpression with Unevaluable {
+    extends SubqueryExpression with Unevaluable
 
   override def plan: LogicalPlan = SubqueryAlias(toString, query)
 
@@ -60,15 +59,13 @@ case class ScalarSubquery(
 
   override def dataType: DataType = query.schema.fields.head.dataType
 
-  override def checkInputDataTypes(): TypeCheckResult = {
-    if (query.schema.length != 1) {
+  override def checkInputDataTypes(): TypeCheckResult =
+    if (query.schema.length != 1)
       TypeCheckResult.TypeCheckFailure(
           "Scalar subquery must return only one column, but got " +
           query.schema.length.toString)
-    } else {
+    else
       TypeCheckResult.TypeCheckSuccess
-    }
-  }
 
   override def foldable: Boolean = false
   override def nullable: Boolean = true
@@ -77,4 +74,3 @@ case class ScalarSubquery(
     ScalarSubquery(plan, exprId)
 
   override def toString: String = s"subquery#${exprId.id}"
-}

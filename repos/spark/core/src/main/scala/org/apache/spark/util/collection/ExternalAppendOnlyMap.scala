@@ -61,26 +61,24 @@ class ExternalAppendOnlyMap[K, V, C](
     blockManager: BlockManager = SparkEnv.get.blockManager,
     context: TaskContext = TaskContext.get())
     extends Iterable[(K, C)] with Serializable with Logging
-    with Spillable[SizeTracker] {
+    with Spillable[SizeTracker]
 
-  if (context == null) {
+  if (context == null)
     throw new IllegalStateException(
         "Spillable collections should not be instantiated outside of tasks")
-  }
 
   // Backwards-compatibility constructor for binary compatibility
   def this(createCombiner: V => C,
            mergeValue: (C, V) => C,
            mergeCombiners: (C, C) => C,
            serializer: Serializer,
-           blockManager: BlockManager) {
+           blockManager: BlockManager)
     this(createCombiner,
          mergeValue,
          mergeCombiners,
          serializer,
          blockManager,
          TaskContext.get())
-  }
 
   override protected[this] def taskMemoryManager: TaskMemoryManager =
     context.taskMemoryManager()
@@ -129,9 +127,8 @@ class ExternalAppendOnlyMap[K, V, C](
   /**
     * Insert the given key and value into the map.
     */
-  def insert(key: K, value: V): Unit = {
+  def insert(key: K, value: V): Unit =
     insertAll(Iterator((key, value)))
-  }
 
   /**
     * Insert the given iterator of keys and values into the map.
@@ -142,33 +139,26 @@ class ExternalAppendOnlyMap[K, V, C](
     *
     * The shuffle memory usage of the first trackMemoryThreshold entries is not tracked.
     */
-  def insertAll(entries: Iterator[Product2[K, V]]): Unit = {
-    if (currentMap == null) {
+  def insertAll(entries: Iterator[Product2[K, V]]): Unit =
+    if (currentMap == null)
       throw new IllegalStateException(
           "Cannot insert new elements into a map after calling iterator")
-    }
     // An update function for the map that we reuse across entries to avoid allocating
     // a new closure each time
     var curEntry: Product2[K, V] = null
     val update: (Boolean, C) => C = (hadVal, oldVal) =>
-      {
         if (hadVal) mergeValue(oldVal, curEntry._2)
         else createCombiner(curEntry._2)
-    }
 
-    while (entries.hasNext) {
+    while (entries.hasNext)
       curEntry = entries.next()
       val estimatedSize = currentMap.estimateSize()
-      if (estimatedSize > _peakMemoryUsedBytes) {
+      if (estimatedSize > _peakMemoryUsedBytes)
         _peakMemoryUsedBytes = estimatedSize
-      }
-      if (maybeSpill(currentMap, estimatedSize)) {
+      if (maybeSpill(currentMap, estimatedSize))
         currentMap = new SizeTrackingAppendOnlyMap[K, C]
-      }
       currentMap.changeValue(curEntry._1, update)
       addElementsRead()
-    }
-  }
 
   /**
     * Insert the given iterable of keys and values into the map.
@@ -179,14 +169,13 @@ class ExternalAppendOnlyMap[K, V, C](
     *
     * The shuffle memory usage of the first trackMemoryThreshold entries is not tracked.
     */
-  def insertAll(entries: Iterable[Product2[K, V]]): Unit = {
+  def insertAll(entries: Iterable[Product2[K, V]]): Unit =
     insertAll(entries.iterator)
-  }
 
   /**
     * Sort the existing contents of the in-memory map and spill them to a temporary file on disk.
     */
-  override protected[this] def spill(collection: SizeTracker): Unit = {
+  override protected[this] def spill(collection: SizeTracker): Unit =
     val (blockId, file) = diskBlockManager.createTempLocalBlock()
     curWriteMetrics = new ShuffleWriteMetrics()
     var writer = blockManager.getDiskWriter(
@@ -197,82 +186,68 @@ class ExternalAppendOnlyMap[K, V, C](
     val batchSizes = new ArrayBuffer[Long]
 
     // Flush the disk writer's contents to disk, and update relevant variables
-    def flush(): Unit = {
+    def flush(): Unit =
       val w = writer
       writer = null
       w.commitAndClose()
       _diskBytesSpilled += curWriteMetrics.bytesWritten
       batchSizes.append(curWriteMetrics.bytesWritten)
       objectsWritten = 0
-    }
 
     var success = false
-    try {
+    try
       val it = currentMap.destructiveSortedIterator(keyComparator)
-      while (it.hasNext) {
+      while (it.hasNext)
         val kv = it.next()
         writer.write(kv._1, kv._2)
         objectsWritten += 1
 
-        if (objectsWritten == serializerBatchSize) {
+        if (objectsWritten == serializerBatchSize)
           flush()
           curWriteMetrics = new ShuffleWriteMetrics()
           writer = blockManager.getDiskWriter(
               blockId, file, ser, fileBufferSize, curWriteMetrics)
-        }
-      }
-      if (objectsWritten > 0) {
+      if (objectsWritten > 0)
         flush()
-      } else if (writer != null) {
+      else if (writer != null)
         val w = writer
         writer = null
         w.revertPartialWritesAndClose()
-      }
       success = true
-    } finally {
-      if (!success) {
+    finally
+      if (!success)
         // This code path only happens if an exception was thrown above before we set success;
         // close our stuff and let the exception be thrown further
-        if (writer != null) {
+        if (writer != null)
           writer.revertPartialWritesAndClose()
-        }
-        if (file.exists()) {
-          if (!file.delete()) {
+        if (file.exists())
+          if (!file.delete())
             logWarning(s"Error deleting ${file}")
-          }
-        }
-      }
-    }
 
     spilledMaps.append(new DiskMapIterator(file, blockId, batchSizes))
-  }
 
   /**
     * Return a destructive iterator that merges the in-memory map with the spilled maps.
     * If no spill has occurred, simply return the in-memory map's iterator.
     */
-  override def iterator: Iterator[(K, C)] = {
-    if (currentMap == null) {
+  override def iterator: Iterator[(K, C)] =
+    if (currentMap == null)
       throw new IllegalStateException(
           "ExternalAppendOnlyMap.iterator is destructive and should only be called once.")
-    }
-    if (spilledMaps.isEmpty) {
+    if (spilledMaps.isEmpty)
       CompletionIterator[(K, C), Iterator[(K, C)]](
           currentMap.iterator, freeCurrentMap())
-    } else {
+    else
       new ExternalIterator()
-    }
-  }
 
-  private def freeCurrentMap(): Unit = {
+  private def freeCurrentMap(): Unit =
     currentMap = null // So that the memory can be garbage-collected
     releaseMemory()
-  }
 
   /**
     * An iterator that sort-merges (K, C) pairs from the in-memory map and the spilled maps
     */
-  private class ExternalIterator extends Iterator[(K, C)] {
+  private class ExternalIterator extends Iterator[(K, C)]
 
     // A queue that maintains a buffer for each stream we are currently merging
     // This queue maintains the invariant that it only contains non-empty buffers
@@ -285,13 +260,11 @@ class ExternalAppendOnlyMap[K, V, C](
     private val inputStreams =
       (Seq(sortedMap) ++ spilledMaps).map(it => it.buffered)
 
-    inputStreams.foreach { it =>
+    inputStreams.foreach  it =>
       val kcPairs = new ArrayBuffer[(K, C)]
       readNextHashCode(it, kcPairs)
-      if (kcPairs.length > 0) {
+      if (kcPairs.length > 0)
         mergeHeap.enqueue(new StreamBuffer(it, kcPairs))
-      }
-    }
 
     /**
       * Fill a buffer with the next set of keys with the same hash code from a given iterator. We
@@ -303,37 +276,31 @@ class ExternalAppendOnlyMap[K, V, C](
       * @param buf buffer to write the results into
       */
     private def readNextHashCode(
-        it: BufferedIterator[(K, C)], buf: ArrayBuffer[(K, C)]): Unit = {
-      if (it.hasNext) {
+        it: BufferedIterator[(K, C)], buf: ArrayBuffer[(K, C)]): Unit =
+      if (it.hasNext)
         var kc = it.next()
         buf += kc
         val minHash = hashKey(kc)
-        while (it.hasNext && it.head._1.hashCode() == minHash) {
+        while (it.hasNext && it.head._1.hashCode() == minHash)
           kc = it.next()
           buf += kc
-        }
-      }
-    }
 
     /**
       * If the given buffer contains a value for the given key, merge that value into
       * baseCombiner and remove the corresponding (K, C) pair from the buffer.
       */
     private def mergeIfKeyExists(
-        key: K, baseCombiner: C, buffer: StreamBuffer): C = {
+        key: K, baseCombiner: C, buffer: StreamBuffer): C =
       var i = 0
-      while (i < buffer.pairs.length) {
+      while (i < buffer.pairs.length)
         val pair = buffer.pairs(i)
-        if (pair._1 == key) {
+        if (pair._1 == key)
           // Note that there's at most one pair in the buffer with a given key, since we always
           // merge stuff in a map before spilling, so it's safe to return after the first we find
           removeFromBuffer(buffer.pairs, i)
           return mergeCombiners(baseCombiner, pair._2)
-        }
         i += 1
-      }
       baseCombiner
-    }
 
     /**
       * Remove the index'th element from an ArrayBuffer in constant time, swapping another element
@@ -341,12 +308,11 @@ class ExternalAppendOnlyMap[K, V, C](
       * not have to shift all the elements in the array over. It works for our array buffers because
       * we don't care about the order of elements inside, we just want to search them for a key.
       */
-    private def removeFromBuffer[T](buffer: ArrayBuffer[T], index: Int): T = {
+    private def removeFromBuffer[T](buffer: ArrayBuffer[T], index: Int): T =
       val elem = buffer(index)
       buffer(index) = buffer(buffer.size - 1) // This also works if index == buffer.size - 1
       buffer.reduceToSize(buffer.size - 1)
       elem
-    }
 
     /**
       * Return true if there exists an input stream that still has unvisited pairs.
@@ -357,10 +323,9 @@ class ExternalAppendOnlyMap[K, V, C](
       * Select a key with the minimum hash, then combine all values with the same key from all
       * input streams.
       */
-    override def next(): (K, C) = {
-      if (mergeHeap.length == 0) {
+    override def next(): (K, C) =
+      if (mergeHeap.length == 0)
         throw new NoSuchElementException
-      }
       // Select a key from the StreamBuffer that holds the lowest key hash
       val minBuffer = mergeHeap.dequeue()
       val minPairs = minBuffer.pairs
@@ -373,24 +338,19 @@ class ExternalAppendOnlyMap[K, V, C](
       // For all other streams that may have this key (i.e. have the same minimum key hash),
       // merge in the corresponding value (if any) from that stream
       val mergedBuffers = ArrayBuffer[StreamBuffer](minBuffer)
-      while (mergeHeap.length > 0 && mergeHeap.head.minKeyHash == minHash) {
+      while (mergeHeap.length > 0 && mergeHeap.head.minKeyHash == minHash)
         val newBuffer = mergeHeap.dequeue()
         minCombiner = mergeIfKeyExists(minKey, minCombiner, newBuffer)
         mergedBuffers += newBuffer
-      }
 
       // Repopulate each visited stream buffer and add it back to the queue if it is non-empty
-      mergedBuffers.foreach { buffer =>
-        if (buffer.isEmpty) {
+      mergedBuffers.foreach  buffer =>
+        if (buffer.isEmpty)
           readNextHashCode(buffer.iterator, buffer.pairs)
-        }
-        if (!buffer.isEmpty) {
+        if (!buffer.isEmpty)
           mergeHeap.enqueue(buffer)
-        }
-      }
 
       (minKey, minCombiner)
-    }
 
     /**
       * A buffer for streaming from a map iterator (in-memory or on-disk) sorted by key hash.
@@ -404,30 +364,26 @@ class ExternalAppendOnlyMap[K, V, C](
       */
     private class StreamBuffer(val iterator: BufferedIterator[(K, C)],
                                val pairs: ArrayBuffer[(K, C)])
-        extends Comparable[StreamBuffer] {
+        extends Comparable[StreamBuffer]
 
       def isEmpty: Boolean = pairs.length == 0
 
       // Invalid if there are no more pairs in this stream
-      def minKeyHash: Int = {
+      def minKeyHash: Int =
         assert(pairs.length > 0)
         hashKey(pairs.head)
-      }
 
-      override def compareTo(other: StreamBuffer): Int = {
+      override def compareTo(other: StreamBuffer): Int =
         // descending order because mutable.PriorityQueue dequeues the max, not the min
         if (other.minKeyHash < minKeyHash) -1
         else if (other.minKeyHash == minKeyHash) 0 else 1
-      }
-    }
-  }
 
   /**
     * An iterator that returns (K, C) pairs in sorted order from an on-disk map
     */
   private class DiskMapIterator(
       file: File, blockId: BlockId, batchSizes: ArrayBuffer[Long])
-      extends Iterator[(K, C)] {
+      extends Iterator[(K, C)]
     private val batchOffsets =
       batchSizes.scanLeft(0L)(_ + _) // Size will be batchSize.length + 1
     assert(file.length() == batchOffsets.last,
@@ -448,16 +404,15 @@ class ExternalAppendOnlyMap[K, V, C](
     /**
       * Construct a stream that reads only from the next batch.
       */
-    private def nextBatchStream(): DeserializationStream = {
+    private def nextBatchStream(): DeserializationStream =
       // Note that batchOffsets.length = numBatches + 1 since we did a scan above; check whether
       // we're still in a valid batch.
-      if (batchIndex < batchOffsets.length - 1) {
-        if (deserializeStream != null) {
+      if (batchIndex < batchOffsets.length - 1)
+        if (deserializeStream != null)
           deserializeStream.close()
           fileStream.close()
           deserializeStream = null
           fileStream = null
-        }
 
         val start = batchOffsets(batchIndex)
         fileStream = new FileInputStream(file)
@@ -475,12 +430,10 @@ class ExternalAppendOnlyMap[K, V, C](
         val compressedStream =
           blockManager.wrapForCompression(blockId, bufferedStream)
         ser.deserializeStream(compressedStream)
-      } else {
+      else
         // No more batches left
         cleanup()
         null
-      }
-    }
 
     /**
       * Return the next (K, C) pair from the deserialization stream.
@@ -488,85 +441,66 @@ class ExternalAppendOnlyMap[K, V, C](
       * If the current batch is drained, construct a stream for the next batch and read from it.
       * If no more pairs are left, return null.
       */
-    private def readNextItem(): (K, C) = {
-      try {
+    private def readNextItem(): (K, C) =
+      try
         val k = deserializeStream.readKey().asInstanceOf[K]
         val c = deserializeStream.readValue().asInstanceOf[C]
         val item = (k, c)
         objectsRead += 1
-        if (objectsRead == serializerBatchSize) {
+        if (objectsRead == serializerBatchSize)
           objectsRead = 0
           deserializeStream = nextBatchStream()
-        }
         item
-      } catch {
+      catch
         case e: EOFException =>
           cleanup()
           null
-      }
-    }
 
-    override def hasNext: Boolean = {
-      if (nextItem == null) {
-        if (deserializeStream == null) {
+    override def hasNext: Boolean =
+      if (nextItem == null)
+        if (deserializeStream == null)
           return false
-        }
         nextItem = readNextItem()
-      }
       nextItem != null
-    }
 
-    override def next(): (K, C) = {
+    override def next(): (K, C) =
       val item = if (nextItem == null) readNextItem() else nextItem
-      if (item == null) {
+      if (item == null)
         throw new NoSuchElementException
-      }
       nextItem = null
       item
-    }
 
-    private def cleanup() {
+    private def cleanup()
       batchIndex = batchOffsets.length // Prevent reading any other batch
       val ds = deserializeStream
-      if (ds != null) {
+      if (ds != null)
         ds.close()
         deserializeStream = null
-      }
-      if (fileStream != null) {
+      if (fileStream != null)
         fileStream.close()
         fileStream = null
-      }
-      if (file.exists()) {
-        if (!file.delete()) {
+      if (file.exists())
+        if (!file.delete())
           logWarning(s"Error deleting ${file}")
-        }
-      }
-    }
 
     context.addTaskCompletionListener(context => cleanup())
-  }
 
   /** Convenience function to hash the given (K, C) pair by the key. */
   private def hashKey(kc: (K, C)): Int = ExternalAppendOnlyMap.hash(kc._1)
-}
 
-private[spark] object ExternalAppendOnlyMap {
+private[spark] object ExternalAppendOnlyMap
 
   /**
     * Return the hash code of the given object. If the object is null, return a special hash code.
     */
-  private def hash[T](obj: T): Int = {
+  private def hash[T](obj: T): Int =
     if (obj == null) 0 else obj.hashCode()
-  }
 
   /**
     * A comparator which sorts arbitrary keys based on their hash codes.
     */
-  private class HashComparator[K] extends Comparator[K] {
-    def compare(key1: K, key2: K): Int = {
+  private class HashComparator[K] extends Comparator[K]
+    def compare(key1: K, key2: K): Int =
       val hash1 = hash(key1)
       val hash2 = hash(key2)
       if (hash1 < hash2) -1 else if (hash1 == hash2) 0 else 1
-    }
-  }
-}

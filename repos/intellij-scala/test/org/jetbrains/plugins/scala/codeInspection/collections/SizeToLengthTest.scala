@@ -5,13 +5,13 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 /**
   * @author Nikolay.Tropin
   */
-class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
+class SizeToLengthTest extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[SizeToLengthInspection]
 
   override def hint: String = InspectionBundle.message("size.to.length")
 
-  def testString(): Unit = {
+  def testString(): Unit =
     doTest(s"""|"".${START}size$END""".stripMargin, "\"\".size", "\"\".length")
 
     doTest(
@@ -34,9 +34,8 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
         |}
       """.stripMargin
     )
-  }
 
-  def testArray(): Unit = {
+  def testArray(): Unit =
     doTest(s"Array(1, 2).${START}size$END",
            "Array(1, 2).size",
            "Array(1, 2).length")
@@ -65,5 +64,3 @@ class SizeToLengthTest extends OperationsOnCollectionInspectionTest {
         |}
       """.stripMargin
     )
-  }
-}

@@ -52,14 +52,13 @@ import org.apache.spark.util.Utils
 /**
   * Contains util methods to interact with Hadoop from spark.
   */
-class YarnSparkHadoopUtil extends SparkHadoopUtil {
+class YarnSparkHadoopUtil extends SparkHadoopUtil
 
   private var tokenRenewer: Option[ExecutorDelegationTokenUpdater] = None
 
   override def transferCredentials(
-      source: UserGroupInformation, dest: UserGroupInformation) {
+      source: UserGroupInformation, dest: UserGroupInformation)
     dest.addCredentials(source.getCredentials())
-  }
 
   // Note that all params which start with SPARK are propagated all the way through, so if in yarn
   // mode, this MUST be set to true.
@@ -72,48 +71,40 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
 
   // Add any user credentials to the job conf which are necessary for running on a secure Hadoop
   // cluster
-  override def addCredentials(conf: JobConf) {
+  override def addCredentials(conf: JobConf)
     val jobCreds = conf.getCredentials()
     jobCreds.mergeAll(UserGroupInformation.getCurrentUser().getCredentials())
-  }
 
-  override def getCurrentUserCredentials(): Credentials = {
+  override def getCurrentUserCredentials(): Credentials =
     UserGroupInformation.getCurrentUser().getCredentials()
-  }
 
-  override def addCurrentUserCredentials(creds: Credentials) {
+  override def addCurrentUserCredentials(creds: Credentials)
     UserGroupInformation.getCurrentUser().addCredentials(creds)
-  }
 
-  override def addSecretKeyToUserCredentials(key: String, secret: String) {
+  override def addSecretKeyToUserCredentials(key: String, secret: String)
     val creds = new Credentials()
     creds.addSecretKey(new Text(key), secret.getBytes(UTF_8))
     addCurrentUserCredentials(creds)
-  }
 
-  override def getSecretKeyFromUserCredentials(key: String): Array[Byte] = {
+  override def getSecretKeyFromUserCredentials(key: String): Array[Byte] =
     val credentials = getCurrentUserCredentials()
     if (credentials != null) credentials.getSecretKey(new Text(key)) else null
-  }
 
   /**
     * Get the list of namenodes the user may access.
     */
-  def getNameNodesToAccess(sparkConf: SparkConf): Set[Path] = {
+  def getNameNodesToAccess(sparkConf: SparkConf): Set[Path] =
     sparkConf.get(NAMENODES_TO_ACCESS).map(new Path(_)).toSet
-  }
 
-  def getTokenRenewer(conf: Configuration): String = {
+  def getTokenRenewer(conf: Configuration): String =
     val delegTokenRenewer = Master.getMasterPrincipal(conf)
     logDebug("delegation token renewer is: " + delegTokenRenewer)
-    if (delegTokenRenewer == null || delegTokenRenewer.length() == 0) {
+    if (delegTokenRenewer == null || delegTokenRenewer.length() == 0)
       val errorMessage =
         "Can't get Master Kerberos principal for use as renewer"
       logError(errorMessage)
       throw new SparkException(errorMessage)
-    }
     delegTokenRenewer
-  }
 
   /**
     * Obtains tokens for the namenodes passed in and adds them to the credentials.
@@ -123,70 +114,57 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       conf: Configuration,
       creds: Credentials,
       renewer: Option[String] = None
-  ): Unit = {
-    if (UserGroupInformation.isSecurityEnabled()) {
+  ): Unit =
+    if (UserGroupInformation.isSecurityEnabled())
       val delegTokenRenewer = renewer.getOrElse(getTokenRenewer(conf))
-      paths.foreach { dst =>
+      paths.foreach  dst =>
         val dstFs = dst.getFileSystem(conf)
         logInfo("getting token for namenode: " + dst)
         dstFs.addDelegationTokens(delegTokenRenewer, creds)
-      }
-    }
-  }
 
   /**
     * Obtains token for the Hive metastore and adds them to the credentials.
     */
   def obtainTokenForHiveMetastore(sparkConf: SparkConf,
                                   conf: Configuration,
-                                  credentials: Credentials) {
+                                  credentials: Credentials)
     if (shouldGetTokens(sparkConf, "hive") &&
-        UserGroupInformation.isSecurityEnabled) {
-      YarnSparkHadoopUtil.get.obtainTokenForHiveMetastore(conf).foreach {
+        UserGroupInformation.isSecurityEnabled)
+      YarnSparkHadoopUtil.get.obtainTokenForHiveMetastore(conf).foreach
         credentials.addToken(new Text("hive.server2.delegation.token"), _)
-      }
-    }
-  }
 
   /**
     * Obtain a security token for HBase.
     */
   def obtainTokenForHBase(sparkConf: SparkConf,
                           conf: Configuration,
-                          credentials: Credentials): Unit = {
+                          credentials: Credentials): Unit =
     if (shouldGetTokens(sparkConf, "hbase") &&
-        UserGroupInformation.isSecurityEnabled) {
-      YarnSparkHadoopUtil.get.obtainTokenForHBase(conf).foreach { token =>
+        UserGroupInformation.isSecurityEnabled)
+      YarnSparkHadoopUtil.get.obtainTokenForHBase(conf).foreach  token =>
         credentials.addToken(token.getService, token)
         logInfo("Added HBase security token to credentials.")
-      }
-    }
-  }
 
   /**
     * Return whether delegation tokens should be retrieved for the given service when security is
     * enabled. By default, tokens are retrieved, but that behavior can be changed by setting
     * a service-specific configuration.
     */
-  private def shouldGetTokens(conf: SparkConf, service: String): Boolean = {
+  private def shouldGetTokens(conf: SparkConf, service: String): Boolean =
     conf.getBoolean(s"spark.yarn.security.tokens.${service}.enabled", true)
-  }
 
   private[spark] override def startExecutorDelegationTokenRenewer(
-      sparkConf: SparkConf): Unit = {
+      sparkConf: SparkConf): Unit =
     tokenRenewer = Some(new ExecutorDelegationTokenUpdater(sparkConf, conf))
     tokenRenewer.get.updateCredentialsIfRequired()
-  }
 
-  private[spark] override def stopExecutorDelegationTokenRenewer(): Unit = {
+  private[spark] override def stopExecutorDelegationTokenRenewer(): Unit =
     tokenRenewer.foreach(_.stop())
-  }
 
-  private[spark] def getContainerId: ContainerId = {
+  private[spark] def getContainerId: ContainerId =
     val containerIdString =
       System.getenv(ApplicationConstants.Environment.CONTAINER_ID.name())
     ConverterUtils.toContainerId(containerIdString)
-  }
 
   /**
     * Obtains token for the Hive metastore, using the current user as the principal.
@@ -196,16 +174,14 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     *         in the config), or if a binding exception was caught and downgraded.
     */
   def obtainTokenForHiveMetastore(
-      conf: Configuration): Option[Token[DelegationTokenIdentifier]] = {
-    try {
+      conf: Configuration): Option[Token[DelegationTokenIdentifier]] =
+    try
       obtainTokenForHiveMetastoreInner(conf)
-    } catch {
+    catch
       case e: ClassNotFoundException =>
         logInfo(s"Hive class not found $e")
         logDebug("Hive class not found", e)
         None
-    }
-  }
 
   /**
     * Inner routine to obtains token for the Hive metastore; exceptions are raised on any problem.
@@ -214,7 +190,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     * @return a delegation token
     */
   private[yarn] def obtainTokenForHiveMetastoreInner(
-      conf: Configuration): Option[Token[DelegationTokenIdentifier]] = {
+      conf: Configuration): Option[Token[DelegationTokenIdentifier]] =
     val mirror = universe.runtimeMirror(Utils.getContextOrSparkClassLoader)
 
     // the hive configuration class is a subclass of Hadoop Configuration, so can be cast down
@@ -230,7 +206,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     val metastoreUri = hiveConf.getTrimmed("hive.metastore.uris", "")
 
     // Check for local metastore
-    if (metastoreUri.nonEmpty) {
+    if (metastoreUri.nonEmpty)
       val principalKey = "hive.metastore.kerberos.principal"
       val principal = hiveConf.getTrimmed(principalKey, "")
       require(principal.nonEmpty, "Hive principal $principalKey undefined")
@@ -241,13 +217,13 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       val hiveClass =
         mirror.classLoader.loadClass("org.apache.hadoop.hive.ql.metadata.Hive")
       val closeCurrent = hiveClass.getMethod("closeCurrent")
-      try {
+      try
         // get all the instance methods before invoking any
         val getDelegationToken = hiveClass.getMethod(
             "getDelegationToken", classOf[String], classOf[String])
         val getHive = hiveClass.getMethod("get", hiveConfClass)
 
-        doAsRealUser {
+        doAsRealUser
           val hive = getHive.invoke(null, hiveConf)
           val tokenStr = getDelegationToken
             .invoke(hive, currentUser.getUserName(), principal)
@@ -255,17 +231,12 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
           val hive2Token = new Token[DelegationTokenIdentifier]()
           hive2Token.decodeFromUrlString(tokenStr)
           Some(hive2Token)
-        }
-      } finally {
-        Utils.tryLogNonFatalError {
+      finally
+        Utils.tryLogNonFatalError
           closeCurrent.invoke(null)
-        }
-      }
-    } else {
+    else
       logDebug("HiveMetaStore configured in localmode")
       None
-    }
-  }
 
   /**
     * Obtain a security token for HBase.
@@ -281,16 +252,14 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     * @return a token if the requirements were met, `None` if not.
     */
   def obtainTokenForHBase(
-      conf: Configuration): Option[Token[TokenIdentifier]] = {
-    try {
+      conf: Configuration): Option[Token[TokenIdentifier]] =
+    try
       obtainTokenForHBaseInner(conf)
-    } catch {
+    catch
       case e: ClassNotFoundException =>
         logInfo(s"HBase class not found $e")
         logDebug("HBase class not found", e)
         None
-    }
-  }
 
   /**
     * Obtain a security token for HBase if `"hbase.security.authentication" == "kerberos"`
@@ -300,7 +269,7 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
     * @return a token if one was needed
     */
   def obtainTokenForHBaseInner(
-      conf: Configuration): Option[Token[TokenIdentifier]] = {
+      conf: Configuration): Option[Token[TokenIdentifier]] =
     val mirror = universe.runtimeMirror(getClass.getClassLoader)
     val confCreate = mirror.classLoader
       .loadClass("org.apache.hadoop.hbase.HBaseConfiguration")
@@ -309,40 +278,35 @@ class YarnSparkHadoopUtil extends SparkHadoopUtil {
       .loadClass("org.apache.hadoop.hbase.security.token.TokenUtil")
       .getMethod("obtainToken", classOf[Configuration])
     val hbaseConf = confCreate.invoke(null, conf).asInstanceOf[Configuration]
-    if ("kerberos" == hbaseConf.get("hbase.security.authentication")) {
+    if ("kerberos" == hbaseConf.get("hbase.security.authentication"))
       logDebug("Attempting to fetch HBase security token.")
       Some(
           obtainToken
             .invoke(null, hbaseConf)
             .asInstanceOf[Token[TokenIdentifier]])
-    } else {
+    else
       None
-    }
-  }
 
   /**
     * Run some code as the real logged in user (which may differ from the current user, for
     * example, when using proxying).
     */
-  private def doAsRealUser[T](fn: => T): T = {
+  private def doAsRealUser[T](fn: => T): T =
     val currentUser = UserGroupInformation.getCurrentUser()
     val realUser = Option(currentUser.getRealUser()).getOrElse(currentUser)
 
     // For some reason the Scala-generated anonymous class ends up causing an
     // UndeclaredThrowableException, even if you annotate the method with @throws.
-    try {
+    try
       realUser.doAs(
-          new PrivilegedExceptionAction[T]() {
+          new PrivilegedExceptionAction[T]()
         override def run(): T = fn
-      })
-    } catch {
+      )
+    catch
       case e: UndeclaredThrowableException =>
         throw Option(e.getCause()).getOrElse(e)
-    }
-  }
-}
 
-object YarnSparkHadoopUtil {
+object YarnSparkHadoopUtil
   // Additional memory overhead
   // 10% was arrived at experimentally. In the interest of minimizing memory waste while covering
   // the common cases. Memory overhead tends to grow with container size.
@@ -358,71 +322,60 @@ object YarnSparkHadoopUtil {
   // request types (like map/reduce in hadoop for example)
   val RM_REQUEST_PRIORITY = Priority.newInstance(1)
 
-  def get: YarnSparkHadoopUtil = {
+  def get: YarnSparkHadoopUtil =
     val yarnMode = java.lang.Boolean.valueOf(System.getProperty(
             "SPARK_YARN_MODE", System.getenv("SPARK_YARN_MODE")))
-    if (!yarnMode) {
+    if (!yarnMode)
       throw new SparkException(
           "YarnSparkHadoopUtil is not available in non-YARN mode!")
-    }
     SparkHadoopUtil.get.asInstanceOf[YarnSparkHadoopUtil]
-  }
 
   /**
     * Add a path variable to the given environment map.
     * If the map already contains this key, append the value to the existing value instead.
     */
   def addPathToEnvironment(
-      env: HashMap[String, String], key: String, value: String): Unit = {
+      env: HashMap[String, String], key: String, value: String): Unit =
     val newValue =
       if (env.contains(key)) { env(key) + getClassPathSeparator + value } else
         value
     env.put(key, newValue)
-  }
 
   /**
     * Set zero or more environment variables specified by the given input string.
     * The input string is expected to take the form "KEY1=VAL1,KEY2=VAL2,KEY3=VAL3".
     */
   def setEnvFromInputString(
-      env: HashMap[String, String], inputString: String): Unit = {
-    if (inputString != null && inputString.length() > 0) {
+      env: HashMap[String, String], inputString: String): Unit =
+    if (inputString != null && inputString.length() > 0)
       val childEnvs = inputString.split(",")
       val p = Pattern.compile(environmentVariableRegex)
-      for (cEnv <- childEnvs) {
+      for (cEnv <- childEnvs)
         val parts = cEnv.split("=") // split on '='
         val m = p.matcher(parts(1))
         val sb = new StringBuffer
-        while (m.find()) {
+        while (m.find())
           val variable = m.group(1)
           var replace = ""
-          if (env.get(variable) != None) {
+          if (env.get(variable) != None)
             replace = env.get(variable).get
-          } else {
+          else
             // if this key is not configured for the child .. get it from the env
             replace = System.getenv(variable)
-            if (replace == null) {
+            if (replace == null)
               // the env key is note present anywhere .. simply set it
               replace = ""
-            }
-          }
           m.appendReplacement(sb, Matcher.quoteReplacement(replace))
-        }
         m.appendTail(sb)
         // This treats the environment variable as path variable delimited by `File.pathSeparator`
         // This is kept for backward compatibility and consistency with Hadoop's behavior
         addPathToEnvironment(env, parts(0), sb.toString)
-      }
-    }
-  }
 
-  private val environmentVariableRegex: String = {
-    if (Utils.isWindows) {
+  private val environmentVariableRegex: String =
+    if (Utils.isWindows)
       "%([A-Za-z_][A-Za-z0-9_]*?)%"
-    } else {
+    else
       "\\$([A-Za-z_][A-Za-z0-9_]*)"
-    }
-  }
 
   /**
     * The handler if an OOM Exception is thrown by the JVM must be configured on Windows
@@ -438,13 +391,11 @@ object YarnSparkHadoopUtil {
     *
     * @return The correct OOM Error handler JVM option, platform dependent.
     */
-  def getOutOfMemoryErrorArgument: String = {
-    if (Utils.isWindows) {
+  def getOutOfMemoryErrorArgument: String =
+    if (Utils.isWindows)
       escapeForShell("-XX:OnOutOfMemoryError=taskkill /F /PID %%%%p")
-    } else {
+    else
       "-XX:OnOutOfMemoryError='kill %p'"
-    }
-  }
 
   /**
     * Escapes a string for inclusion in a command line executed by Yarn. Yarn executes commands
@@ -463,34 +414,28 @@ object YarnSparkHadoopUtil {
     * @param arg A single argument.
     * @return Argument quoted for execution via Yarn's generated shell script.
     */
-  def escapeForShell(arg: String): String = {
-    if (arg != null) {
-      if (Utils.isWindows) {
+  def escapeForShell(arg: String): String =
+    if (arg != null)
+      if (Utils.isWindows)
         YarnCommandBuilderUtils.quoteForBatchScript(arg)
-      } else {
+      else
         val escaped = new StringBuilder("'")
-        for (i <- 0 to arg.length() - 1) {
-          arg.charAt(i) match {
+        for (i <- 0 to arg.length() - 1)
+          arg.charAt(i) match
             case '$' => escaped.append("\\$")
             case '"' => escaped.append("\\\"")
             case '\'' => escaped.append("'\\''")
             case c => escaped.append(c)
-          }
-        }
         escaped.append("'").toString()
-      }
-    } else {
+    else
       arg
-    }
-  }
 
   def getApplicationAclsForYarn(
-      securityMgr: SecurityManager): Map[ApplicationAccessType, String] = {
+      securityMgr: SecurityManager): Map[ApplicationAccessType, String] =
     Map[ApplicationAccessType, String](
         ApplicationAccessType.VIEW_APP -> securityMgr.getViewAcls,
         ApplicationAccessType.MODIFY_APP -> securityMgr.getModifyAcls
     )
-  }
 
   /**
     * Expand environment variable using Yarn API.
@@ -514,9 +459,8 @@ object YarnSparkHadoopUtil {
     Try(classOf[ApplicationConstants].getField("CLASS_PATH_SEPARATOR"))
       .getOrElse(classOf[File].getField("pathSeparator"))
 
-  def getClassPathSeparator(): String = {
+  def getClassPathSeparator(): String =
     classPathSeparatorField.get(null).asInstanceOf[String]
-  }
 
   /**
     * Getting the initial target number of executors depends on whether dynamic allocation is
@@ -524,8 +468,8 @@ object YarnSparkHadoopUtil {
     * If not using dynamic allocation it gets the number of executors requested by the user.
     */
   def getInitialTargetExecutorNumber(
-      conf: SparkConf, numExecutors: Int = DEFAULT_NUMBER_EXECUTORS): Int = {
-    if (Utils.isDynamicAllocationEnabled(conf)) {
+      conf: SparkConf, numExecutors: Int = DEFAULT_NUMBER_EXECUTORS): Int =
+    if (Utils.isDynamicAllocationEnabled(conf))
       val minNumExecutors = conf.get(DYN_ALLOCATION_MIN_EXECUTORS)
       val initialNumExecutors = conf.get(DYN_ALLOCATION_INITIAL_EXECUTORS)
       val maxNumExecutors = conf.get(DYN_ALLOCATION_MAX_EXECUTORS)
@@ -536,13 +480,10 @@ object YarnSparkHadoopUtil {
           s"$minNumExecutors and max executor number $maxNumExecutors")
 
       initialNumExecutors
-    } else {
+    else
       val targetNumExecutors = sys.env
         .get("SPARK_EXECUTOR_INSTANCES")
         .map(_.toInt)
         .getOrElse(numExecutors)
       // System property can override environment variable.
       conf.get(EXECUTOR_INSTANCES).getOrElse(targetNumExecutors)
-    }
-  }
-}

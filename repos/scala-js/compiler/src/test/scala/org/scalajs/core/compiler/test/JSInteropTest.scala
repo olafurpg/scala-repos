@@ -7,7 +7,7 @@ import org.junit.Ignore
 
 // scalastyle:off line.size.limit
 
-class JSInteropTest extends DirectTest with TestHelpers {
+class JSInteropTest extends DirectTest with TestHelpers
 
   override def preamble: String =
     """
@@ -16,11 +16,11 @@ class JSInteropTest extends DirectTest with TestHelpers {
     """
 
   @Test
-  def warnNoJSNativeAnnotation: Unit = {
+  def warnNoJSNativeAnnotation: Unit =
 
-    for {
+    for
       obj <- Seq("class", "trait", "object")
-    } yield {
+    yield
       s"""
       $obj A extends js.Object
       """ hasWarns s"""
@@ -28,11 +28,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |      $obj A extends js.Object
         |      ${" " * obj.length} ^
       """
-    }
-  }
 
   @Test
-  def warnJSPackageObjectDeprecated: Unit = {
+  def warnJSPackageObjectDeprecated: Unit =
 
     s"""
     package object jspackage extends js.Object
@@ -41,14 +39,13 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    package object jspackage extends js.Object
       |                   ^
     """
-  }
 
   @Test
-  def noJSNativeAnnotWithSJSDefinedAnnot: Unit = {
+  def noJSNativeAnnotWithSJSDefinedAnnot: Unit =
 
-    for {
+    for
       obj <- Seq("class", "trait", "object")
-    } yield {
+    yield
       s"""
       @ScalaJSDefined
       @js.native
@@ -58,11 +55,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |      $obj A extends js.Object
         |      ${" " * obj.length} ^
       """
-    }
-  }
 
   @Test
-  def noJSNativeAnnotWithoutJSAny: Unit = {
+  def noJSNativeAnnotWithoutJSAny: Unit =
 
     """
     @js.native
@@ -90,16 +85,15 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    object A
       |           ^
     """
-  }
 
   @Test
-  def noInnerClassTraitObject: Unit = {
+  def noInnerClassTraitObject: Unit =
 
-    for {
+    for
       outer <- Seq("class", "trait")
       inner <- Seq("class", "trait", "object")
       innerSJSDefined <- Seq(false, true)
-    } yield {
+    yield
       val innerLine =
         if (innerSJSDefined) s"@ScalaJSDefined $inner A extends js.Object"
         else s"$inner A"
@@ -113,15 +107,13 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |        $innerLine
         |        ${" " * innerLine.indexOf('A')}^
       """
-    }
-  }
 
   @Test
-  def noScalaStuffInsideNativeJSObject: Unit = {
+  def noScalaStuffInsideNativeJSObject: Unit =
 
-    for {
+    for
       inner <- Seq("class", "trait", "object")
-    } yield {
+    yield
       s"""
       @js.native
       object A extends js.Object {
@@ -132,11 +124,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |        $inner A
         |        ${" " * inner.length} ^
       """
-    }
-  }
 
   @Test
-  def noNonSyntheticCompanionInsideNativeJSObject: Unit = {
+  def noNonSyntheticCompanionInsideNativeJSObject: Unit =
 
     // See #1891: The default parameter generates a synthetic companion object
     // The synthetic companion should be allowed, but it may not be expliclit
@@ -157,14 +147,13 @@ class JSInteropTest extends DirectTest with TestHelpers {
       @js.native class B(x: Int = ???) extends js.Object
     }
     """.succeeds
-  }
 
   @Test
-  def noScalaJSDefinedClassObjectInsideNativeJSObject: Unit = {
+  def noScalaJSDefinedClassObjectInsideNativeJSObject: Unit =
 
-    for {
+    for
       inner <- Seq("class", "object")
-    } yield {
+    yield
       s"""
       @js.native
       object A extends js.Object {
@@ -175,11 +164,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |        @ScalaJSDefined $inner A extends js.Object
         |                        ${" " * inner.length} ^
       """
-    }
-  }
 
   @Test
-  def noBadSetters: Unit = {
+  def noBadSetters: Unit =
 
     """
     @js.native
@@ -203,10 +190,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      def hoo_=(x: Int = 1): Unit = js.native
       |          ^
     """
-  }
 
   @Test
-  def noBadBracketCall: Unit = {
+  def noBadBracketCall: Unit =
 
     """
     @js.native
@@ -219,10 +205,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      def foo(): Int = js.native
       |          ^
     """
-  }
 
   @Test
-  def onlyJSRawTraits: Unit = {
+  def onlyJSRawTraits: Unit =
 
     """
     trait A
@@ -242,10 +227,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    class B extends js.Object with Serializable
       |          ^
     """
-  }
 
   @Test
-  def noCaseClassObject: Unit = {
+  def noCaseClassObject: Unit =
 
     """
     @js.native
@@ -282,19 +266,18 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    case object B extends js.Object
       |                ^
     """
-  }
 
   @Test
-  def notNested: Unit = {
+  def notNested: Unit =
 
     val outers = List("class", "trait")
     val inners = List("trait", "class", "object")
 
-    for {
+    for
       outer <- outers
       inner <- inners
       outerSJSDefined <- Seq(false, true)
-    } yield {
+    yield
       val outerLine =
         if (outerSJSDefined) s"@ScalaJSDefined $outer A extends js.Object"
         else s"$outer A"
@@ -311,11 +294,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |        $inner Inner extends js.Object
         |         ${" " * inner.length}^
       """
-    }
-  }
 
   @Test
-  def noGlobalScopeClass: Unit = {
+  def noGlobalScopeClass: Unit =
 
     """
     @js.native
@@ -361,10 +342,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    object A extends js.Object with js.GlobalScope
       |           ^
     """
-  }
 
   @Test
-  def noLocalClass: Unit = {
+  def noLocalClass: Unit =
 
     """
     object A {
@@ -378,10 +358,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |        class B extends js.Object
       |              ^
     """
-  }
 
   @Test
-  def noLocalObject: Unit = {
+  def noLocalObject: Unit =
 
     """
     object A {
@@ -395,10 +374,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |        object B extends js.Object
       |               ^
     """
-  }
 
   @Test
-  def noNativeInJSAny: Unit = {
+  def noNativeInJSAny: Unit =
 
     """
     @js.native
@@ -411,10 +389,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      def value: Int = js.native
       |          ^
     """
-  }
 
   @Test
-  def warnJSAnyBody: Unit = {
+  def warnJSAnyBody: Unit =
 
     """
     @js.native
@@ -430,10 +407,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      val x: Int = ???
       |                   ^
     """
-  }
 
   @Test
-  def noWarnJSAnyDeferred: Unit = {
+  def noWarnJSAnyDeferred: Unit =
 
     """
     @js.native
@@ -450,10 +426,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       val x: Int
     }
     """.hasNoWarns
-  }
 
   @Test
-  def noCallSecondaryCtor: Unit = {
+  def noCallSecondaryCtor: Unit =
 
     """
     @js.native
@@ -466,10 +441,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      def this() = this(7)
       |          ^
     """
-  }
 
   @Test
-  def noUseJsNative: Unit = {
+  def noUseJsNative: Unit =
 
     """
     class A {
@@ -480,10 +454,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      def foo = js.native
       |                   ^
     """
-  }
 
   @Test
-  def warnNothingRaw: Unit = {
+  def warnNothingRaw: Unit =
 
     """
     @js.native
@@ -499,10 +472,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |      val bar = js.native
       |          ^
     """
-  }
 
   @Test
-  def noNativeClassObjectWithoutJSNameInsideScalaObject: Unit = {
+  def noNativeClassObjectWithoutJSNameInsideScalaObject: Unit =
 
     """
     object A {
@@ -555,14 +527,13 @@ class JSInteropTest extends DirectTest with TestHelpers {
       object D extends js.Object
     }
     """.hasNoWarns
-  }
 
   @Test
-  def noNativeClassObjectInsideScalaJSDefinedObject: Unit = {
+  def noNativeClassObjectInsideScalaJSDefinedObject: Unit =
 
-    for {
+    for
       inner <- Seq("class", "object")
-    } {
+    
       s"""
       @ScalaJSDefined
       object A extends js.Object {
@@ -574,11 +545,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
         |        $inner B extends js.Object
         |        ${" " * inner.length} ^
       """
-    }
-  }
 
   @Test
-  def noNonLiteralJSName: Unit = {
+  def noNonLiteralJSName: Unit =
 
     """
     import js.annotation.JSName
@@ -624,10 +593,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    @JSName(A.a)
       |     ^
     """
-  }
 
   @Test
-  def noApplyProperty: Unit = {
+  def noApplyProperty: Unit =
 
     // def apply
 
@@ -697,10 +665,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       var apply: Int = js.native
     }
     """.succeeds
-  }
 
   @Test
-  def scalaJSDefinedJSNameOverrideWarnings: Unit = {
+  def scalaJSDefinedJSNameOverrideWarnings: Unit =
     """
     @ScalaJSDefined
     abstract class A extends js.Object {
@@ -1046,10 +1013,9 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    abstract class C extends A with B
       |                   ^
     """
-  }
 
   @Test
-  def noDefaultConstructorArgsIfModuleIsJSNative: Unit = {
+  def noDefaultConstructorArgsIfModuleIsJSNative: Unit =
     """
     @ScalaJSDefined
     class A(x: Int = 1) extends js.Object
@@ -1070,5 +1036,3 @@ class JSInteropTest extends DirectTest with TestHelpers {
       |    class A(x: Int = 1)
       |          ^
     """
-  }
-}

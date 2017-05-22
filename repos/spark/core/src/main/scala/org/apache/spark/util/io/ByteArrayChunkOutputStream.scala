@@ -27,7 +27,7 @@ import scala.collection.mutable.ArrayBuffer
   * @param chunkSize size of each chunk, in bytes.
   */
 private[spark] class ByteArrayChunkOutputStream(chunkSize: Int)
-    extends OutputStream {
+    extends OutputStream
 
   private val chunks = new ArrayBuffer[Array[Byte]]
 
@@ -42,54 +42,44 @@ private[spark] class ByteArrayChunkOutputStream(chunkSize: Int)
     */
   private var position = chunkSize
 
-  override def write(b: Int): Unit = {
+  override def write(b: Int): Unit =
     allocateNewChunkIfNeeded()
     chunks(lastChunkIndex)(position) = b.toByte
     position += 1
-  }
 
-  override def write(bytes: Array[Byte], off: Int, len: Int): Unit = {
+  override def write(bytes: Array[Byte], off: Int, len: Int): Unit =
     var written = 0
-    while (written < len) {
+    while (written < len)
       allocateNewChunkIfNeeded()
       val thisBatch = math.min(chunkSize - position, len - written)
       System.arraycopy(
           bytes, written + off, chunks(lastChunkIndex), position, thisBatch)
       written += thisBatch
       position += thisBatch
-    }
-  }
 
   @inline
-  private def allocateNewChunkIfNeeded(): Unit = {
-    if (position == chunkSize) {
+  private def allocateNewChunkIfNeeded(): Unit =
+    if (position == chunkSize)
       chunks += new Array[Byte](chunkSize)
       lastChunkIndex += 1
       position = 0
-    }
-  }
 
-  def toArrays: Array[Array[Byte]] = {
-    if (lastChunkIndex == -1) {
+  def toArrays: Array[Array[Byte]] =
+    if (lastChunkIndex == -1)
       new Array[Array[Byte]](0)
-    } else {
+    else
       // Copy the first n-1 chunks to the output, and then create an array that fits the last chunk.
       // An alternative would have been returning an array of ByteBuffers, with the last buffer
       // bounded to only the last chunk's position. However, given our use case in Spark (to put
       // the chunks in block manager), only limiting the view bound of the buffer would still
       // require the block manager to store the whole chunk.
       val ret = new Array[Array[Byte]](chunks.size)
-      for (i <- 0 until chunks.size - 1) {
+      for (i <- 0 until chunks.size - 1)
         ret(i) = chunks(i)
-      }
-      if (position == chunkSize) {
+      if (position == chunkSize)
         ret(lastChunkIndex) = chunks(lastChunkIndex)
-      } else {
+      else
         ret(lastChunkIndex) = new Array[Byte](position)
         System.arraycopy(
             chunks(lastChunkIndex), 0, ret(lastChunkIndex), 0, position)
-      }
       ret
-    }
-  }
-}

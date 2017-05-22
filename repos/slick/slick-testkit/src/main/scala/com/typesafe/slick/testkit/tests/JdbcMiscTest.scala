@@ -4,20 +4,18 @@ import com.typesafe.slick.testkit.util.{JdbcTestDB, AsyncTest}
 
 import slick.jdbc.{ResultSetHoldability, ResultSetConcurrency, ResultSetType, JdbcBackend}
 
-class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
+class JdbcMiscTest extends AsyncTest[JdbcTestDB]
   import tdb.profile.api._
 
-  def testNullability = {
-    class T1(tag: Tag) extends Table[String](tag, "t1") {
+  def testNullability =
+    class T1(tag: Tag) extends Table[String](tag, "t1")
       def a = column[String]("a", O.PrimaryKey)
       def * = a
-    }
     val t1 = TableQuery[T1]
 
-    class T3(tag: Tag) extends Table[Option[String]](tag, "t3") {
+    class T3(tag: Tag) extends Table[Option[String]](tag, "t3")
       def a = column[Option[String]]("a")
       def * = a
-    }
     val t3 = TableQuery[T3]
 
     seq(
@@ -27,18 +25,15 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
         t3 += None,
         (t1 += null.asInstanceOf[String]).failed
     )
-  }
 
-  def testSimpleDBIO = {
+  def testSimpleDBIO =
     val getAutoCommit = SimpleDBIO[Boolean](_.connection.getAutoCommit)
     getAutoCommit.map(_ shouldBe true)
-  }
 
-  def testStatementParameters = {
+  def testStatementParameters =
     def check(sp: JdbcBackend.StatementParameters) =
-      GetStatementParameters.map { csp =>
+      GetStatementParameters.map  csp =>
         csp shouldBe sp
-      }
 
     DBIO.seq(
         check(
@@ -78,13 +73,11 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
                                             null,
                                             0))
     )
-  }
 
-  def testOverrideStatements = {
-    class T(tag: Tag) extends Table[Int](tag, u"t") {
+  def testOverrideStatements =
+    class T(tag: Tag) extends Table[Int](tag, u"t")
       def id = column[Int]("a")
       def * = id
-    }
     val t = TableQuery[T]
 
     val a1 = t.filter(_.id === 1)
@@ -102,5 +95,3 @@ class JdbcMiscTest extends AsyncTest[JdbcTestDB] {
           .overrideStatements(a2.result.head.statements)
           .map(_ shouldBe 2)
       )
-  }
-}

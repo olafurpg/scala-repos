@@ -12,7 +12,7 @@ import akka.http.scaladsl.model.ws.{WebSocketRequest ⇒ ScalaWebSocketRequest}
   * for a target URI and then use `addHeader` or `requestSubprotocol` to set optional
   * details.
   */
-abstract class WebSocketRequest {
+abstract class WebSocketRequest
 
   /**
     * Return a copy of this request that contains the given additional header.
@@ -26,8 +26,7 @@ abstract class WebSocketRequest {
   def requestSubprotocol(subprotocol: String): WebSocketRequest
 
   def asScala: ScalaWebSocketRequest
-}
-object WebSocketRequest {
+object WebSocketRequest
   import akka.http.impl.util.JavaMapping.Implicits._
 
   /**
@@ -48,7 +47,7 @@ object WebSocketRequest {
     * Wraps a Scala version of WebSocketRequest.
     */
   def wrap(scalaRequest: ScalaWebSocketRequest): WebSocketRequest =
-    new WebSocketRequest {
+    new WebSocketRequest
       def addHeader(header: HttpHeader): WebSocketRequest =
         transform(s ⇒ s.copy(extraHeaders = s.extraHeaders :+ header.asScala))
       def requestSubprotocol(subprotocol: String): WebSocketRequest =
@@ -59,5 +58,3 @@ object WebSocketRequest {
       def transform(
           f: ScalaWebSocketRequest ⇒ ScalaWebSocketRequest): WebSocketRequest =
         wrap(f(asScala))
-    }
-}

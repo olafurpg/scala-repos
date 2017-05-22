@@ -13,9 +13,8 @@ import akka.actor.SupervisorStrategy
 import akka.dispatch.Dispatchers
 import akka.actor.ActorSystem
 
-object SmallestMailboxRoutingLogic {
+object SmallestMailboxRoutingLogic
   def apply(): SmallestMailboxRoutingLogic = new SmallestMailboxRoutingLogic
-}
 
 /**
   * Tries to send to the non-suspended routee with fewest messages in mailbox.
@@ -29,7 +28,7 @@ object SmallestMailboxRoutingLogic {
   * </ul>
   */
 @SerialVersionUID(1L)
-class SmallestMailboxRoutingLogic extends RoutingLogic {
+class SmallestMailboxRoutingLogic extends RoutingLogic
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
@@ -50,40 +49,36 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
                                   proposedTarget: Routee = NoRoutee,
                                   currentScore: Long = Long.MaxValue,
                                   at: Int = 0,
-                                  deep: Boolean = false): Routee = {
+                                  deep: Boolean = false): Routee =
     if (targets.isEmpty) NoRoutee
-    else if (at >= targets.size) {
-      if (deep) {
+    else if (at >= targets.size)
+      if (deep)
         if (isTerminated(proposedTarget))
           targets(ThreadLocalRandom.current.nextInt(targets.size))
         else proposedTarget
-      } else selectNext(targets, proposedTarget, currentScore, 0, deep = true)
-    } else {
+      else selectNext(targets, proposedTarget, currentScore, 0, deep = true)
+    else
       val target = targets(at)
       val newScore: Long =
         if (isSuspended(target)) Long.MaxValue - 1
-        else {
+        else
           //Just about better than the DeadLetters
           (if (isProcessingMessage(target)) 1l else 0l) +
           (if (!hasMessages(target)) 0l
-           else {
+           else
              //Race between hasMessages and numberOfMessages here, unfortunate the numberOfMessages returns 0 if unknown
              val noOfMsgs: Long = if (deep) numberOfMessages(target) else 0
              if (noOfMsgs > 0) noOfMsgs else Long.MaxValue - 3 //Just better than a suspended actorref
-           })
-        }
+           )
 
       if (newScore == 0) target
       else if (newScore < 0 || newScore >= currentScore)
         selectNext(targets, proposedTarget, currentScore, at + 1, deep)
       else selectNext(targets, target, newScore, at + 1, deep)
-    }
-  }
 
-  protected def isTerminated(a: Routee): Boolean = a match {
+  protected def isTerminated(a: Routee): Boolean = a match
     case ActorRefRoutee(ref) ⇒ ref.isTerminated
     case _ ⇒ false
-  }
 
   /**
     * Returns true if the actor is currently processing a message.
@@ -91,15 +86,13 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
     * Method is exposed to subclasses to be able to implement custom
     * routers based on mailbox and actor internal state.
     */
-  protected def isProcessingMessage(a: Routee): Boolean = a match {
+  protected def isProcessingMessage(a: Routee): Boolean = a match
     case ActorRefRoutee(x: ActorRefWithCell) ⇒
-      x.underlying match {
+      x.underlying match
         case cell: ActorCell ⇒
           cell.mailbox.isScheduled && cell.currentMessage != null
         case _ ⇒ false
-      }
     case _ ⇒ false
-  }
 
   /**
     * Returns true if the actor currently has any pending messages
@@ -108,10 +101,9 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
     * Method is exposed to subclasses to be able to implement custom
     * routers based on mailbox and actor internal state.
     */
-  protected def hasMessages(a: Routee): Boolean = a match {
+  protected def hasMessages(a: Routee): Boolean = a match
     case ActorRefRoutee(x: ActorRefWithCell) ⇒ x.underlying.hasMessages
     case _ ⇒ false
-  }
 
   /**
     * Returns true if the actor is currently suspended.
@@ -119,14 +111,12 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
     * Method is exposed to subclasses to be able to implement custom
     * routers based on mailbox and actor internal state.
     */
-  protected def isSuspended(a: Routee): Boolean = a match {
+  protected def isSuspended(a: Routee): Boolean = a match
     case ActorRefRoutee(x: ActorRefWithCell) ⇒
-      x.underlying match {
+      x.underlying match
         case cell: ActorCell ⇒ cell.mailbox.isSuspended
         case _ ⇒ true
-      }
     case _ ⇒ false
-  }
 
   /**
     * Returns the number of pending messages in the mailbox of the actor.
@@ -134,11 +124,9 @@ class SmallestMailboxRoutingLogic extends RoutingLogic {
     * Method is exposed to subclasses to be able to implement custom
     * routers based on mailbox and actor internal state.
     */
-  protected def numberOfMessages(a: Routee): Int = a match {
+  protected def numberOfMessages(a: Routee): Int = a match
     case ActorRefRoutee(x: ActorRefWithCell) ⇒ x.underlying.numberOfMessages
     case _ ⇒ 0
-  }
-}
 
 /**
   * A router pool that tries to send to the non-suspended routee with fewest messages in mailbox.
@@ -185,7 +173,7 @@ final case class SmallestMailboxPool(
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[SmallestMailboxPool] {
+    extends Pool with PoolOverrideUnsetConfig[SmallestMailboxPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -230,4 +218,3 @@ final case class SmallestMailboxPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}

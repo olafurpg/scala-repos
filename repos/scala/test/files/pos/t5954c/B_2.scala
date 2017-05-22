@@ -1,4 +1,4 @@
-package object A {
+package object A
   // these used to should be prevented by the implementation restriction
   // but are now allowed
   class B
@@ -15,4 +15,3 @@ package object A {
   type j = String
   class K(val k: Int) extends AnyVal
   implicit class L(val l: Int)
-}

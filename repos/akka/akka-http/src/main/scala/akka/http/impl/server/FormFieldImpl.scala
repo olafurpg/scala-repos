@@ -23,31 +23,26 @@ private[http] class FormFieldImpl[T, U](receptacle: NameReceptacle[T])(
     implicit fu: FromStrictFormFieldUnmarshaller[T],
     tTag: ClassTag[U],
     conv: T ⇒ U)
-    extends StandaloneExtractionImpl[U] with FormField[U] {
+    extends StandaloneExtractionImpl[U] with FormField[U]
   import Directives._
 
   def directive: Directive1[U] =
-    extractMaterializer.flatMap { implicit fm ⇒
+    extractMaterializer.flatMap  implicit fm ⇒
       formField(receptacle).map(conv)
-    }
 
   def optional: RequestVal[Optional[U]] =
-    new StandaloneExtractionImpl[Optional[U]] {
+    new StandaloneExtractionImpl[Optional[U]]
       def directive: Directive1[Optional[U]] = optionalDirective
-    }
 
   private def optionalDirective: Directive1[Optional[U]] =
-    extractMaterializer.flatMap { implicit fm ⇒
+    extractMaterializer.flatMap  implicit fm ⇒
       formField(receptacle.?).map(v ⇒ v.map(conv).asJava)
-    }
 
   def withDefault(defaultValue: U): RequestVal[U] =
-    new StandaloneExtractionImpl[U] {
+    new StandaloneExtractionImpl[U]
       def directive: Directive1[U] =
         optionalDirective.map(_.orElse(defaultValue))
-    }
-}
-object FormFieldImpl {
+object FormFieldImpl
   def apply[T, U](receptacle: NameReceptacle[T])(
       implicit fu: FromStrictFormFieldUnmarshaller[T],
       tTag: ClassTag[U],
@@ -58,4 +53,3 @@ object FormFieldImpl {
       implicit tTag: ClassTag[U], conv: T ⇒ U): FormField[U] =
     apply(new NameReceptacle[T](receptacle.name))(
         StrictForm.Field.unmarshallerFromFSU(receptacle.um), tTag, conv)
-}

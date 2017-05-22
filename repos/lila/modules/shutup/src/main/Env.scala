@@ -10,12 +10,11 @@ final class Env(config: Config,
                 reporter: akka.actor.ActorSelection,
                 follows: (String, String) => Fu[Boolean],
                 system: ActorSystem,
-                db: lila.db.Env) {
+                db: lila.db.Env)
 
-  private val settings = new {
+  private val settings = new
     val CollectionShutup = config getString "collection.shutup"
     val ActorName = config getString "actor.name"
-  }
   import settings._
 
   lazy val api = new ShutupApi(
@@ -24,9 +23,9 @@ final class Env(config: Config,
   private lazy val coll = db(CollectionShutup)
 
   // api actor
-  system.actorOf(Props(new Actor {
+  system.actorOf(Props(new Actor
     import lila.hub.actorApi.shutup._
-    def receive = {
+    def receive =
       case RecordPublicForumMessage(userId, text) =>
         api.publicForumMessage(userId, text)
       case RecordTeamForumMessage(userId, text) =>
@@ -37,11 +36,9 @@ final class Env(config: Config,
         api.privateChat(chatId, userId, text)
       case RecordPublicChat(chatId, userId, text) =>
         api.publicChat(chatId, userId, text)
-    }
-  }), name = ActorName)
-}
+  ), name = ActorName)
 
-object Env {
+object Env
 
   lazy val current: Env =
     "shutup" boot new Env(
@@ -50,4 +47,3 @@ object Env {
         system = lila.common.PlayApp.system,
         follows = lila.relation.Env.current.api.fetchFollows _,
         db = lila.db.Env.current)
-}

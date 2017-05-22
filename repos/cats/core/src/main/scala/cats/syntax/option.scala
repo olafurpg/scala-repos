@@ -3,15 +3,14 @@ package syntax
 
 import cats.data.{Xor, Validated, ValidatedNel}
 
-trait OptionSyntax {
+trait OptionSyntax
   final def none[A] = Option.empty[A]
   implicit final def optionIdSyntax[A](a: A): OptionIdOps[A] =
     new OptionIdOps(a)
   implicit final def optionSyntax[A](oa: Option[A]): OptionOps[A] =
     new OptionOps(oa)
-}
 
-final class OptionIdOps[A](val a: A) extends AnyVal {
+final class OptionIdOps[A](val a: A) extends AnyVal
 
   /**
     * Wrap a value in `Some`.
@@ -27,9 +26,8 @@ final class OptionIdOps[A](val a: A) extends AnyVal {
     * }}}
     */
   def some: Option[A] = Some(a)
-}
 
-final class OptionOps[A](val oa: Option[A]) extends AnyVal {
+final class OptionOps[A](val oa: Option[A]) extends AnyVal
 
   /**
     * If the `Option` is a `Some`, return its value in a [[cats.data.Xor.Left]].
@@ -183,4 +181,3 @@ final class OptionOps[A](val oa: Option[A]) extends AnyVal {
     * }}}
     */
   def orEmpty(implicit A: Monoid[A]): A = oa.getOrElse(A.empty)
-}

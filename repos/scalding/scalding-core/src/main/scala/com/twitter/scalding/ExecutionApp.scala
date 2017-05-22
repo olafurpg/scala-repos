@@ -29,7 +29,7 @@ case class NonHadoopArgs(toArray: Array[String])
  * Make an object that extend this trait, and you can run
  * it as a normal java application.
  */
-object ExecutionApp {
+object ExecutionApp
   /*
    * Anything that looks like hadoop args, use
    * the hadoop arg parser, otherwise, scalding.
@@ -40,14 +40,14 @@ object ExecutionApp {
   private[this] val hadoopReservedArgs = List(
       "-fs", "-jt", "-files", "-libjars", "-archives")
 
-  def extractUserHadoopArgs(args: Array[String]): (HadoopArgs, NonHadoopArgs) = {
+  def extractUserHadoopArgs(args: Array[String]): (HadoopArgs, NonHadoopArgs) =
 
     val argsWithLibJars = ExpandLibJarsGlobs(args)
 
     // This adds a look back mechanism to match on other hadoop args we need to support
     // currently thats just libjars
     val (hadoopArgs, tmpNonHadoop, finalLast) = argsWithLibJars.foldLeft(
-        Array[String](), Array[String](), Option.empty[String]) {
+        Array[String](), Array[String](), Option.empty[String])
       // Current is a -D, so store the last in non hadoop, and add current to hadoop args
       case ((hadoopArgs, nonHadoop, Some(l)), current)
           if dArgPattern.findFirstIn(current).isDefined =>
@@ -66,12 +66,10 @@ object ExecutionApp {
       // Have no last, and nothing matches. So just store current in the last spot
       case ((hadoopArgs, nonHadoop, None), current) =>
         (hadoopArgs, nonHadoop, Some(current))
-    }
     // We can have something left in the last bucket, so extract it.
-    val nonHadoop = finalLast match {
+    val nonHadoop = finalLast match
       case Some(x) => tmpNonHadoop :+ x
       case None => tmpNonHadoop
-    }
 
     // Throwaway hadoop config
     // see which of our hadoop config args are not ones
@@ -80,10 +78,8 @@ object ExecutionApp {
 
     (HadoopArgs(hadoopArgs.filter(!unparsed.contains(_))),
      NonHadoopArgs(nonHadoop ++ unparsed))
-  }
-}
 
-trait ExecutionApp extends java.io.Serializable {
+trait ExecutionApp extends java.io.Serializable
   def job: Execution[Unit]
 
   /**
@@ -93,7 +89,7 @@ trait ExecutionApp extends java.io.Serializable {
     * and put them into the config. Any unparsed hadoop
     * arguments are put into the Args.
     */
-  def config(inputArgs: Array[String]): (Config, Mode) = {
+  def config(inputArgs: Array[String]): (Config, Mode) =
     /*
      * Anything that looks like hadoop args, use
      * the hadoop arg parser, otherwise, scalding.
@@ -114,11 +110,7 @@ trait ExecutionApp extends java.io.Serializable {
     config.toMap.foreach { case (k, v) => hconf.set(k, v) }
 
     (config, mode)
-  }
 
-  def main(args: Array[String]) {
-    config(args) match {
+  def main(args: Array[String])
+    config(args) match
       case (conf, mode) => job.waitFor(conf, mode).get
-    }
-  }
-}

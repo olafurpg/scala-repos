@@ -17,24 +17,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlock, ScBlockStatement}
 /**
   * @author yole
   */
-class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
-  def canSelect(e: PsiElement) = {
-    e match {
+class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase
+  def canSelect(e: PsiElement) =
+    e match
       case _: ScBlockStatement => true
       case _: PsiComment => true
       case _ => false
-    }
-  }
 
   override def select(e: PsiElement,
                       editorText: CharSequence,
                       cursorOffset: Int,
-                      editor: Editor): java.util.List[TextRange] = {
+                      editor: Editor): java.util.List[TextRange] =
     val parent: PsiElement = e.getParent
 
-    if (!parent.isInstanceOf[ScBlock]) {
+    if (!parent.isInstanceOf[ScBlock])
       return new util.ArrayList[TextRange]
-    }
 
     def back(e: PsiElement) = e.getPrevSibling
     def forward(e: PsiElement) = e.getNextSibling
@@ -47,37 +44,28 @@ class ScalaStatementGroupSelectioner extends ExtendWordSelectionHandlerBase {
         startElement.getTextRange.getStartOffset,
         endElement.getTextRange.getEndOffset)
     ExtendWordSelectionHandlerBase.expandToWholeLine(editorText, range)
-  }
 
   def findGroupBoundary(startElement: PsiElement,
                         step: PsiElement => PsiElement,
-                        stopAt: IElementType): PsiElement = {
+                        stopAt: IElementType): PsiElement =
     var current: PsiElement = startElement
-    while (step(current) != null) {
+    while (step(current) != null)
       val sibling: PsiElement = step(current)
-      sibling match {
+      sibling match
         case leaf: LeafPsiElement =>
           if (leaf.getElementType == stopAt) return current
-          if (ScalaPsiUtil.isLineTerminator(leaf)) {
+          if (ScalaPsiUtil.isLineTerminator(leaf))
             val strings: Array[String] =
               LineTokenizer.tokenize(leaf.getText.toCharArray, false)
-            if (strings.length > 2) {
+            if (strings.length > 2)
               return current
-            }
-          }
         case _ =>
-      }
       current = sibling
-    }
     current
-  }
 
   def skipWhitespace(
-      start: PsiElement, step: PsiElement => PsiElement): PsiElement = {
+      start: PsiElement, step: PsiElement => PsiElement): PsiElement =
     var current = start
-    while (current.isInstanceOf[PsiWhiteSpace]) {
+    while (current.isInstanceOf[PsiWhiteSpace])
       current = step(current)
-    }
     current
-  }
-}

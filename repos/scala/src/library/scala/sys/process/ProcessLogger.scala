@@ -32,7 +32,7 @@ import java.io._
   *
   *  @see [[scala.sys.process.ProcessBuilder]]
   */
-trait ProcessLogger {
+trait ProcessLogger
 
   /** Will be called with each line read from the process output stream.
     */
@@ -53,11 +53,10 @@ trait ProcessLogger {
     *  unbuffered.
     */
   def buffer[T](f: => T): T
-}
 
 /** A [[scala.sys.process.ProcessLogger]] that writes output to a file. */
 class FileProcessLogger(file: File)
-    extends ProcessLogger with Closeable with Flushable {
+    extends ProcessLogger with Closeable with Flushable
   private val writer = (new PrintWriter(
       new BufferedWriter(
           new OutputStreamWriter(
@@ -70,13 +69,12 @@ class FileProcessLogger(file: File)
   def buffer[T](f: => T): T = f
   def close(): Unit = writer.close()
   def flush(): Unit = writer.flush()
-}
 
 /** Provides factories to create [[scala.sys.process.ProcessLogger]], which
   *  are used to capture output of [[scala.sys.process.ProcessBuilder]] commands
   *  when run.
   */
-object ProcessLogger {
+object ProcessLogger
 
   /** Creates a [[scala.sys.process.ProcessLogger]] that redirects output to a `java.io.File`. */
   def apply(file: File): FileProcessLogger = new FileProcessLogger(file)
@@ -94,9 +92,7 @@ object ProcessLogger {
     *  @param ferr  This function will receive standard error.
     */
   def apply(fout: String => Unit, ferr: String => Unit): ProcessLogger =
-    new ProcessLogger {
+    new ProcessLogger
       def out(s: => String): Unit = fout(s)
       def err(s: => String): Unit = ferr(s)
       def buffer[T](f: => T): T = f
-    }
-}

@@ -25,7 +25,7 @@ import java.util.Date
   * Implement this trait to specify a set of rules to parse and format dates
   * @author nafg 
   */
-trait DateTimeConverter {
+trait DateTimeConverter
 
   /**
     * A function to format a Date as a date and time
@@ -56,12 +56,11 @@ trait DateTimeConverter {
     * A function that parses a String representing a time into a Date.
     */
   def parseTime(s: String): Box[Date]
-}
 
 /**
   * A default implementation of DateTimeConverter that uses (Time)Helpers
   */
-object DefaultDateTimeConverter extends DateTimeConverter {
+object DefaultDateTimeConverter extends DateTimeConverter
   def formatDateTime(d: Date) = internetDateFormat.format(d)
   def formatDate(d: Date) = dateFormat.format(d)
 
@@ -72,7 +71,5 @@ object DefaultDateTimeConverter extends DateTimeConverter {
   def parseDate(s: String) = tryo { dateFormat.parse(s) }
 
   /** Tries Helpers.hourFormat and Helpers.timeFormat */
-  def parseTime(s: String) = tryo { hourFormat.parse(s) } or tryo {
+  def parseTime(s: String) = tryo { hourFormat.parse(s) } or tryo
     timeFormat.parse(s)
-  }
-}

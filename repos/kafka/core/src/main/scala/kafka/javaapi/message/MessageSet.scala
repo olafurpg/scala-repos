@@ -25,7 +25,7 @@ import kafka.message.{MessageAndOffset, InvalidMessageException}
   * 4 byte size containing an integer N
   * N message bytes as described in the message class
   */
-abstract class MessageSet extends java.lang.Iterable[MessageAndOffset] {
+abstract class MessageSet extends java.lang.Iterable[MessageAndOffset]
 
   /**
     * Provides an iterator over the messages in this set
@@ -41,11 +41,8 @@ abstract class MessageSet extends java.lang.Iterable[MessageAndOffset] {
     * Validate the checksum of all the messages in the set. Throws an InvalidMessageException if the checksum doesn't
     * match the payload for any message.
     */
-  def validate(): Unit = {
+  def validate(): Unit =
     val thisIterator = this.iterator
-    while (thisIterator.hasNext) {
+    while (thisIterator.hasNext)
       val messageAndOffset = thisIterator.next
       if (!messageAndOffset.message.isValid) throw new InvalidMessageException
-    }
-  }
-}

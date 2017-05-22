@@ -15,15 +15,15 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.util.control.NoStackTrace
 import scala.concurrent.duration._
 
-class FlowWatchTerminationSpec extends AkkaSpec {
+class FlowWatchTerminationSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "A WatchTermination" must {
+  "A WatchTermination" must
 
-    "complete future when stream is completed" in assertAllStagesStopped {
+    "complete future when stream is completed" in assertAllStagesStopped
       val (future, p) = Source(1 to 4)
         .watchTermination()(Keep.right)
         .toMat(TestSink.probe[Int])(Keep.both)
@@ -31,18 +31,16 @@ class FlowWatchTerminationSpec extends AkkaSpec {
       p.request(4).expectNext(1, 2, 3, 4)
       future.futureValue should ===(Done)
       p.expectComplete()
-    }
 
-    "complete future when stream is cancelled from downstream" in assertAllStagesStopped {
+    "complete future when stream is cancelled from downstream" in assertAllStagesStopped
       val (future, p) = Source(1 to 4)
         .watchTermination()(Keep.right)
         .toMat(TestSink.probe[Int])(Keep.both)
         .run()
       p.request(3).expectNext(1, 2, 3).cancel()
       future.futureValue should ===(Done)
-    }
 
-    "fail future when stream is failed" in assertAllStagesStopped {
+    "fail future when stream is failed" in assertAllStagesStopped
       val ex = new RuntimeException("Stream failed.") with NoStackTrace
       val (p, future) = TestSource
         .probe[Int]
@@ -52,9 +50,8 @@ class FlowWatchTerminationSpec extends AkkaSpec {
       p.sendNext(1)
       p.sendError(ex)
       whenReady(future.failed) { _ shouldBe (ex) }
-    }
 
-    "complete the future for an empty stream" in assertAllStagesStopped {
+    "complete the future for an empty stream" in assertAllStagesStopped
       val (future, p) = Source
         .empty[Int]
         .watchTermination()(Keep.right)
@@ -62,9 +59,8 @@ class FlowWatchTerminationSpec extends AkkaSpec {
         .run()
       p.request(1)
       future.futureValue should ===(Done)
-    }
 
-    "complete future for graph" in assertAllStagesStopped {
+    "complete future for graph" in assertAllStagesStopped
       implicit val ec = system.dispatcher
 
       val ((sourceProbe, future), sinkProbe) = TestSource
@@ -83,6 +79,3 @@ class FlowWatchTerminationSpec extends AkkaSpec {
       expectMsg(Done)
 
       sinkProbe.expectNextN(2 to 5).expectComplete()
-    }
-  }
-}

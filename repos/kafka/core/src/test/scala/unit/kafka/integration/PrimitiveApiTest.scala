@@ -37,14 +37,14 @@ import java.util.Properties
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class PrimitiveApiTest
-    extends ProducerConsumerTestHarness with ZooKeeperTestHarness {
+    extends ProducerConsumerTestHarness with ZooKeeperTestHarness
   val requestHandlerLogger = Logger.getLogger(classOf[KafkaRequestHandler])
 
   def generateConfigs() =
     List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
 
   @Test
-  def testFetchRequestCanProperlySerialize() {
+  def testFetchRequestCanProperlySerialize()
     val request = new FetchRequestBuilder()
       .clientId("test-client")
       .maxWait(10001)
@@ -58,19 +58,17 @@ class PrimitiveApiTest
     serializedBuffer.rewind()
     val deserializedRequest = FetchRequest.readFrom(serializedBuffer)
     assertEquals(request, deserializedRequest)
-  }
 
   @Test
-  def testEmptyFetchRequest() {
+  def testEmptyFetchRequest()
     val partitionRequests =
       immutable.Map[TopicAndPartition, PartitionFetchInfo]()
     val request = new FetchRequest(requestInfo = partitionRequests)
     val fetched = consumer.fetch(request)
     assertTrue(!fetched.hasError && fetched.data.size == 0)
-  }
 
   @Test
-  def testDefaultEncoderProducerAndFetch() {
+  def testDefaultEncoderProducerAndFetch()
     val topic = "test-topic"
 
     producer.send(new KeyedMessage[String, String](topic, "test-message"))
@@ -96,10 +94,9 @@ class PrimitiveApiTest
     assertEquals(
         "test-message",
         TestUtils.readString(fetchedMessageAndOffset.message.payload, "UTF-8"))
-  }
 
   @Test
-  def testDefaultEncoderProducerAndFetchWithCompression() {
+  def testDefaultEncoderProducerAndFetchWithCompression()
     val topic = "test-topic"
     val props = new Properties()
     props.put("compression.codec", "gzip")
@@ -123,116 +120,99 @@ class PrimitiveApiTest
     assertEquals(
         "test-message",
         TestUtils.readString(fetchedMessageAndOffset.message.payload, "UTF-8"))
-  }
 
-  private def produceAndMultiFetch(producer: Producer[String, String]) {
+  private def produceAndMultiFetch(producer: Producer[String, String])
     for (topic <- List("test1", "test2", "test3", "test4")) TestUtils
       .createTopic(zkUtils, topic, servers = servers)
 
     // send some messages
     val topics = List(("test4", 0), ("test1", 0), ("test2", 0), ("test3", 0));
-    {
       val messages = new mutable.HashMap[String, Seq[String]]
       val builder = new FetchRequestBuilder()
-      for ((topic, partition) <- topics) {
+      for ((topic, partition) <- topics)
         val messageList = List("a_" + topic, "b_" + topic)
         val producerData =
           messageList.map(new KeyedMessage[String, String](topic, topic, _))
         messages += topic -> messageList
         producer.send(producerData: _*)
         builder.addFetch(topic, partition, 0, 10000)
-      }
 
       val request = builder.build()
       val response = consumer.fetch(request)
-      for ((topic, partition) <- topics) {
+      for ((topic, partition) <- topics)
         val fetched = response.messageSet(topic, partition)
         assertEquals(
             messages(topic),
             fetched.map(messageAndOffset =>
                   TestUtils.readString(messageAndOffset.message.payload)))
-      }
-    }
 
     // temporarily set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.FATAL)
 
-    {
       // send some invalid offsets
       val builder = new FetchRequestBuilder()
       for ((topic, partition) <- topics) builder.addFetch(
           topic, partition, -1, 10000)
 
-      try {
+      try
         val request = builder.build()
         val response = consumer.fetch(request)
         response.data.values
           .foreach(pdata => ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid offset")
-      } catch {
+      catch
         case e: OffsetOutOfRangeException => "this is good"
-      }
-    }
 
-    {
       // send some invalid partitions
       val builder = new FetchRequestBuilder()
       for ((topic, partition) <- topics) builder.addFetch(topic, -1, 0, 10000)
 
-      try {
+      try
         val request = builder.build()
         val response = consumer.fetch(request)
         response.data.values
           .foreach(pdata => ErrorMapping.maybeThrowException(pdata.error))
         fail("Expected exception when fetching message with invalid partition")
-      } catch {
+      catch
         case e: UnknownTopicOrPartitionException => "this is good"
-      }
-    }
 
     // restore set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.ERROR)
-  }
 
   @Test
-  def testProduceAndMultiFetch() {
+  def testProduceAndMultiFetch()
     produceAndMultiFetch(producer)
-  }
 
-  private def multiProduce(producer: Producer[String, String]) {
+  private def multiProduce(producer: Producer[String, String])
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
     topics.keys.map(
         topic => TestUtils.createTopic(zkUtils, topic, servers = servers))
 
     val messages = new mutable.HashMap[String, Seq[String]]
     val builder = new FetchRequestBuilder()
-    for ((topic, partition) <- topics) {
+    for ((topic, partition) <- topics)
       val messageList = List("a_" + topic, "b_" + topic)
       val producerData =
         messageList.map(new KeyedMessage[String, String](topic, topic, _))
       messages += topic -> messageList
       producer.send(producerData: _*)
       builder.addFetch(topic, partition, 0, 10000)
-    }
 
     val request = builder.build()
     val response = consumer.fetch(request)
-    for ((topic, partition) <- topics) {
+    for ((topic, partition) <- topics)
       val fetched = response.messageSet(topic, partition)
       assertEquals(
           messages(topic),
           fetched.map(messageAndOffset =>
                 TestUtils.readString(messageAndOffset.message.payload)))
-    }
-  }
 
   @Test
-  def testMultiProduce() {
+  def testMultiProduce()
     multiProduce(producer)
-  }
 
   @Test
-  def testConsumerEmptyTopic() {
+  def testConsumerEmptyTopic()
     val newTopic = "new-topic"
     TestUtils.createTopic(zkUtils,
                           newTopic,
@@ -243,10 +223,9 @@ class PrimitiveApiTest
     val fetchResponse = consumer.fetch(
         new FetchRequestBuilder().addFetch(newTopic, 0, 0, 10000).build())
     assertFalse(fetchResponse.messageSet(newTopic, 0).iterator.hasNext)
-  }
 
   @Test
-  def testPipelinedProduceRequests() {
+  def testPipelinedProduceRequests()
     val topics = Map("test4" -> 0, "test1" -> 0, "test2" -> 0, "test3" -> 0)
     topics.keys.map(
         topic => TestUtils.createTopic(zkUtils, topic, servers = servers))
@@ -263,96 +242,84 @@ class PrimitiveApiTest
     // send some messages
     val messages = new mutable.HashMap[String, Seq[String]]
     val builder = new FetchRequestBuilder()
-    for ((topic, partition) <- topics) {
+    for ((topic, partition) <- topics)
       val messageList = List("a_" + topic, "b_" + topic)
       val producerData =
         messageList.map(new KeyedMessage[String, String](topic, topic, _))
       messages += topic -> messageList
       pipelinedProducer.send(producerData: _*)
       builder.addFetch(topic, partition, 0, 10000)
-    }
 
     // wait until the messages are published
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.logManager
                                   .getLog(TopicAndPartition("test1", 0))
                                   .get
                                   .logEndOffset == 2
-                            },
+                            ,
                             "Published messages should be in the log")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.logManager
                                   .getLog(TopicAndPartition("test2", 0))
                                   .get
                                   .logEndOffset == 2
-                            },
+                            ,
                             "Published messages should be in the log")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.logManager
                                   .getLog(TopicAndPartition("test3", 0))
                                   .get
                                   .logEndOffset == 2
-                            },
+                            ,
                             "Published messages should be in the log")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.logManager
                                   .getLog(TopicAndPartition("test4", 0))
                                   .get
                                   .logEndOffset == 2
-                            },
+                            ,
                             "Published messages should be in the log")
 
     val replicaId = servers.head.config.brokerId
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.replicaManager
                                   .getReplica("test1", 0, replicaId)
                                   .get
                                   .highWatermark
                                   .messageOffset == 2
-                            },
+                            ,
                             "High watermark should equal to log end offset")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.replicaManager
                                   .getReplica("test2", 0, replicaId)
                                   .get
                                   .highWatermark
                                   .messageOffset == 2
-                            },
+                            ,
                             "High watermark should equal to log end offset")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.replicaManager
                                   .getReplica("test3", 0, replicaId)
                                   .get
                                   .highWatermark
                                   .messageOffset == 2
-                            },
+                            ,
                             "High watermark should equal to log end offset")
     TestUtils.waitUntilTrue(() =>
-                              {
                                 servers.head.replicaManager
                                   .getReplica("test4", 0, replicaId)
                                   .get
                                   .highWatermark
                                   .messageOffset == 2
-                            },
+                            ,
                             "High watermark should equal to log end offset")
 
     // test if the consumer received the messages in the correct order when producer has enabled request pipelining
     val request = builder.build()
     val response = consumer.fetch(request)
-    for ((topic, partition) <- topics) {
+    for ((topic, partition) <- topics)
       val fetched = response.messageSet(topic, partition)
       assertEquals(
           messages(topic),
           fetched.map(messageAndOffset =>
                 TestUtils.readString(messageAndOffset.message.payload)))
-    }
-  }
-}

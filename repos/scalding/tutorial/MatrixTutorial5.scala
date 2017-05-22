@@ -13,7 +13,7 @@ import com.twitter.scalding.mathematics.Matrix
  *
  */
 
-class ComputeJaccardJob(args: Args) extends Job(args) {
+class ComputeJaccardJob(args: Args) extends Job(args)
 
   import Matrix._
 
@@ -38,4 +38,3 @@ class ComputeJaccardJob(args: Args) extends Job(args) {
     .zip(unionMat)
     .mapValues(pair => pair._1 / pair._2)
     .write(Tsv(args("output")))
-}

@@ -5,7 +5,7 @@
 
 package scala.tools
 
-package object nsc {
+package object nsc
   type Mode = scala.reflect.internal.Mode
   val Mode = scala.reflect.internal.Mode
 
@@ -25,4 +25,3 @@ package object nsc {
 
   @deprecated("Use scala.reflect.internal.util.ListOfNil", "2.11.0")
   lazy val ListOfNil = scala.reflect.internal.util.ListOfNil
-}

@@ -1,22 +1,15 @@
 package trials
-object crashing {
-  trait C {
-    abstract class T[A] {
+object crashing
+  trait C
+    abstract class T[A]
       def f[Z](a: T[Z]): T[A]
-    }
-  }
-  abstract class Thing {
-    val c = new C {
-      class T[A](a: A) {
+  abstract class Thing
+    val c = new C
+      class T[A](a: A)
         def f[Z](t: T[Z]) = new T(a)
-      }
-    }
-    val x1 = {
+    val x1 =
       class C[T] { val x: T }
       new C[String]
-    }
-  }
-}
 /*
 
 Infinite loop in Typer.addLocals. Printing all calls to it:

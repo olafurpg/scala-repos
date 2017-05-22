@@ -24,17 +24,14 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 
 class MulticlassClassificationEvaluatorSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new MulticlassClassificationEvaluator)
-  }
 
-  test("read/write") {
+  test("read/write")
     val evaluator = new MulticlassClassificationEvaluator()
       .setPredictionCol("myPrediction")
       .setLabelCol("myLabel")
       .setMetricName("recall")
     testDefaultReadWrite(evaluator)
-  }
-}

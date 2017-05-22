@@ -8,27 +8,24 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * 4/24/13
   */
 class SimplifyBooleanInspectionTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
   val s = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
   val annotation = "Simplify boolean expression"
 
-  private def check(text: String) {
+  private def check(text: String)
     checkTextHasError(text, annotation, classOf[SimplifyBooleanInspection])
-  }
 
-  private def testFix(text: String, result: String, hint: String) {
+  private def testFix(text: String, result: String, hint: String)
     testQuickFix(text.replace("\r", ""),
                  result.replace("\r", ""),
                  hint,
                  classOf[SimplifyBooleanInspection])
-  }
 
-  private def checkHasNoErrors(text: String) {
+  private def checkHasNoErrors(text: String)
     checkTextHasNoErrors(text, annotation, classOf[SimplifyBooleanInspection])
-  }
 
-  def test_NotTrue() {
+  def test_NotTrue()
     val selectedText = s"$s!true$e"
     check(selectedText)
 
@@ -36,9 +33,8 @@ class SimplifyBooleanInspectionTest
     val result = "false"
     val hint = "Simplify !true"
     testFix(text, result, hint)
-  }
 
-  def test_TrueEqualsA() {
+  def test_TrueEqualsA()
     val selectedText = s"""val a = true
           |${s}true == a$e""".stripMargin
     check(selectedText)
@@ -49,9 +45,8 @@ class SimplifyBooleanInspectionTest
                    |a""".stripMargin
     val hint = "Simplify true == a"
     testFix(text, result, hint)
-  }
 
-  def test_TrueAndA() {
+  def test_TrueAndA()
     val selectedText = s"""val a = true
           |${s}true && a$e""".stripMargin
     check(selectedText)
@@ -62,9 +57,8 @@ class SimplifyBooleanInspectionTest
                     |a""".stripMargin
     val hint = "Simplify true && a"
     testFix(text, result, hint)
-  }
 
-  def test_AOrFalse() {
+  def test_AOrFalse()
     val selectedText = s"""val a = true
                           |${s}a | false$e""".stripMargin
     check(selectedText)
@@ -75,9 +69,8 @@ class SimplifyBooleanInspectionTest
                     |a""".stripMargin
     val hint = "Simplify a | false"
     testFix(text, result, hint)
-  }
 
-  def test_ExternalExpression() {
+  def test_ExternalExpression()
     val selectedText = s"""
         |val a = true
         |${s}true && (a || false)$e
@@ -92,9 +85,8 @@ class SimplifyBooleanInspectionTest
         |a""".stripMargin
     val hint = "Simplify true && (a || false)"
     testFix(text, result, hint)
-  }
 
-  def test_InternalExpression() {
+  def test_InternalExpression()
     val selectedText = s"""
         |val a = true
         |true && ($s<caret>a || false$e)
@@ -111,9 +103,8 @@ class SimplifyBooleanInspectionTest
       """.stripMargin
     val hint = "Simplify a || false"
     testFix(text, result, hint)
-  }
 
-  def test_TrueNotEqualsA() {
+  def test_TrueNotEqualsA()
     val selectedText = s"""val a = true
                             |val flag: Boolean = ${s}true != a$e""".stripMargin
     check(selectedText)
@@ -124,9 +115,8 @@ class SimplifyBooleanInspectionTest
                     |val flag: Boolean = !a""".stripMargin
     val hint = "Simplify true != a"
     testFix(text, result, hint)
-  }
 
-  def test_SimplifyInParentheses() {
+  def test_SimplifyInParentheses()
     val selectedText = s"""val a = true
                             |!(${s}true != a$e)""".stripMargin
     check(selectedText)
@@ -137,9 +127,8 @@ class SimplifyBooleanInspectionTest
                    |!(!a)""".stripMargin
     val hint = "Simplify true != a"
     testFix(text, result, hint)
-  }
 
-  def test_TrueAsAny() {
+  def test_TrueAsAny()
     val text = """
         |def trueAsAny: Any = {
         |  true
@@ -153,11 +142,8 @@ class SimplifyBooleanInspectionTest
       """.stripMargin.replace("\r", "").trim
 
     checkHasNoErrors(text)
-  }
 
-  def testParentheses(): Unit = {
+  def testParentheses(): Unit =
     testFix("true<caret> && (2 - 1) * 0 == 0",
             "(2 - 1) * 0 == 0",
             "Simplify true && (2 - 1) * 0 == 0")
-  }
-}

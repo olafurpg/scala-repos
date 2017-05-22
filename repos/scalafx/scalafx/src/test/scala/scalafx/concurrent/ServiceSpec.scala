@@ -42,11 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ServiceSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.Service[T], Service[T]](
-        classOf[jfxc.Service[T]], classOf[Service[T]]) {
+        classOf[jfxc.Service[T]], classOf[Service[T]])
 
   override protected def getScalaClassInstance = Service[T](null)
 
-  override protected def getJavaClassInstance = new jfxc.Service[T] {
+  override protected def getJavaClassInstance = new jfxc.Service[T]
     protected def createTask = null
-  }
-}

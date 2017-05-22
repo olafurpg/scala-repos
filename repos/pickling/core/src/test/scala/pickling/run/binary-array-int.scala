@@ -5,8 +5,8 @@ import scala.pickling._, scala.pickling.Defaults._, binary._
 
 import scala.reflect.runtime.universe._
 
-class BinaryArrayIntTest extends FunSuite {
-  test("main") {
+class BinaryArrayIntTest extends FunSuite
+  test("main")
     val ia = Array[Int](30, 31)
 
     val pickle: BinaryPickle = ia.pickle
@@ -15,5 +15,3 @@ class BinaryArrayIntTest extends FunSuite {
 
     val readArr = pickle.unpickle[Array[Int]]
     assert(readArr.mkString("[", ",", "]") === "[30,31]")
-  }
-}

@@ -14,7 +14,7 @@ import scala.language.existentials
 /**
   * Mixed in by Actor implementations that consume message from Camel endpoints.
   */
-trait Consumer extends Actor with CamelSupport {
+trait Consumer extends Actor with CamelSupport
   import Consumer._
 
   /**
@@ -26,22 +26,20 @@ trait Consumer extends Actor with CamelSupport {
     * Registers the consumer endpoint. Note: when overriding this method, be sure to
     * call 'super.preRestart', otherwise the consumer endpoint will not be registered.
     */
-  override def preStart() {
+  override def preStart()
     super.preStart()
     // Possible FIXME. registering the endpoint here because of problems
     // with order of execution of trait body in the Java version (UntypedConsumerActor)
     // where getEndpointUri is called before its constructor (where a uri is set to return from getEndpointUri)
     // and remains null. CustomRouteTest provides a test to verify this.
     register()
-  }
 
-  private[this] def register() {
+  private[this] def register()
     camel.supervisor ! Register(
         self,
         endpointUri,
         Some(ConsumerConfig(
                 activationTimeout, replyTimeout, autoAck, onRouteDefinition)))
-  }
 
   /**
     * How long the actor should wait for activation before it fails.
@@ -68,11 +66,10 @@ trait Consumer extends Actor with CamelSupport {
     * return a custom route definition handler. The returned function is not allowed to close over 'this', meaning it is
     * not allowed to refer to the actor instance itself, since that can easily cause concurrent shared state issues.
     */
-  def onRouteDefinition: RouteDefinition ⇒ ProcessorDefinition[_] = {
+  def onRouteDefinition: RouteDefinition ⇒ ProcessorDefinition[_] =
     val mapper = getRouteDefinitionHandler
     if (mapper != identityRouteMapper) mapper.apply _
     else identityRouteMapper
-  }
 
   /**
     * Java API: Returns the [[akka.dispatch.Mapper]] function that will be used as a route definition handler
@@ -82,18 +79,15 @@ trait Consumer extends Actor with CamelSupport {
     */
   def getRouteDefinitionHandler: Mapper[
       RouteDefinition, ProcessorDefinition[_]] = identityRouteMapper
-}
 
 /**
   * Internal use only.
   */
-private[camel] object Consumer {
+private[camel] object Consumer
   val identityRouteMapper =
-    new Mapper[RouteDefinition, ProcessorDefinition[_]]() {
+    new Mapper[RouteDefinition, ProcessorDefinition[_]]()
       override def checkedApply(rd: RouteDefinition): ProcessorDefinition[_] =
         rd
-    }
-}
 
 /**
   * INTERNAL API
@@ -108,7 +102,7 @@ private[camel] class ConsumerConfig(
     val onRouteDefinition: RouteDefinition ⇒ ProcessorDefinition[_])
     extends NoSerializationVerificationNeeded with scala.Serializable
 
-private[camel] object ConsumerConfig {
+private[camel] object ConsumerConfig
   def apply(activationTimeout: FiniteDuration,
             replyTimeout: FiniteDuration,
             autoAck: Boolean,
@@ -116,4 +110,3 @@ private[camel] object ConsumerConfig {
     : ConsumerConfig =
     new ConsumerConfig(
         activationTimeout, replyTimeout, autoAck, onRouteDefinition)
-}

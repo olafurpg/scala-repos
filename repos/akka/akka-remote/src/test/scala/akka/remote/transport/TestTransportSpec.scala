@@ -9,15 +9,15 @@ import akka.util.ByteString
 import akka.remote.transport.AssociationHandle.{ActorHandleEventListener, Disassociated, InboundPayload}
 
 class TestTransportSpec
-    extends AkkaSpec with DefaultTimeout with ImplicitSender {
+    extends AkkaSpec with DefaultTimeout with ImplicitSender
 
   val addressA: Address = Address("test", "testsytemA", "testhostA", 4321)
   val addressB: Address = Address("test", "testsytemB", "testhostB", 5432)
   val nonExistingAddress = Address("test", "nosystem", "nohost", 0)
 
-  "TestTransport" must {
+  "TestTransport" must
 
-    "return an Address and promise when listen is called and log calls" in {
+    "return an Address and promise when listen is called and log calls" in
       val registry = new AssociationRegistry
       val transportA = new TestTransport(addressA, registry)
 
@@ -26,13 +26,12 @@ class TestTransportSpec
       result._1 should ===(addressA)
       result._2 should not be null
 
-      registry.logSnapshot.exists {
+      registry.logSnapshot.exists
         case ListenAttempt(address) ⇒ address == addressA
         case _ ⇒ false
-      } should ===(true)
-    }
+      should ===(true)
 
-    "associate successfully with another TestTransport and log" in {
+    "associate successfully with another TestTransport and log" in
       val registry = new AssociationRegistry
       val transportA = new TestTransport(addressA, registry)
       val transportB = new TestTransport(addressB, registry)
@@ -50,15 +49,13 @@ class TestTransportSpec
       awaitCond(registry.transportsReady(addressA, addressB))
 
       transportA.associate(addressB)
-      expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+      expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
         case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
-      }
 
       registry.logSnapshot.contains(AssociateAttempt(addressA, addressB)) should ===(
           true)
-    }
 
-    "fail to associate with nonexisting address" in {
+    "fail to associate with nonexisting address" in
       val registry = new AssociationRegistry
       var transportA = new TestTransport(addressA, registry)
 
@@ -68,13 +65,11 @@ class TestTransportSpec
         .success(ActorAssociationEventListener(self))
 
       // TestTransport throws IllegalAssociationException when trying to associate with non-existing system
-      intercept[InvalidAssociationException] {
+      intercept[InvalidAssociationException]
         Await.result(transportA.associate(nonExistingAddress),
                      timeout.duration)
-      }
-    }
 
-    "emulate sending PDUs and logs write" in {
+    "emulate sending PDUs and logs write" in
       val registry = new AssociationRegistry
       val transportA = new TestTransport(addressA, registry)
       val transportB = new TestTransport(addressB, registry)
@@ -92,10 +87,9 @@ class TestTransportSpec
 
       val associate: Future[AssociationHandle] = transportA.associate(addressB)
       val handleB =
-        expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+        expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
           case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
             handle
-        }
 
       handleB.readHandlerPromise.success(ActorHandleEventListener(self))
       val handleA = Await.result(associate, timeout.duration)
@@ -108,18 +102,16 @@ class TestTransportSpec
       awaitCond(registry.existsAssociation(addressA, addressB))
 
       handleA.write(akkaPDU)
-      expectMsgPF(timeout.duration, "Expect InboundPayload from A") {
+      expectMsgPF(timeout.duration, "Expect InboundPayload from A")
         case InboundPayload(payload) if payload == akkaPDU ⇒
-      }
 
-      registry.logSnapshot.exists {
+      registry.logSnapshot.exists
         case WriteAttempt(sender, recipient, payload) ⇒
           sender == addressA && recipient == addressB && payload == akkaPDU
         case _ ⇒ false
-      } should ===(true)
-    }
+      should ===(true)
 
-    "emulate disassociation and log it" in {
+    "emulate disassociation and log it" in
       val registry = new AssociationRegistry
       val transportA = new TestTransport(addressA, registry)
       val transportB = new TestTransport(addressB, registry)
@@ -137,10 +129,9 @@ class TestTransportSpec
 
       val associate: Future[AssociationHandle] = transportA.associate(addressB)
       val handleB: AssociationHandle =
-        expectMsgPF(timeout.duration, "Expect InboundAssociation from A") {
+        expectMsgPF(timeout.duration, "Expect InboundAssociation from A")
           case InboundAssociation(handle) if handle.remoteAddress == addressA ⇒
             handle
-        }
 
       handleB.readHandlerPromise.success(ActorHandleEventListener(self))
       val handleA = Await.result(associate, timeout.duration)
@@ -152,18 +143,14 @@ class TestTransportSpec
 
       handleA.disassociate()
 
-      expectMsgPF(timeout.duration) {
+      expectMsgPF(timeout.duration)
         case Disassociated(_) ⇒
-      }
 
       awaitCond(!registry.existsAssociation(addressA, addressB))
 
-      registry.logSnapshot exists {
+      registry.logSnapshot exists
         case DisassociateAttempt(requester, remote)
             if requester == addressA && remote == addressB ⇒
           true
         case _ ⇒ false
-      } should ===(true)
-    }
-  }
-}
+      should ===(true)

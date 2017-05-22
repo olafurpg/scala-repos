@@ -22,19 +22,18 @@ import org.scalatest.junit.JUnitSuite
 import org.junit._
 import org.junit.Assert._
 
-class MessageCompressionTest extends JUnitSuite {
+class MessageCompressionTest extends JUnitSuite
 
   @Test
-  def testSimpleCompressDecompress() {
+  def testSimpleCompressDecompress()
     val codecs = mutable.ArrayBuffer[CompressionCodec](GZIPCompressionCodec)
     if (isSnappyAvailable) codecs += SnappyCompressionCodec
     if (isLZ4Available) codecs += LZ4CompressionCodec
     for (codec <- codecs) testSimpleCompressDecompress(codec)
-  }
 
   //  A quick test to ensure any growth or increase in compression size is known when upgrading libraries
   @Test
-  def testCompressSize() {
+  def testCompressSize()
     val bytes1k: Array[Byte] = (0 until 1000).map(_.toByte).toArray
     val bytes2k: Array[Byte] = (1000 until 2000).map(_.toByte).toArray
     val bytes3k: Array[Byte] = (3000 until 4000).map(_.toByte).toArray
@@ -49,9 +48,8 @@ class MessageCompressionTest extends JUnitSuite {
       testCompressSize(SnappyCompressionCodec, messages, 502)
 
     if (isLZ4Available) testCompressSize(LZ4CompressionCodec, messages, 387)
-  }
 
-  def testSimpleCompressDecompress(compressionCodec: CompressionCodec) {
+  def testSimpleCompressDecompress(compressionCodec: CompressionCodec)
     val messages = List[Message](
         new Message("hi there".getBytes),
         new Message("I am fine".getBytes),
@@ -62,34 +60,27 @@ class MessageCompressionTest extends JUnitSuite {
                  messageSet.shallowIterator.next().message.compressionCodec)
     val decompressed = messageSet.iterator.map(_.message).toList
     assertEquals(messages, decompressed)
-  }
 
   def testCompressSize(compressionCodec: CompressionCodec,
                        messages: List[Message],
-                       expectedSize: Int) {
+                       expectedSize: Int)
     val messageSet = new ByteBufferMessageSet(
         compressionCodec = compressionCodec, messages = messages: _*)
     assertEquals(s"$compressionCodec size has changed.",
                  expectedSize,
                  messageSet.sizeInBytes)
-  }
 
-  def isSnappyAvailable: Boolean = {
-    try {
+  def isSnappyAvailable: Boolean =
+    try
       new org.xerial.snappy.SnappyOutputStream(new ByteArrayOutputStream())
       true
-    } catch {
+    catch
       case e: UnsatisfiedLinkError => false
       case e: org.xerial.snappy.SnappyError => false
-    }
-  }
 
-  def isLZ4Available: Boolean = {
-    try {
+  def isLZ4Available: Boolean =
+    try
       new net.jpountz.lz4.LZ4BlockOutputStream(new ByteArrayOutputStream())
       true
-    } catch {
+    catch
       case e: UnsatisfiedLinkError => false
-    }
-  }
-}

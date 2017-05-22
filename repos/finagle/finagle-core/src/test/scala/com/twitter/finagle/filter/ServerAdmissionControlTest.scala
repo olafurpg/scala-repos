@@ -13,34 +13,28 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
-  class Ctx {
+class ServerAdmissionControlTest extends FunSuite with MockitoSugar
+  class Ctx
     val a = new AtomicInteger(1)
 
-    class AdditionFilter[Req, Rep](delta: Int) extends SimpleFilter[Req, Rep] {
-      def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
+    class AdditionFilter[Req, Rep](delta: Int) extends SimpleFilter[Req, Rep]
+      def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
         a.addAndGet(delta)
         service(req)
-      }
-    }
 
-    object Addition2Filter {
+    object Addition2Filter
       val name = "multiple 2"
 
-      val typeAgnostic: TypeAgnostic = new TypeAgnostic {
+      val typeAgnostic: TypeAgnostic = new TypeAgnostic
         override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
           new AdditionFilter(2)
-      }
-    }
 
-    object Addition3Filter {
+    object Addition3Filter
       val name = "multiple 3"
 
-      val typeAgnostic: TypeAgnostic = new TypeAgnostic {
+      val typeAgnostic: TypeAgnostic = new TypeAgnostic
         override def toFilter[Req, Rep]: Filter[Req, Rep, Req, Rep] =
           new AdditionFilter(3)
-      }
-    }
 
     ServerAdmissionControl.unregisterAll()
 
@@ -51,9 +45,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
         Addition2Filter.name,
         Addition2Filter.typeAgnostic
     )
-  }
 
-  test("register a controller") {
+  test("register a controller")
     val ctx = new Ctx
     import ctx._
 
@@ -62,9 +55,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
 
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 3)
-  }
 
-  test("disabled by param") {
+  test("disabled by param")
     val ctx = new Ctx
     import ctx._
 
@@ -73,9 +65,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     val svc = Await.result(factory(), 5.seconds)
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 1)
-  }
 
-  test("unregister a controller") {
+  test("unregister a controller")
     val ctx = new Ctx
     import ctx._
 
@@ -86,9 +77,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
 
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 1)
-  }
 
-  test("register multiple controller") {
+  test("register multiple controller")
     val ctx = new Ctx
     import ctx._
 
@@ -101,9 +91,8 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
 
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 6)
-  }
 
-  test("duplicated registration is ignored") {
+  test("duplicated registration is ignored")
     val ctx = new Ctx
     import ctx._
 
@@ -116,5 +105,3 @@ class ServerAdmissionControlTest extends FunSuite with MockitoSugar {
     val svc = Await.result(factory(), 5.seconds)
     assert(Await.result(svc(1), 5.seconds) == 1)
     assert(a.get == 3)
-  }
-}

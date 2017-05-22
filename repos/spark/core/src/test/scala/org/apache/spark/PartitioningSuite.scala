@@ -26,9 +26,9 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.util.StatCounter
 
 class PartitioningSuite
-    extends SparkFunSuite with SharedSparkContext with PrivateMethodTester {
+    extends SparkFunSuite with SharedSparkContext with PrivateMethodTester
 
-  test("HashPartitioner equality") {
+  test("HashPartitioner equality")
     val p2 = new HashPartitioner(2)
     val p4 = new HashPartitioner(4)
     val anotherP4 = new HashPartitioner(4)
@@ -38,9 +38,8 @@ class PartitioningSuite
     assert(p4 != p2)
     assert(p4 === anotherP4)
     assert(anotherP4 === p4)
-  }
 
-  test("RangePartitioner equality") {
+  test("RangePartitioner equality")
     // Make an RDD where all the elements are the same so that the partition range bounds
     // are deterministically all the same.
     val rdd = sc.parallelize(Seq(1, 1, 1, 1)).map(x => (x, x))
@@ -63,9 +62,8 @@ class PartitioningSuite
     assert(p4 != descendingP4)
     assert(descendingP2 != p2)
     assert(descendingP4 != p4)
-  }
 
-  test("RangePartitioner getPartition") {
+  test("RangePartitioner getPartition")
     val rdd = sc.parallelize(1.to(2000)).map(x => (x, x))
     // We have different behaviour of getPartition for partitions with less than 1000 and more than
     // 1000 partitions.
@@ -73,58 +71,45 @@ class PartitioningSuite
     val partitioners =
       partitionSizes.map(p => (p, new RangePartitioner(p, rdd)))
     val decoratedRangeBounds = PrivateMethod[Array[Int]]('rangeBounds)
-    partitioners.map {
+    partitioners.map
       case (numPartitions, partitioner) =>
         val rangeBounds = partitioner.invokePrivate(decoratedRangeBounds())
-        1.to(1000).map { element =>
-          {
+        1.to(1000).map  element =>
             val partition = partitioner.getPartition(element)
-            if (numPartitions > 1) {
-              if (partition < rangeBounds.size) {
+            if (numPartitions > 1)
+              if (partition < rangeBounds.size)
                 assert(element <= rangeBounds(partition))
-              }
-              if (partition > 0) {
+              if (partition > 0)
                 assert(element > rangeBounds(partition - 1))
-              }
-            } else {
+            else
               assert(partition === 0)
-            }
-          }
-        }
-    }
-  }
 
-  test("RangePartitioner for keys that are not Comparable (but with Ordering)") {
+  test("RangePartitioner for keys that are not Comparable (but with Ordering)")
     // Row does not extend Comparable, but has an implicit Ordering defined.
-    implicit object RowOrdering extends Ordering[Item] {
+    implicit object RowOrdering extends Ordering[Item]
       override def compare(x: Item, y: Item): Int = x.value - y.value
-    }
 
     val rdd = sc.parallelize(1 to 4500).map(x => (Item(x), Item(x)))
     val partitioner = new RangePartitioner(1500, rdd)
     partitioner.getPartition(Item(100))
-  }
 
-  test("RangPartitioner.sketch") {
+  test("RangPartitioner.sketch")
     val rdd = sc
       .makeRDD(0 until 20, 20)
-      .flatMap { i =>
+      .flatMap  i =>
         val random = new java.util.Random(i)
         Iterator.fill(i)(random.nextDouble())
-      }
       .cache()
     val sampleSizePerPartition = 10
     val (count, sketched) =
       RangePartitioner.sketch(rdd, sampleSizePerPartition)
     assert(count === rdd.count())
-    sketched.foreach {
+    sketched.foreach
       case (idx, n, sample) =>
         assert(n === idx)
         assert(sample.size === math.min(n, sampleSizePerPartition))
-    }
-  }
 
-  test("RangePartitioner.determineBounds") {
+  test("RangePartitioner.determineBounds")
     assert(RangePartitioner
              .determineBounds(ArrayBuffer.empty[(Int, Float)], 10)
              .isEmpty,
@@ -137,17 +122,15 @@ class PartitioningSuite
                                  (0.5, 1.0f),
                                  (1.0, 3.0f))
     assert(RangePartitioner.determineBounds(candidates, 3) === Array(0.4, 0.7))
-  }
 
-  test("RangePartitioner should run only one job if data is roughly balanced") {
+  test("RangePartitioner should run only one job if data is roughly balanced")
     val rdd = sc
       .makeRDD(0 until 20, 20)
-      .flatMap { i =>
+      .flatMap  i =>
         val random = new java.util.Random(i)
         Iterator.fill(5000 * i)((random.nextDouble() + i, i))
-      }
       .cache()
-    for (numPartitions <- Seq(10, 20, 40)) {
+    for (numPartitions <- Seq(10, 20, 40))
       val partitioner = new RangePartitioner(numPartitions, rdd)
       assert(partitioner.numPartitions === numPartitions)
       val counts = rdd.keys
@@ -155,18 +138,15 @@ class PartitioningSuite
         .countByValue()
         .values
       assert(counts.max < 3.0 * counts.min)
-    }
-  }
 
-  test("RangePartitioner should work well on unbalanced data") {
+  test("RangePartitioner should work well on unbalanced data")
     val rdd = sc
       .makeRDD(0 until 20, 20)
-      .flatMap { i =>
+      .flatMap  i =>
         val random = new java.util.Random(i)
         Iterator.fill(20 * i * i * i)((random.nextDouble() + i, i))
-      }
       .cache()
-    for (numPartitions <- Seq(2, 4, 8)) {
+    for (numPartitions <- Seq(2, 4, 8))
       val partitioner = new RangePartitioner(numPartitions, rdd)
       assert(partitioner.numPartitions === numPartitions)
       val counts = rdd.keys
@@ -174,10 +154,8 @@ class PartitioningSuite
         .countByValue()
         .values
       assert(counts.max < 3.0 * counts.min)
-    }
-  }
 
-  test("RangePartitioner should return a single partition for empty RDDs") {
+  test("RangePartitioner should return a single partition for empty RDDs")
     val empty1 = sc.emptyRDD[(Int, Double)]
     val partitioner1 = new RangePartitioner(0, empty1)
     assert(partitioner1.numPartitions === 1)
@@ -185,9 +163,8 @@ class PartitioningSuite
       sc.makeRDD(0 until 2, 2).flatMap(i => Seq.empty[(Int, Double)])
     val partitioner2 = new RangePartitioner(2, empty2)
     assert(partitioner2.numPartitions === 1)
-  }
 
-  test("HashPartitioner not equal to RangePartitioner") {
+  test("HashPartitioner not equal to RangePartitioner")
     val rdd = sc.parallelize(1 to 10).map(x => (x, x))
     val rangeP2 = new RangePartitioner(2, rdd)
     val hashP2 = new HashPartitioner(2)
@@ -195,9 +172,8 @@ class PartitioningSuite
     assert(hashP2 === hashP2)
     assert(hashP2 !== rangeP2)
     assert(rangeP2 !== hashP2)
-  }
 
-  test("partitioner preservation") {
+  test("partitioner preservation")
     val rdd = sc.parallelize(1 to 10, 4).map(x => (x, x))
 
     val grouped2 = rdd.groupByKey(2)
@@ -242,17 +218,15 @@ class PartitioningSuite
     assert(
         grouped2.flatMapValues(_ => Seq(1)).partitioner === grouped2.partitioner)
     assert(grouped2.filter(_._1 > 4).partitioner === grouped2.partitioner)
-  }
 
-  test("partitioning Java arrays should fail") {
+  test("partitioning Java arrays should fail")
     val arrs: RDD[Array[Int]] =
       sc.parallelize(Array(1, 2, 3, 4), 2).map(x => Array(x))
     val arrPairs: RDD[(Array[Int], Int)] =
       sc.parallelize(Array(1, 2, 3, 4), 2).map(x => (Array(x), x))
 
-    def verify(testFun: => Unit): Unit = {
+    def verify(testFun: => Unit): Unit =
       intercept[SparkException](testFun).getMessage.contains("array")
-    }
 
     verify(arrs.distinct())
     // We can't catch all usages of arrays, since they might occur inside other collections:
@@ -268,9 +242,8 @@ class PartitioningSuite
     verify(arrPairs.cogroup(arrPairs))
     verify(arrPairs.reduceByKeyLocally(_ + _))
     verify(arrPairs.reduceByKey(_ + _))
-  }
 
-  test("zero-length partitions should be correctly handled") {
+  test("zero-length partitions should be correctly handled")
     // Create RDD with some consecutive empty partitions (including the "first" one)
     val rdd: RDD[Double] = sc
       .parallelize(Array(-1.0, -1.0, -1.0, -1.0, 2.0, 4.0, -1.0, -1.0), 8)
@@ -286,7 +259,5 @@ class PartitioningSuite
     assert(stats.min === 2.0)
 
     // Add other tests here for classes that should be able to handle empty partitions correctly
-  }
-}
 
 private sealed case class Item(value: Int)

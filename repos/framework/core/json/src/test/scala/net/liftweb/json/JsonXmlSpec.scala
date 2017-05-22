@@ -26,23 +26,20 @@ import org.scalacheck.Prop.forAll
   * System under specification for JSON XML.
   */
 object JsonXmlSpec
-    extends Specification with NodeGen with JValueGen with ScalaCheck {
+    extends Specification with NodeGen with JValueGen with ScalaCheck
   "JSON XML Specification".title
 
   import Xml._
   import scala.xml.Node
 
-  "Valid XML can be converted to JSON and back (symmetric op)" in {
+  "Valid XML can be converted to JSON and back (symmetric op)" in
     val conversion = (xml: Node) => { toXml(toJson(xml)).head == xml }
     forAll(conversion)
-  }
 
-  "JSON can be converted to XML, and back to valid JSON (non symmetric op)" in {
+  "JSON can be converted to XML, and back to valid JSON (non symmetric op)" in
     val conversion =
       (json: JValue) => { parse(compactRender(toJson(toXml(json)))); true }
     forAll(conversion)
-  }
 
   implicit def arbXml: Arbitrary[Node] = Arbitrary(genXml)
   implicit def arbJValue: Arbitrary[JValue] = Arbitrary(genObject)
-}

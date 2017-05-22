@@ -11,7 +11,7 @@ package runtime
 
 import java.lang.Character
 
-final class RichChar(val self: Char) extends AnyVal with IntegralProxy[Char] {
+final class RichChar(val self: Char) extends AnyVal with IntegralProxy[Char]
   protected def num = scala.math.Numeric.CharIsIntegral
   protected def ord = scala.math.Ordering.Char
 
@@ -65,4 +65,3 @@ final class RichChar(val self: Char) extends AnyVal with IntegralProxy[Char] {
   // public static boolean isDefined(char ch)
   // public static boolean isJavaIdentifierStart(char ch)
   // public static boolean isJavaIdentifierPart(char ch)
-}

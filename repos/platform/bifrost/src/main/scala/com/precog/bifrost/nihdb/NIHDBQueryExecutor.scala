@@ -81,7 +81,7 @@ import org.streum.configrity.Configuration
 trait NIHDBQueryExecutorConfig
     extends ShardQueryExecutorConfig with BlockStoreColumnarTableModuleConfig
     with ManagedQueryModuleConfig with IdSourceConfig with EvaluatorConfig
-    with KafkaIngestActorProjectionSystemConfig {
+    with KafkaIngestActorProjectionSystemConfig
 
   lazy val flatMapTimeout: Duration =
     config[Int]("precog.evaluator.timeout.fm", 30) seconds
@@ -101,23 +101,22 @@ trait NIHDBQueryExecutorConfig
     config[Int]("precog.storage.quiescence_timeout", 300) seconds
   lazy val maxOpenPaths: Int =
     config[Int]("precog.storage.max_open_paths", 500)
-}
 
-trait NIHDBQueryExecutorComponent {
+trait NIHDBQueryExecutorComponent
   import blueeyes.json.serialization.Extractor
 
   def nihdbPlatform(config0: Configuration,
                     extApiKeyFinder: APIKeyFinder[Future],
                     extAccountFinder: AccountFinder[Future],
-                    extJobManager: JobManager[Future]) = {
+                    extJobManager: JobManager[Future]) =
     new ManagedPlatform with SecureVFSModule[Future, Slice] with ActorVFSModule
     with SchedulingActorModule with ShardQueryExecutorPlatform[Future]
     with VFSColumnarTableModule with KafkaIngestActorProjectionSystem
-    with GracefulStopSupport {
+    with GracefulStopSupport
       platform =>
 
       type YggConfig = NIHDBQueryExecutorConfig
-      val yggConfig = new NIHDBQueryExecutorConfig {
+      val yggConfig = new NIHDBQueryExecutorConfig
         override val config = config0.detach("queryExecutor")
         val sortWorkDir = scratchDir
         val memoizationBufferSize = sortBufferSize
@@ -132,7 +131,6 @@ trait NIHDBQueryExecutorComponent {
 
         //TODO: Get a producer ID
         val idSource = new FreshAtomicIdSource
-      }
 
       val clock = blueeyes.util.Clock.System
 
@@ -150,11 +148,10 @@ trait NIHDBQueryExecutorComponent {
 
       val jobActorSystem = ActorSystem("jobPollingActorSystem")
 
-      val chefs = (1 to yggConfig.howManyChefsInTheKitchen).map { _ =>
+      val chefs = (1 to yggConfig.howManyChefsInTheKitchen).map  _ =>
         actorSystem.actorOf(Props(
                 Chef(VersionedCookedBlockFormat(Map(1 -> V1CookedBlockFormat)),
                      VersionedSegmentFormat(Map(1 -> V1SegmentFormat)))))
-      }
       val masterChef =
         actorSystem.actorOf(Props[Chef].withRouter(RoundRobinRouter(chefs)))
 
@@ -202,48 +199,39 @@ trait NIHDBQueryExecutorComponent {
           checkpoint: YggCheckpoint, logRoot: File): IngestFailureLog =
         FilesystemIngestFailureLog(logRoot, checkpoint)
 
-      def asyncExecutorFor(apiKey: APIKey) = {
-        for {
+      def asyncExecutorFor(apiKey: APIKey) =
+        for
           executionContext0 <- threadPooling.getAccountExecutionContext(apiKey)
-        } yield {
-          new AsyncQueryExecutor {
+        yield
+          new AsyncQueryExecutor
             val executionContext: ExecutionContext = executionContext0
-          }
-        }
-      }
 
-      def syncExecutorFor(apiKey: APIKey) = {
-        for {
+      def syncExecutorFor(apiKey: APIKey) =
+        for
           executionContext0 <- threadPooling.getAccountExecutionContext(apiKey)
-        } yield {
-          new SyncQueryExecutor {
+        yield
+          new SyncQueryExecutor
             val executionContext: ExecutionContext = executionContext0
-          }
-        }
-      }
 
       override def executor(implicit shardQueryMonad: JobQueryTFMonad)
-        : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] = {
-        implicit val mn = new (Future ~> JobQueryTF) {
+        : QueryExecutor[JobQueryTF, StreamT[JobQueryTF, Slice]] =
+        implicit val mn = new (Future ~> JobQueryTF)
           def apply[A](fut: Future[A]) = fut.liftM[JobQueryT]
-        }
 
         new ShardQueryExecutor[JobQueryTF](shardQueryMonad)
-        with IdSourceScannerModule {
+        with IdSourceScannerModule
           val M = shardQueryMonad.M
           type YggConfig = NIHDBQueryExecutorConfig
           val yggConfig = platform.yggConfig
           val queryReport =
             errorReport[Option[FaultPosition]](shardQueryMonad, implicitly)
           override def freshIdScanner = platform.freshIdScanner
-        } map {
+        map
           case (faults, result) =>
             result
-        }
-      }
 
       def shutdown() =
-        for {
+        for
           _ <- Stoppable.stop(Stoppable.fromFuture(gracefulStop(
                       scheduleActor,
                       yggConfig.schedulingTimeout.duration)(actorSystem)))
@@ -257,11 +245,7 @@ trait NIHDBQueryExecutorComponent {
           _ <- chefs
             .map(IngestSystem.actorStop(yggConfig, _, "masterChef"))
             .sequence
-        } yield {
+        yield
           queryLogger.info("Actor ecossytem shutdown complete.")
           jobActorSystem.shutdown()
           actorSystem.shutdown()
-        }
-    }
-  }
-}

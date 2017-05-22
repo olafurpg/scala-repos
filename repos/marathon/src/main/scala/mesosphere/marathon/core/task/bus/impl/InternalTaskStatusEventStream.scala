@@ -11,21 +11,19 @@ import rx.lang.scala.Observer
   */
 private[bus] class InternalTaskStatusEventStream
     extends SubchannelEventBus[
-        TaskStatusUpdate, Observer[TaskStatusUpdate], PathId] {
+        TaskStatusUpdate, Observer[TaskStatusUpdate], PathId]
 
   override val subclassification: Subclassification[PathId] =
-    new Subclassification[PathId] {
+    new Subclassification[PathId]
       override def isEqual(x: PathId, y: PathId): Boolean = x == y
       // Simplistic implementation (since we do not need anything fancy):
       // Only allow for subscription of specific appId or all appIds by
       // using the root path.
       override def isSubclass(x: PathId, y: PathId): Boolean =
         y.isRoot || x == y
-    }
 
   override protected def publish(
       event: TaskStatusUpdate, subscriber: Observer[TaskStatusUpdate]): Unit =
     subscriber.onNext(event)
   override protected def classify(event: TaskStatusUpdate): PathId =
     event.appId
-}

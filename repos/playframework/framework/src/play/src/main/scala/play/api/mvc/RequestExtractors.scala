@@ -3,7 +3,7 @@
  */
 package play.api.mvc
 
-trait RequestExtractors extends AcceptExtractors {
+trait RequestExtractors extends AcceptExtractors
 
   /**
     * Convenient extractor allowing to apply two extractors.
@@ -14,17 +14,15 @@ trait RequestExtractors extends AcceptExtractors {
     * }
     * }}}
     */
-  object & {
+  object &
     def unapply(
         request: RequestHeader): Option[(RequestHeader, RequestHeader)] =
       Some((request, request))
-  }
-}
 
 /**
   * Define a set of extractors allowing to pattern match on the Accept HTTP header of a request
   */
-trait AcceptExtractors {
+trait AcceptExtractors
 
   /**
     * Common extractors to check if a request accepts JSON, Html, etc.
@@ -36,14 +34,12 @@ trait AcceptExtractors {
     * }
     * }}}
     */
-  object Accepts {
+  object Accepts
     import play.api.http.MimeTypes
     val Json = Accepting(MimeTypes.JSON)
     val Html = Accepting(MimeTypes.HTML)
     val Xml = Accepting(MimeTypes.XML)
     val JavaScript = Accepting(MimeTypes.JAVASCRIPT)
-  }
-}
 
 /**
   * Convenient class to generate extractors checking if a given mime type matches the Accept header of a request.
@@ -58,8 +54,7 @@ trait AcceptExtractors {
   * }
   * }}}
   */
-case class Accepting(mimeType: String) {
+case class Accepting(mimeType: String)
   def unapply(request: RequestHeader): Boolean = request.accepts(mimeType)
   def unapply(mediaRange: play.api.http.MediaRange): Boolean =
     mediaRange.accepts(mimeType)
-}

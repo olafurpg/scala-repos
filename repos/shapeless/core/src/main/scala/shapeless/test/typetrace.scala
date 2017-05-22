@@ -22,19 +22,16 @@ import scala.reflect.macros.blackbox
 
 class TypeTrace[T]
 
-object TypeTrace {
+object TypeTrace
   implicit def apply[T]: TypeTrace[T] = macro TypeTraceMacros.applyImpl[T]
-}
 
 @macrocompat.bundle
-class TypeTraceMacros(val c: blackbox.Context) {
+class TypeTraceMacros(val c: blackbox.Context)
   import c.universe._
 
-  def applyImpl[T](implicit tTag: WeakTypeTag[T]): Tree = {
+  def applyImpl[T](implicit tTag: WeakTypeTag[T]): Tree =
     val tTpe = weakTypeOf[T]
     println(
         s"Trace: $tTpe ${tTpe.dealias} ${tTpe.getClass.getName} ${tTpe.dealias.getClass.getName}")
 
     q"""new _root_.shapeless.test.TypeTrace[$tTpe]"""
-  }
-}

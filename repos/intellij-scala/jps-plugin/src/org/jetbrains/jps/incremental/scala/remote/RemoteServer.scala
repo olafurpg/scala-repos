@@ -10,18 +10,18 @@ import org.jetbrains.jps.incremental.scala.data.{CompilationData, CompilerData, 
   * @author Pavel Fatin
   */
 class RemoteServer(val address: InetAddress, val port: Int)
-    extends Server with RemoteResourceOwner {
+    extends Server with RemoteResourceOwner
   def compile(sbtData: SbtData,
               compilerData: CompilerData,
               compilationData: CompilationData,
-              client: Client): ExitCode = {
+              client: Client): ExitCode =
     val arguments = Arguments(
         sbtData, compilerData, compilationData, Seq.empty).asStrings
 
-    try {
+    try
       send(serverAlias, arguments, client)
       ExitCode.OK
-    } catch {
+    catch
       case e: ConnectException =>
         val firstLine =
           s"Cannot connect to compile server at ${address.toString}:$port"
@@ -39,6 +39,3 @@ class RemoteServer(val address: InetAddress, val port: Int)
         client.debug(
             s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
         ExitCode.ABORT
-    }
-  }
-}

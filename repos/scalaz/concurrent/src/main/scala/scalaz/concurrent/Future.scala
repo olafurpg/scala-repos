@@ -51,10 +51,10 @@ import scala.concurrent.duration._
   * `Future[Throwable \/ A]` with a number of additional
   * convenience functions.
   */
-sealed abstract class Future[+A] {
+sealed abstract class Future[+A]
   import Future._
 
-  def flatMap[B](f: A => Future[B]): Future[B] = this match {
+  def flatMap[B](f: A => Future[B]): Future[B] = this match
     case Now(a) => Suspend(() => f(a))
     case Suspend(thunk) => BindSuspend(thunk, f)
     case Async(listen) => BindAsync(listen, f)
@@ -62,7 +62,6 @@ sealed abstract class Future[+A] {
       Suspend(() => BindSuspend(thunk, g andThen (_ flatMap f)))
     case BindAsync(listen, g) =>
       Suspend(() => BindAsync(listen, g andThen (_ flatMap f)))
-  }
 
   def map[B](f: A => B): Future[B] =
     flatMap(f andThen (b => Future.now(b)))
@@ -72,12 +71,11 @@ sealed abstract class Future[+A] {
     * Also see `unsafePerformAsync`.
     */
   def unsafePerformListen(cb: A => Trampoline[Unit]): Unit =
-    (this.step: @unchecked) match {
+    (this.step: @unchecked) match
       case Now(a) => cb(a).run
       case Async(onFinish) => onFinish(cb)
       case BindAsync(onFinish, g) =>
         onFinish(x => Trampoline.delay(g(x)) map (_ unsafePerformListen cb))
-    }
 
   @deprecated("use unsafePerformListen", "7.2")
   def listen(cb: A => Trampoline[Unit]): Unit =
@@ -91,7 +89,7 @@ sealed abstract class Future[+A] {
     */
   def unsafePerformListenInterruptibly(
       cb: A => Trampoline[Unit], cancel: AtomicBoolean): Unit =
-    this.stepInterruptibly(cancel) match {
+    this.stepInterruptibly(cancel) match
       case Now(a) if !cancel.get => cb(a).run
       case Async(onFinish) if !cancel.get =>
         onFinish(
@@ -106,7 +104,6 @@ sealed abstract class Future[+A] {
                 (_ unsafePerformListenInterruptibly (cb, cancel))
               else Trampoline.done(()))
       case _ if cancel.get => ()
-    }
 
   @deprecated("use unsafePerformListenInterruptibly", "7.2")
   def listenInterruptibly(
@@ -119,22 +116,21 @@ sealed abstract class Future[+A] {
     * the start of this `Future`.
     */
   @annotation.tailrec
-  final def step: Future[A] = this match {
+  final def step: Future[A] = this match
     case Suspend(thunk) => thunk().step
     case BindSuspend(thunk, f) => (thunk() flatMap f).step
     case _ => this
-  }
 
   /** Like `step`, but may be interrupted by setting `cancel` to true. */
   @annotation.tailrec
   final def stepInterruptibly(cancel: AtomicBoolean): Future[A] =
     if (!cancel.get)
-      this match {
+      this match
         case Suspend(thunk) => thunk().stepInterruptibly(cancel)
         case BindSuspend(thunk, f) =>
           (thunk() flatMap f).stepInterruptibly(cancel)
         case _ => this
-      } else this
+      else this
 
   /**
     * Begins running this `Future` and returns a new future that blocks
@@ -144,14 +140,12 @@ sealed abstract class Future[+A] {
     * 
     * Use with care.
     */
-  def unsafeStart: Future[A] = {
+  def unsafeStart: Future[A] =
     val latch = new java.util.concurrent.CountDownLatch(1)
     @volatile var result: Option[A] = None
-    unsafePerformAsync { a =>
+    unsafePerformAsync  a =>
       result = Some(a); latch.countDown
-    }
     delay { latch.await; result.get }
-  }
 
   @deprecated("use unsafeStart", "7.2")
   def start: Future[A] =
@@ -185,18 +179,15 @@ sealed abstract class Future[+A] {
     unsafePerformAsyncInterruptibly(cb, cancel)
 
   /** Run this `Future` and block awaiting its result. */
-  def unsafePerformSync: A = this match {
+  def unsafePerformSync: A = this match
     case Now(a) => a
-    case _ => {
+    case _ =>
         val latch = new java.util.concurrent.CountDownLatch(1)
         @volatile var result: Option[A] = None
-        unsafePerformAsync { a =>
+        unsafePerformAsync  a =>
           result = Some(a); latch.countDown
-        }
         latch.await
         result.get
-      }
-  }
 
   @deprecated("use unsafePerformSync", "7.2")
   def run: A =
@@ -208,10 +199,9 @@ sealed abstract class Future[+A] {
     * will be thrown and the `Future` will attempt to be canceled.
     */
   def unsafePerformSyncFor(timeoutInMillis: Long): A =
-    unsafePerformSyncAttemptFor(timeoutInMillis) match {
+    unsafePerformSyncAttemptFor(timeoutInMillis) match
       case -\/(e) => throw e
       case \/-(a) => a
-    }
 
   def unsafePerformSyncFor(timeout: Duration): A =
     unsafePerformSyncFor(timeout.toMillis)
@@ -226,16 +216,14 @@ sealed abstract class Future[+A] {
 
   /** Like `unsafePerformSyncFor`, but returns `TimeoutException` as left value. 
     * Will not report any other exceptions that may be raised during computation of `A`*/
-  def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A = {
+  def unsafePerformSyncAttemptFor(timeoutInMillis: Long): Throwable \/ A =
     val sync = new SyncVar[Throwable \/ A]
     val interrupt = new AtomicBoolean(false)
     unsafePerformAsyncInterruptibly(a => sync.put(\/-(a)), interrupt)
-    sync.get(timeoutInMillis).getOrElse {
+    sync.get(timeoutInMillis).getOrElse
       interrupt.set(true)
       -\/(new TimeoutException(
               s"Timed out after $timeoutInMillis milliseconds"))
-    }
-  }
 
   def unsafePerformSyncAttemptFor(timeout: Duration): Throwable \/ A =
     unsafePerformSyncAttemptFor(timeout.toMillis)
@@ -257,22 +245,19 @@ sealed abstract class Future[+A] {
       implicit scheduler: ScheduledExecutorService): Future[Throwable \/ A] =
     //instead of run this though chooseAny, it is run through simple primitive, 
     //as we are never interested in results of timeout callback, and this is more resource savvy
-    async[Throwable \/ A] { cb =>
+    async[Throwable \/ A]  cb =>
       val cancel = new AtomicBoolean(false)
       val done = new AtomicBoolean(false)
-      scheduler.schedule(new Runnable {
-        def run() {
-          if (done.compareAndSet(false, true)) {
+      scheduler.schedule(new Runnable
+        def run()
+          if (done.compareAndSet(false, true))
             cancel.set(true)
             cb(-\/(new TimeoutException(
                         s"Timed out after $timeoutInMillis milliseconds")))
-          }
-        }
-      }, timeoutInMillis, TimeUnit.MILLISECONDS)
+      , timeoutInMillis, TimeUnit.MILLISECONDS)
 
       unsafePerformAsyncInterruptibly(
           a => if (done.compareAndSet(false, true)) cb(\/-(a)), cancel)
-    }
 
   def unsafePerformTimed(timeout: Duration)(
       implicit scheduler: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
@@ -298,9 +283,8 @@ sealed abstract class Future[+A] {
 
   def after(t: Long): Future[A] =
     Timer.default.valueWait((), t).flatMap(_ => this)
-}
 
-object Future {
+object Future
   case class Now[+A](a: A) extends Future[A]
   case class Async[+A](onFinish: (A => Trampoline[Unit]) => Unit)
       extends Future[A]
@@ -315,14 +299,14 @@ object Future {
   // to run the Future; leaving out for now
 
   implicit val futureInstance: Nondeterminism[Future] =
-    new Nondeterminism[Future] {
+    new Nondeterminism[Future]
       def bind[A, B](fa: Future[A])(f: A => Future[B]): Future[B] =
         fa flatMap f
       def point[A](a: => A): Future[A] = delay(a)
 
       def chooseAny[A](
-          h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] = {
-        Async { cb =>
+          h: Future[A], t: Seq[Future[A]]): Future[(A, Seq[Future[A]])] =
+        Async  cb =>
           // The details of this implementation are a bit tricky, but the general
           // idea is to run all futures in parallel, returning whichever result
           // becomes available first.
@@ -333,37 +317,35 @@ object Future {
           // then revert back to running the original Future.
           val won = new AtomicBoolean(false) // threads race to set this
 
-          val fs = (h +: t).view.zipWithIndex.map {
+          val fs = (h +: t).view.zipWithIndex.map
             case (f, ind) =>
               val used = new AtomicBoolean(false)
               val ref = new AtomicReference[A]
               val listener = new AtomicReference[A => Trampoline[Unit]](null)
-              val residual = Async { (cb: A => Trampoline[Unit]) =>
-                if (used.compareAndSet(false, true)) {
+              val residual = Async  (cb: A => Trampoline[Unit]) =>
+                if (used.compareAndSet(false, true))
                   // get residual value from already running Future
                   if (listener.compareAndSet(null, cb)) {} // we've successfully registered ourself with running task
                   else
                     cb(ref.get).run // the running task has completed, use its result
-                } else
+                else
                   // residual value used up, revert to original Future
                   f.unsafePerformListen(cb)
-              }
               (ind, f, residual, listener, ref)
-          }.toIndexedSeq
+          .toIndexedSeq
 
-          fs.foreach {
+          fs.foreach
             case (ind, f, residual, listener, ref) =>
-              f.unsafePerformListen { a =>
+              f.unsafePerformListen  a =>
                 ref.set(a)
                 val notifyWinner =
                   // If we're the first to finish, invoke `cb`, passing residuals
                   if (won.compareAndSet(false, true))
-                    cb((a, fs.collect {
+                    cb((a, fs.collect
                       case (i, _, rf, _, _) if i != ind => rf
-                    }))
-                  else {
+                    ))
+                  else
                     Trampoline.done(()) // noop; another thread will have already invoked `cb` w/ our residual
-                  }
                 val notifyListener =
                   if (listener.compareAndSet(null, finishedCallback))
                     // noop; no listeners yet, any added after this will use result stored in `ref`
@@ -372,10 +354,6 @@ object Future {
                     // there is a registered listener, invoke it with the result
                     listener.get.apply(a)
                 notifyWinner *> notifyListener
-              }
-          }
-        }
-      }
 
       private val finishedCallback: Any => Trampoline[Unit] = _ =>
         sys.error(
@@ -385,16 +363,16 @@ object Future {
       // last thread to finish invokes the callback with the results
       override def reduceUnordered[A, M](
           fs: Seq[Future[A]])(implicit R: Reducer[A, M]): Future[M] =
-        fs match {
+        fs match
           case Seq() => Future.now(R.zero)
           case Seq(f) => f.map(R.unit)
           case other =>
-            Async { cb =>
+            Async  cb =>
               val results = new ConcurrentLinkedQueue[M]
               val c = new AtomicInteger(fs.size)
 
-              fs.foreach { f =>
-                f.unsafePerformListen { a =>
+              fs.foreach  f =>
+                f.unsafePerformListen  a =>
                   // Try to reduce number of values in the queue
                   val front = results.poll()
                   if (front == null) results.add(R.unit(a))
@@ -405,11 +383,6 @@ object Future {
                     cb(results.toList.foldLeft(R.zero)((a,
                             b) => R.append(a, b)))
                   else Trampoline.done(())
-                }
-              }
-            }
-        }
-    }
 
   /** type for Futures which need to be executed in parallel when using an Applicative instance */
   type ParallelFuture[A] = Future[A] @@ Parallel
@@ -461,26 +434,24 @@ object Future {
   def async[A](listen: (A => Unit) => Unit): Future[A] =
     Async(
         (cb: A => Trampoline[Unit]) =>
-          listen { a =>
+          listen  a =>
         cb(a).run
-    })
+    )
 
   /** Create a `Future` that will evaluate `a` using the given `ExecutorService`. */
   def apply[A](a: => A)(
       implicit pool: ExecutorService = Strategy.DefaultExecutorService)
-    : Future[A] = Async { cb =>
+    : Future[A] = Async  cb =>
     pool.submit { new Callable[Unit] { def call = cb(a).run } }
-  }
 
   /** Create a `Future` that will evaluate `a` after at least the given delay. */
   def schedule[A](a: => A, delay: Duration)(
       implicit pool: ScheduledExecutorService = Strategy.DefaultTimeoutScheduler)
     : Future[A] =
-    Async { cb =>
-      pool.schedule(new Callable[Unit] {
+    Async  cb =>
+      pool.schedule(new Callable[Unit]
         def call = cb(a).run
-      }, delay.toMillis, TimeUnit.MILLISECONDS)
-    }
+      , delay.toMillis, TimeUnit.MILLISECONDS)
 
   /** Calls `Nondeterminism[Future].gatherUnordered`.
     * @since 7.0.3
@@ -491,4 +462,3 @@ object Future {
   def reduceUnordered[A, M](fs: Seq[Future[A]])(
       implicit R: Reducer[A, M]): Future[M] =
     futureInstance.reduceUnordered(fs)
-}

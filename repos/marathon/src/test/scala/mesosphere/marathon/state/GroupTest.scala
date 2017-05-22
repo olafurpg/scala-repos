@@ -9,11 +9,11 @@ import org.scalatest.{FunSpec, GivenWhenThen, Matchers}
 import scala.collection.JavaConverters._
 import scala.collection.immutable.Seq
 
-class GroupTest extends FunSpec with GivenWhenThen with Matchers {
+class GroupTest extends FunSpec with GivenWhenThen with Matchers
 
-  describe("A Group") {
+  describe("A Group")
 
-    it("can find a group by its path") {
+    it("can find a group by its path")
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
           groups = Set(Group("/test".toPath,
@@ -31,9 +31,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the group is found")
       current.group(path) should be('defined)
-    }
 
-    it("can not find a group if its not existing") {
+    it("can not find a group if its not existing")
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
           groups = Set(Group("/test".toPath,
@@ -51,9 +50,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the group is not found")
       current.group(path) should be('empty)
-    }
 
-    it("can filter a group by a filter function") {
+    it("can filter a group by a filter function")
       Given("an group with subgroups")
       val current =
         Group.empty.copy(
@@ -81,12 +79,11 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       When("a group with a specific path is requested")
       val allowed = "/test/group2/a".toPath
-      val updated = current.updateGroup { group =>
+      val updated = current.updateGroup  group =>
         if (group.id.includes(allowed)) Some(group) //child
         else if (allowed.includes(group.id))
           Some(group.copy(apps = Set.empty, dependencies = Set.empty)) //taskTrackerRef
         else None
-      }
 
       Then("the group is not found")
       updated should be('defined)
@@ -95,9 +92,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       updated.get.group("/test/group2".toPath) should be('defined)
       updated.get.group("/test/group2/a".toPath) should be('defined)
       updated.get.group("/test/group2/b".toPath) should be('empty)
-    }
 
-    it("can do an update by applying a change function") {
+    it("can do an update by applying a change function")
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
           groups = Set(Group("/test".toPath,
@@ -112,22 +108,20 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       When("the group will be updated")
       val timestamp = Timestamp.now()
-      val result = current.update(timestamp) { group =>
+      val result = current.update(timestamp)  group =>
         if (group.id == PathId("/test/group2"))
           Group("/test/group3".toPath,
                 Set(AppDefinition("app2".toPath)),
                 version = timestamp)
         else group
-      }
 
       Then("the update has been applied")
       result.version should be(timestamp)
       result.group("/test/group3".toPath) should be('defined)
       result.group("/test/group3".toPath).get.version should be(timestamp)
       result.group("/test".toPath).get.version should be(timestamp)
-    }
 
-    it("can do an update by applying a change function with a path identifier") {
+    it("can do an update by applying a change function with a path identifier")
       Given("an existing group with two subgroups")
       val current = Group.empty.copy(
           groups = Set(Group("/test".toPath,
@@ -154,9 +148,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       result.group("/test/group3".toPath) should be('defined)
       result.group("/test/group3".toPath).get.version should be(timestamp)
       result.group("/test".toPath).get.version should be(timestamp)
-    }
 
-    it("can delete a node based in the path") {
+    it("can delete a node based in the path")
       Given("an existing group with two subgroups")
       val current = Group.empty
         .makeGroup("/test/foo/one".toPath)
@@ -168,9 +161,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       Then("the update has been applied")
       group.group("/test/foo".toPath) should be('empty)
       group.group("/test/bla".toPath) should be('defined)
-    }
 
-    it("can make groups specified by a path") {
+    it("can make groups specified by a path")
       Given("a group with subgroups")
       val current = Group.empty.copy(
           groups = Set(Group("/test".toPath,
@@ -203,9 +195,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("nothing has been changed")
       group3 should equal(current)
-    }
 
-    it("can replace a group without apps by an app definition") {
+    it("can replace a group without apps by an app definition")
       // See https://github.com/mesosphere/marathon/issues/851
       // Groups are created implicitly by creating apps and are not visible as separate entities
       // at the time of the creation of this test/issue. They are only visible in the GUI if they contain apps.
@@ -235,9 +226,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the resulting group should be valid when represented in the V2 API model")
       validate(changed) should be(Success)
-    }
 
-    it("cannot replace a group with apps by an app definition") {
+    it("cannot replace a group with apps by an app definition")
       Given("an existing group /some/nested which does contain an app")
       val current = Group.empty
         .makeGroup("/some/nested/path".toPath)
@@ -276,9 +266,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       result.isFailure should be(true)
       ValidationHelper.getAllRuleConstrains(result).head.message should be(
           "Groups and Applications may not have the same identifier.")
-    }
 
-    it("can marshal and unmarshal from to protos") {
+    it("can marshal and unmarshal from to protos")
       Given("a group with subgroups")
       val now = Timestamp(11)
       val fullVersion = VersionInfo.forNewConfig(now)
@@ -306,9 +295,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the groups are identical")
       group should equal(current)
-    }
 
-    it("can turn a group with group dependencies into a dependency graph") {
+    it("can turn a group with group dependencies into a dependency graph")
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty.copy(
           groups = Set(Group(
@@ -397,9 +385,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       ids should equal(expectedIds)
 
       current.appsWithNoDependencies should have size 2
-    }
 
-    it("can turn a group with app dependencies into a dependency graph") {
+    it("can turn a group with app dependencies into a dependency graph")
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty
         .copy(groups = Set(
@@ -470,9 +457,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       ids should be(expected)
 
       current.appsWithNoDependencies should have size 2
-    }
 
-    it("can turn a group without dependencies into a dependency graph") {
+    it("can turn a group without dependencies into a dependency graph")
       Given("a group with subgroups and dependencies")
       val current: Group = Group.empty.copy(
           groups = Set(Group(
@@ -529,9 +515,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the dependency graph is correct")
       current.appsWithNoDependencies should have size 8
-    }
 
-    it("detects a cyclic dependency graph") {
+    it("detects a cyclic dependency graph")
       Given("a group with cyclic dependencies")
       val current: Group = Group(
           "/test".toPath,
@@ -557,9 +542,8 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the cycle is detected")
       current.hasNonCyclicDependencies should equal(false)
-    }
 
-    it("can contain a path which has the same name multiple times in it") {
+    it("can contain a path which has the same name multiple times in it")
       Given("a group with subgroups having the same name")
       val reference: Group = Group(
           "/".toPath,
@@ -580,16 +564,15 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
       val app =
         AppDefinition("/test/service/test/app".toPath, cmd = Some("Foobar"))
       val group = Group(PathId("/"), Set(app))
-      val updatedGroup = group.updateApp(app.id, { a =>
+      val updatedGroup = group.updateApp(app.id,  a =>
         app
-      }, Timestamp.zero)
+      , Timestamp.zero)
       val ids = updatedGroup.transitiveGroups.map(_.id)
 
       Then("All non existing subgroups should be created")
       ids should equal(reference.transitiveGroups.map(_.id))
-    }
 
-    it("relative dependencies should be resolvable") {
+    it("relative dependencies should be resolvable")
       Given("a group with an app having relative dependency")
       val group: Group = Group(
           "/".toPath,
@@ -611,6 +594,3 @@ class GroupTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("result should be a success")
       result.isSuccess should be(true)
-    }
-  }
-}

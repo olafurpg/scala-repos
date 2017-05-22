@@ -37,7 +37,7 @@ import org.apache.spark.streaming.dstream.DStream
   */
 class JavaDStream[T](val dstream: DStream[T])(
     implicit val classTag: ClassTag[T])
-    extends AbstractJavaDStreamLike[T, JavaDStream[T], JavaRDD[T]] {
+    extends AbstractJavaDStreamLike[T, JavaDStream[T], JavaRDD[T]]
 
   override def wrapRDD(rdd: RDD[T]): JavaRDD[T] = JavaRDD.fromRDD(rdd)
 
@@ -56,12 +56,10 @@ class JavaDStream[T](val dstream: DStream[T])(
     dstream.persist(storageLevel)
 
   /** Generate an RDD for the given duration */
-  def compute(validTime: Time): JavaRDD[T] = {
-    dstream.compute(validTime) match {
+  def compute(validTime: Time): JavaRDD[T] =
+    dstream.compute(validTime) match
       case Some(rdd) => new JavaRDD(rdd)
       case None => null
-    }
-  }
 
   /**
     * Return a new DStream in which each RDD contains all the elements in seen in a
@@ -98,9 +96,8 @@ class JavaDStream[T](val dstream: DStream[T])(
     */
   def repartition(numPartitions: Int): JavaDStream[T] =
     dstream.repartition(numPartitions)
-}
 
-object JavaDStream {
+object JavaDStream
 
   /**
     * Convert a scala [[org.apache.spark.streaming.dstream.DStream]] to a Java-friendly
@@ -108,4 +105,3 @@ object JavaDStream {
     */
   implicit def fromDStream[T : ClassTag](dstream: DStream[T]): JavaDStream[T] =
     new JavaDStream[T](dstream)
-}

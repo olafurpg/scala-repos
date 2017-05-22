@@ -5,7 +5,7 @@ import lila.db.Types.Coll
 import org.joda.time.DateTime
 import reactivemongo.bson._
 
-private[timeline] final class EntryRepo(coll: Coll, userMax: Int) {
+private[timeline] final class EntryRepo(coll: Coll, userMax: Int)
 
   import Entry._
 
@@ -40,4 +40,3 @@ private[timeline] final class EntryRepo(coll: Coll, userMax: Int) {
         ).some) map (0 !=)
 
   def insert(entry: Entry) = coll insert entry void
-}

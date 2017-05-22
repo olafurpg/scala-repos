@@ -29,7 +29,7 @@ import scala.reflect.ClassTag
   */
 @SerialVersionUID(1L)
 final class TriangularArray[T : ClassTag](val dimension: Int)
-    extends Serializable { outer =>
+    extends Serializable  outer =>
   import TriangularArray._
 
   private def numElems = dimension * (dimension + 1) / 2
@@ -43,12 +43,11 @@ final class TriangularArray[T : ClassTag](val dimension: Int)
   @inline
   def apply(r: Int) = slice(r)
 
-  private def slice(r: Int): Seq[T] = new Seq[T] {
+  private def slice(r: Int): Seq[T] = new Seq[T]
     def apply(c: Int) = outer.apply(r, c)
     def update(c: Int, t: T) = outer.update(r, c, t)
     def length = (dimension - r)
     def iterator = Iterator.range(r, dimension).map(apply _)
-  }
 
   def iterator = Iterator.range(0, numElems) map slice
   def foreach(f: T => Unit) { data foreach f }
@@ -56,50 +55,38 @@ final class TriangularArray[T : ClassTag](val dimension: Int)
   def map[U : ClassTag](f: T => U) =
     tabulate(dimension)((i, j) => f(apply(i, j)))
 
-  override def toString = {
+  override def toString =
     val buffer = new StringBuilder()
-    for (r <- 0 until dimension) {
-      val columns = for (c <- 0 until dimension) yield {
+    for (r <- 0 until dimension)
+      val columns = for (c <- 0 until dimension) yield
         if (c <= r) "----"
         else Option(apply(r, c)).map(_.toString).getOrElse("null")
-      }
       buffer ++= columns.mkString("[", ", ", "]\n")
-    }
     buffer.toString()
-  }
-}
 
-object TriangularArray {
+object TriangularArray
 
-  def tabulate[T : ClassTag](dim: Int)(fill: (Int, Int) => T) = {
+  def tabulate[T : ClassTag](dim: Int)(fill: (Int, Int) => T) =
     val array = new TriangularArray[T](dim)
-    for (c <- 0 until dim; r <- 0 to c) {
+    for (c <- 0 until dim; r <- 0 to c)
       array.data(index(r, c)) = fill(r, c)
-    }
     array
-  }
 
-  def fill[T : ClassTag](dim: Int)(fill: => T) = {
+  def fill[T : ClassTag](dim: Int)(fill: => T) =
     val array = new TriangularArray[T](dim)
-    for (c <- 0 until dim; r <- 0 to c) {
+    for (c <- 0 until dim; r <- 0 to c)
       array.data(index(r, c)) = fill
-    }
     array
-  }
 
   @inline
-  def index(r: Int, c: Int) = {
+  def index(r: Int, c: Int) =
     if (r > c) require(r <= c, "row must be less than column!")
     (c * (c + 1) / 2 + r)
-  }
 
-  def raw[T : ClassTag](dim: Int, fill: => T) = {
+  def raw[T : ClassTag](dim: Int, fill: => T) =
     val numElems = arraySize(dim)
     val data = Array.fill[T](numElems)(fill)
     data
-  }
 
-  def arraySize(dim: Int): Int = {
+  def arraySize(dim: Int): Int =
     dim * (dim + 1) / 2
-  }
-}

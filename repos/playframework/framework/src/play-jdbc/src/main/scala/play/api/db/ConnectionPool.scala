@@ -13,7 +13,7 @@ import play.utils.Reflect
 /**
   * Connection pool API for managing data sources.
   */
-trait ConnectionPool {
+trait ConnectionPool
 
   /**
     * Create a data source with the given configuration.
@@ -32,9 +32,8 @@ trait ConnectionPool {
     * @param dataSource the data source to close
     */
   def close(dataSource: DataSource): Unit
-}
 
-object ConnectionPool {
+object ConnectionPool
 
   /**
     * Load a connection pool from a configured connection pool
@@ -42,16 +41,14 @@ object ConnectionPool {
   def fromConfig(config: String,
                  injector: Injector,
                  environment: Environment,
-                 default: ConnectionPool): ConnectionPool = {
-    config match {
+                 default: ConnectionPool): ConnectionPool =
+    config match
       case "default" => default
       case "bonecp" => new BoneConnectionPool(environment)
       case "hikaricp" => new HikariCPConnectionPool(environment)
       case fqcn =>
         injector.instanceOf(
             Reflect.getClass[ConnectionPool](fqcn, environment.classLoader))
-    }
-  }
 
   private val PostgresFullUrl =
     "^postgres://([a-zA-Z0-9_]+):([^@]+)@([^/]+)/([^\\s]+)$".r
@@ -67,9 +64,9 @@ object ConnectionPool {
     */
   def extractUrl(
       maybeUrl: Option[String],
-      mode: Mode.Mode): (Option[String], Option[(String, String)]) = {
+      mode: Mode.Mode): (Option[String], Option[(String, String)]) =
 
-    maybeUrl match {
+    maybeUrl match
       case Some(PostgresFullUrl(username, password, host, dbname)) =>
         Some(s"jdbc:postgresql://$host/$dbname") -> Some(username -> password)
 
@@ -91,6 +88,3 @@ object ConnectionPool {
         Some(url) -> None
       case None =>
         None -> None
-    }
-  }
-}

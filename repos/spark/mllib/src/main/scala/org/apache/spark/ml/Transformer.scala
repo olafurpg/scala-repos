@@ -32,7 +32,7 @@ import org.apache.spark.sql.types._
   * Abstract class for transformers that transform one dataset into another.
   */
 @DeveloperApi
-abstract class Transformer extends PipelineStage {
+abstract class Transformer extends PipelineStage
 
   /**
     * Transforms the dataset with optional parameters
@@ -44,10 +44,9 @@ abstract class Transformer extends PipelineStage {
   @varargs
   def transform(dataset: DataFrame,
                 firstParamPair: ParamPair[_],
-                otherParamPairs: ParamPair[_]*): DataFrame = {
+                otherParamPairs: ParamPair[_]*): DataFrame =
     val map = new ParamMap().put(firstParamPair).put(otherParamPairs: _*)
     transform(dataset, map)
-  }
 
   /**
     * Transforms the dataset with provided parameter map as additional parameters.
@@ -55,9 +54,8 @@ abstract class Transformer extends PipelineStage {
     * @param paramMap additional parameters, overwrite embedded params
     * @return transformed dataset
     */
-  def transform(dataset: DataFrame, paramMap: ParamMap): DataFrame = {
+  def transform(dataset: DataFrame, paramMap: ParamMap): DataFrame =
     this.copy(paramMap).transform(dataset)
-  }
 
   /**
     * Transforms the input dataset.
@@ -65,7 +63,6 @@ abstract class Transformer extends PipelineStage {
   def transform(dataset: DataFrame): DataFrame
 
   override def copy(extra: ParamMap): Transformer
-}
 
 /**
   * :: DeveloperApi ::
@@ -74,7 +71,7 @@ abstract class Transformer extends PipelineStage {
   */
 @DeveloperApi
 abstract class UnaryTransformer[IN, OUT, T <: UnaryTransformer[IN, OUT, T]]
-    extends Transformer with HasInputCol with HasOutputCol with Logging {
+    extends Transformer with HasInputCol with HasOutputCol with Logging
 
   /** @group setParam */
   def setInputCol(value: String): T = set(inputCol, value).asInstanceOf[T]
@@ -99,24 +96,20 @@ abstract class UnaryTransformer[IN, OUT, T <: UnaryTransformer[IN, OUT, T]]
     */
   protected def validateInputType(inputType: DataType): Unit = {}
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val inputType = schema($(inputCol)).dataType
     validateInputType(inputType)
-    if (schema.fieldNames.contains($(outputCol))) {
+    if (schema.fieldNames.contains($(outputCol)))
       throw new IllegalArgumentException(
           s"Output column ${$(outputCol)} already exists.")
-    }
     val outputFields =
       schema.fields :+ StructField(
           $(outputCol), outputDataType, nullable = false)
     StructType(outputFields)
-  }
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema, logging = true)
     val transformUDF = udf(this.createTransformFunc, outputDataType)
     dataset.withColumn($(outputCol), transformUDF(dataset($(inputCol))))
-  }
 
   override def copy(extra: ParamMap): T = defaultCopy(extra)
-}

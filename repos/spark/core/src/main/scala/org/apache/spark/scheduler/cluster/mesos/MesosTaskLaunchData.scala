@@ -28,25 +28,21 @@ import org.apache.spark.internal.Logging
   */
 private[spark] case class MesosTaskLaunchData(
     serializedTask: ByteBuffer, attemptNumber: Int)
-    extends Logging {
+    extends Logging
 
-  def toByteString: ByteString = {
+  def toByteString: ByteString =
     val dataBuffer = ByteBuffer.allocate(4 + serializedTask.limit)
     dataBuffer.putInt(attemptNumber)
     dataBuffer.put(serializedTask)
     dataBuffer.rewind
     logDebug(s"ByteBuffer size: [${dataBuffer.remaining}]")
     ByteString.copyFrom(dataBuffer)
-  }
-}
 
-private[spark] object MesosTaskLaunchData extends Logging {
-  def fromByteString(byteString: ByteString): MesosTaskLaunchData = {
+private[spark] object MesosTaskLaunchData extends Logging
+  def fromByteString(byteString: ByteString): MesosTaskLaunchData =
     val byteBuffer = byteString.asReadOnlyByteBuffer()
     logDebug(s"ByteBuffer size: [${byteBuffer.remaining}]")
     val attemptNumber = byteBuffer.getInt // updates the position by 4 bytes
     val serializedTask =
       byteBuffer.slice() // subsequence starting at the current position
     MesosTaskLaunchData(serializedTask, attemptNumber)
-  }
-}

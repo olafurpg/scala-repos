@@ -8,11 +8,10 @@ case class UserSession(_id: String,
                        ip: String,
                        ua: String,
                        api: Option[Int],
-                       date: Option[DateTime]) {
+                       date: Option[DateTime])
 
   def id = _id
 
   def isMobile = api.isDefined
-}
 
 case class LocatedSession(session: UserSession, location: Option[Location])

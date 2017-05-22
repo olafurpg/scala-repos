@@ -18,16 +18,15 @@ import scala.collection.mutable
 /**
   * @author ilyas
   */
-class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
+class ReachingDefsTest extends LightCodeInsightFixtureTestCase
   protected override def getBasePath =
     TestUtils.getTestDataPath + "/dataFlow/reachingDefs/"
 
-  override def setUp() = {
+  override def setUp() =
     super.setUp()
     myFixture.setTestDataPath(getBasePath)
-  }
 
-  def doTest() {
+  def doTest()
     val input: java.util.List[String] =
       TestUtils.readInput(getBasePath + getTestName(true) + ".test")
     myFixture.configureByText(ScalaFileType.SCALA_FILE_TYPE, input.get(0))
@@ -53,23 +52,18 @@ class ReachingDefsTest extends LightCodeInsightFixtureTestCase {
 
     val cf: String = dumpDataFlow(markup)
     Assert.assertEquals(input.get(1).trim, cf.trim)
-  }
 
   protected def dumpDataFlow(
-      markup: mutable.Map[Instruction, Set[Instruction]]): String = {
+      markup: mutable.Map[Instruction, Set[Instruction]]): String =
     var builder: StringBuilder = new StringBuilder
-    for (instruction <- markup.keySet.toSeq.sortBy(_.num)) {
+    for (instruction <- markup.keySet.toSeq.sortBy(_.num))
       builder.append(instruction.toString)
       val defs: Set[Instruction] = markup(instruction)
 
-      for (d <- defs.toSeq.sortBy(_.num)) {
+      for (d <- defs.toSeq.sortBy(_.num))
         builder.append("\n  ").append(d.toString)
-      }
       builder.append("\n")
-    }
     builder.toString
-  }
 
   def testFirst() = doTest
   def testSecond() = doTest
-}

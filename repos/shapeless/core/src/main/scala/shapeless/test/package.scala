@@ -19,7 +19,7 @@ package shapeless
 import scala.language.experimental.macros
 import scala.reflect.macros.blackbox
 
-package object test {
+package object test
   def typed[T](t: => T) {}
 
   def sameTyped[T](t1: => T)(t2: => T) {}
@@ -27,14 +27,12 @@ package object test {
   def showType[T]: String = macro TestMacros.showTypeNoValue[T]
 
   def showType[T](t: => T): String = macro TestMacros.showType[T]
-}
 
 @macrocompat.bundle
-class TestMacros(val c: blackbox.Context) {
+class TestMacros(val c: blackbox.Context)
   import c.universe._
 
   def showTypeNoValue[T : WeakTypeTag]: Tree =
     q"${weakTypeOf[T].dealias.toString}"
 
   def showType[T : WeakTypeTag](t: Tree): Tree = showTypeNoValue[T]
-}

@@ -23,48 +23,41 @@ import com.twitter.scalding.source.{DailySuffixSource, HourlySuffixSource}
 import java.io.Serializable
 import org.apache.thrift.{TBase, TFieldIdEnum}
 
-object ParquetThrift extends Serializable {
+object ParquetThrift extends Serializable
   type ThriftBase = TBase[_ <: TBase[_, _], _ <: TFieldIdEnum]
-}
 
 trait ParquetThriftBase[T]
     extends FileSource with SingleMappable[T] with TypedSink[T]
-    with LocalTapSource with HasFilterPredicate with HasColumnProjection {
+    with LocalTapSource with HasFilterPredicate with HasColumnProjection
 
   def mf: Manifest[T]
 
-  def config: ParquetValueScheme.Config[T] = {
+  def config: ParquetValueScheme.Config[T] =
     val config = new ParquetValueScheme.Config[T]
       .withRecordClass(mf.runtimeClass.asInstanceOf[Class[T]])
-    val configWithFp = withFilter match {
+    val configWithFp = withFilter match
       case Some(fp) => config.withFilterPredicate(fp)
       case None => config
-    }
 
-    val configWithProjection = columnProjectionString match {
+    val configWithProjection = columnProjectionString match
       case Some(s @ DeprecatedColumnProjectionString(_)) =>
         configWithFp.withProjectionString(s.asSemicolonString)
       case Some(s @ StrictColumnProjectionString(_)) =>
         configWithFp.withStrictProjectionString(s.asSemicolonString)
       case None => configWithFp
-    }
 
     configWithProjection
-  }
 
   override def setter[U <: T] =
     TupleSetter.asSubSetter[T, U](TupleSetter.singleSetter[T])
-}
 
 trait ParquetThrift[T <: ParquetThrift.ThriftBase]
-    extends ParquetThriftBase[T] {
+    extends ParquetThriftBase[T]
 
-  override def hdfsScheme = {
+  override def hdfsScheme =
     // See docs in Parquet346TBaseScheme
     val scheme = new Parquet346TBaseScheme[T](this.config)
     HadoopSchemeInstance(scheme.asInstanceOf[Scheme[_, _, _, _, _]])
-  }
-}
 
 /**
   * When Using these sources or creating subclasses of them, you can

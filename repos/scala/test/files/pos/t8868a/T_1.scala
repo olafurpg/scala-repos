@@ -1,6 +1,5 @@
 class C
 
-trait T {
+trait T
   @deprecated(since = "", message = "")
   class X
-}

@@ -28,40 +28,37 @@ import scala.collection.JavaConverters._
   * @author Nikolay.Tropin
   */
 class ScalaPrefixPackageCompletionContributor
-    extends ScalaCompletionContributor {
+    extends ScalaCompletionContributor
   extend(
       CompletionType.BASIC,
       PlatformPatterns
         .psiElement(ScalaTokenTypes.tIDENTIFIER)
         .withParent(classOf[ScReferenceElement]),
-      new CompletionProvider[CompletionParameters] {
+      new CompletionProvider[CompletionParameters]
 
         def addCompletions(parameters: CompletionParameters,
                            context: ProcessingContext,
-                           result: CompletionResultSet) {
+                           result: CompletionResultSet)
           if (!shouldRunClassNameCompletion(positionFromParameters(parameters),
                                             parameters,
-                                            result.getPrefixMatcher)) {
+                                            result.getPrefixMatcher))
             ScalaPrefixPackageCompletionContributor.completePrefixPackageNames(
                 positionFromParameters(parameters),
                 parameters,
                 context,
                 result)
-          }
-        }
-      })
-}
+      )
 
-object ScalaPrefixPackageCompletionContributor {
+object ScalaPrefixPackageCompletionContributor
 
   def completePrefixPackageNames(dummyPosition: PsiElement,
                                  parameters: CompletionParameters,
                                  context: ProcessingContext,
-                                 result: CompletionResultSet) = {
+                                 result: CompletionResultSet) =
     val position = dummyPosition
     val project = position.getProject
 
-    def addPackageForCompletion(packageFqn: String): Unit = {
+    def addPackageForCompletion(packageFqn: String): Unit =
       val isExcluded: Boolean =
         CodeInsightSettings.getInstance.EXCLUDED_PACKAGES
           .contains(packageFqn.startsWith(_: String))
@@ -79,33 +76,28 @@ object ScalaPrefixPackageCompletionContributor {
       if (pckg == null) return
 
       ScalaPsiElementFactory.createExpressionWithContextFromText(
-          pckg.name, position.getContext, position) match {
+          pckg.name, position.getContext, position) match
         case ResolvesTo(pack: PsiPackage)
             if pack.getQualifiedName == pckg.getQualifiedName =>
           return
         case _ =>
-      }
 
       val resolveResult = new ScalaResolveResult(pckg, prefixCompletion = true)
       val lookupElems = LookupElementManager.getLookupElement(
           resolveResult, isInImport = false, shouldImport = true)
-      lookupElems.foreach { le =>
+      lookupElems.foreach  le =>
         le.elementToImport = pckg
-      }
       result.addAllElements(lookupElems.asJava)
-    }
 
     val prefixMatcher = result.getPrefixMatcher
-    for {
+    for
       fqn <- prefixPackages(project)
       name = fqn.substring(fqn.lastIndexOf('.'))
           if prefixMatcher.prefixMatches(name)
-    } {
+    
       addPackageForCompletion(fqn)
-    }
-  }
 
-  def prefixPackages(project: Project) = {
+  def prefixPackages(project: Project) =
     def stripLastWord(pattern: String) =
       pattern.split('.').dropRight(1).mkString(".")
 
@@ -113,5 +105,3 @@ object ScalaPrefixPackageCompletionContributor {
     val patterns = settings.getImportsWithPrefix.filter(
         !_.startsWith(ScalaCodeStyleSettings.EXCLUDE_PREFIX))
     patterns.toSeq.map(stripLastWord).distinct
-  }
-}

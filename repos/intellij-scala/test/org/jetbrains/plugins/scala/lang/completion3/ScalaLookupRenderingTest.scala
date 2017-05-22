@@ -11,8 +11,8 @@ import org.junit.Assert
   * @author Alefas
   * @since 23.03.12
   */
-class ScalaLookupRenderingTest extends ScalaCodeInsightTestBase {
-  def testJavaVarargs() {
+class ScalaLookupRenderingTest extends ScalaCodeInsightTestBase
+  def testJavaVarargs()
     val javaFileText = """
       |package a;
       |
@@ -27,12 +27,11 @@ class ScalaLookupRenderingTest extends ScalaCodeInsightTestBase {
       |}
       """.stripMargin('|').replaceAll("\r", "").trim()
 
-    inWriteAction {
+    inWriteAction
       val myVFile = getSourceRootAdapter
         .createChildDirectory(null, "a")
         .createChildData(null, "Java.java")
       VfsUtil.saveText(myVFile, javaFileText)
-    }
 
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
@@ -44,15 +43,12 @@ class ScalaLookupRenderingTest extends ScalaCodeInsightTestBase {
     val result = activeLookup
       .filter(_.getLookupString == "foo")
       .map(p =>
-            {
           val presentation: LookupElementPresentation =
             new LookupElementPresentation
           p.renderElement(presentation)
           presentation.getItemText + presentation.getTailText
-      })
+      )
       .sorted
       .mkString("\n")
 
     Assert.assertEquals(resultText, result)
-  }
-}

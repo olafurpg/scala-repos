@@ -22,13 +22,13 @@ import org.junit.Test
 import kafka.producer.ProducerConfig
 import kafka.consumer.ConsumerConfig
 
-class ConfigTest {
+class ConfigTest
 
   @Test
   @deprecated(
       "This test is deprecated and it will be removed in a future release.",
       "0.10.0.0")
-  def testInvalidClientIds() {
+  def testInvalidClientIds()
     val invalidClientIds = new ArrayBuffer[String]()
     val badChars = Array('/',
                          '\\',
@@ -45,32 +45,26 @@ class ConfigTest {
                          '\r',
                          '\n',
                          '=')
-    for (weirdChar <- badChars) {
+    for (weirdChar <- badChars)
       invalidClientIds += "Is" + weirdChar + "illegal"
-    }
 
-    for (i <- 0 until invalidClientIds.size) {
-      try {
+    for (i <- 0 until invalidClientIds.size)
+      try
         ProducerConfig.validateClientId(invalidClientIds(i))
         fail("Should throw InvalidClientIdException.")
-      } catch {
+      catch
         case e: InvalidConfigException => "This is good."
-      }
-    }
 
     val validClientIds = new ArrayBuffer[String]()
     validClientIds += ("valid", "CLIENT", "iDs", "ar6", "VaL1d", "_0-9_.", "")
-    for (i <- 0 until validClientIds.size) {
-      try {
+    for (i <- 0 until validClientIds.size)
+      try
         ProducerConfig.validateClientId(validClientIds(i))
-      } catch {
+      catch
         case e: Exception => fail("Should not throw exception.")
-      }
-    }
-  }
 
   @Test
-  def testInvalidGroupIds() {
+  def testInvalidGroupIds()
     val invalidGroupIds = new ArrayBuffer[String]()
     val badChars = Array('/',
                          '\\',
@@ -87,27 +81,20 @@ class ConfigTest {
                          '\r',
                          '\n',
                          '=')
-    for (weirdChar <- badChars) {
+    for (weirdChar <- badChars)
       invalidGroupIds += "Is" + weirdChar + "illegal"
-    }
 
-    for (i <- 0 until invalidGroupIds.size) {
-      try {
+    for (i <- 0 until invalidGroupIds.size)
+      try
         ConsumerConfig.validateGroupId(invalidGroupIds(i))
         fail("Should throw InvalidGroupIdException.")
-      } catch {
+      catch
         case e: InvalidConfigException => "This is good."
-      }
-    }
 
     val validGroupIds = new ArrayBuffer[String]()
     validGroupIds += ("valid", "GROUP", "iDs", "ar6", "VaL1d", "_0-9_.", "")
-    for (i <- 0 until validGroupIds.size) {
-      try {
+    for (i <- 0 until validGroupIds.size)
+      try
         ConsumerConfig.validateGroupId(validGroupIds(i))
-      } catch {
+      catch
         case e: Exception => fail("Should not throw exception.")
-      }
-    }
-  }
-}

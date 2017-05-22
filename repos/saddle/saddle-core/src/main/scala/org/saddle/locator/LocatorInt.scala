@@ -20,7 +20,7 @@ import it.unimi.dsi.fastutil.ints.{Int2IntLinkedOpenHashMap, Int2IntOpenHashMap}
 /**
   * A integer-to-integer hash map, backed by fastutil implementation
   */
-class LocatorInt(sz: Int = Locator.INIT_CAPACITY) extends Locator[Int] {
+class LocatorInt(sz: Int = Locator.INIT_CAPACITY) extends Locator[Int]
   val map = new Int2IntLinkedOpenHashMap(sz)
   val cts = new Int2IntOpenHashMap(sz)
 
@@ -29,10 +29,9 @@ class LocatorInt(sz: Int = Locator.INIT_CAPACITY) extends Locator[Int] {
 
   def get(key: Int): Int = map.get(key)
 
-  def put(key: Int, value: Int) {
+  def put(key: Int, value: Int)
     // prevents unboxing!
     val tmp = map.put(key, value)
-  }
 
   def contains(key: Int) = map.containsKey(key)
 
@@ -44,14 +43,11 @@ class LocatorInt(sz: Int = Locator.INIT_CAPACITY) extends Locator[Int] {
 
   def count(key: Int) = cts.get(key)
 
-  def counts() = {
+  def counts() =
     val iter = map.keySet().iterator()
     val res = Array.ofDim[Int](size)
     var i = 0
-    while (iter.hasNext) {
+    while (iter.hasNext)
       res(i) = cts.get(iter.nextInt())
       i += 1
-    }
     res
-  }
-}

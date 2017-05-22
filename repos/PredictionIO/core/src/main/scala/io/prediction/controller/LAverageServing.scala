@@ -21,23 +21,20 @@ import io.prediction.core.BaseAlgorithm
   *
   * @group Serving
   */
-class LAverageServing[Q] extends LServing[Q, Double] {
+class LAverageServing[Q] extends LServing[Q, Double]
 
   /** Returns the average of all algorithms' predictions. */
-  def serve(query: Q, predictions: Seq[Double]): Double = {
+  def serve(query: Q, predictions: Seq[Double]): Double =
     predictions.sum / predictions.length
-  }
-}
 
 /** A concrete implementation of [[LServing]] returning the average of all
   * algorithms' predictions, where their classes are expected to be all Double.
   *
   * @group Serving
   */
-object LAverageServing {
+object LAverageServing
 
   /** Returns an instance of [[LAverageServing]]. */
   def apply[Q](
       a: Class[_ <: BaseAlgorithm[_, _, Q, _]]): Class[LAverageServing[Q]] =
     classOf[LAverageServing[Q]]
-}

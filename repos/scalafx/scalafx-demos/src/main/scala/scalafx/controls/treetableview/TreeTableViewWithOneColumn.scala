@@ -38,32 +38,25 @@ import scalafx.scene.control.{TreeItem, TreeTableColumn, TreeTableView}
   * ScalaFX version of example 15-1 in JavaFX
   * [[https://docs.oracle.com/javase/8/javafx/user-interface-tutorial/tree-table-view.htm Tree Table View tutorial]].
   */
-object TreeTableViewWithOneColumn extends JFXApp {
+object TreeTableViewWithOneColumn extends JFXApp
 
   // Creating items to be displayed in the TreeTableView
-  val rootNode = new TreeItem("Root node") {
+  val rootNode = new TreeItem("Root node")
     expanded = true
     children = Seq(
         new TreeItem("Child Node 1"),
         new TreeItem("Child Node 2"),
         new TreeItem("Child Node 3")
     )
-  }
 
   // Creating a stage with tree table view
-  stage = new PrimaryStage {
-    scene = new Scene {
+  stage = new PrimaryStage
+    scene = new Scene
       title = "TreeTableView with One Column"
-      root = new TreeTableView(rootNode) {
-        columns += new TreeTableColumn[String, String]("Column") {
+      root = new TreeTableView(rootNode)
+        columns += new TreeTableColumn[String, String]("Column")
           prefWidth = 150
-          cellValueFactory = { p =>
+          cellValueFactory =  p =>
             p.value.value
-          }
-        }
         prefWidth = 152
         showRoot = true
-      }
-    }
-  }
-}

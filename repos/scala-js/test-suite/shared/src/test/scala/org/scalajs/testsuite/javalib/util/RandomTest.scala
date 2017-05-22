@@ -14,9 +14,9 @@ import java.util.Random
 
 import org.scalajs.testsuite.utils.AssertThrows._
 
-class RandomTest {
+class RandomTest
 
-  @Test def should_produce_bits_according_to_spec_with_seed_10(): Unit = {
+  @Test def should_produce_bits_according_to_spec_with_seed_10(): Unit =
     val random = new HackRandom(10)
 
     assertEquals(747, random.next(10))
@@ -24,9 +24,8 @@ class RandomTest {
     assertEquals(16, random.next(6))
     assertEquals(432970, random.next(20))
     assertEquals(254270492, random.next(32))
-  }
 
-  @Test def should_produce_bits_according_to_spec_with_seed_neg5(): Unit = {
+  @Test def should_produce_bits_according_to_spec_with_seed_neg5(): Unit =
     val random = new HackRandom(-5)
 
     assertEquals(275, random.next(10))
@@ -34,9 +33,8 @@ class RandomTest {
     assertEquals(21, random.next(6))
     assertEquals(360349, random.next(20))
     assertEquals(1635930704, random.next(32))
-  }
 
-  @Test def should_produce_bits_according_to_spec_withseedMaxLong(): Unit = {
+  @Test def should_produce_bits_according_to_spec_withseedMaxLong(): Unit =
     val random = new HackRandom(Long.MaxValue)
 
     assertEquals(275, random.next(10))
@@ -44,9 +42,8 @@ class RandomTest {
     assertEquals(0, random.next(6))
     assertEquals(574655, random.next(20))
     assertEquals(-1451336087, random.next(32))
-  }
 
-  @Test def should_produce_bits_according_to_spec_withseedMinInt(): Unit = {
+  @Test def should_produce_bits_according_to_spec_withseedMinInt(): Unit =
     val random = new HackRandom(Int.MinValue)
 
     assertEquals(388, random.next(10))
@@ -54,9 +51,8 @@ class RandomTest {
     assertEquals(25, random.next(6))
     assertEquals(352095, random.next(20))
     assertEquals(-2140124682, random.next(32))
-  }
 
-  @Test def should_allow_resetting_the_seed(): Unit = {
+  @Test def should_allow_resetting_the_seed(): Unit =
     val random = new HackRandom(11)
     assertEquals(747, random.next(10))
     assertEquals(1, random.next(1))
@@ -66,16 +62,14 @@ class RandomTest {
     assertEquals(747, random.next(10))
     assertEquals(1, random.next(1))
     assertEquals(27, random.next(6))
-  }
 
-  @Test def should_reset_nextNextGaussian_when_setting_the_seed(): Unit = {
+  @Test def should_reset_nextNextGaussian_when_setting_the_seed(): Unit =
     val random = new Random(-1)
     assertEquals(1.7853314409882288, random.nextGaussian(), 0.0)
     random.setSeed(-1)
     assertEquals(1.7853314409882288, random.nextGaussian(), 0.0)
-  }
 
-  @Test def should_correctly_implement_nextDouble(): Unit = {
+  @Test def should_correctly_implement_nextDouble(): Unit =
     val random = new Random(-45)
     assertEquals(0.27288421395636253, random.nextDouble(), 0.0)
     assertEquals(0.5523165360074201, random.nextDouble(), 0.0)
@@ -87,9 +81,8 @@ class RandomTest {
     assertEquals(0.06132131151816378, random.nextDouble(), 0.0)
     assertEquals(0.7303867762743866, random.nextDouble(), 0.0)
     assertEquals(0.7426529384056163, random.nextDouble(), 0.0)
-  }
 
-  @Test def should_correctly_implement_nextBoolean(): Unit = {
+  @Test def should_correctly_implement_nextBoolean(): Unit =
     val random = new Random(4782934)
     assertFalse(random.nextBoolean())
     assertTrue(random.nextBoolean())
@@ -99,9 +92,8 @@ class RandomTest {
     assertFalse(random.nextBoolean())
     assertTrue(random.nextBoolean())
     assertFalse(random.nextBoolean())
-  }
 
-  @Test def should_correctly_implement_nextInt(): Unit = {
+  @Test def should_correctly_implement_nextInt(): Unit =
     val random = new Random(-84638)
     assertEquals(-1217585344, random.nextInt())
     assertEquals(1665699216, random.nextInt())
@@ -113,9 +105,8 @@ class RandomTest {
     assertEquals(922172344, random.nextInt())
     assertEquals(-1890515287, random.nextInt())
     assertEquals(1397525728, random.nextInt())
-  }
 
-  @Test def should_correctly_implement_nextInt_of_n(): Unit = {
+  @Test def should_correctly_implement_nextInt_of_n(): Unit =
     val random = new Random(7)
     assertEquals(32736, random.nextInt(76543))
     assertThrows(classOf[Exception], random.nextInt(0))
@@ -125,9 +116,8 @@ class RandomTest {
     assertEquals(23932, random.nextInt(35699))
     assertEquals(2278, random.nextInt(3699))
     assertEquals(8, random.nextInt(10))
-  }
 
-  @Test def should_correctly_implement_nextInt_for_powers_of_2(): Unit = {
+  @Test def should_correctly_implement_nextInt_for_powers_of_2(): Unit =
     val random = new Random(-56938)
 
     assertEquals(8, random.nextInt(32))
@@ -140,9 +130,8 @@ class RandomTest {
     assertEquals(7077, random.nextInt(8192))
     assertEquals(2392, random.nextInt(8192))
     assertEquals(31, random.nextInt(32))
-  }
 
-  @Test def should_correctly_implement_nextLong(): Unit = {
+  @Test def should_correctly_implement_nextLong(): Unit =
     val random = new Random(205620432625028L)
     assertEquals(3710537363280377478L, random.nextLong())
     assertEquals(4121778334981170700L, random.nextLong())
@@ -154,9 +143,8 @@ class RandomTest {
     assertEquals(-7888117030898487184L, random.nextLong())
     assertEquals(-3499168703537933266L, random.nextLong())
     assertEquals(-1998975913933474L, random.nextLong())
-  }
 
-  @Test def should_correctly_implement_nextFloat(): Unit = {
+  @Test def should_correctly_implement_nextFloat(): Unit =
     val random = new Random(-3920005825473L)
     assertEquals(0.059591234f, random.nextFloat(), 0.0f)
     assertEquals(0.7007871f, random.nextFloat(), 0.0f)
@@ -168,17 +156,15 @@ class RandomTest {
     assertEquals(0.008844078f, random.nextFloat(), 0.0f)
     assertEquals(0.08891684f, random.nextFloat(), 0.0f)
     assertEquals(0.06482434f, random.nextFloat(), 0.0f)
-  }
 
-  @Test def should_correctly_implement_nextBytes(): Unit = {
+  @Test def should_correctly_implement_nextBytes(): Unit =
     val random = new Random(7399572013373333L)
 
-    def test(exps: Int*): Unit = {
+    def test(exps: Int*): Unit =
       val exp = exps.map(_.toByte).toArray
       val buf = new Array[Byte](exp.length)
       random.nextBytes(buf)
       assertArrayEquals(exp, buf)
-    }
 
     test(62, 89, 68, -91, 10, 0, 85)
     test(-89,
@@ -210,9 +196,8 @@ class RandomTest {
     test()
     test(-84, -96, 108)
     test(57, -106, 42, -100, -47, -84, 67, -48, 45)
-  }
 
-  @Test def should_correctly_implement_nextGaussian(): Unit = {
+  @Test def should_correctly_implement_nextGaussian(): Unit =
     val random = new Random(2446004)
     assertEquals(-0.5043346938630431, random.nextGaussian(), 0.0)
     assertEquals(-0.3250983270156675, random.nextGaussian(), 0.0)
@@ -234,10 +219,7 @@ class RandomTest {
     assertEquals(0.6734222041441913, random.nextGaussian(), 0.0)
     assertEquals(0.3990565555091522, random.nextGaussian(), 0.0)
     assertEquals(2.0051627385915154, random.nextGaussian(), 0.0)
-  }
 
   /** Helper class to access next */
-  class HackRandom(seed: Long) extends Random(seed) {
+  class HackRandom(seed: Long) extends Random(seed)
     override def next(bits: Int): Int = super.next(bits)
-  }
-}

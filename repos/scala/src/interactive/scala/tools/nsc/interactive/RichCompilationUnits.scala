@@ -8,7 +8,7 @@ package interactive
 import scala.reflect.internal.util.SourceFile
 import scala.collection.mutable.ArrayBuffer
 
-trait RichCompilationUnits { self: Global =>
+trait RichCompilationUnits  self: Global =>
 
   /** The status value of a unit that has not yet been loaded */
   final val NotLoaded = -2
@@ -20,7 +20,7 @@ trait RichCompilationUnits { self: Global =>
   final val PartiallyChecked = 0
 
   class RichCompilationUnit(source: SourceFile)
-      extends CompilationUnit(source) {
+      extends CompilationUnit(source)
 
     /** The runid of the latest compiler run that typechecked this unit,
       *  or else @see NotLoaded, JustParsed
@@ -55,5 +55,3 @@ trait RichCompilationUnits { self: Global =>
 
     /** The last fully type-checked body of this unit */
     var lastBody: Tree = EmptyTree
-  }
-}

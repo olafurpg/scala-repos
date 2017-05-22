@@ -3,7 +3,7 @@ trait A2
 trait A3
 trait L1 extends A1 with A2 with A3
 
-object Test {
+object Test
   trait T1[-A <: A1]
   trait T2[-A >: L1]
   trait T3[A <: A1]
@@ -45,4 +45,3 @@ object Test {
   def h4(x: T4[_ >: L1 <: A1]) = x
   def h5(x: T5[_ >: L1 <: A1]) = x
   def h6(x: T6[_ >: L1 <: A1]) = x
-}

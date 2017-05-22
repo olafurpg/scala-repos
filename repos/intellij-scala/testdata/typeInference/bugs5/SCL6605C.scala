@@ -1,4 +1,4 @@
-trait SCL6605C {
+trait SCL6605C
   type X <: Z with Y
   type Z <: A
   type Y <: B
@@ -15,5 +15,4 @@ trait SCL6605C {
   val u = if (true) x else h
   /*start*/
   u /*end*/
-}
 //SCL6605C.this.Z

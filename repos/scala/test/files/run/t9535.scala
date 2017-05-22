@@ -1,4 +1,4 @@
-class C[E <: Exception] {
+class C[E <: Exception]
   @throws[E]
   def f = 1
 
@@ -8,9 +8,8 @@ class C[E <: Exception] {
   @throws[E]
   @throws[Exception]
   def h = 1
-}
 
-object Test extends App {
+object Test extends App
   val c = classOf[C[_]]
   def sig(method: String) = c.getDeclaredMethod(method).toString
   def genSig(method: String) = c.getDeclaredMethod(method).toGenericString
@@ -25,4 +24,3 @@ object Test extends App {
   assert(
       sig("h") == "public int C.h() throws java.lang.Exception,java.lang.Exception")
   assert(genSig("h") == "public int C.h() throws E,java.lang.Exception")
-}

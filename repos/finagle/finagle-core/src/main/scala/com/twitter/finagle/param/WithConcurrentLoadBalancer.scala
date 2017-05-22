@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[ConcurrentLoadBalancingParams]]
   */
-trait WithConcurrentLoadBalancer[A <: Stack.Parameterized[A]] {
+trait WithConcurrentLoadBalancer[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -19,4 +19,3 @@ trait WithConcurrentLoadBalancer[A <: Stack.Parameterized[A]] {
     */
   val withLoadBalancer: ConcurrentLoadBalancingParams[A] =
     new ConcurrentLoadBalancingParams(self)
-}

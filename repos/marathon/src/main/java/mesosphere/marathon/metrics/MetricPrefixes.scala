@@ -1,6 +1,6 @@
 package mesosphere.marathon.metrics
 
-object MetricPrefixes {
+object MetricPrefixes
 
   /**
     * Metrics relating to our API.
@@ -11,4 +11,3 @@ object MetricPrefixes {
     * Metrics relating to the application code.
     */
   val SERVICE = "service"
-}

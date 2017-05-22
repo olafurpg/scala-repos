@@ -10,7 +10,7 @@ import scala.annotation.tailrec
 import java.nio._
 import java.nio.charset.CodingErrorAction
 
-final class URI(origStr: String) extends Serializable with Comparable[URI] {
+final class URI(origStr: String) extends Serializable with Comparable[URI]
 
   import URI.Fields._
   import URI.decodeComponent
@@ -21,9 +21,8 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
     *  This is a local val for the primary constructor. It is a val,
     *  since we'll set it to null after initializing all fields.
     */
-  private[this] var _fld = Option(URI.uriRe.exec(origStr)).getOrElse {
+  private[this] var _fld = Option(URI.uriRe.exec(origStr)).getOrElse
     throw new URISyntaxException(origStr, "Malformed URI")
-  }
 
   private val _isAbsolute = fld(AbsScheme).isDefined
   private val _isOpaque = fld(AbsOpaquePart).isDefined
@@ -35,23 +34,22 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 
   private val _scheme = fld(AbsScheme)
 
-  private val _schemeSpecificPart = {
+  private val _schemeSpecificPart =
     if (!_isAbsolute) fld(RelSchemeSpecificPart)
     else if (_isOpaque) fld(AbsOpaquePart)
     else fld(AbsHierPart)
-  }.get
+  .get
 
   private val _authority = fld(AbsAuthority, RelAuthority).filter(_ != "")
   private val _userInfo = fld(AbsUserInfo, RelUserInfo)
   private val _host = fld(AbsHost, RelHost)
   private val _port = fld(AbsPort, RelPort).fold(-1)(_.toInt)
 
-  private val _path = {
+  private val _path =
     val useNetPath = fld(AbsAuthority, RelAuthority).isDefined
     if (useNetPath) fld(AbsNetPath, RelNetPath) orElse ""
     else if (_isAbsolute) fld(AbsAbsPath)
     else fld(RelAbsPath) orElse fld(RelRelPath)
-  }
 
   private val _query = fld(AbsQuery, RelQuery)
   private val _fragment = fld(Fragment)
@@ -68,10 +66,9 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
            port: Int,
            path: String,
            query: String,
-           fragment: String) = {
+           fragment: String) =
     this(URI.uriStr(scheme, userInfo, host, port, path, query, fragment))
     parseServerAuthority()
-  }
 
   def this(scheme: String, host: String, path: String, fragment: String) =
     this(scheme, null, host, -1, path, null, fragment)
@@ -80,13 +77,12 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
            authority: String,
            path: String,
            query: String,
-           fragment: String) = {
+           fragment: String) =
     this(URI.uriStr(scheme, authority, path, query, fragment))
     // JavaDoc says to invoke parseServerAuthority() here, but in practice
     // it isn't invoked. This makes sense, since you want to be able
     // to create URIs with registry-based authorities.
     // parseServerAuthority()
-  }
 
   /** Compare this URI to another URI while supplying a comparator
     *
@@ -95,46 +91,42 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
     *  URI escapes specially: they are never case-sensitive).
     */
   @inline
-  private def internalCompare(that: URI)(cmp: (String, String) => Int): Int = {
-    @inline def cmpOpt(x: js.UndefOr[String], y: js.UndefOr[String]): Int = {
+  private def internalCompare(that: URI)(cmp: (String, String) => Int): Int =
+    @inline def cmpOpt(x: js.UndefOr[String], y: js.UndefOr[String]): Int =
       if (x == y) 0
       // Undefined components are considered less than defined components
       else x.fold(-1)(s1 => y.fold(1)(s2 => cmp(s1, s2)))
-    }
 
     if (this._scheme != that._scheme)
       this._scheme.fold(-1)(s1 => that._scheme.fold(1)(s1.compareToIgnoreCase))
     else if (this._isOpaque != that._isOpaque)
       // A hierarchical URI is less than an opaque URI
       if (this._isOpaque) 1 else -1
-    else if (_isOpaque) {
+    else if (_isOpaque)
       val ssp = cmp(this._schemeSpecificPart, that._schemeSpecificPart)
       if (ssp != 0) ssp
       else cmpOpt(this._fragment, that._fragment)
-    } else if (this._authority != that._authority) {
-      if (this._host.isDefined && that._host.isDefined) {
+    else if (this._authority != that._authority)
+      if (this._host.isDefined && that._host.isDefined)
         val ui = cmpOpt(this._userInfo, that._userInfo)
         if (ui != 0) ui
-        else {
+        else
           val hst = this._host.get.compareToIgnoreCase(that._host.get)
           if (hst != 0) hst
           else if (this._port == that._port) 0
           else if (this._port == -1) -1
           else if (that._port == -1) 1
           else this._port - that._port
-        }
-      } else cmpOpt(this._authority, that._authority)
-    } else if (this._path != that._path) cmpOpt(this._path, that._path)
+      else cmpOpt(this._authority, that._authority)
+    else if (this._path != that._path) cmpOpt(this._path, that._path)
     else if (this._query != that._query) cmpOpt(this._query, that._query)
     else cmpOpt(this._fragment, that._fragment)
-  }
 
   def compareTo(that: URI): Int = internalCompare(that)(_.compareTo(_))
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: URI => internalCompare(that)(URI.escapeAwareCompare) == 0
     case _ => false
-  }
 
   def getAuthority(): String = _authority.map(decodeComponent).orNull
   def getFragment(): String = _fragment.map(decodeComponent).orNull
@@ -152,7 +144,7 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
   def getSchemeSpecificPart(): String = decodeComponent(_schemeSpecificPart)
   def getUserInfo(): String = _userInfo.map(decodeComponent).orNull
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     import scala.util.hashing.MurmurHash3._
     import URI.normalizeEscapes
 
@@ -162,14 +154,13 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
     acc = mixLast(acc, _fragment.map(normalizeEscapes).##)
 
     finalizeHash(acc, 3)
-  }
 
   def isAbsolute(): Boolean = _isAbsolute
   def isOpaque(): Boolean = _isOpaque
 
   def normalize(): URI =
     if (_isOpaque || _path.isEmpty) this
-    else {
+    else
       val origPath = _path.get
 
       // Step 1: Remove all "." segments
@@ -184,7 +175,7 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 
       @tailrec
       def loop(in: List[String], resRev: List[String]): List[String] =
-        in match {
+        in match
           case "." :: Nil =>
             // convert "." segments at end to an empty segment
             // (consider: /a/b/. => /a/b/, not /a/b)
@@ -206,7 +197,6 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
             loop(xs, x :: resRev)
           case Nil =>
             resRev.reverse
-        }
 
       // Split into segments. -1 since we want empty trailing ones
       val segments0 = origPath.split("/", -1).toList
@@ -219,12 +209,11 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       // Step 3: If path is relative and first segment contains ":", prepend "."
       // segment (according to JavaDoc). If it is absolute, add empty
       // segment again to have leading "/".
-      val segments3 = {
+      val segments3 =
         if (isAbsPath) "" :: segments2
         else if (segments2.nonEmpty && segments2.head.contains(':'))
           "." :: segments2
         else segments2
-      }
 
       val newPath = segments3.mkString("/")
 
@@ -233,27 +222,24 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
       else
         new URI(
             getScheme(), getRawAuthority(), newPath, getQuery(), getFragment())
-    }
 
-  def parseServerAuthority(): URI = {
+  def parseServerAuthority(): URI =
     if (_authority.nonEmpty && _host.isEmpty)
       throw new URISyntaxException(origStr, "No Host in URI")
     else this
-  }
 
-  def relativize(uri: URI): URI = {
-    def authoritiesEqual = this._authority.fold(uri._authority.isEmpty) { a1 =>
+  def relativize(uri: URI): URI =
+    def authoritiesEqual = this._authority.fold(uri._authority.isEmpty)  a1 =>
       uri._authority.fold(false)(a2 => URI.escapeAwareCompare(a1, a2) == 0)
-    }
 
     if (this.isOpaque || uri.isOpaque || this._scheme != uri._scheme ||
         !authoritiesEqual) uri
-    else {
+    else
       val thisN = this.normalize()
       val uriN = uri.normalize()
 
       // Strangely, Java doesn't handle escapes here. So we don't
-      if (uriN.getRawPath().startsWith(thisN.getRawPath())) {
+      if (uriN.getRawPath().startsWith(thisN.getRawPath()))
         val newPath = uriN.getRawPath().stripPrefix(thisN.getRawPath())
 
         new URI(scheme = null,
@@ -262,13 +248,11 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
                 path = newPath.stripPrefix("/"),
                 query = uri.getQuery(),
                 fragment = uri.getFragment())
-      } else uri
-    }
-  }
+      else uri
 
   def resolve(str: String): URI = resolve(URI.create(str))
 
-  def resolve(uri: URI): URI = {
+  def resolve(uri: URI): URI =
     if (uri.isAbsolute() || this.isOpaque()) uri
     else if (uri._scheme.isEmpty && uri._authority.isEmpty &&
              uri._path.get == "" && uri._query.isEmpty)
@@ -291,7 +275,7 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
               uri.getRawPath(),
               uri.getRawQuery(),
               uri.getRawFragment())
-    else {
+    else
       val basePath = this._path.get
       val relPath = uri._path.get
       val endIdx = basePath.lastIndexOf('/')
@@ -303,8 +287,6 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
               path,
               uri.getRawQuery(),
               uri.getRawFragment()).normalize()
-    }
-  }
 
   def toASCIIString(): String = quoteNonASCII(origStr)
 
@@ -312,20 +294,17 @@ final class URI(origStr: String) extends Serializable with Comparable[URI] {
 
   // Not implemented:
   // def toURL(): URL
-}
 
-object URI {
+object URI
 
-  def create(str: String): URI = {
-    try new URI(str) catch {
+  def create(str: String): URI =
+    try new URI(str) catch
       case e: URISyntaxException => throw new IllegalArgumentException(e)
-    }
-  }
 
   // IPv4address   = 1*digit "." 1*digit "." 1*digit "." 1*digit
   private final val ipv4address = "[0-9]{1,3}(?:\\.[0-9]{1,3}){3}"
 
-  private final val ipv6address = {
+  private final val ipv6address =
     // http://stackoverflow.com/a/17871737/1149944
     val block = "[0-9a-f]{1,4}"
     val lelem = "(?:" + block + ":)"
@@ -377,7 +356,6 @@ object URI {
     // (25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])           # 2001:db8:3:4::192.0.2.33  64:ff9b::192.0.2.33 (IPv4-Embedded IPv6 Address)
 
     // scalastyle:on line.size.limit
-  }
 
   private val ipv6Re = new RegExp("^" + ipv6address + "$", "i")
 
@@ -386,7 +364,7 @@ object URI {
   // - http://www.ietf.org/rfc/rfc2396.txt (see Appendix A for complete syntax)
   // - http://www.ietf.org/rfc/rfc2732.txt
 
-  private val uriRe = {
+  private val uriRe =
     // We don't use any interpolators here to allow for constant folding
 
     ///////////////////
@@ -540,9 +518,8 @@ object URI {
       "^(?:" + absoluteURI + "|" + relativeURI + ")(?:#" + fragment + ")?$"
 
     new RegExp(uriRef, "i")
-  }
 
-  private object Fields {
+  private object Fields
     final val AbsScheme = 1
     final val AbsHierPart = AbsScheme + 1
     final val AbsAuthority = AbsHierPart + 1
@@ -564,11 +541,10 @@ object URI {
     final val RelRelPath = RelAbsPath + 1
     final val RelQuery = RelRelPath + 1
     final val Fragment = RelQuery + 1
-  }
 
   // Helpers for constructors
 
-  private def uriStr(scheme: String, ssp: String, fragment: String): String = {
+  private def uriStr(scheme: String, ssp: String, fragment: String): String =
     var resStr = ""
 
     if (scheme != null) resStr += scheme + ":"
@@ -578,7 +554,6 @@ object URI {
     if (fragment != null) resStr += "#" + quoteIllegal(fragment)
 
     resStr
-  }
 
   private def uriStr(scheme: String,
                      userInfo: String,
@@ -586,7 +561,7 @@ object URI {
                      port: Int,
                      path: String,
                      query: String,
-                     fragment: String): String = {
+                     fragment: String): String =
     var resStr = ""
 
     if (scheme != null) resStr += scheme + ":"
@@ -595,10 +570,9 @@ object URI {
 
     if (userInfo != null) resStr += quoteUserInfo(userInfo) + "@"
 
-    if (host != null) {
+    if (host != null)
       if (URI.ipv6Re.test(host)) resStr += "[" + host + "]"
       else resStr += host
-    }
 
     if (port != -1) resStr += ":" + port
 
@@ -609,13 +583,12 @@ object URI {
     if (fragment != null) resStr += "#" + quoteIllegal(fragment)
 
     resStr
-  }
 
   private def uriStr(scheme: String,
                      authority: String,
                      path: String,
                      query: String,
-                     fragment: String) = {
+                     fragment: String) =
     var resStr = ""
 
     if (scheme != null) resStr += scheme + ":"
@@ -629,14 +602,13 @@ object URI {
     if (fragment != null) resStr += "#" + quoteIllegal(fragment)
 
     resStr
-  }
 
   // Quote helpers
 
-  private def decodeComponent(str: String): String = {
+  private def decodeComponent(str: String): String =
     // Fast-track, if no encoded components
     if (str.forall(_ != '%')) str
-    else {
+    else
       val inBuf = CharBuffer.wrap(str)
       val outBuf = CharBuffer.allocate(inBuf.capacity)
       val byteBuf = ByteBuffer.allocate(64)
@@ -645,20 +617,18 @@ object URI {
         .onMalformedInput(CodingErrorAction.REPLACE)
         .onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-      def decode(endOfInput: Boolean) = {
+      def decode(endOfInput: Boolean) =
         byteBuf.flip()
         decoder.decode(byteBuf, outBuf, endOfInput)
-        if (endOfInput) {
+        if (endOfInput)
           decoder.reset()
           byteBuf.clear()
           decoding = false
-        } else {
+        else
           byteBuf.compact()
-        }
-      }
 
-      while (inBuf.hasRemaining) {
-        inBuf.get() match {
+      while (inBuf.hasRemaining)
+        inBuf.get() match
           case '%' =>
             if (!byteBuf.hasRemaining) decode(false)
 
@@ -672,27 +642,21 @@ object URI {
           case c =>
             if (decoding) decode(true)
             outBuf.put(c)
-        }
-      }
 
       if (decoding) decode(true)
 
       outBuf.flip()
       outBuf.toString
-    }
-  }
 
-  private val quoteStr: js.Function1[String, String] = { (str: String) =>
+  private val quoteStr: js.Function1[String, String] =  (str: String) =>
     val buf = StandardCharsets.UTF_8.encode(str)
 
     var res = ""
-    while (buf.hasRemaining) {
+    while (buf.hasRemaining)
       val c = buf.get & 0xff
       res += (if (c <= 0xf) "%0" else "%") + Integer.toHexString(c).toUpperCase
-    }
 
     res
-  }
 
   /** matches any character not in unreserved, punct, escaped or other */
   private val userInfoQuoteRe = new RegExp(
@@ -704,10 +668,9 @@ object URI {
       "ig")
 
   /** Quote any character not in unreserved, punct, escaped or other */
-  private def quoteUserInfo(str: String) = {
+  private def quoteUserInfo(str: String) =
     import js.JSStringOps._
     str.jsReplace(userInfoQuoteRe, quoteStr)
-  }
 
   /** matches any character not in unreserved, punct, escaped, other or equal
     *  to '/' or '@'
@@ -723,10 +686,9 @@ object URI {
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '/' or '@'
     */
-  private def quotePath(str: String) = {
+  private def quotePath(str: String) =
     import js.JSStringOps._
     str.jsReplace(pathQuoteRe, quoteStr)
-  }
 
   /** matches any character not in unreserved, punct, escaped, other or equal
     *  to '@', '[' or ']'
@@ -746,10 +708,9 @@ object URI {
   /** Quote any character not in unreserved, punct, escaped, other or equal
     *  to '@'
     */
-  private def quoteAuthority(str: String) = {
+  private def quoteAuthority(str: String) =
     import js.JSStringOps._
     str.jsReplace(authorityQuoteRe, quoteStr)
-  }
 
   /** matches any character not in unreserved, reserved, escaped or other */
   private val illegalQuoteRe = new RegExp(
@@ -761,10 +722,9 @@ object URI {
       "ig")
 
   /** Quote any character not in unreserved, reserved, escaped or other */
-  private def quoteIllegal(str: String) = {
+  private def quoteIllegal(str: String) =
     import js.JSStringOps._
     str.jsReplace(illegalQuoteRe, quoteStr)
-  }
 
   /** matches characters not in ASCII
     *
@@ -773,23 +733,22 @@ object URI {
     */
   private val nonASCIIQuoteRe = new RegExp("[^\u0000-\u007F]+", "g")
 
-  private def quoteNonASCII(str: String) = {
+  private def quoteNonASCII(str: String) =
     import js.JSStringOps._
     str.jsReplace(nonASCIIQuoteRe, quoteStr)
-  }
 
   /** Case-sensitive comparison that is case-insensitive inside URI
     *  escapes. Will compare `a%A0` and `a%a0` as equal, but `a%A0` and
     *  `A%A0` as different.
     */
-  private def escapeAwareCompare(x: String, y: String): Int = {
+  private def escapeAwareCompare(x: String, y: String): Int =
     @tailrec
-    def loop(i: Int): Int = {
+    def loop(i: Int): Int =
       if (i >= x.length || i >= y.length) x.length - y.length
-      else {
+      else
         val diff = x.charAt(i) - y.charAt(i)
         if (diff != 0) diff
-        else if (x.charAt(i) == '%') {
+        else if (x.charAt(i) == '%')
           // we need to do a CI compare for the next two characters
           assert(x.length > i + 2, "Invalid escape in URI")
           assert(y.length > i + 2, "Invalid escape in URI")
@@ -798,30 +757,23 @@ object URI {
             .compareToIgnoreCase(y.substring(i + 1, i + 3))
           if (cmp != 0) cmp
           else loop(i + 3)
-        } else loop(i + 1)
-      }
-    }
+        else loop(i + 1)
 
     loop(0)
-  }
 
   /** Upper-cases all URI escape sequences in `str`. Used for hashing */
-  private def normalizeEscapes(str: String): String = {
+  private def normalizeEscapes(str: String): String =
     var i = 0
     var res = ""
-    while (i < str.length) {
-      if (str.charAt(i) == '%') {
+    while (i < str.length)
+      if (str.charAt(i) == '%')
         assert(str.length > i + 2, "Invalid escape in URI")
         res += str.substring(i, i + 3).toUpperCase()
         i += 3
-      } else {
+      else
         res += str.substring(i, i + 1)
         i += 1
-      }
-    }
 
     res
-  }
 
   private final val uriSeed = 53722356
-}

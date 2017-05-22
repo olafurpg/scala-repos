@@ -41,17 +41,16 @@ import org.apache.spark.sql.types.StructType
   * @since 1.4.0
   */
 @Experimental
-class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
+class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging
 
   /**
     * Specifies the input data source format.
     *
     * @since 1.4.0
     */
-  def format(source: String): DataFrameReader = {
+  def format(source: String): DataFrameReader =
     this.source = source
     this
-  }
 
   /**
     * Specifies the input schema. Some data sources (e.g. JSON) can infer the input schema
@@ -60,20 +59,18 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def schema(schema: StructType): DataFrameReader = {
+  def schema(schema: StructType): DataFrameReader =
     this.userSpecifiedSchema = Option(schema)
     this
-  }
 
   /**
     * Adds an input option for the underlying data source.
     *
     * @since 1.4.0
     */
-  def option(key: String, value: String): DataFrameReader = {
+  def option(key: String, value: String): DataFrameReader =
     this.extraOptions += (key -> value)
     this
-  }
 
   /**
     * Adds an input option for the underlying data source.
@@ -104,20 +101,18 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def options(options: scala.collection.Map[String, String]): DataFrameReader = {
+  def options(options: scala.collection.Map[String, String]): DataFrameReader =
     this.extraOptions ++= options
     this
-  }
 
   /**
     * Adds input options for the underlying data source.
     *
     * @since 1.4.0
     */
-  def options(options: java.util.Map[String, String]): DataFrameReader = {
+  def options(options: java.util.Map[String, String]): DataFrameReader =
     this.options(options.asScala)
     this
-  }
 
   /**
     * Loads input in as a [[DataFrame]], for data sources that don't require a path (e.g. external
@@ -125,14 +120,13 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def load(): DataFrame = {
+  def load(): DataFrame =
     val dataSource = DataSource(sqlContext,
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
     Dataset.newDataFrame(
         sqlContext, LogicalRelation(dataSource.resolveRelation()))
-  }
 
   /**
     * Loads input in as a [[DataFrame]], for data sources that require a path (e.g. data backed by
@@ -140,9 +134,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def load(path: String): DataFrame = {
+  def load(path: String): DataFrame =
     option("path", path).load()
-  }
 
   /**
     * Loads input in as a [[DataFrame]], for data sources that support multiple paths.
@@ -151,10 +144,10 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @since 1.6.0
     */
   @scala.annotation.varargs
-  def load(paths: String*): DataFrame = {
-    if (paths.isEmpty) {
+  def load(paths: String*): DataFrame =
+    if (paths.isEmpty)
       sqlContext.emptyDataFrame
-    } else {
+    else
       sqlContext.baseRelationToDataFrame(
           DataSource
             .apply(sqlContext,
@@ -163,8 +156,6 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
                    className = source,
                    options = extraOptions.toMap)
             .resolveRelation())
-    }
-  }
 
   /**
     * Loads input data stream in as a [[DataFrame]], for data streams that don't require a path
@@ -172,23 +163,21 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 2.0.0
     */
-  def stream(): DataFrame = {
+  def stream(): DataFrame =
     val dataSource = DataSource(sqlContext,
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = source,
                                 options = extraOptions.toMap)
     Dataset.newDataFrame(
         sqlContext, StreamingRelation(dataSource.createSource()))
-  }
 
   /**
     * Loads input in as a [[DataFrame]], for data streams that read from some path.
     *
     * @since 2.0.0
     */
-  def stream(path: String): DataFrame = {
+  def stream(path: String): DataFrame =
     option("path", path).stream()
-  }
 
   /**
     * Construct a [[DataFrame]] representing the database table accessible via JDBC URL
@@ -196,9 +185,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def jdbc(url: String, table: String, properties: Properties): DataFrame = {
+  def jdbc(url: String, table: String, properties: Properties): DataFrame =
     jdbc(url, table, JDBCRelation.columnPartition(null), properties)
-  }
 
   /**
     * Construct a [[DataFrame]] representing the database table accessible via JDBC URL
@@ -227,12 +215,11 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
            lowerBound: Long,
            upperBound: Long,
            numPartitions: Int,
-           connectionProperties: Properties): DataFrame = {
+           connectionProperties: Properties): DataFrame =
     val partitioning = JDBCPartitioningInfo(
         columnName, lowerBound, upperBound, numPartitions)
     val parts = JDBCRelation.columnPartition(partitioning)
     jdbc(url, table, parts, connectionProperties)
-  }
 
   /**
     * Construct a [[DataFrame]] representing the database table accessible via JDBC URL
@@ -254,28 +241,24 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
   def jdbc(url: String,
            table: String,
            predicates: Array[String],
-           connectionProperties: Properties): DataFrame = {
-    val parts: Array[Partition] = predicates.zipWithIndex.map {
+           connectionProperties: Properties): DataFrame =
+    val parts: Array[Partition] = predicates.zipWithIndex.map
       case (part, i) =>
         JDBCPartition(part, i): Partition
-    }
     jdbc(url, table, parts, connectionProperties)
-  }
 
   private def jdbc(url: String,
                    table: String,
                    parts: Array[Partition],
-                   connectionProperties: Properties): DataFrame = {
+                   connectionProperties: Properties): DataFrame =
     val props = new Properties()
-    extraOptions.foreach {
+    extraOptions.foreach
       case (key, value) =>
         props.put(key, value)
-    }
     // connectionProperties should override settings in extraOptions
     props.putAll(connectionProperties)
     val relation = JDBCRelation(url, table, parts, props)(sqlContext)
     sqlContext.baseRelationToDataFrame(relation)
-  }
 
   /**
     * Loads a JSON file (one object per line) and returns the result as a [[DataFrame]].
@@ -360,12 +343,11 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @param jsonRDD input RDD with one JSON object per record
     * @since 1.4.0
     */
-  def json(jsonRDD: RDD[String]): DataFrame = {
+  def json(jsonRDD: RDD[String]): DataFrame =
     val parsedOptions: JSONOptions = new JSONOptions(extraOptions.toMap)
-    val schema = userSpecifiedSchema.getOrElse {
+    val schema = userSpecifiedSchema.getOrElse
       InferSchema.infer(
           jsonRDD, sqlContext.conf.columnNameOfCorruptRecord, parsedOptions)
-    }
 
     Dataset.newDataFrame(
         sqlContext,
@@ -375,7 +357,6 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
                                 schema,
                                 sqlContext.conf.columnNameOfCorruptRecord,
                                 parsedOptions))(sqlContext))
-  }
 
   /**
     * Loads a CSV file and returns the result as a [[DataFrame]].
@@ -395,9 +376,8 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @since 1.4.0
     */
   @scala.annotation.varargs
-  def parquet(paths: String*): DataFrame = {
+  def parquet(paths: String*): DataFrame =
     format("parquet").load(paths: _*)
-  }
 
   /**
     * Loads an ORC file and returns the result as a [[DataFrame]].
@@ -413,12 +393,11 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     *
     * @since 1.4.0
     */
-  def table(tableName: String): DataFrame = {
+  def table(tableName: String): DataFrame =
     Dataset.newDataFrame(
         sqlContext,
         sqlContext.sessionState.catalog.lookupRelation(
             sqlContext.sessionState.sqlParser.parseTableIdentifier(tableName)))
-  }
 
   /**
     * Loads a text file and returns a [[Dataset]] of String. The underlying schema of the Dataset
@@ -437,11 +416,10 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
     * @since 2.0.0
     */
   @scala.annotation.varargs
-  def text(paths: String*): Dataset[String] = {
+  def text(paths: String*): Dataset[String] =
     format("text")
       .load(paths: _*)
       .as[String](sqlContext.implicits.newStringEncoder)
-  }
 
   ///////////////////////////////////////////////////////////////////////////////////////
   // Builder pattern config options
@@ -453,4 +431,3 @@ class DataFrameReader private[sql](sqlContext: SQLContext) extends Logging {
 
   private var extraOptions =
     new scala.collection.mutable.HashMap[String, String]
-}

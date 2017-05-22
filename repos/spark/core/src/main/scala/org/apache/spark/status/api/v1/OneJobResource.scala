@@ -24,19 +24,15 @@ import org.apache.spark.ui.SparkUI
 import org.apache.spark.ui.jobs.UIData.JobUIData
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class OneJobResource(ui: SparkUI) {
+private[v1] class OneJobResource(ui: SparkUI)
 
   @GET
-  def oneJob(@PathParam("jobId") jobId: Int): JobData = {
+  def oneJob(@PathParam("jobId") jobId: Int): JobData =
     val statusToJobs: Seq[(JobExecutionStatus, Seq[JobUIData])] =
       AllJobsResource.getStatusToJobs(ui)
-    val jobOpt = statusToJobs.flatMap(_._2).find { jobInfo =>
+    val jobOpt = statusToJobs.flatMap(_._2).find  jobInfo =>
       jobInfo.jobId == jobId
-    }
-    jobOpt.map { job =>
+    jobOpt.map  job =>
       AllJobsResource.convertJobData(job, ui.jobProgressListener, false)
-    }.getOrElse {
+    .getOrElse
       throw new NotFoundException("unknown job: " + jobId)
-    }
-  }
-}

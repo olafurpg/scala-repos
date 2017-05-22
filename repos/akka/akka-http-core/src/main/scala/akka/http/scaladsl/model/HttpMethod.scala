@@ -7,20 +7,15 @@ import akka.http.impl.util._
 import akka.http.javadsl.{model ⇒ jm}
 import akka.http.scaladsl.model.RequestEntityAcceptance._
 
-sealed trait RequestEntityAcceptance {
+sealed trait RequestEntityAcceptance
   def isEntityAccepted: Boolean
-}
-object RequestEntityAcceptance {
-  case object Expected extends RequestEntityAcceptance {
+object RequestEntityAcceptance
+  case object Expected extends RequestEntityAcceptance
     override def isEntityAccepted: Boolean = true
-  }
-  case object Tolerated extends RequestEntityAcceptance {
+  case object Tolerated extends RequestEntityAcceptance
     override def isEntityAccepted: Boolean = true
-  }
-  case object Disallowed extends RequestEntityAcceptance {
+  case object Disallowed extends RequestEntityAcceptance
     override def isEntityAccepted: Boolean = false
-  }
-}
 
 /**
   * The method of an HTTP request.
@@ -33,22 +28,20 @@ final case class HttpMethod private[http](
     isSafe: Boolean,
     isIdempotent: Boolean,
     requestEntityAcceptance: RequestEntityAcceptance)
-    extends jm.HttpMethod with SingletonValueRenderable {
+    extends jm.HttpMethod with SingletonValueRenderable
   override def isEntityAccepted: Boolean =
     requestEntityAcceptance.isEntityAccepted
   override def toString: String = s"HttpMethod($value)"
-}
 
-object HttpMethod {
+object HttpMethod
   def custom(name: String,
              safe: Boolean,
              idempotent: Boolean,
-             requestEntityAcceptance: RequestEntityAcceptance): HttpMethod = {
+             requestEntityAcceptance: RequestEntityAcceptance): HttpMethod =
     require(name.nonEmpty, "value must be non-empty")
     require(!safe || idempotent,
             "An HTTP method cannot be safe without being idempotent")
     apply(name, safe, idempotent, requestEntityAcceptance)
-  }
 
   /**
     * Creates a custom method by name and assumes properties conservatively to be
@@ -59,9 +52,8 @@ object HttpMethod {
            safe = false,
            idempotent = false,
            requestEntityAcceptance = Expected)
-}
 
-object HttpMethods extends ObjectRegistry[String, HttpMethod] {
+object HttpMethods extends ObjectRegistry[String, HttpMethod]
   private def register(method: HttpMethod): HttpMethod =
     register(method.value, method)
 
@@ -76,4 +68,3 @@ object HttpMethods extends ObjectRegistry[String, HttpMethod] {
   val PUT     = register(HttpMethod("PUT"    , isSafe = false, isIdempotent = true , requestEntityAcceptance = Expected))
   val TRACE   = register(HttpMethod("TRACE"  , isSafe = true , isIdempotent = true , requestEntityAcceptance = Disallowed))
   // format: ON
-}

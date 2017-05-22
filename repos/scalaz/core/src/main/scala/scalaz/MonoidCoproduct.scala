@@ -11,24 +11,21 @@ import scalaz.std.vector._
   * the identity as the empty list, and composition as list concatenation that
   * combines adjacent elements when possible.
   */
-sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
+sealed class :+:[+M, +N](private val rep: Vector[M \/ N])
 
   /** The associative operation of the monoid coproduct */
-  def |+|[A >: M : Monoid, B >: N : Monoid](m: A :+: B): A :+: B = {
+  def |+|[A >: M : Monoid, B >: N : Monoid](m: A :+: B): A :+: B =
     @annotation.tailrec
     def go(r1: Vector[A \/ B], r2: Vector[A \/ B]): Vector[A \/ B] =
-      (r1, r2) match {
+      (r1, r2) match
         case (Vector(), es) => es
         case (es, Vector()) => es
         case (v1, v2) =>
-          (v1.last, v2.head) match {
+          (v1.last, v2.head) match
             case (-\/(m1), -\/(m2)) => go(v1.init, -\/(m1 |+| m2) +: v2.tail)
             case (\/-(n1), \/-(n2)) => go(v1.init, \/-(n1 |+| n2) +: v2.tail)
             case _ => (v1 ++ v2)
-          }
-      }
     new :+:(go(rep, m.rep))
-  }
 
   /** Append a value from the left monoid */
   def appendLeft[A >: M : Monoid, B >: N : Monoid](m: A): A :+: B =
@@ -48,15 +45,13 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
 
   /** Project out the value in the left monoid */
   def left[A >: M : Monoid]: A =
-    rep.foldLeft(mzero[A]) { (m, e) =>
+    rep.foldLeft(mzero[A])  (m, e) =>
       m |+| e.fold(a => a, _ => mzero[A])
-    }
 
   /** Project out the value in the right monoid */
   def right[A >: N : Monoid]: A =
-    rep.foldLeft(mzero[A]) { (n, e) =>
+    rep.foldLeft(mzero[A])  (n, e) =>
       n |+| e.fold(_ => mzero[A], a => a)
-    }
 
   /** Project out both monoids individually */
   def both[A >: M : Monoid, B >: N : Monoid]: (A, B) =
@@ -76,12 +71,11 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
     */
   def untangle[A >: M : Monoid, B >: N : Monoid](
       f: (B, A) => A, g: (A, B) => B): (A, B) =
-    rep.foldLeft(mzero[(A, B)]) {
+    rep.foldLeft(mzero[(A, B)])
       case ((curm, curn), -\/(m)) =>
         (curm |+| f(curn, m), curn)
       case ((curm, curn), \/-(n)) =>
         (curm, curn |+| g(curm, n))
-    }
 
   /**
     * Like `untangle`, except `M` values are simply combined without regard to the
@@ -96,9 +90,8 @@ sealed class :+:[+M, +N](private val rep: Vector[M \/ N]) {
     */
   def untangleRight[A >: M : Monoid, B >: N : Monoid](f: (B, A) => A): (A, B) =
     untangle[A, B](f, (_, n) => n)
-}
 
-object :+: {
+object :+:
   import \/._
 
   def inL[A](a: A): A :+: Nothing = new :+:(Vector(left(a)))
@@ -111,8 +104,6 @@ object :+: {
     Equal.equalBy(_.rep)
 
   implicit def instance[M : Monoid, N : Monoid]: Monoid[M :+: N] =
-    new Monoid[M :+: N] {
+    new Monoid[M :+: N]
       val zero = empty
       def append(a: M :+: N, b: => M :+: N) = a |+| b
-    }
-}

@@ -13,7 +13,7 @@ import Iteratee._
   *           The type constructor [[scalaz.Id]] is used to model pure computations, and is fixed as such in the type alias [[scalaz.iteratee.Step]].
   * @tparam A The type of the calculated result
   */
-sealed abstract class StepT[E, F[_], A] {
+sealed abstract class StepT[E, F[_], A]
   def fold[Z](
       cont: (Input[E] => IterateeT[E, F, A]) => Z,
       done: (=> A, => Input[E]) => Z
@@ -80,43 +80,36 @@ sealed abstract class StepT[E, F[_], A] {
 
   def pointI(implicit P: Applicative[F]): IterateeT[E, F, A] =
     iterateeT(P.point(this))
-}
 
 // object StepT is in the implicit scope for EnumeratorT, so we mix in EnumeratorTInstances here.
-object StepT extends StepTFunctions with EnumeratorTInstances {
+object StepT extends StepTFunctions with EnumeratorTInstances
   private[this] val ToNone1: (Any => None.type) = x => None
   private[this] val ToNone2: ((=> Any, => Any) => None.type) = (x, y) => None
 
-  object Cont {
+  object Cont
     def apply[E, F[_], A](c: Input[E] => IterateeT[E, F, A]): StepT[E, F, A] =
-      new StepT[E, F, A] {
+      new StepT[E, F, A]
         def fold[Z](
             cont: (Input[E] => IterateeT[E, F, A]) => Z,
             done: (=> A, => Input[E]) => Z
         ) = cont(c)
-      }
 
     def unapply[E, F[_], A](
         s: StepT[E, F, A]): Option[Input[E] => IterateeT[E, F, A]] =
       s.fold(f => Some(f), ToNone2)
-  }
 
-  object Done {
-    def apply[E, F[_], A](d: => A, r: => Input[E]) = new StepT[E, F, A] {
+  object Done
+    def apply[E, F[_], A](d: => A, r: => Input[E]) = new StepT[E, F, A]
       def fold[Z](
           cont: (Input[E] => IterateeT[E, F, A]) => Z,
           done: (=> A, => Input[E]) => Z
       ) = done(d, r)
-    }
 
     def unapply[E, F[_], A](s: StepT[E, F, A]): Option[(A, Input[E])] =
       s.fold(ToNone1, (a, ie) => Some((a, ie)))
-  }
-}
 
-trait StepTFunctions {
+trait StepTFunctions
   def scont[E, F[_], A](c: Input[E] => IterateeT[E, F, A]): StepT[E, F, A] =
     StepT.Cont(c)
   def sdone[E, F[_], A](d: => A, r: => Input[E]): StepT[E, F, A] =
     StepT.Done(d, r)
-}

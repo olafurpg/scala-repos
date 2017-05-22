@@ -1,4 +1,4 @@
-object Tupling {
+object Tupling
   def foo(x: Any): Int = 1
   def foo(x: Int, y: Int, z: Int) = 2
 
@@ -28,4 +28,3 @@ object Tupling {
 
   /* resolved: false */
   joo(1, "")
-}

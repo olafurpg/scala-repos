@@ -28,27 +28,26 @@ class ExpandedExtractorResolveProcessor(ref: ScReferenceElement,
                                         refName: String,
                                         kinds: Set[ResolveTargets.Value],
                                         expected: Option[ScType])
-    extends ExtractorResolveProcessor(ref, refName, kinds, expected) {
-  override def execute(element: PsiElement, state: ResolveState): Boolean = {
+    extends ExtractorResolveProcessor(ref, refName, kinds, expected)
+  override def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
-    if (nameAndKindMatch(named, state)) {
+    if (nameAndKindMatch(named, state))
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
-      named match {
-        case bind: ScTypedDefinition => {
+      named match
+        case bind: ScTypedDefinition =>
             val parentSubst = getSubst(state)
             val parentImports = getImports(state)
-            val typez = getFromType(state) match {
+            val typez = getFromType(state) match
               case Some(tp) =>
                 ScProjectionType(tp, bind, superReference = false)
               case _ => bind.getType(TypingContext.empty).getOrAny
-            }
             var seq = false
             val buffer = new ArrayBuffer[ScalaResolveResult]
-            val proc = new BaseProcessor(StdKinds.methodRef) {
-              def execute(element: PsiElement, state: ResolveState): Boolean = {
+            val proc = new BaseProcessor(StdKinds.methodRef)
+              def execute(element: PsiElement, state: ResolveState): Boolean =
                 val subst = getSubst(state)
-                element match {
+                element match
                   case fun: ScFunction
                       if fun.name == "unapply" ||
                       (seq && fun.name == "unapplySeq") =>
@@ -59,24 +58,15 @@ class ExpandedExtractorResolveProcessor(ref: ScReferenceElement,
                                              parentElement = Some(bind),
                                              isAccessible = accessible)
                   case _ =>
-                }
                 true
-              }
-            }
             proc.processType(
                 parentSubst.subst(typez), ref, ResolveState.initial)
             addResults(buffer.toSeq)
-            if (candidatesSet.isEmpty && levelSet.isEmpty) {
+            if (candidatesSet.isEmpty && levelSet.isEmpty)
               buffer.clear()
               seq = true
               proc.processType(
                   parentSubst.subst(typez), ref, ResolveState.initial)
               addResults(buffer.toSeq)
-            }
-          }
         case _ => return super.execute(element, state)
-      }
-    }
     true
-  }
-}

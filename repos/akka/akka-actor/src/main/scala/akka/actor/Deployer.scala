@@ -11,11 +11,10 @@ import com.typesafe.config._
 
 import scala.annotation.tailrec
 
-object Deploy {
+object Deploy
   final val NoDispatcherGiven = ""
   final val NoMailboxGiven = ""
   val local = Deploy(scope = LocalScope)
-}
 
 /**
   * This class represents deployment configuration for a given actor path. It is
@@ -38,7 +37,7 @@ final case class Deploy(path: String = "",
                         routerConfig: RouterConfig = NoRouter,
                         scope: Scope = NoScopeGiven,
                         dispatcher: String = Deploy.NoDispatcherGiven,
-                        mailbox: String = Deploy.NoMailboxGiven) {
+                        mailbox: String = Deploy.NoMailboxGiven)
 
   /**
     * Java API to create a Deploy with the given RouterConfig
@@ -61,7 +60,7 @@ final case class Deploy(path: String = "",
     * precedence. The “path” of the other Deploy is not taken into account. All
     * other members are merged using `X.withFallback(other.X)`.
     */
-  def withFallback(other: Deploy): Deploy = {
+  def withFallback(other: Deploy): Deploy =
     Deploy(path,
            config.withFallback(other.config),
            routerConfig.withFallback(other.routerConfig),
@@ -69,8 +68,6 @@ final case class Deploy(path: String = "",
            if (dispatcher == Deploy.NoDispatcherGiven) other.dispatcher
            else dispatcher,
            if (mailbox == Deploy.NoMailboxGiven) other.mailbox else mailbox)
-  }
-}
 
 /**
   * The scope of a [[akka.actor.Deploy]] serves two purposes: as a marker for
@@ -79,7 +76,7 @@ final case class Deploy(path: String = "",
   * used in conjunction with a custom [[akka.actor.ActorRefProvider]], making
   * Akka actors fully extensible.
   */
-trait Scope {
+trait Scope
 
   /**
     * When merging [[akka.actor.Deploy]] instances using ``withFallback()`` on
@@ -89,7 +86,6 @@ trait Scope {
     * precedence.
     */
   def withFallback(other: Scope): Scope
-}
 
 @SerialVersionUID(1L)
 abstract class LocalScope extends Scope
@@ -100,7 +96,7 @@ abstract class LocalScope extends Scope
   * the LocalActorRefProvider.
   */
 @SerialVersionUID(1L)
-case object LocalScope extends LocalScope {
+case object LocalScope extends LocalScope
 
   /**
     * Java API: get the singleton instance
@@ -108,7 +104,6 @@ case object LocalScope extends LocalScope {
   def getInstance = this
 
   def withFallback(other: Scope): Scope = this
-}
 
 /**
   * This is the default value and as such allows overrides.
@@ -116,20 +111,19 @@ case object LocalScope extends LocalScope {
 @SerialVersionUID(1L)
 abstract class NoScopeGiven extends Scope
 @SerialVersionUID(1L)
-case object NoScopeGiven extends NoScopeGiven {
+case object NoScopeGiven extends NoScopeGiven
   def withFallback(other: Scope): Scope = other
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * Deployer maps actor paths to actor deployments.
   */
 private[akka] class Deployer(
-    val settings: ActorSystem.Settings, val dynamicAccess: DynamicAccess) {
+    val settings: ActorSystem.Settings, val dynamicAccess: DynamicAccess)
 
   import scala.collection.JavaConverters._
 
@@ -143,16 +137,15 @@ private[akka] class Deployer(
     .root
     .unwrapped
     .asScala
-    .collect {
+    .collect
       case (key, value: String) ⇒ (key -> value)
-    }
     .toMap
 
-  config.root.asScala flatMap {
+  config.root.asScala flatMap
     case ("default", _) ⇒ None
     case (key, value: ConfigObject) ⇒ parseConfig(key, value.toConfig)
     case _ ⇒ None
-  } foreach deploy
+  foreach deploy
 
   def lookup(path: ActorPath): Option[Deploy] =
     lookup(path.elements.drop(1).iterator)
@@ -162,31 +155,27 @@ private[akka] class Deployer(
   def lookup(path: Iterator[String]): Option[Deploy] =
     deployments.get().find(path).data
 
-  def deploy(d: Deploy): Unit = {
+  def deploy(d: Deploy): Unit =
     @tailrec def add(path: Array[String], d: Deploy, w: WildcardTree[Deploy] = deployments.get)
-      : Unit = {
-      for (i ← 0 until path.length) path(i) match {
+      : Unit =
+      for (i ← 0 until path.length) path(i) match
         case "" ⇒
           throw new InvalidActorNameException(
               s"Actor name in deployment [${d.path}] must not be empty")
         case el ⇒ ActorPath.validatePathElement(el, fullPath = d.path)
-      }
 
       if (!deployments.compareAndSet(w, w.insert(path.iterator, d)))
         add(path, d)
-    }
 
     add(d.path.split("/").drop(1), d)
-  }
 
-  def parseConfig(key: String, config: Config): Option[Deploy] = {
+  def parseConfig(key: String, config: Config): Option[Deploy] =
     val deployment = config.withFallback(default)
     val router = createRouterConfig(
         deployment.getString("router"), key, config, deployment)
     val dispatcher = deployment.getString("dispatcher")
     val mailbox = deployment.getString("mailbox")
     Some(Deploy(key, deployment, router, NoScopeGiven, dispatcher, mailbox))
-  }
 
   /**
     * Factory method for creating `RouterConfig`
@@ -200,7 +189,7 @@ private[akka] class Deployer(
                                    config: Config,
                                    deployment: Config): RouterConfig =
     if (routerType == "from-code") NoRouter
-    else {
+    else
       // need this for backwards compatibility, resizer enabled when including (parts of) resizer section in the deployment
       val deployment2 =
         if (config.hasPath("resizer") &&
@@ -224,19 +213,17 @@ private[akka] class Deployer(
                        classOf[DynamicAccess] -> dynamicAccess)
       dynamicAccess
         .createInstanceFor[RouterConfig](fqn, args1)
-        .recover({
+        .recover(
           case e @ (_: IllegalArgumentException | _: ConfigException) ⇒ throw e
           case e: NoSuchMethodException ⇒
             dynamicAccess
               .createInstanceFor[RouterConfig](fqn, args2)
-              .recover({
+              .recover(
                 case e @ (_: IllegalArgumentException | _: ConfigException) ⇒
                   throw e
                 case e2 ⇒ throwCannotInstantiateRouter(args2, e)
-              })
+              )
               .get
           case e ⇒ throwCannotInstantiateRouter(args2, e)
-        })
+        )
         .get
-    }
-}

@@ -1,6 +1,6 @@
 import sbt._
 
-object Versions {
+object Versions
   val scalaVersion = "2.11.6"
   val sbtVersion = "0.13.9"
   val ideaVersion = "145.256.33"
@@ -10,9 +10,8 @@ object Versions {
   val sisuInjectVersion = "2.2.3"
   val wagonVersion = "2.6"
   val httpComponentsVersion = "4.3.1"
-}
 
-object Dependencies {
+object Dependencies
   import Versions._
 
   val sbtStructureExtractor012 =
@@ -93,9 +92,8 @@ object Dependencies {
   val bundledJline = "org.jetbrains" % "jline" % "1.0.0"
   val incrementalCompiler = "org.jetbrains" % "incremental-compiler" % "1.0.0"
   val sbtInterface = "org.jetbrains" % "sbt-interface" % "1.0.0"
-}
 
-object DependencyGroups {
+object DependencyGroups
   import Dependencies._
 
   val sbtBundled = Seq(
@@ -242,7 +240,7 @@ object DependencyGroups {
       "org.scala-lang" % "scala-compiler" % "2.12.0-M2"
   )
 
-  val mockSbtDownloader = {
+  val mockSbtDownloader =
     val v = "0.13.5"
     Seq(
         "org.scala-sbt" % "collections" % v,
@@ -255,11 +253,9 @@ object DependencyGroups {
         "org.scala-sbt" % "process" % v,
         "org.scala-sbt" % "sbt" % v
     )
-  }
 
   val sbtRuntime = Seq(
       sbtStructureExtractor012,
       sbtStructureExtractor013,
       sbtLaunch
   )
-}

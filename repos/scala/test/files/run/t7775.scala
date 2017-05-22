@@ -3,21 +3,18 @@ import ExecutionContext.Implicits.global
 import scala.tools.reflect.WrappedProperties.AccessControl._
 import java.util.concurrent.CyclicBarrier
 
-object Test extends App {
+object Test extends App
   @volatile var done = false
   val barrier = new CyclicBarrier(2)
 
-  val probe = Future {
+  val probe = Future
     val attempts = 1024 // previously, failed after a few
     def fail(i: Int) = s"Failed at $i"
     barrier.await()
-    for (i <- 1 to attempts; p <- systemProperties) p match {
+    for (i <- 1 to attempts; p <- systemProperties) p match
       case (k, v) => assert(k != null && v != null, fail(i))
-    }
-  }
-  probe onComplete {
+  probe onComplete
     case _ => done = true
-  }
 
   System.setProperty("foo", "fooz")
   System.setProperty("bar", "barz")
@@ -26,19 +23,16 @@ object Test extends App {
   // continually modify properties trying to break live iteration over sys props
   // hint: don't iterate lively over sys props
   var alt = true
-  while (!done) {
-    if (alt) {
+  while (!done)
+    if (alt)
       System.getProperties.remove("foo")
       System.setProperty("bar", "barz")
       alt = false
-    } else {
+    else
       System.getProperties.remove("bar")
       System.setProperty("foo", "fooz")
       alt = true
-    }
-  }
   Await.result(probe, Duration.Inf)
-}
 
 /*
 import scala.concurrent.{duration, Future, Await, ExecutionContext}

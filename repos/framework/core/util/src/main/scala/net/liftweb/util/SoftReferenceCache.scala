@@ -34,7 +34,7 @@ import java.lang.Thread._
   * calling <i>shutDown</i>. It monitors all SoftReferenceCache instances in the context of the same classloader.
   * It can also be used as a factory for obtaining new instances of SoftReferenceCache class
   */
-object SoftReferenceCache {
+object SoftReferenceCache
 
   @volatile
   private var terminated = false;
@@ -49,39 +49,31 @@ object SoftReferenceCache {
   /**
     * Initialize the orphan keys monitor
     */
-  def initialize = {
+  def initialize =
     // A daemon thread is more approapriate here then an Actor as
     // we'll do blocking reads from the reference queue
     val thread = new Thread(
-        new Runnable() {
-      def run() {
+        new Runnable()
+      def run()
         processQueue
-      }
-    })
+    )
     thread.setDaemon(true)
     thread setContextClassLoader null
     thread.start
-  }
 
   /**
     * ShutDown the monitoring
     */
-  def shutDown = {
+  def shutDown =
     terminated = true;
-  }
 
-  private def processQueue {
-    while (!terminated) {
-      tryo {
+  private def processQueue
+    while (!terminated)
+      tryo
         // Wait 30 seconds for something to appear in the queue.
         val sftVal = refQueue.remove(30000).asInstanceOf[SoftValue[_, _]];
-        if (sftVal != null) {
+        if (sftVal != null)
           sftVal.cache.remove(sftVal.key);
-        }
-      }
-    }
-  }
-}
 
 case object ProcessQueue
 
@@ -90,29 +82,25 @@ case object Done
 /**
   * A Map that holds the values as SoftReference-s. It also applies a LRU policy for the cache entries.
   */
-class SoftReferenceCache[K, V](cacheSize: Int) {
+class SoftReferenceCache[K, V](cacheSize: Int)
 
-  val cache = new LinkedHashMap[K, SoftValue[K, V]]() {
+  val cache = new LinkedHashMap[K, SoftValue[K, V]]()
     override def removeEldestEntry(
-        eldest: Entry[K, SoftValue[K, V]]): Boolean = {
+        eldest: Entry[K, SoftValue[K, V]]): Boolean =
       return size() > cacheSize;
-    }
-  }
 
   val rwl = new ReentrantReadWriteLock();
 
   val readLock = rwl.readLock
   val writeLock = rwl.writeLock
 
-  private def lock[T](l: Lock)(block: => T): T = {
+  private def lock[T](l: Lock)(block: => T): T =
     l.lock
 
-    try {
+    try
       block
-    } finally {
+    finally
       l.unlock
-    }
-  }
 
   /**
     * Returns the cached value mapped with this key or Empty if not found
@@ -120,70 +108,57 @@ class SoftReferenceCache[K, V](cacheSize: Int) {
     * @param key
     * @return Box[V]
     */
-  def apply(key: K): Box[V] = {
-    val result: (Boolean, Box[V]) /* (doRemove, retval) */ = lock(readLock) {
-      Box.!!(cache.get(key)) match {
+  def apply(key: K): Box[V] =
+    val result: (Boolean, Box[V]) /* (doRemove, retval) */ = lock(readLock)
+      Box.!!(cache.get(key)) match
         case Full(value) =>
-          Box.!!(value.get).map(value => (false, Full(value))) openOr {
+          Box.!!(value.get).map(value => (false, Full(value))) openOr
             (true, Empty)
-          }
         case _ => (false, Empty)
-      }
-    }
 
-    result match {
+    result match
       case (doRemove, retval) if doRemove =>
-        lock(writeLock) {
+        lock(writeLock)
           val value = cache.get(key)
 
           if (value != null && value.get == null) remove(key)
-        }
 
         retval
       case (_, retval) =>
         retval
-    }
-  }
 
   /**
     * Puts a new keyed entry in cache
     * @param tuple: (K, V)*
     * @return this
     */
-  def +=(tuple: (K, V)*) = {
-    lock(writeLock) {
-      for (t <- tuple) yield {
+  def +=(tuple: (K, V)*) =
+    lock(writeLock)
+      for (t <- tuple) yield
         cache.put(
             t._1,
             new SoftValue(t._1, t._2, this, SoftReferenceCache.refQueue));
-      }
-    }
     this
-  }
 
   /**
     * Removes the cache entry mapped with this key
     *
     * @return the value removed
     */
-  def remove(key: Any): Box[V] = {
-    lock(writeLock) {
-      for {
+  def remove(key: Any): Box[V] =
+    lock(writeLock)
+      for
         value <- Box.!!(cache.remove(key).asInstanceOf[SoftValue[K, V]])
         realValue <- Box.!!(value.get)
-      } yield realValue
-    }
-  }
+      yield realValue
 
   def keys = cache.keySet
-}
 
 class SoftValue[K, V](k: K,
                       v: V,
                       lruCache: SoftReferenceCache[K, V],
                       queue: ReferenceQueue[Any])
-    extends SoftReference[V](v, queue) {
+    extends SoftReference[V](v, queue)
   def key: K = k
 
   def cache: SoftReferenceCache[K, V] = lruCache
-}

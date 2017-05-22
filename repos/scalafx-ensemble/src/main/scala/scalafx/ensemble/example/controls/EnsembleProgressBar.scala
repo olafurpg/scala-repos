@@ -32,30 +32,27 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.ProgressBar
 import scalafx.scene.layout.{StackPane, VBox}
 
-class EnsembleProgressBar extends EnsembleExample {
+class EnsembleProgressBar extends EnsembleExample
 
   // @stage-property width = 400
 
-  def getContent = new StackPane {
+  def getContent = new StackPane
     padding = Insets(20)
-    children = new VBox {
+    children = new VBox
       spacing = 10
-      children = List(new ProgressBar {
+      children = List(new ProgressBar
         maxWidth = 100
-      }, new ProgressBar {
+      , new ProgressBar
         maxWidth = 200
-      }, new ProgressBar {
+      , new ProgressBar
         maxWidth = 300
-      }, new ProgressBar {
+      , new ProgressBar
         maxWidth = 100
         progress = 0.25
-      }, new ProgressBar {
+      , new ProgressBar
         maxWidth = 200
         progress = 0.50
-      }, new ProgressBar {
+      , new ProgressBar
         maxWidth = 300
         progress = 1
-      })
-    }
-  }
-}
+      )

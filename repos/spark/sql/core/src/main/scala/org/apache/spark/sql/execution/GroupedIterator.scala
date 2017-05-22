@@ -21,18 +21,15 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.{Ascending, Attribute, Expression, SortOrder}
 import org.apache.spark.sql.catalyst.expressions.codegen.{GenerateOrdering, GenerateUnsafeProjection}
 
-object GroupedIterator {
+object GroupedIterator
   def apply(input: Iterator[InternalRow],
             keyExpressions: Seq[Expression],
             inputSchema: Seq[Attribute])
-    : Iterator[(InternalRow, Iterator[InternalRow])] = {
-    if (input.hasNext) {
+    : Iterator[(InternalRow, Iterator[InternalRow])] =
+    if (input.hasNext)
       new GroupedIterator(input.buffered, keyExpressions, inputSchema)
-    } else {
+    else
       Iterator.empty
-    }
-  }
-}
 
 /**
   * Iterates over a presorted set of rows, chunking it up by the grouping expression.  Each call to
@@ -66,7 +63,7 @@ object GroupedIterator {
 class GroupedIterator private (input: BufferedIterator[InternalRow],
                                groupingExpressions: Seq[Expression],
                                inputSchema: Seq[Attribute])
-    extends Iterator[(InternalRow, Iterator[InternalRow])] {
+    extends Iterator[(InternalRow, Iterator[InternalRow])]
 
   /** Compares two input rows and returns 0 if they are in the same group. */
   val sortOrder = groupingExpressions.map(SortOrder(_, Ascending))
@@ -96,73 +93,60 @@ class GroupedIterator private (input: BufferedIterator[InternalRow],
     */
   def hasNext: Boolean = currentIterator != null || fetchNextGroupIterator
 
-  def next(): (InternalRow, Iterator[InternalRow]) = {
+  def next(): (InternalRow, Iterator[InternalRow]) =
     assert(hasNext) // Ensure we have fetched the next iterator.
     val ret = (keyProjection(currentGroup), currentIterator)
     currentIterator = null
     ret
-  }
 
-  private def fetchNextGroupIterator(): Boolean = {
+  private def fetchNextGroupIterator(): Boolean =
     assert(currentIterator == null)
 
-    if (currentRow == null && input.hasNext) {
+    if (currentRow == null && input.hasNext)
       currentRow = input.next()
-    }
 
-    if (currentRow == null) {
+    if (currentRow == null)
       // These is no data left, return false.
       false
-    } else {
+    else
       // Skip to next group.
       // currentRow may be overwritten by `hasNext`, so we should compare them first.
       while (keyOrdering.compare(currentGroup, currentRow) == 0 &&
-      input.hasNext) {
+      input.hasNext)
         currentRow = input.next()
-      }
 
-      if (keyOrdering.compare(currentGroup, currentRow) == 0) {
+      if (keyOrdering.compare(currentGroup, currentRow) == 0)
         // We are in the last group, there is no more groups, return false.
         false
-      } else {
+      else
         // Now the `currentRow` is the first row of next group.
         currentGroup = currentRow.copy()
         currentIterator = createGroupValuesIterator()
         true
-      }
-    }
-  }
 
-  private def createGroupValuesIterator(): Iterator[InternalRow] = {
-    new Iterator[InternalRow] {
+  private def createGroupValuesIterator(): Iterator[InternalRow] =
+    new Iterator[InternalRow]
       def hasNext: Boolean = currentRow != null || fetchNextRowInGroup()
 
-      def next(): InternalRow = {
+      def next(): InternalRow =
         assert(hasNext)
         val res = currentRow
         currentRow = null
         res
-      }
 
-      private def fetchNextRowInGroup(): Boolean = {
+      private def fetchNextRowInGroup(): Boolean =
         assert(currentRow == null)
 
-        if (input.hasNext) {
+        if (input.hasNext)
           // The inner iterator should NOT consume the input into next group, here we use `head` to
           // peek the next input, to see if we should continue to process it.
-          if (keyOrdering.compare(currentGroup, input.head) == 0) {
+          if (keyOrdering.compare(currentGroup, input.head) == 0)
             // Next input is in the current group.  Continue the inner iterator.
             currentRow = input.next()
             true
-          } else {
+          else
             // Next input is not in the right group.  End this inner iterator.
             false
-          }
-        } else {
+        else
           // There is no more data, return false.
           false
-        }
-      }
-    }
-  }
-}

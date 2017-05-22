@@ -55,7 +55,7 @@ import annotation.ScalaJSDefined
 trait Any extends scala.AnyRef
 
 /** Provides implicit conversions from Scala values to JavaScript values. */
-object Any extends LowPrioAnyImplicits {
+object Any extends LowPrioAnyImplicits
   @inline implicit def fromUnit(value: Unit): Any =
     value.asInstanceOf[Any]
   @inline implicit def fromBoolean(value: Boolean): Any =
@@ -78,16 +78,14 @@ object Any extends LowPrioAnyImplicits {
   implicit def jsArrayOps[A](array: Array[A]): ArrayOps[A] =
     new ArrayOps(array)
 
-  implicit def canBuildFromArray[A]: CanBuildFrom[Array[_], A, Array[A]] = {
+  implicit def canBuildFromArray[A]: CanBuildFrom[Array[_], A, Array[A]] =
     @inline
-    class CanBuildFromArray extends CanBuildFrom[Array[_], A, Array[A]] {
+    class CanBuildFromArray extends CanBuildFrom[Array[_], A, Array[A]]
       def apply(from: Array[_]): mutable.Builder[A, Array[A]] =
         new ArrayOps[A]
       def apply(): mutable.Builder[A, Array[A]] =
         new ArrayOps[A]
-    }
     new CanBuildFromArray
-  }
 
   // scalastyle:off line.size.limit
 
@@ -1154,11 +1152,9 @@ object Any extends LowPrioAnyImplicits {
     value.asInstanceOf[Any]
   @inline implicit def fromJDouble(value: java.lang.Double): Any =
     value.asInstanceOf[Any]
-}
 
-trait LowPrioAnyImplicits {
+trait LowPrioAnyImplicits
   implicit def wrapArray[A](array: Array[A]): WrappedArray[A] =
     new WrappedArray(array)
   implicit def wrapDictionary[A](dict: Dictionary[A]): WrappedDictionary[A] =
     new WrappedDictionary(dict)
-}

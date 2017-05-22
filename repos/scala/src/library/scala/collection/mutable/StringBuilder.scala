@@ -31,7 +31,7 @@ import immutable.StringLike
 final class StringBuilder(private val underlying: JavaStringBuilder)
     extends AbstractSeq[Char] with java.lang.CharSequence
     with IndexedSeq[Char] with StringLike[StringBuilder]
-    with ReusableBuilder[Char, String] with Serializable {
+    with ReusableBuilder[Char, String] with Serializable
 
   override protected[this] def thisCollection: StringBuilder = this
   override protected[this] def toCollection(
@@ -66,11 +66,10 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     */
   def this(str: String) = this(16, str)
 
-  def toArray: Array[Char] = {
+  def toArray: Array[Char] =
     val arr = new Array[Char](length)
     underlying.getChars(0, length, arr, 0)
     arr
-  }
 
   override def length: Int = underlying.length()
   def length_=(n: Int) { underlying.setLength(n) }
@@ -102,9 +101,8 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *
     *  @param newCapacity    the minimum desired capacity.
     */
-  def ensureCapacity(newCapacity: Int) {
+  def ensureCapacity(newCapacity: Int)
     underlying ensureCapacity newCapacity
-  }
 
   /** Returns the Char at the specified index, counting from 0 as in Arrays.
     *
@@ -125,10 +123,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return        This StringBuilder.
     *  @throws IndexOutOfBoundsException  if the index is out of bounds.
     */
-  def deleteCharAt(index: Int): StringBuilder = {
+  def deleteCharAt(index: Int): StringBuilder =
     underlying deleteCharAt index
     this
-  }
 
   /** Update the sequence at the given index to hold the specified Char.
     *
@@ -179,15 +176,13 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
 
   /** Optimization.
     */
-  def ++=(s: String): this.type = {
+  def ++=(s: String): this.type =
     underlying append s
     this
-  }
 
-  def appendAll(xs: String): StringBuilder = {
+  def appendAll(xs: String): StringBuilder =
     underlying append xs
     this
-  }
 
   /** !!! This should create a new sequence.
     */
@@ -199,30 +194,27 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @param  x   an `Any` object.
     *  @return     this StringBuilder.
     */
-  def append(x: Any): StringBuilder = {
+  def append(x: Any): StringBuilder =
     underlying append String.valueOf(x)
     this
-  }
 
   /** Appends the given String to this sequence.
     *
     *  @param  s   a String.
     *  @return     this StringBuilder.
     */
-  def append(s: String): StringBuilder = {
+  def append(s: String): StringBuilder =
     underlying append s
     this
-  }
 
   /** Appends the specified string builder to this sequence.
     *
     *  @param sb
     *  @return
     */
-  def append(sb: StringBuilder): StringBuilder = {
+  def append(sb: StringBuilder): StringBuilder =
     underlying append sb
     this
-  }
 
   /** Appends all the Chars in the given Seq[Char] to this sequence.
     *
@@ -237,10 +229,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @param  xs  the characters to be appended.
     *  @return     a reference to this object.
     */
-  def appendAll(xs: Array[Char]): StringBuilder = {
+  def appendAll(xs: Array[Char]): StringBuilder =
     underlying append xs
     this
-  }
 
   /** Appends a portion of the given Array[Char] to this sequence.
     *
@@ -249,10 +240,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @param  len     the numbers of Chars to append.
     *  @return         this StringBuilder.
     */
-  def appendAll(xs: Array[Char], offset: Int, len: Int): StringBuilder = {
+  def appendAll(xs: Array[Char], offset: Int, len: Int): StringBuilder =
     underlying.append(xs, offset, len)
     this
-  }
 
   /** Append the String representation of the given primitive type
     *  to this sequence.  The argument is converted to a String with
@@ -279,10 +269,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return        This StringBuilder.
     *  @throws StringIndexOutOfBoundsException   if start < 0 || start > end
     */
-  def delete(start: Int, end: Int): StringBuilder = {
+  def delete(start: Int, end: Int): StringBuilder =
     underlying.delete(start, end)
     this
-  }
 
   /** Replaces a subsequence of Chars with the given String.  The semantics
     *  are as in delete, with the String argument then inserted at index 'start'.
@@ -293,10 +282,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return        This StringBuilder.
     *  @throws StringIndexOutOfBoundsException if start < 0, start > length, or start > end
     */
-  def replace(start: Int, end: Int, str: String): StringBuilder = {
+  def replace(start: Int, end: Int, str: String): StringBuilder =
     underlying.replace(start, end, str)
     this
-  }
 
   /** Inserts a subarray of the given Array[Char] at the given index
     *  of this sequence.
@@ -311,10 +299,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *         offset < 0, len < 0, or (offset + len) > str.length.
     */
   def insertAll(
-      index: Int, str: Array[Char], offset: Int, len: Int): StringBuilder = {
+      index: Int, str: Array[Char], offset: Int, len: Int): StringBuilder =
     underlying.insert(index, str, offset, len)
     this
-  }
 
   /** Inserts the String representation (via String.valueOf) of the given
     *  argument into this sequence at the given index.
@@ -334,10 +321,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return       this StringBuilder.
     *  @throws StringIndexOutOfBoundsException  if the index is out of bounds.
     */
-  def insert(index: Int, x: String): StringBuilder = {
+  def insert(index: Int, x: String): StringBuilder =
     underlying.insert(index, x)
     this
-  }
 
   /** Inserts the given Seq[Char] into this sequence at the given index.
     *
@@ -356,10 +342,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return       this StringBuilder.
     *  @throws StringIndexOutOfBoundsException  if the index is out of bounds.
     */
-  def insertAll(index: Int, xs: Array[Char]): StringBuilder = {
+  def insertAll(index: Int, xs: Array[Char]): StringBuilder =
     underlying.insert(index, xs)
     this
-  }
 
   /** Calls String.valueOf on the given primitive value, and inserts the
     *  String at the given index.
@@ -434,10 +419,9 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *
     *  @return   the reversed StringBuilder (same as the target StringBuilder)
     */
-  def reverseContents(): StringBuilder = {
+  def reverseContents(): StringBuilder =
     underlying.reverse()
     this
-  }
 
   /** Returns a new String representing the data in this sequence.
     *
@@ -463,8 +447,6 @@ final class StringBuilder(private val underlying: JavaStringBuilder)
     *  @return  the string assembled by this StringBuilder
     */
   def result(): String = toString
-}
 
-object StringBuilder {
+object StringBuilder
   def newBuilder = new StringBuilder
-}

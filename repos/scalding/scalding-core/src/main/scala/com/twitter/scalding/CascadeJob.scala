@@ -3,11 +3,11 @@ package com.twitter.scalding
 import cascading.cascade.CascadeConnector
 import cascading.cascade.Cascade
 
-abstract class CascadeJob(args: Args) extends Job(args) {
+abstract class CascadeJob(args: Args) extends Job(args)
 
   def jobs: Seq[Job]
 
-  override def run = {
+  override def run =
     val flows = jobs.map { _.buildFlow }
     val cascade = new CascadeConnector().connect(flows: _*)
     preProcessCascade(cascade)
@@ -17,11 +17,9 @@ abstract class CascadeJob(args: Args) extends Job(args) {
 
     handleStats(statsData)
     statsData.isSuccessful
-  }
 
-  override def validate {
+  override def validate
     jobs.foreach { _.validate }
-  }
 
   /*
    * Good for printing a dot file, setting the flow skip strategy, etc
@@ -32,4 +30,3 @@ abstract class CascadeJob(args: Args) extends Job(args) {
    * Good for checking the cascade stats
    */
   def postProcessCascade(cascade: Cascade) = {}
-}

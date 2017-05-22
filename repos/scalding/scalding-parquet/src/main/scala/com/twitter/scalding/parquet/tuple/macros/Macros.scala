@@ -11,7 +11,7 @@ import scala.language.experimental.macros
   * like scala List, Set, and Map.
   * @author Jian TANG
   */
-object Macros {
+object Macros
 
   /**
     * Macro used to generate parquet schema for a given case class. For example if we have:
@@ -50,4 +50,3 @@ object Macros {
     */
   implicit def caseClassParquetWriteSupport[T]: ParquetWriteSupport[T] = macro WriteSupportProvider
     .toWriteSupportImpl[T]
-}

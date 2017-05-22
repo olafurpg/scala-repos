@@ -57,8 +57,8 @@ import org.apache.spark.sql.types._
   *    LocalRelation [key#2,value#3], []
   * }}}
   */
-package object dsl {
-  trait ImplicitOperators {
+package object dsl
+  trait ImplicitOperators
     def expr: Expression
 
     def unary_- : Expression = UnaryMinus(expr)
@@ -114,12 +114,10 @@ package object dsl {
 
     def as(alias: String): NamedExpression = Alias(expr, alias)()
     def as(alias: Symbol): NamedExpression = Alias(expr, alias.name)()
-  }
 
-  trait ExpressionConversions {
-    implicit class DslExpression(e: Expression) extends ImplicitOperators {
+  trait ExpressionConversions
+    implicit class DslExpression(e: Expression) extends ImplicitOperators
       def expr: Expression = e
-    }
 
     implicit def booleanToLiteral(b: Boolean): Literal = Literal(b)
     implicit def byteToLiteral(b: Byte): Literal = Literal(b)
@@ -143,13 +141,11 @@ package object dsl {
       analysis.UnresolvedAttribute(s.name)
 
     /** Converts $"col name" into an [[analysis.UnresolvedAttribute]]. */
-    implicit class StringToAttributeConversionHelper(val sc: StringContext) {
+    implicit class StringToAttributeConversionHelper(val sc: StringContext)
       // Note that if we make ExpressionConversions an object rather than a trait, we can
       // then make this a value class to avoid the small penalty of runtime instantiation.
-      def $(args: Any*): analysis.UnresolvedAttribute = {
+      def $(args: Any*): analysis.UnresolvedAttribute =
         analysis.UnresolvedAttribute(sc.s(args: _*))
-      }
-    }
 
     def sum(e: Expression): Expression = Sum(e).toAggregateExpression()
     def sumDistinct(e: Expression): Expression =
@@ -169,16 +165,14 @@ package object dsl {
     def sqrt(e: Expression): Expression = Sqrt(e)
     def abs(e: Expression): Expression = Abs(e)
 
-    implicit class DslSymbol(sym: Symbol) extends ImplicitAttribute {
+    implicit class DslSymbol(sym: Symbol) extends ImplicitAttribute
       def s: String = sym.name
-    }
     // TODO more implicit class for literal?
-    implicit class DslString(val s: String) extends ImplicitOperators {
+    implicit class DslString(val s: String) extends ImplicitOperators
       override def expr: Expression = Literal(s)
       def attr: UnresolvedAttribute = analysis.UnresolvedAttribute(s)
-    }
 
-    abstract class ImplicitAttribute extends ImplicitOperators {
+    abstract class ImplicitAttribute extends ImplicitOperators
       def s: String
       def expr: UnresolvedAttribute = attr
       def attr: UnresolvedAttribute = analysis.UnresolvedAttribute(s)
@@ -251,21 +245,18 @@ package object dsl {
         AttributeReference(s, structType, nullable = true)()
       def struct(attrs: AttributeReference*): AttributeReference =
         struct(StructType.fromAttributes(attrs))
-    }
 
-    implicit class DslAttribute(a: AttributeReference) {
+    implicit class DslAttribute(a: AttributeReference)
       def notNull: AttributeReference = a.withNullability(false)
       def canBeNull: AttributeReference = a.withNullability(true)
       def at(ordinal: Int): BoundReference =
         BoundReference(ordinal, a.dataType, a.nullable)
-    }
-  }
 
   object expressions extends ExpressionConversions // scalastyle:ignore
 
-  object plans {
+  object plans
     // scalastyle:ignore
-    implicit class DslLogicalPlan(val logicalPlan: LogicalPlan) {
+    implicit class DslLogicalPlan(val logicalPlan: LogicalPlan)
       def select(exprs: NamedExpression*): LogicalPlan =
         Project(exprs, logicalPlan)
 
@@ -287,13 +278,11 @@ package object dsl {
         Sort(sortExprs, false, logicalPlan)
 
       def groupBy(groupingExprs: Expression*)(
-          aggregateExprs: Expression*): LogicalPlan = {
-        val aliasedExprs = aggregateExprs.map {
+          aggregateExprs: Expression*): LogicalPlan =
+        val aliasedExprs = aggregateExprs.map
           case ne: NamedExpression => ne
           case e => Alias(e, e.toString)()
-        }
         Aggregate(groupingExprs, aliasedExprs, logicalPlan)
-      }
 
       def window(windowExpressions: Seq[NamedExpression],
                  partitionSpec: Seq[Expression],
@@ -335,6 +324,3 @@ package object dsl {
 
       def analyze: LogicalPlan =
         EliminateSubqueryAliases(analysis.SimpleAnalyzer.execute(logicalPlan))
-    }
-  }
-}

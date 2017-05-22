@@ -8,15 +8,14 @@ import play.api.mvc.RequestHeader
 /**
   * An extractor that extracts requests by method.
   */
-class RequestMethodExtractor private[sird](method: String) {
+class RequestMethodExtractor private[sird](method: String)
   def unapply(request: RequestHeader): Option[RequestHeader] =
     Some(request).filter(_.method.equalsIgnoreCase(method))
-}
 
 /**
   * Extractors that extract requests by method.
   */
-trait RequestMethodExtractors {
+trait RequestMethodExtractors
 
   /**
     * Extracts a GET request.
@@ -52,4 +51,3 @@ trait RequestMethodExtractors {
     * Extracts a HEAD request.
     */
   val HEAD = new RequestMethodExtractor("HEAD")
-}

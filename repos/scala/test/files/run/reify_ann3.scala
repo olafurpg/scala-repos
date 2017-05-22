@@ -5,11 +5,11 @@ import scala.tools.reflect.ToolBox
 import scala.annotation._
 import scala.annotation.meta._
 
-object Test extends App {
+object Test extends App
   // test 1: reify
-  val tree = reify {
+  val tree = reify
     class Tree[A, +B](@(inline @getter) final val key: A)
-  }.tree
+  .tree
   println(tree.toString)
 
   // test 2: import and typecheck
@@ -19,4 +19,3 @@ object Test extends App {
 
   // test 3: import and compile
   toolbox.eval(tree)
-}

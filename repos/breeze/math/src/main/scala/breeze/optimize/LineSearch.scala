@@ -3,9 +3,8 @@ package breeze.optimize
 import breeze.math.InnerProductModule
 import breeze.util.Implicits._
 
-trait MinimizingLineSearch {
+trait MinimizingLineSearch
   def minimize(f: DiffFunction[Double], init: Double = 1.0): Double
-}
 
 /**
   * A line search optimizes a function of one variable without
@@ -20,18 +19,17 @@ trait LineSearch extends ApproximateLineSearch
   * backtracking line search), where there is no intrinsic termination criterion, only extrinsic
   * @author dlwh
   */
-trait ApproximateLineSearch extends MinimizingLineSearch {
+trait ApproximateLineSearch extends MinimizingLineSearch
   final case class State(alpha: Double, value: Double, deriv: Double)
   def iterations(f: DiffFunction[Double], init: Double = 1.0): Iterator[State]
   def minimize(f: DiffFunction[Double], init: Double = 1.0): Double =
     iterations(f, init).last.alpha
-}
 
-object LineSearch {
+object LineSearch
   def functionFromSearchDirection[T, I](
       f: DiffFunction[T], x: T, direction: T)(
       implicit prod: InnerProductModule[T, Double]): DiffFunction[Double] =
-    new DiffFunction[Double] {
+    new DiffFunction[Double]
       import prod._
 
       /** calculates the value at a point */
@@ -43,9 +41,6 @@ object LineSearch {
         f.gradientAt(x + direction * alpha) dot direction
 
       /** Calculates both the value and the gradient at a point */
-      def calculate(alpha: Double): (Double, Double) = {
+      def calculate(alpha: Double): (Double, Double) =
         val (ff, grad) = f.calculate(x + direction * alpha)
         ff -> (grad dot direction)
-      }
-    }
-}

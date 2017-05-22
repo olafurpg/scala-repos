@@ -25,7 +25,7 @@ import net.liftweb.record.Field
 import net.liftweb.common.{Box, Empty, Full}
 import scala.xml.NodeSeq
 
-trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify {
+trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify
   self: MetaRecord[T] =>
 
   type TheCrudType = T
@@ -47,48 +47,38 @@ trait CRUDify[K, T <: Record[T] with KeyedEntity[K]] extends Crudify {
     instance.fieldByName(pointer.name)
 
   override def findForParam(in: String): Box[TheCrudType] =
-    inTransaction {
+    inTransaction
       table.lookup(idFromString(in))
-    }
 
   override def findForList(start: Long, count: Int) =
-    inTransaction {
+    inTransaction
       from(table)(t => select(t)).page(start.toInt, count).toList
-    }
 
   override def create = createRecord
 
   override def buildBridge(in: TheCrudType) = new SquerylBridge(in)
 
-  protected class SquerylBridge(in: TheCrudType) extends CrudBridge {
+  protected class SquerylBridge(in: TheCrudType) extends CrudBridge
 
-    def delete_! = inTransaction {
+    def delete_! = inTransaction
       table.delete(in.id)
-    }
 
-    def save = {
-      if (in.isPersisted) {
-        inTransaction {
+    def save =
+      if (in.isPersisted)
+        inTransaction
           table.update(in)
-        }
-      } else {
-        inTransaction {
+      else
+        inTransaction
           table.insert(in)
-        }
-      }
       true
-    }
 
     def validate = in.validate
 
     def primaryKeyFieldAsString = in.id.toString
-  }
 
   def buildFieldBridge(from: FieldPointerType): FieldPointerBridge =
     new SquerylFieldBridge(from)
 
   protected class SquerylFieldBridge(in: FieldPointerType)
-      extends FieldPointerBridge {
+      extends FieldPointerBridge
     def displayHtml: NodeSeq = in.displayHtml
-  }
-}

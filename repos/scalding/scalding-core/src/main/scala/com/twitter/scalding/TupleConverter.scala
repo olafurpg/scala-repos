@@ -36,24 +36,20 @@ import scala.collection.breakOut
   * encode in scala.
   */
 trait TupleConverter[@specialized(Int, Long, Float, Double) T]
-    extends java.io.Serializable with TupleArity { self =>
+    extends java.io.Serializable with TupleArity  self =>
   def apply(te: TupleEntry): T
-  def andThen[U](fn: T => U): TupleConverter[U] = new TupleConverter[U] {
+  def andThen[U](fn: T => U): TupleConverter[U] = new TupleConverter[U]
     def apply(te: TupleEntry) = fn(self(te))
     def arity = self.arity
-  }
-}
 
-trait LowPriorityTupleConverters extends java.io.Serializable {
+trait LowPriorityTupleConverters extends java.io.Serializable
   implicit def singleConverter[@specialized(Int, Long, Float, Double) A](
       implicit g: TupleGetter[A]) =
-    new TupleConverter[A] {
+    new TupleConverter[A]
       def apply(tup: TupleEntry) = g.get(tup.getTuple, 0)
       def arity = 1
-    }
-}
 
-object TupleConverter extends GeneratedTupleConverters {
+object TupleConverter extends GeneratedTupleConverters
 
   /**
     * Treat this TupleConverter as one for a superclass
@@ -64,10 +60,9 @@ object TupleConverter extends GeneratedTupleConverters {
     tc.asInstanceOf[TupleConverter[U]]
 
   def build[T](thisArity: Int)(fn: TupleEntry => T): TupleConverter[T] =
-    new TupleConverter[T] {
+    new TupleConverter[T]
       def apply(te: TupleEntry) = fn(te)
       def arity = thisArity
-    }
   def fromTupleEntry[T](t: TupleEntry)(implicit tc: TupleConverter[T]): T =
     tc(t)
   def arity[T](implicit tc: TupleConverter[T]): Int = tc.arity
@@ -79,10 +74,9 @@ object TupleConverter extends GeneratedTupleConverters {
     * to this tuple)
     */
   implicit lazy val TupleEntryConverter: TupleConverter[TupleEntry] =
-    new TupleConverter[TupleEntry] {
+    new TupleConverter[TupleEntry]
       override def apply(tup: TupleEntry) = new TupleEntry(tup)
       override def arity = -1
-    }
 
   /**
     * Copies the tuple, since cascading may change it after the end of an
@@ -90,65 +84,54 @@ object TupleConverter extends GeneratedTupleConverters {
     * to this tuple
     */
   implicit lazy val CTupleConverter: TupleConverter[CTuple] =
-    new TupleConverter[CTuple] {
+    new TupleConverter[CTuple]
       override def apply(tup: TupleEntry) = tup.getTupleCopy
       override def arity = -1
-    }
 
   /**
     * In the case where you don't know the arity, prefer to use this.
     */
   implicit lazy val ProductTupleConverter: TupleConverter[Product] =
-    new TupleConverter[Product] {
-      def wrap(tup: CTuple): Product = new Product {
-        def canEqual(that: Any) = that match {
+    new TupleConverter[Product]
+      def wrap(tup: CTuple): Product = new Product
+        def canEqual(that: Any) = that match
           case p: Product => true
           case _ => false
-        }
         def productArity = tup.size
         def productElement(idx: Int) = tup.getObject(idx)
-      }
       override def apply(tup: TupleEntry) = wrap(tup.getTupleCopy)
       override def arity = -1
-    }
 
   implicit lazy val UnitConverter: TupleConverter[Unit] =
-    new TupleConverter[Unit] {
+    new TupleConverter[Unit]
       override def apply(arg: TupleEntry) = ()
       override def arity = 0
-    }
   // Doesn't seem safe to make these implicit by default:
   /**
     * Convert a TupleEntry to a List of CTuple, of length 2, with key, value
     * from the TupleEntry (useful for RichPipe.unpivot)
     */
-  object KeyValueList extends TupleConverter[List[CTuple]] {
-    def apply(tupe: TupleEntry): List[CTuple] = {
+  object KeyValueList extends TupleConverter[List[CTuple]]
+    def apply(tupe: TupleEntry): List[CTuple] =
       val keys = tupe.getFields
-      (0 until keys.size).map { idx =>
+      (0 until keys.size).map  idx =>
         new CTuple(keys.get(idx).asInstanceOf[Object], tupe.getObject(idx))
-      }(breakOut)
-    }
+      (breakOut)
     def arity = -1
-  }
 
-  object ToMap extends TupleConverter[Map[String, AnyRef]] {
-    def apply(tupe: TupleEntry): Map[String, AnyRef] = {
+  object ToMap extends TupleConverter[Map[String, AnyRef]]
+    def apply(tupe: TupleEntry): Map[String, AnyRef] =
       val keys = tupe.getFields
-      (0 until keys.size).map { idx =>
+      (0 until keys.size).map  idx =>
         (keys.get(idx).toString, tupe.getObject(idx))
-      }(breakOut)
-    }
+      (breakOut)
     def arity = -1
-  }
 
   /**
     * Utility to create a single item Tuple
     */
-  def tupleAt(idx: Int)(tup: CTuple): CTuple = {
+  def tupleAt(idx: Int)(tup: CTuple): CTuple =
     val obj = tup.getObject(idx)
     val res = CTuple.size(1)
     res.set(0, obj)
     res
-  }
-}

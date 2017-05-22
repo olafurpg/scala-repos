@@ -5,6 +5,5 @@ trait IsIgnoreCaseClassSubclasses
 /**
   * This gives us all of our generator options.
   */
-package object opts {
+package object opts
   implicit object ignoreCaseClassSubclasses extends IsIgnoreCaseClassSubclasses
-}

@@ -28,36 +28,31 @@ import scala.collection.JavaConverters._
 class HashJoiner[K, V, W, R](rightGetter: (K, Iterator[CTuple],
                              Seq[Iterable[CTuple]]) => Iterator[W],
                              joiner: (K, V, Iterable[W]) => Iterator[R])
-    extends CJoiner {
+    extends CJoiner
 
-  override def getIterator(jc: JoinerClosure) = {
+  override def getIterator(jc: JoinerClosure) =
     // The left one cannot be iterated multiple times on Hadoop:
     val leftIt = jc.getIterator(0).asScala // should only be 0 or 1 here
-    if (leftIt.isEmpty) {
+    if (leftIt.isEmpty)
       (Iterator.empty: Iterator[CTuple]).asJava // java is not covariant so we need this
-    } else {
+    else
       val left = leftIt.buffered
       // There must be at least one item on the left in a hash-join
       val key = left.head.getObject(0).asInstanceOf[K]
 
       // It is safe to iterate over the right side again and again
-      val rightIterable = new Iterable[W] {
+      val rightIterable = new Iterable[W]
         def iterator = rightGetter(key, jc.getIterator(1).asScala, Nil)
-      }
 
-      left.flatMap { kv =>
+      left.flatMap  kv =>
         val leftV = kv.getObject(1).asInstanceOf[V] // get just the Vs
 
-        joiner(key, leftV, rightIterable).map { rval =>
+        joiner(key, leftV, rightIterable).map  rval =>
           // There always has to be four resulting fields
           // or otherwise the flow planner will throw
           val res = CTuple.size(4)
           res.set(0, key)
           res.set(1, rval)
           res
-        }
-      }.asJava
-    }
-  }
+      .asJava
   override val numJoins = 1
-}

@@ -20,14 +20,14 @@ import scala.concurrent.duration._
 
 class KillOverdueTasksActorTest
     extends MarathonSpec with GivenWhenThen with marathon.test.Mockito
-    with ScalaFutures {
+    with ScalaFutures
   implicit var actorSystem: ActorSystem = _
   var taskTracker: TaskTracker = _
   var driver: SchedulerDriver = _
   var checkActor: ActorRef = _
   val clock = ConstantClock()
 
-  before {
+  before
     actorSystem = ActorSystem()
     taskTracker = mock[TaskTracker]
     driver = mock[SchedulerDriver]
@@ -37,16 +37,14 @@ class KillOverdueTasksActorTest
     checkActor = actorSystem.actorOf(
         KillOverdueTasksActor.props(config, taskTracker, driverHolder, clock),
         "check")
-  }
 
-  after {
-    def waitForActorProcessingAllAndDying(): Unit = {
+  after
+    def waitForActorProcessingAllAndDying(): Unit =
       checkActor ! PoisonPill
       val probe = TestProbe()
       probe.watch(checkActor)
       val terminated = probe.expectMsgAnyClassOf(classOf[Terminated])
       assert(terminated.actor == checkActor)
-    }
 
     waitForActorProcessingAllAndDying()
 
@@ -54,9 +52,8 @@ class KillOverdueTasksActorTest
     actorSystem.awaitTermination()
 
     noMoreInteractions(taskTracker, driver)
-  }
 
-  test("no overdue tasks") {
+  test("no overdue tasks")
     Given("no tasks")
     taskTracker.tasksByAppSync returns TasksByApp.empty
 
@@ -70,9 +67,8 @@ class KillOverdueTasksActorTest
     verify(taskTracker).tasksByAppSync
     And("no kill calls are issued")
     noMoreInteractions(driver)
-  }
 
-  test("some overdue tasks") {
+  test("some overdue tasks")
     Given("one overdue task")
     val mockTask = MarathonTestHelper.stagedTaskProto("someId")
     val app = TaskTracker.AppTasks(PathId("/some"), Iterable(mockTask))
@@ -85,11 +81,10 @@ class KillOverdueTasksActorTest
     verify(taskTracker, Mockito.timeout(1000)).tasksByAppSync
     import mesosphere.mesos.protos.Implicits._
     verify(driver, Mockito.timeout(1000)).killTask(TaskID("someId"))
-  }
 
   // sounds strange, but this is how it currently works: determineOverdueTasks will consider a missing startedAt to
   // determine whether a task is in staging and might need to be killed if it exceeded the taskLaunchTimeout
-  test("ensure that check kills tasks disregarding the stagedAt property") {
+  test("ensure that check kills tasks disregarding the stagedAt property")
     import scala.language.implicitConversions
     implicit def toMillis(timestamp: Timestamp): Long =
       timestamp.toDateTime.getMillis
@@ -169,5 +164,3 @@ class KillOverdueTasksActorTest
 
     And("but not more")
     verifyNoMoreInteractions(driver)
-  }
-}

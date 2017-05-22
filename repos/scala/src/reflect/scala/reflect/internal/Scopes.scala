@@ -9,20 +9,19 @@ package internal
 
 import scala.annotation.tailrec
 
-trait Scopes extends api.Scopes { self: SymbolTable =>
+trait Scopes extends api.Scopes  self: SymbolTable =>
 
   /** An ADT to represent the results of symbol name lookups.
     */
   sealed trait NameLookup { def symbol: Symbol; def isSuccess = false }
   case class LookupSucceeded(qualifier: Tree, symbol: Symbol)
       extends NameLookup { override def isSuccess = true }
-  case class LookupAmbiguous(msg: String) extends NameLookup {
+  case class LookupAmbiguous(msg: String) extends NameLookup
     def symbol = NoSymbol
-  }
   case class LookupInaccessible(symbol: Symbol, msg: String) extends NameLookup
   case object LookupNotFound extends NameLookup { def symbol = NoSymbol }
 
-  class ScopeEntry(val sym: Symbol, val owner: Scope) {
+  class ScopeEntry(val sym: Symbol, val owner: Scope)
 
     /** the next entry in the hash bucket
       */
@@ -35,24 +34,21 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     def depth = owner.nestingLevel
     override def hashCode(): Int = sym.name.start
     override def toString() = s"$sym (depth=$depth)"
-  }
 
-  private def newScopeEntry(sym: Symbol, owner: Scope): ScopeEntry = {
+  private def newScopeEntry(sym: Symbol, owner: Scope): ScopeEntry =
     val e = new ScopeEntry(sym, owner)
     e.next = owner.elems
     owner.elems = e
     e
-  }
 
-  object Scope {
+  object Scope
     def unapplySeq(decls: Scope): Some[Seq[Symbol]] = Some(decls.toList)
-  }
 
   /** Note: constructor is protected to force everyone to use the factory methods newScope or newNestedScope instead.
     *  This is necessary because when run from reflection every scope needs to have a
     *  SynchronizedScope as mixin.
     */
-  class Scope protected[Scopes]() extends ScopeApi with MemberScopeApi {
+  class Scope protected[Scopes]() extends ScopeApi with MemberScopeApi
 
     private[scala] var elems: ScopeEntry = _
 
@@ -68,10 +64,9 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       */
     private var elemsCache: List[Symbol] = null
     private var cachedSize = -1
-    private def flushElemsCache() {
+    private def flushElemsCache()
       elemsCache = null
       cachedSize = -1
-    }
 
     /** size and mask of hash tables
       *  todo: make hashtables grow?
@@ -90,134 +85,109 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     override def isEmpty: Boolean = elems eq null
 
     /** the number of entries in this scope */
-    override def size: Int = {
+    override def size: Int =
       if (cachedSize < 0) cachedSize = directSize
 
       cachedSize
-    }
-    private def directSize: Int = {
+    private def directSize: Int =
       var s = 0
       var e = elems
-      while (e ne null) {
+      while (e ne null)
         s += 1
         e = e.next
-      }
       s
-    }
 
     /** enter a scope entry
       */
-    protected def enterEntry(e: ScopeEntry) {
+    protected def enterEntry(e: ScopeEntry)
       flushElemsCache()
       if (hashtable ne null) enterInHash(e)
       else if (size >= MIN_HASH) createHash()
-    }
 
-    private def enterInHash(e: ScopeEntry): Unit = {
+    private def enterInHash(e: ScopeEntry): Unit =
       val i = e.sym.name.start & HASHMASK
       e.tail = hashtable(i)
       hashtable(i) = e
-    }
 
     /** enter a symbol
       */
-    def enter[T <: Symbol](sym: T): T = {
+    def enter[T <: Symbol](sym: T): T =
       enterEntry(newScopeEntry(sym, this))
       sym
-    }
 
     /** enter a symbol, asserting that no symbol with same name exists in scope
       */
-    def enterUnique(sym: Symbol) {
+    def enterUnique(sym: Symbol)
       assert(lookup(sym.name) == NoSymbol,
              (sym.fullLocationString, lookup(sym.name).fullLocationString))
       enter(sym)
-    }
 
-    def enterIfNew[T <: Symbol](sym: T): T = {
+    def enterIfNew[T <: Symbol](sym: T): T =
       val existing = lookupEntry(sym.name)
       if (existing == null) enter(sym)
       else existing.sym.asInstanceOf[T]
-    }
 
-    private def createHash() {
+    private def createHash()
       hashtable = new Array[ScopeEntry](HASHSIZE)
       enterAllInHash(elems)
-    }
 
-    private def enterAllInHash(e: ScopeEntry, n: Int = 0) {
-      if (e ne null) {
-        if (n < maxRecursions) {
+    private def enterAllInHash(e: ScopeEntry, n: Int = 0)
+      if (e ne null)
+        if (n < maxRecursions)
           enterAllInHash(e.next, n + 1)
           enterInHash(e)
-        } else {
+        else
           var entries: List[ScopeEntry] = List()
           var ee = e
-          while (ee ne null) {
+          while (ee ne null)
             entries = ee :: entries
             ee = ee.next
-          }
           entries foreach enterInHash
-        }
-      }
-    }
 
-    def rehash(sym: Symbol, newname: Name) {
-      if (hashtable ne null) {
+    def rehash(sym: Symbol, newname: Name)
+      if (hashtable ne null)
         val index = sym.name.start & HASHMASK
         var e1 = hashtable(index)
         var e: ScopeEntry = null
-        if (e1 != null) {
-          if (e1.sym == sym) {
+        if (e1 != null)
+          if (e1.sym == sym)
             hashtable(index) = e1.tail
             e = e1
-          } else {
+          else
             while (e1.tail != null && e1.tail.sym != sym) e1 = e1.tail
-            if (e1.tail != null) {
+            if (e1.tail != null)
               e = e1.tail
               e1.tail = e.tail
-            }
-          }
-        }
-        if (e != null) {
+        if (e != null)
           val newindex = newname.start & HASHMASK
           e.tail = hashtable(newindex)
           hashtable(newindex) = e
-        }
-      }
-    }
 
     /** remove entry
       */
-    def unlink(e: ScopeEntry) {
-      if (elems == e) {
+    def unlink(e: ScopeEntry)
+      if (elems == e)
         elems = e.next
-      } else {
+      else
         var e1 = elems
         while (e1.next != e) e1 = e1.next
         e1.next = e.next
-      }
-      if (hashtable ne null) {
+      if (hashtable ne null)
         val index = e.sym.name.start & HASHMASK
         var e1 = hashtable(index)
-        if (e1 == e) {
+        if (e1 == e)
           hashtable(index) = e.tail
-        } else {
+        else
           while (e1.tail != e) e1 = e1.tail
           e1.tail = e.tail
-        }
-      }
       flushElemsCache()
-    }
 
     /** remove symbol */
-    def unlink(sym: Symbol) {
+    def unlink(sym: Symbol)
       var e = lookupEntry(sym.name)
-      while (e ne null) {
+      while (e ne null)
         if (e.sym == sym) unlink(e)
         e = lookupNextEntry(e)
-      }
-    }
 
     /** Lookup a module or a class, filtering out matching names in scope
       *  which do not match that requirement.
@@ -232,11 +202,11 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
 
     /** Lookup a symbol.
       */
-    def lookup(name: Name): Symbol = {
+    def lookup(name: Name): Symbol =
       val e = lookupEntry(name)
       if (e eq null) NoSymbol
       else if (lookupNextEntry(e) eq null) e.sym
-      else {
+      else
         // We shouldn't get here: until now this method was picking a random
         // symbol when there was more than one with the name, so this should
         // only be called knowing that there are 0-1 symbols of interest. So, we
@@ -262,67 +232,56 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
         // val prefix = lub(alts map (_.info.prefix) distinct)
         // Now using NoSymbol and NoPrefix always to avoid forcing info (SI-6664)
         NoSymbol.newOverloaded(NoPrefix, alts)
-      }
-    }
 
     /** Returns an iterator yielding every symbol with given name in this scope.
       */
-    def lookupAll(name: Name): Iterator[Symbol] = new Iterator[Symbol] {
+    def lookupAll(name: Name): Iterator[Symbol] = new Iterator[Symbol]
       var e = lookupEntry(name)
       def hasNext: Boolean = e ne null
       def next(): Symbol = try e.sym finally e = lookupNextEntry(e)
-    }
 
     def lookupAllEntries(name: Name): Iterator[ScopeEntry] =
-      new Iterator[ScopeEntry] {
+      new Iterator[ScopeEntry]
         var e = lookupEntry(name)
         def hasNext: Boolean = e ne null
         def next(): ScopeEntry = try e finally e = lookupNextEntry(e)
-      }
 
-    def lookupUnshadowedEntries(name: Name): Iterator[ScopeEntry] = {
-      lookupEntry(name) match {
+    def lookupUnshadowedEntries(name: Name): Iterator[ScopeEntry] =
+      lookupEntry(name) match
         case null => Iterator.empty
         case e =>
           lookupAllEntries(name) filter
           (e1 => (e eq e1) || (e.depth == e1.depth && e.sym != e1.sym))
-      }
-    }
 
     /** lookup a symbol entry matching given name.
       *  @note from Martin: I believe this is a hotspot or will be one
       *  in future versions of the type system. I have reverted the previous
       *  change to use iterators as too costly.
       */
-    def lookupEntry(name: Name): ScopeEntry = {
+    def lookupEntry(name: Name): ScopeEntry =
       var e: ScopeEntry = null
-      if (hashtable ne null) {
+      if (hashtable ne null)
         e = hashtable(name.start & HASHMASK)
-        while ( (e ne null) && e.sym.name != name) {
+        while ( (e ne null) && e.sym.name != name)
           e = e.tail
-        }
-      } else {
+      else
         e = elems
-        while ( (e ne null) && e.sym.name != name) {
+        while ( (e ne null) && e.sym.name != name)
           e = e.next
-        }
-      }
       e
-    }
 
     /** lookup next entry with same name as this one
       *  @note from Martin: I believe this is a hotspot or will be one
       *  in future versions of the type system. I have reverted the previous
       *  change to use iterators as too costly.
       */
-    def lookupNextEntry(entry: ScopeEntry): ScopeEntry = {
+    def lookupNextEntry(entry: ScopeEntry): ScopeEntry =
       var e = entry
       if (hashtable ne null)
         do { e = e.tail } while ( (e ne null) && e.sym.name != entry.sym.name)
       else
         do { e = e.next } while ( (e ne null) && e.sym.name != entry.sym.name)
       e
-    }
 
     /** TODO - we can test this more efficiently than checking isSubScope
       *  in both directions. However the size test might be enough to quickly
@@ -332,37 +291,31 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       ((size == other.size) // optimization - size is cached
           && (this isSubScope other) && (other isSubScope this))
 
-    def isSubScope(other: Scope) = {
-      def scopeContainsSym(sym: Symbol): Boolean = {
-        @tailrec def entryContainsSym(e: ScopeEntry): Boolean = e match {
+    def isSubScope(other: Scope) =
+      def scopeContainsSym(sym: Symbol): Boolean =
+        @tailrec def entryContainsSym(e: ScopeEntry): Boolean = e match
           case null => false
           case _ =>
             val comparableInfo = sym.info.substThis(sym.owner, e.sym.owner)
             (e.sym.info =:= comparableInfo) ||
             entryContainsSym(lookupNextEntry(e))
-        }
         entryContainsSym(this lookupEntry sym.name)
-      }
       other.toList forall scopeContainsSym
-    }
 
     /** Return all symbols as a list in the order they were entered in this scope.
       */
-    override def toList: List[Symbol] = {
-      if (elemsCache eq null) {
+    override def toList: List[Symbol] =
+      if (elemsCache eq null)
         var symbols: List[Symbol] = Nil
         var count = 0
         var e = elems
-        while ( (e ne null) && e.owner == this) {
+        while ( (e ne null) && e.owner == this)
           count += 1
           symbols ::= e.sym
           e = e.next
-        }
         elemsCache = symbols
         cachedSize = count
-      }
       elemsCache
-    }
 
     /** Vanilla scope - symbols are stored in declaration order.
       */
@@ -391,7 +344,6 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       toList.map(_.defString).mkString(start, sep, end)
 
     override def toString(): String = mkString("Scope{\n  ", ";\n  ", "\n}")
-  }
 
   implicit val ScopeTag = ClassTag[Scope](classOf[Scope])
 
@@ -422,17 +374,15 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
     *  Once `members` became a public API, this has been confusing countless numbers of users.
     *  Therefore we introduce a special flavor of scopes to accommodate this quirk of `findMembers`
     */
-  private[scala] def newFindMemberScope: Scope = new Scope() {
-    override def sorted = {
+  private[scala] def newFindMemberScope: Scope = new Scope()
+    override def sorted =
       val members = toList
       val owners = members.map(_.owner).distinct
       val grouped = members groupBy (_.owner)
       owners.flatMap(owner => grouped(owner).reverse)
-    }
-  }
 
   /** Create a new scope nested in another one with which it shares its elements */
-  final def newNestedScope(outer: Scope): Scope = {
+  final def newNestedScope(outer: Scope): Scope =
     val nested =
       newScope // not `new Scope`, we must allow the runtime reflection universe to mixin SynchronizedScopes!
     nested.elems = outer.elems
@@ -441,14 +391,12 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
       nested.hashtable = java.util.Arrays
         .copyOf(outer.hashtable, outer.hashtable.length)
     nested
-  }
 
   /** Create a new scope with given initial elements */
-  def newScopeWith(elems: Symbol*): Scope = {
+  def newScopeWith(elems: Symbol*): Scope =
     val scope = newScope
     elems foreach scope.enter
     scope
-  }
 
   /** Create new scope for the members of package `pkg` */
   def newPackageScope(pkgClass: Symbol): Scope = newScope
@@ -460,15 +408,12 @@ trait Scopes extends api.Scopes { self: SymbolTable =>
 
   /** The empty scope (immutable).
     */
-  object EmptyScope extends Scope {
-    override def enterEntry(e: ScopeEntry) {
+  object EmptyScope extends Scope
+    override def enterEntry(e: ScopeEntry)
       abort("EmptyScope.enter")
-    }
-  }
 
   /** The error scope.
     */
   class ErrorScope(owner: Symbol) extends Scope
 
   private final val maxRecursions = 1000
-}

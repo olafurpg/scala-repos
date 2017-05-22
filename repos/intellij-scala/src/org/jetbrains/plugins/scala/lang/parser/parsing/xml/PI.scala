@@ -15,29 +15,23 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * PI ::= <? name [S charTag] ?>
  */
 
-object PI {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object PI
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val PIMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_PI_START => builder.advanceLexer()
       case _ =>
         PIMarker.drop()
         return false
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_NAME => builder.advanceLexer()
       case _ => builder error ErrMsg("xml.name.expected")
-    }
     while (Attribute parse builder) {}
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_TAG_CHARACTERS => builder.advanceLexer()
       case _ =>
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaXmlTokenTypes.XML_PI_END => builder.advanceLexer()
       case _ => builder error ErrMsg("xml.PI.end.expected")
-    }
     PIMarker.done(ScalaElementTypes.XML_PI)
     true
-  }
-}

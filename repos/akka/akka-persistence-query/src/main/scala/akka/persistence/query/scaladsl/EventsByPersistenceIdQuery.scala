@@ -10,7 +10,7 @@ import akka.persistence.query.EventEnvelope
 /**
   * A plugin may optionally support this query by implementing this trait.
   */
-trait EventsByPersistenceIdQuery extends ReadJournal {
+trait EventsByPersistenceIdQuery extends ReadJournal
 
   /**
     * Query events for a specific `PersistentActor` identified by `persistenceId`.
@@ -28,4 +28,3 @@ trait EventsByPersistenceIdQuery extends ReadJournal {
   def eventsByPersistenceId(persistenceId: String,
                             fromSequenceNr: Long,
                             toSequenceNr: Long): Source[EventEnvelope, NotUsed]
-}

@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
 
   // For these methods, the compiler emits calls to BoxesRuntime.equalsNumNum/equalsNumChar/equalsNumObject directly
 
@@ -16,4 +16,3 @@ object Test extends App {
   numObject(new Integer(97), new Character('a'))
 
   charObject(new Character('a'), new Integer(97))
-}

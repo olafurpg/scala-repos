@@ -22,7 +22,7 @@ package mutable
     "Proxying is deprecated due to lack of use and compiler-level support.",
     "2.11.0")
 abstract class PriorityQueueProxy[A](implicit ord: Ordering[A])
-    extends PriorityQueue[A] with Proxy {
+    extends PriorityQueue[A] with Proxy
   def self: PriorityQueue[A]
 
   /** Creates a new iterator over all elements contained in this
@@ -52,10 +52,9 @@ abstract class PriorityQueueProxy[A](implicit ord: Ordering[A])
     *
     *  @param  it        an iterator
     */
-  override def ++=(it: TraversableOnce[A]): this.type = {
+  override def ++=(it: TraversableOnce[A]): this.type =
     self ++= it
     this
-  }
 
   /** Adds all elements to the queue.
     *
@@ -90,7 +89,5 @@ abstract class PriorityQueueProxy[A](implicit ord: Ordering[A])
     *
     *  @return  a priority queue with the same elements.
     */
-  override def clone(): PriorityQueue[A] = new PriorityQueueProxy[A] {
+  override def clone(): PriorityQueue[A] = new PriorityQueueProxy[A]
     def self = PriorityQueueProxy.this.self.clone()
-  }
-}

@@ -41,13 +41,12 @@ import scalaz._
 
 import shapeless._
 
-object CronExpressionSerialization {
-  implicit val cronExpressionDecomposer = new Decomposer[CronExpression] {
+object CronExpressionSerialization
+  implicit val cronExpressionDecomposer = new Decomposer[CronExpression]
     def decompose(expr: CronExpression) = JString(expr.toString)
-  }
 
-  implicit val cronExpressionExtractor = new Extractor[CronExpression] {
-    def validated(jv: JValue) = jv match {
+  implicit val cronExpressionExtractor = new Extractor[CronExpression]
+    def validated(jv: JValue) = jv match
       case JString(expr) =>
         Validation
           .fromTryCatch(new CronExpression(expr))
@@ -56,9 +55,6 @@ object CronExpressionSerialization {
         Failure(
             Extractor.Error.invalid(
                 "Could not parse CRON expression from " + invalid))
-    }
-  }
-}
 
 case class ScheduledTask(id: UUID,
                          repeat: Option[CronExpression],
@@ -67,14 +63,12 @@ case class ScheduledTask(id: UUID,
                          context: EvaluationContext,
                          source: Path,
                          sink: Path,
-                         timeoutMillis: Option[Long]) {
+                         timeoutMillis: Option[Long])
   def taskName = "Scheduled %s -> %s".format(source, sink)
-  def timeout = timeoutMillis map { to =>
+  def timeout = timeoutMillis map  to =>
     Duration(to, TimeUnit.MILLISECONDS)
-  }
-}
 
-object ScheduledTask {
+object ScheduledTask
   import CronExpressionSerialization._
 
   implicit val iso = Iso.hlist(ScheduledTask.apply _, ScheduledTask.unapply _)
@@ -86,4 +80,3 @@ object ScheduledTask {
       schemaV1, Some("1.0".v))
   implicit val extractor: Extractor[ScheduledTask] = extractorV(
       schemaV1, Some("1.0".v))
-}

@@ -30,7 +30,7 @@ class ReadHighestFailedException
   */
 private object ChaosJournalMessages extends InmemMessages
 
-class ChaosJournal extends AsyncWriteJournal {
+class ChaosJournal extends AsyncWriteJournal
   import ChaosJournalMessages.{delete ⇒ del, _}
 
   val config =
@@ -44,44 +44,38 @@ class ChaosJournal extends AsyncWriteJournal {
 
   override def asyncWriteMessages(
       messages: immutable.Seq[AtomicWrite]): Future[immutable.Seq[Try[Unit]]] =
-    try Future.successful {
+    try Future.successful
       if (shouldFail(writeFailureRate))
         throw new WriteFailedException(messages.flatMap(_.payload))
       else
-        for (a ← messages) yield {
+        for (a ← messages) yield
           a.payload.foreach(add)
           AsyncWriteJournal.successUnit
-        }
-    } catch {
+    catch
       case NonFatal(e) ⇒ Future.failed(e)
-    }
 
   override def asyncDeleteMessagesTo(
-      persistenceId: String, toSequenceNr: Long): Future[Unit] = {
-    try Future.successful {
-      (1L to toSequenceNr).foreach { snr ⇒
+      persistenceId: String, toSequenceNr: Long): Future[Unit] =
+    try Future.successful
+      (1L to toSequenceNr).foreach  snr ⇒
         del(persistenceId, snr)
-      }
-    } catch {
+    catch
       case NonFatal(e) ⇒ Future.failed(e)
-    }
-  }
 
   def asyncReplayMessages(persistenceId: String,
                           fromSequenceNr: Long,
                           toSequenceNr: Long,
                           max: Long)(
       replayCallback: (PersistentRepr) ⇒ Unit): Future[Unit] =
-    if (shouldFail(replayFailureRate)) {
+    if (shouldFail(replayFailureRate))
       val rm = read(persistenceId, fromSequenceNr, toSequenceNr, max)
       val sm = rm.take(random.nextInt(rm.length + 1))
       sm.foreach(replayCallback)
       Future.failed(new ReplayFailedException(sm))
-    } else {
+    else
       read(persistenceId, fromSequenceNr, toSequenceNr, max).foreach(
           replayCallback)
       Future.successful(())
-    }
 
   def asyncReadHighestSequenceNr(
       persistenceId: String, fromSequenceNr: Long): Future[Long] =
@@ -91,4 +85,3 @@ class ChaosJournal extends AsyncWriteJournal {
 
   def shouldFail(rate: Double): Boolean =
     random.nextDouble() < rate
-}

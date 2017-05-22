@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def extraSettings = "-Xlog-free-terms"
   def code = """
 {
@@ -10,4 +10,3 @@ object Test extends ReplTest {
   println(tt)
 }
   """
-}

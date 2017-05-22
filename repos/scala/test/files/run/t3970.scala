@@ -1,7 +1,7 @@
 import collection.mutable._
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val dl = DoubleLinkedList[Int]()
     dl.remove()
 
@@ -12,5 +12,3 @@ object Test {
     val dl3 = DoubleLinkedList[Int](1, 2, 3)
     assert(dl3.drop(1) == DoubleLinkedList(2, 3))
     assert(dl3.drop(1).prev == null)
-  }
-}

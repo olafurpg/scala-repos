@@ -44,7 +44,7 @@ Note that the line order may no longer be the same as the input file.
 That's parallelism, man.
 
   **/
-class Tutorial5(args: Args) extends Job(args) {
+class Tutorial5(args: Args) extends Job(args)
 
   /**
   We'll start with the dict data source.
@@ -55,17 +55,15 @@ class Tutorial5(args: Args) extends Job(args) {
     **/
   val scores = TextLine(args("words")).read
     .rename('offset, 'score)
-    .map('line -> 'dictWord) { line: String =>
+    .map('line -> 'dictWord)  line: String =>
       line.toLowerCase
-    }
     .project('score, 'dictWord)
 
   TextLine(args("input")).read
 
   //split and normalize to lowercase
-    .flatMap('line -> 'word) { line: String =>
+    .flatMap('line -> 'word)  line: String =>
       line.split("\\s").map { _.toLowerCase }
-    }
 
     /**
     When we join, we need to specify which fields from each side of the join should match.
@@ -79,8 +77,6 @@ class Tutorial5(args: Args) extends Job(args) {
     and sum up the word scores. Sum is another common aggregation that GroupBuilder
     provides; we just need to specify which field to sum by.
       **/
-    .groupBy('line) { group =>
+    .groupBy('line)  group =>
       group.sum[Double]('score)
-    }
     .write(Tsv(args("output")))
-}

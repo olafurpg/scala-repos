@@ -22,8 +22,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.xml.ScXmlPairedTag
   * User: Dmitry Naydanov
   * Date: 4/8/12
   */
-class XmlRenameHandler extends RenameHandler {
-  def isAvailableOnDataContext(dataContext: DataContext): Boolean = {
+class XmlRenameHandler extends RenameHandler
+  def isAvailableOnDataContext(dataContext: DataContext): Boolean =
     val editor = CommonDataKeys.EDITOR.getData(dataContext)
     if (editor == null || !editor.getSettings.isVariableInplaceRenameEnabled)
       return false
@@ -34,11 +34,9 @@ class XmlRenameHandler extends RenameHandler {
 
     if (element == null) return false
 
-    element.getParent match {
+    element.getParent match
       case _: ScXmlPairedTag => true
       case _ => false
-    }
-  }
 
   def isRenaming(dataContext: DataContext): Boolean =
     isAvailableOnDataContext(dataContext)
@@ -46,16 +44,15 @@ class XmlRenameHandler extends RenameHandler {
   def invoke(project: Project,
              editor: Editor,
              file: PsiFile,
-             dataContext: DataContext) {
+             dataContext: DataContext)
     if (!isRenaming(dataContext)) return
     val element = file.findElementAt(editor.getCaretModel.getOffset)
 
     if (element != null) invoke(project, Array(element), dataContext)
-  }
 
   def invoke(project: Project,
              elements: Array[PsiElement],
-             dataContext: DataContext) {
+             dataContext: DataContext)
     import scala.collection.JavaConversions._
 
     if (!isRenaming(dataContext) || elements == null || elements.length != 1)
@@ -73,7 +70,7 @@ class XmlRenameHandler extends RenameHandler {
     val rangeHighlighters = new ArrayList[RangeHighlighter]()
     val matchedRange = element.getMatchedTag.getTagNameElement.getTextRange
 
-    def highlightMatched() {
+    def highlightMatched()
       val colorsManager = EditorColorsManager.getInstance()
       val attributes = colorsManager.getGlobalScheme.getAttributes(
           EditorColors.WRITE_SEARCH_RESULT_ATTRIBUTES)
@@ -88,18 +85,16 @@ class XmlRenameHandler extends RenameHandler {
                                 rangeHighlighters,
                                 null)
 
-      rangeHighlighters.foreach { a =>
+      rangeHighlighters.foreach  a =>
         a.setGreedyToLeft(true)
         a.setGreedyToRight(true)
-      }
-    }
 
-    def rename() {
+    def rename()
       CommandProcessor
         .getInstance()
-        .executeCommand(project, new Runnable {
-          def run() {
-            extensions.inWriteAction {
+        .executeCommand(project, new Runnable
+          def run()
+            extensions.inWriteAction
               val offset = editor.getCaretModel.getOffset
               val template = buildTemplate()
               editor.getCaretModel.moveToOffset(
@@ -107,48 +102,39 @@ class XmlRenameHandler extends RenameHandler {
 
               TemplateManager
                 .getInstance(project)
-                .startTemplate(editor, template, new TemplateEditingAdapter {
+                .startTemplate(editor, template, new TemplateEditingAdapter
                   override def templateFinished(template: Template,
-                                                brokenOff: Boolean) {
+                                                brokenOff: Boolean)
                     templateCancelled(template)
-                  }
 
-                  override def templateCancelled(template: Template) {
+                  override def templateCancelled(template: Template)
                     val highlightManager =
                       HighlightManager.getInstance(project)
-                    rangeHighlighters.foreach { a =>
+                    rangeHighlighters.foreach  a =>
                       highlightManager.removeSegmentHighlighter(editor, a)
-                    }
-                  }
-                }, new PairProcessor[String, String] {
+                , new PairProcessor[String, String]
                   def process(s: String, t: String): Boolean =
                     !(t.length == 0 || t.charAt(t.length - 1) == ' ')
-                })
+                )
 
               highlightMatched()
               editor.getCaretModel.moveToOffset(offset)
-            }
-          }
-        }, RefactoringBundle.message("rename.title"), null)
-    }
+        , RefactoringBundle.message("rename.title"), null)
 
-    def buildTemplate(): Template = {
+    def buildTemplate(): Template =
       val builder = new TemplateBuilderImpl(element.getParent)
 
       builder.replaceElement(
-          element.getTagNameElement, "first", new EmptyExpression {
+          element.getTagNameElement, "first", new EmptyExpression
         override def calculateQuickResult(context: ExpressionContext): Result =
           new TextResult(
               Option(element.getTagName).getOrElse(elementStartName))
         override def calculateResult(context: ExpressionContext): Result =
           calculateQuickResult(context)
-      }, true)
+      , true)
       builder.replaceElement(
           element.getMatchedTag.getTagNameElement, "second", "first", false)
 
       builder.buildInlineTemplate()
-    }
 
     rename()
-  }
-}

@@ -11,7 +11,7 @@ package pickling
   *  @author Martin Odersky
   *  @version 1.0
   */
-object PickleFormat {
+object PickleFormat
 
   /***************************************************
     * Symbol table attribute format:
@@ -220,4 +220,3 @@ object PickleFormat {
   //SUPERtpe, ... are not in the same range as the other types
   //final val firstTypeTag = NOtpe
   //final val lastTypeTag = POLYtpe
-}

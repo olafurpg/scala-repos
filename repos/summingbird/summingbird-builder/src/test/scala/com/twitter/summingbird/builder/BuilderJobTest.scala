@@ -31,7 +31,7 @@ import org.scalatest.WordSpec
 import java.util.Date
 import scala.util.Try
 
-object TestJob {
+object TestJob
   import Dsl._
   import StoreAlgebra.enrich
 
@@ -39,63 +39,53 @@ object TestJob {
 
   implicit def keyPairInjection[T](implicit toS: Injection[T, String])
     : Injection[(T, BatchID), Array[Byte]] =
-    Injection.build[(T, BatchID), Array[Byte]] {
+    Injection.build[(T, BatchID), Array[Byte]]
       case (t, batchID) =>
         (t.as[String] + ":" + batchID.as[String]).as[Array[Byte]]
-    } { bytes: Array[Byte] =>
-      for {
+     bytes: Array[Byte] =>
+      for
         deser <- bytes.as[Try[String]]
         Array(tString, batchIDString) = deser.split(":")
         t <- tString.as[Try[T]]
         batchID <- batchIDString.as[Try[BatchID]]
-      } yield (t, batchID)
-    }
+      yield (t, batchID)
   implicit def valPairInjection[T](implicit toS: Injection[T, String])
     : Injection[(BatchID, T), Array[Byte]] =
     Injection.connect[(BatchID, T), (T, BatchID), Array[Byte]]
 
   def offlineStore = VersionedStore[Long, Int]("tmp")
   def onlineStore = new JMapStore[(Long, BatchID), Int].toMergeable
-}
 
-class TestJobWithOffline(env: Env) extends AbstractJob(env) {
+class TestJobWithOffline(env: Env) extends AbstractJob(env)
   import TestJob._
 
-  EventSource.fromOnline {
+  EventSource.fromOnline
     Spout.fromTraversable(1 to 100)
-  }.withTime(new Date(_))
-    .map { i =>
+  .withTime(new Date(_))
+    .map  i =>
       (100L, i)
-    }
     .groupAndSumTo(offlineStore)
-}
 
-class TestJobWithOnline(env: Env) extends AbstractJob(env) {
+class TestJobWithOnline(env: Env) extends AbstractJob(env)
   import TestJob._
 
-  EventSource.fromOnline {
+  EventSource.fromOnline
     Spout.fromTraversable(1 to 100)
-  }.withTime(new Date(_))
-    .map { i =>
+  .withTime(new Date(_))
+    .map  i =>
       (100L, i)
-    }
     .groupAndSumTo(onlineStore)
-}
 
-class BuilderJobTest extends WordSpec {
-  "Builder API should NOT throw when building a storm job w/ onlineStore" in {
+class BuilderJobTest extends WordSpec
+  "Builder API should NOT throw when building a storm job w/ onlineStore" in
     AbstractJob(
         "com.twitter.summingbird.builder.TestJobWithOnline",
         StormEnv("name", Args(Array.empty[String]))
     )
-  }
 
-  "Builder API should throw when building a storm job w/ missing onlineStore" in {
-    intercept[Exception] {
+  "Builder API should throw when building a storm job w/ missing onlineStore" in
+    intercept[Exception]
       AbstractJob(
           "com.twitter.summingbird.builder.TestJobWithOffline",
           StormEnv("name", Args(Array.empty[String]))
       )
-    }
-  }
-}

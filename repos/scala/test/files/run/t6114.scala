@@ -1,5 +1,5 @@
-object Test extends App {
-  def testList = {
+object Test extends App
+  def testList =
     val list = new java.util.ArrayList[Int]
     list.add(1)
     list.add(2)
@@ -12,8 +12,7 @@ object Test extends App {
     val cloned = raw.clone
     list.add(1)
     assert(raw != cloned)
-  }
-  def testSet = {
+  def testSet =
     val set = new java.util.HashSet[Int]
     set.add(1)
     set.add(2)
@@ -26,8 +25,7 @@ object Test extends App {
     val cloned = raw.clone
     set.add(4)
     assert(raw != cloned)
-  }
-  def testMap = {
+  def testMap =
     val map = new java.util.HashMap[Int, Int]
     map.put(1, 1)
     map.put(2, 2)
@@ -40,9 +38,8 @@ object Test extends App {
     val cloned = raw.clone
     map.put(4, 4)
     assert(raw != cloned)
-  }
 
-  def testCollection = {
+  def testCollection =
     val list: java.util.Collection[Int] = new java.util.ArrayDeque[Int]
     list.add(1)
     list.add(2)
@@ -52,10 +49,8 @@ object Test extends App {
     assert(next != list.asScala)
 
     // Note: Clone is hidden at this level, so no overridden cloning.
-  }
 
   testList
   testSet
   testMap
   testCollection
-}

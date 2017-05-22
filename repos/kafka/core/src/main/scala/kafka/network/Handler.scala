@@ -18,7 +18,7 @@ package kafka.network
 
 import org.apache.kafka.common.network.{NetworkReceive, Send}
 
-private[kafka] object Handler {
+private[kafka] object Handler
 
   /**
     * A request handler is a function that turns an incoming 
@@ -30,4 +30,3 @@ private[kafka] object Handler {
     * A handler mapping finds the right Handler function for a given request
     */
   type HandlerMapping = (Short, NetworkReceive) => Handler
-}

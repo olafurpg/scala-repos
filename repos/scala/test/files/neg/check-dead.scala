@@ -1,9 +1,8 @@
-object Other {
+object Other
   def oops(msg: String = "xxx"): Nothing =
     throw new Exception(msg) // should not warn
-}
 
-class NoDeads {
+class NoDeads
   def y1(arg: Any) = println("foo")
   def z1 = y1(throw new Exception) // should warn
 
@@ -15,25 +14,20 @@ class NoDeads {
 
   def nowarn1 = synchronized { throw new Exception } // should not warn: synchronized should be by name
 
-  def nowarn2: Int = synchronized {
+  def nowarn2: Int = synchronized
     // should not warn
     val i = 10 + 2
     return i
-  }
-  def nowarn3: Int = synchronized {
+  def nowarn3: Int = synchronized
     // should not warn
     val i = 10 + 2
     i
-  }
 
   def nowarn4: String = Other.oops("don't warn about me") // should not warn
 
-  def yeswarn1 = synchronized {
+  def yeswarn1 = synchronized
     throw new Exception // should warn
     5 * 5
-  }
-  def yeswarn2: Int = synchronized {
+  def yeswarn2: Int = synchronized
     throw new Exception // should warn
     return 5
-  }
-}

@@ -11,40 +11,33 @@ import scala.collection.JavaConverters._
   */
 private[http4] class Netty4HeaderMap(
     private[http4] val underlying: HttpHeaders)
-    extends HeaderMap {
+    extends HeaderMap
   import Netty4HeaderMap._
 
   def getAll(key: String): Iterable[String] = underlying.getAll(key).asScala
 
-  def set(k: String, v: String): HeaderMap = {
+  def set(k: String, v: String): HeaderMap =
     underlying.set(k, v)
     this
-  }
 
-  def add(k: String, v: String): HeaderMap = {
+  def add(k: String, v: String): HeaderMap =
     underlying.add(k, v)
     this
-  }
 
-  def +=(kv: (String, String)): Netty4HeaderMap.this.type = {
+  def +=(kv: (String, String)): Netty4HeaderMap.this.type =
     underlying.add(kv._1, kv._2)
     this
-  }
 
-  def -=(key: String): Netty4HeaderMap.this.type = {
+  def -=(key: String): Netty4HeaderMap.this.type =
     underlying.remove(key)
     this
-  }
 
   def get(key: String): Option[String] = Option(underlying.get(key))
 
   def iterator: Iterator[(String, String)] =
     underlying.iteratorAsString().asScala.map(entryToTuple)
-}
 
-private[http4] object Netty4HeaderMap {
-  val entryToTuple: (Entry[String, String]) => (String, String) = {
+private[http4] object Netty4HeaderMap
+  val entryToTuple: (Entry[String, String]) => (String, String) =
     entry: Entry[String, String] =>
       entry.getKey -> entry.getValue
-  }
-}

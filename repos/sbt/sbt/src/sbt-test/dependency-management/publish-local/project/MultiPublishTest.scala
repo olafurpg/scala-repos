@@ -2,17 +2,16 @@ import sbt._
 import Import._
 import Keys._
 
-object MultiPublishTest extends Build {
+object MultiPublishTest extends Build
   override lazy val settings =
     super.settings ++ Seq(
         organization := "A",
         version := "1.0",
         ivyPaths <<=
           baseDirectory(dir => new IvyPaths(dir, Some(dir / "ivy" / "cache"))),
-        externalResolvers <<= baseDirectory map { base =>
+        externalResolvers <<= baseDirectory map  base =>
           Resolver.file("local", base / "ivy" / "local" asFile)(
               Resolver.ivyStylePatterns) :: Nil
-        }
     )
 
   lazy val root =
@@ -23,14 +22,11 @@ object MultiPublishTest extends Build {
     Project("sub", file("sub")) settings (mavenStyle, name := "Sub Project")
 
   lazy val mavenStyle =
-    publishMavenStyle <<= baseDirectory { base =>
+    publishMavenStyle <<= baseDirectory  base =>
       (base / "mavenStyle") exists
-    }
 
   def interProject =
     projectDependencies <<=
-      (publishMavenStyle, publishMavenStyle in sub, projectDependencies) map {
+      (publishMavenStyle, publishMavenStyle in sub, projectDependencies) map
       (style, subStyle, pd) =>
         if (style == subStyle) pd else Nil
-    }
-}

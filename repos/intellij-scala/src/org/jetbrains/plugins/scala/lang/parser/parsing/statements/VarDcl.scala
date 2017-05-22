@@ -17,51 +17,40 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.Type
  * VarDcl ::= ids ':' Type
  */
 
-object VarDcl {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object VarDcl
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val returnMarker = builder.mark
     //Look for val
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kVAR => builder.advanceLexer() //Ate var
       case _ =>
         returnMarker.rollbackTo
         return false
-    }
     //Look for identifier
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
         Ids parse builder
         //Look for :
-        builder.getTokenType match {
-          case ScalaTokenTypes.tCOLON => {
+        builder.getTokenType match
+          case ScalaTokenTypes.tCOLON =>
               builder.advanceLexer //Ate :
-              if (Type.parse(builder)) {
+              if (Type.parse(builder))
                 returnMarker.drop
-              } else {
+              else
                 builder error ScalaBundle.message("wrong.type")
                 returnMarker.drop
-              }
-            }
-          case _ => {
+          case _ =>
               builder error ScalaBundle.message("wrong.var.declaration")
               returnMarker.drop
-            }
-        }
 
-        builder.getTokenType match {
-          case ScalaTokenTypes.tASSIGN => {
+        builder.getTokenType match
+          case ScalaTokenTypes.tASSIGN =>
               builder.advanceLexer
               builder.error("Expected expression")
               return true
-            }
-          case _ => {
+          case _ =>
               return true
-            }
-        }
       case _ =>
         builder error ScalaBundle.message("identifier.expected")
         returnMarker.drop
         return false
-    }
-  }
-}

@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 /**
   * Helper to access the application defined Akka Actor system.
   */
-object Akka {
+object Akka
 
   /**
     * Retrieve the application Akka Actor system, using an implicit application.
@@ -89,7 +89,6 @@ object Akka {
   def bindingOf[T <: Actor : ClassTag](
       name: String, props: Props => Props = identity): Binding[ActorRef] =
     bind[ActorRef].qualifiedWith(name).to(providerOf[T](name, props)).eagerly()
-}
 
 /**
   * Support for binding actors with Guice.
@@ -110,18 +109,16 @@ object Akka {
   *   }
   * }}}
   */
-trait AkkaGuiceSupport { self: AbstractModule =>
+trait AkkaGuiceSupport  self: AbstractModule =>
 
   import com.google.inject.name.Names
   import com.google.inject.util.Providers
 
-  private def accessBinder: Binder = {
+  private def accessBinder: Binder =
     val method: Method = classOf[AbstractModule].getDeclaredMethod("binder")
-    if (!method.isAccessible) {
+    if (!method.isAccessible)
       method.setAccessible(true)
-    }
     method.invoke(this).asInstanceOf[Binder]
-  }
 
   /**
     * Bind an actor.
@@ -137,13 +134,12 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     * @tparam T The class that implements the actor.
     */
   def bindActor[T <: Actor : ClassTag](
-      name: String, props: Props => Props = identity): Unit = {
+      name: String, props: Props => Props = identity): Unit =
     accessBinder
       .bind(classOf[ActorRef])
       .annotatedWith(Names.named(name))
       .toProvider(Providers.guicify(Akka.providerOf[T](name, props)))
       .asEagerSingleton()
-  }
 
   /**
     * Bind an actor factory.
@@ -195,35 +191,31 @@ trait AkkaGuiceSupport { self: AbstractModule =>
     * @tparam FactoryClass The class of the actor factory
     */
   def bindActorFactory[
-      ActorClass <: Actor : ClassTag, FactoryClass : ClassTag]: Unit = {
+      ActorClass <: Actor : ClassTag, FactoryClass : ClassTag]: Unit =
     accessBinder.install(
         new FactoryModuleBuilder()
           .implement(classOf[Actor],
                      implicitly[ClassTag[ActorClass]].runtimeClass
                        .asInstanceOf[Class[_ <: Actor]])
           .build(implicitly[ClassTag[FactoryClass]].runtimeClass))
-  }
-}
 
 /**
   * Provider for creating actor refs
   */
 class ActorRefProvider[T <: Actor : ClassTag](
     name: String, props: Props => Props)
-    extends Provider[ActorRef] {
+    extends Provider[ActorRef]
 
   @Inject private var actorSystem: ActorSystem = _
   @Inject private var injector: Injector = _
-  lazy val get = {
+  lazy val get =
     val creation = Props(injector.instanceOf[T])
     actorSystem.actorOf(props(creation), name)
-  }
-}
 
 /**
   * Support for creating injected child actors.
   */
-trait InjectedActorSupport {
+trait InjectedActorSupport
 
   /**
     * Create an injected child actor.
@@ -238,15 +230,13 @@ trait InjectedActorSupport {
     */
   def injectedChild(
       create: => Actor, name: String, props: Props => Props = identity)(
-      implicit context: ActorContext): ActorRef = {
+      implicit context: ActorContext): ActorRef =
     context.actorOf(props(Props(create)), name)
-  }
-}
 
 /**
   * Components for configuring Akka.
   */
-trait AkkaComponents {
+trait AkkaComponents
 
   def environment: Environment
   def configuration: Configuration
@@ -254,7 +244,6 @@ trait AkkaComponents {
 
   lazy val actorSystem: ActorSystem = new ActorSystemProvider(
       environment, configuration, applicationLifecycle).get
-}
 
 /**
   * Provider for the actor system
@@ -263,37 +252,33 @@ trait AkkaComponents {
 class ActorSystemProvider @Inject()(environment: Environment,
                                     configuration: Configuration,
                                     applicationLifecycle: ApplicationLifecycle)
-    extends Provider[ActorSystem] {
+    extends Provider[ActorSystem]
 
   private val logger = Logger(classOf[ActorSystemProvider])
 
-  lazy val get: ActorSystem = {
+  lazy val get: ActorSystem =
     val (system, stopHook) =
       ActorSystemProvider.start(environment.classLoader, configuration)
     applicationLifecycle.addStopHook(stopHook)
     system
-  }
-}
 
 /**
   * Provider for the default flow materializer
   */
 @Singleton
 class MaterializerProvider @Inject()(actorSystem: ActorSystem)
-    extends Provider[Materializer] {
+    extends Provider[Materializer]
   lazy val get: Materializer = ActorMaterializer()(actorSystem)
-}
 
 /**
   * Provider for the default execution context
   */
 @Singleton
 class ExecutionContextProvider @Inject()(actorSystem: ActorSystem)
-    extends Provider[ExecutionContextExecutor] {
+    extends Provider[ExecutionContextExecutor]
   def get = actorSystem.dispatcher
-}
 
-object ActorSystemProvider {
+object ActorSystemProvider
 
   type StopHook = () => Future[_]
 
@@ -304,53 +289,45 @@ object ActorSystemProvider {
     * @return The ActorSystem and a function that can be used to stop it.
     */
   def start(classLoader: ClassLoader,
-            configuration: Configuration): (ActorSystem, StopHook) = {
+            configuration: Configuration): (ActorSystem, StopHook) =
     val config = PlayConfig(configuration)
 
-    val akkaConfig: Config = {
+    val akkaConfig: Config =
       val akkaConfigRoot = config.get[String]("play.akka.config")
       // Need to fallback to root config so we can lookup dispatchers defined outside the main namespace
       config.get[Config](akkaConfigRoot).withFallback(config.underlying)
-    }
 
     val name = config.get[String]("play.akka.actor-system")
     val system = ActorSystem(name, akkaConfig, classLoader)
     logger.debug(s"Starting application default Akka system: $name")
 
-    val stopHook = { () =>
+    val stopHook =  () =>
       logger.debug(s"Shutdown application default Akka system: $name")
       system.terminate()
 
-      config.get[Duration]("play.akka.shutdown-timeout") match {
+      config.get[Duration]("play.akka.shutdown-timeout") match
         case timeout: FiniteDuration =>
-          try {
+          try
             Await.result(system.whenTerminated, timeout)
-          } catch {
+          catch
             case te: TimeoutException =>
               // oh well.  We tried to be nice.
               logger.info(
                   s"Could not shutdown the Akka system in $timeout milliseconds.  Giving up.")
-          }
         case _ =>
           // wait until it is shutdown
           Await.result(system.whenTerminated, Duration.Inf)
-      }
 
       Future.successful(())
-    }
 
     (system, stopHook)
-  }
 
   /**
     * A lazy wrapper around `start`. Useful when the `ActorSystem` may
     * not be needed.
     */
   def lazyStart(classLoader: => ClassLoader, configuration: => Configuration)
-    : ClosableLazy[ActorSystem, Future[_]] = {
-    new ClosableLazy[ActorSystem, Future[_]] {
+    : ClosableLazy[ActorSystem, Future[_]] =
+    new ClosableLazy[ActorSystem, Future[_]]
       protected def create() = start(classLoader, configuration)
       protected def closeNotNeeded = Future.successful(())
-    }
-  }
-}

@@ -33,7 +33,7 @@ import com.precog.common.jobs.JobManager
 import com.precog.common.security.APIKeyFinder
 import com.precog.standalone.StandaloneShardServer
 
-object MongoShardServer extends StandaloneShardServer {
+object MongoShardServer extends StandaloneShardServer
   val caveatMessage =
     Some("""
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -63,4 +63,3 @@ Please note that path globs are not yet supported in Precog for MongoDB
          jobManager,
          actorSystem),
      Stoppable.fromFuture(Future(())))
-}

@@ -6,15 +6,14 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ActivityTest extends FunSuite {
-  test("Activity#flatMap") {
+class ActivityTest extends FunSuite
+  test("Activity#flatMap")
     val v = Var(Activity.Pending: Activity.State[Int])
     val ref = new AtomicReference[Seq[Activity.State[Int]]]
     val act =
-      Activity(v) flatMap {
+      Activity(v) flatMap
         case i if i % 2 == 0 => Activity.value(-i)
         case i => Activity.value(i)
-      }
     act.states.build.register(Witness(ref))
 
     assert(ref.get == Seq(Activity.Pending))
@@ -24,9 +23,8 @@ class ActivityTest extends FunSuite {
 
     v() = Activity.Ok(2)
     assert(ref.get == Seq(Activity.Pending, Activity.Ok(1), Activity.Ok(-2)))
-  }
 
-  test("Activity#handle") {
+  test("Activity#handle")
     val e = new Exception
     case class E(x: Int) extends Exception
 
@@ -42,15 +40,13 @@ class ActivityTest extends FunSuite {
     assert(ref.get == Activity.Ok(2))
     w.notify(Throw(e))
     assert(ref.get == Activity.Failed(e))
-  }
 
-  test("Activity#collect") {
+  test("Activity#collect")
     val v = Var(Activity.Pending: Activity.State[Int])
     val ref = new AtomicReference(Seq.empty: Seq[Try[String]])
     val act =
-      Activity(v) collect {
+      Activity(v) collect
         case i if i % 2 == 0 => "EVEN%d".format(i)
-      }
     act.values.build.register(Witness(ref))
 
     assert(ref.get.isEmpty)
@@ -66,17 +62,15 @@ class ActivityTest extends FunSuite {
     val exc = new Exception
     v() = Activity.Failed(exc)
     assert(ref.get == Seq(Return("EVEN2"), Return("EVEN4"), Throw(exc)))
-  }
 
-  test("Activity.collect") {
+  test("Activity.collect")
     val (acts, wits) = Seq.fill(10) { Activity[Int]() }.unzip
     val ref = new AtomicReference(Seq.empty: Seq[Try[Seq[Int]]])
     Activity.collect(acts).values.build.register(Witness(ref))
 
-    for ((w, i) <- wits.zipWithIndex) {
+    for ((w, i) <- wits.zipWithIndex)
       assert(ref.get.isEmpty)
       w.notify(Return(i))
-    }
 
     assert(ref.get == Seq(Return(Seq.range(0, 10))))
 
@@ -89,40 +83,35 @@ class ActivityTest extends FunSuite {
         ref.get == Seq(Return(Seq.range(0, 10)),
                        Throw(exc),
                        Return(100 +: Seq.range(1, 10))))
-  }
 
-  test("Activity.future: produce an initially-pending Activity") {
+  test("Activity.future: produce an initially-pending Activity")
     assert(Activity.future(Future.never).run.sample == Activity.Pending)
-  }
 
   test(
-      "Activity.future: produce an Activity that completes on success of the original Future") {
+      "Activity.future: produce an Activity that completes on success of the original Future")
     val p = new Promise[Int]
     val act = Activity.future(p)
     assert(act.run.sample == Activity.Pending)
     p.setValue(4)
     assert(act.run.sample == Activity.Ok(4))
-  }
 
   test(
-      "Activity.future: produce an Activity that fails on failure of the original Future") {
+      "Activity.future: produce an Activity that fails on failure of the original Future")
     val p = new Promise[Unit]
     val e = new Exception("gooby pls")
     val act = Activity.future(p)
     assert(act.run.sample == Activity.Pending)
     p.setException(e)
     assert(act.run.sample == Activity.Failed(e))
-  }
 
   test("Activity.future: produce an Activity that doesn't propagate " +
-      "cancellation back to the parent future") {
+      "cancellation back to the parent future")
     val p = new Promise[Unit]
     val obs = Activity.future(p).run.changes.register(Witness(_ => ()))
     Await.ready(obs.close())
     assert(!p.isDefined)
-  }
 
-  test("Exceptions are encoded") {
+  test("Exceptions are encoded")
     val (a, w) = Activity[Int]()
     val exc1 = new Exception("1")
     val exc2 = new Exception("2")
@@ -130,16 +119,15 @@ class ActivityTest extends FunSuite {
 
     val ref = new AtomicReference(Seq.empty: Seq[Try[Int]])
     val b =
-      a map {
+      a map
         case 111 => throw exc1
         case i => i
-      } flatMap {
+      flatMap
         case 222 => throw exc2
         case i => Activity.value(i)
-      } transform {
+      transform
         case Activity.Ok(333) => throw exc3
         case other => Activity(Var.value(other))
-      }
 
     b.values.build.register(Witness(ref))
 
@@ -169,9 +157,8 @@ class ActivityTest extends FunSuite {
                        Throw(exc2),
                        Return(3),
                        Throw(exc3)))
-  }
 
-  test("Activity.sample") {
+  test("Activity.sample")
     val (a, w) = Activity[Int]()
 
     val exc = intercept[IllegalStateException] { a.sample() }
@@ -183,9 +170,8 @@ class ActivityTest extends FunSuite {
 
     w.notify(Return(123))
     assert(a.sample() == 123)
-  }
 
-  test("Activity.join") {
+  test("Activity.join")
     val (a, aw) = Activity[Int]()
     val (b, bw) = Activity[String]()
 
@@ -209,5 +195,3 @@ class ActivityTest extends FunSuite {
                        Activity.Pending,
                        Activity.Ok((1, "ok")),
                        Activity.Failed(exc)))
-  }
-}

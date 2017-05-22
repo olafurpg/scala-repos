@@ -17,7 +17,7 @@ import scala.collection.mutable.ArrayBuffer
   * @author Mikhail.Mutcianko
   * @since  26.12.14
   */
-class SyntheticMembersInjector {
+class SyntheticMembersInjector
 
   /**
     * This method allows to add custom functions to any class, object or trait.
@@ -63,120 +63,104 @@ class SyntheticMembersInjector {
     * @return sequence of strings, containing super types.
     */
   def injectSupers(source: ScTypeDefinition): Seq[String] = Seq.empty
-}
 
-object SyntheticMembersInjector {
+object SyntheticMembersInjector
   type Kind = Kind.Value
-  object Kind extends Enumeration {
+  object Kind extends Enumeration
     val Class, Object, Trait = Value
-  }
 
   val LOG = Logger.getInstance(getClass)
 
   private val CLASS_NAME = "org.intellij.scala.syntheticMemberInjector"
   val EP_NAME: ExtensionPointName[SyntheticMembersInjector] =
     ExtensionPointName.create(CLASS_NAME)
-  val injectedExtensions = { proj: Project =>
-    try {
+  val injectedExtensions =  proj: Project =>
+    try
       LibraryInjectorLoader
         .getInstance(proj)
         .getInjectorInstances(classOf[SyntheticMembersInjector])
-    } catch {
+    catch
       case e: Throwable =>
         LOG.error("Failed to get dynamic injector", e)
         Seq.empty
-    }
-  }
 
   def inject(
-      source: ScTypeDefinition, withOverride: Boolean): Seq[ScFunction] = {
+      source: ScTypeDefinition, withOverride: Boolean): Seq[ScFunction] =
     val buffer = new ArrayBuffer[ScFunction]()
-    for {
+    for
       injector <- EP_NAME.getExtensions.toSet ++ injectedExtensions(
           source.getProject).toSet
       template <- injector.injectFunctions(source)
-    } try {
-      val context = source match {
+    try
+      val context = source match
         case o: ScObject if o.isSyntheticObject =>
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
-      }
       val function = ScalaPsiElementFactory.createMethodWithContext(
           template, context, source)
       function.setSynthetic(context)
       function.syntheticContainingClass = Some(source)
       if (withOverride ^ !function.hasModifierProperty("override"))
         buffer += function
-    } catch {
+    catch
       case e: Throwable =>
         LOG.error(
             s"Error during parsing template from injector: ${injector.getClass.getName}",
             e)
-    }
     buffer
-  }
 
-  def injectInners(source: ScTypeDefinition): Seq[ScTypeDefinition] = {
+  def injectInners(source: ScTypeDefinition): Seq[ScTypeDefinition] =
     val buffer = new ArrayBuffer[ScTypeDefinition]()
-    for {
+    for
       injector <- EP_NAME.getExtensions.toSet ++ injectedExtensions(
           source.getProject).toSet
       template <- injector.injectInners(source)
-    } try {
-      val context = (source match {
+    try
+      val context = (source match
         case o: ScObject if o.isSyntheticObject =>
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
-      }).extendsBlock
+      ).extendsBlock
       val td = ScalaPsiElementFactory.createTypeDefinitionWithContext(
           template, context, source)
       td.syntheticContainingClass = Some(source)
-      def updateSynthetic(element: ScMember): Unit = {
-        element match {
+      def updateSynthetic(element: ScMember): Unit =
+        element match
           case td: ScTypeDefinition =>
             td.setSynthetic(context)
             td.members.foreach(updateSynthetic)
           case fun: ScFunction => fun.setSynthetic(context)
           case _ => //todo: ?
-        }
-      }
       updateSynthetic(td)
       buffer += td
-    } catch {
+    catch
       case p: ProcessCanceledException => throw p
       case e: Throwable =>
         LOG.error(
             s"Error during parsing template from injector: ${injector.getClass.getName}",
             e)
-    }
     buffer
-  }
 
-  def needsCompanion(source: ScTypeDefinition): Boolean = {
+  def needsCompanion(source: ScTypeDefinition): Boolean =
     if (DumbService.getInstance(source.getProject).isDumb) return false
     EP_NAME.getExtensions.exists(_.needsCompanionObject(source))
-  }
 
-  def injectSupers(source: ScTypeDefinition): Seq[ScTypeElement] = {
+  def injectSupers(source: ScTypeDefinition): Seq[ScTypeElement] =
     val buffer = new ArrayBuffer[ScTypeElement]()
-    for {
+    for
       injector <- EP_NAME.getExtensions
       supers <- injector.injectSupers(source)
-    } try {
-      val context = source match {
+    try
+      val context = source match
         case o: ScObject if o.isSyntheticObject =>
           ScalaPsiUtil.getCompanionModule(o).getOrElse(source)
         case _ => source
-      }
       buffer += ScalaPsiElementFactory.createTypeElementFromText(
           supers, context, source)
-    } catch {
+    catch
       case p: ProcessCanceledException => throw p
       case e: Throwable =>
         LOG.error(
             s"Error during parsing type element from injector: ${injector.getClass.getName}",
             e)
-    }
     buffer
-  }
-}

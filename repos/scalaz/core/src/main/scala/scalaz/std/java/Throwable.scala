@@ -1,11 +1,10 @@
 package scalaz
 package std.java
 
-trait ThrowableInstances {
+trait ThrowableInstances
 
   /** @since 7.0.1 */
   implicit val throwableInstance: Show[Throwable] =
     Show.showFromToString[Throwable]
-}
 
 object throwable extends ThrowableInstances

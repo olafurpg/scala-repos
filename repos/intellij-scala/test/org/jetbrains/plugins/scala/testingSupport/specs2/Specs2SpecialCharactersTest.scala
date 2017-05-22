@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   * @author Roman.Shein
   * @since 27.01.2015.
   */
-abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
+abstract class Specs2SpecialCharactersTest extends Specs2TestCase
   private def addSpecialCharactersTest(testName: String) =
     addFileToProject(
         testName + ".scala",
@@ -36,7 +36,7 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
             |
           """.stripMargin)
 
-  def testComma(): Unit = {
+  def testComma(): Unit =
     val testName = "TestComma"
 
     addSpecialCharactersTest(testName)
@@ -52,9 +52,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                            testName,
                                            "Special characters test should",
                                            "Comma , " + "test"))
-  }
 
-  def testExclamation(): Unit = {
+  def testExclamation(): Unit =
     val testName = "TestExclamation"
 
     addSpecialCharactersTest(testName)
@@ -70,9 +69,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                            testName,
                                            "Special characters test should",
                                            "! test"))
-  }
 
-  def testTick(): Unit = {
+  def testTick(): Unit =
     val testName = "TestTick"
 
     addSpecialCharactersTest(testName)
@@ -88,9 +86,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                            testName,
                                            "Special characters test should",
                                            "tick ' " + "test"))
-  }
 
-  def testBacktick(): Unit = {
+  def testBacktick(): Unit =
     val testName = "TestBacktick"
 
     addSpecialCharactersTest(testName)
@@ -106,9 +103,8 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                            testName,
                                            "Special characters test should",
                                            "backtick " + "` test"))
-  }
 
-  def testTilde(): Unit = {
+  def testTilde(): Unit =
     val testName = "TestTilde"
 
     addSpecialCharactersTest(testName)
@@ -124,5 +120,3 @@ abstract class Specs2SpecialCharactersTest extends Specs2TestCase {
                                            testName,
                                            "Special characters test should",
                                            "tilde ~ " + "test"))
-  }
-}

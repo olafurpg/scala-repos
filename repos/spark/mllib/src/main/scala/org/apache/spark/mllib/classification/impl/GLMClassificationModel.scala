@@ -28,9 +28,9 @@ import org.apache.spark.sql.{Row, SQLContext}
 /**
   * Helper class for import/export of GLM classification models.
   */
-private[classification] object GLMClassificationModel {
+private[classification] object GLMClassificationModel
 
-  object SaveLoadV1_0 {
+  object SaveLoadV1_0
 
     def thisFormatVersion: String = "1.0"
 
@@ -50,7 +50,7 @@ private[classification] object GLMClassificationModel {
              numClasses: Int,
              weights: Vector,
              intercept: Double,
-             threshold: Option[Double]): Unit = {
+             threshold: Option[Double]): Unit =
       val sqlContext = SQLContext.getOrCreate(sc)
       import sqlContext.implicits._
 
@@ -64,7 +64,6 @@ private[classification] object GLMClassificationModel {
       // Create Parquet data.
       val data = Data(weights, intercept, threshold)
       sc.parallelize(Seq(data), 1).toDF().write.parquet(Loader.dataPath(path))
-    }
 
     /**
       * Helper method for loading GLM classification model data.
@@ -73,7 +72,7 @@ private[classification] object GLMClassificationModel {
       *
       * @param modelClass  String name for model class (used for error messages)
       */
-    def loadData(sc: SparkContext, path: String, modelClass: String): Data = {
+    def loadData(sc: SparkContext, path: String, modelClass: String): Data =
       val datapath = Loader.dataPath(path)
       val sqlContext = SQLContext.getOrCreate(sc)
       val dataRDD = sqlContext.read.parquet(datapath)
@@ -84,17 +83,12 @@ private[classification] object GLMClassificationModel {
       val data = dataArray(0)
       assert(
           data.size == 3, s"Unable to load $modelClass data from: $datapath")
-      val (weights, intercept) = data match {
+      val (weights, intercept) = data match
         case Row(weights: Vector, intercept: Double, _) =>
           (weights, intercept)
-      }
       val threshold =
-        if (data.isNullAt(2)) {
+        if (data.isNullAt(2))
           None
-        } else {
+        else
           Some(data.getDouble(2))
-        }
       Data(weights, intercept, threshold)
-    }
-  }
-}

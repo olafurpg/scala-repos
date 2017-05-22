@@ -6,7 +6,7 @@ class Batcher[In, Out] private[util](
 )(
     implicit timer: Timer
 )
-    extends (In => Future[Out]) { batcher =>
+    extends (In => Future[Out])  batcher =>
 
   /**
     * Enqueues requests for a batched [[com.twitter.util.Future]]
@@ -17,4 +17,3 @@ class Batcher[In, Out] private[util](
 
   /** Immediately processes all unprocessed requests */
   def flushBatch(): Unit = executor.flushNow()
-}

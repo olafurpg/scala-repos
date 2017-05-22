@@ -28,34 +28,29 @@ private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
                                       globalScope: Scriptable,
                                       base: Scriptable,
                                       isStatics: Boolean)
-    extends Scriptable {
+    extends Scriptable
 
   private val fields = mutable.HashMap.empty[String, Any]
   private var prototype: Scriptable = _
   private var parentScope: Scriptable = _
 
-  {
     // Pre-fill fields with the properties of `base`
-    for (id <- base.getIds()) {
-      (id.asInstanceOf[Any]: @unchecked) match {
+    for (id <- base.getIds())
+      (id.asInstanceOf[Any]: @unchecked) match
         case name: String => put(name, this, base.get(name, base))
         case index: Int => put(index, this, base.get(index, base))
-      }
-    }
-  }
 
   private def load(name: String): Unit =
     coreLib.load(globalScope, propNameToEncodedName(name))
 
-  private def propNameToEncodedName(name: String): String = {
+  private def propNameToEncodedName(name: String): String =
     if (isStatics) name.split("__")(0)
     else name
-  }
 
   override def getClassName(): String = "LazyScalaJSScope"
 
-  override def get(name: String, start: Scriptable): AnyRef = {
-    if (name == "__noSuchMethod__") {
+  override def get(name: String, start: Scriptable): AnyRef =
+    if (name == "__noSuchMethod__")
       /* Automatically called by Rhino when trying to call a method fails.
        * We don't want to throw a ClassNotFoundException for this case, but
        * rather return a proper NOT_FOUND sentinel. Otherwise, this exception
@@ -63,22 +58,19 @@ private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
        * be found on the classpath.
        */
       Scriptable.NOT_FOUND
-    } else {
+    else
       fields
-        .getOrElse(name, {
-          try {
+        .getOrElse(name,
+          try
             load(name)
             fields.getOrElse(name, Scriptable.NOT_FOUND)
-          } catch {
+          catch
             // We need to re-throw the exception if `load` fails, otherwise the
             // JavaScript runtime will not catch it.
             case t: RhinoJSEnv.ClassNotFoundException =>
               throw Context.throwAsScriptRuntimeEx(t)
-          }
-        })
+        )
         .asInstanceOf[AnyRef]
-    }
-  }
 
   override def get(index: Int, start: Scriptable): AnyRef =
     get(index.toString, start)
@@ -104,9 +96,7 @@ private[rhino] class LazyScalaJSScope(coreLib: ScalaJSCoreLib,
 
   override def getIds(): Array[AnyRef] = fields.keys.toArray
 
-  override def getDefaultValue(hint: java.lang.Class[_]): AnyRef = {
+  override def getDefaultValue(hint: java.lang.Class[_]): AnyRef =
     base.getDefaultValue(hint)
-  }
 
   override def hasInstance(instance: Scriptable): Boolean = false
-}

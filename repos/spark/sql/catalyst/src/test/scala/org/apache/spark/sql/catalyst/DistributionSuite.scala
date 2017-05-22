@@ -22,12 +22,12 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.plans.physical._
 
-class DistributionSuite extends SparkFunSuite {
+class DistributionSuite extends SparkFunSuite
 
   protected def checkSatisfied(inputPartitioning: Partitioning,
                                requiredDistribution: Distribution,
-                               satisfied: Boolean) {
-    if (inputPartitioning.satisfies(requiredDistribution) != satisfied) {
+                               satisfied: Boolean)
+    if (inputPartitioning.satisfies(requiredDistribution) != satisfied)
       fail(
           s"""
         |== Input Partitioning ==
@@ -35,13 +35,11 @@ class DistributionSuite extends SparkFunSuite {
         |== Required Distribution ==
         |$requiredDistribution
         |== Does input partitioning satisfy required distribution? ==
-        |Expected $satisfied got ${inputPartitioning.satisfies(
-             requiredDistribution)}
+        |Expected $satisfied got $inputPartitioning.satisfies(
+             requiredDistribution)
         """.stripMargin)
-    }
-  }
 
-  test("HashPartitioning (with nullSafe = true) is the output partitioning") {
+  test("HashPartitioning (with nullSafe = true) is the output partitioning")
     // Cases which do not need an exchange between two data properties.
     checkSatisfied(HashPartitioning(Seq('a, 'b, 'c), 10),
                    UnspecifiedDistribution,
@@ -88,9 +86,8 @@ class DistributionSuite extends SparkFunSuite {
       ClusteredDistribution(Seq('b + 1)),
       true)
    */
-  }
 
-  test("RangePartitioning is the output partitioning") {
+  test("RangePartitioning is the output partitioning")
     // Cases which do not need an exchange between two data properties.
     checkSatisfied(RangePartitioning(Seq('a.asc, 'b.asc, 'c.asc), 10),
                    UnspecifiedDistribution,
@@ -144,5 +141,3 @@ class DistributionSuite extends SparkFunSuite {
     checkSatisfied(RangePartitioning(Seq('a.asc, 'b.asc, 'c.asc), 10),
                    AllTuples,
                    false)
-  }
-}

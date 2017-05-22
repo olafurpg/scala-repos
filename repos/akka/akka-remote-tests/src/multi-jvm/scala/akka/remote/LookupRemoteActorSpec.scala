@@ -12,50 +12,41 @@ import akka.testkit._
 import akka.actor.Identify
 import akka.actor.ActorIdentity
 
-object LookupRemoteActorMultiJvmSpec extends MultiNodeConfig {
+object LookupRemoteActorMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor extends Actor {
-    def receive = {
+  class SomeActor extends Actor
+    def receive =
       case "identify" ⇒ sender() ! self
-    }
-  }
 
   commonConfig(debugConfig(on = false))
 
   val master = role("master")
   val slave = role("slave")
-}
 
 class LookupRemoteActorMultiJvmNode1 extends LookupRemoteActorSpec
 class LookupRemoteActorMultiJvmNode2 extends LookupRemoteActorSpec
 
 class LookupRemoteActorSpec
     extends MultiNodeSpec(LookupRemoteActorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import LookupRemoteActorMultiJvmSpec._
 
   def initialParticipants = 2
 
-  runOn(master) {
+  runOn(master)
     system.actorOf(Props[SomeActor], "service-hello")
-  }
 
-  "Remoting" must {
-    "lookup remote actor" taggedAs LongRunningTest in {
-      runOn(slave) {
-        val hello = {
+  "Remoting" must
+    "lookup remote actor" taggedAs LongRunningTest in
+      runOn(slave)
+        val hello =
           system.actorSelection(node(master) / "user" / "service-hello") ! Identify(
               "id1")
           expectMsgType[ActorIdentity].ref.get
-        }
         hello.isInstanceOf[RemoteActorRef] should ===(true)
         val masterAddress = testConductor
           .getAddressFor(master)
           .await
           (hello ? "identify").await.asInstanceOf[ActorRef].path.address should ===(
             masterAddress)
-      }
       enterBarrier("done")
-    }
-  }
-}

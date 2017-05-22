@@ -9,8 +9,8 @@ import org.jetbrains.plugins.scala.base.ScalaLightPlatformCodeInsightTestCaseAda
   * @since 24.12.13
   */
 class GoToImplementationTest
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-  def testTraitImplementation() {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
+  def testTraitImplementation()
     val fileText = """
         |trait a {
         |  def f<caret>
@@ -27,5 +27,3 @@ class GoToImplementationTest
       .getSourceAndTargetElements(getEditorAdapter, getFileAdapter)
       .targets
     assert(targets.length == 1, s"Wrong number of targets: ${targets.length}")
-  }
-}

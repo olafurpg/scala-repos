@@ -6,7 +6,7 @@ private[nio] final class HeapCharBuffer private (_capacity: Int,
                                                  _initialPosition: Int,
                                                  _initialLimit: Int,
                                                  _readOnly: Boolean)
-    extends CharBuffer(_capacity, _array0, _arrayOffset0) {
+    extends CharBuffer(_capacity, _array0, _arrayOffset0)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -30,7 +30,7 @@ private[nio] final class HeapCharBuffer private (_capacity: Int,
   def asReadOnlyBuffer(): CharBuffer =
     GenHeapBuffer(this).generic_asReadOnlyBuffer()
 
-  def subSequence(start: Int, end: Int): CharBuffer = {
+  def subSequence(start: Int, end: Int): CharBuffer =
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new HeapCharBuffer(capacity,
@@ -39,7 +39,6 @@ private[nio] final class HeapCharBuffer private (_capacity: Int,
                        position + start,
                        position + end,
                        isReadOnly)
-  }
 
   @noinline
   def get(): Char =
@@ -90,37 +89,32 @@ private[nio] final class HeapCharBuffer private (_capacity: Int,
   override private[nio] def store(
       startIndex: Int, src: Array[Char], offset: Int, length: Int): Unit =
     GenHeapBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object HeapCharBuffer {
+private[nio] object HeapCharBuffer
   private[nio] implicit object NewHeapCharBuffer
-      extends GenHeapBuffer.NewHeapBuffer[CharBuffer, Char] {
+      extends GenHeapBuffer.NewHeapBuffer[CharBuffer, Char]
     def apply(capacity: Int,
               array: Array[Char],
               arrayOffset: Int,
               initialPosition: Int,
               initialLimit: Int,
-              readOnly: Boolean): CharBuffer = {
+              readOnly: Boolean): CharBuffer =
       new HeapCharBuffer(capacity,
                          array,
                          arrayOffset,
                          initialPosition,
                          initialLimit,
                          readOnly)
-    }
-  }
 
   private[nio] def wrap(array: Array[Char],
                         arrayOffset: Int,
                         capacity: Int,
                         initialPosition: Int,
                         initialLength: Int,
-                        isReadOnly: Boolean): CharBuffer = {
+                        isReadOnly: Boolean): CharBuffer =
     GenHeapBuffer.generic_wrap(array,
                                arrayOffset,
                                capacity,
                                initialPosition,
                                initialLength,
                                isReadOnly)
-  }
-}

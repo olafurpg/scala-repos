@@ -21,7 +21,7 @@ import scala.util.{Try, Success}
   *
   * See: <a href="https://www.ietf.org/rfc/rfc2617.txt">RFC 2617</a>.
   */
-trait SecurityDirectives {
+trait SecurityDirectives
   import BasicDirectives._
   import HeaderDirectives._
   import FutureDirectives._
@@ -73,15 +73,12 @@ trait SecurityDirectives {
   def authenticateBasicAsync[T](
       realm: String,
       authenticator: AsyncAuthenticator[T]): AuthenticationDirective[T] =
-    extractExecutionContext.flatMap { implicit ec ⇒
-      authenticateOrRejectWithChallenge[BasicHttpCredentials, T] { cred ⇒
-        authenticator(Credentials(cred)).fast.map {
+    extractExecutionContext.flatMap  implicit ec ⇒
+      authenticateOrRejectWithChallenge[BasicHttpCredentials, T]  cred ⇒
+        authenticator(Credentials(cred)).fast.map
           case Some(t) ⇒ AuthenticationResult.success(t)
           case None ⇒
             AuthenticationResult.failWithChallenge(challengeFor(realm))
-        }
-      }
-    }
 
   /**
     * A directive that wraps the inner route with Http Basic authentication support.
@@ -101,13 +98,12 @@ trait SecurityDirectives {
   def authenticateBasicPFAsync[T](
       realm: String,
       authenticator: AsyncAuthenticatorPF[T]): AuthenticationDirective[T] =
-    extractExecutionContext.flatMap { implicit ec ⇒
+    extractExecutionContext.flatMap  implicit ec ⇒
       authenticateBasicAsync(realm,
                              credentials ⇒
                                if (authenticator isDefinedAt credentials)
                                  authenticator(credentials).fast.map(Some(_))
                                else FastFuture.successful(None))
-    }
 
   /**
     * A directive that wraps the inner route with OAuth2 Bearer Token authentication support.
@@ -128,15 +124,12 @@ trait SecurityDirectives {
   def authenticateOAuth2Async[T](
       realm: String,
       authenticator: AsyncAuthenticator[T]): AuthenticationDirective[T] =
-    extractExecutionContext.flatMap { implicit ec ⇒
-      authenticateOrRejectWithChallenge[OAuth2BearerToken, T] { cred ⇒
-        authenticator(Credentials(cred)).fast.map {
+    extractExecutionContext.flatMap  implicit ec ⇒
+      authenticateOrRejectWithChallenge[OAuth2BearerToken, T]  cred ⇒
+        authenticator(Credentials(cred)).fast.map
           case Some(t) ⇒ AuthenticationResult.success(t)
           case None ⇒
             AuthenticationResult.failWithChallenge(challengeFor(realm))
-        }
-      }
-    }
 
   /**
     * A directive that wraps the inner route with OAuth2 Bearer Token authentication support.
@@ -156,13 +149,12 @@ trait SecurityDirectives {
   def authenticateOAuth2PFAsync[T](
       realm: String,
       authenticator: AsyncAuthenticatorPF[T]): AuthenticationDirective[T] =
-    extractExecutionContext.flatMap { implicit ec ⇒
+    extractExecutionContext.flatMap  implicit ec ⇒
       authenticateOAuth2Async(realm,
                               credentials ⇒
                                 if (authenticator isDefinedAt credentials)
                                   authenticator(credentials).fast.map(Some(_))
                                 else FastFuture.successful(None))
-    }
 
   /**
     * Lifts an authenticator function into a directive. The authenticator function gets passed in credentials from the
@@ -174,18 +166,15 @@ trait SecurityDirectives {
   def authenticateOrRejectWithChallenge[T](
       authenticator: Option[HttpCredentials] ⇒ Future[AuthenticationResult[T]])
     : AuthenticationDirective[T] =
-    extractExecutionContext.flatMap { implicit ec ⇒
-      extractCredentials.flatMap { cred ⇒
-        onSuccess(authenticator(cred)).flatMap {
+    extractExecutionContext.flatMap  implicit ec ⇒
+      extractCredentials.flatMap  cred ⇒
+        onSuccess(authenticator(cred)).flatMap
           case Right(user) ⇒ provide(user)
           case Left(challenge) ⇒
             val cause =
               if (cred.isEmpty) CredentialsMissing else CredentialsRejected
             reject(AuthenticationFailedRejection(cause, challenge)): Directive1[
                 T]
-        }
-      }
-    }
 
   /**
     * Lifts an authenticator function into a directive. Same as `authenticateOrRejectWithChallenge`
@@ -224,21 +213,17 @@ trait SecurityDirectives {
     * authorization fails and the route is rejected with an [[AuthorizationFailedRejection]].
     */
   def authorizeAsync(check: RequestContext ⇒ Future[Boolean]): Directive0 =
-    extractExecutionContext.flatMap { implicit ec ⇒
-      extract(check).flatMap[Unit] { fa =>
-        onComplete(fa).flatMap {
+    extractExecutionContext.flatMap  implicit ec ⇒
+      extract(check).flatMap[Unit]  fa =>
+        onComplete(fa).flatMap
           case Success(true) => pass
           case _ => reject(AuthorizationFailedRejection)
-        }
-      }
-    }
 
   /**
     * Creates a `Basic` [[HttpChallenge]] for the given realm.
     */
   def challengeFor(realm: String) =
     HttpChallenge(scheme = "Basic", realm = realm, params = Map.empty)
-}
 
 object SecurityDirectives extends SecurityDirectives
 
@@ -248,9 +233,9 @@ object SecurityDirectives extends SecurityDirectives
   * supplied and a function to check the known secret against the provided one in a secure fashion.
   */
 sealed trait Credentials
-object Credentials {
+object Credentials
   case object Missing extends Credentials
-  abstract case class Provided(identifier: String) extends Credentials {
+  abstract case class Provided(identifier: String) extends Credentials
 
     /**
       * Safely compares the passed in `secret` with the received secret part of the Credentials.
@@ -259,36 +244,29 @@ object Credentials {
       * See also [[EnhancedString#secure_==]], for more information.
       */
     def verify(secret: String): Boolean
-  }
 
-  def apply(cred: Option[HttpCredentials]): Credentials = {
-    cred match {
+  def apply(cred: Option[HttpCredentials]): Credentials =
+    cred match
       case Some(BasicHttpCredentials(username, receivedSecret)) ⇒
-        new Credentials.Provided(username) {
+        new Credentials.Provided(username)
           def verify(secret: String): Boolean = secret secure_== receivedSecret
-        }
       case Some(OAuth2BearerToken(token)) ⇒
-        new Credentials.Provided(token) {
+        new Credentials.Provided(token)
           def verify(secret: String): Boolean = secret secure_== token
-        }
       case Some(GenericHttpCredentials(scheme, token, params)) ⇒
         throw new UnsupportedOperationException(
             "cannot verify generic HTTP credentials")
       case None ⇒ Credentials.Missing
-    }
-  }
-}
 
 import SecurityDirectives._
 
-object AuthenticationResult {
+object AuthenticationResult
   def success[T](user: T): AuthenticationResult[T] = Right(user)
   def failWithChallenge(
       challenge: HttpChallenge): AuthenticationResult[Nothing] =
     Left(challenge)
-}
 
-trait AuthenticationDirective[T] extends Directive1[T] {
+trait AuthenticationDirective[T] extends Directive1[T]
   import BasicDirectives._
   import RouteDirectives._
 
@@ -297,11 +275,10 @@ trait AuthenticationDirective[T] extends Directive1[T] {
     * were supplied and otherwise `None`.
     */
   def optional: Directive1[Option[T]] =
-    this.map(Some(_): Option[T]) recover {
+    this.map(Some(_): Option[T]) recover
       case AuthenticationFailedRejection(CredentialsMissing, _) +: _ ⇒
         provide(None)
       case rejs ⇒ reject(rejs: _*)
-    }
 
   /**
     * Returns a copy of this [[AuthenticationDirective]] that uses the given object as the
@@ -309,10 +286,7 @@ trait AuthenticationDirective[T] extends Directive1[T] {
     */
   def withAnonymousUser(anonymous: T): Directive1[T] =
     optional map (_ getOrElse anonymous)
-}
-object AuthenticationDirective {
+object AuthenticationDirective
   implicit def apply[T](other: Directive1[T]): AuthenticationDirective[T] =
-    new AuthenticationDirective[T] {
+    new AuthenticationDirective[T]
       def tapply(inner: Tuple1[T] ⇒ Route) = other.tapply(inner)
-    }
-}

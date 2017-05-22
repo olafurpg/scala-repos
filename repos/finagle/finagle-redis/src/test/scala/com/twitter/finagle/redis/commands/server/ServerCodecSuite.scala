@@ -6,9 +6,7 @@ import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-final class ServerCodecSuite extends RedisRequestTest {
+final class ServerCodecSuite extends RedisRequestTest
 
-  test("Correctly encode FLUSHALL", CodecTest) {
+  test("Correctly encode FLUSHALL", CodecTest)
     assert(codec(wrap("FLUSHALL\r\n")) == List(FlushAll))
-  }
-}

@@ -45,7 +45,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/AccessibleRole.html]]
   */
 object AccessibleRole
-    extends SFXEnumDelegateCompanion[jfxs.AccessibleRole, AccessibleRole] {
+    extends SFXEnumDelegateCompanion[jfxs.AccessibleRole, AccessibleRole]
 
   /**
     * Button role.
@@ -913,7 +913,6 @@ object AccessibleRole
           TreeTableRow,
           TreeTableView,
           TreeView)
-}
 
 sealed case class AccessibleRole(override val delegate: jfxs.AccessibleRole)
     extends SFXEnumDelegate[jfxs.AccessibleRole]

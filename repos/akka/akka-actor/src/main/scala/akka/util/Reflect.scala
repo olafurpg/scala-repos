@@ -16,7 +16,7 @@ import scala.util.Try
   *
   * INTERNAL API
   */
-private[akka] object Reflect {
+private[akka] object Reflect
 
   /**
     * This optionally holds a function which looks N levels above itself
@@ -26,8 +26,8 @@ private[akka] object Reflect {
     *
     * Hint: when comparing to Thread.currentThread.getStackTrace, add two levels.
     */
-  val getCallerClass: Option[Int ⇒ Class[_]] = {
-    try {
+  val getCallerClass: Option[Int ⇒ Class[_]] =
+    try
       val c = Class.forName("sun.reflect.Reflection")
       val m = c.getMethod("getCallerClass", Array(classOf[Int]): _*)
       Some(
@@ -35,10 +35,8 @@ private[akka] object Reflect {
             m.invoke(
                   null, Array[AnyRef](i.asInstanceOf[java.lang.Integer]): _*)
               .asInstanceOf[Class[_]])
-    } catch {
+    catch
       case NonFatal(e) ⇒ None
-    }
-  }
 
   /**
     * INTERNAL API
@@ -46,37 +44,33 @@ private[akka] object Reflect {
     * @return a new instance from the default constructor of the given class
     */
   private[akka] def instantiate[T](clazz: Class[T]): T =
-    try clazz.newInstance catch {
+    try clazz.newInstance catch
       case iae: IllegalAccessException ⇒
         val ctor = clazz.getDeclaredConstructor()
         ctor.setAccessible(true)
         ctor.newInstance()
-    }
 
   /**
     * INTERNAL API
     * Calls findConstructor and invokes it with the given arguments.
     */
   private[akka] def instantiate[T](
-      clazz: Class[T], args: immutable.Seq[Any]): T = {
+      clazz: Class[T], args: immutable.Seq[Any]): T =
     instantiate(findConstructor(clazz, args), args)
-  }
 
   /**
     * INTERNAL API
     * Invokes the constructor with the given arguments.
     */
   private[akka] def instantiate[T](
-      constructor: Constructor[T], args: immutable.Seq[Any]): T = {
+      constructor: Constructor[T], args: immutable.Seq[Any]): T =
     constructor.setAccessible(true)
-    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*) catch {
+    try constructor.newInstance(args.asInstanceOf[Seq[AnyRef]]: _*) catch
       case e: IllegalArgumentException ⇒
         val argString = args map safeGetClass mkString ("[", ", ", "]")
         throw new IllegalArgumentException(
             s"constructor $constructor is incompatible with arguments $argString",
             e)
-    }
-  }
 
   /**
     * INTERNAL API
@@ -84,40 +78,36 @@ private[akka] object Reflect {
     * right constructor.
     */
   private[akka] def findConstructor[T](
-      clazz: Class[T], args: immutable.Seq[Any]): Constructor[T] = {
-    def error(msg: String): Nothing = {
+      clazz: Class[T], args: immutable.Seq[Any]): Constructor[T] =
+    def error(msg: String): Nothing =
       val argClasses = args map safeGetClass mkString ", "
       throw new IllegalArgumentException(
           s"$msg found on $clazz for arguments [$argClasses]")
-    }
 
     val constructor: Constructor[T] =
       if (args.isEmpty) Try { clazz.getDeclaredConstructor() } getOrElse (null)
-      else {
+      else
         val length = args.length
         val candidates =
           clazz.getDeclaredConstructors
             .asInstanceOf[Array[Constructor[T]]]
-            .iterator filter { c ⇒
+            .iterator filter  c ⇒
             val parameterTypes = c.getParameterTypes
             parameterTypes.length == length &&
-            (parameterTypes.iterator zip args.iterator forall {
+            (parameterTypes.iterator zip args.iterator forall
                   case (found, required) ⇒
                     found.isInstance(required) ||
                     BoxedType(found).isInstance(required) ||
                     (required == null && !found.isPrimitive)
-                })
-          }
-        if (candidates.hasNext) {
+                )
+        if (candidates.hasNext)
           val cstrtr = candidates.next()
           if (candidates.hasNext) error("multiple matching constructors")
           else cstrtr
-        } else null
-      }
+        else null
 
     if (constructor == null) error("no matching constructor")
     else constructor
-  }
 
   private def safeGetClass(a: Any): Class[_] =
     if (a == null) classOf[AnyRef] else a.getClass
@@ -130,17 +120,17 @@ private[akka] object Reflect {
   private[akka] def instantiator[T](clazz: Class[T]): () ⇒ T =
     () ⇒ instantiate(clazz)
 
-  def findMarker(root: Class[_], marker: Class[_]): Type = {
-    @tailrec def rec(curr: Class[_]): Type = {
+  def findMarker(root: Class[_], marker: Class[_]): Type =
+    @tailrec def rec(curr: Class[_]): Type =
       if (curr.getSuperclass != null &&
           marker.isAssignableFrom(curr.getSuperclass)) rec(curr.getSuperclass)
       else
-        curr.getGenericInterfaces collectFirst {
+        curr.getGenericInterfaces collectFirst
           case c: Class[_] if marker isAssignableFrom c ⇒ c
           case t: ParameterizedType
               if marker isAssignableFrom t.getRawType.asInstanceOf[Class[_]] ⇒
             t
-        } match {
+        match
           case None ⇒
             throw new IllegalArgumentException(
                 s"cannot find [$marker] in ancestors of [$root]")
@@ -149,33 +139,26 @@ private[akka] object Reflect {
             if (t.getRawType == marker) t
             else rec(t.getRawType.asInstanceOf[Class[_]])
           case _ ⇒ ??? // cannot happen due to collectFirst
-        }
-    }
     rec(root)
-  }
 
   /**
     * INTERNAL API
     * Set a val inside a class.
     */
   @tailrec protected[akka] final def lookupAndSetField(
-      clazz: Class[_], instance: AnyRef, name: String, value: Any): Boolean = {
+      clazz: Class[_], instance: AnyRef, name: String, value: Any): Boolean =
     @tailrec
     def clearFirst(fields: Array[java.lang.reflect.Field], idx: Int): Boolean =
-      if (idx < fields.length) {
+      if (idx < fields.length)
         val field = fields(idx)
-        if (field.getName == name) {
+        if (field.getName == name)
           field.setAccessible(true)
           field.set(instance, value)
           true
-        } else clearFirst(fields, idx + 1)
-      } else false
+        else clearFirst(fields, idx + 1)
+      else false
 
-    clearFirst(clazz.getDeclaredFields, 0) || {
-      clazz.getSuperclass match {
+    clearFirst(clazz.getDeclaredFields, 0) ||
+      clazz.getSuperclass match
         case null ⇒ false // clazz == classOf[AnyRef]
         case sc ⇒ lookupAndSetField(sc, instance, name, value)
-      }
-    }
-  }
-}

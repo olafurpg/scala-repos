@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.base._
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code =
     """
@@ -34,7 +34,7 @@ object Test extends ScaladocModelTest {
 
   def scaladocSettings = ""
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -56,5 +56,3 @@ object Test extends ScaladocModelTest {
         extractCommentText(test._method("bar").comment.get) == "bar comment")
     assert(
         extractCommentText(test._method("baz").comment.get) == "baz comment")
-  }
-}

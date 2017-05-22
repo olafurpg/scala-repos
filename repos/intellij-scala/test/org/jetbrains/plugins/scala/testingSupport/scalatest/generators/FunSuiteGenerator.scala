@@ -6,8 +6,8 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait FunSuiteGenerator extends ScalaTestTestCase {
-  def addFunSuite() {
+trait FunSuiteGenerator extends ScalaTestTestCase
+  def addFunSuite()
     addFileToProject("FunSuiteTest.scala",
                      """
         |import org.scalatest._
@@ -23,5 +23,3 @@ trait FunSuiteGenerator extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
-}

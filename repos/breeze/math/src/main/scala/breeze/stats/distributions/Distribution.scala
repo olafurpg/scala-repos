@@ -23,21 +23,20 @@ import breeze.generic._
   *
   * @author dlwh
   */
-trait Density[T] {
+trait Density[T]
 
   /** Returns the unnormalized value of the measure*/
   def apply(x: T): Double
 
   /** Returns the log unnormalized value of the measure*/
   def logApply(x: T): Double = apply(x)
-}
 
 /**
   * Represents a continuous Distribution.
   * Why T? just in case.
   * @author dlwh
   */
-trait ContinuousDistr[T] extends Density[T] with Rand[T] {
+trait ContinuousDistr[T] extends Density[T] with Rand[T]
 
   /** Returns the probability density function at that point.*/
   def pdf(x: T): Double = math.exp(logPdf(x))
@@ -53,38 +52,32 @@ trait ContinuousDistr[T] extends Density[T] with Rand[T] {
 
   def apply(x: T) = unnormalizedPdf(x)
   override def logApply(x: T) = unnormalizedLogPdf(x)
-}
 
-trait HasCdf {
+trait HasCdf
   def probability(x: Double, y: Double): Double // Probability that x < a <= Y
   def cdf(x: Double): Double
-}
 
-trait HasInverseCdf {
+trait HasInverseCdf
   def inverseCdf(p: Double): Double //Compute the quantile of p
-}
 
-trait PdfIsUFunc[U <: UFunc, T, P <: PdfIsUFunc[U, T, P]] { self: P =>
+trait PdfIsUFunc[U <: UFunc, T, P <: PdfIsUFunc[U, T, P]]  self: P =>
   final def pdf[@specialized(Int, Double, Float) V,
                 @specialized(Int, Double, Float) VR](v: V)(
       implicit impl: UFunc.UImpl2[U, P, V, VR]): VR = impl(self, v)
-}
 
 trait ContinuousDistributionUFuncProvider[T, D <: ContinuousDistr[T]]
-    extends UFunc with MappingUFunc { self: UFunc =>
+    extends UFunc with MappingUFunc  self: UFunc =>
   implicit object basicImpl
-      extends Impl2[ContinuousDistrUFuncWrapper, T, Double] {
+      extends Impl2[ContinuousDistrUFuncWrapper, T, Double]
     def apply(w: ContinuousDistrUFuncWrapper, v: T) = w.dist.pdf(v)
-  }
   implicit class ContinuousDistrUFuncWrapper(val dist: D)
       extends PdfIsUFunc[self.type, T, ContinuousDistrUFuncWrapper]
-}
 
 /**
   * Represents a discrete Distribution.
   * @author dlwh
   */
-trait DiscreteDistr[T] extends Density[T] with Rand[T] {
+trait DiscreteDistr[T] extends Density[T] with Rand[T]
 
   /** Returns the probability of that draw. */
   def probabilityOf(x: T): Double
@@ -97,4 +90,3 @@ trait DiscreteDistr[T] extends Density[T] with Rand[T] {
 
   def apply(x: T) = unnormalizedProbabilityOf(x)
   override def logApply(x: T) = unnormalizedLogProbabilityOf(x)
-}

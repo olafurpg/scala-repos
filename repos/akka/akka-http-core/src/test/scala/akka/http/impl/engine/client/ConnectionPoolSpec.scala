@@ -30,33 +30,30 @@ class ConnectionPoolSpec
     akka.loggers = []
     akka.loglevel = OFF
     akka.io.tcp.windows-connection-abort-workaround-enabled = auto
-    akka.io.tcp.trace-logging = off""") {
+    akka.io.tcp.trace-logging = off""")
   implicit val materializer = ActorMaterializer()
 
   // FIXME: Extract into proper util class to be reusable
-  lazy val ConnectionResetByPeerMessage: String = {
+  lazy val ConnectionResetByPeerMessage: String =
     val serverSocket = ServerSocketChannel.open()
     serverSocket.socket.bind(new InetSocketAddress("127.0.0.1", 0))
-    try {
+    try
       val clientSocket = SocketChannel.open(new InetSocketAddress(
               "127.0.0.1", serverSocket.socket().getLocalPort))
       @volatile var serverSideChannel: SocketChannel = null
-      awaitCond {
+      awaitCond
         serverSideChannel = serverSocket.accept()
         serverSideChannel != null
-      }
       serverSideChannel.socket.setSoLinger(true, 0)
       serverSideChannel.close()
       clientSocket.read(ByteBuffer.allocate(1))
       null
-    } catch {
+    catch
       case NonFatal(e) ⇒ e.getMessage
-    }
-  }
 
-  "The host-level client infrastructure" should {
+  "The host-level client infrastructure" should
 
-    "properly complete a simple request/response cycle" in new TestSetup {
+    "properly complete a simple request/response cycle" in new TestSetup
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int]()
 
@@ -67,9 +64,8 @@ class ConnectionPoolSpec
       val (Success(response), 42) = responseOut.expectNext()
       response.headers should contain(
           RawHeader("Req-Host", s"$serverHostName:$serverPort"))
-    }
 
-    "open a second connection if the first one is loaded" in new TestSetup {
+    "open a second connection if the first one is loaded" in new TestSetup
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int]()
 
@@ -82,28 +78,25 @@ class ConnectionPoolSpec
       acceptIncomingConnection()
       val r2 = responseOut.expectNext()
 
-      Seq(r1, r2) foreach {
+      Seq(r1, r2) foreach
         case (Success(x), 42) ⇒ requestUri(x) should endWith("/a")
         case (Success(x), 43) ⇒ requestUri(x) should endWith("/b")
         case x ⇒ fail(x.toString)
-      }
       Seq(r1, r2).map(t ⇒ connNr(t._1.get)) should contain allOf (1, 2)
-    }
 
-    "open a second connection if the request on the first one is dispatch but not yet completed" in new TestSetup {
+    "open a second connection if the request on the first one is dispatch but not yet completed" in new TestSetup
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int]()
 
       val responseEntityPub = TestPublisher.probe[ByteString]()
 
-      override def testServerHandler(connNr: Int): HttpRequest ⇒ HttpResponse = {
+      override def testServerHandler(connNr: Int): HttpRequest ⇒ HttpResponse =
         case request @ HttpRequest(_, Uri.Path("/a"), _, _, _) ⇒
           val entity = HttpEntity.Chunked.fromData(
               ContentTypes.`text/plain(UTF-8)`,
               Source.fromPublisher(responseEntityPub))
           super.testServerHandler(connNr)(request) withEntity entity
         case x ⇒ super.testServerHandler(connNr)(x)
-      }
 
       requestIn.sendNext(HttpRequest(uri = "/a") -> 42)
       responseOutSub.request(1)
@@ -120,9 +113,8 @@ class ConnectionPoolSpec
       acceptIncomingConnection()
       val (Success(r2), 43) = responseOut.expectNext()
       connNr(r2) shouldEqual 2
-    }
 
-    "not open a second connection if there is an idle one available" in new TestSetup {
+    "not open a second connection if there is an idle one available" in new TestSetup
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int]()
 
@@ -136,9 +128,8 @@ class ConnectionPoolSpec
       responseOutSub.request(1)
       val (Success(response2), 43) = responseOut.expectNext()
       connNr(response2) shouldEqual 1
-    }
 
-    "be able to handle 500 pipelined requests against the test server" in new TestSetup {
+    "be able to handle 500 pipelined requests against the test server" in new TestSetup
       val settings = ConnectionPoolSettings(system)
         .withMaxConnections(4)
         .withPipeliningLimit(2)
@@ -150,12 +141,11 @@ class ConnectionPoolSpec
       val idSum = requestIds
         .map(id ⇒ HttpRequest(uri = s"/r$id") -> id)
         .via(poolFlow)
-        .map {
+        .map
           case (Success(response), id) ⇒
             requestUri(response) should endWith(s"/r$id")
             id
           case x ⇒ fail(x.toString)
-        }
         .runFold(0)(_ + _)
 
       acceptIncomingConnection()
@@ -164,10 +154,9 @@ class ConnectionPoolSpec
       acceptIncomingConnection()
 
       Await.result(idSum, 10.seconds) shouldEqual N * (N + 1) / 2
-    }
 
     "properly surface connection-level errors" in new TestSetup(
-        autoAccept = true) {
+        autoAccept = true)
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int](maxRetries = 0)
 
@@ -182,16 +171,13 @@ class ConnectionPoolSpec
 
       val responses = Seq(responseOut.expectNext(), responseOut.expectNext())
 
-      responses mustContainLike {
+      responses mustContainLike
         case (Success(x), 42) ⇒ requestUri(x) should endWith("/a")
-      }
-      responses mustContainLike {
+      responses mustContainLike
         case (Failure(x), 43) ⇒
           x.getMessage should include(ConnectionResetByPeerMessage)
-      }
-    }
 
-    "retry failed requests" in new TestSetup(autoAccept = true) {
+    "retry failed requests" in new TestSetup(autoAccept = true)
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int]()
 
@@ -209,16 +195,13 @@ class ConnectionPoolSpec
 
       val responses = Seq(responseOut.expectNext(), responseOut.expectNext())
 
-      responses mustContainLike {
+      responses mustContainLike
         case (Success(x), 42) ⇒ requestUri(x) should endWith("/a")
-      }
-      responses mustContainLike {
+      responses mustContainLike
         case (Success(x), 43) ⇒ requestUri(x) should endWith("/crash")
-      }
-    }
 
     "respect the configured `maxRetries` value" in new TestSetup(
-        autoAccept = true) {
+        autoAccept = true)
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int](maxRetries = 4)
 
@@ -236,17 +219,14 @@ class ConnectionPoolSpec
 
       val responses = Seq(responseOut.expectNext(), responseOut.expectNext())
 
-      responses mustContainLike {
+      responses mustContainLike
         case (Success(x), 42) ⇒ requestUri(x) should endWith("/a")
-      }
-      responses mustContainLike {
+      responses mustContainLike
         case (Failure(x), 43) ⇒
           x.getMessage should include(ConnectionResetByPeerMessage)
-      }
       remainingResponsesToKill.get() shouldEqual 0
-    }
 
-    "automatically shutdown after configured timeout periods" in new TestSetup() {
+    "automatically shutdown after configured timeout periods" in new TestSetup()
       val (_, _, _, hcp) =
         cachedHostConnectionPool[Int](idleTimeout = 1.second)
       val gateway = Await.result(hcp.gatewayFuture, 500.millis)
@@ -257,9 +237,8 @@ class ConnectionPoolSpec
       shutdownCompletedPromise.isCompleted shouldEqual false
       Await.result(shutdownStartedPromise.future, 1500.millis) // verify shutdown start (after idle)
       Await.result(shutdownCompletedPromise.future, 1500.millis) // verify shutdown completed
-    }
 
-    "transparently restart after idle shutdown" in new TestSetup() {
+    "transparently restart after idle shutdown" in new TestSetup()
       val (requestIn, responseOut, responseOutSub, hcp) =
         cachedHostConnectionPool[Int](idleTimeout = 1.second)
 
@@ -273,15 +252,13 @@ class ConnectionPoolSpec
       responseOutSub.request(1)
       acceptIncomingConnection()
       val (Success(_), 42) = responseOut.expectNext()
-    }
-  }
 
-  "The single-request client infrastructure" should {
+  "The single-request client infrastructure" should
     class LocalTestSetup
         extends TestSetup(ServerSettings(system).withRawRequestUriHeader(true),
                           autoAccept = true)
 
-    "transform absolute request URIs into relative URIs plus host header" in new LocalTestSetup {
+    "transform absolute request URIs into relative URIs plus host header" in new LocalTestSetup
       val request = HttpRequest(
           uri = s"http://$serverHostName:$serverPort/abc?query#fragment")
       val responseFuture = Http().singleRequest(request)
@@ -290,16 +267,14 @@ class ConnectionPoolSpec
           RawHeader("Req-Raw-Request-URI", "/abc?query"))
       responseHeaders should contain(
           RawHeader("Req-Host", s"$serverHostName:$serverPort"))
-    }
 
-    "support absolute request URIs without path component" in new LocalTestSetup {
+    "support absolute request URIs without path component" in new LocalTestSetup
       val request = HttpRequest(uri = s"http://$serverHostName:$serverPort")
       val responseFuture = Http().singleRequest(request)
       val responseHeaders = Await.result(responseFuture, 1.second).headers
       responseHeaders should contain(RawHeader("Req-Raw-Request-URI", "/"))
-    }
 
-    "support absolute request URIs with a double slash path component" in new LocalTestSetup {
+    "support absolute request URIs with a double slash path component" in new LocalTestSetup
       val request =
         HttpRequest(uri = s"http://$serverHostName:$serverPort//foo")
       val responseFuture = Http().singleRequest(request)
@@ -307,22 +282,19 @@ class ConnectionPoolSpec
       responseHeaders should contain(
           RawHeader("Req-Uri", s"http://$serverHostName:$serverPort//foo"))
       responseHeaders should contain(RawHeader("Req-Raw-Request-URI", "//foo"))
-    }
 
-    "produce an error if the request does not have an absolute URI" in {
+    "produce an error if the request does not have an absolute URI" in
       val request = HttpRequest(uri = "/foo")
       val responseFuture = Http().singleRequest(request)
       val thrown =
         the[IllegalUriException] thrownBy Await.result(responseFuture,
                                                        1.second)
       thrown should have message "Cannot determine request scheme and target endpoint as HttpMethod(GET) request to /foo doesn't have an absolute URI"
-    }
-  }
 
-  "The superPool client infrastructure" should {
+  "The superPool client infrastructure" should
 
     "route incoming requests to the right cached host connection pool" in new TestSetup(
-        autoAccept = true) {
+        autoAccept = true)
       val (serverEndpoint2, serverHostName2, serverPort2) =
         TestUtils.temporaryServerHostnameAndPort()
       Http().bindAndHandleSync(
@@ -336,25 +308,21 @@ class ConnectionPoolSpec
           HttpRequest(uri = s"http://$serverHostName2:$serverPort2/b") -> 43)
 
       responseOutSub.request(2)
-      Seq(responseOut.expectNext(), responseOut.expectNext()) foreach {
+      Seq(responseOut.expectNext(), responseOut.expectNext()) foreach
         case (Success(x), 42) ⇒
           requestUri(x) shouldEqual s"http://$serverHostName:$serverPort/a"
         case (Success(x), 43) ⇒
           requestUri(x) shouldEqual s"http://$serverHostName2:$serverPort2/b"
         case x ⇒ fail(x.toString)
-      }
-    }
-  }
 
   class TestSetup(serverSettings: ServerSettings = ServerSettings(system),
-                  autoAccept: Boolean = false) {
+                  autoAccept: Boolean = false)
     val (serverEndpoint, serverHostName, serverPort) =
       TestUtils.temporaryServerHostnameAndPort()
 
-    def testServerHandler(connNr: Int): HttpRequest ⇒ HttpResponse = {
+    def testServerHandler(connNr: Int): HttpRequest ⇒ HttpResponse =
       case r: HttpRequest ⇒
         HttpResponse(headers = responseHeaders(r, connNr), entity = r.entity)
-    }
 
     def responseHeaders(r: HttpRequest, connNr: Int) =
       ConnNrHeader(connNr) +: RawHeader("Req-Uri", r.uri.toString) +: r.headers
@@ -365,15 +333,14 @@ class ConnectionPoolSpec
     val incomingConnectionCounter = new AtomicInteger
     val incomingConnections =
       TestSubscriber.manualProbe[Http.IncomingConnection]
-    val incomingConnectionsSub = {
+    val incomingConnectionsSub =
       val rawBytesInjection = BidiFlow.fromFlows(
           Flow[SslTlsOutbound]
-            .collect[ByteString] {
+            .collect[ByteString]
               case SendBytes(x) ⇒ mapServerSideOutboundRawBytes(x)
-            }
-            .transform(StreamUtils.recover {
+            .transform(StreamUtils.recover
               case NoErrorComplete ⇒ ByteString.empty
-            }),
+            ),
           Flow[ByteString].map(SessionBytes(null, _)))
       val sink =
         if (autoAccept) Sink.foreach[Http.IncomingConnection](handleConnection)
@@ -382,21 +349,18 @@ class ConnectionPoolSpec
         .bind(serverEndpoint.getHostString,
               serverEndpoint.getPort,
               idleTimeout = serverSettings.timeouts.idleTimeout)
-        .map { c ⇒
+        .map  c ⇒
           val layer = Http().serverLayer(serverSettings, log = log)
           Http.IncomingConnection(c.localAddress,
                                   c.remoteAddress,
                                   layer atop rawBytesInjection join c.flow)
-        }
         .runWith(sink)
       if (autoAccept) null else incomingConnections.expectSubscription()
-    }
 
-    def acceptIncomingConnection(): Unit = {
+    def acceptIncomingConnection(): Unit =
       incomingConnectionsSub.request(1)
       val conn = incomingConnections.expectNext()
       handleConnection(conn)
-    }
 
     private def handleConnection(c: Http.IncomingConnection) =
       c.handleWithSyncHandler(
@@ -409,7 +373,7 @@ class ConnectionPoolSpec
         pipeliningLimit: Int = 1,
         idleTimeout: Duration = 5.seconds,
         ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+              system)) =
       val settings = new ConnectionPoolSettingsImpl(
           maxConnections,
           maxRetries,
@@ -419,7 +383,6 @@ class ConnectionPoolSpec
           ClientConnectionSettings(system))
       flowTestBench(Http()
             .cachedHostConnectionPool[T](serverHostName, serverPort, settings))
-    }
 
     def superPool[T](
         maxConnections: Int = 2,
@@ -428,7 +391,7 @@ class ConnectionPoolSpec
         pipeliningLimit: Int = 1,
         idleTimeout: Duration = 5.seconds,
         ccSettings: ClientConnectionSettings = ClientConnectionSettings(
-              system)) = {
+              system)) =
       val settings = new ConnectionPoolSettingsImpl(
           maxConnections,
           maxRetries,
@@ -437,10 +400,9 @@ class ConnectionPoolSpec
           idleTimeout,
           ClientConnectionSettings(system))
       flowTestBench(Http().superPool[T](settings = settings))
-    }
 
     def flowTestBench[T, Mat](
-        poolFlow: Flow[(HttpRequest, T), (Try[HttpResponse], T), Mat]) = {
+        poolFlow: Flow[(HttpRequest, T), (Try[HttpResponse], T), Mat]) =
       val requestIn = TestPublisher.probe[(HttpRequest, T)]()
       val responseOut = TestSubscriber.manualProbe[(Try[HttpResponse], T)]
       val hcp = Source
@@ -450,25 +412,20 @@ class ConnectionPoolSpec
         .run()
       val responseOutSub = responseOut.expectSubscription()
       (requestIn, responseOut, responseOutSub, hcp)
-    }
 
     def connNr(r: HttpResponse): Int =
       r.headers.find(_ is "conn-nr").get.value.toInt
     def requestUri(r: HttpResponse): String =
       r.headers.find(_ is "req-uri").get.value
-  }
 
-  case class ConnNrHeader(nr: Int) extends CustomHeader {
+  case class ConnNrHeader(nr: Int) extends CustomHeader
     def renderInRequests = false
     def renderInResponses = true
     def name = "Conn-Nr"
     def value = nr.toString
-  }
 
-  implicit class MustContain[T](specimen: Seq[T]) {
+  implicit class MustContain[T](specimen: Seq[T])
     def mustContainLike(pf: PartialFunction[T, Unit]): Unit =
       specimen.collectFirst(pf) getOrElse fail("did not contain")
-  }
 
   object NoErrorComplete extends SingletonException
-}

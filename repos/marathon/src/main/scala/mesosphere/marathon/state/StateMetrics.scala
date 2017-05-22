@@ -6,35 +6,31 @@ import mesosphere.marathon.metrics.{MetricPrefixes, Metrics}
 import scala.concurrent.Future
 import scala.util.control.NonFatal
 
-object StateMetrics {
+object StateMetrics
   private[state] class MetricTemplate(metrics: Metrics,
                                       prefix: String,
                                       metricsClass: Class[_],
                                       nanoTime: () => Long = () =>
-                                          System.nanoTime) {
-    def timedFuture[T](f: => Future[T]): Future[T] = {
+                                          System.nanoTime)
+    def timedFuture[T](f: => Future[T]): Future[T] =
       requestMeter.mark()
       val t0 = nanoTime()
-      val result: Future[T] = try f catch {
+      val result: Future[T] = try f catch
         case NonFatal(t) =>
           // if the function did not even manage to return the Future
           val t1 = nanoTime()
           durationHistogram.update((t1 - t0) / 1000000)
           errorMeter.mark()
           throw t
-      }
 
       import mesosphere.util.CallerThreadExecutionContext.callerThreadExecutionContext
-      result.onComplete { _ =>
+      result.onComplete  _ =>
         val t1 = nanoTime()
         durationHistogram.update((t1 - t0) / 1000000)
-      }
-      result.onFailure {
+      result.onFailure
         case _ => errorMeter.mark()
-      }
 
       result
-    }
 
     val requestsMeterName = metricName(s"$prefix-requests")
     val errorMeterName = metricName(s"$prefix-request-errors")
@@ -47,10 +43,8 @@ object StateMetrics {
 
     private[this] def metricName(name: String): String =
       metrics.name(MetricPrefixes.SERVICE, metricsClass, name)
-  }
-}
 
-trait StateMetrics {
+trait StateMetrics
 
   protected val metrics: Metrics
 
@@ -66,4 +60,3 @@ trait StateMetrics {
     writeMetrics.timedFuture(f)
 
   protected def nanoTime(): Long = System.nanoTime()
-}

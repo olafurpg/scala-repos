@@ -15,12 +15,12 @@ import com.twitter.finagle.transport.Transport
 import com.twitter.finagle.util.Showable
 import com.twitter.util.Future
 
-object StackClient {
+object StackClient
 
   /**
     * Canonical Roles for each Client-related Stack modules.
     */
-  object Role extends Stack.Role("StackClient") {
+  object Role extends Stack.Role("StackClient")
     val pool = Stack.Role("Pool")
     val requestDraining = Stack.Role("RequestDraining")
     val prepFactory = Stack.Role("PrepFactory")
@@ -28,7 +28,6 @@ object StackClient {
     /** PrepConn is special in that it's the first role before the `Endpoint` role */
     val prepConn = Stack.Role("PrepConn")
     val protoTracing = Stack.Role("protoTracing")
-  }
 
   /**
     * A [[com.twitter.finagle.Stack]] representing an endpoint.
@@ -50,7 +49,7 @@ object StackClient {
     * @see [[com.twitter.finagle.filter.ExceptionSourceFilter]]
     * @see [[com.twitter.finagle.client.LatencyCompensation]]
     */
-  def endpointStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] = {
+  def endpointStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] =
     // Ensure that we have performed global initialization.
     com.twitter.finagle.Init()
 
@@ -186,7 +185,6 @@ object StackClient {
     stk.push(LatencyCompensation.module)
 
     stk.result
-  }
 
   /**
     * Creates a default finagle client [[com.twitter.finagle.Stack]].
@@ -207,7 +205,7 @@ object StackClient {
     * @see [[com.twitter.finagle.tracing.ClientTracingFilter]]
     * @see [[com.twitter.finagle.tracing.TraceInitializerFilter]]
     */
-  def newStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] = {
+  def newStack[Req, Rep]: Stack[ServiceFactory[Req, Rep]] =
     /*
      * NB on orientation: we here speak of "up" / "down" or "above" /
      * "below" in terms of a request's traversal of the stack---a
@@ -351,7 +349,6 @@ object StackClient {
     stk.push(TraceInitializerFilter.clientModule)
     stk.push(RegistryEntryLifecycle.module)
     stk.result
-  }
 
   /**
     * The default params used for client stacks.
@@ -359,7 +356,6 @@ object StackClient {
   val defaultParams: Stack.Params =
     Stack.Params.empty + Stats(ClientStatsReceiver) +
     LoadBalancerFactory.HostStats(LoadedHostStatsReceiver)
-}
 
 /**
   * A [[com.twitter.finagle.Client Client]] that may have its
@@ -380,7 +376,7 @@ trait StackBasedClient[Req, Rep]
 trait StackClient[Req, Rep]
     extends StackBasedClient[Req, Rep]
     with Stack.Parameterized[StackClient[Req, Rep]]
-    with Stack.Transformable[StackClient[Req, Rep]] {
+    with Stack.Transformable[StackClient[Req, Rep]]
 
   /** The current stack. */
   def stack: Stack[ServiceFactory[Req, Rep]]
@@ -398,7 +394,6 @@ trait StackClient[Req, Rep]
   def withParams(ps: Stack.Params): StackClient[Req, Rep]
   def configured[P : Stack.Param](p: P): StackClient[Req, Rep]
   def configured[P](psp: (P, Stack.Param[P])): StackClient[Req, Rep]
-}
 
 /**
   * The standard template implementation for
@@ -413,7 +408,7 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     extends StackClient[Req, Rep] with Stack.Parameterized[This]
     with CommonParams[This] with ClientParams[This]
     with WithClientAdmissionControl[This] with WithClientTransport[This]
-    with WithSession[This] with WithSessionQualifier[This] {
+    with WithSession[This] with WithSessionQualifier[This]
   self =>
 
   /**
@@ -464,10 +459,9 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
   /**
     * Creates a new StackClient with parameter `psp._1` and Stack Param type `psp._2`.
     */
-  override def configured[P](psp: (P, Stack.Param[P])): This = {
+  override def configured[P](psp: (P, Stack.Param[P])): This =
     val (p, sp) = psp
     configured(p)(sp)
-  }
 
   /**
     * Creates a new StackClient with `params` used to configure this StackClient's `stack`.
@@ -482,11 +476,10 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     * is particularly useful for `StdStackClient` implementations that don't expose
     * services but instead wrap the resulting service with a rich API.
     */
-  def filtered(filter: Filter[Req, Rep, Req, Rep]): This = {
+  def filtered(filter: Filter[Req, Rep, Req, Rep]): This =
     val role = Stack.Role(filter.getClass.getSimpleName)
     val stackable = Filter.canStackFromFac.toStackable(role, filter)
     withStack(stackable +: stack)
-  }
 
   /**
     * A copy constructor in lieu of defining StackClient as a
@@ -501,13 +494,13 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
     * when applied.
     */
   protected def endpointer: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module[ServiceFactory[Req, Rep]] {
+    new Stack.Module[ServiceFactory[Req, Rep]]
       val role = Endpoint
       val description = "Send requests over the wire"
       val parameters = Seq(implicitly[Stack.Param[Transporter.EndpointAddr]])
-      def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) = {
+      def make(prms: Stack.Params, next: Stack[ServiceFactory[Req, Rep]]) =
         val Transporter.EndpointAddr(addr) = prms[Transporter.EndpointAddr]
-        val factory = addr match {
+        val factory = addr match
           case com.twitter.finagle.exp.Address
                 .ServiceFactory(sf: ServiceFactory[Req, Rep], _) =>
             sf
@@ -516,30 +509,24 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
             val endpointClient = copy1(params = prms)
             val transporter = endpointClient.newTransporter()
             val mkFutureSvc: () => Future[Service[Req, Rep]] = () =>
-              transporter(ia).map { trans =>
+              transporter(ia).map  trans =>
                 // we do not want to capture and request specific Locals
                 // that would live for the life of the session.
-                Contexts.letClear {
+                Contexts.letClear
                   endpointClient.newDispatcher(trans)
-                }
-            }
             ServiceFactory(mkFutureSvc)
-        }
         Stack.Leaf(this, factory)
-      }
-    }
 
-  def newClient(dest: Name, label0: String): ServiceFactory[Req, Rep] = {
+  def newClient(dest: Name, label0: String): ServiceFactory[Req, Rep] =
     val Stats(stats) = params[Stats]
     val Label(label1) = params[Label]
 
     // For historical reasons, we have two sources for identifying
     // a client. The most recently set `label0` takes precedence.
-    val clientLabel = (label0, label1) match {
+    val clientLabel = (label0, label1) match
       case ("", "") => Showable.show(dest)
       case ("", l1) => l1
       case (l0, l1) => l0
-    }
 
     val clientStack = stack ++ (endpointer +: nilStack)
     val clientParams =
@@ -547,12 +534,9 @@ trait StdStackClient[Req, Rep, This <: StdStackClient[Req, Rep, This]]
       BindingFactory.Dest(dest)
 
     clientStack.make(clientParams)
-  }
 
-  override def newService(dest: Name, label: String): Service[Req, Rep] = {
+  override def newService(dest: Name, label: String): Service[Req, Rep] =
     val client = copy1(
         params = params + FactoryToService.Enabled(true)
     ).newClient(dest, label)
     new FactoryToService[Req, Rep](client)
-  }
-}

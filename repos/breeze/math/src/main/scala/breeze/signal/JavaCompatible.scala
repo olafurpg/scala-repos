@@ -8,7 +8,7 @@ import breeze.util.JavaArrayOps._
   * @author ktakagaki
   * @date 3/11/14.
   */
-object JavaCompatible {
+object JavaCompatible
 
   def convolve(data: Array[Double], kernel: Array[Double]) =
     dvDToArray(breeze.signal.convolve(arrayDToDv(data), arrayDToDv(kernel)))
@@ -251,4 +251,3 @@ object JavaCompatible {
     */
   def filterMedianD(data: Array[Double], windowLength: Int) =
     dvDToArray(breeze.signal.filterMedian(arrayDToDv(data), windowLength))
-}

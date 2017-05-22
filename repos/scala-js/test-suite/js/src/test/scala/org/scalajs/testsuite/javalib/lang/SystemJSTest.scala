@@ -18,9 +18,9 @@ import scala.scalajs.runtime.linkingInfo
 import org.junit.Test
 import org.junit.Assert._
 
-class SystemJSTest {
+class SystemJSTest
 
-  @Test def identityHashCode_should_survive_if_an_object_is_sealed(): Unit = {
+  @Test def identityHashCode_should_survive_if_an_object_is_sealed(): Unit =
     /* This is mostly forward-checking that, should we have an implementation
      * that seals Scala.js objects, identityHashCode() survives.
      */
@@ -37,10 +37,9 @@ class SystemJSTest {
     val x2FirstHash = x2.hashCode()
     js.Object.seal(x2.asInstanceOf[js.Object])
     assertEquals(x2FirstHash, x2.hashCode())
-  }
 
-  @Test def identityHashCode_for_JS_objects(): Unit = {
-    if (assumingES6 || !js.isUndefined(js.Dynamic.global.WeakMap)) {
+  @Test def identityHashCode_for_JS_objects(): Unit =
+    if (assumingES6 || !js.isUndefined(js.Dynamic.global.WeakMap))
       /* This test is more restrictive than the spec, but we know our
        * implementation will always pass the test.
        */
@@ -53,15 +52,13 @@ class SystemJSTest {
 
       assertEquals(x1FirstHash, System.identityHashCode(x1))
       assertEquals(x2.hashCode(), System.identityHashCode(x2))
-    } else {
+    else
       val x1 = new js.Object
       val x1FirstHash = x1.hashCode()
       assertEquals(x1FirstHash, x1.hashCode())
       assertEquals(x1FirstHash, System.identityHashCode(x1))
-    }
-  }
 
-  @Test def systemProperties(): Unit = {
+  @Test def systemProperties(): Unit =
     def get(key: String): String = java.lang.System.getProperty(key)
 
     // Defined in System.scala
@@ -83,15 +80,13 @@ class SystemJSTest {
 
     val compliantAsInstanceOf =
       get("scalajs.compliant-asinstanceofs") == "true"
-    if (compliantAsInstanceOf) {
-      try {
+    if (compliantAsInstanceOf)
+      try
         Int.box(5).asInstanceOf[String]
         fail("Invalid class cast succeeded in presence of " +
             "\"compliant-asinstanceofs\" flag.")
-      } catch {
+      catch
         case _: ClassCastException => // As expected
-      }
-    }
     assertEquals(compliantAsInstanceOf, Platform.hasCompliantAsInstanceOfs)
 
     val compliantModule = get("scalajs.compliant-moduleinit") == "true"
@@ -108,19 +103,18 @@ class SystemJSTest {
     val inNode = get("scalajs.nodejs") == "true"
     val inPhantomJS = get("scalajs.phantomjs") == "true"
     val inRhino = get("scalajs.rhino") == "true"
-    if (inNode) {
+    if (inNode)
       val process = js.Dynamic.global.process
       assertFalse(js.isUndefined(process))
       assertFalse(inPhantomJS || inRhino)
-    } else if (inPhantomJS) {
+    else if (inPhantomJS)
       assertFalse(js.isUndefined(js.Dynamic.global.callPhantom))
       assertFalse(inNode || inRhino)
-    } else if (inRhino) {
+    else if (inRhino)
       assertFalse(js.isUndefined(js.Dynamic.global.Packages))
       assertFalse(inNode || inPhantomJS)
-    } else {
+    else
       fail("No known platform tag found.")
-    }
     assertEquals(inNode, Platform.executingInNodeJS)
     assertEquals(inPhantomJS, Platform.executingInPhantomJS)
     assertEquals(inRhino, Platform.executingInRhino)
@@ -132,5 +126,3 @@ class SystemJSTest {
     val isInFullOpt = get("scalajs.fullopt-stage") == "true"
     assertEquals(isInFastOpt, Platform.isInFastOpt)
     assertEquals(isInFullOpt, Platform.isInFullOpt)
-  }
-}

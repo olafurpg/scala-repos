@@ -14,7 +14,7 @@ import org.openjdk.jmh.annotations._
 @Warmup(iterations = 10)
 @Measurement(iterations = 20)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-class CachingConfigBenchmark {
+class CachingConfigBenchmark
 
   val deepKey = "akka.actor.deep.settings.something"
   val deepConfigString = s"""$deepKey = something"""
@@ -23,4 +23,3 @@ class CachingConfigBenchmark {
 
   @Benchmark def deep_config = deepConfig.hasPath(deepKey)
   @Benchmark def deep_caching = deepCaching.hasPath(deepKey)
-}

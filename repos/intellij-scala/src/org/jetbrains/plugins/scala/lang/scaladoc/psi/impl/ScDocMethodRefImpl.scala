@@ -13,6 +13,5 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocMethodRef
   * Date: 22.07.2008
   */
 class ScDocMethodRefImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDocMethodRef {
+    extends ScalaPsiElementImpl(node) with ScDocMethodRef
   override def toString: String = "DocMethodRef"
-}

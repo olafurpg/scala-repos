@@ -22,7 +22,7 @@ import scala.collection.mutable.ListBuffer
   *   If the node has a TransparentPosition, the solid descendants of all its children
   *   Otherwise, the singleton consisting of the node itself.
   */
-trait Positions extends api.Positions { self: SymbolTable =>
+trait Positions extends api.Positions  self: SymbolTable =>
   type Position = scala.reflect.internal.util.Position
   val NoPosition = scala.reflect.internal.util.NoPosition
   implicit val PositionTag = ClassTag[Position](classOf[Position])
@@ -37,9 +37,9 @@ trait Positions extends api.Positions { self: SymbolTable =>
   def wrappingPos(default: Position, trees: List[Tree]): Position =
     wrappingPos(default, trees, focus = true)
   def wrappingPos(
-      default: Position, trees: List[Tree], focus: Boolean): Position = {
+      default: Position, trees: List[Tree], focus: Boolean): Position =
     if (useOffsetPositions) default
-    else {
+    else
       val ranged = trees filter (_.pos.isRange)
       if (ranged.isEmpty) if (focus) default.focus else default
       else
@@ -47,63 +47,55 @@ trait Positions extends api.Positions { self: SymbolTable =>
                        (ranged map (_.pos.start)).min,
                        default.point,
                        (ranged map (_.pos.end)).max)
-    }
-  }
 
   /** A position that wraps the non-empty set of trees.
     *  The point of the wrapping position is the point of the first trees' position.
     *  If some of the trees are non-synthetic, returns a range position enclosing the non-synthetic trees
     *  Otherwise returns a synthetic offset position to point.
     */
-  def wrappingPos(trees: List[Tree]): Position = {
+  def wrappingPos(trees: List[Tree]): Position =
     val headpos = trees.head.pos
     if (useOffsetPositions || !headpos.isDefined) headpos
     else wrappingPos(headpos, trees)
-  }
 
   /** Ensure that given tree has no positions that overlap with
     *  any of the positions of `others`. This is done by
     *  shortening the range, assigning TransparentPositions
     *  to some of the nodes in `tree` or focusing on the position.
     */
-  def ensureNonOverlapping(tree: Tree, others: List[Tree]) {
+  def ensureNonOverlapping(tree: Tree, others: List[Tree])
     ensureNonOverlapping(tree, others, focus = true)
-  }
-  def ensureNonOverlapping(tree: Tree, others: List[Tree], focus: Boolean) {
+  def ensureNonOverlapping(tree: Tree, others: List[Tree], focus: Boolean)
     if (useOffsetPositions) return
 
     def isOverlapping(pos: Position) =
       pos.isRange && (others exists (pos overlaps _.pos))
 
-    if (isOverlapping(tree.pos)) {
+    if (isOverlapping(tree.pos))
       val children = tree.children
       children foreach (ensureNonOverlapping(_, others, focus))
-      if (tree.pos.isOpaqueRange) {
+      if (tree.pos.isOpaqueRange)
         val wpos = wrappingPos(tree.pos, children, focus)
         tree setPos
         (if (isOverlapping(wpos)) tree.pos.makeTransparent else wpos)
-      }
-    }
-  }
 
   def rangePos(
       source: SourceFile, start: Int, point: Int, end: Int): Position =
     if (useOffsetPositions) Position.offset(source, point)
     else Position.range(source, start, point, end)
 
-  def validatePositions(tree: Tree) {
+  def validatePositions(tree: Tree)
     if (useOffsetPositions) return
 
-    def reportTree(prefix: String, tree: Tree) {
+    def reportTree(prefix: String, tree: Tree)
       val source = if (tree.pos.isDefined) tree.pos.source else ""
       inform("== " + prefix + " tree [" + tree.id + "] of type " +
           tree.productPrefix + " at " + tree.pos.show + source)
       inform("")
       inform(treeStatus(tree))
       inform("")
-    }
 
-    def positionError(msg: String)(body: => Unit) {
+    def positionError(msg: String)(body: => Unit)
       inform("======= Position error\n" + msg)
       body
       inform("\nWhile validating #" + tree.id)
@@ -112,57 +104,45 @@ trait Positions extends api.Positions { self: SymbolTable =>
       tree.children foreach (t => inform("  " + treeStatus(t, tree)))
       inform("=======")
       throw new ValidateException(msg)
-    }
 
-    def validate(tree: Tree, encltree: Tree): Unit = {
+    def validate(tree: Tree, encltree: Tree): Unit =
 
-      if (!tree.isEmpty && tree.canHaveAttrs) {
+      if (!tree.isEmpty && tree.canHaveAttrs)
         if (settings.Yposdebug && (settings.verbose || settings.Yrangepos))
           inform("[%10s] %s".format("validate", treeStatus(tree, encltree)))
 
         if (!tree.pos.isDefined)
-          positionError("Unpositioned tree #" + tree.id) {
+          positionError("Unpositioned tree #" + tree.id)
             inform(
                 "%15s %s".format("unpositioned", treeStatus(tree, encltree)))
             inform("%15s %s".format("enclosing", treeStatus(encltree)))
             encltree.children foreach
             (t => inform("%15s %s".format("sibling", treeStatus(t, encltree))))
-          }
-        if (tree.pos.isRange) {
+        if (tree.pos.isRange)
           if (!encltree.pos.isRange)
             positionError("Synthetic tree [" + encltree.id +
-                "] contains nonsynthetic tree [" + tree.id + "]") {
+                "] contains nonsynthetic tree [" + tree.id + "]")
               reportTree("Enclosing", encltree)
               reportTree("Enclosed", tree)
-            }
           if (!(encltree.pos includes tree.pos))
             positionError("Enclosing tree [" + encltree.id +
-                "] does not include tree [" + tree.id + "]") {
+                "] does not include tree [" + tree.id + "]")
               reportTree("Enclosing", encltree)
               reportTree("Enclosed", tree)
-            }
 
-          findOverlapping(tree.children flatMap solidDescendants) match {
+          findOverlapping(tree.children flatMap solidDescendants) match
             case List() => ;
-            case xs => {
-                positionError("Overlapping trees " + xs.map {
+            case xs =>
+                positionError("Overlapping trees " + xs.map
                   case (x, y) => (x.id, y.id)
-                }.mkString("", ", ", "")) {
+                .mkString("", ", ", ""))
                   reportTree("Ancestor", tree)
-                  for ((x, y) <- xs) {
+                  for ((x, y) <- xs)
                     reportTree("First overlapping", x)
                     reportTree("Second overlapping", y)
-                  }
-                }
-              }
-          }
-        }
         for (ct <- tree.children flatMap solidDescendants) validate(ct, tree)
-      }
-    }
 
     if (!isPastTyper) validate(tree, tree)
-  }
 
   def solidDescendants(tree: Tree): List[Tree] =
     if (tree.pos.isTransparent) tree.children flatMap solidDescendants
@@ -185,21 +165,19 @@ trait Positions extends api.Positions { self: SymbolTable =>
     */
   private def insert(
       rs: List[Range], t: Tree, conflicting: ListBuffer[Tree]): List[Range] =
-    rs match {
+    rs match
       case List() =>
         assert(conflicting.nonEmpty)
         rs
       case r :: rs1 =>
         assert(!t.pos.isTransparent)
-        if (r.isFree && (r.pos includes t.pos)) {
+        if (r.isFree && (r.pos includes t.pos))
 //      inform("subdividing "+r+"/"+t.pos)
           maybeFree(t.pos.end, r.pos.end) ::: List(Range(t.pos, t)) ::: maybeFree(
               r.pos.start, t.pos.start) ::: rs1
-        } else {
+        else
           if (!r.isFree && (r.pos overlaps t.pos)) conflicting += r.tree
           r :: insert(rs1, t, conflicting)
-        }
-    }
 
   /** Replace elem `t` of `ts` by `replacement` list. */
   private def replace(
@@ -210,17 +188,14 @@ trait Positions extends api.Positions { self: SymbolTable =>
   /** Does given list of trees have mutually non-overlapping positions?
     *  pre: None of the trees is transparent
     */
-  def findOverlapping(cts: List[Tree]): List[(Tree, Tree)] = {
+  def findOverlapping(cts: List[Tree]): List[(Tree, Tree)] =
     var ranges = List(maxFree)
-    for (ct <- cts) {
-      if (ct.pos.isOpaqueRange) {
+    for (ct <- cts)
+      if (ct.pos.isOpaqueRange)
         val conflicting = new ListBuffer[Tree]
         ranges = insert(ranges, ct, conflicting)
         if (conflicting.nonEmpty) return conflicting.toList map (t => (t, ct))
-      }
-    }
     List()
-  }
 
   /** Set position of all children of a node
     *  @param  pos   A target position.
@@ -230,23 +205,19 @@ trait Positions extends api.Positions { self: SymbolTable =>
     *  @param  trees  The children to position. All children must be positionable.
     */
   private def setChildrenPos(pos: Position, trees: List[Tree]): Unit =
-    try {
-      for (tree <- trees) {
-        if (!tree.isEmpty && tree.canHaveAttrs && tree.pos == NoPosition) {
+    try
+      for (tree <- trees)
+        if (!tree.isEmpty && tree.canHaveAttrs && tree.pos == NoPosition)
           val children = tree.children
-          if (children.isEmpty) {
+          if (children.isEmpty)
             tree setPos pos.focus
-          } else {
+          else
             setChildrenPos(pos, children)
             tree setPos wrappingPos(pos, children)
-          }
-        }
-      }
-    } catch {
+    catch
       case ex: Exception =>
         inform("error while set children pos " + pos + " of " + trees)
         throw ex
-    }
 
   class ValidateException(msg: String) extends Exception(msg)
 
@@ -254,59 +225,50 @@ trait Positions extends api.Positions { self: SymbolTable =>
     *  Given a position `pos`, locator.apply returns
     *  the smallest tree that encloses `pos`.
     */
-  class Locator(pos: Position) extends Traverser {
+  class Locator(pos: Position) extends Traverser
     var last: Tree = _
-    def locateIn(root: Tree): Tree = {
+    def locateIn(root: Tree): Tree =
       this.last = EmptyTree
       traverse(root)
       this.last
-    }
     protected def isEligible(t: Tree) = !t.pos.isTransparent
-    override def traverse(t: Tree) {
-      t match {
+    override def traverse(t: Tree)
+      t match
         case tt: TypeTree
             if tt.original != null && (tt.pos includes tt.original.pos) =>
           traverse(tt.original)
         case _ =>
-          if (t.pos includes pos) {
+          if (t.pos includes pos)
             if (isEligible(t)) last = t
             super.traverse(t)
-          } else
-            t match {
+          else
+            t match
               case mdef: MemberDef =>
-                val annTrees = mdef.mods.annotations match {
+                val annTrees = mdef.mods.annotations match
                   case Nil if mdef.symbol != null =>
                     // After typechecking, annotations are moved from the modifiers
                     // to the annotation on the symbol of the anotatee.
                     mdef.symbol.annotations.map(_.original)
                   case anns => anns
-                }
                 traverseTrees(annTrees)
               case _ =>
-            }
-      }
-    }
-  }
 
-  case class Range(pos: Position, tree: Tree) {
+  case class Range(pos: Position, tree: Tree)
     def isFree = tree == EmptyTree
-  }
 
-  class TypedLocator(pos: Position) extends Locator(pos) {
+  class TypedLocator(pos: Position) extends Locator(pos)
     override protected def isEligible(t: Tree) =
       super.isEligible(t) && t.tpe != null
-  }
 
-  trait PosAssigner extends Traverser {
+  trait PosAssigner extends Traverser
     var pos: Position
-  }
   protected[this] lazy val posAssigner: PosAssigner = new DefaultPosAssigner
 
-  protected class DefaultPosAssigner extends PosAssigner {
+  protected class DefaultPosAssigner extends PosAssigner
     var pos: Position = _
-    override def traverse(t: Tree) {
+    override def traverse(t: Tree)
       if (!t.canHaveAttrs) ()
-      else if (t.pos == NoPosition) {
+      else if (t.pos == NoPosition)
         t.setPos(pos)
         super.traverse(t) // TODO: bug? shouldn't the traverse be outside of the if?
         // @PP: it's pruning whenever it encounters a node with a
@@ -320,28 +282,20 @@ trait Positions extends api.Positions { self: SymbolTable =>
         // children beneath it and then to assign whatever happens to
         // be in `pos` to such nodes. There are supposed to be some
         // position invariants which I can't imagine surviving that.
-      }
-    }
-  }
 
   /** Position a tree.
     *  This means: Set position of a node and position all its unpositioned children.
     */
-  def atPos[T <: Tree](pos: Position)(tree: T): T = {
-    if (useOffsetPositions || !pos.isOpaqueRange) {
+  def atPos[T <: Tree](pos: Position)(tree: T): T =
+    if (useOffsetPositions || !pos.isOpaqueRange)
       posAssigner.pos = pos
       posAssigner.traverse(tree)
       tree
-    } else {
-      if (!tree.isEmpty && tree.canHaveAttrs && tree.pos == NoPosition) {
+    else
+      if (!tree.isEmpty && tree.canHaveAttrs && tree.pos == NoPosition)
         tree.setPos(pos)
         val children = tree.children
-        if (children.nonEmpty) {
+        if (children.nonEmpty)
           if (children.tail.isEmpty) atPos(pos)(children.head)
           else setChildrenPos(pos, children)
-        }
-      }
       tree
-    }
-  }
-}

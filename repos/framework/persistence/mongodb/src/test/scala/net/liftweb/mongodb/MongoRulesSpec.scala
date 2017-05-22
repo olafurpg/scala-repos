@@ -24,26 +24,20 @@ import org.specs2.mutable._
 import org.bson.types.ObjectId
 
 case class CollectionNameTestDoc(_id: ObjectId)
-    extends MongoDocument[CollectionNameTestDoc] {
+    extends MongoDocument[CollectionNameTestDoc]
   def meta = CollectionNameTestDoc
-}
 object CollectionNameTestDoc extends MongoDocumentMeta[CollectionNameTestDoc]
 
 /**
   * Systems under specification for MongoRules.
   */
-object MongoRulesSpec extends Specification {
+object MongoRulesSpec extends Specification
   "Mongo Rules Specification".title
   sequential
 
-  "MongoRules" should {
-    "default collection name" in {
+  "MongoRules" should
+    "default collection name" in
       CollectionNameTestDoc.collectionName must_== "collectionnametestdocs"
-    }
-    "snakify collection name" in {
-      MongoRules.collectionName.doWith((_, name) => snakify(name) + "s") {
+    "snakify collection name" in
+      MongoRules.collectionName.doWith((_, name) => snakify(name) + "s")
         CollectionNameTestDoc.collectionName must_== "net.liftweb.mongodb.collection_name_test_docs"
-      }
-    }
-  }
-}

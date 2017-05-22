@@ -1,8 +1,6 @@
 //cannot.inline.used.outside.class
-object X {
+object X
   val /*caret*/ b = 1
-}
 
-object Y {
+object Y
   val b = X.b
-}

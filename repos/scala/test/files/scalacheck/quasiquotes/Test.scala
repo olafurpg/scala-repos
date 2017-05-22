@@ -1,6 +1,6 @@
 import org.scalacheck._
 
-object Test extends Properties("quasiquotes") {
+object Test extends Properties("quasiquotes")
   include(TermConstructionProps)
   include(TermDeconstructionProps)
   include(TypeConstructionProps)
@@ -16,4 +16,3 @@ object Test extends Properties("quasiquotes") {
   include(DeprecationProps)
   include(ForProps)
   include(TypecheckedProps)
-}

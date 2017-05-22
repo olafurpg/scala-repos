@@ -29,9 +29,9 @@ import com.precog.util.Timing
 import com.precog.common._
 
 trait JoinOptimizerModule[M[+ _]]
-    extends DAGTransform with TransSpecableModule[M] {
+    extends DAGTransform with TransSpecableModule[M]
 
-  trait JoinOptimizer extends TransSpecable {
+  trait JoinOptimizer extends TransSpecable
     import dag._
     import instructions._
     import TableModule.CrossOrder
@@ -39,24 +39,23 @@ trait JoinOptimizerModule[M[+ _]]
 
     def optimizeJoins(graph: DepGraph,
                       ctx: EvaluationContext,
-                      idGen: IdGen = IdGen): DepGraph = {
+                      idGen: IdGen = IdGen): DepGraph =
 
       def compareAncestor(lhs: DepGraph, rhs: DepGraph): Boolean =
         findAncestor(lhs, ctx) == findAncestor(rhs, ctx)
 
       def liftRewrite(
           graph: DepGraph, eq: DepGraph, lifted: DepGraph): DepGraph =
-        transformBottomUp(graph) { g =>
+        transformBottomUp(graph)  g =>
           if (g == eq) lifted else g
-        }
 
       def rewrite(filter: dag.Filter,
                   body: DepGraph,
                   eqA: DepGraph,
-                  eqB: DepGraph): DepGraph = {
+                  eqB: DepGraph): DepGraph =
         val sortId = idGen.nextInt()
 
-        def lift(keyGraph: DepGraph, valueGraph: DepGraph): DepGraph = {
+        def lift(keyGraph: DepGraph, valueGraph: DepGraph): DepGraph =
           val key = "key"
           val value = "value"
 
@@ -73,21 +72,19 @@ trait JoinOptimizerModule[M[+ _]]
                      key,
                      value,
                      sortId)
-        }
 
-        val rewritten = transformBottomUp(body) {
+        val rewritten = transformBottomUp(body)
           case j @ Join(_, _, Const(_), _) => j
 
           case j @ Join(_, _, _, Const(_)) => j
 
           case j @ Join(op, Cross(_), lhs, rhs)
               if (compareAncestor(lhs, eqA) && compareAncestor(rhs, eqB)) ||
-              (compareAncestor(lhs, eqB) && compareAncestor(rhs, eqA)) => {
+              (compareAncestor(lhs, eqB) && compareAncestor(rhs, eqA)) =>
 
-              val (eqLHS, eqRHS) = {
+              val (eqLHS, eqRHS) =
                 if (compareAncestor(lhs, eqA)) (eqA, eqB)
                 else (eqB, eqA)
-              }
 
               val ancestorLHS = findOrderAncestor(lhs, ctx) getOrElse lhs
               val ancestorRHS = findOrderAncestor(rhs, ctx) getOrElse rhs
@@ -99,15 +96,12 @@ trait JoinOptimizerModule[M[+ _]]
                    ValueSort(sortId),
                    liftRewrite(lhs, ancestorLHS, liftedLHS),
                    liftRewrite(rhs, ancestorRHS, liftedRHS))(j.loc)
-            }
 
           case other => other
-        }
 
         if (rewritten == body) filter else rewritten
-      }
 
-      transformBottomUp(graph) {
+      transformBottomUp(graph)
         case filter @ Filter(IdentitySort,
                              body @ Join(BuiltInFunction2Op(op2), _, _, _),
                              Join(Eq, Cross(_), eqA, eqB)) if op2.rowLevel =>
@@ -130,7 +124,3 @@ trait JoinOptimizerModule[M[+ _]]
           rewrite(filter, body, eqA, eqB)
 
         case other => other
-      }
-    }
-  }
-}

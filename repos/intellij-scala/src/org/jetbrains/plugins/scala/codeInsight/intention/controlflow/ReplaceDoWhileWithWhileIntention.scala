@@ -24,79 +24,72 @@ import scala.collection.Set
   * Nikolay.Tropin
   * 4/17/13
   */
-object ReplaceDoWhileWithWhileIntention {
+object ReplaceDoWhileWithWhileIntention
   def familyName = "Replace do while with while"
-}
 
-class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
+class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction
   def getFamilyName = ReplaceDoWhileWithWhileIntention.familyName
 
   override def getText: String = ReplaceDoWhileWithWhileIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
-    for {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
+    for
       doStmt <- Option(
           PsiTreeUtil.getParentOfType(element, classOf[ScDoStmt], false))
       condition <- doStmt.condition
       body <- doStmt.getExprBody
-    } {
+    
       val offset = editor.getCaretModel.getOffset
       //offset is on the word "do" or "while"
       if ((offset >= doStmt.getTextRange.getStartOffset &&
               offset < body.getTextRange.getStartOffset) ||
           (offset > body.getTextRange.getEndOffset &&
               offset < condition.getTextRange.getStartOffset)) return true
-    }
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     //check for name conflicts
-    for {
+    for
       doStmt <- Option(PsiTreeUtil.getParentOfType(element, classOf[ScDoStmt]))
       body <- doStmt.getExprBody
       doStmtParent <- doStmt.parent
-    } {
+    
 
       val nameConflict =
         (declaredNames(body) intersect declaredNames(doStmtParent)).nonEmpty
-      if (nameConflict) {
+      if (nameConflict)
         val message = "This action will cause name conflict."
         showNotification(message)
         return
-      }
-    }
 
     doReplacement()
 
-    def showNotification(text: String) {
+    def showNotification(text: String)
 
       val popupFactory = JBPopupFactory.getInstance
       popupFactory
-        .createConfirmation(text, "Continue", "Cancel", new Runnable {
+        .createConfirmation(text, "Continue", "Cancel", new Runnable
           //action on confirmation
-          def run() {
+          def run()
             //to make action Undoable
             CommandProcessor
               .getInstance()
-              .executeCommand(project, new Runnable() {
+              .executeCommand(project, new Runnable()
                 def run() { doReplacement() }
-              }, null, null)
-          }
-        }, 0)
+              , null, null)
+        , 0)
         .showInBestPositionFor(editor)
-    }
 
-    def doReplacement() {
-      for {
+    def doReplacement()
+      for
         doStmt <- Option(
             PsiTreeUtil.getParentOfType(element, classOf[ScDoStmt]))
         condition <- doStmt.condition
         body <- doStmt.getExprBody
         doStmtParent <- doStmt.parent
-      } {
+      
         val condText = condition.getText
         val bodyText = body.getText
 
@@ -113,52 +106,44 @@ class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
           .map(_.getNode.getElementType)
           .contains(ScalaTokenTypes.tLBRACE)
 
-        val parentBlockNeedBraces: Boolean = doStmtParent match {
+        val parentBlockNeedBraces: Boolean = doStmtParent match
           case _: ScalaFile => false
           case block: ScBlock =>
-            block.getParent match {
+            block.getParent match
               case _: ScCaseClause => false
               case _ => true
-            }
           case _ => true
-        }
 
-        inWriteAction {
+        inWriteAction
           val newDoStmt =
-            if (!parentBlockHasBraces && parentBlockNeedBraces) {
+            if (!parentBlockHasBraces && parentBlockNeedBraces)
               val doStmtInBraces = doStmt.replaceExpression(
                   ScalaPsiElementFactory.createBlockFromExpr(doStmt, manager),
                   removeParenthesis = true)
               PsiTreeUtil.findChildOfType(
                   doStmtInBraces, classOf[ScDoStmt], true)
-            } else doStmt
+            else doStmt
           val newExpression: ScExpression =
             newDoStmt.replaceExpression(newWhileStmt, removeParenthesis = true)
           val parent = newExpression.getParent
 
-          val bodyElements = newBody match {
+          val bodyElements = newBody match
             case _: ScBlock => newBody.children
             case _: ScExpression => Iterator(newBody)
-          }
 
-          for (elem <- bodyElements) {
+          for (elem <- bodyElements)
             val elementType: IElementType = elem.getNode.getElementType
             if (elementType != ScalaTokenTypes.tLBRACE &&
                 elementType != ScalaTokenTypes.tRBRACE)
               parent.addBefore(elem, newExpression)
-          }
           parent.addBefore(
               ScalaPsiElementFactory.createNewLine(manager), newExpression)
 
           PsiDocumentManager
             .getInstance(project)
             .commitDocument(editor.getDocument)
-        }
-      }
-    }
-  }
 
-  def declaredNames(element: PsiElement): Set[String] = {
+  def declaredNames(element: PsiElement): Set[String] =
     val firstChild: PsiElement = element.firstChild.get
     val processor: CompletionProcessor = new CompletionProcessor(
         StdKinds.refExprLastRef, firstChild, collectImplicits = true)
@@ -167,5 +152,3 @@ class ReplaceDoWhileWithWhileIntention extends PsiElementBaseIntentionAction {
     val candidates: Set[ScalaResolveResult] = processor.candidatesS
 
     candidates.map(_.name)
-  }
-}

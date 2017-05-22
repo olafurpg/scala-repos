@@ -6,15 +6,10 @@
 //
 // https://github.com/scala/scala/pull/2816#issuecomment-22555206
 //
-class C {
-  def foo = {
+class C
+  def foo =
     class C { private def x = 0 }
 
-    {
       val a = 0
-      object C {
+      object C
         new C().x
-      }
-    }
-  }
-}

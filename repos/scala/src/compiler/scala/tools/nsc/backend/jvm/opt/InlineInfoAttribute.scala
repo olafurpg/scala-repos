@@ -31,7 +31,7 @@ import scala.tools.nsc.backend.jvm.BackendReporting.UnknownScalaInlineInfoVersio
   * ScalaInlineAttribute remains relatively compact.
   */
 case class InlineInfoAttribute(inlineInfo: InlineInfo)
-    extends Attribute(InlineInfoAttribute.attributeName) {
+    extends Attribute(InlineInfoAttribute.attributeName)
 
   /**
     * Not sure what this method is good for, it is not invoked anywhere in the ASM framework. However,
@@ -48,7 +48,7 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
                      code: Array[Byte],
                      len: Int,
                      maxStack: Int,
-                     maxLocals: Int): ByteVector = {
+                     maxLocals: Int): ByteVector =
     val result = new ByteVector()
 
     result.putByte(InlineInfoAttribute.VERSION)
@@ -59,21 +59,19 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
     if (inlineInfo.sam.isDefined) finalSelfSam |= 4
     result.putByte(finalSelfSam)
 
-    for (selfInternalName <- inlineInfo.traitImplClassSelfType) {
+    for (selfInternalName <- inlineInfo.traitImplClassSelfType)
       result.putShort(cw.newUTF8(selfInternalName))
-    }
 
-    for (samNameDesc <- inlineInfo.sam) {
+    for (samNameDesc <- inlineInfo.sam)
       val (name, desc) = samNameDesc.span(_ != '(')
       result.putShort(cw.newUTF8(name))
       result.putShort(cw.newUTF8(desc))
-    }
 
     // The method count fits in a short (the methods_count in a classfile is also a short)
     result.putShort(inlineInfo.methodInfos.size)
 
     // Sort the methodInfos for stability of classfiles
-    for ((nameAndType, info) <- inlineInfo.methodInfos.toList.sortBy(_._1)) {
+    for ((nameAndType, info) <- inlineInfo.methodInfos.toList.sortBy(_._1))
       val (name, desc) = nameAndType.span(_ != '(')
       // Name and desc are added separately because a NameAndType entry also stores them separately.
       // This makes sure that we use the existing constant pool entries for the method.
@@ -86,10 +84,8 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
       if (info.annotatedInline) inlineInfo |= 4
       if (info.annotatedNoInline) inlineInfo |= 8
       result.putByte(inlineInfo)
-    }
 
     result
-  }
 
   /**
     * De-serialize the attribute into an InlineInfo. The attribute starts at cr.b(off), but we don't
@@ -103,7 +99,7 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
                     len: Int,
                     buf: Array[Char],
                     codeOff: Int,
-                    labels: Array[Label]): InlineInfoAttribute = {
+                    labels: Array[Label]): InlineInfoAttribute =
     var next = off
 
     def nextByte() = { val r = cr.readByte(next); next += 1; r }
@@ -111,7 +107,7 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
     def nextShort() = { val r = cr.readShort(next); next += 2; r }
 
     val version = nextByte()
-    if (version == 1) {
+    if (version == 1)
       val finalSelfSam = nextByte()
       val isFinal = (finalSelfSam & 1) != 0
       val hasSelf = (finalSelfSam & 2) != 0
@@ -119,23 +115,20 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
 
       val self =
         if (!hasSelf) None
-        else {
+        else
           val selfName = nextUTF8()
           Some(selfName)
-        }
 
       val sam =
         if (!hasSam) None
-        else {
+        else
           val name = nextUTF8()
           val desc = nextUTF8()
           Some(name + desc)
-        }
 
       val numEntries = nextShort()
       val infos = (0 until numEntries)
         .map(_ =>
-              {
             val name = nextUTF8()
             val desc = nextUTF8()
 
@@ -149,18 +142,15 @@ case class InlineInfoAttribute(inlineInfo: InlineInfo)
                               traitMethodWithStaticImplementation,
                               isInline,
                               isNoInline))
-        })
+        )
         .toMap
 
       InlineInfoAttribute(InlineInfo(self, isFinal, sam, infos, None))
-    } else {
+    else
       val msg = UnknownScalaInlineInfoVersion(cr.getClassName, version)
       InlineInfoAttribute(BTypes.EmptyInlineInfo.copy(warning = Some(msg)))
-    }
-  }
-}
 
-object InlineInfoAttribute {
+object InlineInfoAttribute
 
   /**
     * [u1]    version
@@ -176,7 +166,6 @@ object InlineInfoAttribute {
   final val VERSION: Byte = 1
 
   final val attributeName = "ScalaInlineInfo"
-}
 
 /**
   * In order to instruct the ASM framework to de-serialize the ScalaInlineInfo attribute, we need

@@ -33,32 +33,27 @@ private[http] object pageScript
 /**
   * Create a javascript command that will initialize lift.js using LiftRules.
   */
-object LiftJavaScript {
+object LiftJavaScript
 
-  object PageJs {
-    def unapply(req: Req): Option[JavaScriptResponse] = {
+  object PageJs
+    def unapply(req: Req): Option[JavaScriptResponse] =
       val suffixedPath = req.path.wholePath
       val LiftPath = LiftRules.liftContextRelativePath
       val renderVersion = "([^.]+)\\.js".r
 
-      suffixedPath match {
+      suffixedPath match
         case LiftPath :: "page" :: renderVersion(version) :: Nil =>
-          RenderVersion.doWith(version) {
+          RenderVersion.doWith(version)
             pageScript.is.toOption
-          }
         case other =>
           None
-      }
-    }
-  }
 
-  def servePageJs: LiftRules.DispatchPF = {
+  def servePageJs: LiftRules.DispatchPF =
     case PageJs(response) =>
       () =>
         Full(response)
-  }
 
-  def settings: JsObj = {
+  def settings: JsObj =
     val jsCometServer = LiftRules.cometServer().map(Str(_)).getOrElse(JsNull)
     JsObj(
         "liftPath" -> LiftRules.liftPath,
@@ -82,10 +77,9 @@ object LiftJavaScript {
           .map(fnc => AnonFunc(fnc()))
           .openOr(AnonFunc(Noop))
       )
-  }
 
-  def initCmd(settings: JsObj): JsCmd = {
-    val extendJsHelpersCmd = LiftRules.jsArtifacts match {
+  def initCmd(settings: JsObj): JsCmd =
+    val extendJsHelpersCmd = LiftRules.jsArtifacts match
       case JQueryArtifacts =>
         Call("window.lift.extend",
              JsVar("lift_settings"),
@@ -94,10 +88,7 @@ object LiftJavaScript {
         Call("window.lift.extend",
              JsVar("lift_settings"),
              JsVar("window", "liftVanilla"))
-    }
 
     JsCrVar("lift_settings", JsObj()) & extendJsHelpersCmd & Call(
         "window.lift.extend", JsVar("lift_settings"), settings) & Call(
         "window.lift.init", JsVar("lift_settings"))
-  }
-}

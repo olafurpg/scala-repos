@@ -34,23 +34,19 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec}
 
 /** ReadOnlyStringWrapper Spec tests. */
 @RunWith(classOf[JUnitRunner])
-class ReadOnlyStringWrapperSpec extends FlatSpec with BeforeAndAfterEach {
+class ReadOnlyStringWrapperSpec extends FlatSpec with BeforeAndAfterEach
 
-  "A ReadOnlyStringWrapper" should "be an instance of StringProperty" in {
+  "A ReadOnlyStringWrapper" should "be an instance of StringProperty" in
     val p = new ReadOnlyStringWrapper()
     assert(p.isInstanceOf[StringProperty])
-  }
 
-  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyStringProperty`" in {
+  it should "have public field `readOnlyProperty` that is an instance of `ReadOnlyStringProperty`" in
     val p = new ReadOnlyStringWrapper()
     assert(p.readOnlyProperty.isInstanceOf[ReadOnlyStringProperty])
-  }
 
-  it should "propagate value changes to `readOnlyProperty`" in {
+  it should "propagate value changes to `readOnlyProperty`" in
     val p = new ReadOnlyStringWrapper()
     p.value = "F One"
     p.readOnlyProperty() should equal("F One")
     p.value = "Alfa Alfa"
     p.readOnlyProperty() should equal("Alfa Alfa")
-  }
-}

@@ -24,15 +24,15 @@ import scala.collection.mutable
 
 import com.precog.util.IdGen
 
-trait DAGTransform extends DAG {
+trait DAGTransform extends DAG
   import dag._
   import instructions.{DerefObject, Eq, JoinObject, Line, PushString, WrapObject}
 
-  def transformBottomUp(graph: DepGraph)(f: DepGraph => DepGraph): DepGraph = {
+  def transformBottomUp(graph: DepGraph)(f: DepGraph => DepGraph): DepGraph =
 
     val memotable = mutable.Map[DepGraphWrapper, DepGraph]()
 
-    def transformSpec(spec: BucketSpec): BucketSpec = spec match {
+    def transformSpec(spec: BucketSpec): BucketSpec = spec match
       case UnionBucketSpec(left, right) =>
         UnionBucketSpec(transformSpec(left), transformSpec(right))
 
@@ -47,10 +47,9 @@ trait DAGTransform extends DAG {
 
       case Extra(target) =>
         Extra(transformAux(target))
-    }
 
-    def transformAux(graph: DepGraph): DepGraph = {
-      def inner(graph: DepGraph): DepGraph = graph match {
+    def transformAux(graph: DepGraph): DepGraph =
+      def inner(graph: DepGraph): DepGraph = graph match
         case r: Root => f(r)
 
         case graph @ New(parent) => f(New(transformAux(parent))(graph.loc))
@@ -115,11 +114,10 @@ trait DAGTransform extends DAG {
         case graph @ Distinct(parent) =>
           f(Distinct(transformAux(parent))(graph.loc))
 
-        case s @ Split(spec, child, id) => {
+        case s @ Split(spec, child, id) =>
             val spec2 = transformSpec(spec)
             val child2 = transformAux(child)
             f(Split(spec2, child2, id)(s.loc))
-          }
 
         // not using extractors due to bug
         case s: SplitGroup =>
@@ -128,15 +126,10 @@ trait DAGTransform extends DAG {
         // not using extractors due to bug
         case s: SplitParam =>
           f(SplitParam(s.id, s.parentId)(s.loc))
-      }
 
-      memotable.get(new DepGraphWrapper(graph)) getOrElse {
+      memotable.get(new DepGraphWrapper(graph)) getOrElse
         val result = inner(graph)
         memotable += (new DepGraphWrapper(graph) -> result)
         result
-      }
-    }
 
     transformAux(graph)
-  }
-}

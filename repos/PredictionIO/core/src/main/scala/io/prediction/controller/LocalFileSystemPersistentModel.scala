@@ -37,12 +37,10 @@ import org.apache.spark.SparkContext
   * @group Algorithm
   */
 trait LocalFileSystemPersistentModel[AP <: Params]
-    extends PersistentModel[AP] {
-  def save(id: String, params: AP, sc: SparkContext): Boolean = {
+    extends PersistentModel[AP]
+  def save(id: String, params: AP, sc: SparkContext): Boolean =
     Utils.save(id, this)
     true
-  }
-}
 
 /** Implement an object that extends this trait for PredictionIO to support
   * loading a persisted model from local filesystem during serving deployment.
@@ -55,11 +53,9 @@ trait LocalFileSystemPersistentModel[AP <: Params]
   * @group Algorithm
   */
 trait LocalFileSystemPersistentModelLoader[AP <: Params, M]
-    extends PersistentModelLoader[AP, M] {
-  def apply(id: String, params: AP, sc: Option[SparkContext]): M = {
+    extends PersistentModelLoader[AP, M]
+  def apply(id: String, params: AP, sc: Option[SparkContext]): M =
     Utils.load(id).asInstanceOf[M]
-  }
-}
 
 /** DEPRECATED. Use [[LocalFileSystemPersistentModel]] instead.
   *

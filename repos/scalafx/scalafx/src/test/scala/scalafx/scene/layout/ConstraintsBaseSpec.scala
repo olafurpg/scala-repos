@@ -43,9 +43,8 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class ConstraintsBaseSpec
     extends SimpleSFXDelegateSpec[jfxsl.ConstraintsBase, ConstraintsBase](
-        classOf[jfxsl.ConstraintsBase], classOf[ConstraintsBase]) {
+        classOf[jfxsl.ConstraintsBase], classOf[ConstraintsBase])
 
   override protected def getScalaClassInstance = new RowConstraints
 
   override protected def getJavaClassInstance = new jfxsl.RowConstraints
-}

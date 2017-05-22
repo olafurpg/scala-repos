@@ -23,28 +23,24 @@ Literal ::= ['-']integerLiteral
             | null
             | javaId"StringLiteral" 
  */
-object Literal {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Literal
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val marker = builder.mark()
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
-        if (builder.getTokenText == "-") {
+        if (builder.getTokenText == "-")
           builder.advanceLexer() //Ate -
-          builder.getTokenType match {
-            case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT => {
+          builder.getTokenType match
+            case ScalaTokenTypes.tINTEGER | ScalaTokenTypes.tFLOAT =>
                 builder.advanceLexer() //Ate literal
                 marker.done(ScalaElementTypes.LITERAL)
                 true
-              }
-            case _ => {
+            case _ =>
                 marker.rollbackTo()
                 false
-              }
-          }
-        } else {
+        else
           marker.rollbackTo()
           false
-        }
       case ScalaTokenTypes.tINTERPOLATED_STRING_ID =>
         CommonUtils.parseInterpolatedString(builder, isPattern = false)
         marker.done(ScalaElementTypes.INTERPOLATED_STRING_LITERAL)
@@ -71,6 +67,3 @@ object Literal {
       case _ =>
         marker.rollbackTo()
         false
-    }
-  }
-}

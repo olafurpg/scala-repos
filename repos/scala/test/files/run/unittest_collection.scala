@@ -1,17 +1,15 @@
-object Test {
+object Test
 
   import scala.collection.mutable.{ArrayBuffer, Buffer, BufferProxy, ListBuffer}
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     test(collection.mutable.ArrayBuffer[String]())
     test(collection.mutable.ListBuffer[String]())
-    class BBuf(z: ListBuffer[String]) extends BufferProxy[String] {
+    class BBuf(z: ListBuffer[String]) extends BufferProxy[String]
       def self = z
-    }
     test(new BBuf(collection.mutable.ListBuffer[String]()))
-  }
 
-  def test(x: Buffer[String]) {
+  def test(x: Buffer[String])
     // testing method +=
     x += "one"
     assert(x(0) == "one", "retrieving 'one'")
@@ -25,13 +23,11 @@ object Test {
 
     assert(x.length == 1, "length C")
 
-    try { x(1); sys.error("no exception for removed element") } catch {
+    try { x(1); sys.error("no exception for removed element") } catch
       case i: IndexOutOfBoundsException =>
-    }
 
-    try { x.remove(1); sys.error("no exception for removed element") } catch {
+    try { x.remove(1); sys.error("no exception for removed element") } catch
       case i: IndexOutOfBoundsException =>
-    }
 
     x += "two2"
     assert(x.length == 2, "length D")
@@ -55,5 +51,3 @@ object Test {
     x.copyToBuffer(dest)
     assert(List("a", "b") == dest.toList, "dest")
     assert(List("a", "b") == x.toList, "source")
-  }
-}

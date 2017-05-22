@@ -11,24 +11,21 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class StatsFactoryWrapperTest extends FunSuite with MockitoSugar {
+class StatsFactoryWrapperTest extends FunSuite with MockitoSugar
   val underlying = mock[ServiceFactory[Int, Int]]
   val rex = new RuntimeException
   val t = new Throwable(rex)
 
-  test("report exceptions on Service creation failure") {
+  test("report exceptions on Service creation failure")
     val receiver = new InMemoryStatsReceiver
     val statsFac = new StatsFactoryWrapper(underlying, receiver)
 
     when(underlying(any[ClientConnection])) thenReturn Future.exception(t)
 
-    intercept[Throwable] {
+    intercept[Throwable]
       Await.result(statsFac(ClientConnection.nil))
-    }
 
     val expected =
       Map(List("failures", t.getClass.getName, rex.getClass.getName) -> 1)
     assert(receiver.counters == expected)
     verify(underlying)(ClientConnection.nil)
-  }
-}

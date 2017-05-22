@@ -1,9 +1,6 @@
-object CompanionForTrait {
-  trait A {
+object CompanionForTrait
+  trait A
     A. /*ref*/ x
-  }
-  object A {
+  object A
     private val x = 34
-  }
-}
 //true

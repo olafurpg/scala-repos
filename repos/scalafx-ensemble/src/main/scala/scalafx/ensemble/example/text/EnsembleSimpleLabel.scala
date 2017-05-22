@@ -37,18 +37,14 @@ import scalafx.scene.layout.VBox
   *
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleSimpleLabel extends EnsembleExample {
+class EnsembleSimpleLabel extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     padding = Insets(20)
-    children = new Label {
+    children = new Label
       text = "A simple label with a graphic on the left."
-      graphic = new ImageView {
+      graphic = new ImageView
         image = new Image(
             this.getClass
               .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
-      }
       contentDisplay = ContentDisplay.Left
-    }
-  }
-}

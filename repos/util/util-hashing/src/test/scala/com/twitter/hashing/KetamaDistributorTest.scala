@@ -9,8 +9,8 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class KetamaDistributorTest extends WordSpec {
-  "KetamaDistributor" should {
+class KetamaDistributorTest extends WordSpec
+  "KetamaDistributor" should
     val nodes = Seq(
         KetamaNode("10.0.1.1", 600, 1),
         KetamaNode("10.0.1.2", 300, 2),
@@ -26,7 +26,7 @@ class KetamaDistributorTest extends WordSpec {
     val ketamaDistributor = new KetamaDistributor(nodes, 160)
     val ketamaDistributorInoldLibMemcachedVersionComplianceMode =
       new KetamaDistributor(nodes, 160, true)
-    "pick the correct node with ketama hash function" in {
+    "pick the correct node with ketama hash function" in
       // Test from Smile's KetamaNodeLocatorSpec.scala
 
       // Load known good results (key, hash(?), continuum ceiling(?), IP)
@@ -35,21 +35,20 @@ class KetamaDistributorTest extends WordSpec {
       val reader = new BufferedReader(new InputStreamReader(stream))
       val expected = new mutable.ListBuffer[Array[String]]
       var line: String = null
-      do {
+      do
         line = reader.readLine
-        if (line != null) {
+        if (line != null)
           val segments = line.split(" ")
           assert(segments.length == 4)
           expected += segments
-        }
-      } while (line != null)
+      while (line != null)
       assert(expected.size == 99)
 
       // Test that ketamaClient.clientOf(key) == expected IP
-      val handleToIp = nodes.map { n =>
+      val handleToIp = nodes.map  n =>
         n.handle -> n.identifier
-      }.toMap
-      for (testcase <- expected) {
+      .toMap
+      for (testcase <- expected)
         val hash = KeyHasher.KETAMA.hashKey(testcase(0).getBytes)
 
         val handle = ketamaDistributor.nodeForHash(hash)
@@ -60,10 +59,8 @@ class KetamaDistributorTest extends WordSpec {
         val resultIp2 = handleToIp(handle2)
         assert(testcase(3) == resultIp)
         assert(testcase(3) == resultIp2)
-      }
-    }
 
-    "pick the correct node with 64-bit hash values" in {
+    "pick the correct node with 64-bit hash values" in
       val knownGoodValues = Map(
           -166124121512512L -> 5,
           8796093022208L -> 3,
@@ -72,11 +69,7 @@ class KetamaDistributorTest extends WordSpec {
           -9515121512312L -> 5
       )
 
-      knownGoodValues foreach {
+      knownGoodValues foreach
         case (key, node) =>
           val handle = ketamaDistributor.nodeForHash(key)
           assert(handle == node)
-      }
-    }
-  }
-}

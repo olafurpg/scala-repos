@@ -32,7 +32,7 @@ import javafx.{geometry => jfxg}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/VPos.html javafx.geometry.VPos]] */
-object VPos extends SFXEnumDelegateCompanion[jfxg.VPos, VPos] {
+object VPos extends SFXEnumDelegateCompanion[jfxg.VPos, VPos]
 
   /** Indicates baseline vertical position. */
   val Baseline = new VPos(jfxg.VPos.BASELINE)
@@ -59,7 +59,6 @@ object VPos extends SFXEnumDelegateCompanion[jfxg.VPos, VPos] {
 
   protected override def unsortedValues: Array[VPos] =
     Array(Top, Center, Baseline, Bottom)
-}
 
 sealed case class VPos(override val delegate: jfxg.VPos)
     extends SFXEnumDelegate[jfxg.VPos]

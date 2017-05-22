@@ -27,33 +27,29 @@ import breeze.linalg._
   * @author stucchio
   */
 @RunWith(classOf[JUnitRunner])
-class FinancialTest extends FunSuite {
+class FinancialTest extends FunSuite
 
   val DOUBLE_ROUND5_MIN = 1E-5;
 
-  test("NetPresentValue") {
+  test("NetPresentValue")
     assert(netPresentValue(1.0, Seq(1)) == 1.0)
     assert(netPresentValue(1.0, Seq(1, 1)) == 1.5)
     assert(netPresentValue(1.0, Seq(1, 1, 1)) == 1.75)
     assert(netPresentValue(1.0, Seq(1, 1, 2)) == 2.0)
-  }
-  test("FutureValue") {
+  test("FutureValue")
     assert(
         math.abs(futureValue(0.05 / 12, 10 * 12, -100, -100) - 15692.92889) < 1e-5)
     assert(futureValue(0.0, 3, 1, 1) == -4.0)
-  }
-  test("presentValue") {
+  test("presentValue")
     assert(math.abs(presentValue(0.05 / 12, 10 * 12, -100, 15692.93) -
             -100.0006713) < 1e-5)
     assert(presentValue(0, 3, 1, 1) == -4.0)
-  }
-  test("payment") {
+  test("payment")
     assert(math.abs(payment(0.075 / 12, 12 * 15, 200000, 0) -
             -1854.0247200054619) < 1e-5)
     assert(math.abs(payment(0.0, 10, 1100, -100) - -100.0) < 1e-5)
-  }
 
-  test("principal vs interest payments") {
+  test("principal vs interest payments")
     val (principal, interest, remainingPrincipal) =
       principalInterest(0.0824 / 12, 12, 2500.0)
 
@@ -97,9 +93,8 @@ class FinancialTest extends FunSuite {
     assert(norm(expectedRemainingPrincipal - remainingPrincipal) < 2e-1)
     assert(norm(expectedPrincipalPayment - principal) < 1e-1)
     assert(norm(expectedInterestPayment - interest) < 1e-1)
-  }
 
-  test("IRR vs MIRR") {
+  test("IRR vs MIRR")
 
     //Some(0.2809484211599611)
     var expectNormalIRR = DenseVector[Double](-100, 39, 59, 55, 20);
@@ -126,9 +121,8 @@ class FinancialTest extends FunSuite {
     val withMultiNegMIRR = modifiedInternalRateReturn(
         DenseVector[Double](-180, 42, 39, -50, 40, 32, 48), 0.08, 0.11);
     assert(math.abs(withMultiNegMIRR - 0.0303) < DOUBLE_ROUND5_MIN)
-  }
 
-  test("number periodic vs solve rate of annuity") {
+  test("number periodic vs solve rate of annuity")
 
     val normalRate = 0.07 / 12 //~0.00583191332402286
     val expectNormal = numberPeriodicPayments(normalRate, -150, 8000)
@@ -141,5 +135,3 @@ class FinancialTest extends FunSuite {
     val expectNormalRate =
       ratePeriodicPayments(expectNormal, -150, 8000, 0).get
     assert(math.abs(expectNormalRate - normalRate) < DOUBLE_ROUND5_MIN)
-  }
-}

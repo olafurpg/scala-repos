@@ -23,6 +23,5 @@ package kafka.common
   * the produce request.
   */
 class RequestTimedOutException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

@@ -31,7 +31,7 @@ import scalaz.syntax.monad._
 class TestAccountFinder[M[+ _]](
     accountIds: Map[APIKey, AccountId], accounts: Map[AccountId, Account])(
     implicit val M: Monad[M])
-    extends AccountFinder[M] {
+    extends AccountFinder[M]
   def findAccountByAPIKey(apiKey: APIKey): M[Option[AccountId]] =
     M.point(accountIds.get(apiKey))
 
@@ -40,9 +40,8 @@ class TestAccountFinder[M[+ _]](
 
   def findAccountDetailsById(accountId: AccountId): M[Option[AccountDetails]] =
     M.point(accounts.get(accountId).map(AccountDetails.from(_)))
-}
 
-object TestAccounts {
+object TestAccounts
   def newAccountId() = java.util.UUID.randomUUID.toString.toUpperCase
 
   def createAccount[M[+ _]: Monad](email: String,
@@ -51,12 +50,12 @@ object TestAccounts {
                                    plan: AccountPlan,
                                    parentId: Option[AccountId],
                                    profile: Option[JValue])(
-      f: AccountId => M[APIKey]): M[Account] = {
-    for {
+      f: AccountId => M[APIKey]): M[Account] =
+    for
       accountId <- newAccountId().point[M]
       path = Path(accountId)
       apiKey <- f(accountId)
-    } yield {
+    yield
       val salt = Account.randomSalt()
       Account(accountId,
               email,
@@ -69,7 +68,4 @@ object TestAccounts {
               None,
               None,
               profile)
-    }
-  }
-}
 // vim: set ts=4 sw=4 et:

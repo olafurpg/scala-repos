@@ -4,8 +4,8 @@ import com.typesafe.slick.testkit.util.ShouldNotTypecheck
 import slick.jdbc.H2Profile.api._
 import slick.lifted.{Shape, ShapeLevel}
 
-class NestedShapesTest {
-  def legal = {
+class NestedShapesTest
+  def legal =
     // Flat and Nested alike, only Mixed specified
     implicitly[Shape[FlatShapeLevel, Int, _, _]]
     implicitly[Shape[FlatShapeLevel, (Int, String), _, _]]
@@ -80,7 +80,6 @@ class NestedShapesTest {
                      (Int, Seq[(Int, String)]),
                      (ConstColumn[Int],
                      Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 8
-  }
 
   def illegal1 =
     ShouldNotTypecheck(
@@ -137,4 +136,3 @@ class NestedShapesTest {
       implicitly[Shape[FlatShapeLevel, (Int, Query[(Rep[Int], Rep[String]), (Int, String), Seq]), (Int, Seq[(Int, String)]), (ConstColumn[Int], Query[(Rep[Int], Rep[String]), (Int, String), Seq])]] // 8
     """,
         "No matching Shape.*")
-}

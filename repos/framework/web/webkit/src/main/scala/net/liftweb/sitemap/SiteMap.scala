@@ -29,7 +29,7 @@ class SiteMapException(msg: String) extends Exception(msg)
 case class SiteMap(
     globalParamFuncs: List[PartialFunction[Box[Req], Loc.AnyLocParam]],
     private val convertablekids: ConvertableToMenu*)
-    extends HasKids {
+    extends HasKids
   import SiteMap._
 
   lazy val kids: Seq[Menu] = convertablekids.map(_.toMenu)
@@ -50,7 +50,7 @@ case class SiteMap(
   kids.foreach(_.init(this))
   kids.foreach(_.validate)
 
-  private[sitemap] def addLoc(in: Loc[_]) {
+  private[sitemap] def addLoc(in: Loc[_])
     val name = in.name
     if (locs.isDefinedAt(name))
       throw new SiteMapException(
@@ -63,13 +63,11 @@ case class SiteMap(
           "Location " + name + " defines a duplicate link " + in.link.uriList)
 
     if (!in.link.external_?) locPath += in.link.uriList
-  }
 
-  def globalParams: List[Loc.AnyLocParam] = {
+  def globalParams: List[Loc.AnyLocParam] =
     val r = S.request
 
     globalParamFuncs.flatMap(f => if (f.isDefinedAt(r)) List(f(r)) else Nil)
-  }
 
   def findLoc(name: String): Box[Loc[_]] = Box(locs.get(name))
 
@@ -82,43 +80,38 @@ case class SiteMap(
   def locForGroup(group: String): Seq[Loc[_]] =
     kids
       .flatMap(_.locForGroup(group))
-      .filter(_.testAccess match {
+      .filter(_.testAccess match
         case Left(true) => true
         case _ => false
-      })
+      )
 
   /**
     * Find all the menu items for a given group.
     * This method returns menu tree
     */
-  def menuForGroup(group: String): CompleteMenu = {
+  def menuForGroup(group: String): CompleteMenu =
     CompleteMenu(kids.flatMap(_.makeMenuItem(Nil, group)))
-  }
 
   lazy val menus: List[Menu] = locs.valuesIterator.map(_.menu).toList
 
   /**
     * Build a menu based on the current location
     */
-  def buildMenu(current: Box[Loc[_]]): CompleteMenu = {
-    val path: List[Loc[_]] = current match {
+  def buildMenu(current: Box[Loc[_]]): CompleteMenu =
+    val path: List[Loc[_]] = current match
       case Full(loc) => loc.breadCrumbs
       case _ => Nil
-    }
     CompleteMenu(kids.flatMap(_.makeMenuItem(path)))
-  }
-}
 
 /**
   * The bridge to get the SiteMap singleton
   */
-final class SiteMapJBridge {
+final class SiteMapJBridge
   def siteMap(): SiteMapSingleton = SiteMap
-}
 
 object SiteMap extends SiteMapSingleton
 
-sealed class SiteMapSingleton {
+sealed class SiteMapSingleton
 
   /**
     * By default, Lift enforced unique links in a SiteMap.  However, you
@@ -145,19 +138,16 @@ sealed class SiteMapSingleton {
   def sitemapMutator(pf: PartialFunction[Menu, List[Menu]])(
       or: SiteMap => SiteMap): SiteMap => SiteMap =
     (sm: SiteMap) =>
-      {
         var fired = false
 
         def theFunc: Menu => List[Menu] =
           (menu: Menu) =>
-            {
-              if (fired) {
+              if (fired)
                 List(menu)
-              } else if (pf.isDefinedAt(menu)) {
+              else if (pf.isDefinedAt(menu))
                 fired = true
                 pf(menu)
-              } else List(menu.rebuild(doAMenuItem _))
-          }
+              else List(menu.rebuild(doAMenuItem _))
 
         def doAMenuItem(in: List[Menu]): List[Menu] =
           in.flatMap(theFunc)
@@ -165,7 +155,6 @@ sealed class SiteMapSingleton {
         val ret = sm.rebuild(_.flatMap(theFunc))
 
         if (fired) ret else or(sm)
-    }
 
   /**
     * Builds a function that successively tests the partial function against the Menu.  If the PartialFunction is
@@ -202,9 +191,8 @@ sealed class SiteMapSingleton {
     * </pre></code>
     * </p>
     */
-  trait UnapplyLocMatcher {
+  trait UnapplyLocMatcher
     def unapply(menu: Menu): Option[Menu]
-  }
 
   /**
     * <p>
@@ -221,33 +209,29 @@ sealed class SiteMapSingleton {
     */
   def buildMenuMatcher(
       matchFunc: Loc.LocParam[_] => Boolean): UnapplyLocMatcher =
-    new UnapplyLocMatcher {
+    new UnapplyLocMatcher
       def unapply(menu: Menu): Option[Menu] =
         menu.loc.params.find(matchFunc).map(ignore => menu)
-    }
 
   def findAndTestLoc(name: String): Box[Loc[_]] =
     findLoc(name).flatMap(
         l =>
-          l.testAccess match {
+          l.testAccess match
         case Left(true) => Full(l)
         case _ => Empty
-    })
+    )
 
-  def buildLink(name: String, text: NodeSeq): NodeSeq = {
-    val options = for {
+  def buildLink(name: String, text: NodeSeq): NodeSeq =
+    val options = for
       loc <- findAndTestLoc(name).toList
       link <- loc.createDefaultLink
-    } yield {
-      val linkText = text match {
+    yield
+      val linkText = text match
         case x if x.length > 0 => x
         case _ => loc.linkText openOr Text(loc.name)
-      }
       <a href={link}>{linkText}</a>
-    }
 
     options.headOption getOrElse NodeSeq.Empty
-  }
 
   def buildLink(name: String): NodeSeq = buildLink(name, Nil)
 
@@ -265,9 +249,8 @@ sealed class SiteMapSingleton {
     * is not running in the root context.
     */
   @volatile var rawIndex_? = false
-}
 
-trait HasKids {
+trait HasKids
   def kids: Seq[Menu]
   def buildUpperLines(pathAt: HasKids,
                       actual: Menu,
@@ -277,4 +260,3 @@ trait HasKids {
 
   private[sitemap] def testAccess: Either[Boolean, Box[() => LiftResponse]] =
     Left(true)
-}

@@ -18,22 +18,18 @@ import scala.concurrent.Future
   * This solves the issue of the ObjectMapper cache from holding references to the application class loader between
   * reloads.
   */
-class ObjectMapperModule extends Module {
+class ObjectMapperModule extends Module
 
   def bindings(environment: Environment, configuration: Configuration) = Seq(
       bind[ObjectMapper].toProvider[ObjectMapperProvider].eagerly()
   )
-}
 
 @Singleton
 class ObjectMapperProvider @Inject()(lifecycle: ApplicationLifecycle)
-    extends Provider[ObjectMapper] {
-  lazy val get = {
+    extends Provider[ObjectMapper]
+  lazy val get =
     val objectMapper = Json.newDefaultMapper()
     Json.setObjectMapper(objectMapper)
-    lifecycle.addStopHook { () =>
+    lifecycle.addStopHook  () =>
       Future.successful(Json.setObjectMapper(null))
-    }
     objectMapper
-  }
-}

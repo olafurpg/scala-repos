@@ -12,7 +12,7 @@ import java.io.File
 
 import org.apache.tools.ant.types.Path
 
-class Settings {
+class Settings
 
   private var gBf: Option[String] = None
   def g = gBf.get
@@ -96,7 +96,7 @@ class Settings {
                                                                                                                                                                    else
                                                                                                                                                                      Nil) ::: extraParamsBf.toList
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case cs: Settings =>
       this.gBf == cs.gBf && this.uncheckedBf == cs.uncheckedBf &&
       this.classpathBf == cs.classpathBf &&
@@ -108,7 +108,6 @@ class Settings {
       this.optimiseBf == cs.optimiseBf &&
       this.extraParamsBf == cs.extraParamsBf
     case _ => false
-  }
 
   override lazy val hashCode: Int = Seq[Any](
       gBf,
@@ -124,4 +123,3 @@ class Settings {
       optimiseBf,
       extraParamsBf
   ).##
-}

@@ -16,42 +16,40 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
   * @author Alexander Podkhalyuzin
   *                         Date: 07.03.2008
   */
-trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
+trait ScAnnotations extends ScalaPsiElement with PsiReferenceList
   def getReferenceElements = Array[PsiJavaCodeReferenceElement]()
 
   def foldFuns(initial: Any)(fail: Any)(
-      l: List[PartialFunction[Any, _]]): Any = l match {
+      l: List[PartialFunction[Any, _]]): Any = l match
     case h :: t =>
       if (h.isDefinedAt(initial)) foldFuns(h(initial))(fail)(t) else fail
     case Nil => initial
-  }
 
   // todo rewrite via continuations
-  private def getExceptionTypes: Array[PsiClassType] = {
+  private def getExceptionTypes: Array[PsiClassType] =
     val annotations = getAnnotations
     annotations.map(extractExceptionType _).filter(_ != null)
-  }
 
-  private def extractExceptionType(a: ScAnnotation): PsiClassType = {
+  private def extractExceptionType(a: ScAnnotation): PsiClassType =
     val constr = a.annotationExpr.constr
-    constr.typeElement match {
+    constr.typeElement match
       case te: ScSimpleTypeElement =>
-        te.reference match {
+        te.reference match
           case Some(ref) =>
-            ref.bind() match {
+            ref.bind() match
               case Some(r: ScalaResolveResult)
                   if r.getActualElement.isInstanceOf[PsiClass] && r.getActualElement
                     .asInstanceOf[PsiClass]
                     .qualifiedName == "scala.throws" =>
-                constr.args match {
+                constr.args match
                   case Some(args) if args.exprs.length == 1 =>
-                    args.exprs(0).getType(TypingContext.empty) match {
+                    args.exprs(0).getType(TypingContext.empty) match
                       case Success(ScParameterizedType(tp, arg), _)
                           if arg.length == 1 =>
-                        ScType.extractClass(tp, Some(getProject)) match {
+                        ScType.extractClass(tp, Some(getProject)) match
                           case Some(clazz)
                               if clazz.qualifiedName == "java.lang.Class" =>
-                            ScType.extractClass(arg(0), Some(getProject)) match {
+                            ScType.extractClass(arg(0), Some(getProject)) match
                               case Some(p) =>
                                 JavaPsiFacade
                                   .getInstance(getProject)
@@ -60,20 +58,12 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
                                       p.qualifiedName,
                                       GlobalSearchScope.allScope(getProject))
                               case _ => null
-                            }
                           case _ => null
-                        }
                       case _ => null
-                    }
                   case _ => null
-                }
               case _ => null
-            }
           case _ => null
-        }
       case _ => null
-    }
-  }
 
   def getReferencedTypes = getExceptionTypes
 
@@ -81,4 +71,3 @@ trait ScAnnotations extends ScalaPsiElement with PsiReferenceList {
   def getRole = PsiReferenceList.Role.THROWS_LIST
 
   def getAnnotations: Array[ScAnnotation]
-}

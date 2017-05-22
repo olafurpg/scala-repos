@@ -30,7 +30,7 @@ import java.lang.Integer.{rotateLeft ⇒ rotl}
   *  incorporate a new integer) to update the values.  Only one method
   *  needs to be called to finalize the hash.
   */
-object MurmurHash {
+object MurmurHash
   // Magic values used for MurmurHash's 32 bit hash.
   // Don't change these without consulting a hashing expert!
   final private val visibleMagic: Int = 0x971e137b
@@ -82,68 +82,60 @@ object MurmurHash {
   def nextMagicB(magicB: Int): Int = magicB * 5 + hiddenMixerB
 
   /** Once all hashes have been incorporated, this performs a final mixing */
-  def finalizeHash(hash: Int): Int = {
+  def finalizeHash(hash: Int): Int =
     var i = (hash ^ (hash >>> 16))
     i *= finalMixer1
     i ^= (i >>> 13)
     i *= finalMixer2
     i ^= (i >>> 16)
     i
-  }
 
   /** Compute a high-quality hash of an array */
-  def arrayHash[@specialized T](a: Array[T]): Int = {
+  def arrayHash[@specialized T](a: Array[T]): Int =
     var h = startHash(a.length * seedArray)
     var c = hiddenMagicA
     var k = hiddenMagicB
     var j = 0
-    while (j < a.length) {
+    while (j < a.length)
       h = extendHash(h, a(j).##, c, k)
       c = nextMagicA(c)
       k = nextMagicB(k)
       j += 1
-    }
     finalizeHash(h)
-  }
 
   /** Compute a high-quality hash of a string */
-  def stringHash(s: String): Int = {
+  def stringHash(s: String): Int =
     var h = startHash(s.length * seedString)
     var c = hiddenMagicA
     var k = hiddenMagicB
     var j = 0
-    while (j + 1 < s.length) {
+    while (j + 1 < s.length)
       val i = (s.charAt(j) << 16) + s.charAt(j + 1);
       h = extendHash(h, i, c, k)
       c = nextMagicA(c)
       k = nextMagicB(k)
       j += 2
-    }
     if (j < s.length) h = extendHash(h, s.charAt(j), c, k)
     finalizeHash(h)
-  }
 
   /**
     * Compute a hash that is symmetric in its arguments--that is,
     *  where the order of appearance of elements does not matter.
     *  This is useful for hashing sets, for example.
     */
-  def symmetricHash[T](xs: TraversableOnce[T], seed: Int): Int = {
+  def symmetricHash[T](xs: TraversableOnce[T], seed: Int): Int =
     var a, b, n = 0
     var c = 1
     xs.foreach(
         i ⇒
-          {
         val h = i.##
         a += h
         b ^= h
         if (h != 0) c *= h
         n += 1
-    })
+    )
     var h = startHash(seed * n)
     h = extendHash(h, a, storedMagicA(0), storedMagicB(0))
     h = extendHash(h, b, storedMagicA(1), storedMagicB(1))
     h = extendHash(h, c, storedMagicA(2), storedMagicB(2))
     finalizeHash(h)
-  }
-}

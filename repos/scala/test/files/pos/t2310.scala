@@ -1,6 +1,6 @@
 import scala.Stream._
 
-object consistencyError {
+object consistencyError
   /* this gives an error:
   Consistency problem compiling (virtual file)!
   Trying to call method body%1(List(scala.collection.immutable.Stream[A])) with arguments (List(tp2, temp6, temp5))
@@ -20,10 +20,9 @@ object consistencyError {
   bx = 1
   label.tpe = (val rs: scala.collection.immutable.Stream[A])None.type
    */
-  def crash[A](lefts: Stream[A], rights: Stream[A]) = (lefts, rights) match {
+  def crash[A](lefts: Stream[A], rights: Stream[A]) = (lefts, rights) match
     case (Stream.Empty, Stream.Empty) => None
     case (l #:: ls, rs) => None
-  }
 
   // These work
   // def works1[A](lefts: Stream[A]) = lefts match {
@@ -35,4 +34,3 @@ object consistencyError {
   //   case (Stream.Empty, Stream.Empty) => None
   //   case (ls, rs) => None
   // }
-}

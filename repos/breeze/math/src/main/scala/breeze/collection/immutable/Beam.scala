@@ -27,61 +27,52 @@ import scala.collection.generic._
   * @author dlwh
   */
 class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
-    extends Iterable[T] with IterableLike[T, Beam[T]] { outer =>
+    extends Iterable[T] with IterableLike[T, Beam[T]]  outer =>
   assert(maxSize >= 0)
   val heap = trim(BinomialHeap(xs: _*))
 
   override def size = heap.size
   def this(maxSize: Int)(implicit o: Ordering[T]) = this(maxSize, Nil: _*)(o)
 
-  private def trim(h2: BinomialHeap[T]) = {
+  private def trim(h2: BinomialHeap[T]) =
     var h = h2
-    while (h.size > maxSize) {
+    while (h.size > maxSize)
       h = h.delMin
-    }
     h
-  }
 
-  private def cat(h: BinomialHeap[T], x: T) = {
+  private def cat(h: BinomialHeap[T], x: T) =
     if (h.size < maxSize) h + x
     else if (o.compare(h.min, x) < 0) h.delMin + x
     else h
-  }
 
-  override protected def newBuilder = new Builder[T, Beam[T]] {
+  override protected def newBuilder = new Builder[T, Beam[T]]
     var beam: Beam[T] = new Beam(maxSize)
     def result() = beam
 
     def clear() = beam = new Beam(maxSize)
 
     def +=(elem: T) = { beam += elem; this }
-  }
 
-  def +(x: T) = new Beam[T](maxSize) {
+  def +(x: T) = new Beam[T](maxSize)
     override val heap = cat(outer.heap, x)
-  }
 
   def iterator = heap.iterator
   override def toString() = iterator.mkString("Beam(", ",", ")")
 
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case b: Beam[T @unchecked] =>
       (maxSize == b.maxSize) && this.iterator.sameElements(b.iterator)
     case _ => false
-  }
 
   def min = heap.head
   def best = heap.reduceOption(o.max(_, _))
-}
 
-object Beam {
+object Beam
   def apply[T : Ordering](maxSize: Int)(items: T*): Beam[T] =
     new Beam(maxSize, items: _*)
 
   implicit def canBuildFrom[T : Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
-    new CanBuildFrom[Beam[T], T, Beam[T]] {
+    new CanBuildFrom[Beam[T], T, Beam[T]]
       def apply() = sys.error("Sorry, need a max size")
 
       def apply(from: Beam[T]) = from.newBuilder
-    }
-}

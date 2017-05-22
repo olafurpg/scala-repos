@@ -37,7 +37,7 @@ import scalafx.collections.ObservableBuffer
   * [[https://github.com/scalafx/scalafx/issues/169#issuecomment-67577800]]
   *
   */
-object Example3App extends App {
+object Example3App extends App
 
   val items: ObservableBuffer[jfxc.ObservableList[String]] =
     new ObservableBuffer(
@@ -47,9 +47,8 @@ object Example3App extends App {
 
   items.onChange(
       (_, changes) =>
-        {
       println(s"onChange(_, $changes")
-      for (change <- changes) change match {
+      for (change <- changes) change match
         case ObservableBuffer.Add(_, _) => println(s"  case Add: $change")
         case ObservableBuffer.Remove(_, _) =>
           println(s"  case Remove: $change")
@@ -57,8 +56,7 @@ object Example3App extends App {
           println(s"  case Reorder: $change")
         case ObservableBuffer.Update(_, _) =>
           println(s"  case Update: $change")
-      }
-  })
+  )
 
   // Should produce `Add` notification
   println("items += ObservableBuffer(\"test\")")
@@ -70,4 +68,3 @@ object Example3App extends App {
   println("items(0) += \"update\"")
   items(0) += "update"
   println("Items: " + items)
-}

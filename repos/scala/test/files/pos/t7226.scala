@@ -1,4 +1,4 @@
-trait HK {
+trait HK
   type Rep [X]
 
   // okay
@@ -17,10 +17,8 @@ trait HK {
   def unzipHKRet[A, C[_]](ps: Rep[C[A]]): Rep[C[Int]]
   def rls: Rep[List[String]]
   unzipHKRet(rls)
-}
 
-trait HK1 {
+trait HK1
   type Rep [A]
   def unzip1[A, B, C[_]](ps: Rep[C[(A, B)]]): (Rep[C[A]], Rep[C[B]])
   def doUnzip1[A, B](ps: Rep[List[(A, B)]]) = unzip1(ps)
-}

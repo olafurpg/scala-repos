@@ -17,7 +17,7 @@ import java.lang.String.{valueOf => println}
 import akka.actor.ActorRef
 
 //#typed-actor-iface
-trait Squarer {
+trait Squarer
   //#typed-actor-iface-methods
   def squareDontCare(i: Int): Unit //fire-forget
 
@@ -30,11 +30,10 @@ trait Squarer {
   @throws(classOf[Exception]) //declare it or you will get an UndeclaredThrowableException
   def squareTry(i: Int): Int //blocking send-request-reply with possible exception
   //#typed-actor-iface-methods
-}
 //#typed-actor-iface
 
 //#typed-actor-impl
-class SquarerImpl(val name: String) extends Squarer {
+class SquarerImpl(val name: String) extends Squarer
 
   def this() = this("default")
   //#typed-actor-impl-methods
@@ -48,40 +47,35 @@ class SquarerImpl(val name: String) extends Squarer {
 
   def squareTry(i: Int): Int = throw new Exception("Catch me!")
   //#typed-actor-impl-methods
-}
 //#typed-actor-impl
 //#typed-actor-supercharge
-trait Foo {
+trait Foo
   def doFoo(times: Int): Unit = println("doFoo(" + times + ")")
-}
 
-trait Bar {
+trait Bar
   def doBar(str: String): Future[String] =
     Future.successful(str.toUpperCase)
-}
 
 class FooBar extends Foo with Bar
 //#typed-actor-supercharge
 
 //#typed-router-types
-trait HasName {
+trait HasName
   def name(): String
-}
 
-class Named extends HasName {
+class Named extends HasName
   import scala.util.Random
   private val id = Random.nextInt(1024)
 
   def name(): String = "name-" + id
-}
 //#typed-router-types
 
-class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
+class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO"))
 
-  "get the TypedActor extension" in {
+  "get the TypedActor extension" in
     val someReference: AnyRef = null
 
-    try {
+    try
       //#typed-actor-extension-tools
 
       import akka.actor.TypedActor
@@ -109,12 +103,10 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
       TypedActor(TypedActor.context)
 
       //#typed-actor-extension-tools
-    } catch {
+    catch
       case e: Exception => //dun care
-    }
-  }
 
-  "create a typed actor" in {
+  "create a typed actor" in
     //#typed-actor-create1
     val mySquarer: Squarer =
       TypedActor(system).typedActorOf(TypedProps[SquarerImpl]())
@@ -155,31 +147,27 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
     //#typed-actor-poisonpill
     TypedActor(system).poisonPill(otherSquarer)
     //#typed-actor-poisonpill
-  }
 
-  "proxy any ActorRef" in {
+  "proxy any ActorRef" in
     val actorRefToRemoteActor: ActorRef = system.deadLetters
     //#typed-actor-remote
     val typedActor: Foo with Bar = TypedActor(system).typedActorOf(
         TypedProps[FooBar], actorRefToRemoteActor)
     //Use "typedActor" as a FooBar
     //#typed-actor-remote
-  }
 
-  "create hierarchies" in {
-    try {
+  "create hierarchies" in
+    try
       //#typed-actor-hierarchy
       //Inside your Typed Actor
       val childSquarer: Squarer =
         TypedActor(TypedActor.context).typedActorOf(TypedProps[SquarerImpl]())
       //Use "childSquarer" as a Squarer
       //#typed-actor-hierarchy
-    } catch {
+    catch
       case e: Exception => //ignore
-    }
-  }
 
-  "supercharge" in {
+  "supercharge" in
     //#typed-actor-supercharge-usage
     val awesomeFooBar: Foo with Bar =
       TypedActor(system).typedActorOf(TypedProps[FooBar]())
@@ -190,9 +178,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
     TypedActor(system).poisonPill(awesomeFooBar)
     //#typed-actor-supercharge-usage
     Await.result(f, 3.seconds) should be("YES")
-  }
 
-  "typed router pattern" in {
+  "typed router pattern" in
     //#typed-router
     def namedActor(): HasName =
       TypedActor(system).typedActorOf(TypedProps[Named]())
@@ -200,9 +187,8 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
     // prepare routees
     val routees: List[HasName] = List.fill(5) { namedActor() }
     val routeePaths =
-      routees map { r =>
+      routees map  r =>
         TypedActor(system).getActorRefFor(r).path.toStringWithoutAddress
-      }
 
     // prepare untyped router
     val router: ActorRef = system.actorOf(RoundRobinGroup(routeePaths).props())
@@ -219,5 +205,3 @@ class TypedActorDocSpec extends AkkaSpec(Map("akka.loglevel" -> "INFO")) {
 
     routees foreach { TypedActor(system).poisonPill(_) }
     TypedActor(system).poisonPill(router)
-  }
-}

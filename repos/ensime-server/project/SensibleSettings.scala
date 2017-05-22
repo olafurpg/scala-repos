@@ -10,7 +10,7 @@ import com.typesafe.sbt.SbtScalariform._
   *
   * TODO: integrate / contribute to the typelevel sbt plugin.
   */
-object Sensible {
+object Sensible
 
   lazy val settings =
     Seq(
@@ -31,15 +31,15 @@ object Sensible {
             //"-Ywarn-numeric-widen", // noisy
             //"-Ywarn-value-discard", // will require a lot of work
             "-Xfuture"
-        ) ++ {
+        ) ++
           if (scalaVersion.value.startsWith("2.11"))
             Seq("-Ywarn-unused-import")
           else Nil
-        } ++ {
+        ++
           // fatal warnings can get in the way during the DEV cycle
           if (sys.env.contains("CI")) Seq("-Xfatal-warnings")
           else Nil
-        },
+        ,
         javacOptions in (Compile, compile) ++= Seq(
             "-source",
             "1.6",
@@ -88,7 +88,7 @@ object Sensible {
           envVars,
           javaHome,
           connectInput
-      ).map { (tests, base, options, strategy, env, javaHomeDir, connectIn) =>
+      ).map  (tests, base, options, strategy, env, javaHomeDir, connectIn) =>
         val opts = ForkOptions(
             bootJars = Nil,
             javaHome = javaHomeDir,
@@ -98,10 +98,9 @@ object Sensible {
             workingDirectory = Some(base),
             envVars = env
         )
-        tests.map { test =>
+        tests.map  test =>
           Tests.Group(test.name, Seq(test), Tests.SubProcess(opts))
-        }
-      },
+      ,
       testOptions ++= noColorIfEmacs,
       testFrameworks := Seq(TestFrameworks.ScalaTest, TestFrameworks.JUnit)
   )
@@ -118,10 +117,10 @@ object Sensible {
       compilerPlugin(
           "org.scalamacros" % "paradise" % "2.0.1" cross CrossVersion.full)
   )
-  def shapeless(scalaVersion: String) = {
+  def shapeless(scalaVersion: String) =
     if (scalaVersion.startsWith("2.10.")) macroParadise
     else Nil
-  } :+ "com.chuusai" %% "shapeless" % "2.3.0"
+  :+ "com.chuusai" %% "shapeless" % "2.3.0"
   val logback = Seq(
       "ch.qos.logback" % "logback-classic" % "1.1.5",
       "org.slf4j" % "slf4j-api" % logbackVersion,
@@ -146,12 +145,11 @@ object Sensible {
   // e.g. YOURKIT_AGENT=/opt/yourkit/bin/linux-x86-64/libyjpagent.so
   val yourkitAgent = Properties
     .envOrNone("YOURKIT_AGENT")
-    .map { name =>
+    .map  name =>
       val agent = file(name)
       require(agent.exists(),
               s"Yourkit agent specified ($agent) does not exist")
       Seq(s"-agentpath:${agent.getCanonicalPath}")
-    }
     .getOrElse(Nil)
 
   // WORKAROUND: https://github.com/scalatest/scalatest/issues/511
@@ -159,4 +157,3 @@ object Sensible {
     if (sys.env.get("INSIDE_EMACS").isDefined)
       Seq(Tests.Argument(TestFrameworks.ScalaTest, "-oWF"))
     else Seq(Tests.Argument(TestFrameworks.ScalaTest, "-oF"))
-}

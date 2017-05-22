@@ -28,29 +28,25 @@ import org.apache.spark.sql.Row
 
 class IDFSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  def scaleDataWithIDF(dataSet: Array[Vector], model: Vector): Array[Vector] = {
-    dataSet.map {
+  def scaleDataWithIDF(dataSet: Array[Vector], model: Vector): Array[Vector] =
+    dataSet.map
       case data: DenseVector =>
         val res = data.toArray.zip(model.toArray).map { case (x, y) => x * y }
         Vectors.dense(res)
       case data: SparseVector =>
-        val res = data.indices.zip(data.values).map {
+        val res = data.indices.zip(data.values).map
           case (id, value) =>
             (id, value * model(id))
-        }
         Vectors.sparse(data.size, res)
-    }
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new IDF)
     val model = new IDFModel("idf", new OldIDFModel(Vectors.dense(1.0)))
     ParamsSuite.checkParams(model)
-  }
 
-  test("compute IDF with default parameter") {
+  test("compute IDF with default parameter")
     val numOfFeatures = 4
     val data = Array(
         Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
@@ -58,9 +54,9 @@ class IDFSuite
         Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
     )
     val numOfData = data.size
-    val idf = Vectors.dense(Array(0, 3, 1, 2).map { x =>
+    val idf = Vectors.dense(Array(0, 3, 1, 2).map  x =>
       math.log((numOfData + 1.0) / (x + 1.0))
-    })
+    )
     val expected = scaleDataWithIDF(data, idf)
 
     val df = sqlContext
@@ -70,14 +66,12 @@ class IDFSuite
     val idfModel =
       new IDF().setInputCol("features").setOutputCol("idfValue").fit(df)
 
-    idfModel.transform(df).select("idfValue", "expected").collect().foreach {
+    idfModel.transform(df).select("idfValue", "expected").collect().foreach
       case Row(x: Vector, y: Vector) =>
         assert(x ~== y absTol 1e-5,
                "Transformed vector is different with expected vector.")
-    }
-  }
 
-  test("compute IDF with setter") {
+  test("compute IDF with setter")
     val numOfFeatures = 4
     val data = Array(
         Vectors.sparse(numOfFeatures, Array(1, 3), Array(1.0, 2.0)),
@@ -85,9 +79,9 @@ class IDFSuite
         Vectors.sparse(numOfFeatures, Array(1), Array(1.0))
     )
     val numOfData = data.size
-    val idf = Vectors.dense(Array(0, 3, 1, 2).map { x =>
+    val idf = Vectors.dense(Array(0, 3, 1, 2).map  x =>
       if (x > 0) math.log((numOfData + 1.0) / (x + 1.0)) else 0
-    })
+    )
     val expected = scaleDataWithIDF(data, idf)
 
     val df = sqlContext
@@ -100,27 +94,22 @@ class IDFSuite
       .setMinDocFreq(1)
       .fit(df)
 
-    idfModel.transform(df).select("idfValue", "expected").collect().foreach {
+    idfModel.transform(df).select("idfValue", "expected").collect().foreach
       case Row(x: Vector, y: Vector) =>
         assert(x ~== y absTol 1e-5,
                "Transformed vector is different with expected vector.")
-    }
-  }
 
-  test("IDF read/write") {
+  test("IDF read/write")
     val t = new IDF()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setMinDocFreq(5)
     testDefaultReadWrite(t)
-  }
 
-  test("IDFModel read/write") {
+  test("IDFModel read/write")
     val instance =
       new IDFModel("myIDFModel", new OldIDFModel(Vectors.dense(1.0, 2.0)))
         .setInputCol("myInputCol")
         .setOutputCol("myOutputCol")
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.idf === instance.idf)
-  }
-}

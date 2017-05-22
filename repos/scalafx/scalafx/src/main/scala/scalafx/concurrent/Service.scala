@@ -35,7 +35,7 @@ import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.event.EventHandlerDelegate
 
-object Service {
+object Service
   implicit def sfxService2jfx[T](s: Service[T]): jfxc.Service[T] =
     if (s != null) s.delegate else null
 
@@ -47,10 +47,9 @@ object Service {
     *           the JavaFX Application Thread.
     */
   def apply[T](op: => jfxc.Task[T]) =
-    new Service[T](new jfxc.Service[T] {
+    new Service[T](new jfxc.Service[T]
       protected def createTask = op
-    }) {}
-}
+    ) {}
 
 /**
   * Wrapper trait for [[http://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/Service.html Service]]
@@ -58,7 +57,7 @@ object Service {
   */
 abstract class Service[T](override val delegate: jfxc.Service[T])
     extends Worker[T] with jfxe.EventTarget with EventHandlerDelegate
-    with SFXDelegate[jfxc.Service[T]] {
+    with SFXDelegate[jfxc.Service[T]]
 
   def eventHandlerDelegate = delegate.asInstanceOf[EventHandled]
 
@@ -66,79 +65,68 @@ abstract class Service[T](override val delegate: jfxc.Service[T])
     * The executor to use for running this Service.
     */
   def executor: ObjectProperty[juc.Executor] = delegate.executorProperty
-  def executor_=(v: juc.Executor) {
+  def executor_=(v: juc.Executor)
     executor() = v
-  }
 
   /**
     * The onCancelled event handler is called whenever the Task state transitions to the CANCELLED
     * state.
     */
   def onCancelled = delegate.onCancelledProperty
-  def onCancelled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onCancelled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onCancelled() = v
-  }
 
   /**
     * The onFailed event handler is called whenever the Task state transitions to the FAILED state.
     */
   def onFailed = delegate.onFailedProperty
-  def onFailed_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onFailed_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onFailed() = v
-  }
 
   /**
     * The onReady event handler is called whenever the Task state transitions to the READY state.
     */
   def onReady = delegate.onReadyProperty
-  def onReady_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onReady_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onReady() = v
-  }
 
   /**
     * The onRunning event handler is called whenever the Task state transitions to the RUNNING state.
     */
   def onRunning = delegate.onRunningProperty
-  def onRunning_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onRunning_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onRunning() = v
-  }
 
   /**
     * The onSchedule event handler is called whenever the Task state transitions to the SCHEDULED
     * state.
     */
   def onScheduled = delegate.onScheduledProperty
-  def onScheduled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onScheduled_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onScheduled() = v
-  }
 
   /**
     * The onSucceeded event handler is called whenever the Task state transitions to the SUCCEEDED
     * state.
     */
   def onSucceeded = delegate.onSucceededProperty
-  def onSucceeded_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent]) {
+  def onSucceeded_=(v: jfxe.EventHandler[jfxc.WorkerStateEvent])
     onSucceeded() = v
-  }
 
   /**
     * Resets the Service.
     */
-  def reset() {
+  def reset()
     delegate.reset()
-  }
 
   /**
     * Cancels any currently running Task, if any, and restarts this Service.
     */
-  def restart() {
+  def restart()
     delegate.restart()
-  }
 
   /**
     * Starts this Service.
     */
-  def start() {
+  def start()
     delegate.start()
-  }
-}

@@ -22,25 +22,23 @@ import org.apache.spark.mllib.linalg.{DenseMatrix, Matrices, SparseMatrix, Vecto
 import org.apache.spark.mllib.recommendation.Rating
 import org.apache.spark.mllib.regression.LabeledPoint
 
-class PythonMLLibAPISuite extends SparkFunSuite {
+class PythonMLLibAPISuite extends SparkFunSuite
 
   SerDe.initialize()
 
-  test("pickle vector") {
+  test("pickle vector")
     val vectors = Seq(Vectors.dense(Array.empty[Double]),
                       Vectors.dense(0.0),
                       Vectors.dense(0.0, -2.0),
                       Vectors.sparse(0, Array.empty[Int], Array.empty[Double]),
                       Vectors.sparse(1, Array.empty[Int], Array.empty[Double]),
                       Vectors.sparse(2, Array(1), Array(-2.0)))
-    vectors.foreach { v =>
+    vectors.foreach  v =>
       val u = SerDe.loads(SerDe.dumps(v))
       assert(u.getClass === v.getClass)
       assert(u === v)
-    }
-  }
 
-  test("pickle labeled point") {
+  test("pickle labeled point")
     val points =
       Seq(LabeledPoint(0.0, Vectors.dense(Array.empty[Double])),
           LabeledPoint(1.0, Vectors.dense(0.0)),
@@ -50,25 +48,21 @@ class PythonMLLibAPISuite extends SparkFunSuite {
           LabeledPoint(
               1.0, Vectors.sparse(1, Array.empty[Int], Array.empty[Double])),
           LabeledPoint(-0.5, Vectors.sparse(2, Array(1), Array(-2.0))))
-    points.foreach { p =>
+    points.foreach  p =>
       val q = SerDe.loads(SerDe.dumps(p)).asInstanceOf[LabeledPoint]
       assert(q.label === p.label)
       assert(q.features.getClass === p.features.getClass)
       assert(q.features === p.features)
-    }
-  }
 
-  test("pickle double") {
+  test("pickle double")
     for (x <- List(
-        123.0, -10.0, 0.0, Double.MaxValue, Double.MinValue, Double.NaN)) {
+        123.0, -10.0, 0.0, Double.MaxValue, Double.MinValue, Double.NaN))
       val deser =
         SerDe.loads(SerDe.dumps(x.asInstanceOf[AnyRef])).asInstanceOf[Double]
       // We use `equals` here for comparison because we cannot use `==` for NaN
       assert(x.equals(deser))
-    }
-  }
 
-  test("pickle matrix") {
+  test("pickle matrix")
     val values = Array[Double](0, 1.2, 3, 4.56, 7, 8)
     val matrix = Matrices.dense(2, 3, values)
     val nm = SerDe.loads(SerDe.dumps(matrix)).asInstanceOf[DenseMatrix]
@@ -93,9 +87,8 @@ class PythonMLLibAPISuite extends SparkFunSuite {
                                isTransposed = true)
     val nsmt = SerDe.loads(SerDe.dumps(smt)).asInstanceOf[SparseMatrix]
     assert(smt.toArray === nsmt.toArray)
-  }
 
-  test("pickle rating") {
+  test("pickle rating")
     val rat = new Rating(1, 2, 3.0)
     val rat2 = SerDe.loads(SerDe.dumps(rat)).asInstanceOf[Rating]
     assert(rat == rat2)
@@ -105,5 +98,3 @@ class PythonMLLibAPISuite extends SparkFunSuite {
     val bytes = SerDe.dumps(rats)
     assert(bytes.toString.split("Rating").length == 1)
     assert(bytes.length / 10 < 25) //  25 bytes per rating
-  }
-}

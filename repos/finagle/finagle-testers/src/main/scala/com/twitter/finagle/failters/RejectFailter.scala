@@ -17,18 +17,15 @@ case class RejectFailter[Req, Rep](
     rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep] with Failter
 
-  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
-    if (prob == 0.0 || rand.nextDouble() >= prob) {
+  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
+    if (prob == 0.0 || rand.nextDouble() >= prob)
       passedStat.incr()
       service(req)
-    } else {
+    else
       rejectedStat.incr()
       Future.exception(rejectWith())
-    }
-  }
-}
 
 /**
   * Like the reject filter, but will throw exceptions AFTER the service has been called.
@@ -38,18 +35,14 @@ case class ByzantineRejectFailter[Req, Rep](
     rejectWith: (() => Throwable) = (() => new RejectedExecutionException()),
     seed: Long = Failter.DefaultSeed,
     stats: StatsReceiver = NullStatsReceiver)
-    extends SimpleFilter[Req, Rep] with Failter {
+    extends SimpleFilter[Req, Rep] with Failter
 
-  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] = {
-    service(req).transform { result =>
-      if (prob == 0.0 || rand.nextDouble() >= prob) {
+  def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
+    service(req).transform  result =>
+      if (prob == 0.0 || rand.nextDouble() >= prob)
         passedStat.incr()
         Future.const(result)
-      } else {
+      else
         rejectedStat.incr()
         // The result is now simply discarded
         Future.exception(rejectWith())
-      }
-    }
-  }
-}

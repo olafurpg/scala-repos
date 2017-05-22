@@ -37,7 +37,7 @@ import scalafx.scene.image.{Image, WritableImage}
   *
   * @since 8.0
   */
-object SwingFXUtils {
+object SwingFXUtils
 
   /**
     * Snapshots the specified ScalaFX [[scalafx.scene.image.Image Image]] object and stores a copy
@@ -60,4 +60,3 @@ object SwingFXUtils {
     */
   def toFXImage(bimg: BufferedImage, wimg: WritableImage): WritableImage =
     jfxes.SwingFXUtils.toFXImage(bimg, wimg)
-}

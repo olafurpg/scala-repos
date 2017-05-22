@@ -12,12 +12,12 @@ import sun.misc.BASE64Encoder
 
 import scala.concurrent.{Future, ExecutionContext}
 
-class SegmentIOAuthSpec extends Specification {
+class SegmentIOAuthSpec extends Specification
 
   val system = ActorSystem("EventServiceSpecSystem")
   sequential
   isolated
-  val eventClient = new LEvents {
+  val eventClient = new LEvents
     override def init(appId: Int, channelId: Option[Int]): Boolean = true
 
     override def futureInsert(
@@ -52,9 +52,8 @@ class SegmentIOAuthSpec extends Specification {
       Future successful true
 
     override def close(): Unit = {}
-  }
   val appId = 0
-  val accessKeysClient = new AccessKeys {
+  val accessKeysClient = new AccessKeys
     override def insert(k: AccessKey): Option[String] = null
     override def getByAppid(appid: Int): Seq[AccessKey] = null
     override def update(k: AccessKey): Unit = {}
@@ -62,11 +61,9 @@ class SegmentIOAuthSpec extends Specification {
     override def getAll(): Seq[AccessKey] = null
 
     override def get(k: String): Option[AccessKey] =
-      k match {
+      k match
         case "abc" ⇒ Some(AccessKey(k, appId, Seq.empty))
         case _ ⇒ None
-      }
-  }
 
   val channelsClient = Storage.getMetaDataChannels()
   val eventServiceActor = system.actorOf(
@@ -82,9 +79,9 @@ class SegmentIOAuthSpec extends Specification {
 
   val base64Encoder = new BASE64Encoder
 
-  "Event Service" should {
+  "Event Service" should
 
-    "reject with CredentialsRejected with invalid credentials" in {
+    "reject with CredentialsRejected with invalid credentials" in
       val accessKey = "abc123:"
       val probe = TestProbe()(system)
       probe.send(
@@ -105,9 +102,8 @@ class SegmentIOAuthSpec extends Specification {
           )
       )
       success
-    }
 
-    "reject with CredentialsMissed without credentials" in {
+    "reject with CredentialsMissed without credentials" in
       val probe = TestProbe()(system)
       probe.send(
           eventServiceActor,
@@ -123,9 +119,8 @@ class SegmentIOAuthSpec extends Specification {
           )
       )
       success
-    }
 
-    "process SegmentIO identity request properly" in {
+    "process SegmentIO identity request properly" in
       val jsonReq =
         """
           |{
@@ -174,8 +169,5 @@ class SegmentIOAuthSpec extends Specification {
           )
       )
       success
-    }
-  }
 
   step(system.shutdown())
-}

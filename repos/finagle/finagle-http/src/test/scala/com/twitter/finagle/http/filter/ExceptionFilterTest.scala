@@ -8,10 +8,10 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ExceptionFilterTest extends FunSuite {
+class ExceptionFilterTest extends FunSuite
 
-  val service = new Service[Request, Response] {
-    def apply(request: Request): Future[Response] = {
+  val service = new Service[Request, Response]
+    def apply(request: Request): Future[Response] =
       request.response.write("hello")
       request.response.contentLength = 5
       if (request.params.get("exception").isDefined) throw new Exception
@@ -20,10 +20,8 @@ class ExceptionFilterTest extends FunSuite {
       else if (request.params.get("cancel").isDefined)
         Future.exception(new CancelledRequestException)
       else Future.value(request.response)
-    }
-  }
 
-  test("ignore success") {
+  test("ignore success")
     val request = Request()
     val filter = (new ExceptionFilter) andThen service
 
@@ -31,9 +29,8 @@ class ExceptionFilterTest extends FunSuite {
     assert(response.status == Status.Ok)
     assert(response.contentString == "hello")
     assert(response.contentLength == Some(5))
-  }
 
-  test("handle exception") {
+  test("handle exception")
     val request = Request("exception" -> "true")
     val filter = (new ExceptionFilter) andThen service
 
@@ -41,9 +38,8 @@ class ExceptionFilterTest extends FunSuite {
     assert(response.status == Status.InternalServerError)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
-  }
 
-  test("handle throw") {
+  test("handle throw")
     val request = Request("throw" -> "true")
     val filter = (new ExceptionFilter) andThen service
 
@@ -51,9 +47,8 @@ class ExceptionFilterTest extends FunSuite {
     assert(response.status == Status.InternalServerError)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
-  }
 
-  test("handle cancel") {
+  test("handle cancel")
     val request = Request("cancel" -> "true")
     val filter = (new ExceptionFilter) andThen service
 
@@ -61,5 +56,3 @@ class ExceptionFilterTest extends FunSuite {
     assert(response.statusCode == 499)
     assert(response.contentString == "")
     assert(response.contentLength == Some(0))
-  }
-}

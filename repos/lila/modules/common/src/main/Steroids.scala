@@ -18,40 +18,34 @@ trait Steroids
     with scalaz.syntax.ToShowOps with BooleanSteroids with OptionSteroids
     with ListSteroids with JodaTimeSteroids
 
-trait JodaTimeSteroids {
+trait JodaTimeSteroids
   import org.joda.time.DateTime
-  implicit final class LilaPimpedDateTime(date: DateTime) {
+  implicit final class LilaPimpedDateTime(date: DateTime)
     def getSeconds: Long = date.getMillis / 1000
     def getDate: java.util.Date = date.toDate
-  }
   implicit val dateTimeOrdering: Ordering[DateTime] =
     Ordering.fromLessThan(_ isBefore _)
-}
 
-trait ListSteroids {
+trait ListSteroids
 
   import scala.util.{Try, Success}
 
-  implicit final class LilaPimpedTryList[A](list: List[Try[A]]) {
+  implicit final class LilaPimpedTryList[A](list: List[Try[A]])
     def sequence: Try[List[A]] =
-      (Try(List[A]()) /: list) { (a, b) =>
+      (Try(List[A]()) /: list)  (a, b) =>
         a flatMap (c => b map (d => d :: c))
-      } map (_.reverse)
-  }
-  implicit final class LilaPimpedList[A](list: List[A]) {
-    def sortLike[B](other: List[B], f: A => B): List[A] = list.sortWith {
+      map (_.reverse)
+  implicit final class LilaPimpedList[A](list: List[A])
+    def sortLike[B](other: List[B], f: A => B): List[A] = list.sortWith
       case (x, y) => other.indexOf(f(x)) < other.indexOf(f(y))
-    }
-  }
-}
 
-trait BooleanSteroids {
+trait BooleanSteroids
 
   /*
    * Replaces scalaz boolean ops
    * so ?? works on Zero and not Monoid
    */
-  implicit final class LilaPimpedBoolean(self: Boolean) {
+  implicit final class LilaPimpedBoolean(self: Boolean)
 
     def ??[A](a: => A)(implicit z: Zero[A]): A = if (self) a else Zero[A].zero
 
@@ -62,23 +56,20 @@ trait BooleanSteroids {
     def ?[X](t: => X) = new { def |(f: => X) = if (self) t else f }
 
     def option[A](a: => A): Option[A] = if (self) Some(a) else None
-  }
-}
 
-trait OptionSteroids {
+trait OptionSteroids
 
   /*
    * Replaces scalaz option ops
    * so ~ works on Zero and not Monoid
    */
-  implicit final class LilaPimpedOption[A](self: Option[A]) {
+  implicit final class LilaPimpedOption[A](self: Option[A])
 
     import scalaz.std.{option => o}
 
-    def fold[X](some: A => X, none: => X): X = self match {
+    def fold[X](some: A => X, none: => X): X = self match
       case None => none
       case Some(a) => some(a)
-    }
 
     def |(a: => A): A = self getOrElse a
 
@@ -91,5 +82,3 @@ trait OptionSteroids {
     def err(message: => String): A = self.getOrElse(sys.error(message))
 
     def ifNone(n: => Unit): Unit = if (self.isEmpty) n
-  }
-}

@@ -27,7 +27,7 @@ import org.saddle.scalar.ScalarTagDouble
 /**
   * Index with double keys
   */
-class IndexDouble(keys: Vec[Double]) extends Index[Double] {
+class IndexDouble(keys: Vec[Double]) extends Index[Double]
   val scalarTag = ScalarTagDouble
 
   private lazy val (kmap, IndexProperties(contiguous, monotonic)) =
@@ -64,42 +64,37 @@ class IndexDouble(keys: Vec[Double]) extends Index[Double] {
     JoinerImpl.join(this, other, how)
 
   // Intersects two indices if both have set semantics
-  def intersect(other: Index[Double]): ReIndexer[Double] = {
+  def intersect(other: Index[Double]): ReIndexer[Double] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot intersect non-unique indexes")
     JoinerImpl.join(this, other, InnerJoin)
-  }
 
   // Unions two indices if both have set semantics
-  def union(other: Index[Double]): ReIndexer[Double] = {
+  def union(other: Index[Double]): ReIndexer[Double] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot union non-unique indexes")
     JoinerImpl.join(this, other, OuterJoin)
-  }
 
-  def slice(from: Int, until: Int, stride: Int): Index[Double] = {
+  def slice(from: Int, until: Int, stride: Int): Index[Double] =
     new IndexDouble(keys.slice(from, until, stride))
-  }
 
   // find the first location whereby an insertion would maintain a sorted index
-  def lsearch(t: Double): Int = {
+  def lsearch(t: Double): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   // find the last location whereby an insertion would maintain a sorted index
-  def rsearch(t: Double): Int = {
+  def rsearch(t: Double): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) fnd + locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
       f: Double => B): Index[B] =
@@ -108,19 +103,14 @@ class IndexDouble(keys: Vec[Double]) extends Index[Double] {
   def toArray: Array[Double] = keys.toArray
 
   /** Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case rv: IndexDouble =>
-        (this eq rv) || (this.length == rv.length) && {
+        (this eq rv) || (this.length == rv.length) &&
           var i = 0
           var eq = true
-          while (eq && i < this.length) {
+          while (eq && i < this.length)
             eq &&= raw(i) == rv.raw(i)
             i += 1
-          }
           eq
-        }
       case _ => super.equals(o)
-    }
-  }
-}

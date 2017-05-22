@@ -16,7 +16,7 @@ import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object ActorsLeakSpec {
+object ActorsLeakSpec
 
   val config =
     ConfigFactory.parseString("""
@@ -31,14 +31,14 @@ object ActorsLeakSpec {
       |
       |""".stripMargin)
 
-  def collectLiveActors(root: ActorRef): immutable.Seq[ActorRef] = {
+  def collectLiveActors(root: ActorRef): immutable.Seq[ActorRef] =
 
-    def recurse(node: ActorRef): List[ActorRef] = {
-      val children: List[ActorRef] = node match {
+    def recurse(node: ActorRef): List[ActorRef] =
+      val children: List[ActorRef] = node match
         case wc: ActorRefWithCell ⇒
           val cell = wc.underlying
 
-          cell.childrenRefs match {
+          cell.childrenRefs match
             case ChildrenContainer.TerminatingChildrenContainer(
                 _, toDie, reason) ⇒
               Nil
@@ -48,44 +48,36 @@ object ActorsLeakSpec {
             case n: ChildrenContainer.NormalChildrenContainer ⇒
               cell.childrenRefs.children.toList
             case x ⇒ Nil
-          }
         case _ ⇒ Nil
-      }
 
       node :: children.flatMap(recurse)
-    }
 
     recurse(root)
-  }
 
-  class StoppableActor extends Actor {
-    override def receive = {
+  class StoppableActor extends Actor
+    override def receive =
       case "stop" ⇒ context.stop(self)
-    }
-  }
-}
 
 class ActorsLeakSpec
-    extends AkkaSpec(ActorsLeakSpec.config) with ImplicitSender {
+    extends AkkaSpec(ActorsLeakSpec.config) with ImplicitSender
   import ActorsLeakSpec._
 
-  "Remoting" must {
+  "Remoting" must
 
-    "not leak actors" in {
+    "not leak actors" in
       val ref = system.actorOf(Props[EchoActor], "echo")
       val echoPath =
         RootActorPath(RARP(system).provider.getDefaultAddress) / "user" / "echo"
 
-      val targets = List("/system/endpointManager", "/system/transports").map {
+      val targets = List("/system/endpointManager", "/system/transports").map
         path ⇒
           system.actorSelection(path) ! Identify(0)
           expectMsgType[ActorIdentity].getRef
-      }
 
       val initialActors = targets.flatMap(collectLiveActors).toSet
 
       //Clean shutdown case
-      for (_ ← 1 to 3) {
+      for (_ ← 1 to 3)
 
         val remoteSystem =
           ActorSystem("remote",
@@ -93,20 +85,18 @@ class ActorsLeakSpec
                         .parseString("akka.remote.netty.tcp.port = 0")
                         .withFallback(config))
 
-        try {
+        try
           val probe = TestProbe()(remoteSystem)
 
           remoteSystem.actorSelection(echoPath).tell(Identify(1), probe.ref)
           probe.expectMsgType[ActorIdentity].ref.nonEmpty should be(true)
-        } finally {
+        finally
           remoteSystem.terminate()
-        }
 
         Await.ready(remoteSystem.whenTerminated, 10.seconds)
-      }
 
       // Missing SHUTDOWN case
-      for (_ ← 1 to 3) {
+      for (_ ← 1 to 3)
 
         val remoteSystem =
           ActorSystem("remote",
@@ -115,7 +105,7 @@ class ActorsLeakSpec
                         .withFallback(config))
         val remoteAddress = RARP(remoteSystem).provider.getDefaultAddress
 
-        try {
+        try
           val probe = TestProbe()(remoteSystem)
 
           remoteSystem.actorSelection(echoPath).tell(Identify(1), probe.ref)
@@ -125,16 +115,13 @@ class ActorsLeakSpec
           Await.ready(RARP(system).provider.transport
                         .managementCommand(ForceDisassociate(remoteAddress)),
                       3.seconds)
-        } finally {
+        finally
           remoteSystem.terminate()
-        }
 
         EventFilter
           .warning(pattern = "Association with remote system", occurrences = 1)
-          .intercept {
+          .intercept
             Await.ready(remoteSystem.whenTerminated, 10.seconds)
-          }
-      }
 
       // Remote idle for too long case
       val remoteSystem =
@@ -146,7 +133,7 @@ class ActorsLeakSpec
 
       remoteSystem.actorOf(Props[StoppableActor], "stoppable")
 
-      try {
+      try
         val probe = TestProbe()(remoteSystem)
 
         remoteSystem.actorSelection(echoPath).tell(Identify(1), probe.ref)
@@ -165,15 +152,13 @@ class ActorsLeakSpec
         Await.ready(RARP(system).provider.transport
                       .managementCommand(ForceDisassociate(remoteAddress)),
                     3.seconds)
-      } finally {
+      finally
         remoteSystem.terminate()
-      }
 
       EventFilter
         .warning(pattern = "Association with remote system", occurrences = 1)
-        .intercept {
+        .intercept
           Await.ready(remoteSystem.whenTerminated, 10.seconds)
-        }
 
       EventFilter[TimeoutException](occurrences = 1).intercept {}
 
@@ -182,6 +167,3 @@ class ActorsLeakSpec
         .toSet
 
         (finalActors diff initialActors) should be(Set.empty)
-    }
-  }
-}

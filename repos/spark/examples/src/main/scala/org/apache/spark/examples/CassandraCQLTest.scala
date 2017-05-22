@@ -66,9 +66,9 @@ import org.apache.spark.{SparkConf, SparkContext}
   * Usage: ./bin/spark-submit examples.jar \
   *  --class org.apache.spark.examples.CassandraCQLTest localhost 9160
   */
-object CassandraCQLTest {
+object CassandraCQLTest
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("CQLTestApp")
 
     val sc = new SparkContext(sparkConf)
@@ -109,26 +109,21 @@ object CassandraCQLTest {
                                     classOf[java.util.Map[String, ByteBuffer]])
 
     println("Count: " + casRdd.count)
-    val productSaleRDD = casRdd.map {
-      case (key, value) => {
+    val productSaleRDD = casRdd.map
+      case (key, value) =>
           (ByteBufferUtil.string(value.get("prod_id")),
            ByteBufferUtil.toInt(value.get("quantity")))
-        }
-    }
     val aggregatedRDD = productSaleRDD.reduceByKey(_ + _)
-    aggregatedRDD.collect().foreach {
+    aggregatedRDD.collect().foreach
       case (productId, saleCount) => println(productId + ":" + saleCount)
-    }
 
-    val casoutputCF = aggregatedRDD.map {
-      case (productId, saleCount) => {
+    val casoutputCF = aggregatedRDD.map
+      case (productId, saleCount) =>
           val outKey = Collections.singletonMap(
               "prod_id", ByteBufferUtil.bytes(productId))
           val outVal =
             Collections.singletonList(ByteBufferUtil.bytes(saleCount))
           (outKey, outVal)
-        }
-    }
 
     casoutputCF.saveAsNewAPIHadoopFile(
         KeySpace,
@@ -139,6 +134,4 @@ object CassandraCQLTest {
     )
 
     sc.stop()
-  }
-}
 // scalastyle:on println

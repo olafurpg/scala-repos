@@ -24,29 +24,26 @@ import org.apache.spark.util.Utils
   * A collection of generators that build custom bytecode at runtime for performing the evaluation
   * of catalyst expression.
   */
-package object codegen {
+package object codegen
 
   /** Canonicalizes an expression so those that differ only by names can reuse the same code. */
-  object ExpressionCanonicalizer extends rules.RuleExecutor[Expression] {
+  object ExpressionCanonicalizer extends rules.RuleExecutor[Expression]
     val batches =
       Batch("CleanExpressions", FixedPoint(20), CleanExpressions) :: Nil
 
-    object CleanExpressions extends rules.Rule[Expression] {
-      def apply(e: Expression): Expression = e transform {
+    object CleanExpressions extends rules.Rule[Expression]
+      def apply(e: Expression): Expression = e transform
         case Alias(c, _) => c
-      }
-    }
-  }
 
   /**
     * Dumps the bytecode from a class to the screen using javap.
     */
-  object DumpByteCode {
+  object DumpByteCode
     import scala.sys.process._
     val dumpDirectory = Utils.createTempDir()
     dumpDirectory.mkdir()
 
-    def apply(obj: Any): Unit = {
+    def apply(obj: Any): Unit =
       val generatedClass = obj.getClass
       val classLoader = generatedClass.getClassLoader
         .asInstanceOf[scala.tools.nsc.interpreter.AbstractFileClassLoader]
@@ -67,6 +64,3 @@ package object codegen {
       println(
           s"javap -p -v -classpath ${dumpDirectory.getCanonicalPath} ${generatedClass.getName}".!!)
       // scalastyle:on println
-    }
-  }
-}

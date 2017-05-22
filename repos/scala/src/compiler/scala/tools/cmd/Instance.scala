@@ -10,7 +10,7 @@ package cmd
   *
   *  @see    Reference
   */
-trait Instance extends Spec {
+trait Instance extends Spec
   def parsed: CommandLine
 
   protected def help(str: => String): Unit = ()
@@ -23,4 +23,3 @@ trait Instance extends Spec {
   type OptionMagic = Opt.Instance
   protected implicit def optionMagicAdditions(name: String) =
     new Opt.Instance(programInfo, parsed, name)
-}

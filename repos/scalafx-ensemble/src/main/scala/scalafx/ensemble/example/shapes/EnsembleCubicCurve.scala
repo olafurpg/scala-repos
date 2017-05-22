@@ -33,13 +33,13 @@ import scalafx.scene.layout.HBox
 import scalafx.scene.paint.Color
 import scalafx.scene.shape.CubicCurve
 
-class EnsembleCubicCurve extends EnsembleExample {
+class EnsembleCubicCurve extends EnsembleExample
 
-  def getContent = new HBox {
+  def getContent = new HBox
     spacing = 10
     padding = Insets(20)
     children = List(
-        new CubicCurve {
+        new CubicCurve
           controlX1 = 30.0
           controlX2 = 150.0
           controlY1 = 10.0
@@ -51,8 +51,8 @@ class EnsembleCubicCurve extends EnsembleExample {
           stroke = Color.Burlywood
           fill = Color.Orange
           strokeWidth = 2d
-        },
-        new CubicCurve {
+        ,
+        new CubicCurve
           controlX1 = 230.0
           controlX2 = 350.0
           controlY1 = 100.0
@@ -64,7 +64,4 @@ class EnsembleCubicCurve extends EnsembleExample {
           stroke = Color.DarkOrange
           fill = Color.White
           strokeWidth = 5d
-        }
     )
-  }
-}

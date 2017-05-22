@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Traverse` */
 final class TraverseOps[F[_], A] private[syntax](
     val self: F[A])(implicit val F: Traverse[F])
-    extends Ops[F[A]] {
+    extends Ops[F[A]]
   ////
 
   import Leibniz.===
@@ -28,16 +28,14 @@ final class TraverseOps[F[_], A] private[syntax](
 
   /** Traverse with the identity function */
   final def sequence[G[_], B](
-      implicit ev: A === G[B], G: Applicative[G]): G[F[B]] = {
+      implicit ev: A === G[B], G: Applicative[G]): G[F[B]] =
     val fgb: F[G[B]] = ev.subst[F](self)
     F.sequence(fgb)
-  }
 
   /** A version of `sequence` that infers the nested type constructor */
   final def sequenceU(
-      implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ = {
+      implicit G: Unapply[Applicative, A]): G.M[F[G.A]] /*G[F[A]] */ =
     G.TC.traverse(self)(x => G.apply(x))
-  }
 
   /** A version of `traverse` specialized for `State` */
   final def traverseS[S, B](f: A => State[S, B]): State[S, F[B]] =
@@ -78,25 +76,22 @@ final class TraverseOps[F[_], A] private[syntax](
   final def mapAccumR[S, B](z: S)(f: (S, A) => (S, B)): (S, F[B]) =
     F.mapAccumR(self, z)(f)
   ////
-}
 
-sealed trait ToTraverseOps0 {
+sealed trait ToTraverseOps0
   implicit def ToTraverseOpsUnapply[FA](v: FA)(
       implicit F0: Unapply[Traverse, FA]) =
     new TraverseOps[F0.M, F0.A](F0(v))(F0.TC)
-}
 
 trait ToTraverseOps
-    extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps {
+    extends ToTraverseOps0 with ToFunctorOps with ToFoldableOps
   implicit def ToTraverseOps[F[_], A](v: F[A])(implicit F0: Traverse[F]) =
     new TraverseOps[F, A](v)
 
   ////
 
   ////
-}
 
-trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
+trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F]
   implicit def ToTraverseOps[A](v: F[A]): TraverseOps[F, A] =
     new TraverseOps[F, A](v)(TraverseSyntax.this.F)
 
@@ -104,4 +99,3 @@ trait TraverseSyntax[F[_]] extends FunctorSyntax[F] with FoldableSyntax[F] {
   ////
 
   ////
-}

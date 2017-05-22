@@ -5,9 +5,9 @@ import lila.hub.actorApi.slack._
 import lila.user.User
 
 final class SlackApi(
-    client: SlackClient, implicit val lightUser: String => Option[LightUser]) {
+    client: SlackClient, implicit val lightUser: String => Option[LightUser])
 
-  def donation(event: lila.hub.actorApi.DonationEvent): Funit = {
+  def donation(event: lila.hub.actorApi.DonationEvent): Funit =
     val user = event.userId flatMap lightUser
     val username = user.fold("Anonymous")(_.titleName)
     def amount(cents: Int) =
@@ -16,24 +16,21 @@ final class SlackApi(
         SlackMessage(
             username = "donation",
             icon = "heart_eyes",
-            text = s"$username donated ${amount(event.gross)} (${amount(
-            event.net)})! Weekly progress: ${event.progress}%",
+            text = s"$username donated ${amount(event.gross)} ($amount(
+            event.net))! Weekly progress: ${event.progress}%",
             channel = "general"
-        )) >> event.message.?? { msg =>
+        )) >> event.message.??  msg =>
       client(
           SlackMessage(username = username,
                        icon = "kissing_heart",
                        text = msg,
                        channel = "general"))
-    }
-  }
 
-  def publishEvent(event: Event): Funit = event match {
+  def publishEvent(event: Event): Funit = event match
     case Error(msg) => publishError(msg)
     case Warning(msg) => publishWarning(msg)
     case Info(msg) => publishInfo(msg)
     case Victory(msg) => publishVictory(msg)
-  }
 
   def publishError(msg: String): Funit =
     client(
@@ -85,4 +82,3 @@ final class SlackApi(
                      icon = "rocket",
                      text = "Lichess is being updated! Brace for impact.",
                      channel = "general"))
-}

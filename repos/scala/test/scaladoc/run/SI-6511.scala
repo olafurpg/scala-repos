@@ -1,14 +1,14 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def resourceFile: String = "SI-6511.scala"
 
   // no need for special settings
   def scaladocSettings = "-diagrams"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -22,5 +22,3 @@ object Test extends ScaladocModelTest {
 
     testDiagram(X, X.contentDiagram, nodes = 4, edges = 3)
     testDiagram(Y, Y.contentDiagram, nodes = 4, edges = 3)
-  }
-}

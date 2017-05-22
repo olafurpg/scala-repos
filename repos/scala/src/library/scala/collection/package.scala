@@ -86,7 +86,7 @@ package scala
   * of decorators that allow converting between Scala and Java collections using `asScala`
   * and `asJava` methods.
   */
-package object collection {
+package object collection
   import scala.collection.generic.CanBuildFrom
 
   /** Provides a CanBuildFrom instance that builds a specific target collection (`To')
@@ -95,35 +95,29 @@ package object collection {
   def breakOut[From, T, To](
       implicit b: CanBuildFrom[Nothing, T, To]): CanBuildFrom[From, T, To] =
     // can't just return b because the argument to apply could be cast to From in b
-    new CanBuildFrom[From, T, To] {
+    new CanBuildFrom[From, T, To]
       def apply(from: From) = b.apply()
       def apply() = b.apply()
-    }
-}
 
-package collection {
+package collection
 
   /** Collection internal utility functions.
     */
-  private[collection] object DebugUtils {
+  private[collection] object DebugUtils
     def unsupported(msg: String) = throw new UnsupportedOperationException(msg)
     def noSuchElement(msg: String) = throw new NoSuchElementException(msg)
     def indexOutOfBounds(index: Int) =
       throw new IndexOutOfBoundsException(index.toString)
     def illegalArgument(msg: String) = throw new IllegalArgumentException(msg)
 
-    def buildString(closure: (Any => Unit) => Unit): String = {
+    def buildString(closure: (Any => Unit) => Unit): String =
       var output = ""
       closure(output += _ + "\n")
 
       output
-    }
 
-    def arrayString[T](array: Array[T], from: Int, until: Int): String = {
-      array.slice(from, until) map {
+    def arrayString[T](array: Array[T], from: Int, until: Int): String =
+      array.slice(from, until) map
         case null => "n/a"
         case x => "" + x
-      } mkString " | "
-    }
-  }
-}
+      mkString " | "

@@ -5,7 +5,7 @@ import java.util.regex.Matcher.quoteReplacement
 import ornicar.scalalib.Random
 import play.api.mvc.{Cookie, Session, RequestHeader}
 
-object LilaCookie {
+object LilaCookie
 
   private val domainRegex = """^.+(\.[^\.]+\.[^\.]+)$""".r
 
@@ -18,9 +18,8 @@ object LilaCookie {
     session(sessionId, Random nextStringUppercase 8)
 
   def session(name: String, value: String)(
-      implicit req: RequestHeader): Cookie = withSession { s =>
+      implicit req: RequestHeader): Cookie = withSession  s =>
     s + (name -> value)
-  }
 
   def newSession(implicit req: RequestHeader): Cookie = withSession(identity)
 
@@ -42,4 +41,3 @@ object LilaCookie {
            domain(req).some,
            Session.secure,
            httpOnly | Session.httpOnly)
-}

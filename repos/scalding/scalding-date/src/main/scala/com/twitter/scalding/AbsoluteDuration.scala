@@ -23,7 +23,7 @@ import scala.annotation.tailrec
 /*
  * These are reasonably indepedendent of calendars (or we will pretend)
  */
-object AbsoluteDuration extends java.io.Serializable {
+object AbsoluteDuration extends java.io.Serializable
 
   def max(a: AbsoluteDuration, b: AbsoluteDuration) = if (a > b) a else b
 
@@ -37,13 +37,11 @@ object AbsoluteDuration extends java.io.Serializable {
                                  (Seconds, SEC_IN_MS),
                                  (Millisecs, 1)).reverse
 
-  def exact(fnms: TimeCons): (Long) => Option[AbsoluteDuration] = { ms: Long =>
-    if (ms % fnms._2 == 0) {
+  def exact(fnms: TimeCons): (Long) => Option[AbsoluteDuration] =  ms: Long =>
+    if (ms % fnms._2 == 0)
       Some(fnms._1((ms / fnms._2).toInt))
-    } else {
+    else
       None
-    }
-  }
 
   def apply(count: Long, tunit: TimeUnit): AbsoluteDuration =
     fromMillisecs(tunit.toMillis(count))
@@ -54,33 +52,30 @@ object AbsoluteDuration extends java.io.Serializable {
   @tailrec
   private def fromMillisecs(diffInMs: Long,
                             units: List[TimeCons],
-                            acc: List[AbsoluteDuration]): AbsoluteDuration = {
+                            acc: List[AbsoluteDuration]): AbsoluteDuration =
 
-    if (diffInMs == 0L) {
+    if (diffInMs == 0L)
       //We are done:
-      acc match {
+      acc match
         case Nil => units.head._1(0)
         case (h :: Nil) => h
         case _ => AbsoluteDurationList(acc)
-      }
-    } else {
-      units match {
-        case (tc0 :: tc1 :: tail) => {
+    else
+      units match
+        case (tc0 :: tc1 :: tail) =>
             //Only get as many as the next guy can't get:
             val nextSize = tc1._2
             val thisDiff =
               diffInMs % nextSize // Keep only this amount of millis for this unit
             val theseUnits = thisDiff / tc0._2
             val (newDiff, newAcc) =
-              if (theseUnits != 0L) {
+              if (theseUnits != 0L)
                 val dur = tc0._1(theseUnits.toInt)
                 (diffInMs - dur.toMillisecs, dur :: acc)
-              } else {
+              else
                 (diffInMs, acc)
-              }
             fromMillisecs(newDiff, (tc1 :: tail), newAcc)
-          }
-        case (tc :: Nil) => {
+        case (tc :: Nil) =>
             // We can't go any further, try to jam the rest into this unit:
             val (fn, cnt) = tc
             val theseUnits = diffInMs / cnt
@@ -92,18 +87,12 @@ object AbsoluteDuration extends java.io.Serializable {
             val thisPart = fn(theseUnits.toInt)
             if (acc.isEmpty) thisPart
             else AbsoluteDurationList(thisPart :: acc)
-          }
-        case Nil => {
+        case Nil =>
             // These are left over millisecs, but should be unreachable
             sys.error(
                 "this is only reachable if units is passed with a length == 0, which should never happen")
-          }
-      }
-    }
-  }
-}
 
-sealed trait AbsoluteDuration extends Duration with Ordered[AbsoluteDuration] {
+sealed trait AbsoluteDuration extends Duration with Ordered[AbsoluteDuration]
   // Here are the abstracts:
   def toMillisecs: Long
 
@@ -129,49 +118,40 @@ sealed trait AbsoluteDuration extends Duration with Ordered[AbsoluteDuration] {
     * Returns the number of times that divides this and the remainder
     * The law is: that * result_.1 + result._2 == this
     */
-  def /(that: AbsoluteDuration): (Long, AbsoluteDuration) = {
+  def /(that: AbsoluteDuration): (Long, AbsoluteDuration) =
     val divs = (this.toMillisecs / that.toMillisecs)
     val rem = this - (that * divs)
     (divs, rem)
-  }
 
-  override def equals(eq: Any): Boolean = {
-    eq match {
+  override def equals(eq: Any): Boolean =
+    eq match
       case eqo: AbsoluteDuration => (eqo.toMillisecs) == this.toMillisecs
       case _ => false
-    }
-  }
   override def hashCode: Int = toMillisecs.hashCode
-}
 
 case class Millisecs(cnt: Int)
     extends Duration(Calendar.MILLISECOND, cnt, DateOps.UTC)
-    with AbsoluteDuration {
+    with AbsoluteDuration
   override def toSeconds = cnt / 1000.0
   override def toMillisecs = cnt.toLong
-}
 
 case class Seconds(cnt: Int)
-    extends Duration(Calendar.SECOND, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.SECOND, cnt, DateOps.UTC) with AbsoluteDuration
   override def toSeconds = cnt.toDouble
   override def toMillisecs = (cnt.toLong) * 1000L
-}
 
 case class Minutes(cnt: Int)
-    extends Duration(Calendar.MINUTE, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.MINUTE, cnt, DateOps.UTC) with AbsoluteDuration
   override def toSeconds = cnt * 60.0
   override def toMillisecs = cnt.toLong * 60L * 1000L
-}
 
 case class Hours(cnt: Int)
-    extends Duration(Calendar.HOUR, cnt, DateOps.UTC) with AbsoluteDuration {
+    extends Duration(Calendar.HOUR, cnt, DateOps.UTC) with AbsoluteDuration
   override def toSeconds = cnt * 60.0 * 60.0
   override def toMillisecs = cnt.toLong * 60L * 60L * 1000L
-}
 
 case class AbsoluteDurationList(parts: List[AbsoluteDuration])
     extends AbstractDurationList[AbsoluteDuration](parts)
-    with AbsoluteDuration {
+    with AbsoluteDuration
   override def toSeconds = parts.map { _.toSeconds }.sum
   override def toMillisecs: Long = parts.map { _.toMillisecs }.sum
-}

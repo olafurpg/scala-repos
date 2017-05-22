@@ -17,8 +17,8 @@ import com.intellij.ui.PopupHandler
   * @author Alexander Podkhalyuzin
   */
 final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
-    extends CallHierarchyBrowserBase(project, method) {
-  protected def createTrees(type2TreeMap: util.Map[String, JTree]): Unit = {
+    extends CallHierarchyBrowserBase(project, method)
+  protected def createTrees(type2TreeMap: util.Map[String, JTree]): Unit =
     var group: ActionGroup = ActionManager.getInstance
       .getAction(IdeActions.GROUP_CALL_HIERARCHY_POPUP)
       .asInstanceOf[ActionGroup]
@@ -55,32 +55,26 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
                     .getShortcutSet,
                   tree2)
     type2TreeMap.put(CALLER_TYPE, tree2)
-  }
 
   protected def getElementFromDescriptor(
-      descriptor: HierarchyNodeDescriptor): PsiElement = {
-    descriptor match {
+      descriptor: HierarchyNodeDescriptor): PsiElement =
+    descriptor match
       case nodeDescriptor: CallHierarchyNodeDescriptor =>
         nodeDescriptor.getEnclosingElement
       case _ => null
-    }
-  }
 
   protected override def getOpenFileElementFromDescriptor(
-      descriptor: HierarchyNodeDescriptor): PsiElement = {
-    descriptor match {
+      descriptor: HierarchyNodeDescriptor): PsiElement =
+    descriptor match
       case nodeDescriptor: CallHierarchyNodeDescriptor =>
         nodeDescriptor.getTargetElement
       case _ => null
-    }
-  }
 
-  protected def isApplicableElement(element: PsiElement): Boolean = {
+  protected def isApplicableElement(element: PsiElement): Boolean =
     element.isInstanceOf[PsiMethod]
-  }
 
   protected def createHierarchyTreeStructure(
-      typeName: String, psiElement: PsiElement): HierarchyTreeStructure = {
+      typeName: String, psiElement: PsiElement): HierarchyTreeStructure =
     if (CALLER_TYPE.equals(typeName))
       new ScalaCallerMethodsTreeStructure(
           myProject, psiElement.asInstanceOf[PsiMethod], getCurrentScopeType)
@@ -88,9 +82,6 @@ final class ScalaCallHierarchyBrowser(project: Project, method: PsiMethod)
       new ScalaCalleeMethodsTreeStructure(
           myProject, psiElement.asInstanceOf[PsiMethod], getCurrentScopeType)
     else null
-  }
 
-  protected def getComparator: Comparator[NodeDescriptor[_]] = {
+  protected def getComparator: Comparator[NodeDescriptor[_]] =
     JavaHierarchyUtil.getComparator(myProject)
-  }
-}

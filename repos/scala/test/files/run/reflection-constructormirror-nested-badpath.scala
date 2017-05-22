@@ -1,9 +1,9 @@
 import scala.reflect.runtime.universe._
 import scala.reflect.ClassTag
 
-class Foo {
+class Foo
   import Test._
-  def foo = {
+  def foo =
     val expectedType = implicitly[TypeTag[R]]
     val classTag = implicitly[ClassTag[R]]
     val cl = classTag.runtimeClass.getClassLoader
@@ -11,21 +11,17 @@ class Foo {
     val constructor = expectedType.tpe.member(termNames.CONSTRUCTOR).asMethod
     val sig = constructor.info
     val sym = cm.classSymbol(classTag.runtimeClass)
-    try {
+    try
       val cls = cm.reflect(this).reflectClass(sym)
       cls.reflectConstructor(constructor)(5, "test").asInstanceOf[R]
       println("this indicates a failure")
-    } catch {
+    catch
       case ex: Throwable =>
         println(ex.getMessage)
-    }
-  }
-}
-object Test extends App {
+object Test extends App
   case class R(
       sales: Int,
       name: String
   )
   val foo = new Foo
   println(foo.foo)
-}

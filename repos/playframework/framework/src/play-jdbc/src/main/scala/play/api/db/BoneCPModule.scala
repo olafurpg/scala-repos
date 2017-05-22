@@ -20,29 +20,26 @@ import scala.concurrent.duration.FiniteDuration
 /**
   * BoneCP runtime inject module.
   */
-class BoneCPModule extends Module {
-  def bindings(environment: Environment, configuration: Configuration) = {
+class BoneCPModule extends Module
+  def bindings(environment: Environment, configuration: Configuration) =
     Seq(
         bind[ConnectionPool].to[BoneConnectionPool]
     )
-  }
-}
 
 /**
   * BoneCP components (for compile-time injection).
   */
-trait BoneCPComponents {
+trait BoneCPComponents
   def environment: Environment
 
   lazy val connectionPool: ConnectionPool = new BoneConnectionPool(environment)
-}
 
 /**
   * BoneCP implementation of connection pool interface.
   */
 @Singleton
 class BoneConnectionPool @Inject()(environment: Environment)
-    extends ConnectionPool {
+    extends ConnectionPool
 
   import BoneConnectionPool._
 
@@ -50,7 +47,7 @@ class BoneConnectionPool @Inject()(environment: Environment)
     * Create a data source with the given configuration.
     */
   def create(
-      name: String, dbConfig: DatabaseConfig, conf: Config): DataSource = {
+      name: String, dbConfig: DatabaseConfig, conf: Config): DataSource =
 
     val config = PlayConfig(conf)
 
@@ -60,7 +57,7 @@ class BoneConnectionPool @Inject()(environment: Environment)
       config.getDeprecated[Boolean]("bonecp.autoCommit", "autocommit")
     val isolation = config
       .getDeprecated[Option[String]]("bonecp.isolation", "isolation")
-      .map {
+      .map
         case "NONE" => Connection.TRANSACTION_NONE
         case "READ_COMMITTED" => Connection.TRANSACTION_READ_COMMITTED
         case "READ_UNCOMMITTED" => Connection.TRANSACTION_READ_UNCOMMITTED
@@ -69,7 +66,6 @@ class BoneConnectionPool @Inject()(environment: Environment)
         case unknown =>
           throw config.reportError(
               "bonecp.isolation", s"Unknown isolation level [$unknown]")
-      }
     val catalog = config.getDeprecated[Option[String]](
         "bonecp.defaultCatalog", "defaultCatalog")
     val readOnly = config.getDeprecated[Boolean]("bonecp.readOnly", "readOnly")
@@ -77,38 +73,33 @@ class BoneConnectionPool @Inject()(environment: Environment)
     datasource.setClassLoader(environment.classLoader)
 
     // Re-apply per connection config @ checkout
-    datasource.setConnectionHook(new AbstractConnectionHook {
+    datasource.setConnectionHook(new AbstractConnectionHook
 
-      override def onCheckIn(connection: ConnectionHandle) {
-        if (logger.isTraceEnabled) {
+      override def onCheckIn(connection: ConnectionHandle)
+        if (logger.isTraceEnabled)
           logger.trace(
               s"Check in connection $connection [${datasource.getTotalLeased} leased]")
-        }
-      }
 
-      override def onCheckOut(connection: ConnectionHandle) {
+      override def onCheckOut(connection: ConnectionHandle)
         connection.setAutoCommit(autocommit)
         isolation.foreach(connection.setTransactionIsolation)
         connection.setReadOnly(readOnly)
         catalog.foreach(connection.setCatalog)
-        if (logger.isTraceEnabled) {
+        if (logger.isTraceEnabled)
           logger.trace(
               s"Check out connection $connection [${datasource.getTotalLeased} leased]")
-        }
-      }
 
       override def onQueryExecuteTimeLimitExceeded(
           handle: ConnectionHandle,
           statement: Statement,
           sql: String,
           logParams: java.util.Map[AnyRef, AnyRef],
-          timeElapsedInNs: Long) {
+          timeElapsedInNs: Long)
         val timeMs = timeElapsedInNs / 1000
         val query = PoolUtil.fillLogParams(sql, logParams)
         logger.warn(
             s"Query execute time limit exceeded (${timeMs}ms) - query: $query")
-      }
-    })
+    )
 
     dbConfig.url.foreach(datasource.setJdbcUrl)
     dbConfig.username.foreach(datasource.setUsername)
@@ -179,24 +170,19 @@ class BoneConnectionPool @Inject()(environment: Environment)
       .foreach(datasource.setConnectionTestStatement)
 
     // Bind in JNDI
-    dbConfig.jndiName foreach { name =>
+    dbConfig.jndiName foreach  name =>
       JNDI.initialContext.rebind(name, datasource)
       val visibleUrl = datasource.getJdbcUrl
       logger.info(s"""datasource [$visibleUrl] bound to JNDI as $name""")
-    }
 
     datasource
-  }
 
   /**
     * Close the given data source.
     */
-  def close(ds: DataSource): Unit = ds match {
+  def close(ds: DataSource): Unit = ds match
     case bcp: BoneCPDataSource => bcp.close()
     case _ => sys.error("Unable to close data source: not a BoneCPDataSource")
-  }
-}
 
-object BoneConnectionPool {
+object BoneConnectionPool
   private val logger = Logger(classOf[BoneConnectionPool])
-}

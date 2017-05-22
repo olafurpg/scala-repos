@@ -21,16 +21,16 @@ package com.precog.bytecode
 
 import scalaz.Scalaz._
 
-trait Instructions {
+trait Instructions
   type Lib <: Library
   val library: Lib
 
   import library._
 
-  sealed trait Instruction { self =>
+  sealed trait Instruction  self =>
     import instructions._
 
-    def operandStackDelta: (Int, Int) = self match {
+    def operandStackDelta: (Int, Int) = self match
       case Map1(_) => (1, 1)
       case Map2Match(_) => (2, 1)
       case Map2Cross(_) => (2, 1)
@@ -80,11 +80,9 @@ trait Instructions {
 
       case PushGroup(_) => (0, 1)
       case PushKey(_) => (0, 1)
-    }
-  }
 
   // namespace
-  object instructions {
+  object instructions
     sealed trait DataInstr extends Instruction
 
     sealed trait JoinInstr extends Instruction
@@ -123,9 +121,8 @@ trait Instructions {
     case class Swap(depth: Int) extends Instruction with DataInstr
 
     case class Line(line: Int, col: Int, text: String)
-        extends Instruction with DataInstr {
+        extends Instruction with DataInstr
       override def toString = "<%d:%d>".format(line, col)
-    }
 
     case object AbsoluteLoad extends Instruction
     case object RelativeLoad extends Instruction
@@ -147,77 +144,60 @@ trait Instructions {
     case class PushGroup(id: Int) extends Instruction
     case class PushKey(id: Int) extends Instruction
 
-    object Map2 {
+    object Map2
       def unapply(instr: JoinInstr): Option[BinaryOperationType] =
-        instr match {
+        instr match
           case Map2Match(op) => Some(op.tpe)
           case Map2Cross(op) => Some(op.tpe)
           case _ => None
-        }
-    }
 
-    sealed trait UnaryOperation {
+    sealed trait UnaryOperation
       val tpe: UnaryOperationType
-    }
 
-    trait NumericUnaryOperation extends UnaryOperation {
+    trait NumericUnaryOperation extends UnaryOperation
       val tpe = UnaryOperationType(JNumberT, JNumberT)
-    }
 
-    trait BooleanUnaryOperation extends UnaryOperation {
+    trait BooleanUnaryOperation extends UnaryOperation
       val tpe = UnaryOperationType(JBooleanT, JBooleanT)
-    }
 
-    trait UnfixedUnaryOperation extends UnaryOperation {
+    trait UnfixedUnaryOperation extends UnaryOperation
       val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
-    }
 
-    sealed trait BinaryOperation {
+    sealed trait BinaryOperation
       val tpe: BinaryOperationType
-    }
 
-    trait NumericBinaryOperation extends BinaryOperation {
+    trait NumericBinaryOperation extends BinaryOperation
       val tpe = BinaryOperationType(JNumberT, JNumberT, JNumberT)
-    }
 
-    trait NumericComparisonOperation extends BinaryOperation {
+    trait NumericComparisonOperation extends BinaryOperation
       val dateAndNum = JUnionT(JNumberT, JDateT)
       val tpe = BinaryOperationType(dateAndNum, dateAndNum, JBooleanT)
-    }
 
-    trait BooleanBinaryOperation extends BinaryOperation {
+    trait BooleanBinaryOperation extends BinaryOperation
       val tpe = BinaryOperationType(JBooleanT, JBooleanT, JBooleanT)
-    }
 
-    trait EqualityOperation extends BinaryOperation {
+    trait EqualityOperation extends BinaryOperation
       val tpe = BinaryOperationType(
           JType.JUniverseT, JType.JUniverseT, JBooleanT)
-    }
 
-    trait UnfixedBinaryOperation extends BinaryOperation {
+    trait UnfixedBinaryOperation extends BinaryOperation
       val tpe = BinaryOperationType(
           JType.JUniverseT, JType.JUniverseT, JType.JUniverseT)
-    }
 
-    case class BuiltInFunction1Op(op: Op1) extends UnaryOperation {
+    case class BuiltInFunction1Op(op: Op1) extends UnaryOperation
       val tpe = op.tpe
-    }
 
-    case class BuiltInFunction2Op(op: Op2) extends BinaryOperation {
+    case class BuiltInFunction2Op(op: Op2) extends BinaryOperation
       val tpe = op.tpe
-    }
 
-    case class BuiltInMorphism1(mor: Morphism1) extends UnaryOperation {
+    case class BuiltInMorphism1(mor: Morphism1) extends UnaryOperation
       val tpe = mor.tpe
-    }
 
-    case class BuiltInMorphism2(mor: Morphism2) extends BinaryOperation {
+    case class BuiltInMorphism2(mor: Morphism2) extends BinaryOperation
       val tpe = mor.tpe
-    }
 
-    case class BuiltInReduction(red: Reduction) extends UnaryOperation {
+    case class BuiltInReduction(red: Reduction) extends UnaryOperation
       val tpe = red.tpe
-    }
 
     case object Add extends NumericBinaryOperation
     case object Sub extends NumericBinaryOperation
@@ -241,34 +221,25 @@ trait Instructions {
     case object Comp extends BooleanUnaryOperation
     case object Neg extends NumericUnaryOperation
 
-    case object WrapObject extends BinaryOperation {
+    case object WrapObject extends BinaryOperation
       val tpe = BinaryOperationType(JTextT, JType.JUniverseT, JObjectUnfixedT)
-    }
-    case object WrapArray extends UnaryOperation {
+    case object WrapArray extends UnaryOperation
       val tpe = UnaryOperationType(JType.JUniverseT, JArrayUnfixedT)
-    }
 
-    case object JoinObject extends BinaryOperation {
+    case object JoinObject extends BinaryOperation
       val tpe = BinaryOperationType(
           JObjectUnfixedT, JObjectUnfixedT, JObjectUnfixedT)
-    }
-    case object JoinArray extends BinaryOperation {
+    case object JoinArray extends BinaryOperation
       val tpe = BinaryOperationType(
           JArrayUnfixedT, JArrayUnfixedT, JArrayUnfixedT)
-    }
 
-    case object ArraySwap extends BinaryOperation {
+    case object ArraySwap extends BinaryOperation
       val tpe = BinaryOperationType(JArrayUnfixedT, JNumberT, JArrayUnfixedT)
-    }
 
-    case object DerefObject extends BinaryOperation {
+    case object DerefObject extends BinaryOperation
       val tpe = BinaryOperationType(JObjectUnfixedT, JTextT, JType.JUniverseT)
-    }
     case object DerefMetadata extends UnfixedBinaryOperation
-    case object DerefArray extends BinaryOperation {
+    case object DerefArray extends BinaryOperation
       val tpe = BinaryOperationType(JArrayUnfixedT, JNumberT, JType.JUniverseT)
-    }
 
     case object Range
-  }
-}

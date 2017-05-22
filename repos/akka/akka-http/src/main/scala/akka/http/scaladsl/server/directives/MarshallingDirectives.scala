@@ -11,7 +11,7 @@ import akka.http.scaladsl.marshalling.ToResponseMarshaller
 import akka.http.scaladsl.unmarshalling.{Unmarshaller, FromRequestUnmarshaller}
 import akka.http.impl.util._
 
-trait MarshallingDirectives {
+trait MarshallingDirectives
   import BasicDirectives._
   import FutureDirectives._
   import RouteDirectives._
@@ -22,10 +22,10 @@ trait MarshallingDirectives {
     * produced by the unmarshaller.
     */
   def entity[T](um: FromRequestUnmarshaller[T]): Directive1[T] =
-    extractRequestContext.flatMap[Tuple1[T]] { ctx ⇒
+    extractRequestContext.flatMap[Tuple1[T]]  ctx ⇒
       import ctx.executionContext
       import ctx.materializer
-      onComplete(um(ctx.request)) flatMap {
+      onComplete(um(ctx.request)) flatMap
         case Success(value) ⇒ provide(value)
         case Failure(Unmarshaller.NoContentException) ⇒
           reject(RequestEntityExpectedRejection)
@@ -36,8 +36,7 @@ trait MarshallingDirectives {
         case Failure(x) ⇒
           reject(MalformedRequestContentRejection(x.getMessage.nullAsEmpty,
                                                   Option(x.getCause)))
-      }
-    } & cancelRejections(RequestEntityExpectedRejection.getClass,
+    & cancelRejections(RequestEntityExpectedRejection.getClass,
                          classOf[UnsupportedRequestContentTypeRejection])
 
   /**
@@ -51,14 +50,12 @@ trait MarshallingDirectives {
     */
   def completeWith[T](marshaller: ToResponseMarshaller[T])(
       inner: (T ⇒ Unit) ⇒ Unit): Route =
-    extractRequestContext { ctx ⇒
+    extractRequestContext  ctx ⇒
       implicit val m = marshaller
-      complete {
+      complete
         val promise = Promise[T]()
         inner(promise.success(_))
         promise.future
-      }
-    }
 
   /**
     * Returns the in-scope Marshaller for the given type.
@@ -72,9 +69,7 @@ trait MarshallingDirectives {
     */
   def handleWith[A, B](f: A ⇒ B)(implicit um: FromRequestUnmarshaller[A],
                                  m: ToResponseMarshaller[B]): Route =
-    entity(um) { a ⇒
+    entity(um)  a ⇒
       complete(f(a))
-    }
-}
 
 object MarshallingDirectives extends MarshallingDirectives

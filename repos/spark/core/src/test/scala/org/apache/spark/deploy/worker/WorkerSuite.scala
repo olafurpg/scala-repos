@@ -25,24 +25,22 @@ import org.apache.spark.deploy.DeployMessages.{DriverStateChanged, ExecutorState
 import org.apache.spark.deploy.master.DriverState
 import org.apache.spark.rpc.{RpcAddress, RpcEnv}
 
-class WorkerSuite extends SparkFunSuite with Matchers {
+class WorkerSuite extends SparkFunSuite with Matchers
 
   import org.apache.spark.deploy.DeployTestUtils._
 
-  def cmd(javaOpts: String*): Command = {
+  def cmd(javaOpts: String*): Command =
     Command("", Seq.empty, Map.empty, Seq.empty, Seq.empty, Seq(javaOpts: _*))
-  }
   def conf(opts: (String, String)*): SparkConf =
     new SparkConf(loadDefaults = false).setAll(opts)
 
-  test("test isUseLocalNodeSSLConfig") {
+  test("test isUseLocalNodeSSLConfig")
     Worker.isUseLocalNodeSSLConfig(cmd("-Dasdf=dfgh")) shouldBe false
     Worker.isUseLocalNodeSSLConfig(cmd("-Dspark.ssl.useNodeLocalConf=true")) shouldBe true
     Worker.isUseLocalNodeSSLConfig(cmd("-Dspark.ssl.useNodeLocalConf=false")) shouldBe false
     Worker.isUseLocalNodeSSLConfig(cmd("-Dspark.ssl.useNodeLocalConf=")) shouldBe false
-  }
 
-  test("test maybeUpdateSSLSettings") {
+  test("test maybeUpdateSSLSettings")
     Worker
       .maybeUpdateSSLSettings(cmd("-Dasdf=dfgh", "-Dspark.ssl.opt1=x"),
                               conf("spark.ssl.opt1" -> "y",
@@ -65,9 +63,8 @@ class WorkerSuite extends SparkFunSuite with Matchers {
         "-Dspark.ssl.useNodeLocalConf=true",
         "-Dspark.ssl.opt1=y",
         "-Dspark.ssl.opt2=z")
-  }
 
-  test("test clearing of finishedExecutors (small number of executors)") {
+  test("test clearing of finishedExecutors (small number of executors)")
     val conf = new SparkConf()
     conf.set("spark.worker.ui.retainedExecutors", 2.toString)
     val rpcEnv = RpcEnv.create(
@@ -82,26 +79,22 @@ class WorkerSuite extends SparkFunSuite with Matchers {
                             conf,
                             new SecurityManager(conf))
     // initialize workers
-    for (i <- 0 until 5) {
+    for (i <- 0 until 5)
       worker.executors += s"app1/$i" -> createExecutorRunner(i)
-    }
     // initialize ExecutorStateChanged Message
     worker.handleExecutorStateChanged(
         ExecutorStateChanged("app1", 0, ExecutorState.EXITED, None, None))
     assert(worker.finishedExecutors.size === 1)
     assert(worker.executors.size === 4)
-    for (i <- 1 until 5) {
+    for (i <- 1 until 5)
       worker.handleExecutorStateChanged(
           ExecutorStateChanged("app1", i, ExecutorState.EXITED, None, None))
       assert(worker.finishedExecutors.size === 2)
-      if (i > 1) {
+      if (i > 1)
         assert(!worker.finishedExecutors.contains(s"app1/${i - 2}"))
-      }
       assert(worker.executors.size === 4 - i)
-    }
-  }
 
-  test("test clearing of finishedExecutors (more executors)") {
+  test("test clearing of finishedExecutors (more executors)")
     val conf = new SparkConf()
     conf.set("spark.worker.ui.retainedExecutors", 30.toString)
     val rpcEnv = RpcEnv.create(
@@ -116,35 +109,28 @@ class WorkerSuite extends SparkFunSuite with Matchers {
                             conf,
                             new SecurityManager(conf))
     // initialize workers
-    for (i <- 0 until 50) {
+    for (i <- 0 until 50)
       worker.executors += s"app1/$i" -> createExecutorRunner(i)
-    }
     // initialize ExecutorStateChanged Message
     worker.handleExecutorStateChanged(
         ExecutorStateChanged("app1", 0, ExecutorState.EXITED, None, None))
     assert(worker.finishedExecutors.size === 1)
     assert(worker.executors.size === 49)
-    for (i <- 1 until 50) {
-      val expectedValue = {
-        if (worker.finishedExecutors.size < 30) {
+    for (i <- 1 until 50)
+      val expectedValue =
+        if (worker.finishedExecutors.size < 30)
           worker.finishedExecutors.size + 1
-        } else {
+        else
           28
-        }
-      }
       worker.handleExecutorStateChanged(
           ExecutorStateChanged("app1", i, ExecutorState.EXITED, None, None))
-      if (expectedValue == 28) {
-        for (j <- i - 30 until i - 27) {
+      if (expectedValue == 28)
+        for (j <- i - 30 until i - 27)
           assert(!worker.finishedExecutors.contains(s"app1/$j"))
-        }
-      }
       assert(worker.executors.size === 49 - i)
       assert(worker.finishedExecutors.size === expectedValue)
-    }
-  }
 
-  test("test clearing of finishedDrivers (small number of drivers)") {
+  test("test clearing of finishedDrivers (small number of drivers)")
     val conf = new SparkConf()
     conf.set("spark.worker.ui.retainedDrivers", 2.toString)
     val rpcEnv = RpcEnv.create(
@@ -159,28 +145,24 @@ class WorkerSuite extends SparkFunSuite with Matchers {
                             conf,
                             new SecurityManager(conf))
     // initialize workers
-    for (i <- 0 until 5) {
+    for (i <- 0 until 5)
       val driverId = s"driverId-$i"
       worker.drivers += driverId -> createDriverRunner(driverId)
-    }
     // initialize DriverStateChanged Message
     worker.handleDriverStateChanged(
         DriverStateChanged("driverId-0", DriverState.FINISHED, None))
     assert(worker.drivers.size === 4)
     assert(worker.finishedDrivers.size === 1)
-    for (i <- 1 until 5) {
+    for (i <- 1 until 5)
       val driverId = s"driverId-$i"
       worker.handleDriverStateChanged(
           DriverStateChanged(driverId, DriverState.FINISHED, None))
-      if (i > 1) {
+      if (i > 1)
         assert(!worker.finishedDrivers.contains(s"driverId-${i - 2}"))
-      }
       assert(worker.drivers.size === 4 - i)
       assert(worker.finishedDrivers.size === 2)
-    }
-  }
 
-  test("test clearing of finishedDrivers (more drivers)") {
+  test("test clearing of finishedDrivers (more drivers)")
     val conf = new SparkConf()
     conf.set("spark.worker.ui.retainedDrivers", 30.toString)
     val rpcEnv = RpcEnv.create(
@@ -195,33 +177,25 @@ class WorkerSuite extends SparkFunSuite with Matchers {
                             conf,
                             new SecurityManager(conf))
     // initialize workers
-    for (i <- 0 until 50) {
+    for (i <- 0 until 50)
       val driverId = s"driverId-$i"
       worker.drivers += driverId -> createDriverRunner(driverId)
-    }
     // initialize DriverStateChanged Message
     worker.handleDriverStateChanged(
         DriverStateChanged("driverId-0", DriverState.FINISHED, None))
     assert(worker.finishedDrivers.size === 1)
     assert(worker.drivers.size === 49)
-    for (i <- 1 until 50) {
-      val expectedValue = {
-        if (worker.finishedDrivers.size < 30) {
+    for (i <- 1 until 50)
+      val expectedValue =
+        if (worker.finishedDrivers.size < 30)
           worker.finishedDrivers.size + 1
-        } else {
+        else
           28
-        }
-      }
       val driverId = s"driverId-$i"
       worker.handleDriverStateChanged(
           DriverStateChanged(driverId, DriverState.FINISHED, None))
-      if (expectedValue == 28) {
-        for (j <- i - 30 until i - 27) {
+      if (expectedValue == 28)
+        for (j <- i - 30 until i - 27)
           assert(!worker.finishedDrivers.contains(s"driverId-$j"))
-        }
-      }
       assert(worker.drivers.size === 49 - i)
       assert(worker.finishedDrivers.size === expectedValue)
-    }
-  }
-}

@@ -42,11 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class WorkerSpec[T]
     extends SimpleSFXDelegateSpec[jfxc.Worker[T], Worker[T]](
-        classOf[jfxc.Worker[T]], classOf[Worker[T]]) {
+        classOf[jfxc.Worker[T]], classOf[Worker[T]])
 
   override protected def getScalaClassInstance = Task[T](null.asInstanceOf[T])
 
-  override protected def getJavaClassInstance = new jfxc.Task[T] {
+  override protected def getJavaClassInstance = new jfxc.Task[T]
     def call = null.asInstanceOf[T]
-  }
-}

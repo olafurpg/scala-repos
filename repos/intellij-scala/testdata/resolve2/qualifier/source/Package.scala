@@ -1,5 +1,4 @@
 package p
 
-object O {
+object O
   println(p. /* line: 3 */ O)
-}

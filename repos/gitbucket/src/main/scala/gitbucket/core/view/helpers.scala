@@ -15,7 +15,7 @@ import play.twirl.api.{Html, HtmlFormat}
   * Provides helper methods for Twirl templates.
   */
 object helpers
-    extends AvatarImageProvider with LinkConverter with RequestCache {
+    extends AvatarImageProvider with LinkConverter with RequestCache
 
   /**
     * Format java.util.Date to "yyyy-MM-dd HH:mm:ss".
@@ -35,23 +35,21 @@ object helpers
   /**
     * Format java.util.Date to "x {seconds/minutes/hours/days/months/years} ago"
     */
-  def datetimeAgo(date: Date): String = {
+  def datetimeAgo(date: Date): String =
     val duration = new Date().getTime - date.getTime
-    timeUnits.find(tuple => duration / tuple._1 > 0) match {
+    timeUnits.find(tuple => duration / tuple._1 > 0) match
       case Some((unitValue, unitString)) =>
         val value = duration / unitValue
         s"${value} ${unitString}${if (value > 1) "s" else ""} ago"
       case None => "just now"
-    }
-  }
 
   /**
     * Format java.util.Date to "x {seconds/minutes/hours/days} ago"
     * If duration over 1 month, format to "d MMM (yyyy)"
     */
-  def datetimeAgoRecentOnly(date: Date): String = {
+  def datetimeAgoRecentOnly(date: Date): String =
     val duration = new Date().getTime - date.getTime
-    timeUnits.find(tuple => duration / tuple._1 > 0) match {
+    timeUnits.find(tuple => duration / tuple._1 > 0) match
       case Some((_, "month")) =>
         s"on ${new SimpleDateFormat("d MMM", Locale.ENGLISH).format(date)}"
       case Some((_, "year")) =>
@@ -60,17 +58,14 @@ object helpers
         val value = duration / unitValue
         s"${value} ${unitString}${if (value > 1) "s" else ""} ago"
       case None => "just now"
-    }
-  }
 
   /**
     * Format java.util.Date to "yyyy-MM-dd'T'hh:mm:ss'Z'".
     */
-  def datetimeRFC3339(date: Date): String = {
+  def datetimeRFC3339(date: Date): String =
     val sf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
     sf.setTimeZone(TimeZone.getTimeZone("UTC"))
     sf.format(date)
-  }
 
   /**
     * Format java.util.Date to "yyyy-MM-dd".
@@ -121,7 +116,7 @@ object helpers
                    repository: RepositoryService.RepositoryInfo,
                    enableWikiLink: Boolean,
                    enableRefsLink: Boolean,
-                   enableAnchor: Boolean)(implicit context: Context): Html = {
+                   enableAnchor: Boolean)(implicit context: Context): Html =
 
     val fileName = filePath.reverse.head.toLowerCase
     val extension = FileUtil.getExtension(fileName)
@@ -135,23 +130,20 @@ object helpers
                       enableRefsLink,
                       enableAnchor,
                       context))
-  }
 
   /**
     * Tests whether the given file is renderable. It's tested by the file extension.
     */
-  def isRenderable(fileName: String): Boolean = {
+  def isRenderable(fileName: String): Boolean =
     PluginRegistry().renderableExtensions
       .exists(extension => fileName.toLowerCase.endsWith("." + extension))
-  }
 
   /**
     * Creates a link to the issue or the pull request from the issue id.
     */
   def issueLink(repository: RepositoryService.RepositoryInfo, issueId: Int)(
-      implicit context: Context): Html = {
+      implicit context: Context): Html =
     Html(createIssueLink(repository, issueId))
-  }
 
   /**
     * Returns &lt;img&gt; which displays the avatar icon for the given user name.
@@ -179,18 +171,15 @@ object helpers
     Html(convertRefsLinks(value, repository))
 
   def cut(value: String, length: Int): String =
-    if (value.length > length) {
+    if (value.length > length)
       value.substring(0, length) + "..."
-    } else {
+    else
       value
-    }
 
   import scala.util.matching.Regex._
-  implicit class RegexReplaceString(s: String) {
-    def replaceAll(pattern: String, replacer: (Match) => String): String = {
+  implicit class RegexReplaceString(s: String)
+    def replaceAll(pattern: String, replacer: (Match) => String): String =
       pattern.r.replaceAllIn(s, (m: Match) => replacer(m).replace("$", "\\$"))
-    }
-  }
 
   /**
     * Convert link notations in the activity message.
@@ -209,22 +198,22 @@ object helpers
           .replaceAll(
               "\\[branch:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
               (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
+                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/$encodeRefName(
+                m.group(3))">${m.group(3)}</a>""")
           .replaceAll(
               "\\[tag:([^\\s]+?)/([^\\s]+?)#([^\\s]+?)\\]",
               (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/${encodeRefName(
-                m.group(3))}">${m.group(3)}</a>""")
+                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/tree/$encodeRefName(
+                m.group(3))">${m.group(3)}</a>""")
           .replaceAll("\\[user:([^\\s]+?)\\]",
                       (m: Match) => user(m.group(1)).body)
           .replaceAll(
               "\\[commit:([^\\s]+?)/([^\\s]+?)\\@([^\\s]+?)\\]",
               (m: Match) =>
-                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/commit/${m
-              .group(3)}">${m.group(1)}/${m.group(2)}@${m
+                s"""<a href="${context.path}/${m.group(1)}/${m.group(2)}/commit/$m
+              .group(3)">${m.group(1)}/${m.group(2)}@$m
               .group(3)
-              .substring(0, 7)}</a>"""))
+              .substring(0, 7)</a>"""))
 
   /**
     * Remove html tags from the given Html instance.
@@ -292,14 +281,14 @@ object helpers
   private def userWithContent(
       userName: String, mailAddress: String = "", styleClass: String = "")(
       content: Html)(implicit context: Context): Html =
-    (if (mailAddress.isEmpty) {
+    (if (mailAddress.isEmpty)
        getAccountByUserName(userName)
-     } else {
+     else
        getAccountByMailAddress(mailAddress)
-     }).map { account =>
+     ).map  account =>
       Html(
           s"""<a href="${url(account.userName)}" class="${styleClass}">${content}</a>""")
-    } getOrElse content
+    getOrElse content
 
   /**
     * Test whether the given Date is past date.
@@ -309,8 +298,8 @@ object helpers
   /**
     * Returns file type for AceEditor.
     */
-  def editorType(fileName: String): String = {
-    fileName.toLowerCase match {
+  def editorType(fileName: String): String =
+    fileName.toLowerCase match
       case x if (x.endsWith(".bat")) => "batchfile"
       case x if (x.endsWith(".java")) => "java"
       case x if (x.endsWith(".scala")) => "scala"
@@ -341,8 +330,6 @@ object helpers
       case x if (x.endsWith(".vbs")) => "vbscript"
       case x if (x.endsWith(".yml")) => "yaml"
       case _ => "plain_text"
-    }
-  }
 
   def pre(value: Html): Html =
     Html(
@@ -351,14 +338,13 @@ object helpers
   /**
     * Implicit conversion to add mkHtml() to Seq[Html].
     */
-  implicit class RichHtmlSeq(seq: Seq[Html]) {
+  implicit class RichHtmlSeq(seq: Seq[Html])
     def mkHtml(separator: String) = Html(seq.mkString(separator))
     def mkHtml(separator: scala.xml.Elem) =
       Html(seq.mkString(separator.toString))
-  }
 
   def commitStateIcon(state: CommitState) =
-    Html(state match {
+    Html(state match
       case CommitState.PENDING =>
         """<i style="color:inherit;width:inherit;height:inherit" class="octicon octicon-primitive-dot"></i>"""
       case CommitState.SUCCESS =>
@@ -367,25 +353,24 @@ object helpers
         """<i style="color:inherit;width:inherit;height:inherit" class="octicon octicon-x"></i>"""
       case CommitState.FAILURE =>
         """<i style="color:inherit;width:inherit;height:inherit" class="octicon octicon-x"></i>"""
-    })
+    )
 
-  def commitStateText(state: CommitState, commitId: String) = state match {
+  def commitStateText(state: CommitState, commitId: String) = state match
     case CommitState.PENDING =>
       "Waiting to hear about " + commitId.substring(0, 8)
     case CommitState.SUCCESS => "All is well"
     case CommitState.ERROR => "Failed"
     case CommitState.FAILURE => "Failed"
-  }
 
   // This pattern comes from: http://stackoverflow.com/a/4390768/1771641 (extract-url-from-string)
   private[this] val detectAndRenderLinksRegex =
     """(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,13}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»“”‘’]))""".r
 
-  def detectAndRenderLinks(text: String): Html = {
+  def detectAndRenderLinks(text: String): Html =
     val matches = detectAndRenderLinksRegex.findAllMatchIn(text).toSeq
 
     val (x, pos) =
-      matches.foldLeft((collection.immutable.Seq.empty[Html], 0)) {
+      matches.foldLeft((collection.immutable.Seq.empty[Html], 0))
         case ((x, pos), m) =>
           val url = m.group(0)
           val href = url.replace("\"", "&quot;")
@@ -397,11 +382,8 @@ object helpers
                    Some(Html(s"""<a href="${href}">${url}</a>"""))
                ).flatten),
            m.end)
-      }
     // append rest fragment
     val out =
       if (pos < text.length) x :+ HtmlFormat.escape(text.substring(pos)) else x
 
     HtmlFormat.fill(out)
-  }
-}

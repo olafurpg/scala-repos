@@ -11,20 +11,19 @@ import akka.remote.MessageSerializer
 import akka.actor.ExtendedActorSystem
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class ProtobufSerializerSpec extends AkkaSpec {
+class ProtobufSerializerSpec extends AkkaSpec
 
   val ser = SerializationExtension(system)
 
-  "Serialization" must {
+  "Serialization" must
 
-    "resolve protobuf serializer" in {
+    "resolve protobuf serializer" in
       ser.serializerFor(classOf[SerializedMessage]).getClass should ===(
           classOf[ProtobufSerializer])
       ser.serializerFor(classOf[MyMessage]).getClass should ===(
           classOf[ProtobufSerializer])
-    }
 
-    "work for SerializedMessage (just an akka.protobuf message)" in {
+    "work for SerializedMessage (just an akka.protobuf message)" in
       // create a protobuf message
       val protobufMessage = MessageSerializer.serialize(
           system.asInstanceOf[ExtendedActorSystem], "hello")
@@ -37,6 +36,3 @@ class ProtobufSerializerSpec extends AkkaSpec {
         .asInstanceOf[SerializedMessage]
       deserialized.getSerializerId should ===(protobufMessage.getSerializerId)
       deserialized.getMessage should ===(protobufMessage.getMessage) // same "hello"
-    }
-  }
-}

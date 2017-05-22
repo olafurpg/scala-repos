@@ -22,15 +22,12 @@ import kafka.common.{TopicAndPartition, OffsetMetadataAndError}
 import collection.JavaConversions
 
 class OffsetFetchResponse(
-    private val underlying: kafka.api.OffsetFetchResponse) {
+    private val underlying: kafka.api.OffsetFetchResponse)
 
-  def offsets: java.util.Map[TopicAndPartition, OffsetMetadataAndError] = {
+  def offsets: java.util.Map[TopicAndPartition, OffsetMetadataAndError] =
     import JavaConversions._
     underlying.requestInfo
-  }
-}
 
-object OffsetFetchResponse {
+object OffsetFetchResponse
   def readFrom(buffer: ByteBuffer) =
     new OffsetFetchResponse(kafka.api.OffsetFetchResponse.readFrom(buffer))
-}

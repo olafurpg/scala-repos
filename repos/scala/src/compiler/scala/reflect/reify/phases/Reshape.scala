@@ -3,7 +3,7 @@ package phases
 
 import scala.tools.nsc.symtab.Flags._
 
-trait Reshape { self: Reifier =>
+trait Reshape  self: Reifier =>
 
   import global._
   import definitions._
@@ -23,14 +23,14 @@ trait Reshape { self: Reifier =>
     *    * Transforming Annotated(annot, expr) into Typed(expr, TypeTree(Annotated(annot, _))
     *    * Non-idempotencies of the typechecker: https://issues.scala-lang.org/browse/SI-5464
     */
-  val reshape = new Transformer {
+  val reshape = new Transformer
     var currentSymbol: Symbol = NoSymbol
 
-    override def transform(tree0: Tree) = {
+    override def transform(tree0: Tree) =
       val tree = undoMacroExpansion(tree0)
       currentSymbol = tree.symbol
 
-      val preTyper = tree match {
+      val preTyper = tree match
         case tree if tree.isErroneous =>
           tree
         case tt @ TypeTree() =>
@@ -78,19 +78,17 @@ trait Reshape { self: Reifier =>
           Apply(fun, args).copyAttrs(unapply)
         case _ =>
           tree
-      }
 
       super.transform(preTyper)
-    }
 
     private def undoMacroExpansion(tree: Tree): Tree =
-      tree.attachments.get[analyzer.MacroExpansionAttachment] match {
+      tree.attachments.get[analyzer.MacroExpansionAttachment] match
         case Some(analyzer.MacroExpansionAttachment(original, _)) =>
           def mkImplicitly(tp: Type) = atPos(tree.pos)(
               gen.mkNullaryCall(Predef_implicitly, List(tp))
           )
           val sym = original.symbol
-          original match {
+          original match
             // this hack is necessary until I fix implicit macros
             // so far tag materialization is implemented by sneaky macros hidden in scala-compiler.jar
             // hence we cannot reify references to them, because noone will be able to see them later
@@ -106,17 +104,14 @@ trait Reshape { self: Reifier =>
                 if sym == materializeTypeTag =>
               mkImplicitly(typeRef(pre.tpe, TypeTagClass, List(tt.tpe)))
             case _ => original
-          }
         case _ => tree
-      }
 
-    override def transformModifiers(mods: Modifiers) = {
+    override def transformModifiers(mods: Modifiers) =
       val mods1 = toPreTyperModifiers(mods, currentSymbol)
       super.transformModifiers(mods1)
-    }
 
-    private def toPreTyperModifiers(mods: Modifiers, sym: Symbol) = {
-      if (!sym.annotations.isEmpty) {
+    private def toPreTyperModifiers(mods: Modifiers, sym: Symbol) =
+      if (!sym.annotations.isEmpty)
         val postTyper = sym.annotations filter (_.original != EmptyTree)
         if (reifyDebug && !postTyper.isEmpty)
           println("reify symbol annotations for: " + sym)
@@ -124,10 +119,8 @@ trait Reshape { self: Reifier =>
           println("originals are: " + sym.annotations)
         val preTyper = postTyper map toPreTyperAnnotation
         mods.withAnnotations(preTyper)
-      } else {
+      else
         mods
-      }
-    }
 
     /** Restore pre-typer representation of a type.
       *
@@ -163,8 +156,8 @@ trait Reshape { self: Reifier =>
       *  The only usage of `reifyType` now is for servicing typetags, however, I have some ideas how to get rid of that as well.
       */
     private def isDiscarded(tt: TypeTree) = tt.original == null
-    private def toPreTyperTypeTree(tt: TypeTree): Tree = {
-      if (!isDiscarded(tt)) {
+    private def toPreTyperTypeTree(tt: TypeTree): Tree =
+      if (!isDiscarded(tt))
         // here we rely on the fact that the originals that reach this point
         // have all necessary symbols attached to them (i.e. that they can be recompiled in any lexical context)
         // if this assumption fails, please, don't be quick to add postprocessing here (like I did before)
@@ -176,7 +169,7 @@ trait Reshape { self: Reifier =>
               "verdict: rolled back to original %s".format(
                   tt.original.toString.replaceAll("\\s+", " ")))
         transform(tt.original)
-      } else {
+      else
         // type is deemed to be non-essential
         // erase it and hope that subsequent reflective compilation will be able to recreate it again
         if (reifyDebug)
@@ -184,10 +177,8 @@ trait Reshape { self: Reifier =>
               "TypeTree, non-essential: %s (%s)".format(tt.tpe, tt.tpe.kind))
         if (reifyDebug) println("verdict: discarded")
         TypeTree()
-      }
-    }
 
-    private def toPreTyperCompoundTypeTree(ctt: CompoundTypeTree): Tree = {
+    private def toPreTyperCompoundTypeTree(ctt: CompoundTypeTree): Tree =
       val CompoundTypeTree(tmpl @ Template(parents, self, stats)) = ctt
       if (stats.nonEmpty) CannotReifyCompoundTypeTreeWithNonEmptyBody(ctt)
       assert(self eq noSelfType, self)
@@ -195,40 +186,34 @@ trait Reshape { self: Reifier =>
       val CompoundTypeTreeOriginalAttachment(parents1, stats1) =
         att.getOrElse(CompoundTypeTreeOriginalAttachment(parents, stats))
       CompoundTypeTree(Template(parents1, self, stats1))
-    }
 
-    private def toPreTyperTypedOrAnnotated(tree: Tree): Tree = tree match {
+    private def toPreTyperTypedOrAnnotated(tree: Tree): Tree = tree match
       case ty @ Typed(expr1, tpt) =>
         if (reifyDebug) println("reify typed: " + tree)
-        val original = tpt match {
+        val original = tpt match
           case tt @ TypeTree() => tt.original
           case tpt => tpt
-        }
-        val annotatedArg = {
-          def loop(tree: Tree): Tree = tree match {
+        val annotatedArg =
+          def loop(tree: Tree): Tree = tree match
             case annotated1 @ Annotated(ann, annotated2 @ Annotated(_, _)) =>
               loop(annotated2)
             case annotated1 @ Annotated(ann, arg) => arg
             case _ => EmptyTree
-          }
 
           loop(original)
-        }
-        if (annotatedArg != EmptyTree) {
-          if (annotatedArg.isType) {
+        if (annotatedArg != EmptyTree)
+          if (annotatedArg.isType)
             if (reifyDebug)
               println("verdict: was an annotated type, reify as usual")
             ty
-          } else {
+          else
             if (reifyDebug)
               println(
                   "verdict: was an annotated value, equivalent is " + original)
             toPreTyperTypedOrAnnotated(original)
-          }
-        } else {
+        else
           if (reifyDebug) println("verdict: wasn't annotated, reify as usual")
           ty
-        }
       case at @ Annotated(annot, arg) =>
         if (reifyDebug) println("reify type annotations for: " + tree)
         assert(at.tpe.isInstanceOf[AnnotatedType],
@@ -237,45 +222,38 @@ trait Reshape { self: Reifier =>
             at.tpe.asInstanceOf[AnnotatedType].annotations(0))
         if (reifyDebug) println("originals are: " + annot1)
         Annotated(annot1, arg).copyAttrs(at)
-    }
 
     /** Restore pre-typer representation of an annotation.
       *  The trick here is to retain the symbols that have been populated during typechecking of the annotation.
       *  If we do not do that, subsequent reflective compilation will fail.
       */
-    private def toPreTyperAnnotation(ann: AnnotationInfo): Tree = {
+    private def toPreTyperAnnotation(ann: AnnotationInfo): Tree =
       val args =
-        if (ann.assocs.isEmpty) {
+        if (ann.assocs.isEmpty)
           ann.args
-        } else {
+        else
           def toScalaAnnotation(jann: ClassfileAnnotArg): Tree =
-            (jann: @unchecked) match {
+            (jann: @unchecked) match
               case LiteralAnnotArg(const) => Literal(const)
               case ArrayAnnotArg(arr) =>
                 Apply(Ident(definitions.ArrayModule),
                       arr.toList map toScalaAnnotation)
               case NestedAnnotArg(ann) => toPreTyperAnnotation(ann)
-            }
 
-          ann.assocs map {
+          ann.assocs map
             case (nme, arg) =>
               AssignOrNamedArg(Ident(nme), toScalaAnnotation(arg))
-          }
-        }
 
-      def extractOriginal: PartialFunction[Tree, Tree] = {
+      def extractOriginal: PartialFunction[Tree, Tree] =
         case Apply(Select(New(tpt), _), _) => tpt
-      }
       assert(extractOriginal.isDefinedAt(ann.original), showRaw(ann.original))
       New(TypeTree(ann.atp) setOriginal extractOriginal(ann.original),
           List(args))
-    }
 
-    private def toPreTyperLazyVal(ddef: DefDef): ValDef = {
-      def extractRhs(rhs: Tree) = rhs match {
+    private def toPreTyperLazyVal(ddef: DefDef): ValDef =
+      def extractRhs(rhs: Tree) = rhs match
         case Block(Assign(lhs, rhs) :: Nil, _) if lhs.symbol.isLazy => rhs
         case _ => rhs // unit or trait case
-      }
       val DefDef(mods0, name0, _, _, tpt0, rhs0) = ddef
       val name1 = name0.dropLocal
       val Modifiers(flags0, privateWithin0, annotations0) = mods0
@@ -284,52 +262,46 @@ trait Reshape { self: Reifier =>
         Modifiers(flags1, privateWithin0, annotations0) setPositions mods0.positions
       val mods2 = toPreTyperModifiers(mods1, ddef.symbol)
       ValDef(mods2, name1, tpt0, extractRhs(rhs0))
-    }
 
-    private def trimAccessors(deff: Tree, stats: List[Tree]): List[Tree] = {
+    private def trimAccessors(deff: Tree, stats: List[Tree]): List[Tree] =
       val symdefs = (stats collect { case vodef: ValOrDefDef => vodef } map
           (vodeff => vodeff.symbol -> vodeff)).toMap
       val accessors = scala.collection.mutable.Map[ValDef, List[DefDef]]()
       stats collect { case ddef: DefDef => ddef } foreach
       (defdef =>
-            {
               val valdef =
-                symdefs get defdef.symbol.accessedOrSelf collect {
+                symdefs get defdef.symbol.accessedOrSelf collect
                   case vdef: ValDef => vdef
-                } getOrElse null
+                getOrElse null
               if (valdef != null)
                 accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
 
-              def detectBeanAccessors(prefix: String): Unit = {
-                if (defdef.name.startsWith(prefix)) {
+              def detectBeanAccessors(prefix: String): Unit =
+                if (defdef.name.startsWith(prefix))
                   val name = defdef.name.toString.substring(prefix.length)
                   def uncapitalize(s: String) =
                     if (s.length == 0) ""
-                    else {
+                    else
                       val chars = s.toCharArray; chars(0) = chars(0).toLower;
                       new String(chars)
-                    }
-                  def findValDef(name: String) = symdefs.values collectFirst {
+                  def findValDef(name: String) = symdefs.values collectFirst
                     case vdef: ValDef if vdef.name.dropLocal string_== name =>
                       vdef
-                  }
                   val valdef = findValDef(name)
                     .orElse(findValDef(uncapitalize(name)))
                     .orNull
                   if (valdef != null)
                     accessors(valdef) = accessors.getOrElse(valdef, Nil) :+ defdef
-                }
-              }
               detectBeanAccessors("get")
               detectBeanAccessors("set")
               detectBeanAccessors("is")
-          })
+          )
 
       val stats1 =
-        stats flatMap {
+        stats flatMap
           case vdef @ ValDef(mods, name, tpt, rhs) if !mods.isLazy =>
             val mods1 =
-              if (accessors.contains(vdef)) {
+              if (accessors.contains(vdef))
                 val ddef = accessors(vdef)(0) // any accessor will do
                 val Modifiers(flags, _, annotations) = mods
                 var flags1 = flags & ~LOCAL
@@ -340,9 +312,8 @@ trait Reshape { self: Reifier =>
                         curr ++
                         (acc.symbol.annotations map toPreTyperAnnotation))
                 Modifiers(flags1, privateWithin1, annotations1) setPositions mods.positions
-              } else {
+              else
                 mods
-              }
             val mods2 = toPreTyperModifiers(mods1, vdef.symbol)
             val name1 = name.dropLocal
             val vdef1 = ValDef(mods2, name1.toTermName, tpt, rhs)
@@ -353,20 +324,17 @@ trait Reshape { self: Reifier =>
           case ddef: DefDef if !ddef.mods.isLazy =>
             // lazy val accessors are removed in reshapeLazyVals
             // as they are needed to recreate lazy vals
-            if (accessors.values.exists(_.contains(ddef))) {
+            if (accessors.values.exists(_.contains(ddef)))
               if (reifyDebug) println("discarding accessor method: " + ddef)
               None
-            } else {
+            else
               Some(ddef)
-            }
           case tree =>
             Some(tree)
-        }
 
       stats1
-    }
 
-    private def reshapeLazyVals(stats: List[Tree]): List[Tree] = {
+    private def reshapeLazyVals(stats: List[Tree]): List[Tree] =
       val lazyvaldefs: Map[Symbol, DefDef] = stats
         .collect({ case ddef: DefDef if ddef.mods.isLazy => ddef })
         .map((ddef: DefDef) => ddef.symbol -> ddef)
@@ -375,36 +343,34 @@ trait Reshape { self: Reifier =>
       // only that valdef needs to have its rhs rebuilt from defdef
       stats flatMap
       (stat =>
-            stat match {
+            stat match
               case vdef: ValDef if vdef.symbol.isLazy =>
                 if (reifyDebug)
                   println(s"reconstructing original lazy value for $vdef")
                 val ddefSym = vdef.symbol.lazyAccessor
-                val vdef1 = lazyvaldefs.get(ddefSym) match {
+                val vdef1 = lazyvaldefs.get(ddefSym) match
                   case Some(ddef) =>
                     toPreTyperLazyVal(ddef)
                   case None =>
                     if (reifyDebug)
                       println("couldn't find corresponding lazy val accessor")
                     vdef
-                }
                 if (reifyDebug) println(s"reconstructed lazy val is $vdef1")
                 vdef1 :: Nil
               case ddef: DefDef if ddef.symbol.isLazy =>
-                if (isUnitType(ddef.symbol.info)) {
+                if (isUnitType(ddef.symbol.info))
                   // since lazy values of type Unit don't have val's
                   // we need to create them from scratch
                   toPreTyperLazyVal(ddef) :: Nil
-                } else Nil
+                else Nil
               case _ => stat :: Nil
-          })
-    }
+          )
 
     private def trimSyntheticCaseClassMembers(
         deff: Tree, stats: List[Tree]): List[Tree] =
       stats filterNot
       (memberDef =>
-            memberDef.isDef && {
+            memberDef.isDef &&
               val isSynthetic = memberDef.symbol.isSynthetic
               // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
               // that's why I replace the check with an assumption that all synthetic members are, in fact, generated of case classes
@@ -413,14 +379,13 @@ trait Reshape { self: Reifier =>
               if (isSynthetic && isCaseMember && reifyDebug)
                 println("discarding case class synthetic def: " + memberDef)
               isSynthetic && isCaseMember
-          })
+          )
 
     private def trimSyntheticCaseClassCompanions(
         stats: List[Tree]): List[Tree] =
       stats diff
       (stats collect { case moddef: ModuleDef => moddef } filter
           (moddef =>
-                {
                   val isSynthetic = moddef.symbol.isSynthetic
                   // this doesn't work for local classes, e.g. for ones that are top-level to a quasiquote (see comments to companionClass)
                   // that's why I replace the check with an assumption that all synthetic modules are, in fact, companions of case classes
@@ -430,6 +395,4 @@ trait Reshape { self: Reifier =>
                     println(
                         "discarding synthetic case class companion: " + moddef)
                   isSynthetic && isCaseCompanion
-              }))
-  }
-}
+              ))

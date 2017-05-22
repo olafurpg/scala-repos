@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
 import scala.language.experimental.macros
@@ -11,4 +11,3 @@ class Foo(val c: Context) { def impl = { import c.universe._; c.Expr[Unit](q"()"
 def foo: Unit = macro Foo.impl
 foo
   """
-}

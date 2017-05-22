@@ -7,7 +7,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object OneOrTest extends SpecLite {
+object OneOrTest extends SpecLite
   import OneOr._
   checkAll("OneOr", equal.laws[OneOr[List, Int]])
   checkAll("OneOr", order.laws[OneOr[List, Int]])
@@ -22,19 +22,17 @@ object OneOrTest extends SpecLite {
 //    }
 //  }
 
-  "findLeft" ! forAll { a: OneOr[List, Int] =>
+  "findLeft" ! forAll  a: OneOr[List, Int] =>
     val f = (_: Int) % 2 == 0
     val F = Foldable[OneOr.OneOrList]
     F.findLeft(a)(f) must_=== Foldable[List].findLeft(F.toList(a))(f)
-  }
 
-  "findRight" ! forAll { a: OneOr[List, Int] =>
+  "findRight" ! forAll  a: OneOr[List, Int] =>
     val f = (_: Int) % 2 == 0
     val F = Foldable[OneOr.OneOrList]
     F.findRight(a)(f) must_=== Foldable[List].findRight(F.toList(a))(f)
-  }
 
-  object instances {
+  object instances
     def functor[F[_]: Functor] = Functor[OneOr[F, ?]]
     def apply[F[_]: Apply] = Apply[OneOr[F, ?]]
     def applicative[F[_]: Apply] = Applicative[OneOr[F, ?]]
@@ -44,5 +42,3 @@ object OneOrTest extends SpecLite {
     def foldable1[F[_]: Foldable1] = Foldable1[OneOr[F, ?]]
     def traverse[F[_]: Traverse] = Traverse[OneOr[F, ?]]
     def traverse1[F[_]: Traverse1] = Traverse1[OneOr[F, ?]]
-  }
-}

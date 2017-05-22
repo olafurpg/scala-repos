@@ -2,7 +2,7 @@ package test
 
 /* private elements are visible in the companion class/object */
 
-class Completion1 {
+class Completion1
 
   import Completion1._
 
@@ -12,9 +12,8 @@ class Completion1 {
   private class Cc1 {}
 
   /*_*/
-}
 
-object Completion1 {
+object Completion1
 
   val c = new Completion1()
   import c._
@@ -25,4 +24,3 @@ object Completion1 {
   private class Co1 {}
 
   /*_*/
-}

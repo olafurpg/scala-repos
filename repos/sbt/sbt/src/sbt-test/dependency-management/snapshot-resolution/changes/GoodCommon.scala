@@ -1,3 +1,2 @@
-object Common {
+object Common
   def name = "common"
-}

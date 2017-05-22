@@ -5,9 +5,9 @@ package refactoring.extractTrait
   * Nikolay.Tropin
   * 2014-06-25
   */
-class ExtractTraitTestTypeParameters extends ExtractTraitTestBase {
+class ExtractTraitTestTypeParameters extends ExtractTraitTestBase
 
-  def testSimpleParameterizedClass() {
+  def testSimpleParameterizedClass()
     val text = """
         |class Parameterized[T] {<caret>
         |  def foo(p: T) {}
@@ -37,9 +37,8 @@ class ExtractTraitTestTypeParameters extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result2, onlyDeclarations = true)
-  }
 
-  def testTypeParameterWithBound() {
+  def testTypeParameterWithBound()
     val text = """
         |class Parameterized[T <: List[Int]] {<caret>
         |  def foo(t: T) {
@@ -60,9 +59,8 @@ class ExtractTraitTestTypeParameters extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result, onlyDeclarations = false)
-  }
 
-  def testChainedParameter() {
+  def testChainedParameter()
     val text = """
         |class Parameterized[S, T <: List[S]] {<caret>
         |  def foo(t: T) {
@@ -84,5 +82,3 @@ class ExtractTraitTestTypeParameters extends ExtractTraitTestBase {
       """.stripMargin
 
     checkResult(text, result, onlyDeclarations = false)
-  }
-}

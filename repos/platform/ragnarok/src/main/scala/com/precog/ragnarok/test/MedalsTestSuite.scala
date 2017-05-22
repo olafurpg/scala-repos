@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object MedalsTestSuite extends PerfTestSuite {
+object MedalsTestSuite extends PerfTestSuite
   query("""
       | import std::math::floor
       | 
@@ -35,4 +35,3 @@ object MedalsTestSuite extends PerfTestSuite {
       | 
       | histogram
       | """.stripMargin)
-}

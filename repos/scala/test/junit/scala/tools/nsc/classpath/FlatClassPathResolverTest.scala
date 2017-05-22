@@ -17,7 +17,7 @@ import scala.tools.util.FlatClassPathResolver
 import scala.tools.util.PathResolver
 
 @RunWith(classOf[JUnit4])
-class FlatClassPathResolverTest {
+class FlatClassPathResolverTest
 
   val tempDir = new TemporaryFolder()
 
@@ -40,7 +40,7 @@ class FlatClassPathResolverTest {
   private val settings = new Settings
 
   @Before
-  def initTempDirAndSourcePath: Unit = {
+  def initTempDirAndSourcePath: Unit =
     // In Java TemporaryFolder in JUnit is managed automatically using @Rule.
     // It would work also in Scala after adding and extending a class like
     // TestWithTempFolder.java containing it. But in this case it doesn't work when running tests
@@ -56,7 +56,6 @@ class FlatClassPathResolverTest {
 
     settings.usejavacp.value = true
     settings.sourcepath.value = tempDir.getRoot.getAbsolutePath
-  }
 
   @After
   def deleteTempDir: Unit = tempDir.delete()
@@ -65,10 +64,10 @@ class FlatClassPathResolverTest {
     new FlatClassPathResolver(settings).result
 
   @Test
-  def testEntriesFromListOperationAgainstSeparateMethods: Unit = {
+  def testEntriesFromListOperationAgainstSeparateMethods: Unit =
     val classPath = createFlatClassPath(settings)
 
-    def compareEntriesInPackage(inPackage: String): Unit = {
+    def compareEntriesInPackage(inPackage: String): Unit =
       val packages = classPath.packages(inPackage)
       val classes = classPath.classes(inPackage)
       val sources = classPath.sources(inPackage)
@@ -104,33 +103,28 @@ class FlatClassPathResolverTest {
           s"Class and source entries with the same name obtained via list for package '$inPackage' should be merged into one containing both files",
           uniqueNamesOfClassAndSourceFiles.size,
           classesAndSourcesFromList.length)
-    }
 
     packagesToTest foreach compareEntriesInPackage
-  }
 
   @Test
-  def testCreatedEntriesAgainstRecursiveClassPath: Unit = {
+  def testCreatedEntriesAgainstRecursiveClassPath: Unit =
     val flatClassPath = createFlatClassPath(settings)
     val recursiveClassPath = new PathResolver(settings).result
 
-    def compareEntriesInPackage(inPackage: String): Unit = {
+    def compareEntriesInPackage(inPackage: String): Unit =
 
       @tailrec
       def traverseToPackage(
           packageNameParts: Seq[String],
-          cp: ClassPath[AbstractFile]): ClassPath[AbstractFile] = {
-        packageNameParts match {
+          cp: ClassPath[AbstractFile]): ClassPath[AbstractFile] =
+        packageNameParts match
           case Nil => cp
           case h :: t =>
-            cp.packages.find(_.name == h) match {
+            cp.packages.find(_.name == h) match
               case Some(nestedCp) => traverseToPackage(t, nestedCp)
               case _ =>
                 throw new Exception(
                     s"There's no package $inPackage in recursive classpath - error when searching for '$h'")
-            }
-        }
-      }
 
       val packageNameParts =
         if (inPackage == FlatClassPath.RootPackage) Nil
@@ -166,26 +160,19 @@ class FlatClassPathResolverTest {
           s"Class entries in package '$inPackage' on flat cp should be the same as on the recursive cp",
           recursiveCpClasses,
           flatCpClasses)
-    }
 
     packagesToTest foreach compareEntriesInPackage
-  }
 
   @Test
-  def testFindClassFile: Unit = {
+  def testFindClassFile: Unit =
     val classPath = createFlatClassPath(settings)
-    classFilesToFind foreach { className =>
+    classFilesToFind foreach  className =>
       assertTrue(s"File for $className should be found",
                  classPath.findClassFile(className).isDefined)
-    }
-  }
 
   @Test
-  def testFindClass: Unit = {
+  def testFindClass: Unit =
     val classPath = createFlatClassPath(settings)
-    classesToFind foreach { className =>
+    classesToFind foreach  className =>
       assertTrue(s"File for $className should be found",
                  classPath.findClass(className).isDefined)
-    }
-  }
-}

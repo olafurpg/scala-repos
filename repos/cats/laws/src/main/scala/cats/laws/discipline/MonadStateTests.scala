@@ -6,7 +6,7 @@ import cats.laws.discipline.CartesianTests.Isomorphisms
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
-trait MonadStateTests[F[_], S] extends MonadTests[F] {
+trait MonadStateTests[F[_], S] extends MonadTests[F]
   def laws: MonadStateLaws[F, S]
 
   def monadState[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
@@ -24,8 +24,8 @@ trait MonadStateTests[F[_], S] extends MonadTests[F] {
       EqFUnit: Eq[F[Unit]],
       EqFS: Eq[F[S]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
-    new RuleSet {
+      iso: Isomorphisms[F]): RuleSet =
+    new RuleSet
       def name: String = "monadState"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(monad[A, B, C])
@@ -35,13 +35,8 @@ trait MonadStateTests[F[_], S] extends MonadTests[F] {
           "monadState set get" -> forAll(laws.monadStateSetGet _),
           "monadState get set" -> laws.monadStateGetSet
       )
-    }
-  }
-}
 
-object MonadStateTests {
+object MonadStateTests
   def apply[F[_], S](implicit FS: MonadState[F, S]): MonadStateTests[F, S] =
-    new MonadStateTests[F, S] {
+    new MonadStateTests[F, S]
       def laws: MonadStateLaws[F, S] = MonadStateLaws[F, S]
-    }
-}

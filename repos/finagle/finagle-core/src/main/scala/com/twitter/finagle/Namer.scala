@@ -13,7 +13,7 @@ import java.net.InetSocketAddress
   * external processes, for example lookups through DNS or to ZooKeeper,
   * and thus lookup results are represented by a [[com.twitter.util.Activity Activity]].
   */
-trait Namer { self =>
+trait Namer  self =>
 
   /**
     * Translate a [[com.twitter.finagle.Path Path]] into a
@@ -28,21 +28,17 @@ trait Namer { self =>
     */
   def bind(tree: NameTree[Path]): Activity[NameTree[Name.Bound]] =
     Namer.bind(this.lookup, tree)
-}
 
-private case class FailingNamer(exc: Throwable) extends Namer {
+private case class FailingNamer(exc: Throwable) extends Namer
   def lookup(path: Path): Activity[NameTree[Name]] =
     Activity.exception(exc)
-}
 
-object Namer {
+object Namer
   import NameTree._
 
-  private[finagle] val namerOfKind: (String => Namer) = Memoize { kind =>
-    try Class.forName(kind).newInstance().asInstanceOf[Namer] catch {
+  private[finagle] val namerOfKind: (String => Namer) = Memoize  kind =>
+    try Class.forName(kind).newInstance().asInstanceOf[Namer] catch
       case NonFatal(exc) => FailingNamer(exc)
-    }
-  }
 
   // Key to encode name tree weights in Addr metadata
   private[twitter] val AddrWeightKey = "namer_nametree_weight"
@@ -67,10 +63,10 @@ object Namer {
     *
     * to force empty resolutions.
     */
-  val global: Namer = new Namer {
+  val global: Namer = new Namer
 
-    private[this] object InetPath {
-      def unapply(path: Path): Option[(Address, Path)] = path match {
+    private[this] object InetPath
+      def unapply(path: Path): Option[(Address, Path)] = path match
         case Path.Utf8(
             "$", "inet", host, IntegerString(port), residual @ _ *) =>
           Some(
@@ -79,32 +75,26 @@ object Namer {
         case Path.Utf8("$", "inet", IntegerString(port), residual @ _ *) =>
           Some((Address(new InetSocketAddress(port)), Path.Utf8(residual: _*)))
         case _ => None
-      }
-    }
 
-    private[this] object FailPath {
+    private[this] object FailPath
       val prefix = Path.Utf8("$", "fail")
 
       def unapply(path: Path): Boolean =
         path startsWith prefix
-    }
 
-    private[this] object NilPath {
+    private[this] object NilPath
       val prefix = Path.Utf8("$", "nil")
 
       def unapply(path: Path): Boolean =
         path startsWith prefix
-    }
 
-    private[this] object NamerPath {
-      def unapply(path: Path): Option[(Namer, Path)] = path match {
+    private[this] object NamerPath
+      def unapply(path: Path): Option[(Namer, Path)] = path match
         case Path.Utf8("$", kind, rest @ _ *) =>
           Some((namerOfKind(kind), Path.Utf8(rest: _*)))
         case _ => None
-      }
-    }
 
-    def lookup(path: Path): Activity[NameTree[Name]] = path match {
+    def lookup(path: Path): Activity[NameTree[Name]] = path match
       // Clients may depend on Name.Bound ids being Paths which resolve
       // back to the same Name.Bound.
       case InetPath(addr, residual) =>
@@ -116,21 +106,18 @@ object Namer {
       case NilPath() => Activity.value(Empty)
       case NamerPath(namer, rest) => namer.lookup(rest)
       case _ => Activity.value(Neg)
-    }
 
     override def toString = "Namer.global"
-  }
 
   /**
     * Resolve a path to an address set (taking `dtab` into account).
     */
   def resolve(dtab: Dtab, path: Path): Var[Addr] =
-    NameInterpreter.bind(dtab, path).map(_.eval).run.flatMap {
+    NameInterpreter.bind(dtab, path).map(_.eval).run.flatMap
       case Activity.Ok(None) => Var.value(Addr.Neg)
       case Activity.Ok(Some(names)) => Name.all(names).addr
       case Activity.Pending => Var.value(Addr.Pending)
       case Activity.Failed(exc) => Var.value(Addr.Failed(exc))
-    }
 
   /**
     * Resolve a path to an address set (taking [[Dtab.local]] into account).
@@ -141,20 +128,17 @@ object Namer {
     * Resolve a path to an address set (taking [[Dtab.local]] into account).
     */
   def resolve(path: String): Var[Addr] =
-    Try { Path.read(path) } match {
+    Try { Path.read(path) } match
       case Return(path) => resolve(path)
       case Throw(e) => Var.value(Addr.Failed(e))
-    }
 
-  private object IntegerString {
+  private object IntegerString
     def unapply(s: String): Option[Int] =
       Try(s.toInt).toOption
-  }
 
-  private object DoubleString {
+  private object DoubleString
     def unapply(s: String): Option[Double] =
       Try(s.toDouble).toOption
-  }
 
   private val MaxDepth = 100
 
@@ -167,44 +151,39 @@ object Namer {
       lookup: Path => Activity[NameTree[Name]],
       tree: NameTree[Path]
   ): Activity[NameTree[Name.Bound]] =
-    bind(lookup, 0, None)(tree map { path =>
+    bind(lookup, 0, None)(tree map  path =>
       Name.Path(path)
-    })
+    )
 
   private[this] def bindUnion(
       lookup: Path => Activity[NameTree[Name]],
       depth: Int,
       trees: Seq[Weighted[Name]]
-  ): Activity[NameTree[Name.Bound]] = {
+  ): Activity[NameTree[Name.Bound]] =
 
     val weightedTreeVars: Seq[Var[
-            Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map {
+            Activity.State[NameTree.Weighted[Name.Bound]]]] = trees.map
       case Weighted(w, t) =>
         val treesAct: Activity[NameTree[Name.Bound]] =
           bind(lookup, depth, Some(w))(t)
         treesAct.map(Weighted(w, _)).run
-    }
 
     val stateVar: Var[Activity.State[NameTree[Name.Bound]]] =
-      Var.collect(weightedTreeVars).map {
+      Var.collect(weightedTreeVars).map
         seq: Seq[Activity.State[NameTree.Weighted[Name.Bound]]] =>
           // - if there's at least one activity in Ok state, return the union of them
           // - if all activities are pending, the union is pending.
           // - if no subtree is Ok, and there are failures, retain the first failure.
 
-          val oks = seq.collect {
+          val oks = seq.collect
             case Activity.Ok(t) => t
-          }
-          if (oks.isEmpty) {
-            seq.collectFirst {
+          if (oks.isEmpty)
+            seq.collectFirst
               case f @ Activity.Failed(_) => f
-            }.getOrElse(Activity.Pending)
-          } else {
+            .getOrElse(Activity.Pending)
+          else
             Activity.Ok(Union.fromSeq(oks).simplified)
-          }
-      }
     new Activity(stateVar)
-  }
 
   // values of the returned activity are simplified and contain no Alt nodes
   private def bind(lookup: Path => Activity[NameTree[Name]],
@@ -215,19 +194,17 @@ object Namer {
       Activity.exception(
           new IllegalArgumentException("Max recursion level reached."))
     else
-      tree match {
+      tree match
         case Leaf(Name.Path(path)) =>
           lookup(path).flatMap(bind(lookup, depth + 1, weight))
         case Leaf(bound @ Name.Bound(addr)) =>
           // Add the weight of the parent to the addr's metadata
           // Note: this assumes a single level of tree weights
-          val addrWithWeight = addr.map { addr =>
-            (addr, weight) match {
+          val addrWithWeight = addr.map  addr =>
+            (addr, weight) match
               case (Addr.Bound(addrs, metadata), Some(weight)) =>
                 Addr.Bound(addrs, metadata + ((AddrWeightKey, weight)))
               case _ => addr
-            }
-          }
           Activity.value(
               Leaf(Name.Bound(addrWithWeight, bound.id, bound.path)))
 
@@ -245,18 +222,14 @@ object Namer {
         case Alt(trees @ _ *) =>
           def loop(
               trees: Seq[NameTree[Name]]): Activity[NameTree[Name.Bound]] =
-            trees match {
+            trees match
               case Nil => Activity.value(Neg)
               case Seq(head, tail @ _ *) =>
-                bind(lookup, depth, weight)(head).flatMap {
+                bind(lookup, depth, weight)(head).flatMap
                   case Fail => Activity.value(Fail)
                   case Neg => loop(tail)
                   case head => Activity.value(head)
-                }
-            }
           loop(trees)
-      }
-}
 
 /**
   * Abstract [[Namer]] class for Java compatibility.
@@ -272,12 +245,12 @@ abstract class AbstractNamer extends Namer
   * Note that this can't actually be accomplished in a type-safe manner
   * since the naming step obscures the service's type to observers.
   */
-trait ServiceNamer[Req, Rep] extends Namer {
+trait ServiceNamer[Req, Rep] extends Namer
 
   protected def lookupService(path: Path): Option[Service[Req, Rep]]
 
   def lookup(path: Path): Activity[NameTree[Name]] =
-    lookupService(path) match {
+    lookupService(path) match
       case None =>
         Activity.value(NameTree.Neg)
       case Some(svc) =>
@@ -285,11 +258,7 @@ trait ServiceNamer[Req, Rep] extends Namer {
         val addr = Addr.Bound(exp.Address(factory))
         val name = Name.Bound(Var.value(addr), factory, path)
         Activity.value(NameTree.Leaf(name))
-    }
-}
 
-package namer {
-  final class global extends Namer {
+package namer
+  final class global extends Namer
     def lookup(path: Path) = Namer.global.lookup(path)
-  }
-}

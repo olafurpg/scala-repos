@@ -21,11 +21,11 @@ import org.scalatest.junit.JUnitRunner
   */
 object ServerChannelConfigCodec extends ServerChannelConfigCodec
 
-class ServerChannelConfigCodec extends CodecFactory[String, String] {
-  def server = Function.const {
-    new Codec[String, String] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline = {
+class ServerChannelConfigCodec extends CodecFactory[String, String]
+  def server = Function.const
+    new Codec[String, String]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline =
           val pipeline = Channels.pipeline()
           pipeline.addLast("line",
                            new DelimiterBasedFrameDecoder(
@@ -33,32 +33,22 @@ class ServerChannelConfigCodec extends CodecFactory[String, String] {
           pipeline.addLast("stringDecoder", new StringDecoder(Charsets.Utf8))
           pipeline.addLast("stringEncoder", new StringEncoder(Charsets.Utf8))
           pipeline
-        }
-      }
-    }
-  }
 
-  def client = Function.const {
-    new Codec[String, String] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline = {
+  def client = Function.const
+    new Codec[String, String]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline =
           val pipeline = Channels.pipeline()
           pipeline.addLast("stringEncode", new StringEncoder(Charsets.Utf8))
           pipeline.addLast("stringDecode", new StringDecoder(Charsets.Utf8))
           pipeline
-        }
-      }
-    }
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class ServerChannelConfigurationTest extends FunSuite {
-  val service = new Service[String, String] {
+class ServerChannelConfigurationTest extends FunSuite
+  val service = new Service[String, String]
     def apply(request: String) = Future.value(request)
-  }
 
-  test("close connection after max life time duration") {
+  test("close connection after max life time duration")
     // create a server builder which will close connections in 2 seconds
     val address = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val server = ServerBuilder()
@@ -77,13 +67,11 @@ class ServerChannelConfigurationTest extends FunSuite {
 
     // Issue a request which is NOT newline-delimited. Server should close connection
     // after waiting for 2 seconds for a new line
-    intercept[ChannelClosedException] {
+    intercept[ChannelClosedException]
       Await.result(client("123"), 15.seconds)
-    }
     server.close()
-  }
 
-  test("close connection after max idle time duration") {
+  test("close connection after max idle time duration")
     // create a server builder which will close idle connections in 2 seconds
     val address = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val server = ServerBuilder()
@@ -102,9 +90,6 @@ class ServerChannelConfigurationTest extends FunSuite {
 
     // Issue a request which is NOT newline-delimited. Server should close connection
     // after waiting for 2 seconds for a new line
-    intercept[ChannelClosedException] {
+    intercept[ChannelClosedException]
       Await.result(client("123"), 5.seconds)
-    }
     server.close()
-  }
-}

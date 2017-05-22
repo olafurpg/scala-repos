@@ -93,7 +93,7 @@ import scala.concurrent.duration.FiniteDuration
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 trait PersistentFSMBase[S, D, E]
-    extends Actor with Listeners with ActorLogging {
+    extends Actor with Listeners with ActorLogging
 
   import akka.persistence.fsm.PersistentFSM._
 
@@ -194,10 +194,9 @@ trait PersistentFSMBase[S, D, E]
   final def stop(reason: Reason, stateData: D): State =
     stay using stateData withStopReason (reason)
 
-  final class TransformHelper(func: StateFunction) {
+  final class TransformHelper(func: StateFunction)
     def using(andThen: PartialFunction[State, State]): StateFunction =
       func andThen (andThen orElse { case x ⇒ x })
-  }
 
   final def transform(func: StateFunction): TransformHelper =
     new TransformHelper(func)
@@ -214,29 +213,25 @@ trait PersistentFSMBase[S, D, E]
   final def setTimer(name: String,
                      msg: Any,
                      timeout: FiniteDuration,
-                     repeat: Boolean = false): Unit = {
+                     repeat: Boolean = false): Unit =
     if (debugEvent)
       log.debug("setting " + (if (repeat) "repeating " else "") + "timer '" +
           name + "'/" + timeout + ": " + msg)
-    if (timers contains name) {
+    if (timers contains name)
       timers(name).cancel
-    }
     val timer = Timer(name, msg, repeat, timerGen.next)(context)
     timer.schedule(self, timeout)
     timers(name) = timer
-  }
 
   /**
     * Cancel named timer, ensuring that the message is not subsequently delivered (no race).
     * @param name of the timer to cancel
     */
-  final def cancelTimer(name: String): Unit = {
+  final def cancelTimer(name: String): Unit =
     if (debugEvent) log.debug("canceling timer '" + name + "'")
-    if (timers contains name) {
+    if (timers contains name)
       timers(name).cancel
       timers -= name
-    }
-  }
 
   /**
     * Inquire whether the named timer is still active. Returns true unless the
@@ -291,10 +286,9 @@ trait PersistentFSMBase[S, D, E]
     */
   implicit final def total2pf(
       transitionHandler: (S, S) ⇒ Unit): TransitionHandler =
-    new TransitionHandler {
+    new TransitionHandler
       def isDefinedAt(in: (S, S)) = true
       def apply(in: (S, S)) { transitionHandler(in._1, in._2) }
-    }
 
   /**
     * Set handler which is called upon termination of this FSM actor. Calling
@@ -342,12 +336,11 @@ trait PersistentFSMBase[S, D, E]
   /**
     * Return next state data (available in onTransition handlers)
     */
-  final def nextStateData = nextState match {
+  final def nextStateData = nextState match
     case null ⇒
       throw new IllegalStateException(
           "nextStateData is only available during onTransition")
     case x ⇒ x.stateData
-  }
 
   /*
    * ****************************************************************
@@ -378,24 +371,21 @@ trait PersistentFSMBase[S, D, E]
   private val stateTimeouts = mutable.Map[S, Timeout]()
 
   private def register(
-      name: S, function: StateFunction, timeout: Timeout): Unit = {
-    if (stateFunctions contains name) {
+      name: S, function: StateFunction, timeout: Timeout): Unit =
+    if (stateFunctions contains name)
       stateFunctions(name) = stateFunctions(name) orElse function
       stateTimeouts(name) = timeout orElse stateTimeouts(name)
-    } else {
+    else
       stateFunctions(name) = function
       stateTimeouts(name) = timeout
-    }
-  }
 
   /*
    * unhandled event handler
    */
-  private val handleEventDefault: StateFunction = {
+  private val handleEventDefault: StateFunction =
     case Event(value, stateData) ⇒
       log.warning("unhandled event " + value + " in state " + stateName)
       stay
-  }
   private var handleEvent: StateFunction = handleEventDefault
 
   /*
@@ -407,33 +397,28 @@ trait PersistentFSMBase[S, D, E]
    * transition handling
    */
   private var transitionEvent: List[TransitionHandler] = Nil
-  private def handleTransition(prev: S, next: S) {
+  private def handleTransition(prev: S, next: S)
     val tuple = (prev, next)
     for (te ← transitionEvent) { if (te.isDefinedAt(tuple)) te(tuple) }
-  }
 
   /*
    * *******************************************
    *       Main actor receive() method
    * *******************************************
    */
-  override def receive: Receive = {
+  override def receive: Receive =
     case TimeoutMarker(gen) ⇒
-      if (generation == gen) {
+      if (generation == gen)
         processMsg(StateTimeout, "state timeout")
-      }
     case t @ Timer(name, msg, repeat, gen) ⇒
-      if ((timers contains name) && (timers(name).generation == gen)) {
-        if (timeoutFuture.isDefined) {
+      if ((timers contains name) && (timers(name).generation == gen))
+        if (timeoutFuture.isDefined)
           timeoutFuture.get.cancel()
           timeoutFuture = None
-        }
         generation += 1
-        if (!repeat) {
+        if (!repeat)
           timers -= name
-        }
         processMsg(msg, t)
-      }
     case SubscribeTransitionCallBack(actorRef) ⇒
       // TODO Use context.watch(actor) and receive Terminated(actor) to clean up list
       listeners.add(actorRef)
@@ -451,54 +436,45 @@ trait PersistentFSMBase[S, D, E]
     case Deafen(actorRef) ⇒
       listeners.remove(actorRef)
     case value ⇒
-      if (timeoutFuture.isDefined) {
+      if (timeoutFuture.isDefined)
         timeoutFuture.get.cancel()
         timeoutFuture = None
-      }
       generation += 1
       processMsg(value, sender())
-  }
 
-  private def processMsg(value: Any, source: AnyRef): Unit = {
+  private def processMsg(value: Any, source: AnyRef): Unit =
     val event = Event(value, currentState.stateData)
     processEvent(event, source)
-  }
 
-  private[akka] def processEvent(event: Event, source: AnyRef): Unit = {
+  private[akka] def processEvent(event: Event, source: AnyRef): Unit =
     val stateFunc = stateFunctions(currentState.stateName)
     val nextState =
-      if (stateFunc isDefinedAt event) {
+      if (stateFunc isDefinedAt event)
         stateFunc(event)
-      } else {
+      else
         // handleEventDefault ensures that this is always defined
         handleEvent(event)
-      }
     applyState(nextState)
-  }
 
-  private[akka] def applyState(nextState: State): Unit = {
-    nextState.stopReason match {
+  private[akka] def applyState(nextState: State): Unit =
+    nextState.stopReason match
       case None ⇒ makeTransition(nextState)
       case _ ⇒
-        nextState.replies.reverse foreach { r ⇒
+        nextState.replies.reverse foreach  r ⇒
           sender() ! r
-        }
         terminate(nextState)
         context.stop(self)
-    }
-  }
 
-  private[akka] def makeTransition(nextState: State): Unit = {
-    if (!stateFunctions.contains(nextState.stateName)) {
+  private[akka] def makeTransition(nextState: State): Unit =
+    if (!stateFunctions.contains(nextState.stateName))
       terminate(
           stay withStopReason Failure(
               "Next state %s does not exist".format(nextState.stateName)))
-    } else {
-      nextState.replies.reverse foreach { r ⇒
+    else
+      nextState.replies.reverse foreach  r ⇒
         sender() ! r
-      }
       if (currentState.stateName != nextState.stateName ||
-          nextState.notifies) {
+          nextState.notifies)
         this.nextState = nextState
         handleTransition(currentState.stateName, nextState.stateName)
         gossip(
@@ -507,21 +483,16 @@ trait PersistentFSMBase[S, D, E]
                        nextState.stateName,
                        nextState.timeout))
         this.nextState = null
-      }
       currentState = nextState
       val timeout =
         if (currentState.timeout.isDefined) currentState.timeout
         else stateTimeouts(currentState.stateName)
-      if (timeout.isDefined) {
+      if (timeout.isDefined)
         val t = timeout.get
-        if (t.isFinite && t.length >= 0) {
+        if (t.isFinite && t.length >= 0)
           import context.dispatcher
           timeoutFuture = Some(context.system.scheduler
                 .scheduleOnce(t, self, TimeoutMarker(generation)))
-        }
-      }
-    }
-  }
 
   /**
     * Call `onTermination` hook; if you want to retain this behavior when
@@ -531,17 +502,16 @@ trait PersistentFSMBase[S, D, E]
     * so override that one if `onTermination` shall not be called during
     * restart.
     */
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     /*
      * setting this instance’s state to terminated does no harm during restart
      * since the new instance will initialize fresh using startWith()
      */
     terminate(stay withStopReason Shutdown)
     super.postStop()
-  }
 
-  private def terminate(nextState: State): Unit = {
-    if (currentState.stopReason.isEmpty) {
+  private def terminate(nextState: State): Unit =
+    if (currentState.stopReason.isEmpty)
       val reason = nextState.stopReason.get
       logTermination(reason)
       for (timer ← timers.values) timer.cancel()
@@ -551,19 +521,15 @@ trait PersistentFSMBase[S, D, E]
       val stopEvent = StopEvent(
           reason, currentState.stateName, currentState.stateData)
       if (terminateEvent.isDefinedAt(stopEvent)) terminateEvent(stopEvent)
-    }
-  }
 
   /**
     * By default [[PersistentFSM.Failure]] is logged at error level and other reason
     * types are not logged. It is possible to override this behavior.
     */
-  protected def logTermination(reason: Reason): Unit = reason match {
+  protected def logTermination(reason: Reason): Unit = reason match
     case Failure(ex: Throwable) ⇒ log.error(ex, "terminating due to Failure")
     case Failure(msg: AnyRef) ⇒ log.error(msg.toString)
     case _ ⇒
-  }
-}
 
 /**
   * Stackable trait for [[akka.actor.FSM]] which adds a rolling event log and
@@ -571,7 +537,7 @@ trait PersistentFSMBase[S, D, E]
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
+trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E]
   this: Actor ⇒
 
   import akka.persistence.fsm.PersistentFSM._
@@ -585,33 +551,28 @@ trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
   private var pos = 0
   private var full = false
 
-  private def advance() {
+  private def advance()
     val n = pos + 1
-    if (n == logDepth) {
+    if (n == logDepth)
       full = true
       pos = 0
-    } else {
+    else
       pos = n
-    }
-  }
 
   private[akka] abstract override def processEvent(
-      event: Event, source: AnyRef): Unit = {
-    if (debugEvent) {
-      val srcstr = source match {
+      event: Event, source: AnyRef): Unit =
+    if (debugEvent)
+      val srcstr = source match
         case s: String ⇒ s
         case Timer(name, _, _, _) ⇒ "timer " + name
         case a: ActorRef ⇒ a.toString
         case _ ⇒ "unknown"
-      }
       log.debug("processing " + event + " from " + srcstr)
-    }
 
-    if (logDepth > 0) {
+    if (logDepth > 0)
       states(pos) = stateName.asInstanceOf[AnyRef]
       events(pos) = event
       advance()
-    }
 
     val oldState = stateName
     super.processEvent(event, source)
@@ -619,31 +580,27 @@ trait LoggingPersistentFSM[S, D, E] extends PersistentFSMBase[S, D, E] {
 
     if (debugEvent && oldState != newState)
       log.debug("transition " + oldState + " -> " + newState)
-  }
 
   /**
     * Retrieve current rolling log in oldest-first order. The log is filled with
     * each incoming event before processing by the user supplied state handler.
     * The log entries are lost when this actor is restarted.
     */
-  protected def getLog: IndexedSeq[LogEntry[S, D]] = {
+  protected def getLog: IndexedSeq[LogEntry[S, D]] =
     val log =
       events zip states filter (_._1 ne null) map
       (x ⇒ LogEntry(x._2.asInstanceOf[S], x._1.stateData, x._1.event))
-    if (full) {
+    if (full)
       IndexedSeq() ++ log.drop(pos) ++ log.take(pos)
-    } else {
+    else
       IndexedSeq() ++ log
-    }
-  }
-}
 
 /**
   * Java API: compatible with lambda expressions
   *
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
-object AbstractPersistentFSMBase {
+object AbstractPersistentFSMBase
 
   /**
     * A partial function value which does not match anything and can be used to
@@ -654,7 +611,6 @@ object AbstractPersistentFSMBase {
     * }}}
     */
   def NullFunction[S, D]: PartialFunction[S, D] = PersistentFSM.NullFunction
-}
 
 /**
   * Java API: compatible with lambda expressions
@@ -664,7 +620,7 @@ object AbstractPersistentFSMBase {
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractPersistentFSMBase[S, D, E]
-    extends PersistentFSMBase[S, D, E] {
+    extends PersistentFSMBase[S, D, E]
   import akka.persistence.fsm.japi.pf.FSMStateFunctionBuilder
   import akka.persistence.fsm.japi.pf.FSMStopBuilder
   import akka.japi.pf.FI._
@@ -1054,4 +1010,3 @@ abstract class AbstractPersistentFSMBase[S, D, E]
     * also applies to `Stop` supervision directive.
     */
   val Shutdown: PersistentFSM.Reason = PersistentFSM.Shutdown
-}

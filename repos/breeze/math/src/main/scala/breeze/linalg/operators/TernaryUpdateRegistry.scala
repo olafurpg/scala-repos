@@ -30,7 +30,7 @@ import scala.reflect.ClassTag
 // because we don't need BinaryOp's to inherit from Function2, which has a lot of @specialzied cruft.
 trait TernaryUpdateRegistry[A, B, C, Op]
     extends UFunc.InPlaceImpl3[Op, A, B, C]
-    with MMRegistry3[UFunc.InPlaceImpl3[Op, _ <: A, _ <: B, _ <: C]] {
+    with MMRegistry3[UFunc.InPlaceImpl3[Op, _ <: A, _ <: B, _ <: C]]
   protected def bindingMissing(a: A, b: B, c: C): Unit =
     throw new UnsupportedOperationException(
         "Types not found!" + a + b + " " + ops)
@@ -39,25 +39,23 @@ trait TernaryUpdateRegistry[A, B, C, Op]
       b: B,
       c: C,
       m: Map[(Class[_], Class[_], Class[_]),
-             UFunc.InPlaceImpl3[Op, _ <: A, _ <: B, _ <: C]]): Unit = {
+             UFunc.InPlaceImpl3[Op, _ <: A, _ <: B, _ <: C]]): Unit =
     throw new RuntimeException("Multiple bindings for method: " + m)
-  }
 
-  def apply(a: A, b: B, c: C) {
+  def apply(a: A, b: B, c: C)
     val ac = a.asInstanceOf[AnyRef].getClass
     val bc = b.asInstanceOf[AnyRef].getClass
     val cc = c.asInstanceOf[AnyRef].getClass
 
     val cached = cache.get((ac, bc, cc))
-    if (cached != null) {
-      cached match {
+    if (cached != null)
+      cached match
         case None => bindingMissing(a, b, c)
         case Some(m) =>
           m.asInstanceOf[InPlaceImpl3[Op, A, B, C]].apply(a, b, c)
-      }
-    } else {
+    else
       val options = resolve(ac, bc, cc)
-      options.size match {
+      options.size match
         case 0 =>
           cache.put((ac, bc, cc), None)
           bindingMissing(a, b, c)
@@ -67,19 +65,13 @@ trait TernaryUpdateRegistry[A, B, C, Op]
           method.asInstanceOf[InPlaceImpl3[Op, A, B, C]].apply(a, b, c)
         case _ =>
           val selected = selectBestOption(options)
-          if (selected.size != 1) {
+          if (selected.size != 1)
             multipleOptions(a, b, c, options)
-          } else {
+          else
             val method = selected.values.head
             cache.put((ac, bc, cc), Some(method))
             method.asInstanceOf[InPlaceImpl3[Op, A, B, C]].apply(a, b, c)
-          }
-      }
-    }
-  }
 
   def register[AA <: A, BB <: B, CC <: C](op: InPlaceImpl3[Op, AA, BB, CC])(
-      implicit manA: ClassTag[AA], manB: ClassTag[BB], manC: ClassTag[CC]) {
+      implicit manA: ClassTag[AA], manB: ClassTag[BB], manC: ClassTag[CC])
     super.register(manA.runtimeClass, manB.runtimeClass, manC.runtimeClass, op)
-  }
-}

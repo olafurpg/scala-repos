@@ -13,17 +13,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 /**
   * Pavel Fatin
   */
-object FormattedStringParser extends StringParser {
+object FormattedStringParser extends StringParser
   private val FormatSpecifierPattern =
     "%(\\d+\\$)?([-#+ 0,(\\<]*)?(\\d+)?(\\.\\d+)?([tT])?([a-zA-Z%])".r
 
-  def parse(element: PsiElement) = {
+  def parse(element: PsiElement) =
     extractFormatCall(element).map(p => parseFormatCall(p._1, p._2))
-  }
 
   def extractFormatCall(
       element: PsiElement): Option[(ScLiteral, Seq[ScExpression])] =
-    Some(element) collect {
+    Some(element) collect
       // "%d".format(1)
       case ScMethodCall(
           ScReferenceExpression.withQualifier(literal: ScLiteral) && PsiReferenceEx
@@ -38,10 +37,9 @@ object FormattedStringParser extends StringParser {
                        (f: ScFunction) && ContainingClass(owner: ScTrait)),
                        arg)
           if literal.isString && isFormatMethod(owner.qualifiedName, f.name) =>
-        val args = arg match {
+        val args = arg match
           case tuple: ScTuple => tuple.exprs
           case it => Seq(it)
-        }
         (literal, args)
 
       // 1.formatted("%d")
@@ -70,7 +68,6 @@ object FormattedStringParser extends StringParser {
           if literal.isString &&
           isStringFormatMethod(owner.qualifiedName, f.getName) =>
         (literal, args)
-    }
 
   private def isFormatMethod(holder: String, method: String) =
     holder == "scala.collection.immutable.StringLike" && method == "format"
@@ -83,33 +80,30 @@ object FormattedStringParser extends StringParser {
     holder == "java.lang.String" && method == "format"
 
   def parseFormatCall(
-      literal: ScLiteral, arguments: Seq[ScExpression]): Seq[StringPart] = {
+      literal: ScLiteral, arguments: Seq[ScExpression]): Seq[StringPart] =
     val remainingArguments = arguments.toIterator
     val shift = if (literal.isMultiLineString) 3 else 1
     val formatString = literal.getText.drop(shift).dropRight(shift)
 
     var refferredArguments: List[ScExpression] = Nil
 
-    val bindings = FormatSpecifierPattern.findAllMatchIn(formatString).map {
+    val bindings = FormatSpecifierPattern.findAllMatchIn(formatString).map
       it =>
-        val specifier = {
+        val specifier =
           val span = Span(literal, it.start(0) + shift, it.end(0) + shift)
-          val cleanFormat = {
+          val cleanFormat =
             val format = it.group(0)
             "%" + format.substring(1 + it.end(1) - it.start(1))
-          }
           Specifier(span, cleanFormat)
-        }
         val positional = it.group(1) != null
-        if (positional) {
+        if (positional)
           val position = it.group(1).dropRight(1).toInt
-          arguments.lift(position - 1).map { argument =>
+          arguments.lift(position - 1).map  argument =>
             refferredArguments ::= argument
             Injection(argument, Some(specifier))
-          } getOrElse {
+          getOrElse
             UnboundPositionalSpecifier(specifier, position)
-          }
-        } else {
+        else
           if (it.toString().equals("%n"))
             Injection(ScalaPsiElementFactory.createExpressionFromText(
                           "\"\\n\"", literal.getManager),
@@ -121,18 +115,14 @@ object FormattedStringParser extends StringParser {
           else if (remainingArguments.hasNext)
             Injection(remainingArguments.next(), Some(specifier))
           else UnboundSpecifier(specifier)
-        }
-    }
 
-    val texts = FormatSpecifierPattern.split(formatString).map { s =>
+    val texts = FormatSpecifierPattern.split(formatString).map  s =>
       if (literal.isMultiLineString) Text(s)
       else Text(StringUtil.unescapeStringCharacters(s))
-    }
 
-    val prefix = intersperse(texts.toList, bindings.toList).filter {
+    val prefix = intersperse(texts.toList, bindings.toList).filter
       case Text("") => false
       case _ => true
-    }
 
     val unusedArguments = remainingArguments
       .filterNot(refferredArguments.contains)
@@ -140,12 +130,9 @@ object FormattedStringParser extends StringParser {
       .toList
 
     prefix ++ unusedArguments
-  }
 
   private def intersperse[T](as: List[T], bs: List[T]): List[T] =
-    (as, bs) match {
+    (as, bs) match
       case (x :: xs, y :: ys) => x :: y :: intersperse(xs, ys)
       case (xs, Nil) => xs
       case (Nil, ys) => ys
-    }
-}

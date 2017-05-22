@@ -27,7 +27,7 @@ package play.core
   * also returns a function that will be called when `close()` is called. This allows
   * any resources associated with the value to be closed.
   */
-private[play] abstract class ClosableLazy[T >: Null <: AnyRef, C] {
+private[play] abstract class ClosableLazy[T >: Null <: AnyRef, C]
 
   protected type CloseFunction = (() => C)
 
@@ -42,14 +42,14 @@ private[play] abstract class ClosableLazy[T >: Null <: AnyRef, C] {
     * Calling this method after the `close()` method has been called will result in an
     * IllegalStateException.
     */
-  final def get(): T = {
+  final def get(): T =
     val currentValue = value
     if (currentValue != null) return currentValue
-    synchronized {
+    synchronized
       if (hasBeenClosed)
         throw new IllegalStateException(
             "Can't get ClosableLazy value after it has been closed")
-      if (value == null) {
+      if (value == null)
         val (v, cf): (T, CloseFunction) = create()
         if (v == null)
           throw new IllegalStateException(
@@ -60,40 +60,34 @@ private[play] abstract class ClosableLazy[T >: Null <: AnyRef, C] {
         value = v
         closeFunction = cf
         v
-      } else {
+      else
         // Value was initialized by another thread before we got the monitor
         value
-      }
-    }
-  }
 
   /**
     * Close the value. Calling this method is safe, but does nothing, if the value
     * has not been initialized.
     */
-  final def close(): C = {
-    val optionalClose: Option[CloseFunction] = synchronized {
-      if (hasBeenClosed) {
+  final def close(): C =
+    val optionalClose: Option[CloseFunction] = synchronized
+      if (hasBeenClosed)
         // Already closed
         None
-      } else if (value == null) {
+      else if (value == null)
         // Close before first call to get
         hasBeenClosed = true
         None
-      } else {
+      else
         // Close and call the close function
         hasBeenClosed = true
         val prevCloseFunction = closeFunction
         value = null
         closeFunction = null
         Some(prevCloseFunction)
-      }
-    }
     // Perform actual close outside the synchronized block,
     // just in case the close function calls get or close
     // from another thread.
     optionalClose.fold(closeNotNeeded)(_.apply())
-  }
 
   /**
     * Called when the lazy value is first initialized. Returns the value and
@@ -107,4 +101,3 @@ private[play] abstract class ClosableLazy[T >: Null <: AnyRef, C] {
     * In common usage this method will return `()` or `Future.successful(())`.
     */
   protected def closeNotNeeded: C
-}

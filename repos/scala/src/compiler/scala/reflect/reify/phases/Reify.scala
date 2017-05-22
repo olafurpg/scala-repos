@@ -6,25 +6,22 @@ import scala.reflect.reify.codegen._
 
 trait Reify
     extends GenSymbols with GenTypes with GenNames with GenTrees
-    with GenAnnotationInfos with GenPositions with GenUtils {
+    with GenAnnotationInfos with GenPositions with GenUtils
 
   self: Reifier =>
 
   import global._
 
-  private object reifyStack {
+  private object reifyStack
     def currents: List[Any] = state.reifyStack
     def currents_=(value: List[Any]): Unit = state.reifyStack = value
 
-    @inline final def push[T](reifee: Any)(body: => T): T = {
+    @inline final def push[T](reifee: Any)(body: => T): T =
       currents ::= reifee
       try body finally currents = currents.tail
-    }
-  }
-  def boundSymbolsInCallstack = flatCollect(reifyStack.currents) {
+  def boundSymbolsInCallstack = flatCollect(reifyStack.currents)
     case ExistentialType(quantified, _) => quantified
     case PolyType(typeParams, _) => typeParams
-  }
   def current = reifyStack.currents.head
   def currents = reifyStack.currents
 
@@ -33,7 +30,7 @@ trait Reify
     *  For internal use only, use `reified` instead.
     */
   def reify(reifee: Any): Tree =
-    reifyStack.push(reifee)(reifee match {
+    reifyStack.push(reifee)(reifee match
       // before adding some case here, in global scope, please, consider
       // whether it can be localized like reifyAnnotationInfo or reifyScope
       // this will help reification stay as sane as possible
@@ -53,5 +50,4 @@ trait Reify
       case _ =>
         throw new Error("reifee %s of type %s is not supported".format(
                 reifee, reifee.getClass))
-    })
-}
+    )

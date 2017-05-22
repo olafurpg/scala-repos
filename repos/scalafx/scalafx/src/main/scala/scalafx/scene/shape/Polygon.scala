@@ -31,18 +31,16 @@ import javafx.scene.{shape => jfxss}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Polygon {
+object Polygon
   implicit def sfxPolygon2jfx(v: Polygon): jfxss.Polygon =
     if (v != null) v.delegate else null
 
   def apply(points: Double*) = new Polygon(new jfxss.Polygon(points: _*))
-}
 
 class Polygon(override val delegate: jfxss.Polygon = new jfxss.Polygon)
-    extends Shape(delegate) with SFXDelegate[jfxss.Polygon] {
+    extends Shape(delegate) with SFXDelegate[jfxss.Polygon]
 
   /**
     * Gets the coordinates of the PolyLine segments.
     */
   def points = delegate.getPoints
-}

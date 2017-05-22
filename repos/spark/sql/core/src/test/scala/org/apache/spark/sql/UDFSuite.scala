@@ -22,46 +22,40 @@ import org.apache.spark.sql.test.SQLTestData._
 
 private case class FunctionResult(f1: String, f2: String)
 
-class UDFSuite extends QueryTest with SharedSQLContext {
+class UDFSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("built-in fixed arity expressions") {
+  test("built-in fixed arity expressions")
     val df = sqlContext.emptyDataFrame
     df.selectExpr("rand()", "randn()", "rand(5)", "randn(50)")
-  }
 
-  test("built-in vararg expressions") {
+  test("built-in vararg expressions")
     val df = Seq((1, 2)).toDF("a", "b")
     df.selectExpr("array(a, b)")
     df.selectExpr("struct(a, b)")
-  }
 
-  test("built-in expressions with multiple constructors") {
+  test("built-in expressions with multiple constructors")
     val df = Seq(("abcd", 2)).toDF("a", "b")
     df.selectExpr("substr(a, 2)", "substr(a, 2, 3)").collect()
-  }
 
-  test("count") {
+  test("count")
     val df = Seq(("abcd", 2)).toDF("a", "b")
     df.selectExpr("count(a)")
-  }
 
-  test("count distinct") {
+  test("count distinct")
     val df = Seq(("abcd", 2)).toDF("a", "b")
     df.selectExpr("count(distinct a)")
-  }
 
-  test("SPARK-8003 spark_partition_id") {
+  test("SPARK-8003 spark_partition_id")
     val df =
       Seq((1, "Tearing down the walls that divide us")).toDF("id", "saying")
     df.registerTempTable("tmp_table")
     checkAnswer(
         sql("select spark_partition_id() from tmp_table").toDF(), Row(0))
     sqlContext.dropTempTable("tmp_table")
-  }
 
-  test("SPARK-8005 input_file_name") {
-    withTempPath { dir =>
+  test("SPARK-8005 input_file_name")
+    withTempPath  dir =>
       val data = sparkContext.parallelize(0 to 10, 2).toDF("id")
       data.write.parquet(dir.getCanonicalPath)
       sqlContext.read
@@ -75,41 +69,32 @@ class UDFSuite extends QueryTest with SharedSQLContext {
             .collect()
             .length >= 2)
       sqlContext.dropTempTable("test_table")
-    }
-  }
 
-  test("error reporting for incorrect number of arguments") {
+  test("error reporting for incorrect number of arguments")
     val df = sqlContext.emptyDataFrame
-    val e = intercept[AnalysisException] {
+    val e = intercept[AnalysisException]
       df.selectExpr("substr('abcd', 2, 3, 4)")
-    }
     assert(e.getMessage.contains("arguments"))
-  }
 
-  test("error reporting for undefined functions") {
+  test("error reporting for undefined functions")
     val df = sqlContext.emptyDataFrame
-    val e = intercept[AnalysisException] {
+    val e = intercept[AnalysisException]
       df.selectExpr("a_function_that_does_not_exist()")
-    }
     assert(e.getMessage.contains("undefined function"))
-  }
 
-  test("Simple UDF") {
+  test("Simple UDF")
     sqlContext.udf.register("strLenScala", (_: String).length)
     assert(sql("SELECT strLenScala('test')").head().getInt(0) === 4)
-  }
 
-  test("ZeroArgument UDF") {
+  test("ZeroArgument UDF")
     sqlContext.udf.register("random0", () => { Math.random() })
     assert(sql("SELECT random0()").head().getDouble(0) >= 0.0)
-  }
 
-  test("TwoArgument UDF") {
+  test("TwoArgument UDF")
     sqlContext.udf.register("strLenScala", (_: String).length + (_: Int))
     assert(sql("SELECT strLenScala('test', 1)").head().getInt(0) === 5)
-  }
 
-  test("UDF in a WHERE") {
+  test("UDF in a WHERE")
     sqlContext.udf.register("oneArgFilter", (n: Int) => { n > 80 })
 
     val df = sparkContext
@@ -119,9 +104,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
 
     val result = sql("SELECT * FROM integerData WHERE oneArgFilter(key)")
     assert(result.count() === 20)
-  }
 
-  test("UDF in a HAVING") {
+  test("UDF in a HAVING")
     sqlContext.udf.register("havingFilter", (n: Long) => { n > 5 })
 
     val df =
@@ -137,9 +121,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
         """.stripMargin)
 
     assert(result.count() === 2)
-  }
 
-  test("UDF in a GROUP BY") {
+  test("UDF in a GROUP BY")
     sqlContext.udf.register("groupFunction", (n: Int) => { n > 10 })
 
     val df =
@@ -153,9 +136,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
          | GROUP BY groupFunction(v)
         """.stripMargin)
     assert(result.count() === 2)
-  }
 
-  test("UDFs everywhere") {
+  test("UDFs everywhere")
     sqlContext.udf.register("groupFunction", (n: Int) => { n > 10 })
     sqlContext.udf.register("havingFilter", (n: Long) => { n > 2000 })
     sqlContext.udf.register("whereFilter", (n: Int) => { n < 150 })
@@ -174,9 +156,8 @@ class UDFSuite extends QueryTest with SharedSQLContext {
          | HAVING havingFilter(v100)
         """.stripMargin)
     assert(result.count() === 1)
-  }
 
-  test("struct UDF") {
+  test("struct UDF")
     sqlContext.udf.register(
         "returnStruct", (f1: String, f2: String) => FunctionResult(f1, f2))
 
@@ -185,22 +166,19 @@ class UDFSuite extends QueryTest with SharedSQLContext {
       .head()
       .getString(0)
     assert(result === "test")
-  }
 
-  test("udf that is transformed") {
+  test("udf that is transformed")
     sqlContext.udf.register("makeStruct", (x: Int, y: Int) => (x, y))
     // 1 + 1 is constant folded causing a transformation.
     assert(
         sql("SELECT makeStruct(1 + 1, 2)").first().getAs[Row](0) === Row(2, 2))
-  }
 
-  test("type coercion for udf inputs") {
+  test("type coercion for udf inputs")
     sqlContext.udf.register("intExpected", (x: Int) => x)
     // pass a decimal to intExpected.
     assert(sql("SELECT intExpected(1.0)").head().getInt(0) === 1)
-  }
 
-  test("udf in different types") {
+  test("udf in different types")
     sqlContext.udf.register("testDataFunc", (n: Int, s: String) => { (n, s) })
     sqlContext.udf.register("decimalDataFunc",
                             (a: java.math.BigDecimal,
@@ -246,10 +224,9 @@ class UDFSuite extends QueryTest with SharedSQLContext {
            | (SELECT complexDataFunc(m, a, b) AS t FROM complexData) tmp
           """.stripMargin).toDF(),
         complexData.select("m", "a", "b"))
-  }
 
   test(
-      "SPARK-11716 UDFRegistration does not include the input data type in returned UDF") {
+      "SPARK-11716 UDFRegistration does not include the input data type in returned UDF")
     val myUDF = sqlContext.udf.register(
         "testDataFunc", (n: Int, s: String) => { (n, s.toInt) })
 
@@ -263,5 +240,3 @@ class UDFSuite extends QueryTest with SharedSQLContext {
         sql("SELECT tmp.t.* FROM (SELECT testDataFunc(a, b) AS t from testData2) tmp")
           .toDF(),
         testData2)
-  }
-}

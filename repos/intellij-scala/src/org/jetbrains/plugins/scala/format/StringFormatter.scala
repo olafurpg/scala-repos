@@ -4,6 +4,5 @@ package format
 /**
   * Pavel Fatin
   */
-trait StringFormatter {
+trait StringFormatter
   def format(parts: Seq[StringPart]): String
-}

@@ -1,4 +1,4 @@
-trait Test {
+trait Test
   type OK[A, B] = A Tuple2 B
   type *[A, B] = A Tuple2 B
   def f(is: Int*, s: String) = ???
@@ -7,4 +7,3 @@ trait Test {
   // won't recover from following
   //def i(is: Int OK) = ???  //error: identifier expected but ')' found.
   def j(is: Int* = 5) = ???
-}

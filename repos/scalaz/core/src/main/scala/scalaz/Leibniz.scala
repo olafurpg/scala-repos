@@ -17,7 +17,7 @@ import Id._
   *
   * The more refined types are useful if you need to be able to substitute into restricted contexts.
   */
-sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
+sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H]
   def apply(a: A): B = subst[Id](a)
   def subst[F[_ >: L <: H]](p: F[A]): F[B]
   def compose[L2 <: L, H2 >: H, C >: L2 <: H2](
@@ -33,16 +33,14 @@ sealed abstract class Leibniz[-L, +H >: L, A >: L <: H, B >: L <: H] {
   def onContra[FA](fa: FA)(
       implicit U: Unapply.AuxA[Contravariant, FA, A]): U.M[B] =
     subst(U(fa))
-}
 
-sealed abstract class LeibnizInstances {
+sealed abstract class LeibnizInstances
   import Leibniz._
 
-  implicit val leibniz: Category[===] = new Category[===] {
+  implicit val leibniz: Category[===] = new Category[===]
     def id[A]: (A === A) = refl[A]
 
     def compose[A, B, C](bc: B === C, ab: A === B) = bc compose ab
-  }
 
   // TODO
   /*sealed class LeibnizGroupoid[L_, H_ >: L_] extends GeneralizedGroupoid with Hom {
@@ -64,17 +62,15 @@ sealed abstract class LeibnizInstances {
     }
 
     implicit def leibnizGroupoid[L, H >: L]: LeibnizGroupoid[L, H] = new LeibnizGroupoid[L, H]*/
-}
 
-object Leibniz extends LeibnizInstances {
+object Leibniz extends LeibnizInstances
 
   /** `(A === B)` is a supertype of `Leibniz[L,H,A,B]` */
   type ===[A, B] = Leibniz[⊥, ⊤, A, B]
 
   /** Equality is reflexive -- we rely on subtyping to expand this type */
-  implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A] {
+  implicit def refl[A]: Leibniz[A, A, A, A] = new Leibniz[A, A, A, A]
     def subst[F[_ >: A <: A]](p: F[A]): F[A] = p
-  }
 
   /** We can witness equality by using it to convert between types
     * We rely on subtyping to enable this to work for any Leibniz arrow
@@ -166,9 +162,8 @@ object Leibniz extends LeibnizInstances {
     * It is unsafe, but needed where Leibnizian equality isn't sufficient
     */
   def force[L, H >: L, A >: L <: H, B >: L <: H]: Leibniz[L, H, A, B] =
-    new Leibniz[L, H, A, B] {
+    new Leibniz[L, H, A, B]
       def subst[F[_ >: L <: H]](fa: F[A]): F[B] = fa.asInstanceOf[F[B]]
-    }
 
   /**
     * Emir Pasalic's PhD thesis mentions that it is unknown whether or not `((A,B) === (C,D)) => (A === C)` is inhabited.
@@ -203,4 +198,3 @@ object Leibniz extends LeibnizInstances {
       t: T[A, B] === T[A2, B2]
   ): (Leibniz[LA, HA, A, A2], Leibniz[LB, HB, B, B2]) =
     (force[LA, HA, A, A2], force[LB, HB, B, B2])
-}

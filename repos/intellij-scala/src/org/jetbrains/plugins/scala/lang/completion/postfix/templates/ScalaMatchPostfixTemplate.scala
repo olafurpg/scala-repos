@@ -15,6 +15,5 @@ class ScalaMatchPostfixTemplate
         "match",
         "expr match {...}",
         new ScalaPostfixTemplatePsiInfo,
-        new AncestorSelector(SelectorConditions.ANY_EXPR, All)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, All))
   override def getSurrounder: Surrounder = new ScalaWithMatchSurrounder
-}

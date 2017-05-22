@@ -23,21 +23,20 @@ import org.json4s._
 import org.json4s.native.JsonMethods._
 
 class ESSequences(client: Client, config: StorageClientConfig, index: String)
-    extends Logging {
+    extends Logging
   implicit val formats = DefaultFormats
   private val estype = "sequences"
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     // val settingsJson =
     //   ("number_of_shards" -> 1) ~
     //   ("auto_expand_replicas" -> "0-all")
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val mappingJson =
       (estype -> ("_source" -> ("enabled" -> 0)) ~ ("_all" -> ("enabled" -> 0)) ~
           ("_type" -> ("index" -> "no")) ~ ("enabled" -> 0))
@@ -46,19 +45,15 @@ class ESSequences(client: Client, config: StorageClientConfig, index: String)
       .setType(estype)
       .setSource(compact(render(mappingJson)))
       .get
-  }
 
-  def genNext(name: String): Int = {
-    try {
+  def genNext(name: String): Int =
+    try
       val response = client
         .prepareIndex(index, estype, name)
         .setSource(compact(render("n" -> name)))
         .get
       response.getVersion().toInt
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         0
-    }
-  }
-}

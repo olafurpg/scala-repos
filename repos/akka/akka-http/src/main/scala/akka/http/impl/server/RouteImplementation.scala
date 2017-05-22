@@ -29,19 +29,18 @@ import akka.dispatch.ExecutionContexts.sameThreadExecutionContext
 /**
   * INTERNAL API
   */
-private[http] trait ExtractionMap extends CustomHeader {
+private[http] trait ExtractionMap extends CustomHeader
   def get[T](key: RequestVal[T]): Option[T]
   def set[T](key: RequestVal[T], value: T): ExtractionMap
   def addAll(values: Map[RequestVal[_], Any]): ExtractionMap
-}
 
 /**
   * INTERNAL API
   */
-private[http] object ExtractionMap {
+private[http] object ExtractionMap
   val Empty = ExtractionMap(Map.empty)
   implicit def apply(map: Map[RequestVal[_], Any]): ExtractionMap =
-    new ExtractionMap {
+    new ExtractionMap
       def get[T](key: RequestVal[T]): Option[T] =
         map.get(key).asInstanceOf[Option[T]]
 
@@ -55,16 +54,14 @@ private[http] object ExtractionMap {
       def renderInResponses = false
       def name(): String = "ExtractedValues"
       def value(): String = "<empty>"
-    }
-}
 
 /**
   * INTERNAL API
   */
 private[http] object RouteImplementation
-    extends Directives with server.RouteConcatenation {
-  def apply(route: Route): ScalaRoute = {
-    def directiveFor(route: DirectiveRoute): Directive0 = route match {
+    extends Directives with server.RouteConcatenation
+  def apply(route: Route): ScalaRoute =
+    def directiveFor(route: DirectiveRoute): Directive0 = route match
       case RouteAlternatives() ⇒ ScalaDirective.Empty
       case RawPathPrefix(elements) ⇒
         pathMatcherDirective[String](elements, rawPathPrefix)
@@ -83,67 +80,58 @@ private[http] object RouteImplementation
 
       case MethodFilter(m) ⇒ method(m.asScala)
       case Extract(extractions) ⇒
-        extractRequestContext.flatMap { ctx ⇒
-          extractions.map { e ⇒
+        extractRequestContext.flatMap  ctx ⇒
+          extractions.map  e ⇒
             e.directive.flatMap(
                 addExtraction(e.asInstanceOf[RequestVal[Any]], _))
-          }.reduce(_ & _)
-        }
+          .reduce(_ & _)
 
       case BasicAuthentication(authenticator) ⇒
-        authenticateBasicAsync(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
+        authenticateBasicAsync(authenticator.realm,  creds ⇒
+          val javaCreds = creds match
             case Credentials.Missing ⇒
-              new BasicCredentials {
+              new BasicCredentials
                 def available: Boolean = false
                 def identifier: String =
                   throw new IllegalStateException("Credentials missing")
                 def verify(secret: String): Boolean =
                   throw new IllegalStateException("Credentials missing")
-              }
             case p @ Credentials.Provided(name) ⇒
-              new BasicCredentials {
+              new BasicCredentials
                 def available: Boolean = true
                 def identifier: String = name
                 def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
 
           authenticator
             .authenticate(javaCreds)
             .toScala
             .map(_.asScala)(
                 akka.dispatch.ExecutionContexts.sameThreadExecutionContext)
-        }).flatMap { user ⇒
+        ).flatMap  user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
-        }
 
       case OAuth2Authentication(authenticator) ⇒
-        authenticateOAuth2Async(authenticator.realm, { creds ⇒
-          val javaCreds = creds match {
+        authenticateOAuth2Async(authenticator.realm,  creds ⇒
+          val javaCreds = creds match
             case Credentials.Missing ⇒
-              new OAuth2Credentials {
+              new OAuth2Credentials
                 def available: Boolean = false
                 def identifier: String =
                   throw new IllegalStateException("Credentials missing")
                 def verify(secret: String): Boolean =
                   throw new IllegalStateException("Credentials missing")
-              }
             case p @ Credentials.Provided(name) ⇒
-              new OAuth2Credentials {
+              new OAuth2Credentials
                 def available: Boolean = true
                 def identifier: String = name
                 def verify(secret: String): Boolean = p.verify(secret)
-              }
-          }
 
           authenticator
             .authenticate(javaCreds)
             .toScala
             .map(_.asScala)(sameThreadExecutionContext)
-        }).flatMap { user ⇒
+        ).flatMap  user ⇒
           addExtraction(authenticator.asInstanceOf[RequestVal[Any]], user)
-        }
 
       case EncodeResponse(coders) ⇒
         val scalaCoders = coders.map(_._underlyingScalaCoder())
@@ -158,9 +146,8 @@ private[http] object RouteImplementation
 
       case HandleExceptions(handler) ⇒
         val pf: akka.http.scaladsl.server.ExceptionHandler =
-          akka.http.scaladsl.server.ExceptionHandler {
+          akka.http.scaladsl.server.ExceptionHandler
             case e: RuntimeException ⇒ apply(handler.handle(e))
-          }
         handleExceptions(pf)
 
       case HandleRejections(handler) ⇒
@@ -171,9 +158,8 @@ private[http] object RouteImplementation
       case DeleteCookie(name, domain, path) ⇒
         deleteCookie(
             HttpCookie(name, domain = domain, path = path, value = "deleted"))
-    }
 
-    route match {
+    route match
       case route: DirectiveRoute ⇒
         directiveFor(route).apply(fromAlternatives(route.children))
       case GetFromResource(path, contentType, classLoader) ⇒
@@ -183,17 +169,16 @@ private[http] object RouteImplementation
       case GetFromFile(file, contentType) ⇒
         getFromFile(file, contentType.asScala)
       case GetFromDirectory(directory, true, resolver) ⇒
-        extractExecutionContext { implicit ec ⇒
+        extractExecutionContext  implicit ec ⇒
           getFromBrowseableDirectory(directory.getPath)(
               DirectoryRenderer.defaultDirectoryRenderer,
               scalaResolver(resolver))
-        }
       case FileAndResourceRouteWithDefaultResolver(constructor) ⇒
         RouteImplementation(
-            constructor(new directives.ContentTypeResolver {
+            constructor(new directives.ContentTypeResolver
           def resolve(fileName: String): ContentType =
             ContentTypeResolver.Default(fileName)
-        }))
+        ))
 
       case HandleWebSocketMessages(handler) ⇒
         handleWebSocketMessages(JavaMapping.toScala(handler))
@@ -225,15 +210,12 @@ private[http] object RouteImplementation
             .asInstanceOf[RouteResultImpl]
             .underlying)
       case p: Product ⇒
-        extractExecutionContext { implicit ec ⇒
+        extractExecutionContext  implicit ec ⇒
           complete((500, s"Not implemented: ${p.productPrefix}"))
-        }
-    }
-  }
   def pathMatcherDirective[T](
       matchers: immutable.Seq[PathMatcher[_]],
       directive: PathMatcher1[T] ⇒ Directive1[T] // this type is too specific and only a placeholder for a proper polymorphic function
-      ): Directive0 = {
+      ): Directive0 =
     // Concatenating PathMatchers is a bit complicated as we don't want to build up a tuple
     // but something which we can later split all the separate values and add them to the
     // ExtractionMap.
@@ -242,11 +224,10 @@ private[http] object RouteImplementation
     // which provides the desired behavior.
 
     type ValMap = Tuple1[Map[RequestVal[_], Any]]
-    object AddToMapJoin extends Join[ValMap, ValMap] {
+    object AddToMapJoin extends Join[ValMap, ValMap]
       type Out = ValMap
       def apply(prefix: ValMap, suffix: ValMap): AddToMapJoin.Out =
         Tuple1(prefix._1 ++ suffix._1)
-    }
     def toScala(matcher: PathMatcher[_]): ScalaPathMatcher[ValMap] =
       matcher
         .asInstanceOf[PathMatcherImpl[_]]
@@ -258,7 +239,6 @@ private[http] object RouteImplementation
     val reduced: ScalaPathMatcher[ValMap] =
       matchers.map(toScala).reduce(_.~(_)(AddToMapJoin))
     directive(reduced.asInstanceOf[PathMatcher1[T]]).flatMap(addExtractions)
-  }
 
   def fromAlternatives(alternatives: Seq[Route]): ScalaRoute =
     alternatives.map(RouteImplementation.apply).reduce(_ ~ _)
@@ -266,26 +246,22 @@ private[http] object RouteImplementation
   def addExtraction[T](key: RequestVal[T], value: T): Directive0 =
     transformExtractionMap(_.set(key, value))
 
-  def transformExtractionMap(f: ExtractionMap ⇒ ExtractionMap): Directive0 = {
+  def transformExtractionMap(f: ExtractionMap ⇒ ExtractionMap): Directive0 =
     @tailrec
     def updateExtractionMap(
         headers: immutable.Seq[HttpHeader],
         prefix: Vector[HttpHeader] = Vector.empty): immutable.Seq[HttpHeader] =
-      headers match {
+      headers match
         case (m: ExtractionMap) +: rest ⇒ f(m) +: (prefix ++ rest)
         case other +: rest ⇒ updateExtractionMap(rest, prefix :+ other)
         case Nil ⇒ f(ExtractionMap.Empty) +: prefix
-      }
     mapRequest(_.mapHeaders(updateExtractionMap(_)))
-  }
 
   private def scalaResolver(
       resolver: directives.ContentTypeResolver): ContentTypeResolver =
     ContentTypeResolver(f ⇒ resolver.resolve(f).asScala)
 
   def requestValToDirective[T](value: RequestVal[T]): Directive1[T] =
-    value match {
+    value match
       case s: StandaloneExtractionImpl[_] ⇒ s.directive
       case v: RequestVal[_] ⇒ extract(ctx ⇒ v.get(new RequestContextImpl(ctx)))
-    }
-}

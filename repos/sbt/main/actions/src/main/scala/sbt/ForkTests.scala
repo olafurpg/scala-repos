@@ -12,13 +12,13 @@ import ForkMain._
 import sbt.io.IO
 import sbt.util.Logger
 
-private[sbt] object ForkTests {
+private[sbt] object ForkTests
   def apply(runners: Map[TestFramework, Runner],
             tests: List[TestDefinition],
             config: Execution,
             classpath: Seq[File],
             fork: ForkOptions,
-            log: Logger): Task[TestOutput] = {
+            log: Logger): Task[TestOutput] =
     val opts = processOptions(config, tests, log)
 
     import std.TaskExtra._
@@ -35,10 +35,8 @@ private[sbt] object ForkTests {
       else
         mainTestTask(runners, opts, classpath, fork, log, config.parallel)
           .tagw(config.tags: _*)
-    main.dependsOn(all(opts.setup): _*) flatMap { results =>
+    main.dependsOn(all(opts.setup): _*) flatMap  results =>
       all(opts.cleanup).join.map(_ => results)
-    }
-  }
 
   private[this] def mainTestTask(runners: Map[TestFramework, Runner],
                                  opts: ProcessedOptions,
@@ -46,37 +44,35 @@ private[sbt] object ForkTests {
                                  fork: ForkOptions,
                                  log: Logger,
                                  parallel: Boolean): Task[TestOutput] =
-    std.TaskExtra.task {
+    std.TaskExtra.task
       val server = new ServerSocket(0)
       val testListeners =
-        opts.testListeners flatMap {
+        opts.testListeners flatMap
           case tl: TestsListener => Some(tl)
           case _ => None
-        }
 
-      object Acceptor extends Runnable {
+      object Acceptor extends Runnable
         val resultsAcc = mutable.Map.empty[String, SuiteResult]
         lazy val result = TestOutput(overall(resultsAcc.values.map(_.result)),
                                      resultsAcc.toMap,
                                      Iterable.empty)
 
-        def run() {
-          val socket = try {
+        def run()
+          val socket = try
             server.accept()
-          } catch {
+          catch
             case e: java.net.SocketException =>
               log.error("Could not accept connection from test agent: " +
                   e.getClass + ": " + e.getMessage)
               log.trace(e)
               server.close()
               return
-          }
           val os = new ObjectOutputStream(socket.getOutputStream)
           // Must flush the header that the constructor writes, otherwise the ObjectInputStream on the other end may block indefinitely
           os.flush()
           val is = new ObjectInputStream(socket.getInputStream)
 
-          try {
+          try
             val config =
               new ForkConfiguration(log.ansiCodesSupported, parallel)
             os.writeObject(config)
@@ -89,21 +85,17 @@ private[sbt] object ForkTests {
             os.writeObject(taskdefs.toArray)
 
             os.writeInt(runners.size)
-            for ((testFramework, mainRunner) <- runners) {
+            for ((testFramework, mainRunner) <- runners)
               os.writeObject(testFramework.implClassNames.toArray)
               os.writeObject(mainRunner.args)
               os.writeObject(mainRunner.remoteArgs)
-            }
             os.flush()
 
             new React(is, os, log, opts.testListeners, resultsAcc).react()
-          } finally {
+          finally
             is.close(); os.close(); socket.close()
-          }
-        }
-      }
 
-      try {
+      try
         testListeners.foreach(_.doInit())
         val acceptorThread = new Thread(Acceptor)
         acceptorThread.start()
@@ -123,35 +115,30 @@ private[sbt] object ForkTests {
                 Map("Running java with options " + options.mkString(" ") +
                     " failed with exit code " + ec -> SuiteResult.Error),
                 Iterable.empty)
-          else {
+          else
             // Need to wait acceptor thread to finish its business
             acceptorThread.join()
             Acceptor.result
-          }
 
         testListeners.foreach(_.doComplete(result.overall))
         result
-      } finally {
+      finally
         server.close()
-      }
-    }
 
   private[this] def forkFingerprint(
       f: Fingerprint): Fingerprint with Serializable =
-    f match {
+    f match
       case s: SubclassFingerprint => new ForkMain.SubclassFingerscan(s)
       case a: AnnotatedFingerprint => new ForkMain.AnnotatedFingerscan(a)
       case _ => sys.error("Unknown fingerprint type: " + f.getClass)
-    }
-}
 private final class React(is: ObjectInputStream,
                           os: ObjectOutputStream,
                           log: Logger,
                           listeners: Seq[TestReportListener],
-                          results: mutable.Map[String, SuiteResult]) {
+                          results: mutable.Map[String, SuiteResult])
   import ForkTags._
   @annotation.tailrec
-  def react(): Unit = is.readObject match {
+  def react(): Unit = is.readObject match
     case `Done` =>
       os.writeObject(Done); os.flush()
     case Array(`Error`, s: String) =>
@@ -172,5 +159,3 @@ private final class React(is: ObjectInputStream,
       results += group -> suiteResult
       listeners.foreach(_ endGroup (group, suiteResult.result))
       react()
-  }
-}

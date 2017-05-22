@@ -23,7 +23,7 @@ package org.apache.spark.graphx
   * @tparam VD the type of the vertex attribute.
   * @tparam ED the type of the edge attribute
   */
-class EdgeTriplet[VD, ED] extends Edge[ED] {
+class EdgeTriplet[VD, ED] extends Edge[ED]
 
   /**
     * The source vertex attribute
@@ -38,12 +38,11 @@ class EdgeTriplet[VD, ED] extends Edge[ED] {
   /**
     * Set the edge properties of this triplet.
     */
-  protected[spark] def set(other: Edge[ED]): EdgeTriplet[VD, ED] = {
+  protected[spark] def set(other: Edge[ED]): EdgeTriplet[VD, ED] =
     srcId = other.srcId
     dstId = other.dstId
     attr = other.attr
     this
-  }
 
   /**
     * Given one vertex in the edge return the other vertex.
@@ -68,4 +67,3 @@ class EdgeTriplet[VD, ED] extends Edge[ED] {
 
   def toTuple: ((VertexId, VD), (VertexId, VD), ED) =
     ((srcId, srcAttr), (dstId, dstAttr), attr)
-}

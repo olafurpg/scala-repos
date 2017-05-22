@@ -18,18 +18,17 @@ import scala.concurrent.duration._
 class AtmosphereSpecServlet(
     implicit override protected val scalatraActorSystem: ActorSystem)
     extends ScalatraServlet with JacksonJsonSupport with SessionSupport
-    with AtmosphereSupport {
+    with AtmosphereSupport
 
   implicit protected def jsonFormats: Formats = DefaultFormats
   implicit val system = scalatraActorSystem.dispatcher
 
-  get("/echo") {
+  get("/echo")
     "echo ok"
-  }
 
-  atmosphere("/test1") {
-    new AtmosphereClient {
-      def receive: AtmoReceive = {
+  atmosphere("/test1")
+    new AtmosphereClient
+      def receive: AtmoReceive =
         case Connected =>
           println("connected client")
 
@@ -47,25 +46,18 @@ class AtmosphereSpecServlet(
           send(("seen" -> "test1") ~ ("data" -> json))
         case m =>
           println("Got unknown message " + m.getClass + " " + m.toString)
-      }
-    }
-  }
 
-  error {
+  error
     case t: Throwable => t.printStackTrace()
-  }
 
   override def handle(
-      request: HttpServletRequest, response: HttpServletResponse) {
-    withRequestResponse(request, response) {
+      request: HttpServletRequest, response: HttpServletResponse)
+    withRequestResponse(request, response)
       println(request.headers)
       println("routeBasePath: " + routeBasePath(request))
       println("requestPath: " + requestPath(request))
 
       super.handle(request, response)
-    }
-  }
-}
 
 //object WaSync {
 //
@@ -105,7 +97,7 @@ class AtmosphereSpecServlet(
 //
 //}
 
-class AtmosphereSpec extends MutableScalatraSpec {
+class AtmosphereSpec extends MutableScalatraSpec
 
   implicit val system = ActorSystem("scalatra")
 
@@ -115,17 +107,15 @@ class AtmosphereSpec extends MutableScalatraSpec {
 
   sequential
 
-  "To support Atmosphere, Scalatra" should {
+  "To support Atmosphere, Scalatra" should
 
-    "allow regular requests" in {
-      get("/echo") {
+    "allow regular requests" in
+      get("/echo")
         println(header)
         status must_== 200
         body must_== "echo ok"
-      }
-    }
 
-    "allow one client to connect" in {
+    "allow one client to connect" in
       val latch = new CountDownLatch(1)
 
       // yay?
@@ -146,31 +136,24 @@ class AtmosphereSpec extends MutableScalatraSpec {
 
       val socket = client
         .create(opts)
-        .on(Event.MESSAGE, new Function[String] {
-          def on(r: String) = {
+        .on(Event.MESSAGE, new Function[String]
+          def on(r: String) =
             latch.countDown()
             println(r)
-          }
-        })
-        .on(new Function[Throwable] {
-          def on(t: Throwable) = {
+        )
+        .on(new Function[Throwable]
+          def on(t: Throwable) =
             t.printStackTrace
-          }
-        })
+        )
 
       socket.open(req.build()).fire("echo");
 
       latch.await(5, TimeUnit.SECONDS) must beTrue
-    }
-  }
 
-  private def stopSystem {
+  private def stopSystem
     system.shutdown()
     system.awaitTermination(Duration(1, TimeUnit.MINUTES))
-  }
 
-  override def afterAll = {
+  override def afterAll =
     super.afterAll
     stopSystem
-  }
-}

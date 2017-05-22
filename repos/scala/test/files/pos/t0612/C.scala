@@ -1,6 +1,5 @@
 package test
 package app
 
-class C {
+class C
   Ob.f
-}

@@ -37,12 +37,10 @@ private[streaming] class SocketInputDStream[T : ClassTag](
     bytesToObjects: InputStream => Iterator[T],
     storageLevel: StorageLevel
 )
-    extends ReceiverInputDStream[T](_ssc) {
+    extends ReceiverInputDStream[T](_ssc)
 
-  def getReceiver(): Receiver[T] = {
+  def getReceiver(): Receiver[T] =
     new SocketReceiver(host, port, bytesToObjects, storageLevel)
-  }
-}
 
 private[streaming] class SocketReceiver[T : ClassTag](
     host: String,
@@ -50,83 +48,67 @@ private[streaming] class SocketReceiver[T : ClassTag](
     bytesToObjects: InputStream => Iterator[T],
     storageLevel: StorageLevel
 )
-    extends Receiver[T](storageLevel) with Logging {
+    extends Receiver[T](storageLevel) with Logging
 
   private var socket: Socket = _
 
-  def onStart() {
+  def onStart()
 
     logInfo(s"Connecting to $host:$port")
-    try {
+    try
       socket = new Socket(host, port)
-    } catch {
+    catch
       case e: ConnectException =>
         restart(s"Error connecting to $host:$port", e)
         return
-    }
     logInfo(s"Connected to $host:$port")
 
     // Start the thread that receives data over a connection
-    new Thread("Socket Receiver") {
+    new Thread("Socket Receiver")
       setDaemon(true)
       override def run() { receive() }
-    }.start()
-  }
+    .start()
 
-  def onStop() {
+  def onStop()
     // in case restart thread close it twice
-    synchronized {
-      if (socket != null) {
+    synchronized
+      if (socket != null)
         socket.close()
         socket = null
         logInfo(s"Closed socket to $host:$port")
-      }
-    }
-  }
 
   /** Create a socket connection and receive data until receiver is stopped */
-  def receive() {
-    try {
+  def receive()
+    try
       val iterator = bytesToObjects(socket.getInputStream())
-      while (!isStopped && iterator.hasNext) {
+      while (!isStopped && iterator.hasNext)
         store(iterator.next())
-      }
-      if (!isStopped()) {
+      if (!isStopped())
         restart("Socket data stream had no more data")
-      } else {
+      else
         logInfo("Stopped receiving")
-      }
-    } catch {
+    catch
       case NonFatal(e) =>
         logWarning("Error receiving data", e)
         restart("Error receiving data", e)
-    } finally {
+    finally
       onStop()
-    }
-  }
-}
 
-private[streaming] object SocketReceiver {
+private[streaming] object SocketReceiver
 
   /**
     * This methods translates the data from an inputstream (say, from a socket)
     * to '\n' delimited strings and returns an iterator to access the strings.
     */
-  def bytesToLines(inputStream: InputStream): Iterator[String] = {
+  def bytesToLines(inputStream: InputStream): Iterator[String] =
     val dataInputStream = new BufferedReader(
         new InputStreamReader(inputStream, StandardCharsets.UTF_8))
-    new NextIterator[String] {
-      protected override def getNext() = {
+    new NextIterator[String]
+      protected override def getNext() =
         val nextValue = dataInputStream.readLine()
-        if (nextValue == null) {
+        if (nextValue == null)
           finished = true
-        }
         nextValue
-      }
 
-      protected override def close() {
+      protected override def close()
         dataInputStream.close()
-      }
-    }
-  }
-}

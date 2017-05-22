@@ -16,9 +16,8 @@
 
 package com.twitter.logging
 
-package object config {
+package object config
   type Level = com.twitter.logging.Level
   val Level = com.twitter.logging.Level
   type Policy = com.twitter.logging.Policy
   val Policy = com.twitter.logging.Policy
-}

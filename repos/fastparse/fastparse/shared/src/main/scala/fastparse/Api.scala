@@ -7,7 +7,7 @@ import acyclic.file
   * This is basically a trait which contains
   * the "public" API to fastparse packages
   */
-trait Api {
+trait Api
 
   val Parsed = core.Parsed
   type Parsed[+T] = core.Parsed[T]
@@ -43,10 +43,8 @@ trait Api {
   type P[+T] = Parser[T]
   val ParseError = core.ParseError
   type ParseError = core.ParseError
-}
-object all extends Api {
+object all extends Api
   implicit def parserApi[T, V](p: T)(
       implicit c: T => core.Parser[V]): ParserApi[V] =
     new ParserApiImpl[V](p)
-}
 object noApi extends Api

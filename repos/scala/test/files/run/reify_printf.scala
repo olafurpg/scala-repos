@@ -8,7 +8,7 @@ import scala.reflect.api.Trees
 import scala.reflect.internal.Types
 import scala.util.matching.Regex
 
-object Test extends App {
+object Test extends App
   //val output = new ByteArrayOutputStream()
   //Console.setOut(new PrintStream(output))
   val toolbox = cm.mkToolBox()
@@ -25,7 +25,7 @@ object Test extends App {
   var i = 0
   def gensym(name: String) = { i += 1; TermName(name + i) }
 
-  def createTempValDef(value: Tree, tpe: Type): (Option[Tree], Tree) = {
+  def createTempValDef(value: Tree, tpe: Type): (Option[Tree], Tree) =
     val local = gensym("temp")
     (
         Some(
@@ -38,22 +38,18 @@ object Test extends App {
         ),
         Ident(local)
     )
-  }
 
-  def tree_printf(format: Tree, params: Tree*) = {
+  def tree_printf(format: Tree, params: Tree*) =
     val Literal(Constant(s_format: String)) = format
     val paramsStack = scala.collection.mutable.Stack(params: _*)
     val parsed =
-      s_format.split("(?<=%[\\w%])|(?=%[\\w%])") map {
+      s_format.split("(?<=%[\\w%])|(?=%[\\w%])") map
         case "%d" => createTempValDef(paramsStack.pop, typeOf[Int])
         case "%s" => createTempValDef(paramsStack.pop, typeOf[String])
-        case "%%" => {
+        case "%%" =>
             (None: Option[Tree], Literal(Constant("%")))
-          }
-        case part => {
+        case part =>
             (None: Option[Tree], Literal(Constant(part)))
-          }
-      }
 
     val evals = for ((Some(eval), _) <- parsed if eval != None) yield
       (eval: Tree)
@@ -69,5 +65,3 @@ object Test extends App {
           List(ref)
       ): Tree
     Block((evals ++ prints).toList, Literal(Constant(())))
-  }
-}

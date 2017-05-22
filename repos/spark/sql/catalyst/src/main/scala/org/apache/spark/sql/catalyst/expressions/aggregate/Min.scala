@@ -22,7 +22,7 @@ import org.apache.spark.sql.catalyst.expressions._
 import org.apache.spark.sql.catalyst.util.TypeUtils
 import org.apache.spark.sql.types._
 
-case class Min(child: Expression) extends DeclarativeAggregate {
+case class Min(child: Expression) extends DeclarativeAggregate
 
   override def children: Seq[Expression] = child :: Nil
 
@@ -49,11 +49,9 @@ case class Min(child: Expression) extends DeclarativeAggregate {
       /* min = */ Least(Seq(min, child))
   )
 
-  override lazy val mergeExpressions: Seq[Expression] = {
+  override lazy val mergeExpressions: Seq[Expression] =
     Seq(
         /* min = */ Least(Seq(min.left, min.right))
     )
-  }
 
   override lazy val evaluateExpression: AttributeReference = min
-}

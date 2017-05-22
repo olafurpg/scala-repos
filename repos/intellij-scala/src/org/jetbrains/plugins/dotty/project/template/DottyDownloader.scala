@@ -12,7 +12,7 @@ import scala.util.Try
 /**
   * @author adkozlov
   */
-object DottyDownloader extends Downloader {
+object DottyDownloader extends Downloader
   final val RepositoryUrl =
     "https://oss.jfrog.org/artifactory/oss-snapshot-local"
   final val GroupId = "me.d-d"
@@ -22,8 +22,8 @@ object DottyDownloader extends Downloader {
   def downloadDotty(version: String, listener: String => Unit) =
     download(version, listener)
 
-  private def collectDependencies(pomFileUrl: String): Seq[Dependency] = {
-    def toDependency(content: Content): Option[Dependency] = content match {
+  private def collectDependencies(pomFileUrl: String): Seq[Dependency] =
+    def toDependency(content: Content): Option[Dependency] = content match
       case e: Element if e.getName == "dependency" =>
         Try(
             Dependency(
@@ -33,32 +33,27 @@ object DottyDownloader extends Downloader {
                 Option(e.getChild("scope")).map(_.getText)
             )).toOption
       case _ => None
-    }
     val element =
-      Try(HttpConfigurable.getInstance().openHttpConnection(pomFileUrl)).map {
+      Try(HttpConfigurable.getInstance().openHttpConnection(pomFileUrl)).map
         connection =>
-          try {
+          try
             val bytes = Source
               .fromInputStream(connection.getInputStream)
               .mkString
               .getBytes
             MavenJDOMUtil.read(bytes, null)
-          } finally {
+          finally
             connection.disconnect()
-          }
-      }
     element.toOption.toSeq
       .flatMap(_.getDescendants.asScala)
       .flatMap(toDependency _)
       .toVector
-  }
 
   override protected def sbtCommandsFor(version: String) =
     Seq(
         s"""set resolvers := Seq("JFrog OSS Snapshots" at "$RepositoryUrl")""",
         s"""set libraryDependencies := Seq("$GroupId" % "$ArtifactId" % "$version")"""
     ) ++ super.sbtCommandsFor(version)
-}
 
 private case class Dependency(groupId: String,
                               artifactId: String,

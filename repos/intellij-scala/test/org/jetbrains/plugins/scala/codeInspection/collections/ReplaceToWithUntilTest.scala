@@ -5,13 +5,13 @@ import org.jetbrains.plugins.scala.codeInspection.InspectionBundle
 /**
   * @author Nikolay.Tropin
   */
-class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
+class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest
   override val inspectionClass: Class[_ <: OperationOnCollectionInspection] =
     classOf[ReplaceToWithUntilInspection]
 
   override def hint: String = InspectionBundle.message("replace.to.with.until")
 
-  def testInfix(): Unit = {
+  def testInfix(): Unit =
     doTest(s"""
          |val x = 42
          |0 ${START}to x - 1$END
@@ -22,9 +22,8 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
         |val x = 42
         |0 until x
       """.stripMargin)
-  }
 
-  def testCall(): Unit = {
+  def testCall(): Unit =
     doTest(s"""
          |val x = 42
          |0.${START}to(x - 1)$END
@@ -35,9 +34,8 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
         |val x = 42
         |0.until(x)
       """.stripMargin)
-  }
 
-  def testOtherTo(): Unit = {
+  def testOtherTo(): Unit =
     checkTextHasNoErrors(
         s"""
          |class A {
@@ -49,5 +47,3 @@ class ReplaceToWithUntilTest extends OperationsOnCollectionInspectionTest {
          |a to x - 1
        """.stripMargin
     )
-  }
-}

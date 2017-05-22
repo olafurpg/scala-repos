@@ -5,39 +5,35 @@ class PQ(val reflected: Boolean) extends P with Q {}
 trait A
 trait B
 trait C { val y: P }
-class ABC extends A with B with C {
+class ABC extends A with B with C
   private def reflected = (Thread.currentThread.getStackTrace takeWhile
       (_.getMethodName != "main") exists (_.toString contains "sun.reflect."))
   lazy val y: PQ = new PQ(reflected)
-}
 
 /*** The source used to generate the second file
      Not otherwise used in the test except that compiling
      it helps make sure it still compiles.
 
   ****/
-object Gen {
-  case class Tp(outer: String, elem: String) {
+object Gen
+  case class Tp(outer: String, elem: String)
     override def toString = s"$outer { val y: $elem }"
-  }
-  case class Pair(tp1: Tp, tp2: Tp) {
+  case class Pair(tp1: Tp, tp2: Tp)
     def expr = s"((new ABC): $tp)"
     def tp = s"($tp1) with ($tp2)"
-  }
   val traits = Vector("Any", "A", "B", "C") map ("%6s" format _)
   val types = Vector("P", "Q", "R forSome { type R <: P with Q }")
   val allTypes = for (c <- traits; tp <- types) yield Tp(c, tp)
   val pairs = allTypes flatMap (t1 => allTypes map (t2 => Pair(t1, t2)))
   val indices = pairs.indices
 
-  def aliases(idx: Int) = {
+  def aliases(idx: Int) =
     val p = pairs(idx)
     import p._
     List(
         s"type R1_$idx = $tp",
         s"type R2_$idx = R1_$idx { val y: (${tp1.elem}) with (${tp2.elem}) }"
     )
-  }
 
   def mkMethodContent(pre: String)(f: Int => String) =
     indices map (i => s"def $pre$i${f(i)}") mkString "\n  "
@@ -53,7 +49,7 @@ object Gen {
 
   def fCalls = indices map ("f" + _) mkString ("\n    ", ",\n    ", "\n  ")
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // One cannot attain proper appreciation for the inadequacies of
     // string interpolation without becoming one with the newline.
     val nl = "\\n"
@@ -82,5 +78,3 @@ object Gen {
       |  }
       |}
       """.stripMargin.trim)
-  }
-}

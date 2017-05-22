@@ -6,22 +6,21 @@ import org.apache.mesos.Protos.{FrameworkID, MasterInfo, Offer, TaskStatus}
 import org.apache.mesos.{Scheduler, SchedulerDriver}
 import org.slf4j.LoggerFactory
 
-object SchedulerActor {
+object SchedulerActor
   private val log = LoggerFactory.getLogger(getClass)
 
   case class Registered(frameworkId: FrameworkID, master: MasterInfo)
 
   case class ResourceOffers(offers: Seq[Offer])
-}
 
-class SchedulerActor(scheduler: Scheduler) extends Actor with Stash {
+class SchedulerActor(scheduler: Scheduler) extends Actor with Stash
   import SchedulerActor._
 
   var driverOpt: Option[SchedulerDriver] = None
 
   def receive: Receive = waitForDriver
 
-  def waitForDriver: Receive = LoggingReceive.withLabel("waitForDriver") {
+  def waitForDriver: Receive = LoggingReceive.withLabel("waitForDriver")
     case driver: SchedulerDriver =>
       log.info("received driver")
       driverOpt = Some(driver)
@@ -29,10 +28,9 @@ class SchedulerActor(scheduler: Scheduler) extends Actor with Stash {
       unstashAll()
 
     case _ => stash()
-  }
 
   def handleCmds(driver: SchedulerDriver): Receive =
-    LoggingReceive.withLabel("handleCmds") {
+    LoggingReceive.withLabel("handleCmds")
       case Registered(frameworkId, masterInfo) =>
         scheduler.registered(driver, frameworkId, masterInfo)
 
@@ -42,11 +40,7 @@ class SchedulerActor(scheduler: Scheduler) extends Actor with Stash {
 
       case status: TaskStatus =>
         scheduler.statusUpdate(driver, status)
-    }
 
-  override def postStop(): Unit = {
-    driverOpt.foreach { driver =>
+  override def postStop(): Unit =
+    driverOpt.foreach  driver =>
       scheduler.disconnected(driver)
-    }
-  }
-}

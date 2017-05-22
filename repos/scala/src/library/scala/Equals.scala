@@ -11,7 +11,7 @@ package scala
 /** An interface containing operations for equality.
   *  The only method not already present in class `AnyRef` is `canEqual`.
   */
-trait Equals extends Any {
+trait Equals extends Any
 
   /** A method that should be called from every well-designed equals method
     *  that is open to be overridden in a subclass. See
@@ -26,4 +26,3 @@ trait Equals extends Any {
   /** The universal equality method defined in `AnyRef`.
     */
   def equals(that: Any): Boolean
-}

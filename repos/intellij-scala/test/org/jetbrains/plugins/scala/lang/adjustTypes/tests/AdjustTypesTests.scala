@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.adjustTypes.AdjustTypesTestBase
   * Nikolay.Tropin
   * 7/11/13
   */
-class AdjustTypesTests extends AdjustTypesTestBase {
+class AdjustTypesTests extends AdjustTypesTestBase
 
   def testSimpleJava() = doTest()
 
@@ -30,10 +30,8 @@ class AdjustTypesTests extends AdjustTypesTestBase {
   def testThisType() = doTest()
 
   def testPrefixed() = doTest()
-}
 
-class AdjustCatsTypeTest extends AdjustTypesTestBase {
+class AdjustCatsTypeTest extends AdjustTypesTestBase
   override protected def additionalLibraries(): Array[String] = Array("cats")
 
   def testSCL10006() = doTest()
-}

@@ -27,11 +27,11 @@ import junit.framework.AssertionFailedError
 
 import common.Box
 
-final class JettyTestServer(baseUrlBox: Box[URL]) {
+final class JettyTestServer(baseUrlBox: Box[URL])
 
   def baseUrl = baseUrlBox getOrElse new URL("http://127.0.0.1:8080")
 
-  private val (server_, context_) = {
+  private val (server_, context_) =
     val server = new Server(baseUrl.getPort)
     val context = new WebAppContext()
     context.setServer(server)
@@ -45,35 +45,28 @@ final class JettyTestServer(baseUrlBox: Box[URL]) {
     server.setGracefulShutdown(100)
     server.setStopAtShutdown(true)
     (server, context)
-  }
 
   def urlFor(path: String) = baseUrl + path
 
-  def start() {
+  def start()
     server_.start()
-  }
 
-  def stop() {
+  def stop()
     context_.setShutdown(true)
     server_.stop()
     server_.join()
-  }
 
   def running = server_.isRunning
 
-  def browse[A](startPath: String, f: (WebTester) => A): A = {
+  def browse[A](startPath: String, f: (WebTester) => A): A =
     val wc = new WebTester()
-    try {
+    try
       wc.setScriptingEnabled(false)
       wc.beginAt(urlFor(startPath))
       f(wc)
-    } catch {
-      case exc: AssertionFailedError => {
+    catch
+      case exc: AssertionFailedError =>
           System.err.println("server response: ", wc.getServerResponse)
           throw exc
-        }
-    } finally {
+    finally
       wc.closeBrowser()
-    }
-  }
-}

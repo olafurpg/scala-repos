@@ -36,131 +36,110 @@ import org.specs2.mutable._
 
 trait CompactSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with Specification
-    with ScalaCheck {
+    with ScalaCheck
   import SampleData._
   import trans._
 
-  def tableStats(table: Table): List[(Int, Int)] = table match {
+  def tableStats(table: Table): List[(Int, Int)] = table match
     case cTable: ColumnarTable =>
       val slices = cTable.slices.toStream.copoint
       val sizes = slices.map(_.size).toList
-      val undefined = slices.map { slice =>
-        (0 until slice.size).foldLeft(0) {
+      val undefined = slices.map  slice =>
+        (0 until slice.size).foldLeft(0)
           case (acc, i) =>
             if (!slice.columns.values.exists(_.isDefinedAt(i))) acc + 1
             else acc
-        }
-      }.toList
+      .toList
 
       sizes zip undefined
-  }
 
-  def mkDeref(path: CPath): TransSpec1 = {
-    def mkDeref0(nodes: List[CPathNode]): TransSpec1 = nodes match {
+  def mkDeref(path: CPath): TransSpec1 =
+    def mkDeref0(nodes: List[CPathNode]): TransSpec1 = nodes match
       case (f: CPathField) :: rest => DerefObjectStatic(mkDeref0(rest), f)
       case (i: CPathIndex) :: rest => DerefArrayStatic(mkDeref0(rest), i)
       case _ => Leaf(Source)
-    }
 
     mkDeref0(path.nodes)
-  }
 
-  def extractPath(spec: TransSpec1): Option[CPath] = spec match {
+  def extractPath(spec: TransSpec1): Option[CPath] = spec match
     case DerefObjectStatic(TransSpec1.Id, f) => Some(f)
     case DerefObjectStatic(lhs, f) => extractPath(lhs).map(_ \ f)
     case DerefArrayStatic(TransSpec1.Id, i) => Some(i)
     case DerefArrayStatic(lhs, f) => extractPath(lhs).map(_ \ f)
     case _ => None
-  }
 
-  def chooseColumn(table: Table): TransSpec1 = table match {
+  def chooseColumn(table: Table): TransSpec1 = table match
     case cTable: ColumnarTable =>
-      cTable.slices.toStream.copoint.headOption.map { slice =>
+      cTable.slices.toStream.copoint.headOption.map  slice =>
         val chosenPath =
           Random.shuffle(slice.columns.keys.map(_.selector)).head
         mkDeref(chosenPath)
-      } getOrElse (mkDeref(CPath.Identity))
-  }
+      getOrElse (mkDeref(CPath.Identity))
 
-  def undefineTable(fullTable: Table): Table = fullTable match {
+  def undefineTable(fullTable: Table): Table = fullTable match
     case cTable: ColumnarTable =>
       val slices =
         cTable.slices.toStream.copoint // fuzzing must be done strictly otherwise sadness will ensue
       val numSlices = slices.size
 
-      val maskedSlices = slices.map { slice =>
-        if (numSlices > 1 && Random.nextDouble < 0.25) {
-          new Slice {
+      val maskedSlices = slices.map  slice =>
+        if (numSlices > 1 && Random.nextDouble < 0.25)
+          new Slice
             val size = slice.size
-            val columns = slice.columns.mapValues { col =>
+            val columns = slice.columns.mapValues  col =>
               (col |> cf.util.filter(0, slice.size, new BitSet)).get
-            }
-          }
-        } else {
-          val retained = (0 until slice.size).flatMap { x =>
+        else
+          val retained = (0 until slice.size).flatMap  x =>
             if (scala.util.Random.nextDouble < 0.75) Some(x) else None
-          }
-          new Slice {
+          new Slice
             val size = slice.size
-            val columns = slice.columns.mapValues { col =>
+            val columns = slice.columns.mapValues  col =>
               (col |> cf.util.filter(0,
                                      slice.size,
                                      BitSetUtil.create(retained))).get
-            }
-          }
-        }
-      }
 
       Table(StreamT.fromStream(M.point(maskedSlices)), UnknownSize)
-  }
 
-  def undefineColumn(fullTable: Table, path: CPath): Table = fullTable match {
+  def undefineColumn(fullTable: Table, path: CPath): Table = fullTable match
     case cTable: ColumnarTable =>
       val slices =
         cTable.slices.toStream.copoint // fuzzing must be done strictly otherwise sadness will ensue
       val numSlices = slices.size
 
-      val maskedSlices = slices.map { slice =>
+      val maskedSlices = slices.map  slice =>
         val colRef = slice.columns.keys.find(_.selector == path)
-        val maskedSlice = colRef.map { colRef =>
+        val maskedSlice = colRef.map  colRef =>
           val col = slice.columns(colRef)
           val maskedCol =
             if (numSlices > 1 && Random.nextDouble < 0.25)
               (col |> cf.util.filter(0, slice.size, new BitSet)).get
-            else {
-              val retained = (0 until slice.size).map { (x: Int) =>
+            else
+              val retained = (0 until slice.size).map  (x: Int) =>
                 if (scala.util.Random.nextDouble < 0.75) Some(x) else None
-              }.flatten
+              .flatten
               (col |> cf.util.filter(0,
                                      slice.size,
                                      BitSetUtil.create(retained))).get
-            }
-          new Slice {
+          new Slice
             val size = slice.size
             val columns = slice.columns.updated(colRef, maskedCol)
-          }
-        }
         maskedSlice.getOrElse(slice)
-      }
 
       Table(StreamT.fromStream(M.point(maskedSlices)), UnknownSize)
-  }
 
-  def testCompactIdentity = {
+  def testCompactIdentity =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val table = fromSample(sample)
       val compactTable = table.compact(Leaf(Source))
 
       val results = toJson(compactTable)
 
       results.copoint must_== sample.data
-    }
-  }
 
-  def testCompactPreserve = {
+  def testCompactPreserve =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val sampleTable = undefineTable(fromSample(sample))
       val sampleJson = toJson(sampleTable)
 
@@ -168,12 +147,10 @@ trait CompactSpec[M[+ _]]
       val results = toJson(compactTable)
 
       results.copoint must_== sampleJson.copoint
-    }
-  }
 
-  def testCompactRows = {
+  def testCompactRows =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val sampleTable = undefineTable(fromSample(sample))
       val sampleJson = toJson(sampleTable)
 
@@ -182,12 +159,10 @@ trait CompactSpec[M[+ _]]
       val results = toJson(compactTable)
 
       compactStats.map(_._2).foldLeft(0)(_ + _) must_== 0
-    }
-  }
 
-  def testCompactSlices = {
+  def testCompactSlices =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val sampleTable = undefineTable(fromSample(sample))
       val sampleJson = toJson(sampleTable)
 
@@ -196,12 +171,10 @@ trait CompactSpec[M[+ _]]
       val results = toJson(compactTable)
 
       compactStats.map(_._1).count(_ == 0) must_== 0
-    }
-  }
 
-  def testCompactPreserveKey = {
+  def testCompactPreserveKey =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val baseTable = fromSample(sample)
       val key = chooseColumn(baseTable)
 
@@ -215,12 +188,10 @@ trait CompactSpec[M[+ _]]
       val resultKeyJson = toJson(resultKey)
 
       resultKeyJson.copoint must_== sampleKeyJson.copoint
-    }
-  }
 
-  def testCompactRowsKey = {
+  def testCompactRowsKey =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val baseTable = fromSample(sample)
       val key = chooseColumn(baseTable)
 
@@ -233,12 +204,10 @@ trait CompactSpec[M[+ _]]
       val resultKeyStats = tableStats(resultKey)
 
       resultKeyStats.map(_._2).foldLeft(0)(_ + _) must_== 0
-    }
-  }
 
-  def testCompactSlicesKey = {
+  def testCompactSlicesKey =
     implicit val gen = sample(schema)
-    check { (sample: SampleData) =>
+    check  (sample: SampleData) =>
       val baseTable = fromSample(sample)
       val key = chooseColumn(baseTable)
 
@@ -251,6 +220,3 @@ trait CompactSpec[M[+ _]]
       val resultKeyStats = tableStats(resultKey)
 
       resultKeyStats.map(_._1).count(_ == 0) must_== 0
-    }
-  }
-}

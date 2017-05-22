@@ -38,7 +38,7 @@ import scala.language.implicitConversions
   * @author Nikolay Obedin
   * @since 6/5/15.
   */
-object ExternalSystemDataDsl {
+object ExternalSystemDataDsl
 
   import DslUtils._
 
@@ -67,22 +67,20 @@ object ExternalSystemDataDsl {
   val arbitraryNodes = new Attribute[Seq[Node[_]]]("arbitraryNodes")
   with ProjectAttribute with ModuleAttribute with LibraryAttribute
 
-  class project {
+  class project
 
-    def build: ProjectNode = {
+    def build: ProjectNode =
       val node = new ProjectNode(attributes.getOrFail(name),
                                  attributes.getOrFail(ideDirectoryPath),
                                  attributes.getOrFail(linkedProjectPath))
 
-      val moduleToNode = {
+      val moduleToNode =
         val allModules = attributes.get(modules).getOrElse(Seq.empty)
         allModules.map(m => (m, m.build)).toMap
-      }
 
-      val libraryToNode = {
+      val libraryToNode =
         val allLibraries = attributes.get(libraries).getOrElse(Seq.empty)
         allLibraries.map(l => (l, l.build)).toMap
-      }
 
       createModuleDependencies(moduleToNode)
       createLibraryDependencies(moduleToNode, libraryToNode)
@@ -90,32 +88,25 @@ object ExternalSystemDataDsl {
       node.addAll(libraryToNode.values.toSeq)
       attributes.get(arbitraryNodes).foreach(node.addAll)
       node
-    }
 
     private def createModuleDependencies(
         moduleToNode: Map[module, ModuleNode]): Unit =
-      moduleToNode.foreach {
+      moduleToNode.foreach
         case (module, moduleNode) =>
-          module.getModuleDependencies.foreach { dependency =>
-            moduleToNode.get(dependency).foreach { dependencyModuleNode =>
+          module.getModuleDependencies.foreach  dependency =>
+            moduleToNode.get(dependency).foreach  dependencyModuleNode =>
               moduleNode.add(
                   new ModuleDependencyNode(moduleNode, dependencyModuleNode))
-            }
-          }
-      }
 
     private def createLibraryDependencies(
         moduleToNode: Map[module, ModuleNode],
         libraryToNode: Map[library, LibraryNode]): Unit =
-      moduleToNode.foreach {
+      moduleToNode.foreach
         case (module, moduleNode) =>
-          module.getLibraryDependencies.foreach { dependency =>
-            libraryToNode.get(dependency).foreach { libraryNode =>
+          module.getLibraryDependencies.foreach  dependency =>
+            libraryToNode.get(dependency).foreach  libraryNode =>
               moduleNode.add(new LibraryDependencyNode(
                       moduleNode, libraryNode, LibraryLevel.PROJECT))
-            }
-          }
-      }
 
     private val attributes = new AttributeMap
 
@@ -126,27 +117,23 @@ object ExternalSystemDataDsl {
         attribute: Attribute[Seq[T]] with ProjectAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
 
-  abstract class module {
+  abstract class module
     val typeId: String
 
-    def build: ModuleNode = {
+    def build: ModuleNode =
       val node = new ModuleNode(typeId,
                                 attributes.getOrFail(name),
                                 attributes.getOrFail(name),
                                 attributes.getOrFail(moduleFileDirectoryPath),
                                 attributes.getOrFail(externalConfigPath))
-      attributes.get(libraries).foreach { libs =>
-        libs.map(_.build).foreach { libNode =>
+      attributes.get(libraries).foreach  libs =>
+        libs.map(_.build).foreach  libNode =>
           node.add(libNode)
           node.add(
               new LibraryDependencyNode(node, libNode, LibraryLevel.MODULE))
-        }
-      }
       attributes.get(arbitraryNodes).foreach(node.addAll)
       node
-    }
 
     def getModuleDependencies: Seq[module] =
       attributes.get(moduleDependencies).getOrElse(Seq.empty)
@@ -163,18 +150,15 @@ object ExternalSystemDataDsl {
         attribute: Attribute[Seq[T]] with ModuleAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
 
-  class javaModule extends module {
+  class javaModule extends module
     val typeId = StdModuleTypes.JAVA.getId
-  }
 
-  class library {
-    def build: LibraryNode = {
+  class library
+    def build: LibraryNode =
       val node = new LibraryNode(attributes.getOrFail(name), true)
       attributes.get(arbitraryNodes).foreach(node.addAll)
       node
-    }
 
     private val attributes = new AttributeMap
 
@@ -185,5 +169,3 @@ object ExternalSystemDataDsl {
         attribute: Attribute[Seq[T]] with LibraryAttribute)(
         implicit m: Manifest[Seq[T]]): AttributeSeqDef[T] =
       new AttributeSeqDef(attribute, attributes)
-  }
-}

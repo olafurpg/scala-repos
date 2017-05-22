@@ -10,6 +10,5 @@ class Bar[A] extends Foo[A] { def f(): Option[A] = ??? }
 // I suspect he whittled down the example too far.
 class Wrapper(val value: Int) extends AnyVal
 abstract class Test { def check(the: Wrapper): Boolean }
-object T {
+object T
   new Test { def check(the: Wrapper) = true }
-}

@@ -11,21 +11,19 @@ case class ApiRepository(name: String,
                          forks: Int,
                          `private`: Boolean,
                          default_branch: String,
-                         owner: ApiUser)(urlIsHtmlUrl: Boolean) {
+                         owner: ApiUser)(urlIsHtmlUrl: Boolean)
   val forks_count = forks
   val watchers_count = watchers
   val url =
-    if (urlIsHtmlUrl) {
+    if (urlIsHtmlUrl)
       ApiPath(s"/${full_name}")
-    } else {
+    else
       ApiPath(s"/api/v3/repos/${full_name}")
-    }
   val http_url = ApiPath(s"/git/${full_name}.git")
   val clone_url = ApiPath(s"/git/${full_name}.git")
   val html_url = ApiPath(s"/${full_name}")
-}
 
-object ApiRepository {
+object ApiRepository
   def apply(repository: Repository,
             owner: ApiUser,
             forkedCount: Int = 0,
@@ -56,4 +54,3 @@ object ApiRepository {
                   owner,
                   forkedCount = repositoryInfo.forkedCount,
                   urlIsHtmlUrl = true)
-}

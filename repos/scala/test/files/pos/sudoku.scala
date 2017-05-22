@@ -1,4 +1,4 @@
-object SudokuSolver extends App {
+object SudokuSolver extends App
   // The board is represented by an array of strings (arrays of chars),
   // held in a global variable m. The program begins by reading 9 lines
   // of input to fill the board
@@ -26,7 +26,7 @@ object SudokuSolver extends App {
   // The function is itself a higher-order fold, accumulating the value
   // accu by applying the given function f to it whenever a solution m
   // is found
-  def search(x: Int, y: Int, f: (Int) => Int, accu: Int): Int = (x, y) match {
+  def search(x: Int, y: Int, f: (Int) => Int, accu: Int): Int = (x, y) match
     case (9, y) => search(0, y + 1, f, accu) // next row
     case (0, 9) => f(accu) // found a solution
     case (x, y) =>
@@ -34,18 +34,16 @@ object SudokuSolver extends App {
       else
         fold((accu: Int, n: Int) =>
                if (invalid(0, x, y, (n + 48).toChar)) accu
-               else {
+               else
                  m(y)(x) = (n + 48).toChar;
                  val newaccu = search(x + 1, y, f, accu);
                  m(y)(x) = '0';
                  newaccu
-             },
+             ,
              accu,
              1,
              10)
-  }
 
   // The main part of the program uses the search function to accumulate
   // the total number of solutions
   println("\n" + search(0, 0, i => { print; i + 1 }, 0) + " solution(s)")
-}

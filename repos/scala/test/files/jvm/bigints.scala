@@ -3,15 +3,13 @@
   *
   *  @author Stephane Micheloud
   */
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     Test_BigInt.runTest()
     Test_BigDecimal.runTest()
-  }
-}
 
-object Test_BigInt {
-  def runTest() {
+object Test_BigInt
+  def runTest()
     import BigInt._
 
     val x: BigInt = 1
@@ -22,11 +20,9 @@ object Test_BigInt {
     println("int_mul_bigint = " + (2 * x * y, y * x * 2))
     println("z <= 3 = " + (z <= 3))
     println("3 < z = " + (3 < z))
-  }
-}
 
-object Test_BigDecimal {
-  def runTest() {
+object Test_BigDecimal
+  def runTest()
     import scala.BigDecimal, BigDecimal._
 
     val xi: BigDecimal = 1
@@ -45,5 +41,3 @@ object Test_BigDecimal {
     val c = a - b
     println("c > MAX_LONG = " + (c > Long.MaxValue))
     println("c <= MAX_LONG = " + (c <= Long.MaxValue))
-  }
-}

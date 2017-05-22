@@ -52,12 +52,12 @@ import TableModule._
 import PrecogJValueOrder._
 
 trait BlockSortSpec[M[+ _]]
-    extends BlockStoreTestSupport[M] with Specification with ScalaCheck {
+    extends BlockStoreTestSupport[M] with Specification with ScalaCheck
   self =>
   def testSortDense(sample: SampleData,
                     sortOrder: DesiredSortOrder,
                     unique: Boolean,
-                    sortKeys: JPath*) = {
+                    sortKeys: JPath*) =
     val module = BlockStoreTestModule.empty[M]
 
     val jvalueOrdering = Order[JValue].toScalaOrdering
@@ -67,24 +67,23 @@ trait BlockSortSpec[M[+ _]]
     val globalIdPath = JPath(".globalId")
 
     val original =
-      if (unique) {
-        sample.data.map { jv =>
+      if (unique)
+        sample.data.map  jv =>
           JArray(sortKeys.map(_.extract(jv \ "value")).toList) -> jv
-        }.toMap.toList.unzip._2.toStream
-      } else {
+        .toMap.toList.unzip._2.toStream
+      else
         sample.data
-      }
 
     // We have to add in and then later remove the global Id (insert
     // order) to match real sort semantics for disambiguation of equal
     // values
-    val sorted = original.zipWithIndex.map {
+    val sorted = original.zipWithIndex.map
       case (jv, i) => JValue.unsafeInsert(jv, globalIdPath, JNum(i))
-    }.sortBy { v =>
+    .sortBy  v =>
       JArray(
           sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
         .asInstanceOf[JValue]
-    }(desiredJValueOrder).map(_.delete(globalIdPath).get).toList
+    (desiredJValueOrder).map(_.delete(globalIdPath).get).toList
 
     //def xyz(v: JValue): JValue = {
     //  JArray(sortKeys.map(_.extract(v \ "value")).toList ::: List(v \ "globalId"))
@@ -92,35 +91,30 @@ trait BlockSortSpec[M[+ _]]
 
     val cSortKeys = sortKeys map { CPath(_) }
 
-    val resultM = for {
+    val resultM = for
       sorted <- module
         .fromSample(sample)
         .sort(module.sortTransspec(cSortKeys: _*), sortOrder)
       json <- sorted.toJson
-    } yield (json, sorted)
+    yield (json, sorted)
 
     val (result, resultTable) = resultM.copoint
 
     result.toList must_== sorted
 
     resultTable.size mustEqual ExactSize(sorted.size)
-  }
 
-  def checkSortDense(sortOrder: DesiredSortOrder) = {
+  def checkSortDense(sortOrder: DesiredSortOrder) =
     import TableModule.paths.Value
 
     implicit val gen = sample(objectSchema(_, 3))
-    check { (sample: SampleData) =>
-      {
+    check  (sample: SampleData) =>
         val Some((_, schema)) = sample.schema
 
         testSortDense(sample, sortOrder, false, schema.map(_._1).head)
-      }
-    }
-  }
 
   // Simple test of sorting on homogeneous data
-  def homogeneousSortSample = {
+  def homogeneousSortSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -152,10 +146,9 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortDescending, false, JPath(".uid"))
-  }
 
   // Simple test of sorting on homogeneous data with objects
-  def homogeneousSortSampleWithNonexistentSortKey = {
+  def homogeneousSortSampleWithNonexistentSortKey =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {"key":[2],"value":6},
@@ -167,10 +160,9 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortDescending, false, JPath(".uid"))
-  }
 
   // Simple test of partially undefined sort key data
-  def partiallyUndefinedSortSample = {
+  def partiallyUndefinedSortSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -202,9 +194,8 @@ trait BlockSortSpec[M[+ _]]
 
     testSortDense(
         sampleData, SortAscending, false, JPath(".uid"), JPath(".hW"))
-  }
 
-  def heterogeneousBaseValueTypeSample = {
+  def heterogeneousBaseValueTypeSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -229,9 +220,8 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".uid"))
-  }
 
-  def badSchemaSortSample = {
+  def badSchemaSortSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -266,10 +256,9 @@ trait BlockSortSpec[M[+ _]]
                   JPath(".q") -> CNum,
                   JPath(".vxu") -> CEmptyArray))))
     testSortDense(sampleData, SortAscending, false, JPath("q"))
-  }
 
   // Simple test of sorting on heterogeneous data
-  def heterogeneousSortSample2 = {
+  def heterogeneousSortSample2 =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {"key":[1,4,3],"value":{"b0":["",{"alxk":-1},-5.170005125478374E+307],"y":{"pvbT":[-1458654748381439976,{}]}}},
@@ -279,10 +268,9 @@ trait BlockSortSpec[M[+ _]]
         None)
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
-  }
 
   // Simple test of sorting on heterogeneous data
-  def heterogeneousSortSampleDescending = {
+  def heterogeneousSortSampleDescending =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
@@ -291,10 +279,9 @@ trait BlockSortSpec[M[+ _]]
         None)
 
     testSortDense(sampleData, SortDescending, false, JPath(".y"))
-  }
 
   // Simple test of sorting on heterogeneous data
-  def heterogeneousSortSampleAscending = {
+  def heterogeneousSortSampleAscending =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {"key":[2],"value":{"y":false}},
@@ -303,10 +290,9 @@ trait BlockSortSpec[M[+ _]]
         None)
 
     testSortDense(sampleData, SortAscending, false, JPath(".y"))
-  }
 
   // Simple test of heterogeneous sort keys
-  def heterogeneousSortSample = {
+  def heterogeneousSortSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -348,9 +334,8 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".uid"))
-  }
 
-  def secondHetSortSample = {
+  def secondHetSortSample =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -385,7 +370,6 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".zw1"))
-  }
 
   /* The following data set results in three separate JDBM
    * indices due to formats. This exposed a bug in mergeProjections
@@ -393,7 +377,7 @@ trait BlockSortSpec[M[+ _]]
    * once one of the index slices expired. See commit
    * a253d47f3f6d09fd39afc2986c529e84e5443e7f for details
    */
-  def threeCellMerge = {
+  def threeCellMerge =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         {
@@ -538,9 +522,8 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".zbtQhnpnun"))
-  }
 
-  def uniqueSort = {
+  def uniqueSort =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[
         { "key" : [2], "value" : { "foo" : 10 } },
@@ -552,9 +535,8 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".foo"))
-  }
 
-  def emptySort = {
+  def emptySort =
     val sampleData = SampleData(
         (JParser.parseUnsafe("""[]""") --> classOf[JArray]).elements.toStream,
         Some(
@@ -563,6 +545,4 @@ trait BlockSortSpec[M[+ _]]
     )
 
     testSortDense(sampleData, SortAscending, false, JPath(".foo"))
-  }
-}
 // vim: set ts=4 sw=4 et:

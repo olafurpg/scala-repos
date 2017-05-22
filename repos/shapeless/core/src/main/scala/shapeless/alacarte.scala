@@ -23,12 +23,11 @@ import ops.hlist.{Length, Tupler}
 import ops.nat.ToInt
 import ops.record.Merger
 
-trait CaseClassFacet {
+trait CaseClassFacet
   type C
-}
 
-trait ProductISOFacet extends CaseClassFacet {
-  trait ProductISOOps {
+trait ProductISOFacet extends CaseClassFacet
+  trait ProductISOOps
     type Repr <: HList
     type P <: Product
     val gen: Generic.Aux[C, Repr]
@@ -36,28 +35,23 @@ trait ProductISOFacet extends CaseClassFacet {
 
     def toProduct(c: C): P = pgen.from(gen.to(c))
     def fromProduct(p: P): C = gen.from(pgen.to(p))
-  }
 
   val ops: ProductISOOps
-}
 
-trait ApplyUnapplyFacet extends ProductISOFacet {
-  trait ApplyUnapplyOps extends ProductISOOps {
+trait ApplyUnapplyFacet extends ProductISOFacet
+  trait ApplyUnapplyOps extends ProductISOOps
     def apply(p: P): C = fromProduct(p)
 
     def unapply(c: C): Option[P] = Some(toProduct(c))
-  }
 
   val ops: ApplyUnapplyOps
 
-  trait ApplyUnapplyCompanion {
+  trait ApplyUnapplyCompanion
     @nonGeneric def apply(elems: ops.P): C = ops.apply(elems)
     @nonGeneric def unapply(s: C): Option[ops.P] = ops.unapply(s)
-  }
-}
 
-trait ProductFacet extends ProductISOFacet {
-  trait ProductOps extends ProductISOOps {
+trait ProductFacet extends ProductISOFacet
+  trait ProductOps extends ProductISOOps
     def productElement(c: C, n: Int): Any = toProduct(c).productElement(n)
 
     def productIterator(c: C): Iterator[Any] = toProduct(c).productIterator
@@ -65,11 +59,10 @@ trait ProductFacet extends ProductISOFacet {
     def productPrefix: String
 
     def productArity: Int
-  }
 
   val ops: ProductOps
 
-  trait ProductMethods { self: C =>
+  trait ProductMethods  self: C =>
     def productElement(n: Int): Any = ops.productElement(this, n)
 
     def productIterator: Iterator[Any] = ops.productIterator(this)
@@ -77,11 +70,9 @@ trait ProductFacet extends ProductISOFacet {
     def productPrefix: String = ops.productPrefix
 
     def productArity: Int = ops.productArity
-  }
-}
 
-trait PolymorphicEqualityFacet extends ProductISOFacet {
-  trait PolymorphicEqualityOps extends ProductISOOps {
+trait PolymorphicEqualityFacet extends ProductISOFacet
+  trait PolymorphicEqualityOps extends ProductISOOps
     val typ: Typeable[C]
 
     def canEqual(c: C, other: Any): Boolean = typ.cast(other).isDefined
@@ -89,25 +80,21 @@ trait PolymorphicEqualityFacet extends ProductISOFacet {
     def equals(c: C, other: Any): Boolean =
       (c.asInstanceOf[AnyRef] eq other.asInstanceOf[AnyRef]) || typ
         .cast(other)
-        .map { that =>
+        .map  that =>
           (toProduct(c) == toProduct(that)) && canEqual(that, c)
-        }
         .getOrElse(false)
 
     def hashCode(c: C): Int = toProduct(c).hashCode
-  }
 
   val ops: PolymorphicEqualityOps
 
-  trait PolymorphicEqualityMethods { self: C =>
+  trait PolymorphicEqualityMethods  self: C =>
     override def equals(other: Any): Boolean = ops.equals(this, other)
 
     override def hashCode: Int = ops.hashCode(this)
-  }
-}
 
-trait CopyFacet extends CaseClassFacet {
-  trait CopyOps {
+trait CopyFacet extends CaseClassFacet
+  trait CopyOps
     type LRepr <: HList
     type CopyMerger[R <: HList] = Merger.Aux[LRepr, R, LRepr]
 
@@ -115,31 +102,25 @@ trait CopyFacet extends CaseClassFacet {
 
     def copy[R <: HList](c: C, rec: R)(implicit merger: CopyMerger[R]): C =
       lgen.from(lgen.to(c).merge(rec))
-  }
 
   val ops: CopyOps
 
-  trait CopyMethods extends RecordArgs { self: C =>
+  trait CopyMethods extends RecordArgs  self: C =>
     def copyRecord[R <: HList](rec: R)(implicit merger: ops.CopyMerger[R]): C =
       ops.copy(this, rec)
-  }
-}
 
-trait ToStringFacet extends ProductFacet {
-  trait ToStringOps extends ProductOps {
+trait ToStringFacet extends ProductFacet
+  trait ToStringOps extends ProductOps
     def toString(c: C): String = productPrefix + toProduct(c).toString
-  }
 
   val ops: ToStringOps
 
-  trait ToStringMethods { self: C =>
+  trait ToStringMethods  self: C =>
     override def toString: String = ops.toString(this)
-  }
-}
 
 trait DefaultCaseClassDefns
     extends ApplyUnapplyFacet with ProductFacet with PolymorphicEqualityFacet
-    with CopyFacet with ToStringFacet {
+    with CopyFacet with ToStringFacet
 
   trait CaseClassOps
       extends ApplyUnapplyOps with ProductOps with PolymorphicEqualityOps
@@ -149,9 +130,8 @@ trait DefaultCaseClassDefns
 
   trait CaseClass
       extends ProductMethods with PolymorphicEqualityMethods with CopyMethods
-      with ToStringMethods {
+      with ToStringMethods
     self: C =>
-  }
 
   val ops: CaseClassOps
 
@@ -164,7 +144,7 @@ trait DefaultCaseClassDefns
       pgen0: Generic.Aux[P0, Repr0],
       typ0: Typeable[C],
       tag0: ClassTag[C]) =
-    new CaseClassOps {
+    new CaseClassOps
       type Repr = Repr0
       type LRepr = LRepr0
       type P = P0
@@ -175,5 +155,3 @@ trait DefaultCaseClassDefns
       val tag = tag0
       val productPrefix = tag0.runtimeClass.getName.split("(\\.|\\$)").last
       val productArity = toInt()
-    }
-}

@@ -22,10 +22,10 @@ import scala.language.postfixOps
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
 
-class DatasetCacheSuite extends QueryTest with SharedSQLContext {
+class DatasetCacheSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("persist and unpersist") {
+  test("persist and unpersist")
     val ds =
       Seq(("a", 1), ("b", 2), ("c", 3)).toDS().select(expr("_2 + 1").as[Int])
     val cached = ds.cache()
@@ -38,9 +38,8 @@ class DatasetCacheSuite extends QueryTest with SharedSQLContext {
     // Drop the cache.
     cached.unpersist()
     assert(!sqlContext.isCached(cached), "The Dataset should not be cached.")
-  }
 
-  test("persist and then rebind right encoder when join 2 datasets") {
+  test("persist and then rebind right encoder when join 2 datasets")
     val ds1 = Seq("1", "2").toDS().as("a")
     val ds2 = Seq(2, 3).toDS().as("b")
 
@@ -57,9 +56,8 @@ class DatasetCacheSuite extends QueryTest with SharedSQLContext {
     assert(!sqlContext.isCached(ds1), "The Dataset ds1 should not be cached.")
     ds2.unpersist()
     assert(!sqlContext.isCached(ds2), "The Dataset ds2 should not be cached.")
-  }
 
-  test("persist and then groupBy columns asKey, map") {
+  test("persist and then groupBy columns asKey, map")
     val ds = Seq(("a", 10), ("a", 20), ("b", 1), ("b", 2), ("c", 1)).toDS()
     val grouped = ds.groupByKey($"_1").keyAs[String]
     val agged = grouped.mapGroups { case (g, iter) => (g, iter.map(_._2).sum) }
@@ -73,5 +71,3 @@ class DatasetCacheSuite extends QueryTest with SharedSQLContext {
     agged.unpersist()
     assert(
         !sqlContext.isCached(agged), "The Dataset agged should not be cached.")
-  }
-}

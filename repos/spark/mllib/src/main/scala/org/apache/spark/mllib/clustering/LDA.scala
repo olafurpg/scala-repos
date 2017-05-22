@@ -50,7 +50,7 @@ class LDA private (private var k: Int,
                    private var seed: Long,
                    private var checkpointInterval: Int,
                    private var ldaOptimizer: LDAOptimizer)
-    extends Logging {
+    extends Logging
 
   /**
     * Constructs a LDA instance with default parameters.
@@ -76,12 +76,11 @@ class LDA private (private var k: Int,
     * (default = 10)
     */
   @Since("1.3.0")
-  def setK(k: Int): this.type = {
+  def setK(k: Int): this.type =
     require(
         k > 0, s"LDA k (number of clusters) must be > 0, but was set to $k")
     this.k = k
     this
-  }
 
   /**
     * Concentration parameter (commonly named "alpha") for the prior placed on documents'
@@ -100,15 +99,13 @@ class LDA private (private var k: Int,
     * [[Double]] parameter. It should fail if docConcentration is asymmetric.
     */
   @Since("1.3.0")
-  def getDocConcentration: Double = {
+  def getDocConcentration: Double =
     val parameter = docConcentration(0)
-    if (docConcentration.size == 1) {
+    if (docConcentration.size == 1)
       parameter
-    } else {
+    else
       require(docConcentration.toArray.forall(_ == parameter))
       parameter
-    }
-  }
 
   /**
     * Concentration parameter (commonly named "alpha") for the prior placed on documents'
@@ -135,21 +132,19 @@ class LDA private (private var k: Int,
     *       [[https://github.com/Blei-Lab/onlineldavb]].
     */
   @Since("1.5.0")
-  def setDocConcentration(docConcentration: Vector): this.type = {
+  def setDocConcentration(docConcentration: Vector): this.type =
     require(
         docConcentration.size > 0, "docConcentration must have > 0 elements")
     this.docConcentration = docConcentration
     this
-  }
 
   /**
     * Replicates a [[Double]] docConcentration to create a symmetric prior.
     */
   @Since("1.3.0")
-  def setDocConcentration(docConcentration: Double): this.type = {
+  def setDocConcentration(docConcentration: Double): this.type =
     this.docConcentration = Vectors.dense(docConcentration)
     this
-  }
 
   /**
     * Alias for [[getAsymmetricDocConcentration]]
@@ -210,10 +205,9 @@ class LDA private (private var k: Int,
     *       [[https://github.com/Blei-Lab/onlineldavb]].
     */
   @Since("1.3.0")
-  def setTopicConcentration(topicConcentration: Double): this.type = {
+  def setTopicConcentration(topicConcentration: Double): this.type =
     this.topicConcentration = topicConcentration
     this
-  }
 
   /**
     * Alias for [[getTopicConcentration]]
@@ -238,10 +232,9 @@ class LDA private (private var k: Int,
     * (default = 20)
     */
   @Since("1.3.0")
-  def setMaxIterations(maxIterations: Int): this.type = {
+  def setMaxIterations(maxIterations: Int): this.type =
     this.maxIterations = maxIterations
     this
-  }
 
   /**
     * Random seed for cluster initialization.
@@ -253,10 +246,9 @@ class LDA private (private var k: Int,
     * Set the random seed for cluster initialization.
     */
   @Since("1.3.0")
-  def setSeed(seed: Long): this.type = {
+  def setSeed(seed: Long): this.type =
     this.seed = seed
     this
-  }
 
   /**
     * Period (in iterations) between checkpoints.
@@ -273,10 +265,9 @@ class LDA private (private var k: Int,
     * @see [[org.apache.spark.SparkContext#setCheckpointDir]]
     */
   @Since("1.3.0")
-  def setCheckpointInterval(checkpointInterval: Int): this.type = {
+  def setCheckpointInterval(checkpointInterval: Int): this.type =
     this.checkpointInterval = checkpointInterval
     this
-  }
 
   /**
     * :: DeveloperApi ::
@@ -294,26 +285,23 @@ class LDA private (private var k: Int,
     */
   @Since("1.4.0")
   @DeveloperApi
-  def setOptimizer(optimizer: LDAOptimizer): this.type = {
+  def setOptimizer(optimizer: LDAOptimizer): this.type =
     this.ldaOptimizer = optimizer
     this
-  }
 
   /**
     * Set the LDAOptimizer used to perform the actual calculation by algorithm name.
     * Currently "em", "online" are supported.
     */
   @Since("1.4.0")
-  def setOptimizer(optimizerName: String): this.type = {
-    this.ldaOptimizer = optimizerName.toLowerCase match {
+  def setOptimizer(optimizerName: String): this.type =
+    this.ldaOptimizer = optimizerName.toLowerCase match
       case "em" => new EMLDAOptimizer
       case "online" => new OnlineLDAOptimizer
       case other =>
         throw new IllegalArgumentException(
             s"Only em, online are supported but got $other.")
-    }
     this
-  }
 
   /**
     * Learn an LDA model using the given dataset.
@@ -325,30 +313,26 @@ class LDA private (private var k: Int,
     * @return  Inferred LDA model
     */
   @Since("1.3.0")
-  def run(documents: RDD[(Long, Vector)]): LDAModel = {
+  def run(documents: RDD[(Long, Vector)]): LDAModel =
     val state = ldaOptimizer.initialize(documents, this)
     var iter = 0
     val iterationTimes = Array.fill[Double](maxIterations)(0)
-    while (iter < maxIterations) {
+    while (iter < maxIterations)
       val start = System.nanoTime()
       state.next()
       val elapsedSeconds = (System.nanoTime() - start) / 1e9
       iterationTimes(iter) = elapsedSeconds
       iter += 1
-    }
     state.getLDAModel(iterationTimes)
-  }
 
   /**
     * Java-friendly version of [[run()]]
     */
   @Since("1.3.0")
-  def run(documents: JavaPairRDD[java.lang.Long, Vector]): LDAModel = {
+  def run(documents: JavaPairRDD[java.lang.Long, Vector]): LDAModel =
     run(documents.rdd.asInstanceOf[RDD[(Long, Vector)]])
-  }
-}
 
-private[clustering] object LDA {
+private[clustering] object LDA
 
   /*
     DEVELOPERS NOTE:
@@ -426,7 +410,7 @@ private[clustering] object LDA {
                                         totalTopicCounts: TopicCounts,
                                         vocabSize: Int,
                                         eta: Double,
-                                        alpha: Double): TopicCounts = {
+                                        alpha: Double): TopicCounts =
     val K = docTopicCounts.length
     val N_j = docTopicCounts.data
     val N_w = termTopicCounts.data
@@ -437,13 +421,10 @@ private[clustering] object LDA {
     var sum = 0.0
     val gamma_wj = new Array[Double](K)
     var k = 0
-    while (k < K) {
+    while (k < K)
       val gamma_wjk = (N_w(k) + eta1) * (N_j(k) + alpha1) / (N(k) + Weta1)
       gamma_wj(k) = gamma_wjk
       sum += gamma_wjk
       k += 1
-    }
     // normalize
     BDV(gamma_wj) /= sum
-  }
-}

@@ -1,18 +1,18 @@
 package scala.tools.nsc
 package typechecker
 
-trait Tags { self: Analyzer =>
+trait Tags  self: Analyzer =>
 
   import global._
   import definitions._
 
-  trait Tag { self: Typer =>
+  trait Tag  self: Typer =>
 
     private val runDefinitions = currentRun.runDefinitions
 
     private def resolveTag(
         pos: Position, taggedTp: Type, allowMaterialization: Boolean) =
-      enteringTyper {
+      enteringTyper
         def wrapper(tree: => Tree): Tree =
           if (allowMaterialization)(context.withMacrosEnabled[Tree](tree))
           else (context.withMacrosDisabled[Tree](tree))
@@ -26,7 +26,6 @@ trait Tags { self: Analyzer =>
                 saveAmbiguousDivergent = true,
                 pos
             ).tree)
-      }
 
     /** Finds in scope or materializes a ClassTag.
       *  Should be used instead of ClassManifest every time compiler needs to persist an erasure.
@@ -45,10 +44,9 @@ trait Tags { self: Analyzer =>
       */
     def resolveClassTag(pos: Position,
                         tp: Type,
-                        allowMaterialization: Boolean = true): Tree = {
+                        allowMaterialization: Boolean = true): Tree =
       val taggedTp = appliedType(ClassTagClass.typeConstructor, List(tp))
       resolveTag(pos, taggedTp, allowMaterialization)
-    }
 
     /** Finds in scope or materializes an WeakTypeTag (if `concrete` is false) or a TypeTag (if `concrete` is true).
       *
@@ -73,7 +71,7 @@ trait Tags { self: Analyzer =>
                        allowMaterialization: Boolean = true): Tree =
       // if someone requests a type tag, but scala-reflect.jar isn't on the library classpath, then bail
       if (pre == NoType && ApiUniverseClass == NoSymbol) EmptyTree
-      else {
+      else
         val tagSym =
           if (concrete) runDefinitions.TypeTagClass
           else runDefinitions.WeakTypeTagClass
@@ -83,6 +81,3 @@ trait Tags { self: Analyzer =>
           else singleType(pre, pre member tagSym.name)
         val taggedTp = appliedType(tagTp, List(tp))
         resolveTag(pos, taggedTp, allowMaterialization)
-      }
-  }
-}

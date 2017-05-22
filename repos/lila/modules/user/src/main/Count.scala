@@ -11,17 +11,16 @@ case class Count(ai: Int,
                  lossH: Int, // only against human opponents
                  rated: Int,
                  win: Int,
-                 winH: Int) {
+                 winH: Int)
   // only against human opponents
 
   def gameH = winH + lossH + drawH
 
   def casual = game - rated
-}
 
-object Count {
+object Count
 
-  private[user] val countBSONHandler = new BSON[Count] {
+  private[user] val countBSONHandler = new BSON[Count]
 
     def reads(r: BSON.Reader): Count =
       Count(ai = r nInt "ai",
@@ -44,7 +43,5 @@ object Count {
                    "rated" -> w.int(o.rated),
                    "win" -> w.int(o.win),
                    "winH" -> w.int(o.winH))
-  }
 
   val default = Count(0, 0, 0, 0, 0, 0, 0, 0, 0)
-}

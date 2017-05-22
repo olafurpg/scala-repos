@@ -17,8 +17,8 @@ package com.twitter.scalding
 
 import org.scalatest.{Matchers, WordSpec}
 
-class WeightedPageRankSpec extends WordSpec with Matchers {
-  "Weighted PageRank job" should {
+class WeightedPageRankSpec extends WordSpec with Matchers
+  "Weighted PageRank job" should
     var idx = 0
     JobTest(new com.twitter.scalding.examples.WeightedPageRank(_))
       .arg("pwd", ".")
@@ -31,37 +31,29 @@ class WeightedPageRankSpec extends WordSpec with Matchers {
                    (3, "", "", 0.2)))
       .source(Tsv("./numnodes"), List((3)))
       .source(Tsv("./pagerank_0"), List((1, 0.086), (2, 0.192), (3, 0.722)))
-      .typedSink(TypedTsv[Double]("./totaldiff")) { ob =>
-        (idx + ": have low error") in {
+      .typedSink(TypedTsv[Double]("./totaldiff"))  ob =>
+        (idx + ": have low error") in
           ob.head shouldBe (0.722 - 0.461 + 0.2964 - 0.192 + 0.2426 - 0.086) +- 0.001
-        }
         idx += 1
-      }
-      .sink[(Int, Double)](Tsv("./pagerank_1")) { outputBuffer =>
-        val pageRank = outputBuffer.map { res =>
+      .sink[(Int, Double)](Tsv("./pagerank_1"))  outputBuffer =>
+        val pageRank = outputBuffer.map  res =>
           (res._1, res._2)
-        }.toMap
-        (idx + ": correctly compute pagerank") in {
+        .toMap
+        (idx + ": correctly compute pagerank") in
           val deadMass = 0.722 / 3 * 0.9
           val userMass = List(0.26, 0.54, 0.2).map { _ * 0.1 }
-          val massNext = List(0, 0.086 / 3, (0.086 * 2 / 3 + 0.192)).map {
+          val massNext = List(0, 0.086 / 3, (0.086 * 2 / 3 + 0.192)).map
             _ * 0.9
-          }
           val expected =
-            (userMass zip massNext) map { a: (Double, Double) =>
+            (userMass zip massNext) map  a: (Double, Double) =>
               a._1 + a._2 + deadMass
-            }
 
           println(pageRank)
           (pageRank(1) + pageRank(2) + pageRank(3)) shouldBe 1.0 +- 0.001
           pageRank(1) shouldBe(expected(0)) +- 0.001
           pageRank(2) shouldBe(expected(1)) +- 0.001
           pageRank(3) shouldBe(expected(2)) +- 0.001
-        }
         idx += 1
-      }
       .runWithoutNext(useHadoop = false)
       .runWithoutNext(useHadoop = true)
       .finish
-  }
-}

@@ -24,29 +24,26 @@ import common._
 
 object IoHelpers extends IoHelpers
 
-trait IoHelpers {
+trait IoHelpers
 
   /**
     * Execute the specified OS command and return the output of that command
     * in a Full Box if the command succeeds, or a Failure if an error occurs.
     */
-  def exec(cmds: String*): Box[String] = {
-    try {
-      class ReadItAll(in: InputStream, done: String => Unit) extends Runnable {
-        def run {
+  def exec(cmds: String*): Box[String] =
+    try
+      class ReadItAll(in: InputStream, done: String => Unit) extends Runnable
+        def run
           val br =
             new BufferedReader(new InputStreamReader(in)) // default to platform character set
           val lines = new ListBuffer[String]
           var line = ""
-          while (line != null) {
+          while (line != null)
             line = br.readLine
             if (line != null) lines += line
-          }
           br.close
           in.close
           done(lines.mkString("\n"))
-        }
-      }
 
       var stdOut = ""
       var stdErr = ""
@@ -59,30 +56,26 @@ trait IoHelpers {
       t2.join
       if (res == 0) Full(stdOut)
       else Failure(stdErr, Empty, Empty)
-    } catch {
+    catch
       case e: Throwable => Failure(e.getMessage, Full(e), Empty)
-    }
-  }
 
   /**
     * Read all data to the end of the specified Reader and concatenate
     * the resulting data into a string.
     */
-  def readWholeThing(in: Reader): String = {
+  def readWholeThing(in: Reader): String =
     val bos = new StringBuilder
     val ba = new Array[Char](4096)
 
-    def readOnce {
+    def readOnce
       val len = in.read(ba)
       if (len < 0) return
       if (len > 0) bos.appendAll(ba, 0, len)
       readOnce
-    }
 
     readOnce
 
     bos.toString
-  }
 
   /**
     * Read an entire file into an Array[Byte]
@@ -93,34 +86,29 @@ trait IoHelpers {
   /**
     * Read all data from a stream into an Array[Byte]
     */
-  def readWholeStream(in: InputStream): Array[Byte] = {
+  def readWholeStream(in: InputStream): Array[Byte] =
     val bos = new ByteArrayOutputStream
     val ba = new Array[Byte](4096)
 
-    def readOnce {
+    def readOnce
       val len = in.read(ba)
       if (len > 0) bos.write(ba, 0, len)
       if (len >= 0) readOnce
-    }
 
     readOnce
 
     in.close
 
     bos.toByteArray
-  }
 
   /**
     * Executes by-name function f and then closes the Cloaseables parameters
     */
-  def doClose[T](is: java.io.Closeable*)(f: => T): T = {
-    try {
+  def doClose[T](is: java.io.Closeable*)(f: => T): T =
+    try
       f
-    } finally {
+    finally
       is.foreach(stream => tryo { stream.close })
-    }
-  }
-}
 
 /**
   * A trait that defines an Automatic Resource Manager. The ARM
@@ -129,7 +117,7 @@ trait IoHelpers {
   *
   * @tparam ResourceType the type of resource allocated
   */
-trait AutoResourceManager[ResourceType] {
+trait AutoResourceManager[ResourceType]
 
   /**
     * Execute a block of code with the allocated resource
@@ -140,4 +128,3 @@ trait AutoResourceManager[ResourceType] {
     *
     */
   def exec[T](f: ResourceType => T): T
-}

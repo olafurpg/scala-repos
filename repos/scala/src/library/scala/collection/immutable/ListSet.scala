@@ -19,7 +19,7 @@ import mutable.{Builder, ReusableBuilder}
   *  @define coll immutable list set
   *  @since 1
   */
-object ListSet extends ImmutableSetFactory[ListSet] {
+object ListSet extends ImmutableSetFactory[ListSet]
 
   /** setCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, ListSet[A]] =
@@ -38,22 +38,18 @@ object ListSet extends ImmutableSetFactory[ListSet] {
     *  This builder is reusable.
     */
   class ListSetBuilder[Elem](initial: ListSet[Elem])
-      extends ReusableBuilder[Elem, ListSet[Elem]] {
+      extends ReusableBuilder[Elem, ListSet[Elem]]
     def this() = this(empty[Elem])
     protected val elems = (new mutable.ListBuffer[Elem] ++= initial).reverse
     protected val seen = new mutable.HashSet[Elem] ++= initial
 
-    def +=(x: Elem): this.type = {
-      if (!seen(x)) {
+    def +=(x: Elem): this.type =
+      if (!seen(x))
         elems += x
         seen += x
-      }
       this
-    }
     def clear() = { elems.clear(); seen.clear() }
     def result() = elems.foldLeft(empty[Elem])(_ unchecked_+ _)
-  }
-}
 
 /** This class implements immutable sets using a list-based data
   *  structure. Instances of `ListSet` represent
@@ -75,7 +71,7 @@ object ListSet extends ImmutableSetFactory[ListSet] {
     "2.11.0")
 class ListSet[A]
     extends AbstractSet[A] with Set[A] with GenericSetTemplate[A, ListSet]
-    with SetLike[A, ListSet[A]] with Serializable {
+    with SetLike[A, ListSet[A]] with Serializable
   self =>
   override def companion: GenericCompanion[ListSet] = ListSet
 
@@ -120,16 +116,15 @@ class ListSet[A]
     *  @throws java.util.NoSuchElementException
     *  @return the new iterator
     */
-  def iterator: Iterator[A] = new AbstractIterator[A] {
+  def iterator: Iterator[A] = new AbstractIterator[A]
     var that: ListSet[A] = self
     def hasNext = that.nonEmpty
     def next: A =
-      if (hasNext) {
+      if (hasNext)
         val res = that.head
         that = that.tail
         res
-      } else Iterator.empty.next()
-  }
+      else Iterator.empty.next()
 
   /**
     *  @throws java.util.NoSuchElementException
@@ -148,7 +143,7 @@ class ListSet[A]
   /** Represents an entry in the `ListSet`.
     */
   protected class Node(override val head: A)
-      extends ListSet[A] with Serializable {
+      extends ListSet[A] with Serializable
     override private[ListSet] def unchecked_outer = self
 
     /** Returns the number of elements in this set.
@@ -183,12 +178,9 @@ class ListSet[A]
       */
     override def -(e: A): ListSet[A] =
       if (e == head) self
-      else {
+      else
         val tail = self - e; new tail.Node(head)
-      }
 
     override def tail: ListSet[A] = self
-  }
 
   override def toSet[B >: A]: Set[B] = this.asInstanceOf[ListSet[B]]
-}

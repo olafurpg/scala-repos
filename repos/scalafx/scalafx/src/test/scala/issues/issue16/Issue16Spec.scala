@@ -42,9 +42,9 @@ import scalafx.scene.paint.Color
   * Verify that code causing Issue 16 behaves correctly after fix.
   */
 @RunWith(classOf[JUnitRunner])
-class Issue16Spec extends FlatSpec {
+class Issue16Spec extends FlatSpec
 
-  "Issue 16 - binding" should "respond to changes in `when` condition" in {
+  "Issue 16 - binding" should "respond to changes in `when` condition" in
 
     // Recreate situation in Issue 16 using properties of the same types.
     val hoverWrapper = new jfxbp.ReadOnlyBooleanWrapper(true)
@@ -68,5 +68,3 @@ class Issue16Spec extends FlatSpec {
     hoverWrapper.set(true)
     assert(true === hover())
     assert(Color.Green === fill())
-  }
-}

@@ -14,19 +14,18 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object UnusedLocalVariablesTest extends ClearAfterClass.Clearable {
+object UnusedLocalVariablesTest extends ClearAfterClass.Clearable
   var dceCompiler = newCompiler(extraArgs = "-Yopt:unreachable-code")
   def clear(): Unit = { dceCompiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class UnusedLocalVariablesTest extends ClearAfterClass {
+class UnusedLocalVariablesTest extends ClearAfterClass
   ClearAfterClass.stateToClear = UnusedLocalVariablesTest
 
   val dceCompiler = UnusedLocalVariablesTest.dceCompiler
 
   @Test
-  def removeUnusedVar(): Unit = {
+  def removeUnusedVar(): Unit =
     val code =
       """def f(a: Long, b: String, c: Double): Unit = { return; var x = a; var y = x + 10 }"""
     assertLocalVarCount(code, 4) // `this, a, b, c`
@@ -36,10 +35,9 @@ class UnusedLocalVariablesTest extends ClearAfterClass {
 
     val code3 = """def f: Unit = return""" // paramless method
     assertLocalVarCount(code3, 1) // this
-  }
 
   @Test
-  def keepUsedVar(): Unit = {
+  def keepUsedVar(): Unit =
     val code =
       """def f(a: Long, b: String, c: Double): Unit = { val x = 10 + a; val y = x + 10 }"""
     assertLocalVarCount(code, 6)
@@ -47,10 +45,9 @@ class UnusedLocalVariablesTest extends ClearAfterClass {
     val code2 =
       """def f(a: Long): Unit = { var x = if (a == 0l) return else () }"""
     assertLocalVarCount(code2, 3) // remains
-  }
 
   @Test
-  def constructorLocals(): Unit = {
+  def constructorLocals(): Unit =
     val code = """class C {
                  |  def this(a: Int) = {
                  |    this()
@@ -90,9 +87,6 @@ class UnusedLocalVariablesTest extends ClearAfterClass {
 
     assertTrue(clsConstr.localVars.length == 1) // this
     assertTrue(companionConstr.localVars.length == 1) // this
-  }
 
-  def assertLocalVarCount(code: String, numVars: Int): Unit = {
+  def assertLocalVarCount(code: String, numVars: Int): Unit =
     assertTrue(singleMethod(dceCompiler)(code).localVars.length == numVars)
-  }
-}

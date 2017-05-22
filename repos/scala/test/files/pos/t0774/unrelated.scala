@@ -1,9 +1,7 @@
-object Outer {
+object Outer
   import Inner._
 
   deathname
 
-  object Inner {
+  object Inner
     def deathname: Int = 1
-  }
-}

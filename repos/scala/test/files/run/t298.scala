@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   implicit def anyList[T]: List[T] = Nil
 
   implicit def intList: List[Int] = 42 :: 24 :: Nil
@@ -15,4 +15,3 @@ object Test extends App {
   val t = foo[List[Tuple2[Int, Int]]]
 
   println(t) // incorrect - prints "List()"
-}

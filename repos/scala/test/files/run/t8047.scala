@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import scala.reflect.runtime.universe._
   //
   // x's owner is outer Test scope. Previously the quasiquote expansion
@@ -28,4 +28,3 @@ object Test extends App {
   // Owner stays the same and life is good again.
   //
   println(q"do ${ val x = 1; x } while(true)")
-}

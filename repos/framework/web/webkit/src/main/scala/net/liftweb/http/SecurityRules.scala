@@ -45,55 +45,47 @@ final case class HttpsRules(
       * When set to true, the required time above includes subdomains.
       */
     includeSubDomains: Boolean = false
-) {
-  lazy val headers: List[(String, String)] = {
-    requiredTime.toList.map { duration =>
+)
+  lazy val headers: List[(String, String)] =
+    requiredTime.toList.map  duration =>
       val age = s"max-age=${duration.toSeconds}"
 
       val header =
-        if (includeSubDomains) {
+        if (includeSubDomains)
           s"$age ; includeSubDomains"
-        } else {
+        else
           age
-        }
 
       ("Strict-Transport-Security" -> header)
-    }
-  }
 
   /**
     * Returns the headers implied by this set of HTTPS rules. If `enforce` is
     * false, returns nothing.
     */
-  def headers(enforce: Boolean): List[(String, String)] = {
-    if (enforce) {
+  def headers(enforce: Boolean): List[(String, String)] =
+    if (enforce)
       headers
-    } else {
+    else
       Nil
-    }
-  }
-}
-object HttpsRules {
+object HttpsRules
 
   /**
     * Creates a restrictive set of HTTPS rules requiring HTTPS for 365 days and
     * including subdomains in the requirement.
     */
   def secure = apply(Some(365.days), true)
-}
 
 /**
   * Base trait for content source restrictions. These are different ways of
   * restricting where contents of various types are allowed to come from, in
   * conjunction with `ContentSecurityPolicy` categories.
   */
-sealed trait ContentSourceRestriction {
+sealed trait ContentSourceRestriction
 
   /**
     * The `Content-Security-Policy` string that represents this restriction.
     */
   def sourceRestrictionString: String
-}
 
 /**
   * Marker trait for restrictions that only apply to JavaScript.
@@ -107,14 +99,13 @@ sealed trait StylesheetSourceRestriction extends ContentSourceRestriction
 sealed trait GeneralSourceRestriction
     extends JavaScriptSourceRestriction with StylesheetSourceRestriction
 
-object ContentSourceRestriction {
+object ContentSourceRestriction
 
   /**
     * Indicates content from all sources is allowed.
     */
-  case object All extends GeneralSourceRestriction {
+  case object All extends GeneralSourceRestriction
     val sourceRestrictionString = "*"
-  }
 
   /**
     * Indicates content from the given host path is allowed. See the
@@ -127,9 +118,8 @@ object ContentSourceRestriction {
     * Host("https://base.*.example.com")
     * }}}
     */
-  case class Host(hostAndPath: String) extends GeneralSourceRestriction {
+  case class Host(hostAndPath: String) extends GeneralSourceRestriction
     val sourceRestrictionString = hostAndPath
-  }
 
   /**
     * Indicates content from the given scheme is allowed. The scheme should not
@@ -140,23 +130,20 @@ object ContentSourceRestriction {
     * Scheme("data")
     * }}}
     */
-  case class Scheme(scheme: String) extends GeneralSourceRestriction {
+  case class Scheme(scheme: String) extends GeneralSourceRestriction
     val sourceRestrictionString = scheme + ":"
-  }
 
   /**
     * Indicates content from no sources is allowed.
     */
-  case object None extends GeneralSourceRestriction {
+  case object None extends GeneralSourceRestriction
     val sourceRestrictionString = "'none'"
-  }
 
   /**
     * Indicates content from the same origin as the content is allowed.
     */
-  case object Self extends GeneralSourceRestriction {
+  case object Self extends GeneralSourceRestriction
     val sourceRestrictionString = "'self'"
-  }
 
   /**
     * Indicates inline content on the page is allowed to be interpreted.  It is
@@ -172,9 +159,8 @@ object ContentSourceRestriction {
     * policies.
     */
   case object UnsafeInline
-      extends JavaScriptSourceRestriction with StylesheetSourceRestriction {
+      extends JavaScriptSourceRestriction with StylesheetSourceRestriction
     val sourceRestrictionString = "'unsafe-inline'"
-  }
 
   /**
     * Indicates `eval` and related functionality can be used. Some of Lift's
@@ -187,10 +173,8 @@ object ContentSourceRestriction {
     * all throw security exceptions in a browser that supports content security
     * policies.
     */
-  case object UnsafeEval extends JavaScriptSourceRestriction {
+  case object UnsafeEval extends JavaScriptSourceRestriction
     val sourceRestrictionString = "'unsafe-eval'"
-  }
-}
 
 /**
   * Specifies a `[[https://developer.mozilla.org/en-US/docs/Web/Security/CSP Content-Security-Policy]] `
@@ -251,13 +235,13 @@ final case class ContentSecurityPolicy(
       ),
     styleSources: List[StylesheetSourceRestriction] = Nil,
     reportUri: Option[URI] = Some(ContentSecurityPolicy.defaultReportUri)
-) {
+)
 
   /**
     * The string that describes this content security policy in the syntax
     * expected by the `Content-Security-Policy` header.
     */
-  def contentSecurityPolicyString = {
+  def contentSecurityPolicyString =
     val allRestrictions = List(
         "default-src" -> defaultSources,
         "connect-src" -> connectSources,
@@ -270,55 +254,47 @@ final case class ContentSecurityPolicy(
         "style-src" -> styleSources
     )
 
-    val restrictionString = allRestrictions.collect {
+    val restrictionString = allRestrictions.collect
       case (category, restrictions) if restrictions.nonEmpty =>
         category + " " +
         restrictions.map(_.sourceRestrictionString).mkString(" ")
-    }.mkString("; ")
+    .mkString("; ")
 
-    reportUri.map { uri =>
+    reportUri.map  uri =>
       s"$restrictionString; report-uri $uri"
-    } getOrElse {
+    getOrElse
       restrictionString
-    }
-  }
 
-  private[this] lazy val reportOnlyHeaders = {
+  private[this] lazy val reportOnlyHeaders =
     List(
         "Content-Security-Policy-Report-Only" -> contentSecurityPolicyString,
         "X-Content-Security-Policy-Report-Only" -> contentSecurityPolicyString
     )
-  }
-  private[this] lazy val enforcedHeaders = {
+  private[this] lazy val enforcedHeaders =
     List(
         "Content-Security-Policy" -> contentSecurityPolicyString,
         "X-Content-Security-Policy" -> contentSecurityPolicyString
     )
-  }
 
   /**
     * Returns the headers implied by this content security policy.
     */
   def headers(enforce: Boolean = true,
-              logViolations: Boolean = true): List[(String, String)] = {
-    if (enforce) {
+              logViolations: Boolean = true): List[(String, String)] =
+    if (enforce)
       enforcedHeaders
-    } else if (logViolations) {
+    else if (logViolations)
       reportOnlyHeaders
-    } else {
+    else
       Nil
-    }
-  }
-}
-object ContentSecurityPolicy {
+object ContentSecurityPolicy
 
   /**
     * The default URI where security policy violations will be reported. This
     * URI is under Lift's URI namespace, at `[[LiftRules.liftPath]]`.
     */
-  def defaultReportUri = {
+  def defaultReportUri =
     new URI(LiftRules.liftPath + "/content-security-policy-report")
-  }
 
   /**
     * Creates a restrictive content security policy that disallows images from
@@ -328,10 +304,8 @@ object ContentSecurityPolicy {
     * to the same origin, but allows images from any source; the secure one only
     * differs because it adds restrictions to the image sources.
     */
-  def secure: ContentSecurityPolicy = {
+  def secure: ContentSecurityPolicy =
     ContentSecurityPolicy(imageSources = Nil)
-  }
-}
 
 /**
   * The expected payload of a content security policy violation report.
@@ -346,15 +320,15 @@ case class ContentSecurityPolicyViolation(
     violatedDirective: String,
     originalPolicy: String
 )
-object ContentSecurityPolicyViolation extends LazyLoggable {
+object ContentSecurityPolicyViolation extends LazyLoggable
   private[this] implicit val formats = DefaultFormats
 
-  def defaultViolationHandler: DispatchPF = {
+  def defaultViolationHandler: DispatchPF =
     case request @ Req(start :: "content-security-policy-report" :: Nil, _, _)
         if start == LiftRules.liftContextRelativePath =>
-      val violation = for {
+      val violation = for
         requestJson <- request.json
-        camelCasedJson = requestJson.transformField {
+        camelCasedJson = requestJson.transformField
           case JField("document-uri", content) =>
             JField("documentUri", content)
           case JField("blocked-uri", content) =>
@@ -363,38 +337,31 @@ object ContentSecurityPolicyViolation extends LazyLoggable {
             JField("violatedDirective", content)
           case JField("original-policy", content) =>
             JField("originalPolicy", content)
-        }
         violationJson = camelCasedJson \ "csp-report"
         extractedViolation <- tryo(
             violationJson.extract[ContentSecurityPolicyViolation])
-      } yield {
+      yield
         extractedViolation
-      }
 
       () =>
-        {
-          violation match {
+          violation match
             case Full(violation) =>
               LiftRules.contentSecurityPolicyViolationReport(violation) or Full(
                   OkResponse())
 
             case _ =>
               logger.warn(
-                  s"Got a content security violation report we couldn't interpret: '${request.body
-                    .map(new String(_, "UTF-8"))}'."
+                  s"Got a content security violation report we couldn't interpret: '$request.body
+                    .map(new String(_, "UTF-8"))'."
               )
 
               Full(BadRequestResponse(
                       "Unrecognized format for content security policy report."))
-          }
-        }
-  }
-}
 
 /**
   * Defines restrictions on allowing served pages to be embedded in frames.
   */
-sealed trait FrameRestrictions {
+sealed trait FrameRestrictions
   def headers: List[(String, String)]
 
   /**
@@ -403,31 +370,25 @@ sealed trait FrameRestrictions {
     * Because of how frame restrictions are handled, if enforcement is turned
     * off, no headers are generated.
     */
-  def headers(enforce: Boolean = false): List[(String, String)] = {
-    if (enforce) {
+  def headers(enforce: Boolean = false): List[(String, String)] =
+    if (enforce)
       headers
-    } else {
+    else
       Nil
-    }
-  }
-}
-object FrameRestrictions {
+object FrameRestrictions
 
   /**
     * Allows other pages from the same origin as the one being served to embed
     * this page in a frame.
     */
-  case object SameOrigin extends FrameRestrictions {
+  case object SameOrigin extends FrameRestrictions
     val headers = List("X-Frame-Options" -> "SAMEORIGIN")
-  }
 
   /**
     * Does not allow embedding the page being served in a frame at all.
     */
-  case object Deny extends FrameRestrictions {
+  case object Deny extends FrameRestrictions
     val headers = List("X-Frame-Options" -> "DENY")
-  }
-}
 
 /**
   * Specifies security rules for a Lift application. By default, HTTPS is not
@@ -456,32 +417,26 @@ final case class SecurityRules(
     logInOtherModes: Boolean = true,
     enforceInDevMode: Boolean = false,
     logInDevMode: Boolean = true
-) {
-  private val enforce_? = {
-    if (Props.devMode) {
+)
+  private val enforce_? =
+    if (Props.devMode)
       enforceInDevMode
-    } else {
+    else
       enforceInOtherModes
-    }
-  }
-  private val logViolations_? = {
-    if (Props.devMode) {
+  private val logViolations_? =
+    if (Props.devMode)
       logInDevMode
-    } else {
+    else
       logInOtherModes
-    }
-  }
 
   /**
     * Returns the headers implied by this set of security rules.
     */
-  lazy val headers: List[(String, String)] = {
+  lazy val headers: List[(String, String)] =
     https.toList.flatMap(_.headers(enforce_?)) ::: content.toList.flatMap(
         _.headers(enforce_?, logViolations_?)) ::: frameRestrictions.toList
       .flatMap(_.headers(enforce_?))
-  }
-}
-object SecurityRules {
+object SecurityRules
 
   /**
     * Creates a restrictive set of security rules, including required HTTPS,
@@ -491,11 +446,9 @@ object SecurityRules {
     * To tweak any of these settings, use the `SecurityRules` constructor
     * directly.
     */
-  def secure = {
+  def secure =
     apply(
         Some(HttpsRules.secure),
         Some(ContentSecurityPolicy.secure),
         enforceInOtherModes = true
     )
-  }
-}

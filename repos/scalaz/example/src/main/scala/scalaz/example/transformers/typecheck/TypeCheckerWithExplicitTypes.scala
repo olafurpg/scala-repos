@@ -2,7 +2,7 @@ package scalaz.example
 package transformers
 package typecheck
 
-object TypeCheckerWithExplicitTypes {
+object TypeCheckerWithExplicitTypes
 
   import TypeCheckerWithExplicitTypesAST._
 
@@ -19,7 +19,7 @@ object TypeCheckerWithExplicitTypes {
     if (t1 == t2) success(resultType) else typeError(errorMsg)
 
   // the real type check function, which works with the type environment.
-  def typeCheck(expr: Exp, env: TypeEnv = predef): Type = expr match {
+  def typeCheck(expr: Exp, env: TypeEnv = predef): Type = expr match
     case Lit(v) => success(litToTy(v))
     case Id(x) => find(x, env)
     // make sure the first branch is a boolean and then
@@ -44,7 +44,7 @@ object TypeCheckerWithExplicitTypes {
     case App(operator, operand) =>
       val operatorType = typeCheck(operator, env)
       val operandType = typeCheck(operand, env)
-      val res = operatorType match {
+      val res = operatorType match
         case TyLam(argType, resultType) =>
           compare(argType,
                   operandType,
@@ -53,7 +53,4 @@ object TypeCheckerWithExplicitTypes {
                   operandType)
         case t =>
           typeError("function application expected function, but got: " + t)
-      }
       res
-  }
-}

@@ -11,7 +11,7 @@ import sbt.util.{Level, Logger}
   *
   * @since 0.13.5
   */
-trait TestResultLogger {
+trait TestResultLogger
 
   /**
     * Perform logging.
@@ -31,9 +31,8 @@ trait TestResultLogger {
   final def unless(f: (Output, String) => Boolean,
                    otherwise: TestResultLogger = TestResultLogger.Null) =
     TestResultLogger.choose(f, otherwise, this)
-}
 
-object TestResultLogger {
+object TestResultLogger
 
   /** A `TestResultLogger` that does nothing. */
   val Null = const(_ => ())
@@ -46,10 +45,9 @@ object TestResultLogger {
 
   /** Creates a `TestResultLogger` using a given function. */
   def apply(f: (Logger, Output, String) => Unit): TestResultLogger =
-    new TestResultLogger {
+    new TestResultLogger
       override def run(log: Logger, results: Output, taskName: String) =
         f(log, results, taskName)
-    }
 
   /** Creates a `TestResultLogger` that ignores its input and always performs the same logging. */
   def const(f: Logger => Unit) = apply((l, _, _) => f(l))
@@ -75,7 +73,7 @@ object TestResultLogger {
         printNoTests = Null
     )
 
-  object Defaults {
+  object Defaults
 
     /** SBT's default `TestResultLogger`. Use `copy()` to change selective portions. */
     case class Main(
@@ -84,9 +82,9 @@ object TestResultLogger {
         printStandard: TestResultLogger = Defaults.printStandard,
         printFailures: TestResultLogger = Defaults.printFailures,
         printNoTests: TestResultLogger = Defaults.printNoTests)
-        extends TestResultLogger {
+        extends TestResultLogger
 
-      override def run(log: Logger, results: Output, taskName: String): Unit = {
+      override def run(log: Logger, results: Output, taskName: String): Unit =
         def run(r: TestResultLogger): Unit = r.run(log, results, taskName)
 
         run(printSummary)
@@ -96,25 +94,20 @@ object TestResultLogger {
         if (results.events.isEmpty) run(printNoTests)
         else run(printFailures)
 
-        results.overall match {
+        results.overall match
           case TestResult.Error | TestResult.Failed =>
             throw new TestsFailedException
           case TestResult.Passed =>
-        }
-      }
-    }
 
     val printSummary = TestResultLogger(
         (log, results, _) =>
-          {
         val multipleFrameworks = results.summaries.size > 1
         for (Summary(name, message) <- results.summaries) if (message.isEmpty)
           log.debug("Summary for " + name + " not available.")
-        else {
+        else
           if (multipleFrameworks) log.info(name)
           log.info(message)
-        }
-    })
+    )
 
     val printStandard_? : Output => Boolean = results =>
       // Print the standard one-liner statistic if no framework summary is defined, or when > 1 framework is in used.
@@ -123,14 +116,13 @@ object TestResultLogger {
 
     val printStandard = TestResultLogger(
         (log, results, _) =>
-          {
         val (skippedCount,
              errorsCount,
              passedCount,
              failuresCount,
              ignoredCount,
              canceledCount,
-             pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0)) {
+             pendingCount) = results.events.foldLeft((0, 0, 0, 0, 0, 0, 0))
           case ((skippedAcc,
                  errorAcc,
                  passedAcc,
@@ -146,7 +138,6 @@ object TestResultLogger {
              ignoredAcc + testEvent.ignoredCount,
              canceledAcc + testEvent.canceledCount,
              pendingAcc + testEvent.pendingCount)
-        }
         val totalCount =
           failuresCount + errorsCount + skippedCount + passedCount
         val base =
@@ -156,39 +147,32 @@ object TestResultLogger {
                               "Ignored" -> ignoredCount,
                               "Canceled" -> canceledCount,
                               "Pending" -> pendingCount)
-        val extra = otherCounts.filter(_._2 > 0).map {
+        val extra = otherCounts.filter(_._2 > 0).map
           case (label, count) => s", $label $count"
-        }
 
         val postfix = base + extra.mkString
-        results.overall match {
+        results.overall match
           case TestResult.Error => log.error("Error: " + postfix)
           case TestResult.Passed => log.info("Passed: " + postfix)
           case TestResult.Failed => log.error("Failed: " + postfix)
-        }
-    })
+    )
 
     val printFailures = TestResultLogger(
         (log, results, _) =>
-          {
-        def select(resultTpe: TestResult.Value) = results.events collect {
+        def select(resultTpe: TestResult.Value) = results.events collect
           case (name, tpe) if tpe.result == resultTpe =>
             scala.reflect.NameTransformer.decode(name)
-        }
 
         def show(
             label: String, level: Level.Value, tests: Iterable[String]): Unit =
-          if (tests.nonEmpty) {
+          if (tests.nonEmpty)
             log.log(level, label)
             log.log(level, tests.mkString("\t", "\n\t", ""))
-          }
 
         show("Passed tests:", Level.Debug, select(TestResult.Passed))
         show("Failed tests:", Level.Error, select(TestResult.Failed))
         show("Error during tests:", Level.Error, select(TestResult.Error))
-    })
+    )
 
     val printNoTests = TestResultLogger((log, results,
         taskName) => log.info("No tests to run for " + taskName))
-  }
-}

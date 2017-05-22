@@ -9,7 +9,7 @@ import simulacrum.typeclass
   */
 @typeclass(excludeParents = List("ApplyArityFunctions"))
 trait Apply[F[_]]
-    extends Functor[F] with Cartesian[F] with ApplyArityFunctions[F] { self =>
+    extends Functor[F] with Cartesian[F] with ApplyArityFunctions[F]  self =>
 
   /**
     * Given a value and a function in the Apply context, applies the
@@ -42,14 +42,12 @@ trait Apply[F[_]]
     * ap.map2(x, y)(_ + _) == Some(List(11, 12, 21, 22))
     */
   def compose[G[_]](implicit GG: Apply[G]): Apply[Lambda[X => F[G[X]]]] =
-    new CompositeApply[F, G] {
+    new CompositeApply[F, G]
       def F: Apply[F] = self
       def G: Apply[G] = GG
-    }
-}
 
 trait CompositeApply[F[_], G[_]]
-    extends Apply[Lambda[X => F[G[X]]]] with Functor.Composite[F, G] {
+    extends Apply[Lambda[X => F[G[X]]]] with Functor.Composite[F, G]
   def F: Apply[F]
   def G: Apply[G]
 
@@ -58,4 +56,3 @@ trait CompositeApply[F[_], G[_]]
 
   def product[A, B](fa: F[G[A]], fb: F[G[B]]): F[G[(A, B)]] =
     F.map2(fa, fb)(G.product)
-}

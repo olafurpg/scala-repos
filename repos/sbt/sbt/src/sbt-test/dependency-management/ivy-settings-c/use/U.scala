@@ -1,3 +1,2 @@
-object U {
+object U
   val x = D.x
-}

@@ -11,12 +11,11 @@ class BuildFileChange(val beforeRevision: ContentRevision,
                       val afterRevision: ContentRevision,
                       val buildFileStatus: BuildFileModifiedStatus)
     extends Change(
-        beforeRevision, afterRevision, buildFileStatus.getChangeStatus) {
+        beforeRevision, afterRevision, buildFileStatus.getChangeStatus)
 
   override def getOriginText(project: Project) = buildFileStatus.getOriginText
-}
 
-object BuildFileChange {
+object BuildFileChange
 
   /**
     * Swaps places of before and after revision. This is used to display proper file paths for changed build files since
@@ -26,4 +25,3 @@ object BuildFileChange {
   def swap(change: BuildFileChange) =
     new BuildFileChange(
         change.afterRevision, change.beforeRevision, change.buildFileStatus)
-}

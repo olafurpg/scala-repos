@@ -5,11 +5,11 @@ import org.scalatest._
 
 class EventSubscribersIntegrationTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    with Matchers with BeforeAndAfter with GivenWhenThen
 
   before(cleanUp())
 
-  test("adding an event subscriber") {
+  test("adding an event subscriber")
     When("an event subscriber is added")
     marathon.subscribe("http://localhost:1337").code should be(200)
 
@@ -23,9 +23,8 @@ class EventSubscribersIntegrationTest
 
     // Cleanup
     marathon.unsubscribe("http://localhost:1337")
-  }
 
-  test("removing an event subscriber") {
+  test("removing an event subscriber")
     When("an event subscriber is removed")
     marathon.subscribe("http://localhost:1337").code should be(200)
     marathon.listSubscribers.value.urls should contain("http://localhost:1337")
@@ -39,5 +38,3 @@ class EventSubscribersIntegrationTest
     And("the subscriber should not show up in the list of subscribers")
     marathon.listSubscribers.value.urls shouldNot contain(
         "http://localhost:1337")
-  }
-}

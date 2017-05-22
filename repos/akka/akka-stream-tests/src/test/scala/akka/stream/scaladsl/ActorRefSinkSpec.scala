@@ -12,30 +12,26 @@ import akka.actor.ActorRef
 import akka.actor.Props
 import akka.testkit.AkkaSpec
 
-object ActorRefSinkSpec {
-  case class Fw(ref: ActorRef) extends Actor {
-    def receive = {
+object ActorRefSinkSpec
+  case class Fw(ref: ActorRef) extends Actor
+    def receive =
       case msg ⇒ ref forward msg
-    }
-  }
-}
 
-class ActorRefSinkSpec extends AkkaSpec {
+class ActorRefSinkSpec extends AkkaSpec
   import ActorRefSinkSpec._
   implicit val materializer = ActorMaterializer()
 
-  "A ActorRefSink" must {
+  "A ActorRefSink" must
 
-    "send the elements to the ActorRef" in assertAllStagesStopped {
+    "send the elements to the ActorRef" in assertAllStagesStopped
       Source(List(1, 2, 3))
         .runWith(Sink.actorRef(testActor, onCompleteMessage = "done"))
       expectMsg(1)
       expectMsg(2)
       expectMsg(3)
       expectMsg("done")
-    }
 
-    "cancel stream when actor terminates" in assertAllStagesStopped {
+    "cancel stream when actor terminates" in assertAllStagesStopped
       val fw = system.actorOf(Props(classOf[Fw], testActor)
             .withDispatcher("akka.test.stream-dispatcher"))
       val publisher = TestSource
@@ -48,6 +44,3 @@ class ActorRefSinkSpec extends AkkaSpec {
       expectMsg(2)
       system.stop(fw)
       publisher.expectCancellation()
-    }
-  }
-}

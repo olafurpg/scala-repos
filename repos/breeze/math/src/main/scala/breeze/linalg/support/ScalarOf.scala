@@ -25,7 +25,7 @@ package breeze.linalg.support
   **/
 trait ScalarOf[V, S] {}
 
-object ScalarOf {
+object ScalarOf
   object DummyInstance extends ScalarOf[Any, Any]
   def dummy[V, S]: ScalarOf[V, S] = DummyInstance.asInstanceOf[ScalarOf[V, S]]
 
@@ -33,4 +33,3 @@ object ScalarOf {
 
 //  @expand
 //  implicit def scalarOf[@expand.args(Int, Float, Long, Double, Complex, Short) T]:ScalarOf[T, T] = dummy
-}

@@ -31,14 +31,14 @@ case class RegressionStrategyParams(
     extends Params
 
 class RegressionStrategy(params: RegressionStrategyParams)
-    extends StockStrategy[Map[String, DenseVector[Double]]] {
+    extends StockStrategy[Map[String, DenseVector[Double]]]
 
   private def getRet(logPrice: Frame[DateTime, String, Double], d: Int) =
     (logPrice - logPrice.shift(d)).mapVec[Double](_.fillNA(_ => 0.0))
 
   // Regress on specific ticker
   private def regress(calculatedData: Seq[Series[DateTime, Double]],
-                      retF1d: Series[DateTime, Double]) = {
+                      retF1d: Series[DateTime, Double]) =
     val array =
       (calculatedData.map(_.toVec.contents).reduce(_ ++ _) ++ Array.fill(
               retF1d.length)(1.0)).toArray[Double]
@@ -50,27 +50,22 @@ class RegressionStrategy(params: RegressionStrategyParams)
     )
     val result = LinearRegression.regress(m, target)
     result
-  }
 
   // Compute each indicator value for training the model
   private def calcIndicator(
-      logPrice: Series[DateTime, Double]): Seq[Series[DateTime, Double]] = {
-    params.indicators.map {
+      logPrice: Series[DateTime, Double]): Seq[Series[DateTime, Double]] =
+    params.indicators.map
       case (name, indicator) => indicator.getTraining(logPrice)
-    }
-  }
 
   // Get max period from series of indicators
-  private def getMaxPeriod(): Int = {
+  private def getMaxPeriod(): Int =
     // create an array of periods
-    val periods = params.indicators.map {
+    val periods = params.indicators.map
       case (name, indicator) => indicator.getMinWindowSize()
-    }
     periods.max
-  }
 
   // Apply regression algorithm on complete dataset to create a model
-  def createModel(dataView: DataView): Map[String, DenseVector[Double]] = {
+  def createModel(dataView: DataView): Map[String, DenseVector[Double]] =
     // price: row is time, col is ticker, values are prices
     val price = dataView.priceFrame(params.maxTrainingWindowSize)
     val logPrice = price.mapValues(math.log)
@@ -90,51 +85,42 @@ class RegressionStrategy(params: RegressionStrategyParams)
     val tickerModelMap = tickers
       .filter(ticker => (active.firstCol(ticker).findOne(_ == false) == -1))
       .map(ticker =>
-            {
           val model = regress(calcIndicator(price.firstCol(ticker))
                                 .map(_.slice(firstIdx, lastIdx)),
                               retF1d.firstCol(ticker).slice(firstIdx, lastIdx))
           (ticker, model)
-      })
+      )
       .toMap
 
     // tickers mapped to model
     tickerModelMap
-  }
 
   // returns a prediction for a specific ticker
   private def predictOne(coef: DenseVector[Double],
                          ticker: String,
-                         dataView: DataView): Double = {
+                         dataView: DataView): Double =
 
-    val vecArray = params.indicators.map {
-      case (name, indicator) => {
+    val vecArray = params.indicators.map
+      case (name, indicator) =>
           val price = dataView.priceFrame(indicator.getMinWindowSize())
           val logPrice = price.mapValues(math.log)
           indicator.getOne(logPrice.firstCol(ticker))
-        }
-    }.toArray
+    .toArray
 
     val densVecArray = vecArray ++ Array[Double](1)
     val vec = DenseVector[Double](densVecArray)
 
     val p = coef.dot(vec)
     return p
-  }
 
   // Returns a mapping of tickers to predictions
   def onClose(
-      model: Map[String, DenseVector[Double]], query: Query): Prediction = {
+      model: Map[String, DenseVector[Double]], query: Query): Prediction =
     val dataView = query.dataView
 
     val prediction =
-      query.tickers.filter(ticker => model.contains(ticker)).map { ticker =>
-        {
+      query.tickers.filter(ticker => model.contains(ticker)).map  ticker =>
           val p = predictOne(model(ticker), ticker, dataView)
           (ticker, p)
-        }
-      }
 
     Prediction(HashMap[String, Double](prediction: _*))
-  }
-}

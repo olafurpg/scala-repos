@@ -72,7 +72,7 @@ class ALS private (
     private var alpha: Double,
     private var seed: Long = System.nanoTime()
 )
-    extends Serializable with Logging {
+    extends Serializable with Logging
 
   /**
     * Constructs an ALS instance with default parameters: {numBlocks: -1, rank: 10, iterations: 10,
@@ -97,83 +97,73 @@ class ALS private (
     * into; pass -1 for an auto-configured number of blocks. Default: -1.
     */
   @Since("0.8.0")
-  def setBlocks(numBlocks: Int): this.type = {
+  def setBlocks(numBlocks: Int): this.type =
     this.numUserBlocks = numBlocks
     this.numProductBlocks = numBlocks
     this
-  }
 
   /**
     * Set the number of user blocks to parallelize the computation.
     */
   @Since("1.1.0")
-  def setUserBlocks(numUserBlocks: Int): this.type = {
+  def setUserBlocks(numUserBlocks: Int): this.type =
     this.numUserBlocks = numUserBlocks
     this
-  }
 
   /**
     * Set the number of product blocks to parallelize the computation.
     */
   @Since("1.1.0")
-  def setProductBlocks(numProductBlocks: Int): this.type = {
+  def setProductBlocks(numProductBlocks: Int): this.type =
     this.numProductBlocks = numProductBlocks
     this
-  }
 
   /** Set the rank of the feature matrices computed (number of features). Default: 10. */
   @Since("0.8.0")
-  def setRank(rank: Int): this.type = {
+  def setRank(rank: Int): this.type =
     this.rank = rank
     this
-  }
 
   /** Set the number of iterations to run. Default: 10. */
   @Since("0.8.0")
-  def setIterations(iterations: Int): this.type = {
+  def setIterations(iterations: Int): this.type =
     this.iterations = iterations
     this
-  }
 
   /** Set the regularization parameter, lambda. Default: 0.01. */
   @Since("0.8.0")
-  def setLambda(lambda: Double): this.type = {
+  def setLambda(lambda: Double): this.type =
     this.lambda = lambda
     this
-  }
 
   /** Sets whether to use implicit preference. Default: false. */
   @Since("0.8.1")
-  def setImplicitPrefs(implicitPrefs: Boolean): this.type = {
+  def setImplicitPrefs(implicitPrefs: Boolean): this.type =
     this.implicitPrefs = implicitPrefs
     this
-  }
 
   /**
     * Sets the constant used in computing confidence in implicit ALS. Default: 1.0.
     */
   @Since("0.8.1")
-  def setAlpha(alpha: Double): this.type = {
+  def setAlpha(alpha: Double): this.type =
     this.alpha = alpha
     this
-  }
 
   /** Sets a random seed to have deterministic results. */
   @Since("1.0.0")
-  def setSeed(seed: Long): this.type = {
+  def setSeed(seed: Long): this.type =
     this.seed = seed
     this
-  }
 
   /**
     * Set whether the least-squares problems solved at each iteration should have
     * nonnegativity constraints.
     */
   @Since("1.1.0")
-  def setNonnegative(b: Boolean): this.type = {
+  def setNonnegative(b: Boolean): this.type =
     this.nonnegative = b
     this
-  }
 
   /**
     * :: DeveloperApi ::
@@ -183,12 +173,11 @@ class ALS private (
     */
   @DeveloperApi
   @Since("1.1.0")
-  def setIntermediateRDDStorageLevel(storageLevel: StorageLevel): this.type = {
+  def setIntermediateRDDStorageLevel(storageLevel: StorageLevel): this.type =
     require(storageLevel != StorageLevel.NONE,
             "ALS is not designed to run without persisting intermediate RDDs.")
     this.intermediateRDDStorageLevel = storageLevel
     this
-  }
 
   /**
     * :: DeveloperApi ::
@@ -199,10 +188,9 @@ class ALS private (
     */
   @DeveloperApi
   @Since("1.3.0")
-  def setFinalRDDStorageLevel(storageLevel: StorageLevel): this.type = {
+  def setFinalRDDStorageLevel(storageLevel: StorageLevel): this.type =
     this.finalRDDStorageLevel = storageLevel
     this
-  }
 
   /**
     * Set period (in iterations) between checkpoints (default = 10). Checkpointing helps with
@@ -213,31 +201,28 @@ class ALS private (
     */
   @DeveloperApi
   @Since("1.4.0")
-  def setCheckpointInterval(checkpointInterval: Int): this.type = {
+  def setCheckpointInterval(checkpointInterval: Int): this.type =
     this.checkpointInterval = checkpointInterval
     this
-  }
 
   /**
     * Run ALS with the configured parameters on an input RDD of [[Rating]] objects.
     * Returns a MatrixFactorizationModel with feature vectors for each user and product.
     */
   @Since("0.8.0")
-  def run(ratings: RDD[Rating]): MatrixFactorizationModel = {
+  def run(ratings: RDD[Rating]): MatrixFactorizationModel =
     val sc = ratings.context
 
     val numUserBlocks =
-      if (this.numUserBlocks == -1) {
+      if (this.numUserBlocks == -1)
         math.max(sc.defaultParallelism, ratings.partitions.length / 2)
-      } else {
+      else
         this.numUserBlocks
-      }
     val numProductBlocks =
-      if (this.numProductBlocks == -1) {
+      if (this.numProductBlocks == -1)
         math.max(sc.defaultParallelism, ratings.partitions.length / 2)
-      } else {
+      else
         this.numProductBlocks
-      }
 
     val (floatUserFactors, floatProdFactors) = NewALS.train[Int](
         ratings = ratings.map(
@@ -263,12 +248,10 @@ class ALS private (
       .mapValues(_.map(_.toDouble))
       .setName("products")
       .persist(finalRDDStorageLevel)
-    if (finalRDDStorageLevel != StorageLevel.NONE) {
+    if (finalRDDStorageLevel != StorageLevel.NONE)
       userFactors.count()
       prodFactors.count()
-    }
     new MatrixFactorizationModel(rank, userFactors, prodFactors)
-  }
 
   /**
     * Java-friendly version of [[ALS.run]].
@@ -276,13 +259,12 @@ class ALS private (
   @Since("1.3.0")
   def run(ratings: JavaRDD[Rating]): MatrixFactorizationModel =
     run(ratings.rdd)
-}
 
 /**
   * Top-level methods for calling Alternating Least Squares (ALS) matrix factorization.
   */
 @Since("0.8.0")
-object ALS {
+object ALS
 
   /**
     * Train a matrix factorization model given an RDD of ratings by users for a subset of products.
@@ -305,10 +287,9 @@ object ALS {
       lambda: Double,
       blocks: Int,
       seed: Long
-  ): MatrixFactorizationModel = {
+  ): MatrixFactorizationModel =
     new ALS(blocks, blocks, rank, iterations, lambda, false, 1.0, seed)
       .run(ratings)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of ratings by users for a subset of products.
@@ -329,9 +310,8 @@ object ALS {
       iterations: Int,
       lambda: Double,
       blocks: Int
-  ): MatrixFactorizationModel = {
+  ): MatrixFactorizationModel =
     new ALS(blocks, blocks, rank, iterations, lambda, false, 1.0).run(ratings)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of ratings by users for a subset of products.
@@ -348,9 +328,8 @@ object ALS {
   def train(ratings: RDD[Rating],
             rank: Int,
             iterations: Int,
-            lambda: Double): MatrixFactorizationModel = {
+            lambda: Double): MatrixFactorizationModel =
     train(ratings, rank, iterations, lambda, -1)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of ratings by users for a subset of products.
@@ -365,9 +344,8 @@ object ALS {
   @Since("0.8.0")
   def train(ratings: RDD[Rating],
             rank: Int,
-            iterations: Int): MatrixFactorizationModel = {
+            iterations: Int): MatrixFactorizationModel =
     train(ratings, rank, iterations, 0.01, -1)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of 'implicit preferences' given by users
@@ -393,10 +371,9 @@ object ALS {
       blocks: Int,
       alpha: Double,
       seed: Long
-  ): MatrixFactorizationModel = {
+  ): MatrixFactorizationModel =
     new ALS(blocks, blocks, rank, iterations, lambda, true, alpha, seed)
       .run(ratings)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of 'implicit preferences' of users for a
@@ -419,9 +396,8 @@ object ALS {
       lambda: Double,
       blocks: Int,
       alpha: Double
-  ): MatrixFactorizationModel = {
+  ): MatrixFactorizationModel =
     new ALS(blocks, blocks, rank, iterations, lambda, true, alpha).run(ratings)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of 'implicit preferences' of users for a
@@ -441,9 +417,8 @@ object ALS {
                     rank: Int,
                     iterations: Int,
                     lambda: Double,
-                    alpha: Double): MatrixFactorizationModel = {
+                    alpha: Double): MatrixFactorizationModel =
     trainImplicit(ratings, rank, iterations, lambda, -1, alpha)
-  }
 
   /**
     * Train a matrix factorization model given an RDD of 'implicit preferences' of users for a
@@ -459,7 +434,5 @@ object ALS {
   @Since("0.8.1")
   def trainImplicit(ratings: RDD[Rating],
                     rank: Int,
-                    iterations: Int): MatrixFactorizationModel = {
+                    iterations: Int): MatrixFactorizationModel =
     trainImplicit(ratings, rank, iterations, 0.01, -1, 1.0)
-  }
-}

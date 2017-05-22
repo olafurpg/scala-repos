@@ -2,7 +2,7 @@ import scala.tools.partest._
 import java.io.{Console => _, _}
 
 // a cold run of partest takes about 15s for this test on my laptop
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String = "-usejavacp -d " + testOutput.path
 
   // test that we hit the code size limit and error out gracefully
@@ -15,9 +15,6 @@ object Test extends DirectTest {
       |  }
       |}""".stripMargin.trim
 
-  override def show(): Unit = {
-    Console.withErr(System.out) {
+  override def show(): Unit =
+    Console.withErr(System.out)
       compile()
-    }
-  }
-}

@@ -31,7 +31,7 @@ class IntermediateFlatMap[T, U, S, D, RC](
     pDecoder: Injection[T, D],
     pEncoder: Injection[U, D])
     extends AsyncBase[T, U, S, D, RC](
-        maxWaitingFutures, maxWaitingTime, maxEmitPerExec) {
+        maxWaitingFutures, maxWaitingTime, maxEmitPerExec)
 
   val encoder = pEncoder
   val decoder = pDecoder
@@ -41,9 +41,7 @@ class IntermediateFlatMap[T, U, S, D, RC](
   override def apply(
       state: S,
       tup: T): Future[Iterable[(List[S], Future[TraversableOnce[U]])]] =
-    lockedOp.get.apply(tup).map { res =>
+    lockedOp.get.apply(tup).map  res =>
       List((List(state), Future.value(res)))
-    }
 
   override def cleanup { lockedOp.get.close }
-}

@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentMap
   * implementation for caching the results of an asynchronous function
   * can be found at [[FutureCache$.default]].
   */
-abstract class FutureCache[K, V] {
+abstract class FutureCache[K, V]
 
   /**
     * Gets the cached Future.
@@ -54,13 +54,12 @@ abstract class FutureCache[K, V] {
     * @return the number of results that have been computed successfully or are in flight.
     */
   def size: Int
-}
 
 /**
   * A proxy for [[FutureCache]]s, useful for wrap-but-modify.
   */
 abstract class FutureCacheProxy[K, V](underlying: FutureCache[K, V])
-    extends FutureCache[K, V] {
+    extends FutureCache[K, V]
   def get(key: K): Option[Future[V]] = underlying.get(key)
 
   def getOrElseUpdate(key: K)(compute: => Future[V]): Future[V] =
@@ -71,7 +70,6 @@ abstract class FutureCacheProxy[K, V](underlying: FutureCache[K, V])
   def evict(key: K, value: Future[V]): Boolean = underlying.evict(key, value)
 
   def size: Int = underlying.size
-}
 
 /**
   * The FutureCache object provides the public interface for constructing
@@ -86,7 +84,7 @@ abstract class FutureCacheProxy[K, V](underlying: FutureCache[K, V])
   * it easy to use Guava caches, and can be found in the util-collection lib.
   * The object is called [[com.twitter.cache.guava.Guava$]].
   */
-object FutureCache {
+object FutureCache
 
   /**
     * A [[com.twitter.cache.FutureCache]] backed by a
@@ -112,9 +110,8 @@ object FutureCache {
     */
   def default[K, V](
       fn: K => Future[V], cache: FutureCache[K, V]): K => Future[V] =
-    AsyncMemoize(fn, new EvictingCache(cache)) andThen { f: Future[V] =>
+    AsyncMemoize(fn, new EvictingCache(cache)) andThen  f: Future[V] =>
       f.interruptible()
-    }
 
   /**
     * Alias for [[default]] which can be called from Java.
@@ -122,4 +119,3 @@ object FutureCache {
   def standard[K, V](
       fn: K => Future[V], cache: FutureCache[K, V]): K => Future[V] =
     default(fn, cache)
-}

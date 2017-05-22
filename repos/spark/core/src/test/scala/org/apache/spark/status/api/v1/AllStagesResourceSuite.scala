@@ -25,17 +25,16 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.scheduler.{StageInfo, TaskInfo, TaskLocality}
 import org.apache.spark.ui.jobs.UIData.{StageUIData, TaskUIData}
 
-class AllStagesResourceSuite extends SparkFunSuite {
+class AllStagesResourceSuite extends SparkFunSuite
 
-  def getFirstTaskLaunchTime(taskLaunchTimes: Seq[Long]): Option[Date] = {
+  def getFirstTaskLaunchTime(taskLaunchTimes: Seq[Long]): Option[Date] =
     val tasks = new HashMap[Long, TaskUIData]
-    taskLaunchTimes.zipWithIndex.foreach {
+    taskLaunchTimes.zipWithIndex.foreach
       case (time, idx) =>
         tasks(idx.toLong) = new TaskUIData(
             new TaskInfo(idx, idx, 1, time, "", "", TaskLocality.ANY, false),
             None,
             None)
-    }
 
     val stageUiData = new StageUIData()
     stageUiData.taskData = tasks
@@ -46,21 +45,16 @@ class AllStagesResourceSuite extends SparkFunSuite {
         status, stageInfo, stageUiData, false)
 
     stageData.firstTaskLaunchedTime
-  }
 
-  test("firstTaskLaunchedTime when there are no tasks") {
+  test("firstTaskLaunchedTime when there are no tasks")
     val result = getFirstTaskLaunchTime(Seq())
     assert(result == None)
-  }
 
-  test("firstTaskLaunchedTime when there are tasks but none launched") {
+  test("firstTaskLaunchedTime when there are tasks but none launched")
     val result = getFirstTaskLaunchTime(Seq(-100L, -200L, -300L))
     assert(result == None)
-  }
 
-  test("firstTaskLaunchedTime when there are tasks and some launched") {
+  test("firstTaskLaunchedTime when there are tasks and some launched")
     val result =
       getFirstTaskLaunchTime(Seq(-100L, 1449255596000L, 1449255597000L))
     assert(result == Some(new Date(1449255596000L)))
-  }
-}

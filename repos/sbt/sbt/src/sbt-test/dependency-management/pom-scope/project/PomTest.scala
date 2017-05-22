@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object PomTest extends Build {
+object PomTest extends Build
   lazy val custom = config("custom")
   lazy val root =
     Project("root", file("root")) configs (custom) settings
@@ -17,7 +17,7 @@ object PomTest extends Build {
             "h" % "h" % "1.0" % "custom,optional,runtime" classifier "foo"
         ))
 
-  def checkPom = makePom map { pom =>
+  def checkPom = makePom map  pom =>
     val expected = Seq(
         ("a", None, false, None),
         ("b", Some("runtime"), true, None),
@@ -30,7 +30,7 @@ object PomTest extends Build {
     )
     val loaded = xml.XML.loadFile(pom)
     val deps = loaded \\ "dependency"
-    expected foreach {
+    expected foreach
       case (id, scope, opt, classifier) =>
         val dep = deps
           .find(d => (d \ "artifactId").text == id)
@@ -42,18 +42,13 @@ object PomTest extends Build {
                "Invalid 'optional' section '" + (dep \\ "optional") +
                "' for " + id + ", expected optional=" + opt)
 
-        val actualScope = (dep \\ "scope") match {
+        val actualScope = (dep \\ "scope") match
           case Seq() => None; case x => Some(x.text)
-        }
-        val actualClassifier = (dep \\ "classifier") match {
+        val actualClassifier = (dep \\ "classifier") match
           case Seq() => None; case x => Some(x.text)
-        }
         assert(actualScope == scope,
                "Invalid 'scope' section '" + (dep \\ "scope") + "' for " + id +
                ", expected scope=" + scope)
         assert(actualClassifier == classifier,
                "Invalid 'classifier' section '" + (dep \\ "classifier") +
                "' for " + id + ", expected classifier=" + classifier)
-    }
-  }
-}

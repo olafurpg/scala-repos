@@ -5,7 +5,7 @@ import Tests._
 import Defaults._
 import Import._
 
-object JUnitXmlReportTest extends Build {
+object JUnitXmlReportTest extends Build
   val checkReport = taskKey[Unit]("Check the test reports")
   val checkNoReport = taskKey[Unit]("Check that no reports are present")
 
@@ -22,7 +22,7 @@ object JUnitXmlReportTest extends Build {
             libraryDependencies +=
               "com.novocode" % "junit-interface" % "0.10" % "test",
             // TODO use matchers instead of sys.error
-            checkReport := {
+            checkReport :=
             val oneSecondReport = XML.loadFile(oneSecondReportFile)
             if (oneSecondReport.label != "testsuite")
               sys.error("Report should have a root <testsuite> element.")
@@ -42,12 +42,10 @@ object JUnitXmlReportTest extends Build {
             // TODO more checks -> the two test cases with time etc..
 
             // TODO check console output is in the report
-          },
-            checkNoReport := {
+          ,
+            checkNoReport :=
             if (file(oneSecondReportFile).exists())
               sys.error(oneSecondReportFile + " should not exist")
             if (file(failingReportFile).exists())
               sys.error(failingReportFile + " should not exist")
-          }
         ))
-}

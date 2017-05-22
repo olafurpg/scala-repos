@@ -40,7 +40,7 @@ import _root_.kafka.api._
 import _root_.kafka.consumer._
 import _root_.kafka.producer._
 
-object DirectKafkaConsumer extends App {
+object DirectKafkaConsumer extends App
   val config = new Properties()
   config.put("groupid", "test_group_2")
   config.put("enable.zookeeper", "false")
@@ -55,17 +55,17 @@ object DirectKafkaConsumer extends App {
   var batch = 0
   var msgs: Long = 0
   val start = System.nanoTime
-  while (true) {
+  while (true)
     // create a fetch request for topic “test”, partition 0, current offset, and fetch size of 1MB
     val fetchRequest = new FetchRequest(topic, 0, offset, 1000000)
 
     // get the message set from the consumer and print them out
     val messages = simpleConsumer.fetch(fetchRequest)
-    messages foreach { msg =>
+    messages foreach  msg =>
       // advance the offset after consuming each message
       offset = msg.offset
       msgs += 1
-      if (msgs % 1000 == 0) {
+      if (msgs % 1000 == 0)
         System.out.println(
             "consumed: " + EventMessageEncoding.read(msg.message.buffer));
         val now = System.nanoTime
@@ -74,14 +74,10 @@ object DirectKafkaConsumer extends App {
         println(
             "Message %d batch %d time %.02fs throughput %.01f msgs/s".format(
                 msgs, batch, secs, throughput))
-      }
-    }
 
     batch += 1
-  }
-}
 
-object DirectKafkaProducer extends App {
+object DirectKafkaProducer extends App
   val config = new Properties()
   config.put("broker.list", "0:localhost:9092")
   config.put("enable.zookeeper", "false")
@@ -104,21 +100,18 @@ object DirectKafkaProducer extends App {
 
   val total = 1000000
   val start = System.nanoTime
-  for (i <- 0 to total) {
-    if (i % 1000 == 0) {
+  for (i <- 0 to total)
+    if (i % 1000 == 0)
       val now = System.nanoTime
       val secs = (now - start) / 1000000000.0
       val throughput = i / secs
       println(
           "Message %d time %.02fs throughput %.01f msgs/s".format(
               i, secs, throughput))
-    }
 
     val data = new ProducerData[String, IngestMessage](topic, msg)
     producer.send(data)
-  }
 
   producer.close
-}
 
 // type DirectIngestBenchmark

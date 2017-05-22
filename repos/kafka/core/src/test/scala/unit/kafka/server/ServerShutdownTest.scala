@@ -29,7 +29,7 @@ import org.apache.kafka.common.serialization.{IntegerSerializer, StringSerialize
 import org.junit.{Before, Test}
 import org.junit.Assert._
 
-class ServerShutdownTest extends ZooKeeperTestHarness {
+class ServerShutdownTest extends ZooKeeperTestHarness
   var config: KafkaConfig = null
   val host = "localhost"
   val topic = "test"
@@ -37,14 +37,13 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
   val sent2 = List("more", "messages")
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val props = TestUtils.createBrokerConfig(0, zkConnect)
     config = KafkaConfig.fromProps(props)
-  }
 
   @Test
-  def testCleanShutdown() {
+  def testCleanShutdown()
 
     def createProducer(server: KafkaServer): KafkaProducer[Integer, String] =
       TestUtils.createNewProducer(
@@ -73,12 +72,11 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
 
     // do a clean shutdown and check that offset checkpoint file exists
     server.shutdown()
-    for (logDir <- config.logDirs) {
+    for (logDir <- config.logDirs)
       val OffsetCheckpointFile = new File(
           logDir, server.logManager.RecoveryPointCheckpointFile)
       assertTrue(OffsetCheckpointFile.exists)
       assertTrue(OffsetCheckpointFile.length() > 0)
-    }
     producer.close()
 
     /* now restart the server and check that the written data is still readable and everything still works */
@@ -93,14 +91,13 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
         host, server.boundPort(), 1000000, 64 * 1024, "")
 
     var fetchedMessage: ByteBufferMessageSet = null
-    while (fetchedMessage == null || fetchedMessage.validBytes == 0) {
+    while (fetchedMessage == null || fetchedMessage.validBytes == 0)
       val fetched = consumer.fetch(
           new FetchRequestBuilder()
             .addFetch(topic, 0, 0, 10000)
             .maxWait(0)
             .build())
       fetchedMessage = fetched.messageSet(topic, 0)
-    }
     assertEquals(
         sent1,
         fetchedMessage.map(m => TestUtils.readString(m.message.payload)))
@@ -112,12 +109,11 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
       .foreach(_.get)
 
     fetchedMessage = null
-    while (fetchedMessage == null || fetchedMessage.validBytes == 0) {
+    while (fetchedMessage == null || fetchedMessage.validBytes == 0)
       val fetched = consumer.fetch(new FetchRequestBuilder()
             .addFetch(topic, 0, newOffset, 10000)
             .build())
       fetchedMessage = fetched.messageSet(topic, 0)
-    }
     assertEquals(
         sent2,
         fetchedMessage.map(m => TestUtils.readString(m.message.payload)))
@@ -127,10 +123,9 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     server.shutdown()
     CoreUtils.rm(server.config.logDirs)
     verifyNonDaemonThreadsStatus
-  }
 
   @Test
-  def testCleanShutdownWithDeleteTopicEnabled() {
+  def testCleanShutdownWithDeleteTopicEnabled()
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("delete.topic.enable", "true")
     val newConfig = KafkaConfig.fromProps(newProps)
@@ -141,19 +136,18 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
     server.awaitShutdown()
     CoreUtils.rm(server.config.logDirs)
     verifyNonDaemonThreadsStatus
-  }
 
   @Test
-  def testCleanShutdownAfterFailedStartup() {
+  def testCleanShutdownAfterFailedStartup()
     val newProps = TestUtils.createBrokerConfig(0, zkConnect)
     newProps.setProperty("zookeeper.connect", "fakehostthatwontresolve:65535")
     val newConfig = KafkaConfig.fromProps(newProps)
     val server = new KafkaServer(
         newConfig, threadNamePrefix = Option(this.getClass.getName))
-    try {
+    try
       server.startup()
       fail("Expected KafkaServer setup to fail, throw exception")
-    } catch {
+    catch
       // Try to clean up carefully without hanging even if the test fails. This means trying to accurately
       // identify the correct exception, making sure the server was shutdown, and cleaning up if anything
       // goes wrong so that awaitShutdown doesn't hang
@@ -163,39 +157,32 @@ class ServerShutdownTest extends ZooKeeperTestHarness {
         fail(
             "Expected ZkException during Kafka server starting up but caught a different exception %s"
               .format(e.toString))
-    } finally {
+    finally
       if (server.brokerState.currentState != NotRunning.state)
         server.shutdown()
       server.awaitShutdown()
-    }
     CoreUtils.rm(server.config.logDirs)
     verifyNonDaemonThreadsStatus
-  }
 
-  private[this] def isNonDaemonKafkaThread(t: Thread): Boolean = {
+  private[this] def isNonDaemonKafkaThread(t: Thread): Boolean =
     !t.isDaemon && t.isAlive && t.getName.startsWith(this.getClass.getName)
-  }
 
-  def verifyNonDaemonThreadsStatus() {
+  def verifyNonDaemonThreadsStatus()
     assertEquals(0,
                  Thread.getAllStackTraces
                    .keySet()
                    .toArray
                    .map { _.asInstanceOf[Thread] }
                    .count(isNonDaemonKafkaThread))
-  }
 
   @Test
-  def testConsecutiveShutdown() {
+  def testConsecutiveShutdown()
     val server = new KafkaServer(config)
-    try {
+    try
       server.startup()
       server.shutdown()
       server.awaitShutdown()
       server.shutdown()
       assertTrue(true)
-    } catch {
+    catch
       case ex: Throwable => fail()
-    }
-  }
-}

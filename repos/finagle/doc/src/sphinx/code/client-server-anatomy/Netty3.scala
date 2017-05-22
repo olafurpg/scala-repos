@@ -4,8 +4,8 @@ import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecod
 import org.jboss.netty.util.CharsetUtil
 
 //#serverpipeline
-object StringServerPipeline extends ChannelPipelineFactory {
-  def getPipeline = {
+object StringServerPipeline extends ChannelPipelineFactory
+  def getPipeline =
     val pipeline = Channels.pipeline()
     pipeline.addLast(
         "line",
@@ -13,28 +13,21 @@ object StringServerPipeline extends ChannelPipelineFactory {
     pipeline.addLast("stringDecoder", new StringDecoder(CharsetUtil.UTF_8))
     pipeline.addLast("stringEncoder", new StringEncoder(CharsetUtil.UTF_8))
     pipeline
-  }
-}
 //#serverpipeline
 
 //#clientpipeline
-object StringClientPipeline extends ChannelPipelineFactory {
-  def getPipeline = {
+object StringClientPipeline extends ChannelPipelineFactory
+  def getPipeline =
     val pipeline = Channels.pipeline()
     pipeline.addLast("stringEncode", new StringEncoder(CharsetUtil.UTF_8))
     pipeline.addLast("stringDecode", new StringDecoder(CharsetUtil.UTF_8))
     pipeline.addLast("line", new DelimEncoder('\n'))
     pipeline
-  }
-}
 
-class DelimEncoder(delim: Char) extends SimpleChannelHandler {
-  override def writeRequested(ctx: ChannelHandlerContext, evt: MessageEvent) = {
-    val newMessage = evt.getMessage match {
+class DelimEncoder(delim: Char) extends SimpleChannelHandler
+  override def writeRequested(ctx: ChannelHandlerContext, evt: MessageEvent) =
+    val newMessage = evt.getMessage match
       case m: String => m + delim
       case m => m
-    }
     Channels.write(ctx, evt.getFuture, newMessage, evt.getRemoteAddress)
-  }
-}
 //#clientpipeline

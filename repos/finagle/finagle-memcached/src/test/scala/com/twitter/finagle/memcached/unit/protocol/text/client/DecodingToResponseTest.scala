@@ -11,37 +11,33 @@ import com.twitter.finagle.memcached.protocol.text.{StatLines, Tokens}
 import com.twitter.io.Buf
 
 @RunWith(classOf[JUnitRunner])
-class DecodingToResponseTest extends FunSuite {
+class DecodingToResponseTest extends FunSuite
 
-  class Context {
+  class Context
     val decodingToResponse = new DecodingToResponse
-  }
 
-  test("parseResponse NOT_FOUND") {
+  test("parseResponse NOT_FOUND")
     val context = new Context
     import context._
 
     val buffer = Tokens(Seq(Buf.Utf8("NOT_FOUND")))
     assert(decodingToResponse.decode(null, null, buffer) == NotFound())
-  }
 
-  test("parseResponse STORED") {
+  test("parseResponse STORED")
     val context = new Context
     import context._
 
     val buffer = Tokens(Seq(Buf.Utf8("STORED")))
     assert(decodingToResponse.decode(null, null, buffer) == Stored())
-  }
 
-  test("parseResponse EXISTS") {
+  test("parseResponse EXISTS")
     val context = new Context
     import context._
 
     val buffer = Tokens(Seq(Buf.Utf8("EXISTS")))
     assert(decodingToResponse.decode(null, null, buffer) == Exists())
-  }
 
-  test("parseResponse ERROR") {
+  test("parseResponse ERROR")
     val context = new Context
     import context._
 
@@ -52,36 +48,31 @@ class DecodingToResponseTest extends FunSuite {
           .asInstanceOf[protocol.Error]
           .cause
           .getClass == classOf[NonexistentCommand])
-  }
 
-  test("parseResponse STATS") {
+  test("parseResponse STATS")
     val context = new Context
     import context._
 
     val lines = Seq(Seq("STAT", "items:1:number", "1"),
                     Seq("STAT", "items:1:age", "1468"),
                     Seq("ITEM", "foo", "[5 b;", "1322514067", "s]"))
-    val plines = lines.map { line =>
+    val plines = lines.map  line =>
       Tokens(line map { Buf.Utf8(_) })
-    }
     val info = decodingToResponse.decode(null, null, StatLines(plines))
     assert(info.getClass == classOf[InfoLines])
     val ilines = info.asInstanceOf[InfoLines].lines
     assert(ilines.size == lines.size)
-    ilines.zipWithIndex.foreach {
+    ilines.zipWithIndex.foreach
       case (line, idx) =>
         val key = lines(idx)(0)
         val values = lines(idx).drop(1)
         assert(line.key == Buf.Utf8(key))
         assert(line.values.size == values.size)
-        line.values.zipWithIndex.foreach {
+        line.values.zipWithIndex.foreach
           case (token, tokIdx) =>
             assert(token == Buf.Utf8(values(tokIdx)))
-        }
-    }
-  }
 
-  test("parseResponse CLIENT_ERROR") {
+  test("parseResponse CLIENT_ERROR")
     val context = new Context
     import context._
 
@@ -92,9 +83,8 @@ class DecodingToResponseTest extends FunSuite {
       .asInstanceOf[protocol.Error]
     assert(error.cause.getClass == classOf[ClientError])
     assert(error.cause.getMessage() == errorMessage)
-  }
 
-  test("parseResponse SERVER_ERROR") {
+  test("parseResponse SERVER_ERROR")
     val context = new Context
     import context._
 
@@ -106,5 +96,3 @@ class DecodingToResponseTest extends FunSuite {
       .asInstanceOf[protocol.Error]
     assert(error.cause.getClass == classOf[ServerError])
     assert(error.cause.getMessage() == errorMessage)
-  }
-}

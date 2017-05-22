@@ -12,7 +12,7 @@ import breeze.util.SerializableLogging
   *
   * @author dlwh
   */
-object GradientTester extends SerializableLogging {
+object GradientTester extends SerializableLogging
 
   /**
     * Tests a gradient by comparing the gradient to the empirically calculated gradient from finite differences,
@@ -40,13 +40,12 @@ object GradientTester extends SerializableLogging {
       view: T <:< Tensor[K, Double],
       copy: CanCopy[T],
       canNorm: norm.Impl[T, Double],
-      opSub: OpSub.Impl2[T, T, T]) = {
+      opSub: OpSub.Impl2[T, T, T]) =
     val indices = Rand
       .subsetsOfSize(
           x.keysIterator.toIndexedSeq, (x.size * randFraction + 1).toInt)
       .get()
     testIndices(f, x, indices, skipZeros, toString, epsilon, tolerance)
-  }
 
   def testIndices[T, K](f: DiffFunction[T],
                         x: T,
@@ -59,39 +58,33 @@ object GradientTester extends SerializableLogging {
       view: T <:< Tensor[K, Double],
       copy: CanCopy[T],
       canNorm: norm.Impl[T, Double],
-      opSub: OpSub.Impl2[T, T, T]): T = {
+      opSub: OpSub.Impl2[T, T, T]): T =
     val (fx, trueGrad) = f.calculate(x)
     val xx = copy(x)
     val differences = opSub(x, x)
     var ok, tried = 0
     val sz = indices.size
-    for (k <- indices) {
-      if (skipZeros && trueGrad(k) == 0.0) {
+    for (k <- indices)
+      if (skipZeros && trueGrad(k) == 0.0)
         logger.debug(s"Zero Grad: ${toString(k)}")
         print(toString(k) + " ")
-      } else {
+      else
         xx(k) += epsilon
         val grad = (f(xx) - fx) / epsilon
         xx(k) -= epsilon
         val relDif =
           (grad -
               trueGrad(k)).abs / math.max(trueGrad(k).abs, grad.abs).max(1E-4)
-        if (relDif < tolerance) {
+        if (relDif < tolerance)
           ok += 1
           logger.debug(s"OK: ${toString(k)} $relDif")
-        } else {
+        else
           logger.warn(toString(k) +
               " relDif: %.3e [eps : %e, calculated: %4.3e empirical: %4.3e]"
                 .format(relDif, epsilon, trueGrad(k), grad))
-        }
         differences(k) = relDif
         tried += 1
-      }
-      if (tried % 100 == 0 || tried == sz) {
+      if (tried % 100 == 0 || tried == sz)
         logger.info(
             f"Checked $tried of ${sz} (out of dimension ${x.size}). ${ok * 100.0 / tried}%.4g%% ok.")
-      }
-    }
     differences
-  }
-}

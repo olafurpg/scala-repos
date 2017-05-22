@@ -27,9 +27,9 @@ import org.apache.spark.util.{ChildFirstURLClassLoader, MutableURLClassLoader, U
   * Utility object for launching driver programs such that they share fate with the Worker process.
   * This is used in standalone cluster mode only.
   */
-object DriverWrapper {
-  def main(args: Array[String]) {
-    args.toList match {
+object DriverWrapper
+  def main(args: Array[String])
+    args.toList match
       /*
        * IMPORTANT: Spark 1.3 provides a stable application submission gateway that is both
        * backward and forward compatible across future Spark versions. Because this gateway
@@ -51,11 +51,10 @@ object DriverWrapper {
         val loader =
           if (sys.props
                 .getOrElse("spark.driver.userClassPathFirst", "false")
-                .toBoolean) {
+                .toBoolean)
             new ChildFirstURLClassLoader(Array(userJarUrl), currentLoader)
-          } else {
+          else
             new MutableURLClassLoader(Array(userJarUrl), currentLoader)
-          }
         Thread.currentThread.setContextClassLoader(loader)
 
         // Delegate to supplied main class
@@ -71,6 +70,3 @@ object DriverWrapper {
             "Usage: DriverWrapper <workerUrl> <userJar> <driverMainClass> [options]")
         // scalastyle:on println
         System.exit(-1)
-    }
-  }
-}

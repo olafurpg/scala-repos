@@ -9,32 +9,29 @@ import spire.implicits._
   *
   * @author stucchio
   */
-object unique extends UFunc {
+object unique extends UFunc
 
   @expand
   implicit def impl[@expand.args(Int, Double, Float, Long) S]: Impl[
       DenseVector[S], DenseVector[S]] =
-    new Impl[DenseVector[S], DenseVector[S]] {
+    new Impl[DenseVector[S], DenseVector[S]]
       def apply(v: DenseVector[S]): DenseVector[S] =
-        if (v.size > 0) {
+        if (v.size > 0)
           val data = new Array[S](v.size)
           cfor(0)(i => i < v.size, i => i + 1)(i =>
-                {
               data(i) = v(i)
-          })
+          )
           java.util.Arrays.sort(data)
 
           var elementCount = 1
           var lastElement = data(0)
           cfor(0)(i => i < data.size, i => i + 1)(
               i =>
-                {
               val di = data(i)
-              if (di != lastElement) {
+              if (di != lastElement)
                 elementCount += 1
                 lastElement = di
-              }
-          })
+          )
 
           val result = new Array[S](elementCount)
           result(0) = data(0)
@@ -42,18 +39,13 @@ object unique extends UFunc {
           var idx = 1
           cfor(0)(i => i < data.size, i => i + 1)(
               i =>
-                {
               val di = data(i)
-              if (di != lastElement) {
+              if (di != lastElement)
                 result(idx) = di
                 lastElement = di
                 idx += 1
-              }
-          })
+          )
 
           DenseVector(result)
-        } else {
+        else
           DenseVector(new Array[S](0))
-        }
-    }
-}

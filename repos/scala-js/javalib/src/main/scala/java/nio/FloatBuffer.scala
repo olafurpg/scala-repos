@@ -2,7 +2,7 @@ package java.nio
 
 import scala.scalajs.js.typedarray._
 
-object FloatBuffer {
+object FloatBuffer
   private final val HashSeed = 1920204022 // "java.nio.FloatBuffer".##
 
   def allocate(capacity: Int): FloatBuffer =
@@ -18,12 +18,11 @@ object FloatBuffer {
 
   def wrap(array: Float32Array): FloatBuffer =
     TypedArrayFloatBuffer.wrap(array)
-}
 
 abstract class FloatBuffer private[nio](_capacity: Int,
                                         private[nio] val _array: Array[Float],
                                         private[nio] val _arrayOffset: Int)
-    extends Buffer(_capacity) with Comparable[FloatBuffer] {
+    extends Buffer(_capacity) with Comparable[FloatBuffer]
 
   private[nio] type ElementType = Float
   private[nio] type BufferType = FloatBuffer
@@ -82,10 +81,9 @@ abstract class FloatBuffer private[nio](_capacity: Int,
   override def hashCode(): Int =
     GenBuffer(this).generic_hashCode(FloatBuffer.HashSeed)
 
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: FloatBuffer => compareTo(that) == 0
     case _ => false
-  }
 
   @noinline
   def compareTo(that: FloatBuffer): Int =
@@ -108,4 +106,3 @@ abstract class FloatBuffer private[nio](_capacity: Int,
   private[nio] def store(
       startIndex: Int, src: Array[Float], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}

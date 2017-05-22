@@ -10,7 +10,7 @@ import utils.FileHelper
   * User: jim
   * Date: 5/13/11
   */
-object PerformanceTester {
+object PerformanceTester
 
   val resDir = "/com/gravity/goose/statichtml/"
 
@@ -21,7 +21,7 @@ object PerformanceTester {
     * 32329 ms for 100 articles v1
     * 27047 ms for 100 articles v2 (erraggy perf improvements)
     */
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     System.out.println("testing performance of general goose extraction algos")
     implicit val config = TestUtils.NO_IMAGE_CONFIG
@@ -35,10 +35,7 @@ object PerformanceTester {
     System.out.println("How long does it take to extract an article?")
     clock.start()
 
-    for (i <- 0 to 100) {
+    for (i <- 0 to 100)
       goose.extractContent(url, html)
-    }
     clock.stop()
     System.out.println("It takes " + clock.getTime + " milliseconds")
-  }
-}

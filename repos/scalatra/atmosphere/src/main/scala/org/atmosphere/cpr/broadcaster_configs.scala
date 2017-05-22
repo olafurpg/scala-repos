@@ -4,11 +4,10 @@ import java.net.URI
 
 import org.scalatra.atmosphere.{RedisScalatraBroadcaster, ScalatraBroadcaster}
 
-trait BroadcasterConf {
+trait BroadcasterConf
   def broadcasterClass: Class[_ <: ScalatraBroadcaster]
   def uri: URI
   def extraSetup: Broadcaster => Unit // To perform optional plugin-specific Broadcaster setup
-}
 
 /**
   *
@@ -21,8 +20,8 @@ trait BroadcasterConf {
 sealed case class ScalatraBroadcasterConfig(
     broadcasterClass: Class[_ <: ScalatraBroadcaster],
     uri: URI = URI.create("http://127.0.0.1"),
-    extraSetup: Broadcaster => Unit = { b =>
-    })
+    extraSetup: Broadcaster => Unit =  b =>
+    )
     extends BroadcasterConf
 
 /**
@@ -37,9 +36,7 @@ sealed case class ScalatraBroadcasterConfig(
 sealed case class RedisScalatraBroadcasterConfig(
     uri: URI = URI.create("redis://127.0.0.1:6379"),
     auth: Option[String] = None)
-    extends BroadcasterConf {
+    extends BroadcasterConf
   final def broadcasterClass = classOf[RedisScalatraBroadcaster]
-  final def extraSetup = { b: Broadcaster =>
+  final def extraSetup =  b: Broadcaster =>
     auth.foreach(b.asInstanceOf[RedisScalatraBroadcaster].setAuth(_))
-  }
-}

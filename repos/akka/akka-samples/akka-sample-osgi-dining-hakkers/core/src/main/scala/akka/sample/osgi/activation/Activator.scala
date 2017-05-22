@@ -23,20 +23,19 @@ import akka.sample.osgi.api.DiningHakkersService
 import akka.event.{LogSource, Logging}
 import org.osgi.framework.{ServiceRegistration, BundleContext}
 
-class Activator extends ActorSystemActivator {
+class Activator extends ActorSystemActivator
 
   import Activator._
 
   var diningHakkerService: Option[ServiceRegistration[_]] = None
 
-  def configure(context: BundleContext, system: ActorSystem) {
+  def configure(context: BundleContext, system: ActorSystem)
     val log = Logging(system, this)
     log.info("Core bundle configured")
     system.actorOf(Props[Table], "table")
     registerService(context, system)
     registerHakkersService(context, system)
     log.info("Hakker service registered")
-  }
 
   /**
     * registers the DinningHakkerService as a Service to be tracked and find by other OSGi bundles.
@@ -44,32 +43,26 @@ class Activator extends ActorSystemActivator {
     * @param context  OSGi BundleContext
     * @param system   ActorSystem
     */
-  def registerHakkersService(context: BundleContext, system: ActorSystem) {
+  def registerHakkersService(context: BundleContext, system: ActorSystem)
 
     val hakkersService = new DiningHakkersServiceImpl(system)
 
     diningHakkerService = Some(
         context.registerService(
             classOf[DiningHakkersService].getName(), hakkersService, null))
-  }
 
-  override def stop(context: BundleContext) {
+  override def stop(context: BundleContext)
     unregisterServices(context)
     println("Hakker service unregistred")
     super.stop(context)
-  }
 
-  def unregisterServices(context: BundleContext) {
+  def unregisterServices(context: BundleContext)
     diningHakkerService foreach (_.unregister())
-  }
 
   override def getActorSystemName(context: BundleContext): String =
     "akka-osgi-sample"
-}
 
-object Activator {
-  implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef] {
+object Activator
+  implicit val logSource: LogSource[AnyRef] = new LogSource[AnyRef]
     def genString(o: AnyRef): String = o.getClass.getName
     override def getClazz(o: AnyRef): Class[_] = o.getClass
-  }
-}

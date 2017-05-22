@@ -20,7 +20,7 @@ import scala.reflect.internal.util.StringContextStripMarginOps
   *   should have the same name.
   * @param classname The name of the main Plugin class.
   */
-case class PluginDescription(name: String, classname: String) {
+case class PluginDescription(name: String, classname: String)
 
   /** An XML representation of this description.
     *  It should be stored inside the jar archive file.
@@ -30,7 +30,6 @@ case class PluginDescription(name: String, classname: String) {
          | <name>${name}</name>
          | <classname>${classname}</classname>
          |</plugin>"""
-}
 
 /** Utilities for the PluginDescription class.
   *
@@ -39,12 +38,12 @@ case class PluginDescription(name: String, classname: String) {
   * @author Adriaan Moors
   * @version 2.0, 2013
   */
-object PluginDescription {
+object PluginDescription
   private def text(ns: org.w3c.dom.NodeList): String =
     if (ns.getLength == 1) ns.item(0).getTextContent.trim
     else throw new RuntimeException("Bad plugin descriptor.")
 
-  def fromXML(xml: java.io.InputStream): PluginDescription = {
+  def fromXML(xml: java.io.InputStream): PluginDescription =
     import javax.xml.parsers.DocumentBuilderFactory
     val root = DocumentBuilderFactory.newInstance.newDocumentBuilder
       .parse(xml)
@@ -56,5 +55,3 @@ object PluginDescription {
 
     PluginDescription(text(root.getElementsByTagName("name")),
                       text(root.getElementsByTagName("classname")))
-  }
-}

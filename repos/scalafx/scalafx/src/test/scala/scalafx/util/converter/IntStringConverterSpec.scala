@@ -46,11 +46,10 @@ class IntStringConverterSpec
                                                 IntStringConverter](
         classOf[jfxuc.IntegerStringConverter],
         classOf[IntStringConverter],
-        classOf[Int]) {
+        classOf[Int])
 
   val examples = List((0, "0"),
                       (123, "123"),
                       (-123, "-123"),
                       (Int.MaxValue, Int.MaxValue.toString),
                       (Int.MinValue, Int.MinValue.toString))
-}

@@ -26,7 +26,7 @@ import test._
 import testutil._
 import union._
 
-object LabelledGenericTestsAux {
+object LabelledGenericTestsAux
   case class Book(author: String, title: String, id: Int, price: Double)
   case class ExtendedBook(
       author: String, title: String, id: Int, price: Double, inPrint: Boolean)
@@ -79,19 +79,16 @@ object LabelledGenericTestsAux {
   class NonCCB(val b: Boolean, val d: Double) extends AbstractNonCC
 
   class NonCCWithCompanion private (val i: Int, val s: String)
-  object NonCCWithCompanion {
+  object NonCCWithCompanion
     def apply(i: Int, s: String) = new NonCCWithCompanion(i, s)
     def unapply(s: NonCCWithCompanion): Option[(Int, String)] =
       Some((s.i, s.s))
-  }
 
-  class NonCCLazy(prev0: => NonCCLazy, next0: => NonCCLazy) {
+  class NonCCLazy(prev0: => NonCCLazy, next0: => NonCCLazy)
     lazy val prev = prev0
     lazy val next = next0
-  }
-}
 
-object ScalazTaggedAux {
+object ScalazTaggedAux
   import labelled.FieldType
 
   type Tagged[A, T] = { type Tag = T; type Self = A }
@@ -101,58 +98,48 @@ object ScalazTaggedAux {
   case class Dummy(i: Int @@ CustomTag)
   case class DummyTagged(b: Boolean, i: Int @@ CustomTag)
 
-  trait TC[T] {
+  trait TC[T]
     def apply(): String
-  }
 
-  object TC {
-    implicit val intTC: TC[Int] = new TC[Int] {
+  object TC
+    implicit val intTC: TC[Int] = new TC[Int]
       def apply() = "Int"
-    }
 
-    implicit val booleanTC: TC[Boolean] = new TC[Boolean] {
+    implicit val booleanTC: TC[Boolean] = new TC[Boolean]
       def apply() = "Boolean"
-    }
 
-    implicit val taggedIntTC: TC[Int @@ CustomTag] = new TC[Int @@ CustomTag] {
+    implicit val taggedIntTC: TC[Int @@ CustomTag] = new TC[Int @@ CustomTag]
       def apply() = s"TaggedInt"
-    }
 
-    implicit val hnilTC: TC[HNil] = new TC[HNil] {
+    implicit val hnilTC: TC[HNil] = new TC[HNil]
       def apply() = "HNil"
-    }
 
     implicit def hconsTCTagged[K <: Symbol, H, HT, T <: HList](
         implicit key: Witness.Aux[K],
         headTC: Lazy[TC[H @@ HT]],
         tailTC: Lazy[TC[T]]): TC[FieldType[K, H @@ HT] :: T] =
-      new TC[FieldType[K, H @@ HT] :: T] {
+      new TC[FieldType[K, H @@ HT] :: T]
         def apply() =
           s"${key.value.name}: ${headTC.value()} :: ${tailTC.value()}"
-      }
 
     implicit def hconsTC[K <: Symbol, H, T <: HList](
         implicit key: Witness.Aux[K],
         headTC: Lazy[TC[H]],
         tailTC: Lazy[TC[T]]): TC[FieldType[K, H] :: T] =
-      new TC[FieldType[K, H] :: T] {
+      new TC[FieldType[K, H] :: T]
         def apply() =
           s"${key.value.name}: ${headTC.value()} :: ${tailTC.value()}"
-      }
 
     implicit def projectTC[F, G](
         implicit lgen: LabelledGeneric.Aux[F, G], tc: Lazy[TC[G]]): TC[F] =
-      new TC[F] {
+      new TC[F]
         def apply() = s"Proj(${tc.value()})"
-      }
-  }
-}
 
-class LabelledGenericTests {
+class LabelledGenericTests
   import LabelledGenericTestsAux._
 
   @Test
-  def testProductBasics {
+  def testProductBasics
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -172,10 +159,9 @@ class LabelledGenericTests {
     assertEquals(
         "Benjamin Pierce" :: "Types and Programming Languages" :: 262162091 :: 44.11 :: HNil,
         values)
-  }
 
   @Test
-  def testProductWithVarargBasics: Unit = {
+  def testProductWithVarargBasics: Unit =
     val gen = LabelledGeneric[BookWithMultipleAuthors]
 
     val b0 = gen.to(dp)
@@ -193,10 +179,9 @@ class LabelledGenericTests {
                                               "John Vlissides") :: HNil,
         values
     )
-  }
 
   @Test
-  def testGet {
+  def testGet
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -216,10 +201,9 @@ class LabelledGenericTests {
     val e4 = b0.get('price)
     typed[Double](e4)
     assertEquals(44.11, e4, Double.MinPositiveValue)
-  }
 
   @Test
-  def testApply {
+  def testApply
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -239,10 +223,9 @@ class LabelledGenericTests {
     val e4 = b0('price)
     typed[Double](e4)
     assertEquals(44.11, e4, Double.MinPositiveValue)
-  }
 
   @Test
-  def testAt {
+  def testAt
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -262,10 +245,9 @@ class LabelledGenericTests {
     val v4 = b0.at(3)
     typed[Double](v4)
     assertEquals(44.11, v4, Double.MinPositiveValue)
-  }
 
   @Test
-  def testUpdated {
+  def testUpdated
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -275,10 +257,9 @@ class LabelledGenericTests {
 
     val updated = gen.from(b2)
     assertEquals(tapl2, updated)
-  }
 
   @Test
-  def testUpdateWith {
+  def testUpdateWith
     val gen = LabelledGeneric[Book]
 
     val b0 = gen.to(tapl)
@@ -288,10 +269,9 @@ class LabelledGenericTests {
 
     val updated = gen.from(b2)
     assertEquals(tapl2, updated)
-  }
 
   @Test
-  def testExtension {
+  def testExtension
     val gen = LabelledGeneric[Book]
     val gen2 = LabelledGeneric[ExtendedBook]
 
@@ -301,10 +281,9 @@ class LabelledGenericTests {
     val b2 = gen2.from(b1)
     typed[ExtendedBook](b2)
     assertEquals(taplExt, b2)
-  }
 
   @Test
-  def testCoproductBasics {
+  def testCoproductBasics
     type TreeUnion = Union.`'Leaf -> Leaf, 'Node -> Node`.T
 
     val gen = LabelledGeneric[Tree]
@@ -312,10 +291,9 @@ class LabelledGenericTests {
     val t = Node(Node(Leaf(1), Leaf(2)), Leaf(3))
     val gt = gen.to(t)
     typed[TreeUnion](gt)
-  }
 
   @Test
-  def testAbstractNonCC {
+  def testAbstractNonCC
     val ncca = new NonCCA(23, "foo")
     val nccb = new NonCCB(true, 2.0)
     val ancc: AbstractNonCC = ncca
@@ -354,10 +332,9 @@ class LabelledGenericTests {
     assertTrue(fAbs.isInstanceOf[NonCCB])
     assertEquals(true, fAbs.asInstanceOf[NonCCB].b)
     assertEquals(2.0, fAbs.asInstanceOf[NonCCB].d, Double.MinPositiveValue)
-  }
 
   @Test
-  def testNonCCWithCompanion {
+  def testNonCCWithCompanion
     val nccc = NonCCWithCompanion(23, "foo")
 
     val rec = ('i ->> 23) :: ('s ->> "foo") :: HNil
@@ -372,10 +349,9 @@ class LabelledGenericTests {
     typed[NonCCWithCompanion](f)
     assertEquals(13, f.i)
     assertEquals("bar", f.s)
-  }
 
   @Test
-  def testNonCCLazy {
+  def testNonCCLazy
     lazy val (a: NonCCLazy, b: NonCCLazy, c: NonCCLazy) =
       (new NonCCLazy(c, b), new NonCCLazy(a, c), new NonCCLazy(b, a))
 
@@ -391,10 +367,9 @@ class LabelledGenericTests {
     typed[NonCCLazy](fD)
     assertEquals(a, fD.prev)
     assertEquals(c, fD.next)
-  }
 
   @Test
-  def testScalazTagged {
+  def testScalazTagged
     import ScalazTaggedAux._
 
     implicitly[TC[Int @@ CustomTag]]
@@ -408,5 +383,3 @@ class LabelledGenericTests {
     implicitly[TC[DummyTagged]]
 
     // Note: Further tests in LabelledGeneric211Tests
-  }
-}

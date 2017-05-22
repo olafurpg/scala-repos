@@ -31,7 +31,7 @@ import org.json4s.JValue
   * @tparam A Actual result class
   */
 @DeveloperApi
-abstract class BaseEngine[EI, Q, P, A] extends Serializable {
+abstract class BaseEngine[EI, Q, P, A] extends Serializable
 
   /** :: DeveloperApi ::
     * Implement this method so that training this engine would return a list of
@@ -77,11 +77,9 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
   def batchEval(sc: SparkContext,
                 engineParamsList: Seq[EngineParams],
                 params: WorkflowParams)
-    : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] = {
-    engineParamsList.map { engineParams =>
+    : Seq[(EngineParams, Seq[(EI, RDD[(Q, P, A)])])] =
+    engineParamsList.map  engineParams =>
       (engineParams, eval(sc, engineParams, params))
-    }
-  }
 
   /** :: DeveloperApi ::
     * Implement this method to convert a JValue (read from an engine variant
@@ -95,4 +93,3 @@ abstract class BaseEngine[EI, Q, P, A] extends Serializable {
   def jValueToEngineParams(
       variantJson: JValue, jsonExtractor: JsonExtractorOption): EngineParams =
     throw new NotImplementedError("JSON to EngineParams is not implemented.")
-}

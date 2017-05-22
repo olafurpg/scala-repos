@@ -2,6 +2,5 @@ package a
 
 import pkgName.Test
 
-object Use {
+object Use
   val x = Test
-}

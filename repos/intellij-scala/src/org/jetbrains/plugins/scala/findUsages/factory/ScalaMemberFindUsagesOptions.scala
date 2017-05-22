@@ -9,11 +9,9 @@ import com.intellij.openapi.project.Project
   * 2014-09-15
   */
 class ScalaMemberFindUsagesOptions(project: Project)
-    extends JavaFindUsagesOptions(project) {
+    extends JavaFindUsagesOptions(project)
   isSearchForTextOccurrences = false
-}
 
 class ScalaLocalFindUsagesOptions(project: Project)
-    extends JavaFindUsagesOptions(project) {
+    extends JavaFindUsagesOptions(project)
   isSearchForTextOccurrences = false
-}

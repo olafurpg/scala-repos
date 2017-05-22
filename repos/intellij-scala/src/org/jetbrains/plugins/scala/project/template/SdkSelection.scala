@@ -10,7 +10,7 @@ import com.intellij.openapi.vfs.VfsUtilCore
 /**
   * @author Pavel Fatin
   */
-object SdkSelection extends SdkSelection {
+object SdkSelection extends SdkSelection
   override protected val SdkDescriptor = ScalaSdkDescriptor
 
   override protected def filesChooserDescriptor =
@@ -18,25 +18,22 @@ object SdkSelection extends SdkSelection {
 
   def chooseScalaSdkFiles(parentComponent: JComponent) =
     chooseSdkFiles(parentComponent)
-}
 
-trait SdkSelection {
+trait SdkSelection
   protected val SdkDescriptor: SdkDescriptorCompanion
 
   protected def filesChooserDescriptor: FileChooserDescriptor
 
   protected def chooseSdkFiles(
-      parentComponent: JComponent): Option[SdkDescriptor] = {
-    browse(parentComponent).flatMap {
+      parentComponent: JComponent): Option[SdkDescriptor] =
+    browse(parentComponent).flatMap
       case Left(message) =>
         Messages.showErrorDialog(parentComponent, message)
         None
       case Right(sdk) => Some(sdk)
-    }
-  }
 
   protected def browse(
-      parent: JComponent): Option[Either[String, SdkDescriptor]] = {
+      parent: JComponent): Option[Either[String, SdkDescriptor]] =
     val virtualFiles =
       FileChooser.chooseFiles(filesChooserDescriptor, parent, null, null).toSeq
 
@@ -47,5 +44,3 @@ trait SdkSelection {
     val components = Component.discoverIn(allFiles)
 
     if (files.nonEmpty) Some(SdkDescriptor.from(components)) else None
-  }
-}

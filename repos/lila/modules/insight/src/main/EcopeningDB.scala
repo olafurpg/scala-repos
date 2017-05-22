@@ -1,6 +1,6 @@
 package lila.insight
 
-private object EcopeningDB {
+private object EcopeningDB
 
   import Ecopening._
 
@@ -8,9 +8,8 @@ private object EcopeningDB {
 
   lazy val all = allByEco.values.toList.sorted
 
-  lazy val allByFen: Map[FEN, Ecopening] = allByEco.map {
+  lazy val allByFen: Map[FEN, Ecopening] = allByEco.map
     case (_, opening) => opening.fen -> opening
-  }
 
   lazy val allByEco: Map[ECO, Ecopening] = Map(
       "A00" -> Ecopening("A00",
@@ -3347,4 +3346,3 @@ private object EcopeningDB {
           "d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 f3 f5",
           "r1bq1rk1/pppnn1bp/3p2p1/3Ppp2/2P1P3/2N2P2/PP2B1PP/R1BQNRK1",
           "f7f5"))
-}

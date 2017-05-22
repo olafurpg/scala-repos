@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.StopWordsRemover
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object StopWordsRemoverExample {
-  def main(args: Array[String]): Unit = {
+object StopWordsRemoverExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("StopWordsRemoverExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -44,6 +44,4 @@ object StopWordsRemoverExample {
     remover.transform(dataSet).show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

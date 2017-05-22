@@ -1,5 +1,4 @@
 import sun.net.spi.nameservice.dns.DNSNameService
 
-object A {
+object A
   val x = new DNSNameService
-}

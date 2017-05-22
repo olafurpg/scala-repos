@@ -33,7 +33,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/StrokeType.html javafx.scene.shape.StrokeType]] */
 object StrokeType
-    extends SFXEnumDelegateCompanion[jfxss.StrokeType, StrokeType] {
+    extends SFXEnumDelegateCompanion[jfxss.StrokeType, StrokeType]
 
   val Inside = new StrokeType(jfxss.StrokeType.INSIDE)
   @deprecated(
@@ -50,7 +50,6 @@ object StrokeType
 
   protected override def unsortedValues: Array[StrokeType] =
     Array(Inside, Outside, Centered)
-}
 
 sealed case class StrokeType(override val delegate: jfxss.StrokeType)
     extends SFXEnumDelegate[jfxss.StrokeType]

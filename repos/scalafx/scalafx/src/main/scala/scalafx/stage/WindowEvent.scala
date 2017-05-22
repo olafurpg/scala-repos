@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventType}
 
-object WindowEvent {
+object WindowEvent
   implicit def sfxWindowEvent2jfx(v: WindowEvent): jfxs.WindowEvent =
     if (v != null) v.delegate else null
 
@@ -70,14 +70,12 @@ object WindowEvent {
     * This event occurs on window just after it is shown.
     */
   val WindowShown: EventType[jfxs.WindowEvent] = jfxs.WindowEvent.WINDOW_SHOWN
-}
 
 class WindowEvent(override val delegate: jfxs.WindowEvent)
-    extends Event(delegate) with SFXDelegate[jfxs.WindowEvent] {
+    extends Event(delegate) with SFXDelegate[jfxs.WindowEvent]
 
   /**
     * Construct a new Event with the specified event source, target and type.
     */
   def this(source: Window, eventType: EventType[_ <: javafx.event.Event]) =
     this(new jfxs.WindowEvent(source, eventType))
-}

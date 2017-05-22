@@ -7,27 +7,24 @@ import java.util.concurrent.{Callable, TimeUnit}
   * An append-only collection of time-series data. Example Stats are
   * "queue depth" or "query width in a stream of requests".
   */
-trait Stat {
+trait Stat
   def add(value: Float): Unit
-}
 
 /**
   * Helpers for working with histograms.  Java-friendly versions can be found in
   * [[com.twitter.finagle.stats.JStats]].
   */
-object Stat {
+object Stat
 
   /**
     * Time a given `f` using the given `unit`.
     */
-  def time[A](stat: Stat, unit: TimeUnit)(f: => A): A = {
+  def time[A](stat: Stat, unit: TimeUnit)(f: => A): A =
     val elapsed = Stopwatch.start()
-    try {
+    try
       f
-    } finally {
+    finally
       stat.add(elapsed().inUnit(unit))
-    }
-  }
 
   /**
     * Time a given `f` using milliseconds.
@@ -37,28 +34,25 @@ object Stat {
   /**
     * Time a given asynchronous `f` using the given `unit`.
     */
-  def timeFuture[A](stat: Stat, unit: TimeUnit)(f: => Future[A]): Future[A] = {
+  def timeFuture[A](stat: Stat, unit: TimeUnit)(f: => Future[A]): Future[A] =
     val elapsed = Stopwatch.start()
-    try {
+    try
       f.ensure { stat.add(elapsed().inUnit(unit)) }
-    } catch {
+    catch
       case NonFatal(e) =>
         stat.add(elapsed().inUnit(unit))
         Future.exception(e)
-    }
-  }
 
   /**
     * Time a given asynchronous `f` using milliseconds.
     */
   def timeFuture[A](stat: Stat)(f: => Future[A]): Future[A] =
     timeFuture(stat, TimeUnit.MILLISECONDS)(f)
-}
 
 /**
   * Stat utility methods for ease of use from java.
   */
-object JStats {
+object JStats
 
   /**
     * Time a given `fn` using the given `unit`.
@@ -83,4 +77,3 @@ object JStats {
     */
   def timeFuture[A](stat: Stat, fn: Callable[Future[A]]): Future[A] =
     Stat.timeFuture(stat)(fn.call())
-}

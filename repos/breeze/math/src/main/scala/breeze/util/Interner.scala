@@ -30,12 +30,11 @@ import java.io.{ObjectInputStream, ObjectOutputStream};
   *
   * @author dlwh
   */
-class Interner[T] extends (T => T) with Serializable {
+class Interner[T] extends (T => T) with Serializable
   override def apply(t: T) = intern(t);
 
-  def intern(t: T): T = synchronized {
+  def intern(t: T): T = synchronized
     inner.getOrElseUpdate(t, new WeakReference[T](t)).get;
-  }
 
   def clear() = inner.clear();
   def size = inner.size;
@@ -46,38 +45,31 @@ class Interner[T] extends (T => T) with Serializable {
   def internAll(c: Array[T]) = c map apply
   def internAll(c: Set[T]) = c map apply
 
-  def internKeys[V](c: scala.collection.Map[T, V]) = {
+  def internKeys[V](c: scala.collection.Map[T, V]) =
     Map[T, V]() ++ c.map { case (k, v) => (intern(k), v) }
-  }
 
-  def internValues[K](c: scala.collection.Map[K, T]) = {
+  def internValues[K](c: scala.collection.Map[K, T]) =
     Map[K, T]() ++ c.map { case (k, v) => (k, intern(v)) }
-  }
 
   @transient private var inner = new WeakHashMap[T, WeakReference[T]];
 
   @throws(classOf[java.io.IOException])
-  private def writeObject(oos: ObjectOutputStream) {
+  private def writeObject(oos: ObjectOutputStream)
     oos.defaultWriteObject();
-  }
 
   @throws(classOf[java.io.IOException])
   @throws(classOf[ClassNotFoundException])
-  private def readObject(ois: ObjectInputStream) {
+  private def readObject(ois: ObjectInputStream)
     ois.defaultReadObject();
     inner = new WeakHashMap[T, WeakReference[T]]
-  }
-}
 
-object Interner {
+object Interner
   private val typedInterners =
-    new scala.collection.mutable.HashMap[Class[_], Interner[_]] {
+    new scala.collection.mutable.HashMap[Class[_], Interner[_]]
       override def default(c: Class[_]) =
         getOrElseUpdate(c, new Interner[Any]);
-    }
 
   def apply[T](implicit m: scala.reflect.Manifest[T]) =
     forClass[T](m.runtimeClass.asInstanceOf[Class[T]]);
 
   def forClass[T](c: Class[T]) = typedInterners(c).asInstanceOf[Interner[T]];
-}

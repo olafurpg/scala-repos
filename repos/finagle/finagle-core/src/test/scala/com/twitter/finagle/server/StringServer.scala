@@ -9,8 +9,8 @@ import org.jboss.netty.channel._
 import org.jboss.netty.handler.codec.frame.{Delimiters, DelimiterBasedFrameDecoder}
 import org.jboss.netty.handler.codec.string.{StringEncoder, StringDecoder}
 
-private[finagle] object StringServerPipeline extends ChannelPipelineFactory {
-  def getPipeline = {
+private[finagle] object StringServerPipeline extends ChannelPipelineFactory
+  def getPipeline =
     val pipeline = Channels.pipeline()
     pipeline.addLast(
         "line",
@@ -18,14 +18,12 @@ private[finagle] object StringServerPipeline extends ChannelPipelineFactory {
     pipeline.addLast("stringDecoder", new StringDecoder(Charsets.Utf8))
     pipeline.addLast("stringEncoder", new StringEncoder(Charsets.Utf8))
     pipeline
-  }
-}
 
-private[finagle] trait StringServer {
+private[finagle] trait StringServer
   case class Server(
       stack: Stack[ServiceFactory[String, String]] = StackServer.newStack,
       params: Stack.Params = StackServer.defaultParams)
-      extends StdStackServer[String, String, Server] {
+      extends StdStackServer[String, String, Server]
     protected def copy1(
         stack: Stack[ServiceFactory[String, String]] = this.stack,
         params: Stack.Params = this.params
@@ -38,7 +36,5 @@ private[finagle] trait StringServer {
     protected def newDispatcher(
         transport: Transport[In, Out], service: Service[String, String]) =
       new SerialServerDispatcher(transport, service)
-  }
 
   val stringServer = Server()
-}

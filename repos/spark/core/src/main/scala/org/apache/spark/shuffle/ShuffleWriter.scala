@@ -24,7 +24,7 @@ import org.apache.spark.scheduler.MapStatus
 /**
   * Obtained inside a map task to write out records to the shuffle system.
   */
-private[spark] abstract class ShuffleWriter[K, V] {
+private[spark] abstract class ShuffleWriter[K, V]
 
   /** Write a sequence of records to this task's output */
   @throws[IOException]
@@ -32,4 +32,3 @@ private[spark] abstract class ShuffleWriter[K, V] {
 
   /** Close this writer, passing along whether the map completed */
   def stop(success: Boolean): Option[MapStatus]
-}

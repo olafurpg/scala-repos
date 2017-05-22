@@ -2,12 +2,10 @@
 import nestpkg._;
 
 // bug #695
-object ForceParse extends OuterTParams[AnyRef] {
+object ForceParse extends OuterTParams[AnyRef]
   // Force import of HarderToParse<A>.InnerClass,
   // which has confusing method signature.
   var field: InnerClass = null
-}
 
-object Test extends App {
+object Test extends App
   ForceParse
-}

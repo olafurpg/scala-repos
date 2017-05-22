@@ -39,7 +39,7 @@ import scala.concurrent.{Await, Promise}
 @Fork(2)
 @Warmup(iterations = 10, time = 1700, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 20, time = 1700, timeUnit = TimeUnit.MILLISECONDS)
-class ScheduleBenchmark {
+class ScheduleBenchmark
   implicit val system: ActorSystem = ActorSystem()
   val scheduler: Scheduler = system.scheduler
   val interval: FiniteDuration = 25.millis
@@ -56,47 +56,38 @@ class ScheduleBenchmark {
   var promise: Promise[Any] = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     winner = (to * ratio + 1).toInt
     promise = Promise[Any]()
-  }
 
   @TearDown
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
-  }
 
   def op(idx: Int) = if (idx == winner) promise.trySuccess(idx) else idx
 
   @Benchmark
-  def oneSchedule(): Unit = {
+  def oneSchedule(): Unit =
     val aIdx = new AtomicInteger(1)
-    val tryWithNext = scheduler.schedule(0.millis, interval) {
+    val tryWithNext = scheduler.schedule(0.millis, interval)
       val idx = aIdx.getAndIncrement
       if (idx <= to) op(idx)
-    }
-    promise.future.onComplete {
+    promise.future.onComplete
       case _ ⇒
         tryWithNext.cancel()
-    }
     Await.result(promise.future, within)
-  }
 
   @Benchmark
-  def multipleScheduleOnce(): Unit = {
+  def multipleScheduleOnce(): Unit =
     val tryWithNext = (1 to to)
-      .foldLeft(0.millis -> List[Cancellable]()) {
+      .foldLeft(0.millis -> List[Cancellable]())
         case ((interv, c), idx) ⇒
-          (interv + interval, scheduler.scheduleOnce(interv) {
+          (interv + interval, scheduler.scheduleOnce(interv)
             op(idx)
-          } :: c)
-      }
+          :: c)
       ._2
-    promise.future.onComplete {
+    promise.future.onComplete
       case _ ⇒
         tryWithNext.foreach(_.cancel())
-    }
     Await.result(promise.future, within)
-  }
-}

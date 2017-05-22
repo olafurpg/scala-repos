@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Object Companion for [[scalafx.event.WeakEventHandler]]
   */
-object WeakEventHandler {
+object WeakEventHandler
 
   /**
     * Converts a ScalaFX WeakEventHandler to a JavaFX WeakEventHandler.
@@ -47,7 +47,6 @@ object WeakEventHandler {
   implicit def sfxWeakEventHandler2jfx[T <: jfxe.Event](
       weh: WeakEventHandler[T]): jfxe.WeakEventHandler[T] =
     if (weh != null) weh.delegate else null
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/event/WeakEventHandler.html WeakEventHandler]].
@@ -59,7 +58,7 @@ object WeakEventHandler {
   */
 class WeakEventHandler[T <: jfxe.Event](
     override val delegate: jfxe.WeakEventHandler[T])
-    extends SFXDelegate[jfxe.WeakEventHandler[T]] {
+    extends SFXDelegate[jfxe.WeakEventHandler[T]]
 
   /**
     * Creates a new instance of WeakEventHandler.
@@ -68,9 +67,9 @@ class WeakEventHandler[T <: jfxe.Event](
     */
   def this(eventHandler: (T) => Unit) =
     this(
-        new jfxe.WeakEventHandler[T](new jfxe.EventHandler[T] {
+        new jfxe.WeakEventHandler[T](new jfxe.EventHandler[T]
       def handle(event: T) = eventHandler(event)
-    }))
+    ))
 
   /**
     * Indicates whether the associated event handler has been garbage collected.
@@ -83,4 +82,3 @@ class WeakEventHandler[T <: jfxe.Event](
     * @param event The event to be handled
     */
   def handle(event: T): Unit = delegate.handle(event)
-}

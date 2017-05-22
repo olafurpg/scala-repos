@@ -24,24 +24,22 @@ import kafka.utils.VerifiableProperties
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
 class SyncProducerConfig private (val props: VerifiableProperties)
-    extends SyncProducerConfigShared {
-  def this(originalProps: Properties) {
+    extends SyncProducerConfigShared
+  def this(originalProps: Properties)
     this(new VerifiableProperties(originalProps))
     // no need to verify the property since SyncProducerConfig is supposed to be used internally
-  }
 
   /** the broker to which the producer sends events */
   val host = props.getString("host")
 
   /** the port on which the broker is running */
   val port = props.getInt("port")
-}
 
 @deprecated(
     "This trait has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
-trait SyncProducerConfigShared {
+trait SyncProducerConfigShared
   val props: VerifiableProperties
 
   val sendBufferBytes = props.getInt("send.buffer.bytes", 100 * 1024)
@@ -69,14 +67,12 @@ trait SyncProducerConfigShared {
       "request.timeout.ms",
       SyncProducerConfig.DefaultAckTimeoutMs,
       (1, Integer.MAX_VALUE))
-}
 
 @deprecated(
     "This object has been deprecated and will be removed in a future release. " +
     "Please use org.apache.kafka.clients.producer.ProducerConfig instead.",
     "0.10.0.0")
-object SyncProducerConfig {
+object SyncProducerConfig
   val DefaultClientId = ""
   val DefaultRequiredAcks: Short = 0
   val DefaultAckTimeoutMs = 10000
-}

@@ -12,20 +12,18 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.collection.immutable
 
-object EventAdapterSpec {
+object EventAdapterSpec
 
   final val JournalModelClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
     classOf[JournalModel].getSimpleName
-  trait JournalModel {
+  trait JournalModel
     def payload: Any
     def tags: immutable.Set[String]
-  }
   final case class Tagged(payload: Any, tags: immutable.Set[String])
       extends JournalModel
-  final case class NotTagged(payload: Any) extends JournalModel {
+  final case class NotTagged(payload: Any) extends JournalModel
     override def tags = Set.empty
-  }
 
   final val DomainEventClassName =
     classOf[EventAdapterSpec].getCanonicalName + "$" +
@@ -36,82 +34,67 @@ object EventAdapterSpec {
   final case class UserDataChanged(countryCode: String, age: Int)
       extends DomainEvent
 
-  class UserAgeTaggingAdapter extends EventAdapter {
+  class UserAgeTaggingAdapter extends EventAdapter
     val Adult = Set("adult")
     val Minor = Set("minor")
 
-    override def toJournal(event: Any): Any = event match {
+    override def toJournal(event: Any): Any = event match
       case e @ UserDataChanged(_, age) if age > 18 ⇒ Tagged(e, Adult)
       case e @ UserDataChanged(_, age) ⇒ Tagged(e, Minor)
       case e ⇒ NotTagged(e)
-    }
     override def fromJournal(event: Any, manifest: String): EventSeq =
-      EventSeq.single {
-        event match {
+      EventSeq.single
+        event match
           case m: JournalModel ⇒ m.payload
-        }
-      }
 
     override def manifest(event: Any): String = ""
-  }
 
-  class ReplayPassThroughAdapter extends UserAgeTaggingAdapter {
+  class ReplayPassThroughAdapter extends UserAgeTaggingAdapter
     override def fromJournal(event: Any, manifest: String): EventSeq =
-      EventSeq.single {
-        event match {
+      EventSeq.single
+        event match
           case m: JournalModel ⇒
             event // don't unpack, just pass through the JournalModel
-        }
-      }
-  }
 
-  class LoggingAdapter(system: ExtendedActorSystem) extends EventAdapter {
+  class LoggingAdapter(system: ExtendedActorSystem) extends EventAdapter
     final val log = Logging(system, getClass)
-    override def toJournal(event: Any): Any = {
+    override def toJournal(event: Any): Any =
       log.info("On its way to the journal: []: " + event)
       event
-    }
     override def fromJournal(event: Any, manifest: String): EventSeq =
-      EventSeq.single {
+      EventSeq.single
         log.info("On its way out from the journal: []: " + event)
         event
-      }
 
     override def manifest(event: Any): String = ""
-  }
 
   class PersistAllIncomingActor(
       name: String, override val journalPluginId: String)
-      extends NamedPersistentActor(name) with PersistentActor {
+      extends NamedPersistentActor(name) with PersistentActor
 
     var state: List[Any] = Nil
 
-    val persistIncoming: Receive = {
+    val persistIncoming: Receive =
       case GetState ⇒
         state.reverse.foreach { sender() ! _ }
       case in ⇒
-        persist(in) { e ⇒
+        persist(in)  e ⇒
           state ::= e
           sender() ! e
-        }
-    }
 
-    override def receiveRecover = {
+    override def receiveRecover =
       case RecoveryCompleted ⇒ // ignore
       case e ⇒ state ::= e
-    }
     override def receiveCommand = persistIncoming
-  }
-}
 
 class EventAdapterSpec(
     journalName: String, journalConfig: Config, adapterConfig: Config)
     extends PersistenceSpec(journalConfig.withFallback(adapterConfig))
-    with ImplicitSender {
+    with ImplicitSender
 
   import EventAdapterSpec._
 
-  def this(journalName: String) {
+  def this(journalName: String)
     this("inmem",
          PersistenceSpec.config("inmem", "InmemPersistentTaggingSpec"),
          ConfigFactory.parseString(s"""
@@ -159,7 +142,6 @@ class EventAdapterSpec(
          |  }
          |}
       """.stripMargin))
-  }
 
   def persister(name: String, journalId: String = journalName) =
     system.actorOf(Props(classOf[PersistAllIncomingActor],
@@ -179,35 +161,30 @@ class EventAdapterSpec(
       .get(in.getClass)
       .fromJournal(in, "")
 
-  "EventAdapter" must {
+  "EventAdapter" must
 
-    "wrap with tags" in {
+    "wrap with tags" in
       val event = UserDataChanged("name", 42)
       toJournal(event) should equal(Tagged(event, Set("adult")))
-    }
 
-    "unwrap when reading" in {
+    "unwrap when reading" in
       val event = UserDataChanged("name", 42)
       val tagged = Tagged(event, Set("adult"))
 
       toJournal(event) should equal(tagged)
       fromJournal(tagged) should equal(SingleEventSeq(event))
-    }
 
-    "create adapter requiring ActorSystem" in {
+    "create adapter requiring ActorSystem" in
       val event = UserDataChanged("name", 42)
       toJournal(event, "with-actor-system") should equal(event)
       fromJournal(event, "with-actor-system") should equal(
           SingleEventSeq(event))
-    }
-  }
-}
 
-trait ReplayPassThrough {
+trait ReplayPassThrough
   this: EventAdapterSpec ⇒
-  "EventAdapter" must {
+  "EventAdapter" must
 
-    "store events after applying adapter" in {
+    "store events after applying adapter" in
       val replayPassThroughJournalId = "replay-pass-through-adapter-journal"
 
       val p1 = persister("p1", journalId = replayPassThroughJournalId)
@@ -226,14 +203,11 @@ trait ReplayPassThrough {
       p11 ! GetState
       expectMsg(Tagged(m1, Set("adult")))
       expectMsg(m2)
-    }
-  }
-}
 
-trait NoAdapters {
+trait NoAdapters
   this: EventAdapterSpec ⇒
-  "EventAdapter" must {
-    "work when plugin defines no adapter" in {
+  "EventAdapter" must
+    "work when plugin defines no adapter" in
       val p2 = persister("p2", journalId = "no-adapter")
       val m1 = UserDataChanged("name", 64)
       val m2 = "hello"
@@ -250,9 +224,6 @@ trait NoAdapters {
       p22 ! GetState
       expectMsg(m1)
       expectMsg(m2)
-    }
-  }
-}
 
 // this style of testing allows us to try different leveldb journal plugin configurations
 // because it always would use the same leveldb directory anyway (based on class name),

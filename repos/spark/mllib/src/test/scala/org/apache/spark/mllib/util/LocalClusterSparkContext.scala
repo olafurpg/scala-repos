@@ -21,25 +21,20 @@ import org.scalatest.{BeforeAndAfterAll, Suite}
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-trait LocalClusterSparkContext extends BeforeAndAfterAll { self: Suite =>
+trait LocalClusterSparkContext extends BeforeAndAfterAll  self: Suite =>
   @transient var sc: SparkContext = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     val conf = new SparkConf()
       .setMaster("local-cluster[2, 1, 1024]")
       .setAppName("test-cluster")
       .set("spark.rpc.message.maxSize", "1") // set to 1MB to detect direct serialization of data
     sc = new SparkContext(conf)
-  }
 
-  override def afterAll() {
-    try {
-      if (sc != null) {
+  override def afterAll()
+    try
+      if (sc != null)
         sc.stop()
-      }
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
-}

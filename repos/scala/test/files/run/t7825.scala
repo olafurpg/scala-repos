@@ -1,13 +1,12 @@
 import scala.tools.partest._
 
-object Test extends CompilerTest {
+object Test extends CompilerTest
   import global._
 
-  override lazy val units: List[CompilationUnit] = {
+  override lazy val units: List[CompilationUnit] =
     // We can test this on JDK6.
     javaCompilationUnits(global)(defaultMethodSource) ++ compilationUnits(
         global)(scalaExtendsDefault)
-  }
 
   private def defaultMethodSource =
     """
@@ -32,4 +31,3 @@ object Test {
   // We're only checking we that the Scala compilation unit passes refchecks
   // No further checks are needed here.
   def check(source: String, unit: global.CompilationUnit): Unit = {}
-}

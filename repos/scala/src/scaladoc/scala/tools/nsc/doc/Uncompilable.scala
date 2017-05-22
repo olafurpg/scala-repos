@@ -11,7 +11,7 @@ import scala.language.postfixOps
 /** Some glue between DocParser (which reads source files which can't be compiled)
   *  and the scaladoc model.
   */
-trait Uncompilable {
+trait Uncompilable
   val global: Global
   val settings: Settings
 
@@ -29,14 +29,13 @@ trait Uncompilable {
     docDefs(code) map (p => (docSymbol(p), new DocComment(p.raw)))
 
   lazy val pairs =
-    files flatMap { f =>
+    files flatMap  f =>
       val comments = docPairs(f.slurp())
       if (settings.verbose)
         inform("Found %d doc comments in parse-only file %s: %s".format(
                 comments.size, f, comments.map(_._1).mkString(", ")))
 
       comments
-    }
   def files = settings.uncompilableFiles
   def symbols = pairs map (_._1)
   def templates =
@@ -44,7 +43,7 @@ trait Uncompilable {
     (x =>
           x.isClass || x.isTrait ||
           x == AnyRefClass /* which is now a type alias */ ) toSet
-  def comments = {
+  def comments =
     if (settings.debug || settings.verbose)
       inform(
           "Found %d uncompilable files: %s".format(
@@ -54,9 +53,7 @@ trait Uncompilable {
       warning("no doc comments read from " + settings.docUncompilable.value)
 
     pairs
-  }
   override def toString =
     pairs.size + " uncompilable symbols:\n" +
     (symbols filterNot (_ == NoSymbol) map
         (x => "  " + x.owner.fullName + " " + x.defString) mkString "\n")
-}

@@ -16,59 +16,51 @@ package breeze.util
  limitations under the License. 
  */
 
-object Profiling {
+object Profiling
 
   /**
     * Returns the average time to execute n iterations of
     * the given function in ms.
     */
-  def time(n: Int)(function: (() => Any)): Double = {
+  def time(n: Int)(function: (() => Any)): Double =
     var total = 0.0;
-    for (i <- 0 until n) {
+    for (i <- 0 until n)
       val start = System.currentTimeMillis;
       function();
       total += (System.currentTimeMillis - start);
-    }
     return total / n;
-  }
 
   /**
     * Times a single run.  Not scientific, but designed for rough timings in real programs.
     */
-  def time(fn: => Unit): Long = {
+  def time(fn: => Unit): Long =
     val start = System.currentTimeMillis;
     fn;
     (System.currentTimeMillis - start);
-  }
 
   /**
     * Times a single run of the function, logging it to std out
     */
-  def time[T](lbl: String)(fn: => T): T = {
+  def time[T](lbl: String)(fn: => T): T =
     val start = System.currentTimeMillis;
     val r = fn;
     println(lbl + ": " + (System.currentTimeMillis - start));
     r
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val n = 1000000;
 
-    def loop1 = {
+    def loop1 =
       var sum = 0;
       for (i <- 0 until n) { sum += i; }
       sum;
-    }
 
-    def loop2 = {
+    def loop2 =
       var sum = 0;
       var i = 0;
       while (i < n) { sum += i; i += 1; }
       sum;
-    }
 
     var iters = 100;
     println("From range:  " + time(iters)(loop1 _));
     println("Manual loop: " + time(iters)(loop2 _));
-  }
-}

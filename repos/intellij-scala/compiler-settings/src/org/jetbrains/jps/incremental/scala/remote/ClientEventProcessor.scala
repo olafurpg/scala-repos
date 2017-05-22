@@ -6,9 +6,9 @@ import java.io.{PrintStream, PrintWriter}
 /**
   * @author Pavel Fatin
   */
-class ClientEventProcessor(client: Client) {
-  def process(event: Event) {
-    event match {
+class ClientEventProcessor(client: Client)
+  def process(event: Event)
+    event match
       case MessageEvent(kind, text, source, line, column) =>
         client.message(kind, text, source, line, column)
 
@@ -35,19 +35,13 @@ class ClientEventProcessor(client: Client) {
 
       case WorksheetOutputEvent(text) =>
         client.worksheetOutput(text)
-    }
-  }
-}
 
 class ServerException(message: String, lines: Array[String])
-    extends Exception {
+    extends Exception
   override def getMessage = message
 
-  override def printStackTrace(s: PrintWriter) {
+  override def printStackTrace(s: PrintWriter)
     lines.foreach(s.println)
-  }
 
-  override def printStackTrace(s: PrintStream) {
+  override def printStackTrace(s: PrintStream)
     lines.foreach(s.println)
-  }
-}

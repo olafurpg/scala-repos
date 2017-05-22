@@ -20,20 +20,16 @@ import play.api.libs.ws._
 class Application @Inject()(wsClient: WSClient) extends Controller {}
 //#dependency
 
-object routes {
-  object Application {
+object routes
+  object Application
     val authenticate = Call("GET", "authenticate")
     val index = Call("GET", "index")
-  }
-}
 
-object ScalaOAuthSpec extends PlaySpecification {
+object ScalaOAuthSpec extends PlaySpecification
 
-  "Scala OAuth" should {
-    "be injectable" in new WithApplication() {
+  "Scala OAuth" should
+    "be injectable" in new WithApplication()
       app.injector.instanceOf[Application] must beAnInstanceOf[Application]
-    }
-  }
 
   def wsClient: WSClient = null
 
@@ -47,54 +43,43 @@ object ScalaOAuthSpec extends PlaySpecification {
                                 KEY),
                     true)
 
-  def sessionTokenPair(implicit request: RequestHeader): Option[RequestToken] = {
-    for {
+  def sessionTokenPair(implicit request: RequestHeader): Option[RequestToken] =
+    for
       token <- request.session.get("token")
       secret <- request.session.get("secret")
-    } yield {
+    yield
       RequestToken(token, secret)
-    }
-  }
 
-  def authenticate = Action { request =>
+  def authenticate = Action  request =>
     request
       .getQueryString("oauth_verifier")
-      .map { verifier =>
+      .map  verifier =>
         val tokenPair = sessionTokenPair(request).get
         // We got the verifier; now get the access token, store it and back to index
-        oauth.retrieveAccessToken(tokenPair, verifier) match {
-          case Right(t) => {
+        oauth.retrieveAccessToken(tokenPair, verifier) match
+          case Right(t) =>
               // We received the authorized tokens in the OAuth object - store it before we proceed
               Redirect(routes.Application.index)
                 .withSession("token" -> t.token, "secret" -> t.secret)
-            }
           case Left(e) => throw e
-        }
-      }
       .getOrElse(
-          oauth.retrieveRequestToken("https://localhost:9000/auth") match {
-        case Right(t) => {
+          oauth.retrieveRequestToken("https://localhost:9000/auth") match
+        case Right(t) =>
             // We received the unauthorized tokens in the OAuth object - store it before we proceed
             Redirect(oauth.redirectUrl(t.token))
               .withSession("token" -> t.token, "secret" -> t.secret)
-          }
         case Left(e) => throw e
-      })
-  }
+      )
   //#flow
 
   //#extended
-  def timeline = Action.async { implicit request =>
-    sessionTokenPair match {
-      case Some(credentials) => {
+  def timeline = Action.async  implicit request =>
+    sessionTokenPair match
+      case Some(credentials) =>
           wsClient
             .url("https://api.twitter.com/1.1/statuses/home_timeline.json")
             .sign(OAuthCalculator(KEY, credentials))
             .get
             .map(result => Ok(result.json))
-        }
       case _ => Future.successful(Redirect(routes.Application.authenticate))
-    }
-  }
   //#extended
-}

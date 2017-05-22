@@ -17,33 +17,29 @@ package io.prediction.data.api
 import akka.actor.Actor
 import akka.event.Logging
 
-class PluginsActor() extends Actor {
+class PluginsActor() extends Actor
   implicit val system = context.system
   val log = Logging(system, this)
 
   val pluginContext = EventServerPluginContext(log)
 
-  def receive: PartialFunction[Any, Unit] = {
+  def receive: PartialFunction[Any, Unit] =
     case e: EventInfo =>
       pluginContext.inputSniffers.values.foreach(_.process(e, pluginContext))
     case h: PluginsActor.HandleREST =>
-      try {
+      try
         sender() ! pluginContext
           .inputSniffers(h.pluginName)
           .handleREST(h.appId, h.channelId, h.pluginArgs)
-      } catch {
+      catch
         case e: Exception =>
           sender() ! s"""{"message":"${e.getMessage}"}"""
-      }
     case _ =>
       log.error(
           "Unknown message sent to Event Server input sniffer plugin host.")
-  }
-}
 
-object PluginsActor {
+object PluginsActor
   case class HandleREST(pluginName: String,
                         appId: Int,
                         channelId: Option[Int],
                         pluginArgs: Seq[String])
-}

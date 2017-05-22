@@ -3,7 +3,7 @@ package tests
 
 import cats.laws.discipline.{FoldableTests, MonoidKTests, SerializableTests}
 
-class SetTests extends CatsSuite {
+class SetTests extends CatsSuite
   checkAll("Set[Int]", algebra.laws.GroupLaws[Set[Int]].monoid)
 
   checkAll("Set[Int]", MonoidKTests[Set].monoidK[Int])
@@ -12,20 +12,16 @@ class SetTests extends CatsSuite {
   checkAll("Set[Int]", FoldableTests[Set].foldable[Int, Int])
   checkAll("Foldable[Set]", SerializableTests.serializable(Foldable[Set]))
 
-  test("show") {
+  test("show")
     Set(1, 1, 2, 3).show should ===("Set(1, 2, 3)")
     Set.empty[String].show should ===("Set()")
 
-    forAll { fs: Set[String] =>
+    forAll  fs: Set[String] =>
       fs.show should ===(fs.toString)
-    }
-  }
 
-  test("show keeps separate entries for items that map to identical strings") {
+  test("show keeps separate entries for items that map to identical strings")
     implicit val intShow: Show[Int] = Show.show(_ => "1")
     // an implementation implemented as set.map(_.show).mkString(", ") would
     // only show one entry in the result instead of 3, because Set.map combines
     // duplicate items in the codomain.
     Set(1, 2, 3).show should ===("Set(1, 1, 1)")
-  }
-}

@@ -1,18 +1,16 @@
 trait A
 trait B
 
-trait L[A2, B2 <: A2] {
+trait L[A2, B2 <: A2]
   def bar(a: Any, b: Any) = 0
-}
 
-object Lub {
+object Lub
   // use named args transforms to include TypeTree(<lub.tpe>) in the AST before refchecks.
   def foo(a: L[_, _], b: Any) = 0
 
   foo(b = 0, a = if (true) (null: L[A, A]) else (null: L[B, B]))
 
   (if (true) (null: L[A, A]) else (null: L[B, B])).bar(b = 0, a = 0)
-}
 
 /*
 The LUB ends up as:

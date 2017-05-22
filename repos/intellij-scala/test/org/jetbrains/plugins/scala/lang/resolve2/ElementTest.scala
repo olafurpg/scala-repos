@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ElementTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ElementTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "element/"
-  }
 
   def testCaseClass() = doTest()
   def testCaseObject() = doTest()
@@ -46,4 +45,3 @@ class ElementTest extends ResolveTestBase {
 //  def testPackage = doTest
   //TODO answer? classof, it's internal compiler error, should be resolved, but another error in annotator
 //  def testPackageObject = doTest
-}

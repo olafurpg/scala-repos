@@ -16,13 +16,12 @@ import org.jetbrains.plugins.scala.lang.psi.{ScalaPsiElement, ScalaPsiUtil}
   */
 class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
     extends LightElement(clause.getManager, clause.getLanguage)
-    with ScParameterClause {
+    with ScParameterClause
   override def isImplicit: Boolean = clause.isImplicit
 
   override def parameters: Seq[ScParameter] =
-    clause.parameters.zip(types).zipWithIndex.map {
+    clause.parameters.zip(types).zipWithIndex.map
       case ((param, tp), i) => new ScLightParameter(param, tp, i)
-    }
 
   override def effectiveParameters: Seq[ScParameter] = parameters
 
@@ -39,11 +38,9 @@ class ScLightParameterClause(types: List[ScType], clause: ScParameterClause)
       clazz: Class[T]): T =
     throw new UnsupportedOperationException("Operation on light element")
 
-  override def owner: PsiElement = {
+  override def owner: PsiElement =
     ScalaPsiUtil.getContextOfType(this,
                                   true,
                                   classOf[ScFunctionExpr],
                                   classOf[ScFunction],
                                   classOf[ScPrimaryConstructor])
-  }
-}

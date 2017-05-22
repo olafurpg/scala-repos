@@ -44,7 +44,7 @@ import org.apache.spark.util.NextIterator
   * They are intended to be used to serialize/de-serialize data within a single Spark application.
   */
 @DeveloperApi
-abstract class Serializer {
+abstract class Serializer
 
   /**
     * Default ClassLoader to use in deserialization. Implementations of [[Serializer]] should
@@ -57,10 +57,9 @@ abstract class Serializer {
     *
     * @return this Serializer object
     */
-  def setDefaultClassLoader(classLoader: ClassLoader): Serializer = {
+  def setDefaultClassLoader(classLoader: ClassLoader): Serializer =
     defaultClassLoader = Some(classLoader)
     this
-  }
 
   /** Creates a new [[SerializerInstance]]. */
   def newInstance(): SerializerInstance
@@ -97,7 +96,6 @@ abstract class Serializer {
     */
   @Private
   private[spark] def supportsRelocationOfSerializedObjects: Boolean = false
-}
 
 /**
   * :: DeveloperApi ::
@@ -108,7 +106,7 @@ abstract class Serializer {
   */
 @DeveloperApi
 @NotThreadSafe
-abstract class SerializerInstance {
+abstract class SerializerInstance
   def serialize[T : ClassTag](t: T): ByteBuffer
 
   def deserialize[T : ClassTag](bytes: ByteBuffer): T
@@ -118,14 +116,13 @@ abstract class SerializerInstance {
   def serializeStream(s: OutputStream): SerializationStream
 
   def deserializeStream(s: InputStream): DeserializationStream
-}
 
 /**
   * :: DeveloperApi ::
   * A stream for writing serialized objects.
   */
 @DeveloperApi
-abstract class SerializationStream {
+abstract class SerializationStream
 
   /** The most general-purpose method to write an object. */
   def writeObject[T : ClassTag](t: T): SerializationStream
@@ -139,20 +136,17 @@ abstract class SerializationStream {
   def flush(): Unit
   def close(): Unit
 
-  def writeAll[T : ClassTag](iter: Iterator[T]): SerializationStream = {
-    while (iter.hasNext) {
+  def writeAll[T : ClassTag](iter: Iterator[T]): SerializationStream =
+    while (iter.hasNext)
       writeObject(iter.next())
-    }
     this
-  }
-}
 
 /**
   * :: DeveloperApi ::
   * A stream for reading serialized objects.
   */
 @DeveloperApi
-abstract class DeserializationStream {
+abstract class DeserializationStream
 
   /** The most general-purpose method to read an object. */
   def readObject[T : ClassTag](): T
@@ -168,40 +162,30 @@ abstract class DeserializationStream {
     * Read the elements of this stream through an iterator. This can only be called once, as
     * reading each element will consume data from the input source.
     */
-  def asIterator: Iterator[Any] = new NextIterator[Any] {
-    override protected def getNext() = {
-      try {
+  def asIterator: Iterator[Any] = new NextIterator[Any]
+    override protected def getNext() =
+      try
         readObject[Any]()
-      } catch {
+      catch
         case eof: EOFException =>
           finished = true
           null
-      }
-    }
 
-    override protected def close() {
+    override protected def close()
       DeserializationStream.this.close()
-    }
-  }
 
   /**
     * Read the elements of this stream through an iterator over key-value pairs. This can only be
     * called once, as reading each element will consume data from the input source.
     */
-  def asKeyValueIterator: Iterator[(Any, Any)] = new NextIterator[(Any, Any)] {
-    override protected def getNext() = {
-      try {
+  def asKeyValueIterator: Iterator[(Any, Any)] = new NextIterator[(Any, Any)]
+    override protected def getNext() =
+      try
         (readKey[Any](), readValue[Any]())
-      } catch {
-        case eof: EOFException => {
+      catch
+        case eof: EOFException =>
             finished = true
             null
-          }
-      }
-    }
 
-    override protected def close() {
+    override protected def close()
       DeserializationStream.this.close()
-    }
-  }
-}

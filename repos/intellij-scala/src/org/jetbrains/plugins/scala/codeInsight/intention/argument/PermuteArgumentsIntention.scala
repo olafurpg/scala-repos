@@ -12,27 +12,24 @@ import org.jetbrains.plugins.scala.lang.psi.types.nonvalue.Parameter
 /**
   * Jason Zaugg
   */
-class PermuteArgumentsIntention extends PsiElementBaseIntentionAction {
+class PermuteArgumentsIntention extends PsiElementBaseIntentionAction
   def getFamilyName = "Permute arguments"
 
   override def getText =
     "Permute arguments to match the parameter declaration order"
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
     check(project, editor, element).isDefined
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     if (!element.isValid) return
-    check(project, editor, element) match {
+    check(project, editor, element) match
       case Some(x) => x()
       case None =>
-    }
-  }
 
   private def check(project: Project,
                     editor: Editor,
-                    element: PsiElement): Option[() => Unit] = {
+                    element: PsiElement): Option[() => Unit] =
     val argList =
       PsiTreeUtil.getParentOfType(element, classOf[ScArgumentExprList])
     if (argList == null) return None
@@ -41,17 +38,12 @@ class PermuteArgumentsIntention extends PsiElementBaseIntentionAction {
       argList.matchedParameters.sortBy(_._1.getTextOffset)
     val argumentParamIndices: Seq[Int] = argsAndMatchingParams.map(_._2.index)
     val sorted: Seq[Int] = argumentParamIndices.sorted
-    if (argumentParamIndices != sorted) {
+    if (argumentParamIndices != sorted)
       val doIt = () =>
-        {
           val argsCopy = argList.exprs.map(_.copy)
-          argList.exprs.zipWithIndex.foreach {
+          argList.exprs.zipWithIndex.foreach
             case (argExpr, i) =>
               val i2 = argumentParamIndices.indexOf(sorted(i))
               argExpr.replace(argsCopy(i2))
-          }
-      }
       Some(doIt)
-    } else None
-  }
-}
+    else None

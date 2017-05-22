@@ -8,7 +8,6 @@ package api
   *
   * @group ReflectionAPI
   */
-abstract class TreeCreator extends Serializable {
+abstract class TreeCreator extends Serializable
   def apply[U <: Universe with Singleton](
       m: scala.reflect.api.Mirror[U]): U#Tree
-}

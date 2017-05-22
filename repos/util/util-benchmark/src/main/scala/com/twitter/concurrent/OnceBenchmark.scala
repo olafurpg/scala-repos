@@ -5,18 +5,14 @@ import org.openjdk.jmh.annotations._
 
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @BenchmarkMode(Array(Mode.SampleTime))
-class OnceBenchmark {
+class OnceBenchmark
   import OnceBenchmark._
 
   @Benchmark
-  def timeApply(state: OnceState): Unit = {
+  def timeApply(state: OnceState): Unit =
     state.once()
-  }
-}
 
-object OnceBenchmark {
+object OnceBenchmark
   @State(Scope.Benchmark)
-  class OnceState {
+  class OnceState
     val once = Once(())
-  }
-}

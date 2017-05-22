@@ -19,30 +19,24 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScPatternListStub
 class ScPatternListImpl private (
     stub: StubElement[ScPatternList], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScPatternList {
+    with ScPatternList
 
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScPatternListStub) = {
+  def this(stub: ScPatternListStub) =
     this(stub, ScalaElementTypes.PATTERN_LIST, null)
-  }
 
   override def toString: String = "ListOfPatterns"
 
-  def patterns: Seq[ScPattern] = {
+  def patterns: Seq[ScPattern] =
     val stub = getStub
-    if (stub != null && allPatternsSimple) {
+    if (stub != null && allPatternsSimple)
       return stub.getChildrenByType(
           ScalaElementTypes.REFERENCE_PATTERN,
           JavaArrayFactoryUtil.ScReferencePatternFactory)
-    }
     findChildrenByClass[ScPattern](classOf[ScPattern])
-  }
 
-  def allPatternsSimple: Boolean = {
+  def allPatternsSimple: Boolean =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       return stub.asInstanceOf[ScPatternListStub].allPatternsSimple
-    }
     !patterns.exists(p => !(p.isInstanceOf[ScReferencePattern]))
-  }
-}

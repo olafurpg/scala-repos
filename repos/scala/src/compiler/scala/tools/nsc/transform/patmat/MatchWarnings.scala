@@ -8,11 +8,11 @@ package scala.tools.nsc.transform.patmat
 
 import scala.language.postfixOps
 
-trait MatchWarnings { self: PatternMatching =>
+trait MatchWarnings  self: PatternMatching =>
 
   import global._
 
-  trait TreeMakerWarnings { self: MatchTranslator =>
+  trait TreeMakerWarnings  self: MatchTranslator =>
 
     import typer.context
 
@@ -21,8 +21,8 @@ trait MatchWarnings { self: PatternMatching =>
     // use the scopes of the contexts in the enclosing context chain discover
     // nothing. How to associate a name with a symbol would would be a wonderful
     // linkage for which to establish a canonical acquisition mechanism.
-    private def matchingSymbolInScope(pat: Tree): Symbol = {
-      def declarationOfName(tpe: Type, name: Name): Symbol = tpe match {
+    private def matchingSymbolInScope(pat: Tree): Symbol =
+      def declarationOfName(tpe: Type, name: Name): Symbol = tpe match
         case PolyType(tparams, restpe) =>
           tparams find (_.name == name) getOrElse declarationOfName(
               restpe, name)
@@ -31,14 +31,11 @@ trait MatchWarnings { self: PatternMatching =>
               restpe, name)
         case ClassInfoType(_, _, clazz) => clazz.rawInfo member name
         case _ => NoSymbol
-      }
-      pat match {
+      pat match
         case Bind(name, _) =>
           context.enclosingContextChain.foldLeft(NoSymbol: Symbol)((res,
               ctx) => res orElse declarationOfName(ctx.owner.rawInfo, name))
         case _ => NoSymbol
-      }
-    }
 
     // Issue better warnings than "unreachable code" when people misuse
     // variable patterns thinking they bind to existing identifiers.
@@ -48,24 +45,22 @@ trait MatchWarnings { self: PatternMatching =>
     // However this is a pain (at least the way I'm going about it)
     // and I have to think these detailed errors are primarily useful
     // for beginners, not people writing nested pattern matches.
-    def checkMatchVariablePatterns(cases: List[CaseDef]) {
+    def checkMatchVariablePatterns(cases: List[CaseDef])
       // A string describing the first variable pattern
       var vpat: String = null
       // Using an iterator so we can recognize the last case
       val it = cases.iterator
 
-      def addendum(pat: Tree) = {
-        matchingSymbolInScope(pat) match {
+      def addendum(pat: Tree) =
+        matchingSymbolInScope(pat) match
           case NoSymbol => ""
           case sym =>
             val desc =
               if (sym.isParameter) s"parameter ${sym.nameString} of"
               else sym + " in"
             s"\nIf you intended to match against $desc ${sym.owner}, you must use backticks, like: case `${sym.nameString}` =>"
-        }
-      }
 
-      while (it.hasNext) {
+      while (it.hasNext)
         val cdef = it.next()
         // If a default case has been seen, then every succeeding case is unreachable.
         if (vpat != null)
@@ -77,18 +72,12 @@ trait MatchWarnings { self: PatternMatching =>
         // we have a reason to mention its pattern variable name and any corresponding
         // symbol in scope.  Errors will follow from the remaining cases, at least
         // once we make the above warning an error.
-        else if (it.hasNext && (treeInfo isDefaultCase cdef)) {
-          val vpatName = cdef.pat match {
+        else if (it.hasNext && (treeInfo isDefaultCase cdef))
+          val vpatName = cdef.pat match
             case Bind(name, _) => s" '$name'"
             case _ => ""
-          }
           vpat = s"variable pattern$vpatName on line ${cdef.pat.pos.line}"
           reporter.warning(
               cdef.pos,
               s"patterns after a variable pattern cannot match (SLS 8.1.1)" +
               addendum(cdef.pat))
-        }
-      }
-    }
-  }
-}

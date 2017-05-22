@@ -10,12 +10,11 @@ import akka.actor.Cancellable
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration.FiniteDuration
 
-private[akka] object ReceiveTimeout {
+private[akka] object ReceiveTimeout
   final val emptyReceiveTimeoutData: (Duration, Cancellable) =
     (Duration.Undefined, ActorCell.emptyCancellable)
-}
 
-private[akka] trait ReceiveTimeout {
+private[akka] trait ReceiveTimeout
   this: ActorCell ⇒
 
   import ReceiveTimeout._
@@ -29,23 +28,20 @@ private[akka] trait ReceiveTimeout {
   final def setReceiveTimeout(timeout: Duration): Unit =
     receiveTimeoutData = receiveTimeoutData.copy(_1 = timeout)
 
-  final def checkReceiveTimeout() {
+  final def checkReceiveTimeout()
     val recvtimeout = receiveTimeoutData
     //Only reschedule if desired and there are currently no more messages to be processed
     if (!mailbox.hasMessages)
-      recvtimeout._1 match {
+      recvtimeout._1 match
         case f: FiniteDuration ⇒
           recvtimeout._2.cancel() //Cancel any ongoing future
           val task = system.scheduler.scheduleOnce(
               f, self, akka.actor.ReceiveTimeout)(this.dispatcher)
           receiveTimeoutData = (f, task)
         case _ ⇒ cancelReceiveTimeout()
-      } else cancelReceiveTimeout()
-  }
+      else cancelReceiveTimeout()
 
   final def cancelReceiveTimeout(): Unit =
-    if (receiveTimeoutData._2 ne emptyCancellable) {
+    if (receiveTimeoutData._2 ne emptyCancellable)
       receiveTimeoutData._2.cancel()
       receiveTimeoutData = (receiveTimeoutData._1, emptyCancellable)
-    }
-}

@@ -6,7 +6,7 @@ import fastparse.parsers.Intrinsics
 import Basic._
 import Identifiers._
 
-trait Literals { l =>
+trait Literals  l =>
   def Block: P0
 
   /**
@@ -29,19 +29,17 @@ trait Literals { l =>
   val Newline = P(WL ~ Basic.Newline)
 
   val NotNewline: P0 = P(&(WS ~ !Basic.Newline))
-  val OneNLMax: P0 = {
+  val OneNLMax: P0 =
     val ConsumeComments = P(
         (Basic.WSChars.? ~ Literals.Comment ~ Basic.WSChars.? ~ Basic.Newline).rep)
     P(NoCut(WS ~ Basic.Newline.? ~ ConsumeComments ~ NotNewline))
-  }
   def Pattern: P0
-  object Literals {
+  object Literals
     import Basic._
-    val Float = {
+    val Float =
       def Thing = P(DecNum ~ Exp.? ~ FloatType.?)
       def Thing2 = P("." ~ Thing | Exp ~ FloatType.? | Exp.? ~ FloatType)
       P("." ~ Thing | DecNum ~ Thing2)
-    }
 
     val Int = P((HexNum | DecNum) ~ CharIn("Ll").?)
 
@@ -67,21 +65,19 @@ trait Literals { l =>
     // Note that symbols can take on the same values as keywords!
     val Symbol = P(Identifiers.PlainId | Identifiers.Keywords)
 
-    val Char = {
+    val Char =
       // scalac 2.10 crashes if PrintableChar below is substituted by its body
       def PrintableChar = CharPred(CharPredicates.isPrintableChar)
 
       P((Escape | PrintableChar) ~ "'")
-    }
 
-    class InterpCtx(interp: Option[P0]) {
+    class InterpCtx(interp: Option[P0])
       val Literal = P(("-".? ~ (Float | Int)) | Bool | String | "'" ~/
           (Char | Symbol) | Null)
-      val Interp = interp match {
+      val Interp = interp match
         case None => P(Fail)
         case Some(p) =>
           P("$" ~ Identifiers.PlainIdNoDollar | ("${" ~ p ~ WL ~ "}") | "$$")
-      }
 
       val TQ = P("\"\"\"")
 
@@ -96,22 +92,16 @@ trait Literals { l =>
           "\"" ~ "\"".? ~ !"\"" | Intrinsics.CharIn("\\$\n"))
       val TripleChars = P((StringChars | Interp | NonTripleQuoteChar).rep)
       val TripleTail = P(TQ ~ "\"".rep)
-      def SingleChars(allowSlash: Boolean) = {
+      def SingleChars(allowSlash: Boolean) =
         val LiteralSlash = P(if (allowSlash) "\\" else Fail)
         val NonStringEnd = P(!CharIn("\n\"") ~ AnyChar)
         P((StringChars | Interp | LiteralSlash | Escape | NonStringEnd).rep)
-      }
-      val String = {
-        P {
+      val String =
+        P
           (Id ~ TQ ~/ TripleChars ~ TripleTail) |
           (Id ~ "\"" ~/ SingleChars(true) ~ "\"") |
           (TQ ~/ NoInterp.TripleChars ~ TripleTail) |
           ("\"" ~/ NoInterp.SingleChars(false) ~ "\"")
-        }
-      }
-    }
     object NoInterp extends InterpCtx(None)
     object Pat extends InterpCtx(Some(l.Pattern))
     object Expr extends InterpCtx(Some(Block))
-  }
-}

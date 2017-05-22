@@ -36,23 +36,18 @@ import scalafx.scene.layout.BorderPane
 /**
   * An example of using CSS create custom button.
   */
-object SimpleCSSDemo extends JFXApp {
+object SimpleCSSDemo extends JFXApp
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Simple CSS Demo"
 
-    scene = new Scene {
+    scene = new Scene
       // Add a stylesheet to existing ones.
       stylesheets += getClass.getResource("simple.css").toExternalForm
 
-      root = new BorderPane {
+      root = new BorderPane
         id = "my-pane"
 
-        center = new Button {
+        center = new Button
           id = "my-button"
           text = "Large Rounded Button"
-        }
-      }
-    }
-  }
-}

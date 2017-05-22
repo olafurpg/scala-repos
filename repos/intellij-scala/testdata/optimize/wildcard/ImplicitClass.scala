@@ -1,14 +1,13 @@
 import scala.language.implicitConversions
 
-class ImplicitClass {
+class ImplicitClass
   import Mess.{a, s, foo, AAAA, BBBB}
 
   val x = new AAAA
   val y = new BBBB
   val z = a + s + foo
-}
 
-object Mess {
+object Mess
   val a = 1
   val s = "a"
   def foo = 1
@@ -16,10 +15,8 @@ object Mess {
   class AAAA
   class BBBB
 
-  implicit class PrintableString(val s: String) extends AnyVal {
+  implicit class PrintableString(val s: String) extends AnyVal
     def println() = Predef.println(s)
-  }
-}
 
 /*
 import scala.language.implicitConversions

@@ -12,7 +12,7 @@ import DurationConversions._
 
 // Would be nice to limit the visibility of this trait a little bit,
 // but it crashes scalac to do so.
-trait DurationConversions extends Any {
+trait DurationConversions extends Any
   protected def durationIn(unit: TimeUnit): FiniteDuration
 
   def nanoseconds = durationIn(NANOSECONDS)
@@ -71,24 +71,19 @@ trait DurationConversions extends Any {
 
   def days[C](c: C)(implicit ev: Classifier[C]): ev.R = ev.convert(days)
   def day[C](c: C)(implicit ev: Classifier[C]): ev.R = days(c)
-}
 
 /**
   * This object just holds some cogs which make the DSL machine work, not for direct consumption.
   */
-object DurationConversions {
-  trait Classifier[C] {
+object DurationConversions
+  trait Classifier[C]
     type R
     def convert(d: FiniteDuration): R
-  }
 
-  implicit object spanConvert extends Classifier[span.type] {
+  implicit object spanConvert extends Classifier[span.type]
     type R = FiniteDuration
     def convert(d: FiniteDuration) = d
-  }
 
-  implicit object fromNowConvert extends Classifier[fromNow.type] {
+  implicit object fromNowConvert extends Classifier[fromNow.type]
     type R = Deadline
     def convert(d: FiniteDuration) = Deadline.now + d
-  }
-}

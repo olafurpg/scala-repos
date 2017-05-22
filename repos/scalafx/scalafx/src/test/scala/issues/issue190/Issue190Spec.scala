@@ -40,15 +40,14 @@ import scalafx.testutil.RunOnApplicationThread
 
 /** Issue 190: Convenience methods not working for clipboard */
 @RunWith(classOf[JUnitRunner])
-class Issue190Spec extends FlatSpec with RunOnApplicationThread {
+class Issue190Spec extends FlatSpec with RunOnApplicationThread
 
-  "ClipboardContent" should "be assignable to the content of the clipboard" in {
+  "ClipboardContent" should "be assignable to the content of the clipboard" in
     Clipboard.systemClipboard.content = new ClipboardContent()
 
     //    Clipboard.systemClipboard.content.size shouldBe 0
-  }
 
-  "ClipboardContent" should "be assignable from Map[DataFormat, T <: AnyRef]" in {
+  "ClipboardContent" should "be assignable from Map[DataFormat, T <: AnyRef]" in
 
     val files = List(new File("Test"))
     //    Clipboard.systemClipboard.content = ClipboardContent(Map(DataFormat.Files -> files.asJava))
@@ -59,9 +58,8 @@ class Issue190Spec extends FlatSpec with RunOnApplicationThread {
     val contentFiles = content.files
     contentFiles.length shouldBe 1
     contentFiles.head.getName shouldBe "Test"
-  }
 
-  "ClipboardContent" should "be assignable from `DataFormat -> value` pairs" in {
+  "ClipboardContent" should "be assignable from `DataFormat -> value` pairs" in
 
     //    Clipboard.systemClipboard.clear()
 
@@ -82,9 +80,8 @@ class Issue190Spec extends FlatSpec with RunOnApplicationThread {
 
     content.hasString shouldBe true
     content.string shouldBe "Test3"
-  }
 
-  "ClipboardContent" should "be assignable with `put` methods" in {
+  "ClipboardContent" should "be assignable with `put` methods" in
 
     //    Clipboard.systemClipboard.clear()
 
@@ -108,5 +105,3 @@ class Issue190Spec extends FlatSpec with RunOnApplicationThread {
 
     content.hasString shouldBe true
     content.string shouldBe "Test3"
-  }
-}

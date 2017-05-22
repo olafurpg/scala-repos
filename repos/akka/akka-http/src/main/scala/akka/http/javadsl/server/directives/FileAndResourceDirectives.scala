@@ -13,17 +13,15 @@ import akka.http.impl.server.RouteStructure._
 /**
   * Implement this interface to provide a custom mapping from a file name to a [[akka.http.javadsl.model.ContentType]].
   */
-trait ContentTypeResolver {
+trait ContentTypeResolver
   def resolve(fileName: String): ContentType
-}
 
 /**
   * A resolver that assumes the given constant [[akka.http.javadsl.model.ContentType]] for all files.
   */
 case class StaticContentTypeResolver(contentType: ContentType)
-    extends ContentTypeResolver {
+    extends ContentTypeResolver
   def resolve(fileName: String): ContentType = contentType
-}
 
 /**
   * Allows to customize one of the predefined routes of [[FileAndResourceRoute]] to respond
@@ -31,7 +29,7 @@ case class StaticContentTypeResolver(contentType: ContentType)
   *
   * The default behavior is to determine the content type by file extension.
   */
-trait FileAndResourceRoute extends Route {
+trait FileAndResourceRoute extends Route
 
   /**
     * Returns a variant of this route that responds with the given constant [[akka.http.javadsl.model.ContentType]].
@@ -43,21 +41,19 @@ trait FileAndResourceRoute extends Route {
     * which [[akka.http.javadsl.model.ContentType]] to respond with by file name.
     */
   def resolveContentTypeWith(resolver: ContentTypeResolver): Route
-}
 
-object FileAndResourceRoute {
+object FileAndResourceRoute
 
   /**
     * INTERNAL API
     */
   private[http] def apply(
       f: ContentTypeResolver ⇒ Route): FileAndResourceRoute =
-    new FileAndResourceRouteWithDefaultResolver(f) with FileAndResourceRoute {
+    new FileAndResourceRouteWithDefaultResolver(f) with FileAndResourceRoute
       def withContentType(contentType: ContentType): Route =
         resolveContentTypeWith(StaticContentTypeResolver(contentType))
       def resolveContentTypeWith(resolver: ContentTypeResolver): Route =
         f(resolver)
-    }
 
   /**
     * INTERNAL API
@@ -65,15 +61,13 @@ object FileAndResourceRoute {
   private[http] def forFixedName(fileName: String)(
       f: ContentType ⇒ Route): FileAndResourceRoute =
     new FileAndResourceRouteWithDefaultResolver(
-        resolver ⇒ f(resolver.resolve(fileName))) with FileAndResourceRoute {
+        resolver ⇒ f(resolver.resolve(fileName))) with FileAndResourceRoute
       def withContentType(contentType: ContentType): Route =
         resolveContentTypeWith(StaticContentTypeResolver(contentType))
       def resolveContentTypeWith(resolver: ContentTypeResolver): Route =
         f(resolver.resolve(fileName))
-    }
-}
 
-abstract class FileAndResourceDirectives extends ExecutionDirectives {
+abstract class FileAndResourceDirectives extends ExecutionDirectives
 
   /**
     * Completes GET requests with the content of the given resource loaded from the default ClassLoader.
@@ -147,4 +141,3 @@ abstract class FileAndResourceDirectives extends ExecutionDirectives {
 
   protected def defaultClassLoader: ClassLoader =
     server.directives.FileAndResourceDirectives.defaultClassLoader
-}

@@ -26,42 +26,38 @@ import kafka.utils.TestUtils._
 import kafka.message._
 import org.junit.Test
 
-class FileMessageSetTest extends BaseMessageSetTestCases {
+class FileMessageSetTest extends BaseMessageSetTestCases
 
   val messageSet = createMessageSet(messages)
 
-  def createMessageSet(messages: Seq[Message]): FileMessageSet = {
+  def createMessageSet(messages: Seq[Message]): FileMessageSet =
     val set = new FileMessageSet(tempFile())
     set.append(new ByteBufferMessageSet(NoCompressionCodec, messages: _*))
     set.flush()
     set
-  }
 
   /**
     * Test that the cached size variable matches the actual file size as we append messages
     */
   @Test
-  def testFileSize() {
+  def testFileSize()
     assertEquals(messageSet.channel.size, messageSet.sizeInBytes)
-    for (i <- 0 until 20) {
+    for (i <- 0 until 20)
       messageSet.append(singleMessageSet("abcd".getBytes))
       assertEquals(messageSet.channel.size, messageSet.sizeInBytes)
-    }
-  }
 
   /**
     * Test that adding invalid bytes to the end of the log doesn't break iteration
     */
   @Test
-  def testIterationOverPartialAndTruncation() {
+  def testIterationOverPartialAndTruncation()
     testPartialWrite(0, messageSet)
     testPartialWrite(2, messageSet)
     testPartialWrite(4, messageSet)
     testPartialWrite(5, messageSet)
     testPartialWrite(6, messageSet)
-  }
 
-  def testPartialWrite(size: Int, messageSet: FileMessageSet) {
+  def testPartialWrite(size: Int, messageSet: FileMessageSet)
     val buffer = ByteBuffer.allocate(size)
     val originalPosition = messageSet.channel.position
     for (i <- 0 until size) buffer.put(0.asInstanceOf[Byte])
@@ -69,23 +65,21 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     messageSet.channel.write(buffer)
     // appending those bytes should not change the contents
     checkEquals(messages.iterator, messageSet.map(m => m.message).iterator)
-  }
 
   /**
     * Iterating over the file does file reads but shouldn't change the position of the underlying FileChannel.
     */
   @Test
-  def testIterationDoesntChangePosition() {
+  def testIterationDoesntChangePosition()
     val position = messageSet.channel.position
     checkEquals(messages.iterator, messageSet.map(m => m.message).iterator)
     assertEquals(position, messageSet.channel.position)
-  }
 
   /**
     * Test a simple append and read.
     */
   @Test
-  def testRead() {
+  def testRead()
     var read = messageSet.read(0, messageSet.sizeInBytes)
     checkEquals(messageSet.iterator, read.iterator)
     val items = read.iterator.toList
@@ -100,13 +94,12 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
         "Try a read of a single message starting from the second message",
         List(items.tail.head),
         read.toList)
-  }
 
   /**
     * Test the MessageSet.searchFor API.
     */
   @Test
-  def testSearch() {
+  def testSearch()
     // append a new message with a high offset
     val lastMessage = new Message("test".getBytes)
     messageSet.append(new ByteBufferMessageSet(
@@ -132,37 +125,34 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     assertEquals("Should be able to find fourth message by correct offset",
                  OffsetPosition(50L, position),
                  messageSet.searchFor(50, position))
-  }
 
   /**
     * Test that the message set iterator obeys start and end slicing
     */
   @Test
-  def testIteratorWithLimits() {
+  def testIteratorWithLimits()
     val message = messageSet.toList(1)
     val start = messageSet.searchFor(1, 0).position
     val size = message.message.size
     val slice = messageSet.read(start, size)
     assertEquals(List(message), slice.toList)
-  }
 
   /**
     * Test the truncateTo method lops off messages and appropriately updates the size
     */
   @Test
-  def testTruncate() {
+  def testTruncate()
     val message = messageSet.toList(0)
     val end = messageSet.searchFor(1, 0).position
     messageSet.truncateTo(end)
     assertEquals(List(message), messageSet.toList)
     assertEquals(MessageSet.entrySize(message.message), messageSet.sizeInBytes)
-  }
 
   /**
     * Test the new FileMessageSet with pre allocate as true
     */
   @Test
-  def testPreallocateTrue() {
+  def testPreallocateTrue()
     val temp = tempFile()
     val set = new FileMessageSet(temp, false, 512 * 1024 * 1024, true)
     val position = set.channel.position
@@ -170,13 +160,12 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     assertEquals(0, position)
     assertEquals(0, size)
     assertEquals(512 * 1024 * 1024, temp.length)
-  }
 
   /**
     * Test the new FileMessageSet with pre allocate as false
     */
   @Test
-  def testPreallocateFalse() {
+  def testPreallocateFalse()
     val temp = tempFile()
     val set = new FileMessageSet(temp, false, 512 * 1024 * 1024, false)
     val position = set.channel.position
@@ -184,13 +173,12 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     assertEquals(0, position)
     assertEquals(0, size)
     assertEquals(0, temp.length)
-  }
 
   /**
     * Test the new FileMessageSet with pre allocate as true and file has been clearly shut down, the file will be truncate to end of valid data.
     */
   @Test
-  def testPreallocateClearShutdown() {
+  def testPreallocateClearShutdown()
     val temp = tempFile()
     val set = new FileMessageSet(temp, false, 512 * 1024 * 1024, true)
     set.append(new ByteBufferMessageSet(NoCompressionCodec, messages: _*))
@@ -209,10 +197,9 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     assertEquals(oldposition, position)
     assertEquals(oldposition, size)
     assertEquals(oldposition, tempReopen.length)
-  }
 
   @Test
-  def testMessageFormatConversion() {
+  def testMessageFormatConversion()
 
     // Prepare messages.
     val offsets = Seq(0L, 2L)
@@ -279,9 +266,9 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
     verifyConvertedMessageSet(convertedMessageSet, Message.MagicValue_V1)
 
     def verifyConvertedMessageSet(
-        convertedMessageSet: MessageSet, magicByte: Byte) {
+        convertedMessageSet: MessageSet, magicByte: Byte)
       var i = 0
-      for (messageAndOffset <- convertedMessageSet) {
+      for (messageAndOffset <- convertedMessageSet)
         assertEquals("magic byte should be 1",
                      magicByte,
                      messageAndOffset.message.magic)
@@ -294,7 +281,3 @@ class FileMessageSetTest extends BaseMessageSetTestCases {
                      messagesV0(i).payload,
                      messageAndOffset.message.payload)
         i += 1
-      }
-    }
-  }
-}

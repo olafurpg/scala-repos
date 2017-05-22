@@ -84,7 +84,7 @@ private[yarn] case class ContainerLocalityPreferences(
 private[yarn] class LocalityPreferredContainerPlacementStrategy(
     val sparkConf: SparkConf,
     val yarnConf: Configuration,
-    val resource: Resource) {
+    val resource: Resource)
 
   /**
     * Calculate each container's node locality and rack locality
@@ -106,7 +106,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
       hostToLocalTaskCount: Map[String, Int],
       allocatedHostToContainersMap: HashMap[String, Set[ContainerId]],
       localityMatchedPendingAllocations: Seq[ContainerRequest]
-  ): Array[ContainerLocalityPreferences] = {
+  ): Array[ContainerLocalityPreferences] =
     val updatedHostToContainerCount = expectedHostToContainerCount(
         numLocalityAwareTasks,
         hostToLocalTaskCount,
@@ -124,50 +124,43 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
 
     val containerLocalityPreferences =
       ArrayBuffer[ContainerLocalityPreferences]()
-    if (requiredLocalityFreeContainerNum > 0) {
-      for (i <- 0 until requiredLocalityFreeContainerNum) {
+    if (requiredLocalityFreeContainerNum > 0)
+      for (i <- 0 until requiredLocalityFreeContainerNum)
         containerLocalityPreferences += ContainerLocalityPreferences(
             null.asInstanceOf[Array[String]], null.asInstanceOf[Array[String]])
-      }
-    }
 
-    if (requiredLocalityAwareContainerNum > 0) {
+    if (requiredLocalityAwareContainerNum > 0)
       val largestRatio = updatedHostToContainerCount.values.max
       // Round the ratio of preferred locality to the number of locality required container
       // number, which is used for locality preferred host calculating.
-      var preferredLocalityRatio = updatedHostToContainerCount.mapValues {
+      var preferredLocalityRatio = updatedHostToContainerCount.mapValues
         ratio =>
           val adjustedRatio =
             ratio.toDouble * requiredLocalityAwareContainerNum / largestRatio
           adjustedRatio.ceil.toInt
-      }
 
-      for (i <- 0 until requiredLocalityAwareContainerNum) {
+      for (i <- 0 until requiredLocalityAwareContainerNum)
         // Only filter out the ratio which is larger than 0, which means the current host can
         // still be allocated with new container request.
         val hosts = preferredLocalityRatio.filter(_._2 > 0).keys.toArray
-        val racks = hosts.map { h =>
+        val racks = hosts.map  h =>
           RackResolver.resolve(yarnConf, h).getNetworkLocation
-        }.toSet
+        .toSet
         containerLocalityPreferences +=
           ContainerLocalityPreferences(hosts, racks.toArray)
 
         // Minus 1 each time when the host is used. When the current ratio is 0,
         // which means all the required ratio is satisfied, this host will not be allocated again.
         preferredLocalityRatio = preferredLocalityRatio.mapValues(_ - 1)
-      }
-    }
 
     containerLocalityPreferences.toArray
-  }
 
   /**
     * Calculate the number of executors need to satisfy the given number of pending tasks.
     */
-  private def numExecutorsPending(numTasksPending: Int): Int = {
+  private def numExecutorsPending(numTasksPending: Int): Int =
     val coresPerExecutor = resource.getVirtualCores
     (numTasksPending * sparkConf.get(CPUS_PER_TASK) + coresPerExecutor - 1) / coresPerExecutor
-  }
 
   /**
     * Calculate the expected host to number of containers by considering with allocated containers.
@@ -186,12 +179,12 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
       hostToLocalTaskCount: Map[String, Int],
       allocatedHostToContainersMap: HashMap[String, Set[ContainerId]],
       localityMatchedPendingAllocations: Seq[ContainerRequest]
-  ): Map[String, Int] = {
+  ): Map[String, Int] =
     val totalLocalTaskNum = hostToLocalTaskCount.values.sum
     val pendingHostToContainersMap = pendingHostToContainerCount(
         localityMatchedPendingAllocations)
 
-    hostToLocalTaskCount.map {
+    hostToLocalTaskCount.map
       case (host, count) =>
         val expectedCount =
           count.toDouble * numExecutorsPending(localityAwareTasks) / totalLocalTaskNum
@@ -204,8 +197,6 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
         // the required container number is expected count minus existed count. Otherwise the
         // required container number is 0.
         (host, math.max(0, (expectedCount - existedCount).ceil.toInt))
-    }
-  }
 
   /**
     * According to the locality ratio and number of container requests, calculate the host to
@@ -220,14 +211,12 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
     */
   private def pendingHostToContainerCount(
       localityMatchedPendingAllocations: Seq[ContainerRequest])
-    : Map[String, Double] = {
+    : Map[String, Double] =
     val pendingHostToContainerCount = new HashMap[String, Int]()
-    localityMatchedPendingAllocations.foreach { cr =>
-      cr.getNodes.asScala.foreach { n =>
+    localityMatchedPendingAllocations.foreach  cr =>
+      cr.getNodes.asScala.foreach  n =>
         val count = pendingHostToContainerCount.getOrElse(n, 0) + 1
         pendingHostToContainerCount(n) = count
-      }
-    }
 
     val possibleTotalContainerNum = pendingHostToContainerCount.values.sum
     val localityMatchedPendingNum =
@@ -235,5 +224,3 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
     pendingHostToContainerCount
       .mapValues(_ * localityMatchedPendingNum / possibleTotalContainerNum)
       .toMap
-  }
-}

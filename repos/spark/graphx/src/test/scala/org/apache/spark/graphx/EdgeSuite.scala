@@ -19,8 +19,8 @@ package org.apache.spark.graphx
 
 import org.apache.spark.SparkFunSuite
 
-class EdgeSuite extends SparkFunSuite {
-  test("compare") {
+class EdgeSuite extends SparkFunSuite
+  test("compare")
     // descending order
     val testEdges: Array[Edge[Int]] = Array(
         Edge(0x7FEDCBA987654321L, -0x7FEDCBA987654321L, 1),
@@ -32,8 +32,5 @@ class EdgeSuite extends SparkFunSuite {
     // to ascending order
     val sortedEdges = testEdges.sorted(Edge.lexicographicOrdering[Int])
 
-    for (i <- 0 until testEdges.length) {
+    for (i <- 0 until testEdges.length)
       assert(sortedEdges(i) == testEdges(testEdges.length - i - 1))
-    }
-  }
-}

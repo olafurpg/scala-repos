@@ -1,3 +1,2 @@
-trait A {
+trait A
   def foo: Int = 12
-}

@@ -18,23 +18,21 @@ import ir.Infos
   *
   *  @author Sébastien Doeraene
   */
-trait GenJSFiles extends SubComponent { self: GenJSCode =>
+trait GenJSFiles extends SubComponent  self: GenJSCode =>
   import global._
   import jsAddons._
 
   def genIRFile(
-      cunit: CompilationUnit, sym: Symbol, tree: ir.Trees.ClassDef): Unit = {
+      cunit: CompilationUnit, sym: Symbol, tree: ir.Trees.ClassDef): Unit =
     val outfile = getFileFor(cunit, sym, ".sjsir")
     val output = outfile.bufferedOutput
-    try {
+    try
       ir.InfoSerializers.serialize(output, Infos.generateClassInfo(tree))
       ir.Serializers.serialize(output, tree)
-    } finally {
+    finally
       output.close()
-    }
-  }
 
-  private def getFileFor(cunit: CompilationUnit, sym: Symbol, suffix: String) = {
+  private def getFileFor(cunit: CompilationUnit, sym: Symbol, suffix: String) =
     val baseDir: AbstractFile =
       settings.outputDirs.outputDirFor(cunit.source.file)
 
@@ -46,5 +44,3 @@ trait GenJSFiles extends SubComponent { self: GenJSCode =>
       filename = filename + nme.MODULE_SUFFIX_STRING
 
     dir fileNamed (filename + suffix)
-  }
-}

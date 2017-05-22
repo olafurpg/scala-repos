@@ -12,63 +12,50 @@ import org.jetbrains.plugins.scala.debugger.evaluation.EvaluationException
   * User: Alefas
   * Date: 12.10.11
   */
-class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator {
-  private def getOuterObject(objRef: ObjectReference): ObjectReference = {
-    if (objRef == null) {
+class ScalaThisEvaluator(iterations: Int = 0) extends Evaluator
+  private def getOuterObject(objRef: ObjectReference): ObjectReference =
+    if (objRef == null)
       return null
-    }
     val list = objRef.referenceType.fields
     import scala.collection.JavaConversions._
-    for (field <- list) {
+    for (field <- list)
       val name: String = field.name
-      if (name != null && name.startsWith("$outer")) {
+      if (name != null && name.startsWith("$outer"))
         val rv: ObjectReference =
           objRef.getValue(field).asInstanceOf[ObjectReference]
-        if (rv != null) {
+        if (rv != null)
           return rv
-        }
-      }
-    }
     null
-  }
 
   def getModifier: Modifier = null
 
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     lazy val frameProxy: StackFrameProxyImpl = context.getFrameProxy
-    var objRef: Value = context.getThisObject match {
+    var objRef: Value = context.getThisObject match
       case null => //so we possibly in trait $class
-        try {
+        try
           val variable: LocalVariableProxyImpl =
             frameProxy.visibleVariableByName("$this")
           if (variable == null) null
-          else {
+          else
             frameProxy.getValue(variable)
-          }
-        } catch {
+        catch
           case e: AbsentInformationException =>
             val args = frameProxy.getArgumentValues
             if (args.size() > 0) args.get(0)
             else null
-        }
       case x => x
-    }
-    if (iterations > 0) {
+    if (iterations > 0)
       var thisRef: ObjectReference = objRef.asInstanceOf[ObjectReference]
       var idx: Int = 0
-      while (idx < iterations && thisRef != null) {
+      while (idx < iterations && thisRef != null)
         thisRef = getOuterObject(thisRef)
         idx += 1
-      }
       if (thisRef == null)
         throw EvaluationException(
             ScalaBundle.message("outer.this.not.available"))
       objRef = thisRef
-    }
-    if (objRef == null) {
+    if (objRef == null)
       throw EvaluationException(
           DebuggerBundle.message("evaluation.error.this.not.avalilable"))
-    }
     objRef
-  }
-}

@@ -10,16 +10,13 @@ import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class Netty4TransporterTest
-    extends FunSuite with Eventually with IntegrationPatience {
+    extends FunSuite with Eventually with IntegrationPatience
 
-  test("connection failures are propagated to the transporter promise") {
+  test("connection failures are propagated to the transporter promise")
     val transporter = Netty4Transporter(None, None, Params.empty)
 
     val p = transporter(InetSocketAddressUtil.unconnected)
 
     // connection failure is propagated to the Transporter promise
-    intercept[java.nio.channels.UnsupportedAddressTypeException] {
+    intercept[java.nio.channels.UnsupportedAddressTypeException]
       Await.result(p, Duration.fromSeconds(15))
-    }
-  }
-}

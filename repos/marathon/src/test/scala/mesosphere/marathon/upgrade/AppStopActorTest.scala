@@ -20,19 +20,18 @@ import scala.concurrent.{Await, Promise}
 
 class AppStopActorTest
     extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll with MockitoSugar {
+    with BeforeAndAfterAll with MockitoSugar
 
   var driver: SchedulerDriver = _
   var taskTracker: TaskTracker = _
   var taskFailureRepository: TaskFailureRepository = _
 
-  before {
+  before
     driver = mock[SchedulerDriver]
     taskTracker = mock[TaskTracker]
     taskFailureRepository = mock[TaskFailureRepository]
-  }
 
-  test("Stop App") {
+  test("Stop App")
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
     val tasks = Set(MarathonTestHelper.runningTask("task_a"),
@@ -107,9 +106,8 @@ class AppStopActorTest
     verify(taskFailureRepository, times(1)).store(app.id, taskFailureB)
 
     verify(taskFailureRepository, times(1)).expunge(app.id)
-  }
 
-  test("Stop App without running tasks") {
+  test("Stop App without running tasks")
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
 
@@ -132,9 +130,8 @@ class AppStopActorTest
 
     verify(driver, times(0)).killTask(any())
     expectTerminated(ref)
-  }
 
-  test("Failed") {
+  test("Failed")
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
     val tasks = Set(MarathonTestHelper.runningTask("task_a"),
@@ -156,15 +153,13 @@ class AppStopActorTest
 
     ref.stop()
 
-    intercept[TaskUpgradeCanceledException] {
+    intercept[TaskUpgradeCanceledException]
       Await.result(promise.future, 5.seconds)
-    }
 
     verify(driver, times(2)).killTask(any())
     expectTerminated(ref)
-  }
 
-  test("Task synchronization") {
+  test("Task synchronization")
     val app = AppDefinition(id = PathId("app"), instances = 2)
     val promise = Promise[Unit]()
     val tasks = Set(MarathonTestHelper.runningTask("task_a"),
@@ -194,5 +189,3 @@ class AppStopActorTest
 
     verify(driver, times(2)).killTask(any())
     expectTerminated(ref)
-  }
-}

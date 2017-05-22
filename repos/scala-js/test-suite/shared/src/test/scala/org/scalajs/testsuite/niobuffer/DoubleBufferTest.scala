@@ -11,61 +11,52 @@ import java.nio._
 
 import org.scalajs.testsuite.niobuffer.ByteBufferFactories._
 
-abstract class DoubleBufferTest extends BaseBufferTest {
+abstract class DoubleBufferTest extends BaseBufferTest
   type Factory = BufferFactory.DoubleBufferFactory
 
-  class AllocDoubleBufferFactory extends Factory {
+  class AllocDoubleBufferFactory extends Factory
     def allocBuffer(capacity: Int): DoubleBuffer =
       DoubleBuffer.allocate(capacity)
-  }
 
   class WrappedDoubleBufferFactory
-      extends Factory with BufferFactory.WrappedBufferFactory {
+      extends Factory with BufferFactory.WrappedBufferFactory
     def baseWrap(array: Array[Double]): DoubleBuffer =
       DoubleBuffer.wrap(array)
 
     def baseWrap(
         array: Array[Double], offset: Int, length: Int): DoubleBuffer =
       DoubleBuffer.wrap(array, offset, length)
-  }
 
   class ByteBufferDoubleViewFactory(
       byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-      extends Factory with BufferFactory.ByteBufferViewFactory {
+      extends Factory with BufferFactory.ByteBufferViewFactory
     require(!byteBufferFactory.createsReadOnly)
 
     def baseAllocBuffer(capacity: Int): DoubleBuffer =
       byteBufferFactory.allocBuffer(capacity * 8).order(order).asDoubleBuffer()
-  }
-}
 
-class AllocDoubleBufferTest extends DoubleBufferTest {
+class AllocDoubleBufferTest extends DoubleBufferTest
   val factory: Factory = new AllocDoubleBufferFactory
-}
 
-class WrappedDoubleBufferTest extends DoubleBufferTest {
+class WrappedDoubleBufferTest extends DoubleBufferTest
   val factory: Factory = new WrappedDoubleBufferFactory
-}
 
-class WrappedDoubleReadOnlyBufferTest extends DoubleBufferTest {
+class WrappedDoubleReadOnlyBufferTest extends DoubleBufferTest
   val factory: Factory = new WrappedDoubleBufferFactory
   with BufferFactory.ReadOnlyBufferFactory
-}
 
-class AllocDoubleSlicedBufferTest extends DoubleBufferTest {
+class AllocDoubleSlicedBufferTest extends DoubleBufferTest
   val factory: Factory = new AllocDoubleBufferFactory
   with BufferFactory.SlicedBufferFactory
-}
 
 // Double views of byte buffers
 
 abstract class DoubleViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends DoubleBufferTest {
+    extends DoubleBufferTest
 
   val factory: BufferFactory.DoubleBufferFactory =
     new ByteBufferDoubleViewFactory(byteBufferFactory, order)
-}
 
 class DoubleViewOfAllocByteBufferBigEndianTest
     extends DoubleViewOfByteBufferTest(
@@ -95,13 +86,11 @@ class DoubleViewOfSlicedAllocByteBufferLittleEndianTest
 
 abstract class ReadOnlyDoubleViewOfByteBufferTest(
     byteBufferFactory: BufferFactory.ByteBufferFactory, order: ByteOrder)
-    extends DoubleBufferTest {
+    extends DoubleBufferTest
 
-  val factory: BufferFactory.DoubleBufferFactory = {
+  val factory: BufferFactory.DoubleBufferFactory =
     new ByteBufferDoubleViewFactory(byteBufferFactory, order)
     with BufferFactory.ReadOnlyBufferFactory
-  }
-}
 
 class ReadOnlyDoubleViewOfAllocByteBufferBigEndianTest
     extends ReadOnlyDoubleViewOfByteBufferTest(

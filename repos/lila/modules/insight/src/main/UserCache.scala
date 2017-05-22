@@ -12,12 +12,11 @@ import lila.db.Implicits._
 case class UserCache(_id: String, // user id
                      count: Int, // nb insight entries
                      ecos: Set[String],
-                     date: DateTime) {
+                     date: DateTime)
 
   def id = _id
-}
 
-private final class UserCacheApi(coll: Coll) {
+private final class UserCacheApi(coll: Coll)
 
   private implicit val userCacheBSONHandler = Macros.handler[UserCache]
 
@@ -28,4 +27,3 @@ private final class UserCacheApi(coll: Coll) {
   def remove(id: String) = coll.remove(selectId(id)).void
 
   private def selectId(id: String) = BSONDocument("_id" -> id)
-}

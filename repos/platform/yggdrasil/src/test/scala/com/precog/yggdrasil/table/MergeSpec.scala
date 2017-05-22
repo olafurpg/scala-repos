@@ -41,7 +41,7 @@ import scalaz.syntax.monad._
 
 trait MergeSpec[M[+ _]]
     extends ColumnarTableModuleTestSupport[M] with TableModuleSpec[M]
-    with IndicesModule[M] {
+    with IndicesModule[M]
 
   type GroupId = Int
   import trans._
@@ -52,7 +52,7 @@ trait MergeSpec[M[+ _]]
   implicit val fid = NaturalTransformation.refl[M]
 
   class Table(slices: StreamT[M, Slice], size: TableSize)
-      extends ColumnarTable(slices, size) {
+      extends ColumnarTable(slices, size)
     import trans._
     def load(apiKey: APIKey, jtpe: JType) = sys.error("todo")
     def sort(sortKey: TransSpec1,
@@ -62,9 +62,8 @@ trait MergeSpec[M[+ _]]
                  valueSpec: TransSpec1,
                  sortOrder: DesiredSortOrder = SortAscending,
                  unique: Boolean = false): M[Seq[Table]] = sys.error("todo")
-  }
 
-  trait TableCompanion extends ColumnarTableCompanion {
+  trait TableCompanion extends ColumnarTableCompanion
     def apply(slices: StreamT[M, Slice], size: TableSize) =
       new Table(slices, size)
 
@@ -76,12 +75,11 @@ trait MergeSpec[M[+ _]]
               sourceRight: Table,
               alignOnR: TransSpec1): M[(Table, Table)] =
       sys.error("not implemented here")
-  }
 
   object Table extends TableCompanion
 
-  "merge" should {
-    "avoid crosses in trivial cases" in {
+  "merge" should
+    "avoid crosses in trivial cases" in
       val fooJson = """
         | {"key":[5908438637678328470],"value":{"a":0,"b":4}}
         | {"key":[5908438637678328471],"value":{"a":1,"b":5}}
@@ -170,7 +168,7 @@ trait MergeSpec[M[+ _]]
           ),
           GroupingSpec.Intersection)
 
-      def evaluator(key: RValue, partition: GroupId => M[Table]) = {
+      def evaluator(key: RValue, partition: GroupId => M[Table]) =
         val K0 = RValue.fromJValue(JParser.parseUnsafe("""{"1":0,"2":4}"""))
         val K1 = RValue.fromJValue(JParser.parseUnsafe("""{"1":1,"2":5}"""))
         val K2 = RValue.fromJValue(JParser.parseUnsafe("""{"1":2,"2":6}"""))
@@ -203,44 +201,38 @@ trait MergeSpec[M[+ _]]
         val r3 = fromJson(
             JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
 
-        (key match {
-          case K0 => {
+        (key match
+          case K0 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(3):")
               //partition(3).flatMap(_.toJson).copoint.foreach(println)
               r0
-            }
-          case K1 => {
+          case K1 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(3):")
               //partition(3).flatMap(_.toJson).copoint.foreach(println)
               r1
-            }
-          case K2 => {
+          case K2 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(3):")
               //partition(3).flatMap(_.toJson).copoint.foreach(println)
               r2
-            }
-          case K3 => {
+          case K3 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(3):")
               //partition(3).flatMap(_.toJson).copoint.foreach(println)
               r3
-            }
           case _ => sys.error("Unexpected group key")
-        }).point[M]
-      }
+        ).point[M]
 
       val result = Table.merge(grouping)(evaluator)
       result.flatMap(_.toJson).copoint.toSet must_== resultJson.toSet
-    }
 
-    "execute the medals query without a cross" in {
+    "execute the medals query without a cross" in
       val medalsJson =
         """
         | {"key":[5908438637678314371],"value":{"Edition":"2000","Gender":"Men"}}
@@ -346,7 +338,7 @@ trait MergeSpec[M[+ _]]
           ),
           GroupingSpec.Intersection)
 
-      def evaluator(key: RValue, partition: GroupId => M[Table]) = {
+      def evaluator(key: RValue, partition: GroupId => M[Table]) =
         val K0 = RValue.fromJValue(JParser.parseUnsafe(
                 """{"1":"1996","extra0":true,"extra1":true}"""))
         val K1 = RValue.fromJValue(JParser.parseUnsafe(
@@ -378,54 +370,44 @@ trait MergeSpec[M[+ _]]
         val r3 = fromJson(
             JParser.parseManyFromString(r3Json).valueOr(throw _).toStream)
 
-        (key match {
-          case K0 => {
+        (key match
+          case K0 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(2):")
               //partition(2).flatMap(_.toJson).copoint.foreach(println)
               r0
-            }
-          case K1 => {
+          case K1 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(2):")
               //partition(2).flatMap(_.toJson).copoint.foreach(println)
               r1
-            }
-          case K2 => {
+          case K2 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(2):")
               //partition(2).flatMap(_.toJson).copoint.foreach(println)
               r2
-            }
-          case K3 => {
+          case K3 =>
               //println("key: "+keyJson+" partition(0):")
               //partition(0).flatMap(_.toJson).copoint.foreach(println)
               //println("key: "+keyJson+" partition(3):")
               //partition(3).flatMap(_.toJson).copoint.foreach(println)
               r3
-            }
           case _ => sys.error("Unexpected group key")
-        }).point[M]
-      }
+        ).point[M]
 
       val result = Table.merge(grouping)(evaluator)
       result.flatMap(_.toJson).copoint.toSet must_== resultJson.toSet
-    }
-  }
-}
 
-object MergeSpec extends MergeSpec[Need] {
+object MergeSpec extends MergeSpec[Need]
   implicit def M = Need.need
 
   type YggConfig = IdSourceConfig with ColumnarTableModuleConfig
 
-  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig {
+  val yggConfig = new IdSourceConfig with ColumnarTableModuleConfig
     val maxSliceSize = 10
     val smallSliceSize = 3
 
     val idSource = new FreshAtomicIdSource
-  }
-}

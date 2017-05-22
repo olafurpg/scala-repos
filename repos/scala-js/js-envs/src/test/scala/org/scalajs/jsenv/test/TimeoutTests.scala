@@ -5,10 +5,10 @@ import org.junit.Assert._
 
 import scala.concurrent.duration._
 
-trait TimeoutTests extends JSEnvTest {
+trait TimeoutTests extends JSEnvTest
 
   @Test
-  def basicTimeoutTest: Unit = {
+  def basicTimeoutTest: Unit =
 
     val deadline = 300.millis.fromNow
 
@@ -24,10 +24,9 @@ trait TimeoutTests extends JSEnvTest {
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-  }
 
   @Test
-  def clearTimeoutTest: Unit = {
+  def clearTimeoutTest: Unit =
 
     val deadline = 300.millis.fromNow
 
@@ -45,10 +44,9 @@ trait TimeoutTests extends JSEnvTest {
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-  }
 
   @Test
-  def timeoutArgTest: Unit = {
+  def timeoutArgTest: Unit =
 
     val deadline = 300.millis.fromNow
 
@@ -64,10 +62,9 @@ trait TimeoutTests extends JSEnvTest {
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-  }
 
   @Test
-  def intervalTest: Unit = {
+  def intervalTest: Unit =
 
     val deadline = 1.second.fromNow
 
@@ -98,10 +95,9 @@ trait TimeoutTests extends JSEnvTest {
        |""".stripMargin
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-  }
 
   @Test
-  def intervalSelfClearTest: Unit = {
+  def intervalSelfClearTest: Unit =
 
     val deadline = 100.millis.fromNow
 
@@ -116,5 +112,3 @@ trait TimeoutTests extends JSEnvTest {
     """ hasOutput (1 to 10).map(_ + "\n").mkString
 
     assertTrue("Execution took too little time", deadline.isOverdue())
-  }
-}

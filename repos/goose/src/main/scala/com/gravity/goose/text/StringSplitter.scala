@@ -25,16 +25,13 @@ package com.gravity.goose.text
   */
 import java.util.regex.Pattern
 
-class StringSplitter {
-  def this(pattern: String) {
+class StringSplitter
+  def this(pattern: String)
     this()
     this.pattern = Pattern.compile(pattern)
-  }
 
-  def split(input: String): Array[String] = {
+  def split(input: String): Array[String] =
     if (string.isNullOrEmpty(input)) return string.emptyArray
     pattern.split(input)
-  }
 
   private var pattern: Pattern = null
-}

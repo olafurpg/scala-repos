@@ -6,7 +6,7 @@ package play.api.libs.openid
 sealed abstract class OpenIDError(val id: String, val message: String)
     extends Throwable
 
-object Errors {
+object Errors
   object MISSING_PARAMETERS
       extends OpenIDError(
           "missing_parameters",
@@ -26,4 +26,3 @@ object Errors {
           "no_server", """The OpenID server could not be resolved.""")
   object NETWORK_ERROR
       extends OpenIDError("network_error", """Couldn't contact the server.""")
-}

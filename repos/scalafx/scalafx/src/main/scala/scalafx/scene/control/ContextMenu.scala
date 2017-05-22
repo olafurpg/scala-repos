@@ -35,17 +35,16 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object ContextMenu {
+object ContextMenu
   implicit def sfxContextMenu2jfx(cm: ContextMenu): jfxsc.ContextMenu =
     if (cm != null) cm.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/ContextMenu.html]].
   */
 class ContextMenu(
     override val delegate: jfxsc.ContextMenu = new jfxsc.ContextMenu)
-    extends PopupControl(delegate) with SFXDelegate[jfxsc.ContextMenu] {
+    extends PopupControl(delegate) with SFXDelegate[jfxsc.ContextMenu]
 
   /**
     * Create a new ContextMenu initialized with the given items
@@ -57,9 +56,8 @@ class ContextMenu(
     * Callback function to be informed when an item contained within this ContextMenu has been activated.
     */
   def onAction = delegate.onActionProperty
-  def onAction_=(v: jfxe.EventHandler[jfxe.ActionEvent]) {
+  def onAction_=(v: jfxe.EventHandler[jfxe.ActionEvent])
     onAction() = v
-  }
 
   /**
     * The menu items on the context menu.
@@ -70,7 +68,5 @@ class ContextMenu(
     * Shows the `ContextMenu` relative to the given anchor node, on the side specified by the hpos and vpos parameters,
     * and offset by the given dx and dy values for the x-axis and y-axis, respectively.
     */
-  def show(anchor: Node, side: jfxg.Side, screenX: Double, screenY: Double) {
+  def show(anchor: Node, side: jfxg.Side, screenX: Double, screenY: Double)
     delegate.show(anchor, side, screenX, screenY)
-  }
-}

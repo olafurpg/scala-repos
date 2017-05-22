@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Try}
 
 /** The backend for DistributedProfile. */
-trait DistributedBackend extends RelationalBackend with Logging {
+trait DistributedBackend extends RelationalBackend with Logging
   type This = DistributedBackend
   type Database = DatabaseDef
   type Session = SessionDef
@@ -30,7 +30,7 @@ trait DistributedBackend extends RelationalBackend with Logging {
 
   class DatabaseDef(val dbs: Vector[BasicBackend#DatabaseDef],
                     val executionContext: ExecutionContext)
-      extends super.DatabaseDef {
+      extends super.DatabaseDef
     protected[this] def createDatabaseActionContext[T](
         _useSameThread: Boolean): Context =
       new BasicActionContext { val useSameThread = _useSameThread }
@@ -39,63 +39,54 @@ trait DistributedBackend extends RelationalBackend with Logging {
         s: Subscriber[_ >: T], useSameThread: Boolean): StreamingContext =
       new BasicStreamingActionContext(s, useSameThread, DatabaseDef.this)
 
-    def createSession(): Session = {
+    def createSession(): Session =
       val sessions = new ArrayBuffer[BasicBackend#Session]
-      for (db <- dbs) sessions += Try(db.createSession()).recoverWith {
+      for (db <- dbs) sessions += Try(db.createSession()).recoverWith
         case ex =>
-          sessions.reverseIterator.foreach { s =>
+          sessions.reverseIterator.foreach  s =>
             Try(s.close())
-          }
           Failure(ex)
-      }.get
+      .get
       new SessionDef(sessions.toVector)
-    }
 
     protected[this] val synchronousExecutionContext: ExecutionContext =
-      new ExecutionContext {
+      new ExecutionContext
         def reportFailure(t: Throwable): Unit =
           executionContext.reportFailure(t)
         def execute(runnable: Runnable): Unit =
           executionContext.execute(
-              new Runnable {
+              new Runnable
             def run(): Unit = blocking(runnable.run)
-          })
-      }
+          )
 
     override def shutdown: Future[Unit] = Future.successful(())
     def close: Unit = ()
-  }
 
-  class DatabaseFactoryDef {
+  class DatabaseFactoryDef
 
     /** Create a new distributed database instance that uses the supplied ExecutionContext for
       * asynchronous execution of database actions. */
     def apply(dbs: TraversableOnce[BasicBackend#DatabaseDef],
               executionContext: ExecutionContext): Database =
       new DatabaseDef(dbs.toVector, executionContext)
-  }
 
   class SessionDef(val sessions: Vector[BasicBackend#Session])
-      extends super.SessionDef {
-    def close() {
+      extends super.SessionDef
+    def close()
       sessions
         .map(s => Try(s.close()))
         .collectFirst { case Failure(t) => t }
         .foreach(throw _)
-    }
 
     def rollback() =
       throw new SlickException(
           "DistributedBackend does not currently support transactions")
 
-    def force() {
+    def force()
       sessions.foreach(_.force)
-    }
 
     def withTransaction[T](f: => T) =
       throw new SlickException(
           "DistributedBackend does not currently support transactions")
-  }
-}
 
 object DistributedBackend extends DistributedBackend

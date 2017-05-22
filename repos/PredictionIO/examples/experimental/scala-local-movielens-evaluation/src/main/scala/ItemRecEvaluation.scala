@@ -18,8 +18,8 @@ import io.prediction.controller.WorkflowParams
 import com.github.nscala_time.time.Imports._
 
 // Recommend to run with "--driver-memory 2G"
-object ItemRecEvaluation1 {
-  def main(args: Array[String]) {
+object ItemRecEvaluation1
+  def main(args: Array[String])
     val engine = ItemRecEngine()
 
     val dsp = EventsDataSourceParams(
@@ -69,5 +69,3 @@ object ItemRecEvaluation1 {
         evaluatorClassOpt = Some(classOf[ItemRecEvaluator]),
         evaluatorParams = evaluatorParams
     )
-  }
-}

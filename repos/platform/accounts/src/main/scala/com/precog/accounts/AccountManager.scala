@@ -35,7 +35,7 @@ import scalaz.syntax.traverse._
 import scalaz.std.stream._
 import scalaz.syntax.std.option._
 
-trait AccountManager[M[+ _]] extends AccountFinder[M] {
+trait AccountManager[M[+ _]] extends AccountFinder[M]
   import Account._
 
   implicit def M: Monad[M]
@@ -48,26 +48,23 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
   def updateAccount(account: Account): M[Boolean]
 
   def updateAccountPassword(
-      account: Account, newPassword: String): M[Boolean] = {
+      account: Account, newPassword: String): M[Boolean] =
     val salt = randomSalt()
     updateAccount(
         account.copy(passwordHash = saltAndHashSHA256(newPassword, salt),
                      passwordSalt = salt,
                      lastPasswordChangeTime = Some(new DateTime)))
-  }
 
   def resetAccountPassword(accountId: AccountId,
                            tokenId: ResetTokenId,
-                           newPassword: String): M[String \/ Boolean] = {
-    findAccountByResetToken(accountId, tokenId).flatMap {
+                           newPassword: String): M[String \/ Boolean] =
+    findAccountByResetToken(accountId, tokenId).flatMap
       case errD @ -\/(error) => M.point(errD)
       case \/-(account) =>
-        for {
+        for
           updated <- updateAccountPassword(account, newPassword)
           _ <- markResetTokenUsed(tokenId)
-        } yield \/-(updated)
-    }
-  }
+        yield \/-(updated)
 
   def generateResetToken(accountId: Account): M[ResetTokenId]
 
@@ -78,35 +75,32 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
 
   // The accountId is used here as a sanity/security check only, not for lookup
   def findAccountByResetToken(
-      accountId: AccountId, tokenId: ResetTokenId): M[String \/ Account] = {
+      accountId: AccountId, tokenId: ResetTokenId): M[String \/ Account] =
     logger.debug("Locating account for token id %s, account id %s".format(
             tokenId, accountId))
-    findResetToken(accountId, tokenId).flatMap {
+    findResetToken(accountId, tokenId).flatMap
       case Some(token) =>
-        if (token.expiresAt.isBefore(new DateTime)) {
+        if (token.expiresAt.isBefore(new DateTime))
           logger.warn("Located expired reset token: " + token)
           M.point(-\/("Reset token %s has expired".format(tokenId)))
-        } else if (token.usedAt.nonEmpty) {
+        else if (token.usedAt.nonEmpty)
           logger.warn(
               "Reset attempted with previously used reset token: " + token)
           M.point(-\/("Reset token %s has already been used".format(tokenId)))
-        } else if (token.accountId != accountId) {
+        else if (token.accountId != accountId)
           logger.debug(
               "Located reset token, but with the wrong account (expected %s): %s"
                 .format(accountId, token))
           M.point(-\/("Reset token %s does not match provided account %s"
                     .format(tokenId, accountId)))
-        } else {
+        else
           logger.debug("Located reset token " + token)
           findAccountById(token.accountId)
             .map(_.\/>("Could not find account by id " + token.accountId))
-        }
 
       case None =>
         logger.warn("Could not locate reset token for id " + tokenId)
         M.point(-\/("No reset token found for id " + tokenId))
-    }
-  }
 
   def createAccount(email: String,
                     password: String,
@@ -119,25 +113,21 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
   def findAccountByEmail(email: String): M[Option[Account]]
 
   def hasAncestor(child: Account, ancestor: Account)(
-      implicit M: Monad[M]): M[Boolean] = {
-    if (child == ancestor) {
+      implicit M: Monad[M]): M[Boolean] =
+    if (child == ancestor)
       true.point[M]
-    } else {
-      child.parentId map { id =>
-        findAccountById(id) flatMap {
+    else
+      child.parentId map  id =>
+        findAccountById(id) flatMap
           case None => false.point[M]
           case Some(`child`) => false.point[M] // avoid infinite loops
           case Some(parent) => hasAncestor(parent, ancestor)
-        }
-      } getOrElse {
+      getOrElse
         false.point[M]
-      }
-    }
-  }
 
   def authAccount(email: String, password: String)(
-      implicit M: Monad[M]): M[Validation[String, Account]] = {
-    findAccountByEmail(email) map {
+      implicit M: Monad[M]): M[Validation[String, Account]] =
+    findAccountByEmail(email) map
       case Some(account)
           if account.passwordHash == saltAndHashSHA1(password,
                                                      account.passwordSalt) ||
@@ -148,8 +138,5 @@ trait AccountManager[M[+ _]] extends AccountFinder[M] {
         Success(account)
       case Some(account) => Failure("password mismatch")
       case None => Failure("account not found")
-    }
-  }
 
   def deleteAccount(accountId: AccountId): M[Option[Account]]
-}

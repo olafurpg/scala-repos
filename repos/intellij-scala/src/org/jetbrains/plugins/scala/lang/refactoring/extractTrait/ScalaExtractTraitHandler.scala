@@ -31,47 +31,42 @@ import scala.collection.mutable
   * Nikolay.Tropin
   * 2014-05-20
   */
-class ScalaExtractTraitHandler extends RefactoringActionHandler {
+class ScalaExtractTraitHandler extends RefactoringActionHandler
 
   val REFACTORING_NAME = ScalaBundle.message("extract.trait.title")
 
   override def invoke(project: Project,
                       editor: Editor,
                       file: PsiFile,
-                      dataContext: DataContext) = {
+                      dataContext: DataContext) =
     val offset: Int = editor.getCaretModel.getOffset
     editor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     val element: PsiElement = file.findElementAt(offset)
     val clazz =
       PsiTreeUtil.getParentOfType(element, classOf[ScTemplateDefinition])
     invokeOnClass(clazz, project, editor)
-  }
 
   override def invoke(project: Project,
                       elements: Array[PsiElement],
-                      dataContext: DataContext) = {
-    val clazz = elements match {
+                      dataContext: DataContext) =
+    val clazz = elements match
       case Array(clazz: ScTemplateDefinition) => clazz
       case _ =>
         val parent = PsiTreeUtil.findCommonParent(elements: _*)
         PsiTreeUtil.getParentOfType(
             parent, classOf[ScTemplateDefinition], false)
-    }
 
-    if (dataContext != null) {
+    if (dataContext != null)
       val editor: Editor = CommonDataKeys.EDITOR.getData(dataContext)
-      if (editor != null && clazz != null) {
+      if (editor != null && clazz != null)
         invokeOnClass(clazz, project, editor)
-      }
-    }
-  }
 
   @TestOnly
   def testInvoke(project: Project,
                  editor: Editor,
                  file: PsiFile,
                  onlyDeclarations: Boolean,
-                 onlyFirstMember: Boolean) {
+                 onlyFirstMember: Boolean)
     val offset: Int = editor.getCaretModel.getOffset
     editor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     val element: PsiElement = file.findElementAt(offset)
@@ -84,11 +79,11 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     extractInfo.collect()
     val messages = extractInfo.conflicts.values().asScala
     if (messages.nonEmpty) throw new RuntimeException(messages.mkString("\n"))
-    inWriteCommandAction(project, "Extract trait") {
+    inWriteCommandAction(project, "Extract trait")
       val traitText = "trait ExtractedTrait {\n\n}"
       val newTrt = ScalaPsiElementFactory.createTemplateDefinitionFromText(
           traitText, clazz.getContext, clazz)
-      val newTrtAdded = clazz match {
+      val newTrtAdded = clazz match
         case anon: ScNewTemplateDefinition =>
           val tBody =
             PsiTreeUtil.getParentOfType(anon, classOf[ScTemplateBody], true)
@@ -96,13 +91,10 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
             tBody.addBefore(newTrt, tBody.getLastChild).asInstanceOf[ScTrait]
           added
         case _ => clazz.getParent.addAfter(newTrt, clazz).asInstanceOf[ScTrait]
-      }
       finishExtractTrait(newTrtAdded, extractInfo)
-    }
-  }
 
   private def invokeOnClass(
-      clazz: ScTemplateDefinition, project: Project, editor: Editor) {
+      clazz: ScTemplateDefinition, project: Project, editor: Editor)
     if (clazz == null) return
 
     UsageTrigger.trigger(ScalaBundle.message("extract.trait.id"))
@@ -122,13 +114,11 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     val name = dialog.getTraitName
     val packName = dialog.getPackageName
 
-    inWriteCommandAction(project, "Extract trait") {
+    inWriteCommandAction(project, "Extract trait")
       val newTrait = createTraitFromTemplate(name, packName, clazz)
       finishExtractTrait(newTrait, extractInfo)
-    }
-  }
 
-  private def finishExtractTrait(trt: ScTrait, extractInfo: ExtractInfo) {
+  private def finishExtractTrait(trt: ScTrait, extractInfo: ExtractInfo)
     val memberInfos = extractInfo.memberInfos
     val clazz = extractInfo.clazz
 
@@ -138,10 +128,9 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
     val pullUpProcessor = new ScalaPullUpProcessor(
         clazz.getProject, clazz, trt, memberInfos)
     pullUpProcessor.moveMembersToBase()
-  }
 
-  private def addSelfType(trt: ScTrait, selfTypeText: Option[String]) {
-    selfTypeText match {
+  private def addSelfType(trt: ScTrait, selfTypeText: Option[String])
+    selfTypeText match
       case None =>
       case Some(selfTpe) =>
         val traitText = s"trait ${trt.name} {\n$selfTpe\n}"
@@ -150,52 +139,46 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
               traitText, trt.getParent, trt)
         val selfTypeElem = dummyTrait.extendsBlock.selfTypeElement.get
         val extendsBlock = trt.extendsBlock
-        val templateBody = extendsBlock.templateBody match {
+        val templateBody = extendsBlock.templateBody match
           case Some(tb) => tb
           case None =>
             extendsBlock.add(
                 ScalaPsiElementFactory.createTemplateBody(trt.getManager))
-        }
 
         val lBrace = templateBody.getFirstChild
         val ste = templateBody.addAfter(selfTypeElem, lBrace)
         templateBody.addAfter(
             ScalaPsiElementFactory.createNewLine(trt.getManager), lBrace)
         ScalaPsiUtil.adjustTypes(ste)
-    }
-  }
 
-  private def addTypeParameters(trt: ScTrait, typeParamsText: String) {
+  private def addTypeParameters(trt: ScTrait, typeParamsText: String)
     if (typeParamsText == null || typeParamsText.isEmpty) return
     val clause =
       ScalaPsiElementFactory.createTypeParameterClauseFromTextWithContext(
           typeParamsText, trt, trt.nameId)
     trt.addAfter(clause, trt.nameId)
-  }
 
   private def createTraitFromTemplate(name: String,
                                       packageName: String,
-                                      clazz: ScTemplateDefinition): ScTrait = {
+                                      clazz: ScTemplateDefinition): ScTrait =
     val currentPackageName = ExtractSuperUtil.packageName(clazz)
     val dir =
       if (packageName == currentPackageName)
         clazz.getContainingFile.getContainingDirectory
-      else {
+      else
         val pckg =
           JavaPsiFacade.getInstance(clazz.getProject).findPackage(packageName)
         if (pckg == null || pckg.getDirectories.isEmpty)
           throw new IllegalArgumentException(
               "Cannot find directory for new trait")
         else pckg.getDirectories()(0)
-      }
     ScalaDirectoryService
       .createClassFromTemplate(
           dir, name, "Scala Trait", askToDefineVariables = false)
       .asInstanceOf[ScTrait]
-  }
 
   private class ExtractInfo(val clazz: ScTemplateDefinition,
-                            val memberInfos: Seq[ScalaExtractMemberInfo]) {
+                            val memberInfos: Seq[ScalaExtractMemberInfo])
     private val classesForSelfType = mutable.Set[PsiClass]()
     private val selected = memberInfos.map(_.getMember)
     private var currentMemberName: String = null
@@ -204,66 +187,52 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
       new MultiMap[PsiElement, String]
 
     private def forMember[T](elem: PsiElement)(
-        action: PsiMember => Option[T]): Option[T] = {
-      elem match {
+        action: PsiMember => Option[T]): Option[T] =
+      elem match
         case ScalaPsiUtil.inNameContext(m: ScMember) => action(m)
         case m: PsiMember => action(m)
         case _ => None
-      }
-    }
 
-    private object inSameClassOrAncestor {
-      def unapply(elem: PsiElement): Option[(PsiMember, PsiClass)] = {
-        forMember(elem) { m =>
-          m.containingClass match {
+    private object inSameClassOrAncestor
+      def unapply(elem: PsiElement): Option[(PsiMember, PsiClass)] =
+        forMember(elem)  m =>
+          m.containingClass match
             case null => None
             case `clazz` => Some(m, clazz)
             case c if clazz.isInheritor(c, deep = true) => Some(m, c)
             case _ => None
-          }
-        }
-      }
-    }
 
-    private object inSelfType {
-      def unapply(elem: PsiElement): Option[PsiClass] = {
+    private object inSelfType
+      def unapply(elem: PsiElement): Option[PsiClass] =
         val selfTypeOfClazz = clazz.extendsBlock.selfType
         if (selfTypeOfClazz.isEmpty) return None
 
-        forMember(elem) { m =>
-          m.containingClass match {
+        forMember(elem)  m =>
+          m.containingClass match
             case null => None
             case c if selfTypeOfClazz.get.conforms(ScType.designator(c)) =>
               Some(c)
             case _ => None
-          }
-        }
-      }
-    }
 
-    private def addToClassesForSelfType(cl: PsiClass) {
+    private def addToClassesForSelfType(cl: PsiClass)
       if (!classesForSelfType.contains(cl) &&
-          !classesForSelfType.exists(_.isInheritor(cl, true))) {
+          !classesForSelfType.exists(_.isInheritor(cl, true)))
         classesForSelfType --=
           classesForSelfType.filter(cl.isInheritor(_, true))
         classesForSelfType += cl
-      }
-    }
 
-    private def collectForSelfType(resolve: PsiElement) {
-      resolve match {
+    private def collectForSelfType(resolve: PsiElement)
+      resolve match
         case inSameClassOrAncestor(m, cl: PsiClass) if !selected.contains(m) =>
           addToClassesForSelfType(cl)
         case inSelfType(cl) => addToClassesForSelfType(cl)
         case _ =>
-      }
-    }
 
     private def collectConflicts(
-        ref: ScReferenceElement, resolve: PsiElement) {
-      resolve match {
+        ref: ScReferenceElement, resolve: PsiElement)
+      resolve match
         case named: PsiNamedElement =>
-          ScalaPsiUtil.nameContext(named) match {
+          ScalaPsiUtil.nameContext(named) match
             case m: ScMember if m.containingClass == clazz && m.isPrivate =>
               val message = ScalaBundle.message(
                   "private.member.cannot.be.used.in.extracted.member",
@@ -287,84 +256,66 @@ class ScalaExtractTraitHandler extends RefactoringActionHandler {
                   currentMemberName)
               conflicts.putValue(m, message)
             case _ =>
-          }
         case _ =>
-      }
-    }
 
-    private def collectTypeParameters(resolve: PsiElement) {
-      val visitor = new ScalaRecursiveElementVisitor {
-        override def visitReference(ref: ScReferenceElement) = {
-          ref.resolve() match {
+    private def collectTypeParameters(resolve: PsiElement)
+      val visitor = new ScalaRecursiveElementVisitor
+        override def visitReference(ref: ScReferenceElement) =
+          ref.resolve() match
             case tp: ScTypeParam => typeParams += tp
             case _ =>
-          }
-        }
-      }
 
-      resolve match {
+      resolve match
         case typeParam: ScTypeParam if typeParam.owner == clazz =>
           typeParams += typeParam
           typeParam.accept(visitor)
         case _ =>
-      }
-    }
 
-    def collect() {
-      val visitor = new ScalaRecursiveElementVisitor {
-        override def visitReference(ref: ScReferenceElement) {
+    def collect()
+      val visitor = new ScalaRecursiveElementVisitor
+        override def visitReference(ref: ScReferenceElement)
           val resolve = ref.resolve()
           collectForSelfType(resolve)
           collectConflicts(ref, resolve)
           collectTypeParameters(resolve)
-        }
-      }
 
-      for {
+      for
         info <- memberInfos
         member = info.getMember
-      } {
+      
         currentMemberName = info.getDisplayName
         if (info.isToAbstract)
-          member.children.foreach {
+          member.children.foreach
             case _: ScExpression =>
             case other => other.accept(visitor)
-          } else member.accept(visitor)
-      }
+          else member.accept(visitor)
 
-      classesForSelfType.foreach {
+      classesForSelfType.foreach
         case cl: PsiClass if cl.getTypeParameters.nonEmpty =>
           val message = ScalaBundle.message(
               "type.parameters.for.self.type.not.supported", cl.name)
           conflicts.putValue(cl, message)
         case _ =>
-      }
-    }
 
-    def selfTypeText: Option[String] = {
+    def selfTypeText: Option[String] =
       val alias = clazz.extendsBlock.selfTypeElement.fold("this")(_.name)
 
-      val typeText = classesForSelfType.map {
+      val typeText = classesForSelfType.map
         case obj: ScObject => s"${obj.qualifiedName}.type"
         case cl: ScTypeDefinition => cl.qualifiedName
         case cl: PsiClass => cl.getQualifiedName
-      }.mkString(" with ")
+      .mkString(" with ")
 
-      if (classesForSelfType.nonEmpty) {
+      if (classesForSelfType.nonEmpty)
         val arrow = ScalaPsiUtil.functionArrow(clazz.getProject)
         Some(s"$alias: $typeText $arrow")
-      } else None
-    }
+      else None
 
-    def typeParameters: String = {
+    def typeParameters: String =
       val paramTexts =
         typeParams.toSeq.sortBy(_.getOffsetInFile).map(_.getText)
       if (paramTexts.isEmpty) "" else paramTexts.mkString("[", ", ", "]")
-    }
 
-    def typeArgs: String = {
+    def typeArgs: String =
       val names = typeParams.toSeq.sortBy(_.getOffsetInFile).map(_.name)
       if (names.isEmpty) "" else names.mkString("[", ", ", "]")
-    }
-  }
-}

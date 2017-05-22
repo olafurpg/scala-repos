@@ -21,7 +21,7 @@ case class ApiPullRequestReviewComment(
     created_at: Date, // "2015-05-05T23:40:27Z",
     updated_at: Date // "2015-05-05T23:40:27Z",
 )(repositoryName: RepositoryName, issueId: Int)
-    extends FieldSerializable {
+    extends FieldSerializable
   // "url": "https://api.github.com/repos/baxterthehacker/public-repo/pulls/comments/29724692",
   val url = ApiPath(
       s"/api/v3/repos/${repositoryName.fullName}/pulls/comments/${id}")
@@ -48,9 +48,8 @@ case class ApiPullRequestReviewComment(
   val _links = Map("self" -> Map("href" -> url),
                    "html" -> Map("href" -> html_url),
                    "pull_request" -> Map("href" -> pull_request_url))
-}
 
-object ApiPullRequestReviewComment {
+object ApiPullRequestReviewComment
   def apply(comment: CommitComment,
             commentedUser: ApiUser,
             repositoryName: RepositoryName,
@@ -64,4 +63,3 @@ object ApiPullRequestReviewComment {
         created_at = comment.registeredDate,
         updated_at = comment.updatedDate
     )(repositoryName, issueId)
-}

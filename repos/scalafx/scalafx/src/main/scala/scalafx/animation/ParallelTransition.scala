@@ -40,7 +40,7 @@ import scalafx.scene.Node
   *
   * @define PT `ParallelTransition`
   */
-object ParallelTransition extends AnimationStatics {
+object ParallelTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $PT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/ParallelTransition.html $PT]],
@@ -52,7 +52,6 @@ object ParallelTransition extends AnimationStatics {
   implicit def sfxParallelTransition2jfx(
       v: ParallelTransition): jfxa.ParallelTransition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/ParallelTransition.html $PT]].
@@ -70,7 +69,7 @@ object ParallelTransition extends AnimationStatics {
   */
 class ParallelTransition(
     override val delegate: jfxa.ParallelTransition = new jfxa.ParallelTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.ParallelTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.ParallelTransition]
 
   // CONSTRUCTORS
 
@@ -104,9 +103,8 @@ class ParallelTransition(
     * This $ND is used in all child $TRS, that do not define a target `Node` themselves.
     */
   def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-  def node_=(n: Node) {
+  def node_=(n: Node)
     node() = n
-  }
 
   // METHODS
 
@@ -120,7 +118,5 @@ class ParallelTransition(
     *
     * @param c list of $ANS to replace prior content.
     */
-  def children_=(c: Iterable[Animation]) {
+  def children_=(c: Iterable[Animation])
     fillSFXCollection(this.children, c)
-  }
-}

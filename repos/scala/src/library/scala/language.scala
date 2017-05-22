@@ -31,7 +31,7 @@ package scala
   *  @groupname experimental Experimental Language Features
   *  @groupprio experimental 10
   */
-object language {
+object language
 
   import languageFeature._
 
@@ -163,7 +163,7 @@ object language {
     *
     *  @group experimental
     */
-  object experimental {
+  object experimental
 
     import languageFeature.experimental._
 
@@ -179,5 +179,3 @@ object language {
       *  to debug and understand.
       */
     implicit lazy val macros: macros = languageFeature.experimental.macros
-  }
-}

@@ -7,7 +7,7 @@ import slick.ast.{FieldSymbol, BaseTypedType}
   * Implicit JdbcTypes for the standard types are provided by the profile. */
 trait JdbcType[
     @specialized(Byte, Short, Int, Long, Char, Float, Double, Boolean) T]
-    extends BaseTypedType[T] { self =>
+    extends BaseTypedType[T]  self =>
 
   /** The constant from java.sql.Types that is used for setting parameters of the type to NULL. */
   def sqlType: Int
@@ -23,10 +23,9 @@ trait JdbcType[
 
   /** Set an Option parameter of the type. */
   final def setOption(v: Option[T], p: PreparedStatement, idx: Int): Unit =
-    v match {
+    v match
       case Some(v) => setValue(v, p, idx)
       case None => setNull(p, idx)
-    }
 
   /** Get a result column of the type. For reference types, SQL NULL values
     * are returned as `null`, for primitive types a default value is returned. */
@@ -54,4 +53,3 @@ trait JdbcType[
   def hasLiteralForm: Boolean
 
   override def toString = scalaType.toString + "'"
-}

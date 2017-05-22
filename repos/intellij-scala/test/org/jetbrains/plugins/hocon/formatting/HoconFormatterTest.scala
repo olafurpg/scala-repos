@@ -11,9 +11,9 @@ import org.junit.runners.AllTests
 object HoconFormatterTest extends TestSuiteCompanion[HoconFormatterTest]
 
 @RunWith(classOf[AllTests])
-class HoconFormatterTest extends HoconFileSetTestCase("formatter") {
+class HoconFormatterTest extends HoconFileSetTestCase("formatter")
 
-  protected def transform(data: Seq[String]): String = {
+  protected def transform(data: Seq[String]): String =
     val Seq(settingsXml, input) = data
 
     val settings = CodeStyleSettingsManager.getSettings(getProject)
@@ -21,13 +21,10 @@ class HoconFormatterTest extends HoconFileSetTestCase("formatter") {
 
     val psiFile = createPseudoPhysicalHoconFile(getProject, input)
 
-    inWriteCommandAction {
+    inWriteCommandAction
       val TextRange(start, end) = psiFile.getTextRange
       CodeStyleManager
         .getInstance(getProject)
         .reformatText(psiFile, start, end)
-    }
 
     psiFile.getText
-  }
-}

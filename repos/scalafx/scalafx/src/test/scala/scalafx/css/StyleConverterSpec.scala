@@ -42,10 +42,9 @@ class StyleConverterSpec
     extends SimpleSFXDelegateSpec[
         jfxcss.StyleConverter[String, String], StyleConverter[String, String]](
         classOf[jfxcss.StyleConverter[String, String]],
-        classOf[StyleConverter[String, String]]) {
+        classOf[StyleConverter[String, String]])
 
   override protected def getScalaClassInstance = StyleConverter.stringConverter
 
   override protected def getJavaClassInstance =
     jfxcss.StyleConverter.getStringConverter
-}

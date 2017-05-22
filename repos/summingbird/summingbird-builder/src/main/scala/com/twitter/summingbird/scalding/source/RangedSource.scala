@@ -30,9 +30,7 @@ import java.util.Date
   * the source is always filtered before use, so it never uses
   * events with timestamp outside the range.
   */
-object RangedSource {
+object RangedSource
   def apply[Event](fn: DateRange => Mappable[Event]) =
-    new OfflineSource[Event] {
+    new OfflineSource[Event]
       def scaldingSource(range: DateRange) = fn(range.embiggen(Hours(1)))
-    }
-}

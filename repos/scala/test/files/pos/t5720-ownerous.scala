@@ -19,7 +19,7 @@
       qual$1.copy("baz")(x$6)
     }
  */
-class C {
+class C
   case class M(currentUser: String = "anon")(val message: String = "empty")
   val m = M("foo")()
 
@@ -36,15 +36,12 @@ class C {
   case class N(currentUser: String = "anon")
   val n = N("fun")
   def nudel = Option(n).getOrElse(N()).copy()
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val c = new C
     println(c.model.currentUser)
     println(c.model.message)
-  }
-}
 /*
 symbol value x$4$1 does not exist in badcopy.C.model
 at scala.reflect.internal.SymbolTable.abort(SymbolTable.scala:45)

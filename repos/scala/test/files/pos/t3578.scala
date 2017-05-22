@@ -1,8 +1,8 @@
-object Test {
-  sealed abstract class JValue {
-    def ++(other: JValue) = {
+object Test
+  sealed abstract class JValue
+    def ++(other: JValue) =
       def append(value1: JValue, value2: JValue): JValue =
-        (value1, value2) match {
+        (value1, value2) match
           case (JNothing, x) => x
           case (x, JNothing) => x
           case (JObject(xs), x: JField) => JObject(xs ::: List(x))
@@ -13,10 +13,7 @@ object Test {
           case (f1: JField, f2: JField) => JObject(f1 :: f2 :: Nil)
           case (JField(n, v1), v2: JValue) => JField(n, append(v1, v2))
           case (x, y) => JArray(x :: y :: Nil)
-        }
       append(this, other)
-    }
-  }
 
   case object JNothing extends JValue
   case object JNull extends JValue
@@ -27,4 +24,3 @@ object Test {
   case class JField(name: String, value: JValue) extends JValue
   case class JObject(obj: List[JField]) extends JValue
   case class JArray(arr: List[JValue]) extends JValue
-}

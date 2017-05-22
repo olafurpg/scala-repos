@@ -16,7 +16,7 @@ package transform
   *
   * Concretely, enteringPhase(p) { sym.info } yields the info *before* phase p has transformed it. Imagine you're a phase and it all makes sense.
   */
-trait InfoTransform extends Transform {
+trait InfoTransform extends Transform
   import global.{Symbol, Type, InfoTransformer, infoTransformers}
 
   def transformInfo(sym: Symbol, tpe: Type): Type
@@ -27,17 +27,13 @@ trait InfoTransform extends Transform {
   protected def changesBaseClasses = true
   protected def keepsTypeParams = true
 
-  class Phase(prev: scala.tools.nsc.Phase) extends super.Phase(prev) {
+  class Phase(prev: scala.tools.nsc.Phase) extends super.Phase(prev)
     override val keepsTypeParams = InfoTransform.this.keepsTypeParams
 
-    if (infoTransformers.nextFrom(id).pid != id) {
+    if (infoTransformers.nextFrom(id).pid != id)
       // this phase is not yet in the infoTransformers
-      val infoTransformer = new InfoTransformer {
+      val infoTransformer = new InfoTransformer
         val pid = id
         val changesBaseClasses = InfoTransform.this.changesBaseClasses
         def transform(sym: Symbol, tpe: Type): Type = transformInfo(sym, tpe)
-      }
       infoTransformers insert infoTransformer
-    }
-  }
-}

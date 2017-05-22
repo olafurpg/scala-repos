@@ -36,7 +36,7 @@ import org.saddle.util.Concat.Promoter
   */
 class IndexTime(val times: Index[Long],
                 val tzone: DateTimeZone = ISO_CHRONO.getZone)
-    extends Index[DateTime] {
+    extends Index[DateTime]
 
   @transient lazy val scalarTag = ScalarTagTime
 
@@ -50,7 +50,7 @@ class IndexTime(val times: Index[Long],
     if (scalarTag.isMissing(t)) lmf.missing else t.getMillis
   private def il2it(l: Index[Long]) = new IndexTime(l, tzone)
 
-  @transient lazy private val _locator = new Locator[DateTime] {
+  @transient lazy private val _locator = new Locator[DateTime]
     lazy val _keys = times.uniques.map(l2t)
 
     def contains(key: DateTime) = times.contains(t2l(key))
@@ -66,7 +66,6 @@ class IndexTime(val times: Index[Long],
     // these should not be accessible
     def put(key: DateTime, value: Int) { throw new IllegalAccessError() }
     def inc(key: DateTime) = throw new IllegalAccessError()
-  }
 
   protected def locator = _locator
 
@@ -107,15 +106,13 @@ class IndexTime(val times: Index[Long],
   def slice(from: Int, until: Int, stride: Int) =
     il2it(times.slice(from, until, stride))
 
-  def intersect(other: Index[DateTime]) = {
+  def intersect(other: Index[DateTime]) =
     val tmp = times.intersect(getTimes(other))
     ReIndexer(tmp.lTake, tmp.rTake, il2it(tmp.index))
-  }
 
-  def union(other: Index[DateTime]) = {
+  def union(other: Index[DateTime]) =
     val tmp = times.union(getTimes(other))
     ReIndexer(tmp.lTake, tmp.rTake, il2it(tmp.index))
-  }
 
   // default implementation, could be sped up in specialized instances
   def isMonotonic = times.isMonotonic
@@ -129,40 +126,34 @@ class IndexTime(val times: Index[Long],
   def reversed: IndexTime = il2it(times.reversed)
 
   // sql-style joins
-  def join(other: Index[DateTime], how: JoinType) = {
+  def join(other: Index[DateTime], how: JoinType) =
     val tmp = times.join(getTimes(other), how)
     ReIndexer(tmp.lTake, tmp.rTake, il2it(tmp.index))
-  }
 
-  private def getTimes(other: Index[DateTime]): Index[Long] = other match {
+  private def getTimes(other: Index[DateTime]): Index[Long] = other match
     case ts: IndexTime => ts.times
     case _ => other.map(t2l)
-  }
 
-  override def getIndexer(other: Index[DateTime]): Option[Array[Int]] = {
+  override def getIndexer(other: Index[DateTime]): Option[Array[Int]] =
     val otherTs = getTimes(other)
     val ixer = times.join(otherTs, index.RightJoin)
     require(ixer.index.length == other.length, "Could not reindex uniquely")
     ixer.lTake
-  }
 
   // maps
 
   def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](f: DateTime => B) =
     times.map(v => f(new DateTime(v, chrono)))
 
-  private[saddle] def toArray = {
+  private[saddle] def toArray =
     val arr = array.empty[DateTime](length)
     var i = 0
-    while (i < length) {
+    while (i < length)
       arr(i) = l2t(times.raw(i))
       i += 1
-    }
     arr
-  }
-}
 
-object IndexTime {
+object IndexTime
   @transient lazy private val st = ScalarTagTime
   @transient lazy private val sl = ScalarTagLong
 
@@ -175,14 +166,11 @@ object IndexTime {
     * Create a new IndexTime from a Vec of times, with an attached timezone
     */
   def apply(times: Vec[DateTime],
-            tzone: DateTimeZone = ISO_CHRONO.getZone): IndexTime = {
+            tzone: DateTimeZone = ISO_CHRONO.getZone): IndexTime =
     val millis = array.empty[Long](times.length)
     var i = 0
-    while (i < millis.length) {
+    while (i < millis.length)
       val t = times(i)
       millis(i) = if (st.isMissing(t)) sl.missing else t.getMillis
       i += 1
-    }
     new IndexTime(Index(millis), tzone)
-  }
-}

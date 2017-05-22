@@ -1,4 +1,4 @@
-trait T {
+trait T
 
   def id(i: Int) = i
   def f(i: Int)(j: Int) = i + j
@@ -9,4 +9,3 @@ trait T {
   val x = f
   val y = g
   val z = h
-}

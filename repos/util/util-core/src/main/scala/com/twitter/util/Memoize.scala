@@ -4,21 +4,20 @@ import java.util.concurrent.{CountDownLatch => JCountDownLatch}
 
 import scala.annotation.tailrec
 
-object Memoize {
+object Memoize
 
   /**
     * A Snappable is a memoized function for which a
     * [[scala.collection.immutable.Map]] of the currently memoized computations
     * can be obtained.
     */
-  trait Snappable[A, B] extends (A => B) {
+  trait Snappable[A, B] extends (A => B)
 
     /**
       * Produces a snapshot of the currently memoized computations, as a
       * [[scala.collection.immutable.Map]]
       */
     def snap: Map[A, B]
-  }
 
   /**
     * Thread-safe memoization for a function.
@@ -53,22 +52,21 @@ object Memoize {
     * memoization for a function.
     */
   def snappable[A, B](f: A => B): Snappable[A, B] =
-    new Snappable[A, B] {
+    new Snappable[A, B]
       private[this] var memo = Map.empty[A, Either[JCountDownLatch, B]]
 
       def snap: Map[A, B] =
-        synchronized(memo) collect {
+        synchronized(memo) collect
           case (a, Right(b)) => (a, b)
-        }
 
       /**
         * What to do if we do not find the value already in the memo
         * table.
         */
       @tailrec private[this] def missing(a: A): B =
-        synchronized {
+        synchronized
           // With the lock, check to see what state the value is in.
-          memo.get(a) match {
+          memo.get(a) match
             case None =>
               // If it's missing, then claim the slot by putting in a
               // CountDownLatch that will be completed when the value is
@@ -85,8 +83,7 @@ object Memoize {
               // This is either the latch that will indicate that the
               // work has been done, or the computed value.
               Right(other)
-          }
-        } match {
+        match
           case Right(Right(b)) =>
             // The computation is already done.
             b
@@ -102,9 +99,9 @@ object Memoize {
 
           case Left(latch) =>
             // Compute the value outside of the synchronized block.
-            val b = try {
+            val b = try
               f(a)
-            } catch {
+            catch
               case t: Throwable =>
                 // If there was an exception running the
                 // computation, then we need to make sure we do not
@@ -113,7 +110,6 @@ object Memoize {
                 synchronized { memo = memo - a }
                 latch.countDown()
                 throw t
-            }
 
             // Update the memo table to indicate that the work has
             // been done, and signal to any waiting threads that the
@@ -121,15 +117,11 @@ object Memoize {
             synchronized { memo = memo + (a -> Right(b)) }
             latch.countDown()
             b
-        }
 
       override def apply(a: A): B =
         // Look in the (possibly stale) memo table. If the value is
         // present, then it is guaranteed to be the final value. If it
         // is absent, call missing() to determine what to do.
-        memo.get(a) match {
+        memo.get(a) match
           case Some(Right(b)) => b
           case _ => missing(a)
-        }
-    }
-}

@@ -33,7 +33,7 @@ import org.junit.Assert._
 @deprecated(
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
-class SyncProducerTest extends KafkaServerTestHarness {
+class SyncProducerTest extends KafkaServerTestHarness
   private val messageBytes = new Array[Byte](2)
   // turning off controlled shutdown since testProducerCanTimeout() explicitly shuts down request handler pool.
   def generateConfigs() =
@@ -48,13 +48,12 @@ class SyncProducerTest extends KafkaServerTestHarness {
       timeout: Int = SyncProducerConfig.DefaultAckTimeoutMs,
       correlationId: Int = 0,
       clientId: String = SyncProducerConfig.DefaultClientId)
-    : ProducerRequest = {
+    : ProducerRequest =
     TestUtils.produceRequest(
         topic, partition, message, acks, timeout, correlationId, clientId)
-  }
 
   @Test
-  def testReachableServer() {
+  def testReachableServer()
     val server = servers.head
 
     val props =
@@ -62,7 +61,7 @@ class SyncProducerTest extends KafkaServerTestHarness {
 
     val producer = new SyncProducer(new SyncProducerConfig(props))
     val firstStart = SystemTime.milliseconds
-    try {
+    try
       val response = producer.send(
           produceRequest(
               "test",
@@ -71,14 +70,13 @@ class SyncProducerTest extends KafkaServerTestHarness {
                                        messages = new Message(messageBytes)),
               acks = 1))
       assertNotNull(response)
-    } catch {
+    catch
       case e: Exception =>
         fail("Unexpected failure sending message to broker. " + e.getMessage)
-    }
     val firstEnd = SystemTime.milliseconds
     assertTrue((firstEnd - firstStart) < 500)
     val secondStart = SystemTime.milliseconds
-    try {
+    try
       val response = producer.send(
           produceRequest(
               "test",
@@ -87,13 +85,12 @@ class SyncProducerTest extends KafkaServerTestHarness {
                                        messages = new Message(messageBytes)),
               acks = 1))
       assertNotNull(response)
-    } catch {
+    catch
       case e: Exception =>
         fail("Unexpected failure sending message to broker. " + e.getMessage)
-    }
     val secondEnd = SystemTime.milliseconds
     assertTrue((secondEnd - secondStart) < 500)
-    try {
+    try
       val response = producer.send(
           produceRequest(
               "test",
@@ -102,14 +99,12 @@ class SyncProducerTest extends KafkaServerTestHarness {
                                        messages = new Message(messageBytes)),
               acks = 1))
       assertNotNull(response)
-    } catch {
+    catch
       case e: Exception =>
         fail("Unexpected failure sending message to broker. " + e.getMessage)
-    }
-  }
 
   @Test
-  def testEmptyProduceRequest() {
+  def testEmptyProduceRequest()
     val server = servers.head
     val props =
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
@@ -129,10 +124,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
     val response = producer.send(emptyRequest)
     assertTrue(response != null)
     assertTrue(!response.hasError && response.status.size == 0)
-  }
 
   @Test
-  def testMessageSizeTooLarge() {
+  def testMessageSizeTooLarge()
     val server = servers.head
     val props =
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
@@ -168,10 +162,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
     assertEquals(
         Errors.NONE.code, response2.status(TopicAndPartition("test", 0)).error)
     assertEquals(0, response2.status(TopicAndPartition("test", 0)).offset)
-  }
 
   @Test
-  def testMessageSizeTooLargeWithAckZero() {
+  def testMessageSizeTooLargeWithAckZero()
     val server = servers.head
     val props =
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
@@ -196,7 +189,7 @@ class SyncProducerTest extends KafkaServerTestHarness {
     // Send another message whose size is large enough to exceed the buffer size so
     // the socket buffer will be flushed immediately;
     // this send should fail since the socket has been closed
-    try {
+    try
       producer.send(
           produceRequest(
               "test",
@@ -206,14 +199,12 @@ class SyncProducerTest extends KafkaServerTestHarness {
                   messages = new Message(
                         new Array[Byte](configs(0).messageMaxBytes + 1))),
               acks = 0))
-    } catch {
+    catch
       case e: java.io.IOException => // success
       case e2: Throwable => throw e2
-    }
-  }
 
   @Test
-  def testProduceCorrectlyReceivesResponse() {
+  def testProduceCorrectlyReceivesResponse()
     val server = servers.head
     val props =
       TestUtils.getSyncProducerConfig(server.socketServer.boundPort())
@@ -235,12 +226,11 @@ class SyncProducerTest extends KafkaServerTestHarness {
     assertNotNull(response)
     assertEquals(request.correlationId, response.correlationId)
     assertEquals(3, response.status.size)
-    response.status.values.foreach {
+    response.status.values.foreach
       case ProducerResponseStatus(error, nextOffset, timestamp) =>
         assertEquals(Errors.UNKNOWN_TOPIC_OR_PARTITION.code, error)
         assertEquals(-1L, nextOffset)
         assertEquals(Message.NoTimestamp, timestamp)
-    }
 
     // #2 - test that we get correct offsets when partition is owned by broker
     AdminUtils.createTopic(zkUtils, "topic1", 1, 1)
@@ -265,10 +255,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
     assertEquals(Errors.UNKNOWN_TOPIC_OR_PARTITION.code,
                  response2.status(TopicAndPartition("topic2", 0)).error)
     assertEquals(-1, response2.status(TopicAndPartition("topic2", 0)).offset)
-  }
 
   @Test
-  def testProducerCanTimeout() {
+  def testProducerCanTimeout()
     val timeoutMs = 500
 
     val server = servers.head
@@ -285,22 +274,20 @@ class SyncProducerTest extends KafkaServerTestHarness {
     server.requestHandlerPool.shutdown()
 
     val t1 = SystemTime.milliseconds
-    try {
+    try
       producer.send(request)
       fail(
           "Should have received timeout exception since request handling is stopped.")
-    } catch {
+    catch
       case e: SocketTimeoutException => /* success */
       case e: Throwable =>
         fail("Unexpected exception when expecting timeout: " + e)
-    }
     val t2 = SystemTime.milliseconds
     // make sure we don't wait fewer than timeoutMs for a response
     assertTrue((t2 - t1) >= timeoutMs)
-  }
 
   @Test
-  def testProduceRequestWithNoResponse() {
+  def testProduceRequestWithNoResponse()
     val server = servers.head
 
     val port = server.socketServer.boundPort(SecurityProtocol.PLAINTEXT)
@@ -318,10 +305,9 @@ class SyncProducerTest extends KafkaServerTestHarness {
     val producer = new SyncProducer(new SyncProducerConfig(props))
     val response = producer.send(emptyRequest)
     assertTrue(response == null)
-  }
 
   @Test
-  def testNotEnoughReplicas() {
+  def testNotEnoughReplicas()
     val topicName = "minisrtest"
     val server = servers.head
     val props =
@@ -345,5 +331,3 @@ class SyncProducerTest extends KafkaServerTestHarness {
 
     assertEquals(Errors.NOT_ENOUGH_REPLICAS.code,
                  response.status(TopicAndPartition(topicName, 0)).error)
-  }
-}

@@ -43,7 +43,7 @@ private[streaming] case class ReceiverTrackingInfo(
     runningExecutor: Option[ExecutorCacheTaskLocation],
     name: Option[String] = None,
     endpoint: Option[RpcEndpointRef] = None,
-    errorInfo: Option[ReceiverErrorInfo] = None) {
+    errorInfo: Option[ReceiverErrorInfo] = None)
 
   def toReceiverInfo: ReceiverInfo = ReceiverInfo(
       receiverId,
@@ -55,4 +55,3 @@ private[streaming] case class ReceiverTrackingInfo(
       lastError = errorInfo.map(_.lastError).getOrElse(""),
       lastErrorTime = errorInfo.map(_.lastErrorTime).getOrElse(-1L)
   )
-}

@@ -18,7 +18,7 @@ package shapeless.examples
 
 import shapeless._
 
-object Lift extends App {
+object Lift extends App
   import poly._
   import ops.function._
   import ops.hlist._
@@ -32,17 +32,14 @@ object Lift extends App {
       mapped: Mapped.Aux[InL, Option, OInL],
       mapper: Mapper.Aux[get.type, OInL, InL],
       folder: MapFolder[OInL, Boolean, isDefined.type],
-      fnfromp: FnFromProduct.Aux[OInL => Option[R], OutF]): OutF = {
+      fnfromp: FnFromProduct.Aux[OInL => Option[R], OutF]): OutF =
     (o: OInL) =>
       if (o.foldMap(true)(isDefined)(_ && _)) Some(f.toProduct(o map get))
       else None
-  }.fromProduct
+  .fromProduct
 
-  object isDefined extends (Option ~>> Boolean) {
+  object isDefined extends (Option ~>> Boolean)
     def apply[T](o: Option[T]) = o.isDefined
-  }
 
-  object get extends (Option ~> Id) {
+  object get extends (Option ~> Id)
     def apply[T](o: Option[T]) = o.get
-  }
-}

@@ -16,11 +16,10 @@ import generic._
   *  @define Coll `LinkedHashMap`
   *  @define coll linked hash map
   */
-object LinkedHashMap extends MutableMapFactory[LinkedHashMap] {
+object LinkedHashMap extends MutableMapFactory[LinkedHashMap]
   implicit def canBuildFrom[A, B]: CanBuildFrom[
       Coll, (A, B), LinkedHashMap[A, B]] = new MapCanBuildFrom[A, B]
   def empty[A, B] = new LinkedHashMap[A, B]
-}
 
 /** This class implements mutable maps using a hashtable.
   *  The iterator and all traversal methods of this class visit elements in the order they were inserted.
@@ -48,7 +47,7 @@ object LinkedHashMap extends MutableMapFactory[LinkedHashMap] {
 class LinkedHashMap[A, B]
     extends AbstractMap[A, B] with Map[A, B]
     with MapLike[A, B, LinkedHashMap[A, B]]
-    with HashTable[A, LinkedEntry[A, B]] with Serializable {
+    with HashTable[A, LinkedEntry[A, B]] with Serializable
 
   override def empty = LinkedHashMap.empty[A, B]
   override def size = tableSize
@@ -58,29 +57,25 @@ class LinkedHashMap[A, B]
   @transient protected var firstEntry: Entry = null
   @transient protected var lastEntry: Entry = null
 
-  def get(key: A): Option[B] = {
+  def get(key: A): Option[B] =
     val e = findEntry(key)
     if (e == null) None
     else Some(e.value)
-  }
 
-  override def put(key: A, value: B): Option[B] = {
+  override def put(key: A, value: B): Option[B] =
     val e = findOrAddEntry(key, value)
     if (e eq null) None
     else { val v = e.value; e.value = value; Some(v) }
-  }
 
-  override def remove(key: A): Option[B] = {
+  override def remove(key: A): Option[B] =
     val e = removeEntry(key)
     if (e eq null) None
-    else {
+    else
       if (e.earlier eq null) firstEntry = e.later
       else e.earlier.later = e.later
       if (e.later eq null) lastEntry = e.earlier
       else e.later.earlier = e.earlier
       Some(e.value)
-    }
-  }
 
   @deprecatedOverriding(
       "+= should not be overridden so it stays consistent with put.", "2.11.0")
@@ -91,90 +86,75 @@ class LinkedHashMap[A, B]
       "2.11.0")
   def -=(key: A): this.type = { remove(key); this }
 
-  def iterator: Iterator[(A, B)] = new AbstractIterator[(A, B)] {
+  def iterator: Iterator[(A, B)] = new AbstractIterator[(A, B)]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
       if (hasNext) { val res = (cur.key, cur.value); cur = cur.later; res } else
         Iterator.empty.next()
-  }
 
-  protected class FilteredKeys(p: A => Boolean) extends super.FilteredKeys(p) {
+  protected class FilteredKeys(p: A => Boolean) extends super.FilteredKeys(p)
     override def empty = LinkedHashMap.empty
-  }
 
   override def filterKeys(p: A => Boolean): scala.collection.Map[A, B] =
     new FilteredKeys(p)
 
-  protected class MappedValues[C](f: B => C) extends super.MappedValues[C](f) {
+  protected class MappedValues[C](f: B => C) extends super.MappedValues[C](f)
     override def empty = LinkedHashMap.empty
-  }
 
   override def mapValues[C](f: B => C): scala.collection.Map[A, C] =
     new MappedValues(f)
 
-  protected class DefaultKeySet extends super.DefaultKeySet {
+  protected class DefaultKeySet extends super.DefaultKeySet
     override def empty = LinkedHashSet.empty
-  }
 
   override def keySet: scala.collection.Set[A] = new DefaultKeySet
 
-  override def keysIterator: Iterator[A] = new AbstractIterator[A] {
+  override def keysIterator: Iterator[A] = new AbstractIterator[A]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
       if (hasNext) { val res = cur.key; cur = cur.later; res } else
         Iterator.empty.next()
-  }
 
-  override def valuesIterator: Iterator[B] = new AbstractIterator[B] {
+  override def valuesIterator: Iterator[B] = new AbstractIterator[B]
     private var cur = firstEntry
     def hasNext = cur ne null
     def next =
       if (hasNext) { val res = cur.value; cur = cur.later; res } else
         Iterator.empty.next()
-  }
 
-  override def foreach[U](f: ((A, B)) => U) {
+  override def foreach[U](f: ((A, B)) => U)
     var cur = firstEntry
-    while (cur ne null) {
+    while (cur ne null)
       f((cur.key, cur.value))
       cur = cur.later
-    }
-  }
 
-  protected override def foreachEntry[U](f: Entry => U) {
+  protected override def foreachEntry[U](f: Entry => U)
     var cur = firstEntry
-    while (cur ne null) {
+    while (cur ne null)
       f(cur)
       cur = cur.later
-    }
-  }
 
-  protected def createNewEntry[B1](key: A, value: B1): Entry = {
+  protected def createNewEntry[B1](key: A, value: B1): Entry =
     val e = new Entry(key, value.asInstanceOf[B])
     if (firstEntry eq null) firstEntry = e
     else { lastEntry.later = e; e.earlier = lastEntry }
     lastEntry = e
     e
-  }
 
-  override def clear() {
+  override def clear()
     clearTable()
     firstEntry = null
     lastEntry = null
-  }
 
-  private def writeObject(out: java.io.ObjectOutputStream) {
-    serializeTo(out, { entry =>
+  private def writeObject(out: java.io.ObjectOutputStream)
+    serializeTo(out,  entry =>
       out.writeObject(entry.key)
       out.writeObject(entry.value)
-    })
-  }
+    )
 
-  private def readObject(in: java.io.ObjectInputStream) {
+  private def readObject(in: java.io.ObjectInputStream)
     firstEntry = null
     lastEntry = null
     init(in, createNewEntry(in.readObject().asInstanceOf[A], in.readObject()))
-  }
-}

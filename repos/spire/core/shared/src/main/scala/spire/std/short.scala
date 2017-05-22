@@ -4,7 +4,7 @@ package std
 import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
-trait ShortIsEuclideanRing extends EuclideanRing[Short] {
+trait ShortIsEuclideanRing extends EuclideanRing[Short]
   override def minus(a: Short, b: Short): Short = (a - b).toShort
   def negate(a: Short): Short = (-a).toShort
   def one: Short = 1.toShort
@@ -18,32 +18,27 @@ trait ShortIsEuclideanRing extends EuclideanRing[Short] {
   def quot(a: Short, b: Short): Short = (a / b).toShort
   def mod(a: Short, b: Short): Short = (a % b).toShort
   def gcd(a: Short, b: Short): Short = spire.math.gcd(a, b).toShort
-}
 
 // Not included in Instances trait.
-trait ShortIsNRoot extends NRoot[Short] {
-  def nroot(x: Short, n: Int): Short = {
-    def findnroot(prev: Int, add: Int): Short = {
+trait ShortIsNRoot extends NRoot[Short]
+  def nroot(x: Short, n: Int): Short =
+    def findnroot(prev: Int, add: Int): Short =
       val next = prev | add
       val e = Math.pow(next, n)
 
-      if (e == x || add == 0) {
+      if (e == x || add == 0)
         next.toShort
-      } else if (e <= 0 || e > x) {
+      else if (e <= 0 || e > x)
         findnroot(prev, add >> 1)
-      } else {
+      else
         findnroot(next, add >> 1)
-      }
-    }
 
     findnroot(0, 1 << ((33 - n) / n))
-  }
 
   def log(a: Short): Short = Math.log(a.toDouble).toShort
   def fpow(a: Short, b: Short): Short = Math.pow(a, b).toShort
-}
 
-trait ShortOrder extends Order[Short] {
+trait ShortOrder extends Order[Short]
   override def eqv(x: Short, y: Short): Boolean = x == y
   override def neqv(x: Short, y: Short): Boolean = x != y
   override def gt(x: Short, y: Short): Boolean = x > y
@@ -52,21 +47,18 @@ trait ShortOrder extends Order[Short] {
   override def lteqv(x: Short, y: Short): Boolean = x <= y
   def compare(x: Short, y: Short): Int =
     java.lang.Integer.signum((x: Int) - (y: Int))
-}
 
-trait ShortIsSigned extends Signed[Short] {
+trait ShortIsSigned extends Signed[Short]
   def signum(a: Short): Int = a
   def abs(a: Short): Short = (if (a < 0) -a else a).toShort
-}
 
 trait ShortIsReal
-    extends IsIntegral[Short] with ShortOrder with ShortIsSigned {
+    extends IsIntegral[Short] with ShortOrder with ShortIsSigned
   def toDouble(n: Short): Double = n.toDouble
   def toBigInt(n: Short): BigInt = BigInt(n)
-}
 
 @SerialVersionUID(0L)
-class ShortIsBitString extends BitString[Short] with Serializable {
+class ShortIsBitString extends BitString[Short] with Serializable
   def one: Short = (-1: Short)
   def zero: Short = (0: Short)
   def and(a: Short, b: Short): Short = (a & b).toShort
@@ -94,24 +86,20 @@ class ShortIsBitString extends BitString[Short] with Serializable {
     (((n & 0xffff) >>> (i & 15)) & 0xffff).toShort
   def signedRightShift(n: Short, i: Int): Short =
     ((n >> (i & 15)) & 0xffff).toShort
-  def rotateLeft(n: Short, i: Int): Short = {
+  def rotateLeft(n: Short, i: Int): Short =
     val j = i & 15
     ((((n & 0xffff) << j) | ((n & 0xffff) >>> (16 - j))) & 0xffff).toShort
-  }
-  def rotateRight(n: Short, i: Int): Short = {
+  def rotateRight(n: Short, i: Int): Short =
     val j = i & 15
     ((((n & 0xffff) >>> j) | ((n & 0xffff) << (16 - j))) & 0xffff).toShort
-  }
-}
 
 @SerialVersionUID(0L)
 class ShortAlgebra
     extends ShortIsEuclideanRing with ShortIsReal with Serializable
 
-trait ShortInstances {
+trait ShortInstances
   implicit final val ShortBitString = new ShortIsBitString
   implicit final val ShortAlgebra = new ShortAlgebra
   import spire.math.NumberTag._
   implicit final val ShortTag =
     new BuiltinIntTag[Short](0, Short.MinValue, Short.MaxValue)
-}

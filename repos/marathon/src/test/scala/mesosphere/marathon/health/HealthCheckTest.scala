@@ -10,9 +10,9 @@ import play.api.libs.json.Json
 import scala.concurrent.duration._
 import com.wix.accord.validate
 
-class HealthCheckTest extends MarathonSpec {
+class HealthCheckTest extends MarathonSpec
 
-  test("ToProto") {
+  test("ToProto")
     val healthCheck = HealthCheck(
         path = Some("/health"),
         protocol = Protocol.HTTP,
@@ -31,9 +31,8 @@ class HealthCheckTest extends MarathonSpec {
     assert(60 == proto.getIntervalSeconds)
     assert(0 == proto.getMaxConsecutiveFailures)
     assert(!proto.hasPort)
-  }
 
-  test("ToProto with port") {
+  test("ToProto with port")
     val healthCheck = HealthCheck(
         path = Some("/health"),
         protocol = Protocol.HTTP,
@@ -52,9 +51,8 @@ class HealthCheckTest extends MarathonSpec {
     assert(60 == proto.getIntervalSeconds)
     assert(0 == proto.getMaxConsecutiveFailures)
     assert(12345 == proto.getPort)
-  }
 
-  test("ToProtoTcp") {
+  test("ToProtoTcp")
     val healthCheck = HealthCheck(
         protocol = Protocol.TCP,
         portIndex = Some(1),
@@ -70,9 +68,8 @@ class HealthCheckTest extends MarathonSpec {
     assert(7 == proto.getGracePeriodSeconds)
     assert(35 == proto.getIntervalSeconds)
     assert(10 == proto.getMaxConsecutiveFailures)
-  }
 
-  test("MergeFromProto with portIndex") {
+  test("MergeFromProto with portIndex")
     val proto = Protos.HealthCheckDefinition.newBuilder
       .setPath("/health")
       .setProtocol(Protocol.HTTP)
@@ -97,9 +94,8 @@ class HealthCheckTest extends MarathonSpec {
     )
 
     assert(mergeResult == expectedResult)
-  }
 
-  test("MergeFromProto with port") {
+  test("MergeFromProto with port")
     val proto = Protos.HealthCheckDefinition.newBuilder
       .setPath("/health")
       .setProtocol(Protocol.HTTP)
@@ -124,9 +120,8 @@ class HealthCheckTest extends MarathonSpec {
     )
 
     assert(mergeResult == expectedResult)
-  }
 
-  test("MergeFromProto with neither port nor portIndex") {
+  test("MergeFromProto with neither port nor portIndex")
     val proto = Protos.HealthCheckDefinition.newBuilder
       .setPath("/health")
       .setProtocol(Protocol.HTTP)
@@ -150,9 +145,8 @@ class HealthCheckTest extends MarathonSpec {
     )
 
     assert(mergeResult == expectedResult)
-  }
 
-  test("MergeFromProtoTcp") {
+  test("MergeFromProtoTcp")
     val proto = Protos.HealthCheckDefinition.newBuilder
       .setProtocol(Protocol.TCP)
       .setPortIndex(1)
@@ -175,9 +169,8 @@ class HealthCheckTest extends MarathonSpec {
     )
 
     assert(mergeResult == expectedResult)
-  }
 
-  test("MergeFromProtoHttps") {
+  test("MergeFromProtoHttps")
     val proto = Protos.HealthCheckDefinition.newBuilder
       .setPath("/health")
       .setProtocol(Protocol.HTTPS)
@@ -201,25 +194,21 @@ class HealthCheckTest extends MarathonSpec {
     )
 
     assert(mergeResult == expectedResult)
-  }
 
-  private[this] def toJson(healthCheck: HealthCheck): String = {
+  private[this] def toJson(healthCheck: HealthCheck): String =
     import mesosphere.marathon.api.v2.json.Formats._
     Json.prettyPrint(Json.toJson(healthCheck))
-  }
-  private[this] def fromJson(json: String): HealthCheck = {
+  private[this] def fromJson(json: String): HealthCheck =
     import mesosphere.marathon.api.v2.json.Formats._
     Json.fromJson[HealthCheck](Json.parse(json)).get
-  }
 
-  test("SerializationRoundtrip empty") {
+  test("SerializationRoundtrip empty")
     val original = HealthCheck()
     val json = toJson(original)
     val readResult = fromJson(json)
     assert(readResult == original)
-  }
 
-  test("Read COMMAND health check") {
+  test("Read COMMAND health check")
     val json = """
         {
           "protocol": "COMMAND",
@@ -236,10 +225,9 @@ class HealthCheckTest extends MarathonSpec {
     )
     val readResult = fromJson(json)
     assert(readResult == expected)
-  }
 
   test(
-      "Read COMMAND health check (portIndex may be provided for backwards-compatibility)") {
+      "Read COMMAND health check (portIndex may be provided for backwards-compatibility)")
     val json = """
         {
           "protocol": "COMMAND",
@@ -258,125 +246,108 @@ class HealthCheckTest extends MarathonSpec {
     )
     val readResult = fromJson(json)
     assert(readResult == expected)
-  }
 
-  def shouldBeInvalid(hc: HealthCheck): Unit = {
+  def shouldBeInvalid(hc: HealthCheck): Unit =
     assert(validate(hc).isFailure)
-  }
 
-  def shouldBeValid(hc: HealthCheck): Unit = {
+  def shouldBeValid(hc: HealthCheck): Unit =
     val result = validate(hc)
     assert(result.isSuccess,
            s"violations: ${ValidationHelper.getAllRuleConstrains(result)}")
-  }
 
-  test("A default HealthCheck should be valid") {
+  test("A default HealthCheck should be valid")
     // portIndex is added in the Format conversion of the app
     shouldBeValid(HealthCheck(portIndex = Some(0)))
-  }
 
-  test("path is not accepted for a COMMAND HealthCheck") {
+  test("path is not accepted for a COMMAND HealthCheck")
     shouldBeInvalid(
         HealthCheck(protocol = Protocol.COMMAND, path = Some("/health")))
-  }
 
-  test("command is required for a COMMAND HealthCheck") {
+  test("command is required for a COMMAND HealthCheck")
     shouldBeInvalid(HealthCheck(protocol = Protocol.COMMAND, command = None))
-  }
 
-  test("command is not accepted for a HTTP HealthCheck") {
+  test("command is not accepted for a HTTP HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.HTTP,
             command = Some(Command("echo healthy"))
         ))
-  }
 
-  test("path is not accepted for a TCP HealthCheck") {
+  test("path is not accepted for a TCP HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.TCP,
             path = Some("/")
         ))
-  }
 
-  test("command is not accepted for a TCP HealthCheck") {
+  test("command is not accepted for a TCP HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.TCP,
             command = Some(Command("echo healthy"))
         ))
-  }
 
-  test("port is not accepted for a COMMAND HealthCheck") {
+  test("port is not accepted for a COMMAND HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.COMMAND,
             port = Some(1)
         ))
-  }
 
-  test("portIndex is not accepted for a COMMAND HealthCheck") {
+  test("portIndex is not accepted for a COMMAND HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.COMMAND,
             portIndex = Some(0)
         ))
-  }
 
   test(
-      "both port and portIndex are not accepted at the same time for a HTTP HealthCheck") {
+      "both port and portIndex are not accepted at the same time for a HTTP HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.HTTP,
             port = Some(1),
             portIndex = Some(0)
         ))
-  }
 
   test(
-      "both port and portIndex are not accepted at the same time for a TCP HealthCheck") {
+      "both port and portIndex are not accepted at the same time for a TCP HealthCheck")
     shouldBeInvalid(
         HealthCheck(
             protocol = Protocol.TCP,
             port = Some(1),
             portIndex = Some(0)
         ))
-  }
 
-  test("port is accepted for a HTTP HealthCheck") {
+  test("port is accepted for a HTTP HealthCheck")
     shouldBeValid(
         HealthCheck(
             protocol = Protocol.HTTP,
             port = Some(1)
         ))
-  }
 
-  test("port is accepted for a TCP HealthCheck") {
+  test("port is accepted for a TCP HealthCheck")
     shouldBeValid(
         HealthCheck(
             protocol = Protocol.TCP,
             port = Some(1)
         ))
-  }
 
-  test("portIndex is accepted for a HTTP HealthCheck") {
+  test("portIndex is accepted for a HTTP HealthCheck")
     shouldBeValid(
         HealthCheck(
             protocol = Protocol.HTTP,
             portIndex = Some(0)
         ))
-  }
 
-  test("portIndex is accepted for a TCP HealthCheck") {
+  test("portIndex is accepted for a TCP HealthCheck")
     shouldBeValid(
         HealthCheck(
             protocol = Protocol.TCP,
             portIndex = Some(0)
         ))
-  }
 
-  test("getPort") {
+  test("getPort")
     import MarathonTestHelper.Implicits._
     val check = new HealthCheck(port = Some(1234))
     val task = MarathonTestHelper
@@ -384,5 +355,3 @@ class HealthCheckTest extends MarathonSpec {
       .withNetworking(Task.HostPorts(4321))
 
     assert(check.hostPort(task.launched.get).contains(1234))
-  }
-}

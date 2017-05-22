@@ -27,9 +27,9 @@ import com.intellij.openapi.application.ApplicationManager
   * @author Dmitry Naydanov        
   * @since 11/12/12
   */
-class CleanMacrosheetAction() extends AnAction with TopComponentAction {
+class CleanMacrosheetAction() extends AnAction with TopComponentAction
 
-  def actionPerformed(e: AnActionEvent) {
+  def actionPerformed(e: AnActionEvent)
     val editor: Editor =
       FileEditorManager.getInstance(e.getProject).getSelectedTextEditor
     val file: VirtualFile =
@@ -48,8 +48,8 @@ class CleanMacrosheetAction() extends AnAction with TopComponentAction {
     val parent = splitPane.getParent
     if (parent == null) return
 
-    invokeLater {
-      inWriteAction {
+    invokeLater
+      inWriteAction
         CleanWorksheetAction.resetScrollModel(viewer)
 
         CleanWorksheetAction.cleanWorksheet(
@@ -59,15 +59,10 @@ class CleanMacrosheetAction() extends AnAction with TopComponentAction {
         parent.add(editor.getComponent, BorderLayout.CENTER)
         editor.getSettings.setFoldingOutlineShown(true)
         ScalaMacroDebuggingUtil.macrosToExpand.clear()
-      }
-    }
-  }
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     ScalaActionUtil.enableAndShowIfInScalaFile(e)
-  }
 
   override def actionIcon = AllIcons.Actions.GC
 
   override def bundleKey = "worksheet.clear.button"
-}

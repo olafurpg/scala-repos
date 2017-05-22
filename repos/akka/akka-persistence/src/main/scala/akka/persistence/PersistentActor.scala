@@ -15,13 +15,12 @@ abstract class RecoveryCompleted
   * Sent to a [[PersistentActor]] when the journal replay has been finished.
   */
 @SerialVersionUID(1L)
-case object RecoveryCompleted extends RecoveryCompleted {
+case object RecoveryCompleted extends RecoveryCompleted
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * Reply message to a successful [[Eventsourced#deleteMessages]] request.
@@ -57,7 +56,7 @@ final case class Recovery(
     toSequenceNr: Long = Long.MaxValue,
     replayMax: Long = Long.MaxValue)
 
-object Recovery {
+object Recovery
 
   /**
     * Java API
@@ -100,7 +99,6 @@ object Recovery {
     * @see [[Recovery]]
     */
   val none: Recovery = Recovery(toSequenceNr = 0L)
-}
 
 /**
   * This defines how to handle the current received message which failed to stash, when the size of
@@ -111,13 +109,12 @@ sealed trait StashOverflowStrategy
 /**
   * Discard the message to [[akka.actor.DeadLetter]].
   */
-case object DiscardToDeadLetterStrategy extends StashOverflowStrategy {
+case object DiscardToDeadLetterStrategy extends StashOverflowStrategy
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * Throw [[akka.actor.StashOverflowException]], hence the persistent actor will starting recovery
@@ -125,13 +122,12 @@ case object DiscardToDeadLetterStrategy extends StashOverflowStrategy {
   * Be carefully if used together with persist/persistAll or has many messages needed
   * to replay.
   */
-case object ThrowOverflowExceptionStrategy extends StashOverflowStrategy {
+case object ThrowOverflowExceptionStrategy extends StashOverflowStrategy
 
   /**
     * Java API: get the singleton instance
     */
   def getInstance = this
-}
 
 /**
   * Reply to sender with predefined response, and discard the received message silently.
@@ -144,41 +140,35 @@ final case class ReplyToStrategy(response: Any) extends StashOverflowStrategy
   * the internal stash of persistent actor.
   * An instance of this class must be instantiable using a no-arg constructor.
   */
-trait StashOverflowStrategyConfigurator {
+trait StashOverflowStrategyConfigurator
   def create(config: Config): StashOverflowStrategy
-}
 
 final class ThrowExceptionConfigurator
-    extends StashOverflowStrategyConfigurator {
+    extends StashOverflowStrategyConfigurator
   override def create(config: Config) = ThrowOverflowExceptionStrategy
-}
 
-final class DiscardConfigurator extends StashOverflowStrategyConfigurator {
+final class DiscardConfigurator extends StashOverflowStrategyConfigurator
   override def create(config: Config) = DiscardToDeadLetterStrategy
-}
 
 /**
   * An persistent Actor - can be used to implement command or event sourcing.
   */
-trait PersistentActor extends Eventsourced with PersistenceIdentity {
+trait PersistentActor extends Eventsourced with PersistenceIdentity
   def receive = receiveCommand
-}
 
 /**
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class UntypedPersistentActor
-    extends UntypedActor with Eventsourced with PersistenceIdentity {
+    extends UntypedActor with Eventsourced with PersistenceIdentity
 
   final def onReceive(message: Any) = onReceiveCommand(message)
 
-  final def receiveRecover: Receive = {
+  final def receiveRecover: Receive =
     case msg ⇒ onReceiveRecover(msg)
-  }
 
-  final def receiveCommand: Receive = {
+  final def receiveCommand: Receive =
     case msg ⇒ onReceiveCommand(msg)
-  }
 
   /**
     * Java API: asynchronously persists `event`. On successful persistence, `handler` is called with the
@@ -305,13 +295,12 @@ abstract class UntypedPersistentActor
     */
   @throws(classOf[Exception])
   def onReceiveCommand(msg: Any): Unit
-}
 
 /**
   * Java API: an persistent actor - can be used to implement command or event sourcing.
   */
 abstract class AbstractPersistentActor
-    extends AbstractActor with PersistentActor with Eventsourced {
+    extends AbstractActor with PersistentActor with Eventsourced
 
   /**
     * Java API: asynchronously persists `event`. On successful persistence, `handler` is called with the
@@ -413,4 +402,3 @@ abstract class AbstractPersistentActor
     super.deferAsync(event)(event ⇒ handler(event))
 
   override def receive = super [PersistentActor].receive
-}

@@ -12,8 +12,7 @@ import scala.tools.nsc.doc.html.page.diagram.DotRunner
   * @author Pedro Furlanetto
   * @author Gilles Dubochet
   */
-trait Universe {
+trait Universe
   def settings: Settings
   def rootPackage: model.Package
   def dotRunner: DotRunner
-}

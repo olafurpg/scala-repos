@@ -1,12 +1,10 @@
-class NoReturnNoOutput {
-  def foo(i: Int) {
+class NoReturnNoOutput
+  def foo(i: Int)
     /*start*/
     if (true) {}
     println(i)
     /*end*/
     println()
-  }
-}
 /*
 class NoReturnNoOutput {
   def foo(i: Int) {

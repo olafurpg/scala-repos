@@ -15,11 +15,11 @@ import scala.collection.mutable
   * @author Roman.Shein
   * @since 17.03.2015.
   */
-trait BuildFileProvider {
+trait BuildFileProvider
   def findBuildFile(module: IJModule,
                     elementType: BuildFileElementType,
                     vfsFileToCopy: mutable.Map[VirtualFile, LightVirtualFile])
-    : Option[BuildFileEntry[PsiFile]] = {
+    : Option[BuildFileEntry[PsiFile]] =
 
     def findVirtualFile(file: File) =
       Option(VfsUtil.findFileByIoFile(file, true))
@@ -34,18 +34,15 @@ trait BuildFileProvider {
     def toPsiFile(vFile: VirtualFile) =
       Option(PsiManager.getInstance(module.getProject).findFile(vFile))
 
-    findIoFile(module, elementType).flatMap {
+    findIoFile(module, elementType).flatMap
       case BuildFileEntry(buildFile, isModuleLocal) =>
         findVirtualFile(buildFile)
           .map(toLightVirtualFile)
           .flatMap(toPsiFile)
           .map(BuildFileEntry(_, isModuleLocal))
-    }
-  }
 
   def findIoFile(
       module: IJModule,
       elementType: BuildFileElementType): Option[BuildFileEntry[File]]
-}
 
 case class BuildFileEntry[T](file: T, isModuleLocal: Boolean)

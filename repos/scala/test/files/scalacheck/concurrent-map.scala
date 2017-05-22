@@ -5,11 +5,10 @@ import org.scalacheck._
 import org.scalacheck.Prop._
 import org.scalacheck.Gen._
 
-case class Wrap(i: Int) {
+case class Wrap(i: Int)
   override def hashCode = i * 0x9e3775cd
-}
 
-object Test extends Properties("concurrent.TrieMap") {
+object Test extends Properties("concurrent.TrieMap")
 
   /* generators */
 
@@ -17,45 +16,38 @@ object Test extends Properties("concurrent.TrieMap") {
 
   val threadCounts = choose(2, 16)
 
-  val threadCountsAndSizes = for {
+  val threadCountsAndSizes = for
     p <- threadCounts
     sz <- sizes
-  } yield (p, sz);
+  yield (p, sz);
 
   /* helpers */
 
-  def inParallel[T](totalThreads: Int)(body: Int => T): Seq[T] = {
+  def inParallel[T](totalThreads: Int)(body: Int => T): Seq[T] =
     val threads = for (idx <- 0 until totalThreads) yield
-      new Thread {
+      new Thread
         setName("ParThread-" + idx)
         private var res: T = _
-        override def run() {
+        override def run()
           res = body(idx)
-        }
-        def result = {
+        def result =
           this.join()
           res
-        }
-      }
 
     threads foreach (_.start())
     threads map (_.result)
-  }
 
   property("concurrent getOrElseUpdate insertions") = forAll(
-      threadCounts, sizes) { (p, sz) =>
+      threadCounts, sizes)  (p, sz) =>
     val chm = new ConcurrentHashMap[Wrap, Int]().asScala
 
-    val results = inParallel(p) { idx =>
+    val results = inParallel(p)  idx =>
       for (i <- 0 until sz) yield chm.getOrElseUpdate(new Wrap(i), idx)
-    }
 
     val resultSets = for (i <- 0 until sz) yield results.map(_ (i)).toSet
     val largerThanOne = resultSets.zipWithIndex.find(_._1.size != 1)
-    val allThreadsAgreeOnWhoInserted = {
+    val allThreadsAgreeOnWhoInserted =
       largerThanOne == None
-    } :| s"$p threads agree on who inserted [disagreement (differentResults, position) = $largerThanOne]"
+    :| s"$p threads agree on who inserted [disagreement (differentResults, position) = $largerThanOne]"
 
     allThreadsAgreeOnWhoInserted
-  }
-}

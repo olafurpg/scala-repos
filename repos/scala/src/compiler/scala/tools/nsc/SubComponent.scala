@@ -11,7 +11,7 @@ import scala.ref.WeakReference
   *
   *  @author Martin Odersky
   */
-abstract class SubComponent {
+abstract class SubComponent
 
   /** The global environment; overridden by instantiation in Global. */
   val global: Global
@@ -64,8 +64,8 @@ abstract class SubComponent {
     global.exitingPhase(ownPhase)(op)
 
   /** The phase corresponding to this subcomponent in the current compiler run */
-  def ownPhase: Phase = {
-    ownPhaseCache.get match {
+  def ownPhase: Phase =
+    ownPhaseCache.get match
       case Some(phase) if ownPhaseRunId == global.currentRunId =>
         phase
       case _ =>
@@ -73,16 +73,12 @@ abstract class SubComponent {
         ownPhaseCache = new WeakReference(phase)
         ownPhaseRunId = global.currentRunId
         phase
-    }
-  }
 
   /** The phase defined by this subcomponent. Can be called only after phase is installed by newPhase. */
   //  lazy val ownPhase: Phase = global.currentRun.phaseNamed(phaseName)
 
   /** A standard phase template */
-  abstract class StdPhase(prev: Phase) extends global.GlobalPhase(prev) {
+  abstract class StdPhase(prev: Phase) extends global.GlobalPhase(prev)
     def name = phaseName
     override def newFlags = phaseNewFlags
     override def nextFlags = phaseNextFlags
-  }
-}

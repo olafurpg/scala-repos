@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.icons.Icons
   * User: Alexander Podkhalyuzin
   * Date: 10.02.2009
   */
-class ScalaConsoleConfigurationType extends ConfigurationType {
+class ScalaConsoleConfigurationType extends ConfigurationType
   val confFactory = new ScalaConsoleRunConfigurationFactory(this)
 
   def getIcon: Icon = Icons.SCALA_CONSOLE
@@ -24,4 +24,3 @@ class ScalaConsoleConfigurationType extends ConfigurationType {
     Array[ConfigurationFactory](confFactory)
 
   def getId: String = "ScalaScriptConsoleRunConfiguration"
-}

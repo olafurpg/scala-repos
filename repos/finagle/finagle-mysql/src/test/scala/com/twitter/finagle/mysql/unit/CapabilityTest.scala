@@ -5,43 +5,35 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class CapabilityTest extends FunSuite {
+class CapabilityTest extends FunSuite
   val c = Capability(Capability.LongPassword,
                      Capability.SSL,
                      Capability.Transactions,
                      Capability.MultiResults)
 
-  test("contain capability") {
+  test("contain capability")
     assertResult(true) { c.has(Capability.SSL) }
     assertResult(false) { c.has(Capability.Compress) }
-  }
 
-  test("contain all capabilities") {
-    assertResult(false) {
+  test("contain all capabilities")
+    assertResult(false)
       c.hasAll(Capability.LongPassword, Capability.NoSchema)
-    }
-    assertResult(true) {
+    assertResult(true)
       c.hasAll(
           Capability.LongPassword,
           Capability.SSL,
           Capability.Transactions,
           Capability.MultiResults
       )
-    }
-  }
 
-  test("subtract capability") {
+  test("subtract capability")
     val c2 = c - Capability.SSL
     assertResult(false) { c2.has(Capability.SSL) }
-  }
 
-  test("add capability") {
+  test("add capability")
     val c2 = c + Capability.LocalFiles + Capability.Compress
-    assertResult(true) {
+    assertResult(true)
       c2.hasAll(
           Capability.LocalFiles,
           Capability.Compress
       )
-    }
-  }
-}

@@ -23,7 +23,7 @@ package collection
   */
 trait GenSetLike[A, +Repr]
     extends GenIterableLike[A, Repr] with (A => Boolean) with Equals
-    with Parallelizable[A, parallel.ParSet[A]] {
+    with Parallelizable[A, parallel.ParSet[A]]
 
   def iterator: Iterator[A]
   def contains(elem: A): Boolean
@@ -109,15 +109,14 @@ trait GenSetLike[A, +Repr]
     *  @return     `true` if `that` is a set which contains the same elements
     *              as this set.
     */
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: GenSet[_] =>
       (this eq that) || (that canEqual this) && (this.size == that.size) &&
-      (try this subsetOf that.asInstanceOf[GenSet[A]] catch {
+      (try this subsetOf that.asInstanceOf[GenSet[A]] catch
             case ex: ClassCastException => false
-          })
+          )
     case _ =>
       false
-  }
 
   // Careful! Don't write a Set's hashCode like:
   //    override def hashCode() = this map (_.hashCode) sum
@@ -125,4 +124,3 @@ trait GenSetLike[A, +Repr]
   // then be dropped before they can be added.
   // Hash should be symmetric in set entries, but without trivial collisions.
   override def hashCode() = scala.util.hashing.MurmurHash3.setHash(seq)
-}

@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object BorderWidths {
+object BorderWidths
   implicit def sfxBorderWidths2jfx(v: BorderWidths): jfxsl.BorderWidths =
     if (v != null) v.delegate else null
 
@@ -56,13 +56,12 @@ object BorderWidths {
     * A set of widths representing 100% on each side.
     */
   val Full: BorderWidths = jfxsl.BorderWidths.FULL
-}
 
 /**
   * Defines widths for four components (top, right, bottom, and left).
   */
 class BorderWidths(override val delegate: jfxsl.BorderWidths)
-    extends SFXDelegate[jfxsl.BorderWidths] {
+    extends SFXDelegate[jfxsl.BorderWidths]
 
   /**
     * Creates a new BorderWidths using the given width for all four borders, and treating this
@@ -120,4 +119,3 @@ class BorderWidths(override val delegate: jfxsl.BorderWidths)
     * the top of the border.
     */
   def top: Double = delegate.getTop
-}

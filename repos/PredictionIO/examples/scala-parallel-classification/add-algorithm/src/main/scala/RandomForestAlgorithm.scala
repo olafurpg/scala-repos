@@ -25,10 +25,10 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
     extends P2LAlgorithm[PreparedData,
                          RandomForestModel, // CHANGED
                          Query,
-                         PredictedResult] {
+                         PredictedResult]
 
   // CHANGED
-  def train(sc: SparkContext, data: PreparedData): RandomForestModel = {
+  def train(sc: SparkContext, data: PreparedData): RandomForestModel =
     // CHANGED
     // Empty categoricalFeaturesInfo indicates all features are continuous.
     val categoricalFeaturesInfo = Map[Int, Int]()
@@ -40,12 +40,9 @@ class RandomForestAlgorithm(val ap: RandomForestAlgorithmParams) // CHANGED
                                  ap.impurity,
                                  ap.maxDepth,
                                  ap.maxBins)
-  }
 
   def predict(model: RandomForestModel, // CHANGED
-              query: Query): PredictedResult = {
+              query: Query): PredictedResult =
 
     val label = model.predict(Vectors.dense(query.features))
     new PredictedResult(label)
-  }
-}

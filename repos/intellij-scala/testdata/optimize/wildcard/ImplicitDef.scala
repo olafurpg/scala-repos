@@ -1,14 +1,13 @@
 import scala.language.implicitConversions
 
-class ImplicitDef {
+class ImplicitDef
   import Mess.{a, s, foo, AAAA, BBBB}
 
   val x = new AAAA
   val y = new BBBB
   val z = a + s + foo
-}
 
-object Mess {
+object Mess
   val a = 1
   val s = "a"
   def foo = 1
@@ -17,7 +16,6 @@ object Mess {
   class BBBB
 
   implicit def intToString(i: Int): String = i.toString
-}
 
 /*
 import scala.language.implicitConversions

@@ -1,4 +1,3 @@
-object Test {
+object Test
   val x = new InfixUsageWithTuple()
   x foo 1 + 1
-}

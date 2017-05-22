@@ -10,7 +10,7 @@ import org.reactivestreams._
   * It can be used as a building block for creating Publishers, allowing the
   * Subscription creation logic to be factored out.
   */
-private[streams] trait SubscriptionFactory[T] {
+private[streams] trait SubscriptionFactory[T]
 
   /**
     * Create a Subscription object and return a handle to it.
@@ -27,13 +27,12 @@ private[streams] trait SubscriptionFactory[T] {
   def createSubscription[U >: T](
       subr: Subscriber[U], onSubscriptionEnded: SubscriptionHandle[U] => Unit)
     : SubscriptionHandle[U]
-}
 
 /**
   * Wraps a Subscription created by a SubscriptionFactory, allowing the
   * Subscription to be started and queried.
   */
-trait SubscriptionHandle[U] {
+trait SubscriptionHandle[U]
 
   /**
     * Called to start the Subscription. This will typically call the
@@ -53,4 +52,3 @@ trait SubscriptionHandle[U] {
     * been cancelled, completed or had an error.
     */
   def isActive: Boolean
-}

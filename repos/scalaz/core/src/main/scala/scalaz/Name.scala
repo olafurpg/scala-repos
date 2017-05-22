@@ -3,9 +3,8 @@ package scalaz
 import scala.annotation.tailrec
 
 /** Call by name */
-sealed abstract class Name[+A] {
+sealed abstract class Name[+A]
   def value: A
-}
 
 /** Call by need */
 sealed abstract class Need[+A] extends Name[A]
@@ -13,17 +12,16 @@ sealed abstract class Need[+A] extends Name[A]
 /** Call by value */
 final case class Value[+A](value: A) extends Need[A]
 
-object Name {
-  def apply[A](a: => A) = new Name[A] {
+object Name
+  def apply[A](a: => A) = new Name[A]
     def value = a
-  }
   def unapply[A](v: Name[A]): Option[A] = Some(v.value)
 
   implicit val name: Monad[Name] with BindRec[Name] with Comonad[Name] with Distributive[
       Name] with Traverse1[Name] with Zip[Name] with Unzip[Name] with Align[
       Name] with Cozip[Name] = new Monad[Name] with BindRec[Name]
   with Comonad[Name] with Distributive[Name] with Traverse1[Name]
-  with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name] {
+  with Zip[Name] with Unzip[Name] with Align[Name] with Cozip[Name]
     override def foldMap1[A, B : Semigroup](fa: Name[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Name[A], z: B)(f: (B, A) => B) =
@@ -53,31 +51,25 @@ object Name {
       Name(G.map(fa)(a => f(a).value))
     @tailrec
     def tailrecM[A, B](f: A => Name[A \/ B])(a: A): Name[B] =
-      f(a).value match {
+      f(a).value match
         case -\/(a0) => tailrecM(f)(a0)
         case \/-(b) => Name(b)
-      }
-  }
-  implicit def nameEqual[A : Equal]: Equal[Name[A]] = new Equal[Name[A]] {
+  implicit def nameEqual[A : Equal]: Equal[Name[A]] = new Equal[Name[A]]
     def equal(a1: Name[A], a2: Name[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
-  }
-}
 
-object Need {
-  def apply[A](a: => A): Need[A] = {
-    new Need[A] {
+object Need
+  def apply[A](a: => A): Need[A] =
+    new Need[A]
       private[this] lazy val value0: A = a
       def value = value0
-    }
-  }
   def unapply[A](x: Need[A]): Option[A] = Some(x.value)
 
   implicit val need: Monad[Need] with BindRec[Need] with Comonad[Need] with Distributive[
       Need] with Traverse1[Need] with Zip[Need] with Unzip[Need] with Align[
       Need] with Cozip[Need] = new Monad[Need] with BindRec[Need]
   with Comonad[Need] with Distributive[Need] with Traverse1[Need]
-  with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need] {
+  with Zip[Need] with Unzip[Need] with Align[Need] with Cozip[Need]
     override def foldMap1[A, B : Semigroup](fa: Need[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Need[A], z: B)(f: (B, A) => B) =
@@ -107,23 +99,19 @@ object Need {
       Need(G.map(fa)(a => f(a).value))
     @tailrec
     def tailrecM[A, B](f: A => Need[A \/ B])(a: A): Need[B] =
-      f(a).value match {
+      f(a).value match
         case -\/(a0) => tailrecM(f)(a0)
         case \/-(b) => Need(b)
-      }
-  }
-  implicit def needEqual[A : Equal]: Equal[Need[A]] = new Equal[Need[A]] {
+  implicit def needEqual[A : Equal]: Equal[Need[A]] = new Equal[Need[A]]
     def equal(a1: Need[A], a2: Need[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
-  }
-}
 
-object Value {
+object Value
   implicit val value: Monad[Value] with BindRec[Value] with Comonad[Value] with Distributive[
       Value] with Traverse1[Value] with Zip[Value] with Unzip[Value] with Align[
       Value] with Cozip[Value] = new Monad[Value] with BindRec[Value]
   with Comonad[Value] with Distributive[Value] with Traverse1[Value]
-  with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value] {
+  with Zip[Value] with Unzip[Value] with Align[Value] with Cozip[Value]
     override def foldMap1[A, B : Semigroup](fa: Value[A])(f: A => B) =
       f(fa.value)
     override def foldLeft[A, B](fa: Value[A], z: B)(f: (B, A) => B) =
@@ -149,13 +137,9 @@ object Value {
       Value(G.map(fa)(a => f(a).value))
     @tailrec
     def tailrecM[A, B](f: A => Value[A \/ B])(a: A): Value[B] =
-      f(a).value match {
+      f(a).value match
         case -\/(a0) => tailrecM(f)(a0)
         case \/-(b) => Value(b)
-      }
-  }
-  implicit def valueEqual[A : Equal]: Equal[Value[A]] = new Equal[Value[A]] {
+  implicit def valueEqual[A : Equal]: Equal[Value[A]] = new Equal[Value[A]]
     def equal(a1: Value[A], a2: Value[A]): Boolean =
       Equal[A].equal(a1.value, a2.value)
-  }
-}

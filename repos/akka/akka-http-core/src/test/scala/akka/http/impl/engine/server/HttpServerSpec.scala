@@ -27,12 +27,12 @@ import akka.testkit.AkkaSpec
 class HttpServerSpec
     extends AkkaSpec("""akka.loggers = []
      akka.loglevel = OFF
-     akka.http.server.request-timeout = infinite""") with Inside { spec ⇒
+     akka.http.server.request-timeout = infinite""") with Inside  spec ⇒
   implicit val materializer = ActorMaterializer()
 
-  "The server implementation" should {
+  "The server implementation" should
 
-    "deliver an empty request as soon as all headers are received" in new TestSetup {
+    "deliver an empty request as soon as all headers are received" in new TestSetup
       send("""GET / HTTP/1.1
              |Host: example.com
              |
@@ -40,16 +40,15 @@ class HttpServerSpec
 
       expectRequest() shouldEqual HttpRequest(
           uri = "http://example.com/", headers = List(Host("example.com")))
-    }
 
-    "deliver a request as soon as all headers are received" in new TestSetup {
+    "deliver a request as soon as all headers are received" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 12
              |
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Default(_, 12, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ByteString]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -63,10 +62,8 @@ class HttpServerSpec
           send("ghijk")
           dataProbe.expectNext(ByteString("ghijk"))
           dataProbe.expectNoMsg(50.millis)
-      }
-    }
 
-    "deliver an error response as soon as a parsing error occurred" in new TestSetup {
+    "deliver an error response as soon as a parsing error occurred" in new TestSetup
       send("""GET / HTTP/1.2
              |Host: example.com
              |
@@ -83,9 +80,8 @@ class HttpServerSpec
           |Content-Length: 74
           |
           |The server does not support the HTTP protocol version used in the request.""")
-    }
 
-    "report an invalid Chunked stream" in new TestSetup {
+    "report an invalid Chunked stream" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Transfer-Encoding: chunked
@@ -94,7 +90,7 @@ class HttpServerSpec
              |abcdef
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -119,10 +115,8 @@ class HttpServerSpec
               |Content-Length: 36
               |
               |Illegal character 'g' in chunk start""")
-      }
-    }
 
-    "deliver the request entity as it comes in strictly for an immediately completed Strict entity" in new TestSetup {
+    "deliver the request entity as it comes in strictly for an immediately completed Strict entity" in new TestSetup
       send("""POST /strict HTTP/1.1
              |Host: example.com
              |Content-Length: 12
@@ -135,16 +129,15 @@ class HttpServerSpec
           headers = List(Host("example.com")),
           entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`,
                                      ByteString("abcdefghijkl")))
-    }
 
-    "deliver the request entity as it comes in for a Default entity" in new TestSetup {
+    "deliver the request entity as it comes in for a Default entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 12
              |
              |abcdef""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Default(_, 12, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ByteString]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -155,10 +148,8 @@ class HttpServerSpec
           send("ghijk")
           dataProbe.expectNext(ByteString("ghijk"))
           dataProbe.expectNoMsg(50.millis)
-      }
-    }
 
-    "deliver the request entity as it comes in for a chunked entity" in new TestSetup {
+    "deliver the request entity as it comes in for a chunked entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Transfer-Encoding: chunked
@@ -167,7 +158,7 @@ class HttpServerSpec
              |abcdef
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -178,10 +169,8 @@ class HttpServerSpec
           send("3\r\nghi\r\n")
           dataProbe.expectNext(Chunk(ByteString("ghi")))
           dataProbe.expectNoMsg(50.millis)
-      }
-    }
 
-    "deliver the second message properly after a Strict entity" in new TestSetup {
+    "deliver the second message properly after a Strict entity" in new TestSetup
       send("""POST /strict HTTP/1.1
              |Host: example.com
              |Content-Length: 12
@@ -207,16 +196,15 @@ class HttpServerSpec
           headers = List(Host("example.com")),
           entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`,
                                      ByteString("mnopqrstuvwx")))
-    }
 
-    "deliver the second message properly after a Default entity" in new TestSetup {
+    "deliver the second message properly after a Default entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 12
              |
              |abcdef""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Default(_, 12, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ByteString]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -230,7 +218,6 @@ class HttpServerSpec
           send("kl")
           dataProbe.expectNext(ByteString("kl"))
           dataProbe.expectComplete()
-      }
 
       send("""POST /next-strict HTTP/1.1
              |Host: example.com
@@ -238,13 +225,11 @@ class HttpServerSpec
              |
              |abcde""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Strict(_, data), _) ⇒
           data shouldEqual ByteString("abcde")
-      }
-    }
 
-    "deliver the second message properly after a Chunked entity" in new TestSetup {
+    "deliver the second message properly after a Chunked entity" in new TestSetup
       send("""POST /chunked HTTP/1.1
              |Host: example.com
              |Transfer-Encoding: chunked
@@ -253,7 +238,7 @@ class HttpServerSpec
              |abcdef
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -268,7 +253,6 @@ class HttpServerSpec
           send("0\r\n\r\n")
           dataProbe.expectNext(LastChunk)
           dataProbe.expectComplete()
-      }
 
       send("""POST /next-strict HTTP/1.1
              |Host: example.com
@@ -276,20 +260,18 @@ class HttpServerSpec
              |
              |abcde""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Strict(_, data), _) ⇒
           data shouldEqual ByteString("abcde")
-      }
-    }
 
-    "close the request entity stream when the entity is complete for a Default entity" in new TestSetup {
+    "close the request entity stream when the entity is complete for a Default entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 12
              |
              |abcdef""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Default(_, 12, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ByteString]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -300,10 +282,8 @@ class HttpServerSpec
           send("ghijkl")
           dataProbe.expectNext(ByteString("ghijkl"))
           dataProbe.expectComplete()
-      }
-    }
 
-    "close the request entity stream when the entity is complete for a Chunked entity" in new TestSetup {
+    "close the request entity stream when the entity is complete for a Chunked entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Transfer-Encoding: chunked
@@ -312,7 +292,7 @@ class HttpServerSpec
              |abcdef
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -324,10 +304,8 @@ class HttpServerSpec
           send("0\r\n\r\n")
           dataProbe.expectNext(LastChunk)
           dataProbe.expectComplete()
-      }
-    }
 
-    "close the connection if request entity stream has been cancelled" in new TestSetup {
+    "close the connection if request entity stream has been cancelled" in new TestSetup
       // two chunks sent by client
       send("""POST / HTTP/1.1
              |Host: example.com
@@ -341,7 +319,7 @@ class HttpServerSpec
              |
              |""")
 
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           // but only one consumed by server
@@ -352,13 +330,11 @@ class HttpServerSpec
           dataProbe.expectComplete()
           // connection closes once requested elements are consumed
           netIn.expectCancellation()
-      }
-    }
 
-    "proceed to next request once previous request's entity has beed drained" in new TestSetup {
+    "proceed to next request once previous request's entity has beed drained" in new TestSetup
       def twice(action: => Unit): Unit = { action; action }
 
-      twice {
+      twice
         send("""POST / HTTP/1.1
                |Host: example.com
                |Transfer-Encoding: chunked
@@ -372,16 +348,14 @@ class HttpServerSpec
         val whenComplete =
           expectRequest().entity.dataBytes.runWith(Sink.ignore)
         whenComplete.futureValue should be(akka.Done)
-      }
-    }
 
-    "report a truncated entity stream on the entity data stream and the main stream for a Default entity" in new TestSetup {
+    "report a truncated entity stream on the entity data stream and the main stream for a Default entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 12
              |
              |abcdef""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Default(_, 12, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ByteString]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -391,10 +365,8 @@ class HttpServerSpec
           dataProbe.expectNoMsg(50.millis)
           closeNetworkInput()
           dataProbe.expectError().getMessage shouldEqual "Entity stream truncation"
-      }
-    }
 
-    "report a truncated entity stream on the entity data stream and the main stream for a Chunked entity" in new TestSetup {
+    "report a truncated entity stream on the entity data stream and the main stream for a Chunked entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Transfer-Encoding: chunked
@@ -402,7 +374,7 @@ class HttpServerSpec
              |6
              |abcdef
              |""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST, _, _, HttpEntity.Chunked(_, data), _) ⇒
           val dataProbe = TestSubscriber.manualProbe[ChunkStreamPart]
           data.to(Sink.fromSubscriber(dataProbe)).run()
@@ -412,10 +384,8 @@ class HttpServerSpec
           dataProbe.expectNoMsg(50.millis)
           closeNetworkInput()
           dataProbe.expectError().getMessage shouldEqual "Entity stream truncation"
-      }
-    }
 
-    "translate HEAD request to GET request when transparent-head-requests are enabled" in new TestSetup {
+    "translate HEAD request to GET request when transparent-head-requests are enabled" in new TestSetup
       override def settings =
         ServerSettings(system).withTransparentHeadRequests(true)
       send("""HEAD / HTTP/1.1
@@ -426,9 +396,8 @@ class HttpServerSpec
           GET,
           uri = "http://example.com/",
           headers = List(Host("example.com")))
-    }
 
-    "keep HEAD request when transparent-head-requests are disabled" in new TestSetup {
+    "keep HEAD request when transparent-head-requests are disabled" in new TestSetup
       override def settings =
         ServerSettings(system).withTransparentHeadRequests(false)
       send("""HEAD / HTTP/1.1
@@ -439,14 +408,13 @@ class HttpServerSpec
           HEAD,
           uri = "http://example.com/",
           headers = List(Host("example.com")))
-    }
 
-    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Strict)" in new TestSetup {
+    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Strict)" in new TestSetup
       send("""HEAD / HTTP/1.1
              |Host: example.com
              |
              |""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(entity = HttpEntity.Strict(
                         ContentTypes.`text/plain(UTF-8)`, ByteString("abcd"))))
@@ -457,16 +425,14 @@ class HttpServerSpec
                |Content-Length: 4
                |
                |""")
-      }
-    }
 
-    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Default)" in new TestSetup {
+    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Default)" in new TestSetup
       send("""HEAD / HTTP/1.1
              |Host: example.com
              |
              |""")
       val data = TestPublisher.manualProbe[ByteString]()
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(
                   entity = HttpEntity.Default(ContentTypes.`text/plain(UTF-8)`,
@@ -481,16 +447,14 @@ class HttpServerSpec
                |Content-Length: 4
                |
                |""")
-      }
-    }
 
-    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with CloseDelimited)" in new TestSetup {
+    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with CloseDelimited)" in new TestSetup
       send("""HEAD / HTTP/1.1
              |Host: example.com
              |
              |""")
       val data = TestPublisher.manualProbe[ByteString]()
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(entity = HttpEntity.CloseDelimited(
                         ContentTypes.`text/plain(UTF-8)`,
@@ -503,18 +467,16 @@ class HttpServerSpec
                |Content-Type: text/plain; charset=UTF-8
                |
                |""")
-      }
       // No close should happen here since this was a HEAD request
       netOut.expectNoBytes(50.millis)
-    }
 
-    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Chunked)" in new TestSetup {
+    "not emit entities when responding to HEAD requests if transparent-head-requests is enabled (with Chunked)" in new TestSetup
       send("""HEAD / HTTP/1.1
              |Host: example.com
              |
              |""")
       val data = TestPublisher.manualProbe[ChunkStreamPart]()
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(
                   entity = HttpEntity.Chunked(ContentTypes.`text/plain(UTF-8)`,
@@ -528,17 +490,15 @@ class HttpServerSpec
                |Content-Type: text/plain; charset=UTF-8
                |
                |""")
-      }
-    }
 
-    "respect Connection headers of HEAD requests if transparent-head-requests is enabled" in new TestSetup {
+    "respect Connection headers of HEAD requests if transparent-head-requests is enabled" in new TestSetup
       send("""HEAD / HTTP/1.1
              |Host: example.com
              |Connection: close
              |
              |""")
       val data = TestPublisher.manualProbe[ByteString]()
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(GET, _, _, _, _) ⇒
           responses.sendNext(HttpResponse(
                   entity = CloseDelimited(ContentTypes.`text/plain(UTF-8)`,
@@ -546,18 +506,16 @@ class HttpServerSpec
           val dataSub = data.expectSubscription()
           dataSub.expectCancellation()
           netOut.expectBytes(1)
-      }
       netOut.expectComplete()
-    }
 
-    "produce a `100 Continue` response when requested by a `Default` entity" in new TestSetup {
+    "produce a `100 Continue` response when requested by a `Default` entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Expect: 100-continue
              |Content-Length: 16
              |
              |""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(
             POST,
             _,
@@ -587,17 +545,15 @@ class HttpServerSpec
               |Content-Length: 4
               |
               |Yeah""")
-      }
-    }
 
-    "produce a `100 Continue` response when requested by a `Chunked` entity" in new TestSetup {
+    "produce a `100 Continue` response when requested by a `Chunked` entity" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Expect: 100-continue
              |Transfer-Encoding: chunked
              |
              |""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(POST,
                          _,
                          _,
@@ -632,17 +588,15 @@ class HttpServerSpec
               |Content-Length: 4
               |
               |Yeah""")
-      }
-    }
 
-    "render a closing response instead of `100 Continue` if request entity is not requested" in new TestSetup {
+    "render a closing response instead of `100 Continue` if request entity is not requested" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Expect: 100-continue
              |Content-Length: 16
              |
              |""")
-      inside(expectRequest()) {
+      inside(expectRequest())
         case HttpRequest(
             POST,
             _,
@@ -658,10 +612,8 @@ class HttpServerSpec
               |Content-Length: 4
               |
               |Yeah""")
-      }
-    }
 
-    "render a 500 response on response stream errors from the application" in new TestSetup {
+    "render a 500 response on response stream errors from the application" in new TestSetup
       send("""GET / HTTP/1.1
              |Host: example.com
              |
@@ -680,9 +632,8 @@ class HttpServerSpec
           |Content-Length: 0
           |
           |""")
-    }
 
-    "correctly consume and render large requests and responses" in new TestSetup {
+    "correctly consume and render large requests and responses" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 100000
@@ -703,13 +654,12 @@ class HttpServerSpec
 
       val random = new Random()
       @tailrec def rec(bytesLeft: Int): Unit =
-        if (bytesLeft > 0) {
+        if (bytesLeft > 0)
           val count = math.min(random.nextInt(1000) + 1, bytesLeft)
           val data = random.alphanumeric.take(count).mkString
           send(data)
           netOut.expectUtf8EncodedString(data)
           rec(bytesLeft - count)
-        }
       rec(100000)
 
       netIn.sendComplete()
@@ -717,9 +667,8 @@ class HttpServerSpec
       requests.request(1)
       requests.expectComplete()
       netOut.expectComplete()
-    }
 
-    "deliver a request with a non-RFC3986 request-target" in new TestSetup {
+    "deliver a request with a non-RFC3986 request-target" in new TestSetup
       send("""GET //foo HTTP/1.1
              |Host: example.com
              |
@@ -727,9 +676,8 @@ class HttpServerSpec
 
       expectRequest() shouldEqual HttpRequest(
           uri = "http://example.com//foo", headers = List(Host("example.com")))
-    }
 
-    "use default-host-header for HTTP/1.0 requests" in new TestSetup {
+    "use default-host-header for HTTP/1.0 requests" in new TestSetup
       send("""GET /abc HTTP/1.0
              |
              |""")
@@ -739,9 +687,8 @@ class HttpServerSpec
 
       override def settings: ServerSettings =
         super.settings.withDefaultHostHeader(Host("example.com"))
-    }
 
-    "fail an HTTP/1.0 request with 400 if no default-host-header is set" in new TestSetup {
+    "fail an HTTP/1.0 request with 400 if no default-host-header is set" in new TestSetup
       send("""GET /abc HTTP/1.0
              |
              |""")
@@ -756,9 +703,8 @@ class HttpServerSpec
            |Content-Length: 41
            |
            |Request is missing required `Host` header""")
-    }
 
-    "support remote-address-header" in new TestSetup {
+    "support remote-address-header" in new TestSetup
       lazy val theAddress = InetAddress.getByName("127.5.2.1")
 
       override def remoteAddress: Option[InetSocketAddress] =
@@ -775,11 +721,10 @@ class HttpServerSpec
       val request = expectRequest()
       request.headers should contain(
           `Remote-Address`(RemoteAddress(theAddress, Some(8080))))
-    }
 
-    "support request timeouts" which {
+    "support request timeouts" which
 
-      "are defined via the config" in new RequestTimeoutTestSetup(10.millis) {
+      "are defined via the config" in new RequestTimeoutTestSetup(10.millis)
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         expectRequest().header[`Timeout-Access`] shouldBe defined
         expectResponseWithWipedDate("""HTTP/1.1 503 Service Unavailable
@@ -790,10 +735,9 @@ class HttpServerSpec
             |
             |The server was not able to produce a timely response to your request.
             |Please try again in a short while!""")
-      }
 
       "are programmatically increased (not expiring)" in new RequestTimeoutTestSetup(
-          10.millis) {
+          10.millis)
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         expectRequest()
           .header[`Timeout-Access`]
@@ -806,10 +750,9 @@ class HttpServerSpec
             |Content-Length: 0
             |
             |""")
-      }
 
       "are programmatically increased (expiring)" in new RequestTimeoutTestSetup(
-          10.millis) {
+          10.millis)
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         expectRequest()
           .header[`Timeout-Access`]
@@ -823,10 +766,9 @@ class HttpServerSpec
             |
             |The server was not able to produce a timely response to your request.
             |Please try again in a short while!""")
-      }
 
       "are programmatically decreased" in new RequestTimeoutTestSetup(
-          50.millis) {
+          50.millis)
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         expectRequest()
           .header[`Timeout-Access`]
@@ -841,10 +783,9 @@ class HttpServerSpec
             |The server was not able to produce a timely response to your request.
             |Please try again in a short while!""")
         (System.nanoTime() - mark) should be < (40 * 1000000L)
-      }
 
       "have a programmatically set timeout handler" in new RequestTimeoutTestSetup(
-          10.millis) {
+          10.millis)
         send("GET / HTTP/1.1\r\nHost: example.com\r\n\r\n")
         val timeoutResponse =
           HttpResponse(StatusCodes.InternalServerError, entity = "OOPS!")
@@ -858,10 +799,8 @@ class HttpServerSpec
             |Content-Length: 5
             |
             |OOPS!""")
-      }
-    }
 
-    "add `Connection: close` to early responses" in new TestSetup {
+    "add `Connection: close` to early responses" in new TestSetup
       send("""POST / HTTP/1.1
              |Host: example.com
              |Content-Length: 100000
@@ -884,12 +823,11 @@ class HttpServerSpec
       netIn.sendComplete()
       requests.expectComplete()
       netOut.expectComplete()
-    }
 
-    "support request length verification" which afterWord("is defined via") {
+    "support request length verification" which afterWord("is defined via")
 
       class LengthVerificationTest(maxContentLength: Int)
-          extends TestSetup(maxContentLength) {
+          extends TestSetup(maxContentLength)
         val entityBase = "0123456789ABCD"
         def sendStrictRequestWithLength(bytes: Int) =
           send(s"""POST /foo HTTP/1.1
@@ -897,7 +835,7 @@ class HttpServerSpec
                  |Content-Length: $bytes
                  |
                  |${entityBase take bytes}""")
-        def sendDefaultRequestWithLength(bytes: Int) = {
+        def sendDefaultRequestWithLength(bytes: Int) =
           send(s"""POST /foo HTTP/1.1
                  |Host: example.com
                  |Content-Length: $bytes
@@ -905,7 +843,6 @@ class HttpServerSpec
                  |${entityBase take 3}""")
           send(entityBase.slice(3, 7))
           send(entityBase.slice(7, bytes))
-        }
         def sendChunkedRequestWithLength(bytes: Int) =
           send(s"""POST /foo HTTP/1.1
                  |Host: example.com
@@ -921,19 +858,18 @@ class HttpServerSpec
                  |
                  |""")
 
-        implicit class XRequest(request: HttpRequest) {
+        implicit class XRequest(request: HttpRequest)
           def expectEntity[T <: HttpEntity : ClassTag](bytes: Int) =
-            inside(request) {
+            inside(request)
               case HttpRequest(POST, _, _, entity: T, _) ⇒
                 entity
                   .toStrict(100.millis)
                   .awaitResult(100.millis)
                   .data
                   .utf8String shouldEqual entityBase.take(bytes)
-            }
 
           def expectDefaultEntityWithSizeError(limit: Int, actualSize: Int) =
-            inside(request) {
+            inside(request)
               case HttpRequest(POST,
                                _,
                                _,
@@ -961,10 +897,9 @@ class HttpServerSpec
                       |Content-Length: 75
                       |
                   |Request Content-Length of $actualSize bytes exceeds the configured limit of $limit bytes""")
-            }
 
           def expectChunkedEntityWithSizeError(limit: Int) =
-            inside(request) {
+            inside(request)
               case HttpRequest(POST, _, _, entity: HttpEntity.Chunked, _) ⇒
                 val error = the[Exception]
                   .thrownBy(entity.dataBytes
@@ -987,12 +922,9 @@ class HttpServerSpec
                     |Content-Length: 81
                     |
                     |Aggregated data length of request entity exceeds the configured limit of $limit bytes""")
-            }
-        }
-      }
 
       "the config setting (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+          maxContentLength = 10)
         sendStrictRequestWithLength(10)
         expectRequest().expectEntity[HttpEntity.Strict](10)
 
@@ -1001,29 +933,26 @@ class HttpServerSpec
         sendStrictRequestWithLength(11)
         expectRequest().expectDefaultEntityWithSizeError(limit = 10,
                                                          actualSize = 11)
-      }
 
       "the config setting (default entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+          maxContentLength = 10)
         sendDefaultRequestWithLength(10)
         expectRequest().expectEntity[HttpEntity.Default](10)
 
         sendDefaultRequestWithLength(11)
         expectRequest().expectDefaultEntityWithSizeError(limit = 10,
                                                          actualSize = 11)
-      }
 
       "the config setting (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
+          maxContentLength = 10)
         sendChunkedRequestWithLength(10)
         expectRequest().expectEntity[HttpEntity.Chunked](10)
 
         sendChunkedRequestWithLength(11)
         expectRequest().expectChunkedEntityWithSizeError(limit = 10)
-      }
 
       "a smaller programmatically-set limit (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+          maxContentLength = 12)
         sendStrictRequestWithLength(10)
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
@@ -1035,10 +964,9 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
-      }
 
       "a smaller programmatically-set limit (default entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+          maxContentLength = 12)
         sendDefaultRequestWithLength(10)
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
@@ -1048,10 +976,9 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
-      }
 
       "a smaller programmatically-set limit (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 12) {
+          maxContentLength = 12)
         sendChunkedRequestWithLength(10)
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
@@ -1061,10 +988,9 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectChunkedEntityWithSizeError(limit = 10)
-      }
 
       "a larger programmatically-set limit (strict entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+          maxContentLength = 8)
         // entities that would be strict but have a Content-Length > the configured maximum are delivered
         // as single element Default entities!
         sendStrictRequestWithLength(10)
@@ -1076,10 +1002,9 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
-      }
 
       "a larger programmatically-set limit (default entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+          maxContentLength = 8)
         sendDefaultRequestWithLength(10)
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
@@ -1089,10 +1014,9 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
-      }
 
       "a larger programmatically-set limit (chunked entity)" in new LengthVerificationTest(
-          maxContentLength = 8) {
+          maxContentLength = 8)
         sendChunkedRequestWithLength(10)
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
@@ -1102,14 +1026,12 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(_ withSizeLimit 10)
           .expectChunkedEntityWithSizeError(limit = 10)
-      }
 
       "the config setting applied before another attribute (default entity)" in new LengthVerificationTest(
-          maxContentLength = 10) {
-        def nameDataSource(name: String): RequestEntity ⇒ RequestEntity = {
+          maxContentLength = 10)
+        def nameDataSource(name: String): RequestEntity ⇒ RequestEntity =
           case x: HttpEntity.Default ⇒ x.copy(data = x.data named name)
           case _ ⇒ ??? // prevent a compile-time warning
-        }
         sendDefaultRequestWithLength(10)
         expectRequest()
           .mapEntity(nameDataSource("foo"))
@@ -1119,25 +1041,17 @@ class HttpServerSpec
         expectRequest()
           .mapEntity(nameDataSource("foo"))
           .expectDefaultEntityWithSizeError(limit = 10, actualSize = 11)
-      }
-    }
-  }
-  class TestSetup(maxContentLength: Int = -1) extends HttpServerTestSetupBase {
+  class TestSetup(maxContentLength: Int = -1) extends HttpServerTestSetupBase
     implicit def system = spec.system
     implicit def materializer = spec.materializer
 
-    override def settings = {
+    override def settings =
       val s = super.settings
       if (maxContentLength < 0) s
       else
         s.withParserSettings(
             s.parserSettings.withMaxContentLength(maxContentLength))
-    }
-  }
-  class RequestTimeoutTestSetup(requestTimeout: Duration) extends TestSetup {
-    override def settings = {
+  class RequestTimeoutTestSetup(requestTimeout: Duration) extends TestSetup
+    override def settings =
       val s = super.settings
       s.withTimeouts(s.timeouts.withRequestTimeout(requestTimeout))
-    }
-  }
-}

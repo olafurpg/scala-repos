@@ -20,11 +20,11 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * Date: 30.06.2009
   */
 abstract class OptimizeImportsTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
 
   def folderPath: String = baseRootPath() + "optimize/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -51,13 +51,10 @@ abstract class OptimizeImportsTestBase
 
     lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res)
-  }
-}

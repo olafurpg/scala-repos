@@ -20,43 +20,36 @@ import scala.annotation.tailrec
 
 trait ScBindingPattern
     extends ScPattern with ScNamedElement with ScTypedDefinition
-    with NavigationItem with PsiDocCommentOwner {
+    with NavigationItem with PsiDocCommentOwner
   override def getTextOffset: Int = nameId.getTextRange.getStartOffset
 
   def isWildcard: Boolean
 
-  protected def getEnclosingVariable: Option[ScVariable] = {
-    ScalaPsiUtil.nameContext(this) match {
+  protected def getEnclosingVariable: Option[ScVariable] =
+    ScalaPsiUtil.nameContext(this) match
       case v: ScVariable => Some(v)
       case _ => None
-    }
-  }
 
-  override def isStable = getEnclosingVariable match {
+  override def isStable = getEnclosingVariable match
     case None => true
     case _ => false
-  }
 
   override def isVar: Boolean = nameContext.isInstanceOf[ScVariable]
   override def isVal: Boolean = nameContext.isInstanceOf[ScValue]
 
-  def isClassMember = nameContext.getContext match {
+  def isClassMember = nameContext.getContext match
     case _: ScTemplateBody | _: ScEarlyDefinitions => true
     case _ => false
-  }
-  def isBeanProperty: Boolean = nameContext match {
+  def isBeanProperty: Boolean = nameContext match
     case a: ScAnnotationsHolder => ScalaPsiUtil.isBeanProperty(a)
     case _ => false
-  }
 
-  def containingClass: ScTemplateDefinition = {
-    ScalaPsiUtil.nameContext(this) match {
+  def containingClass: ScTemplateDefinition =
+    ScalaPsiUtil.nameContext(this) match
       case memb: ScMember => memb.containingClass
       case _ => null
-    }
-  }
 
-  def getOriginalElement: PsiElement = {
+  def getOriginalElement: PsiElement =
     val ccontainingClass = containingClass
     if (ccontainingClass == null) return this
     val originalClass: PsiClass =
@@ -65,68 +58,50 @@ trait ScBindingPattern
     if (!originalClass.isInstanceOf[ScTypeDefinition]) return this
     val c = originalClass.asInstanceOf[ScTypeDefinition]
     val membersIterator = c.members.iterator
-    while (membersIterator.hasNext) {
+    while (membersIterator.hasNext)
       val member = membersIterator.next()
-      member match {
+      member match
         case _: ScValue | _: ScVariable =>
           val d = member.asInstanceOf[ScDeclaredElementsHolder]
           val elemsIterator = d.declaredElements.iterator
-          while (elemsIterator.hasNext) {
+          while (elemsIterator.hasNext)
             val nextElem = elemsIterator.next()
             if (nextElem.name == name) return nextElem
-          }
         case _ =>
-      }
-    }
     this
-  }
 
-  def getDocComment: PsiDocComment = {
-    nameContext match {
+  def getDocComment: PsiDocComment =
+    nameContext match
       case d: PsiDocCommentOwner => d.getDocComment
       case _ => null
-    }
-  }
 
-  def isDeprecated: Boolean = {
-    nameContext match {
+  def isDeprecated: Boolean =
+    nameContext match
       case d: PsiDocCommentOwner => d.isDeprecated
       case _ => false
-    }
-  }
 
   /**
     * It's for Java only
     */
-  def getContainingClass: PsiClass = {
-    nameContext match {
+  def getContainingClass: PsiClass =
+    nameContext match
       case m: PsiMember => m.getContainingClass
       case _ => null
-    }
-  }
 
-  def getModifierList: PsiModifierList = {
-    nameContext match {
+  def getModifierList: PsiModifierList =
+    nameContext match
       case owner: PsiModifierListOwner => owner.getModifierList
       case _ => null
-    }
-  }
 
-  def hasModifierProperty(name: String): Boolean = {
-    nameContext match {
+  def hasModifierProperty(name: String): Boolean =
+    nameContext match
       case owner: PsiModifierListOwner => owner.hasModifierProperty(name)
       case _ => false
-    }
-  }
-}
 
-object ScBindingPattern {
+object ScBindingPattern
   @tailrec
-  def getCompoundCopy(rt: ScType, b: ScBindingPattern): ScBindingPattern = {
-    b match {
+  def getCompoundCopy(rt: ScType, b: ScBindingPattern): ScBindingPattern =
+    b match
       case light: ScLightBindingPattern => getCompoundCopy(rt, light.b)
       case definition: ScBindingPattern =>
         new ScLightBindingPattern(rt, definition)
-    }
-  }
-}

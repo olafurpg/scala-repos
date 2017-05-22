@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.Bucketizer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object BucketizerExample {
-  def main(args: Array[String]): Unit = {
+object BucketizerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("BucketizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -48,6 +48,4 @@ object BucketizerExample {
     bucketedData.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

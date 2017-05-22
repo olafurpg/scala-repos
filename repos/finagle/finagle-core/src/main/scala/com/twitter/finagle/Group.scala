@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicReference
   */
 @deprecated(
     "Use `com.twitter.finagle.Name` to represent clusters instead", "6.7.x")
-trait Group[T] { outer =>
+trait Group[T]  outer =>
   // Group is needlessly complex due to it transitioning to
   // deprecation. In order to provide reasonable compatibility with
   // forthcoming structrures, we base the group implementation on Var
@@ -42,11 +42,10 @@ trait Group[T] { outer =>
 
   // We use the ref here to preserve group semantics.  IE: retain object
   // identity to repeated calls to Group.members
-  final protected[finagle] lazy val ref = {
+  final protected[finagle] lazy val ref =
     val r = new AtomicReference[Set[T]]()
     set.changes.register(Witness(r))
     r
-  }
 
   /**
     * Create a new group by mapping each element of this group
@@ -60,22 +59,18 @@ trait Group[T] { outer =>
     * with `f`. `f` is guaranteed to be invoked exactly once for each
     * element of the group, even for dynamic groups.
     */
-  def collect[U](f: PartialFunction[T, U]): Group[U] = new Group[U] {
+  def collect[U](f: PartialFunction[T, U]): Group[U] = new Group[U]
     var mapped = Map[T, U]()
     var last = Set[T]()
     protected[finagle] val set =
-      outer.set map { set =>
-        synchronized {
-          mapped ++= (set &~ last) collect {
+      outer.set map  set =>
+        synchronized
+          mapped ++= (set &~ last) collect
             case el if f.isDefinedAt(el) => el -> f(el)
-          }
           mapped --= last &~ set
           last = set
-        }
 
         mapped.values.toSet
-      }
-  }
 
   /**
     * The current members of this group. If the group has not
@@ -93,13 +88,11 @@ trait Group[T] { outer =>
     */
   def named(n: String): Group[T] = LabelledGroup(this, n)
 
-  def +(other: Group[T]): Group[T] = new Group[T] {
+  def +(other: Group[T]): Group[T] = new Group[T]
     protected[finagle] val set = for { a <- outer.set; b <- other.set } yield
       a ++ b
-  }
 
   override def toString = "Group(%s)".format(this() mkString ", ")
-}
 
 /**
   * A group that simply contains a name. Getting at the set binds the
@@ -109,19 +102,16 @@ trait Group[T] { outer =>
 @deprecated(
     "Use `com.twitter.finagle.Name` to represent clusters instead", "6.7.x")
 private[finagle] case class NameGroup(name: Name.Bound)
-    extends Group[SocketAddress] {
+    extends Group[SocketAddress]
   protected[finagle] lazy val set: Var[Set[SocketAddress]] =
-    name.addr map {
+    name.addr map
       case Addr.Bound(set, _) => set.collect { case Address.Inet(ia, _) => ia }
       case _ => Set()
-    }
-}
 
 @deprecated(
     "Use `com.twitter.finagle.Name` to represent clusters instead", "6.7.x")
-trait MutableGroup[T] extends Group[T] {
+trait MutableGroup[T] extends Group[T]
   def update(newMembers: Set[T])
-}
 
 /**
   * A mixin trait to assign a ``name`` to the group. This is used
@@ -130,11 +120,10 @@ trait MutableGroup[T] extends Group[T] {
 @deprecated(
     "Use `com.twitter.finagle.Name` to represent clusters instead", "6.7.x")
 case class LabelledGroup[T](underlying: Group[T], name: String)
-    extends Group[T] {
+    extends Group[T]
   protected[finagle] lazy val set: Var[Set[T]] = underlying.set
-}
 
-object Group {
+object Group
 
   /**
     * Construct a `T`-typed static group from the given elements.
@@ -143,23 +132,19 @@ object Group {
     */
   @deprecated("Use `com.twitter.finagle.Name` to represent clusters instead",
               "2014-11-21")
-  def apply[T](staticMembers: T*): Group[T] = new Group[T] {
+  def apply[T](staticMembers: T*): Group[T] = new Group[T]
     protected[finagle] val set = Var(Set(staticMembers: _*))
-  }
 
   def fromVarAddr(va: Var[Addr]): Group[SocketAddress] =
-    new Group[SocketAddress] {
+    new Group[SocketAddress]
       protected[finagle] val set: Var[Set[SocketAddress]] =
-        va map {
+        va map
           case Addr.Bound(addrs, _) =>
             addrs.collect { case Address.Inet(ia, _) => ia }
           case _ => Set[SocketAddress]()
-        }
-    }
 
-  def fromVar[T](v: Var[Set[T]]): Group[T] = new Group[T] {
+  def fromVar[T](v: Var[Set[T]]): Group[T] = new Group[T]
     protected[finagle] val set = v
-  }
 
   /**
     * The empty group of type `T`.
@@ -175,10 +160,9 @@ object Group {
     */
   @deprecated("Use `com.twitter.finagle.Name` to represent clusters instead",
               "2014-11-21")
-  def mutable[T](initial: T*): MutableGroup[T] = new MutableGroup[T] {
+  def mutable[T](initial: T*): MutableGroup[T] = new MutableGroup[T]
     protected[finagle] val set = Var(Set(initial: _*))
     def update(newMembers: Set[T]) { set() = newMembers }
-  }
 
   /**
     * Construct a (dynamic) `Group` from the given
@@ -188,17 +172,12 @@ object Group {
     */
   @deprecated("Use `com.twitter.finagle.Name` to represent clusters instead",
               "2014-11-21")
-  def fromCluster[T](underlying: Cluster[T]): Group[T] = {
+  def fromCluster[T](underlying: Cluster[T]): Group[T] =
     val (snap, edits) = underlying.snap
-    new Group[T] {
+    new Group[T]
       protected[finagle] val set = Var(snap.toSet)
 
-      edits foreach { spool =>
-        spool foreach {
+      edits foreach  spool =>
+        spool foreach
           case Cluster.Add(t) => set() += t
           case Cluster.Rem(t) => set() -= t
-        }
-      }
-    }
-  }
-}

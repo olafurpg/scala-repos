@@ -17,15 +17,14 @@ import java.math.MathContext
   * computation and testing if a value is negative may not be ideal. So, do not
   * count on `ArithmeticException`s to save you from bad arithmetic!
   */
-trait NRoot[@sp(Double, Float, Int, Long) A] extends Any {
+trait NRoot[@sp(Double, Float, Int, Long) A] extends Any
   def nroot(a: A, n: Int): A
   def sqrt(a: A): A = nroot(a, 2)
   def fpow(a: A, b: A): A
-}
 
 import spire.math.{ConvertableTo, ConvertableFrom, Number}
 
-object NRoot {
+object NRoot
   @inline final def apply[@sp(Int, Long, Float, Double) A](
       implicit ev: NRoot[A]): NRoot[A] = ev
 
@@ -37,33 +36,28 @@ object NRoot {
     * This can be used, for example, to find an integer `x` s.t.
     * `x * x < y < (x+1)*(x+1)`, by using `intSearch(x => x * x <= y)`.
     */
-  private def intSearch(f: Int => Boolean): Int = {
+  private def intSearch(f: Int => Boolean): Int =
     val ceil = (0 until 32) find (i => !f(1 << i)) getOrElse 33
-    if (ceil == 0) {
+    if (ceil == 0)
       0
-    } else {
-      (0 /: ((ceil - 1) to 0 by -1)) { (x, i) =>
+    else
+      (0 /: ((ceil - 1) to 0 by -1))  (x, i) =>
         val y = x | (1 << i)
         if (f(y)) y else x
-      }
-    }
-  }
 
   /**
     * Returns the digits to the right of the decimal point of `x / y` in base
     * `r` if x < y.
     */
-  private def decDiv(x: BigInt, y: BigInt, r: Int): Stream[BigInt] = {
+  private def decDiv(x: BigInt, y: BigInt, r: Int): Stream[BigInt] =
     val expanded = x * r
     val quot = expanded / y
     val rem = expanded - (quot * y)
 
-    if (rem == 0) {
+    if (rem == 0)
       Stream.cons(quot, Stream.empty)
-    } else {
+    else
       Stream.cons(quot, decDiv(rem, y, r))
-    }
-  }
 
   /** Returns the digits of `x` in base `r`. */
   private def digitize(x: BigInt, r: Int, prev: List[Int] = Nil): List[Int] =
@@ -90,24 +84,22 @@ object NRoot {
     * returns A `BigDecimal` approximation to the `k`-th root of `a`.
     */
   def nroot(a: BigDecimal, k: Int, ctxt: MathContext): BigDecimal =
-    if (k == 0) {
+    if (k == 0)
       BigDecimal(1)
-    } else if (a.signum < 0) {
-      if (k % 2 == 0) {
+    else if (a.signum < 0)
+      if (k % 2 == 0)
         throw new ArithmeticException("%d-root of negative number" format k)
-      } else {
+      else
         -nroot(-a, k, ctxt)
-      }
-    } else {
+    else
       val underlying = BigInt(a.bigDecimal.unscaledValue.toByteArray)
       val scale = BigInt(10) pow a.scale
       val intPart = digitize(underlying / scale, radix)
       val fracPart = decDiv(underlying % scale, scale, radix) map (_.toInt)
       val leader =
         if (intPart.size % k == 0) Stream.empty
-        else {
+        else
           Stream.fill(k - intPart.size % k)(0)
-        }
       val digits =
         leader ++ intPart.toStream ++ fracPart ++ Stream.continually(0)
       val radixPowK = BigInt(radix) pow k
@@ -118,7 +110,7 @@ object NRoot {
       val maxSize = (ctxt.getPrecision + 8) / 9 + 2
 
       def findRoot(
-          digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) = {
+          digits: Stream[Int], y: BigInt, r: BigInt, i: Int): (Int, BigInt) =
         val y_ = y * radix
         val a = undigitize(digits take k, radix)
         // Note: target grows quite fast (so I imagine (y_ + b) pow k does too).
@@ -127,20 +119,16 @@ object NRoot {
 
         val ny = y_ + b
 
-        if (i == maxSize) {
+        if (i == maxSize)
           (i, ny)
-        } else {
+        else
           val nr = target - (ny pow k)
 
           // TODO: Add stopping condition for when nr == 0 and there are no more
           // digits. Tricky part is refactoring to know when digits end...
 
           findRoot(digits drop k, ny, nr, i + 1)
-        }
-      }
 
       val (size, unscaled) = findRoot(digits, 0, 0, 1)
       val newscale = (size - (intPart.size + k - 1) / k) * 9
       BigDecimal(unscaled, newscale, ctxt)
-    }
-}

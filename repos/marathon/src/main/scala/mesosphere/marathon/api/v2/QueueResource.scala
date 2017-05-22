@@ -24,18 +24,18 @@ class QueueResource @Inject()(clock: Clock,
                               val authenticator: Authenticator,
                               val authorizer: Authorizer,
                               val config: MarathonConf)
-    extends AuthResource {
+    extends AuthResource
 
   @GET
   @Timed
   @Produces(Array(MarathonMediaType.PREFERRED_APPLICATION_JSON))
-  def index(@Context req: HttpServletRequest): Response = authenticated(req) {
+  def index(@Context req: HttpServletRequest): Response = authenticated(req)
     implicit identity =>
       import Formats._
 
       val queuedWithDelay = launchQueue.list
         .filter(t => t.inProgress && isAuthorized(ViewApp, t.app))
-        .map {
+        .map
           case taskCount: LaunchQueue.QueuedTaskInfo =>
             val timeLeft = clock.now() until taskCount.backOffUntil
             Json.obj(
@@ -46,23 +46,18 @@ class QueueResource @Inject()(clock: Clock,
                     "overdue" -> (timeLeft < 0.seconds)
                 )
             )
-        }
       ok(Json.obj("queue" -> queuedWithDelay).toString())
-  }
 
   @DELETE
   @Path("""{appId:.+}/delay""")
   def resetDelay(@PathParam("appId") id: String,
                  @Context req: HttpServletRequest): Response =
-    authenticated(req) { implicit identity =>
+    authenticated(req)  implicit identity =>
       val appId = id.toRootPath
       val maybeApp = launchQueue.list.find(_.app.id == appId).map(_.app)
       withAuthorization(
           UpdateApp,
           maybeApp,
-          notFound(s"Application $appId not found in tasks queue.")) { app =>
+          notFound(s"Application $appId not found in tasks queue."))  app =>
         launchQueue.resetDelay(app)
         noContent
-      }
-    }
-}

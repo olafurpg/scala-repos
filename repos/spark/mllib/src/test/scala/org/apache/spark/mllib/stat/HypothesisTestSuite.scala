@@ -29,9 +29,9 @@ import org.apache.spark.mllib.stat.test.ChiSqTest
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
+class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("chi squared pearson goodness of fit") {
+  test("chi squared pearson goodness of fit")
 
     val observed = new DenseVector(Array[Double](4, 6, 5))
     val pearson = Statistics.chiSqTest(observed)
@@ -83,9 +83,8 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val zeroObserved = new DenseVector(Array(2.0, 0.0, 1.0))
     intercept[IllegalArgumentException](
         Statistics.chiSqTest(zeroObserved, zeroExpected))
-  }
 
-  test("chi squared pearson matrix independence") {
+  test("chi squared pearson matrix independence")
     val data = Array(
         40.0, 24.0, 29.0, 56.0, 32.0, 42.0, 31.0, 10.0, 0.0, 30.0, 15.0, 12.0)
     // [[40.0, 56.0, 31.0, 30.0],
@@ -116,9 +115,8 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     // IllegalArgumentException thrown here since it's thrown on driver, not inside a task
     intercept[IllegalArgumentException](
         Statistics.chiSqTest(Matrices.dense(2, 2, colZero)))
-  }
 
-  test("chi squared pearson RDD[LabeledPoint]") {
+  test("chi squared pearson RDD[LabeledPoint]")
     // labels: 1.0 (2 / 6), 0.0 (4 / 6)
     // feature1: 0.5 (1 / 6), 1.5 (2 / 6), 3.5 (3 / 6)
     // feature2: 10.0 (1 / 6), 20.0 (1 / 6), 30.0 (2 / 6), 40.0 (2 / 6)
@@ -128,7 +126,7 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
                    LabeledPoint(0.0, Vectors.dense(3.5, 30.0)),
                    LabeledPoint(0.0, Vectors.dense(3.5, 40.0)),
                    LabeledPoint(1.0, Vectors.dense(3.5, 40.0)))
-    for (numParts <- List(2, 4, 6, 8)) {
+    for (numParts <- List(2, 4, 6, 8))
       val chi = Statistics.chiSqTest(sc.parallelize(data, numParts))
       val feature1 = chi(0)
       assert(feature1.statistic === 0.75)
@@ -144,7 +142,6 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
       assert(feature2.method === ChiSqTest.PEARSON.name)
       assert(
           feature2.nullHypothesis === ChiSqTest.NullHypothesis.independence.toString)
-    }
 
     // Test that the right number of results is returned
     val numCols = 1001
@@ -159,18 +156,15 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val random = new Random(11L)
     val continuousLabel = Seq.fill(100000)(
         LabeledPoint(random.nextDouble(), Vectors.dense(random.nextInt(2))))
-    intercept[SparkException] {
+    intercept[SparkException]
       Statistics.chiSqTest(sc.parallelize(continuousLabel, 2))
-    }
     val continuousFeature = Seq.fill(100000)(
         LabeledPoint(random.nextInt(2), Vectors.dense(random.nextDouble())))
-    intercept[SparkException] {
+    intercept[SparkException]
       Statistics.chiSqTest(sc.parallelize(continuousFeature, 2))
-    }
-  }
 
   test(
-      "1 sample Kolmogorov-Smirnov test: apache commons math3 implementation equivalence") {
+      "1 sample Kolmogorov-Smirnov test: apache commons math3 implementation equivalence")
     // Create theoretical distributions
     val stdNormalDist = new NormalDistribution(0, 1)
     val expDist = new ExponentialDistribution(0.6)
@@ -231,9 +225,8 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(result3.pValue ~== referencePVal3 relTol 1e-4)
     // reject null hypothesis
     assert(result3.pValue < pThreshold)
-  }
 
-  test("1 sample Kolmogorov-Smirnov test: R implementation equivalence") {
+  test("1 sample Kolmogorov-Smirnov test: R implementation equivalence")
     /*
       Comparing results with R's implementation of Kolmogorov-Smirnov for 1 sample
       > sessionInfo()
@@ -284,5 +277,3 @@ class HypothesisTestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val rCompResult = Statistics.kolmogorovSmirnovTest(rData, "norm", 0, 1)
     assert(rCompResult.statistic ~== rKSStat relTol 1e-4)
     assert(rCompResult.pValue ~== rKSPVal relTol 1e-4)
-  }
-}

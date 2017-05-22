@@ -18,7 +18,7 @@ import scala.concurrent.duration._
 /**
   * A helper to add caching to an Action.
   */
-class Cached @Inject()(cache: CacheApi) {
+class Cached @Inject()(cache: CacheApi)
 
   /**
     * Cache an action.
@@ -36,18 +36,16 @@ class Cached @Inject()(cache: CacheApi) {
     *
     * @param key Compute a key from the request header
     */
-  def apply(key: RequestHeader => String): CachedBuilder = {
+  def apply(key: RequestHeader => String): CachedBuilder =
     apply(key, duration = 0)
-  }
 
   /**
     * Cache an action.
     *
     * @param key Cache key
     */
-  def apply(key: String): CachedBuilder = {
+  def apply(key: String): CachedBuilder =
     apply(_ => key, duration = 0)
-  }
 
   /**
     * Cache an action.
@@ -55,11 +53,10 @@ class Cached @Inject()(cache: CacheApi) {
     * @param key Cache key
     * @param duration Cache duration (in seconds)
     */
-  def apply(key: RequestHeader => String, duration: Int): CachedBuilder = {
-    new CachedBuilder(cache, key, {
+  def apply(key: RequestHeader => String, duration: Int): CachedBuilder =
+    new CachedBuilder(cache, key,
       case (_: ResponseHeader) => Duration(duration, SECONDS)
-    })
-  }
+    )
 
   /**
     * A cached instance caching nothing
@@ -93,13 +90,12 @@ class Cached @Inject()(cache: CacheApi) {
     */
   def status(key: RequestHeader => String, status: Int): CachedBuilder =
     empty(key).includeStatus(status)
-}
 
 /**
   * A helper to add caching to an Action. This helper uses the Application's default cache.
   * If you want to inject a custom cache, see the `Cached` class.
   */
-object Cached {
+object Cached
 
   /**
     * Cache an action.
@@ -118,9 +114,8 @@ object Cached {
     * @param key Compute a key from the request header
     */
   @deprecated("Inject Cached into your component", "2.5.0")
-  def apply(key: RequestHeader => String): UnboundCachedBuilder = {
+  def apply(key: RequestHeader => String): UnboundCachedBuilder =
     apply(key, duration = 0)
-  }
 
   /**
     * Cache an action.
@@ -128,9 +123,8 @@ object Cached {
     * @param key Cache key
     */
   @deprecated("Inject Cached into your component", "2.5.0")
-  def apply(key: String): UnboundCachedBuilder = {
+  def apply(key: String): UnboundCachedBuilder =
     apply(_ => key, duration = 0)
-  }
 
   /**
     * Cache an action.
@@ -140,11 +134,10 @@ object Cached {
     */
   @deprecated("Inject Cached into your component", "2.5.0")
   def apply(
-      key: RequestHeader => String, duration: Int): UnboundCachedBuilder = {
-    new UnboundCachedBuilder(key, {
+      key: RequestHeader => String, duration: Int): UnboundCachedBuilder =
+    new UnboundCachedBuilder(key,
       case (_: ResponseHeader) => Duration(duration, SECONDS)
-    })
-  }
+    )
 
   /**
     * A cached instance caching nothing
@@ -184,7 +177,6 @@ object Cached {
   @deprecated("Inject Cached into your component", "2.5.0")
   def status(key: RequestHeader => String, status: Int): UnboundCachedBuilder =
     empty(key).includeStatus(status)
-}
 
 /**
   * Builds an action with caching behavior. Typically created with one of the methods in the `Cached`
@@ -200,7 +192,7 @@ object Cached {
   */
 final class CachedBuilder(cache: CacheApi,
                           key: RequestHeader => String,
-                          caching: PartialFunction[ResponseHeader, Duration]) {
+                          caching: PartialFunction[ResponseHeader, Duration])
 
   /**
     * Compose the cache with an action
@@ -210,49 +202,44 @@ final class CachedBuilder(cache: CacheApi,
   /**
     * Compose the cache with an action
     */
-  def build(action: EssentialAction): EssentialAction = EssentialAction {
+  def build(action: EssentialAction): EssentialAction = EssentialAction
     request =>
       val resultKey = key(request)
       val etagKey = s"$resultKey-etag"
 
       // Has the client a version of the resource as fresh as the last one we served?
-      val notModified = for {
+      val notModified = for
         requestEtag <- request.headers.get(IF_NONE_MATCH)
         etag <- cache.get[String](etagKey) if requestEtag == "*" ||
                etag == requestEtag
-      } yield Accumulator.done(NotModified)
+      yield Accumulator.done(NotModified)
 
-      notModified.orElse {
+      notModified.orElse
         // Otherwise try to serve the resource from the cache, if it has not yet expired
-        cache.get[SerializableResult](resultKey).map {
+        cache.get[SerializableResult](resultKey).map
           sr: SerializableResult =>
             Accumulator.done(sr.result)
-        }
-      }.getOrElse {
+      .getOrElse
         // The resource was not in the cache, we have to run the underlying action
         val accumulatorResult = action(request)
 
         // Add cache information to the response, so clients can cache its content
         accumulatorResult.map(handleResult(_, etagKey, resultKey))
-      }
-  }
 
   /**
     * Eternity is one year long. Duration zero means eternity.
     */
-  private val cachingWithEternity = caching.andThen { duration =>
+  private val cachingWithEternity = caching.andThen  duration =>
     // FIXME: Surely Duration.Inf is a better marker for eternity than 0?
     val zeroDuration: Boolean = duration.neg().equals(duration)
-    if (zeroDuration) {
+    if (zeroDuration)
       Duration(60 * 60 * 24 * 365, SECONDS)
-    } else {
+    else
       duration
-    }
-  }
 
   private def handleResult(
-      result: Result, etagKey: String, resultKey: String): Result = {
-    cachingWithEternity.andThen { duration =>
+      result: Result, etagKey: String, resultKey: String): Result =
+    cachingWithEternity.andThen  duration =>
       // Format expiration date according to http standard
       val expirationDate =
         http.dateFormat.print(System.currentTimeMillis() + duration.toMillis)
@@ -269,8 +256,7 @@ final class CachedBuilder(cache: CacheApi,
       cache.set(resultKey, new SerializableResult(resultWithHeaders), duration)
 
       resultWithHeaders
-    }.applyOrElse(result.header, (_: ResponseHeader) => result)
-  }
+    .applyOrElse(result.header, (_: ResponseHeader) => result)
 
   /**
     * Whether this cache should cache the specified response if the status code match
@@ -296,11 +282,9 @@ final class CachedBuilder(cache: CacheApi,
     * @param status the status code to check
     * @param duration how long should we cache the result for
     */
-  def includeStatus(status: Int, duration: Duration): CachedBuilder = compose {
-    case e if e.status == status => {
+  def includeStatus(status: Int, duration: Duration): CachedBuilder = compose
+    case e if e.status == status =>
         duration
-      }
-  }
 
   /**
     * The returned cache will store all responses whatever they may contain
@@ -328,7 +312,6 @@ final class CachedBuilder(cache: CacheApi,
         key = key,
         caching = caching.orElse(alternative)
     )
-}
 
 /**
   * Builds an action with caching behavior. Typically created with one of the methods in the `Cached`
@@ -348,7 +331,7 @@ final class CachedBuilder(cache: CacheApi,
 @deprecated("Use CachedBuilder instead", "2.5.0")
 class UnboundCachedBuilder(
     key: RequestHeader => String,
-    caching: PartialFunction[ResponseHeader, Duration]) {
+    caching: PartialFunction[ResponseHeader, Duration])
   import Cached._
 
   /**
@@ -361,9 +344,8 @@ class UnboundCachedBuilder(
     * Compose the cache with an action
     */
   def build(action: EssentialAction)(
-      implicit app: Application): EssentialAction = {
+      implicit app: Application): EssentialAction =
     new CachedBuilder(Cache.cacheApi, key, caching).build(action)
-  }
 
   /**
     * Whether this cache should cache the specified response if the status code match
@@ -390,11 +372,9 @@ class UnboundCachedBuilder(
     * @param duration how long should we cache the result for
     */
   def includeStatus(status: Int, duration: Duration): UnboundCachedBuilder =
-    compose {
-      case e if e.status == status => {
+    compose
+      case e if e.status == status =>
           duration
-        }
-    }
 
   /**
     * The returned cache will store all responses whatever they may contain
@@ -420,4 +400,3 @@ class UnboundCachedBuilder(
       key = key,
       caching = caching.orElse(alternative)
   )
-}

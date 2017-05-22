@@ -6,7 +6,7 @@ import asm._
 import asm.tree._
 import java.lang.reflect.Modifier
 
-sealed trait AsmNode[+T] {
+sealed trait AsmNode[+T]
   def node: T
   def access: Int
   def desc: String
@@ -22,23 +22,20 @@ sealed trait AsmNode[+T] {
     if (access == 0) "" else " " + Modifier.toString(access)
   private def sigString = if (signature == null) "" else " " + signature
   override def toString = characteristics
-}
 
-object AsmNode {
+object AsmNode
   type AsmMethod = AsmNode[MethodNode]
   type AsmField = AsmNode[FieldNode]
   type AsmMember = AsmNode[_]
 
-  implicit class ClassNodeOps(val node: ClassNode) {
-    def fieldsAndMethods: List[AsmMember] = {
+  implicit class ClassNodeOps(val node: ClassNode)
+    def fieldsAndMethods: List[AsmMember] =
       val xs: List[AsmMember] =
         (node.methods.asScala.toList.map(x => (x: AsmMethod)) ++ node.fields.asScala.toList
               .map(x => (x: AsmField)))
       xs sortBy (_.characteristics)
-    }
-  }
   implicit class AsmMethodNode(val node: MethodNode)
-      extends AsmNode[MethodNode] {
+      extends AsmNode[MethodNode]
     def access: Int = node.access
     def desc: String = node.desc
     def name: String = node.name
@@ -48,8 +45,7 @@ object AsmNode {
       node.visibleAnnotations.asScala.toList
     def invisibleAnnotations: List[AnnotationNode] =
       node.invisibleAnnotations.asScala.toList
-  }
-  implicit class AsmFieldNode(val node: FieldNode) extends AsmNode[FieldNode] {
+  implicit class AsmFieldNode(val node: FieldNode) extends AsmNode[FieldNode]
     def access: Int = node.access
     def desc: String = node.desc
     def name: String = node.name
@@ -59,8 +55,6 @@ object AsmNode {
       node.visibleAnnotations.asScala.toList
     def invisibleAnnotations: List[AnnotationNode] =
       node.invisibleAnnotations.asScala.toList
-  }
 
   def apply(node: MethodNode): AsmMethodNode = new AsmMethodNode(node)
   def apply(node: FieldNode): AsmFieldNode = new AsmFieldNode(node)
-}

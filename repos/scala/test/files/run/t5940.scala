@@ -1,6 +1,6 @@
 import scala.tools.partest._
 
-object Test extends DirectTest {
+object Test extends DirectTest
   def code = ???
 
   def macros_1 =
@@ -17,7 +17,7 @@ object Test extends DirectTest {
       def foo: Unit = macro impl
     }
   """
-  def compileMacros() = {
+  def compileMacros() =
     val classpath =
       List(sys.props("partest.lib"), sys.props("partest.reflect")) mkString sys
         .props("path.separator")
@@ -27,25 +27,20 @@ object Test extends DirectTest {
                     classpath,
                     "-d",
                     testOutput.path))(macros_1)
-  }
 
   def test_2 = """
     object Test extends App {
       println(Macros.foo)
     }
   """
-  def compileTest() = {
+  def compileTest() =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(test_2)
-  }
 
-  def show(): Unit = {
+  def show(): Unit =
     log("Compiling Macros_1...")
-    if (compileMacros()) {
+    if (compileMacros())
       log("Compiling Test_2...")
       if (compileTest()) log("Success!") else log("Failed...")
-    }
-  }
-}

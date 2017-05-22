@@ -22,36 +22,32 @@ package com.twitter.scalding.typed
   *
   * This may be slow, but is used in scalding at planning time
   */
-sealed trait NoStackAndThen[-A, +B] extends java.io.Serializable {
+sealed trait NoStackAndThen[-A, +B] extends java.io.Serializable
   def apply(a: A): B
   def andThen[C](fn: B => C): NoStackAndThen[A, C] =
     NoStackAndThen.NoStackMore(this, fn)
-  def andThen[C](that: NoStackAndThen[B, C]): NoStackAndThen[A, C] = {
+  def andThen[C](that: NoStackAndThen[B, C]): NoStackAndThen[A, C] =
     import NoStackAndThen._
     @annotation.tailrec
     def push(front: NoStackAndThen[A, Any],
              next: NoStackAndThen[Any, Any],
              toAndThen: ReversedStack[Any, C]): NoStackAndThen[A, C] =
-      (next, toAndThen) match {
+      (next, toAndThen) match
         case (NoStackWrap(fn), EmptyStack(fn2)) =>
           NoStackMore(front, fn).andThen(fn2)
         case (NoStackWrap(fn), NonEmpty(h, tail)) =>
           push(NoStackMore(front, fn), NoStackAndThen.NoStackWrap(h), tail)
         case (NoStackMore(first, tail), _) =>
           push(front, first, NonEmpty(tail, toAndThen))
-      }
-    that match {
+    that match
       case NoStackWrap(fn) => andThen(fn)
       case NoStackMore(head, tail) =>
         // casts needed for the tailrec, they can't cause runtime errors
         push(this,
              head.asInstanceOf[NoStackAndThen[Any, Any]],
              EmptyStack(tail))
-    }
-  }
-}
 
-object NoStackAndThen {
+object NoStackAndThen
   private[typed] def buildStackEntry: Array[StackTraceElement] =
     Thread.currentThread().getStackTrace
 
@@ -66,7 +62,7 @@ object NoStackAndThen {
 
   private[scalding] case class WithStackTrace[A, B](
       inner: NoStackAndThen[A, B], stackEntry: Array[StackTraceElement])
-      extends NoStackAndThen[A, B] {
+      extends NoStackAndThen[A, B]
     override def apply(a: A): B = inner(a)
 
     override def andThen[C](fn: B => C): NoStackAndThen[A, C] =
@@ -74,17 +70,15 @@ object NoStackAndThen {
 
     override def andThen[C](that: NoStackAndThen[B, C]): NoStackAndThen[A, C] =
       WithStackTrace[A, C](inner.andThen(that), stackEntry ++ buildStackEntry)
-  }
 
   // Just wraps a function
   private case class NoStackWrap[A, B](fn: A => B)
-      extends NoStackAndThen[A, B] {
+      extends NoStackAndThen[A, B]
     def apply(a: A) = fn(a)
-  }
   // This is the defunctionalized andThen
   private case class NoStackMore[A, B, C](
       first: NoStackAndThen[A, B], andThenFn: (B) => C)
-      extends NoStackAndThen[A, C] {
+      extends NoStackAndThen[A, C]
     /*
      * scala cannot optimize tail calls if the types change.
      * Any call that changes types, we replace that type with Any. These casts
@@ -93,21 +87,17 @@ object NoStackAndThen {
     @annotation.tailrec
     private def reversed(toPush: NoStackAndThen[A, Any],
                          rest: ReversedStack[Any, C]): ReversedStack[A, C] =
-      toPush match {
+      toPush match
         case NoStackWrap(fn) => NonEmpty(fn, rest)
         case NoStackMore(more, fn) => reversed(more, NonEmpty(fn, rest))
-      }
     @annotation.tailrec
     private def call(arg: Any, revstack: ReversedStack[Any, C]): C =
-      revstack match {
+      revstack match
         case EmptyStack(last) => last(arg)
         case NonEmpty(head, rest) => call(head(arg), rest)
-      }
     private lazy val revStack =
       // casts needed for the tailrec, they can't cause runtime errors
       reversed(first, EmptyStack(andThenFn.asInstanceOf[(Any) => (C)]))
         .asInstanceOf[ReversedStack[Any, C]]
 
     def apply(a: A): C = call(a, revStack)
-  }
-}

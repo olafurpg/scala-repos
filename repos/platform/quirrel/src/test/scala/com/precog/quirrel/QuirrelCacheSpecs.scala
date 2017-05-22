@@ -28,34 +28,29 @@ import emitter._
 
 object QuirrelCacheSpecs
     extends Specification with Parser with Compiler with TreeShaker
-    with GroupSolver with LineErrors with RandomLibrarySpec {
+    with GroupSolver with LineErrors with RandomLibrarySpec
 
   import ast._
 
   private def findNode[A](root: Expr)(
-      pf: PartialFunction[Expr, A]): Option[A] = {
-    def loop(expr: Expr): Option[A] = {
-      if (pf.isDefinedAt(expr)) {
+      pf: PartialFunction[Expr, A]): Option[A] =
+    def loop(expr: Expr): Option[A] =
+      if (pf.isDefinedAt(expr))
         Some(pf(expr))
-      } else {
-        val cs = expr match {
+      else
+        val cs = expr match
           // special-case Let because its children
           // doesn't return all the sub-exprs
           case Let(_, _, _, c1, c2) => c1 :: c2 :: Nil
           case e => e.children
-        }
 
-        cs.iterator map loop collectFirst {
+        cs.iterator map loop collectFirst
           case Some(a) => a
-        }
-      }
-    }
 
     loop(root)
-  }
 
-  "quirrel cache" should {
-    "not modify locs for identical queries" in {
+  "quirrel cache" should
+    "not modify locs for identical queries" in
       val input = """a := 1
                     |b := "asdf"
                     |c := true
@@ -68,26 +63,21 @@ object QuirrelCacheSpecs
       result must haveSize(1)
       val root = result.head
 
-      val a = findNode(root) {
+      val a = findNode(root)
         case NumLit(loc, _) => (loc.lineNum, loc.colNum)
-      }
-      val b = findNode(root) {
+      val b = findNode(root)
         case StrLit(loc, "asdf") => (loc.lineNum, loc.colNum)
-      }
-      val c = findNode(root) {
+      val c = findNode(root)
         case BoolLit(loc, _) => (loc.lineNum, loc.colNum)
-      }
-      val d = findNode(root) {
+      val d = findNode(root)
         case StrLit(loc, "/abc") => (loc.lineNum, loc.colNum)
-      }
 
       a must_== Some((1, 6))
       b must_== Some((2, 6))
       c must_== Some((3, 6))
       d must_== Some((4, 6))
-    }
 
-    "update locs" in {
+    "update locs" in
       val input1 = """a := 1
                     |b := 999
                     |c := 1000
@@ -116,12 +106,10 @@ object QuirrelCacheSpecs
       result2 must haveSize(1)
       result3 must haveSize(1)
 
-      def varLoc(name: String)(e: Expr) = {
-        findNode(e) {
+      def varLoc(name: String)(e: Expr) =
+        findNode(e)
           case Dispatch(loc, Identifier(_, `name`), _) =>
             (loc.lineNum, loc.colNum)
-        }
-      }
 
       val root2 = result2.head
       varLoc("a")(root2) must_== Some((5, 1))
@@ -134,6 +122,3 @@ object QuirrelCacheSpecs
       varLoc("b")(root3) must_== Some((5, 5))
       varLoc("c")(root3) must_== Some((5, 40))
       varLoc("d")(root3) must_== Some((5, 44))
-    }
-  }
-}

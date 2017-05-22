@@ -16,6 +16,5 @@
 
 package com.twitter.summingbird.scalding
 
-trait Sink[T] {
+trait Sink[T]
   def write(incoming: PipeFactory[T]): PipeFactory[T]
-}

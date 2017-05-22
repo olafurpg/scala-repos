@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit._
   *
   * Please note that this is a *very coarse* estimation; The gain though is that we do not have to perform the counting inside of the measured thing (we can adding in tight loops).
   */
-class KnownOpsInTimespanTimer(expectedOps: Long) extends Metric with Counting {
+class KnownOpsInTimespanTimer(expectedOps: Long) extends Metric with Counting
 
   val startTime = System.nanoTime
   val stopTime = new AtomicLong(0)
@@ -35,4 +35,3 @@ class KnownOpsInTimespanTimer(expectedOps: Long) extends Metric with Counting {
   def opsPerSecond: Double =
     expectedOps.toDouble /
     (elapsedTime.toDouble / NANOSECONDS.convert(1, SECONDS))
-}

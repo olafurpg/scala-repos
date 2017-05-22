@@ -33,7 +33,7 @@ case class App(id: Int, name: String, description: Option[String])
   * @group Meta Data
   */
 @DeveloperApi
-trait Apps {
+trait Apps
 
   /** Insert a new [[App]]. Returns a generated app ID if the supplied app ID is 0. */
   def insert(app: App): Option[Int]
@@ -52,4 +52,3 @@ trait Apps {
 
   /** Delete an [[App]] */
   def delete(id: Int): Unit
-}

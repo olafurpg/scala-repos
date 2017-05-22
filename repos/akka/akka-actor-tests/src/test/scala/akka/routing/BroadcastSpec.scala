@@ -9,37 +9,33 @@ import akka.actor.{Props, Actor}
 import akka.testkit.{TestLatch, ImplicitSender, DefaultTimeout, AkkaSpec}
 import akka.pattern.ask
 
-object BroadcastSpec {
-  class TestActor extends Actor {
+object BroadcastSpec
+  class TestActor extends Actor
     def receive = { case _ ⇒ }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class BroadcastSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
+class BroadcastSpec extends AkkaSpec with DefaultTimeout with ImplicitSender
 
-  "broadcast group" must {
+  "broadcast group" must
 
-    "broadcast message using !" in {
+    "broadcast message using !" in
       val doneLatch = new TestLatch(2)
 
       val counter1 = new AtomicInteger
       val actor1 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter1.addAndGet(msg)
-        }
-      }))
+      ))
 
       val counter2 = new AtomicInteger
       val actor2 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter2.addAndGet(msg)
-        }
-      }))
+      ))
 
       val paths = List(actor1, actor2).map(_.path.toString)
       val routedActor = system.actorOf(BroadcastGroup(paths).props())
@@ -50,30 +46,27 @@ class BroadcastSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
 
       counter1.get should ===(1)
       counter2.get should ===(1)
-    }
 
-    "broadcast message using ?" in {
+    "broadcast message using ?" in
       val doneLatch = new TestLatch(2)
 
       val counter1 = new AtomicInteger
       val actor1 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒
             counter1.addAndGet(msg)
             sender() ! "ack"
-        }
-      }))
+      ))
 
       val counter2 = new AtomicInteger
       val actor2 = system.actorOf(
-          Props(new Actor {
-        def receive = {
+          Props(new Actor
+        def receive =
           case "end" ⇒ doneLatch.countDown()
           case msg: Int ⇒ counter2.addAndGet(msg)
-        }
-      }))
+      ))
 
       val paths = List(actor1, actor2).map(_.path.toString)
       val routedActor = system.actorOf(BroadcastGroup(paths).props())
@@ -84,6 +77,3 @@ class BroadcastSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
 
       counter1.get should ===(1)
       counter2.get should ===(1)
-    }
-  }
-}

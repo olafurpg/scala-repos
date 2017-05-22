@@ -3,8 +3,8 @@ import language.experimental.macros
 
 class ann extends scala.annotation.StaticAnnotation
 
-object Macros {
-  def impl(c: Context) = {
+object Macros
+  def impl(c: Context) =
     import c.universe._
     // val tpt = Annotated(Apply(Select(New(Ident(newTypeName("ann"))), termNames.CONSTRUCTOR), List()), Ident(newTypeName("Int")))
     val tpt = Annotated(
@@ -18,7 +18,5 @@ object Macros {
                           Literal(Constant(42)))),
               Apply(Ident(newTermName("println")),
                     List(Ident(newTermName("x"))))))
-  }
 
   def foo = macro impl
-}

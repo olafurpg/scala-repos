@@ -21,7 +21,7 @@ package kafka.metrics
 
 import kafka.utils.{VerifiableProperties, CoreUtils}
 
-class KafkaMetricsConfig(props: VerifiableProperties) {
+class KafkaMetricsConfig(props: VerifiableProperties)
 
   /**
     * Comma-separated list of reporter types. These classes should be on the
@@ -35,4 +35,3 @@ class KafkaMetricsConfig(props: VerifiableProperties) {
     */
   val pollingIntervalSecs =
     props.getInt("kafka.metrics.polling.interval.secs", 10)
-}

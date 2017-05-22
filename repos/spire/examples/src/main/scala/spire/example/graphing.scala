@@ -4,8 +4,8 @@ package example
 import spire.implicits._
 import spire.math._
 
-object Graphing {
-  def main(args: Array[String]): Unit = {
+object Graphing
+  def main(args: Array[String]): Unit =
 
     val r = 9.0
 
@@ -18,14 +18,10 @@ object Graphing {
     def geny(y: Interval[Double]): Interval[Double] =
       y ** 2
 
-    for (iy <- -10 to 10) {
-      for (ix <- -10 to 10) {
+    for (iy <- -10 to 10)
+      for (ix <- -10 to 10)
         val x = genx(ix.toDouble +/- 0.5)
         val y = geny(iy.toDouble +/- 0.5)
         val c = if (x intersects y) "#" else "."
         print(c)
-      }
       println("")
-    }
-  }
-}

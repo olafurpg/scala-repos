@@ -10,7 +10,7 @@ import akka.http.scaladsl.server.util.ClassMagnet
 import akka.http.scaladsl.model._
 import akka.http.impl.util._
 
-trait HeaderDirectives {
+trait HeaderDirectives
   import BasicDirectives._
   import RouteDirectives._
 
@@ -19,21 +19,18 @@ trait HeaderDirectives {
     * request is rejected with an empty rejection set. If the given function throws an exception the request is rejected
     * with a [[akka.http.scaladsl.server.MalformedHeaderRejection]].
     */
-  def headerValue[T](f: HttpHeader ⇒ Option[T]): Directive1[T] = {
+  def headerValue[T](f: HttpHeader ⇒ Option[T]): Directive1[T] =
     val protectedF: HttpHeader ⇒ Option[Either[Rejection, T]] = header ⇒
-      try f(header).map(Right.apply) catch {
+      try f(header).map(Right.apply) catch
         case NonFatal(e) ⇒
           Some(
               Left(MalformedHeaderRejection(
                       header.name, e.getMessage.nullAsEmpty, Some(e))))
-    }
 
-    extract(_.request.headers.collectFirst(Function.unlift(protectedF))).flatMap {
+    extract(_.request.headers.collectFirst(Function.unlift(protectedF))).flatMap
       case Some(Right(a)) ⇒ provide(a)
       case Some(Left(rejection)) ⇒ reject(rejection)
       case None ⇒ reject
-    }
-  }
 
   /**
     * Extracts an HTTP header value using the given partial function. If the function is undefined for all headers the
@@ -74,9 +71,8 @@ trait HeaderDirectives {
     */
   def optionalHeaderValue[T](
       f: HttpHeader ⇒ Option[T]): Directive1[Option[T]] =
-    headerValue(f).map(Some(_): Option[T]).recoverPF {
+    headerValue(f).map(Some(_): Option[T]).recoverPF
       case Nil ⇒ provide(None)
-    }
   //#
 
   /**
@@ -99,13 +95,12 @@ trait HeaderDirectives {
     * Extracts the value of the optional HTTP request header with the given name.
     */
   def optionalHeaderValueByName(
-      headerName: String): Directive1[Option[String]] = {
+      headerName: String): Directive1[Option[String]] =
     val lowerCaseName = headerName.toLowerCase
     extract(
-        _.request.headers.collectFirst {
+        _.request.headers.collectFirst
       case HttpHeader(`lowerCaseName`, value) ⇒ value
-    })
-  }
+    )
 
   /**
     * Extract the header value of the optional HTTP request header with the given type.
@@ -115,10 +110,8 @@ trait HeaderDirectives {
     optionalHeaderValuePF(magnet.extractPF)
 
   private def optionalValue(
-      lowerCaseName: String): HttpHeader ⇒ Option[String] = {
+      lowerCaseName: String): HttpHeader ⇒ Option[String] =
     case HttpHeader(`lowerCaseName`, value) ⇒ Some(value)
     case _ ⇒ None
-  }
-}
 
 object HeaderDirectives extends HeaderDirectives

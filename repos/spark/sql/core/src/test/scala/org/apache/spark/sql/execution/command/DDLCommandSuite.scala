@@ -24,10 +24,10 @@ import org.apache.spark.sql.execution.SparkQl
 import org.apache.spark.sql.execution.datasources.BucketSpec
 import org.apache.spark.sql.types._
 
-class DDLCommandSuite extends PlanTest {
+class DDLCommandSuite extends PlanTest
   private val parser = new SparkQl
 
-  test("create database") {
+  test("create database")
     val sql = """
        |CREATE DATABASE IF NOT EXISTS database_name
        |COMMENT 'database_comment' LOCATION '/home/user/db'
@@ -40,9 +40,8 @@ class DDLCommandSuite extends PlanTest {
                                   Some("database_comment"),
                                   Map("a" -> "a", "b" -> "b", "c" -> "c"))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("create function") {
+  test("create function")
     val sql1 =
       """
        |CREATE TEMPORARY FUNCTION helloworld as
@@ -69,18 +68,16 @@ class DDLCommandSuite extends PlanTest {
         isTemp = false)(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: rename table") {
+  test("alter table: rename table")
     val sql = "ALTER TABLE table_name RENAME TO new_table_name"
     val parsed = parser.parsePlan(sql)
     val expected =
       AlterTableRename(TableIdentifier("table_name", None),
                        TableIdentifier("new_table_name", None))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: alter table properties") {
+  test("alter table: alter table properties")
     val sql1 =
       "ALTER TABLE table_name SET TBLPROPERTIES ('test' = 'test', " +
       "'comment' = 'new_comment')"
@@ -104,9 +101,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
     comparePlans(parsed3, expected3)
-  }
 
-  test("alter table: SerDe properties") {
+  test("alter table: SerDe properties")
     val sql1 = "ALTER TABLE table_name SET SERDE 'org.apache.class'"
     val sql2 = """
        |ALTER TABLE table_name SET SERDE 'org.apache.class'
@@ -163,9 +159,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed3, expected3)
     comparePlans(parsed4, expected4)
     comparePlans(parsed5, expected5)
-  }
 
-  test("alter table: storage properties") {
+  test("alter table: storage properties")
     val sql1 =
       "ALTER TABLE table_name CLUSTERED BY (dt, country) INTO 10 BUCKETS"
     val sql2 =
@@ -190,9 +185,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed2, expected2)
     comparePlans(parsed3, expected3)
     comparePlans(parsed4, expected4)
-  }
 
-  test("alter table: skewed") {
+  test("alter table: skewed")
     val sql1 =
       """
        |ALTER TABLE table_name SKEWED BY (dt, country) ON
@@ -236,9 +230,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed3, expected3)
     comparePlans(parsed4, expected4)
     comparePlans(parsed5, expected5)
-  }
 
-  test("alter table: skewed location") {
+  test("alter table: skewed location")
     val sql1 = """
        |ALTER TABLE table_name SET SKEWED LOCATION
        |('123'='location1', 'test'='location2')
@@ -258,9 +251,8 @@ class DDLCommandSuite extends PlanTest {
                                                  "test" -> "location2"))(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: add partition") {
+  test("alter table: add partition")
     val sql = """
        |ALTER TABLE table_name ADD IF NOT EXISTS PARTITION
        |(dt='2008-08-08', country='us') LOCATION 'location1' PARTITION
@@ -273,9 +265,8 @@ class DDLCommandSuite extends PlanTest {
             (Map("dt" -> "2009-09-09", "country" -> "uk"), None)),
         ifNotExists = true)(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: rename partition") {
+  test("alter table: rename partition")
     val sql = """
        |ALTER TABLE table_name PARTITION (dt='2008-08-08', country='us')
        |RENAME TO PARTITION (dt='2008-09-09', country='uk')
@@ -286,9 +277,8 @@ class DDLCommandSuite extends PlanTest {
         Map("dt" -> "2008-08-08", "country" -> "us"),
         Map("dt" -> "2008-09-09", "country" -> "uk"))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: exchange partition") {
+  test("alter table: exchange partition")
     val sql = """
        |ALTER TABLE table_name_1 EXCHANGE PARTITION
        |(dt='2008-08-08', country='us') WITH TABLE table_name_2
@@ -299,9 +289,8 @@ class DDLCommandSuite extends PlanTest {
         TableIdentifier("table_name_2", None),
         Map("dt" -> "2008-08-08", "country" -> "us"))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: drop partitions") {
+  test("alter table: drop partitions")
     val sql1 =
       """
        |ALTER TABLE table_name DROP IF EXISTS PARTITION
@@ -329,9 +318,8 @@ class DDLCommandSuite extends PlanTest {
         purge = true)(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: archive partition") {
+  test("alter table: archive partition")
     val sql =
       "ALTER TABLE table_name ARCHIVE PARTITION (dt='2008-08-08', country='us')"
     val parsed = parser.parsePlan(sql)
@@ -339,9 +327,8 @@ class DDLCommandSuite extends PlanTest {
         TableIdentifier("table_name", None),
         Map("dt" -> "2008-08-08", "country" -> "us"))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: unarchive partition") {
+  test("alter table: unarchive partition")
     val sql =
       "ALTER TABLE table_name UNARCHIVE PARTITION (dt='2008-08-08', country='us')"
     val parsed = parser.parsePlan(sql)
@@ -349,9 +336,8 @@ class DDLCommandSuite extends PlanTest {
         TableIdentifier("table_name", None),
         Map("dt" -> "2008-08-08", "country" -> "us"))(sql)
     comparePlans(parsed, expected)
-  }
 
-  test("alter table: set file format") {
+  test("alter table: set file format")
     val sql1 =
       """
        |ALTER TABLE table_name SET FILEFORMAT INPUTFORMAT 'test'
@@ -382,9 +368,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
     comparePlans(parsed3, expected3)
-  }
 
-  test("alter table: set location") {
+  test("alter table: set location")
     val sql1 = "ALTER TABLE table_name SET LOCATION 'new location'"
     val sql2 =
       "ALTER TABLE table_name PARTITION (dt='2008-08-08', country='us') " +
@@ -400,9 +385,8 @@ class DDLCommandSuite extends PlanTest {
                             "new location")(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: touch") {
+  test("alter table: touch")
     val sql1 = "ALTER TABLE table_name TOUCH"
     val sql2 =
       "ALTER TABLE table_name TOUCH PARTITION (dt='2008-08-08', country='us')"
@@ -414,9 +398,8 @@ class DDLCommandSuite extends PlanTest {
         tableIdent, Some(Map("dt" -> "2008-08-08", "country" -> "us")))(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: compact") {
+  test("alter table: compact")
     val sql1 = "ALTER TABLE table_name COMPACT 'compaction_type'"
     val sql2 =
       """
@@ -434,9 +417,8 @@ class DDLCommandSuite extends PlanTest {
                         "MAJOR")(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: concatenate") {
+  test("alter table: concatenate")
     val sql1 = "ALTER TABLE table_name CONCATENATE"
     val sql2 =
       "ALTER TABLE table_name PARTITION (dt='2008-08-08', country='us') CONCATENATE"
@@ -448,9 +430,8 @@ class DDLCommandSuite extends PlanTest {
         tableIdent, Some(Map("dt" -> "2008-08-08", "country" -> "us")))(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
 
-  test("alter table: change column name/type/position/comment") {
+  test("alter table: change column name/type/position/comment")
     val sql1 = "ALTER TABLE table_name CHANGE col_old_name col_new_name INT"
     val sql2 =
       """
@@ -496,9 +477,8 @@ class DDLCommandSuite extends PlanTest {
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
     comparePlans(parsed3, expected3)
-  }
 
-  test("alter table: add/replace columns") {
+  test("alter table: add/replace columns")
     val sql1 =
       """
        |ALTER TABLE table_name PARTITION (dt='2008-08-08', country='us')
@@ -535,5 +515,3 @@ class DDLCommandSuite extends PlanTest {
         cascade = false)(sql2)
     comparePlans(parsed1, expected1)
     comparePlans(parsed2, expected2)
-  }
-}

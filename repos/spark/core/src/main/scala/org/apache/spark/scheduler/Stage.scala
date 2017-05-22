@@ -59,7 +59,7 @@ private[scheduler] abstract class Stage(val id: Int,
                                         val parents: List[Stage],
                                         val firstJobId: Int,
                                         val callSite: CallSite)
-    extends Logging {
+    extends Logging
 
   val numPartitions = rdd.partitions.length
 
@@ -86,9 +86,8 @@ private[scheduler] abstract class Stage(val id: Int,
     * belonging to this stage has already finished. Otherwise, reinitializing the internal
     * accumulators here again will override partial values from the finished tasks.
     */
-  def resetInternalAccumulators(): Unit = {
+  def resetInternalAccumulators(): Unit =
     _internalAccumulators = InternalAccumulator.create(rdd.sparkContext)
-  }
 
   /**
     * Pointer to the [StageInfo] object for the most recent attempt. This needs to be initialized
@@ -106,9 +105,8 @@ private[scheduler] abstract class Stage(val id: Int,
     */
   private val fetchFailedAttemptIds = new HashSet[Int]
 
-  private[scheduler] def clearFailures(): Unit = {
+  private[scheduler] def clearFailures(): Unit =
     fetchFailedAttemptIds.clear()
-  }
 
   /**
     * Check whether we should abort the failedStage due to multiple consecutive fetch failures.
@@ -117,37 +115,32 @@ private[scheduler] abstract class Stage(val id: Int,
     * true if the number of failures exceeds the allowable number of failures.
     */
   private[scheduler] def failedOnFetchAndShouldAbort(
-      stageAttemptId: Int): Boolean = {
+      stageAttemptId: Int): Boolean =
     fetchFailedAttemptIds.add(stageAttemptId)
     fetchFailedAttemptIds.size >= Stage.MAX_CONSECUTIVE_FETCH_FAILURES
-  }
 
   /** Creates a new attempt for this stage by creating a new StageInfo with a new attempt ID. */
   def makeNewStageAttempt(
       numPartitionsToCompute: Int,
-      taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty): Unit = {
+      taskLocalityPreferences: Seq[Seq[TaskLocation]] = Seq.empty): Unit =
     _latestInfo = StageInfo.fromStage(this,
                                       nextAttemptId,
                                       Some(numPartitionsToCompute),
                                       taskLocalityPreferences)
     nextAttemptId += 1
-  }
 
   /** Returns the StageInfo for the most recent attempt for this stage. */
   def latestInfo: StageInfo = _latestInfo
 
   override final def hashCode(): Int = id
 
-  override final def equals(other: Any): Boolean = other match {
+  override final def equals(other: Any): Boolean = other match
     case stage: Stage => stage != null && stage.id == id
     case _ => false
-  }
 
   /** Returns the sequence of partition ids that are missing (i.e. needs to be computed). */
   def findMissingPartitions(): Seq[Int]
-}
 
-private[scheduler] object Stage {
+private[scheduler] object Stage
   // The number of consecutive failures allowed before a stage is aborted
   val MAX_CONSECUTIVE_FETCH_FAILURES = 4
-}

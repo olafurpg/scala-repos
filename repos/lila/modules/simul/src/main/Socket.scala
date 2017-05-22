@@ -20,25 +20,21 @@ private[simul] final class Socket(simulId: String,
                                   uidTimeout: Duration,
                                   socketTimeout: Duration)
     extends SocketActor[Member](uidTimeout)
-    with Historical[Member, Messadata] {
+    with Historical[Member, Messadata]
 
   private val timeBomb = new TimeBomb(socketTimeout)
 
   private var delayedCrowdNotification = false
 
   private def redirectPlayer(
-      game: lila.game.Game, colorOption: Option[chess.Color]) {
-    colorOption foreach { color =>
+      game: lila.game.Game, colorOption: Option[chess.Color])
+    colorOption foreach  color =>
       val player = game player color
-      player.userId foreach { userId =>
-        membersByUserId(userId) foreach { member =>
+      player.userId foreach  userId =>
+        membersByUserId(userId) foreach  member =>
           notifyMember("redirect", game fullIdOf player.color)(member)
-        }
-      }
-    }
-  }
 
-  def receiveSpecific = {
+  def receiveSpecific =
 
     case StartGame(game, hostId) =>
       redirectPlayer(game, game.playerByUserId(hostId) map (!_.color))
@@ -49,36 +45,29 @@ private[simul] final class Socket(simulId: String,
     case HostIsOn(gameId) => notifyVersion("hostGame", gameId, Messadata())
 
     case Reload =>
-      getSimul(simulId) foreach {
-        _ foreach { simul =>
-          jsonView(simul) foreach { obj =>
+      getSimul(simulId) foreach
+        _ foreach  simul =>
+          jsonView(simul) foreach  obj =>
             notifyVersion("reload", obj, Messadata())
-          }
-        }
-      }
 
     case Aborted => notifyVersion("aborted", Json.obj(), Messadata())
 
-    case PingVersion(uid, v) => {
+    case PingVersion(uid, v) =>
         ping(uid)
         timeBomb.delay
-        withMember(uid) { m =>
+        withMember(uid)  m =>
           history.since(v).fold(resync(m))(_ foreach sendMessage(m))
-        }
-      }
 
-    case Broom => {
+    case Broom =>
         broom
         if (timeBomb.boom) self ! PoisonPill
-      }
 
     case lila.chat.actorApi.ChatLine(_, line) =>
-      line match {
+      line match
         case line: lila.chat.UserLine =>
           notifyVersion(
               "message", lila.chat.Line toJson line, Messadata(line.troll))
         case _ =>
-      }
 
     case GetVersion => sender ! history.version
 
@@ -98,19 +87,14 @@ private[simul] final class Socket(simulId: String,
     case NotifyCrowd =>
       delayedCrowdNotification = false
       notifyAll("crowd", showSpectators(lightUser)(members.values))
-  }
 
-  def notifyCrowd {
-    if (!delayedCrowdNotification) {
+  def notifyCrowd
+    if (!delayedCrowdNotification)
       delayedCrowdNotification = true
       context.system.scheduler.scheduleOnce(500 millis, self, NotifyCrowd)
-    }
-  }
 
   protected def shouldSkipMessageFor(message: Message, member: Member) =
     message.metadata.trollish && !member.troll
-}
 
-case object Socket {
+case object Socket
   case object GetUserIds
-}

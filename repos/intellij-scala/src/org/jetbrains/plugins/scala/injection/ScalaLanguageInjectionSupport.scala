@@ -6,7 +6,7 @@ import org.intellij.plugins.intelliLang.inject.AbstractLanguageInjectionSupport
 /**
   * Pavel Fatin
   */
-class ScalaLanguageInjectionSupport extends AbstractLanguageInjectionSupport {
+class ScalaLanguageInjectionSupport extends AbstractLanguageInjectionSupport
   private final val SUPPORT_ID: String = "scala"
 
   override def getId: String = SUPPORT_ID
@@ -16,4 +16,3 @@ class ScalaLanguageInjectionSupport extends AbstractLanguageInjectionSupport {
 
   override def useDefaultInjector(host: PsiLanguageInjectionHost): Boolean =
     false
-}

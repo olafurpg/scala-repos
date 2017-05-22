@@ -11,21 +11,18 @@ import org.scalajs.testsuite.niobuffer.BufferFactory.ByteBufferFactory
 
 object AllocDirectByteBufferJSTest extends SupportsTypedArrays
 
-class AllocDirectByteBufferJSTest extends ByteBufferTest {
+class AllocDirectByteBufferJSTest extends ByteBufferTest
   val factory: ByteBufferFactory =
     new ByteBufferFactories.AllocDirectByteBufferFactory
-}
 
 object SlicedAllocDirectByteBufferJSTest extends SupportsTypedArrays
 
-class SlicedAllocDirectByteBufferJSTest extends ByteBufferTest {
+class SlicedAllocDirectByteBufferJSTest extends ByteBufferTest
   val factory: ByteBufferFactory =
     new ByteBufferFactories.SlicedAllocDirectByteBufferFactory
-}
 
 object WrappedTypedArrayByteBufferJSTest extends SupportsTypedArrays
 
-class WrappedTypedArrayByteBufferJSTest extends ByteBufferTest {
+class WrappedTypedArrayByteBufferJSTest extends ByteBufferTest
   val factory: ByteBufferFactory =
     new ByteBufferJSFactories.WrappedTypedArrayByteBufferFactory
-}

@@ -30,7 +30,7 @@ import cascading.flow.FlowDef
   * Examples could be Keys which are Unique IDs, such as UserIDs,
   * content IDs, cryptographic hashes, etc...
   */
-trait SimpleService[K, V] extends ExternalService[K, V] {
+trait SimpleService[K, V] extends ExternalService[K, V]
 
   import Scalding.dateRangeInjection
 
@@ -43,24 +43,21 @@ trait SimpleService[K, V] extends ExternalService[K, V] {
 
   final def lookup[W](
       getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
-    StateWithError({ intMode: FactoryInput =>
+    StateWithError( intMode: FactoryInput =>
       val (timeSpan, mode) = intMode
       Scalding
         .toDateRange(timeSpan)
         .right
         .flatMap(satisfiable(_, mode))
         .right
-        .flatMap {
+        .flatMap
           dr =>
             val ts = dr.as[Interval[Timestamp]]
-            getKeys((ts, mode)).right.map {
+            getKeys((ts, mode)).right.map
               case ((avail, m), getFlow) =>
-                val rdr = Reader({ implicit fdM: (FlowDef, Mode) =>
+                val rdr = Reader( implicit fdM: (FlowDef, Mode) =>
                   // This get can't fail because it came from a DateRange initially
                   serve(avail.as[Option[DateRange]].get, getFlow(fdM))
-                })
+                )
                 ((avail, m), rdr)
-            }
-        }
-    })
-}
+    )

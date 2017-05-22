@@ -6,7 +6,7 @@ import com.twitter.finagle.util.Rng
 import com.twitter.logging.Logger
 import com.twitter.util._
 
-private[serverset2] object ServiceDiscoverer {
+private[serverset2] object ServiceDiscoverer
   val EndpointGlob = "/member_"
   val VectorGlob = "/vector_"
 
@@ -18,23 +18,21 @@ private[serverset2] object ServiceDiscoverer {
     * entry in `vecs`.
     */
   def zipWithWeights(
-      ents: Seq[Entry], vecs: Set[Vector]): Seq[(Entry, Double)] = {
-    ents map { ent =>
+      ents: Seq[Entry], vecs: Set[Vector]): Seq[(Entry, Double)] =
+    ents map  ent =>
       val w = vecs.foldLeft(1.0) { case (w, vec) => w * vec.weightOf(ent) }
       ent -> w
-    }
-  }
 
   /**
     * ZooKeeper client health as observed by the ServiceDiscoverer.
     */
   private[serverset2] sealed trait ClientHealth
-  private[serverset2] object ClientHealth {
+  private[serverset2] object ClientHealth
     case object Healthy extends ClientHealth
     case object Unhealthy extends ClientHealth
 
-    def apply(sessionState: SessionState): ClientHealth = {
-      sessionState match {
+    def apply(sessionState: SessionState): ClientHealth =
+      sessionState match
         case SessionState.Expired | SessionState.NoSyncConnected |
             SessionState.Unknown | SessionState.AuthFailed |
             SessionState.Disconnected =>
@@ -42,13 +40,9 @@ private[serverset2] object ServiceDiscoverer {
         case SessionState.ConnectedReadOnly | SessionState.SaslAuthenticated |
             SessionState.SyncConnected =>
           Healthy
-      }
-    }
-  }
 
   object EntryLookupFailureException
       extends Exception("All serverset member lookups failed")
-}
 
 /**
   * A representation of a session to a given ZooKeeper-backed service
@@ -68,7 +62,7 @@ private[serverset2] class ServiceDiscoverer(
     val statsReceiver: StatsReceiver,
     healthStabilizationEpoch: Epoch,
     timer: Timer
-) {
+)
   import ServiceDiscoverer._
 
   private[this] val zkEntriesReadStat =
@@ -86,26 +80,22 @@ private[serverset2] class ServiceDiscoverer(
     * the connection is healthy or unhealthy. Exposed for testing
     */
   private[serverset2] val rawHealth: Var[ClientHealth] =
-    Var.async[ClientHealth](ClientHealth.Healthy) { u =>
+    Var.async[ClientHealth](ClientHealth.Healthy)  u =>
       @volatile var stateListener = Closable.nop
 
-      val sessionChanges = varZkSession.changes.dedup.respond { zk =>
+      val sessionChanges = varZkSession.changes.dedup.respond  zk =>
         // When the zk session changes, we need to stop observing changes
         // to the previous session.
-        synchronized {
+        synchronized
           stateListener.close()
-          stateListener = zk.state.changes.dedup.respond {
+          stateListener = zk.state.changes.dedup.respond
             case WatchState.SessionState(state) =>
               log.info(
                   s"SessionState. Session ${zk.sessionIdAsHex}. State $state")
               u() = ClientHealth(state)
             case _ => // don't need to update on non-sessionstate events
-          }
-        }
-      }
 
       Closable.all(sessionChanges, Closable.make(t => stateListener.close(t)))
-    }
 
   /**
     * Monitor the session state of the ZkSession within a HealthStabilizer
@@ -124,17 +114,14 @@ private[serverset2] class ServiceDiscoverer(
       cache: ZkNodeDataCache[Entity],
       readStat: Stat,
       glob: String
-  ): Activity[Seq[Entity]] = {
-    actZkSession.flatMap {
+  ): Activity[Seq[Entity]] =
+    actZkSession.flatMap
       case zkSession =>
         cache.setSession(zkSession)
-        zkSession.globOf(path + glob).flatMap { paths =>
+        zkSession.globOf(path + glob).flatMap  paths =>
           // Remove any cached entries not surfaced by globOf from our cache
           (cache.keys &~ paths).foreach(cache.remove)
           bulkResolveMemberData(path, paths.toSeq, cache, readStat)
-        }
-    }
-  }
 
   /**
     * Resolve all child paths of a watch. If all resolutions fail,
@@ -146,72 +133,62 @@ private[serverset2] class ServiceDiscoverer(
       cache: ZkNodeDataCache[Entity],
       readStat: Stat
   ): Activity[Seq[Entity]] =
-    Activity(Var.async[Activity.State[Seq[Entity]]](Activity.Pending) { u =>
+    Activity(Var.async[Activity.State[Seq[Entity]]](Activity.Pending)  u =>
       @volatile var closed = false
 
-      def loop(): Future[Unit] = {
-        if (!closed) {
+      def loop(): Future[Unit] =
+        if (!closed)
           @volatile var seenFailures = false
-          Stat.timeFuture(readStat) {
+          Stat.timeFuture(readStat)
             Future
-              .collectToTry(paths.map { path =>
+              .collectToTry(paths.map  path =>
                 // note if any failed
-                cache.get(path).onFailure { _ =>
+                cache.get(path).onFailure  _ =>
                   seenFailures = true
-                }
-              })
+              )
               // We end up with a Seq[Seq[Entity]] here, b/c cache.get() returns a Seq[Entity]
               // flatten() to fix this (see the comment on ZkNodeDataCache for why we get a Seq[])
               .map(tries => tries.collect { case Return(e) => e }.flatten)
-              .map {
+              .map
                 seq =>
                   // if we have *any* results or no-failure, we consider it a success
                   if (seenFailures && seq.isEmpty)
                     u() = Activity.Failed(EntryLookupFailureException)
                   else u() = Activity.Ok(seq)
-              }
-              .ensure {
-                if (seenFailures) {
+              .ensure
+                if (seenFailures)
                   log.warning(
                       s"Failed to read all data for $parentPath. Retrying in $retryJitter")
                   timer.doLater(retryJitter) { loop() }
-                }
-              }
-          }
-        }
 
         Future.Done
-      }
 
       loop()
 
-      Closable.make { _ =>
+      Closable.make  _ =>
         closed = true
         Future.Done
-      }
-    })
+    )
 
   // protected for testing
-  protected[this] val entriesOf: String => Activity[Seq[Entry]] = Memoize {
+  protected[this] val entriesOf: String => Activity[Seq[Entry]] = Memoize
     path: String =>
       entitiesOf(path,
                  new ZkEntryCache(path, statsReceiver),
                  zkEntriesReadStat,
                  EndpointGlob)
-  }
 
-  private[this] val vectorsOf: String => Activity[Seq[Vector]] = Memoize {
+  private[this] val vectorsOf: String => Activity[Seq[Vector]] = Memoize
     path: String =>
       entitiesOf(path,
                  new ZkVectorCache(path, statsReceiver),
                  zkVectorsReadStat,
                  VectorGlob)
-  }
 
   /**
     * Look up the weighted ServerSet entries for a given path.
     */
-  def apply(path: String): Activity[Seq[(Entry, Double)]] = {
+  def apply(path: String): Activity[Seq[(Entry, Double)]] =
     val es = entriesOf(path)
     val vs = vectorsOf(path)
 
@@ -220,5 +197,3 @@ private[serverset2] class ServiceDiscoverer(
 
     // Squash duplicate updates
     Activity(Var(Activity.Pending, raw.states.dedup))
-  }
-}

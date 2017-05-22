@@ -2,13 +2,12 @@ import sbt._
 import Import._
 import Keys._
 
-object B extends Build {
+object B extends Build
   override def projectDefinitions(f: File) = Seq(makeProject(f))
 
-  def makeProject(f: File) = {
+  def makeProject(f: File) =
     val addBin = if (isBinary(f)) binaryDep(baseProject) else baseProject
     if (isSource(f)) sourceDep(addBin) else addBin
-  }
 
   def isBinary(f: File) = f / "binary" exists;
   def isSource(f: File) = f / "source" exists;
@@ -22,4 +21,3 @@ object B extends Build {
     p settings
     (libraryDependencies += "org.example" %% "app" % "0.1.17", resolvers <+=
           baseDirectory(base => "sample" at (base / "repo").toURI.toString))
-}

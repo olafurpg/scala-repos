@@ -1,9 +1,8 @@
-package p {
-  trait TCon[+CC[X]] {
+package p
+  trait TCon[+CC[X]]
     def fPublic: CC[Int] = ???
     private[p] def fPackagePrivate: CC[Int] = ???
     protected[p] def fPackageProtected: CC[Int] = ???
-  }
   trait Iterable[+A] extends TCon[Iterable]
   trait Set[A] extends Iterable[A] with TCon[Set]
   trait Seq[+A] extends Iterable[A] with TCon[Seq]
@@ -12,37 +11,33 @@ package p {
   private[p] abstract class ASeq[+A] extends AIterable[A] with Seq[A]
   private[p] abstract class ASet[A] extends AIterable[A] with Set[A]
 
-  package m {
+  package m
     private[m] abstract class ASeq[A] extends p.ASeq[A] with Seq[A]
     private[m] abstract class ASet[A] extends p.ASet[A] with Set[A]
     trait Set[A] extends p.Set[A] with TCon[Set]
     trait Seq[A] extends p.Seq[A] with TCon[Seq]
     trait BitSet extends ASet[Int]
     trait IntSeq extends ASeq[Int]
-  }
 
-  package i {
+  package i
     private[i] abstract class ASeq[+A] extends p.ASeq[A] with Seq[A]
     private[i] abstract class ASet[A] extends p.ASet[A] with Set[A]
     trait Set[A] extends p.Set[A] with TCon[Set]
     trait Seq[+A] extends p.Seq[A] with TCon[Seq]
     trait BitSet extends ASet[Int]
     trait IntSeq extends ASeq[Int]
-  }
-}
 
-object Test {
+object Test
   import scala.reflect.runtime.universe._
   // Complicated by the absence of usable type constructor type tags.
   def extract[A, CC[X]](xs: CC[A]): CC[A] = xs
-  def whatis[T : TypeTag](x: T): Unit = {
+  def whatis[T : TypeTag](x: T): Unit =
     val tpe = typeOf[T]
     val access = tpe.typeSymbol
       .asInstanceOf[scala.reflect.internal.HasFlags]
       .accessString
       .replaceAllLiterally("package ", "")
     println(f"$access%15s $tpe")
-  }
 
   trait IntIterable extends p.Iterable[Int]
   trait IntSet extends p.Set[Int]
@@ -66,7 +61,7 @@ object Test {
   def h2: p.i.BitSet = null
   def h3: p.i.IntSeq = null
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     whatis(extract(f1))
     whatis(extract(f2))
     whatis(extract(f3))
@@ -124,5 +119,3 @@ object Test {
     whatis(extract("abc"))
     whatis(extract(if (true) Stream(1) else List(1)))
     whatis(extract(if (true) Seq(1) else Set(1)))
-  }
-}

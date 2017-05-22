@@ -12,7 +12,7 @@ case class Chart(question: JsonQuestion,
                  sizeSerie: Chart.Serie,
                  games: List[JsObject])
 
-object Chart {
+object Chart
 
   case class Xaxis(name: String, categories: List[String])
 
@@ -24,11 +24,11 @@ object Chart {
                    data: List[Double])
 
   def fromAnswer[X](getLightUser: String => Option[LightUser])(
-      answer: Answer[X]): Chart = {
+      answer: Answer[X]): Chart =
 
     import answer._, question._
 
-    def gameUserJson(player: lila.game.Player): JsObject = {
+    def gameUserJson(player: lila.game.Player): JsObject =
       val light = player.userId flatMap getLightUser
       Json
         .obj(
@@ -37,9 +37,8 @@ object Chart {
             "rating" -> player.rating
         )
         .noNull
-    }
 
-    def games = povs.map { pov =>
+    def games = povs.map  pov =>
       Json.obj("id" -> pov.game.id,
                "fen" ->
                (chess.format.Forsyth exportBoard pov.game.toChess.board),
@@ -47,7 +46,6 @@ object Chart {
                "lastMove" -> ~pov.game.castleLastMoveTime.lastMoveString,
                "user1" -> gameUserJson(pov.player),
                "user2" -> gameUserJson(pov.opponent))
-    }
 
     def xAxis =
       Xaxis(name = dimension.name,
@@ -61,46 +59,40 @@ object Chart {
 
     def series =
       clusters
-        .foldLeft(Map.empty[String, Serie]) {
+        .foldLeft(Map.empty[String, Serie])
           case (acc, cluster) =>
-            cluster.insight match {
+            cluster.insight match
               case Insight.Single(point) =>
                 val key = metric.name
-                acc.updated(key, acc.get(key) match {
+                acc.updated(key, acc.get(key) match
                   case None =>
                     Serie(name = metric.name,
                           dataType = metric.dataType.name,
                           stack = none,
                           data = List(point.y))
                   case Some(s) => s.copy(data = point.y :: s.data)
-                })
+                )
               case Insight.Stacked(points) =>
-                points.foldLeft(acc) {
+                points.foldLeft(acc)
                   case (acc, (metricValueName, point)) =>
                     val key = s"${metric.name}/${metricValueName.name}"
-                    acc.updated(key, acc.get(key) match {
+                    acc.updated(key, acc.get(key) match
                       case None =>
                         Serie(name = metricValueName.name,
                               dataType = metric.dataType.name,
                               stack = metric.name.some,
                               data = List(point.y))
                       case Some(s) => s.copy(data = point.y :: s.data)
-                    })
-                }
-            }
-        }
-        .map {
+                    )
+        .map
           case (_, serie) => serie.copy(data = serie.data.reverse)
-        }
         .toList
 
-    def sortedSeries = answer.clusters.headOption.fold(series) {
-      _.insight match {
+    def sortedSeries = answer.clusters.headOption.fold(series)
+      _.insight match
         case Insight.Single(_) => series
         case Insight.Stacked(points) =>
           series.sortLike(points.map(_._1.name), _.name)
-      }
-    }
 
     Chart(question = JsonQuestion fromQuestion question,
           xAxis = xAxis,
@@ -109,5 +101,3 @@ object Chart {
           series = sortedSeries,
           sizeSerie = sizeSerie,
           games = games)
-  }
-}

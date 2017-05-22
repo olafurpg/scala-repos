@@ -36,20 +36,18 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.util.logging.{FileAppender, RollingFileAppender, SizeBasedRollingPolicy, TimeBasedRollingPolicy}
 
 class FileAppenderSuite
-    extends SparkFunSuite with BeforeAndAfter with Logging {
+    extends SparkFunSuite with BeforeAndAfter with Logging
 
   val testFile =
     new File(Utils.createTempDir(), "FileAppenderSuite-test").getAbsoluteFile
 
-  before {
+  before
     cleanup()
-  }
 
-  after {
+  after
     cleanup()
-  }
 
-  test("basic file appender") {
+  test("basic file appender")
     val testString = (1 to 1000).mkString(", ")
     val inputStream =
       new ByteArrayInputStream(testString.getBytes(StandardCharsets.UTF_8))
@@ -57,9 +55,8 @@ class FileAppenderSuite
     inputStream.close()
     appender.awaitTermination()
     assert(Files.toString(testFile, StandardCharsets.UTF_8) === testString)
-  }
 
-  test("rolling file appender - time-based rolling") {
+  test("rolling file appender - time-based rolling")
     // setup input stream and appender
     val testOutputStream = new PipedOutputStream()
     val testInputStream = new PipedInputStream(testOutputStream, 100 * 1000)
@@ -78,9 +75,8 @@ class FileAppenderSuite
 
     testRolling(
         appender, testOutputStream, textToAppend, rolloverIntervalMillis)
-  }
 
-  test("rolling file appender - size-based rolling") {
+  test("rolling file appender - size-based rolling")
     // setup input stream and appender
     val testOutputStream = new PipedOutputStream()
     val testInputStream = new PipedInputStream(testOutputStream, 100 * 1000)
@@ -95,13 +91,11 @@ class FileAppenderSuite
                               99)
 
     val files = testRolling(appender, testOutputStream, textToAppend, 0)
-    files.foreach { file =>
+    files.foreach  file =>
       logInfo(file.toString + ": " + file.length + " bytes")
       assert(file.length <= rolloverSize)
-    }
-  }
 
-  test("rolling file appender - cleaning") {
+  test("rolling file appender - cleaning")
     // setup input stream and appender
     val testOutputStream = new PipedOutputStream()
     val testInputStream = new PipedInputStream(testOutputStream, 100 * 1000)
@@ -117,7 +111,7 @@ class FileAppenderSuite
     // send data to appender through the input stream, and wait for the data to be written
     val allGeneratedFiles = new HashSet[String]()
     val items = (1 to 10).map { _.toString * 10000 }
-    for (i <- 0 until items.size) {
+    for (i <- 0 until items.size)
       testOutputStream.write(items(i).getBytes(StandardCharsets.UTF_8))
       testOutputStream.flush()
       allGeneratedFiles ++= RollingFileAppender
@@ -126,7 +120,6 @@ class FileAppenderSuite
         .map(_.toString)
 
       Thread.sleep(10)
-    }
     testOutputStream.close()
     appender.awaitTermination()
     logInfo("Appender closed")
@@ -144,22 +137,20 @@ class FileAppenderSuite
     logInfo("Existing rolled over files:\n" +
         existingRolledOverFiles.mkString("\n"))
     assert(!existingRolledOverFiles.toSet.contains(earliestRolledOverFile))
-  }
 
-  test("file appender selection") {
+  test("file appender selection")
     // Test whether FileAppender.apply() returns the right type of the FileAppender based
     // on SparkConf settings.
 
     def testAppenderSelection[
         ExpectedAppender : ClassTag, ExpectedRollingPolicy](
         properties: Seq[(String, String)],
-        expectedRollingPolicyParam: Long = -1): Unit = {
+        expectedRollingPolicyParam: Long = -1): Unit =
 
       // Set spark conf properties
       val conf = new SparkConf
-      properties.foreach { p =>
+      properties.foreach  p =>
         conf.set(p._1, p._2)
-      }
 
       // Create and test file appender
       val testOutputStream = new PipedOutputStream()
@@ -168,24 +159,21 @@ class FileAppenderSuite
       // assert(appender.getClass === classTag[ExpectedAppender].getClass)
       assert(
           appender.getClass.getSimpleName === classTag[ExpectedAppender].runtimeClass.getSimpleName)
-      if (appender.isInstanceOf[RollingFileAppender]) {
+      if (appender.isInstanceOf[RollingFileAppender])
         val rollingPolicy =
           appender.asInstanceOf[RollingFileAppender].rollingPolicy
         val policyParam =
-          if (rollingPolicy.isInstanceOf[TimeBasedRollingPolicy]) {
+          if (rollingPolicy.isInstanceOf[TimeBasedRollingPolicy])
             rollingPolicy
               .asInstanceOf[TimeBasedRollingPolicy]
               .rolloverIntervalMillis
-          } else {
+          else
             rollingPolicy
               .asInstanceOf[SizeBasedRollingPolicy]
               .rolloverSizeBytes
-          }
         assert(policyParam === expectedRollingPolicyParam)
-      }
       testOutputStream.close()
       appender.awaitTermination()
-    }
 
     import RollingFileAppender._
 
@@ -225,9 +213,8 @@ class FileAppenderSuite
 
     // test illegal strategy
     testAppenderSelection[FileAppender, Any](rollingStrategy("xyz"))
-  }
 
-  test("file appender async close stream abruptly") {
+  test("file appender async close stream abruptly")
     // Test FileAppender reaction to closing InputStream using a mock logging appender
     val mockAppender = mock(classOf[Appender])
     val loggingEventCaptor = ArgumentCaptor.forClass(classOf[LoggingEvent])
@@ -253,9 +240,8 @@ class FileAppenderSuite
     assert(loggingEvent.getThrowableInformation !== null)
     assert(loggingEvent.getThrowableInformation.getThrowable
           .isInstanceOf[IOException])
-  }
 
-  test("file appender async close stream gracefully") {
+  test("file appender async close stream gracefully")
     // Test FileAppender reaction to closing InputStream using a mock logging appender
     val mockAppender = mock(classOf[Appender])
     val loggingEventCaptor = ArgumentCaptor.forClass(classOf[LoggingEvent])
@@ -284,12 +270,10 @@ class FileAppenderSuite
     // Make sure no IOException errors have been logged as a result of appender closing gracefully
     verify(mockAppender, atLeast(0)).doAppend(loggingEventCaptor.capture)
     import scala.collection.JavaConverters._
-    loggingEventCaptor.getAllValues.asScala.foreach { loggingEvent =>
+    loggingEventCaptor.getAllValues.asScala.foreach  loggingEvent =>
       assert(loggingEvent.getThrowableInformation === null ||
           !loggingEvent.getThrowableInformation.getThrowable
             .isInstanceOf[IOException])
-    }
-  }
 
   /**
     * Run the rolling file appender with data and see whether all the data was written correctly
@@ -300,14 +284,13 @@ class FileAppenderSuite
       outputStream: OutputStream,
       textToAppend: Seq[String],
       sleepTimeBetweenTexts: Long
-  ): Seq[File] = {
+  ): Seq[File] =
     // send data to appender through the input stream, and wait for the data to be written
     val expectedText = textToAppend.mkString("")
-    for (i <- 0 until textToAppend.size) {
+    for (i <- 0 until textToAppend.size)
       outputStream.write(textToAppend(i).getBytes(StandardCharsets.UTF_8))
       outputStream.flush()
       Thread.sleep(sleepTimeBetweenTexts)
-    }
     logInfo("Data sent to appender")
     outputStream.close()
     appender.awaitTermination()
@@ -318,28 +301,23 @@ class FileAppenderSuite
         testFile.getParentFile.toString, testFile.getName)
     logInfo("Filtered files: \n" + generatedFiles.mkString("\n"))
     assert(generatedFiles.size > 1)
-    val allText = generatedFiles.map { file =>
+    val allText = generatedFiles.map  file =>
       Files.toString(file, StandardCharsets.UTF_8)
-    }.mkString("")
+    .mkString("")
     assert(allText === expectedText)
     generatedFiles
-  }
 
   /** Delete all the generated rolledover files */
-  def cleanup() {
-    testFile.getParentFile.listFiles.filter { file =>
+  def cleanup()
+    testFile.getParentFile.listFiles.filter  file =>
       file.getName.startsWith(testFile.getName)
-    }.foreach { _.delete() }
-  }
+    .foreach { _.delete() }
 
   /** Used to synchronize when read is called on a stream */
-  private trait LatchedInputStream extends PipedInputStream {
+  private trait LatchedInputStream extends PipedInputStream
     val latchReadStarted = new CountDownLatch(1)
     val latchReadProceed = new CountDownLatch(1)
-    abstract override def read(): Int = {
+    abstract override def read(): Int =
       latchReadStarted.countDown()
       latchReadProceed.await()
       super.read()
-    }
-  }
-}

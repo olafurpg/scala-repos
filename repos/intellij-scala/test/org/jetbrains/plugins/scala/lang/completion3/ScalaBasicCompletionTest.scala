@@ -9,8 +9,8 @@ import org.junit.Assert
   * @author Alefas
   * @since 06.10.11
   */
-class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
-  def testInImportSelector() {
+class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase
+  def testInImportSelector()
     val fileText = """
       |import scala.collection.immutable.{VBuil<caret>}
       """.stripMargin('|').replaceAll("\r", "").trim()
@@ -24,9 +24,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "VectorBuilder").get)
     checkResultByText(resultText)
-  }
 
-  def testPrivateFromCompanionModule() {
+  def testPrivateFromCompanionModule()
     val fileText = """
         |class A {
         |  A.<caret>
@@ -50,9 +49,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "xxxxx").get)
     checkResultByText(resultText)
-  }
 
-  def testVarCompletion() {
+  def testVarCompletion()
     val fileText = """
         |class A {
         |  A.<caret>
@@ -78,9 +76,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "xxxxx").get)
     checkResultByText(resultText)
-  }
 
-  def testVarCompletion2() {
+  def testVarCompletion2()
     val fileText = """
         |class A {
         |  A.<caret>
@@ -104,9 +101,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "xxxxx_=").get)
     checkResultByText(resultText)
-  }
 
-  def testNewInnerClass() {
+  def testNewInnerClass()
     val fileText = """
       |class A {
       |  class BBBBB
@@ -126,9 +122,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "BBBBB").get)
     checkResultByText(resultText)
-  }
 
-  def testBeanProperty() {
+  def testBeanProperty()
     val fileText = """
         |import scala.reflect.BeanProperty
         |abstract class Foo {
@@ -144,12 +139,11 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
     assert(
-        activeLookup.collect {
+        activeLookup.collect
       case le if le.getLookupString == "getGoo" => le
-    }.length == 1)
-  }
+    .length == 1)
 
-  def testSCL3546() {
+  def testSCL3546()
     val fileText = """
       |class C(private[this] val abcdef: Any)
       |new C(abcde<caret> = 0)
@@ -165,9 +159,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "abcdef").get)
     checkResultByText(resultText)
-  }
 
-  def testRecursion() {
+  def testRecursion()
     val fileText = """
       |object Main {
       |  class A {
@@ -207,9 +200,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "brrrrr").get)
     checkResultByText(resultText)
-  }
 
-  def testObjectCompletion() {
+  def testObjectCompletion()
     val fileText = """
       |object States {
       |  class Nested
@@ -233,9 +225,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "States").get)
     checkResultByText(resultText)
-  }
 
-  def testImportObjectCompletion() {
+  def testImportObjectCompletion()
     val fileText = """
         |object States {
         |  class Nested
@@ -259,9 +250,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "States").get)
     checkResultByText(resultText)
-  }
 
-  def testObjectCompletionDotChar() {
+  def testObjectCompletionDotChar()
     val fileText = """
       |object States {
       |  class Nested
@@ -285,9 +275,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "States").get, '.')
     checkResultByText(resultText)
-  }
 
-  def testPrivateMethod() {
+  def testPrivateMethod()
     val fileText = """
       |class A {
       |  private def fooaa = 1
@@ -311,9 +300,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "fooaa").get)
     checkResultByText(resultText)
-  }
 
-  def testParenthCompletionChar() {
+  def testParenthCompletionChar()
     val fileText = """
       |val theMap = Map()
       |th<caret>
@@ -329,9 +317,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "theMap").get, '(')
     checkResultByText(resultText)
-  }
 
-  def testAfterNew() {
+  def testAfterNew()
     val fileText = """
       |import collection.mutable.ListBuffer
       |class A {
@@ -351,9 +338,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "ListBuffer").get, '[')
     checkResultByText(resultText)
-  }
 
-  def testAfterNewWithImport() {
+  def testAfterNewWithImport()
     val fileText = """
       |class A {
       |  val f = new LBuff<caret>
@@ -373,9 +359,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "ListBuffer").get, '[')
     checkResultByText(resultText)
-  }
 
-  def testSeq() {
+  def testSeq()
     val fileText = """
       |class A {
       |  val f = Se<caret>
@@ -393,9 +378,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "Seq").get, '(')
     checkResultByText(resultText)
-  }
 
-  def testClosingParentheses() {
+  def testClosingParentheses()
     val fileText = """
       |class A {
       |  def foo(x: AnR<caret>)
@@ -413,9 +397,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "AnyRef").get, ')')
     checkResultByText(resultText)
-  }
 
-  def testDeprecated() {
+  def testDeprecated()
     val fileText = """
       |class A {
       |  @dep<caret>
@@ -435,9 +418,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "deprecated").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testStringLength() {
+  def testStringLength()
     val fileText = """
       |class A {
       |  "".len<caret>
@@ -455,9 +437,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "length").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testNamedParametersCompletion() {
+  def testNamedParametersCompletion()
     val fileText = """
       |class A {
       |  def foo(xxxx: Int) {
@@ -468,9 +449,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(0, CompletionType.BASIC)
     Assert.assertTrue(activeLookup.length == 2)
-  }
 
-  def testHiding1() {
+  def testHiding1()
     val fileText = """
       |class SmartValueInitializerCompletion {
       |  def foo(x: Int) {}
@@ -485,9 +465,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(0, CompletionType.BASIC)
     Assert.assertTrue(activeLookup.count(_.getLookupString == "foo") == 1)
-  }
 
-  def testHiding2() {
+  def testHiding2()
     val fileText = """
       |class SmartValueInitializerCompletion {
       |  def foo(x: Int) {}
@@ -502,9 +481,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(0, CompletionType.BASIC)
     Assert.assertTrue(activeLookup.count(_.getLookupString == "foo") == 2)
-  }
 
-  def testHiding3() {
+  def testHiding3()
     val fileText = """
       |class SmartValueInitializerCompletion {
       |  val foo: Int = 1
@@ -516,18 +494,16 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(0, CompletionType.BASIC)
     Assert.assertTrue(activeLookup.count(_.getLookupString == "foo") == 1)
-  }
 
-  def testHidingImplicits() {
+  def testHidingImplicits()
     val fileText = """
       |"".<caret>
       """.stripMargin.replaceAll("\r", "").trim()
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(0, CompletionType.BASIC)
     Assert.assertTrue(!activeLookup.exists(_.getLookupString == "x"))
-  }
 
-  def testBasicRenamed() {
+  def testBasicRenamed()
     val fileText = """
       |import java.util.{ArrayList => BLLLL}
       |object Test extends App {
@@ -547,9 +523,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testYield() {
+  def testYield()
     val fileText = """
         |object Test extends App {
         |  Thread.<caret>
@@ -567,9 +542,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "`yield`").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testInfix() {
+  def testInfix()
     val fileText = """
       |class a {
       |  def foo(x: Int): Boolean = false
@@ -589,9 +563,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "foo").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testPrefixedThis() {
+  def testPrefixedThis()
     val fileText = """
       |class aaa {
       |  a<caret>
@@ -609,9 +582,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "aaa.this").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testPrefixedSuper() {
+  def testPrefixedSuper()
     val fileText = """
       |class aaa {
       |  a<caret>
@@ -629,9 +601,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "aaa.super").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testCompanionObjectName() {
+  def testCompanionObjectName()
     val fileText = """
       |class aaa {
       |}
@@ -649,9 +620,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testNoBeanCompletion() {
+  def testNoBeanCompletion()
     val fileText = """
       |class Foo {
       |  val bar = 10
@@ -663,9 +633,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
     assert(!activeLookup.exists(le => le.getLookupString == "getBar"))
-  }
 
-  def testBasicTypeCompletion() {
+  def testBasicTypeCompletion()
     val fileText = """
         |class Foo {
         |  val bar: Int<caret>
@@ -675,9 +644,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
     assert(activeLookup.count(le => le.getLookupString == "Int") == 2)
-  }
 
-  def testBasicTypeCompletionNoMethods() {
+  def testBasicTypeCompletionNoMethods()
     val fileText = """
         |class Foo {
         |  def foo(): Int = 1
@@ -689,9 +657,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.BASIC)
 
     assert(!activeLookup.exists(le => le.getLookupString == "foo"))
-  }
 
-  def testBraceCompletionChar() {
+  def testBraceCompletionChar()
     val fileText = """
         |class aaa {
         |  Seq(1, 2, 3).ma<caret>
@@ -709,9 +676,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "map").get, '{')
     checkResultByText(resultText)
-  }
 
-  def testTailrecBasicCompletion() {
+  def testTailrecBasicCompletion()
     val fileText = """
         |class aaa {
         |  @tail<caret>
@@ -733,9 +699,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "tailrec").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSCL4791() {
+  def testSCL4791()
     val fileText =
       """
         |object PrivateInvisible {
@@ -775,9 +740,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "fault").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSCL4837() {
+  def testSCL4837()
     val fileText = """
         |System.current<caret>TimeMillis()
       """.stripMargin.replaceAll("\r", "").trim()
@@ -793,9 +757,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         '\t')
 
     checkResultByText(resultText)
-  }
 
-  def testParethsExists() {
+  def testParethsExists()
     val fileText = """
         |def foo(x: Int) = 1
         |fo<caret>()
@@ -812,9 +775,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "foo").get, '\t')
 
     checkResultByText(resultText)
-  }
 
-  def testBracketsExists() {
+  def testBracketsExists()
     val fileText = """
         |clas<caret>[]
       """.stripMargin.replaceAll("\r", "").trim()
@@ -829,9 +791,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "classOf").get, '\t')
 
     checkResultByText(resultText)
-  }
 
-  def testBracketsExistsForType() {
+  def testBracketsExistsForType()
     val fileText = """
         |val x: Opti<caret>[]
       """.stripMargin.replaceAll("\r", "").trim()
@@ -850,9 +811,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
                        '[')
 
     checkResultByText(resultText)
-  }
 
-  def testBracketsWithoutParentheses() {
+  def testBracketsWithoutParentheses()
     val fileText = """
         |Array.app<caret>
       """.stripMargin.replaceAll("\r", "").trim()
@@ -867,9 +827,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "apply").get, '[')
 
     checkResultByText(resultText)
-  }
 
-  def testParenthesesCompletionChar() {
+  def testParenthesesCompletionChar()
     val fileText = """
         |System.c<caret>
       """.stripMargin.replaceAll("\r", "").trim()
@@ -885,9 +844,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         '(')
 
     checkResultByText(resultText)
-  }
 
-  def testNoEtaExpansion() {
+  def testNoEtaExpansion()
     val fileText = """
         |List(1, 2, 3) takeRight<caret>
       """.stripMargin.replaceAll("\r", "").trim()
@@ -902,9 +860,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "takeRight").get, ' ')
 
     checkResultByText(resultText)
-  }
 
-  def testTypeIsFirst() {
+  def testTypeIsFirst()
     val fileText = """
         |class A {
         |  def typeSomething = 1
@@ -917,9 +874,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
 
     assert(getActiveLookup.getCurrentItem.getLookupString == "type",
            "Wrong item preselected.")
-  }
 
-  def testBackticks() {
+  def testBackticks()
     val fileText = """
         |object Z {
         |  def `foo` = 123
@@ -942,9 +898,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "`foo`").get)
 
     checkResultByText(resultText)
-  }
 
-  def testStringSimple() {
+  def testStringSimple()
     val fileText = """
         |object Z {
         |  val xxx = 1
@@ -965,9 +920,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "xxx").get)
 
     checkResultByText(resultText)
-  }
 
-  def testStringSimpleFunctionParameter() {
+  def testStringSimpleFunctionParameter()
     val fileText = """
         |object Z {
         |  def xxx(yyy: Int) = "$<caret>"
@@ -986,9 +940,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "yyy").get)
 
     checkResultByText(resultText)
-  }
 
-  def testStringNeedBraces() {
+  def testStringNeedBraces()
     val fileText = """
         |object Z {
         |  val xxx = 1
@@ -1009,9 +962,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "xxx").get, '\n')
 
     checkResultByText(resultText)
-  }
 
-  def testStringFunction() {
+  def testStringFunction()
     val fileText = """
         |object Z {
         |  def xxx() = 1
@@ -1032,9 +984,8 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "xxx").get)
 
     checkResultByText(resultText)
-  }
 
-  def testInterpolatedStringDotCompletion() {
+  def testInterpolatedStringDotCompletion()
     val fileText = """
         |object Z {
         |  def xxx: String = "abc"
@@ -1055,5 +1006,3 @@ class ScalaBasicCompletionTest extends ScalaCodeInsightTestBase {
         activeLookup.find(le => le.getLookupString == "substring").get)
 
     checkResultByText(resultText)
-  }
-}

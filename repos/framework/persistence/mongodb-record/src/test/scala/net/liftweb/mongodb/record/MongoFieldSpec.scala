@@ -46,7 +46,7 @@ import org.bson.types.ObjectId
 /**
   * Systems under specification for MongoField.
   */
-object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
+object MongoFieldSpec extends Specification with MongoTestKit with AroundEach
   "MongoField Specification".title
   sequential
 
@@ -55,9 +55,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
   lazy val session = new LiftSession("", randomString(20), Empty)
 
   // One of these is for specs2 2.x, the other for specs2 1.x
-  protected def around[T : AsResult](t: => T) = S.initIfUninitted(session) {
+  protected def around[T : AsResult](t: => T) = S.initIfUninitted(session)
     AsResult(t)
-  }
   protected def around[T <% org.specs2.execute.Result](t: => T) =
     S.initIfUninitted(session) { t }
 
@@ -67,17 +66,16 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       mandatory: MandatoryTypedField[A],
       legacyOptionalBox: Box[MandatoryTypedField[A]],
       canCheckDefaultValues: Boolean = true
-  )(implicit m: scala.reflect.Manifest[A]): Unit = {
+  )(implicit m: scala.reflect.Manifest[A]): Unit =
 
-    def commonBehaviorsForAllFlavors(field: MandatoryTypedField[A]) = {
+    def commonBehaviorsForAllFlavors(field: MandatoryTypedField[A]) =
 
-      "which have the correct initial value" in {
+      "which have the correct initial value" in
         field.value must be_==(field.defaultValue).when(canCheckDefaultValues)
         field.valueBox must be_==(field.defaultValueBox)
           .when(canCheckDefaultValues)
-      }
 
-      "which are readable and writable" in {
+      "which are readable and writable" in
         field.set(example)
         field.value must_== example
         field.valueBox must_== Full(example)
@@ -87,29 +85,24 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         field.setBox(Full(example))
         field.value must_== example
         field.valueBox must_== Full(example)
-      }
 
-      "which correctly clear back to the default" in {
+      "which correctly clear back to the default" in
         { field.clear; field.valueBox } must be_==(field.defaultValueBox)
           .when(canCheckDefaultValues)
-      }
 
-      "which capture error conditions set in" in {
+      "which capture error conditions set in" in
         // FIXME: This needs to be rearranged just so that it doesn't foul with subsequent examples
         // field.setBox(Failure("my failure"))
         // Failure("my failure") must_== Failure("my failure")
         pending
-      }
 
-      "which are only flagged as dirty_? when setBox is called with a different value" in {
+      "which are only flagged as dirty_? when setBox is called with a different value" in
         field.clear
-        field match {
+        field match
           case owned: OwnedField[_] =>
-            owned.owner.runSafe {
+            owned.owner.runSafe
               field.resetDirty
-            }
           case _ => field.resetDirty
-        }
         field.dirty_? must_== false
         val valueBox = field.valueBox
         field.setBox(valueBox)
@@ -124,74 +117,57 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         field.dirty_? must_== true
         field.setBox(valueBox)
         success
-      }
-    }
 
-    "support mandatory fields" in {
-      "which are configured correctly" in {
+    "support mandatory fields" in
+      "which are configured correctly" in
         mandatory.optional_? must_== false
-      }
 
-      "which initialize to some value" in {
+      "which initialize to some value" in
         mandatory.valueBox.isDefined must_== true
-      }
 
-      "common behaviors for all flavors" in {
+      "common behaviors for all flavors" in
         commonBehaviorsForAllFlavors(mandatory)
-      }
 
-      "which correctly fail to be set to Empty" in {
+      "which correctly fail to be set to Empty" in
         mandatory.valueBox.isDefined must_== true
         mandatory.setBox(Empty)
-        mandatory.valueBox must beLike {
+        mandatory.valueBox must beLike
           case Failure(s, _, _) => s must_== mandatory.notOptionalErrorMessage
-        }
-      }
-    }
 
-    legacyOptionalBox map { legacyOptional =>
-      "support 'legacy' optional fields (override optional_?)" in {
-        "which are configured correctly" in {
+    legacyOptionalBox map  legacyOptional =>
+      "support 'legacy' optional fields (override optional_?)" in
+        "which are configured correctly" in
           legacyOptional.optional_? must_== true
-        }
 
-        "which initialize to Empty" in {
+        "which initialize to Empty" in
           legacyOptional.valueBox must_== Empty
-        }
 
-        "common behaviors for all flavors" in {
+        "common behaviors for all flavors" in
           commonBehaviorsForAllFlavors(legacyOptional)
-        }
 
-        "which do not fail when set to Empty" in {
+        "which do not fail when set to Empty" in
           legacyOptional.set(example)
           legacyOptional.value must_== example
           legacyOptional.valueBox must_== Full(example)
           legacyOptional.clear
-          if (canCheckDefaultValues) {
+          if (canCheckDefaultValues)
             legacyOptional.value must_== legacyOptional.defaultValue
             legacyOptional.valueBox must_== legacyOptional.defaultValueBox
-          }
           legacyOptional.set(example)
           legacyOptional.value must_== example
           legacyOptional.valueBox must_== Full(example)
           legacyOptional.setBox(Empty)
-          if (canCheckDefaultValues) {
+          if (canCheckDefaultValues)
             legacyOptional.value must_== legacyOptional.defaultValue
             legacyOptional.valueBox must_== legacyOptional.defaultValueBox
-          }
           success
-        }
-      }
-    }
-  }
 
   def passConversionTests[A](example: A,
                              mandatory: MandatoryTypedField[A],
                              jsexp: JsExp,
                              jvalue: JValue,
                              formPattern: Box[NodeSeq],
-                             canCheckSetFromJValue: Boolean = true) = {
+                             canCheckSetFromJValue: Boolean = true) =
 
     /*
     "convert to JsExp" in {
@@ -199,45 +175,37 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       mandatory.asJs mustEqual jsexp
     }*/
 
-    "convert to JValue" in {
+    "convert to JValue" in
       mandatory.set(example)
       mandatory.asJValue mustEqual jvalue
-    }
 
-    if (canCheckSetFromJValue) {
-      "get set from JValue" in {
+    if (canCheckSetFromJValue)
+      "get set from JValue" in
         mandatory.setFromJValue(jvalue) mustEqual Full(example)
         mandatory.value mustEqual example
-      }
-    }
 
-    "convert to form XML" in {
-      formPattern foreach { fp =>
+    "convert to form XML" in
+      formPattern foreach  fp =>
         mandatory.set(example)
         val session = new LiftSession("", randomString(20), Empty)
-        S.initIfUninitted(session) {
+        S.initIfUninitted(session)
           val formXml = mandatory.toForm
           formXml.isDefined must_== true
-          formXml foreach { fprime =>
+          formXml foreach  fprime =>
             val f = ("* [name]" #> ".*" & "select *" #>
                 (((ns: NodeSeq) =>
-                      ns.filter {
+                      ns.filter
                         case e: Elem =>
                           e.attribute("selected").map(_.text) == Some(
                               "selected")
                         case _ => false
-                      }) andThen "* [value]" #> ".*"))(fprime)
+                      ) andThen "* [value]" #> ".*"))(fprime)
             val ret: Boolean = Helpers.compareXml(f, fp)
 
             ret must_== true
-          }
-        }
-      }
       success
-    }
-  }
 
-  "DateField" should {
+  "DateField" should
     val rec = MongoFieldTypeTestRecord.createRecord
     val now = new Date
     val nowStr = rec.meta.formats.dateFormat.format(now)
@@ -255,9 +223,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         JObject(List(JField("$dt", JString(nowStr)))),
         Full(<input name=".*" type="text" tabindex="1" value={nowStr} id="mandatoryDateField_id"></input>)
     )
-  }
 
-  "JsonObjectField" should {
+  "JsonObjectField" should
     val rec = MongoFieldTypeTestRecord.createRecord
     val ttjo = TypeTestJsonObject(1, "jsonobj1", Map("x" -> "a"))
     val ttjo2 = TypeTestJsonObject(2, "jsonobj2", Map("x" -> "b"))
@@ -271,17 +238,16 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
     passConversionTests(
         ttjo,
         rec.mandatoryJsonObjectField,
-        new JsExp {
+        new JsExp
           def toJsCmd = compactRender(json)
-        },
+        ,
         json,
         Empty
     )
-  }
 
-  "ObjectIdField" should {
+  "ObjectIdField" should
     // The extra `in` here is required for compilation, or we get a strange ambiguous overload warning.
-    "work and provide the appropriate date" in {
+    "work and provide the appropriate date" in
       val rec = MongoFieldTypeTestRecord.createRecord
       val oid = ObjectId.get
       val oid2 = ObjectId.get
@@ -300,10 +266,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       rec.mandatoryObjectIdField(oid)
 
       oid.getDate must_== rec.mandatoryObjectIdField.createdAt
-    }
-  }
 
-  "PatternField" should {
+  "PatternField" should
     val rec = PatternFieldTestRecord.createRecord
     val ptrn = Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE)
     val ptrn2 = Pattern.compile("^MON", Pattern.CASE_INSENSITIVE)
@@ -321,9 +285,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         Empty,
         false
     )
-  }
 
-  "UUIDField" should {
+  "UUIDField" should
     val rec = MongoFieldTypeTestRecord.createRecord
     val uuid = UUID.randomUUID
     val uuid2 = UUID.randomUUID
@@ -339,26 +302,22 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
         JObject(List(JField("$uuid", JString(uuid.toString)))),
         Full(<input name=".*" type="text" tabindex="1" value={uuid.toString} id="mandatoryUUIDField_id"></input>)
     )
-  }
 
-  "PasswordField" should {
-    "require a nonempty password" in {
+  "PasswordField" should
+    "require a nonempty password" in
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("")
       rec.validate must_==
       (FieldError(rec.password, Text(S.?("password.must.be.set"))) :: Nil)
-    }
 
-    "require at least 3 character password" in {
+    "require at least 3 character password" in
       val rec = PasswordTestRecord.createRecord
       rec.password.setPassword("ab")
       rec.validate must_==
       (FieldError(rec.password, Text(S.?("password.too.short"))) :: Nil)
-    }
-  }
 
-  "MongoListField (String)" should {
-    "function correctly" in {
+  "MongoListField (String)" should
+    "function correctly" in
       val rec = ListTestRecord.createRecord
       val lst = List("abc", "def", "ghi")
       val lst2 = List("ab", "de", "gh")
@@ -370,11 +329,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JArray(List(JString("abc"), JString("def"), JString("ghi"))),
           Empty
       )
-    }
-  }
 
-  "MongoListField (Int)" should {
-    "function correctly" in {
+  "MongoListField (Int)" should
+    "function correctly" in
       val rec = ListTestRecord.createRecord
       val lst = List(4, 5, 6)
       val lst2 = List(1, 2, 3)
@@ -386,11 +343,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JArray(List(JInt(4), JInt(5), JInt(6))),
           Empty
       )
-    }
-  }
 
-  "MongoListField (ObjectId)" should {
-    "function correctly" in {
+  "MongoListField (ObjectId)" should
+    "function correctly" in
       val rec = MongoListTestRecord.createRecord
       val oid1 = ObjectId.get
       val oid2 = ObjectId.get
@@ -413,11 +368,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "MongoListField (Pattern)" should {
-    "function correctly" in {
+  "MongoListField (Pattern)" should
+    "function correctly" in
       val rec = MongoListTestRecord.createRecord
       val ptrn1 = Pattern.compile("^Mo", Pattern.CASE_INSENSITIVE)
       val ptrn2 = Pattern.compile("^MON", Pattern.CASE_INSENSITIVE)
@@ -437,11 +390,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           Empty,
           false
       )
-    }
-  }
 
-  "MongoListField (Date)" should {
-    "function correctly" in {
+  "MongoListField (Date)" should
+    "function correctly" in
       val rec = MongoListTestRecord.createRecord
       val dt1 = new Date
       val dt2 = new Date
@@ -463,11 +414,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "MongoListField (UUID)" should {
-    "function correctly" in {
+  "MongoListField (UUID)" should
+    "function correctly" in
       val rec = MongoListTestRecord.createRecord
       val uuid1 = UUID.randomUUID
       val uuid2 = UUID.randomUUID
@@ -491,11 +440,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "MongoListField (DateTime)" should {
-    "function correctly" in {
+  "MongoListField (DateTime)" should
+    "function correctly" in
       val rec = MongoJodaListTestRecord.createRecord
       val dt1 = new DateTime
       val dt2 = new DateTime
@@ -517,11 +464,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "MongoJsonObjectListField" should {
-    "function correctly" in {
+  "MongoJsonObjectListField" should
+    "function correctly" in
       val rec = ListTestRecord.createRecord
       val lst = List(TypeTestJsonObject(1, "jsonobj1", Map("x" -> "1")),
                      TypeTestJsonObject(2, "jsonobj2", Map("x" -> "2")))
@@ -537,26 +482,22 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
       passConversionTests(
           lst,
           rec.mandatoryMongoJsonObjectListField,
-          new JsExp {
+          new JsExp
             def toJsCmd = compactRender(json)
-          },
+          ,
           json,
           Empty
       )
-    }
-  }
 
-  "MongoCaseClassListField" should {
-    "setFromAny a List" in {
+  "MongoCaseClassListField" should
+    "setFromAny a List" in
       val rec = ListTestRecord.createRecord
       val lst = List(MongoCaseClassTestObject(1, "str1", MyTestEnum.THREE))
       rec.mongoCaseClassListField.setFromAny(lst)
       rec.mongoCaseClassListField.value must_== lst
-    }
-  }
 
-  "MongoMapField (String)" should {
-    "function correctly" in {
+  "MongoMapField (String)" should
+    "function correctly" in
       val rec = MapTestRecord.createRecord
       val map = Map("a" -> "abc", "b" -> "def", "c" -> "ghi")
       val map2 = Map("a" -> "ab", "b" -> "de", "c" -> "gh")
@@ -573,11 +514,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "MongoMapField (Int)" should {
-    "function correctly" in {
+  "MongoMapField (Int)" should
+    "function correctly" in
       val rec = MapTestRecord.createRecord
       val map = Map("a" -> 4, "b" -> 5, "c" -> 6)
       val map2 = Map("a" -> 1, "b" -> 2, "c" -> 3)
@@ -594,11 +533,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
               )),
           Empty
       )
-    }
-  }
 
-  "BsonRecordField" should {
-    "function correctly" in {
+  "BsonRecordField" should
+    "function correctly" in
       val rec = SubRecordTestRecord.createRecord
       val subSubRec = SubSubRecord.createRecord.name("subsub")
       val subRec = SubRecord.createRecord.name("subrecord").subsub(subSubRec)
@@ -615,9 +552,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
             ("$flags" -> subRec.pattern.value.flags)) ~
         ("uuid" -> ("$uuid" -> subRec.uuid.value.toString))
 
-      val srJsExp = new JsExp {
+      val srJsExp = new JsExp
         def toJsCmd = compactRender(srJson)
-      }
 
       passBasicTests(subRec,
                      subRec2,
@@ -631,11 +567,9 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           srJson,
           Empty
       )
-    }
-  }
 
-  "BsonRecordListField" should {
-    "function correctly" in {
+  "BsonRecordListField" should
+    "function correctly" in
       val rec = SubRecordTestRecord.createRecord
       val subSubRec = SubSubRecord.createRecord.name("subsub")
       val lst = List(SubRecord.createRecord.name("subrec1").subsub(subSubRec),
@@ -664,12 +598,10 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
             ("$flags" -> lst(1).pattern.value.flags)) ~
         ("uuid" -> ("$uuid" -> lst(1).uuid.value.toString))
 
-      val sr1JsExp = new JsExp {
+      val sr1JsExp = new JsExp
         def toJsCmd = compactRender(sr1Json)
-      }
-      val sr2JsExp = new JsExp {
+      val sr2JsExp = new JsExp
         def toJsCmd = compactRender(sr2Json)
-      }
 
       passBasicTests(lst,
                      lst2,
@@ -682,29 +614,24 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
           JArray(List(sr1Json, sr2Json)),
           Empty
       )
-    }
-  }
 
-  "JObjectField" should {
+  "JObjectField" should
     val jo: JValue = ("minutes" -> 59)
     val json: JObject = ("mandatoryJObjectField" -> jo)
 
-    "convert to JValue" in {
+    "convert to JValue" in
       val rec = JObjectFieldTestRecord.createRecord.mandatoryJObjectField(json)
 
       rec.mandatoryJObjectField.asJValue must_== json
-    }
-    "get set from JValue" in {
+    "get set from JValue" in
       val rec = JObjectFieldTestRecord.createRecord
       val recFromJson = rec.mandatoryJObjectField.setFromJValue(json)
 
       recFromJson.isDefined must_== true
-      recFromJson foreach { r =>
+      recFromJson foreach  r =>
         r must_== json
-      }
       success
-    }
-    "get set from JValue after BSON roundtrip" in {
+    "get set from JValue after BSON roundtrip" in
       val joftrJson: JObject =
         ("_id" -> ("$oid" -> ObjectId.get.toString)) ~
         ("mandatoryJObjectField" -> ("minutes" -> 59))
@@ -712,12 +639,8 @@ object MongoFieldSpec extends Specification with MongoTestKit with AroundEach {
 
       fromJsonBox.isDefined must_== true
 
-      fromJsonBox foreach { fromJson =>
+      fromJsonBox foreach  fromJson =>
         //Convert the test record, make a DBObject out of it, and make a record from that DBObject
         val fromBson = JObjectFieldTestRecord.fromDBObject(fromJson.asDBObject)
         fromBson.asJValue must_== fromJson.asJValue
-      }
       success
-    }
-  }
-}

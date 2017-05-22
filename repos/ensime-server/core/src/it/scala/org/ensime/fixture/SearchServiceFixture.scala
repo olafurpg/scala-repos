@@ -9,38 +9,33 @@ import org.ensime.indexer.SearchService
 import scala.concurrent._
 import scala.concurrent.duration._
 
-trait IsolatedSearchServiceFixture extends IsolatedSourceResolverFixture {
+trait IsolatedSearchServiceFixture extends IsolatedSourceResolverFixture
 
   def withSearchService(testCode: (EnsimeConfig, SearchService) => Any)(
       implicit actorSystem: ActorSystem, vfs: EnsimeVFS): Any =
-    withSourceResolver { (config, resolver) =>
+    withSourceResolver  (config, resolver) =>
       val searchService = new SearchService(config, resolver)
-      try {
+      try
         testCode(config, searchService)
-      } finally {
+      finally
         Await.ready(searchService.shutdown(), Duration.Inf)
         actorSystem.shutdown()
         actorSystem.awaitTermination(10.seconds)
-      }
-    }
-}
 
 trait SharedSearchServiceFixture
-    extends SharedEnsimeVFSFixture with SharedSourceResolverFixture {
+    extends SharedEnsimeVFSFixture with SharedSourceResolverFixture
   this: SharedTestKitFixture =>
 
   private[fixture] var _search: SearchService = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     implicit val system = _testkit.system
     _search = new SearchService(_config, _resolver)
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     Await.ready(_search.shutdown(), Duration.Inf)
     super.afterAll()
-  }
 
   def withSearchService(
       testCode: (EnsimeConfig, SearchService) => Any
@@ -48,4 +43,3 @@ trait SharedSearchServiceFixture
 
   def withSearchService(testCode: SearchService => Any): Unit =
     testCode(_search)
-}

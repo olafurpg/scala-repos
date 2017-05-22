@@ -17,16 +17,14 @@ class ScPatternListStubImpl[ParentPsi <: PsiElement] private (
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScPatternList](parent, elemType)
-    with ScPatternListStub {
+    with ScPatternListStub
   var patternsSimple: Boolean = false
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
-           patternsSimple: Boolean) {
+           patternsSimple: Boolean)
     this(parent, elemType)
     this.patternsSimple = patternsSimple
-  }
 
   def allPatternsSimple: Boolean = patternsSimple
-}

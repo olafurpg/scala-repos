@@ -36,8 +36,8 @@ import cascading.flow.FlowProcess
 /**
   * Serializes BinaryConverters to JobConf.
   */
-private[source] object ExternalizerSerializer {
-  def inj[T]: Injection[Externalizer[T], String] = {
+private[source] object ExternalizerSerializer
+  def inj[T]: Injection[Externalizer[T], String] =
     import com.twitter.bijection.Inversion.attemptWhen
     import com.twitter.bijection.codec.Base64
 
@@ -46,27 +46,22 @@ private[source] object ExternalizerSerializer {
     implicit val unwrap: Injection[GZippedBase64String, String] =
       // this does not catch cases where it's Base64 but not compressed
       // but the decompression injection will, so it's safe to do this
-      new AbstractInjection[GZippedBase64String, String] {
+      new AbstractInjection[GZippedBase64String, String]
         override def apply(gzbs: GZippedBase64String) = gzbs.str
         override def invert(str: String) =
           attemptWhen(str)(Base64.isBase64)(GZippedBase64String(_))
-      }
 
     Injection
       .connect[Externalizer[T], Array[Byte], GZippedBase64String, String]
-  }
-}
 
-private[source] object SourceConfigBinaryConverterProvider {
+private[source] object SourceConfigBinaryConverterProvider
   val ProviderConfKey = "com.twitter.scalding.lzo.converter.provider.source"
-}
 private[source] class SourceConfigBinaryConverterProvider[M]
     extends ConfigBinaryConverterProvider[M](
         SourceConfigBinaryConverterProvider.ProviderConfKey)
 
-private[source] object SinkConfigBinaryConverterProvider {
+private[source] object SinkConfigBinaryConverterProvider
   val ProviderConfKey = "com.twitter.scalding.lzo.converter.provider.sink"
-}
 private[source] class SinkConfigBinaryConverterProvider[M]
     extends ConfigBinaryConverterProvider[M](
         SinkConfigBinaryConverterProvider.ProviderConfKey)
@@ -76,24 +71,21 @@ private[source] class SinkConfigBinaryConverterProvider[M]
   */
 private[source] class ConfigBinaryConverterProvider[M](
     private[this] val confKey: String)
-    extends BinaryConverterProvider[M] {
+    extends BinaryConverterProvider[M]
   private[this] var cached: Option[(String, BinaryConverter[M])] = None
 
-  override def getConverter(conf: Configuration): BinaryConverter[M] = {
+  override def getConverter(conf: Configuration): BinaryConverter[M] =
     val data = conf.get(confKey)
     require(data != null, s"$confKey is not set in configuration")
-    cached match {
+    cached match
       case Some((d, conv)) if d == data => conv
       case _ =>
         val extern = ExternalizerSerializer.inj.invert(data).get
         val conv = extern.get.asInstanceOf[BinaryConverter[M]]
         cached = Some((data, conv))
         conv
-    }
-  }
-}
 
-object LzoGenericScheme {
+object LzoGenericScheme
   def apply[M : ClassTag](conv: BinaryConverter[M]): LzoGenericScheme[M] =
     new LzoGenericScheme(
         conv, implicitly[ClassTag[M]].runtimeClass.asInstanceOf[Class[M]])
@@ -108,30 +100,26 @@ object LzoGenericScheme {
   def setConverter[M](conv: BinaryConverter[M],
                       conf: JobConf,
                       confKey: String,
-                      overrideConf: Boolean = false): Unit = {
-    if ((conf.get(confKey) == null) || overrideConf) {
+                      overrideConf: Boolean = false): Unit =
+    if ((conf.get(confKey) == null) || overrideConf)
       val extern = Externalizer(conv)
-      try {
+      try
         ExternalizerSerializer.inj
           .invert(ExternalizerSerializer.inj(extern))
           .get
-      } catch {
+      catch
         case e: Exception =>
           throw new RuntimeException(
               "Unable to roundtrip the BinaryConverter in the Externalizer.",
               e)
-      }
       conf.set(confKey, ExternalizerSerializer.inj(extern))
-    }
-  }
-}
 
 /**
   * Generic scheme for data stored as lzo-compressed protobuf messages.
   * Serialization is performed using the supplied BinaryConverter.
   */
 class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
-    extends LzoBinaryScheme[M, GenericWritable[M]] {
+    extends LzoBinaryScheme[M, GenericWritable[M]]
 
   override protected def prepareBinaryWritable(): GenericWritable[M] =
     new GenericWritable(conv)
@@ -139,7 +127,7 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
   override def sourceConfInit(
       fp: FlowProcess[JobConf],
       tap: Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]],
-      conf: JobConf): Unit = {
+      conf: JobConf): Unit =
 
     LzoGenericScheme.setConverter(
         conv, conf, SourceConfigBinaryConverterProvider.ProviderConfKey)
@@ -149,12 +137,11 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
 
     DelegateCombineFileInputFormat.setDelegateInputFormat(
         conf, classOf[MultiInputFormat[_]])
-  }
 
   override def sinkConfInit(
       fp: FlowProcess[JobConf],
       tap: Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]],
-      conf: JobConf): Unit = {
+      conf: JobConf): Unit =
     LzoGenericScheme.setConverter(
         conv, conf, SinkConfigBinaryConverterProvider.ProviderConfKey)
     LzoGenericBlockOutputFormat.setClassConf(clazz, conf)
@@ -162,5 +149,3 @@ class LzoGenericScheme[M](@transient conv: BinaryConverter[M], clazz: Class[M])
         classOf[SinkConfigBinaryConverterProvider[_]], conf)
     DeprecatedOutputFormatWrapper.setOutputFormat(
         classOf[LzoGenericBlockOutputFormat[_]], conf)
-  }
-}

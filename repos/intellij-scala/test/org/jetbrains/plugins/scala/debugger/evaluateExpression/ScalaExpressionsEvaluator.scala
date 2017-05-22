@@ -11,7 +11,7 @@ class ScalaExpressionsEvaluator
 class ScalaExpressionsEvaluator_212
     extends ScalaExpressionsEvaluatorBase with ScalaVersion_2_12
 
-abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
+abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase
   addFileWithBreakpoints("PrefixUnary.scala",
                          s"""
       |object PrefixUnary {
@@ -24,13 +24,11 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testPrefixUnary() {
-    runDebugger() {
+  def testPrefixUnary()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("!u", "false")
       evalEquals("!true", "false")
-    }
-  }
 
   addFileWithBreakpoints("VariousExprs.scala",
                          s"""
@@ -40,16 +38,14 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testVariousExprs() {
-    runDebugger() {
+  def testVariousExprs()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("(1, 2, 3)", "(1,2,3)")
       evalEquals("if (true) \"text\"", "undefined")
       evalEquals("if (true) \"text\" else \"next\"", "text")
       evalEquals("if (false) \"text\" else \"next\"", "next")
       evalEquals("\"text\" != null", "true")
-    }
-  }
 
   addFileWithBreakpoints("SmartBoxing.scala",
                          s"""
@@ -63,8 +59,8 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  def test2(tup: Tuple2[Int,  Int]) = tup._2
       |}
     """.stripMargin.trim())
-  def testSmartBoxing() {
-    runDebugger() {
+  def testSmartBoxing()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("test(tup)", "1")
       evalEquals("test((1, 2))", "1")
@@ -75,8 +71,6 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       evalEquals("foo(1)(2)", "1")
       evalEquals(
           "scala.collection.immutable.HashSet.empty + 1 + 2", "Set(1, 2)")
-    }
-  }
 
   addFileWithBreakpoints("Assignment.scala",
                          s"""
@@ -90,8 +84,8 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testAssignment() {
-    runDebugger() {
+  def testAssignment()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x(0)(0)", "1")
       evalEquals("x(0)(0) = 2", "2")
@@ -104,8 +98,6 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       evalEquals("m", "2")
       evalEquals("y = 1", "1") //local vals may be reassigned in debugger
       evalEquals("y", "1")
-    }
-  }
 
   addFileWithBreakpoints("This.scala",
                          s"""
@@ -121,12 +113,10 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testThis() {
-    runDebugger() {
+  def testThis()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("this.x", "1")
-    }
-  }
 
   addFileWithBreakpoints("PrefixedThis.scala",
                          s"""
@@ -151,12 +141,10 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testPrefixedThis() {
-    runDebugger() {
+  def testPrefixedThis()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("This.this.x", "1")
-    }
-  }
 
   addFileWithBreakpoints("Postfix.scala",
                          s"""
@@ -168,13 +156,11 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testPostfix() {
-    runDebugger() {
+  def testPostfix()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x x", "1")
       evalEquals("1 toString ()", "1")
-    }
-  }
 
   addFileWithBreakpoints("Backticks.scala",
                          s"""
@@ -185,12 +171,10 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testBackticks() {
-    runDebugger() {
+  def testBackticks()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("`val`", "100")
-    }
-  }
 
   addFileWithBreakpoints("Literal.scala",
                          s"""
@@ -202,8 +186,8 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testLiteral() {
-    runDebugger() {
+  def testLiteral()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("\"x\".length", "1")
       evalEquals("s\"n = $n\"", "n = 1")
@@ -218,8 +202,6 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       evalEquals("\"a\".concat(123)", "a123123")
       evalEquals("'aaa", "'aaa")
       evalEquals("'aaa.name", "aaa")
-    }
-  }
 
   addFileWithBreakpoints("JavaLib.scala",
                          s"""
@@ -229,13 +211,11 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testJavaLib() {
-    runDebugger() {
+  def testJavaLib()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("new StringBuilder(\"test\").append(23)", "test23")
       evalEquals("new Array[Int](2)", "[0,0]")
-    }
-  }
 
   addFileWithBreakpoints("InnerClass.scala",
                          s"""
@@ -246,12 +226,10 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testInnerClass() {
-    runDebugger() {
+  def testInnerClass()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("new Expr", "InnerClass$Expr")
-    }
-  }
 
   addFileWithBreakpoints("OverloadingClass.scala",
                          s"""
@@ -266,13 +244,11 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim())
-  def testOverloadingClass() {
-    runDebugger() {
+  def testOverloadingClass()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("new Expr(\"\")", "OverloadingClass$Expr")
       evalStartsWith("new Expr(2)", "OverloadingClass$Expr")
-    }
-  }
 
   addFileWithBreakpoints("IsInstanceOf.scala",
                          s"""
@@ -286,16 +262,14 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testIsInstanceOf() {
-    runDebugger() {
+  def testIsInstanceOf()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("x.isInstanceOf[A]", "true")
       evalEquals("x.isInstanceOf[B]", "false")
       evalEquals("y.isInstanceOf[B]", "true")
       evalEquals("y.isInstanceOf[String]", "false")
       evalEquals("\"\".isInstanceOf[String]", "true")
-    }
-  }
 
   addFileWithBreakpoints("SyntheticOperators.scala",
                          s"""
@@ -308,8 +282,8 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testSyntheticOperators(): Unit = {
-    runDebugger() {
+  def testSyntheticOperators(): Unit =
+    runDebugger()
       waitForBreakpoint()
       evalEquals("tr || fail", "true")
       evalEquals("fls && fail", "false")
@@ -327,6 +301,3 @@ abstract class ScalaExpressionsEvaluatorBase extends ScalaDebuggerTestCase {
       evalEquals("5 % 2", "1")
       evalEquals("1 << 2", "4")
       evalEquals("\"1\" + 1", "11")
-    }
-  }
-}

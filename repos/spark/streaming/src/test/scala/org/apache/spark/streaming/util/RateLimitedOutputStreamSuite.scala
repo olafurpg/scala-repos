@@ -23,27 +23,23 @@ import java.util.concurrent.TimeUnit._
 
 import org.apache.spark.SparkFunSuite
 
-class RateLimitedOutputStreamSuite extends SparkFunSuite {
+class RateLimitedOutputStreamSuite extends SparkFunSuite
 
-  private def benchmark[U](f: => U): Long = {
+  private def benchmark[U](f: => U): Long =
     val start = System.nanoTime
     f
     System.nanoTime - start
-  }
 
-  test("write") {
+  test("write")
     val underlying = new ByteArrayOutputStream
     val data = "X" * 41000
     val stream =
       new RateLimitedOutputStream(underlying, desiredBytesPerSec = 10000)
-    val elapsedNs = benchmark {
+    val elapsedNs = benchmark
       stream.write(data.getBytes(StandardCharsets.UTF_8))
-    }
 
     val seconds = SECONDS.convert(elapsedNs, NANOSECONDS)
     assert(seconds >= 4, s"Seconds value ($seconds) is less than 4.")
     assert(
         seconds <= 30, s"Took more than 30 seconds ($seconds) to write data.")
     assert(underlying.toString("UTF-8") === data)
-  }
-}

@@ -9,15 +9,15 @@ import client.{Decoder => ClientDecoder}
 import com.twitter.finagle.{Stack, ServiceFactory, Codec, CodecFactory}
 import com.twitter.finagle.tracing.ClientRequestTracingFilter
 
-class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response] {
+class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response]
   private[this] val storageCommands = collection.Set[ChannelBuffer]("set")
 
   def this() = this(false)
 
-  def server = Function.const {
-    new Codec[Command, Response] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline() = {
+  def server = Function.const
+    new Codec[Command, Response]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline() =
           val pipeline = Channels.pipeline()
 
           //        pipeline.addLast("exceptionHandler", new ExceptionHandler)
@@ -28,15 +28,11 @@ class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response] {
           pipeline.addLast("encoder", new Encoder)
           pipeline.addLast("response2encoding", new ResponseToEncoding)
           pipeline
-        }
-      }
-    }
-  }
 
-  def client = Function.const {
-    new Codec[Command, Response] {
-      def pipelineFactory = new ChannelPipelineFactory {
-        def getPipeline() = {
+  def client = Function.const
+    new Codec[Command, Response]
+      def pipelineFactory = new ChannelPipelineFactory
+        def getPipeline() =
           val pipeline = Channels.pipeline()
 
           pipeline.addLast("decoder", new ClientDecoder)
@@ -45,8 +41,6 @@ class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response] {
           pipeline.addLast("encoder", new Encoder)
           pipeline.addLast("command2encoding", new CommandToEncoding)
           pipeline
-        }
-      }
 
       // pass every request through a filter to create trace data
       override def prepareConnFactory(
@@ -55,23 +49,19 @@ class Kestrel(failFast: Boolean) extends CodecFactory[Command, Response] {
         new KestrelTracingFilter() andThen underlying
 
       override def failFastOk = failFast
-    }
-  }
 
   override val protocolLibraryName: String = "kestrel"
-}
 
 /**
   * Adds tracing information for each kestrel request.
   * Including command name, when request was sent and when it was received.
   */
 private class KestrelTracingFilter
-    extends ClientRequestTracingFilter[Command, Response] {
+    extends ClientRequestTracingFilter[Command, Response]
   val serviceName = "kestrel"
   def methodName(req: Command): String = req.name
-}
 
-object Kestrel {
+object Kestrel
   def apply(): CodecFactory[Command, Response] = apply(false)
 
   /**
@@ -81,4 +71,3 @@ object Kestrel {
   def apply(failFast: Boolean): CodecFactory[Command, Response] =
     new Kestrel(failFast)
   def get() = apply()
-}

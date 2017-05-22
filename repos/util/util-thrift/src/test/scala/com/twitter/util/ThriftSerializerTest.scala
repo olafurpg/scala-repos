@@ -21,7 +21,7 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ThriftSerializerTest extends WordSpec {
+class ThriftSerializerTest extends WordSpec
   val aString = "me gustan los tacos y los burritos"
   val aNumber = 42
   val original = new TestThriftStructure(aString, aNumber)
@@ -32,14 +32,14 @@ class ThriftSerializerTest extends WordSpec {
       "GCJtZSBndXN0YW4gbG9zIHRhY29zIHkgbG9zIGJ1cnJpdG9zFVQA")
 
   def testSerializer(
-      serializer: ThriftSerializer, stringVersion: Option[String] = None) = {
+      serializer: ThriftSerializer, stringVersion: Option[String] = None) =
     val bytes = serializer.toBytes(original)
     var obj = new TestThriftStructure()
     serializer.fromBytes(obj, bytes)
     assert(obj.aString == original.aString)
     assert(obj.aNumber == original.aNumber)
 
-    stringVersion match {
+    stringVersion match
       case None =>
       case Some(str) =>
         assert(serializer.toString(original) == str)
@@ -47,21 +47,14 @@ class ThriftSerializerTest extends WordSpec {
         serializer.fromString(obj, str)
         assert(obj.aString == original.aString)
         assert(obj.aNumber == original.aNumber)
-    }
     true
-  }
 
-  "ThriftSerializer" should {
-    "encode and decode json" in {
+  "ThriftSerializer" should
+    "encode and decode json" in
       testSerializer(new JsonThriftSerializer, Some(json))
-    }
 
-    "encode and decode binary" in {
+    "encode and decode binary" in
       testSerializer(new BinaryThriftSerializer, encodedBinary)
-    }
 
-    "encode and decode compact" in {
+    "encode and decode compact" in
       testSerializer(new CompactThriftSerializer, encodedCompact)
-    }
-  }
-}

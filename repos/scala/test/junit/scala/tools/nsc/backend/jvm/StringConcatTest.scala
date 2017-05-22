@@ -14,18 +14,17 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object StringConcatTest extends ClearAfterClass.Clearable {
+object StringConcatTest extends ClearAfterClass.Clearable
   var compiler = newCompiler()
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class StringConcatTest extends ClearAfterClass {
+class StringConcatTest extends ClearAfterClass
   ClearAfterClass.stateToClear = StringConcatTest
   val compiler = StringConcatTest.compiler
 
   @Test
-  def appendOverloadNoBoxing(): Unit = {
+  def appendOverloadNoBoxing(): Unit =
     val code =
       """class C {
         |  def t1(
@@ -63,9 +62,8 @@ class StringConcatTest extends ClearAfterClass {
     val List(c) = compileClasses(compiler)(code)
 
     def invokeNameDesc(m: String): List[String] =
-      getSingleMethod(c, m).instructions collect {
+      getSingleMethod(c, m).instructions collect
         case Invoke(_, _, name, desc, _) => name + desc
-      }
     assertEquals(
         invokeNameDesc("t1"),
         List("<init>()V",
@@ -105,10 +103,9 @@ class StringConcatTest extends ClearAfterClass {
             "append(Ljava/lang/CharSequence;)Ljava/lang/StringBuilder;",
             "append(Ljava/lang/Object;)Ljava/lang/StringBuilder;", // test that we're not using the [C overload
             "toString()Ljava/lang/String;"))
-  }
 
   @Test
-  def concatPrimitiveCorrectness(): Unit = {
+  def concatPrimitiveCorrectness(): Unit =
     val obj: Object = new { override def toString = "TTT" }
     def t(v: Unit,
           z: Boolean,
@@ -122,13 +119,12 @@ class StringConcatTest extends ClearAfterClass {
           str: String,
           sbuf: java.lang.StringBuffer,
           chsq: java.lang.CharSequence,
-          chrs: Array[Char]) = {
+          chrs: Array[Char]) =
       val s1 =
         str + obj + v + z + c + b + s + i + f + l + d + sbuf + chsq + chrs
       val s2 =
         obj + str + v + z + c + b + s + i + f + l + d + sbuf + chsq + chrs
       s1 + "//" + s2
-    }
     def sbuf = { val r = new java.lang.StringBuffer(); r.append("sbuf"); r }
     def chsq: java.lang.CharSequence = "chsq"
     val s = t((),
@@ -148,5 +144,3 @@ class StringConcatTest extends ClearAfterClass {
     assertEquals(
         r,
         "meTTT()trued312312.3-32-4.2sbufchsq<ARRAY>//TTTme()trued312312.3-32-4.2sbufchsq<ARRAY>")
-  }
-}

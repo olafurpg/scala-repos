@@ -34,22 +34,20 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object Skin {
+object Skin
   implicit def sfxSkin2jfx[C <: jfxsc.Skinnable](s: Skin[C]): jfxsc.Skin[C] =
     if (s != null) s.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/Skinnable.html javafx.scene.control.Skinnable]] interface.
   */
-trait Skin[C <: jfxsc.Skinnable] extends SFXDelegate[jfxsc.Skin[C]] {
+trait Skin[C <: jfxsc.Skinnable] extends SFXDelegate[jfxsc.Skin[C]]
 
   /**
     * Called by a Skinnable when the Skin is replaced on the Skinnable.
     */
-  def dispose() {
+  def dispose()
     delegate.dispose()
-  }
 
   /**
     * Gets the Node which represents this Skin.
@@ -60,4 +58,3 @@ trait Skin[C <: jfxsc.Skinnable] extends SFXDelegate[jfxsc.Skin[C]] {
     * Gets the Skinnable to which this Skin is assigned.
     */
   def skinnable: C = delegate.getSkinnable
-}

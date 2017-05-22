@@ -20,10 +20,10 @@ import org.junit.Assert._
 import collection.mutable.ArrayBuffer
 import org.junit.Test
 
-class TopicTest {
+class TopicTest
 
   @Test
-  def testInvalidTopicNames() {
+  def testInvalidTopicNames()
     val invalidTopicNames = new ArrayBuffer[String]()
     invalidTopicNames += ("", ".", "..")
     var longName = "ATCG"
@@ -44,33 +44,27 @@ class TopicTest {
                          '\r',
                          '\n',
                          '=')
-    for (weirdChar <- badChars) {
+    for (weirdChar <- badChars)
       invalidTopicNames += "Is" + weirdChar + "illegal"
-    }
 
-    for (i <- 0 until invalidTopicNames.size) {
-      try {
+    for (i <- 0 until invalidTopicNames.size)
+      try
         Topic.validate(invalidTopicNames(i))
         fail("Should throw InvalidTopicException.")
-      } catch {
+      catch
         case e: org.apache.kafka.common.errors.InvalidTopicException =>
         // This is good.
-      }
-    }
 
     val validTopicNames = new ArrayBuffer[String]()
     validTopicNames += ("valid", "TOPIC", "nAmEs", "ar6", "VaL1d", "_0-9_.")
-    for (i <- 0 until validTopicNames.size) {
-      try {
+    for (i <- 0 until validTopicNames.size)
+      try
         Topic.validate(validTopicNames(i))
-      } catch {
+      catch
         case e: Exception => fail("Should not throw exception.")
-      }
-    }
-  }
 
   @Test
-  def testTopicHasCollisionChars() = {
+  def testTopicHasCollisionChars() =
     val falseTopics = List("start", "end", "middle", "many")
     val trueTopics = List(
         ".start",
@@ -86,34 +80,27 @@ class TopicTest {
     falseTopics.foreach(t => assertFalse(Topic.hasCollisionChars(t)))
 
     trueTopics.foreach(t => assertTrue(Topic.hasCollisionChars(t)))
-  }
 
   @Test
-  def testTopicHasCollision() = {
+  def testTopicHasCollision() =
     val periodFirstMiddleLastNone = List(".topic", "to.pic", "topic.", "topic")
     val underscoreFirstMiddleLastNone = List(
         "_topic", "to_pic", "topic_", "topic")
 
     // Self
-    periodFirstMiddleLastNone.foreach { t =>
+    periodFirstMiddleLastNone.foreach  t =>
       assertTrue(Topic.hasCollision(t, t))
-    }
-    underscoreFirstMiddleLastNone.foreach { t =>
+    underscoreFirstMiddleLastNone.foreach  t =>
       assertTrue(Topic.hasCollision(t, t))
-    }
 
     // Same Position
-    periodFirstMiddleLastNone.zip(underscoreFirstMiddleLastNone).foreach {
+    periodFirstMiddleLastNone.zip(underscoreFirstMiddleLastNone).foreach
       case (t1, t2) =>
         assertTrue(Topic.hasCollision(t1, t2))
-    }
 
     // Different Position
     periodFirstMiddleLastNone
       .zip(underscoreFirstMiddleLastNone.reverse)
-      .foreach {
+      .foreach
         case (t1, t2) =>
           assertFalse(Topic.hasCollision(t1, t2))
-      }
-  }
-}

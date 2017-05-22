@@ -1,5 +1,5 @@
-object Test {
-  def test(xs: Any) = xs match {
+object Test
+  def test(xs: Any) = xs match
     // test error message TooManyArgsPatternError
     case List(x1,
               x2,
@@ -25,5 +25,3 @@ object Test {
               x22,
               x23) =>
       7
-  }
-}

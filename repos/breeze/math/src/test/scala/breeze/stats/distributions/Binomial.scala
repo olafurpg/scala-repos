@@ -23,31 +23,27 @@ import org.scalatest.junit._
 import org.scalatest.prop._
 
 @RunWith(classOf[JUnitRunner])
-class BinomialTest extends FunSuite with Checkers with MomentsTestBase[Int] {
+class BinomialTest extends FunSuite with Checkers with MomentsTestBase[Int]
   type Distr = Binomial
   import org.scalacheck.Arbitrary.arbitrary;
 
   override val numSamples: Int = 100000
   override val VARIANCE_TOLERANCE: Double = 1E-1
 
-  implicit def arbDistr = Arbitrary {
+  implicit def arbDistr = Arbitrary
     for (n <- arbitrary[Int].map { _.abs % 10000 + 1 };
     p <- arbitrary[Double].map { _.abs % 1.0 + 1E-4 }) yield
       new Binomial(n.abs + 1, p)
-  }
 
   def asDouble(x: Int): Double = x.toDouble
   def fromDouble(x: Double): Int = x.toInt
 
-  test("gh issues/282") {
+  test("gh issues/282")
     val b1 = Binomial(10, 1)
     val b0 = Binomial(10, 0)
     assert(b1.probabilityOf(10) === 1.0)
     assert(b1.probabilityOf(0) === 0.0)
     assert(b0.probabilityOf(1) === 0.0)
     assert(b0.probabilityOf(0) === 1.0)
-    for (i <- 1 until 10) {
+    for (i <- 1 until 10)
       assert(b1.probabilityOf(i) === 0.0)
-    }
-  }
-}

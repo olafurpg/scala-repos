@@ -1,4 +1,4 @@
-package scala.test.scaladoc {
+package scala.test.scaladoc
 
   /** Check the interaction between SI-3314 and diagrams
     *  - the three enumerations below should get valid content diagrams:
@@ -13,11 +13,11 @@ package scala.test.scaladoc {
     *                         |
     *           {Mon,Tue,Wed,Thu,Fri,Sat,Sun}
     */
-  package diagrams {
+  package diagrams
 
     /** @contentDiagram
       *  @inheritanceDiagram hideDiagram */
-    trait WeekDayTraitWithDiagram extends Enumeration {
+    trait WeekDayTraitWithDiagram extends Enumeration
       type WeekDay = Value
 
       /** @inheritanceDiagram */
@@ -40,11 +40,10 @@ package scala.test.scaladoc {
 
       /** @inheritanceDiagram */
       object Sun extends WeekDay
-    }
 
     /** @contentDiagram
       *  @inheritanceDiagram hideDiagram */
-    class WeekDayClassWithDiagram extends Enumeration {
+    class WeekDayClassWithDiagram extends Enumeration
       type WeekDay = Value
 
       /** @inheritanceDiagram */
@@ -67,11 +66,10 @@ package scala.test.scaladoc {
 
       /** @inheritanceDiagram */
       object Sun extends WeekDay
-    }
 
     /** @contentDiagram
       *  @inheritanceDiagram hideDiagram */
-    object WeekDayObjectWithDiagram extends Enumeration {
+    object WeekDayObjectWithDiagram extends Enumeration
       type WeekDay = Value
 
       /** @inheritanceDiagram */
@@ -94,6 +92,3 @@ package scala.test.scaladoc {
 
       /** @inheritanceDiagram */
       object Sun extends WeekDay
-    }
-  }
-}

@@ -6,7 +6,7 @@ import org.apache.commons.math3.ode.nonstiff.AdaptiveStepsizeIntegrator
 
 abstract class ApacheAdaptiveStepIntegrator(
     relTol: DenseVector[Double] = null, absTol: DenseVector[Double] = null)
-    extends ApacheOdeIntegrator {
+    extends ApacheOdeIntegrator
 
   type T <: AdaptiveStepsizeIntegrator
 
@@ -35,9 +35,7 @@ abstract class ApacheAdaptiveStepIntegrator(
                              inner.getMaxStep,
                              ApacheAdaptiveStepIntegrator.defaultAbsTol,
                              ApacheAdaptiveStepIntegrator.defaultRelTol)
-}
 
-object ApacheAdaptiveStepIntegrator {
+object ApacheAdaptiveStepIntegrator
   val defaultRelTol = 1.49012e-8
   val defaultAbsTol = 1.49012e-8
-}

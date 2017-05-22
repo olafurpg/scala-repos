@@ -13,7 +13,7 @@ import scala.language.higherKinds
   *
   *  @group ReflectionAPI
   */
-trait Internals { self: Universe =>
+trait Internals  self: Universe =>
 
   /** @see [[InternalApi]]
     *  @group Internal
@@ -52,7 +52,7 @@ trait Internals { self: Universe =>
     *
     *  @group Internal
     */
-  trait InternalApi { internal =>
+  trait InternalApi  internal =>
 
     /** This is an internal implementation module.
       */
@@ -404,7 +404,7 @@ trait Internals { self: Universe =>
     val decorators: Decorators
 
     /** @see [[Decorators]] */
-    trait DecoratorApi {
+    trait DecoratorApi
 
       /** Extension methods for trees */
       type TreeDecorator [T <: Tree] <: TreeDecoratorApi[T]
@@ -413,7 +413,7 @@ trait Internals { self: Universe =>
       implicit def treeDecorator[T <: Tree](tree: T): TreeDecorator[T]
 
       /** @see [[TreeDecorator]] */
-      class TreeDecoratorApi[T <: Tree](val tree: T) {
+      class TreeDecoratorApi[T <: Tree](val tree: T)
 
         /** @see [[internal.freeTerms]] */
         def freeTerms: List[FreeTermSymbol] = internal.freeTerms(tree)
@@ -432,7 +432,6 @@ trait Internals { self: Universe =>
         /** @see [[internal.substituteThis]] */
         def substituteThis(clazz: Symbol, to: Tree): Tree =
           internal.substituteThis(tree, clazz, to)
-      }
 
       /** Extension methods for symbols */
       type SymbolDecorator [T <: Symbol] <: SymbolDecoratorApi[T]
@@ -441,7 +440,7 @@ trait Internals { self: Universe =>
       implicit def symbolDecorator[T <: Symbol](symbol: T): SymbolDecorator[T]
 
       /** @see [[SymbolDecorator]] */
-      class SymbolDecoratorApi[T <: Symbol](val symbol: T) {
+      class SymbolDecoratorApi[T <: Symbol](val symbol: T)
 
         /** @see [[internal.isFreeTerm]] */
         def isFreeTerm: Boolean = internal.isFreeTerm(symbol)
@@ -503,7 +502,6 @@ trait Internals { self: Universe =>
 
         /** @see [[internal.flags]] */
         def flags: FlagSet = internal.flags(symbol)
-      }
 
       /** Extension methods for types */
       type TypeDecorator [T <: Type] <: TypeDecoratorApi[T]
@@ -512,13 +510,10 @@ trait Internals { self: Universe =>
       implicit def typeDecorator[T <: Type](tp: T): TypeDecorator[T]
 
       /** @see [[TypeDecorator]] */
-      implicit class TypeDecoratorApi[T <: Type](val tp: T) {
+      implicit class TypeDecoratorApi[T <: Type](val tp: T)
 
         /** @see [[internal.fullyInitialize]] */
         def fullyInitialize: T = internal.fullyInitialize(tp)
-      }
-    }
-  }
 
   /** This is an internal implementation class.
     *  @group Internal
@@ -526,7 +521,7 @@ trait Internals { self: Universe =>
   // this API abstracts away the functionality necessary for reification and quasiquotes
   // it's too gimmicky and unstructured to be exposed directly in the universe
   // but we need it in a publicly available place for reification to work
-  trait ReificationSupportApi {
+  trait ReificationSupportApi
 
     /** Selects type symbol with given simple name `name` from the defined members of `owner`.
       */
@@ -653,45 +648,40 @@ trait Internals { self: Universe =>
 
     val ImplicitParams: ImplicitParamsExtractor
 
-    trait ImplicitParamsExtractor {
+    trait ImplicitParamsExtractor
       def apply(
           paramss: List[List[Tree]], implparams: List[Tree]): List[List[Tree]]
       def unapply(vparamss: List[List[ValDef]])
         : Some[(List[List[ValDef]], List[ValDef])]
-    }
 
     val ScalaDot: ScalaDotExtractor
 
-    trait ScalaDotExtractor {
+    trait ScalaDotExtractor
       def apply(name: Name): Tree
       def unapply(tree: Tree): Option[Name]
-    }
 
     val FlagsRepr: FlagsReprExtractor
 
-    trait FlagsReprExtractor {
+    trait FlagsReprExtractor
       def apply(value: Long): FlagSet
       def unapply(flags: Long): Some[Long]
-    }
 
     val SyntacticTypeApplied: SyntacticTypeAppliedExtractor
     val SyntacticAppliedType: SyntacticTypeAppliedExtractor
 
-    trait SyntacticTypeAppliedExtractor {
+    trait SyntacticTypeAppliedExtractor
       def apply(tree: Tree, targs: List[Tree]): Tree
       def unapply(tree: Tree): Option[(Tree, List[Tree])]
-    }
 
     val SyntacticApplied: SyntacticAppliedExtractor
 
-    trait SyntacticAppliedExtractor {
+    trait SyntacticAppliedExtractor
       def apply(tree: Tree, argss: List[List[Tree]]): Tree
       def unapply(tree: Tree): Some[(Tree, List[List[Tree]])]
-    }
 
     val SyntacticClassDef: SyntacticClassDefExtractor
 
-    trait SyntacticClassDefExtractor {
+    trait SyntacticClassDefExtractor
       def apply(mods: Modifiers,
                 name: TypeName,
                 tparams: List[Tree],
@@ -704,11 +694,10 @@ trait Internals { self: Universe =>
       def unapply(tree: Tree)
         : Option[(Modifiers, TypeName, List[TypeDef], Modifiers, List[List[
                     ValDef]], List[Tree], List[Tree], ValDef, List[Tree])]
-    }
 
     val SyntacticTraitDef: SyntacticTraitDefExtractor
 
-    trait SyntacticTraitDefExtractor {
+    trait SyntacticTraitDefExtractor
       def apply(mods: Modifiers,
                 name: TypeName,
                 tparams: List[Tree],
@@ -718,11 +707,10 @@ trait Internals { self: Universe =>
                 body: List[Tree]): ClassDef
       def unapply(tree: Tree): Option[(Modifiers, TypeName, List[TypeDef], List[
               Tree], List[Tree], ValDef, List[Tree])]
-    }
 
     val SyntacticObjectDef: SyntacticObjectDefExtractor
 
-    trait SyntacticObjectDefExtractor {
+    trait SyntacticObjectDefExtractor
       def apply(mods: Modifiers,
                 name: TermName,
                 earlyDefs: List[Tree],
@@ -731,11 +719,10 @@ trait Internals { self: Universe =>
                 body: List[Tree]): ModuleDef
       def unapply(tree: Tree): Option[(Modifiers, TermName, List[Tree], List[
               Tree], ValDef, List[Tree])]
-    }
 
     val SyntacticPackageObjectDef: SyntacticPackageObjectDefExtractor
 
-    trait SyntacticPackageObjectDefExtractor {
+    trait SyntacticPackageObjectDefExtractor
       def apply(name: TermName,
                 earlyDefs: List[Tree],
                 parents: List[Tree],
@@ -743,52 +730,46 @@ trait Internals { self: Universe =>
                 body: List[Tree]): PackageDef
       def unapply(tree: Tree)
         : Option[(TermName, List[Tree], List[Tree], ValDef, List[Tree])]
-    }
 
     val SyntacticTuple: SyntacticTupleExtractor
     val SyntacticTupleType: SyntacticTupleExtractor
 
-    trait SyntacticTupleExtractor {
+    trait SyntacticTupleExtractor
       def apply(args: List[Tree]): Tree
       def unapply(tree: Tree): Option[List[Tree]]
-    }
 
     val SyntacticBlock: SyntacticBlockExtractor
 
-    trait SyntacticBlockExtractor {
+    trait SyntacticBlockExtractor
       def apply(stats: List[Tree]): Tree
       def unapply(tree: Tree): Option[List[Tree]]
-    }
 
     val SyntacticNew: SyntacticNewExtractor
 
-    trait SyntacticNewExtractor {
+    trait SyntacticNewExtractor
       def apply(earlyDefs: List[Tree],
                 parents: List[Tree],
                 selfType: Tree,
                 body: List[Tree]): Tree
       def unapply(
           tree: Tree): Option[(List[Tree], List[Tree], ValDef, List[Tree])]
-    }
 
     val SyntacticFunctionType: SyntacticFunctionTypeExtractor
 
-    trait SyntacticFunctionTypeExtractor {
+    trait SyntacticFunctionTypeExtractor
       def apply(argtpes: List[Tree], restpe: Tree): Tree
       def unapply(tree: Tree): Option[(List[Tree], Tree)]
-    }
 
     val SyntacticFunction: SyntacticFunctionExtractor
 
-    trait SyntacticFunctionExtractor {
+    trait SyntacticFunctionExtractor
       def apply(params: List[Tree], body: Tree): Function
 
       def unapply(tree: Function): Option[(List[ValDef], Tree)]
-    }
 
     val SyntacticDefDef: SyntacticDefDefExtractor
 
-    trait SyntacticDefDefExtractor {
+    trait SyntacticDefDefExtractor
       def apply(mods: Modifiers,
                 name: TermName,
                 tparams: List[Tree],
@@ -798,155 +779,130 @@ trait Internals { self: Universe =>
 
       def unapply(tree: Tree): Option[
           (Modifiers, TermName, List[TypeDef], List[List[ValDef]], Tree, Tree)]
-    }
 
     val SyntacticValDef: SyntacticValDefExtractor
     val SyntacticVarDef: SyntacticValDefExtractor
 
-    trait SyntacticValDefExtractor {
+    trait SyntacticValDefExtractor
       def apply(mods: Modifiers, name: TermName, tpt: Tree, rhs: Tree): ValDef
       def unapply(tree: Tree): Option[(Modifiers, TermName, Tree, Tree)]
-    }
 
     val SyntacticPatDef: SyntacticPatDefExtractor
 
-    trait SyntacticPatDefExtractor {
+    trait SyntacticPatDefExtractor
       def apply(mods: Modifiers, pat: Tree, tpt: Tree, rhs: Tree): List[ValDef]
-    }
 
     val SyntacticAssign: SyntacticAssignExtractor
 
-    trait SyntacticAssignExtractor {
+    trait SyntacticAssignExtractor
       def apply(lhs: Tree, rhs: Tree): Tree
       def unapply(tree: Tree): Option[(Tree, Tree)]
-    }
 
     val SyntacticValFrom: SyntacticValFromExtractor
 
-    trait SyntacticValFromExtractor {
+    trait SyntacticValFromExtractor
       def apply(pat: Tree, rhs: Tree): Tree
       def unapply(tree: Tree): Option[(Tree, Tree)]
-    }
 
     val SyntacticValEq: SyntacticValEqExtractor
 
-    trait SyntacticValEqExtractor {
+    trait SyntacticValEqExtractor
       def apply(pat: Tree, rhs: Tree): Tree
       def unapply(tree: Tree): Option[(Tree, Tree)]
-    }
 
     val SyntacticFilter: SyntacticFilterExtractor
 
-    trait SyntacticFilterExtractor {
+    trait SyntacticFilterExtractor
       def apply(test: Tree): Tree
       def unapply(tree: Tree): Option[(Tree)]
-    }
 
     val SyntacticEmptyTypeTree: SyntacticEmptyTypeTreeExtractor
 
-    trait SyntacticEmptyTypeTreeExtractor {
+    trait SyntacticEmptyTypeTreeExtractor
       def apply(): TypeTree
       def unapply(tt: TypeTree): Boolean
-    }
 
     val SyntacticFor: SyntacticForExtractor
     val SyntacticForYield: SyntacticForExtractor
 
-    trait SyntacticForExtractor {
+    trait SyntacticForExtractor
       def apply(enums: List[Tree], body: Tree): Tree
       def unapply(tree: Tree): Option[(List[Tree], Tree)]
-    }
 
     def UnliftListElementwise[T](
         unliftable: Unliftable[T]): UnliftListElementwise[T]
-    trait UnliftListElementwise[T] {
+    trait UnliftListElementwise[T]
       def unapply(lst: List[Tree]): Option[List[T]]
-    }
 
     def UnliftListOfListsElementwise[T](
         unliftable: Unliftable[T]): UnliftListOfListsElementwise[T]
-    trait UnliftListOfListsElementwise[T] {
+    trait UnliftListOfListsElementwise[T]
       def unapply(lst: List[List[Tree]]): Option[List[List[T]]]
-    }
 
     val SyntacticPartialFunction: SyntacticPartialFunctionExtractor
-    trait SyntacticPartialFunctionExtractor {
+    trait SyntacticPartialFunctionExtractor
       def apply(cases: List[Tree]): Match
       def unapply(tree: Tree): Option[List[CaseDef]]
-    }
 
     val SyntacticMatch: SyntacticMatchExtractor
-    trait SyntacticMatchExtractor {
+    trait SyntacticMatchExtractor
       def apply(scrutinee: Tree, cases: List[Tree]): Match
       def unapply(tree: Match): Option[(Tree, List[CaseDef])]
-    }
 
     val SyntacticTry: SyntacticTryExtractor
-    trait SyntacticTryExtractor {
+    trait SyntacticTryExtractor
       def apply(block: Tree, catches: List[Tree], finalizer: Tree): Try
       def unapply(tree: Try): Option[(Tree, List[CaseDef], Tree)]
-    }
 
     val SyntacticTermIdent: SyntacticTermIdentExtractor
-    trait SyntacticTermIdentExtractor {
+    trait SyntacticTermIdentExtractor
       def apply(name: TermName, isBackquoted: Boolean = false): Ident
       def unapply(id: Ident): Option[(TermName, Boolean)]
-    }
 
     val SyntacticTypeIdent: SyntacticTypeIdentExtractor
-    trait SyntacticTypeIdentExtractor {
+    trait SyntacticTypeIdentExtractor
       def apply(name: TypeName): Ident
       def unapply(tree: Tree): Option[TypeName]
-    }
 
     val SyntacticImport: SyntacticImportExtractor
-    trait SyntacticImportExtractor {
+    trait SyntacticImportExtractor
       def apply(expr: Tree, selectors: List[Tree]): Import
       def unapply(imp: Import): Some[(Tree, List[Tree])]
-    }
 
     val SyntacticSelectType: SyntacticSelectTypeExtractor
-    trait SyntacticSelectTypeExtractor {
+    trait SyntacticSelectTypeExtractor
       def apply(qual: Tree, name: TypeName): Select
       def unapply(tree: Tree): Option[(Tree, TypeName)]
-    }
 
     val SyntacticSelectTerm: SyntacticSelectTermExtractor
-    trait SyntacticSelectTermExtractor {
+    trait SyntacticSelectTermExtractor
       def apply(qual: Tree, name: TermName): Select
       def unapply(tree: Tree): Option[(Tree, TermName)]
-    }
 
     val SyntacticCompoundType: SyntacticCompoundTypeExtractor
-    trait SyntacticCompoundTypeExtractor {
+    trait SyntacticCompoundTypeExtractor
       def apply(parents: List[Tree], defns: List[Tree]): CompoundTypeTree
       def unapply(tree: Tree): Option[(List[Tree], List[Tree])]
-    }
 
     val SyntacticSingletonType: SyntacitcSingletonTypeExtractor
-    trait SyntacitcSingletonTypeExtractor {
+    trait SyntacitcSingletonTypeExtractor
       def apply(tree: Tree): SingletonTypeTree
       def unapply(tree: Tree): Option[Tree]
-    }
 
     val SyntacticTypeProjection: SyntacticTypeProjectionExtractor
-    trait SyntacticTypeProjectionExtractor {
+    trait SyntacticTypeProjectionExtractor
       def apply(qual: Tree, name: TypeName): SelectFromTypeTree
       def unapply(tree: Tree): Option[(Tree, TypeName)]
-    }
 
     val SyntacticAnnotatedType: SyntacticAnnotatedTypeExtractor
-    trait SyntacticAnnotatedTypeExtractor {
+    trait SyntacticAnnotatedTypeExtractor
       def apply(tpt: Tree, annot: Tree): Annotated
       def unapply(tree: Tree): Option[(Tree, Tree)]
-    }
 
     val SyntacticExistentialType: SyntacticExistentialTypeExtractor
-    trait SyntacticExistentialTypeExtractor {
+    trait SyntacticExistentialTypeExtractor
       def apply(tpt: Tree, where: List[Tree]): ExistentialTypeTree
       def unapply(tree: Tree): Option[(Tree, List[MemberDef])]
-    }
-  }
 
   @deprecated("Use `internal.reificationSupport` instead", "2.11.0")
   val build: ReificationSupportApi
@@ -1010,7 +966,7 @@ trait Internals { self: Universe =>
     *  @group Internal
     */
   // SI-6241: move importers to a mirror
-  trait Importer {
+  trait Importer
 
     /** The source universe of reflection artifacts that will be processed.
       *  The target universe is universe that created this importer with `mkImporter`.
@@ -1040,7 +996,6 @@ trait Internals { self: Universe =>
     /** In the current universe, creates a position that corresponds to the provided position in the source universe.
       */
     def importPosition(pos: from.Position): Position
-  }
 
   @deprecated("Use `internal.createImporter` instead", "2.11.0")
   def mkImporter(from0: Universe): Importer { val from: from0.type } =
@@ -1083,20 +1038,18 @@ trait Internals { self: Universe =>
     *  If `ReferenceToBoxed` were used instead of Ident, no transformation would be performed.
     *  @group Internal
     */
-  abstract class ReferenceToBoxedExtractor {
+  abstract class ReferenceToBoxedExtractor
     def apply(ident: Ident): ReferenceToBoxed
     def unapply(referenceToBoxed: ReferenceToBoxed): Option[Ident]
-  }
 
   /** The API that all references support
     *  @group Internal
     */
-  trait ReferenceToBoxedApi extends TermTreeApi {
+  trait ReferenceToBoxedApi extends TermTreeApi
     this: ReferenceToBoxed =>
 
     /** The underlying reference. */
     def ident: Tree
-  }
 
   /** Tag that preserves the identity of `ReferenceToBoxed` in the face of erasure.
     *  Can be used for pattern matching, instance tests, serialization and the like.
@@ -1116,7 +1069,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTermSymbolApi extends TermSymbolApi {
+  trait FreeTermSymbolApi extends TermSymbolApi
     this: FreeTermSymbol =>
 
     /** The place where this symbol has been spawned
@@ -1130,7 +1083,6 @@ trait Internals { self: Universe =>
       *  @group FreeTerm
       */
     def value: Any
-  }
 
   /** Tag that preserves the identity of `FreeTermSymbol` in the face of erasure.
     *  Can be used for pattern matching, instance tests, serialization and the like.
@@ -1150,7 +1102,7 @@ trait Internals { self: Universe =>
     *  $SYMACCESSORS
     *  @group Internal
     */
-  trait FreeTypeSymbolApi extends TypeSymbolApi {
+  trait FreeTypeSymbolApi extends TypeSymbolApi
     this: FreeTypeSymbol =>
 
     /** The place where this symbol has been spawned
@@ -1158,7 +1110,6 @@ trait Internals { self: Universe =>
       *  @group FreeType
       */
     def origin: String
-  }
 
   /** Tag that preserves the identity of `FreeTermSymbol` in the face of erasure.
     *  Can be used for pattern matching, instance tests, serialization and the like.
@@ -1189,7 +1140,7 @@ trait Internals { self: Universe =>
   /** @see [[compat]]
     *  @group Internal
     */
-  trait CompatApi {
+  trait CompatApi
 
     /** @see [[CompatToken]] */
     implicit val token = new CompatToken
@@ -1212,7 +1163,7 @@ trait Internals { self: Universe =>
       internal.newScopeWith(elems: _*)
 
     /** Scala 2.10 compatibility enrichments for BuildApi. */
-    implicit class CompatibleBuildApi(api: BuildApi) {
+    implicit class CompatibleBuildApi(api: BuildApi)
 
       /** @see [[BuildApi.setInfo]] */
       @deprecated(
@@ -1250,10 +1201,9 @@ trait Internals { self: Universe =>
           "Use `internal.reificationSupport.mkTypeTree` instead", "2.11.0")
       def TypeTree(tp: Type): TypeTree =
         internal.reificationSupport.mkTypeTree(tp)
-    }
 
     /** Scala 2.10 compatibility enrichments for Tree. */
-    implicit class CompatibleTree(tree: Tree) {
+    implicit class CompatibleTree(tree: Tree)
 
       /** @see [[InternalApi.freeTerms]] */
       @deprecated(
@@ -1287,10 +1237,9 @@ trait Internals { self: Universe =>
           "2.11.0")
       def substituteThis(clazz: Symbol, to: Tree): Tree =
         internal.substituteThis(tree, clazz, to)
-    }
 
     /** Scala 2.10 compatibility enrichments for Tree. */
-    implicit class CompatibleSymbol(symbol: Symbol) {
+    implicit class CompatibleSymbol(symbol: Symbol)
       @deprecated(
           "This API is unreliable. Use `isPrivateThis` or `isProtectedThis` instead",
           "2.11.0")
@@ -1389,7 +1338,6 @@ trait Internals { self: Universe =>
           "Use `internal.deSkolemize` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
       def deSkolemize: Symbol = internal.deSkolemize(symbol)
-    }
 
     /** @see [[InternalApi.singleType]] */
     @deprecated("Use `internal.singleType` instead", "2.11.0")
@@ -1433,5 +1381,3 @@ trait Internals { self: Universe =>
     @deprecated("Use `internal.existentialAbstraction` instead", "2.11.0")
     def existentialAbstraction(tparams: List[Symbol], tpe0: Type): Type =
       internal.existentialAbstraction(tparams, tpe0)
-  }
-}

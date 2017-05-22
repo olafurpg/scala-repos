@@ -43,7 +43,7 @@ import scalafx.util.StringConverter
   * @define FLVINIT Provides a `TextField` that allows editing of the cell content when the cell is double-clicked, or when `TableView.edit(int, scalafx.scene.control.TableColumn)` is called.
   * @define FLVRET A Function  that can be inserted into the cell factory property of a `TableColumn`, that enables textual editing of the content.
   */
-object TextFieldTableCell {
+object TextFieldTableCell
 
   /**
     * Converts a ScalaFX $TFTC to its JavaFX counterpart.
@@ -83,7 +83,6 @@ object TextFieldTableCell {
       message = "Use forTableColumn[S, T](StringConverter[T])", since = "1.0")
   def forTableColumn[S, T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTableCell.forTableColumn[S, T](converter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/TextFieldTableCell.html $TFTC]]
@@ -99,7 +98,7 @@ class TextFieldTableCell[S, T](override val delegate: jfxscc.TextFieldTableCell[
     extends TableCell[S, T](delegate)
     with ConvertableCell[jfxscc.TextFieldTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.TextFieldTableCell[S, T], T]
-    with SFXDelegate[jfxscc.TextFieldTableCell[S, T]] {
+    with SFXDelegate[jfxscc.TextFieldTableCell[S, T]]
 
   /**
     * Creates a `TextFieldTableCell` that provides a TextField when put into editing mode that allows editing of the
@@ -109,4 +108,3 @@ class TextFieldTableCell[S, T](override val delegate: jfxscc.TextFieldTableCell[
     */
   def this(converter: StringConverter[T]) =
     this(new jfxscc.TextFieldTableCell[S, T](converter))
-}

@@ -7,17 +7,13 @@ import play.api.mvc._, Results._
 import lila.app._
 import views._
 
-object WorldMap extends LilaController {
+object WorldMap extends LilaController
 
-  def index = Action {
+  def index = Action
     Ok(views.html.site.worldMap())
-  }
 
-  def stream = Action.async {
-    Env.worldMap.getStream map { stream =>
+  def stream = Action.async
+    Env.worldMap.getStream map  stream =>
       Ok.chunked(
           stream &> EventSource()
       ) as "text/event-stream"
-    }
-  }
-}

@@ -20,11 +20,11 @@ package org.apache.spark.sql.sources
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.execution.datasources.DataSource
 
-class ResolvedDataSourceSuite extends SparkFunSuite {
+class ResolvedDataSourceSuite extends SparkFunSuite
   private def getProvidingClass(name: String): Class[_] =
     DataSource(sqlContext = null, className = name).providingClass
 
-  test("jdbc") {
+  test("jdbc")
     assert(getProvidingClass("jdbc") === classOf[
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
     assert(
@@ -32,9 +32,8 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
     assert(getProvidingClass("org.apache.spark.sql.jdbc") === classOf[
             org.apache.spark.sql.execution.datasources.jdbc.DefaultSource])
-  }
 
-  test("json") {
+  test("json")
     assert(getProvidingClass("json") === classOf[
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
     assert(
@@ -42,9 +41,8 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
     assert(getProvidingClass("org.apache.spark.sql.json") === classOf[
             org.apache.spark.sql.execution.datasources.json.DefaultSource])
-  }
 
-  test("parquet") {
+  test("parquet")
     assert(getProvidingClass("parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(getProvidingClass(
@@ -52,22 +50,16 @@ class ResolvedDataSourceSuite extends SparkFunSuite {
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
     assert(getProvidingClass("org.apache.spark.sql.parquet") === classOf[
             org.apache.spark.sql.execution.datasources.parquet.DefaultSource])
-  }
 
-  test("error message for unknown data sources") {
-    val error1 = intercept[ClassNotFoundException] {
+  test("error message for unknown data sources")
+    val error1 = intercept[ClassNotFoundException]
       getProvidingClass("avro")
-    }
     assert(error1.getMessage.contains("spark-packages"))
 
-    val error2 = intercept[ClassNotFoundException] {
+    val error2 = intercept[ClassNotFoundException]
       getProvidingClass("com.databricks.spark.avro")
-    }
     assert(error2.getMessage.contains("spark-packages"))
 
-    val error3 = intercept[ClassNotFoundException] {
+    val error3 = intercept[ClassNotFoundException]
       getProvidingClass("asfdwefasdfasdf")
-    }
     assert(error3.getMessage.contains("spark-packages"))
-  }
-}

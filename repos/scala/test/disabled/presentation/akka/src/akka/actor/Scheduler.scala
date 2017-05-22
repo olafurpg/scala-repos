@@ -22,7 +22,7 @@ import java.util.concurrent._
 import akka.event.EventHandler
 import akka.AkkaException
 
-object Scheduler {
+object Scheduler
   import Actor._
 
   case class SchedulerException(msg: String, e: Throwable)
@@ -39,22 +39,20 @@ object Scheduler {
                message: AnyRef,
                initialDelay: Long,
                delay: Long,
-               timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
-    try {
+               timeUnit: TimeUnit): ScheduledFuture[AnyRef] =
+    try
       service
         .scheduleAtFixedRate(new Runnable { def run = receiver ! message },
                              initialDelay,
                              delay,
                              timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
-    } catch {
+    catch
       case e: Exception =>
         val error = SchedulerException(
             message + " could not be scheduled on " + receiver, e)
         EventHandler.error(error, this, "%s @ %s".format(receiver, message))
         throw error
-    }
-  }
 
   /**
     * Schedules to run specified function to the receiver after initialDelay and then repeated after delay,
@@ -73,18 +71,16 @@ object Scheduler {
   def schedule(runnable: Runnable,
                initialDelay: Long,
                delay: Long,
-               timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
-    try {
+               timeUnit: TimeUnit): ScheduledFuture[AnyRef] =
+    try
       service
         .scheduleAtFixedRate(runnable, initialDelay, delay, timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
-    } catch {
+    catch
       case e: Exception =>
         val error = SchedulerException("Failed to schedule a Runnable", e)
         EventHandler.error(error, this, error.getMessage)
         throw error
-    }
-  }
 
   /**
     * Schedules to send the specified message to the receiver after delay
@@ -92,20 +88,18 @@ object Scheduler {
   def scheduleOnce(receiver: ActorRef,
                    message: AnyRef,
                    delay: Long,
-                   timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
-    try {
+                   timeUnit: TimeUnit): ScheduledFuture[AnyRef] =
+    try
       service
         .schedule(
             new Runnable { def run = receiver ! message }, delay, timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
-    } catch {
+    catch
       case e: Exception =>
         val error = SchedulerException(
             message + " could not be scheduleOnce'd on " + receiver, e)
         EventHandler.error(e, this, receiver + " @ " + message)
         throw error
-    }
-  }
 
   /**
     * Schedules a function to be run after delay,
@@ -122,42 +116,33 @@ object Scheduler {
     */
   def scheduleOnce(runnable: Runnable,
                    delay: Long,
-                   timeUnit: TimeUnit): ScheduledFuture[AnyRef] = {
-    try {
+                   timeUnit: TimeUnit): ScheduledFuture[AnyRef] =
+    try
       service
         .schedule(runnable, delay, timeUnit)
         .asInstanceOf[ScheduledFuture[AnyRef]]
-    } catch {
+    catch
       case e: Exception =>
         val error = SchedulerException("Failed to scheduleOnce a Runnable", e)
         EventHandler.error(e, this, error.getMessage)
         throw error
-    }
-  }
 
-  def shutdown() {
-    synchronized {
+  def shutdown()
+    synchronized
       service.shutdown()
-    }
-  }
 
-  def restart() {
-    synchronized {
+  def restart()
+    synchronized
       shutdown()
       service = Executors.newSingleThreadScheduledExecutor(
           SchedulerThreadFactory)
-    }
-  }
-}
 
-private object SchedulerThreadFactory extends ThreadFactory {
+private object SchedulerThreadFactory extends ThreadFactory
   private var count = 0
   val threadFactory = Executors.defaultThreadFactory()
 
-  def newThread(r: Runnable): Thread = {
+  def newThread(r: Runnable): Thread =
     val thread = threadFactory.newThread(r)
     thread.setName("akka:scheduler-" + count)
     thread.setDaemon(true)
     thread
-  }
-}

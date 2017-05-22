@@ -24,11 +24,11 @@ import org.json4s.JObject
 import org.joda.time.DateTime
 import org.joda.time.format.DateTimeFormat
 
-private[prediction] object MailChimpConnector extends FormConnector {
+private[prediction] object MailChimpConnector extends FormConnector
 
-  override def toEventJson(data: Map[String, String]): JObject = {
+  override def toEventJson(data: Map[String, String]): JObject =
 
-    val json = data.get("type") match {
+    val json = data.get("type") match
       case Some("subscribe") => subscribeToEventJson(data)
       // UNSUBSCRIBE
       case Some("unsubscribe") => unsubscribeToEventJson(data)
@@ -47,19 +47,16 @@ private[prediction] object MailChimpConnector extends FormConnector {
       case None =>
         throw new ConnectorException(
             s"The field 'type' is required for MailChimp data.")
-    }
     json
-  }
 
   val mailChimpDateTimeFormat = DateTimeFormat
     .forPattern("yyyy-MM-dd HH:mm:ss")
     .withZone(EventValidation.defaultTimeZone)
 
-  def parseMailChimpDateTime(s: String): DateTime = {
+  def parseMailChimpDateTime(s: String): DateTime =
     mailChimpDateTimeFormat.parseDateTime(s)
-  }
 
-  def subscribeToEventJson(data: Map[String, String]): JObject = {
+  def subscribeToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -99,9 +96,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
           ("ip_signup" -> data("data[ip_signup]")))
 
     json
-  }
 
-  def unsubscribeToEventJson(data: Map[String, String]): JObject = {
+  def unsubscribeToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -147,9 +143,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
           ("campaign_id" -> data("data[campaign_id]")))
 
     json
-  }
 
-  def profileToEventJson(data: Map[String, String]): JObject = {
+  def profileToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -186,9 +181,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
           ("ip_opt" -> data("data[ip_opt]")))
 
     json
-  }
 
-  def upemailToEventJson(data: Map[String, String]): JObject = {
+  def upemailToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -214,9 +208,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
               ("old_email" -> data("data[old_email]"))))
 
     json
-  }
 
-  def cleanedToEventJson(data: Map[String, String]): JObject = {
+  def cleanedToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -243,9 +236,8 @@ private[prediction] object MailChimpConnector extends FormConnector {
               ("email" -> data("data[email]"))))
 
     json
-  }
 
-  def campaignToEventJson(data: Map[String, String]): JObject = {
+  def campaignToEventJson(data: Map[String, String]): JObject =
 
     import org.json4s.JsonDSL._
 
@@ -273,5 +265,3 @@ private[prediction] object MailChimpConnector extends FormConnector {
               ("reason" -> data("data[reason]"))))
 
     json
-  }
-}

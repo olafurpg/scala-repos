@@ -33,13 +33,12 @@ import org.apache.spark.sql.types.IntegerType
   * [[org.apache.spark.sql.catalyst.expressions.Alias Aliases]] are in-lined/substituted if
   * necessary.
   */
-object PhysicalOperation extends PredicateHelper {
+object PhysicalOperation extends PredicateHelper
   type ReturnType = (Seq[NamedExpression], Seq[Expression], LogicalPlan)
 
-  def unapply(plan: LogicalPlan): Option[ReturnType] = {
+  def unapply(plan: LogicalPlan): Option[ReturnType] =
     val (fields, filters, child, _) = collectProjectsAndFilters(plan)
     Some((fields.getOrElse(child.output), filters, child))
-  }
 
   /**
     * Collects all deterministic projects and filters, in-lining/substituting aliases if necessary.
@@ -58,7 +57,7 @@ object PhysicalOperation extends PredicateHelper {
   private def collectProjectsAndFilters(
       plan: LogicalPlan): (Option[Seq[NamedExpression]], Seq[Expression],
   LogicalPlan, Map[Attribute, Expression]) =
-    plan match {
+    plan match
       case Project(fields, child) if fields.forall(_.deterministic) =>
         val (_, filters, other, aliases) = collectProjectsAndFilters(child)
         val substitutedFields = fields
@@ -80,17 +79,16 @@ object PhysicalOperation extends PredicateHelper {
 
       case other =>
         (None, Nil, other, Map.empty)
-    }
 
   private def collectAliases(
       fields: Seq[Expression]): Map[Attribute, Expression] =
-    fields.collect {
+    fields.collect
       case a @ Alias(child, _) => a.toAttribute -> child
-    }.toMap
+    .toMap
 
   private def substitute(aliases: Map[Attribute, Expression])(
-      expr: Expression): Expression = {
-    expr.transform {
+      expr: Expression): Expression =
+    expr.transform
       case a @ Alias(ref: AttributeReference, name) =>
         aliases
           .get(ref)
@@ -104,9 +102,6 @@ object PhysicalOperation extends PredicateHelper {
           .map(Alias(_, a.name)(
                   a.exprId, a.qualifiers, isGenerated = a.isGenerated))
           .getOrElse(a)
-    }
-  }
-}
 
 /**
   * A pattern that finds joins with equality conditions that can be evaluated using equi-join.
@@ -114,19 +109,19 @@ object PhysicalOperation extends PredicateHelper {
   * Null-safe equality will be transformed into equality as joining key (replace null with default
   * value).
   */
-object ExtractEquiJoinKeys extends Logging with PredicateHelper {
+object ExtractEquiJoinKeys extends Logging with PredicateHelper
 
   /** (joinType, leftKeys, rightKeys, condition, leftChild, rightChild) */
   type ReturnType = (JoinType, Seq[Expression], Seq[Expression],
   Option[Expression], LogicalPlan, LogicalPlan)
 
-  def unapply(plan: LogicalPlan): Option[ReturnType] = plan match {
+  def unapply(plan: LogicalPlan): Option[ReturnType] = plan match
     case join @ Join(left, right, joinType, condition) =>
       logDebug(s"Considering join on: $condition")
       // Find equi-join predicates that can be evaluated before the join, and thus can be used
       // as join keys.
       val predicates = condition.map(splitConjunctivePredicates).getOrElse(Nil)
-      val joinKeys = predicates.flatMap {
+      val joinKeys = predicates.flatMap
         case EqualTo(l, r) if canEvaluate(l, left) && canEvaluate(r, right) =>
           Some((l, r))
         case EqualTo(l, r) if canEvaluate(l, right) && canEvaluate(r, left) =>
@@ -142,15 +137,13 @@ object ExtractEquiJoinKeys extends Logging with PredicateHelper {
           Some((Coalesce(Seq(r, Literal.default(r.dataType))),
                 Coalesce(Seq(l, Literal.default(l.dataType)))))
         case other => None
-      }
-      val otherPredicates = predicates.filterNot {
+      val otherPredicates = predicates.filterNot
         case EqualTo(l, r) =>
           canEvaluate(l, left) && canEvaluate(r, right) ||
           canEvaluate(l, right) && canEvaluate(r, left)
         case other => false
-      }
 
-      if (joinKeys.nonEmpty) {
+      if (joinKeys.nonEmpty)
         val (leftKeys, rightKeys) = joinKeys.unzip
         logDebug(s"leftKeys:$leftKeys | rightKeys:$rightKeys")
         Some(
@@ -160,12 +153,9 @@ object ExtractEquiJoinKeys extends Logging with PredicateHelper {
              otherPredicates.reduceOption(And),
              left,
              right))
-      } else {
+      else
         None
-      }
     case _ => None
-  }
-}
 
 /**
   * A pattern that collects the filter and inner joins.
@@ -182,11 +172,11 @@ object ExtractEquiJoinKeys extends Logging with PredicateHelper {
   *
   * Note: This pattern currently only works for left-deep trees.
   */
-object ExtractFiltersAndInnerJoins extends PredicateHelper {
+object ExtractFiltersAndInnerJoins extends PredicateHelper
 
   // flatten all inner joins, which are next to each other
   def flattenJoin(plan: LogicalPlan): (Seq[LogicalPlan], Seq[Expression]) =
-    plan match {
+    plan match
       case Join(left, right, Inner, cond) =>
         val (plans, conditions) = flattenJoin(left)
         (plans ++ Seq(right), conditions ++ cond.toSeq)
@@ -197,53 +187,43 @@ object ExtractFiltersAndInnerJoins extends PredicateHelper {
         (plans, conditions ++ splitConjunctivePredicates(filterCondition))
 
       case _ => (Seq(plan), Seq())
-    }
 
   def unapply(plan: LogicalPlan): Option[(Seq[LogicalPlan], Seq[Expression])] =
-    plan match {
+    plan match
       case f @ Filter(filterCondition, j @ Join(_, _, Inner, _)) =>
         Some(flattenJoin(f))
       case j @ Join(_, _, Inner, _) =>
         Some(flattenJoin(j))
       case _ => None
-    }
-}
 
 /**
   * A pattern that collects all adjacent unions and returns their children as a Seq.
   */
-object Unions {
-  def unapply(plan: LogicalPlan): Option[Seq[LogicalPlan]] = plan match {
+object Unions
+  def unapply(plan: LogicalPlan): Option[Seq[LogicalPlan]] = plan match
     case u: Union =>
       Some(collectUnionChildren(mutable.Stack(u), Seq.empty[LogicalPlan]))
     case _ => None
-  }
 
   // Doing a depth-first tree traversal to combine all the union children.
   @tailrec
   private def collectUnionChildren(
       plans: mutable.Stack[LogicalPlan],
-      children: Seq[LogicalPlan]): Seq[LogicalPlan] = {
+      children: Seq[LogicalPlan]): Seq[LogicalPlan] =
     if (plans.isEmpty) children
-    else {
-      plans.pop match {
+    else
+      plans.pop match
         case Union(grandchildren) =>
           grandchildren.reverseMap(plans.push(_))
           collectUnionChildren(plans, children)
         case other => collectUnionChildren(plans, children :+ other)
-      }
-    }
-  }
-}
 
 /**
   * Extractor for retrieving Int value.
   */
-object IntegerIndex {
-  def unapply(a: Any): Option[Int] = a match {
+object IntegerIndex
+  def unapply(a: Any): Option[Int] = a match
     case Literal(a: Int, IntegerType) => Some(a)
     // When resolving ordinal in Sort, negative values are extracted for issuing error messages.
     case UnaryMinus(IntegerLiteral(v)) => Some(-v)
     case _ => None
-  }
-}

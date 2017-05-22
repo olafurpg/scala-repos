@@ -1,29 +1,21 @@
-class Foo(x: AnyRef) {
-  def this() = {
+class Foo(x: AnyRef)
+  def this() =
     this(new {}) // okay
-  }
-}
 
-class Blerg(x: AnyRef) {
-  def this() = {
+class Blerg(x: AnyRef)
+  def this() =
     this(
-        new {
+        new
       class Bar { println(Bar.this); new { println(Bar.this) } }; new Bar
-    }) // okay
-  }
-}
+    ) // okay
 
-class Outer {
-  class Inner(x: AnyRef) {
-    def this() = {
+class Outer
+  class Inner(x: AnyRef)
+    def this() =
       this(
-          new {
+          new
         class Bar { println(Bar.this); new { println(Bar.this) } }; new Bar
-      }) // okay
-    }
+      ) // okay
 
-    def this(x: Boolean) = {
+    def this(x: Boolean) =
       this(new { println(Outer.this) }) // okay
-    }
-  }
-}

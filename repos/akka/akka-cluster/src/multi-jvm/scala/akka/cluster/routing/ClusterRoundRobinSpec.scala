@@ -26,15 +26,13 @@ import akka.routing.RoutedActorRef
 import akka.routing.GetRoutees
 import akka.routing.Routees
 
-object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
+object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor(routeeType: RouteeType) extends Actor {
+  class SomeActor(routeeType: RouteeType) extends Actor
     def this() = this(PoolRoutee)
 
-    def receive = {
+    def receive =
       case "hit" ⇒ sender() ! Reply(routeeType, self)
-    }
-  }
 
   final case class Reply(routeeType: RouteeType, ref: ActorRef)
 
@@ -92,7 +90,6 @@ object ClusterRoundRobinMultiJvmSpec extends MultiNodeConfig {
       ConfigFactory.parseString("""akka.cluster.roles =["b", "c"]"""))
 
   testTransport(on = true)
-}
 
 class ClusterRoundRobinMultiJvmNode1 extends ClusterRoundRobinSpec
 class ClusterRoundRobinMultiJvmNode2 extends ClusterRoundRobinSpec
@@ -101,7 +98,7 @@ class ClusterRoundRobinMultiJvmNode4 extends ClusterRoundRobinSpec
 
 abstract class ClusterRoundRobinSpec
     extends MultiNodeSpec(ClusterRoundRobinMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout {
+    with MultiNodeClusterSpec with ImplicitSender with DefaultTimeout
   import ClusterRoundRobinMultiJvmSpec._
 
   lazy val router1 =
@@ -121,24 +118,21 @@ abstract class ClusterRoundRobinSpec
       RoundRobinPool(nrOfInstances = 0).props(Props[SomeActor]), "router5")
 
   def receiveReplies(
-      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] = {
+      routeeType: RouteeType, expectedReplies: Int): Map[Address, Int] =
     val zero = Map.empty[Address, Int] ++ roles.map(address(_) -> 0)
-    (receiveWhile(5 seconds, messages = expectedReplies) {
+    (receiveWhile(5 seconds, messages = expectedReplies)
       case Reply(`routeeType`, ref) ⇒ fullAddress(ref)
-    }).foldLeft(zero) {
+    ).foldLeft(zero)
       case (replyMap, address) ⇒
         replyMap + (address -> (replyMap(address) + 1))
-    }
-  }
 
   /**
     * Fills in self address for local ActorRef
     */
   private def fullAddress(actorRef: ActorRef): Address =
-    actorRef.path.address match {
+    actorRef.path.address match
       case Address(_, _, None, None) ⇒ cluster.selfAddress
       case a ⇒ a
-    }
 
   def currentRoutees(router: ActorRef) =
     Await
@@ -146,24 +140,22 @@ abstract class ClusterRoundRobinSpec
       .asInstanceOf[Routees]
       .routees
 
-  "A cluster router with a RoundRobin router" must {
-    "start cluster with 2 nodes" in {
+  "A cluster router with a RoundRobin router" must
+    "start cluster with 2 nodes" in
       awaitClusterUp(first, second)
       enterBarrier("after-1")
-    }
 
-    "deploy routees to the member nodes in the cluster" in {
+    "deploy routees to the member nodes in the cluster" in
 
-      runOn(first) {
+      runOn(first)
         router1.isInstanceOf[RoutedActorRef] should ===(true)
 
         // max-nr-of-instances-per-node=2 times 2 nodes
         awaitAssert(currentRoutees(router1).size should ===(4))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router1 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -172,12 +164,10 @@ abstract class ClusterRoundRobinSpec
         replies(third) should ===(0)
         replies(fourth) should ===(0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-2")
-    }
 
-    "lookup routees on the member nodes in the cluster" in {
+    "lookup routees on the member nodes in the cluster" in
 
       // cluster consists of first and second
 
@@ -185,16 +175,14 @@ abstract class ClusterRoundRobinSpec
       system.actorOf(Props(classOf[SomeActor], GroupRoutee), "myserviceB")
       enterBarrier("myservice-started")
 
-      runOn(first) {
+      runOn(first)
         // 2 nodes, 2 routees on each node
-        within(10.seconds) {
+        within(10.seconds)
           awaitAssert(currentRoutees(router4).size should ===(4))
-        }
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router4 ! "hit"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
@@ -203,66 +191,57 @@ abstract class ClusterRoundRobinSpec
         replies(third) should ===(0)
         replies(fourth) should ===(0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-3")
-    }
 
-    "deploy routees to new nodes in the cluster" in {
+    "deploy routees to new nodes in the cluster" in
 
       // add third and fourth
       awaitClusterUp(first, second, third, fourth)
 
-      runOn(first) {
+      runOn(first)
         // max-nr-of-instances-per-node=2 times 4 nodes
         awaitAssert(currentRoutees(router1).size should ===(8))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router1 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
         replies.values.foreach { _ should be > (0) }
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-4")
-    }
 
-    "lookup routees on new nodes in the cluster" in {
+    "lookup routees on new nodes in the cluster" in
 
       // cluster consists of first, second, third and fourth
 
-      runOn(first) {
+      runOn(first)
         // 4 nodes, 2 routee on each node
         awaitAssert(currentRoutees(router4).size should ===(8))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router4 ! "hit"
-        }
 
         val replies = receiveReplies(GroupRoutee, iterationCount)
 
         replies.values.foreach { _ should be > (0) }
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-5")
-    }
 
-    "deploy routees to only remote nodes when allow-local-routees = off" in {
+    "deploy routees to only remote nodes when allow-local-routees = off" in
 
-      runOn(first) {
+      runOn(first)
         // max-nr-of-instances-per-node=1 times 3 nodes
         awaitAssert(currentRoutees(router3).size should ===(3))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router3 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -271,20 +250,17 @@ abstract class ClusterRoundRobinSpec
         replies(third) should be > (0)
         replies(fourth) should be > (0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-6")
-    }
 
-    "deploy routees to specified node role" in {
+    "deploy routees to specified node role" in
 
-      runOn(first) {
+      runOn(first)
         awaitAssert(currentRoutees(router5).size should ===(2))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router5 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -293,23 +269,20 @@ abstract class ClusterRoundRobinSpec
         replies(third) should ===(0)
         replies(fourth) should ===(0)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-7")
-    }
 
-    "deploy programatically defined routees to the member nodes in the cluster" in {
+    "deploy programatically defined routees to the member nodes in the cluster" in
 
-      runOn(first) {
+      runOn(first)
         router2.isInstanceOf[RoutedActorRef] should ===(true)
 
         // totalInstances = 3, maxInstancesPerNode = 1
         awaitAssert(currentRoutees(router2).size should ===(3))
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router2 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
@@ -320,23 +293,21 @@ abstract class ClusterRoundRobinSpec
 
         routeeAddresses.size should ===(3)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-8")
-    }
 
     "remove routees for unreachable nodes, and add when reachable again" in within(
-        30.seconds) {
+        30.seconds)
 
       // myservice is already running
 
       def routees = currentRoutees(router4)
       def routeeAddresses =
-        (routees map {
+        (routees map
               case ActorSelectionRoutee(sel) ⇒ fullAddress(sel.anchor)
-            }).toSet
+            ).toSet
 
-      runOn(first) {
+      runOn(first)
         // 4 nodes, 2 routees on each node
         awaitAssert(currentRoutees(router4).size should ===(8))
 
@@ -348,15 +319,13 @@ abstract class ClusterRoundRobinSpec
         testConductor.passThrough(first, second, Direction.Both).await
         awaitAssert(routees.size should ===(8))
         routeeAddresses should contain(address(second))
-      }
 
       enterBarrier("after-9")
-    }
 
-    "deploy programatically defined routees to other node when a node becomes down" in {
+    "deploy programatically defined routees to other node when a node becomes down" in
       muteMarkingAsUnreachable()
 
-      runOn(first) {
+      runOn(first)
         def routees = currentRoutees(router2)
         def routeeAddresses =
           (routees map { case ActorRefRoutee(ref) ⇒ fullAddress(ref) }).toSet
@@ -365,29 +334,23 @@ abstract class ClusterRoundRobinSpec
         val notUsedAddress =
           ((roles map address).toSet diff routeeAddresses).head
         val downAddress = routeeAddresses.find(_ != address(first)).get
-        val downRouteeRef = routees.collectFirst {
+        val downRouteeRef = routees.collectFirst
           case ActorRefRoutee(ref) if ref.path.address == downAddress ⇒ ref
-        }.get
+        .get
 
         cluster.down(downAddress)
         expectMsgType[Terminated](15.seconds).actor should ===(downRouteeRef)
-        awaitAssert {
+        awaitAssert
           routeeAddresses should contain(notUsedAddress)
           routeeAddresses should not contain (downAddress)
-        }
 
         val iterationCount = 10
-        for (i ← 0 until iterationCount) {
+        for (i ← 0 until iterationCount)
           router2 ! "hit"
-        }
 
         val replies = receiveReplies(PoolRoutee, iterationCount)
 
         routeeAddresses.size should ===(3)
         replies.values.sum should ===(iterationCount)
-      }
 
       enterBarrier("after-10")
-    }
-  }
-}

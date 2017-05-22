@@ -7,7 +7,7 @@ import scala.scalajs.js
   *  their max/min rather than wrapped around if they overflow.
   */
 @js.native
-class Uint8ClampedArray private extends TypedArray[Int, Uint8ClampedArray] {
+class Uint8ClampedArray private extends TypedArray[Int, Uint8ClampedArray]
 
   /** Constructs a Uint8ClampedArray with the given length. Initialized to all 0 */
   def this(length: Int) = this()
@@ -24,7 +24,6 @@ class Uint8ClampedArray private extends TypedArray[Int, Uint8ClampedArray] {
   /** Creates a Uint8ClampedArray view on the given ArrayBuffer */
   def this(buffer: ArrayBuffer, byteOffset: Int = 0, length: Int = ???) =
     this()
-}
 
 /** <span class="badge badge-ecma6" style="float: right;">ECMAScript 6</span>
   *  [[Uint8ClampedArray]] companion

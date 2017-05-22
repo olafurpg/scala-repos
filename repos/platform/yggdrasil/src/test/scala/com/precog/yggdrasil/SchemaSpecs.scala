@@ -25,9 +25,9 @@ import com.precog.common._
 
 import org.specs2.mutable.Specification
 
-class SchemaSpec extends Specification {
-  "cpath" should {
-    "return the correct sequence of CPath" in {
+class SchemaSpec extends Specification
+  "cpath" should
+    "return the correct sequence of CPath" in
       val jtype = JObjectFixedT(
           Map("foo" -> JNumberT,
               "bar" -> JArrayFixedT(
@@ -46,6 +46,3 @@ class SchemaSpec extends Specification {
                          CPath(CPathField("bar"), CPathIndex(2))) sorted
 
       result mustEqual expected
-    }
-  }
-}

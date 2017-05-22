@@ -28,27 +28,24 @@ case class Data(a: Int, B: Int, n: Nested, nestedArray: Seq[Nested])
   * A set of test cases expressed in Hive QL that are not covered by the tests
   * included in the hive distribution.
   */
-class HiveResolutionSuite extends HiveComparisonTest {
+class HiveResolutionSuite extends HiveComparisonTest
 
-  test("SPARK-3698: case insensitive test for nested data") {
+  test("SPARK-3698: case insensitive test for nested data")
     read
       .json(sparkContext.makeRDD("""{"a": [{"a": {"a": 1}}]}""" :: Nil))
       .registerTempTable("nested")
     // This should be successfully analyzed
     sql("SELECT a[0].A.A from nested").queryExecution.analyzed
-  }
 
-  test("SPARK-5278: check ambiguous reference to fields") {
+  test("SPARK-5278: check ambiguous reference to fields")
     read
       .json(sparkContext.makeRDD("""{"a": [{"b": 1, "B": 2}]}""" :: Nil))
       .registerTempTable("nested")
 
     // there are 2 filed matching field name "b", we should report Ambiguous reference error
-    val exception = intercept[AnalysisException] {
+    val exception = intercept[AnalysisException]
       sql("SELECT a[0].b from nested").queryExecution.analyzed
-    }
     assert(exception.getMessage.contains("Ambiguous reference to fields"))
-  }
 
   createQueryTest("table.attr", "SELECT src.key FROM src ORDER BY key LIMIT 1")
 
@@ -74,7 +71,7 @@ class HiveResolutionSuite extends HiveComparisonTest {
 
   createQueryTest("alias.star", "SELECT a.* FROM src a ORDER BY key LIMIT 1")
 
-  test("case insensitivity with scala reflection") {
+  test("case insensitivity with scala reflection")
     // Test resolution with Scala Reflection
     sparkContext
       .parallelize(Data(1, 2, Nested(1, 2), Seq(Nested(1, 2))) :: Nil)
@@ -87,9 +84,8 @@ class HiveResolutionSuite extends HiveComparisonTest {
                "a", "b", "A", "B", "a", "b", "A", "B"),
            "The output schema did not preserve the case of the query.")
     query.collect()
-  }
 
-  ignore("case insensitivity with scala reflection joins") {
+  ignore("case insensitivity with scala reflection joins")
     // Test resolution with Scala Reflection
     sparkContext
       .parallelize(Data(1, 2, Nested(1, 2), Seq(Nested(1, 2))) :: Nil)
@@ -98,9 +94,8 @@ class HiveResolutionSuite extends HiveComparisonTest {
 
     sql("SELECT * FROM casesensitivitytest a JOIN casesensitivitytest b ON a.a = b.a")
       .collect()
-  }
 
-  test("nested repeated resolution") {
+  test("nested repeated resolution")
     sparkContext
       .parallelize(Data(1, 2, Nested(1, 2), Seq(Nested(1, 2))) :: Nil)
       .toDF()
@@ -108,7 +103,6 @@ class HiveResolutionSuite extends HiveComparisonTest {
     assert(sql("SELECT nestedArray[0].a FROM nestedRepeatedTest")
           .collect()
           .head(0) === 1)
-  }
 
   createQueryTest(
       "test ambiguousReferences resolved as hive",
@@ -132,4 +126,3 @@ class HiveResolutionSuite extends HiveComparisonTest {
   /* Invalid table alias or column reference 'src': (possible column names are: key, value)
   createQueryTest("tableName.attr from aliased subquery",
     "SELECT src.key FROM (SELECT * FROM src ORDER BY key LIMIT 1) a") */
-}

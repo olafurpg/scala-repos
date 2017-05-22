@@ -18,11 +18,11 @@ import breeze.generic.UFunc
   * was exchanged with row P(i-1) during computation (the offset is caused by
   * the internal call to LAPACK).
   */
-object LU extends UFunc {
+object LU extends UFunc
 
   implicit object LU_DM_Impl_Double
-      extends Impl[DenseMatrix[Double], (DenseMatrix[Double], Array[Int])] {
-    def apply(X: DenseMatrix[Double]): (DenseMatrix[Double], Array[Int]) = {
+      extends Impl[DenseMatrix[Double], (DenseMatrix[Double], Array[Int])]
+    def apply(X: DenseMatrix[Double]): (DenseMatrix[Double], Array[Int]) =
 
       val M = X.rows
       val N = X.cols
@@ -42,22 +42,17 @@ object LU extends UFunc {
       assert(info.`val` >= 0)
 
       (Y, ipiv)
-    }
-  }
 
   implicit def LU_DM_Cast_Impl_Double[T](implicit cast: T => Double)
-    : Impl[DenseMatrix[T], (DenseMatrix[Double], Array[Int])] = {
-    new Impl[DenseMatrix[T], (DenseMatrix[Double], Array[Int])] {
-      def apply(v: DenseMatrix[T]): (DenseMatrix[Double], Array[Int]) = {
+    : Impl[DenseMatrix[T], (DenseMatrix[Double], Array[Int])] =
+    new Impl[DenseMatrix[T], (DenseMatrix[Double], Array[Int])]
+      def apply(v: DenseMatrix[T]): (DenseMatrix[Double], Array[Int]) =
         import DenseMatrix.canMapValues
         LU_DM_Impl_Double(v.mapValues(cast))
-      }
-    }
-  }
 
   implicit object LU_DM_Impl_Float
-      extends Impl[DenseMatrix[Float], (DenseMatrix[Float], Array[Int])] {
-    def apply(X: DenseMatrix[Float]): (DenseMatrix[Float], Array[Int]) = {
+      extends Impl[DenseMatrix[Float], (DenseMatrix[Float], Array[Int])]
+    def apply(X: DenseMatrix[Float]): (DenseMatrix[Float], Array[Int]) =
       val M = X.rows
       val N = X.cols
       val Y = X.copy
@@ -76,6 +71,3 @@ object LU extends UFunc {
       assert(info.`val` >= 0)
 
       (Y, ipiv)
-    }
-  }
-}

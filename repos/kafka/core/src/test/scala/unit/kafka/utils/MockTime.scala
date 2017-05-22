@@ -27,7 +27,7 @@ import java.util.concurrent._
   * It also comes with an associated scheduler instance for managing background tasks in
   * a deterministic way.
   */
-class MockTime(@volatile private var currentMs: Long) extends Time {
+class MockTime(@volatile private var currentMs: Long) extends Time
 
   val scheduler = new MockScheduler(this)
 
@@ -38,10 +38,8 @@ class MockTime(@volatile private var currentMs: Long) extends Time {
   def nanoseconds: Long =
     TimeUnit.NANOSECONDS.convert(currentMs, TimeUnit.MILLISECONDS)
 
-  def sleep(ms: Long) {
+  def sleep(ms: Long)
     this.currentMs += ms
     scheduler.tick()
-  }
 
   override def toString() = "MockTime(%d)".format(milliseconds)
-}

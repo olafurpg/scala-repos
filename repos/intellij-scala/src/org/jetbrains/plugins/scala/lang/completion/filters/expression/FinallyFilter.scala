@@ -15,11 +15,11 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
   * @author Alexander Podkhalyuzin
   * Date: 22.05.2008
   */
-class FinallyFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class FinallyFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
       var i = getPrevNotWhitespaceAndComment(
           context.getTextRange.getStartOffset - 1, context)
@@ -36,20 +36,16 @@ class FinallyFilter extends ElementFilter {
       if (Array("catch", "finally").contains(
               getLeafByOffset(i, context).getText)) return false
       return true
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "statements keyword filter"
-  }
 
-  def getPrevNotWhitespaceAndComment(index: Int, context: PsiElement): Int = {
+  def getPrevNotWhitespaceAndComment(index: Int, context: PsiElement): Int =
     var i = index
     if (i < 0) return 0
     while (i > 0 &&
@@ -60,9 +56,8 @@ class FinallyFilter extends ElementFilter {
       return getPrevNotWhitespaceAndComment(
           leaf.getTextRange.getStartOffset - 1, context)
     i
-  }
 
-  def getNextNotWhitespaceAndComment(index: Int, context: PsiElement): Int = {
+  def getNextNotWhitespaceAndComment(index: Int, context: PsiElement): Int =
     var i = index
     if (i >= context.getContainingFile.getTextLength - 1)
       return context.getContainingFile.getTextLength - 2
@@ -74,5 +69,3 @@ class FinallyFilter extends ElementFilter {
       return getNextNotWhitespaceAndComment(
           leaf.getTextRange.getEndOffset, context)
     i
-  }
-}

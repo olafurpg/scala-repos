@@ -11,7 +11,7 @@ import org.apache.http.client.HttpClient
   *
   * The workhorse of goose. Override the {@see com.gravity.goose.network.HtmlFetcher} within your configuration for complete control.
   */
-trait AbstractHtmlFetcher {
+trait AbstractHtmlFetcher
 
   /**
     * Access the `url` over the internet and retrieve the HTML from it
@@ -26,4 +26,3 @@ trait AbstractHtmlFetcher {
     * @return a fully configured and initialized instance for shared use
     */
   def getHttpClient: HttpClient
-}

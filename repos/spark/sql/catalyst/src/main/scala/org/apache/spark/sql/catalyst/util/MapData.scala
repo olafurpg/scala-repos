@@ -19,7 +19,7 @@ package org.apache.spark.sql.catalyst.util
 
 import org.apache.spark.sql.types.DataType
 
-abstract class MapData extends Serializable {
+abstract class MapData extends Serializable
 
   def numElements(): Int
 
@@ -30,14 +30,11 @@ abstract class MapData extends Serializable {
   def copy(): MapData
 
   def foreach(
-      keyType: DataType, valueType: DataType, f: (Any, Any) => Unit): Unit = {
+      keyType: DataType, valueType: DataType, f: (Any, Any) => Unit): Unit =
     val length = numElements()
     val keys = keyArray()
     val values = valueArray()
     var i = 0
-    while (i < length) {
+    while (i < length)
       f(keys.get(i, keyType), values.get(i, valueType))
       i += 1
-    }
-  }
-}

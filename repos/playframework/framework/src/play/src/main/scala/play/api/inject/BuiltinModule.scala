@@ -25,13 +25,12 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
   * Provides all the core components of a Play application. This is typically automatically enabled by Play for an
   * application.
   */
-class BuiltinModule extends Module {
+class BuiltinModule extends Module
   def bindings(
-      env: Environment, configuration: Configuration): Seq[Binding[_]] = {
+      env: Environment, configuration: Configuration): Seq[Binding[_]] =
     def dynamicBindings(
-        factories: ((Environment, Configuration) => Seq[Binding[_]])*) = {
+        factories: ((Environment, Configuration) => Seq[Binding[_]])*) =
       factories.flatMap(_ (env, configuration))
-    }
 
     Seq(
         bind[Environment] to env,
@@ -66,8 +65,6 @@ class BuiltinModule extends Module {
         HttpRequestHandler.bindingsFromConfiguration,
         ActionCreator.bindingsFromConfiguration
     )
-  }
-}
 
 // This allows us to access the original configuration via this
 // provider while overriding the binding for Configuration itself.
@@ -79,13 +76,11 @@ class RoutesProvider @Inject()(injector: Injector,
                                environment: Environment,
                                configuration: Configuration,
                                httpConfig: HttpConfiguration)
-    extends Provider[Router] {
-  lazy val get = {
+    extends Provider[Router]
+  lazy val get =
     val prefix = httpConfig.context
 
     val router = Router
       .load(environment, configuration)
       .fold[Router](Router.empty)(injector.instanceOf(_))
     router.withPrefix(prefix)
-  }
-}

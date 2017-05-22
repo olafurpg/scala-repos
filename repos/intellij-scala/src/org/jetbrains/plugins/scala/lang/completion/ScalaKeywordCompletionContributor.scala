@@ -16,43 +16,37 @@ import org.jetbrains.plugins.scala.lang.completion.lookups.LookupElementManager
   * User: Alexander Podkhalyuzin
   * Date: 17.09.2009
   */
-class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
+class ScalaKeywordCompletionContributor extends ScalaCompletionContributor
   private def registerStandardCompletion(
-      filter: ElementFilter, keywords: String*) {
+      filter: ElementFilter, keywords: String*)
     extend(
         CompletionType.BASIC,
         PlatformPatterns.psiElement.and(new FilterPattern(new AndFilter(
                     new NotFilter(new LeftNeighbour(new TextFilter("."))),
                     filter))),
-        new CompletionProvider[CompletionParameters] {
+        new CompletionProvider[CompletionParameters]
           def addCompletions(parameters: CompletionParameters,
                              context: ProcessingContext,
-                             result: CompletionResultSet) {
-            for (keyword <- keywords) {
+                             result: CompletionResultSet)
+            for (keyword <- keywords)
               result.addElement(LookupElementManager.getKeywrodLookupElement(
                       keyword, positionFromParameters(parameters)))
-            }
-          }
-        })
-  }
+        )
 
   private def registerTypeAfterDotCompletion(
-      filter: ElementFilter, keywords: String*) {
+      filter: ElementFilter, keywords: String*)
     extend(
         CompletionType.BASIC,
         PlatformPatterns.psiElement.and(new FilterPattern(new AndFilter(
                     new LeftNeighbour(new TextFilter(".")), filter))),
-        new CompletionProvider[CompletionParameters] {
+        new CompletionProvider[CompletionParameters]
           def addCompletions(parameters: CompletionParameters,
                              context: ProcessingContext,
-                             result: CompletionResultSet) {
-            for (keyword <- keywords) {
+                             result: CompletionResultSet)
+            for (keyword <- keywords)
               result.addElement(LookupElementManager.getKeywrodLookupElement(
                       keyword, positionFromParameters(parameters)))
-            }
-          }
-        })
-  }
+        )
 
   registerStandardCompletion(new PackageFilter, "package")
   registerStandardCompletion(
@@ -93,4 +87,3 @@ class ScalaKeywordCompletionContributor extends ScalaCompletionContributor {
   registerStandardCompletion(new MatchFilter, "match")
   registerTypeAfterDotCompletion(new TypeFilter, "type")
   registerStandardCompletion(new IfFilter, "if")
-}

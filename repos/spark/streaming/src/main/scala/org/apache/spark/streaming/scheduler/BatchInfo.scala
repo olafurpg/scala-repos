@@ -39,7 +39,7 @@ case class BatchInfo(
     processingStartTime: Option[Long],
     processingEndTime: Option[Long],
     outputOperationInfos: Map[Int, OutputOperationInfo]
-) {
+)
 
   /**
     * Time taken for the first job of this batch to start processing from the time this batch
@@ -67,4 +67,3 @@ case class BatchInfo(
     * The number of recorders received by the receivers in this batch.
     */
   def numRecords: Long = streamIdToInputInfo.values.map(_.numRecords).sum
-}

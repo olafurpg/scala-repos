@@ -38,17 +38,16 @@ import scala.util.Try
   * Nikolay.Tropin
   * 2014-12-04
   */
-class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
+class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider
   override def isAvailable(sourcePosition: SourcePosition,
-                           evaluationContext: EvaluationContext): Boolean = {
+                           evaluationContext: EvaluationContext): Boolean =
     ScalaDebuggerSettings.getInstance().SHOW_VARIABLES_FROM_OUTER_SCOPES &&
     sourcePosition.getFile.getLanguage == ScalaLanguage.Instance
-  }
 
   override def collectVariables(
       sourcePosition: SourcePosition,
       evaluationContext: EvaluationContext,
-      alreadyCollected: util.Set[String]): util.Set[TextWithImports] = {
+      alreadyCollected: util.Set[String]): util.Set[TextWithImports] =
 
     val method =
       Try(evaluationContext.getFrameProxy.location().method()).toOption
@@ -63,12 +62,11 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
       getVisibleVariables(element, evaluationContext, alreadyCollected)
         .map(toTextWithImports)
         .asJava
-  }
 
   private def getVisibleVariables(elem: PsiElement,
                                   evaluationContext: EvaluationContext,
-                                  alreadyCollected: util.Set[String]) = {
-    val initialCandidates = inReadAction {
+                                  alreadyCollected: util.Set[String]) =
+    val initialCandidates = inReadAction
       val completionProcessor = new CollectingProcessor(elem)
       PsiTreeUtil.treeWalkUp(
           completionProcessor, elem, null, ResolveState.initial)
@@ -78,39 +76,33 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
                 .map(ScalaParameterNameAdjuster.fixName)
                 .contains(srr.name))
         .filter(canEvaluate(_, elem))
-    }
     val candidates =
       initialCandidates.filter(canEvaluateLong(_, elem, evaluationContext))
     val sorted = mutable.SortedSet()(Ordering.by[ScalaResolveResult, Int](
             _.getElement.getTextRange.getStartOffset))
-    inReadAction {
+    inReadAction
       candidates.foreach(sorted += _)
-    }
     sorted.map(_.name)
-  }
 
-  private def toTextWithImports(s: String) = {
+  private def toTextWithImports(s: String) =
     val xExpr = new XExpressionImpl(s, ScalaLanguage.Instance, "")
     TextWithImportsImpl.fromXExpression(xExpr)
-  }
 
-  private def canEvaluate(srr: ScalaResolveResult, place: PsiElement) = {
-    srr.getElement match {
+  private def canEvaluate(srr: ScalaResolveResult, place: PsiElement) =
+    srr.getElement match
       case _: ScWildcardPattern => false
       case tp: ScTypedPattern if tp.name == "_" => false
       case cp: ScClassParameter if !cp.isEffectiveVal =>
-        def notInThisClass(elem: PsiElement) = {
+        def notInThisClass(elem: PsiElement) =
           elem != null &&
           !PsiTreeUtil.isAncestor(cp.containingClass, elem, true)
-        }
         val funDef =
           PsiTreeUtil.getParentOfType(place, classOf[ScFunctionDefinition])
         val lazyVal = PsiTreeUtil.getParentOfType(
-            place, classOf[ScPatternDefinition]) match {
+            place, classOf[ScPatternDefinition]) match
           case null => null
           case LazyVal(lzy) => lzy
           case _ => null
-        }
         notInThisClass(funDef) || notInThisClass(lazyVal)
       case named
           if ScalaEvaluatorBuilderUtil.isNotUsedEnumerator(named, place) =>
@@ -120,31 +112,26 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
       case inNameContext(LazyVal(_)) =>
         false //don't add lazy vals as they can be computed too early
       case _ => true
-    }
-  }
 
   private def canEvaluateLong(srr: ScalaResolveResult,
                               place: PsiElement,
-                              evaluationContext: EvaluationContext) = {
-    srr.getElement match {
+                              evaluationContext: EvaluationContext) =
+    srr.getElement match
       case named if generatorNotFromBody(named, place) =>
         tryEvaluate(named.name, place, evaluationContext).isSuccess
       case named: PsiNamedElement if notUsedInCurrentClass(named, place) =>
         tryEvaluate(named.name, place, evaluationContext).isSuccess
       case _ => true
-    }
-  }
 
-  private def isInCatchBlock(cc: ScCaseClause): Boolean = {
+  private def isInCatchBlock(cc: ScCaseClause): Boolean =
     cc.parents.take(3).exists(_.isInstanceOf[ScCatchBlock])
-  }
 
   private def tryEvaluate(
       name: String,
       place: PsiElement,
-      evaluationContext: EvaluationContext): Try[AnyRef] = {
-    Try {
-      val evaluator = inReadAction {
+      evaluationContext: EvaluationContext): Try[AnyRef] =
+    Try
+      val evaluator = inReadAction
         val twi = toTextWithImports(name)
         val codeFragment = new ScalaCodeFragmentFactory()
           .createCodeFragment(twi, place, evaluationContext.getProject)
@@ -154,78 +141,61 @@ class ScalaFrameExtraVariablesProvider extends FrameExtraVariablesProvider {
           .map(_.getSourcePosition(location))
         if (sourcePosition.isEmpty)
           throw EvaluationException("Debug process is detached.")
-        ScalaEvaluatorBuilder.build(codeFragment, sourcePosition.get) match {
+        ScalaEvaluatorBuilder.build(codeFragment, sourcePosition.get) match
           case _: ScalaCompilingExpressionEvaluator =>
             throw EvaluationException("Don't use compiling evaluator here")
           case e => e
-        }
-      }
       evaluator.evaluate(evaluationContext)
-    }
-  }
 
   private def notUsedInCurrentClass(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
-    inReadAction {
+      named: PsiNamedElement, place: PsiElement): Boolean =
+    inReadAction
       val contextClass =
         ScalaEvaluatorBuilderUtil.getContextClass(place, strict = false)
       val containingClass = ScalaEvaluatorBuilderUtil.getContextClass(named)
       if (contextClass == containingClass) return false
 
       val placesToSearch = ArrayBuffer[PsiElement]()
-      contextClass.accept(new ScalaRecursiveElementVisitor() {
-        override def visitFunctionDefinition(fun: ScFunctionDefinition): Unit = {
+      contextClass.accept(new ScalaRecursiveElementVisitor()
+        override def visitFunctionDefinition(fun: ScFunctionDefinition): Unit =
           placesToSearch += fun
-        }
 
-        override def visitPatternDefinition(pat: ScPatternDefinition): Unit = {
-          pat match {
+        override def visitPatternDefinition(pat: ScPatternDefinition): Unit =
+          pat match
             case LazyVal(_) => placesToSearch += pat
             case _ =>
-          }
-        }
-      })
+      )
       if (placesToSearch.isEmpty) true
-      else {
+      else
         val scopes = placesToSearch.map(new LocalSearchScope(_))
         val helper =
           new PsiSearchHelperImpl(place.getManager.asInstanceOf[PsiManagerEx])
         var used = false
-        val processor = new TextOccurenceProcessor {
+        val processor = new TextOccurenceProcessor
           override def execute(
-              element: PsiElement, offsetInElement: Int): Boolean = {
+              element: PsiElement, offsetInElement: Int): Boolean =
             used = true
             false
-          }
-        }
-        scopes.foreach { scope =>
+        scopes.foreach  scope =>
           helper.processElementsWithWord(
               processor,
               scope,
               named.name,
               UsageSearchContext.IN_CODE, /*caseSensitive =*/ true)
-        }
         !used
-      }
-    }
-  }
 
   private def generatorNotFromBody(
-      named: PsiNamedElement, place: PsiElement): Boolean = {
-    inReadAction {
-      val forStmt = ScalaPsiUtil.nameContext(named) match {
+      named: PsiNamedElement, place: PsiElement): Boolean =
+    inReadAction
+      val forStmt = ScalaPsiUtil.nameContext(named) match
         case nc @ (_: ScEnumerator | _: ScGenerator) =>
           Option(PsiTreeUtil.getParentOfType(nc, classOf[ScForStatement]))
         case _ => None
-      }
       forStmt.flatMap(_.enumerators).exists(_.isAncestorOf(named)) &&
       forStmt.flatMap(_.body).exists(!_.isAncestorOf(place))
-    }
-  }
-}
 
 private class CollectingProcessor(element: PsiElement)
-    extends VariablesCompletionProcessor(StdKinds.valuesRef) {
+    extends VariablesCompletionProcessor(StdKinds.valuesRef)
 
   val containingFile = element.getContainingFile
   val startOffset = element.getTextRange.getStartOffset
@@ -235,28 +205,24 @@ private class CollectingProcessor(element: PsiElement)
       classOf[ScTemplateDefinition],
       classOf[PsiFile])
   val usedNames: Set[String] =
-    if (containingBlock != null) {
-      containingBlock.depthFirst.collect {
+    if (containingBlock != null)
+      containingBlock.depthFirst.collect
         case ref: ScReferenceExpression if ref.qualifier.isEmpty => ref.refName
-      }.toSet
-    } else Set.empty
+      .toSet
+    else Set.empty
 
-  override def execute(element: PsiElement, state: ResolveState): Boolean = {
+  override def execute(element: PsiElement, state: ResolveState): Boolean =
     val result = super.execute(element, state)
 
     candidatesSet.foreach(rr => if (!shouldShow(rr)) candidatesSet -= rr)
     result
-  }
 
-  private def shouldShow(candidate: ScalaResolveResult): Boolean = {
+  private def shouldShow(candidate: ScalaResolveResult): Boolean =
     val candElem = candidate.getElement
-    val candElemContext = ScalaPsiUtil.nameContext(candElem) match {
+    val candElemContext = ScalaPsiUtil.nameContext(candElem) match
       case cc: ScCaseClause => cc.pattern.getOrElse(cc)
       case other => other
-    }
     def usedInContainingBlock = usedNames.contains(candElem.name)
     candElem.getContainingFile == containingFile &&
     candElemContext.getTextRange.getEndOffset < startOffset &&
     usedInContainingBlock
-  }
-}

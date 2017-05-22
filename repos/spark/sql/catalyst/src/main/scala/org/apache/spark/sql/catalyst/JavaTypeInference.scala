@@ -34,7 +34,7 @@ import org.apache.spark.unsafe.types.UTF8String
 /**
   * Type-inference utilities for POJOs and Java collections.
   */
-object JavaTypeInference {
+object JavaTypeInference
 
   private val iterableType = TypeToken.of(classOf[JIterable[_]])
   private val mapType = TypeToken.of(classOf[JMap[_, _]])
@@ -53,17 +53,16 @@ object JavaTypeInference {
     * @param beanClass Java type
     * @return (SQL data type, nullable)
     */
-  def inferDataType(beanClass: Class[_]): (DataType, Boolean) = {
+  def inferDataType(beanClass: Class[_]): (DataType, Boolean) =
     inferDataType(TypeToken.of(beanClass))
-  }
 
   /**
     * Infers the corresponding SQL data type of a Java type.
     * @param typeToken Java type
     * @return (SQL data type, nullable)
     */
-  private def inferDataType(typeToken: TypeToken[_]): (DataType, Boolean) = {
-    typeToken.getRawType match {
+  private def inferDataType(typeToken: TypeToken[_]): (DataType, Boolean) =
+    typeToken.getRawType match
       case c: Class[_] if c.isAnnotationPresent(classOf[SQLUserDefinedType]) =>
         (c.getAnnotation(classOf[SQLUserDefinedType]).udt().newInstance(),
          true)
@@ -115,38 +114,32 @@ object JavaTypeInference {
         val beanInfo = Introspector.getBeanInfo(typeToken.getRawType)
         val properties =
           beanInfo.getPropertyDescriptors.filterNot(_.getName == "class")
-        val fields = properties.map { property =>
+        val fields = properties.map  property =>
           val returnType =
             typeToken.method(property.getReadMethod).getReturnType
           val (dataType, nullable) = inferDataType(returnType)
           new StructField(property.getName, dataType, nullable)
-        }
         (new StructType(fields), true)
-    }
-  }
 
   private def getJavaBeanProperties(
-      beanClass: Class[_]): Array[PropertyDescriptor] = {
+      beanClass: Class[_]): Array[PropertyDescriptor] =
     val beanInfo = Introspector.getBeanInfo(beanClass)
     beanInfo.getPropertyDescriptors.filter(
         p => p.getReadMethod != null && p.getWriteMethod != null)
-  }
 
-  private def elementType(typeToken: TypeToken[_]): TypeToken[_] = {
+  private def elementType(typeToken: TypeToken[_]): TypeToken[_] =
     val typeToken2 = typeToken.asInstanceOf[TypeToken[_ <: JIterable[_]]]
     val iterableSuperType = typeToken2.getSupertype(classOf[JIterable[_]])
     val iteratorType = iterableSuperType.resolveType(iteratorReturnType)
     iteratorType.resolveType(nextReturnType)
-  }
 
   private def mapKeyValueType(
-      typeToken: TypeToken[_]): (TypeToken[_], TypeToken[_]) = {
+      typeToken: TypeToken[_]): (TypeToken[_], TypeToken[_]) =
     val typeToken2 = typeToken.asInstanceOf[TypeToken[_ <: JMap[_, _]]]
     val mapSuperType = typeToken2.getSupertype(classOf[JMap[_, _]])
     val keyType = elementType(mapSuperType.resolveType(keySetReturnType))
     val valueType = elementType(mapSuperType.resolveType(valuesReturnType))
     keyType -> valueType
-  }
 
   /**
     * Returns the Spark SQL DataType for a given java class.  Where this is not an exact mapping
@@ -155,7 +148,7 @@ object JavaTypeInference {
     * Unlike `inferDataType`, this function doesn't do any massaging of types into the Spark SQL type
     * system.  As a result, ObjectType will be returned for things like boxed Integers.
     */
-  private def inferExternalType(cls: Class[_]): DataType = cls match {
+  private def inferExternalType(cls: Class[_]): DataType = cls match
     case c if c == java.lang.Boolean.TYPE => BooleanType
     case c if c == java.lang.Byte.TYPE => ByteType
     case c if c == java.lang.Short.TYPE => ShortType
@@ -165,7 +158,6 @@ object JavaTypeInference {
     case c if c == java.lang.Double.TYPE => DoubleType
     case c if c == classOf[Array[Byte]] => BinaryType
     case _ => ObjectType(cls)
-  }
 
   /**
     * Returns an expression that can be used to construct an object of java bean `T` given an input
@@ -173,12 +165,11 @@ object JavaTypeInference {
     * of the same name as the constructor arguments.  Nested classes will have their fields accessed
     * using UnresolvedExtractValue.
     */
-  def constructorFor(beanClass: Class[_]): Expression = {
+  def constructorFor(beanClass: Class[_]): Expression =
     constructorFor(TypeToken.of(beanClass), None)
-  }
 
   private def constructorFor(
-      typeToken: TypeToken[_], path: Option[Expression]): Expression = {
+      typeToken: TypeToken[_], path: Option[Expression]): Expression =
 
     /** Returns the current path with a sub-field extracted. */
     def addToPath(part: String): Expression =
@@ -190,7 +181,7 @@ object JavaTypeInference {
     def getPath: Expression =
       path.getOrElse(BoundReference(0, inferDataType(typeToken)._1, true))
 
-    typeToken.getRawType match {
+    typeToken.getRawType match
       case c if !inferExternalType(c).isInstanceOf[ObjectType] => getPath
 
       case c if c == classOf[java.lang.Short] =>
@@ -232,7 +223,7 @@ object JavaTypeInference {
 
       case c if c.isArray =>
         val elementType = c.getComponentType
-        val primitiveMethod = elementType match {
+        val primitiveMethod = elementType match
           case c if c == java.lang.Boolean.TYPE => Some("toBooleanArray")
           case c if c == java.lang.Byte.TYPE => Some("toByteArray")
           case c if c == java.lang.Short.TYPE => Some("toShortArray")
@@ -241,18 +232,16 @@ object JavaTypeInference {
           case c if c == java.lang.Float.TYPE => Some("toFloatArray")
           case c if c == java.lang.Double.TYPE => Some("toDoubleArray")
           case _ => None
-        }
 
-        primitiveMethod.map { method =>
+        primitiveMethod.map  method =>
           Invoke(getPath, method, ObjectType(c))
-        }.getOrElse {
+        .getOrElse
           Invoke(MapObjects(
                      p => constructorFor(typeToken.getComponentType, Some(p)),
                      getPath,
                      inferDataType(elementType)._1),
                  "array",
                  ObjectType(c))
-        }
 
       case c if listType.isAssignableFrom(typeToken) =>
         val et = elementType(typeToken)
@@ -293,68 +282,61 @@ object JavaTypeInference {
         val properties = getJavaBeanProperties(other)
         assert(properties.length > 0)
 
-        val setters = properties.map { p =>
+        val setters = properties.map  p =>
           val fieldName = p.getName
           val fieldType = typeToken.method(p.getReadMethod).getReturnType
           val (_, nullable) = inferDataType(fieldType)
           val constructor =
             constructorFor(fieldType, Some(addToPath(fieldName)))
           val setter =
-            if (nullable) {
+            if (nullable)
               constructor
-            } else {
+            else
               AssertNotNull(
                   constructor, Seq("currently no type path record in java"))
-            }
           p.getWriteMethod.getName -> setter
-        }.toMap
+        .toMap
 
         val newInstance = NewInstance(
             other, Nil, ObjectType(other), propagateNull = false)
         val result = InitializeJavaBean(newInstance, setters)
 
-        if (path.nonEmpty) {
+        if (path.nonEmpty)
           expressions.If(
               IsNull(getPath),
               expressions.Literal.create(null, ObjectType(other)),
               result
           )
-        } else {
+        else
           result
-        }
-    }
-  }
 
   /**
     * Returns expressions for extracting all the fields from the given type.
     */
-  def extractorsFor(beanClass: Class[_]): CreateNamedStruct = {
+  def extractorsFor(beanClass: Class[_]): CreateNamedStruct =
     val inputObject = BoundReference(0, ObjectType(beanClass), nullable = true)
     extractorFor(inputObject, TypeToken.of(beanClass))
       .asInstanceOf[CreateNamedStruct]
-  }
 
   private def extractorFor(
-      inputObject: Expression, typeToken: TypeToken[_]): Expression = {
+      inputObject: Expression, typeToken: TypeToken[_]): Expression =
 
     def toCatalystArray(
-        input: Expression, elementType: TypeToken[_]): Expression = {
+        input: Expression, elementType: TypeToken[_]): Expression =
       val (dataType, nullable) = inferDataType(elementType)
-      if (ScalaReflection.isNativeType(dataType)) {
+      if (ScalaReflection.isNativeType(dataType))
         NewInstance(classOf[GenericArrayData],
                     input :: Nil,
                     dataType = ArrayType(dataType, nullable))
-      } else {
+      else
         MapObjects(extractorFor(_, elementType),
                    input,
                    ObjectType(elementType.getRawType))
-      }
-    }
 
-    if (!inputObject.dataType.isInstanceOf[ObjectType]) {
+    if (!inputObject.dataType.isInstanceOf[ObjectType])
       inputObject
-    } else {
-      typeToken.getRawType match {
+    else
+      typeToken.getRawType match
         case c if c == classOf[String] =>
           StaticInvoke(classOf[UTF8String],
                        StringType,
@@ -409,9 +391,9 @@ object JavaTypeInference {
 
         case other =>
           val properties = getJavaBeanProperties(other)
-          if (properties.length > 0) {
+          if (properties.length > 0)
             CreateNamedStruct(
-                properties.flatMap { p =>
+                properties.flatMap  p =>
               val fieldName = p.getName
               val fieldType = typeToken.method(p.getReadMethod).getReturnType
               val fieldValue = Invoke(inputObject,
@@ -419,12 +401,7 @@ object JavaTypeInference {
                                       inferExternalType(fieldType.getRawType))
               expressions.Literal(fieldName) :: extractorFor(fieldValue,
                                                              fieldType) :: Nil
-            })
-          } else {
+            )
+          else
             throw new UnsupportedOperationException(
                 s"Cannot infer type for class ${other.getName} because it is not bean-compliant")
-          }
-      }
-    }
-  }
-}

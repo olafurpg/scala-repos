@@ -19,19 +19,17 @@ import org.jetbrains.plugins.scala.extensions._
   * Date: 06.02.12
   */
 class RenameElementQuickfix(myRef: PsiElement, name: String)
-    extends AbstractFixOnPsiElement(name, myRef) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnPsiElement(name, myRef)
+  def doApplyFix(project: Project)
     val elem = getElement
     if (!elem.isValid) return
     val action: AnAction = new RenameElementAction
     val event: AnActionEvent = actionEventForElement(project, action)
-    invokeLater {
+    invokeLater
       action.actionPerformed(event)
-    }
-  }
 
   private def actionEventForElement(
-      project: Project, action: AnAction): AnActionEvent = {
+      project: Project, action: AnAction): AnActionEvent =
     import scala.collection.JavaConversions._
     import scala.collection.mutable
 
@@ -40,16 +38,15 @@ class RenameElementQuickfix(myRef: PsiElement, name: String)
     val containingFile = ref.getContainingFile
     val editor: Editor =
       InjectedLanguageUtil.openEditorFor(containingFile, project)
-    if (editor.isInstanceOf[EditorWindow]) {
+    if (editor.isInstanceOf[EditorWindow])
       map.put(CommonDataKeys.EDITOR.getName, editor)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, ref)
-    } else if (ApplicationManager.getApplication.isUnitTestMode) {
+    else if (ApplicationManager.getApplication.isUnitTestMode)
       val element = new TextEditorPsiDataProvider().getData(
           CommonDataKeys.PSI_ELEMENT.getName,
           editor,
           editor.getCaretModel.getCurrentCaret)
       map.put(CommonDataKeys.PSI_ELEMENT.getName, element)
-    }
     val dataContext = SimpleDataContext.getSimpleContext(
         map, DataManager.getInstance.getDataContext(editor.getComponent))
     new AnActionEvent(null,
@@ -58,5 +55,3 @@ class RenameElementQuickfix(myRef: PsiElement, name: String)
                       action.getTemplatePresentation,
                       ActionManager.getInstance,
                       0)
-  }
-}

@@ -15,7 +15,7 @@ case class ApiPullRequest(number: Int,
                           mergeable: Option[Boolean],
                           title: String,
                           body: String,
-                          user: ApiUser) {
+                          user: ApiUser)
   val html_url = ApiPath(s"${base.repo.html_url.path}/pull/${number}")
   //val diff_url            = ApiPath(s"${base.repo.html_url.path}/pull/${number}.diff")
   //val patch_url           = ApiPath(s"${base.repo.html_url.path}/pull/${number}.patch")
@@ -29,9 +29,8 @@ case class ApiPullRequest(number: Int,
   val comments_url = ApiPath(
       s"${base.repo.url.path}/issues/${number}/comments")
   val statuses_url = ApiPath(s"${base.repo.url.path}/statuses/${head.sha}")
-}
 
-object ApiPullRequest {
+object ApiPullRequest
   def apply(issue: Issue,
             pullRequest: PullRequest,
             headRepo: ApiRepository,
@@ -53,11 +52,8 @@ object ApiPullRequest {
   )
 
   case class Commit(sha: String, ref: String, repo: ApiRepository)(
-      baseOwner: String) {
+      baseOwner: String)
     val label =
-      if (baseOwner == repo.owner.login) { ref } else {
+      if (baseOwner == repo.owner.login) { ref } else
         s"${repo.owner.login}:${ref}"
-      }
     val user = repo.owner
-  }
-}

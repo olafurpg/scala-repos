@@ -14,13 +14,13 @@ class HoconBlock(formatter: HoconFormatter,
                  indent: Indent,
                  wrap: Wrap,
                  alignment: Alignment)
-    extends AbstractBlock(node, wrap, alignment) {
+    extends AbstractBlock(node, wrap, alignment)
 
   import org.jetbrains.plugins.hocon.CommonUtil._
 
   // HoconFormatter needs these to be able to return exactly the same instances of Wrap and Alignment for
   // children of this block
-  private val wrapCache = {
+  private val wrapCache =
     val pathValueSeparatorType =
       if (node.getElementType == HoconElementType.ValuedField)
         node.childrenIterator
@@ -28,7 +28,6 @@ class HoconBlock(formatter: HoconFormatter,
           .find(HoconTokenSets.KeyValueSeparator.contains)
       else None
     new formatter.WrapCache(pathValueSeparatorType)
-  }
   private val alignmentCache = new formatter.AlignmentCache
 
   override def getIndent = indent
@@ -65,7 +64,5 @@ class HoconBlock(formatter: HoconFormatter,
                    formatter.getAlignment(alignmentCache, node, child))
 
   override def toString =
-    s"${node.getElementType}[${node.getText.replaceAllLiterally("\n", "\\n")}]${node.getTextRange}" + {
+    s"${node.getElementType}[${node.getText.replaceAllLiterally("\n", "\\n")}]${node.getTextRange}" +
       if (isLeaf) "" else children.mkString("\n", "\n", "").indent("  ")
-    }
-}

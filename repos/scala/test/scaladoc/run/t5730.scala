@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.base._
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
       package scala.test.scaladoc.T5730
@@ -21,7 +21,7 @@ object Test extends ScaladocModelTest {
 
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -38,5 +38,3 @@ object Test extends ScaladocModelTest {
            s"there should be no constructors, found: ${a.constructors}")
     assert(c.constructors.isEmpty,
            s"there should be no constructors, found: ${c.constructors}")
-  }
-}

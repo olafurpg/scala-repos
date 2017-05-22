@@ -12,12 +12,11 @@ class NotConvergedException(
     val reason: NotConvergedException.Reason, msg: String = "")
     extends RuntimeException(msg) with LinearAlgebraException
 
-object NotConvergedException {
+object NotConvergedException
   trait Reason
   object Iterations extends Reason
   object Divergence extends Reason
   object Breakdown extends Reason
-}
 
 class MatrixNotSymmetricException
     extends IllegalArgumentException("Matrix is not symmetric")

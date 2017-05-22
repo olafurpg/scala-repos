@@ -9,13 +9,11 @@ package algebra
   *
   * 2. `id |+|> p === p` for all `p` in `P` (if `id` is defined)
   */
-trait LeftAction[@sp(Int) P, G] extends Any {
+trait LeftAction[@sp(Int) P, G] extends Any
   def actl(g: G, p: P): P
-}
 
-object LeftAction {
+object LeftAction
   @inline def apply[P, G](G: LeftAction[P, G]): LeftAction[P, G] = G
-}
 
 /**
   * A (right) semigroup/monoid/group action of `G` on `P` is simply the implementation of
@@ -25,13 +23,11 @@ object LeftAction {
   *
   * 2. `p <|+| id === p` for all `p` in `P` (if `id` is defined)
   */
-trait RightAction[@sp(Int) P, G] extends Any {
+trait RightAction[@sp(Int) P, G] extends Any
   def actr(p: P, g: G): P
-}
 
-object RightAction {
+object RightAction
   @inline def apply[P, G](G: RightAction[P, G]): RightAction[P, G] = G
-}
 
 /**
   * A semigroup/monoid/group action of `G` on `P` is the combination of compatible
@@ -56,31 +52,26 @@ object RightAction {
 trait Action[@sp(Int) P, G]
     extends Any with LeftAction[P, G] with RightAction[P, G]
 
-object Action {
+object Action
   @inline def apply[P, G](G: Action[P, G]): Action[P, G] = G
   @inline def additive[P, G](G: AdditiveAction[P, G]): Action[P, G] =
     G.additive
   @inline
   def multiplicative[P, G](G: MultiplicativeAction[P, G]): Action[P, G] =
     G.multiplicative
-}
 
-trait AdditiveAction[@sp(Int) P, G] extends Any { self =>
-  def additive: Action[P, G] = new Action[P, G] {
+trait AdditiveAction[@sp(Int) P, G] extends Any  self =>
+  def additive: Action[P, G] = new Action[P, G]
     def actl(g: G, p: P): P = self.gplusl(g, p)
     def actr(p: P, g: G): P = self.gplusr(p, g)
-  }
 
   def gplusl(g: G, p: P): P
   def gplusr(p: P, g: G): P
-}
 
-trait MultiplicativeAction[@sp(Int) P, G] extends Any { self =>
-  def multiplicative: Action[P, G] = new Action[P, G] {
+trait MultiplicativeAction[@sp(Int) P, G] extends Any  self =>
+  def multiplicative: Action[P, G] = new Action[P, G]
     def actl(g: G, p: P): P = self.gtimesl(g, p)
     def actr(p: P, g: G): P = self.gtimesr(p, g)
-  }
 
   def gtimesl(g: G, p: P): P
   def gtimesr(p: P, g: G): P
-}

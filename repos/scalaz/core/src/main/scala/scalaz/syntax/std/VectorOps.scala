@@ -4,7 +4,7 @@ package std
 
 import scalaz.std.{vector => v}
 
-final class VectorOps[A](val self: Vector[A]) extends AnyVal {
+final class VectorOps[A](val self: Vector[A]) extends AnyVal
   final def intersperse(a: A): Vector[A] = v.intersperse(self, a)
 
   final def toNel: Option[NonEmptyList[A]] = v.toNel(self)
@@ -57,9 +57,7 @@ final class VectorOps[A](val self: Vector[A]) extends AnyVal {
   final def allPairs: Vector[(A, A)] = v.allPairs(self)
 
   final def adjacentPairs: Vector[(A, A)] = v.adjacentPairs(self)
-}
 
-trait ToVectorOps {
+trait ToVectorOps
   implicit def ToVectorOpsFromVector[A](a: Vector[A]): VectorOps[A] =
     new VectorOps[A](a)
-}

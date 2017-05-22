@@ -24,7 +24,7 @@ import org.apache.spark.sql.hive.test.TestHive
 /**
   * A set of tests that validate type promotion and coercion rules.
   */
-class HiveTypeCoercionSuite extends HiveComparisonTest {
+class HiveTypeCoercionSuite extends HiveComparisonTest
   val baseTypes = Seq(("1", "1"),
                       ("1.0", "CAST(1.0 AS DOUBLE)"),
                       ("1L", "1L"),
@@ -32,16 +32,14 @@ class HiveTypeCoercionSuite extends HiveComparisonTest {
                       ("1Y", "1Y"),
                       ("'1'", "'1'"))
 
-  baseTypes.foreach {
+  baseTypes.foreach
     case (ni, si) =>
-      baseTypes.foreach {
+      baseTypes.foreach
         case (nj, sj) =>
           createQueryTest(s"$ni + $nj", s"SELECT $si + $sj FROM src LIMIT 1")
-      }
-  }
 
   val nullVal = "null"
-  baseTypes.init.foreach {
+  baseTypes.init.foreach
     case (i, s) =>
       createQueryTest(
           s"case when then $i else $nullVal end ",
@@ -49,33 +47,27 @@ class HiveTypeCoercionSuite extends HiveComparisonTest {
       createQueryTest(
           s"case when then $nullVal else $i end ",
           s"SELECT case when true then $nullVal else $s end FROM src limit 1")
-  }
 
-  test("[SPARK-2210] boolean cast on boolean value should be removed") {
+  test("[SPARK-2210] boolean cast on boolean value should be removed")
     val q = "select cast(cast(key=0 as boolean) as boolean) from src"
     val project = TestHive
       .sql(q)
       .queryExecution
       .sparkPlan
-      .collect {
+      .collect
         case e: Project => e
-      }
       .head
 
     // No cast expression introduced
-    project.transformAllExpressions {
+    project.transformAllExpressions
       case c: Cast =>
         fail(s"unexpected cast $c")
         c
-    }
 
     // Only one equality check
     var numEquals = 0
-    project.transformAllExpressions {
+    project.transformAllExpressions
       case e: EqualTo =>
         numEquals += 1
         e
-    }
     assert(numEquals === 1)
-  }
-}

@@ -19,13 +19,12 @@ import AsmUtils._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object InlinerIllegalAccessTest extends ClearAfterClass.Clearable {
+object InlinerIllegalAccessTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:l:none")
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class InlinerIllegalAccessTest extends ClearAfterClass {
+class InlinerIllegalAccessTest extends ClearAfterClass
   ClearAfterClass.stateToClear = InlinerIllegalAccessTest
 
   val compiler = InlinerIllegalAccessTest.compiler
@@ -37,7 +36,7 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     for (i <- ins) throw new AssertionError(textify(i))
 
   @Test
-  def typeAccessible(): Unit = {
+  def typeAccessible(): Unit =
     val code =
       """package a {
         |  private class C {            // the Scala compiler makes all classes public
@@ -61,14 +60,13 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
 
     val methods = cClass.methods.asScala.filter(_.name(0) == 'f').toList
 
-    def check(classNode: ClassNode, test: Option[AbstractInsnNode] => Unit) = {
+    def check(classNode: ClassNode, test: Option[AbstractInsnNode] => Unit) =
       for (m <- methods) test(
           inliner
             .findIllegalAccess(m.instructions,
                                classBTypeFromParsedClassfile(cClass.name),
                                classBTypeFromParsedClassfile(classNode.name))
             .map(_._1))
-    }
 
     check(cClass, assertEmpty)
     check(dClass, assertEmpty)
@@ -83,14 +81,13 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // private classes can be accessed from the same package
     check(cClass, assertEmpty)
     check(dClass, assertEmpty) // accessing a private class in the same package is OK
-    check(eClass, {
+    check(eClass,
       case Some(ti: TypeInsnNode) if Set("a/C", "[La/C;")(ti.desc) => ()
       // MatchError otherwise
-    })
-  }
+    )
 
   @Test
-  def memberAccessible(): Unit = {
+  def memberAccessible(): Unit =
     val code =
       """package a {
         |  class C {
@@ -143,11 +140,10 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     val List(a, b, c, d, e, f, g, h) =
       cCl.methods.asScala.toList.filter(m => names(m.name))
 
-    def checkAccess(a: MethodNode, expected: Int): Unit = {
+    def checkAccess(a: MethodNode, expected: Int): Unit =
       assert((a.access &
                  (ACC_STATIC | ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE)) == expected,
              s"${a.name}, ${a.access}")
-    }
 
     checkAccess(a, ACC_PUBLIC)
     b.access &= ~ACC_PUBLIC; checkAccess(b, 0) // make it default access
@@ -170,19 +166,17 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     def check(method: MethodNode,
               decl: ClassNode,
               dest: ClassNode,
-              test: Option[AbstractInsnNode] => Unit): Unit = {
+              test: Option[AbstractInsnNode] => Unit): Unit =
       test(
           inliner
             .findIllegalAccess(method.instructions,
                                classBTypeFromParsedClassfile(decl.name),
                                classBTypeFromParsedClassfile(dest.name))
             .map(_._1))
-    }
 
-    val cOrDOwner = (_: Option[AbstractInsnNode] @unchecked) match {
+    val cOrDOwner = (_: Option[AbstractInsnNode] @unchecked) match
       case Some(mi: MethodInsnNode) if Set("a/C", "a/D")(mi.owner) => ()
       // MatchError otherwise
-    }
 
     // PUBLIC
 
@@ -193,10 +187,9 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
 
     // default access OK in same package
     for ((m, declCls) <- Set((rbC, cCl), (rfC, cCl), (rbD, dCl), (rfD, dCl));
-    c <- allClasses) {
+    c <- allClasses)
       if (c.name startsWith "a/") check(m, declCls, c, assertEmpty)
       else check(m, declCls, c, cOrDOwner)
-    }
 
     // PROTECTED
 
@@ -223,5 +216,3 @@ class InlinerIllegalAccessTest extends ClearAfterClass {
     // privated method accesses can only be inlined in the same class
     for (m <- Set(rdC, rhC)) check(m, cCl, cCl, assertEmpty)
     for (m <- Set(rdC, rhC); c <- allClasses.tail) check(m, cCl, c, cOrDOwner)
-  }
-}

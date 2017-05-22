@@ -25,10 +25,10 @@ import org.junit.Test
 
 import scala.collection.mutable
 
-class BrokerEndPointTest extends Logging {
+class BrokerEndPointTest extends Logging
 
   @Test
-  def testHashAndEquals() {
+  def testHashAndEquals()
     val endpoint1 = new EndPoint("myhost", 9092, SecurityProtocol.PLAINTEXT)
     val endpoint2 = new EndPoint("myhost", 9092, SecurityProtocol.PLAINTEXT)
     val endpoint3 = new EndPoint("myhost", 1111, SecurityProtocol.PLAINTEXT)
@@ -48,10 +48,9 @@ class BrokerEndPointTest extends Logging {
     val hashmap = new mutable.HashMap[Broker, Int]()
     hashmap.put(broker1, 1)
     assert(hashmap.getOrElse(broker1, -1) == 1)
-  }
 
   @Test
-  def testFromJsonFutureVersion() {
+  def testFromJsonFutureVersion()
     // `createBroker` should support future compatible versions, we use a hypothetical future version here
     val brokerInfoStr = """{
       "foo":"bar",
@@ -66,10 +65,9 @@ class BrokerEndPointTest extends Logging {
     assert(broker.id == 1)
     assert(broker.getBrokerEndPoint(SecurityProtocol.SSL).host == "localhost")
     assert(broker.getBrokerEndPoint(SecurityProtocol.SSL).port == 9093)
-  }
 
   @Test
-  def testFromJsonV2 {
+  def testFromJsonV2
     val brokerInfoStr =
       "{\"version\":2," + "\"host\":\"localhost\"," + "\"port\":9092," +
       "\"jmx_port\":9999," + "\"timestamp\":\"1416974968782\"," +
@@ -79,10 +77,9 @@ class BrokerEndPointTest extends Logging {
     assert(
         broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host == "localhost")
     assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).port == 9092)
-  }
 
   @Test
-  def testFromJsonV1() = {
+  def testFromJsonV1() =
     val brokerInfoStr =
       "{\"jmx_port\":-1,\"timestamp\":\"1420485325400\",\"host\":\"172.16.8.243\",\"version\":1,\"port\":9091}"
     val broker = Broker.createBroker(1, brokerInfoStr)
@@ -90,10 +87,9 @@ class BrokerEndPointTest extends Logging {
     assert(
         broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).host == "172.16.8.243")
     assert(broker.getBrokerEndPoint(SecurityProtocol.PLAINTEXT).port == 9091)
-  }
 
   @Test
-  def testBrokerEndpointFromUri() {
+  def testBrokerEndpointFromUri()
     var connectionString = "localhost:9092"
     var endpoint = BrokerEndPoint.createBrokerEndPoint(1, connectionString)
     assert(endpoint.host == "localhost")
@@ -108,10 +104,9 @@ class BrokerEndPointTest extends Logging {
     endpoint = BrokerEndPoint.createBrokerEndPoint(1, connectionString)
     assert(endpoint.host == "MyHostname")
     assert(endpoint.port == 9092)
-  }
 
   @Test
-  def testEndpointFromUri() {
+  def testEndpointFromUri()
     var connectionString = "PLAINTEXT://localhost:9092"
     var endpoint = EndPoint.createEndPoint(connectionString)
     assert(endpoint.host == "localhost")
@@ -135,5 +130,3 @@ class BrokerEndPointTest extends Logging {
     assert(endpoint.host == "MyHostname")
     assert(endpoint.port == 9092)
     assert(endpoint.connectionString == "PLAINTEXT://MyHostname:9092")
-  }
-}

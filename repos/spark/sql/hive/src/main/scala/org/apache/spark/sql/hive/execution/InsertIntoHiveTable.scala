@@ -41,7 +41,7 @@ private[hive] case class InsertIntoHiveTable(
     child: SparkPlan,
     overwrite: Boolean,
     ifNotExists: Boolean)
-    extends UnaryNode {
+    extends UnaryNode
 
   @transient val sc: HiveContext = sqlContext.asInstanceOf[HiveContext]
   @transient private lazy val hiveContext = new Context(sc.hiveconf)
@@ -54,7 +54,7 @@ private[hive] case class InsertIntoHiveTable(
       valueClass: Class[_],
       fileSinkConf: FileSinkDesc,
       conf: SerializableJobConf,
-      writerContainer: SparkHiveWriterContainer): Unit = {
+      writerContainer: SparkHiveWriterContainer): Unit =
     assert(valueClass != null, "Output value class not set")
     conf.value.setOutputValueClass(valueClass)
 
@@ -71,7 +71,6 @@ private[hive] case class InsertIntoHiveTable(
     writerContainer.driverSideSetup()
     sc.sparkContext.runJob(rdd, writerContainer.writeToFile _)
     writerContainer.commitJob()
-  }
 
   /**
     * Inserts all the rows in the table into Hive.  Row objects are properly serialized with the
@@ -80,7 +79,7 @@ private[hive] case class InsertIntoHiveTable(
     *
     * Note: this is run once and then kept to avoid double insertions.
     */
-  protected[sql] lazy val sideEffectResult: Seq[InternalRow] = {
+  protected[sql] lazy val sideEffectResult: Seq[InternalRow] =
     // Have to pass the TableDesc object to RDD.mapPartitions and then instantiate new serializer
     // instances within the closure, since Serializer is not serializable while TableDesc is.
     val tableDesc = table.tableDesc
@@ -91,7 +90,7 @@ private[hive] case class InsertIntoHiveTable(
         ConfVars.COMPRESSRESULT.varname,
         ConfVars.COMPRESSRESULT.defaultBoolVal)
 
-    if (isCompressed) {
+    if (isCompressed)
       // Please note that isCompressed, "mapred.output.compress", "mapred.output.compression.codec",
       // and "mapred.output.compression.type" have no impact on ORC because it uses table properties
       // to store compression information.
@@ -101,14 +100,12 @@ private[hive] case class InsertIntoHiveTable(
           sc.hiveconf.get("mapred.output.compression.codec"))
       fileSinkConf.setCompressType(
           sc.hiveconf.get("mapred.output.compression.type"))
-    }
 
     val numDynamicPartitions = partition.values.count(_.isEmpty)
     val numStaticPartitions = partition.values.count(_.nonEmpty)
-    val partitionSpec = partition.map {
+    val partitionSpec = partition.map
       case (key, Some(value)) => key -> value
       case (key, None) => key -> ""
-    }
 
     // All partition column names in the format of "<column name 1>/<column name 2>/..."
     val partitionColumns =
@@ -117,25 +114,21 @@ private[hive] case class InsertIntoHiveTable(
       Option(partitionColumns).map(_.split("/")).orNull
 
     // Validate partition spec if there exist any dynamic partitions
-    if (numDynamicPartitions > 0) {
+    if (numDynamicPartitions > 0)
       // Report error if dynamic partitioning is not enabled
-      if (!sc.hiveconf.getBoolVar(HiveConf.ConfVars.DYNAMICPARTITIONING)) {
+      if (!sc.hiveconf.getBoolVar(HiveConf.ConfVars.DYNAMICPARTITIONING))
         throw new SparkException(ErrorMsg.DYNAMIC_PARTITION_DISABLED.getMsg)
-      }
 
       // Report error if dynamic partition strict mode is on but no static partition is found
       if (numStaticPartitions == 0 && sc.hiveconf
             .getVar(HiveConf.ConfVars.DYNAMICPARTITIONINGMODE)
-            .equalsIgnoreCase("strict")) {
+            .equalsIgnoreCase("strict"))
         throw new SparkException(ErrorMsg.DYNAMIC_PARTITION_STRICT_MODE.getMsg)
-      }
 
       // Report error if any static partition appears after a dynamic partition
       val isDynamic = partitionColumnNames.map(partitionSpec(_).isEmpty)
-      if (isDynamic.init.zip(isDynamic.tail).contains((true, false))) {
+      if (isDynamic.init.zip(isDynamic.tail).contains((true, false)))
         throw new SparkException(ErrorMsg.PARTITION_DYN_STA_ORDER.getMsg)
-      }
-    }
 
     val jobConf = new JobConf(sc.hiveconf)
     val jobConfSer = new SerializableJobConf(jobConf)
@@ -145,17 +138,16 @@ private[hive] case class InsertIntoHiveTable(
     val speculationEnabled =
       sqlContext.sparkContext.conf.getBoolean("spark.speculation", false)
     val outputCommitterClass = jobConf.get("mapred.output.committer.class", "")
-    if (speculationEnabled && outputCommitterClass.contains("Direct")) {
+    if (speculationEnabled && outputCommitterClass.contains("Direct"))
       val warningMessage =
         s"$outputCommitterClass may be an output committer that writes data directly to " +
         "the final location. Because speculation is enabled, this output committer may " +
         "cause data loss (see the case in SPARK-10063). If possible, please use a output " +
         "committer that does not have this behavior (e.g. FileOutputCommitter)."
       logWarning(warningMessage)
-    }
 
     val writerContainer =
-      if (numDynamicPartitions > 0) {
+      if (numDynamicPartitions > 0)
         val dynamicPartColNames =
           partitionColumnNames.takeRight(numDynamicPartitions)
         new SparkHiveDynamicPartitionWriterContainer(jobConf,
@@ -163,10 +155,9 @@ private[hive] case class InsertIntoHiveTable(
                                                      dynamicPartColNames,
                                                      child.output,
                                                      table)
-      } else {
+      else
         new SparkHiveWriterContainer(
             jobConf, fileSinkConf, child.output, table)
-      }
 
     @transient val outputClass =
       writerContainer.newSerializer(table.tableDesc).getSerializedClass
@@ -183,22 +174,21 @@ private[hive] case class InsertIntoHiveTable(
     // In most of the time, we should have holdDDLTime = false.
     // holdDDLTime will be true when TOK_HOLD_DDLTIME presents in the query as a hint.
     val holdDDLTime = false
-    if (partition.nonEmpty) {
+    if (partition.nonEmpty)
 
       // loadPartition call orders directories created on the iteration order of the this map
       val orderedPartitionSpec = new util.LinkedHashMap[String, String]()
-      table.hiveQlTable.getPartCols.asScala.foreach { entry =>
+      table.hiveQlTable.getPartCols.asScala.foreach  entry =>
         orderedPartitionSpec.put(
             entry.getName, partitionSpec.getOrElse(entry.getName, ""))
-      }
 
       // inheritTableSpecs is set to true. It should be set to false for a IMPORT query
       // which is currently considered as a Hive native command.
       val inheritTableSpecs = true
       // TODO: Correctly set isSkewedStoreAsSubdir.
       val isSkewedStoreAsSubdir = false
-      if (numDynamicPartitions > 0) {
-        catalog.synchronized {
+      if (numDynamicPartitions > 0)
+        catalog.synchronized
           catalog.client.loadDynamicPartitions(outputPath.toString,
                                                qualifiedTableName,
                                                orderedPartitionSpec,
@@ -206,8 +196,7 @@ private[hive] case class InsertIntoHiveTable(
                                                numDynamicPartitions,
                                                holdDDLTime,
                                                isSkewedStoreAsSubdir)
-        }
-      } else {
+      else
         // scalastyle:off
         // ifNotExists is only valid with static partition, refer to
         // https://cwiki.apache.org/confluence/display/Hive/LanguageManual+DML#LanguageManualDML-InsertingdataintoHiveTablesfromqueries
@@ -216,7 +205,7 @@ private[hive] case class InsertIntoHiveTable(
             catalog.client.getTable(table.databaseName, table.tableName),
             partitionSpec)
 
-        if (oldPart.isEmpty || !ifNotExists) {
+        if (oldPart.isEmpty || !ifNotExists)
           catalog.client.loadPartition(outputPath.toString,
                                        qualifiedTableName,
                                        orderedPartitionSpec,
@@ -224,14 +213,11 @@ private[hive] case class InsertIntoHiveTable(
                                        holdDDLTime,
                                        inheritTableSpecs,
                                        isSkewedStoreAsSubdir)
-        }
-      }
-    } else {
+    else
       catalog.client.loadTable(outputPath.toString, // TODO: URI
                                qualifiedTableName,
                                overwrite,
                                holdDDLTime)
-    }
 
     // Invalidate the cache.
     sqlContext.cacheManager.invalidateCache(table)
@@ -241,12 +227,9 @@ private[hive] case class InsertIntoHiveTable(
     // does not return anything for insert operations.
     // TODO: implement hive compatibility as rules.
     Seq.empty[InternalRow]
-  }
 
   override def executeCollect(): Array[InternalRow] = sideEffectResult.toArray
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     sqlContext.sparkContext.parallelize(
         sideEffectResult.asInstanceOf[Seq[InternalRow]], 1)
-  }
-}

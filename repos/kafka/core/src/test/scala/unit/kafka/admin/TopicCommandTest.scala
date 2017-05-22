@@ -29,10 +29,10 @@ import kafka.coordinator.GroupCoordinator
 import org.apache.kafka.common.internals.TopicConstants
 
 class TopicCommandTest
-    extends ZooKeeperTestHarness with Logging with RackAwareTest {
+    extends ZooKeeperTestHarness with Logging with RackAwareTest
 
   @Test
-  def testConfigPreservationAcrossPartitionAlteration() {
+  def testConfigPreservationAcrossPartitionAlteration()
     val topic = "test"
     val numPartitionsOriginal = 1
     val cleanupKey = "cleanup.policy"
@@ -72,10 +72,9 @@ class TopicCommandTest
                newProps.containsKey(cleanupKey))
     assertTrue("Updated properties have incorrect value",
                newProps.getProperty(cleanupKey).equals(cleanupVal))
-  }
 
   @Test
-  def testTopicDeletion() {
+  def testTopicDeletion()
     val normalTopic = "test"
 
     val numPartitionsOriginal = 1
@@ -120,33 +119,29 @@ class TopicCommandTest
         TopicConstants.GROUP_METADATA_TOPIC_NAME)
     assertFalse("Delete path for topic shouldn't exist before deletion.",
                 zkUtils.zkClient.exists(deleteOffsetTopicPath))
-    intercept[AdminOperationException] {
+    intercept[AdminOperationException]
       TopicCommand.deleteTopic(zkUtils, deleteOffsetTopicOpts)
-    }
     assertFalse("Delete path for topic shouldn't exist after deletion.",
                 zkUtils.zkClient.exists(deleteOffsetTopicPath))
-  }
 
   @Test
-  def testDeleteIfExists() {
+  def testDeleteIfExists()
     // create brokers
     val brokers = List(0, 1, 2)
     TestUtils.createBrokersInZk(zkUtils, brokers)
 
     // delete a topic that does not exist without --if-exists
     val deleteOpts = new TopicCommandOptions(Array("--topic", "test"))
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       TopicCommand.deleteTopic(zkUtils, deleteOpts)
-    }
 
     // delete a topic that does not exist with --if-exists
     val deleteExistsOpts = new TopicCommandOptions(
         Array("--topic", "test", "--if-exists"))
     TopicCommand.deleteTopic(zkUtils, deleteExistsOpts)
-  }
 
   @Test
-  def testAlterIfExists() {
+  def testAlterIfExists()
     // create brokers
     val brokers = List(0, 1, 2)
     TestUtils.createBrokersInZk(zkUtils, brokers)
@@ -154,18 +149,16 @@ class TopicCommandTest
     // alter a topic that does not exist without --if-exists
     val alterOpts = new TopicCommandOptions(
         Array("--topic", "test", "--partitions", "1"))
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       TopicCommand.alterTopic(zkUtils, alterOpts)
-    }
 
     // alter a topic that does not exist with --if-exists
     val alterExistsOpts = new TopicCommandOptions(
         Array("--topic", "test", "--partitions", "1", "--if-exists"))
     TopicCommand.alterTopic(zkUtils, alterExistsOpts)
-  }
 
   @Test
-  def testCreateIfNotExists() {
+  def testCreateIfNotExists()
     // create brokers
     val brokers = List(0, 1, 2)
     TestUtils.createBrokersInZk(zkUtils, brokers)
@@ -184,9 +177,8 @@ class TopicCommandTest
     TopicCommand.createTopic(zkUtils, createOpts)
 
     // try to re-create the topic without --if-not-exists
-    intercept[TopicExistsException] {
+    intercept[TopicExistsException]
       TopicCommand.createTopic(zkUtils, createOpts)
-    }
 
     // try to re-create the topic with --if-not-exists
     val createNotExistsOpts = new TopicCommandOptions(
@@ -198,10 +190,9 @@ class TopicCommandTest
               topic,
               "--if-not-exists"))
     TopicCommand.createTopic(zkUtils, createNotExistsOpts)
-  }
 
   @Test
-  def testCreateAlterTopicWithRackAware() {
+  def testCreateAlterTopicWithRackAware()
     val rackInfo = Map(0 -> "rack1",
                        1 -> "rack2",
                        2 -> "rack2",
@@ -221,10 +212,9 @@ class TopicCommandTest
               "foo"))
     TopicCommand.createTopic(zkUtils, createOpts)
 
-    var assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map {
+    var assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map
       case (tp, replicas) =>
         tp.partition -> replicas
-    }
     checkReplicaDistribution(
         assignment, rackInfo, rackInfo.size, numPartitions, replicationFactor)
 
@@ -233,14 +223,11 @@ class TopicCommandTest
     val alterOpts = new TopicCommandOptions(
         Array("--partitions", alteredNumPartitions.toString, "--topic", "foo"))
     TopicCommand.alterTopic(zkUtils, alterOpts)
-    assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map {
+    assignment = zkUtils.getReplicaAssignmentForTopics(Seq("foo")).map
       case (tp, replicas) =>
         tp.partition -> replicas
-    }
     checkReplicaDistribution(assignment,
                              rackInfo,
                              rackInfo.size,
                              alteredNumPartitions,
                              replicationFactor)
-  }
-}

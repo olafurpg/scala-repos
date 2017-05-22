@@ -18,7 +18,7 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScTemplateDefinition](parent, elemType)
-    with ScTemplateDefinitionStub {
+    with ScTemplateDefinitionStub
 
   var myName: String = _
   var myQualName: String = _
@@ -51,7 +51,7 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
            javaName: String,
            additionalJavaNames: Array[String],
            isLocal: Boolean,
-           visibleInJava: Boolean) {
+           visibleInJava: Boolean)
     this(
         parent,
         elemType
@@ -70,7 +70,6 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
     _isImplicitClass = isImplicitClass
     local = isLocal
     this.visibleInJava = visibleInJava
-  }
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
@@ -88,7 +87,7 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
            javaName: StringRef,
            additionalJavaNames: Array[StringRef],
            isLocal: Boolean,
-           visibleInJava: Boolean) {
+           visibleInJava: Boolean)
     this(
         parent,
         elemType
@@ -107,7 +106,6 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
     _isImplicitClass = isImplicitClass
     local = isLocal
     this.visibleInJava = visibleInJava
-  }
 
   def isVisibleInJava: Boolean = visibleInJava
 
@@ -145,4 +143,3 @@ class ScTemplateDefinitionStubImpl[ParentPsi <: PsiElement](
   def getBaseClassReferenceText: String = null
   def additionalJavaNames: Array[String] = myAdditionalJavaNames
   def javaName: String = myJavaName
-}

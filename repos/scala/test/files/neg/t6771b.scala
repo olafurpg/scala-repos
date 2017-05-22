@@ -6,8 +6,7 @@
 // But, to the intrepid hacker who works on this, a few notes:
 // You'll have to look into places in the pattern matcher that
 // call `dealias`, and see if they need to be `dealiasWiden`.
-object Test {
+object Test
   val a = ""; var b: a.type = a
 
   b = b match { case x => x }
-}

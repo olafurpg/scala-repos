@@ -24,19 +24,17 @@ import org.jetbrains.sbt.settings.SbtSystemSettings
   */
 abstract class ImportingTestCase
     extends ExternalSystemImportingTestCase with ProjectStructureMatcher
-    with SbtStructureSetup {
+    with SbtStructureSetup
 
   val Log = Logger.getInstance(this.getClass)
 
-  def testProjectDir: File = {
+  def testProjectDir: File =
     val testdataPath = TestUtils.getTestDataPath + "/sbt/projects"
     new File(testdataPath, getTestName(true))
-  }
 
-  def runTest(expected: project): Unit = {
+  def runTest(expected: project): Unit =
     importProject()
     assertProjectsEqual(expected, myProject)
-  }
 
   override protected def getExternalSystemId: ProjectSystemId =
     SbtProjectSystem.Id
@@ -47,20 +45,17 @@ abstract class ImportingTestCase
   override protected def getTestsTempDir: String =
     "" // Use default temp directory
 
-  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings = {
+  override protected def getCurrentExternalProjectSettings: ExternalProjectSettings =
     val settings = new SbtProjectSettings
     val internalSdk = JavaAwareProjectJdkTableImpl.getInstanceEx.getInternalJdk
     settings.setJdk(internalSdk.getName)
     settings
-  }
 
-  override protected def setUpInWriteAction(): Unit = {
+  override protected def setUpInWriteAction(): Unit =
     super.setUpInWriteAction()
     setUpProjectDirectory()
     setUpSbtLauncherAndStructure(myProject)
-  }
 
   private def setUpProjectDirectory(): Unit =
     myProjectRoot = LocalFileSystem.getInstance.refreshAndFindFileByIoFile(
         testProjectDir)
-}

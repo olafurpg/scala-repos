@@ -59,7 +59,7 @@ class PhiAccrualFailureDetector(val threshold: Double,
                                 val acceptableHeartbeatPause: FiniteDuration,
                                 val firstHeartbeatEstimate: FiniteDuration)(
     implicit clock: Clock)
-    extends FailureDetector {
+    extends FailureDetector
 
   /**
     * Constructor that reads parameters from config.
@@ -87,13 +87,12 @@ class PhiAccrualFailureDetector(val threshold: Double,
 
   // guess statistics for first heartbeat,
   // important so that connections with only one heartbeat becomes unavailable
-  private val firstHeartbeat: HeartbeatHistory = {
+  private val firstHeartbeat: HeartbeatHistory =
     // bootstrap with 2 entries with rather high standard deviation
     val mean = firstHeartbeatEstimate.toMillis
     val stdDeviation = mean / 4
     HeartbeatHistory(maxSampleSize) :+ (mean - stdDeviation) :+
     (mean + stdDeviation)
-  }
 
   private val acceptableHeartbeatPauseMillis =
     acceptableHeartbeatPause.toMillis
@@ -116,12 +115,12 @@ class PhiAccrualFailureDetector(val threshold: Double,
   override def isMonitoring: Boolean = state.get.timestamp.nonEmpty
 
   @tailrec
-  final override def heartbeat(): Unit = {
+  final override def heartbeat(): Unit =
 
     val timestamp = clock()
     val oldState = state.get
 
-    val newHistory = oldState.timestamp match {
+    val newHistory = oldState.timestamp match
       case None ⇒
         // this is heartbeat from a new resource
         // add starter records for this new resource
@@ -132,7 +131,6 @@ class PhiAccrualFailureDetector(val threshold: Double,
         // don't use the first heartbeat after failure for the history, since a long pause will skew the stats
         if (isAvailable(timestamp)) oldState.history :+ interval
         else oldState.history
-    }
 
     val newState = oldState.copy(
         history = newHistory,
@@ -140,7 +138,6 @@ class PhiAccrualFailureDetector(val threshold: Double,
 
     // if we won the race then update else try again
     if (!state.compareAndSet(oldState, newState)) heartbeat() // recur
-  }
 
   /**
     * The suspicion level of the accrual failure detector.
@@ -150,13 +147,13 @@ class PhiAccrualFailureDetector(val threshold: Double,
     */
   def phi: Double = phi(clock())
 
-  private def phi(timestamp: Long): Double = {
+  private def phi(timestamp: Long): Double =
     val oldState = state.get
     val oldTimestamp = oldState.timestamp
 
     if (oldTimestamp.isEmpty)
       0.0 // treat unmanaged connections, e.g. with zero heartbeats, as healthy connections
-    else {
+    else
       val timeDiff = timestamp - oldTimestamp.get
 
       val history = oldState.history
@@ -164,8 +161,6 @@ class PhiAccrualFailureDetector(val threshold: Double,
       val stdDeviation = ensureValidStdDeviation(history.stdDeviation)
 
       phi(timeDiff, mean + acceptableHeartbeatPauseMillis, stdDeviation)
-    }
-  }
 
   /**
     * Calculation of phi, derived from the Cumulative distribution function for
@@ -177,20 +172,18 @@ class PhiAccrualFailureDetector(val threshold: Double,
     * The calculated value is equivalent to -log10(1 - CDF(y))
     */
   private[akka] def phi(
-      timeDiff: Long, mean: Double, stdDeviation: Double): Double = {
+      timeDiff: Long, mean: Double, stdDeviation: Double): Double =
     val y = (timeDiff - mean) / stdDeviation
     val e = math.exp(-y * (1.5976 + 0.070566 * y * y))
     if (timeDiff > mean) -math.log10(e / (1.0 + e))
     else -math.log10(1.0 - 1.0 / (1.0 + e))
-  }
 
   private val minStdDeviationMillis = minStdDeviation.toMillis
 
   private def ensureValidStdDeviation(stdDeviation: Double): Double =
     math.max(stdDeviation, minStdDeviationMillis)
-}
 
-private[akka] object HeartbeatHistory {
+private[akka] object HeartbeatHistory
 
   /**
     * Create an empty HeartbeatHistory, without any history.
@@ -203,7 +196,6 @@ private[akka] object HeartbeatHistory {
                      intervals = immutable.IndexedSeq.empty,
                      intervalSum = 0L,
                      squaredIntervalSum = 0L)
-}
 
 /**
   * Holds the heartbeat statistics for a specific node Address.
@@ -216,7 +208,7 @@ private[akka] final case class HeartbeatHistory private (
     maxSampleSize: Int,
     intervals: immutable.IndexedSeq[Long],
     intervalSum: Long,
-    squaredIntervalSum: Long) {
+    squaredIntervalSum: Long)
 
   // Heartbeat histories are created trough the firstHeartbeat variable of the PhiAccrualFailureDetector
   // which always have intervals.size > 0.
@@ -238,7 +230,7 @@ private[akka] final case class HeartbeatHistory private (
   def stdDeviation: Double = math.sqrt(variance)
 
   @tailrec
-  final def :+(interval: Long): HeartbeatHistory = {
+  final def :+(interval: Long): HeartbeatHistory =
     if (intervals.size < maxSampleSize)
       HeartbeatHistory(
           maxSampleSize,
@@ -246,7 +238,6 @@ private[akka] final case class HeartbeatHistory private (
           intervalSum = intervalSum + interval,
           squaredIntervalSum = squaredIntervalSum + pow2(interval))
     else dropOldest :+ interval // recur
-  }
 
   private def dropOldest: HeartbeatHistory =
     HeartbeatHistory(
@@ -256,4 +247,3 @@ private[akka] final case class HeartbeatHistory private (
         squaredIntervalSum = squaredIntervalSum - pow2(intervals.head))
 
   private def pow2(x: Long) = x * x
-}

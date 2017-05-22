@@ -9,8 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackageCont
 /**
   * @author ilyas
   */
-trait ScPackageContainerStub extends StubElement[ScPackageContainer] {
+trait ScPackageContainerStub extends StubElement[ScPackageContainer]
   def prefix: String
   def ownNamePart: String
   def isExplicit: Boolean
-}

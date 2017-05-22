@@ -18,7 +18,7 @@ import org.jetbrains.plugins.scala.project.template
   * User: Dmitry.Naydanov
   * Date: 20.01.16.
   */
-class ActivatorCachedRepoProcessor extends ProjectComponent {
+class ActivatorCachedRepoProcessor extends ProjectComponent
   import ActivatorCachedRepoProcessor._
   import ActivatorRepoProcessor._
 
@@ -29,46 +29,40 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
   private var indexFile: Option[(String, File)] = None
   private var workOffline = false
 
-  private def error(msg: String, ex: Throwable = null) {
+  private def error(msg: String, ex: Throwable = null)
     ActivatorCachedRepoProcessor.logError(msg, ex)
     throw new ConfigurationException(msg)
-  }
 
   private def errorStr(msg: String) = error(msg, null)
 
   private def urlString = s"$REPO_URI/$INDEX_DIR/$VERSION"
 
-  private def extractHash(): Option[String] = {
+  private def extractHash(): Option[String] =
     if (extractedHash.isEmpty)
-      extractedHash = {
+      extractedHash =
         var downloaded: Option[String] = None
 
-        try {
+        try
           downloaded = ActivatorRepoProcessor.downloadStringFromRepo(
               s"$urlString/$PROPERTIES")
-        } catch {
+        catch
           case io: IOException => error("Can't download index", io)
-        }
 
-        downloaded flatMap {
+        downloaded flatMap
           case str =>
-            str.split('\n').find {
+            str.split('\n').find
               case s => s.trim startsWith CACHE_HASH
-            } map {
+            map
               case hashStr => hashStr.trim.stripPrefix(CACHE_HASH)
-            }
-        }
-      }
 
     extractedHash
-  }
 
-  private def downloadIndex(): Option[File] = {
+  private def downloadIndex(): Option[File] =
     if (extractedHash
           .flatMap(a => indexFile.map(b => (a, b._1)))
           .exists(a => a._1 == a._2)) indexFile.map(_._2)
-    else {
-      extractHash() flatMap {
+    else
+      extractHash() flatMap
         case hash =>
           val tmpFile = FileUtil.createTempFile(s"index-$hash", ".zip", true)
           val downloaded = ActivatorRepoProcessor.downloadFile(
@@ -77,44 +71,38 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
               errorStr,
               ProgressManager.getInstance().getProgressIndicator)
 
-          if (downloaded) {
+          if (downloaded)
             indexFile = Some((hash, tmpFile))
             Some(tmpFile)
-          } else None
-      }
-    }
-  }
+          else None
 
-  private def cacheFile(file: File, where: File) {
+  private def cacheFile(file: File, where: File)
     val cacheDir = getCacheDataPath
 
-    if (cacheDir.exists() || cacheDir.mkdir()) {
+    if (cacheDir.exists() || cacheDir.mkdir())
       if (where.exists() || where.createNewFile()) FileUtil.copy(file, where)
-    }
-  }
 
-  private def processIndex(location: File): Map[String, DocData] = {
+  private def processIndex(location: File): Map[String, DocData] =
     if (!location.exists()) return Map.empty
 
     var reader: IndexReader = null
 
-    try {
-      template.usingTempDirectoryWithHandler("index-activator", None)({
+    try
+      template.usingTempDirectoryWithHandler("index-activator", None)(
         case io: IOException =>
           error("Can't process templates list", io);
           Map.empty[String, ActivatorRepoProcessor.DocData]
-      }, { case io: IOException => }) { extracted =>
+      , { case io: IOException => })  extracted =>
         ZipUtil.extract(location, extracted, null)
 
         import org.apache.lucene
         import org.apache.lucene.search.IndexSearcher
 
-        val loader = getClass.getClassLoader match {
+        val loader = getClass.getClassLoader match
           //hack to avoid lucene 2.4.1 from bundled maven plugin
           case urlLoader: URLClassLoader =>
             new URLClassLoader(urlLoader.getURLs, null)
           case other => other
-        }
         loader.loadClass("org.apache.lucene.store.FSDirectory")
 
         reader = DirectoryReader.open(FSDirectory.open(extracted))
@@ -123,51 +111,43 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
           searcher.search(new lucene.search.MatchAllDocsQuery, reader.maxDoc())
         val data = docs.scoreDocs.map { case doc => reader document doc.doc }
 
-        data.map {
+        data.map
           case docData => Keys.from(docData)
-        }.toMap
-      }
-    } catch {
+        .toMap
+    catch
       case io: IOException =>
         error("Can't process templates list", io)
         Map.empty
-    } finally {
+    finally
       if (reader != null) reader.close()
-    }
-  }
 
   private def getOrDownloadTemplate(
-      templateId: String, pathTo: File, onError: String => Unit) {
+      templateId: String, pathTo: File, onError: String => Unit)
     var hasError = false
 
     val fileName = ActivatorRepoProcessor.templateFileName(templateId)
     val cachedTemplate = new File(getCacheDataPath, fileName)
 
     val myOnError = (a: String) =>
-      {
 
         hasError = true
 
-        if (!cachedTemplate.exists()) {
+        if (!cachedTemplate.exists())
           onError(a)
           return
-        }
 
-        try {
+        try
           FileUtil.copy(cachedTemplate, pathTo)
-        } catch {
+        catch
           case _: IOException => onError(a)
-        }
-    }
 
     ActivatorRepoProcessor.downloadTemplateFromRepo(
         templateId, pathTo, myOnError)
     workOffline = hasError
     if (!workOffline) cacheFile(pathTo, cachedTemplate)
-  }
 
   def createTemplate(
-      templateId: String, extractTo: File, onError: String => Unit) {
+      templateId: String, extractTo: File, onError: String => Unit)
     val contentDir =
       FileUtilRt.createTempDirectory(s"$templateId-template-content", "", true)
     val contentFile = new File(contentDir, "content.zip")
@@ -177,10 +157,9 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
     getOrDownloadTemplate(templateId, contentFile, onError)
 
     ZipUtil.extract(contentFile, extractTo, null)
-  }
 
-  def extractRepoData(): Map[String, DocData] = {
-    val toProcess: File = downloadIndex() match {
+  def extractRepoData(): Map[String, DocData] =
+    val toProcess: File = downloadIndex() match
       case Some(file) =>
         cacheFile(file, new File(getCacheDataPath, INDEX_CACHE_NAME))
         workOffline = false
@@ -189,14 +168,11 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
         val cacheFile = new File(getCacheDataPath, INDEX_CACHE_NAME)
         workOffline = true
         if (!cacheFile.exists()) null else cacheFile
-    }
 
     if (toProcess != null) processIndex(toProcess)
-    else {
+    else
       error("No index file")
       Map.empty
-    }
-  }
 
   override def projectClosed() {}
 
@@ -207,20 +183,16 @@ class ActivatorCachedRepoProcessor extends ProjectComponent {
   override def disposeComponent() {}
 
   override def getComponentName: String = "ScalaActivatorTemplateCache"
-}
 
-object ActivatorCachedRepoProcessor {
+object ActivatorCachedRepoProcessor
   private val INDEX_CACHE_NAME = "activator_template_index"
   private val log = Logger.getInstance(classOf[ActivatorCachedRepoProcessor])
 
-  def logError(msg: String) {
+  def logError(msg: String)
     log.error(msg)
-  }
 
-  def logError(msg: String, ex: Throwable) {
+  def logError(msg: String, ex: Throwable)
     val newMsg =
       if (ex == null) msg
       else s"$msg : ${ex.getMessage} :\n ${ex.getStackTrace.mkString("\n")} "
     logError(newMsg)
-  }
-}

@@ -28,7 +28,7 @@ import Helpers._
   * so that you have the session scope
   *
   */
-trait ScopedLiftActor extends LiftActor with LazyLoggable {
+trait ScopedLiftActor extends LiftActor with LazyLoggable
 
   /**
     * The session captured when the instance is created. It should be correct if the instance is created
@@ -64,11 +64,10 @@ trait ScopedLiftActor extends LiftActor with LazyLoggable {
     */
   protected def composeFunction: PartialFunction[Any, Unit] = composeFunction_i
 
-  private def composeFunction_i: PartialFunction[Any, Unit] = {
+  private def composeFunction_i: PartialFunction[Any, Unit] =
     // if we're no longer running don't pass messages to the other handlers
     // just pass them to our handlers
     highPriority orElse mediumPriority orElse lowPriority
-  }
 
   /**
     * Handle messages sent to this Actor before the
@@ -79,53 +78,40 @@ trait ScopedLiftActor extends LiftActor with LazyLoggable {
 
   def mediumPriority: PartialFunction[Any, Unit] = Map.empty
 
-  protected override def messageHandler = {
+  protected override def messageHandler =
     val what = composeFunction
-    val myPf: PartialFunction[Any, Unit] = new PartialFunction[Any, Unit] {
+    val myPf: PartialFunction[Any, Unit] = new PartialFunction[Any, Unit]
       def apply(in: Any): Unit =
-        S.initIfUninitted(session) {
-          RenderVersion.doWith(uniqueId) {
-            S.functionLifespan(true) {
-              try {
+        S.initIfUninitted(session)
+          RenderVersion.doWith(uniqueId)
+            S.functionLifespan(true)
+              try
                 what.apply(in)
-              } catch {
+              catch
                 case e if exceptionHandler.isDefinedAt(e) =>
                   exceptionHandler(e)
                 case e: Exception =>
                   reportError("Message dispatch for " + in, e)
-              }
-              if (S.functionMap.size > 0) {
+              if (S.functionMap.size > 0)
                 session.updateFunctionMap(S.functionMap, uniqueId, millis)
                 S.clearFunctionMap
-              }
-            }
-          }
-        }
 
       def isDefinedAt(in: Any): Boolean =
-        S.initIfUninitted(session) {
-          RenderVersion.doWith(uniqueId) {
-            S.functionLifespan(true) {
-              try {
+        S.initIfUninitted(session)
+          RenderVersion.doWith(uniqueId)
+            S.functionLifespan(true)
+              try
                 what.isDefinedAt(in)
-              } catch {
+              catch
                 case e if exceptionHandler.isDefinedAt(e) =>
                   exceptionHandler(e); false
                 case e: Exception =>
                   reportError("Message test for " + in, e); false
-              }
-            }
-          }
-        }
-    }
 
     myPf
-  }
 
   /**
     * How to report an error that occurs during message dispatch
     */
-  protected def reportError(msg: String, exception: Exception) {
+  protected def reportError(msg: String, exception: Exception)
     logger.error(msg, exception)
-  }
-}

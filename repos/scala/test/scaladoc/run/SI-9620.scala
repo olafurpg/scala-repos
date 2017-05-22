@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
   override def code =
     """
     package a
@@ -24,7 +24,7 @@ object Test extends ScaladocModelTest {
 
   def scaladocSettings = "-implicits"
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     import access._
 
     // Assert Boo only has one implicit conversion
@@ -41,5 +41,3 @@ object Test extends ScaladocModelTest {
     // Assert that the same for full path
     assert(conversions.head.conversionQualifiedName == "a.Boo.BooLongIsFoo",
            conversions.head.conversionQualifiedName + " == a.Boo.BooLongIsFoo")
-  }
-}

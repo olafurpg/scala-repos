@@ -5,7 +5,7 @@ import com.twitter.finagle.{ServiceProxy, ClientConnection, ServiceFactory}
 import com.twitter.finagle.stats.{NullStatsReceiver, StatsReceiver}
 import com.twitter.util._
 
-object Client {
+object Client
 
   /**
     * Creates a new Client based on a ServiceFactory.
@@ -33,17 +33,15 @@ object Client {
       dbname: String = null,
       logLevel: Level = Level.OFF,
       statsReceiver: StatsReceiver = NullStatsReceiver
-  ): Client = {
+  ): Client =
     val factory = com.twitter.finagle.exp.Mysql.client
       .withCredentials(username, password)
       .withDatabase(dbname)
       .newClient(host)
 
     apply(factory)
-  }
-}
 
-trait Client extends Closable {
+trait Client extends Closable
 
   /**
     * Returns the result of executing the `sql` query on the server.
@@ -73,9 +71,8 @@ trait Client extends Closable {
     * Returns the result of pinging the server.
     */
   def ping(): Future[Result]
-}
 
-trait Transactions {
+trait Transactions
 
   /**
     * Execute `f` in a transaction.
@@ -99,70 +96,58 @@ trait Transactions {
     * is the connection returned to the pool for re-use.
     */
   def transaction[T](f: Client => Future[T]): Future[T]
-}
 
 private[mysql] class StdClient(factory: ServiceFactory[Request, Result])
-    extends Client with Transactions {
+    extends Client with Transactions
   private[this] val service = factory.toService
 
   def query(sql: String): Future[Result] = service(QueryRequest(sql))
   def ping(): Future[Result] = service(PingRequest)
 
   def select[T](sql: String)(f: Row => T): Future[Seq[T]] =
-    query(sql) map {
+    query(sql) map
       case rs: ResultSet => rs.rows.map(f)
       case _ => Nil
-    }
 
-  def prepare(sql: String): PreparedStatement = new PreparedStatement {
-    def apply(ps: Parameter*): Future[Result] = factory() flatMap { svc =>
-      svc(PrepareRequest(sql)).flatMap {
+  def prepare(sql: String): PreparedStatement = new PreparedStatement
+    def apply(ps: Parameter*): Future[Result] = factory() flatMap  svc =>
+      svc(PrepareRequest(sql)).flatMap
         case ok: PrepareOK => svc(ExecuteRequest(ok.id, ps.toIndexedSeq))
         case r =>
           Future.exception(new Exception(
                   "Unexpected result %s when preparing %s".format(r, sql)))
-      } ensure {
+      ensure
         svc.close()
-      }
-    }
-  }
 
-  def transaction[T](f: Client => Future[T]): Future[T] = {
-    val singleton = new ServiceFactory[Request, Result] {
+  def transaction[T](f: Client => Future[T]): Future[T] =
+    val singleton = new ServiceFactory[Request, Result]
       val svc = factory()
       // Because the `singleton` is used in the context of a `FactoryToService` we override
       // `Service#close` to ensure that we can control the checkout lifetime of the `Service`.
       val proxiedService =
-        svc map { service =>
-          new ServiceProxy(service) {
+        svc map  service =>
+          new ServiceProxy(service)
             override def close(deadline: Time) = Future.Done
-          }
-        }
 
       def apply(conn: ClientConnection) = proxiedService
       def close(deadline: Time): Future[Unit] = svc.flatMap(_.close(deadline))
-    }
 
     val client = Client(singleton)
-    val transaction = for {
+    val transaction = for
       _ <- client.query("START TRANSACTION")
       result <- f(client)
       _ <- client.query("COMMIT")
-    } yield result
+    yield result
 
     // handle failures and put connection back in the pool
 
-    transaction transform {
+    transaction transform
       case Return(r) =>
         singleton.close()
         Future.value(r)
       case Throw(e) =>
-        client.query("ROLLBACK") transform { _ =>
+        client.query("ROLLBACK") transform  _ =>
           singleton.close()
           Future.exception(e)
-        }
-    }
-  }
 
   def close(deadline: Time): Future[Unit] = factory.close(deadline)
-}

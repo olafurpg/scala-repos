@@ -47,13 +47,11 @@ case class Event(
     val tags: Seq[String] = Nil,
     val prId: Option[String] = None,
     val creationTime: DateTime = DateTime.now
-) {
-  override def toString(): String = {
+)
+  override def toString(): String =
     s"Event(id=$eventId,event=$event,eType=$entityType,eId=$entityId," +
     s"tType=$targetEntityType,tId=$targetEntityId,p=$properties,t=$eventTime," +
     s"tags=$tags,pKey=$prId,ct=$creationTime)"
-  }
-}
 
 /** :: DeveloperApi ::
   * Utilities for validating [[Event]]s
@@ -61,7 +59,7 @@ case class Event(
   * @group Event Data
   */
 @DeveloperApi
-object EventValidation {
+object EventValidation
 
   /** Default time zone is set to UTC */
   val defaultTimeZone = DateTimeZone.UTC
@@ -106,7 +104,7 @@ object EventValidation {
     *
     * @param e Event to be validated
     */
-  def validate(e: Event): Unit = {
+  def validate(e: Event): Unit =
 
     require(!e.event.isEmpty, "event must not be empty.")
     require(!e.entityType.isEmpty, "entityType must not be empty string.")
@@ -131,13 +129,12 @@ object EventValidation {
         s"The entityType ${e.entityType} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
     require(
-        e.targetEntityType.map { t =>
+        e.targetEntityType.map  t =>
           (!isReservedPrefix(t) || isBuiltinEntityTypes(t))
-        }.getOrElse(true),
+        .getOrElse(true),
         s"The targetEntityType ${e.targetEntityType.get} is not allowed. " +
         s"'pio_' is a reserved name prefix.")
     validateProperties(e)
-  }
 
   /** Defines built-in entity types. The current built-in type is pio_pr. */
   val builtinEntityTypes: Set[String] = Set("pio_pr")
@@ -156,11 +153,8 @@ object EventValidation {
     *
     * @param e Event to be validated
     */
-  def validateProperties(e: Event): Unit = {
-    e.properties.keySet.foreach { k =>
+  def validateProperties(e: Event): Unit =
+    e.properties.keySet.foreach  k =>
       require(!isReservedPrefix(k) || builtinProperties.contains(k),
               s"The property ${k} is not allowed. " +
               s"'pio_' is a reserved name prefix.")
-    }
-  }
-}

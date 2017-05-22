@@ -10,7 +10,7 @@ import scala.collection.mutable.ListBuffer
 class StructureViewBuilderSpec
     extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
-    with ReallyRichPresentationCompilerFixture {
+    with ReallyRichPresentationCompilerFixture
 
   def original = EnsimeConfigFixture.EmptyTestProject
 
@@ -18,29 +18,26 @@ class StructureViewBuilderSpec
       config: EnsimeConfig,
       cc: RichCompilerControl,
       content: String
-  ): List[String] = {
+  ): List[String] =
 
     val result = ListBuffer[String]()
 
-    def collect(parent: Option[String], x: StructureViewMember): Unit = {
+    def collect(parent: Option[String], x: StructureViewMember): Unit =
       val par = parent.map(_ + ".").getOrElse("")
-      x match {
+      x match
         case StructureViewMember(key, name, _, Nil) =>
           result.append(s"($key)${par}$name")
         case StructureViewMember(key, name, _, xs) =>
           result.append(s"($key)${par}$name")
           xs.foreach(collect(Some(s"${par}$name"), _))
-      }
-    }
 
     val file = srcFile(config, "abc.scala", contents(content))
     cc.askLoadedTyped(file)
     cc.askStructure(file).foreach(collect(None, _))
     result.toList
-  }
 
-  "StructureViewBuilder" should "show top level classes and objects" in {
-    withPresCompiler { (config, cc) =>
+  "StructureViewBuilder" should "show top level classes and objects" in
+    withPresCompiler  (config, cc) =>
       val structure = getStructure(
           config,
           cc,
@@ -62,10 +59,8 @@ class StructureViewBuilderSpec
           "(object)Test",
           "(def)Test.apply"
       )
-    }
-  }
 
-  it should "show nested members" in withPresCompiler { (config, cc) =>
+  it should "show nested members" in withPresCompiler  (config, cc) =>
     val structure = getStructure(
         config,
         cc,
@@ -91,9 +86,8 @@ class StructureViewBuilderSpec
         "(object)Test.Nested",
         "(def)Test.Nested.apply"
     )
-  }
 
-  it should "skip accessors" in withPresCompiler { (config, cc) =>
+  it should "skip accessors" in withPresCompiler  (config, cc) =>
     val structure = getStructure(
         config,
         cc,
@@ -115,5 +109,3 @@ class StructureViewBuilderSpec
         "(class)Test.Nested",
         "(class)Test.NestedCase"
     )
-  }
-}

@@ -13,23 +13,22 @@ import org.scalatest.finders.Selection
 trait FindersApiTest
     extends FeatureSpecGenerator with FlatSpecGenerator with FreeSpecGenerator
     with FreeSpecPathGenerator with FunSpecGenerator with FunSuiteGenerator
-    with PropSpecGenerator with WordSpecGenerator {
+    with PropSpecGenerator with WordSpecGenerator
   def checkSelection(lineNumber: Int,
                      offset: Int,
                      fileName: String,
-                     testNames: Set[String]) = {
+                     testNames: Set[String]) =
     val location = createLocation(lineNumber, offset, fileName)
     var selection: Selection = null
     UsefulTestCase.edt(
-        new Runnable() {
+        new Runnable()
       override def run(): Unit =
         selection = new ScalaTestAstTransformer().testSelection(location)
-    })
+    )
     assert(selection != null)
     assert(selection.testNames().map(_.trim).toSet == testNames)
-  }
 
-  def testFeatureSpec() {
+  def testFeatureSpec()
     addFeatureSpec()
 
     val scenarioA = "Feature: Feature 1 Scenario: Scenario A"
@@ -49,9 +48,8 @@ trait FindersApiTest
         14, 15, fileName, Set("Feature: Feature 2 Scenario: Scenario C"))
     //inside scenario
     checkSelection(5, 8, fileName, Set(scenarioA))
-  }
 
-  def testFlatSpec() {
+  def testFlatSpec()
     addFlatSpec()
     addBehaviorFlatSpec()
 
@@ -69,9 +67,8 @@ trait FindersApiTest
     checkSelection(4, 55, fileName, Set(flatTestName1))
     //'it' word
     checkSelection(16, 1, fileName, Set(flatTestName2))
-  }
 
-  def testBehaviorFlatSpec() {
+  def testBehaviorFlatSpec()
     addBehaviorFlatSpec()
 
     val testNames = Set(
@@ -86,9 +83,8 @@ trait FindersApiTest
     checkSelection(3, 20, fileName, testNames)
     //specific test
     checkSelection(5, 8, fileName, Set("FlatSpec should run scopes"))
-  }
 
-  def testItFlatSpec(): Unit = {
+  def testItFlatSpec(): Unit =
     val fileName = "TestItFlatSpec.scala"
     addFileToProject(
         fileName,
@@ -110,10 +106,9 @@ trait FindersApiTest
     checkSelection(6, 10, fileName, Set("Test should be fine"))
 
     checkSelection(8, 10, fileName, Set("Test should change name"))
-  }
 
   //for now, there is no need to test path.FreeSpec separately: it and FreeSpec share the same finder
-  def testFreeSpec() {
+  def testFreeSpec()
     addComplexFreeSpec()
 
     val fileName = "ComplexFreeSpec.scala"
@@ -144,9 +139,8 @@ trait FindersApiTest
     checkSelection(25, 27, fileName, Set())
     //different depth scopes
     checkSelection(10, 10, fileName, Set(testName2, testName3))
-  }
 
-  def testFunSpec() {
+  def testFunSpec()
     addFunSpec()
 
     val fileName = "FunSpecTest.scala"
@@ -165,9 +159,8 @@ trait FindersApiTest
     //inside test
     checkSelection(9, 1, fileName, Set(testName2))
     checkSelection(9, 15, fileName, Set(testName2))
-  }
 
-  def testFunSuite() {
+  def testFunSuite()
     addFunSuite()
 
     val fileName = "FunSuiteTest.scala"
@@ -179,9 +172,8 @@ trait FindersApiTest
     checkSelection(4, 10, fileName, Set(testName1))
     //inside test
     checkSelection(5, 10, fileName, Set(testName1))
-  }
 
-  def testPropSpec() {
+  def testPropSpec()
     addPropSpec()
 
     val fileName = "PropSpecTest.scala"
@@ -193,9 +185,8 @@ trait FindersApiTest
     checkSelection(4, 15, fileName, Set(testName1))
     //inside test
     checkSelection(5, 10, fileName, Set(testName1))
-  }
 
-  def testWordSpec() {
+  def testWordSpec()
     addWordSpec()
 
     val fileName = "WordSpecTest.scala"
@@ -210,5 +201,3 @@ trait FindersApiTest
     checkSelection(4, 10, fileName, Set(testName1))
     //'in' word
     checkSelection(8, 26, fileName, Set(testName2))
-  }
-}

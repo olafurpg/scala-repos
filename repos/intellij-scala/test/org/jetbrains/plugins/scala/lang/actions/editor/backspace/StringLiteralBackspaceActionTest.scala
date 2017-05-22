@@ -8,21 +8,17 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 31.07.14.
   */
 class StringLiteralBackspaceActionTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
-  def testSimpleMultiLine() {
+    extends ScalaLightCodeInsightFixtureTestAdapter
+  def testSimpleMultiLine()
     checkGeneratedTextAfterBackspace(
         s"val x = ${"\"\"\""}$CARET_MARKER${"\"\"\""}",
         s"val x = ${"\"\""}$CARET_MARKER")
-  }
 
-  def testInterpolated() {
+  def testInterpolated()
     checkGeneratedTextAfterBackspace(
         s"val x = s${"\"\"\""}$CARET_MARKER${"\"\"\""}",
         s"val x = s${"\"\""}$CARET_MARKER")
-  }
 
-  def testSimpleInterpolated() {
+  def testSimpleInterpolated()
     checkGeneratedTextAfterBackspace(
         s"""val x = s"$CARET_MARKER"""", s"val x = s$CARET_MARKER")
-  }
-}

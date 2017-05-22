@@ -24,21 +24,19 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{BooleanType, StringType, StructField, StructType}
 
 class ListTablesSuite
-    extends QueryTest with BeforeAndAfter with SharedSQLContext {
+    extends QueryTest with BeforeAndAfter with SharedSQLContext
   import testImplicits._
 
   private lazy val df = (1 to 10).map(i => (i, s"str$i")).toDF("key", "value")
 
-  before {
+  before
     df.registerTempTable("ListTablesSuiteTable")
-  }
 
-  after {
+  after
     sqlContext.sessionState.catalog
       .unregisterTable(TableIdentifier("ListTablesSuiteTable"))
-  }
 
-  test("get all tables") {
+  test("get all tables")
     checkAnswer(
         sqlContext.tables().filter("tableName = 'ListTablesSuiteTable'"),
         Row("ListTablesSuiteTable", true))
@@ -53,10 +51,9 @@ class ListTablesSuite
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
-  }
 
   test(
-      "getting all Tables with a database name has no impact on returned table names") {
+      "getting all Tables with a database name has no impact on returned table names")
     checkAnswer(
         sqlContext.tables("DB").filter("tableName = 'ListTablesSuiteTable'"),
         Row("ListTablesSuiteTable", true))
@@ -71,14 +68,13 @@ class ListTablesSuite
           .tables()
           .filter("tableName = 'ListTablesSuiteTable'")
           .count() === 0)
-  }
 
-  test("query the returned DataFrame of tables") {
+  test("query the returned DataFrame of tables")
     val expectedSchema = StructType(
         StructField("tableName", StringType, false) :: StructField(
             "isTemporary", BooleanType, false) :: Nil)
 
-    Seq(sqlContext.tables(), sql("SHOW TABLes")).foreach {
+    Seq(sqlContext.tables(), sql("SHOW TABLes")).foreach
       case tableDF =>
         assert(expectedSchema === tableDF.schema)
 
@@ -93,6 +89,3 @@ class ListTablesSuite
                       .select("tableName", "isTemporary"),
                     Row("tables", true))
         sqlContext.dropTempTable("tables")
-    }
-  }
-}

@@ -6,12 +6,12 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait FunSpecGenerator extends ScalaTestTestCase {
+trait FunSpecGenerator extends ScalaTestTestCase
   def funSpecClassName = "FunSpecTest"
 
   def funSpecFileName = funSpecClassName + ".scala"
 
-  def addFunSpec() {
+  def addFunSpec()
     addFileToProject("FunSpecTest.scala",
                      """
         |import org.scalatest._
@@ -34,5 +34,3 @@ trait FunSpecGenerator extends ScalaTestTestCase {
         |  describe("emptyScope") {}
         |}
       """.stripMargin.trim())
-  }
-}

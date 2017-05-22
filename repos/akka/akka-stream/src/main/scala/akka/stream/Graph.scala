@@ -6,7 +6,7 @@ package akka.stream
 import akka.stream.impl.StreamLayout
 import scala.annotation.unchecked.uncheckedVariance
 
-trait Graph[+S <: Shape, +M] {
+trait Graph[+S <: Shape, +M]
 
   /**
     * Type-level accessor for the shape parameter of this graph.
@@ -36,4 +36,3 @@ trait Graph[+S <: Shape, +M] {
 
   def addAttributes(attr: Attributes): Graph[S, M] =
     withAttributes(module.attributes and attr)
-}

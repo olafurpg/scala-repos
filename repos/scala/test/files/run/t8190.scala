@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-trait Overloads {
+trait Overloads
   // makes sure noone erases to Any or AnyRef
   def test(x: AnyRef) = "AnyRef"
   def test(x: Annotation) = "Annotation"
@@ -92,15 +92,13 @@ trait Overloads {
   def test(x: TypeTree) = "TypeTree"
   def test(x: Modifiers) = "Modifiers"
   def test(x: TreeCopier) = "TreeCopier"
-}
 
-object Test extends App with Overloads {
+object Test extends App with Overloads
   val buf = scala.collection.mutable.ListBuffer[String]()
-  def record(result: String): Unit = {
+  def record(result: String): Unit =
     println(result)
     buf += result
-  }
-  def check(): Unit = {
+  def check(): Unit =
     println("checking exhaustiveness in scala.reflect.api.Universe...")
     var types = typeOf[scala.reflect.api.Universe].members
       .filter(sym => sym.isType && !sym.isClass)
@@ -118,7 +116,6 @@ object Test extends App with Overloads {
     types = types.filter(_ != "BuildApi") // deprecated
     val diff = types.toList diff buf.toList
     println("uncovered type members: " + diff)
-  }
   record(test(null: Annotation))
   record(test(null: Constant))
   record(test(null: Mirror))
@@ -209,4 +206,3 @@ object Test extends App with Overloads {
   record(test(null: Modifiers))
   record(test(null: TreeCopier))
   check()
-}

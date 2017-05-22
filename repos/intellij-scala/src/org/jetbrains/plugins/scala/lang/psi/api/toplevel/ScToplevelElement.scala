@@ -19,55 +19,45 @@ import scala.collection.mutable.ArrayBuffer
   *
   * @author ilyas
   */
-trait ScToplevelElement extends ScalaPsiElement {
-  def typeDefinitions: Seq[ScTypeDefinition] = {
+trait ScToplevelElement extends ScalaPsiElement
+  def typeDefinitions: Seq[ScTypeDefinition] =
     val buff = new ArrayBuffer[ScTypeDefinition]
     buff ++= immediateTypeDefinitions
     for (pack <- packagings) buff ++= pack.typeDefinitions
     buff.toSeq
-  }
 
-  def typeDefinitionsArray: Array[ScTypeDefinition] = {
+  def typeDefinitionsArray: Array[ScTypeDefinition] =
     val buff = new ArrayBuffer[ScTypeDefinition]
     buff ++= immediateTypeDefinitions
     for (pack <- packagings) buff ++= pack.typeDefinitions
     buff.toArray
-  }
 
-  def immediateTypeDefinitions: Seq[ScTypeDefinition] = {
-    val stub: StubElement[_ <: PsiElement] = this match {
+  def immediateTypeDefinitions: Seq[ScTypeDefinition] =
+    val stub: StubElement[_ <: PsiElement] = this match
       case file: PsiFileImpl => file.getStub
       case st: ScPackagingImpl => st.getStub
       case _ => null
-    }
-    if (stub != null) {
+    if (stub != null)
       stub.getChildrenByType[ScTypeDefinition](
           TokenSets.TMPL_DEF_BIT_SET,
           JavaArrayFactoryUtil.ScTypeDefinitionFactory)
-    } else findChildrenByClassScala(classOf[ScTypeDefinition]).toSeq
-  }
+    else findChildrenByClassScala(classOf[ScTypeDefinition]).toSeq
 
-  def packagings: Seq[ScPackaging] = {
-    val stub: StubElement[_ <: PsiElement] = this match {
+  def packagings: Seq[ScPackaging] =
+    val stub: StubElement[_ <: PsiElement] = this match
       case file: PsiFileImpl => file.getStub
       case st: ScPackagingImpl => st.getStub
       case _ => null
-    }
-    if (stub != null) {
+    if (stub != null)
       stub.getChildrenByType[ScPackaging](
           ScalaElementTypes.PACKAGING, JavaArrayFactoryUtil.ScPackagingFactory)
-    } else {
+    else
       val buffer = new ArrayBuffer[ScPackaging]
       var curr = getFirstChild
-      while (curr != null) {
-        curr match {
+      while (curr != null)
+        curr match
           case packaging: ScPackaging => buffer += packaging
           case _ =>
-        }
         curr = curr.getNextSibling
-      }
       buffer.toSeq
       //collection.immutable.Seq(findChildrenByClassScala(classOf[ScPackaging]).toSeq : _*)
-    }
-  }
-}

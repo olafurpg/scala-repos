@@ -25,34 +25,30 @@ import org.apache.spark.util.{IntParam, Utils}
 /**
   * Command-line parser for the master.
   */
-private[master] class MasterArguments(args: Array[String], conf: SparkConf) {
+private[master] class MasterArguments(args: Array[String], conf: SparkConf)
   var host = Utils.localHostName()
   var port = 7077
   var webUiPort = 8080
   var propertiesFile: String = null
 
   // Check for settings in environment variables
-  if (System.getenv("SPARK_MASTER_HOST") != null) {
+  if (System.getenv("SPARK_MASTER_HOST") != null)
     host = System.getenv("SPARK_MASTER_HOST")
-  }
-  if (System.getenv("SPARK_MASTER_PORT") != null) {
+  if (System.getenv("SPARK_MASTER_PORT") != null)
     port = System.getenv("SPARK_MASTER_PORT").toInt
-  }
-  if (System.getenv("SPARK_MASTER_WEBUI_PORT") != null) {
+  if (System.getenv("SPARK_MASTER_WEBUI_PORT") != null)
     webUiPort = System.getenv("SPARK_MASTER_WEBUI_PORT").toInt
-  }
 
   parse(args.toList)
 
   // This mutates the SparkConf, so all accesses to it must be made after this line
   propertiesFile = Utils.loadDefaultSparkProperties(conf, propertiesFile)
 
-  if (conf.contains("spark.master.ui.port")) {
+  if (conf.contains("spark.master.ui.port"))
     webUiPort = conf.get("spark.master.ui.port").toInt
-  }
 
   @tailrec
-  private def parse(args: List[String]): Unit = args match {
+  private def parse(args: List[String]): Unit = args match
     case ("--ip" | "-i") :: value :: tail =>
       Utils.checkHost(
           value, "ip no longer supported, please use hostname " + value)
@@ -83,12 +79,11 @@ private[master] class MasterArguments(args: Array[String], conf: SparkConf) {
 
     case _ =>
       printUsageAndExit(1)
-  }
 
   /**
     * Print usage and exit JVM with the given exit code.
     */
-  private def printUsageAndExit(exitCode: Int) {
+  private def printUsageAndExit(exitCode: Int)
     // scalastyle:off println
     System.err.println(
         "Usage: Master [options]\n" + "\n" + "Options:\n" +
@@ -100,5 +95,3 @@ private[master] class MasterArguments(args: Array[String], conf: SparkConf) {
         "                         Default is conf/spark-defaults.conf.")
     // scalastyle:on println
     System.exit(exitCode)
-  }
-}

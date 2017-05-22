@@ -12,7 +12,7 @@ final class Env(config: Config,
                 blocks: (String, String) => Fu[Boolean],
                 follows: (String, String) => Fu[Boolean],
                 getPref: String => Fu[lila.pref.Pref],
-                system: ActorSystem) {
+                system: ActorSystem)
 
   private val CollectionThread = config getString "collection.thread"
   private val ThreadMaxPerPage = config getInt "thread.max_per_page"
@@ -36,14 +36,12 @@ final class Env(config: Config,
   lazy val security = new MessageSecurity(
       follows = follows, blocks = blocks, getPref = getPref)
 
-  system.actorOf(Props(new Actor {
-    def receive = {
+  system.actorOf(Props(new Actor
+    def receive =
       case thread: LichessThread => api.lichessThread(thread)
-    }
-  }), name = ActorName)
-}
+  ), name = ActorName)
 
-object Env {
+object Env
 
   lazy val current =
     "message" boot new Env(
@@ -55,4 +53,3 @@ object Env {
         follows = lila.relation.Env.current.api.fetchFollows,
         getPref = lila.pref.Env.current.api.getPref,
         system = lila.common.PlayApp.system)
-}

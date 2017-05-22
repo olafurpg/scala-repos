@@ -1,4 +1,4 @@
-object Test {
+object Test
   trait A[X] { type A[x <: X] = x }
   val a = (new A[String] {}): { type A [x <: String] } // ok
   val b = (new A[String] {}): { type A [x] } // not ok
@@ -8,4 +8,3 @@ object Test {
 //a: AnyRef{type A[X]}
 
   identity[x.A[Any]] _
-}

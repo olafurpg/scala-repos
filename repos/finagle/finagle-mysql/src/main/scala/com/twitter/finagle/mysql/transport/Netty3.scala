@@ -16,10 +16,10 @@ import org.jboss.netty.handler.codec.frame.FrameDecoder
   * frames. MySQL packets are a length encoded set of bytes written
   * in little endian byte order.
   */
-class PacketFrameDecoder extends FrameDecoder {
+class PacketFrameDecoder extends FrameDecoder
   override def decode(ctx: ChannelHandlerContext,
                       channel: Channel,
-                      buffer: ChannelBuffer): Packet = {
+                      buffer: ChannelBuffer): Packet =
     if (buffer.readableBytes < Packet.HeaderSize) return null
 
     buffer.markReaderIndex()
@@ -31,56 +31,47 @@ class PacketFrameDecoder extends FrameDecoder {
     val length = br.readUnsignedInt24()
     val seq = br.readUnsignedByte()
 
-    if (buffer.readableBytes < length) {
+    if (buffer.readableBytes < length)
       buffer.resetReaderIndex()
       return null
-    }
 
     val body = new Array[Byte](length)
     buffer.readBytes(body)
 
     Packet(seq, Buffer(body))
-  }
-}
 
-class PacketEncoder extends SimpleChannelDownstreamHandler {
+class PacketEncoder extends SimpleChannelDownstreamHandler
   override def writeRequested(ctx: ChannelHandlerContext, evt: MessageEvent) =
-    evt.getMessage match {
+    evt.getMessage match
       case p: Packet =>
-        try {
+        try
           val cb = p.toChannelBuffer
           Channels.write(ctx, evt.getFuture, cb, evt.getRemoteAddress)
-        } catch {
+        catch
           case NonFatal(e) =>
             evt.getFuture.setFailure(new ChannelException(e.getMessage))
-        }
 
       case unknown =>
         evt.getFuture.setFailure(
             new ChannelException("Unsupported request type %s".format(
                     unknown.getClass.getName)))
-    }
-}
 
 /**
   * A Netty3 pipeline that is responsible for framing network
   * traffic in terms of mysql logical packets.
   */
-object MysqlClientPipelineFactory extends ChannelPipelineFactory {
-  def getPipeline = {
+object MysqlClientPipelineFactory extends ChannelPipelineFactory
+  def getPipeline =
     val pipeline = Channels.pipeline()
     pipeline.addLast("packetDecoder", new PacketFrameDecoder)
     pipeline.addLast("packetEncoder", new PacketEncoder)
     pipeline
-  }
-}
 
 /**
   * Responsible for the transport layer plumbing required to produce
   * a Transporter[Packet, Packet]. The current implementation uses
   * Netty3.
   */
-object MysqlTransporter {
+object MysqlTransporter
   def apply(params: Stack.Params): Transporter[Packet, Packet] =
     Netty3Transporter(MysqlClientPipelineFactory, params)
-}

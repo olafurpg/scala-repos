@@ -13,7 +13,7 @@ import com.typesafe.config.ConfigFactory
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-object ClusterClientStopSpec extends MultiNodeConfig {
+object ClusterClientStopSpec extends MultiNodeConfig
   val client = role("client")
   val first = role("first")
   val second = role("second")
@@ -31,12 +31,9 @@ object ClusterClientStopSpec extends MultiNodeConfig {
     akka.test.filter-leeway = 10s
   """))
 
-  class Service extends Actor {
-    def receive = {
+  class Service extends Actor
+    def receive =
       case msg ⇒ sender() ! msg
-    }
-  }
-}
 
 class ClusterClientStopMultiJvmNode1 extends ClusterClientStopSpec
 class ClusterClientStopMultiJvmNode2 extends ClusterClientStopSpec
@@ -44,49 +41,41 @@ class ClusterClientStopMultiJvmNode3 extends ClusterClientStopSpec
 
 class ClusterClientStopSpec
     extends MultiNodeSpec(ClusterClientStopSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import ClusterClientStopSpec._
 
   override def initialParticipants: Int = 3
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       Cluster(system) join node(to).address
       ClusterClientReceptionist(system)
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  def awaitCount(expected: Int): Unit = {
-    awaitAssert {
+  def awaitCount(expected: Int): Unit =
+    awaitAssert
       DistributedPubSub(system).mediator ! DistributedPubSubMediator.Count
       expectMsgType[Int] should ===(expected)
-    }
-  }
 
-  def initialContacts = Set(first, second).map { r ⇒
+  def initialContacts = Set(first, second).map  r ⇒
     node(r) / "system" / "receptionist"
-  }
 
-  "A Cluster Client" should {
+  "A Cluster Client" should
 
-    "startup cluster" in within(30.seconds) {
+    "startup cluster" in within(30.seconds)
       join(first, first)
       join(second, first)
-      runOn(first) {
+      runOn(first)
         val service = system.actorOf(Props(classOf[Service]), "testService")
         ClusterClientReceptionist(system).registerService(service)
-      }
-      runOn(first, second) {
+      runOn(first, second)
         awaitCount(1)
-      }
 
       enterBarrier("cluster-started")
-    }
 
-    "stop if re-establish fails for too long time" in within(20.seconds) {
-      runOn(client) {
+    "stop if re-establish fails for too long time" in within(20.seconds)
+      runOn(client)
         val c =
           system.actorOf(ClusterClient.props(ClusterClientSettings(system)
                                .withInitialContacts(initialContacts)),
@@ -103,12 +92,7 @@ class ClusterClientStopSpec
         EventFilter.warning(
             start = "Receptionist reconnect not successful within",
             occurrences = 1)
-      }
 
-      runOn(first, second) {
+      runOn(first, second)
         enterBarrier("was-in-contact")
         Await.ready(system.terminate(), 10.seconds)
-      }
-    }
-  }
-}

@@ -57,36 +57,32 @@ import org.apache.spark.sql.types._
   * - FLOAT and DOUBLE cause fixed-length decimals to turn into DOUBLE
   */
 // scalastyle:on
-object DecimalPrecision extends Rule[LogicalPlan] {
+object DecimalPrecision extends Rule[LogicalPlan]
   import scala.math.{max, min}
 
   private def isFloat(t: DataType): Boolean = t == FloatType || t == DoubleType
 
   // Returns the wider decimal type that's wider than both of them
-  def widerDecimalType(d1: DecimalType, d2: DecimalType): DecimalType = {
+  def widerDecimalType(d1: DecimalType, d2: DecimalType): DecimalType =
     widerDecimalType(d1.precision, d1.scale, d2.precision, d2.scale)
-  }
   // max(s1, s2) + max(p1-s1, p2-s2), max(s1, s2)
-  def widerDecimalType(p1: Int, s1: Int, p2: Int, s2: Int): DecimalType = {
+  def widerDecimalType(p1: Int, s1: Int, p2: Int, s2: Int): DecimalType =
     val scale = max(s1, s2)
     val range = max(p1 - s1, p2 - s2)
     DecimalType.bounded(range + scale, scale)
-  }
 
-  private def promotePrecision(e: Expression, dataType: DataType): Expression = {
+  private def promotePrecision(e: Expression, dataType: DataType): Expression =
     PromotePrecision(Cast(e, dataType))
-  }
 
-  def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
+  def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators
     // fix decimal precision for expressions
     case q =>
       q.transformExpressions(decimalAndDecimal
             .orElse(integralAndDecimalLiteral)
             .orElse(nondecimalAndDecimal))
-  }
 
   /** Decimal precision promotion for +, -, *, /, %, pmod, and binary comparison. */
-  private val decimalAndDecimal: PartialFunction[Expression, Expression] = {
+  private val decimalAndDecimal: PartialFunction[Expression, Expression] =
     // Skip nodes whose children have not been resolved yet
     case e if !e.childrenResolved => e
 
@@ -120,10 +116,9 @@ object DecimalPrecision extends Rule[LogicalPlan] {
       var intDig = min(DecimalType.MAX_SCALE, p1 - s1 + s2)
       var decDig = min(DecimalType.MAX_SCALE, max(6, s1 + p2 + 1))
       val diff = (intDig + decDig) - DecimalType.MAX_SCALE
-      if (diff > 0) {
+      if (diff > 0)
         decDig -= diff / 2 + 1
         intDig = DecimalType.MAX_SCALE - decDig
-      }
       val resultType = DecimalType.bounded(intDig + decDig, decDig)
       val widerType = widerDecimalType(p1, s1, p2, s2)
       CheckOverflow(Divide(promotePrecision(e1, widerType),
@@ -158,7 +153,6 @@ object DecimalPrecision extends Rule[LogicalPlan] {
 
     // TODO: MaxOf, MinOf, etc might want other rules
     // SUM and AVERAGE are handled by the implementations of those expressions
-  }
 
   /**
     * Strength reduction for comparing integral expressions with decimal literals.
@@ -179,90 +173,81 @@ object DecimalPrecision extends Rule[LogicalPlan] {
     * because we are not sure how common they are.
     */
   private val integralAndDecimalLiteral: PartialFunction[
-      Expression, Expression] = {
+      Expression, Expression] =
 
     case GreaterThan(i @ IntegralType(), DecimalLiteral(value)) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         TrueLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         FalseLiteral
-      } else {
+      else
         GreaterThan(i, Literal(value.floor.toLong))
-      }
 
     case GreaterThanOrEqual(i @ IntegralType(), DecimalLiteral(value)) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         TrueLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         FalseLiteral
-      } else {
+      else
         GreaterThanOrEqual(i, Literal(value.ceil.toLong))
-      }
 
     case LessThan(i @ IntegralType(), DecimalLiteral(value)) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         FalseLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         TrueLiteral
-      } else {
+      else
         LessThan(i, Literal(value.ceil.toLong))
-      }
 
     case LessThanOrEqual(i @ IntegralType(), DecimalLiteral(value)) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         FalseLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         TrueLiteral
-      } else {
+      else
         LessThanOrEqual(i, Literal(value.floor.toLong))
-      }
 
     case GreaterThan(DecimalLiteral(value), i @ IntegralType()) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         FalseLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         TrueLiteral
-      } else {
+      else
         GreaterThan(Literal(value.ceil.toLong), i)
-      }
 
     case GreaterThanOrEqual(DecimalLiteral(value), i @ IntegralType()) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         FalseLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         TrueLiteral
-      } else {
+      else
         GreaterThanOrEqual(Literal(value.floor.toLong), i)
-      }
 
     case LessThan(DecimalLiteral(value), i @ IntegralType()) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         TrueLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         FalseLiteral
-      } else {
+      else
         LessThan(Literal(value.floor.toLong), i)
-      }
 
     case LessThanOrEqual(DecimalLiteral(value), i @ IntegralType()) =>
-      if (DecimalLiteral.smallerThanSmallestLong(value)) {
+      if (DecimalLiteral.smallerThanSmallestLong(value))
         TrueLiteral
-      } else if (DecimalLiteral.largerThanLargestLong(value)) {
+      else if (DecimalLiteral.largerThanLargestLong(value))
         FalseLiteral
-      } else {
+      else
         LessThanOrEqual(Literal(value.ceil.toLong), i)
-      }
-  }
 
   /**
     * Type coercion for BinaryOperator in which one side is a non-decimal numeric, and the other
     * side is a decimal.
     */
-  private val nondecimalAndDecimal: PartialFunction[Expression, Expression] = {
+  private val nondecimalAndDecimal: PartialFunction[Expression, Expression] =
     // Promote integers inside a binary expression with fixed-precision decimals to decimals,
     // and fixed-precision decimals in an expression with floats / doubles to doubles
     case b @ BinaryOperator(left, right) if left.dataType != right.dataType =>
-      (left.dataType, right.dataType) match {
+      (left.dataType, right.dataType) match
         case (t: IntegralType, DecimalType.Fixed(p, s)) =>
           b.makeCopy(Array(Cast(left, DecimalType.forType(t)), right))
         case (DecimalType.Fixed(p, s), t: IntegralType) =>
@@ -273,6 +258,3 @@ object DecimalPrecision extends Rule[LogicalPlan] {
           b.makeCopy(Array(Cast(left, DoubleType), right))
         case _ =>
           b
-      }
-  }
-}

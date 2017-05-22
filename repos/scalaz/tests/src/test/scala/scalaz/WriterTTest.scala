@@ -8,7 +8,7 @@ import org.scalacheck.Arbitrary
 import Id._
 import org.scalacheck.Prop.forAll
 
-object WriterTTest extends SpecLite {
+object WriterTTest extends SpecLite
 
   type WriterTOpt[W, A] = WriterT[Option, W, A]
   type WriterTOptInt[A] = WriterTOpt[Int, A]
@@ -31,18 +31,16 @@ object WriterTTest extends SpecLite {
 
   checkAll(comonad.laws[Writer[Int, ?]])
 
-  "flatMapF consistent with flatMap" ! forAll {
+  "flatMapF consistent with flatMap" ! forAll
     (fa: WriterTOptInt[Int], f: Int => Option[(Int, Int)]) =>
       fa.flatMapF(f) must_=== fa.flatMap(f andThen WriterT.writerT)
-  }
 
-  private def writerTUcompilationTest: Unit = {
+  private def writerTUcompilationTest: Unit =
     import syntax.either._
     val a: String \/ (Int, Boolean) = (1, true).right[String]
     WriterT.writerTU(a)
-  }
 
-  object instances {
+  object instances
     def plus[F[_]: Plus, W] = Plus[WriterT[F, W, ?]]
     def plusEmpty[F[_]: PlusEmpty, W] = PlusEmpty[WriterT[F, W, ?]]
     def functor[F[_]: Functor, W] = Functor[WriterT[F, W, ?]]
@@ -82,7 +80,7 @@ object WriterTTest extends SpecLite {
     def functor[F[_]: Traverse, W : Monoid] = Functor[WriterT[F, W, ?]]
     def foldable[F[_]: Traverse, W] = Foldable[WriterT[F, W, ?]]
 
-    object writer {
+    object writer
       def functor[W] = Functor[Writer[W, ?]]
       def apply[W : Semigroup] = Apply[Writer[W, ?]]
       def applicative[W : Monoid] = Applicative[Writer[W, ?]]
@@ -91,6 +89,3 @@ object WriterTTest extends SpecLite {
       def foldable[W] = Foldable[Writer[W, ?]](WriterT.writerTFoldable[Id, W])
       def traverse[W] = Traverse[Writer[W, ?]]
       def comonad[W] = Comonad[Writer[W, ?]]
-    }
-  }
-}

@@ -18,12 +18,11 @@ case class ApiCommitStatus(
     id: Int,
     context: String,
     creator: ApiUser
-)(sha: String, repositoryName: RepositoryName) {
+)(sha: String, repositoryName: RepositoryName)
   val url = ApiPath(
       s"/api/v3/repos/${repositoryName.fullName}/commits/${sha}/statuses")
-}
 
-object ApiCommitStatus {
+object ApiCommitStatus
   def apply(status: CommitStatus, creator: ApiUser): ApiCommitStatus =
     ApiCommitStatus(
         created_at = status.registeredDate,
@@ -35,4 +34,3 @@ object ApiCommitStatus {
         context = status.context,
         creator = creator
     )(status.commitId, RepositoryName(status))
-}

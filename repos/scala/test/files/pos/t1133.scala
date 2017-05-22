@@ -1,6 +1,6 @@
-object Match {
-  def main(args: Array[String]) = {
-    args(0) match {
+object Match
+  def main(args: Array[String]) =
+    args(0) match
       case Extractor1(Extractor2(Extractor3("dog", "dog", "dog"), x2, x3),
                       b,
                       c,
@@ -18,27 +18,18 @@ object Match {
                       Extractor3("c", "c", z)) =>
         println(z)
       case _ => println("fail")
-    }
-  }
 
-  object Extractor1 {
-    def unapply(x: Any) = x match {
+  object Extractor1
+    def unapply(x: Any) = x match
       case x: String => Some(x, x + x, x + x + x, x + x, x)
       case _ => None
-    }
-  }
 
-  object Extractor2 {
-    def unapply(x: Any) = x match {
+  object Extractor2
+    def unapply(x: Any) = x match
       case x: String => Some(x, x + x, x + x + x)
       case _ => None
-    }
-  }
 
-  object Extractor3 {
-    def unapply(x: Any) = x match {
+  object Extractor3
+    def unapply(x: Any) = x match
       case x: String => Some(x, x, x)
       case _ => None
-    }
-  }
-}

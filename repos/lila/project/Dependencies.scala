@@ -1,9 +1,9 @@
 import play.sbt.PlayImport._
 import sbt._, Keys._
 
-object Dependencies {
+object Dependencies
 
-  object Resolvers {
+  object Resolvers
 
     val typesafe =
       "typesafe.com" at "http://repo.typesafe.com/typesafe/releases/"
@@ -30,7 +30,6 @@ object Dependencies {
                       t2v,
                       jgitMaven,
                       sprayRepo)
-  }
 
   val scalaz = "org.scalaz" %% "scalaz-core" % "7.1.7"
   val scalalib = "com.github.ornicar" %% "scalalib" % "5.4"
@@ -49,24 +48,19 @@ object Dependencies {
   val java8compat = "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
   val semver = "com.gilt" %% "gfc-semver" % "0.0.2-9-g11173e1"
 
-  object play {
+  object play
     val version = "2.4.6"
     val api = "com.typesafe.play" %% "play" % version
     val test = "com.typesafe.play" %% "play-test" % version
-  }
-  object spray {
+  object spray
     val version = "1.3.3"
     val caching = "io.spray" %% "spray-caching" % version
     val util = "io.spray" %% "spray-util" % version
-  }
-  object akka {
+  object akka
     val version = "2.4.2"
     val actor = "com.typesafe.akka" %% "akka-actor" % version
     val slf4j = "com.typesafe.akka" %% "akka-slf4j" % version
-  }
-  object kamon {
+  object kamon
     val version = "0.5.2"
     val core = "io.kamon" %% "kamon-core" % version
     val statsd = "io.kamon" %% "kamon-statsd" % version
-  }
-}

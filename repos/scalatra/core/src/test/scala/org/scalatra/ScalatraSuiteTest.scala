@@ -2,144 +2,105 @@ package org.scalatra
 
 import org.scalatra.test.scalatest.ScalatraFunSuite
 
-class ScalatraSuiteTestServlet extends ScalatraServlet {
-  before() {
+class ScalatraSuiteTestServlet extends ScalatraServlet
+  before()
     contentType = "text/html; charset=utf-8"
-  }
 
-  get("/") {
+  get("/")
     "root"
-  }
 
-  get("/session") {
+  get("/session")
     session.getOrElse("name", "error!")
-  }
 
-  post("/session") {
+  post("/session")
     session("name") = params("name")
     session.getOrElse("name", "error!")
-  }
 
-  get("/redirect") {
+  get("/redirect")
     redirect("/redirected")
-  }
 
-  get("/echo_params") {
+  get("/echo_params")
     params("msg")
-  }
 
-  post("/echo_params") {
+  post("/echo_params")
     params("msg")
-  }
 
-  patch("/method") {
+  patch("/method")
     request.getMethod
-  }
 
-  put("/method") {
+  put("/method")
     request.getMethod
-  }
 
-  delete("/method") {
+  delete("/method")
     request.getMethod
-  }
-}
 
-class ScalatraSuiteTest extends ScalatraFunSuite {
+class ScalatraSuiteTest extends ScalatraFunSuite
   addServlet(classOf[ScalatraSuiteTestServlet], "/*")
 
-  test("route test") {
-    get("/") {
+  test("route test")
+    get("/")
       status should equal(200)
       body should include("root")
-    }
-  }
 
-  test("get test") {
-    get("/echo_params", "msg" -> "hi") {
+  test("get test")
+    get("/echo_params", "msg" -> "hi")
       status should equal(200)
       body should equal("hi")
-    }
-  }
-  test("get with multi-byte chars in params") {
+  test("get with multi-byte chars in params")
     // `msg` will automatically be url-encoded by ScalatraSuite
-    get("/echo_params", "msg" -> "こんにちわ") {
+    get("/echo_params", "msg" -> "こんにちわ")
       status should equal(200)
       body should equal("こんにちわ")
-    }
-  }
 
-  test("post test") {
-    post("/echo_params", "msg" -> "hi") {
+  test("post test")
+    post("/echo_params", "msg" -> "hi")
       status should equal(200)
       body should equal("hi")
-    }
-  }
 
-  test("post multi-byte chars test") {
+  test("post multi-byte chars test")
     // `msg` will automatically be url-encoded by ScalatraSuite
-    post("/echo_params", "msg" -> "こんにちわ") {
+    post("/echo_params", "msg" -> "こんにちわ")
       status should equal(200)
       body should equal("こんにちわ")
-    }
-  }
 
-  test("header test") {
-    get("/redirect") {
+  test("header test")
+    get("/redirect")
       status should equal(302)
       header("Location") should include("/redirected")
-    }
-  }
 
-  test("abbrevs test") {
-    get("/redirect") {
+  test("abbrevs test")
+    get("/redirect")
       status should equal(response status)
       body should equal(response body)
       header("Location") should equal(response header ("Location"))
-    }
-  }
 
-  test("session test") {
+  test("session test")
     val name = "Scalatra"
-    post("/session", "name" -> name) {
+    post("/session", "name" -> name)
       status should equal(200)
       body should include(name)
-    }
-    get("/session") {
+    get("/session")
       status should equal(200)
       body should not include (name)
-    }
-    session {
-      post("/session", "name" -> name) {
+    session
+      post("/session", "name" -> name)
         status should equal(200)
         body should include(name)
-      }
-      get("/session") {
+      get("/session")
         status should equal(200)
         body should include(name)
-      }
-      get("/session") {
+      get("/session")
         status should equal(200)
         body should include(name)
-      }
-    }
-  }
 
-  test("put test") {
-    put("/method") {
+  test("put test")
+    put("/method")
       body should equal("PUT")
-    }
-  }
 
-  test("delete test") {
-    delete("/method") {
+  test("delete test")
+    delete("/method")
       body should equal("DELETE")
-    }
-  }
 
-  test("patch test") {
-    patch("/method") {
+  test("patch test")
+    patch("/method")
       body should equal("PATCH")
-    }
-  }
-}

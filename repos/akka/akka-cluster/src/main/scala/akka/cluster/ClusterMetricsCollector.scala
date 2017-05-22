@@ -41,7 +41,7 @@ import java.lang.management.MemoryUsage
   * [[akka.cluster.EWMA]] for exponential weighted moving average.
   */
 private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   import InternalClusterAction._
   import ClusterEvent._
@@ -86,12 +86,11 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
       self,
       MetricsTick)
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberEvent], classOf[ReachabilityEvent])
     logInfo("Metrics collection has started successfully")
-  }
 
-  def receive = {
+  def receive =
     case GossipTick ⇒ gossip()
     case MetricsTick ⇒ collect()
     case msg: MetricsGossipEnvelope ⇒ receiveGossip(msg)
@@ -105,14 +104,12 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
       if (m.status == MemberStatus.Up || m.status == MemberStatus.WeaklyUp)
         addMember(m)
     case _: MemberEvent ⇒ // not interested in other types of MemberEvent
-  }
 
-  override def postStop: Unit = {
+  override def postStop: Unit =
     cluster unsubscribe self
     gossipTask.cancel()
     metricsTask.cancel()
     collector.close()
-  }
 
   /**
     * Adds a member to the node ring.
@@ -122,19 +119,17 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
   /**
     * Removes a member from the member node ring.
     */
-  def removeMember(member: Member): Unit = {
+  def removeMember(member: Member): Unit =
     nodes -= member.address
     latestGossip = latestGossip remove member.address
     publish()
-  }
 
   /**
     * Updates the initial node ring for those nodes that are [[akka.cluster.MemberStatus]] `Up`.
     */
   def receiveState(state: CurrentClusterState): Unit =
-    nodes = state.members collect {
+    nodes = state.members collect
       case m if m.status == Up || m.status == WeaklyUp ⇒ m.address
-    }
 
   /**
     * Samples the latest metrics for the node, updates metrics statistics in
@@ -142,23 +137,21 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     *
     * @see [[akka.cluster.ClusterMetricsCollector#collect]]
     */
-  def collect(): Unit = {
+  def collect(): Unit =
     latestGossip :+= collector.sample()
     publish()
-  }
 
   /**
     * Receives changes from peer nodes, merges remote with local gossip nodes, then publishes
     * changes to the event stream for load balancing router consumption, and gossip back.
     */
-  def receiveGossip(envelope: MetricsGossipEnvelope): Unit = {
+  def receiveGossip(envelope: MetricsGossipEnvelope): Unit =
     // remote node might not have same view of member nodes, this side should only care
     // about nodes that are known here, otherwise removed nodes can come back
     val otherGossip = envelope.gossip.filter(nodes)
     latestGossip = latestGossip merge otherGossip
     // changes will be published in the period collect task
     if (!envelope.reply) replyGossipTo(envelope.from)
-  }
 
   /**
     * Gossip to peer nodes.
@@ -187,14 +180,12 @@ private[cluster] class ClusterMetricsCollector(publisher: ActorRef)
     */
   def publish(): Unit =
     publisher ! PublishEvent(ClusterMetricsChanged(latestGossip.nodes))
-}
 
 /**
   * INTERNAL API
   */
-private[cluster] object MetricsGossip {
+private[cluster] object MetricsGossip
   val empty = MetricsGossip(Set.empty[NodeMetrics])
-}
 
 /**
   * INTERNAL API
@@ -202,7 +193,7 @@ private[cluster] object MetricsGossip {
   * @param nodes metrics per node
   */
 @SerialVersionUID(1L)
-private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
+private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics])
 
   /**
     * Removes nodes if their correlating node ring members are not [[akka.cluster.MemberStatus]] `Up`.
@@ -220,28 +211,24 @@ private[cluster] final case class MetricsGossip(nodes: Set[NodeMetrics]) {
     * Adds new remote [[akka.cluster.NodeMetrics]] and merges existing from a remote gossip.
     */
   def merge(otherGossip: MetricsGossip): MetricsGossip =
-    otherGossip.nodes.foldLeft(this) { (gossip, nodeMetrics) ⇒
+    otherGossip.nodes.foldLeft(this)  (gossip, nodeMetrics) ⇒
       gossip :+ nodeMetrics
-    }
 
   /**
     * Adds new local [[akka.cluster.NodeMetrics]], or merges an existing.
     */
   def :+(newNodeMetrics: NodeMetrics): MetricsGossip =
-    nodeMetricsFor(newNodeMetrics.address) match {
+    nodeMetricsFor(newNodeMetrics.address) match
       case Some(existingNodeMetrics) ⇒
         copy(nodes = nodes - existingNodeMetrics +
               (existingNodeMetrics merge newNodeMetrics))
       case None ⇒ copy(nodes = nodes + newNodeMetrics)
-    }
 
   /**
     * Returns [[akka.cluster.NodeMetrics]] for a node if exists.
     */
-  def nodeMetricsFor(address: Address): Option[NodeMetrics] = nodes find { n ⇒
+  def nodeMetricsFor(address: Address): Option[NodeMetrics] = nodes find  n ⇒
     n.address == address
-  }
-}
 
 /**
   * INTERNAL API
@@ -252,7 +239,7 @@ private[cluster] final case class MetricsGossipEnvelope(
     from: Address, gossip: MetricsGossip, reply: Boolean)
     extends ClusterMessage
 
-private[cluster] object EWMA {
+private[cluster] object EWMA
 
   /**
     * math.log(2)
@@ -269,13 +256,11 @@ private[cluster] object EWMA {
     * 1 – 0.5 ^ (collect-interval / half-life).
     */
   def alpha(
-      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double = {
+      halfLife: FiniteDuration, collectInterval: FiniteDuration): Double =
     val halfLifeMillis = halfLife.toMillis
     require(halfLife.toMillis > 0, "halfLife must be > 0 s")
     val decayRate = LogOf2 / halfLifeMillis
     1 - math.exp(-decayRate * collectInterval.toMillis)
-  }
-}
 
 /**
   * The exponentially weighted moving average (EWMA) approach captures short-term
@@ -299,7 +284,7 @@ private[cluster] object EWMA {
   *
   */
 @SerialVersionUID(1L)
-private[cluster] final case class EWMA(value: Double, alpha: Double) {
+private[cluster] final case class EWMA(value: Double, alpha: Double)
 
   require(0.0 <= alpha && alpha <= 1.0, "alpha must be between 0.0 and 1.0")
 
@@ -309,12 +294,10 @@ private[cluster] final case class EWMA(value: Double, alpha: Double) {
     * @param xn the new data point
     * @return a new [[akka.cluster.EWMA]] with the updated value
     */
-  def :+(xn: Double): EWMA = {
+  def :+(xn: Double): EWMA =
     val newValue = (alpha * xn) + (1 - alpha) * value
     if (newValue == value) this // no change
     else copy(value = newValue)
-  }
-}
 
 /**
   * Metrics key/value.
@@ -332,7 +315,7 @@ private[cluster] final case class EWMA(value: Double, alpha: Double) {
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
 final case class Metric private[cluster](
     name: String, value: Number, private[cluster] val average: Option[EWMA])
-    extends MetricNumericConverter {
+    extends MetricNumericConverter
 
   require(defined(value), s"Invalid Metric [$name] value [$value]")
 
@@ -342,22 +325,21 @@ final case class Metric private[cluster](
     */
   def :+(latest: Metric): Metric =
     if (this sameAs latest)
-      average match {
+      average match
         case Some(avg) ⇒
           copy(value = latest.value,
                average = Some(avg :+ latest.value.doubleValue))
         case None if latest.average.isDefined ⇒
           copy(value = latest.value, average = latest.average)
         case _ ⇒ copy(value = latest.value)
-      } else this
+      else this
 
   /**
     * The numerical value of the average, if defined, otherwise the latest value
     */
-  def smoothValue: Double = average match {
+  def smoothValue: Double = average match
     case Some(avg) ⇒ avg.value
     case None ⇒ value.doubleValue
-  }
 
   /**
     * @return true if this value is smoothed
@@ -370,18 +352,16 @@ final case class Metric private[cluster](
   def sameAs(that: Metric): Boolean = name == that.name
 
   override def hashCode = name.##
-  override def equals(obj: Any) = obj match {
+  override def equals(obj: Any) = obj match
     case other: Metric ⇒ sameAs(other)
     case _ ⇒ false
-  }
-}
 
 /**
   * Factory for creating valid Metric instances.
   */
 @deprecated(
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
-object Metric extends MetricNumericConverter {
+object Metric extends MetricNumericConverter
 
   /**
     * Creates a new Metric instance if the value is valid, otherwise None
@@ -400,18 +380,15 @@ object Metric extends MetricNumericConverter {
     */
   def create(name: String,
              value: Try[Number],
-             decayFactor: Option[Double]): Option[Metric] = value match {
+             decayFactor: Option[Double]): Option[Metric] = value match
     case Success(v) ⇒ create(name, v, decayFactor)
     case Failure(_) ⇒ None
-  }
 
   private def ceateEWMA(
       value: Double, decayFactor: Option[Double]): Option[EWMA] =
-    decayFactor match {
+    decayFactor match
       case Some(alpha) ⇒ Some(EWMA(value, alpha))
       case None ⇒ None
-    }
-}
 
 /**
   * The snapshot of current sampled health metrics for any monitored process.
@@ -428,25 +405,22 @@ object Metric extends MetricNumericConverter {
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
 final case class NodeMetrics(address: Address,
                              timestamp: Long,
-                             metrics: Set[Metric] = Set.empty[Metric]) {
+                             metrics: Set[Metric] = Set.empty[Metric])
 
   /**
     * Returns the most recent data.
     */
-  def merge(that: NodeMetrics): NodeMetrics = {
+  def merge(that: NodeMetrics): NodeMetrics =
     require(
         address == that.address,
         s"merge only allowed for same address, [$address] != [$that.address]")
     if (timestamp >= that.timestamp) this // that is older
-    else {
+    else
       // equality is based on the name of the Metric and Set doesn't replace existing element
       copy(metrics = that.metrics union metrics, timestamp = that.timestamp)
-    }
-  }
 
-  def metric(key: String): Option[Metric] = metrics.collectFirst {
+  def metric(key: String): Option[Metric] = metrics.collectFirst
     case m if m.name == key ⇒ m
-  }
 
   /**
     * Java API
@@ -460,11 +434,9 @@ final case class NodeMetrics(address: Address,
   def sameAs(that: NodeMetrics): Boolean = address == that.address
 
   override def hashCode = address.##
-  override def equals(obj: Any) = obj match {
+  override def equals(obj: Any) = obj match
     case other: NodeMetrics ⇒ sameAs(other)
     case _ ⇒ false
-  }
-}
 
 /**
   * Definitions of the built-in standard metrics.
@@ -474,7 +446,7 @@ final case class NodeMetrics(address: Address,
   */
 @deprecated(
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
-object StandardMetrics {
+object StandardMetrics
 
   // Constants for the heap related Metric names
   final val HeapMemoryUsed = "heap-memory-used"
@@ -486,7 +458,7 @@ object StandardMetrics {
   final val Processors = "processors"
   final val CpuCombined = "cpu-combined"
 
-  object HeapMemory {
+  object HeapMemory
 
     /**
       * Given a NodeMetrics it returns the HeapMemory data if the nodeMetrics contains
@@ -494,30 +466,27 @@ object StandardMetrics {
       * @return if possible a tuple matching the HeapMemory constructor parameters
       */
     def unapply(nodeMetrics: NodeMetrics)
-      : Option[(Address, Long, Long, Long, Option[Long])] = {
-      for {
+      : Option[(Address, Long, Long, Long, Option[Long])] =
+      for
         used ← nodeMetrics.metric(HeapMemoryUsed)
         committed ← nodeMetrics.metric(HeapMemoryCommitted)
-      } yield
+      yield
         (nodeMetrics.address,
          nodeMetrics.timestamp,
          used.smoothValue.longValue,
          committed.smoothValue.longValue,
          nodeMetrics.metric(HeapMemoryMax).map(_.smoothValue.longValue))
-    }
-  }
 
   /**
     * Java API to extract HeapMemory data from nodeMetrics, if the nodeMetrics
     * contains necessary heap metrics, otherwise it returns null.
     */
   def extractHeapMemory(nodeMetrics: NodeMetrics): HeapMemory =
-    nodeMetrics match {
+    nodeMetrics match
       case HeapMemory(address, timestamp, used, committed, max) ⇒
         // note that above extractor returns tuple
         HeapMemory(address, timestamp, used, committed, max)
       case _ ⇒ null
-    }
 
   /**
     * The amount of used and committed memory will always be <= max if max is defined.
@@ -537,12 +506,11 @@ object StandardMetrics {
                               timestamp: Long,
                               used: Long,
                               committed: Long,
-                              max: Option[Long]) {
+                              max: Option[Long])
     require(committed > 0L, "committed heap expected to be > 0 bytes")
     require(max.isEmpty || max.get > 0L, "max heap expected to be > 0 bytes")
-  }
 
-  object Cpu {
+  object Cpu
 
     /**
       * Given a NodeMetrics it returns the Cpu data if the nodeMetrics contains
@@ -550,28 +518,25 @@ object StandardMetrics {
       * @return if possible a tuple matching the Cpu constructor parameters
       */
     def unapply(nodeMetrics: NodeMetrics)
-      : Option[(Address, Long, Option[Double], Option[Double], Int)] = {
-      for {
+      : Option[(Address, Long, Option[Double], Option[Double], Int)] =
+      for
         processors ← nodeMetrics.metric(Processors)
-      } yield
+      yield
         (nodeMetrics.address,
          nodeMetrics.timestamp,
          nodeMetrics.metric(SystemLoadAverage).map(_.smoothValue),
          nodeMetrics.metric(CpuCombined).map(_.smoothValue),
          processors.value.intValue)
-    }
-  }
 
   /**
     * Java API to extract Cpu data from nodeMetrics, if the nodeMetrics
     * contains necessary cpu metrics, otherwise it returns null.
     */
-  def extractCpu(nodeMetrics: NodeMetrics): Cpu = nodeMetrics match {
+  def extractCpu(nodeMetrics: NodeMetrics): Cpu = nodeMetrics match
     case Cpu(address, timestamp, systemLoadAverage, cpuCombined, processors) ⇒
       // note that above extractor returns tuple
       Cpu(address, timestamp, systemLoadAverage, cpuCombined, processors)
     case _ ⇒ null
-  }
 
   /**
     * @param address [[akka.actor.Address]] of the node the metrics are gathered at
@@ -588,16 +553,13 @@ object StandardMetrics {
                        timestamp: Long,
                        systemLoadAverage: Option[Double],
                        cpuCombined: Option[Double],
-                       processors: Int) {
+                       processors: Int)
 
-    cpuCombined match {
+    cpuCombined match
       case Some(x) ⇒
         require(0.0 <= x && x <= 1.0,
                 s"cpuCombined must be between [0.0 - 1.0], was [$x]")
       case None ⇒
-    }
-  }
-}
 
 /**
   * INTERNAL API
@@ -605,22 +567,21 @@ object StandardMetrics {
   * Encapsulates evaluation of validity of metric values, conversion of an actual metric value to
   * a [[akka.cluster.Metric]] for consumption by subscribed cluster entities.
   */
-private[cluster] trait MetricNumericConverter {
+private[cluster] trait MetricNumericConverter
 
   /**
     * An defined value is neither negative nor NaN/Infinite:
     * <ul><li>JMX system load average and max heap can be 'undefined' for certain OS, in which case a -1 is returned</li>
     * <li>SIGAR combined CPU can occasionally return a NaN or Infinite (known bug)</li></ul>
     */
-  def defined(value: Number): Boolean = convertNumber(value) match {
+  def defined(value: Number): Boolean = convertNumber(value) match
     case Left(a) ⇒ a >= 0
     case Right(b) ⇒ !(b < 0.0 || b.isNaN || b.isInfinite)
-  }
 
   /**
     * May involve rounding or truncation.
     */
-  def convertNumber(from: Any): Either[Long, Double] = from match {
+  def convertNumber(from: Any): Either[Long, Double] = from match
     case n: Int ⇒ Left(n)
     case n: Long ⇒ Left(n)
     case n: Double ⇒ Right(n)
@@ -628,15 +589,13 @@ private[cluster] trait MetricNumericConverter {
     case n: BigInt ⇒ Left(n.longValue)
     case n: BigDecimal ⇒ Right(n.doubleValue)
     case x ⇒ throw new IllegalArgumentException(s"Not a number [$x]")
-  }
-}
 
 /**
   * Implementations of cluster system metrics extends this trait.
   */
 @deprecated(
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
-trait MetricsCollector extends Closeable {
+trait MetricsCollector extends Closeable
 
   /**
     * Samples and collects new data points.
@@ -644,7 +603,6 @@ trait MetricsCollector extends Closeable {
     * current metrics for this node.
     */
   def sample(): NodeMetrics
-}
 
 /**
   * Loads JVM and system metrics through JMX monitoring beans.
@@ -655,7 +613,7 @@ trait MetricsCollector extends Closeable {
 @deprecated(
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
 class JmxMetricsCollector(address: Address, decayFactor: Double)
-    extends MetricsCollector {
+    extends MetricsCollector
   import StandardMetrics._
 
   private def this(cluster: Cluster) =
@@ -681,14 +639,13 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     */
   def sample(): NodeMetrics = NodeMetrics(address, newTimestamp, metrics)
 
-  def metrics: Set[Metric] = {
+  def metrics: Set[Metric] =
     val heap = heapMemoryUsage
     Set(systemLoadAverage,
         heapUsed(heap),
         heapCommitted(heap),
         heapMax(heap),
         processors).flatten
-  }
 
   /**
     * JMX Returns the OS-specific average load on the CPUs in the system, for the past 1 minute.
@@ -745,7 +702,6 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
         name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
 
   override def close(): Unit = ()
-}
 
 /**
   * Loads metrics through Hyperic SIGAR and JMX monitoring beans. This
@@ -763,7 +719,7 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     "Superseded by akka.cluster.metrics (in akka-cluster-metrics jar)", "2.4")
 class SigarMetricsCollector(
     address: Address, decayFactor: Double, sigar: AnyRef)
-    extends JmxMetricsCollector(address, decayFactor) {
+    extends JmxMetricsCollector(address, decayFactor)
 
   import StandardMetrics._
 
@@ -791,25 +747,22 @@ class SigarMetricsCollector(
 
   // Do something initially, in constructor, to make sure that the native library can be loaded.
   // This will by design throw exception if sigar isn't usable
-  val pid: Long = createMethodFrom(sigar, "getPid") match {
+  val pid: Long = createMethodFrom(sigar, "getPid") match
     case Some(method) ⇒
-      try method.invoke(sigar).asInstanceOf[Long] catch {
+      try method.invoke(sigar).asInstanceOf[Long] catch
         case e: InvocationTargetException
             if e.getCause.isInstanceOf[LinkageError] ⇒
           // native libraries not in place
           // don't throw fatal LinkageError, but something harmless
           throw new IllegalArgumentException(e.getCause.toString)
         case e: InvocationTargetException ⇒ throw e.getCause
-      }
     case None ⇒
       throw new IllegalArgumentException(
           "Wrong version of Sigar, expected 'getPid' method")
-  }
 
-  override def metrics: Set[Metric] = {
+  override def metrics: Set[Metric] =
     super.metrics.filterNot(_.name == SystemLoadAverage) union Set(
         systemLoadAverage, cpuCombined).flatten
-  }
 
   /**
     * (SIGAR / JMX) Returns the OS-specific average load on the CPUs in the system, for the past 1 minute.
@@ -856,7 +809,6 @@ class SigarMetricsCollector(
       method: String,
       types: Array[(Class[_])] = EmptyClassArray): Option[Method] =
     Try(ref.getClass.getMethod(method, types: _*)).toOption
-}
 
 /**
   * INTERNAL API
@@ -864,13 +816,13 @@ class SigarMetricsCollector(
   * If instantiation of SigarMetricsCollector fails (missing class or native library)
   * it falls back to use JmxMetricsCollector.
   */
-private[cluster] object MetricsCollector {
+private[cluster] object MetricsCollector
   def apply(system: ExtendedActorSystem,
-            settings: ClusterSettings): MetricsCollector = {
+            settings: ClusterSettings): MetricsCollector =
     import settings.{MetricsCollectorClass ⇒ fqcn}
     def log = Logging(system, getClass.getName)
-    if (fqcn == classOf[SigarMetricsCollector].getName) {
-      Try(new SigarMetricsCollector(system)) match {
+    if (fqcn == classOf[SigarMetricsCollector].getName)
+      Try(new SigarMetricsCollector(system)) match
         case Success(sigarCollector) ⇒ sigarCollector
         case Failure(e) ⇒
           Cluster(system).InfoLogger.logInfo(
@@ -879,18 +831,13 @@ private[cluster] object MetricsCollector {
               "platform-specific native libary to 'java.library.path'. Reason: " +
               e.toString)
           new JmxMetricsCollector(system)
-      }
-    } else {
+    else
       system.dynamicAccess
         .createInstanceFor[MetricsCollector](
             fqcn, List(classOf[ActorSystem] -> system))
-        .recover {
+        .recover
           case e ⇒
             throw new ConfigurationException(
                 "Could not create custom metrics collector [" + fqcn +
                 "] due to:" + e.toString)
-        }
         .get
-    }
-  }
-}

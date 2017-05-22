@@ -29,26 +29,24 @@ import breeze.linalg.{DenseVector, Vector}
   * please refer to either org.apache.spark.mllib.classification.LogisticRegressionWithSGD or
   * org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS based on your needs.
   */
-object LocalFileLR {
+object LocalFileLR
   val D = 10 // Number of dimensions
   val rand = new Random(42)
 
   case class DataPoint(x: Vector[Double], y: Double)
 
-  def parsePoint(line: String): DataPoint = {
+  def parsePoint(line: String): DataPoint =
     val nums = line.split(' ').map(_.toDouble)
     DataPoint(new DenseVector(nums.slice(1, D + 1)), nums(0))
-  }
 
-  def showWarning() {
+  def showWarning()
     System.err.println("""WARN: This is a naive implementation of Logistic Regression and is given as an example!
         |Please use either org.apache.spark.mllib.classification.LogisticRegressionWithSGD or
         |org.apache.spark.mllib.classification.LogisticRegressionWithLBFGS
         |for more conventional use.
       """.stripMargin)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     showWarning()
 
@@ -60,17 +58,13 @@ object LocalFileLR {
     var w = DenseVector.fill(D) { 2 * rand.nextDouble - 1 }
     println("Initial w: " + w)
 
-    for (i <- 1 to ITERATIONS) {
+    for (i <- 1 to ITERATIONS)
       println("On iteration " + i)
       var gradient = DenseVector.zeros[Double](D)
-      for (p <- points) {
+      for (p <- points)
         val scale = (1 / (1 + math.exp(-p.y * (w.dot(p.x)))) - 1) * p.y
         gradient += p.x * scale
-      }
       w -= gradient
-    }
 
     println("Final w: " + w)
-  }
-}
 // scalastyle:on println

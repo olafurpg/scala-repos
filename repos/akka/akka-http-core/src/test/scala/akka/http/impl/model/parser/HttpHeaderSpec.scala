@@ -18,14 +18,14 @@ import HttpEncodings._
 import HttpMethods._
 import java.net.InetAddress
 
-class HttpHeaderSpec extends FreeSpec with Matchers {
+class HttpHeaderSpec extends FreeSpec with Matchers
   val `application/vnd.spray` =
     MediaType.applicationBinary("vnd.spray", MediaType.Compressible)
   val PROPFIND = HttpMethod.custom("PROPFIND")
 
-  "The HTTP header model must correctly parse and render the headers" - {
+  "The HTTP header model must correctly parse and render the headers" -
 
-    "Accept" in {
+    "Accept" in
       "Accept: audio/midi;q=0.2, audio/basic" =!= Accept(
           `audio/midi` withQValue 0.2, `audio/basic`)
       "Accept: text/plain;q=0.5, text/html,\r\n text/css;q=0.8" =!= Accept(
@@ -51,9 +51,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                                  "*+xml",
                                  MediaType.Compressible,
                                  params = Map("version" -> "2")))
-    }
 
-    "Accept-Charset" in {
+    "Accept-Charset" in
       "Accept-Charset: *" =!= `Accept-Charset`(HttpCharsetRange.`*`)
       "Accept-Charset: UTF-8" =!= `Accept-Charset`(`UTF-8`)
       "Accept-Charset: utf16;q=1" =!= `Accept-Charset`(`UTF-16`).renderedTo(
@@ -69,72 +68,61 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       `Accept-Charset`(`UTF-16` withQValue 0.234567).toString shouldEqual "Accept-Charset: UTF-16;q=0.235"
       "Accept-Charset: UTF-16, unsupported42" =!= `Accept-Charset`(
           `UTF-16`, HttpCharset.custom("unsupported42"))
-    }
 
-    "Access-Control-Allow-Credentials" in {
+    "Access-Control-Allow-Credentials" in
       "Access-Control-Allow-Credentials: true" =!= `Access-Control-Allow-Credentials`(
           allow = true)
-    }
 
-    "Access-Control-Allow-Headers" in {
+    "Access-Control-Allow-Headers" in
       "Access-Control-Allow-Headers: Accept, X-My-Header" =!= `Access-Control-Allow-Headers`(
           "Accept", "X-My-Header")
-    }
 
-    "Access-Control-Allow-Methods" in {
+    "Access-Control-Allow-Methods" in
       "Access-Control-Allow-Methods: GET, POST" =!= `Access-Control-Allow-Methods`(
           GET, POST)
       "Access-Control-Allow-Methods: GET, PROPFIND, POST" =!= `Access-Control-Allow-Methods`(
           GET, PROPFIND, POST)
-    }
 
-    "Access-Control-Allow-Origin" in {
+    "Access-Control-Allow-Origin" in
       "Access-Control-Allow-Origin: *" =!= `Access-Control-Allow-Origin`.`*`
       "Access-Control-Allow-Origin: null" =!= `Access-Control-Allow-Origin`.`null`
       "Access-Control-Allow-Origin: http://spray.io" =!= `Access-Control-Allow-Origin`(
           "http://spray.io")
       "Access-Control-Allow-Origin: http://akka.io http://spray.io" =!= `Access-Control-Allow-Origin`
         .forRange(HttpOriginRange("http://akka.io", "http://spray.io"))
-    }
 
-    "Access-Control-Expose-Headers" in {
+    "Access-Control-Expose-Headers" in
       "Access-Control-Expose-Headers: Accept, X-My-Header" =!= `Access-Control-Expose-Headers`(
           "Accept", "X-My-Header")
-    }
 
-    "Access-Control-Max-Age" in {
+    "Access-Control-Max-Age" in
       "Access-Control-Max-Age: 3600" =!= `Access-Control-Max-Age`(3600)
-    }
 
-    "Access-Control-Request-Headers" in {
+    "Access-Control-Request-Headers" in
       "Access-Control-Request-Headers: Accept, X-My-Header" =!= `Access-Control-Request-Headers`(
           "Accept", "X-My-Header")
-    }
 
-    "Access-Control-Request-Method" in {
+    "Access-Control-Request-Method" in
       "Access-Control-Request-Method: POST" =!= `Access-Control-Request-Method`(
           POST)
       "Access-Control-Request-Method: PROPFIND" =!= `Access-Control-Request-Method`(
           PROPFIND)
-    }
 
-    "Accept-Ranges" in {
+    "Accept-Ranges" in
       "Accept-Ranges: bytes" =!= `Accept-Ranges`(RangeUnits.Bytes)
       "Accept-Ranges: bytes, sausages" =!= `Accept-Ranges`(
           RangeUnits.Bytes, RangeUnits.Other("sausages"))
       "Accept-Ranges: none" =!= `Accept-Ranges`()
-    }
 
-    "Accept-Encoding" in {
+    "Accept-Encoding" in
       "Accept-Encoding: compress, gzip, fancy" =!= `Accept-Encoding`(
           compress, gzip, HttpEncoding.custom("fancy"))
       "Accept-Encoding: gzip, identity;q=0.5, *;q=0.0" =!= `Accept-Encoding`(
           gzip, identity withQValue 0.5, HttpEncodingRange.`*` withQValue 0)
         .renderedTo("gzip, identity;q=0.5, *;q=0.0")
       "Accept-Encoding: " =!= `Accept-Encoding`()
-    }
 
-    "Accept-Language" in {
+    "Accept-Language" in
       "Accept-Language: da, en-gb;q=0.8, en;q=0.7" =!= `Accept-Language`(
           Language("da"),
           Language("en", "gb") withQValue 0.8f,
@@ -143,19 +131,16 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           Language("de", "CH", "1901"), LanguageRange.`*` withQValue 0f)
       "Accept-Language: es-419, es" =!= `Accept-Language`(
           Language("es", "419"), Language("es"))
-    }
 
-    "Age" in {
+    "Age" in
       "Age: 3600" =!= Age(3600)
-    }
 
-    "Allow" in {
+    "Allow" in
       "Allow: " =!= Allow()
       "Allow: GET, PUT" =!= Allow(GET, PUT)
       "Allow: GET, PROPFIND, PUT" =!= Allow(GET, PROPFIND, PUT)
-    }
 
-    "Authorization" in {
+    "Authorization" in
       BasicHttpCredentials("Aladdin", "open sesame").token shouldEqual "QWxhZGRpbjpvcGVuIHNlc2FtZQ=="
       "Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==" =!= Authorization(
           BasicHttpCredentials("Aladdin", "open sesame"))
@@ -181,9 +166,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           "Illegal HTTP header 'Authorization': Invalid input '=', expected auth-param, OWS, token68, 'EOI' or tchar (line 1, column 23)",
           """QVFJQzV3TTJMWTRTZmN3Zk=
             |                      ^""".stripMarginWithNewline("\n"))
-    }
 
-    "Cache-Control" in {
+    "Cache-Control" in
       "Cache-Control: no-cache, max-age=0" =!= `Cache-Control`(`no-cache`,
                                                                `max-age`(0))
       "Cache-Control: private=\"Some-Field\"" =!= `Cache-Control`(
@@ -202,34 +186,29 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           `no-cache`("Set-Cookie")).renderedTo("no-cache=\"Set-Cookie\"")
       "Cache-Control: private=\"a,b\", no-cache" =!= `Cache-Control`(
           `private`("a", "b"), `no-cache`)
-    }
 
-    "Connection" in {
+    "Connection" in
       "Connection: close" =!= Connection("close")
       "Connection: pipapo, close" =!= Connection("pipapo", "close")
-    }
 
-    "Content-Disposition" in {
+    "Content-Disposition" in
       "Content-Disposition: form-data" =!= `Content-Disposition`(
           ContentDispositionTypes.`form-data`)
       "Content-Disposition: attachment; name=field1; filename=\"file/txt\"" =!= `Content-Disposition`(
           ContentDispositionTypes.attachment,
           Map("name" -> "field1", "filename" -> "file/txt"))
-    }
 
-    "Content-Encoding" in {
+    "Content-Encoding" in
       "Content-Encoding: gzip" =!= `Content-Encoding`(gzip)
       "Content-Encoding: compress, pipapo" =!= `Content-Encoding`(
           compress, HttpEncoding.custom("pipapo"))
-    }
 
-    "Content-Length" in {
+    "Content-Length" in
       "Content-Length: 42" =!= `Content-Length`(42)
       "Content-Length: 12345678901234567890123456789" =!= `Content-Length`(
           999999999999999999L).renderedTo("999999999999999999")
-    }
 
-    "Content-Type" in {
+    "Content-Type" in
       "Content-Type: application/pdf" =!= `Content-Type`(`application/pdf`)
       "Content-Type: application/json" =!= `Content-Type`(`application/json`)
       "Content-Type: text/plain; charset=utf8" =!= `Content-Type`(
@@ -255,9 +234,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                                  "*",
                                  MediaType.Compressible,
                                  allowArbitrarySubtypes = true))
-    }
 
-    "Content-Range" in {
+    "Content-Range" in
       "Content-Range: bytes 42-1233/1234" =!= `Content-Range`(
           ContentRange(42, 1233, 1234))
       "Content-Range: bytes 42-1233/*" =!= `Content-Range`(
@@ -267,9 +245,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Content-Range: bytes */12345678901234567890123456789" =!= `Content-Range`(
           ContentRange.Unsatisfiable(999999999999999999L))
         .renderedTo("bytes */999999999999999999")
-    }
 
-    "Cookie (RFC 6265)" in {
+    "Cookie (RFC 6265)" in
       "Cookie: SID=31d4d96e407aad42" =!= Cookie("SID" -> "31d4d96e407aad42")
       "Cookie: SID=31d4d96e407aad42; lang=en>US" =!= Cookie(
           "SID" -> "31d4d96e407aad42", "lang" -> "en>US")
@@ -291,9 +268,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Cookie: a=1,2" =!= ErrorInfo(
           "Illegal HTTP header 'Cookie'",
           "Cookie header contained no parsable cookie values.")
-    }
 
-    "Cookie (Raw)" in {
+    "Cookie (Raw)" in
       "Cookie: SID=31d4d96e407aad42" =!= Cookie("SID" -> "31d4d96e407aad42")
         .withCookieParsingMode(CookieParsingMode.Raw)
       "Cookie: SID=31d4d96e407aad42; lang=en>US" =!= Cookie(
@@ -326,9 +302,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                                               HttpCookiePair.raw("b" -> "ä"),
                                               HttpCookiePair("c" -> "d")))
         .withCookieParsingMode(CookieParsingMode.Raw)
-    }
 
-    "Date" in {
+    "Date" in
       "Date: Wed, 13 Jul 2011 08:12:31 GMT" =!= Date(
           DateTime(2011, 7, 13, 8, 12, 31))
       "Date: Wed, 13-Jul-2011 08:12:31 GMT" =!= Date(
@@ -343,25 +318,21 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Date: Fri, 23 Mar 1804 12:11:10 UTC" =!= Date(
           DateTime(1804, 3, 23, 12, 11, 10))
         .renderedTo("Fri, 23 Mar 1804 12:11:10 GMT")
-    }
 
-    "ETag" in {
+    "ETag" in
       """ETag: "938fz3f83z3z38z"""" =!= ETag("938fz3f83z3z38z", weak = false)
       """ETag: W/"938fz3f83z3z38z"""" =!= ETag("938fz3f83z3z38z", weak = true)
-    }
 
-    "Expect" in {
+    "Expect" in
       "Expect: 100-continue" =!= Expect.`100-continue`
-    }
 
-    "Expires" in {
+    "Expires" in
       "Expires: Wed, 13 Jul 2011 08:12:31 GMT" =!= Expires(
           DateTime(2011, 7, 13, 8, 12, 31))
       "Expires: 0" =!= Expires(DateTime.MinValue)
         .renderedTo("Wed, 01 Jan 1800 00:00:00 GMT")
-    }
 
-    "Host" in {
+    "Host" in
       "Host: www.spray.io:8080" =!= Host("www.spray.io", 8080)
       "Host: spray.io" =!= Host("spray.io")
       "Host: [2001:db8::1]:8080" =!= Host("[2001:db8::1]", 8080)
@@ -370,24 +341,21 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Host: spray.io:80000" =!= ErrorInfo(
           "Illegal HTTP header 'Host': requirement failed",
           "Illegal port: 80000")
-    }
 
-    "If-Match" in {
+    "If-Match" in
       """If-Match: *""" =!= `If-Match`.`*`
       """If-Match: "938fz3f83z3z38z"""" =!= `If-Match`(
           EntityTag("938fz3f83z3z38z"))
       """If-Match: "938fz3f83z3z38z", "0293f34hhv0nc"""" =!= `If-Match`(
           EntityTag("938fz3f83z3z38z"), EntityTag("0293f34hhv0nc"))
-    }
 
-    "If-Modified-Since" in {
+    "If-Modified-Since" in
       "If-Modified-Since: Wed, 13 Jul 2011 08:12:31 GMT" =!= `If-Modified-Since`(
           DateTime(2011, 7, 13, 8, 12, 31))
       "If-Modified-Since: 0" =!= `If-Modified-Since`(DateTime.MinValue)
         .renderedTo("Wed, 01 Jan 1800 00:00:00 GMT")
-    }
 
-    "If-None-Match" in {
+    "If-None-Match" in
       """If-None-Match: *""" =!= `If-None-Match`.`*`
       """If-None-Match: "938fz3f83z3z38z"""" =!= `If-None-Match`(
           EntityTag("938fz3f83z3z38z"))
@@ -395,25 +363,21 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           EntityTag("938fz3f83z3z38z"), EntityTag("0293f34hhv0nc"))
       """If-None-Match: W/"938fz3f83z3z38z"""" =!= `If-None-Match`(
           EntityTag("938fz3f83z3z38z", weak = true))
-    }
 
-    "If-Range" in {
+    "If-Range" in
       """If-Range: "abcdefg"""" =!= `If-Range`(Left(EntityTag("abcdefg")))
       """If-Range: Wed, 13 Jul 2011 08:12:31 GMT""" =!= `If-Range`(
           Right(DateTime(2011, 7, 13, 8, 12, 31)))
-    }
 
-    "If-Unmodified-Since" in {
+    "If-Unmodified-Since" in
       "If-Unmodified-Since: Wed, 13 Jul 2011 08:12:31 GMT" =!= `If-Unmodified-Since`(
           DateTime(2011, 7, 13, 8, 12, 31))
-    }
 
-    "Last-Modified" in {
+    "Last-Modified" in
       "Last-Modified: Wed, 13 Jul 2011 08:12:31 GMT" =!= `Last-Modified`(
           DateTime(2011, 7, 13, 8, 12, 31))
-    }
 
-    "Location" in {
+    "Location" in
       "Location: https://spray.io/secure" =!= Location(
           Uri("https://spray.io/secure"))
       "Location: /en-us/default.aspx" =!= Location(Uri("/en-us/default.aspx"))
@@ -424,9 +388,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           "Illegal HTTP header 'Location': Invalid input ' ', " +
           "expected '/', 'EOI', '#', segment or '?' (line 1, column 18)",
           "https://spray.io/ sec\n                 ^")
-    }
 
-    "Link" in {
+    "Link" in
       "Link: </?page=2>; rel=next" =!= Link(Uri("/?page=2"), LinkParams.next)
       "Link: <https://spray.io>; rel=next" =!= Link(Uri("https://spray.io"),
                                                     LinkParams.next)
@@ -467,26 +430,22 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
 
       // only one 'rel=' is allowed, http://tools.ietf.org/html/rfc5988#section-5.3 requires any subsequent ones to be skipped
       "Link: </>; rel=prev; rel=next" =!=> "</>; rel=prev"
-    }
 
-    "Origin" in {
+    "Origin" in
       "Origin: null" =!= Origin(Nil)
       "Origin: http://spray.io" =!= Origin("http://spray.io")
-    }
 
-    "Proxy-Authenticate" in {
+    "Proxy-Authenticate" in
       "Proxy-Authenticate: Basic realm=\"WallyWorld\",attr=\"val>ue\", Fancy realm=\"yeah\"" =!= `Proxy-Authenticate`(
           HttpChallenge("Basic", "WallyWorld", Map("attr" -> "val>ue")),
           HttpChallenge("Fancy", "yeah"))
-    }
 
-    "Proxy-Authorization" in {
+    "Proxy-Authorization" in
       """Proxy-Authorization: Fancy yes=no,nonce="4\\2"""" =!= `Proxy-Authorization`(
           GenericHttpCredentials("Fancy",
                                  Map("yes" -> "no", "nonce" -> """4\2""")))
-    }
 
-    "Referer" in {
+    "Referer" in
       "Referer: https://spray.io/secure" =!= Referer(
           Uri("https://spray.io/secure"))
       "Referer: /en-us/default.aspx?foo=bar" =!= Referer(
@@ -494,42 +453,36 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "Referer: https://akka.io/#sec" =!= ErrorInfo(
           "Illegal HTTP header 'Referer': requirement failed",
           "Referer header URI must not contain a fragment")
-    }
 
-    "Server" in {
+    "Server" in
       "Server: as fghf.fdf/xx" =!= `Server`(
           Vector(ProductVersion("as"), ProductVersion("fghf.fdf", "xx")))
-    }
 
-    "Strict-Transport-Security" in {
+    "Strict-Transport-Security" in
       "Strict-Transport-Security: max-age=31536000" =!= `Strict-Transport-Security`(
           maxAge = 31536000)
       "Strict-Transport-Security: max-age=31536000" =!= `Strict-Transport-Security`(
           maxAge = 31536000, includeSubDomains = false)
       "Strict-Transport-Security: max-age=31536000; includeSubDomains" =!= `Strict-Transport-Security`(
           maxAge = 31536000, includeSubDomains = true)
-    }
 
-    "Transfer-Encoding" in {
+    "Transfer-Encoding" in
       "Transfer-Encoding: chunked" =!= `Transfer-Encoding`(
           TransferEncodings.chunked)
       "Transfer-Encoding: gzip" =!= `Transfer-Encoding`(TransferEncodings.gzip)
-    }
 
-    "Range" in {
+    "Range" in
       "Range: bytes=0-1" =!= Range(ByteRange(0, 1))
       "Range: bytes=0-" =!= Range(ByteRange.fromOffset(0))
       "Range: bytes=-1" =!= Range(ByteRange.suffix(1))
       "Range: bytes=0-1, 2-3, -99" =!= Range(ByteRange(0, 1),
                                              ByteRange(2, 3),
                                              ByteRange.suffix(99))
-    }
 
-    "Sec-WebSocket-Accept" in {
+    "Sec-WebSocket-Accept" in
       "Sec-WebSocket-Accept: ZGgwOTM0Z2owcmViamRvcGcK" =!= `Sec-WebSocket-Accept`(
           "ZGgwOTM0Z2owcmViamRvcGcK")
-    }
-    "Sec-WebSocket-Extensions" in {
+    "Sec-WebSocket-Extensions" in
       "Sec-WebSocket-Extensions: abc" =!= `Sec-WebSocket-Extensions`(
           Vector(WebSocketExtension("abc")))
       "Sec-WebSocket-Extensions: abc, def" =!= `Sec-WebSocket-Extensions`(
@@ -554,27 +507,23 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                                         "server_max_window_bits" -> "10")),
                  WebSocketExtension("permessage-deflate",
                                     Map("client_max_window_bits" -> ""))))
-    }
-    "Sec-WebSocket-Key" in {
+    "Sec-WebSocket-Key" in
       "Sec-WebSocket-Key: c2Zxb3JpbmgyMzA5dGpoMDIzOWdlcm5vZ2luCg==" =!= `Sec-WebSocket-Key`(
           "c2Zxb3JpbmgyMzA5dGpoMDIzOWdlcm5vZ2luCg==")
-    }
-    "Sec-WebSocket-Protocol" in {
+    "Sec-WebSocket-Protocol" in
       "Sec-WebSocket-Protocol: chat" =!= `Sec-WebSocket-Protocol`(
           Vector("chat"))
       "Sec-WebSocket-Protocol: chat, superchat" =!= `Sec-WebSocket-Protocol`(
           Vector("chat", "superchat"))
-    }
-    "Sec-WebSocket-Version" in {
+    "Sec-WebSocket-Version" in
       "Sec-WebSocket-Version: 25" =!= `Sec-WebSocket-Version`(Vector(25))
       "Sec-WebSocket-Version: 13, 8, 7" =!= `Sec-WebSocket-Version`(
           Vector(13, 8, 7))
 
       "Sec-WebSocket-Version: 255" =!= `Sec-WebSocket-Version`(Vector(255))
       "Sec-WebSocket-Version: 0" =!= `Sec-WebSocket-Version`(Vector(0))
-    }
 
-    "Set-Cookie" in {
+    "Set-Cookie" in
       "Set-Cookie: SID=\"31d4d96e407aad42\"" =!= `Set-Cookie`(
           HttpCookie("SID", "31d4d96e407aad42"))
         .renderedTo("SID=31d4d96e407aad42")
@@ -707,27 +656,24 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                      path = Some("/"),
                      httpOnly = true)).renderedTo(
           "PLAY_FLASH=; Expires=Sun, 07 Dec 2014 22:48:47 GMT; Path=/; HttpOnly")
-    }
 
-    "Upgrade" in {
+    "Upgrade" in
       "Upgrade: abc, def" =!= Upgrade(
           Vector(UpgradeProtocol("abc"), UpgradeProtocol("def")))
       "Upgrade: abc, def/38.1" =!= Upgrade(
           Vector(UpgradeProtocol("abc"), UpgradeProtocol("def", Some("38.1"))))
 
       "Upgrade: websocket" =!= Upgrade(Vector(UpgradeProtocol("websocket")))
-    }
 
-    "User-Agent" in {
+    "User-Agent" in
       "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_3) AppleWebKit/537.31" =!= `User-Agent`(
           ProductVersion("Mozilla", "5.0", "Macintosh; Intel Mac OS X 10_8_3"),
           ProductVersion("AppleWebKit", "537.31"))
       "User-Agent: foo(bar)(baz)" =!= `User-Agent`(
           ProductVersion("foo", "", "bar"),
           ProductVersion(comment = "baz")).renderedTo("foo (bar) (baz)")
-    }
 
-    "WWW-Authenticate" in {
+    "WWW-Authenticate" in
       "WWW-Authenticate: Basic realm=\"WallyWorld\"" =!= `WWW-Authenticate`(
           HttpChallenge("Basic", "WallyWorld"))
       "WWW-Authenticate: BaSiC rEaLm=WallyWorld" =!= `WWW-Authenticate`(
@@ -753,9 +699,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
           HttpChallenge("Fancy", "yeah"))
       """WWW-Authenticate: Fancy realm="Secure Area",nonce=42""" =!= `WWW-Authenticate`(
           HttpChallenge("Fancy", "Secure Area", Map("nonce" -> "42")))
-    }
 
-    "X-Forwarded-For" in {
+    "X-Forwarded-For" in
       "X-Forwarded-For: 1.2.3.4" =!= `X-Forwarded-For`(
           remoteAddress("1.2.3.4"))
       "X-Forwarded-For: 234.123.5.6, 8.8.8.8" =!= `X-Forwarded-For`(
@@ -795,9 +740,8 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "X-Forwarded-For: 1.2.3.4, akka.io" =!= ErrorInfo(
           "Illegal HTTP header 'X-Forwarded-For': Invalid input 'k', expected HEXDIG, h8, ':', ch16o or cc (line 1, column 11)",
           "1.2.3.4, akka.io\n          ^")
-    }
 
-    "X-Real-Ip" in {
+    "X-Real-Ip" in
       "X-Real-Ip: 1.2.3.4" =!= `X-Real-Ip`(remoteAddress("1.2.3.4"))
       "X-Real-Ip: 2001:db8:cafe:0:0:0:0:17" =!= `X-Real-Ip`(
           remoteAddress("2001:db8:cafe:0:0:0:0:17"))
@@ -832,42 +776,34 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
       "X-Real-Ip: akka.io" =!= ErrorInfo(
           "Illegal HTTP header 'X-Real-Ip': Invalid input 'k', expected HEXDIG, h8, ':', ch16o or cc (line 1, column 2)",
           "akka.io\n ^")
-    }
 
-    "RawHeader" in {
+    "RawHeader" in
       "X-Space-Ranger: no, this rock!" =!= RawHeader("X-Space-Ranger",
                                                      "no, this rock!")
-    }
-  }
 
-  "The header parser should" - {
+  "The header parser should" -
     import HttpHeader._
-    "not accept illegal header names" in {
+    "not accept illegal header names" in
       parse("X:", "a") shouldEqual ParsingResult.Error(
           ErrorInfo("Illegal HTTP header name", "X:"))
       parse(" X", "a") shouldEqual ParsingResult.Error(
           ErrorInfo("Illegal HTTP header name", " X"))
-    }
-    "not accept illegal header values" in {
+    "not accept illegal header values" in
       parse("Foo", "ba\u0000r") shouldEqual ParsingResult.Error(ErrorInfo(
               "Illegal HTTP header value: Invalid input '\\u0000', expected field-value-char, FWS or 'EOI' (line 1, column 3)",
               "ba\u0000r\n  ^"))
-    }
-    "allow UTF8 characters in RawHeaders" in {
+    "allow UTF8 characters in RawHeaders" in
       parse("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép") shouldEqual ParsingResult
         .Ok(RawHeader("Flood-Resistant-Hammerdrill", "árvíztűrő ütvefúrógép"),
             Nil)
-    }
-    "compress value whitespace into single spaces and trim" in {
+    "compress value whitespace into single spaces and trim" in
       parse("Foo", " b  a \tr\t") shouldEqual ParsingResult.Ok(
           RawHeader("Foo", "b a r"), Nil)
-    }
-    "resolve obs-fold occurrences" in {
+    "resolve obs-fold occurrences" in
       parse("Foo", "b\r\n\ta \r\n r") shouldEqual ParsingResult.Ok(
           RawHeader("Foo", "b a r"), Nil)
-    }
 
-    "parse with custom uri parsing mode" in {
+    "parse with custom uri parsing mode" in
       val targetUri =
         Uri("http://example.org/?abc=def=ghi", Uri.ParsingMode.Relaxed)
       HeaderParser
@@ -876,62 +812,51 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
                    HeaderParser.Settings(
                        uriParsingMode = Uri.ParsingMode.Relaxed)) shouldEqual Right(
           Location(targetUri))
-    }
-  }
 
-  implicit class TestLine(line: String) {
+  implicit class TestLine(line: String)
     def =!=(testHeader: TestExample) = testHeader(line)
-    def =!=>(expectedRendering: String) = {
+    def =!=>(expectedRendering: String) =
       val Array(name, value) = line.split(": ", 2)
       val HttpHeader.ParsingResult.Ok(header, Nil) =
         HttpHeader.parse(name, value)
       header.toString shouldEqual header
         .renderedTo(expectedRendering)
         .rendering("")
-    }
-  }
   sealed trait TestExample extends (String ⇒ Unit)
-  implicit class TestHeader(val header: HttpHeader) extends TestExample {
+  implicit class TestHeader(val header: HttpHeader) extends TestExample
     outer ⇒
-    def apply(line: String) = {
+    def apply(line: String) =
       val Array(name, value) = line.split(": ", 2)
       HttpHeader.parse(name, value, settings) should
       (equal(HttpHeader.ParsingResult.Ok(header, Nil)) and renderFromHeaderTo(
               this, line))
-    }
     def rendering(line: String): String = line
     def settings: HeaderParser.Settings = HeaderParser.DefaultSettings
     def renderedTo(expectedRendering: String): TestHeader =
-      new TestHeader(header) {
+      new TestHeader(header)
         override def rendering(line: String): String =
-          header match {
+          header match
             case x: ModeledHeader ⇒ x.name + ": " + expectedRendering
             case _ ⇒ expectedRendering
-          }
 
         override def settings: Settings = outer.settings
-      }
     def withCookieParsingMode(mode: CookieParsingMode): TestHeader =
       withParserSettings(Settings(settings.uriParsingMode, mode))
 
     def withParserSettings(newSettings: HeaderParser.Settings): TestHeader =
-      new TestHeader(header) {
+      new TestHeader(header)
         override def rendering(line: String): String = outer.rendering(line)
         override def settings = newSettings
-      }
-  }
-  implicit class TestError(expectedError: ErrorInfo) extends TestExample {
-    def apply(line: String) = {
+  implicit class TestError(expectedError: ErrorInfo) extends TestExample
+    def apply(line: String) =
       val Array(name, value) = line.split(": ", 2)
       val HttpHeader.ParsingResult.Ok(_, error :: Nil) =
         HttpHeader.parse(name, value)
       error shouldEqual expectedError
-    }
-  }
 
   def renderFromHeaderTo(
       header: TestHeader, line: String): Matcher[HttpHeader.ParsingResult] =
-    Matcher {
+    Matcher
       case HttpHeader.ParsingResult.Ok(h, Nil) ⇒
         MatchResult(
             h.toString === header.rendering(line),
@@ -941,7 +866,5 @@ class HttpHeaderSpec extends FreeSpec with Matchers {
         val info = result.errors.head
         fail(
             s"Input `${header.header}` failed to parse:\n${info.summary}\n${info.detail}")
-    }
 
   def remoteAddress(ip: String) = RemoteAddress(InetAddress.getByName(ip))
-}

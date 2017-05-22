@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object PCAExample {
-  def main(args: Array[String]): Unit = {
+object PCAExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("PCAExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -49,6 +49,4 @@ object PCAExample {
     result.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

@@ -32,12 +32,12 @@ import javafx.{event => jfxe}
 import scala.language.implicitConversions
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 
-object TouchPoint {
+object TouchPoint
   implicit def sfxTouchPoint2jfx(tp: TouchPoint): jfxsi.TouchPoint =
     if (tp != null) tp.delegate else null
 
   object State
-      extends SFXEnumDelegateCompanion[jfxsi.TouchPoint.State, State] {
+      extends SFXEnumDelegateCompanion[jfxsi.TouchPoint.State, State]
 
     /**
       * The touch point has been moved
@@ -74,17 +74,15 @@ object TouchPoint {
 
     protected override def unsortedValues: Array[State] =
       Array(Moved, Pressed, Stationary, Released)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/TouchPoint.State.html]]
     */
   sealed case class State(override val delegate: jfxsi.TouchPoint.State)
       extends SFXEnumDelegate[jfxsi.TouchPoint.State]
-}
 
 class TouchPoint(override val delegate: jfxsi.TouchPoint)
-    extends SFXDelegate[jfxsi.TouchPoint] {
+    extends SFXDelegate[jfxsi.TouchPoint]
 
   /**
     * Distinguishes between touch points targeted to the given node or some of its children from touch points targeted
@@ -95,16 +93,14 @@ class TouchPoint(override val delegate: jfxsi.TouchPoint)
   /**
     * Grabs this touch point by current event source.
     */
-  def grab() {
+  def grab()
     delegate.grab()
-  }
 
   /**
     * Grabs this touch point by the given target.
     */
-  def grab(target: jfxe.EventTarget) {
+  def grab(target: jfxe.EventTarget)
     delegate.grab(target)
-  }
 
   /**
     * Gets event target which has grabbed this touch point.
@@ -161,7 +157,5 @@ class TouchPoint(override val delegate: jfxsi.TouchPoint)
   /**
     *
     */
-  def ungrab() {
+  def ungrab()
     delegate.ungrab()
-  }
-}

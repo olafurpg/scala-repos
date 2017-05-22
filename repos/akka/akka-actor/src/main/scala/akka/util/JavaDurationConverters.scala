@@ -8,12 +8,9 @@ import scala.concurrent.duration.Duration
 /**
   * INTERNAL API
   */
-private[akka] object JavaDurationConverters {
-  final implicit class JavaDurationOps(val self: JDuration) extends AnyVal {
+private[akka] object JavaDurationConverters
+  final implicit class JavaDurationOps(val self: JDuration) extends AnyVal
     def asScala: Duration = Duration.fromNanos(self.toNanos)
-  }
 
-  final implicit class ScalaDurationOps(val self: Duration) extends AnyVal {
+  final implicit class ScalaDurationOps(val self: Duration) extends AnyVal
     def asJava: JDuration = JDuration.ofNanos(self.toNanos)
-  }
-}

@@ -10,7 +10,7 @@ case class Note(_id: String,
                 date: DateTime)
 
 final class NoteApi(
-    coll: lila.db.Types.Coll, timeline: akka.actor.ActorSelection) {
+    coll: lila.db.Types.Coll, timeline: akka.actor.ActorSelection)
 
   import reactivemongo.bson._
   import lila.db.BSON.BSONJodaDateTimeHandler
@@ -28,7 +28,7 @@ final class NoteApi(
       .cursor[Note]()
       .collect[List](100)
 
-  def write(to: User, text: String, from: User) = {
+  def write(to: User, text: String, from: User) =
 
     val note = Note(_id = ornicar.scalalib.Random nextStringUppercase 8,
                     from = from.id,
@@ -42,5 +42,3 @@ final class NoteApi(
     (Propagate(NoteCreate(note.from, note.to)) toFriendsOf from.id exceptUser note.to)
 
     coll insert note
-  }
-}

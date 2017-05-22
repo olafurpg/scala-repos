@@ -29,33 +29,26 @@ import java.util.Comparator
   *  @version 1.0, 2008-04-03
   *  @since 2.7
   */
-trait Equiv[T] extends Any with Serializable {
+trait Equiv[T] extends Any with Serializable
 
   /** Returns `true` iff `x` is equivalent to `y`.
     */
   def equiv(x: T, y: T): Boolean
-}
 
-trait LowPriorityEquiv { self: Equiv.type =>
+trait LowPriorityEquiv  self: Equiv.type =>
 
   implicit def universalEquiv[T]: Equiv[T] = universal[T]
-}
 
-object Equiv extends LowPriorityEquiv {
-  def reference[T <: AnyRef]: Equiv[T] = new Equiv[T] {
+object Equiv extends LowPriorityEquiv
+  def reference[T <: AnyRef]: Equiv[T] = new Equiv[T]
     def equiv(x: T, y: T) = x eq y
-  }
-  def universal[T]: Equiv[T] = new Equiv[T] {
+  def universal[T]: Equiv[T] = new Equiv[T]
     def equiv(x: T, y: T) = x == y
-  }
-  def fromComparator[T](cmp: Comparator[T]): Equiv[T] = new Equiv[T] {
+  def fromComparator[T](cmp: Comparator[T]): Equiv[T] = new Equiv[T]
     def equiv(x: T, y: T) = cmp.compare(x, y) == 0
-  }
-  def fromFunction[T](cmp: (T, T) => Boolean): Equiv[T] = new Equiv[T] {
+  def fromFunction[T](cmp: (T, T) => Boolean): Equiv[T] = new Equiv[T]
     def equiv(x: T, y: T) = cmp(x, y)
-  }
   def by[T, S : Equiv](f: T => S): Equiv[T] =
     fromFunction((x, y) => implicitly[Equiv[S]].equiv(f(x), f(y)))
 
   def apply[T : Equiv]: Equiv[T] = implicitly[Equiv[T]]
-}

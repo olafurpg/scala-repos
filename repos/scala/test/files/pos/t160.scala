@@ -1,3 +1,2 @@
-class Foo(s: String) {
+class Foo(s: String)
   def this() = { this("DEFAULT") }
-}

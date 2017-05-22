@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean
   * additionally implement an MBean trait that extends this trait so that the
   * registered MBean is compliant with the standard MBean convention.
   */
-trait KafkaMetricsReporterMBean {
+trait KafkaMetricsReporterMBean
   def startReporter(pollingPeriodInSeconds: Long)
   def stopReporter()
 
@@ -38,22 +38,19 @@ trait KafkaMetricsReporterMBean {
     * @return The name with which the MBean will be registered.
     */
   def getMBeanName: String
-}
 
-trait KafkaMetricsReporter {
+trait KafkaMetricsReporter
   def init(props: VerifiableProperties)
-}
 
-object KafkaMetricsReporter {
+object KafkaMetricsReporter
   val ReporterStarted: AtomicBoolean = new AtomicBoolean(false)
 
-  def startReporters(verifiableProps: VerifiableProperties) {
-    ReporterStarted synchronized {
-      if (!ReporterStarted.get()) {
+  def startReporters(verifiableProps: VerifiableProperties)
+    ReporterStarted synchronized
+      if (!ReporterStarted.get())
         val metricsConfig = new KafkaMetricsConfig(verifiableProps)
-        if (metricsConfig.reporters.size > 0) {
+        if (metricsConfig.reporters.size > 0)
           metricsConfig.reporters.foreach(reporterType =>
-                {
               val reporter =
                 CoreUtils.createObject[KafkaMetricsReporter](reporterType)
               reporter.init(verifiableProps)
@@ -63,10 +60,5 @@ object KafkaMetricsReporter {
                     reporter
                       .asInstanceOf[KafkaMetricsReporterMBean]
                       .getMBeanName)
-          })
+          )
           ReporterStarted.set(true)
-        }
-      }
-    }
-  }
-}

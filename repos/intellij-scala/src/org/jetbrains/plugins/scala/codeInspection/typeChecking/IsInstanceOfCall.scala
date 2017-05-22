@@ -6,20 +6,15 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.ScSyntheticF
 /**
   * @author Nikolay.Tropin
   */
-object IsInstanceOfCall {
-  def unapply(expression: ScExpression): Option[ScGenericCall] = {
-    expression match {
+object IsInstanceOfCall
+  def unapply(expression: ScExpression): Option[ScGenericCall] =
+    expression match
       case ScParenthesisedExpr(IsInstanceOfCall(call)) => Some(call)
       case call: ScGenericCall =>
-        call.referencedExpr match {
+        call.referencedExpr match
           case ref: ScReferenceExpression if ref.refName == "isInstanceOf" =>
-            ref.resolve() match {
+            ref.resolve() match
               case synth: ScSyntheticFunction => Some(call)
               case _ => None
-            }
           case _ => None
-        }
       case _ => None
-    }
-  }
-}

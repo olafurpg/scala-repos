@@ -3,7 +3,7 @@
   */
 package akka.cluster.ddata
 
-object Key {
+object Key
 
   /**
     * Extract the [[Key#id]].
@@ -11,7 +11,6 @@ object Key {
   def unapply(k: Key[_]): Option[String] = Some(k.id)
 
   private[akka] type KeyR = Key[ReplicatedData]
-}
 
 /**
   * Key for the key-value data in [[Replicator]]. The type of the data value
@@ -21,14 +20,12 @@ object Key {
   * Specific classes are provided for the built in data types, e.g. [[ORSetKey]],
   * and you can create your own keys.
   */
-abstract class Key[+T <: ReplicatedData](val id: String) extends Serializable {
+abstract class Key[+T <: ReplicatedData](val id: String) extends Serializable
 
-  override final def equals(o: Any): Boolean = o match {
+  override final def equals(o: Any): Boolean = o match
     case k: Key[_] ⇒ id == k.id
     case _ ⇒ false
-  }
 
   override final def hashCode: Int = id.hashCode
 
   override def toString(): String = id
-}

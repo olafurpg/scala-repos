@@ -35,18 +35,17 @@ private case class Render(js: JsCmd)
   * 
   * None of these requires explicit use of `buildDeferredFunction`.
   */
-class AsyncRenderComet extends MessageCometActor {
+class AsyncRenderComet extends MessageCometActor
 
   override def lifespan: Box[TimeSpan] = Full(90.seconds)
 
   // make this method visible so that we can initialize the actor
-  override def initCometActor(creationInfo: CometCreationInfo) {
+  override def initCometActor(creationInfo: CometCreationInfo)
     super.initCometActor(creationInfo)
-  }
 
   // FIXME add lifecycle management that will nuke the comet here and on the
   // FIXME client when nothing is left to compute
-  override def lowPriority: PartialFunction[Any, Unit] = {
+  override def lowPriority: PartialFunction[Any, Unit] =
     // farm the request off to another thread
     case Compute(js) =>
       Schedule.schedule(() => this ! Render(js()), 0.seconds)
@@ -54,10 +53,8 @@ class AsyncRenderComet extends MessageCometActor {
     // render it
     case Render(js) =>
       partialUpdate(js)
-  }
-}
 
-object AsyncRenderComet {
+object AsyncRenderComet
   private object pageAsyncRenderer
       extends TransientRequestVar[Box[AsyncRenderComet]](
           S.findOrCreateComet[AsyncRenderComet](
@@ -79,10 +76,9 @@ object AsyncRenderComet {
     * Returns a `Failure` if something went wrong with setting up the
     * asynchronous render.
     */
-  def setupAsync: Box[Unit] = {
+  def setupAsync: Box[Unit] =
     // Dereference to make sure the comet exists.
     pageAsyncRenderer.is.map(_ => ()) ?~! "Failed to create async renderer."
-  }
 
   /**
     * If you're going to be managing the asynchronicity of the render externally
@@ -95,9 +91,8 @@ object AsyncRenderComet {
     * Returns a `Failure` if something went wrong with looking up the
     * asynchronous renderer.
     */
-  def completeAsyncRender(command: JsCmd): Box[Unit] = {
+  def completeAsyncRender(command: JsCmd): Box[Unit] =
     pageAsyncRenderer.is.map(_ ! Render(command)) ?~! "Failed to create async renderer."
-  }
 
   /**
     * Render the given function on a separate thread and send the resulting
@@ -107,23 +102,19 @@ object AsyncRenderComet {
     * Returns a `Failure` if something went wrong with setting up the
     * asynchronous render.
     */
-  def asyncRender(renderFunction: () => JsCmd): Box[Unit] = {
-    for {
+  def asyncRender(renderFunction: () => JsCmd): Box[Unit] =
+    for
       session <- S.session ?~ "Asynchronous rendering requires a session context."
       renderer <- pageAsyncRenderer.is ?~! "Failed to create async renderer."
-    } yield {
+    yield
       renderer ! Compute(session.buildDeferredFunction(renderFunction))
-    }
-  }
 
   /**
     * Similar to `asyncRender`, but any wrapping of the function in a request
     * context is expected to be done before `renderFunction` is passed to this,
     * while `asyncRender` takes care of the wrapping for you.
     */
-  def asyncRenderDeferred(renderFunction: () => JsCmd): Box[Unit] = {
-    pageAsyncRenderer.is.map { renderer =>
+  def asyncRenderDeferred(renderFunction: () => JsCmd): Box[Unit] =
+    pageAsyncRenderer.is.map  renderer =>
       renderer ! Compute(renderFunction)
-    } ?~! "Failed to create async renderer."
-  }
-}
+    ?~! "Failed to create async renderer."

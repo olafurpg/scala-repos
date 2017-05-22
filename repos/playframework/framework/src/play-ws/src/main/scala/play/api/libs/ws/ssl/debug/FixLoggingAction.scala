@@ -16,13 +16,11 @@ import play.api.libs.ws.ssl.MonkeyPatcher
   */
 abstract class FixLoggingAction
     extends PrivilegedExceptionAction[Unit] with MonkeyPatcher
-    with ClassFinder {
+    with ClassFinder
 
   def newOptions: String
 
-  def isValidField(field: Field, definedType: Class[_]): Boolean = {
+  def isValidField(field: Field, definedType: Class[_]): Boolean =
     import java.lang.reflect.Modifier._
     val modifiers: Int = field.getModifiers
     field.getType == definedType && isStatic(modifiers)
-  }
-}

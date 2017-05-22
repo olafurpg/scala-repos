@@ -5,7 +5,7 @@ import java.util.Formatter
 
 class PrintStream private (
     _out: OutputStream, autoFlush: Boolean, charset: Charset)
-    extends FilterOutputStream(_out) with Appendable with Closeable {
+    extends FilterOutputStream(_out) with Appendable with Closeable
 
   /* The way we handle charsets here is a bit tricky, because we want to
    * minimize the area of reachability for normal programs.
@@ -50,7 +50,7 @@ class PrintStream private (
   def this(fileName: String, csn: String) =
     this(new File(fileName), csn)
 
-  private lazy val encoder = {
+  private lazy val encoder =
     val c =
       if (charset == null) Charset.defaultCharset
       else charset
@@ -60,7 +60,6 @@ class PrintStream private (
      * JDK behaves.
      */
     new OutputStreamWriter(this, c)
-  }
 
   private var closing: Boolean = false
   private var closed: Boolean = false
@@ -69,37 +68,33 @@ class PrintStream private (
   override def flush(): Unit =
     ensureOpenAndTrapIOExceptions(out.flush())
 
-  override def close(): Unit = trapIOExceptions {
-    if (!closing) {
+  override def close(): Unit = trapIOExceptions
+    if (!closing)
       closing = true
       encoder.close()
       flush()
       closed = true
       out.close()
-    }
-  }
 
-  def checkError(): Boolean = {
-    if (closed) {
+  def checkError(): Boolean =
+    if (closed)
       /* Just check the error flag.
        * Common sense would tell us to look at the underlying writer's
        * checkError() result too (like we do in the not closed case below).
        * But the JDK does not behave like that. So we don't either.
        */
       errorFlag
-    } else {
+    else
       flush()
       /* If the underlying writer is also a PrintStream, we also check its
        * checkError() result. This is not clearly specified by the JavaDoc,
        * but, experimentally, the JDK seems to behave that way.
        */
       errorFlag ||
-      (out match {
+      (out match
             case out: PrintStream => out.checkError()
             case _ => false
-          })
-    }
-  }
+          )
 
   protected[io] def setError(): Unit = errorFlag = true
   protected[io] def clearError(): Unit = errorFlag = false
@@ -121,19 +116,15 @@ class PrintStream private (
    * This is consistent with the behavior of the JDK.
    */
 
-  override def write(b: Int): Unit = {
-    ensureOpenAndTrapIOExceptions {
+  override def write(b: Int): Unit =
+    ensureOpenAndTrapIOExceptions
       out.write(b)
       if (autoFlush && b == '\n') flush()
-    }
-  }
 
-  override def write(buf: Array[Byte], off: Int, len: Int): Unit = {
-    ensureOpenAndTrapIOExceptions {
+  override def write(buf: Array[Byte], off: Int, len: Int): Unit =
+    ensureOpenAndTrapIOExceptions
       out.write(buf, off, len)
       if (autoFlush) flush()
-    }
-  }
 
   def print(b: Boolean): Unit = printString(String.valueOf(b))
   def print(c: Char): Unit = printString(String.valueOf(c))
@@ -144,21 +135,18 @@ class PrintStream private (
   def print(s: String): Unit = printString(if (s == null) "null" else s)
   def print(obj: AnyRef): Unit = printString(String.valueOf(obj))
 
-  private def printString(s: String): Unit = ensureOpenAndTrapIOExceptions {
+  private def printString(s: String): Unit = ensureOpenAndTrapIOExceptions
     encoder.write(s)
     encoder.flushBuffer()
-  }
 
-  def print(s: Array[Char]): Unit = ensureOpenAndTrapIOExceptions {
+  def print(s: Array[Char]): Unit = ensureOpenAndTrapIOExceptions
     encoder.write(s)
     encoder.flushBuffer()
-  }
 
-  def println(): Unit = ensureOpenAndTrapIOExceptions {
+  def println(): Unit = ensureOpenAndTrapIOExceptions
     encoder.write('\n') // In Scala.js the line separator is always LF
     encoder.flushBuffer()
     if (autoFlush) flush()
-  }
 
   def println(b: Boolean): Unit = { print(b); println() }
   def println(c: Char): Unit = { print(c); println() }
@@ -176,41 +164,33 @@ class PrintStream private (
   // Not implemented:
   //def printf(l: java.util.Locale, fmt: String, args: Array[Object]): PrintStream = ???
 
-  def format(fmt: String, args: Array[Object]): PrintStream = {
+  def format(fmt: String, args: Array[Object]): PrintStream =
     new Formatter(this).format(fmt, args)
     this
-  }
 
   // Not implemented:
   //def format(l: java.util.Locale, fmt: String, args: Array[Object]): PrintStream = ???
 
-  def append(csq: CharSequence): PrintStream = {
+  def append(csq: CharSequence): PrintStream =
     print(if (csq == null) "null" else csq.toString)
     this
-  }
 
-  def append(csq: CharSequence, start: Int, end: Int): PrintStream = {
+  def append(csq: CharSequence, start: Int, end: Int): PrintStream =
     val csq1 = if (csq == null) "null" else csq
     print(csq1.subSequence(start, end).toString)
     this
-  }
 
-  def append(c: Char): PrintStream = {
+  def append(c: Char): PrintStream =
     print(c)
     this
-  }
 
-  @inline private[this] def trapIOExceptions(body: => Unit): Unit = {
-    try {
+  @inline private[this] def trapIOExceptions(body: => Unit): Unit =
+    try
       body
-    } catch {
+    catch
       case _: IOException => setError()
-    }
-  }
 
   @inline private[this] def ensureOpenAndTrapIOExceptions(
-      body: => Unit): Unit = {
+      body: => Unit): Unit =
     if (closed) setError()
     else trapIOExceptions(body)
-  }
-}

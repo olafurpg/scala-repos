@@ -19,7 +19,7 @@ import scala.collection.{Iterator, AbstractIterator}
   */
 class BufferedSource(inputStream: InputStream, bufferSize: Int)(
     implicit val codec: Codec)
-    extends Source {
+    extends Source
   def this(inputStream: InputStream)(implicit codec: Codec) =
     this(inputStream, DefaultBufSize)(codec)
   def reader() = new InputStreamReader(inputStream, codec.decoder)
@@ -31,16 +31,15 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
   // to getLines if it creates a new reader, even though next() was
   // never called on the original.
   private var charReaderCreated = false
-  private lazy val charReader = {
+  private lazy val charReader =
     charReaderCreated = true
     bufferedReader()
-  }
 
   override lazy val iter =
     (Iterator continually (codec wrap charReader.read()) takeWhile (_ != -1) map
         (_.toChar))
 
-  private def decachedReader: BufferedReader = {
+  private def decachedReader: BufferedReader =
     // Don't want to lose a buffered char sitting in iter either. Yes,
     // this is ridiculous, but if I can't get rid of Source, and all the
     // Iterator bits are designed into Source, and people create Sources
@@ -52,46 +51,38 @@ class BufferedSource(inputStream: InputStream, bufferSize: Int)(
     // skip it if the char reader was never created: and almost always
     // it will not have been created, since getLines will be called
     // immediately on the source.
-    if (charReaderCreated && iter.hasNext) {
+    if (charReaderCreated && iter.hasNext)
       val pb = new PushbackReader(charReader)
       pb unread iter.next().toInt
       new BufferedReader(pb, bufferSize)
-    } else charReader
-  }
+    else charReader
 
   class BufferedLineIterator
-      extends AbstractIterator[String] with Iterator[String] {
+      extends AbstractIterator[String] with Iterator[String]
     private val lineReader = decachedReader
     var nextLine: String = null
 
-    override def hasNext = {
+    override def hasNext =
       if (nextLine == null) nextLine = lineReader.readLine
 
       nextLine != null
-    }
-    override def next(): String = {
-      val result = {
+    override def next(): String =
+      val result =
         if (nextLine == null) lineReader.readLine
         else try nextLine finally nextLine = null
-      }
       if (result == null) Iterator.empty.next()
       else result
-    }
-  }
 
   override def getLines(): Iterator[String] = new BufferedLineIterator
 
   /** Efficiently converts the entire remaining input into a string. */
-  override def mkString = {
+  override def mkString =
     // Speed up slurping of whole data set in the simplest cases.
     val allReader = decachedReader
     val sb = new StringBuilder
     val buf = new Array[Char](bufferSize)
     var n = 0
-    while (n != -1) {
+    while (n != -1)
       n = allReader.read(buf)
       if (n > 0) sb.appendAll(buf, 0, n)
-    }
     sb.result
-  }
-}

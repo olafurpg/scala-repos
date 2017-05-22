@@ -17,31 +17,27 @@
 package net.liftweb
 package common
 
-private[common] trait LinkedListElem[T1, T2] {
+private[common] trait LinkedListElem[T1, T2]
   private[common] var _prev: LinkedListElem[T1, T2] = null
   private[common] var _next: LinkedListElem[T1, T2] = null
   private[common] def value1: T1
   private[common] var value2: T2 = _
 
-  private[common] def remove {
+  private[common] def remove
     _prev._next = _next
     _next._prev = _prev
-  }
 
-  private[common] def addAtHead(what: LinkedListElem[T1, T2]) {
+  private[common] def addAtHead(what: LinkedListElem[T1, T2])
     what._next = _next
     what._prev = this
     _next._prev = what
     this._next = what
-  }
 
-  private[common] def addAtTail(what: LinkedListElem[T1, T2]) {
+  private[common] def addAtTail(what: LinkedListElem[T1, T2])
     what._prev = _prev
     what._next = this
     _prev._next = what
     this._prev = what
-  }
-}
 
 /**
   * Implements an LRU Hashmap. Given a size, this map will evict the least
@@ -59,7 +55,7 @@ private[common] trait LinkedListElem[T1, T2] {
   */
 class LRUMap[K, V](
     initMaxSize: Int, loadFactor: Box[Float], expiredFunc: ((K, V) => Unit)*)
-    extends LinkedListElem[K, V] {
+    extends LinkedListElem[K, V]
   import java.util.HashMap
 
   def this(size: Int) = this(size, Empty)
@@ -72,14 +68,12 @@ class LRUMap[K, V](
     * Updates the `LRUMap`'s current max size to `newMaxSize`, evicting the
     * oldest entries if the size has shrunk.
     */
-  def updateMaxSize(newMaxSize: Int) {
+  def updateMaxSize(newMaxSize: Int)
     val oldMaxSize = _maxSize
     _maxSize = newMaxSize
 
-    if (newMaxSize < oldMaxSize) {
+    if (newMaxSize < oldMaxSize)
       doRemoveIfTooMany()
-    }
-  }
 
   _prev = this
   _next = this
@@ -96,13 +90,12 @@ class LRUMap[K, V](
     *
     * Accessing a key this way will mark its value as most-recently-used.
     */
-  def get(key: K): Box[V] = localMap.get(key) match {
+  def get(key: K): Box[V] = localMap.get(key) match
     case null => Empty
     case v =>
       v.remove
       addAtHead(v)
       Full(v.value2)
-  }
 
   /**
     * Unsafe version of `[[get]]`.
@@ -129,14 +122,12 @@ class LRUMap[K, V](
   /**
     * Alias for `[[-]]`.
     */
-  def remove(key: K) {
-    localMap.get(key) match {
+  def remove(key: K)
+    localMap.get(key) match
       case null =>
       case v =>
         v.remove
         localMap.remove(key)
-    }
-  }
 
   /**
     * Set the `value` for the given `key` in the map.
@@ -145,8 +136,8 @@ class LRUMap[K, V](
     * new in the map and the map has grown beyond the specifiex `[[maxSize]]`,
     * evicts the least-recently-used entries.
     */
-  def update(key: K, value: V) {
-    localMap.get(key) match {
+  def update(key: K, value: V)
+    localMap.get(key) match
       case null =>
         val what = new LinkedListElem[K, V] { def value1 = key }
         what.value2 = value
@@ -159,34 +150,28 @@ class LRUMap[K, V](
         v.remove
         addAtHead(v)
         v.value2 = value
-    }
-  }
 
   /**
     * Override this method to implement a test to see if a particular
     * element can be expired from the cache.
     */
-  protected def canExpire(k: K, v: V): Boolean = {
+  protected def canExpire(k: K, v: V): Boolean =
     true
-  }
 
   /**
     * A mechanism for expiring elements from cache. This method can devolve into
     * O(n ^ 2) if lots of elements can't be expired.
     */
-  private def doRemoveIfTooMany() {
-    while (localMap.size > maxSize) {
+  private def doRemoveIfTooMany()
+    while (localMap.size > maxSize)
       var toRemove = _prev
-      while (!canExpire(toRemove.value1, toRemove.value2)) {
+      while (!canExpire(toRemove.value1, toRemove.value2))
         toRemove = toRemove._prev
         if (toRemove eq this) return
-      }
       toRemove.remove
       localMap.remove(toRemove.value1)
       expired(toRemove.value1, toRemove.value2)
       expiredFunc.foreach(_ (toRemove.value1, toRemove.value2))
-    }
-  }
 
   /**
     * Called when a key/value pair is removed, before the `expiredFunc`.
@@ -197,16 +182,12 @@ class LRUMap[K, V](
 
   def keys: List[K] = elements.toList.map(_._1)
 
-  def elements: Iterator[(K, V)] = {
+  def elements: Iterator[(K, V)] =
     val set = localMap.entrySet.iterator
-    new Iterator[(K, V)] {
+    new Iterator[(K, V)]
       def hasNext = set.hasNext
-      def next: (K, V) = {
+      def next: (K, V) =
         val k = set.next
         (k.getKey, k.getValue.value2)
-      }
-    }
-  }
 
   def size: Int = localMap.size
-}

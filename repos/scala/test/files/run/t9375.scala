@@ -1,136 +1,113 @@
 import java.io._
 
-object SerDes {
-  def serialize(obj: AnyRef): Array[Byte] = {
+object SerDes
+  def serialize(obj: AnyRef): Array[Byte] =
     val buffer = new ByteArrayOutputStream
     val out = new ObjectOutputStream(buffer)
     out.writeObject(obj)
     buffer.toByteArray
-  }
 
-  def deserialize(a: Array[Byte]): AnyRef = {
+  def deserialize(a: Array[Byte]): AnyRef =
     val in = new ObjectInputStream(new ByteArrayInputStream(a))
     in.readObject
-  }
 
   def serializeDeserialize[T <: AnyRef](obj: T) =
     deserialize(serialize(obj)).asInstanceOf[T]
-}
 
 import SerDes._
 
 // tests to make sure that de-serializing an object does not run its constructor
 
-trait S extends Serializable {
+trait S extends Serializable
   println("  konstruktor: " + this.getClass)
-}
 
-trait SE extends S {
+trait SE extends S
   def outer: Object
-}
 
-class A extends S {
+class A extends S
   object O extends SE { def outer = A.this }
   private[this] object Op extends SE { def outer = A.this }
   def P: SE = Op
 
-  object N extends S {
+  object N extends S
     object O extends SE { def outer = N }
     private[this] object Op extends SE { def outer = N }
     def P: SE = Op
-  }
 
-  class A extends S {
+  class A extends S
     object O extends SE { def outer = A.this }
     private[this] object Op extends SE { def outer = A.this }
     def P: SE = Op
-  }
 
-  trait T extends S {
+  trait T extends S
     object O extends SE { def outer = T.this }
     private[this] object Op extends SE { def outer = T.this }
     def P: SE = Op
-  }
   class C extends T
 
-  def u: SE = {
+  def u: SE =
     object O extends SE { def outer = A.this }
     O
-  }
 
-  val v: SE = {
+  val v: SE =
     object O extends SE { def outer = A.this }
     O
-  }
 
   val f: () => SE = () =>
-    {
       object O extends SE { def outer = A.this }
       O
-  }
 
   trait GetObj { def O: SE; def P: SE }
-  val a: GetObj = new GetObj with S {
+  val a: GetObj = new GetObj with S
     def anonThis = this
     object O extends SE { def outer = anonThis }
     private[this] object Op extends SE { def outer = anonThis }
     def P: SE = Op
-  }
-}
 
-trait T extends S {
+trait T extends S
   object O extends SE { def outer = T.this }
   private[this] object Op extends SE { def outer = T.this }
   def P: SE = Op
 
-  object N extends S {
+  object N extends S
     object O extends SE { def outer = N }
     private[this] object Op extends SE { def outer = N }
     def P: SE = Op
-  }
 
-  class A extends S {
+  class A extends S
     object O extends SE { def outer = A.this }
     private[this] object Op extends SE { def outer = A.this }
     def P: SE = Op
-  }
 
-  trait T extends S {
+  trait T extends S
     object O extends SE { def outer = T.this }
     private[this] object Op extends SE { def outer = T.this }
     def P: SE = Op
-  }
   class C extends T
 
-  def u: SE = {
+  def u: SE =
     object O extends SE { def outer = T.this }
     O
-  }
 
-  val v: SE = {
+  val v: SE =
     object O extends SE { def outer = T.this }
     O
-  }
 
   val f: () => SE = () =>
-    {
       object O extends SE { def outer = T.this }
       O
-  }
 
   trait GetObj { def O: SE; def P: SE }
-  val a: GetObj = new GetObj with S {
+  val a: GetObj = new GetObj with S
     def anonThis = this
     object O extends SE { def outer = anonThis }
     private[this] object Op extends SE { def outer = anonThis }
     def P: SE = Op
-  }
-}
 
 class C extends T
 
-object DeserializeModuleNoConstructor {
-  def t(): Unit = {
+object DeserializeModuleNoConstructor
+  def t(): Unit =
     val a = new A
     val aa = new a.A
     val ac = new a.C
@@ -192,11 +169,10 @@ object DeserializeModuleNoConstructor {
     println(
         "no object konstruktors called when serializing / deserializing objects (starting at the outer or the object itself)")
 
-    for ((obj, outer) <- os) {
+    for ((obj, outer) <- os)
       assert(obj.outer eq outer, s"${obj.outer} of $obj -- $outer")
       serializeDeserialize(obj)
       serializeDeserialize(outer)
-    }
 
     println("deserializing outer objects with non-initialized inners again")
     val aNotInit = deserialize(serANotInit).asInstanceOf[A]
@@ -215,7 +191,7 @@ object DeserializeModuleNoConstructor {
         serializeDeserialize(a.P).outer.asInstanceOf[A],
         serializeDeserialize(a.v).outer.asInstanceOf[A]
     )
-    for (aSD <- deserializedAs) {
+    for (aSD <- deserializedAs)
       assert(aSD ne a)
       assert(aSD.O ne a.O)
       assert(aSD.P ne a.P)
@@ -225,39 +201,30 @@ object DeserializeModuleNoConstructor {
       assert(aSD.v ne a.v)
       assert(aSD.a.O ne a.a.O)
       assert(aSD.a.P ne a.a.P)
-    }
-  }
-}
 
 // tests for serializing / deserializing static modules
 
-object M extends S {
+object M extends S
   object O extends S
 
-  def u: S = {
+  def u: S =
     object O extends S
     O
-  }
 
-  val v: S = {
+  val v: S =
     object O extends S
     O
-  }
 
-  lazy val w: S = {
+  lazy val w: S =
     object O extends S
     O
-  }
 
   val f: () => S = () =>
-    {
       object O extends S
       O
-  }
-}
 
-object SerializingStaticModules {
-  def t(): Unit = {
+object SerializingStaticModules
+  def t(): Unit =
     println("init static module M and field v")
     M
 
@@ -282,10 +249,7 @@ object SerializingStaticModules {
     println(
         "object declared in a function: new instance created on each invocation")
     assert(M.f() ne M.f())
-  }
-}
 
-object Test extends App {
+object Test extends App
   DeserializeModuleNoConstructor.t()
   SerializingStaticModules.t()
-}

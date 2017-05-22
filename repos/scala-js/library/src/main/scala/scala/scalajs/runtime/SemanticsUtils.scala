@@ -7,7 +7,7 @@ import LinkingInfo.Semantics._
 /** Utilities to test for erroneous conditions depending on the Semantics
   *  configuration.
   */
-object SemanticsUtils {
+object SemanticsUtils
 
   @inline
   private def asInstanceOfs: Int =
@@ -18,17 +18,13 @@ object SemanticsUtils {
     */
   @inline
   def asInstanceOfCheck(
-      shouldThrow: => Boolean, exception: => Throwable): Unit = {
+      shouldThrow: => Boolean, exception: => Throwable): Unit =
     genericCheck(asInstanceOfs, shouldThrow, exception)
-  }
 
   @inline
   private def genericCheck(complianceLevel: Int,
                            shouldThrow: => Boolean,
-                           exception: => Throwable): Unit = {
-    if (complianceLevel != Unchecked && shouldThrow) {
+                           exception: => Throwable): Unit =
+    if (complianceLevel != Unchecked && shouldThrow)
       if (complianceLevel == Compliant) throw exception
       else throw new UndefinedBehaviorError(exception)
-    }
-  }
-}

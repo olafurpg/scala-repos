@@ -34,13 +34,12 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object Hyperlink {
+object Hyperlink
   implicit def sfxHyperlink2jfx(h: Hyperlink): jfxsc.Hyperlink =
     if (h != null) h.delegate else null
-}
 
 class Hyperlink(override val delegate: jfxsc.Hyperlink = new jfxsc.Hyperlink)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.Hyperlink] {
+    extends ButtonBase(delegate) with SFXDelegate[jfxsc.Hyperlink]
 
   /**
     * Create a hyperlink with the specified text as its label.
@@ -57,7 +56,5 @@ class Hyperlink(override val delegate: jfxsc.Hyperlink = new jfxsc.Hyperlink)
     * Indicates whether this link has already been "visited".
     */
   def visited: BooleanProperty = delegate.visitedProperty
-  def visited_=(v: Boolean) {
+  def visited_=(v: Boolean)
     visited() = v
-  }
-}

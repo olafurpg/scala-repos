@@ -29,7 +29,7 @@ import net.liftweb.http.provider.servlet._
 import net.liftweb.util._
 import Helpers._
 
-object Jetty7AsyncProvider extends AsyncProviderMeta {
+object Jetty7AsyncProvider extends AsyncProviderMeta
   // contSupport below gets inferred as a Class[?0] existential.
   import scala.language.existentials
 
@@ -42,8 +42,8 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
                setTimeout,
                resumeMeth,
                isExpired,
-               isResumed) = {
-    try {
+               isResumed) =
+    try
       val cc =
         Class.forName("org.eclipse.jetty.continuation.ContinuationSupport")
       val meth =
@@ -67,11 +67,9 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
        resume,
        isExpired,
        isResumed)
-    } catch {
+    catch
       case e: Exception =>
         (false, null, null, null, null, null, null, null, null, null)
-    }
-  }
 
   def suspendResumeSupport_? : Boolean = hasContinuations_?
 
@@ -81,7 +79,6 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
   def providerFunction: Box[HTTPRequest => ServletAsyncProvider] =
     Full(req => new Jetty7AsyncProvider(req))
       .filter(i => suspendResumeSupport_?)
-}
 
 /**
   * Jetty7AsyncProvider
@@ -89,7 +86,7 @@ object Jetty7AsyncProvider extends AsyncProviderMeta {
   * Implemented by using Jetty 7 Continuation API
   *
   */
-class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
+class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider
 
   import Jetty7AsyncProvider._
 
@@ -100,21 +97,18 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
   def resumeInfo: Option[(Req, LiftResponse)] =
     if (!hasContinuations_?) None
     else if (Props.inGAE) None
-    else {
+    else
       val cont = getContinuation.invoke(contSupport, servletReq)
       val ret = getAttribute.invoke(cont, "__liftCometState")
-      try {
+      try
         setAttribute.invoke(cont, "__liftCometState", null)
-        ret match {
+        ret match
           case (r: Req, lr: LiftResponse) => Some(r -> lr)
           case _ => None
-        }
-      } catch {
+      catch
         case e: Exception => None
-      }
-    }
 
-  def suspend(timeout: Long): RetryState.Value = {
+  def suspend(timeout: Long): RetryState.Value =
     val cont = getContinuation.invoke(contSupport, servletReq)
 
     val expired = isExpired.invoke(cont).asInstanceOf[Boolean]
@@ -122,23 +116,18 @@ class Jetty7AsyncProvider(req: HTTPRequest) extends ServletAsyncProvider {
 
     if (expired) RetryState.TIMED_OUT
     else if (resumed) RetryState.RESUMED
-    else {
+    else
       setTimeout.invoke(cont, new java.lang.Long(timeout))
       suspendMeth.invoke(cont)
       RetryState.SUSPENDED
-    }
-  }
 
-  def resume(what: (Req, LiftResponse)): Boolean = {
+  def resume(what: (Req, LiftResponse)): Boolean =
     val cont = getContinuation.invoke(contSupport, servletReq)
-    try {
+    try
       setAttribute.invoke(cont, "__liftCometState", what)
       resumeMeth.invoke(cont)
       true
-    } catch {
+    catch
       case e: Exception =>
         setAttribute.invoke(cont, "__liftCometState", null)
         false
-    }
-  }
-}

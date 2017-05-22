@@ -7,7 +7,7 @@ import scala.concurrent.Future
 /**
   * Queries for extended group information.
   */
-trait GroupInfoService extends AppInfoService {
+trait GroupInfoService extends AppInfoService
 
   /**
     * Query info for an existing group.
@@ -22,4 +22,3 @@ trait GroupInfoService extends AppInfoService {
       version: Timestamp,
       groupSelector: GroupSelector,
       groupEmbed: Set[GroupInfo.Embed]): Future[Option[GroupInfo]]
-}

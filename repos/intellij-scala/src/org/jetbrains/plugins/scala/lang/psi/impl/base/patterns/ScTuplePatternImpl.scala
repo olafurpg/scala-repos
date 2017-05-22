@@ -15,18 +15,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * Date: 28.02.2008
   */
 class ScTuplePatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTuplePattern {
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScTuplePattern
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "TuplePattern"
 
-  override def subpatterns = patternList match {
+  override def subpatterns = patternList match
     case Some(l) => l.patterns
     case None => Seq.empty
-  }
-}

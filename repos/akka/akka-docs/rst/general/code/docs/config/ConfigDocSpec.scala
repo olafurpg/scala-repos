@@ -12,9 +12,9 @@ import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 //#imports
 
-class ConfigDocSpec extends WordSpec with Matchers {
+class ConfigDocSpec extends WordSpec with Matchers
 
-  "programmatically configure ActorSystem" in {
+  "programmatically configure ActorSystem" in
     //#custom-config
     val customConf = ConfigFactory.parseString("""
       akka.actor.deployment {
@@ -30,9 +30,8 @@ class ConfigDocSpec extends WordSpec with Matchers {
     //#custom-config
 
     TestKit.shutdownActorSystem(system)
-  }
 
-  "deployment section" in {
+  "deployment section" in
     val conf =
       ConfigFactory.parseString("""
   #//#deployment-section
@@ -71,5 +70,3 @@ class ConfigDocSpec extends WordSpec with Matchers {
   """)
     val system = ActorSystem("MySystem", conf)
     TestKit.shutdownActorSystem(system)
-  }
-}

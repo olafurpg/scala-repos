@@ -13,45 +13,41 @@ import scala.concurrent.duration._
 import akka.actor.PoisonPill
 import akka.io.UdpConnected
 
-object ScalaUdpDocSpec {
+object ScalaUdpDocSpec
 
   //#sender
-  class SimpleSender(remote: InetSocketAddress) extends Actor {
+  class SimpleSender(remote: InetSocketAddress) extends Actor
     import context.system
     IO(Udp) ! Udp.SimpleSender
 
-    def receive = {
+    def receive =
       case Udp.SimpleSenderReady =>
         context.become(ready(sender()))
         //#sender
         sender() ! Udp.Send(ByteString("hello"), remote)
       //#sender
-    }
 
-    def ready(send: ActorRef): Receive = {
+    def ready(send: ActorRef): Receive =
       case msg: String =>
         send ! Udp.Send(ByteString(msg), remote)
         //#sender
         if (msg == "world") send ! PoisonPill
       //#sender
-    }
-  }
   //#sender
 
   //#listener
-  class Listener(nextActor: ActorRef) extends Actor {
+  class Listener(nextActor: ActorRef) extends Actor
     import context.system
     IO(Udp) ! Udp.Bind(self, new InetSocketAddress("localhost", 0))
 
-    def receive = {
+    def receive =
       case Udp.Bound(local) =>
         //#listener
         nextActor forward local
         //#listener
         context.become(ready(sender()))
-    }
 
-    def ready(socket: ActorRef): Receive = {
+    def ready(socket: ActorRef): Receive =
       case Udp.Received(data, remote) =>
         val processed = // parse data etc., e.g. using PipelineStage
         //#listener
@@ -61,24 +57,21 @@ object ScalaUdpDocSpec {
         nextActor ! processed
       case Udp.Unbind => socket ! Udp.Unbind
       case Udp.Unbound => context.stop(self)
-    }
-  }
   //#listener
 
   //#connected
-  class Connected(remote: InetSocketAddress) extends Actor {
+  class Connected(remote: InetSocketAddress) extends Actor
     import context.system
     IO(UdpConnected) ! UdpConnected.Connect(self, remote)
 
-    def receive = {
+    def receive =
       case UdpConnected.Connected =>
         context.become(ready(sender()))
         //#connected
         sender() ! UdpConnected.Send(ByteString("hello"))
       //#connected
-    }
 
-    def ready(connection: ActorRef): Receive = {
+    def ready(connection: ActorRef): Receive =
       case UdpConnected.Received(data) =>
         // process data, send it on, etc.
         //#connected
@@ -90,18 +83,15 @@ object ScalaUdpDocSpec {
       case UdpConnected.Disconnect =>
         connection ! UdpConnected.Disconnect
       case UdpConnected.Disconnected => context.stop(self)
-    }
-  }
   //#connected
-}
 
-abstract class UdpDocSpec extends AkkaSpec {
+abstract class UdpDocSpec extends AkkaSpec
 
   def listenerProps(next: ActorRef): Props
   def simpleSenderProps(remote: InetSocketAddress): Props
   def connectedProps(remote: InetSocketAddress): Props
 
-  "demonstrate Udp" in {
+  "demonstrate Udp" in
     val probe = TestProbe()
     val listen = watch(system.actorOf(listenerProps(probe.ref)))
     val local = probe.expectMsgType[InetSocketAddress]
@@ -112,9 +102,8 @@ abstract class UdpDocSpec extends AkkaSpec {
     probe.expectMsg("world")
     listen ! Udp.Unbind
     expectTerminated(listen)
-  }
 
-  "demonstrate Udp suspend reading" in {
+  "demonstrate Udp suspend reading" in
     val probe = TestProbe()
     val listen = watch(system.actorOf(listenerProps(probe.ref)))
     val local = probe.expectMsgType[InetSocketAddress]
@@ -129,9 +118,8 @@ abstract class UdpDocSpec extends AkkaSpec {
     probe.expectMsg("world")
     listen ! Udp.Unbind
     expectTerminated(listen)
-  }
 
-  "demonstrate UdpConnected" in {
+  "demonstrate UdpConnected" in
     val probe = TestProbe()
     val listen = watch(system.actorOf(listenerProps(probe.ref)))
     val local = probe.expectMsgType[InetSocketAddress]
@@ -146,10 +134,8 @@ abstract class UdpDocSpec extends AkkaSpec {
     expectTerminated(listen)
     conn ! UdpConnected.Disconnect
     expectTerminated(conn)
-  }
-}
 
-class ScalaUdpDocSpec extends UdpDocSpec {
+class ScalaUdpDocSpec extends UdpDocSpec
   import ScalaUdpDocSpec._
 
   override def listenerProps(next: ActorRef) = Props(new Listener(next))
@@ -157,9 +143,8 @@ class ScalaUdpDocSpec extends UdpDocSpec {
     Props(new SimpleSender(remote))
   override def connectedProps(remote: InetSocketAddress) =
     Props(new Connected(remote))
-}
 
-class JavaUdpDocSpec extends UdpDocSpec {
+class JavaUdpDocSpec extends UdpDocSpec
   import UdpDocTest._
 
   override def listenerProps(next: ActorRef) = Props(new Listener(next))
@@ -167,4 +152,3 @@ class JavaUdpDocSpec extends UdpDocSpec {
     Props(new SimpleSender(remote))
   override def connectedProps(remote: InetSocketAddress) =
     Props(new Connected(remote))
-}

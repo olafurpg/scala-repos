@@ -25,14 +25,14 @@ import common._
 import Extraction.{decompose, extract}
 import org.apache.commons.codec.binary.Base64
 
-class JsonBoxSerializer extends Serializer[Box[_]] {
+class JsonBoxSerializer extends Serializer[Box[_]]
   private val BoxClass = classOf[Box[_]]
   import scala.collection.JavaConversions._
 
   def deserialize(implicit format: Formats)
-    : PartialFunction[(TypeInfo, JValue), Box[_]] = {
+    : PartialFunction[(TypeInfo, JValue), Box[_]] =
     case (TypeInfo(BoxClass, ptype), json) =>
-      json match {
+      json match
         case JNull | JNothing => Empty
         case JObject(
             JField("box_failure", JString("Failure")) :: JField(
@@ -64,10 +64,8 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
                       TypeInfo(
                           t.getActualTypeArguments()(0).asInstanceOf[Class[_]],
                           None)))
-      }
-  }
 
-  def serialize(implicit format: Formats): PartialFunction[Any, JValue] = {
+  def serialize(implicit format: Formats): PartialFunction[Any, JValue] =
     case Full(x) => decompose(x)
     case Empty => JNull
     case ParamFailure(msg, exception, chain, param) =>
@@ -85,35 +83,28 @@ class JsonBoxSerializer extends Serializer[Box[_]] {
               "msg", JString(msg)) :: JField(
               "exception", serializeException(exception)) :: JField(
               "chain", decompose(chain)) :: Nil)
-  }
 
-  private val typeHoldingFailure = new ParameterizedType {
+  private val typeHoldingFailure = new ParameterizedType
     def getActualTypeArguments = Array(classOf[Failure])
     def getOwnerType = classOf[Box[Failure]]
     def getRawType = classOf[Box[Failure]]
-  }
 
-  private def serializeException(exception: Box[Throwable]) = exception match {
+  private def serializeException(exception: Box[Throwable]) = exception match
     case Full(x) => JString(javaSerialize(x))
     case _ => JNull
-  }
 
-  private def deserializeException(json: JValue) = json match {
+  private def deserializeException(json: JValue) = json match
     case JString(s) => Full(javaDeserialize(s).asInstanceOf[Throwable])
     case _ => Empty
-  }
 
-  private def javaSerialize(obj: AnyRef): String = {
+  private def javaSerialize(obj: AnyRef): String =
     val bytes = new ByteArrayOutputStream
     val out = new ObjectOutputStream(bytes)
     out.writeObject(obj)
     new String((new Base64).encode(bytes.toByteArray))
-  }
 
-  private def javaDeserialize(s: String): Any = {
+  private def javaDeserialize(s: String): Any =
     val bytes = new ByteArrayInputStream(
         (new Base64).decode(s.getBytes("UTF-8")))
     val in = new ObjectInputStream(bytes)
     in.readObject
-  }
-}

@@ -6,13 +6,13 @@ import std.option.some
 import scalaz.scalacheck.ScalazProperties.applicative
 import scalaz.scalacheck.ScalazArbitrary._
 
-object ApplyTest extends SpecLite {
-  checkAll("List applyApplicative", {
+object ApplyTest extends SpecLite
+  checkAll("List applyApplicative",
     implicit val F = Apply[List].applyApplicative
     applicative.laws[λ[α => List[α] \/ α]]
-  })
+  )
 
-  "mapN" in {
+  "mapN" in
     Apply[Option].apply2(some("1"), some("2"))(_ + _) must_=== (some("12"))
     Apply[Option].apply3(some("1"), some("2"), some("3"))(_ + _ + _) must_===
     (some("123"))
@@ -38,9 +38,8 @@ object ApplyTest extends SpecLite {
     A.apply4("1", "2", "3", "4")((a, b, c, d) => undefined) must_=== ("1234")
     A.apply5("1", "2", "3", "4", "5")((a, b, c, d, e) => undefined) must_===
     ("12345")
-  }
 
-  "apN" in {
+  "apN" in
     Apply[Option].ap2(some("1"), some("2"))(some((_: String) + (_: String))) must_===
     (some("12"))
     Apply[Option].ap3(some("1"), some("2"), some("3"))(
@@ -51,9 +50,6 @@ object ApplyTest extends SpecLite {
     Apply[Option].ap5(some("1"), some("2"), some("3"), some("4"), some("5"))(
         some((_: String) + (_: String) + (_: String) + (_: String) +
             (_: String))) must_=== (some("12345"))
-  }
 
-  "<*>" in {
+  "<*>" in
     some(9) <*> some({ (_: Int) + 3 }) must_=== (some(12))
-  }
-}

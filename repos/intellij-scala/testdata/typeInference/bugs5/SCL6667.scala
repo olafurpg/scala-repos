@@ -1,16 +1,13 @@
-object SCL6667 {
+object SCL6667
 
-  trait Expression {
+  trait Expression
     type Repr <: Expression
 
     def foo = 123
-  }
 
-  object Expression {
-    trait Aux[T <: Expression.Aux[T]] extends Expression { self: T =>
+  object Expression
+    trait Aux[T <: Expression.Aux[T]] extends Expression  self: T =>
       type Repr = T
-    }
-  }
 
   case class SubtractNumeric(expression1: Expression, expression2: Expression)
       extends Expression.Aux[SubtractNumeric]
@@ -28,5 +25,4 @@ object SCL6667 {
 
   /*start*/
   x.foo /*end*/
-}
 //Int

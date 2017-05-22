@@ -37,7 +37,7 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
                                             child: LogicalPlan,
                                             allowExisting: Boolean,
                                             orReplace: Boolean)
-    extends RunnableCommand {
+    extends RunnableCommand
 
   private val childSchema = child.output
 
@@ -47,10 +47,10 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
 
   private val tableIdentifier = tableDesc.name
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     val hiveContext = sqlContext.asInstanceOf[HiveContext]
 
-    hiveContext.sessionState.catalog.tableExists(tableIdentifier) match {
+    hiveContext.sessionState.catalog.tableExists(tableIdentifier) match
       case true if allowExisting =>
       // Handles `CREATE VIEW IF NOT EXISTS v0 AS SELECT ...`. Does nothing when the target view
       // already exists.
@@ -71,76 +71,59 @@ private[hive] case class CreateViewAsSelect(tableDesc: CatalogTable,
       case false =>
         hiveContext.sessionState.catalog.client
           .createView(prepareTable(sqlContext))
-    }
 
     Seq.empty[Row]
-  }
 
-  private def prepareTable(sqlContext: SQLContext): CatalogTable = {
+  private def prepareTable(sqlContext: SQLContext): CatalogTable =
     val expandedText =
-      if (sqlContext.conf.canonicalView) {
-        try rebuildViewQueryString(sqlContext) catch {
+      if (sqlContext.conf.canonicalView)
+        try rebuildViewQueryString(sqlContext) catch
           case NonFatal(e) => wrapViewTextWithSelect
-        }
-      } else {
+      else
         wrapViewTextWithSelect
-      }
 
-    val viewSchema = {
-      if (tableDesc.schema.isEmpty) {
-        childSchema.map { a =>
+    val viewSchema =
+      if (tableDesc.schema.isEmpty)
+        childSchema.map  a =>
           CatalogColumn(a.name, HiveMetastoreTypes.toMetastoreType(a.dataType))
-        }
-      } else {
-        childSchema.zip(tableDesc.schema).map {
+      else
+        childSchema.zip(tableDesc.schema).map
           case (a, col) =>
             CatalogColumn(col.name,
                           HiveMetastoreTypes.toMetastoreType(a.dataType),
                           nullable = true,
                           col.comment)
-        }
-      }
-    }
 
     tableDesc.copy(schema = viewSchema, viewText = Some(expandedText))
-  }
 
-  private def wrapViewTextWithSelect: String = {
+  private def wrapViewTextWithSelect: String =
     // When user specified column names for view, we should create a project to do the renaming.
     // When no column name specified, we still need to create a project to declare the columns
     // we need, to make us more robust to top level `*`s.
-    val viewOutput = {
+    val viewOutput =
       val columnNames = childSchema.map(f => quote(f.name))
-      if (tableDesc.schema.isEmpty) {
+      if (tableDesc.schema.isEmpty)
         columnNames.mkString(", ")
-      } else {
+      else
         columnNames
           .zip(tableDesc.schema.map(f => quote(f.name)))
-          .map {
+          .map
             case (name, alias) => s"$name AS $alias"
-          }
           .mkString(", ")
-      }
-    }
 
     val viewText = tableDesc.viewText.get
     val viewName = quote(tableDesc.name.table)
     s"SELECT $viewOutput FROM ($viewText) $viewName"
-  }
 
-  private def rebuildViewQueryString(sqlContext: SQLContext): String = {
+  private def rebuildViewQueryString(sqlContext: SQLContext): String =
     val logicalPlan =
-      if (tableDesc.schema.isEmpty) {
+      if (tableDesc.schema.isEmpty)
         child
-      } else {
-        val projectList = childSchema.zip(tableDesc.schema).map {
+      else
+        val projectList = childSchema.zip(tableDesc.schema).map
           case (attr, col) => Alias(attr, col.name)()
-        }
         sqlContext.executePlan(Project(projectList, child)).analyzed
-      }
     new SQLBuilder(logicalPlan, sqlContext).toSQL
-  }
 
   // escape backtick with double-backtick in column name and wrap it with backtick.
   private def quote(name: String) = s"`${name.replaceAll("`", "``")}`"
-}

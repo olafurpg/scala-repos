@@ -28,7 +28,7 @@ import scala.collection.immutable.Range
 @deprecated(
     "Forwarding is inherently unreliable since it is not automated and new methods can be forgotten.",
     "2.11.0")
-trait SeqForwarder[+A] extends Seq[A] with IterableForwarder[A] {
+trait SeqForwarder[+A] extends Seq[A] with IterableForwarder[A]
 
   protected override def underlying: Seq[A]
 
@@ -72,4 +72,3 @@ trait SeqForwarder[+A] extends Seq[A] with IterableForwarder[A] {
   override def corresponds[B](that: GenSeq[B])(p: (A, B) => Boolean): Boolean =
     underlying.corresponds(that)(p)
   override def indices: Range = underlying.indices
-}

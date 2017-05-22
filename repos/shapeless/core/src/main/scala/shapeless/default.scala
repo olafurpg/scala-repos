@@ -32,18 +32,16 @@ import shapeless.labelled.{FieldType, field}
   *
   * @author Alexandre Archambault
   */
-trait Default[T] extends DepFn0 with Serializable {
+trait Default[T] extends DepFn0 with Serializable
   type Out <: HList
-}
 
-object Default {
+object Default
   def apply[T](implicit default: Default[T]): Aux[T, default.Out] = default
 
   def mkDefault[T, Out0 <: HList](defaults: Out0): Aux[T, Out0] =
-    new Default[T] {
+    new Default[T]
       type Out = Out0
       def apply() = defaults
-    }
 
   type Aux[T, Out0 <: HList] = Default[T] { type Out = Out0 }
 
@@ -71,63 +69,54 @@ object Default {
     *
     * @author Alexandre Archambault
     */
-  trait AsRecord[T] extends DepFn0 with Serializable {
+  trait AsRecord[T] extends DepFn0 with Serializable
     type Out <: HList
-  }
 
-  object AsRecord {
+  object AsRecord
     def apply[T](implicit default: AsRecord[T]): Aux[T, default.Out] = default
 
     type Aux[T, Out0 <: HList] = AsRecord[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Labels <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L] with Serializable
       type Out <: HList
-    }
 
-    object Helper {
+    object Helper
       def apply[L <: HList, Labels <: HList](
           implicit helper: Helper[L, Labels]): Aux[L, Labels, helper.Out] =
         helper
 
-      type Aux[L <: HList, Labels <: HList, Out0 <: HList] = Helper[L, Labels] {
+      type Aux[L <: HList, Labels <: HList, Out0 <: HList] = Helper[L, Labels]
         type Out = Out0
-      }
 
       implicit def hnilHelper: Aux[HNil, HNil, HNil] =
-        new Helper[HNil, HNil] {
+        new Helper[HNil, HNil]
           type Out = HNil
           def apply(l: HNil) = HNil
-        }
 
       implicit def hconsSomeHelper[
           K <: Symbol, H, T <: HList, LabT <: HList, OutT <: HList](
           implicit tailHelper: Aux[T, LabT, OutT])
         : Aux[Some[H] :: T, K :: LabT, FieldType[K, H] :: OutT] =
-        new Helper[Some[H] :: T, K :: LabT] {
+        new Helper[Some[H] :: T, K :: LabT]
           type Out = FieldType[K, H] :: OutT
           def apply(l: Some[H] :: T) = field[K](l.head.x) :: tailHelper(l.tail)
-        }
 
       implicit def hconsNoneHelper[
           K <: Symbol, T <: HList, LabT <: HList, OutT <: HList](
           implicit tailHelper: Aux[T, LabT, OutT])
         : Aux[None.type :: T, K :: LabT, OutT] =
-        new Helper[None.type :: T, K :: LabT] {
+        new Helper[None.type :: T, K :: LabT]
           type Out = OutT
           def apply(l: None.type :: T) = tailHelper(l.tail)
-        }
-    }
 
     implicit def asRecord[T, Labels <: HList, Options <: HList, Rec <: HList](
         implicit default: Default.Aux[T, Options],
         labelling: DefaultSymbolicLabelling.Aux[T, Labels],
         helper: Helper.Aux[Options, Labels, Rec]): Aux[T, Rec] =
-      new AsRecord[T] {
+      new AsRecord[T]
         type Out = Rec
         def apply() = helper(default())
-      }
-  }
 
   /**
     * Provides default values of case class-like types, as a HList of options.
@@ -154,72 +143,62 @@ object Default {
     *
     * @author Alexandre Archambault
     */
-  trait AsOptions[T] extends DepFn0 with Serializable {
+  trait AsOptions[T] extends DepFn0 with Serializable
     type Out <: HList
-  }
 
-  object AsOptions {
+  object AsOptions
     def apply[T](implicit default: AsOptions[T]): Aux[T, default.Out] = default
 
     type Aux[T, Out0 <: HList] = AsOptions[T] { type Out = Out0 }
 
     trait Helper[L <: HList, Repr <: HList]
-        extends DepFn1[L] with Serializable {
+        extends DepFn1[L] with Serializable
       type Out <: HList
-    }
 
-    object Helper {
+    object Helper
       def apply[L <: HList, Repr <: HList](
           implicit helper: Helper[L, Repr]): Aux[L, Repr, helper.Out] = helper
 
-      type Aux[L <: HList, Repr <: HList, Out0 <: HList] = Helper[L, Repr] {
+      type Aux[L <: HList, Repr <: HList, Out0 <: HList] = Helper[L, Repr]
         type Out = Out0
-      }
 
       implicit def hnilHelper: Aux[HNil, HNil, HNil] =
-        new Helper[HNil, HNil] {
+        new Helper[HNil, HNil]
           type Out = HNil
           def apply(l: HNil) = HNil
-        }
 
       implicit def hconsSomeHelper[
           H, T <: HList, ReprT <: HList, OutT <: HList](
           implicit tailHelper: Aux[T, ReprT, OutT])
         : Aux[Some[H] :: T, H :: ReprT, Option[H] :: OutT] =
-        new Helper[Some[H] :: T, H :: ReprT] {
+        new Helper[Some[H] :: T, H :: ReprT]
           type Out = Option[H] :: OutT
           def apply(l: Some[H] :: T) = l.head :: tailHelper(l.tail)
-        }
 
       implicit def hconsNoneHelper[
           H, T <: HList, ReprT <: HList, OutT <: HList](
           implicit tailHelper: Aux[T, ReprT, OutT])
         : Aux[None.type :: T, H :: ReprT, Option[H] :: OutT] =
-        new Helper[None.type :: T, H :: ReprT] {
+        new Helper[None.type :: T, H :: ReprT]
           type Out = Option[H] :: OutT
           def apply(l: None.type :: T) = None :: tailHelper(l.tail)
-        }
-    }
 
     implicit def asOption[T, Repr <: HList, Options <: HList, Out0 <: HList](
         implicit default: Default.Aux[T, Options],
         gen: Generic.Aux[T, Repr],
         helper: Helper.Aux[Options, Repr, Out0]): Aux[T, Out0] =
-      new AsOptions[T] {
+      new AsOptions[T]
         type Out = Out0
         def apply() = helper(default())
-      }
-  }
-}
 
 @macrocompat.bundle
-class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
+class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros
   import c.universe._
 
   def someTpe = typeOf[Some[_]].typeConstructor
   def noneTpe = typeOf[None.type]
 
-  def materialize[T : WeakTypeTag, L : WeakTypeTag]: Tree = {
+  def materialize[T : WeakTypeTag, L : WeakTypeTag]: Tree =
     val tpe = weakTypeOf[T]
 
     if (!isCaseClassLike(classSym(tpe)))
@@ -230,18 +209,16 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
     // Fixes https://github.com/milessabin/shapeless/issues/474
     tpe.typeSymbol.companion.info.members
 
-    def methodFrom(tpe: Type, name: String): Option[Symbol] = {
+    def methodFrom(tpe: Type, name: String): Option[Symbol] =
       val m = tpe.member(TermName(name))
       if (m == NoSymbol) None
       else Some(m)
-    }
 
-    val primaryConstructor = tpe.decls.collectFirst {
+    val primaryConstructor = tpe.decls.collectFirst
       case m if m.isMethod && m.asMethod.isPrimaryConstructor =>
         m.asMethod
-    }.getOrElse {
+    .getOrElse
       c.abort(c.enclosingPosition, s"Cannot get primary constructor of $tpe")
-    }
 
     def methodHasDefaults(m: MethodSymbol): Boolean =
       m.asMethod.paramLists.flatten.exists(_.asTerm.isParamWithDefault)
@@ -251,9 +228,8 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
     // as multiple overloads can define the functions we look for below, possibly
     // with wrong types, making the compilation fail with the wrong error.
     // We do this check here to detect that beforehand.
-    def overloadsWithDefaultCount(tpe: Type): Int = tpe.members.count { m =>
+    def overloadsWithDefaultCount(tpe: Type): Int = tpe.members.count  m =>
       m.isMethod && m.name.toString == "apply" && methodHasDefaults(m.asMethod)
-    }
 
     val mainOverloadsWithDefaultCount = overloadsWithDefaultCount(
         tpe.companion)
@@ -272,36 +248,30 @@ class DefaultMacros(val c: whitebox.Context) extends CaseClassMacros {
     val hasDefaults =
       oneOverloadWithDefaults && methodHasDefaults(primaryConstructor)
 
-    def wrapTpeTree(idx: Int, argTpe: Type) = {
-      if (hasDefaults) {
+    def wrapTpeTree(idx: Int, argTpe: Type) =
+      if (hasDefaults)
         val methodOpt =
           methodFrom(tpe.companion, s"apply$$default$$${idx + 1}")
             .orElse(methodFrom(companion.symbol.info,
                                s"$$lessinit$$greater$$default$$${idx + 1}"))
 
-        methodOpt match {
+        methodOpt match
           case Some(method) =>
             (appliedType(someTpe, argTpe),
              q"_root_.scala.Some($companion.$method)")
           case None =>
             (noneTpe, q"_root_.scala.None")
-        }
-      } else (noneTpe, q"_root_.scala.None")
-    }
+      else (noneTpe, q"_root_.scala.None")
 
-    val wrapTpeTrees = fieldsOf(tpe).zipWithIndex.map {
+    val wrapTpeTrees = fieldsOf(tpe).zipWithIndex.map
       case ((_, argTpe), idx) =>
         wrapTpeTree(idx, devarargify(argTpe))
-    }
 
     val resultTpe = mkHListTpe(
         wrapTpeTrees.map { case (wrapTpe, _) => wrapTpe })
 
-    val resultTree = wrapTpeTrees.foldRight(q"_root_.shapeless.HNil": Tree) {
+    val resultTree = wrapTpeTrees.foldRight(q"_root_.shapeless.HNil": Tree)
       case ((_, value), acc) =>
         q"_root_.shapeless.::($value, $acc)"
-    }
 
     q"_root_.shapeless.Default.mkDefault[$tpe, $resultTpe]($resultTree)"
-  }
-}

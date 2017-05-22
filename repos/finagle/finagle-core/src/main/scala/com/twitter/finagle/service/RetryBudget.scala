@@ -17,7 +17,7 @@ import com.twitter.util.{Duration, Stopwatch, TokenBucket}
   * @see [[Retries]] for how budgets get translated into
   * [[com.twitter.finagle.Filter Filters]].
   */
-trait RetryBudget {
+trait RetryBudget
 
   /**
     * Indicates a deposit, or credit, which will typically
@@ -39,34 +39,31 @@ trait RetryBudget {
     * The balance or number of retries that can be made now.
     */
   def balance: Long
-}
 
 /**
   * See [[RetryBudgets]] for Java APIs.
   */
-object RetryBudget {
+object RetryBudget
 
   /**
     * An immutable [[RetryBudget]] that never has a balance,
     * and as such, will never allow a retry.
     */
-  val Empty: RetryBudget = new RetryBudget {
+  val Empty: RetryBudget = new RetryBudget
     def deposit(): Unit = ()
     def tryWithdraw(): Boolean = false
     def balance: Long = 0L
-  }
 
   /**
     * An immutable [[RetryBudget]] that always has a balance of `100`,
     * and as such, will always allow a retry.
     */
-  val Infinite: RetryBudget = new RetryBudget {
+  val Infinite: RetryBudget = new RetryBudget
     def deposit(): Unit = ()
     def tryWithdraw(): Boolean = true
     def balance: Long = 100L
-  }
 
-  private object TokenRetryBudget {
+  private object TokenRetryBudget
 
     /**
       * This scaling factor allows for `percentCanRetry` > 1 without
@@ -74,12 +71,11 @@ object RetryBudget {
       * here is a `TokenBucket` which is not floating point based).
       */
     val ScaleFactor = 1000.0
-  }
 
   private class TokenRetryBudget(tokenBucket: TokenBucket,
                                  depositAmount: Int,
                                  withdrawalAmount: Int)
-      extends RetryBudget {
+      extends RetryBudget
     def deposit(): Unit =
       tokenBucket.put(depositAmount)
 
@@ -88,7 +84,6 @@ object RetryBudget {
 
     def balance: Long =
       tokenBucket.count / withdrawalAmount
-  }
 
   private[this] val DefaultTtl = 10.seconds
 
@@ -136,7 +131,7 @@ object RetryBudget {
       minRetriesPerSec: Int,
       percentCanRetry: Double,
       nowMillis: () => Long = Stopwatch.systemMillis
-  ): RetryBudget = {
+  ): RetryBudget =
     require(ttl.inSeconds >= 1 && ttl.inSeconds <= 60,
             s"ttl must be [1 second, 60 seconds]: $ttl")
     require(minRetriesPerSec >= 0,
@@ -164,5 +159,3 @@ object RetryBudget {
 
     val tokenBucket = TokenBucket.newLeakyBucket(ttl, reserve, nowMillis)
     new TokenRetryBudget(tokenBucket, depositAmount, withdrawalAmount)
-  }
-}

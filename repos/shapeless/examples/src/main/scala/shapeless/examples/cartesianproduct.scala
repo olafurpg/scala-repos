@@ -26,7 +26,7 @@ import shapeless.ops.hlist.Prepend
   *
   * @author Travis Brown
   */
-object CartesianProductExample extends App {
+object CartesianProductExample extends App
   import shapeless._
   import poly._
   import test._
@@ -36,35 +36,29 @@ object CartesianProductExample extends App {
     * to some value and map the resulting function (which of course isn't
     * literally a Poly1) over an HList.
     */
-  trait ApplyMapper[HF, A, X <: HList, Out <: HList] {
+  trait ApplyMapper[HF, A, X <: HList, Out <: HList]
     def apply(a: A, x: X): Out
-  }
 
-  object ApplyMapper {
-    implicit def hnil[HF, A] = new ApplyMapper[HF, A, HNil, HNil] {
+  object ApplyMapper
+    implicit def hnil[HF, A] = new ApplyMapper[HF, A, HNil, HNil]
       def apply(a: A, x: HNil) = HNil
-    }
 
     implicit def hlist[HF, A, XH, XT <: HList, OutH, OutT <: HList](
         implicit applied: Case2.Aux[HF, A, XH, OutH],
         mapper: ApplyMapper[HF, A, XT, OutT]) =
-      new ApplyMapper[HF, A, XH :: XT, OutH :: OutT] {
+      new ApplyMapper[HF, A, XH :: XT, OutH :: OutT]
         def apply(a: A, x: XH :: XT) = applied(a, x.head) :: mapper(a, x.tail)
-      }
-  }
 
   /**
     * A type class that lets us "lift" a polymorphic binary function so that it
     * operates on HLists, in the manner of Haskell's Control.Applicative.liftA2.
     */
-  trait LiftA2[HF, X <: HList, Y <: HList, Out <: HList] {
+  trait LiftA2[HF, X <: HList, Y <: HList, Out <: HList]
     def apply(x: X, y: Y): Out
-  }
 
-  object LiftA2 {
-    implicit def hnil[HF, Y <: HList] = new LiftA2[HF, HNil, Y, HNil] {
+  object LiftA2
+    implicit def hnil[HF, Y <: HList] = new LiftA2[HF, HNil, Y, HNil]
       def apply(x: HNil, y: Y) = HNil
-    }
 
     implicit def hlist[
         HF,
@@ -76,11 +70,9 @@ object CartesianProductExample extends App {
     ](implicit mapper: ApplyMapper[HF, XH, Y, Out1],
       lift: LiftA2[HF, XT, Y, Out2],
       prepend: Prepend[Out1, Out2]) =
-      new LiftA2[HF, XH :: XT, Y, prepend.Out] {
+      new LiftA2[HF, XH :: XT, Y, prepend.Out]
         def apply(x: XH :: XT, y: Y) =
           prepend(mapper(x.head, y), lift(x.tail, y))
-      }
-  }
 
   /**
     * A method that pulls together evidence that some higher rank function can be
@@ -92,9 +84,8 @@ object CartesianProductExample extends App {
   /**
     * A polymorphic binary function that pairs its arguments.
     */
-  object tuple extends Poly {
+  object tuple extends Poly
     implicit def whatever[A, B] = use((a: A, b: B) => (a, b))
-  }
 
   // Two example lists.
   val xs = 1 :: 'b :: 'c' :: HNil
@@ -114,4 +105,3 @@ object CartesianProductExample extends App {
   typed[Result](result)
 
   assert(result == expected)
-}

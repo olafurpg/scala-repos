@@ -10,17 +10,16 @@ import play.api.libs.json._
 /**
   * Formats for JSON objects which do not need write support in the production code.
   */
-object V2TestFormats {
+object V2TestFormats
   import mesosphere.marathon.api.v2.json.Formats._
 
-  implicit lazy val DeploymentPlanReads: Reads[DeploymentPlan] = Reads { js =>
+  implicit lazy val DeploymentPlanReads: Reads[DeploymentPlan] = Reads  js =>
     JsSuccess(
         DeploymentPlan(original = (js \ "original").as[Group],
                        target = (js \ "target").as[Group],
                        version = (js \ "version").as[Timestamp])
           .copy(id = (js \ "id").as[String])
     )
-  }
 
   implicit lazy val SubscribeReads: Reads[Subscribe] = Json.reads[Subscribe]
   implicit lazy val UnsubscribeReads: Reads[Unsubscribe] =
@@ -56,15 +55,14 @@ object V2TestFormats {
   implicit lazy val SchedulerReregisteredEventWritesReads: Reads[
       SchedulerReregisteredEvent] = Json.reads[SchedulerReregisteredEvent]
 
-  implicit lazy val eventSubscribersReads: Reads[EventSubscribers] = Reads {
+  implicit lazy val eventSubscribersReads: Reads[EventSubscribers] = Reads
     subscribersJson =>
       JsSuccess(
           EventSubscribers(urls = (subscribersJson \ "callbackUrls")
                   .asOpt[Set[String]]
                   .getOrElse(Set.empty)))
-  }
 
-  implicit lazy val v2AppUpdateWrite: Writes[AppUpdate] = Writes { update =>
+  implicit lazy val v2AppUpdateWrite: Writes[AppUpdate] = Writes  update =>
     Json.obj(
         "id" -> update.id.map(_.toString),
         "cmd" -> update.cmd,
@@ -93,5 +91,3 @@ object V2TestFormats {
         "acceptedResourceRoles" -> update.acceptedResourceRoles,
         "ipAddress" -> update.ipAddress
     )
-  }
-}

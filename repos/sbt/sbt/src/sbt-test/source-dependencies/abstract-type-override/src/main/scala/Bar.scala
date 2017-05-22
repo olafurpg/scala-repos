@@ -1,3 +1,2 @@
-object Bar {
+object Bar
   def bar: Outer.TypeInner = null
-}

@@ -1,8 +1,7 @@
-object SCL6854 {
+object SCL6854
 
-  trait Foo[T] {
+  trait Foo[T]
     def value: T
-  }
 
   // LEVEL 1
   case class FooAny[T](value: T) extends Foo[T]
@@ -11,34 +10,28 @@ object SCL6854 {
   case class FooNumberAny[T : Numeric](value: T) extends Foo[T]
 
   // Constructor
-  object Foo {
+  object Foo
     def apply[T, R <: Foo[T]](value: T)(implicit builder: Builder[T, R]): R =
       builder.buildInstance(value)
 
     // Builder
-    trait Builder[T, R <: Foo[T]] {
+    trait Builder[T, R <: Foo[T]]
       def buildInstance(value: T): R
-    }
 
     // defining the FooAny builder, that has a lower priority
-    trait Level1 {
-      implicit def FooAnyBuilder[T] = new Builder[T, FooAny[T]] {
+    trait Level1
+      implicit def FooAnyBuilder[T] = new Builder[T, FooAny[T]]
         def buildInstance(value: T) =
           FooAny(value)
-      }
-    }
 
     // removing the FooNumberAny builder also fixes the error highlighting
-    object Builder extends Level1 {
+    object Builder extends Level1
       implicit def FooNumberAnyBuilder[T](implicit p: Numeric[T]) =
-        new Builder[T, FooNumberAny[T]] {
+        new Builder[T, FooNumberAny[T]]
           def buildInstance(value: T) =
             FooNumberAny(value)
-        }
-    }
-  }
 
-  object Main extends App {
+  object Main extends App
     def log[T](name: String, ref: Foo[T], value: T): Unit =
       println(f"val $name%-12s: ${ref.getClass.getName}%-19s = $value")
 
@@ -66,6 +59,4 @@ object SCL6854 {
 
     /*start*/
     (anyRef, anyRefExp, someBoolean, anyNumber) /*end*/
-  }
-}
 //(SCL6854.FooAny[String], SCL6854.FooAny[String], SCL6854.FooAny[Boolean], SCL6854.FooNumberAny[Long])

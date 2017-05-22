@@ -6,37 +6,31 @@ package com.twitter.util
   * common idioms for handling exceptional cases (such as rescue/ensure which
   * is analogous to try/finally).
   */
-object Try {
+object Try
   case class PredicateDoesNotObtain() extends Exception()
 
-  def apply[R](r: => R): Try[R] = {
-    try { Return(r) } catch {
+  def apply[R](r: => R): Try[R] =
+    try { Return(r) } catch
       case NonFatal(e) => Throw(e)
-    }
-  }
 
   /**
     * Like [[Try.apply]] but allows the caller to specify a handler for fatal
     * errors.
     */
   def withFatals[R](r: => R)(f: PartialFunction[Throwable, Try[R]]): Try[R] =
-    try Try(r) catch {
+    try Try(r) catch
       case e: Throwable if f.isDefinedAt(e) => f(e)
-    }
 
   /**
     * Collect the results from the given Trys into a new Try. The result will be a Throw if any of
     * the argument Trys are Throws. The first Throw in the Seq is the one which is surfaced.
     */
-  def collect[A](ts: Seq[Try[A]]): Try[Seq[A]] = {
+  def collect[A](ts: Seq[Try[A]]): Try[Seq[A]] =
     if (ts.isEmpty) Return(Seq.empty[A])
     else
-      Try {
-        ts map { t =>
+      Try
+        ts map  t =>
           t()
-        }
-      }
-  }
 
   /**
     * Convert an [[scala.Option]] to a [[Try]].
@@ -54,26 +48,22 @@ object Try {
     * returned if the option is None
     */
   def orThrow[A](o: Option[A])(failure: () => Throwable): Try[A] =
-    try {
-      o match {
+    try
+      o match
         case Some(item) => Return(item)
         case None => Throw(failure())
-      }
-    } catch {
+    catch
       case NonFatal(e) => Throw(e)
-    }
 
-  implicit class OrThrow[A](val option: Option[A]) extends AnyVal {
+  implicit class OrThrow[A](val option: Option[A]) extends AnyVal
     def orThrow(failure: => Throwable): Try[A] =
       Try.orThrow(option)(() => failure)
-  }
-}
 
 /**
   * This class represents a computation that can succeed or fail. It has two
   * concrete implementations, Return (for success) and Throw (for failure)
   */
-sealed abstract class Try[+R] {
+sealed abstract class Try[+R]
 
   /**
     * Returns true if the Try is a Throw, false otherwise.
@@ -179,9 +169,8 @@ sealed abstract class Try[+R] {
     * chained `this` as in `respond`.
     */
   def ensure(f: => Unit): Try[R] =
-    respond { _ =>
+    respond  _ =>
       f
-    }
 
   /**
     * Returns None if this is a Throw or a Some containing the value if this is a Return
@@ -211,26 +200,22 @@ sealed abstract class Try[+R] {
   def andThen[R2](f: R => Try[R2]) = flatMap(f)
 
   def flatten[T](implicit ev: R <:< Try[T]): Try[T]
-}
 
-object Throw {
+object Throw
   private val NotApplied: Throw[Nothing] = Throw[Nothing](null)
   private val AlwaysNotApplied: Any => Throw[Nothing] =
     scala.Function.const(NotApplied) _
-}
 
-final case class Throw[+R](e: Throwable) extends Try[R] {
+final case class Throw[+R](e: Throwable) extends Try[R]
   def isThrow = true
   def isReturn = false
   def throwable: Throwable = e
-  def rescue[R2 >: R](rescueException: PartialFunction[Throwable, Try[R2]]) = {
-    try {
+  def rescue[R2 >: R](rescueException: PartialFunction[Throwable, Try[R2]]) =
+    try
       val result = rescueException.applyOrElse(e, Throw.AlwaysNotApplied)
       if (result eq Throw.NotApplied) this else result
-    } catch {
+    catch
       case NonFatal(e2) => Throw(e2)
-    }
-  }
   def apply(): R = throw e
   def flatMap[R2](f: R => Try[R2]) = this.asInstanceOf[Throw[R2]]
   def flatten[T](implicit ev: R <:< Try[T]): Try[T] =
@@ -240,28 +225,24 @@ final case class Throw[+R](e: Throwable) extends Try[R] {
   def exists(p: R => Boolean) = false
   def filter(p: R => Boolean) = this
   def withFilter(p: R => Boolean) = this
-  def onFailure(rescueException: Throwable => Unit) = {
+  def onFailure(rescueException: Throwable => Unit) =
     rescueException(e); this
-  }
   def onSuccess(f: R => Unit) = this
   def handle[R2 >: R](rescueException: PartialFunction[Throwable, R2]) =
-    if (rescueException.isDefinedAt(e)) {
+    if (rescueException.isDefinedAt(e))
       Try(rescueException(e))
-    } else {
+    else
       this
-    }
-}
 
-object Return {
+object Return
   val Unit = Return(())
   val Void = Return[Void](null)
   val None: Return[Option[Nothing]] = Return(Option.empty)
   val Nil: Return[Seq[Nothing]] = Return(Seq.empty)
   val True: Return[Boolean] = Return(true)
   val False: Return[Boolean] = Return(false)
-}
 
-final case class Return[+R](r: R) extends Try[R] {
+final case class Return[+R](r: R) extends Try[R]
   def isThrow: Boolean = false
 
   def isReturn: Boolean = true
@@ -297,4 +278,3 @@ final case class Return[+R](r: R) extends Try[R] {
 
   def handle[R2 >: R](
       rescueException: PartialFunction[Throwable, R2]): Try[R2] = this
-}

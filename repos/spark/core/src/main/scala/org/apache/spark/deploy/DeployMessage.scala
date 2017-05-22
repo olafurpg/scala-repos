@@ -30,7 +30,7 @@ import org.apache.spark.util.Utils
 private[deploy] sealed trait DeployMessage extends Serializable
 
 /** Contains messages sent between Scheduler endpoint nodes. */
-private[deploy] object DeployMessages {
+private[deploy] object DeployMessages
 
   // Worker to Master
 
@@ -41,10 +41,9 @@ private[deploy] object DeployMessages {
                             cores: Int,
                             memory: Int,
                             workerWebUiUrl: String)
-      extends DeployMessage {
+      extends DeployMessage
     Utils.checkHost(host, "Required hostname")
     assert(port > 0)
-  }
 
   case class ExecutorStateChanged(appId: String,
                                   execId: Int,
@@ -133,9 +132,8 @@ private[deploy] object DeployMessages {
 
   // TODO(matei): replace hostPort with host
   case class ExecutorAdded(
-      id: Int, workerId: String, hostPort: String, cores: Int, memory: Int) {
+      id: Int, workerId: String, hostPort: String, cores: Int, memory: Int)
     Utils.checkHostPort(hostPort, "Required hostport")
-  }
 
   case class ExecutorUpdated(id: Int,
                              state: ExecutorState,
@@ -193,16 +191,14 @@ private[deploy] object DeployMessages {
                                  completedApps: Array[ApplicationInfo],
                                  activeDrivers: Array[DriverInfo],
                                  completedDrivers: Array[DriverInfo],
-                                 status: MasterState) {
+                                 status: MasterState)
 
     Utils.checkHost(host, "Required hostname")
     assert(port > 0)
 
     def uri: String = "spark://" + host + ":" + port
-    def restUri: Option[String] = restPort.map { p =>
+    def restUri: Option[String] = restPort.map  p =>
       "spark://" + host + ":" + p
-    }
-  }
 
   //  WorkerWebUI to Worker
 
@@ -222,13 +218,11 @@ private[deploy] object DeployMessages {
                                  memory: Int,
                                  coresUsed: Int,
                                  memoryUsed: Int,
-                                 masterWebUiUrl: String) {
+                                 masterWebUiUrl: String)
 
     Utils.checkHost(host, "Required hostname")
     assert(port > 0)
-  }
 
   // Liveness checks in various places
 
   case object SendHeartbeat
-}

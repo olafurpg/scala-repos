@@ -19,15 +19,12 @@ package org.apache.spark.sql.execution.datasources.json
 
 import com.fasterxml.jackson.core.{JsonParser, JsonToken}
 
-private object JacksonUtils {
+private object JacksonUtils
 
   /**
     * Advance the parser until a null or a specific token is found
     */
-  def nextUntil(parser: JsonParser, stopOn: JsonToken): Boolean = {
-    parser.nextToken() match {
+  def nextUntil(parser: JsonParser, stopOn: JsonToken): Boolean =
+    parser.nextToken() match
       case null => false
       case x => x != stopOn
-    }
-  }
-}

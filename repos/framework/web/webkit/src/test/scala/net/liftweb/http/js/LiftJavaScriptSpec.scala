@@ -35,15 +35,15 @@ import util.Helpers._
 /**
   * System under specification for LiftJavaScript.
   */
-object LiftJavaScriptSpec extends Specification {
+object LiftJavaScriptSpec extends Specification
   sequential
   "LiftJavaScript Specification".title
 
   private def session = new LiftSession("", randomString(20), Empty)
 
-  "LiftJavaScript" should {
-    "create default settings" in withEnglishLocale {
-      S.initIfUninitted(session) {
+  "LiftJavaScript" should
+    "create default settings" in withEnglishLocale
+      S.initIfUninitted(session)
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
             """{"liftPath": "/lift",
@@ -59,10 +59,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}}"""
         )
-      }
-    }
-    "create internationalized default settings" in withPolishLocale {
-      S.initIfUninitted(session) {
+    "create internationalized default settings" in withPolishLocale
+      S.initIfUninitted(session)
         val settings = LiftJavaScript.settings
         val internationalizedMessage =
           "Nie mo\\u017cna skontaktowa\\u0107 si\\u0119 z serwerem"
@@ -80,10 +78,8 @@ object LiftJavaScriptSpec extends Specification {
               |"ajaxOnStart": function() {},
               |"ajaxOnEnd": function() {}}"""
         )
-      }
-    }
-    "create custom static settings" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create custom static settings" in withEnglishLocale
+      S.initIfUninitted(session)
         LiftRules.ajaxRetryCount = Full(4)
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
@@ -100,10 +96,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}}"""
         )
-      }
-    }
-    "create custom dynamic settings" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create custom dynamic settings" in withEnglishLocale
+      S.initIfUninitted(session)
         LiftRules.cometServer = () => Some("srvr1")
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
@@ -120,10 +114,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}}"""
         )
-      }
-    }
-    "create custom function settings" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create custom function settings" in withEnglishLocale
+      S.initIfUninitted(session)
         LiftRules.jsLogFunc = Full(v => JE.Call("lift.logError", v))
         val settings = LiftJavaScript.settings
         settings.toJsCmd must_== formatjs(
@@ -140,10 +132,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnStart": function() {},
             |"ajaxOnEnd": function() {}}"""
         )
-      }
-    }
-    "create init command" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create init command" in withEnglishLocale
+      S.initIfUninitted(session)
         val init = LiftRules.javaScriptSettings
           .vend()
           .map(_.apply(session))
@@ -165,10 +155,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnEnd": function() {}});""",
                     "window.lift.init(lift_settings);"
                 )))
-      }
-    }
-    "create init command with VanillaJS" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create init command with VanillaJS" in withEnglishLocale
+      S.initIfUninitted(session)
         LiftRules.jsArtifacts = ExtCoreArtifacts
         val init = LiftRules.javaScriptSettings
           .vend()
@@ -191,10 +179,8 @@ object LiftJavaScriptSpec extends Specification {
             |"ajaxOnEnd": function() {}});""",
                     "window.lift.init(lift_settings);"
                 )))
-      }
-    }
-    "create init command with custom setting" in withEnglishLocale {
-      S.initIfUninitted(session) {
+    "create init command with custom setting" in withEnglishLocale
+      S.initIfUninitted(session)
         LiftRules.jsArtifacts = JQueryArtifacts
         val settings = LiftJavaScript.settings.extend(
             JsObj("liftPath" -> "liftyStuff", "mysetting" -> 99))
@@ -217,32 +203,24 @@ object LiftJavaScriptSpec extends Specification {
             |"mysetting": 99});""",
                 "window.lift.init(lift_settings);"
             ))
-      }
-    }
-  }
 
   def formatjs(line: String): String = formatjs(line :: Nil)
   def formatjs(lines: List[String]): String =
-    lines.map {
-      _.stripMargin.lines.toList match {
+    lines.map
+      _.stripMargin.lines.toList match
         case init :+ last => (init.map(_ + " ") :+ last).mkString
         case Nil => ""
-      }
-    }.mkString("\n")
+    .mkString("\n")
 
   object withEnglishLocale extends WithLocale(Locale.ENGLISH)
 
   object withPolishLocale extends WithLocale(Locale.forLanguageTag("pl-PL"))
 
-  class WithLocale(locale: Locale) extends Around {
-    override def around[T : AsResult](test: => T): Result = {
+  class WithLocale(locale: Locale) extends Around
+    override def around[T : AsResult](test: => T): Result =
       val savedDefaultLocale = Locale.getDefault
       Locale.setDefault(locale)
-      try {
+      try
         AsResult(test)
-      } finally {
+      finally
         Locale.setDefault(savedDefaultLocale)
-      }
-    }
-  }
-}

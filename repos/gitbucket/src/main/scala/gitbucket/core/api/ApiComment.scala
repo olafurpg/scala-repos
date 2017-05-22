@@ -13,14 +13,13 @@ case class ApiComment(id: Int,
                       body: String,
                       created_at: Date,
                       updated_at: Date)(
-    repositoryName: RepositoryName, issueId: Int, isPullRequest: Boolean) {
+    repositoryName: RepositoryName, issueId: Int, isPullRequest: Boolean)
   val html_url = ApiPath(
-      s"/${repositoryName.fullName}/${if (isPullRequest) { "pull" } else {
+      s"/${repositoryName.fullName}/$if (isPullRequest) { "pull" } else
     "issues"
-  }}/${issueId}#comment-${id}")
-}
+  /${issueId}#comment-${id}")
 
-object ApiComment {
+object ApiComment
   def apply(comment: IssueComment,
             repositoryName: RepositoryName,
             issueId: Int,
@@ -32,4 +31,3 @@ object ApiComment {
                created_at = comment.registeredDate,
                updated_at = comment.updatedDate)(
         repositoryName, issueId, isPullRequest)
-}

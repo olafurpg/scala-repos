@@ -32,14 +32,14 @@ private[streaming] class ShuffledDStream[
     partitioner: Partitioner,
     mapSideCombine: Boolean = true
 )
-    extends DStream[(K, C)](parent.ssc) {
+    extends DStream[(K, C)](parent.ssc)
 
   override def dependencies: List[DStream[_]] = List(parent)
 
   override def slideDuration: Duration = parent.slideDuration
 
-  override def compute(validTime: Time): Option[RDD[(K, C)]] = {
-    parent.getOrCompute(validTime) match {
+  override def compute(validTime: Time): Option[RDD[(K, C)]] =
+    parent.getOrCompute(validTime) match
       case Some(rdd) =>
         Some(
             rdd.combineByKey[C](createCombiner,
@@ -48,6 +48,3 @@ private[streaming] class ShuffledDStream[
                                 partitioner,
                                 mapSideCombine))
       case None => None
-    }
-  }
-}

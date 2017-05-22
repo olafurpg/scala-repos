@@ -29,8 +29,8 @@ import org.joda.time.DateTime
 
 import scalaz._
 
-object JobManager {
-  object channels {
+object JobManager
+  object channels
     val Status = "status"
     val Error = "error"
     val Warning = "warning"
@@ -38,10 +38,8 @@ object JobManager {
     val Log = "log"
     val ServerError = "serverError"
     val ServerWarning = "serverWarning"
-  }
-}
 
-trait JobManager[M[+ _]] { self =>
+trait JobManager[M[+ _]]  self =>
   import Message._
 
   /**
@@ -153,7 +151,7 @@ trait JobManager[M[+ _]] { self =>
     : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]]
 
   def withM[N[+ _]](implicit t: M ~> N, u: N ~> M, M: Monad[M], N: Monad[N]) =
-    new JobManager[N] {
+    new JobManager[N]
       import scalaz.syntax.monad._
 
       private val transformStreamBack = implicitly[Hoist[StreamT]].hoist(u)
@@ -222,73 +220,64 @@ trait JobManager[M[+ _]] { self =>
 
       def getResult(job: JobId)
         : N[Either[String, (Option[MimeType], StreamT[N, Array[Byte]])]] =
-        t(self.getResult(job)) map {
+        t(self.getResult(job)) map
           case Left(s) => Left(s)
           case Right((mimeType, data)) =>
             Right((mimeType, transformStreamForward(data)))
-        }
-    }
-}
 
 /**
   * Given a method that can transition a Job between states, this provides
   * default implementations of the explicit state transition methods.
   */
-trait JobStateManager[M[+ _]] { self: JobManager[M] =>
+trait JobStateManager[M[+ _]]  self: JobManager[M] =>
   import JobState._
 
   protected def transition(job: JobId)(
       t: JobState => Either[String, JobState]): M[Either[String, Job]]
 
   def start(id: JobId, startTime: DateTime): M[Either[String, Job]] =
-    transition(id) {
+    transition(id)
       case NotStarted => Right(Started(startTime, NotStarted))
       case badState =>
         Left("Cannot start job. %s" format JobState.describe(badState))
-    }
 
   def cancel(id: JobId,
              reason: String,
              cancelledAt: DateTime = new DateTime): M[Either[String, Job]] =
-    transition(id) {
+    transition(id)
       case prev @ (NotStarted | Started(_, _)) =>
         Right(Cancelled(reason, cancelledAt, prev))
       case badState => Left(JobState.describe(badState))
-    }
 
   def abort(id: JobId,
             reason: String,
             abortedAt: DateTime = new DateTime): M[Either[String, Job]] =
-    transition(id) {
+    transition(id)
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Aborted(reason, abortedAt, prev))
       case badState =>
         Left("Job already in terminal state. %s" format JobState.describe(
                 badState))
-    }
 
   def finish(
       id: JobId, finishedAt: DateTime = new DateTime): M[Either[String, Job]] =
-    transition(id) {
+    transition(id)
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Finished(finishedAt, prev))
       case badState =>
         Left("Job already in terminal state. %s" format JobState.describe(
                 badState))
-    }
 
   def expire(
       id: JobId, expiredAt: DateTime = new DateTime): M[Either[String, Job]] =
-    transition(id) {
+    transition(id)
       case prev @ (NotStarted | Started(_, _) | Cancelled(_, _, _)) =>
         Right(Expired(expiredAt, prev))
       case badState =>
         Left("Job already in terminal state. %s" format JobState.describe(
                 badState))
-    }
-}
 
-trait JobResultManager[M[+ _]] { self: JobManager[M] =>
+trait JobResultManager[M[+ _]]  self: JobManager[M] =>
   import scalaz.syntax.monad._
 
   implicit def M: Monad[M]
@@ -296,21 +285,18 @@ trait JobResultManager[M[+ _]] { self: JobManager[M] =>
 
   def setResult(id: JobId,
                 mimeType: Option[MimeType],
-                data: StreamT[M, Array[Byte]]): M[Either[String, Unit]] = {
+                data: StreamT[M, Array[Byte]]): M[Either[String, Unit]] =
     findJob(id) flatMap
-    (_ map { job =>
+    (_ map  job =>
           fs.save(job.id, FileData(mimeType, data)) map (Right(_))
-        } getOrElse M.point(Left("Invalid job id: " + id)))
-  }
+        getOrElse M.point(Left("Invalid job id: " + id)))
 
   def getResult(job: JobId)
-    : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]] = {
+    : M[Either[String, (Option[MimeType], StreamT[M, Array[Byte]])]] =
     fs.load(job) map
-    (_ map {
+    (_ map
           case FileData(mimeType, data) =>
             Right((mimeType, data))
-        } getOrElse {
+        getOrElse
           Left("No results exist for job " + job)
-        })
-  }
-}
+        )

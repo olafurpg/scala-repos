@@ -1,4 +1,4 @@
-object SCL7404 {
+object SCL7404
   class A
   class B extends A
   class Z[T]
@@ -12,5 +12,4 @@ object SCL7404 {
 
   /*start*/
   goo((1, new B)) /*end*/
-}
 //Int

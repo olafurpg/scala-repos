@@ -7,7 +7,7 @@
 
 package scala.tools.scalap
 
-object Classfiles {
+object Classfiles
   final val JAVA_MAGIC = 0xCAFEBABE
   final val JAVA_MAJOR_VERSION = 45
   final val JAVA_MINOR_VERSION = 3
@@ -65,4 +65,3 @@ object Classfiles {
   final val META_N = "JacoMeta"
   final val SCALA_N = "ScalaSignature"
   final val CONSTR_N = "<init>"
-}

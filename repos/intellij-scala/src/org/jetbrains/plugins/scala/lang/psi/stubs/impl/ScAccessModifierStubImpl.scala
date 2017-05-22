@@ -18,7 +18,7 @@ class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScAccessModifier](parent, elemType)
-    with ScAccessModifierStub {
+    with ScAccessModifierStub
   var _isPrivate: Boolean = _
   var _isProtected: Boolean = _
   var _isThis: Boolean = _
@@ -30,7 +30,7 @@ class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
            isPrivate: Boolean,
            isProtected: Boolean,
            isThis: Boolean,
-           idText: Option[StringRef]) = {
+           idText: Option[StringRef]) =
     this(
         parent,
         elemType
@@ -39,7 +39,6 @@ class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
     this._isProtected = isProtected
     this._isThis = isThis
     this.idText = idText
-  }
 
   def isProtected: Boolean = _isProtected
 
@@ -48,4 +47,3 @@ class ScAccessModifierStubImpl[ParentPsi <: PsiElement](
   def isThis: Boolean = _isThis
 
   def getIdText: Option[String] = idText.map(StringRef.toString)
-}

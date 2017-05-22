@@ -12,7 +12,7 @@ import SeedSize.Seed256
   * The only method used by netty ssl is engineNextBytes(bytes)
   * This RNG is good to use to prevent startup delay when you don't have Internet access to random.org
   */
-class AES256CounterSecureRNG extends java.security.SecureRandomSpi {
+class AES256CounterSecureRNG extends java.security.SecureRandomSpi
 
   /**Singleton instance. */
   private final val Instance: SecureRandomSeedGenerator =
@@ -43,4 +43,3 @@ class AES256CounterSecureRNG extends java.security.SecureRandomSpi {
     */
   override protected def engineGenerateSeed(numBytes: Int): Array[Byte] =
     Instance.generateSeed(numBytes)
-}

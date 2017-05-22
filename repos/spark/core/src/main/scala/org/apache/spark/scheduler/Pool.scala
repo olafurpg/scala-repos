@@ -32,7 +32,7 @@ private[spark] class Pool(val poolName: String,
                           val schedulingMode: SchedulingMode,
                           initMinShare: Int,
                           initWeight: Int)
-    extends Schedulable with Logging {
+    extends Schedulable with Logging
 
   val schedulableQueue = new ConcurrentLinkedQueue[Schedulable]
   val schedulableNameToSchedulable = new ConcurrentHashMap[String, Schedulable]
@@ -46,74 +46,56 @@ private[spark] class Pool(val poolName: String,
   var name = poolName
   var parent: Pool = null
 
-  var taskSetSchedulingAlgorithm: SchedulingAlgorithm = {
-    schedulingMode match {
+  var taskSetSchedulingAlgorithm: SchedulingAlgorithm =
+    schedulingMode match
       case SchedulingMode.FAIR =>
         new FairSchedulingAlgorithm()
       case SchedulingMode.FIFO =>
         new FIFOSchedulingAlgorithm()
-    }
-  }
 
-  override def addSchedulable(schedulable: Schedulable) {
+  override def addSchedulable(schedulable: Schedulable)
     require(schedulable != null)
     schedulableQueue.add(schedulable)
     schedulableNameToSchedulable.put(schedulable.name, schedulable)
     schedulable.parent = this
-  }
 
-  override def removeSchedulable(schedulable: Schedulable) {
+  override def removeSchedulable(schedulable: Schedulable)
     schedulableQueue.remove(schedulable)
     schedulableNameToSchedulable.remove(schedulable.name)
-  }
 
-  override def getSchedulableByName(schedulableName: String): Schedulable = {
-    if (schedulableNameToSchedulable.containsKey(schedulableName)) {
+  override def getSchedulableByName(schedulableName: String): Schedulable =
+    if (schedulableNameToSchedulable.containsKey(schedulableName))
       return schedulableNameToSchedulable.get(schedulableName)
-    }
-    for (schedulable <- schedulableQueue.asScala) {
+    for (schedulable <- schedulableQueue.asScala)
       val sched = schedulable.getSchedulableByName(schedulableName)
-      if (sched != null) {
+      if (sched != null)
         return sched
-      }
-    }
     null
-  }
 
   override def executorLost(
-      executorId: String, host: String, reason: ExecutorLossReason) {
+      executorId: String, host: String, reason: ExecutorLossReason)
     schedulableQueue.asScala.foreach(_.executorLost(executorId, host, reason))
-  }
 
-  override def checkSpeculatableTasks(): Boolean = {
+  override def checkSpeculatableTasks(): Boolean =
     var shouldRevive = false
-    for (schedulable <- schedulableQueue.asScala) {
+    for (schedulable <- schedulableQueue.asScala)
       shouldRevive |= schedulable.checkSpeculatableTasks()
-    }
     shouldRevive
-  }
 
-  override def getSortedTaskSetQueue: ArrayBuffer[TaskSetManager] = {
+  override def getSortedTaskSetQueue: ArrayBuffer[TaskSetManager] =
     var sortedTaskSetQueue = new ArrayBuffer[TaskSetManager]
     val sortedSchedulableQueue = schedulableQueue.asScala.toSeq
       .sortWith(taskSetSchedulingAlgorithm.comparator)
-    for (schedulable <- sortedSchedulableQueue) {
+    for (schedulable <- sortedSchedulableQueue)
       sortedTaskSetQueue ++= schedulable.getSortedTaskSetQueue
-    }
     sortedTaskSetQueue
-  }
 
-  def increaseRunningTasks(taskNum: Int) {
+  def increaseRunningTasks(taskNum: Int)
     runningTasks += taskNum
-    if (parent != null) {
+    if (parent != null)
       parent.increaseRunningTasks(taskNum)
-    }
-  }
 
-  def decreaseRunningTasks(taskNum: Int) {
+  def decreaseRunningTasks(taskNum: Int)
     runningTasks -= taskNum
-    if (parent != null) {
+    if (parent != null)
       parent.decreaseRunningTasks(taskNum)
-    }
-  }
-}

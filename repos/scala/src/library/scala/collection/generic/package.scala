@@ -3,7 +3,7 @@ package collection
 
 import scala.language.higherKinds
 
-package object generic {
+package object generic
   type CanBuild[-Elem, +To] = CanBuildFrom[Nothing, Elem, To]
 
   @deprecated("use ClassTagTraversableFactory instead", "2.10.0")
@@ -18,4 +18,3 @@ package object generic {
   @deprecated("use GenericClassTagTraversableTemplate instead", "2.10.0")
   type GenericClassManifestTraversableTemplate[+A, +CC[X] <: Traversable[X]] = GenericClassTagTraversableTemplate[
       A, CC]
-}

@@ -13,17 +13,15 @@ import com.typesafe.config.ConfigFactory
 import scala.collection.JavaConverters._
 import akka.actor._
 
-object LoggingReceiveSpec {
-  class TestLogActor extends Actor {
+object LoggingReceiveSpec
+  class TestLogActor extends Actor
     override val supervisorStrategy =
       OneForOneStrategy(maxNrOfRetries = 5, withinTimeRange = 5 seconds)(
           List(classOf[Throwable]))
     def receive = { case _ ⇒ }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
+class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll
 
   import LoggingReceiveSpec._
   val config = ConfigFactory
@@ -49,40 +47,37 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
         .withFallback(config))
 
   val filter = TestEvent.Mute(
-      EventFilter.custom {
+      EventFilter.custom
     case _: Logging.Debug ⇒ true
     case _: Logging.Info ⇒ true
     case _ ⇒ false
-  })
+  )
   appLogging.eventStream.publish(filter)
   appAuto.eventStream.publish(filter)
   appLifecycle.eventStream.publish(filter)
 
-  def ignoreMute(t: TestKit) {
-    t.ignoreMsg {
+  def ignoreMute(t: TestKit)
+    t.ignoreMsg
       case (_: TestEvent.Mute | _: TestEvent.UnMute) ⇒ true
-    }
-  }
 
-  override def afterAll() {
+  override def afterAll()
     TestKit.shutdownActorSystem(appLogging)
     TestKit.shutdownActorSystem(appAuto)
     TestKit.shutdownActorSystem(appLifecycle)
-  }
 
-  "A LoggingReceive" must {
+  "A LoggingReceive" must
 
-    "decorate a Receive" in {
-      new TestKit(appLogging) {
+    "decorate a Receive" in
+      new TestKit(appLogging)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
         system.eventStream.subscribe(testActor, classOf[UnhandledMessage])
         val a = system.actorOf(
-            Props(new Actor {
+            Props(new Actor
           def receive =
-            new LoggingReceive(Some("funky"), {
+            new LoggingReceive(Some("funky"),
               case null ⇒
-            })
-        }))
+            )
+        ))
         a ! "hallo"
         expectMsg(1 second,
                   Logging.Debug("funky",
@@ -90,125 +85,102 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
                                 "received unhandled message hallo from " +
                                 system.deadLetters))
         expectMsgType[UnhandledMessage](1 second)
-      }
-    }
 
-    "be added on Actor if requested" in {
-      new TestKit(appLogging) with ImplicitSender {
+    "be added on Actor if requested" in
+      new TestKit(appLogging) with ImplicitSender
         ignoreMute(this)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
         system.eventStream.subscribe(testActor, classOf[UnhandledMessage])
 
-        val r: Actor.Receive = {
+        val r: Actor.Receive =
           case null ⇒
-        }
 
         val actor = TestActorRef(
-            new Actor {
-          def switch: Actor.Receive = {
+            new Actor
+          def switch: Actor.Receive =
             case "becomenull" ⇒ context.become(r, false)
-          }
-          def receive = switch orElse LoggingReceive {
+          def receive = switch orElse LoggingReceive
             case x ⇒ sender() ! "x"
-          }
-        })
+        )
 
         val name = actor.path.toString
         actor ! "buh"
-        within(1 second) {
+        within(1 second)
           expectMsg(Logging.Debug(actor.path.toString,
                                   actor.underlyingActor.getClass,
                                   "received handled message buh from " + self))
           expectMsg("x")
-        }
 
         actor ! "becomenull"
 
-        within(500 millis) {
+        within(500 millis)
           actor ! "bah"
-          expectMsgPF() {
+          expectMsgPF()
             case UnhandledMessage("bah", testActor, `actor`) ⇒ true
-          }
-        }
-      }
-    }
 
-    "not duplicate logging" in {
-      new TestKit(appLogging) with ImplicitSender {
+    "not duplicate logging" in
+      new TestKit(appLogging) with ImplicitSender
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
         val actor = TestActorRef(
-            new Actor {
+            new Actor
           def receive =
-            LoggingReceive(LoggingReceive {
+            LoggingReceive(LoggingReceive
               case _ ⇒ sender() ! "x"
-            })
-        })
+            )
+        )
         actor ! "buh"
-        within(1 second) {
+        within(1 second)
           expectMsg(Logging.Debug(actor.path.toString,
                                   actor.underlyingActor.getClass,
                                   "received handled message buh from " + self))
           expectMsg("x")
-        }
-      }
-    }
-  }
 
-  "An Actor" must {
+  "An Actor" must
 
-    "log AutoReceiveMessages if requested" in {
-      new TestKit(appAuto) {
+    "log AutoReceiveMessages if requested" in
+      new TestKit(appAuto)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
         val actor = TestActorRef(
-            new Actor {
-          def receive = {
+            new Actor
+          def receive =
             case _ ⇒
-          }
-        })
+        )
         val name = actor.path.toString
         actor ! PoisonPill
-        expectMsgPF() {
+        expectMsgPF()
           case Logging.Debug(`name`, _, msg: String)
               if msg startsWith "received AutoReceiveMessage Envelope(PoisonPill" ⇒
             true
-        }
         awaitCond(actor.isTerminated, 100 millis)
-      }
-    }
 
-    "log Supervision events if requested" in {
-      new TestKit(appLifecycle) {
+    "log Supervision events if requested" in
+      new TestKit(appLifecycle)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
-        within(3 seconds) {
+        within(3 seconds)
           val lifecycleGuardian =
             appLifecycle.asInstanceOf[ActorSystemImpl].guardian
           val lname = lifecycleGuardian.path.toString
           val supervisor = TestActorRef[TestLogActor](Props[TestLogActor])
           val sname = supervisor.path.toString
 
-          fishForMessage(hint = "now supervising") {
+          fishForMessage(hint = "now supervising")
             case Logging.Debug(`lname`, _, msg: String)
                 if msg startsWith "now supervising" ⇒
               true
             case _ ⇒ false
-          }
 
           TestActorRef[TestLogActor](Props[TestLogActor], supervisor, "none")
 
-          fishForMessage(hint = "now supervising") {
+          fishForMessage(hint = "now supervising")
             case Logging.Debug(`sname`, _, msg: String)
                 if msg startsWith "now supervising" ⇒
               true
             case _ ⇒ false
-          }
-        }
-      }
-    }
 
-    "log DeathWatch events if requested" in {
-      new TestKit(appLifecycle) {
+    "log DeathWatch events if requested" in
+      new TestKit(appLifecycle)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
-        within(3 seconds) {
+        within(3 seconds)
           val supervisor = TestActorRef[TestLogActor](Props[TestLogActor])
           val sclass = classOf[TestLogActor]
           val actor =
@@ -216,68 +188,55 @@ class LoggingReceiveSpec extends WordSpec with BeforeAndAfterAll {
           val aname = actor.path.toString
 
           supervisor watch actor
-          fishForMessage(hint = "now watched by") {
+          fishForMessage(hint = "now watched by")
             case Logging.Debug(`aname`, `sclass`, msg: String)
                 if msg.startsWith("now watched by") ⇒
               true
             case _ ⇒ false
-          }
 
           supervisor unwatch actor
-          expectMsgPF(hint = "no longer watched by") {
+          expectMsgPF(hint = "no longer watched by")
             case Logging.Debug(`aname`, `sclass`, msg: String)
                 if msg.startsWith("no longer watched by") ⇒
-          }
-        }
-      }
-    }
 
-    "log LifeCycle events if requested" in {
-      new TestKit(appLifecycle) {
+    "log LifeCycle events if requested" in
+      new TestKit(appLifecycle)
         system.eventStream.subscribe(testActor, classOf[Logging.Debug])
         system.eventStream.subscribe(testActor, classOf[Logging.Error])
-        within(3 seconds) {
+        within(3 seconds)
           val supervisor = TestActorRef[TestLogActor](Props[TestLogActor])
           val sname = supervisor.path.toString
           val sclass = classOf[TestLogActor]
 
-          fishForMessage(hint = "started") {
+          fishForMessage(hint = "started")
             case Logging.Debug(`sname`, `sclass`, msg: String)
                 if msg startsWith "started" ⇒
               true
             case _ ⇒ false
-          }
 
           val actor =
             TestActorRef[TestLogActor](Props[TestLogActor], supervisor, "none")
           val aname = actor.path.toString
           val aclass = classOf[TestLogActor]
 
-          fishForMessage(hint = "started") {
+          fishForMessage(hint = "started")
             case Logging.Debug(`aname`, `aclass`, msg: String)
                 if msg startsWith "started" ⇒
               true
             case _ ⇒ false
-          }
 
-          EventFilter[ActorKilledException](occurrences = 1) intercept {
+          EventFilter[ActorKilledException](occurrences = 1) intercept
             actor ! Kill
-            val set = receiveWhile(messages = 3) {
+            val set = receiveWhile(messages = 3)
               case Logging.Error(_: ActorKilledException, `aname`, _, "Kill") ⇒
                 1
               case Logging.Debug(`aname`, `aclass`, "restarting") ⇒ 2
               case Logging.Debug(`aname`, `aclass`, "restarted") ⇒ 3
-            }.toSet
+            .toSet
             expectNoMsg(Duration.Zero)
             assert(set == Set(1, 2, 3), set + " was not Set(1, 2, 3)")
-          }
 
           system.stop(supervisor)
           expectMsgAllOf(Logging.Debug(aname, aclass, "stopped"),
                          Logging.Debug(sname, sclass, "stopping"),
                          Logging.Debug(sname, sclass, "stopped"))
-        }
-      }
-    }
-  }
-}

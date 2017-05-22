@@ -11,7 +11,7 @@ package org.scalajs.sbtplugin
 import sbt._
 import sbt.Keys._
 
-object ScalaJSJUnitPlugin extends AutoPlugin {
+object ScalaJSJUnitPlugin extends AutoPlugin
   override def requires: Plugins = ScalaJSPlugin
 
   import ScalaJSPlugin.autoImport._
@@ -25,17 +25,14 @@ object ScalaJSJUnitPlugin extends AutoPlugin {
       libraryDependencies ++= Seq(
           "org.scala-js" % "scalajs-junit-test-plugin" % scalaJSVersion % "scala-js-test-plugin" cross CrossVersion.full,
           "org.scala-js" %% "scalajs-junit-test-runtime" % scalaJSVersion % "test"),
-      scalacOptions in Test ++= {
+      scalacOptions in Test ++=
         val report = update.value
         val jars = report.select(configurationFilter("scala-js-test-plugin"))
-        for {
+        for
           jar <- jars
           jarPath = jar.getPath
           // This is a hack to filter out the dependencies of the plugins
           if jarPath.contains("plugin")
-        } yield {
+        yield
           s"-Xplugin:$jarPath"
-        }
-      }
   )
-}

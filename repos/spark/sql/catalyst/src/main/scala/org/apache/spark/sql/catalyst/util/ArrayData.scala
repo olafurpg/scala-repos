@@ -22,119 +22,98 @@ import scala.reflect.ClassTag
 import org.apache.spark.sql.catalyst.expressions.SpecializedGetters
 import org.apache.spark.sql.types.DataType
 
-abstract class ArrayData extends SpecializedGetters with Serializable {
+abstract class ArrayData extends SpecializedGetters with Serializable
   def numElements(): Int
 
   def copy(): ArrayData
 
   def array: Array[Any]
 
-  def toBooleanArray(): Array[Boolean] = {
+  def toBooleanArray(): Array[Boolean] =
     val size = numElements()
     val values = new Array[Boolean](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getBoolean(i)
       i += 1
-    }
     values
-  }
 
-  def toByteArray(): Array[Byte] = {
+  def toByteArray(): Array[Byte] =
     val size = numElements()
     val values = new Array[Byte](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getByte(i)
       i += 1
-    }
     values
-  }
 
-  def toShortArray(): Array[Short] = {
+  def toShortArray(): Array[Short] =
     val size = numElements()
     val values = new Array[Short](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getShort(i)
       i += 1
-    }
     values
-  }
 
-  def toIntArray(): Array[Int] = {
+  def toIntArray(): Array[Int] =
     val size = numElements()
     val values = new Array[Int](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getInt(i)
       i += 1
-    }
     values
-  }
 
-  def toLongArray(): Array[Long] = {
+  def toLongArray(): Array[Long] =
     val size = numElements()
     val values = new Array[Long](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getLong(i)
       i += 1
-    }
     values
-  }
 
-  def toFloatArray(): Array[Float] = {
+  def toFloatArray(): Array[Float] =
     val size = numElements()
     val values = new Array[Float](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getFloat(i)
       i += 1
-    }
     values
-  }
 
-  def toDoubleArray(): Array[Double] = {
+  def toDoubleArray(): Array[Double] =
     val size = numElements()
     val values = new Array[Double](size)
     var i = 0
-    while (i < size) {
+    while (i < size)
       values(i) = getDouble(i)
       i += 1
-    }
     values
-  }
 
   def toObjectArray(elementType: DataType): Array[AnyRef] =
     toArray[AnyRef](elementType: DataType)
 
-  def toArray[T : ClassTag](elementType: DataType): Array[T] = {
+  def toArray[T : ClassTag](elementType: DataType): Array[T] =
     val size = numElements()
     val values = new Array[T](size)
     var i = 0
-    while (i < size) {
-      if (isNullAt(i)) {
+    while (i < size)
+      if (isNullAt(i))
         values(i) = null.asInstanceOf[T]
-      } else {
+      else
         values(i) = get(i, elementType).asInstanceOf[T]
-      }
       i += 1
-    }
     values
-  }
 
   // todo: specialize this.
-  def foreach(elementType: DataType, f: (Int, Any) => Unit): Unit = {
+  def foreach(elementType: DataType, f: (Int, Any) => Unit): Unit =
     val size = numElements()
     var i = 0
-    while (i < size) {
-      if (isNullAt(i)) {
+    while (i < size)
+      if (isNullAt(i))
         f(i, null)
-      } else {
+      else
         f(i, get(i, elementType))
-      }
       i += 1
-    }
-  }
-}

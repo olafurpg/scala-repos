@@ -14,26 +14,23 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   * Date: 12/17/11
   */
 class ScalaDocMissingParameterDescriptionInspection
-    extends LocalInspectionTool {
+    extends LocalInspectionTool
 
   override def getDisplayName: String = "Missing Parameter Description"
 
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
-    new ScalaElementVisitor {
-      override def visitTag(s: ScDocTag) {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
+    new ScalaElementVisitor
+      override def visitTag(s: ScDocTag)
         if (!ScalaDocMissingParameterDescriptionInspection.OurTags.contains(
-                s.name) || s.getValueElement == null) {
+                s.name) || s.getValueElement == null)
           return
-        }
 
         val children = s.findChildrenByType(ScalaDocTokenType.DOC_COMMENT_DATA)
-        for (child <- children) {
+        for (child <- children)
           if (child.getText.length() > 1 &&
-              child.getText.split(" ").nonEmpty) {
+              child.getText.split(" ").nonEmpty)
             return
-          }
-        }
 
         holder.registerProblem(
             holder.getManager.createProblemDescriptor(
@@ -42,13 +39,8 @@ class ScalaDocMissingParameterDescriptionInspection
                 true,
                 ProblemHighlightType.GENERIC_ERROR_OR_WARNING,
                 isOnTheFly))
-      }
-    }
-  }
-}
 
-object ScalaDocMissingParameterDescriptionInspection {
+object ScalaDocMissingParameterDescriptionInspection
   import org.jetbrains.plugins.scala.lang.scaladoc.parser.parsing.MyScaladocParsing._
 
   val OurTags = Set(PARAM_TAG, THROWS_TAG, TYPE_PARAM_TAG)
-}

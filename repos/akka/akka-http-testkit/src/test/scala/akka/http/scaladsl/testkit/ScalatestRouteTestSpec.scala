@@ -18,41 +18,34 @@ import HttpMethods._
 import Directives._
 
 class ScalatestRouteTestSpec
-    extends FreeSpec with Matchers with ScalatestRouteTest {
+    extends FreeSpec with Matchers with ScalatestRouteTest
 
-  "The ScalatestRouteTest should support" - {
+  "The ScalatestRouteTest should support" -
 
-    "the most simple and direct route test" in {
-      Get() ~> complete(HttpResponse()) ~> { rr ⇒
+    "the most simple and direct route test" in
+      Get() ~> complete(HttpResponse()) ~>  rr ⇒
         rr.awaitResult; rr.response
-      } shouldEqual HttpResponse()
-    }
+      shouldEqual HttpResponse()
 
-    "a test using a directive and some checks" in {
+    "a test using a directive and some checks" in
       val pinkHeader = RawHeader("Fancy", "pink")
-      Get() ~> addHeader(pinkHeader) ~> {
-        respondWithHeader(pinkHeader) {
+      Get() ~> addHeader(pinkHeader) ~>
+        respondWithHeader(pinkHeader)
           complete("abc")
-        }
-      } ~> check {
+      ~> check
         status shouldEqual OK
         responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
                                               "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
-      }
-    }
 
-    "proper rejection collection" in {
-      Post("/abc", "content") ~> {
-        (get | put) {
+    "proper rejection collection" in
+      Post("/abc", "content") ~>
+        (get | put)
           complete("naah")
-        }
-      } ~> check {
+      ~> check
         rejections shouldEqual List(MethodRejection(GET), MethodRejection(PUT))
-      }
-    }
 
-    "separation of route execution from checking" in {
+    "separation of route execution from checking" in
       val pinkHeader = RawHeader("Fancy", "pink")
 
       case object Command
@@ -62,25 +55,21 @@ class ScalatestRouteTestSpec
       implicit val askTimeout: Timeout = 1.second
 
       val result =
-        Get() ~> pinkHeader ~> {
-          respondWithHeader(pinkHeader) {
+        Get() ~> pinkHeader ~>
+          respondWithHeader(pinkHeader)
             complete(handler.ref.ask(Command).mapTo[String])
-          }
-        } ~> runRoute
+        ~> runRoute
 
       handler.expectMsg(Command)
       handler.reply("abc")
 
-      check {
+      check
         status shouldEqual OK
         responseEntity shouldEqual HttpEntity(ContentTypes.`text/plain(UTF-8)`,
                                               "abc")
         header("Fancy") shouldEqual Some(pinkHeader)
-      }(result)
-    }
-  }
+      (result)
 
   // TODO: remove once RespondWithDirectives have been ported
   def respondWithHeader(responseHeader: HttpHeader): Directive0 =
     mapResponseHeaders(responseHeader +: _)
-}

@@ -16,7 +16,7 @@ import annotation.tailrec
 
 import sbt.io.IO
 
-object Output {
+object Output
   final val DefaultTail = "> "
 
   @deprecated("Explicitly provide None for the stream ID.", "0.13.0")
@@ -39,12 +39,11 @@ object Output {
                streams: Streams,
                patternString: String,
                printLines: Seq[String] => Unit)(
-      implicit display: Show[ScopedKey[_]]): Unit = {
+      implicit display: Show[ScopedKey[_]]): Unit =
     val pattern = Pattern compile patternString
     val lines =
       flatLines(lastLines(keys, streams))(_ flatMap showMatches(pattern))
     printLines(lines)
-  }
   def lastGrep(file: File,
                patternString: String,
                printLines: Seq[String] => Unit,
@@ -54,24 +53,20 @@ object Output {
     lines flatMap showMatches(Pattern compile patternString)
 
   def flatLines(outputs: Values[Seq[String]])(f: Seq[String] => Seq[String])(
-      implicit display: Show[ScopedKey[_]]): Seq[String] = {
+      implicit display: Show[ScopedKey[_]]): Seq[String] =
     val single = outputs.size == 1
-    outputs flatMap {
+    outputs flatMap
       case KeyValue(key, lines) =>
         val flines = f(lines)
         if (!single) bold(display(key)) +: flines else flines
-    }
-  }
 
   def lastLines(keys: Values[_],
                 streams: Streams,
-                sid: Option[String] = None): Values[Seq[String]] = {
+                sid: Option[String] = None): Values[Seq[String]] =
     val outputs =
-      keys map { (kv: KeyValue[_]) =>
+      keys map  (kv: KeyValue[_]) =>
         KeyValue(kv.key, lastLines(kv.key, streams, sid))
-      }
     outputs.filterNot(_.value.isEmpty)
-  }
 
   @deprecated("Explicitly provide None for the stream ID.", "0.13.0")
   def lastLines(key: ScopedKey[_], mgr: Streams): Seq[String] =
@@ -79,7 +74,7 @@ object Output {
 
   def lastLines(
       key: ScopedKey[_], mgr: Streams, sid: Option[String]): Seq[String] =
-    mgr.use(key) { s =>
+    mgr.use(key)  s =>
       // Workaround for #1155 - Keys.streams are always scoped by the task they're included in
       // but are keyed by the Keys.streams key.  I think this isn't actually a workaround, but
       // is how things are expected to work now.
@@ -89,17 +84,13 @@ object Output {
         ScopedKey(Project.fillTaskAxis(key).scope, Keys.streams.key)
       val tmp = s.readText(streamScopedKey, sid)
       IO.readLines(tmp)
-    }
 
   def tailLines(file: File, tailDelim: String): Seq[String] =
     headLines(IO.readLines(file).reverse, tailDelim).reverse
 
   @tailrec def headLines(lines: Seq[String], tailDelim: String): Seq[String] =
     if (lines.isEmpty) lines
-    else {
-      val (first, tail) = lines.span { line =>
+    else
+      val (first, tail) = lines.span  line =>
         !(line startsWith tailDelim)
-      }
       if (first.isEmpty) headLines(tail drop 1, tailDelim) else first
-    }
-}

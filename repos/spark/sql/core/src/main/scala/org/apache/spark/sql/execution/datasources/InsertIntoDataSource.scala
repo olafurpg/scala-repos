@@ -28,9 +28,9 @@ import org.apache.spark.sql.sources.InsertableRelation
 private[sql] case class InsertIntoDataSource(logicalRelation: LogicalRelation,
                                              query: LogicalPlan,
                                              overwrite: Boolean)
-    extends RunnableCommand {
+    extends RunnableCommand
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     val relation = logicalRelation.relation.asInstanceOf[InsertableRelation]
     val data = Dataset.newDataFrame(sqlContext, query)
     // Apply the schema of the existing table to the new data.
@@ -42,5 +42,3 @@ private[sql] case class InsertIntoDataSource(logicalRelation: LogicalRelation,
     sqlContext.cacheManager.invalidateCache(logicalRelation)
 
     Seq.empty[Row]
-  }
-}

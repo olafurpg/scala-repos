@@ -19,7 +19,7 @@ import akka.http.impl.util.JavaMapping.Implicits._
 import scala.compat.java8.OptionConverters._
 
 /** INTERNAL API */
-case class JavaQuery(query: sm.Uri.Query) extends jm.Query {
+case class JavaQuery(query: sm.Uri.Query) extends jm.Query
   override def get(key: String): Optional[String] = query.get(key).asJava
   override def toMap: ju.Map[String, String] = query.toMap.asJava
   override def toList: ju.List[Pair[String, String]] =
@@ -41,4 +41,3 @@ case class JavaQuery(query: sm.Uri.Query) extends jm.Query {
       .get
   override def render(charset: HttpCharset, keep: CharPredicate): String =
     render(charset, keep)
-}

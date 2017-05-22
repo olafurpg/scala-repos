@@ -3,20 +3,20 @@ import Import._
 import Keys._
 import complete.DefaultParsers._
 
-object PomRepoTest extends Build {
+object PomRepoTest extends Build
   lazy val root =
     Project("root", file(".")) settings
     (resolvers ++= Seq(local,
                        Resolver.sonatypeRepo("releases"),
                        Resolver.sonatypeRepo("snapshots")),
         InputKey[Unit]("check-pom") <<=
-          InputTask(_ => spaceDelimited("<args>")) { result =>
+          InputTask(_ => spaceDelimited("<args>"))  result =>
           (makePom, result, streams) map checkPomRepositories
-        }, makePomConfiguration <<= (makePomConfiguration, baseDirectory) {
+        , makePomConfiguration <<= (makePomConfiguration, baseDirectory)
           (conf, base) =>
             conf.copy(filterRepositories = pomIncludeRepository(
                       base, conf.filterRepositories))
-        }, ivyPaths <<=
+        , ivyPaths <<=
           baseDirectory(dir => new IvyPaths(dir, Some(dir / "ivy-home"))))
 
   val local =
@@ -28,24 +28,20 @@ object PomRepoTest extends Build {
       else if (base / "repo.all" exists) true else prev(r)
 
   def addSlash(s: String): String =
-    s match {
+    s match
       case s if s endsWith "/" => s
       case _ => s + "/"
-    }
 
-  def checkPomRepositories(file: File, args: Seq[String], s: TaskStreams) {
+  def checkPomRepositories(file: File, args: Seq[String], s: TaskStreams)
     val repositories = scala.xml.XML.loadFile(file) \\ "repository"
-    val extracted = repositories.map { repo =>
+    val extracted = repositories.map  repo =>
       MavenRepository(repo \ "name" text, addSlash(repo \ "url" text))
-    }
     val expected = args.map(GlobFilter.apply)
     s.log.info("Extracted: " + extracted.mkString("\n\t", "\n\t", "\n"))
     s.log.info("Expected: " + args.mkString("\n\t", "\n\t", "\n"))
-    extracted.find { e =>
+    extracted.find  e =>
       !expected.exists(_.accept(e.root))
-    } map { "Repository should not be exported: " + _ } orElse
-    (expected.find { e =>
+    map { "Repository should not be exported: " + _ } orElse
+    (expected.find  e =>
           !extracted.exists(r => e.accept(r.root))
-        } map { "Repository should be exported: " + _ }) foreach error
-  }
-}
+        map { "Repository should be exported: " + _ }) foreach error

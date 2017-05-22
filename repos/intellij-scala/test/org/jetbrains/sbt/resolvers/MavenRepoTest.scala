@@ -7,9 +7,9 @@ import com.intellij.openapi.util.SystemInfo
   * @author Nikolay Obedin
   * @since 8/1/14.
   */
-class MavenRepoTest extends IndexingTestCase with UsefulTestCaseHelper {
+class MavenRepoTest extends IndexingTestCase with UsefulTestCaseHelper
 
-  def testIndexUpdate() = {
+  def testIndexUpdate() =
     val testIndex = createAndUpdateIndex(
         SbtResolver(SbtResolver.Kind.Maven,
                     "Test repo",
@@ -18,31 +18,25 @@ class MavenRepoTest extends IndexingTestCase with UsefulTestCaseHelper {
                               Set("org.jetbrains"),
                               Set("test-one", "test-two"),
                               Set("0.0.1", "0.0.2"))
-  }
 
-  def testNonExistentIndexUpdate() = {
+  def testNonExistentIndexUpdate() =
     if (SystemInfo.isWindows)
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
-                         "C:\\non-existent-dir"))) {
+                         "C:\\non-existent-dir")))
         createAndUpdateIndex(
             SbtResolver(SbtResolver.Kind.Maven,
                         "Test repo",
                         "file:/C:/non-existent-dir"))
-      } else
+      else
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
-                         "/non-existent-dir"))) {
+                         "/non-existent-dir")))
         createAndUpdateIndex(SbtResolver(
                 SbtResolver.Kind.Maven, "Test repo", "file:/non-existent-dir"))
-      }
-  }
 
-  def testNonIndexedRepoUpdate() = {
+  def testNonIndexedRepoUpdate() =
     val repoUrl = "http://dl.bintray.com/scalaz/releases/"
-    assertException[RepositoryIndexingException](None) {
+    assertException[RepositoryIndexingException](None)
       createAndUpdateIndex(
           SbtResolver(SbtResolver.Kind.Maven, "Scalaz Bintray repo", repoUrl))
-    }
-  }
-}

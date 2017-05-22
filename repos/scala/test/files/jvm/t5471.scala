@@ -1,6 +1,6 @@
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     import scala.math.Numeric
     import scala.math.Numeric.Implicits._
 
@@ -11,5 +11,3 @@ object Test {
 
     println(dbl(b) == b.toDouble)
     println(flt(b) == b.toFloat)
-  }
-}

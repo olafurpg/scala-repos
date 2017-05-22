@@ -24,17 +24,16 @@ private[akka] final case class ClientConnectionSettingsImpl(
     websocketRandomFactory: () ⇒ Random,
     socketOptions: immutable.Seq[SocketOption],
     parserSettings: ParserSettings)
-    extends akka.http.scaladsl.settings.ClientConnectionSettings {
+    extends akka.http.scaladsl.settings.ClientConnectionSettings
 
   require(connectingTimeout >= Duration.Zero, "connectingTimeout must be >= 0")
   require(requestHeaderSizeHint > 0, "request-size-hint must be > 0")
 
   override def productPrefix = "ClientConnectionSettings"
-}
 
 object ClientConnectionSettingsImpl
-    extends SettingsCompanion[ClientConnectionSettingsImpl]("akka.http.client") {
-  def fromSubConfig(root: Config, inner: Config) = {
+    extends SettingsCompanion[ClientConnectionSettingsImpl]("akka.http.client")
+  def fromSubConfig(root: Config, inner: Config) =
     val c = inner.withFallback(root.getConfig(prefix))
     new ClientConnectionSettingsImpl(
         userAgentHeader = c
@@ -49,5 +48,3 @@ object ClientConnectionSettingsImpl
               root, c.getConfig("socket-options")),
         parserSettings = ParserSettingsImpl.fromSubConfig(
               root, c.getConfig("parsing")))
-  }
-}

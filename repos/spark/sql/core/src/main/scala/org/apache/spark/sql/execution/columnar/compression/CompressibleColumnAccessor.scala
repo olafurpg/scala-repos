@@ -22,20 +22,17 @@ import org.apache.spark.sql.execution.columnar.{ColumnAccessor, NativeColumnAcce
 import org.apache.spark.sql.types.AtomicType
 
 private[columnar] trait CompressibleColumnAccessor[T <: AtomicType]
-    extends ColumnAccessor {
+    extends ColumnAccessor
   this: NativeColumnAccessor[T] =>
 
   private var decoder: Decoder[T] = _
 
-  abstract override protected def initialize(): Unit = {
+  abstract override protected def initialize(): Unit =
     super.initialize()
     decoder = CompressionScheme(underlyingBuffer.getInt())
       .decoder(buffer, columnType)
-  }
 
   abstract override def hasNext: Boolean = super.hasNext || decoder.hasNext
 
-  override def extractSingle(row: MutableRow, ordinal: Int): Unit = {
+  override def extractSingle(row: MutableRow, ordinal: Int): Unit =
     decoder.next(row, ordinal)
-  }
-}

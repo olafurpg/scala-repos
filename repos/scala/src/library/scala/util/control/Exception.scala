@@ -30,11 +30,11 @@ import scala.language.implicitConversions
   *
   *  @author Paul Phillips
   */
-object Exception {
+object Exception
   type Catcher[+T] = PartialFunction[Throwable, T]
 
   def mkCatcher[Ex <: Throwable : ClassTag, T](
-      isDef: Ex => Boolean, f: Ex => T) = new Catcher[T] {
+      isDef: Ex => Boolean, f: Ex => T) = new Catcher[T]
     private def downcast(x: Throwable): Option[Ex] =
       if (classTag[Ex].runtimeClass.isAssignableFrom(x.getClass))
         Some(x.asInstanceOf[Ex])
@@ -42,7 +42,6 @@ object Exception {
 
     def isDefinedAt(x: Throwable) = downcast(x) exists isDef
     def apply(x: Throwable): T = f(downcast(x).get)
-  }
 
   def mkThrowableCatcher[T](isDef: Throwable => Boolean, f: Throwable => T) =
     mkCatcher(isDef, f)
@@ -54,31 +53,27 @@ object Exception {
   /** !!! Not at all sure of every factor which goes into this,
     *  and/or whether we need multiple standard variations.
     */
-  def shouldRethrow(x: Throwable): Boolean = x match {
+  def shouldRethrow(x: Throwable): Boolean = x match
     case _: ControlThrowable => true
     case _: InterruptedException => true
     // case _: java.lang.Error       => true ?
     case _ => false
-  }
 
-  trait Described {
+  trait Described
     protected val name: String
     private var _desc: String = ""
     def desc = _desc
-    def withDesc(s: String): this.type = {
+    def withDesc(s: String): this.type =
       _desc = s
       this
-    }
     override def toString() = name + "(" + desc + ")"
-  }
 
   /** A container class for finally code. */
-  class Finally private[Exception](body: => Unit) extends Described {
+  class Finally private[Exception](body: => Unit) extends Described
     protected val name = "Finally"
 
     def and(other: => Unit): Finally = new Finally({ body; other })
     def invoke() { body }
-  }
 
   /** A container class for catch/finally logic.
     *
@@ -89,7 +84,7 @@ object Exception {
   class Catch[+T](val pf: Catcher[T],
                   val fin: Option[Finally] = None,
                   val rethrow: Throwable => Boolean = shouldRethrow)
-      extends Described {
+      extends Described
 
     protected val name = "Catch"
 
@@ -100,16 +95,15 @@ object Exception {
 
     /** Apply this catch logic to the supplied body. */
     def apply[U >: T](body: => U): U =
-      try body catch {
+      try body catch
         case x if rethrow(x) => throw x
         case x if pf isDefinedAt x => pf(x)
-      } finally fin foreach (_.invoke())
+      finally fin foreach (_.invoke())
 
     /* Create an empty Try container with this Catch and the supplied `Finally`. */
-    def andFinally(body: => Unit): Catch[T] = fin match {
+    def andFinally(body: => Unit): Catch[T] = fin match
       case None => new Catch(pf, Some(new Finally(body)), rethrow)
       case Some(f) => new Catch(pf, Some(f and body), rethrow)
-    }
 
     /** Apply this catch logic to the supplied body, mapping the result
       *  into `Option[T]` - `None` if any exception was caught, `Some(T)` otherwise.
@@ -130,19 +124,16 @@ object Exception {
 
     /** Create a `Catch` object with the same `isDefinedAt` logic as this one,
       * but with the supplied `apply` method replacing the current one. */
-    def withApply[U](f: Throwable => U): Catch[U] = {
-      val pf2 = new Catcher[U] {
+    def withApply[U](f: Throwable => U): Catch[U] =
+      val pf2 = new Catcher[U]
         def isDefinedAt(x: Throwable) = pf isDefinedAt x
         def apply(x: Throwable) = f(x)
-      }
       new Catch(pf2, fin, rethrow)
-    }
 
     /** Convenience methods. */
     def toOption: Catch[Option[T]] = withApply(_ => None)
     def toEither: Catch[Either[Throwable, T]] = withApply(Left(_))
     def toTry: Catch[scala.util.Try[T]] = withApply(x => Failure(x))
-  }
 
   final val nothingCatcher: Catcher[Nothing] = mkThrowableCatcher(
       _ => false, throw _)
@@ -205,25 +196,22 @@ object Exception {
     *   handling(ex1, ex2) by (_.printStackTrace)
     * }}}
     */
-  class By[T, R](f: T => R) {
+  class By[T, R](f: T => R)
     def by(x: T): R = f(x)
-  }
-  def handling[T](exceptions: Class[_]*) = {
+  def handling[T](exceptions: Class[_]*) =
     def fun(f: Throwable => T) = catching(exceptions: _*) withApply f
     new By[Throwable => T, Catch[T]](fun _)
-  }
 
   /** Returns a `Catch` object with no catch logic and the argument as `Finally`. */
   def ultimately[T](body: => Unit): Catch[T] = noCatch andFinally body
 
   /** Creates a `Catch` object which unwraps any of the supplied exceptions. */
-  def unwrapping[T](exceptions: Class[_]*): Catch[T] = {
+  def unwrapping[T](exceptions: Class[_]*): Catch[T] =
     def unwrap(x: Throwable): Throwable =
       if (wouldMatch(x, exceptions) && x.getCause != null) unwrap(x.getCause)
       else x
 
     catching(exceptions: _*) withApply (x => throw unwrap(x))
-  }
 
   /** Private **/
   private def wouldMatch(
@@ -231,7 +219,5 @@ object Exception {
     classes exists (_ isAssignableFrom x.getClass)
 
   private def pfFromExceptions(
-      exceptions: Class[_]*): PartialFunction[Throwable, Nothing] = {
+      exceptions: Class[_]*): PartialFunction[Throwable, Nothing] =
     case x if wouldMatch(x, exceptions) => throw x
-  }
-}

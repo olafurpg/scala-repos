@@ -18,61 +18,48 @@ import org.jetbrains.plugins.scala.scalai18n.codeInspection.i18n.ScalaI18nUtil
   * @since 7/17/12
   */
 class ScalaI18nMessageGotoDeclarationHandler
-    extends GotoDeclarationHandlerBase {
+    extends GotoDeclarationHandlerBase
   private final val KEY: Key[FoldingBuilder] =
     CompositeFoldingBuilder.FOLDING_BUILDER
 
   def getGotoDeclarationTarget(
-      myElement: PsiElement, editor: Editor): PsiElement = {
+      myElement: PsiElement, editor: Editor): PsiElement =
     var element = myElement
     var i: Int = 4 //some street magic from Konstantin Bulenkov
     var flag = true
-    while (element != null && i > 0 && flag) {
+    while (element != null && i > 0 && flag)
       val node: ASTNode = element.getNode
-      if (node != null && node.getUserData(KEY) != null) {
+      if (node != null && node.getUserData(KEY) != null)
         flag = false
-      } else {
+      else
         i -= 1
         element = element.getParent
-      }
-    }
-    if (element.isInstanceOf[ScLiteral]) {
+    if (element.isInstanceOf[ScLiteral])
       return resolve(element)
-    }
-    element match {
+    element match
       case methodCall: ScMethodCall =>
         var foldRegion: FoldRegion = null
-        for (region <- editor.getFoldingModel.getAllFoldRegions) {
+        for (region <- editor.getFoldingModel.getAllFoldRegions)
           val psiElement: PsiElement =
             EditorFoldingInfo.get(editor).getPsiElement(region)
-          if (methodCall == psiElement) {
+          if (methodCall == psiElement)
             foldRegion = region
-          }
-        }
         if (foldRegion == null || foldRegion.isExpanded) return null
-        for (expression <- methodCall.args.exprsArray) {
-          expression match {
+        for (expression <- methodCall.args.exprsArray)
+          expression match
             case literal: ScLiteral
                 if ScalaI18nUtil.isI18nProperty(
                     expression.getProject, literal) =>
               return resolve(expression)
             case _ =>
-          }
-        }
       case _ =>
-    }
     null
-  }
 
-  @Nullable private def resolve(element: PsiElement): PsiElement = {
+  @Nullable private def resolve(element: PsiElement): PsiElement =
     if (element == null) return null
     val references: Array[PsiReference] = element.getReferences
-    if (references.length != 0) {
-      for (reference <- references) {
+    if (references.length != 0)
+      for (reference <- references)
         if (reference.isInstanceOf[PropertyReference])
           return reference.resolve()
-      }
-    }
     null
-  }
-}

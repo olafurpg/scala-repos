@@ -8,16 +8,13 @@ import org.scalacheck.{Gen, Arbitrary}
 import Lens.{lens => _, _}
 import org.scalacheck.Prop.forAll
 
-object LensTest extends SpecLite {
+object LensTest extends SpecLite
 
-  {
     implicit def lensArb = Arbitrary(Gen.const(Lens.lensId[Int]))
-    implicit def lensEqual = new Equal[Lens[Int, Int]] {
+    implicit def lensEqual = new Equal[Lens[Int, Int]]
       def equal(a1: Lens[Int, Int], a2: Lens[Int, Int]): Boolean =
         a1.get(0) == a2.get(0)
-    }
     checkAll("Lens", category.laws[Lens]) // not really testing much!
-  }
 
   checkAll("id", lens.laws(Lens.lensId[Int]))
   checkAll("trivial", lens.laws(Lens.trivialLens[Int]))
@@ -31,12 +28,10 @@ object LensTest extends SpecLite {
       "sum",
       lens.laws(Lens.firstLens[Int, String].sum(Lens.firstLens[Int, String])))
 
-  "NumericLens" should {
+  "NumericLens" should
     "+=" ! forAll((i: Int) =>
           (Lens.lensId[Int] += i).run(1) must_=== ((i + 1) -> (i + 1)))
     "-=" ! forAll((i: Int) =>
           (Lens.lensId[Int] -= i).run(1) must_=== ((1 - i) -> (1 - i)))
     "*=" ! forAll((i: Int) =>
           (Lens.lensId[Int] *= i).run(2) must_=== ((i * 2) -> (i * 2)))
-  }
-}

@@ -1,22 +1,20 @@
 // Some iterator grouped/sliding unit tests
-object Test {
+object Test
   def it = (1 to 10).iterator
   def assertThat[T](expectedLength: Int, expectedLast: Seq[T])(
-      it: Iterator[Seq[T]]) {
+      it: Iterator[Seq[T]])
     val xs = it.toList
     def fail(msg: String) = "assertion failed on %s: %s".format(xs, msg)
     assert(
         xs.size == expectedLength, fail("expected length " + expectedLength))
     assert(xs.last == expectedLast, fail("expected last " + expectedLast))
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val itSum = it.toStream.sum
-    for (i <- it) {
+    for (i <- it)
       // sum of the groups == sum of the original
       val thisSum = ((it grouped i) map (_.sum)).toStream.sum
       assert(thisSum == itSum, thisSum + " != " + itSum)
-    }
 
     // grouped
     assertThat(4, List(10)) { it grouped 3 }
@@ -40,15 +38,12 @@ object Test {
     assertThat(3, List(9, 10)) { it.sliding(2, 4) }
 
     // make sure it throws past the end
-    val thrown = try {
+    val thrown = try
       val it = List(1, 2, 3).sliding(2)
       it.next
       it.next
       it.next
       false
-    } catch {
+    catch
       case _: NoSuchElementException => true
-    }
     assert(thrown)
-  }
-}

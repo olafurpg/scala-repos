@@ -3,7 +3,7 @@
  */
 package scalaguide.advanced.filters
 
-package simple {
+package simple
 
 // #simple-filter
   import javax.inject.Inject
@@ -14,14 +14,14 @@ package simple {
 
   class LoggingFilter @Inject()(
       implicit val mat: Materializer, ec: ExecutionContext)
-      extends Filter {
+      extends Filter
 
     def apply(nextFilter: RequestHeader => Future[Result])(
-        requestHeader: RequestHeader): Future[Result] = {
+        requestHeader: RequestHeader): Future[Result] =
 
       val startTime = System.currentTimeMillis
 
-      nextFilter(requestHeader).map { result =>
+      nextFilter(requestHeader).map  result =>
         val endTime = System.currentTimeMillis
         val requestTime = endTime - startTime
 
@@ -29,13 +29,9 @@ package simple {
             s"${requestHeader.method} ${requestHeader.uri} took ${requestTime}ms and returned ${result.header.status}")
 
         result.withHeaders("Request-Time" -> requestTime.toString)
-      }
-    }
-  }
 // #simple-filter
-}
 
-package httpfilters {
+package httpfilters
 
   import simple.LoggingFilter
 
@@ -48,9 +44,7 @@ package httpfilters {
       gzip: GzipFilter,
       log: LoggingFilter
   )
-      extends HttpFilters {
+      extends HttpFilters
 
     val filters = Seq(gzip, log)
-  }
 //#filters
-}

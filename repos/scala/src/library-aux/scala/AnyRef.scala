@@ -12,7 +12,7 @@ package scala
   *  All types except the value types descend from this class.
   *  @template
   */
-trait AnyRef extends Any {
+trait AnyRef extends Any
 
   /** The equality method for reference types.  Default implementation delegates to `eq`.
     *
@@ -120,4 +120,3 @@ trait AnyRef extends Any {
   final def wait(): Unit
   final def wait(timeout: Long, nanos: Int): Unit
   final def wait(timeout: Long): Unit
-}

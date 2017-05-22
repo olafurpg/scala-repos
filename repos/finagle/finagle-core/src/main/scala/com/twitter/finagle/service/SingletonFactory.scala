@@ -14,27 +14,22 @@ import com.twitter.util.{Future, Promise, Time}
   * proxies all requests to the same `service` rather than creating new objects.
   */
 class SingletonFactory[Req, Rep](service: Service[Req, Rep])
-    extends ServiceFactory[Req, Rep] {
+    extends ServiceFactory[Req, Rep]
   private[this] var latch = new AsyncLatch
 
-  def apply(conn: ClientConnection) = Future {
+  def apply(conn: ClientConnection) = Future
     latch.incr()
-    new Service[Req, Rep] {
+    new Service[Req, Rep]
       def apply(request: Req) = service(request)
       override def close(deadline: Time) = { latch.decr(); Future.Done }
-    }
-  }
 
-  def close(deadline: Time) = {
+  def close(deadline: Time) =
     val p = new Promise[Unit]
-    latch.await {
+    latch.await
       service.close()
       p.setDone()
-    }
     p
-  }
 
   override def status = service.status
 
   override val toString = "singleton_factory_%s".format(service.toString)
-}

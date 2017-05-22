@@ -30,11 +30,11 @@ import emitter._
 import parser._
 import typer._
 
-object QuirrelConsole {
+object QuirrelConsole
   val compiler = new Parser with StubPhases with ProvenanceChecker with Binder
-  with Compiler with Emitter with LineErrors {
+  with Compiler with Emitter with LineErrors
 
-    class Lib extends Library {
+    class Lib extends Library
       type Morphism1 = Morphism1Like
       type Morphism2 = Morphism2Like
       type Op1 = Op1Like with Morphism1
@@ -47,19 +47,16 @@ object QuirrelConsole {
       def lib2 = Set()
       def libReduction = Set()
 
-      lazy val expandGlob = new Morphism1Like {
+      lazy val expandGlob = new Morphism1Like
         val namespace = Vector("std", "fs")
         val name = "expandGlob"
         val opcode = 0x0001
         val tpe = UnaryOperationType(JType.JUniverseT, JType.JUniverseT)
         val rowLevel = false
-      }
-    }
 
     object library extends Lib
-  }
 
-  trait StubPhases extends Phases {
+  trait StubPhases extends Phases
     protected def LoadId = Identifier(Vector(), "load")
     protected def RelLoadId = Identifier(Vector(), "relativeLoad")
     protected def ExpandGlobId = Identifier(Vector("std", "fs"), "expandGlob")
@@ -71,5 +68,3 @@ object QuirrelConsole {
       Map()
     def inferBuckets(expr: Expr) = Set()
     def buildTrace(sigma: Sigma)(expr: Expr): Trace = Trace.empty
-  }
-}

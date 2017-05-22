@@ -31,13 +31,13 @@ import org.specs2.mutable.Specification
 
 import scalaz._
 
-class SerializationSpecs extends Specification {
+class SerializationSpecs extends Specification
   import Permission._
 
   val i0 = new org.joda.time.Instant(0L)
 
-  "APIKeyRecord deserialization" should {
-    "Handle V0 formats" in {
+  "APIKeyRecord deserialization" should
+    "Handle V0 formats" in
       val inputs =
         """[
         { "tid" : "A594581E", "cid" : "A594581E", "gids" : ["4068", "f147"] },
@@ -47,12 +47,12 @@ class SerializationSpecs extends Specification {
         { "tid" : "45A49AB5", "cid" : "A594581E", "gids" : ["b994", "3be3"] }
       ]"""
 
-      val result = for {
+      val result = for
         jv <- JParser.parseFromString(inputs)
         records <- jv.validated[List[APIKeyRecord]]
-      } yield records
+      yield records
 
-      result must beLike {
+      result must beLike
         case Success(records) =>
           records mustEqual List(
               APIKeyRecord("A594581E",
@@ -88,10 +88,8 @@ class SerializationSpecs extends Specification {
           )
 
         case Failure(error) => throw new Exception(error.toString)
-      }
-    }
 
-    "Handle V1 formats" in {
+    "Handle V1 formats" in
       val inputs =
         """[
         {"isRoot" : true, "name" : "root-apiKey", "description" : "The root API key", "apiKey" : "17D42117-EF8E-4F43-B833-005F4EBB262C", "grants" : ["6f89110c953940cbbccc397f68c4cc9293af764c4d034719bf35b4736ee702daaef154314d5441ba8a69ed65e4ffa581"] },
@@ -101,10 +99,10 @@ class SerializationSpecs extends Specification {
         {"isRoot" : true, "name" : "root-apiKey", "description" : "The root API key", "apiKey" : "A09D8293-A28F-4422-B375-9C0CDF75DC68", "grants" : ["c6ab82c1f69640de9e5211ebb2b96661e1bff7d8a4134f25ad1aaf1319fa7b3e182e6aa8eb1f4699b1303f0d03022213"] }
       ]"""
 
-      val records = for {
+      val records = for
         jv <- JParser.parseFromString(inputs)
         records <- jv.validated[List[APIKeyRecord]]
-      } yield records
+      yield records
 
       records mustEqual Success(
           List(
@@ -143,11 +141,9 @@ class SerializationSpecs extends Specification {
                   Set("c6ab82c1f69640de9e5211ebb2b96661e1bff7d8a4134f25ad1aaf1319fa7b3e182e6aa8eb1f4699b1303f0d03022213"),
                   true)
           ))
-    }
-  }
 
-  "Grant deserialization" should {
-    "Handle V0 formats" in {
+  "Grant deserialization" should
+    "Handle V0 formats" in
       val inputs =
         """[
 { "gid" : "4068840", "cid": "(undefined)", "permission" : { "type" : "owner", "path" : "/", "expirationDate" : null } },
@@ -157,10 +153,10 @@ class SerializationSpecs extends Specification {
 { "gid" : "da22fe7", "cid": "(undefined)", "issuer" : "91cb868", "permission" : { "type" : "write", "path" : "/test/", "expirationDate" : null } }
 ]"""
 
-      (for {
+      (for
         jv <- JParser.parseFromString(inputs)
         records <- jv.validated[List[Grant]]
-      } yield {
+      yield
         records mustEqual List(
             Grant("4068840",
                   None,
@@ -204,12 +200,11 @@ class SerializationSpecs extends Specification {
                   i0,
                   None)
         )
-      }).fold({ error =>
+      ).fold( error =>
         throw new Exception(error.toString)
-      }, _ => ok)
-    }
+      , _ => ok)
 
-    "Handle V1 formats" in {
+    "Handle V1 formats" in
       val inputs =
         """[
         {
@@ -247,10 +242,10 @@ class SerializationSpecs extends Specification {
         }
       ]"""
 
-      (for {
+      (for
         jv <- JParser.parseFromString(inputs)
         records <- jv.validated[List[Grant]]
-      } yield {
+      yield
         records mustEqual List(
             Grant(
                 "6f89110c953940cbbccc397f68c4cc9293af764c4d034719bf35b4736ee702daaef154314d5441ba8a69ed65e4ffa581",
@@ -296,51 +291,36 @@ class SerializationSpecs extends Specification {
                 i0,
                 None)
         )
-      }).fold({ error =>
+      ).fold( error =>
         throw new Exception(error.toString)
-      }, _ => ok)
-    }
+      , _ => ok)
 
-    "Deserialize NewGrantRequest without parentIds" in {
-      (JObject("permissions" -> JArray())).validated[v1.NewGrantRequest] must beLike {
+    "Deserialize NewGrantRequest without parentIds" in
+      (JObject("permissions" -> JArray())).validated[v1.NewGrantRequest] must beLike
         case Success(_) => ok
-      }
-    }
-  }
 
-  "Ingest serialization" should {
-    "Handle V0 format" in {
+  "Ingest serialization" should
+    "Handle V0 format" in
       (JObject(
           "tokenId" -> JString("1234"),
           "path" -> JString("/test/"),
-          "data" -> JObject("test" -> JNum(1)))).validated[Ingest] must beLike {
+          "data" -> JObject("test" -> JNum(1)))).validated[Ingest] must beLike
         case Success(_) => ok
-      }
-    }
 
-    "Handle V1 format" in {
+    "Handle V1 format" in
       (JObject("apiKey" -> JString("1234"),
                "path" -> JString("/test/"),
                "data" -> JObject("test" -> JNum(1)),
-               "metadata" -> JArray())).validated[Ingest] must beLike {
+               "metadata" -> JArray())).validated[Ingest] must beLike
         case Success(_) => ok
-      }
-    }
-  }
 
-  "Archive serialization" should {
-    "Handle V0 format" in {
+  "Archive serialization" should
+    "Handle V0 format" in
       JObject("tokenId" -> JString("1234"), "path" -> JString("/test/"))
-        .validated[Archive] must beLike {
+        .validated[Archive] must beLike
         case Success(_) => ok
-      }
-    }
 
-    "Handle V1 format" in {
+    "Handle V1 format" in
       JObject("apiKey" -> JString("1234"), "path" -> JString("/test/"))
-        .validated[Archive] must beLike {
+        .validated[Archive] must beLike
         case Success(_) => ok
-      }
-    }
-  }
-}

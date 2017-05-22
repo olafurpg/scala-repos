@@ -5,8 +5,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 
 class Person(val name: String, val age: Int)
 
-class RuntimeTest extends FunSuite {
-  test("main") {
+class RuntimeTest extends FunSuite
+  test("main")
     val p: Any = new Person("joe", 23)
 
     // the following is invoking the macro to generate a Pickler[Any],
@@ -22,11 +22,9 @@ class RuntimeTest extends FunSuite {
       |  "age": 23
       |}
     """.stripMargin.trim)
-  }
-}
 
-class RuntimeArrayTests extends FunSuite {
-  test("array-double") {
+class RuntimeArrayTests extends FunSuite
+  test("array-double")
     val p: Any = Array(1.0, 2.0, 3.0)
     val pickle = p.pickle
     assert(pickle.value === """
@@ -42,9 +40,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-int") {
+  test("array-int")
     val p: Any = Array(1, 2, 3)
     val pickle = p.pickle
     assert(pickle.value === """
@@ -60,9 +57,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-long") {
+  test("array-long")
     val p: Any = Array(1L, 2L, 3L)
     val pickle = p.pickle
     assert(pickle.value === """
@@ -78,9 +74,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-boolean") {
+  test("array-boolean")
     val p: Any = Array(true, false, false)
     val pickle = p.pickle
     assert(pickle.value === """
@@ -96,9 +91,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-short") {
+  test("array-short")
     val one: Short = 1
     val two: Short = 2
     val three: Short = 3
@@ -117,9 +111,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-char") {
+  test("array-char")
     val p: Any = Array('A', 'B', 'C')
     val pickle = p.pickle
     assert(pickle.value === """
@@ -135,9 +128,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-byte") {
+  test("array-byte")
     val one: Byte = 1
     val two: Byte = 2
     val three: Byte = 3
@@ -156,9 +148,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-float") {
+  test("array-float")
     val p: Any = Array(1F, 2F, 3F)
     val pickle = p.pickle
     assert(pickle.value === """
@@ -174,9 +165,8 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
 
-  test("array-string") {
+  test("array-string")
     val p: Any = Array("one", "two", "three")
     val pickle = p.pickle
     assert(pickle.value === """
@@ -201,5 +191,3 @@ class RuntimeArrayTests extends FunSuite {
 
     val up = pickle.unpickle[Any]
     assert(p === up)
-  }
-}

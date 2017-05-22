@@ -7,7 +7,7 @@ import cats.syntax.functor._
 /**
   * Laws that must be obeyed by any `Applicative`.
   */
-trait ApplicativeLaws[F[_]] extends ApplyLaws[F] {
+trait ApplicativeLaws[F[_]] extends ApplyLaws[F]
   implicit override def F: Applicative[F]
 
   def applicativeIdentity[A](fa: F[A]): IsEq[F[A]] =
@@ -28,10 +28,9 @@ trait ApplicativeLaws[F[_]] extends ApplyLaws[F] {
     * strictly necessary.
     */
   def applicativeComposition[A, B, C](
-      fa: F[A], fab: F[A => B], fbc: F[B => C]): IsEq[F[C]] = {
+      fa: F[A], fab: F[A => B], fbc: F[B => C]): IsEq[F[C]] =
     val compose: (B => C) => (A => B) => (A => C) = _.compose
     F.pure(compose).ap(fbc).ap(fab).ap(fa) <-> fbc.ap(fab.ap(fa))
-  }
 
   def apProductConsistent[A, B](fa: F[A], f: F[A => B]): IsEq[F[B]] =
     F.ap(f)(fa) <-> F.map(F.product(f, fa)) { case (f, a) => f(a) }
@@ -44,9 +43,7 @@ trait ApplicativeLaws[F[_]] extends ApplyLaws[F] {
 
   def monoidalRightIdentity[A](fa: F[A]): (F[(A, Unit)], F[A]) =
     (F.product(fa, F.pure(())), fa)
-}
 
-object ApplicativeLaws {
+object ApplicativeLaws
   def apply[F[_]](implicit ev: Applicative[F]): ApplicativeLaws[F] =
     new ApplicativeLaws[F] { def F: Applicative[F] = ev }
-}

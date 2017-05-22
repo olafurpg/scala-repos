@@ -43,7 +43,7 @@ import scalafx.util.StringConverter
   * @define FLVINTI Provides a `TextField` that allows editing of the cell content when the cell is double-clicked, or when `ListView.edit(int)` is called.
   * @define FLVRET A Function that can be inserted into the cell factory property of a `ListView`, that enables textual editing of the content.
   */
-object TextFieldListCell {
+object TextFieldListCell
 
   /**
     * Converts a ScalaFX $TFLC to its JavaFX counterpart.
@@ -83,7 +83,6 @@ object TextFieldListCell {
       message = "Use forListView[T](StringConverter[T])", since = "1.0")
   def forListView[T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldListCell.forListView[T](converter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/TextFieldListCell.html $TFLC]]
@@ -100,7 +99,7 @@ class TextFieldListCell[T](
     extends ListCell[T](delegate)
     with ConvertableCell[jfxscc.TextFieldListCell[T], T, T]
     with UpdatableCell[jfxscc.TextFieldListCell[T], T]
-    with SFXDelegate[jfxscc.TextFieldListCell[T]] {
+    with SFXDelegate[jfxscc.TextFieldListCell[T]]
 
   /**
     * Creates a `TextFieldListCell` that provides a TextField when put into editing mode that allows editing of the
@@ -110,4 +109,3 @@ class TextFieldListCell[T](
     */
   def this(converter: StringConverter[T]) =
     this(new jfxscc.TextFieldListCell[T](converter))
-}

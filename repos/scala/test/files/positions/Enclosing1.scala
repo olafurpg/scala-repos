@@ -1,3 +1,2 @@
-object Enclosing1 {
+object Enclosing1
   do {} while (true)
-}

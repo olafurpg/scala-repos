@@ -13,13 +13,11 @@ import java.util.concurrent.atomic.AtomicInteger
   *
   * where threadNo is an integer starting from one.
   */
-case class NamedThreadFactory(name: String) extends ThreadFactory {
+case class NamedThreadFactory(name: String) extends ThreadFactory
   val threadNo = new AtomicInteger()
   val backingThreadFactory = Executors.defaultThreadFactory()
 
-  def newThread(r: Runnable) = {
+  def newThread(r: Runnable) =
     val thread = backingThreadFactory.newThread(r)
     thread.setName(name + "-" + threadNo.incrementAndGet())
     thread
-  }
-}

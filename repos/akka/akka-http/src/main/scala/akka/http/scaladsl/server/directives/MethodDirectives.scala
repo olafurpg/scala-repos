@@ -8,7 +8,7 @@ package directives
 import akka.http.scaladsl.model.{StatusCodes, HttpMethod}
 import akka.http.scaladsl.model.HttpMethods._
 
-trait MethodDirectives {
+trait MethodDirectives
   import BasicDirectives._
   import RouteDirectives._
   import ParameterDirectives._
@@ -59,10 +59,10 @@ trait MethodDirectives {
     * Rejects all requests whose HTTP method does not match the given one.
     */
   def method(httpMethod: HttpMethod): Directive0 =
-    extractMethod.flatMap[Unit] {
+    extractMethod.flatMap[Unit]
       case `httpMethod` ⇒ pass
       case _ ⇒ reject(MethodRejection(httpMethod))
-    } & cancelRejections(classOf[MethodRejection])
+    & cancelRejections(classOf[MethodRejection])
   //#
 
   /**
@@ -75,17 +75,14 @@ trait MethodDirectives {
     *  - Supporting older browsers that lack support for certain HTTP methods. E.g. IE8 does not support PATCH
     */
   def overrideMethodWithParameter(paramName: String): Directive0 =
-    parameter(paramName ?) flatMap {
+    parameter(paramName ?) flatMap
       case Some(method) ⇒
-        getForKey(method.toUpperCase) match {
+        getForKey(method.toUpperCase) match
           case Some(m) ⇒ mapRequest(_.copy(method = m))
           case _ ⇒ complete(StatusCodes.NotImplemented)
-        }
       case None ⇒ pass
-    }
-}
 
-object MethodDirectives extends MethodDirectives {
+object MethodDirectives extends MethodDirectives
   private val _extractMethod: Directive1[HttpMethod] =
     BasicDirectives.extract(_.request.method)
 
@@ -98,4 +95,3 @@ object MethodDirectives extends MethodDirectives {
   private val _post   : Directive0 = method(POST)
   private val _put    : Directive0 = method(PUT)
   // format: ON
-}

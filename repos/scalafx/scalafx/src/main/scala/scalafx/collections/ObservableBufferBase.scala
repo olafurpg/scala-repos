@@ -32,7 +32,7 @@ import javafx.{collections => jfxc}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object ObservableBufferBase {
+object ObservableBufferBase
 
   /**
     * Converts a ScalaFX ObservableBufferBase to its JavaFX counterpart ObservableListBase.
@@ -43,7 +43,6 @@ object ObservableBufferBase {
   implicit def sfxObservableListBase2jfx[E](
       v: ObservableBufferBase[E]): jfxc.ObservableListBase[E] =
     if (v != null) v.delegate else null
-}
 
 /**
   * There is no need in ScalaFX to use this class. `ObservableListBase` is really an implementation detail of JavaFX,

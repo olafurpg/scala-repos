@@ -5,7 +5,7 @@ import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
-class ConcurrentRingBufferBench extends StdBenchAnnotations {
+class ConcurrentRingBufferBench extends StdBenchAnnotations
 
   @Param(Array("1000"))
   var size: Int = _
@@ -13,13 +13,10 @@ class ConcurrentRingBufferBench extends StdBenchAnnotations {
   var b: ConcurrentRingBuffer[Int] = _
 
   @Setup
-  def setup() {
+  def setup()
     b = new ConcurrentRingBuffer[Int](size)
-  }
 
   @Benchmark
-  def timePutAndGet(): Option[Int] = {
+  def timePutAndGet(): Option[Int] =
     b.tryPut(1)
     b.tryGet()
-  }
-}

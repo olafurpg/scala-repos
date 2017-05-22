@@ -24,14 +24,14 @@ import org.scalatest.BeforeAndAfterAll
 
 import org.apache.spark.SparkFunSuite
 
-class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
+class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll
   private val topic = "kcsuitetopic" + Random.nextInt(10000)
   private val topicAndPartition = TopicAndPartition(topic, 0)
   private var kc: KafkaCluster = null
 
   private var kafkaTestUtils: KafkaTestUtils = _
 
-  override def beforeAll() {
+  override def beforeAll()
     kafkaTestUtils = new KafkaTestUtils
     kafkaTestUtils.setup()
 
@@ -39,16 +39,13 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
     kafkaTestUtils.sendMessages(topic, Map("a" -> 1))
     kc = new KafkaCluster(
         Map("metadata.broker.list" -> kafkaTestUtils.brokerAddress))
-  }
 
-  override def afterAll() {
-    if (kafkaTestUtils != null) {
+  override def afterAll()
+    if (kafkaTestUtils != null)
       kafkaTestUtils.teardown()
       kafkaTestUtils = null
-    }
-  }
 
-  test("metadata apis") {
+  test("metadata apis")
     val leader =
       kc.findLeaders(Set(topicAndPartition)).right.get(topicAndPartition)
     val leaderAddress = s"${leader._1}:${leader._2}"
@@ -60,18 +57,16 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
     val err = kc.getPartitions(Set(topic + "BAD"))
     assert(
         err.isLeft, "getPartitions for a nonexistant topic should be an error")
-  }
 
-  test("leader offset apis") {
+  test("leader offset apis")
     val earliest =
       kc.getEarliestLeaderOffsets(Set(topicAndPartition)).right.get
     assert(earliest(topicAndPartition).offset === 0, "didn't get earliest")
 
     val latest = kc.getLatestLeaderOffsets(Set(topicAndPartition)).right.get
     assert(latest(topicAndPartition).offset === 1, "didn't get latest")
-  }
 
-  test("consumer offset apis") {
+  test("consumer offset apis")
     val group = "kcsuitegroup" + Random.nextInt(10000)
 
     val offset = Random.nextInt(10000)
@@ -81,5 +76,3 @@ class KafkaClusterSuite extends SparkFunSuite with BeforeAndAfterAll {
 
     val get = kc.getConsumerOffsets(group, Set(topicAndPartition)).right.get
     assert(get(topicAndPartition) === offset, "didn't get consumer offsets")
-  }
-}

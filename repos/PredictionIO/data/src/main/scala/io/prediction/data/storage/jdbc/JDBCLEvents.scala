@@ -32,10 +32,10 @@ import scala.concurrent.Future
 /** JDBC implementation of [[LEvents]] */
 class JDBCLEvents(
     client: String, config: StorageClientConfig, namespace: String)
-    extends LEvents with Logging {
+    extends LEvents with Logging
   implicit private val formats = org.json4s.DefaultFormats
 
-  def init(appId: Int, channelId: Option[Int] = None): Boolean = {
+  def init(appId: Int, channelId: Option[Int] = None): Boolean =
 
     // To use index, it must be varchar less than 255 characters on a VARCHAR column
     val useIndex =
@@ -45,8 +45,8 @@ class JDBCLEvents(
     val tableName = JDBCUtils.eventTableName(namespace, appId, channelId)
     val entityIdIndexName = s"idx_${tableName}_ei"
     val entityTypeIndexName = s"idx_${tableName}_et"
-    DB autoCommit { implicit session =>
-      if (useIndex) {
+    DB autoCommit  implicit session =>
+      if (useIndex)
         SQL(s"""
       create table if not exists $tableName (
         id varchar(32) not null primary key,
@@ -70,7 +70,7 @@ class JDBCLEvents(
         SQL(s"create index $entityTypeIndexName on $tableName (entityType)")
           .execute()
           .apply()
-      } else {
+      else
         SQL(s"""
       create table if not exists $tableName (
         id varchar(32) not null primary key,
@@ -86,24 +86,20 @@ class JDBCLEvents(
         prId text,
         creationTime timestamp DEFAULT CURRENT_TIMESTAMP,
         creationTimeZone varchar(50) not null)""").execute().apply()
-      }
       true
-    }
-  }
 
   def remove(appId: Int, channelId: Option[Int] = None): Boolean =
-    DB autoCommit { implicit session =>
+    DB autoCommit  implicit session =>
       SQL(s"""
       drop table ${JDBCUtils.eventTableName(namespace, appId, channelId)}
       """).execute().apply()
       true
-    }
 
   def close(): Unit = ConnectionPool.closeAll()
 
   def futureInsert(event: Event, appId: Int, channelId: Option[Int])(
-      implicit ec: ExecutionContext): Future[String] = Future {
-    DB localTx { implicit session =>
+      implicit ec: ExecutionContext): Future[String] = Future
+    DB localTx  implicit session =>
       val id = event.eventId.getOrElse(JDBCUtils.generateId)
       val tableName = sqls.createUnsafely(
           JDBCUtils.eventTableName(namespace, appId, channelId))
@@ -125,12 +121,10 @@ class JDBCLEvents(
       )
       """.update().apply()
       id
-    }
-  }
 
   def futureGet(eventId: String, appId: Int, channelId: Option[Int])(
-      implicit ec: ExecutionContext): Future[Option[Event]] = Future {
-    DB readOnly { implicit session =>
+      implicit ec: ExecutionContext): Future[Option[Event]] = Future
+    DB readOnly  implicit session =>
       val tableName = sqls.createUnsafely(
           JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
@@ -151,20 +145,16 @@ class JDBCLEvents(
       from $tableName
       where id = $eventId
       """.map(resultToEvent).single().apply()
-    }
-  }
 
   def futureDelete(eventId: String, appId: Int, channelId: Option[Int])(
-      implicit ec: ExecutionContext): Future[Boolean] = Future {
-    DB localTx { implicit session =>
+      implicit ec: ExecutionContext): Future[Boolean] = Future
+    DB localTx  implicit session =>
       val tableName = sqls.createUnsafely(
           JDBCUtils.eventTableName(namespace, appId, channelId))
       sql"""
       delete from $tableName where id = $eventId
       """.update().apply()
       true
-    }
-  }
 
   def futureFind(
       appId: Int,
@@ -178,8 +168,8 @@ class JDBCLEvents(
       targetEntityId: Option[Option[String]] = None,
       limit: Option[Int] = None,
       reversed: Option[Boolean] = None
-  )(implicit ec: ExecutionContext): Future[Iterator[Event]] = Future {
-    DB readOnly { implicit session =>
+  )(implicit ec: ExecutionContext): Future[Iterator[Event]] = Future
+    DB readOnly  implicit session =>
       val tableName = sqls.createUnsafely(
           JDBCUtils.eventTableName(namespace, appId, channelId))
       val whereClause =
@@ -228,10 +218,8 @@ class JDBCLEvents(
       $limitClause
       """
       q.map(resultToEvent).list().apply().toIterator
-    }
-  }
 
-  private[prediction] def resultToEvent(rs: WrappedResultSet): Event = {
+  private[prediction] def resultToEvent(rs: WrappedResultSet): Event =
     Event(
         eventId = rs.stringOpt("id"),
         event = rs.string("event"),
@@ -255,5 +243,3 @@ class JDBCLEvents(
               rs.jodaDateTime("creationTime"),
               DateTimeZone.forID(rs.string("creationTimeZone")))
     )
-  }
-}

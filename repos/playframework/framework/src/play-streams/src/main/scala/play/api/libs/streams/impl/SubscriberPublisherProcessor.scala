@@ -10,7 +10,7 @@ import org.reactivestreams._
   */
 final class SubscriberPublisherProcessor[T, U](
     subr: Subscriber[T], pubr: Publisher[U])
-    extends Processor[T, U] {
+    extends Processor[T, U]
   override def subscribe(subscriber: Subscriber[_ >: U]): Unit =
     pubr.subscribe(subscriber)
   override def onSubscribe(subscription: Subscription): Unit =
@@ -18,4 +18,3 @@ final class SubscriberPublisherProcessor[T, U](
   override def onError(cause: Throwable): Unit = subr.onError(cause)
   override def onComplete(): Unit = subr.onComplete()
   override def onNext(element: T): Unit = subr.onNext(element)
-}

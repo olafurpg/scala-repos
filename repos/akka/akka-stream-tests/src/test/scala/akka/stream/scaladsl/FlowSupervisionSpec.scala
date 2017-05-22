@@ -15,7 +15,7 @@ import akka.stream.ActorAttributes
 import akka.NotUsed
 import akka.testkit.AkkaSpec
 
-class FlowSupervisionSpec extends AkkaSpec {
+class FlowSupervisionSpec extends AkkaSpec
   import ActorAttributes.supervisionStrategy
 
   implicit val materializer = ActorMaterializer()(system)
@@ -31,35 +31,31 @@ class FlowSupervisionSpec extends AkkaSpec {
                    .runWith(Sink.seq),
                  3.seconds)
 
-  "Stream supervision" must {
+  "Stream supervision" must
 
-    "stop and complete stream with failure by default" in {
-      intercept[RuntimeException] {
+    "stop and complete stream with failure by default" in
+      intercept[RuntimeException]
         run(failingMap)
-      } should be(exc)
-    }
+      should be(exc)
 
-    "support resume " in {
+    "support resume " in
       val result = run(failingMap.withAttributes(
               supervisionStrategy(Supervision.resumingDecider)))
       result should be(List(1, 2, 4, 5, 1, 2, 4, 5))
-    }
 
-    "support restart " in {
+    "support restart " in
       val result = run(failingMap.withAttributes(
               supervisionStrategy(Supervision.restartingDecider)))
       result should be(List(1, 2, 4, 5, 1, 2, 4, 5))
-    }
 
-    "complete stream with NPE failure when null is emitted" in {
-      intercept[NullPointerException] {
+    "complete stream with NPE failure when null is emitted" in
+      intercept[NullPointerException]
         Await.result(
             Source(List("a", "b")).map(_ ⇒ null).limit(1000).runWith(Sink.seq),
             3.seconds)
-      }.getMessage should be(ReactiveStreamsCompliance.ElementMustNotBeNullMsg)
-    }
+      .getMessage should be(ReactiveStreamsCompliance.ElementMustNotBeNullMsg)
 
-    "resume stream when null is emitted" in {
+    "resume stream when null is emitted" in
       val nullMap = Flow[String]
         .map(elem ⇒ if (elem == "b") null else elem)
         .withAttributes(supervisionStrategy(Supervision.resumingDecider))
@@ -69,6 +65,3 @@ class FlowSupervisionSpec extends AkkaSpec {
                                   .runWith(Sink.seq),
                                 3.seconds)
       result should be(List("a", "c"))
-    }
-  }
-}

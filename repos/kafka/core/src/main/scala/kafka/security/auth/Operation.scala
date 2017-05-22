@@ -31,14 +31,12 @@ case object Describe extends Operation { val name = "Describe" }
 case object ClusterAction extends Operation { val name = "ClusterAction" }
 case object All extends Operation { val name = "All" }
 
-object Operation {
-  def fromString(operation: String): Operation = {
+object Operation
+  def fromString(operation: String): Operation =
     val op = values.find(op => op.name.equalsIgnoreCase(operation))
     op.getOrElse(throw new KafkaException(
             operation + " not a valid operation name. The valid names are " +
             values.mkString(",")))
-  }
 
   def values: Seq[Operation] =
     List(Read, Write, Create, Delete, Alter, Describe, ClusterAction, All)
-}

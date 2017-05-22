@@ -40,7 +40,7 @@ import akka.http.scaladsl.model.ws._
   * Some basic docs:
   *  http://doc.akka.io/docs/akka-stream-and-http-experimental/1.0-RC4/scala/http/routing-dsl/websocket-support.html
   */
-object WebSocketBoilerplate {
+object WebSocketBoilerplate
   import Directives._
 
   /**
@@ -55,11 +55,10 @@ object WebSocketBoilerplate {
       mat: Materializer,
       oc: ClassTag[Outgoing],
       printer: JsonPrinter = PrettyPrinter
-  ): Route = {
+  ): Route =
     val underlying = actorRefAsFlow[Incoming, Outgoing](actor)
     val marshalled = jsonMarshalledMessageFlow(underlying)
     handleWebsocketMessages(marshalled)
-  }
 
   /**
     * @param actor constructor for an actor that accepts `Incoming` messages and
@@ -72,7 +71,7 @@ object WebSocketBoilerplate {
       actor: ActorRef => ActorRef
   )(
       implicit mat: Materializer
-  ): Flow[Incoming, Outgoing, Unit] = {
+  ): Flow[Incoming, Outgoing, Unit] =
     val (target, pub) = Source
       .actorRef[Outgoing](
           0,
@@ -86,7 +85,6 @@ object WebSocketBoilerplate {
     val sink = Sink.actorRef[Incoming](handler, PoisonPill)
 
     Flow.wrap(sink, source)((_, _) => ())
-  }
 
   /**
     * @param flow using user domain objects
@@ -100,15 +98,12 @@ object WebSocketBoilerplate {
       //mat: Materializer,
       oc: ClassTag[Outgoing],
       printer: JsonPrinter = PrettyPrinter
-  ): Flow[Message, Message, Unit] = {
-    Flow[Message].collect {
+  ): Flow[Message, Message, Unit] =
+    Flow[Message].collect
       case TextMessage.Strict(msg) =>
         msg.parseJson.convertTo[Incoming]
       case _ =>
         throw new IllegalArgumentException("not a valid message")
-    }.via(flow).map {
+    .via(flow).map
       case e: Outgoing =>
         TextMessage.Strict(e.toJson.toString(printer)): Message
-    }
-  }
-}

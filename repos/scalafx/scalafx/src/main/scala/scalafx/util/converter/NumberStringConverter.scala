@@ -32,16 +32,15 @@ import javafx.util.{converter => jfxuc}
 
 import scala.language.implicitConversions
 
-object NumberStringConverter {
+object NumberStringConverter
   implicit def sfxNumberStringConverter2jfx(
       c: NumberStringConverter): jfxuc.NumberStringConverter =
     if (c != null) c.delegate else null
-}
 
 class NumberStringConverter(
     delegate: jfxuc.NumberStringConverter = new jfxuc.NumberStringConverter)
     extends NumberStringConverterDelegate[jfxuc.NumberStringConverter](
-        delegate) {
+        delegate)
 
   def this(locale: Locale) = this(new jfxuc.NumberStringConverter(locale))
 
@@ -52,4 +51,3 @@ class NumberStringConverter(
     this(new jfxuc.NumberStringConverter(numberFormat))
 
   def this(pattern: String) = this(new jfxuc.NumberStringConverter(pattern))
-}

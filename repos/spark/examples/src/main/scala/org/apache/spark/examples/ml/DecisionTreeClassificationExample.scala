@@ -28,8 +28,8 @@ import org.apache.spark.ml.feature.{IndexToString, StringIndexer, VectorIndexer}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object DecisionTreeClassificationExample {
-  def main(args: Array[String]): Unit = {
+object DecisionTreeClassificationExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("DecisionTreeClassificationExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -91,6 +91,4 @@ object DecisionTreeClassificationExample {
       model.stages(2).asInstanceOf[DecisionTreeClassificationModel]
     println("Learned classification tree model:\n" + treeModel.toDebugString)
     // $example off$
-  }
-}
 // scalastyle:on println

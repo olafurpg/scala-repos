@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-object Test extends App {
+object Test extends App
   def foo[T](x: T) = weakTypeOf(List(x))
   println(foo(2))
   locally { class C; println(weakTypeOf(new C)) }
@@ -11,4 +11,3 @@ object Test extends App {
   println(typeOf[Null])
   println(typeOf[Nothing])
   println(typeOf(null))
-}

@@ -10,20 +10,17 @@ import scala.concurrent.{ExecutionContext, ExecutionContextExecutor}
 /**
   * Provides access to Play's internal ExecutionContext.
   */
-private[play] object Execution {
+private[play] object Execution
 
-  def internalContext: ExecutionContextExecutor = {
+  def internalContext: ExecutionContextExecutor =
     val appOrNull: Application = Play._currentApp
-    appOrNull match {
+    appOrNull match
       case null => common
       case app: Application => app.actorSystem.dispatcher
-    }
-  }
 
-  object Implicits {
+  object Implicits
 
     implicit def internalContext = Execution.internalContext
-  }
 
   /**
     * Use this as a fallback when the application is unavailable.
@@ -32,4 +29,3 @@ private[play] object Execution {
     * seconds).
     */
   private val common = ExecutionContext.fromExecutor(new ForkJoinPool())
-}

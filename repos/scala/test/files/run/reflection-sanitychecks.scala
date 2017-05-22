@@ -1,4 +1,4 @@
-class C {
+class C
   val foo = 11
   def bar = 12
   val quux = 13
@@ -6,15 +6,13 @@ class C {
   class C { override def toString = "CC" }
   object O { override def toString = "CO" }
   override def toString = "an instance of class C"
-}
 
-class D extends C {
+class D extends C
   override val foo = 21
   override def bar = 22
   override def toString = "an instance of class D"
-}
 
-class E {
+class E
   val foo = 31
   def bar = 32
   val quux = 33
@@ -22,17 +20,15 @@ class E {
   class C { override def toString = "EC" }
   object O { override def toString = "EO" }
   override def toString = "an instance of class E"
-}
 
-object Test extends App {
+object Test extends App
   import scala.reflect.runtime.universe._
   import scala.reflect.runtime.{currentMirror => cm}
   val im = cm.reflect(new D)
 
-  def test(tpe: Type): Unit = {
-    def failsafe(action: => Any): Any = try action catch {
+  def test(tpe: Type): Unit =
+    def failsafe(action: => Any): Any = try action catch
       case ex: Throwable => ex.toString
-    }
     println(
         s"=========members of ${tpe.typeSymbol.name} in a mirror of D=========")
     println(
@@ -68,9 +64,7 @@ object Test extends App {
         "object: " + failsafe(
             im.reflectModule(tpe.member(TermName("O")).asModule).instance))
     println()
-  }
 
   test(typeOf[C])
   test(typeOf[D])
   test(typeOf[E])
-}

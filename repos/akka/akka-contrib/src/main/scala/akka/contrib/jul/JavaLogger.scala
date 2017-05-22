@@ -21,31 +21,28 @@ import akka.event.LoggerMessageQueueSemantics
   *
   * For `Actor`s, use `ActorLogging` instead.
   */
-trait JavaLogging {
+trait JavaLogging
 
   @transient
-  protected lazy val log = new JavaLoggingAdapter {
+  protected lazy val log = new JavaLoggingAdapter
     def logger = logging.Logger.getLogger(JavaLogging.this.getClass.getName)
-  }
-}
 
 /**
   * `java.util.logging` logger.
   */
 class JavaLogger
-    extends Actor with RequiresMessageQueue[LoggerMessageQueueSemantics] {
+    extends Actor with RequiresMessageQueue[LoggerMessageQueueSemantics]
 
-  def receive = {
+  def receive =
     case event @ Error(cause, _, _, _) ⇒
       log(logging.Level.SEVERE, cause, event)
     case event: Warning ⇒ log(logging.Level.WARNING, null, event)
     case event: Info ⇒ log(logging.Level.INFO, null, event)
     case event: Debug ⇒ log(logging.Level.CONFIG, null, event)
     case InitializeLogger(_) ⇒ sender() ! LoggerInitialized
-  }
 
   @inline
-  def log(level: logging.Level, cause: Throwable, event: LogEvent) {
+  def log(level: logging.Level, cause: Throwable, event: LogEvent)
     val logger = logging.Logger.getLogger(event.logSource)
     val record = new logging.LogRecord(level, String.valueOf(event.message))
     record.setLoggerName(logger.getName)
@@ -54,10 +51,8 @@ class JavaLogger
     record.setSourceClassName(event.logClass.getName)
     record.setSourceMethodName(null) // lost forever
     logger.log(record)
-  }
-}
 
-trait JavaLoggingAdapter extends LoggingAdapter {
+trait JavaLoggingAdapter extends LoggingAdapter
 
   def logger: logging.Logger
 
@@ -72,57 +67,46 @@ trait JavaLoggingAdapter extends LoggingAdapter {
 
   def isDebugEnabled = logger.isLoggable(logging.Level.CONFIG)
 
-  protected def notifyError(message: String) {
+  protected def notifyError(message: String)
     log(logging.Level.SEVERE, null, message)
-  }
 
-  protected def notifyError(cause: Throwable, message: String) {
+  protected def notifyError(cause: Throwable, message: String)
     log(logging.Level.SEVERE, cause, message)
-  }
 
-  protected def notifyWarning(message: String) {
+  protected def notifyWarning(message: String)
     log(logging.Level.WARNING, null, message)
-  }
 
-  protected def notifyInfo(message: String) {
+  protected def notifyInfo(message: String)
     log(logging.Level.INFO, null, message)
-  }
 
-  protected def notifyDebug(message: String) {
+  protected def notifyDebug(message: String)
     log(logging.Level.CONFIG, null, message)
-  }
 
   @inline
-  def log(level: logging.Level, cause: Throwable, message: String) {
+  def log(level: logging.Level, cause: Throwable, message: String)
     val record = new logging.LogRecord(level, message)
     record.setLoggerName(logger.getName)
     record.setThrown(cause)
     updateSource(record)
 
-    if (loggingExecutionContext.isDefined) {
+    if (loggingExecutionContext.isDefined)
       implicit val context = loggingExecutionContext.get
-      Future(logger.log(record)).onFailure {
+      Future(logger.log(record)).onFailure
         case thrown: Throwable ⇒ thrown.printStackTrace()
-      }
-    } else logger.log(record)
-  }
+    else logger.log(record)
 
   // it is unfortunate that this workaround is needed
-  private def updateSource(record: logging.LogRecord) {
+  private def updateSource(record: logging.LogRecord)
     val stack = Thread.currentThread.getStackTrace
-    val source = stack.find { frame ⇒
+    val source = stack.find  frame ⇒
       val cname = frame.getClassName
       !cname.startsWith("akka.contrib.jul.") &&
       !cname.startsWith("akka.event.LoggingAdapter") &&
       !cname.startsWith("java.lang.reflect.") &&
       !cname.startsWith("sun.reflect.")
-    }
-    if (source.isDefined) {
+    if (source.isDefined)
       record.setSourceClassName(source.get.getClassName)
       record.setSourceMethodName(source.get.getMethodName)
-    } else {
+    else
       record.setSourceClassName(null)
       record.setSourceMethodName(null)
-    }
-  }
-}

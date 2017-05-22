@@ -23,7 +23,7 @@ import scala.reflect.macros.Context
 import scala.language.experimental.macros
 import scala.util.control.NonFatal
 
-object CommonCompareBinary {
+object CommonCompareBinary
   import com.twitter.scalding.serialization.JavaStreamEnrichments._
 
   // If the lengths are equal and greater than this number
@@ -42,65 +42,59 @@ object CommonCompareBinary {
                        inputStreamB: InputStream,
                        lenB: Int): Boolean =
     (lenA > minSizeForFulBinaryCompare && (lenA == lenB) &&
-        inputStreamA.markSupported && inputStreamB.markSupported) && {
+        inputStreamA.markSupported && inputStreamB.markSupported) &&
       inputStreamA.mark(lenA)
       inputStreamB.mark(lenB)
 
       var pos: Int = 0
-      while (pos < lenA) {
+      while (pos < lenA)
         val a = inputStreamA.read
         val b = inputStreamB.read
         pos += 1
-        if (a != b) {
+        if (a != b)
           inputStreamA.reset()
           inputStreamB.reset()
           // yeah, return sucks, but trying to optimize here
           return false
-        }
         // a == b, but may be eof
         if (a < 0) return JavaStreamEnrichments.eof
-      }
       // we consumed all the bytes, and they were all equal
       true
-    }
-}
-object TreeOrderedBuf {
+object TreeOrderedBuf
   import CompileTimeLengthTypes._
   def toOrderedSerialization[T](c: Context)(
       t: TreeOrderedBuf[c.type])(implicit T: t.ctx.WeakTypeTag[T])
-    : t.ctx.Expr[OrderedSerialization[T]] = {
+    : t.ctx.Expr[OrderedSerialization[T]] =
     import t.ctx.universe._
     def freshT(id: String) = newTermName(c.fresh(s"fresh_$id"))
     val outputLength = freshT("outputLength")
 
-    val innerLengthFn: Tree = {
+    val innerLengthFn: Tree =
       val element = freshT("element")
 
-      val fnBodyOpt = t.length(q"$element") match {
+      val fnBodyOpt = t.length(q"$element") match
         case _: NoLengthCalculationAvailable[_] => None
         case const: ConstantLengthCalculation[_] => None
         case f: FastLengthCalculation[_] =>
           Some(
               q"""
-        _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(${f
+        _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen($f
             .asInstanceOf[FastLengthCalculation[c.type]]
-            .t})
+            .t)
         """)
         case m: MaybeLengthCalculation[_] =>
           Some(m.asInstanceOf[MaybeLengthCalculation[c.type]].t)
-      }
 
-      fnBodyOpt.map { fnBody =>
+      fnBodyOpt.map  fnBody =>
         q"""
         private[this] def payloadLength($element: $T): _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.MaybeLength = {
           lengthCalculationAttempts += 1
           $fnBody
         }
         """
-      }.getOrElse(q"()")
-    }
+      .getOrElse(q"()")
 
-    def binaryLengthGen(typeName: Tree): (Tree, Tree) = {
+    def binaryLengthGen(typeName: Tree): (Tree, Tree) =
       val tempLen = freshT("tempLen")
       val lensLen = freshT("lensLen")
       val element = freshT("element")
@@ -126,7 +120,7 @@ object TreeOrderedBuf {
      }
       """)
 
-      t.length(q"$element") match {
+      t.length(q"$element") match
         case _: NoLengthCalculationAvailable[_] =>
           (q"""
           override def staticSize: Option[Int] = None""",
@@ -138,10 +132,8 @@ object TreeOrderedBuf {
           override def dynamicSize($element: $typeName): Option[Int] = staticSize""")
         case f: FastLengthCalculation[_] => callDynamic
         case m: MaybeLengthCalculation[_] => callDynamic
-      }
-    }
 
-    def genNoLenCalc = {
+    def genNoLenCalc =
       val baos = freshT("baos")
       val element = freshT("element")
       val outerOutputStream = freshT("os")
@@ -163,9 +155,8 @@ object TreeOrderedBuf {
         $baos.writeTo($outerOutputStream)
       }
       """
-    }
 
-    def putFnGen(outerbaos: TermName, element: TermName) = {
+    def putFnGen(outerbaos: TermName, element: TermName) =
       val oldPos = freshT("oldPos")
       val len = freshT("len")
 
@@ -179,7 +170,7 @@ object TreeOrderedBuf {
         ${t.put(outerbaos, element)}
       """
 
-      t.length(q"$element") match {
+      t.length(q"$element") match
         case _: ConstantLengthCalculation[_] =>
           q"""${t.put(outerbaos, element)}"""
         case f: FastLengthCalculation[_] =>
@@ -203,28 +194,21 @@ object TreeOrderedBuf {
             }
         """
         case _ => q"noLengthWrite($element, $outerbaos)"
-      }
-    }
 
-    def readLength(inputStream: TermName) = {
-      t.length(q"e") match {
+    def readLength(inputStream: TermName) =
+      t.length(q"e") match
         case const: ConstantLengthCalculation[_] => q"${const.toInt}"
         case _ => q"$inputStream.readPosVarInt"
-      }
-    }
 
-    def discardLength(inputStream: TermName) = {
-      t.length(q"e") match {
+    def discardLength(inputStream: TermName) =
+      t.length(q"e") match
         case const: ConstantLengthCalculation[_] => q"()"
         case _ => q"$inputStream.readPosVarInt"
-      }
-    }
 
-    val lazyVariables = t.lazyOuterVariables.map {
+    val lazyVariables = t.lazyOuterVariables.map
       case (n, t) =>
         val termName = newTermName(n)
         q"""lazy val $termName = $t"""
-    }
 
     val element = freshT("element")
 
@@ -315,10 +299,8 @@ object TreeOrderedBuf {
         }
       }
     """)
-  }
-}
 
-abstract class TreeOrderedBuf[C <: Context] {
+abstract class TreeOrderedBuf[C <: Context]
   val ctx: C
   val tpe: ctx.Type
   // Expected byte buffers to be in values a and b respestively, the tree has the value of the result
@@ -339,4 +321,3 @@ abstract class TreeOrderedBuf[C <: Context] {
   def lazyOuterVariables: Map[String, ctx.Tree]
   // Return the constant size or a tree
   def length(element: ctx.universe.Tree): CompileTimeLengthTypes[ctx.type]
-}

@@ -10,7 +10,7 @@ case object LetP extends Tree
 case object LetC extends Tree
 case object LetF extends Tree
 
-object Test { (tree: Tree) => tree match { case LetL(CharLit) => ??? }
+object Test  (tree: Tree) => tree match { case LetL(CharLit) => ??? }
 (tree: Tree) => tree match { case LetL(CharLit) => ??? }
 (tree: Tree) => tree match { case LetL(CharLit) => ??? }
 (tree: Tree) => tree match { case LetL(CharLit) => ??? }
@@ -27,4 +27,3 @@ object Test { (tree: Tree) => tree match { case LetL(CharLit) => ??? }
 // We need to rework counter example generation to fix that.
 //
 // That work is the subject of SI-7746
-}

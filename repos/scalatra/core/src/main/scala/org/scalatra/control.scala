@@ -7,7 +7,7 @@ import scala.util.control.NoStackTrace
 /**
   * A collection of methods that affect the control flow of routes.
   */
-trait Control {
+trait Control
 
   /**
     * Immediately halts processing of a request.  Can be called from either a
@@ -22,21 +22,18 @@ trait Control {
   def halt[T : Manifest](status: JInteger = null,
                          body: T = (),
                          headers: Map[String, String] = Map.empty,
-                         reason: String = null): Nothing = {
+                         reason: String = null): Nothing =
     val statusOpt = if (status == null) None else Some(status.intValue)
     throw new HaltException(statusOpt, Some(reason), headers, body)
-  }
 
-  def halt(result: ActionResult): Nothing = {
+  def halt(result: ActionResult): Nothing =
     halt(
         result.status.code, result.body, result.headers, result.status.message)
-  }
 
   /**
     * Immediately exits from the current route.
     */
   def pass(): Nothing = throw new PassException
-}
 
 private[scalatra] case class HaltException(status: Option[Int],
                                            reason: Option[String],

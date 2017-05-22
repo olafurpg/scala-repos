@@ -8,7 +8,7 @@ import org.openjdk.jmh.infra.Blackhole
 
 @State(Scope.Benchmark)
 @Threads(Threads.MAX)
-class LatencyHistogramBench extends StdBenchAnnotations {
+class LatencyHistogramBench extends StdBenchAnnotations
 
   @Param(Array("1000"))
   var maxDurationMs = 1000L
@@ -21,7 +21,7 @@ class LatencyHistogramBench extends StdBenchAnnotations {
   var histo: LatencyHistogram = _
 
   @Setup
-  def setup(): Unit = {
+  def setup(): Unit =
     val err = if (error <= 0.0) 0.0 else error
 
     histo = new LatencyHistogram(maxDurationMs,
@@ -32,16 +32,12 @@ class LatencyHistogramBench extends StdBenchAnnotations {
 
     // give it some data to start with
     0L.until(maxDurationMs).foreach(histo.add)
-  }
 
   @Benchmark
-  def add(hole: Blackhole): Unit = {
+  def add(hole: Blackhole): Unit =
     hole.consume(histo.add(i % maxDurationMs))
     i += 1
-  }
 
   @Benchmark
-  def quantile(): Long = {
+  def quantile(): Long =
     histo.quantile(95)
-  }
-}

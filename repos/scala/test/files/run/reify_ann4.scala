@@ -5,15 +5,15 @@ import scala.tools.reflect.ToolBox
 import scala.annotation._
 import scala.annotation.meta._
 
-object Test extends App {
+object Test extends App
   // test 1: reify
-  val tree = reify {
+  val tree = reify
     class D extends StaticAnnotation
     class C
     val c1 = new C @D
     //val c2 = (new C) @D // illegal syntax
     //val c3 = c1 @D // illegal syntax
-  }.tree
+  .tree
   println(tree.toString)
 
   // test 2: import and typecheck
@@ -23,4 +23,3 @@ object Test extends App {
 
   // test 3: import and compile
   toolbox.eval(tree)
-}

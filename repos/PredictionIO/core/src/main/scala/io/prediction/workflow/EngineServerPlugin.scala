@@ -17,7 +17,7 @@ package io.prediction.workflow
 import io.prediction.data.storage.EngineInstance
 import org.json4s._
 
-trait EngineServerPlugin {
+trait EngineServerPlugin
   val pluginName: String
   val pluginDescription: String
   val pluginType: String
@@ -30,9 +30,7 @@ trait EngineServerPlugin {
               context: EngineServerPluginContext): JValue
 
   def handleREST(arguments: Seq[String]): String
-}
 
-object EngineServerPlugin {
+object EngineServerPlugin
   val outputBlocker = "outputblocker"
   val outputSniffer = "outputsniffer"
-}

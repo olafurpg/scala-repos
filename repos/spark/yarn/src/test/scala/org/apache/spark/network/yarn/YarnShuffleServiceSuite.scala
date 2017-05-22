@@ -31,10 +31,10 @@ import org.apache.spark.network.shuffle.ShuffleTestAccessor
 import org.apache.spark.network.shuffle.protocol.ExecutorShuffleInfo
 
 class YarnShuffleServiceSuite
-    extends SparkFunSuite with Matchers with BeforeAndAfterEach {
+    extends SparkFunSuite with Matchers with BeforeAndAfterEach
   private[yarn] var yarnConfig: YarnConfiguration = new YarnConfiguration
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     yarnConfig.set(YarnConfiguration.NM_AUX_SERVICES, "spark_shuffle")
     yarnConfig.set(
@@ -42,40 +42,32 @@ class YarnShuffleServiceSuite
         classOf[YarnShuffleService].getCanonicalName)
     yarnConfig.setInt("spark.shuffle.service.port", 0)
 
-    yarnConfig.get("yarn.nodemanager.local-dirs").split(",").foreach { dir =>
+    yarnConfig.get("yarn.nodemanager.local-dirs").split(",").foreach  dir =>
       val d = new File(dir)
-      if (d.exists()) {
+      if (d.exists())
         FileUtils.deleteDirectory(d)
-      }
       FileUtils.forceMkdir(d)
       logInfo(s"creating yarn.nodemanager.local-dirs: $d")
-    }
-  }
 
   var s1: YarnShuffleService = null
   var s2: YarnShuffleService = null
   var s3: YarnShuffleService = null
 
-  override def afterEach(): Unit = {
-    try {
-      if (s1 != null) {
+  override def afterEach(): Unit =
+    try
+      if (s1 != null)
         s1.stop()
         s1 = null
-      }
-      if (s2 != null) {
+      if (s2 != null)
         s2.stop()
         s2 = null
-      }
-      if (s3 != null) {
+      if (s3 != null)
         s3.stop()
         s3 = null
-      }
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
-  test("executor state kept across NM restart") {
+  test("executor state kept across NM restart")
     s1 = new YarnShuffleService
     s1.init(yarnConfig)
     val app1Id = ApplicationId.newInstance(0, 1)
@@ -105,17 +97,15 @@ class YarnShuffleServiceSuite
     ShuffleTestAccessor.getExecutorInfo(app2Id, "exec-2", blockResolver) should be(
         Some(shuffleInfo2))
 
-    if (!execStateFile.exists()) {
-      @tailrec def findExistingParent(file: File): File = {
+    if (!execStateFile.exists())
+      @tailrec def findExistingParent(file: File): File =
         if (file == null) file
         else if (file.exists()) file
         else findExistingParent(file.getParentFile())
-      }
       val existingParent = findExistingParent(execStateFile)
       assert(
           false,
           s"$execStateFile does not exist -- closest existing parent is $existingParent")
-    }
     assert(execStateFile.exists(), s"$execStateFile did not exist")
 
     // now we pretend the shuffle service goes down, and comes back up
@@ -152,9 +142,8 @@ class YarnShuffleServiceSuite
     ShuffleTestAccessor.getExecutorInfo(app2Id, "exec-2", resolver3) should be(
         None)
     s3.stop()
-  }
 
-  test("removed applications should not be in registered executor file") {
+  test("removed applications should not be in registered executor file")
     s1 = new YarnShuffleService
     s1.init(yarnConfig)
     val app1Id = ApplicationId.newInstance(0, 1)
@@ -187,9 +176,8 @@ class YarnShuffleServiceSuite
     ShuffleTestAccessor.reloadRegisteredExecutors(db) should not be empty
     s1.stopApplication(new ApplicationTerminationContext(app2Id))
     ShuffleTestAccessor.reloadRegisteredExecutors(db) shouldBe empty
-  }
 
-  test("shuffle service should be robust to corrupt registered executor file") {
+  test("shuffle service should be robust to corrupt registered executor file")
     s1 = new YarnShuffleService
     s1.init(yarnConfig)
     val app1Id = ApplicationId.newInstance(0, 1)
@@ -250,5 +238,3 @@ class YarnShuffleServiceSuite
     ShuffleTestAccessor.getExecutorInfo(app2Id, "exec-2", resolver3) should be(
         Some(shuffleInfo2))
     s3.stop()
-  }
-}

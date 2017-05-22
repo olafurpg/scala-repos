@@ -6,7 +6,7 @@ import lila.api.Context
 import play.api.http._
 import play.api.mvc.Codec
 
-trait ResponseWriter {
+trait ResponseWriter
 
   implicit def wUnit(implicit codec: Codec): Writeable[Unit] =
     Writeable[Unit]((_: Unit) => codec encode "ok")
@@ -33,4 +33,3 @@ trait ResponseWriter {
     Writeable[Option[String]]((i: Option[String]) => codec encode ~i)
   implicit def ctoOptionString: ContentTypeOf[Option[String]] =
     ContentTypeOf[Option[String]](Some(ContentTypes.TEXT))
-}

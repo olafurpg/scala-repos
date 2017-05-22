@@ -33,13 +33,13 @@ import java.io.ObjectStreamException
   *
   * @group ReflectionAPI
   */
-trait Exprs { self: Universe =>
+trait Exprs  self: Universe =>
 
   /** Expr wraps an abstract syntax tree and tags it with its type.
     *  The main source of information about exprs is the [[scala.reflect.api.Exprs]] page.
     *  @group Expressions
     */
-  trait Expr[+T] extends Equals with Serializable {
+  trait Expr[+T] extends Equals with Serializable
 
     /**
       * Underlying mirror of this expr.
@@ -126,7 +126,6 @@ trait Exprs { self: Universe =>
     override def hashCode = mirror.hashCode * 31 + tree.hashCode
 
     override def toString = "Expr[" + staticType + "](" + tree + ")"
-  }
 
   /**
     * Constructor/Extractor for Expr.
@@ -137,24 +136,22 @@ trait Exprs { self: Universe =>
     * The main source of information about exprs is the [[scala.reflect.api.Exprs]] page.
     *  @group Expressions
     */
-  object Expr {
+  object Expr
     def apply[T : WeakTypeTag](mirror: scala.reflect.api.Mirror[self.type],
                                treec: TreeCreator): Expr[T] =
       new ExprImpl[T](mirror.asInstanceOf[Mirror], treec)
     def unapply[T](expr: Expr[T]): Option[Tree] = Some(expr.tree)
-  }
 
   private class ExprImpl[+T : WeakTypeTag](
       val mirror: Mirror, val treec: TreeCreator)
-      extends Expr[T] {
+      extends Expr[T]
     def in[U <: Universe with Singleton](
-        otherMirror: scala.reflect.api.Mirror[U]): U#Expr[T] = {
+        otherMirror: scala.reflect.api.Mirror[U]): U#Expr[T] =
       val otherMirror1 = otherMirror
         .asInstanceOf[scala.reflect.api.Mirror[otherMirror.universe.type]]
       val tag1 = (implicitly[WeakTypeTag[T]] in otherMirror)
         .asInstanceOf[otherMirror.universe.WeakTypeTag[T]]
       otherMirror.universe.Expr[T](otherMirror1, treec)(tag1)
-    }
 
     lazy val tree: Tree = treec(mirror)
     lazy val staticType: Type = implicitly[WeakTypeTag[T]].tpe
@@ -177,23 +174,18 @@ trait Exprs { self: Universe =>
     @throws(classOf[ObjectStreamException])
     private def writeReplace(): AnyRef =
       new SerializedExpr(treec, implicitly[WeakTypeTag[T]].in(ru.rootMirror))
-  }
-}
 
 @SerialVersionUID(1L)
 private[scala] class SerializedExpr(
     var treec: TreeCreator, var tag: ru.WeakTypeTag[_])
-    extends Serializable {
+    extends Serializable
   import scala.reflect.runtime.universe.{Expr, runtimeMirror}
 
   @throws(classOf[ObjectStreamException])
-  private def readResolve(): AnyRef = {
-    val loader: ClassLoader = try {
+  private def readResolve(): AnyRef =
+    val loader: ClassLoader = try
       Thread.currentThread().getContextClassLoader()
-    } catch {
+    catch
       case se: SecurityException => null
-    }
     val m = runtimeMirror(loader)
     Expr(m, treec)(tag.in(m))
-  }
-}

@@ -10,7 +10,7 @@ import akka.stream.TLSClientAuth
 
 import scala.compat.java8.OptionConverters
 
-object ConnectionContext {
+object ConnectionContext
   //#https-context-creation
   /** Used to serve HTTPS traffic. */
   def https(sslContext: SSLContext): HttpsConnectionContext =
@@ -29,23 +29,20 @@ object ConnectionContext {
   /** Used to serve HTTP traffic. */
   def noEncryption(): HttpConnectionContext =
     scaladsl.ConnectionContext.noEncryption()
-}
 
-abstract class ConnectionContext {
+abstract class ConnectionContext
   def isSecure: Boolean
 
   /** Java API */
   def getDefaultPort: Int
-}
 
 abstract class HttpConnectionContext
-    extends akka.http.javadsl.ConnectionContext {
+    extends akka.http.javadsl.ConnectionContext
   override final def isSecure = false
   override final def getDefaultPort = 80
-}
 
 abstract class HttpsConnectionContext
-    extends akka.http.javadsl.ConnectionContext {
+    extends akka.http.javadsl.ConnectionContext
   override final def isSecure = true
   override final def getDefaultPort = 443
 
@@ -63,4 +60,3 @@ abstract class HttpsConnectionContext
 
   /** Java API */
   def getSslParameters: Optional[SSLParameters]
-}

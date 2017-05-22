@@ -25,71 +25,59 @@ import org.apache.spark.SparkFunSuite
 
 class DummyClass1 {}
 
-class DummyClass2 {
+class DummyClass2
   val x: Int = 0
-}
 
-class DummyClass3 {
+class DummyClass3
   val x: Int = 0
   val y: Double = 0.0
-}
 
-class DummyClass4(val d: DummyClass3) {
+class DummyClass4(val d: DummyClass3)
   val x: Int = 0
-}
 
 // dummy class to show class field blocks alignment.
-class DummyClass5 extends DummyClass1 {
+class DummyClass5 extends DummyClass1
   val x: Boolean = true
-}
 
-class DummyClass6 extends DummyClass5 {
+class DummyClass6 extends DummyClass5
   val y: Boolean = true
-}
 
-class DummyClass7 {
+class DummyClass7
   val x: DummyClass1 = new DummyClass1
-}
 
-object DummyString {
+object DummyString
   def apply(str: String): DummyString = new DummyString(str.toArray)
-}
-class DummyString(val arr: Array[Char]) {
+class DummyString(val arr: Array[Char])
   override val hashCode: Int = 0
   // JDK-7 has an extra hash32 field http://hg.openjdk.java.net/jdk7u/jdk7u6/jdk/rev/11987e85555f
   @transient val hash32: Int = 0
-}
 
-class DummyClass8 extends KnownSizeEstimation {
+class DummyClass8 extends KnownSizeEstimation
   val x: Int = 0
 
   override def estimatedSize: Long = 2015
-}
 
 class SizeEstimatorSuite
     extends SparkFunSuite with BeforeAndAfterEach with PrivateMethodTester
-    with ResetSystemProperties {
+    with ResetSystemProperties
 
-  override def beforeEach() {
+  override def beforeEach()
     // Set the arch to 64-bit and compressedOops to true to get a deterministic test-case
     super.beforeEach()
     System.setProperty("os.arch", "amd64")
     System.setProperty("spark.test.useCompressedOops", "true")
-  }
 
-  override def afterEach(): Unit = {
+  override def afterEach(): Unit =
     super.afterEach()
-  }
 
-  test("simple classes") {
+  test("simple classes")
     assertResult(16)(SizeEstimator.estimate(new DummyClass1))
     assertResult(16)(SizeEstimator.estimate(new DummyClass2))
     assertResult(24)(SizeEstimator.estimate(new DummyClass3))
     assertResult(24)(SizeEstimator.estimate(new DummyClass4(null)))
     assertResult(48)(SizeEstimator.estimate(new DummyClass4(new DummyClass3)))
-  }
 
-  test("primitive wrapper objects") {
+  test("primitive wrapper objects")
     assertResult(16)(SizeEstimator.estimate(new java.lang.Boolean(true)))
     assertResult(16)(SizeEstimator.estimate(new java.lang.Byte("1")))
     assertResult(16)(SizeEstimator.estimate(new java.lang.Character('1')))
@@ -98,23 +86,20 @@ class SizeEstimatorSuite
     assertResult(24)(SizeEstimator.estimate(new java.lang.Long(1)))
     assertResult(16)(SizeEstimator.estimate(new java.lang.Float(1.0)))
     assertResult(24)(SizeEstimator.estimate(new java.lang.Double(1.0d)))
-  }
 
-  test("class field blocks rounding") {
+  test("class field blocks rounding")
     assertResult(16)(SizeEstimator.estimate(new DummyClass5))
     assertResult(24)(SizeEstimator.estimate(new DummyClass6))
-  }
 
   // NOTE: The String class definition varies across JDK versions (1.6 vs. 1.7) and vendors
   // (Sun vs IBM). Use a DummyString class to make tests deterministic.
-  test("strings") {
+  test("strings")
     assertResult(40)(SizeEstimator.estimate(DummyString("")))
     assertResult(48)(SizeEstimator.estimate(DummyString("a")))
     assertResult(48)(SizeEstimator.estimate(DummyString("ab")))
     assertResult(56)(SizeEstimator.estimate(DummyString("abcdefgh")))
-  }
 
-  test("primitive arrays") {
+  test("primitive arrays")
     assertResult(32)(SizeEstimator.estimate(new Array[Byte](10)))
     assertResult(40)(SizeEstimator.estimate(new Array[Char](10)))
     assertResult(40)(SizeEstimator.estimate(new Array[Short](10)))
@@ -124,9 +109,8 @@ class SizeEstimatorSuite
     assertResult(96)(SizeEstimator.estimate(new Array[Double](10)))
     assertResult(4016)(SizeEstimator.estimate(new Array[Int](1000)))
     assertResult(8016)(SizeEstimator.estimate(new Array[Long](1000)))
-  }
 
-  test("object arrays") {
+  test("object arrays")
     // Arrays containing nulls should just have one pointer per element
     assertResult(56)(SizeEstimator.estimate(new Array[String](10)))
     assertResult(56)(SizeEstimator.estimate(new Array[AnyRef](10)))
@@ -149,14 +133,12 @@ class SizeEstimatorSuite
         SizeEstimator.estimate(Array.fill(10000)(new DummyString(arr))))
 
     val buf = new ArrayBuffer[DummyString]()
-    for (i <- 0 until 5000) {
+    for (i <- 0 until 5000)
       buf.append(new DummyString(new Array[Char](10)))
-    }
     assertResult(340016)(SizeEstimator.estimate(buf.toArray))
 
-    for (i <- 0 until 5000) {
+    for (i <- 0 until 5000)
       buf.append(new DummyString(arr))
-    }
     assertResult(683912)(SizeEstimator.estimate(buf.toArray))
 
     // If an array contains the *same* element many times, we should only count it once.
@@ -176,9 +158,8 @@ class SizeEstimatorSuite
            "Estimated size " + estimatedSize + " should be more than 4000")
     assert(estimatedSize <= 4200,
            "Estimated size " + estimatedSize + " should be less than 4200")
-  }
 
-  test("32-bit arch") {
+  test("32-bit arch")
     System.setProperty("os.arch", "x86")
 
     val initialize = PrivateMethod[Unit]('initialize)
@@ -188,11 +169,10 @@ class SizeEstimatorSuite
     assertResult(48)(SizeEstimator.estimate(DummyString("a")))
     assertResult(48)(SizeEstimator.estimate(DummyString("ab")))
     assertResult(56)(SizeEstimator.estimate(DummyString("abcdefgh")))
-  }
 
   // NOTE: The String class definition varies across JDK versions (1.6 vs. 1.7) and vendors
   // (Sun vs IBM). Use a DummyString class to make tests deterministic.
-  test("64-bit arch with no compressed oops") {
+  test("64-bit arch with no compressed oops")
     System.setProperty("os.arch", "amd64")
     System.setProperty("spark.test.useCompressedOops", "false")
     val initialize = PrivateMethod[Unit]('initialize)
@@ -212,25 +192,20 @@ class SizeEstimatorSuite
     assertResult(24)(SizeEstimator.estimate(new java.lang.Long(1)))
     assertResult(24)(SizeEstimator.estimate(new java.lang.Float(1.0)))
     assertResult(24)(SizeEstimator.estimate(new java.lang.Double(1.0d)))
-  }
 
-  test("class field blocks rounding on 64-bit VM without useCompressedOops") {
+  test("class field blocks rounding on 64-bit VM without useCompressedOops")
     assertResult(24)(SizeEstimator.estimate(new DummyClass5))
     assertResult(32)(SizeEstimator.estimate(new DummyClass6))
-  }
 
-  test("check 64-bit detection for s390x arch") {
+  test("check 64-bit detection for s390x arch")
     System.setProperty("os.arch", "s390x")
     val initialize = PrivateMethod[Unit]('initialize)
     SizeEstimator invokePrivate initialize()
     // Class should be 32 bytes on s390x if recognised as 64 bit platform
     assertResult(32)(SizeEstimator.estimate(new DummyClass7))
-  }
 
-  test("SizeEstimation can provide the estimated size") {
+  test("SizeEstimation can provide the estimated size")
     // DummyClass8 provides its size estimation.
     assertResult(2015)(SizeEstimator.estimate(new DummyClass8))
     assertResult(20206)(
         SizeEstimator.estimate(Array.fill(10)(new DummyClass8)))
-  }
-}

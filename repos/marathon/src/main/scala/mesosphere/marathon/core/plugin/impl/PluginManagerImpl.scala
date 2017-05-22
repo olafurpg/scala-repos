@@ -21,7 +21,7 @@ import scala.reflect.ClassTag
 private[plugin] class PluginManagerImpl(val config: MarathonConf,
                                         val definitions: PluginDefinitions,
                                         val urls: Seq[URL])
-    extends PluginManager {
+    extends PluginManager
   private[this] val log: Logger = LoggerFactory.getLogger(getClass)
 
   private[this] var pluginHolders: List[PluginHolder[_]] =
@@ -33,11 +33,11 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
   /**
     * Load plugin for a specific type.
     */
-  private[this] def load[T](implicit ct: ClassTag[T]): PluginHolder[T] = {
+  private[this] def load[T](implicit ct: ClassTag[T]): PluginHolder[T] =
     log.info(
-        s"Loading plugins implementing '${ct.runtimeClass.getName}' from these urls: [${urls
-      .mkString(", ")}]")
-    def configure(plugin: T, definition: PluginDefinition): T = plugin match {
+        s"Loading plugins implementing '${ct.runtimeClass.getName}' from these urls: [$urls
+      .mkString(", ")]")
+    def configure(plugin: T, definition: PluginDefinition): T = plugin match
       case cf: PluginConfiguration if definition.configuration.isDefined =>
         log.info(
             s"Configure the plugin with this configuration: ${definition.configuration}")
@@ -45,12 +45,11 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
                       definition.configuration.get)
         plugin
       case _ => plugin
-    }
     val serviceLoader =
       ServiceLoader.load(ct.runtimeClass.asInstanceOf[Class[T]], classLoader)
     val providers = serviceLoader.iterator().asScala.toSeq
     val plugins =
-      definitions.plugins.filter(_.plugin == ct.runtimeClass.getName).map {
+      definitions.plugins.filter(_.plugin == ct.runtimeClass.getName).map
         definition =>
           providers
             .find(_.getClass.getName == definition.implementation)
@@ -58,22 +57,19 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
                   PluginReference(configure(plugin, definition), definition))
             .getOrElse(throw new WrongConfigurationException(
                     s"Plugin not found: $definition"))
-      }
     log.info(s"Found ${plugins.size} plugins.")
     PluginHolder(ct, plugins)
-  }
 
   /**
     * Get all the service providers that can be found in the plugin directory for the given type.
     * Each plugin is loaded once and gets cached.
     * @return the list of all service providers for the given type.
     */
-  def plugins[T](implicit ct: ClassTag[T]): Seq[T] = synchronized {
-    def loadAndAdd: PluginHolder[T] = {
+  def plugins[T](implicit ct: ClassTag[T]): Seq[T] = synchronized
+    def loadAndAdd: PluginHolder[T] =
       val pluginHolder: PluginHolder[T] = load[T]
       pluginHolders ::= pluginHolder
       pluginHolder
-    }
 
     pluginHolders
       .find(_.classTag == ct)
@@ -81,41 +77,34 @@ private[plugin] class PluginManagerImpl(val config: MarathonConf,
       .getOrElse(loadAndAdd)
       .plugins
       .map(_.plugin)
-  }
-}
 
-object PluginManagerImpl {
+object PluginManagerImpl
   case class PluginReference[T](plugin: T, definition: PluginDefinition)
   case class PluginHolder[T](
       classTag: ClassTag[T], plugins: Seq[PluginReference[T]])
   implicit val definitionFormat = Json.format[PluginDefinition]
 
-  def parse(fileName: String): PluginDefinitions = {
+  def parse(fileName: String): PluginDefinitions =
     val plugins = Json
       .parse(IO.readFile(fileName))
       .as[JsObject]
       .\("plugins")
       .as[JsObject]
       .fields
-      .map {
+      .map
         case (id, value) =>
           JsObject(value.as[JsObject].fields :+ ("id" -> JsString(id)))
-      }
       .map(_.as[PluginDefinition])
     PluginDefinitions(plugins)
-  }
 
-  private[plugin] def apply(conf: MarathonConf): PluginManagerImpl = {
-    val configuredPluginManager = for {
+  private[plugin] def apply(conf: MarathonConf): PluginManagerImpl =
+    val configuredPluginManager = for
       dirName <- conf.pluginDir
       confName <- conf.pluginConf
-    } yield {
+    yield
       val sources = IO.listFiles(dirName)
       val descriptor = parse(confName)
       new PluginManagerImpl(conf, descriptor, sources.map(_.toURI.toURL))
-    }
 
     configuredPluginManager.get.getOrElse(
         new PluginManagerImpl(conf, PluginDefinitions(Seq.empty), Seq.empty))
-  }
-}

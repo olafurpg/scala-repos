@@ -54,24 +54,22 @@ private[streaming] class FileBasedWriteAheadLog(
     maxFailures: Int,
     closeFileAfterWrite: Boolean
 )
-    extends WriteAheadLog with Logging {
+    extends WriteAheadLog with Logging
 
   import FileBasedWriteAheadLog._
 
   private val pastLogs = new ArrayBuffer[LogInfo]
   private val callerName = getCallerName
 
-  private val threadpoolName = {
+  private val threadpoolName =
     "WriteAheadLogManager" + callerName.map(c => s" for $c").getOrElse("")
-  }
   private val forkJoinPool = ThreadUtils.newForkJoinPool(threadpoolName, 20)
   private val executionContext =
     ExecutionContext.fromExecutorService(forkJoinPool)
 
-  override protected def logName = {
+  override protected def logName =
     getClass.getName.stripSuffix("$") +
     callerName.map("_" + _).getOrElse("").replaceAll("[ ]", "_")
-  }
 
   private var currentLogPath: Option[String] = None
   private var currentLogWriter: FileBasedWriteAheadLogWriter = null
@@ -87,47 +85,40 @@ private[streaming] class FileBasedWriteAheadLog(
     */
   def write(
       byteBuffer: ByteBuffer, time: Long): FileBasedWriteAheadLogSegment =
-    synchronized {
+    synchronized
       var fileSegment: FileBasedWriteAheadLogSegment = null
       var failures = 0
       var lastException: Exception = null
       var succeeded = false
-      while (!succeeded && failures < maxFailures) {
-        try {
+      while (!succeeded && failures < maxFailures)
+        try
           fileSegment = getLogWriter(time).write(byteBuffer)
-          if (closeFileAfterWrite) {
+          if (closeFileAfterWrite)
             resetWriter()
-          }
           succeeded = true
-        } catch {
+        catch
           case ex: Exception =>
             lastException = ex
             logWarning("Failed to write to write ahead log")
             resetWriter()
             failures += 1
-        }
-      }
-      if (fileSegment == null) {
+      if (fileSegment == null)
         logError(
             s"Failed to write to write ahead log after $failures failures")
         throw lastException
-      }
       fileSegment
-    }
 
-  def read(segment: WriteAheadLogRecordHandle): ByteBuffer = {
+  def read(segment: WriteAheadLogRecordHandle): ByteBuffer =
     val fileSegment = segment.asInstanceOf[FileBasedWriteAheadLogSegment]
     var reader: FileBasedWriteAheadLogRandomReader = null
     var byteBuffer: ByteBuffer = null
-    try {
+    try
       reader = new FileBasedWriteAheadLogRandomReader(
           fileSegment.path, hadoopConf)
       byteBuffer = reader.read(fileSegment)
-    } finally {
+    finally
       reader.close()
-    }
     byteBuffer
-  }
 
   /**
     * Read all the existing logs from the log directory.
@@ -138,23 +129,20 @@ private[streaming] class FileBasedWriteAheadLog(
     * the latest the records. This does not deal with currently active log files, and
     * hence the implementation is kept simple.
     */
-  def readAll(): JIterator[ByteBuffer] = synchronized {
+  def readAll(): JIterator[ByteBuffer] = synchronized
     val logFilesToRead = pastLogs.map { _.path } ++ currentLogPath
     logInfo("Reading from the logs:\n" + logFilesToRead.mkString("\n"))
-    def readFile(file: String): Iterator[ByteBuffer] = {
+    def readFile(file: String): Iterator[ByteBuffer] =
       logDebug(s"Creating log reader with $file")
       val reader = new FileBasedWriteAheadLogReader(file, hadoopConf)
       CompletionIterator[ByteBuffer, Iterator[ByteBuffer]](
           reader, reader.close _)
-    }
-    if (!closeFileAfterWrite) {
+    if (!closeFileAfterWrite)
       logFilesToRead.iterator.map(readFile).flatten.asJava
-    } else {
+    else
       // For performance gains, it makes sense to parallelize the recovery if
       // closeFileAfterWrite = true
       seqToParIterator(executionContext, logFilesToRead, readFile).asJava
-    }
-  }
 
   /**
     * Delete the log files that are older than the threshold time.
@@ -168,65 +156,54 @@ private[streaming] class FileBasedWriteAheadLog(
     * deleted. This should be set to true only for testing. Else the files will be deleted
     * asynchronously.
     */
-  def clean(threshTime: Long, waitForCompletion: Boolean): Unit = {
-    val oldLogFiles = synchronized {
+  def clean(threshTime: Long, waitForCompletion: Boolean): Unit =
+    val oldLogFiles = synchronized
       val expiredLogs = pastLogs.filter { _.endTime < threshTime }
       pastLogs --= expiredLogs
       expiredLogs
-    }
     logInfo(
         s"Attempting to clear ${oldLogFiles.size} old log files in $logDirectory " +
         s"older than $threshTime: ${oldLogFiles.map { _.path }.mkString("\n")}")
 
-    def deleteFile(walInfo: LogInfo): Unit = {
-      try {
+    def deleteFile(walInfo: LogInfo): Unit =
+      try
         val path = new Path(walInfo.path)
         val fs = HdfsUtils.getFileSystemForPath(path, hadoopConf)
         fs.delete(path, true)
         logDebug(s"Cleared log file $walInfo")
-      } catch {
+      catch
         case ex: Exception =>
           logWarning(s"Error clearing write ahead log file $walInfo", ex)
-      }
       logInfo(s"Cleared log files in $logDirectory older than $threshTime")
-    }
-    oldLogFiles.foreach { logInfo =>
-      if (!executionContext.isShutdown) {
-        try {
+    oldLogFiles.foreach  logInfo =>
+      if (!executionContext.isShutdown)
+        try
           val f = Future { deleteFile(logInfo) }(executionContext)
-          if (waitForCompletion) {
+          if (waitForCompletion)
             import scala.concurrent.duration._
             Await.ready(f, 1 second)
-          }
-        } catch {
+        catch
           case e: RejectedExecutionException =>
             logWarning(
                 "Execution context shutdown before deleting old WriteAheadLogs. " +
                 "This would not affect recovery correctness.",
                 e)
-        }
-      }
-    }
-  }
 
   /** Stop the manager, close any open log writer */
-  def close(): Unit = synchronized {
-    if (currentLogWriter != null) {
+  def close(): Unit = synchronized
+    if (currentLogWriter != null)
       currentLogWriter.close()
-    }
     executionContext.shutdown()
     logInfo("Stopped write ahead log manager")
-  }
 
   /** Get the current log writer while taking care of rotation */
   private def getLogWriter(currentTime: Long): FileBasedWriteAheadLogWriter =
-    synchronized {
-      if (currentLogWriter == null || currentTime > currentLogWriterStopTime) {
+    synchronized
+      if (currentLogWriter == null || currentTime > currentLogWriterStopTime)
         resetWriter()
-        currentLogPath.foreach {
+        currentLogPath.foreach
           pastLogs +=
             LogInfo(currentLogWriterStartTime, currentLogWriterStopTime, _)
-        }
         currentLogWriterStartTime = currentTime
         currentLogWriterStopTime = currentTime + (rollingIntervalSecs * 1000)
         val newLogPath = new Path(
@@ -235,18 +212,16 @@ private[streaming] class FileBasedWriteAheadLog(
         currentLogPath = Some(newLogPath.toString)
         currentLogWriter = new FileBasedWriteAheadLogWriter(
             currentLogPath.get, hadoopConf)
-      }
       currentLogWriter
-    }
 
   /** Initialize the log directory or recover existing logs inside the directory */
-  private def initializeOrRecover(): Unit = synchronized {
+  private def initializeOrRecover(): Unit = synchronized
     val logDirectoryPath = new Path(logDirectory)
     val fileSystem =
       HdfsUtils.getFileSystemForPath(logDirectoryPath, hadoopConf)
 
     if (fileSystem.exists(logDirectoryPath) &&
-        fileSystem.getFileStatus(logDirectoryPath).isDirectory) {
+        fileSystem.getFileStatus(logDirectoryPath).isDirectory)
       val logFileInfo = logFilesTologInfo(
           fileSystem.listStatus(logDirectoryPath).map { _.getPath })
       pastLogs.clear()
@@ -255,52 +230,42 @@ private[streaming] class FileBasedWriteAheadLog(
           s"Recovered ${logFileInfo.size} write ahead log files from $logDirectory")
       logDebug(
           s"Recovered files are:\n${logFileInfo.map(_.path).mkString("\n")}")
-    }
-  }
 
-  private def resetWriter(): Unit = synchronized {
-    if (currentLogWriter != null) {
+  private def resetWriter(): Unit = synchronized
+    if (currentLogWriter != null)
       currentLogWriter.close()
       currentLogWriter = null
-    }
-  }
-}
 
-private[streaming] object FileBasedWriteAheadLog {
+private[streaming] object FileBasedWriteAheadLog
 
   case class LogInfo(startTime: Long, endTime: Long, path: String)
 
   val logFileRegex = """log-(\d+)-(\d+)""".r
 
-  def timeToLogFile(startTime: Long, stopTime: Long): String = {
+  def timeToLogFile(startTime: Long, stopTime: Long): String =
     s"log-$startTime-$stopTime"
-  }
 
-  def getCallerName(): Option[String] = {
+  def getCallerName(): Option[String] =
     val blacklist = Seq("WriteAheadLog", "Logging", "java.lang", "scala.")
     Thread.currentThread
       .getStackTrace()
       .map(_.getClassName)
-      .find { c =>
+      .find  c =>
         !blacklist.exists(c.contains)
-      }
       .flatMap(_.split("\\.").lastOption)
       .flatMap(_.split("\\$\\$").headOption)
-  }
 
   /** Convert a sequence of files to a sequence of sorted LogInfo objects */
-  def logFilesTologInfo(files: Seq[Path]): Seq[LogInfo] = {
-    files.flatMap { file =>
-      logFileRegex.findFirstIn(file.getName()) match {
+  def logFilesTologInfo(files: Seq[Path]): Seq[LogInfo] =
+    files.flatMap  file =>
+      logFileRegex.findFirstIn(file.getName()) match
         case Some(logFileRegex(startTimeStr, stopTimeStr)) =>
           val startTime = startTimeStr.toLong
           val stopTime = stopTimeStr.toLong
           Some(LogInfo(startTime, stopTime, file.toString))
         case None =>
           None
-      }
-    }.sortBy { _.startTime }
-  }
+    .sortBy { _.startTime }
 
   /**
     * This creates an iterator from a parallel collection, by keeping at most `n` objects in memory
@@ -311,16 +276,13 @@ private[streaming] object FileBasedWriteAheadLog {
     */
   def seqToParIterator[I, O](executionContext: ExecutionContext,
                              source: Seq[I],
-                             handler: I => Iterator[O]): Iterator[O] = {
+                             handler: I => Iterator[O]): Iterator[O] =
     val taskSupport = new ExecutionContextTaskSupport(executionContext)
     val groupSize = taskSupport.parallelismLevel.max(8)
     source
       .grouped(groupSize)
-      .flatMap { group =>
+      .flatMap  group =>
         val parallelCollection = group.par
         parallelCollection.tasksupport = taskSupport
         parallelCollection.map(handler)
-      }
       .flatten
-  }
-}

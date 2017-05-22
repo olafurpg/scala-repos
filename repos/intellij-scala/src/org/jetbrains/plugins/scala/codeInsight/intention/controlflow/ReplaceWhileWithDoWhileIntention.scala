@@ -14,40 +14,37 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * Nikolay.Tropin
   * 4/17/13
   */
-object ReplaceWhileWithDoWhileIntention {
+object ReplaceWhileWithDoWhileIntention
   def familyName = "Replace while with do while"
-}
 
-class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
+class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction
   def getFamilyName = ReplaceWhileWithDoWhileIntention.familyName
 
   override def getText: String = ReplaceWhileWithDoWhileIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
-    for {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
+    for
       whileStmt <- Option(
           PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt], false))
       condition <- whileStmt.condition
       body <- whileStmt.body
-    } {
+    
       val offset = editor.getCaretModel.getOffset
       if (offset >= whileStmt.getTextRange.getStartOffset &&
           offset <= condition.getTextRange.getStartOffset - 1) return true
-    }
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val whileStmt: ScWhileStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScWhileStmt])
     if (whileStmt == null || !whileStmt.isValid) return
 
-    for {
+    for
       condition <- whileStmt.condition
       body <- whileStmt.body
-    } {
+    
       val condText = condition.getText
       val bodyText = body.getText
 
@@ -57,12 +54,8 @@ class ReplaceWhileWithDoWhileIntention extends PsiElementBaseIntentionAction {
         ScalaPsiElementFactory.createExpressionFromText(
             newStmtText, element.getManager)
 
-      inWriteAction {
+      inWriteAction
         whileStmt.replaceExpression(newStmt, removeParenthesis = true)
         PsiDocumentManager
           .getInstance(project)
           .commitDocument(editor.getDocument)
-      }
-    }
-  }
-}

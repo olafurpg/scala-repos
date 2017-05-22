@@ -10,18 +10,14 @@ import scala.collection.JavaConverters._
 import javax.inject.Inject
 
 class Application @Inject()(env: Environment, configuration: Configuration)
-    extends Controller {
+    extends Controller
 
-  def index = Action {
+  def index = Action
     Ok(views.html.index("Your new application is ready."))
-  }
 
-  def config = Action {
+  def config = Action
     Ok(configuration.underlying.getString("some.config"))
-  }
 
-  def count = Action {
+  def count = Action
     val num = env.resource("application.conf").toSeq.size
     Ok(num.toString)
-  }
-}

@@ -31,7 +31,7 @@ import language.higherKinds
   * as type member `Type`.
   */
 class TypedMultiMap[T <: AnyRef, K[_ <: T]] private (
-    private val map: Map[T, Set[Any]]) {
+    private val map: Map[T, Set[Any]])
 
   /**
     * Return the set of keys which are mapped to non-empty value sets.
@@ -41,33 +41,28 @@ class TypedMultiMap[T <: AnyRef, K[_ <: T]] private (
   /**
     * Return a map that has the given value added to the mappings for the given key.
     */
-  def inserted(key: T)(value: K[key.type]): TypedMultiMap[T, K] = {
-    val set = map.get(key) match {
+  def inserted(key: T)(value: K[key.type]): TypedMultiMap[T, K] =
+    val set = map.get(key) match
       case Some(s) ⇒ s
       case None ⇒ Set.empty[Any]
-    }
     new TypedMultiMap[T, K](map.updated(key, set + value))
-  }
 
   /**
     * Obtain all mappings for the given key.
     */
   def get(key: T): Set[K[key.type]] =
-    map.get(key) match {
+    map.get(key) match
       case Some(s) ⇒ s.asInstanceOf[Set[K[key.type]]]
       case None ⇒ Set.empty
-    }
 
   /**
     * Return a map that has the given value removed from all keys.
     */
-  def valueRemoved(value: Any): TypedMultiMap[T, K] = {
+  def valueRemoved(value: Any): TypedMultiMap[T, K] =
     val s = Set(value)
-    val m = map.collect {
+    val m = map.collect
       case (k, set) if set != s ⇒ (k, set - value)
-    }
     new TypedMultiMap[T, K](m)
-  }
 
   /**
     * Return a map that has all mappings for the given key removed.
@@ -78,28 +73,24 @@ class TypedMultiMap[T <: AnyRef, K[_ <: T]] private (
   /**
     * Return a map that has the given mapping from the given key removed.
     */
-  def removed(key: T)(value: K[key.type]): TypedMultiMap[T, K] = {
-    map.get(key) match {
+  def removed(key: T)(value: K[key.type]): TypedMultiMap[T, K] =
+    map.get(key) match
       case None ⇒ this
       case Some(set) ⇒
-        if (set(value)) {
+        if (set(value))
           val newset = set - value
           val newmap =
             if (newset.isEmpty) map - key else map.updated(key, newset)
           new TypedMultiMap[T, K](newmap)
-        } else this
-    }
-  }
+        else this
 
   override def toString: String = s"TypedMultiMap($map)"
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case o: TypedMultiMap[_, _] ⇒ map == o.map
     case _ ⇒ false
-  }
   override def hashCode: Int = map.hashCode
-}
 
-object TypedMultiMap {
+object TypedMultiMap
   private val _empty = new TypedMultiMap[Nothing, Nothing](Map.empty)
 
   /**
@@ -107,4 +98,3 @@ object TypedMultiMap {
     */
   def empty[T <: AnyRef, K[_ <: T]]: TypedMultiMap[T, K] =
     _empty.asInstanceOf[TypedMultiMap[T, K]]
-}

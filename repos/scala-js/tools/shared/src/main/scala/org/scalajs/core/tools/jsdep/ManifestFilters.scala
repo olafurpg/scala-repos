@@ -1,7 +1,7 @@
 package org.scalajs.core.tools.jsdep
 
 /** Holds useful JSDependencyManifest filters */
-object ManifestFilters {
+object ManifestFilters
 
   type ManifestFilter = Traversable[JSDependencyManifest] => Traversable[
       JSDependencyManifest]
@@ -12,17 +12,15 @@ object ManifestFilters {
     *  @param nameMappings resource name mappings
     */
   def reinterpretResourceNames(moduleNames: String*)(
-      nameMappings: (String, String)*): ManifestFilter = {
+      nameMappings: (String, String)*): ManifestFilter =
     val modSet = moduleNames.toSet
     val nameMap = nameMappings.toMap
 
-    val mapper = { (origin: Origin) => (oldName: String) =>
+    val mapper =  (origin: Origin) => (oldName: String) =>
       if (modSet(origin.moduleName)) nameMap.getOrElse(oldName, oldName)
       else oldName
-    }
 
     reinterpretResourceNames(mapper)
-  }
 
   /** Creates a manifest filter that maps resource names of a certain
     *  origin as if they were written differently
@@ -30,8 +28,8 @@ object ManifestFilters {
     *      resource name
     */
   def reinterpretResourceNames(
-      mappings: Origin => String => String): ManifestFilter = { manifests =>
-    for (manifest <- manifests) yield {
+      mappings: Origin => String => String): ManifestFilter =  manifests =>
+    for (manifest <- manifests) yield
       val mapping = mappings(manifest.origin)
       val filteredJSDeps = for (jsDependency <- manifest.libDeps) yield
         new JSDependency(mapping(jsDependency.resourceName),
@@ -42,6 +40,3 @@ object ManifestFilters {
                                filteredJSDeps,
                                manifest.requiresDOM,
                                manifest.compliantSemantics)
-    }
-  }
-}

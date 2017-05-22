@@ -25,18 +25,17 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
+class ColumnExpressionSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  private lazy val booleanData = {
+  private lazy val booleanData =
     sqlContext.createDataFrame(
         sparkContext.parallelize(Row(false, false) :: Row(false, true) :: Row(
                 true, false) :: Row(true, true) :: Nil),
         StructType(
             Seq(StructField("a", BooleanType), StructField("b", BooleanType))))
-  }
 
-  test("column names with space") {
+  test("column names with space")
     val df = Seq((1, "a")).toDF("name with space", "name.with.dot")
 
     checkAnswer(df.select(df("name with space")), Row(1) :: Nil)
@@ -48,9 +47,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select("name with space"), Row(1) :: Nil)
 
     checkAnswer(df.select(expr("`name with space`")), Row(1) :: Nil)
-  }
 
-  test("column names with dot") {
+  test("column names with dot")
     val df = Seq((1, "a")).toDF("name with space", "name.with.dot").as("a")
 
     checkAnswer(df.select(df("`name.with.dot`")), Row("a") :: Nil)
@@ -72,30 +70,26 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     checkAnswer(df.select("a.`name.with.dot`"), Row("a") :: Nil)
 
     checkAnswer(df.select(expr("a.`name.with.dot`")), Row("a") :: Nil)
-  }
 
-  test("alias") {
+  test("alias")
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
     assert(df.select(df("a").as("b")).columns.head === "b")
     assert(df.select(df("a").alias("b")).columns.head === "b")
-  }
 
-  test("as propagates metadata") {
+  test("as propagates metadata")
     val metadata = new MetadataBuilder
     metadata.putString("key", "value")
     val origCol = $"a".as("b", metadata.build())
     val newCol = origCol.as("c")
     assert(
         newCol.expr.asInstanceOf[NamedExpression].metadata.getString("key") === "value")
-  }
 
-  test("single explode") {
+  test("single explode")
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
     checkAnswer(
         df.select(explode('intList)), Row(1) :: Row(2) :: Row(3) :: Nil)
-  }
 
-  test("explode and other columns") {
+  test("explode and other columns")
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
 
     checkAnswer(df.select($"a", explode('intList)),
@@ -106,9 +100,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         Row(1, Seq(1, 2, 3), 1) :: Row(1, Seq(1, 2, 3), 2) :: Row(1,
                                                                   Seq(1, 2, 3),
                                                                   3) :: Nil)
-  }
 
-  test("aliased explode") {
+  test("aliased explode")
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
 
     checkAnswer(df.select(explode('intList).as('int)).select('int),
@@ -116,23 +109,20 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(df.select(explode('intList).as('int)).select(sum('int)),
                 Row(6) :: Nil)
-  }
 
-  test("explode on map") {
+  test("explode on map")
     val df = Seq((1, Map("a" -> "b"))).toDF("a", "map")
 
     checkAnswer(df.select(explode('map)), Row("a", "b"))
-  }
 
-  test("explode on map with aliases") {
+  test("explode on map with aliases")
     val df = Seq((1, Map("a" -> "b"))).toDF("a", "map")
 
     checkAnswer(df.select(explode('map).as("key1" :: "value1" :: Nil))
                   .select("key1", "value1"),
                 Row("a", "b"))
-  }
 
-  test("self join explode") {
+  test("self join explode")
     val df = Seq((1, Seq(1, 2, 3))).toDF("a", "intList")
     val exploded = df.select(explode('intList).as('i))
 
@@ -140,60 +130,52 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                   .join(exploded, exploded("i") === exploded("i"))
                   .agg(count("*")),
                 Row(3) :: Nil)
-  }
 
-  test("collect on column produced by a binary operator") {
+  test("collect on column produced by a binary operator")
     val df = Seq((1, 2, 3)).toDF("a", "b", "c")
     checkAnswer(df.select(df("a") + df("b")), Seq(Row(3)))
     checkAnswer(df.select(df("a") + df("b").as("c")), Seq(Row(3)))
-  }
 
-  test("star") {
+  test("star")
     checkAnswer(testData.select($"*"), testData.collect().toSeq)
-  }
 
-  test("star qualified by data frame object") {
+  test("star qualified by data frame object")
     val df = testData.toDF
     val goldAnswer = df.collect().toSeq
     checkAnswer(df.select(df("*")), goldAnswer)
 
     val df1 = df.select(df("*"), lit("abcd").as("litCol"))
     checkAnswer(df1.select(df("*")), goldAnswer)
-  }
 
-  test("star qualified by table name") {
+  test("star qualified by table name")
     checkAnswer(testData.as("testData").select($"testData.*"),
                 testData.collect().toSeq)
-  }
 
-  test("+") {
+  test("+")
     checkAnswer(testData2.select($"a" + 1),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) + 1)))
 
     checkAnswer(
         testData2.select($"a" + $"b" + 2),
         testData2.collect().toSeq.map(r => Row(r.getInt(0) + r.getInt(1) + 2)))
-  }
 
-  test("-") {
+  test("-")
     checkAnswer(testData2.select($"a" - 1),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) - 1)))
 
     checkAnswer(
         testData2.select($"a" - $"b" - 2),
         testData2.collect().toSeq.map(r => Row(r.getInt(0) - r.getInt(1) - 2)))
-  }
 
-  test("*") {
+  test("*")
     checkAnswer(testData2.select($"a" * 10),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) * 10)))
 
     checkAnswer(
         testData2.select($"a" * $"b"),
         testData2.collect().toSeq.map(r => Row(r.getInt(0) * r.getInt(1))))
-  }
 
-  test("/") {
+  test("/")
     checkAnswer(
         testData2.select($"a" / 2),
         testData2.collect().toSeq.map(r => Row(r.getInt(0).toDouble / 2)))
@@ -203,45 +185,39 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                   .collect()
                   .toSeq
                   .map(r => Row(r.getInt(0).toDouble / r.getInt(1))))
-  }
 
-  test("%") {
+  test("%")
     checkAnswer(testData2.select($"a" % 2),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) % 2)))
 
     checkAnswer(
         testData2.select($"a" % $"b"),
         testData2.collect().toSeq.map(r => Row(r.getInt(0) % r.getInt(1))))
-  }
 
-  test("unary -") {
+  test("unary -")
     checkAnswer(testData2.select(-$"a"),
                 testData2.collect().toSeq.map(r => Row(-r.getInt(0))))
-  }
 
-  test("unary !") {
+  test("unary !")
     checkAnswer(complexData.select(!$"b"),
                 complexData.collect().toSeq.map(r => Row(!r.getBoolean(3))))
-  }
 
-  test("isNull") {
+  test("isNull")
     checkAnswer(
         nullStrings.toDF.where($"s".isNull),
         nullStrings.collect().toSeq.filter(r => r.getString(1) eq null))
 
     checkAnswer(sql("select isnull(null), isnull(1)"), Row(true, false))
-  }
 
-  test("isNotNull") {
+  test("isNotNull")
     checkAnswer(
         nullStrings.toDF.where($"s".isNotNull),
         nullStrings.collect().toSeq.filter(r => r.getString(1) ne null))
 
     checkAnswer(
         sql("select isnotnull(null), isnotnull('a')"), Row(false, true))
-  }
 
-  test("isNaN") {
+  test("isNaN")
     val testData = sqlContext.createDataFrame(
         sparkContext.parallelize(
             Row(Double.NaN, Float.NaN) :: Row(math.log(-1),
@@ -259,9 +235,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                     false, false) :: Nil)
 
     checkAnswer(sql("select isnan(15), isnan('invalid')"), Row(false, false))
-  }
 
-  test("nanvl") {
+  test("nanvl")
     val testData =
       sqlContext.createDataFrame(sparkContext.parallelize(
                                      Row(null,
@@ -294,27 +269,24 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
             " nanvl(b, e), nanvl(e, f) from t"),
         Row(null, 3.0, 10.0, null, Double.PositiveInfinity, 3.0, 1.0)
     )
-  }
 
-  test("===") {
+  test("===")
     checkAnswer(testData2.filter($"a" === 1),
                 testData2.collect().toSeq.filter(r => r.getInt(0) == 1))
 
     checkAnswer(
         testData2.filter($"a" === $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) == r.getInt(1)))
-  }
 
-  test("<=>") {
+  test("<=>")
     checkAnswer(testData2.filter($"a" === 1),
                 testData2.collect().toSeq.filter(r => r.getInt(0) == 1))
 
     checkAnswer(
         testData2.filter($"a" === $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) == r.getInt(1)))
-  }
 
-  test("=!=") {
+  test("=!=")
     val nullData = sqlContext.createDataFrame(
         sparkContext.parallelize(
             Row(1, 1) :: Row(1, 2) :: Row(1, null) :: Row(null, null) :: Nil),
@@ -334,45 +306,40 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         StructType(Seq(StructField("a", StringType, true))))
 
     checkAnswer(nullData2.filter($"a" <=> null), Row(null) :: Nil)
-  }
 
-  test(">") {
+  test(">")
     checkAnswer(testData2.filter($"a" > 1),
                 testData2.collect().toSeq.filter(r => r.getInt(0) > 1))
 
     checkAnswer(
         testData2.filter($"a" > $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) > r.getInt(1)))
-  }
 
-  test(">=") {
+  test(">=")
     checkAnswer(testData2.filter($"a" >= 1),
                 testData2.collect().toSeq.filter(r => r.getInt(0) >= 1))
 
     checkAnswer(
         testData2.filter($"a" >= $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) >= r.getInt(1)))
-  }
 
-  test("<") {
+  test("<")
     checkAnswer(testData2.filter($"a" < 2),
                 testData2.collect().toSeq.filter(r => r.getInt(0) < 2))
 
     checkAnswer(
         testData2.filter($"a" < $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) < r.getInt(1)))
-  }
 
-  test("<=") {
+  test("<=")
     checkAnswer(testData2.filter($"a" <= 2),
                 testData2.collect().toSeq.filter(r => r.getInt(0) <= 2))
 
     checkAnswer(
         testData2.filter($"a" <= $"b"),
         testData2.collect().toSeq.filter(r => r.getInt(0) <= r.getInt(1)))
-  }
 
-  test("between") {
+  test("between")
     val testData = sparkContext
       .parallelize((0, 1, 2) :: (1, 2, 3) :: (2, 1, 0) :: (2, 2, 4) :: (
               3, 1, 6) :: (3, 2, 0) :: Nil)
@@ -383,9 +350,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
       .filter(r => r.getInt(0) >= r.getInt(1) && r.getInt(0) <= r.getInt(2))
 
     checkAnswer(testData.filter($"a".between($"b", $"c")), expectAnswer)
-  }
 
-  test("in") {
+  test("in")
     val df = Seq((1, "x"), (2, "y"), (3, "z")).toDF("a", "b")
     checkAnswer(
         df.filter($"a".isin(1, 2)),
@@ -411,21 +377,18 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
     val df2 = Seq((1, Seq(1)), (2, Seq(2)), (3, Seq(3))).toDF("a", "b")
 
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       df2.filter($"a".isin($"b"))
-    }
-  }
 
-  test("&&") {
+  test("&&")
     checkAnswer(booleanData.filter($"a" && true),
                 Row(true, false) :: Row(true, true) :: Nil)
 
     checkAnswer(booleanData.filter($"a" && false), Nil)
 
     checkAnswer(booleanData.filter($"a" && $"b"), Row(true, true) :: Nil)
-  }
 
-  test("||") {
+  test("||")
     checkAnswer(booleanData.filter($"a" || true), booleanData.collect())
 
     checkAnswer(booleanData.filter($"a" || false),
@@ -433,9 +396,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
 
     checkAnswer(booleanData.filter($"a" || $"b"),
                 Row(false, true) :: Row(true, false) :: Row(true, true) :: Nil)
-  }
 
-  test("SPARK-7321 when conditional statements") {
+  test("SPARK-7321 when conditional statements")
     val testData = (1 to 3).map(i => (i, i.toString)).toDF("key", "value")
 
     checkAnswer(
@@ -455,12 +417,10 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     // Test error handling for invalid expressions.
     intercept[IllegalArgumentException] { $"key".when($"key" === 1, -1) }
     intercept[IllegalArgumentException] { $"key".otherwise(-1) }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       when($"key" === 1, -1).otherwise(-1).otherwise(-1)
-    }
-  }
 
-  test("sqrt") {
+  test("sqrt")
     checkAnswer(
         testData.select(sqrt('key)).orderBy('key.asc),
         (1 to 100).map(n => Row(math.sqrt(n)))
@@ -475,9 +435,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         testData.select(sqrt(lit(null))),
         (1 to 100).map(_ => Row(null))
     )
-  }
 
-  test("upper") {
+  test("upper")
     checkAnswer(
         lowerCaseData.select(upper('l)),
         ('a' to 'd').map(c => Row(c.toString.toUpperCase))
@@ -494,9 +453,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     )
 
     checkAnswer(sql("SELECT upper('aB'), ucase('cDe')"), Row("AB", "CDE"))
-  }
 
-  test("lower") {
+  test("lower")
     checkAnswer(
         upperCaseData.select(lower('L)),
         ('A' to 'F').map(c => Row(c.toString.toLowerCase))
@@ -513,15 +471,13 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     )
 
     checkAnswer(sql("SELECT lower('aB'), lcase('cDe')"), Row("ab", "cde"))
-  }
 
-  test("monotonicallyIncreasingId") {
+  test("monotonicallyIncreasingId")
     // Make sure we have 2 partitions, each with 2 records.
     val df = sparkContext
       .parallelize(Seq[Int](), 2)
-      .mapPartitions { _ =>
+      .mapPartitions  _ =>
         Iterator(Tuple1(1), Tuple1(2))
-      }
       .toDF("a")
     checkAnswer(
         df.select(monotonicallyIncreasingId()),
@@ -531,24 +487,21 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
         df.select(expr("monotonically_increasing_id()")),
         Row(0L) :: Row(1L) :: Row((1L << 33) + 0L) :: Row((1L << 33) + 1L) :: Nil
     )
-  }
 
-  test("spark_partition_id") {
+  test("spark_partition_id")
     // Make sure we have 2 partitions, each with 2 records.
     val df = sparkContext
       .parallelize(Seq[Int](), 2)
-      .mapPartitions { _ =>
+      .mapPartitions  _ =>
         Iterator(Tuple1(1), Tuple1(2))
-      }
       .toDF("a")
     checkAnswer(
         df.select(spark_partition_id()),
         Row(0) :: Row(0) :: Row(1) :: Row(1) :: Nil
     )
-  }
 
-  test("input_file_name") {
-    withTempPath { dir =>
+  test("input_file_name")
+    withTempPath  dir =>
       val data = sparkContext.parallelize(0 to 10).toDF("id")
       data.write.parquet(dir.getCanonicalPath)
       val answer = sqlContext.read
@@ -559,37 +512,30 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
       assert(answer.contains(dir.getCanonicalPath))
 
       checkAnswer(data.select(input_file_name()).limit(1), Row(""))
-    }
-  }
 
-  test("columns can be compared") {
+  test("columns can be compared")
     assert('key.desc == 'key.desc)
     assert('key.desc != 'key.asc)
-  }
 
-  test("alias with metadata") {
+  test("alias with metadata")
     val metadata =
       new MetadataBuilder().putString("originName", "value").build()
     val schema = testData.select($"*", col("value").as("abc", metadata)).schema
     assert(schema("value").metadata === Metadata.empty)
     assert(schema("abc").metadata === metadata)
-  }
 
-  test("rand") {
+  test("rand")
     val randCol = testData.select($"key", rand(5L).as("rand"))
     randCol.columns.length should be(2)
     val rows = randCol.collect()
-    rows.foreach { row =>
+    rows.foreach  row =>
       assert(row.getDouble(1) <= 1.0)
       assert(row.getDouble(1) >= 0.0)
-    }
 
-    def checkNumProjects(df: DataFrame, expectedNumProjects: Int): Unit = {
-      val projects = df.queryExecution.sparkPlan.collect {
+    def checkNumProjects(df: DataFrame, expectedNumProjects: Int): Unit =
+      val projects = df.queryExecution.sparkPlan.collect
         case tungstenProject: Project => tungstenProject
-      }
       assert(projects.size === expectedNumProjects)
-    }
 
     // We first create a plan with two Projects.
     // Project [rand + 1 AS rand1, rand - 1 AS rand2]
@@ -617,22 +563,18 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
     //     LogicalRDD [key, value]
     val dfWithThreeProjects = dfWithTwoProjects.select($"rand1" - $"rand2")
     checkNumProjects(dfWithThreeProjects, 2)
-    dfWithThreeProjects.collect().foreach { row =>
+    dfWithThreeProjects.collect().foreach  row =>
       assert(row.getDouble(0) === 2.0 +- 0.0001)
-    }
-  }
 
-  test("randn") {
+  test("randn")
     val randCol = testData.select('key, randn(5L).as("rand"))
     randCol.columns.length should be(2)
     val rows = randCol.collect()
-    rows.foreach { row =>
+    rows.foreach  row =>
       assert(row.getDouble(1) <= 4.0)
       assert(row.getDouble(1) >= -4.0)
-    }
-  }
 
-  test("bitwiseAND") {
+  test("bitwiseAND")
     checkAnswer(testData2.select($"a".bitwiseAND(75)),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) & 75)))
 
@@ -641,9 +583,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                   .collect()
                   .toSeq
                   .map(r => Row(r.getInt(0) & r.getInt(1) & 22)))
-  }
 
-  test("bitwiseOR") {
+  test("bitwiseOR")
     checkAnswer(testData2.select($"a".bitwiseOR(170)),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) | 170)))
 
@@ -652,9 +593,8 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                   .collect()
                   .toSeq
                   .map(r => Row(r.getInt(0) | r.getInt(1) | 42)))
-  }
 
-  test("bitwiseXOR") {
+  test("bitwiseXOR")
     checkAnswer(testData2.select($"a".bitwiseXOR(112)),
                 testData2.collect().toSeq.map(r => Row(r.getInt(0) ^ 112)))
 
@@ -663,5 +603,3 @@ class ColumnExpressionSuite extends QueryTest with SharedSQLContext {
                   .collect()
                   .toSeq
                   .map(r => Row(r.getInt(0) ^ r.getInt(1) ^ 39)))
-  }
-}

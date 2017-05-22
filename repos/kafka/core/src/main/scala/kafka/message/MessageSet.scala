@@ -22,7 +22,7 @@ import java.nio.channels._
 /**
   * Message set helper functions
   */
-object MessageSet {
+object MessageSet
 
   val MessageSizeLength = 4
   val OffsetLength = 8
@@ -43,19 +43,16 @@ object MessageSet {
   /**
     * Validate that all "magic" values in `messages` are the same and return their magic value and max timestamp
     */
-  def magicAndLargestTimestamp(messages: Seq[Message]): MagicAndTimestamp = {
+  def magicAndLargestTimestamp(messages: Seq[Message]): MagicAndTimestamp =
     val firstMagicValue = messages.head.magic
     var largestTimestamp = Message.NoTimestamp
-    for (message <- messages) {
+    for (message <- messages)
       if (message.magic != firstMagicValue)
         throw new IllegalStateException(
             "Messages in the same message set must have same magic value")
       if (firstMagicValue > Message.MagicValue_V0)
         largestTimestamp = math.max(largestTimestamp, message.timestamp)
-    }
     MagicAndTimestamp(firstMagicValue, largestTimestamp)
-  }
-}
 
 case class MagicAndTimestamp(magic: Byte, timestamp: Long)
 
@@ -67,7 +64,7 @@ case class MagicAndTimestamp(magic: Byte, timestamp: Long)
   * 4 byte size containing an integer N
   * N message bytes as described in the Message class
   */
-abstract class MessageSet extends Iterable[MessageAndOffset] {
+abstract class MessageSet extends Iterable[MessageAndOffset]
 
   /** Write the messages in this set to the given channel starting at the given offset byte. 
     * Less than the complete amount may be written, but no more than maxSize can be. The number
@@ -93,19 +90,16 @@ abstract class MessageSet extends Iterable[MessageAndOffset] {
     * Print this message set's contents. If the message set has more than 100 messages, just
     * print the first 100.
     */
-  override def toString: String = {
+  override def toString: String =
     val builder = new StringBuilder()
     builder.append(getClass.getSimpleName + "(")
     val iter = this.iterator
     var i = 0
-    while (iter.hasNext && i < 100) {
+    while (iter.hasNext && i < 100)
       val message = iter.next
       builder.append(message)
       if (iter.hasNext) builder.append(", ")
       i += 1
-    }
     if (iter.hasNext) builder.append("...")
     builder.append(")")
     builder.toString
-  }
-}

@@ -11,8 +11,6 @@ import java.io._
 
 import scala.language.implicitConversions
 
-class ByteArrayInputStreamTest extends CommonStreamsTests {
-  byteArrayInputStreamLikeTests { seq =>
+class ByteArrayInputStreamTest extends CommonStreamsTests
+  byteArrayInputStreamLikeTests  seq =>
     new ByteArrayInputStream(seq.map(_.toByte).toArray)
-  }
-}

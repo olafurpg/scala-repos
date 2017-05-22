@@ -9,20 +9,17 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScAssignStmt
 /**
   * Pavel.Fatin, 18.05.2010
   */
-class AssignmentAnnotatorTest extends SimpleTestCase {
+class AssignmentAnnotatorTest extends SimpleTestCase
   final val Header = """
   class A; class B
   object A extends A; object B extends B
   """
 
-  def testVariable() {
-    assertMatches(messages("var v = A; v = A")) {
+  def testVariable()
+    assertMatches(messages("var v = A; v = A"))
       case Nil =>
-    }
-    assertMatches(messages("var v = A; v = B")) {
+    assertMatches(messages("var v = A; v = B"))
       case Error("B", TypeMismatch()) :: Nil =>
-    }
-  }
 
   //todo: requires Function1 trait in scope
   /*def testImplicitConversion {
@@ -31,60 +28,43 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
     }
   }*/
 
-  def testValue() {
-    assertMatches(messages("val v = A; v = A")) {
+  def testValue()
+    assertMatches(messages("val v = A; v = A"))
       case Error("v = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("val v = A; v = B")) {
+    assertMatches(messages("val v = A; v = B"))
       case Error("v = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testFunctionParameter() {
-    assertMatches(messages("def f(p: A) { p = A }")) {
+  def testFunctionParameter()
+    assertMatches(messages("def f(p: A) { p = A }"))
       case Error("p = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("def f(p: A) { p = B }")) {
+    assertMatches(messages("def f(p: A) { p = B }"))
       case Error("p = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testClassParameter() {
-    assertMatches(messages("case class C(var p: A) { p = A }")) {
+  def testClassParameter()
+    assertMatches(messages("case class C(var p: A) { p = A }"))
       case Nil =>
-    }
-    assertMatches(messages("class C(p: A) { p = B }")) {
+    assertMatches(messages("class C(p: A) { p = B }"))
       case Error("p = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testClassVariableParameter() {
-    assertMatches(messages("class C(var p: A) { p = A }")) {
+  def testClassVariableParameter()
+    assertMatches(messages("class C(var p: A) { p = A }"))
       case Nil =>
-    }
     // TODO right expression "B" must have expected type    
 //    assertMatches(messages("class C(var p: A) { p = B }")) {
 //      case Error("B", TypeMismatch()) :: Nil =>
 //    }
-  }
 
-  def testClassValueParameter() {
-    assertMatches(messages("class C(val p: A) { p = A }")) {
+  def testClassValueParameter()
+    assertMatches(messages("class C(val p: A) { p = A }"))
       case Error("p = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("class C(val p: A) { p = B }")) {
+    assertMatches(messages("class C(val p: A) { p = B }"))
       case Error("p = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testFunctionLiteralParameter() {
-    assertMatches(messages("(p: A) => { p = A }")) {
+  def testFunctionLiteralParameter()
+    assertMatches(messages("(p: A) => { p = A }"))
       case Error("p = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("(p: A) => { p = B }")) {
+    assertMatches(messages("(p: A) => { p = B }"))
       case Error("p = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
   //TODO fails on server
 //  def testParameterInsideBlock {
@@ -96,82 +76,58 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
 //    }
 //  }
 
-  def testForComprehensionGenerator() {
-    assertMatches(messages("for(v: A <- null) { v = A }")) {
+  def testForComprehensionGenerator()
+    assertMatches(messages("for(v: A <- null) { v = A }"))
       case Error("v = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("for(v: A <- null) { v = B }")) {
+    assertMatches(messages("for(v: A <- null) { v = B }"))
       case Error("v = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testForComprehensionEnumerator() {
-    assertMatches(messages("for(x <- null; v = A) { v = A }")) {
+  def testForComprehensionEnumerator()
+    assertMatches(messages("for(x <- null; v = A) { v = A }"))
       case Error("v = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("for(x <- null; v = A) { v = B }")) {
+    assertMatches(messages("for(x <- null; v = A) { v = B }"))
       case Error("v = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testCaseClause() {
-    assertMatches(messages("A match { case v: A => v = A }")) {
+  def testCaseClause()
+    assertMatches(messages("A match { case v: A => v = A }"))
       case Error("v = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("A match { case v: A => v = B }")) {
+    assertMatches(messages("A match { case v: A => v = B }"))
       case Error("v = B", ReassignmentToVal()) :: Nil =>
-    }
-  }
 
-  def testNamedParameterClause() {
-    assertMatches(messages("def blerg(a: Any)= 0; blerg(a = 0)")) {
+  def testNamedParameterClause()
+    assertMatches(messages("def blerg(a: Any)= 0; blerg(a = 0)"))
       case Nil =>
-    }
-  }
 
-  def testUpdateOkay() {
+  def testUpdateOkay()
     assertMatches(
-        messages("val a = new { def update(x: Int): Unit = () }; a() = 1")) {
+        messages("val a = new { def update(x: Int): Unit = () }; a() = 1"))
       case Nil =>
-    }
-  }
 
-  def testVarInsideVar() {
-    assertMatches(messages("val x = { var a = A; a = A }")) {
+  def testVarInsideVar()
+    assertMatches(messages("val x = { var a = A; a = A }"))
       case Nil =>
-    }
-    assertMatches(messages("val x = { var a = A; a = B }")) {
+    assertMatches(messages("val x = { var a = A; a = B }"))
       case Error("B", TypeMismatch()) :: Nil =>
-    }
-  }
 
-  def testVarInsideTemplateAssignedToVal() {
-    assertMatches(messages("val outer = new { var a = (); a = () }")) {
+  def testVarInsideTemplateAssignedToVal()
+    assertMatches(messages("val outer = new { var a = (); a = () }"))
       case Nil =>
-    }
-  }
 
-  def testSetter() {
-    assertMatches(messages("def a = A; def a_=(x: A) {}; a = A")) {
+  def testSetter()
+    assertMatches(messages("def a = A; def a_=(x: A) {}; a = A"))
       case Nil =>
-    }
     assertMatches(
-        messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A")) {
+        messages("def a(implicit b: B) = A; def a_=(x: A) {}; a = A"))
       case Nil =>
-    }
-    assertMatches(messages("def a() = A; def a_=(x: A) {}; a = A")) {
+    assertMatches(messages("def a() = A; def a_=(x: A) {}; a = A"))
       case Error("a = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("val a = A; def a_=(x: A) {}; a = A")) {
+    assertMatches(messages("val a = A; def a_=(x: A) {}; a = A"))
       case Error("a = A", ReassignmentToVal()) :: Nil =>
-    }
-    assertMatches(messages("def a = A; def a_=(x: A) {}; a = B")) {
+    assertMatches(messages("def a = A; def a_=(x: A) {}; a = B"))
       case Error("B", TypeMismatch()) :: Nil =>
-    }
-  }
 
   def messages(@Language(value = "Scala", prefix = Header) code: String)
-    : List[Message] = {
+    : List[Message] =
     val assignment =
       (Header + code).parse.depthFirst.findByType(classOf[ScAssignStmt]).get
 
@@ -180,12 +136,9 @@ class AssignmentAnnotatorTest extends SimpleTestCase {
 
     annotator.annotateAssignment(assignment, mock, advancedHighlighting = true)
     mock.annotations
-  }
 
   val TypeMismatch = StartWith("Type mismatch")
   val ReassignmentToVal = StartWith("Reassignment to val")
 
-  case class StartWith(fragment: String) {
+  case class StartWith(fragment: String)
     def unapply(s: String) = s.startsWith(fragment)
-  }
-}

@@ -7,7 +7,7 @@ import com.intellij.psi.{PsiElement, PsiElementVisitor, ResolveState}
 /**
   * Pavel.Fatin, 11.05.2010
   */
-abstract class AbstractPsiElementMock extends PsiElement {
+abstract class AbstractPsiElementMock extends PsiElement
   def getIcon(flags: Int) = null
 
   def putUserData[T](key: Key[T], value: T) = {}
@@ -104,4 +104,3 @@ abstract class AbstractPsiElementMock extends PsiElement {
   def getLanguage = null
 
   def getProject = null
-}

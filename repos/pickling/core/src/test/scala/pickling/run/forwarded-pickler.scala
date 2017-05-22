@@ -15,7 +15,7 @@ sealed trait F { val fld: Int }
 final case class G(fld: Int) extends F
 final case class H(fld: Int) extends F
 
-class PicklerCanBeForwarded extends FunSuite {
+class PicklerCanBeForwarded extends FunSuite
 
   // we should be able to use a passed-in implicit pickler
   // rather than trying to generate one, this allows people
@@ -28,9 +28,7 @@ class PicklerCanBeForwarded extends FunSuite {
       implicit unpickler1: Unpickler[T]): T =
     p.unpickle[T]
 
-  test("main") {
+  test("main")
     val x: F = G(42)
     val pickle: JSONPickle = doPickle(x)
     assert(doUnpickle[F](pickle).fld == 42)
-  }
-}

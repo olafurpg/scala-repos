@@ -15,50 +15,45 @@ trait InColl[A] { implicit def coll: Types.Coll }
 trait Tube[Doc] extends BSONDocumentReader[Option[Doc]]
 
 case class BsTube[Doc](handler: BSONHandler[BSONDocument, Doc])
-    extends Tube[Doc] {
+    extends Tube[Doc]
 
-  def read(bson: BSONDocument): Option[Doc] = handler readTry bson match {
+  def read(bson: BSONDocument): Option[Doc] = handler readTry bson match
     case Success(doc) => Some(doc)
     case Failure(err) =>
       logger.error(
           s"[tube] Cannot read ${lila.db.BSON.debug(bson)}\n$err\n", err)
       None
-  }
 
   def write(doc: Doc): BSONDocument = handler write doc
 
   def inColl(c: Coll): BsTubeInColl[Doc] =
     new BsTube[Doc](handler) with InColl[Doc] { def coll = c }
-}
 
 case class JsTube[Doc](reader: Reads[Doc],
                        writer: Writes[Doc],
                        flags: Seq[JsTube.Flag.type => JsTube.Flag] = Seq.empty)
-    extends Tube[Doc] with Reads[Doc] with Writes[Doc] {
+    extends Tube[Doc] with Reads[Doc] with Writes[Doc]
 
   import play.modules.reactivemongo.json._
 
   implicit def reads(js: JsValue): JsResult[Doc] = reader reads js
   implicit def writes(doc: Doc): JsValue = writer writes doc
 
-  def read(bson: BSONDocument): Option[Doc] = {
+  def read(bson: BSONDocument): Option[Doc] =
     val js = JsObjectReader read bson
-    fromMongo(js) match {
+    fromMongo(js) match
       case JsSuccess(v, _) => Some(v)
       case e =>
         logger.error("[tube] Cannot read %s\n%s".format(js, e))
         None
-    }
-  }
 
   def read(js: JsObject): JsResult[Doc] = reads(js)
 
-  def write(doc: Doc): JsResult[JsObject] = writes(doc) match {
+  def write(doc: Doc): JsResult[JsObject] = writes(doc) match
     case obj: JsObject => JsSuccess(obj)
     case something =>
       logger.error(s"[tube] Cannot write $doc\ngot $something")
       JsError()
-  }
 
   def toMongo(doc: Doc): JsResult[JsObject] = flag(_.NoId)(
       write(doc),
@@ -77,9 +72,8 @@ case class JsTube[Doc](reader: Reads[Doc],
 
   private def flag[A](f: JsTube.Flag.type => JsTube.Flag)(x: => A, y: => A) =
     flagSet contains f(JsTube.Flag) fold (x, y)
-}
 
-object JsTube {
+object JsTube
 
   val json = JsTube[JsObject](
       __.read[JsObject],
@@ -94,50 +88,45 @@ object JsTube {
   def fromMongoId(js: JsValue): JsResult[JsObject] = js transform fromMongoIdOp
 
   sealed trait Flag
-  object Flag {
+  object Flag
     case object NoId extends Flag
-  }
 
-  object Helpers {
+  object Helpers
 
     // Adds Writes[A].andThen combinator, symmetric to Reads[A].andThen
     // Explodes on failure
-    implicit final class LilaTubePimpedWrites[A](writes: Writes[A]) {
+    implicit final class LilaTubePimpedWrites[A](writes: Writes[A])
       def andThen(transformer: Reads[JsObject]): Writes[A] =
         writes.transform(
-            Writes[JsValue] { origin =>
-          origin transform transformer match {
+            Writes[JsValue]  origin =>
+          origin transform transformer match
             case err: JsError =>
               throw LilaException(
                   "[tube] Cannot transform %s\n%s".format(origin, err))
             case JsSuccess(js, _) => js
-          }
-        })
-    }
+        )
 
     def rename(from: Symbol, to: Symbol) =
       __.json update ((__ \ to).json copyFrom (__ \ from).json.pick) andThen
       (__ \ from).json.prune
 
     def readDate(field: Symbol) =
-      (__ \ field).json.update(of[JsObject] map { o =>
+      (__ \ field).json.update(of[JsObject] map  o =>
         (o \ "$date").toOption err s"Can't read date of $o"
-      })
+      )
 
     def readDateOpt(field: Symbol) = readDate(field) orElse json.reader
 
     def writeDate(field: Symbol) =
-      (__ \ field).json.update(of[JsNumber] map { millis =>
+      (__ \ field).json.update(of[JsNumber] map  millis =>
         Json.obj("$date" -> millis)
-      })
+      )
 
     def writeDateOpt(field: Symbol) =
-      (__ \ field).json.update(of[JsNumber] map { millis =>
+      (__ \ field).json.update(of[JsNumber] map  millis =>
         Json.obj("$date" -> millis)
-      }) orElse json.reader
+      ) orElse json.reader
 
     def merge(obj: JsObject) = __.read[JsObject] map (obj ++)
-  }
 
   private def depath[A](r: JsResult[A]): JsResult[A] = r.flatMap(JsSuccess(_))
-}

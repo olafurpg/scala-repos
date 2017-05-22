@@ -36,58 +36,48 @@ import scalafx.delegate.{PositionDelegate, SFXDelegate}
 import scalafx.geometry.Rectangle2D
 import scalafx.scene.Node
 
-object ImageView {
+object ImageView
   implicit def sfxImageView2jfx(iv: ImageView): jfxsi.ImageView =
     if (iv != null) iv.delegate else null
-}
 
 class ImageView(override val delegate: jfxsi.ImageView = new jfxsi.ImageView())
     extends Node(delegate) with PositionDelegate[jfxsi.ImageView]
-    with SFXDelegate[jfxsi.ImageView] {
+    with SFXDelegate[jfxsi.ImageView]
 
   /** Allocates a new ImageView object using the given image. */
-  def this(image: Image) {
+  def this(image: Image)
     this(new jfxsi.ImageView(image))
-  }
 
   /** Allocates a new ImageView object with image loaded from the specified URL. */
-  def this(url: String) {
+  def this(url: String)
     this(new jfxsi.ImageView(url))
-  }
 
   def fitHeight: DoubleProperty = delegate.fitHeightProperty
 
-  def fitHeight_=(v: Double) {
+  def fitHeight_=(v: Double)
     fitHeight() = v
-  }
 
   def fitWidth: DoubleProperty = delegate.fitWidthProperty
 
-  def fitWidth_=(v: Double) {
+  def fitWidth_=(v: Double)
     fitWidth() = v
-  }
 
   def image: ObjectProperty[jfxsi.Image] = delegate.imageProperty
 
-  def image_=(v: Image) {
+  def image_=(v: Image)
     image() = v
-  }
 
   def preserveRatio: BooleanProperty = delegate.preserveRatioProperty
 
-  def preserveRatio_=(v: Boolean) {
+  def preserveRatio_=(v: Boolean)
     preserveRatio() = v
-  }
 
   def smooth: BooleanProperty = delegate.smoothProperty
 
-  def smooth_=(v: Boolean) {
+  def smooth_=(v: Boolean)
     smooth() = v
-  }
 
   def viewport: ObjectProperty[jfxg.Rectangle2D] = delegate.viewportProperty
 
-  def viewport_=(v: Rectangle2D) {
+  def viewport_=(v: Rectangle2D)
     viewport() = v
-  }
-}

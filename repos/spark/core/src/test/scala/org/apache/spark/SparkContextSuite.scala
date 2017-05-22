@@ -32,9 +32,9 @@ import org.scalatest.Matchers._
 
 import org.apache.spark.util.Utils
 
-class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
+class SparkContextSuite extends SparkFunSuite with LocalSparkContext
 
-  test("Only one SparkContext may be active at a time") {
+  test("Only one SparkContext may be active at a time")
     // Regression test for SPARK-4180
     val conf = new SparkConf()
       .setAppName("test")
@@ -46,36 +46,31 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     // After stopping the running context, we should be able to create a new one
     resetSparkContext()
     sc = new SparkContext(conf)
-  }
 
   test(
-      "Can still construct a new SparkContext after failing to construct a previous one") {
+      "Can still construct a new SparkContext after failing to construct a previous one")
     val conf =
       new SparkConf().set("spark.driver.allowMultipleContexts", "false")
     // This is an invalid configuration (no app name or master URL)
-    intercept[SparkException] {
+    intercept[SparkException]
       new SparkContext(conf)
-    }
     // Even though those earlier calls failed, we should still be able to create a new context
     sc = new SparkContext(conf.setMaster("local").setAppName("test"))
-  }
 
   test(
-      "Check for multiple SparkContexts can be disabled via undocumented debug option") {
+      "Check for multiple SparkContexts can be disabled via undocumented debug option")
     var secondSparkContext: SparkContext = null
-    try {
+    try
       val conf = new SparkConf()
         .setAppName("test")
         .setMaster("local")
         .set("spark.driver.allowMultipleContexts", "true")
       sc = new SparkContext(conf)
       secondSparkContext = new SparkContext(conf)
-    } finally {
+    finally
       Option(secondSparkContext).foreach(_.stop())
-    }
-  }
 
-  test("Test getOrCreate") {
+  test("Test getOrCreate")
     var sc2: SparkContext = null
     SparkContext.clearActiveContext()
     val conf = new SparkConf().setAppName("test").setMaster("local")
@@ -97,9 +92,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
           .set("spark.driver.allowMultipleContexts", "true"))
 
     sc2.stop()
-  }
 
-  test("BytesWritable implicit conversion is correct") {
+  test("BytesWritable implicit conversion is correct")
     // Regression test for SPARK-3121
     val bytesWritable = new BytesWritable()
     val inputArray = (1 to 10).map(_.toByte).toArray
@@ -113,9 +107,8 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     bytesWritable.set(inputArray, 0, 0)
     val byteArray2 = converter.convert(bytesWritable)
     assert(byteArray2.length === 0)
-  }
 
-  test("addFile works") {
+  test("addFile works")
     val dir = Utils.createTempDir()
 
     val file1 = File.createTempFile("someprefix1", "somesuffix1", dir)
@@ -127,7 +120,7 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       file2.getName
     val absolutePath2 = file2.getAbsolutePath
 
-    try {
+    try
       Files.write("somewords1", file1, StandardCharsets.UTF_8)
       Files.write("somewords2", file2, StandardCharsets.UTF_8)
       val length1 = file1.length()
@@ -139,96 +132,78 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       sc.addFile(relativePath)
       sc.parallelize(Array(1), 1)
         .map(x =>
-              {
             val gotten1 = new File(SparkFiles.get(file1.getName))
             val gotten2 = new File(SparkFiles.get(file2.getName))
-            if (!gotten1.exists()) {
+            if (!gotten1.exists())
               throw new SparkException("file doesn't exist : " + absolutePath1)
-            }
-            if (!gotten2.exists()) {
+            if (!gotten2.exists())
               throw new SparkException("file doesn't exist : " + absolutePath2)
-            }
 
-            if (length1 != gotten1.length()) {
+            if (length1 != gotten1.length())
               throw new SparkException(
                   s"file has different length $length1 than added file ${gotten1.length()} : " +
                   absolutePath1)
-            }
-            if (length2 != gotten2.length()) {
+            if (length2 != gotten2.length())
               throw new SparkException(
                   s"file has different length $length2 than added file ${gotten2.length()} : " +
                   absolutePath2)
-            }
 
-            if (absolutePath1 == gotten1.getAbsolutePath) {
+            if (absolutePath1 == gotten1.getAbsolutePath)
               throw new SparkException(
                   "file should have been copied :" + absolutePath1)
-            }
-            if (absolutePath2 == gotten2.getAbsolutePath) {
+            if (absolutePath2 == gotten2.getAbsolutePath)
               throw new SparkException(
                   "file should have been copied : " + absolutePath2)
-            }
             x
-        })
+        )
         .count()
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
-  test("addFile recursive works") {
+  test("addFile recursive works")
     val pluto = Utils.createTempDir()
     val neptune = Utils.createTempDir(pluto.getAbsolutePath)
     val saturn = Utils.createTempDir(neptune.getAbsolutePath)
     val alien1 = File.createTempFile("alien", "1", neptune)
     val alien2 = File.createTempFile("alien", "2", saturn)
 
-    try {
+    try
       sc = new SparkContext(
           new SparkConf().setAppName("test").setMaster("local"))
       sc.addFile(neptune.getAbsolutePath, true)
       sc.parallelize(Array(1), 1)
         .map(x =>
-              {
             val sep = File.separator
             if (!new File(SparkFiles.get(
-                        neptune.getName + sep + alien1.getName)).exists()) {
+                        neptune.getName + sep + alien1.getName)).exists())
               throw new SparkException(
                   "can't access file under root added directory")
-            }
             if (!new File(SparkFiles.get(neptune.getName + sep +
-                        saturn.getName + sep + alien2.getName)).exists()) {
+                        saturn.getName + sep + alien2.getName)).exists())
               throw new SparkException("can't access file in nested directory")
-            }
             if (new File(SparkFiles.get(pluto.getName + sep + neptune.getName +
-                        sep + alien1.getName)).exists()) {
+                        sep + alien1.getName)).exists())
               throw new SparkException("file exists that shouldn't")
-            }
             x
-        })
+        )
         .count()
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
-  test("addFile recursive can't add directories by default") {
+  test("addFile recursive can't add directories by default")
     val dir = Utils.createTempDir()
 
-    try {
+    try
       sc = new SparkContext(
           new SparkConf().setAppName("test").setMaster("local"))
-      intercept[SparkException] {
+      intercept[SparkException]
         sc.addFile(dir.getAbsolutePath)
-      }
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
   test(
-      "Cancelling job group should not cause SparkContext to shutdown (SPARK-6414)") {
-    try {
+      "Cancelling job group should not cause SparkContext to shutdown (SPARK-6414)")
+    try
       sc = new SparkContext(
           new SparkConf().setAppName("test").setMaster("local"))
       val future =
@@ -239,13 +214,11 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       // In SPARK-6414, sc.cancelJobGroup will cause NullPointerException and cause
       // SparkContext to shutdown, so the following assertion will fail.
       assert(sc.parallelize(1 to 10).count() == 10L)
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
   test(
-      "Comma separated paths for newAPIHadoopFile/wholeTextFiles/binaryFiles (SPARK-7155)") {
+      "Comma separated paths for newAPIHadoopFile/wholeTextFiles/binaryFiles (SPARK-7155)")
     // Regression test for SPARK-7155
     // dir1 and dir2 are used for wholeTextFiles and binaryFiles
     val dir1 = Utils.createTempDir()
@@ -270,7 +243,7 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     val filepath4 = file4.getAbsolutePath
     val filepath5 = file5.getAbsolutePath
 
-    try {
+    try
       // Create 5 text files.
       Files.write("someline1 in file1\nsomeline2 in file1\nsomeline3 in file1",
                   file1,
@@ -323,12 +296,10 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       // Test wholeTextFiles, and binaryFiles for dir1 and dir2
       assert(sc.wholeTextFiles(dirpath1 + "," + dirpath2).count() == 5L)
       assert(sc.binaryFiles(dirpath1 + "," + dirpath2).count() == 5L)
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
-  test("Default path for file based RDDs is properly set (SPARK-12517)") {
+  test("Default path for file based RDDs is properly set (SPARK-12517)")
     sc = new SparkContext(
         new SparkConf().setAppName("test").setMaster("local"))
 
@@ -352,10 +323,9 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
     assert(sc.newAPIHadoopFile(targetPath).name === targetPath)
 
     sc.stop()
-  }
 
-  test("calling multiple sc.stop() must not throw any exception") {
-    noException should be thrownBy {
+  test("calling multiple sc.stop() must not throw any exception")
+    noException should be thrownBy
       sc = new SparkContext(
           new SparkConf().setAppName("test").setMaster("local"))
       val cnt = sc.parallelize(1 to 4).count()
@@ -363,11 +333,9 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
       sc.stop()
       // call stop second time
       sc.stop()
-    }
-  }
 
-  test("No exception when both num-executors and dynamic allocation set.") {
-    noException should be thrownBy {
+  test("No exception when both num-executors and dynamic allocation set.")
+    noException should be thrownBy
       sc = new SparkContext(
           new SparkConf()
             .setAppName("test")
@@ -376,6 +344,3 @@ class SparkContextSuite extends SparkFunSuite with LocalSparkContext {
             .set("spark.executor.instances", "6"))
       assert(sc.executorAllocationManager.isEmpty)
       assert(sc.getConf.getInt("spark.executor.instances", 0) === 6)
-    }
-  }
-}

@@ -12,14 +12,14 @@ import org.ensime.util.file._
   */
 class UnsavedFileTest
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.TimingTestProject
 
-  "ensime-server" should "handle unsaved files" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit testkit =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "handle unsaved files" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit testkit =>
+        withProject  (project, asyncHelper) =>
           import testkit._
 
           val sourceRoot = scalaMain(config)
@@ -41,26 +41,20 @@ class UnsavedFileTest
                                           0,
                                           50,
                                           SourceSymbol.allSymbols)
-          expectMsgPF() {
+          expectMsgPF()
             case SymbolDesignations(inMemory.file,
                                     syms: List[SymbolDesignation])
                 if syms.nonEmpty =>
-          }
 
           project ! CompletionsReq(inMemory, 27, 0, false, false)
-          expectMsgPF() {
+          expectMsgPF()
             case CompletionInfoList("Sy", candidates)
                 if candidates.exists(_.name == "System") =>
-          }
-        }
-      }
-    }
-  }
 
-  it should "handle unsaved empty files" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit testkit =>
-        withProject { (project, asyncHelper) =>
+  it should "handle unsaved empty files" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit testkit =>
+        withProject  (project, asyncHelper) =>
           import testkit._
 
           val sourceRoot = scalaMain(config)
@@ -83,8 +77,3 @@ class UnsavedFileTest
 
           project ! UsesOfSymbolAtPointReq(Left(unsavedEmpty), 0)
           expectMsgPF() { case EnsimeServerError(e) => }
-        }
-      }
-    }
-  }
-}

@@ -18,7 +18,7 @@ package com.twitter.scalding
 /**
   * Represents a strategy for replicating rows when performing skewed joins.
   */
-sealed abstract class SkewReplication {
+sealed abstract class SkewReplication
   val DEFAULT_NUM_REDUCERS = 100
 
   /**
@@ -31,16 +31,15 @@ sealed abstract class SkewReplication {
     */
   def getReplications(
       leftCount: Int, rightCount: Int, reducers: Int): (Int, Int)
-}
 
 /**
   * See https://github.com/twitter/scalding/pull/229#issuecomment-10773810
   */
 case class SkewReplicationA(replicationFactor: Int = 1)
-    extends SkewReplication {
+    extends SkewReplication
 
   override def getReplications(
-      leftCount: Int, rightCount: Int, reducers: Int) = {
+      leftCount: Int, rightCount: Int, reducers: Int) =
     val numReducers = if (reducers <= 0) DEFAULT_NUM_REDUCERS else reducers
 
     val left = scala.math.min(rightCount * replicationFactor, numReducers)
@@ -48,18 +47,16 @@ case class SkewReplicationA(replicationFactor: Int = 1)
 
     // Keys with sampled counts of zero still need to be kept, so we set their replication to 1.
     (if (left == 0) 1 else left, if (right == 0) 1 else right)
-  }
-}
 
 /**
   * See https://github.com/twitter/scalding/pull/229#issuecomment-10792296
   */
 case class SkewReplicationB(
     maxKeysInMemory: Int = 1E6.toInt, maxReducerOutput: Int = 1E7.toInt)
-    extends SkewReplication {
+    extends SkewReplication
 
   override def getReplications(
-      leftCount: Int, rightCount: Int, reducers: Int) = {
+      leftCount: Int, rightCount: Int, reducers: Int) =
     val numReducers = if (reducers <= 0) DEFAULT_NUM_REDUCERS else reducers
 
     val left = scala.math.max(1, rightCount / maxKeysInMemory)
@@ -67,5 +64,3 @@ case class SkewReplicationB(
         numReducers, (leftCount * rightCount) / (maxReducerOutput * left))
 
     (left, if (right == 0) 1 else right)
-  }
-}

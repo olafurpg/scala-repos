@@ -4,13 +4,13 @@ import mesosphere.util.state.{PersistentStore, PersistentStoreTest}
 import org.scalatest.Matchers
 import mesosphere.FutureTestSupport._
 
-class InMemoryStoreTest extends PersistentStoreTest with Matchers {
+class InMemoryStoreTest extends PersistentStoreTest with Matchers
 
   //
   // See PersistentStoreTests for general store tests
   //
 
-  test("Update an entity will increment the version") {
+  test("Update an entity will increment the version")
     persistentStore.create("foo", "Hello".getBytes).futureValue
     val read = fetch("foo").asInstanceOf[Option[InMemoryEntity]]
     read should be('defined)
@@ -20,7 +20,5 @@ class InMemoryStoreTest extends PersistentStoreTest with Matchers {
       .futureValue
       .asInstanceOf[InMemoryEntity]
     update.version should be(read.get.version + 1)
-  }
 
   lazy val persistentStore: PersistentStore = new InMemoryStore
-}

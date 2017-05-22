@@ -27,21 +27,19 @@ import akka.shapeless.HList
   * (even though this is not a requirement).
   */
 trait DynamicRuleHandler[P <: Parser, L <: HList]
-    extends Parser.DeliveryScheme[L] {
+    extends Parser.DeliveryScheme[L]
   def parser: P
   def ruleNotFound(ruleName: String): Result
-}
 
 /**
   * Runs one of the rules of a parser instance of type `P` given the rules name.
   * The rule must have type `RuleN[L]`.
   */
-trait DynamicRuleDispatch[P <: Parser, L <: HList] {
+trait DynamicRuleDispatch[P <: Parser, L <: HList]
   def apply(
       handler: DynamicRuleHandler[P, L], ruleName: String): handler.Result
-}
 
-object DynamicRuleDispatch {
+object DynamicRuleDispatch
 
   /**
     * Implements efficient runtime dispatch to a predefined set of parser rules.
@@ -59,21 +57,20 @@ object DynamicRuleDispatch {
   def __create[P <: Parser, L <: HList](
       c: Context)(ruleNames: c.Expr[String]*)(
       implicit P: c.WeakTypeTag[P], L: c.WeakTypeTag[L])
-    : c.Expr[(DynamicRuleDispatch[P, L], immutable.Seq[String])] = {
+    : c.Expr[(DynamicRuleDispatch[P, L], immutable.Seq[String])] =
     import c.universe._
-    val names: Array[String] = ruleNames.map {
-      _.tree match {
+    val names: Array[String] = ruleNames.map
+      _.tree match
         case Literal(Constant(s: String)) ⇒ s
         case x ⇒
           c.abort(
               x.pos,
               s"Invalid `String` argument `x`, only `String` literals are supported!")
-      }
-    }(collection.breakOut)
+    (collection.breakOut)
     java.util.Arrays.sort(names.asInstanceOf[Array[Object]])
 
     def rec(start: Int, end: Int): Tree =
-      if (start <= end) {
+      if (start <= end)
         val mid = (start + end) >>> 1
         val name = names(mid)
         q"""val c = $name compare ruleName
@@ -83,15 +80,12 @@ object DynamicRuleDispatch {
               val p = handler.parser
               p.__run[$L](p.${newTermName(name).encodedName.toTermName})(handler)
             }"""
-      } else q"handler.ruleNotFound(ruleName)"
+      else q"handler.ruleNotFound(ruleName)"
 
-    c.Expr[(DynamicRuleDispatch[P, L], immutable.Seq[String])] {
+    c.Expr[(DynamicRuleDispatch[P, L], immutable.Seq[String])]
       q"""val drd =
             new akka.parboiled2.DynamicRuleDispatch[$P, $L] {
               def apply(handler: akka.parboiled2.DynamicRuleHandler[$P, $L], ruleName: String): handler.Result =
                  ${rec(0, names.length - 1)}
             }
           (drd, scala.collection.immutable.Seq(..$ruleNames))"""
-    }
-  }
-}

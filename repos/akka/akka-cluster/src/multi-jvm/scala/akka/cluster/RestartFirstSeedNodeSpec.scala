@@ -19,7 +19,7 @@ import akka.actor.RootActorPath
 import akka.cluster.MemberStatus._
 import akka.actor.Deploy
 
-object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig {
+object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig
   val seed1 = role("seed1")
   val seed2 = role("seed2")
   val seed3 = role("seed3")
@@ -31,7 +31,6 @@ object RestartFirstSeedNodeMultiJvmSpec extends MultiNodeConfig {
       akka.cluster.retry-unsuccessful-join-after = 3s
       """))
         .withFallback(MultiNodeClusterSpec.clusterConfig))
-}
 
 class RestartFirstSeedNodeMultiJvmNode1 extends RestartFirstSeedNodeSpec
 class RestartFirstSeedNodeMultiJvmNode2 extends RestartFirstSeedNodeSpec
@@ -39,7 +38,7 @@ class RestartFirstSeedNodeMultiJvmNode3 extends RestartFirstSeedNodeSpec
 
 abstract class RestartFirstSeedNodeSpec
     extends MultiNodeSpec(RestartFirstSeedNodeMultiJvmSpec)
-    with MultiNodeClusterSpec with ImplicitSender {
+    with MultiNodeClusterSpec with ImplicitSender
 
   import RestartFirstSeedNodeMultiJvmSpec._
 
@@ -58,75 +57,60 @@ abstract class RestartFirstSeedNodeSpec
         .parseString("akka.remote.netty.tcp.port=" + seedNodes.head.port.get)
         .withFallback(system.settings.config))
 
-  override def afterAll(): Unit = {
-    runOn(seed1) {
+  override def afterAll(): Unit =
+    runOn(seed1)
       shutdown(if (seed1System.whenTerminated.isCompleted) restartedSeed1System
           else seed1System)
-    }
     super.afterAll()
-  }
 
-  "Cluster seed nodes" must {
+  "Cluster seed nodes" must
     "be able to restart first seed node and join other seed nodes" taggedAs LongRunningTest in within(
-        40 seconds) {
+        40 seconds)
       // seed1System is a separate ActorSystem, to be able to simulate restart
       // we must transfer its address to seed2 and seed3
-      runOn(seed2, seed3) {
-        system.actorOf(Props(new Actor {
-          def receive = {
+      runOn(seed2, seed3)
+        system.actorOf(Props(new Actor
+          def receive =
             case a: Address ⇒
               seedNode1Address = a
               sender() ! "ok"
-          }
-        }).withDeploy(Deploy.local), name = "address-receiver")
+        ).withDeploy(Deploy.local), name = "address-receiver")
         enterBarrier("seed1-address-receiver-ready")
-      }
 
-      runOn(seed1) {
+      runOn(seed1)
         enterBarrier("seed1-address-receiver-ready")
         seedNode1Address = Cluster(seed1System).selfAddress
-        List(seed2, seed3) foreach { r ⇒
+        List(seed2, seed3) foreach  r ⇒
           system.actorSelection(RootActorPath(r) / "user" / "address-receiver") ! seedNode1Address
           expectMsg(5 seconds, "ok")
-        }
-      }
       enterBarrier("seed1-address-transfered")
 
       // now we can join seed1System, seed2, seed3 together
-      runOn(seed1) {
+      runOn(seed1)
         Cluster(seed1System).joinSeedNodes(seedNodes)
         awaitAssert(Cluster(seed1System).readView.members.size should ===(3))
         awaitAssert(
             Cluster(seed1System).readView.members.map(_.status) should ===(
                 Set(Up)))
-      }
-      runOn(seed2, seed3) {
+      runOn(seed2, seed3)
         cluster.joinSeedNodes(seedNodes)
         awaitMembersUp(3)
-      }
       enterBarrier("started")
 
       // shutdown seed1System
-      runOn(seed1) {
+      runOn(seed1)
         shutdown(seed1System, remainingOrDefault)
-      }
       enterBarrier("seed1-shutdown")
 
       // then start restartedSeed1System, which has the same address as seed1System
-      runOn(seed1) {
+      runOn(seed1)
         Cluster(restartedSeed1System).joinSeedNodes(seedNodes)
-        within(20.seconds) {
+        within(20.seconds)
           awaitAssert(
               Cluster(restartedSeed1System).readView.members.size should ===(
                   3))
           awaitAssert(Cluster(restartedSeed1System).readView.members
                 .map(_.status) should ===(Set(Up)))
-        }
-      }
-      runOn(seed2, seed3) {
+      runOn(seed2, seed3)
         awaitMembersUp(3)
-      }
       enterBarrier("seed1-restarted")
-    }
-  }
-}

@@ -32,11 +32,11 @@ import org.scalatest.Matchers._
 /**
   * Trait to test InputDelegate subclasses
   */
-trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec {
+trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec
 
   protected val inputDelegate: D
 
-  it should "allow observe changes in Input Effect" in {
+  it should "allow observe changes in Input Effect" in
     var changed = false
     val initialInput = new Lighting
     val finalInput = new ColorInput
@@ -45,15 +45,12 @@ trait InputDelegateSpec[D <: InputDelegate[_]] extends FlatSpec {
 
     inputDelegate.input.onChange(
         (ov, oldInput, newInput) =>
-          {
         oldInput should be(initialInput.delegate)
         newInput should be(finalInput.delegate)
         changed = true
-    })
+    )
 
     inputDelegate.input = finalInput
 
     changed should be(true)
     inputDelegate.input.value should be(finalInput.delegate)
-  }
-}

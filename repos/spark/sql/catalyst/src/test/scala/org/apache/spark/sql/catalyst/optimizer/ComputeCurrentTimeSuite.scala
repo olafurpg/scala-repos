@@ -24,12 +24,11 @@ import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan, 
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 import org.apache.spark.sql.catalyst.util.DateTimeUtils
 
-class ComputeCurrentTimeSuite extends PlanTest {
-  object Optimize extends RuleExecutor[LogicalPlan] {
+class ComputeCurrentTimeSuite extends PlanTest
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches = Seq(Batch("ComputeCurrentTime", Once, ComputeCurrentTime))
-  }
 
-  test("analyzer should replace current_timestamp with literals") {
+  test("analyzer should replace current_timestamp with literals")
     val in = Project(Seq(Alias(CurrentTimestamp(), "a")(),
                          Alias(CurrentTimestamp(), "b")()),
                      LocalRelation())
@@ -39,18 +38,16 @@ class ComputeCurrentTimeSuite extends PlanTest {
     val max = (System.currentTimeMillis() + 1) * 1000
 
     val lits = new scala.collection.mutable.ArrayBuffer[Long]
-    plan.transformAllExpressions {
+    plan.transformAllExpressions
       case e: Literal =>
         lits += e.value.asInstanceOf[Long]
         e
-    }
     assert(lits.size == 2)
     assert(lits(0) >= min && lits(0) <= max)
     assert(lits(1) >= min && lits(1) <= max)
     assert(lits(0) == lits(1))
-  }
 
-  test("analyzer should replace current_date with literals") {
+  test("analyzer should replace current_date with literals")
     val in =
       Project(Seq(Alias(CurrentDate(), "a")(), Alias(CurrentDate(), "b")()),
               LocalRelation())
@@ -60,14 +57,11 @@ class ComputeCurrentTimeSuite extends PlanTest {
     val max = DateTimeUtils.millisToDays(System.currentTimeMillis())
 
     val lits = new scala.collection.mutable.ArrayBuffer[Int]
-    plan.transformAllExpressions {
+    plan.transformAllExpressions
       case e: Literal =>
         lits += e.value.asInstanceOf[Int]
         e
-    }
     assert(lits.size == 2)
     assert(lits(0) >= min && lits(0) <= max)
     assert(lits(1) >= min && lits(1) <= max)
     assert(lits(0) == lits(1))
-  }
-}

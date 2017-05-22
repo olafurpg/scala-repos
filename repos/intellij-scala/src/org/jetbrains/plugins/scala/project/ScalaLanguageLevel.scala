@@ -5,7 +5,7 @@ package project
   * @author Pavel Fatin
   */
 sealed case class ScalaLanguageLevel(ordinal: Int, version: String)
-    extends Named {
+    extends Named
   def name: String = "Scala " + version
 
   override def getName = name
@@ -22,9 +22,8 @@ sealed case class ScalaLanguageLevel(ordinal: Int, version: String)
   def <=(level: ScalaLanguageLevel): Boolean = ordinal <= level.ordinal
 
   def isDotty: Boolean = name.startsWith("Dotty")
-}
 
-object ScalaLanguageLevel {
+object ScalaLanguageLevel
   val Values = Array(Scala_2_7,
                      Scala_2_8,
                      Scala_2_9,
@@ -66,7 +65,5 @@ object ScalaLanguageLevel {
 
   object Scala_2_12 extends ScalaLanguageLevel(5, "2.12")
 
-  object Dotty extends ScalaLanguageLevel(5, "0.1-SNAPSHOT") {
+  object Dotty extends ScalaLanguageLevel(5, "0.1-SNAPSHOT")
     override def name: String = "Dotty " + version
-  }
-}

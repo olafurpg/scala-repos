@@ -41,13 +41,11 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class TablePositionBaseSpec[TC <: jfxsc.TableColumnBase[_, _]]
     extends SimpleSFXDelegateSpec[
         jfxsc.TablePositionBase[TC], TablePositionBase[TC]](
-        classOf[jfxsc.TablePositionBase[TC]], classOf[TablePositionBase[TC]]) {
+        classOf[jfxsc.TablePositionBase[TC]], classOf[TablePositionBase[TC]])
 
   override def getScalaClassInstance =
     new TablePositionBase[TC](this.getJavaClassInstance) {}
 
   override def getJavaClassInstance =
-    new jfxsc.TablePositionBase[TC](0, null.asInstanceOf[TC]) {
+    new jfxsc.TablePositionBase[TC](0, null.asInstanceOf[TC])
       def getColumn: Int = 0
-    }
-}

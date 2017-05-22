@@ -18,7 +18,7 @@ import org.json4s.JObject
 
 /** Connector for Webhooks connection with Form submission data format
   */
-private[prediction] trait FormConnector {
+private[prediction] trait FormConnector
 
   // TODO: support conversion to multiple events?
 
@@ -27,4 +27,3 @@ private[prediction] trait FormConnector {
     * @return Event JObject
     */
   def toEventJson(data: Map[String, String]): JObject
-}

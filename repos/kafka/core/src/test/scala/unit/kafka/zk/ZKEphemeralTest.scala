@@ -35,47 +35,41 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runner.RunWith;
 
-object ZKEphemeralTest {
+object ZKEphemeralTest
   @Parameters
-  def enableSecurityOptions: Collection[Array[java.lang.Boolean]] = {
+  def enableSecurityOptions: Collection[Array[java.lang.Boolean]] =
     val list = new ArrayList[Array[java.lang.Boolean]]()
     list.add(Array(true))
     list.add(Array(false))
     list
-  }
-}
 
 @RunWith(value = classOf[Parameterized])
-class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
+class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness
   val jaasFile: String = kafka.utils.JaasTestUtils.genZkFile
   val authProvider: String = "zookeeper.authProvider.1"
   var zkSessionTimeoutMs = 1000
 
   @Before
-  override def setUp() {
-    if (secure) {
+  override def setUp()
+    if (secure)
       Configuration.setConfiguration(null)
       System.setProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM, jaasFile)
       System.setProperty(
           authProvider,
           "org.apache.zookeeper.server.auth.SASLAuthenticationProvider")
-      if (!JaasUtils.isZkSecurityEnabled()) {
+      if (!JaasUtils.isZkSecurityEnabled())
         fail("Secure access not enabled")
-      }
-    }
     super.setUp
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown
     System.clearProperty(JaasUtils.JAVA_LOGIN_CONFIG_PARAM)
     System.clearProperty(authProvider)
     Configuration.setConfiguration(null)
-  }
 
   @Test
-  def testEphemeralNodeCleanup = {
+  def testEphemeralNodeCleanup =
     val config = new ConsumerConfig(
         TestUtils.createConsumerProperties(zkConnect, "test", "1"))
     var zkUtils = ZkUtils(zkConnect,
@@ -83,11 +77,10 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
                           config.zkConnectionTimeoutMs,
                           JaasUtils.isZkSecurityEnabled())
 
-    try {
+    try
       zkUtils.createEphemeralPathExpectConflict("/tmp/zktest", "node created")
-    } catch {
+    catch
       case e: Exception =>
-    }
 
     var testData: String = null
     testData = zkUtils.readData("/tmp/zktest")._1
@@ -99,7 +92,6 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
                       JaasUtils.isZkSecurityEnabled())
     val nodeExists = zkUtils.pathExists("/tmp/zktest")
     Assert.assertFalse(nodeExists)
-  }
 
   /*****
     ***** Tests for ZkWatchedEphemeral
@@ -108,39 +100,35 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
     * Tests basic creation
     */
   @Test
-  def testZkWatchedEphemeral = {
+  def testZkWatchedEphemeral =
     var path = "/zwe-test"
     testCreation(path)
     path = "/zwe-test-parent/zwe-test"
     testCreation(path)
-  }
 
-  private def testCreation(path: String) {
+  private def testCreation(path: String)
     val zk = zkUtils.zkConnection.getZookeeper
     val zwe = new ZKCheckedEphemeral(
         path, "", zk, JaasUtils.isZkSecurityEnabled())
     var created = false
     var counter = 10
 
-    zk.exists(path, new Watcher() {
-      def process(event: WatchedEvent) {
-        if (event.getType == Watcher.Event.EventType.NodeCreated) {
+    zk.exists(path, new Watcher()
+      def process(event: WatchedEvent)
+        if (event.getType == Watcher.Event.EventType.NodeCreated)
           created = true
-        }
-      }
-    })
+    )
     zwe.create()
     // Waits until the znode is created
     TestUtils.waitUntilTrue(() => zkUtils.pathExists(path),
                             s"Znode $path wasn't created")
-  }
 
   /**
     * Tests that it fails in the presence of an overlapping
     * session.
     */
   @Test
-  def testOverlappingSessions = {
+  def testOverlappingSessions =
     val path = "/zwe-test"
     val zk1 = zkUtils.zkConnection.getZookeeper
 
@@ -156,21 +144,19 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
 
     //Bootstraps the ZKWatchedEphemeral object
     var gotException = false;
-    try {
+    try
       zwe.create()
-    } catch {
+    catch
       case e: ZkNodeExistsException =>
         gotException = true
-    }
     Assert.assertTrue(gotException)
-  }
 
   /**
     * Tests if succeeds with znode from the same session
     * 
     */
   @Test
-  def testSameSession = {
+  def testSameSession =
     val path = "/zwe-test"
     val zk = zkUtils.zkConnection.getZookeeper
     // Creates znode for path in the first session
@@ -180,12 +166,9 @@ class ZKEphemeralTest(val secure: Boolean) extends ZooKeeperTestHarness {
         path, "", zk, JaasUtils.isZkSecurityEnabled())
     //Bootstraps the ZKWatchedEphemeral object
     var gotException = false;
-    try {
+    try
       zwe.create()
-    } catch {
+    catch
       case e: ZkNodeExistsException =>
         gotException = true
-    }
     Assert.assertFalse(gotException)
-  }
-}

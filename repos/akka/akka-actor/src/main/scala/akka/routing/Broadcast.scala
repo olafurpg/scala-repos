@@ -10,20 +10,18 @@ import akka.actor.SupervisorStrategy
 import akka.japi.Util.immutableSeq
 import akka.actor.ActorSystem
 
-object BroadcastRoutingLogic {
+object BroadcastRoutingLogic
   def apply(): BroadcastRoutingLogic = new BroadcastRoutingLogic
-}
 
 /**
   * Broadcasts a message to all its routees.
   */
 @SerialVersionUID(1L)
-final class BroadcastRoutingLogic extends RoutingLogic {
+final class BroadcastRoutingLogic extends RoutingLogic
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else SeveralRoutees(routees)
-}
 
 /**
   * A router pool that broadcasts a message to all its routees.
@@ -62,7 +60,7 @@ final case class BroadcastPool(
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[BroadcastPool] {
+    extends Pool with PoolOverrideUnsetConfig[BroadcastPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -106,7 +104,6 @@ final case class BroadcastPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}
 
 /**
   * A router group that broadcasts a message to all its routees.
@@ -125,7 +122,7 @@ final case class BroadcastPool(
 final case class BroadcastGroup(
     override val paths: immutable.Iterable[String],
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(paths = immutableSeq(config.getStringList("routees.paths")))
@@ -150,4 +147,3 @@ final case class BroadcastGroup(
     */
   def withDispatcher(dispatcherId: String): BroadcastGroup =
     copy(routerDispatcher = dispatcherId)
-}

@@ -27,7 +27,7 @@ import org.apache.spark.SparkConf
 /**
   * Command-line parser for the worker.
   */
-private[worker] class WorkerArguments(args: Array[String], conf: SparkConf) {
+private[worker] class WorkerArguments(args: Array[String], conf: SparkConf)
   var host = Utils.localHostName()
   var port = 0
   var webUiPort = 8081
@@ -38,35 +38,29 @@ private[worker] class WorkerArguments(args: Array[String], conf: SparkConf) {
   var propertiesFile: String = null
 
   // Check for settings in environment variables
-  if (System.getenv("SPARK_WORKER_PORT") != null) {
+  if (System.getenv("SPARK_WORKER_PORT") != null)
     port = System.getenv("SPARK_WORKER_PORT").toInt
-  }
-  if (System.getenv("SPARK_WORKER_CORES") != null) {
+  if (System.getenv("SPARK_WORKER_CORES") != null)
     cores = System.getenv("SPARK_WORKER_CORES").toInt
-  }
-  if (conf.getenv("SPARK_WORKER_MEMORY") != null) {
+  if (conf.getenv("SPARK_WORKER_MEMORY") != null)
     memory = Utils.memoryStringToMb(conf.getenv("SPARK_WORKER_MEMORY"))
-  }
-  if (System.getenv("SPARK_WORKER_WEBUI_PORT") != null) {
+  if (System.getenv("SPARK_WORKER_WEBUI_PORT") != null)
     webUiPort = System.getenv("SPARK_WORKER_WEBUI_PORT").toInt
-  }
-  if (System.getenv("SPARK_WORKER_DIR") != null) {
+  if (System.getenv("SPARK_WORKER_DIR") != null)
     workDir = System.getenv("SPARK_WORKER_DIR")
-  }
 
   parse(args.toList)
 
   // This mutates the SparkConf, so all accesses to it must be made after this line
   propertiesFile = Utils.loadDefaultSparkProperties(conf, propertiesFile)
 
-  if (conf.contains("spark.worker.ui.port")) {
+  if (conf.contains("spark.worker.ui.port"))
     webUiPort = conf.get("spark.worker.ui.port").toInt
-  }
 
   checkWorkerMemory()
 
   @tailrec
-  private def parse(args: List[String]): Unit = args match {
+  private def parse(args: List[String]): Unit = args match
     case ("--ip" | "-i") :: value :: tail =>
       Utils.checkHost(
           value, "ip no longer supported, please use hostname " + value)
@@ -106,27 +100,24 @@ private[worker] class WorkerArguments(args: Array[String], conf: SparkConf) {
       printUsageAndExit(0)
 
     case value :: tail =>
-      if (masters != null) {
+      if (masters != null)
         // Two positional arguments were given
         printUsageAndExit(1)
-      }
       masters = Utils.parseStandaloneMasterUrls(value)
       parse(tail)
 
     case Nil =>
-      if (masters == null) {
+      if (masters == null)
         // No positional argument was given
         printUsageAndExit(1)
-      }
 
     case _ =>
       printUsageAndExit(1)
-  }
 
   /**
     * Print usage and exit JVM with the given exit code.
     */
-  def printUsageAndExit(exitCode: Int) {
+  def printUsageAndExit(exitCode: Int)
     // scalastyle:off println
     System.err.println(
         "Usage: Worker [options] <master>\n" + "\n" +
@@ -142,48 +133,39 @@ private[worker] class WorkerArguments(args: Array[String], conf: SparkConf) {
         "                           Default is conf/spark-defaults.conf.")
     // scalastyle:on println
     System.exit(exitCode)
-  }
 
-  def inferDefaultCores(): Int = {
+  def inferDefaultCores(): Int =
     Runtime.getRuntime.availableProcessors()
-  }
 
-  def inferDefaultMemory(): Int = {
+  def inferDefaultMemory(): Int =
     val ibmVendor = System.getProperty("java.vendor").contains("IBM")
     var totalMb = 0
-    try {
+    try
       // scalastyle:off classforname
       val bean = ManagementFactory.getOperatingSystemMXBean()
-      if (ibmVendor) {
+      if (ibmVendor)
         val beanClass =
           Class.forName("com.ibm.lang.management.OperatingSystemMXBean")
         val method = beanClass.getDeclaredMethod("getTotalPhysicalMemory")
         totalMb = (method.invoke(bean).asInstanceOf[Long] / 1024 / 1024).toInt
-      } else {
+      else
         val beanClass =
           Class.forName("com.sun.management.OperatingSystemMXBean")
         val method = beanClass.getDeclaredMethod("getTotalPhysicalMemorySize")
         totalMb = (method.invoke(bean).asInstanceOf[Long] / 1024 / 1024).toInt
-      }
       // scalastyle:on classforname
-    } catch {
-      case e: Exception => {
+    catch
+      case e: Exception =>
           totalMb = 2 * 1024
           // scalastyle:off println
           System.out.println(
               "Failed to get total physical memory. Using " + totalMb + " MB")
           // scalastyle:on println
-        }
-    }
     // Leave out 1 GB for the operating system, but don't return a negative memory size
     math.max(totalMb - 1024, Utils.DEFAULT_DRIVER_MEM_MB)
-  }
 
-  def checkWorkerMemory(): Unit = {
-    if (memory <= 0) {
+  def checkWorkerMemory(): Unit =
+    if (memory <= 0)
       val message =
         "Memory is below 1MB, or missing a M/G at the end of the memory specification?"
       throw new IllegalStateException(message)
-    }
-  }
-}

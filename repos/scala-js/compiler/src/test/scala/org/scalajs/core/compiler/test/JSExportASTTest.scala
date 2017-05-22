@@ -7,10 +7,10 @@ import org.junit.Assert._
 
 import org.scalajs.core.ir.{Trees => js}
 
-class JSExportASTTest extends JSASTTest {
+class JSExportASTTest extends JSASTTest
 
   @Test
-  def inheritExportMethods: Unit = {
+  def inheritExportMethods: Unit =
 
     var props = 0
 
@@ -26,11 +26,8 @@ class JSExportASTTest extends JSASTTest {
       @JSExport
       override def foo = 2
     }
-    """.traverse {
+    """.traverse
       case js.PropertyDef(js.StringLiteral("foo"), _, _, _) =>
         props += 1
-    }
 
     assertEquals("Only define the property `foo` once", props, 1)
-  }
-}

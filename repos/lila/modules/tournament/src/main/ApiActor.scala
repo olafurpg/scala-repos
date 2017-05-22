@@ -5,14 +5,13 @@ import akka.actor._
 
 import lila.game.actorApi.FinishGame
 
-private[tournament] final class ApiActor(api: TournamentApi) extends Actor {
+private[tournament] final class ApiActor(api: TournamentApi) extends Actor
 
-  override def preStart {
+  override def preStart
     context.system.lilaBus
       .subscribe(self, 'finishGame, 'adjustCheater, 'adjustBooster)
-  }
 
-  def receive = {
+  def receive =
 
     case FinishGame(game, _, _) => api finishGame game
 
@@ -22,5 +21,3 @@ private[tournament] final class ApiActor(api: TournamentApi) extends Actor {
 
     case lila.hub.actorApi.round.Berserk(gameId, userId) =>
       api.berserk(gameId, userId)
-  }
-}

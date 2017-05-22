@@ -30,7 +30,7 @@ private[spark] class HashShuffleWriter[K, V](
     handle: BaseShuffleHandle[K, V, _],
     mapId: Int,
     context: TaskContext)
-    extends ShuffleWriter[K, V] with Logging {
+    extends ShuffleWriter[K, V] with Logging
 
   private val dep = handle.dependency
   private val numOutputSplits = dep.partitioner.numPartitions
@@ -48,99 +48,76 @@ private[spark] class HashShuffleWriter[K, V](
       dep.shuffleId, mapId, numOutputSplits, dep.serializer, writeMetrics)
 
   /** Write a bunch of records to this task's output */
-  override def write(records: Iterator[Product2[K, V]]): Unit = {
+  override def write(records: Iterator[Product2[K, V]]): Unit =
     val iter =
-      if (dep.aggregator.isDefined) {
-        if (dep.mapSideCombine) {
+      if (dep.aggregator.isDefined)
+        if (dep.mapSideCombine)
           dep.aggregator.get.combineValuesByKey(records, context)
-        } else {
+        else
           records
-        }
-      } else {
+      else
         require(!dep.mapSideCombine,
                 "Map-side combine without Aggregator specified!")
         records
-      }
 
-    for (elem <- iter) {
+    for (elem <- iter)
       val bucketId = dep.partitioner.getPartition(elem._1)
       shuffle.writers(bucketId).write(elem._1, elem._2)
-    }
-  }
 
   /** Close this writer, passing along whether the map completed */
-  override def stop(initiallySuccess: Boolean): Option[MapStatus] = {
+  override def stop(initiallySuccess: Boolean): Option[MapStatus] =
     var success = initiallySuccess
-    try {
-      if (stopping) {
+    try
+      if (stopping)
         return None
-      }
       stopping = true
-      if (success) {
-        try {
+      if (success)
+        try
           Some(commitWritesAndBuildStatus())
-        } catch {
+        catch
           case e: Exception =>
             success = false
             revertWrites()
             throw e
-        }
-      } else {
+      else
         revertWrites()
         None
-      }
-    } finally {
+    finally
       // Release the writers back to the shuffle block manager.
-      if (shuffle != null && shuffle.writers != null) {
-        try {
+      if (shuffle != null && shuffle.writers != null)
+        try
           shuffle.releaseWriters(success)
-        } catch {
+        catch
           case e: Exception => logError("Failed to release shuffle writers", e)
-        }
-      }
-    }
-  }
 
-  private def commitWritesAndBuildStatus(): MapStatus = {
+  private def commitWritesAndBuildStatus(): MapStatus =
     // Commit the writes. Get the size of each bucket block (total block size).
-    val sizes: Array[Long] = shuffle.writers.map {
+    val sizes: Array[Long] = shuffle.writers.map
       writer: DiskBlockObjectWriter =>
         writer.commitAndClose()
         writer.fileSegment().length
-    }
     // rename all shuffle files to final paths
     // Note: there is only one ShuffleBlockResolver in executor
-    shuffleBlockResolver.synchronized {
-      shuffle.writers.zipWithIndex.foreach {
+    shuffleBlockResolver.synchronized
+      shuffle.writers.zipWithIndex.foreach
         case (writer, i) =>
           val output = blockManager.diskBlockManager.getFile(writer.blockId)
-          if (sizes(i) > 0) {
-            if (output.exists()) {
+          if (sizes(i) > 0)
+            if (output.exists())
               // Use length of existing file and delete our own temporary one
               sizes(i) = output.length()
               writer.file.delete()
-            } else {
+            else
               // Commit by renaming our temporary file to something the fetcher expects
-              if (!writer.file.renameTo(output)) {
+              if (!writer.file.renameTo(output))
                 throw new IOException(
                     s"fail to rename ${writer.file} to $output")
-              }
-            }
-          } else {
-            if (output.exists()) {
+          else
+            if (output.exists())
               output.delete()
-            }
-          }
-      }
-    }
     MapStatus(blockManager.shuffleServerId, sizes)
-  }
 
-  private def revertWrites(): Unit = {
-    if (shuffle != null && shuffle.writers != null) {
-      for (writer <- shuffle.writers) {
+  private def revertWrites(): Unit =
+    if (shuffle != null && shuffle.writers != null)
+      for (writer <- shuffle.writers)
         writer.revertPartialWritesAndClose()
-      }
-    }
-  }
-}

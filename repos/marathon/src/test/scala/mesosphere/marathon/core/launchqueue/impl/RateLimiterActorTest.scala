@@ -13,26 +13,24 @@ import org.mockito.Mockito
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RateLimiterActorTest extends MarathonSpec {
+class RateLimiterActorTest extends MarathonSpec
 
-  test("GetDelay gets current delay") {
+  test("GetDelay gets current delay")
     rateLimiter.addDelay(app)
 
     val delay = askLimiter(RateLimiterActor.GetDelay(app))
       .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now() + backoff)
-  }
 
-  test("AddDelay increases delay and sends update") {
+  test("AddDelay increases delay and sends update")
     limiterRef ! RateLimiterActor.AddDelay(app)
     updateReceiver.expectMsg(
         RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
     val delay = askLimiter(RateLimiterActor.GetDelay(app))
       .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now() + backoff)
-  }
 
-  test("ResetDelay resets delay and sends update") {
+  test("ResetDelay resets delay and sends update")
     limiterRef ! RateLimiterActor.AddDelay(app)
     updateReceiver.expectMsg(
         RateLimiterActor.DelayUpdate(app, clock.now() + backoff))
@@ -41,11 +39,9 @@ class RateLimiterActorTest extends MarathonSpec {
     val delay = askLimiter(RateLimiterActor.GetDelay(app))
       .asInstanceOf[RateLimiterActor.DelayUpdate]
     assert(delay.delayUntil == clock.now())
-  }
 
-  private[this] def askLimiter(message: Any): Any = {
+  private[this] def askLimiter(message: Any): Any =
     Await.result(limiterRef ? message, 3.seconds)
-  }
 
   private val backoff: FiniteDuration = 10.seconds
   private val backoffFactor: Double = 2.0
@@ -61,7 +57,7 @@ class RateLimiterActorTest extends MarathonSpec {
   private[this] var updateReceiver: TestProbe = _
   private[this] var limiterRef: ActorRef = _
 
-  before {
+  before
     actorSystem = ActorSystem()
     clock = ConstantClock()
     rateLimiter = Mockito.spy(new RateLimiter(clock))
@@ -71,10 +67,7 @@ class RateLimiterActorTest extends MarathonSpec {
     val props =
       RateLimiterActor.props(rateLimiter, appRepository, updateReceiver.ref)
     limiterRef = actorSystem.actorOf(props, "limiter")
-  }
 
-  after {
+  after
     actorSystem.shutdown()
     actorSystem.awaitTermination()
-  }
-}

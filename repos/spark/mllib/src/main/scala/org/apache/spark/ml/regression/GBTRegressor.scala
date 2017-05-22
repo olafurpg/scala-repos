@@ -46,7 +46,7 @@ import org.apache.spark.sql.functions._
 final class GBTRegressor @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Predictor[Vector, GBTRegressor, GBTRegressionModel] with GBTParams
-    with TreeRegressorParams with Logging {
+    with TreeRegressorParams with Logging
 
   @Since("1.4.0")
   def this() = this(Identifiable.randomUID("gbtr"))
@@ -85,10 +85,9 @@ final class GBTRegressor @Since("1.4.0")(
     * Individual trees are built using impurity "Variance."
     */
   @Since("1.4.0")
-  override def setImpurity(value: String): this.type = {
+  override def setImpurity(value: String): this.type =
     logWarning("GBTRegressor.setImpurity should NOT be used")
     this
-  }
 
   // Parameters from TreeEnsembleParams:
   @Since("1.4.0")
@@ -96,11 +95,10 @@ final class GBTRegressor @Since("1.4.0")(
     super.setSubsamplingRate(value)
 
   @Since("1.4.0")
-  override def setSeed(value: Long): this.type = {
+  override def setSeed(value: Long): this.type =
     logWarning(
         "The 'seed' parameter is currently ignored by Gradient Boosting.")
     super.setSeed(value)
-  }
 
   // Parameters from GBTParams:
   @Since("1.4.0")
@@ -138,18 +136,16 @@ final class GBTRegressor @Since("1.4.0")(
   def getLossType: String = $(lossType).toLowerCase
 
   /** (private[ml]) Convert new loss to old loss. */
-  override private[ml] def getOldLossType: OldLoss = {
-    getLossType match {
+  override private[ml] def getOldLossType: OldLoss =
+    getLossType match
       case "squared" => OldSquaredError
       case "absolute" => OldAbsoluteError
       case _ =>
         // Should never happen because of check in setter method.
         throw new RuntimeException(
             s"GBTRegressorParams was given bad loss type: $getLossType")
-    }
-  }
 
-  override protected def train(dataset: DataFrame): GBTRegressionModel = {
+  override protected def train(dataset: DataFrame): GBTRegressionModel =
     val categoricalFeatures: Map[Int, Int] =
       MetadataUtils.getCategoricalFeatures(dataset.schema($(featuresCol)))
     val oldDataset: RDD[LabeledPoint] = extractLabeledPoints(dataset)
@@ -159,21 +155,18 @@ final class GBTRegressor @Since("1.4.0")(
     val (baseLearners, learnerWeights) =
       GradientBoostedTrees.run(oldDataset, boostingStrategy)
     new GBTRegressionModel(uid, baseLearners, learnerWeights, numFeatures)
-  }
 
   @Since("1.4.0")
   override def copy(extra: ParamMap): GBTRegressor = defaultCopy(extra)
-}
 
 @Since("1.4.0")
 @Experimental
-object GBTRegressor {
+object GBTRegressor
   // The losses below should be lowercase.
   /** Accessor for supported loss settings: squared (L2), absolute (L1) */
   @Since("1.4.0")
   final val supportedLossTypes: Array[String] =
     Array("squared", "absolute").map(_.toLowerCase)
-}
 
 /**
   * :: Experimental ::
@@ -192,7 +185,7 @@ final class GBTRegressionModel private[ml](
     private val _treeWeights: Array[Double],
     override val numFeatures: Int)
     extends PredictionModel[Vector, GBTRegressionModel] with TreeEnsembleModel
-    with Serializable {
+    with Serializable
 
   require(numTrees > 0, "GBTRegressionModel requires at least 1 tree.")
   require(
@@ -218,57 +211,47 @@ final class GBTRegressionModel private[ml](
   @Since("1.4.0")
   override def treeWeights: Array[Double] = _treeWeights
 
-  override protected def transformImpl(dataset: DataFrame): DataFrame = {
+  override protected def transformImpl(dataset: DataFrame): DataFrame =
     val bcastModel = dataset.sqlContext.sparkContext.broadcast(this)
-    val predictUDF = udf { (features: Any) =>
+    val predictUDF = udf  (features: Any) =>
       bcastModel.value.predict(features.asInstanceOf[Vector])
-    }
     dataset.withColumn($(predictionCol), predictUDF(col($(featuresCol))))
-  }
 
-  override protected def predict(features: Vector): Double = {
+  override protected def predict(features: Vector): Double =
     // TODO: When we add a generic Boosting class, handle transform there?  SPARK-7129
     // Classifies by thresholding sum of weighted tree predictions
     val treePredictions =
       _trees.map(_.rootNode.predictImpl(features).prediction)
     blas.ddot(numTrees, treePredictions, 1, _treeWeights, 1)
-  }
 
   @Since("1.4.0")
-  override def copy(extra: ParamMap): GBTRegressionModel = {
+  override def copy(extra: ParamMap): GBTRegressionModel =
     copyValues(new GBTRegressionModel(uid, _trees, _treeWeights, numFeatures),
                extra).setParent(parent)
-  }
 
   @Since("1.4.0")
-  override def toString: String = {
+  override def toString: String =
     s"GBTRegressionModel (uid=$uid) with $numTrees trees"
-  }
 
   /** (private[ml]) Convert to a model in the old API */
-  private[ml] def toOld: OldGBTModel = {
+  private[ml] def toOld: OldGBTModel =
     new OldGBTModel(OldAlgo.Regression, _trees.map(_.toOld), _treeWeights)
-  }
-}
 
-private[ml] object GBTRegressionModel {
+private[ml] object GBTRegressionModel
 
   /** (private[ml]) Convert a model from the old API */
   def fromOld(oldModel: OldGBTModel,
               parent: GBTRegressor,
               categoricalFeatures: Map[Int, Int],
-              numFeatures: Int = -1): GBTRegressionModel = {
+              numFeatures: Int = -1): GBTRegressionModel =
     require(
         oldModel.algo == OldAlgo.Regression,
         "Cannot convert GradientBoostedTreesModel" +
         s" with algo=${oldModel.algo} (old API) to GBTRegressionModel (new API).")
-    val newTrees = oldModel.trees.map { tree =>
+    val newTrees = oldModel.trees.map  tree =>
       // parent for each tree is null since there is no good way to set this.
       DecisionTreeRegressionModel.fromOld(tree, null, categoricalFeatures)
-    }
     val uid =
       if (parent != null) parent.uid else Identifiable.randomUID("gbtr")
     new GBTRegressionModel(
         parent.uid, newTrees, oldModel.treeWeights, numFeatures)
-  }
-}

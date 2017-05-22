@@ -7,13 +7,12 @@ import org.scalatest.{Matchers, WordSpec}
   *
   * @param args to the job. "input" specifies the input file, and "output" the output file.
   */
-class SimpleTestJob(args: Args) extends Job(args) {
+class SimpleTestJob(args: Args) extends Job(args)
   Tsv(args("input")).read.write(Tsv(args("output")))
-}
 
-class JobTestTest extends WordSpec with Matchers {
-  "A JobTest" should {
-    "error helpfully when a source in the job doesn't have a corresponding .source call" in {
+class JobTestTest extends WordSpec with Matchers
+  "A JobTest" should
+    "error helpfully when a source in the job doesn't have a corresponding .source call" in
       val testInput: List[(String, Int)] = List(("a", 1), ("b", 2))
 
       // The source required by SimpleTestJob
@@ -29,16 +28,12 @@ class JobTestTest extends WordSpec with Matchers {
           .arg("input", "input")
           .arg("output", "output")
           .source(incorrectSource, testInput)
-          .sink[(String, Int)](Tsv("output")) { outBuf =>
+          .sink[(String, Int)](Tsv("output"))  outBuf =>
             { outBuf shouldBe testInput }
-          }
           .run
 
-      the[IllegalArgumentException] thrownBy {
+      the[IllegalArgumentException] thrownBy
         runJobTest()
-      } should have message
+      should have message
       (s"Failed to create tap for: ${requiredSource}, with error: requirement failed: " +
           TestTapFactory.sourceNotFoundError.format(requiredSource))
-    }
-  }
-}

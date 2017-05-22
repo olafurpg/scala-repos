@@ -17,7 +17,7 @@ package com.twitter
 
 import org.apache.hadoop.fs.{Path, PathFilter}
 
-package object scalding {
+package object scalding
 
   /**
     * The objects for the Typed-API live in the scalding.typed package
@@ -37,42 +37,30 @@ package object scalding {
     */
   val scaldingVersion: String = "0.15.0"
 
-  object RichPathFilter {
+  object RichPathFilter
     implicit def toRichPathFilter(f: PathFilter) = new RichPathFilter(f)
-  }
 
-  class RichPathFilter(f: PathFilter) {
+  class RichPathFilter(f: PathFilter)
 
-    def and(filters: PathFilter*): PathFilter = {
+    def and(filters: PathFilter*): PathFilter =
       new AndPathFilter(Seq(f) ++ filters)
-    }
 
-    def or(filters: PathFilter*): PathFilter = {
+    def or(filters: PathFilter*): PathFilter =
       new OrPathFilter(Seq(f) ++ filters)
-    }
 
-    def not: PathFilter = {
+    def not: PathFilter =
       new NotPathFilter(f)
-    }
-  }
 
   private[this] class AndPathFilter(filters: Seq[PathFilter])
-      extends PathFilter {
-    override def accept(p: Path): Boolean = {
+      extends PathFilter
+    override def accept(p: Path): Boolean =
       filters.forall(_.accept(p))
-    }
-  }
 
   private[this] class OrPathFilter(filters: Seq[PathFilter])
-      extends PathFilter {
-    override def accept(p: Path): Boolean = {
+      extends PathFilter
+    override def accept(p: Path): Boolean =
       filters.exists(_.accept(p))
-    }
-  }
 
-  private[this] class NotPathFilter(filter: PathFilter) extends PathFilter {
-    override def accept(p: Path): Boolean = {
+  private[this] class NotPathFilter(filter: PathFilter) extends PathFilter
+    override def accept(p: Path): Boolean =
       !filter.accept(p)
-    }
-  }
-}

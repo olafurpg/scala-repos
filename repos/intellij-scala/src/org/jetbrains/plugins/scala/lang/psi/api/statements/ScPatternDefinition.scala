@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-trait ScPatternDefinition extends ScValue {
+trait ScPatternDefinition extends ScValue
   def pList: ScPatternList
 
   def bindings: Seq[ScBindingPattern]
@@ -21,16 +21,11 @@ trait ScPatternDefinition extends ScValue {
 
   def isSimple: Boolean = pList.allPatternsSimple && bindings.size == 1
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitPatternDefinition(this)
-  }
-}
 
-object ScPatternDefinition {
-  object expr {
-    def unapply(definition: ScPatternDefinition): Option[ScExpression] = {
+object ScPatternDefinition
+  object expr
+    def unapply(definition: ScPatternDefinition): Option[ScExpression] =
       if (definition == null) None
       else definition.expr
-    }
-  }
-}

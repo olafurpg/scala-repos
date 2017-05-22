@@ -1,6 +1,6 @@
 package java.io
 
-trait DataInput {
+trait DataInput
   def readBoolean(): Boolean
   def readByte(): Byte
   def readChar(): Char
@@ -16,4 +16,3 @@ trait DataInput {
   def readUnsignedShort(): Int
   def readUTF(): String
   def skipBytes(n: Int): Int
-}

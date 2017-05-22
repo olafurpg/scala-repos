@@ -12,8 +12,8 @@ import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer
 
 @RunWith(classOf[JUnitRunner])
-class ValidateNaiveTimeoutFilter extends FunSuite {
-  def getRealData(n: Int): Iterator[Long] = {
+class ValidateNaiveTimeoutFilter extends FunSuite
+  def getRealData(n: Int): Iterator[Long] =
     val cl: ClassLoader = getClass().getClassLoader();
     val input: InputStreamReader = new InputStreamReader(
         cl.getResourceAsStream("resources/real_latencies.data"));
@@ -21,18 +21,15 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
     val reader: BufferedReader = new BufferedReader(input);
 
     reader.mark(n)
-    new Iterator[String] {
+    new Iterator[String]
       def hasNext = true
-      def next(): String = {
-        Option(reader.readLine()) getOrElse {
+      def next(): String =
+        Option(reader.readLine()) getOrElse
           reader.reset()
           reader.readLine()
-        }
-      }
-    } filter (_.nonEmpty) map (opt => (1000 * opt.toDouble).toLong) take (n)
-  }
+    filter (_.nonEmpty) map (opt => (1000 * opt.toDouble).toLong) take (n)
 
-  test("Timeout kills everything over timeout") {
+  test("Timeout kills everything over timeout")
     val now = Time.now
     val timer = new MockTimer
     val total = 10000
@@ -45,24 +42,21 @@ class ValidateNaiveTimeoutFilter extends FunSuite {
     val filter =
       new TimeoutFilter[Event[Boolean, Boolean], Boolean](timeout, timer)
     val gen = new LoadGenerator(
-        data.map { latency =>
-          new Event(now, latency.milliseconds, true, { b: Boolean =>
+        data.map  latency =>
+          new Event(now, latency.milliseconds, true,  b: Boolean =>
             Try(true)
-          })
-        }, {
+          )
+        ,
           case (duration: Duration, f: Future[Boolean]) =>
-            f onSuccess { _ =>
+            f onSuccess  _ =>
               assert(duration <= timeout)
-            } onFailure { _ =>
+            onFailure  _ =>
               assert(duration > timeout)
-            } ensure {
+            ensure
               num += 1
-            }
-        }: (Duration, Future[Boolean]) => Unit,
+        : (Duration, Future[Boolean]) => Unit,
         filter,
         timer
     )
     gen.execute()
     assert(num == total)
-  }
-}

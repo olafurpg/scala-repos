@@ -27,11 +27,11 @@ import org.apache.hadoop.fs.Path
 
 import scala.sys.process._
 
-object RunWorkflow extends Logging {
+object RunWorkflow extends Logging
   def runWorkflow(ca: ConsoleArgs,
                   core: File,
                   em: EngineManifest,
-                  variantJson: File): Int = {
+                  variantJson: File): Int =
     // Collect and serialize PIO_* environmental variables
     val pioEnvVars = sys.env
       .filter(kv => kv._1.startsWith("PIO_"))
@@ -47,52 +47,46 @@ object RunWorkflow extends Logging {
     val driverClassPathIndex =
       ca.common.sparkPassThrough.indexOf("--driver-class-path")
     val driverClassPathPrefix =
-      if (driverClassPathIndex != -1) {
+      if (driverClassPathIndex != -1)
         Seq(ca.common.sparkPassThrough(driverClassPathIndex + 1))
-      } else {
+      else
         Seq()
-      }
     val extraClasspaths =
       driverClassPathPrefix ++ WorkflowUtils.thirdPartyClasspaths
 
     val deployModeIndex = ca.common.sparkPassThrough.indexOf("--deploy-mode")
     val deployMode =
-      if (deployModeIndex != -1) {
+      if (deployModeIndex != -1)
         ca.common.sparkPassThrough(deployModeIndex + 1)
-      } else {
+      else
         "client"
-      }
 
     val extraFiles = WorkflowUtils.thirdPartyConfFiles
 
     val mainJar =
-      if (ca.build.uberJar) {
-        if (deployMode == "cluster") {
+      if (ca.build.uberJar)
+        if (deployMode == "cluster")
           em.files.filter(_.startsWith("hdfs")).head
-        } else {
+        else
           em.files.filterNot(_.startsWith("hdfs")).head
-        }
-      } else {
-        if (deployMode == "cluster") {
+      else
+        if (deployMode == "cluster")
           em.files.filter(_.contains("pio-assembly")).head
-        } else {
+        else
           core.getCanonicalPath
-        }
-      }
 
     val workMode =
       ca.common.evaluation.map(_ => "Evaluation").getOrElse("Training")
 
     val engineLocation = Seq(sys.env("PIO_FS_ENGINESDIR"), em.id, em.version)
 
-    if (deployMode == "cluster") {
+    if (deployMode == "cluster")
       val dstPath = new Path(engineLocation.mkString(Path.SEPARATOR))
       info(
           "Cluster deploy mode detected. Trying to copy " +
           s"${variantJson.getCanonicalPath} to " +
           s"${hdfs.makeQualified(dstPath).toString}.")
       hdfs.copyFromLocalFile(new Path(variantJson.toURI), dstPath)
-    }
 
     val sparkSubmit =
       Seq(Seq(sparkHome, "bin", "spark-submit").mkString(File.separator)) ++ ca.common.sparkPassThrough ++ Seq(
@@ -100,25 +94,25 @@ object RunWorkflow extends Logging {
           "io.prediction.workflow.CreateWorkflow",
           "--name",
           s"PredictionIO $workMode: ${em.id} ${em.version} (${ca.common.batch})") ++
-      (if (!ca.build.uberJar) {
+      (if (!ca.build.uberJar)
          Seq("--jars", em.files.mkString(","))
-       } else Seq()) ++
-      (if (extraFiles.size > 0) {
+       else Seq()) ++
+      (if (extraFiles.size > 0)
          Seq("--files", extraFiles.mkString(","))
-       } else {
+       else
          Seq()
-       }) ++
-      (if (extraClasspaths.size > 0) {
+       ) ++
+      (if (extraClasspaths.size > 0)
          Seq("--driver-class-path", extraClasspaths.mkString(":"))
-       } else {
+       else
          Seq()
-       }) ++
-      (if (ca.common.sparkKryo) {
+       ) ++
+      (if (ca.common.sparkKryo)
          Seq("--conf",
              "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-       } else {
+       else
          Seq()
-       }) ++ Seq(
+       ) ++ Seq(
           mainJar,
           "--env",
           pioEnvVars,
@@ -127,14 +121,14 @@ object RunWorkflow extends Logging {
           "--engine-version",
           em.version,
           "--engine-variant",
-          if (deployMode == "cluster") {
+          if (deployMode == "cluster")
             hdfs
               .makeQualified(new Path((engineLocation :+ variantJson.getName)
                         .mkString(Path.SEPARATOR)))
               .toString
-          } else {
+          else
             variantJson.getCanonicalPath
-          },
+          ,
           "--verbosity",
           ca.common.verbosity.toString) ++ ca.common.engineFactory
         .map(x => Seq("--engine-factory", x))
@@ -148,11 +142,11 @@ object RunWorkflow extends Logging {
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++
       (if (ca.common.skipSanityCheck) Seq("--skip-sanity-check") else Seq()) ++
       (if (ca.common.stopAfterRead) Seq("--stop-after-read") else Seq()) ++
-      (if (ca.common.stopAfterPrepare) {
+      (if (ca.common.stopAfterPrepare)
          Seq("--stop-after-prepare")
-       } else {
+       else
          Seq()
-       }) ++ ca.common.evaluation
+       ) ++ ca.common.evaluation
         .map(x => Seq("--evaluation-class", x))
         .getOrElse(Seq()) ++ // If engineParamsGenerator is specified, it overrides the evaluation.
       ca.common.engineParamsGenerator
@@ -168,9 +162,8 @@ object RunWorkflow extends Logging {
             None,
             "CLASSPATH" -> "",
             "SPARK_YARN_USER_ENV" -> pioEnvVars).!
-  }
 
-  def newRunWorkflow(ca: ConsoleArgs, em: EngineManifest): Int = {
+  def newRunWorkflow(ca: ConsoleArgs, em: EngineManifest): Int =
     val jarFiles = em.files.map(new URI(_))
     val args =
       Seq("--engine-id",
@@ -190,11 +183,11 @@ object RunWorkflow extends Logging {
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++
       (if (ca.common.skipSanityCheck) Seq("--skip-sanity-check") else Seq()) ++
       (if (ca.common.stopAfterRead) Seq("--stop-after-read") else Seq()) ++
-      (if (ca.common.stopAfterPrepare) {
+      (if (ca.common.stopAfterPrepare)
          Seq("--stop-after-prepare")
-       } else {
+       else
          Seq()
-       }) ++ ca.common.evaluation
+       ) ++ ca.common.evaluation
         .map(x => Seq("--evaluation-class", x))
         .getOrElse(Seq()) ++ // If engineParamsGenerator is specified, it overrides the evaluation.
       ca.common.engineParamsGenerator
@@ -209,5 +202,3 @@ object RunWorkflow extends Logging {
                       args,
                       ca,
                       jarFiles)
-  }
-}

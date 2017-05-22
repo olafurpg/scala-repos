@@ -10,7 +10,7 @@ import com.twitter.util
   *
   * @tparam A a [[Stack.Parameterized]] server/client to configure
   */
-trait CommonParams[A <: Stack.Parameterized[A]] {
+trait CommonParams[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -105,4 +105,3 @@ trait CommonParams[A <: Stack.Parameterized[A]] {
     */
   def withRequestTimeout(timeout: util.Duration): A =
     self.configured(TimeoutFilter.Param(timeout))
-}

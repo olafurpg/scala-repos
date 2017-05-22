@@ -21,22 +21,21 @@ import scala.concurrent.{Future, Await, Promise}
 
 class AppStartActorTest
     extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll with Mockito {
+    with BeforeAndAfterAll with Mockito
 
   var driver: SchedulerDriver = _
   var scheduler: SchedulerActions = _
   var taskQueue: LaunchQueue = _
   var taskTracker: TaskTracker = _
 
-  before {
+  before
     driver = mock[SchedulerDriver]
     scheduler = mock[SchedulerActions]
     taskQueue = mock[LaunchQueue]
     taskTracker = MarathonTestHelper.createTaskTracker(
         AlwaysElectedLeadershipModule.forActorSystem(system))
-  }
 
-  test("Without Health Checks") {
+  test("Without Health Checks")
     val app = AppDefinition(id = PathId("app"), instances = 10)
     val promise = Promise[Unit]()
     val ref = TestActorRef[AppStartActor](
@@ -85,9 +84,8 @@ class AppStartActorTest
 
     verify(scheduler).startApp(driver, app.copy(instances = 2))
     expectTerminated(ref)
-  }
 
-  test("With Health Checks") {
+  test("With Health Checks")
     val app = AppDefinition(
         id = PathId("app"), instances = 10, healthChecks = Set(HealthCheck()))
     val promise = Promise[Unit]()
@@ -115,9 +113,8 @@ class AppStartActorTest
 
     verify(scheduler).startApp(driver, app.copy(instances = 2))
     expectTerminated(ref)
-  }
 
-  test("Failed") {
+  test("Failed")
     scheduler.stopApp(any, any).asInstanceOf[Future[Unit]] returns Future
       .successful(())
 
@@ -140,16 +137,14 @@ class AppStartActorTest
 
     ref.stop()
 
-    intercept[AppStartCanceledException] {
+    intercept[AppStartCanceledException]
       Await.result(promise.future, 5.seconds)
-    }
 
     verify(scheduler).startApp(driver, app.copy(instances = 2))
     verify(scheduler).stopApp(driver, app)
     expectTerminated(ref)
-  }
 
-  test("No tasks to start without health checks") {
+  test("No tasks to start without health checks")
     val app = AppDefinition(id = PathId("app"), instances = 10)
     val promise = Promise[Unit]()
     val ref = TestActorRef[AppStartActor](
@@ -171,9 +166,8 @@ class AppStartActorTest
 
     verify(scheduler).startApp(driver, app.copy(instances = 0))
     expectTerminated(ref)
-  }
 
-  test("No tasks to start with health checks") {
+  test("No tasks to start with health checks")
     val app = AppDefinition(
         id = PathId("app"), instances = 10, healthChecks = Set(HealthCheck()))
     val promise = Promise[Unit]()
@@ -196,5 +190,3 @@ class AppStartActorTest
 
     verify(scheduler).startApp(driver, app.copy(instances = 0))
     expectTerminated(ref)
-  }
-}

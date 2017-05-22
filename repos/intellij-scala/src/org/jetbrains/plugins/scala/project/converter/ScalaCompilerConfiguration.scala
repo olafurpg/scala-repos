@@ -13,21 +13,19 @@ import scala.xml.Elem
   */
 class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings,
                                  profiles: Seq[ScalaCompilerSettingsProfile])
-    extends XmlConversion {
-  def createIn(context: ConversionContext): Option[File] = {
+    extends XmlConversion
+  def createIn(context: ConversionContext): Option[File] =
     val optionsElement = createOptionsElement()
 
-    context.getStorageScheme match {
+    context.getStorageScheme match
       case StorageScheme.DIRECTORY_BASED =>
         Some(addDirectoryBasedOptions(optionsElement, context))
       case StorageScheme.DEFAULT =>
         addProjectBasedOptions(optionsElement, context)
         None
-    }
-  }
 
   private def addDirectoryBasedOptions(
-      options: Elem, context: ConversionContext): File = {
+      options: Elem, context: ConversionContext): File =
     val base = Option(context.getSettingsBaseDir)
       .getOrElse(throw new CannotConvertException(
             "Only directory-based IDEA projects are supported"))
@@ -36,18 +34,14 @@ class ScalaCompilerConfiguration(defaultSettings: ScalaCompilerSettings,
     val componentElement = <project version="4"> {options} </project>
     Files.write(formatXml(componentElement).getBytes, file)
     file
-  }
 
   private def addProjectBasedOptions(
-      options: Elem, context: ConversionContext) {
+      options: Elem, context: ConversionContext)
     val rootElement = context.getProjectSettings.getRootElement
     rootElement.addContent(asJava(options))
-  }
 
-  private def createOptionsElement(): Elem = {
+  private def createOptionsElement(): Elem =
     <component name="ScalaCompilerConfiguration">
       {defaultSettings.toXml}
       {profiles.map(_.toXml)}
     </component>
-  }
-}

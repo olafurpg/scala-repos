@@ -5,7 +5,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 import org.scalacheck.Prop.forAll
 
-object OptionTTest extends SpecLite {
+object OptionTTest extends SpecLite
 
   type OptionTList[A] = OptionT[List, A]
   type OptionTOption[A] = OptionT[Option, A]
@@ -18,19 +18,16 @@ object OptionTTest extends SpecLite {
   checkAll(traverse.laws[OptionTList])
   checkAll(monadError.laws[OptionTEither, Int])
 
-  "show" ! forAll { a: OptionTList[Int] =>
+  "show" ! forAll  a: OptionTList[Int] =>
     Show[OptionTList[Int]].show(a) must_=== Show[List[Option[Int]]].show(a.run)
-  }
 
-  "optionT" ! forAll { ass: List[Option[Int]] =>
+  "optionT" ! forAll  ass: List[Option[Int]] =>
     OptionT.optionT(ass).run == ass
-  }
 
-  "listT" ! forAll { a: OptionTList[Int] =>
+  "listT" ! forAll  a: OptionTList[Int] =>
     a.toListT.run must_=== a.run.map(_.toList)
-  }
 
-  object instances {
+  object instances
     def functor[F[_]: Functor] = Functor[OptionT[F, ?]]
     def bindRec[F[_]: Monad : BindRec] = BindRec[OptionT[F, ?]]
     def monad[F[_]: Monad] = MonadPlus[OptionT[F, ?]]
@@ -48,5 +45,3 @@ object OptionTTest extends SpecLite {
     def bind[F[_]: Monad : BindRec] = Bind[OptionT[F, ?]]
     def apply[F[_]: Monad] = Apply[OptionT[F, ?]]
     def foldable[F[_]: Traverse] = Foldable[OptionT[F, ?]]
-  }
-}

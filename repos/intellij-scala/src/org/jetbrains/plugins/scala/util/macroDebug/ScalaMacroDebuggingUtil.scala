@@ -26,7 +26,7 @@ import scala.collection.mutable.ListBuffer
   * User: Dmitry Naydanov
   * Date: 11/5/12
   */
-object ScalaMacroDebuggingUtil {
+object ScalaMacroDebuggingUtil
   private[this] val MACRO_DEBUG_ENABLE_PROPERTY = "scala.macro.debug.enabled"
 
   val MACRO_SIGN_PREFIX = "<[[macro:" //=\
@@ -47,7 +47,7 @@ object ScalaMacroDebuggingUtil {
   val macrosToExpand = new mutable.HashSet[PsiElement]()
   val allMacroCalls = new mutable.HashSet[PsiElement]()
 
-  def saveCode(fileName: String, code: java.util.ArrayList[String]) {
+  def saveCode(fileName: String, code: java.util.ArrayList[String])
     import scala.collection.JavaConversions._
 
     if (!isEnabled) return
@@ -60,15 +60,14 @@ object ScalaMacroDebuggingUtil {
     dataStream close ()
 
     UPDATE_QUEUE += file.getCanonicalPath
-  }
 
-  def loadCode(file: PsiFile, force: Boolean = false): PsiFile = {
+  def loadCode(file: PsiFile, force: Boolean = false): PsiFile =
     if (!isEnabled || file.getVirtualFile.isInstanceOf[LightVirtualFile])
       return null
 
     val canonicalPath = file.getVirtualFile.getCanonicalPath
 
-    def createFile(): PsiFile = {
+    def createFile(): PsiFile =
       val dataStream =
         SYNTHETIC_SOURCE_ATTRIBUTE readAttribute file.getVirtualFile
       if (dataStream == null) return null
@@ -76,22 +75,19 @@ object ScalaMacroDebuggingUtil {
       var line = dataStream readUTF ()
       val linesRed = StringBuilder.newBuilder
 
-      while (line != null && dataStream.available() > 0) {
+      while (line != null && dataStream.available() > 0)
         linesRed ++= (line map (c => if (c == 0) ' ' else c)) ++= "\n"
         line = dataStream readUTF ()
-      }
 
       //linesRed ++= line
       //unpack debug info 
       val offsets = ListBuffer.empty[(Int, Int, Int)]
       @inline def parse(s: String) = Integer parseInt s
-      line split '|' foreach {
+      line split '|' foreach
         case s =>
           val nums = s split ","
-          if (nums.length == 3) {
+          if (nums.length == 3)
             offsets.append((parse(nums(0)), parse(nums(1)), parse(nums(2))))
-          }
-      }
       SYNTHETIC_OFFSETS_MAP += (canonicalPath -> offsets.result())
       // /unpack
 
@@ -110,11 +106,9 @@ object ScalaMacroDebuggingUtil {
       PREIMAGE_CACHE += (synFile -> file)
 
       synFile
-    }
 
     if (force || UPDATE_QUEUE.remove(canonicalPath)) createFile()
     else SOURCE_CACHE get canonicalPath getOrElse createFile()
-  }
 
   def readPreimageName(file: PsiFile): Option[String] =
     Option(SOURCE_FILE_NAME readAttributeBytes file.getVirtualFile) map
@@ -123,10 +117,9 @@ object ScalaMacroDebuggingUtil {
   def getPreimageFile(file: PsiFile) = PREIMAGE_CACHE get file
 
   def isLoaded(file: PsiFile) =
-    SOURCE_CACHE get file.getVirtualFile.getCanonicalPath match {
+    SOURCE_CACHE get file.getVirtualFile.getCanonicalPath match
       case Some(_) => true
       case _ => false
-    }
 
   def tryToLoad(file: PsiFile) =
     !file.getVirtualFile.isInstanceOf[LightVirtualFile] &&
@@ -136,42 +129,34 @@ object ScalaMacroDebuggingUtil {
     SYNTHETIC_OFFSETS_MAP get file.getVirtualFile.getCanonicalPath
 
   def getOffsetsCount(file: PsiFile) =
-    SYNTHETIC_OFFSETS_MAP get file.getVirtualFile.getCanonicalPath match {
+    SYNTHETIC_OFFSETS_MAP get file.getVirtualFile.getCanonicalPath match
       case Some(offsets) => offsets.length
       case _ => 0
-    }
 
   def checkMarkers(fileName: String, markersCount: Int) =
-    MARKERS_CACHE get fileName match {
+    MARKERS_CACHE get fileName match
       case Some(oldCount) =>
-        if (oldCount == markersCount) { false } else {
+        if (oldCount == markersCount) { false } else
           MARKERS_CACHE += (fileName -> markersCount); true
-        }
       case None => MARKERS_CACHE += (fileName -> markersCount); true
-    }
 
-  def isMacroCall(element: PsiElement) = element match {
+  def isMacroCall(element: PsiElement) = element match
     case methodInvocation: MethodInvocation =>
-      methodInvocation.getEffectiveInvokedExpr match {
+      methodInvocation.getEffectiveInvokedExpr match
         case ref: ScReferenceExpression =>
-          ref.resolve() match {
+          ref.resolve() match
             case _: ScMacroDefinition => true
             case _ => false
-          }
         case _ => false
-      }
     case _ => false
-  }
 
-  def copyTextBetweenEditors(from: Editor, to: Editor, project: Project) {
-    extensions.inWriteAction {
+  def copyTextBetweenEditors(from: Editor, to: Editor, project: Project)
+    extensions.inWriteAction
       val toDoc: Document = to.getDocument
       toDoc.setText(from.getDocument.getText)
       PsiDocumentManager.getInstance(project).commitDocument(toDoc)
-    }
-  }
 
-  def expandMacros(project: Project) {
+  def expandMacros(project: Project)
     val sourceEditor =
       FileEditorManager.getInstance(project).getSelectedTextEditor
     val macroEditor = WorksheetEditorPrinter
@@ -188,16 +173,15 @@ object ScalaMacroDebuggingUtil {
     copyTextBetweenEditors(sourceEditor, macroEditor, project)
 
     for (elt <- macrosToExpand.toList.sortWith(
-        (a, b) => a.getTextOffset > b.getTextOffset)) {
+        (a, b) => a.getTextOffset > b.getTextOffset))
       var macroCall = macrosheetFile.findElementAt(elt.getTextOffset)
       while (macroCall != null &&
-      !ScalaMacroDebuggingUtil.isMacroCall(macroCall)) {
+      !ScalaMacroDebuggingUtil.isMacroCall(macroCall))
         macroCall = macroCall.getParent
-      }
-      if (macroCall != null) {
+      if (macroCall != null)
         //        extensions.inWriteAction {
-        WriteCommandAction.runWriteCommandAction(project, new Runnable {
-          override def run() {
+        WriteCommandAction.runWriteCommandAction(project, new Runnable
+          override def run()
             val macroExpansion = """
                 |val eval$1: String = "world"
                 |print("hello ")
@@ -213,9 +197,4 @@ object ScalaMacroDebuggingUtil {
             statement = CodeStyleManager
               .getInstance(project)
               .reformat(statement)
-          }
-        })
-      }
-    }
-  }
-}
+        )

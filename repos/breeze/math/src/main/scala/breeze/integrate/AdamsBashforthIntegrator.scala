@@ -8,7 +8,7 @@ class AdamsBashforthIntegrator(order: Int,
                                maxStep: Double,
                                relTol: DenseVector[Double] = null,
                                absTol: DenseVector[Double] = null)
-    extends ApacheAdamsIntegrator(relTol, absTol) {
+    extends ApacheAdamsIntegrator(relTol, absTol)
 
   type T = ApacheAdamsBashforthIntegrator
 
@@ -19,4 +19,3 @@ class AdamsBashforthIntegrator(order: Int,
         maxStep,
         ApacheAdaptiveStepIntegrator.defaultAbsTol,
         ApacheAdaptiveStepIntegrator.defaultRelTol)
-}

@@ -79,30 +79,27 @@ import org.streum.configrity.io.BlockFormat
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-trait NIHDBPlatformSpecs extends ParseEvalStackSpecs[Future] {
+trait NIHDBPlatformSpecs extends ParseEvalStackSpecs[Future]
   type TestStack = NIHDBTestStack
   val stack = NIHDBTestStack
 
   override def map(fs: => Fragments): Fragments =
     step { stack.startup() } ^ fs ^ step { stack.shutdown() }
-}
 
-object NIHDBTestStack extends NIHDBTestStack {
+object NIHDBTestStack extends NIHDBTestStack
   def startup() {}
 
   def shutdown() {}
-}
 
 trait NIHDBTestActors
-    extends ActorVFSModule with ActorPlatformSpecs with YggConfigComponent {
+    extends ActorVFSModule with ActorPlatformSpecs with YggConfigComponent
   trait NIHDBTestActorsConfig
-      extends BaseConfig with BlockStoreColumnarTableModuleConfig {
+      extends BaseConfig with BlockStoreColumnarTableModuleConfig
     val cookThreshold = 10
     val storageTimeout = Timeout(300 * 1000)
     val quiescenceTimeout = Duration(300, "seconds")
 
     def clock: blueeyes.util.Clock
-  }
 
   type YggConfig <: NIHDBTestActorsConfig
   implicit val M: Monad[Future] with Comonad[Future] =
@@ -131,20 +128,18 @@ trait NIHDBTestActors
                                  yggConfig.quiescenceTimeout,
                                  10,
                                  yggConfig.clock)))
-}
 
 trait NIHDBTestStack
     extends TestStackLike[Future] with SecureVFSModule[Future, Slice]
     with LongIdMemoryDatasetConsumer[Future] with NIHDBTestActors
-    with VFSColumnarTableModule {
+    with VFSColumnarTableModule
   self =>
 
   abstract class YggConfig
       extends ParseEvalStackSpecConfig with IdSourceConfig with EvaluatorConfig
       with StandaloneShardSystemConfig with ColumnarTableModuleConfig
-      with BlockStoreColumnarTableModuleConfig with NIHDBTestActorsConfig {
+      with BlockStoreColumnarTableModuleConfig with NIHDBTestActorsConfig
     val ingestConfig = None
-  }
 
   object yggConfig extends YggConfig
 
@@ -154,19 +149,16 @@ trait NIHDBTestStack
 
   def Evaluator[N[+ _]](
       N0: Monad[N])(implicit mn: Future ~> N, nm: N ~> Future) =
-    new Evaluator[N](N0)(mn, nm) {
+    new Evaluator[N](N0)(mn, nm)
       val report = new LoggingQueryLogger[N, instructions.Line]
       with ExceptionQueryLogger[N, instructions.Line]
-      with TimingQueryLogger[N, instructions.Line] {
+      with TimingQueryLogger[N, instructions.Line]
         val M = N0
-      }
-      class YggConfig extends EvaluatorConfig {
+      class YggConfig extends EvaluatorConfig
         val idSource = new FreshAtomicIdSource
         val maxSliceSize = 10
-      }
       val yggConfig = new YggConfig
       def freshIdScanner = self.freshIdScanner
-    }
 
   val actorVFS = new ActorVFS(
       projectionsActor, yggConfig.storageTimeout, yggConfig.storageTimeout)
@@ -175,14 +167,12 @@ trait NIHDBTestStack
 
   val report = new LoggingQueryLogger[Future, instructions.Line]
   with ExceptionQueryLogger[Future, instructions.Line]
-  with TimingQueryLogger[Future, instructions.Line] {
+  with TimingQueryLogger[Future, instructions.Line]
     implicit def M = self.M
-  }
 
   trait TableCompanion extends VFSColumnarTableCompanion
 
   object Table extends TableCompanion
-}
 
 class NIHDBBasicValidationSpecs
     extends BasicValidationSpecs with NIHDBPlatformSpecs

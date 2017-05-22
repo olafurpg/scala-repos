@@ -1,19 +1,14 @@
 class G[T]
-object G {
+object G
   def v[T](x: T): G[T] = null
-}
 
 class A[T]
-object A {
+object A
   def apply[T](x: => G[T]): A[T] = null
-}
 
-object T {
+object T
   A[Unit](G.v(() => ())) // Was VerifyError
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     T
-  }
-}

@@ -27,10 +27,9 @@ package squerylrecord
   * squeryl-record. That means, for example, that you can create a subclass
   * of StringTypedField without the need to extend this trait.
   */
-trait SquerylRecordField {
+trait SquerylRecordField
 
   /**
     * Should return the class of the field's value in the database.
     */
   def classOfPersistentField: Class[_]
-}

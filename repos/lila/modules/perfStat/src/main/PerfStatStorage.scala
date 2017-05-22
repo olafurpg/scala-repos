@@ -9,19 +9,17 @@ import lila.db.BSON._
 import lila.db.Types.Coll
 import lila.rating.PerfType
 
-final class PerfStatStorage(coll: Coll) {
+final class PerfStatStorage(coll: Coll)
 
   import lila.db.BSON.BSONJodaDateTimeHandler
   import reactivemongo.bson.Macros
-  implicit val PerfTypeBSONHandler = new BSONHandler[BSONInteger, PerfType] {
+  implicit val PerfTypeBSONHandler = new BSONHandler[BSONInteger, PerfType]
     def read(b: BSONInteger) =
       PerfType.byId get b.value err s"Invalid perf type id ${b.value}"
     def write(p: PerfType) = BSONInteger(p.id)
-  }
-  implicit val UserIdBSONHandler = new BSONHandler[BSONString, UserId] {
+  implicit val UserIdBSONHandler = new BSONHandler[BSONString, UserId]
     def read(b: BSONString) = UserId(b.value)
     def write(u: UserId) = BSONString(u.value)
-  }
   private implicit val RatingAtBSONHandler = Macros.handler[RatingAt]
   private implicit val ResultBSONHandler = Macros.handler[Result]
   private implicit val ResultsBSONHandler = Macros.handler[Results]
@@ -43,4 +41,3 @@ final class PerfStatStorage(coll: Coll) {
 
   def insert(perfStat: PerfStat): Funit =
     coll.insert(perfStat).void
-}

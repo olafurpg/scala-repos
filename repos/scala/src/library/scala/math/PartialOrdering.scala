@@ -37,7 +37,7 @@ package math
   *  @version 1.0, 2008-04-0-3
   *  @since 2.7
   */
-trait PartialOrdering[T] extends Equiv[T] { outer =>
+trait PartialOrdering[T] extends Equiv[T]  outer =>
 
   /** Result of comparing `x` with operand `y`.
     *  Returns `None` if operands are not comparable.
@@ -70,9 +70,7 @@ trait PartialOrdering[T] extends Equiv[T] { outer =>
     */
   def equiv(x: T, y: T): Boolean = lteq(x, y) && lteq(y, x)
 
-  def reverse: PartialOrdering[T] = new PartialOrdering[T] {
+  def reverse: PartialOrdering[T] = new PartialOrdering[T]
     override def reverse = outer
     def lteq(x: T, y: T) = outer.lteq(y, x)
     def tryCompare(x: T, y: T) = outer.tryCompare(y, x)
-  }
-}

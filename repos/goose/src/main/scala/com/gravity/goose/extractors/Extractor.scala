@@ -29,7 +29,7 @@ import org.jsoup.nodes.Element
   * Encapsulates the process of extracting some type <code>T</code> from an article
   * @param <T> the type of {@link Object} the implementing class will return
   */
-trait Extractor[T] {
+trait Extractor[T]
 
   /**
     * Given the specified {@link Element}, extract @param <T>
@@ -38,4 +38,3 @@ trait Extractor[T] {
     * @return an instance of type <code>T</code>
     */
   def extract(rootElement: Element): T
-}

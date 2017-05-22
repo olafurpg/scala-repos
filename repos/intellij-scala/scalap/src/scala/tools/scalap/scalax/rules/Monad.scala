@@ -16,32 +16,26 @@ package rules
 
 import scala.language.higherKinds
 
-trait Monad[+A] extends Functor[A] {
+trait Monad[+A] extends Functor[A]
   type M [+A] <: Monad[A]
   def flatMap[B](f: A => M[B]): M[B]
-}
 
-trait Monads extends UnitFunctors {
+trait Monads extends UnitFunctors
   type M [+A] <: Monad[A]
 
-  trait Monad[+A] extends Functor[A] with rules.Monad[A] {
+  trait Monad[+A] extends Functor[A] with rules.Monad[A]
     this: M[A] =>
-    def map[B](f: A => B) = flatMap { a =>
+    def map[B](f: A => B) = flatMap  a =>
       unit(f(a))
-    }
-  }
 
-  trait ZeroMonad extends Monad[Nothing] with ZeroFunctor {
+  trait ZeroMonad extends Monad[Nothing] with ZeroFunctor
     this: M[Nothing] =>
     def flatMap[B](f: Nothing => M[B]): M[B] = this
-  }
-}
 
-trait StateReader extends Monads {
+trait StateReader extends Monads
   type S
 
   def get: M[S]
   def read[A](f: S => A): M[A]
   def set(s: => S): M[S]
   def update(f: S => S): M[S]
-}

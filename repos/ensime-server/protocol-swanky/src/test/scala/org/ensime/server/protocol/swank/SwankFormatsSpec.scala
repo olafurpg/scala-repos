@@ -6,48 +6,42 @@ import org.ensime.sexp._
 import org.ensime.api._
 import org.ensime.util.{EnsimeSpec, EscapingStringInterpolation}
 
-class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
+class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData
   import SwankFormats._
   import SwankTestData._
 
   import EscapingStringInterpolation._
 
-  def marshal(value: EnsimeServerMessage, via: Option[String]): Unit = {
-    val envelope = value match {
+  def marshal(value: EnsimeServerMessage, via: Option[String]): Unit =
+    val envelope = value match
       case r: RpcResponse => RpcResponseEnvelope(Some(666), value)
       case e: EnsimeEvent => RpcResponseEnvelope(None, value)
-    }
-    val sexp = envelope.toSexp match {
+    val sexp = envelope.toSexp match
       case SexpList(
           SexpSymbol(":return") :: SexpList(
           SexpSymbol(":ok") :: payload :: Nil) :: SexpNumber(callId) :: Nil
           ) if callId == 666 =>
         payload
       case payload => payload
-    }
-    via match {
+    via match
       case None => println(s"$value = ${sexp.compactPrint}")
       // using String form because SexpSymbol("nil") for BasicTypeHint is not commutative
       case Some(expected) => sexp.compactPrint shouldBe expected
-    }
-  }
   def marshal(value: EnsimeServerMessage, via: String): Unit =
     marshal(value, Some(via))
 
-  def unmarshal(from: String, to: RpcRequest): Unit = {
+  def unmarshal(from: String, to: RpcRequest): Unit =
     val sexp = s"(:swank-rpc ${from} 666)"
     //println(sexp + " => " + sexp.parseSexp)
     sexp.parseSexp.convertTo[RpcRequestEnvelope].req shouldBe to
-  }
 
-  "SWANK Formats" should "unmarshal startup messages" in {
+  "SWANK Formats" should "unmarshal startup messages" in
     unmarshal(
         "(swank:connection-info)",
         ConnectionInfoReq: RpcRequest
     )
-  }
 
-  it should "unmarshal RpcSearchRequests" in {
+  it should "unmarshal RpcSearchRequests" in
     unmarshal(
         """(swank:public-symbol-search ("foo" "bar") 10)""",
         PublicSymbolSearchReq(List("foo", "bar"), 10): RpcRequest
@@ -57,9 +51,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         s"""(swank:import-suggestions "$file1" 1 ("foo" "bar") 10)""",
         ImportSuggestionsReq(Left(file1), 1, List("foo", "bar"), 10): RpcRequest
     )
-  }
 
-  it should "unmarshal RpcAnalyserRequests" in {
+  it should "unmarshal RpcAnalyserRequests" in
     unmarshal(
         s"""(swank:remove-file "$file1")""",
         RemoveFileReq(file1): RpcRequest
@@ -230,9 +223,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         s"""(swank:structure-view (:file "$file1" :contents "{/* code here */}" :contents-in "$file2"))""",
         StructureViewReq(sourceFileInfo): RpcRequest
     )
-  }
 
-  it should "unmarshal RpcDebugRequests" in {
+  it should "unmarshal RpcDebugRequests" in
     unmarshal(
         """(swank:debug-active-vm)""",
         DebugActiveVmReq: RpcRequest
@@ -322,9 +314,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         s"""(swank:debug-backtrace "13" 100 200)""",
         DebugBacktraceReq(dtid, 100, 200): RpcRequest
     )
-  }
 
-  it should "marshal EnsimeGeneralEvent as EnsimeEvent" in {
+  it should "marshal EnsimeGeneralEvent as EnsimeEvent" in
     marshal(
         SendBackgroundMessageEvent("ABCDEF", 1): EnsimeEvent,
         """(:background-message 1 "ABCDEF")"""
@@ -357,9 +348,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         ClearAllScalaNotesEvent: EnsimeEvent,
         "(:clear-all-scala-notes)"
     )
-  }
 
-  it should "marshal DebugEvent as EnsimeEvent" in {
+  it should "marshal DebugEvent as EnsimeEvent" in
     marshal(
         DebugOutputEvent("XXX"): EnsimeEvent,
         """(:debug-event (:type output :body "XXX"))"""
@@ -410,9 +400,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         DebugThreadDeathEvent(dtid): EnsimeEvent,
         """(:debug-event (:type threadDeath :thread-id "13"))"""
     )
-  }
 
-  it should "marshal DebugLocation" in {
+  it should "marshal DebugLocation" in
     marshal(
         DebugObjectReference(57L): DebugLocation,
         """(:type reference :object-id "57")"""
@@ -432,9 +421,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         DebugStackSlot(DebugThreadId(27), 12, 23): DebugLocation,
         """(:type slot :thread-id "27" :frame 12 :offset 23)"""
     )
-  }
 
-  it should "marshal DebugValue" in {
+  it should "marshal DebugValue" in
     marshal(
         DebugPrimitiveValue("summaryStr", "typeNameStr"): DebugValue,
         """(:val-type prim :summary "summaryStr" :type-name "typeNameStr")"""
@@ -522,9 +510,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         DebugVmError(303, "xxxx"): DebugVmStatus,
         """(:type error :error-code 303 :details "xxxx" :status "error")"""
     )
-  }
 
-  it should "marshal various informational types" in {
+  it should "marshal various informational types" in
     marshal(
         note1: Note,
         note1Str
@@ -585,9 +572,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         structureView: StructureView,
         s"""(:view ((:keyword "class" :name "StructureView" :position (:type line :file "$file1" :line 57)) (:keyword "object" :name "StructureView" :position (:type line :file "$file1" :line 59) :members ((:keyword "type" :name "BasicType" :position (:type offset :file "$file1" :offset 456))))))"""
     )
-  }
 
-  it should "marshal search related responses" in {
+  it should "marshal search related responses" in
     marshal(
         new SymbolSearchResults(List(methodSearchRes, typeSearchRes)): SymbolSearchResults,
         s"""((:type method :name "abc" :local-name "a" :decl-as method :pos (:type line :file "$abd" :line 10) :owner-name "ownerStr") (:type type :name "abc" :local-name "a" :decl-as trait :pos (:type line :file "$abd" :line 10)))"""
@@ -607,9 +593,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         typeSearchRes: SymbolSearchResult,
         s"""(:type type :name "abc" :local-name "a" :decl-as trait :pos (:type line :file "$abd" :line 10))"""
     )
-  }
 
-  it should "marshal ranges and semantic highlighting" in {
+  it should "marshal ranges and semantic highlighting" in
     marshal(
         ERangePositions(ERangePosition(batchSourceFile, 75, 70, 90) :: Nil),
         s"""((:file "$batchSourceFile" :offset 75 :start 70 :end 90))"""
@@ -645,9 +630,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
                                    true))): ImplicitInfos,
         s"""((:type param :start 5 :end 6 :fun $symbolInfoStr :params ($symbolInfoStr $symbolInfoStr) :fun-is-implicit t))"""
     )
-  }
 
-  it should "marshal refactoring messages" in {
+  it should "marshal refactoring messages" in
     marshal(
         RefactorFailure(7, "message"): RefactorFailure,
         """(:procedure-id 7 :reason "message" :status failure)"""
@@ -667,9 +651,8 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         refactorDiffEffect: RefactorDiffEffect,
         s"""(:procedure-id 9 :refactor-type addImport :diff "$file2")"""
     )
-  }
 
-  it should "marshal legacy raw response types" in {
+  it should "marshal legacy raw response types" in
     marshal(
         FalseResponse,
         "nil"
@@ -689,5 +672,3 @@ class SwankFormatsSpec extends EnsimeSpec with EnsimeTestData {
         VoidResponse,
         """nil"""
     )
-  }
-}

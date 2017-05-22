@@ -18,11 +18,11 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scala.reflect.ClassTag
 
-class ConcurrentHashMapTest extends MapTest {
+class ConcurrentHashMapTest extends MapTest
 
   def factory: ConcurrentHashMapFactory = new ConcurrentHashMapFactory
 
-  @Test def `should give proper Enumerator over elements`(): Unit = {
+  @Test def `should give proper Enumerator over elements`(): Unit =
     val chm = factory.empty[String, String]
 
     chm.put("ONE", "one")
@@ -30,9 +30,8 @@ class ConcurrentHashMapTest extends MapTest {
     assertTrue(elements.hasNext)
     assertEquals("one", elements.nextElement)
     assertFalse(elements.hasNext)
-  }
 
-  @Test def `should replace contained items`(): Unit = {
+  @Test def `should replace contained items`(): Unit =
     val chm = factory.empty[String, String]
 
     chm.put("ONE", "one")
@@ -51,15 +50,12 @@ class ConcurrentHashMapTest extends MapTest {
 
     assertTrue(chm.replace("ONE", "two", "one"))
     assertEquals("one", chm.get("ONE"))
-  }
-}
 
-object ConcurrentHashMapFactory extends ConcurrentHashMapFactory {
+object ConcurrentHashMapFactory extends ConcurrentHashMapFactory
   def allFactories: Iterator[ConcurrentHashMapFactory] =
     Iterator(ConcurrentHashMapFactory)
-}
 
-class ConcurrentHashMapFactory extends ConcurrentMapFactory {
+class ConcurrentHashMapFactory extends ConcurrentMapFactory
   def implementationName: String =
     "java.util.concurrent.ConcurrentHashMap"
 
@@ -70,4 +66,3 @@ class ConcurrentHashMapFactory extends ConcurrentMapFactory {
   def allowsNullKeys: Boolean = false
 
   def allowsNullValues: Boolean = false
-}

@@ -10,28 +10,26 @@ package scala.tools.nsc.interactive
   *
   */
 final class PresentationCompilerThread(var compiler: Global, name: String = "")
-    extends Thread("Scala Presentation Compiler [" + name + "]") {
+    extends Thread("Scala Presentation Compiler [" + name + "]")
 
   /** The presentation compiler loop.
     */
-  override def run() {
+  override def run()
     compiler.debugLog("starting new runner thread")
-    while (compiler ne null) try {
+    while (compiler ne null) try
       compiler.checkNoResponsesOutstanding()
-      compiler.log.logreplay("wait for more work", {
+      compiler.log.logreplay("wait for more work",
         compiler.scheduler.waitForMoreWork(); true
-      })
+      )
       compiler.pollForWork(compiler.NoPosition)
-      while (compiler.isOutOfDate) {
-        try {
+      while (compiler.isOutOfDate)
+        try
           compiler.backgroundCompile()
-        } catch {
+        catch
           case ex: FreshRunReq =>
             compiler.debugLog("fresh run req caught, starting new pass")
-        }
         compiler.log.flush()
-      }
-    } catch {
+    catch
       case ex @ ShutdownReq =>
         compiler.debugLog("exiting presentation compiler")
         compiler.log.close()
@@ -41,7 +39,7 @@ final class PresentationCompilerThread(var compiler: Global, name: String = "")
       case ex: Throwable =>
         compiler.log.flush()
 
-        ex match {
+        ex match
           case ex: FreshRunReq =>
             compiler.debugLog(
                 "fresh run req caught outside presentation compiler loop; ignored") // This shouldn't be reported
@@ -51,7 +49,3 @@ final class PresentationCompilerThread(var compiler: Global, name: String = "")
                 "validate exception caught outside presentation compiler loop; ignored")
           case _ =>
             ex.printStackTrace(); compiler.informIDE("Fatal Error: " + ex)
-        }
-    }
-  }
-}

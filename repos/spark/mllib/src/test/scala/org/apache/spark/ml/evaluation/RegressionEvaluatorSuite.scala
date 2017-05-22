@@ -26,13 +26,12 @@ import org.apache.spark.mllib.util.TestingUtils._
 
 class RegressionEvaluatorSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new RegressionEvaluator)
-  }
 
-  test("Regression Evaluator: default params") {
+  test("Regression Evaluator: default params")
 
     /**
       * Here is the instruction describing how to export the test data into CSV format
@@ -83,13 +82,10 @@ class RegressionEvaluatorSuite
     // mae
     evaluator.setMetricName("mae")
     assert(evaluator.evaluate(predictions) ~== 0.08399089 absTol 0.01)
-  }
 
-  test("read/write") {
+  test("read/write")
     val evaluator = new RegressionEvaluator()
       .setPredictionCol("myPrediction")
       .setLabelCol("myLabel")
       .setMetricName("r2")
     testDefaultReadWrite(evaluator)
-  }
-}

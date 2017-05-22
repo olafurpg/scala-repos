@@ -7,7 +7,7 @@ package testSep { class C { object O } }
 package testSep2 { object `package` { object PO; def bar = 0 } }
 class DSep { object P }
 
-object Test extends CompilerTest {
+object Test extends CompilerTest
   import global._
   override def extraSettings = super.extraSettings + " -d " + testOutput.path
   override def sources = List(
@@ -17,8 +17,8 @@ object Test extends CompilerTest {
     package test2 { object `package` { object PO; def bar = 0 } }
     """
   )
-  def check(source: String, unit: CompilationUnit) = enteringTyper {
-    def checkTree(msg: String, t: => Tree) = {
+  def check(source: String, unit: CompilationUnit) = enteringTyper
+    def checkTree(msg: String, t: => Tree) =
       val run = currentRun
       import run._
       val phases = List(typerPhase,
@@ -32,20 +32,16 @@ object Test extends CompilerTest {
                         flattenPhase,
                         mixinPhase,
                         cleanupPhase)
-      for (phase <- phases) {
-        enteringPhase(phase) {
+      for (phase <- phases)
+        enteringPhase(phase)
           val error = t.exists(t => t.symbol == NoSymbol)
           val errorStr = if (error) "!!!" else " - "
           println(f"$phase%18s [$msg%12s] $errorStr $t")
-        }
-      }
       println("")
-    }
     import rootMirror._
 
     println("\n\nJoint Compilation:\n")
 
-    {
       val c = staticClass("test.C")
       val o = c.info.decl(TermName("O"))
       checkTree("O", gen.mkAttributedQualifier(o.moduleClass.thisType))
@@ -57,11 +53,9 @@ object Test extends CompilerTest {
       checkTree("test2.PO", gen.mkAttributedQualifier(po.moduleClass.thisType))
       checkTree("test2.bar",
                 gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
-    }
 
     println("\n\nSeparate Compilation:\n")
 
-    {
       val c = typeOf[testSep.C].typeSymbol
       val o = c.info.decl(TermName("O"))
       checkTree("O", gen.mkAttributedQualifier(o.moduleClass.thisType))
@@ -73,6 +67,3 @@ object Test extends CompilerTest {
       checkTree("PO", gen.mkAttributedQualifier(po.moduleClass.thisType))
       checkTree("testSep2.bar",
                 gen.mkAttributedRef(po.owner.info.decl(TermName("bar"))))
-    }
-  }
-}

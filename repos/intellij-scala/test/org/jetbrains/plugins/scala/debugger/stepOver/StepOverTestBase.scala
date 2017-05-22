@@ -9,14 +9,13 @@ import scala.io.Source
 /**
   * @author Nikolay.Tropin
   */
-abstract class StepOverTestBase extends ScalaDebuggerTestCase {
-  def doStepOver(): Unit = {
+abstract class StepOverTestBase extends ScalaDebuggerTestCase
+  def doStepOver(): Unit =
     val stepOverCommand =
       getDebugProcess.createStepOverCommand(suspendContext, false)
     getDebugProcess.getManagerThread.invokeAndWait(stepOverCommand)
-  }
 
-  def testStepThrough(expectedLineNumbers: Seq[Int]): Unit = {
+  def testStepThrough(expectedLineNumbers: Seq[Int]): Unit =
     val file = getFileInSrc(mainFileName)
     val lines = Source.fromFile(file).getLines().toSeq
     Assert.assertTrue(
@@ -26,42 +25,31 @@ abstract class StepOverTestBase extends ScalaDebuggerTestCase {
                       lines(1).trim.startsWith("def main") &&
                       lines(2).trim.nonEmpty)
 
-    def checkLine(expectedLineNumber: Int): Unit = {
+    def checkLine(expectedLineNumber: Int): Unit =
       val actualLineNumber = currentLineNumber
-      if (actualLineNumber != expectedLineNumber) {
-        val message = {
+      if (actualLineNumber != expectedLineNumber)
+        val message =
           val actualLine = lines(actualLineNumber)
           val expectedLine = lines(expectedLineNumber)
           s"""Wrong line number.
               |Expected $expectedLineNumber: $expectedLine
               |Actual $actualLineNumber: $actualLine""".stripMargin
-        }
         Assert.fail(message)
-      }
-    }
 
     val expectedNumbers = expectedLineNumbers.toIterator
-    runDebugger(mainClassName) {
-      while (!processTerminatedNoBreakpoints()) {
+    runDebugger(mainClassName)
+      while (!processTerminatedNoBreakpoints())
         if (expectedNumbers.hasNext) checkLine(expectedNumbers.next())
-        else {
+        else
           val lineNumber = currentLineNumber
           Assert.fail(
               s"No expected lines left, stopped at line $lineNumber: ${lines(lineNumber)}")
-        }
         doStepOver()
-      }
-    }
-  }
 
-  private def currentLineNumber: Int = {
-    managed[Integer] {
+  private def currentLineNumber: Int =
+    managed[Integer]
       val location = suspendContext.getFrameProxy.location
-      inReadAction {
+      inReadAction
         new ScalaPositionManager(getDebugProcess)
           .getSourcePosition(location)
           .getLine
-      }
-    }
-  }
-}

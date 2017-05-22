@@ -1,3 +1,2 @@
-object PublishedIvy {
+object PublishedIvy
   val x = 4
-}

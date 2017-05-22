@@ -23,7 +23,7 @@ import java.util.Arrays.binarySearch
   * r(21) == 0 // Wraps around; it's a ring!
   * }}}
   */
-class Ring(positions: Array[Int]) {
+class Ring(positions: Array[Int])
   require(positions.nonEmpty)
   private[this] val N = positions.length
 
@@ -36,32 +36,28 @@ class Ring(positions: Array[Int]) {
   //
   // We also avoid overflow issues by using Longs to represent
   // positions.
-  private[this] val nodes: Array[Long] = {
+  private[this] val nodes: Array[Long] =
     val n = new Array[Long](N * 2)
-    for (i <- positions.indices) {
+    for (i <- positions.indices)
       n(i) = positions(i).toLong
       n(i + N) = positions.last + positions(i).toLong
-    }
     n
-  }
 
   /**
     * Compute the index of the given position.
     */
-  private[this] def index(pos: Long): Int = {
+  private[this] def index(pos: Long): Int =
     // We don't search over the entire range here in case the position
     // is out of bounds, which in any case would snap to the last index.
-    var i = binarySearch(nodes, 0, N * 2, pos) match {
+    var i = binarySearch(nodes, 0, N * 2, pos) match
       case i if i < 0 => -1 - i
       case i => i
-    }
 
     // In the case where positions overlap, we always
     // select the first one. This is to support zero weights.
     while (i > 0 && nodes(i) == nodes(i - 1)) i -= 1
 
     i
-  }
 
   /**
     * Compute the width of the given index.
@@ -109,7 +105,7 @@ class Ring(positions: Array[Int]) {
     * @param off The offset from which to pick.
     * @param wid The width of the range.
     */
-  def pick2(rng: Rng, off: Int, wid: Int): (Int, Int) = {
+  def pick2(rng: Rng, off: Int, wid: Int): (Int, Int) =
     // We pick element a from the full range [off, off+wid); element b
     // is picked from "piecewise" range we get by subtracting the range
     // of a, i.e.: [off, begin(a)), [end(a), off+wid).
@@ -139,21 +135,16 @@ class Ring(positions: Array[Int]) {
     if (pos >= ae - discount) pos += discount
 
     (a % N, index(pos) % N)
-  }
-}
 
-object Ring {
+object Ring
 
   /**
     * Returns a ring with `numSlices` slices and width `width`.
     */
-  def apply(numSlices: Int, width: Int): Ring = {
+  def apply(numSlices: Int, width: Int): Ring =
     require(numSlices > 0)
     require(width >= numSlices, "ring not wide enough")
     val unit = width / numSlices.toDouble
-    val positions = Array.tabulate(numSlices) { i =>
+    val positions = Array.tabulate(numSlices)  i =>
       ((i + 1) * unit).toInt
-    }
     new Ring(positions)
-  }
-}

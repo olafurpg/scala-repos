@@ -31,16 +31,14 @@ import javax.naming.{Context, InitialContext}
 
 trait DB1
 
-object DB1 {
+object DB1
   implicit def db1ToDb(in: DB1): DB = DB.theDB
-}
 
-object DB extends DB1 {
+object DB extends DB1
 
   private[db] lazy val theDB = new DB {}
-}
 
-trait DB extends Loggable {
+trait DB extends Loggable
   private val threadStore =
     new ThreadLocal[HashMap[ConnectionIdentifier, ConnectionHolder]]
   private val _postCommitFuncs = new ThreadLocal[List[() => Unit]]
@@ -52,10 +50,9 @@ trait DB extends Loggable {
   type LogFunc = (DBLog, Long) => Any
   private var logFuncs: List[LogFunc] = Nil
 
-  def addLogFunc(f: LogFunc): List[LogFunc] = {
+  def addLogFunc(f: LogFunc): List[LogFunc] =
     logFuncs = logFuncs ::: List(f)
     logFuncs
-  }
 
   def loggingEnabled_? = !logFuncs.isEmpty
 
@@ -65,17 +62,15 @@ trait DB extends Loggable {
     * Use S.queryLog to get the list of (statement, duration) entries or set an analyzer function using
     * S.addAnalyzer
     */
-  @volatile var queryCollector: LogFunc = {
+  @volatile var queryCollector: LogFunc =
     case (query: DBLog, time) =>
-  }
 
   /**
     * Try to obtain a Connection using the jndiName of the ConnectionIdentifier
     */
-  private def jndiConnection(name: ConnectionIdentifier): Box[Connection] = {
+  private def jndiConnection(name: ConnectionIdentifier): Box[Connection] =
     val toTry: List[() => Connection] = List(
         () =>
-          {
             logger.trace(
                 "Trying JNDI lookup on java:/comp/env followed by lookup on %s"
                   .format(name.jndiName))
@@ -85,35 +80,30 @@ trait DB extends Loggable {
               .lookup(name.jndiName)
               .asInstanceOf[DataSource]
               .getConnection
-        },
+        ,
         () =>
-          {
             logger.trace("Trying JNDI lookup on java:/comp/env/%s".format(
                     name.jndiName))
             (new InitialContext)
               .lookup("java:/comp/env/" + name.jndiName)
               .asInstanceOf[DataSource]
               .getConnection
-        },
+        ,
         () =>
-          {
             logger.trace("Trying JNDI lookup on %s".format(name.jndiName))
             (new InitialContext)
               .lookup(name.jndiName)
               .asInstanceOf[DataSource]
               .getConnection
-        }
     )
 
     first(toTry)(f =>
-          tryo { t: Throwable =>
+          tryo  t: Throwable =>
         logger.trace("JNDI Lookup failed: " + t)
-      }(f())) or {
+      (f())) or
       logger.trace(
           "Unable to obtain Connection for JNDI name %s".format(name.jndiName))
       Empty
-    }
-  }
 
   /**
     * can we get a JDBC connection from JNDI?
@@ -128,64 +118,57 @@ trait DB extends Loggable {
     new ThreadGlobal[Map[ConnectionIdentifier, ConnectionManager]]
 
   def defineConnectionManager(
-      name: ConnectionIdentifier, mgr: ConnectionManager) {
+      name: ConnectionIdentifier, mgr: ConnectionManager)
     connectionManagers(name) = mgr
-  }
 
   /**
     * Allows you to override the connection manager associated with particular connection identifiers for the duration
     * of the call.
     */
   def doWithConnectionManagers[T](
-      mgrs: (ConnectionIdentifier, ConnectionManager)*)(f: => T): T = {
+      mgrs: (ConnectionIdentifier, ConnectionManager)*)(f: => T): T =
     val newMap =
       mgrs.foldLeft(threadLocalConnectionManagers.box openOr Map())(_ + _)
     threadLocalConnectionManagers.doWith(newMap)(f)
-  }
 
   case class ConnectionHolder(conn: SuperConnection,
                               cnt: Int,
                               postTransaction: List[Boolean => Unit],
                               rolledBack: Boolean)
 
-  private def info: HashMap[ConnectionIdentifier, ConnectionHolder] = {
-    threadStore.get match {
+  private def info: HashMap[ConnectionIdentifier, ConnectionHolder] =
+    threadStore.get match
       case null =>
         val tinfo = new HashMap[ConnectionIdentifier, ConnectionHolder]
         threadStore.set(tinfo)
         tinfo
 
       case v => v
-    }
-  }
 
   private def postCommit: List[() => Unit] =
-    _postCommitFuncs.get match {
+    _postCommitFuncs.get match
       case null =>
         _postCommitFuncs.set(Nil)
         Nil
 
       case v => v
-    }
 
   private def postCommit_=(lst: List[() => Unit]): Unit =
     _postCommitFuncs.set(lst)
 
   // remove thread-local association
-  private def clearThread(success: Boolean): Unit = {
+  private def clearThread(success: Boolean): Unit =
     val ks = info.keySet
-    if (ks.isEmpty) {
+    if (ks.isEmpty)
       postCommit.foreach(f => tryo(f.apply()))
 
       _postCommitFuncs.remove
       threadStore.remove
-    } else {
+    else
       ks.foreach(n => releaseConnectionNamed(n, !success))
       clearThread(success)
-    }
-  }
 
-  private def newConnection(name: ConnectionIdentifier): SuperConnection = {
+  private def newConnection(name: ConnectionIdentifier): SuperConnection =
     def cmSuperConnection(cm: ConnectionManager): Box[SuperConnection] =
       cm.newSuperConnection(name) or cm
         .newConnection(name)
@@ -193,49 +176,44 @@ trait DB extends Loggable {
 
     def jndiSuperConnection: Box[SuperConnection] =
       jndiConnection(name).map(c =>
-            {
           val uniqueId =
             if (logger.isDebugEnabled) Helpers.nextNum.toString else ""
           logger.debug("Connection ID " + uniqueId +
               " for JNDI connection " + name.jndiName + " opened")
           new SuperConnection(c,
                               () =>
-                                {
                                   logger.debug("Connection ID " + uniqueId +
                                       " for JNDI connection " +
                                       name.jndiName + " closed"); c.close
-                              })
-      })
+                              )
+      )
 
-    val cmConn = for {
+    val cmConn = for
       connectionManager <- threadLocalConnectionManagers.box.flatMap(
           _.get(name)) or Box(connectionManagers.get(name))
       connection <- cmSuperConnection(connectionManager)
-    } yield connection
+    yield connection
 
     val ret = cmConn or jndiSuperConnection
 
     ret.foreach(_.setAutoCommit(false))
 
-    ret openOr {
+    ret openOr
       throw new NullPointerException(
           "Looking for Connection Identifier " +
           name + " but failed to find either a JNDI data source " +
           "with the name " + name.jndiName +
           " or a lift connection manager with the correct name")
-    }
-  }
 
   private class ThreadBasedConnectionManager(
-      connections: List[ConnectionIdentifier]) {
+      connections: List[ConnectionIdentifier])
     private var used: Set[ConnectionIdentifier] = Set()
 
     def use(conn: ConnectionIdentifier): Int =
-      if (connections.contains(conn)) {
+      if (connections.contains(conn))
         used += conn
         1
-      } else 0
-  }
+      else 0
 
   private object CurrentConnectionSet
       extends DynoVar[ThreadBasedConnectionManager]
@@ -267,102 +245,87 @@ trait DB extends Loggable {
     */
   def buildLoanWrapper(
       eager: Boolean, in: List[ConnectionIdentifier]): LoanWrapper =
-    new LoanWrapper {
+    new LoanWrapper
       private object DepthCnt extends DynoVar[Boolean]
 
       def apply[T](f: => T): T =
         if (DepthCnt.is == Full(true)) f
         else
-          DepthCnt.run(true) {
+          DepthCnt.run(true)
 
             var success = false
-            if (eager) {
-              def recurseMe(lst: List[ConnectionIdentifier]): T = lst match {
+            if (eager)
+              def recurseMe(lst: List[ConnectionIdentifier]): T = lst match
                 case Nil =>
-                  try {
-                    try {
+                  try
+                    try
                       val ret = f
                       success = !S.exceptionThrown_?
                       ret
-                    } catch {
+                    catch
                       // this is the case when we want to commit the transaction
                       // but continue to throw the exception
-                      case e: LiftFlowOfControlException => {
+                      case e: LiftFlowOfControlException =>
                           success = !S.exceptionThrown_?
                           throw e
-                        }
-                    }
-                  } finally {
+                  finally
                     clearThread(success)
-                  }
 
                 case x :: xs =>
-                  DB.use(x) { ignore =>
+                  DB.use(x)  ignore =>
                     recurseMe(xs)
-                  }
-              }
               recurseMe(in)
-            } else {
-              CurrentConnectionSet.run(new ThreadBasedConnectionManager(in)) {
-                try {
-                  try {
+            else
+              CurrentConnectionSet.run(new ThreadBasedConnectionManager(in))
+                try
+                  try
                     val ret = f
                     success = !S.exceptionThrown_?
                     ret
-                  } catch {
+                  catch
                     // this is the case when we want to commit the transaction
                     // but continue to throw the exception
-                    case e: LiftFlowOfControlException => {
+                    case e: LiftFlowOfControlException =>
                         success = !S.exceptionThrown_?
                         throw e
-                      }
-                  }
-                } finally {
+                finally
                   clearThread(success)
-                }
-              }
-            }
-          }
-    }
 
   private def releaseConnection(conn: SuperConnection): Unit = conn.close
 
   private def calcBaseCount(conn: ConnectionIdentifier): Int =
     CurrentConnectionSet.is.map(_.use(conn)) openOr 0
 
-  private def getConnection(name: ConnectionIdentifier): SuperConnection = {
+  private def getConnection(name: ConnectionIdentifier): SuperConnection =
     logger.trace("Acquiring " + name + " On thread " + Thread.currentThread)
-    var ret = info.get(name) match {
+    var ret = info.get(name) match
       case None =>
         ConnectionHolder(
             newConnection(name), calcBaseCount(name) + 1, Nil, false)
       case Some(ConnectionHolder(conn, cnt, post, rb)) =>
         ConnectionHolder(conn, cnt + 1, post, rb)
-    }
     info(name) = ret
     logger.trace("Acquired " + name + " on thread " + Thread.currentThread +
         " count " + ret.cnt)
     ret.conn
-  }
 
   private def releaseConnectionNamed(
-      name: ConnectionIdentifier, rollback: Boolean) {
+      name: ConnectionIdentifier, rollback: Boolean)
     logger.trace("Request to release %s on thread %s, auto rollback=%s".format(
             name, Thread.currentThread, rollback))
 
-    (info.get(name): @unchecked) match {
-      case Some(ConnectionHolder(c, 1, post, manualRollback)) => {
+    (info.get(name): @unchecked) match
+      case Some(ConnectionHolder(c, 1, post, manualRollback)) =>
           // stale and unexpectedly closed connections may throw here
-          try {
-            if (!(c.getAutoCommit() || manualRollback)) {
+          try
+            if (!(c.getAutoCommit() || manualRollback))
               if (rollback) c.rollback
               else c.commit
-            }
-          } catch {
+          catch
             case e: SQLException =>
               logger.error(
                   "Swallowed exception during connection release. ", e)
-          } finally {
+          finally
             tryo(c.releaseFunc())
             info -= name
             val rolledback = rollback | manualRollback
@@ -372,16 +335,12 @@ trait DB extends Loggable {
             post.reverse.foreach(f => tryo(f(!rolledback)))
             logger.trace(
                 "Released %s on thread %s".format(name, Thread.currentThread))
-          }
-        }
       case Some(ConnectionHolder(c, n, post, rb)) =>
         logger.trace("Did not release " + name + " on thread " +
             Thread.currentThread + " count " + (n - 1))
         info(name) = ConnectionHolder(c, n - 1, post, rb)
       case x =>
       // ignore
-    }
-  }
 
   /**
     * Append a function to be invoked after the transaction on the specified connection identifier has ended.
@@ -391,8 +350,8 @@ trait DB extends Loggable {
     * the context of a buildLoanWrapper or a DB.use {}
     */
   def appendPostTransaction(
-      name: ConnectionIdentifier, func: Boolean => Unit) {
-    info.get(name) match {
+      name: ConnectionIdentifier, func: Boolean => Unit)
+    info.get(name) match
       case Some(ConnectionHolder(c, n, post, rb)) =>
         info(name) = ConnectionHolder(c, n, func :: post, rb)
         logger.trace(
@@ -401,8 +360,6 @@ trait DB extends Loggable {
       case _ =>
         throw new IllegalStateException(
             "Tried to append postTransaction function on illegal ConnectionIdentifer or outside transaction context")
-    }
-  }
 
   /**
     * Append function to be invoked after the current transaction on DefaultConnectionIdentifier has ended
@@ -411,52 +368,44 @@ trait DB extends Loggable {
   def appendPostTransaction(func: Boolean => Unit): Unit =
     appendPostTransaction(DefaultConnectionIdentifier, func)
 
-  private def runLogger(logged: Statement, time: Long) = logged match {
+  private def runLogger(logged: Statement, time: Long) = logged match
     case st: DBLog => logFuncs.foreach(_ (st, time))
     case _ => // NOP
-  }
 
-  def statement[T](db: SuperConnection)(f: (Statement) => T): T = {
-    Helpers.calcTime {
+  def statement[T](db: SuperConnection)(f: (Statement) => T): T =
+    Helpers.calcTime
       val st =
-        if (loggingEnabled_?) {
+        if (loggingEnabled_?)
           DBLog.createStatement(db.connection)
-        } else {
+        else
           db.createStatement
-        }
 
       queryTimeout.foreach(to => st.setQueryTimeout(to))
-      try {
+      try
         (st, f(st))
-      } finally {
+      finally
         st.close
-      }
-    } match {
+    match
       case (time, (query, res)) => runLogger(query, time); res
-    }
-  }
 
   def exec[T](db: SuperConnection, query: String)(f: (ResultSet) => T): T =
-    statement(db) { st =>
+    statement(db)  st =>
       f(st.executeQuery(query))
-    }
 
   private def asString(
-      pos: Int, rs: ResultSet, md: ResultSetMetaData): String = {
+      pos: Int, rs: ResultSet, md: ResultSetMetaData): String =
     import java.sql.Types._
-    md.getColumnType(pos) match {
+    md.getColumnType(pos) match
       case ARRAY | BINARY | BLOB | DATALINK | DISTINCT | JAVA_OBJECT |
           LONGVARBINARY | NULL | OTHER | REF | STRUCT | VARBINARY =>
-        rs.getObject(pos) match {
+        rs.getObject(pos) match
           case null => null
           case s => s.toString
-        }
 
       case DECIMAL | NUMERIC =>
-        rs.getBigDecimal(pos) match {
+        rs.getBigDecimal(pos) match
           case null => null
           case x => x.toString
-        }
 
       case BIGINT | INTEGER | /* DECIMAL | NUMERIC | */ SMALLINT | TINYINT =>
         checkNull(rs, pos, rs.getLong(pos).toString)
@@ -466,27 +415,23 @@ trait DB extends Loggable {
       case VARCHAR | CHAR | CLOB | LONGVARCHAR => rs.getString(pos)
 
       case DATE | TIME | TIMESTAMP =>
-        rs.getTimestamp(pos) match {
+        rs.getTimestamp(pos) match
           case null => null
           case x => x.toString
-        }
 
       case DOUBLE | FLOAT | REAL =>
         checkNull(rs, pos, rs.getDouble(pos).toString)
-    }
-  }
 
   /*
    If the column is null, return null rather than the boxed primitive
    */
-  def checkNull[T](rs: ResultSet, pos: Int, res: => T): T = {
+  def checkNull[T](rs: ResultSet, pos: Int, res: => T): T =
     if (null eq rs.getObject(pos)) null.asInstanceOf[T]
     else res
-  }
 
-  private def asAny(pos: Int, rs: ResultSet, md: ResultSetMetaData): Any = {
+  private def asAny(pos: Int, rs: ResultSet, md: ResultSetMetaData): Any =
     import java.sql.Types._
-    md.getColumnType(pos) match {
+    md.getColumnType(pos) match
       case ARRAY | BINARY | BLOB | DATALINK | DISTINCT | JAVA_OBJECT |
           LONGVARBINARY | NULL | OTHER | REF | STRUCT | VARBINARY =>
         rs.getObject(pos)
@@ -503,10 +448,8 @@ trait DB extends Loggable {
       case DATE | TIME | TIMESTAMP => rs.getTimestamp(pos)
 
       case DOUBLE | FLOAT | REAL => checkNull(rs, pos, rs.getDouble(pos))
-    }
-  }
 
-  def resultSetTo(rs: ResultSet): (List[String], List[List[String]]) = {
+  def resultSetTo(rs: ResultSet): (List[String], List[List[String]]) =
     val md = rs.getMetaData
     val cnt = md.getColumnCount
     val cntList = (1 to cnt).toList
@@ -514,14 +457,12 @@ trait DB extends Loggable {
 
     val lb = new ListBuffer[List[String]]()
 
-    while (rs.next) {
+    while (rs.next)
       lb += cntList.map(i => asString(i, rs, md))
-    }
 
     (colNames, lb.toList)
-  }
 
-  def resultSetToAny(rs: ResultSet): (List[String], List[List[Any]]) = {
+  def resultSetToAny(rs: ResultSet): (List[String], List[List[Any]]) =
     val md = rs.getMetaData
     val cnt = md.getColumnCount
     val cntList = (1 to cnt).toList
@@ -529,20 +470,18 @@ trait DB extends Loggable {
 
     val lb = new ListBuffer[List[Any]]()
 
-    while (rs.next) {
+    while (rs.next)
       lb += cntList.map(i => asAny(i, rs, md))
-    }
 
     (colNames, lb.toList)
-  }
 
   /*
    * This method handles the common task of setting arguments on a prepared
    * statement based on argument type. Returns the properly updated PreparedStatement.
    */
   private def setPreparedParams(
-      ps: PreparedStatement, params: List[Any]): PreparedStatement = {
-    params.zipWithIndex.foreach {
+      ps: PreparedStatement, params: List[Any]): PreparedStatement =
+    params.zipWithIndex.foreach
       case (null, idx) => ps.setNull(idx + 1, Types.VARCHAR)
       case (i: Int, idx) => ps.setInt(idx + 1, i)
       case (l: Long, idx) => ps.setLong(idx + 1, l)
@@ -560,9 +499,7 @@ trait DB extends Loggable {
       case (s: String, idx) => ps.setString(idx + 1, s)
       case (bn: java.math.BigDecimal, idx) => ps.setBigDecimal(idx + 1, bn)
       case (obj, idx) => ps.setObject(idx + 1, obj)
-    }
     ps
-  }
 
   /**
     * Executes the given parameterized query string with the given parameters.
@@ -583,13 +520,12 @@ trait DB extends Loggable {
   def runQuery(query: String,
                params: List[Any],
                connectionIdentifier: ConnectionIdentifier)
-    : (List[String], List[List[String]]) = {
+    : (List[String], List[List[String]]) =
     use(connectionIdentifier)(
         conn =>
-          prepareStatement(query, conn) { ps =>
+          prepareStatement(query, conn)  ps =>
         resultSetTo(setPreparedParams(ps, params).executeQuery)
-    })
-  }
+    )
 
   /**
     * Executes the given parameterized query string with the given parameters.
@@ -610,13 +546,12 @@ trait DB extends Loggable {
   def performQuery(query: String,
                    params: List[Any],
                    connectionIdentifier: ConnectionIdentifier)
-    : (List[String], List[List[Any]]) = {
+    : (List[String], List[List[Any]]) =
     use(connectionIdentifier)(
         conn =>
-          prepareStatement(query, conn) { ps =>
+          prepareStatement(query, conn)  ps =>
         resultSetToAny(setPreparedParams(ps, params).executeQuery)
-    })
-  }
+    )
 
   /**
     * Executes the given parameterized update string with the given parameters.
@@ -635,13 +570,12 @@ trait DB extends Loggable {
     */
   def runUpdate(query: String,
                 params: List[Any],
-                connectionIdentifier: ConnectionIdentifier): Int = {
+                connectionIdentifier: ConnectionIdentifier): Int =
     use(connectionIdentifier)(
         conn =>
-          prepareStatement(query, conn) { ps =>
+          prepareStatement(query, conn)  ps =>
         setPreparedParams(ps, params).executeUpdate
-    })
-  }
+    )
 
   def runQuery(query: String): (List[String], List[List[String]]) =
     use(DefaultConnectionIdentifier)(conn => exec(conn, query)(resultSetTo))
@@ -649,8 +583,8 @@ trait DB extends Loggable {
   def performQuery(query: String): (List[String], List[List[Any]]) =
     use(DefaultConnectionIdentifier)(conn => exec(conn, query)(resultSetToAny))
 
-  def rollback(name: ConnectionIdentifier): Unit = {
-    info.get(name) match {
+  def rollback(name: ConnectionIdentifier): Unit =
+    info.get(name) match
       case Some(ConnectionHolder(c, n, post, _)) =>
         info(name) = ConnectionHolder(c, n, post, true)
         logger.trace("Manual rollback on %s".format(name))
@@ -658,8 +592,6 @@ trait DB extends Loggable {
       case _ =>
         throw new IllegalStateException(
             "Tried to rollback transaction on illegal ConnectionIdentifer or outside transaction context")
-    }
-  }
 
   def rollback: Unit = rollback(DefaultConnectionIdentifier)
 
@@ -667,16 +599,14 @@ trait DB extends Loggable {
     * Executes  { @code statement } and converts the  { @code ResultSet } to model
     * instance  { @code T } using  { @code f }
     */
-  def exec[T](statement: PreparedStatement)(f: (ResultSet) => T): T = {
+  def exec[T](statement: PreparedStatement)(f: (ResultSet) => T): T =
     queryTimeout.foreach(to => statement.setQueryTimeout(to))
     val rs = statement.executeQuery
-    try {
+    try
       f(rs)
-    } finally {
+    finally
       statement.close
       rs.close
-    }
-  }
 
   /**
     * Prepares the given statement and then passes it to the given function for use. This method
@@ -684,15 +614,13 @@ trait DB extends Loggable {
     * PreparedStatement.
     */
   def prepareStatement[T](statement: String, conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      f: (PreparedStatement) => T): T =
     val st =
-      if (loggingEnabled_?) {
+      if (loggingEnabled_?)
         DBLog.prepareStatement(conn.connection, statement)
-      } else {
+      else
         conn.prepareStatement(statement)
-      }
     runPreparedStatement(st)(f)
-  }
 
   /**
     * Prepares the given statement and then passes it to the given function for use. This method
@@ -704,15 +632,13 @@ trait DB extends Loggable {
     */
   def prepareStatement[T](
       statement: String, autokeys: Int, conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      f: (PreparedStatement) => T): T =
     val st =
-      if (loggingEnabled_?) {
+      if (loggingEnabled_?)
         DBLog.prepareStatement(conn.connection, statement, autokeys)
-      } else {
+      else
         conn.prepareStatement(statement, autokeys)
-      }
     runPreparedStatement(st)(f)
-  }
 
   /**
     * Prepares the given statement and then passes it to the given function for use. This method
@@ -723,15 +649,13 @@ trait DB extends Loggable {
     */
   def prepareStatement[T](
       statement: String, autoColumns: Array[Int], conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      f: (PreparedStatement) => T): T =
     val st =
-      if (loggingEnabled_?) {
+      if (loggingEnabled_?)
         DBLog.prepareStatement(conn.connection, statement, autoColumns)
-      } else {
+      else
         conn.prepareStatement(statement, autoColumns)
-      }
     runPreparedStatement(st)(f)
-  }
 
   /**
     * Prepares the given statement and then passes it to the given function for use. This method
@@ -742,29 +666,24 @@ trait DB extends Loggable {
     */
   def prepareStatement[T](
       statement: String, autoColumns: Array[String], conn: SuperConnection)(
-      f: (PreparedStatement) => T): T = {
+      f: (PreparedStatement) => T): T =
     val st =
-      if (loggingEnabled_?) {
+      if (loggingEnabled_?)
         DBLog.prepareStatement(conn.connection, statement, autoColumns)
-      } else {
+      else
         conn.prepareStatement(statement, autoColumns)
-      }
     runPreparedStatement(st)(f)
-  }
 
   private def runPreparedStatement[T](st: PreparedStatement)(
-      f: (PreparedStatement) => T): T = {
+      f: (PreparedStatement) => T): T =
     queryTimeout.foreach(to => st.setQueryTimeout(to))
-    Helpers.calcTime {
-      try {
+    Helpers.calcTime
+      try
         (st, f(st))
-      } finally {
+      finally
         st.close
-      }
-    } match {
+    match
       case (time, (query, res)) => runLogger(query, time); res
-    }
-  }
 
   private object currentConn extends DynoVar[SuperConnection]
 
@@ -776,26 +695,22 @@ trait DB extends Loggable {
     *
     * Only use within a stateful request
     */
-  def use[T](name: ConnectionIdentifier)(f: (SuperConnection) => T): T = {
+  def use[T](name: ConnectionIdentifier)(f: (SuperConnection) => T): T =
     val conn = getConnection(name)
-    currentConn.run(conn) {
+    currentConn.run(conn)
       var rollback = true
-      try {
+      try
         val ret = f(conn)
         rollback = S.exceptionThrown_?
         ret
-      } catch {
+      catch
         // this is the case when we want to commit the transaction
         // but continue to throw the exception
-        case e: LiftFlowOfControlException => {
+        case e: LiftFlowOfControlException =>
             rollback = S.exceptionThrown_?
             throw e
-          }
-      } finally {
+      finally
         releaseConnectionNamed(name, rollback)
-      }
-    }
-  }
 
   /**
     * The SQL reserved words.  These words will be changed if they are used for column or table names.
@@ -1176,11 +1091,10 @@ trait DB extends Loggable {
         "work",
         "write",
         "xor")
-}
 
 class SuperConnection(val connection: Connection,
                       val releaseFunc: () => Unit,
-                      val schemaName: Box[String]) {
+                      val schemaName: Box[String])
   def this(c: Connection, rf: () => Unit) = this(c, rf, Empty)
 
   lazy val brokenLimit_? = driverType.brokenLimit_?
@@ -1192,11 +1106,9 @@ class SuperConnection(val connection: Connection,
   lazy val driverType: DriverType = DriverType.calcDriver(connection)
 
   lazy val metaData = connection.getMetaData
-}
 
-object SuperConnection {
+object SuperConnection
   implicit def superToConn(in: SuperConnection): Connection = in.connection
-}
 
 /**
   * The standard DB vendor.
@@ -1209,32 +1121,29 @@ class StandardDBVendor(driverName: String,
                        dbUrl: String,
                        dbUser: Box[String],
                        dbPassword: Box[String])
-    extends ProtoDBVendor {
+    extends ProtoDBVendor
 
   private val logger = Logger(classOf[StandardDBVendor])
 
-  protected def createOne: Box[Connection] = {
-    tryo { t: Throwable =>
+  protected def createOne: Box[Connection] =
+    tryo  t: Throwable =>
       logger.error("Cannot load database driver: %s".format(driverName), t)
-    } { Class.forName(driverName); () }
+    { Class.forName(driverName); () }
 
-    (dbUser, dbPassword) match {
+    (dbUser, dbPassword) match
       case (Full(user), Full(pwd)) =>
-        tryo { t: Throwable =>
+        tryo  t: Throwable =>
           logger.error("Unable to get database connection. url=%s, user=%s"
                          .format(dbUrl, user),
                        t)
-        }(DriverManager.getConnection(dbUrl, user, pwd))
+        (DriverManager.getConnection(dbUrl, user, pwd))
       case _ =>
-        tryo { t: Throwable =>
+        tryo  t: Throwable =>
           logger.error(
               "Unable to get database connection. url=%s".format(dbUrl), t)
-        }(DriverManager.getConnection(dbUrl))
-    }
-  }
-}
+        (DriverManager.getConnection(dbUrl))
 
-trait ProtoDBVendor extends ConnectionManager {
+trait ProtoDBVendor extends ConnectionManager
   private val logger = Logger(classOf[ProtoDBVendor])
   private var pool: List[Connection] = Nil
   private var poolSize = 0
@@ -1273,13 +1182,12 @@ trait ProtoDBVendor extends ConnectionManager {
     * Test the connection.  By default, setAutoCommit(false),
     * but you can do a real query on your RDBMS to see if the connection is alive
     */
-  protected def testConnection(conn: Connection) {
+  protected def testConnection(conn: Connection)
     conn.setAutoCommit(false)
-  }
 
   def newConnection(name: ConnectionIdentifier): Box[Connection] =
-    synchronized {
-      pool match {
+    synchronized
+      pool match
         case Nil if poolSize < tempMaxSize =>
           val ret = createOne
           ret.foreach(_.setAutoCommit(false))
@@ -1293,61 +1201,50 @@ trait ProtoDBVendor extends ConnectionManager {
           logger.trace("No connection left in pool, waiting...")
           wait(50L)
           // if we've waited 50 ms and the pool is still empty, temporarily expand it
-          if (pool.isEmpty && poolSize == curSize && canExpand_?) {
+          if (pool.isEmpty && poolSize == curSize && canExpand_?)
             tempMaxSize += 1
             logger.debug("Temporarily expanding pool. name=%s, tempMaxSize=%d"
                   .format(name, tempMaxSize))
-          }
           newConnection(name)
 
         case x :: xs =>
           logger.trace("Found connection in pool, name=%s".format(name))
           pool = xs
-          try {
+          try
             this.testConnection(x)
             Full(x)
-          } catch {
+          catch
             case e: Exception =>
-              try {
+              try
                 logger.debug(
                     "Test connection failed, removing connection from pool, name=%s"
                       .format(name))
                 poolSize = poolSize - 1
                 tryo(x.close)
                 newConnection(name)
-              } catch {
+              catch
                 case e: Exception => newConnection(name)
-              }
-          }
-      }
-    }
 
-  def releaseConnection(conn: Connection): Unit = synchronized {
-    if (tempMaxSize > maxPoolSize) {
+  def releaseConnection(conn: Connection): Unit = synchronized
+    if (tempMaxSize > maxPoolSize)
       tryo { conn.close() }
       tempMaxSize -= 1
       poolSize -= 1
-    } else {
+    else
       pool = conn :: pool
-    }
     logger.debug("Released connection. poolSize=%d".format(poolSize))
     notifyAll
-  }
 
   def closeAllConnections_!(): Unit = _closeAllConnections_!(0)
 
-  private def _closeAllConnections_!(cnt: Int): Unit = synchronized {
+  private def _closeAllConnections_!(cnt: Int): Unit = synchronized
     logger.info("Closing all connections")
     if (poolSize <= 0 || cnt > 10) ()
-    else {
-      pool.foreach { c =>
+    else
+      pool.foreach  c =>
         tryo(c.close); poolSize -= 1
-      }
       pool = Nil
 
       if (poolSize > 0) wait(250)
 
       _closeAllConnections_!(cnt + 1)
-    }
-  }
-}

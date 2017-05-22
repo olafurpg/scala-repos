@@ -43,7 +43,6 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 class ShearSpec
     extends SimpleSFXDelegateSpec[jfxst.Shear, Shear](
         classOf[jfxst.Shear], classOf[Shear])
-    with PositionDelegateSpec[Shear] {
+    with PositionDelegateSpec[Shear]
 
   val positionDelegate = getScalaClassInstance
-}

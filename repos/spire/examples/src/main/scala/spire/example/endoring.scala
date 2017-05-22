@@ -6,33 +6,29 @@ import language.implicitConversions
 import spire.algebra._
 import spire.implicits._
 
-object EndoRingExample extends App {
+object EndoRingExample extends App
 
   // An abelian group is a commutative monoid with an inverse.
   trait AbGroup[A] extends Group[A]
 
-  object AbGroup {
-    implicit object IntAbGroup extends AbGroup[Int] {
+  object AbGroup
+    implicit object IntAbGroup extends AbGroup[Int]
       def op(a: Int, b: Int): Int = a + b
       def inverse(a: Int): Int = -a
       def id: Int = 0
-    }
 
     /**
       * This turns the group of Sets under union into an abelian group by
       * keeping track of the inclusions and exclusions separately. This let's
       * us ensure it is commutative and that we always have an inverse.
       */
-    implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])] {
-      def op(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) = {
+    implicit def PairedSetAbGroup[A] = new AbGroup[(Set[A], Set[A])]
+      def op(a: (Set[A], Set[A]), b: (Set[A], Set[A])): (Set[A], Set[A]) =
         val (a1, a2) = a
         val (b1, b2) = b
         ((a1 -- b2) union (b1 -- a2), (a2 -- b1) union (b2 -- a1))
-      }
       def inverse(a: (Set[A], Set[A])): (Set[A], Set[A]) = (a._2, a._1)
       def id: (Set[A], Set[A]) = (Set.empty, Set.empty)
-    }
-  }
 
   implicit def set2pairedSet[A](a: Set[A]): (Set[A], Set[A]) = (a, Set.empty)
   implicit def pairedSet2set[A](a: (Set[A], Set[A])): Set[A] = a._1 -- a._2
@@ -45,7 +41,7 @@ object EndoRingExample extends App {
     * for an abelian group `ab`. This defines addition as group addition after
     * applying the endomorphism and multiplication as composition.
     */
-  class EndoRing[A : AbGroup] extends Ring[Endo[A]] {
+  class EndoRing[A : AbGroup] extends Ring[Endo[A]]
     def plus(f: Endo[A], g: Endo[A]): Endo[A] = a => f(a) |+| g(a)
     def negate(f: Endo[A]): Endo[A] = a => f(a).inverse
     def times(f: Endo[A], g: Endo[A]): Endo[A] = a => f(g(a))
@@ -55,11 +51,9 @@ object EndoRingExample extends App {
 
     // Endomorphism to the trivial group.
     def zero: Endo[A] = a => Group[A].id
-  }
 
-  object EndoRing {
+  object EndoRing
     def apply[A : AbGroup] = new EndoRing[A]
-  }
 
   implicit val intEndoRing = EndoRing[Int]
 
@@ -83,10 +77,9 @@ object EndoRingExample extends App {
   val one = Ring[Int => Int].one
   val two = one + one
   val five = two * two + one
-  (0 until 10).foreach { i =>
+  (0 until 10).foreach  i =>
     assert(five(i) == 5 * i)
     assert(((five * two) + two)(i) == 12 * i)
-  }
 
   implicit val pairedSetEndoRing = EndoRing[(Set[Int], Set[Int])]
 
@@ -112,4 +105,3 @@ object EndoRingExample extends App {
   val e1 = (double + triple) * triple
   val e2 = (double * triple) + (triple * triple)
   assert(e1(q) == e2(q))
-}

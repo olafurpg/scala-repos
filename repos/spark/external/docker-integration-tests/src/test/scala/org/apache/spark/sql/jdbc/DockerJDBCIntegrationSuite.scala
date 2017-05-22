@@ -33,7 +33,7 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.util.DockerUtils
 
-abstract class DatabaseOnDocker {
+abstract class DatabaseOnDocker
 
   /**
     * The docker image to be pulled.
@@ -54,11 +54,10 @@ abstract class DatabaseOnDocker {
     * Return a JDBC URL that connects to the database running at the given IP address and port.
     */
   def getJdbcUrl(ip: String, port: Int): String
-}
 
 abstract class DockerJDBCIntegrationSuite
     extends SparkFunSuite with BeforeAndAfterAll with Eventually
-    with SharedSQLContext {
+    with SharedSQLContext
 
   val db: DatabaseOnDocker
 
@@ -66,35 +65,32 @@ abstract class DockerJDBCIntegrationSuite
   private var containerId: String = _
   protected var jdbcUrl: String = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
-    try {
+    try
       docker = DefaultDockerClient.fromEnv.build()
       // Check that Docker is actually up
-      try {
+      try
         docker.ping()
-      } catch {
+      catch
         case NonFatal(e) =>
           log.error(
               "Exception while connecting to Docker. Check whether Docker is running.")
           throw e
-      }
       // Ensure that the Docker image is installed:
-      try {
+      try
         docker.inspectImage(db.imageName)
-      } catch {
+      catch
         case e: ImageNotFoundException =>
           log.warn(
               s"Docker image ${db.imageName} not found; pulling image from registry")
           docker.pull(db.imageName)
-      }
       // Configure networking (necessary for boot2docker / Docker Machine)
-      val externalPort: Int = {
+      val externalPort: Int =
         val sock = new ServerSocket(0)
         val port = sock.getLocalPort
         sock.close()
         port
-      }
       val dockerIp = DockerUtils.getDockerIp()
       val hostConfig: HostConfig = HostConfig
         .builder()
@@ -115,49 +111,38 @@ abstract class DockerJDBCIntegrationSuite
       // Start the container and wait until the database can accept JDBC connections:
       docker.startContainer(containerId)
       jdbcUrl = db.getJdbcUrl(dockerIp, externalPort)
-      eventually(timeout(60.seconds), interval(1.seconds)) {
+      eventually(timeout(60.seconds), interval(1.seconds))
         val conn = java.sql.DriverManager.getConnection(jdbcUrl)
         conn.close()
-      }
       // Run any setup queries:
       val conn: Connection = java.sql.DriverManager.getConnection(jdbcUrl)
-      try {
+      try
         dataPreparation(conn)
-      } finally {
+      finally
         conn.close()
-      }
-    } catch {
+    catch
       case NonFatal(e) =>
-        try {
+        try
           afterAll()
-        } finally {
+        finally
           throw e
-        }
-    }
-  }
 
-  override def afterAll() {
-    try {
-      if (docker != null) {
-        try {
-          if (containerId != null) {
+  override def afterAll()
+    try
+      if (docker != null)
+        try
+          if (containerId != null)
             docker.killContainer(containerId)
             docker.removeContainer(containerId)
-          }
-        } catch {
+        catch
           case NonFatal(e) =>
             logWarning(s"Could not stop container $containerId", e)
-        } finally {
+        finally
           docker.close()
-        }
-      }
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
   /**
     * Prepare databases and tables for testing.
     */
   def dataPreparation(connection: Connection): Unit
-}

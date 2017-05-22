@@ -1,20 +1,16 @@
-trait Table[T] {
+trait Table[T]
   def foo: T
-}
 trait Computer
 trait Device
 
-object schema {
+object schema
   def lub[T](a: T, b: T) = ???
   lub(null: Computers, null: Devices)
-}
-trait Computers extends Table[Computer] {
+trait Computers extends Table[Computer]
   def foo: Computer
-}
-trait Devices extends Table[Device] {
+trait Devices extends Table[Device]
   def foo: Device
   def foo: Device
-}
 /* Was:
 Exception in thread "main" java.lang.AssertionError: assertion failed: List(method foo, method foo)
         at scala.Predef$.assert(Predef.scala:165)

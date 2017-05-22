@@ -18,11 +18,11 @@ case class ALSAlgorithmParams(
     extends Params
 
 class ALSAlgorithm(val ap: ALSAlgorithmParams)
-    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult] {
+    extends PAlgorithm[PreparedData, ALSModel, Query, PredictedResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  def train(sc: SparkContext, data: PreparedData): ALSModel = {
+  def train(sc: SparkContext, data: PreparedData): ALSModel =
     // MLLib ALS cannot handle empty training data.
     require(data.ratings.take(1).nonEmpty,
             s"RDD[Rating] in PreparedData cannot be empty." +
@@ -60,13 +60,13 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
     val categories =
       data.items.flatMap(_.categories).distinct().collect().toSet
 
-    val categoriesMap = categories.map { category =>
+    val categoriesMap = categories.map  category =>
       category -> data.items
         .filter(_.categories.contains(category))
         .map(item => itemStringIntMap(item.id))
         .collect()
         .toSet
-    }.toMap
+    .toMap
 
     new ALSModel(rank = m.rank,
                  userFeatures = m.userFeatures,
@@ -74,29 +74,23 @@ class ALSAlgorithm(val ap: ALSAlgorithmParams)
                  userStringIntMap = userStringIntMap,
                  itemStringIntMap = itemStringIntMap,
                  categoryItemsMap = categoriesMap)
-  }
 
-  def predict(model: ALSModel, query: Query): PredictedResult = {
+  def predict(model: ALSModel, query: Query): PredictedResult =
     // Convert String ID to Int index for Mllib
     model.userStringIntMap
       .get(query.user)
-      .map { userInt =>
+      .map  userInt =>
         // create inverse view of itemStringIntMap
         val itemIntStringMap = model.itemStringIntMap.inverse
         // Find items on query category
-        val categoriesItems = query.categories.map { category =>
+        val categoriesItems = query.categories.map  category =>
           model.categoryItemsMap.getOrElse(category, Set.empty)
-        }
         // recommendProductsFromCategory() returns Array[MLlibRating], which uses item Int
         // index. Convert it to String ID for returning PredictedResult
         val itemScores = model
           .recommendProductsFromCategory(userInt, query.num, categoriesItems)
           .map(r => ItemScore(itemIntStringMap(r.product), r.rating))
         new PredictedResult(itemScores)
-      }
-      .getOrElse {
+      .getOrElse
         logger.info(s"No prediction for unknown user ${query.user}.")
         new PredictedResult(Array.empty)
-      }
-  }
-}

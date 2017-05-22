@@ -5,7 +5,7 @@ import com.intellij.psi.PsiComment
 import com.intellij.psi.tree.IElementType
 import org.jetbrains.plugins.hocon.lexer.HoconTokenType
 
-class HoconCommenter extends CodeDocumentationAwareCommenter {
+class HoconCommenter extends CodeDocumentationAwareCommenter
   def getLineCommentPrefix = "//"
 
   def getLineCommentTokenType: IElementType = HoconTokenType.DoubleSlashComment
@@ -29,4 +29,3 @@ class HoconCommenter extends CodeDocumentationAwareCommenter {
   def getDocumentationCommentSuffix: String = null
 
   def getDocumentationCommentPrefix: String = null
-}

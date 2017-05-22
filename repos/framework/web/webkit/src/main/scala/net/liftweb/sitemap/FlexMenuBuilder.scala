@@ -21,12 +21,11 @@ import net.liftweb.http.{LiftRules, S}
 import xml.{Elem, Text, NodeSeq}
 import net.liftweb.util.Helpers
 
-trait FlexMenuBuilder {
+trait FlexMenuBuilder
   // a hack to use structural typing to get around the private[http] on Loc.buildItem
-  type StructBuildItem = {
+  type StructBuildItem =
     def buildItem(
         kids: List[MenuItem], current: Boolean, path: Boolean): Box[MenuItem]
-  }
 
   /**
     * Override if you want a link to the current page
@@ -48,43 +47,40 @@ trait FlexMenuBuilder {
     */
   protected def buildItemMenu[A](loc: Loc[A],
                                  currLoc: Box[Loc[_]],
-                                 expandAll: Boolean): List[MenuItem] = {
+                                 expandAll: Boolean): List[MenuItem] =
     val isInPath =
-      currLoc.map { cur =>
+      currLoc.map  cur =>
         def isInPath(loc: Loc[_]): Boolean =
           (cur == loc) || loc.menu.kids.exists(k => isInPath(k.loc))
         isInPath(loc)
-      } openOr false
+      openOr false
 
     val kids: List[MenuItem] =
       if (expandAll) loc.buildKidMenuItems(loc.menu.kids) else Nil
     loc.buildItem(kids, currLoc == Full(loc), isInPath).toList
-  }
 
   /**
     * Compute the MenuItems to be rendered by looking at the 'item' and 'group' attributes
     */
-  def toRender: Seq[MenuItem] = {
-    val res = (S.attr("item"), S.attr("group")) match {
+  def toRender: Seq[MenuItem] =
+    val res = (S.attr("item"), S.attr("group")) match
       case (Full(item), _) =>
-        for {
+        for
           sm <- LiftRules.siteMap.toList
           req <- S.request.toList
           loc <- sm.findLoc(item).toList
           item <- buildItemMenu(loc, req.location, expandAll)
-        } yield item
+        yield item
 
       case (_, Full(group)) =>
-        for {
+        for
           sm <- LiftRules.siteMap.toList
           loc <- sm.locForGroup(group)
           req <- S.request.toList
           item <- buildItemMenu(loc, req.location, expandAll)
-        } yield item
+        yield item
       case _ => renderWhat(expandAll)
-    }
     res
-  }
 
   /**
     * If a group is specified and the group is empty what to display
@@ -124,20 +120,19 @@ trait FlexMenuBuilder {
     * Render a placeholder
     */
   protected def renderPlaceholder(
-      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem = {
+      item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
     buildInnerTag(
         <xml:group><span>{item.text}</span>{renderInner(item.kids)}</xml:group>,
         item.path,
         item.current)
-  }
 
   /**
     * Render a link that's the current link, but the "link to self" flag is set to true
     */
   protected def renderSelfLinked(
       item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
+    buildInnerTag(<xml:group>renderLink(item.uri, item.text, item.path,
+      item.current){renderInner(item.kids)}</xml:group>,
                   item.path,
                   item.current)
 
@@ -168,8 +163,8 @@ trait FlexMenuBuilder {
     */
   protected def renderItemInPath(
       item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
+    buildInnerTag(<xml:group>renderLink(item.uri, item.text, item.path,
+      item.current){renderInner(item.kids)}</xml:group>,
                   item.path,
                   item.current)
 
@@ -178,8 +173,8 @@ trait FlexMenuBuilder {
     */
   protected def renderItem(
       item: MenuItem, renderInner: Seq[MenuItem] => NodeSeq): Elem =
-    buildInnerTag(<xml:group>{renderLink(item.uri, item.text, item.path,
-      item.current)}{renderInner(item.kids)}</xml:group>,
+    buildInnerTag(<xml:group>renderLink(item.uri, item.text, item.path,
+      item.current){renderInner(item.kids)}</xml:group>,
                   item.path,
                   item.current)
 
@@ -194,13 +189,13 @@ trait FlexMenuBuilder {
     */
   protected def renderWhat(expandAll: Boolean): Seq[MenuItem] =
     (if (expandAll)
-       for {
+       for
          sm <- LiftRules.siteMap;
          req <- S.request
-       } yield sm.buildMenu(req.location).lines
+       yield sm.buildMenu(req.location).lines
      else S.request.map(_.buildMenu.lines)) openOr Nil
 
-  def render: NodeSeq = {
+  def render: NodeSeq =
 
     val level: Box[Int] = for (lvs <- S.attr("level"); i <- Helpers.asInt(lvs)) yield
       i
@@ -211,12 +206,12 @@ trait FlexMenuBuilder {
       if (expandAny || expandAll) f else NodeSeq.Empty
     def ifExpandAll(f: => NodeSeq): NodeSeq =
       if (expandAll) f else NodeSeq.Empty
-    toRender.toList match {
+    toRender.toList match
       case Nil if S.attr("group").isDefined => emptyGroup
       case Nil => emptyMenu
       case xs =>
-        def buildANavItem(i: MenuItem): NodeSeq = {
-          i match {
+        def buildANavItem(i: MenuItem): NodeSeq =
+          i match
             // Per Loc.PlaceHolder, placeholder implies HideIfNoKids
             case m @ MenuItem(text, uri, kids, _, _, _)
                 if m.placeholder_? && kids.isEmpty =>
@@ -231,19 +226,16 @@ trait FlexMenuBuilder {
             case m @ MenuItem(text, uri, kids, _, true, _) =>
               renderItemInPath(m, buildLine _)
             case m => renderItem(m, buildLine _)
-          }
-        }
 
         def buildLine(in: Seq[MenuItem]): NodeSeq = buildUlLine(in, false)
 
         def buildUlLine(in: Seq[MenuItem], top: Boolean): NodeSeq =
-          if (in.isEmpty) {
+          if (in.isEmpty)
             NodeSeq.Empty
-          } else {
+          else
             renderOuterTag(in.flatMap(buildANavItem), top)
-          }
 
-        val realMenuItems = level match {
+        val realMenuItems = level match
           case Full(lvl) if lvl > 0 =>
             def findKids(cur: Seq[MenuItem], depth: Int): Seq[MenuItem] =
               if (depth == 0) cur
@@ -252,8 +244,4 @@ trait FlexMenuBuilder {
             findKids(xs, lvl)
 
           case _ => xs
-        }
         buildUlLine(realMenuItems, true)
-    }
-  }
-}

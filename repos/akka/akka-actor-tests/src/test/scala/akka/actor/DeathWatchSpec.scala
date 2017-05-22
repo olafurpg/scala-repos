@@ -15,16 +15,15 @@ class LocalDeathWatchSpec
     extends AkkaSpec with ImplicitSender with DefaultTimeout
     with DeathWatchSpec
 
-object DeathWatchSpec {
+object DeathWatchSpec
   def props(target: ActorRef, testActor: ActorRef) =
     Props(
-        new Actor {
+        new Actor
       context.watch(target)
-      def receive = {
+      def receive =
         case t: Terminated ⇒ testActor forward WrappedTerminated(t)
         case x ⇒ testActor forward x
-      }
-    })
+    )
 
   /**
     * Forwarding `Terminated` to non-watching testActor is not possible,
@@ -38,9 +37,8 @@ object DeathWatchSpec {
 
   final case class Latches(t1: TestLatch, t2: TestLatch)
       extends NoSerializationVerificationNeeded
-}
 
-trait DeathWatchSpec {
+trait DeathWatchSpec
   this: AkkaSpec with ImplicitSender with DefaultTimeout ⇒
 
   import DeathWatchSpec._
@@ -52,14 +50,13 @@ trait DeathWatchSpec {
     Await.result(
         (supervisor ? props(target, testActor)).mapTo[ActorRef], 3 seconds)
 
-  "The Death Watch" must {
+  "The Death Watch" must
     def expectTerminationOf(actorRef: ActorRef) =
       expectMsgPF(5 seconds,
-                  actorRef + ": Stopped or Already terminated when linking") {
+                  actorRef + ": Stopped or Already terminated when linking")
         case WrappedTerminated(Terminated(`actorRef`)) ⇒ true
-      }
 
-    "notify with one Terminated message when an Actor is stopped" in {
+    "notify with one Terminated message when an Actor is stopped" in
       val terminal = system.actorOf(Props.empty)
       startWatching(terminal) ! "hallo"
       expectMsg("hallo")
@@ -67,18 +64,16 @@ trait DeathWatchSpec {
       terminal ! PoisonPill
 
       expectTerminationOf(terminal)
-    }
 
-    "notify with one Terminated message when an Actor is already dead" in {
+    "notify with one Terminated message when an Actor is already dead" in
       val terminal = system.actorOf(Props.empty)
 
       terminal ! PoisonPill
 
       startWatching(terminal)
       expectTerminationOf(terminal)
-    }
 
-    "notify with all monitors with one Terminated message when an Actor is stopped" in {
+    "notify with all monitors with one Terminated message when an Actor is stopped" in
       val terminal = system.actorOf(Props.empty)
       val monitor1, monitor2, monitor3 = startWatching(terminal)
 
@@ -91,20 +86,18 @@ trait DeathWatchSpec {
       system.stop(monitor1)
       system.stop(monitor2)
       system.stop(monitor3)
-    }
 
-    "notify with _current_ monitors with one Terminated message when an Actor is stopped" in {
+    "notify with _current_ monitors with one Terminated message when an Actor is stopped" in
       val terminal = system.actorOf(Props.empty)
       val monitor1, monitor3 = startWatching(terminal)
       val monitor2 = system.actorOf(
-          Props(new Actor {
+          Props(new Actor
         context.watch(terminal)
         context.unwatch(terminal)
-        def receive = {
+        def receive =
           case "ping" ⇒ sender() ! "pong"
           case t: Terminated ⇒ testActor ! WrappedTerminated(t)
-        }
-      }).withDeploy(Deploy.local))
+      ).withDeploy(Deploy.local))
 
       monitor2 ! "ping"
 
@@ -118,10 +111,9 @@ trait DeathWatchSpec {
       system.stop(monitor1)
       system.stop(monitor2)
       system.stop(monitor3)
-    }
 
-    "notify with a Terminated message once when an Actor is stopped but not when restarted" in {
-      filterException[ActorKilledException] {
+    "notify with a Terminated message once when an Actor is stopped but not when restarted" in
+      filterException[ActorKilledException]
         val supervisor = system.actorOf(Props(new Supervisor(OneForOneStrategy(
                         maxNrOfRetries = 2)(List(classOf[Exception])))))
         val terminalProps =
@@ -141,38 +133,34 @@ trait DeathWatchSpec {
         terminal.isTerminated should ===(true)
 
         system.stop(supervisor)
-      }
-    }
 
-    "fail a monitor which does not handle Terminated()" in {
+    "fail a monitor which does not handle Terminated()" in
       filterEvents(EventFilter[ActorKilledException](),
-                   EventFilter[DeathPactException]()) {
+                   EventFilter[DeathPactException]())
         val strategy =
-          new OneForOneStrategy()(SupervisorStrategy.defaultStrategy.decider) {
+          new OneForOneStrategy()(SupervisorStrategy.defaultStrategy.decider)
             override def handleFailure(
                 context: ActorContext,
                 child: ActorRef,
                 cause: Throwable,
                 stats: ChildRestartStats,
-                children: Iterable[ChildRestartStats]) = {
+                children: Iterable[ChildRestartStats]) =
               testActor.tell(FF(Failed(child, cause, 0)), child)
               super.handleFailure(context, child, cause, stats, children)
-            }
-          }
         val supervisor = system.actorOf(
             Props(new Supervisor(strategy)).withDeploy(Deploy.local))
 
         val failed = Await.result((supervisor ? Props.empty).mapTo[ActorRef],
                                   timeout.duration)
-        val brother = Await.result((supervisor ? Props(new Actor {
+        val brother = Await.result((supervisor ? Props(new Actor
               context.watch(failed)
               def receive = Actor.emptyBehavior
-            })).mapTo[ActorRef], timeout.duration)
+            )).mapTo[ActorRef], timeout.duration)
 
         startWatching(brother)
 
         failed ! Kill
-        val result = receiveWhile(3 seconds, messages = 3) {
+        val result = receiveWhile(3 seconds, messages = 3)
           case FF(Failed(_, _: ActorKilledException, _))
               if lastSender eq failed ⇒
             1
@@ -180,35 +168,29 @@ trait DeathWatchSpec {
               if lastSender eq brother ⇒
             2
           case WrappedTerminated(Terminated(`brother`)) ⇒ 3
-        }
         testActor.isTerminated should not be true
         result should ===(Seq(1, 2, 3))
-      }
-    }
 
-    "be able to watch a child with the same name after the old died" in {
-      val parent = system.actorOf(Props(new Actor {
-        def receive = {
+    "be able to watch a child with the same name after the old died" in
+      val parent = system.actorOf(Props(new Actor
+        def receive =
           case "NKOTB" ⇒
-            val currentKid = context.watch(context.actorOf(Props(new Actor {
+            val currentKid = context.watch(context.actorOf(Props(new Actor
               def receive = { case "NKOTB" ⇒ context stop self }
-            }), "kid"))
+            ), "kid"))
             currentKid forward "NKOTB"
-            context become {
+            context become
               case Terminated(`currentKid`) ⇒
                 testActor ! "GREEN"
                 context unbecome
-            }
-        }
-      }).withDeploy(Deploy.local))
+      ).withDeploy(Deploy.local))
 
       parent ! "NKOTB"
       expectMsg("GREEN")
       parent ! "NKOTB"
       expectMsg("GREEN")
-    }
 
-    "only notify when watching" in {
+    "only notify when watching" in
       val subject =
         system.actorOf(Props(new Actor { def receive = Actor.emptyBehavior }))
 
@@ -219,18 +201,15 @@ trait DeathWatchSpec {
 
       // the testActor is not watching subject and will not receive a Terminated msg
       expectNoMsg
-    }
 
-    "discard Terminated when unwatched between sysmsg and processing" in {
-      class Watcher extends Actor {
-        def receive = {
+    "discard Terminated when unwatched between sysmsg and processing" in
+      class Watcher extends Actor
+        def receive =
           case W(ref) ⇒ context watch ref
           case U(ref) ⇒ context unwatch ref
           case Latches(t1: TestLatch, t2: TestLatch) ⇒
             t1.countDown()
             Await.ready(t2, 3.seconds)
-        }
-      }
 
       val t1, t2 = TestLatch()
       val w = system.actorOf(Props(new Watcher).withDeploy(Deploy.local),
@@ -255,6 +234,3 @@ trait DeathWatchSpec {
       expectMsg(ActorIdentity((), Some(w)))
       w ! Identify(())
       expectMsg(ActorIdentity((), Some(w)))
-    }
-  }
-}

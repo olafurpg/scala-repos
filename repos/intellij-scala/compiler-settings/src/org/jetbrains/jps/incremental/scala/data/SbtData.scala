@@ -16,40 +16,39 @@ case class SbtData(interfaceJar: File,
                    interfacesHome: File,
                    javaClassVersion: String)
 
-object SbtData {
+object SbtData
   val compilerInterfacesKey = "scala.compiler.interfaces.dir"
 
-  private def compilerInterfacesDir = {
+  private def compilerInterfacesDir =
     def defaultDir =
       new File(new File(System.getProperty("user.home"), ".idea-build"),
                "scala-compiler-interfaces")
 
     val customPath = Option(System.getProperty(compilerInterfacesKey))
     customPath.map(new File(_)).getOrElse(defaultDir)
-  }
 
   def from(classLoader: ClassLoader,
            pluginRoot: File,
-           javaClassVersion: String): Either[String, SbtData] = {
+           javaClassVersion: String): Either[String, SbtData] =
     Either
       .cond(pluginRoot.exists,
             pluginRoot,
             "SBT home directory does not exist: " + pluginRoot)
-      .flatMap { sbtHome =>
+      .flatMap  sbtHome =>
         Option(sbtHome.listFiles)
           .toRight("Invalid SBT home directory: " + sbtHome.getPath)
-          .flatMap { files =>
+          .flatMap  files =>
             files
               .find(_.getName == "sbt-interface.jar")
               .toRight("No 'sbt-interface.jar' in SBT home directory")
-              .flatMap { interfaceJar =>
+              .flatMap  interfaceJar =>
                 files
                   .find(_.getName == "compiler-interface-sources.jar")
                   .toRight("No 'compiler-interface-sources.jar' in SBT home directory")
-                  .flatMap { sourceJar =>
+                  .flatMap  sourceJar =>
                     readSbtVersionFrom(classLoader)
                       .toRight("Unable to read SBT version from JVM classpath")
-                      .map { sbtVersion =>
+                      .map  sbtVersion =>
                         val checksum =
                           DatatypeConverter.printHexBinary(md5(sourceJar))
                         val interfacesHome =
@@ -60,38 +59,26 @@ object SbtData {
                                     sourceJar,
                                     interfacesHome,
                                     javaClassVersion)
-                      }
-                  }
-              }
-          }
-      }
-  }
 
-  private def readSbtVersionFrom(classLoader: ClassLoader): Option[String] = {
-    readProperty(classLoader, "xsbt.version.properties", "version").map {
+  private def readSbtVersionFrom(classLoader: ClassLoader): Option[String] =
+    readProperty(classLoader, "xsbt.version.properties", "version").map
       version =>
-        if (version.endsWith("-SNAPSHOT")) {
+        if (version.endsWith("-SNAPSHOT"))
           readProperty(getClass.getClassLoader,
                        "xsbt.version.properties",
                        "timestamp")
             .map(timestamp => version + "-" + timestamp)
             .getOrElse(version)
-        } else {
+        else
           version
-        }
-    }
-  }
 
-  private def md5(file: File): Array[Byte] = {
+  private def md5(file: File): Array[Byte] =
     val md = MessageDigest.getInstance("MD5")
     val isSource =
       file.getName.endsWith(".java") || file.getName.endsWith(".scala")
-    if (isSource) {
+    if (isSource)
       val text =
         scala.io.Source.fromFile(file, "UTF-8").mkString.replace("\r", "")
       md.digest(text.getBytes("UTF8"))
-    } else {
+    else
       md.digest(FileUtil.loadBytes(new FileInputStream(file)))
-    }
-  }
-}

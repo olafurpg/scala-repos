@@ -52,7 +52,7 @@ class ScalaInplaceVariableIntroducer(project: Project,
                                                     project,
                                                     title,
                                                     Array.empty[ScExpression],
-                                                    expr) {
+                                                    expr)
 
   private var myVarCheckbox: JCheckBox = null
   private var mySpecifyTypeChb: JCheckBox = null
@@ -75,86 +75,76 @@ class ScalaInplaceVariableIntroducer(project: Project,
   myCheckIdentifierListener = checkIdentifierListener()
 
   private def checkIdentifierListener(): DocumentListener =
-    new DocumentAdapter() {
-      override def documentChanged(e: DocumentEvent): Unit = {
+    new DocumentAdapter()
+      override def documentChanged(e: DocumentEvent): Unit =
         commitDocument()
         val range = new TextRange(
             myCaretRangeMarker.getStartOffset, myCaretRangeMarker.getEndOffset)
         if (range.getLength == 0 &&
-            UndoManager.getInstance(myProject).isUndoInProgress) {} else {
+            UndoManager.getInstance(myProject).isUndoInProgress) {} else
           val input = myCaretRangeMarker.getDocument.getText(range)
           val numberOfSpaces = input.lastIndexOf(' ') + 1
           val declaration = findDeclaration(
               range.getStartOffset + numberOfSpaces)
           val named: Option[ScNamedElement] = namedElement(declaration)
-          if (named.isDefined) {
+          if (named.isDefined)
             setDeclaration(declaration)
             if (nameIsValid !=
                 (named.isDefined &&
-                    isIdentifier(input.trim, myFile.getLanguage))) {
+                    isIdentifier(input.trim, myFile.getLanguage)))
               nameIsValid = !nameIsValid
-            }
             resetBalloonPanel(nameIsValid)
-          } else {
+          else
             nameIsValid = false
             resetBalloonPanel(nameIsValid)
-          }
-        }
         super.documentChanged(e)
-      }
-    }
 
   private def namedElement(declaration: PsiElement): Option[ScNamedElement] =
-    declaration match {
+    declaration match
       case value: ScValue => value.declaredElements.headOption
       case variable: ScVariable => variable.declaredElements.headOption
       case enumerator: ScEnumerator => enumerator.pattern.bindings.headOption
       case _ => None
-    }
 
-  private def findDeclaration(offset: Int): PsiElement = {
+  private def findDeclaration(offset: Int): PsiElement =
     val elem = myFile.findElementAt(offset)
     ScalaPsiUtil.getParentOfType(
         elem, classOf[ScEnumerator], classOf[ScDeclaredElementsHolder])
-  }
 
   private def getDeclaration: PsiElement =
     findDeclaration(myDeclarationStartOffset)
 
-  private def setDeclaration(declaration: PsiElement): Unit = {
+  private def setDeclaration(declaration: PsiElement): Unit =
     myDeclarationStartOffset = declaration.getTextRange.getStartOffset
-  }
 
-  private def commitDocument(): Unit = {
+  private def commitDocument(): Unit =
     PsiDocumentManager
       .getInstance(myProject)
       .commitDocument(myEditor.getDocument)
-  }
 
-  private def needInferType = forceInferType.getOrElse {
+  private def needInferType = forceInferType.getOrElse
     if (mySpecifyTypeChb != null) mySpecifyTypeChb.isSelected
     else
       ScalaApplicationSettings.getInstance().INTRODUCE_VARIABLE_EXPLICIT_TYPE
-  }
 
   override def getInitialName: String = initialName
 
-  protected override def getComponent: JComponent = {
+  protected override def getComponent: JComponent =
 
-    if (!isEnumerator) {
+    if (!isEnumerator)
       myVarCheckbox = new NonFocusableCheckBox(
           ScalaBundle.message("introduce.variable.declare.as.var"))
       myVarCheckbox.setSelected(
           ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_IS_VAR)
       myVarCheckbox.setMnemonic('v')
-      myVarCheckbox.addActionListener(new ActionListener {
-        def actionPerformed(e: ActionEvent): Unit = {
+      myVarCheckbox.addActionListener(new ActionListener
+        def actionPerformed(e: ActionEvent): Unit =
           val writeAction = new WriteCommandAction[Unit](
-              myProject, getCommandName, getCommandName) {
+              myProject, getCommandName, getCommandName)
 
             private def changeValOrVar(
-                asVar: Boolean, declaration: PsiElement): Unit = {
-              val replacement = declaration match {
+                asVar: Boolean, declaration: PsiElement): Unit =
+              val replacement = declaration match
                 case value: ScValue if asVar =>
                   ScalaPsiElementFactory.createVarFromValDeclaration(
                       value, value.getManager)
@@ -162,62 +152,53 @@ class ScalaInplaceVariableIntroducer(project: Project,
                   ScalaPsiElementFactory.createValFromVarDefinition(
                       variable, variable.getManager)
                 case _ => declaration
-              }
               if (replacement != declaration)
                 setDeclaration(declaration.replace(replacement))
-            }
 
-            protected def run(result: Result[Unit]): Unit = {
+            protected def run(result: Result[Unit]): Unit =
               changeValOrVar(myVarCheckbox.isSelected, getDeclaration)
               commitDocument()
-            }
-          }
           writeAction.execute()
-        }
-      })
-    }
+      )
 
-    if (types.nonEmpty && forceInferType.isEmpty) {
+    if (types.nonEmpty && forceInferType.isEmpty)
       val selectedType = types(0)
       mySpecifyTypeChb = new NonFocusableCheckBox(
           ScalaBundle.message("introduce.variable.specify.type.explicitly"))
       mySpecifyTypeChb.setSelected(
           ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_EXPLICIT_TYPE)
       mySpecifyTypeChb.setMnemonic('t')
-      mySpecifyTypeChb.addActionListener(new ActionListener {
-        def actionPerformed(e: ActionEvent): Unit = {
+      mySpecifyTypeChb.addActionListener(new ActionListener
+        def actionPerformed(e: ActionEvent): Unit =
           val greedyToRight = mutable.WeakHashMap[RangeHighlighter, Boolean]()
 
-          def setGreedyToRightToFalse(): Unit = {
+          def setGreedyToRightToFalse(): Unit =
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters; if checkRange(
                                    highlighter.getStartOffset,
                                    highlighter.getEndOffset)) greedyToRight +=
             (highlighter -> highlighter.isGreedyToRight)
-          }
-          def resetGreedyToRightBack(): Unit = {
+          def resetGreedyToRightBack(): Unit =
             val highlighters: Array[RangeHighlighter] =
               myEditor.getMarkupModel.getAllHighlighters
             for (highlighter <- highlighters; if checkRange(
                                    highlighter.getStartOffset,
                                    highlighter.getEndOffset)) highlighter
               .setGreedyToRight(greedyToRight(highlighter))
-          }
-          def checkRange(start: Int, end: Int): Boolean = {
+          def checkRange(start: Int, end: Int): Boolean =
             val named: Option[ScNamedElement] = namedElement(getDeclaration)
-            if (named.isDefined) {
+            if (named.isDefined)
               val nameRange = named.get.getNameIdentifier.getTextRange
               nameRange.getStartOffset == start &&
               nameRange.getEndOffset <= end
-            } else false
-          }
+            else false
 
           val writeAction = new WriteCommandAction[Unit](
-              myProject, getCommandName, getCommandName) {
-            private def addTypeAnnotation(selectedType: ScType): Unit = {
+              myProject, getCommandName, getCommandName)
+            private def addTypeAnnotation(selectedType: ScType): Unit =
               val declaration = getDeclaration
-              declaration match {
+              declaration match
                 case _: ScDeclaredElementsHolder | _: ScEnumerator =>
                   val declarationCopy =
                     declaration.copy.asInstanceOf[ScalaPsiElement]
@@ -242,10 +223,8 @@ class ScalaInplaceVariableIntroducer(project: Project,
                   setDeclaration(replaced)
                   commitDocument()
                 case _ =>
-              }
-            }
-            private def removeTypeAnnotation(): Unit = {
-              getDeclaration match {
+            private def removeTypeAnnotation(): Unit =
+              getDeclaration match
                 case holder: ScDeclaredElementsHolder =>
                   val colon =
                     holder.findFirstChildByType(ScalaTokenTypes.tCOLON)
@@ -267,43 +246,33 @@ class ScalaInplaceVariableIntroducer(project: Project,
                   setDeclaration(enum)
                   commitDocument()
                 case _ =>
-              }
-            }
-            protected def run(result: Result[Unit]): Unit = {
+            protected def run(result: Result[Unit]): Unit =
               commitDocument()
               setGreedyToRightToFalse()
-              if (needInferType) {
+              if (needInferType)
                 addTypeAnnotation(selectedType)
-              } else {
+              else
                 removeTypeAnnotation()
-              }
-            }
-          }
           writeAction.execute()
-          ApplicationManager.getApplication.runReadAction(new Runnable {
-            def run(): Unit = {
+          ApplicationManager.getApplication.runReadAction(new Runnable
+            def run(): Unit =
               if (needInferType) resetGreedyToRightBack()
-            }
-          })
-        }
-      })
-    }
+          )
+      )
 
     myEditor.getDocument.addDocumentListener(myCheckIdentifierListener)
 
     setBalloonPanel(nameIsValid = true)
     myBalloonPanel
-  }
 
-  private def setBalloonPanel(nameIsValid: Boolean): Unit = {
+  private def setBalloonPanel(nameIsValid: Boolean): Unit =
     this.nameIsValid = nameIsValid
 
     myChbPanel.setLayout(new BoxLayout(myChbPanel, BoxLayout.Y_AXIS))
     myChbPanel.setBorder(null)
-    Seq(myVarCheckbox, mySpecifyTypeChb).filter(_ != null).foreach { chb =>
+    Seq(myVarCheckbox, mySpecifyTypeChb).filter(_ != null).foreach  chb =>
       myChbPanel.add(chb)
       chb.setEnabled(nameIsValid)
-    }
 
     myLabel.setText(
         ScalaBundle.message("introduce.variable.identifier.is.not.valid"))
@@ -315,78 +284,64 @@ class ScalaInplaceVariableIntroducer(project: Project,
 
     if (!nameIsValid) myBalloonPanel add myLabelPanel
     else myBalloonPanel add myChbPanel
-  }
 
-  private def resetBalloonPanel(nameIsValid: Boolean): Unit = {
+  private def resetBalloonPanel(nameIsValid: Boolean): Unit =
     if (myBalloon.isDisposed) return
-    if (!nameIsValid) {
+    if (!nameIsValid)
       myBalloonPanel add myLabelPanel
       myBalloonPanel remove myChbPanel
-    } else {
+    else
       myBalloonPanel add myChbPanel
       myBalloonPanel remove myLabelPanel
-    }
     Seq(myVarCheckbox, mySpecifyTypeChb) filter (_ != null) foreach
     (_.setEnabled(nameIsValid))
     myBalloon.revalidate()
-  }
 
-  protected override def moveOffsetAfter(success: Boolean): Unit = {
-    try {
+  protected override def moveOffsetAfter(success: Boolean): Unit =
+    try
       myBalloon.hide()
-      if (success) {
-        if (myExprMarker != null) {
+      if (success)
+        if (myExprMarker != null)
           val startOffset: Int = myExprMarker.getStartOffset
           val elementAt: PsiElement = myFile.findElementAt(startOffset)
-          if (elementAt != null) {
+          if (elementAt != null)
             myEditor.getCaretModel.moveToOffset(
                 elementAt.getTextRange.getEndOffset)
-          } else {
+          else
             myEditor.getCaretModel.moveToOffset(myExprMarker.getEndOffset)
-          }
-        } else if (getDeclaration != null) {
+        else if (getDeclaration != null)
           val declaration = getDeclaration
           myEditor.getCaretModel.moveToOffset(
               declaration.getTextRange.getEndOffset)
-        }
-      } else if (getDeclaration != null &&
-                 !UndoManager.getInstance(myProject).isUndoInProgress) {
+      else if (getDeclaration != null &&
+                 !UndoManager.getInstance(myProject).isUndoInProgress)
         val revertInfo =
           myEditor.getUserData(ScalaIntroduceVariableHandler.REVERT_INFO)
-        if (revertInfo != null) {
-          extensions.inWriteAction {
+        if (revertInfo != null)
+          extensions.inWriteAction
             myEditor.getDocument.replaceString(
                 0, myFile.getTextLength, revertInfo.fileText)
-          }
           myEditor.getCaretModel.moveToOffset(revertInfo.caretOffset)
           myEditor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
-        }
-      }
-    } finally {
+    finally
       import scala.collection.JavaConversions._
-      for (occurrenceMarker <- getOccurrenceMarkers) {
+      for (occurrenceMarker <- getOccurrenceMarkers)
         occurrenceMarker.dispose()
-      }
       if (getExprMarker != null) getExprMarker.dispose()
-    }
-  }
 
   protected override def getReferencesSearchScope(
-      file: VirtualFile): SearchScope = {
+      file: VirtualFile): SearchScope =
     new LocalSearchScope(myElementToRename.getContainingFile)
-  }
 
-  protected override def checkLocalScope(): PsiElement = {
+  protected override def checkLocalScope(): PsiElement =
     val scope = new LocalSearchScope(myElementToRename.getContainingFile)
     val elements: Array[PsiElement] = scope.getScope
     PsiTreeUtil.findCommonParent(elements: _*)
-  }
 
-  protected override def startRename: StartMarkAction = {
+  protected override def startRename: StartMarkAction =
     StartMarkAction.start(myEditor, myProject, getCommandName)
-  }
 
-  override def finish(success: Boolean): Unit = {
+  override def finish(success: Boolean): Unit =
     myEditor.getDocument.removeDocumentListener(myCheckIdentifierListener)
 
     if (myVarCheckbox != null)
@@ -394,11 +349,11 @@ class ScalaInplaceVariableIntroducer(project: Project,
     if (mySpecifyTypeChb != null && !isEnumerator)
       ScalaApplicationSettings.getInstance.INTRODUCE_VARIABLE_EXPLICIT_TYPE = mySpecifyTypeChb.isSelected
 
-    try {
+    try
       val named = namedElement(getDeclaration).orNull
       val templateState: TemplateState =
         TemplateManagerImpl.getTemplateState(myEditor)
-      if (named != null && templateState != null) {
+      if (named != null && templateState != null)
         val occurrences =
           (for (i <- 0 to templateState.getSegmentsCount - 1) yield
             templateState.getSegmentRange(i)).toArray
@@ -410,13 +365,9 @@ class ScalaInplaceVariableIntroducer(project: Project,
             named,
             occurrences)
         validator.isOK(named.name, replaceAll)
-      }
-    } catch {
+    catch
       //templateState can contain null private fields
       case exc: NullPointerException =>
-    } finally {
+    finally
       myEditor.getSelectionModel.removeSelection()
-    }
     super.finish(success)
-  }
-}

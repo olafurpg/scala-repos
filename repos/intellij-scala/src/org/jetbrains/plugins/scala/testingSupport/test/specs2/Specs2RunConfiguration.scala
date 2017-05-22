@@ -16,7 +16,7 @@ class Specs2RunConfiguration(
     override val configurationFactory: ConfigurationFactory,
     override val name: String)
     extends AbstractTestRunConfiguration(project, configurationFactory, name)
-    with ScalaTestingConfiguration {
+    with ScalaTestingConfiguration
 
   override def getAdditionalTestParams(testName: String): Seq[String] =
     Seq("-Dspecs2.ex=\"\\A" + testName + "\\Z\"")
@@ -37,9 +37,8 @@ class Specs2RunConfiguration(
 
   protected[test] override def isInvalidSuite(clazz: PsiClass): Boolean =
     Specs2RunConfiguration.isInvalidSuite(clazz)
-}
 
-object Specs2RunConfiguration extends SuiteValidityChecker {
+object Specs2RunConfiguration extends SuiteValidityChecker
   private def isScalaObject(clazz: PsiClass) =
     clazz.getQualifiedName.endsWith("$")
 
@@ -47,4 +46,3 @@ object Specs2RunConfiguration extends SuiteValidityChecker {
       clazz: PsiClass): Boolean =
     !isScalaObject(clazz) &&
     AbstractTestRunConfiguration.lackSuitableConstructor(clazz)
-}

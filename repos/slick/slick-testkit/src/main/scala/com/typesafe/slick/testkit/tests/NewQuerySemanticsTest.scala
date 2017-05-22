@@ -4,13 +4,13 @@ import slick.jdbc.H2Profile
 
 import com.typesafe.slick.testkit.util.{RelationalTestDB, AsyncTest}
 
-class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
+class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB]
   import tdb.profile.api._
 
-  def testNewComposition = {
+  def testNewComposition =
     class SuppliersStd(tag: Tag)
         extends Table[(Int, String, String, String, String, String)](
-            tag, "SUPPLIERS") {
+            tag, "SUPPLIERS")
       def id =
         column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
       def name = column[String]("SUP_NAME")
@@ -19,11 +19,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       def state = column[String]("STATE")
       def zip = column[String]("ZIP")
       def * = (id, name, street, city, state, zip)
-    }
     val suppliersStd = TableQuery[SuppliersStd]
 
     class CoffeesStd(tag: Tag)
-        extends Table[(String, Int, Int, Int, Int)](tag, "COFFEES") {
+        extends Table[(String, Int, Int, Int, Int)](tag, "COFFEES")
       def name = column[String]("COF_NAME", O.PrimaryKey, O.Length(254))
       def supID = column[Int]("SUP_ID")
       def price = column[Int]("PRICE")
@@ -31,11 +30,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       def total = column[Int]("TOTAL")
       def * = (name, supID, price, sales, total)
       def supplier = foreignKey("SUP_FK", supID, suppliersStd)(_.id)
-    }
     val coffeesStd = TableQuery[CoffeesStd]
 
     class Suppliers(tag: Tag)
-        extends Table[(Int, String, String)](tag, "SUPPLIERS") {
+        extends Table[(Int, String, String)](tag, "SUPPLIERS")
       def id =
         column[Int]("SUP_ID", O.PrimaryKey) // This is the primary key column
       def name = column[String]("SUP_NAME")
@@ -44,11 +42,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       def state = column[String]("STATE")
       def zip = column[String]("ZIP")
       def * = (id, name, street)
-    }
     val suppliers = TableQuery[Suppliers]
 
     class Coffees(tag: Tag)
-        extends Table[(String, Int, Int, Int, Int)](tag, "COFFEES") {
+        extends Table[(String, Int, Int, Int, Int)](tag, "COFFEES")
       def name = column[String]("COF_NAME", O.PrimaryKey)
       def supID = column[Int]("SUP_ID")
       def price = column[Int]("PRICE")
@@ -57,7 +54,6 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       def * = (name, supID, price, sales, (total * 10))
       def totalComputed = sales * price
       def supplier = foreignKey("SUP_FK", supID, suppliers)(_.id)
-    }
     val coffees = TableQuery[Coffees]
 
     val setup = seq(
@@ -77,9 +73,9 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         )
     ).named("setup")
 
-    val qa = for {
+    val qa = for
       c <- coffees.take(3)
-    } yield (c.supID, (c.name, 42))
+    yield (c.supID, (c.name, 42))
     val qa2 = coffees.take(3).map(_.name).take(2)
     val qb = qa.take(2).map(_._2)
     val qb2 = qa.map(n => n).take(2).map(_._2)
@@ -88,61 +84,60 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val a1 = seq(
         mark("qa", qa.result)
           .map(_.toSet)
-          .map { ra =>
+          .map  ra =>
             ra.size shouldBe 3
             // No sorting, so result contents can vary
             ra shouldAllMatch { case (s: Int, (i: String, 42)) => () }
-          },
+          ,
         mark("qa2", qa2.result).map(_.toSet).map(_.size shouldBe 2),
         mark("qb", qb.result)
           .map(_.toSet)
-          .map { rb =>
+          .map  rb =>
             rb.size shouldBe 2
             // No sorting, so result contents can vary
             rb shouldAllMatch { case (i: String, 42) => () }
-          },
+          ,
         mark("qb2", qb2.result)
           .map(_.toSet)
-          .map { rb2 =>
+          .map  rb2 =>
             rb2.size shouldBe 2
             // No sorting, so result contents can vary
             rb2 shouldAllMatch { case (i: String, 42) => () }
-          },
+          ,
         mark("qc", qc.result)
           .map(_.toSet)
-          .map { rc =>
+          .map  rc =>
             rc.size shouldBe 2
             // No sorting, so result contents can vary
             rc shouldAllMatch { case (i: String, 42) => () }
-          }
       )
 
     // Plain table
     val q0 = coffees
 
     // Plain implicit join
-    val q1 = for {
+    val q1 = for
       c <- coffees.sortBy(c => (c.name, c.price.desc)).take(2)
       s <- suppliers
-    } yield ((c.name, (s.city ++ ":")), c, s, c.totalComputed)
+    yield ((c.name, (s.city ++ ":")), c, s, c.totalComputed)
 
     // Explicit join with condition
     val q1b_0 =
       coffees.sortBy(_.price).take(3) join suppliers on (_.supID === _.id)
     def q1b =
-      for {
+      for
         (c, s) <- q1b_0
           .sortBy(_._1.price)
           .take(2)
           .filter(_._1.name =!= "Colombian")
           (c2, s2) <- q1b_0
-      } yield (c.name, s.city, c2.name)
+      yield (c.name, s.city, c2.name)
 
     def a2 = seq(
         mark("q0", q0.result)
           .named("q0: Plain table")
           .map(_.toSet)
-          .map { r0 =>
+          .map  r0 =>
             r0 shouldBe Set(
                 ("Colombian", 101, 799, 1, 0),
                 ("French_Roast", 49, 799, 2, 0),
@@ -150,11 +145,11 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 ("Colombian_Decaf", 101, 849, 4, 0),
                 ("French_Roast_Decaf", 49, 999, 5, 0)
             )
-          },
+          ,
         mark("q1", q1.result)
           .named("q1: Plain implicit join")
           .map(_.toSet)
-          .map { r1 =>
+          .map  r1 =>
             r1 shouldBe Set(
                 (("Colombian", "Groundsville:"),
                  ("Colombian", 101, 799, 1, 0),
@@ -181,82 +176,72 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                  (150, "The High Ground", "100 Coffee Lane"),
                  3396)
             )
-          },
-        ifCap(rcap.pagingNested) {
+          ,
+        ifCap(rcap.pagingNested)
           mark("q1b", q1b.result)
             .named("q1b: Explicit join with condition")
-            .map { r1b =>
+            .map  r1b =>
               r1b.toSet shouldBe Set(
                   ("French_Roast", "Mendocino", "Colombian"),
                   ("French_Roast", "Mendocino", "French_Roast"),
                   ("French_Roast", "Mendocino", "Colombian_Decaf")
               )
-            }
-        }
     )
 
     // More elaborate query
-    val q2 = for {
+    val q2 = for
       c <- coffees.filter(_.price < 900).map(_.*)
       s <- suppliers if s.id === c._2
-    } yield (c._1, s.name)
+    yield (c._1, s.name)
 
     // Lifting scalar values
-    val q3 = coffees.flatMap { c =>
+    val q3 = coffees.flatMap  c =>
       val cf = Query(c).filter(_.price === 849)
-      cf.flatMap { cf =>
-        suppliers.filter(_.id === c.supID).map { s =>
+      cf.flatMap  cf =>
+        suppliers.filter(_.id === c.supID).map  s =>
           (c.name, s.name, cf.name, cf.total, cf.totalComputed)
-        }
-      }
-    }
 
     // Lifting scalar values, with extra tuple
-    val q3b = coffees.flatMap { c =>
+    val q3b = coffees.flatMap  c =>
       val cf = Query((c, 42)).filter(_._1.price < 900)
-      cf.flatMap {
+      cf.flatMap
         case (cf, num) =>
-          suppliers.filter(_.id === c.supID).map { s =>
+          suppliers.filter(_.id === c.supID).map  s =>
             (c.name, s.name, cf.name, cf.total, cf.totalComputed, num)
-          }
-      }
-    }
 
     // Map to tuple, then filter
     def q4 =
-      for {
+      for
         c <- coffees
           .map(c => (c.name, c.price, 42))
           .sortBy(_._1)
           .take(2)
           .filter(_._2 < 800)
-      } yield (c._1, c._3)
+      yield (c._1, c._3)
 
     // Map to tuple, then filter, with self-join
     def q4b_0 = coffees.map(c => (c.name, c.price, 42)).filter(_._2 < 800)
     def q4b =
-      for {
+      for
         c <- q4b_0
         d <- q4b_0
-      } yield (c, d)
+      yield (c, d)
 
     def a3 =
-      for {
-        _ <- q2.result.named("More elaborate query").map(_.toSet).map { r2 =>
+      for
+        _ <- q2.result.named("More elaborate query").map(_.toSet).map  r2 =>
           r2 shouldBe Set(
               ("Colombian", "Acme, Inc."),
               ("French_Roast", "Superior Coffee"),
               ("Colombian_Decaf", "Acme, Inc.")
           )
-        }
-        _ <- q3.result.named("Lifting scalar values").map(_.toSet).map { r3 =>
+        _ <- q3.result.named("Lifting scalar values").map(_.toSet).map  r3 =>
           r3 shouldBe Set(
               ("Colombian_Decaf", "Acme, Inc.", "Colombian_Decaf", 0, 3396))
-        }
         _ <- q3b.result
           .named("Lifting scalar values, with extra tuple")
           .map(_.toSet)
-          .map { r3b =>
+          .map  r3b =>
             r3b shouldBe Set(
                 ("Colombian", "Acme, Inc.", "Colombian", 0, 799, 42),
                 ("French_Roast",
@@ -272,12 +257,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                  3396,
                  42)
             )
-          }
-        _ <- ifCap(rcap.pagingNested) {
+        _ <- ifCap(rcap.pagingNested)
           mark("q4", q4.result)
             .named("q4: Map to tuple, then filter")
             .map(_.toSet shouldBe Set(("Colombian", 42)))
-        }
         _ <- mark("q4b", q4b.result).map(
             _.toSet shouldBe Set(
                 (("Colombian", 799, 42), ("Colombian", 799, 42)),
@@ -285,19 +268,19 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 (("French_Roast", 799, 42), ("Colombian", 799, 42)),
                 (("French_Roast", 799, 42), ("French_Roast", 799, 42))
             ))
-      } yield ()
+      yield ()
 
     // Implicit self-join
     val q5_0 = coffees.sortBy(_.price).take(2)
-    val q5 = for {
+    val q5 = for
       c1 <- q5_0
       c2 <- q5_0
-    } yield (c1, c2)
+    yield (c1, c2)
 
     // Explicit self-join with condition
-    val q5b = for {
+    val q5b = for
       t <- q5_0 join q5_0 on (_.name === _.name)
-    } yield (t._1, t._2)
+    yield (t._1, t._2)
 
     // Unused outer query result, unbound TableQuery
     val q6 = coffees.flatMap(c => suppliers)
@@ -306,7 +289,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         mark("q5", q5.result)
           .named("q5: Implicit self-join")
           .map(_.toSet)
-          .map { r5 =>
+          .map  r5 =>
             r5 shouldBe Set(
                 (("Colombian", 101, 799, 1, 0), ("Colombian", 101, 799, 1, 0)),
                 (("Colombian", 101, 799, 1, 0),
@@ -316,123 +299,121 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                 (("French_Roast", 49, 799, 2, 0),
                  ("French_Roast", 49, 799, 2, 0))
             )
-          },
+          ,
         mark("q5b", q5b.result)
           .named("q5b: Explicit self-join with condition")
           .map(_.toSet)
-          .map { r5b =>
+          .map  r5b =>
             r5b shouldBe Set(
                 (("Colombian", 101, 799, 1, 0), ("Colombian", 101, 799, 1, 0)),
                 (("French_Roast", 49, 799, 2, 0),
                  ("French_Roast", 49, 799, 2, 0))
             )
-          },
+          ,
         mark("q6", q6.result)
           .named("q6: Unused outer query result, unbound TableQuery")
           .map(_.toSet)
-          .map { r6 =>
+          .map  r6 =>
             r6 shouldBe Set(
                 (101, "Acme, Inc.", "99 Market Street"),
                 (49, "Superior Coffee", "1 Party Place"),
                 (150, "The High Ground", "100 Coffee Lane")
             )
-          }
       )
 
     // Simple union
-    val q7a = for {
+    val q7a = for
       c <- coffees.filter(_.price < 800) union coffees.filter(_.price > 950)
-    } yield (c.name, c.supID, c.total)
+    yield (c.name, c.supID, c.total)
 
     // Union
-    val q7 = for {
+    val q7 = for
       c <- coffees.filter(_.price < 800).map((_, 1)) union coffees
         .filter(_.price > 950)
         .map((_, 2))
-    } yield (c._1.name, c._1.supID, c._2)
+    yield (c._1.name, c._1.supID, c._2)
 
     // Transitive push-down without union
-    val q71 = for {
+    val q71 = for
       c <- coffees.filter(_.price < 800).map((_, 1))
-    } yield (c._1.name, c._1.supID, c._2)
+    yield (c._1.name, c._1.supID, c._2)
 
     def a5 = seq(
         q7a.result
           .named("Simple union")
           .map(_.toSet)
-          .map { r7a =>
+          .map  r7a =>
             r7a shouldBe Set(
                 ("Colombian", 101, 0),
                 ("French_Roast", 49, 0),
                 ("Espresso", 150, 0),
                 ("French_Roast_Decaf", 49, 0)
             )
-          },
+          ,
         q7.result
           .named("Union")
           .map(_.toSet)
-          .map { r7 =>
+          .map  r7 =>
             r7 shouldBe Set(
                 ("Colombian", 101, 1),
                 ("French_Roast", 49, 1),
                 ("Espresso", 150, 2),
                 ("French_Roast_Decaf", 49, 2)
             )
-          },
+          ,
         q71.result
           .named("Transitive push-down without union")
           .map(_.toSet)
-          .map { r71 =>
+          .map  r71 =>
             r71 shouldBe Set(
                 ("Colombian", 101, 1),
                 ("French_Roast", 49, 1)
             )
-          }
       )
 
     // Union with filter on the outside
     val q7b = q7 filter (_._1 =!= "Colombian")
 
     // Outer join
-    val q8 = for {
+    val q8 = for
       (c1, c2) <- coffees.filter(_.price < 900) joinLeft coffees.filter(
           _.price < 800) on (_.name === _.name)
-    } yield (c1.name, c2.map(_.name))
+    yield (c1.name, c2.map(_.name))
 
     // Nested outer join
-    val q8b = for {
+    val q8b = for
       t <- coffees.sortBy(_.sales).take(1) joinLeft coffees
         .sortBy(_.sales)
         .take(2) on (_.name === _.name) joinLeft coffees
         .sortBy(_.sales)
         .take(4) on (_._1.supID === _.supID)
-    } yield (t._1, t._2)
+    yield (t._1, t._2)
 
     def a6 = seq(
         q7b.result
           .named("Union with filter on the outside")
           .map(_.toSet)
-          .map { r7b =>
+          .map  r7b =>
             r7b shouldBe Set(
                 ("French_Roast", 49, 1),
                 ("Espresso", 150, 2),
                 ("French_Roast_Decaf", 49, 2)
             )
-          },
+          ,
         q8.result
           .named("Outer join")
           .map(_.toSet)
-          .map { r8 =>
+          .map  r8 =>
             r8 shouldBe Set(
                 ("Colombian", Some("Colombian")),
                 ("French_Roast", Some("French_Roast")),
                 ("Colombian_Decaf", None)
             )
-          },
+          ,
         q8b.result
           .named("Nested outer join")
           .map(_.toSet)
-          .map { r8b =>
+          .map  r8b =>
             r8b shouldBe Set(
                 ((("Colombian", 101, 799, 1, 0),
                   Some(("Colombian", 101, 799, 1, 0))),
@@ -441,55 +422,50 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                   Some(("Colombian", 101, 799, 1, 0))),
                  Some(("Colombian_Decaf", 101, 849, 4, 0)))
             )
-          }
       )
 
     seq(setup, a1, a2, a3, a4, a5, a6)
-  }
 
-  def testOldComposition = {
+  def testOldComposition =
     import TupleMethods._
 
-    class Users(tag: Tag) extends Table[(Int, String, String)](tag, "users") {
+    class Users(tag: Tag) extends Table[(Int, String, String)](tag, "users")
       def id = column[Int]("id")
       def first = column[String]("first")
       def last = column[String]("last")
       def * = id ~ first ~ last
-    }
     val users = TableQuery[Users]
 
-    class Orders(tag: Tag) extends Table[(Int, Int)](tag, "orders") {
+    class Orders(tag: Tag) extends Table[(Int, Int)](tag, "orders")
       def userID = column[Int]("userID")
       def orderID = column[Int]("orderID")
       def * = userID ~ orderID
-    }
     val orders = TableQuery[Orders]
 
-    val q2 = for {
+    val q2 = for
       u <- users.sortBy(u => (u.first, u.last.desc))
-      o <- orders filter { o =>
+      o <- orders filter  o =>
         u.id === o.userID
-      }
-    } yield u.first ~ u.last ~ o.orderID
+    yield u.first ~ u.last ~ o.orderID
 
     val q3 = for (u <- users filter (_.id === 42)) yield u.first ~ u.last
 
-    val q4 = (for {
+    val q4 = (for
       (u, o) <- users join orders on (_.id === _.userID)
-    } yield (u.last, u.first ~ o.orderID)).sortBy(_._1).map(_._2)
+    yield (u.last, u.first ~ o.orderID)).sortBy(_._1).map(_._2)
 
-    val q6a = (for (o <- orders if o.orderID === (for {
+    val q6a = (for (o <- orders if o.orderID === (for
                           o2 <- orders if o.userID === o2.userID
-                        } yield o2.orderID).max) yield o.orderID).sorted
+                        yield o2.orderID).max) yield o.orderID).sorted
 
-    val q6b = (for (o <- orders if o.orderID === (for {
+    val q6b = (for (o <- orders if o.orderID === (for
                           o2 <- orders if o.userID === o2.userID
-                        } yield o2.orderID).max) yield
+                        yield o2.orderID).max) yield
       o.orderID ~ o.userID).sortBy(_._1)
 
-    val q6c = (for (o <- orders if o.orderID === (for {
+    val q6c = (for (o <- orders if o.orderID === (for
                           o2 <- orders if o.userID === o2.userID
-                        } yield o2.orderID).max) yield
+                        yield o2.orderID).max) yield
       o).sortBy(_.orderID).map(o => o.orderID ~ o.userID)
 
     seq(
@@ -501,73 +477,64 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
         q6c.result,
         (users.schema ++ orders.schema).drop
     )
-  }
 
-  def testAdvancedFusion = {
-    class TableA(tag: Tag) extends Table[Int](tag, "TableA") {
+  def testAdvancedFusion =
+    class TableA(tag: Tag) extends Table[Int](tag, "TableA")
       def id = column[Int]("id")
       def * = id
-    }
     val tableA = TableQuery[TableA]
 
-    class TableB(tag: Tag) extends Table[(Int, Int)](tag, "TableB") {
+    class TableB(tag: Tag) extends Table[(Int, Int)](tag, "TableB")
       def id = column[Int]("id")
       def start = column[Int]("start")
       def * = (id, start)
-    }
     val tableB = TableQuery[TableB]
 
-    class TableC(tag: Tag) extends Table[Int](tag, "TableC") {
+    class TableC(tag: Tag) extends Table[Int](tag, "TableC")
       def start = column[Int]("start")
       def * = start
-    }
     val tableC = TableQuery[TableC]
 
-    val queryErr2 = for {
+    val queryErr2 = for
       a <- tableA
       b <- tableB if b.id === a.id
       start = a.id + 1
       c <- tableC if c.start <= start
-    } yield (b, c)
+    yield (b, c)
 
     (tableA.schema ++ tableB.schema ++ tableC.schema).create >> queryErr2.result
-  }
 
-  def testSubquery = {
-    class A(tag: Tag) extends Table[Int](tag, "A_subquery") {
+  def testSubquery =
+    class A(tag: Tag) extends Table[Int](tag, "A_subquery")
       def id = column[Int]("id")
       def * = id
-    }
     val as = TableQuery[A]
 
-    for {
+    for
       _ <- as.schema.create
       _ <- as += 42
 
       q0 = as.filter(_.id === 42.bind).length
       _ <- q0.result.named("q0").map(_ shouldBe 1)
 
-      q1 = Compiled { (n: Rep[Int]) =>
+      q1 = Compiled  (n: Rep[Int]) =>
         as.filter(_.id === n).map(a => as.length)
-      }
       _ <- q1(42).result.named("q1(42)").map(_ shouldBe List(1))
 
       q2 = as.filter(_.id in as.sortBy(_.id).map(_.id))
       _ <- q2.result.named("q2").map(_ shouldBe Vector(42))
-    } yield ()
-  }
+    yield ()
 
-  def testExpansion = {
-    class A(tag: Tag) extends Table[(Int, String)](tag, "A_refexp") {
+  def testExpansion =
+    class A(tag: Tag) extends Table[(Int, String)](tag, "A_refexp")
       def id = column[Int]("id")
       def a = column[String]("a")
       def b = column[String]("b")
       def * = (id, a)
       override def create_* = collectFieldSymbols((id, a, b).shaped.toNode)
-    }
     val as = TableQuery[A]
 
-    for {
+    for
       _ <- as.schema.create
       _ <- as.map(a => (a.id, a.a, a.b)) ++= Seq(
           (1, "a1", "b1"),
@@ -579,10 +546,10 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       _ <- q1.result.named("q1").map(r1 => r1.toSet shouldBe Set((3, "a3")))
 
       q2a = as.sortBy(_.a) join as on (_.b === _.b)
-      q2 = for {
+      q2 = for
         (c, s) <- q2a
         c2 <- as
-      } yield (c.id, c2.a)
+      yield (c.id, c2.a)
       r2 <- q2.result.named("q2").map(_.toSet)
       _ = r2 shouldBe Set((1, "a1"),
                           (1, "a2"),
@@ -593,17 +560,15 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
                           (3, "a1"),
                           (3, "a2"),
                           (3, "a3"))
-    } yield ()
-  }
+    yield ()
 
-  def testNewFusion = {
+  def testNewFusion =
     class A(tag: Tag)
-        extends Table[(Int, String, String)](tag, "A_NEWFUSION") {
+        extends Table[(Int, String, String)](tag, "A_NEWFUSION")
       def id = column[Int]("id", O.PrimaryKey)
       def a = column[String]("a")
       def b = column[String]("b")
       def * = (id, a, b)
-    }
     val as = TableQuery[A]
 
     val data = Set((1, "a", "a"), (2, "a", "b"), (3, "c", "b"))
@@ -611,13 +576,12 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val q1 = (as join as on (_.id === _.id))
     val q2 = (as join as on (_.id === _.id) join as on (_._1.id === _.id))
     val q3 = q2.map { case ((a1, a2), a3) => (a1.id, a2.a, a3.b) }
-    val q4 = as.map(a => (a.id, a.a, a.b, a)).filter(_._3 === "b").map {
+    val q4 = as.map(a => (a.id, a.a, a.b, a)).filter(_._3 === "b").map
       case (id, a1, b, a2) => (id, a2)
-    }
     val q5a = as.to[Set].filter(_.b === "b").map(_.id)
     val q5b = as.filter(_.b === "b").to[Set].map(_.id)
     val q5c = as.filter(_.b === "b").map(_.id).to[Set]
-    val q6 = (as join as).groupBy(j => (j._1.a, j._1.b)).map {
+    val q6 = (as join as).groupBy(j => (j._1.a, j._1.b)).map
       case (ab, rs) =>
         (ab,
          rs.length,
@@ -625,7 +589,6 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
          rs.map(_._2).length,
          rs.map(_._1.id).max,
          rs.map(_._1.id).length)
-    }
     val q7 = q6.filter(_._1._1 === "a").map(_._5.getOrElse(0))
     val q8 = as.sortBy(_.id.desc).map(_.a)
     val q9a = as.sortBy(_.b).sortBy(_.a.desc).map(_.id)
@@ -646,9 +609,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
     val q16 = (as.map(a => a.id.?).filter(_ < 2) unionAll as
           .map(a => a.id.?)
           .filter(_ > 2)).map(_.getOrElse(-1)).to[Set].filter(_ =!= 42)
-    val q17 = as.sortBy(_.id).zipWithIndex.filter(_._2 < 2L).map {
+    val q17 = as.sortBy(_.id).zipWithIndex.filter(_._2 < 2L).map
       case (a, i) => (a.id, i)
-    }
     val q18 = as
       .joinLeft(as)
       .on { case (a1, a2) => a1.id === a2.id }
@@ -668,7 +630,7 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       .subquery
       .map(_._2)
 
-    if (tdb.profile == H2Profile) {
+    if (tdb.profile == H2Profile)
       assertNesting(q1, 1)
       assertNesting(q2, 1)
       assertNesting(q3, 1)
@@ -697,9 +659,8 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
       assertNesting(q18, 1)
       assertNesting(q19, 1)
       assertNesting(q19b, 2)
-    }
 
-    for {
+    for
       _ <- as.schema.create
       _ <- as ++= data
       _ <- mark("as", as.result).map(_.toSet shouldBe data)
@@ -740,6 +701,4 @@ class NewQuerySemanticsTest extends AsyncTest[RelationalTestDB] {
               Some((1, "a", "a")), Some((2, "a", "b")), Some((3, "c", "b"))))
       _ <- mark("q19b", q19b.result).map(_.toSet shouldBe Set(
               Some((1, "a", "a")), Some((2, "a", "b")), Some((3, "c", "b"))))
-    } yield ()
-  }
-}
+    yield ()

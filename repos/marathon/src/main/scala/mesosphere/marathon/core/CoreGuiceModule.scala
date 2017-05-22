@@ -27,7 +27,7 @@ import mesosphere.util.{CapConcurrentExecutionsMetrics, CapConcurrentExecutions}
 /**
   * Provides the glue between guice and the core modules.
   */
-class CoreGuiceModule extends AbstractModule {
+class CoreGuiceModule extends AbstractModule
 
   // Export classes used outside of core to guice
   @Provides
@@ -123,7 +123,7 @@ class CoreGuiceModule extends AbstractModule {
       taskStatusEmitterPublishImpl: TaskStatusEmitterPublishStepImpl,
       postToEventStreamStepImpl: PostToEventStreamStepImpl,
       scaleAppUpdateStepImpl: ScaleAppUpdateStepImpl)
-    : Seq[TaskStatusUpdateStep] = {
+    : Seq[TaskStatusUpdateStep] =
 
     // This is a sequence on purpose. The specified steps are executed in order for every
     // task status update.
@@ -147,16 +147,14 @@ class CoreGuiceModule extends AbstractModule {
         ContinueOnErrorStep(postToEventStreamStepImpl),
         ContinueOnErrorStep(scaleAppUpdateStepImpl)
     )
-  }
 
   @Provides
   @Singleton
   def pluginHttpRequestHandler(
-      coreModule: CoreModule): Seq[HttpRequestHandler] = {
+      coreModule: CoreModule): Seq[HttpRequestHandler] =
     coreModule.pluginModule.httpRequestHandler
-  }
 
-  override def configure(): Unit = {
+  override def configure(): Unit =
     bind(classOf[Clock]).toInstance(Clock())
     bind(classOf[CoreModule]).to(classOf[CoreModuleImpl]).in(Scopes.SINGLETON)
 
@@ -172,7 +170,6 @@ class CoreGuiceModule extends AbstractModule {
       .asEagerSingleton()
 
     bind(classOf[AppInfoModule]).asEagerSingleton()
-  }
 
   @Provides
   @Singleton
@@ -180,7 +177,7 @@ class CoreGuiceModule extends AbstractModule {
   def throttlingTaskStatusUpdateProcessorSerializer(
       metrics: Metrics,
       config: MarathonConf,
-      actorRefFactory: ActorRefFactory): CapConcurrentExecutions = {
+      actorRefFactory: ActorRefFactory): CapConcurrentExecutions =
     val capMetrics = new CapConcurrentExecutionsMetrics(
         metrics, classOf[ThrottlingTaskStatusUpdateProcessor])
 
@@ -191,5 +188,3 @@ class CoreGuiceModule extends AbstractModule {
         maxParallel = config.internalMaxParallelStatusUpdates(),
         maxQueued = config.internalMaxQueuedStatusUpdates()
     )
-  }
-}

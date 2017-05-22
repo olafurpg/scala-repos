@@ -8,7 +8,7 @@ import Either3._
 import MonadPartialOrder._
 import Id._
 
-object Enumeratee2TTest extends SpecLite {
+object Enumeratee2TTest extends SpecLite
   implicit val ls = listShow[Either3[Int, (Int, Int), Int]]
   implicit val v = IterateeT.IterateeTMonad[Int, Id]
   implicit val vt = IterateeT.IterateeTMonadTrans[Int]
@@ -19,7 +19,7 @@ object Enumeratee2TTest extends SpecLite {
   type StepM[A] = StepT[Int, Id, A]
   type IterateeM[A] = IterateeT[Int, Id, A]
 
-  "join equal pairs" in {
+  "join equal pairs" in
     val enum = enumStream[Int, IterateeM](Stream(1, 3, 5, 7))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 6))
 
@@ -28,12 +28,11 @@ object Enumeratee2TTest extends SpecLite {
     val inner = outer.run &= enum2
 
     inner.run.pointI.run must_=== (List((3, 3), (5, 5)))
-  }
 
-  "cogroup" should {
+  "cogroup" should
     type E3I = Either3[Int, (Int, Int), Int]
     type E3LI = List[E3I]
-    "match equal elements, retaining unequal elements on the \"side\" they came from" in {
+    "match equal elements, retaining unequal elements on the \"side\" they came from" in
       val enum = enumStream[Int, IterateeM](Stream(1, 3, 3, 5, 7, 8, 8))
       val enum2 = enumStream[Int, Id](Stream(2, 3, 4, 5, 5, 6, 8, 8))
 
@@ -58,10 +57,8 @@ object Enumeratee2TTest extends SpecLite {
           middle3((8, 8)),
           middle3((8, 8))
       )
-    }
-  }
 
-  "merge sorted iteratees" in {
+  "merge sorted iteratees" in
     val enum = enumStream[Int, IterateeM](Stream(1, 3, 5))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 3, 4, 5, 6))
 
@@ -69,9 +66,8 @@ object Enumeratee2TTest extends SpecLite {
     val inner = outer.run &= enum2
 
     inner.run.pointI.run must_=== (List(1, 2, 3, 3, 3, 4, 5, 5, 6))
-  }
 
-  "cross the first element with all of the second iteratee's elements" in {
+  "cross the first element with all of the second iteratee's elements" in
     val enum1 = enumStream[Int, Id](Stream(1, 3, 5))
     val enum2 = enumStream[Int, Id](Stream(2, 3, 4))
 
@@ -89,24 +85,19 @@ object Enumeratee2TTest extends SpecLite {
             (5, 3),
             (5, 4)
         ))
-  }
 
-  "join the first element with all of the second iteratee's elements, which compare equal" in {
-    val enum1p = new EnumeratorP[Int, Id] {
+  "join the first element with all of the second iteratee's elements, which compare equal" in
+    val enum1p = new EnumeratorP[Int, Id]
       def apply[F[_]](
-          implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] = {
+          implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] =
         import ord._
         enumStream[Int, F](Stream(1))
-      }
-    }
 
-    val enum2p = new EnumeratorP[Int, Id] {
+    val enum2p = new EnumeratorP[Int, Id]
       def apply[F[_]](
-          implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] = {
+          implicit ord: MonadPartialOrder[F, Id]): EnumeratorT[Int, F] =
         import ord._
         enumStream[Int, F](Stream(1, 1, 1))
-      }
-    }
 
     val consumer = consume[(Int, Int), Id, List]
     val producer = joinE[Int, Int, Id]
@@ -118,7 +109,5 @@ object Enumeratee2TTest extends SpecLite {
             (1, 1),
             (1, 1)
         ))
-  }
-}
 
 // vim: set ts=4 sw=4 et:

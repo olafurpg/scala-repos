@@ -6,20 +6,17 @@ import play.api.libs.json._
 import play.api.test._
 import Types._
 
-class DbApiTest extends Specification {
+class DbApiTest extends Specification
 
   import api._
 
   val date = DateTime.now
 
-  "operators" should {
+  "operators" should
 
-    "$set" in {
+    "$set" in
       $set("foo" -> "bar") must_== Json.obj("$set" -> Json.obj("foo" -> "bar"))
-    }
     // "$set DateTime" in new WithApplication {
     //   $set("foo" -> date) must_== Json.obj(
     //     "$set" -> Json.obj("foo" -> Json.obj("$date" -> date.getMillis)))
     // }
-  }
-}

@@ -20,12 +20,12 @@ import scala.collection.JavaConversions._
   * Nikolay.Tropin
   * 2014-03-20
   */
-object ImportMembersUtil {
+object ImportMembersUtil
   def isInImport(element: PsiElement): Boolean =
     PsiTreeUtil.getParentOfType(element, classOf[ScImportExpr]) != null
 
-  def hasQualifier(ref: ScReferenceElement) = {
-    ref match {
+  def hasQualifier(ref: ScReferenceElement) =
+    ref match
       case _ childOf(ScInfixExpr(qual: ScReferenceExpression, `ref`, _)) =>
         true
       case _ childOf(ScPostfixExpr(qual: ScReferenceExpression, `ref`)) => true
@@ -35,26 +35,22 @@ object ImportMembersUtil {
       case stCodeRef: ScStableCodeReferenceElement =>
         stCodeRef.qualifier.isDefined
       case _ => false
-    }
-  }
 
-  def resolvesToStablePath(ref: ScReferenceElement): Boolean = {
+  def resolvesToStablePath(ref: ScReferenceElement): Boolean =
     if (ref == null) return false
 
-    ref.resolve() match {
+    ref.resolve() match
       case Both(member: PsiMember, named: PsiNamedElement) =>
         ScalaPsiUtil.hasStablePath(named) &&
         (member.hasModifierProperty(PsiModifier.STATIC) ||
             member.containingClass == null)
       case named: PsiNamedElement => ScalaPsiUtil.hasStablePath(named)
       case _ => false
-    }
-  }
 
   @tailrec
   def replaceWithName(
-      oldRef: ScReferenceElement, name: String): ScReferenceElement = {
-    oldRef match {
+      oldRef: ScReferenceElement, name: String): ScReferenceElement =
+    oldRef match
       case _ childOf (inf @ ScInfixExpr(
           qual: ScReferenceExpression, `oldRef`, _)) =>
         val call = ScalaPsiElementFactory.createEquivMethodCall(inf)
@@ -80,21 +76,18 @@ object ImportMembersUtil {
                   name, oldRef.getManager))
           .asInstanceOf[ScReferenceElement]
       case _ => null
-    }
-  }
 
   @tailrec
   def replaceAndBind(
-      oldRef: ScReferenceElement, name: String, toBind: PsiNamedElement) {
-    toBind match {
+      oldRef: ScReferenceElement, name: String, toBind: PsiNamedElement)
+    toBind match
       case fun: ScFunction if fun.isSynthetic =>
-        fun.getSyntheticNavigationElement match {
+        fun.getSyntheticNavigationElement match
           case Some(named: PsiNamedElement) =>
             replaceAndBind(oldRef, named.name, named)
           case _ =>
-        }
       case _ =>
-        oldRef match {
+        oldRef match
           case _ childOf (inf @ ScInfixExpr(
               qual: ScReferenceExpression, `oldRef`, _)) =>
             val call = ScalaPsiElementFactory.createEquivMethodCall(inf)
@@ -113,10 +106,9 @@ object ImportMembersUtil {
               .asInstanceOf[ScReferenceExpression]
             replaceAndBind(withDot, name, toBind)
           case expr: ScReferenceExpression =>
-            val clazz = toBind match {
+            val clazz = toBind match
               case m: PsiMember => Option(m.getContainingClass)
               case _ => None
-            }
             val refExpr = ScalaPsiElementFactory.createExpressionFromText(
                 name, oldRef.getManager)
             val replaced =
@@ -132,36 +124,28 @@ object ImportMembersUtil {
               .asInstanceOf[ScStableCodeReferenceElement]
               .bindToElement(toBind)
           case _ =>
-        }
-    }
-  }
 
   def sorted(usages: util.Collection[PsiReference],
-             isQualifier: Boolean): Seq[PsiReference] = {
-    def actuallyReplaced(ref: PsiReference): PsiElement = {
+             isQualifier: Boolean): Seq[PsiReference] =
+    def actuallyReplaced(ref: PsiReference): PsiElement =
       val trueRef =
         if (!isQualifier) ref
         else
-          ref match {
+          ref match
             case isQualifierFor(r) => r
             case _ => ref
-          }
-      trueRef match {
+      trueRef match
         case _ childOf (inf @ ScInfixExpr(_, `trueRef`, _)) => inf
         case _ childOf (postfix @ ScPostfixExpr(_, `trueRef`)) => postfix
         case _ => trueRef.getElement
-      }
-    }
-    val lessThan: (PsiReference, PsiReference) => Boolean = { (ref1, ref2) =>
+    val lessThan: (PsiReference, PsiReference) => Boolean =  (ref1, ref2) =>
       PsiTreeUtil.isAncestor(
           actuallyReplaced(ref2), actuallyReplaced(ref1), true)
-    }
     usages.toSeq.sortWith(lessThan)
-  }
 
-  object isQualifierFor {
-    def unapply(qual: ScReferenceElement): Option[ScReferenceElement] = {
-      qual.getParent match {
+  object isQualifierFor
+    def unapply(qual: ScReferenceElement): Option[ScReferenceElement] =
+      qual.getParent match
         case ref @ ScReferenceExpression.withQualifier(`qual`) => Some(ref)
         case ScInfixExpr(`qual`, op, _) => Some(op)
         case ScPostfixExpr(`qual`, op: ScReferenceElement) => Some(op)
@@ -169,13 +153,7 @@ object ImportMembersUtil {
             if stRef.qualifier.contains(qual) =>
           Some(stRef)
         case _ => None
-      }
-    }
-  }
 
-  object isQualifierInImport {
-    def unapply(qual: ScStableCodeReferenceElement): Option[ScImportExpr] = {
+  object isQualifierInImport
+    def unapply(qual: ScStableCodeReferenceElement): Option[ScImportExpr] =
       PsiTreeUtil.getParentOfType(qual, classOf[ScImportExpr]).toOption
-    }
-  }
-}

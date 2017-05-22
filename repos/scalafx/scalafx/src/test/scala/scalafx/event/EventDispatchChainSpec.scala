@@ -42,14 +42,12 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class EventDispatchChainSpec
     extends SimpleSFXDelegateSpec[jfxe.EventDispatchChain, EventDispatchChain](
-        classOf[jfxe.EventDispatchChain], classOf[EventDispatchChain]) {
+        classOf[jfxe.EventDispatchChain], classOf[EventDispatchChain])
 
   override protected def getScalaClassInstance: EventDispatchChain =
     getJavaClassInstance
 
-  override protected def getJavaClassInstance = new jfxe.EventDispatchChain() {
+  override protected def getJavaClassInstance = new jfxe.EventDispatchChain()
     override def append(eventDispatcher: jfxe.EventDispatcher) = ???
     override def prepend(eventDispatcher: jfxe.EventDispatcher) = ???
     override def dispatchEvent(event: jfxe.Event) = ???
-  }
-}

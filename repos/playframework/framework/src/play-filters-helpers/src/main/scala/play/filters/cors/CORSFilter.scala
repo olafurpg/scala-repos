@@ -38,30 +38,26 @@ class CORSFilter(
     override protected val errorHandler: HttpErrorHandler = DefaultHttpErrorHandler,
     private val pathPrefixes: Seq[String] = Seq("/"))(
     override implicit val mat: Materializer)
-    extends Filter with AbstractCORSPolicy {
+    extends Filter with AbstractCORSPolicy
 
   // Java constructor
   def this(corsConfig: CORSConfig,
            errorHandler: play.http.HttpErrorHandler,
-           pathPrefixes: java.util.List[String])(mat: Materializer) = {
+           pathPrefixes: java.util.List[String])(mat: Materializer) =
     this(corsConfig,
          new JavaHttpErrorHandlerAdapter(errorHandler),
          Seq(pathPrefixes.toArray.asInstanceOf[Array[String]]: _*))(mat)
-  }
 
   override protected val logger = Logger(classOf[CORSFilter])
 
   override def apply(f: RequestHeader => Future[Result])(
-      request: RequestHeader): Future[Result] = {
-    if (pathPrefixes.exists(request.path.startsWith)) {
+      request: RequestHeader): Future[Result] =
+    if (pathPrefixes.exists(request.path.startsWith))
       filterRequest(f, request)
-    } else {
+    else
       f(request)
-    }
-  }
-}
 
-object CORSFilter {
+object CORSFilter
 
   val RequestTag = "CORS_REQUEST"
 
@@ -69,4 +65,3 @@ object CORSFilter {
             errorHandler: HttpErrorHandler = DefaultHttpErrorHandler,
             pathPrefixes: Seq[String] = Seq("/"))(implicit mat: Materializer) =
     new CORSFilter(corsConfig, errorHandler, pathPrefixes)
-}

@@ -46,8 +46,8 @@ import scalafx.scene.chart.XYChart
   * @see scalafx.scene.chart.NumberAxis
   *
   */
-class EnsembleBarChart extends EnsembleExample {
-  def getContent = {
+class EnsembleBarChart extends EnsembleExample
+  def getContent =
     val years = ObservableBuffer("2007", "2008", "2009")
 
     val xAxis = CategoryAxis(years)
@@ -60,9 +60,6 @@ class EnsembleBarChart extends EnsembleExample {
     val series2 = XYChart.Series("Lemons", xyData(Seq(956, 1665, 2559)))
     val series3 = XYChart.Series("Oranges", xyData(Seq(1154, 1927, 2774)))
 
-    new BarChart[String, Number](xAxis, yAxis) {
+    new BarChart[String, Number](xAxis, yAxis)
       data = Seq(series1, series2, series3)
       categoryGap = 25.0d
-    }
-  }
-}

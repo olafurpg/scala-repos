@@ -91,7 +91,7 @@ package akka.actor
   *  }
   * }}}
   */
-abstract class UntypedActor extends Actor {
+abstract class UntypedActor extends Actor
 
   /**
     * To be implemented by concrete UntypedActor, this defines the behavior of the
@@ -174,4 +174,3 @@ abstract class UntypedActor extends Actor {
     * to the actor's system's [[akka.event.EventStream]].
     */
   override def unhandled(message: Any): Unit = super.unhandled(message)
-}

@@ -38,7 +38,7 @@ import scalafx.util.Duration.sfxDuration2jfx
 /**
   * Defines Constants to be used for all [[scalafx.animation.Animation]]s object companions.
   */
-trait AnimationStatics {
+trait AnimationStatics
 
   /**
     * Used to specify an animation that repeats indefinitely, until the stop() method is called.
@@ -47,7 +47,6 @@ trait AnimationStatics {
   @deprecated("Use Indefinite; INDEFINITE will be removed in a future release",
               "2.2.60")
   val INDEFINITE = Indefinite
-}
 
 /**
   * Companion Object for [[scalafx.animation.Animation]].
@@ -55,7 +54,7 @@ trait AnimationStatics {
   * @define AN `Animation`
   * @define ST `Status`
   */
-object Animation extends AnimationStatics {
+object Animation extends AnimationStatics
 
   /**
     * Converts a ScalaFX $AN to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Animation.html $AN]],
@@ -71,7 +70,7 @@ object Animation extends AnimationStatics {
     * Companion Object for $ST, where its values are defined.
     */
   object Status
-      extends SFXEnumDelegateCompanion[jfxa.Animation.Status, Status] {
+      extends SFXEnumDelegateCompanion[jfxa.Animation.Status, Status]
 
     /**
       * The paused state.
@@ -99,7 +98,6 @@ object Animation extends AnimationStatics {
 
     protected override def unsortedValues: Array[Status] =
       Array(Paused, Running, Stopped)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Animation.Status.html $ST]]
@@ -109,7 +107,6 @@ object Animation extends AnimationStatics {
     */
   sealed case class Status(override val delegate: jfxa.Animation.Status)
       extends SFXEnumDelegate[jfxa.Animation.Status]
-}
 
 /**
   * Wraps JavaFX's [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Animation.html $AN]].
@@ -118,7 +115,7 @@ object Animation extends AnimationStatics {
   * @define DV Default value:
   */
 abstract class Animation protected (override val delegate: jfxa.Animation)
-    extends SFXDelegate[jfxa.Animation] {
+    extends SFXDelegate[jfxa.Animation]
 
   // Properties
 
@@ -126,9 +123,8 @@ abstract class Animation protected (override val delegate: jfxa.Animation)
     * Defines whether this $AN reverses direction on alternating cycles. $DV false.
     */
   def autoReverse: BooleanProperty = delegate.autoReverseProperty
-  def autoReverse_=(ar: Boolean) {
+  def autoReverse_=(ar: Boolean)
     autoReverse() = ar
-  }
 
   /**
     * Read-only variable to indicate current direction/speed at which the
@@ -146,9 +142,8 @@ abstract class Animation protected (override val delegate: jfxa.Animation)
     * Defines the number of cycles in this $AN. $DV 0ms
     */
   def cycleCount: IntegerProperty = delegate.cycleCountProperty
-  def cycleCount_=(r: Int) {
+  def cycleCount_=(r: Int)
     cycleCount() = r
-  }
 
   /**
     * Read-only variable to indicate the duration of one cycle of this
@@ -162,25 +157,22 @@ abstract class Animation protected (override val delegate: jfxa.Animation)
     * Delays the start of an $AN. $DV 0ms.
     */
   def delay: ObjectProperty[jfxu.Duration] = delegate.delayProperty
-  def delay_=(d: Duration) {
+  def delay_=(d: Duration)
     delay() = d
-  }
 
   /**
     * The action to be executed at the conclusion of this $AN.
     */
   def onFinished = delegate.onFinishedProperty
-  def onFinished_=(handler: jfxe.EventHandler[jfxe.ActionEvent]) {
+  def onFinished_=(handler: jfxe.EventHandler[jfxe.ActionEvent])
     onFinished() = handler
-  }
 
   /**
     * Defines the direction/speed at which the $AN is expected to be played. $DV 1.0
     */
   def rate: DoubleProperty = delegate.rateProperty
-  def rate_=(r: Double) {
+  def rate_=(r: Double)
     rate() = r
-  }
 
   /**
     * The `status` of the $AN.
@@ -201,67 +193,58 @@ abstract class Animation protected (override val delegate: jfxa.Animation)
     *
     * @param time the new position
     */
-  def jumpTo(time: Duration) {
+  def jumpTo(time: Duration)
     delegate.jumpTo(time)
-  }
 
   /**
     * Jumps to a predefined position in this $AN.
     *
     * @param cuePoint the name of the cue point
     */
-  def jumpTo(cuePoint: String) {
+  def jumpTo(cuePoint: String)
     delegate.jumpTo(cuePoint)
-  }
 
   /**
     * Pauses the $AN.
     */
-  def pause() {
+  def pause()
     delegate.pause()
-  }
 
   /**
     * Plays $AN from current position in the direction indicated by `rate`.
     */
-  def play() {
+  def play()
     delegate.play()
-  }
 
   /**
     * A convenience method to play this $AN from a specific position.
     *
     * @param time position where to play from
     */
-  def playFrom(time: Duration) {
+  def playFrom(time: Duration)
     delegate.playFrom(time)
-  }
 
   /**
     * A convenience method to play this $AN from a predefined position.
     *
     * @param cuePoint name of the cue point
     */
-  def playFrom(cuePoint: String) {
+  def playFrom(cuePoint: String)
     delegate.playFrom(cuePoint)
-  }
 
   /**
     * Plays an $AN from initial position in forward direction.
     */
-  def playFromStart() {
+  def playFromStart()
     delegate.playFromStart()
-  }
 
   /**
     * Stops the $AN and resets the play head to its initial position.
     */
-  def stop() {
+  def stop()
     delegate.stop()
-  }
 
   /**
     * The target framerate is the maximum framerate at which this $AN will run, in frames per second.
     */
   def targetFramerate = delegate.getTargetFramerate
-}

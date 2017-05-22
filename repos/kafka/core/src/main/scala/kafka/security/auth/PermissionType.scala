@@ -23,23 +23,19 @@ import kafka.common.{BaseEnum, KafkaException}
   */
 sealed trait PermissionType extends BaseEnum
 
-case object Allow extends PermissionType {
+case object Allow extends PermissionType
   val name = "Allow"
-}
 
-case object Deny extends PermissionType {
+case object Deny extends PermissionType
   val name = "Deny"
-}
 
-object PermissionType {
-  def fromString(permissionType: String): PermissionType = {
+object PermissionType
+  def fromString(permissionType: String): PermissionType =
     val pType =
       values.find(pType => pType.name.equalsIgnoreCase(permissionType))
     pType.getOrElse(
         throw new KafkaException(permissionType +
             " not a valid permissionType name. The valid names are " +
             values.mkString(",")))
-  }
 
   def values: Seq[PermissionType] = List(Allow, Deny)
-}

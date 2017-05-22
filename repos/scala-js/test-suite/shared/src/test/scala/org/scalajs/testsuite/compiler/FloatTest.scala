@@ -10,9 +10,9 @@ package org.scalajs.testsuite.compiler
 import org.junit.Test
 import org.junit.Assert._
 
-class FloatTest {
+class FloatTest
   @Test
-  def `toInt`(): Unit = {
+  def `toInt`(): Unit =
     @inline
     def test(x: Float, expected: Int): Unit =
       assertEquals(x.toInt, expected)
@@ -41,5 +41,3 @@ class FloatTest {
     test(-2147483646f, -2147483648)
     test(-2147483500f, -2147483520)
     test(-65.67f, -65)
-  }
-}

@@ -1,39 +1,30 @@
-trait Base[T, R] {
+trait Base[T, R]
   def f(x: T): R
   def g(x: T): R
   def h(x: T): R = null.asInstanceOf[R]
-}
 
-trait Foo1[T] extends Base[T, String] {
+trait Foo1[T] extends Base[T, String]
   def f(x: T): String = null
   def g(x: T): String
-}
-trait Foo2[R] extends Base[String, R] {
+trait Foo2[R] extends Base[String, R]
   def f(x: String): R = { print(x.length); null.asInstanceOf[R] }
   def g(x: String): R
-}
-abstract class Foo3[T] extends Base[T, String] {
+abstract class Foo3[T] extends Base[T, String]
   def f(x: T): String = ""
   def g(x: T): String
-}
-abstract class Foo4[R] extends Base[String, R] {
+abstract class Foo4[R] extends Base[String, R]
   def f(x: String): R = { print(x.length); null.asInstanceOf[R] }
   def g(x: String): R
-}
 
-object Test {
-  object bar1 extends Foo1[String] {
+object Test
+  object bar1 extends Foo1[String]
     def g(x: String): String = { print(x.length); "" }
-  }
-  object bar2 extends Foo2[String] {
+  object bar2 extends Foo2[String]
     def g(x: String): String = { print(x.length); "" }
-  }
-  object bar3 extends Foo3[String] {
+  object bar3 extends Foo3[String]
     def g(x: String): String = { print(x.length); "" }
-  }
-  object bar4 extends Foo4[String] {
+  object bar4 extends Foo4[String]
     def g(x: String): String = { print(x.length); "" }
-  }
 
   // Notice that in bar5, f and g require THREE bridges, because the final
   // implementation is (String)String, but:
@@ -47,10 +38,9 @@ object Test {
   // public java.lang.Object Test$bar5$.g(java.lang.String) <bridge> <synthetic>
   // public java.lang.Object Test$bar5$.g(java.lang.Object) <bridge> <synthetic>
   // public java.lang.String Test$bar5$.g(java.lang.Object) <bridge> <synthetic>
-  object bar5 extends Foo1[String] with Foo2[String] {
+  object bar5 extends Foo1[String] with Foo2[String]
     override def f(x: String): String = { print(x.length); x }
     def g(x: String): String = { print(x.length); x }
-  }
 
   final def m1[T, R](x: Base[T, R], y: T) = { x.f(y); x.g(y); x.h(y) }
   final def m2[T](x: Base[T, String], y: T) = { x.f(y); x.g(y); x.h(y) }
@@ -66,7 +56,7 @@ object Test {
   final def m41[T](x: Foo4[T], y: T) = { x.f(""); x.g(""); x.h("") }
   final def m42(x: Foo4[String]) = { x.f(""); x.g(""); x.h("") }
 
-  def go = {
+  def go =
     m1(bar1, ""); m2(bar1, ""); m3(bar1); m4(bar1)
     m1(bar2, ""); m2(bar2, ""); m3(bar2); m4(bar2)
     m1(bar3, ""); m2(bar3, ""); m3(bar3); m4(bar3)
@@ -77,9 +67,8 @@ object Test {
     m31(bar3, ""); m32(bar3)
     m41(bar4, ""); m42(bar4)
     ""
-  }
 
-  def flagsString(m: java.lang.reflect.Method) = {
+  def flagsString(m: java.lang.reflect.Method) =
     val str =
       List(
           if (m.isBridge) "<bridge>" else "",
@@ -90,26 +79,20 @@ object Test {
     //
     // val flags = scala.reflect.internal.ClassfileConstants.toScalaMethodFlags(m.getModifiers())
     // scala.tools.nsc.symtab.Flags.flagsToString(flags)
-  }
 
-  def show(clazz: Class[_]) {
+  def show(clazz: Class[_])
     print(clazz + " {")
     clazz.getMethods.sortBy(x => (x.getName, x.isBridge, x.toString)) filter
-    (_.getName.length == 1) foreach { m =>
+    (_.getName.length == 1) foreach  m =>
       print("\n  " + m + flagsString(m))
-      if ("" + m != "" + m.toGenericString) {
+      if ("" + m != "" + m.toGenericString)
         print("\n    generic: " + m.toGenericString)
-      }
-    }
     println("\n}")
     println("")
-  }
   def show(x: AnyRef) { show(x.getClass) }
   def show(x: String) { show(Class.forName(x)) }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     List(bar1, bar2, bar3, bar4, bar5) foreach show
     List("Foo1", "Foo2") foreach show
     println(go)
-  }
-}

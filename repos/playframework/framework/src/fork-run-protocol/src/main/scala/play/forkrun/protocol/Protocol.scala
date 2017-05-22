@@ -24,7 +24,7 @@ case class ForkConfig(projectDirectory: File,
                       compileTimeout: Long,
                       mainClass: String)
 
-object ForkConfig {
+object ForkConfig
   import play.runsupport._
 
   sealed trait WatchService
@@ -34,19 +34,16 @@ object ForkConfig {
   case class PollingWatchService(pollInterval: Int) extends WatchService
 
   def identifyWatchService(watchService: FileWatchService): WatchService =
-    watchService match {
+    watchService match
       case _: DefaultFileWatchService => DefaultWatchService
       case _: JDK7FileWatchService => JDK7WatchService
       case _: JNotifyFileWatchService => JNotifyWatchService
       case sbt: PollingFileWatchService =>
         PollingWatchService(sbt.pollDelayMillis)
       case optional: OptionalFileWatchServiceDelegate =>
-        optional.watchService match {
+        optional.watchService match
           case Success(service) => identifyWatchService(service)
           case Failure(_) => DefaultWatchService
-        }
       case _ => DefaultWatchService
-    }
-}
 
 case class PlayServerStarted(url: String)

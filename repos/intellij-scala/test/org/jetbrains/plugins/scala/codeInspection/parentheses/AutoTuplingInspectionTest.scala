@@ -9,14 +9,14 @@ import org.jetbrains.plugins.scala.codeInspection.parameters.{AutoTuplingInspect
   * Date: 10/14/15.
   */
 class AutoTuplingInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[AutoTuplingInspection]
 
   override protected def annotation: String = AutoTuplingInspection.message
   val hint = MakeTuplesExplicitFix.hint
 
-  def testBasic(): Unit = {
+  def testBasic(): Unit =
     val text = s"""
         |def foo(a: Any) = {}
         |foo$START(1, 2)$END
@@ -32,9 +32,8 @@ class AutoTuplingInspectionTest
         |foo((1, 2))
       """.stripMargin
     testFix(code, result, hint)
-  }
 
-  def testSAMNotHighlighted(): Unit = {
+  def testSAMNotHighlighted(): Unit =
     val text = """
         |trait SAM {
         |  def foo(): Int
@@ -43,9 +42,8 @@ class AutoTuplingInspectionTest
         |foo(() => 2)
       """.stripMargin
     checkTextHasNoErrors(text)
-  }
 
-  def testAutoTupledSAMsAreHighlighted(): Unit = {
+  def testAutoTupledSAMsAreHighlighted(): Unit =
     val text = s"""
          |def foo(a: Any) = {}
          |foo$START(() => println("foo"),  () => 2)$END
@@ -61,10 +59,9 @@ class AutoTuplingInspectionTest
         |foo((() => println("foo"), () => 2))
       """.stripMargin
     testFix(code, result, hint)
-  }
 
   def testSAMNotHighlightedWhenTypesOfParametersOfAnonymousFunctionAreInferred(
-      ): Unit = {
+      ): Unit =
     val text = """
         |trait SAM {
         |  def foo(s: String): Char
@@ -74,5 +71,3 @@ class AutoTuplingInspectionTest
         |bar(j => j.charAt(0))
       """.stripMargin
     checkTextHasNoErrors(text)
-  }
-}

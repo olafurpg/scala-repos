@@ -19,7 +19,7 @@ import scala.language.implicitConversions
 @RunWith(classOf[JUnitRunner])
 class Zk2ResolverTest
     extends FunSuite with BeforeAndAfter with Eventually
-    with PatienceConfiguration with SpanSugar {
+    with PatienceConfiguration with SpanSugar
   val zkTimeout: Span = 100.milliseconds
 
   implicit val config = PatienceConfig(
@@ -36,21 +36,18 @@ class Zk2ResolverTest
 
   val shardId = 42
 
-  before {
+  before
     inst = new ZkInstance
     inst.start()
-  }
 
-  after {
+  after
     inst.stop()
-  }
 
-  override def test(testName: String, testTags: Tag*)(f: => Unit) {
+  override def test(testName: String, testTags: Tag*)(f: => Unit)
     // Since this test currently relies on timing, it's currently best to treat it as flaky for CI.
     // It should be runnable, if a little slow, however.
     if (!sys.props.contains("SKIP_FLAKY"))
       super.test(testName, testTags: _*)(f)
-  }
 
   private[this] def zk2resolve(path: String): Name =
     Resolver.eval("zk2!" + inst.zookeeperConnectString + "!" + path)
@@ -60,62 +57,54 @@ class Zk2ResolverTest
         Address.Inet(ia, ZkMetadata.toAddrMetadata(ZkMetadata(Some(shardId)))),
         1.0)
 
-  test("end-to-end: service endpoint") {
+  test("end-to-end: service endpoint")
     val Name.Bound(va) = zk2resolve("/foo/bar")
-    eventually {
+    eventually
       assert(va.sample() == Addr.Neg,
              "resolution is not negative before serverset exists")
-    }
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
     val joinAddr = RandomSocket()
     val status = serverSet.join(
         joinAddr, Map.empty[String, InetSocketAddress].asJava, shardId)
-    eventually {
+    eventually
       assert(va.sample() == Addr.Bound(address(joinAddr)),
              "resolution is not bound once the serverset exists")
-    }
 
     status.leave()
-    eventually(stabilizationTimeout, stabilizationInterval) {
+    eventually(stabilizationTimeout, stabilizationInterval)
       assert(va.sample() == Addr.Neg,
              "resolution is not negative after the serverset disappears")
-    }
-  }
 
-  test("end-to-end: additional endpoints") {
+  test("end-to-end: additional endpoints")
     val Name.Bound(va1) = zk2resolve("/foo/bar")
     val Name.Bound(va2) = zk2resolve("/foo/bar!epep")
-    eventually {
+    eventually
       assert(va1.sample() == Addr.Neg,
              "resolution is not negative before serverset exists")
       assert(va2.sample() == Addr.Neg,
              "resolution is not negative before serverset exists")
-    }
 
     val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar")
     val serviceAddr = RandomSocket()
     val epepAddr = RandomSocket()
     val status =
       serverSet.join(serviceAddr, Map("epep" -> epepAddr).asJava, shardId)
-    eventually {
+    eventually
       assert(va1.sample() == Addr.Bound(address(serviceAddr)),
              "resolution is not bound once the serverset exists")
       assert(va2.sample() == Addr.Bound(address(epepAddr)),
              "resolution is not bound once the serverset exists")
-    }
 
     status.leave()
-    eventually(stabilizationTimeout, stabilizationInterval) {
+    eventually(stabilizationTimeout, stabilizationInterval)
       assert(va1.sample() == Addr.Neg,
              "resolution is not negative after the serverset disappears")
       assert(va2.sample() == Addr.Neg,
              "resolution is not negative after the serverset disappears")
-    }
-  }
 
   // This test isn't flaky so don't use the definition of test in this file
-  super.test("statsOf takes the first two components of the first hostname") {
+  super.test("statsOf takes the first two components of the first hostname")
     assert(Zk2Resolver.statsOf("foo-bar.baz.twitter.com") == "foo-bar.baz")
     assert(Zk2Resolver.statsOf(
             "foo-bar.baz.twitter.com,foo-bar2.baz.twitter.com") == "foo-bar.baz")
@@ -123,5 +112,3 @@ class Zk2ResolverTest
     assert(
         Zk2Resolver.statsOf("some-very-very-very-long-hostname") == "some-very-very-very-long-hostn")
     assert(Zk2Resolver.statsOf("localhost:2181") == "localhost:2181")
-  }
-}

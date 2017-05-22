@@ -13,7 +13,7 @@ import akka.stream.ActorMaterializer
 import akka.stream.ActorMaterializerSettings
 import akka.testkit.AkkaSpec
 
-class FlowCompileSpec extends AkkaSpec {
+class FlowCompileSpec extends AkkaSpec
 
   val intSeq = Source(Seq(1, 2, 3))
   val strSeq = Source(Seq("a", "b", "c"))
@@ -23,18 +23,15 @@ class FlowCompileSpec extends AkkaSpec {
   implicit val materializer = ActorMaterializer(
       ActorMaterializerSettings(system))
 
-  "Flow" should {
-    "not run" in {
+  "Flow" should
+    "not run" in
       val open: Flow[Int, Int, _] = Flow[Int]
       "open.run()" shouldNot compile
-    }
-    "accept Iterable" in {
+    "accept Iterable" in
       val f: Source[Int, _] = intSeq.via(Flow[Int])
-    }
-    "accept Future" in {
+    "accept Future" in
       val f: Source[Int, _] = intFut.via(Flow[Int])
-    }
-    "append Flow" in {
+    "append Flow" in
       val open1: Flow[Int, String, _] = Flow[Int].map(_.toString)
       val open2: Flow[String, Int, _] = Flow[String].map(_.hashCode)
       val open3: Flow[Int, Int, _] = open1.via(open2)
@@ -48,8 +45,7 @@ class FlowCompileSpec extends AkkaSpec {
 
       closedSource.to(Sink.asPublisher[Int](false)).run()
       intSeq.to(closedSink).run()
-    }
-    "append Sink" in {
+    "append Sink" in
       val open: Flow[Int, String, _] = Flow[Int].map(_.toString)
       val closedSink: Sink[String, _] =
         Flow[String].map(_.hashCode).to(Sink.asPublisher[Int](false))
@@ -57,8 +53,7 @@ class FlowCompileSpec extends AkkaSpec {
       "appended.run()" shouldNot compile
       "appended.to(Sink.head[Int])" shouldNot compile
       intSeq.to(appended).run
-    }
-    "be appended to Source" in {
+    "be appended to Source" in
       val open: Flow[Int, String, _] = Flow[Int].map(_.toString)
       val closedSource: Source[Int, _] =
         strSeq.via(Flow[String].map(_.hashCode))
@@ -66,63 +61,48 @@ class FlowCompileSpec extends AkkaSpec {
       "closedSource2.run()" shouldNot compile
       "strSeq.to(closedSource2)" shouldNot compile
       closedSource2.to(Sink.asPublisher[String](false)).run
-    }
-  }
 
-  "Sink" should {
+  "Sink" should
     val openSink: Sink[Int, _] =
       Flow[Int].map(_.toString).to(Sink.asPublisher[String](false))
-    "accept Source" in {
+    "accept Source" in
       intSeq.to(openSink)
-    }
-    "not accept Sink" in {
+    "not accept Sink" in
       "openSink.to(Sink.head[String])" shouldNot compile
-    }
-    "not run()" in {
+    "not run()" in
       "openSink.run()" shouldNot compile
-    }
-  }
 
-  "Source" should {
+  "Source" should
     val openSource: Source[String, _] = Source(Seq(1, 2, 3)).map(_.toString)
-    "accept Sink" in {
+    "accept Sink" in
       openSource.to(Sink.asPublisher[String](false))
-    }
-    "not be accepted by Source" in {
+    "not be accepted by Source" in
       "openSource.to(intSeq)" shouldNot compile
-    }
-    "not run()" in {
+    "not run()" in
       "openSource.run()" shouldNot compile
-    }
-  }
 
-  "RunnableGraph" should {
+  "RunnableGraph" should
     Sink.head[String]
     val closed: RunnableGraph[Publisher[String]] = Source(Seq(1, 2, 3))
       .map(_.toString)
       .toMat(Sink.asPublisher[String](false))(Keep.right)
-    "run" in {
+    "run" in
       closed.run()
-    }
-    "not be accepted by Source" in {
+    "not be accepted by Source" in
       "intSeq.to(closed)" shouldNot compile
-    }
 
-    "not accept Sink" in {
+    "not accept Sink" in
       "closed.to(Sink.head[String])" shouldNot compile
-    }
-  }
 
-  "FlowOps" should {
-    "be extensible" in {
+  "FlowOps" should
+    "be extensible" in
       val f: FlowOps[Int, NotUsed] { type Closed = Sink[Int, NotUsed] } =
         Flow[Int]
       val fm = f.map(identity)
       val f2: FlowOps[Int, NotUsed] = fm
       val s: Sink[Int, NotUsed] = fm.to(Sink.ignore)
-    }
 
-    "be extensible (with MaterializedValue)" in {
+    "be extensible (with MaterializedValue)" in
       val f: FlowOpsMat[Int, NotUsed] { type ClosedMat[+M] = Sink[Int, M] } =
         Flow[Int]
       val fm = f.map(identity).concatMat(Source.empty)(Keep.both)
@@ -130,6 +110,3 @@ class FlowCompileSpec extends AkkaSpec {
       // CloseMat type without which `.to(sink)` does not work
       val f2: FlowOpsMat[Int, (NotUsed, NotUsed)] = fm
       val s: Sink[Int, (NotUsed, NotUsed)] = fm.to(Sink.ignore)
-    }
-  }
-}

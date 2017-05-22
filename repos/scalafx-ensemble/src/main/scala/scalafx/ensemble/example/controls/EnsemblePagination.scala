@@ -47,31 +47,28 @@ import scalafx.scene.layout.{Priority, Region, VBox}
   * @resource /scalafx/ensemble/images/animals-200x200/animal7.jpg
   * @resource /scalafx/ensemble/images/animals-200x200/animal8.jpg
   */
-class EnsemblePagination extends EnsembleExample {
+class EnsemblePagination extends EnsembleExample
 
-  def getContent = {
+  def getContent =
 
     // Images to load pages
-    val images = for (i <- 0 until 7) yield {
+    val images = for (i <- 0 until 7) yield
       val ipStream = this.getClass.getResourceAsStream(
           "/scalafx/ensemble/images/animals-200x200/animal" + (i + 1) + ".jpg")
       new Image(ipStream)
-    }
 
     // Factory function for creating page content
     val createAnimalPage = (index: Int) =>
-      new VBox() {
+      new VBox()
         children = List(
             new ImageView(images(index)), new Label("PAGE " + (index + 1)))
         alignment = Pos.Center
-    }
 
     // Pagination with 7 pages and index starts at zero
-    val pagination = new Pagination(7, 0) {
+    val pagination = new Pagination(7, 0)
       pageFactory = createAnimalPage
-    }
 
-    new VBox {
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       alignment = Pos.Center
@@ -79,20 +76,14 @@ class EnsemblePagination extends EnsembleExample {
       padding = Insets(20)
       children = List(
           pagination,
-          new Button {
+          new Button
             maxWidth = Region.USE_PREF_SIZE
             maxHeight = Region.USE_PREF_SIZE
             text = "Toggle Pagination Button"
             onAction = (ae: ActionEvent) =>
-              {
                 if (pagination.styleClass.contains(
-                        Pagination.STYLE_CLASS_BULLET)) {
+                        Pagination.STYLE_CLASS_BULLET))
                   pagination.styleClass -= Pagination.STYLE_CLASS_BULLET
-                } else {
+                else
                   pagination.styleClass += Pagination.STYLE_CLASS_BULLET
-                }
-            }
-          })
-    }
-  }
-}
+          )

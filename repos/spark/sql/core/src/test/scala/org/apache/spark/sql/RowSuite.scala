@@ -24,10 +24,10 @@ import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
 
-class RowSuite extends SparkFunSuite with SharedSQLContext {
+class RowSuite extends SparkFunSuite with SharedSQLContext
   import testImplicits._
 
-  test("create row") {
+  test("create row")
     val expected = new GenericMutableRow(4)
     expected.setInt(0, 2147483647)
     expected.update(1, UTF8String.fromString("this is a string"))
@@ -47,51 +47,42 @@ class RowSuite extends SparkFunSuite with SharedSQLContext {
     assert(expected.getString(1) === actual2.getString(1))
     assert(expected.getBoolean(2) === actual2.getBoolean(2))
     assert(expected.isNullAt(3) === actual2.isNullAt(3))
-  }
 
-  test("SpecificMutableRow.update with null") {
+  test("SpecificMutableRow.update with null")
     val row = new SpecificMutableRow(Seq(IntegerType))
     row(0) = null
     assert(row.isNullAt(0))
-  }
 
-  test("serialize w/ kryo") {
+  test("serialize w/ kryo")
     val row = Seq((1, Seq(1), Map(1 -> 1), BigDecimal(1))).toDF().first()
     val serializer = new SparkSqlSerializer(sparkContext.getConf)
     val instance = serializer.newInstance()
     val ser = instance.serialize(row)
     val de = instance.deserialize(ser).asInstanceOf[Row]
     assert(de === row)
-  }
 
-  test("get values by field name on Row created via .toDF") {
+  test("get values by field name on Row created via .toDF")
     val row = Seq((1, Seq(1))).toDF("a", "b").first()
     assert(row.getAs[Int]("a") === 1)
     assert(row.getAs[Seq[Int]]("b") === Seq(1))
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       row.getAs[Int]("c")
-    }
-  }
 
-  test("float NaN == NaN") {
+  test("float NaN == NaN")
     val r1 = Row(Float.NaN)
     val r2 = Row(Float.NaN)
     assert(r1 === r2)
-  }
 
-  test("double NaN == NaN") {
+  test("double NaN == NaN")
     val r1 = Row(Double.NaN)
     val r2 = Row(Double.NaN)
     assert(r1 === r2)
-  }
 
-  test("equals and hashCode") {
+  test("equals and hashCode")
     val r1 = Row("Hello")
     val r2 = Row("Hello")
     assert(r1 === r2)
     assert(r1.hashCode() === r2.hashCode())
     val r3 = Row("World")
     assert(r3.hashCode() != r1.hashCode())
-  }
-}

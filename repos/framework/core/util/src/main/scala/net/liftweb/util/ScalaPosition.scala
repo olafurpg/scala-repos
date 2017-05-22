@@ -38,7 +38,7 @@ package io
   * We renamed it because having a private vs public class with the same name causes errors with the assembly plugin
   * and may/(will?) cause errors at runtime.
   */
-abstract class ScalaPosition {
+abstract class ScalaPosition
 
   /** Definable behavior for overflow conditions.
     */
@@ -56,12 +56,11 @@ abstract class ScalaPosition {
   final val COLUMN_MASK = (1 << COLUMN_BITS) - 1
 
   /** Encodes a position into a single integer. */
-  final def encode(line: Int, column: Int): Int = {
+  final def encode(line: Int, column: Int): Int =
     checkInput(line, column)
 
     if (line >= LINE_MASK) LINE_MASK << COLUMN_BITS
     else (line << COLUMN_BITS) | scala.math.min(COLUMN_MASK, column)
-  }
 
   /** Returns the line number of the encoded position. */
   final def line(pos: Int): Int = (pos >> COLUMN_BITS) & LINE_MASK
@@ -71,14 +70,11 @@ abstract class ScalaPosition {
 
   /** Returns a string representation of the encoded position. */
   def toString(pos: Int): String = line(pos) + ":" + column(pos)
-}
 
-object ScalaPosition extends ScalaPosition {
-  def checkInput(line: Int, column: Int) {
+object ScalaPosition extends ScalaPosition
+  def checkInput(line: Int, column: Int)
     if (line < 0) throw new IllegalArgumentException(line + " < 0")
     if ((line == 0) && (column != 0))
       throw new IllegalArgumentException(line + "," + column + " not allowed")
     if (column < 0)
       throw new IllegalArgumentException(line + "," + column + " not allowed")
-  }
-}

@@ -1,5 +1,4 @@
 package sbttest.multitest
 
-object Lib {
+object Lib
   def sq(x: Int): Int = x * x
-}

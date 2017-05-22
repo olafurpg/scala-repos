@@ -7,20 +7,19 @@ import cascading.flow.planner.PlannerException
   * @param xMap - mapping as Map with Throwable class as key and String as value
   * @param dVal - default value for undefined keys in mapping
   */
-class XHandler(xMap: Map[Class[_ <: Throwable], String], dVal: String) {
+class XHandler(xMap: Map[Class[_ <: Throwable], String], dVal: String)
 
   def handlers: List[Throwable => Boolean] =
     xMap.keys.map(kCls => ((t: Throwable) => kCls == t.getClass)).toList
 
   def mapping: Class[_ <: Throwable] => String =
     xMap.withDefaultValue(dVal)
-}
 
 /**
   * Provide apply method for creating XHandlers with default or custom settings
   * and contain messages and mapping
   */
-object RichXHandler {
+object RichXHandler
 
   val Default = "Unknown type of throwable"
 
@@ -50,20 +49,18 @@ object RichXHandler {
 
   @annotation.tailrec
   final def rootOf(t: Throwable): Throwable =
-    t.getCause match {
+    t.getCause match
       case null => t
       case cause => rootOf(cause)
-    }
 
   @annotation.tailrec
   final def peelUntilMappable(t: Throwable): Class[_ <: Throwable] =
-    (mapping.get(t.getClass), t.getCause) match {
+    (mapping.get(t.getClass), t.getCause) match
       case (Some(diag), _) =>
         t.getClass // we're going to find a mappable cause.
       case (None, null) =>
         t.getClass // we're at the root. There won't be any cause
       case (None, cause) => peelUntilMappable(cause)
-    }
 
   def createXUrl(t: Throwable): String =
     gitHubUrl + (peelUntilMappable(t).getName.replace(".", "").toLowerCase)
@@ -76,4 +73,3 @@ object RichXHandler {
     mapping.get(peelUntilMappable(t)).map(_ + "\n").getOrElse("") +
     "If you know what exactly caused this error, please consider contributing to GitHub via following link.\n" +
     createXUrl(t)
-}

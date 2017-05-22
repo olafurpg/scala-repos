@@ -27,11 +27,11 @@ import akka.actor.{ExtendedActorSystem, ActorRef, Props}
   * Also by not creating extra internal actor system we are conserving resources.
   */
 private[camel] class DefaultCamel(val system: ExtendedActorSystem)
-    extends Camel {
+    extends Camel
   val supervisor = system.actorOf(Props[CamelSupervisor], "camel-supervisor")
   private[camel] implicit val log = Logging(system, getClass.getName)
 
-  lazy val context: DefaultCamelContext = {
+  lazy val context: DefaultCamelContext =
     val ctx = settings.ContextProvider.getContext(system)
     if (!settings.JmxStatistics) ctx.disableJMX()
     ctx.setName(system.name)
@@ -40,7 +40,6 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     ctx.getTypeConverterRegistry.addTypeConverter(
         classOf[FiniteDuration], classOf[String], DurationTypeConverter)
     ctx
-  }
 
   val settings = new CamelSettings(
       system.settings.config, system.dynamicAccess)
@@ -52,14 +51,13 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     * Only the creator of Camel should start and stop it.
     * @see akka.camel.internal.DefaultCamel#shutdown
     */
-  def start(): this.type = {
+  def start(): this.type =
     context.start()
     try template.start() catch { case NonFatal(e) ⇒ context.stop(); throw e }
     log.debug("Started CamelContext[{}] for ActorSystem[{}]",
               context.getName,
               system.name)
     this
-  }
 
   /**
     * Stops camel and underlying camel context and template.
@@ -68,19 +66,16 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
     *
     * @see akka.camel.internal.DefaultCamel#start
     */
-  def shutdown(): Unit = {
-    try context.stop() finally {
-      try template.stop() catch {
+  def shutdown(): Unit =
+    try context.stop() finally
+      try template.stop() catch
         case NonFatal(e) ⇒
           log.debug(
               "Swallowing non-fatal exception [{}] on stopping Camel producer template",
               e)
-      }
-    }
     log.debug("Stopped CamelContext[{}] for ActorSystem[{}]",
               context.getName,
               system.name)
-  }
 
   /**
     * Produces a Future with the specified endpoint that will be completed when the endpoint has been activated,
@@ -94,10 +89,10 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
                           executor: ExecutionContext): Future[ActorRef] =
     (supervisor
       .ask(AwaitActivation(endpoint))(timeout))
-      .map[ActorRef]({
+      .map[ActorRef](
         case EndpointActivated(`endpoint`) ⇒ endpoint
         case EndpointFailedToActivate(`endpoint`, cause) ⇒ throw cause
-      })
+      )
 
   /**
     * Produces a Future which will be completed when the given endpoint has been deactivated or
@@ -111,8 +106,7 @@ private[camel] class DefaultCamel(val system: ExtendedActorSystem)
                           executor: ExecutionContext): Future[ActorRef] =
     (supervisor
       .ask(AwaitDeActivation(endpoint))(timeout))
-      .map[ActorRef]({
+      .map[ActorRef](
         case EndpointDeActivated(`endpoint`) ⇒ endpoint
         case EndpointFailedToDeActivate(`endpoint`, cause) ⇒ throw cause
-      })
-}
+      )

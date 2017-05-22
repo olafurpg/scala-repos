@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 @Fork(3)
 @Warmup(iterations = 20)
 @Measurement(iterations = 100)
-class RouterPoolCreationBenchmark {
+class RouterPoolCreationBenchmark
   implicit val system: ActorSystem = ActorSystem()
   val probe = TestProbe()
 
@@ -26,18 +26,15 @@ class RouterPoolCreationBenchmark {
   var size = 0
 
   @TearDown(Level.Trial)
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
-  }
 
   @Benchmark
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
-  def testCreation: Boolean = {
+  def testCreation: Boolean =
     val pool =
       system.actorOf(RoundRobinPool(size).props(TestActors.echoActorProps))
     pool.tell("hello", probe.ref)
     probe.expectMsg(5.seconds, "hello")
     true
-  }
-}

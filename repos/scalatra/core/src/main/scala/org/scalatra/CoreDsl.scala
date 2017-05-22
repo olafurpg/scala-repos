@@ -7,7 +7,7 @@ import org.scalatra.servlet.ServletApiImplicits
   */
 trait CoreDsl
     extends Handler with Control with ScalatraContext
-    with ServletApiImplicits {
+    with ServletApiImplicits
 
   /**
     * Adds a filter to run before the route.  The filter only runs if each
@@ -129,7 +129,5 @@ trait CoreDsl
   /**
     * @see error
     */
-  def trap(code: Int)(block: => Any): Unit = {
+  def trap(code: Int)(block: => Any): Unit =
     trap(Range(code, code + 1))(block)
-  }
-}

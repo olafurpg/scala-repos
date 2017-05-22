@@ -27,16 +27,15 @@ import scala.collection.mutable.{HashMap => MutableHashMap, ListBuffer, Map => M
 /**
   * Tests for Summingbird's in-memory planner.
   */
-class MemoryLaws extends WordSpec {
+class MemoryLaws extends WordSpec
   // This is dangerous, obviously. The Memory platform tested here
   // doesn't perform any batching, so the actual time extraction isn't
   // needed.
   implicit def extractor[T]: TimeExtractor[T] = TimeExtractor(_ => 0L)
 
-  class BufferFunc[T] extends (T => Unit) {
+  class BufferFunc[T] extends (T => Unit)
     val buf = ListBuffer[T]()
     def apply(t: T) = buf += t
-  }
 
   def sample[T : Arbitrary]: T = Arbitrary.arbitrary[T].sample.get
 
@@ -44,12 +43,12 @@ class MemoryLaws extends WordSpec {
                 K : Arbitrary,
                 V : Monoid : Arbitrary : Equiv] =
     new TestGraphs[Memory, T, K, V](new Memory)(() => MutableMap.empty[K, V])(
-        () => new BufferFunc[T])(Memory.toSource(_))(s => { s.get(_) })({
+        () => new BufferFunc[T])(Memory.toSource(_))(s => { s.get(_) })(
       (f, items) =>
         f.asInstanceOf[BufferFunc[T]].buf.toList == items
-    })({ (p: Memory, plan: Memory#Plan[_]) =>
+    )( (p: Memory, plan: Memory#Plan[_]) =>
       p.run(plan)
-    })
+    )
 
   /**
     * Tests the in-memory planner against a job with a single flatMap
@@ -79,20 +78,18 @@ class MemoryLaws extends WordSpec {
                   K : Arbitrary,
                   U : Arbitrary,
                   JoinedU : Arbitrary,
-                  V : Monoid : Arbitrary : Equiv] = {
+                  V : Monoid : Arbitrary : Equiv] =
     import MemoryArbitraries._
     val serviceFn: MemoryService[K, JoinedU] =
       Arbitrary.arbitrary[MemoryService[K, JoinedU]].sample.get
     testGraph[T, K, V].leftJoinChecker[U, JoinedU](
-        serviceFn, { svc =>
-          { (k: K) =>
+        serviceFn,  svc =>
+          (k: K) =>
             svc.get(k)
-          }
-        },
+        ,
         sample[List[T]],
         sample[T => List[(K, U)]],
         sample[((K, (U, Option[JoinedU]))) => List[(K, V)]])
-  }
 
   /**
     * Tests the in-memory planner by generating arbitrary flatMap and
@@ -102,7 +99,7 @@ class MemoryLaws extends WordSpec {
                                   K : Arbitrary,
                                   U : Arbitrary,
                                   JoinedU : Monoid : Arbitrary,
-                                  V : Monoid : Arbitrary : Equiv] = {
+                                  V : Monoid : Arbitrary : Equiv] =
     val platform = new Memory
     val finalStore: Memory#Store[K, V] = MutableMap.empty[K, V]
     val storeAndService: Memory#Store[K, JoinedU] with Memory#Service[
@@ -116,13 +113,12 @@ class MemoryLaws extends WordSpec {
     val fnB = sample[(T) => List[(K, U)]]
     val postJoinFn = sample[((K, (U, Option[JoinedU]))) => List[(K, V)]]
 
-    val plan = platform.plan {
+    val plan = platform.plan
       TestGraphs.leftJoinWithStoreJob[Memory, T, T, U, K, JoinedU, V](
           sourceMaker(items1),
           sourceMaker(items2),
           storeAndService,
           finalStore)(fnA)(fnB)(postJoinFn)
-    }
     platform.run(plan)
     val serviceFn = storeAndService.get(_)
     val lookupFn = finalStore.get(_)
@@ -131,11 +127,10 @@ class MemoryLaws extends WordSpec {
       .sumByKey(
           items1.flatMap(fnA)
       )
-      .forall {
+      .forall
         case (k, v) =>
           val lv: JoinedU = serviceFn(k).getOrElse(Monoid.zero[JoinedU])
           Equiv[JoinedU].equiv(v, lv)
-      }
 
     val finalStoreMatches = MapAlgebra
       .sumByKey(
@@ -144,19 +139,17 @@ class MemoryLaws extends WordSpec {
             .map { case (k, u) => (k, (u, serviceFn(k))) }
             .flatMap(postJoinFn)
         )
-      .forall {
+      .forall
         case (k, v) =>
           val lv = lookupFn(k).getOrElse(Monoid.zero[V])
           Equiv[V].equiv(v, lv)
-      }
 
     storeAndServiceMatches && finalStoreMatches
-  }
 
   def mapKeysChecker[T : Manifest : Arbitrary,
                      K1 : Arbitrary,
                      K2 : Arbitrary,
-                     V : Monoid : Arbitrary : Equiv](): Boolean = {
+                     V : Monoid : Arbitrary : Equiv](): Boolean =
     val platform = new Memory
     val currentStore: Memory#Store[K2, V] = MutableMap.empty[K2, V]
     val sourceMaker = Memory.toSource[T](_)
@@ -166,38 +159,34 @@ class MemoryLaws extends WordSpec {
 
     // Use the supplied platform to execute the source into the
     // supplied store.
-    val plan = platform.plan {
+    val plan = platform.plan
       TestGraphs.singleStepMapKeysJob[Memory, T, K1, K2, V](
           sourceMaker(original), currentStore)(fnA, fnB)
-    }
     platform.run(plan)
     val lookupFn = currentStore.get(_)
-    TestGraphs.singleStepMapKeysInScala(original)(fnA, fnB).forall {
+    TestGraphs.singleStepMapKeysInScala(original)(fnA, fnB).forall
       case (k, v) =>
         val lv = lookupFn(k).getOrElse(Monoid.zero)
         Equiv[V].equiv(v, lv)
-    }
-  }
 
   def lookupCollectChecker[
-      T : Arbitrary : Equiv : Manifest, U : Arbitrary : Equiv]: Boolean = {
+      T : Arbitrary : Equiv : Manifest, U : Arbitrary : Equiv]: Boolean =
     import MemoryArbitraries._
     val mem = new Memory
     val input = sample[List[T]]
     val srv = sample[MemoryService[T, U]]
     var buffer = Vector[(T, U)]() // closure to mutate this
     val prod =
-      TestGraphs.lookupJob[Memory, T, U](Memory.toSource(input), srv, {
+      TestGraphs.lookupJob[Memory, T, U](Memory.toSource(input), srv,
         tu: (T, U) =>
           buffer = buffer :+ tu
-      })
+      )
     mem.run(mem.plan(prod))
     // check it out:
     Equiv[List[(T, U)]]
-      .equiv((buffer.toList), TestGraphs.lookupJobInScala(input, { (t: T) =>
+      .equiv((buffer.toList), TestGraphs.lookupJobInScala(input,  (t: T) =>
       srv.get(t)
-    }))
-  }
+    ))
 
   /**
     * Tests the in-memory planner against a job with a single flatMap
@@ -205,7 +194,7 @@ class MemoryLaws extends WordSpec {
     */
   def counterChecker[T : Manifest : Arbitrary,
                      K : Arbitrary,
-                     V : Monoid : Arbitrary : Equiv]: Boolean = {
+                     V : Monoid : Arbitrary : Equiv]: Boolean =
     implicit val jobID: JobId = new JobId("memory.job.testJobId")
     val mem = new Memory
     val fn = sample[(T) => List[(K, V)]]
@@ -228,50 +217,38 @@ class MemoryLaws extends WordSpec {
       (origCounter == original.size) &&
     (fmCounter == (original.flatMap(fn).size * 2)) &&
     (fltrCounter == (original.flatMap(fn).size))
-  }
 
-  "The Memory Platform" should {
+  "The Memory Platform" should
     //Set up the job:
-    "singleStep w/ Int, Int, Set[Int]" in {
+    "singleStep w/ Int, Int, Set[Int]" in
       assert(singleStepLaw[Int, Int, Set[Int]] == true)
-    }
-    "singleStep w/ Int, String, List[Int]" in {
+    "singleStep w/ Int, String, List[Int]" in
       assert(singleStepLaw[Int, String, List[Int]] == true)
-    }
-    "singleStep w/ String, Short, Map[Set[Int], Long]" in {
+    "singleStep w/ String, Short, Map[Set[Int], Long]" in
       assert(singleStepLaw[String, Short, Map[Set[Int], Long]] == true)
-    }
 
-    "diamond w/ Int, Int, Set[Int]" in {
+    "diamond w/ Int, Int, Set[Int]" in
       assert(diamondLaw[Int, Int, Set[Int]] == true)
-    }
-    "diamond w/ Int, String, List[Int]" in {
+    "diamond w/ Int, String, List[Int]" in
       assert(diamondLaw[Int, String, List[Int]] == true)
-    }
-    "diamond w/ String, Short, Map[Set[Int], Long]" in {
+    "diamond w/ String, Short, Map[Set[Int], Long]" in
       assert(diamondLaw[String, Short, Map[Set[Int], Long]] == true)
-    }
 
-    "leftJoin w/ Int, Int, String, Long, Set[Int]" in {
+    "leftJoin w/ Int, Int, String, Long, Set[Int]" in
       assert(leftJoinLaw[Int, Int, String, Long, Set[Int]] == true)
-    }
-    "leftJoinAgainstStore w/ Int, Int, String, Long, Int" in {
+    "leftJoinAgainstStore w/ Int, Int, String, Long, Int" in
       assert(leftJoinAgainstStoreChecker[Int, Int, String, Long, Int] == true)
-    }
 
-    "flatMapKeys w/ Int, Int, Int, Set[Int]" in {
+    "flatMapKeys w/ Int, Int, Int, Set[Int]" in
       assert(mapKeysChecker[Int, Int, Int, Set[Int]] == true)
-    }
 
-    "lookupCollect w/ Int, Int" in {
+    "lookupCollect w/ Int, Int" in
       assert(lookupCollectChecker[Int, Int] == true)
-    }
 
-    "counters w/ Int, Int, Int" in {
+    "counters w/ Int, Int, Int" in
       assert(counterChecker[Int, Int, Int] == true)
-    }
 
-    "needless also shouldn't cause a problem" in {
+    "needless also shouldn't cause a problem" in
       val source = Memory.toSource(0 to 100)
       val store1 = MutableMap.empty[Int, Int]
       val store2 = MutableMap.empty[Int, Int]
@@ -282,26 +259,23 @@ class MemoryLaws extends WordSpec {
       mem.run(mem.plan(prod))
       assert(store1.toMap == ((0 to 100).groupBy(_ % 3).mapValues(_.sum)))
       assert(store2.toMap == ((0 to 100).groupBy(_ % 3).mapValues(_.sum)))
-    }
 
-    "self also shouldn't duplicate work" in {
+    "self also shouldn't duplicate work" in
       val platform = new Memory
       val sinkBuffer = collection.mutable.Buffer[Int]()
       val source = Memory.toSource(List(1, 2))
       val store: Memory#Store[Int, Int] =
         collection.mutable.Map.empty[Int, Int]
-      val sink: Memory#Sink[Int] = { x: Int =>
+      val sink: Memory#Sink[Int] =  x: Int =>
         sinkBuffer += x
-      }
 
-      val summed = source.map { v =>
+      val summed = source.map  v =>
         (v, v)
-      }.sumByKey(store).map {
+      .sumByKey(store).map
         case (_, (existingEventOpt, currentEvent)) =>
-          existingEventOpt.map { existingEvent =>
+          existingEventOpt.map  existingEvent =>
             Semigroup.plus(existingEvent, currentEvent)
-          }.getOrElse(currentEvent)
-      }
+          .getOrElse(currentEvent)
 
       val write1 = summed.write(sink)
       val write2 = summed.write(sink)
@@ -311,6 +285,3 @@ class MemoryLaws extends WordSpec {
       assert(1 == store(1))
       assert(2 == store(2))
       assert(List(1, 2) == sinkBuffer.toList)
-    }
-  }
-}

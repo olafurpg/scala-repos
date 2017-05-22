@@ -5,9 +5,9 @@ import chess.Color
 
 import actorApi._
 
-private[chat] final class FrontActor(api: ChatApi) extends Actor {
+private[chat] final class FrontActor(api: ChatApi) extends Actor
 
-  def receive = {
+  def receive =
 
     case UserTalk(chatId, userId, text, replyTo, public) =>
       api.userChat.write(chatId, userId, text, public) foreach publish(
@@ -19,11 +19,7 @@ private[chat] final class FrontActor(api: ChatApi) extends Actor {
 
     case SystemTalk(chatId, text, replyTo) =>
       api.userChat.system(chatId, text) foreach publish(chatId, replyTo)
-  }
 
-  def publish(chatId: String, replyTo: ActorRef)(lineOption: Option[Line]) {
-    lineOption foreach { line =>
+  def publish(chatId: String, replyTo: ActorRef)(lineOption: Option[Line])
+    lineOption foreach  line =>
       replyTo ! ChatLine(chatId, line)
-    }
-  }
-}

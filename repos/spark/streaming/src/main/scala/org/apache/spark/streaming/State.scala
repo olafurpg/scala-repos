@@ -79,7 +79,7 @@ import org.apache.spark.annotation.Experimental
   * @tparam S Class of the state
   */
 @Experimental
-sealed abstract class State[S] {
+sealed abstract class State[S]
 
   /** Whether the state already exists */
   def exists(): Boolean
@@ -124,13 +124,11 @@ sealed abstract class State[S] {
     */
   @inline final def getOption(): Option[S] = if (exists) Some(get()) else None
 
-  @inline final override def toString(): String = {
+  @inline final override def toString(): String =
     getOption.map { _.toString }.getOrElse("<state not set>")
-  }
-}
 
 /** Internal implementation of the [[State]] interface */
-private[streaming] class StateImpl[S] extends State[S] {
+private[streaming] class StateImpl[S] extends State[S]
 
   private var state: S = null.asInstanceOf[S]
   private var defined: Boolean = false
@@ -139,56 +137,48 @@ private[streaming] class StateImpl[S] extends State[S] {
   private var removed: Boolean = false
 
   // ========= Public API =========
-  override def exists(): Boolean = {
+  override def exists(): Boolean =
     defined
-  }
 
-  override def get(): S = {
-    if (defined) {
+  override def get(): S =
+    if (defined)
       state
-    } else {
+    else
       throw new NoSuchElementException("State is not set")
-    }
-  }
 
-  override def update(newState: S): Unit = {
+  override def update(newState: S): Unit =
     require(!removed, "Cannot update the state after it has been removed")
     require(!timingOut, "Cannot update the state that is timing out")
     state = newState
     defined = true
     updated = true
-  }
 
-  override def isTimingOut(): Boolean = {
+  override def isTimingOut(): Boolean =
     timingOut
-  }
 
-  override def remove(): Unit = {
+  override def remove(): Unit =
     require(!timingOut, "Cannot remove the state that is timing out")
     require(!removed, "Cannot remove the state that has already been removed")
     defined = false
     updated = false
     removed = true
-  }
 
   // ========= Internal API =========
 
   /** Whether the state has been marked for removing */
-  def isRemoved(): Boolean = {
+  def isRemoved(): Boolean =
     removed
-  }
 
   /** Whether the state has been been updated */
-  def isUpdated(): Boolean = {
+  def isUpdated(): Boolean =
     updated
-  }
 
   /**
     * Update the internal data and flags in `this` to the given state option.
     * This method allows `this` object to be reused across many state records.
     */
-  def wrap(optionalState: Option[S]): Unit = {
-    optionalState match {
+  def wrap(optionalState: Option[S]): Unit =
+    optionalState match
       case Some(newState) =>
         this.state = newState
         defined = true
@@ -196,21 +186,17 @@ private[streaming] class StateImpl[S] extends State[S] {
       case None =>
         this.state = null.asInstanceOf[S]
         defined = false
-    }
     timingOut = false
     removed = false
     updated = false
-  }
 
   /**
     * Update the internal data and flags in `this` to the given state that is going to be timed out.
     * This method allows `this` object to be reused across many state records.
     */
-  def wrapTimingOutState(newState: S): Unit = {
+  def wrapTimingOutState(newState: S): Unit =
     this.state = newState
     defined = true
     timingOut = true
     removed = false
     updated = false
-  }
-}

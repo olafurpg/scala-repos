@@ -17,7 +17,7 @@ import Configurations.Test
   *
   *  Note:  Using AutoPlugins to enable/disable build features is experimental in sbt 0.13.5.
   */
-object JUnitXmlReportPlugin extends AutoPlugin {
+object JUnitXmlReportPlugin extends AutoPlugin
   // TODO - If testing becomes its own plugin, we only rely on the core settings.
   override def requires = JvmPlugin
   override def trigger = allRequirements
@@ -27,4 +27,3 @@ object JUnitXmlReportPlugin extends AutoPlugin {
   override lazy val projectSettings: Seq[Setting[_]] = Seq(
       testListeners += new JUnitXmlTestsListener(target.value.getAbsolutePath)
   )
-}

@@ -1,9 +1,8 @@
-class Test(x: => Object) extends Serializable {
+class Test(x: => Object) extends Serializable
   @transient lazy val foo = x
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     import java.io._
     val t = new Test("foo")
     println(t.foo)
@@ -15,5 +14,3 @@ object Test {
         new ByteArrayInputStream(baos.toByteArray()))
     val t1 = dis.readObject().asInstanceOf[Test]
     println(t1.foo) // was NPE
-  }
-}

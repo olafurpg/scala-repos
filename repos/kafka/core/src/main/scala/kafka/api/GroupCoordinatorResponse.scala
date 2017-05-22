@@ -20,13 +20,13 @@ import java.nio.ByteBuffer
 import kafka.cluster.BrokerEndPoint
 import org.apache.kafka.common.protocol.Errors
 
-object GroupCoordinatorResponse {
+object GroupCoordinatorResponse
   val CurrentVersion = 0
 
   private val NoBrokerEndpointOpt = Some(
       BrokerEndPoint(id = -1, host = "", port = -1))
 
-  def readFrom(buffer: ByteBuffer) = {
+  def readFrom(buffer: ByteBuffer) =
     val correlationId = buffer.getInt
     val errorCode = buffer.getShort
     val broker = BrokerEndPoint.readFrom(buffer)
@@ -35,13 +35,11 @@ object GroupCoordinatorResponse {
       else None
 
     GroupCoordinatorResponse(coordinatorOpt, errorCode, correlationId)
-  }
-}
 
 case class GroupCoordinatorResponse(coordinatorOpt: Option[BrokerEndPoint],
                                     errorCode: Short,
                                     correlationId: Int)
-    extends RequestOrResponse() {
+    extends RequestOrResponse()
 
   def sizeInBytes =
     4 + /* correlationId */
@@ -51,13 +49,11 @@ case class GroupCoordinatorResponse(coordinatorOpt: Option[BrokerEndPoint],
       .get
       .sizeInBytes
 
-  def writeTo(buffer: ByteBuffer) {
+  def writeTo(buffer: ByteBuffer)
     buffer.putInt(correlationId)
     buffer.putShort(errorCode)
     coordinatorOpt
       .orElse(GroupCoordinatorResponse.NoBrokerEndpointOpt)
       .foreach(_.writeTo(buffer))
-  }
 
   def describe(details: Boolean) = toString
-}

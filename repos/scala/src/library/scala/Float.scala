@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Float]] => [[scala.runtime.RichFloat]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Float private extends AnyVal {
+final abstract class Float private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -268,9 +268,8 @@ final abstract class Float private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Float] = null
-}
 
-object Float extends AnyValCompanion {
+object Float extends AnyValCompanion
 
   /** The smallest positive value greater than 0.0f which is
     *  representable as a Float.
@@ -318,4 +317,3 @@ object Float extends AnyValCompanion {
   /** Language mandated coercions from Float to "wider" types. */
   import scala.language.implicitConversions
   implicit def float2double(x: Float): Double = x.toDouble
-}

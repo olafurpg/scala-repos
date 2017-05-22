@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypeResult, T
   * @since 26/09/14.
   */
 class ScTypeVariableTypeElementImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScTypeVariableTypeElement {
+    extends ScalaPsiElementImpl(node) with ScTypeVariableTypeElement
   override protected def innerType(ctx: TypingContext): TypeResult[ScType] =
     Success(ScTypeVariable(name), Some(this))
 
@@ -22,4 +22,3 @@ class ScTypeVariableTypeElementImpl(node: ASTNode)
     findChildByType[PsiElement](ScalaTokenTypes.tIDENTIFIER)
 
   override def toString: String = s"TypeVariable: $name"
-}

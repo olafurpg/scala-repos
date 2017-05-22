@@ -27,7 +27,7 @@ import com.twitter.summingbird.online.OnlineServiceFactory
   *
   * This is platform specific, as the contents of what are in Producer's are also platform specific.
   */
-object Producer2FlatMapOperation {
+object Producer2FlatMapOperation
 
   /**
     * Keep the crazy casts localized in here
@@ -35,9 +35,9 @@ object Producer2FlatMapOperation {
   def foldOperations[T, U](
       producers: List[Producer[Storm, _]]): FlatMapOperation[T, U] =
     producers
-      .foldLeft(FlatMapOperation.identity[Any]) {
+      .foldLeft(FlatMapOperation.identity[Any])
         case (acc, p) =>
-          p match {
+          p match
             case LeftJoinedProducer(_, wrapper) =>
               FlatMapOperation
                 .combine(acc.asInstanceOf[FlatMapOperation[Any, (Any, Any)]],
@@ -64,7 +64,4 @@ object Producer2FlatMapOperation {
               acc.andThen(FlatMapOperation
                     .keyFlatMap[Any, Any, Any](op)
                     .asInstanceOf[FlatMapOperation[Any, Any]])
-          }
-      }
       .asInstanceOf[FlatMapOperation[T, U]]
-}

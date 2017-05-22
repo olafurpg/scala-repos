@@ -15,15 +15,14 @@ import scala.reflect.ClassTag
 
 @RunWith(classOf[RobolectricTestRunner])
 @Config(manifest = Config.NONE, emulateSdk = 16)
-class helpersTest extends JUnitSuite with ShouldMatchers {
+class helpersTest extends JUnitSuite with ShouldMatchers
   implicit var activity: SActivity = _
   @Before
-  def createActivity(): Unit = {
+  def createActivity(): Unit =
     activity = Robolectric.buildActivity(classOf[SActivityImpl]).create.get
-  }
 
   @Test
-  def testAlert(): Unit = {
+  def testAlert(): Unit =
     AppHelpers.alert("TITLE", "MESSAGE", () => {})
     val alert = ShadowAlertDialog.getLatestAlertDialog
     alert shouldBe a('showing)
@@ -34,38 +33,34 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
 
     alert.getButton(DialogInterface.BUTTON_POSITIVE).performClick()
     alert shouldNot be a 'showing
-  }
 
   @Test
-  def testOpenUri(): Unit = {
+  def testOpenUri(): Unit =
     val uri = Uri.parse("http://scaloid.org/")
     AppHelpers.openUri(uri)
     val shadowActivity = Robolectric.shadowOf(activity)
     val intent = shadowActivity.getNextStartedActivity
     intent.getAction shouldBe Intent.ACTION_VIEW
     intent.getData shouldBe uri
-  }
 
   @Test
-  def testPendingService(): Unit = {
+  def testPendingService(): Unit =
     implicit val tag = ClassTag(classOf[SServiceImpl])
     val shadowPI =
       Robolectric.shadowOf(AppHelpers.pendingService[SServiceImpl])
     val intent = shadowPI.getSavedIntent
     intent.getComponent.getClassName shouldBe classOf[SServiceImpl].getName
-  }
 
   @Test
-  def testPendingActivity(): Unit = {
+  def testPendingActivity(): Unit =
     implicit val tag = ClassTag(classOf[SActivityImpl])
     val shadowPI =
       Robolectric.shadowOf(AppHelpers.pendingActivity[SActivityImpl])
     val intent = shadowPI.getSavedIntent
     intent.getComponent.getClassName shouldBe classOf[SActivityImpl].getName
-  }
 
   @Test
-  def testBroadcastReceiver(): Unit = {
+  def testBroadcastReceiver(): Unit =
     val controller = Robolectric.buildActivity(classOf[SActivityImpl]).create
     activity = controller.get()
     ContentHelpers.broadcastReceiver(new IntentFilter(Intent.ACTION_VIEW))(
@@ -75,9 +70,8 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
     val registered =
       Robolectric.getShadowApplication.getRegisteredReceivers.asScala
     registered shouldNot be a 'empty
-    registered.foreach { r =>
+    registered.foreach  r =>
       r.getIntentFilter.getAction(0) shouldBe Intent.ACTION_VIEW
-    }
 
     val intent = new Intent(
         Intent.ACTION_VIEW, Uri.parse("http://scaloid.org/"))
@@ -88,23 +82,20 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
         Robolectric.getShadowApplication.getApplicationContext, intent)
     val nextIntent = Robolectric.getShadowApplication.peekNextStartedActivity
     nextIntent.getComponent.getClassName shouldBe classOf[SActivityImpl].getName
-  }
 
   @Test
-  def testSharedPreference(): Unit = {
+  def testSharedPreference(): Unit =
     PreferenceHelpers.defaultSharedPreferences.edit
       .putString("foo", "bar")
       .commit
     PreferenceHelpers.defaultSharedPreferences.getString("foo", "") shouldBe "bar"
-  }
 
   @Test
-  def testToast(): Unit = {
+  def testToast(): Unit =
     WidgetHelpers.toast("Hello")
     ShadowToast.getTextOfLatestToast shouldBe "Hello"
-  }
   @Test
-  def testSpinnerDialog(): Unit = {
+  def testSpinnerDialog(): Unit =
     val dialog = WidgetHelpers.spinnerDialog("TITLE", "MESSAGE")
     dialog shouldBe a('showing)
 
@@ -120,5 +111,3 @@ class helpersTest extends JUnitSuite with ShouldMatchers {
 
     dialog.cancel()
     dialog shouldNot be a 'showing
-  }
-}

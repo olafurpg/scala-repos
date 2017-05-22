@@ -34,13 +34,12 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 
-object MenuBar {
+object MenuBar
   implicit def sfxMenuBar2jfx(cb: MenuBar): jfxsc.MenuBar =
     if (cb != null) cb.delegate else null
-}
 
 class MenuBar(override val delegate: jfxsc.MenuBar = new jfxsc.MenuBar())
-    extends Control(delegate) with SFXDelegate[jfxsc.MenuBar] {
+    extends Control(delegate) with SFXDelegate[jfxsc.MenuBar]
 
   /**
     * Gets the list of Menus for this instance.
@@ -50,9 +49,8 @@ class MenuBar(override val delegate: jfxsc.MenuBar = new jfxsc.MenuBar())
   /**
     * Sets the list of Menus for this instance.
     */
-  def menus_=(c: Iterable[Menu]) {
+  def menus_=(c: Iterable[Menu])
     fillSFXCollection(this.menus, c)
-  }
 
   /**
     * Gets the useSystemMenuBar for this instance.
@@ -62,7 +60,5 @@ class MenuBar(override val delegate: jfxsc.MenuBar = new jfxsc.MenuBar())
   /**
     * Sets the useSystemMenuBar for this instance.
     */
-  def useSystemMenuBar_=(v: Boolean) {
+  def useSystemMenuBar_=(v: Boolean)
     useSystemMenuBar() = v
-  }
-}

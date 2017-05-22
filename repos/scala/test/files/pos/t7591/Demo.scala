@@ -22,7 +22,7 @@ import scala.tools.cmd._
   *
   *  The normal option configuration is plausibly self-explanatory.
   */
-trait DemoSpec extends Spec with Meta.StdOpts with Interpolation {
+trait DemoSpec extends Spec with Meta.StdOpts with Interpolation
   lazy val referenceSpec = DemoSpec
   lazy val programInfo =
     Spec.Info("demo", "Usage: demo [<options>]", "scala.tools.cmd.Demo")
@@ -41,23 +41,19 @@ trait DemoSpec extends Spec with Meta.StdOpts with Interpolation {
   val optDefault = "defstr" / "an optional String" defaultTo "default"
   val optDefaultInt = "defint" / "an optional Int" defaultTo -1
   val optExpand = "alias" / "an option which expands" expandTo ("--int", "15")
-}
 
-object DemoSpec extends DemoSpec with Property {
+object DemoSpec extends DemoSpec with Property
   lazy val propMapper = new PropertyMapper(DemoSpec)
 
   type ThisCommandLine = SpecCommandLine
   def creator(args: List[String]) =
-    new SpecCommandLine(args) {
-      override def errorFn(msg: String) = {
+    new SpecCommandLine(args)
+      override def errorFn(msg: String) =
         println("Error: " + msg); sys.exit(0)
-      }
-    }
-}
 
-class Demo(args: List[String]) extends {
+class Demo(args: List[String]) extends
   val parsed = DemoSpec(args: _*)
-} with DemoSpec with Instance {
+with DemoSpec with Instance
   import java.lang.reflect._
 
   def helpMsg = DemoSpec.helpMsg
@@ -66,23 +62,19 @@ class Demo(args: List[String]) extends {
     (m.getName startsWith "opt") && !(m.getName contains "$") &&
     (m.getParameterTypes.isEmpty)
 
-  def demoString(ms: List[Method]) = {
+  def demoString(ms: List[Method]) =
     val longest = ms map (_.getName.length) max
     val formatStr = "    %-" + longest + "s: %s"
     val xs = ms map (m => formatStr.format(m.getName, m.invoke(this)))
 
     xs mkString ("Demo(\n  ", "\n  ", "\n)\n")
-  }
 
   override def toString = demoString(demoSpecMethods filter isDemo)
-}
 
-object Demo {
-  def main(args: Array[String]): Unit = {
+object Demo
+  def main(args: Array[String]): Unit =
     val runner = new Demo(args.toList)
 
     if (args.isEmpty) println(runner.helpMsg)
 
     println(runner)
-  }
-}

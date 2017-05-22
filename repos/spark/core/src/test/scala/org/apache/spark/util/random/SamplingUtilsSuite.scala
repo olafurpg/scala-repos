@@ -23,9 +23,9 @@ import org.apache.commons.math3.distribution.{BinomialDistribution, PoissonDistr
 
 import org.apache.spark.SparkFunSuite
 
-class SamplingUtilsSuite extends SparkFunSuite {
+class SamplingUtilsSuite extends SparkFunSuite
 
-  test("reservoirSampleAndCount") {
+  test("reservoirSampleAndCount")
     val input = Seq.fill(100)(Random.nextInt())
 
     // input size < k
@@ -45,30 +45,24 @@ class SamplingUtilsSuite extends SparkFunSuite {
       SamplingUtils.reservoirSampleAndCount(input.iterator, 10)
     assert(count3 === 100)
     assert(sample3.length === 10)
-  }
 
-  test("computeFraction") {
+  test("computeFraction")
     // test that the computed fraction guarantees enough data points
     // in the sample with a failure rate <= 0.0001
     val n = 100000
 
-    for (s <- 1 to 15) {
+    for (s <- 1 to 15)
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, true)
       val poisson = new PoissonDistribution(frac * n)
       assert(poisson.inverseCumulativeProbability(0.0001) >= s,
              "Computed fraction is too low")
-    }
-    for (s <- List(20, 100, 1000)) {
+    for (s <- List(20, 100, 1000))
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, true)
       val poisson = new PoissonDistribution(frac * n)
       assert(poisson.inverseCumulativeProbability(0.0001) >= s,
              "Computed fraction is too low")
-    }
-    for (s <- List(1, 10, 100, 1000)) {
+    for (s <- List(1, 10, 100, 1000))
       val frac = SamplingUtils.computeFractionForSampleSize(s, n, false)
       val binomial = new BinomialDistribution(n, frac)
       assert(binomial.inverseCumulativeProbability(0.0001) * n >= s,
              "Computed fraction is too low")
-    }
-  }
-}

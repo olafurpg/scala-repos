@@ -1,8 +1,8 @@
 import collection.mutable.UnrolledBuffer
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val u1 = new UnrolledBuffer[Int]
     assert(u1.isEmpty)
     assert(u1.size == 0)
@@ -32,9 +32,8 @@ object Test {
     assert(u1 == UnrolledBuffer(1, 3, 5, 7, 9))
 
     val u2 =
-      u1 map { x =>
+      u1 map  x =>
         (x - 1) / 2
-      }
     assert(u2 == UnrolledBuffer(0, 1, 2, 3, 4))
 
     u1.clear
@@ -58,14 +57,12 @@ object Test {
     assertCorrect(u1)
 
     val u3 =
-      u1 map { x =>
+      u1 map  x =>
         x
-      }
     var i = 0
-    for (elem <- u1) {
+    for (elem <- u1)
       assert(elem == u3(i))
       i += 1
-    }
 
     u1.remove(999)
     assert(u1.size == 999)
@@ -99,29 +96,24 @@ object Test {
     assert(u1.size == 1000)
     assertCorrect(u1)
 
-    for (i <- -100 until 0) {
+    for (i <- -100 until 0)
       i +=: u1
       assertCorrect(u1)
-    }
     assert(u1.size == 1100)
     assertCorrect(u1)
-  }
 
-  def assertCorrect(u1: UnrolledBuffer[Int]) {
+  def assertCorrect(u1: UnrolledBuffer[Int])
     val sz = u1.size
     val store = new Array[Int](sz)
-    for (i <- 0 until sz) {
+    for (i <- 0 until sz)
       store(i) = u1(i)
       u1(i) = sz - i
-    }
     for (i <- 0 until sz) assert(u1(i) == (sz - i))
     for (i <- 0 until sz) u1(i) = store(i)
     for (i <- 0 until sz) assert(store(i) == u1(i))
 
     assert(
-        (u1 map { x =>
+        (u1 map  x =>
           x
-        }) == u1)
+        ) == u1)
     assert(u1.iterator.toSeq.size == u1.size)
-  }
-}

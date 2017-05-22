@@ -13,12 +13,12 @@ import org.scalatest.{Matchers, FreeSpec}
 import akka.http.impl.engine.server.HttpServerTestSetupBase
 
 class WebSocketServerSpec
-    extends FreeSpec with Matchers with WithMaterializerSpec { spec ⇒
+    extends FreeSpec with Matchers with WithMaterializerSpec  spec ⇒
 
-  "The server-side WebSocket integration should" - {
-    "establish a websocket connection when the user requests it" - {
-      "when user handler instantly tries to send messages" in Utils.assertAllStagesStopped {
-        new TestSetup {
+  "The server-side WebSocket integration should" -
+    "establish a websocket connection when the user requests it" -
+      "when user handler instantly tries to send messages" in Utils.assertAllStagesStopped
+        new TestSetup
           send("""GET /chat HTTP/1.1
               |Host: server.example.com
               |Upgrade: websocket
@@ -69,10 +69,8 @@ class WebSocketServerSpec
           sendWSCloseFrame(Protocol.CloseCodes.Regular, mask = true)
           closeNetworkInput()
           expectNetworkClose()
-        }
-      }
-      "for echoing user handler" in Utils.assertAllStagesStopped {
-        new TestSetup {
+      "for echoing user handler" in Utils.assertAllStagesStopped
+        new TestSetup
 
           send("""GET /echo HTTP/1.1
               |Host: server.example.com
@@ -142,25 +140,18 @@ class WebSocketServerSpec
 
           closeNetworkInput()
           expectNetworkClose()
-        }
-      }
-    }
     "prevent the selection of an unavailable subprotocol" in pending
-    "reject invalid WebSocket handshakes" - {
+    "reject invalid WebSocket handshakes" -
       "missing `Upgrade: websocket` header" in pending
       "missing `Connection: upgrade` header" in pending
       "missing `Sec-WebSocket-Key header" in pending
       "`Sec-WebSocket-Key` with wrong amount of base64 encoded data" in pending
       "missing `Sec-WebSocket-Version` header" in pending
       "unsupported `Sec-WebSocket-Version`" in pending
-    }
-  }
 
-  class TestSetup extends HttpServerTestSetupBase with WSTestSetupBase {
+  class TestSetup extends HttpServerTestSetupBase with WSTestSetupBase
     implicit def system = spec.system
     implicit def materializer = spec.materializer
 
     def expectBytes(length: Int): ByteString = netOut.expectBytes(length)
     def expectBytes(bytes: ByteString): Unit = netOut.expectBytes(bytes)
-  }
-}

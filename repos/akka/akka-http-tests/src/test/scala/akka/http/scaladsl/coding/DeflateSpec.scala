@@ -9,7 +9,7 @@ import akka.util.ByteString
 import java.io.{InputStream, OutputStream}
 import java.util.zip._
 
-class DeflateSpec extends CoderSpec {
+class DeflateSpec extends CoderSpec
   protected def Coder: Coder with StreamDecoder = Deflate
 
   protected def newDecodedInputStream(underlying: InputStream): InputStream =
@@ -19,11 +19,8 @@ class DeflateSpec extends CoderSpec {
       underlying: OutputStream): OutputStream =
     new DeflaterOutputStream(underlying)
 
-  override def extraTests(): Unit = {
-    "throw early if header is corrupt" in {
-      (the[RuntimeException] thrownBy {
+  override def extraTests(): Unit =
+    "throw early if header is corrupt" in
+      (the[RuntimeException] thrownBy
             ourDecode(ByteString(0, 1, 2, 3, 4))
-          }).getCause should be(a[DataFormatException])
-    }
-  }
-}
+          ).getCause should be(a[DataFormatException])

@@ -15,16 +15,16 @@ import akka.stream._
 import akka.stream.testkit._
 import akka.testkit.AkkaSpec
 
-class FlowConflateSpec extends AkkaSpec {
+class FlowConflateSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "Conflate" must {
+  "Conflate" must
 
-    "pass-through elements unchanged when there is no rate difference" in {
+    "pass-through elements unchanged when there is no rate difference" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -35,16 +35,14 @@ class FlowConflateSpec extends AkkaSpec {
         .run()
       val sub = subscriber.expectSubscription()
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         sub.request(1)
         publisher.sendNext(i)
         subscriber.expectNext(i)
-      }
 
       sub.cancel()
-    }
 
-    "pass-through elements unchanged when there is no rate difference (simple conflate)" in {
+    "pass-through elements unchanged when there is no rate difference (simple conflate)" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -55,16 +53,14 @@ class FlowConflateSpec extends AkkaSpec {
         .run()
       val sub = subscriber.expectSubscription()
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         sub.request(1)
         publisher.sendNext(i)
         subscriber.expectNext(i)
-      }
 
       sub.cancel()
-    }
 
-    "conflate elements while downstream is silent" in {
+    "conflate elements while downstream is silent" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -75,16 +71,14 @@ class FlowConflateSpec extends AkkaSpec {
         .run()
       val sub = subscriber.expectSubscription()
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         publisher.sendNext(i)
-      }
       subscriber.expectNoMsg(1.second)
       sub.request(1)
       subscriber.expectNext(5050)
       sub.cancel()
-    }
 
-    "conflate elements while downstream is silent (simple conflate)" in {
+    "conflate elements while downstream is silent (simple conflate)" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -95,36 +89,30 @@ class FlowConflateSpec extends AkkaSpec {
         .run()
       val sub = subscriber.expectSubscription()
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         publisher.sendNext(i)
-      }
       subscriber.expectNoMsg(1.second)
       sub.request(1)
       subscriber.expectNext(5050)
       sub.cancel()
-    }
 
-    "work on a variable rate chain" in {
+    "work on a variable rate chain" in
       val future = Source(1 to 1000)
         .conflateWithSeed(seed = i ⇒ i)(aggregate = (sum, i) ⇒ sum + i)
-        .map { i ⇒
+        .map  i ⇒
           if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
-        }
         .runFold(0)(_ + _)
       Await.result(future, 10.seconds) should be(500500)
-    }
 
-    "work on a variable rate chain (simple conflate)" in {
+    "work on a variable rate chain (simple conflate)" in
       val future = Source(1 to 1000)
         .conflate(_ + _)
-        .map { i ⇒
+        .map  i ⇒
           if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
-        }
         .runFold(0)(_ + _)
       Await.result(future, 10.seconds) should be(500500)
-    }
 
-    "backpressure subscriber when upstream is slower" in {
+    "backpressure subscriber when upstream is slower" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -154,31 +142,28 @@ class FlowConflateSpec extends AkkaSpec {
       sub.request(1)
       subscriber.expectNoMsg(500.millis)
       sub.cancel()
-    }
 
-    "work with a buffer and fold" in {
+    "work with a buffer and fold" in
       val future = Source(1 to 50)
         .conflateWithSeed(seed = i ⇒ i)(aggregate = (sum, i) ⇒ sum + i)
         .buffer(50, OverflowStrategy.backpressure)
         .runFold(0)(_ + _)
       Await.result(future, 3.seconds) should be((1 to 50).sum)
-    }
 
-    "restart when `seed` throws and a restartingDecider is used" in {
+    "restart when `seed` throws and a restartingDecider is used" in
       val sourceProbe = TestPublisher.probe[Int]()
       val sinkProbe = TestSubscriber.probe[Int]()
       val exceptionLatch = TestLatch()
 
       val future = Source
         .fromPublisher(sourceProbe)
-        .conflateWithSeed { i ⇒
-          if (i % 2 == 0) {
+        .conflateWithSeed  i ⇒
+          if (i % 2 == 0)
             exceptionLatch.open()
             throw TE("I hate even seed numbers")
-          } else i
-        } { (sum, i) ⇒
+          else i
+         (sum, i) ⇒
           sum + i
-        }
         .withAttributes(supervisionStrategy(restartingDecider))
         .to(Sink.fromSubscriber(sinkProbe))
         .withAttributes(inputBuffer(initial = 1, max = 1))
@@ -209,16 +194,15 @@ class FlowConflateSpec extends AkkaSpec {
       // now we should have lost the 2 and the accumulated state
       sinkSub.request(1)
       sinkProbe.expectNext(3)
-    }
 
-    "restart when `aggregate` throws and a restartingDecider is used" in {
+    "restart when `aggregate` throws and a restartingDecider is used" in
       val latch = TestLatch()
       val conflate = Flow[String]
         .conflateWithSeed(seed = i ⇒ i)((state, elem) ⇒
-              if (elem == "two") {
+              if (elem == "two")
             latch.open()
             throw TE("two is a three letter word")
-          } else state + elem)
+          else state + elem)
         .withAttributes(supervisionStrategy(restartingDecider))
 
       val sourceProbe = TestPublisher.probe[String]()
@@ -242,9 +226,8 @@ class FlowConflateSpec extends AkkaSpec {
       // "one" should be lost
       Await.ready(latch, 3.seconds)
       sinkProbe.requestNext() should ===("three")
-    }
 
-    "resume when `aggregate` throws and a resumingDecider is used" in {
+    "resume when `aggregate` throws and a resumingDecider is used" in
 
       val sourceProbe = TestPublisher.probe[Int]()
       val sinkProbe = TestSubscriber.probe[Vector[Int]]()
@@ -253,12 +236,12 @@ class FlowConflateSpec extends AkkaSpec {
       val future = Source
         .fromPublisher(sourceProbe)
         .conflateWithSeed(seed = i ⇒ Vector(i))((state, elem) ⇒
-              if (elem == 2) {
+              if (elem == 2)
             throw TE("three is a four letter word")
-          } else {
+          else
             if (elem == 4) saw4Latch.open()
             state :+ elem
-        })
+        )
         .withAttributes(supervisionStrategy(resumingDecider))
         .to(Sink.fromSubscriber(sinkProbe))
         .withAttributes(inputBuffer(initial = 1, max = 1))
@@ -287,6 +270,3 @@ class FlowConflateSpec extends AkkaSpec {
       sinkSub.request(1)
 
       sinkProbe.expectNext(Vector(1, 3, 4))
-    }
-  }
-}

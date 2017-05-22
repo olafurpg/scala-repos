@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.lang.psi.util.ScalaConstantExpressionEvaluato
   * @author Ksenia.Sautina
   * @since 5/15/12
   */
-trait AbstractTestConfigurationProducer {
+trait AbstractTestConfigurationProducer
   private var myPsiElement: PsiElement = null
   private val constEvaluator = new ScalaConstantExpressionEvaluator
   def getSourceElement: PsiElement = myPsiElement
@@ -22,7 +22,7 @@ trait AbstractTestConfigurationProducer {
 
   def createConfigurationByElement(location: Location[_ <: PsiElement],
                                    context: ConfigurationContext)
-    : Option[(PsiElement, RunnerAndConfigurationSettings)] = {
+    : Option[(PsiElement, RunnerAndConfigurationSettings)] =
     if (context.getModule == null) return null
     val scope: GlobalSearchScope =
       GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(
@@ -34,16 +34,14 @@ trait AbstractTestConfigurationProducer {
                 .orNull == null)) return null
     myPsiElement = location.getPsiElement
     createConfigurationByLocation(location) //.asInstanceOf[RunnerAndConfigurationSettingsImpl]
-  }
 
   def findExistingByElement(
       location: Location[_ <: PsiElement],
       existingConfigurations: Array[RunnerAndConfigurationSettings],
-      context: ConfigurationContext): RunnerAndConfigurationSettings = {
+      context: ConfigurationContext): RunnerAndConfigurationSettings =
     existingConfigurations
       .find(c => isConfigurationByLocation(c.getConfiguration, location))
       .orNull
-  }
 
   def createConfigurationByLocation(location: Location[_ <: PsiElement])
     : Option[(PsiElement, RunnerAndConfigurationSettings)]
@@ -51,8 +49,6 @@ trait AbstractTestConfigurationProducer {
   def isConfigurationByLocation(configuration: RunConfiguration,
                                 location: Location[_ <: PsiElement]): Boolean
 
-  protected def escapeAndConcatTestNames(testNames: List[String]) = {
+  protected def escapeAndConcatTestNames(testNames: List[String]) =
     val res = testNames.map(TestConfigurationUtil.escapeTestName)
     if (res.size > 0) res.tail.fold(res.head)(_ + "\n" + _) else ""
-  }
-}

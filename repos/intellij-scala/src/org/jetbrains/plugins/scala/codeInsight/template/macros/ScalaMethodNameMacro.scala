@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
   * @author Roman.Shein
   * @since 19.09.2015.
   */
-class ScalaMethodNameMacro extends Macro {
+class ScalaMethodNameMacro extends Macro
   override def calculateResult(
       params: Array[Expression], context: ExpressionContext): Result =
     Option(PsiTreeUtil.getParentOfType(
@@ -29,4 +29,3 @@ class ScalaMethodNameMacro extends Macro {
 
   override def isAcceptableInContext(context: TemplateContextType): Boolean =
     context.isInstanceOf[ScalaCodeContextType]
-}

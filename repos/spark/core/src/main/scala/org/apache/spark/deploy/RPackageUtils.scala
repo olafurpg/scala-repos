@@ -30,7 +30,7 @@ import org.apache.spark.api.r.RUtils
 import org.apache.spark.internal.Logging
 import org.apache.spark.util.{RedirectThread, Utils}
 
-private[deploy] object RPackageUtils extends Logging {
+private[deploy] object RPackageUtils extends Logging
 
   /** The key in the MANIFEST.mf that we look for, in case a jar contains R code. */
   private final val hasRPackage = "Spark-HasRPackage"
@@ -68,33 +68,28 @@ private[deploy] object RPackageUtils extends Logging {
   private def print(msg: String,
                     printStream: PrintStream,
                     level: Level = Level.FINE,
-                    e: Throwable = null): Unit = {
-    if (printStream != null) {
+                    e: Throwable = null): Unit =
+    if (printStream != null)
       // scalastyle:off println
       printStream.println(msg)
       // scalastyle:on println
-      if (e != null) {
+      if (e != null)
         e.printStackTrace(printStream)
-      }
-    } else {
-      level match {
+    else
+      level match
         case Level.INFO => logInfo(msg)
         case Level.WARNING => logWarning(msg)
         case Level.SEVERE => logError(msg, e)
         case _ => logDebug(msg)
-      }
-    }
-  }
 
   /**
     * Checks the manifest of the Jar whether there is any R source code bundled with it.
     * Exposed for testing.
     */
-  private[deploy] def checkManifestForR(jar: JarFile): Boolean = {
+  private[deploy] def checkManifestForR(jar: JarFile): Boolean =
     val manifest = jar.getManifest.getMainAttributes
     manifest.getValue(hasRPackage) != null &&
     manifest.getValue(hasRPackage).trim == "true"
-  }
 
   /**
     * Runs the standard R package installation code to build the R package from source.
@@ -103,14 +98,13 @@ private[deploy] object RPackageUtils extends Logging {
   private def rPackageBuilder(dir: File,
                               printStream: PrintStream,
                               verbose: Boolean,
-                              libDir: String): Boolean = {
+                              libDir: String): Boolean =
     // this code should be always running on the driver.
     val pathToPkg = Seq(dir, "R", "pkg").mkString(File.separator)
     val installCmd = baseInstallCmd ++ Seq(libDir, pathToPkg)
-    if (verbose) {
+    if (verbose)
       print(s"Building R package with the command: $installCmd", printStream)
-    }
-    try {
+    try
       val builder = new ProcessBuilder(installCmd.asJava)
       builder.redirectErrorStream(true)
 
@@ -127,121 +121,99 @@ private[deploy] object RPackageUtils extends Logging {
       new RedirectThread(
           process.getInputStream, printStream, "redirect R packaging").start()
       process.waitFor() == 0
-    } catch {
+    catch
       case e: Throwable =>
         print("Failed to build R package.", printStream, Level.SEVERE, e)
         false
-    }
-  }
 
   /**
     * Extracts the files under /R in the jar to a temporary directory for building.
     */
   private def extractRFolder(
-      jar: JarFile, printStream: PrintStream, verbose: Boolean): File = {
+      jar: JarFile, printStream: PrintStream, verbose: Boolean): File =
     val tempDir = Utils.createTempDir(null)
     val jarEntries = jar.entries()
-    while (jarEntries.hasMoreElements) {
+    while (jarEntries.hasMoreElements)
       val entry = jarEntries.nextElement()
       val entryRIndex = entry.getName.indexOf(RJarEntries)
-      if (entryRIndex > -1) {
+      if (entryRIndex > -1)
         val entryPath = entry.getName.substring(entryRIndex)
-        if (entry.isDirectory) {
+        if (entry.isDirectory)
           val dir = new File(tempDir, entryPath)
-          if (verbose) {
+          if (verbose)
             print(s"Creating directory: $dir", printStream)
-          }
           dir.mkdirs
-        } else {
+        else
           val inStream = jar.getInputStream(entry)
           val outPath = new File(tempDir, entryPath)
           Files.createParentDirs(outPath)
           val outStream = new FileOutputStream(outPath)
-          if (verbose) {
+          if (verbose)
             print(s"Extracting $entry to $outPath", printStream)
-          }
           Utils.copyStream(inStream, outStream, closeStreams = true)
-        }
-      }
-    }
     tempDir
-  }
 
   /**
     * Extracts the files under /R in the jar to a temporary directory for building.
     */
   private[deploy] def checkAndBuildRPackage(jars: String,
                                             printStream: PrintStream = null,
-                                            verbose: Boolean = false): Unit = {
-    jars.split(",").foreach { jarPath =>
+                                            verbose: Boolean = false): Unit =
+    jars.split(",").foreach  jarPath =>
       val file = new File(Utils.resolveURI(jarPath))
-      if (file.exists()) {
+      if (file.exists())
         val jar = new JarFile(file)
-        if (checkManifestForR(jar)) {
+        if (checkManifestForR(jar))
           print(s"$file contains R source code. Now installing package.",
                 printStream,
                 Level.INFO)
           val rSource = extractRFolder(jar, printStream, verbose)
-          if (RUtils.rPackages.isEmpty) {
+          if (RUtils.rPackages.isEmpty)
             RUtils.rPackages = Some(Utils.createTempDir().getAbsolutePath)
-          }
-          try {
+          try
             if (!rPackageBuilder(
-                    rSource, printStream, verbose, RUtils.rPackages.get)) {
+                    rSource, printStream, verbose, RUtils.rPackages.get))
               print(s"ERROR: Failed to build R package in $file.", printStream)
               print(RJarDoc, printStream)
-            }
-          } finally {
+          finally
             // clean up
-            if (!rSource.delete()) {
+            if (!rSource.delete())
               logWarning(s"Error deleting ${rSource.getPath()}")
-            }
-          }
-        } else {
-          if (verbose) {
+        else
+          if (verbose)
             print(s"$file doesn't contain R source code, skipping...",
                   printStream)
-          }
-        }
-      } else {
+      else
         print(s"WARN: $file resolved as dependency, but not found.",
               printStream,
               Level.WARNING)
-      }
-    }
-  }
 
   private def listFilesRecursively(
-      dir: File, excludePatterns: Seq[String]): Set[File] = {
-    if (!dir.exists()) {
+      dir: File, excludePatterns: Seq[String]): Set[File] =
+    if (!dir.exists())
       Set.empty[File]
-    } else {
-      if (dir.isDirectory) {
+    else
+      if (dir.isDirectory)
         val subDir = dir.listFiles(
-            new FilenameFilter {
-          override def accept(dir: File, name: String): Boolean = {
+            new FilenameFilter
+          override def accept(dir: File, name: String): Boolean =
             !excludePatterns.map(name.contains).reduce(_ || _) // exclude files with given pattern
-          }
-        })
+        )
         subDir.flatMap(listFilesRecursively(_, excludePatterns)).toSet
-      } else {
+      else
         Set(dir)
-      }
-    }
-  }
 
   /** Zips all the R libraries built for distribution to the cluster. */
-  private[deploy] def zipRLibraries(dir: File, name: String): File = {
+  private[deploy] def zipRLibraries(dir: File, name: String): File =
     val filesToBundle = listFilesRecursively(dir, Seq(".zip"))
     // create a zip file from scratch, do not append to existing file.
     val zipFile = new File(dir, name)
-    if (!zipFile.delete()) {
+    if (!zipFile.delete())
       logWarning(s"Error deleting ${zipFile.getPath()}")
-    }
     val zipOutputStream = new ZipOutputStream(
         new FileOutputStream(zipFile, false))
-    try {
-      filesToBundle.foreach { file =>
+    try
+      filesToBundle.foreach  file =>
         // get the relative paths for proper naming in the zip file
         val relPath =
           file.getAbsolutePath.replaceFirst(dir.getAbsolutePath, "")
@@ -251,10 +223,6 @@ private[deploy] object RPackageUtils extends Logging {
         ByteStreams.copy(fis, zipOutputStream)
         zipOutputStream.closeEntry()
         fis.close()
-      }
-    } finally {
+    finally
       zipOutputStream.close()
-    }
     zipFile
-  }
-}

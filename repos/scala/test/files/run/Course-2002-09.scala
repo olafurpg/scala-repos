@@ -2,170 +2,139 @@
 // Programmation IV - 2002 - Week 09
 //############################################################################
 
-trait Constraint {
+trait Constraint
   def newValue: Unit;
   def dropValue: Unit
-}
 
-object NoConstraint extends Constraint {
+object NoConstraint extends Constraint
   def newValue: Unit = sys.error("NoConstraint.newValue");
   def dropValue: Unit = sys.error("NoConstraint.dropValue");
-}
 
-class Adder(a1: Quantity, a2: Quantity, sum: Quantity) extends Constraint {
-  def newValue = (a1.getValue, a2.getValue, sum.getValue) match {
+class Adder(a1: Quantity, a2: Quantity, sum: Quantity) extends Constraint
+  def newValue = (a1.getValue, a2.getValue, sum.getValue) match
     case (Some(x1), Some(x2), _) => sum.setValue(x1 + x2, this)
     case (Some(x1), _, Some(r)) => a2.setValue(r - x1, this)
     case (_, Some(x2), Some(r)) => a1.setValue(r - x2, this)
     case _ =>
-  }
-  def dropValue: Unit = {
+  def dropValue: Unit =
     a1.forgetValue(this); a2.forgetValue(this); sum.forgetValue(this);
-  }
   a1 connect this;
   a2 connect this;
   sum connect this;
-}
 
 class Multiplier(m1: Quantity, m2: Quantity, prod: Quantity)
-    extends Constraint {
-  def newValue = (m1.getValue, m2.getValue, prod.getValue) match {
+    extends Constraint
+  def newValue = (m1.getValue, m2.getValue, prod.getValue) match
     case (Some(0d), _, _) => prod.setValue(0, this);
     case (_, Some(0d), _) => prod.setValue(0, this);
     case (Some(x1), Some(x2), _) => prod.setValue(x1 * x2, this)
     case (Some(x1), _, Some(r)) => m2.setValue(r / x1, this)
     case (_, Some(x2), Some(r)) => m1.setValue(r / x2, this)
     case _ =>
-  }
-  def dropValue: Unit = {
+  def dropValue: Unit =
     m1.forgetValue(this); m2.forgetValue(this); prod.forgetValue(this);
-  }
   m1 connect this;
   m2 connect this;
   prod connect this;
-}
 
-class Squarer(square: Quantity, root: Quantity) extends Constraint {
-  def newValue: Unit = (square.getValue, root.getValue) match {
+class Squarer(square: Quantity, root: Quantity) extends Constraint
+  def newValue: Unit = (square.getValue, root.getValue) match
     case (Some(x), _) if (x < 0) => sys.error("Square of negative number")
     case (Some(x), _) => root.setValue(Math.sqrt(x), this)
     case (_, Some(x)) => square.setValue(x * x, this)
     case _ =>
-  }
-  def dropValue: Unit = {
+  def dropValue: Unit =
     square.forgetValue(this); root.forgetValue(this);
-  }
   square connect this;
   root connect this;
-}
 
-class Eq(a: Quantity, b: Quantity) extends Constraint {
-  def newValue = ((a.getValue, b.getValue): @unchecked) match {
+class Eq(a: Quantity, b: Quantity) extends Constraint
+  def newValue = ((a.getValue, b.getValue): @unchecked) match
     case (Some(x), _) => b.setValue(x, this);
     case (_, Some(y)) => a.setValue(y, this);
-  }
-  def dropValue {
+  def dropValue
     a.forgetValue(this); b.forgetValue(this);
-  }
   a connect this;
   b connect this;
-}
 
-class Constant(q: Quantity, v: Double) extends Constraint {
+class Constant(q: Quantity, v: Double) extends Constraint
   def newValue: Unit = sys.error("Constant.newValue");
   def dropValue: Unit = sys.error("Constant.dropValue");
   q connect this;
   q.setValue(v, this);
-}
 
-class Probe(name: String, q: Quantity) extends Constraint {
+class Probe(name: String, q: Quantity) extends Constraint
   def newValue: Unit = printProbe(q.getValue);
   def dropValue: Unit = printProbe(None);
-  private def printProbe(v: Option[Double]) {
-    val vstr = v match {
+  private def printProbe(v: Option[Double])
+    val vstr = v match
       case Some(x) => x.toString()
       case None => "?"
-    }
     Console.println("Probe: " + name + " = " + vstr);
-  }
   q connect this
-}
 
-class Quantity() {
+class Quantity()
   private var value: Option[Double] = None;
   private var constraints: List[Constraint] = List();
   private var informant: Constraint = null;
 
   def getValue: Option[Double] = value;
 
-  def setValue(v: Double, setter: Constraint) = value match {
+  def setValue(v: Double, setter: Constraint) = value match
     case Some(v1) =>
       if (v != v1) sys.error("Error! contradiction: " + v + " and " + v1);
     case None =>
       informant = setter; value = Some(v);
-      for (c <- constraints; if !(c == informant)) {
+      for (c <- constraints; if !(c == informant))
         c.newValue;
-      }
-  }
   def setValue(v: Double): Unit = setValue(v, NoConstraint);
 
-  def forgetValue(retractor: Constraint): Unit = {
-    if (retractor == informant) {
+  def forgetValue(retractor: Constraint): Unit =
+    if (retractor == informant)
       value = None;
       for (c <- constraints; if !(c == informant)) c.dropValue;
-    }
-  }
   def forgetValue: Unit = forgetValue(NoConstraint);
 
-  def connect(c: Constraint) = {
+  def connect(c: Constraint) =
     constraints = c :: constraints;
-    value match {
+    value match
       case Some(_) => c.newValue
       case None =>
-    }
-  }
 
-  def +(that: Quantity): Quantity = {
+  def +(that: Quantity): Quantity =
     val sum = new Quantity();
     new Adder(this, that, sum);
     sum;
-  }
 
-  def *(that: Quantity): Quantity = {
+  def *(that: Quantity): Quantity =
     val prod = new Quantity();
     new Multiplier(this, that, prod);
     prod;
-  }
 
-  def square: Quantity = {
+  def square: Quantity =
     val square = new Quantity();
     new Squarer(square, this);
     square;
-  }
 
-  def sqrt: Quantity = {
+  def sqrt: Quantity =
     val root = new Quantity();
     new Squarer(this, root);
     root;
-  }
 
-  def ===(that: Quantity): Constraint = {
+  def ===(that: Quantity): Constraint =
     new Eq(this, that);
-  }
 
-  override def toString(): String = value match {
+  override def toString(): String = value match
     case None => "  ?"
     case Some(v) => v.toString()
-  }
 
   def str: String = toString();
-}
 
 //############################################################################
 
-object M0 {
+object M0
 
-  def CFconverter(c: Quantity, f: Quantity) = {
+  def CFconverter(c: Quantity, f: Quantity) =
     val u = new Quantity();
     val v = new Quantity();
     val w = new Quantity();
@@ -177,9 +146,8 @@ object M0 {
     new Constant(w, 9);
     new Constant(x, 5);
     new Constant(y, 32);
-  }
 
-  def test = {
+  def test =
     val c = new Quantity(); new Probe("c", c);
     val f = new Quantity(); new Probe("f", f);
     CFconverter(c, f);
@@ -199,38 +167,32 @@ object M0 {
     f.setValue(212);
     f.forgetValue;
     Console.println;
-  }
-}
 
 //############################################################################
 
-object M1 {
+object M1
 
-  def constant(x: Double): Quantity = {
+  def constant(x: Double): Quantity =
     val q = new Quantity();
     new Constant(q, x);
     q
-  }
 
-  def CFconverter(c: Quantity, f: Quantity) = {
+  def CFconverter(c: Quantity, f: Quantity) =
     val v = new Quantity();
     constant(9) * c === constant(5) * v;
     v + constant(32) === f;
-  }
 
-  def show_c2f(c: Quantity, f: Quantity, v: Int) = {
+  def show_c2f(c: Quantity, f: Quantity, v: Int) =
     c.setValue(v);
     Console.println(c.str + " Celsius -> " + f.str + " Fahrenheits");
     c.forgetValue;
-  }
 
-  def show_f2c(c: Quantity, f: Quantity, v: Int) = {
+  def show_f2c(c: Quantity, f: Quantity, v: Int) =
     f.setValue(v);
     Console.println(f.str + " Fahrenheits -> " + c.str + " Celsius");
     f.forgetValue;
-  }
 
-  def test = {
+  def test =
     val c = new Quantity();
     val f = new Quantity();
     CFconverter(c, f);
@@ -240,32 +202,28 @@ object M1 {
     show_f2c(c, f, 32);
     show_f2c(c, f, 212);
     Console.println;
-  }
-}
 
 //############################################################################
 
-object M2 {
+object M2
 
   val a = new Quantity();
   val b = new Quantity();
   val c = a * b;
 
-  def set(q: Quantity, o: Option[Int]): String = {
-    o match {
+  def set(q: Quantity, o: Option[Int]): String =
+    o match
       case None => "?"
       case Some(v) => q.setValue(v); v.toString()
-    };
-  }
+    ;
 
-  def show(x: Option[Int], y: Option[Int], z: Option[Int]) = {
+  def show(x: Option[Int], y: Option[Int], z: Option[Int]) =
     Console.print(
         "a = " + set(a, x) + ", b = " + set(b, y) + ", c = " + set(c, z));
     Console.println(" => " + a.str + " * " + b.str + " = " + c.str);
     a.forgetValue; b.forgetValue; c.forgetValue;
-  }
 
-  def test = {
+  def test =
     show(None, None, None);
     show(Some(2), None, None);
     show(None, Some(3), None);
@@ -288,14 +246,12 @@ object M2 {
     show(Some(7), Some(0), Some(0));
     show(Some(0), Some(0), Some(0));
     Console.println;
-  }
-}
 
 //############################################################################
 
-object M3 {
+object M3
 
-  def test = {
+  def test =
     val a = new Quantity();
     val b = new Quantity();
     val c = new Quantity();
@@ -314,19 +270,15 @@ object M3 {
     b.forgetValue; c.forgetValue;
 
     Console.println;
-  }
-}
 
 //############################################################################
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     M0.test;
     M1.test;
     M2.test;
     M3.test;
     ()
-  }
-}
 
 //############################################################################

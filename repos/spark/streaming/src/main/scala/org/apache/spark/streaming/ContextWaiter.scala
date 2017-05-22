@@ -20,7 +20,7 @@ package org.apache.spark.streaming
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReentrantLock
 
-private[streaming] class ContextWaiter {
+private[streaming] class ContextWaiter
 
   private val lock = new ReentrantLock()
   private val condition = lock.newCondition()
@@ -31,49 +31,39 @@ private[streaming] class ContextWaiter {
   // Guarded by "lock"
   private var stopped: Boolean = false
 
-  def notifyError(e: Throwable): Unit = {
+  def notifyError(e: Throwable): Unit =
     lock.lock()
-    try {
+    try
       error = e
       condition.signalAll()
-    } finally {
+    finally
       lock.unlock()
-    }
-  }
 
-  def notifyStop(): Unit = {
+  def notifyStop(): Unit =
     lock.lock()
-    try {
+    try
       stopped = true
       condition.signalAll()
-    } finally {
+    finally
       lock.unlock()
-    }
-  }
 
   /**
     * Return `true` if it's stopped; or throw the reported error if `notifyError` has been called; or
     * `false` if the waiting time detectably elapsed before return from the method.
     */
-  def waitForStopOrError(timeout: Long = -1): Boolean = {
+  def waitForStopOrError(timeout: Long = -1): Boolean =
     lock.lock()
-    try {
-      if (timeout < 0) {
-        while (!stopped && error == null) {
+    try
+      if (timeout < 0)
+        while (!stopped && error == null)
           condition.await()
-        }
-      } else {
+      else
         var nanos = TimeUnit.MILLISECONDS.toNanos(timeout)
-        while (!stopped && error == null && nanos > 0) {
+        while (!stopped && error == null && nanos > 0)
           nanos = condition.awaitNanos(nanos)
-        }
-      }
       // If already had error, then throw it
       if (error != null) throw error
       // already stopped or timeout
       stopped
-    } finally {
+    finally
       lock.unlock()
-    }
-  }
-}

@@ -21,10 +21,10 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Failure, Success, Typi
   * Date: 10.03.2009
   */
 abstract class TypeConformanceTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   def folderPath: String = baseRootPath() + "typeConformance/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -45,21 +45,17 @@ abstract class TypeConformanceTestBase
 
     valueDecl.expr
       .getOrElse(throw new RuntimeException("Expression not found"))
-      .getType(TypingContext.empty) match {
+      .getType(TypingContext.empty) match
       case Success(rhsType, _) =>
         val res: Boolean = Conformance.conforms(declaredType, rhsType)
         val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
         val text = lastPsi.getText
-        val output = lastPsi.getNode.getElementType match {
+        val output = lastPsi.getNode.getElementType match
           case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             text.substring(2, text.length - 2).trim
           case _ => fail("Test result must be in last comment statement")
-        }
         if (java.lang.Boolean.parseBoolean(output.asInstanceOf[String]) != res)
           fail("conformance wrong")
       case Failure(msg, elem) =>
         assert(assertion = false, message = msg + " :: " + elem.get.getText)
-    }
-  }
-}

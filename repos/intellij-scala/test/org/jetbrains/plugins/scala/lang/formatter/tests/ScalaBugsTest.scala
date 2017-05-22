@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.lang.formatter.AbstractScalaFormatterTestBase
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaBugsTest extends AbstractScalaFormatterTestBase {
+class ScalaBugsTest extends AbstractScalaFormatterTestBase
   /* stub:
   def test {
     val before =
@@ -19,23 +19,21 @@ class ScalaBugsTest extends AbstractScalaFormatterTestBase {
   }
    */
 
-  def testSCL2424() {
+  def testSCL2424()
     val before = """
 someMethod(new Something, abc, def)
 """.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL2425() {
+  def testSCL2425()
     val before = """
 import foo.{Foo, Bar}
 """.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL2477() {
+  def testSCL2477()
     val before = """
 class Foo {
   //some comment
@@ -64,9 +62,8 @@ class Foo {
 }
 """.replace("\r", "")
     doTextTest(before, after)
-  }
 
-  def testSCL1875() {
+  def testSCL1875()
     val before = """
 /**
  * something{@link Foo}
@@ -82,9 +79,8 @@ class A
 class A
 """.replace("\r", "")
     doTextTest(before, after)
-  }
 
-  def testSCL2066FromDiscussion() {
+  def testSCL2066FromDiscussion()
     val settings = getCommonSettings
     settings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE
     val before = """
@@ -108,9 +104,8 @@ n.foreach
 }
 """.replace("\r", "")
     doTextTest(before, after)
-  }
 
-  def testSCL2775sTrue() {
+  def testSCL2775sTrue()
     getScalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST = true
 
     val before =
@@ -127,9 +122,8 @@ Map(1 -> "aa", 2 -> "bb", 3 -> "cc").filter { case (1, "aa") => true; case _ => 
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2775sFalse() {
+  def testSCL2775sFalse()
     getScalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST = false
     getScalaSettings.PLACE_CLOSURE_PARAMETERS_ON_NEW_LINE = true
 
@@ -154,9 +148,8 @@ Map(1 -> "aa", 2 -> "bb", 3 -> "cc").filter {
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2839sTrue() {
+  def testSCL2839sTrue()
     getScalaSettings.SPACES_IN_ONE_LINE_BLOCKS = true
     getCommonSettings.KEEP_SIMPLE_METHODS_IN_ONE_LINE = true
 
@@ -176,9 +169,8 @@ def func2() {
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2839sFalse() {
+  def testSCL2839sFalse()
     getCommonSettings.KEEP_SIMPLE_METHODS_IN_ONE_LINE = false
 
     val before = """
@@ -199,9 +191,8 @@ def func2() {
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2470() {
+  def testSCL2470()
     getScalaSettings.NOT_CONTINUATION_INDENT_FOR_PARAMS = true
 
     val before = """
@@ -241,9 +232,8 @@ def f[T](i: Int) {
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3126AllTrue() {
+  def testSCL3126AllTrue()
     getScalaSettings.SPACE_BEFORE_INFIX_LIKE_METHOD_PARENTHESES = true
     getScalaSettings.PRESERVE_SPACE_AFTER_METHOD_DECLARATION_NAME = true
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = true
@@ -293,9 +283,8 @@ def ::= (o: Any) {}
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3126InfixFalse() {
+  def testSCL3126InfixFalse()
     getScalaSettings.SPACE_BEFORE_INFIX_LIKE_METHOD_PARENTHESES = false
     getScalaSettings.PRESERVE_SPACE_AFTER_METHOD_DECLARATION_NAME = true
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = true
@@ -345,9 +334,8 @@ def ::= (o: Any) {}
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3126InfixTruePreservevTrue() {
+  def testSCL3126InfixTruePreservevTrue()
     getScalaSettings.SPACE_BEFORE_INFIX_LIKE_METHOD_PARENTHESES = true
     getScalaSettings.PRESERVE_SPACE_AFTER_METHOD_DECLARATION_NAME = true
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = false
@@ -397,9 +385,8 @@ def ::= (o: Any) {}
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3126InfixTruePreserveFalse() {
+  def testSCL3126InfixTruePreserveFalse()
     getScalaSettings.SPACE_BEFORE_INFIX_LIKE_METHOD_PARENTHESES = true
     getScalaSettings.PRESERVE_SPACE_AFTER_METHOD_DECLARATION_NAME = false
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = false
@@ -449,8 +436,7 @@ def ::= (o: Any) {}
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
-  def testSCL3126AllFalse() {
+  def testSCL3126AllFalse()
     getScalaSettings.SPACE_BEFORE_INFIX_LIKE_METHOD_PARENTHESES = false
     getScalaSettings.PRESERVE_SPACE_AFTER_METHOD_DECLARATION_NAME = false
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = false
@@ -500,9 +486,8 @@ def ::=(o: Any) {}
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2474() {
+  def testSCL2474()
     getCommonSettings.SPACE_BEFORE_METHOD_CALL_PARENTHESES = true
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = true
 
@@ -519,9 +504,8 @@ f (1)(2)
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testThisExtraSpace() {
+  def testThisExtraSpace()
     getCommonSettings.SPACE_BEFORE_METHOD_PARENTHESES = false
     getCommonSettings.SPACE_BEFORE_METHOD_CALL_PARENTHESES = false
 
@@ -570,9 +554,8 @@ class B(i: Int)(s: String) {
 """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSpaceInsideClosureBraces() {
+  def testSpaceInsideClosureBraces()
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = true
     getScalaSettings.SPACE_BEFORE_INFIX_METHOD_CALL_PARENTHESES = true
     getScalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST = true
@@ -614,9 +597,8 @@ bars foreach { case (x, y) => list.add(x + y) }
       """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testNoSpaceInsideClosure() {
+  def testNoSpaceInsideClosure()
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = false
     getScalaSettings.SPACE_BEFORE_INFIX_METHOD_CALL_PARENTHESES = true
     getScalaSettings.KEEP_ONE_LINE_LAMBDAS_IN_ARG_LIST = true
@@ -656,9 +638,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL6702() {
+  def testSCL6702()
     getCurrentCodeStyleSettings.FORMATTER_TAGS_ENABLED = true
     val before = """
       |//@formatter:off
@@ -689,9 +670,8 @@ bars foreach {case (x, y) => list.add(x + y)}
     """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL5488_1() {
+  def testSCL5488_1()
     getScalaSettings.SPACES_IN_ONE_LINE_BLOCKS = false
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = false
     getCommonSettings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE = true
@@ -715,9 +695,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL5488_2() {
+  def testSCL5488_2()
     getScalaSettings.SPACES_IN_ONE_LINE_BLOCKS = true
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = false
     getCommonSettings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE = true
@@ -741,9 +720,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL5488_3() {
+  def testSCL5488_3()
     getScalaSettings.SPACES_IN_ONE_LINE_BLOCKS = false
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = true
     getCommonSettings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE = true
@@ -767,9 +745,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL5488_4() {
+  def testSCL5488_4()
     getScalaSettings.SPACES_IN_ONE_LINE_BLOCKS = true
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = true
     getCommonSettings.KEEP_SIMPLE_BLOCKS_IN_ONE_LINE = true
@@ -793,9 +770,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL9243() {
+  def testSCL9243()
     getScalaSettings.INDENT_BRACED_FUNCTION_ARGS = false
     val before = """
         |class a {
@@ -808,9 +784,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL5427(): Unit = {
+  def testSCL5427(): Unit =
     getScalaSettings.USE_SCALADOC2_FORMATTING = false
 
     val before = """
@@ -828,9 +803,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL9264(): Unit = {
+  def testSCL9264(): Unit =
     val before = """
         |class X {
         |  (for {
@@ -852,9 +826,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL7898(): Unit = {
+  def testSCL7898(): Unit =
     getCommonSettings.KEEP_FIRST_COLUMN_COMMENT = true
 
     val before = """
@@ -865,9 +838,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL9387(): Unit = {
+  def testSCL9387(): Unit =
     val before = """
         |val x = for {
         |//Comment
@@ -898,9 +870,8 @@ bars foreach {case (x, y) => list.add(x + y)}
      */
 
     doTextTest(before, after)
-  }
 
-  def testSCL5028_1(): Unit = {
+  def testSCL5028_1(): Unit =
     getCommonSettings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE
 
     val before = """
@@ -923,9 +894,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL5028_2(): Unit = {
+  def testSCL5028_2(): Unit =
     getCommonSettings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE_SHIFTED2
     getCommonSettings.CATCH_ON_NEW_LINE = true
 
@@ -950,9 +920,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL8825(): Unit = {
+  def testSCL8825(): Unit =
     getScalaSettings.DO_NOT_INDENT_CASE_CLAUSE_BODY = true
 
     val before = """
@@ -963,9 +932,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL2454(): Unit = {
+  def testSCL2454(): Unit =
     getCommonSettings.KEEP_LINE_BREAKS = false
 
     val before = """
@@ -979,9 +947,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2468(): Unit = {
+  def testSCL2468(): Unit =
     getScalaSettings.NEWLINE_AFTER_ANNOTATIONS = true
 
     val before = """
@@ -995,9 +962,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2469(): Unit = {
+  def testSCL2469(): Unit =
     getCommonSettings.VARIABLE_ANNOTATION_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
@@ -1020,9 +986,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2571(): Unit = {
+  def testSCL2571(): Unit =
     getCommonSettings.EXTENDS_LIST_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
@@ -1044,9 +1009,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2571_1(): Unit = {
+  def testSCL2571_1(): Unit =
     getCommonSettings.EXTENDS_KEYWORD_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
 
     val before = """
@@ -1067,9 +1031,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2571_2(): Unit = {
+  def testSCL2571_2(): Unit =
     getCommonSettings.EXTENDS_KEYWORD_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
     getCommonSettings.EXTENDS_LIST_WRAP = CommonCodeStyleSettings.WRAP_ALWAYS
 
@@ -1093,9 +1056,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL2999(): Unit = {
+  def testSCL2999(): Unit =
     getCommonSettings.EXTENDS_LIST_WRAP = CommonCodeStyleSettings.WRAP_ON_EVERY_ITEM
     getScalaSettings.WRAP_BEFORE_WITH_KEYWORD = true
     getCommonSettings.getIndentOptions.CONTINUATION_INDENT_SIZE = 4
@@ -1117,9 +1079,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3140_disabled(): Unit = {
+  def testSCL3140_disabled(): Unit =
     getScalaSettings.ENABLE_SCALADOC_FORMATTING = false
 
     val before = """
@@ -1145,9 +1106,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3140_noAlignment(): Unit = {
+  def testSCL3140_noAlignment(): Unit =
 
     getScalaSettings.SD_ALIGN_RETURN_COMMENTS = false
 
@@ -1174,9 +1134,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3140_addBlankLineTag(): Unit = {
+  def testSCL3140_addBlankLineTag(): Unit =
     getScalaSettings.SD_BLANK_LINE_AFTER_PARAMETERS_COMMENTS = true
 
     val before =
@@ -1211,9 +1170,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3140_removeBlankLines(): Unit = {
+  def testSCL3140_removeBlankLines(): Unit =
     getScalaSettings.SD_BLANK_LINE_BEFORE_TAGS = false
 
     val before =
@@ -1247,9 +1205,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL3140_preserveSpacesInTags(): Unit = {
+  def testSCL3140_preserveSpacesInTags(): Unit =
     getScalaSettings.SD_PRESERVE_SPACES_IN_TAGS = true
 
     val before =
@@ -1269,9 +1226,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testSCL8313_1(): Unit = {
+  def testSCL8313_1(): Unit =
 
     getCommonSettings.METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE = true
     getScalaSettings.USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS = true
@@ -1298,9 +1254,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL8313_2(): Unit = {
+  def testSCL8313_2(): Unit =
     getCommonSettings.METHOD_PARAMETERS_LPAREN_ON_NEXT_LINE = true
     getCommonSettings.METHOD_PARAMETERS_RPAREN_ON_NEXT_LINE = true
     getScalaSettings.USE_ALTERNATE_CONTINUATION_INDENT_FOR_PARAMS = true
@@ -1335,9 +1290,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL9136_1(): Unit = {
+  def testSCL9136_1(): Unit =
     getCommonSettings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE
 
     val before = """
@@ -1379,9 +1333,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSCL9136_2(): Unit = {
+  def testSCL9136_2(): Unit =
     getCommonSettings.BRACE_STYLE = CommonCodeStyleSettings.NEXT_LINE_SHIFTED2
 
     val before = """
@@ -1423,9 +1376,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testParameterlessScalaDocTag(): Unit = {
+  def testParameterlessScalaDocTag(): Unit =
     val before = """
         |/**
         |  * @inheritdoc
@@ -1437,9 +1389,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testDisabledScalaDocTagsNewline(): Unit = {
+  def testDisabledScalaDocTagsNewline(): Unit =
     getScalaSettings.ENABLE_SCALADOC_FORMATTING = false
 
     val before = """
@@ -1451,9 +1402,8 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before)
-  }
 
-  def testScalaDocBlankLineBetweenParameters(): Unit = {
+  def testScalaDocBlankLineBetweenParameters(): Unit =
     getScalaSettings.SD_BLANK_LINE_BETWEEN_PARAMETERS = true
 
     val before = """
@@ -1472,15 +1422,12 @@ bars foreach {case (x, y) => list.add(x + y)}
       """.stripMargin.replace("\r", "")
 
     doTextTest(before, after)
-  }
 
-  def testSpaceInsideClosureBracesDisabled(): Unit = {
+  def testSpaceInsideClosureBracesDisabled(): Unit =
     getScalaSettings.SPACE_INSIDE_CLOSURE_BRACES = false
 
     val before = "def f: Int => String = { x => x.toString }"
     val after = "def f: Int => String = {x => x.toString}"
     doTextTest(before, after)
-  }
 
   def doTextTest(value: String): Unit = doTextTest(value, value)
-}

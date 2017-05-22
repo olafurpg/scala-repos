@@ -8,11 +8,10 @@ import akka.persistence.query.ReadJournalProvider
 import com.typesafe.config.Config
 
 class LeveldbReadJournalProvider(system: ExtendedActorSystem, config: Config)
-    extends ReadJournalProvider {
+    extends ReadJournalProvider
 
   override val scaladslReadJournal: scaladsl.LeveldbReadJournal =
     new scaladsl.LeveldbReadJournal(system, config)
 
   override val javadslReadJournal: javadsl.LeveldbReadJournal =
     new javadsl.LeveldbReadJournal(scaladslReadJournal)
-}

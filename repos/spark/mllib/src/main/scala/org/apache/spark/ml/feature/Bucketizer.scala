@@ -37,7 +37,7 @@ import org.apache.spark.sql.types.{DoubleType, StructField, StructType}
 @Experimental
 final class Bucketizer(override val uid: String)
     extends Model[Bucketizer] with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("bucketizer"))
 
@@ -71,78 +71,64 @@ final class Bucketizer(override val uid: String)
   /** @group setParam */
   def setOutputCol(value: String): this.type = set(outputCol, value)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     transformSchema(dataset.schema)
-    val bucketizer = udf { feature: Double =>
+    val bucketizer = udf  feature: Double =>
       Bucketizer.binarySearchForBuckets($(splits), feature)
-    }
     val newCol = bucketizer(dataset($(inputCol)))
     val newField = prepOutputField(dataset.schema)
     dataset.withColumn($(outputCol), newCol, newField.metadata)
-  }
 
-  private def prepOutputField(schema: StructType): StructField = {
+  private def prepOutputField(schema: StructType): StructField =
     val buckets =
       $(splits).sliding(2).map(bucket => bucket.mkString(", ")).toArray
     val attr = new NominalAttribute(name = Some($(outputCol)),
                                     isOrdinal = Some(true),
                                     values = Some(buckets))
     attr.toStructField()
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     SchemaUtils.checkColumnType(schema, $(inputCol), DoubleType)
     SchemaUtils.appendColumn(schema, prepOutputField(schema))
-  }
 
-  override def copy(extra: ParamMap): Bucketizer = {
+  override def copy(extra: ParamMap): Bucketizer =
     defaultCopy[Bucketizer](extra).setParent(parent)
-  }
-}
 
-object Bucketizer extends DefaultParamsReadable[Bucketizer] {
+object Bucketizer extends DefaultParamsReadable[Bucketizer]
 
   /** We require splits to be of length >= 3 and to be in strictly increasing order. */
-  private[feature] def checkSplits(splits: Array[Double]): Boolean = {
-    if (splits.length < 3) {
+  private[feature] def checkSplits(splits: Array[Double]): Boolean =
+    if (splits.length < 3)
       false
-    } else {
+    else
       var i = 0
       val n = splits.length - 1
-      while (i < n) {
+      while (i < n)
         if (splits(i) >= splits(i + 1)) return false
         i += 1
-      }
       true
-    }
-  }
 
   /**
     * Binary searching in several buckets to place each data point.
     * @throws SparkException if a feature is < splits.head or > splits.last
     */
   private[feature] def binarySearchForBuckets(
-      splits: Array[Double], feature: Double): Double = {
-    if (feature == splits.last) {
+      splits: Array[Double], feature: Double): Double =
+    if (feature == splits.last)
       splits.length - 2
-    } else {
+    else
       val idx = ju.Arrays.binarySearch(splits, feature)
-      if (idx >= 0) {
+      if (idx >= 0)
         idx
-      } else {
+      else
         val insertPos = -idx - 1
-        if (insertPos == 0 || insertPos == splits.length) {
+        if (insertPos == 0 || insertPos == splits.length)
           throw new SparkException(
               s"Feature value $feature out of Bucketizer bounds" +
               s" [${splits.head}, ${splits.last}].  Check your features, or loosen " +
               s"the lower/upper bound constraints.")
-        } else {
+        else
           insertPos - 1
-        }
-      }
-    }
-  }
 
   @Since("1.6.0")
   override def load(path: String): Bucketizer = super.load(path)
-}

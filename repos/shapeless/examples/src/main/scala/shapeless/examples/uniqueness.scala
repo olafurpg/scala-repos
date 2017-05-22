@@ -27,7 +27,7 @@ package shapeless.examples
   *
   * @author Travis Brown
   */
-object UniquenessExample extends App {
+object UniquenessExample extends App
   import shapeless._
   import ops.hlist.Filter
 
@@ -37,9 +37,8 @@ object UniquenessExample extends App {
     * returns the element of that type. It will not compile if the type does
     * not occur exactly once in the list.
     */
-  implicit class Uniqueable[L <: HList](l: L) {
+  implicit class Uniqueable[L <: HList](l: L)
     def unique[A](implicit ev: Filter.Aux[L, A, A :: HNil]) = ev(l).head
-  }
 
   // A simple type hierarchy for demonstration purposes.
   class Foo
@@ -70,4 +69,3 @@ object UniquenessExample extends App {
     * The following would not compile, for example:
     */
   //stuff.unifySubtypes[Foo].unique[Foo]
-}

@@ -37,20 +37,16 @@ import scalafx.scene.layout.VBox
   * @resource /scalafx/ensemble/css/InsetText.css
   *
   */
-class EnsembleInsetText extends EnsembleExample {
+class EnsembleInsetText extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     //StyleSheets are added
     val insetTextCss = this.getClass
       .getResource("/scalafx/ensemble/css/InsetText.css")
       .toExternalForm
-    new VBox {
+    new VBox
       padding = Insets(20)
-      children = new Label {
+      children = new Label
         text = "Label styled as a bar"
         id = "label1"
         stylesheets = List(insetTextCss)
-      }
-    }
-  }
-}

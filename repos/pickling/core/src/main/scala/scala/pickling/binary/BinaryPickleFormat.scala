@@ -5,19 +5,17 @@ import scala.pickling.internal._
 import scala.language.implicitConversions
 import scala.reflect.runtime.universe.Mirror
 
-trait BinaryFormats {
+trait BinaryFormats
   implicit val pickleFormat = new BinaryPickleFormat
   implicit def toBinaryPickle(value: Array[Byte]): BinaryPickle =
     BinaryPickle(value)
   implicit def binaryPickleToUnpickleOps(value: Array[Byte]): UnpickleOps =
     new UnpickleOps(BinaryPickle(value))
-}
 
-trait BinaryPBuilder extends PBuilder {
+trait BinaryPBuilder extends PBuilder
   def result(): BinaryPickle
-}
 
-class BinaryPickleFormat extends PickleFormat with Constants {
+class BinaryPickleFormat extends PickleFormat with Constants
   type PickleType = BinaryPickle
   type OutputType = BinaryOutput
   def createBuilder(): BinaryPBuilder = new BinaryPickleBuilder(this, null)
@@ -28,9 +26,8 @@ class BinaryPickleFormat extends PickleFormat with Constants {
   def createBuilder(out: java.io.OutputStream): BinaryPBuilder =
     createBuilder(new StreamOutput(out))
   def createReader(pickle: PickleType) = pickle.createReader(this)
-}
 
-trait Constants {
+trait Constants
   val NULL_TAG: Byte = -2
   val REF_TAG: Byte = -3
   val UNIT_TAG: Byte = -4
@@ -90,4 +87,3 @@ trait Constants {
                                KEY_ARRAY_BOOLEAN,
                                KEY_ARRAY_FLOAT,
                                KEY_ARRAY_DOUBLE)
-}

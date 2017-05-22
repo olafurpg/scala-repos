@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Associative` */
 final class AssociativeOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
     implicit val F: Associative[F])
-    extends Ops[F[A, B]] {
+    extends Ops[F[A, B]]
   ////
   import Leibniz.===
 
@@ -17,15 +17,13 @@ final class AssociativeOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
     F.reassociateRight(ev.subst[F[?, B]](self))
 
   ////
-}
 
-sealed trait ToAssociativeOps0 {
+sealed trait ToAssociativeOps0
   implicit def ToAssociativeOpsUnapply[FA](v: FA)(
       implicit F0: Unapply2[Associative, FA]) =
     new AssociativeOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
-}
 
-trait ToAssociativeOps extends ToAssociativeOps0 {
+trait ToAssociativeOps extends ToAssociativeOps0
 
   implicit def ToAssociativeOps[F[_, _], A, B](v: F[A, B])(
       implicit F0: Associative[F]) =
@@ -38,9 +36,8 @@ trait ToAssociativeOps extends ToAssociativeOps0 {
   ////
 
   ////
-}
 
-trait AssociativeSyntax[F[_, _]] {
+trait AssociativeSyntax[F[_, _]]
   implicit def ToAssociativeOps[A, B](v: F[A, B]): AssociativeOps[F, A, B] =
     new AssociativeOps[F, A, B](v)(AssociativeSyntax.this.F)
 
@@ -48,4 +45,3 @@ trait AssociativeSyntax[F[_, _]] {
   ////
 
   ////
-}

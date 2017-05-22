@@ -3,12 +3,12 @@ package gitbucket.core.service
 import gitbucket.core.model.WebHook
 import org.scalatest.FunSuite
 
-class WebHookServiceSpec extends FunSuite with ServiceSpecBase {
+class WebHookServiceSpec extends FunSuite with ServiceSpecBase
   lazy val service = new WebHookPullRequestService with AccountService
   with RepositoryService with PullRequestService with IssuesService
 
-  test("WebHookPullRequestService.getPullRequestsByRequestForWebhook") {
-    withTestDB { implicit session =>
+  test("WebHookPullRequestService.getPullRequestsByRequestForWebhook")
+    withTestDB  implicit session =>
       val user1 = generateNewUserWithDBRepository("user1", "repo1")
       val user2 = generateNewUserWithDBRepository("user2", "repo2")
       val user3 = generateNewUserWithDBRepository("user3", "repo3")
@@ -80,11 +80,9 @@ class WebHookServiceSpec extends FunSuite with ServiceSpecBase {
                                                                  "webhook3-2"))
       assert(r2((issue32, issueUser, pullreq32, user3, user2)) == Set(
               "webhook3-1", "webhook3-2"))
-    }
-  }
 
-  test("add and get and update and delete") {
-    withTestDB { implicit session =>
+  test("add and get and update and delete")
+    withTestDB  implicit session =>
       val user1 = generateNewUserWithDBRepository("user1", "repo1")
       service.addWebHook("user1",
                          "repo1",
@@ -125,11 +123,9 @@ class WebHookServiceSpec extends FunSuite with ServiceSpecBase {
       service.deleteWebHook("user1", "repo1", "http://example.com")
       assert(
           service.getWebHook("user1", "repo1", "http://example.com") == None)
-    }
-  }
 
-  test("getWebHooks, getWebHooksByEvent") {
-    withTestDB { implicit session =>
+  test("getWebHooks, getWebHooksByEvent")
+    withTestDB  implicit session =>
       val user1 = generateNewUserWithDBRepository("user1", "repo1")
       service.addWebHook("user1",
                          "repo1",
@@ -158,6 +154,3 @@ class WebHookServiceSpec extends FunSuite with ServiceSpecBase {
           service.getWebHooksByEvent("user1", "repo1", WebHook.PullRequest) == List(
               WebHook("user1", "repo1", "http://example.com/1", Some("key")),
               WebHook("user1", "repo1", "http://example.com/3", Some("key"))))
-    }
-  }
-}

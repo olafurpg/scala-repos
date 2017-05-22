@@ -13,7 +13,7 @@ import akka.stream.scaladsl.Flow
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import akka.http.scaladsl.util.FastFuture._
 
-object Route {
+object Route
 
   /**
     * Helper for constructing a Route from a function literal.
@@ -27,14 +27,11 @@ object Route {
       implicit routingSettings: RoutingSettings,
       parserSettings: ParserSettings = null,
       rejectionHandler: RejectionHandler = RejectionHandler.default,
-      exceptionHandler: ExceptionHandler = null): Route = {
+      exceptionHandler: ExceptionHandler = null): Route =
     import directives.ExecutionDirectives._
-    handleExceptions(ExceptionHandler.seal(exceptionHandler)) {
-      handleRejections(rejectionHandler.seal) {
+    handleExceptions(ExceptionHandler.seal(exceptionHandler))
+      handleRejections(rejectionHandler.seal)
         route
-      }
-    }
-  }
 
   /**
     * Turns a `Route` into a server flow.
@@ -63,12 +60,11 @@ object Route {
       executionContext: ExecutionContextExecutor = null,
       rejectionHandler: RejectionHandler = RejectionHandler.default,
       exceptionHandler: ExceptionHandler = null)
-    : HttpRequest ⇒ Future[HttpResponse] = {
+    : HttpRequest ⇒ Future[HttpResponse] =
     val effectiveEC =
       if (executionContext ne null) executionContext
       else materializer.executionContext
 
-    {
       implicit val executionContext = effectiveEC // overrides parameter
       val effectiveParserSettings =
         if (parserSettings ne null) parserSettings
@@ -80,12 +76,8 @@ object Route {
             new RequestContextImpl(request,
                                    routingLog.requestLog(request),
                                    routingSettings,
-                                   effectiveParserSettings)).fast.map {
+                                   effectiveParserSettings)).fast.map
           case RouteResult.Complete(response) ⇒ response
           case RouteResult.Rejected(rejected) ⇒
             throw new IllegalStateException(
                 s"Unhandled rejections '$rejected', unsealed RejectionHandler?!")
-        }
-    }
-  }
-}

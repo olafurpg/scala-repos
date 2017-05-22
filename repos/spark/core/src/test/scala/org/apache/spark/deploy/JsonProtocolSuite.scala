@@ -28,46 +28,41 @@ import org.apache.spark.deploy.DeployMessages.{MasterStateResponse, WorkerStateR
 import org.apache.spark.deploy.master.{ApplicationInfo, RecoveryState}
 import org.apache.spark.deploy.worker.ExecutorRunner
 
-class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
+class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils
 
   import org.apache.spark.deploy.DeployTestUtils._
 
-  test("writeApplicationInfo") {
+  test("writeApplicationInfo")
     val output = JsonProtocol.writeApplicationInfo(createAppInfo())
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.appInfoJsonStr))
-  }
 
-  test("writeWorkerInfo") {
+  test("writeWorkerInfo")
     val output = JsonProtocol.writeWorkerInfo(createWorkerInfo())
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.workerInfoJsonStr))
-  }
 
-  test("writeApplicationDescription") {
+  test("writeApplicationDescription")
     val output = JsonProtocol.writeApplicationDescription(createAppDesc())
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.appDescJsonStr))
-  }
 
-  test("writeExecutorRunner") {
+  test("writeExecutorRunner")
     val output = JsonProtocol.writeExecutorRunner(createExecutorRunner(123))
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.executorRunnerJsonStr))
-  }
 
-  test("writeDriverInfo") {
+  test("writeDriverInfo")
     val output = JsonProtocol.writeDriverInfo(createDriverInfo())
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.driverInfoJsonStr))
-  }
 
-  test("writeMasterState") {
+  test("writeMasterState")
     val workers = Array(createWorkerInfo(), createWorkerInfo())
     val activeApps = Array(createAppInfo())
     val completedApps = Array[ApplicationInfo]()
@@ -86,9 +81,8 @@ class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.masterStateJsonStr))
-  }
 
-  test("writeWorkerState") {
+  test("writeWorkerState")
     val executors = List[ExecutorRunner]()
     val finishedExecutors = List[ExecutorRunner](
         createExecutorRunner(123), createExecutorRunner(123))
@@ -112,18 +106,14 @@ class JsonProtocolSuite extends SparkFunSuite with JsonTestUtils {
     assertValidJson(output)
     assertValidDataInJson(
         output, JsonMethods.parse(JsonConstants.workerStateJsonStr))
-  }
 
-  def assertValidJson(json: JValue) {
-    try {
+  def assertValidJson(json: JValue)
+    try
       JsonMethods.parse(JsonMethods.compact(json))
-    } catch {
+    catch
       case e: JsonParseException => fail("Invalid Json detected", e)
-    }
-  }
-}
 
-object JsonConstants {
+object JsonConstants
   val currTimeInMillis = System.currentTimeMillis()
   val appInfoStartTime = 3
   val submitDate = new Date(123456789)
@@ -185,4 +175,3 @@ object JsonConstants {
       |"executors":[],
       |"finishedexecutors":[%s,%s]}
     """.format(executorRunnerJsonStr, executorRunnerJsonStr).stripMargin
-}

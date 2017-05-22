@@ -1,10 +1,9 @@
-object Tag {
+object Tag
   type Tagged[U] = { type Tag = U }
   type @@[T, U] = T with Tagged[U]
   @inline def apply[A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
-}
 
-object Test {
+object Test
   import Tag._
 
   sealed trait _MyId
@@ -18,4 +17,3 @@ object Test {
 
   /*line: 18*/
   foo(Tag[Long, _MyId](1))
-}

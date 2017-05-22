@@ -17,7 +17,7 @@ package api
   *
   *  @group ReflectionAPI
   */
-trait StandardDefinitions { self: Universe =>
+trait StandardDefinitions  self: Universe =>
 
   /** A value containing all standard definitions in [[DefinitionsApi]]
     *  @group Definitions
@@ -27,7 +27,7 @@ trait StandardDefinitions { self: Universe =>
   /** Defines standard symbols (and types via its base trait).
     *  @group API
     */
-  trait DefinitionsApi extends StandardTypes {
+  trait DefinitionsApi extends StandardTypes
 
     /** The module class symbol of package `scala`. */
     def ScalaPackageClass: ClassSymbol
@@ -218,9 +218,8 @@ trait StandardDefinitions { self: Universe =>
       *  of the definition with given arity and also look
       *  through all known symbols via `seq`.
       */
-    abstract class VarArityClassApi extends (Int => Symbol) {
+    abstract class VarArityClassApi extends (Int => Symbol)
       def seq: Seq[ClassSymbol]
-    }
 
     /** Function-like object that maps arity to symbols for classes `scala.ProductX`.
       *   -  0th element is `Unit`
@@ -275,12 +274,11 @@ trait StandardDefinitions { self: Universe =>
       *   - Char
       */
     def ScalaNumericValueClasses: List[ClassSymbol]
-  }
 
   /** Defines standard types.
     *  @group Definitions
     */
-  trait StandardTypes {
+  trait StandardTypes
 
     /** The type of primitive type `Unit`. */
     val UnitTpe: Type
@@ -326,5 +324,3 @@ trait StandardDefinitions { self: Universe =>
 
     /** The type of core type `Null`. */
     val NullTpe: Type
-  }
-}

@@ -4,15 +4,14 @@ import parallel.immutable.ParVector
 import parallel.mutable.ParArray
 import reflect.ClassTag
 
-object Test {
+object Test
 
   def printResult[A, B](msg: String, obj: A, expected: B)(
-      implicit tag: ClassTag[A], tag2: ClassTag[B]) = {
+      implicit tag: ClassTag[A], tag2: ClassTag[B]) =
     print("  :" + msg + ": ")
-    val isArray = obj match {
+    val isArray = obj match
       case x: Array[Int] => true
       case _ => false
-    }
     val expectedEquals =
       if (isArray)
         obj.asInstanceOf[Array[Int]].toSeq == expected
@@ -25,7 +24,6 @@ object Test {
     if (!expectedEquals) print(", " + obj + " != " + expected)
     if (!tagEquals) print(", " + tag + " != " + tag2)
     println("")
-  }
 
   val testVector = Vector(1, 2, 3)
   val testBuffer = Buffer(1, 2, 3)
@@ -37,7 +35,7 @@ object Test {
   val testParArray = ParArray(1, 2, 3)
 
   def testConversion[A : ClassTag](
-      name: String, col: => GenTraversableOnce[A]): Unit = {
+      name: String, col: => GenTraversableOnce[A]): Unit =
     val tmp = col
     println("-- Testing " + name + " ---")
     printResult("[Direct] Vector   ", col.toVector, testVector)
@@ -53,9 +51,8 @@ object Test {
     printResult("[Copy]   Array    ", col.to[Array], testArray)
     printResult("[Copy]   ParVector", col.to[ParVector], testParVector)
     printResult("[Copy]   ParArray ", col.to[ParArray], testParArray)
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     testConversion("iterator", (1 to 3).iterator)
     testConversion("Vector", Vector(1, 2, 3))
     testConversion("List", List(1, 2, 3))
@@ -65,5 +62,3 @@ object Test {
     testConversion("Set", Set(1, 2, 3))
     testConversion("SetView", Set(1, 2, 3).view)
     testConversion("BufferView", Buffer(1, 2, 3).view)
-  }
-}

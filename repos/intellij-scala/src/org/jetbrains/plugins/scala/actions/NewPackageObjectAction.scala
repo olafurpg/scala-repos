@@ -17,9 +17,9 @@ class NewPackageObjectAction
     extends CreateFromTemplateAction(
         FileTemplateManager
           .getDefaultInstance()
-          .getInternalTemplate("Package Object")) with DumbAware {
+          .getInternalTemplate("Package Object")) with DumbAware
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     super.update(e)
 
     e.getPresentation.setIcon(Icons.PACKAGE_OBJECT)
@@ -37,9 +37,6 @@ class NewPackageObjectAction
 
     e.getPresentation.setEnabled(hasPackage && isEnabled)
     e.getPresentation.setVisible(hasPackage && isEnabled)
-  }
 
-  override def getAttributesDefaults(dataContext: DataContext) = {
+  override def getAttributesDefaults(dataContext: DataContext) =
     new AttributesDefaults("package").withFixedName(true)
-  }
-}

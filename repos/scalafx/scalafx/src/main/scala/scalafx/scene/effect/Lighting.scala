@@ -33,13 +33,12 @@ import scalafx.Includes._
 import scalafx.beans.property.{DoubleProperty, ObjectProperty}
 import scalafx.delegate.SFXDelegate
 
-object Lighting {
+object Lighting
   implicit def sfxLighting2jfx(l: Lighting): jfxse.Lighting =
     if (l != null) l.delegate else null
-}
 
 class Lighting(override val delegate: jfxse.Lighting = new jfxse.Lighting)
-    extends Effect(delegate) with SFXDelegate[jfxse.Lighting] {
+    extends Effect(delegate) with SFXDelegate[jfxse.Lighting]
 
   /**
     * Creates a new instance of Lighting with the specified light.
@@ -50,56 +49,48 @@ class Lighting(override val delegate: jfxse.Lighting = new jfxse.Lighting)
     * The optional bump map input.
     */
   def bumpInput: ObjectProperty[jfxse.Effect] = delegate.bumpInputProperty
-  def bumpInput_=(v: Effect) {
+  def bumpInput_=(v: Effect)
     bumpInput() = v
-  }
 
   /**
     * The content input for this Effect.
     */
   def contentInput: ObjectProperty[jfxse.Effect] =
     delegate.contentInputProperty
-  def contentInput_=(v: Effect) {
+  def contentInput_=(v: Effect)
     contentInput() = v
-  }
 
   /**
     * The diffuse constant.
     */
   def diffuseConstant: DoubleProperty = delegate.diffuseConstantProperty
-  def diffuseConstant_=(v: Double) {
+  def diffuseConstant_=(v: Double)
     diffuseConstant() = v
-  }
 
   /**
     * The light source for this Lighting effect.
     */
   def light: ObjectProperty[jfxse.Light] = delegate.lightProperty
-  def light_=(v: Light) {
+  def light_=(v: Light)
     light() = v
-  }
 
   /**
     * The specular constant.
     */
   def specularConstant: DoubleProperty = delegate.specularConstantProperty
-  def specularConstant_=(v: Double) {
+  def specularConstant_=(v: Double)
     specularConstant() = v
-  }
 
   /**
     * The specular exponent.
     */
   def specularExponent: DoubleProperty = delegate.specularExponentProperty
-  def specularExponent_=(v: Double) {
+  def specularExponent_=(v: Double)
     specularExponent() = v
-  }
 
   /**
     * The surface scale factor.
     */
   def surfaceScale: DoubleProperty = delegate.surfaceScaleProperty
-  def surfaceScale_=(v: Double) {
+  def surfaceScale_=(v: Double)
     surfaceScale() = v
-  }
-}

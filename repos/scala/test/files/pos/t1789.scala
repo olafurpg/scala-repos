@@ -1,3 +1,2 @@
-object S {
+object S
   try {} catch { case _ => } finally { while (true) {} }
-}

@@ -27,7 +27,7 @@ import org.apache.kafka.common.utils.Utils
 /**
   * Constants related to messages
   */
-object Message {
+object Message
 
   /**
     * The current offset and size for all the fixed-length fields
@@ -100,7 +100,6 @@ object Message {
     */
   def headerSizeDiff(fromMagicValue: Byte, toMagicValue: Byte): Int =
     MessageHeaderSizeMap(toMagicValue) - MessageHeaderSizeMap(fromMagicValue)
-}
 
 /**
   * A message. The format of an N byte message is the following:
@@ -133,7 +132,7 @@ object Message {
 class Message(
     val buffer: ByteBuffer,
     private val wrapperMessageTimestamp: Option[Long] = None,
-    private val wrapperMessageTimestampType: Option[TimestampType] = None) {
+    private val wrapperMessageTimestampType: Option[TimestampType] = None)
 
   import kafka.message.Message._
 
@@ -155,7 +154,7 @@ class Message(
            codec: CompressionCodec,
            payloadOffset: Int,
            payloadSize: Int,
-           magicValue: Byte) = {
+           magicValue: Byte) =
     this(
         ByteBuffer.allocate(Message.CrcLength + Message.MagicLength +
             Message.AttributesLength +
@@ -177,12 +176,11 @@ class Message(
     buffer.put(attributes)
     // Only put timestamp when "magic" value is greater than 0
     if (magic > MagicValue_V0) buffer.putLong(timestamp)
-    if (key == null) {
+    if (key == null)
       buffer.putInt(-1)
-    } else {
+    else
       buffer.putInt(key.length)
       buffer.put(key, 0, key.length)
-    }
     val size =
       if (bytes == null) -1
       else if (payloadSize >= 0) payloadSize
@@ -193,7 +191,6 @@ class Message(
 
     // now compute the checksum and fill it in
     Utils.writeUnsignedInt(buffer, CrcOffset, computeChecksum)
-  }
 
   def this(bytes: Array[Byte],
            key: Array[Byte],
@@ -264,11 +261,10 @@ class Message(
   /**
     * Throw an InvalidMessageException if isValid is false for this message
     */
-  def ensureValid() {
+  def ensureValid()
     if (!isValid)
       throw new InvalidMessageException(
           s"Message is corrupt (stored crc = ${checksum}, computed crc = ${computeChecksum})")
-  }
 
   /**
     * The complete serialized size of this message in bytes (including crc, header attributes, etc)
@@ -278,10 +274,9 @@ class Message(
   /**
     * The position where the key size is stored.
     */
-  private def keySizeOffset = {
+  private def keySizeOffset =
     if (magic == MagicValue_V0) KeySizeOffset_V0
     else KeySizeOffset_V1
-  }
 
   /**
     * The length of the key in bytes
@@ -296,10 +291,9 @@ class Message(
   /**
     * The position where the payload size is stored
     */
-  private def payloadSizeOffset = {
+  private def payloadSizeOffset =
     if (magic == MagicValue_V0) KeyOffset_V0 + max(0, keySize)
     else KeyOffset_V1 + max(0, keySize)
-  }
 
   /**
     * The length of the message value in bytes
@@ -328,7 +322,7 @@ class Message(
     * 2. wrapperMessageTimestampType = LogAppendTime and wrapperMessageTimestamp is defined - Compressed message using LogAppendTime
     * 3. wrapperMessageTimestampType = CreateTime and wrapperMessageTimestamp is defined - Compressed message using CreateTime
     */
-  def timestamp: Long = {
+  def timestamp: Long =
     if (magic == MagicValue_V0) Message.NoTimestamp
     // Case 2
     else if (wrapperMessageTimestampType.exists(
@@ -337,17 +331,15 @@ class Message(
     else
       // case 1, 3
       buffer.getLong(Message.TimestampOffset)
-  }
 
   /**
     * The timestamp type of the message
     */
-  def timestampType = {
+  def timestampType =
     if (magic == MagicValue_V0) TimestampType.NO_TIMESTAMP_TYPE
     else
       wrapperMessageTimestampType.getOrElse(
           TimestampType.forAttributes(attributes))
-  }
 
   /**
     * The compression codec used with this message
@@ -369,28 +361,26 @@ class Message(
   /**
     * convert the message to specified format
     */
-  def toFormatVersion(toMagicValue: Byte): Message = {
+  def toFormatVersion(toMagicValue: Byte): Message =
     if (magic == toMagicValue) this
-    else {
+    else
       val byteBuffer =
         ByteBuffer.allocate(size + Message.headerSizeDiff(magic, toMagicValue))
       // Copy bytes from old messages to new message
       convertToBuffer(toMagicValue, byteBuffer, Message.NoTimestamp)
       new Message(byteBuffer)
-    }
-  }
 
   def convertToBuffer(
       toMagicValue: Byte,
       byteBuffer: ByteBuffer,
       now: Long,
       timestampType: TimestampType = wrapperMessageTimestampType.getOrElse(
-            TimestampType.forAttributes(attributes))) {
+            TimestampType.forAttributes(attributes)))
     if (byteBuffer.remaining() < size + headerSizeDiff(magic, toMagicValue))
       throw new IndexOutOfBoundsException(
           "The byte buffer does not have enough capacity to hold new message format " +
           s"version $toMagicValue")
-    if (toMagicValue == Message.MagicValue_V1) {
+    if (toMagicValue == Message.MagicValue_V1)
       // Up-conversion, reserve CRC and update magic byte
       byteBuffer.position(Message.MagicOffset)
       byteBuffer.put(Message.MagicValue_V1)
@@ -402,7 +392,7 @@ class Message(
       byteBuffer.put(buffer.array(),
                      buffer.arrayOffset() + Message.KeySizeOffset_V0,
                      size - Message.KeySizeOffset_V0)
-    } else {
+    else
       // Down-conversion, reserve CRC and update magic byte
       byteBuffer.position(Message.MagicOffset)
       byteBuffer.put(Message.MagicValue_V0)
@@ -411,35 +401,31 @@ class Message(
       byteBuffer.put(buffer.array(),
                      buffer.arrayOffset() + Message.KeySizeOffset_V1,
                      size - Message.KeySizeOffset_V1)
-    }
     // update crc value
     val newMessage = new Message(byteBuffer)
     Utils.writeUnsignedInt(
         byteBuffer, Message.CrcOffset, newMessage.computeChecksum)
     byteBuffer.rewind()
-  }
 
   /**
     * Read a size-delimited byte buffer starting at the given offset
     */
-  private def sliceDelimited(start: Int): ByteBuffer = {
+  private def sliceDelimited(start: Int): ByteBuffer =
     val size = buffer.getInt(start)
-    if (size < 0) {
+    if (size < 0)
       null
-    } else {
+    else
       var b = buffer.duplicate()
       b.position(start + 4)
       b = b.slice()
       b.limit(size)
       b.rewind
       b
-    }
-  }
 
   /**
     * Validate the timestamp and "magic" value
     */
-  private def validateTimestampAndMagicValue(timestamp: Long, magic: Byte) {
+  private def validateTimestampAndMagicValue(timestamp: Long, magic: Byte)
     if (magic != MagicValue_V0 && magic != MagicValue_V1)
       throw new IllegalArgumentException(s"Invalid magic value $magic")
     if (timestamp < 0 && timestamp != NoTimestamp)
@@ -448,21 +434,16 @@ class Message(
     if (magic == MagicValue_V0 && timestamp != NoTimestamp)
       throw new IllegalArgumentException(
           s"Invalid timestamp $timestamp. Timestamp must be ${NoTimestamp} when magic = ${MagicValue_V0}")
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     if (magic == MagicValue_V0)
       s"Message(magic = $magic, attributes = $attributes, crc = $checksum, key = $key, payload = $payload)"
     else
       s"Message(magic = $magic, attributes = $attributes, $timestampType = $timestamp, crc = $checksum, key = $key, payload = $payload)"
-  }
 
-  override def equals(any: Any): Boolean = {
-    any match {
+  override def equals(any: Any): Boolean =
+    any match
       case that: Message => this.buffer.equals(that.buffer)
       case _ => false
-    }
-  }
 
   override def hashCode(): Int = buffer.hashCode
-}

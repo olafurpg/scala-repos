@@ -42,13 +42,12 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class PixelWriterSpec
     extends SimpleSFXDelegateSpec[jfxsi.PixelWriter, PixelWriter](
-        classOf[jfxsi.PixelWriter], classOf[PixelWriter]) {
+        classOf[jfxsi.PixelWriter], classOf[PixelWriter])
 
-  override protected def getScalaClassInstance = new PixelWriter {
+  override protected def getScalaClassInstance = new PixelWriter
     override val delegate = getJavaClassInstance
-  }
 
-  override protected def getJavaClassInstance = new jfxsi.PixelWriter {
+  override protected def getJavaClassInstance = new jfxsi.PixelWriter
     def getPixelFormat = null
     def setArgb(x: Int, y: Int, argb: Int) {}
     def setColor(x: Int, y: Int, c: jfxsp.Color) {}
@@ -82,5 +81,3 @@ class PixelWriterSpec
                   reader: jfxsi.PixelReader,
                   srcx: Int,
                   srcy: Int) {}
-  }
-}

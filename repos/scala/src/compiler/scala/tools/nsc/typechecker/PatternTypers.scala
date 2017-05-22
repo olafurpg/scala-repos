@@ -31,20 +31,18 @@ import Mode._
   *    object Foo { def unapply(x: Any): Option[(Int, Int)] }
   *    object Foo { def unapplySeq(x: Any): Option[(Int, Int, Seq[Int])] }
   */
-trait PatternTypers { self: Analyzer =>
+trait PatternTypers  self: Analyzer =>
 
   import global._
   import definitions._
 
-  private object FixedAndRepeatedTypes {
-    def unapply(types: List[Type]) = types match {
+  private object FixedAndRepeatedTypes
+    def unapply(types: List[Type]) = types match
       case init :+ last if isRepeatedParamType(last) =>
         Some((init, dropRepeated(last)))
       case _ => Some((types, NoType))
-    }
-  }
 
-  trait PatternTyper { self: Typer =>
+  trait PatternTyper  self: Typer =>
 
     import TyperErrorGen._
     import infer._
@@ -67,18 +65,16 @@ trait PatternTypers { self: Analyzer =>
     // If some but not all alternatives survive filtering the tree's symbol with `p`,
     // then update the tree's symbol and type to exclude the filtered out alternatives.
     private def inPlaceAdHocOverloadingResolution(fun: Tree)(
-        p: Symbol => Boolean): Tree = fun.symbol filter p match {
+        p: Symbol => Boolean): Tree = fun.symbol filter p match
       case sym if sym.exists && (sym ne fun.symbol) =>
         fun setSymbol sym modifyType (tp => filterOverloadedAlts(tp)(p))
       case _ => fun
-    }
     private def filterOverloadedAlts(tpe: Type)(p: Symbol => Boolean): Type =
-      tpe match {
+      tpe match
         case OverloadedType(pre, alts) => overloadedType(pre, alts filter p)
         case tp => tp
-      }
 
-    def typedConstructorPattern(fun0: Tree, pt: Type): Tree = {
+    def typedConstructorPattern(fun0: Tree, pt: Type): Tree =
       // Do some ad-hoc overloading resolution and update the tree's symbol and type
       // do not update the symbol if the tree's symbol's type does not define an unapply member
       // (e.g. since it's some method that returns an object with an unapply member)
@@ -111,77 +107,65 @@ trait PatternTypers { self: Analyzer =>
         CaseClassConstructorError(
             fun,
             s"an unapply result must have a member `def isEmpty: Boolean (found: def isEmpty: $isEmptyType)")
-    }
 
     def typedArgsForFormals(
-        args: List[Tree], formals: List[Type], mode: Mode): List[Tree] = {
-      def typedArgWithFormal(arg: Tree, pt: Type) = {
+        args: List[Tree], formals: List[Type], mode: Mode): List[Tree] =
+      def typedArgWithFormal(arg: Tree, pt: Type) =
         val newMode =
           if (isByNameParamType(pt)) mode.onlySticky
           else mode.onlySticky | BYVALmode
         typedArg(arg, mode, newMode, dropByName(pt))
-      }
       val FixedAndRepeatedTypes(fixed, elem) = formals
       val front = (args, fixed).zipped map typedArgWithFormal
       def rest =
         context withinStarPatterns
         (args drop front.length map (typedArgWithFormal(_, elem)))
 
-      elem match {
+      elem match
         case NoType => front
         case _ => front ::: rest
-      }
-    }
 
-    private def boundedArrayType(bound: Type): Type = {
+    private def boundedArrayType(bound: Type): Type =
       val tparam =
         context.owner freshExistential "" setInfo (TypeBounds upper bound)
       newExistentialType(tparam :: Nil, arrayType(tparam.tpe_*))
-    }
 
-    protected def typedStarInPattern(tree: Tree, mode: Mode, pt: Type) = {
+    protected def typedStarInPattern(tree: Tree, mode: Mode, pt: Type) =
       val Typed(expr, tpt) = tree
       val exprTyped = typed(expr, mode)
-      val baseClass = exprTyped.tpe.typeSymbol match {
+      val baseClass = exprTyped.tpe.typeSymbol match
         case ArrayClass => ArrayClass
         case _ => SeqClass
-      }
-      val starType = baseClass match {
+      val starType = baseClass match
         case ArrayClass if isPrimitiveValueType(pt) || !isFullyDefined(pt) =>
           arrayType(pt)
         case ArrayClass => boundedArrayType(pt)
         case _ => seqType(pt)
-      }
       val exprAdapted = adapt(exprTyped, mode, starType)
-      exprAdapted.tpe baseType baseClass match {
+      exprAdapted.tpe baseType baseClass match
         case TypeRef(_, _, elemtp :: Nil) =>
           treeCopy.Typed(tree, exprAdapted, tpt setType elemtp) setType elemtp
         case _ => setError(tree)
-      }
-    }
 
-    protected def typedInPattern(tree: Typed, mode: Mode, pt: Type) = {
+    protected def typedInPattern(tree: Typed, mode: Mode, pt: Type) =
       val Typed(expr, tpt) = tree
       val tptTyped = typedType(tpt, mode)
       val tpe = tptTyped.tpe
       val exprTyped = typed(expr, mode, tpe.deconst)
       val extractor = extractorForUncheckedType(tpt.pos, tpe)
 
-      val canRemedy = tpe match {
+      val canRemedy = tpe match
         case RefinedType(_, decls) if !decls.isEmpty => false
         case RefinedType(parents, _) if parents exists isUncheckable => false
         case _ => extractor.nonEmpty
-      }
 
       val ownType = inferTypedPattern(tptTyped, tpe, pt, canRemedy)
       val treeTyped = treeCopy.Typed(tree, exprTyped, tptTyped) setType ownType
 
-      extractor match {
+      extractor match
         case EmptyTree => treeTyped
         case _ => wrapClassTagUnapply(treeTyped, extractor, tpe)
-      }
-    }
-    private class VariantToSkolemMap extends TypeMap(trackVariance = true) {
+    private class VariantToSkolemMap extends TypeMap(trackVariance = true)
       private val skolemBuffer = mutable.ListBuffer[TypeSymbol]()
 
       // !!! FIXME - skipping this when variance.isInvariant allows unsoundness, see SI-5189
@@ -191,7 +175,7 @@ trait PatternTypers { self: Analyzer =>
           (settings.strictInference || !variance.isInvariant))
 
       def skolems = try skolemBuffer.toList finally skolemBuffer.clear()
-      def apply(tp: Type): Type = mapOver(tp) match {
+      def apply(tp: Type): Type = mapOver(tp) match
         case tp @ TypeRef(NoPrefix, tpSym, Nil) if eligible(tpSym) =>
           val bounds =
             (if (variance.isInvariant) tpSym.tpeHK.bounds
@@ -205,8 +189,6 @@ trait PatternTypers { self: Analyzer =>
               s"Created gadt skolem $skolem: ${skolem.tpe_*} to stand in for $tpSym")(
               skolem.tpe_*)
         case tp1 => tp1
-      }
-    }
 
     /*
      * To deal with the type slack between actual (run-time) types and statically known types, for each abstract type T,
@@ -236,7 +218,7 @@ trait PatternTypers { self: Analyzer =>
      * see test/files/../t5189*.scala
      */
     private def convertToCaseConstructor(
-        tree: Tree, caseClass: Symbol, ptIn: Type): Tree = {
+        tree: Tree, caseClass: Symbol, ptIn: Type): Tree =
       // TODO SI-7886 / SI-5900 This is well intentioned but doesn't quite hit the nail on the head.
       //      For now, I've put it completely behind -Xstrict-inference.
       val untrustworthyPt =
@@ -271,7 +253,7 @@ trait PatternTypers { self: Analyzer =>
 
       // once the containing CaseDef has been type checked (see typedCase),
       // tree1's remaining type-slack skolems will be deskolemized (to the method type parameter skolems)
-      tree1 modifyType {
+      tree1 modifyType
         case MethodType(ctorArgs, restpe) =>
           // ctorArgs are actually in a covariant position, since this is the type of the subpatterns of the pattern represented by this Apply node
           copyMethodType(
@@ -279,43 +261,38 @@ trait PatternTypers { self: Analyzer =>
               ctorArgs map (_ modifyInfo extrapolate),
               extrapolate(restpe)) // no need to clone ctorArgs, this is OUR method type
         case tp => tp
-      }
-    }
 
     def doTypedUnapply(tree: Tree,
                        fun0: Tree,
                        fun: Tree,
                        args: List[Tree],
                        mode: Mode,
-                       pt: Type): Tree = {
+                       pt: Type): Tree =
       def duplErrTree = setError(treeCopy.Apply(tree, fun0, args))
-      def duplErrorTree(err: AbsTypeError) = {
+      def duplErrorTree(err: AbsTypeError) =
         context.issue(err); duplErrTree
-      }
 
       if (args.length > MaxTupleArity)
         return duplErrorTree(TooManyArgsPatternError(fun))
 
-      def freshArgType(tp: Type): Type = tp match {
+      def freshArgType(tp: Type): Type = tp match
         case MethodType(param :: _, _) => param.tpe
         case PolyType(tparams, restpe) =>
           createFromClonedSymbols(tparams, freshArgType(restpe))(genPolyType)
         case OverloadedType(_, _) => OverloadedUnapplyError(fun); ErrorType
         case _ => UnapplyWithSingleArgError(fun); ErrorType
-      }
       val unapplyMethod = unapplyMember(fun.tpe)
       val unapplyType = fun.tpe memberType unapplyMethod
       val unapplyParamType = firstParamType(unapplyType)
       def isSeq = unapplyMethod.name == nme.unapplySeq
 
       def extractor = extractorForUncheckedType(fun.pos, unapplyParamType)
-      def canRemedy = unapplyParamType match {
+      def canRemedy = unapplyParamType match
         case RefinedType(_, decls) if !decls.isEmpty => false
         case RefinedType(parents, _) if parents exists isUncheckable => false
         case _ => extractor.nonEmpty
-      }
 
-      def freshUnapplyArgType(): Type = {
+      def freshUnapplyArgType(): Type =
         val GenPolyType(freeVars, unappFormal) = freshArgType(
             unapplyType.skolemizeExistential(context.owner, tree))
         val unapplyContext = context.makeNewScope(context.tree, context.owner)
@@ -327,7 +304,6 @@ trait PatternTypers { self: Analyzer =>
           freeVars map
           (fv => unapplyContext.owner.newExistentialSkolem(fv, fv))
         pattp.substSym(freeVars, skolems)
-      }
 
       val unapplyArg =
         (context.owner.newValue(nme.SELECTOR_DUMMY, fun.pos, Flags.SYNTHETIC) setInfo
@@ -341,7 +317,7 @@ trait PatternTypers { self: Analyzer =>
       val fun1 = typedPos(fun.pos)(
           Apply(Select(fun.clearType(), unapplyMethod), unapplyArgTree :: Nil))
 
-      def makeTypedUnapply() = {
+      def makeTypedUnapply() =
         // the union of the expected type and the inferred type of the argument to unapply
         val glbType = glb(ensureFullyDefined(pt) :: unapplyArg.tpe_* :: Nil)
         val wrapInTypeTest =
@@ -354,18 +330,16 @@ trait PatternTypers { self: Analyzer =>
 
         if (wrapInTypeTest) wrapClassTagUnapply(result, extractor, glbType)
         else result
-      }
 
       if (fun1.tpe.isErroneous) duplErrTree
-      else if (unapplyMethod.isMacro && !fun1.isInstanceOf[Apply]) {
+      else if (unapplyMethod.isMacro && !fun1.isInstanceOf[Apply])
         if (isBlackbox(unapplyMethod))
           duplErrorTree(BlackboxExtractorExpansion(tree))
         else duplErrorTree(WrongShapeExtractorExpansion(tree))
-      } else makeTypedUnapply()
-    }
+      else makeTypedUnapply()
 
     def wrapClassTagUnapply(
-        uncheckedPattern: Tree, classTagExtractor: Tree, pt: Type): Tree = {
+        uncheckedPattern: Tree, classTagExtractor: Tree, pt: Type): Tree =
       // TODO: disable when in unchecked match
       // we don't create a new Context for a Match, so find the CaseDef,
       // then go out one level and navigate back to the match that has this case
@@ -387,34 +361,26 @@ trait PatternTypers { self: Analyzer =>
         |}""".trim)
 
       res
-    }
 
     // if there's a ClassTag that allows us to turn the unchecked type test for `pt` into a checked type test
     // return the corresponding extractor (an instance of ClassTag[`pt`])
-    def extractorForUncheckedType(pos: Position, pt: Type): Tree = {
+    def extractorForUncheckedType(pos: Position, pt: Type): Tree =
       if (isPastTyper || (pt eq NoType)) EmptyTree
-      else {
-        pt match {
+      else
+        pt match
           case RefinedType(parents, decls)
               if !decls.isEmpty || (parents exists isUncheckable) =>
             return EmptyTree
           case _ =>
-        }
         // only look at top-level type, can't (reliably) do anything about unchecked type args (in general)
         // but at least make a proper type before passing it elsewhere
-        val pt1 = pt.dealiasWiden match {
+        val pt1 = pt.dealiasWiden match
           case tr @ TypeRef(pre, sym, args) if args.nonEmpty =>
             copyTypeRef(tr, pre, sym, sym.typeParams map (_.tpeHK)) // replace actual type args with dummies
           case pt1 => pt1
-        }
         if (isCheckable(pt1)) EmptyTree
         else
-          resolveClassTag(pos, pt1) match {
+          resolveClassTag(pos, pt1) match
             case tree if unapplyMember(tree.tpe).exists => tree
             case _ =>
               devWarning(s"Cannot create runtime type test for $pt1"); EmptyTree
-          }
-      }
-    }
-  }
-}

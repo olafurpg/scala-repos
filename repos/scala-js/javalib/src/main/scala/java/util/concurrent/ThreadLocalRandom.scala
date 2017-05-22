@@ -11,39 +11,35 @@ package java.util.concurrent
 import java.util.Random
 import scala.annotation.tailrec
 
-class ThreadLocalRandom extends Random {
+class ThreadLocalRandom extends Random
 
   private var initialized: Boolean = _
   initialized = true
 
-  override def setSeed(seed: Long): Unit = {
+  override def setSeed(seed: Long): Unit =
     if (initialized) throw new UnsupportedOperationException()
 
     super.setSeed(seed)
-  }
 
-  def nextInt(least: Int, bound: Int): Int = {
+  def nextInt(least: Int, bound: Int): Int =
     if (least >= bound) throw new IllegalArgumentException()
 
     val difference = bound - least
-    if (difference > 0) {
+    if (difference > 0)
       nextInt(difference) + least
-    } else {
+    else
       /* The interval size here is greater than Int.MaxValue,
        * so the loop will exit with a probability of at least 1/2.
        */
       @tailrec
-      def loop(): Int = {
+      def loop(): Int =
         val n = nextInt()
         if (n >= least && n < bound) n
         else loop()
-      }
 
       loop()
-    }
-  }
 
-  def nextLong(_n: Long): Long = {
+  def nextLong(_n: Long): Long =
     if (_n <= 0) throw new IllegalArgumentException("n must be positive")
 
     /*
@@ -57,7 +53,7 @@ class ThreadLocalRandom extends Random {
     var offset = 0L
     var n = _n
 
-    while (n >= Integer.MAX_VALUE) {
+    while (n >= Integer.MAX_VALUE)
       val bits = next(2)
       val halfn = n >>> 1
       val nextn =
@@ -65,38 +61,32 @@ class ThreadLocalRandom extends Random {
         else n - halfn
       if ((bits & 1) == 0) offset += n - nextn
       n = nextn
-    }
     offset + nextInt(n.toInt)
-  }
 
-  def nextLong(least: Long, bound: Long): Long = {
+  def nextLong(least: Long, bound: Long): Long =
     if (least >= bound) throw new IllegalArgumentException()
 
     val difference = bound - least
-    if (difference >= 0) {
+    if (difference >= 0)
       nextLong(difference) + least
-    } else {
+    else
       /* The interval size here is greater than Long.MaxValue,
        * so the loop will exit with a probability of at least 1/2.
        */
       @tailrec
-      def loop(): Long = {
+      def loop(): Long =
         val n = nextLong()
         if (n >= least && n < bound) n
         else loop()
-      }
 
       loop()
-    }
-  }
 
-  def nextDouble(n: Double): Double = {
+  def nextDouble(n: Double): Double =
     if (n <= 0) throw new IllegalArgumentException("n must be positive")
 
     nextDouble() * n
-  }
 
-  def nextDouble(least: Double, bound: Double): Double = {
+  def nextDouble(least: Double, bound: Double): Double =
     if (least >= bound) throw new IllegalArgumentException()
 
     /* Based on documentation for Random.doubles to avoid issue #2144 and other
@@ -106,12 +96,9 @@ class ThreadLocalRandom extends Random {
     val next = nextDouble() * (bound - least) + least
     if (next < bound) next
     else Math.nextAfter(bound, Double.NegativeInfinity)
-  }
-}
 
-object ThreadLocalRandom {
+object ThreadLocalRandom
 
   private val _current = new ThreadLocalRandom()
 
   def current(): ThreadLocalRandom = _current
-}

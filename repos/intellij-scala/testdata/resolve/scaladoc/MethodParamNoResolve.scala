@@ -1,4 +1,4 @@
-class a {
+class a
 
   var aa: Int = 5
   var bb: String = "qwerty"
@@ -16,4 +16,3 @@ class a {
     * @param <testref>a
     */
   def f(a: Int, b: String, c: String, d: Int) {}
-}

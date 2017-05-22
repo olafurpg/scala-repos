@@ -16,35 +16,32 @@ import java.security.Security
   * code works inconsistently.  The solution is to set the system properties on the command line explicitly (or in the
   * case of "ocsp.enable", in the security property file).
   */
-class SystemConfiguration {
+class SystemConfiguration
 
   val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
-  def configure(config: WSClientConfig) {
+  def configure(config: WSClientConfig)
 
     config.ssl.loose.allowUnsafeRenegotiation.map(configureUnsafeRenegotiation)
     config.ssl.loose.allowLegacyHelloMessages
       .map(configureAllowLegacyHelloMessages)
     config.ssl.checkRevocation.map(configureCheckRevocation)
-  }
 
-  def configureUnsafeRenegotiation(allowUnsafeRenegotiation: Boolean) {
+  def configureUnsafeRenegotiation(allowUnsafeRenegotiation: Boolean)
     System.setProperty("sun.security.ssl.allowUnsafeRenegotiation",
                        allowUnsafeRenegotiation.toString)
     logger.debug(
         "configureUnsafeRenegotiation: sun.security.ssl.allowUnsafeRenegotiation = {}",
         allowUnsafeRenegotiation.toString)
-  }
 
-  def configureAllowLegacyHelloMessages(allowLegacyHelloMessages: Boolean) {
+  def configureAllowLegacyHelloMessages(allowLegacyHelloMessages: Boolean)
     System.setProperty("sun.security.ssl.allowLegacyHelloMessages",
                        allowLegacyHelloMessages.toString)
     logger.debug(
         "configureAllowLegacyHelloMessages: sun.security.ssl.allowLegacyHelloMessages = {}",
         allowLegacyHelloMessages.toString)
-  }
 
-  def configureCheckRevocation(checkRevocation: Boolean) {
+  def configureCheckRevocation(checkRevocation: Boolean)
     // http://docs.oracle.com/javase/8/docs/technotes/guides/security/certpath/CertPathProgGuide.html#AppC
     // https://blogs.oracle.com/xuelei/entry/enable_ocsp_checking
 
@@ -58,17 +55,14 @@ class SystemConfiguration {
                  checkRevocation.toString)
     System.setProperty(
         "com.sun.net.ssl.checkRevocation", checkRevocation.toString)
-  }
 
   /**
     * For use in testing.
     */
-  def clearProperties() {
+  def clearProperties()
     Security.setProperty("ocsp.enable", "false")
     System.clearProperty("com.sun.security.enableCRLDP")
     System.clearProperty("com.sun.net.ssl.checkRevocation")
 
     System.clearProperty("sun.security.ssl.allowLegacyHelloMessages")
     System.clearProperty("sun.security.ssl.allowUnsafeRenegotiation")
-  }
-}

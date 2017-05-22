@@ -21,7 +21,7 @@ import scala.annotation.switch
 /** @author Martin Odersky
   *  @version 1.0
   */
-abstract class UnPickler {
+abstract class UnPickler
   val symbolTable: SymbolTable
   import symbolTable._
 
@@ -37,10 +37,10 @@ abstract class UnPickler {
                offset: Int,
                classRoot: Symbol,
                moduleRoot: Symbol,
-               filename: String) {
-    try {
+               filename: String)
+    try
       new Scan(bytes, offset, classRoot, moduleRoot, filename).run()
-    } catch {
+    catch
       case ex: IOException =>
         throw ex
       case ex: MissingRequirementError =>
@@ -51,15 +51,13 @@ abstract class UnPickler {
         throw new RuntimeException(
             "error reading Scala signature of " + filename + ": " +
             ex.getMessage())
-    }
-  }
 
   class Scan(_bytes: Array[Byte],
              offset: Int,
              classRoot: Symbol,
              moduleRoot: Symbol,
              filename: String)
-      extends PickleBuffer(_bytes, offset, -1) {
+      extends PickleBuffer(_bytes, offset, -1)
     //println("unpickle " + classRoot + " and " + moduleRoot)//debug
 
     protected def debug = settings.debug.value
@@ -77,41 +75,35 @@ abstract class UnPickler {
     /** A map from symbols to their associated `decls` scopes */
     private val symScopes = mutable.HashMap[Symbol, Scope]()
 
-    private def expect(expected: Int, msg: => String) {
+    private def expect(expected: Int, msg: => String)
       val tag = readByte()
       if (tag != expected) errorBadSignature(s"$msg ($tag)")
-    }
 
     //println("unpickled " + classRoot + ":" + classRoot.rawInfo + ", " + moduleRoot + ":" + moduleRoot.rawInfo);//debug
 
-    @inline private def runAtIndex[T](i: Int)(body: => T): T = {
+    @inline private def runAtIndex[T](i: Int)(body: => T): T =
       val saved = readIndex
       readIndex = index(i)
       try body finally readIndex = saved
-    }
 
     // Laboriously unrolled for performance.
-    def run() {
+    def run()
       var i = 0
-      while (i < index.length) {
+      while (i < index.length)
         if (entries(i) == null && isSymbolEntry(i))
           runAtIndex(i)(entries(i) = readSymbol())
 
         i += 1
-      }
 
       // read children last, fix for #3951
       i = 0
-      while (i < index.length) {
-        if (entries(i) == null) {
+      while (i < index.length)
+        if (entries(i) == null)
           if (isSymbolAnnotationEntry(i)) runAtIndex(i)(readSymbolAnnotation())
           else if (isChildrenEntry(i)) runAtIndex(i)(readChildren())
-        }
         i += 1
-      }
-    }
 
-    private def checkVersion() {
+    private def checkVersion()
       val major = readNat()
       val minor = readNat()
       if (major != MajorVersion || minor > MinorVersion)
@@ -120,52 +112,45 @@ abstract class UnPickler {
             " has wrong version\n expected: " + MajorVersion + "." +
             MinorVersion + "\n found: " + major + "." + minor + " in " +
             filename)
-    }
 
     /** The `decls` scope associated with given symbol */
     protected def symScope(sym: Symbol) =
       symScopes.getOrElseUpdate(sym, newScope)
 
     /** Does entry represent an (internal) symbol */
-    protected def isSymbolEntry(i: Int): Boolean = {
+    protected def isSymbolEntry(i: Int): Boolean =
       val tag = bytes(index(i)).toInt
       (firstSymTag <= tag && tag <= lastSymTag &&
           (tag != CLASSsym || !isRefinementSymbolEntry(i)))
-    }
 
     /** Does entry represent an (internal or external) symbol */
-    protected def isSymbolRef(i: Int): Boolean = {
+    protected def isSymbolRef(i: Int): Boolean =
       val tag = bytes(index(i))
       (firstSymTag <= tag && tag <= lastExtSymTag)
-    }
 
     /** Does entry represent a name? */
-    protected def isNameEntry(i: Int): Boolean = {
+    protected def isNameEntry(i: Int): Boolean =
       val tag = bytes(index(i)).toInt
       tag == TERMname || tag == TYPEname
-    }
 
     /** Does entry represent a symbol annotation? */
-    protected def isSymbolAnnotationEntry(i: Int): Boolean = {
+    protected def isSymbolAnnotationEntry(i: Int): Boolean =
       val tag = bytes(index(i)).toInt
       tag == SYMANNOT
-    }
 
     /** Does the entry represent children of a symbol? */
-    protected def isChildrenEntry(i: Int): Boolean = {
+    protected def isChildrenEntry(i: Int): Boolean =
       val tag = bytes(index(i)).toInt
       tag == CHILDREN
-    }
 
-    private def maybeReadSymbol(): Either[Int, Symbol] = readNat() match {
+    private def maybeReadSymbol(): Either[Int, Symbol] = readNat() match
       case index if isSymbolRef(index) => Right(at(index, readSymbol))
       case index => Left(index)
-    }
 
     /** Does entry represent a refinement symbol?
       *  pre: Entry is a class symbol
       */
-    protected def isRefinementSymbolEntry(i: Int): Boolean = {
+    protected def isRefinementSymbolEntry(i: Int): Boolean =
       val savedIndex = readIndex
       readIndex = index(i)
       val tag = readByte().toInt
@@ -175,76 +160,67 @@ abstract class UnPickler {
       val result = readNameRef() == tpnme.REFINE_CLASS_NAME
       readIndex = savedIndex
       result
-    }
 
     /** If entry at `i` is undefined, define it by performing
       *  operation `op` with `readIndex` at start of i'th
       *  entry. Restore `readIndex` afterwards.
       */
-    protected def at[T <: AnyRef](i: Int, op: () => T): T = {
+    protected def at[T <: AnyRef](i: Int, op: () => T): T =
       var r = entries(i)
-      if (r eq null) {
+      if (r eq null)
         val savedIndex = readIndex
         readIndex = index(i)
         r = op()
         assert(entries(i) eq null, entries(i))
         entries(i) = r
         readIndex = savedIndex
-      }
       r.asInstanceOf[T]
-    }
 
     /** Read a name */
-    protected def readName(): Name = {
+    protected def readName(): Name =
       val tag = readByte()
       val len = readNat()
-      tag match {
+      tag match
         case TERMname => newTermName(bytes, readIndex, len)
         case TYPEname => newTypeName(bytes, readIndex, len)
         case _ => errorBadSignature("bad name tag: " + tag)
-      }
-    }
     private def readEnd() = readNat() + readIndex
 
     /** Read a symbol */
-    protected def readSymbol(): Symbol = {
+    protected def readSymbol(): Symbol =
       val tag = readByte()
       val end = readEnd()
       def atEnd = readIndex == end
 
-      def readExtSymbol(): Symbol = {
+      def readExtSymbol(): Symbol =
         val name = readNameRef()
         val owner = if (atEnd) loadingMirror.RootClass else readSymbolRef()
 
         def adjust(sym: Symbol) = if (tag == EXTref) sym else sym.moduleClass
 
-        def fromName(name: Name) = name.toTermName match {
+        def fromName(name: Name) = name.toTermName match
           case nme.ROOT => loadingMirror.RootClass
           case nme.ROOTPKG => loadingMirror.RootPackage
           case _ =>
-            val decl = owner match {
+            val decl = owner match
               case stub: StubSymbol =>
                 NoSymbol // SI-8502 Don't call .info and fail the stub
               case _ => owner.info.decl(name)
-            }
             adjust(decl)
-        }
-        def nestedObjectSymbol: Symbol = {
+        def nestedObjectSymbol: Symbol =
           // If the owner is overloaded (i.e. a method), it's not possible to select the
           // right member, so return NoSymbol. This can only happen when unpickling a tree.
           // the "case Apply" in readTree() takes care of selecting the correct alternative
           //  after parsing the arguments.
           if (owner.isOverloaded) return NoSymbol
 
-          if (tag == EXTMODCLASSref) {
+          if (tag == EXTMODCLASSref)
             val moduleVar = owner.info.decl(nme.moduleVarName(name.toTermName))
             if (moduleVar.isLazyAccessor)
               return moduleVar.lazyAccessor.lazyAccessor
-          }
           NoSymbol
-        }
 
-        def moduleAdvice(missing: String): String = {
+        def moduleAdvice(missing: String): String =
           val module =
             if (missing.startsWith("scala.xml"))
               Some(("org.scala-lang.modules", "scala-xml"))
@@ -254,28 +230,26 @@ abstract class UnPickler {
               Some(("org.scala-lang.modules", "scala-swing"))
             else None
 
-          (module map {
+          (module map
                 case (group, art) =>
                   s"""\n(NOTE: It looks like the $art module is missing; try adding a dependency on "$group" : "$art".
                |       See http://docs.scala-lang.org/overviews/ for more information.)""".stripMargin
-              } getOrElse "")
-        }
+              getOrElse "")
 
-        def localDummy = {
+        def localDummy =
           if (nme.isLocalDummyName(name)) owner.newLocalDummy(NoPosition)
           else NoSymbol
-        }
 
         // (1) Try name.
-        localDummy orElse fromName(name) orElse {
+        localDummy orElse fromName(name) orElse
           // (2) Try with expanded name.  Can happen if references to private
           // symbols are read from outside: for instance when checking the children
           // of a class.  See #1722.
-          fromName(nme.expandedName(name.toTermName, owner)) orElse {
+          fromName(nme.expandedName(name.toTermName, owner)) orElse
             // (3) Try as a nested object symbol.
-            nestedObjectSymbol orElse {
+            nestedObjectSymbol orElse
               // (4) Call the mirror's "missing" hook.
-              adjust(mirrorThatLoaded(owner).missingHook(owner, name)) orElse {
+              adjust(mirrorThatLoaded(owner).missingHook(owner, name)) orElse
                 // (5) Create a stub symbol to defer hard failure a little longer.
                 val advice = moduleAdvice(s"${owner.fullName}.$name")
                 val missingMessage =
@@ -285,17 +259,11 @@ abstract class UnPickler {
                       |missing or conflicting dependencies. (Re-run with `-Ylog-classpath` to see the problematic classpath.)
                       |A full rebuild may help if '$filename' was compiled against an incompatible version of ${owner.fullName}.$advice""".stripMargin
                 owner.newStubSymbol(name, missingMessage)
-              }
-            }
-          }
-        }
-      }
 
-      tag match {
+      tag match
         case NONEsym => return NoSymbol
         case EXTref | EXTMODCLASSref => return readExtSymbol()
         case _ => ()
-      }
 
       // symbols that were pickled with Pickler.writeSymInfo
       val nameref = readNat()
@@ -303,10 +271,9 @@ abstract class UnPickler {
       val owner = readSymbolRef()
       val flags = pickledToRawFlags(readLongNat())
 
-      val (privateWithin, inforef) = maybeReadSymbol() match {
+      val (privateWithin, inforef) = maybeReadSymbol() match
         case Left(index) => NoSymbol -> index
         case Right(sym) => sym -> readNat()
-      }
 
       def isModuleFlag = (flags & MODULE) != 0L
       def isClassRoot = (name == classRoot.name) && (owner == classRoot.owner)
@@ -314,7 +281,7 @@ abstract class UnPickler {
         (name == moduleRoot.name) && (owner == moduleRoot.owner)
       def pflags = flags & PickledFlags
 
-      def finishSym(sym: Symbol): Symbol = {
+      def finishSym(sym: Symbol): Symbol =
 
         /**
           * member symbols (symbols owned by a class) are added to the class's scope, with a number
@@ -325,37 +292,35 @@ abstract class UnPickler {
           *     Since it is not a member, it should not be entered in the owner's scope.
           * (2) Similarly, we ignore local dummy symbols, as seen in SI-8868
           */
-        def shouldEnterInOwnerScope = {
+        def shouldEnterInOwnerScope =
           sym.owner.isClass && sym != classRoot && sym != moduleRoot &&
           !sym.isModuleClass && !sym.isRefinementClass &&
           !sym.isTypeParameter && !sym.isExistentiallyBound &&
           sym.rawname != tpnme.LOCAL_CHILD && // (1)
           !nme.isLocalDummyName(sym.rawname) // (2)
-        }
 
         markFlagsCompleted(sym)(mask = AllFlags)
         sym.privateWithin = privateWithin
-        sym.info = (if (atEnd) {
+        sym.info = (if (atEnd)
                       assert(!sym.isSuperAccessor, sym)
                       newLazyTypeRef(inforef)
-                    } else {
+                    else
                       assert(sym.isSuperAccessor || sym.isParamAccessor, sym)
                       newLazyTypeRefAndAlias(inforef, readNat())
-                    })
+                    )
         if (shouldEnterInOwnerScope) symScope(sym.owner) enter sym
 
         sym
-      }
 
-      finishSym(tag match {
+      finishSym(tag match
         case TYPEsym | ALIASsym =>
           owner.newNonClassSymbol(name.toTypeName, NoPosition, pflags)
         case CLASSsym =>
           val sym =
-            (if (isClassRoot) {
+            (if (isClassRoot)
                if (isModuleFlag) moduleRoot.moduleClass setFlag pflags
                else classRoot setFlag pflags
-             } else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
+             else owner.newClassSymbol(name.toTypeName, NoPosition, pflags))
           if (!atEnd) sym.typeOfThis = newLazyTypeRef(readNat())
 
           sym
@@ -365,16 +330,15 @@ abstract class UnPickler {
           if (isModuleRoot) moduleRoot setFlag pflags
           else owner.newLinkedModule(clazz, pflags)
         case VALsym =>
-          if (isModuleRoot) {
+          if (isModuleRoot)
             abort(s"VALsym at module root: owner = $owner, name = $name")
-          } else owner.newTermSymbol(name.toTermName, NoPosition, pflags)
+          else owner.newTermSymbol(name.toTermName, NoPosition, pflags)
 
         case _ =>
           errorBadSignature("bad symbol tag: " + tag)
-      })
-    }
+      )
 
-    protected def readType(forceProperType: Boolean = false): Type = {
+    protected def readType(forceProperType: Boolean = false): Type =
       val tag = readByte()
       val end = readEnd()
       @inline def all[T](body: => T): List[T] = until(end, () => body)
@@ -390,30 +354,26 @@ abstract class UnPickler {
         (if (restpe == NoType || (params contains NoSymbol)) NoType
          else MethodType(params, restpe))
       def PolyOrNullaryType(restpe: Type, tparams: List[Symbol]): Type =
-        tparams match {
+        tparams match
           case Nil => NullaryMethodType(restpe)
           case _ => PolyType(tparams, restpe)
-        }
-      def CompoundType(clazz: Symbol, parents: List[Type]): Type = tag match {
+      def CompoundType(clazz: Symbol, parents: List[Type]): Type = tag match
         case REFINEDtpe => RefinedType(parents, symScope(clazz), clazz)
         case CLASSINFOtpe => ClassInfoType(parents, symScope(clazz), clazz)
-      }
 
-      def readThisType(): Type = {
-        val sym = readSymbolRef() match {
+      def readThisType(): Type =
+        val sym = readSymbolRef() match
           case stub: StubSymbol if !stub.isClass =>
             // SI-8502 This allows us to create a stub for a unpickled reference to `missingPackage.Foo`.
             stub.owner.newStubSymbol(
                 stub.name.toTypeName, stub.missingMessage, isPackage = true)
           case sym => sym
-        }
         ThisType(sym)
-      }
 
       // We're stuck with the order types are pickled in, but with judicious use
       // of named parameters we can recapture a declarative flavor in a few cases.
       // But it's still a rat's nest of adhockery.
-      (tag: @switch) match {
+      (tag: @switch) match
         case NOtpe => NoType
         case NOPREFIXtpe => NoPrefix
         case THIStpe => readThisType()
@@ -432,17 +392,15 @@ abstract class UnPickler {
               underlying = readTypeRef(), quantified = readSymbols())
         case ANNOTATEDtpe =>
           AnnotatedType(underlying = readTypeRef(), annotations = readAnnots())
-      }
-    }
 
     def noSuchTypeTag(tag: Int, end: Int): Type =
       errorBadSignature("bad type tag: " + tag)
 
     /** Read a constant */
-    protected def readConstant(): Constant = {
+    protected def readConstant(): Constant =
       val tag = readByte().toInt
       val len = readNat()
-      (tag: @switch) match {
+      (tag: @switch) match
         case LITERALunit => Constant(())
         case LITERALboolean => Constant(readLong(len) != 0L)
         case LITERALbyte => Constant(readLong(len).toByte)
@@ -457,98 +415,86 @@ abstract class UnPickler {
         case LITERALclass => Constant(readTypeRef())
         case LITERALenum => Constant(readSymbolRef())
         case _ => noSuchConstantTag(tag, len)
-      }
-    }
 
     def noSuchConstantTag(tag: Int, len: Int): Constant =
       errorBadSignature("bad constant tag: " + tag)
 
     /** Read children and store them into the corresponding symbol.
       */
-    protected def readChildren() {
+    protected def readChildren()
       val tag = readByte()
       assert(tag == CHILDREN)
       val end = readEnd()
       val target = readSymbolRef()
       while (readIndex != end) target addChild readSymbolRef()
-    }
 
     /** Read an annotation argument, which is pickled either
       *  as a Constant or a Tree.
       */
-    protected def readAnnotArg(i: Int): Tree = bytes(index(i)) match {
+    protected def readAnnotArg(i: Int): Tree = bytes(index(i)) match
       case TREE => at(i, readTree)
       case _ =>
         val const = at(i, readConstant)
         Literal(const) setType const.tpe
-    }
 
     /** Read a ClassfileAnnotArg (argument to a classfile annotation)
       */
-    private def readArrayAnnot() = {
+    private def readArrayAnnot() =
       readByte() // skip the `annotargarray` tag
       val end = readEnd()
       until(end, () => readClassfileAnnotArg(readNat()))
         .toArray(JavaArgumentTag)
-    }
     protected def readClassfileAnnotArg(i: Int): ClassfileAnnotArg =
-      bytes(index(i)) match {
+      bytes(index(i)) match
         case ANNOTINFO => NestedAnnotArg(at(i, readAnnotation))
         case ANNOTARGARRAY => at(i, () => ArrayAnnotArg(readArrayAnnot()))
         case _ => LiteralAnnotArg(at(i, readConstant))
-      }
 
     /** Read an AnnotationInfo. Not to be called directly, use
       *  readAnnotation or readSymbolAnnotation
       */
-    protected def readAnnotationInfo(end: Int): AnnotationInfo = {
+    protected def readAnnotationInfo(end: Int): AnnotationInfo =
       val atp = readTypeRef()
       val args = new ListBuffer[Tree]
       val assocs = new ListBuffer[(Name, ClassfileAnnotArg)]
-      while (readIndex != end) {
+      while (readIndex != end)
         val argref = readNat()
-        if (isNameEntry(argref)) {
+        if (isNameEntry(argref))
           val name = at(argref, readName)
           val arg = readClassfileAnnotArg(readNat())
           assocs += ((name, arg))
-        } else args += readAnnotArg(argref)
-      }
+        else args += readAnnotArg(argref)
       AnnotationInfo(atp, args.toList, assocs.toList)
-    }
 
     /** Read an annotation and as a side effect store it into
       *  the symbol it requests. Called at top-level, for all
       *  (symbol, annotInfo) entries. */
-    protected def readSymbolAnnotation() {
+    protected def readSymbolAnnotation()
       expect(SYMANNOT, "symbol annotation expected")
       val end = readEnd()
       val target = readSymbolRef()
       target.addAnnotation(readAnnotationInfo(end))
-    }
 
     /** Read an annotation and return it. Used when unpickling
       *  an ANNOTATED(WSELF)tpe or a NestedAnnotArg */
-    protected def readAnnotation(): AnnotationInfo = {
+    protected def readAnnotation(): AnnotationInfo =
       val tag = readByte()
       if (tag != ANNOTINFO)
         errorBadSignature("annotation expected (" + tag + ")")
       val end = readEnd()
       readAnnotationInfo(end)
-    }
 
-    private def readNonEmptyTree(tag: Int, end: Int): Tree = {
+    private def readNonEmptyTree(tag: Int, end: Int): Tree =
       @inline def all[T](body: => T): List[T] = until(end, () => body)
       @inline def rep[T](body: => T): List[T] = times(readNat(), () => body)
 
       // !!! What is this doing here?
-      def fixApply(tree: Apply, tpe: Type): Apply = {
+      def fixApply(tree: Apply, tpe: Type): Apply =
         val Apply(fun, args) = tree
-        if (fun.symbol.isOverloaded) {
+        if (fun.symbol.isOverloaded)
           fun setType fun.symbol.info
           inferMethodAlternative(fun, args map (_.tpe), tpe)
-        }
         tree
-      }
       def ref() = readTreeRef()
       def caseRef() = readCaseDefRef()
       def modsRef() = readModifiersRef()
@@ -561,16 +507,15 @@ abstract class UnPickler {
       def idRef() = readIdentRef()
       def termNameRef() = readNameRef().toTermName
       def typeNameRef() = readNameRef().toTypeName
-      def refTreeRef() = ref() match {
+      def refTreeRef() = ref() match
         case t: RefTree => t
         case t => errorBadSignature("RefTree expected, found " + t.shortClass)
-      }
       def selectorsRef() = all(ImportSelector(nameRef(), -1, nameRef(), -1))
 
       /** A few of the most popular trees have been pulled to the top for
         *  switch efficiency purposes.
         */
-      def readTree(tpe: Type): Tree = (tag: @switch) match {
+      def readTree(tpe: Type): Tree = (tag: @switch) match
         case IDENTtree => Ident(nameRef)
         case SELECTtree => Select(ref, nameRef)
         case APPLYtree => fixApply(Apply(ref, all(ref)), tpe) // !!!
@@ -621,7 +566,6 @@ abstract class UnPickler {
         case UNAPPLYtree => UnApply(ref, all(ref))
         case VALDEFtree => ValDef(modsRef, termNameRef, ref, ref)
         case _ => noSuchTreeTag(tag, end)
-      }
 
       val tpe = readTypeRef()
       val sym = if (isTreeSymbolPickled(tag)) readSymbolRef() else null
@@ -629,22 +573,19 @@ abstract class UnPickler {
 
       if (sym ne null) result setSymbol sym
       result setType tpe
-    }
 
     /* Read an abstract syntax tree */
-    protected def readTree(): Tree = {
+    protected def readTree(): Tree =
       expect(TREE, "tree expected")
       val end = readEnd()
-      readByte() match {
+      readByte() match
         case EMPTYtree => EmptyTree
         case tag => readNonEmptyTree(tag, end)
-      }
-    }
 
     def noSuchTreeTag(tag: Int, end: Int) =
       errorBadSignature("unknown tree type (" + tag + ")")
 
-    def readModifiers(): Modifiers = {
+    def readModifiers(): Modifiers =
       val tag = readNat()
       if (tag != MODIFIERS)
         errorBadSignature("expected a modifiers tag (" + tag + ")")
@@ -656,23 +597,20 @@ abstract class UnPickler {
       val flags = pickledToRawFlags(pflags)
       val privateWithin = readNameRef()
       Modifiers(flags, privateWithin, Nil)
-    }
 
     /* Read a reference to a pickled item */
-    protected def readSymbolRef(): Symbol = {
+    protected def readSymbolRef(): Symbol =
       //OPT inlined from: at(readNat(), readSymbol) to save on closure creation
       val i = readNat()
       var r = entries(i)
-      if (r eq null) {
+      if (r eq null)
         val savedIndex = readIndex
         readIndex = index(i)
         r = readSymbol()
         assert(entries(i) eq null, entries(i))
         entries(i) = r
         readIndex = savedIndex
-      }
       r.asInstanceOf[Symbol]
-    }
 
     protected def readNameRef(): Name = at(readNat(), readName)
     protected def readTypeRef(): Type =
@@ -686,41 +624,35 @@ abstract class UnPickler {
     protected def readTypeNameRef(): TypeName = readNameRef().toTypeName
 
     protected def readTemplateRef(): Template =
-      readTreeRef() match {
+      readTreeRef() match
         case templ: Template => templ
         case other =>
           errorBadSignature("expected a template (" + other + ")")
-      }
     protected def readCaseDefRef(): CaseDef =
-      readTreeRef() match {
+      readTreeRef() match
         case tree: CaseDef => tree
         case other =>
           errorBadSignature("expected a case def (" + other + ")")
-      }
     protected def readValDefRef(): ValDef =
-      readTreeRef() match {
+      readTreeRef() match
         case tree: ValDef => tree
         case other =>
           errorBadSignature("expected a ValDef (" + other + ")")
-      }
     protected def readIdentRef(): Ident =
-      readTreeRef() match {
+      readTreeRef() match
         case tree: Ident => tree
         case other =>
           errorBadSignature("expected an Ident (" + other + ")")
-      }
     protected def readTypeDefRef(): TypeDef =
-      readTreeRef() match {
+      readTreeRef() match
         case tree: TypeDef => tree
         case other =>
           errorBadSignature("expected an TypeDef (" + other + ")")
-      }
     protected def readMemberDefRef(): MemberDef =
-      readTreeRef() match {
+      readTreeRef() match
         case tree: MemberDef => tree
         case other =>
           errorBadSignature("expected an MemberDef (" + other + ")")
-      }
 
     protected def errorBadSignature(msg: String) =
       throw new RuntimeException(
@@ -738,17 +670,16 @@ abstract class UnPickler {
       *  Similar in intent to what SymbolLoader does (but here we don't have access to
       *  error reporting, so we rely on the typechecker to report the error).
       */
-    def toTypeError(e: MissingRequirementError) = {
+    def toTypeError(e: MissingRequirementError) =
       new TypeError(e.msg)
-    }
 
     /** A lazy type which when completed returns type at index `i`. */
     private class LazyTypeRef(i: Int)
-        extends LazyType with FlagAgnosticCompleter {
+        extends LazyType with FlagAgnosticCompleter
       private val definedAtRunId = currentRunId
       private val p = phase
       protected def completeInternal(sym: Symbol): Unit =
-        try {
+        try
           val tp =
             at(i, () => readType(sym.isTerm)) // after NMT_TRANSITION, revert `() => readType(sym.isTerm)` to `readType`
 
@@ -760,36 +691,32 @@ abstract class UnPickler {
           // to only read classfiles generated by 2.12.
           val fixLocalChildTp =
             if (sym.rawname == tpnme.LOCAL_CHILD)
-              tp match {
+              tp match
                 case ClassInfoType(superClass :: traits, decls, typeSymbol)
                     if superClass.typeSymbol.isTrait =>
                   ClassInfoType(definitions.ObjectTpe :: superClass :: traits,
                                 decls,
                                 typeSymbol)
                 case _ => tp
-              } else tp
+              else tp
 
-          if (p ne null) {
+          if (p ne null)
             slowButSafeEnteringPhase(p)(sym setInfo fixLocalChildTp)
-          }
           if (currentRunId != definedAtRunId)
             sym.setInfo(adaptToNewRunMap(fixLocalChildTp))
-        } catch {
+        catch
           case e: MissingRequirementError => throw toTypeError(e)
-        }
-      override def complete(sym: Symbol): Unit = {
+      override def complete(sym: Symbol): Unit =
         completeInternal(sym)
         if (!isCompilerUniverse) markAllCompleted(sym)
-      }
       override def load(sym: Symbol) { complete(sym) }
-    }
 
     /** A lazy type which when completed returns type at index `i` and sets alias
       *  of completed symbol to symbol at index `j`.
       */
-    private class LazyTypeRefAndAlias(i: Int, j: Int) extends LazyTypeRef(i) {
+    private class LazyTypeRefAndAlias(i: Int, j: Int) extends LazyTypeRef(i)
       override def completeInternal(sym: Symbol) =
-        try {
+        try
           super.completeInternal(sym)
 
           var alias = at(j, readSymbol)
@@ -798,9 +725,5 @@ abstract class UnPickler {
                     (alt => sym.tpe =:= sym.owner.thisType.memberType(alt))))
 
           sym.asInstanceOf[TermSymbol].setAlias(alias)
-        } catch {
+        catch
           case e: MissingRequirementError => throw toTypeError(e)
-        }
-    }
-  }
-}

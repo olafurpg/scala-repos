@@ -5,13 +5,13 @@ import akka.stream.{ActorMaterializerSettings, ActorMaterializer}
 import scala.collection.immutable
 import scala.concurrent.Await
 
-class RecipeCollectingMetrics extends RecipeSpec {
+class RecipeCollectingMetrics extends RecipeSpec
   implicit val m2 = ActorMaterializer(
       ActorMaterializerSettings(system).withInputBuffer(1, 1))
 
-  "Recipe for periodically collecting metrics" must {
+  "Recipe for periodically collecting metrics" must
 
-    "work" in {
+    "work" in
       //      type Tick = Unit
       //
       //      val loadPub = TestPublisher.manualProbe[Int]()
@@ -80,6 +80,3 @@ class RecipeCollectingMetrics extends RecipeSpec {
 
       // FIXME: This recipe does only work with buffer size of 0, which is only available if graph fusing is implemented
       pending
-    }
-  }
-}

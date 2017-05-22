@@ -10,7 +10,7 @@ final class Env(config: Config,
                 getFollowerIds: String => Fu[Set[String]],
                 lobbySocket: ActorSelection,
                 renderer: ActorSelection,
-                system: ActorSystem) {
+                system: ActorSystem)
 
   private val CollectionEntry = config getString "collection.entry"
   private val CollectionUnsub = config getString "collection.unsub"
@@ -37,20 +37,17 @@ final class Env(config: Config,
     unsubApi.get(channel, userId)
 
   def status(channel: String)(userId: String): Fu[Option[Boolean]] =
-    unsubApi.get(channel, userId) flatMap {
+    unsubApi.get(channel, userId) flatMap
       case true => fuccess(Some(true)) // unsubed
       case false =>
-        entryRepo.channelUserIdRecentExists(channel, userId) map {
+        entryRepo.channelUserIdRecentExists(channel, userId) map
           case true => Some(false) // subed
           case false => None // not applicable
-        }
-    }
 
   private[timeline] lazy val entryColl = db(CollectionEntry)
   private[timeline] lazy val unsubColl = db(CollectionUnsub)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "timeline" boot new Env(
@@ -62,4 +59,3 @@ object Env {
         lobbySocket = lila.hub.Env.current.socket.lobby,
         renderer = lila.hub.Env.current.actor.renderer,
         system = lila.common.PlayApp.system)
-}

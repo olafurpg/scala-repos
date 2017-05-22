@@ -26,16 +26,14 @@ import java.util.regex.Pattern
 import org.bson.types.ObjectId
 import org.joda.time.DateTime
 
-object JsonObjectId {
-  def unapply(json: JValue): Option[ObjectId] = {
-    json match {
+object JsonObjectId
+  def unapply(json: JValue): Option[ObjectId] =
+    json match
       case JObject(JField("$oid", JString(objectIdString)) :: Nil)
           if ObjectId.isValid(objectIdString) =>
         Some(new ObjectId(objectIdString))
       case _ =>
         None
-    }
-  }
 
   def apply(objectId: ObjectId): JValue = ("$oid" -> objectId.toString)
 
@@ -51,60 +49,47 @@ object JsonObjectId {
 
   private val objectIdSerializerClass =
     classOf[net.liftweb.mongodb.ObjectIdSerializer]
-}
 
-object JsonRegex {
-  def unapply(json: JValue): Option[Pattern] = {
-    json match {
+object JsonRegex
+  def unapply(json: JValue): Option[Pattern] =
+    json match
       case JObject(JField("$regex", JString(regex)) :: JField(
           "$flags", JInt(f)) :: Nil) =>
         Some(Pattern.compile(regex, f.intValue))
       case _ =>
         None
-    }
-  }
 
   def apply(p: Pattern): JValue =
     ("$regex" -> p.pattern) ~ ("$flags" -> p.flags)
-}
 
-object JsonUUID {
-  def unapply(json: JValue): Option[UUID] = {
-    json match {
+object JsonUUID
+  def unapply(json: JValue): Option[UUID] =
+    json match
       case JObject(JField("$uuid", JString(s)) :: Nil) =>
         tryo(UUID.fromString(s))
       case _ =>
         None
-    }
-  }
 
   def apply(uuid: UUID): JValue = ("$uuid" -> uuid.toString)
-}
 
-object JsonDate {
-  def unapply(json: JValue)(implicit formats: Formats): Option[Date] = {
-    json match {
+object JsonDate
+  def unapply(json: JValue)(implicit formats: Formats): Option[Date] =
+    json match
       case JObject(JField("$dt", JString(s)) :: Nil) =>
         formats.dateFormat.parse(s)
       case _ =>
         None
-    }
-  }
 
   def apply(dt: Date)(implicit formats: Formats): JValue =
     ("$dt" -> formats.dateFormat.format(dt))
-}
 
-object JsonDateTime {
-  def unapply(json: JValue)(implicit formats: Formats): Option[DateTime] = {
-    json match {
+object JsonDateTime
+  def unapply(json: JValue)(implicit formats: Formats): Option[DateTime] =
+    json match
       case JObject(JField("$dt", JString(s)) :: Nil) =>
         formats.dateFormat.parse(s).map(dt => new DateTime(dt))
       case _ =>
         None
-    }
-  }
 
   def apply(dt: DateTime)(implicit formats: Formats): JValue =
     ("$dt" -> formats.dateFormat.format(dt.toDate))
-}

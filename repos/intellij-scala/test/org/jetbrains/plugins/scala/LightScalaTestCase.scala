@@ -16,28 +16,25 @@ import scala.language.existentials
 /**
   * @author ilyas
   */
-abstract class LightScalaTestCase extends LightCodeInsightFixtureTestCase {
+abstract class LightScalaTestCase extends LightCodeInsightFixtureTestCase
   override def getProjectDescriptor = LightScalaTestCase.SCALA_DESCRIPTOR
 
-  override def setUp() {
+  override def setUp()
     super.setUp()
     val syntheticClasses =
       myFixture.getProject.getComponent(classOf[SyntheticClasses])
-    if (!syntheticClasses.isClassesRegistered) {
+    if (!syntheticClasses.isClassesRegistered)
       syntheticClasses.registerClasses()
-    }
-  }
-}
 
-object LightScalaTestCase {
-  val SCALA_DESCRIPTOR = new LightProjectDescriptor {
-    override def getModuleType: ModuleType[T] forSome {
+object LightScalaTestCase
+  val SCALA_DESCRIPTOR = new LightProjectDescriptor
+    override def getModuleType: ModuleType[T] forSome
       type T <: ModuleBuilder
-    } = StdModuleTypes.JAVA
+    = StdModuleTypes.JAVA
     override def getSdk = IdeaTestUtil.getMockJdk14
     override def configureModule(module: Module,
                                  model: ModifiableRootModel,
-                                 contentEntry: ContentEntry) {
+                                 contentEntry: ContentEntry)
       val modifiableModel =
         model.getModuleLibraryTable.createLibrary("SCALA").getModifiableModel
       val scalaLib = TestUtils.getScalaLibraryPath + "!/"
@@ -49,6 +46,3 @@ object LightScalaTestCase {
           VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
       // do not forget to commit a model!
       modifiableModel.commit()
-    }
-  }
-}

@@ -9,15 +9,13 @@ import org.typelevel.discipline.{Laws, Predicate}
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object VectorSpaceLaws {
+object VectorSpaceLaws
   def apply[V : Eq : Arbitrary, A : Eq : Arbitrary : Predicate] =
-    new VectorSpaceLaws[V, A] {
+    new VectorSpaceLaws[V, A]
       val scalarLaws = RingLaws[A]
       val vectorLaws = GroupLaws[V]
-    }
-}
 
-trait VectorSpaceLaws[V, A] extends Laws {
+trait VectorSpaceLaws[V, A] extends Laws
 
   implicit def scalar(implicit V: Module[V, A]): Rng[A] = V.scalar
 
@@ -32,11 +30,11 @@ trait VectorSpaceLaws[V, A] extends Laws {
       sl = _.rng(V.scalar),
       vl = _.abGroup(V.additive),
       parents = Seq.empty,
-      "associative scalar" → forAll { (r: A, s: A, v: V) =>
+      "associative scalar" → forAll  (r: A, s: A, v: V) =>
         // TODO compiler crash if variable 'w' is replaced by its value
         val w = r *: s *: v
         w === ((r * s) *: v)
-      },
+      ,
       "scalar distributes over vector" → forAll(
           (r: A, v: V, w: V) => (r *: (v + w)) === ((r *: v) + (r *: w))),
       "vector distributes over scalar" → forAll(
@@ -102,11 +100,10 @@ trait VectorSpaceLaws[V, A] extends Laws {
               linearity(_ ⋅ w).all)
     )
 
-  object SpaceProperties {
+  object SpaceProperties
     def fromParent(
         name: String, parent: SpaceProperties, props: (String, Prop)*) =
       new SpaceProperties(name, parent.sl, parent.vl, Seq(parent), props: _*)
-  }
 
   class SpaceProperties(
       val name: String,
@@ -115,9 +112,7 @@ trait VectorSpaceLaws[V, A] extends Laws {
       val parents: Seq[SpaceProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet {
+      extends RuleSet
     val bases = Seq("scalar" → sl(scalarLaws), "vector" → vl(vectorLaws))
-  }
-}
 
 // vim: expandtab:ts=2:sw=2

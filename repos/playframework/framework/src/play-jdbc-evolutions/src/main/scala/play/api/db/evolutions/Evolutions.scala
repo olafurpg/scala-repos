@@ -24,18 +24,17 @@ import play.utils.PlayIO
   * @param sql_up the SQL statements for UP application
   * @param sql_down the SQL statements for DOWN application
   */
-case class Evolution(revision: Int, sql_up: String = "", sql_down: String = "") {
+case class Evolution(revision: Int, sql_up: String = "", sql_down: String = "")
 
   /**
     * Revision hash, automatically computed from the SQL content.
     */
   val hash = sha1(sql_down.trim + sql_up.trim)
-}
 
 /**
   * A Script to run on the database.
   */
-trait Script {
+trait Script
 
   /**
     * Original evolution.
@@ -52,44 +51,39 @@ trait Script {
     *
     * Any ";;" found in the sql are escaped to ";".
     */
-  def statements: Seq[String] = {
+  def statements: Seq[String] =
     // Regex matches on semicolons that neither precede nor follow other semicolons
     sql.split("(?<!;);(?!;)").map(_.trim.replace(";;", ";")).filter(_ != "")
-  }
-}
 
 /**
   * An UP Script to run on the database.
   *
   * @param evolution the original evolution
   */
-case class UpScript(evolution: Evolution) extends Script {
+case class UpScript(evolution: Evolution) extends Script
   def sql: String = evolution.sql_up
-}
 
 /**
   * A DOWN Script to run on the database.
   *
   * @param evolution the original evolution
   */
-case class DownScript(evolution: Evolution) extends Script {
+case class DownScript(evolution: Evolution) extends Script
   def sql: String = evolution.sql_down
-}
 
 /**
   * Defines database url patterns.
   */
-private[evolutions] object DatabaseUrlPatterns {
+private[evolutions] object DatabaseUrlPatterns
   lazy val SqlServerJdbcUrl = "^jdbc:sqlserver:.*".r
   lazy val OracleJdbcUrl = "^jdbc:oracle:.*".r
   lazy val MysqlJdbcUrl = "^(jdbc:)?mysql:.*".r
   lazy val DerbyJdbcUrl = "^jdbc:derby:.*".r
-}
 
 /**
   * Defines Evolutions utilities functions.
   */
-object Evolutions {
+object Evolutions
 
   /**
     * Default evolutions directory location.
@@ -114,14 +108,13 @@ object Evolutions {
   def applyFor(dbName: String,
                path: java.io.File = new java.io.File("."),
                autocommit: Boolean = true,
-               schema: String = ""): Unit = {
+               schema: String = ""): Unit =
     val evolutions = Play.current.injector.instanceOf[EvolutionsApi]
     val scripts = evolutions.scripts(
         dbName,
         new EnvironmentEvolutionsReader(Environment.simple(path = path)),
         schema)
     evolutions.evolve(dbName, scripts, autocommit, schema)
-  }
 
   /**
     * Updates a local (file-based) evolution script.
@@ -130,7 +123,7 @@ object Evolutions {
                             revision: Int = 1,
                             comment: String = "Generated",
                             ups: String,
-                            downs: String)(implicit environment: Environment) {
+                            downs: String)(implicit environment: Environment)
     val evolutions = environment.getFile(fileName(db, revision))
     Files.createDirectory(environment.getFile(directoryName(db)).toPath)
     writeFileIfChanged(evolutions,
@@ -143,17 +136,13 @@ object Evolutions {
          |%s
          |
          |""".stripMargin.format(comment, ups, downs))
-  }
 
-  private def writeFileIfChanged(path: File, content: String): Unit = {
-    if (content != PlayIO.readFileAsString(path)) {
+  private def writeFileIfChanged(path: File, content: String): Unit =
+    if (content != PlayIO.readFileAsString(path))
       writeFile(path, content)
-    }
-  }
 
-  private def writeFile(destination: File, content: String): Unit = {
+  private def writeFile(destination: File, content: String): Unit =
     Files.write(destination.toPath, content.getBytes(utf8))
-  }
 
   private lazy val utf8 = Charset.forName("UTF8")
 
@@ -163,22 +152,21 @@ object Evolutions {
     * @param scripts the evolution scripts
     * @return a formatted script
     */
-  def toHumanReadableScript(scripts: Seq[Script]): String = {
-    val txt = scripts.map {
+  def toHumanReadableScript(scripts: Seq[Script]): String =
+    val txt = scripts.map
       case UpScript(ev) =>
         "# --- Rev:" + ev.revision + ",Ups - " + ev.hash.take(7) + "\n" +
         ev.sql_up + "\n"
       case DownScript(ev) =>
         "# --- Rev:" + ev.revision + ",Downs - " + ev.hash.take(7) + "\n" +
         ev.sql_down + "\n"
-    }.mkString("\n")
+    .mkString("\n")
 
     val hasDownWarning =
       "# !!! WARNING! This script contains DOWNS evolutions that are likely destructive\n\n"
 
     if (scripts.exists(_.isInstanceOf[DownScript])) hasDownWarning + txt
     else txt
-  }
 
   /**
     *
@@ -193,9 +181,8 @@ object Evolutions {
     downs
       .zip(ups)
       .reverse
-      .dropWhile {
+      .dropWhile
         case (down, up) => down.hash == up.hash
-      }
       .reverse
       .unzip
 
@@ -211,11 +198,10 @@ object Evolutions {
       database: Database,
       evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
       autocommit: Boolean = true,
-      schema: String = ""): Unit = {
+      schema: String = ""): Unit =
     val dbEvolutions = new DatabaseEvolutions(database, schema)
     val evolutions = dbEvolutions.scripts(evolutionsReader)
     dbEvolutions.evolve(evolutions, autocommit)
-  }
 
   /**
     * Cleanup evolutions for the given database.
@@ -229,11 +215,10 @@ object Evolutions {
     */
   def cleanupEvolutions(database: Database,
                         autocommit: Boolean = true,
-                        schema: String = ""): Unit = {
+                        schema: String = ""): Unit =
     val dbEvolutions = new DatabaseEvolutions(database, schema)
     val evolutions = dbEvolutions.resetScripts()
     dbEvolutions.evolve(evolutions, autocommit)
-  }
 
   /**
     * Execute the following code block with the evolutions for the database, cleaning up afterwards by running the downs.
@@ -248,25 +233,21 @@ object Evolutions {
       database: Database,
       evolutionsReader: EvolutionsReader = ThisClassLoaderEvolutionsReader,
       autocommit: Boolean = true,
-      schema: String = "")(block: => T): T = {
+      schema: String = "")(block: => T): T =
     applyEvolutions(database, evolutionsReader, autocommit, schema)
-    try {
+    try
       block
-    } finally {
-      try {
+    finally
+      try
         cleanupEvolutions(database, autocommit, schema)
-      } catch {
+      catch
         case e: Exception =>
           Logger.warn("Error resetting evolutions", e)
-      }
-    }
-  }
-}
 
 /**
   * Can be used to run off-line evolutions, i.e. outside a running application.
   */
-object OfflineEvolutions {
+object OfflineEvolutions
 
   private val logger = Logger(this.getClass)
 
@@ -275,16 +256,14 @@ object OfflineEvolutions {
 
   private def getEvolutions(appPath: File,
                             classloader: ClassLoader,
-                            dbApi: DBApi): EvolutionsComponents = {
+                            dbApi: DBApi): EvolutionsComponents =
     val _dbApi = dbApi
-    new EvolutionsComponents {
+    new EvolutionsComponents
       lazy val environment = Environment(appPath, classloader, Mode.Dev)
       lazy val configuration = Configuration.load(environment)
       lazy val applicationLifecycle = new DefaultApplicationLifecycle
       lazy val dbApi: DBApi = _dbApi
       lazy val webCommands = new DefaultWebCommands
-    }
-  }
 
   /**
     * Computes and applies an evolutions script.
@@ -300,16 +279,14 @@ object OfflineEvolutions {
                   dbApi: DBApi,
                   dbName: String,
                   autocommit: Boolean = true,
-                  schema: String = ""): Unit = {
+                  schema: String = ""): Unit =
     val evolutions = getEvolutions(appPath, classloader, dbApi)
     val scripts = evolutions.evolutionsApi.scripts(
         dbName, evolutions.evolutionsReader, schema)
-    if (!isTest) {
+    if (!isTest)
       logger.warn("Applying evolution scripts for database '" + dbName +
           "':\n\n" + Evolutions.toHumanReadableScript(scripts))
-    }
     evolutions.evolutionsApi.evolve(dbName, scripts, autocommit, schema)
-  }
 
   /**
     * Resolve an inconsistent evolution.
@@ -326,12 +303,9 @@ object OfflineEvolutions {
               dbApi: DBApi,
               dbName: String,
               revision: Int,
-              schema: String = ""): Unit = {
+              schema: String = ""): Unit =
     val evolutions = getEvolutions(appPath, classloader, dbApi)
-    if (!isTest) {
+    if (!isTest)
       logger.warn("Resolving evolution [" + revision + "] for database '" +
           dbName + "'")
-    }
     evolutions.evolutionsApi.resolve(dbName, revision, schema)
-  }
-}

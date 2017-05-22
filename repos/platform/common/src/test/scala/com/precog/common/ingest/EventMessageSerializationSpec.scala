@@ -35,18 +35,13 @@ import blueeyes.json.serialization._
 import scalaz._
 
 object EventMessageSerializationSpec
-    extends Specification with ScalaCheck with ArbitraryEventMessage {
+    extends Specification with ScalaCheck with ArbitraryEventMessage
   implicit val arbMsg = Arbitrary(genRandomEventMessage)
 
-  "Event message serialization " should {
-    "maintain event content" in {
-      check { (in: EventMessage) =>
+  "Event message serialization " should
+    "maintain event content" in
+      check  (in: EventMessage) =>
         val buf = EventMessageEncoding.toMessageBytes(in)
-        EventMessageEncoding.read(buf) must beLike {
+        EventMessageEncoding.read(buf) must beLike
           case Success(\/-(out)) => out must_== in
           case Failure(Extractor.Thrown(ex)) => throw ex
-        }
-      }
-    }
-  }
-}

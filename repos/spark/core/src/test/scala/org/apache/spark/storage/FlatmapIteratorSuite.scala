@@ -18,7 +18,7 @@ package org.apache.spark.storage
 
 import org.apache.spark._
 
-class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
+class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext
   /* Tests the ability of Spark to deal with user provided iterators from flatMap
    * calls, that may generate more data then available memory. In any
    * memory based persistance Spark will unroll the iterator into an ArrayBuffer
@@ -30,7 +30,7 @@ class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
    * data, however that stops GC of those objects. By calling 'reset' you flush that
    * info from the serializer, and allow old objects to be GC'd
    */
-  test("Flatmap Iterator to Disk") {
+  test("Flatmap Iterator to Disk")
     val sconf =
       new SparkConf().setMaster("local").setAppName("iterator_to_disk_test")
     sc = new SparkContext(sconf)
@@ -40,9 +40,8 @@ class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
     var persisted = data.persist(StorageLevel.DISK_ONLY)
     assert(persisted.count() === 500)
     assert(persisted.filter(_ == 1).count() === 5)
-  }
 
-  test("Flatmap Iterator to Memory") {
+  test("Flatmap Iterator to Memory")
     val sconf =
       new SparkConf().setMaster("local").setAppName("iterator_to_disk_test")
     sc = new SparkContext(sconf)
@@ -52,9 +51,8 @@ class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
     var persisted = data.persist(StorageLevel.MEMORY_ONLY)
     assert(persisted.count() === 500)
     assert(persisted.filter(_ == 1).count() === 5)
-  }
 
-  test("Serializer Reset") {
+  test("Serializer Reset")
     val sconf = new SparkConf()
       .setMaster("local")
       .setAppName("serializer_reset_test")
@@ -69,5 +67,3 @@ class FlatmapIteratorSuite extends SparkFunSuite with LocalSparkContext {
               .map(y => "%d: string test %d".format(y, x)))
     val persisted = data.persist(StorageLevel.MEMORY_ONLY_SER)
     assert(persisted.filter(_.startsWith("1:")).count() === 2)
-  }
-}

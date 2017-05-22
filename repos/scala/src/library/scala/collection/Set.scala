@@ -23,11 +23,10 @@ import generic._
   */
 trait Set[A]
     extends (A => Boolean) with Iterable[A]
-    with GenSet[A] with GenericSetTemplate[A, Set] with SetLike[A, Set[A]] {
+    with GenSet[A] with GenericSetTemplate[A, Set] with SetLike[A, Set[A]]
   override def companion: GenericCompanion[Set] = Set
 
   override def seq: Set[A] = this
-}
 
 /** $factoryInfo
   *  The current default implementation of a $Coll is one of `EmptySet`, `Set1`, `Set2`, `Set3`, `Set4` in
@@ -35,12 +34,11 @@ trait Set[A]
   *  @define coll set
   *  @define Coll `Set`
   */
-object Set extends SetFactory[Set] {
+object Set extends SetFactory[Set]
   def newBuilder[A] = immutable.Set.newBuilder[A]
   override def empty[A]: Set[A] = immutable.Set.empty[A]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Set[A]] =
     setCanBuildFrom[A]
-}
 
 /** Explicit instantiation of the `Set` trait to reduce class file size in subclasses. */
 abstract class AbstractSet[A] extends AbstractIterable[A] with Set[A]

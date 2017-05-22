@@ -3,14 +3,14 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.macros.blackbox.Context
 import scala.language.experimental.macros
 
-case class Utils[C <: Context](c: C) {
+case class Utils[C <: Context](c: C)
   import c.universe._
   import c.{Tree => _}
-  object removeDoubleReify extends c.universe.Transformer {
+  object removeDoubleReify extends c.universe.Transformer
     def apply(tree: Tree) = transform(tree)
-    override def transform(tree: Tree): Tree = {
-      super.transform {
-        tree match {
+    override def transform(tree: Tree): Tree =
+      super.transform
+        tree match
           case Apply(TypeApply(Select(_this, termname), _), reification :: Nil)
               if termname.toString == "factory" =>
             c.unreifyTree(reification)
@@ -18,14 +18,9 @@ case class Utils[C <: Context](c: C) {
               if termname.toString == "factory" =>
             c.unreifyTree(reification)
           case _ => tree
-        }
-      }
-    }
-  }
-}
-object QueryableMacros {
+object QueryableMacros
   def _helper[C <: Context, S : c.WeakTypeTag](c: C)(
-      name: String, projection: c.Expr[_]) = {
+      name: String, projection: c.Expr[_]) =
     import c.universe._
     import internal._
     val element_type = implicitly[c.WeakTypeTag[S]].tpe
@@ -41,16 +36,12 @@ object QueryableMacros {
                           .asInstanceOf[Tree]
                       )))
     c.universe.reify { Queryable.factory[S](foo.splice) }
-  }
   def map[T : c.WeakTypeTag, S : c.WeakTypeTag](c: Context)(
       projection: c.Expr[T => S]): c.Expr[Queryable[S]] =
     _helper[c.type, S](c)("_map", projection)
-}
-class Queryable[T] {
+class Queryable[T]
   def _map[S](projection: T => S): Queryable[S] = ???
   def map[S](projection: T => S): Queryable[S] = macro QueryableMacros
     .map[T, S]
-}
-object Queryable {
+object Queryable
   def factory[S](projection: ru.Expr[Queryable[S]]): Queryable[S] = null
-}

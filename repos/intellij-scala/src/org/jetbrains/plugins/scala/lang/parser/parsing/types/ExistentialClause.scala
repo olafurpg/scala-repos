@@ -16,17 +16,16 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
  * ExistentialClause ::= 'forSome' '{' ExistentialDcl {semi ExistentialDcl} '}'
  */
 
-object ExistentialClause {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ExistentialClause
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val existMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kFOR_SOME =>
         builder.advanceLexer() //Ate forSome
       case _ =>
         existMarker.drop()
         return false
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
         builder.advanceLexer() //Ate {
         builder.enableNewlines
@@ -34,13 +33,9 @@ object ExistentialClause {
         builder error ScalaBundle.message("existential.block.expected")
         existMarker.done(ScalaElementTypes.EXISTENTIAL_CLAUSE)
         return true
-    }
-    def foo() {
+    def foo()
       ExistentialDclSeq parse builder
-    }
     ParserUtils.parseLoopUntilRBrace(builder, foo)
     builder.restoreNewlinesState
     existMarker.done(ScalaElementTypes.EXISTENTIAL_CLAUSE)
     true
-  }
-}

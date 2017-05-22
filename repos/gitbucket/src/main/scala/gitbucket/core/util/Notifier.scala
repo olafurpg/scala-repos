@@ -15,7 +15,7 @@ import SystemSettingsService.Smtp
 import ControlUtil.defining
 
 trait Notifier
-    extends RepositoryService with AccountService with IssuesService {
+    extends RepositoryService with AccountService with IssuesService
   def toNotify(
       r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
       msg: String => String)(implicit context: Context): Unit
@@ -32,16 +32,14 @@ trait Notifier
       .withFilter(_ != context.loginAccount.get.userName) // the operation in person is excluded
       .foreach(getAccountByUserName(_) filterNot (_.isGroupAccount) filterNot
           (LDAPUtil.isDummyMailAddress(_)) foreach (x => notify(x.mailAddress)))
-}
 
-object Notifier {
+object Notifier
   // TODO We want to be able to switch to mock.
   def apply(): Notifier =
-    new SystemSettingsService {}.loadSystemSettings match {
+    new SystemSettingsService {}.loadSystemSettings match
       case settings if (settings.notification && settings.useSMTP) =>
         new Mailer(settings.smtp.get)
       case _ => new MockMailer
-    }
 
   def msgIssue(url: String) = (content: String) => s"""
     |${content}<br/>
@@ -64,18 +62,17 @@ object Notifier {
   def msgStatus(url: String) = (content: String) => s"""
     |${content} <a href="${url}">#${url split ('/') last}</a>
     """.stripMargin
-}
 
-class Mailer(private val smtp: Smtp) extends Notifier {
+class Mailer(private val smtp: Smtp) extends Notifier
   private val logger = LoggerFactory.getLogger(classOf[Mailer])
 
   def toNotify(
       r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
-      msg: String => String)(implicit context: Context) = {
+      msg: String => String)(implicit context: Context) =
     val database = Database()
 
-    val f = Future {
-      database withSession { implicit session =>
+    val f = Future
+      database withSession  implicit session =>
         defining(
             s"[${r.name}] ${issue.title} (#${issue.issueId})" -> msg(
                 Markdown.toHtml(
@@ -85,48 +82,36 @@ class Mailer(private val smtp: Smtp) extends Notifier {
                     enableRefsLink = true,
                     enableAnchor = false,
                     enableLineBreaks = false
-                ))) {
+                )))
           case (subject, msg) =>
-            recipients(issue) { to =>
+            recipients(issue)  to =>
               val email = new HtmlEmail
               email.setHostName(smtp.host)
               email.setSmtpPort(smtp.port.get)
-              smtp.user.foreach { user =>
+              smtp.user.foreach  user =>
                 email.setAuthenticator(new DefaultAuthenticator(
                         user, smtp.password.getOrElse("")))
-              }
-              smtp.ssl.foreach { ssl =>
+              smtp.ssl.foreach  ssl =>
                 email.setSSLOnConnect(ssl)
-              }
               smtp.fromAddress
                 .map(_ -> smtp.fromName.getOrElse(
                         context.loginAccount.get.userName))
                 .orElse(Some(
                         "notifications@gitbucket.com" -> context.loginAccount.get.userName))
-                .foreach {
+                .foreach
                   case (address, name) =>
                     email.setFrom(address, name)
-                }
               email.setCharset("UTF-8")
               email.setSubject(subject)
               email.setHtmlMsg(msg)
 
               email.addTo(to).send
-            }
-        }
-      }
       "Notifications Successful."
-    }
-    f onSuccess {
+    f onSuccess
       case s => logger.debug(s)
-    }
-    f onFailure {
+    f onFailure
       case t => logger.error("Notifications Failed.", t)
-    }
-  }
-}
-class MockMailer extends Notifier {
+class MockMailer extends Notifier
   def toNotify(
       r: RepositoryService.RepositoryInfo, issue: Issue, content: String)(
       msg: String => String)(implicit context: Context): Unit = {}
-}

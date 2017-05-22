@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 21.04.2015.
   */
-trait WordSpecFileStructureViewTest extends ScalaTestTestCase {
+trait WordSpecFileStructureViewTest extends ScalaTestTestCase
   private val className = "WordSpecViewTest"
 
-  def addWordSpecViewTest(): Unit = {
+  def addWordSpecViewTest(): Unit =
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -34,9 +34,8 @@ trait WordSpecFileStructureViewTest extends ScalaTestTestCase {
         |  }
         |}
       """.stripMargin)
-  }
 
-  def testWordSpecNormal(): Unit = {
+  def testWordSpecNormal(): Unit =
     addWordSpecViewTest()
     runFileStructureViewTest(className,
                              normalStatusId,
@@ -46,29 +45,23 @@ trait WordSpecFileStructureViewTest extends ScalaTestTestCase {
                              "\"parent2\"",
                              "\"child3\"",
                              "\"child4\"")
-  }
 
-  def testWordSpecHierarchy(): Unit = {
+  def testWordSpecHierarchy(): Unit =
     addWordSpecViewTest()
     runFileStructureViewTest(className, "\"child1\"", Some("\"parent1\""))
     runFileStructureViewTest(className, "\"child2\"", Some("\"parent1\""))
     runFileStructureViewTest(className, "\"child3\"", Some("\"parent2\""))
     runFileStructureViewTest(className, "\"child4\"", Some("\"parent2\""))
-  }
 
-  def testWordSpecIgnored(): Unit = {
+  def testWordSpecIgnored(): Unit =
     addWordSpecViewTest()
     runFileStructureViewTest(className, ignoredStatusId, "\"ignore1\"")
-  }
 
-  def testWordSpecPending(): Unit = {
+  def testWordSpecPending(): Unit =
     addWordSpecViewTest()
     runFileStructureViewTest(className, pendingStatusId, "\"pending1\"")
     runFileStructureViewTest(className, pendingStatusId, "\"pending2\"")
-  }
 
-  def testWordSpecIgnoredAndPending(): Unit = {
+  def testWordSpecIgnoredAndPending(): Unit =
     addWordSpecViewTest()
     runFileStructureViewTest(className, ignoredStatusId, "\"ignore2\"")
-  }
-}

@@ -28,34 +28,30 @@ import java.util.{logging => javalog}
   * `sourceMethod` and `sourceClass` names.
   */
 class LogRecord(level: javalog.Level, msg: String)
-    extends javalog.LogRecord(level, msg) {
+    extends javalog.LogRecord(level, msg)
   private[this] var inferred = false
   private[this] var sourceClassName: String = null
   private[this] var sourceMethodName: String = null
 
   // May be incorrect if called lazily
-  override def getSourceClassName(): String = {
+  override def getSourceClassName(): String =
     if (!inferred) infer()
     sourceClassName
-  }
 
   // May be incorrect if called lazily
-  override def getSourceMethodName(): String = {
+  override def getSourceMethodName(): String =
     if (!inferred) infer()
     sourceMethodName
-  }
 
-  override def setSourceClassName(name: String) {
+  override def setSourceClassName(name: String)
     inferred = true
     sourceClassName = name
-  }
 
-  override def setSourceMethodName(name: String) {
+  override def setSourceMethodName(name: String)
     inferred = true
     sourceMethodName = name
-  }
 
-  private[this] def infer() {
+  private[this] def infer()
     // TODO: there is a small optimization we can do in jdk7 with new JavaLangAccess
     val stack = Thread.currentThread.getStackTrace()
 
@@ -65,15 +61,11 @@ class LogRecord(level: javalog.Level, msg: String)
     // Find the first non-Logger StackTraceElement after the first occurrence of Logger.
     val elt = stack dropWhile notTwitterString find notTwitterString
 
-    val (cName, mName) = elt match {
+    val (cName, mName) = elt match
       case Some(element) => (element.getClassName, element.getMethodName)
       case None => (super.getSourceClassName, super.getSourceMethodName)
-    }
     setSourceMethodName(mName)
     setSourceClassName(cName)
-  }
-}
 
-object LogRecord {
+object LogRecord
   private[logging] val twitterString = "com.twitter.logging.Logger"
-}

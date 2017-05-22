@@ -27,7 +27,7 @@ import scala.xml.NodeSeq
 /**
   * Objects which can parse content should implement this trait. See [[LiftRules.contentParsers]]
   */
-trait ContentParser {
+trait ContentParser
 
   /**
     * The template filename suffixes this parser is for, e.g. "html", "md", "adoc", etc.
@@ -45,9 +45,8 @@ trait ContentParser {
     * Called to auto-surround the content when needed, i.e. when this content is a top-level template
     */
   def surround(content: NodeSeq): NodeSeq
-}
 
-object ContentParser {
+object ContentParser
 
   /**
     * Convenience function to convert a simple `String => Box[NodeSeq]` content parser function into a
@@ -56,23 +55,20 @@ object ContentParser {
     * @return your parser wrapped up to handle an `InputStream`
     */
   def toInputStreamParser(
-      simpleParser: String => Box[NodeSeq]): InputStream => Box[NodeSeq] = {
+      simpleParser: String => Box[NodeSeq]): InputStream => Box[NodeSeq] =
     is: InputStream =>
-      for {
+      for
         bytes <- Helpers.tryo(Helpers.readWholeStream(is))
         elems <- simpleParser(new String(bytes, "UTF-8"))
-      } yield {
+      yield
         elems
-      }
-  }
 
   /**
     * Default surround function used by `ContentParser.basic` and the built-it markdown parser which results in the
     * template being surrounded by `default.html` with the content located at `id=content`.
     */
-  val defaultSurround: NodeSeq => NodeSeq = { elems =>
+  val defaultSurround: NodeSeq => NodeSeq =  elems =>
     <lift:surround with="default" at="content">{elems}</lift:surround>
-  }
 
   /**
     * A basic `ContentParser` which handles one template filename suffix, operates on a string, and surrounds the
@@ -86,13 +82,12 @@ object ContentParser {
       templateSuffix: String,
       parseFunction: String => Box[NodeSeq],
       surroundFunction: NodeSeq => NodeSeq = defaultSurround): ContentParser =
-    new ContentParser {
+    new ContentParser
       override def templateSuffixes: Seq[String] = Seq(templateSuffix)
       override def parse(content: InputStream): Box[NodeSeq] =
         toInputStreamParser(parseFunction)(content)
       override def surround(content: NodeSeq): NodeSeq =
         surroundFunction(content)
-    }
 
   /**
     * A fully-specified `ContentParser` which handles multiple filename suffixes, operates on an `InputStream`, and
@@ -101,9 +96,7 @@ object ContentParser {
   def apply(templateSuffixesSeq: Seq[String],
             parseF: InputStream => Box[NodeSeq],
             surroundF: NodeSeq => NodeSeq): ContentParser =
-    new ContentParser {
+    new ContentParser
       override def templateSuffixes: Seq[String] = templateSuffixesSeq
       override def parse(content: InputStream): Box[NodeSeq] = parseF(content)
       override def surround(content: NodeSeq): NodeSeq = surroundF(content)
-    }
-}

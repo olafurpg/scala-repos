@@ -6,19 +6,17 @@ import ControlUtil._
 import org.apache.commons.io.input.BOMInputStream
 import org.apache.commons.io.IOUtils
 
-object StringUtil {
+object StringUtil
 
   def sha1(value: String): String =
-    defining(java.security.MessageDigest.getInstance("SHA-1")) { md =>
+    defining(java.security.MessageDigest.getInstance("SHA-1"))  md =>
       md.update(value.getBytes)
       md.digest.map(b => "%02x".format(b)).mkString
-    }
 
-  def md5(value: String): String = {
+  def md5(value: String): String =
     val md = java.security.MessageDigest.getInstance("MD5")
     md.update(value.getBytes)
     md.digest.map(b => "%02x".format(b)).mkString
-  }
 
   def urlEncode(value: String): String =
     URLEncoder.encode(value, "UTF-8").replace("+", "%20")
@@ -44,14 +42,12 @@ object StringUtil {
         detectEncoding(content))
 
   def detectEncoding(content: Array[Byte]): String =
-    defining(new UniversalDetector(null)) { detector =>
+    defining(new UniversalDetector(null))  detector =>
       detector.handleData(content, 0, content.length)
       detector.dataEnd()
-      detector.getDetectedCharset match {
+      detector.getDetectedCharset match
         case null => "UTF-8"
         case e => e
-      }
-    }
 
   /**
     * Converts line separator in the given content.
@@ -60,14 +56,12 @@ object StringUtil {
     * @param lineSeparator "LF" or "CRLF"
     * @return the converted content
     */
-  def convertLineSeparator(content: String, lineSeparator: String): String = {
+  def convertLineSeparator(content: String, lineSeparator: String): String =
     val lf = content.replace("\r\n", "\n").replace("\r", "\n")
-    if (lineSeparator == "CRLF") {
+    if (lineSeparator == "CRLF")
       lf.replace("\n", "\r\n")
-    } else {
+    else
       lf
-    }
-  }
 
   /**
     * Appends LF if the given string does not end with LF.
@@ -76,13 +70,11 @@ object StringUtil {
     * @param lineSeparator "LF" or "CRLF"
     * @return the converted content
     */
-  def appendNewLine(content: String, lineSeparator: String): String = {
-    if (lineSeparator == "CRLF") {
+  def appendNewLine(content: String, lineSeparator: String): String =
+    if (lineSeparator == "CRLF")
       if (content.endsWith("\r\n")) content else content + "\r\n"
-    } else {
+    else
       if (content.endsWith("\n")) content else content + "\n"
-    }
-  }
 
   /**
     * Extract issue id like ```#issueId``` from the given message.
@@ -104,4 +96,3 @@ object StringUtil {
       .findAllIn(message)
       .matchData
       .map(_.group(1))
-}

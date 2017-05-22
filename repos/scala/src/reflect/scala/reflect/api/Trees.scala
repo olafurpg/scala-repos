@@ -53,7 +53,7 @@ package api
   *  @contentDiagram hideNodes "*Api"
   *  @group ReflectionAPI
   */
-trait Trees { self: Universe =>
+trait Trees  self: Universe =>
 
   /** The type of Scala abstract syntax trees.
     *  @group Trees
@@ -65,7 +65,7 @@ trait Trees { self: Universe =>
     *  The main source of information about trees is the [[scala.reflect.api.Trees]] page.
     *  @group API
     */
-  trait TreeApi extends Product {
+  trait TreeApi extends Product
     this: Tree =>
 
     /** Does this tree represent a definition? (of a method, of a class, etc) */
@@ -178,7 +178,6 @@ trait Trees { self: Universe =>
 
     /** Obtains string representation of a tree */
     override def toString: String = treeToString(this)
-  }
 
   /** Obtains string representation of a tree
     *  @group Trees
@@ -226,12 +225,11 @@ trait Trees { self: Universe =>
   /** The API that all sym trees support
     *  @group API
     */
-  trait SymTreeApi extends TreeApi {
+  trait SymTreeApi extends TreeApi
     this: SymTree =>
 
     /** @inheritdoc */
     def symbol: Symbol
-  }
 
   /** A tree that carries a name, e.g. by defining it (`DefTree`) or by referring to it (`RefTree`).
     *  @group Trees
@@ -242,14 +240,13 @@ trait Trees { self: Universe =>
   /** The API that all name trees support
     *  @group API
     */
-  trait NameTreeApi extends TreeApi {
+  trait NameTreeApi extends TreeApi
     this: NameTree =>
 
     /** The underlying name.
       *  For example, the `List` part of `Ident(TermName("List"))`.
       */
     def name: Name
-  }
 
   /** A tree which references a symbol-carrying entity.
     *  References one, as opposed to defining one; definitions
@@ -262,7 +259,7 @@ trait Trees { self: Universe =>
   /** The API that all ref trees support
     *  @group API
     */
-  trait RefTreeApi extends SymTreeApi with NameTreeApi {
+  trait RefTreeApi extends SymTreeApi with NameTreeApi
     this: RefTree =>
 
     /** The qualifier of the reference.
@@ -273,7 +270,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def name: Name
-  }
 
   /** The constructor/extractor for `RefTree` instances.
     *  @group Extractors
@@ -284,10 +280,9 @@ trait Trees { self: Universe =>
     *  This AST node corresponds to either Ident, Select or SelectFromTypeTree.
     *  @group Extractors
     */
-  abstract class RefTreeExtractor {
+  abstract class RefTreeExtractor
     def apply(qualifier: Tree, name: Name): RefTree
     def unapply(refTree: RefTree): Option[(Tree, Name)]
-  }
 
   /** A tree representing a symbol-defining entity:
     *    1) A declaration or a definition (type, class, object, package, val, var, or def)
@@ -301,12 +296,11 @@ trait Trees { self: Universe =>
   /** The API that all def trees support
     *  @group API
     */
-  trait DefTreeApi extends SymTreeApi with NameTreeApi {
+  trait DefTreeApi extends SymTreeApi with NameTreeApi
     this: DefTree =>
 
     /** @inheritdoc */
     def name: Name
-  }
 
   /** Common base class for all member definitions: types, classes,
     *  objects, packages, vals and vars, defs.
@@ -318,12 +312,11 @@ trait Trees { self: Universe =>
   /** The API that all member defs support
     *  @group API
     */
-  trait MemberDefApi extends DefTreeApi {
+  trait MemberDefApi extends DefTreeApi
     this: MemberDef =>
 
     /** Modifiers of the declared member. */
     def mods: Modifiers
-  }
 
   /** A packaging, such as `package pid { stats }`
     *  @group Trees
@@ -342,15 +335,14 @@ trait Trees { self: Universe =>
     *    `package` pid { stats }
     *  @group Extractors
     */
-  abstract class PackageDefExtractor {
+  abstract class PackageDefExtractor
     def apply(pid: RefTree, stats: List[Tree]): PackageDef
     def unapply(packageDef: PackageDef): Option[(RefTree, List[Tree])]
-  }
 
   /** The API that all package defs support
     *  @group API
     */
-  trait PackageDefApi extends MemberDefApi {
+  trait PackageDefApi extends MemberDefApi
     this: PackageDef =>
 
     /** The (possibly, fully-qualified) name of the package. */
@@ -358,7 +350,6 @@ trait Trees { self: Universe =>
 
     /** Body of the package definition. */
     def stats: List[Tree]
-  }
 
   /** A common base class for class and object definitions.
     *  @group Trees
@@ -369,12 +360,11 @@ trait Trees { self: Universe =>
   /** The API that all impl defs support
     *  @group API
     */
-  trait ImplDefApi extends MemberDefApi {
+  trait ImplDefApi extends MemberDefApi
     this: ImplDef =>
 
     /** The body of the definition. */
     def impl: Template
-  }
 
   /** A class definition.
     *  @group Trees
@@ -397,7 +387,7 @@ trait Trees { self: Universe =>
     *    `extends` parents { defs }
     *  @group Extractors
     */
-  abstract class ClassDefExtractor {
+  abstract class ClassDefExtractor
     def apply(mods: Modifiers,
               name: TypeName,
               tparams: List[TypeDef],
@@ -409,12 +399,11 @@ trait Trees { self: Universe =>
     @deprecated("Use `internal.classDef` instead", "2.11.0")
     def apply(sym: Symbol, impl: Template)(
         implicit token: CompatToken): ClassDef = internal.classDef(sym, impl)
-  }
 
   /** The API that all class defs support
     *  @group API
     */
-  trait ClassDefApi extends ImplDefApi {
+  trait ClassDefApi extends ImplDefApi
     this: ClassDef =>
 
     /** @inheritdoc */
@@ -428,7 +417,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def impl: Template
-  }
 
   /** An object definition, e.g. `object Foo`.  Internally, objects are
     *  quite frequently called modules to reduce ambiguity.
@@ -453,7 +441,7 @@ trait Trees { self: Universe =>
     *    `extends` parents { defs }
     *  @group Extractors
     */
-  abstract class ModuleDefExtractor {
+  abstract class ModuleDefExtractor
     def apply(mods: Modifiers, name: TermName, impl: Template): ModuleDef
     def unapply(moduleDef: ModuleDef): Option[(Modifiers, TermName, Template)]
 
@@ -461,12 +449,11 @@ trait Trees { self: Universe =>
     @deprecated("Use `internal.moduleDef` instead", "2.11.0")
     def apply(sym: Symbol, impl: Template)(
         implicit token: CompatToken): ModuleDef = internal.moduleDef(sym, impl)
-  }
 
   /** The API that all module defs support
     *  @group API
     */
-  trait ModuleDefApi extends ImplDefApi {
+  trait ModuleDefApi extends ImplDefApi
     this: ModuleDef =>
 
     /** @inheritdoc */
@@ -477,7 +464,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def impl: Template
-  }
 
   /** A common base class for ValDefs and DefDefs.
     *  @group Trees
@@ -488,7 +474,7 @@ trait Trees { self: Universe =>
   /** The API that all val defs and def defs support
     *  @group API
     */
-  trait ValOrDefDefApi extends MemberDefApi {
+  trait ValOrDefDefApi extends MemberDefApi
     this: ValOrDefDef =>
 
     /** @inheritdoc */
@@ -504,7 +490,6 @@ trait Trees { self: Universe =>
       *  The `EmptyTree` is the body is empty (e.g. for abstract members).
       */
     def rhs: Tree
-  }
 
   /** Broadly speaking, a value definition.  All these are encoded as ValDefs:
     *
@@ -538,7 +523,7 @@ trait Trees { self: Universe =>
     *  this is expressed by having `tpt` set to `TypeTree()` (but not to an `EmptyTree`!).
     *  @group Extractors
     */
-  abstract class ValDefExtractor {
+  abstract class ValDefExtractor
     def apply(mods: Modifiers, name: TermName, tpt: Tree, rhs: Tree): ValDef
     def unapply(valDef: ValDef): Option[(Modifiers, TermName, Tree, Tree)]
 
@@ -551,12 +536,11 @@ trait Trees { self: Universe =>
     @deprecated("Use `internal.valDef` instead", "2.11.0")
     def apply(sym: Symbol)(implicit token: CompatToken): ValDef =
       internal.valDef(sym)
-  }
 
   /** The API that all val defs support
     *  @group API
     */
-  trait ValDefApi extends ValOrDefDefApi {
+  trait ValDefApi extends ValOrDefDefApi
     this: ValDef =>
 
     /** @inheritdoc */
@@ -570,7 +554,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def rhs: Tree
-  }
 
   /** A method or macro definition.
     *  @param name   The name of the method or macro. Can be a type name in case this is a type macro
@@ -593,7 +576,7 @@ trait Trees { self: Universe =>
     *  this is expressed by having `tpt` set to `TypeTree()` (but not to an `EmptyTree`!).
     *  @group Extractors
     */
-  abstract class DefDefExtractor {
+  abstract class DefDefExtractor
     def apply(mods: Modifiers,
               name: TermName,
               tparams: List[TypeDef],
@@ -630,12 +613,11 @@ trait Trees { self: Universe =>
     @deprecated("Use `internal.defDef` instead", "2.11.0")
     def apply(sym: Symbol, rhs: List[List[Symbol]] => Tree)(
         implicit token: CompatToken): DefDef = internal.defDef(sym, rhs)
-  }
 
   /** The API that all def defs support
     *  @group API
     */
-  trait DefDefApi extends ValOrDefDefApi {
+  trait DefDefApi extends ValOrDefDefApi
     this: DefDef =>
 
     /** @inheritdoc */
@@ -655,7 +637,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def rhs: Tree
-  }
 
   /** An abstract type, a type parameter, or a type alias.
     *  Eliminated by erasure.
@@ -681,7 +662,7 @@ trait Trees { self: Universe =>
     *  where lo and hi are both `TypeBoundsTrees` and `Modifier.deferred` is set in mods.
     *  @group Extractors
     */
-  abstract class TypeDefExtractor {
+  abstract class TypeDefExtractor
     def apply(mods: Modifiers,
               name: TypeName,
               tparams: List[TypeDef],
@@ -698,12 +679,11 @@ trait Trees { self: Universe =>
     @deprecated("Use `internal.typeDef` instead", "2.11.0")
     def apply(sym: Symbol)(implicit token: CompatToken): TypeDef =
       internal.typeDef(sym)
-  }
 
   /** The API that all type defs support
     *  @group API
     */
-  trait TypeDefApi extends MemberDefApi {
+  trait TypeDefApi extends MemberDefApi
     this: TypeDef =>
 
     /** @inheritdoc */
@@ -719,7 +699,6 @@ trait Trees { self: Universe =>
       *  The `EmptyTree` is the body is empty (e.g. for abstract type members).
       */
     def rhs: Tree
-  }
 
   /** A labelled expression.  Not expressible in language syntax, but
     *  generated by the compiler to simulate while/do-while loops, and
@@ -757,7 +736,7 @@ trait Trees { self: Universe =>
     *  }}}
     *  @group Extractors
     */
-  abstract class LabelDefExtractor {
+  abstract class LabelDefExtractor
     def apply(name: TermName, params: List[Ident], rhs: Tree): LabelDef
     def unapply(labelDef: LabelDef): Option[(TermName, List[Ident], Tree)]
 
@@ -766,12 +745,11 @@ trait Trees { self: Universe =>
     def apply(sym: Symbol, params: List[Symbol], rhs: Tree)(
         implicit token: CompatToken): LabelDef =
       internal.labelDef(sym, params, rhs)
-  }
 
   /** The API that all label defs support
     *  @group API
     */
-  trait LabelDefApi extends DefTreeApi with TermTreeApi {
+  trait LabelDefApi extends DefTreeApi with TermTreeApi
     this: LabelDef =>
 
     /** @inheritdoc */
@@ -786,7 +764,6 @@ trait Trees { self: Universe =>
       *  See the example for [[scala.reflect.api.Trees#LabelDefExtractor]].
       */
     def rhs: Tree
-  }
 
   /** Import selector (not a tree, but a component of the `Import` tree)
     *
@@ -812,16 +789,15 @@ trait Trees { self: Universe =>
     *  This is not an AST node, it is used as a part of the `Import` node.
     *  @group Extractors
     */
-  abstract class ImportSelectorExtractor {
+  abstract class ImportSelectorExtractor
     def apply(
         name: Name, namePos: Int, rename: Name, renamePos: Int): ImportSelector
     def unapply(importSelector: ImportSelector): Option[(Name, Int, Name, Int)]
-  }
 
   /** The API that all import selectors support
     *  @group API
     */
-  trait ImportSelectorApi {
+  trait ImportSelectorApi
     this: ImportSelector =>
 
     /** The imported name. */
@@ -841,7 +817,6 @@ trait Trees { self: Universe =>
       *  Is equal to -1 is the position is unknown.
       */
     def renamePos: Int
-  }
 
   /** Import clause
     *
@@ -875,15 +850,14 @@ trait Trees { self: Universe =>
     *  It's used primarily as a marker to check that the import has been typechecked.
     *  @group Extractors
     */
-  abstract class ImportExtractor {
+  abstract class ImportExtractor
     def apply(expr: Tree, selectors: List[ImportSelector]): Import
     def unapply(import_ : Import): Option[(Tree, List[ImportSelector])]
-  }
 
   /** The API that all imports support
     *  @group API
     */
-  trait ImportApi extends SymTreeApi {
+  trait ImportApi extends SymTreeApi
     this: Import =>
 
     /** The qualifier of the import.
@@ -895,7 +869,6 @@ trait Trees { self: Universe =>
       *  See the example for [[scala.reflect.api.Trees#ImportExtractor]].
       */
     def selectors: List[ImportSelector]
-  }
 
   /** Instantiation template of a class or trait
     *
@@ -930,15 +903,14 @@ trait Trees { self: Universe =>
     *    }
     *  @group Extractors
     */
-  abstract class TemplateExtractor {
+  abstract class TemplateExtractor
     def apply(parents: List[Tree], self: ValDef, body: List[Tree]): Template
     def unapply(template: Template): Option[(List[Tree], ValDef, List[Tree])]
-  }
 
   /** The API that all templates support
     *  @group API
     */
-  trait TemplateApi extends SymTreeApi {
+  trait TemplateApi extends SymTreeApi
     this: Template =>
 
     /** Superclasses of the template. */
@@ -952,7 +924,6 @@ trait Trees { self: Universe =>
     /** Body of the template.
       */
     def body: List[Tree]
-  }
 
   /** Block of expressions (semicolon separated expressions)
     *  @group Trees
@@ -973,15 +944,14 @@ trait Trees { self: Universe =>
     *  If the block is empty, the `expr` is set to `Literal(Constant(()))`.
     *  @group Extractors
     */
-  abstract class BlockExtractor {
+  abstract class BlockExtractor
     def apply(stats: List[Tree], expr: Tree): Block
     def unapply(block: Block): Option[(List[Tree], Tree)]
-  }
 
   /** The API that all blocks support
     *  @group API
     */
-  trait BlockApi extends TermTreeApi {
+  trait BlockApi extends TermTreeApi
     this: Block =>
 
     /** All, but the last, expressions in the block.
@@ -991,7 +961,6 @@ trait Trees { self: Universe =>
 
     /** The last expression in the block. */
     def expr: Tree
-  }
 
   /** Case clause in a pattern match.
     *  (except for occurrences in switch statements).
@@ -1015,15 +984,14 @@ trait Trees { self: Universe =>
     *  If the body is not specified, the `body` is set to `Literal(Constant(()))`
     *  @group Extractors
     */
-  abstract class CaseDefExtractor {
+  abstract class CaseDefExtractor
     def apply(pat: Tree, guard: Tree, body: Tree): CaseDef
     def unapply(caseDef: CaseDef): Option[(Tree, Tree, Tree)]
-  }
 
   /** The API that all case defs support
     *  @group API
     */
-  trait CaseDefApi extends TreeApi {
+  trait CaseDefApi extends TreeApi
     this: CaseDef =>
 
     /** The pattern of the pattern matching clause. */
@@ -1038,7 +1006,6 @@ trait Trees { self: Universe =>
       *  Is equal to `Literal(Constant(()))` if the body is not specified.
       */
     def body: Tree
-  }
 
   /** Alternatives of patterns.
     *
@@ -1061,20 +1028,18 @@ trait Trees { self: Universe =>
     *    pat1 | ... | patn
     *  @group Extractors
     */
-  abstract class AlternativeExtractor {
+  abstract class AlternativeExtractor
     def apply(trees: List[Tree]): Alternative
     def unapply(alternative: Alternative): Option[List[Tree]]
-  }
 
   /** The API that all alternatives support
     *  @group API
     */
-  trait AlternativeApi extends TermTreeApi {
+  trait AlternativeApi extends TermTreeApi
     this: Alternative =>
 
     /** Alternatives of the pattern matching clause. */
     def trees: List[Tree]
-  }
 
   /** Repetition of pattern.
     *
@@ -1095,20 +1060,18 @@ trait Trees { self: Universe =>
     *    pat*
     *  @group Extractors
     */
-  abstract class StarExtractor {
+  abstract class StarExtractor
     def apply(elem: Tree): Star
     def unapply(star: Star): Option[Tree]
-  }
 
   /** The API that all stars support
     *  @group API
     */
-  trait StarApi extends TermTreeApi {
+  trait StarApi extends TermTreeApi
     this: Star =>
 
     /** The quantified pattern. */
     def elem: Tree
-  }
 
   /** Bind a variable to a rhs pattern.
     *
@@ -1132,15 +1095,14 @@ trait Trees { self: Universe =>
     *    pat*
     *  @group Extractors
     */
-  abstract class BindExtractor {
+  abstract class BindExtractor
     def apply(name: Name, body: Tree): Bind
     def unapply(bind: Bind): Option[(Name, Tree)]
-  }
 
   /** The API that all binds support
     *  @group API
     */
-  trait BindApi extends DefTreeApi {
+  trait BindApi extends DefTreeApi
     this: Bind =>
 
     /** The name that can be used to refer to this fragment of the matched expression.
@@ -1153,7 +1115,6 @@ trait Trees { self: Universe =>
       *  Is equal to `EmptyTree` if the pattern is not specified as in `case x => x`.
       */
     def body: Tree
-  }
 
   /**
     * Used to represent `unapply` methods in pattern matching.
@@ -1196,15 +1157,14 @@ trait Trees { self: Universe =>
     *  and is introduced when typechecking pattern matches and `try` blocks.
     *  @group Extractors
     */
-  abstract class UnApplyExtractor {
+  abstract class UnApplyExtractor
     def apply(fun: Tree, args: List[Tree]): UnApply
     def unapply(unApply: UnApply): Option[(Tree, List[Tree])]
-  }
 
   /** The API that all unapplies support
     *  @group API
     */
-  trait UnApplyApi extends TermTreeApi {
+  trait UnApplyApi extends TermTreeApi
     this: UnApply =>
 
     /** A dummy node that carries the type of unapplication.
@@ -1216,7 +1176,6 @@ trait Trees { self: Universe =>
       *  See the example for [[scala.reflect.api.Trees#UnApplyExtractor]].
       */
     def args: List[Tree]
-  }
 
   /** Anonymous function, eliminated by compiler phase lambdalift
     *  @group Trees
@@ -1238,15 +1197,14 @@ trait Trees { self: Universe =>
     *  It is the owner of the function's parameters.
     *  @group Extractors
     */
-  abstract class FunctionExtractor {
+  abstract class FunctionExtractor
     def apply(vparams: List[ValDef], body: Tree): Function
     def unapply(function: Function): Option[(List[ValDef], Tree)]
-  }
 
   /** The API that all functions support
     *  @group API
     */
-  trait FunctionApi extends TermTreeApi with SymTreeApi {
+  trait FunctionApi extends TermTreeApi with SymTreeApi
     this: Function =>
 
     /** The list of parameters of the function.
@@ -1256,7 +1214,6 @@ trait Trees { self: Universe =>
     /** The body of the function.
       */
     def body: Tree
-  }
 
   /** Assignment
     *  @group Trees
@@ -1275,15 +1232,14 @@ trait Trees { self: Universe =>
     *    lhs = rhs
     *  @group Extractors
     */
-  abstract class AssignExtractor {
+  abstract class AssignExtractor
     def apply(lhs: Tree, rhs: Tree): Assign
     def unapply(assign: Assign): Option[(Tree, Tree)]
-  }
 
   /** The API that all assigns support
     *  @group API
     */
-  trait AssignApi extends TermTreeApi {
+  trait AssignApi extends TermTreeApi
     this: Assign =>
 
     /** The left-hand side of the assignment.
@@ -1293,7 +1249,6 @@ trait Trees { self: Universe =>
     /** The right-hand side of the assignment.
       */
     def rhs: Tree
-  }
 
   /** Either an assignment or a named argument. Only appears in argument lists,
     *  eliminated by compiler phase typecheck (doTypedApply), resurrected by reifier.
@@ -1319,15 +1274,14 @@ trait Trees { self: Universe =>
     *
     *  @group Extractors
     */
-  abstract class AssignOrNamedArgExtractor {
+  abstract class AssignOrNamedArgExtractor
     def apply(lhs: Tree, rhs: Tree): AssignOrNamedArg
     def unapply(assignOrNamedArg: AssignOrNamedArg): Option[(Tree, Tree)]
-  }
 
   /** The API that all assigns support
     *  @group API
     */
-  trait AssignOrNamedArgApi extends TermTreeApi {
+  trait AssignOrNamedArgApi extends TermTreeApi
     this: AssignOrNamedArg =>
 
     /** The left-hand side of the expression.
@@ -1337,7 +1291,6 @@ trait Trees { self: Universe =>
     /** The right-hand side of the expression.
       */
     def rhs: Tree
-  }
 
   /** Conditional expression
     *  @group Trees
@@ -1358,15 +1311,14 @@ trait Trees { self: Universe =>
     *  If the alternative is not present, the `elsep` is set to `Literal(Constant(()))`.
     *  @group Extractors
     */
-  abstract class IfExtractor {
+  abstract class IfExtractor
     def apply(cond: Tree, thenp: Tree, elsep: Tree): If
     def unapply(if_ : If): Option[(Tree, Tree, Tree)]
-  }
 
   /** The API that all ifs support
     *  @group API
     */
-  trait IfApi extends TermTreeApi {
+  trait IfApi extends TermTreeApi
     this: If =>
 
     /** The condition of the if.
@@ -1381,7 +1333,6 @@ trait Trees { self: Universe =>
       *  Is equal to `Literal(Constant(()))` if not specified.
       */
     def elsep: Tree
-  }
 
   /** - Pattern matching expression  (before compiler phase explicitouter before 2.10 / patmat from 2.10)
     *  - Switch statements            (after compiler phase explicitouter before 2.10 / patmat from 2.10)
@@ -1411,15 +1362,14 @@ trait Trees { self: Universe =>
     * `Match` is also used in pattern matching assignments like `val (foo, bar) = baz`.
     *  @group Extractors
     */
-  abstract class MatchExtractor {
+  abstract class MatchExtractor
     def apply(selector: Tree, cases: List[CaseDef]): Match
     def unapply(match_ : Match): Option[(Tree, List[CaseDef])]
-  }
 
   /** The API that all matches support
     *  @group API
     */
-  trait MatchApi extends TermTreeApi {
+  trait MatchApi extends TermTreeApi
     this: Match =>
 
     /** The scrutinee of the pattern match. */
@@ -1427,7 +1377,6 @@ trait Trees { self: Universe =>
 
     /** The arms of the pattern match. */
     def cases: List[CaseDef]
-  }
 
   /** Return expression
     *  @group Trees
@@ -1448,20 +1397,18 @@ trait Trees { self: Universe =>
     *  The symbol of a Return node is the enclosing method.
     *  @group Extractors
     */
-  abstract class ReturnExtractor {
+  abstract class ReturnExtractor
     def apply(expr: Tree): Return
     def unapply(return_ : Return): Option[Tree]
-  }
 
   /** The API that all returns support
     *  @group API
     */
-  trait ReturnApi extends TermTreeApi {
+  trait ReturnApi extends TermTreeApi
     this: Return =>
 
     /** The returned expression. */
     def expr: Tree
-  }
 
   /** Try catch node
     *  @group Trees
@@ -1482,15 +1429,14 @@ trait Trees { self: Universe =>
     *  If the finalizer is not present, the `finalizer` is set to `EmptyTree`.
     *  @group Extractors
     */
-  abstract class TryExtractor {
+  abstract class TryExtractor
     def apply(block: Tree, catches: List[CaseDef], finalizer: Tree): Try
     def unapply(try_ : Try): Option[(Tree, List[CaseDef], Tree)]
-  }
 
   /** The API that all tries support
     *  @group API
     */
-  trait TryApi extends TermTreeApi {
+  trait TryApi extends TermTreeApi
     this: Try =>
 
     /** The protected block. */
@@ -1501,7 +1447,6 @@ trait Trees { self: Universe =>
 
     /** The `finally` part of the try. */
     def finalizer: Tree
-  }
 
   /** Throw expression
     *  @group Trees
@@ -1520,20 +1465,18 @@ trait Trees { self: Universe =>
     *    `throw` expr
     *  @group Extractors
     */
-  abstract class ThrowExtractor {
+  abstract class ThrowExtractor
     def apply(expr: Tree): Throw
     def unapply(throw_ : Throw): Option[Tree]
-  }
 
   /** The API that all tries support
     *  @group API
     */
-  trait ThrowApi extends TermTreeApi {
+  trait ThrowApi extends TermTreeApi
     this: Throw =>
 
     /** The thrown expression. */
     def expr: Tree
-  }
 
   /** Object instantiation
     *  @group Trees
@@ -1570,22 +1513,20 @@ trait Trees { self: Universe =>
     *      List(Literal(Constant(3))))
     *  @group Extractors
     */
-  abstract class NewExtractor {
+  abstract class NewExtractor
     def apply(tpt: Tree): New
     def unapply(new_ : New): Option[Tree]
-  }
 
   /** The API that all news support
     *  @group API
     */
-  trait NewApi extends TermTreeApi {
+  trait NewApi extends TermTreeApi
     this: New =>
 
     /** The tree that represents the type being instantiated.
       *  See the example for [[scala.reflect.api.Trees#NewExtractor]].
       */
     def tpt: Tree
-  }
 
   /** Type annotation, eliminated by compiler phase cleanup
     *  @group Trees
@@ -1604,15 +1545,14 @@ trait Trees { self: Universe =>
     *    expr: tpt
     *  @group Extractors
     */
-  abstract class TypedExtractor {
+  abstract class TypedExtractor
     def apply(expr: Tree, tpt: Tree): Typed
     def unapply(typed: Typed): Option[(Tree, Tree)]
-  }
 
   /** The API that all typeds support
     *  @group API
     */
-  trait TypedApi extends TermTreeApi {
+  trait TypedApi extends TermTreeApi
     this: Typed =>
 
     /** The expression being ascribed with the type. */
@@ -1620,7 +1560,6 @@ trait Trees { self: Universe =>
 
     /** The type being ascribed to the expression. */
     def tpt: Tree
-  }
 
   /** Common base class for Apply and TypeApply.
     *  @group Trees
@@ -1631,7 +1570,7 @@ trait Trees { self: Universe =>
   /** The API that all applies support
     *  @group API
     */
-  trait GenericApplyApi extends TermTreeApi {
+  trait GenericApplyApi extends TermTreeApi
     this: GenericApply =>
 
     /** The target of the application. */
@@ -1639,7 +1578,6 @@ trait Trees { self: Universe =>
 
     /** The arguments of the application. */
     def args: List[Tree]
-  }
 
   /* @PP: All signs point toward it being a requirement that args.nonEmpty,
    *  but I can't find that explicitly stated anywhere.  Unless your last name
@@ -1672,10 +1610,9 @@ trait Trees { self: Universe =>
     *
     *  @group Extractors
     */
-  abstract class TypeApplyExtractor {
+  abstract class TypeApplyExtractor
     def apply(fun: Tree, args: List[Tree]): TypeApply
     def unapply(typeApply: TypeApply): Option[(Tree, List[Tree])]
-  }
 
   /** The API that all type applies support
     *  @group API
@@ -1707,10 +1644,9 @@ trait Trees { self: Universe =>
     *    Apply(TypeApply(fun, targs), args)
     *  @group Extractors
     */
-  abstract class ApplyExtractor {
+  abstract class ApplyExtractor
     def apply(fun: Tree, args: List[Tree]): Apply
     def unapply(apply: Apply): Option[(Tree, List[Tree])]
-  }
 
   /** The API that all applies support
     *  @group API
@@ -1744,15 +1680,14 @@ trait Trees { self: Universe =>
     *  For instance in C.super(...), it would be C.
     *  @group Extractors
     */
-  abstract class SuperExtractor {
+  abstract class SuperExtractor
     def apply(qual: Tree, mix: TypeName): Super
     def unapply(super_ : Super): Option[(Tree, TypeName)]
-  }
 
   /** The API that all supers support
     *  @group API
     */
-  trait SuperApi extends TermTreeApi {
+  trait SuperApi extends TermTreeApi
     this: Super =>
 
     /** The qualifier of the `super` expression.
@@ -1764,7 +1699,6 @@ trait Trees { self: Universe =>
       *  See the example for [[scala.reflect.api.Trees#SuperExtractor]].
       */
     def mix: TypeName
-  }
 
   /** Self reference
     *  @group Trees
@@ -1786,22 +1720,20 @@ trait Trees { self: Universe =>
     *  For instance in C.this, it would be C.
     *  @group Extractors
     */
-  abstract class ThisExtractor {
+  abstract class ThisExtractor
     def apply(qual: TypeName): This
     def unapply(this_ : This): Option[TypeName]
-  }
 
   /** The API that all thises support
     *  @group API
     */
-  trait ThisApi extends TermTreeApi with SymTreeApi {
+  trait ThisApi extends TermTreeApi with SymTreeApi
     this: This =>
 
     /** The qualifier of the `this` expression.
       *  For an unqualified `this` refers to the enclosing class.
       */
     def qual: TypeName
-  }
 
   /** A member selection <qualifier> . <name>
     *  @group Trees
@@ -1826,15 +1758,14 @@ trait Trees { self: Universe =>
     *    Foo#Bar // represented as SelectFromTypeTree(Ident(<Foo>), <Bar>)
     *  @group Extractors
     */
-  abstract class SelectExtractor {
+  abstract class SelectExtractor
     def apply(qualifier: Tree, name: Name): Select
     def unapply(select: Select): Option[(Tree, Name)]
-  }
 
   /** The API that all selects support
     *  @group API
     */
-  trait SelectApi extends RefTreeApi {
+  trait SelectApi extends RefTreeApi
     this: Select =>
 
     /** @inheritdoc */
@@ -1842,7 +1773,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def name: Name
-  }
 
   /** A reference to identifier `name`.
     *  @group Trees
@@ -1864,15 +1794,14 @@ trait Trees { self: Universe =>
     *  For example, name ==> this.name
     *  @group Extractors
     */
-  abstract class IdentExtractor {
+  abstract class IdentExtractor
     def apply(name: Name): Ident
     def unapply(ident: Ident): Option[Name]
-  }
 
   /** The API that all idents support
     *  @group API
     */
-  trait IdentApi extends RefTreeApi {
+  trait IdentApi extends RefTreeApi
     this: Ident =>
 
     /** Was this ident created from a backquoted identifier? */
@@ -1880,7 +1809,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def name: Name
-  }
 
   /** Literal
     *  @group Trees
@@ -1899,20 +1827,18 @@ trait Trees { self: Universe =>
     *    value
     *  @group Extractors
     */
-  abstract class LiteralExtractor {
+  abstract class LiteralExtractor
     def apply(value: Constant): Literal
     def unapply(literal: Literal): Option[Constant]
-  }
 
   /** The API that all literals support
     *  @group API
     */
-  trait LiteralApi extends TermTreeApi {
+  trait LiteralApi extends TermTreeApi
     this: Literal =>
 
     /** The compile-time constant underlying the literal. */
     def value: Constant
-  }
 
   /** A tree that has an annotation attached to it. Only used for annotated types and
     *  annotation ascriptions, annotations on definitions are stored in the Modifiers.
@@ -1935,15 +1861,14 @@ trait Trees { self: Universe =>
     *    arg: @annot   // for exprs
     *  @group Extractors
     */
-  abstract class AnnotatedExtractor {
+  abstract class AnnotatedExtractor
     def apply(annot: Tree, arg: Tree): Annotated
     def unapply(annotated: Annotated): Option[(Tree, Tree)]
-  }
 
   /** The API that all annotateds support
     *  @group API
     */
-  trait AnnotatedApi extends TreeApi {
+  trait AnnotatedApi extends TreeApi
     this: Annotated =>
 
     /** The annotation. */
@@ -1951,7 +1876,6 @@ trait Trees { self: Universe =>
 
     /** The annotee. */
     def arg: Tree
-  }
 
   /** Singleton type, eliminated by RefCheck
     *  @group Trees
@@ -1970,20 +1894,18 @@ trait Trees { self: Universe =>
     *    ref.type
     *  @group Extractors
     */
-  abstract class SingletonTypeTreeExtractor {
+  abstract class SingletonTypeTreeExtractor
     def apply(ref: Tree): SingletonTypeTree
     def unapply(singletonTypeTree: SingletonTypeTree): Option[Tree]
-  }
 
   /** The API that all singleton type trees support
     *  @group API
     */
-  trait SingletonTypeTreeApi extends TypTreeApi {
+  trait SingletonTypeTreeApi extends TypTreeApi
     this: SingletonTypeTree =>
 
     /** The underlying reference. */
     def ref: Tree
-  }
 
   /** Type selection <qualifier> # <name>, eliminated by RefCheck
     *  @group Trees
@@ -2010,16 +1932,15 @@ trait Trees { self: Universe =>
     *    foo.Bar // represented as Select(Ident(<foo>), <Bar>)
     *  @group Extractors
     */
-  abstract class SelectFromTypeTreeExtractor {
+  abstract class SelectFromTypeTreeExtractor
     def apply(qualifier: Tree, name: TypeName): SelectFromTypeTree
     def unapply(
         selectFromTypeTree: SelectFromTypeTree): Option[(Tree, TypeName)]
-  }
 
   /** The API that all selects from type trees support
     *  @group API
     */
-  trait SelectFromTypeTreeApi extends TypTreeApi with RefTreeApi {
+  trait SelectFromTypeTreeApi extends TypTreeApi with RefTreeApi
     this: SelectFromTypeTree =>
 
     /** @inheritdoc */
@@ -2027,7 +1948,6 @@ trait Trees { self: Universe =>
 
     /** @inheritdoc */
     def name: TypeName
-  }
 
   /** Intersection type <parent1> with ... with <parentN> { <decls> }, eliminated by RefCheck
     *  @group Trees
@@ -2046,20 +1966,18 @@ trait Trees { self: Universe =>
     *    parent1 with ... with parentN { refinement }
     *  @group Extractors
     */
-  abstract class CompoundTypeTreeExtractor {
+  abstract class CompoundTypeTreeExtractor
     def apply(templ: Template): CompoundTypeTree
     def unapply(compoundTypeTree: CompoundTypeTree): Option[Template]
-  }
 
   /** The API that all compound type trees support
     *  @group API
     */
-  trait CompoundTypeTreeApi extends TypTreeApi {
+  trait CompoundTypeTreeApi extends TypTreeApi
     this: CompoundTypeTree =>
 
     /** The template of the compound type - represents the parents, the optional self-type and the optional definitions. */
     def templ: Template
-  }
 
   /** Applied type <tpt> [ <args> ], eliminated by RefCheck
     *  @group Trees
@@ -2087,15 +2005,14 @@ trait Trees { self: Universe =>
     *    foo[Int] // represented as TypeApply(Ident(<foo>), List(TypeTree(<Int>)))
     *  @group Extractors
     */
-  abstract class AppliedTypeTreeExtractor {
+  abstract class AppliedTypeTreeExtractor
     def apply(tpt: Tree, args: List[Tree]): AppliedTypeTree
     def unapply(appliedTypeTree: AppliedTypeTree): Option[(Tree, List[Tree])]
-  }
 
   /** The API that all applied type trees support
     *  @group API
     */
-  trait AppliedTypeTreeApi extends TypTreeApi {
+  trait AppliedTypeTreeApi extends TypTreeApi
     this: AppliedTypeTree =>
 
     /** The target of the application. */
@@ -2103,7 +2020,6 @@ trait Trees { self: Universe =>
 
     /** The arguments of the application. */
     def args: List[Tree]
-  }
 
   /** Type bounds tree node
     *  @group Trees
@@ -2122,15 +2038,14 @@ trait Trees { self: Universe =>
     *    >: lo <: hi
     *  @group Extractors
     */
-  abstract class TypeBoundsTreeExtractor {
+  abstract class TypeBoundsTreeExtractor
     def apply(lo: Tree, hi: Tree): TypeBoundsTree
     def unapply(typeBoundsTree: TypeBoundsTree): Option[(Tree, Tree)]
-  }
 
   /** The API that all type bound trees support
     *  @group API
     */
-  trait TypeBoundsTreeApi extends TypTreeApi {
+  trait TypeBoundsTreeApi extends TypTreeApi
     this: TypeBoundsTree =>
 
     /** The lower bound.
@@ -2142,7 +2057,6 @@ trait Trees { self: Universe =>
       *  Is equal to `Ident(<scala.Any>)` if not specified explicitly.
       */
     def hi: Tree
-  }
 
   /** Existential type tree node
     *  @group Trees
@@ -2161,16 +2075,15 @@ trait Trees { self: Universe =>
     *    tpt forSome { whereClauses }
     *  @group Extractors
     */
-  abstract class ExistentialTypeTreeExtractor {
+  abstract class ExistentialTypeTreeExtractor
     def apply(tpt: Tree, whereClauses: List[MemberDef]): ExistentialTypeTree
     def unapply(existentialTypeTree: ExistentialTypeTree)
       : Option[(Tree, List[MemberDef])]
-  }
 
   /** The API that all existential type trees support
     *  @group API
     */
-  trait ExistentialTypeTreeApi extends TypTreeApi {
+  trait ExistentialTypeTreeApi extends TypTreeApi
     this: ExistentialTypeTree =>
 
     /** The underlying type of the existential type. */
@@ -2182,7 +2095,6 @@ trait Trees { self: Universe =>
       *    2) ValDef with empty right-hand side
       */
     def whereClauses: List[MemberDef]
-  }
 
   /** A synthetic tree holding an arbitrary type.  Not to be confused with
     *  with TypTree, the trait for trees that are only used for type trees.
@@ -2204,22 +2116,20 @@ trait Trees { self: Universe =>
     *  and is emitted by everywhere when we want to wrap a `Type` in a `Tree`.
     *  @group Extractors
     */
-  abstract class TypeTreeExtractor {
+  abstract class TypeTreeExtractor
     def apply(): TypeTree
     def unapply(typeTree: TypeTree): Boolean
-  }
 
   /** The API that all type trees support
     *  @group API
     */
-  trait TypeTreeApi extends TypTreeApi {
+  trait TypeTreeApi extends TypTreeApi
     this: TypeTree =>
 
     /** The precursor of this tree.
       *  Is equal to `EmptyTree` if this type tree doesn't have precursors.
       */
     def original: Tree
-  }
 
   /** An empty deferred value definition corresponding to:
     *    val _: _
@@ -2376,7 +2286,7 @@ trait Trees { self: Universe =>
   /** The API of a tree copier.
     *  @group API
     */
-  abstract class TreeCopierOps {
+  abstract class TreeCopierOps
 
     /** Creates a `ClassDef` node from the given components, having a given `tree` as a prototype.
       *  Having a tree as a prototype means that the tree's attachments, type and symbol will be copied into the result.
@@ -2612,14 +2522,13 @@ trait Trees { self: Universe =>
     def ExistentialTypeTree(tree: Tree,
                             tpt: Tree,
                             whereClauses: List[MemberDef]): ExistentialTypeTree
-  }
 
 // ---------------------- traversing and transforming ------------------------------
 
   /** A class that implement a default tree traversal strategy: breadth-first component-wise.
     *  @group Traversal
     */
-  class Traverser {
+  class Traverser
     protected[scala] var currentOwner: Symbol = rootMirror.RootClass
 
     /** Traverse something which Trees contain, but which isn't a Tree itself. */
@@ -2654,25 +2563,22 @@ trait Trees { self: Universe =>
       vparamss foreach traverseParams
 
     /** Traverses a list of trees with a given owner symbol. */
-    def traverseStats(stats: List[Tree], exprOwner: Symbol) {
+    def traverseStats(stats: List[Tree], exprOwner: Symbol)
       stats foreach
       (stat =>
             if (exprOwner != currentOwner) atOwner(exprOwner)(traverse(stat))
             else traverse(stat))
-    }
 
     /** Performs a traversal with a given owner symbol. */
-    def atOwner(owner: Symbol)(traverse: => Unit) {
+    def atOwner(owner: Symbol)(traverse: => Unit)
       val prevOwner = currentOwner
       currentOwner = owner
       traverse
       currentOwner = prevOwner
-    }
 
     /** Leave apply available in the generic traverser to do something else.
       */
     def apply[T <: Tree](tree: T): T = { traverse(tree); tree }
-  }
 
   /** Delegates the traversal strategy to `scala.reflect.internal.Trees`,
     *  because pattern matching on abstract types we have here degrades performance.
@@ -2691,7 +2597,7 @@ trait Trees { self: Universe =>
   /** A class that implement a default tree transformation strategy: breadth-first component-wise cloning.
     *  @group Traversal
     */
-  abstract class Transformer {
+  abstract class Transformer
 
     /** The underlying tree copier. */
     val treeCopy: TreeCopier = newLazyTreeCopier
@@ -2700,19 +2606,17 @@ trait Trees { self: Universe =>
     protected[scala] var currentOwner: Symbol = rootMirror.RootClass
 
     /** The enclosing method of the currently transformed tree. */
-    protected def currentMethod = {
+    protected def currentMethod =
       def enclosingMethod(sym: Symbol): Symbol =
         if (sym.isMethod || sym == NoSymbol) sym
         else enclosingMethod(sym.owner)
       enclosingMethod(currentOwner)
-    }
 
     /** The enclosing class of the currently transformed tree. */
-    protected def currentClass = {
+    protected def currentClass =
       def enclosingClass(sym: Symbol): Symbol =
         if (sym.isClass || sym == NoSymbol) sym else enclosingClass(sym.owner)
       enclosingClass(currentOwner)
-    }
 
 //    protected def currentPackage = currentOwner.enclosingTopLevelClass.owner
 
@@ -2763,20 +2667,17 @@ trait Trees { self: Universe =>
             else transform(stat)) filter (EmptyTree != _)
 
     /** Transforms `Modifiers`. */
-    def transformModifiers(mods: Modifiers): Modifiers = {
+    def transformModifiers(mods: Modifiers): Modifiers =
       if (mods.annotations.isEmpty) mods
       else mods mapAnnotations transformTrees
-    }
 
     /** Transforms a tree with a given owner symbol. */
-    def atOwner[A](owner: Symbol)(trans: => A): A = {
+    def atOwner[A](owner: Symbol)(trans: => A): A =
       val prevOwner = currentOwner
       currentOwner = owner
       val result = trans
       currentOwner = prevOwner
       result
-    }
-  }
 
   /** Delegates the transformation strategy to `scala.reflect.internal.Trees`,
     *  because pattern matching on abstract types we have here degrades performance.
@@ -2800,7 +2701,7 @@ trait Trees { self: Universe =>
   /** The API that all Modifiers support
     *  @group API
     */
-  abstract class ModifiersApi {
+  abstract class ModifiersApi
 
     /** The underlying flags of the enclosing definition.
       *  Is equal to `NoFlags` if none are specified explicitly.
@@ -2824,7 +2725,6 @@ trait Trees { self: Universe =>
       */
     def mapAnnotations(f: List[Tree] => List[Tree]): Modifiers =
       Modifiers(flags, privateWithin, f(annotations))
-  }
 
   /** The constructor/extractor for `Modifiers` instances.
     *  @group Traversal
@@ -2838,13 +2738,12 @@ trait Trees { self: Universe =>
     *  Modifiers encapsulate flags, visibility annotations and Scala annotations for member definitions.
     *  @group Traversal
     */
-  abstract class ModifiersExtractor {
+  abstract class ModifiersExtractor
     def apply(): Modifiers = Modifiers(NoFlags, typeNames.EMPTY, List())
     def apply(flags: FlagSet,
               privateWithin: Name,
               annotations: List[Tree]): Modifiers
     def unapply(mods: Modifiers): Option[(FlagSet, Name, List[Tree])]
-  }
 
   /** The factory for `Modifiers` instances.
     *  @group Traversal
@@ -2861,4 +2760,3 @@ trait Trees { self: Universe =>
     *  @group Traversal
     */
   lazy val NoMods = Modifiers()
-}

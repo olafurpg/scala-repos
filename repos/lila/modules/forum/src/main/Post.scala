@@ -16,7 +16,7 @@ case class Post(id: String,
                 troll: Boolean,
                 hidden: Boolean,
                 lang: Option[String],
-                createdAt: DateTime) {
+                createdAt: DateTime)
 
   def showAuthor = (author map (_.trim) filter ("" !=)) | User.anonymous
 
@@ -25,9 +25,8 @@ case class Post(id: String,
   def isTeam = categId startsWith teamSlug("")
 
   def isStaff = categId == "staff"
-}
 
-object Post {
+object Post
 
   val idSize = 8
 
@@ -62,4 +61,3 @@ object Post {
       (__.json update readDate('createdAt)) andThen Json.reads[Post],
       Json.writes[Post] andThen (__.json update writeDate('createdAt))
   )
-}

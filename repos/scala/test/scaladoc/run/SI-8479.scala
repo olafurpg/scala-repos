@@ -5,7 +5,7 @@ import scala.tools.partest.ScaladocModelTest
 import java.net.{URI, URL}
 import java.io.File
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code =
     """
@@ -26,7 +26,5 @@ object Test extends ScaladocModelTest {
 
   override def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) {
+  def testModel(rootPackage: Package)
     // it didn't crash
-  }
-}

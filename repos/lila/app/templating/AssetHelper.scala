@@ -4,7 +4,7 @@ package templating
 import controllers.routes
 import play.twirl.api.Html
 
-trait AssetHelper { self: I18nHelper =>
+trait AssetHelper  self: I18nHelper =>
 
   def assetVersion = lila.api.Env.current.assetVersion.get
 
@@ -23,10 +23,9 @@ trait AssetHelper { self: I18nHelper =>
   def cssVendorTag(name: String, staticDomain: Boolean = true) =
     cssAt("vendor/" + name, staticDomain)
 
-  def cssAt(path: String, staticDomain: Boolean = true) = Html {
+  def cssAt(path: String, staticDomain: Boolean = true) = Html
     val href = if (staticDomain) staticUrl(path) else routes.Assets.at(path)
     s"""<link href="$href?v=$assetVersion" type="text/css" rel="stylesheet"/>"""
-  }
 
   def jsTag(name: String) = jsAt("javascripts/" + name)
 
@@ -48,9 +47,8 @@ trait AssetHelper { self: I18nHelper =>
       test = "window.Highcharts",
       local = staticUrl("vendor/highcharts4/highcharts-4.1.9.js"))
 
-  val highchartsMoreTag = Html {
+  val highchartsMoreTag = Html
     """<script src="http://code.highcharts.com/4.1.4/highcharts-more.js"></script>"""
-  }
 
   val momentjsTag = cdnOrLocal(
       cdn = "http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js",
@@ -63,14 +61,13 @@ trait AssetHelper { self: I18nHelper =>
       local = staticUrl("javascripts/vendor/peer.min.js"))
 
   def momentLangTag(implicit ctx: lila.api.Context) =
-    (lang(ctx).language match {
+    (lang(ctx).language match
       case "en" => none
       case "pt" => "pt-br".some
       case "zh" => "zh-cn".some
       case l => l.some
-    }).fold(Html("")) { l =>
+    ).fold(Html(""))  l =>
       jsAt(s"vendor/moment/locale/$l.js", static = true)
-    }
 
   val tagmanagerTag = cdnOrLocal(
       cdn = "http://cdnjs.cloudflare.com/ajax/libs/tagmanager/3.0.0/tagmanager.js",
@@ -82,21 +79,17 @@ trait AssetHelper { self: I18nHelper =>
       test = "$.typeahead",
       local = staticUrl("javascripts/vendor/typeahead.bundle.min.js"))
 
-  val fingerprintTag = Html {
+  val fingerprintTag = Html
     """<script src="http://cdn.jsdelivr.net/fingerprintjs2/0.7/fingerprint2.min.js"></script>"""
-  }
 
-  private def cdnOrLocal(cdn: String, test: String, local: String) = Html {
+  private def cdnOrLocal(cdn: String, test: String, local: String) = Html
     if (isProd)
       s"""<script src="$cdn"></script><script>$test || document.write('<script src="$local">\\x3C/script>')</script>"""
     else s"""<script src="$local"></script>"""
-  }
 
-  def jsAt(path: String, static: Boolean = true) = Html {
+  def jsAt(path: String, static: Boolean = true) = Html
     s"""<script src="${static.fold(staticUrl(path), path)}?v=$assetVersion"></script>"""
-  }
 
   def embedJs(js: String): Html =
     Html(s"""<script>/* <![CDATA[ */ $js /* ]]> */</script>""")
   def embedJs(js: Html): Html = embedJs(js.body)
-}

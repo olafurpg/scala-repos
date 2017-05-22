@@ -8,7 +8,7 @@ import scala.util.parsing.combinator._
   * Pavel.Fatin, 11.05.2010
   */
 class PsiElementMock(val name: String, children: PsiElementMock*)
-    extends AbstractPsiElementMock {
+    extends AbstractPsiElementMock
   private var parent: PsiElement = _
   private var prevSibling: PsiElement = _
   private var nextSibling: PsiElement = _
@@ -17,12 +17,10 @@ class PsiElementMock(val name: String, children: PsiElementMock*)
 
   for (child <- children) { child.parent = this }
 
-  if (children.nonEmpty) {
-    for ((a, b) <- children.zip(children.tail)) {
+  if (children.nonEmpty)
+    for ((a, b) <- children.zip(children.tail))
       a.nextSibling = b
       b.prevSibling = a
-    }
-  }
 
   override def getParent = parent
 
@@ -40,24 +38,20 @@ class PsiElementMock(val name: String, children: PsiElementMock*)
 
   override def toString = name
 
-  override def getText: String = {
+  override def getText: String =
     if (children.isEmpty) toString
     else toString + "(" + children.map(_.getText).mkString(", ") + ")"
-  }
-}
 
-object PsiElementMock extends JavaTokenParsers {
+object PsiElementMock extends JavaTokenParsers
   def apply(name: String, children: PsiElementMock*) =
     new PsiElementMock(name, children: _*)
 
   def parse(s: String): PsiElementMock = parse(element, s).get
 
-  private def element: Parser[PsiElementMock] = identifier ~ opt(elements) ^^ {
+  private def element: Parser[PsiElementMock] = identifier ~ opt(elements) ^^
     case name ~ children => PsiElementMock(name, children.getOrElse(Nil): _*)
-  }
 
   private def identifier: Parser[String] = """[^,() ]+""".r
 
   private def elements: Parser[List[PsiElementMock]] =
     "(" ~> repsep(element, ",") <~ ")"
-}

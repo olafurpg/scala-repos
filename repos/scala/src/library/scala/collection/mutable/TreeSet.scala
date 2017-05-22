@@ -22,7 +22,7 @@ import scala.collection.mutable.{RedBlackTree => RB}
   * @author Lucien Pereira
   *
   */
-object TreeSet extends MutableSortedSetFactory[TreeSet] {
+object TreeSet extends MutableSortedSetFactory[TreeSet]
 
   /**
     *  The empty set of this type
@@ -33,7 +33,6 @@ object TreeSet extends MutableSortedSetFactory[TreeSet] {
   implicit def canBuildFrom[A](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, A, TreeSet[A]] =
     new SortedSetCanBuildFrom[A]
-}
 
 /**
   * A mutable sorted set implemented using a mutable red-black tree as underlying data structure.
@@ -53,7 +52,7 @@ object TreeSet extends MutableSortedSetFactory[TreeSet] {
 sealed class TreeSet[A] private (
     tree: RB.Tree[A, Null])(implicit val ordering: Ordering[A])
     extends AbstractSortedSet[A] with SortedSet[A] with SetLike[A, TreeSet[A]]
-    with SortedSetLike[A, TreeSet[A]] with Serializable {
+    with SortedSetLike[A, TreeSet[A]] with Serializable
 
   if (ordering eq null)
     throw new NullPointerException("ordering must not be null")
@@ -122,36 +121,33 @@ sealed class TreeSet[A] private (
     */
   @SerialVersionUID(7087824939194006086L)
   private[this] final class TreeSetView(from: Option[A], until: Option[A])
-      extends TreeSet[A](tree) {
+      extends TreeSet[A](tree)
 
     /**
       * Given a possible new lower bound, chooses and returns the most constraining one (the maximum).
       */
     private[this] def pickLowerBound(newFrom: Option[A]): Option[A] =
-      (from, newFrom) match {
+      (from, newFrom) match
         case (Some(fr), Some(newFr)) => Some(ordering.max(fr, newFr))
         case (None, _) => newFrom
         case _ => from
-      }
 
     /**
       * Given a possible new upper bound, chooses and returns the most constraining one (the minimum).
       */
     private[this] def pickUpperBound(newUntil: Option[A]): Option[A] =
-      (until, newUntil) match {
+      (until, newUntil) match
         case (Some(unt), Some(newUnt)) => Some(ordering.min(unt, newUnt))
         case (None, _) => newUntil
         case _ => until
-      }
 
     /**
       * Returns true if the argument is inside the view bounds (between `from` and `until`).
       */
-    private[this] def isInsideViewBounds(key: A): Boolean = {
+    private[this] def isInsideViewBounds(key: A): Boolean =
       val afterFrom = from.isEmpty || ordering.compare(from.get, key) <= 0
       val beforeUntil = until.isEmpty || ordering.compare(key, until.get) < 0
       afterFrom && beforeUntil
-    }
 
     override def rangeImpl(from: Option[A], until: Option[A]): TreeSet[A] =
       new TreeSetView(pickLowerBound(from), pickUpperBound(until))
@@ -169,25 +165,21 @@ sealed class TreeSet[A] private (
     override def isEmpty = !iterator.hasNext
 
     override def head = headOption.get
-    override def headOption = {
+    override def headOption =
       val elem =
         if (from.isDefined) RB.minKeyAfter(tree, from.get) else RB.minKey(tree)
-      (elem, until) match {
+      (elem, until) match
         case (Some(e), Some(unt)) if ordering.compare(e, unt) >= 0 => None
         case _ => elem
-      }
-    }
 
     override def last = lastOption.get
-    override def lastOption = {
+    override def lastOption =
       val elem =
         if (until.isDefined) RB.maxKeyBefore(tree, until.get)
         else RB.maxKey(tree)
-      (elem, from) match {
+      (elem, from) match
         case (Some(e), Some(fr)) if ordering.compare(e, fr) < 0 => None
         case _ => elem
-      }
-    }
 
     // Using the iterator should be efficient enough; if performance is deemed a problem later, a specialized
     // `foreachKey(f, from, until)` method can be created in `RedBlackTree`. See
@@ -195,5 +187,3 @@ sealed class TreeSet[A] private (
     override def foreach[U](f: A => U): Unit = iterator.foreach(f)
 
     override def clone() = super.clone().rangeImpl(from, until)
-  }
-}

@@ -5,11 +5,10 @@ package com.twitter.finagle.http
   *
   * For Java-friendly enums, see [[com.twitter.finagle.http.Methods]].
   */
-sealed abstract class Method(name: String) {
+sealed abstract class Method(name: String)
   override def toString: String = name
-}
 
-object Method {
+object Method
   case object Get extends Method("GET")
   case object Post extends Method("POST")
   case object Put extends Method("PUT")
@@ -30,7 +29,7 @@ object Method {
     * for example, accidentally with the wrong case. For other names, not part
     * of the common methods, we observe the case.
     */
-  def apply(name: String): Method = name.toUpperCase match {
+  def apply(name: String): Method = name.toUpperCase match
     case "GET" => Get
     case "POST" => Post
     case "PUT" => Put
@@ -41,5 +40,3 @@ object Method {
     case "CONNECT" => Connect
     case "OPTIONS" => Options
     case method => Custom(name)
-  }
-}

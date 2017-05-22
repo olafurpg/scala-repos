@@ -5,10 +5,9 @@ package org.ensime.sexp.formats
 /**
   * An example Abstract Syntax Tree / family.
   */
-object ExampleAst {
-  sealed trait Token {
+object ExampleAst
+  sealed trait Token
     def text: String
-  }
 
   sealed trait RawToken extends Token
   case class Split(text: String) extends RawToken
@@ -32,14 +31,12 @@ object ExampleAst {
   case class Ignored(text: String = "") extends TokenTree
   case class Unclear(text: String = "") extends TokenTree
 
-  object SpecialToken extends TokenTree {
+  object SpecialToken extends TokenTree
     // to test case object serialisation
     def text = ""
-  }
 
-  sealed trait Term extends TokenTree {
+  sealed trait Term extends TokenTree
     def field: DatabaseField
-  }
 
   case class DatabaseField(column: String)
   case class FieldTerm(text: String, field: DatabaseField, value: String)
@@ -52,19 +49,16 @@ object ExampleAst {
       inclusive: Boolean = false
   )
       extends Term
-  case class LikeTerm(term: FieldTerm, like: Option[Like]) extends Term {
+  case class LikeTerm(term: FieldTerm, like: Option[Like]) extends Term
     val text = like.map(_.text).getOrElse("")
     val field = term.field
-  }
   case class PreferToken(
       tree: TokenTree, before: Option[Prefer], after: Option[Prefer])
-      extends TokenTree {
+      extends TokenTree
     val text = before.getOrElse("") + tree.text + after.getOrElse("")
-  }
   case class InTerm(
       field: DatabaseField, value: List[String], text: String = "")
       extends CompressedToken
 
   case class QualifierToken(text: String, field: DatabaseField)
       extends ContextualToken with Term
-}

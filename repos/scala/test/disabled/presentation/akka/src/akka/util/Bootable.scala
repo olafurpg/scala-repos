@@ -3,7 +3,6 @@
   */
 package akka.util
 
-trait Bootable {
+trait Bootable
   def onLoad() {}
   def onUnload() {}
-}

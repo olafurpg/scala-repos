@@ -5,20 +5,16 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class TempDirectoryTest extends WordSpec {
+class TempDirectoryTest extends WordSpec
 
-  "TempDirectory" should {
+  "TempDirectory" should
 
-    "create a directory when deleteAtExit is true" in {
+    "create a directory when deleteAtExit is true" in
       val dir = TempDirectory.create(true)
       assert(dir.exists())
       assert(dir.isDirectory)
-    }
 
-    "create a directory when deleteAtExit is false" in {
+    "create a directory when deleteAtExit is false" in
       val dir = TempDirectory.create(false)
       assert(dir.exists())
       assert(dir.isDirectory)
-    }
-  }
-}

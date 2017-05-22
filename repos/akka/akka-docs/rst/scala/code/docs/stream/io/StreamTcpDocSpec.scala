@@ -15,7 +15,7 @@ import docs.utils.TestUtils
 
 import scala.concurrent.Future
 
-class StreamTcpDocSpec extends AkkaSpec {
+class StreamTcpDocSpec extends AkkaSpec
 
   implicit val ec = system.dispatcher
   implicit val materializer = ActorMaterializer()
@@ -23,27 +23,22 @@ class StreamTcpDocSpec extends AkkaSpec {
   // silence sysout
   def println(s: String) = ()
 
-  "simple server connection" in {
-    {
+  "simple server connection" in
       //#echo-server-simple-bind
       val binding: Future[ServerBinding] =
         Tcp().bind("127.0.0.1", 8888).to(Sink.ignore).run()
 
-      binding.map { b =>
-        b.unbind() onComplete {
+      binding.map  b =>
+        b.unbind() onComplete
           case _ => // ...
-        }
-      }
       //#echo-server-simple-bind
-    }
-    {
       val (host, port) = TestUtils.temporaryServerHostnameAndPort()
       //#echo-server-simple-handle
       import akka.stream.scaladsl.Framing
 
       val connections: Source[IncomingConnection, Future[ServerBinding]] =
         Tcp().bind(host, port)
-      connections runForeach { connection =>
+      connections runForeach  connection =>
         println(s"New connection from: ${connection.remoteAddress}")
 
         val echo = Flow[ByteString]
@@ -55,12 +50,9 @@ class StreamTcpDocSpec extends AkkaSpec {
           .map(ByteString(_))
 
         connection.handleWith(echo)
-      }
       //#echo-server-simple-handle
-    }
-  }
 
-  "initial server banner echo server" in {
+  "initial server banner echo server" in
     val localhost = TestUtils.temporaryServerAddress()
     val connections =
       Tcp().bind(localhost.getHostName, localhost.getPort) // TODO getHostString in Java7
@@ -69,7 +61,7 @@ class StreamTcpDocSpec extends AkkaSpec {
     import akka.stream.scaladsl.Framing
     //#welcome-banner-chat-server
 
-    connections.runForeach { connection =>
+    connections.runForeach  connection =>
       // server logic, parses incoming commands
       val commandParser = Flow[String].takeWhile(_ != "BYE").map(_ + "!")
 
@@ -83,9 +75,8 @@ class StreamTcpDocSpec extends AkkaSpec {
                                allowTruncation = true))
         .map(_.utf8String)
         //#welcome-banner-chat-server
-        .map { command ⇒
+        .map  command ⇒
           serverProbe.ref ! command; command
-        }
         //#welcome-banner-chat-server
         .via(commandParser)
         // merge in the initial banner after parser
@@ -94,27 +85,21 @@ class StreamTcpDocSpec extends AkkaSpec {
         .map(ByteString(_))
 
       connection.handleWith(serverLogic)
-    }
     //#welcome-banner-chat-server
 
     import akka.stream.scaladsl.Framing
 
     val input =
       new AtomicReference("Hello world" :: "What a lovely day" :: Nil)
-    def readLine(prompt: String): String = {
-      input.get() match {
+    def readLine(prompt: String): String =
+      input.get() match
         case all @ cmd :: tail if input.compareAndSet(all, tail) ⇒ cmd
         case _ ⇒ "q"
-      }
-    }
 
-    {
       //#repl-client
       val connection = Tcp().outgoingConnection("127.0.0.1", 8888)
       //#repl-client
-    }
 
-    {
       val connection = Tcp().outgoingConnection(localhost)
       //#repl-client
 
@@ -134,10 +119,7 @@ class StreamTcpDocSpec extends AkkaSpec {
 
       connection.join(repl).run()
       //#repl-client
-    }
 
     serverProbe.expectMsg("Hello world")
     serverProbe.expectMsg("What a lovely day")
     serverProbe.expectMsg("BYE")
-  }
-}

@@ -43,7 +43,6 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 class SepiaToneSpec
     extends SimpleSFXDelegateSpec[jfxse.SepiaTone, SepiaTone](
         classOf[jfxse.SepiaTone], classOf[SepiaTone])
-    with InputDelegateSpec[SepiaTone] {
+    with InputDelegateSpec[SepiaTone]
 
   val inputDelegate = getScalaClassInstance
-}

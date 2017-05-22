@@ -19,7 +19,7 @@ import scala.collection.immutable.Queue
 
 @RunWith(classOf[JUnitRunner])
 class HandshakeTest
-    extends FunSuite with OneInstancePerTest with MockitoSugar {
+    extends FunSuite with OneInstancePerTest with MockitoSugar
 
   import Message.{encode => enc, decode => dec}
 
@@ -32,7 +32,7 @@ class HandshakeTest
   val serverTransport = new QueueTransport(
       writeq = serverToClient, readq = clientToServer)
 
-  test("handshake") {
+  test("handshake")
     var clientNegotiated = false
     var serverNegotiated = false
 
@@ -41,10 +41,8 @@ class HandshakeTest
         version = 0x0001,
         headers = Seq.empty,
         negotiate = (_, trans) =>
-            {
             clientNegotiated = true
             trans.map(enc, dec)
-        }
     )
 
     val server = Handshake.server(
@@ -52,10 +50,8 @@ class HandshakeTest
         version = 0x0001,
         headers = identity,
         negotiate = (_, trans) =>
-            {
             serverNegotiated = true
             trans.map(enc, dec)
-        }
     )
 
     // ensure negotiation is complete
@@ -64,28 +60,24 @@ class HandshakeTest
 
     assert(serverNegotiated)
     assert(clientNegotiated)
-  }
 
-  test("sync operations are proxied") {
+  test("sync operations are proxied")
     val remote = new java.net.SocketAddress {}
     val local = new java.net.SocketAddress {}
     val peerCert = Some(mock[X509Certificate])
 
     val q = new AsyncQueue[ChannelBuffer]
-    val trans = new QueueTransport(q, q) {
+    val trans = new QueueTransport(q, q)
       override val localAddress: SocketAddress = local
       override val remoteAddress: SocketAddress = remote
       override def peerCertificate: Option[Certificate] = peerCert
-    }
 
     val client = Handshake.client(
         trans = trans,
         version = 0x0001,
         headers = Seq.empty,
         negotiate = (_, trans) =>
-            {
             trans.map(enc, dec)
-        }
     )
 
     assert(client.localAddress == local)
@@ -97,27 +89,22 @@ class HandshakeTest
         version = 0x0001,
         headers = identity,
         negotiate = (_, trans) =>
-            {
             trans.map(enc, dec)
-        }
     )
 
     assert(server.localAddress == local)
     assert(server.remoteAddress == remote)
     assert(server.peerCertificate == peerCert)
-  }
 
-  test("exceptions in negotiate propagate") {
+  test("exceptions in negotiate propagate")
     val clientExc = new Exception("boom!")
     val client = Handshake.client(
         trans = clientTransport,
         version = 0x0001,
         headers = Seq.empty,
         negotiate = (_, trans) =>
-            {
             throw clientExc
             trans.map(enc, dec)
-        }
     )
 
     val serverExc = new Exception("boom!")
@@ -126,40 +113,35 @@ class HandshakeTest
         version = 0x0001,
         headers = identity,
         negotiate = (_, trans) =>
-            {
             throw serverExc
             trans.map(enc, dec)
-        }
     )
 
-    assert(intercept[Exception] {
+    assert(intercept[Exception]
       Await.result(client.read(), 5.seconds)
-    } == clientExc)
+    == clientExc)
 
-    assert(intercept[Exception] {
+    assert(intercept[Exception]
       Await.result(client.write(Message.Tping(1)), 5.seconds)
-    } == clientExc)
+    == clientExc)
 
-    assert(intercept[Exception] {
+    assert(intercept[Exception]
       Await.result(server.read(), 5.seconds)
-    } == serverExc)
+    == serverExc)
 
-    assert(intercept[Exception] {
+    assert(intercept[Exception]
       Await.result(server.write(Message.Rping(1)), 5.seconds)
-    } == serverExc)
-  }
+    == serverExc)
 
-  test("pre handshake") {
+  test("pre handshake")
     var negotiated = false
     val client = Handshake.client(
         trans = clientTransport,
         version = 0x0001,
         headers = Nil,
         negotiate = (_, trans) =>
-            {
             negotiated = true
             trans.map(enc, dec)
-        }
     )
 
     val f = client.write(Message.Tping(2))
@@ -168,9 +150,8 @@ class HandshakeTest
             1, "tinit check"))
     assert(!negotiated)
     assert(!f.isDefined)
-  }
 
-  test("client handshake") {
+  test("client handshake")
     val version = 10: Short
     val headers =
       Seq(wrappedBuffer("key".getBytes) -> wrappedBuffer("value".getBytes))
@@ -181,10 +162,8 @@ class HandshakeTest
         version = version,
         headers = headers,
         negotiate = (_, trans) =>
-            {
             negotiated = true
             trans.map(enc, dec)
-        }
     )
 
     val f = client.write(Message.Tping(2))
@@ -205,9 +184,8 @@ class HandshakeTest
     serverToClient.offer(enc(Message.Rinit(1, version, Seq.empty)))
     assert(negotiated)
     assert(f.isDefined && Await.result(f.liftToTry, 5.seconds).isReturn)
-  }
 
-  test("client fails gracefully") {
+  test("client fails gracefully")
     var negotiated = false
 
     val client = Handshake.client(
@@ -215,10 +193,8 @@ class HandshakeTest
         version = 0x0001,
         headers = Seq.empty,
         negotiate = (_, trans) =>
-            {
             negotiated = true
             trans.map(enc, dec)
-        }
     )
 
     val f = client.write(Message.Tping(2))
@@ -232,9 +208,8 @@ class HandshakeTest
 
     assert(!negotiated)
     assert(f.isDefined && Await.result(f.liftToTry, 5.seconds).isReturn)
-  }
 
-  test("server handshake") {
+  test("server handshake")
     val version = 10: Short
     val hdrs =
       Seq(wrappedBuffer("key".getBytes) -> wrappedBuffer("value".getBytes))
@@ -245,10 +220,8 @@ class HandshakeTest
         version = version,
         headers = _ => hdrs,
         negotiate = (_, trans) =>
-            {
             negotiated = true
             trans.map(enc, dec)
-        }
     )
 
     clientToServer.offer(enc(Message.Tinit(1, version, Seq.empty)))
@@ -257,9 +230,8 @@ class HandshakeTest
         dec(Await.result(serverToClient.poll(), 5.seconds)) == Message.Rinit(
             1, version, hdrs))
     assert(negotiated)
-  }
 
-  test("version mismatch") {
+  test("version mismatch")
     var clientNegotiated = false
     var serverNegotiated = false
 
@@ -271,10 +243,8 @@ class HandshakeTest
         version = clientVersion,
         headers = Seq.empty,
         negotiate = (_, trans) =>
-            {
             clientNegotiated = true
             trans.map(enc, dec)
-        }
     )
 
     val server = Handshake.server(
@@ -282,19 +252,15 @@ class HandshakeTest
         version = serverVersion,
         headers = identity,
         negotiate = (_, trans) =>
-            {
             serverNegotiated = true
             trans.map(enc, dec)
-        }
     )
 
-    val f0 = intercept[Failure] {
+    val f0 = intercept[Failure]
       Await.result(client.write(Message.Tping(1)), 5.seconds)
-    }
 
-    val f1 = intercept[Failure] {
+    val f1 = intercept[Failure]
       Await.result(server.write(Message.Rping(1)), 5.seconds)
-    }
 
     val msg = s"unsupported version $clientVersion, expected $serverVersion"
     assert(f0.getMessage == msg)
@@ -307,9 +273,8 @@ class HandshakeTest
 
     assert(client.status == Status.Closed)
     assert(server.status == Status.Closed)
-  }
 
-  test("server passes non-init messages through") {
+  test("server passes non-init messages through")
     var negotiated = false
 
     val server = Handshake.server(
@@ -317,15 +282,11 @@ class HandshakeTest
         version = 0x0001,
         headers = identity,
         negotiate = (_, trans) =>
-            {
             negotiated = true
             trans.map(enc, dec)
-        }
     )
 
     clientToServer.offer(enc(Message.Tping(1)))
     assert(serverToClient.drain() == Return(Queue.empty))
     assert(Await.result(server.read(), 5.seconds) == Message.Tping(1))
     assert(!negotiated)
-  }
-}

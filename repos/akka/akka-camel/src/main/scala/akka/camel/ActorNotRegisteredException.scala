@@ -8,6 +8,5 @@ package akka.camel
   * found in the actor system.
   *
   */
-class ActorNotRegisteredException(uri: String) extends RuntimeException {
+class ActorNotRegisteredException(uri: String) extends RuntimeException
   override def getMessage: String = "Actor [%s] doesn't exist" format uri
-}

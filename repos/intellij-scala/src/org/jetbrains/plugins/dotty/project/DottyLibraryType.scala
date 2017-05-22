@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.project.ScalaLibraryProperties
   * @author Nikolay.Tropin
   */
 class DottyLibraryType
-    extends LibraryType[ScalaLibraryProperties](DottyLibraryKind) {
+    extends LibraryType[ScalaLibraryProperties](DottyLibraryKind)
 
   override def getIcon = Icons.SCALA_SDK
 
@@ -32,9 +32,8 @@ class DottyLibraryType
       editorComponent: LibraryEditorComponent[ScalaLibraryProperties])
     : LibraryPropertiesEditor =
     new DottyLibraryPropertiesEditor(editorComponent)
-}
 
-object DottyLibraryType {
+object DottyLibraryType
 
   def instance =
     Option(
@@ -42,4 +41,3 @@ object DottyLibraryType {
           .findByKind(DottyLibraryKind)
           .asInstanceOf[DottyLibraryType]).getOrElse(
         throw new NoSuchElementException("Dotty library type not found"))
-}

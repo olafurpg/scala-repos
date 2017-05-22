@@ -12,9 +12,9 @@ import play.api.libs.json.Json
 import org.specs2.mutable.Specification
 import org.joda.time.{DateTime, LocalDate}
 
-object FormSpec extends Specification {
-  "A form" should {
-    "have an error due to a malformed email" in {
+object FormSpec extends Specification
+  "A form" should
+    "have an error due to a malformed email" in
       val f5 = ScalaForms.emailForm.fillAndValidate(("john@", "John"))
       f5.errors must haveSize(1)
       f5.errors.find(_.message == "error.email") must beSome
@@ -23,9 +23,8 @@ object FormSpec extends Specification {
         ScalaForms.emailForm.fillAndValidate(("john@zen.....com", "John"))
       f6.errors must haveSize(1)
       f6.errors.find(_.message == "error.email") must beSome
-    }
 
-    "be valid with a well-formed email" in {
+    "be valid with a well-formed email" in
       val f7 = ScalaForms.emailForm.fillAndValidate(("john@zen.com", "John"))
       f7.errors must beEmpty
 
@@ -40,9 +39,8 @@ object FormSpec extends Specification {
       ScalaForms.emailForm
         .fillAndValidate(("o'flynn@example.com", "O'Flynn"))
         .errors must beEmpty
-    }
 
-    "support mapping 22 fields" in {
+    "support mapping 22 fields" in
       val form = Form(
           tuple(
               "k1" -> of[String],
@@ -97,10 +95,9 @@ object FormSpec extends Specification {
                 "k22" -> "v22"
             ))
         .fold(_ => "errors", t => t._21) must_== "v21"
-    }
 
-    "apply constraints on wrapped mappings" in {
-      "when it binds data" in {
+    "apply constraints on wrapped mappings" in
+      "when it binds data" in
         val f1 = ScalaForms.form.bind(Map("foo" -> "0"))
         f1.errors must haveSize(1)
         f1.errors.find(_.message == "first.digit") must beSome
@@ -115,9 +112,8 @@ object FormSpec extends Specification {
         val f4 = ScalaForms.form.bind(Map("foo" -> "333"))
         f4.errors must haveSize(1)
         f4.errors.find(_.message == "number.42") must beSome
-      }
 
-      "when it is filled with data" in {
+      "when it is filled with data" in
         val f1 = ScalaForms.form.fillAndValidate(0)
         f1.errors must haveSize(1)
         f1.errors.find(_.message == "first.digit") must beSome
@@ -133,10 +129,8 @@ object FormSpec extends Specification {
         val f4 = ScalaForms.form.fillAndValidate(333)
         f4.errors must haveSize(1)
         f4.errors.find(_.message == "number.42") must beSome
-      }
-    }
 
-    "apply constraints on longNumber fields" in {
+    "apply constraints on longNumber fields" in
       val f1 = ScalaForms.longNumberForm.fillAndValidate(0)
       f1.errors must haveSize(1)
       f1.errors.find(_.message == "error.min") must beSome
@@ -150,9 +144,8 @@ object FormSpec extends Specification {
 
       val f4 = ScalaForms.longNumberForm.fillAndValidate(42)
       f4.errors must beEmpty
-    }
 
-    "apply constraints on shortNumber fields" in {
+    "apply constraints on shortNumber fields" in
       val f1 = ScalaForms.shortNumberForm.fillAndValidate(0)
       f1.errors must haveSize(1)
       f1.errors.find(_.message == "error.min") must beSome
@@ -166,9 +159,8 @@ object FormSpec extends Specification {
 
       val f4 = ScalaForms.shortNumberForm.fillAndValidate(42)
       f4.errors must beEmpty
-    }
 
-    "apply constraints on byteNumber fields" in {
+    "apply constraints on byteNumber fields" in
       val f1 = ScalaForms.byteNumberForm.fillAndValidate(0)
       f1.errors must haveSize(1)
       f1.errors.find(_.message == "error.min") must beSome
@@ -182,14 +174,12 @@ object FormSpec extends Specification {
 
       val f4 = ScalaForms.byteNumberForm.fillAndValidate(42)
       f4.errors must beEmpty
-    }
 
-    "apply constraints on char fields" in {
+    "apply constraints on char fields" in
       val f = ScalaForms.charForm.fillAndValidate('M')
       f.errors must beEmpty
-    }
 
-    "not even attempt to validate on fill" in {
+    "not even attempt to validate on fill" in
       val failingValidatorForm = Form(
           "foo" -> Forms.text.verifying(
               "isEmpty",
@@ -200,16 +190,13 @@ object FormSpec extends Specification {
                       "Validation was run when it wasn't meant to"))
       )
       failingValidatorForm.fill("foo").errors must beEmpty
-    }
-  }
 
-  "render form using field[Type] syntax" in {
+  "render form using field[Type] syntax" in
     val anyData = Map("email" -> "bob@gmail.com", "password" -> "123")
     ScalaForms.loginForm.bind(anyData).get.toString must equalTo(
         "(bob@gmail.com,123)")
-  }
 
-  "support default values" in {
+  "support default values" in
     ScalaForms.defaultValuesForm.bindFromRequest(Map()).get must equalTo(
         (42, "default text"))
     ScalaForms.defaultValuesForm
@@ -224,9 +211,8 @@ object FormSpec extends Specification {
     val f1 =
       ScalaForms.defaultValuesForm.bindFromRequest(Map("pos" -> Seq("abc")))
     f1.errors must haveSize(1)
-  }
 
-  "support repeated values" in {
+  "support repeated values" in
     ScalaForms.repeatedForm.bindFromRequest(Map("name" -> Seq("Kiki"))).get must equalTo(
         ("Kiki", Seq()))
     ScalaForms.repeatedForm
@@ -252,9 +238,8 @@ object FormSpec extends Specification {
           Map("name" -> Seq("Kiki"),
               "emails[]" -> Seq("kiki@gmail.com", "kiki@zen.com")))
       .get must equalTo(("Kiki", Seq("kiki@gmail.com", "kiki@zen.com")))
-  }
 
-  "support repeated values with set" in {
+  "support repeated values with set" in
     ScalaForms.repeatedFormWithSet
       .bindFromRequest(Map("name" -> Seq("Kiki")))
       .get must equalTo(("Kiki", Set()))
@@ -286,45 +271,38 @@ object FormSpec extends Specification {
           Map("name" -> Seq("Kiki"),
               "emails[]" -> Seq("kiki@gmail.com", "kiki@gmail.com")))
       .get must equalTo(("Kiki", Set("kiki@gmail.com")))
-  }
 
-  "render a form with max 18 fields" in {
+  "render a form with max 18 fields" in
     ScalaForms.helloForm
       .bind(Map("name" -> "foo", "repeat" -> "1"))
       .get
       .toString must equalTo(
         "(foo,1,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None,None)")
-  }
 
-  "render form using jodaDate" in {
+  "render form using jodaDate" in
     val dateForm = Form(("date" -> jodaDate))
     val data = Map("date" -> "2012-01-01")
     dateForm.bind(data).get mustEqual (new DateTime(2012, 1, 1, 0, 0))
-  }
 
-  "render form using jodaDate with format(30/1/2012)" in {
+  "render form using jodaDate with format(30/1/2012)" in
     val dateForm = Form(("date" -> jodaDate("dd/MM/yyyy")))
     val data = Map("date" -> "30/1/2012")
     dateForm.bind(data).get mustEqual (new DateTime(2012, 1, 30, 0, 0))
-  }
 
-  "render form using jodaLocalDate with format(30/1/2012)" in {
+  "render form using jodaLocalDate with format(30/1/2012)" in
     val dateForm = Form(("date" -> jodaLocalDate("dd/MM/yyyy")))
     val data = Map("date" -> "30/1/2012")
     dateForm.bind(data).get mustEqual (new LocalDate(2012, 1, 30))
-  }
 
-  "reject input if it contains global errors" in {
+  "reject input if it contains global errors" in
     Form("value" -> nonEmptyText)
       .withGlobalError("some.error")
       .bind(Map("value" -> "some value"))
       .errors
-      .headOption must beSome.like {
+      .headOption must beSome.like
       case error => error.message must equalTo("some.error")
-    }
-  }
 
-  "find nested error on unbind" in {
+  "find nested error on unbind" in
     case class Item(text: String)
     case class Items(seq: Seq[Item])
     val itemForm = Form[Items](
@@ -342,19 +320,16 @@ object FormSpec extends Specification {
     )
 
     result should beFalse
-  }
 
-  "support boolean binding from json" in {
+  "support boolean binding from json" in
     ScalaForms.booleanForm.bind(Json.obj("accepted" -> "true")).get must beTrue
     ScalaForms.booleanForm.bind(Json.obj("accepted" -> "false")).get must beFalse
-  }
 
-  "reject boolean binding from an invalid json" in {
+  "reject boolean binding from an invalid json" in
     val f = ScalaForms.booleanForm.bind(Json.obj("accepted" -> "foo"))
     f.errors must not be 'empty
-  }
 
-  "correctly lookup error messages when using errorsAsJson" in {
+  "correctly lookup error messages when using errorsAsJson" in
     val messagesApi =
       new DefaultMessagesApi(Environment.simple(),
                              Configuration.reference,
@@ -368,10 +343,8 @@ object FormSpec extends Specification {
            None)
     (form.errorsAsJson \ "foo")(0).asOpt[String] must beSome(
         "This is a custom error")
-  }
-}
 
-object ScalaForms {
+object ScalaForms
 
   val booleanForm = Form("accepted" -> Forms.boolean)
 
@@ -457,4 +430,3 @@ object ScalaForms {
   val byteNumberForm = Form("byteNumber" -> shortNumber(10, 42))
 
   val charForm = Form("gender" -> char)
-}

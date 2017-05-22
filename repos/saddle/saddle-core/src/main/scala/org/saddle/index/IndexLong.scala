@@ -27,7 +27,7 @@ import locator.Locator
 /**
   * Index with long keys
   */
-class IndexLong(keys: Vec[Long]) extends Index[Long] {
+class IndexLong(keys: Vec[Long]) extends Index[Long]
   val scalarTag = ScalarTagLong
 
   private lazy val (lmap, IndexProperties(contiguous, monotonic)) =
@@ -64,42 +64,37 @@ class IndexLong(keys: Vec[Long]) extends Index[Long] {
     JoinerImpl.join(this, other, how)
 
   // Intersects two indices if both have set semantics
-  def intersect(other: Index[Long]): ReIndexer[Long] = {
+  def intersect(other: Index[Long]): ReIndexer[Long] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot intersect non-unique indexes")
     JoinerImpl.join(this, other, InnerJoin)
-  }
 
   // Unions two indices if both have set semantics
-  def union(other: Index[Long]): ReIndexer[Long] = {
+  def union(other: Index[Long]): ReIndexer[Long] =
     if (!this.isUnique || !other.isUnique)
       throw Index.IndexException("Cannot union non-unique indexes")
     JoinerImpl.join(this, other, OuterJoin)
-  }
 
-  def slice(from: Int, until: Int, stride: Int): Index[Long] = {
+  def slice(from: Int, until: Int, stride: Int): Index[Long] =
     new IndexLong(keys.slice(from, until, stride))
-  }
 
   // find the first location whereby an insertion would maintain a sorted index
-  def lsearch(t: Long): Int = {
+  def lsearch(t: Long): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   // find the last location whereby an insertion would maintain a sorted index
-  def rsearch(t: Long): Int = {
+  def rsearch(t: Long): Int =
     require(isMonotonic, "Index must be sorted")
 
     val fnd = locator.count(t)
 
     if (fnd > 0) fnd + locator.get(t)
     else -(binarySearch(keys, t) + 1)
-  }
 
   def map[@spec(Boolean, Int, Long, Double) B : ST : ORD](
       f: Long => B): Index[B] =
@@ -108,19 +103,14 @@ class IndexLong(keys: Vec[Long]) extends Index[Long] {
   def toArray: Array[Long] = keys.toArray
 
   /**Default equality does an iterative, element-wise equality check of all values. */
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case rv: IndexInt =>
-        (this eq rv) || (this.length == rv.length) && {
+        (this eq rv) || (this.length == rv.length) &&
           var i = 0
           var eq = true
-          while (eq && i < this.length) {
+          while (eq && i < this.length)
             eq &&= raw(i) == rv.raw(i)
             i += 1
-          }
           eq
-        }
       case _ => super.equals(o)
-    }
-  }
-}

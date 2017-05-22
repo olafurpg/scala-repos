@@ -46,13 +46,12 @@ import org.apache.spark.storage.{BlockId, BlockStatus}
   */
 @DeveloperApi
 class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
-    extends Serializable {
+    extends Serializable
   import InternalAccumulator._
 
   // Needed for Java tests
-  def this() {
+  def this()
     this(InternalAccumulator.createAll())
-  }
 
   /**
     * All accumulators registered with this task.
@@ -63,13 +62,12 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   /**
     * A map for quickly accessing the initial set of accumulators by name.
     */
-  private val initialAccumsMap: Map[String, Accumulator[_]] = {
+  private val initialAccumsMap: Map[String, Accumulator[_]] =
     val map = new mutable.HashMap[String, Accumulator[_]]
-    initialAccums.foreach { a =>
-      val name = a.name.getOrElse {
+    initialAccums.foreach  a =>
+      val name = a.name.getOrElse
         throw new IllegalArgumentException(
             "initial accumulators passed to TaskMetrics must be named")
-      }
       require(
           a.isInternal,
           s"initial accumulator '$name' passed to TaskMetrics must be marked as internal")
@@ -77,9 +75,7 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
           !map.contains(name),
           s"detected duplicate accumulator name '$name' when constructing TaskMetrics")
       map(name) = a
-    }
     map.toMap
-  }
 
   // Each metric is internally represented as an accumulator
   private val _executorDeserializeTime = getAccum(EXECUTOR_DESERIALIZE_TIME)
@@ -144,14 +140,12 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
     _updatedBlockStatuses.localValue
 
   @deprecated("use updatedBlockStatuses instead", "2.0.0")
-  def updatedBlocks: Option[Seq[(BlockId, BlockStatus)]] = {
+  def updatedBlocks: Option[Seq[(BlockId, BlockStatus)]] =
     if (updatedBlockStatuses.nonEmpty) Some(updatedBlockStatuses) else None
-  }
 
   @deprecated("setting updated blocks is not allowed", "2.0.0")
-  def updatedBlocks_=(blocks: Option[Seq[(BlockId, BlockStatus)]]): Unit = {
+  def updatedBlocks_=(blocks: Option[Seq[(BlockId, BlockStatus)]]): Unit =
     blocks.foreach(setUpdatedBlockStatuses)
-  }
 
   // Setters and increment-ers
   private[spark] def setExecutorDeserializeTime(v: Long): Unit =
@@ -179,9 +173,8 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
     * Get a Long accumulator from the given map by name, assuming it exists.
     * Note: this only searches the initial set of accumulators passed into the constructor.
     */
-  private[spark] def getAccum(name: String): Accumulator[Long] = {
+  private[spark] def getAccum(name: String): Accumulator[Long] =
     TaskMetrics.getAccum[Long](initialAccumsMap, name)
-  }
 
   /* ========================== *
    |        INPUT METRICS       |
@@ -199,28 +192,24 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
     * Get or create a new [[InputMetrics]] associated with this task.
     */
   private[spark] def registerInputMetrics(
-      readMethod: DataReadMethod.Value): InputMetrics = {
-    synchronized {
-      val metrics = _inputMetrics.getOrElse {
+      readMethod: DataReadMethod.Value): InputMetrics =
+    synchronized
+      val metrics = _inputMetrics.getOrElse
         val metrics = new InputMetrics(initialAccumsMap)
         metrics.setReadMethod(readMethod)
         _inputMetrics = Some(metrics)
         metrics
-      }
       // If there already exists an InputMetric with the same read method, we can just return
       // that one. Otherwise, if the read method is different from the one previously seen by
       // this task, we return a new dummy one to avoid clobbering the values of the old metrics.
       // In the future we should try to store input metrics from all different read methods at
       // the same time (SPARK-5225).
-      if (metrics.readMethod == readMethod) {
+      if (metrics.readMethod == readMethod)
         metrics
-      } else {
+      else
         val m = new InputMetrics
         m.setReadMethod(readMethod)
         m
-      }
-    }
-  }
 
   /* ============================ *
    |        OUTPUT METRICS        |
@@ -235,22 +224,19 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   def outputMetrics: Option[OutputMetrics] = _outputMetrics
 
   @deprecated("setting OutputMetrics is for internal use only", "2.0.0")
-  def outputMetrics_=(om: Option[OutputMetrics]): Unit = {
+  def outputMetrics_=(om: Option[OutputMetrics]): Unit =
     _outputMetrics = om
-  }
 
   /**
     * Get or create a new [[OutputMetrics]] associated with this task.
     */
   private[spark] def registerOutputMetrics(
-      writeMethod: DataWriteMethod.Value): OutputMetrics = synchronized {
-    _outputMetrics.getOrElse {
+      writeMethod: DataWriteMethod.Value): OutputMetrics = synchronized
+    _outputMetrics.getOrElse
       val metrics = new OutputMetrics(initialAccumsMap)
       metrics.setWriteMethod(writeMethod)
       _outputMetrics = Some(metrics)
       metrics
-    }
-  }
 
   /* ================================== *
    |        SHUFFLE READ METRICS        |
@@ -282,18 +268,17 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
     * be lost.
     */
   private[spark] def registerTempShuffleReadMetrics(): ShuffleReadMetrics =
-    synchronized {
+    synchronized
       val readMetrics = new ShuffleReadMetrics
       tempShuffleReadMetrics += readMetrics
       readMetrics
-    }
 
   /**
     * Merge values across all temporary [[ShuffleReadMetrics]] into `_shuffleReadMetrics`.
     * This is expected to be called on executor heartbeat and at the end of a task.
     */
-  private[spark] def mergeShuffleReadMetrics(): Unit = synchronized {
-    if (tempShuffleReadMetrics.nonEmpty) {
+  private[spark] def mergeShuffleReadMetrics(): Unit = synchronized
+    if (tempShuffleReadMetrics.nonEmpty)
       val metrics = new ShuffleReadMetrics(initialAccumsMap)
       metrics.setRemoteBlocksFetched(
           tempShuffleReadMetrics.map(_.remoteBlocksFetched).sum)
@@ -306,8 +291,6 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
           tempShuffleReadMetrics.map(_.localBytesRead).sum)
       metrics.setRecordsRead(tempShuffleReadMetrics.map(_.recordsRead).sum)
       _shuffleReadMetrics = Some(metrics)
-    }
-  }
 
   /* =================================== *
    |        SHUFFLE WRITE METRICS        |
@@ -321,29 +304,25 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   def shuffleWriteMetrics: Option[ShuffleWriteMetrics] = _shuffleWriteMetrics
 
   @deprecated("setting ShuffleWriteMetrics is for internal use only", "2.0.0")
-  def shuffleWriteMetrics_=(swm: Option[ShuffleWriteMetrics]): Unit = {
+  def shuffleWriteMetrics_=(swm: Option[ShuffleWriteMetrics]): Unit =
     _shuffleWriteMetrics = swm
-  }
 
   /**
     * Get or create a new [[ShuffleWriteMetrics]] associated with this task.
     */
   private[spark] def registerShuffleWriteMetrics(): ShuffleWriteMetrics =
-    synchronized {
-      _shuffleWriteMetrics.getOrElse {
+    synchronized
+      _shuffleWriteMetrics.getOrElse
         val metrics = new ShuffleWriteMetrics(initialAccumsMap)
         _shuffleWriteMetrics = Some(metrics)
         metrics
-      }
-    }
 
   /* ========================== *
    |        OTHER THINGS        |
    * ========================== */
 
-  private[spark] def registerAccumulator(a: Accumulable[_, _]): Unit = {
+  private[spark] def registerAccumulator(a: Accumulable[_, _]): Unit =
     accums += a
-  }
 
   /**
     * Return the latest updates of accumulators in this task.
@@ -352,21 +331,18 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
     * field is always empty, since this represents the partial updates recorded in this task,
     * not the aggregated value across multiple tasks.
     */
-  def accumulatorUpdates(): Seq[AccumulableInfo] = {
-    accums.map { a =>
+  def accumulatorUpdates(): Seq[AccumulableInfo] =
+    accums.map  a =>
       a.toInfo(Some(a.localValue), None)
-    }
-  }
 
   // If we are reconstructing this TaskMetrics on the driver, some metrics may already be set.
   // If so, initialize all relevant metrics classes so listeners can access them downstream.
-  {
     var (hasShuffleRead, hasShuffleWrite, hasInput, hasOutput) =
       (false, false, false, false)
-    initialAccums.filter { a =>
+    initialAccums.filter  a =>
       a.localValue != a.zero
-    }.foreach { a =>
-      a.name.get match {
+    .foreach  a =>
+      a.name.get match
         case sr if sr.startsWith(SHUFFLE_READ_METRICS_PREFIX) =>
           hasShuffleRead = true
         case sw if sw.startsWith(SHUFFLE_WRITE_METRICS_PREFIX) =>
@@ -374,20 +350,13 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
         case in if in.startsWith(INPUT_METRICS_PREFIX) => hasInput = true
         case out if out.startsWith(OUTPUT_METRICS_PREFIX) => hasOutput = true
         case _ =>
-      }
-    }
-    if (hasShuffleRead) {
+    if (hasShuffleRead)
       _shuffleReadMetrics = Some(new ShuffleReadMetrics(initialAccumsMap))
-    }
-    if (hasShuffleWrite) {
+    if (hasShuffleWrite)
       _shuffleWriteMetrics = Some(new ShuffleWriteMetrics(initialAccumsMap))
-    }
     if (hasInput) { _inputMetrics = Some(new InputMetrics(initialAccumsMap)) }
-    if (hasOutput) {
+    if (hasOutput)
       _outputMetrics = Some(new OutputMetrics(initialAccumsMap))
-    }
-  }
-}
 
 /**
   * Internal subclass of [[TaskMetrics]] which is used only for posting events to listeners.
@@ -401,16 +370,14 @@ class TaskMetrics private[spark](initialAccums: Seq[Accumulator[_]])
   */
 private[spark] class ListenerTaskMetrics(
     initialAccums: Seq[Accumulator[_]], accumUpdates: Seq[AccumulableInfo])
-    extends TaskMetrics(initialAccums) {
+    extends TaskMetrics(initialAccums)
 
   override def accumulatorUpdates(): Seq[AccumulableInfo] = accumUpdates
 
-  override private[spark] def registerAccumulator(a: Accumulable[_, _]): Unit = {
+  override private[spark] def registerAccumulator(a: Accumulable[_, _]): Unit =
     throw new UnsupportedOperationException("This TaskMetrics is read-only")
-  }
-}
 
-private[spark] object TaskMetrics extends Logging {
+private[spark] object TaskMetrics extends Logging
 
   def empty: TaskMetrics = new TaskMetrics
 
@@ -418,18 +385,16 @@ private[spark] object TaskMetrics extends Logging {
     * Get an accumulator from the given map by name, assuming it exists.
     */
   def getAccum[T](
-      accumMap: Map[String, Accumulator[_]], name: String): Accumulator[T] = {
+      accumMap: Map[String, Accumulator[_]], name: String): Accumulator[T] =
     require(accumMap.contains(name), s"metric '$name' is missing")
     val accum = accumMap(name)
-    try {
+    try
       // Note: we can't do pattern matching here because types are erased by compile time
       accum.asInstanceOf[Accumulator[T]]
-    } catch {
+    catch
       case e: ClassCastException =>
         throw new SparkException(
             s"accumulator $name was of unexpected type", e)
-    }
-  }
 
   /**
     * Construct a [[TaskMetrics]] object from a list of accumulator updates, called on driver only.
@@ -441,20 +406,16 @@ private[spark] object TaskMetrics extends Logging {
     * This assumes the provided updates contain the initial set of accumulators representing
     * internal task level metrics.
     */
-  def fromAccumulatorUpdates(accumUpdates: Seq[AccumulableInfo]): TaskMetrics = {
+  def fromAccumulatorUpdates(accumUpdates: Seq[AccumulableInfo]): TaskMetrics =
     // Initial accumulators are passed into the TaskMetrics constructor first because these
     // are required to be uniquely named. The rest of the accumulators from this task are
     // registered later because they need not satisfy this requirement.
-    val definedAccumUpdates = accumUpdates.filter { info =>
+    val definedAccumUpdates = accumUpdates.filter  info =>
       info.update.isDefined
-    }
-    val initialAccums = definedAccumUpdates.filter { info =>
+    val initialAccums = definedAccumUpdates.filter  info =>
       info.name.exists(_.startsWith(InternalAccumulator.METRICS_PREFIX))
-    }.map { info =>
+    .map  info =>
       val accum = InternalAccumulator.create(info.name.get)
       accum.setValueAny(info.update.get)
       accum
-    }
     new ListenerTaskMetrics(initialAccums, definedAccumUpdates)
-  }
-}

@@ -3,7 +3,7 @@ package breeze.linalg
 import breeze.generic.UFunc
 import breeze.numerics._
 
-object EnforceUFuncCoverage {
+object EnforceUFuncCoverage
 
   sealed trait Witness[F, L, T]
   sealed trait One
@@ -75,9 +75,7 @@ object EnforceUFuncCoverage {
 
   // Ensure things work
   private object Q extends UFunc
-  shapeless.test.illTyped {
+  shapeless.test.illTyped
     """
       EnforceUFuncCoverage.vectors1(Q)
     """
-  }
-}

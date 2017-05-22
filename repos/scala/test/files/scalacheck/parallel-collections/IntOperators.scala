@@ -2,7 +2,7 @@ package scala.collection.parallel.ops
 
 import scala.collection.parallel._
 
-trait IntOperators extends Operators[Int] {
+trait IntOperators extends Operators[Int]
   def reduceOperators =
     List(_ + _, _ * _, math.min(_, _), math.max(_, _), _ ^ _)
   def countPredicates = List(
@@ -28,9 +28,9 @@ trait IntOperators extends Operators[Int] {
   def mapFunctions =
     List(-_, math.abs(_), _ % 2, _ % 3, _ % 4, _ % 150, _ % 500)
   def partialMapFunctions =
-    List({ case x => -x }, { case 0 => -1; case x if x > 0 => x + 1 }, {
+    List({ case x => -x }, { case 0 => -1; case x if x > 0 => x + 1 },
       case x if x % 3 == 0 => x / 3
-    })
+    )
   def flatMapFunctions = List(
       (n: Int) =>
         if (n < 0) List()
@@ -109,9 +109,8 @@ trait IntOperators extends Operators[Int] {
       _ * 2,
       _ + 1
   )
-}
 
-trait IntSeqOperators extends IntOperators with SeqOperators[Int] {
+trait IntSeqOperators extends IntOperators with SeqOperators[Int]
   def segmentLengthPredicates = List(
       _ % 2 == 0,
       _ > 0,
@@ -181,4 +180,3 @@ trait IntSeqOperators extends IntOperators with SeqOperators[Int] {
       List(4, 5, 6, 7, 8, 9, 0),
       List(-4, -3, -2, -1)
   )
-}

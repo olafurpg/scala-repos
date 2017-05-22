@@ -33,14 +33,14 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import scalaz.std.map._
 
 trait ReductionFinderModule[M[+ _]]
-    extends DAG with EvaluatorMethodsModule[M] with TransSpecableModule[M] {
+    extends DAG with EvaluatorMethodsModule[M] with TransSpecableModule[M]
   type TS1 = trans.TransSpec1
   import library._
   import trans._
   import TableModule.CrossOrder
   import CrossOrder._
 
-  trait ReductionFinder extends EvaluatorMethods with TransSpecable {
+  trait ReductionFinder extends EvaluatorMethods with TransSpecable
     import dag._
     import instructions._
 
@@ -48,85 +48,74 @@ trait ReductionFinderModule[M[+ _]]
         reduce: dag.Reduce, spec: TransSpec1, ancestor: DepGraph)
 
     def buildReduceInfo(
-        reduce: dag.Reduce, ctx: EvaluationContext): ReduceInfo = {
+        reduce: dag.Reduce, ctx: EvaluationContext): ReduceInfo =
       val (spec, ancestor) = findTransSpecAndAncestor(reduce.parent, ctx)
         .getOrElse((Leaf(Source), reduce.parent))
       ReduceInfo(reduce, spec, ancestor)
-    }
 
     def findReductions(
-        node: DepGraph, ctx: EvaluationContext): MegaReduceState = {
-      implicit val m = new Monoid[List[dag.Reduce]] {
+        node: DepGraph, ctx: EvaluationContext): MegaReduceState =
+      implicit val m = new Monoid[List[dag.Reduce]]
         def zero: List[dag.Reduce] = Nil
         def append(x: List[dag.Reduce], y: => List[dag.Reduce]) = x ::: y
-      }
 
       val reduces = node
-        .foldDown[List[dag.Reduce]](true) {
+        .foldDown[List[dag.Reduce]](true)
           case r: dag.Reduce => List(r)
-      } distinct
+      distinct
 
       val info: List[ReduceInfo] =
         reduces map { buildReduceInfo(_: dag.Reduce, ctx) }
 
       // for each reduce node, associate it with its ancestor
       val (ancestorByReduce, specByParent) = info.foldLeft(
-          (Map[dag.Reduce, DepGraph](), Map[DepGraph, TransSpec1]())) {
+          (Map[dag.Reduce, DepGraph](), Map[DepGraph, TransSpec1]()))
         case ((ancestorByReduce, specByParent),
               ReduceInfo(reduce, spec, ancestor)) =>
           (ancestorByReduce + (reduce -> ancestor),
            specByParent + (reduce.parent -> spec))
-      }
 
       // for each ancestor, assemble a list of the parents it created
       val parentsByAncestor = (info groupBy { _.ancestor })
-        .foldLeft(Map[DepGraph, List[DepGraph]]()) {
+        .foldLeft(Map[DepGraph, List[DepGraph]]())
         case (parentsByAncestor, (ancestor, lst)) =>
           parentsByAncestor +
           (ancestor -> (lst map { _.reduce.parent } distinct))
-      }
 
       // for each parent, assemble a list of the reduces it created
       val reducesByParent = (info groupBy { _.reduce.parent })
-        .foldLeft(Map[DepGraph, List[dag.Reduce]]()) {
+        .foldLeft(Map[DepGraph, List[dag.Reduce]]())
         case (reducesByParent, (parent, lst)) =>
           reducesByParent + (parent -> (lst map { _.reduce }))
-      }
 
       MegaReduceState(
           ancestorByReduce, parentsByAncestor, reducesByParent, specByParent)
-    }
 
     case class MegaReduceState(
         ancestorByReduce: Map[dag.Reduce, DepGraph],
         parentsByAncestor: Map[DepGraph, List[DepGraph]],
         reducesByParent: Map[DepGraph, List[dag.Reduce]],
-        specByParent: Map[DepGraph, TransSpec1]) {
+        specByParent: Map[DepGraph, TransSpec1])
 
       def buildMembers(
-          ancestor: DepGraph): List[(TransSpec1, List[Reduction])] = {
-        parentsByAncestor(ancestor) map { p =>
+          ancestor: DepGraph): List[(TransSpec1, List[Reduction])] =
+        parentsByAncestor(ancestor) map  p =>
           (specByParent(p), reducesByParent(p) map { _.red })
-        }
-      }
-    }
 
-    def megaReduce(node: DepGraph, st: MegaReduceState): DepGraph = {
+    def megaReduce(node: DepGraph, st: MegaReduceState): DepGraph =
       val reduceTable = mutable.Map[DepGraph, dag.MegaReduce]()
 
-      node mapDown { recurse =>
-        {
+      node mapDown  recurse =>
           case graph @ dag.Reduce(red, parent)
-              if st.ancestorByReduce contains graph => {
+              if st.ancestorByReduce contains graph =>
               val ancestor = st.ancestorByReduce(graph)
               val members = st.buildMembers(ancestor)
 
               val left =
-                reduceTable get ancestor getOrElse {
+                reduceTable get ancestor getOrElse
                   val result = dag.MegaReduce(members, recurse(ancestor))
                   reduceTable(ancestor) = result
                   result
-                }
 
               val firstIndex =
                 st.parentsByAncestor(ancestor).reverse indexOf parent
@@ -141,9 +130,3 @@ trait ReductionFinderModule[M[+ _]]
                            left,
                            Const(CLong(firstIndex))(graph.loc))(graph.loc),
                   Const(CLong(secondIndex))(graph.loc))(graph.loc)
-            }
-        }
-      }
-    }
-  }
-}

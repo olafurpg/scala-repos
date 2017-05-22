@@ -12,22 +12,20 @@ import akka.testkit.{TestLatch, ImplicitSender, DefaultTimeout, AkkaSpec}
 import akka.pattern.ask
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
+class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender
 
-  "random pool" must {
+  "random pool" must
 
-    "be able to shut down its instance" in {
+    "be able to shut down its instance" in
       val stopLatch = new TestLatch(7)
 
-      val actor = system.actorOf(RandomPool(7).props(Props(new Actor {
-        def receive = {
+      val actor = system.actorOf(RandomPool(7).props(Props(new Actor
+        def receive =
           case "hello" ⇒ sender() ! "world"
-        }
 
-        override def postStop() {
+        override def postStop()
           stopLatch.countDown()
-        }
-      })), "random-shutdown")
+      )), "random-shutdown")
 
       actor ! "hello"
       actor ! "hello"
@@ -35,41 +33,35 @@ class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       actor ! "hello"
       actor ! "hello"
 
-      within(2 seconds) {
+      within(2 seconds)
         for (i ← 1 to 5) expectMsg("world")
-      }
 
       system.stop(actor)
       Await.ready(stopLatch, 5 seconds)
-    }
 
-    "deliver messages in a random fashion" in {
+    "deliver messages in a random fashion" in
       val connectionCount = 10
       val iterationCount = 100
       val doneLatch = new TestLatch(connectionCount)
 
       val counter = new AtomicInteger
       var replies = Map.empty[Int, Int]
-      for (i ← 0 until connectionCount) {
+      for (i ← 0 until connectionCount)
         replies = replies + (i -> 0)
-      }
 
       val actor = system.actorOf(RandomPool(connectionCount).props(
-                                     routeeProps = Props(new Actor {
+                                     routeeProps = Props(new Actor
                                    lazy val id = counter.getAndIncrement()
-                                   def receive = {
+                                   def receive =
                                      case "hit" ⇒ sender() ! id
                                      case "end" ⇒ doneLatch.countDown()
-                                   }
-                                 })),
+                                 )),
                                  name = "random")
 
-      for (i ← 0 until iterationCount) {
-        for (k ← 0 until connectionCount) {
+      for (i ← 0 until iterationCount)
+        for (k ← 0 until connectionCount)
           val id = Await.result((actor ? "hit").mapTo[Int], timeout.duration)
           replies = replies + (id -> (replies(id) + 1))
-        }
-      }
 
       counter.get should ===(connectionCount)
 
@@ -78,28 +70,22 @@ class RandomSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
 
       replies.values foreach { _ should be > (0) }
       replies.values.sum should ===(iterationCount * connectionCount)
-    }
 
-    "deliver a broadcast message using the !" in {
+    "deliver a broadcast message using the !" in
       val helloLatch = new TestLatch(6)
       val stopLatch = new TestLatch(6)
 
       val actor =
-        system.actorOf(RandomPool(6).props(routeeProps = Props(new Actor {
-          def receive = {
+        system.actorOf(RandomPool(6).props(routeeProps = Props(new Actor
+          def receive =
             case "hello" ⇒ helloLatch.countDown()
-          }
 
-          override def postStop() {
+          override def postStop()
             stopLatch.countDown()
-          }
-        })), "random-broadcast")
+        )), "random-broadcast")
 
       actor ! akka.routing.Broadcast("hello")
       Await.ready(helloLatch, 5 seconds)
 
       system.stop(actor)
       Await.ready(stopLatch, 5 seconds)
-    }
-  }
-}

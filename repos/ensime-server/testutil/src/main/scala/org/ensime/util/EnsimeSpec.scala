@@ -17,7 +17,7 @@ import scala.concurrent.duration._
   */
 trait EnsimeSpec
     extends FlatSpec with Matchers with Inside with Retries with Eventually
-    with TryValues with Inspectors with TypeCheckedTripleEquals {
+    with TryValues with Inspectors with TypeCheckedTripleEquals
 
   SLF4JBridgeHandler.removeHandlersForRootLogger()
   SLF4JBridgeHandler.install()
@@ -36,8 +36,6 @@ trait EnsimeSpec
 
   // taggedAs(org.scalatest.tagobject.Retryable)
   // will be retried (don't abuse it)
-  override def withFixture(test: NoArgTest) = {
+  override def withFixture(test: NoArgTest) =
     if (isRetryable(test)) withRetry { super.withFixture(test) } else
       super.withFixture(test)
-  }
-}

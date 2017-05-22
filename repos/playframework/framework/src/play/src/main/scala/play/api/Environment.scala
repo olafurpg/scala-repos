@@ -15,7 +15,7 @@ import java.io.{InputStream, File}
   * @param mode The mode of the application.
   */
 case class Environment(
-    rootPath: File, classLoader: ClassLoader, mode: Mode.Mode) {
+    rootPath: File, classLoader: ClassLoader, mode: Mode.Mode)
 
   /**
     * Retrieves a file relative to the application root path.
@@ -65,10 +65,9 @@ case class Environment(
     * @param name the absolute name of the resource (from the classpath root)
     * @return the resource URL, if found
     */
-  def resource(name: String): Option[java.net.URL] = {
+  def resource(name: String): Option[java.net.URL] =
     val n = name.stripPrefix("/")
     Option(classLoader.getResource(n))
-  }
 
   /**
     * Scans the application classloader to retrieve a resource’s contents as a stream.
@@ -84,13 +83,11 @@ case class Environment(
     * @param name the absolute name of the resource (from the classpath root)
     * @return a stream, if found
     */
-  def resourceAsStream(name: String): Option[InputStream] = {
+  def resourceAsStream(name: String): Option[InputStream] =
     val n = name.stripPrefix("/")
     Option(classLoader.getResourceAsStream(n))
-  }
-}
 
-object Environment {
+object Environment
 
   /**
     * A simple environment.
@@ -100,4 +97,3 @@ object Environment {
     */
   def simple(path: File = new File("."), mode: Mode.Mode = Mode.Test) =
     Environment(path, Environment.getClass.getClassLoader, mode)
-}

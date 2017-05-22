@@ -5,8 +5,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class LoadedStatsReceiverTest extends FunSuite {
-  test("Forwarding to LoadedStatsReceiver") {
+class LoadedStatsReceiverTest extends FunSuite
+  test("Forwarding to LoadedStatsReceiver")
     val prev = LoadedStatsReceiver.self
     LoadedStatsReceiver.self = NullStatsReceiver
 
@@ -14,7 +14,7 @@ class LoadedStatsReceiverTest extends FunSuite {
     val csr = ClientStatsReceiver // NameTranslatingStatsReceiver
     val ssr = ServerStatsReceiver // NameTranslatingStatsReceiver
 
-    try {
+    try
       assert(dsr.isNull, "DefaultStatsReceiver should be null")
       assert(csr.isNull, "ClientStatsReceiver should be null")
       assert(ssr.isNull, "ServerStatsReceiver should be null")
@@ -33,8 +33,5 @@ class LoadedStatsReceiverTest extends FunSuite {
       assert(mem.counters(Seq("req")) == 1)
       assert(mem.counters(Seq("clnt", "req")) == 1)
       assert(mem.counters(Seq("srv", "req")) == 1)
-    } finally {
+    finally
       LoadedStatsReceiver.self = prev
-    }
-  }
-}

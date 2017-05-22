@@ -12,12 +12,12 @@ import akka.util.ByteString
 
 import scala.concurrent.{Future, Promise}
 
-class CompositionDocSpec extends AkkaSpec {
+class CompositionDocSpec extends AkkaSpec
 
   implicit val ec = system.dispatcher
   implicit val materializer = ActorMaterializer()
 
-  "nonnested flow" in {
+  "nonnested flow" in
     //#non-nested-flow
     Source
       .single(0)
@@ -28,9 +28,8 @@ class CompositionDocSpec extends AkkaSpec {
 
     // ... where is the nesting?
     //#non-nested-flow
-  }
 
-  "nested flow" in {
+  "nested flow" in
     //#nested-flow
     val nestedSource = Source
       .single(0) // An atomic source
@@ -49,9 +48,8 @@ class CompositionDocSpec extends AkkaSpec {
     // Create a RunnableGraph
     val runnableGraph = nestedSource.to(nestedSink)
     //#nested-flow
-  }
 
-  "reusing components" in {
+  "reusing components" in
     val nestedSource = Source
       .single(0) // An atomic source
       .map(_ + 1) // an atomic processing stage
@@ -73,13 +71,12 @@ class CompositionDocSpec extends AkkaSpec {
     // Usage is uniform, no matter if modules are composite or atomic
     val runnableGraph2 = Source.single(0).to(Sink.fold(0)(_ + _))
     //#reuse
-  }
 
-  "complex graph" in {
+  "complex graph" in
     // format: OFF
     //#complex-graph
     import GraphDSL.Implicits._
-    RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+    RunnableGraph.fromGraph(GraphDSL.create()  implicit builder =>
       val A: Outlet[Int]                  = builder.add(Source.single(0)).out
       val B: UniformFanOutShape[Int, Int] = builder.add(Broadcast[Int](2))
       val C: UniformFanInShape[Int, Int]  = builder.add(Merge[Int](2))
@@ -94,12 +91,12 @@ class CompositionDocSpec extends AkkaSpec {
                            E  ~>  G
 
       ClosedShape
-    })
+    )
     //#complex-graph
 
     //#complex-graph-alt
     import GraphDSL.Implicits._
-    RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+    RunnableGraph.fromGraph(GraphDSL.create()  implicit builder =>
       val B = builder.add(Broadcast[Int](2))
       val C = builder.add(Merge[Int](2))
       val E = builder.add(Balance[Int](2))
@@ -111,16 +108,15 @@ class CompositionDocSpec extends AkkaSpec {
       B.out(1).map(_ + 1) ~> E.in; E.out(0) ~> F.in(1)
       E.out(1) ~> Sink.foreach(println)
       ClosedShape
-    })
+    )
     //#complex-graph-alt
     // format: ON
-  }
 
-  "partial graph" in {
+  "partial graph" in
     // format: OFF
     //#partial-graph
     import GraphDSL.Implicits._
-    val partial = GraphDSL.create() { implicit builder =>
+    val partial = GraphDSL.create()  implicit builder =>
       val B = builder.add(Broadcast[Int](2))
       val C = builder.add(Merge[Int](2))
       val E = builder.add(Balance[Int](2))
@@ -130,7 +126,7 @@ class CompositionDocSpec extends AkkaSpec {
       B  ~>                            C  ~>  F
       B  ~>  Flow[Int].map(_ + 1)  ~>  E  ~>  F
       FlowShape(B.in, E.out(1))
-    }.named("partial")
+    .named("partial")
     //#partial-graph
     // format: ON
 
@@ -145,40 +141,37 @@ class CompositionDocSpec extends AkkaSpec {
     val flow = Flow.fromGraph(partial)
 
     // Simple way to create a graph backed Source
-    val source = Source.fromGraph( GraphDSL.create() { implicit builder =>
+    val source = Source.fromGraph( GraphDSL.create()  implicit builder =>
       val merge = builder.add(Merge[Int](2))
       Source.single(0)      ~> merge
       Source(List(2, 3, 4)) ~> merge
 
       // Exposing exactly one output port
       SourceShape(merge.out)
-    })
+    )
 
     // Building a Sink with a nested Flow, using the fluid DSL
-    val sink = {
+    val sink =
       val nestedFlow = Flow[Int].map(_ * 2).drop(10).named("nestedFlow")
       nestedFlow.to(Sink.head)
-    }
 
     // Putting all together
     val closed = source.via(flow.filter(_ > 1)).to(sink)
     //#partial-flow-dsl
     // format: ON
-  }
 
-  "closed graph" in {
+  "closed graph" in
     //#embed-closed
     val closed1 = Source.single(0).to(Sink.foreach(println))
     val closed2 = RunnableGraph.fromGraph(
-        GraphDSL.create() { implicit builder =>
+        GraphDSL.create()  implicit builder =>
       val embeddedClosed: ClosedShape = builder.add(closed1)
       // …
       embeddedClosed
-    })
+    )
     //#embed-closed
-  }
 
-  "materialized values" in {
+  "materialized values" in
     //#mat-combine-1
     // Materializes to Promise[Option[Int]]                                   (red)
     val source: Source[Int, Promise[Option[Int]]] = Source.maybe[Int]
@@ -193,9 +186,8 @@ class CompositionDocSpec extends AkkaSpec {
 
     //#mat-combine-2
     // Materializes to Unit                                                   (orange)
-    val flow2: Flow[Int, ByteString, NotUsed] = Flow[Int].map { i =>
+    val flow2: Flow[Int, ByteString, NotUsed] = Flow[Int].map  i =>
       ByteString(i.toString)
-    }
 
     // Materializes to Future[OutgoingConnection]                             (yellow)
     val flow3: Flow[ByteString, ByteString, Future[OutgoingConnection]] =
@@ -218,25 +210,22 @@ class CompositionDocSpec extends AkkaSpec {
 
     //#mat-combine-4
     case class MyClass(
-        private val p: Promise[Option[Int]], conn: OutgoingConnection) {
+        private val p: Promise[Option[Int]], conn: OutgoingConnection)
       def close() = p.trySuccess(None)
-    }
 
     def f(p: Promise[Option[Int]],
           rest: (Future[OutgoingConnection],
-          Future[String])): Future[MyClass] = {
+          Future[String])): Future[MyClass] =
 
       val connFuture = rest._1
       connFuture.map(MyClass(p, _))
-    }
 
     // Materializes to Future[MyClass]                                        (purple)
     val runnableGraph: RunnableGraph[Future[MyClass]] =
       nestedSource.toMat(nestedSink)(f)
     //#mat-combine-4
-  }
 
-  "attributes" in {
+  "attributes" in
     //#attributes-inheritance
     import Attributes._
     val nestedSource =
@@ -251,5 +240,3 @@ class CompositionDocSpec extends AkkaSpec {
       .to(Sink.fold(0)(_ + _)) // wire an atomic sink to the nestedFlow
       .withAttributes(name("nestedSink") and inputBuffer(3, 3)) // override
     //#attributes-inheritance
-  }
-}

@@ -1,8 +1,6 @@
-object O {
-  implicit class C(s: String) {
+object O
+  implicit class C(s: String)
     def twice = s + s
-  }
-}
 
 /**
 // 

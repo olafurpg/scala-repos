@@ -4,7 +4,7 @@ import java.util.Properties
 import java.io.FileInputStream
 import scala.collection.JavaConverters._
 
-object VersionUtil {
+object VersionUtil
   lazy val baseVersion = settingKey[String](
       "The base version number from which all others are derived")
   lazy val baseVersionSuffix =
@@ -39,7 +39,7 @@ object VersionUtil {
                       osgiVersion: String,
                       commitSha: String,
                       commitDate: String,
-                      isRelease: Boolean) {
+                      isRelease: Boolean)
     val githubTree =
       if (isRelease) "v" + mavenVersion
       else if (commitSha != "unknown") commitSha
@@ -53,7 +53,6 @@ object VersionUtil {
         "maven.version.number" -> mavenVersion,
         "osgi.version.number" -> osgiVersion
     )
-  }
 
   /** Compute the canonical, Maven and OSGi version number from `baseVersion` and `baseVersionSuffix`.
     * Examples of the generated versions:
@@ -70,30 +69,28 @@ object VersionUtil {
     * milestone builds. The special suffix value "SPLIT" is used to split the real suffix off from `baseVersion`
     * instead and then apply the usual logic. */
   private lazy val versionPropertiesImpl: Def.Initialize[Versions] =
-    Def.setting {
+    Def.setting
 
-      val (base, suffix) = {
+      val (base, suffix) =
         val (b, s) = (baseVersion.value, baseVersionSuffix.value)
-        if (s == "SPLIT") {
+        if (s == "SPLIT")
           val split = """([\w+\.]+)(-[\w+\.]+)??""".r
           val split(b2, sOrNull) = b
           (b2, Option(sOrNull).map(_.drop(1)).getOrElse(""))
-        } else (b, s)
-      }
+        else (b, s)
 
-      def executeTool(tool: String) = {
+      def executeTool(tool: String) =
         val cmd =
           if (System.getProperty("os.name").toLowerCase.contains("windows"))
             s"cmd.exe /c tools\\$tool.bat -p"
           else s"tools/$tool"
         Process(cmd).lines.head
-      }
 
       val date = executeTool("get-scala-commit-date")
       val sha =
         executeTool("get-scala-commit-sha").substring(0, 7) // The script produces 10 digits at the moment
 
-      val (canonicalV, mavenV, osgiV, release) = suffix match {
+      val (canonicalV, mavenV, osgiV, release) = suffix match
         case "SNAPSHOT" =>
           (s"$base-$date-$sha", s"$base-SNAPSHOT", s"$base.v$date-$sha", false)
         case "SHA-SNAPSHOT" =>
@@ -107,27 +104,23 @@ object VersionUtil {
            s"$base-$suffix",
            s"$base.v$date-$suffix-$sha",
            true)
-      }
 
       Versions(canonicalV, mavenV, osgiV, sha, date, release)
-    }
 
   private lazy val generateVersionPropertiesFileImpl: Def.Initialize[
-      Task[File]] = Def.task {
+      Task[File]] = Def.task
     writeProps(
         versionProperties.value.toMap +
         ("copyright.string" -> copyrightString.value),
         (resourceManaged in Compile).value / s"${thisProject.value.id}.properties")
-  }
 
   private lazy val generateBuildCharacterPropertiesFileImpl: Def.Initialize[
-      Task[File]] = Def.task {
+      Task[File]] = Def.task
     writeProps(
         versionProperties.value.toMap,
         (baseDirectory in ThisBuild).value / "buildcharacter.properties")
-  }
 
-  private def writeProps(m: Map[String, String], propFile: File): File = {
+  private def writeProps(m: Map[String, String], propFile: File): File =
     val props = new Properties
     m.foreach { case (k, v) => props.put(k, v) }
     // unfortunately, this will write properties in arbitrary order
@@ -136,20 +129,16 @@ object VersionUtil {
     // instead of java.util.Properties
     IO.write(props, null, propFile)
     propFile
-  }
 
   /** The global versions.properties data */
-  lazy val versionProps: Map[String, String] = {
+  lazy val versionProps: Map[String, String] =
     val props = new Properties()
     val in = new FileInputStream(file("versions.properties"))
     try props.load(in) finally in.close()
-    props.asScala.toMap.map {
+    props.asScala.toMap.map
       case (k, v) =>
         (k, sys.props.getOrElse(k, v)) // allow system properties to override versions.properties
-    }
-  }
 
   /** Get a subproject version number from `versionProps` */
   def versionNumber(name: String): String =
     versionProps(s"$name.version.number")
-}

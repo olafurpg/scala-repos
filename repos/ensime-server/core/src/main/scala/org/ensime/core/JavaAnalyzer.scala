@@ -17,26 +17,23 @@ class JavaAnalyzer(
     implicit val config: EnsimeConfig,
     implicit val vfs: EnsimeVFS
 )
-    extends Actor with Stash with ActorLogging {
+    extends Actor with Stash with ActorLogging
 
   protected var javaCompiler: JavaCompiler = _
 
   import FileUtils._
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     javaCompiler = new JavaCompiler(
         config,
-        new ReportHandler {
-          override def messageUser(str: String): Unit = {
+        new ReportHandler
+          override def messageUser(str: String): Unit =
             broadcaster ! SendBackgroundMessageEvent(str, 101)
-          }
-          override def clearAllJavaNotes(): Unit = {
+          override def clearAllJavaNotes(): Unit =
             broadcaster ! ClearAllJavaNotesEvent
-          }
-          override def reportJavaNotes(notes: List[Note]): Unit = {
+          override def reportJavaNotes(notes: List[Note]): Unit =
             broadcaster ! NewJavaNotesEvent(isFull = false, notes)
-          }
-        },
+        ,
         indexer,
         search,
         vfs
@@ -45,14 +42,12 @@ class JavaAnalyzer(
     // JavaAnalyzer is always 'ready', but legacy clients expect to see
     // AnalyzerReady
     broadcaster ! Broadcaster.Persist(AnalyzerReadyEvent)
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     // no way to stop the java compiler
-  }
 
   // TODO: create a sealed family of requests / responses just for Java usage
-  override def receive = {
+  override def receive =
     case TypecheckFileReq(sfi) =>
       javaCompiler.askTypecheckFiles(sfi :: Nil)
       sender() ! VoidResponse
@@ -86,9 +81,7 @@ class JavaAnalyzer(
       // Implicit type conversion information is not applicable for Java, so we
       // return an empty list.
       sender() ! ImplicitInfos(Nil)
-  }
-}
-object JavaAnalyzer {
+object JavaAnalyzer
   def apply(
       broadcaster: ActorRef,
       indexer: ActorRef,
@@ -97,4 +90,3 @@ object JavaAnalyzer {
       implicit config: EnsimeConfig,
       vfs: EnsimeVFS
   ) = Props(new JavaAnalyzer(broadcaster, indexer, search, config, vfs))
-}

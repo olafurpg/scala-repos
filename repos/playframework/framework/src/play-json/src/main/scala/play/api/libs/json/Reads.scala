@@ -26,7 +26,7 @@ import reflect.ClassTag
 @implicitNotFound(
     "No Json deserializer found for type ${A}. Try to implement an implicit Reads or Format for this type."
 )
-trait Reads[A] { self =>
+trait Reads[A]  self =>
 
   /**
     * Convert the JsValue into a A
@@ -34,64 +34,52 @@ trait Reads[A] { self =>
   def reads(json: JsValue): JsResult[A]
 
   def map[B](f: A => B): Reads[B] =
-    Reads[B] { json =>
+    Reads[B]  json =>
       self.reads(json).map(f)
-    }
 
-  def flatMap[B](f: A => Reads[B]): Reads[B] = Reads[B] { json =>
+  def flatMap[B](f: A => Reads[B]): Reads[B] = Reads[B]  json =>
     // Do not flatMap result to avoid repath
-    self.reads(json) match {
+    self.reads(json) match
       case JsSuccess(a, _) => f(a).reads(json)
       case error: JsError => error
-    }
-  }
 
   def filter(f: A => Boolean): Reads[A] =
-    Reads[A] { json =>
+    Reads[A]  json =>
       self.reads(json).filter(f)
-    }
 
   def filter(error: ValidationError)(f: A => Boolean): Reads[A] =
-    Reads[A] { json =>
+    Reads[A]  json =>
       self.reads(json).filter(JsError(error))(f)
-    }
 
   def filterNot(f: A => Boolean): Reads[A] =
-    Reads[A] { json =>
+    Reads[A]  json =>
       self.reads(json).filterNot(f)
-    }
 
   def filterNot(error: ValidationError)(f: A => Boolean): Reads[A] =
-    Reads[A] { json =>
+    Reads[A]  json =>
       self.reads(json).filterNot(JsError(error))(f)
-    }
 
   def collect[B](error: ValidationError)(f: PartialFunction[A, B]) =
-    Reads[B] { json =>
+    Reads[B]  json =>
       self.reads(json).collect(error)(f)
-    }
 
   def orElse(v: Reads[A]): Reads[A] =
-    Reads[A] { json =>
+    Reads[A]  json =>
       self.reads(json).orElse(v.reads(json))
-    }
 
   def compose[B <: JsValue](rb: Reads[B]): Reads[A] =
-    Reads[A] { js =>
-      rb.reads(js) match {
+    Reads[A]  js =>
+      rb.reads(js) match
         case JsSuccess(b, p) => this.reads(b).repath(p)
         case JsError(e) => JsError(e)
-      }
-    }
 
   def andThen[B](rb: Reads[B])(implicit witness: A <:< JsValue): Reads[B] =
     rb.compose(this.map(witness))
-}
 
 /**
   * Default deserializer type classes.
   */
-object Reads extends ConstraintReads with PathReads with DefaultReads {
+object Reads extends ConstraintReads with PathReads with DefaultReads
 
   val constraints: ConstraintReads = this
 
@@ -100,62 +88,51 @@ object Reads extends ConstraintReads with PathReads with DefaultReads {
   import play.api.libs.functional._
 
   implicit def applicative(implicit applicativeJsResult: Applicative[JsResult])
-    : Applicative[Reads] = new Applicative[Reads] {
+    : Applicative[Reads] = new Applicative[Reads]
 
-    def pure[A](a: A): Reads[A] = Reads[A] { _ =>
+    def pure[A](a: A): Reads[A] = Reads[A]  _ =>
       JsSuccess(a)
-    }
 
     def map[A, B](m: Reads[A], f: A => B): Reads[B] = m.map(f)
 
-    def apply[A, B](mf: Reads[A => B], ma: Reads[A]): Reads[B] = new Reads[B] {
+    def apply[A, B](mf: Reads[A => B], ma: Reads[A]): Reads[B] = new Reads[B]
       def reads(js: JsValue) = applicativeJsResult(mf.reads(js), ma.reads(js))
-    }
-  }
 
   implicit def alternative(
       implicit a: Applicative[Reads]): Alternative[Reads] =
-    new Alternative[Reads] {
+    new Alternative[Reads]
       val app = a
       def |[A, B >: A](alt1: Reads[A], alt2: Reads[B]): Reads[B] =
-        new Reads[B] {
-          def reads(js: JsValue) = alt1.reads(js) match {
+        new Reads[B]
+          def reads(js: JsValue) = alt1.reads(js) match
             case r @ JsSuccess(_, _) => r
             case r @ JsError(es1) =>
-              alt2.reads(js) match {
+              alt2.reads(js) match
                 case r2 @ JsSuccess(_, _) => r2
                 case r2 @ JsError(es2) => JsError(JsError.merge(es1, es2))
-              }
-          }
-        }
 
       def empty: Reads[Nothing] =
         new Reads[Nothing] { def reads(js: JsValue) = JsError(Seq()) }
-    }
 
   def apply[A](f: JsValue => JsResult[A]): Reads[A] =
     new Reads[A] { def reads(json: JsValue) = f(json) }
 
   implicit def functorReads(implicit a: Applicative[Reads]) =
-    new Functor[Reads] {
+    new Functor[Reads]
       def fmap[A, B](reads: Reads[A], f: A => B): Reads[B] = a.map(reads, f)
-    }
 
-  implicit object JsObjectMonoid extends Monoid[JsObject] {
+  implicit object JsObjectMonoid extends Monoid[JsObject]
     def append(o1: JsObject, o2: JsObject) = o1 deepMerge o2
     def identity = JsObject(Seq())
-  }
 
   implicit val JsObjectReducer = Reducer[JsObject, JsObject](o => o)
 
-  implicit object JsArrayMonoid extends Monoid[JsArray] {
+  implicit object JsArrayMonoid extends Monoid[JsArray]
     def append(a1: JsArray, a2: JsArray) = a1 ++ a2
     def identity = JsArray()
-  }
 
   implicit val JsArrayReducer =
     Reducer[JsValue, JsArray](js => JsArray(Seq(js)))
-}
 
 /**
   * Low priority reads.
@@ -165,48 +142,42 @@ object Reads extends ConstraintReads with PathReads with DefaultReads {
   *
   * See https://github.com/playframework/playframework/issues/4313 for more details.
   */
-trait LowPriorityDefaultReads {
+trait LowPriorityDefaultReads
 
   /**
     * Generic deserializer for collections types.
     */
   implicit def traversableReads[F[_], A](
       implicit bf: generic.CanBuildFrom[F[_], A, F[A]], ra: Reads[A]) =
-    new Reads[F[A]] {
-      def reads(json: JsValue) = json match {
+    new Reads[F[A]]
+      def reads(json: JsValue) = json match
         case JsArray(ts) =>
           type Errors = Seq[(JsPath, Seq[ValidationError])]
-          def locate(e: Errors, idx: Int) = e.map {
+          def locate(e: Errors, idx: Int) = e.map
             case (p, valerr) => (JsPath(idx)) ++ p -> valerr
-          }
 
           ts.iterator.zipWithIndex
-            .foldLeft(Right(Vector.empty): Either[Errors, Vector[A]]) {
+            .foldLeft(Right(Vector.empty): Either[Errors, Vector[A]])
               case (acc, (elt, idx)) =>
-                (acc, fromJson[A](elt)(ra)) match {
+                (acc, fromJson[A](elt)(ra)) match
                   case (Right(vs), JsSuccess(v, _)) => Right(vs :+ v)
                   case (Right(_), JsError(e)) => Left(locate(e, idx))
                   case (Left(e), _: JsSuccess[_]) => Left(e)
                   case (Left(e1), JsError(e2)) => Left(e1 ++ locate(e2, idx))
-                }
-            }
-            .fold(JsError.apply, { res =>
+            .fold(JsError.apply,  res =>
               val builder = bf()
               builder.sizeHint(res)
               builder ++= res
               JsSuccess(builder.result())
-            })
+            )
         case _ =>
           JsError(
               Seq(JsPath() -> Seq(ValidationError("error.expected.jsarray"))))
-      }
-    }
-}
 
 /**
   * Default deserializer type classes.
   */
-trait DefaultReads extends LowPriorityDefaultReads {
+trait DefaultReads extends LowPriorityDefaultReads
   import scala.language.implicitConversions
 
   /**
@@ -217,85 +188,72 @@ trait DefaultReads extends LowPriorityDefaultReads {
     *    __ARGS__ : "the args for the error msg" (JsArray)
     * }
     */
-  def JsErrorObj(knownValue: JsValue, key: String, args: JsValue*) = {
+  def JsErrorObj(knownValue: JsValue, key: String, args: JsValue*) =
     Json.obj(
         "__VAL__" -> knownValue,
         "__ERR__" -> key,
         "__ARGS__" -> args.foldLeft(JsArray())(
             (acc: JsArray, arg: JsValue) => acc :+ arg)
     )
-  }
 
   /**
     * Deserializer for Int types.
     */
-  implicit object IntReads extends Reads[Int] {
-    def reads(json: JsValue) = json match {
+  implicit object IntReads extends Reads[Int]
+    def reads(json: JsValue) = json match
       case JsNumber(n) if n.isValidInt => JsSuccess(n.toInt)
       case JsNumber(n) => JsError("error.expected.int")
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for Short types.
     */
-  implicit object ShortReads extends Reads[Short] {
-    def reads(json: JsValue) = json match {
+  implicit object ShortReads extends Reads[Short]
+    def reads(json: JsValue) = json match
       case JsNumber(n) if n.isValidShort => JsSuccess(n.toShort)
       case JsNumber(n) => JsError("error.expected.short")
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for Byte types.
     */
-  implicit object ByteReads extends Reads[Byte] {
-    def reads(json: JsValue) = json match {
+  implicit object ByteReads extends Reads[Byte]
+    def reads(json: JsValue) = json match
       case JsNumber(n) if n.isValidByte => JsSuccess(n.toByte)
       case JsNumber(n) => JsError("error.expected.byte")
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for Long types.
     */
-  implicit object LongReads extends Reads[Long] {
-    def reads(json: JsValue) = json match {
+  implicit object LongReads extends Reads[Long]
+    def reads(json: JsValue) = json match
       case JsNumber(n) if n.isValidLong => JsSuccess(n.toLong)
       case JsNumber(n) => JsError("error.expected.long")
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for Float types.
     */
-  implicit object FloatReads extends Reads[Float] {
-    def reads(json: JsValue) = json match {
+  implicit object FloatReads extends Reads[Float]
+    def reads(json: JsValue) = json match
       case JsNumber(n) => JsSuccess(n.toFloat)
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for Double types.
     */
-  implicit object DoubleReads extends Reads[Double] {
-    def reads(json: JsValue) = json match {
+  implicit object DoubleReads extends Reads[Double]
+    def reads(json: JsValue) = json match
       case JsNumber(n) => JsSuccess(n.toDouble)
       case _ => JsError("error.expected.jsnumber")
-    }
-  }
 
   /**
     * Deserializer for BigDecimal
     */
   implicit val bigDecReads = Reads[BigDecimal](
       js =>
-        js match {
+        js match
       case JsString(s) =>
         scala.util.control.Exception
           .catching(classOf[NumberFormatException])
@@ -304,13 +262,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
                   ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _ => JsError(ValidationError("error.expected.jsnumberorjsstring"))
-  })
+  )
 
   /**
     * Deserializer for BigDecimal
     */
   implicit val javaBigDecReads = Reads[java.math.BigDecimal](js =>
-        js match {
+        js match
       case JsString(s) =>
         scala.util.control.Exception
           .catching(classOf[NumberFormatException])
@@ -319,7 +277,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
                   ValidationError("error.expected.numberformatexception")))
       case JsNumber(d) => JsSuccess(d.underlying)
       case _ => JsError(ValidationError("error.expected.jsnumberorjsstring"))
-  })
+  )
 
   /**
     * Reads for the `java.util.Date` type.
@@ -330,33 +288,28 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def dateReads(
       pattern: String,
       corrector: String => String = identity): Reads[java.util.Date] =
-    new Reads[java.util.Date] {
+    new Reads[java.util.Date]
 
-      def reads(json: JsValue): JsResult[java.util.Date] = json match {
+      def reads(json: JsValue): JsResult[java.util.Date] = json match
         case JsNumber(d) => JsSuccess(new java.util.Date(d.toLong))
         case JsString(s) =>
-          parseJDate(pattern, corrector(s)) match {
+          parseJDate(pattern, corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", pattern))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
-    }
 
   private def parseJDate(
-      pattern: String, input: String): Option[java.util.Date] = {
+      pattern: String, input: String): Option[java.util.Date] =
     // REMEMBER THAT SIMPLEDATEFORMAT IS NOT THREADSAFE
     val df = new java.text.SimpleDateFormat(pattern)
     df.setLenient(false)
-    try { Some(df.parse(input)) } catch {
+    try { Some(df.parse(input)) } catch
       case x: java.text.ParseException =>
         None
-    }
-  }
 
   /**
     * the default implicit java.util.Date reads
@@ -364,12 +317,11 @@ trait DefaultReads extends LowPriorityDefaultReads {
   implicit val DefaultDateReads = dateReads("yyyy-MM-dd")
 
   /** Typeclass to implement way of parsing string as Java8 temporal types. */
-  trait TemporalParser[T <: java.time.temporal.Temporal] {
+  trait TemporalParser[T <: java.time.temporal.Temporal]
     def parse(input: String): Option[T]
-  }
 
   /** Parsing companion */
-  object TemporalParser {
+  object TemporalParser
 
     /** Instance of local date/time based on specified pattern. */
     implicit def LocalDateTimePatternParser(
@@ -379,15 +331,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     /** Instance of local date/time based on formatter. */
     implicit def LocalDateTimeFormatterParser(
         formatter: DateTimeFormatter): TemporalParser[LocalDateTime] =
-      new TemporalParser[LocalDateTime] {
+      new TemporalParser[LocalDateTime]
         def parse(input: String): Option[LocalDateTime] =
-          try {
+          try
             Some(LocalDateTime.parse(input, formatter))
-          } catch {
+          catch
             case _: DateTimeParseException => None
             case _: UnsupportedTemporalTypeException => None
-          }
-      }
 
     /** Instance of offset date/time based on specified pattern. */
     implicit def OffsetDateTimePatternParser(
@@ -397,15 +347,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     /** Instance of offset date/time based on formatter. */
     implicit def OffsetDateTimeFormatterParser(
         formatter: DateTimeFormatter): TemporalParser[OffsetDateTime] =
-      new TemporalParser[OffsetDateTime] {
+      new TemporalParser[OffsetDateTime]
         def parse(input: String): Option[OffsetDateTime] =
-          try {
+          try
             Some(OffsetDateTime.parse(input, formatter))
-          } catch {
+          catch
             case _: DateTimeParseException => None
             case _: UnsupportedTemporalTypeException => None
-          }
-      }
 
     /** Instance of date based on specified pattern. */
     implicit def DatePatternParser(
@@ -415,15 +363,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     /** Instance of date based on formatter. */
     implicit def DateFormatterParser(
         formatter: DateTimeFormatter): TemporalParser[LocalDate] =
-      new TemporalParser[LocalDate] {
+      new TemporalParser[LocalDate]
         def parse(input: String): Option[LocalDate] =
-          try {
+          try
             Some(LocalDate.parse(input, formatter))
-          } catch {
+          catch
             case _: DateTimeParseException => None
             case _: UnsupportedTemporalTypeException => None
-          }
-      }
 
     /** Instance of instant parser based on specified pattern. */
     implicit def InstantPatternParser(
@@ -433,16 +379,14 @@ trait DefaultReads extends LowPriorityDefaultReads {
     /** Instance of instant parser based on formatter. */
     implicit def InstantFormatterParser(
         formatter: DateTimeFormatter): TemporalParser[Instant] =
-      new TemporalParser[Instant] {
+      new TemporalParser[Instant]
         def parse(input: String): Option[Instant] =
-          try {
+          try
             Some(Instant.from(formatter.parse(input)))
-          } catch {
+          catch
             case _: DateTimeException => None
             case _: DateTimeParseException => None
             case _: UnsupportedTemporalTypeException => None
-          }
-      }
 
     /** Instance of zoned date/time based on specified pattern. */
     implicit def ZonedDateTimePatternParser(
@@ -452,16 +396,13 @@ trait DefaultReads extends LowPriorityDefaultReads {
     /** Instance of zoned date/time based on formatter. */
     implicit def ZonedDateTimeFormatterParser(
         formatter: DateTimeFormatter): TemporalParser[ZonedDateTime] =
-      new TemporalParser[ZonedDateTime] {
+      new TemporalParser[ZonedDateTime]
         def parse(input: String): Option[ZonedDateTime] =
-          try {
+          try
             Some(ZonedDateTime.parse(input, formatter))
-          } catch {
+          catch
             case _: DateTimeParseException => None
             case _: UnsupportedTemporalTypeException => None
-          }
-      }
-  }
 
   /**
     * Reads for the `java.time.LocalDateTime` type.
@@ -484,24 +425,21 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def localDateTimeReads[T](
       parsing: T, corrector: String => String = identity)(
       implicit p: T => TemporalParser[LocalDateTime]): Reads[LocalDateTime] =
-    new Reads[LocalDateTime] {
-      def reads(json: JsValue): JsResult[LocalDateTime] = json match {
+    new Reads[LocalDateTime]
+      def reads(json: JsValue): JsResult[LocalDateTime] = json match
         case JsNumber(d) => JsSuccess(epoch(d.toLong))
         case JsString(s) =>
-          p(parsing).parse(corrector(s)) match {
+          p(parsing).parse(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", parsing))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
 
       @inline def epoch(millis: Long): LocalDateTime =
         LocalDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.UTC)
-    }
 
   /**
     * The default typeclass to reads `java.time.LocalDateTime` from JSON.
@@ -534,20 +472,17 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def offsetDateTimeReads[T](
       parsing: T, corrector: String => String = identity)(
       implicit p: T => TemporalParser[OffsetDateTime]): Reads[OffsetDateTime] =
-    new Reads[OffsetDateTime] {
-      def reads(json: JsValue): JsResult[OffsetDateTime] = json match {
+    new Reads[OffsetDateTime]
+      def reads(json: JsValue): JsResult[OffsetDateTime] = json match
         case JsString(s) =>
-          p(parsing).parse(corrector(s)) match {
+          p(parsing).parse(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", parsing))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
-    }
 
   /**
     * The default typeclass to reads `java.time.OffsetDateTime` from JSON.
@@ -576,24 +511,21 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def zonedDateTimeReads[T](
       parsing: T, corrector: String => String = identity)(
       implicit p: T => TemporalParser[ZonedDateTime]): Reads[ZonedDateTime] =
-    new Reads[ZonedDateTime] {
-      def reads(json: JsValue): JsResult[ZonedDateTime] = json match {
+    new Reads[ZonedDateTime]
+      def reads(json: JsValue): JsResult[ZonedDateTime] = json match
         case JsNumber(d) => JsSuccess(epoch(d.toLong))
         case JsString(s) =>
-          p(parsing).parse(corrector(s)) match {
+          p(parsing).parse(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", parsing))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
 
       @inline def epoch(millis: Long): ZonedDateTime =
         ZonedDateTime.ofInstant(Instant.ofEpochMilli(millis), ZoneOffset.UTC)
-    }
 
   /**
     * The default typeclass to reads `java.time.ZonedDateTime` from JSON.
@@ -620,25 +552,22 @@ trait DefaultReads extends LowPriorityDefaultReads {
     */
   def localDateReads[T](parsing: T, corrector: String => String = identity)(
       implicit p: T => TemporalParser[LocalDate]): Reads[LocalDate] =
-    new Reads[LocalDate] {
-      def reads(json: JsValue): JsResult[LocalDate] = json match {
+    new Reads[LocalDate]
+      def reads(json: JsValue): JsResult[LocalDate] = json match
         case JsNumber(d) => JsSuccess(epoch(d.toLong))
         case JsString(s) =>
-          p(parsing).parse(corrector(s)) match {
+          p(parsing).parse(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", parsing))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
 
       @inline def epoch(millis: Long): LocalDate =
         LocalDate.now(
             Clock.fixed(Instant.ofEpochMilli(millis), ZoneOffset.UTC))
-    }
 
   /**
     * The default typeclass to reads `java.time.LocalDate` from JSON.
@@ -665,21 +594,18 @@ trait DefaultReads extends LowPriorityDefaultReads {
     */
   def instantReads[T](parsing: T, corrector: String => String = identity)(
       implicit p: T => TemporalParser[Instant]): Reads[Instant] =
-    new Reads[Instant] {
-      def reads(json: JsValue): JsResult[Instant] = json match {
+    new Reads[Instant]
+      def reads(json: JsValue): JsResult[Instant] = json match
         case JsNumber(d) => JsSuccess(Instant ofEpochMilli d.toLong)
         case JsString(s) =>
-          p(parsing).parse(corrector(s)) match {
+          p(parsing).parse(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.date.isoformat", parsing))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
-    }
 
   /**
     * The default typeclass to reads `java.time.Instant` from JSON.
@@ -691,7 +617,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   /**
     * ISO 8601 Reads
     */
-  object IsoDateReads extends Reads[java.util.Date] {
+  object IsoDateReads extends Reads[java.util.Date]
     import java.util.Date
 
     val millisAndTz = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
@@ -708,26 +634,23 @@ trait DefaultReads extends LowPriorityDefaultReads {
     val WithTz =
       """^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}[^.]+$""".r
 
-    def reads(json: JsValue): JsResult[Date] = json match {
+    def reads(json: JsValue): JsResult[Date] = json match
       case JsNumber(d) => JsSuccess(new Date(d.toLong))
 
       case JsString(s) =>
-        (s match {
+        (s match
           case WithMillisAndTz() => millisAndTz -> parseJDate(millisAndTz, s)
           case WithMillis() => millis -> parseJDate(millis, s)
           case WithTz() => tz -> parseJDate(tz, s)
           case _ => mini -> parseJDate(mini, s)
-        }) match {
+        ) match
           case (_, Some(d)) => JsSuccess(d)
           case (p, None) =>
             JsError(
                 Seq(JsPath() -> Seq(
                         ValidationError("error.expected.date.isoformat", p))))
-        }
 
       case js => JsError("error.expected.date.isoformat")
-    }
-  }
 
   /**
     * Reads for the `org.joda.time.DateTime` type.
@@ -738,29 +661,26 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def jodaDateReads(
       pattern: String,
       corrector: String => String = identity): Reads[org.joda.time.DateTime] =
-    new Reads[org.joda.time.DateTime] {
+    new Reads[org.joda.time.DateTime]
       import org.joda.time.DateTime
 
       val df = org.joda.time.format.DateTimeFormat.forPattern(pattern)
 
-      def reads(json: JsValue): JsResult[DateTime] = json match {
+      def reads(json: JsValue): JsResult[DateTime] = json match
         case JsNumber(d) => JsSuccess(new DateTime(d.toLong))
         case JsString(s) =>
-          parseDate(corrector(s)) match {
+          parseDate(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.jodadate.format", pattern))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
 
       private def parseDate(input: String): Option[DateTime] =
         scala.util.control.Exception.allCatch[DateTime] opt
         (DateTime.parse(input, df))
-    }
 
   /**
     * the default implicit JodaDate reads
@@ -776,7 +696,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def jodaLocalDateReads(
       pattern: String,
       corrector: String => String = identity): Reads[org.joda.time.LocalDate] =
-    new Reads[org.joda.time.LocalDate] {
+    new Reads[org.joda.time.LocalDate]
 
       import org.joda.time.LocalDate
       import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
@@ -785,23 +705,20 @@ trait DefaultReads extends LowPriorityDefaultReads {
         if (pattern == "") ISODateTimeFormat.localDateParser
         else DateTimeFormat.forPattern(pattern)
 
-      def reads(json: JsValue): JsResult[LocalDate] = json match {
+      def reads(json: JsValue): JsResult[LocalDate] = json match
         case JsString(s) =>
-          parseDate(corrector(s)) match {
+          parseDate(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.jodadate.format", pattern))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.date"))))
-      }
 
       private def parseDate(input: String): Option[LocalDate] =
         scala.util.control.Exception.allCatch[LocalDate] opt
         (LocalDate.parse(input, df))
-    }
 
   /**
     * the default implicit joda.time.LocalDate reads
@@ -817,7 +734,7 @@ trait DefaultReads extends LowPriorityDefaultReads {
   def jodaLocalTimeReads(
       pattern: String,
       corrector: String => String = identity): Reads[org.joda.time.LocalTime] =
-    new Reads[org.joda.time.LocalTime] {
+    new Reads[org.joda.time.LocalTime]
 
       import org.joda.time.LocalTime
       import org.joda.time.format.{DateTimeFormat, ISODateTimeFormat}
@@ -826,24 +743,21 @@ trait DefaultReads extends LowPriorityDefaultReads {
         if (pattern == "") ISODateTimeFormat.localTimeParser
         else DateTimeFormat.forPattern(pattern)
 
-      def reads(json: JsValue): JsResult[LocalTime] = json match {
+      def reads(json: JsValue): JsResult[LocalTime] = json match
         case JsNumber(n) => JsSuccess(new LocalTime(n.toLong))
         case JsString(s) =>
-          parseTime(corrector(s)) match {
+          parseTime(corrector(s)) match
             case Some(d) => JsSuccess(d)
             case None =>
               JsError(
                   Seq(JsPath() -> Seq(ValidationError(
                               "error.expected.jodatime.format", pattern))))
-          }
         case _ =>
           JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.time"))))
-      }
 
       private def parseTime(input: String): Option[LocalTime] =
         scala.util.control.Exception.allCatch[LocalTime] opt
         (LocalTime.parse(input, df))
-    }
 
   /**
     * the default implicit joda.time.LocalTime reads
@@ -872,8 +786,8 @@ trait DefaultReads extends LowPriorityDefaultReads {
     * @param enum a `scala.Enumeration`.
     */
   def enumNameReads[E <: Enumeration](enum: E): Reads[E#Value] =
-    new Reads[E#Value] {
-      def reads(json: JsValue) = json match {
+    new Reads[E#Value]
+      def reads(json: JsValue) = json match
         case JsString(str) =>
           enum.values
             .find(_.toString == str)
@@ -883,196 +797,161 @@ trait DefaultReads extends LowPriorityDefaultReads {
         case _ =>
           JsError(Seq(JsPath() -> Seq(
                       ValidationError("error.expected.enumstring"))))
-      }
-    }
 
   /**
     * Deserializer for Boolean types.
     */
-  implicit object BooleanReads extends Reads[Boolean] {
-    def reads(json: JsValue) = json match {
+  implicit object BooleanReads extends Reads[Boolean]
+    def reads(json: JsValue) = json match
       case JsBoolean(b) => JsSuccess(b)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsboolean"))))
-    }
-  }
 
   /**
     * Deserializer for String types.
     */
-  implicit object StringReads extends Reads[String] {
-    def reads(json: JsValue) = json match {
+  implicit object StringReads extends Reads[String]
+    def reads(json: JsValue) = json match
       case JsString(s) => JsSuccess(s)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
-    }
-  }
 
   /**
     * Deserializer for JsObject.
     */
-  implicit object JsObjectReads extends Reads[JsObject] {
-    def reads(json: JsValue) = json match {
+  implicit object JsObjectReads extends Reads[JsObject]
+    def reads(json: JsValue) = json match
       case o: JsObject => JsSuccess(o)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsobject"))))
-    }
-  }
 
   /**
     * Deserializer for JsArray.
     */
-  implicit object JsArrayReads extends Reads[JsArray] {
-    def reads(json: JsValue) = json match {
+  implicit object JsArrayReads extends Reads[JsArray]
+    def reads(json: JsValue) = json match
       case o: JsArray => JsSuccess(o)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsarray"))))
-    }
-  }
 
   /**
     * Deserializer for JsValue.
     */
-  implicit object JsValueReads extends Reads[JsValue] {
+  implicit object JsValueReads extends Reads[JsValue]
     def reads(json: JsValue) = JsSuccess(json)
-  }
 
   /**
     * Deserializer for JsString.
     */
-  implicit object JsStringReads extends Reads[JsString] {
-    def reads(json: JsValue) = json match {
+  implicit object JsStringReads extends Reads[JsString]
+    def reads(json: JsValue) = json match
       case s: JsString => JsSuccess(s)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsstring"))))
-    }
-  }
 
   /**
     * Deserializer for JsNumber.
     */
-  implicit object JsNumberReads extends Reads[JsNumber] {
-    def reads(json: JsValue) = json match {
+  implicit object JsNumberReads extends Reads[JsNumber]
+    def reads(json: JsValue) = json match
       case n: JsNumber => JsSuccess(n)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsnumber"))))
-    }
-  }
 
   /**
     * Deserializer for JsBoolean.
     */
-  implicit object JsBooleanReads extends Reads[JsBoolean] {
-    def reads(json: JsValue) = json match {
+  implicit object JsBooleanReads extends Reads[JsBoolean]
+    def reads(json: JsValue) = json match
       case b: JsBoolean => JsSuccess(b)
       case _ =>
         JsError(
             Seq(JsPath() -> Seq(ValidationError("error.expected.jsboolean"))))
-    }
-  }
 
   /**
     * Deserializer for Jackson JsonNode
     */
-  implicit object JsonNodeReads extends Reads[JsonNode] {
+  implicit object JsonNodeReads extends Reads[JsonNode]
     def reads(json: JsValue): JsResult[JsonNode] =
       JsSuccess(JacksonJson.jsValueToJsonNode(json))
-  }
 
   /**
     * Deserializer for Jackson ObjectNode
     */
-  implicit object ObjectNodeReads extends Reads[ObjectNode] {
-    def reads(json: JsValue): JsResult[ObjectNode] = {
+  implicit object ObjectNodeReads extends Reads[ObjectNode]
+    def reads(json: JsValue): JsResult[ObjectNode] =
       json.validate[JsObject] map
       (jo => JacksonJson.jsValueToJsonNode(jo).asInstanceOf[ObjectNode])
-    }
-  }
 
   /**
     * Deserializer for Jackson ArrayNode
     */
-  implicit object ArrayNodeReads extends Reads[ArrayNode] {
-    def reads(json: JsValue): JsResult[ArrayNode] = {
+  implicit object ArrayNodeReads extends Reads[ArrayNode]
+    def reads(json: JsValue): JsResult[ArrayNode] =
       json.validate[JsArray] map
       (ja => JacksonJson.jsValueToJsonNode(ja).asInstanceOf[ArrayNode])
-    }
-  }
 
   /**
     * Deserializer for Map[String,V] types.
     */
   implicit def mapReads[V](
       implicit fmtv: Reads[V]): Reads[collection.immutable.Map[String, V]] =
-    new Reads[collection.immutable.Map[String, V]] {
-      def reads(json: JsValue) = json match {
-        case JsObject(m) => {
+    new Reads[collection.immutable.Map[String, V]]
+      def reads(json: JsValue) = json match
+        case JsObject(m) =>
 
             type Errors = Seq[(JsPath, Seq[ValidationError])]
-            def locate(e: Errors, key: String) = e.map {
+            def locate(e: Errors, key: String) = e.map
               case (p, valerr) => (JsPath \ key) ++ p -> valerr
-            }
 
-            m.foldLeft(Right(Map.empty): Either[Errors, Map[String, V]]) {
+            m.foldLeft(Right(Map.empty): Either[Errors, Map[String, V]])
                 case (acc, (key, value)) =>
-                  (acc, fromJson[V](value)(fmtv)) match {
+                  (acc, fromJson[V](value)(fmtv)) match
                     case (Right(vs), JsSuccess(v, _)) => Right(vs + (key -> v))
                     case (Right(_), JsError(e)) => Left(locate(e, key))
                     case (Left(e), _: JsSuccess[_]) => Left(e)
                     case (Left(e1), JsError(e2)) => Left(e1 ++ locate(e2, key))
-                  }
-              }
               .fold(JsError.apply, res => JsSuccess(res.toMap))
-          }
         case _ =>
           JsError(
               Seq(JsPath() -> Seq(ValidationError("error.expected.jsobject"))))
-      }
-    }
 
   /**
     * Deserializer for Array[T] types.
     */
   implicit def ArrayReads[T : Reads : ClassTag]: Reads[Array[T]] =
-    new Reads[Array[T]] {
+    new Reads[Array[T]]
       def reads(json: JsValue) = json.validate[List[T]].map(_.toArray)
-    }
 
   /**
     * Deserializer for java.util.UUID
     */
-  class UUIDReader(checkUuuidValidity: Boolean) extends Reads[java.util.UUID] {
+  class UUIDReader(checkUuuidValidity: Boolean) extends Reads[java.util.UUID]
     import java.util.UUID
     import scala.util.Try
 
     def check(s: String)(u: UUID): Boolean = (u != null && s == u.toString())
-    def parseUuid(s: String): Option[UUID] = {
+    def parseUuid(s: String): Option[UUID] =
       val uncheckedUuid = Try(UUID.fromString(s)).toOption
 
-      if (checkUuuidValidity) {
+      if (checkUuuidValidity)
         uncheckedUuid filter check(s)
-      } else {
+      else
         uncheckedUuid
-      }
-    }
 
-    def reads(json: JsValue) = json match {
-      case JsString(s) => {
+    def reads(json: JsValue) = json match
+      case JsString(s) =>
           parseUuid(s)
             .map(JsSuccess(_))
             .getOrElse(JsError(Seq(JsPath() -> Seq(
                             ValidationError("error.expected.uuid")))))
-        }
       case _ =>
         JsError(Seq(JsPath() -> Seq(ValidationError("error.expected.uuid"))))
-    }
-  }
 
   implicit val uuidReads: Reads[java.util.UUID] = new UUIDReader(false)
-}

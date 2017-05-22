@@ -47,7 +47,7 @@ class FormatStringConverterSpec
     extends SimpleSFXDelegateSpec[
         jfxuc.FormatStringConverter[Number], FormatStringConverter[Number]](
         classOf[jfxuc.FormatStringConverter[Number]],
-        classOf[FormatStringConverter[Number]]) {
+        classOf[FormatStringConverter[Number]])
 
   override protected def getJavaClassInstance = getScalaClassInstance
   override protected def getScalaClassInstance =
@@ -63,23 +63,19 @@ class FormatStringConverterSpec
       (-123.45, "($123.45)")
   )
 
-  private def runConverterForExamples() {
+  private def runConverterForExamples()
 
     val converter = getConverterForExample
 
-    def runConversionsForExamples(number: Number, string: String) {
+    def runConversionsForExamples(number: Number, string: String)
       val numberAsString = converter.toString(number)
       numberAsString should equal(string)
 
       val stringToNumber = converter.fromString(string)
       stringToNumber should equal(number)
-    }
 
     examples.foreach(
         example => runConversionsForExamples(example._1, example._2))
-  }
 
-  it should "convert Number to String and vice-versa" in {
+  it should "convert Number to String and vice-versa" in
     this.runConverterForExamples()
-  }
-}

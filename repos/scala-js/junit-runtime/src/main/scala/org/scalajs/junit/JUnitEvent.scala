@@ -8,7 +8,6 @@ final class JUnitEvent(
     val selector: Selector,
     val throwable: OptionalThrowable = new OptionalThrowable,
     val duration: Long = -1L)
-    extends Event {
+    extends Event
   def fullyQualifiedName: String = taskDef.fullyQualifiedName
   def fingerprint: Fingerprint = taskDef.fingerprint
-}

@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean
   *
   * This shows how to process messages continuously from a kestrel queue.
   */
-object KestrelClient {
+object KestrelClient
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     // Configure your duration as necessary.
     // On a production server, you would typically not use this part and just
     // let the client read continuously until a shutdown is requested.
@@ -29,38 +29,33 @@ object KestrelClient {
     val stopped = new AtomicBoolean(false)
 
     val clients: Seq[Client] =
-      hosts map { host =>
+      hosts map  host =>
         Client(
             ClientBuilder()
               .codec(Kestrel())
               .hosts(host)
               .hostConnectionLimit(1) // process at most 1 item per connection concurrently
               .buildFactory())
-      }
 
-    val readHandles: Seq[ReadHandle] = {
+    val readHandles: Seq[ReadHandle] =
       val queueName = "queue"
       val timer = new JavaTimer(isDaemon = true)
       val retryBackoffs = Backoff.const(10.milliseconds)
       clients map { _.readReliably(queueName, timer, retryBackoffs) }
-    }
 
     val readHandle: ReadHandle = ReadHandle.merged(readHandles)
 
     // Attach an async error handler that prints to stderr
-    readHandle.error foreach { e =>
+    readHandle.error foreach  e =>
       if (!stopped.get) System.err.println("zomg! got an error " + e)
-    }
 
     // Attach an async message handler that prints the messages to stdout
-    readHandle.messages foreach { msg =>
-      try {
+    readHandle.messages foreach  msg =>
+      try
         val Buf.Utf8(str) = msg.bytes
         println(str)
-      } finally {
+      finally
         msg.ack.sync() // if we don't do this, no more msgs will come to us
-      }
-    }
 
     // Let it run for a little while
     Thread.sleep(duration.inMillis)
@@ -71,5 +66,3 @@ object KestrelClient {
     readHandle.close()
     clients foreach { _.close() }
     println("done")
-  }
-}

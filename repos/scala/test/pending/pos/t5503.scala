@@ -1,18 +1,14 @@
-trait A {
+trait A
   type Type
   type MethodType <: Type
 
   val MethodType: MethodTypeExtractor = null
 
-  abstract class MethodTypeExtractor {
+  abstract class MethodTypeExtractor
     def unapply(tpe: MethodType): Option[(Any, Any)]
-  }
-}
 
-object Test {
+object Test
   val a: A = null
 
-  def foo(tpe: a.Type) = tpe match {
+  def foo(tpe: a.Type) = tpe match
     case a.MethodType(_, _) =>
-  }
-}

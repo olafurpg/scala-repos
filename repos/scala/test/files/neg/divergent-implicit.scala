@@ -1,10 +1,9 @@
-object Test1 {
+object Test1
   implicit def cast[A, B](x: A)(implicit c: A => B): B = c(x)
 
   val x1: String = 1
   val x2: String = cast[Int, String](1)
-}
-object Test2 {
+object Test2
   class Foo
   class Bar
   class Baz
@@ -15,4 +14,3 @@ object Test2 {
 
   val x: Bar = new Foo
   val y: Bar = new Baz
-}

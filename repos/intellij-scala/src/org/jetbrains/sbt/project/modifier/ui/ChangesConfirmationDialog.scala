@@ -27,19 +27,18 @@ class ChangesConfirmationDialog private (
     val fileStatusMap: mutable.Map[
         VirtualFile, (BuildFileModifiedStatus, Long)],
     val canExcludeChanges: Boolean = false)
-    extends DialogWrapper(project) {
+    extends DialogWrapper(project)
 
   setTitle("SBT build file changes")
   init()
 
-  def selectedChanges: List[BuildFileChange] = {
+  def selectedChanges: List[BuildFileChange] =
     myChangesBrowser.getViewer.getIncludedChanges
       .map(
           change => BuildFileChange.swap(change.asInstanceOf[BuildFileChange]))
       .toList
-  }
 
-  override def createCenterPanel(): JComponent = {
+  override def createCenterPanel(): JComponent =
     val rootPane: JPanel = new JPanel(new BorderLayout)
 
     val swappedChanges: java.util.ArrayList[Change] =
@@ -53,23 +52,19 @@ class ChangesConfirmationDialog private (
         ActionManager.getInstance.getAction(IdeActions.ACTION_EDIT_SOURCE))
     rootPane.add(changesBrowser)
 
-    val diffDetails = new ShortDiffDetails(project, new Getter[Array[Change]] {
-      def get: Array[Change] = {
+    val diffDetails = new ShortDiffDetails(project, new Getter[Array[Change]]
+      def get: Array[Change] =
         val selectedChanges = changesBrowser.getViewer.getSelectedChanges
         selectedChanges.toArray(new Array[Change](selectedChanges.size))
-      }
-    }, VcsChangeDetailsManager.getInstance(project))
+    , VcsChangeDetailsManager.getInstance(project))
     diffDetails.setParent(changesBrowser)
 
     rootPane
-  }
-}
 
-object ChangesConfirmationDialog {
+object ChangesConfirmationDialog
   def apply(project: IJProject,
             changes: List[BuildFileChange],
             fileChangesMap: mutable.Map[
                 VirtualFile, (BuildFileModifiedStatus, Long)])
     : ChangesConfirmationDialog =
     new ChangesConfirmationDialog(project, changes, null, fileChangesMap)
-}

@@ -21,7 +21,7 @@ import akka.stream.impl.ConstantFun
   *
   * '''Cancels when''' downstream cancels
   */
-object Merge {
+object Merge
 
   /**
     * Create a new `Merge` stage with the specified output type.
@@ -58,7 +58,6 @@ object Merge {
       inputPorts: Int,
       eagerComplete: Boolean): Graph[UniformFanInShape[T, T], NotUsed] =
     create(inputPorts, eagerComplete)
-}
 
 /**
   * Merge several streams, taking elements as they arrive from input streams
@@ -73,7 +72,7 @@ object Merge {
   *
   * '''Cancels when''' downstream cancels
   */
-object MergePreferred {
+object MergePreferred
 
   /**
     * Create a new `MergePreferred` stage with the specified output type.
@@ -108,7 +107,6 @@ object MergePreferred {
   def create[T](clazz: Class[T], secondaryPorts: Int, eagerComplete: Boolean)
     : Graph[scaladsl.MergePreferred.MergePreferredShape[T], NotUsed] =
     create(secondaryPorts, eagerComplete)
-}
 
 /**
   * Fan-out the stream to several streams. emitting each incoming upstream element to all downstream consumers.
@@ -124,7 +122,7 @@ object MergePreferred {
   * '''Cancels when'''
   *   If eagerCancel is enabled: when any downstream cancels; otherwise: when all downstreams cancel
   */
-object Broadcast {
+object Broadcast
 
   /**
     * Create a new `Broadcast` stage with the specified input type.
@@ -151,7 +149,6 @@ object Broadcast {
   def create[T](clazz: Class[T],
                 outputCount: Int): Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount)
-}
 
 /**
   * Fan-out the stream to several streams. emitting an incoming upstream element to one downstream consumer according
@@ -166,7 +163,7 @@ object Broadcast {
   * '''Cancels when'''
   *   when one of the downstreams cancel
   */
-object Partition {
+object Partition
 
   /**
     * Create a new `Partition` stage with the specified input type.
@@ -190,7 +187,6 @@ object Partition {
                 partitioner: function.Function[T, Int])
     : Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount, partitioner)
-}
 
 /**
   * Fan-out the stream to several streams. Each upstream element is emitted to the first available downstream consumer.
@@ -205,7 +201,7 @@ object Partition {
   *
   * '''Cancels when''' all downstreams cancel
   */
-object Balance {
+object Balance
 
   /**
     * Create a new `Balance` stage with the specified input type.
@@ -240,7 +236,6 @@ object Balance {
       clazz: Class[T], outputCount: Int, waitForAllDownstreams: Boolean)
     : Graph[UniformFanOutShape[T, T], NotUsed] =
     create(outputCount, waitForAllDownstreams)
-}
 
 /**
   * Combine the elements of 2 streams into a stream of tuples.
@@ -255,7 +250,7 @@ object Balance {
   *
   * '''Cancels when''' downstream cancels
   */
-object Zip {
+object Zip
   import akka.japi.function.Function2
   import akka.japi.Pair
 
@@ -267,10 +262,8 @@ object Zip {
     ZipWith.create(_toPair.asInstanceOf[Function2[A, B, A Pair B]])
 
   private[this] final val _toPair: Function2[Any, Any, Any Pair Any] =
-    new Function2[Any, Any, Any Pair Any] {
+    new Function2[Any, Any, Any Pair Any]
       override def apply(a: Any, b: Any): Any Pair Any = new Pair(a, b)
-    }
-}
 
 /**
   * Takes a stream of pair elements and splits each pair to two output streams.
@@ -285,7 +278,7 @@ object Zip {
   *
   * '''Cancels when''' any downstream cancels
   */
-object Unzip {
+object Unzip
 
   /**
     * Creates a new `Unzip` stage with the specified output types.
@@ -300,7 +293,6 @@ object Unzip {
       left: Class[A],
       right: Class[B]): Graph[FanOutShape2[A Pair B, A, B], NotUsed] =
     create[A, B]()
-}
 
 /**
   * Takes two streams and outputs an output stream formed from the two input streams
@@ -315,7 +307,7 @@ object Unzip {
   *
   * '''Cancels when''' downstream cancels
   */
-object Concat {
+object Concat
 
   /**
     * Create a new anonymous `Concat` stage with the specified input types.
@@ -334,11 +326,10 @@ object Concat {
     */
   def create[T](clazz: Class[T]): Graph[UniformFanInShape[T, T], NotUsed] =
     create()
-}
 
 // flow graph //
 
-object GraphDSL extends GraphCreate {
+object GraphDSL extends GraphCreate
 
   /**
     * Start building a [[GraphDSL]].
@@ -350,7 +341,7 @@ object GraphDSL extends GraphCreate {
     new Builder()(new scaladsl.GraphDSL.Builder[M])
 
   final class Builder[+Mat]()(
-      private implicit val delegate: scaladsl.GraphDSL.Builder[Mat]) { self ⇒
+      private implicit val delegate: scaladsl.GraphDSL.Builder[Mat])  self ⇒
     import akka.stream.scaladsl.GraphDSL.Implicits._
 
     /**
@@ -393,15 +384,13 @@ object GraphDSL extends GraphCreate {
     def to[I, O](j: UniformFanOutShape[I, O]): ReverseOps[I] =
       new ReverseOps(j.in)
 
-    final class ForwardOps[T](out: Outlet[T]) {
+    final class ForwardOps[T](out: Outlet[T])
       def toInlet(in: Inlet[_ >: T]): Builder[Mat] = { out ~> in; self }
       def to(dst: SinkShape[_ >: T]): Builder[Mat] = { out ~> dst; self }
-      def toFanIn[U](j: UniformFanInShape[_ >: T, U]): Builder[Mat] = {
+      def toFanIn[U](j: UniformFanInShape[_ >: T, U]): Builder[Mat] =
         out ~> j; self
-      }
-      def toFanOut[U](j: UniformFanOutShape[_ >: T, U]): Builder[Mat] = {
+      def toFanOut[U](j: UniformFanOutShape[_ >: T, U]): Builder[Mat] =
         out ~> j; self
-      }
       def via[U](f: FlowShape[_ >: T, U]): ForwardOps[U] =
         from((out ~> f).outlet)
       def viaFanIn[U](j: UniformFanInShape[_ >: T, U]): ForwardOps[U] =
@@ -409,22 +398,16 @@ object GraphDSL extends GraphCreate {
       def viaFanOut[U](j: UniformFanOutShape[_ >: T, U]): ForwardOps[U] =
         from((out ~> j).outlet)
       def out(): Outlet[T] = out
-    }
 
-    final class ReverseOps[T](out: Inlet[T]) {
+    final class ReverseOps[T](out: Inlet[T])
       def fromOutlet(dst: Outlet[_ <: T]): Builder[Mat] = { out <~ dst; self }
       def from(dst: SourceShape[_ <: T]): Builder[Mat] = { out <~ dst; self }
-      def fromFanIn[U](j: UniformFanInShape[U, _ <: T]): Builder[Mat] = {
+      def fromFanIn[U](j: UniformFanInShape[U, _ <: T]): Builder[Mat] =
         out <~ j; self
-      }
-      def fromFanOut[U](j: UniformFanOutShape[U, _ <: T]): Builder[Mat] = {
+      def fromFanOut[U](j: UniformFanOutShape[U, _ <: T]): Builder[Mat] =
         out <~ j; self
-      }
       def via[U](f: FlowShape[U, _ <: T]): ReverseOps[U] = to((out <~ f).inlet)
       def viaFanIn[U](j: UniformFanInShape[U, _ <: T]): ReverseOps[U] =
         to((out <~ j).inlet)
       def viaFanOut[U](j: UniformFanOutShape[U, _ <: T]): ReverseOps[U] =
         to((out <~ j).inlet)
-    }
-  }
-}

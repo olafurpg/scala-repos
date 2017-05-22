@@ -22,9 +22,9 @@ import javax.net.ssl.SSLContext
 
 import org.scalatest.BeforeAndAfterAll
 
-class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll {
+class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll
 
-  test("test resolving property file as spark conf ") {
+  test("test resolving property file as spark conf ")
     val keyStorePath =
       new File(this.getClass.getResource("/keystore").toURI).getAbsolutePath
     val trustStorePath =
@@ -60,9 +60,8 @@ class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(opts.keyPassword === Some("password"))
     assert(opts.protocol === Some("TLSv1.2"))
     assert(opts.enabledAlgorithms === algorithms)
-  }
 
-  test("test resolving property with defaults specified ") {
+  test("test resolving property with defaults specified ")
     val keyStorePath =
       new File(this.getClass.getResource("/keystore").toURI).getAbsolutePath
     val trustStorePath =
@@ -96,9 +95,8 @@ class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(opts.protocol === Some("SSLv3"))
     assert(opts.enabledAlgorithms === Set("TLS_RSA_WITH_AES_128_CBC_SHA",
                                           "TLS_RSA_WITH_AES_256_CBC_SHA"))
-  }
 
-  test("test whether defaults can be overridden ") {
+  test("test whether defaults can be overridden ")
     val keyStorePath =
       new File(this.getClass.getResource("/keystore").toURI).getAbsolutePath
     val trustStorePath =
@@ -134,5 +132,3 @@ class SSLOptionsSuite extends SparkFunSuite with BeforeAndAfterAll {
     assert(opts.keyPassword === Some("password"))
     assert(opts.protocol === Some("SSLv3"))
     assert(opts.enabledAlgorithms === Set("ABC", "DEF"))
-  }
-}

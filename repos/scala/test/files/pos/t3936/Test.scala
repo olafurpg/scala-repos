@@ -1,4 +1,3 @@
 package pack
-trait Test {
+trait Test
   val b: BlockingQueue[Nothing]
-}

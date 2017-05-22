@@ -34,7 +34,7 @@ import scalafx.beans.property.BooleanProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object StackedAreaChart {
+object StackedAreaChart
   implicit def sfxStackedAreaChart2jfx[X, Y](
       v: StackedAreaChart[X, Y]): jfxsc.StackedAreaChart[X, Y] =
     if (v != null) v.delegate else null
@@ -47,23 +47,19 @@ object StackedAreaChart {
                   data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) =
     new StackedAreaChart[X, Y](
         new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
-}
 
 class StackedAreaChart[X, Y](
     override val delegate: jfxsc.StackedAreaChart[X, Y])
     extends XYChart[X, Y](delegate)
-    with SFXDelegate[jfxsc.StackedAreaChart[X, Y]] {
+    with SFXDelegate[jfxsc.StackedAreaChart[X, Y]]
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y]) {
+  def this(xAxis: Axis[X], yAxis: Axis[Y])
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis))
-  }
 
   def this(xAxis: Axis[X],
            yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]])
     this(new jfxsc.StackedAreaChart[X, Y](xAxis, yAxis, data))
-  }
 
   /** When true, CSS styleable symbols are created for any data items that don't have a symbol node specified. */
   def createSymbols: BooleanProperty = delegate.createSymbolsProperty
-}

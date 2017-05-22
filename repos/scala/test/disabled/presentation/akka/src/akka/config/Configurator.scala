@@ -5,7 +5,7 @@ package akka.config
 
 import akka.config.Supervision.{SuperviseTypedActor, FaultHandlingStrategy}
 
-private[akka] trait TypedActorConfiguratorBase {
+private[akka] trait TypedActorConfiguratorBase
   def getExternalDependency[T](clazz: Class[T]): T
 
   def configure(
@@ -19,4 +19,3 @@ private[akka] trait TypedActorConfiguratorBase {
   def reset
 
   def stop
-}

@@ -5,7 +5,7 @@ import com.twitter.scalding.platform.{HadoopPlatformJobTest, HadoopSharedPlatfor
 import org.scalatest.{Matchers, WordSpec}
 import scala.collection.JavaConverters._
 
-object HipJob {
+object HipJob
   val InSrcFileSize = 2496L
   val inSrc =
     TextLine(getClass.getResource("/hipster.txt").toString) // file size is 2496 bytes
@@ -16,9 +16,8 @@ object HipJob {
   val counts = TypedTsv[(String, Int)]("counts.tsv")
   val size = TypedTsv[Long]("size.tsv")
   val correct = Map("hello" -> 1, "goodbye" -> 1, "world" -> 2)
-}
 
-class HipJob(args: Args, customConfig: Config) extends Job(args) {
+class HipJob(args: Args, customConfig: Config) extends Job(args)
   import HipJob._
   override def config = super.config ++ customConfig.toMap.toMap
 
@@ -43,9 +42,8 @@ class HipJob(args: Args, customConfig: Config) extends Job(args) {
     .values
     .sum
     .write(out)
-}
 
-class SimpleJob(args: Args, customConfig: Config) extends Job(args) {
+class SimpleJob(args: Args, customConfig: Config) extends Job(args)
   import HipJob._
 
   override def config = super.config ++ customConfig.toMap.toMap
@@ -59,9 +57,8 @@ class SimpleJob(args: Args, customConfig: Config) extends Job(args) {
     .withReducers(2)
     .sum
     .write(counts)
-}
 
-class GroupAllJob(args: Args, customConfig: Config) extends Job(args) {
+class GroupAllJob(args: Args, customConfig: Config) extends Job(args)
 
   import HipJob._
   override def config = super.config ++ customConfig.toMap.toMap
@@ -73,9 +70,8 @@ class GroupAllJob(args: Args, customConfig: Config) extends Job(args) {
     .size
     .values
     .write(size)
-}
 
-class SimpleMapOnlyJob(args: Args, customConfig: Config) extends Job(args) {
+class SimpleMapOnlyJob(args: Args, customConfig: Config) extends Job(args)
   import HipJob._
 
   override def config = super.config ++ customConfig.toMap.toMap
@@ -85,87 +81,78 @@ class SimpleMapOnlyJob(args: Args, customConfig: Config) extends Job(args) {
     .from(inSrc)
     .flatMap(_.split("[^\\w]+"))
     .write(TypedTsv[String]("mapped_output"))
-}
 
 class ReducerEstimatorTest
-    extends WordSpec with Matchers with HadoopSharedPlatformTest {
+    extends WordSpec with Matchers with HadoopSharedPlatformTest
   import HipJob._
 
-  "Single-step job with reducer estimator" should {
-    "run with correct number of reducers" in {
+  "Single-step job with reducer estimator" should
+    "run with correct number of reducers" in
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
         (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
-      HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
+      HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow
         flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(2)
-      }.run
-    }
+      .run
 
-    "run with correct number of reducers when overriding set values" in {
+    "run with correct number of reducers when overriding set values" in
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
         (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString) +
         (Config.ReducerEstimatorOverride -> "true")
 
-      HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow {
+      HadoopPlatformJobTest(new SimpleJob(_, customConfig), cluster).inspectCompletedFlow
         flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(3)
-      }.run
-    }
-  }
+      .run
 
-  "Group-all job with reducer estimator" should {
-    "run with correct number of reducers (i.e. 1)" in {
+  "Group-all job with reducer estimator" should
+    "run with correct number of reducers (i.e. 1)" in
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
         (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
-      HadoopPlatformJobTest(new GroupAllJob(_, customConfig), cluster).inspectCompletedFlow {
+      HadoopPlatformJobTest(new GroupAllJob(_, customConfig), cluster).inspectCompletedFlow
         flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
 
           val conf = Config.fromHadoop(steps.head.getConfig)
           conf.getNumReducers should contain(1)
-      }.run
-    }
-  }
+      .run
 
-  "Multi-step job with reducer estimator" should {
-    "run with correct number of reducers in each step" in {
+  "Multi-step job with reducer estimator" should
+    "run with correct number of reducers in each step" in
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
         (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
       HadoopPlatformJobTest(new HipJob(_, customConfig), cluster)
         .sink[Double](out)(_.head shouldBe 2.86 +- 0.0001)
-        .inspectCompletedFlow { flow =>
+        .inspectCompletedFlow  flow =>
           val steps = flow.getFlowSteps.asScala
           val reducers =
             steps.map(_.getConfig.getInt(Config.HadoopNumReducers, 0)).toList
           reducers shouldBe List(3, 1, 1)
-        }
         .run
-    }
-  }
 
-  "Map-only job with reducer estimator" should {
-    "not set num reducers" in {
+  "Map-only job with reducer estimator" should
+    "not set num reducers" in
       val customConfig =
         Config.empty.addReducerEstimator(classOf[InputSizeReducerEstimator]) +
         (InputSizeReducerEstimator.BytesPerReducer -> (1L << 10).toString)
 
-      HadoopPlatformJobTest(new SimpleMapOnlyJob(_, customConfig), cluster).inspectCompletedFlow {
+      HadoopPlatformJobTest(new SimpleMapOnlyJob(_, customConfig), cluster).inspectCompletedFlow
         flow =>
           val steps = flow.getFlowSteps.asScala
           steps should have size 1
@@ -174,7 +161,4 @@ class ReducerEstimatorTest
           val numReducers = conf.getNumReducers
           assert(!numReducers.isDefined || numReducers.get == 0,
                  "Reducers should be 0")
-      }.run
-    }
-  }
-}
+      .run

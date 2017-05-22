@@ -1,6 +1,5 @@
 package a
 
-object A {
+object A
   val tagString = "foo"
   Seq.empty[Byte].toArray.toSeq
-}

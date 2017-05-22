@@ -15,19 +15,17 @@ import scala.concurrent.Promise
 import scala.util.{Failure, Success}
 
 /** INTERNAL API */
-private[akka] object OutputStreamSubscriber {
+private[akka] object OutputStreamSubscriber
   def props(os: OutputStream,
             completionPromise: Promise[IOResult],
             bufSize: Int,
-            autoFlush: Boolean) = {
+            autoFlush: Boolean) =
     require(bufSize > 0, "buffer size must be > 0")
     Props(classOf[OutputStreamSubscriber],
           os,
           completionPromise,
           bufSize,
           autoFlush).withDeploy(Deploy.local)
-  }
-}
 
 /** INTERNAL API */
 private[akka] class OutputStreamSubscriber(
@@ -35,25 +33,24 @@ private[akka] class OutputStreamSubscriber(
     completionPromise: Promise[IOResult],
     bufSize: Int,
     autoFlush: Boolean)
-    extends akka.stream.actor.ActorSubscriber with ActorLogging {
+    extends akka.stream.actor.ActorSubscriber with ActorLogging
 
   override protected val requestStrategy = WatermarkRequestStrategy(
       highWatermark = bufSize)
 
   private var bytesWritten: Long = 0
 
-  def receive = {
+  def receive =
     case ActorSubscriberMessage.OnNext(bytes: ByteString) ⇒
-      try {
+      try
         // blocking write
         os.write(bytes.toArray)
         bytesWritten += bytes.length
         if (autoFlush) os.flush()
-      } catch {
+      catch
         case ex: Exception ⇒
           completionPromise.success(IOResult(bytesWritten, Failure(ex)))
           cancel()
-      }
 
     case ActorSubscriberMessage.OnError(ex) ⇒
       log.error(
@@ -66,17 +63,13 @@ private[akka] class OutputStreamSubscriber(
     case ActorSubscriberMessage.OnComplete ⇒
       context.stop(self)
       os.flush()
-  }
 
-  override def postStop(): Unit = {
-    try {
+  override def postStop(): Unit =
+    try
       if (os ne null) os.close()
-    } catch {
+    catch
       case ex: Exception ⇒
         completionPromise.success(IOResult(bytesWritten, Failure(ex)))
-    }
 
     completionPromise.trySuccess(IOResult(bytesWritten, Success(Done)))
     super.postStop()
-  }
-}

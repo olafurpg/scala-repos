@@ -29,7 +29,7 @@ import scala.reflect.Manifest
   *
   * @see net.liftweb.json.TypeHints
   */
-object Serialization {
+object Serialization
   import java.io.{Reader, StringWriter, Writer}
 
   /** Serialize to String.
@@ -40,10 +40,9 @@ object Serialization {
   /** Serialize to Writer.
     */
   def write[A <: Any, W <: Writer](a: A, out: W)(
-      implicit formats: Formats): W = {
+      implicit formats: Formats): W =
     JsonAST.compactRender(Extraction.decompose(a)(formats), out)
     out
-  }
 
   /** Serialize to String (pretty format).
     */
@@ -53,10 +52,9 @@ object Serialization {
   /** Serialize to Writer (pretty format).
     */
   def writePretty[A <: Any, W <: Writer](a: A, out: W)(
-      implicit formats: Formats): W = {
+      implicit formats: Formats): W =
     JsonAST.prettyRender(Extraction.decompose(a)(formats), out)
     out
-  }
 
   /** Deserialize from a String.
     */
@@ -75,8 +73,6 @@ object Serialization {
     * implicit val formats = Serialization.formats(hints)
     * </pre>
     */
-  def formats(hints: TypeHints) = new Formats {
+  def formats(hints: TypeHints) = new Formats
     val dateFormat = DefaultFormats.lossless.dateFormat
     override val typeHints = hints
-  }
-}

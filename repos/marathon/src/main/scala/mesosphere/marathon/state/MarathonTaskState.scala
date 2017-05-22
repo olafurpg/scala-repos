@@ -7,7 +7,7 @@ import mesosphere.marathon.Protos.MarathonTask
   * something that extends MarathonState – this wrapper enables this.
   */
 case class MarathonTaskState(task: MarathonTask)
-    extends MarathonState[MarathonTask, MarathonTaskState] {
+    extends MarathonState[MarathonTask, MarathonTaskState]
 
   override def mergeFromProto(message: MarathonTask): MarathonTaskState =
     MarathonTaskState(message)
@@ -18,4 +18,3 @@ case class MarathonTaskState(task: MarathonTask)
   override def toProto: MarathonTask = task
 
   override def version: Timestamp = Timestamp.zero
-}

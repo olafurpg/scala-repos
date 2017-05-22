@@ -8,11 +8,11 @@ package generator
   * - https://en.wikipedia.org/wiki/Danger,_Will_Robinson
   * - https://www.youtube.com/watch?v=RG0ochx16Dg
   */
-private[pickling] object WillRobinsonPickling extends PicklingAlgorithm {
+private[pickling] object WillRobinsonPickling extends PicklingAlgorithm
   private case class FieldInfo(setter: SetField, getter: GetField)
   // TODO - Constructor unification in the case-class generator is probably still useful here...
   private def allScalaField(
-      tpe: IrClass, logger: AlgorithmLogger): Seq[FieldInfo] = {
+      tpe: IrClass, logger: AlgorithmLogger): Seq[FieldInfo] =
     // TODO - We find all these and hope it's ok
     // TODO - We need this list to actually come from a recursive descent through the hierarchy for vars.
     val fields =
@@ -28,16 +28,14 @@ private[pickling] object WillRobinsonPickling extends PicklingAlgorithm {
         .map(_._2.head)
         .toList
         .sortBy(_.fieldName)
-    fields.map { f =>
+    fields.map  f =>
       FieldInfo(SetField(f.fieldName, f), GetField(f.fieldName, f))
-    }
-  }
 
   override def generate(
-      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult = {
+      tpe: IrClass, logger: AlgorithmLogger): AlgorithmResult =
     logger.warn(
         s"DANGER WILL ROBINSON - ${tpe} is being serialized/deserialized using Unsafe operations.  Cannot statically identify any other safe mechanism.")
-    if (tpe.isScala) {
+    if (tpe.isScala)
       // TODO - We should probably try the constructor unification thing.
       val fields = allScalaField(tpe, logger)
       val unpickleBasic = UnpickleBehavior(
@@ -50,16 +48,14 @@ private[pickling] object WillRobinsonPickling extends PicklingAlgorithm {
           Nil, tpe, Some(unpickleBasic), lookupRuntime = true)
       AlgorithmSucccess(PickleUnpickleImplementation(pickle, unpickle))
       // We special case AnyRef to be PURE reflection-based pickling.
-    } else if ((tpe.className == "java.lang.Object") ||
-               (tpe.className == "AnyRef")) {
+    else if ((tpe.className == "java.lang.Object") ||
+               (tpe.className == "AnyRef"))
       val pickle = SubclassDispatch.apply(Nil, tpe, None, lookupRuntime = true)
       val unpickle =
         SubclassUnpicklerDelegation.apply(Nil, tpe, None, lookupRuntime = true)
       AlgorithmSucccess(PickleUnpickleImplementation(pickle, unpickle))
-    } else
+    else
       // TODO - Grab a list of all vars and vals and serialized them ALL.
       //        We're planning to unsafe instantiate (no constructor) anyway.
       AlgorithmFailure(
           s"Pickling arbitrary java type ($tpe) not implemented yet.")
-  }
-}

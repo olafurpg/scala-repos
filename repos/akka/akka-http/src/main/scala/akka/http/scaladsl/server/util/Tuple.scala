@@ -9,7 +9,7 @@ package akka.http.scaladsl.server.util
   */
 sealed trait Tuple[T]
 
-object Tuple {
+object Tuple
 
   /**
     * Used to provide "is-Tuple" evidence where we know that a given value must be a tuple.
@@ -64,4 +64,3 @@ object Tuple {
       A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V]: Tuple[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
     null
-}

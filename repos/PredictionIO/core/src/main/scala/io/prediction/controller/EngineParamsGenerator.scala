@@ -23,20 +23,17 @@ import scala.language.implicitConversions
   *
   * @group Evaluation
   */
-trait EngineParamsGenerator {
+trait EngineParamsGenerator
   protected[this] var epList: Seq[EngineParams] = _
   protected[this] var epListSet: Boolean = false
 
   /** Returns the list of [[EngineParams]] of this [[EngineParamsGenerator]]. */
-  def engineParamsList: Seq[EngineParams] = {
+  def engineParamsList: Seq[EngineParams] =
     assert(epListSet, "EngineParamsList not set")
     epList
-  }
 
   /** Sets the list of [[EngineParams]] of this [[EngineParamsGenerator]]. */
-  def engineParamsList_=(l: Seq[EngineParams]) {
+  def engineParamsList_=(l: Seq[EngineParams])
     assert(!epListSet, "EngineParamsList can bet set at most once")
     epList = Seq(l: _*)
     epListSet = true
-  }
-}

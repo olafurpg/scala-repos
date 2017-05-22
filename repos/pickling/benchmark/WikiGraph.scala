@@ -19,44 +19,37 @@ import java.nio.charset.CodingErrorAction
 import scala.io.Codec
 
 final class Vertex(val label: String, var neighbors: List[Vertex])
-    extends Serializable {
+    extends Serializable
 
   //var graph: Graph = null
 
-  def connectTo(v: Vertex) {
+  def connectTo(v: Vertex)
     neighbors = v +: neighbors
-  }
 
-  def sameAs(other: Vertex): Boolean = {
+  def sameAs(other: Vertex): Boolean =
     (this ne other) && this.label == other.label &&
     (this.neighbors.length == other.neighbors.length && this.neighbors
           .zip(other.neighbors)
-          .forall {
+          .forall
             case (thisv, otherv) => thisv.label == otherv.label
-          })
-  }
+          )
 
   override def toString = "Vertex(" + label + ")"
-}
 
-final class Graph extends Serializable {
+final class Graph extends Serializable
   var vertices: Vector[Vertex] = Vector()
 
-  def addVertex(v: Vertex): Vertex = {
+  def addVertex(v: Vertex): Vertex =
     //v.graph = this
     vertices = v +: vertices
     v
-  }
 
-  def sameAs(other: Graph): Boolean = {
+  def sameAs(other: Graph): Boolean =
     (this ne other) && this.vertices.length == other.vertices.length &&
-    this.vertices.zip(other.vertices).forall {
+    this.vertices.zip(other.vertices).forall
       case (thisv, otherv) => thisv.sameAs(otherv)
-    }
-  }
-}
 
-object GraphReader extends RegexParsers {
+object GraphReader extends RegexParsers
   override def skipWhitespace = false
 
   lazy val token: Parser[String] = """\S+""".r
@@ -68,17 +61,16 @@ object GraphReader extends RegexParsers {
     tokenize(line, x => throw new Exception(x))
 
   def tokenize(line: String, onError: String => Unit): List[String] =
-    parse(edgeline, line.trim) match {
+    parse(edgeline, line.trim) match
       case Success(args, _) => args
       case NoSuccess(msg, rest) => onError(msg); List()
-    }
 
   def readChunk(lines: Iterator[String],
                 names: Map[String, String],
-                size: Int): Graph = {
+                size: Int): Graph =
     val graph = new Graph
 
-    for (line <- lines) {
+    for (line <- lines)
       val labels = tokenize(line)
       //println("read labels " + labels)
 
@@ -90,38 +82,30 @@ object GraphReader extends RegexParsers {
         else firstVertexOpt.get
       vertices.put(firstLabel, firstVertex)
 
-      val targetVertices = for (targetLabel <- labels.tail) yield {
+      val targetVertices = for (targetLabel <- labels.tail) yield
         val vertexOpt = vertices.get(targetLabel)
 
-        if (vertexOpt.isEmpty) {
+        if (vertexOpt.isEmpty)
           val newVertex =
             graph.addVertex(new Vertex(names(targetLabel), List()))
           vertices.put(targetLabel, newVertex)
           newVertex
-        } else {
+        else
           vertexOpt.get
-        }
-      }
 
       firstVertex.neighbors = targetVertices
       if (graph.vertices.length > size) return graph
-    }
 
     graph
-  }
 
-  def printGraph(g: Graph): Unit = {
-    for (v <- g.vertices) {
+  def printGraph(g: Graph): Unit =
+    for (v <- g.vertices)
       print(v.label + ":")
-      for (to <- v.neighbors) {
+      for (to <- v.neighbors)
         print(" " + to.label)
-      }
       println()
-    }
-  }
-}
 
-object WikiGraph {
+object WikiGraph
   val titlesPath = "benchmark/data/titles-sorted.txt"
   val linksPath = "benchmark/data/links-sorted.txt"
 
@@ -129,11 +113,9 @@ object WikiGraph {
   codec.onMalformedInput(CodingErrorAction.REPLACE)
   codec.onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-  val names: Map[String, String] = new HashMap[String, String] {
-    override def default(label: String) = {
+  val names: Map[String, String] = new HashMap[String, String]
+    override def default(label: String) =
       "no_title[" + label + "]"
-    }
-  }
   // println("Building page title map...")
 
   val titles = Source.fromFile(titlesPath).getLines()
@@ -145,18 +127,15 @@ object WikiGraph {
 
   //GraphReader.printGraph(wikigraph)
   // println("#vertices: " + wikigraph.vertices.size)
-}
 
-trait WikiGraphBenchmark extends PicklingBenchmark {
-  val data = {
+trait WikiGraphBenchmark extends PicklingBenchmark
+  val data =
     // println(size)
     val result = WikiGraph.readChunk(size)
     // println("#vertices: " + result.vertices.size)
     result
-  }
-}
 
-object WikiGraphPicklingBench extends WikiGraphBenchmark {
+object WikiGraphPicklingBench extends WikiGraphBenchmark
   implicit val VertexTag = FastTypeTag.materializeFastTypeTag[Vertex]
   implicit val GraphTag = FastTypeTag.materializeFastTypeTag[Graph]
   implicit val StringTag = FastTypeTag.materializeFastTypeTag[String]
@@ -172,14 +151,12 @@ object WikiGraphPicklingBench extends WikiGraphBenchmark {
   // TODO - why does this no longer compile?
   implicit val picklerNil = Pickler.generate[Nil.type]
   implicit val unpicklerNil = implicitly[Unpickler[Nil.type]]
-  implicit lazy val picklerVertex: Pickler[Vertex] = {
+  implicit lazy val picklerVertex: Pickler[Vertex] =
     val picklerVertex = "boom!"
     implicitly[Pickler[Vertex]]
-  }
-  implicit lazy val unpicklerVertex: Unpickler[Vertex] = {
+  implicit lazy val unpicklerVertex: Unpickler[Vertex] =
     val unpicklerVertex = "boom!"
     implicitly[Unpickler[Vertex]]
-  }
   // NOTE: doesn't work well either
   // implicit object PicklerUnpicklerColonColonVertex extends scala.pickling.Pickler[::[Vertex]] with scala.pickling.Unpickler[::[Vertex]] {
   //   import scala.reflect.runtime.universe._
@@ -232,14 +209,12 @@ object WikiGraphPicklingBench extends WikiGraphBenchmark {
   implicit val picklerGraph = implicitly[Pickler[Graph]]
   implicit val unpicklerGraph = implicitly[Unpickler[Graph]]
 
-  override def run(): Unit = {
+  override def run(): Unit =
     val pickle = data.pickle
     val res = pickle.unpickle[Graph]
-  }
-}
 
-object WikiGraphJavaBench extends WikiGraphBenchmark {
-  override def run(): Unit = {
+object WikiGraphJavaBench extends WikiGraphBenchmark
+  override def run(): Unit =
     val bos = new ByteArrayOutputStream()
     val out = new ObjectOutputStream(bos)
     out.writeObject(data)
@@ -248,17 +223,14 @@ object WikiGraphJavaBench extends WikiGraphBenchmark {
     val bis = new ByteArrayInputStream(ba)
     val in = new ObjectInputStream(bis)
     val res = in.readObject.asInstanceOf[Graph]
-  }
-}
 
-object WikiGraphKryoBench extends WikiGraphBenchmark {
+object WikiGraphKryoBench extends WikiGraphBenchmark
   var ser: KryoSerializer = _
 
-  override def tearDown() {
+  override def tearDown()
     ser = null
-  }
 
-  override def run() {
+  override def run()
     val rnd: Int = Random.nextInt(10)
     val arr = Array.ofDim[Byte](32 * 2048 * 2048 + rnd)
     ser = new KryoSerializer
@@ -267,5 +239,3 @@ object WikiGraphKryoBench extends WikiGraphBenchmark {
     // println("Size: "+pickled.length)
     // TODO: uncrash this
     // val res = ser.fromBytes[Graph](pickled)
-  }
-}

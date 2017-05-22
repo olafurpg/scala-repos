@@ -1,10 +1,10 @@
 package scalaz
 package std
 
-trait StringInstances {
+trait StringInstances
   implicit object stringInstance
       extends Monoid[String] with Show[String]
-      with Equal[String] with Order[String] with IsEmpty[λ[α => String]] {
+      with Equal[String] with Order[String] with IsEmpty[λ[α => String]]
     type SA[α] = String
     def append(f1: String, f2: => String) = f1 + f2
     def zero: String = ""
@@ -15,10 +15,8 @@ trait StringInstances {
     def empty[A] = zero
     def plus[A](f1: SA[A], f2: => SA[A]) = f1 + f2
     def isEmpty[A](s: SA[A]) = s == ""
-  }
-}
 
-trait StringFunctions {
+trait StringFunctions
 
   /**
     * Returns the same String value if the given value is 1 otherwise pluralises this String by appending an "s" unless
@@ -46,55 +44,46 @@ trait StringFunctions {
   // Parsing functions.
 
   def parseBoolean(s: String): Validation[IllegalArgumentException, Boolean] =
-    try {
+    try
       Success(s.toBoolean)
-    } catch {
+    catch
       case e: IllegalArgumentException => Failure(e)
-    }
 
   def parseByte(s: String): Validation[NumberFormatException, Byte] =
-    try {
+    try
       Success(s.toByte)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
 
   def parseShort(s: String): Validation[NumberFormatException, Short] =
-    try {
+    try
       Success(s.toShort)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
 
   def parseInt(s: String): Validation[NumberFormatException, Int] =
-    try {
+    try
       Success(s.toInt)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
 
   def parseLong(s: String): Validation[NumberFormatException, Long] =
-    try {
+    try
       Success(s.toLong)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
 
   def parseFloat(s: String): Validation[NumberFormatException, Float] =
-    try {
+    try
       Success(s.toFloat)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
 
   def parseDouble(s: String): Validation[NumberFormatException, Double] =
-    try {
+    try
       Success(s.toDouble)
-    } catch {
+    catch
       case e: NumberFormatException => Failure(e)
-    }
-}
 
-object string extends StringInstances with StringFunctions {
+object string extends StringInstances with StringFunctions
   object stringSyntax extends scalaz.syntax.std.ToStringOps
-}

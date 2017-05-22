@@ -28,7 +28,7 @@ import java.util.zip.{GZIPInputStream, GZIPOutputStream};
   *
   * @author dramage
   */
-object FileStreams {
+object FileStreams
 
   /** Use a 16k buffer size. */
   val BUFFER_SIZE = 16 * 1024;
@@ -37,39 +37,32 @@ object FileStreams {
     * Gets an input stream with proper buffering (minimum 16k) for the given
     * file, automatically gunziping if the file name ends in .gz.
     */
-  def input(path: File): InputStream = {
+  def input(path: File): InputStream =
     val fis = new FileInputStream(path);
-    try {
-      if (path.getName.endsWith(".gz")) {
+    try
+      if (path.getName.endsWith(".gz"))
         new BufferedInputStream(
             new GZIPInputStream(fis, BUFFER_SIZE), BUFFER_SIZE);
-      } else {
+      else
         new BufferedInputStream(fis, BUFFER_SIZE);
-      }
-    } catch {
+    catch
       case ex: Throwable =>
         fis.close();
         throw (ex);
-    }
-  }
 
   /**
     * Gets an output stream writing to the given file with proper buffering
     * (minimum 16k), automatically gziping if the file name ends in .gz.
     */
-  def output(path: File): OutputStream = {
+  def output(path: File): OutputStream =
     val fos = new FileOutputStream(path);
-    try {
-      if (path.getName.endsWith(".gz")) {
+    try
+      if (path.getName.endsWith(".gz"))
         new BufferedOutputStream(
             new GZIPOutputStream(fos, BUFFER_SIZE), BUFFER_SIZE);
-      } else {
+      else
         new BufferedOutputStream(fos, BUFFER_SIZE);
-      }
-    } catch {
+    catch
       case ex: Throwable =>
         fos.close();
         throw (ex);
-    }
-  }
-}

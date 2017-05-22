@@ -11,12 +11,12 @@ import java.{util => ju}
 
 import scala.reflect.ClassTag
 
-trait CollectionsOnSynchronizedMapTest extends CollectionsOnMapsTest {
+trait CollectionsOnSynchronizedMapTest extends CollectionsOnMapsTest
 
   def originalFactory: MapFactory
 
-  def factory: MapFactory = {
-    new MapFactory {
+  def factory: MapFactory =
+    new MapFactory
       override def implementationName: String =
         s"synchronizedMap(${originalFactory.implementationName})"
 
@@ -28,17 +28,14 @@ trait CollectionsOnSynchronizedMapTest extends CollectionsOnMapsTest {
 
       override def allowsNullValues: Boolean =
         originalFactory.allowsNullValues
-    }
-  }
-}
 
 trait CollectionsOnSynchronizedSortedMapTest
-    extends CollectionsOnSortedMapsTest {
+    extends CollectionsOnSortedMapsTest
 
   def originalFactory: SortedMapFactory
 
-  def factory: SortedMapFactory = {
-    new SortedMapFactory {
+  def factory: SortedMapFactory =
+    new SortedMapFactory
       override def implementationName: String =
         s"synchronizedSortedMap(${originalFactory.implementationName})"
 
@@ -50,31 +47,23 @@ trait CollectionsOnSynchronizedSortedMapTest
 
       override def allowsNullValues: Boolean =
         originalFactory.allowsNullValues
-    }
-  }
-}
 
 class CollectionsOnSynchronizedMapOnHashMapTest
-    extends CollectionsOnSynchronizedMapTest {
+    extends CollectionsOnSynchronizedMapTest
   def originalFactory: MapFactory = new HashMapFactory
-}
 
 class CollectionsOnSynchronizedMapOnLinkedHashMapInsertionOrderTest
-    extends CollectionsOnSynchronizedMapTest {
+    extends CollectionsOnSynchronizedMapTest
   def originalFactory: MapFactory = new LinkedHashMapFactory(false, None)
-}
 
 class CollectionsOnSynchronizedMapOnLinkedHashMapInsertionOrderWithLimitTest
-    extends CollectionsOnSynchronizedMapTest {
+    extends CollectionsOnSynchronizedMapTest
   def originalFactory: MapFactory = new LinkedHashMapFactory(false, Some(50))
-}
 
 class CollectionsOnSynchronizedMapOnLinkedHashMapAccessOrderTest
-    extends CollectionsOnSynchronizedMapTest {
+    extends CollectionsOnSynchronizedMapTest
   def originalFactory: MapFactory = new LinkedHashMapFactory(true, None)
-}
 
 class CollectionsOnOnSynchronizedMapOnLinkedHashMapAccessOrderWithLimitTest
-    extends CollectionsOnSynchronizedMapTest {
+    extends CollectionsOnSynchronizedMapTest
   def originalFactory: MapFactory = new LinkedHashMapFactory(true, Some(50))
-}

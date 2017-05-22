@@ -14,7 +14,7 @@ import akka.stream._
   * A virtual header that WebSocket requests will contain. Use [[UpgradeToWebSocket.handleMessagesWith]] to
   * create a WebSocket handshake response and handle the WebSocket message stream with the given handler.
   */
-trait UpgradeToWebSocket extends sm.HttpHeader {
+trait UpgradeToWebSocket extends sm.HttpHeader
 
   /**
     * Returns the sequence of protocols the client accepts.
@@ -56,4 +56,3 @@ trait UpgradeToWebSocket extends sm.HttpHeader {
   def handleMessagesWith(inSink: Graph[SinkShape[Message], _ <: Any],
                          outSource: Graph[SourceShape[Message], _ <: Any],
                          subprotocol: String): HttpResponse
-}

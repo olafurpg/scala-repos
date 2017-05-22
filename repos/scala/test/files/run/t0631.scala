@@ -1,10 +1,8 @@
-object Test extends App {
-  class Foo {
-    override def equals(that: Any) = {
+object Test extends App
+  class Foo
+    override def equals(that: Any) =
       println("Foo.equals called")
       super.equals(that)
-    }
-  }
 
   println(new Foo == new Foo)
 
@@ -13,4 +11,3 @@ object Test extends App {
 
   // this should not call Foo.equals, but simply compare object identity of b
   println(b == b)
-}

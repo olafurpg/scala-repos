@@ -13,9 +13,9 @@ final class Env(config: Config,
                 blocking: String => Fu[Set[String]],
                 playban: String => Fu[Option[lila.playban.TempBan]],
                 system: ActorSystem,
-                scheduler: lila.common.Scheduler) {
+                scheduler: lila.common.Scheduler)
 
-  private val settings = new {
+  private val settings = new
     val MessageTtl = config duration "message.ttl"
     val NetDomain = config getString "net.domain"
     val SocketName = config getString "socket.name"
@@ -28,7 +28,6 @@ final class Env(config: Config,
     val CollectionSeekArchive = config getString "collection.seek_archive"
     val SeekMaxPerPage = config getInt "seek.max_per_page"
     val SeekMaxPerUser = config getInt "seek.max_per_user"
-  }
   import settings._
 
   private val socket = system.actorOf(Props(
@@ -63,16 +62,14 @@ final class Env(config: Config,
   private val abortListener = new AbortListener(seekApi = seekApi)
 
   system.actorOf(
-      Props(new Actor {
+      Props(new Actor
     system.lilaBus.subscribe(self, 'abortGame)
-    def receive = {
+    def receive =
       case lila.game.actorApi.AbortedBy(pov) if pov.game.isCorrespondence =>
         abortListener recreateSeek pov
-    }
-  }))
-}
+  ))
 
-object Env {
+object Env
 
   lazy val current =
     "lobby" boot new Env(
@@ -84,4 +81,3 @@ object Env {
         playban = lila.playban.Env.current.api.currentBan _,
         system = lila.common.PlayApp.system,
         scheduler = lila.common.PlayApp.scheduler)
-}

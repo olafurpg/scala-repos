@@ -20,25 +20,22 @@ import org.junit.Assert._
 import org.scalatest.Assertions
 import org.junit.{Test, After, Before}
 
-class IteratorTemplateTest extends Assertions {
+class IteratorTemplateTest extends Assertions
 
   val lst = (0 until 10)
-  val iterator = new IteratorTemplate[Int]() {
+  val iterator = new IteratorTemplate[Int]()
     var i = 0
-    override def makeNext() = {
-      if (i >= lst.size) {
+    override def makeNext() =
+      if (i >= lst.size)
         allDone()
-      } else {
+      else
         val item = lst(i)
         i += 1
         item
-      }
-    }
-  }
 
   @Test
-  def testIterator() {
-    for (i <- 0 until 10) {
+  def testIterator()
+    for (i <- 0 until 10)
       assertEquals("We should have an item to read.", true, iterator.hasNext)
       assertEquals(
           "Checking again shouldn't change anything.", true, iterator.hasNext)
@@ -47,13 +44,8 @@ class IteratorTemplateTest extends Assertions {
       assertEquals("Peeking again shouldn't change anything", i, iterator.peek)
       assertEquals(
           "Getting the item should give the right thing.", i, iterator.next)
-    }
     assertEquals("All gone!", false, iterator.hasNext)
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       iterator.peek
-    }
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       iterator.next
-    }
-  }
-}

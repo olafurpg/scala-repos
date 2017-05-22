@@ -19,7 +19,7 @@ package com.twitter.scalding.db
 // String form of a Column definition to be understood by a db
 case class Definition(toStr: String) extends AnyVal
 
-object DBColumnDefinition {
+object DBColumnDefinition
   def apply(col: ColumnDefinition): DBColumnDefinition =
     DBColumnDefinition(col.jdbcType,
                        col.name,
@@ -27,7 +27,6 @@ object DBColumnDefinition {
                        col.sizeOpt,
                        col.defaultValue,
                        SqlTypeName(col.jdbcType.toString))
-}
 
 case class DBColumnDefinition(jdbcType: SqlType,
                               name: ColumnName,
@@ -36,25 +35,24 @@ case class DBColumnDefinition(jdbcType: SqlType,
                               defaultValue: Option[String],
                               sqlType: SqlTypeName)
 
-object DBColumnTransformer {
+object DBColumnTransformer
   def columnDefnToDefinition(
       col: ColumnDefinition,
       columnMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition])
-    : Definition = {
+    : Definition =
     val preparedCol = columnMutator(DBColumnDefinition(col))
-    val sizeStr = preparedCol.sizeOpt.map { siz =>
+    val sizeStr = preparedCol.sizeOpt.map  siz =>
       s"($siz)"
-    }.getOrElse("")
-    val defStr = preparedCol.defaultValue.map { default =>
+    .getOrElse("")
+    val defStr = preparedCol.defaultValue.map  default =>
       s" DEFAULT '${default}' "
-    }.getOrElse(" ")
+    .getOrElse(" ")
     val sqlType = preparedCol.sqlType.toStr
 
     Definition(sqlType + sizeStr + defStr + preparedCol.nullable.toStr)
-  }
 
   private def defaultColumnMutator: PartialFunction[
-      DBColumnDefinition, DBColumnDefinition] = {
+      DBColumnDefinition, DBColumnDefinition] =
     case t @ DBColumnDefinition(BIGINT, _, _, None, _, _) =>
       t.copy(sizeOpt = Some(20))
     case t @ DBColumnDefinition(INT, _, _, None, _, _) =>
@@ -66,7 +64,6 @@ object DBColumnTransformer {
     case t @ DBColumnDefinition(VARCHAR, _, _, None, _, _) =>
       t.copy(sizeOpt = Some(255))
     case t => t
-  }
 
   def mutateColumns(
       columnMutator: PartialFunction[DBColumnDefinition, DBColumnDefinition],
@@ -85,4 +82,3 @@ object DBColumnTransformer {
   def columnDefnsToCreate(
       columns: Iterable[ColumnDefinition]): Iterable[Definition] =
     columns.map(c => columnDefnToDefinition(c, defaultColumnMutator))
-}

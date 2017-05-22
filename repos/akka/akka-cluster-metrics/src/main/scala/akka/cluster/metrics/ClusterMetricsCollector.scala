@@ -25,21 +25,19 @@ sealed abstract class CollectionControlMessage extends Serializable
   * Command for [[ClusterMetricsSupervisor]] to start metrics collection.
   */
 @SerialVersionUID(1L)
-case object CollectionStartMessage extends CollectionControlMessage {
+case object CollectionStartMessage extends CollectionControlMessage
 
   /** Java API */
   def getInstance = CollectionStartMessage
-}
 
 /**
   * Command for [[ClusterMetricsSupervisor]] to stop metrics collection.
   */
 @SerialVersionUID(1L)
-case object CollectionStopMessage extends CollectionControlMessage {
+case object CollectionStopMessage extends CollectionControlMessage
 
   /** Java API */
   def getInstance = CollectionStopMessage
-}
 
 /**
   * INTERNAL API.
@@ -47,7 +45,7 @@ case object CollectionStopMessage extends CollectionControlMessage {
   * Actor providing customizable metrics collection supervision.
   */
 private[metrics] class ClusterMetricsSupervisor
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   val metrics = ClusterMetricsExtension(context.system)
   import metrics.settings._
   import context._
@@ -58,17 +56,15 @@ private[metrics] class ClusterMetricsSupervisor
 
   def collectorName = s"collector-${collectorInstance}"
 
-  override def preStart() = {
-    if (CollectorEnabled) {
+  override def preStart() =
+    if (CollectorEnabled)
       self ! CollectionStartMessage
-    } else {
+    else
       log.warning(
-          s"Metrics collection is disabled in configuration. Use subtypes of ${classOf[
-          CollectionControlMessage].getName} to manage collection at runtime.")
-    }
-  }
+          s"Metrics collection is disabled in configuration. Use subtypes of $classOf[
+          CollectionControlMessage].getName to manage collection at runtime.")
 
-  override def receive = {
+  override def receive =
     case CollectionStartMessage ⇒
       children.foreach(stop)
       collectorInstance += 1
@@ -77,8 +73,6 @@ private[metrics] class ClusterMetricsSupervisor
     case CollectionStopMessage ⇒
       children.foreach(stop)
       log.debug(s"Collection stopped.")
-  }
-}
 
 /**
   * Local cluster metrics extension events.
@@ -91,12 +85,11 @@ trait ClusterMetricsEvent
   * Current snapshot of cluster node metrics.
   */
 final case class ClusterMetricsChanged(nodeMetrics: Set[NodeMetrics])
-    extends ClusterMetricsEvent {
+    extends ClusterMetricsEvent
 
   /** Java API */
   def getNodeMetrics: java.lang.Iterable[NodeMetrics] =
     scala.collection.JavaConverters.asJavaIterableConverter(nodeMetrics).asJava
-}
 
 /**
   * INTERNAL API.
@@ -123,7 +116,7 @@ private[metrics] final case class MetricsGossipEnvelope(
   * Actor responsible for periodic data sampling in the node and publication to the cluster.
   */
 private[metrics] class ClusterMetricsCollector
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import InternalClusterAction._
   // TODO collapse to ClusterEvent._ after akka-cluster metrics is gone
   import ClusterEvent.MemberEvent
@@ -176,12 +169,11 @@ private[metrics] class ClusterMetricsCollector
       self,
       MetricsTick)
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberEvent], classOf[ReachabilityEvent])
     logInfo("Metrics collection has started successfully")
-  }
 
-  def receive = {
+  def receive =
     case GossipTick ⇒ gossip()
     case MetricsTick ⇒ sample()
     case msg: MetricsGossipEnvelope ⇒ receiveGossip(msg)
@@ -195,14 +187,12 @@ private[metrics] class ClusterMetricsCollector
       if (m.status == MemberStatus.Up || m.status == MemberStatus.WeaklyUp)
         addMember(m)
     case _: MemberEvent ⇒ // not interested in other types of MemberEvent
-  }
 
-  override def postStop: Unit = {
+  override def postStop: Unit =
     cluster unsubscribe self
     gossipTask.cancel()
     sampleTask.cancel()
     collector.close()
-  }
 
   /**
     * Adds a member to the node ring.
@@ -212,21 +202,19 @@ private[metrics] class ClusterMetricsCollector
   /**
     * Removes a member from the member node ring.
     */
-  def removeMember(member: Member): Unit = {
+  def removeMember(member: Member): Unit =
     nodes -= member.address
     latestGossip = latestGossip remove member.address
     publish()
-  }
 
   /**
     * Updates the initial node ring for those nodes that are [[akka.cluster.MemberStatus]] `Up`.
     */
   def receiveState(state: CurrentClusterState): Unit =
-    nodes = (state.members diff state.unreachable) collect {
+    nodes = (state.members diff state.unreachable) collect
       case m
           if m.status == MemberStatus.Up || m.status == MemberStatus.WeaklyUp ⇒
         m.address
-    }
 
   /**
     * Samples the latest metrics for the node, updates metrics statistics in
@@ -234,23 +222,21 @@ private[metrics] class ClusterMetricsCollector
     *
     * @see [[MetricsCollector]]
     */
-  def sample(): Unit = {
+  def sample(): Unit =
     latestGossip :+= collector.sample()
     publish()
-  }
 
   /**
     * Receives changes from peer nodes, merges remote with local gossip nodes, then publishes
     * changes to the event stream for load balancing router consumption, and gossip back.
     */
-  def receiveGossip(envelope: MetricsGossipEnvelope): Unit = {
+  def receiveGossip(envelope: MetricsGossipEnvelope): Unit =
     // remote node might not have same view of member nodes, this side should only care
     // about nodes that are known here, otherwise removed nodes can come back
     val otherGossip = envelope.gossip.filter(nodes)
     latestGossip = latestGossip merge otherGossip
     // changes will be published in the period collect task
     if (!envelope.reply) replyGossipTo(envelope.from)
-  }
 
   /**
     * Gossip to peer nodes.
@@ -280,4 +266,3 @@ private[metrics] class ClusterMetricsCollector
   def publish(): Unit =
     context.system.eventStream publish ClusterMetricsChanged(
         latestGossip.nodes)
-}

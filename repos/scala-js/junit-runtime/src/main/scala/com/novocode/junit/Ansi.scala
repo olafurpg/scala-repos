@@ -1,6 +1,6 @@
 package com.novocode.junit
 
-object Ansi {
+object Ansi
 
   private[this] final val NORMAL = "\u001B[0m"
 
@@ -8,26 +8,22 @@ object Ansi {
     if (colorSequence == null) s
     else colorSequence + s + NORMAL
 
-  def filterAnsi(s: String): String = {
-    if (s == null) {
+  def filterAnsi(s: String): String =
+    if (s == null)
       null
-    } else {
+    else
       var r: String = ""
       val len = s.length
       var i = 0
-      while (i < len) {
+      while (i < len)
         val c = s.charAt(i)
-        if (c == '\u001B') {
+        if (c == '\u001B')
           i += 1
           while (i < len && s.charAt(i) != 'm') i += 1
-        } else {
+        else
           r += c
-        }
         i += 1
-      }
       r
-    }
-  }
 
   final val INFO = "\u001B[34m" // BLUE
   final val ERRCOUNT = "\u001B[31m" // RED
@@ -41,4 +37,3 @@ object Ansi {
   final val ENAME3 = "\u001B[33m" // YELLOW
   final val TESTFILE1 = "\u001B[35m" // MAGENTA
   final val TESTFILE2 = "\u001B[33m" // YELLOW
-}

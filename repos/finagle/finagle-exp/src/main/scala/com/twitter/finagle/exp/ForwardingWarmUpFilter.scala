@@ -16,7 +16,7 @@ abstract class ForwardingWarmUpFilter[Req, Rep](
     forwardTo: Service[Req, Rep],
     statsReceiver: StatsReceiver = DefaultStatsReceiver
 )
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
 
   @volatile private[this] var warmupComplete = false
 
@@ -44,31 +44,24 @@ abstract class ForwardingWarmUpFilter[Req, Rep](
     */
   def bypassForward: Boolean
 
-  final override def apply(request: Req, service: Service[Req, Rep]) = {
-    if (warmupComplete || bypassForward) {
+  final override def apply(request: Req, service: Service[Req, Rep]) =
+    if (warmupComplete || bypassForward)
       service(request)
-    } else {
+    else
       val start = startTime.inMillis
 
       val timePassed = math.max(Time.now.inMillis - start, 0)
       val percentWarm = math.pow(timePassed.toFloat / warmupPeriod.inMillis, 3)
 
-      if (percentWarm >= 1) {
+      if (percentWarm >= 1)
         warmupComplete = true
         onWarmp.setDone()
         service(request)
-      } else {
+      else
         val r = rng.nextFloat()
-        if (percentWarm > r) {
-          Stat.timeFuture(localLatency)(service(request)) onFailure { _ =>
+        if (percentWarm > r)
+          Stat.timeFuture(localLatency)(service(request)) onFailure  _ =>
             localFailureCounter.incr()
-          }
-        } else {
-          Stat.timeFuture(forwardLatency)(forwardTo(request)) onFailure { _ =>
+        else
+          Stat.timeFuture(forwardLatency)(forwardTo(request)) onFailure  _ =>
             forwardFailureCounter.incr()
-          }
-        }
-      }
-    }
-  }
-}

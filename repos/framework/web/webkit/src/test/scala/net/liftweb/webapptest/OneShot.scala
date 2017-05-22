@@ -30,16 +30,14 @@ import java.net.{URL, InetAddress}
 import snippet.Counter
 import net.liftweb.common.Full
 
-object OneShot extends Specification with RequestKit with XmlMatchers {
+object OneShot extends Specification with RequestKit with XmlMatchers
   sequential
 
-  private def reachableLocalAddress = {
+  private def reachableLocalAddress =
     val l = InetAddress.getLocalHost
-    tryo { l.isReachable(50) } match {
+    tryo { l.isReachable(50) } match
       case Full(true) => l.getHostAddress
       case _ => "127.0.0.1"
-    }
-  }
 
   private val host_ = System.getProperty(
       "net.liftweb.webapptest.oneshot.host", reachableLocalAddress)
@@ -54,127 +52,110 @@ object OneShot extends Specification with RequestKit with XmlMatchers {
 
   step(jetty.start())
 
-  "ContainerVars" should {
-    "have correct int default" in {
+  "ContainerVars" should
+    "have correct int default" in
       val tmp = LiftRules.sessionCreator
-      try {
+      try
         LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions
 
-        val bx = for {
+        val bx = for
           resp <- get("/cv_int")
           xml <- resp.xml
-        } yield xml
+        yield xml
 
         bx.openOrThrowException("legacy code") must ==/(<int>45</int>)
           .when(jetty.running)
-      } finally {
+      finally
         LiftRules.sessionCreator = tmp
-      }
-    }
 
-    "be settable as Int" in {
+    "be settable as Int" in
       val tmp = LiftRules.sessionCreator
-      try {
+      try
         LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions
 
-        val bx = for {
+        val bx = for
           resp <- get("/cv_int/33")
           resp2 <- resp.get("/cv_int")
           xml <- resp2.xml
-        } yield xml
+        yield xml
 
         bx.openOrThrowException("legacy code") must ==/(<int>33</int>)
           .when(jetty.running)
-      } finally {
+      finally
         LiftRules.sessionCreator = tmp
-      }
-    }
 
-    "be session aware" in {
+    "be session aware" in
       val tmp = LiftRules.sessionCreator
-      try {
+      try
         LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions
 
-        val bx = for {
+        val bx = for
           resp <- get("/cv_int/33")
           resp2 <- resp.get("/cv_int")
           xml <- resp2.xml
           resp3 <- get("/cv_int")
           xml2 <- resp3.xml
-        } yield (xml, xml2)
+        yield (xml, xml2)
 
         bx.openOrThrowException("legacy code")._1 must ==/(<int>33</int>)
           .when(jetty.running)
         bx.openOrThrowException("legacy code")._2 must ==/(<int>45</int>)
           .when(jetty.running)
-      } finally {
+      finally
         LiftRules.sessionCreator = tmp
-      }
-    }
 
-    "support multiple vars" in {
+    "support multiple vars" in
       val tmp = LiftRules.sessionCreator
-      try {
+      try
         LiftRules.sessionCreator = LiftRules.sessionCreatorForMigratorySessions
 
-        val bx = for {
+        val bx = for
           resp <- get("/cv_int/33")
           resp2 <- resp.get("/cv_int")
           respx <- resp.get("/cv_str/meow")
           resp3 <- resp.get("/cv_str")
           xml <- resp2.xml
           xml2 <- resp3.xml
-        } yield (xml, xml2)
+        yield (xml, xml2)
 
         bx.openOrThrowException("legacy code")._1 must ==/(<int>33</int>)
           .when(jetty.running)
         bx.openOrThrowException("legacy code")._2 must ==/(<str>meow</str>)
           .when(jetty.running)
-      } finally {
+      finally
         LiftRules.sessionCreator = tmp
-      }
-    }
-  }
 
-  "OneShot" should {
-    "fire once for oneshot" in {
+  "OneShot" should
+    "fire once for oneshot" in
       Counter.x = 0
 
-      for {
+      for
         resp <- get("/oneshot")
         xml <- resp.html5AsXml
         span <- (xml \\ "span").filter(x => (x \ "@id").text == "one")
         in <- (span \\ "input")
         name <- in \ "@name"
-      } {
+      
         resp.get("/oneshot?" + urlEncode(name.text) + "=3")
         resp.get("/oneshot?" + urlEncode(name.text) + "=3")
-      }
 
       Counter.x must be_==(1).when(jetty.running)
-    }
 
-    "fire multiple times for normal" in {
+    "fire multiple times for normal" in
       Counter.x = 0
 
-      for {
+      for
         resp <- get("/oneshot")
         xml <- resp.html5AsXml
         span <- (xml \\ "span").filter(x => (x \ "@id").text == "two")
         in <- (span \\ "input")
         name <- in \ "@name"
-      } {
+      
         resp.get("/oneshot?" + urlEncode(name.text) + "=3")
         resp.get("/oneshot?" + urlEncode(name.text) + "=3")
-      }
 
       Counter.x must be_>=(2).when(jetty.running)
-    }
-  }
 
-  step {
-    tryo {
+  step
+    tryo
       jetty.stop()
-    }
-  }
-}

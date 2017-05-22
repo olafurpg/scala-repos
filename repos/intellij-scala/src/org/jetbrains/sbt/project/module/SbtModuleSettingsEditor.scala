@@ -20,7 +20,7 @@ import scala.collection.JavaConverters._
   * @since 12/1/14.
   */
 class SbtModuleSettingsEditor(state: ModuleConfigurationState)
-    extends ModuleElementsEditor(state) {
+    extends ModuleElementsEditor(state)
   private val myForm = new SbtModuleSettingsForm
   private val modelWrapper = new CollectionListModelWrapper(
       new CollectionListModel[String](new util.ArrayList[String]))
@@ -32,24 +32,22 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
 
   def saveData() {}
 
-  def createComponentImpl() = {
+  def createComponentImpl() =
     myForm.sbtImportsList.setEmptyText(
         SbtBundle("sbt.settings.noImplicitImportsFound"))
     JListCompatibility.setModel(
         myForm.sbtImportsList, modelWrapper.getModelRaw)
 
-    myForm.updateButton.addActionListener(new ActionListener {
-      override def actionPerformed(e: ActionEvent): Unit = {
+    myForm.updateButton.addActionListener(new ActionListener
+      override def actionPerformed(e: ActionEvent): Unit =
         val resolversToUpdate: Seq[SbtResolver] =
           myForm.resolversTable.getSelectedRows map (resolvers(_))
         SbtResolverIndexesManager().update(resolversToUpdate)
-      }
-    })
+    )
 
     myForm.mainPanel
-  }
 
-  override def reset() {
+  override def reset()
     val moduleSettings = SbtSystemSettings
       .getInstance(state.getProject)
       .getLinkedProjectSettings(getModel.getModule)
@@ -65,11 +63,9 @@ class SbtModuleSettingsEditor(state: ModuleConfigurationState)
     myForm.resolversTable.getColumnModel.getColumn(0).setPreferredWidth(50)
     myForm.resolversTable.getColumnModel.getColumn(1).setPreferredWidth(400)
     myForm.resolversTable.getColumnModel.getColumn(2).setPreferredWidth(20)
-  }
-}
 
 private class ResolversModel(val resolvers: Seq[SbtResolver])
-    extends AbstractTableModel {
+    extends AbstractTableModel
 
   private val columns = Seq(
       SbtBundle("sbt.settings.resolvers.name"),
@@ -83,7 +79,7 @@ private class ResolversModel(val resolvers: Seq[SbtResolver])
 
   override def getColumnName(columnIndex: Int) = columns(columnIndex)
 
-  def getValueAt(rowIndex: Int, columnIndex: Int) = columnIndex match {
+  def getValueAt(rowIndex: Int, columnIndex: Int) = columnIndex match
     case 0 => resolvers(rowIndex).name
     case 1 => resolvers(rowIndex).root
     case 2 =>
@@ -93,5 +89,3 @@ private class ResolversModel(val resolvers: Seq[SbtResolver])
       if (ts == SbtResolverIndex.NO_TIMESTAMP)
         SbtBundle("sbt.settings.resolvers.neverUpdated")
       else DateFormatUtil.formatDate(ts)
-  }
-}

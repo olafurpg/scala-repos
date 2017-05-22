@@ -46,11 +46,11 @@ import org.streum.configrity.Configuration
 import scalaz._
 import scalaz.std.option._
 
-trait ManagedMongoJobManagerModule {
+trait ManagedMongoJobManagerModule
   implicit def executionContext: ExecutionContext
   implicit def M: Monad[Future]
 
-  def jobManager(config: Configuration): (Mongo, JobManager[Future]) = {
+  def jobManager(config: Configuration): (Mongo, JobManager[Future]) =
     import MongoJobManagerSettings.default
 
     val mongo = RealMongo(config.detach("mongo"))
@@ -67,22 +67,19 @@ trait ManagedMongoJobManagerModule {
     val fs = GridFSFileStorage[Future](config.detach("mongo"))
 
     (mongo, new MongoJobManager(mongo.database(database), settings, fs))
-  }
-}
 
 case class MongoJobManagerSettings(
     queryTimeout: Timeout, jobs: String, messages: String)
-object MongoJobManagerSettings {
+object MongoJobManagerSettings
   val default: MongoJobManagerSettings = MongoJobManagerSettings(
       5000, "jobs", "jog_messages")
-}
 
 final class MongoJobManager(database: Database,
                             settings: MongoJobManagerSettings,
                             fs0: FileStorage[Future])(
     implicit executionContext: ExecutionContext)
     extends JobManager[Future]
-    with JobStateManager[Future] with JobResultManager[Future] with Logging {
+    with JobStateManager[Future] with JobResultManager[Future] with Logging
 
   import JobManager._
   import JobState._
@@ -104,156 +101,130 @@ final class MongoJobManager(database: Database,
                 name: String,
                 jobType: String,
                 data: Option[JValue],
-                started: Option[DateTime]): Future[Job] = {
+                started: Option[DateTime]): Future[Job] =
     val start = System.nanoTime
     val id = newJobId()
     val state = started map (Started(_, NotStarted)) getOrElse NotStarted
     val job = Job(id, apiKey, name, jobType, data, state)
-    database(insert(job.serialize.asInstanceOf[JObject]).into(settings.jobs)) map {
+    database(insert(job.serialize.asInstanceOf[JObject]).into(settings.jobs)) map
       _ =>
         logger.info("Job %s created in %f ms".format(
                 id, (System.nanoTime - start) / 1000000.0))
         job
-    }
-  }
 
-  def findJob(jobId: JobId): Future[Option[Job]] = {
-    database(selectOne().from(settings.jobs).where("id" === jobId)) map {
+  def findJob(jobId: JobId): Future[Option[Job]] =
+    database(selectOne().from(settings.jobs).where("id" === jobId)) map
       _ map (_.deserialize[Job])
-    }
-  }
 
-  def listJobs(apiKey: APIKey): Future[Seq[Job]] = {
-    database(selectAll.from(settings.jobs).where("apiKey" === apiKey)) map {
+  def listJobs(apiKey: APIKey): Future[Seq[Job]] =
+    database(selectAll.from(settings.jobs).where("apiKey" === apiKey)) map
       _.map(_.deserialize[Job]).toList
-    }
-  }
 
   def updateStatus(jobId: JobId,
                    prevStatusId: Option[StatusId],
                    msg: String,
                    progress: BigDecimal,
                    unit: String,
-                   extra: Option[JValue]): Future[Either[String, Status]] = {
+                   extra: Option[JValue]): Future[Either[String, Status]] =
 
     val start = System.nanoTime
-    nextMessageId(jobId) flatMap { statusId =>
-      prevStatusId match {
+    nextMessageId(jobId) flatMap  statusId =>
+      prevStatusId match
         case Some(prevId) =>
           database(selectAndUpdate(settings.jobs)
                 .set(JPath("status") set statusId)
-                .where("id" === jobId && "status" === prevId)) flatMap {
+                .where("id" === jobId && "status" === prevId)) flatMap
             case Some(_) => // Success
               val status = Status(jobId, statusId, msg, progress, unit, extra)
               val message = Status.toMessage(status)
               database(insert(message.serialize.asInstanceOf[JObject])
-                    .into(settings.messages)) map { _ =>
+                    .into(settings.messages)) map  _ =>
                 logger.trace("Job %s updated in %f ms".format(
                         jobId, (System.nanoTime - start) / 1000.0))
                 Right(status)
-              }
 
             case None => // Failed
-              Future {
+              Future
                 Left("Current status ID didn't match that given: " + prevId)
-              }
-          }
 
         case None =>
           val status = Status(jobId, statusId, msg, progress, unit, extra)
           val message = Status.toMessage(status)
-          database {
+          database
             upsert(settings.jobs)
               .set(JPath("status") set statusId)
               .where("id" === jobId)
-          } flatMap { _ =>
+          flatMap  _ =>
             database(insert(message.serialize.asInstanceOf[JObject])
                   .into(settings.messages))
-          } map { _ =>
+          map  _ =>
             Right(status)
-          }
-      }
-    }
-  }
 
-  def getStatus(jobId: JobId): Future[Option[Status]] = {
+  def getStatus(jobId: JobId): Future[Option[Status]] =
 
     // TODO: Get Job object, find current status ID, then use that as since.
     // It'll include at least the last status, but rarely much more.
 
     listMessages(jobId, channels.Status, None) map
     (_.lastOption flatMap (Status.fromMessage(_)))
-  }
 
-  private def nextMessageId(jobId: JobId): Future[Long] = {
+  private def nextMessageId(jobId: JobId): Future[Long] =
     database(
         selectAndUpsert(settings.jobs)
           .set(JPath("sequence") inc 1)
           .where("id" === jobId)
-          .returnNew(true)) map {
+          .returnNew(true)) map
       case Some(obj) =>
         (obj \ "sequence").validated[Long] getOrElse sys.error(
             "Expected an integral sequence number.")
       case None =>
         sys.error("Sequence number doesn't exist. This shouldn't happen.")
-    }
-  }
 
-  def listChannels(jobId: JobId): Future[Seq[String]] = {
-    database {
+  def listChannels(jobId: JobId): Future[Seq[String]] =
+    database
       distinct("channel").from(settings.messages).where("jobId" === jobId)
-    } map
-    (_.collect {
+    map
+    (_.collect
           case JString(channel) => channel
-        }.toList)
-  }
+        .toList)
 
   def addMessage(
-      jobId: JobId, channel: String, value: JValue): Future[Message] = {
-    nextMessageId(jobId) flatMap { id =>
+      jobId: JobId, channel: String, value: JValue): Future[Message] =
+    nextMessageId(jobId) flatMap  id =>
       val message = Message(jobId, id, channel, value)
-      database {
+      database
         insert(message.serialize.asInstanceOf[JObject]).into(settings.messages)
-      } map { _ =>
+      map  _ =>
         message
-      }
-    }
-  }
 
   def listMessages(jobId: JobId,
                    channel: String,
-                   since: Option[MessageId]): Future[Seq[Message]] = {
+                   since: Option[MessageId]): Future[Seq[Message]] =
     val filter0 = "jobId" === jobId && "channel" === channel
     val filter =
-      since map { id =>
+      since map  id =>
         filter0 && MongoFieldFilter("id", MongoFilterOperators.$gt, id)
-      } getOrElse filter0
-    database {
+      getOrElse filter0
+    database
       selectAll.from(settings.messages).where(filter)
-    } map { _.map(_.deserialize[Message]).toList }
-  }
+    map { _.map(_.deserialize[Message]).toList }
 
   protected def transition(jobId: JobId)(
-      t: JobState => Either[String, JobState]): Future[Either[String, Job]] = {
-    findJob(jobId) flatMap {
+      t: JobState => Either[String, JobState]): Future[Either[String, Job]] =
+    findJob(jobId) flatMap
       case Some(job) =>
-        t(job.state) match {
+        t(job.state) match
           case Right(newState) =>
             val newJob = job.copy(state = newState)
-            database {
+            database
               update(settings.jobs)
                 .set(newJob.serialize.asInstanceOf[JObject])
                 .where("id" === job.id)
-            } map { _ =>
+            map  _ =>
               Right(newJob)
-            }
 
           case Left(error) =>
             Future { Left(error) }
-        }
 
       case None =>
         Future { Left("Cannot find job with ID '%s'." format jobId) }
-    }
-  }
-}

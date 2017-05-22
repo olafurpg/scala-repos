@@ -4,11 +4,11 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 04.09.2015.
   */
-trait ScalaTestPackageTest extends ScalaTestTestCase {
+trait ScalaTestPackageTest extends ScalaTestTestCase
   protected val packageName = "myPackage"
   protected val secondPackageName = "secondPackage"
 
-  protected def addFiles(): Unit = {
+  protected def addFiles(): Unit =
     addFileToProject(packageName + "/Test1.scala",
                      """
         |package myPackage
@@ -46,9 +46,8 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
         |  test("SecondTest") {}
         |}
       """.stripMargin.trim())
-  }
 
-  def testPackageTestRun(): Unit = {
+  def testPackageTestRun(): Unit =
     addFiles()
     runTestByConfig(
         createTestFromPackage(packageName),
@@ -57,9 +56,8 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
           checkResultTreeHasExactNamedPath(root, "[root]", "Test1", "Test1") &&
           checkResultTreeHasExactNamedPath(root, "[root]", "Test2", "Test2") &&
           checkResultTreeDoesNotHaveNodes(root, "SecondTest"))
-  }
 
-  def testModuleTestRun(): Unit = {
+  def testModuleTestRun(): Unit =
     addFiles()
     runTestByConfig(
         createTestFromModule(testClassName),
@@ -70,5 +68,3 @@ trait ScalaTestPackageTest extends ScalaTestTestCase {
           checkResultTreeHasExactNamedPath(root, "[root]", "Test2", "Test2") &&
           checkResultTreeHasExactNamedPath(
               root, "[root]", "Test1", "SecondTest"))
-  }
-}

@@ -8,30 +8,30 @@ import scala.util.{Success, Failure}
 
 import com.twitter.scalding.db.macros.impl.FieldName
 
-object StringTypeHandler {
+object StringTypeHandler
   def apply[T](c: Context)(
       implicit accessorTree: List[c.universe.MethodSymbol],
       fieldName: FieldName,
       defaultValue: Option[c.Expr[String]],
       annotationInfo: List[(c.universe.Type, Option[Int])],
-      nullable: Boolean): scala.util.Try[List[ColumnFormat[c.type]]] = {
+      nullable: Boolean): scala.util.Try[List[ColumnFormat[c.type]]] =
     import c.universe._
 
-    val helper = new {
+    val helper = new
       val ctx: c.type = c
       val cfieldName = fieldName
       val cannotationInfo = annotationInfo
-    } with AnnotationHelper
+    with AnnotationHelper
 
-    val extracted = for {
+    val extracted = for
       (nextHelper, sizeAnno) <- helper.sizeAnnotation
       (nextHelper, varcharAnno) <- nextHelper.varcharAnnotation
       (nextHelper, textAnno) <- nextHelper.textAnnotation
       _ <- nextHelper.validateFinished
-    } yield (sizeAnno, varcharAnno, textAnno)
+    yield (sizeAnno, varcharAnno, textAnno)
 
-    extracted.flatMap { t =>
-      t match {
+    extracted.flatMap  t =>
+      t match
         case (_, WithVarchar, WithText) =>
           Failure(new Exception(
                   s"String field $fieldName, has mutually exclusive annotations @text and @varchar"))
@@ -52,7 +52,3 @@ object StringTypeHandler {
           Success(List(ColumnFormat(c)(accessorTree, "VARCHAR", Some(siz))))
         case (_, WithoutVarchar, WithText) =>
           Success(List(ColumnFormat(c)(accessorTree, "TEXT", None)))
-      }
-    }
-  }
-}

@@ -54,7 +54,7 @@ package api
   *  make sense for certain subclasses of `Symbol` and return `NoSymbol`, `Nil` or other empty values.
   *
   */
-trait Symbols { self: Universe =>
+trait Symbols  self: Universe =>
 
   /** The type of symbols representing declarations.
     *  @group Symbols
@@ -128,7 +128,7 @@ trait Symbols { self: Universe =>
     *  @groupname Module        Module Symbol Members
     *  @groupprio Module        -2
     */
-  trait SymbolApi {
+  trait SymbolApi
     this: Symbol =>
 
     /** The owner of this symbol. This is the symbol
@@ -222,14 +222,13 @@ trait Symbols { self: Universe =>
       *
       *  @group Conversions
       */
-    def asMethod: MethodSymbol = {
+    def asMethod: MethodSymbol =
       def overloadedMsg =
         "encapsulates multiple overloaded alternatives and cannot be treated as a method. " +
         "Consider invoking `<offending symbol>.asTerm.alternatives` and manually picking the required method"
       def vanillaMsg = "is not a method"
       val msg = if (isOverloadedMethod) overloadedMsg else vanillaMsg
       throw new ScalaReflectionException(s"$this $msg")
-    }
 
     /** Used to provide a better error message for `asMethod`.
       *
@@ -550,7 +549,6 @@ trait Symbols { self: Universe =>
       *  @group Helpers
       */
     def suchThat(cond: Symbol => Boolean): Symbol
-  }
 
   /** The API of term symbols.
     *  The main source of information about symbols is the [[Symbols]] page.
@@ -558,7 +556,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait TermSymbolApi extends SymbolApi {
+  trait TermSymbolApi extends SymbolApi
     this: TermSymbol =>
 
     /** Term symbols have their names of type `TermName`.
@@ -667,7 +665,6 @@ trait Symbols { self: Universe =>
       *  @group Term
       */
     def isByNameParam: Boolean
-  }
 
   /** The API of type symbols.
     *  The main source of information about symbols is the [[Symbols]] page.
@@ -675,7 +672,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait TypeSymbolApi extends SymbolApi {
+  trait TypeSymbolApi extends SymbolApi
     this: TypeSymbol =>
 
     /** Type symbols have their names of type `TypeName`.
@@ -754,7 +751,6 @@ trait Symbols { self: Universe =>
       *  @group Type
       */
     def typeParams: List[Symbol]
-  }
 
   /** The API of method symbols.
     *  The main source of information about symbols is the [[Symbols]] page.
@@ -762,7 +758,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait MethodSymbolApi extends TermSymbolApi {
+  trait MethodSymbolApi extends TermSymbolApi
     this: MethodSymbol =>
     final override def isMethod = true
     final override def asMethod = this
@@ -814,7 +810,6 @@ trait Symbols { self: Universe =>
       *  @group Method
       */
     def exceptions: List[Symbol]
-  }
 
   /** The API of module symbols.
     *  The main source of information about symbols is the [[Symbols]] page.
@@ -822,7 +817,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait ModuleSymbolApi extends TermSymbolApi {
+  trait ModuleSymbolApi extends TermSymbolApi
     this: ModuleSymbol =>
 
     /** The class implicitly associated with the object definition.
@@ -836,7 +831,6 @@ trait Symbols { self: Universe =>
 
     final override def isModule = true
     final override def asModule = this
-  }
 
   /** The API of class symbols.
     *  The main source of information about symbols is the [[Symbols]] page.
@@ -844,7 +838,7 @@ trait Symbols { self: Universe =>
     *  $SYMACCESSORS
     *  @group API
     */
-  trait ClassSymbolApi extends TypeSymbolApi {
+  trait ClassSymbolApi extends TypeSymbolApi
     this: ClassSymbol =>
     final override def isClass = true
     final override def asClass = this
@@ -964,5 +958,3 @@ trait Symbols { self: Universe =>
     // This, however, will require some refactoring in the compiler, so I'll leave it for later
     // as at the moment we don't have time or risk tolerance for that
     def primaryConstructor: Symbol
-  }
-}

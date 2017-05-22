@@ -24,7 +24,7 @@ case class Multipart(attributes: Map[String, Seq[String]],
   * An _experimental_ set ot utility classes and methods for decoding HTTP POST requests with
   * `multipart/form-data` content type.
   */
-object Multipart {
+object Multipart
 
   /**
     * The maximum size of the file upload to be stored as in-memory file.
@@ -34,7 +34,7 @@ object Multipart {
   /**
     * A type representing a multipart _file upload_.
     */
-  trait FileUpload {
+  trait FileUpload
 
     /**
       * The Content-Type of this file upload.
@@ -51,7 +51,6 @@ object Multipart {
       * The Content-Transfer-Encoding of this file upload.
       */
     def contentTransferEncoding: String
-  }
 
   /**
     * A variant of [[FileUpload]] that is already in memory and represented as [[Buf]].
@@ -81,7 +80,7 @@ object Multipart {
     * See [[https://groups.google.com/forum/#!topic/netty/NxT-4QzutI4 this Netty thread]]
     * for more details.
     */
-  private[http] def decodeNonChunked(request: Request): Multipart = {
+  private[http] def decodeNonChunked(request: Request): Multipart =
     require(!request.isChunked)
     require(request.method == Method.Post)
 
@@ -91,7 +90,7 @@ object Multipart {
     val attrs = new mutable.HashMap[String, mutable.ListBuffer[String]]()
     val files = new mutable.HashMap[String, mutable.ListBuffer[FileUpload]]()
 
-    decoder.getBodyHttpDatas.asScala.foreach {
+    decoder.getBodyHttpDatas.asScala.foreach
       case attr: multipart.Attribute =>
         val buf =
           attrs.getOrElseUpdate(attr.getName, mutable.ListBuffer[String]())
@@ -100,25 +99,21 @@ object Multipart {
       case fu: multipart.FileUpload =>
         val buf =
           files.getOrElseUpdate(fu.getName, mutable.ListBuffer[FileUpload]())
-        if (fu.isInMemory) {
+        if (fu.isInMemory)
           buf += InMemoryFileUpload(
               Buf.ByteArray.Owned(fu.get()),
               fu.getContentType,
               fu.getFilename,
               fu.getContentTransferEncoding
           )
-        } else {
+        else
           buf += OnDiskFileUpload(
               fu.getFile,
               fu.getContentType,
               fu.getFilename,
               fu.getContentTransferEncoding
           )
-        }
 
       case _ => // ignore everything else
-    }
 
     Multipart(attrs.mapValues(_.toSeq).toMap, files.mapValues(_.toSeq).toMap)
-  }
-}

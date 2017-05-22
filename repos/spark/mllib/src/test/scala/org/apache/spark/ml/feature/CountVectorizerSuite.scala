@@ -26,16 +26,15 @@ import org.apache.spark.sql.Row
 
 class CountVectorizerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new CountVectorizer)
     ParamsSuite.checkParams(new CountVectorizerModel(Array("empty")))
-  }
 
   private def split(s: String): Seq[String] = s.split("\\s+")
 
-  test("CountVectorizerModel common cases") {
+  test("CountVectorizerModel common cases")
     val df = sqlContext
       .createDataFrame(
           Seq(
@@ -55,13 +54,11 @@ class CountVectorizerSuite
     val cv = new CountVectorizerModel(Array("a", "b", "c", "d"))
       .setInputCol("words")
       .setOutputCol("features")
-    cv.transform(df).select("features", "expected").collect().foreach {
+    cv.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizer common cases") {
+  test("CountVectorizer common cases")
     val df = sqlContext
       .createDataFrame(
           Seq((0,
@@ -78,13 +75,11 @@ class CountVectorizerSuite
       .fit(df)
     assert(cv.vocabulary === Array("a", "b", "c", "d", "e"))
 
-    cv.transform(df).select("features", "expected").collect().foreach {
+    cv.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizer vocabSize and minDF") {
+  test("CountVectorizer vocabSize and minDF")
     val df = sqlContext
       .createDataFrame(
           Seq((0,
@@ -109,10 +104,9 @@ class CountVectorizerSuite
       .fit(df)
     assert(cvModel2.vocabulary === Array("a", "b"))
 
-    cvModel2.transform(df).select("features", "expected").collect().foreach {
+    cvModel2.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
 
     // minDF: ignore terms with freq < 0.75
     val cvModel3 = new CountVectorizer()
@@ -122,14 +116,12 @@ class CountVectorizerSuite
       .fit(df)
     assert(cvModel3.vocabulary === Array("a", "b"))
 
-    cvModel3.transform(df).select("features", "expected").collect().foreach {
+    cvModel3.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizer throws exception when vocab is empty") {
-    intercept[IllegalArgumentException] {
+  test("CountVectorizer throws exception when vocab is empty")
+    intercept[IllegalArgumentException]
       val df = sqlContext
         .createDataFrame(
             Seq((0, split("a a b b c c")), (1, split("aa bb cc"))))
@@ -140,10 +132,8 @@ class CountVectorizerSuite
         .setVocabSize(3) // limit vocab size to 3
         .setMinDF(3)
         .fit(df)
-    }
-  }
 
-  test("CountVectorizerModel with minTF count") {
+  test("CountVectorizerModel with minTF count")
     val df = sqlContext
       .createDataFrame(
           Seq((0,
@@ -159,13 +149,11 @@ class CountVectorizerSuite
       .setInputCol("words")
       .setOutputCol("features")
       .setMinTF(3)
-    cv.transform(df).select("features", "expected").collect().foreach {
+    cv.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizerModel with minTF freq") {
+  test("CountVectorizerModel with minTF freq")
     val df = sqlContext
       .createDataFrame(
           Seq((0,
@@ -181,13 +169,11 @@ class CountVectorizerSuite
       .setInputCol("words")
       .setOutputCol("features")
       .setMinTF(0.3)
-    cv.transform(df).select("features", "expected").collect().foreach {
+    cv.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizerModel with binary") {
+  test("CountVectorizerModel with binary")
     val df = sqlContext
       .createDataFrame(Seq(
               (0,
@@ -202,13 +188,11 @@ class CountVectorizerSuite
       .setInputCol("words")
       .setOutputCol("features")
       .setBinary(true)
-    cv.transform(df).select("features", "expected").collect().foreach {
+    cv.transform(df).select("features", "expected").collect().foreach
       case Row(features: Vector, expected: Vector) =>
         assert(features ~== expected absTol 1e-14)
-    }
-  }
 
-  test("CountVectorizer read/write") {
+  test("CountVectorizer read/write")
     val t = new CountVectorizer()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
@@ -216,9 +200,8 @@ class CountVectorizerSuite
       .setMinTF(3.0)
       .setVocabSize(10)
     testDefaultReadWrite(t)
-  }
 
-  test("CountVectorizerModel read/write") {
+  test("CountVectorizerModel read/write")
     val instance =
       new CountVectorizerModel("myCountVectorizerModel", Array("a", "b", "c"))
         .setInputCol("myInputCol")
@@ -226,5 +209,3 @@ class CountVectorizerSuite
         .setMinTF(3.0)
     val newInstance = testDefaultReadWrite(instance)
     assert(newInstance.vocabulary === instance.vocabulary)
-  }
-}

@@ -37,7 +37,7 @@ import scala.collection._
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
 class ZookeeperConsumerConnectorTest
-    extends KafkaServerTestHarness with Logging {
+    extends KafkaServerTestHarness with Logging
 
   val RebalanceBackoffMs = 5000
   var dirs: ZKGroupTopicDirs = null
@@ -60,26 +60,23 @@ class ZookeeperConsumerConnectorTest
   val nMessages = 2
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     dirs = new ZKGroupTopicDirs(group, topic)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown()
-  }
 
   @Test
-  def testBasic() {
+  def testBasic()
     val requestHandlerLogger = Logger.getLogger(classOf[KafkaRequestHandler])
     requestHandlerLogger.setLevel(Level.FATAL)
 
     // test consumer timeout logic
     val consumerConfig0 = new ConsumerConfig(
-        TestUtils.createConsumerProperties(zkConnect, group, consumer0)) {
+        TestUtils.createConsumerProperties(zkConnect, group, consumer0))
       override val consumerTimeoutMs = 200
-    }
     val zkConsumerConnector0 = new ZookeeperConsumerConnector(
         consumerConfig0, true)
     val topicMessageStreams0 = zkConsumerConnector0.createMessageStreams(
@@ -87,15 +84,13 @@ class ZookeeperConsumerConnectorTest
 
     // no messages to consume, we should hit timeout;
     // also the iterator should support re-entrant, so loop it twice
-    for (i <- 0 until 2) {
-      try {
+    for (i <- 0 until 2)
+      try
         getMessages(topicMessageStreams0, nMessages * 2)
         fail("should get an exception")
-      } catch {
+      catch
         case e: ConsumerTimeoutException => // this is ok
         case e: Throwable => throw e
-      }
-    }
 
     zkConsumerConnector0.shutdown
 
@@ -133,9 +128,8 @@ class ZookeeperConsumerConnectorTest
 
     // create a consumer
     val consumerConfig2 = new ConsumerConfig(
-        TestUtils.createConsumerProperties(zkConnect, group, consumer2)) {
+        TestUtils.createConsumerProperties(zkConnect, group, consumer2))
       override val rebalanceBackoffMs = RebalanceBackoffMs
-    }
     val zkConsumerConnector2 = new ZookeeperConsumerConnector(
         consumerConfig2, true)
     val topicMessageStreams2 = zkConsumerConnector2.createMessageStreams(
@@ -184,23 +178,21 @@ class ZookeeperConsumerConnectorTest
     assertEquals(expected_2, actual_3)
 
     // call createMesssageStreams twice should throw MessageStreamsExistException
-    try {
+    try
       val topicMessageStreams4 = zkConsumerConnector3.createMessageStreams(
           new mutable.HashMap[String, Int]())
       fail("Should fail with MessageStreamsExistException")
-    } catch {
+    catch
       case e: MessageStreamsExistException => // expected
-    }
 
     zkConsumerConnector1.shutdown
     zkConsumerConnector2.shutdown
     zkConsumerConnector3.shutdown
     info("all consumer connectors stopped")
     requestHandlerLogger.setLevel(Level.ERROR)
-  }
 
   @Test
-  def testCompression() {
+  def testCompression()
     val requestHandlerLogger =
       Logger.getLogger(classOf[kafka.server.KafkaRequestHandler])
     requestHandlerLogger.setLevel(Level.FATAL)
@@ -237,9 +229,8 @@ class ZookeeperConsumerConnectorTest
 
     // create a consumer
     val consumerConfig2 = new ConsumerConfig(
-        TestUtils.createConsumerProperties(zkConnect, group, consumer2)) {
+        TestUtils.createConsumerProperties(zkConnect, group, consumer2))
       override val rebalanceBackoffMs = RebalanceBackoffMs
-    }
     val zkConsumerConnector2 = new ZookeeperConsumerConnector(
         consumerConfig2, true)
     val topicMessageStreams2 = zkConsumerConnector2.createMessageStreams(
@@ -294,10 +285,9 @@ class ZookeeperConsumerConnectorTest
     zkConsumerConnector3.shutdown
     info("all consumer connectors stopped")
     requestHandlerLogger.setLevel(Level.ERROR)
-  }
 
   @Test
-  def testCompressionSetConsumption() {
+  def testCompressionSetConsumption()
     // send some messages to each broker
     val sentMessages =
       sendMessages(servers, topic, 200, 0, DefaultCompressionCodec) ++ sendMessages(
@@ -322,10 +312,9 @@ class ZookeeperConsumerConnectorTest
     assertEquals(expected_2, actual_2)
 
     zkConsumerConnector1.shutdown
-  }
 
   @Test
-  def testConsumerDecoder() {
+  def testConsumerDecoder()
     val requestHandlerLogger =
       Logger.getLogger(classOf[kafka.server.KafkaRequestHandler])
     requestHandlerLogger.setLevel(Level.FATAL)
@@ -350,25 +339,21 @@ class ZookeeperConsumerConnectorTest
         Map(topic -> 1), new StringDecoder(), new StringDecoder())
 
     var receivedMessages: List[String] = Nil
-    for ((topic, messageStreams) <- topicMessageStreams) {
-      for (messageStream <- messageStreams) {
+    for ((topic, messageStreams) <- topicMessageStreams)
+      for (messageStream <- messageStreams)
         val iterator = messageStream.iterator
-        for (i <- 0 until nMessages * 2) {
+        for (i <- 0 until nMessages * 2)
           assertTrue(iterator.hasNext())
           val message = iterator.next().message
           receivedMessages ::= message
           debug("received message: " + message)
-        }
-      }
-    }
     assertEquals(sentMessages.sorted, receivedMessages.sorted)
 
     zkConsumerConnector.shutdown()
     requestHandlerLogger.setLevel(Level.ERROR)
-  }
 
   @Test
-  def testLeaderSelectionForPartition() {
+  def testLeaderSelectionForPartition()
     val zkUtils = ZkUtils(zkConnect, 6000, 30000, false)
 
     // create topic topic1 with 1 partition on broker 0
@@ -405,10 +390,9 @@ class ZookeeperConsumerConnectorTest
     assertEquals(sentMessages1, receivedMessages1)
     zkConsumerConnector1.shutdown()
     zkUtils.close()
-  }
 
   @Test
-  def testConsumerRebalanceListener() {
+  def testConsumerRebalanceListener()
     // Send messages to create topic
     sendMessages(servers, topic, nMessages, 0)
     sendMessages(servers, topic, nMessages, 1)
@@ -492,25 +476,22 @@ class ZookeeperConsumerConnectorTest
                  rebalanceListener2.globalPartitionOwnership)
     zkConsumerConnector1.shutdown()
     zkConsumerConnector2.shutdown()
-  }
 
-  def getZKChildrenValues(path: String): Seq[Tuple2[String, String]] = {
+  def getZKChildrenValues(path: String): Seq[Tuple2[String, String]] =
     val children = zkUtils.zkClient.getChildren(path)
     Collections.sort(children)
-    val childrenAsSeq: Seq[java.lang.String] = {
+    val childrenAsSeq: Seq[java.lang.String] =
       import scala.collection.JavaConversions._
       children.toSeq
-    }
     childrenAsSeq.map(
         partition =>
           (partition,
            zkUtils.zkClient
              .readData(path + "/" + partition)
              .asInstanceOf[String]))
-  }
 
   private class TestConsumerRebalanceListener
-      extends ConsumerRebalanceListener {
+      extends ConsumerRebalanceListener
     var beforeReleasingPartitionsCalled: Boolean = false
     var beforeStartingFetchersCalled: Boolean = false
     var consumerId: String = "";
@@ -520,18 +501,14 @@ class ZookeeperConsumerConnectorTest
         String, java.util.Map[java.lang.Integer, ConsumerThreadId]] = null
 
     override def beforeReleasingPartitions(partitionOwnership: java.util.Map[
-            String, java.util.Set[java.lang.Integer]]) {
+            String, java.util.Set[java.lang.Integer]])
       beforeReleasingPartitionsCalled = true
       this.partitionOwnership = partitionOwnership
-    }
 
     override def beforeStartingFetchers(
         consumerId: String,
         globalPartitionOwnership: java.util.Map[
-            String, java.util.Map[java.lang.Integer, ConsumerThreadId]]) {
+            String, java.util.Map[java.lang.Integer, ConsumerThreadId]])
       beforeStartingFetchersCalled = true
       this.consumerId = consumerId
       this.globalPartitionOwnership = globalPartitionOwnership
-    }
-  }
-}

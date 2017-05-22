@@ -1,5 +1,4 @@
 package a.b
 
-object A {
+object A
   private[b] def x = 3
-}

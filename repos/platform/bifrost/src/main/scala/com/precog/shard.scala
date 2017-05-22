@@ -30,9 +30,8 @@ import scalaz.StreamT
 import blueeyes.json.JValue
 import java.nio.CharBuffer
 
-package object bifrost {
+package object bifrost
   type QueryResult = Either[JValue, StreamT[Future, CharBuffer]]
 
   type JobQueryT[M[+ _], +A] = QueryT[JobQueryState, M, A]
   type JobQueryTF[+A] = JobQueryT[Future, A]
-}

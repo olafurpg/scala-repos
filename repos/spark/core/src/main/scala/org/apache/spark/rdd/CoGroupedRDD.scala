@@ -38,16 +38,14 @@ private[spark] case class NarrowCoGroupSplitDep(
     @transient splitIndex: Int,
     var split: Partition
 )
-    extends Serializable {
+    extends Serializable
 
   @throws(classOf[IOException])
   private def writeObject(oos: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       // Update the reference to parent split at the time of task serialization
       split = rdd.partitions(splitIndex)
       oos.defaultWriteObject()
-    }
-}
 
 /**
   * Stores information about the narrow dependencies used by a CoGroupedRdd.
@@ -59,10 +57,9 @@ private[spark] case class NarrowCoGroupSplitDep(
   */
 private[spark] class CoGroupPartition(
     idx: Int, val narrowDeps: Array[Option[NarrowCoGroupSplitDep]])
-    extends Partition with Serializable {
+    extends Partition with Serializable
   override val index: Int = idx
   override def hashCode(): Int = idx
-}
 
 /**
   * :: DeveloperApi ::
@@ -78,7 +75,7 @@ private[spark] class CoGroupPartition(
 @DeveloperApi
 class CoGroupedRDD[K : ClassTag](
     @transient var rdds: Seq[RDD[_ <: Product2[K, _]]], part: Partitioner)
-    extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil) {
+    extends RDD[(K, Array[Iterable[_]])](rdds.head.context, Nil)
 
   // For example, `(k, a) cogroup (k, b)` produces k -> Array(ArrayBuffer as, ArrayBuffer bs).
   // Each ArrayBuffer is represented as a CoGroup, and the resulting Array as a CoGroupCombiner.
@@ -90,53 +87,46 @@ class CoGroupedRDD[K : ClassTag](
   private var serializer: Serializer = SparkEnv.get.serializer
 
   /** Set a serializer for this RDD's shuffle, or null to use the default (spark.serializer) */
-  def setSerializer(serializer: Serializer): CoGroupedRDD[K] = {
+  def setSerializer(serializer: Serializer): CoGroupedRDD[K] =
     this.serializer = serializer
     this
-  }
 
-  override def getDependencies: Seq[Dependency[_]] = {
-    rdds.map { rdd: RDD[_] =>
-      if (rdd.partitioner == Some(part)) {
+  override def getDependencies: Seq[Dependency[_]] =
+    rdds.map  rdd: RDD[_] =>
+      if (rdd.partitioner == Some(part))
         logDebug("Adding one-to-one dependency with " + rdd)
         new OneToOneDependency(rdd)
-      } else {
+      else
         logDebug("Adding shuffle dependency with " + rdd)
         new ShuffleDependency[K, Any, CoGroupCombiner](
             rdd.asInstanceOf[RDD[_ <: Product2[K, _]]], part, serializer)
-      }
-    }
-  }
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     val array = new Array[Partition](part.numPartitions)
-    for (i <- 0 until array.length) {
+    for (i <- 0 until array.length)
       // Each CoGroupPartition will have a dependency per contributing RDD
-      array(i) = new CoGroupPartition(i, rdds.zipWithIndex.map {
+      array(i) = new CoGroupPartition(i, rdds.zipWithIndex.map
         case (rdd, j) =>
           // Assume each RDD contributed a single dependency, and get it
-          dependencies(j) match {
+          dependencies(j) match
             case s: ShuffleDependency[_, _, _] =>
               None
             case _ =>
               Some(new NarrowCoGroupSplitDep(rdd, i, rdd.partitions(i)))
-          }
-      }.toArray)
-    }
+      .toArray)
     array
-  }
 
   override val partitioner: Some[Partitioner] = Some(part)
 
   override def compute(
       s: Partition,
-      context: TaskContext): Iterator[(K, Array[Iterable[_]])] = {
+      context: TaskContext): Iterator[(K, Array[Iterable[_]])] =
     val split = s.asInstanceOf[CoGroupPartition]
     val numRdds = dependencies.length
 
     // A list of (rdd iterator, dependency number) pairs
     val rddIterators = new ArrayBuffer[(Iterator[Product2[K, Any]], Int)]
-    for ((dep, depNum) <- dependencies.zipWithIndex) dep match {
+    for ((dep, depNum) <- dependencies.zipWithIndex) dep match
       case oneToOneDependency: OneToOneDependency[Product2[K, Any]] @unchecked =>
         val dependencyPartition = split.narrowDeps(depNum).get.split
         // Read them from the parent
@@ -152,51 +142,38 @@ class CoGroupedRDD[K : ClassTag](
                      context)
           .read()
         rddIterators += ((it, depNum))
-    }
 
     val map = createExternalMap(numRdds)
-    for ((it, depNum) <- rddIterators) {
+    for ((it, depNum) <- rddIterators)
       map.insertAll(
           it.map(pair => (pair._1, new CoGroupValue(pair._2, depNum))))
-    }
     context.taskMetrics().incMemoryBytesSpilled(map.memoryBytesSpilled)
     context.taskMetrics().incDiskBytesSpilled(map.diskBytesSpilled)
     context.taskMetrics().incPeakExecutionMemory(map.peakMemoryUsedBytes)
     new InterruptibleIterator(
         context, map.iterator.asInstanceOf[Iterator[(K, Array[Iterable[_]])]])
-  }
 
   private def createExternalMap(numRdds: Int)
-    : ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner] = {
+    : ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner] =
 
     val createCombiner: (CoGroupValue => CoGroupCombiner) = value =>
-      {
         val newCombiner = Array.fill(numRdds)(new CoGroup)
         newCombiner(value._2) += value._1
         newCombiner
-    }
     val mergeValue: (CoGroupCombiner,
     CoGroupValue) => CoGroupCombiner = (combiner, value) =>
-      {
         combiner(value._2) += value._1
         combiner
-    }
     val mergeCombiners: (CoGroupCombiner,
     CoGroupCombiner) => CoGroupCombiner = (combiner1, combiner2) =>
-      {
         var depNum = 0
-        while (depNum < numRdds) {
+        while (depNum < numRdds)
           combiner1(depNum) ++= combiner2(depNum)
           depNum += 1
-        }
         combiner1
-    }
     new ExternalAppendOnlyMap[K, CoGroupValue, CoGroupCombiner](
         createCombiner, mergeValue, mergeCombiners)
-  }
 
-  override def clearDependencies() {
+  override def clearDependencies()
     super.clearDependencies()
     rdds = null
-  }
-}

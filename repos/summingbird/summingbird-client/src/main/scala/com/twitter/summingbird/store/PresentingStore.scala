@@ -34,15 +34,13 @@ import com.twitter.util.Future
   * @author Sam Ritchie
   * @author Oscar Boykin
   */
-object PresentingStore {
+object PresentingStore
   def apply[K, V, U](onlineStore: MergeableStore[(K, BatchID), V],
                      clientStore: ReadableStore[K, V],
                      presentingStore: Store[K, U])(
       fn: V => U): MergeableStore[(K, BatchID), V] =
-    new SideEffectStore(onlineStore)({
+    new SideEffectStore(onlineStore)(
       case (k, _) =>
-        clientStore.get(k).flatMap { optV =>
+        clientStore.get(k).flatMap  optV =>
           presentingStore.put(k -> optV.map(fn))
-        }
-    })
-}
+    )

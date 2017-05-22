@@ -9,25 +9,20 @@ import scala.concurrent.Future
 class TaskRepository(
     protected[state] val store: EntityStore[MarathonTaskState],
     protected val metrics: Metrics)
-    extends EntityRepository[MarathonTaskState] {
+    extends EntityRepository[MarathonTaskState]
 
   val maxVersions = None
 
   def task(key: String): Future[Option[MarathonTask]] =
-    currentVersion(key).map {
+    currentVersion(key).map
       case Some(taskState) => Some(taskState.toProto)
       case _ => None
-    }
 
-  def tasksKeys(appId: PathId): Future[Iterable[String]] = {
+  def tasksKeys(appId: PathId): Future[Iterable[String]] =
     allIds().map(_.filter(name => name.startsWith(appId.safePath)))
-  }
 
-  def store(task: MarathonTask): Future[MarathonTask] = {
+  def store(task: MarathonTask): Future[MarathonTask] =
     this.store.store(task.getId, MarathonTaskState(task)).map(_.toProto)
-  }
-}
 
-object TaskRepository {
+object TaskRepository
   val storePrefix = "task:"
-}

@@ -27,7 +27,7 @@ import scala.scalajs.js.annotation._
   *  conversion [[JSArrayOps.jsArrayOps]].
   */
 @native
-trait JSArrayOps[A] extends Object {
+trait JSArrayOps[A] extends Object
 
   /**
     * The indexOf() method returns the first index at which a given element can
@@ -267,9 +267,7 @@ trait JSArrayOps[A] extends Object {
   def jsReduceRight[B](callbackfn: Function3[B, A, Int, B]): B = native
   @JSName("reduceRight")
   def jsReduceRight[B](callbackfn: Function2[B, A, B]): B = native
-}
 
-object JSArrayOps {
+object JSArrayOps
   @inline implicit def jsArrayOps[A](array: Array[A]): JSArrayOps[A] =
     array.asInstanceOf[JSArrayOps[A]]
-}

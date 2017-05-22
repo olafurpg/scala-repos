@@ -12,16 +12,16 @@ import scala.reflect.ClassTag
   */
 abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](
     name: String)
-    extends HoconFileSetTestCase("manipulators/" + name) {
+    extends HoconFileSetTestCase("manipulators/" + name)
 
-  protected def transform(data: Seq[String]): String = {
+  protected def transform(data: Seq[String]): String =
     val Seq(inputCaret, newContentInBrackets) = data
     val (input, offset) = extractCaret(inputCaret)
     val newContent = newContentInBrackets.stripPrefix("[").stripSuffix("]")
 
     val psiFile = createPseudoPhysicalHoconFile(getProject, input)
 
-    inWriteCommandAction {
+    inWriteCommandAction
       val element = Iterator
         .iterate(psiFile.findElementAt(offset))(_.getParent)
         .collectFirst({ case t: T => t })
@@ -29,8 +29,5 @@ abstract class HoconManipulatorTest[T <: HoconPsiElement : ClassTag](
       val manipulator = ElementManipulators.getManipulator(element)
       val range = manipulator.getRangeInElement(element)
       manipulator.handleContentChange(element, range, newContent)
-    }
 
     psiFile.getText
-  }
-}

@@ -9,7 +9,7 @@ import java.net.InetSocketAddress
 import akka.http.scaladsl
 
 class OutgoingConnection private[http](
-    delegate: scaladsl.Http.OutgoingConnection) {
+    delegate: scaladsl.Http.OutgoingConnection)
 
   /**
     * The local address of this connection.
@@ -20,4 +20,3 @@ class OutgoingConnection private[http](
     * The address of the remote peer.
     */
   def remoteAddress: InetSocketAddress = delegate.remoteAddress
-}

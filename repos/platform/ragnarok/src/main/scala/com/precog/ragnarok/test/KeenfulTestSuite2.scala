@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object KeenfulTestSuite2 extends PerfTestSuite {
+object KeenfulTestSuite2 extends PerfTestSuite
   query("""
 import std::time::*
 data := //keenful
@@ -44,4 +44,3 @@ solve 'day
 --8152 ms (1/1) after
 --6707 ms (6/3)
     """)
-}

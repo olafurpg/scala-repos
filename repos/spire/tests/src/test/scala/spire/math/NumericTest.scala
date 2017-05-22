@@ -11,7 +11,7 @@ import java.math.MathContext
 
 // nice alias
 
-class NumericTest extends FunSuite {
+class NumericTest extends FunSuite
 
   /**
     * We use this function to avoid duplicating our tests for all the different
@@ -20,7 +20,7 @@ class NumericTest extends FunSuite {
     *   a=-3  b=3  c=9
     */
   def runWith[@sp A : Numeric : ClassTag](cls: String)(
-      a: A, b: A, c: A): Unit = {
+      a: A, b: A, c: A): Unit =
 
     // the name to use for this A
     //val cls = implicitly[ClassTag[A]].erasure.getSimpleName
@@ -55,7 +55,6 @@ class NumericTest extends FunSuite {
 
     // toInt
     runTest("3.toInt")(assert(b.toInt === 3))
-  }
 
   implicit val mc: MathContext = MathContext.DECIMAL128
 
@@ -73,4 +72,3 @@ class NumericTest extends FunSuite {
       Complex(BigDecimal(3), BigDecimal(0)),
       Complex(BigDecimal(-9), BigDecimal(0))
   )
-}

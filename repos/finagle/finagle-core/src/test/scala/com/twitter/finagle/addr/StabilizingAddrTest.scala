@@ -10,13 +10,12 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 import StabilizingAddr.State._
 
-class MockHealth {
+class MockHealth
   val pulse = new Broker[Health]()
   def mkHealthy() { pulse ! Healthy }
   def mkUnhealthy() { pulse ! Unhealthy }
-}
 
-class Context {
+class Context
   val s1 = Address(1)
   val s2 = Address(2)
   val s3 = Address(3)
@@ -29,17 +28,15 @@ class Context {
   val s10 = Address(10)
   val allAddrs = Set(s1, s2, s3, s4, s5, s6, s7, s8, s9, s10)
 
-  object addrs {
+  object addrs
     val broker = new Broker[Addr]
     val offer = broker.recv
     @volatile var set = Set.empty[Address]
 
     def apply() = set
-    def update(newSet: Set[Address]) {
+    def update(newSet: Set[Address])
       set = newSet
       broker !! Addr.Bound(set)
-    }
-  }
 
   val healthStatus = new MockHealth
   val grace = 150.milliseconds
@@ -59,16 +56,14 @@ class Context {
 
   addrs() = allAddrs
 
-  def assertStable() {
+  def assertStable()
     assert(stabilized == Addr.Bound(addrs()))
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class StabilizingAddrTest extends FunSuite {
+class StabilizingAddrTest extends FunSuite
 
-  test("delay removals while healthy") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("delay removals while healthy")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -88,11 +83,9 @@ class StabilizingAddrTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assertStable()
-    }
-  }
 
-  test("queue removals while unstable") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("queue removals while unstable")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -114,11 +107,9 @@ class StabilizingAddrTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assertStable()
-    }
-  }
 
-  test("be aware of adds while unstable") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("be aware of adds while unstable")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -141,11 +132,9 @@ class StabilizingAddrTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assertStable()
-    }
-  }
 
-  test("don't skip interim adds") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("don't skip interim adds")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -157,11 +146,9 @@ class StabilizingAddrTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assertStable()
-    }
-  }
 
-  test("Qualify Addr.Neg like an empty group") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("Qualify Addr.Neg like an empty group")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -173,11 +160,9 @@ class StabilizingAddrTest extends FunSuite {
       tc.advance(grace)
       timer.tick()
       assert(stabilized == Addr.Neg)
-    }
-  }
 
-  test("Pass through nonbound addresses after grace") {
-    Time.withCurrentTimeFrozen { tc =>
+  test("Pass through nonbound addresses after grace")
+    Time.withCurrentTimeFrozen  tc =>
       val ctx = new Context
       import ctx._
 
@@ -199,6 +184,3 @@ class StabilizingAddrTest extends FunSuite {
 
       addrs() = Set(s1, s2)
       assertStable()
-    }
-  }
-}

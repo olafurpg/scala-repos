@@ -24,7 +24,7 @@ package mutable
   *  @version 2.8
   *  @since   1
   */
-trait Publisher[Evt] {
+trait Publisher[Evt]
 
   type Pub <: Publisher[Evt]
   type Sub = Subscriber[Evt, Pub]
@@ -46,19 +46,16 @@ trait Publisher[Evt] {
   def removeSubscription(sub: Sub) { filters -= sub }
   def removeSubscriptions() { filters.clear() }
 
-  protected def publish(event: Evt) {
+  protected def publish(event: Evt)
     filters.keys.foreach(sub =>
           if (!suspended.contains(sub) &&
               filters.entryExists(sub, p => p(event))) sub.notify(self, event))
-  }
 
   /** Checks if two publishers are structurally identical.
     *
     *  @return true, iff both publishers contain the same sequence of elements.
     */
-  override def equals(obj: Any): Boolean = obj match {
+  override def equals(obj: Any): Boolean = obj match
     case that: Publisher[_] =>
       filters == that.filters && suspended == that.suspended
     case _ => false
-  }
-}

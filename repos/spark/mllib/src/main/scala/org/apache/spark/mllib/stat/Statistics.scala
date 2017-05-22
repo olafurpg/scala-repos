@@ -32,7 +32,7 @@ import org.apache.spark.rdd.RDD
   * API for statistical functions in MLlib.
   */
 @Since("1.1.0")
-object Statistics {
+object Statistics
 
   /**
     * Computes column-wise summary statistics for the input RDD[Vector].
@@ -41,9 +41,8 @@ object Statistics {
     * @return [[MultivariateStatisticalSummary]] object containing column-wise summary statistics.
     */
   @Since("1.1.0")
-  def colStats(X: RDD[Vector]): MultivariateStatisticalSummary = {
+  def colStats(X: RDD[Vector]): MultivariateStatisticalSummary =
     new RowMatrix(X).computeColumnSummaryStatistics()
-  }
 
   /**
     * Compute the Pearson correlation matrix for the input RDD of Vectors.
@@ -139,9 +138,8 @@ object Statistics {
     *         the method used, and the null hypothesis.
     */
   @Since("1.1.0")
-  def chiSqTest(observed: Vector, expected: Vector): ChiSqTestResult = {
+  def chiSqTest(observed: Vector, expected: Vector): ChiSqTestResult =
     ChiSqTest.chiSquared(observed, expected)
-  }
 
   /**
     * Conduct Pearson's chi-squared goodness of fit test of the observed data against the uniform
@@ -180,9 +178,8 @@ object Statistics {
     *         The order of the elements in the returned array reflects the order of input features.
     */
   @Since("1.1.0")
-  def chiSqTest(data: RDD[LabeledPoint]): Array[ChiSqTestResult] = {
+  def chiSqTest(data: RDD[LabeledPoint]): Array[ChiSqTestResult] =
     ChiSqTest.chiSquaredFeatures(data)
-  }
 
   /** Java-friendly version of [[chiSqTest()]] */
   @Since("1.5.0")
@@ -205,9 +202,8 @@ object Statistics {
   @Since("1.5.0")
   def kolmogorovSmirnovTest(
       data: RDD[Double],
-      cdf: Double => Double): KolmogorovSmirnovTestResult = {
+      cdf: Double => Double): KolmogorovSmirnovTestResult =
     KolmogorovSmirnovTest.testOneSample(data, cdf)
-  }
 
   /**
     * Convenience function to conduct a one-sample, two-sided Kolmogorov-Smirnov test for probability
@@ -224,17 +220,14 @@ object Statistics {
   @varargs
   def kolmogorovSmirnovTest(data: RDD[Double],
                             distName: String,
-                            params: Double*): KolmogorovSmirnovTestResult = {
+                            params: Double*): KolmogorovSmirnovTestResult =
     KolmogorovSmirnovTest.testOneSample(data, distName, params: _*)
-  }
 
   /** Java-friendly version of [[kolmogorovSmirnovTest()]] */
   @Since("1.5.0")
   @varargs
   def kolmogorovSmirnovTest(data: JavaDoubleRDD,
                             distName: String,
-                            params: Double*): KolmogorovSmirnovTestResult = {
+                            params: Double*): KolmogorovSmirnovTestResult =
     kolmogorovSmirnovTest(
         data.rdd.asInstanceOf[RDD[Double]], distName, params: _*)
-  }
-}

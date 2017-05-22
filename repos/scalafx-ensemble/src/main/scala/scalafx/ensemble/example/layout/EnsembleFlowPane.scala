@@ -41,32 +41,27 @@ import scalafx.scene.layout.FlowPane
   * @see scalafx.scene.layout.FlowPane
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleFlowPane extends EnsembleExample {
+class EnsembleFlowPane extends EnsembleExample
 
   // @stage-property width = 400
   // @stage-property height = 500
   // @stage-property resizable = false
 
-  def getContent = {
+  def getContent =
     val image = new Image(
         this.getClass
           .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
 
-    val flowPane = new FlowPane(2, 4) {
+    val flowPane = new FlowPane(2, 4)
       prefWrapLength = 200
       padding = Insets(20)
-      for (i <- 1 to 5) {
+      for (i <- 1 to 5)
         children ++= Seq(
             new Label("Short label"),
             new Label("I am a slightly longer label."),
             new ImageView(image)
         )
-      }
-    }
 
     // Wrap in a Group to isolate from parent's layout parameters
-    new Group {
+    new Group
       children = flowPane
-    }
-  }
-}

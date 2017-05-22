@@ -14,7 +14,7 @@ import scala.annotation.varargs
 import akka.http.scaladsl
 import akka.http.impl.server.RouteStructure
 
-abstract class CodingDirectives extends CacheConditionDirectives {
+abstract class CodingDirectives extends CacheConditionDirectives
 
   /**
     * Wraps the inner routes with encoding support. The response will be encoded
@@ -67,12 +67,11 @@ abstract class CodingDirectives extends CacheConditionDirectives {
     RouteStructure.DecodeRequest(
         CodingDirectives._DefaultCodersToDecodeRequest)(
         innerRoute, moreInnerRoutes.toList)
-}
 
 /**
   * Internal API
   */
-private[http] object CodingDirectives {
+private[http] object CodingDirectives
   private[http] val _DefaultCodersToEncodeResponse =
     scaladsl.server.directives.CodingDirectives.DefaultEncodeResponseEncoders
       .map(c ⇒ Coder.values().find(_._underlyingScalaCoder() == c).get)
@@ -80,4 +79,3 @@ private[http] object CodingDirectives {
   private[http] val _DefaultCodersToDecodeRequest =
     scaladsl.server.directives.CodingDirectives.DefaultCoders
       .map(c ⇒ Coder.values().find(_._underlyingScalaCoder() == c).get)
-}

@@ -61,7 +61,7 @@ import scala.collection.JavaConverters._
 private[kafka] class ZookeeperConsumerConnector(
     val config: ConsumerConfig,
     val enableFetcher: Boolean) // for testing only
-    extends ConsumerConnector {
+    extends ConsumerConnector
 
   private val underlying =
     new kafka.consumer.ZookeeperConsumerConnector(config, enableFetcher)
@@ -74,29 +74,26 @@ private[kafka] class ZookeeperConsumerConnector(
       topicCountMap: java.util.Map[String, java.lang.Integer],
       keyDecoder: Decoder[K],
       valueDecoder: Decoder[V])
-    : java.util.Map[String, java.util.List[KafkaStream[K, V]]] = {
+    : java.util.Map[String, java.util.List[KafkaStream[K, V]]] =
 
     if (messageStreamCreated.getAndSet(true))
       throw new MessageStreamsExistException(
           this.getClass.getSimpleName +
           " can create message streams at most once",
           null)
-    val scalaTopicCountMap: Map[String, Int] = {
+    val scalaTopicCountMap: Map[String, Int] =
       import JavaConversions._
       Map.empty[String, Int] ++
       (topicCountMap.asInstanceOf[java.util.Map[String, Int]]: mutable.Map[
               String, Int])
-    }
     val scalaReturn =
       underlying.consume(scalaTopicCountMap, keyDecoder, valueDecoder)
     val ret = new java.util.HashMap[String, java.util.List[KafkaStream[K, V]]]
-    for ((topic, streams) <- scalaReturn) {
+    for ((topic, streams) <- scalaReturn)
       var javaStreamList = new java.util.ArrayList[KafkaStream[K, V]]
       for (stream <- streams) javaStreamList.add(stream)
       ret.put(topic, javaStreamList)
-    }
     ret
-  }
 
   def createMessageStreams(
       topicCountMap: java.util.Map[String, java.lang.Integer]): java.util.Map[
@@ -107,11 +104,10 @@ private[kafka] class ZookeeperConsumerConnector(
   def createMessageStreamsByFilter[K, V](topicFilter: TopicFilter,
                                          numStreams: Int,
                                          keyDecoder: Decoder[K],
-                                         valueDecoder: Decoder[V]) = {
+                                         valueDecoder: Decoder[V]) =
     import JavaConversions._
     underlying.createMessageStreamsByFilter(
         topicFilter, numStreams, keyDecoder, valueDecoder)
-  }
 
   def createMessageStreamsByFilter(topicFilter: TopicFilter, numStreams: Int) =
     createMessageStreamsByFilter(
@@ -121,26 +117,20 @@ private[kafka] class ZookeeperConsumerConnector(
     createMessageStreamsByFilter(
         topicFilter, 1, new DefaultDecoder(), new DefaultDecoder())
 
-  def commitOffsets() {
+  def commitOffsets()
     underlying.commitOffsets(true)
-  }
 
-  def commitOffsets(retryOnFailure: Boolean) {
+  def commitOffsets(retryOnFailure: Boolean)
     underlying.commitOffsets(retryOnFailure)
-  }
 
   def commitOffsets(
       offsetsToCommit: java.util.Map[TopicAndPartition, OffsetAndMetadata],
-      retryOnFailure: Boolean) {
+      retryOnFailure: Boolean)
     underlying.commitOffsets(offsetsToCommit.asScala.toMap, retryOnFailure)
-  }
 
   def setConsumerRebalanceListener(
-      consumerRebalanceListener: ConsumerRebalanceListener) {
+      consumerRebalanceListener: ConsumerRebalanceListener)
     underlying.setConsumerRebalanceListener(consumerRebalanceListener)
-  }
 
-  def shutdown() {
+  def shutdown()
     underlying.shutdown
-  }
-}

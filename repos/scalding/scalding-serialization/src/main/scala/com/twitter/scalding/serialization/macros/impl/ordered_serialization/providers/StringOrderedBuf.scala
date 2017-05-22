@@ -24,21 +24,20 @@ import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object StringOrderedBuf {
-  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+object StringOrderedBuf
+  def dispatch(c: Context): PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe =:= c.universe.typeOf[String] => StringOrderedBuf(c)(tpe)
-  }
 
-  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] = {
+  def apply(c: Context)(outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(id))
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         val lenA = freshT("lenA")
         val lenB = freshT("lenB")
 
@@ -50,12 +49,11 @@ object StringOrderedBuf {
           $lenB,
           $inputStreamB)
       """
-      }
 
       override def hash(element: ctx.TermName): ctx.Tree =
         q"_root_.com.twitter.scalding.serialization.Hasher.string.hash($element)"
 
-      override def put(inputStream: ctx.TermName, element: ctx.TermName) = {
+      override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         val bytes = freshT("bytes")
         val charLen = freshT("charLen")
         val len = freshT("len")
@@ -96,8 +94,7 @@ object StringOrderedBuf {
            $inputStream.write($bytes)
          }
         """
-      }
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
         val len = freshT("len")
         val strBytes = freshT("strBytes")
         q"""
@@ -110,7 +107,6 @@ object StringOrderedBuf {
           ""
         }
       """
-      }
       override def compare(elementA: ctx.TermName, elementB: ctx.TermName) =
         q"""$elementA.compareTo($elementB)"""
 
@@ -123,6 +119,3 @@ object StringOrderedBuf {
                 _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.NoLengthCalculation
               }
             """)
-    }
-  }
-}

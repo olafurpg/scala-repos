@@ -20,7 +20,7 @@ package org.apache.spark.sql.catalyst.expressions
 /**
   * Utilities to make sure we pass the proper numeric ranges
   */
-object IntegralLiteralTestUtils {
+object IntegralLiteralTestUtils
 
   val positiveShort: Short = (Byte.MaxValue + 1).toShort
   val negativeShort: Short = (Byte.MinValue - 1).toShort
@@ -39,4 +39,3 @@ object IntegralLiteralTestUtils {
 
   val positiveLongLit: Literal = Literal(positiveLong)
   val negativeLongLit: Literal = Literal(negativeLong)
-}

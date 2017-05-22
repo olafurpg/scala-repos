@@ -16,22 +16,20 @@ class StaticPsiTypedDefinitionWrapper(
     val typedDefinition: ScTypedDefinition,
     role: PsiTypedDefinitionWrapper.DefinitionRole.DefinitionRole,
     containingClass: PsiClassWrapper)
-    extends {
+    extends
   val elementFactory =
     JavaPsiFacade.getInstance(typedDefinition.getProject).getElementFactory
   val methodText = StaticPsiTypedDefinitionWrapper.methodText(
       typedDefinition, role, containingClass)
-  val method: PsiMethod = {
-    try {
+  val method: PsiMethod =
+    try
       elementFactory.createMethodFromText(methodText, containingClass)
-    } catch {
+    catch
       case e: Exception =>
         elementFactory.createMethodFromText(
             "public void FAILED_TO_DECOMPILE_METHOD() {}", containingClass)
-    }
-  }
-} with LightMethodAdapter(typedDefinition.getManager, method, containingClass)
-with LightScalaMethod {
+with LightMethodAdapter(typedDefinition.getManager, method, containingClass)
+with LightScalaMethod
 
   override def getNavigationElement: PsiElement = this
 
@@ -50,64 +48,55 @@ with LightScalaMethod {
   override def getParent: PsiElement = containingClass
 
   override def isWritable: Boolean = getContainingFile.isWritable
-}
 
-object StaticPsiTypedDefinitionWrapper {
+object StaticPsiTypedDefinitionWrapper
   import org.jetbrains.plugins.scala.lang.psi.light.PsiTypedDefinitionWrapper.DefinitionRole._
 
   def methodText(b: ScTypedDefinition,
                  role: DefinitionRole,
-                 containingClass: PsiClassWrapper): String = {
+                 containingClass: PsiClassWrapper): String =
     val builder = new StringBuilder
 
-    ScalaPsiUtil.nameContext(b) match {
+    ScalaPsiUtil.nameContext(b) match
       case m: ScModifierListOwner =>
         builder.append(JavaConversionUtil.annotationsAndModifiers(m, true))
       case _ =>
-    }
 
     val result = b.getType(TypingContext.empty)
-    result match {
+    result match
       case _ if role == SETTER || role == EQ => builder.append("void")
       case Success(tp, _) =>
         builder.append(
             JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
       case _ => builder.append("java.lang.Object")
-    }
 
     val qualName = containingClass.getQualifiedName
     val paramText = qualName.substring(0, qualName.length() - 6) + " This"
 
     builder.append(" ")
-    val name = role match {
+    val name = role match
       case SIMPLE_ROLE => b.getName
       case GETTER => "get" + b.getName.capitalize
       case IS_GETTER => "is" + b.getName.capitalize
       case SETTER => "set" + b.getName.capitalize
       case EQ => b.getName + "_$eq"
-    }
     builder.append(name)
 
-    if (role != SETTER && role != EQ) {
+    if (role != SETTER && role != EQ)
       builder.append("(" + paramText + ")")
-    } else {
+    else
       builder.append("(").append(paramText).append(", ")
-      result match {
+      result match
         case Success(tp, _) =>
           builder.append(
               JavaConversionUtil.typeText(tp, b.getProject, b.getResolveScope))
         case _ => builder.append("java.lang.Object")
-      }
       builder.append(" ").append(b.getName).append(")")
-    }
 
     val holder = PsiTreeUtil.getContextOfType(b, classOf[ScAnnotationsHolder])
-    if (holder != null) {
+    if (holder != null)
       builder.append(LightUtil.getThrowsSection(holder))
-    }
 
     builder.append(" {}")
 
     builder.toString()
-  }
-}

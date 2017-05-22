@@ -28,7 +28,7 @@ import AsmNode._
   * See test/files/jvm/bytecode-test-example for an example of bytecode test.
   *
   */
-abstract class BytecodeTest {
+abstract class BytecodeTest
   import ASMConverters._
 
   /** produce the output to be compared against a checkfile */
@@ -37,12 +37,11 @@ abstract class BytecodeTest {
   def main(args: Array[String]): Unit = show()
 
   // asserts
-  def sameBytecode(methA: MethodNode, methB: MethodNode) = {
+  def sameBytecode(methA: MethodNode, methB: MethodNode) =
     val isa = instructionsFromMethod(methA)
     val isb = instructionsFromMethod(methB)
     if (isa == isb) println("bytecode identical")
     else diffInstructions(isa, isb)
-  }
 
   // Do these classes have all the same methods, with the same names, access,
   // descriptors and generic signatures? Method bodies are not considered, and
@@ -60,25 +59,23 @@ abstract class BytecodeTest {
     sameCharacteristics(clazzA, clazzB)(_.erasedCharacteristics)
 
   private def sameCharacteristics(clazzA: ClassNode, clazzB: ClassNode)(
-      f: AsmNode[_] => String): Boolean = {
+      f: AsmNode[_] => String): Boolean =
     val ms1 = clazzA.fieldsAndMethods.toIndexedSeq
     val ms2 = clazzB.fieldsAndMethods.toIndexedSeq
     val name1 = clazzA.name
     val name2 = clazzB.name
 
-    if (ms1.length != ms2.length) {
+    if (ms1.length != ms2.length)
       println(s"Different member counts in $name1 and $name2")
       false
-    } else
-      (ms1, ms2).zipped forall { (m1, m2) =>
+    else
+      (ms1, ms2).zipped forall  (m1, m2) =>
         val c1 = f(m1)
         val c2 = f(m2).replaceAllLiterally(name2, name1)
         if (c1 == c2) println(s"[ok] $m1")
         else println(s"[fail]\n  in $name1: $c1\n  in $name2: $c2")
 
         c1 == c2
-      }
-  }
 
   /**
     * Compare the bytecodes of two methods.
@@ -88,31 +85,27 @@ abstract class BytecodeTest {
   def similarBytecode(methA: MethodNode,
                       methB: MethodNode,
                       similar: (List[Instruction],
-                      List[Instruction]) => Boolean) = {
+                      List[Instruction]) => Boolean) =
     val isa = instructionsFromMethod(methA)
     val isb = instructionsFromMethod(methB)
     if (isa == isb) println("bytecode identical")
     else if (similar(isa, isb)) println("bytecode similar")
     else diffInstructions(isa, isb)
-  }
 
-  def diffInstructions(isa: List[Instruction], isb: List[Instruction]) = {
+  def diffInstructions(isa: List[Instruction], isb: List[Instruction]) =
     val len = Math.max(isa.length, isb.length)
-    if (len > 0) {
+    if (len > 0)
       val width = isa.map(_.toString.length).max
       val lineWidth = len.toString.length
-      (1 to len) foreach { line =>
+      (1 to len) foreach  line =>
         val isaPadded = isa.map(_.toString) orElse Stream.continually("")
         val isbPadded = isb.map(_.toString) orElse Stream.continually("")
         val a = isaPadded(line - 1)
         val b = isbPadded(line - 1)
 
         println(
-            s"""$line${" " * (lineWidth - line.toString.length)} ${if (a == b)
-          "==" else "<>"} $a${" " * (width - a.length)} | $b""")
-      }
-    }
-  }
+            s"""$line${" " * (lineWidth - line.toString.length)} $if (a == b)
+          "==" else "<>" $a${" " * (width - a.length)} | $b""")
 
 // loading
   protected def getMethod(classNode: ClassNode, name: String): MethodNode =
@@ -120,7 +113,7 @@ abstract class BytecodeTest {
         s"Didn't find method '$name' in class '${classNode.name}'")
 
   protected def loadClassNode(
-      name: String, skipDebugInfo: Boolean = true): ClassNode = {
+      name: String, skipDebugInfo: Boolean = true): ClassNode =
     val classBytes: InputStream = classpath
       .findClassFile(name)
       .map(_.input)
@@ -131,43 +124,35 @@ abstract class BytecodeTest {
     val cn = new ClassNode()
     cr.accept(cn, if (skipDebugInfo) ClassReader.SKIP_DEBUG else 0)
     cn
-  }
 
-  protected lazy val classpath: JavaClassPath = {
+  protected lazy val classpath: JavaClassPath =
     import scala.tools.nsc.util.ClassPath.DefaultJavaContext
     import scala.tools.util.PathResolver.Defaults
     // logic inspired by scala.tools.util.PathResolver implementation
     val containers =
       DefaultJavaContext.classesInExpandedPath(Defaults.javaUserClassPath)
     new JavaClassPath(containers, DefaultJavaContext)
-  }
-}
 
-object BytecodeTest {
+object BytecodeTest
 
   /** Parse `file` as a class file, transforms the ASM representation with `f`,
     *  and overwrites the original file.
     */
-  def modifyClassFile(file: JFile)(f: ClassNode => ClassNode) {
+  def modifyClassFile(file: JFile)(f: ClassNode => ClassNode)
     val rfile = new reflect.io.File(file)
-    def readClass: ClassNode = {
+    def readClass: ClassNode =
       val cr = new ClassReader(rfile.toByteArray())
       val cn = new ClassNode()
       cr.accept(cn, 0)
       cn
-    }
 
-    def writeClass(cn: ClassNode) {
+    def writeClass(cn: ClassNode)
       val writer = new ClassWriter(0)
       cn.accept(writer)
       val os = rfile.bufferedOutput()
-      try {
+      try
         os.write(writer.toByteArray)
-      } finally {
+      finally
         os.close()
-      }
-    }
 
     writeClass(f(readClass))
-  }
-}

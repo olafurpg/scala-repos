@@ -28,7 +28,7 @@ import org.apache.spark.util.Utils
   */
 private[streaming] class FileBasedWriteAheadLogWriter(
     path: String, hadoopConf: Configuration)
-    extends Closeable {
+    extends Closeable
 
   private lazy val stream = HdfsUtils.getOutputStream(path, hadoopConf)
 
@@ -36,7 +36,7 @@ private[streaming] class FileBasedWriteAheadLogWriter(
   private var closed = false
 
   /** Write the bytebuffer to the log file */
-  def write(data: ByteBuffer): FileBasedWriteAheadLogSegment = synchronized {
+  def write(data: ByteBuffer): FileBasedWriteAheadLogSegment = synchronized
     assertOpen()
     data.rewind() // Rewind to ensure all data in the buffer is retrieved
     val lengthToWrite = data.remaining()
@@ -47,21 +47,16 @@ private[streaming] class FileBasedWriteAheadLogWriter(
     flush()
     nextOffset = stream.getPos()
     segment
-  }
 
-  override def close(): Unit = synchronized {
+  override def close(): Unit = synchronized
     closed = true
     stream.close()
-  }
 
-  private def flush() {
+  private def flush()
     stream.hflush()
     // Useful for local file system where hflush/sync does not work (HADOOP-7844)
     stream.getWrappedStream.flush()
-  }
 
-  private def assertOpen() {
+  private def assertOpen()
     HdfsUtils.checkState(
         !closed, "Stream is closed. Create a new Writer to write to file.")
-  }
-}

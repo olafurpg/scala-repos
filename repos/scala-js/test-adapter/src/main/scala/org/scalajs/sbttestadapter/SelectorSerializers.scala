@@ -12,12 +12,12 @@ import sbt.testing._
 
 import org.scalajs.core.tools.json._
 
-private[testadapter] object SelectorSerializers {
+private[testadapter] object SelectorSerializers
 
-  implicit object SelectorSerializer extends JSONSerializer[Selector] {
-    def serialize(sel: Selector): JSON = {
+  implicit object SelectorSerializer extends JSONSerializer[Selector]
+    def serialize(sel: Selector): JSON =
       val bld = new JSONObjBuilder()
-      sel match {
+      sel match
         case sel: SuiteSelector => bld.fld("selType", "SuiteSelector")
         case sel: TestSelector =>
           bld.fld("selType", "TestSelector").fld("testName", sel.testName)
@@ -35,15 +35,12 @@ private[testadapter] object SelectorSerializers {
         case _ =>
           throw new IllegalArgumentException(
               s"Unknown Selector type: ${sel.getClass}")
-      }
       bld.toJSON
-    }
-  }
 
-  implicit object SelectorDeserializer extends JSONDeserializer[Selector] {
-    def deserialize(x: JSON): Selector = {
+  implicit object SelectorDeserializer extends JSONDeserializer[Selector]
+    def deserialize(x: JSON): Selector =
       val obj = new JSONObjExtractor(x)
-      obj.fld[String]("selType") match {
+      obj.fld[String]("selType") match
         case "SuiteSelector" =>
           new SuiteSelector()
         case "TestSelector" =>
@@ -57,7 +54,3 @@ private[testadapter] object SelectorSerializers {
           new TestWildcardSelector(obj.fld[String]("testWildcard"))
         case tpe =>
           throw new IllegalArgumentException(s"Unknown Selector type: $tpe")
-      }
-    }
-  }
-}

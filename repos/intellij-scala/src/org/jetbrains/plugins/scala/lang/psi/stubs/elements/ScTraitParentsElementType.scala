@@ -12,9 +12,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.templates.ScTraitParen
   * Date: 17.06.2009
   */
 class ScTraitParentsElementType
-    extends ScTemplateParentsElementType[ScTraitParents]("trait parents") {
+    extends ScTemplateParentsElementType[ScTraitParents]("trait parents")
   def createPsi(stub: ScTemplateParentsStub): ScTemplateParents =
     new ScTraitParentsImpl(stub)
 
   override def isLeftBound = true
-}

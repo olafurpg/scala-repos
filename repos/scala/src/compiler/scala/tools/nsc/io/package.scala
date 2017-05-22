@@ -7,7 +7,7 @@ package scala.tools.nsc
 
 import scala.language.implicitConversions
 
-package object io {
+package object io
   // Forwarders from scala.reflect.io
   type AbstractFile = scala.reflect.io.AbstractFile
   val AbstractFile = scala.reflect.io.AbstractFile
@@ -27,4 +27,3 @@ package object io {
   type JFile = java.io.File
 
   implicit def enrichManifest(m: JManifest): Jar.WManifest = Jar.WManifest(m)
-}

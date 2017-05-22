@@ -7,7 +7,7 @@ import akka.cluster.Cluster
 import akka.cluster.UniqueAddress
 import java.math.BigInteger
 
-object PNCounterMap {
+object PNCounterMap
   val empty: PNCounterMap = new PNCounterMap(ORMap.empty)
   def apply(): PNCounterMap = empty
 
@@ -20,7 +20,6 @@ object PNCounterMap {
     * Extract the [[PNCounterMap#entries]].
     */
   def unapply(m: PNCounterMap): Option[Map[String, BigInt]] = Some(m.entries)
-}
 
 /**
   * Map of named counters. Specialized [[ORMap]] with [[PNCounter]] values.
@@ -31,20 +30,18 @@ object PNCounterMap {
 final class PNCounterMap private[akka](
     private[akka] val underlying: ORMap[PNCounter])
     extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning {
+    with RemovedNodePruning
 
   type T = PNCounterMap
 
   /** Scala API */
-  def entries: Map[String, BigInt] = underlying.entries.map {
+  def entries: Map[String, BigInt] = underlying.entries.map
     case (k, c) ⇒ k -> c.value
-  }
 
   /** Java API */
-  def getEntries: java.util.Map[String, BigInteger] = {
+  def getEntries: java.util.Map[String, BigInteger] =
     import scala.collection.JavaConverters._
     underlying.entries.map { case (k, c) ⇒ k -> c.value.bigInteger }.asJava
-  }
 
   /**
     *  Scala API: The count for a key
@@ -105,10 +102,9 @@ final class PNCounterMap private[akka](
     * INTERNAL API
     */
   private[akka] def decrement(
-      node: UniqueAddress, key: String, delta: Long): PNCounterMap = {
+      node: UniqueAddress, key: String, delta: Long): PNCounterMap =
     new PNCounterMap(
         underlying.updated(node, key, PNCounter())(_.decrement(node, delta)))
-  }
 
   /**
     * Removes an entry from the map.
@@ -148,17 +144,14 @@ final class PNCounterMap private[akka](
 
   override def toString: String = s"PNCounter$entries"
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case other: PNCounterMap ⇒ underlying == other.underlying
     case _ ⇒ false
-  }
 
   override def hashCode: Int = underlying.hashCode
-}
 
-object PNCounterMapKey {
+object PNCounterMapKey
   def create[A](id: String): Key[PNCounterMap] = PNCounterMapKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class PNCounterMapKey(_id: String)

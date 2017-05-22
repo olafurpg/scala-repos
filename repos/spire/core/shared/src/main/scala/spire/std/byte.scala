@@ -4,7 +4,7 @@ package std
 import spire.algebra.{EuclideanRing, IsIntegral, NRoot, Order, Signed}
 import spire.math.BitString
 
-trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
+trait ByteIsEuclideanRing extends EuclideanRing[Byte]
   override def minus(a: Byte, b: Byte): Byte = (a - b).toByte
   def negate(a: Byte): Byte = (-a).toByte
   def one: Byte = 1.toByte
@@ -18,37 +18,31 @@ trait ByteIsEuclideanRing extends EuclideanRing[Byte] {
   def quot(a: Byte, b: Byte): Byte = (a / b).toByte
   def mod(a: Byte, b: Byte): Byte = (a % b).toByte
   def gcd(a: Byte, b: Byte): Byte = spire.math.gcd(a, b).toByte
-}
 
 // Not included in Instances trait.
-trait ByteIsNRoot extends NRoot[Byte] {
-  def nroot(x: Byte, n: Int): Byte = {
-    def findnroot(prev: Int, add: Int): Byte = {
+trait ByteIsNRoot extends NRoot[Byte]
+  def nroot(x: Byte, n: Int): Byte =
+    def findnroot(prev: Int, add: Int): Byte =
       val next = prev | add
       val e = Math.pow(next, n)
 
-      if (e == x || add == 0) {
+      if (e == x || add == 0)
         next.toByte
-      } else if (e <= 0 || e > x) {
+      else if (e <= 0 || e > x)
         findnroot(prev, add >> 1)
-      } else {
+      else
         findnroot(next, add >> 1)
-      }
-    }
 
     findnroot(0, 1 << ((33 - n) / n))
-  }
 
   def log(a: Byte): Byte = Math.log(a.toDouble).toByte
   def fpow(a: Byte, b: Byte): Byte = Math.pow(a, b).toByte
-}
 
-trait ByteIsSigned extends Signed[Byte] {
+trait ByteIsSigned extends Signed[Byte]
   def signum(a: Byte): Int = a
   def abs(a: Byte): Byte = (if (a < 0) -a else a).toByte
-}
 
-trait ByteOrder extends Order[Byte] {
+trait ByteOrder extends Order[Byte]
   override def eqv(x: Byte, y: Byte): Boolean = x == y
   override def neqv(x: Byte, y: Byte): Boolean = x != y
   override def gt(x: Byte, y: Byte): Boolean = x > y
@@ -57,15 +51,13 @@ trait ByteOrder extends Order[Byte] {
   override def lteqv(x: Byte, y: Byte): Boolean = x <= y
   def compare(x: Byte, y: Byte): Int =
     java.lang.Integer.signum((x: Int) - (y: Int))
-}
 
-trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned {
+trait ByteIsReal extends IsIntegral[Byte] with ByteOrder with ByteIsSigned
   def toDouble(n: Byte): Double = n.toDouble
   def toBigInt(n: Byte): BigInt = BigInt(n)
-}
 
 @SerialVersionUID(0L)
-class ByteIsBitString extends BitString[Byte] with Serializable {
+class ByteIsBitString extends BitString[Byte] with Serializable
   def one: Byte = (-1: Byte)
   def zero: Byte = (0: Byte)
   def and(a: Byte, b: Byte): Byte = (a & b).toByte
@@ -92,23 +84,19 @@ class ByteIsBitString extends BitString[Byte] with Serializable {
   def rightShift(n: Byte, i: Int): Byte =
     (((n & 0xff) >>> (i & 7)) & 0xff).toByte
   def signedRightShift(n: Byte, i: Int): Byte = ((n >> (i & 7)) & 0xff).toByte
-  def rotateLeft(n: Byte, i: Int): Byte = {
+  def rotateLeft(n: Byte, i: Int): Byte =
     val j = i & 7
     ((((n & 0xff) << j) | ((n & 0xff) >>> (8 - j))) & 0xff).toByte
-  }
-  def rotateRight(n: Byte, i: Int): Byte = {
+  def rotateRight(n: Byte, i: Int): Byte =
     val j = i & 7
     ((((n & 0xff) >>> j) | ((n & 0xff) << (8 - j))) & 0xff).toByte
-  }
-}
 
 @SerialVersionUID(0L)
 class ByteAlgebra extends ByteIsEuclideanRing with ByteIsReal with Serializable
 
-trait ByteInstances {
+trait ByteInstances
   implicit final val ByteBitString = new ByteIsBitString
   implicit final val ByteAlgebra = new ByteAlgebra
   import spire.math.NumberTag._
   implicit final val ByteTag =
     new BuiltinIntTag[Byte](0, Byte.MinValue, Byte.MaxValue)
-}

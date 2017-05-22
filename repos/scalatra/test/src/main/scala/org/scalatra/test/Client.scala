@@ -4,7 +4,7 @@ import java.net.URLEncoder.encode
 
 import scala.util.DynamicVariable
 
-trait Client extends ImplicitConversions {
+trait Client extends ImplicitConversions
   private val _response = new DynamicVariable[ClientResponse](null)
 
   def session[A](f: => A): A
@@ -22,9 +22,8 @@ trait Client extends ImplicitConversions {
 
   def header = response.header
 
-  protected def withResponse[A](res: ClientResponse)(f: => A): A = {
+  protected def withResponse[A](res: ClientResponse)(f: => A): A =
     _response.withValue(res) { f }
-  }
 
   def submit[A](method: String,
                 uri: String,
@@ -147,4 +146,3 @@ trait Client extends ImplicitConversions {
     params
       .map(t => List(t._1, t._2).map(encode(_, "UTF-8")).mkString("="))
       .mkString("&")
-}

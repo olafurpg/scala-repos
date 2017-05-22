@@ -1,4 +1,4 @@
-package a {
+package a
   class DeveloperApi extends scala.annotation.StaticAnnotation
 
   /** Some doc here */
@@ -7,4 +7,3 @@ package a {
 
   @DeveloperApi
   class B
-}

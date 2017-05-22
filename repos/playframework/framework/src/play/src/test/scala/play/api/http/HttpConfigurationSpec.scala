@@ -8,13 +8,13 @@ import org.specs2.mutable.Specification
 import play.api.{PlayException, Configuration}
 import play.core.netty.utils.{ClientCookieEncoder, ClientCookieDecoder, ServerCookieDecoder, ServerCookieEncoder}
 
-object HttpConfigurationSpec extends Specification {
+object HttpConfigurationSpec extends Specification
 
-  "HttpConfiguration" should {
+  "HttpConfiguration" should
 
     import scala.collection.JavaConversions._
 
-    def properties = {
+    def properties =
       Map(
           "play.http.context" -> "/",
           "play.http.parser.maxMemoryBuffer" -> "10k",
@@ -31,163 +31,131 @@ object HttpConfigurationSpec extends Specification {
           "play.http.flash.secure" -> "true",
           "play.http.flash.httpOnly" -> "true"
       )
-    }
 
     val configuration = new Configuration(ConfigFactory.parseMap(properties))
 
-    "configure a context" in {
+    "configure a context" in
       val httpConfiguration =
         new HttpConfiguration.HttpConfigurationProvider(configuration).get
       httpConfiguration.context must beEqualTo("/")
-    }
 
-    "throw an error when context does not starts with /" in {
+    "throw an error when context does not starts with /" in
       val config = properties + ("play.http.context" -> "something")
       val wrongConfiguration = Configuration(ConfigFactory.parseMap(config))
       new HttpConfiguration.HttpConfigurationProvider(wrongConfiguration).get must throwA[
           PlayException]
-    }
 
-    "configure max memory buffer" in {
+    "configure max memory buffer" in
       val httpConfiguration =
         new HttpConfiguration.HttpConfigurationProvider(configuration).get
       httpConfiguration.parser.maxMemoryBuffer must beEqualTo(10 * 1024)
-    }
 
-    "configure max disk buffer" in {
+    "configure max disk buffer" in
       val httpConfiguration =
         new HttpConfiguration.HttpConfigurationProvider(configuration).get
       httpConfiguration.parser.maxDiskBuffer must beEqualTo(20 * 1024)
-    }
 
-    "configure cookies encoder/decoder" in {
+    "configure cookies encoder/decoder" in
       val httpConfiguration =
         new HttpConfiguration.HttpConfigurationProvider(configuration).get
       httpConfiguration.cookies.strict must beTrue
-    }
 
-    "configure session should set" in {
+    "configure session should set" in
 
-      "cookie name" in {
+      "cookie name" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.cookieName must beEqualTo("PLAY_SESSION")
-      }
 
-      "cookie security" in {
+      "cookie security" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.secure must beTrue
-      }
 
-      "cookie maxAge" in {
+      "cookie maxAge" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.maxAge.map(_.toSeconds) must beEqualTo(
             Some(10))
-      }
 
-      "cookie httpOnly" in {
+      "cookie httpOnly" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.httpOnly must beTrue
-      }
 
-      "cookie domain" in {
+      "cookie domain" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.session.domain must beEqualTo(
             Some("playframework.com"))
-      }
-    }
 
-    "configure flash should set" in {
+    "configure flash should set" in
 
-      "cookie name" in {
+      "cookie name" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.flash.cookieName must beEqualTo("PLAY_FLASH")
-      }
 
-      "cookie security" in {
+      "cookie security" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.flash.secure must beTrue
-      }
 
-      "cookie httpOnly" in {
+      "cookie httpOnly" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.flash.httpOnly must beTrue
-      }
-    }
 
-    "configure action composition" in {
+    "configure action composition" in
 
-      "controller annotations first" in {
+      "controller annotations first" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.actionComposition.controllerAnnotationsFirst must beTrue
-      }
 
-      "execute request handler action first" in {
+      "execute request handler action first" in
         val httpConfiguration =
           new HttpConfiguration.HttpConfigurationProvider(configuration).get
         httpConfiguration.actionComposition.executeActionCreatorActionFirst must beTrue
-      }
-    }
-  }
 
-  "Cookies configuration" should {
+  "Cookies configuration" should
 
-    "be configured as strict" in {
+    "be configured as strict" in
 
       val cookieConfiguration = CookiesConfiguration(strict = true)
 
-      "for server encoder" in {
+      "for server encoder" in
         cookieConfiguration.serverEncoder must beEqualTo(
             ServerCookieEncoder.STRICT)
-      }
 
-      "for server decoder" in {
+      "for server decoder" in
         cookieConfiguration.serverDecoder must beEqualTo(
             ServerCookieDecoder.STRICT)
-      }
 
-      "for client encoder" in {
+      "for client encoder" in
         cookieConfiguration.clientEncoder must beEqualTo(
             ClientCookieEncoder.STRICT)
-      }
 
-      "for client decoder" in {
+      "for client decoder" in
         cookieConfiguration.clientDecoder must beEqualTo(
             ClientCookieDecoder.STRICT)
-      }
-    }
 
-    "be configured as lax" in {
+    "be configured as lax" in
 
       val cookieConfiguration = CookiesConfiguration(strict = false)
 
-      "for server encoder" in {
+      "for server encoder" in
         cookieConfiguration.serverEncoder must beEqualTo(
             ServerCookieEncoder.LAX)
-      }
 
-      "for server decoder" in {
+      "for server decoder" in
         cookieConfiguration.serverDecoder must beEqualTo(
             ServerCookieDecoder.LAX)
-      }
 
-      "for client encoder" in {
+      "for client encoder" in
         cookieConfiguration.clientEncoder must beEqualTo(
             ClientCookieEncoder.LAX)
-      }
 
-      "for client decoder" in {
+      "for client decoder" in
         cookieConfiguration.clientDecoder must beEqualTo(
             ClientCookieDecoder.LAX)
-      }
-    }
-  }
-}

@@ -4,7 +4,7 @@ import scala.annotation.tailrec
 
 import scala.scalajs.js
 
-class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
+class Random(seed_in: Long) extends AnyRef with java.io.Serializable
 
   private var seedHi: Int = _ // 24 msb of the seed
   private var seedLo: Int = _ // 24 lsb of the seed
@@ -17,14 +17,13 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
 
   def this() = this(Random.randomSeed())
 
-  def setSeed(seed_in: Long): Unit = {
+  def setSeed(seed_in: Long): Unit =
     val seed = ((seed_in ^ 0x5DEECE66DL) & ((1L << 48) - 1)) // as documented
     seedHi = (seed >>> 24).toInt
     seedLo = seed.toInt & ((1 << 24) - 1)
     haveNextNextGaussian = false
-  }
 
-  protected def next(bits: Int): Int = {
+  protected def next(bits: Int): Int =
     /* This method is originally supposed to work with a Long seed from which
      * 48 bits are used.
      * Since Longs are too slow, we manually decompose the 48-bit seed in two
@@ -70,22 +69,20 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
 
     val result32 = (newSeedHi << 8) | (newSeedLo >> 16)
     result32 >>> (32 - bits)
-  }
 
-  def nextDouble(): Double = {
+  def nextDouble(): Double =
     // ((next(26).toLong << 27) + next(27)) / (1L << 53).toDouble
     ((next(26).toDouble * (1L << 27).toDouble) + next(27).toDouble) /
     (1L << 53).toDouble
-  }
 
   def nextBoolean(): Boolean = next(1) != 0
 
   def nextInt(): Int = next(32)
 
-  def nextInt(n: Int): Int = {
-    if (n <= 0) {
+  def nextInt(n: Int): Int =
+    if (n <= 0)
       throw new IllegalArgumentException("n must be positive")
-    } else if ((n & -n) == n) {
+    else if ((n & -n) == n)
       // i.e., n is a power of 2
       /* The specification is
        *   ((n * next(31).toLong) >> 31).toInt
@@ -99,41 +96,34 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
        *   next(31) >> numberOfLeadingZeros(n)
        */
       next(31) >> Integer.numberOfLeadingZeros(n)
-    } else {
+    else
       @tailrec
-      def loop(): Int = {
+      def loop(): Int =
         val bits = next(31)
         val value = bits % n
         if (bits - value + (n - 1) < 0) loop()
         else value
-      }
 
       loop()
-    }
-  }
 
   def nextLong(): Long = (next(32).toLong << 32) + next(32)
 
-  def nextFloat(): Float = {
+  def nextFloat(): Float =
     // next(24).toFloat / (1 << 24).toFloat
     (next(24).toDouble / (1 << 24).toDouble).toFloat
-  }
 
-  def nextBytes(bytes: Array[Byte]): Unit = {
+  def nextBytes(bytes: Array[Byte]): Unit =
     var i = 0
-    while (i < bytes.length) {
+    while (i < bytes.length)
       var rnd = nextInt()
       var n = Math.min(bytes.length - i, 4)
-      while (n > 0) {
+      while (n > 0)
         bytes(i) = rnd.toByte
         rnd >>= 8
         n -= 1
         i += 1
-      }
-    }
-  }
 
-  def nextGaussian(): Double = {
+  def nextGaussian(): Double =
     // See http://www.protonfish.com/jslib/boxmuller.shtml
 
     /* The Box-Muller algorithm produces two random numbers at once. We save
@@ -141,10 +131,10 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
      * nextGaussian().
      */
 
-    if (haveNextNextGaussian) {
+    if (haveNextNextGaussian)
       haveNextNextGaussian = false
       nextNextGaussian
-    } else {
+    else
       var x, y, rds: Double = 0
 
       /* Get two random numbers from -1 to 1.
@@ -152,11 +142,11 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
        * new ones.
        * Rejection sampling throws away about 20% of the pairs.
        */
-      do {
+      do
         x = nextDouble() * 2 - 1
         y = nextDouble() * 2 - 1
         rds = x * x + y * y
-      } while (rds == 0 || rds > 1)
+      while (rds == 0 || rds > 1)
 
       val c = Math.sqrt(-2 * Math.log(rds) / rds)
 
@@ -166,11 +156,8 @@ class Random(seed_in: Long) extends AnyRef with java.io.Serializable {
 
       // And return x*c
       x * c
-    }
-  }
-}
 
-object Random {
+object Random
 
   /** Generate a random long from JS RNG to seed a new Random */
   private def randomSeed(): Long =
@@ -178,4 +165,3 @@ object Random {
 
   private def randomInt(): Int =
     (Math.floor(js.Math.random() * 4294967296.0) - 2147483648.0).toInt
-}

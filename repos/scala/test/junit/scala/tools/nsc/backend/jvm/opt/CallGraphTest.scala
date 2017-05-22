@@ -24,7 +24,7 @@ import BackendReporting._
 import scala.collection.convert.decorateAsScala._
 import scala.tools.testing.ClearAfterClass
 
-object CallGraphTest extends ClearAfterClass.Clearable {
+object CallGraphTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:inline-global -Yopt-warnings")
   def clear(): Unit = { compiler = null }
 
@@ -35,10 +35,9 @@ object CallGraphTest extends ClearAfterClass.Clearable {
       compiler.genBCode.bTypes.byteCodeRepository.parsedClasses,
       compiler.genBCode.bTypes.callGraph.callsites)
   notPerRun foreach compiler.perRunCaches.unrecordCache
-}
 
 @RunWith(classOf[JUnit4])
-class CallGraphTest extends ClearAfterClass {
+class CallGraphTest extends ClearAfterClass
   ClearAfterClass.stateToClear = CallGraphTest
 
   val compiler = CallGraphTest.compiler
@@ -47,17 +46,16 @@ class CallGraphTest extends ClearAfterClass {
 
   def compile(code: String,
               allowMessage: StoreReporter#Info => Boolean = _ =>
-                  false): List[ClassNode] = {
+                  false): List[ClassNode] =
     CallGraphTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(code, allowMessage = allowMessage)
       .map(c => byteCodeRepository.classNode(c.name).get)
-  }
 
   def callsInMethod(methodNode: MethodNode): List[MethodInsnNode] =
     methodNode.instructions.iterator.asScala
-      .collect({
+      .collect(
         case call: MethodInsnNode => call
-      })
+      )
       .toList
 
   def checkCallsite(call: MethodInsnNode,
@@ -67,9 +65,9 @@ class CallGraphTest extends ClearAfterClass {
                     safeToInline: Boolean,
                     atInline: Boolean,
                     atNoInline: Boolean,
-                    argInfos: IntMap[ArgInfo] = IntMap.empty) = {
+                    argInfos: IntMap[ArgInfo] = IntMap.empty) =
     val callsite = callGraph.callsites(callsiteMethod)(call)
-    try {
+    try
       assert(callsite.callsiteInstruction == call)
       assert(callsite.callsiteMethod == callsiteMethod)
       val callee = callsite.callee.get
@@ -79,13 +77,11 @@ class CallGraphTest extends ClearAfterClass {
       assert(callee.annotatedInline == atInline)
       assert(callee.annotatedNoInline == atNoInline)
       assert(callsite.argInfos == argInfos)
-    } catch {
+    catch
       case e: Throwable => println(callsite); throw e
-    }
-  }
 
   @Test
-  def callGraphStructure(): Unit = {
+  def callGraphStructure(): Unit =
     val code =
       """class C {
         |  // try-catch prevents inlining - we want to analyze the callsite
@@ -124,10 +120,8 @@ class CallGraphTest extends ClearAfterClass {
         "operand stack at the callsite in Test::t2(LD;)I contains more values")
     var msgCount = 0
     val checkMsg = (m: StoreReporter#Info) =>
-      {
         msgCount += 1
         ok exists (m.msg contains _)
-    }
     val List(cCls, cMod, dCls, testCls) = compile(code, checkMsg)
     assert(msgCount == 6, msgCount)
 
@@ -165,10 +159,9 @@ class CallGraphTest extends ClearAfterClass {
     checkCallsite(df6Call, t2, cf6, cClassBType, true, false, true)
     checkCallsite(df7Call, t2, cf7, cClassBType, false, true, true)
     checkCallsite(dg1Call, t2, g1, cMClassBType, true, false, false)
-  }
 
   @Test
-  def callerSensitiveNotSafeToInline(): Unit = {
+  def callerSensitiveNotSafeToInline(): Unit =
     val code = """class C {
         |  def m = java.lang.Class.forName("C")
         |}
@@ -191,10 +184,9 @@ class CallGraphTest extends ClearAfterClass {
                   safeToInline = false,
                   atInline = false,
                   atNoInline = false)
-  }
 
   @Test
-  def checkArgInfos(): Unit = {
+  def checkArgInfos(): Unit =
     val code = """abstract class C {
         |  def h(f: Int => Int): Int = f(1)
         |  def t1 = h(x => x + 1)
@@ -221,10 +213,9 @@ class CallGraphTest extends ClearAfterClass {
 
     val selfSamCall = callIn("selfSamCall")
     assertEquals(selfSamCall.argInfos.toList, List((0, ForwardedParam(0))))
-  }
 
   @Test
-  def argInfoAfterInlining(): Unit = {
+  def argInfoAfterInlining(): Unit =
     val code =
       """class C {
         |  def foo(f: Int => Int) = f(1)                 // not inlined
@@ -246,5 +237,3 @@ class CallGraphTest extends ClearAfterClass {
     assertEquals(callIn("t2").argInfos.toList, List((1, ForwardedParam(2))))
     assertEquals(callIn("t3").argInfos.toList, List((1, FunctionLiteral)))
     assertEquals(callIn("t4").argInfos.toList, Nil)
-  }
-}

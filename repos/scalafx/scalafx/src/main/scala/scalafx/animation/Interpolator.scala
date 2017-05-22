@@ -37,7 +37,7 @@ import scala.language.implicitConversions
   *
   * @define INT `Interpolator`
   */
-object Interpolator {
+object Interpolator
 
   /**
     * Built-in $INT that provides discrete time interpolation.
@@ -122,4 +122,3 @@ object Interpolator {
       "Use Tangent; TANGENT will be removed in a future release", "8.0.60-R10")
   def TANGENT(t1: Duration, v1: Double, t2: Duration, v2: Double) =
     Tangent(t1, v1, t2, v2)
-}

@@ -21,17 +21,16 @@ package shapeless.examples
   *
   * @author Miles Sabin
   */
-object FoldExamples extends App {
+object FoldExamples extends App
   import shapeless._
 
   // Polymorphic binary function value with type-specific cases:
   //  (c : Char, s : String) => s.indexOf(c)
   //  (i : Int, b : Boolean) => if ((i >= 0) == b) "pass" else "fail")
-  object combine extends Poly {
+  object combine extends Poly
     implicit def caseCharString = use((c: Char, s: String) => s.indexOf(c))
     implicit def caseIntBoolean =
       use((i: Int, b: Boolean) => if ((i >= 0) == b) "pass" else "fail")
-  }
 
   // Computation is:
   // val c1a = "foo".indexOf('o')
@@ -46,4 +45,3 @@ object FoldExamples extends App {
   val l2 = "bar" :: false :: HNil
   val f2 = l2.foldLeft('o')(combine)
   assert(f2 == "pass")
-}

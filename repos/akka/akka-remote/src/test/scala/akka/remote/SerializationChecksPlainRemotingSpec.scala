@@ -5,13 +5,10 @@ package akka.remote
 
 import akka.testkit.AkkaSpec
 
-class SerializationChecksPlainRemotingSpec extends AkkaSpec {
+class SerializationChecksPlainRemotingSpec extends AkkaSpec
 
-  "Settings serialize-messages and serialize-creators" must {
+  "Settings serialize-messages and serialize-creators" must
 
-    "be on for tests" in {
+    "be on for tests" in
       system.settings.SerializeAllCreators should ===(true)
       system.settings.SerializeAllMessages should ===(true)
-    }
-  }
-}

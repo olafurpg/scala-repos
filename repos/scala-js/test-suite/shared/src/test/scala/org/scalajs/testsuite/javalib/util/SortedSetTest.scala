@@ -14,20 +14,19 @@ import java.{util => ju}
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 
-trait SortedSetTest extends SetTest {
+trait SortedSetTest extends SetTest
 
   def factory: SortedSetFactory
 
-  def testSortedSetApi(): Unit = {
+  def testSortedSetApi(): Unit =
     testSetApi()
     shouldRetrieveTheFirstElement()
     shouldRetrieveTheLastElement()
     shouldReturnAProperHeadSet()
     shouldReturnAProperTailSet()
     shouldReturnAProperSubSet()
-  }
 
-  @Test def shouldRetrieveTheFirstElement(): Unit = {
+  @Test def shouldRetrieveTheFirstElement(): Unit =
     val ssInt = factory.empty[Int]
 
     assertTrue(ssInt.add(1000))
@@ -45,9 +44,8 @@ trait SortedSetTest extends SetTest {
     assertTrue(ssDouble.add(+10000.987))
     assertTrue(ssDouble.add(-0.987))
     assertEquals(-0.987, ssDouble.first, 0.0)
-  }
 
-  @Test def shouldRetrieveTheLastElement(): Unit = {
+  @Test def shouldRetrieveTheLastElement(): Unit =
     val ssInt = factory.empty[Int]
 
     assertTrue(ssInt.add(1000))
@@ -65,11 +63,10 @@ trait SortedSetTest extends SetTest {
     assertTrue(ssDouble.add(+10000.987))
     assertTrue(ssDouble.add(-0.987))
     assertEquals(10000.987, ssDouble.last, 0.0)
-  }
 
   val l = asJavaCollection(Set(1, 5, 2, 3, 4))
 
-  @Test def shouldReturnAProperHeadSet(): Unit = {
+  @Test def shouldReturnAProperHeadSet(): Unit =
     val ss = factory.empty[Int]
 
     ss.addAll(l)
@@ -91,9 +88,8 @@ trait SortedSetTest extends SetTest {
     assertTrue(hs2.isEmpty)
     assertEquals(2, ss.size)
     assertTrue(ss.containsAll(asJavaCollection(Set(4, 5))))
-  }
 
-  @Test def shouldReturnAProperTailSet(): Unit = {
+  @Test def shouldReturnAProperTailSet(): Unit =
     val ss = factory.empty[Int]
 
     ss.addAll(l)
@@ -115,9 +111,8 @@ trait SortedSetTest extends SetTest {
     assertTrue(ts2.isEmpty)
     assertEquals(3, ss.size)
     assertTrue(ss.containsAll(asJavaCollection(Set(1, 2, 3))))
-  }
 
-  @Test def shouldReturnAProperSubSet(): Unit = {
+  @Test def shouldReturnAProperSubSet(): Unit =
     val ss = factory.empty[Int]
 
     ss.addAll(l)
@@ -138,14 +133,10 @@ trait SortedSetTest extends SetTest {
     assertFalse(ss2.isEmpty)
     assertEquals(3, ss.size)
     assertTrue(ss.containsAll(asJavaCollection(Set(1, 4, 5))))
-  }
-}
 
-object SortedSetFactory {
+object SortedSetFactory
   def allFactories: Iterator[SortedSetFactory] =
     Iterator.empty
-}
 
-trait SortedSetFactory extends SetFactory {
+trait SortedSetFactory extends SetFactory
   def empty[E : ClassTag]: ju.SortedSet[E]
-}

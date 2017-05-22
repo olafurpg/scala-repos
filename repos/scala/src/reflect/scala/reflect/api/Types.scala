@@ -51,7 +51,7 @@ package api
   *
   *  @contentDiagram hideNodes "*Api"
   */
-trait Types { self: Universe =>
+trait Types  self: Universe =>
 
   /** The type of Scala types, and also Scala type signatures.
     *  (No difference is internally made between the two).
@@ -82,7 +82,7 @@ trait Types { self: Universe =>
     *  Therefore careful thought has to be applied to identify and carry out
     *  unwrapping logic specific to your use case.
     */
-  abstract class TypeApi {
+  abstract class TypeApi
 
     /** The term symbol associated with the type, or `NoSymbol` for types
       *  that do not refer to a term symbol.
@@ -385,7 +385,6 @@ trait Types { self: Universe =>
 
     /** Does this type contain a reference to given symbol? */
     def contains(sym: Symbol): Boolean
-  }
 
   /** The type of Scala singleton types, i.e., types that are inhabited
     *  by only one nun-null value. These include types of the forms
@@ -424,25 +423,23 @@ trait Types { self: Universe =>
     *  where `sym` is the class prefix of the this type.
     *  @group Extractors
     */
-  abstract class ThisTypeExtractor {
+  abstract class ThisTypeExtractor
     def unapply(tpe: ThisType): Option[Symbol]
 
     /** @see [[InternalApi.thisType]] */
     @deprecated("Use `internal.thisType` instead", "2.11.0")
     def apply(sym: Symbol)(implicit token: CompatToken): Type =
       internal.thisType(sym)
-  }
 
   /** The API that all this types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ThisTypeApi extends TypeApi {
+  trait ThisTypeApi extends TypeApi
     this: ThisType =>
 
     /** The underlying class symbol. */
     def sym: Symbol
-  }
 
   /** The `SingleType` type describes types of any of the forms on the left,
     *  with their TypeRef representations to the right.
@@ -466,7 +463,7 @@ trait Types { self: Universe =>
     *  referred to by the single-type.
     *  @group Extractors
     */
-  abstract class SingleTypeExtractor {
+  abstract class SingleTypeExtractor
     def unapply(tpe: SingleType): Option[(Type, Symbol)]
 
     /** @see [[InternalApi.singleType]] */
@@ -475,13 +472,12 @@ trait Types { self: Universe =>
         "2.11.0")
     def apply(pre: Type, sym: Symbol)(implicit token: CompatToken): Type =
       internal.singleType(pre, sym)
-  }
 
   /** The API that all single types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait SingleTypeApi extends TypeApi {
+  trait SingleTypeApi extends TypeApi
     this: SingleType =>
 
     /** The type of the qualifier. */
@@ -489,7 +485,6 @@ trait Types { self: Universe =>
 
     /** The underlying symbol. */
     def sym: Symbol
-  }
 
   /** The `SuperType` type is not directly written, but arises when `C.super` is used
     *  as a prefix in a `TypeRef` or `SingleType`. It's internal presentation is
@@ -512,7 +507,7 @@ trait Types { self: Universe =>
   /** An extractor class to create and pattern match with syntax `SingleType(thistpe, supertpe)`
     *  @group Extractors
     */
-  abstract class SuperTypeExtractor {
+  abstract class SuperTypeExtractor
     def unapply(tpe: SuperType): Option[(Type, Type)]
 
     /** @see [[InternalApi.superType]] */
@@ -522,13 +517,12 @@ trait Types { self: Universe =>
     def apply(thistpe: Type, supertpe: Type)(
         implicit token: CompatToken): Type =
       internal.superType(thistpe, supertpe)
-  }
 
   /** The API that all super types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait SuperTypeApi extends TypeApi {
+  trait SuperTypeApi extends TypeApi
     this: SuperType =>
 
     /** The type of the qualifier.
@@ -540,7 +534,6 @@ trait Types { self: Universe =>
       *  See the example for [[scala.reflect.api.Trees#SuperExtractor]].
       */
     def supertpe: Type
-  }
 
   /** The `ConstantType` type is not directly written in user programs, but arises as the type of a constant.
     *  The REPL expresses constant types like `Int(11)`. Here are some constants with their types:
@@ -562,25 +555,23 @@ trait Types { self: Universe =>
     *  Here, `constant` is the constant value represented by the type.
     *  @group Extractors
     */
-  abstract class ConstantTypeExtractor {
+  abstract class ConstantTypeExtractor
     def unapply(tpe: ConstantType): Option[Constant]
 
     /** @see [[InternalApi.constantType]] */
     @deprecated("Use `value.tpe` or `internal.constantType` instead", "2.11.0")
     def apply(value: Constant)(implicit token: CompatToken): ConstantType =
       internal.constantType(value)
-  }
 
   /** The API that all constant types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ConstantTypeApi extends TypeApi {
+  trait ConstantTypeApi extends TypeApi
     this: ConstantType =>
 
     /** The compile-time constant underlying this type. */
     def value: Constant
-  }
 
   /** The `TypeRef` type describes types of any of the forms on the left,
     *  with their TypeRef representations to the right.
@@ -608,20 +599,19 @@ trait Types { self: Universe =>
     *  type arguments.
     *  @group Extractors
     */
-  abstract class TypeRefExtractor {
+  abstract class TypeRefExtractor
     def unapply(tpe: TypeRef): Option[(Type, Symbol, List[Type])]
 
     /** @see [[InternalApi.typeRef]] */
     @deprecated("Use `internal.typeRef` instead", "2.11.0")
     def apply(pre: Type, sym: Symbol, args: List[Type])(
         implicit token: CompatToken): Type = internal.typeRef(pre, sym, args)
-  }
 
   /** The API that all type refs support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait TypeRefApi extends TypeApi {
+  trait TypeRefApi extends TypeApi
     this: TypeRef =>
 
     /** The prefix of the type reference.
@@ -636,7 +626,6 @@ trait Types { self: Universe =>
       *  Is equal to `Nil` if the arguments are not provided.
       */
     def args: List[Type]
-  }
 
   /** A subtype of Type representing refined types as well as `ClassInfo` signatures.
     *  @template
@@ -671,7 +660,7 @@ trait Types { self: Universe =>
     *  containing all declarations in the class.
     *  @group Extractors
     */
-  abstract class RefinedTypeExtractor {
+  abstract class RefinedTypeExtractor
     def unapply(tpe: RefinedType): Option[(List[Type], Scope)]
 
     /** @see [[InternalApi.refinedType]] */
@@ -685,13 +674,12 @@ trait Types { self: Universe =>
     def apply(parents: List[Type], decls: Scope, clazz: Symbol)(
         implicit token: CompatToken): RefinedType =
       internal.refinedType(parents, decls, clazz)
-  }
 
   /** The API that all refined types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait RefinedTypeApi extends TypeApi {
+  trait RefinedTypeApi extends TypeApi
     this: RefinedType =>
 
     /** The superclasses of the type. */
@@ -699,7 +687,6 @@ trait Types { self: Universe =>
 
     /** The scope that holds the definitions comprising the type. */
     def decls: MemberScope
-  }
 
   /** The `ClassInfo` type signature is used to define parents and declarations
     *  of classes, traits, and objects. If a class, trait, or object C is declared like this
@@ -726,7 +713,7 @@ trait Types { self: Universe =>
     *  itself.
     *  @group Extractors
     */
-  abstract class ClassInfoTypeExtractor {
+  abstract class ClassInfoTypeExtractor
     def unapply(tpe: ClassInfoType): Option[(List[Type], Scope, Symbol)]
 
     /** @see [[InternalApi.classInfoType]] */
@@ -734,13 +721,12 @@ trait Types { self: Universe =>
     def apply(parents: List[Type], decls: Scope, typeSymbol: Symbol)(
         implicit token: CompatToken): ClassInfoType =
       internal.classInfoType(parents, decls, typeSymbol)
-  }
 
   /** The API that all class info types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ClassInfoTypeApi extends TypeApi {
+  trait ClassInfoTypeApi extends TypeApi
     this: ClassInfoType =>
 
     /** The superclasses of the class type. */
@@ -751,7 +737,6 @@ trait Types { self: Universe =>
 
     /** The symbol underlying the class type. */
     def typeSymbol: Symbol
-  }
 
   /** The `MethodType` type signature is used to indicate parameters and result type of a method
     *  @template
@@ -779,7 +764,7 @@ trait Types { self: Universe =>
     *  its type is a `NullaryMethodType`.
     *  @group Extractors
     */
-  abstract class MethodTypeExtractor {
+  abstract class MethodTypeExtractor
     def unapply(tpe: MethodType): Option[(List[Symbol], Type)]
 
     /** @see [[InternalApi.methodType]] */
@@ -787,13 +772,12 @@ trait Types { self: Universe =>
     def apply(params: List[Symbol], resultType: Type)(
         implicit token: CompatToken): MethodType =
       internal.methodType(params, resultType)
-  }
 
   /** The API that all method types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait MethodTypeApi extends TypeApi {
+  trait MethodTypeApi extends TypeApi
     this: MethodType =>
 
     /** The symbols that correspond to the parameters of the method. */
@@ -801,7 +785,6 @@ trait Types { self: Universe =>
 
     /** The result type of the method. */
     def resultType: Type
-  }
 
   /** The `NullaryMethodType` type signature is used for parameterless methods
     *  with declarations of the form `def foo: T`
@@ -819,7 +802,7 @@ trait Types { self: Universe =>
     *  Here, `resultType` is the result type of the parameterless method.
     *  @group Extractors
     */
-  abstract class NullaryMethodTypeExtractor {
+  abstract class NullaryMethodTypeExtractor
     def unapply(tpe: NullaryMethodType): Option[(Type)]
 
     /** @see [[InternalApi.nullaryMethodType]] */
@@ -827,18 +810,16 @@ trait Types { self: Universe =>
     def apply(resultType: Type)(
         implicit token: CompatToken): NullaryMethodType =
       internal.nullaryMethodType(resultType)
-  }
 
   /** The API that all nullary method types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait NullaryMethodTypeApi extends TypeApi {
+  trait NullaryMethodTypeApi extends TypeApi
     this: NullaryMethodType =>
 
     /** The result type of the method. */
     def resultType: Type
-  }
 
   /** The `PolyType` type signature is used for polymorphic methods
     *  that have at least one type parameter.
@@ -857,7 +838,7 @@ trait Types { self: Universe =>
     *  is the type signature following the type parameters.
     *  @group Extractors
     */
-  abstract class PolyTypeExtractor {
+  abstract class PolyTypeExtractor
     def unapply(tpe: PolyType): Option[(List[Symbol], Type)]
 
     /** @see [[InternalApi.polyType]] */
@@ -865,13 +846,12 @@ trait Types { self: Universe =>
     def apply(typeParams: List[Symbol], resultType: Type)(
         implicit token: CompatToken): PolyType =
       internal.polyType(typeParams, resultType)
-  }
 
   /** The API that all polymorphic types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait PolyTypeApi extends TypeApi {
+  trait PolyTypeApi extends TypeApi
     this: PolyType =>
 
     /** The symbols corresponding to the type parameters. */
@@ -879,7 +859,6 @@ trait Types { self: Universe =>
 
     /** The underlying type. */
     def resultType: Type
-  }
 
   /** The `ExistentialType` type signature is used for existential types and
     *  wildcard types.
@@ -899,7 +878,7 @@ trait Types { self: Universe =>
     *  is the type that's existentially quantified.
     *  @group Extractors
     */
-  abstract class ExistentialTypeExtractor {
+  abstract class ExistentialTypeExtractor
     def unapply(tpe: ExistentialType): Option[(List[Symbol], Type)]
 
     /** @see [[InternalApi.existentialType]] */
@@ -907,13 +886,12 @@ trait Types { self: Universe =>
     def apply(quantified: List[Symbol], underlying: Type)(
         implicit token: CompatToken): ExistentialType =
       internal.existentialType(quantified, underlying)
-  }
 
   /** The API that all existential types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait ExistentialTypeApi extends TypeApi {
+  trait ExistentialTypeApi extends TypeApi
     this: ExistentialType =>
 
     /** The symbols corresponding to the `forSome` clauses of the existential type. */
@@ -921,7 +899,6 @@ trait Types { self: Universe =>
 
     /** The underlying type of the existential type. */
     def underlying: Type
-  }
 
   /** The `AnnotatedType` type signature is used for annotated types of the
     *  for `<type> @<annotation>`.
@@ -941,7 +918,7 @@ trait Types { self: Universe =>
     *  `selfSym` is a symbol representing the annotated type itself.
     *  @group Extractors
     */
-  abstract class AnnotatedTypeExtractor {
+  abstract class AnnotatedTypeExtractor
     def unapply(tpe: AnnotatedType): Option[(List[Annotation], Type)]
 
     /** @see [[InternalApi.annotatedType]] */
@@ -949,13 +926,12 @@ trait Types { self: Universe =>
     def apply(annotations: List[Annotation], underlying: Type)(
         implicit token: CompatToken): AnnotatedType =
       internal.annotatedType(annotations, underlying)
-  }
 
   /** The API that all annotated types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait AnnotatedTypeApi extends TypeApi {
+  trait AnnotatedTypeApi extends TypeApi
     this: AnnotatedType =>
 
     /** The annotations. */
@@ -963,7 +939,6 @@ trait Types { self: Universe =>
 
     /** The annotee. */
     def underlying: Type
-  }
 
   /** The `TypeBounds` type signature is used to indicate lower and upper type bounds
     *  of type parameters and abstract types. It is not a first-class type.
@@ -989,20 +964,19 @@ trait Types { self: Universe =>
     *  the upper bound.
     *  @group Extractors
     */
-  abstract class TypeBoundsExtractor {
+  abstract class TypeBoundsExtractor
     def unapply(tpe: TypeBounds): Option[(Type, Type)]
 
     /** @see [[InternalApi.typeBounds]] */
     @deprecated("Use `internal.typeBounds` instead", "2.11.0")
     def apply(lo: Type, hi: Type)(implicit token: CompatToken): TypeBounds =
       internal.typeBounds(lo, hi)
-  }
 
   /** The API that all type bounds support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait TypeBoundsApi extends TypeApi {
+  trait TypeBoundsApi extends TypeApi
     this: TypeBounds =>
 
     /** The lower bound.
@@ -1014,7 +988,6 @@ trait Types { self: Universe =>
       *  Is equal to `definitions.AnyTpe` if not specified explicitly.
       */
     def hi: Type
-  }
 
   /** An object representing an unknown type, used during type inference.
     *  If you see WildcardType outside of inference it is almost certainly a bug.
@@ -1045,7 +1018,7 @@ trait Types { self: Universe =>
     *  with `bounds` denoting the type bounds.
     *  @group Extractors
     */
-  abstract class BoundedWildcardTypeExtractor {
+  abstract class BoundedWildcardTypeExtractor
     def unapply(tpe: BoundedWildcardType): Option[TypeBounds]
 
     /** @see [[InternalApi.boundedWildcardType]] */
@@ -1053,18 +1026,16 @@ trait Types { self: Universe =>
     def apply(bounds: TypeBounds)(
         implicit token: CompatToken): BoundedWildcardType =
       internal.boundedWildcardType(bounds)
-  }
 
   /** The API that all this types support.
     *  The main source of information about types is the [[scala.reflect.api.Types]] page.
     *  @group API
     */
-  trait BoundedWildcardTypeApi extends TypeApi {
+  trait BoundedWildcardTypeApi extends TypeApi
     this: BoundedWildcardType =>
 
     /** Type bounds for the wildcard type. */
     def bounds: TypeBounds
-  }
 
   /** The least upper bound of a list of types, as determined by `<:<`.
     *  @group TypeOps
@@ -1089,4 +1060,3 @@ trait Types { self: Universe =>
 
   /** @see [[appliedType]] */
   def appliedType(sym: Symbol, args: Type*): Type
-}

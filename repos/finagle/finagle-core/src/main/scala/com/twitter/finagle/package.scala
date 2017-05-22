@@ -63,8 +63,8 @@ future, printing an appropriate message when the response arrives.
 The [[http://twitter.github.io/finagle/ Finagle homepage]] contains useful documentation and
 resources for using Finagle.
   */
-package object finagle {
-  object stack {
+package object finagle
+  object stack
     object Endpoint extends Stack.Role("Endpoint")
 
     /**
@@ -74,5 +74,3 @@ package object finagle {
       Stack.Leaf(Endpoint,
                  new com.twitter.finagle.service.FailingFactory[Req, Rep](
                      new IllegalArgumentException("Unterminated stack")))
-  }
-}

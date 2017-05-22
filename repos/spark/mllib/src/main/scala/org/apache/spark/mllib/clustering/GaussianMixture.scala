@@ -55,7 +55,7 @@ class GaussianMixture private (private var k: Int,
                                private var convergenceTol: Double,
                                private var maxIterations: Int,
                                private var seed: Long)
-    extends Serializable {
+    extends Serializable
 
   /**
     * Constructs a default instance. The default parameters are {k: 2, convergenceTol: 0.01,
@@ -77,15 +77,13 @@ class GaussianMixture private (private var k: Int,
     * (model.k == this.k) must be met; failure will result in an IllegalArgumentException
     */
   @Since("1.3.0")
-  def setInitialModel(model: GaussianMixtureModel): this.type = {
-    if (model.k == k) {
+  def setInitialModel(model: GaussianMixtureModel): this.type =
+    if (model.k == k)
       initialModel = Some(model)
-    } else {
+    else
       throw new IllegalArgumentException(
           "mismatched cluster count (model.k != k)")
-    }
     this
-  }
 
   /**
     * Return the user supplied initial GMM, if supplied
@@ -97,10 +95,9 @@ class GaussianMixture private (private var k: Int,
     * Set the number of Gaussians in the mixture model.  Default: 2
     */
   @Since("1.3.0")
-  def setK(k: Int): this.type = {
+  def setK(k: Int): this.type =
     this.k = k
     this
-  }
 
   /**
     * Return the number of Gaussians in the mixture model
@@ -112,10 +109,9 @@ class GaussianMixture private (private var k: Int,
     * Set the maximum number of iterations allowed. Default: 100
     */
   @Since("1.3.0")
-  def setMaxIterations(maxIterations: Int): this.type = {
+  def setMaxIterations(maxIterations: Int): this.type =
     this.maxIterations = maxIterations
     this
-  }
 
   /**
     * Return the maximum number of iterations allowed
@@ -128,10 +124,9 @@ class GaussianMixture private (private var k: Int,
     * considered to have occurred.
     */
   @Since("1.3.0")
-  def setConvergenceTol(convergenceTol: Double): this.type = {
+  def setConvergenceTol(convergenceTol: Double): this.type =
     this.convergenceTol = convergenceTol
     this
-  }
 
   /**
     * Return the largest change in log-likelihood at which convergence is
@@ -144,10 +139,9 @@ class GaussianMixture private (private var k: Int,
     * Set the random seed
     */
   @Since("1.3.0")
-  def setSeed(seed: Long): this.type = {
+  def setSeed(seed: Long): this.type =
     this.seed = seed
     this
-  }
 
   /**
     * Return the random seed
@@ -159,7 +153,7 @@ class GaussianMixture private (private var k: Int,
     * Perform expectation maximization
     */
   @Since("1.3.0")
-  def run(data: RDD[Vector]): GaussianMixtureModel = {
+  def run(data: RDD[Vector]): GaussianMixtureModel =
     val sc = data.sparkContext
 
     // we will operate on the data as breeze data
@@ -176,24 +170,22 @@ class GaussianMixture private (private var k: Int,
     // we start with uniform weights, a random mean from the data, and
     // diagonal covariance matrices using component variances
     // derived from the samples
-    val (weights, gaussians) = initialModel match {
+    val (weights, gaussians) = initialModel match
       case Some(gmm) => (gmm.weights, gmm.gaussians)
 
-      case None => {
+      case None =>
           val samples =
             breezeData.takeSample(withReplacement = true, k * nSamples, seed)
-          (Array.fill(k)(1.0 / k), Array.tabulate(k) { i =>
+          (Array.fill(k)(1.0 / k), Array.tabulate(k)  i =>
             val slice = samples.view(i * nSamples, (i + 1) * nSamples)
             new MultivariateGaussian(vectorMean(slice), initCovariance(slice))
-          })
-        }
-    }
+          )
 
     var llh = Double.MinValue // current log-likelihood
     var llhp = 0.0 // previous log-likelihood
 
     var iter = 0
-    while (iter < maxIterations && math.abs(llh - llhp) > convergenceTol) {
+    while (iter < maxIterations && math.abs(llh - llhp) > convergenceTol)
       // create and broadcast curried cluster contribution function
       val compute = sc.broadcast(ExpectationSum.add(weights, gaussians) _)
 
@@ -205,38 +197,33 @@ class GaussianMixture private (private var k: Int,
       // (often referred to as the "M" step in literature)
       val sumWeights = sums.weights.sum
 
-      if (shouldDistributeGaussians) {
+      if (shouldDistributeGaussians)
         val numPartitions = math.min(k, 1024)
         val tuples = Seq.tabulate(k)(
             i => (sums.means(i), sums.sigmas(i), sums.weights(i)))
         val (ws, gs) = sc
           .parallelize(tuples, numPartitions)
-          .map {
+          .map
             case (mean, sigma, weight) =>
               updateWeightsAndGaussians(mean, sigma, weight, sumWeights)
-          }
           .collect()
           .unzip
         Array.copy(ws.toArray, 0, weights, 0, ws.length)
         Array.copy(gs.toArray, 0, gaussians, 0, gs.length)
-      } else {
+      else
         var i = 0
-        while (i < k) {
+        while (i < k)
           val (weight, gaussian) = updateWeightsAndGaussians(
               sums.means(i), sums.sigmas(i), sums.weights(i), sumWeights)
           weights(i) = weight
           gaussians(i) = gaussian
           i = i + 1
-        }
-      }
 
       llhp = llh // current becomes previous
       llh = sums.logLikelihood // this is the freshly computed log-likelihood
       iter += 1
-    }
 
     new GaussianMixtureModel(weights, gaussians)
-  }
 
   /**
     * Java-friendly version of [[run()]]
@@ -248,7 +235,7 @@ class GaussianMixture private (private var k: Int,
       mean: BDV[Double],
       sigma: BreezeMatrix[Double],
       weight: Double,
-      sumWeights: Double): (Double, MultivariateGaussian) = {
+      sumWeights: Double): (Double, MultivariateGaussian) =
     val mu = (mean /= weight)
     BLAS.syr(-weight,
              Vectors.fromBreeze(mu),
@@ -256,28 +243,24 @@ class GaussianMixture private (private var k: Int,
     val newWeight = weight / sumWeights
     val newGaussian = new MultivariateGaussian(mu, sigma / weight)
     (newWeight, newGaussian)
-  }
 
   /** Average of dense breeze vectors */
-  private def vectorMean(x: IndexedSeq[BV[Double]]): BDV[Double] = {
+  private def vectorMean(x: IndexedSeq[BV[Double]]): BDV[Double] =
     val v = BDV.zeros[Double](x(0).length)
     x.foreach(xi => v += xi)
     v / x.length.toDouble
-  }
 
   /**
     * Construct matrix where diagonal entries are element-wise
     * variance of input vectors (computes biased variance)
     */
-  private def initCovariance(x: IndexedSeq[BV[Double]]): BreezeMatrix[Double] = {
+  private def initCovariance(x: IndexedSeq[BV[Double]]): BreezeMatrix[Double] =
     val mu = vectorMean(x)
     val ss = BDV.zeros[Double](x(0).length)
     x.foreach(xi => ss += (xi - mu) :^ 2.0)
     diag(ss / x.length.toDouble)
-  }
-}
 
-private[clustering] object GaussianMixture {
+private[clustering] object GaussianMixture
 
   /**
     * Heuristic to distribute the computation of the [[MultivariateGaussian]]s, approximately when
@@ -287,28 +270,25 @@ private[clustering] object GaussianMixture {
     */
   def shouldDistributeGaussians(k: Int, d: Int): Boolean =
     ((k - 1.0) / k) * d > 25
-}
 
 // companion class to provide zero constructor for ExpectationSum
-private object ExpectationSum {
-  def zero(k: Int, d: Int): ExpectationSum = {
+private object ExpectationSum
+  def zero(k: Int, d: Int): ExpectationSum =
     new ExpectationSum(0.0,
                        Array.fill(k)(0.0),
                        Array.fill(k)(BDV.zeros(d)),
                        Array.fill(k)(BreezeMatrix.zeros(d, d)))
-  }
 
   // compute cluster contributions for each input point
   // (U, T) => U for aggregation
   def add(weights: Array[Double], dists: Array[MultivariateGaussian])(
-      sums: ExpectationSum, x: BV[Double]): ExpectationSum = {
-    val p = weights.zip(dists).map {
+      sums: ExpectationSum, x: BV[Double]): ExpectationSum =
+    val p = weights.zip(dists).map
       case (weight, dist) => MLUtils.EPSILON + weight * dist.pdf(x)
-    }
     val pSum = p.sum
     sums.logLikelihood += math.log(pSum)
     var i = 0
-    while (i < sums.k) {
+    while (i < sums.k)
       p(i) /= pSum
       sums.weights(i) += p(i)
       sums.means(i) += x * p(i)
@@ -316,29 +296,23 @@ private object ExpectationSum {
                Vectors.fromBreeze(x),
                Matrices.fromBreeze(sums.sigmas(i)).asInstanceOf[DenseMatrix])
       i = i + 1
-    }
     sums
-  }
-}
 
 // Aggregation class for partial expectation results
 private class ExpectationSum(var logLikelihood: Double,
                              val weights: Array[Double],
                              val means: Array[BDV[Double]],
                              val sigmas: Array[BreezeMatrix[Double]])
-    extends Serializable {
+    extends Serializable
 
   val k = weights.length
 
-  def +=(x: ExpectationSum): ExpectationSum = {
+  def +=(x: ExpectationSum): ExpectationSum =
     var i = 0
-    while (i < k) {
+    while (i < k)
       weights(i) += x.weights(i)
       means(i) += x.means(i)
       sigmas(i) += x.sigmas(i)
       i = i + 1
-    }
     logLikelihood += x.logLikelihood
     this
-  }
-}

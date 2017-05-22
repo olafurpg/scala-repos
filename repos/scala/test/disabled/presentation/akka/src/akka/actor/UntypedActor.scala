@@ -53,7 +53,7 @@ import akka.japi.{Creator, Procedure}
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-abstract class UntypedActor extends Actor {
+abstract class UntypedActor extends Actor
 
   /**
     * To be implemented by concrete UntypedActor. Defines the message handler.
@@ -116,14 +116,11 @@ abstract class UntypedActor extends Actor {
     * Is called when a message isn't handled by the current behavior of the actor
     * by default it throws an UnhandledMessageException
     */
-  override def unhandled(msg: Any) {
+  override def unhandled(msg: Any)
     throw new UnhandledMessageException(msg, self)
-  }
 
-  final protected def receive = {
+  final protected def receive =
     case msg => onReceive(msg)
-  }
-}
 
 /**
   * Factory closure for an UntypedActor, to be used with 'Actors.actorOf(factory)'.

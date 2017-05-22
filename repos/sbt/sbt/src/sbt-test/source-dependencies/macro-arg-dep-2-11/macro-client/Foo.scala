@@ -1,5 +1,4 @@
 package macros
 
-object Foo {
+object Foo
   def str: String = "abc"
-}

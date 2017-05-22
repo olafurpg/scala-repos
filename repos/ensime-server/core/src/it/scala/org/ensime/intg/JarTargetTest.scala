@@ -13,63 +13,51 @@ import scala.concurrent.duration._
   */
 class JarTargetTest
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.SimpleJarTestProject
 
-  "ensime-server" should "index jar targets" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "index jar targets" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
+        withProject  (project, asyncHelper) =>
           import tk._
 
           mainTarget should be a 'file
 
-          eventually(interval(1 second)) {
+          eventually(interval(1 second))
             project ! PublicSymbolSearchReq(List("Foo"), 5)
-            atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern {
+            atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern
               case TypeSearchResult("baz.Foo$",
                                     "Foo$",
                                     DeclaredAs.Class,
                                     Some(_)) =>
-            }
-          }
-        }
-      }
-    }
-  }
 
-  it should "allow jar targets to be deleted" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
-        withProject { (project, asyncHelper) =>
+  it should "allow jar targets to be deleted" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
+        withProject  (project, asyncHelper) =>
           mainTarget should be a 'file
 
           // no scaling here
-          eventually(timeout(30 seconds), interval(1 second)) {
+          eventually(timeout(30 seconds), interval(1 second))
             mainTarget.delete() shouldBe true
-          }
-        }
-      }
-    }
-  }
-}
 
 /**
   * Variant of JarTargetTest with jars missing on startup.
   */
 class MissingJarTargetTest
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture with IsolatedProjectFixture {
+    with IsolatedTestKitFixture with IsolatedProjectFixture
 
   val original = EnsimeConfigFixture.SimpleJarTestProject
 
   override def copyTargets = false
 
-  "ensime-server" should "index jar targets that appear after startup" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
-        withProject { (project, asyncHelper) =>
+  "ensime-server" should "index jar targets that appear after startup" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
+        withProject  (project, asyncHelper) =>
           import tk._
 
           // internal consistency check
@@ -85,17 +73,10 @@ class MissingJarTargetTest
           // means the file addition was detected
           asyncHelper.expectMsg(CompilerRestartedEvent)
 
-          eventually(interval(1 second)) {
+          eventually(interval(1 second))
             project ! PublicSymbolSearchReq(List("Foo"), 5)
-            atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern {
+            atLeast(1, expectMsgType[SymbolSearchResults].syms) should matchPattern
               case TypeSearchResult("baz.Foo$",
                                     "Foo$",
                                     DeclaredAs.Class,
                                     Some(_)) =>
-            }
-          }
-        }
-      }
-    }
-  }
-}

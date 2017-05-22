@@ -16,7 +16,7 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * User: Alexander Podkhalyuzin
   * Date: 24.02.2009
   */
-abstract class ScalaPsiTestCase extends PsiTestCase {
+abstract class ScalaPsiTestCase extends PsiTestCase
   private val JDK_HOME = TestUtils.getDefaultJdk
 
   protected def rootPath = TestUtils.getTestDataPath + "/"
@@ -26,12 +26,12 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
     */
   protected def doTest()
 
-  override protected def setUp() {
+  override protected def setUp()
     super.setUp()
     val rootModel: ModifiableRootModel =
       ModuleRootManager.getInstance(getModule).getModifiableModel
 
-    try {
+    try
       val testDataRoot =
         LocalFileSystem.getInstance.refreshAndFindFileByPath(rootPath)
       assert(testDataRoot != null)
@@ -45,7 +45,7 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
       val libraryTable = rootModel.getModuleLibraryTable
       val scalaLib = libraryTable.createLibrary("scala_lib")
       val libModel: ModifiableModel = scalaLib.getModifiableModel
-      try {
+      try
         val libRoot = new File(TestUtils.getScalaLibraryPath)
         assert(libRoot.exists)
 
@@ -58,21 +58,14 @@ abstract class ScalaPsiTestCase extends PsiTestCase {
             VfsUtil.getUrlForLibraryRoot(srcRoot), OrderRootType.SOURCES)
 
         ApplicationManager.getApplication.runWriteAction(
-            new Runnable {
-          def run() {
+            new Runnable
+          def run()
             libModel.commit()
             rootModel.commit()
-          }
-        })
-      } finally {
-        if (!Disposer.isDisposed(libModel)) {
+        )
+      finally
+        if (!Disposer.isDisposed(libModel))
           Disposer.dispose(libModel)
-        }
-      }
-    } finally {
-      if (!rootModel.isDisposed) {
+    finally
+      if (!rootModel.isDisposed)
         rootModel.dispose()
-      }
-    }
-  }
-}

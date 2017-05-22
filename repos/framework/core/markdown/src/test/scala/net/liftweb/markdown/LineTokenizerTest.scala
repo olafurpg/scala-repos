@@ -28,11 +28,11 @@ import org.scalatest.junit.JUnitRunner
   * Tests the Line Tokenizer that prepares input for parsing.
   */
 @RunWith(classOf[JUnitRunner])
-class LineTokenizerTest extends FlatSpec with ShouldMatchers {
+class LineTokenizerTest extends FlatSpec with ShouldMatchers
 
   val tokenizer = new LineTokenizer
 
-  "The LineTokenizer" should "split input lines correctly" in {
+  "The LineTokenizer" should "split input lines correctly" in
     tokenizer.splitLines("line1\nline2\n") should equal(List("line1", "line2"))
     tokenizer.splitLines("line1\nline2 no nl") should equal(
         List("line1", "line2 no nl"))
@@ -43,9 +43,8 @@ class LineTokenizerTest extends FlatSpec with ShouldMatchers {
     tokenizer.splitLines("\n\n") should equal(Nil)
     tokenizer.splitLines("\n") should equal(Nil)
     tokenizer.splitLines("") should equal(List(""))
-  }
 
-  it should "preprocess the input correctly" in {
+  it should "preprocess the input correctly" in
     tokenizer.tokenize("[foo]: http://example.com/  \"Optional Title Here\"") should equal(
         (new MarkdownLineReader(
             List(),
@@ -78,15 +77,12 @@ more text
                 "foo" -> new LinkDefinition(
                     "foo", "http://www.example.com", Some("A Title"))
             )))
-  }
 
-  it should "parse different line types" in {
-    def p(line: String) = {
-      tokenizer.lineToken(new LineReader(Seq(line))) match {
+  it should "parse different line types" in
+    def p(line: String) =
+      tokenizer.lineToken(new LineReader(Seq(line))) match
         case tokenizer.Success(result, _) => result
         case _ => fail("Line tokenization failed.")
-      }
-    }
     p("a line") should equal(new OtherLine("a line"))
     p("    a code line") should equal(new CodeLine("    ", "a code line"))
     p("#a header#") should equal(new AtxHeaderLine("#", "a header#"))
@@ -98,5 +94,3 @@ more text
     p("===") should equal(new SetExtHeaderLine("===", 1))
     p("---  ") should equal(new SetExtHeaderLine("---  ", 2))
     p("- - -") should equal(new RulerLine("- - -"))
-  }
-}

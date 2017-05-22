@@ -20,7 +20,7 @@ import java.io.Writer
 import com.twitter.summingbird.{Platform, Producer, Dependants, NamedProducer, IdentityKeyedProducer}
 import com.twitter.summingbird.planner._
 
-object VizGraph {
+object VizGraph
   def apply[P <: Platform[P]](dag: Dag[P], writer: Writer): Unit =
     writer.write(apply(dag))
   def apply[P <: Platform[P]](dag: Dag[P]): String = DagViz(dag).toString
@@ -28,4 +28,3 @@ object VizGraph {
     writer.write(VizGraph(tail))
   def apply[P <: Platform[P]](tail: Producer[P, _]): String =
     ProducerViz(tail).toString
-}

@@ -24,7 +24,7 @@ import annotation.tailrec
   */
 sealed trait List[@specialized +A]
     extends LinearSeq[A] with Product with GenericTraversableTemplate[A, List]
-    with LinearSeqOptimized[A, List[A]] {
+    with LinearSeqOptimized[A, List[A]]
   override def companion: GenericCompanion[List] = List
 
   import scala.collection.{Iterable, Traversable, Seq}
@@ -82,15 +82,13 @@ sealed trait List[@specialized +A]
     *  @param prefix the prefix to reverse and then prepend
     *  @return       the concatenation of the reversed prefix and the current list.
     */
-  def reverse_:::[B >: A](prefix: List[B]): List[B] = {
+  def reverse_:::[B >: A](prefix: List[B]): List[B] =
     var these: List[B] = this
     var pres = prefix
-    while (!pres.isEmpty) {
+    while (!pres.isEmpty)
       these = pres.head :: these
       pres = pres.tail
-    }
     these
-  }
 
   /** Apply a function to all the elements of the list, and return the
     *  reversed list of results. This is equivalent to a call to <code>map</code>
@@ -99,43 +97,36 @@ sealed trait List[@specialized +A]
     *  @param f the function to apply to each elements.
     *  @return  the reversed list of results.
     */
-  def reverseMap[B](f: A => B): List[B] = {
+  def reverseMap[B](f: A => B): List[B] =
     @tailrec
-    def loop(l: List[A], res: List[B]): List[B] = l match {
+    def loop(l: List[A], res: List[B]): List[B] = l match
       case Nil => res
       case head :: tail => loop(tail, f(head) :: res)
-    }
     loop(this, Nil)
-  }
 
   /** Like xs map f, but returns <code>xs</code> unchanged if function
     *  <code>f</code> maps all elements to themselves (wrt ==).
     *  @note Unlike `map`, `mapConserve` is not tail-recursive.
     */
-  def mapConserve[B >: A](f: A => B): List[B] = {
+  def mapConserve[B >: A](f: A => B): List[B] =
     def loop(ys: List[A]): List[B] =
       if (ys.isEmpty) this
-      else {
+      else
         val head0 = ys.head
         val head1 = f(head0)
-        if (head1 == head0) {
+        if (head1 == head0)
           loop(ys.tail)
-        } else {
+        else
           val ys1 = head1 :: ys.tail.mapConserve(f)
           if (this eq ys) ys1
-          else {
+          else
             val b = new ListBuffer[B]
             var xc = this
-            while (xc ne ys) {
+            while (xc ne ys)
               b += xc.head
               xc = xc.tail
-            }
             b.prependToList(ys1)
-          }
-        }
-      }
     loop(this)
-  }
 
   // Overridden methods from IterableLike or overloaded variants of such methods
 
@@ -143,11 +134,10 @@ sealed trait List[@specialized +A]
     *  followed by all elements of Traversable `that'
     */
   override def ++[B >: A, That](xs: GenTraversableOnce[B])(
-      implicit bf: CanBuildFrom[List[A], B, That]): That = {
+      implicit bf: CanBuildFrom[List[A], B, That]): That =
     val b = bf(this)
     if (b.isInstanceOf[ListBuffer[_]]) (this ::: xs.toList).asInstanceOf[That]
     else super.++(xs)
-  }
 
   /** Overrides the method in Iterable for efficiency.
     *
@@ -161,18 +151,16 @@ sealed trait List[@specialized +A]
     *  @param n the number of elements to take.
     *  @return the <code>n</code> first elements of this list.
     */
-  override def take(n: Int): List[A] = {
+  override def take(n: Int): List[A] =
     val b = new ListBuffer[A]
     var i = 0
     var these = this
-    while (!these.isEmpty && i < n) {
+    while (!these.isEmpty && i < n)
       i += 1
       b += these.head
       these = these.tail
-    }
     if (these.isEmpty) this
     else b.toList
-  }
 
   /** Returns the list without its <code>n</code> first elements.
     *  If this list has less than <code>n</code> elements, the empty list is returned.
@@ -180,15 +168,13 @@ sealed trait List[@specialized +A]
     *  @param n the number of elements to drop.
     *  @return the list without its <code>n</code> first elements.
     */
-  override def drop(n: Int): List[A] = {
+  override def drop(n: Int): List[A] =
     var these = this
     var count = n
-    while (!these.isEmpty && count > 0) {
+    while (!these.isEmpty && count > 0)
       these = these.tail
       count -= 1
-    }
     these
-  }
 
   /** Returns the list with elements belonging to the given index range.
     *
@@ -196,25 +182,22 @@ sealed trait List[@specialized +A]
     *  @param end   the end position (exclusive) of the list slice.
     *  @return the list with elements belonging to the given index range.
     */
-  override def slice(start: Int, end: Int): List[A] = {
+  override def slice(start: Int, end: Int): List[A] =
     var len = end
     if (start > 0) len -= start
     drop(start) take len
-  }
 
   /** Returns the rightmost <code>n</code> elements from this list.
     *
     *  @param n the number of elements to take
     *  @return the suffix of length <code>n</code> of the list
     */
-  override def takeRight(n: Int): List[A] = {
+  override def takeRight(n: Int): List[A] =
     @tailrec
-    def loop(lead: List[A], lag: List[A]): List[A] = lead match {
+    def loop(lead: List[A], lag: List[A]): List[A] = lead match
       case Nil => lag
       case _ :: tail => loop(tail, lag.tail)
-    }
     loop(drop(n), this)
-  }
 
   // dropRight is inherited from Stream
 
@@ -225,17 +208,15 @@ sealed trait List[@specialized +A]
     *  @return  a pair of lists composed of the first <code>n</code>
     *           elements, and the other elements.
     */
-  override def splitAt(n: Int): (List[A], List[A]) = {
+  override def splitAt(n: Int): (List[A], List[A]) =
     val b = new ListBuffer[A]
     var i = 0
     var these = this
-    while (!these.isEmpty && i < n) {
+    while (!these.isEmpty && i < n)
       i += 1
       b += these.head
       these = these.tail
-    }
     (b.toList, these)
-  }
 
   /** Returns the longest prefix of this list whose elements satisfy
     *  the predicate <code>p</code>.
@@ -244,15 +225,13 @@ sealed trait List[@specialized +A]
     *  @return  the longest prefix of this list whose elements satisfy
     *           the predicate <code>p</code>.
     */
-  override def takeWhile(p: A => Boolean): List[A] = {
+  override def takeWhile(p: A => Boolean): List[A] =
     val b = new ListBuffer[A]
     var these = this
-    while (!these.isEmpty && p(these.head)) {
+    while (!these.isEmpty && p(these.head))
       b += these.head
       these = these.tail
-    }
     b.toList
-  }
 
   /** Returns the longest suffix of this list whose first element
     *  does not satisfy the predicate <code>p</code>.
@@ -261,14 +240,13 @@ sealed trait List[@specialized +A]
     *  @return  the longest suffix of the list whose first element
     *           does not satisfy the predicate <code>p</code>.
     */
-  override def dropWhile(p: A => Boolean): List[A] = {
+  override def dropWhile(p: A => Boolean): List[A] =
     @tailrec
     def loop(xs: List[A]): List[A] =
       if (xs.isEmpty || !p(xs.head)) xs
       else loop(xs.tail)
 
     loop(this)
-  }
 
   /** Returns the longest prefix of the list whose elements all satisfy
     *  the given predicate, and the rest of the list.
@@ -277,27 +255,23 @@ sealed trait List[@specialized +A]
     *  @return  a pair consisting of the longest prefix of the list whose
     *           elements all satisfy <code>p</code>, and the rest of the list.
     */
-  override def span(p: A => Boolean): (List[A], List[A]) = {
+  override def span(p: A => Boolean): (List[A], List[A]) =
     val b = new ListBuffer[A]
     var these = this
-    while (!these.isEmpty && p(these.head)) {
+    while (!these.isEmpty && p(these.head))
       b += these.head
       these = these.tail
-    }
     (b.toList, these)
-  }
 
   /** A list consisting of all elements of this list in reverse order.
     */
-  override def reverse: List[A] = {
+  override def reverse: List[A] =
     var result: List[A] = Nil
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       result = these.head :: result
       these = these.tail
-    }
     result
-  }
 
   override def stringPrefix = "List"
 
@@ -315,15 +289,13 @@ sealed trait List[@specialized +A]
     *              <code>that</code>.
     */
   @deprecated("use `diff' instead")
-  def --[B >: A](that: List[B]): List[B] = {
+  def --[B >: A](that: List[B]): List[B] =
     val b = new ListBuffer[B]
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (!that.contains(these.head)) b += these.head
       these = these.tail
-    }
     b.toList
-  }
 
   /** Computes the difference between this list and the given object
     *  <code>x</code>.
@@ -333,15 +305,13 @@ sealed trait List[@specialized +A]
     *              <code>x</code>.
     */
   @deprecated("use `diff' instead")
-  def -[B >: A](x: B): List[B] = {
+  def -[B >: A](x: B): List[B] =
     val b = new ListBuffer[B]
     var these = this
-    while (!these.isEmpty) {
+    while (!these.isEmpty)
       if (these.head != x) b += these.head
       these = these.tail
-    }
     b.toList
-  }
 
   /** <p>
     *    Sort the list according to the comparison function
@@ -360,51 +330,45 @@ sealed trait List[@specialized +A]
     *    List("Bob", "John", "Steve", "Tom")</pre>
     */
   @deprecated("use `sortWith' instead")
-  def sort(lt: (A, A) => Boolean): List[A] = {
+  def sort(lt: (A, A) => Boolean): List[A] =
 
     /** Merge two already-sorted lists */
-    def merge(l1: List[A], l2: List[A]): List[A] = {
+    def merge(l1: List[A], l2: List[A]): List[A] =
       val res = new ListBuffer[A]
       var left1 = l1
       var left2 = l2
 
-      while (!left1.isEmpty && !left2.isEmpty) {
-        if (lt(left1.head, left2.head)) {
+      while (!left1.isEmpty && !left2.isEmpty)
+        if (lt(left1.head, left2.head))
           res += left1.head
           left1 = left1.tail
-        } else {
+        else
           res += left2.head
           left2 = left2.tail
-        }
-      }
 
       res ++= left1
       res ++= left2
 
       res.toList
-    }
 
     /** Split a list into two lists of about the same size */
-    def split(lst: List[A]) = {
+    def split(lst: List[A]) =
       val res1 = new ListBuffer[A]
       val res2 = new ListBuffer[A]
       var left = lst
 
-      while (!left.isEmpty) {
+      while (!left.isEmpty)
         res1 += left.head
         left = left.tail
-        if (!left.isEmpty) {
+        if (!left.isEmpty)
           res2 += left.head
           left = left.tail
-        }
-      }
 
       (res1.toList, res2.toList)
-    }
 
     /** Merge-sort the specified list */
     def ms(lst: List[A]): List[A] =
-      lst match {
+      lst match
         case Nil => lst
         case x :: Nil => lst
         case x :: y :: Nil =>
@@ -416,11 +380,8 @@ sealed trait List[@specialized +A]
           val l1s = ms(l1)
           val l2s = ms(l2)
           merge(l1s, l2s)
-      }
 
     ms(this)
-  }
-}
 
 /** The empty list.
   *
@@ -428,18 +389,16 @@ sealed trait List[@specialized +A]
   *  @version 1.0, 15/07/2003
   */
 @SerialVersionUID(0 - 8256821097970055419L)
-case object Nil extends List[Nothing] {
+case object Nil extends List[Nothing]
   override def isEmpty = true
   override def head: Nothing =
     throw new NoSuchElementException("head of empty list")
   override def tail: List[Nothing] =
     throw new NoSuchElementException("tail of empty list")
   // Removal of equals method here might lead to an infinite recursion similar to IntMap.equals.
-  override def equals(that: Any) = that match {
+  override def equals(that: Any) = that match
     case that1: Seq[_] => that1.isEmpty
     case _ => false
-  }
-}
 
 /** A non empty list characterized by a head and a tail.
   *
@@ -449,24 +408,23 @@ case object Nil extends List[Nothing] {
 @SerialVersionUID(0L - 8476791151983527571L)
 final case class ::[@specialized B](
     private var hd: B, private[scala] var tl: List[B])
-    extends List[B] {
+    extends List[B]
   override def head: B = hd
   override def tail: List[B] = tl
   override def isEmpty: Boolean = false
 
   import java.io._
 
-  private def writeObject(out: ObjectOutputStream) {
+  private def writeObject(out: ObjectOutputStream)
     var xs: List[B] = this
     while (!xs.isEmpty) { out.writeObject(xs.head); xs = xs.tail }
     out.writeObject(ListSerializeEnd)
-  }
 
-  private def readObject(in: ObjectInputStream) {
+  private def readObject(in: ObjectInputStream)
     hd = in.readObject.asInstanceOf[B]
     assert(hd != ListSerializeEnd)
     var current: ::[B] = this
-    while (true) in.readObject match {
+    while (true) in.readObject match
       case ListSerializeEnd =>
         current.tl = Nil
         return
@@ -474,9 +432,6 @@ final case class ::[@specialized B](
         val list: ::[B] = new ::(a.asInstanceOf[B], Nil)
         current.tl = list
         current = list
-    }
-  }
-}
 
 /** This object provides methods for creating specialized lists, and for
   *  transforming special kinds of lists (e.g. lists of lists).
@@ -484,14 +439,13 @@ final case class ::[@specialized B](
   *  @author  Martin Odersky
   *  @version 2.8
   */
-object List extends SeqFactory[List] {
+object List extends SeqFactory[List]
 
   import collection.{Iterable, Seq}
 
   implicit def builderFactory[A]: CanBuildFrom[Coll, A, List[A]] =
-    new GenericCanBuildFrom[A] {
+    new GenericCanBuildFrom[A]
       override def apply() = newBuilder[A]
-    }
   def newBuilder[A]: Builder[A, List[A]] = new ListBuffer[A]
 
   override def empty[A]: List[A] = Nil
@@ -512,21 +466,19 @@ object List extends SeqFactory[List] {
     *  @return     the sorted list of all integers in range [start;end).
     */
   @deprecated("use `iterate' instead")
-  def range(start: Int, end: Int, step: Int => Int): List[Int] = {
+  def range(start: Int, end: Int, step: Int => Int): List[Int] =
     val up = step(start) > start
     val down = step(start) < start
     val b = new ListBuffer[Int]
     var i = start
-    while ( (!up || i < end) && (!down || i > end)) {
+    while ( (!up || i < end) && (!down || i > end))
       b += i
       val next = step(i)
       if (i == next)
         throw new IllegalArgumentException(
             "the step function did not make any progress on " + i)
       i = next
-    }
     b.toList
-  }
 
   /** Create a list containing several copies of an element.
     *
@@ -535,15 +487,13 @@ object List extends SeqFactory[List] {
     *  @return     a list composed of n elements all equal to elem
     */
   @deprecated("use `fill' instead")
-  def make[A](n: Int, elem: A): List[A] = {
+  def make[A](n: Int, elem: A): List[A] =
     val b = new ListBuffer[A]
     var i = 0
-    while (i < n) {
+    while (i < n)
       b += elem
       i += 1
-    }
     b.toList
-  }
 
   /** Concatenate all the elements of a given list of lists.
     *
@@ -551,17 +501,14 @@ object List extends SeqFactory[List] {
     *  @return    the concatenation of all the lists
     */
   @deprecated("use `xss.flatten' instead")
-  def flatten[A](xss: List[List[A]]): List[A] = {
+  def flatten[A](xss: List[List[A]]): List[A] =
     val b = new ListBuffer[A]
-    for (xs <- xss) {
+    for (xs <- xss)
       var xc = xs
-      while (!xc.isEmpty) {
+      while (!xc.isEmpty)
         b += xc.head
         xc = xc.tail
-      }
-    }
     b.toList
-  }
 
   /** Transforms a list of pairs into a pair of lists.
     *
@@ -569,17 +516,15 @@ object List extends SeqFactory[List] {
     *  @return a pair of lists.
     */
   @deprecated("use `xs.unzip' instead")
-  def unzip[A, B](xs: List[(A, B)]): (List[A], List[B]) = {
+  def unzip[A, B](xs: List[(A, B)]): (List[A], List[B]) =
     val b1 = new ListBuffer[A]
     val b2 = new ListBuffer[B]
     var xc = xs
-    while (!xc.isEmpty) {
+    while (!xc.isEmpty)
       b1 += xc.head._1
       b2 += xc.head._2
       xc = xc.tail
-    }
     (b1.toList, b2.toList)
-  }
 
   /** Transforms an iterable of pairs into a pair of lists.
     *
@@ -588,9 +533,8 @@ object List extends SeqFactory[List] {
     */
   @deprecated("use `xs.unzip' instead")
   def unzip[A, B](xs: Iterable[(A, B)]): (List[A], List[B]) =
-    xs.foldRight[(List[A], List[B])]((Nil, Nil)) {
+    xs.foldRight[(List[A], List[B])]((Nil, Nil))
       case ((x, y), (xs, ys)) => (x :: xs, y :: ys)
-    }
 
   /**
     * Returns the <code>Left</code> values in the given <code>Iterable</code>
@@ -599,10 +543,10 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.lefts' instead")
   def lefts[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[A]](Nil)((e, as) =>
-          e match {
+          e match
         case Left(a) => a :: as
         case Right(_) => as
-    })
+    )
 
   /**
     * Returns the <code>Right</code> values in the given<code>Iterable</code> of  <code>Either</code>s.
@@ -610,10 +554,10 @@ object List extends SeqFactory[List] {
   @deprecated("use `Either.rights' instead")
   def rights[A, B](es: Iterable[Either[A, B]]) =
     es.foldRight[List[B]](Nil)((e, bs) =>
-          e match {
+          e match
         case Left(_) => bs
         case Right(b) => b :: bs
-    })
+    )
 
   /** Transforms an Iterable of Eithers into a pair of lists.
     *
@@ -622,10 +566,9 @@ object List extends SeqFactory[List] {
     */
   @deprecated("use `Either.separate' instead")
   def separate[A, B](es: Iterable[Either[A, B]]): (List[A], List[B]) =
-    es.foldRight[(List[A], List[B])]((Nil, Nil)) {
+    es.foldRight[(List[A], List[B])]((Nil, Nil))
       case (Left(a), (lefts, rights)) => (a :: lefts, rights)
       case (Right(b), (lefts, rights)) => (lefts, b :: rights)
-    }
 
   /** Converts an iterator to a list.
     *
@@ -654,15 +597,13 @@ object List extends SeqFactory[List] {
     *               in the same order
     */
   @deprecated("use `array.view(start, end).toList' instead")
-  def fromArray[A](arr: Array[A], start: Int, len: Int): List[A] = {
+  def fromArray[A](arr: Array[A], start: Int, len: Int): List[A] =
     var res: List[A] = Nil
     var i = start + len
-    while (i > start) {
+    while (i > start)
       i -= 1
       res = arr(i) :: res
-    }
     res
-  }
 
   /** Parses a string which contains substrings separated by a
     *  separator character and returns a list of all substrings.
@@ -672,16 +613,14 @@ object List extends SeqFactory[List] {
     *  @return          the list of substrings
     */
   @deprecated("use `str.split(separator).toList' instead")
-  def fromString(str: String, separator: Char): List[String] = {
+  def fromString(str: String, separator: Char): List[String] =
     var words: List[String] = Nil
     var pos = str.length()
-    while (pos > 0) {
+    while (pos > 0)
       val pos1 = str.lastIndexOf(separator, pos - 1)
       if (pos1 + 1 < pos) words = str.substring(pos1 + 1, pos) :: words
       pos = pos1
-    }
     words
-  }
 
   /** Returns the given string as a list of characters.
     *
@@ -697,44 +636,37 @@ object List extends SeqFactory[List] {
     *  @return   the list in form of a string.
     */
   @deprecated("use `xs.mkString' instead")
-  def toString(xs: List[Char]): String = {
+  def toString(xs: List[Char]): String =
     val sb = new StringBuilder()
     var xc = xs
-    while (!xc.isEmpty) {
+    while (!xc.isEmpty)
       sb.append(xc.head)
       xc = xc.tail
-    }
     sb.toString()
-  }
 
   /** Like xs map f, but returns <code>xs</code> unchanged if function
     *  <code>f</code> maps all elements to themselves.
     */
   @deprecated("use `xs.mapConserve(f)' instead")
-  def mapConserve[A <: AnyRef](xs: List[A])(f: A => A): List[A] = {
+  def mapConserve[A <: AnyRef](xs: List[A])(f: A => A): List[A] =
     def loop(ys: List[A]): List[A] =
       if (ys.isEmpty) xs
-      else {
+      else
         val head0 = ys.head
         val head1 = f(head0)
-        if (head1 eq head0) {
+        if (head1 eq head0)
           loop(ys.tail)
-        } else {
+        else
           val ys1 = head1 :: mapConserve(ys.tail)(f)
           if (xs eq ys) ys1
-          else {
+          else
             val b = new ListBuffer[A]
             var xc = xs
-            while (xc ne ys) {
+            while (xc ne ys)
               b += xc.head
               xc = xc.tail
-            }
             b.prependToList(ys1)
-          }
-        }
-      }
     loop(xs)
-  }
 
   /** Returns the list resulting from applying the given function <code>f</code>
     *  to corresponding elements of the argument lists.
@@ -744,17 +676,15 @@ object List extends SeqFactory[List] {
     *          <code>n = min(k,l)</code>
     */
   @deprecated("use `(xs, ys).map(f)' instead")
-  def map2[A, B, C](xs: List[A], ys: List[B])(f: (A, B) => C): List[C] = {
+  def map2[A, B, C](xs: List[A], ys: List[B])(f: (A, B) => C): List[C] =
     val b = new ListBuffer[C]
     var xc = xs
     var yc = ys
-    while (!xc.isEmpty && !yc.isEmpty) {
+    while (!xc.isEmpty && !yc.isEmpty)
       b += f(xc.head, yc.head)
       xc = xc.tail
       yc = yc.tail
-    }
     b.toList
-  }
 
   /** Returns the list resulting from applying the given function
     *  <code>f</code> to corresponding elements of the argument lists.
@@ -769,19 +699,17 @@ object List extends SeqFactory[List] {
     */
   @deprecated("use `(xs, ys, zs).map(f)' instead")
   def map3[A, B, C, D](xs: List[A], ys: List[B], zs: List[C])(
-      f: (A, B, C) => D): List[D] = {
+      f: (A, B, C) => D): List[D] =
     val b = new ListBuffer[D]
     var xc = xs
     var yc = ys
     var zc = zs
-    while (!xc.isEmpty && !yc.isEmpty && !zc.isEmpty) {
+    while (!xc.isEmpty && !yc.isEmpty && !zc.isEmpty)
       b += f(xc.head, yc.head, zc.head)
       xc = xc.tail
       yc = yc.tail
       zc = zc.tail
-    }
     b.toList
-  }
 
   /** Tests whether the given predicate <code>p</code> holds 
     *  for all corresponding elements of the argument lists.
@@ -794,16 +722,14 @@ object List extends SeqFactory[List] {
     *           and <code>n = min(k,l)</code>
     */
   @deprecated("use `(xs, ys).forall(f)' instead")
-  def forall2[A, B](xs: List[A], ys: List[B])(f: (A, B) => Boolean): Boolean = {
+  def forall2[A, B](xs: List[A], ys: List[B])(f: (A, B) => Boolean): Boolean =
     var xc = xs
     var yc = ys
-    while (!xc.isEmpty && !yc.isEmpty) {
+    while (!xc.isEmpty && !yc.isEmpty)
       if (!f(xc.head, yc.head)) return false
       xc = xc.tail
       yc = yc.tail
-    }
     true
-  }
 
   /** Tests whether the given predicate <code>p</code> holds
     *  for some corresponding elements of the argument lists.
@@ -816,16 +742,14 @@ object List extends SeqFactory[List] {
     *           <code>n = min(k,l)</code>
     */
   @deprecated("use `(xs, ys).exists(f)' instead")
-  def exists2[A, B](xs: List[A], ys: List[B])(f: (A, B) => Boolean): Boolean = {
+  def exists2[A, B](xs: List[A], ys: List[B])(f: (A, B) => Boolean): Boolean =
     var xc = xs
     var yc = ys
-    while (!xc.isEmpty && !yc.isEmpty) {
+    while (!xc.isEmpty && !yc.isEmpty)
       if (f(xc.head, yc.head)) return true
       xc = xc.tail
       yc = yc.tail
-    }
     false
-  }
 
   /** Transposes a list of lists.
     *  pre: All element lists have the same length.
@@ -834,15 +758,13 @@ object List extends SeqFactory[List] {
     *  @return    the transposed list of lists
     */
   @deprecated("use p`xss.transpose' instead")
-  def transpose[A](xss: List[List[A]]): List[List[A]] = {
+  def transpose[A](xss: List[List[A]]): List[List[A]] =
     val buf = new ListBuffer[List[A]]
     var yss = xss
-    while (!yss.head.isEmpty) {
+    while (!yss.head.isEmpty)
       buf += (yss map (_.head))
       yss = (yss map (_.tail))
-    }
     buf.toList
-  }
 
   /** Lists with ordered elements are ordered
   implicit def list2ordered[a <% Ordered[a]](x: List[a]): Ordered[List[a]] = new Ordered[List[a]] {
@@ -862,7 +784,6 @@ object List extends SeqFactory[List] {
     }
   }
   */
-}
 
 /** Only used for list serialization */
 @SerialVersionUID(0L - 8476791151975527571L)

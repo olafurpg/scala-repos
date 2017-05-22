@@ -3,7 +3,7 @@ package slick
 /** Contains the abstract `MemoryQueryingProfile` and related code, as well as the concrete
   * `MemoryProfile` and `DistributedProfile` implementations for in-memory interpretation of
   * queries and scheduling of distributed queries (i.e. combining several profiles and backends). */
-package object memory {
+package object memory
 
   @deprecated(
       "Use `slick.memory.MemoryProfile` instead of `slick.memory.MemoryDriver`",
@@ -23,4 +23,3 @@ package object memory {
       "Use `slick.memory.DistributedProfile` instead of `slick.memory.DistributedDriver`",
       "3.2")
   type DistributedDriver = DistributedProfile
-}

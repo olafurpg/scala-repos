@@ -8,37 +8,31 @@ import com.sun.jdi.event.{ClassPrepareEvent, VMDisconnectEvent, EventQueue}
 import org.slf4j.LoggerFactory
 
 class VMEventManager(val eventQueue: EventQueue, debugManager: ActorRef)
-    extends Thread {
+    extends Thread
 
   val log = LoggerFactory.getLogger("VMEventManager")
 
   // TODO needs proper stop method with interrupt
 
   @volatile var finished = false
-  override def run(): Unit = {
-    while (!finished) {
-      try {
+  override def run(): Unit =
+    while (!finished)
+      try
         val eventSet = eventQueue.remove()
         val it = eventSet.eventIterator()
-        while (it.hasNext) {
+        while (it.hasNext)
           val evt = it.nextEvent()
-          evt match {
+          evt match
             case e: VMDisconnectEvent =>
               finished = true
             case e: ClassPrepareEvent =>
               debugManager ! DMClassPrepareEvent(e, eventSet)
             case _ =>
-          }
           debugManager ! evt
-        }
-      } catch {
+      catch
         case t: VMDisconnectedException =>
           debugManager ! t
           finished = true
         case t: Throwable =>
           log.info("Exception during execution", t)
           finished = true
-      }
-    }
-  }
-}

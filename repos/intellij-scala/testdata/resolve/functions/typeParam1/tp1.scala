@@ -1,4 +1,4 @@
-class Foo[A] {
+class Foo[A]
   def map(f: (A) => Int)(i: Int)(j: Int): A = null.asInstanceOf[A]
 
   def fooz(i: Int)(s: String) = 42
@@ -13,10 +13,9 @@ class Foo[A] {
 
   def pal(i: Int)(s: String) = null
   def pal(i: String)(j: Int) = null
-}
 
-object Main {
-  def main(args: Array[String]) {
+object Main
+  def main(args: Array[String])
     val foo: Foo[String] = new Foo[String];
 
 //     println(foo.gul[Int](13))
@@ -35,5 +34,3 @@ object Main {
 
 //    foo.fooz(239)(45)
 //    foo.fooz(42)[Int](53)
-  }
-}

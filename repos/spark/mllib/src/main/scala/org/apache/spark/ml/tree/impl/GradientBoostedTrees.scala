@@ -29,7 +29,7 @@ import org.apache.spark.mllib.tree.loss.{Loss => OldLoss}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 
-private[ml] object GradientBoostedTrees extends Logging {
+private[ml] object GradientBoostedTrees extends Logging
 
   /**
     * Method to train a gradient boosting model
@@ -38,9 +38,9 @@ private[ml] object GradientBoostedTrees extends Logging {
     *         (array of decision tree models, array of model weights)
     */
   def run(input: RDD[LabeledPoint], boostingStrategy: OldBoostingStrategy)
-    : (Array[DecisionTreeRegressionModel], Array[Double]) = {
+    : (Array[DecisionTreeRegressionModel], Array[Double]) =
     val algo = boostingStrategy.treeStrategy.algo
-    algo match {
+    algo match
       case OldAlgo.Regression =>
         GradientBoostedTrees.boost(
             input, input, boostingStrategy, validate = false)
@@ -53,8 +53,6 @@ private[ml] object GradientBoostedTrees extends Logging {
       case _ =>
         throw new IllegalArgumentException(
             s"$algo is not supported by gradient boosting.")
-    }
-  }
 
   /**
     * Method to validate a gradient boosting model
@@ -71,9 +69,9 @@ private[ml] object GradientBoostedTrees extends Logging {
       input: RDD[LabeledPoint],
       validationInput: RDD[LabeledPoint],
       boostingStrategy: OldBoostingStrategy
-  ): (Array[DecisionTreeRegressionModel], Array[Double]) = {
+  ): (Array[DecisionTreeRegressionModel], Array[Double]) =
     val algo = boostingStrategy.treeStrategy.algo
-    algo match {
+    algo match
       case OldAlgo.Regression =>
         GradientBoostedTrees.boost(
             input, validationInput, boostingStrategy, validate = true)
@@ -90,8 +88,6 @@ private[ml] object GradientBoostedTrees extends Logging {
       case _ =>
         throw new IllegalArgumentException(
             s"$algo is not supported by the gradient boosting.")
-    }
-  }
 
   /**
     * Compute the initial predictions and errors for a dataset for the first
@@ -107,14 +103,12 @@ private[ml] object GradientBoostedTrees extends Logging {
       data: RDD[LabeledPoint],
       initTreeWeight: Double,
       initTree: DecisionTreeRegressionModel,
-      loss: OldLoss): RDD[(Double, Double)] = {
-    data.map { lp =>
+      loss: OldLoss): RDD[(Double, Double)] =
+    data.map  lp =>
       val pred =
         initTreeWeight * initTree.rootNode.predictImpl(lp.features).prediction
       val error = loss.computeError(pred, lp.label)
       (pred, error)
-    }
-  }
 
   /**
     * Update a zipped predictionError RDD
@@ -131,20 +125,17 @@ private[ml] object GradientBoostedTrees extends Logging {
                             predictionAndError: RDD[(Double, Double)],
                             treeWeight: Double,
                             tree: DecisionTreeRegressionModel,
-                            loss: OldLoss): RDD[(Double, Double)] = {
+                            loss: OldLoss): RDD[(Double, Double)] =
 
-    val newPredError = data.zip(predictionAndError).mapPartitions { iter =>
-      iter.map {
+    val newPredError = data.zip(predictionAndError).mapPartitions  iter =>
+      iter.map
         case (lp, (pred, error)) =>
           val newPred =
             pred +
             tree.rootNode.predictImpl(lp.features).prediction * treeWeight
           val newError = loss.computeError(newPred, lp.label)
           (newPred, newError)
-      }
-    }
     newPredError
-  }
 
   /**
     * Internal method for performing regression using trees as base learners.
@@ -159,7 +150,7 @@ private[ml] object GradientBoostedTrees extends Logging {
             validationInput: RDD[LabeledPoint],
             boostingStrategy: OldBoostingStrategy,
             validate: Boolean)
-    : (Array[DecisionTreeRegressionModel], Array[Double]) = {
+    : (Array[DecisionTreeRegressionModel], Array[Double]) =
     val timer = new TimeTracker()
     timer.start("total")
     timer.start("init")
@@ -181,12 +172,11 @@ private[ml] object GradientBoostedTrees extends Logging {
 
     // Cache input
     val persistedInput =
-      if (input.getStorageLevel == StorageLevel.NONE) {
+      if (input.getStorageLevel == StorageLevel.NONE)
         input.persist(StorageLevel.MEMORY_AND_DISK)
         true
-      } else {
+      else
         false
-      }
 
     // Prepare periodic checkpointers
     val predErrorCheckpointer = new PeriodicRDDCheckpointer[(Double, Double)](
@@ -227,12 +217,11 @@ private[ml] object GradientBoostedTrees extends Logging {
 
     var m = 1
     var doneLearning = false
-    while (m < numIterations && !doneLearning) {
+    while (m < numIterations && !doneLearning)
       // Update data with pseudo-residuals
-      val data = predError.zip(input).map {
+      val data = predError.zip(input).map
         case ((pred, _), point) =>
           LabeledPoint(-loss.gradient(pred, point.label), point.features)
-      }
 
       timer.start(s"building tree $m")
       logDebug("###################################################")
@@ -253,7 +242,7 @@ private[ml] object GradientBoostedTrees extends Logging {
       predErrorCheckpointer.update(predError)
       logDebug("error of gbt = " + predError.values.mean())
 
-      if (validate) {
+      if (validate)
         // Stop training early if
         // 1. Reduction in error is less than the validationTol or
         // 2. If the error increases, that is if the model is overfit.
@@ -267,15 +256,12 @@ private[ml] object GradientBoostedTrees extends Logging {
         validatePredErrorCheckpointer.update(validatePredError)
         val currentValidateError = validatePredError.values.mean()
         if (bestValidateError - currentValidateError < validationTol * Math
-              .max(currentValidateError, 0.01)) {
+              .max(currentValidateError, 0.01))
           doneLearning = true
-        } else if (currentValidateError < bestValidateError) {
+        else if (currentValidateError < bestValidateError)
           bestValidateError = currentValidateError
           bestM = m + 1
-        }
-      }
       m += 1
-    }
 
     timer.stop("total")
 
@@ -286,10 +272,7 @@ private[ml] object GradientBoostedTrees extends Logging {
     validatePredErrorCheckpointer.deleteAllCheckpoints()
     if (persistedInput) input.unpersist()
 
-    if (validate) {
+    if (validate)
       (baseLearners.slice(0, bestM), baseLearnerWeights.slice(0, bestM))
-    } else {
+    else
       (baseLearners, baseLearnerWeights)
-    }
-  }
-}

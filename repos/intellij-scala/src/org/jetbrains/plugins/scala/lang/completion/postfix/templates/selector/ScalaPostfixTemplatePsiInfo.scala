@@ -13,12 +13,12 @@ import org.jetbrains.plugins.scala.lang.surroundWith.surrounders.expression.Scal
   * @author Roman.Shein
   * @since 09.09.2015.
   */
-class ScalaPostfixTemplatePsiInfo extends PostfixTemplatePsiInfo {
+class ScalaPostfixTemplatePsiInfo extends PostfixTemplatePsiInfo
 
-  private val notSurrounder = new ScalaWithUnaryNotSurrounder() {
+  private val notSurrounder = new ScalaWithUnaryNotSurrounder()
     override def getTemplateAsString(elements: Array[PsiElement]) =
-      if (elements.length == 1) {
-        elements(0) match {
+      if (elements.length == 1)
+        elements(0) match
           case literal: ScLiteral if literal.getText == "true" => "false"
           case literal: ScLiteral if literal.getText == "false" => "true"
           case id: ScReferenceExpression
@@ -28,32 +28,25 @@ class ScalaPostfixTemplatePsiInfo extends PostfixTemplatePsiInfo {
                 .getElementType == ScalaTokenTypes.tIDENTIFIER =>
             "!" + id.getText
           case _ => super.getTemplateAsString(elements)
-        }
-      } else {
+      else
         super.getTemplateAsString(elements)
-      }
-  }
 
   override def getNegatedExpression(element: PsiElement): PsiElement =
-    element match {
+    element match
       case expr if notSurrounder.isApplicable(Array(expr)) =>
         var res =
           notSurrounder.surroundPsi(Array(element)).asInstanceOf[ScExpression]
-        if (DoubleNegationUtil.hasDoubleNegation(res)) {
+        if (DoubleNegationUtil.hasDoubleNegation(res))
           res = DoubleNegationUtil.removeDoubleNegation(res)
-        }
-        if (SimplifyBooleanUtil.canBeSimplified(res)) {
+        if (SimplifyBooleanUtil.canBeSimplified(res))
           res = SimplifyBooleanUtil.simplify(res)
-        }
         res
       case _ =>
         throw new IllegalArgumentException(
             "Attempted adding negation through template for element " +
             element.getText + " which is not a valid boolean expression.")
-    }
 
   override def createExpression(
       context: PsiElement, prefix: String, suffix: String): PsiElement =
     ScalaPsiElementFactory.createExpressionFromText(
         prefix + context.getText + suffix, context)
-}

@@ -1,4 +1,4 @@
-object LiterateExistentials {
+object LiterateExistentials
 
 //  Let's play with Scala's type system a bit.
 //
@@ -149,9 +149,9 @@ object LiterateExistentials {
 //  (Nothing, List[String]) <: ((A, B) forSome { type A >: String <: AnyRef; type B >: Null <: List[A] })
 
   implicitly[
-      (Nothing, List[String]) <:< ((A, B) forSome {
+      (Nothing, List[String]) <:< ((A, B) forSome
         type A >: String <: AnyRef; type B >: Null <: List[A]
-      })
+      )
   ]
 
 //  Now let's try one that isn't true:
@@ -210,4 +210,3 @@ object LiterateExistentials {
 //  String :< X forSome { type X >: Nothing <: String }
 
   implicitly[String <:< (X forSome { type X >: Nothing <: String })]
-}

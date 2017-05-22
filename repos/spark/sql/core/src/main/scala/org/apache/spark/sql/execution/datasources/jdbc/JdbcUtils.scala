@@ -32,7 +32,7 @@ import org.apache.spark.sql.types._
 /**
   * Util functions for JDBC tables.
   */
-object JdbcUtils extends Logging {
+object JdbcUtils extends Logging
 
   /**
     * Returns a factory for creating connections to the given JDBC URL.
@@ -41,81 +41,71 @@ object JdbcUtils extends Logging {
     * @param properties JDBC connection properties.
     */
   def createConnectionFactory(
-      url: String, properties: Properties): () => Connection = {
+      url: String, properties: Properties): () => Connection =
     val userSpecifiedDriverClass = Option(properties.getProperty("driver"))
     userSpecifiedDriverClass.foreach(DriverRegistry.register)
     // Performing this part of the logic on the driver guards against the corner-case where the
     // driver returned for a URL is different on the driver and executors due to classpath
     // differences.
-    val driverClass: String = userSpecifiedDriverClass.getOrElse {
+    val driverClass: String = userSpecifiedDriverClass.getOrElse
       DriverManager.getDriver(url).getClass.getCanonicalName
-    }
     () =>
-      {
         userSpecifiedDriverClass.foreach(DriverRegistry.register)
-        val driver: Driver = DriverManager.getDrivers.asScala.collectFirst {
+        val driver: Driver = DriverManager.getDrivers.asScala.collectFirst
           case d: DriverWrapper
               if d.wrapped.getClass.getCanonicalName == driverClass =>
             d
           case d if d.getClass.getCanonicalName == driverClass => d
-        }.getOrElse {
+        .getOrElse
           throw new IllegalStateException(
               s"Did not find registered driver with class $driverClass")
-        }
         driver.connect(url, properties)
-      }
-  }
 
   /**
     * Returns true if the table already exists in the JDBC database.
     */
-  def tableExists(conn: Connection, url: String, table: String): Boolean = {
+  def tableExists(conn: Connection, url: String, table: String): Boolean =
     val dialect = JdbcDialects.get(url)
 
     // Somewhat hacky, but there isn't a good way to identify whether a table exists for all
     // SQL database systems using JDBC meta data calls, considering "table" could also include
     // the database name. Query used to find table exists can be overridden by the dialects.
-    Try {
+    Try
       val statement = conn.prepareStatement(dialect.getTableExistsQuery(table))
-      try {
+      try
         statement.executeQuery()
-      } finally {
+      finally
         statement.close()
-      }
-    }.isSuccess
-  }
+    .isSuccess
 
   /**
     * Drops a table from the JDBC database.
     */
-  def dropTable(conn: Connection, table: String): Unit = {
+  def dropTable(conn: Connection, table: String): Unit =
     val statement = conn.createStatement
-    try {
+    try
       statement.executeUpdate(s"DROP TABLE $table")
-    } finally {
+    finally
       statement.close()
-    }
-  }
 
   /**
     * Returns a PreparedStatement that inserts a row into table via conn.
     */
   def insertStatement(conn: Connection,
                       table: String,
-                      rddSchema: StructType): PreparedStatement = {
+                      rddSchema: StructType): PreparedStatement =
     val columns = rddSchema.fields.map(_.name).mkString(",")
     val placeholders = rddSchema.fields.map(_ => "?").mkString(",")
     val sql = s"INSERT INTO $table ($columns) VALUES ($placeholders)"
     conn.prepareStatement(sql)
-  }
 
   /**
     * Retrieve standard jdbc types.
     * @param dt The datatype (e.g. [[org.apache.spark.sql.types.StringType]])
     * @return The default JdbcType for this DataType
     */
-  def getCommonJDBCType(dt: DataType): Option[JdbcType] = {
-    dt match {
+  def getCommonJDBCType(dt: DataType): Option[JdbcType] =
+    dt match
       case IntegerType => Option(JdbcType("INTEGER", java.sql.Types.INTEGER))
       case LongType => Option(JdbcType("BIGINT", java.sql.Types.BIGINT))
       case DoubleType =>
@@ -133,16 +123,13 @@ object JdbcUtils extends Logging {
         Option(JdbcType(
                 s"DECIMAL(${t.precision},${t.scale})", java.sql.Types.DECIMAL))
       case _ => None
-    }
-  }
 
-  private def getJdbcType(dt: DataType, dialect: JdbcDialect): JdbcType = {
+  private def getJdbcType(dt: DataType, dialect: JdbcDialect): JdbcType =
     dialect
       .getJDBCType(dt)
       .orElse(getCommonJDBCType(dt))
       .getOrElse(throw new IllegalArgumentException(
               s"Can't get JDBC type for ${dt.simpleString}"))
-  }
 
   /**
     * Saves a partition of a DataFrame to the JDBC database.  This is done in
@@ -164,35 +151,33 @@ object JdbcUtils extends Logging {
                     rddSchema: StructType,
                     nullTypes: Array[Int],
                     batchSize: Int,
-                    dialect: JdbcDialect): Iterator[Byte] = {
+                    dialect: JdbcDialect): Iterator[Byte] =
     val conn = getConnection()
     var committed = false
-    val supportsTransactions = try {
+    val supportsTransactions = try
       conn.getMetaData().supportsDataManipulationTransactionsOnly() || conn
         .getMetaData()
         .supportsDataDefinitionAndDataManipulationTransactions()
-    } catch {
+    catch
       case NonFatal(e) =>
         logWarning("Exception while detecting transaction support", e)
         true
-    }
 
-    try {
-      if (supportsTransactions) {
+    try
+      if (supportsTransactions)
         conn.setAutoCommit(false) // Everything in the same db transaction.
-      }
       val stmt = insertStatement(conn, table, rddSchema)
-      try {
+      try
         var rowCount = 0
-        while (iterator.hasNext) {
+        while (iterator.hasNext)
           val row = iterator.next()
           val numFields = rddSchema.fields.length
           var i = 0
-          while (i < numFields) {
-            if (row.isNullAt(i)) {
+          while (i < numFields)
+            if (row.isNullAt(i))
               stmt.setNull(i + 1, nullTypes(i))
-            } else {
-              rddSchema.fields(i).dataType match {
+            else
+              rddSchema.fields(i).dataType match
                 case IntegerType => stmt.setInt(i + 1, row.getInt(i))
                 case LongType => stmt.setLong(i + 1, row.getLong(i))
                 case DoubleType => stmt.setDouble(i + 1, row.getDouble(i))
@@ -220,66 +205,49 @@ object JdbcUtils extends Logging {
                 case _ =>
                   throw new IllegalArgumentException(
                       s"Can't translate non-null value for field $i")
-              }
-            }
             i = i + 1
-          }
           stmt.addBatch()
           rowCount += 1
-          if (rowCount % batchSize == 0) {
+          if (rowCount % batchSize == 0)
             stmt.executeBatch()
             rowCount = 0
-          }
-        }
-        if (rowCount > 0) {
+        if (rowCount > 0)
           stmt.executeBatch()
-        }
-      } finally {
+      finally
         stmt.close()
-      }
-      if (supportsTransactions) {
+      if (supportsTransactions)
         conn.commit()
-      }
       committed = true
-    } finally {
-      if (!committed) {
+    finally
+      if (!committed)
         // The stage must fail.  We got here through an exception path, so
         // let the exception through unless rollback() or close() want to
         // tell the user about another problem.
-        if (supportsTransactions) {
+        if (supportsTransactions)
           conn.rollback()
-        }
         conn.close()
-      } else {
+      else
         // The stage must succeed.  We cannot propagate any exception close() might throw.
-        try {
+        try
           conn.close()
-        } catch {
+        catch
           case e: Exception =>
             logWarning("Transaction succeeded, but closing failed", e)
-        }
-      }
-    }
     Array[Byte]().iterator
-  }
 
   /**
     * Compute the schema string for this RDD.
     */
-  def schemaString(df: DataFrame, url: String): String = {
+  def schemaString(df: DataFrame, url: String): String =
     val sb = new StringBuilder()
     val dialect = JdbcDialects.get(url)
-    df.schema.fields foreach { field =>
-      {
+    df.schema.fields foreach  field =>
         val name = field.name
         val typ: String =
           getJdbcType(field.dataType, dialect).databaseTypeDefinition
         val nullable = if (field.nullable) "" else "NOT NULL"
         sb.append(s", $name $typ $nullable")
-      }
-    }
     if (sb.length < 2) "" else sb.substring(2)
-  }
 
   /**
     * Saves the RDD to the database in a single transaction.
@@ -287,17 +255,16 @@ object JdbcUtils extends Logging {
   def saveTable(df: DataFrame,
                 url: String,
                 table: String,
-                properties: Properties) {
+                properties: Properties)
     val dialect = JdbcDialects.get(url)
-    val nullTypes: Array[Int] = df.schema.fields.map { field =>
+    val nullTypes: Array[Int] = df.schema.fields.map  field =>
       getJdbcType(field.dataType, dialect).jdbcNullType
-    }
 
     val rddSchema = df.schema
     val getConnection: () => Connection = createConnectionFactory(
         url, properties)
     val batchSize = properties.getProperty("batchsize", "1000").toInt
-    df.foreachPartition { iterator =>
+    df.foreachPartition  iterator =>
       savePartition(getConnection,
                     table,
                     iterator,
@@ -305,6 +272,3 @@ object JdbcUtils extends Logging {
                     nullTypes,
                     batchSize,
                     dialect)
-    }
-  }
-}

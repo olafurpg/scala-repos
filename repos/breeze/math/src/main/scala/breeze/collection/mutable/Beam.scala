@@ -27,7 +27,7 @@ import scala.collection.generic._
   * @author dlwh
   */
 class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
-    extends Iterable[T] with IterableLike[T, Beam[T]] with Growable[T] {
+    extends Iterable[T] with IterableLike[T, Beam[T]] with Growable[T]
   outer =>
   assert(maxSize >= 0)
   protected val queue = new PriorityQueue[T]()(o.reverse)
@@ -42,16 +42,13 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
   def +(x: T) = { this += x; this }
   def +=(x: T) = { cat(queue, x); this }
 
-  private def trim() {
-    while (queue.size > maxSize) {
+  private def trim()
+    while (queue.size > maxSize)
       queue.dequeue()
-    }
-  }
 
-  private def cat(h: PriorityQueue[T], x: T) {
+  private def cat(h: PriorityQueue[T], x: T)
     if (h.size < maxSize) h += x
     else if (o.compare(h.head, x) < 0) { h.dequeue(); h += x; }
-  }
 
   def iterator = queue.iterator
   override def toString() = iterator.mkString("Beam(", ",", ")")
@@ -59,13 +56,11 @@ class Beam[T](val maxSize: Int, xs: T*)(implicit o: Ordering[T])
 
   override protected def newBuilder = new GrowingBuilder(new Beam[T](maxSize))
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case b: Beam[T @unchecked] =>
       (maxSize == b.maxSize) && (iterator sameElements b.iterator)
-  }
-}
 
-object Beam {
+object Beam
   def apply[T : Ordering](maxSize: Int)(xs: T*): Beam[T] =
     new Beam[T](maxSize, xs: _*)
 
@@ -75,9 +70,7 @@ object Beam {
     new Beam[T](maxSize, xs: _*)
 
   implicit def canBuildFrom[T : Ordering]: CanBuildFrom[Beam[T], T, Beam[T]] =
-    new CanBuildFrom[Beam[T], T, Beam[T]] {
+    new CanBuildFrom[Beam[T], T, Beam[T]]
       def apply() = sys.error("Sorry, need a max size")
 
       def apply(from: Beam[T]) = from.newBuilder
-    }
-}

@@ -32,7 +32,7 @@ import javafx.{scene => jfxs}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/CacheHint.html javafx.scene.CacheHint]] */
-object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
+object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint]
 
   val Default = new CacheHint(jfxs.CacheHint.DEFAULT)
   @deprecated(
@@ -73,7 +73,6 @@ object CacheHint extends SFXEnumDelegateCompanion[jfxs.CacheHint, CacheHint] {
       Rotate,
       ScaleAndRotate
   )
-}
 
 sealed case class CacheHint(override val delegate: jfxs.CacheHint)
     extends SFXEnumDelegate[jfxs.CacheHint]

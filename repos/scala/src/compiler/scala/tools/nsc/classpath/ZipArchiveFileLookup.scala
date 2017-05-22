@@ -16,7 +16,7 @@ import FileUtils.AbstractFileOps
   * It's aware of things like e.g. META-INF directory which is correctly skipped.
   */
 trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry]
-    extends FlatClassPath {
+    extends FlatClassPath
   val zipFile: File
 
   assert(zipFile != null, "Zip file in ZipArchiveFileLookup cannot be null")
@@ -26,41 +26,36 @@ trait ZipArchiveFileLookup[FileEntryType <: ClassRepClassPathEntry]
 
   private val archive = new FileZipArchive(zipFile)
 
-  override private[nsc] def packages(inPackage: String): Seq[PackageEntry] = {
+  override private[nsc] def packages(inPackage: String): Seq[PackageEntry] =
     val prefix = PackageNameUtils.packagePrefix(inPackage)
-    for {
+    for
       dirEntry <- findDirEntry(inPackage).toSeq
       entry <- dirEntry.iterator if entry.isPackage
-    } yield PackageEntryImpl(prefix + entry.name)
-  }
+    yield PackageEntryImpl(prefix + entry.name)
 
   protected def files(inPackage: String): Seq[FileEntryType] =
-    for {
+    for
       dirEntry <- findDirEntry(inPackage).toSeq
       entry <- dirEntry.iterator if isRequiredFileType(entry)
-    } yield createFileEntry(entry)
+    yield createFileEntry(entry)
 
-  override private[nsc] def list(inPackage: String): FlatClassPathEntries = {
+  override private[nsc] def list(inPackage: String): FlatClassPathEntries =
     val foundDirEntry = findDirEntry(inPackage)
 
-    foundDirEntry map { dirEntry =>
+    foundDirEntry map  dirEntry =>
       val pkgBuf = collection.mutable.ArrayBuffer.empty[PackageEntry]
       val fileBuf = collection.mutable.ArrayBuffer.empty[FileEntryType]
       val prefix = PackageNameUtils.packagePrefix(inPackage)
 
-      for (entry <- dirEntry.iterator) {
+      for (entry <- dirEntry.iterator)
         if (entry.isPackage) pkgBuf += PackageEntryImpl(prefix + entry.name)
         else if (isRequiredFileType(entry)) fileBuf += createFileEntry(entry)
-      }
       FlatClassPathEntries(pkgBuf, fileBuf)
-    } getOrElse FlatClassPathEntries(Seq.empty, Seq.empty)
-  }
+    getOrElse FlatClassPathEntries(Seq.empty, Seq.empty)
 
-  private def findDirEntry(pkg: String) = {
+  private def findDirEntry(pkg: String) =
     val dirName = s"${FileUtils.dirPath(pkg)}/"
     archive.allDirs.get(dirName)
-  }
 
   protected def createFileEntry(file: FileZipArchive#Entry): FileEntryType
   protected def isRequiredFileType(file: AbstractFile): Boolean
-}

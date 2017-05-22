@@ -1,3 +1,2 @@
-object Foo {
+object Foo
   def ### = 123
-}

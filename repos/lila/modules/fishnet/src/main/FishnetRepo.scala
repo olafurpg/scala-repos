@@ -8,7 +8,7 @@ import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Implicits._
 import lila.memo.AsyncCache
 
-private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
+private final class FishnetRepo(analysisColl: Coll, clientColl: Coll)
 
   import BSONHandlers._
 
@@ -17,9 +17,8 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
       timeToLive = 10 seconds)
 
   def getClient(key: Client.Key) = clientCache(key)
-  def getEnabledClient(key: Client.Key) = getClient(key).map {
+  def getEnabledClient(key: Client.Key) = getClient(key).map
     _.filter(_.enabled)
-  }
   def getOfflineClient: Fu[Client] =
     getEnabledClient(Client.offline.key) getOrElse fuccess(Client.offline)
   def updateClient(client: Client): Funit =
@@ -27,9 +26,8 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
       .remove(client.key)
   def updateClientInstance(
       client: Client, instance: Client.Instance): Fu[Client] =
-    client.updateInstance(instance).fold(fuccess(client)) { updated =>
+    client.updateInstance(instance).fold(fuccess(client))  updated =>
       updateClient(updated) inject updated
-    }
   def addClient(client: Client) = clientColl.insert(client)
   def deleteClient(key: Client.Key) =
     clientColl.remove(selectClient(key)) >> clientCache.remove(key)
@@ -78,4 +76,3 @@ private final class FishnetRepo(analysisColl: Coll, clientColl: Coll) {
 
   def selectWork(id: Work.Id) = BSONDocument("_id" -> id.value)
   def selectClient(key: Client.Key) = BSONDocument("_id" -> key.value)
-}

@@ -1,6 +1,5 @@
-class a {
+class a
   ne /*caret*/
-}
 /*
 new
  */

@@ -11,10 +11,9 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import akka.testkit.TestProbe
 
-object NodeQueueBenchmark {
+object NodeQueueBenchmark
   final val burst = 100000
   case object Stop
-}
 
 @State(Scope.Benchmark)
 @BenchmarkMode(Array(Mode.Throughput))
@@ -22,7 +21,7 @@ object NodeQueueBenchmark {
 @Warmup(iterations = 5)
 @Measurement(iterations = 10)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
-class NodeQueueBenchmark {
+class NodeQueueBenchmark
   import NodeQueueBenchmark._
 
   val config = ConfigFactory
@@ -41,33 +40,28 @@ mailbox {
 """)
     .withFallback(ConfigFactory.load())
   implicit val sys = ActorSystem("ANQ", config)
-  val ref = sys.actorOf(Props(new Actor {
-    def receive = {
+  val ref = sys.actorOf(Props(new Actor
+    def receive =
       case Stop => sender() ! Stop
       case _ =>
-    }
-  }).withDispatcher("dispatcher").withMailbox("mailbox"), "receiver")
+  ).withDispatcher("dispatcher").withMailbox("mailbox"), "receiver")
 
   @TearDown
   def teardown(): Unit = Await.result(sys.terminate(), 5.seconds)
 
   @TearDown(Level.Invocation)
-  def waitInBetween(): Unit = {
+  def waitInBetween(): Unit =
     val probe = TestProbe()
     probe.send(ref, Stop)
     probe.expectMsg(Stop)
     System.gc()
     System.gc()
     System.gc()
-  }
 
   @Benchmark
   @OperationsPerInvocation(burst)
-  def send(): Unit = {
+  def send(): Unit =
     var todo = burst
-    while (todo > 0) {
+    while (todo > 0)
       ref ! "hello"
       todo -= 1
-    }
-  }
-}

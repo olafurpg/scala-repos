@@ -5,7 +5,7 @@ import scala.annotation.{switch, tailrec}
 import java.nio._
 
 abstract class CharsetDecoder protected (
-    cs: Charset, _averageCharsPerByte: Float, _maxCharsPerByte: Float) {
+    cs: Charset, _averageCharsPerByte: Float, _maxCharsPerByte: Float)
 
   import CharsetDecoder._
 
@@ -27,7 +27,7 @@ abstract class CharsetDecoder protected (
 
   final def replacement(): String = _replacement
 
-  final def replaceWith(newReplacement: String): CharsetDecoder = {
+  final def replaceWith(newReplacement: String): CharsetDecoder =
     if (newReplacement == null || newReplacement == "")
       throw new IllegalArgumentException(
           "Invalid replacement: " + newReplacement)
@@ -37,19 +37,17 @@ abstract class CharsetDecoder protected (
     _replacement = newReplacement
     implReplaceWith(newReplacement)
     this
-  }
 
   protected def implReplaceWith(newReplacement: String): Unit = ()
 
   def malformedInputAction(): CodingErrorAction = _malformedInputAction
 
-  final def onMalformedInput(newAction: CodingErrorAction): CharsetDecoder = {
+  final def onMalformedInput(newAction: CodingErrorAction): CharsetDecoder =
     if (newAction == null)
       throw new IllegalArgumentException("null CodingErrorAction")
     _malformedInputAction = newAction
     implOnMalformedInput(newAction)
     this
-  }
 
   protected def implOnMalformedInput(newAction: CodingErrorAction): Unit = ()
 
@@ -57,13 +55,12 @@ abstract class CharsetDecoder protected (
     _unmappableCharacterAction
 
   final def onUnmappableCharacter(
-      newAction: CodingErrorAction): CharsetDecoder = {
+      newAction: CodingErrorAction): CharsetDecoder =
     if (newAction == null)
       throw new IllegalArgumentException("null CodingErrorAction")
     _unmappableCharacterAction = newAction
     implOnUnmappableCharacter(newAction)
     this
-  }
 
   protected def implOnUnmappableCharacter(newAction: CodingErrorAction): Unit =
     ()
@@ -72,7 +69,7 @@ abstract class CharsetDecoder protected (
   final def maxCharsPerByte(): Float = _maxCharsPerByte
 
   final def decode(
-      in: ByteBuffer, out: CharBuffer, endOfInput: Boolean): CoderResult = {
+      in: ByteBuffer, out: CharBuffer, endOfInput: Boolean): CoderResult =
 
     if (status == FLUSHED || (!endOfInput && status == END))
       throw new IllegalStateException
@@ -81,56 +78,49 @@ abstract class CharsetDecoder protected (
 
     @inline
     @tailrec
-    def loop(): CoderResult = {
-      val result1 = try {
+    def loop(): CoderResult =
+      val result1 = try
         decodeLoop(in, out)
-      } catch {
+      catch
         case ex: BufferOverflowException =>
           throw new CoderMalfunctionError(ex)
         case ex: BufferUnderflowException =>
           throw new CoderMalfunctionError(ex)
-      }
 
       val result2 =
-        if (result1.isUnderflow) {
+        if (result1.isUnderflow)
           val remaining = in.remaining
           if (endOfInput && remaining > 0)
             CoderResult.malformedForLength(remaining)
           else result1
-        } else {
+        else
           result1
-        }
 
-      if (result2.isUnderflow || result2.isOverflow) {
+      if (result2.isUnderflow || result2.isOverflow)
         result2
-      } else {
+      else
         val action =
           if (result2.isUnmappable) unmappableCharacterAction
           else malformedInputAction
 
-        action match {
+        action match
           case CodingErrorAction.REPLACE =>
-            if (out.remaining < replacement.length) {
+            if (out.remaining < replacement.length)
               CoderResult.OVERFLOW
-            } else {
+            else
               out.put(replacement)
               in.position(in.position + result2.length)
               loop()
-            }
           case CodingErrorAction.REPORT =>
             result2
           case CodingErrorAction.IGNORE =>
             in.position(in.position + result2.length)
             loop()
-        }
-      }
-    }
 
     loop()
-  }
 
-  final def flush(out: CharBuffer): CoderResult = {
-    (status: @switch) match {
+  final def flush(out: CharBuffer): CoderResult =
+    (status: @switch) match
       case END =>
         val result = implFlush(out)
         if (result.isUnderflow) status = FLUSHED
@@ -139,69 +129,59 @@ abstract class CharsetDecoder protected (
         CoderResult.UNDERFLOW
       case _ =>
         throw new IllegalStateException
-    }
-  }
 
   protected def implFlush(out: CharBuffer): CoderResult =
     CoderResult.UNDERFLOW
 
-  final def reset(): CharsetDecoder = {
+  final def reset(): CharsetDecoder =
     status = INIT
     implReset()
     this
-  }
 
   protected def implReset(): Unit = ()
 
   protected def decodeLoop(in: ByteBuffer, out: CharBuffer): CoderResult
 
-  final def decode(in: ByteBuffer): CharBuffer = {
-    def grow(out: CharBuffer): CharBuffer = {
-      if (out.capacity == 0) {
+  final def decode(in: ByteBuffer): CharBuffer =
+    def grow(out: CharBuffer): CharBuffer =
+      if (out.capacity == 0)
         CharBuffer.allocate(1)
-      } else {
+      else
         val result = CharBuffer.allocate(out.capacity * 2)
         out.flip()
         result.put(out)
         result
-      }
-    }
 
     @inline
     @tailrec
-    def loopDecode(out: CharBuffer): CharBuffer = {
+    def loopDecode(out: CharBuffer): CharBuffer =
       val result = decode(in, out, endOfInput = true)
-      if (result.isUnderflow) {
+      if (result.isUnderflow)
         assert(!in.hasRemaining)
         out
-      } else if (result.isOverflow) {
+      else if (result.isOverflow)
         loopDecode(grow(out))
-      } else {
+      else
         result.throwException()
         throw new AssertionError("should not get here")
-      }
-    }
 
     @inline
     @tailrec
-    def loopFlush(out: CharBuffer): CharBuffer = {
+    def loopFlush(out: CharBuffer): CharBuffer =
       val result = flush(out)
-      if (result.isUnderflow) {
+      if (result.isUnderflow)
         out
-      } else if (result.isOverflow) {
+      else if (result.isOverflow)
         loopFlush(grow(out))
-      } else {
+      else
         result.throwException()
         throw new AssertionError("should not get here")
-      }
-    }
 
     reset()
     val initLength = (in.remaining.toDouble * averageCharsPerByte).toInt
     val out = loopFlush(loopDecode(CharBuffer.allocate(initLength)))
     out.flip()
     out
-  }
 
   def isAutoDetecting(): Boolean = false
 
@@ -210,11 +190,9 @@ abstract class CharsetDecoder protected (
 
   def detectedCharset(): Charset =
     throw new UnsupportedOperationException
-}
 
-object CharsetDecoder {
+object CharsetDecoder
   private final val INIT = 1
   private final val ONGOING = 2
   private final val END = 3
   private final val FLUSHED = 4
-}

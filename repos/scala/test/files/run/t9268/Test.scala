@@ -1,15 +1,14 @@
 import scala.tools.partest._
 import java.io.File
 
-object Test extends StoreReporterDirectTest {
+object Test extends StoreReporterDirectTest
   def code = ???
 
-  def compileCode(code: String) = {
+  def compileCode(code: String) =
     val classpath =
       List(sys.props("partest.lib"), testOutput.path) mkString sys.props(
           "path.separator")
     compileString(newCompiler("-cp", classpath, "-d", testOutput.path))(code)
-  }
 
   def client1 = """
     class Client1 { def p(p: Partial) = p.toString }
@@ -19,13 +18,12 @@ object Test extends StoreReporterDirectTest {
     class Client2 { def p(p: Partial) = p.waitFor() }
   """
 
-  def deleteClass(s: String) = {
+  def deleteClass(s: String) =
     val f = new File(testOutput.path, s + ".class")
     assert(f.exists)
     f.delete()
-  }
 
-  def show(): Unit = {
+  def show(): Unit =
     deleteClass("Waiter")
     deleteClass("Waiter$Predicate")
 
@@ -37,5 +35,3 @@ object Test extends StoreReporterDirectTest {
     println("Compiling Client2")
     compileCode(client2)
     println(storeReporter.infos.mkString("\n"))
-  }
-}

@@ -24,49 +24,42 @@ import org.apache.spark.sql.{Column, DataFrame, Dataset, Row}
 import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
 import org.apache.spark.sql.types._
 
-private[sql] object FrequentItems extends Logging {
+private[sql] object FrequentItems extends Logging
 
   /** A helper class wrapping `MutableMap[Any, Long]` for simplicity. */
-  private class FreqItemCounter(size: Int) extends Serializable {
+  private class FreqItemCounter(size: Int) extends Serializable
     val baseMap: MutableMap[Any, Long] = MutableMap.empty[Any, Long]
 
     /**
       * Add a new example to the counts if it exists, otherwise deduct the count
       * from existing items.
       */
-    def add(key: Any, count: Long): this.type = {
-      if (baseMap.contains(key)) {
+    def add(key: Any, count: Long): this.type =
+      if (baseMap.contains(key))
         baseMap(key) += count
-      } else {
-        if (baseMap.size < size) {
+      else
+        if (baseMap.size < size)
           baseMap += key -> count
-        } else {
+        else
           val minCount = baseMap.values.min
           val remainder = count - minCount
-          if (remainder >= 0) {
+          if (remainder >= 0)
             baseMap += key -> count // something will get kicked out, so we can add this
             baseMap.retain((k, v) => v > minCount)
             baseMap.transform((k, v) => v - minCount)
-          } else {
+          else
             baseMap.transform((k, v) => v - count)
-          }
-        }
-      }
       this
-    }
 
     /**
       * Merge two maps of counts.
       * @param other The map containing the counts for that partition
       */
-    def merge(other: FreqItemCounter): this.type = {
-      other.baseMap.foreach {
+    def merge(other: FreqItemCounter): this.type =
+      other.baseMap.foreach
         case (k, v) =>
           add(k, v)
-      }
       this
-    }
-  }
 
   /**
     * Finding frequent items for columns, possibly with false positives. Using the
@@ -82,51 +75,43 @@ private[sql] object FrequentItems extends Logging {
     * @return A Local DataFrame with the Array of frequent items for each column.
     */
   private[sql] def singlePassFreqItems(
-      df: DataFrame, cols: Seq[String], support: Double): DataFrame = {
+      df: DataFrame, cols: Seq[String], support: Double): DataFrame =
     require(support >= 1e-4, s"support ($support) must be greater than 1e-4.")
     val numCols = cols.length
     // number of max items to keep counts for
     val sizeOfMap = (1 / support).toInt
     val countMaps = Seq.tabulate(numCols)(i => new FreqItemCounter(sizeOfMap))
     val originalSchema = df.schema
-    val colInfo: Array[(String, DataType)] = cols.map { name =>
+    val colInfo: Array[(String, DataType)] = cols.map  name =>
       val index = originalSchema.fieldIndex(name)
       (name, originalSchema.fields(index).dataType)
-    }.toArray
+    .toArray
 
     val freqItems = df
       .select(cols.map(Column(_)): _*)
       .rdd
       .aggregate(countMaps)(
           seqOp = (counts, row) =>
-              {
               var i = 0
-              while (i < numCols) {
+              while (i < numCols)
                 val thisMap = counts(i)
                 val key = row.get(i)
                 thisMap.add(key, 1L)
                 i += 1
-              }
               counts
-          },
+          ,
           combOp = (baseCounts, counts) =>
-              {
               var i = 0
-              while (i < numCols) {
+              while (i < numCols)
                 baseCounts(i).merge(counts(i))
                 i += 1
-              }
               baseCounts
-          }
       )
     val justItems = freqItems.map(m => m.baseMap.keys.toArray)
     val resultRow = Row(justItems: _*)
     // append frequent Items to the column name for easy debugging
-    val outputCols = colInfo.map { v =>
+    val outputCols = colInfo.map  v =>
       StructField(v._1 + "_freqItems", ArrayType(v._2, false))
-    }
     val schema = StructType(outputCols).toAttributes
     Dataset.newDataFrame(
         df.sqlContext, LocalRelation.fromExternalRows(schema, Seq(resultRow)))
-  }
-}

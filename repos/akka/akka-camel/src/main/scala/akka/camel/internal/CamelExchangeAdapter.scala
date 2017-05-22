@@ -14,7 +14,7 @@ import akka.camel.{FailureResult, AkkaCamelException, CamelMessage}
   * This adapter is used to convert to immutable messages to be used with Actors, and convert the immutable messages back
   * to org.apache.camel.Message when using Camel.
   */
-private[camel] class CamelExchangeAdapter(val exchange: Exchange) {
+private[camel] class CamelExchangeAdapter(val exchange: Exchange)
 
   /**
     * Returns the exchange id
@@ -81,11 +81,10 @@ private[camel] class CamelExchangeAdapter(val exchange: Exchange) {
     * @param headers additional headers to set on the exception in addition to those
     *                in the exchange.
     */
-  def toAkkaCamelException(headers: Map[String, Any]): AkkaCamelException = {
+  def toAkkaCamelException(headers: Map[String, Any]): AkkaCamelException =
     import scala.collection.JavaConversions._
     new AkkaCamelException(
         exchange.getException, headers ++ response.getHeaders)
-  }
 
   /**
     * Creates an immutable Failure object from the adapted Exchange so it can be used internally between Actors.
@@ -98,10 +97,9 @@ private[camel] class CamelExchangeAdapter(val exchange: Exchange) {
     * @param headers additional headers to set on the created CamelMessage in addition to those
     *                in the Camel message.
     */
-  def toFailureResult(headers: Map[String, Any]): FailureResult = {
+  def toFailureResult(headers: Map[String, Any]): FailureResult =
     import scala.collection.JavaConversions._
     FailureResult(exchange.getException, headers ++ response.getHeaders)
-  }
 
   /**
     * Creates an immutable CamelMessage object from Exchange.getIn so it can be used with Actors.
@@ -126,4 +124,3 @@ private[camel] class CamelExchangeAdapter(val exchange: Exchange) {
 
   private def response: JCamelMessage =
     ExchangeHelper.getResultMessage(exchange)
-}

@@ -1,9 +1,7 @@
-object RepeatedParamsResolve {
-  def foo(x: Int*) {
+object RepeatedParamsResolve
+  def foo(x: Int*)
     /*start*/
-    x.map {
+    x.map
       case i => i.toString
-    } /*end*/
-  }
-}
+    /*end*/
 //Seq[String]

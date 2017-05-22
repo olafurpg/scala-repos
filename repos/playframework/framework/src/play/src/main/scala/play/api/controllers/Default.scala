@@ -20,7 +20,7 @@ object Default extends Default
   * GET   /xxx             controllers.Default.error
   * }}}
   */
-class Default @Inject()() extends Controller {
+class Default @Inject()() extends Controller
 
   /**
     * Returns a 501 NotImplemented response.
@@ -40,9 +40,8 @@ class Default @Inject()() extends Controller {
     * GET   /favicon.ico     controllers.Default.notFound
     * }}}
     */
-  def notFound: Action[AnyContent] = Action {
+  def notFound: Action[AnyContent] = Action
     NotFound
-  }
 
   /**
     * Returns a 302 Redirect response.
@@ -52,9 +51,8 @@ class Default @Inject()() extends Controller {
     * GET   /google          controllers.Default.redirect(to = "http://www.google.com")
     * }}}
     */
-  def redirect(to: String): Action[AnyContent] = Action {
+  def redirect(to: String): Action[AnyContent] = Action
     Redirect(to)
-  }
 
   /**
     * Returns a 500 InternalServerError response.
@@ -64,7 +62,5 @@ class Default @Inject()() extends Controller {
     * GET   /xxx             controllers.Default.error
     * }}}
     */
-  def error: Action[AnyContent] = Action {
+  def error: Action[AnyContent] = Action
     InternalServerError
-  }
-}

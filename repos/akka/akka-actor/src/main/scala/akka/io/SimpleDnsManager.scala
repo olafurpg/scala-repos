@@ -10,7 +10,7 @@ import scala.concurrent.duration.Duration
 
 class SimpleDnsManager(val ext: DnsExt)
     extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics]
-    with ActorLogging {
+    with ActorLogging
 
   import context._
 
@@ -20,34 +20,28 @@ class SimpleDnsManager(val ext: DnsExt)
             .withDeploy(Deploy.local)
             .withDispatcher(ext.Settings.Dispatcher)),
       ext.Settings.Resolver)
-  private val cacheCleanup = ext.cache match {
+  private val cacheCleanup = ext.cache match
     case cleanup: PeriodicCacheCleanup ⇒ Some(cleanup)
     case _ ⇒ None
-  }
 
   private val cleanupTimer =
-    cacheCleanup map { _ ⇒
+    cacheCleanup map  _ ⇒
       val interval = Duration(
           ext.Settings.ResolverConfig
             .getDuration("cache-cleanup-interval", TimeUnit.MILLISECONDS),
           TimeUnit.MILLISECONDS)
       system.scheduler.schedule(
           interval, interval, self, SimpleDnsManager.CacheCleanup)
-    }
 
-  override def receive = {
+  override def receive =
     case r @ Dns.Resolve(name) ⇒
       log.debug("Resolution request for {} from {}", name, sender())
       resolver.forward(r)
     case SimpleDnsManager.CacheCleanup ⇒
       for (c ← cacheCleanup) c.cleanup()
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     for (t ← cleanupTimer) t.cancel()
-  }
-}
 
-object SimpleDnsManager {
+object SimpleDnsManager
   private case object CacheCleanup
-}

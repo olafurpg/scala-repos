@@ -22,76 +22,62 @@ import org.scalajs.testsuite.utils.Platform._
 
 import scala.reflect.ClassTag
 
-trait CollectionsCheckedCollectionTest extends CollectionsOnCollectionsTest {
+trait CollectionsCheckedCollectionTest extends CollectionsOnCollectionsTest
 
   def originalFactory: CollectionFactory
 
-  def factory: CollectionFactory = {
-    new CollectionFactory {
+  def factory: CollectionFactory =
+    new CollectionFactory
       override def implementationName: String =
         s"checkedCollection(${originalFactory.implementationName})"
 
-      override def empty[E](implicit ct: ClassTag[E]): ju.Collection[E] = {
+      override def empty[E](implicit ct: ClassTag[E]): ju.Collection[E] =
         ju.Collections.checkedCollection(
             originalFactory.empty[E], ct.runtimeClass.asInstanceOf[Class[E]])
-      }
-    }
-  }
 
-  @Test def testCheckedCollection(): Unit = {
+  @Test def testCheckedCollection(): Unit =
     assertTrue(superColl().add(new C))
     assertTrue(superColl().addAll(Seq(new C)))
-  }
 
-  @Test def testCheckedCollectionBadInputs(): Unit = {
+  @Test def testCheckedCollectionBadInputs(): Unit =
     assumeTrue("Needs compliant asInstanceOf", hasCompliantAsInstanceOfs)
 
     expectThrows(classOf[ClassCastException], superColl().add(new A))
     expectThrows(classOf[ClassCastException], superColl().addAll(Seq(new A)))
-  }
 
   protected def superColl(): ju.Collection[A] =
     factory.empty[B].asInstanceOf[ju.Collection[A]]
-}
 
 class CollectionsOnCheckedCollectionAbstractListTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new AbstractListFactory
-}
 
 class CollectionsOnCheckedCollectionArrayListTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new ArrayListFactory
-}
 
 class CollectionsOnCheckedCollectionLinkedListTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new LinkedListFactory
-}
 
 class CollectionsOnCheckedCollectionCopyOnWriteArrayListTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new CopyOnWriteArrayListFactory
-}
 
 class CollectionsOnCheckedCollectionHashSetFactoryTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new HashSetFactory
-}
 
 class CollectionsOnCheckedCollectionLinkedHashSetTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory = new LinkedHashSetFactory
-}
 
 class CollectionsOnCheckedCollectionConcurrentSkipListSetTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory =
     new concurrent.ConcurrentSkipListSetFactory
-}
 
 class CollectionsOnCheckedCollectionArrayDequeTest
-    extends CollectionsCheckedCollectionTest {
+    extends CollectionsCheckedCollectionTest
   def originalFactory: CollectionFactory =
     new ArrayDequeFactory
-}

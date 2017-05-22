@@ -19,7 +19,7 @@ package scala
   *  There is an implicit conversion from [[scala.Byte]] => [[scala.runtime.RichByte]]
   *  which provides useful non-primitive operations.
   */
-final abstract class Byte private extends AnyVal {
+final abstract class Byte private extends AnyVal
   def toByte: Byte
   def toShort: Short
   def toChar: Char
@@ -520,9 +520,8 @@ final abstract class Byte private extends AnyVal {
   def %(x: Double): Double
 
   override def getClass(): Class[Byte] = null
-}
 
-object Byte extends AnyValCompanion {
+object Byte extends AnyValCompanion
 
   /** The smallest value representable as a Byte. */
   final val MinValue = java.lang.Byte.MIN_VALUE
@@ -562,4 +561,3 @@ object Byte extends AnyValCompanion {
   implicit def byte2long(x: Byte): Long = x.toLong
   implicit def byte2float(x: Byte): Float = x.toFloat
   implicit def byte2double(x: Byte): Double = x.toDouble
-}

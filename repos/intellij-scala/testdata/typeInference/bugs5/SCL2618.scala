@@ -1,4 +1,4 @@
-object SCL2618 {
+object SCL2618
   class A[T]
   type F[T] = A[T]
   class Z[CC[_]]
@@ -8,5 +8,4 @@ object SCL2618 {
 
   /*start*/
   foo(new Z[A]) /*end*/
-}
 //String

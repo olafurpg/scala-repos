@@ -1,13 +1,12 @@
 import util.hashing.Hashing
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     hashing()
     equality()
-  }
 
-  def hashing() {
+  def hashing()
     import collection._
 
     val tm = new concurrent.TrieMap[String, String](
@@ -20,9 +19,8 @@ object Test {
 
     for (i <- 0 until 1000) tm(i.toString) = i.toString
     for (i <- 0 until 1000) assert(tm(i.toString) == i.toString)
-  }
 
-  def equality() {
+  def equality()
     import collection._
 
     val tm = new concurrent.TrieMap[String, String](
@@ -39,5 +37,3 @@ object Test {
     assert(tm.size == 12, tm)
     assert(tm("0") == "0", tm)
     for (i <- 1 to 9) assert(tm(i.toString) == i.toString + "99", tm)
-  }
-}

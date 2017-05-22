@@ -4,7 +4,7 @@ package syntax
 /** Wraps a value `self` and provides methods related to `Bifunctor` */
 final class BifunctorOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
     implicit val F: Bifunctor[F])
-    extends Ops[F[A, B]] {
+    extends Ops[F[A, B]]
   ////
   import Liskov.<~<
 
@@ -21,15 +21,13 @@ final class BifunctorOps[F[_, _], A, B] private[syntax](val self: F[A, B])(
   final def leftAs[C](c: => C): F[C, B] = F.bimap(self)(_ => c, b => b)
   final def widen[C >: A, D >: B]: F[C, D] = F.widen(self)
   ////
-}
 
-sealed trait ToBifunctorOps0 {
+sealed trait ToBifunctorOps0
   implicit def ToBifunctorOpsUnapply[FA](v: FA)(
       implicit F0: Unapply2[Bifunctor, FA]) =
     new BifunctorOps[F0.M, F0.A, F0.B](F0(v))(F0.TC)
-}
 
-trait ToBifunctorOps extends ToBifunctorOps0 {
+trait ToBifunctorOps extends ToBifunctorOps0
 
   implicit def ToBifunctorOps[F[_, _], A, B](v: F[A, B])(
       implicit F0: Bifunctor[F]) =
@@ -42,9 +40,8 @@ trait ToBifunctorOps extends ToBifunctorOps0 {
   ////
 
   ////
-}
 
-trait BifunctorSyntax[F[_, _]] {
+trait BifunctorSyntax[F[_, _]]
   implicit def ToBifunctorOps[A, B](v: F[A, B]): BifunctorOps[F, A, B] =
     new BifunctorOps[F, A, B](v)(BifunctorSyntax.this.F)
 
@@ -52,4 +49,3 @@ trait BifunctorSyntax[F[_, _]] {
   ////
 
   ////
-}

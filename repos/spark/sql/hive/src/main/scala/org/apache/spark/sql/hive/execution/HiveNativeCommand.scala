@@ -24,11 +24,10 @@ import org.apache.spark.sql.hive.HiveContext
 import org.apache.spark.sql.types.StringType
 
 private[hive] case class HiveNativeCommand(sql: String)
-    extends RunnableCommand {
+    extends RunnableCommand
 
   override def output: Seq[AttributeReference] =
     Seq(AttributeReference("result", StringType, nullable = false)())
 
   override def run(sqlContext: SQLContext): Seq[Row] =
     sqlContext.asInstanceOf[HiveContext].runSqlHive(sql).map(Row(_))
-}

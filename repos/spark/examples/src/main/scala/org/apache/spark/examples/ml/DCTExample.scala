@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object DCTExample {
-  def main(args: Array[String]): Unit = {
+object DCTExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("DCTExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -48,6 +48,4 @@ object DCTExample {
     dctDf.select("featuresDCT").show(3)
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

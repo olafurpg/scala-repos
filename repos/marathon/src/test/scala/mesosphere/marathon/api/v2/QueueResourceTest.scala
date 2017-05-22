@@ -16,9 +16,9 @@ import scala.collection.immutable.Seq
 import scala.concurrent.duration._
 
 class QueueResourceTest
-    extends MarathonSpec with Matchers with Mockito with GivenWhenThen {
+    extends MarathonSpec with Matchers with Mockito with GivenWhenThen
 
-  test("return well formatted JSON") {
+  test("return well formatted JSON")
     //given
     val app = AppDefinition(id = "app".toRootPath)
     queue.list returns Seq(
@@ -38,17 +38,16 @@ class QueueResourceTest
     response.getStatus should be(200)
     val json = Json.parse(response.getEntity.asInstanceOf[String])
     val queuedApps = (json \ "queue").as[Seq[JsObject]]
-    val jsonApp1 = queuedApps.find { apps =>
+    val jsonApp1 = queuedApps.find  apps =>
       (apps \ "app" \ "id").as[String] == "/app"
-    }.get
+    .get
 
     (jsonApp1 \ "app").as[AppDefinition] should be(app)
     (jsonApp1 \ "count").as[Int] should be(23)
     (jsonApp1 \ "delay" \ "overdue").as[Boolean] should be(false)
     (jsonApp1 \ "delay" \ "timeLeftSeconds").as[Int] should be(100) //the deadline holds the current time...
-  }
 
-  test("the generated info from the queue contains 0 if there is no delay") {
+  test("the generated info from the queue contains 0 if there is no delay")
     //given
     val app = AppDefinition(id = "app".toRootPath)
     queue.list returns Seq(
@@ -67,17 +66,16 @@ class QueueResourceTest
     response.getStatus should be(200)
     val json = Json.parse(response.getEntity.asInstanceOf[String])
     val queuedApps = (json \ "queue").as[Seq[JsObject]]
-    val jsonApp1 = queuedApps.find { apps =>
+    val jsonApp1 = queuedApps.find  apps =>
       (apps \ "app" \ "id").get == JsString("/app")
-    }.get
+    .get
 
     (jsonApp1 \ "app").as[AppDefinition] should be(app)
     (jsonApp1 \ "count").as[Int] should be(23)
     (jsonApp1 \ "delay" \ "overdue").as[Boolean] should be(true)
     (jsonApp1 \ "delay" \ "timeLeftSeconds").as[Int] should be(0)
-  }
 
-  test("unknown application backoff can not be removed from the taskqueue") {
+  test("unknown application backoff can not be removed from the taskqueue")
     //given
     queue.list returns Seq.empty
 
@@ -86,9 +84,8 @@ class QueueResourceTest
 
     //then
     response.getStatus should be(404)
-  }
 
-  test("application backoff can be removed from the taskqueue") {
+  test("application backoff can be removed from the taskqueue")
     //given
     val app = AppDefinition(id = "app".toRootPath)
     queue.list returns Seq(
@@ -107,9 +104,8 @@ class QueueResourceTest
     //then
     response.getStatus should be(204)
     verify(queue, times(1)).resetDelay(app)
-  }
 
-  test("access without authentication is denied") {
+  test("access without authentication is denied")
     Given("An unauthenticated request")
     auth.authenticated = false
     val req = auth.request
@@ -123,9 +119,8 @@ class QueueResourceTest
     val resetDelay = queueResource.resetDelay("appId", req)
     Then("we receive a NotAuthenticated response")
     resetDelay.getStatus should be(auth.NotAuthenticatedStatus)
-  }
 
-  test("access without authorization is denied if the app is in the queue") {
+  test("access without authorization is denied if the app is in the queue")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -140,10 +135,9 @@ class QueueResourceTest
     val resetDelay = queueResource.resetDelay("appId", req)
     Then("we receive a not authorized response")
     resetDelay.getStatus should be(auth.UnauthorizedStatus)
-  }
 
   test(
-      "access without authorization leads to a 404 if the app is not in the queue") {
+      "access without authorization leads to a 404 if the app is not in the queue")
     Given("An unauthorized request")
     auth.authenticated = true
     auth.authorized = false
@@ -155,7 +149,6 @@ class QueueResourceTest
     val resetDelay = queueResource.resetDelay("appId", req)
     Then("we receive a not authorized response")
     resetDelay.getStatus should be(404)
-  }
 
   var clock: Clock = _
   var config: MarathonConf = _
@@ -163,7 +156,7 @@ class QueueResourceTest
   var auth: TestAuthFixture = _
   var queue: LaunchQueue = _
 
-  before {
+  before
     clock = ConstantClock()
     auth = new TestAuthFixture
     config = mock[MarathonConf]
@@ -175,5 +168,3 @@ class QueueResourceTest
         auth.auth,
         config
     )
-  }
-}

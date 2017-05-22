@@ -22,44 +22,38 @@ import scala.annotation.tailrec
  *            | Packaging
  */
 
-object TopStat {
+object TopStat
   @tailrec
-  def parse(builder: ScalaPsiBuilder, state: Int): Int = {
+  def parse(builder: ScalaPsiBuilder, state: Int): Int =
     val patcher = ParserPatcher.getSuitablePatcher(builder)
 
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kIMPORT =>
         Import parse builder
         ParserState.ADDITIONAL_STATE
       case ScalaTokenTypes.kPACKAGE =>
         if (state == 2) ParserState.EMPTY_STATE
-        else {
+        else
           if (ParserUtils.lookAhead(builder,
                                     ScalaTokenTypes.kPACKAGE,
-                                    ScalaTokenTypes.kOBJECT)) {
+                                    ScalaTokenTypes.kOBJECT))
             if (PackageObject parse builder) ParserState.FILE_STATE
             else ParserState.EMPTY_STATE
-          } else {
+          else
             if (Packaging parse builder) ParserState.FILE_STATE
             else ParserState.EMPTY_STATE
-          }
-        }
       case _ if patcher.parse(builder) =>
         if (!builder.eof()) parse(builder, state) else ParserState.SCRIPT_STATE
       case _ =>
-        state match {
+        state match
           case ParserState.EMPTY_STATE =>
-            if (!TmplDef.parse(builder)) {
+            if (!TmplDef.parse(builder))
               if (!TemplateStat.parse(builder)) ParserState.EMPTY_STATE
               else ParserState.SCRIPT_STATE
-            } else ParserState.ADDITIONAL_STATE
+            else ParserState.ADDITIONAL_STATE
           case ParserState.FILE_STATE =>
             if (!TmplDef.parse(builder)) ParserState.EMPTY_STATE
             else ParserState.FILE_STATE
           case ParserState.SCRIPT_STATE =>
             if (!TemplateStat.parse(builder)) ParserState.EMPTY_STATE
             else ParserState.SCRIPT_STATE
-        }
-    }
-  }
-}

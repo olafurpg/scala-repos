@@ -34,7 +34,7 @@ import scala.concurrent.duration.Deadline
   * failures (see [[StepWise.Steps#expectFailure]]).
   */
 @deprecated("to be replaced by process DSL", "2.4-M2")
-object StepWise {
+object StepWise
   import ScalaDSL._
 
   sealed trait AST
@@ -56,24 +56,20 @@ object StepWise {
       timeout: FiniteDuration, f: (Terminated, Any) ⇒ Any, trace: Trace)
       extends AST
 
-  private sealed trait Trace {
+  private sealed trait Trace
     def getStackTrace: Array[StackTraceElement]
     protected def getFrames: Array[StackTraceElement] =
-      Thread.currentThread.getStackTrace.dropWhile { elem ⇒
+      Thread.currentThread.getStackTrace.dropWhile  elem ⇒
         val name = elem.getClassName
         name.startsWith("java.lang.Thread") ||
         name.startsWith("akka.typed.StepWise")
-      }
-  }
-  private class WithTrace extends Trace {
+  private class WithTrace extends Trace
     private val trace = getFrames
     def getStackTrace = trace
-  }
-  private object WithoutTrace extends Trace {
+  private object WithoutTrace extends Trace
     def getStackTrace = getFrames
-  }
 
-  final case class Steps[T, U](ops: List[AST], keepTraces: Boolean) {
+  final case class Steps[T, U](ops: List[AST], keepTraces: Boolean)
     private def getTrace(): Trace =
       if (keepTraces) new WithTrace
       else WithoutTrace
@@ -116,9 +112,8 @@ object StepWise {
       copy(
           ops = Message(timeout,
                         (msg, value) ⇒
-                          {
                       f.asInstanceOf[(Any, Any) ⇒ Any](msg, value); value
-                  },
+                  ,
                         getTrace()) :: ops)
 
     def expectMultipleMessagesKeep(timeout: FiniteDuration, count: Int)(
@@ -127,9 +122,8 @@ object StepWise {
           ops = MultiMessage(timeout,
                              count,
                              (msgs, value) ⇒
-                               {
                            f.asInstanceOf[(Seq[Any], Any) ⇒ Any](msgs, value); value
-                       },
+                       ,
                              getTrace()) :: ops)
 
     def expectFailureKeep(timeout: FiniteDuration)(
@@ -151,44 +145,37 @@ object StepWise {
                 getTrace()) :: ops)
 
     def withKeepTraces(b: Boolean): Steps[T, U] = copy(keepTraces = b)
-  }
 
-  class StartWith[T](keepTraces: Boolean) {
+  class StartWith[T](keepTraces: Boolean)
     def apply[U](thunk: ⇒ U): Steps[T, U] =
       Steps(Thunk(() ⇒ thunk) :: Nil, keepTraces)
     def withKeepTraces(b: Boolean): StartWith[T] = new StartWith(b)
-  }
 
   def apply[T](f: (ActorContext[T], StartWith[T]) ⇒ Steps[T, _]): Behavior[T] =
-    Full {
+    Full
       case Sig(ctx, PreStart) ⇒
         run(ctx, f(ctx, new StartWith(keepTraces = false)).ops.reverse, ())
-    }
 
   private def throwTimeout(trace: Trace, message: String): Nothing =
-    throw new TimeoutException(message) {
-      override def fillInStackTrace(): Throwable = {
+    throw new TimeoutException(message)
+      override def fillInStackTrace(): Throwable =
         setStackTrace(trace.getStackTrace)
         this
-      }
-    }
 
   private def throwIllegalState(trace: Trace, message: String): Nothing =
-    throw new IllegalStateException(message) {
-      override def fillInStackTrace(): Throwable = {
+    throw new IllegalStateException(message)
+      override def fillInStackTrace(): Throwable =
         setStackTrace(trace.getStackTrace)
         this
-      }
-    }
 
   private def run[T](
       ctx: ActorContext[T], ops: List[AST], value: Any): Behavior[T] =
-    ops match {
+    ops match
       case Thunk(f) :: tail ⇒ run(ctx, tail, f())
       case ThunkV(f) :: tail ⇒ run(ctx, tail, f(value))
       case Message(t, f, trace) :: tail ⇒
         ctx.setReceiveTimeout(t)
-        Full {
+        Full
           case Sig(_, ReceiveTimeout) ⇒
             throwTimeout(
                 trace, s"timeout of $t expired while waiting for a message")
@@ -196,31 +183,28 @@ object StepWise {
           case Sig(_, other) ⇒
             throwIllegalState(
                 trace, s"unexpected $other while waiting for a message")
-        }
       case MultiMessage(t, c, f, trace) :: tail ⇒
         val deadline = Deadline.now + t
-        def behavior(count: Int, acc: List[Any]): Behavior[T] = {
+        def behavior(count: Int, acc: List[Any]): Behavior[T] =
           ctx.setReceiveTimeout(deadline.timeLeft)
-          Full {
+          Full
             case Sig(_, ReceiveTimeout) ⇒
               throwTimeout(
                   trace,
                   s"timeout of $t expired while waiting for $c messages (got only $count)")
             case Msg(_, msg) ⇒
               val nextCount = count + 1
-              if (nextCount == c) {
+              if (nextCount == c)
                 run(ctx, tail, f((msg :: acc).reverse, value))
-              } else behavior(nextCount, msg :: acc)
+              else behavior(nextCount, msg :: acc)
             case Sig(_, other) ⇒
               throwIllegalState(
                   trace,
                   s"unexpected $other while waiting for $c messages (got $count valid ones)")
-          }
-        }
         behavior(0, Nil)
       case Failure(t, f, trace) :: tail ⇒
         ctx.setReceiveTimeout(t)
-        Full {
+        Full
           case Sig(_, ReceiveTimeout) ⇒
             throwTimeout(
                 trace, s"timeout of $t expired while waiting for a failure")
@@ -231,10 +215,9 @@ object StepWise {
           case other ⇒
             throwIllegalState(
                 trace, s"unexpected $other while waiting for a message")
-        }
       case Termination(t, f, trace) :: tail ⇒
         ctx.setReceiveTimeout(t)
-        Full {
+        Full
           case Sig(_, ReceiveTimeout) ⇒
             throwTimeout(
                 trace, s"timeout of $t expired while waiting for termination")
@@ -242,9 +225,6 @@ object StepWise {
           case other ⇒
             throwIllegalState(
                 trace, s"unexpected $other while waiting for termination")
-        }
       case Nil ⇒ Stopped
-    }
-}
 
 abstract class StepWise

@@ -1,13 +1,11 @@
-class UnitReturnOneOutput {
-  def foo(i: Int) {
+class UnitReturnOneOutput
+  def foo(i: Int)
     /*start*/
     if (true) return
     val x = 0
     println(i)
     /*end*/
     println(x)
-  }
-}
 /*
 class UnitReturnOneOutput {
   def foo(i: Int) {

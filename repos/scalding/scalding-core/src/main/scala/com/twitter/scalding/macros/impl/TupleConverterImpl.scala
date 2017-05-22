@@ -27,7 +27,7 @@ import com.twitter.bijection.macros.impl.IsCaseClassImpl
   * This class contains the core macro implementations. This is in a separate module to allow it to be in
   * a separate compilation unit, which makes it easier to provide helper methods interfacing with macros.
   */
-object TupleConverterImpl {
+object TupleConverterImpl
   def caseClassTupleConverterImpl[T](c: Context)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] =
     caseClassTupleConverterCommonImpl(c, false)
@@ -38,55 +38,48 @@ object TupleConverterImpl {
 
   def caseClassTupleConverterCommonImpl[T](
       c: Context, allowUnknownTypes: Boolean)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[TupleConverter[T]] =
     import c.universe._
 
     import TypeDescriptorProviderImpl.{optionInner, evidentColumn}
 
     def membersOf(outerTpe: Type): Vector[Type] =
-      outerTpe.declarations.collect {
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
+      .map  accessorMethod =>
         accessorMethod.returnType.asSeenFrom(
             outerTpe, outerTpe.typeSymbol.asClass)
-      }.toVector
+      .toVector
 
-    sealed trait ConverterBuilder {
+    sealed trait ConverterBuilder
       def columns: Int
       def applyTree(offset: Int): Tree
-    }
     case class PrimitiveBuilder(primitiveGetter: Int => Tree)
-        extends ConverterBuilder {
+        extends ConverterBuilder
       def columns = 1
       def applyTree(offset: Int) = primitiveGetter(offset)
-    }
     case class OptionBuilder(evidentCol: Int, of: ConverterBuilder)
-        extends ConverterBuilder {
+        extends ConverterBuilder
       def columns = of.columns
-      def applyTree(offset: Int) = {
+      def applyTree(offset: Int) =
         val testIdx = offset + evidentCol
         q"""if (t.getObject($testIdx) == null) None
             else Some(${of.applyTree(offset)})"""
-      }
-    }
     case class CaseClassBuilder(tpe: Type, members: Vector[ConverterBuilder])
-        extends ConverterBuilder {
+        extends ConverterBuilder
       val columns = members.map(_.columns).sum
-      def applyTree(offset: Int) = {
+      def applyTree(offset: Int) =
         val trees = members
-          .scanLeft((offset, Option.empty[Tree])) {
+          .scanLeft((offset, Option.empty[Tree]))
             case ((o, _), cb) =>
               val nextOffset = o + cb.columns
               (nextOffset, Some(cb.applyTree(o)))
-          }
           .collect { case (_, Some(tree)) => tree }
 
         q"${tpe.typeSymbol.companionSymbol}(..$trees)"
-      }
-    }
 
     def matchField(outerTpe: Type): ConverterBuilder =
-      outerTpe match {
+      outerTpe match
         /*
          * First we handle primitives, which never recurse
          */
@@ -111,14 +104,13 @@ object TupleConverterImpl {
           PrimitiveBuilder(idx => q"""t.getDouble($idx)""")
         case tpe if tpe.erasure =:= typeOf[Option[Any]] =>
           val innerType = tpe.asInstanceOf[TypeRefApi].args.head
-          evidentColumn(c, allowUnknownTypes)(innerType) match {
+          evidentColumn(c, allowUnknownTypes)(innerType) match
             case None => // there is no evident column, not supported.
               c.abort(
                   c.enclosingPosition,
                   s"$tpe has unsupported nesting of Options at: $innerType")
             case Some(ev) => // we can recurse here
               OptionBuilder(ev, matchField(innerType))
-          }
         case tpe
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
           CaseClassBuilder(tpe, membersOf(tpe).map(matchField))
@@ -129,7 +121,6 @@ object TupleConverterImpl {
           c.abort(
               c.enclosingPosition,
               s"${T.tpe} is not pure primitives, Option of a primitive, nested case classes when looking at type ${tpe}")
-      }
 
     val builder = matchField(T.tpe)
     if (builder.columns == 0)
@@ -146,5 +137,3 @@ object TupleConverterImpl {
   }
   """
     c.Expr[TupleConverter[T]](res)
-  }
-}

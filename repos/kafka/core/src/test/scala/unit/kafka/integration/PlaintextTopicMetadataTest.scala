@@ -18,7 +18,6 @@ package kafka.integration
 
 import org.apache.kafka.common.protocol.SecurityProtocol
 
-class PlaintextTopicMetadataTest extends BaseTopicMetadataTest {
+class PlaintextTopicMetadataTest extends BaseTopicMetadataTest
   protected def securityProtocol = SecurityProtocol.PLAINTEXT
   protected def trustStoreFile = None
-}

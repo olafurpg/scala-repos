@@ -17,7 +17,7 @@ final class Failure private[finagle](
     protected val sources: Map[Failure.Source.Value, Object] = Map.empty,
     val stacktrace: Array[StackTraceElement] = Failure.NoStacktrace,
     val logLevel: Level = Level.WARNING)
-    extends Exception(why, cause.orNull) with NoStacktrace with HasLogLevel {
+    extends Exception(why, cause.orNull) with NoStacktrace with HasLogLevel
   import Failure._
 
   require(!isFlagged(Wrapped) || cause.isDefined)
@@ -101,19 +101,16 @@ final class Failure private[finagle](
         if (sources.isEmpty) "NoSources" else sources.mkString("\n\twith "))
 
   override def getStackTrace(): Array[StackTraceElement] = stacktrace
-  override def printStackTrace(p: java.io.PrintWriter) {
+  override def printStackTrace(p: java.io.PrintWriter)
     p.println(this)
     for (te <- stacktrace) p.println("\tat %s".format(te))
-  }
 
-  override def equals(a: Any) = {
-    a match {
+  override def equals(a: Any) =
+    a match
       case that: Failure =>
         this.why.equals(that.why) && this.cause.equals(that.cause) &&
         this.flags.equals(that.flags) && this.sources.equals(that.sources)
       case _ => false
-    }
-  }
 
   override def hashCode: Int =
     why.hashCode ^ cause.hashCode ^ flags.hashCode ^ sources.hashCode
@@ -126,15 +123,13 @@ final class Failure private[finagle](
       stacktrace: Array[StackTraceElement] = stacktrace,
       logLevel: Level = logLevel
   ): Failure = new Failure(why, cause, flags, sources, stacktrace, logLevel)
-}
 
-object Failure {
+object Failure
   private val NoStacktrace = Array(
       new StackTraceElement("com.twitter.finagle", "NoStacktrace", null, -1))
 
-  object Source extends Enumeration {
+  object Source extends Enumeration
     val Service, Role, RemoteInfo = Value
-  }
 
   /**
     * Flag restartable indicates that the action that caused the failure
@@ -214,7 +209,7 @@ object Failure {
     * Expose flags as strings, used for stats reporting
     */
   def flagsOf(exc: Throwable): Set[String] =
-    exc match {
+    exc match
       case f: Failure =>
         var flags: Set[String] = Set.empty
         if (f.isFlagged(Interrupted)) flags += "interrupted"
@@ -223,29 +218,25 @@ object Failure {
         if (f.isFlagged(Naming)) flags += "naming"
         flags
       case _ => Set.empty
-    }
 
   /**
     * Adapt an exception. If the passed-in exception is already a failure,
     * this returns a chained failure with the assigned flags. If it is not,
     * it returns a new failure with the given flags.
     */
-  def adapt(exc: Throwable, flags: Long): Failure = exc match {
+  def adapt(exc: Throwable, flags: Long): Failure = exc match
     case f: Failure => f.chained.flagged(flags)
     case exc => Failure(exc, flags)
-  }
 
   /**
     * Create a new wrapped Failure with the given flags. If the passed-in exception
     * is a failure, it is simply extended, otherwise a new Failure is created.
     */
-  def wrap(exc: Throwable, flags: Long): Failure = {
+  def wrap(exc: Throwable, flags: Long): Failure =
     require(exc != null)
-    exc match {
+    exc match
       case f: Failure => f.flagged(flags | Failure.Wrapped)
       case exc => Failure(exc, flags | Failure.Wrapped)
-    }
-  }
 
   /**
     * Create a new wrapped Failure with no flags. If the passed-in exception
@@ -279,16 +270,14 @@ object Failure {
   val rejected: Failure = rejected("The request was rejected")
 
   @tailrec
-  private def show(f: Failure): Throwable = {
+  private def show(f: Failure): Throwable =
     if (!f.isFlagged(Failure.Wrapped)) f.masked(ShowMask)
     else
-      f.cause match {
+      f.cause match
         case Some(inner: Failure) => show(inner)
         case Some(inner: Throwable) => inner
         case None =>
           throw new IllegalArgumentException("Wrapped failure without a cause")
-      }
-  }
 
   /**
     * Process failures for external presentation. Specifically, this converts
@@ -302,14 +291,12 @@ object Failure {
     * effect before issuing the client call.)
     */
   private[finagle] class ProcessFailures[Req, Rep]
-      extends SimpleFilter[Req, Rep] {
-    private[this] val Process: PartialFunction[Throwable, Future[Rep]] = {
+      extends SimpleFilter[Req, Rep]
+    private[this] val Process: PartialFunction[Throwable, Future[Rep]] =
       case f: Failure => Future.exception(f.show)
-    }
 
     def apply(req: Req, service: Service[Req, Rep]): Future[Rep] =
       service(req).rescue(Process)
-  }
 
   val role = Stack.Role("ProcessFailure")
 
@@ -317,12 +304,10 @@ object Failure {
     * A module to strip out dangerous flags; more coming soon.
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module0[ServiceFactory[Req, Rep]] {
+    new Stack.Module0[ServiceFactory[Req, Rep]]
       val role = Failure.role
       val description = "process failures"
 
       private[this] val filter = new ProcessFailures[Req, Rep]
 
       def make(next: ServiceFactory[Req, Rep]) = filter andThen next
-    }
-}

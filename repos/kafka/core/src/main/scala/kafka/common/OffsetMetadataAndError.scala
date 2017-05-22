@@ -19,25 +19,23 @@ package kafka.common
 import org.apache.kafka.common.protocol.Errors
 
 case class OffsetMetadata(
-    offset: Long, metadata: String = OffsetMetadata.NoMetadata) {
+    offset: Long, metadata: String = OffsetMetadata.NoMetadata)
   override def toString =
     "OffsetMetadata[%d,%s]".format(offset,
                                    if (metadata != null && metadata.length > 0)
                                      metadata else "NO_METADATA")
-}
 
-object OffsetMetadata {
+object OffsetMetadata
   val InvalidOffset: Long = -1L
   val NoMetadata: String = ""
 
   val InvalidOffsetMetadata = OffsetMetadata(
       OffsetMetadata.InvalidOffset, OffsetMetadata.NoMetadata)
-}
 
 case class OffsetAndMetadata(
     offsetMetadata: OffsetMetadata,
     commitTimestamp: Long = org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP,
-    expireTimestamp: Long = org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP) {
+    expireTimestamp: Long = org.apache.kafka.common.requests.OffsetCommitRequest.DEFAULT_TIMESTAMP)
 
   def offset = offsetMetadata.offset
 
@@ -46,9 +44,8 @@ case class OffsetAndMetadata(
   override def toString =
     "[%s,CommitTime %d,ExpirationTime %d]".format(
         offsetMetadata, commitTimestamp, expireTimestamp)
-}
 
-object OffsetAndMetadata {
+object OffsetAndMetadata
   def apply(offset: Long,
             metadata: String,
             commitTimestamp: Long,
@@ -64,18 +61,16 @@ object OffsetAndMetadata {
 
   def apply(offset: Long) =
     new OffsetAndMetadata(OffsetMetadata(offset, OffsetMetadata.NoMetadata))
-}
 
 case class OffsetMetadataAndError(
-    offsetMetadata: OffsetMetadata, error: Short = Errors.NONE.code) {
+    offsetMetadata: OffsetMetadata, error: Short = Errors.NONE.code)
   def offset = offsetMetadata.offset
 
   def metadata = offsetMetadata.metadata
 
   override def toString = "[%s,ErrorCode %d]".format(offsetMetadata, error)
-}
 
-object OffsetMetadataAndError {
+object OffsetMetadataAndError
   val NoOffset = OffsetMetadataAndError(
       OffsetMetadata.InvalidOffsetMetadata, Errors.NONE.code)
   val GroupLoading = OffsetMetadataAndError(
@@ -103,4 +98,3 @@ object OffsetMetadataAndError {
 
   def apply(offset: Long, metadata: String, error: Short) =
     new OffsetMetadataAndError(OffsetMetadata(offset, metadata), error)
-}

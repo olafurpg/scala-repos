@@ -39,31 +39,26 @@ import scalafx.scene.layout.StackPane
   * @related controls/ToggleButton
   * @related controls/ToolBar
   */
-class EnsembleAccordion extends EnsembleExample {
+class EnsembleAccordion extends EnsembleExample
 
   // @stage-property resizable = false
   // @stage-property width = 200
   // @stage-property height = 200
 
-  def getContent = new StackPane {
+  def getContent = new StackPane
     padding = Insets(10)
-    children = new Accordion {
+    children = new Accordion
       maxWidth = 150
       maxHeight = 150
-      panes = List(new TitledPane {
+      panes = List(new TitledPane
         text = "Ensemble Button 1"
         children = new Button("Button 1")
-      }, new TitledPane {
+      , new TitledPane
         text = "Ensemble TextField 1"
-        children = new TextField {
+        children = new TextField
           promptText = "Hi! Scalafx Ensemble!"
-        }
-      }, new TitledPane {
+      , new TitledPane
         text = "Ensemble CheckBox 1"
-        children = new CheckBox {
+        children = new CheckBox
           text = "CheckBox 1"
-        }
-      })
-    }
-  }
-}
+      )

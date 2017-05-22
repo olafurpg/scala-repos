@@ -5,11 +5,11 @@ import akka.stream.ClosedShape
 import akka.stream.scaladsl._
 import akka.util.ByteString
 
-class RecipeKeepAlive extends RecipeSpec {
+class RecipeKeepAlive extends RecipeSpec
 
-  "Recipe for injecting keepalive messages" must {
+  "Recipe for injecting keepalive messages" must
 
-    "work" in {
+    "work" in
       val keepaliveMessage = ByteString(11)
 
       //#inject-keepalive
@@ -19,6 +19,3 @@ class RecipeKeepAlive extends RecipeSpec {
       //#inject-keepalive
 
       // No need to test, this is a built-in stage with proper tests
-    }
-  }
-}

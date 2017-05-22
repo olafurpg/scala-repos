@@ -6,19 +6,15 @@ import org.scalatra.util.{MultiMap, MapWithIndifferentAccess, MultiMapHeadView}
 package object scalatra
     extends Control // make halt and pass visible to helpers outside the DSL
     //  with DefaultValues // make defaults visible
-    {
 
-  object RouteTransformer {
+  object RouteTransformer
 
     implicit def fn2transformer(fn: Route => Route): RouteTransformer =
-      new RouteTransformer {
+      new RouteTransformer
         override def apply(route: Route): Route = fn(route)
-      }
-  }
 
-  trait RouteTransformer {
+  trait RouteTransformer
     def apply(route: Route): Route
-  }
 
   @deprecated(
       "Use ContentEncodingSupport, GZipSupport will be removed eventually",
@@ -61,4 +57,3 @@ package object scalatra
 
   type FullCoreStack = CoreStack with FileUploadSupport
   type FileUploadStack = FutureSupport with FlashMapSupport with FileUploadSupport
-}

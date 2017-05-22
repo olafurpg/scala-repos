@@ -7,7 +7,7 @@ import com.intellij.openapi.vfs.{VirtualFile, VirtualFileListener, VirtualFileSy
 /**
   * @author Pavel Fatin
   */
-class AbsentLocalFile(url: String, path: String) extends VirtualFile {
+class AbsentLocalFile(url: String, path: String) extends VirtualFile
   def getName = throw new UnsupportedOperationException()
 
   def getLength = throw new UnsupportedOperationException()
@@ -41,9 +41,8 @@ class AbsentLocalFile(url: String, path: String) extends VirtualFile {
   def getInputStream = throw new UnsupportedOperationException()
 
   override def getUrl = url
-}
 
-object AbsentLocalFileSystem extends VirtualFileSystem {
+object AbsentLocalFileSystem extends VirtualFileSystem
   def getProtocol = throw new UnsupportedOperationException()
 
   def renameFile(requestor: AnyRef, vFile: VirtualFile, newName: String) =
@@ -86,4 +85,3 @@ object AbsentLocalFileSystem extends VirtualFileSystem {
 
   override def extractPresentableUrl(path: String) =
     path.replace('/', File.separatorChar)
-}

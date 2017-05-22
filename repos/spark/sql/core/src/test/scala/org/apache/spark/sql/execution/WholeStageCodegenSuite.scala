@@ -25,16 +25,15 @@ import org.apache.spark.sql.functions.{avg, broadcast, col, max}
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types.{IntegerType, StringType, StructType}
 
-class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
+class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext
 
-  test("range/filter should be combined") {
+  test("range/filter should be combined")
     val df = sqlContext.range(10).filter("id = 1").selectExpr("id + 1")
     val plan = df.queryExecution.executedPlan
     assert(plan.find(_.isInstanceOf[WholeStageCodegen]).isDefined)
     assert(df.collect() === Array(Row(2)))
-  }
 
-  test("Aggregate should be included in WholeStageCodegen") {
+  test("Aggregate should be included in WholeStageCodegen")
     val df = sqlContext.range(10).groupBy().agg(max(col("id")), avg(col("id")))
     val plan = df.queryExecution.executedPlan
     assert(
@@ -46,9 +45,8 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
                   .isInstanceOf[TungstenAggregate])
           .isDefined)
     assert(df.collect() === Array(Row(9, 4.5)))
-  }
 
-  test("Aggregate with grouping keys should be included in WholeStageCodegen") {
+  test("Aggregate with grouping keys should be included in WholeStageCodegen")
     val df = sqlContext.range(3).groupBy("id").count().orderBy("id")
     val plan = df.queryExecution.executedPlan
     assert(
@@ -60,9 +58,8 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
                   .isInstanceOf[TungstenAggregate])
           .isDefined)
     assert(df.collect() === Array(Row(0, 1), Row(1, 1), Row(2, 1)))
-  }
 
-  test("BroadcastHashJoin should be included in WholeStageCodegen") {
+  test("BroadcastHashJoin should be included in WholeStageCodegen")
     val rdd = sqlContext.sparkContext.makeRDD(
         Seq(Row(1, "1"), Row(1, "1"), Row(2, "2")))
     val schema = new StructType().add("k", IntegerType).add("v", StringType)
@@ -79,9 +76,8 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
           .isDefined)
     assert(
         df.collect() === Array(Row(1, 1, "1"), Row(1, 1, "1"), Row(2, 2, "2")))
-  }
 
-  test("Sort should be included in WholeStageCodegen") {
+  test("Sort should be included in WholeStageCodegen")
     val df = sqlContext.range(3, 0, -1).toDF().sort(col("id"))
     val plan = df.queryExecution.executedPlan
     assert(
@@ -91,5 +87,3 @@ class WholeStageCodegenSuite extends SparkPlanTest with SharedSQLContext {
                 p.asInstanceOf[WholeStageCodegen].child.isInstanceOf[Sort])
           .isDefined)
     assert(df.collect() === Array(Row(1), Row(2), Row(3)))
-  }
-}

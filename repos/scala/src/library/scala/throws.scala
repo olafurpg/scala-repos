@@ -24,6 +24,5 @@ package scala
   * @since   2.1
   */
 class throws[T <: Throwable](cause: String = "")
-    extends scala.annotation.StaticAnnotation {
+    extends scala.annotation.StaticAnnotation
   def this(clazz: Class[T]) = this("")
-}

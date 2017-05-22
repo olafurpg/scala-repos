@@ -20,11 +20,10 @@ import org.jetbrains.plugins.scala.lang.refactoring.introduceVariable.ScalaIntro
   * User: Alexander Podkhalyuzin
   * Date: 29.03.2009
   */
-class ScalaRefactoringSupportProvider extends RefactoringSupportProvider {
+class ScalaRefactoringSupportProvider extends RefactoringSupportProvider
   override def isInplaceRenameAvailable(
-      element: PsiElement, context: PsiElement) = {
+      element: PsiElement, context: PsiElement) =
     false // handled by ScalaInplaceRenameHandler
-  }
 
   override def getIntroduceConstantHandler: RefactoringActionHandler = null
 
@@ -38,16 +37,14 @@ class ScalaRefactoringSupportProvider extends RefactoringSupportProvider {
     new ScalaIntroduceParameterHandler
 
   override def isSafeDeleteAvailable(element: PsiElement): Boolean =
-    element match {
+    element match
       case _: ScTypeDefinition | _: ScFunction | _: ScFieldId |
           _: ScReferencePattern =>
         true
       case _ => false
-    }
 
   override def getExtractMethodHandler: RefactoringActionHandler =
     new ScalaExtractMethodHandler
 
   override def getChangeSignatureHandler: ChangeSignatureHandler =
     new ScalaChangeSignatureHandler
-}

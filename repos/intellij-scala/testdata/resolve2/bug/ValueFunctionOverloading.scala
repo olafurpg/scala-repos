@@ -1,4 +1,4 @@
-object ValueFunctionOverloading {
+object ValueFunctionOverloading
   def foo(x: Int): Int = x + 1
   val foo: String => String = "" + _
 
@@ -6,4 +6,3 @@ object ValueFunctionOverloading {
   foo(3)
   /* line: 3 */
   foo("")
-}

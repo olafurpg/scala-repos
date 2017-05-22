@@ -1,9 +1,6 @@
-abstract class Q[T] {
+abstract class Q[T]
   type t <: T
-}
 
-class User(q: Q[String]) {
-  def r(v: q.t) = {
+class User(q: Q[String])
+  def r(v: q.t) =
     v.< ref > toLowerCase
-  }
-}

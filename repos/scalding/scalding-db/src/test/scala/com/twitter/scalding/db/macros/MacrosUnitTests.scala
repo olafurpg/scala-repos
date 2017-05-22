@@ -15,7 +15,7 @@ import com.twitter.scalding.db._
 import java.sql.{ResultSet, ResultSetMetaData}
 import java.util.Date
 
-object User {
+object User
   // these defaults should not get picked up in ColumnDefinition
   def apply(): User = User(0, "username", Some(0), "female")
   def apply(date_id: Int): User = User(date_id, "username", Some(0), "female")
@@ -23,7 +23,6 @@ object User {
     User(date_id, username, Some(0), "female")
   def apply(date_id: Int, username: String, age: Option[Int]): User =
     User(date_id, username, age, "female")
-}
 
 case class User(date_id: Int,
                 @size(64) user_name: String,
@@ -41,9 +40,8 @@ case class BadUser3(@size(0) age: Int)
 case class BadUser5(user_name: Option[String] = Some("bob"), age: Int)
 
 case class BadUser6(user_names: List[String])
-object Consts {
+object Consts
   val cInt: Int = 13
-}
 case class BadUser7(@size(Consts.cInt) age: Int)
 case class BadUser8(age: Option[Option[Int]])
 case class BadUser9(@size(15) @text age: Option[Option[Int]])
@@ -78,73 +76,61 @@ case class OuterWithBadNesting(id: Int, // duplicate in nested case class
                                @text name: String,
                                details: InnerWithBadNesting)
 
-class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
+class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar
 
-  val dummy = new ColumnDefinitionProvider[Nothing] {
+  val dummy = new ColumnDefinitionProvider[Nothing]
     override val columns = Nil
     override val resultSetExtractor = null
-  }
 
   def isColumnDefinitionAvailable[T](
       implicit proof: ColumnDefinitionProvider[T] = dummy
-          .asInstanceOf[ColumnDefinitionProvider[T]]) {
+          .asInstanceOf[ColumnDefinitionProvider[T]])
     proof shouldBe a[MacroGenerated]
     proof.columns.isEmpty shouldBe false
-  }
 
   def isJDBCTypeInfoAvailable[T](
       implicit proof: DBTypeDescriptor[T] = dummy
-          .asInstanceOf[DBTypeDescriptor[T]]) {
+          .asInstanceOf[DBTypeDescriptor[T]])
     proof shouldBe a[MacroGenerated]
     proof.columnDefn.columns.isEmpty shouldBe false
-  }
 
-  "String field missing annotation" in {
+  "String field missing annotation" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser1]
-  }
 
-  "String field size annotation not in range" in {
+  "String field size annotation not in range" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser2]
-  }
 
-  "Int field size annotation not in range" in {
+  "Int field size annotation not in range" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser3]
-  }
 
-  "Option field with default" in {
+  "Option field with default" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser5]
-  }
 
-  "Unknown field type" in {
+  "Unknown field type" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser6]
-  }
 
-  "Annotation for size doesn't use a constant" in {
+  "Annotation for size doesn't use a constant" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser7]
-  }
 
-  "Nested options should be blocked" in {
+  "Nested options should be blocked" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser8]
-  }
 
-  "Extra annotation not supported on current field " in {
+  "Extra annotation not supported on current field " in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser9]
-  }
 
-  "Two annotations of the same type " in {
+  "Two annotations of the same type " in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         BadUser10]
-  }
 
-  "Produces the ColumnDefinition" should {
+  "Produces the ColumnDefinition" should
 
     isColumnDefinitionAvailable[User]
 
@@ -189,9 +175,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(
         columnDef.resultSetExtractor.toCaseClass(rs, typeDesc.converter) == User(
             123, "alice", Some(26), "F"))
-  }
 
-  "Produces the ColumnDefinition for nested case class " should {
+  "Produces the ColumnDefinition for nested case class " should
 
     isColumnDefinitionAvailable[User2]
 
@@ -222,9 +207,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(
         columnDef.resultSetExtractor.toCaseClass(rs, typeDesc.converter) == User2(
             123, "alice", Demographics(Some(26), "F")))
-  }
 
-  "Produces the DBTypeDescriptor" should {
+  "Produces the DBTypeDescriptor" should
     // explictly just call this to get a compiler error
     DBMacro.toDBTypeDescriptor[User]
     // ensure the implicit fires
@@ -243,9 +227,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
 
     assert(
         DBMacro.toDBTypeDescriptor[User].columnDefn.columns.toList === expectedColumns)
-  }
 
-  "Big Jdbc Test" should {
+  "Big Jdbc Test" should
 
     isColumnDefinitionAvailable[ExhaustiveJdbcCaseClass]
 
@@ -359,9 +342,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
             new Date(1111L),
             new Date(1112L),
             Some(1113L)))
-  }
 
-  "TupleConverter for Date" should {
+  "TupleConverter for Date" should
     val typeDesc = DBMacro.toDBTypeDescriptor[CaseClassWithDate]
     val converter = typeDesc.converter
     val date1 = new Date(100L)
@@ -372,9 +354,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     t.set(2, date2)
     assert(
         CaseClassWithDate(99L, date1, date2) == converter(new TupleEntry(t)))
-  }
 
-  "ResultSetExtractor for null values" should {
+  "ResultSetExtractor for null values" should
 
     val typeDesc = DBMacro.toDBTypeDescriptor[CaseClassWithOptions]
     val columnDef = typeDesc.columnDefn
@@ -404,9 +385,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     assert(
         columnDef.resultSetExtractor.toCaseClass(rs, typeDesc.converter) == CaseClassWithOptions(
             Some(0), None, None))
-  }
 
-  "ResultSetExtractor for DB schema type mismatch" in {
+  "ResultSetExtractor for DB schema type mismatch" in
     val typeDesc = DBMacro.toDBTypeDescriptor[CaseClassWithOptions]
     val columnDef = typeDesc.columnDefn
 
@@ -419,9 +399,8 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNullable)
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isFailure)
-  }
 
-  "ResultSetExtractor for DB schema nullable mismatch" in {
+  "ResultSetExtractor for DB schema nullable mismatch" in
     val typeDesc = DBMacro.toDBTypeDescriptor[CaseClassWithOptions]
     val columnDef = typeDesc.columnDefn
 
@@ -434,10 +413,7 @@ class JdbcMacroUnitTests extends WordSpec with Matchers with MockitoSugar {
     when(rsmd.isNullable(3)) thenReturn (ResultSetMetaData.columnNoNulls) // mismatch
 
     assert(columnDef.resultSetExtractor.validate(rsmd).isFailure)
-  }
 
-  "Duplicate nested fields should be blocked" in {
+  "Duplicate nested fields should be blocked" in
     a[TestFailedException] should be thrownBy isColumnDefinitionAvailable[
         OuterWithBadNesting]
-  }
-}

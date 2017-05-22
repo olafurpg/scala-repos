@@ -66,7 +66,7 @@ import scala.io.StdIn
   *  Short value to a Long value as required, and to add additional higher-order
   *  functions to Array values. These are described in more detail in the documentation of [[scala.Array]].
   */
-object Predef extends LowPriorityImplicits with DeprecatedPredef {
+object Predef extends LowPriorityImplicits with DeprecatedPredef
 
   /**
     * Retrieve the runtime representation of a class type. `classOf[T]` is equivalent to
@@ -155,9 +155,8 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     *  @param assertion   the expression to test
     */
   @elidable(ASSERTION)
-  def assert(assertion: Boolean) {
+  def assert(assertion: Boolean)
     if (!assertion) throw new java.lang.AssertionError("assertion failed")
-  }
 
   /** Tests an expression, throwing an `AssertionError` if false.
     *  Calls to this method will not be generated if `-Xelide-below`
@@ -169,10 +168,9 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     */
   @elidable(ASSERTION)
   @inline
-  final def assert(assertion: Boolean, message: => Any) {
+  final def assert(assertion: Boolean, message: => Any)
     if (!assertion)
       throw new java.lang.AssertionError("assertion failed: " + message)
-  }
 
   /** Tests an expression, throwing an `AssertionError` if false.
     *  This method differs from assert only in the intent expressed:
@@ -184,9 +182,8 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     *  @param assumption   the expression to test
     */
   @elidable(ASSERTION)
-  def assume(assumption: Boolean) {
+  def assume(assumption: Boolean)
     if (!assumption) throw new java.lang.AssertionError("assumption failed")
-  }
 
   /** Tests an expression, throwing an `AssertionError` if false.
     *  This method differs from assert only in the intent expressed:
@@ -200,10 +197,9 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     */
   @elidable(ASSERTION)
   @inline
-  final def assume(assumption: Boolean, message: => Any) {
+  final def assume(assumption: Boolean, message: => Any)
     if (!assumption)
       throw new java.lang.AssertionError("assumption failed: " + message)
-  }
 
   /** Tests an expression, throwing an `IllegalArgumentException` if false.
     *  This method is similar to `assert`, but blames the caller of the method
@@ -211,9 +207,8 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     *
     *  @param requirement   the expression to test
     */
-  def require(requirement: Boolean) {
+  def require(requirement: Boolean)
     if (!requirement) throw new IllegalArgumentException("requirement failed")
-  }
 
   /** Tests an expression, throwing an `IllegalArgumentException` if false.
     *  This method is similar to `assert`, but blames the caller of the method
@@ -222,10 +217,9 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     *  @param requirement   the expression to test
     *  @param message       a String to include in the failure message
     */
-  @inline final def require(requirement: Boolean, message: => Any) {
+  @inline final def require(requirement: Boolean, message: => Any)
     if (!requirement)
       throw new IllegalArgumentException("requirement failed: " + message)
-  }
 
   /** `???` can be used for marking methods that remain to be implemented.
     *  @throws NotImplementedError
@@ -237,80 +231,69 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
   @deprecated("Use built-in tuple syntax or Tuple2 instead", "2.11.0")
   type Pair[+A, +B] = Tuple2[A, B]
   @deprecated("Use built-in tuple syntax or Tuple2 instead", "2.11.0")
-  object Pair {
+  object Pair
     def apply[A, B](x: A, y: B) = Tuple2(x, y)
     def unapply[A, B](x: Tuple2[A, B]): Option[Tuple2[A, B]] = Some(x)
-  }
 
   @deprecated("Use built-in tuple syntax or Tuple3 instead", "2.11.0")
   type Triple[+A, +B, +C] = Tuple3[A, B, C]
   @deprecated("Use built-in tuple syntax or Tuple3 instead", "2.11.0")
-  object Triple {
+  object Triple
     def apply[A, B, C](x: A, y: B, z: C) = Tuple3(x, y, z)
     def unapply[A, B, C](x: Tuple3[A, B, C]): Option[Tuple3[A, B, C]] = Some(x)
-  }
 
   // implicit classes -----------------------------------------------------
 
-  implicit final class ArrowAssoc[A](private val self: A) extends AnyVal {
+  implicit final class ArrowAssoc[A](private val self: A) extends AnyVal
     @inline def ->[B](y: B): Tuple2[A, B] = Tuple2(self, y)
     def →[B](y: B): Tuple2[A, B] = ->(y)
-  }
 
-  implicit final class Ensuring[A](private val self: A) extends AnyVal {
+  implicit final class Ensuring[A](private val self: A) extends AnyVal
     def ensuring(cond: Boolean): A = { assert(cond); self }
     def ensuring(cond: Boolean, msg: => Any): A = { assert(cond, msg); self }
     def ensuring(cond: A => Boolean): A = { assert(cond(self)); self }
-    def ensuring(cond: A => Boolean, msg: => Any): A = {
+    def ensuring(cond: A => Boolean, msg: => Any): A =
       assert(cond(self), msg); self
-    }
-  }
 
-  implicit final class StringFormat[A](private val self: A) extends AnyVal {
+  implicit final class StringFormat[A](private val self: A) extends AnyVal
 
     /** Returns string formatted according to given `format` string.
       *  Format strings are as for `String.format`
       *  (@see java.lang.String.format).
       */
     @inline def formatted(fmtstr: String): String = fmtstr format self
-  }
 
   // SI-8229 retaining the pre 2.11 name for source compatibility in shadowing this implicit
-  implicit final class any2stringadd[A](private val self: A) extends AnyVal {
+  implicit final class any2stringadd[A](private val self: A) extends AnyVal
     def +(other: String): String = String.valueOf(self) + other
-  }
 
   implicit final class RichException(private val self: Throwable)
-      extends AnyVal {
+      extends AnyVal
     import scala.compat.Platform.EOL
     @deprecated("Use Throwable#getStackTrace", "2.11.0")
     def getStackTraceString = self.getStackTrace().mkString("", EOL, EOL)
-  }
 
   implicit final class SeqCharSequence(
       val __sequenceOfChars: scala.collection.IndexedSeq[Char])
-      extends CharSequence {
+      extends CharSequence
     def length: Int = __sequenceOfChars.length
     def charAt(index: Int): Char = __sequenceOfChars(index)
     def subSequence(start: Int, end: Int): CharSequence =
       new SeqCharSequence(__sequenceOfChars.slice(start, end))
     override def toString = __sequenceOfChars mkString ""
-  }
 
   implicit final class ArrayCharSequence(val __arrayOfChars: Array[Char])
-      extends CharSequence {
+      extends CharSequence
     def length: Int = __arrayOfChars.length
     def charAt(index: Int): Char = __arrayOfChars(index)
     def subSequence(start: Int, end: Int): CharSequence =
       new runtime.ArrayCharSequence(__arrayOfChars, start, end)
     override def toString = __arrayOfChars mkString ""
-  }
 
   implicit val StringCanBuildFrom: CanBuildFrom[String, Char, String] =
-    new CanBuildFrom[String, Char, String] {
+    new CanBuildFrom[String, Char, String]
       def apply(from: String) = apply()
       def apply() = mutable.StringBuilder.newBuilder
-    }
 
   @inline implicit def augmentString(x: String): StringOps = new StringOps(x)
   @inline implicit def unaugmentString(x: StringOps): String = x.repr
@@ -358,7 +341,7 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     new runtime.Tuple3Zipped.Ops(x)
 
   implicit def genericArrayOps[T](xs: Array[T]): ArrayOps[T] =
-    (xs match {
+    (xs match
       case x: Array[AnyRef] => refArrayOps[AnyRef](x)
       case x: Array[Boolean] => booleanArrayOps(x)
       case x: Array[Byte] => byteArrayOps(x)
@@ -370,7 +353,7 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
       case x: Array[Short] => shortArrayOps(x)
       case x: Array[Unit] => unitArrayOps(x)
       case null => null
-    }).asInstanceOf[ArrayOps[T]]
+    ).asInstanceOf[ArrayOps[T]]
 
   // TODO: when we remove, these should we drop the underscores from the new generation below? (For source compatibility in case someone was shadowing these.)
   @deprecated(
@@ -492,9 +475,8 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     */
   @implicitNotFound(msg = "Cannot prove that ${From} <:< ${To}.")
   sealed abstract class <:<[-From, +To] extends (From => To) with Serializable
-  private[this] final val singleton_<:< = new <:<[Any, Any] {
+  private[this] final val singleton_<:< = new <:<[Any, Any]
     def apply(x: Any): Any = x
-  }
   // The dollar prefix is to dodge accidental shadowing of this method
   // by a user-defined method of the same name (SI-7788).
   // The collections rely on this method.
@@ -509,28 +491,24 @@ object Predef extends LowPriorityImplicits with DeprecatedPredef {
     */
   @implicitNotFound(msg = "Cannot prove that ${From} =:= ${To}.")
   sealed abstract class =:=[From, To] extends (From => To) with Serializable
-  private[this] final val singleton_=:= = new =:=[Any, Any] {
+  private[this] final val singleton_=:= = new =:=[Any, Any]
     def apply(x: Any): Any = x
-  }
-  object =:= {
+  object =:=
     implicit def tpEquals[A]: A =:= A = singleton_=:=.asInstanceOf[A =:= A]
-  }
 
   /** A type for which there is always an implicit value.
     *  @see [[scala.Array$]], method `fallbackCanBuildFrom`
     */
   class DummyImplicit
 
-  object DummyImplicit {
+  object DummyImplicit
 
     /** An implicit value yielding a `DummyImplicit`.
       *   @see [[scala.Array$]], method `fallbackCanBuildFrom`
       */
     implicit def dummyImplicit: DummyImplicit = new DummyImplicit
-  }
-}
 
-private[scala] trait DeprecatedPredef { self: Predef.type =>
+private[scala] trait DeprecatedPredef  self: Predef.type =>
 
   // Deprecated stubs for any who may have been calling these methods directly.
   @deprecated("Use `ArrowAssoc`", "2.11.0")
@@ -576,7 +554,6 @@ private[scala] trait DeprecatedPredef { self: Predef.type =>
   def readf2(format: String) = StdIn.readf2(format)
   @deprecated("Use the method in `scala.io.StdIn`", "2.11.0")
   def readf3(format: String) = StdIn.readf3(format)
-}
 
 /** The `LowPriorityImplicits` class provides implicit values that
   *  are valid in all Scala compilation units without explicit qualification,
@@ -589,7 +566,7 @@ private[scala] trait DeprecatedPredef { self: Predef.type =>
 // SI-7335 Parents of Predef are defined in the same compilation unit to avoid
 // cyclic reference errors compiling the standard library *without* a previously
 // compiled copy on the classpath.
-private[scala] abstract class LowPriorityImplicits {
+private[scala] abstract class LowPriorityImplicits
   import mutable.WrappedArray
   import immutable.WrappedString
 
@@ -619,11 +596,10 @@ private[scala] abstract class LowPriorityImplicits {
   // Since the JVM thinks arrays are covariant, one 0-length Array[AnyRef]
   // is as good as another for all T <: AnyRef.  Instead of creating 100,000,000
   // unique ones by way of this implicit, let's share one.
-  implicit def wrapRefArray[T <: AnyRef](xs: Array[T]): WrappedArray[T] = {
+  implicit def wrapRefArray[T <: AnyRef](xs: Array[T]): WrappedArray[T] =
     if (xs eq null) null
     else if (xs.length == 0) WrappedArray.empty[T]
     else new WrappedArray.ofRef[T](xs)
-  }
 
   implicit def wrapIntArray(xs: Array[Int]): WrappedArray[Int] =
     if (xs ne null) new WrappedArray.ofInt(xs) else null
@@ -651,8 +627,6 @@ private[scala] abstract class LowPriorityImplicits {
 
   implicit def fallbackStringCanBuildFrom[T]: CanBuildFrom[
       String, T, immutable.IndexedSeq[T]] =
-    new CanBuildFrom[String, T, immutable.IndexedSeq[T]] {
+    new CanBuildFrom[String, T, immutable.IndexedSeq[T]]
       def apply(from: String) = immutable.IndexedSeq.newBuilder[T]
       def apply() = immutable.IndexedSeq.newBuilder[T]
-    }
-}

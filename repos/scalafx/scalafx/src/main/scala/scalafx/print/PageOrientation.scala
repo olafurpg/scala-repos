@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Companion Object for [[scalafx.print.PageOrientation]].
   */
 object PageOrientation
-    extends SFXEnumDelegateCompanion[jfxp.PageOrientation, PageOrientation] {
+    extends SFXEnumDelegateCompanion[jfxp.PageOrientation, PageOrientation]
 
   /**
     * The printable area's origin is at the bottom left of the paper.
@@ -60,7 +60,6 @@ object PageOrientation
 
   protected override def unsortedValues: Array[PageOrientation] =
     Array(Landscape, Portrait, ReverseLandcsape, ReversePortrait)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PageOrientation.html JavaFX PageOrientation]].

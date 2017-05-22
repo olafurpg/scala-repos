@@ -1,3 +1,2 @@
-object UseIvy {
+object UseIvy
   def yi = PublishedIvy.x
-}

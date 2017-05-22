@@ -28,7 +28,7 @@ import scala.collection.immutable.TreeMap
   */
 final class ResponseHeader(val status: Int,
                            _headers: Map[String, String] = Map.empty,
-                           val reasonPhrase: Option[String] = None) {
+                           val reasonPhrase: Option[String] = None)
   private[play] def this(status: Int,
                          _headers: java.util.Map[String, String],
                          reasonPhrase: Option[String]) =
@@ -46,13 +46,11 @@ final class ResponseHeader(val status: Int,
 
   override def toString = s"$status, $headers"
   override def hashCode = (status, headers).hashCode
-  override def equals(o: Any) = o match {
+  override def equals(o: Any) = o match
     case ResponseHeader(s, h, r) =>
       (s, h, r).equals((status, headers, reasonPhrase))
     case _ => false
-  }
-}
-object ResponseHeader {
+object ResponseHeader
   val basicDateFormatPattern = "EEE, dd MMM yyyy HH:mm:ss"
   val httpDateFormat: DateTimeFormatter = DateTimeFormat
     .forPattern(basicDateFormatPattern + " 'GMT'")
@@ -66,7 +64,6 @@ object ResponseHeader {
   def unapply(
       rh: ResponseHeader): Option[(Int, Map[String, String], Option[String])] =
     if (rh eq null) None else Some((rh.status, rh.headers, rh.reasonPhrase))
-}
 
 /**
   * A simple result, which defines the response header and a body ready to send to the client.
@@ -74,7 +71,7 @@ object ResponseHeader {
   * @param header the response header, which contains status code and HTTP headers
   * @param body the response body
   */
-case class Result(header: ResponseHeader, body: HttpEntity) {
+case class Result(header: ResponseHeader, body: HttpEntity)
 
   /**
     * Adds headers to this result.
@@ -87,22 +84,20 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @param headers the headers to add to this result.
     * @return the new result
     */
-  def withHeaders(headers: (String, String)*): Result = {
+  def withHeaders(headers: (String, String)*): Result =
     copy(header = header.copy(headers = header.headers ++ headers))
-  }
 
   /**
     * Add a header with a DateTime formatted using the default http date format
     * @param headers the headers with a DateTime to add to this result.
     * @return the new result.
     */
-  def withDateHeaders(headers: (String, DateTime)*): Result = {
+  def withDateHeaders(headers: (String, DateTime)*): Result =
     copy(
-        header = header.copy(headers = header.headers ++ headers.map {
+        header = header.copy(headers = header.headers ++ headers.map
       case (name, dateTime) =>
         (name, ResponseHeader.httpDateFormat.print(dateTime.getMillis))
-    }))
-  }
+    ))
 
   /**
     * Adds cookies to this result. If the result already contains
@@ -116,14 +111,12 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @param cookies the cookies to add to this result
     * @return the new result
     */
-  def withCookies(cookies: Cookie*): Result = {
+  def withCookies(cookies: Cookie*): Result =
     if (cookies.isEmpty) this
-    else {
+    else
       withHeaders(
           SET_COOKIE -> Cookies.mergeSetCookieHeader(
               header.headers.getOrElse(SET_COOKIE, ""), cookies))
-    }
-  }
 
   /**
     * Discards cookies along this result.
@@ -136,11 +129,10 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @param cookies the cookies to discard along to this result
     * @return the new result
     */
-  def discardingCookies(cookies: DiscardingCookie*): Result = {
+  def discardingCookies(cookies: DiscardingCookie*): Result =
     withHeaders(
         SET_COOKIE -> Cookies.mergeSetCookieHeader(
             header.headers.getOrElse(SET_COOKIE, ""), cookies.map(_.toCookie)))
-  }
 
   /**
     * Sets a new session for this result.
@@ -153,10 +145,9 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @param session the session to set with this result
     * @return the new result
     */
-  def withSession(session: Session): Result = {
+  def withSession(session: Session): Result =
     if (session.isEmpty) discardingCookies(Session.discard)
     else withCookies(Session.encodeAsCookie(session))
-  }
 
   /**
     * Sets a new session for this result, discarding the existing session.
@@ -195,12 +186,10 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
     * @param flash the flash scope to set with this result
     * @return the new result
     */
-  def flashing(flash: Flash): Result = {
-    if (shouldWarnIfNotRedirect(flash)) {
+  def flashing(flash: Flash): Result =
+    if (shouldWarnIfNotRedirect(flash))
       logRedirectWarning("flashing")
-    }
     withCookies(Flash.encodeAsCookie(flash))
-  }
 
   /**
     * Adds values to the flash scope for this result.
@@ -236,10 +225,9 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
   def session(implicit request: RequestHeader): Session =
     Cookies
       .fromCookieHeader(header.headers.get(SET_COOKIE))
-      .get(Session.COOKIE_NAME) match {
+      .get(Session.COOKIE_NAME) match
       case Some(cookie) => Session.decodeFromCookie(Some(cookie))
       case None => request.session
-    }
 
   /**
     * Example:
@@ -267,34 +255,30 @@ case class Result(header: ResponseHeader, body: HttpEntity) {
       implicit request: RequestHeader): Result =
     withSession(new Session(session.data -- keys))
 
-  override def toString = {
+  override def toString =
     "Result(" + header + ")"
-  }
 
   /**
     * Returns true if the status code is not 3xx and the application is in Dev mode.
     */
-  private def shouldWarnIfNotRedirect(flash: Flash): Boolean = {
+  private def shouldWarnIfNotRedirect(flash: Flash): Boolean =
     play.api.Play.privateMaybeApplication.exists(app =>
           (app.mode == play.api.Mode.Dev) && (!flash.isEmpty) &&
           (header.status < 300 || header.status > 399))
-  }
 
   /**
     * Logs a redirect warning.
     */
-  private def logRedirectWarning(methodName: String) {
+  private def logRedirectWarning(methodName: String)
     val status = header.status
     play.api
       .Logger("play")
       .warn(s"You are using status code '$status' with $methodName, which should only be used with a redirect status!")
-  }
 
   /**
     * Convert this result to a Java result.
     */
   def asJava: play.mvc.Result = new play.mvc.Result(header, body.asJava)
-}
 
 /**
   * A Codec handle the conversion of String to Byte arrays.
@@ -308,7 +292,7 @@ case class Codec(charset: String)(
 /**
   * Default Codec support.
   */
-object Codec {
+object Codec
 
   /**
     * Create a Codec from an encoding already supported by the JVM.
@@ -326,9 +310,8 @@ object Codec {
     * Codec for ISO-8859-1
     */
   val iso_8859_1 = javaSupported("iso-8859-1")
-}
 
-trait LegacyI18nSupport {
+trait LegacyI18nSupport
 
   /**
     * Adds convenient methods to handle the client-side language.
@@ -336,7 +319,7 @@ trait LegacyI18nSupport {
     * This class exists only for backward compatibility.
     */
   implicit class ResultWithLang(result: Result)(
-      implicit messagesApi: MessagesApi) {
+      implicit messagesApi: MessagesApi)
 
     /**
       * Sets the user's language permanently for future requests by storing it in a cookie.
@@ -365,18 +348,15 @@ trait LegacyI18nSupport {
       */
     def clearingLang: Result =
       messagesApi.clearLang(result)
-  }
-}
 
 /** Helper utilities to generate results. */
-object Results extends Results with LegacyI18nSupport {
+object Results extends Results with LegacyI18nSupport
 
   /** Empty result, i.e. nothing to send. */
   case class EmptyContent()
-}
 
 /** Helper utilities to generate results. */
-trait Results {
+trait Results
 
   import play.api.http.Status._
 
@@ -387,32 +367,30 @@ trait Results {
     */
   class Status(status: Int)
       extends Result(
-          header = ResponseHeader(status), body = HttpEntity.NoEntity) {
+          header = ResponseHeader(status), body = HttpEntity.NoEntity)
 
     /**
       * Set the result's content.
       *
       * @param content The content to send.
       */
-    def apply[C](content: C)(implicit writeable: Writeable[C]): Result = {
+    def apply[C](content: C)(implicit writeable: Writeable[C]): Result =
       Result(
           header,
           writeable.toEntity(content)
       )
-    }
 
     private def streamFile(file: Source[ByteString, _],
                            name: String,
                            length: Long,
-                           inline: Boolean): Result = {
+                           inline: Boolean): Result =
       Result(
           ResponseHeader(status,
                          Map(
-                             CONTENT_DISPOSITION -> {
+                             CONTENT_DISPOSITION ->
                                val dispositionType =
                                  if (inline) "inline" else "attachment"
                                dispositionType + "; filename=\"" + name + "\""
-                             }
                          )),
           HttpEntity.Streamed(
               file,
@@ -422,7 +400,6 @@ trait Results {
                 .orElse(Some(play.api.http.ContentTypes.BINARY))
             )
         )
-    }
 
     /**
       * Send a file.
@@ -434,13 +411,12 @@ trait Results {
     def sendFile(content: java.io.File,
                  inline: Boolean = false,
                  fileName: java.io.File => String = _.getName,
-                 onClose: () => Unit = () => ()): Result = {
+                 onClose: () => Unit = () => ()): Result =
       streamFile(StreamConverters.fromInputStream(
                      () => Files.newInputStream(content.toPath)),
                  fileName(content),
                  content.length,
                  inline)
-    }
 
     /**
       * Send a file.
@@ -452,13 +428,12 @@ trait Results {
     def sendPath(content: Path,
                  inline: Boolean = false,
                  fileName: Path => String = _.getFileName.toString,
-                 onClose: () => Unit = () => ()): Result = {
+                 onClose: () => Unit = () => ()): Result =
       streamFile(StreamConverters.fromInputStream(
                      () => Files.newInputStream(content)),
                  fileName(content),
                  Files.size(content),
                  inline)
-    }
 
     /**
       * Send the given resource from the given classloader.
@@ -470,14 +445,13 @@ trait Results {
     def sendResource(
         resource: String,
         classLoader: ClassLoader = Results.getClass.getClassLoader,
-        inline: Boolean = true): Result = {
+        inline: Boolean = true): Result =
       val stream = classLoader.getResourceAsStream(resource)
       val fileName = resource.split('/').last
       streamFile(StreamConverters.fromInputStream(() => stream),
                  fileName,
                  stream.available(),
                  inline)
-    }
 
     /**
       * Feed the content as the response, using chunked transfer encoding.
@@ -491,14 +465,13 @@ trait Results {
       * @param content Source providing the content to stream.
       */
     def chunked[C](content: Source[C, _])(
-        implicit writeable: Writeable[C]): Result = {
+        implicit writeable: Writeable[C]): Result =
       Result(
           header = header,
           body = HttpEntity.Chunked(
                 content.map(c => HttpChunk.Chunk(writeable.transform(c))),
                 writeable.contentType)
       )
-    }
 
     /**
       * Feed the content as the response, using chunked transfer encoding.
@@ -513,9 +486,8 @@ trait Results {
       */
     @deprecated("Use chunked with an Akka streams Source instead", "2.5.0")
     def chunked[C](content: Enumerator[C])(
-        implicit writeable: Writeable[C]): Result = {
+        implicit writeable: Writeable[C]): Result =
       chunked(Source.fromPublisher(Streams.enumeratorToPublisher(content)))
-    }
 
     /**
       * Feed the content as the response, closing the connection when done.
@@ -524,7 +496,7 @@ trait Results {
       */
     @deprecated("Use sendEntity with a Streamed entity instead", "2.5.0")
     def feed[C](content: Enumerator[C])(
-        implicit writeable: Writeable[C]): Result = {
+        implicit writeable: Writeable[C]): Result =
       Result(
           header = header,
           body = HttpEntity.Streamed(
@@ -534,18 +506,15 @@ trait Results {
                 None,
                 writeable.contentType)
       )
-    }
 
     /**
       * Send an HTTP entity with this status.
       */
-    def sendEntity(entity: HttpEntity): Result = {
+    def sendEntity(entity: HttpEntity): Result =
       Result(
           header = header,
           body = entity
       )
-    }
-  }
 
   /** Generates a ‘200 OK’ result. */
   val Ok = new Status(OK)
@@ -721,21 +690,19 @@ trait Results {
     */
   def Redirect(url: String,
                queryString: Map[String, Seq[String]] = Map.empty,
-               status: Int = SEE_OTHER) = {
+               status: Int = SEE_OTHER) =
     import java.net.URLEncoder
     val fullUrl =
       url + Option(queryString)
         .filterNot(_.isEmpty)
-        .map { params =>
-          (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap {
+        .map  params =>
+          (if (url.contains("?")) "&" else "?") + params.toSeq.flatMap
             pair =>
               pair._2.map(
                   value => (pair._1 + "=" + URLEncoder.encode(value, "utf-8")))
-          }.mkString("&")
-        }
+          .mkString("&")
         .getOrElse("")
     Status(status).withHeaders(LOCATION -> fullUrl)
-  }
 
   /**
     * Generates a redirect simple result.
@@ -752,4 +719,3 @@ trait Results {
     */
   def Redirect(call: Call, status: Int): Result =
     Redirect(call.url, Map.empty, status)
-}

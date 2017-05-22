@@ -22,7 +22,7 @@ import org.hyperic.sigar.SigarProxy
   *
   * Implementations of cluster system metrics collectors extend this trait.
   */
-trait MetricsCollector extends Closeable {
+trait MetricsCollector extends Closeable
 
   /**
     * Samples and collects new data points.
@@ -30,7 +30,6 @@ trait MetricsCollector extends Closeable {
     * current metrics for this node.
     */
   def sample(): NodeMetrics
-}
 
 /**
   * INTERNAL API
@@ -42,10 +41,10 @@ trait MetricsCollector extends Closeable {
   * 2) Internal [[SigarMetricsCollector]]
   * 3) Internal [[JmxMetricsCollector]]
   */
-private[metrics] object MetricsCollector {
+private[metrics] object MetricsCollector
 
   /** Try to create collector instance in the order of priority. */
-  def apply(system: ActorSystem): MetricsCollector = {
+  def apply(system: ActorSystem): MetricsCollector =
     val log = Logging(system, getClass.getName)
     val settings = ClusterMetricsSettings(system.settings.config)
     import settings._
@@ -57,7 +56,7 @@ private[metrics] object MetricsCollector {
     val useCustom = !CollectorFallback
     val useInternal = CollectorFallback && CollectorProvider == ""
 
-    def create(provider: String) = TryNative {
+    def create(provider: String) = TryNative
       log.debug(s"Trying ${provider}.")
       system
         .asInstanceOf[ExtendedActorSystem]
@@ -65,7 +64,6 @@ private[metrics] object MetricsCollector {
         .createInstanceFor[MetricsCollector](
             provider, List(classOf[ActorSystem] -> system))
         .get
-    }
 
     val collector =
       if (useCustom) create(collectorCustom)
@@ -75,13 +73,11 @@ private[metrics] object MetricsCollector {
         create(collectorCustom) orElse create(collectorSigar) orElse create(
             collectorJMX)
 
-    collector.recover {
+    collector.recover
       case e ⇒
         throw new ConfigurationException(
             s"Could not create metrics collector: ${e}")
-    }.get
-  }
-}
+    .get
 
 /**
   * Loads JVM and system metrics through JMX monitoring beans.
@@ -90,7 +86,7 @@ private[metrics] object MetricsCollector {
   * @param decayFactor how quickly the exponential weighting of past data is decayed
   */
 class JmxMetricsCollector(address: Address, decayFactor: Double)
-    extends MetricsCollector {
+    extends MetricsCollector
   import StandardMetrics._
 
   private def this(address: Address, settings: ClusterMetricsSettings) =
@@ -121,14 +117,13 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
     * Generate metrics set.
     * Creates a new instance each time.
     */
-  def metrics(): Set[Metric] = {
+  def metrics(): Set[Metric] =
     val heap = heapMemoryUsage
     Set(systemLoadAverage,
         heapUsed(heap),
         heapCommitted(heap),
         heapMax(heap),
         processors).flatten
-  }
 
   /**
     * (JMX) Returns the OS-specific average load on the CPUs in the system, for the past 1 minute.
@@ -185,7 +180,6 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
         name = HeapMemoryMax, value = heap.getMax, decayFactor = None)
 
   override def close(): Unit = ()
-}
 
 /**
   * Loads metrics through Hyperic SIGAR and JMX monitoring beans. This
@@ -201,7 +195,7 @@ class JmxMetricsCollector(address: Address, decayFactor: Double)
   */
 class SigarMetricsCollector(
     address: Address, decayFactor: Double, sigar: SigarProxy)
-    extends JmxMetricsCollector(address, decayFactor) {
+    extends JmxMetricsCollector(address, decayFactor)
 
   import StandardMetrics._
   import org.hyperic.sigar.CpuPerc
@@ -231,11 +225,10 @@ class SigarMetricsCollector(
 
   // Construction complete.
 
-  override def metrics(): Set[Metric] = {
+  override def metrics(): Set[Metric] =
     // Must obtain cpuPerc in one shot. See https://github.com/akka/akka/issues/16121
     val cpuPerc = sigar.getCpuPerc
     super.metrics union Set(cpuCombined(cpuPerc), cpuStolen(cpuPerc)).flatten
-  }
 
   /**
     * (SIGAR) Returns the OS-specific average load on the CPUs in the system, for the past 1 minute.
@@ -289,4 +282,3 @@ class SigarMetricsCollector(
     * Releases any native resources associated with this instance.
     */
   override def close(): Unit = SigarProvider.close(sigar)
-}

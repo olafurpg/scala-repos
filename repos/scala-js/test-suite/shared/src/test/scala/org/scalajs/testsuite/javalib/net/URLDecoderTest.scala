@@ -7,38 +7,34 @@ import org.scalajs.testsuite.utils.AssertThrows._
 import java.net.URLDecoder
 import java.io.UnsupportedEncodingException
 
-class URLDecoderTest {
+class URLDecoderTest
 
   private final val utf8 = "utf-8"
   private final val ReplacementChar = '\uFFFD'
 
   @Test
-  def decodeTest(): Unit = {
+  def decodeTest(): Unit =
     def test(encoded: String, expected: String, enc: String = utf8): Unit =
       assertEquals(URLDecoder.decode(encoded, enc), expected)
 
     def illegalArgumentOrReplacement(
-        encoded: String, enc: String = utf8): Unit = {
-      val thrown = {
-        try {
+        encoded: String, enc: String = utf8): Unit =
+      val thrown =
+        try
           val res = URLDecoder.decode(encoded, enc)
 
           /* It is valid to return the Unicode replacement character (U+FFFD)
            * when encountering an invalid codepoint.
            */
           res.contains(ReplacementChar)
-        } catch {
+        catch
           case _: IllegalArgumentException => true
-        }
-      }
 
       assertTrue(thrown)
-    }
 
-    def unsupportedEncoding(encoded: String, enc: String = utf8): Unit = {
+    def unsupportedEncoding(encoded: String, enc: String = utf8): Unit =
       val exception = classOf[UnsupportedEncodingException]
       assertThrows(exception, URLDecoder.decode(encoded, enc))
-    }
 
     // empty string
     test("", "")
@@ -73,5 +69,3 @@ class URLDecoderTest {
     test("a%00%20b%00%20c", "a b c", enc = "utf-16be")
     test("a%20%00b%20%00c", "a b c", enc = "utf-16le")
     test("a%fe%ff%00%20b%fe%ff%00%20c", "a b c", enc = "utf-16")
-  }
-}

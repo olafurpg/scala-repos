@@ -21,68 +21,51 @@ import org.scalacheck.{Gen, Arbitrary}
 import org.scalacheck.Prop._
 import Serde.serializedCopy
 
-class FrameCheck extends Specification with ScalaCheck {
+class FrameCheck extends Specification with ScalaCheck
 
-  "Frame Tests" in {
+  "Frame Tests" in
     implicit val frame = Arbitrary(FrameArbitraries.frameDoubleWithNA)
 
-    "frame equality" in {
-      forAll { (f: Frame[Int, Int, Double]) =>
+    "frame equality" in
+      forAll  (f: Frame[Int, Int, Double]) =>
         (f must_== f.col(*)) and (f must_== f)
-      }
-    }
 
-    "frame sortedRowsBy" in {
-      forAll { (f: Frame[Int, Int, Double]) =>
-        if (f.numCols > 0) {
-          val res = f.sortedRowsBy { x =>
+    "frame sortedRowsBy" in
+      forAll  (f: Frame[Int, Int, Double]) =>
+        if (f.numCols > 0)
+          val res = f.sortedRowsBy  x =>
             x.at(0)
-          }
           val ord = array.argsort(f.colAt(0).toVec)
           val exp = f.rowAt(ord)
           res must_== exp
-        } else f must_== Frame.empty[Int, Int, Double]
-      }
-    }
+        else f must_== Frame.empty[Int, Int, Double]
 
-    "frame colSplitAt works" in {
-      forAll { (f: Frame[Int, Int, Double]) =>
+    "frame colSplitAt works" in
+      forAll  (f: Frame[Int, Int, Double]) =>
         val idx = Gen.choose(0, f.numCols - 1)
-        forAll(idx) { i =>
+        forAll(idx)  i =>
           val (l, r) = f.colSplitAt(i)
           l.numCols must_== i
           r.numCols must_== f.numCols - i
           (l rconcat r) must_== f
-        }
-      }
-    }
 
-    "frame rowSplitAt works" in {
-      forAll { (f: Frame[Int, Int, Double]) =>
+    "frame rowSplitAt works" in
+      forAll  (f: Frame[Int, Int, Double]) =>
         val idx = Gen.choose(0, f.numRows - 1)
-        forAll(idx) { i =>
+        forAll(idx)  i =>
           val (l, r) = f.rowSplitAt(i)
           l.numRows must_== i
           r.numRows must_== f.numRows - i
           (l concat r) must_== f
-        }
-      }
-    }
 
-    "Stringify works for one col, zero rows" in {
+    "Stringify works for one col, zero rows" in
       val f = Frame(Array(Vec.empty[Double]): _*)
       f.toString must throwAn[RuntimeException].not
-    }
 
-    "Transpose must work for a string frame" in {
+    "Transpose must work for a string frame" in
       val f = Frame(Vec("a", "b", "c"), Vec("d", "e", "f"))
       f.T must_== Frame(Vec("a", "d"), Vec("b", "e"), Vec("c", "f"))
-    }
 
-    "serialization works" in {
-      forAll { f: Frame[Int, Int, Double] =>
+    "serialization works" in
+      forAll  f: Frame[Int, Int, Double] =>
         f must_== serializedCopy(f)
-      }
-    }
-  }
-}

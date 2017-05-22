@@ -19,12 +19,11 @@ package kafka.utils
 import org.apache.log4j.{Logger, Level, LogManager}
 import java.util
 
-object Log4jController {
+object Log4jController
 
   private val controller = new Log4jController
 
   CoreUtils.registerMBean(controller, "kafka:type=kafka.Log4jController")
-}
 
 /**
   * An MBean that allows the user to dynamically alter log4j levels at runtime.
@@ -32,22 +31,19 @@ object Log4jController {
   * registers the MBean. The [[kafka.utils.Logging]] trait forces initialization
   * of the companion object.
   */
-private class Log4jController extends Log4jControllerMBean {
+private class Log4jController extends Log4jControllerMBean
 
-  def getLoggers = {
+  def getLoggers =
     val lst = new util.ArrayList[String]()
     lst.add("root=" + existingLogger("root").getLevel.toString)
     val loggers = LogManager.getCurrentLoggers
-    while (loggers.hasMoreElements) {
+    while (loggers.hasMoreElements)
       val logger = loggers.nextElement().asInstanceOf[Logger]
-      if (logger != null) {
+      if (logger != null)
         val level = if (logger != null) logger.getLevel else null
         lst.add("%s=%s".format(
                 logger.getName, if (level != null) level.toString else "null"))
-      }
-    }
     lst
-  }
 
   private def newLogger(loggerName: String) =
     if (loggerName == "root") LogManager.getRootLogger
@@ -57,26 +53,22 @@ private class Log4jController extends Log4jControllerMBean {
     if (loggerName == "root") LogManager.getRootLogger
     else LogManager.exists(loggerName)
 
-  def getLogLevel(loggerName: String) = {
+  def getLogLevel(loggerName: String) =
     val log = existingLogger(loggerName)
-    if (log != null) {
+    if (log != null)
       val level = log.getLevel
       if (level != null) log.getLevel.toString
       else "Null log level."
-    } else "No such logger."
-  }
+    else "No such logger."
 
-  def setLogLevel(loggerName: String, level: String) = {
+  def setLogLevel(loggerName: String, level: String) =
     val log = newLogger(loggerName)
-    if (!loggerName.trim.isEmpty && !level.trim.isEmpty && log != null) {
+    if (!loggerName.trim.isEmpty && !level.trim.isEmpty && log != null)
       log.setLevel(Level.toLevel(level.toUpperCase))
       true
-    } else false
-  }
-}
+    else false
 
-private trait Log4jControllerMBean {
+private trait Log4jControllerMBean
   def getLoggers: java.util.List[String]
   def getLogLevel(logger: String): String
   def setLogLevel(logger: String, level: String): Boolean
-}

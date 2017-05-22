@@ -12,7 +12,7 @@ import scala.concurrent.Future
 /**
   * Java API: abstract snapshot store.
   */
-abstract class SnapshotStore extends SSnapshotStore with SnapshotStorePlugin {
+abstract class SnapshotStore extends SSnapshotStore with SnapshotStorePlugin
   import context.dispatcher
 
   override final def loadAsync(
@@ -32,4 +32,3 @@ abstract class SnapshotStore extends SSnapshotStore with SnapshotStorePlugin {
       criteria: SnapshotSelectionCriteria): Future[Unit] =
     doDeleteAsync(persistenceId: String, criteria: SnapshotSelectionCriteria)
       .map(_ ⇒ ())
-}

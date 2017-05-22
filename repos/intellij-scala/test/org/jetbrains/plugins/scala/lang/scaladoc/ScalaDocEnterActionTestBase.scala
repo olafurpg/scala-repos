@@ -11,23 +11,21 @@ import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettin
   * Date: 2/6/12
   */
 abstract class ScalaDocEnterActionTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
-  override protected def setUp(): Unit = {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
+  override protected def setUp(): Unit =
     super.setUp()
     getCurrentCodeStyleSettings
       .getCustomSettings(classOf[ScalaCodeStyleSettings])
       .USE_SCALADOC2_FORMATTING = false
-  }
 
   protected def checkGeneratedTextFromString(
-      header: String, footer: String, assumedStub: String) {
+      header: String, footer: String, assumedStub: String)
     checkGeneratedTextFromString(header, footer, assumedStub, a => a)
-  }
 
   protected def checkGeneratedTextFromString(header: String,
                                              footer: String,
                                              assumedStub: String,
-                                             transform: String => String) {
+                                             transform: String => String)
     configureFromFileTextAdapter("dummy.scala", header + footer)
     getEditorAdapter.getCaretModel.moveToOffset(header.length - 1)
     val enterHandler = EditorActionManager
@@ -37,16 +35,12 @@ abstract class ScalaDocEnterActionTestBase
     enterHandler.execute(
         getEditorAdapter,
         getEditorAdapter.getCaretModel.getCurrentCaret,
-        new DataContext {
-          def getData(dataId: String): AnyRef = {
-            dataId match {
+        new DataContext
+          def getData(dataId: String): AnyRef =
+            dataId match
               case "Language" | "language" => getFileAdapter.getLanguage
               case "Project" | "project" => getFileAdapter.getProject
               case _ => null
-            }
-          }
-        })
+        )
 
     assert(transform(getFileAdapter.getText).equals(assumedStub))
-  }
-}

@@ -25,33 +25,26 @@ import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.fs.Path
 
 class HDFSModels(fs: FileSystem, config: StorageClientConfig, prefix: String)
-    extends Models with Logging {
+    extends Models with Logging
 
-  def insert(i: Model): Unit = {
-    try {
+  def insert(i: Model): Unit =
+    try
       val fsdos = fs.create(new Path(s"$prefix${i.id}"))
       fsdos.write(i.models)
       fsdos.close
-    } catch {
+    catch
       case e: IOException => error(e.getMessage)
-    }
-  }
 
-  def get(id: String): Option[Model] = {
-    try {
+  def get(id: String): Option[Model] =
+    try
       val p = new Path(s"$prefix$id")
       Some(Model(id = id, models = ByteStreams.toByteArray(fs.open(p))))
-    } catch {
+    catch
       case e: Throwable =>
         error(e.getMessage)
         None
-    }
-  }
 
-  def delete(id: String): Unit = {
+  def delete(id: String): Unit =
     val p = new Path(s"$prefix$id")
-    if (!fs.delete(p, false)) {
+    if (!fs.delete(p, false))
       error(s"Unable to delete ${fs.makeQualified(p).toString}!")
-    }
-  }
-}

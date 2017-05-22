@@ -78,7 +78,7 @@ trait SceneIncludes
   * @define SNP SnapshotParameters
   * @define SSCE SubScene
   */
-trait LowerPriorityIncludes {
+trait LowerPriorityIncludes
 
   implicit def jfxAccessibleAction2sfx(
       e: jfxs.AccessibleAction): AccessibleAction =
@@ -205,11 +205,10 @@ trait LowerPriorityIncludes {
     * @throws java.lang.IllegalArgumentException if `v` has no known correspondence in ScalaFX.
     */
   implicit def jfxSceneAntialiasing2sfx(
-      v: jfxs.SceneAntialiasing): SceneAntialiasing = {
+      v: jfxs.SceneAntialiasing): SceneAntialiasing =
     // A value of null is treated as though antialiasing is disabled.
     if (v eq null) SceneAntialiasing.Disabled
     else new SceneAntialiasing(v)
-  }
 
   /**
     * Generates a $SCP from a $JFX $SCE.
@@ -239,4 +238,3 @@ trait LowerPriorityIncludes {
     */
   implicit def jfxSubScene2sfx(v: jfxs.SubScene): SubScene =
     if (v != null) new SubScene(v) else null
-}

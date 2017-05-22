@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
 2 ; 3
@@ -14,4 +14,3 @@ object Bovine { var x: List[_] = null } ; case class Ruminant(x: Int) ; bippy * 
 Bovine.x = List(Ruminant(5), Cow, new Moo)
 Bovine.x
   """
-}

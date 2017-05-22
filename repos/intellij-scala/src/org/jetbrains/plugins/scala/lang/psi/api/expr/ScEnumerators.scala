@@ -8,7 +8,7 @@ package expr
   * @author Alexander Podkhalyuzin
   * Date: 06.03.2008
   */
-trait ScEnumerators extends ScalaPsiElement {
+trait ScEnumerators extends ScalaPsiElement
 
   def enumerators: Seq[ScEnumerator]
 
@@ -17,4 +17,3 @@ trait ScEnumerators extends ScalaPsiElement {
   def guards: Seq[ScGuard]
 
   def namings: Seq[ScPatterned]
-}

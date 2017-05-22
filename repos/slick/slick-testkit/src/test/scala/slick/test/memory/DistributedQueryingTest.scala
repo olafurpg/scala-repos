@@ -11,30 +11,27 @@ import scala.concurrent.{Await, ExecutionContext}
 import ExecutionContext.Implicits.global
 
 /** Test for the DistributedProfile */
-class DistributedQueryingTest {
+class DistributedQueryingTest
   val dc1 = DatabaseConfig.forConfig[JdbcProfile]("distrib1")
   val dc2 = DatabaseConfig.forConfig[JdbcProfile]("distrib2")
   val dProfile = new DistributedProfile(dc1.profile, dc2.profile)
 
-  val ts = {
+  val ts =
     import dc1.profile.api._
-    class T(tag: Tag) extends Table[(Int, Int, String)](tag, "tdb1_T") {
+    class T(tag: Tag) extends Table[(Int, Int, String)](tag, "tdb1_T")
       def id = column[Int]("id", O.PrimaryKey)
       def a = column[Int]("a")
       def b = column[String]("b")
       def * = (id, a, b)
-    }
     TableQuery[T]
-  }
 
   class U(tag: slick.lifted.Tag)
-      extends dc2.profile.Table[(Int, Int, String)](tag, "tdb2_U") {
+      extends dc2.profile.Table[(Int, Int, String)](tag, "tdb2_U")
     import dc2.profile.api._
     def id = column[Int]("id", O.PrimaryKey)
     def a = column[Int]("a")
     def b = column[String]("b")
     def * = (id, a, b)
-  }
   val us = slick.lifted.TableQuery[U]
 
   val tData = Seq((1, 1, "a"),
@@ -51,22 +48,19 @@ class DistributedQueryingTest {
                   (6, 3, "F"))
 
   @Test
-  def test1: Unit = {
-    try {
-      try {
+  def test1: Unit =
+    try
+      try
         val db = DistributedBackend.Database(
             Seq(dc1.db, dc2.db), ExecutionContext.global);
-        {
           import dc1.profile.api._
           Await.result(dc1.db.run(DBIO.seq(ts.schema.create, ts ++= tData)),
                        Duration.Inf)
-        };
-        {
+        ;
           import dc2.profile.api._
           Await.result(dc2.db.run(DBIO.seq(us.schema.create, us ++= uData)),
                        Duration.Inf)
-        };
-        {
+        ;
           import dProfile.api._
           Await.result(
               db.run(
@@ -83,8 +77,5 @@ class DistributedQueryingTest {
                                   d.toSet))
                     )),
               Duration.Inf)
-        }
-      } finally dc2.db.close
-    } finally dc1.db.close
-  }
-}
+      finally dc2.db.close
+    finally dc1.db.close

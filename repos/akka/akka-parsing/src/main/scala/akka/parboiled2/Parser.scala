@@ -25,7 +25,7 @@ import akka.parboiled2.support._
 
 abstract class Parser(initialValueStackSize: Int = 16,
                       maxValueStackSize: Int = 1024)
-    extends RuleDSL {
+    extends RuleDSL
   import Parser._
 
   require(
@@ -83,10 +83,9 @@ abstract class Parser(initialValueStackSize: Int = 16,
     * Returns the input character at the index with the given offset from the cursor.
     * If this index is out of range the method returns `EOI`.
     */
-  def charAtRC(offset: Int): Char = {
+  def charAtRC(offset: Int): Char =
     val ix = _cursor + offset
     if (0 <= ix && ix < input.length) input.charAt(ix) else EOI
-  }
 
   /**
     * Allows "raw" (i.e. untyped) access to the `ValueStack`.
@@ -124,13 +123,12 @@ abstract class Parser(initialValueStackSize: Int = 16,
   // the current ErrorAnalysisPhase or null (in the initial run)
   private var phase: ErrorAnalysisPhase = _
 
-  def copyStateFrom(other: Parser, offset: Int): Unit = {
+  def copyStateFrom(other: Parser, offset: Int): Unit =
     _cursorChar = other._cursorChar
     _cursor = other._cursor - offset
     _valueStack = other._valueStack
     phase = other.phase
     if (phase ne null) phase.applyOffset(offset)
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -141,51 +139,44 @@ abstract class Parser(initialValueStackSize: Int = 16,
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   def __run[L <: HList](rule: ⇒ RuleN[L])(
-      implicit scheme: Parser.DeliveryScheme[L]): scheme.Result = {
-    def runRule(): Boolean = {
+      implicit scheme: Parser.DeliveryScheme[L]): scheme.Result =
+    def runRule(): Boolean =
       _cursor = -1
       __advance()
       valueStack.clear()
-      try rule ne null catch {
+      try rule ne null catch
         case CutError ⇒ false
-      }
-    }
 
-    def phase0_initialRun() = {
+    def phase0_initialRun() =
       _valueStack = new ValueStack(initialValueStackSize, maxValueStackSize)
       runRule()
-    }
 
-    def phase1_establishPrincipalErrorIndex(): Int = {
+    def phase1_establishPrincipalErrorIndex(): Int =
       val phase1 = new EstablishingPrincipalErrorIndex()
       phase = phase1
       if (runRule())
         sys.error(
             "Parsing unexpectedly succeeded while trying to establish the principal error location")
       phase1.maxCursor
-    }
 
-    def phase2_establishReportedErrorIndex(principalErrorIndex: Int) = {
+    def phase2_establishReportedErrorIndex(principalErrorIndex: Int) =
       val phase2 = new EstablishingReportedErrorIndex(principalErrorIndex)
       phase = phase2
       if (runRule())
         sys.error(
             "Parsing unexpectedly succeeded while trying to establish the reported error location")
       phase2
-    }
 
-    def phase3_determineReportQuiet(reportedErrorIndex: Int): Boolean = {
+    def phase3_determineReportQuiet(reportedErrorIndex: Int): Boolean =
       phase = new DetermineReportQuiet(reportedErrorIndex)
-      try {
+      try
         if (runRule())
           sys.error(
               "Parsing unexpectedly succeeded while trying to determine quiet reporting")
         true // if we got here we can only reach the reportedErrorIndex via quiet rules
-      } catch {
+      catch
         case UnquietMismatch ⇒
           false // we mismatched beyond the reportedErrorIndex outside of a quiet rule
-      }
-    }
 
     @tailrec
     def phase4_collectRuleTraces(reportedErrorIndex: Int,
@@ -193,23 +184,21 @@ abstract class Parser(initialValueStackSize: Int = 16,
                                  reportQuiet: Boolean)(
         phase3: CollectingRuleTraces = new CollectingRuleTraces(
               reportedErrorIndex, reportQuiet),
-        traces: VectorBuilder[RuleTrace] = new VectorBuilder): ParseError = {
+        traces: VectorBuilder[RuleTrace] = new VectorBuilder): ParseError =
 
-      def done = {
+      def done =
         val principalErrorPos = Position(principalErrorIndex, input)
         val reportedErrorPos =
           if (reportedErrorIndex != principalErrorIndex)
             Position(reportedErrorIndex, input) else principalErrorPos
         ParseError(reportedErrorPos, principalErrorPos, traces.result())
-      }
-      if (phase3.traceNr < errorTraceCollectionLimit) {
-        val trace: RuleTrace = try {
+      if (phase3.traceNr < errorTraceCollectionLimit)
+        val trace: RuleTrace = try
           phase = phase3
           runRule()
           null // we managed to complete the run w/o exception, i.e. we have collected all traces
-        } catch {
+        catch
           case e: TracingBubbleException ⇒ e.trace
-        }
         if (trace eq null) done
         else
           phase4_collectRuleTraces(
@@ -217,56 +206,48 @@ abstract class Parser(initialValueStackSize: Int = 16,
               new CollectingRuleTraces(
                   reportedErrorIndex, reportQuiet, phase3.traceNr + 1),
               traces += trace)
-      } else done
-    }
+      else done
 
-    try {
+    try
       if (phase0_initialRun()) scheme.success(valueStack.toHList[L]())
-      else {
+      else
         val principalErrorIndex = phase1_establishPrincipalErrorIndex()
         val p2 = phase2_establishReportedErrorIndex(principalErrorIndex)
         val reportQuiet = phase3_determineReportQuiet(principalErrorIndex)
         val parseError = phase4_collectRuleTraces(
             p2.reportedErrorIndex, principalErrorIndex, reportQuiet)()
         scheme.parseError(parseError)
-      }
-    } catch {
+    catch
       case e: Parser.Fail ⇒
         val pos = Position(cursor, input)
         scheme.parseError(ParseError(
                 pos, pos, RuleTrace(Nil, RuleTrace.Fail(e.expected)) :: Nil))
       case NonFatal(e) ⇒
         scheme.failure(e)
-    } finally {
+    finally
       phase = null
-    }
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __advance(): Boolean = {
+  def __advance(): Boolean =
     var c = _cursor
     val max = input.length
-    if (c < max) {
+    if (c < max)
       c += 1
       _cursor = c
       _cursorChar = if (c == max) EOI else input charAt c
-    }
     true
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __updateMaxCursor(): Boolean = {
-    phase match {
+  def __updateMaxCursor(): Boolean =
+    phase match
       case x: EstablishingPrincipalErrorIndex ⇒
         if (_cursor > x.maxCursor) x.maxCursor = _cursor
       case _ ⇒ // nothing to do
-    }
     true
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -278,20 +259,18 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __restoreState(mark: Mark): Unit = {
+  def __restoreState(mark: Mark): Unit =
     _cursor = (mark.value >>> 32).toInt
     _cursorChar = ((mark.value >>> 16) & 0x000000000000FFFF).toChar
     valueStack.size = (mark.value & 0x000000000000FFFF).toInt
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __enterNotPredicate(): AnyRef = {
+  def __enterNotPredicate(): AnyRef =
     val saved = phase
     phase = null
     saved
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -303,77 +282,67 @@ abstract class Parser(initialValueStackSize: Int = 16,
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   def __enterAtomic(start: Int): Boolean =
-    phase match {
+    phase match
       case null ⇒ false
       case x: EstablishingReportedErrorIndex
           if x.currentAtomicStart == Int.MinValue ⇒
         x.currentAtomicStart = start
         true
       case _ ⇒ false
-    }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   def __exitAtomic(saved: Boolean): Unit =
-    if (saved) {
-      phase match {
+    if (saved)
+      phase match
         case x: EstablishingReportedErrorIndex ⇒
           x.currentAtomicStart = Int.MinValue
         case _ ⇒ throw new IllegalStateException
-      }
-    }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   def __enterQuiet(): Int =
-    phase match {
+    phase match
       case x: DetermineReportQuiet ⇒
         if (x.inQuiet) -1
-        else {
+        else
           x.inQuiet = true
           0
-        }
       case x: CollectingRuleTraces if !x.reportQuiet ⇒
         val saved = x.minErrorIndex
         x.minErrorIndex = Int.MaxValue // disables triggering of StartTracingException in __registerMismatch
         saved
       case _ ⇒ -1
-    }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   def __exitQuiet(saved: Int): Unit =
-    if (saved >= 0) {
-      phase match {
+    if (saved >= 0)
+      phase match
         case x: DetermineReportQuiet ⇒ x.inQuiet = false
         case x: CollectingRuleTraces ⇒ x.minErrorIndex = saved
         case _ ⇒ throw new IllegalStateException
-      }
-    }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __registerMismatch(): Boolean = {
-    phase match {
+  def __registerMismatch(): Boolean =
+    phase match
       case null | _: EstablishingPrincipalErrorIndex ⇒ // nothing to do
       case x: CollectingRuleTraces ⇒
-        if (_cursor >= x.minErrorIndex) {
+        if (_cursor >= x.minErrorIndex)
           if (x.errorMismatches == x.traceNr)
             throw Parser.StartTracingException else x.errorMismatches += 1
-        }
       case x: EstablishingReportedErrorIndex ⇒
         if (x.currentAtomicStart > x.maxAtomicErrorStart)
           x.maxAtomicErrorStart = x.currentAtomicStart
       case x: DetermineReportQuiet ⇒
         // stop this run early because we just learned that reporting quiet traces is unnecessary
         if (_cursor >= x.minErrorIndex & !x.inQuiet) throw UnquietMismatch
-    }
     false
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -391,24 +360,22 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __push(value: Any): Boolean = {
-    value match {
+  def __push(value: Any): Boolean =
+    value match
       case () ⇒
       case x: HList ⇒ valueStack.pushAll(x)
       case x ⇒ valueStack.push(x)
-    }
     true
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   @tailrec final def __matchString(string: String, ix: Int = 0): Boolean =
     if (ix < string.length)
-      if (_cursorChar == string.charAt(ix)) {
+      if (_cursorChar == string.charAt(ix))
         __advance()
         __matchString(string, ix + 1)
-      } else false
+      else false
     else true
 
   /**
@@ -417,18 +384,17 @@ abstract class Parser(initialValueStackSize: Int = 16,
   @tailrec final def __matchStringWrapped(
       string: String, ix: Int = 0): Boolean =
     if (ix < string.length)
-      if (_cursorChar == string.charAt(ix)) {
+      if (_cursorChar == string.charAt(ix))
         __advance()
         __updateMaxCursor()
         __matchStringWrapped(string, ix + 1)
-      } else {
-        try __registerMismatch() catch {
+      else
+        try __registerMismatch() catch
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(StringMatch(string), -ix) :: Nil,
                        CharMatch(string charAt ix))
-        }
-      } else true
+      else true
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -436,10 +402,10 @@ abstract class Parser(initialValueStackSize: Int = 16,
   @tailrec final def __matchIgnoreCaseString(
       string: String, ix: Int = 0): Boolean =
     if (ix < string.length)
-      if (Character.toLowerCase(_cursorChar) == string.charAt(ix)) {
+      if (Character.toLowerCase(_cursorChar) == string.charAt(ix))
         __advance()
         __matchIgnoreCaseString(string, ix + 1)
-      } else false
+      else false
     else true
 
   /**
@@ -448,18 +414,17 @@ abstract class Parser(initialValueStackSize: Int = 16,
   @tailrec final def __matchIgnoreCaseStringWrapped(
       string: String, ix: Int = 0): Boolean =
     if (ix < string.length)
-      if (Character.toLowerCase(_cursorChar) == string.charAt(ix)) {
+      if (Character.toLowerCase(_cursorChar) == string.charAt(ix))
         __advance()
         __updateMaxCursor()
         __matchIgnoreCaseStringWrapped(string, ix + 1)
-      } else {
-        try __registerMismatch() catch {
+      else
+        try __registerMismatch() catch
           case Parser.StartTracingException ⇒
             import RuleTrace._
             __bubbleUp(NonTerminal(IgnoreCaseString(string), -ix) :: Nil,
                        IgnoreCaseChar(string charAt ix))
-        }
-      } else true
+      else true
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -482,39 +447,34 @@ abstract class Parser(initialValueStackSize: Int = 16,
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __matchMap(m: Map[String, Any]): Boolean = {
+  def __matchMap(m: Map[String, Any]): Boolean =
     val keys = m.keysIterator
-    while (keys.hasNext) {
+    while (keys.hasNext)
       val mark = __saveState
       val key = keys.next()
-      if (__matchString(key)) {
+      if (__matchString(key))
         __push(m(key))
         return true
-      } else __restoreState(mark)
-    }
+      else __restoreState(mark)
     false
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  def __matchMapWrapped(m: Map[String, Any]): Boolean = {
+  def __matchMapWrapped(m: Map[String, Any]): Boolean =
     val keys = m.keysIterator
     val start = _cursor
-    try {
-      while (keys.hasNext) {
+    try
+      while (keys.hasNext)
         val mark = __saveState
         val key = keys.next()
-        if (__matchStringWrapped(key)) {
+        if (__matchStringWrapped(key))
           __push(m(key))
           return true
-        } else __restoreState(mark)
-      }
+        else __restoreState(mark)
       false
-    } catch {
+    catch
       case e: TracingBubbleException ⇒ e.bubbleUp(RuleTrace.MapMatch(m), start)
-    }
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -525,22 +485,19 @@ abstract class Parser(initialValueStackSize: Int = 16,
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
   class TracingBubbleException(private var _trace: RuleTrace)
-      extends RuntimeException with NoStackTrace {
+      extends RuntimeException with NoStackTrace
     def trace = _trace
     def bubbleUp(key: RuleTrace.NonTerminalKey, start: Int): Nothing =
       throw prepend(key, start)
-    def prepend(key: RuleTrace.NonTerminalKey, start: Int): this.type = {
-      val offset = phase match {
+    def prepend(key: RuleTrace.NonTerminalKey, start: Int): this.type =
+      val offset = phase match
         case x: CollectingRuleTraces ⇒ start - x.minErrorIndex
         case _ ⇒ throw new IllegalStateException
-      }
       _trace = _trace.copy(
           prefix = RuleTrace.NonTerminal(key, offset) :: _trace.prefix)
       this
-    }
-  }
 
-  protected class __SubParserInput extends ParserInput {
+  protected class __SubParserInput extends ParserInput
     val offset =
       _cursor // the number of chars the input the sub-parser sees is offset from the outer input start
     def getLine(line: Int): String = ??? // TODO
@@ -550,43 +507,35 @@ abstract class Parser(initialValueStackSize: Int = 16,
       input.sliceString(start + offset, end + offset)
     def length: Int = input.length - offset
     def charAt(ix: Int): Char = input.charAt(offset + ix)
-  }
-}
 
-object Parser {
+object Parser
 
-  trait DeliveryScheme[L <: HList] {
+  trait DeliveryScheme[L <: HList]
     type Result
     def success(result: L): Result
     def parseError(error: ParseError): Result
     def failure(error: Throwable): Result
-  }
 
-  object DeliveryScheme extends AlternativeDeliverySchemes {
+  object DeliveryScheme extends AlternativeDeliverySchemes
     implicit def Try[L <: HList, Out](implicit unpack: Unpack.Aux[L, Out]) =
-      new DeliveryScheme[L] {
+      new DeliveryScheme[L]
         type Result = Try[Out]
         def success(result: L) = Success(unpack(result))
         def parseError(error: ParseError) = Failure(error)
         def failure(error: Throwable) = Failure(error)
-      }
-  }
-  sealed abstract class AlternativeDeliverySchemes {
+  sealed abstract class AlternativeDeliverySchemes
     implicit def Either[L <: HList, Out](implicit unpack: Unpack.Aux[L, Out]) =
-      new DeliveryScheme[L] {
+      new DeliveryScheme[L]
         type Result = Either[ParseError, Out]
         def success(result: L) = Right(unpack(result))
         def parseError(error: ParseError) = Left(error)
         def failure(error: Throwable) = throw error
-      }
     implicit def Throw[L <: HList, Out](implicit unpack: Unpack.Aux[L, Out]) =
-      new DeliveryScheme[L] {
+      new DeliveryScheme[L]
         type Result = Out
         def success(result: L) = unpack(result)
         def parseError(error: ParseError) = throw error
         def failure(error: Throwable) = throw error
-      }
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -618,15 +567,13 @@ object Parser {
   // 1: EstablishingPrincipalErrorIndex (1 run)
   // 2: EstablishingReportedErrorIndex (1 run)
   // 3: CollectingRuleTraces (n runs)
-  private sealed trait ErrorAnalysisPhase {
+  private sealed trait ErrorAnalysisPhase
     def applyOffset(offset: Int): Unit
-  }
 
   // establish the max cursor value reached in a run
   private class EstablishingPrincipalErrorIndex(var maxCursor: Int = 0)
-      extends ErrorAnalysisPhase {
+      extends ErrorAnalysisPhase
     def applyOffset(offset: Int) = maxCursor -= offset
-  }
 
   // establish the largest match-start index of all outermost atomic rules
   // that we are in when mismatching at the principal error index
@@ -635,16 +582,14 @@ object Parser {
       private var _principalErrorIndex: Int,
       var currentAtomicStart: Int = Int.MinValue,
       var maxAtomicErrorStart: Int = Int.MinValue)
-      extends ErrorAnalysisPhase {
+      extends ErrorAnalysisPhase
     def reportedErrorIndex =
       if (maxAtomicErrorStart >= 0) maxAtomicErrorStart
       else _principalErrorIndex
-    def applyOffset(offset: Int) = {
+    def applyOffset(offset: Int) =
       _principalErrorIndex -= offset
       if (currentAtomicStart != Int.MinValue) currentAtomicStart -= offset
       if (maxAtomicErrorStart != Int.MinValue) maxAtomicErrorStart -= offset
-    }
-  }
 
   // determine whether the reported error location can only be reached via quiet rules
   // in which case we need to report them even though they are marked as "quiet"
@@ -652,10 +597,9 @@ object Parser {
       private var _minErrorIndex: Int, // the smallest index at which a mismatch triggers a StartTracingException
       var inQuiet: Boolean = false // are we currently in a quiet rule?
   )
-      extends ErrorAnalysisPhase {
+      extends ErrorAnalysisPhase
     def minErrorIndex = _minErrorIndex
     def applyOffset(offset: Int) = _minErrorIndex -= offset
-  }
 
   // collect the traces of all mismatches happening at an index >= minErrorIndex (the reported error index)
   // by throwing a StartTracingException which gets turned into a TracingBubbleException by the terminal rule
@@ -665,28 +609,25 @@ object Parser {
       val traceNr: Int = 0, // the zero-based index number of the RuleTrace we are currently building
       var errorMismatches: Int = 0 // the number of times we have already seen a mismatch at >= minErrorIndex
   )
-      extends ErrorAnalysisPhase {
+      extends ErrorAnalysisPhase
     def applyOffset(offset: Int) = minErrorIndex -= offset
-  }
-}
 
-object ParserMacros {
+object ParserMacros
   import scala.reflect.macros.Context
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  type RunnableRuleContext[L <: HList] = Context {
+  type RunnableRuleContext[L <: HList] = Context
     type PrefixType = Rule.Runnable[L]
-  }
 
   def runImpl[L <: HList : c.WeakTypeTag](c: RunnableRuleContext[L])()(
       scheme: c.Expr[Parser.DeliveryScheme[L]])
-    : c.Expr[scheme.value.Result] = {
+    : c.Expr[scheme.value.Result] =
     import c.universe._
-    val runCall = c.prefix.tree match {
+    val runCall = c.prefix.tree match
       case q"parboiled2.this.Rule.Runnable[$l]($ruleExpr)" ⇒
-        ruleExpr match {
+        ruleExpr match
           case q"$p.$r" if p.tpe <:< typeOf[Parser] ⇒
             q"val p = $p; p.__run[$l](p.$r)($scheme)"
           case q"$p.$r($args)" if p.tpe <:< typeOf[Parser] ⇒
@@ -696,11 +637,8 @@ object ParserMacros {
           case q"$p.$r[$t]" if p.tpe <:< typeOf[RuleX] ⇒
             q"__run[$l]($ruleExpr)($scheme)"
           case x ⇒ c.abort(x.pos, "Illegal `.run()` call base: " + x)
-        }
       case x ⇒ c.abort(x.pos, "Illegal `Runnable.apply` call: " + x)
-    }
     c.Expr[scheme.value.Result](runCall)
-  }
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
@@ -708,20 +646,18 @@ object ParserMacros {
   type ParserContext = Context { type PrefixType = Parser }
 
   def ruleImpl[I <: HList : ctx.WeakTypeTag, O <: HList : ctx.WeakTypeTag](
-      ctx: ParserContext)(r: ctx.Expr[Rule[I, O]]): ctx.Expr[Rule[I, O]] = {
+      ctx: ParserContext)(r: ctx.Expr[Rule[I, O]]): ctx.Expr[Rule[I, O]] =
     import ctx.universe._
-    val ruleName = ctx.enclosingMethod match {
+    val ruleName = ctx.enclosingMethod match
       case DefDef(_, name, _, _, _, _) ⇒ name.decoded
       case _ ⇒
         ctx.abort(r.tree.pos, "`rule` can only be used from within a method")
-    }
     namedRuleImpl(ctx)(ctx.Expr[String](Literal(Constant(ruleName))))(r)
-  }
 
   def namedRuleImpl[
       I <: HList : ctx.WeakTypeTag, O <: HList : ctx.WeakTypeTag](
       ctx: ParserContext)(name: ctx.Expr[String])(
-      r: ctx.Expr[Rule[I, O]]): ctx.Expr[Rule[I, O]] = {
+      r: ctx.Expr[Rule[I, O]]): ctx.Expr[Rule[I, O]] =
     val opTreeCtx = new OpTreeContext[ctx.type] { val c: ctx.type = ctx }
     val opTree = opTreeCtx.RuleCall(Left(opTreeCtx.OpTree(r.tree)), name.tree)
     import ctx.universe._
@@ -733,5 +669,3 @@ object ParserMacros {
       if (matched) akka.parboiled2.Rule else null""" // we encode the "matched" boolean as 'ruleResult ne null'
 
     reify { ctx.Expr[RuleX](ruleTree).splice.asInstanceOf[Rule[I, O]] }
-  }
-}

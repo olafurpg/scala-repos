@@ -32,30 +32,23 @@ import scalafx.application.JFXApp
 import scalafx.scene.Scene
 import scalafx.scene.paint.Color
 
-object TextFlowDemo extends JFXApp {
-  stage = new JFXApp.PrimaryStage {
+object TextFlowDemo extends JFXApp
+  stage = new JFXApp.PrimaryStage
     title = "TextFlow Demo"
-    scene = new Scene(500, 200) {
+    scene = new Scene(500, 200)
       fill = Color.White
-      root = new TextFlow {
+      root = new TextFlow
         val family = "Helvetica"
         val size = 20d
-        val text1 = new Text {
+        val text1 = new Text
           text = "Hello "
           font = Font(family, size)
-        }
-        val text2 = new Text {
+        val text2 = new Text
           text = "Bold"
           font = Font(family, FontWeight.Bold, size)
-        }
-        val text3 = new Text {
+        val text3 = new Text
           text = " World"
           font = Font(family, FontPosture.Italic, size)
-        }
         children ++= Seq(text1, text2, text3)
         layoutX = 40
         layoutY = 40
-      }
-    }
-  }
-}

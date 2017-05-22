@@ -14,9 +14,9 @@ import org.junit.Test
 
 import org.scalajs.testsuite.utils.AssertThrows._
 
-class FunctionTest {
+class FunctionTest
 
-  @Test def should_support_call_with_expanded_arguments(): Unit = {
+  @Test def should_support_call_with_expanded_arguments(): Unit =
     val f = js.eval("""
         var f = function() { return arguments; }; f;
     """).asInstanceOf[js.Function]
@@ -25,10 +25,9 @@ class FunctionTest {
     assertEquals(42, res("0"))
     assertEquals(true, res("1"))
     assertFalse(res.contains("2"))
-  }
 
   @Test
-  def `should_support_call_with_the_:_*_notation_to_expand_a_Seq`(): Unit = {
+  def `should_support_call_with_the_:_*_notation_to_expand_a_Seq`(): Unit =
     val f = js.eval("""
         var f = function() { return arguments; }; f;
     """).asInstanceOf[js.Function]
@@ -38,5 +37,3 @@ class FunctionTest {
     assertEquals(42, res("0"))
     assertEquals(true, res("1"))
     assertFalse(res.contains("2"))
-  }
-}

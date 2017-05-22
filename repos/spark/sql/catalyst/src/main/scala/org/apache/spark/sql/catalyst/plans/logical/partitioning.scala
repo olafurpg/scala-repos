@@ -23,9 +23,8 @@ import org.apache.spark.sql.catalyst.expressions.{Attribute, Expression, SortOrd
   * Performs a physical redistribution of the data.  Used when the consumer of the query
   * result have expectations about the distribution and ordering of partitioned input data.
   */
-abstract class RedistributeData extends UnaryNode {
+abstract class RedistributeData extends UnaryNode
   override def output: Seq[Attribute] = child.output
-}
 
 case class SortPartitions(sortExpressions: Seq[SortOrder], child: LogicalPlan)
     extends RedistributeData
@@ -41,9 +40,7 @@ case class SortPartitions(sortExpressions: Seq[SortOrder], child: LogicalPlan)
 case class RepartitionByExpression(partitionExpressions: Seq[Expression],
                                    child: LogicalPlan,
                                    numPartitions: Option[Int] = None)
-    extends RedistributeData {
-  numPartitions match {
+    extends RedistributeData
+  numPartitions match
     case Some(n) => require(n > 0, "numPartitions must be greater than 0.")
     case None => // Ok
-  }
-}

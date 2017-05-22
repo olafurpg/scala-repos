@@ -12,7 +12,7 @@ import org.apache.camel.impl.DefaultCamelContext
   * Subclass this abstract class to create an MDB-style untyped consumer actor. This
   * class is meant to be used from Java.
   */
-abstract class UntypedConsumerActor extends UntypedActor with Consumer {
+abstract class UntypedConsumerActor extends UntypedActor with Consumer
   final def endpointUri: String = getEndpointUri
 
   /**
@@ -38,4 +38,3 @@ abstract class UntypedConsumerActor extends UntypedActor with Consumer {
     * @return the Activation interface
     */
   protected def getActivation(): Activation = camel
-}

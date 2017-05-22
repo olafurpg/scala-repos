@@ -40,13 +40,12 @@ import scalafx.scene.{Scene, SnapshotResult}
 /**
   * Helper app used to reproduce and then test fixes for issue #205 and related infinite recursions.
   */
-object InfiniteRecursionIssue205Tester extends JFXApp {
+object InfiniteRecursionIssue205Tester extends JFXApp
 
-  class Person(firstName_ : String, lastName_ : String) {
+  class Person(firstName_ : String, lastName_ : String)
 
     val firstName = new StringProperty(this, "firstName", firstName_)
     val lastName = new StringProperty(this, "lastName", lastName_)
-  }
 
   val characters = ObservableBuffer[Person](
       new Person("Peggy", "Sue"),
@@ -75,56 +74,41 @@ object InfiniteRecursionIssue205Tester extends JFXApp {
   val extraRow = new Person("Desmond", "Jones")
   characters += extraRow
 
-  val tableView = new TableView[Person](characters) {
+  val tableView = new TableView[Person](characters)
     columns ++= List(
-        new TableColumn[Person, String] {
+        new TableColumn[Person, String]
           text = "First Name"
-          cellValueFactory = {
+          cellValueFactory =
             _.value.firstName
-          }
           prefWidth = 180
-        },
-        new TableColumn[Person, String]() {
+        ,
+        new TableColumn[Person, String]()
           text = "Last Name"
-          cellValueFactory = {
+          cellValueFactory =
             _.value.lastName
-          }
           prefWidth = 180
-        }
     )
-  }
 
-  val scrollToButton = new Button {
+  val scrollToButton = new Button
     text = "scrollTo(item) - #205"
     onAction = (ae: ActionEvent) =>
-      {
         // This line would cause infinite recursion before fix
         tableView.scrollTo(extraRow)
-    }
-  }
 
-  val snapshotButton = new Button {
+  val snapshotButton = new Button
     text = "snapshot  - #214"
     onAction = (ae: ActionEvent) =>
-      {
-        def callback(result: SnapshotResult): Unit = {
+        def callback(result: SnapshotResult): Unit =
           println("callback(" + result + ")")
-        }
         // This line would cause infinite recursion before fix (also issue #214)
         tableView.snapshot(callback, null, null)
-    }
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Simple Table View"
-    scene = new Scene {
-      root = new VBox {
+    scene = new Scene
+      root = new VBox
         children = Seq(
             tableView,
             scrollToButton,
             snapshotButton
         )
-      }
-    }
-  }
-}

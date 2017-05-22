@@ -7,7 +7,7 @@ import scalaz.std.anyVal._
 import scalaz.std.option._
 import scalaz.std.string._
 
-object Foldable1Usage extends App {
+object Foldable1Usage extends App
   // Foldable1 is a typeclass which is like the Foldable typeclass
   // except is only defined for structures which guarantee that there
   // is always at least one value of the contained type
@@ -89,4 +89,3 @@ object Foldable1Usage extends App {
   // which gives you a structure isomorphic to a NonEmptyList but
   // using IList instead of List as the tail.
   assert(OneAnd(1, IList(2, 3)).foldMap1(identity) === 6)
-}

@@ -33,7 +33,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.geometry.Side
 import scalafx.scene.Scene
 
-object CategoryLineChartDemo extends JFXApp {
+object CategoryLineChartDemo extends JFXApp
 
   val dataPairs = Seq(("Alpha", 50),
                       ("Beta", 80),
@@ -42,20 +42,16 @@ object CategoryLineChartDemo extends JFXApp {
                       ("1.0", 122),
                       ("1.1", 10))
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "CategoryLineChartDemo"
-    scene = new Scene {
-      root = new LineChart(CategoryAxis("X Axis"), NumberAxis("Y Axis")) {
+    scene = new Scene
+      root = new LineChart(CategoryAxis("X Axis"), NumberAxis("Y Axis"))
         title = "LineChart with Category Axis"
         legendSide = Side.Right
         data = XYChart.Series[String, Number](
             "Series 1",
             ObservableBuffer(
-                dataPairs.map {
+                dataPairs.map
               case (x, y) => XYChart.Data[String, Number](x, y)
-            })
+            )
         )
-      }
-    }
-  }
-}

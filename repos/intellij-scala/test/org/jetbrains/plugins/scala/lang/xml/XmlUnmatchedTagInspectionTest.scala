@@ -9,31 +9,28 @@ import org.jetbrains.plugins.scala.codeInspection.xml.ScalaXmlUnmatchedTagInspec
   * Date: 4/9/12
   */
 class XmlUnmatchedTagInspectionTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
   val noOpeningTagError = ScalaBundle.message("xml.no.opening.tag")
   val noClosingTagError = ScalaBundle.message("xml.no.closing.tag")
   val s = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val e = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
 
-  private def check(text: String, annotation: String) {
+  private def check(text: String, annotation: String)
     checkTextHasError(
         text, annotation, classOf[ScalaXmlUnmatchedTagInspection])
-  }
 
-  def testSimpleClosingError() {
+  def testSimpleClosingError()
     val text = "val xml = <aaa>blah blah" + s + "</aab>" + e
 
     check(text, noOpeningTagError)
-  }
 
-  def testSimpleOpeningError() {
+  def testSimpleOpeningError()
     val text =
       "val xml = " + s + "<sdgdsjh attr1=\"1\">" + e + "blah lbah</asfgsd>"
 
     check(text, noClosingTagError)
-  }
 
-  def testNestedOpeningError() {
+  def testNestedOpeningError()
     val text = """
         val xml = <aaa attr="1" attr2="2">
                     <bbb>blah blah</bbb>
@@ -46,9 +43,8 @@ class XmlUnmatchedTagInspectionTest
       """
 
     check(text, noClosingTagError)
-  }
 
-  def testNestedClosingError() {
+  def testNestedClosingError()
     val text = """
         val xml = <aaa attr="1" attr2="2">
                     <bbb>blah blah</bbb>
@@ -61,9 +57,8 @@ class XmlUnmatchedTagInspectionTest
       """
 
     check(text, noOpeningTagError)
-  }
 
-  def testErrorInsideCase() {
+  def testErrorInsideCase()
     val text = """
         <a>blah</a> match {
           case <b>blah</b> =>
@@ -73,5 +68,3 @@ class XmlUnmatchedTagInspectionTest
       """
 
     check(text, noOpeningTagError)
-  }
-}

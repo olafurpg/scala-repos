@@ -22,19 +22,19 @@ import javax.ws.rs.WebApplicationException
 import javax.ws.rs.core.Response
 import javax.ws.rs.core.Response.Status
 
-private[v1] class SimpleDateParam(val originalValue: String) {
+private[v1] class SimpleDateParam(val originalValue: String)
 
-  val timestamp: Long = {
+  val timestamp: Long =
     val format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSz")
-    try {
+    try
       format.parse(originalValue).getTime()
-    } catch {
+    catch
       case _: ParseException =>
         val gmtDay = new SimpleDateFormat("yyyy-MM-dd")
         gmtDay.setTimeZone(TimeZone.getTimeZone("GMT"))
-        try {
+        try
           gmtDay.parse(originalValue).getTime()
-        } catch {
+        catch
           case _: ParseException =>
             throw new WebApplicationException(
                 Response
@@ -42,7 +42,3 @@ private[v1] class SimpleDateParam(val originalValue: String) {
                   .entity("Couldn't parse date: " + originalValue)
                   .build()
               )
-        }
-    }
-  }
-}

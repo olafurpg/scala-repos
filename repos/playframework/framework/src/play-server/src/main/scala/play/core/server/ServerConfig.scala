@@ -27,14 +27,13 @@ case class ServerConfig(rootDir: File,
                         address: String,
                         mode: Mode.Mode,
                         properties: Properties,
-                        configuration: Configuration) {
+                        configuration: Configuration)
   // Some basic validation of config
   if (!port.isDefined && !sslPort.isDefined)
     throw new IllegalArgumentException(
         "Must provide either an HTTP port or an HTTPS port")
-}
 
-object ServerConfig {
+object ServerConfig
 
   def apply(classLoader: ClassLoader = this.getClass.getClassLoader,
             rootDir: File = new File("."),
@@ -42,7 +41,7 @@ object ServerConfig {
             sslPort: Option[Int] = None,
             address: String = "0.0.0.0",
             mode: Mode.Mode = Mode.Prod,
-            properties: Properties = System.getProperties): ServerConfig = {
+            properties: Properties = System.getProperties): ServerConfig =
     ServerConfig(
         rootDir = rootDir,
         port = port,
@@ -55,7 +54,6 @@ object ServerConfig {
                                            rootDirConfig(rootDir),
                                            mode == Mode.Test)
     )
-  }
 
   /**
     * Gets the configuration for the given root directory. Used to construct
@@ -63,4 +61,3 @@ object ServerConfig {
     */
   def rootDirConfig(rootDir: File): Map[String, String] =
     Map("play.server.dir" -> rootDir.getAbsolutePath)
-}

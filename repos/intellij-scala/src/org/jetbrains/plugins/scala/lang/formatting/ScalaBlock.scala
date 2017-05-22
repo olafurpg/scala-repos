@@ -33,7 +33,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
                  protected var myWrap: Wrap,
                  protected val mySettings: CodeStyleSettings,
                  val subBlocksContext: Option[SubBlocksContext] = None)
-    extends Object with ScalaTokenTypes with ASTBlock {
+    extends Object with ScalaTokenTypes with ASTBlock
 
   protected var mySubBlocks: util.List[Block] = null
 
@@ -60,7 +60,7 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
 
   def isIncomplete = isIncomplete(myNode)
 
-  def getChildAttributes(newChildIndex: Int): ChildAttributes = {
+  def getChildAttributes(newChildIndex: Int): ChildAttributes =
     val scalaSettings =
       mySettings.getCustomSettings(classOf[ScalaCodeStyleSettings])
     val indentSize = mySettings.getIndentSize(ScalaFileType.SCALA_FILE_TYPE)
@@ -70,23 +70,22 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     def isBlockOnlyScope(scope: PsiElement) =
       !isLeaf && Set(ScalaTokenTypes.tLBRACE, ScalaTokenTypes.tLPARENTHESIS)
         .contains(scope.getNode.getElementType) &&
-      (scope.getParent match {
+      (scope.getParent match
             case _: ScTryBlock | _: ScForStatement | _: ScPackaging => true
             case _ => false
-          })
-    parent match {
+          )
+    parent match
       case m: ScMatchStmt =>
-        if (m.caseClauses.length == 0) {
+        if (m.caseClauses.length == 0)
           new ChildAttributes(if (braceShifted) Indent.getNoneIndent
                               else Indent.getNormalIndent,
                               null)
-        } else {
+        else
           val indent =
             if (mySettings.INDENT_CASE_FROM_SWITCH)
               Indent.getSpaceIndent(2 * indentSize)
             else Indent.getNormalIndent
           new ChildAttributes(indent, null)
-        }
       case c: ScCaseClauses =>
         new ChildAttributes(Indent.getNormalIndent, null)
       case l: ScLiteral
@@ -176,64 +175,50 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
       case _: ScArgumentExprList =>
         new ChildAttributes(Indent.getNormalIndent, this.getAlignment)
       case _ => new ChildAttributes(Indent.getNoneIndent, null)
-    }
-  }
 
   private def isConstructorArgOrMemberFunctionParameter(
-      paramClause: ScParameterClause): Boolean = {
+      paramClause: ScParameterClause): Boolean =
     val owner = paramClause.owner
     owner != null &&
     (owner.isInstanceOf[ScPrimaryConstructor] ||
         owner.isInstanceOf[ScFunction])
-  }
 
-  def getSpacing(child1: Block, child2: Block) = {
+  def getSpacing(child1: Block, child2: Block) =
     ScalaSpacingProcessor.getSpacing(
         child1.asInstanceOf[ScalaBlock], child2.asInstanceOf[ScalaBlock])
-  }
 
-  def getSubBlocks: util.List[Block] = {
+  def getSubBlocks: util.List[Block] =
     import scala.collection.JavaConversions._
-    if (mySubBlocks == null) {
-      mySubBlocks = getDummyBlocks(myNode, myLastNode, this).filterNot {
+    if (mySubBlocks == null)
+      mySubBlocks = getDummyBlocks(myNode, myLastNode, this).filterNot
         _.asInstanceOf[ScalaBlock].getNode.getElementType == ScalaTokenTypes.tWHITE_SPACE_IN_LINE
-      }
-    }
     mySubBlocks
-  }
 
-  def isLeaf(node: ASTNode): Boolean = {
+  def isLeaf(node: ASTNode): Boolean =
     if (myLastNode == null) node.getFirstChildNode == null
     else false
-  }
 
-  def isIncomplete(node: ASTNode): Boolean = {
+  def isIncomplete(node: ASTNode): Boolean =
     if (node.getPsi.isInstanceOf[PsiErrorElement]) return true
     var lastChild = node.getLastChildNode
     while (lastChild != null &&
     (lastChild.getPsi.isInstanceOf[PsiWhiteSpace] ||
-        lastChild.getPsi.isInstanceOf[PsiComment])) {
+        lastChild.getPsi.isInstanceOf[PsiComment]))
       lastChild = lastChild.getTreePrev
-    }
-    if (lastChild == null) {
+    if (lastChild == null)
       return false
-    }
-    if (lastChild.getPsi.isInstanceOf[PsiErrorElement]) {
+    if (lastChild.getPsi.isInstanceOf[PsiErrorElement])
       return true
-    }
     isIncomplete(lastChild)
-  }
 
   private var _suggestedWrap: Wrap = null
 
-  def suggestedWrap: Wrap = {
-    if (_suggestedWrap == null) {
+  def suggestedWrap: Wrap =
+    if (_suggestedWrap == null)
       val settings =
         getSettings.getCustomSettings(classOf[ScalaCodeStyleSettings])
       _suggestedWrap = ScalaWrapManager.suggestedWrap(this, settings)
-    }
     _suggestedWrap
-  }
 
   def getChildBlockLastNode(childNode: ASTNode) =
     subBlocksContext
@@ -245,27 +230,24 @@ class ScalaBlock(val myParentBlock: ScalaBlock,
     subBlocksContext
       .flatMap(_.childrenAdditionalContexts.get(childNode))
       .flatMap(_.alignment)
-}
 
 class SubBlocksContext(
     val additionalNodes: Seq[ASTNode] = Seq(),
     val alignment: Option[Alignment] = None,
-    val childrenAdditionalContexts: Map[ASTNode, SubBlocksContext] = Map()) {
+    val childrenAdditionalContexts: Map[ASTNode, SubBlocksContext] = Map())
   def getLastNode(firstNode: ASTNode): ASTNode =
     getLastNode.filter(_ != firstNode).orNull
 
   private def getLastNode: Option[ASTNode] =
     childrenAdditionalContexts.map { case (_, context) => context.getLastNode }
       .filter(_.isDefined)
-      .map(_.get) ++ additionalNodes ++ childrenAdditionalContexts.map {
+      .map(_.get) ++ additionalNodes ++ childrenAdditionalContexts.map
       case (child, _) => child
-    } match {
+    match
       case empty if empty.isEmpty => None
       case nonEmpty => Some(nonEmpty.maxBy(_.getTextRange.getEndOffset))
-    }
-}
 
-object SubBlocksContext {
+object SubBlocksContext
   def apply(childNodes: Seq[ASTNode],
             alignment: Option[Alignment]): SubBlocksContext =
     new SubBlocksContext(childNodes, alignment)
@@ -273,7 +255,6 @@ object SubBlocksContext {
   def apply(node: ASTNode,
             alignment: Alignment,
             childNodes: Seq[ASTNode]): SubBlocksContext =
-    new SubBlocksContext(Seq(), None, Map({
+    new SubBlocksContext(Seq(), None, Map(
       node -> SubBlocksContext(childNodes, Some(alignment))
-    }))
-}
+    ))

@@ -13,13 +13,12 @@ import Interpolation._
   *  of additional goodness here, but for now it's completion and script
   *  generation.  See Demo for example usage.
   */
-object Meta {
-  trait Opt {
+object Meta
+  trait Opt
     def name: String
     def action: () => Unit
-  }
 
-  trait StdOpts { self: Spec with Interpolation =>
+  trait StdOpts  self: Spec with Interpolation =>
 
     Bash.name --> runAndExit(Bash.action())
     val selfUpdateName = SelfUpdate.name --|;
@@ -32,10 +31,9 @@ object Meta {
       *  to the console.  Place it inside backtickes like `partest --bash`
       *  and voila, you have absorbed command completion.
       */
-    object Bash extends Opt {
+    object Bash extends Opt
       val name = "bash"
       val action = () =>
-        {
           val file = File.makeTemp("scala.cmd.bash")
           file writeAll interpolate(bashTemplate)
 
@@ -43,8 +41,6 @@ object Meta {
           // not always comments in bash, and breaking it is worse.
           // Console println ("# Run the following line, or issue the --bash command in `backticks`.")
           Console println (". " + file.normalize.path)
-      }
-    }
 
     /** Generates a very basic runner script.  It's called SelfUpdate
       *  because once it exists you can do something like
@@ -53,15 +49,10 @@ object Meta {
       *
       *  and it will overwrite itself with the current version.
       */
-    object SelfUpdate extends Opt {
+    object SelfUpdate extends Opt
       val name = "self-update"
       val action = () =>
-        {
           val file = File(selfUpdateName.get)
           file writeAll interpolate(runnerTemplate)
           file setExecutable true
           ()
-      }
-    }
-  }
-}

@@ -7,7 +7,7 @@ import cats.implicits._
 /**
   * Laws that must be obeyed by any `Monad`.
   */
-trait MonadLaws[F[_]] extends ApplicativeLaws[F] with FlatMapLaws[F] {
+trait MonadLaws[F[_]] extends ApplicativeLaws[F] with FlatMapLaws[F]
   implicit override def F: Monad[F]
 
   def monadLeftIdentity[A, B](a: A, f: A => F[B]): IsEq[F[B]] =
@@ -35,9 +35,7 @@ trait MonadLaws[F[_]] extends ApplicativeLaws[F] with FlatMapLaws[F] {
     */
   def mapFlatMapCoherence[A, B](fa: F[A], f: A => B): IsEq[F[B]] =
     fa.flatMap(a => F.pure(f(a))) <-> fa.map(f)
-}
 
-object MonadLaws {
+object MonadLaws
   def apply[F[_]](implicit ev: Monad[F]): MonadLaws[F] =
     new MonadLaws[F] { def F: Monad[F] = ev }
-}

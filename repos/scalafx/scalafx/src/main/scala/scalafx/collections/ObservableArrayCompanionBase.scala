@@ -52,7 +52,7 @@ import scala.language.implicitConversions
 private[collections] abstract class ObservableArrayCompanionBase[
     V : ClassTag,
     T <: ObservableArray[V, T, D],
-    D <: jfxc.ObservableArray[D]] {
+    D <: jfxc.ObservableArray[D]]
 
   // TODO: Enter link when JavaFX 8 API Docs are available on-line.
   /**
@@ -129,4 +129,3 @@ private[collections] abstract class ObservableArrayCompanionBase[
     */
   def iterate(start: V, n: Int)(f: V => V): T =
     apply(Array.iterate(start, n)(f))
-}

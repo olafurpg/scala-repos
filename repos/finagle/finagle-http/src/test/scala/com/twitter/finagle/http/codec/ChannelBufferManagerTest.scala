@@ -11,7 +11,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
+class ChannelBufferManagerTest extends FunSuite with MockitoSugar
   val me = mock[MessageEvent]
   val c = mock[Channel]
   val ctx = mock[ChannelHandlerContext]
@@ -19,20 +19,18 @@ class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
   val wce = mock[WriteCompletionEvent]
   when(me.getChannel).thenReturn(c)
 
-  def makeGetMessage(channelCapacity: Int): Unit = {
+  def makeGetMessage(channelCapacity: Int): Unit =
     val channelBuffer = ChannelBuffers.directBuffer(channelCapacity)
     doReturn(channelBuffer).when(me).getMessage
-  }
 
-  def usageTrackerFactory() = {
+  def usageTrackerFactory() =
     val usageTracker = new ChannelBufferUsageTracker(1000.bytes)
     assert(usageTracker.usageLimit == (1000.bytes))
     usageTracker
-  }
   def handlerFactory(usageTracker: ChannelBufferUsageTracker) =
     new ChannelBufferManager(usageTracker)
 
-  test("track the capacity of the channel buffer") {
+  test("track the capacity of the channel buffer")
     val usageTracker = usageTrackerFactory()
     val handler = handlerFactory(usageTracker)
 
@@ -54,10 +52,9 @@ class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
     handler.channelClosed(ctx, e)
     usageTracker.currentUsage == (0.bytes)
     usageTracker.maxUsage == (768.bytes)
-  }
 
   test(
-      "throw exception if usage exceeds limit at the beginning of the request") {
+      "throw exception if usage exceeds limit at the beginning of the request")
     val usageTracker = usageTrackerFactory()
     val handler = handlerFactory(usageTracker)
 
@@ -66,17 +63,15 @@ class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
     assert(usageTracker.currentUsage == (0.bytes))
 
     makeGetMessage(20)
-    intercept[ChannelBufferUsageException] {
+    intercept[ChannelBufferUsageException]
       handler.messageReceived(ctx, me)
-    }
     assert(usageTracker.currentUsage == (0.bytes))
 
     handler.channelClosed(ctx, e)
     assert(usageTracker.currentUsage == (0.bytes))
     assert(usageTracker.maxUsage == (0.bytes))
-  }
 
-  test("throw exception if usage exceeds limit in the middle of the request") {
+  test("throw exception if usage exceeds limit in the middle of the request")
     val usageTracker = usageTrackerFactory()
     val handler = handlerFactory(usageTracker)
 
@@ -89,9 +84,8 @@ class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
     assert(usageTracker.currentUsage == (100.bytes))
 
     makeGetMessage(350)
-    intercept[ChannelBufferUsageException] {
+    intercept[ChannelBufferUsageException]
       handler.messageReceived(ctx, me)
-    }
     assert(usageTracker.currentUsage == (100.bytes))
     assert(usageTracker.maxUsage == (100.bytes))
 
@@ -107,5 +101,3 @@ class ChannelBufferManagerTest extends FunSuite with MockitoSugar {
     handler.channelClosed(ctx, e)
     assert(usageTracker.currentUsage == (0.bytes))
     assert(usageTracker.maxUsage == (300.bytes))
-  }
-}

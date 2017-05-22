@@ -13,29 +13,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypeBoundsOwner
   * 2014-11-18
   */
 class DeprecatedViewBoundInspection
-    extends AbstractInspection(id, description) {
+    extends AbstractInspection(id, description)
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case boundsOwner: ScTypeBoundsOwner
         if boundsOwner.viewBound.nonEmpty && canBeConverted(boundsOwner) =>
       holder.registerProblem(
           boundsOwner,
           description,
           new ConvertToImplicitParametersQuickFix(boundsOwner))
-  }
-}
 
 class ConvertToImplicitParametersQuickFix(owner: ScTypeBoundsOwner)
-    extends AbstractFixOnPsiElement(fixDescription, owner) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement(fixDescription, owner)
+  override def doApplyFix(project: Project): Unit =
     val boundOwner = getElement
     val addedParams = doConversion(boundOwner)
     runRenamingTemplate(addedParams)
-  }
-}
 
-object DeprecatedViewBoundInspection {
+object DeprecatedViewBoundInspection
   val id = "DeprecatedViewBound"
   val description = "View bounds are deprecated"
   val fixDescription = "Replace with implicit parameters"
-}

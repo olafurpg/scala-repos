@@ -12,7 +12,7 @@ trait X$$$$Y
 
 trait Foo[A]
 
-class Test {
+class Test
   def f[A : C] = ???
   f[X$Y]
   /* using the $$ separator for expanded names is unwise
@@ -21,4 +21,3 @@ class Test {
   f[X$$$$Y]
    */
   f[Foo[Int]]
-}

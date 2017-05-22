@@ -10,7 +10,7 @@ package scala.compat
 
 import java.lang.System
 
-object Platform {
+object Platform
 
   /** Thrown when a stack overflow occurs because a method or function recurses too deeply.
     *
@@ -47,9 +47,8 @@ object Platform {
     */
   @inline
   def arraycopy(
-      src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int) {
+      src: AnyRef, srcPos: Int, dest: AnyRef, destPos: Int, length: Int)
     System.arraycopy(src, srcPos, dest, destPos, length)
-  }
 
   /** Creates a new array of the specified type and given length.
     *
@@ -129,4 +128,3 @@ object Platform {
   /** The name of the default character set encoding as a string */
   @inline
   def defaultCharsetName: String = java.nio.charset.Charset.defaultCharset.name
-}

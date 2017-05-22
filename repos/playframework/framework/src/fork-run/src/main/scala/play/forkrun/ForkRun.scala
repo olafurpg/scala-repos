@@ -19,13 +19,13 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.util.{Success, Failure, Properties}
 
-object ForkRun {
+object ForkRun
   case object Reload
   case object Close
 
   private val running = new AtomicBoolean(true)
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val baseDirectory = args(0)
     val configKey = args(1)
     val runArgs = args.drop(2)
@@ -45,43 +45,36 @@ object ForkRun {
     waitForStop()
 
     doShutdown(log, system, forkRun)
-  }
 
-  def doShutdown(log: Logger, system: ActorSystem, forkRun: ActorRef): Unit = {
-    if (running.compareAndSet(true, false)) {
+  def doShutdown(log: Logger, system: ActorSystem, forkRun: ActorRef): Unit =
+    if (running.compareAndSet(true, false))
       log.info("Stopping Play fork run ...")
       forkRun ! Close
-      try system.awaitTermination(30.seconds) catch {
+      try system.awaitTermination(30.seconds) catch
         case _: TimeoutException => System.exit(1)
-      }
-    } else {
+    else
       log.info("Play fork run already stopped ...")
-    }
-  }
 
   def registerShutdownHook(
-      log: Logger, system: ActorSystem, forkRun: ActorRef): Unit = {
+      log: Logger, system: ActorSystem, forkRun: ActorRef): Unit =
     Runtime
       .getRuntime()
-      .addShutdownHook(new Thread {
-        override def run(): Unit = {
+      .addShutdownHook(new Thread
+        override def run(): Unit =
           log.info("JVM exiting, shutting down Play fork run ...")
           doShutdown(log, system, forkRun)
-        }
-      })
-  }
+      )
 
   def startServer(config: ForkConfig,
                   args: Seq[String],
                   notifyStart: InetSocketAddress => Unit,
                   reloadCompile: () => CompileResult,
-                  log: Logger): PlayDevServer = {
-    val notifyStartHook = new RunHook {
+                  log: Logger): PlayDevServer =
+    val notifyStartHook = new RunHook
       override def afterStarted(address: InetSocketAddress): Unit =
         notifyStart(address)
-    }
 
-    val watchService = config.watchService match {
+    val watchService = config.watchService match
       case ForkConfig.DefaultWatchService =>
         FileWatchService.defaultWatchService(
             config.targetDirectory, config.pollInterval, log)
@@ -90,7 +83,6 @@ object ForkRun {
         FileWatchService.jnotify(config.targetDirectory)
       case ForkConfig.PollingWatchService(pollInterval) =>
         FileWatchService.sbt(pollInterval)
-    }
 
     val runSbtTask = (s: String) =>
       throw new UnsupportedOperationException(
@@ -125,21 +117,19 @@ object ForkRun {
     println()
 
     server
-  }
 
   def sendStart(sbt: ActorRef,
                 config: ForkConfig,
-                args: Seq[String]): InetSocketAddress => Unit = { address =>
+                args: Seq[String]): InetSocketAddress => Unit =  address =>
     val url = serverUrl(
         args, config.defaultHttpPort, config.defaultHttpAddress, address)
     sbt ! SbtClient.Execute(s"${config.notifyKey} $url")
-  }
 
   // reparse args to support https urls
   def serverUrl(args: Seq[String],
                 defaultHttpPort: Int,
                 defaultHttpAddress: String,
-                address: InetSocketAddress): String = {
+                address: InetSocketAddress): String =
     val devSettings: Seq[(String, String)] = Seq.empty
     val (properties, httpPort, httpsPort, httpAddress) = Reloader.filterArgs(
         args, defaultHttpPort, defaultHttpAddress, devSettings)
@@ -147,117 +137,95 @@ object ForkRun {
     if (httpPort.isDefined) s"http://$host:${httpPort.get}"
     else if (httpsPort.isDefined) s"https://$host:${httpsPort.get}"
     else s"http://$host:${address.getPort}"
-  }
 
   def askForReload(actor: ActorRef)(
       implicit timeout: Timeout): () => CompileResult =
     () =>
-      {
         val future = (actor ? ForkRun.Reload).mapTo[CompileResult]
         Await.result(future, timeout.duration)
-    }
 
-  def waitForStop(): Unit = {
-    System.in.read() match {
+  def waitForStop(): Unit =
+    System.in.read() match
       case -1 | 4 => // exit on EOF or EOT/Ctrl-D
       case _ => waitForStop()
-    }
-  }
 
-  def cancel(): Unit = {
+  def cancel(): Unit =
     // close stdin in case we're in waitForStop
     System.in.close()
-  }
 
-  def akkaNoLogging: Config = {
+  def akkaNoLogging: Config =
     ConfigFactory.parseString("""
       akka.stdout-loglevel = "OFF"
       akka.loglevel = "OFF"
     """)
-  }
 
   def props(sbt: ActorRef,
             configKey: String,
             args: Seq[String],
             log: Logger): Props = Props(new ForkRun(sbt, configKey, args, log))
-}
 
 class ForkRun(sbt: ActorRef, configKey: String, args: Seq[String], log: Logger)
-    extends Actor {
+    extends Actor
   import SbtClient._
   import Serializers._
 
   def receive: Receive = setup
 
-  def setup: Receive = {
+  def setup: Receive =
     sbt ! Request(configKey, self)
     settingUp
-  }
 
-  def settingUp: Receive = {
+  def settingUp: Receive =
     case Response(`configKey`, result) =>
-      result.result[ForkConfig] match {
+      result.result[ForkConfig] match
         case Success(config) => run(config)
         case Failure(error) => fail(error)
-      }
     case Failed(error) => fail(error)
     case ForkRun.Close => shutdown()
-  }
 
-  def run(config: ForkConfig): Unit = {
-    try {
+  def run(config: ForkConfig): Unit =
+    try
       val notifyStart = ForkRun.sendStart(sbt, config, args)
       val reloadCompile =
         ForkRun.askForReload(self)(Timeout(config.compileTimeout.millis))
       val server =
         ForkRun.startServer(config, args, notifyStart, reloadCompile, log)
       context become running(server, config.reloadKey)
-    } catch {
+    catch
       case e: Exception => fail(e)
-    }
-  }
 
-  def running(server: PlayDevServer, reloadKey: String): Receive = {
+  def running(server: PlayDevServer, reloadKey: String): Receive =
     case ForkRun.Reload => reload(server, reloadKey)
     case ForkRun.Close => close(server)
-  }
 
-  def reload(server: PlayDevServer, reloadKey: String): Unit = {
+  def reload(server: PlayDevServer, reloadKey: String): Unit =
     sbt ! Request(reloadKey, self)
     val replyTo = sender()
     context become reloading(server, reloadKey, replyTo)
-  }
 
   def reloading(
-      server: PlayDevServer, reloadKey: String, replyTo: ActorRef): Receive = {
+      server: PlayDevServer, reloadKey: String, replyTo: ActorRef): Receive =
     case Response(`reloadKey`, result) =>
-      result.result[CompileResult] match {
+      result.result[CompileResult] match
         case Success(result) =>
           replyTo ! result
           context become running(server, reloadKey)
         case Failure(error) => fail(error)
-      }
     case ForkRun.Close => close(server)
-  }
 
-  def close(server: PlayDevServer): Unit = {
+  def close(server: PlayDevServer): Unit =
     server.close()
     shutdown()
-  }
 
-  def fail(cause: Throwable): Unit = {
+  def fail(cause: Throwable): Unit =
     log.error("Play fork run has failed due to:")
     log.trace(cause)
     shutdown()
     ForkRun.cancel()
-  }
 
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     sbt ! Shutdown
     context become shuttingDown
-  }
 
-  def shuttingDown: Receive = {
+  def shuttingDown: Receive =
     case _ => // ignore messages while shutting down
-  }
-}

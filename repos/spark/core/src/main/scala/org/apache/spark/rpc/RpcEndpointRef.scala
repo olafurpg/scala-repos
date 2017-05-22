@@ -28,7 +28,7 @@ import org.apache.spark.util.RpcUtils
   * A reference for a remote [[RpcEndpoint]]. [[RpcEndpointRef]] is thread-safe.
   */
 private[spark] abstract class RpcEndpointRef(conf: SparkConf)
-    extends Serializable with Logging {
+    extends Serializable with Logging
 
   private[this] val maxRetries = RpcUtils.numRetries(conf)
   private[this] val retryWaitMs = RpcUtils.retryWaitMs(conf)
@@ -93,34 +93,28 @@ private[spark] abstract class RpcEndpointRef(conf: SparkConf)
     * @tparam T type of the reply message
     * @return the reply message from the corresponding [[RpcEndpoint]]
     */
-  def askWithRetry[T : ClassTag](message: Any, timeout: RpcTimeout): T = {
+  def askWithRetry[T : ClassTag](message: Any, timeout: RpcTimeout): T =
     // TODO: Consider removing multiple attempts
     var attempts = 0
     var lastException: Exception = null
-    while (attempts < maxRetries) {
+    while (attempts < maxRetries)
       attempts += 1
-      try {
+      try
         val future = ask[T](message, timeout)
         val result = timeout.awaitResult(future)
-        if (result == null) {
+        if (result == null)
           throw new SparkException("RpcEndpoint returned null")
-        }
         return result
-      } catch {
+      catch
         case ie: InterruptedException => throw ie
         case e: Exception =>
           lastException = e
           logWarning(
               s"Error sending message [message = $message] in $attempts attempts",
               e)
-      }
 
-      if (attempts < maxRetries) {
+      if (attempts < maxRetries)
         Thread.sleep(retryWaitMs)
-      }
-    }
 
     throw new SparkException(
         s"Error sending message [message = $message]", lastException)
-  }
-}

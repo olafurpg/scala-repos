@@ -12,27 +12,22 @@ case class PortDefinition(
     name: Option[String] = None,
     labels: Map[String, String] = Map.empty[String, String])
 
-object PortDefinition {
-  implicit val portDefinitionValidator = validator[PortDefinition] {
+object PortDefinition
+  implicit val portDefinitionValidator = validator[PortDefinition]
     portDefinition =>
       portDefinition.protocol is oneOf(DiscoveryInfo.Port.AllowedProtocols)
       portDefinition.port should be >= 0
-  }
-}
 
-object PortDefinitions {
-  def apply(ports: Int*): Seq[PortDefinition] = {
+object PortDefinitions
+  def apply(ports: Int*): Seq[PortDefinition] =
     ports.map(PortDefinition.apply(_)).toIndexedSeq
-  }
 
   implicit val portDefinitionsValidator: Validator[Seq[PortDefinition]] =
-    validator[Seq[PortDefinition]] { portDefinitions =>
+    validator[Seq[PortDefinition]]  portDefinitions =>
       portDefinitions is every(valid)
       portDefinitions is elementsAreUniqueByOptional(
           _.name, "Port names must be unique.")
       portDefinitions is elementsAreUniqueBy(
-          _.port, "Ports must be unique.", filter = { port: Int =>
+          _.port, "Ports must be unique.", filter =  port: Int =>
         port != AppDefinition.RandomPortValue
-      })
-    }
-}
+      )

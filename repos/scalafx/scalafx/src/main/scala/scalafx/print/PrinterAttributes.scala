@@ -37,7 +37,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.PrinterAttributes]].
   */
-object PrinterAttributes {
+object PrinterAttributes
 
   /**
     * Converts a ScalaFX PrinterAttributes to its JavaFX counterpart.
@@ -48,7 +48,6 @@ object PrinterAttributes {
   implicit def sfxPrinterAttributes2jfx(
       pa: PrinterAttributes): jfxp.PrinterAttributes =
     if (pa != null) pa.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrinterAttributes.html JavaFX PrinterAttributes]].
@@ -59,7 +58,7 @@ object PrinterAttributes {
   * @since 8.0
   */
 final class PrinterAttributes(override val delegate: jfxp.PrinterAttributes)
-    extends SFXDelegate[jfxp.PrinterAttributes] {
+    extends SFXDelegate[jfxp.PrinterAttributes]
 
   /**
     * The default collation setting.
@@ -171,4 +170,3 @@ final class PrinterAttributes(override val delegate: jfxp.PrinterAttributes)
     * Reports if page ranges are supported.
     */
   def supportsPageRanges: Boolean = delegate.supportsPageRanges
-}

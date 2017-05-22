@@ -4,7 +4,7 @@ package transform
 import scala.collection.mutable
 
 abstract class LazyVals
-    extends Transform with TypingTransformers with ast.TreeDSL {
+    extends Transform with TypingTransformers with ast.TreeDSL
   // inherits abstract value `global` and class `Phase` from Transform
 
   import global._ // the global environment
@@ -22,15 +22,15 @@ abstract class LazyVals
   private def lazyUnit(sym: Symbol) =
     sym.tpe.resultType.typeSymbol == UnitClass
 
-  object LocalLazyValFinder extends Traverser {
+  object LocalLazyValFinder extends Traverser
     var result: Boolean = _
 
     def find(t: Tree) = { result = false; traverse(t); result }
     def find(ts: List[Tree]) = { result = false; traverseTrees(ts); result }
 
-    override def traverse(t: Tree) {
+    override def traverse(t: Tree)
       if (!result)
-        t match {
+        t match
           case v @ ValDef(_, _, _, _) if v.symbol.isLazy =>
             result = true
 
@@ -45,14 +45,11 @@ abstract class LazyVals
           case LabelDef(name, _, _) if nme.isLoopHeaderLabel(name) =>
           case _ =>
             super.traverse(t)
-        }
-    }
-  }
 
   /**
     * Transform local lazy accessors to check for the initialized bit.
     */
-  class LazyValues(unit: CompilationUnit) extends TypingTransformer(unit) {
+  class LazyValues(unit: CompilationUnit) extends TypingTransformer(unit)
 
     /** map from method symbols to the number of lazy values it defines. */
     private val lazyVals =
@@ -61,14 +58,14 @@ abstract class LazyVals
     import symtab.Flags._
     private def flattenThickets(stats: List[Tree]): List[Tree] =
       stats.flatMap(
-          _ match {
+          _ match
         case b @ Block(List(d1 @ DefDef(_, n1, _, _, _, _)),
                        d2 @ DefDef(_, n2, _, _, _, _))
             if b.tpe == null && n1.endsWith(nme.LAZY_SLOW_SUFFIX) =>
           List(d1, d2)
         case stat =>
           List(stat)
-      })
+      )
 
     /** Perform the following transformations:
       *  - for a lazy accessor inside a method, make it check the initialization bitmap
@@ -91,11 +88,11 @@ abstract class LazyVals
       *  - remove ACCESSOR flags: accessors in traits are not statically implemented,
       *    but moved to the host class. local lazy values should be statically implemented.
       */
-    override def transform(tree: Tree): Tree = {
+    override def transform(tree: Tree): Tree =
       val sym = tree.symbol
       curTree = tree
 
-      tree match {
+      tree match
 
         case Block(_, _) =>
           val block1 = super.transform(tree)
@@ -103,19 +100,18 @@ abstract class LazyVals
           treeCopy.Block(block1, flattenThickets(stats), expr)
 
         case DefDef(_, _, _, _, _, rhs) =>
-          atOwner(tree.symbol) {
+          atOwner(tree.symbol)
             val (res, slowPathDef) =
-              if (!sym.owner.isClass && sym.isLazy) {
-                val enclosingClassOrDummyOrMethod = {
+              if (!sym.owner.isClass && sym.isLazy)
+                val enclosingClassOrDummyOrMethod =
                   val enclMethod = sym.enclMethod
 
-                  if (enclMethod != NoSymbol) {
+                  if (enclMethod != NoSymbol)
                     val enclClass = sym.enclClass
                     if (enclClass != NoSymbol &&
                         enclMethod == enclClass.enclMethod) enclClass
                     else enclMethod
-                  } else sym.owner
-                }
+                  else sym.owner
                 debuglog(
                     s"determined enclosing class/dummy/method for lazy val as $enclosingClassOrDummyOrMethod given symbol $sym")
                 val idx = lazyVals(enclosingClassOrDummyOrMethod)
@@ -124,9 +120,9 @@ abstract class LazyVals
                     enclosingClassOrDummyOrMethod, transform(rhs), idx, sym)
                 sym.resetFlag((if (lazyUnit(sym)) 0 else LAZY) | ACCESSOR)
                 (rhs1, sDef)
-              } else if (sym.hasAllFlags(MODULE | METHOD) &&
-                         !sym.owner.isTrait) {
-                rhs match {
+              else if (sym.hasAllFlags(MODULE | METHOD) &&
+                         !sym.owner.isTrait)
+                rhs match
                   case b @ Block(
                       (assign @ Assign(moduleRef, _)) :: Nil, expr) =>
                     def cond =
@@ -147,27 +143,24 @@ abstract class LazyVals
                         "Unexpected tree on the RHS of a module accessor: " +
                         rhs)
                     (rhs, EmptyTree)
-                }
-              } else {
+              else
                 (transform(rhs), EmptyTree)
-              }
 
             val ddef1 = deriveDefDef(tree)(_ =>
                   if (LocalLazyValFinder.find(res))
                     typed(addBitmapDefs(sym, res)) else res)
-            if (slowPathDef != EmptyTree) {
+            if (slowPathDef != EmptyTree)
               // The contents of this block are flattened into the enclosing statement sequence, see flattenThickets
               // This is a poor man's version of dotty's Thicket: https://github.com/lampepfl/dotty/blob/d5280358d1/src/dotty/tools/dotc/ast/Trees.scala#L707
               Block(slowPathDef, ddef1)
-            } else ddef1
-          }
+            else ddef1
 
         case Template(_, _, body) =>
-          atOwner(currentOwner) {
+          atOwner(currentOwner)
             // TODO: shady business... can this logic be encapsulated in LocalLazyValFinder?
             var added = false
             val stats =
-              super.transformTrees(body) mapConserve {
+              super.transformTrees(body) mapConserve
                 case stat: ValDef =>
                   typed(deriveValDef(stat)(addBitmapDefs(stat.symbol, _)))
                 case stat: TermTree
@@ -175,34 +168,29 @@ abstract class LazyVals
                   added = true
                   typed(addBitmapDefs(sym, stat))
                 case stat => stat
-              }
 
             val innerClassBitmaps =
               if (!added && currentOwner.isClass &&
-                  bitmaps.contains(currentOwner)) {
+                  bitmaps.contains(currentOwner))
                 // add bitmap to inner class if necessary
                 val toAdd0 =
                   bitmaps(currentOwner).map(s => typed(ValDef(s, ZERO)))
                 toAdd0.foreach(
                     t =>
-                      {
-                    if (currentOwner.info.decl(t.symbol.name) == NoSymbol) {
+                    if (currentOwner.info.decl(t.symbol.name) == NoSymbol)
                       t.symbol.setFlag(PROTECTED)
                       currentOwner.info.decls.enter(t.symbol)
-                    }
-                })
+                )
                 toAdd0
-              } else List()
+              else List()
             deriveTemplate(tree)(
                 _ => innerClassBitmaps ++ flattenThickets(stats))
-          }
 
         case ValDef(_, _, _, _) if !sym.owner.isModule && !sym.owner.isClass =>
-          deriveValDef(tree) { rhs0 =>
+          deriveValDef(tree)  rhs0 =>
             val rhs = transform(rhs0)
             if (LocalLazyValFinder.find(rhs)) typed(addBitmapDefs(sym, rhs))
             else rhs
-          }
 
         case l @ LabelDef(name0, params0, ifp0 @ If(_, _, _))
             if name0.startsWith(nme.WHILE_PREFIX) =>
@@ -232,8 +220,6 @@ abstract class LazyVals
           else l
 
         case _ => super.transform(tree)
-      }
-    }
 
     /** Add the bitmap definitions to the rhs of a method definition.
       *  If the rhs has been tail-call transformed, insert the bitmap
@@ -241,11 +227,10 @@ abstract class LazyVals
       *  iteration has the lazy values uninitialized. Otherwise add them
       *  at the very beginning of the method.
       */
-    private def addBitmapDefs(methSym: Symbol, rhs: Tree): Tree = {
-      def prependStats(stats: List[Tree], tree: Tree): Block = tree match {
+    private def addBitmapDefs(methSym: Symbol, rhs: Tree): Tree =
+      def prependStats(stats: List[Tree], tree: Tree): Block = tree match
         case Block(stats1, res) => Block(stats ::: stats1, res)
         case _ => Block(stats, tree)
-      }
 
       val bmps = bitmaps(methSym) map (ValDef(_, ZERO))
 
@@ -254,22 +239,20 @@ abstract class LazyVals
 
       if (bmps.isEmpty) rhs
       else
-        rhs match {
+        rhs match
           case Block(assign, l @ LabelDef(name, params, _))
               if (name string_== "_" + methSym.name) && isMatch(params) =>
             Block(assign,
                   deriveLabelDef(l)(rhs => typed(prependStats(bmps, rhs))))
 
           case _ => prependStats(bmps, rhs)
-        }
-    }
 
     def mkSlowPathDef(clazz: Symbol,
                       lzyVal: Symbol,
                       cond: Tree,
                       syncBody: List[Tree],
                       stats: List[Tree],
-                      retVal: Tree): Tree = {
+                      retVal: Tree): Tree =
       // Q: is there a reason to first set owner to `clazz` (by using clazz.newMethod), and then
       // changing it to lzyVal.owner very soon after? Could we just do lzyVal.owner.newMethod?
       val defSym = clazz.newMethod(
@@ -286,18 +269,16 @@ abstract class LazyVals
         .changeOwner(currentOwner -> defSym)
 
       DefDef(defSym, addBitmapDefs(lzyVal, BLOCK(rhs, retVal)))
-    }
 
     def mkFastPathBody(clazz: Symbol,
                        lzyVal: Symbol,
                        cond: => Tree,
                        syncBody: List[Tree],
                        stats: List[Tree],
-                       retVal: Tree): (Tree, Tree) = {
+                       retVal: Tree): (Tree, Tree) =
       val slowPathDef: Tree = mkSlowPathDef(
           clazz, lzyVal, cond, syncBody, stats, retVal)
       (If(cond, Apply(Ident(slowPathDef.symbol), Nil), retVal), slowPathDef)
-    }
 
     /** return a 'lazified' version of rhs. Rhs should conform to the
       *  following schema:
@@ -336,7 +317,7 @@ abstract class LazyVals
     private def mkLazyDef(methOrClass: Symbol,
                           tree: Tree,
                           offset: Int,
-                          lazyVal: Symbol): (Tree, Tree) = {
+                          lazyVal: Symbol): (Tree, Tree) =
       val bitmapSym = getBitmapFor(methOrClass, offset)
       val mask = LIT(1 << (offset % FLAGS_PER_BYTE))
       val bitmapRef =
@@ -347,19 +328,17 @@ abstract class LazyVals
         BLOCK(stmt, mkSetFlag(bitmapSym, mask, bitmapRef), UNIT)
 
       debuglog(s"create complete lazy def in $methOrClass for $lazyVal")
-      val (block, res) = tree match {
+      val (block, res) = tree match
         case Block(List(assignment), res) if !lazyUnit(lazyVal) =>
           (mkBlock(assignment), res)
         case rhs =>
           (mkBlock(rhs), UNIT)
-      }
 
       def cond = (bitmapRef GEN_& (mask, bitmapKind)) GEN_== (ZERO, bitmapKind)
       val lazyDefs = mkFastPathBody(
           methOrClass.enclClass, lazyVal, cond, List(block), Nil, res)
       (atPos(tree.pos)(localTyper.typed { lazyDefs._1 }),
        atPos(tree.pos)(localTyper.typed { lazyDefs._2 }))
-    }
 
     private def mkSetFlag(bmp: Symbol, mask: Tree, bmpRef: Tree): Tree =
       bmpRef === (bmpRef GEN_| (mask, bitmapKind))
@@ -369,21 +348,16 @@ abstract class LazyVals
     /** Return the symbol corresponding of the right bitmap int inside meth,
       *  given offset.
       */
-    private def getBitmapFor(meth: Symbol, offset: Int): Symbol = {
+    private def getBitmapFor(meth: Symbol, offset: Int): Symbol =
       val n = offset / FLAGS_PER_BYTE
       val bmps = bitmaps(meth)
       if (bmps.length > n) bmps(n)
-      else {
+      else
         val sym = meth
           .newVariable(nme.newBitmapName(nme.BITMAP_NORMAL, n), meth.pos)
           .setInfo(ByteTpe)
-        enteringTyper {
+        enteringTyper
           sym addAnnotation VolatileAttr
-        }
 
         bitmaps(meth) = (sym :: bmps).reverse
         sym
-      }
-    }
-  }
-}

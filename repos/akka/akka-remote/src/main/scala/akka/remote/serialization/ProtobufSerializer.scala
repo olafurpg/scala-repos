@@ -12,18 +12,17 @@ import akka.serialization.{Serialization, BaseSerializer}
 
 import scala.annotation.tailrec
 
-object ProtobufSerializer {
+object ProtobufSerializer
   private val ARRAY_OF_BYTE_ARRAY = Array[Class[_]](classOf[Array[Byte]])
 
   /**
     * Helper to serialize an [[akka.actor.ActorRef]] to Akka's
     * protobuf representation.
     */
-  def serializeActorRef(ref: ActorRef): ActorRefData = {
+  def serializeActorRef(ref: ActorRef): ActorRefData =
     ActorRefData.newBuilder
       .setPath(Serialization.serializedActorPath(ref))
       .build
-  }
 
   /**
     * Helper to materialize (lookup) an [[akka.actor.ActorRef]]
@@ -33,7 +32,6 @@ object ProtobufSerializer {
   def deserializeActorRef(
       system: ExtendedActorSystem, refProtocol: ActorRefData): ActorRef =
     system.provider.resolveActorRef(refProtocol.getPath)
-}
 
 /**
   * This Serializer serializes `akka.protobuf.Message` and `com.google.protobuf.Message`
@@ -41,7 +39,7 @@ object ProtobufSerializer {
   * dependency to `com.google.protobuf`.
   */
 class ProtobufSerializer(val system: ExtendedActorSystem)
-    extends BaseSerializer {
+    extends BaseSerializer
 
   @deprecated("Use constructor with ExtendedActorSystem", "2.4")
   def this() = this(null)
@@ -62,13 +60,13 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
   override def includeManifest: Boolean = true
 
   override def fromBinary(
-      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef = {
-    manifest match {
+      bytes: Array[Byte], manifest: Option[Class[_]]): AnyRef =
+    manifest match
       case Some(clazz) ⇒
         @tailrec
-        def parsingMethod(method: Method = null): Method = {
+        def parsingMethod(method: Method = null): Method =
           val parsingMethodBinding = parsingMethodBindingRef.get()
-          parsingMethodBinding.get(clazz) match {
+          parsingMethodBinding.get(clazz) match
             case Some(cachedParsingMethod) ⇒ cachedParsingMethod
             case None ⇒
               val unCachedParsingMethod =
@@ -81,22 +79,18 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
                       parsingMethodBinding.updated(
                           clazz, unCachedParsingMethod))) unCachedParsingMethod
               else parsingMethod(unCachedParsingMethod)
-          }
-        }
         parsingMethod().invoke(null, bytes)
 
       case None ⇒
         throw new IllegalArgumentException(
             "Need a protobuf message class to be able to serialize bytes using protobuf")
-    }
-  }
 
-  override def toBinary(obj: AnyRef): Array[Byte] = {
+  override def toBinary(obj: AnyRef): Array[Byte] =
     val clazz = obj.getClass
     @tailrec
-    def toByteArrayMethod(method: Method = null): Method = {
+    def toByteArrayMethod(method: Method = null): Method =
       val toByteArrayMethodBinding = toByteArrayMethodBindingRef.get()
-      toByteArrayMethodBinding.get(clazz) match {
+      toByteArrayMethodBinding.get(clazz) match
         case Some(cachedtoByteArrayMethod) ⇒ cachedtoByteArrayMethod
         case None ⇒
           val unCachedtoByteArrayMethod =
@@ -108,8 +102,4 @@ class ProtobufSerializer(val system: ExtendedActorSystem)
                       clazz, unCachedtoByteArrayMethod)))
             unCachedtoByteArrayMethod
           else toByteArrayMethod(unCachedtoByteArrayMethod)
-      }
-    }
     toByteArrayMethod().invoke(obj).asInstanceOf[Array[Byte]]
-  }
-}

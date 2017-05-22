@@ -26,18 +26,16 @@ import org.apache.spark.sql.catalyst.expressions.codegen.CodegenFallback
   * to this class and they subsequently query for expression equality. Expression trees are
   * considered equal if for the same input(s), the same result is produced.
   */
-class EquivalentExpressions {
+class EquivalentExpressions
 
   /**
     * Wrapper around an Expression that provides semantic equality.
     */
-  case class Expr(e: Expression) {
-    override def equals(o: Any): Boolean = o match {
+  case class Expr(e: Expression)
+    override def equals(o: Any): Boolean = o match
       case other: Expr => e.semanticEquals(other.e)
       case _ => false
-    }
     override val hashCode: Int = e.semanticHash()
-  }
 
   // For each expression, the set of equivalent expressions.
   private val equivalenceMap =
@@ -48,64 +46,52 @@ class EquivalentExpressions {
     * expressions. Non-recursive.
     * Returns true if there was already a matching expression.
     */
-  def addExpr(expr: Expression): Boolean = {
-    if (expr.deterministic) {
+  def addExpr(expr: Expression): Boolean =
+    if (expr.deterministic)
       val e: Expr = Expr(expr)
       val f = equivalenceMap.get(e)
-      if (f.isDefined) {
+      if (f.isDefined)
         f.get += expr
         true
-      } else {
+      else
         equivalenceMap.put(e, mutable.MutableList(expr))
         false
-      }
-    } else {
+    else
       false
-    }
-  }
 
   /**
     * Adds the expression to this data structure recursively. Stops if a matching expression
     * is found. That is, if `expr` has already been added, its children are not added.
     * If ignoreLeaf is true, leaf nodes are ignored.
     */
-  def addExprTree(root: Expression, ignoreLeaf: Boolean = true): Unit = {
+  def addExprTree(root: Expression, ignoreLeaf: Boolean = true): Unit =
     val skip = root.isInstanceOf[LeafExpression] && ignoreLeaf
     // the children of CodegenFallback will not be used to generate code (call eval() instead)
-    if (!skip && !addExpr(root) && !root.isInstanceOf[CodegenFallback]) {
+    if (!skip && !addExpr(root) && !root.isInstanceOf[CodegenFallback])
       root.children.foreach(addExprTree(_, ignoreLeaf))
-    }
-  }
 
   /**
     * Returns all of the expression trees that are equivalent to `e`. Returns
     * an empty collection if there are none.
     */
-  def getEquivalentExprs(e: Expression): Seq[Expression] = {
+  def getEquivalentExprs(e: Expression): Seq[Expression] =
     equivalenceMap.getOrElse(Expr(e), mutable.MutableList())
-  }
 
   /**
     * Returns all the equivalent sets of expressions.
     */
-  def getAllEquivalentExprs: Seq[Seq[Expression]] = {
+  def getAllEquivalentExprs: Seq[Seq[Expression]] =
     equivalenceMap.values.map(_.toSeq).toSeq
-  }
 
   /**
     * Returns the state of the data structure as a string. If `all` is false, skips sets of
     * equivalent expressions with cardinality 1.
     */
-  def debugString(all: Boolean = false): String = {
+  def debugString(all: Boolean = false): String =
     val sb: mutable.StringBuilder = new StringBuilder()
     sb.append("Equivalent expressions:\n")
-    equivalenceMap.foreach {
-      case (k, v) => {
-          if (all || v.length > 1) {
+    equivalenceMap.foreach
+      case (k, v) =>
+          if (all || v.length > 1)
             sb.append("  " + v.mkString(", ")).append("\n")
-          }
-        }
-    }
     sb.toString()
-  }
-}

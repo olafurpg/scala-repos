@@ -27,8 +27,8 @@ import scala.collection.mutable
   */
 class ScDocCommentImpl(text: CharSequence)
     extends LazyParseablePsiElement(
-        ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment {
-  def version: Int = {
+        ScalaDocElementTypes.SCALA_DOC_COMMENT, text) with ScDocComment
+  def version: Int =
     val firstLineIsEmpty = getNode
       .getChildren(null)
       .lift(2)
@@ -36,27 +36,22 @@ class ScDocCommentImpl(text: CharSequence)
           _.getElementType == ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS)
 
     if (firstLineIsEmpty) 1 else 2
-  }
 
-  def getOwner: PsiDocCommentOwner = getParent match {
+  def getOwner: PsiDocCommentOwner = getParent match
     case owner: PsiDocCommentOwner if owner.getDocComment eq this => owner
     case _ => null
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     super.processDeclarations(processor, state, lastParent, place) &&
-    !Option(getOwner).exists {
+    !Option(getOwner).exists
       case owner: ScClass =>
-        owner.members.exists {
+        owner.members.exists
           case named: PsiNamedElement => !processor.execute(named, state)
           case _ => false
-        }
       case _ => false
-    }
-  }
 
   def getTokenType: IElementType = ScalaDocElementTypes.SCALA_DOC_COMMENT
 
@@ -73,56 +68,45 @@ class ScDocCommentImpl(text: CharSequence)
   def findTagsByName(name: String): Array[PsiDocTag] =
     findTagsByName(a => a == name)
 
-  def findTagsByName(filter: String => Boolean): Array[PsiDocTag] = {
+  def findTagsByName(filter: String => Boolean): Array[PsiDocTag] =
     var currentChild = getFirstChild
     val answer = mutable.ArrayBuilder.make[PsiDocTag]()
 
     while (currentChild != null &&
-    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END) {
-      currentChild match {
+    currentChild.getNode.getElementType != ScalaDocTokenType.DOC_COMMENT_END)
+      currentChild match
         case docTag: ScDocTag
             if docTag.getNode.getElementType == ScalaDocElementTypes.DOC_TAG &&
             filter(docTag.name) =>
           answer += currentChild.asInstanceOf[PsiDocTag]
         case _ =>
-      }
       currentChild = currentChild.getNextSibling
-    }
 
     answer.result()
-  }
 
   protected def findChildrenByClassScala[T >: Null <: ScalaPsiElement](
-      aClass: Class[T]): Array[T] = {
+      aClass: Class[T]): Array[T] =
     val result: util.List[T] = new util.ArrayList[T]
     var cur: PsiElement = getFirstChild
-    while (cur != null) {
+    while (cur != null)
       if (aClass.isInstance(cur)) result.add(cur.asInstanceOf[T])
       cur = cur.getNextSibling
-    }
     result.toArray[T](java.lang.reflect.Array
           .newInstance(aClass, result.size)
           .asInstanceOf[Array[T]])
-  }
 
   protected def findChildByClassScala[T >: Null <: ScalaPsiElement](
-      aClass: Class[T]): T = {
+      aClass: Class[T]): T =
     var cur: PsiElement = getFirstChild
-    while (cur != null) {
+    while (cur != null)
       if (aClass.isInstance(cur)) return cur.asInstanceOf[T]
       cur = cur.getNextSibling
-    }
     null
-  }
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitDocComment(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => accept(s)
       case _ => super.accept(visitor)
-    }
-  }
-}

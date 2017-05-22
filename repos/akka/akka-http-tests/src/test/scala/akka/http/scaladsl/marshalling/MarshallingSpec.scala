@@ -19,45 +19,37 @@ import MediaTypes._
 
 class MarshallingSpec
     extends FreeSpec with Matchers with BeforeAndAfterAll
-    with MultipartMarshallers with MarshallingTestUtils {
+    with MultipartMarshallers with MarshallingTestUtils
   implicit val system = ActorSystem(getClass.getSimpleName)
   implicit val materializer = ActorMaterializer()
   import system.dispatcher
 
-  "The PredefinedToEntityMarshallers." - {
-    "StringMarshaller should marshal strings to `text/plain` content in UTF-8" in {
+  "The PredefinedToEntityMarshallers." -
+    "StringMarshaller should marshal strings to `text/plain` content in UTF-8" in
       marshal("Ha“llo") shouldEqual HttpEntity("Ha“llo")
-    }
-    "DoneMarshaller should enable marshalling of akka.Done" in {
+    "DoneMarshaller should enable marshalling of akka.Done" in
       marshal(akka.Done) shouldEqual HttpEntity("")
-    }
-    "CharArrayMarshaller should marshal char arrays to `text/plain` content in UTF-8" in {
+    "CharArrayMarshaller should marshal char arrays to `text/plain` content in UTF-8" in
       marshal("Ha“llo".toCharArray) shouldEqual HttpEntity("Ha“llo")
-    }
-    "FormDataMarshaller should marshal FormData instances to application/x-www-form-urlencoded content" in {
+    "FormDataMarshaller should marshal FormData instances to application/x-www-form-urlencoded content" in
       marshal(FormData(Map("name" -> "Bob", "pass" -> "hällo", "admin" -> ""))) shouldEqual HttpEntity(
           `application/x-www-form-urlencoded` withCharset `UTF-8`,
           "name=Bob&pass=h%C3%A4llo&admin=")
-    }
-  }
 
-  "The GenericMarshallers." - {
-    "optionMarshaller should enable marshalling of Option[T]" in {
+  "The GenericMarshallers." -
+    "optionMarshaller should enable marshalling of Option[T]" in
 
       marshal(Some("Ha“llo")) shouldEqual HttpEntity("Ha“llo")
       marshal(None: Option[String]) shouldEqual HttpEntity.Empty
-    }
-    "eitherMarshaller should enable marshalling of Either[A, B]" in {
+    "eitherMarshaller should enable marshalling of Either[A, B]" in
       marshal[Either[Array[Char], String]](Right("right")) shouldEqual HttpEntity(
           "right")
       marshal[Either[Array[Char], String]](Left("left".toCharArray)) shouldEqual HttpEntity(
           "left")
-    }
-  }
 
-  "The MultipartMarshallers." - {
-    "multipartMarshaller should correctly marshal multipart content with" - {
-      "one empty part" in {
+  "The MultipartMarshallers." -
+    "multipartMarshaller should correctly marshal multipart content with" -
+      "one empty part" in
         marshal(Multipart.General(
                 `multipart/mixed`,
                 Multipart.General.BodyPart.Strict(""))) shouldEqual HttpEntity(
@@ -67,8 +59,7 @@ class MarshallingSpec
                       |
                       |
                       |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
-      }
-      "one non-empty part" in {
+      "one non-empty part" in
         marshal(
             Multipart.General(
                 `multipart/alternative`,
@@ -85,8 +76,7 @@ class MarshallingSpec
                         |
                         |test@there.com
                         |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
-      }
-      "two different parts" in {
+      "two different parts" in
         marshal(
             Multipart.General(
                 `multipart/related`,
@@ -109,11 +99,9 @@ class MarshallingSpec
                       |
                       |filecontent
                       |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
-      }
-    }
 
-    "multipartFormDataMarshaller should correctly marshal 'multipart/form-data' content with" - {
-      "two fields" in {
+    "multipartFormDataMarshaller should correctly marshal 'multipart/form-data' content with" -
+      "two fields" in
         marshal(Multipart.FormData(ListMap(
                     "surname" -> HttpEntity("Mike"),
                     "age" -> marshal(<int>42</int>)))) shouldEqual HttpEntity(
@@ -129,9 +117,8 @@ class MarshallingSpec
                       |
                       |<int>42</int>
                       |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
-      }
 
-      "two fields having a custom `Content-Disposition`" in {
+      "two fields having a custom `Content-Disposition`" in
         marshal(Multipart.FormData(
                 Source(List(Multipart.FormData.BodyPart(
                                 "attachment[0]",
@@ -160,16 +147,11 @@ class MarshallingSpec
                         |
                         |naice!
                         |--$randomBoundary--""".stripMarginWithNewline("\r\n"))
-      }
-    }
-  }
 
   override def afterAll() = system.terminate()
 
-  protected class FixedRandom extends java.util.Random {
+  protected class FixedRandom extends java.util.Random
     override def nextBytes(array: Array[Byte]): Unit =
       "my-stable-boundary".getBytes("UTF-8").copyToArray(array)
-  }
   override protected val multipartBoundaryRandom =
     new FixedRandom // fix for stable value
-}

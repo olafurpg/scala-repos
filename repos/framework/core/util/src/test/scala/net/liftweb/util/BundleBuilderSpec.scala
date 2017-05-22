@@ -27,11 +27,11 @@ import org.specs2.mutable.Specification
 /**
   * Systems under specification for BundleBuilder.
   */
-object BundleBuilderSpec extends Specification with XmlMatchers {
+object BundleBuilderSpec extends Specification with XmlMatchers
   "BundleBuilder Specification".title
 
-  "BundleBuilder" should {
-    "Build a Bundle" in {
+  "BundleBuilder" should
+    "Build a Bundle" in
       val b = BundleBuilder
         .convert(<div>
                                     <div name="dog" lang="en">Dog</div>
@@ -43,9 +43,8 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
 
       b.getObject("dog") must_== "Dog"
       b.getObject("cat").asInstanceOf[NodeSeq] must ==/(<div>hi</div>)
-    }
 
-    "Build a Bundle must support default" in {
+    "Build a Bundle must support default" in
       val b = BundleBuilder
         .convert(<div>
                                     <div name="dog" lang="zz">Dog</div>
@@ -57,6 +56,3 @@ object BundleBuilderSpec extends Specification with XmlMatchers {
 
       b.getObject("dog") must_== "Chien"
       b.getObject("cat").asInstanceOf[NodeSeq] must ==/(<div>hi</div>)
-    }
-  }
-}

@@ -1,4 +1,4 @@
-object SCL3470 {
+object SCL3470
   class A; class B; class C
   implicit def c2a(c: C): A = new A
   implicit def b2a(b: B): A = new A
@@ -16,5 +16,4 @@ object SCL3470 {
     foo(new B, new C) // fail: Seq[ScalaObject] doesn't conform to Seq[A]
   /*start*/
   (r1, r2, r3, r4, r5, r6) /*end*/
-}
 //(Seq[SCL3470.A], Seq[SCL3470.A], Seq[SCL3470.A], Seq[SCL3470.A], Seq[SCL3470.A], Seq[SCL3470.A])

@@ -40,7 +40,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
         DenseVector[Double], DiffFunction[DenseVector[Double]]](
         LBFGSB.defaultConvergenceCheck(
             lowerBounds, upperBounds, tolerance, maxIter))
-    with SerializableLogging {
+    with SerializableLogging
   protected val EPS = 2.2E-16
 
   /**
@@ -59,22 +59,20 @@ class LBFGSB(lowerBounds: DenseVector[Double],
 
   //initialize only is called once, so it can be used to init some arguments
   override protected def initialHistory(f: DiffFunction[DenseVector[Double]],
-                                        init: DenseVector[Double]): History = {
+                                        init: DenseVector[Double]): History =
     initialize(f, init)
-  }
 
   override protected def updateHistory(newX: DenseVector[Double],
                                        newGrad: DenseVector[Double],
                                        newVal: Double,
                                        f: DiffFunction[DenseVector[Double]],
-                                       oldState: State): History = {
+                                       oldState: State): History =
     updateSkYkHessianApproxMat(
         oldState.history, newX - oldState.x, newGrad :- oldState.grad)
-  }
 
   override protected def chooseDescentDirection(
       state: State,
-      f: DiffFunction[DenseVector[Double]]): DenseVector[Double] = {
+      f: DiffFunction[DenseVector[Double]]): DenseVector[Double] =
     val x = state.x
     val g = state.grad
 
@@ -83,34 +81,31 @@ class LBFGSB(lowerBounds: DenseVector[Double],
 
     val dirk =
       if (0 == state.iter) cauchyPoint - x
-      else {
+      else
         //step3:compute a search direction d_k by the primal method
         val subspaceMin = subspaceMinimization(
             state.history, cauchyPoint, x, c, g)
         subspaceMin - x
-      };
+      ;
 
     dirk
-  }
 
   override protected def determineStepSize(
       state: State,
       f: DiffFunction[DenseVector[Double]],
-      direction: DenseVector[Double]): Double = {
+      direction: DenseVector[Double]): Double =
     val x = state.x
     val ff = LineSearch.functionFromSearchDirection(f, x, direction)
     val wolfeRuleSearch = new StrongWolfeLineSearch(
         maxZoomIter, maxLineSearchIter) // TODO: Need good default values here.
     wolfeRuleSearch.minimize(ff, 1.0)
-  }
 
   override protected def takeStep(
-      state: State, dir: DenseVector[Double], stepSize: Double) = {
+      state: State, dir: DenseVector[Double], stepSize: Double) =
     state.x + (dir :* stepSize)
-  }
 
   private def initialize(
-      f: DiffFunction[DenseVector[Double]], x0: DenseVector[Double]) = {
+      f: DiffFunction[DenseVector[Double]], x0: DenseVector[Double]) =
     val DIM = x0.length
     require(
         lowerBounds.length == x0.length,
@@ -128,28 +123,24 @@ class LBFGSB(lowerBounds: DenseVector[Double],
         yHistory = DenseMatrix.zeros[Double](0, 0),
         sHistory = DenseMatrix.zeros[Double](0, 0)
     )
-  }
 
   protected def getGeneralizedCauchyPoint(
-      history: History, x: DenseVector[Double], g: DenseVector[Double]) = {
+      history: History, x: DenseVector[Double], g: DenseVector[Double]) =
     import history._
     //Algorithm CP:Computation of generalized Cauchy point
     val n = x.length
     val d = DenseVector.zeros[Double](n)
-    val t = g.mapPairs { (i, gi) =>
-      if (0 == gi) {
+    val t = g.mapPairs  (i, gi) =>
+      if (0 == gi)
         (i, Double.MaxValue)
-      } else {
+      else
         val ti =
-          if (gi < 0) {
+          if (gi < 0)
             (x(i) - upperBounds(i)) / gi
-          } else {
+          else
             (x(i) - lowerBounds(i)) / gi
-          }
         d(i) = if (0 == ti) 0 else -gi
         (i, ti)
-      }
-    }
 
     //Initialize
     val xCauchy = x.copy;
@@ -168,7 +159,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     var deltaT = minT - oldT
 
     //examination of subsequent  segments
-    while (deltaT <= dtMin && (i < n)) {
+    while (deltaT <= dtMin && (i < n))
       xCauchy(b) = if (0 < d(b)) upperBounds(b) else lowerBounds(b)
 
       val zb = xCauchy(b) - x(b)
@@ -185,25 +176,21 @@ class LBFGSB(lowerBounds: DenseVector[Double],
       dtMin = -fDerivative / fSecondDerivative
       oldT = minT
       i += 1
-      if (i < n) {
+      if (i < n)
         b = sortedIndeces(i)
         minT = t(b)._2
         deltaT = minT - oldT
-      }
-    }
 
     dtMin = math.max(dtMin, 0)
     oldT += dtMin
 
-    for (sortIdx <- i until n) {
+    for (sortIdx <- i until n)
       xCauchy(sortedIndeces(sortIdx)) = x(sortedIndeces(sortIdx)) + oldT * d(
           sortedIndeces(sortIdx))
-    }
 
     c += p :* dtMin
 
     (xCauchy, c)
-  }
 
   /**
     *
@@ -214,42 +201,36 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     */
   protected def findAlpha(xCauchy: DenseVector[Double],
                           du: Vector[Double],
-                          freeVarIndex: Array[Int]) = {
+                          freeVarIndex: Array[Int]) =
     var starAlpha = 1.0
-    for ((vIdx, i) <- freeVarIndex.zipWithIndex) {
-      starAlpha = if (0 < du(i)) {
+    for ((vIdx, i) <- freeVarIndex.zipWithIndex)
+      starAlpha = if (0 < du(i))
         math.max(starAlpha,
                  math.min(upperBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
-      } else {
+      else
         math.max(starAlpha,
                  math.min(lowerBounds(vIdx) - xCauchy(vIdx) / du(i), 1.0))
-      }
-    }
 
     starAlpha
-  }
 
   //use Direct Primal Method
   protected def subspaceMinimization(history: History,
                                      xCauchy: DenseVector[Double],
                                      x: DenseVector[Double],
                                      c: DenseVector[Double],
-                                     g: DenseVector[Double]) = {
+                                     g: DenseVector[Double]) =
     import history._
     val invTheta = 1.0 / theta
 
     var freeVariableIndexes = collection.mutable.ArrayBuffer[Int]()
-    xCauchy.mapPairs { (i, v) =>
-      if (v != upperBounds(i) && v != lowerBounds(i)) {
+    xCauchy.mapPairs  (i, v) =>
+      if (v != upperBounds(i) && v != lowerBounds(i))
         freeVariableIndexes += i
-      }
-    }
     val freeVarCount = freeVariableIndexes.length
     //WZ = W^T*Z
     val WZ = DenseMatrix.zeros[Double](W.cols, freeVarCount)
-    for (i <- 0 until freeVarCount) {
+    for (i <- 0 until freeVarCount)
       WZ(::, i) := W(freeVariableIndexes(i), ::).t
-    }
 
     // r=(g+theta*(x_cauchy-x)-W*(M*c));
     val dirTheta: DenseVector[Double] = (xCauchy - x) :* theta;
@@ -276,28 +257,26 @@ class LBFGSB(lowerBounds: DenseVector[Double],
     val dStar = du :* starAlpha
 
     val subspaceMinX = xCauchy.copy
-    for ((freeVarIdx, i) <- freeVariableIndexes.zipWithIndex) {
+    for ((freeVarIdx, i) <- freeVariableIndexes.zipWithIndex)
       subspaceMinX(freeVarIdx) = subspaceMinX(freeVarIdx) + dStar(i)
-    }
 
     subspaceMinX
-  }
 
   protected def updateSkYkHessianApproxMat(history: History,
                                            newS: DenseVector[Double],
-                                           newY: DenseVector[Double]) = {
-    val newHistory = {
+                                           newY: DenseVector[Double]) =
+    val newHistory =
       import history._
-      if (0 == yHistory.cols) {
+      if (0 == yHistory.cols)
         //yHistory.cols means update times
         history.copy(
             yHistory = newY.toDenseMatrix.t, sHistory = newS.toDenseMatrix.t)
-      } else if (yHistory.cols < m) {
+      else if (yHistory.cols < m)
         history.copy(
             yHistory = DenseMatrix.horzcat(yHistory, newY.toDenseMatrix.t),
             sHistory = DenseMatrix.horzcat(sHistory, newS.toDenseMatrix.t)
         )
-      } else {
+      else
         //m <= k discard the oldest yk and sk
         history.copy(
             yHistory = DenseMatrix.horzcat(
@@ -305,8 +284,6 @@ class LBFGSB(lowerBounds: DenseVector[Double],
             sHistory = DenseMatrix.horzcat(
                   sHistory(::, 1 until m), newS.toDenseMatrix.t)
         )
-      }
-    }
 
     import newHistory._
 
@@ -314,7 +291,7 @@ class LBFGSB(lowerBounds: DenseVector[Double],
      *If more than m updates are stored, delete the old columns from Sk and Yk
      */
     val curvatureTest = math.abs(newS.dot(newY))
-    if (EPS * norm(newY, 2) < curvatureTest) {
+    if (EPS * norm(newY, 2) < curvatureTest)
       //step7:update Sk'Sk, Yk'Yk, Lk and Rk, and set theta = yk'*yk/yk'*sk
       val newTheta = newY.t * newY / (newY.t * newS)
       val newW = DenseMatrix.horzcat(yHistory, sHistory :* newTheta)
@@ -327,50 +304,41 @@ class LBFGSB(lowerBounds: DenseVector[Double],
           DenseMatrix.horzcat(D, L.t), DenseMatrix.horzcat(L, STS :* newTheta))
       val newM = inv(MM) //MM-1 M is defined at formula 3.4
       newHistory.copy(newTheta, newW, newM)
-    } else {
+    else
       history
-    }
-  }
 
   //norm(P(xk-gk, l, u) - xk, INF) < 1E-5
-}
 
-object LBFGSB {
+object LBFGSB
   def defaultConvergenceCheck(lowerBounds: DenseVector[Double],
                               upperBounds: DenseVector[Double],
                               tolerance: Double,
-                              maxIter: Int) = {
+                              maxIter: Int) =
     bfgsbConvergenceTest(lowerBounds, upperBounds) ||
     FirstOrderMinimizer.functionValuesConverged(tolerance) ||
     FirstOrderMinimizer.maxIterationsReached(maxIter)
-  }
 
   protected val PROJ_GRADIENT_EPS = 1E-5
   protected def bfgsbConvergenceTest(lowerBounds: DenseVector[Double],
                                      upperBounds: DenseVector[Double])
     : ConvergenceCheck[DenseVector[Double]] =
-    ConvergenceCheck.fromPartialFunction {
+    ConvergenceCheck.fromPartialFunction
       case state if boundedConvCheck(state, lowerBounds, upperBounds) =>
         ProjectedStepConverged
-    }
 
   private def boundedConvCheck[H](
       state: State[DenseVector[Double], _, H],
       lowerBounds: DenseVector[Double],
-      upperBounds: DenseVector[Double]): Boolean = {
+      upperBounds: DenseVector[Double]): Boolean =
     val x = state.x
     val g = state.grad
-    val pMinusX = (x - g).mapPairs { (i, v) =>
-      if (v <= lowerBounds(i)) {
+    val pMinusX = (x - g).mapPairs  (i, v) =>
+      if (v <= lowerBounds(i))
         lowerBounds(i) - x(i)
-      } else if (upperBounds(i) <= v) {
+      else if (upperBounds(i) <= v)
         upperBounds(i) - x(i)
-      } else {
+      else
         v - x(i)
-      }
-    }
     val normPMinusX = norm(pMinusX, Double.PositiveInfinity)
 
     math.abs(normPMinusX) < PROJ_GRADIENT_EPS
-  }
-}

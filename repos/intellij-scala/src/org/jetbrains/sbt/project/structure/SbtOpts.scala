@@ -10,14 +10,13 @@ import com.intellij.openapi.util.io.FileUtil
   * @author Nikolay Obedin
   * @since 11/27/14.
   */
-object SbtOpts {
+object SbtOpts
 
-  def loadFrom(directory: File): Seq[String] = {
+  def loadFrom(directory: File): Seq[String] =
     val sbtOptsFile = directory / ".sbtopts"
     if (sbtOptsFile.exists && sbtOptsFile.isFile && sbtOptsFile.canRead)
       process(FileUtil.loadLines(sbtOptsFile).asScala.map(_.trim))
     else Seq.empty
-  }
 
   private val noShareOpts =
     "-Dsbt.global.base=project/.sbtboot -Dsbt.boot.directory=project/.boot -Dsbt.ivy.home=project/.ivy"
@@ -32,8 +31,8 @@ object SbtOpts {
       "-jvm-debug" -> debuggerOpts
   )
 
-  private def process(opts: Seq[String]): Seq[String] = {
-    opts.flatMap { opt =>
+  private def process(opts: Seq[String]): Seq[String] =
+    opts.flatMap  opt =>
       if (opt.startsWith("-no-share")) Some(noShareOpts)
       else if (opt.startsWith("-no-global")) Some(noGlobalOpts)
       else if (sbtToJdkOpts.exists { case (k, _) => opt.startsWith(k) })
@@ -41,14 +40,9 @@ object SbtOpts {
       else if (opt.startsWith("-J")) Some(opt.substring(2))
       else if (opt.startsWith("-D")) Some(opt)
       else None
-    }
-  }
 
-  private def processOptWithArg(opt: String): Option[String] = {
-    sbtToJdkOpts.find { case (k, _) => opt.startsWith(k) }.flatMap {
+  private def processOptWithArg(opt: String): Option[String] =
+    sbtToJdkOpts.find { case (k, _) => opt.startsWith(k) }.flatMap
       case (k, x) =>
         val v = opt.replace(k, "").trim
         if (v.isEmpty) None else Some(x + v)
-    }
-  }
-}

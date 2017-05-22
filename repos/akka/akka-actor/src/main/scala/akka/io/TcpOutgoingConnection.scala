@@ -27,7 +27,7 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
                             .open()
                             .configureBlocking(false)
                             .asInstanceOf[SocketChannel],
-                          connect.pullMode) {
+                          connect.pullMode)
 
   import context._
   import connect._
@@ -42,85 +42,70 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
   private def stop(): Unit =
     stopWith(CloseInformation(Set(commander), connect.failureMessage))
 
-  private def reportConnectFailure(thunk: ⇒ Unit): Unit = {
-    try {
+  private def reportConnectFailure(thunk: ⇒ Unit): Unit =
+    try
       thunk
-    } catch {
+    catch
       case NonFatal(e) ⇒
         log.debug("Could not establish connection to [{}] due to {}",
                   remoteAddress,
                   e)
         stop()
-    }
-  }
 
-  def receive: Receive = {
+  def receive: Receive =
     case registration: ChannelRegistration ⇒
-      reportConnectFailure {
-        if (remoteAddress.isUnresolved) {
+      reportConnectFailure
+        if (remoteAddress.isUnresolved)
           log.debug(
               "Resolving {} before connecting", remoteAddress.getHostName)
-          Dns.resolve(remoteAddress.getHostName)(system, self) match {
+          Dns.resolve(remoteAddress.getHostName)(system, self) match
             case None ⇒
               context.become(resolving(registration))
             case Some(resolved) ⇒
               register(
                   new InetSocketAddress(resolved.addr, remoteAddress.getPort),
                   registration)
-          }
-        } else {
+        else
           register(remoteAddress, registration)
-        }
-      }
-  }
 
-  def resolving(registration: ChannelRegistration): Receive = {
+  def resolving(registration: ChannelRegistration): Receive =
     case resolved: Dns.Resolved ⇒
-      reportConnectFailure {
+      reportConnectFailure
         register(new InetSocketAddress(resolved.addr, remoteAddress.getPort),
                  registration)
-      }
-  }
 
   def register(
-      address: InetSocketAddress, registration: ChannelRegistration): Unit = {
-    reportConnectFailure {
+      address: InetSocketAddress, registration: ChannelRegistration): Unit =
+    reportConnectFailure
       log.debug("Attempting connection to [{}]", address)
       if (channel.connect(address))
         completeConnect(registration, commander, options)
-      else {
+      else
         registration.enableInterest(SelectionKey.OP_CONNECT)
         context.become(
             connecting(registration, tcp.Settings.FinishConnectRetries))
-      }
-    }
-  }
 
   def connecting(registration: ChannelRegistration,
-                 remainingFinishConnectRetries: Int): Receive = {
-    {
+                 remainingFinishConnectRetries: Int): Receive =
       case ChannelConnectable ⇒
-        reportConnectFailure {
-          if (channel.finishConnect()) {
+        reportConnectFailure
+          if (channel.finishConnect())
             if (timeout.isDefined)
               context.setReceiveTimeout(Duration.Undefined) // Clear the timeout
             log.debug("Connection established to [{}]", remoteAddress)
             completeConnect(registration, commander, options)
-          } else {
-            if (remainingFinishConnectRetries > 0) {
-              context.system.scheduler.scheduleOnce(1.millisecond) {
+          else
+            if (remainingFinishConnectRetries > 0)
+              context.system.scheduler.scheduleOnce(1.millisecond)
                 channelRegistry.register(channel, SelectionKey.OP_CONNECT)
-              }(context.dispatcher)
+              (context.dispatcher)
               context.become(
                   connecting(registration, remainingFinishConnectRetries - 1))
-            } else {
+            else
               log.debug(
                   "Could not establish connection because finishConnect " +
                   "never returned true (consider increasing akka.io.tcp.finish-connect-retries)")
               stop()
-            }
-          }
-        }
 
       case ReceiveTimeout ⇒
         if (timeout.isDefined)
@@ -129,6 +114,3 @@ private[io] class TcpOutgoingConnection(_tcp: TcpExt,
             "Connect timeout expired, could not establish connection to [{}]",
             remoteAddress)
         stop()
-    }
-  }
-}

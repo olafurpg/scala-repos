@@ -1,4 +1,3 @@
-package object foo {
+package object foo
 
   var labels: Array[_ <: String] = null
-}

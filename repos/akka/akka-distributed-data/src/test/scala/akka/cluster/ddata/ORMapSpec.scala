@@ -9,14 +9,14 @@ import akka.cluster.ddata.Replicator.Changed
 import org.scalatest.Matchers
 import org.scalatest.WordSpec
 
-class ORMapSpec extends WordSpec with Matchers {
+class ORMapSpec extends WordSpec with Matchers
 
   val node1 = UniqueAddress(Address("akka.tcp", "Sys", "localhost", 2551), 1)
   val node2 = UniqueAddress(node1.address.copy(port = Some(2552)), 2)
 
-  "A ORMap" must {
+  "A ORMap" must
 
-    "be able to add entries" in {
+    "be able to add entries" in
       val m =
         ORMap().put(node1, "a", GSet() + "A").put(node1, "b", GSet() + "B")
       val GSet(a) = m.entries("a")
@@ -27,18 +27,16 @@ class ORMapSpec extends WordSpec with Matchers {
       val m2 = m.put(node1, "a", GSet() + "C")
       val GSet(a2) = m2.entries("a")
       a2 should be(Set("C"))
-    }
 
-    "be able to remove entry" in {
+    "be able to remove entry" in
       val m = ORMap()
         .put(node1, "a", GSet() + "A")
         .put(node1, "b", GSet() + "B")
         .remove(node1, "a")
       m.entries.keySet should not contain ("a")
       m.entries.keySet should contain("b")
-    }
 
-    "be able to add removed" in {
+    "be able to add removed" in
       val m = ORMap()
         .put(node1, "a", GSet() + "A")
         .put(node1, "b", GSet() + "B")
@@ -48,9 +46,8 @@ class ORMapSpec extends WordSpec with Matchers {
       val m2 = m.put(node1, "a", GSet() + "C")
       m2.entries.keySet should contain("a")
       m2.entries.keySet should contain("b")
-    }
 
-    "be able to have its entries correctly merged with another ORMap with other entries" in {
+    "be able to have its entries correctly merged with another ORMap with other entries" in
       val m1 =
         ORMap().put(node1, "a", GSet() + "A").put(node1, "b", GSet() + "B")
       val m2 = ORMap().put(node2, "c", GSet() + "C")
@@ -65,9 +62,8 @@ class ORMapSpec extends WordSpec with Matchers {
       merged2.entries.keySet should contain("a")
       merged2.entries.keySet should contain("b")
       merged2.entries.keySet should contain("c")
-    }
 
-    "be able to have its entries correctly merged with another ORMap with overlapping entries" in {
+    "be able to have its entries correctly merged with another ORMap with overlapping entries" in
       val m1 = ORMap()
         .put(node1, "a", GSet() + "A1")
         .put(node1, "b", GSet() + "B1")
@@ -104,9 +100,8 @@ class ORMapSpec extends WordSpec with Matchers {
       merged2.entries.keySet should contain("d")
       val GSet(d2) = merged2.entries("d")
       d2 should be(Set("D1", "D2"))
-    }
 
-    "illustrate the danger of using remove+put to replace an entry" in {
+    "illustrate the danger of using remove+put to replace an entry" in
       val m1 = ORMap.empty
         .put(node1, "a", GSet.empty + "A")
         .put(node1, "b", GSet.empty + "B")
@@ -123,17 +118,14 @@ class ORMapSpec extends WordSpec with Matchers {
       // note that B is included, because GSet("B") is merged with GSet("B2")
       merged2.entries("b").elements should be(Set("B", "B2"))
       merged2.entries("c").elements should be(Set("C"))
-    }
 
-    "not allow put for ORSet elements type" in {
+    "not allow put for ORSet elements type" in
       val m = ORMap().put(node1, "a", ORSet().add(node1, "A"))
 
-      intercept[IllegalArgumentException] {
+      intercept[IllegalArgumentException]
         m.put(node1, "a", ORSet().add(node1, "B"))
-      }
-    }
 
-    "be able to update entry" in {
+    "be able to update entry" in
       val m1 = ORMap
         .empty[ORSet[String]]
         .put(node1, "a", ORSet.empty.add(node1, "A"))
@@ -159,9 +151,8 @@ class ORMapSpec extends WordSpec with Matchers {
       merged3.entries("a").elements should be(Set("A"))
       merged3.entries("b").elements should be(Set("B2", "B3"))
       merged3.entries("c").elements should be(Set("C"))
-    }
 
-    "be able to update ORSet entry with remove+put" in {
+    "be able to update ORSet entry with remove+put" in
       val m1 = ORMap
         .empty[ORSet[String]]
         .put(node1, "a", ORSet.empty.add(node1, "A01"))
@@ -192,9 +183,8 @@ class ORMapSpec extends WordSpec with Matchers {
       merged3.entries("a").elements should be(Set("A01", "A02", "A03"))
       merged3.entries("b").elements should be(Set("B2", "B3"))
       merged3.entries("c").elements should be(Set("C"))
-    }
 
-    "be able to update ORSet entry with remove -> merge -> put" in {
+    "be able to update ORSet entry with remove -> merge -> put" in
       val m1 = ORMap.empty
         .put(node1, "a", ORSet.empty.add(node1, "A"))
         .put(node1,
@@ -220,20 +210,15 @@ class ORMapSpec extends WordSpec with Matchers {
       merged3.entries("a").elements should be(Set("A"))
       merged3.entries("b").elements should be(Set("B2", "B3"))
       merged3.entries("c").elements should be(Set("C", "C2"))
-    }
 
-    "have unapply extractor" in {
+    "have unapply extractor" in
       val m1 =
         ORMap.empty.put(node1, "a", Flag(true)).put(node2, "b", Flag(false))
       val m2: ORMap[Flag] = m1
       val ORMap(entries1) = m1
       val entries2: Map[String, Flag] = entries1
-      Changed(ORMapKey[Flag]("key"))(m1) match {
+      Changed(ORMapKey[Flag]("key"))(m1) match
         case c @ Changed(ORMapKey("key")) ⇒
           val ORMap(entries3) = c.dataValue
           val entries4: Map[String, ReplicatedData] = entries3
           entries4 should be(Map("a" -> Flag(true), "b" -> Flag(false)))
-      }
-    }
-  }
-}

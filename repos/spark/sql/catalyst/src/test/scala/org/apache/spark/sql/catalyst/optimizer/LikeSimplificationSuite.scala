@@ -25,15 +25,14 @@ import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.rules._
 
-class LikeSimplificationSuite extends PlanTest {
+class LikeSimplificationSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches = Batch("Like Simplification", Once, LikeSimplification) :: Nil
-  }
 
   val testRelation = LocalRelation('a.string)
 
-  test("simplify Like into StartsWith") {
+  test("simplify Like into StartsWith")
     val originalQuery =
       testRelation.where(('a like "abc%") || ('a like "abc\\%"))
 
@@ -42,18 +41,16 @@ class LikeSimplificationSuite extends PlanTest {
       testRelation.where(StartsWith('a, "abc") || ('a like "abc\\%")).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("simplify Like into EndsWith") {
+  test("simplify Like into EndsWith")
     val originalQuery = testRelation.where('a like "%xyz")
 
     val optimized = Optimize.execute(originalQuery.analyze)
     val correctAnswer = testRelation.where(EndsWith('a, "xyz")).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("simplify Like into Contains") {
+  test("simplify Like into Contains")
     val originalQuery =
       testRelation.where(('a like "%mn%") || ('a like "%mn\\%"))
 
@@ -62,9 +59,8 @@ class LikeSimplificationSuite extends PlanTest {
       testRelation.where(Contains('a, "mn") || ('a like "%mn\\%")).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("simplify Like into EqualTo") {
+  test("simplify Like into EqualTo")
     val originalQuery = testRelation.where(('a like "") || ('a like "abc"))
 
     val optimized = Optimize.execute(originalQuery.analyze)
@@ -72,5 +68,3 @@ class LikeSimplificationSuite extends PlanTest {
       testRelation.where(('a === "") || ('a === "abc")).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
-}

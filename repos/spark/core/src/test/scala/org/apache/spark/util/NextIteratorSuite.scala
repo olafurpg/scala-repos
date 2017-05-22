@@ -25,16 +25,15 @@ import org.scalatest.Matchers
 
 import org.apache.spark.SparkFunSuite
 
-class NextIteratorSuite extends SparkFunSuite with Matchers {
-  test("one iteration") {
+class NextIteratorSuite extends SparkFunSuite with Matchers
+  test("one iteration")
     val i = new StubIterator(Buffer(1))
     i.hasNext should be(true)
     i.next should be(1)
     i.hasNext should be(false)
     intercept[NoSuchElementException] { i.next() }
-  }
 
-  test("two iterations") {
+  test("two iterations")
     val i = new StubIterator(Buffer(1, 2))
     i.hasNext should be(true)
     i.next should be(1)
@@ -42,22 +41,19 @@ class NextIteratorSuite extends SparkFunSuite with Matchers {
     i.next should be(2)
     i.hasNext should be(false)
     intercept[NoSuchElementException] { i.next() }
-  }
 
-  test("empty iteration") {
+  test("empty iteration")
     val i = new StubIterator(Buffer())
     i.hasNext should be(false)
     intercept[NoSuchElementException] { i.next() }
-  }
 
-  test("close is called once for empty iterations") {
+  test("close is called once for empty iterations")
     val i = new StubIterator(Buffer())
     i.hasNext should be(false)
     i.hasNext should be(false)
     i.closeCalled should be(1)
-  }
 
-  test("close is called once for non-empty iterations") {
+  test("close is called once for non-empty iterations")
     val i = new StubIterator(Buffer(1, 2))
     i.next should be(1)
     i.next should be(2)
@@ -67,22 +63,16 @@ class NextIteratorSuite extends SparkFunSuite with Matchers {
     i.closeCalled should be(1)
     i.hasNext should be(false)
     i.closeCalled should be(1)
-  }
 
-  class StubIterator(ints: Buffer[Int]) extends NextIterator[Int] {
+  class StubIterator(ints: Buffer[Int]) extends NextIterator[Int]
     var closeCalled = 0
 
-    override def getNext(): Int = {
-      if (ints.size == 0) {
+    override def getNext(): Int =
+      if (ints.size == 0)
         finished = true
         0
-      } else {
+      else
         ints.remove(0)
-      }
-    }
 
-    override def close() {
+    override def close()
       closeCalled += 1
-    }
-  }
-}

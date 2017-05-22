@@ -9,11 +9,9 @@ import org.jetbrains.plugins.scala.lang.refactoring.ScalaRefactoringSupportProvi
   * Nikolay.Tropin
   * 2014-05-20
   */
-class ScalaExtractTraitAction extends ExtractSuperActionBase {
+class ScalaExtractTraitAction extends ExtractSuperActionBase
 
   override def getRefactoringHandler(provider: RefactoringSupportProvider) =
-    provider match {
+    provider match
       case _: ScalaRefactoringSupportProvider => new ScalaExtractTraitHandler
       case _ => null
-    }
-}

@@ -15,7 +15,7 @@ import org.scalatest.time._
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
-class ZkResolverTest extends FunSuite with BeforeAndAfter {
+class ZkResolverTest extends FunSuite with BeforeAndAfter
   val zkTimeout = 100.milliseconds
   var inst: ZkInstance = _
   val factory = new ZkClientFactory(zkTimeout)
@@ -23,20 +23,18 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
   implicit val patienceConfig = PatienceConfig(
       timeout = toSpan(1.second), interval = toSpan(zkTimeout))
 
-  before {
+  before
     inst = new ZkInstance
     inst.start()
-  }
 
-  after {
+  after
     inst.stop()
-  }
 
   def toSpan(d: Duration): Span = Span(d.inNanoseconds, Nanoseconds)
 
   // Flaky tests. See https://jira.twitter.biz/browse/COORD-437 for details.
-  if (!sys.props.contains("SKIP_FLAKY")) {
-    test("represent the underlying ServerSet") {
+  if (!sys.props.contains("SKIP_FLAKY"))
+    test("represent the underlying ServerSet")
       val serverSet = new ServerSetImpl(inst.zookeeperClient, "/foo/bar/baz")
       val clust = new ZkGroup(serverSet, "/foo/bar/baz")
       assert(clust().isEmpty)
@@ -57,13 +55,11 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       serverSet.join(ephAddr2, Map[String, InetSocketAddress]().asJava, ALIVE)
 
       eventually { assert(clust().size == 2) }
-      assert {
+      assert
         val Seq(fst) = (clust() &~ snap).toSeq
         fst.getServiceEndpoint.getPort == ephAddr2.getPort
-      }
-    }
 
-    test("filter by shardid") {
+    test("filter by shardid")
       val path = "/bar/foo/baz"
       val serverSet = new ServerSetImpl(inst.zookeeperClient, path)
       val clust = new ZkGroup(serverSet, path)
@@ -74,7 +70,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val ephAddr2 = RandomSocket.nextAddress
       val ephAddr3 = RandomSocket.nextAddress
 
-      Seq(ephAddr1, ephAddr2, ephAddr3).foreach { sockAddr =>
+      Seq(ephAddr1, ephAddr2, ephAddr3).foreach  sockAddr =>
         serverSet
           .join(
               sockAddr,
@@ -82,7 +78,6 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
               sockAddr.getPort
           )
           .update(ALIVE)
-      }
 
       eventually { assert(clust().size == 3) }
 
@@ -92,16 +87,13 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
           path,
           shardId = Some(ephAddr2.getPort)
       )
-      eventually {
-        Var.sample(filteredAddr) match {
+      eventually
+        Var.sample(filteredAddr) match
           case Addr.Bound(addrs, attrs) if addrs.size == 1 && attrs.isEmpty =>
             true
           case _ => fail()
-        }
-      }
-    }
 
-    test("resolve ALIVE endpoints") {
+    test("resolve ALIVE endpoints")
       val res = new ZkResolver(factory)
       val va = res.bind(
           "localhost:%d!/foo/bar/baz".format(inst.zookeeperAddress.getPort))
@@ -138,9 +130,8 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val blahVa = res.bind("localhost:%d!/foo/bar/baz!blah".format(
               inst.zookeeperAddress.getPort))
       eventually { assert(Var.sample(blahVa) == Addr.Bound(blahAddr)) }
-    }
 
-    test("filter by endpoint") {
+    test("filter by endpoint")
       val path = "/bar/foo/baz"
       val serverSet = new ServerSetImpl(inst.zookeeperClient, path)
       val clust = new ZkGroup(serverSet, path)
@@ -150,7 +141,7 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
       val ephAddr1 = RandomSocket.nextAddress
       val ephAddr2 = RandomSocket.nextAddress
       val ephAddr3 = RandomSocket.nextAddress
-      Seq(ephAddr1, ephAddr2, ephAddr3).foreach { sockAddr =>
+      Seq(ephAddr1, ephAddr2, ephAddr3).foreach  sockAddr =>
         serverSet
           .join(
               sockAddr,
@@ -158,7 +149,6 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
                   sockAddr.getPort.toString -> sockAddr).asJava
           )
           .update(ALIVE)
-      }
 
       eventually { assert(clust().size == 3) }
 
@@ -168,18 +158,12 @@ class ZkResolverTest extends FunSuite with BeforeAndAfter {
           endpoint = Some(ephAddr1.getPort.toString)
       )
 
-      eventually {
-        Var.sample(filteredAddr) match {
+      eventually
+        Var.sample(filteredAddr) match
           case Addr.Bound(addrs, attrs) if addrs.size == 1 && attrs.isEmpty =>
             true
           case _ => fail()
-        }
-      }
-    }
 
-    test("resolves from the main resolver") {
+    test("resolves from the main resolver")
       Resolver.eval("zk!localhost:%d!/foo/bar/baz!blah".format(
               inst.zookeeperAddress.getPort))
-    }
-  }
-}

@@ -11,7 +11,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScStableCodeReferenceElemen
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */
-trait ScImportSelector extends ScalaPsiElement {
+trait ScImportSelector extends ScalaPsiElement
   def importedName: String
 
   def reference: ScStableCodeReferenceElement
@@ -19,4 +19,3 @@ trait ScImportSelector extends ScalaPsiElement {
   def deleteSelector()
 
   def isAliasedImport: Boolean
-}

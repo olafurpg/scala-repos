@@ -23,9 +23,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.regression.{LassoModel, LinearRegressionModel, RidgeRegressionModel}
 import org.apache.spark.mllib.util.LinearDataGenerator
 
-class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
+class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite
 
-  test("linear regression PMML export") {
+  test("linear regression PMML export")
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val linearRegressionModel =
@@ -50,9 +50,8 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
           .get(0)
           .getNumericPredictors
           .size === linearRegressionModel.weights.size)
-  }
 
-  test("ridge regression PMML export") {
+  test("ridge regression PMML export")
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val ridgeRegressionModel =
@@ -77,9 +76,8 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
           .get(0)
           .getNumericPredictors
           .size === ridgeRegressionModel.weights.size)
-  }
 
-  test("lasso PMML export") {
+  test("lasso PMML export")
     val linearInput =
       LinearDataGenerator.generateLinearInput(3.0, Array(10.0, 10.0), 1, 17)
     val lassoModel =
@@ -104,5 +102,3 @@ class GeneralizedLinearPMMLModelExportSuite extends SparkFunSuite {
           .get(0)
           .getNumericPredictors
           .size === lassoModel.weights.size)
-  }
-}

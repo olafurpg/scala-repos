@@ -4,7 +4,7 @@ import complete.DefaultParsers._
 import Keys._
 import AddSettings._
 
-object B extends Build {
+object B extends Build
   // This configuration is added to 'sub' only.
   //  This verifies that delegation works when a configuration is not defined in the project that is being delegated to
   val newConfig = config("sample")
@@ -26,4 +26,3 @@ object B extends Build {
   def checkTask(expected: Int) =
     check <<= sample in newConfig map
     (i => assert(i == expected, "Expected " + expected + ", got " + i))
-}

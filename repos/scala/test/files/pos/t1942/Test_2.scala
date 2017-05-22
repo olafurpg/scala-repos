@@ -1,3 +1,2 @@
-class Test {
+class Test
   println(new t)
-}

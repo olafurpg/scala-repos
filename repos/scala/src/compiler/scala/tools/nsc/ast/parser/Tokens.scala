@@ -6,7 +6,7 @@
 package scala.tools.nsc
 package ast.parser
 
-object Tokens extends CommonTokens {
+object Tokens extends CommonTokens
   final val STRINGPART = 7 // a part of an interpolated string
   final val SYMBOLLIT = 8
   final val INTERPOLATIONID =
@@ -61,4 +61,3 @@ object Tokens extends CommonTokens {
   final val WHITESPACE = 201
   final val IGNORE = 202
   final val ESCAPE = 203
-}

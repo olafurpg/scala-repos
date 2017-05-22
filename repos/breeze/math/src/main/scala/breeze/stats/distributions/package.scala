@@ -17,6 +17,5 @@ package breeze.stats;
  */
 import breeze.stats.distributions._;
 
-package object sampling {
+package object sampling
   implicit val standardBasis: RandBasis = Rand;
-}

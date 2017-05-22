@@ -11,28 +11,22 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 /**
   * Pavel Fatin
   */
-class LegacyStringFormattingInspection extends AbstractInspection {
-  def actionFor(holder: ProblemsHolder) = {
+class LegacyStringFormattingInspection extends AbstractInspection
+  def actionFor(holder: ProblemsHolder) =
     case element
         if FormattedStringParser.extractFormatCall(element).isDefined =>
       holder.registerProblem(
           element,
           "Legacy string formatting, an interpolated string can be used instead",
           new QuickFix(element))
-  }
 
   private class QuickFix(e: PsiElement)
-      extends AbstractFixOnPsiElement("Convert to interpolated string", e) {
-    def doApplyFix(project: Project) {
+      extends AbstractFixOnPsiElement("Convert to interpolated string", e)
+    def doApplyFix(project: Project)
       val elem = getElement
-      FormattedStringParser.parse(elem).foreach { parts =>
-        val expression = {
+      FormattedStringParser.parse(elem).foreach  parts =>
+        val expression =
           val s = InterpolatedStringFormatter.format(parts)
           ScalaPsiElementFactory.createExpressionFromText(s, elem.getManager)
-        }
 
         elem.replace(expression)
-      }
-    }
-  }
-}

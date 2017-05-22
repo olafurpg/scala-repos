@@ -31,7 +31,7 @@ import javafx.beans.{property => jfxbp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object IntegerProperty {
+object IntegerProperty
   implicit def sfxIntegerProperty2jfx(
       ip: IntegerProperty): jfxbp.IntegerProperty =
     if (ip != null) ip.delegate else null
@@ -44,12 +44,11 @@ object IntegerProperty {
     */
   def apply(value: Int) =
     new IntegerProperty(new jfxbp.SimpleIntegerProperty(value))
-}
 
 class IntegerProperty(
     override val delegate: jfxbp.IntegerProperty = new jfxbp.SimpleIntegerProperty)
     extends ReadOnlyIntegerProperty(delegate) with Property[Int, Number]
-    with SFXDelegate[jfxbp.IntegerProperty] {
+    with SFXDelegate[jfxbp.IntegerProperty]
 
   def this(bean: Object, name: String) =
     this(new jfxbp.SimpleIntegerProperty(bean, name))
@@ -57,10 +56,7 @@ class IntegerProperty(
   def this(bean: Object, name: String, initialValue: Int) =
     this(new jfxbp.SimpleIntegerProperty(bean, name, initialValue))
 
-  def value_=(v: Int) {
+  def value_=(v: Int)
     delegate.set(v)
-  }
-  def value_=(v: Number) {
+  def value_=(v: Number)
     delegate.set(v.intValue)
-  }
-}

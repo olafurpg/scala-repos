@@ -8,34 +8,29 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 2/27/12
   */
 class WikiPairedTagBackspaceTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
 
-  def testDeleteUnderlinedTag() {
+  def testDeleteUnderlinedTag()
     checkGeneratedTextAfterBackspace(
         "/** __" + CARET_MARKER + "blah blah__ */", "/** _blah blah */")
-  }
 
-  def testDeleteMonospaceTag() {
+  def testDeleteMonospaceTag()
     checkGeneratedTextAfterBackspace(
         "/** `" + CARET_MARKER + "blahblah` */", "/** blahblah */")
-  }
 
-  def testDeleteItalicTag() {
+  def testDeleteItalicTag()
     checkGeneratedTextAfterBackspace(
         "/** ''" + CARET_MARKER + "blah blah'' */", "/** 'blah blah */")
-  }
 
-  def testDeleteBoldTag() {
+  def testDeleteBoldTag()
     checkGeneratedTextAfterBackspace(
         "/** '''" + CARET_MARKER + "blah blah''' */", "/** ''blah blah'' */")
-  }
 
-  def testDeleteSubscriptTag() {
+  def testDeleteSubscriptTag()
     checkGeneratedTextAfterBackspace(
         "/** ,," + CARET_MARKER + "blah blah,, */", "/** ,blah blah */")
-  }
 
-  def testScl6717() {
+  def testScl6717()
     checkGeneratedTextAfterBackspace(
         s"""
          | /**
@@ -48,9 +43,8 @@ class WikiPairedTagBackspaceTest
          |  */
        """.stripMargin
     )
-  }
 
-  def testDeleteInnerCodeTag() {
+  def testDeleteInnerCodeTag()
     val text = ("""
       | /**
       |   * {{{""" + CARET_MARKER + """
@@ -71,16 +65,12 @@ class WikiPairedTagBackspaceTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextAfterBackspace(text, assumedStub)
-  }
 
-  def testDeleteCodeLinkTag() {
+  def testDeleteCodeLinkTag()
     checkGeneratedTextAfterBackspace(
         "/** [[" + CARET_MARKER + "java.lang.String]] */",
         "/** [java.lang.String */")
-  }
 
-  def testDeleteEmptyItalicTag() {
+  def testDeleteEmptyItalicTag()
     checkGeneratedTextAfterBackspace(
         "/** ''" + CARET_MARKER + "'' */", "/** ' */")
-  }
-}

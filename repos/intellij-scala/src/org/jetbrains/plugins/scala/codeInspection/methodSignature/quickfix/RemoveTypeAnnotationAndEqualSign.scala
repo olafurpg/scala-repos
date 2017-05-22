@@ -9,10 +9,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunctionDefinition
   */
 class RemoveTypeAnnotationAndEqualSign(f: ScFunctionDefinition)
     extends AbstractFixOnPsiElement(
-        "Remove redundant type annotation and equals sign", f) {
-  def doApplyFix(project: Project) {
+        "Remove redundant type annotation and equals sign", f)
+  def doApplyFix(project: Project)
     val funDef = getElement
     funDef.removeExplicitType()
     funDef.removeAssignment()
-  }
-}

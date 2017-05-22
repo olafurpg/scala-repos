@@ -14,36 +14,34 @@ import testing.{Event => TEvent, Status => TStatus, OptionalThrowable, TestSelec
   * report format.
   * @param outputDir path to the dir in which a folder with results is generated
   */
-class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
+class JUnitXmlTestsListener(val outputDir: String) extends TestsListener
 
   /**Current hostname so we know which machine executed the tests*/
-  val hostname = try InetAddress.getLocalHost.getHostName catch {
+  val hostname = try InetAddress.getLocalHost.getHostName catch
     case x: IOException => "localhost"
-  }
 
   /**The dir in which we put all result files. Is equal to the given dir + "/test-reports"*/
   val targetDir = new File(outputDir + "/test-reports/")
 
   /**all system properties as XML*/
   val properties = <properties>
-      {
+      
         // create a clone, defending against [[ConcurrentModificationException]]
         val clonedProperties = System.getProperties.clone.asInstanceOf[Hashtable[AnyRef, AnyRef]]
         val iter = clonedProperties.entrySet.iterator
         val props: ListBuffer[XNode] = new ListBuffer()
-        while (iter.hasNext) {
+        while (iter.hasNext)
           val next = iter.next
           props += <property name={ next.getKey.toString } value={ next.getValue.toString }/>
-        }
         props
-      }
+      
     </properties>
 
   /**
     * Gathers data for one Test Suite. We map test groups to TestSuites.
     * Each TestSuite gets its own output file.
     */
-  class TestSuite(val name: String) {
+  class TestSuite(val name: String)
     val events: ListBuffer[TEvent] = new ListBuffer()
 
     /**Adds one test result to this suite.*/
@@ -56,7 +54,7 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
       * Stops the time measuring and emits the XML for
       * All tests collected so far.
       */
-    def stop(): Elem = {
+    def stop(): Elem =
       val duration = events.map(_.duration()).sum
 
       val (errors, failures, tests) =
@@ -65,42 +63,37 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
       val result =
         <testsuite hostname={ hostname } name={ name } tests={ tests + "" } errors={ errors + "" } failures={ failures + "" } time={ (duration / 1000.0).toString }>
                      { properties }
-                     {
-                       for (e <- events) yield <testcase classname={ name } name={
-                         e.selector match {
+                     
+                       for (e <- events) yield <testcase classname={ name } name=
+                         e.selector match
                            case selector: TestSelector=> selector.testName.split('.').last
                            case _   => "(It is not a test)"
-                         }
-                       } time={ (e.duration() / 1000.0).toString }>
-                                                 {
-                                                   val trace: String = if (e.throwable.isDefined) {
+                        time={ (e.duration() / 1000.0).toString }>
+                                                 
+                                                   val trace: String = if (e.throwable.isDefined)
                                                      val stringWriter = new StringWriter()
                                                      val writer = new PrintWriter(stringWriter)
                                                      e.throwable.get.printStackTrace(writer)
                                                      writer.flush()
                                                      stringWriter.toString
-                                                   } else {
+                                                   else
                                                      ""
-                                                   }
-                                                   e.status match {
+                                                   e.status match
                                                      case TStatus.Error if (e.throwable.isDefined) => <error message={ e.throwable.get.getMessage } type={ e.throwable.get.getClass.getName }>{ trace }</error>
                                                      case TStatus.Error => <error message={ "No Exception or message provided" }/>
                                                      case TStatus.Failure if (e.throwable.isDefined) => <failure message={ e.throwable.get.getMessage } type={ e.throwable.get.getClass.getName }>{ trace }</failure>
                                                      case TStatus.Failure => <failure message={ "No Exception or message provided" }/>
                                                      case TStatus.Skipped => <skipped/>
                                                      case _ => {}
-                                                   }
-                                                 }
+                                                 
                                                </testcase>
 
-                     }
+                     
                      <system-out><![CDATA[]]></system-out>
                      <system-err><![CDATA[]]></system-err>
                    </testsuite>
 
       result
-    }
-  }
 
   /**The currently running test suite*/
   val testSuite = new DynamicVariable(null: TestSuite)
@@ -117,9 +110,8 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
   /**
     * Adds all details for the given even to the current suite.
     */
-  override def testEvent(event: TestEvent): Unit = for (e <- event.detail) {
+  override def testEvent(event: TestEvent): Unit = for (e <- event.detail)
     testSuite.value.addEvent(e)
-  }
 
   /**
     * called for each class or equivalent grouping
@@ -142,9 +134,9 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
     *       <system-err><![CDATA[]]></system-err>
     *  </testsuite>
     */
-  override def endGroup(name: String, t: Throwable) = {
+  override def endGroup(name: String, t: Throwable) =
     // create our own event to record the error
-    val event = new TEvent {
+    val event = new TEvent
       def fullyQualifiedName = name
       //def description =
       //"Throwable escaped the test run of '%s'".format(name)
@@ -153,31 +145,27 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
       def fingerprint = null
       def selector = null
       def throwable = new OptionalThrowable(t)
-    }
     testSuite.value.addEvent(event)
     writeSuite()
-  }
 
   /**
     * Ends the current suite, wraps up the result and writes it to an XML file
     *  in the output folder that is named after the suite.
     */
-  override def endGroup(name: String, result: TestResult.Value) = {
+  override def endGroup(name: String, result: TestResult.Value) =
     writeSuite()
-  }
 
   // Here we normalize the name to ensure that it's a nicer filename, rather than
   // contort the user into not using spaces.
   private[this] def normalizeName(s: String) = s.replaceAll("""\s+""", "-")
 
-  private def writeSuite() = {
+  private def writeSuite() =
     val file = new File(
         targetDir,
         s"${normalizeName(testSuite.value.name)}.xml").getAbsolutePath
     // TODO would be nice to have a logger and log this with level debug
     // System.err.println("Writing JUnit XML test report: " + file)
     XML.save(file, testSuite.value.stop(), "UTF-8", true, null)
-  }
 
   /**Does nothing, as we write each file after a suite is done.*/
   override def doComplete(finalResult: TestResult.Value): Unit = {}
@@ -185,4 +173,3 @@ class JUnitXmlTestsListener(val outputDir: String) extends TestsListener {
   /**Returns None*/
   override def contentLogger(test: TestDefinition): Option[ContentLogger] =
     None
-}

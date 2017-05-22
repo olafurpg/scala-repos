@@ -36,11 +36,11 @@ import scalafx.scene.control.TextField
 import scalafx.scene.layout.{BorderPane, FlowPane, Priority, VBox}
 import scalafx.scene.paint.Color
 
-object TextFieldTest extends JFXApp {
+object TextFieldTest extends JFXApp
 
   val textField = new TextField
 
-  val controlsPane = new VBox {
+  val controlsPane = new VBox
     spacing = 5
     fillWidth = true
     alignment = Pos.Center
@@ -48,26 +48,20 @@ object TextFieldTest extends JFXApp {
     children = List(new TextFieldControls(textField),
                     new TextInputControlControls(textField),
                     new ControlControls(textField))
-  }
 
-  val mainPane = new BorderPane {
-    top = new FlowPane {
+  val mainPane = new BorderPane
+    top = new FlowPane
       children = List(textField)
-    }
     center = controlsPane
     vgrow = Priority.Always
     hgrow = Priority.Always
-  }
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "TextField Test"
     width = 300
     height = 400
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
       content = mainPane
-    }
-  }
   mainPane.prefHeight <== stage.scene().height
   mainPane.prefWidth <== stage.scene().width
-}

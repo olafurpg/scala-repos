@@ -25,25 +25,23 @@ import org.apache.spark.util.Utils
   * An abstract request sent from the client in the REST application submission protocol.
   */
 private[rest] abstract class SubmitRestProtocolRequest
-    extends SubmitRestProtocolMessage {
+    extends SubmitRestProtocolMessage
   var clientSparkVersion: String = null
-  protected override def doValidate(): Unit = {
+  protected override def doValidate(): Unit =
     super.doValidate()
     assertFieldIsSet(clientSparkVersion, "clientSparkVersion")
-  }
-}
 
 /**
   * A request to launch a new application in the REST application submission protocol.
   */
-private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
+private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest
   var appResource: String = null
   var mainClass: String = null
   var appArgs: Array[String] = null
   var sparkProperties: Map[String, String] = null
   var environmentVariables: Map[String, String] = null
 
-  protected override def doValidate(): Unit = {
+  protected override def doValidate(): Unit =
     super.doValidate()
     assert(sparkProperties != null, "No Spark properties set!")
     assertFieldIsSet(appResource, "appResource")
@@ -53,7 +51,6 @@ private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
     assertPropertyIsNumeric("spark.cores.max")
     assertPropertyIsMemory("spark.driver.memory")
     assertPropertyIsMemory("spark.executor.memory")
-  }
 
   private def assertPropertyIsSet(key: String): Unit =
     assertFieldIsSet(sparkProperties.getOrElse(key, null), key)
@@ -69,12 +66,8 @@ private[rest] class CreateSubmissionRequest extends SubmitRestProtocolRequest {
 
   /** Assert that a Spark property can be converted to a certain type. */
   private def assertProperty[T](
-      key: String, valueType: String, convert: (String => T)): Unit = {
-    sparkProperties.get(key).foreach { value =>
-      Try(convert(value)).getOrElse {
+      key: String, valueType: String, convert: (String => T)): Unit =
+    sparkProperties.get(key).foreach  value =>
+      Try(convert(value)).getOrElse
         throw new SubmitRestProtocolException(
             s"Property '$key' expected $valueType value: actual was '$value'.")
-      }
-    }
-  }
-}

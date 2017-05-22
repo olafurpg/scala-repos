@@ -26,7 +26,7 @@ import org.jetbrains.plugins.scala.project._
 /**
   * @author Pavel Fatin
   */
-class CompileServerManager(project: Project) extends ProjectComponent {
+class CompileServerManager(project: Project) extends ProjectComponent
   private val IconRunning = Icons.COMPILE_SERVER
 
   private val IconStopped = IconLoader.getDisabledIcon(IconRunning)
@@ -37,29 +37,27 @@ class CompileServerManager(project: Project) extends ProjectComponent {
 
   def disposeComponent() {}
 
-  def projectOpened() {
+  def projectOpened()
     if (ApplicationManager.getApplication.isUnitTestMode) return
 
     project.scalaEvents.addScalaProjectListener(ScalaListener)
     configureWidget()
     timer.setRepeats(true)
     timer.start()
-  }
 
-  def projectClosed() {
+  def projectClosed()
     if (ApplicationManager.getApplication.isUnitTestMode) return
 
     project.scalaEvents.removeScalaProjectListener(ScalaListener)
     configureWidget()
     timer.stop()
-  }
 
   def getComponentName = getClass.getSimpleName
 
-  def configureWidget() {
+  def configureWidget()
     if (ApplicationManager.getApplication.isUnitTestMode) return
 
-    (applicable, installed) match {
+    (applicable, installed) match
       case (true, true) => // do nothing
       case (true, false) =>
         bar.addWidget(Widget, "before Position", project)
@@ -67,19 +65,14 @@ class CompileServerManager(project: Project) extends ProjectComponent {
       case (false, true) =>
         removeWidget()
       case (false, false) => // do nothing
-    }
-  }
 
-  def removeWidget() {
-    if (installed) {
+  def removeWidget()
+    if (installed)
       bar.removeWidget(Widget.ID)
       installed = false
-    }
-  }
 
-  private def updateWidget() {
+  private def updateWidget()
     bar.updateWidget(Widget.ID)
-  }
 
   private def applicable =
     running || ScalaCompileServerSettings.getInstance.COMPILE_SERVER_ENABLED &&
@@ -93,7 +86,7 @@ class CompileServerManager(project: Project) extends ProjectComponent {
 
   private def bar = WindowManager.getInstance.getStatusBar(project)
 
-  private object Widget extends StatusBarWidget {
+  private object Widget extends StatusBarWidget
     def ID = "Compile server"
 
     def getPresentation(platformType: PlatformType) = Presentation
@@ -102,7 +95,7 @@ class CompileServerManager(project: Project) extends ProjectComponent {
 
     def dispose() {}
 
-    object Presentation extends StatusBarWidget.IconPresentation {
+    object Presentation extends StatusBarWidget.IconPresentation
       def getIcon = if (running) IconRunning else IconStopped
 
       def getClickConsumer = ClickConsumer
@@ -110,17 +103,13 @@ class CompileServerManager(project: Project) extends ProjectComponent {
       def getTooltipText =
         title + launcher.port.map(_.formatted(" (TCP %d)")).getOrElse("")
 
-      object ClickConsumer extends Consumer[MouseEvent] {
-        def consume(t: MouseEvent) {
+      object ClickConsumer extends Consumer[MouseEvent]
+        def consume(t: MouseEvent)
           toggleList(t)
-        }
-      }
-    }
-  }
 
   private def title = "Scala compile server"
 
-  private def toggleList(e: MouseEvent) {
+  private def toggleList(e: MouseEvent)
     val mnemonics = JBPopupFactory.ActionSelectionAid.MNEMONICS
 
     val addActions =
@@ -139,87 +128,69 @@ class CompileServerManager(project: Project) extends ProjectComponent {
     val at = new Point(0, -dimension.height)
 
     popup.show(new RelativePoint(e.getComponent, at))
-  }
 
   private object Start
       extends AnAction(
           "&Run", "Start compile server", AllIcons.Actions.Execute)
-      with DumbAware {
-    override def update(e: AnActionEvent) {
+      with DumbAware
+    override def update(e: AnActionEvent)
       e.getPresentation.setEnabled(!launcher.running)
-    }
 
-    def actionPerformed(e: AnActionEvent) {
+    def actionPerformed(e: AnActionEvent)
       launcher.tryToStart(project)
-    }
-  }
 
   private object Stop
       extends AnAction(
           "&Stop", "Shutdown compile server", AllIcons.Actions.Suspend)
-      with DumbAware {
-    override def update(e: AnActionEvent) {
+      with DumbAware
+    override def update(e: AnActionEvent)
       e.getPresentation.setEnabled(launcher.running)
-    }
 
-    def actionPerformed(e: AnActionEvent) {
+    def actionPerformed(e: AnActionEvent)
       launcher.stop(e.getProject)
-    }
-  }
 
   private object Configure
       extends AnAction("&Configure...",
                        "Configure compile server",
-                       AllIcons.General.Settings) with DumbAware {
-    def actionPerformed(e: AnActionEvent) {
+                       AllIcons.General.Settings) with DumbAware
+    def actionPerformed(e: AnActionEvent)
       showCompileServerSettingsDialog()
-    }
-  }
 
-  private object ScalaListener extends ScalaProjectListener {
-    def onScalaProjectChanged() {
+  private object ScalaListener extends ScalaProjectListener
+    def onScalaProjectChanged()
       configureWidget()
-    }
-  }
 
-  private object TimerListener extends ActionListener {
+  private object TimerListener extends ActionListener
     private var wasRunning: Option[Boolean] = None
 
-    def actionPerformed(e: ActionEvent) {
+    def actionPerformed(e: ActionEvent)
       val nowRunning = running
 
       if (installed || nowRunning) updateWidget()
 
-      wasRunning -> nowRunning match {
+      wasRunning -> nowRunning match
         case (Some(false), true) =>
 //           val message = "Started" + launcher.port.map(_.formatted(" on TCP %d")).getOrElse("") + "."
 //           Notifications.Bus.notify(new Notification("scala", title, message, NotificationType.INFORMATION), project)
         case (Some(true), false) =>
 //           Notifications.Bus.notify(new Notification("scala", title, "Stopped.", NotificationType.INFORMATION), project)
         case _ =>
-      }
 
       wasRunning = Some(nowRunning)
 
       val errors = launcher.errors()
 
-      if (errors.nonEmpty) {
+      if (errors.nonEmpty)
         Notifications.Bus.notify(
             new Notification(
                 "scala", title, errors.mkString, NotificationType.ERROR),
             project)
-      }
-    }
-  }
-}
 
-object CompileServerManager {
+object CompileServerManager
   def instance(project: Project) =
     project.getComponent(classOf[CompileServerManager])
 
-  def showCompileServerSettingsDialog(): Unit = {
+  def showCompileServerSettingsDialog(): Unit =
     ShowSettingsUtil
       .getInstance()
       .showSettingsDialog(null, "Scala Compile Server")
-  }
-}

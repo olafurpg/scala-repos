@@ -11,11 +11,11 @@ import net.liftweb.json._
 
 import org.specs2.mutable.Specification
 
-object ValidationExample extends Specification {
+object ValidationExample extends Specification
 
   case class Person(name: String, age: Int)
 
-  "Validation" should {
+  "Validation" should
     def min(x: Int): Int => Result[Int] =
       (y: Int) => if (y < x) Fail("min", y + " < " + x) else y.success
 
@@ -24,31 +24,28 @@ object ValidationExample extends Specification {
 
     val json = JsonParser.parse(""" {"name":"joe","age":17} """)
 
-    "fail when age is less than min age" in {
+    "fail when age is less than min age" in
       // Age must be between 18 an 60
       val ageResult = (jValue: JValue) =>
-        (for {
+        (for
           age <- field[Int]("age")(jValue).disjunction
           _ <- min(18)(age).disjunction
           _ <- max(60)(age).disjunction
-        } yield age).validation
+        yield age).validation
       val person = Person.applyJSON(field[String]("name"), ageResult)
       person(json) mustEqual Failure(
           NonEmptyList(UncategorizedError("min", "17 < 18", Nil)))
-    }
 
-    "pass when age within limits" in {
+    "pass when age within limits" in
       // Age must be between 16 an 60
       val ageResult = (jValue: JValue) =>
-        (for {
+        (for
           age <- field[Int]("age")(jValue).disjunction
           _ <- min(16)(age).disjunction
           _ <- max(60)(age).disjunction
-        } yield age).validation
+        yield age).validation
       val person = Person.applyJSON(field[String]("name"), ageResult)
       person(json) mustEqual Success(Person("joe", 17))
-    }
-  }
 
   case class Range(start: Int, end: Int)
 
@@ -56,7 +53,7 @@ object ValidationExample extends Specification {
   // * a validation where result depends on more than one value
   // * parse a List with invalid values
 
-  "Range filtering" should {
+  "Range filtering" should
     val json = JsonParser.parse(
         """ [{"s":10,"e":17},{"s":12,"e":13},{"s":11,"e":8}] """)
 
@@ -65,28 +62,22 @@ object ValidationExample extends Specification {
         if (x1 > x2) Fail("asc", x1 + " > " + x2) else (x1, x2).success
 
     // Valid range is a range having start <= end
-    implicit def rangeJSON: JSONR[Range] = new JSONR[Range] {
-      def read(json: JValue) = {
-        (for {
+    implicit def rangeJSON: JSONR[Range] = new JSONR[Range]
+      def read(json: JValue) =
+        (for
           s <- field[Int]("s")(json).disjunction
           e <- field[Int]("e")(json).disjunction
           r <- ascending(s, e).disjunction
-        } yield Range.tupled(r)).validation
-      }
-    }
+        yield Range.tupled(r)).validation
 
-    "fail if lists contains invalid ranges" in {
+    "fail if lists contains invalid ranges" in
       val r = fromJSON[List[Range]](json)
       r mustEqual Failure(
           NonEmptyList(UncategorizedError("asc", "11 > 8", Nil)))
-    }
 
-    "optionally return only valid ranges" in {
+    "optionally return only valid ranges" in
       val ranges = json.children
         .map(fromJSON[Range])
         .filter(_.isSuccess)
         .sequence[({ type λ[α] = ValidationNel[Error, α] })#λ, Range]
       ranges mustEqual Success(List(Range(10, 17), Range(12, 13)))
-    }
-  }
-}

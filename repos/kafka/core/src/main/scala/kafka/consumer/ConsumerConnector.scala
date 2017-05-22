@@ -26,7 +26,7 @@ import kafka.serializer._
 /**
   *  Main interface for consumer
   */
-trait ConsumerConnector {
+trait ConsumerConnector
 
   /**
     *  Create a list of MessageStreams for each topic.
@@ -98,9 +98,8 @@ trait ConsumerConnector {
     *  Shut down the connector
     */
   def shutdown()
-}
 
-object Consumer extends Logging {
+object Consumer extends Logging
 
   /**
     *  Create a ConsumerConnector
@@ -108,10 +107,9 @@ object Consumer extends Logging {
     *  @param config  at the minimum, need to specify the groupid of the consumer and the zookeeper
     *                 connection string zookeeper.connect.
     */
-  def create(config: ConsumerConfig): ConsumerConnector = {
+  def create(config: ConsumerConfig): ConsumerConnector =
     val consumerConnect = new ZookeeperConsumerConnector(config)
     consumerConnect
-  }
 
   /**
     *  Create a ConsumerConnector
@@ -120,9 +118,7 @@ object Consumer extends Logging {
     *                 connection string zookeeper.connect.
     */
   def createJavaConsumerConnector(
-      config: ConsumerConfig): kafka.javaapi.consumer.ConsumerConnector = {
+      config: ConsumerConfig): kafka.javaapi.consumer.ConsumerConnector =
     val consumerConnect =
       new kafka.javaapi.consumer.ZookeeperConsumerConnector(config)
     consumerConnect
-  }
-}

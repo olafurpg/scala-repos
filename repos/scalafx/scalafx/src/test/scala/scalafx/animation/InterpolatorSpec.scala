@@ -44,8 +44,8 @@ import scalafx.testutil.PropertyComparator
   * @todo When Interpolator is converted to SFXEnumDelegate, this test should be converted to a SFXEnumDelegateSpec
   */
 @RunWith(classOf[JUnitRunner])
-class InterpolatorSpec extends FlatSpec with PropertyComparator {
-  "Interpolators" should "support all the built-in interpolators" in {
+class InterpolatorSpec extends FlatSpec with PropertyComparator
+  "Interpolators" should "support all the built-in interpolators" in
     val doubleProperty = new DoubleProperty(null, "test")
     val kv1 = doubleProperty -> 50 tween Interpolator.DISCRETE
     kv1.interpolator should equal(jfxa.Interpolator.DISCRETE)
@@ -57,17 +57,15 @@ class InterpolatorSpec extends FlatSpec with PropertyComparator {
     kv4.interpolator should equal(jfxa.Interpolator.EASE_OUT)
     val kv5 = doubleProperty -> 50 tween Interpolator.LINEAR
     kv5.interpolator should equal(jfxa.Interpolator.LINEAR)
-  }
 
-  it should "support spline interpolations" in {
+  it should "support spline interpolations" in
     val doubleProperty = new DoubleProperty(null, "test")
     val kv1 = doubleProperty -> 50 tween Interpolator.SPLINE(.2, .2, .8, .8)
     // equals method doesn't work, so the best we can do is test the class type
     kv1.interpolator.getClass should equal(
         Interpolator.SPLINE(.2, .2, .8, .8).getClass)
-  }
 
-  it should "support tangent interpolations" in {
+  it should "support tangent interpolations" in
     val doubleProperty = new DoubleProperty(null, "test")
     val kv1 = doubleProperty -> 50 tween Interpolator.TANGENT((100 ms), .3)
     // equals method doesn't work, so the best we can do is test the class type
@@ -79,5 +77,3 @@ class InterpolatorSpec extends FlatSpec with PropertyComparator {
     // equals method doesn't work, so the best we can do is test the class type
     kv2.interpolator.getClass should equal(
         Interpolator.TANGENT((50 ms), .5, (100 ms), .3).getClass)
-  }
-}

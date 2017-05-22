@@ -21,7 +21,7 @@ import kafka.api.OffsetRequest
 import kafka.utils._
 import kafka.common.{InvalidConfigException, Config}
 
-object ConsumerConfig extends Config {
+object ConsumerConfig extends Config
   val RefreshMetadataBackoffMs = 200
   val SocketTimeout = 30 * 1000
   val SocketBufferSize = 64 * 1024
@@ -53,24 +53,21 @@ object ConsumerConfig extends Config {
   val MirrorConsumerNumThreadsProp = "mirror.consumer.numthreads"
   val DefaultClientId = ""
 
-  def validate(config: ConsumerConfig) {
+  def validate(config: ConsumerConfig)
     validateClientId(config.clientId)
     validateGroupId(config.groupId)
     validateAutoOffsetReset(config.autoOffsetReset)
     validateOffsetsStorage(config.offsetsStorage)
     validatePartitionAssignmentStrategy(config.partitionAssignmentStrategy)
-  }
 
-  def validateClientId(clientId: String) {
+  def validateClientId(clientId: String)
     validateChars("client.id", clientId)
-  }
 
-  def validateGroupId(groupId: String) {
+  def validateGroupId(groupId: String)
     validateChars("group.id", groupId)
-  }
 
-  def validateAutoOffsetReset(autoOffsetReset: String) {
-    autoOffsetReset match {
+  def validateAutoOffsetReset(autoOffsetReset: String)
+    autoOffsetReset match
       case OffsetRequest.SmallestTimeString =>
       case OffsetRequest.LargestTimeString =>
       case _ =>
@@ -79,11 +76,9 @@ object ConsumerConfig extends Config {
             autoOffsetReset + " of auto.offset.reset in ConsumerConfig; " +
             "Valid values are " + OffsetRequest.SmallestTimeString + " and " +
             OffsetRequest.LargestTimeString)
-    }
-  }
 
-  def validateOffsetsStorage(storage: String) {
-    storage match {
+  def validateOffsetsStorage(storage: String)
+    storage match
       case "zookeeper" =>
       case "kafka" =>
       case _ =>
@@ -91,11 +86,9 @@ object ConsumerConfig extends Config {
             "Wrong value " + storage +
             " of offsets.storage in consumer config; " +
             "Valid values are 'zookeeper' and 'kafka'")
-    }
-  }
 
-  def validatePartitionAssignmentStrategy(strategy: String) {
-    strategy match {
+  def validatePartitionAssignmentStrategy(strategy: String)
+    strategy match
       case "range" =>
       case "roundrobin" =>
       case _ =>
@@ -103,18 +96,14 @@ object ConsumerConfig extends Config {
             "Wrong value " + strategy +
             " of partition.assignment.strategy in consumer config; " +
             "Valid values are 'range' and 'roundrobin'")
-    }
-  }
-}
 
 class ConsumerConfig private (val props: VerifiableProperties)
-    extends ZKConfig(props) {
+    extends ZKConfig(props)
   import ConsumerConfig._
 
-  def this(originalProps: Properties) {
+  def this(originalProps: Properties)
     this(new VerifiableProperties(originalProps))
     props.verify()
-  }
 
   /** a string that uniquely identifies a set of consumers within the same consumer group */
   val groupId = props.getString("group.id")
@@ -219,4 +208,3 @@ class ConsumerConfig private (val props: VerifiableProperties)
       "partition.assignment.strategy", DefaultPartitionAssignmentStrategy)
 
   validate(this)
-}

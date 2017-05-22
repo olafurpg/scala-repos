@@ -10,11 +10,11 @@ import org.jetbrains.annotations.Nullable
 import org.jetbrains.plugins.scala.icons.Icons
 import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 
-class ScalaIconProvider extends IconProvider {
+class ScalaIconProvider extends IconProvider
   @Nullable
-  override def getIcon(element: PsiElement, flags: Int): Icon = {
+  override def getIcon(element: PsiElement, flags: Int): Icon =
     ProgressManager.checkCanceled()
-    element match {
+    element match
       case null =>
       case file: ScalaFile =>
         if (file.isWorksheetFile) return Icons.WORKSHEET_LOGO
@@ -23,13 +23,9 @@ class ScalaIconProvider extends IconProvider {
         val name = file.getVirtualFile.getNameWithoutExtension
         val defs = file.typeDefinitions
         val clazzIterator = defs.iterator
-        while (clazzIterator.hasNext) {
+        while (clazzIterator.hasNext)
           val clazz = clazzIterator.next()
           if (name.equals(clazz.name)) return clazz.getIcon(flags)
-        }
         if (defs.nonEmpty) return defs.head.getIcon(flags)
       case _ =>
-    }
     null
-  }
-}

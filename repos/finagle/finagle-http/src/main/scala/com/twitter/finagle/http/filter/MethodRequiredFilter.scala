@@ -12,22 +12,20 @@ import com.twitter.util.Future
 class MethodRequiredFilter[REQUEST <: Request](
     val supportedMethods: Set[Method] = Set(
           Method.Get, Method.Head, Method.Post))
-    extends SimpleFilter[REQUEST, Response] {
+    extends SimpleFilter[REQUEST, Response]
 
   private[this] val allowedMethods =
     supportedMethods.mkString(", ").toUpperCase
 
   def apply(request: REQUEST,
             service: Service[REQUEST, Response]): Future[Response] =
-    if (!supportedMethods.contains(request.method)) {
+    if (!supportedMethods.contains(request.method))
       val response = request.response
       response.status = Status.MethodNotAllowed
       response.allow = allowedMethods
       Future.value(response)
-    } else {
+    else
       service(request)
-    }
-}
 
 object MethodRequiredFilter
     extends MethodRequiredFilter[Request](

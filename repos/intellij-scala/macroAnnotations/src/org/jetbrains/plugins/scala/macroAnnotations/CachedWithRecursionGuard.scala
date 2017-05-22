@@ -16,18 +16,17 @@ import scala.reflect.macros.whitebox
   */
 class CachedWithRecursionGuard[T](
     element: Any, defaultValue: => Any, dependecyItem: Object)
-    extends StaticAnnotation {
+    extends StaticAnnotation
   def macroTransform(annottees: Any*) = macro CachedWithRecursionGuard.cachedWithRecursionGuardImpl
-}
 
-object CachedWithRecursionGuard {
+object CachedWithRecursionGuard
   import CachedMacroUtil._
   def cachedWithRecursionGuardImpl(c: whitebox.Context)(
-      annottees: c.Tree*): c.Expr[Any] = {
+      annottees: c.Tree*): c.Expr[Any] =
     import c.universe._
     implicit val x: c.type = c
 
-    def parameters: (Tree, Tree, Tree, Tree) = c.prefix.tree match {
+    def parameters: (Tree, Tree, Tree, Tree) = c.prefix.tree match
       case q"new CachedWithRecursionGuard[$t](..$params)"
           if params.length == 3 =>
         (params.head,
@@ -35,15 +34,13 @@ object CachedWithRecursionGuard {
          modCountParamToModTracker(c)(params(2), params.head),
          t)
       case _ => abort("Wrong annotation parameters!")
-    }
 
     val (element, defaultValue, dependencyItem, providerType) = parameters
 
-    annottees.toList match {
+    annottees.toList match
       case DefDef(mods, name, tpParams, params, retTp, rhs) :: Nil =>
-        if (retTp.isEmpty) {
+        if (retTp.isEmpty)
           abort("You must specify return type")
-        }
 
         //generated names
         val cachedFunName = TermName(c.freshName("cachedFun"))
@@ -63,8 +60,8 @@ object CachedWithRecursionGuard {
           q"new $cachesUtilFQN.$provider[$providerType, $retTp]($element, _ => $cachedFunName())($dependencyItem)"
 
         val updatedRhs = q"""
-          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
-        else EmptyTree}
+          $if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree
           $fun
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           $cachesUtilFQN.getWithRecursionPreventingWithRollback[$providerType, $retTp]($element, $keyVarName, $builder, $defaultValue)
@@ -74,15 +71,12 @@ object CachedWithRecursionGuard {
         val res = q"""
           private val $keyVarName = $cachesUtilFQN.getOrCreateKey[$keyTypeFQN[$cachedValueTypeFQN[$retTp]]]($keyId)
 
-          ${if (analyzeCaches)
+          $if (analyzeCaches)
           q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
-        else EmptyTree}
+        else EmptyTree
 
           ..$updatedDef
           """
         println(res)
         c.Expr(res)
       case _ => abort("You can only annotate one function!")
-    }
-  }
-}

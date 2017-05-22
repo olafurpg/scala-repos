@@ -5,8 +5,8 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class SummarizingStatsReceiverTest extends FunSuite {
-  test("SummarizingStatsReceiver doesn't fail on empty/low stats") {
+class SummarizingStatsReceiverTest extends FunSuite
+  test("SummarizingStatsReceiver doesn't fail on empty/low stats")
     val receiver = new SummarizingStatsReceiver
     assert(receiver.summary() == "# counters\n\n# gauges\n\n# stats\n")
 
@@ -30,5 +30,3 @@ class SummarizingStatsReceiverTest extends FunSuite {
       |# stats
       |toto                           n=10 min=1.0 med=6.0 p90=10.0 p95=10.0 p99=10.0 p999=10.0 p9999=10.0 max=10.0""".stripMargin
     assert(receiver.summary() == expected2)
-  }
-}

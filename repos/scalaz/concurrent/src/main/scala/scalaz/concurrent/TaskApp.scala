@@ -5,7 +5,7 @@ package concurrent
   *
   * Clients should implement `run`, `runl`, or `runc`.
   */
-trait TaskApp {
+trait TaskApp
   def run(args: ImmutableArray[String]): Task[Unit] = runl(args.toList)
 
   def runl(args: List[String]): Task[Unit] = runc
@@ -14,4 +14,3 @@ trait TaskApp {
 
   final def main(args: Array[String]): Unit =
     run(ImmutableArray.fromArray(args)).unsafePerformSync
-}

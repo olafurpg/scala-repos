@@ -38,16 +38,15 @@ import scalafx.geometry.Insets._
 import scalafx.scene.Node
 import scalafx.scene.Node._
 
-object HBox {
+object HBox
   implicit def sfxHBox2jfx(v: HBox): jfxsl.HBox =
     if (v != null) v.delegate else null
 
   /**
     * Removes all hbox constraints from the child node.
     */
-  def clearConstraints(child: jfxs.Node) {
+  def clearConstraints(child: jfxs.Node)
     jfxsl.HBox.clearConstraints(child)
-  }
 
   /**
     * Returns the child's hgrow constraint if set.
@@ -57,9 +56,8 @@ object HBox {
   /**
     * Sets the horizontal grow priority for the child when contained by an hbox.
     */
-  def setHgrow(child: Node, value: Priority) {
+  def setHgrow(child: Node, value: Priority)
     jfxsl.HBox.setHgrow(child, value)
-  }
 
   /**
     * Returns the child's margin constraint if set.
@@ -69,17 +67,15 @@ object HBox {
   /**
     * Sets the margin for the child when contained by an hbox.
     */
-  def setMargin(child: Node, value: Insets) {
+  def setMargin(child: Node, value: Insets)
     jfxsl.HBox.setMargin(child, value)
-  }
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/HBox.html]]
   */
 class HBox(override val delegate: jfxsl.HBox = new jfxsl.HBox)
     extends Pane(delegate) with AlignmentDelegate[jfxsl.HBox]
-    with SFXDelegate[jfxsl.HBox] {
+    with SFXDelegate[jfxsl.HBox]
 
   /**
     * Creates an HBox layout with the specified spacing between children.
@@ -105,16 +101,13 @@ class HBox(override val delegate: jfxsl.HBox = new jfxsl.HBox)
     * The amount of horizontal space between each child in the hbox.
     */
   def spacing: DoubleProperty = delegate.spacingProperty
-  def spacing_=(v: Double) {
+  def spacing_=(v: Double)
     spacing() = v
-  }
 
   /**
     * Whether or not resizable children will be resized to fill the full height of the hbox or be
     * kept to their preferred height and aligned according to the alignment vpos value.
     */
   def fillHeight: BooleanProperty = delegate.fillHeightProperty
-  def fillHeight_=(v: Boolean) {
+  def fillHeight_=(v: Boolean)
     fillHeight() = v
-  }
-}

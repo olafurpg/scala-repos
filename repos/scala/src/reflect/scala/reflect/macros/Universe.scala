@@ -18,13 +18,13 @@ import scala.language.higherKinds
   *
   *  @contentDiagram hideNodes "*Api"
   */
-abstract class Universe extends scala.reflect.api.Universe {
+abstract class Universe extends scala.reflect.api.Universe
 
   /** @inheritdoc */
   override type Internal <: MacroInternalApi
 
   /** @inheritdoc */
-  trait MacroInternalApi extends InternalApi { internal =>
+  trait MacroInternalApi extends InternalApi  internal =>
 
     /** Adds a given symbol to the given scope.
       */
@@ -160,7 +160,7 @@ abstract class Universe extends scala.reflect.api.Universe {
     override type Decorators <: MacroDecoratorApi
 
     /** @inheritdoc */
-    trait MacroDecoratorApi extends DecoratorApi {
+    trait MacroDecoratorApi extends DecoratorApi
 
       /** Extension methods for scopes */
       type ScopeDecorator [T <: Scope] <: MacroScopeDecoratorApi[T]
@@ -169,21 +169,20 @@ abstract class Universe extends scala.reflect.api.Universe {
       implicit def scopeDecorator[T <: Scope](tree: T): ScopeDecorator[T]
 
       /** @see [[ScopeDecorator]] */
-      class MacroScopeDecoratorApi[T <: Scope](val scope: T) {
+      class MacroScopeDecoratorApi[T <: Scope](val scope: T)
 
         /** @see [[internal.enter]] */
         def enter(sym: Symbol): T = internal.enter(scope, sym)
 
         /** @see [[internal.unlink]] */
         def unlink(sym: Symbol): T = internal.unlink(scope, sym)
-      }
 
       /** @inheritdoc */
       override type TreeDecorator [T <: Tree] <: MacroTreeDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroTreeDecoratorApi[T <: Tree](override val tree: T)
-          extends TreeDecoratorApi[T](tree) {
+          extends TreeDecoratorApi[T](tree)
 
         /** @see [[internal.changeOwner]] */
         def changeOwner(prev: Symbol, next: Symbol): tree.type =
@@ -212,7 +211,6 @@ abstract class Universe extends scala.reflect.api.Universe {
 
         /** @see [[internal.setSymbol]] */
         def setSymbol(sym: Symbol): T = internal.setSymbol(tree, sym)
-      }
 
       /** Extension methods for typetrees */
       type TypeTreeDecorator [T <: TypeTree] <: MacroTypeTreeDecoratorApi[T]
@@ -222,18 +220,17 @@ abstract class Universe extends scala.reflect.api.Universe {
           tt: T): TypeTreeDecorator[T]
 
       /** @see [[TypeTreeDecorator]] */
-      class MacroTypeTreeDecoratorApi[T <: TypeTree](val tt: T) {
+      class MacroTypeTreeDecoratorApi[T <: TypeTree](val tt: T)
 
         /** @see [[internal.setOriginal]] */
         def setOriginal(tree: Tree): TypeTree = internal.setOriginal(tt, tree)
-      }
 
       /** @inheritdoc */
       override type SymbolDecorator [T <: Symbol] <: MacroSymbolDecoratorApi[T]
 
       /** @see [[TreeDecorator]] */
       class MacroSymbolDecoratorApi[T <: Symbol](override val symbol: T)
-          extends SymbolDecoratorApi[T](symbol) {
+          extends SymbolDecoratorApi[T](symbol)
 
         /** @see [[internal.attachments]] */
         def attachments: Attachments { type Pos = Position } =
@@ -269,12 +266,9 @@ abstract class Universe extends scala.reflect.api.Universe {
 
         /** @see [[internal.setFlag]] */
         def resetFlag(flags: FlagSet): T = internal.resetFlag(symbol, flags)
-      }
-    }
-  }
 
   /** @group Internal */
-  trait TreeGen {
+  trait TreeGen
 
     /** Builds a reference to value whose type is given stable prefix.
       *  The type must be suitable for this.  For example, it
@@ -355,7 +349,6 @@ abstract class Universe extends scala.reflect.api.Universe {
     def mkZero(tp: Type): Tree
 
     def mkCast(tree: Tree, pt: Type): Tree
-  }
 
   /** @see [[internal.gen]] */
   @deprecated("Use `internal.gen` instead", "2.11.0")
@@ -367,10 +360,10 @@ abstract class Universe extends scala.reflect.api.Universe {
   /** @see [[compat]]
     *  @group Internal
     */
-  trait MacroCompatApi extends CompatApi {
+  trait MacroCompatApi extends CompatApi
 
     /** Scala 2.10 compatibility enrichments for Symbol. */
-    implicit class MacroCompatibleSymbol(symbol: Symbol) {
+    implicit class MacroCompatibleSymbol(symbol: Symbol)
 
       /** @see [[InternalMacroApi.attachments]] */
       @deprecated(
@@ -418,10 +411,9 @@ abstract class Universe extends scala.reflect.api.Universe {
           "2.11.0")
       def setPrivateWithin(sym: Symbol): Symbol =
         internal.setPrivateWithin(symbol, sym)
-    }
 
     /** Scala 2.10 compatibility enrichments for TypeTree. */
-    implicit class MacroCompatibleTree(tree: Tree) {
+    implicit class MacroCompatibleTree(tree: Tree)
 
       /** @see [[InternalMacroApi.attachments]] */
       @deprecated(
@@ -485,17 +477,15 @@ abstract class Universe extends scala.reflect.api.Universe {
           "Use `internal.setSymbol` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
       def setSymbol(sym: Symbol): Tree = internal.setSymbol(tree, sym)
-    }
 
     /** Scala 2.10 compatibility enrichments for TypeTree. */
-    implicit class CompatibleTypeTree(tt: TypeTree) {
+    implicit class CompatibleTypeTree(tt: TypeTree)
 
       /** @see [[InternalMacroApi.setOriginal]] */
       @deprecated(
           "Use `internal.setOriginal` instead or import `internal.decorators._` for infix syntax",
           "2.11.0")
       def setOriginal(tree: Tree): TypeTree = internal.setOriginal(tt, tree)
-    }
 
     /** @see [[InternalMacroApi.captureVariable]] */
     @deprecated("Use `internal.captureVariable` instead", "2.11.0")
@@ -510,7 +500,6 @@ abstract class Universe extends scala.reflect.api.Universe {
     @deprecated("Use `internal.capturedVariableType` instead", "2.11.0")
     def capturedVariableType(vble: Symbol): Type =
       internal.capturedVariableType(vble)
-  }
 
   /** The type of compilation runs.
     *  @see [[scala.reflect.macros.Enclosures]]
@@ -531,7 +520,7 @@ abstract class Universe extends scala.reflect.api.Universe {
   @deprecated(
       "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
       "2.11.0")
-  trait RunContextApi {
+  trait RunContextApi
 
     /** Currently processed unit of work (a real or a virtual file). */
     @deprecated(
@@ -544,7 +533,6 @@ abstract class Universe extends scala.reflect.api.Universe {
         "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
         "2.11.0")
     def units: Iterator[CompilationUnit]
-  }
 
   /** The type of compilation units.
     *  @see [[scala.reflect.macros.Enclosures]]
@@ -564,7 +552,7 @@ abstract class Universe extends scala.reflect.api.Universe {
   @deprecated(
       "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
       "2.11.0")
-  trait CompilationUnitContextApi {
+  trait CompilationUnitContextApi
 
     /** Source file corresponding to this compilation unit.
       *
@@ -585,5 +573,3 @@ abstract class Universe extends scala.reflect.api.Universe {
         "c.enclosingTree-style APIs are now deprecated; consult the scaladoc for more information",
         "2.11.0")
     def body: Tree
-  }
-}

@@ -19,13 +19,13 @@ package org.apache.spark.util
 
 import org.apache.spark.SparkFunSuite
 
-class CompletionIteratorSuite extends SparkFunSuite {
-  test("basic test") {
+class CompletionIteratorSuite extends SparkFunSuite
+  test("basic test")
     var numTimesCompleted = 0
     val iter = List(1, 2, 3).iterator
-    val completionIter = CompletionIterator[Int, Iterator[Int]](iter, {
+    val completionIter = CompletionIterator[Int, Iterator[Int]](iter,
       numTimesCompleted += 1
-    })
+    )
 
     assert(completionIter.hasNext)
     assert(completionIter.next() === 1)
@@ -45,5 +45,3 @@ class CompletionIteratorSuite extends SparkFunSuite {
     // SPARK-4264: Calling hasNext should not trigger the completion callback again.
     assert(!completionIter.hasNext)
     assert(numTimesCompleted === 1)
-  }
-}

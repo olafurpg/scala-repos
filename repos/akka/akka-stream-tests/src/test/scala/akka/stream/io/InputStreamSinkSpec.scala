@@ -23,7 +23,7 @@ import scala.concurrent.{Await, Future}
 import scala.util.control.NoStackTrace
 import akka.testkit.AkkaSpec
 
-class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
+class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig)
   import system.dispatcher
 
   val settings = ActorMaterializerSettings(system).withDispatcher(
@@ -31,33 +31,30 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
   implicit val materializer = ActorMaterializer(settings)
 
   val timeout = 300.milliseconds
-  def randomByteString(size: Int): ByteString = {
+  def randomByteString(size: Int): ByteString =
     val a = new Array[Byte](size)
     ThreadLocalRandom.current().nextBytes(a)
     ByteString(a)
-  }
 
   val byteString = randomByteString(3)
   val byteArray = byteString.toArray
 
-  def readN(is: InputStream, n: Int): (Int, ByteString) = {
+  def readN(is: InputStream, n: Int): (Int, ByteString) =
     val buf = new Array[Byte](n)
     val r = is.read(buf)
     (r, ByteString.fromArray(buf, 0, r))
-  }
   def testSink(probe: TestProbe) =
     TestSinkStage(new InputStreamSinkStage(timeout), probe)
 
-  "InputStreamSink" must {
-    "read bytes from InputStream" in assertAllStagesStopped {
+  "InputStreamSink" must
+    "read bytes from InputStream" in assertAllStagesStopped
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
       readN(inputStream, byteString.size) should ===(
           (byteString.size, byteString))
       inputStream.close()
-    }
 
-    "read bytes correctly if requested by InputStream not in chunk size" in assertAllStagesStopped {
+    "read bytes correctly if requested by InputStream not in chunk size" in assertAllStagesStopped
       val sinkProbe = TestProbe()
       val byteString2 = randomByteString(3)
       val inputStream =
@@ -72,9 +69,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       readN(inputStream, 2) should ===((2, byteString2.drop(1)))
 
       inputStream.close()
-    }
 
-    "returns less than was expected when the data source has provided some but not enough data" in assertAllStagesStopped {
+    "returns less than was expected when the data source has provided some but not enough data" in assertAllStagesStopped
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
 
@@ -83,9 +79,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       ByteString(arr) should ===(byteString :+ 0)
 
       inputStream.close()
-    }
 
-    "block read until get requested number of bytes from upstream" in assertAllStagesStopped {
+    "block read until get requested number of bytes from upstream" in assertAllStagesStopped
       val (probe, inputStream) = TestSource
         .probe[ByteString]
         .toMat(StreamConverters.asInputStream())(Keep.both)
@@ -100,9 +95,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       probe.sendComplete()
       inputStream.read() should ===(-1)
       inputStream.close()
-    }
 
-    "fill up buffer by default" in assertAllStagesStopped {
+    "fill up buffer by default" in assertAllStagesStopped
       val byteString2 = randomByteString(3)
       val inputStream = Source(byteString :: byteString2 :: Nil)
         .runWith(StreamConverters.asInputStream())
@@ -111,9 +105,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       readN(inputStream, 3) should ===((3, byteString2))
 
       inputStream.close()
-    }
 
-    "throw error when reactive stream is closed" in assertAllStagesStopped {
+    "throw error when reactive stream is closed" in assertAllStagesStopped
       val (probe, inputStream) = TestSource
         .probe[ByteString]
         .toMat(StreamConverters.asInputStream())(Keep.both)
@@ -122,9 +115,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       inputStream.close()
       probe.expectCancellation()
       the[Exception] thrownBy inputStream.read() shouldBe a[IOException]
-    }
 
-    "return all data when upstream is completed" in assertAllStagesStopped {
+    "return all data when upstream is completed" in assertAllStagesStopped
       val sinkProbe = TestProbe()
       val (probe, inputStream) = TestSource
         .probe[ByteString]
@@ -139,9 +131,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       sinkProbe.expectMsg(GraphStageMessages.UpstreamFinish)
 
       readN(inputStream, 3) should ===((1, bytes))
-    }
 
-    "work when read chunks smaller than stream chunks" in assertAllStagesStopped {
+    "work when read chunks smaller than stream chunks" in assertAllStagesStopped
       val bytes = randomByteString(10)
       val inputStream =
         Source.single(bytes).runWith(StreamConverters.asInputStream())
@@ -150,9 +141,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
           (expect.size, expect))
 
       inputStream.close()
-    }
 
-    "throw exception when call read with wrong parameters" in assertAllStagesStopped {
+    "throw exception when call read with wrong parameters" in assertAllStagesStopped
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
       val buf = new Array[Byte](3)
@@ -165,25 +155,22 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       an[IllegalArgumentException] shouldBe thrownBy(
           inputStream.read(buf, 0, 0))
       inputStream.close()
-    }
 
-    "successfully read several chunks at once" in assertAllStagesStopped {
+    "successfully read several chunks at once" in assertAllStagesStopped
       val bytes = List.fill(4)(randomByteString(4))
       val sinkProbe = TestProbe()
       val inputStream = Source[ByteString](bytes).runWith(testSink(sinkProbe))
 
       //need to wait while all elements arrive to sink
-      bytes foreach { _ ⇒
+      bytes foreach  _ ⇒
         sinkProbe.expectMsg(GraphStageMessages.Push)
-      }
 
       for (i ← 0 to 1) readN(inputStream, 8) should ===(
           (8, bytes(i * 2) ++ bytes(i * 2 + 1)))
 
       inputStream.close()
-    }
 
-    "work when read chunks bigger than stream chunks" in assertAllStagesStopped {
+    "work when read chunks bigger than stream chunks" in assertAllStagesStopped
       val bytes1 = randomByteString(10)
       val bytes2 = randomByteString(10)
       val sinkProbe = TestProbe()
@@ -198,9 +185,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       readN(inputStream, 15) should ===((5, bytes2.drop(5)))
 
       inputStream.close()
-    }
 
-    "return -1 when read after stream is completed" in assertAllStagesStopped {
+    "return -1 when read after stream is completed" in assertAllStagesStopped
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
 
@@ -209,9 +195,8 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       inputStream.read() should ===(-1)
 
       inputStream.close()
-    }
 
-    "return IOException when stream is failed" in assertAllStagesStopped {
+    "return IOException when stream is failed" in assertAllStagesStopped
       val sinkProbe = TestProbe()
       val (probe, inputStream) = TestSource
         .probe[ByteString]
@@ -227,16 +212,14 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
 
       probe.sendError(ex)
       sinkProbe.expectMsg(GraphStageMessages.Failure(ex))
-      val e = intercept[IOException] {
+      val e = intercept[IOException]
         Await.result(Future(inputStream.read()), timeout)
-      }
       e.getCause should ===(ex)
-    }
 
-    "use dedicated default-blocking-io-dispatcher by default" in assertAllStagesStopped {
+    "use dedicated default-blocking-io-dispatcher by default" in assertAllStagesStopped
       val sys = ActorSystem("dispatcher-testing", UnboundedMailboxConfig)
       val materializer = ActorMaterializer()(sys)
-      try {
+      try
         TestSource
           .probe[ByteString]
           .runWith(StreamConverters.asInputStream())(materializer)
@@ -248,10 +231,9 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
           .find(_.path.toString contains "inputStreamSink")
           .get
         assertDispatcher(ref, "akka.stream.default-blocking-io-dispatcher")
-      } finally shutdown(sys)
-    }
+      finally shutdown(sys)
 
-    "work when more bytes pulled from InputStream than available" in assertAllStagesStopped {
+    "work when more bytes pulled from InputStream than available" in assertAllStagesStopped
       val inputStream =
         Source.single(byteString).runWith(StreamConverters.asInputStream())
 
@@ -260,11 +242,9 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
       inputStream.read() should ===(-1)
 
       inputStream.close()
-    }
-  }
 
-  "fail to materialize with zero sized input buffer" in {
-    an[IllegalArgumentException] shouldBe thrownBy {
+  "fail to materialize with zero sized input buffer" in
+    an[IllegalArgumentException] shouldBe thrownBy
       Source
         .single(byteString)
         .runWith(StreamConverters
@@ -276,6 +256,3 @@ class InputStreamSinkSpec extends AkkaSpec(UnboundedMailboxConfig) {
        Source.empty is used, the same exception is thrown by
        Materializer.
      */
-    }
-  }
-}

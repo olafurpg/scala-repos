@@ -21,34 +21,31 @@ import scala.annotation.tailrec
   * @author Alexander Podkhalyuzin
   *         Date: 22.05.2008
   */
-class DefinitionsFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class DefinitionsFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
-      parent match {
+      parent match
         case _: ScClassParameter =>
           return true
         case _: ScReferenceExpression =>
         case _ => return false
-      }
       @tailrec
-      def findParent(p: PsiElement): PsiElement = {
+      def findParent(p: PsiElement): PsiElement =
         if (p == null) return null
-        p.getParent match {
+        p.getParent match
           case parent @ (_: ScBlock | _: ScCaseClause | _: ScTemplateBody |
               _: ScClassParameter | _: ScalaFile) =>
-            parent match {
+            parent match
               case clause: ScCaseClause =>
-                clause.funType match {
+                clause.funType match
                   case Some(elem) =>
                     if (leaf.getTextRange.getStartOffset <= elem.getTextRange.getStartOffset)
                       return null
                   case _ => return null
-                }
               case _ =>
-            }
             if (!parent.isInstanceOf[ScalaFile] ||
                 parent.asInstanceOf[ScalaFile].isScriptFile())
               if ((leaf.getPrevSibling == null ||
@@ -61,22 +58,15 @@ class DefinitionsFilter extends ElementFilter {
                             .isInstanceOf[PsiErrorElement]))) return p
             null
           case _ => findParent(p.getParent)
-        }
-      }
       val otherParent = findParent(parent)
       if (otherParent != null &&
           otherParent.getTextRange.getStartOffset == parent.getTextRange.getStartOffset)
         return true
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "val, var keyword filter"
-  }
-}

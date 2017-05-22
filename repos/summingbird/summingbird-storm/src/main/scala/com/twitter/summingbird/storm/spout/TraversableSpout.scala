@@ -25,14 +25,13 @@ import com.twitter.tormenta.spout.Spout
 import java.util.{List => JList, ArrayList}
 import collection.JavaConverters._
 
-object TraversableSpout {
+object TraversableSpout
   def apply[T](items: TraversableOnce[T],
                fieldName: String = "item"): TraversableSpout[T] =
     new TraversableSpout(items, fieldName)
-}
 
 class TraversableSpout[+T](items: TraversableOnce[T], fieldName: String)
-    extends Spout[T] {
+    extends Spout[T]
   private def wrap[T](t: T) = new Values(t.asInstanceOf[AnyRef])
 
   lazy val tupleList = items.toList
@@ -42,4 +41,3 @@ class TraversableSpout[+T](items: TraversableOnce[T], fieldName: String)
 
   def flatMap[U](fn: T => TraversableOnce[U]) =
     new TraversableSpout(tupleList.flatMap(fn), fieldName)
-}

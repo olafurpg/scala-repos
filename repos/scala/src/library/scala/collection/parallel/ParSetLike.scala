@@ -29,18 +29,15 @@ import scala.collection.Set
 trait ParSetLike[T,
                  +Repr <: ParSetLike[T, Repr, Sequential] with ParSet[T],
                  +Sequential <: Set[T] with SetLike[T, Sequential]]
-    extends GenSetLike[T, Repr] with ParIterableLike[T, Repr, Sequential] {
+    extends GenSetLike[T, Repr] with ParIterableLike[T, Repr, Sequential]
   self =>
 
   def empty: Repr
 
   // note: should not override toSet (could be mutable)
 
-  def union(that: GenSet[T]): Repr = sequentially {
+  def union(that: GenSet[T]): Repr = sequentially
     _ union that
-  }
 
-  def diff(that: GenSet[T]): Repr = sequentially {
+  def diff(that: GenSet[T]): Repr = sequentially
     _ diff that
-  }
-}

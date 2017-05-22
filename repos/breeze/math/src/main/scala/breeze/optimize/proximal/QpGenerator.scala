@@ -22,16 +22,15 @@ import breeze.stats.distributions.Rand
   * @return q is linear representation of the function
   * @return H is the quadratic representation of the function
   */
-object QpGenerator {
-  def getGram(nGram: Int) = {
+object QpGenerator
+  def getGram(nGram: Int) =
     val hrand = DenseMatrix.rand[Double](nGram, nGram, Rand.gaussian(0, 1))
     val hrandt = hrand.t
     val hposdef = hrandt * hrand
     val H = hposdef.t + hposdef
     H
-  }
 
-  def apply(nGram: Int, nEqualities: Int) = {
+  def apply(nGram: Int, nEqualities: Int) =
     val en = DenseVector.ones[Double](nGram)
     val zn = DenseVector.zeros[Double](nGram)
 
@@ -47,5 +46,3 @@ object QpGenerator {
     val H = getGram(nGram)
 
     (A, b, lb, ub, q, H)
-  }
-}

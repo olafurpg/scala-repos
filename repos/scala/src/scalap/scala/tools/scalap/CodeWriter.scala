@@ -10,7 +10,7 @@ package tools.scalap
 
 import java.io._
 
-class CodeWriter(writer: Writer) {
+class CodeWriter(writer: Writer)
 
   private val nl = scala.compat.Platform.EOL
   private var step = "  "
@@ -23,10 +23,9 @@ class CodeWriter(writer: Writer) {
 
   def getIndentLevel = level
 
-  def setIndentLevel(level: Int): CodeWriter = {
+  def setIndentLevel(level: Int): CodeWriter =
     this.level = level
     this
-  }
 
   def getIndentWidth = if (step == null) -1 else step.length()
 
@@ -35,40 +34,34 @@ class CodeWriter(writer: Writer) {
 
   def getIndentString = step
 
-  def setIndentString(step: String): CodeWriter = {
+  def setIndentString(step: String): CodeWriter =
     this.step = step
     this
-  }
 
-  def indent: CodeWriter = {
+  def indent: CodeWriter =
     level += 1
     this
-  }
 
-  def undent: CodeWriter = {
+  def undent: CodeWriter =
     level -= 1
     this
-  }
 
-  def newline: CodeWriter = {
+  def newline: CodeWriter =
     if (step == null) newspace
-    else if (!line) {
-      try {
+    else if (!line)
+      try
         writer.write(nl)
-      } catch {
+      catch
         case e: Exception => sys.error("IO error")
-      }
       line = align
       align = true
       space = false
       this
-    } else this
-  }
+    else this
 
-  def newspace: CodeWriter = {
+  def newspace: CodeWriter =
     space = !align
     this
-  }
 
   def *() = {}
 
@@ -109,23 +102,19 @@ class CodeWriter(writer: Writer) {
   def print(value: Double): CodeWriter = print(String.valueOf(value))
 
   def print(value: String): CodeWriter =
-    try {
-      if (align) {
+    try
+      if (align)
         var i = 0
-        while (i < level) {
+        while (i < level)
           writer.write(step)
           i += 1
-        }
-      }
       if (space) writer.write(" ")
       writer.write(value)
       align = false
       space = false
       line = false
       this
-    } catch {
+    catch
       case e: Exception => sys.error("IO error")
-    }
 
   override def toString(): String = writer.toString()
-}

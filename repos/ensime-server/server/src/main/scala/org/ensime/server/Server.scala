@@ -31,18 +31,17 @@ class ServerActor(
     protocol: Protocol,
     interface: String = "127.0.0.1"
 )
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
-  override val supervisorStrategy = OneForOneStrategy() {
+  override val supervisorStrategy = OneForOneStrategy()
     case ex: Exception =>
       log.error(s"Error with monitor actor ${ex.getMessage}", ex)
       self ! ShutdownRequest(
           s"Monitor actor failed with ${ex.getClass} - ${ex.toString}",
           isError = true)
       Stop
-  }
 
-  def initialiseChildren(): Unit = {
+  def initialiseChildren(): Unit =
 
     implicit val config = this.config
     implicit val mat = ActorMaterializer()
@@ -77,7 +76,7 @@ class ServerActor(
     Http()(context.system)
       .bindAndHandle(
           webserver.route, interface, preferredHttpPort.getOrElse(0))
-      .onComplete {
+      .onComplete
         case Failure(ex) =>
           log.error(s"Error binding http endpoint ${ex.getMessage}", ex)
           selfRef ! ShutdownRequest(
@@ -86,46 +85,39 @@ class ServerActor(
 
         case Success(ServerBinding(addr)) =>
           log.info(s"ENSIME HTTP on ${addr.getAddress}")
-          try {
+          try
             PortUtil.writePort(config.cacheDir, addr.getPort, "http")
-          } catch {
+          catch
             case ex: Throwable =>
               log.error(
                   s"Error initializing http endpoint ${ex.getMessage}", ex)
               selfRef ! ShutdownRequest(
                   s"http endpoint failed to initialise: ${ex.getMessage}",
                   isError = true)
-          }
-      }(context.system.dispatcher)
+      (context.system.dispatcher)
 
     Environment.info foreach log.info
-  }
 
-  override def preStart(): Unit = {
-    try {
+  override def preStart(): Unit =
+    try
       initialiseChildren()
-    } catch {
+    catch
       case t: Throwable =>
         log.error(s"Error during startup - ${t.getMessage}", t)
         self ! ShutdownRequest(t.toString, isError = true)
-    }
-  }
-  override def receive: Receive = {
+  override def receive: Receive =
     case req: ShutdownRequest =>
       triggerShutdown(req)
-  }
 
-  def triggerShutdown(request: ShutdownRequest): Unit = {
+  def triggerShutdown(request: ShutdownRequest): Unit =
     Server.shutdown(context.system, request)
-  }
-}
 
-object Server {
+object Server
   SLF4JBridgeHandler.removeHandlersForRootLogger()
   SLF4JBridgeHandler.install()
   val log = LoggerFactory.getLogger("Server")
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val ensimeFileStr = propOrNone("ensime.config").getOrElse(
         throw new RuntimeException(
             "ensime.config (the location of the .ensime file) must be set")
@@ -135,29 +127,26 @@ object Server {
     if (!ensimeFile.exists() || !ensimeFile.isFile)
       throw new RuntimeException(s".ensime file ($ensimeFile) not found")
 
-    implicit val config = try {
+    implicit val config = try
       EnsimeConfigProtocol.parse(Files.toString(ensimeFile, Charsets.UTF_8))
-    } catch {
+    catch
       case e: Throwable =>
         log.error(s"There was a problem parsing $ensimeFile", e)
         throw e
-    }
 
-    val protocol: Protocol = propOrElse("ensime.protocol", "swank") match {
+    val protocol: Protocol = propOrElse("ensime.protocol", "swank") match
       case "swank" => new SwankProtocol
       case "jerk" => new JerkProtocol
       case other =>
         throw new IllegalArgumentException(
             s"$other is not a valid ENSIME protocol")
-    }
 
     val system = ActorSystem("ENSIME")
     system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
-  }
 
-  def shutdown(system: ActorSystem, request: ShutdownRequest): Unit = {
-    val t = new Thread(new Runnable {
-      def run(): Unit = {
+  def shutdown(system: ActorSystem, request: ShutdownRequest): Unit =
+    val t = new Thread(new Runnable
+      def run(): Unit =
         if (request.isError)
           log.error(
               s"Shutdown requested due to internal error: ${request.reason}")
@@ -170,12 +159,8 @@ object Server {
         Try(system.awaitTermination())
 
         log.info("Shutdown complete")
-        if (!propIsSet("ensime.server.test")) {
+        if (!propIsSet("ensime.server.test"))
           if (request.isError) System.exit(1)
           else System.exit(0)
-        }
-      }
-    })
+    )
     t.start()
-  }
-}

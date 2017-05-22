@@ -3,10 +3,10 @@ package gitbucket.core.util
 import GitSpecUtil._
 import org.scalatest.FunSuite
 
-class JGitUtilSpec extends FunSuite {
+class JGitUtilSpec extends FunSuite
 
-  test("getFileList(git: Git, revision: String, path)") {
-    withTestRepository { git =>
+  test("getFileList(git: Git, revision: String, path)")
+    withTestRepository  git =>
       def list(branch: String, path: String) =
         JGitUtil
           .getFileList(git, branch, path)
@@ -149,11 +149,9 @@ class JGitUtilSpec extends FunSuite {
       assert(
           list("master", "dir/subdir") == List(("File3.md", "commit7", false),
                                                ("File4.md", "commit4", false)))
-    }
-  }
 
-  test("getFileList subfolder multi-origin (issue #721)") {
-    withTestRepository { git =>
+  test("getFileList subfolder multi-origin (issue #721)")
+    withTestRepository  git =>
       def list(branch: String, path: String) =
         JGitUtil
           .getFileList(git, branch, path)
@@ -162,6 +160,3 @@ class JGitUtilSpec extends FunSuite {
       createFile(git, "branch", "test/text2.txt", "body2", message = "commit2")
       mergeAndCommit(git, "master", "branch", message = "merge3")
       assert(list("master", "test") == List(("text2.txt", "commit2", false)))
-    }
-  }
-}

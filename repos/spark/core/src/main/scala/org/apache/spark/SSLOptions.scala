@@ -57,13 +57,13 @@ private[spark] case class SSLOptions(
     trustStoreType: Option[String] = None,
     protocol: Option[String] = None,
     enabledAlgorithms: Set[String] = Set.empty)
-    extends Logging {
+    extends Logging
 
   /**
     * Creates a Jetty SSL context factory according to the SSL settings represented by this object.
     */
-  def createJettySslContextFactory(): Option[SslContextFactory] = {
-    if (enabled) {
+  def createJettySslContextFactory(): Option[SslContextFactory] =
+    if (enabled)
       val sslContextFactory = new SslContextFactory()
 
       keyStore.foreach(
@@ -71,60 +71,53 @@ private[spark] case class SSLOptions(
       keyStorePassword.foreach(sslContextFactory.setKeyStorePassword)
       keyPassword.foreach(sslContextFactory.setKeyManagerPassword)
       keyStoreType.foreach(sslContextFactory.setKeyStoreType)
-      if (needClientAuth) {
+      if (needClientAuth)
         trustStore.foreach(
             file => sslContextFactory.setTrustStore(file.getAbsolutePath))
         trustStorePassword.foreach(sslContextFactory.setTrustStorePassword)
         trustStoreType.foreach(sslContextFactory.setTrustStoreType)
-      }
       protocol.foreach(sslContextFactory.setProtocol)
-      if (supportedAlgorithms.nonEmpty) {
+      if (supportedAlgorithms.nonEmpty)
         sslContextFactory.setIncludeCipherSuites(supportedAlgorithms.toSeq: _*)
-      }
 
       Some(sslContextFactory)
-    } else {
+    else
       None
-    }
-  }
 
   /*
    * The supportedAlgorithms set is a subset of the enabledAlgorithms that
    * are supported by the current Java security provider for this protocol.
    */
   private val supportedAlgorithms: Set[String] =
-    if (enabledAlgorithms.isEmpty) {
+    if (enabledAlgorithms.isEmpty)
       Set()
-    } else {
+    else
       var context: SSLContext = null
-      try {
+      try
         context = SSLContext.getInstance(protocol.orNull)
         /* The set of supported algorithms does not depend upon the keys, trust, or
          rng, although they will influence which algorithms are eventually used. */
         context.init(null, null, null)
-      } catch {
+      catch
         case npe: NullPointerException =>
           logDebug("No SSL protocol specified")
           context = SSLContext.getDefault
         case nsa: NoSuchAlgorithmException =>
           logDebug(s"No support for requested SSL protocol ${protocol.get}")
           context = SSLContext.getDefault
-      }
 
       val providerAlgorithms =
         context.getServerSocketFactory.getSupportedCipherSuites.toSet
 
       // Log which algorithms we are discarding
-      (enabledAlgorithms &~ providerAlgorithms).foreach { cipher =>
+      (enabledAlgorithms &~ providerAlgorithms).foreach  cipher =>
         logDebug(s"Discarding unsupported cipher $cipher")
-      }
 
       val supported = enabledAlgorithms & providerAlgorithms
       require(supported.nonEmpty || sys.env.contains("SPARK_TESTING"),
               "SSLContext does not support any of the enabled algorithms: " +
               enabledAlgorithms.mkString(","))
       supported
-    }
 
   /** Returns a string representation of this SSLOptions with all the passwords masked. */
   override def toString: String =
@@ -132,9 +125,8 @@ private[spark] case class SSLOptions(
     s"keyStore=$keyStore, keyStorePassword=${keyStorePassword.map(_ => "xxx")}, " +
     s"trustStore=$trustStore, trustStorePassword=${trustStorePassword.map(_ => "xxx")}, " +
     s"protocol=$protocol, enabledAlgorithms=$enabledAlgorithms}"
-}
 
-private[spark] object SSLOptions extends Logging {
+private[spark] object SSLOptions extends Logging
 
   /** Resolves SSLOptions settings from a given Spark configuration object at a given namespace.
     *
@@ -166,7 +158,7 @@ private[spark] object SSLOptions extends Logging {
     */
   def parse(conf: SparkConf,
             ns: String,
-            defaults: Option[SSLOptions] = None): SSLOptions = {
+            defaults: Option[SSLOptions] = None): SSLOptions =
     val enabled = conf.getBoolean(
         s"$ns.enabled", defaultValue = defaults.exists(_.enabled))
 
@@ -224,5 +216,3 @@ private[spark] object SSLOptions extends Logging {
                    trustStoreType,
                    protocol,
                    enabledAlgorithms)
-  }
-}

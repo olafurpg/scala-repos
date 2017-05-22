@@ -43,13 +43,13 @@ class SortBasedAggregationIterator(
                                 aggregateAttributes,
                                 initialInputBufferOffset,
                                 resultExpressions,
-                                newMutableProjection) {
+                                newMutableProjection)
 
   /**
     * Creates a new aggregation buffer and initializes buffer values
     * for all aggregate functions.
     */
-  private def newBuffer: MutableRow = {
+  private def newBuffer: MutableRow =
     val bufferSchema = aggregateFunctions.flatMap(_.aggBufferAttributes)
     val bufferRowSize: Int = bufferSchema.length
 
@@ -58,16 +58,14 @@ class SortBasedAggregationIterator(
       bufferSchema.map(_.dataType).forall(UnsafeRow.isMutable)
 
     val buffer =
-      if (useUnsafeBuffer) {
+      if (useUnsafeBuffer)
         val unsafeProjection =
           UnsafeProjection.create(bufferSchema.map(_.dataType))
         unsafeProjection.apply(genericMutableBuffer)
-      } else {
+      else
         genericMutableBuffer
-      }
     initializeBuffer(buffer)
     buffer
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // Mutable states for sort based aggregation.
@@ -93,23 +91,21 @@ class SortBasedAggregationIterator(
   private[this] val safeProj: Projection = FromUnsafeProjection(
       valueAttributes.map(_.dataType))
 
-  protected def initialize(): Unit = {
-    if (inputIterator.hasNext) {
+  protected def initialize(): Unit =
+    if (inputIterator.hasNext)
       initializeBuffer(sortBasedAggregationBuffer)
       val inputRow = inputIterator.next()
       nextGroupingKey = groupingProjection(inputRow).copy()
       firstRowInNextGroup = inputRow.copy()
       sortedInputHasNewGroup = true
-    } else {
+    else
       // This inputIter is empty.
       sortedInputHasNewGroup = false
-    }
-  }
 
   initialize()
 
   /** Processes rows in the current group. It will stop when it find a new group. */
-  protected def processCurrentSortedGroup(): Unit = {
+  protected def processCurrentSortedGroup(): Unit =
     currentGroupingKey = nextGroupingKey
     // Now, we will start to find all rows belonging to this group.
     // We create a variable to track if we see the next group.
@@ -119,27 +115,23 @@ class SortBasedAggregationIterator(
 
     // The search will stop when we see the next group or there is no
     // input row left in the iter.
-    while (!findNextPartition && inputIterator.hasNext) {
+    while (!findNextPartition && inputIterator.hasNext)
       // Get the grouping key.
       val currentRow = inputIterator.next()
       val groupingKey = groupingProjection(currentRow)
 
       // Check if the current row belongs the current input row.
-      if (currentGroupingKey == groupingKey) {
+      if (currentGroupingKey == groupingKey)
         processRow(sortBasedAggregationBuffer, safeProj(currentRow))
-      } else {
+      else
         // We find a new group.
         findNextPartition = true
         nextGroupingKey = groupingKey.copy()
         firstRowInNextGroup = currentRow.copy()
-      }
-    }
     // We have not seen a new group. It means that there is no new row in the input
     // iter. The current group is the last group of the iter.
-    if (!findNextPartition) {
+    if (!findNextPartition)
       sortedInputHasNewGroup = false
-    }
-  }
 
   ///////////////////////////////////////////////////////////////////////////
   // Iterator's public methods
@@ -147,8 +139,8 @@ class SortBasedAggregationIterator(
 
   override final def hasNext: Boolean = sortedInputHasNewGroup
 
-  override final def next(): UnsafeRow = {
-    if (hasNext) {
+  override final def next(): UnsafeRow =
+    if (hasNext)
       // Process the current group.
       processCurrentSortedGroup()
       // Generate output row for the current group.
@@ -158,15 +150,11 @@ class SortBasedAggregationIterator(
       initializeBuffer(sortBasedAggregationBuffer)
       numOutputRows += 1
       outputRow
-    } else {
+    else
       // no more result
       throw new NoSuchElementException
-    }
-  }
 
-  def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow = {
+  def outputForEmptyGroupingKeyWithoutInput(): UnsafeRow =
     initializeBuffer(sortBasedAggregationBuffer)
     generateOutput(
         UnsafeRow.createFromByteArray(0, 0), sortBasedAggregationBuffer)
-  }
-}

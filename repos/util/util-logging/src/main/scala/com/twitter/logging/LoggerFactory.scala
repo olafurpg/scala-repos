@@ -38,30 +38,26 @@ case class LoggerFactory(node: String = "",
                          level: Option[Level] = None,
                          handlers: List[HandlerFactory] = Nil,
                          useParents: Boolean = true)
-    extends (() => Logger) {
+    extends (() => Logger)
 
   /**
     * Registers new handlers and setting with the logger at `node`
     * @note It clears all the existing handlers for the node
     */
-  def apply(): Logger = {
+  def apply(): Logger =
     val logger = Logger.get(node)
     logger.clearHandlers()
-    level.foreach { x =>
+    level.foreach  x =>
       logger.setLevel(x)
-    }
-    handlers.foreach { h =>
+    handlers.foreach  h =>
       logger.addHandler(h())
-    }
     logger.setUseParentHandlers(useParents)
     logger
-  }
-}
 
 /**
   * Shim for java compatibility.  Make a new LoggerFactoryBuilder with `LoggerFactory#newBuilder()`.
   */
-class LoggerFactoryBuilder private[logging](factory: LoggerFactory) {
+class LoggerFactoryBuilder private[logging](factory: LoggerFactory)
   def node(_node: String): LoggerFactoryBuilder =
     new LoggerFactoryBuilder(factory.copy(node = _node))
 
@@ -85,9 +81,7 @@ class LoggerFactoryBuilder private[logging](factory: LoggerFactory) {
     new LoggerFactoryBuilder(factory.copy(useParents = false))
 
   def build(): LoggerFactory = factory
-}
 
-object LoggerFactory {
+object LoggerFactory
   def newBuilder(): LoggerFactoryBuilder =
     new LoggerFactoryBuilder(LoggerFactory())
-}

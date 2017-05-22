@@ -3,7 +3,7 @@ import Keys._
 import scala.language.implicitConversions
 import scala.language.postfixOps
 
-object Common {
+object Common
   def newProject(projectName: String, base: File): Project =
     Project(projectName, base).settings(
         name := projectName,
@@ -20,13 +20,11 @@ object Common {
     newProject(projectName, file(projectName))
 
   def unmanagedJarsFrom(
-      sdkDirectory: File, subdirectories: String*): Classpath = {
-    val sdkPathFinder = subdirectories.foldLeft(PathFinder.empty) {
+      sdkDirectory: File, subdirectories: String*): Classpath =
+    val sdkPathFinder = subdirectories.foldLeft(PathFinder.empty)
       (finder, dir) =>
         finder +++ (sdkDirectory / dir)
-    }
     (sdkPathFinder * globFilter("*.jar")).classpath
-  }
 
   def filterTestClasspath(classpath: Def.Classpath): Def.Classpath =
     classpath.filterNot(_.data.getName.endsWith("lucene-core-2.4.1.jar"))
@@ -60,4 +58,3 @@ object Common {
       envVars in Test += "NO_FS_ROOTS_ACCESS_CHECK" -> "yes",
       fullClasspath in Test <<= fullClasspath.in(Test).map(filterTestClasspath)
   )
-}

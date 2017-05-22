@@ -12,10 +12,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiManager
 import org.jetbrains.plugins.scala.lang.psi.impl.toplevel.synthetic.{ScSyntheticClass, SyntheticClasses}
 
 abstract class StdType(val name: String, val tSuper: Option[StdType])
-    extends ValueType {
-  def visitType(visitor: ScalaTypeVisitor) {
+    extends ValueType
+  def visitType(visitor: ScalaTypeVisitor)
     visitor.visitStdType(this)
-  }
 
   /**
     * Return wrapped to option appropriate synthetic class.
@@ -23,38 +22,30 @@ abstract class StdType(val name: String, val tSuper: Option[StdType])
     * @param project in which project to find this class
     * @return If possible class to represent this type.
     */
-  def asClass(project: Project): Option[ScSyntheticClass] = {
+  def asClass(project: Project): Option[ScSyntheticClass] =
     if (SyntheticClasses.get(project).isClassesRegistered)
       Some(SyntheticClasses.get(project).byName(name).get)
     else None
-  }
 
   override def equivInner(
       r: ScType,
       subst: ScUndefinedSubstitutor,
-      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
-    (this, r) match {
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) =
+    (this, r) match
       case (l: StdType, _: StdType) => (l == r, subst)
-      case (AnyRef, _) => {
-          ScType.extractClass(r) match {
+      case (AnyRef, _) =>
+          ScType.extractClass(r) match
             case Some(clazz) if clazz.qualifiedName == "java.lang.Object" =>
               (true, subst)
             case _ => (false, subst)
-          }
-        }
-      case (_, _) => {
-          ScType.extractClass(r) match {
+      case (_, _) =>
+          ScType.extractClass(r) match
             case Some(o: ScObject) => (false, subst)
             case Some(clazz) if clazz.qualifiedName == "scala." + name =>
               (true, subst)
             case _ => (false, subst)
-          }
-        }
-    }
-  }
-}
 
-object StdType {
+object StdType
   val QualNameToType = Map(
       "scala.Any" -> Any,
       "scala.AnyRef" -> AnyRef,
@@ -101,63 +92,52 @@ object StdType {
       JAVA_LANG_DOUBLE -> Double
   )
 
-  def unboxedType(tp: ScType): ScType = {
+  def unboxedType(tp: ScType): ScType =
     val name = tp.canonicalText.stripPrefix("_root_.")
     if (fqnBoxedToScType.contains(name)) fqnBoxedToScType(name)
     else tp
-  }
 
   def unapply(tp: StdType): Option[(String, Option[StdType])] =
     Some(tp.name, tp.tSuper)
-}
 
-trait ValueType extends ScType {
+trait ValueType extends ScType
   def isValue = true
 
   def inferValueType: ValueType = this
-}
 
 case object Any extends StdType("Any", None)
 
-case object Null extends StdType("Null", Some(AnyRef)) {
+case object Null extends StdType("Null", Some(AnyRef))
   override def isFinalType = true
-}
 
 case object AnyRef extends StdType("AnyRef", Some(Any))
 
-case object Nothing extends StdType("Nothing", Some(Any)) {
+case object Nothing extends StdType("Nothing", Some(Any))
   override def isFinalType = true
-}
 
-case object Singleton extends StdType("Singleton", Some(AnyRef)) {
+case object Singleton extends StdType("Singleton", Some(AnyRef))
   override def isFinalType = true
-}
 
-case object AnyVal extends StdType("AnyVal", Some(Any)) {
+case object AnyVal extends StdType("AnyVal", Some(Any))
   override def getValType: Option[StdType] = Some(this)
-}
 
 abstract class ValType(override val name: String)
-    extends StdType(name, Some(AnyVal)) {
-  def apply(element: PsiElement): ScType = {
+    extends StdType(name, Some(AnyVal))
+  def apply(element: PsiElement): ScType =
     apply(element.getManager, element.getResolveScope)
-  }
 
-  def apply(manager: PsiManager, scope: GlobalSearchScope): ScType = {
+  def apply(manager: PsiManager, scope: GlobalSearchScope): ScType =
     val clazz = ScalaPsiManager
       .instance(manager.getProject)
       .getCachedClass(scope, "scala." + name)
     clazz.map(ScDesignatorType(_)).getOrElse(this)
-  }
 
   override def getValType: Option[StdType] = Some(this)
 
   override def isFinalType = true
-}
 
-object ValType {
+object ValType
   def unapply(tp: ValType): Option[String] = Some(tp.name)
-}
 
 object Unit extends ValType("Unit")
 

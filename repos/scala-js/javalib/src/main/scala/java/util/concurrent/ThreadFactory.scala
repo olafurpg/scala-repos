@@ -1,5 +1,4 @@
 package java.util.concurrent
 
-trait ThreadFactory {
+trait ThreadFactory
   def newThread(r: Runnable): Thread
-}

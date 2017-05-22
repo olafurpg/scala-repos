@@ -11,17 +11,16 @@ import scala.util.Random
 
 // ./sbt 'project finagle-benchmark' 'run .*StatsReceiverBenchmark.*'
 @Threads(3)
-class StatsReceiverBenchmark extends StdBenchAnnotations {
+class StatsReceiverBenchmark extends StdBenchAnnotations
   import StatsReceiverBenchmark._
 
   private[this] def newStat(statRecv: StatsReceiver): Stat =
     statRecv.stat("stats_receiver_histogram")
 
-  private[this] def add(addState: AddState, stat: Stat): Unit = {
+  private[this] def add(addState: AddState, stat: Stat): Unit =
     val i = addState.i
     addState.i += 1
     stat.add(i)
-  }
 
   // ----- Ostrich ------
 
@@ -86,9 +85,8 @@ class StatsReceiverBenchmark extends StdBenchAnnotations {
   @Benchmark
   def queryStatsCommons(state: QueryState): java.lang.Iterable[CStat[_]] =
     state.statsGet()
-}
 
-object StatsReceiverBenchmark {
+object StatsReceiverBenchmark
   private[this] val ostrich = new OstrichStatsReceiver
 
   private[this] val metrics = new MetricsStatsReceiver(
@@ -104,34 +102,30 @@ object StatsReceiverBenchmark {
   private[this] val stats = new CommonsStatsReceiver
 
   @State(Scope.Benchmark)
-  class StatsReceiverState {
+  class StatsReceiverState
     val ostrichStatsReceiver: StatsReceiver = ostrich
     val metricsStatsReceiver: StatsReceiver = metrics
     val metricsBucketedStatsReceiver: StatsReceiver = metricsBucketed
-  }
 
   @State(Scope.Benchmark)
-  class StatState {
+  class StatState
     val ostrichStat: Stat = ostrich.stat("histo")
     val metricsStat: Stat = metrics.stat("histo")
     val metricsBucketedStat: Stat = metricsBucketed.stat("histo")
     val statsStat: Stat = stats.stat("histo")
-  }
 
   @State(Scope.Benchmark)
-  class CounterState {
+  class CounterState
     val ostrichCounter: Counter = ostrich.counter("cnt")
     val metricsCounter: Counter = metrics.counter("cnt")
     val statsCounter: Counter = stats.counter("cnt")
-  }
 
   @State(Scope.Thread)
-  class AddState {
+  class AddState
     var i = 0
-  }
 
   @State(Scope.Benchmark)
-  class QueryState {
+  class QueryState
     var statName: String = ""
     val rng = new Random(31415926535897932L)
 
@@ -142,24 +136,19 @@ object StatsReceiverBenchmark {
     def statsGet(): java.lang.Iterable[CStat[_]] = Stats.getVariables()
 
     @Setup(Level.Trial)
-    def setup(): Unit = {
+    def setup(): Unit =
       val oStat = ostrich.stat("my_stat")
       val mStat = metrics.stat("my_stat")
       val mbStat = metricsBucketed.stat("my_stat")
       val sStat = stats.stat("my_stat")
-      (1 to 100000).foreach { x =>
+      (1 to 100000).foreach  x =>
         val rand = rng.nextInt(x)
         oStat.add(rand)
         mStat.add(rand)
         mbStat.add(rand)
         sStat.add(rand)
-      }
-    }
 
     @TearDown(Level.Trial)
-    def teardown(): Unit = {
+    def teardown(): Unit =
       ostrich.repr.clearAll()
       Stats.flush()
-    }
-  }
-}

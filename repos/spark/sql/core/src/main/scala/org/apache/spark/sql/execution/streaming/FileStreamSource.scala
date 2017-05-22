@@ -37,7 +37,7 @@ class FileStreamSource(sqlContext: SQLContext,
                        dataSchema: Option[StructType],
                        providerName: String,
                        dataFrameBuilder: Array[String] => DataFrame)
-    extends Source with Logging {
+    extends Source with Logging
 
   private val fs = FileSystem.get(sqlContext.sparkContext.hadoopConfiguration)
   private val metadataLog =
@@ -45,28 +45,23 @@ class FileStreamSource(sqlContext: SQLContext,
   private var maxBatchId = metadataLog.getLatest().map(_._1).getOrElse(-1L)
 
   private val seenFiles = new OpenHashSet[String]
-  metadataLog.get(None, maxBatchId).foreach {
+  metadataLog.get(None, maxBatchId).foreach
     case (batchId, files) =>
       files.foreach(seenFiles.add)
-  }
 
   /** Returns the schema of the data from this source */
-  override lazy val schema: StructType = {
-    dataSchema.getOrElse {
+  override lazy val schema: StructType =
+    dataSchema.getOrElse
       val filesPresent = fetchAllFiles()
-      if (filesPresent.isEmpty) {
-        if (providerName == "text") {
+      if (filesPresent.isEmpty)
+        if (providerName == "text")
           // Add a default schema for "text"
           new StructType().add("value", StringType)
-        } else {
+        else
           throw new IllegalArgumentException("No schema specified")
-        }
-      } else {
+      else
         // There are some existing files. Use them to infer the schema.
         dataFrameBuilder(filesPresent.toArray).schema
-      }
-    }
-  }
 
   /**
     * Returns the maximum offset that can be retrieved from the source.
@@ -74,61 +69,51 @@ class FileStreamSource(sqlContext: SQLContext,
     * `synchronized` on this method is for solving race conditions in tests. In the normal usage,
     * there is no race here, so the cost of `synchronized` should be rare.
     */
-  private def fetchMaxOffset(): LongOffset = synchronized {
+  private def fetchMaxOffset(): LongOffset = synchronized
     val filesPresent = fetchAllFiles()
     val newFiles = new ArrayBuffer[String]()
-    filesPresent.foreach { file =>
-      if (!seenFiles.contains(file)) {
+    filesPresent.foreach  file =>
+      if (!seenFiles.contains(file))
         logDebug(s"new file: $file")
         newFiles.append(file)
         seenFiles.add(file)
-      } else {
+      else
         logDebug(s"old file: $file")
-      }
-    }
 
-    if (newFiles.nonEmpty) {
+    if (newFiles.nonEmpty)
       maxBatchId += 1
       metadataLog.add(maxBatchId, newFiles)
-    }
 
     new LongOffset(maxBatchId)
-  }
 
   /**
     * For test only. Run `func` with the internal lock to make sure when `func` is running,
     * the current offset won't be changed and no new batch will be emitted.
     */
-  def withBatchingLocked[T](func: => T): T = synchronized {
+  def withBatchingLocked[T](func: => T): T = synchronized
     func
-  }
 
   /** Return the latest offset in the source */
-  def currentOffset: LongOffset = synchronized {
+  def currentOffset: LongOffset = synchronized
     new LongOffset(maxBatchId)
-  }
 
   /**
     * Returns the next batch of data that is available after `start`, if any is available.
     */
-  override def getNextBatch(start: Option[Offset]): Option[Batch] = {
+  override def getNextBatch(start: Option[Offset]): Option[Batch] =
     val startId = start.map(_.asInstanceOf[LongOffset].offset).getOrElse(-1L)
     val end = fetchMaxOffset()
     val endId = end.offset
 
-    if (startId + 1 <= endId) {
+    if (startId + 1 <= endId)
       val files = metadataLog.get(Some(startId + 1), endId).map(_._2).flatten
       logDebug(s"Return files from batches ${startId + 1}:$endId")
       logDebug(s"Streaming ${files.mkString(", ")}")
       Some(new Batch(end, dataFrameBuilder(files)))
-    } else {
+    else
       None
-    }
-  }
 
-  private def fetchAllFiles(): Seq[String] = {
+  private def fetchAllFiles(): Seq[String] =
     fs.listStatus(new Path(path))
       .filterNot(_.getPath.getName.startsWith("_"))
       .map(_.getPath.toUri.toString)
-  }
-}

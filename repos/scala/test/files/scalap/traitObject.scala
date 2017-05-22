@@ -1,7 +1,5 @@
-trait TraitObject {
+trait TraitObject
   def foo = 239
-}
 
-object TraitObject {
+object TraitObject
   def bar = 42
-}

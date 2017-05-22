@@ -33,27 +33,22 @@ import scalafx.scene.control.ScrollPane
 import scalafx.scene.layout.{Priority, VBox}
 
 /** Dashboard Page */
-class DashboardPage(dashPart: String = "dashboard") extends DisplayablePage {
+class DashboardPage(dashPart: String = "dashboard") extends DisplayablePage
 
   private val tree = EnsembleTree.create()
 
-  def getPage = {
-    val thumbs = dashPart match {
+  def getPage =
+    val thumbs = dashPart match
       case "dashboard" => tree.getDashThumbsCtrl
       case _ => tree.getDashThumb(dashPart)
-    }
 
-    new ScrollPane {
+    new ScrollPane
       vgrow = Priority.Always
       hgrow = Priority.Always
       fitToHeight = true
       fitToWidth = true
-      content = new VBox {
+      content = new VBox
         vgrow = Priority.Always
         hgrow = Priority.Always
         children = thumbs
-      }
       styleClass += "category-page"
-    }
-  }
-}

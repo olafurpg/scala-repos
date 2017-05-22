@@ -10,15 +10,14 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 /**
   * Pavel Fatin
   */
-object PrintStringParser extends StringParser {
-  def parse(element: PsiElement) = {
+object PrintStringParser extends StringParser
+  def parse(element: PsiElement) =
     extractPrintCall(element).map(
         p => FormattedStringParser.parseFormatCall(p._1, p._2))
-  }
 
   def extractPrintCall(
       element: PsiElement): Option[(ScLiteral, Seq[ScExpression])] =
-    Some(element) collect {
+    Some(element) collect
       // printf("%d", 1)
       case MethodInvocation(
           PsiReferenceEx.resolve(
@@ -35,11 +34,9 @@ object PrintStringParser extends StringParser {
           if literal.isString &&
           isPrintStreamPrintfMethod(owner.qualifiedName, f.getName) =>
         (literal, args)
-    }
 
   private def isPrintStreamPrintfMethod(holder: String, method: String) =
     holder == "java.io.PrintStream" && method == "printf"
 
   private def isPrintfMethod(holder: String, method: String) =
     holder == "scala.Predef" && method == "printf"
-}

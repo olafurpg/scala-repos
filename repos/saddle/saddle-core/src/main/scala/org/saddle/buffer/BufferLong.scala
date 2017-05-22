@@ -18,28 +18,24 @@ package org.saddle.buffer
 import it.unimi.dsi.fastutil.longs.LongArrays
 import org.saddle.Buffer
 
-class BufferLong(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Long] {
+class BufferLong(sz: Int = Buffer.INIT_CAPACITY) extends Buffer[Long]
   var list = Array.ofDim[Long](sz)
   var count = 0
   var remain = sz
 
   def apply(loc: Int) = list(loc)
 
-  def add(i: Long) {
-    if (remain == 0) {
+  def add(i: Long)
+    if (remain == 0)
       remain = list.length
       list = LongArrays.grow(list, remain * 2)
-    }
 
     list(count) = i
     count += 1
     remain -= 1
-  }
 
   def toArray: Array[Long] = LongArrays.copy(list, 0, count)
-}
 
-object BufferLong {
+object BufferLong
   def apply(sz: Int) = new BufferLong(sz)
   def apply() = new BufferLong()
-}

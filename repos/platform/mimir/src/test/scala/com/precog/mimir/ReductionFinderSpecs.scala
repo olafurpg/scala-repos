@@ -30,7 +30,7 @@ import com.precog.yggdrasil.execution.EvaluationContext
 import scala.collection.mutable
 
 trait ReductionFinderSpecs[M[+ _]]
-    extends Specification with EvaluatorTestSupport[M] {
+    extends Specification with EvaluatorTestSupport[M]
 
   import instructions._
   import dag._
@@ -40,22 +40,20 @@ trait ReductionFinderSpecs[M[+ _]]
   val evalCtx = defaultEvaluationContext
   val morphCtx = defaultMorphContext
 
-  object reductions extends ReductionFinder with StdLibOpFinder {
+  object reductions extends ReductionFinder with StdLibOpFinder
     def MorphContext(ctx: EvaluationContext, node: DepGraph): MorphContext =
       new MorphContext(ctx, null)
-  }
   import reductions._
 
-  "mega reduce" should {
+  "mega reduce" should
 
-    "in a load, rewrite to itself" in {
+    "in a load, rewrite to itself" in
       val line = Line(1, 1, "")
       val input = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual input
-    }
 
-    "in a reduction of a singleton" in {
+    "in a reduction of a singleton" in
       val line = Line(1, 1, "")
 
       val input = dag.Reduce(Count, Const(CString("alpha"))(line))(line)
@@ -66,9 +64,8 @@ trait ReductionFinderSpecs[M[+ _]]
       val expected = joinDeref(megaR, 0, 0, line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in a single reduction" in {
+    "in a single reduction" in
       val line = Line(1, 1, "")
 
       val input =
@@ -83,9 +80,8 @@ trait ReductionFinderSpecs[M[+ _]]
       val expected = joinDeref(megaR, 0, 0, line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in joins where transpecs are eq, wrap object, operate, filter" in {
+    "in joins where transpecs are eq, wrap object, operate, filter" in
       val line = Line(1, 1, "")
 
       val clicks = dag.AbsoluteLoad(Const(CString("/clicks"))(line))(line)
@@ -171,9 +167,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                    line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in a join of two reductions on the same dataset" in {
+    "in a join of two reductions on the same dataset" in
       val line = Line(1, 1, "")
 
       val parent = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -202,9 +197,8 @@ trait ReductionFinderSpecs[M[+ _]]
       findReductions(input, evalCtx) mustEqual expectedReductions
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in a join where only one side is a reduction" in {
+    "in a join where only one side is a reduction" in
       val line = Line(1, 1, "")
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
       val reduction = StdDev
@@ -213,7 +207,7 @@ trait ReductionFinderSpecs[M[+ _]]
       val spec = trans.Leaf(trans.Source)
       val megaR = dag.MegaReduce(List((spec, List(reduction))), load)
 
-      "right" in {
+      "right" in
         val input =
           Join(Add, Cross(None), dag.Operate(Neg, load)(line), r)(line)
         val expected = Join(Add,
@@ -222,8 +216,7 @@ trait ReductionFinderSpecs[M[+ _]]
                             joinDeref(megaR, 0, 0, line))(line)
 
         megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-      }
-      "left" in {
+      "left" in
         val input =
           Join(Add, Cross(None), r, dag.Operate(Neg, load)(line))(line)
         val expected = Join(Add,
@@ -232,10 +225,8 @@ trait ReductionFinderSpecs[M[+ _]]
                             dag.Operate(Neg, load)(line))(line)
 
         megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-      }
-    }
 
-    "where two different sets are being reduced" in {
+    "where two different sets are being reduced" in
       val line = Line(1, 1, "")
 
       val load1 = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -257,9 +248,8 @@ trait ReductionFinderSpecs[M[+ _]]
                           joinDeref(megaR2, 0, 0, line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where two different sets are being reduced" in {
+    "where two different sets are being reduced" in
       val line = Line(1, 1, "")
 
       val load1 = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -304,9 +294,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                    line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where a single set is being reduced three times" in {
+    "where a single set is being reduced three times" in
       val line = Line(1, 1, "")
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
 
@@ -333,9 +322,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                joinDeref(megaR, 0, 0, line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where three reductions use three different trans specs" in {
+    "where three reductions use three different trans specs" in
       import trans._
 
       val line = Line(1, 1, "")
@@ -382,9 +370,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                joinDeref(mega, 0, 0, line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where three reductions use two trans specs" in {
+    "where three reductions use two trans specs" in
       import trans._
 
       val line = Line(1, 1, "")
@@ -427,9 +414,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                joinDeref(mega, 0, 0, line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where three reductions use one trans spec" in {
+    "where three reductions use one trans spec" in
       import trans._
 
       val line = Line(1, 1, "")
@@ -468,9 +454,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                joinDeref(mega, 0, 0, line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "where one reduction uses three trans spec" in {
+    "where one reduction uses three trans spec" in
       import trans._
 
       val line = Line(1, 1, "")
@@ -515,9 +500,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                joinDeref(mega, 0, 0, line))(line))(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in a split" in {
+    "in a split" in
       val line = Line(1, 1, "")
       // 
       // nums := dataset(//hom/numbers)
@@ -564,9 +548,8 @@ trait ReductionFinderSpecs[M[+ _]]
                                id)(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
 
-    "in a split that contains two reductions of the same dataset" in {
+    "in a split that contains two reductions of the same dataset" in
       val line = Line(1, 1, "")
 
       // 
@@ -655,11 +638,9 @@ trait ReductionFinderSpecs[M[+ _]]
           id)(line)
 
       megaReduce(input, findReductions(input, evalCtx)) mustEqual expected
-    }
-  }
 
-  "reduction finder" should {
-    "in a load, find no reductions when there aren't any" in {
+  "reduction finder" should
+    "in a load, find no reductions when there aren't any" in
       val line = Line(1, 1, "")
 
       val input = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -671,9 +652,8 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
 
-    "in a single reduction" in {
+    "in a single reduction" in
       val line = Line(1, 1, "")
 
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -688,9 +668,8 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(r, evalCtx) mustEqual expected
-    }
 
-    "in a join of two reductions on the same dataset #2" in {
+    "in a join of two reductions on the same dataset #2" in
       val line = Line(1, 1, "")
 
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -707,9 +686,8 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
 
-    "findReductions given a reduction inside a reduction" in {
+    "findReductions given a reduction inside a reduction" in
       val line = Line(1, 1, "")
 
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -724,9 +702,8 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(r2, evalCtx) mustEqual expected
-    }
 
-    "findReductions given two reductions inside a reduction" in {
+    "findReductions given two reductions inside a reduction" in
       val line = Line(1, 1, "")
 
       val foo = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
@@ -757,10 +734,9 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
 
     // TODO: need to test reductions whose parents are splits
-    "findReductions inside a Split" in {
+    "findReductions inside a Split" in
       val line = Line(1, 1, "")
 
       val clicks = dag.AbsoluteLoad(Const(CString("/clicks"))(line))(line)
@@ -781,13 +757,12 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
 
-    "in a join where only one side is a reduction" in {
+    "in a join where only one side is a reduction" in
       val line = Line(1, 1, "")
       val load = dag.AbsoluteLoad(Const(CString("/foo"))(line))(line)
 
-      "right" in {
+      "right" in
         val r = dag.Reduce(StdDev, load)(line)
         val input =
           Join(Add, Cross(None), dag.Operate(Neg, load)(line), r)(line)
@@ -800,8 +775,7 @@ trait ReductionFinderSpecs[M[+ _]]
         )
 
         findReductions(input, evalCtx) mustEqual expected
-      }
-      "left" in {
+      "left" in
         val r = dag.Reduce(Count, load)(line)
         val input = Join(Add,
                          Cross(Some(CrossRight)),
@@ -816,10 +790,8 @@ trait ReductionFinderSpecs[M[+ _]]
         )
 
         findReductions(input, evalCtx) mustEqual expected
-      }
-    }
 
-    "in a split" in {
+    "in a split" in
       val line = Line(1, 1, "")
 
       // nums := dataset(//hom/numbers)
@@ -850,9 +822,8 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
 
-    "in a split that contains two reductions of the same dataset #2" in {
+    "in a split that contains two reductions of the same dataset #2" in
       val line = Line(1, 1, "")
 
       // clicks := dataset(//clicks)
@@ -906,8 +877,6 @@ trait ReductionFinderSpecs[M[+ _]]
       )
 
       findReductions(input, evalCtx) mustEqual expected
-    }
-  }
 
   def joinDeref(
       left: DepGraph, first: Int, second: Int, line: Line): DepGraph =
@@ -918,7 +887,6 @@ trait ReductionFinderSpecs[M[+ _]]
               left,
               Const(CLong(first))(line))(line),
          Const(CLong(second))(line))(line)
-}
 
 object ReductionFinderSpecs
     extends ReductionFinderSpecs[test.YId] with test.YIdInstances

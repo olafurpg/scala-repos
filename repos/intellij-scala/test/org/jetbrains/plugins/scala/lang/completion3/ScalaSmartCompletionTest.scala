@@ -10,8 +10,8 @@ import org.junit.Assert
   * User: Alexander Podkhalyuzin
   * Date: 28.10.11
   */
-class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
-  def testAfterPlaceholder() {
+class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase
+  def testAfterPlaceholder()
     val fileText = """
       |class A {
       |  class B {def concat: B = new B}
@@ -31,9 +31,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "concat").get)
     checkResultByText(resultText)
-  }
 
-  def testTimeUnit1() {
+  def testTimeUnit1()
     val fileText = """
         |class TimeUnit
         |object TimeUnit {
@@ -67,9 +66,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString.contains("DAYS")).get)
     checkResultByText(resultText)
-  }
 
-  def testTimeUnit2() {
+  def testTimeUnit2()
     val fileText = """
         |class TimeUnit
         |object TimeUnit {
@@ -103,9 +101,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString.contains("DAYS")).get)
     checkResultByText(resultText)
-  }
 
-  def testAfterNew() {
+  def testAfterNew()
     val fileText = """
       |import scala.collection.mutable.HashSet
       |
@@ -128,9 +125,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "HashSet").get, '[')
     checkResultByText(resultText)
-  }
 
-  def testFilterPrivates() {
+  def testFilterPrivates()
     val fileText = """
       |class Test {
       |  def foo(): String = ""
@@ -145,9 +141,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.SMART)
 
     Assert.assertNull(activeLookup)
-  }
 
-  def testFilterObjectDouble() {
+  def testFilterObjectDouble()
     val fileText = """
       |class Test {
       |  val x: Double = <caret>
@@ -157,9 +152,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     val (activeLookup, _) = complete(1, CompletionType.SMART)
 
     Assert.assertTrue(!activeLookup.exists(_.getLookupString == "Double"))
-  }
 
-  def testFalse() {
+  def testFalse()
     val fileText = """
       |class A {
       |  val f: Boolean = <caret>
@@ -177,9 +171,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "false").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testClassOf() {
+  def testClassOf()
     val fileText = """
       |class A {
       |  val f: Class[_] = <caret>
@@ -197,9 +190,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "classOf").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testSmartRenamed() {
+  def testSmartRenamed()
     val fileText = """
       |import java.util.{ArrayList => BLLLL}
       |object Test extends App {
@@ -219,9 +211,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "BLLLL").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testThis() {
+  def testThis()
     val fileText = """
       |class TT {
       |  val al: TT = <caret>
@@ -240,9 +231,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "this").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testInnerThis() {
+  def testInnerThis()
     val fileText = """
       |class TT {
       |  class GG {
@@ -265,9 +255,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "this").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testOuterThis() {
+  def testOuterThis()
     val fileText = """
       |class TT {
       |  class GG {
@@ -290,9 +279,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "TT.this").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testWhile() {
+  def testWhile()
     val fileText = """
       |while (<caret>) {}
       """.stripMargin.replaceAll("\r", "").trim()
@@ -307,9 +295,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "true").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testDoWhile() {
+  def testDoWhile()
     val fileText = """
       |do {} while (<caret>)
       """.stripMargin.replaceAll("\r", "").trim()
@@ -324,9 +311,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "true").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testNewFunction() {
+  def testNewFunction()
     val fileText = """
       |val x: Int => String = new <caret>
       """.stripMargin.replaceAll("\r", "").trim()
@@ -343,9 +329,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "Function1").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testEtaExpansion() {
+  def testEtaExpansion()
     val fileText = """
       |def foo(x: Int): String = x.toString
       |val x: Int => String = <caret>
@@ -362,9 +347,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "foo").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testJavaEnum() {
+  def testJavaEnum()
     val javaFileText = """
       |package a;
       |
@@ -379,12 +363,11 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       |}
       """.stripMargin('|').replaceAll("\r", "").trim()
 
-    inWriteAction {
+    inWriteAction
       val myVFile = getSourceRootAdapter
         .createChildDirectory(null, "a")
         .createChildData(null, "Java.java")
       VfsUtil.saveText(myVFile, javaFileText)
-    }
 
     configureFromFileTextAdapter("dummy.scala", fileText)
     val (activeLookup, _) = complete(1, CompletionType.SMART)
@@ -400,9 +383,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testScalaEnum() {
+  def testScalaEnum()
     val fileText =
       """
       |object Scala extends Enumeration {type Scala = Value; val aaa, bbb, ccc = Value}
@@ -425,9 +407,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "aaa").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testScalaFactoryMethod() {
+  def testScalaFactoryMethod()
     val fileText = """
       |class Scala
       |object Scala {
@@ -455,9 +436,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
           activeLookup.find(le => le.getLookupString == "getInstance").get,
           '\t')
     checkResultByText(resultText)
-  }
 
-  def testScalaFactoryApply() {
+  def testScalaFactoryApply()
     val fileText = """
       |case class Scala()
       |class A {
@@ -478,9 +458,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "apply").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testScalaHashSetEmpty() {
+  def testScalaHashSetEmpty()
     val fileText = """
       |import collection.mutable.HashSet
       |class A {
@@ -501,9 +480,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "empty").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testTwoGenerics() {
+  def testTwoGenerics()
     val fileText = """
         |class A[T, K](s: Int)
         |
@@ -526,9 +504,8 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "B").get, '\t')
     checkResultByText(resultText)
-  }
 
-  def testChainedSecondCompletion() {
+  def testChainedSecondCompletion()
     val fileText = """
       |object YY {
       |  def foo(): YY = new YY
@@ -557,5 +534,3 @@ class ScalaSmartCompletionTest extends ScalaCodeInsightTestBase {
       completeLookupItem(
           activeLookup.find(le => le.getLookupString == "foo.goo").get, '\t')
     checkResultByText(resultText)
-  }
-}

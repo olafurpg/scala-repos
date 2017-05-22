@@ -19,7 +19,7 @@ package kafka.admin
 /**
   * Mode to control how rack aware replica assignment will be executed
   */
-object RackAwareMode {
+object RackAwareMode
 
   /**
     * Ignore all rack information in replica assignment. This is an optional mode used in command line.
@@ -37,6 +37,5 @@ object RackAwareMode {
     * creation.
     */
   case object Safe extends RackAwareMode
-}
 
 sealed trait RackAwareMode

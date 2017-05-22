@@ -13,7 +13,7 @@ import org.jetbrains.plugins.scala.finder.ScalaSourceFilterScope
 /**
   * @author ilyas
   */
-class ScPackageObjectIndex extends IntStubIndexExtension[PsiClass] {
+class ScPackageObjectIndex extends IntStubIndexExtension[PsiClass]
 
   override def get(int: java.lang.Integer,
                    project: Project,
@@ -21,8 +21,6 @@ class ScPackageObjectIndex extends IntStubIndexExtension[PsiClass] {
     super.get(int, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScPackageObjectIndex.KEY
-}
 
-object ScPackageObjectIndex {
+object ScPackageObjectIndex
   val KEY = ScalaIndexKeys.PACKAGE_OBJECT_KEY
-}

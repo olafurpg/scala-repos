@@ -20,6 +20,5 @@ package kafka.common
   * Indicates a producer pool initialization problem
   */
 class UnavailableProducerException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

@@ -28,9 +28,9 @@ import org.apache.spark.sql.SQLContext
 /**
   * An example for Multilayer Perceptron Classification.
   */
-object MultilayerPerceptronClassifierExample {
+object MultilayerPerceptronClassifierExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("MultilayerPerceptronClassifierExample")
     val sc = new SparkContext(conf)
@@ -66,6 +66,4 @@ object MultilayerPerceptronClassifierExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

@@ -47,7 +47,7 @@ import javax.servlet.http._
   */
 class MockHttpServletResponse(
     var writer: PrintWriter, var outputStream: ServletOutputStream)
-    extends HttpServletResponse {
+    extends HttpServletResponse
   protected var statusCode: Int = 200
   protected var statusString: String = "OK"
   protected var contentType = "text/html"
@@ -58,89 +58,68 @@ class MockHttpServletResponse(
   protected var bufferSize: Int = 0
   protected var charEncoding = "ISO-8859-1" // yes, that's HTTP's default
 
-  def setStatus(i: Int, s: String): Unit = {
+  def setStatus(i: Int, s: String): Unit =
     statusCode = i
     statusString = s
-  }
 
-  def setStatus(i: Int): Unit = {
+  def setStatus(i: Int): Unit =
     statusCode = i
-  }
   def getStatus = statusCode
 
-  def addIntHeader(s: String, i: Int) {
+  def addIntHeader(s: String, i: Int)
     addHeader(s, i.toString)
-  }
-  def setIntHeader(s: String, i: Int) {
+  def setIntHeader(s: String, i: Int)
     setHeader(s, i.toString)
-  }
-  def addHeader(s1: String, s2: String) {
+  def addHeader(s1: String, s2: String)
     headers += (s1 -> (headers.getOrElse(s1, Nil) ::: List(s2)))
-  }
-  def setHeader(s1: String, s2: String) {
+  def setHeader(s1: String, s2: String)
     headers += (s1 -> List(s2))
-  }
 
-  def getHeader(name: String): String = {
+  def getHeader(name: String): String =
     headers.get(name).flatMap(_.headOption).getOrElse("")
-  }
-  def getHeaders(name: String): Collection[String] = {
+  def getHeaders(name: String): Collection[String] =
     headers.get(name).getOrElse(Nil).asJava
-  }
-  def getHeaderNames(): Collection[String] = {
+  def getHeaderNames(): Collection[String] =
     headers.keySet.toSeq.asJava
-  }
 
-  def addDateHeader(s: String, l: Long) {
+  def addDateHeader(s: String, l: Long)
     addHeader(s, (new Date(l)).toString)
-  }
-  def setDateHeader(s: String, l: Long) {
+  def setDateHeader(s: String, l: Long)
     setHeader(s, (new Date(l)).toString)
-  }
 
-  def sendRedirect(uri: String) {
+  def sendRedirect(uri: String)
     // Send back a 301 to the URL mentioned
     statusCode = 301
     addHeader("Location", uri)
-  }
 
-  def sendError(code: Int) {
+  def sendError(code: Int)
     statusCode = code
-  }
 
-  def sendError(code: Int, s: String) {
+  def sendError(code: Int, s: String)
     sendError(code)
     statusString = s
-  }
 
   def encodeRedirectURL(url: String): String = encodeRedirectUrl(url)
-  def encodeRedirectUrl(url: String): String = {
+  def encodeRedirectUrl(url: String): String =
     // do something fancy encoding on uri, return that.
     url
-  }
   def encodeURL(url: String): String = encodeUrl(url)
-  def encodeUrl(url: String): String = {
+  def encodeUrl(url: String): String =
     // use the same encoder as encodeRedirectUrl
     url
-  }
-  def containsHeader(header: String): Boolean = {
+  def containsHeader(header: String): Boolean =
     headers.contains(header)
-  }
-  def addCookie(cookie: Cookie) = {
+  def addCookie(cookie: Cookie) =
     cookies = cookie :: cookies
-  }
   def getLocale: Locale = locale
   def setLocale(l: Locale) = locale = l
-  def reset {
+  def reset
     // well, reset all the state to it's original values. yikes. later.
-  }
   def isCommitted = false
-  def resetBuffer {
+  def resetBuffer
     // reset the buffer.
-  }
-  def flushBuffer {
+  def flushBuffer
     // flush the buffer
-  }
   def getBufferSize(): Int = bufferSize
   def setBufferSize(i: Int): Unit = bufferSize = i
   def setContentType(t: String): Unit = contentType = t
@@ -151,4 +130,3 @@ class MockHttpServletResponse(
   def getContentType(): String = contentType
   def getCharacterEncoding(): String = charEncoding
   def setContentLengthLong(l: Long): Unit = contentType = l.toString
-}

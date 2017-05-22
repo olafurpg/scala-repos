@@ -9,7 +9,7 @@ import akka.dispatch.sysmsg.{Unwatch, Watch}
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-trait GracefulStopSupport {
+trait GracefulStopSupport
 
   /**
     * Returns a [[scala.concurrent.Future]] that will be completed with success (value `true`) when
@@ -45,7 +45,7 @@ trait GracefulStopSupport {
     */
   def gracefulStop(target: ActorRef,
                    timeout: FiniteDuration,
-                   stopMessage: Any = PoisonPill): Future[Boolean] = {
+                   stopMessage: Any = PoisonPill): Future[Boolean] =
     val internalTarget = target.asInstanceOf[InternalActorRef]
     val ref = PromiseActorRef(internalTarget.provider,
                               Timeout(timeout),
@@ -53,11 +53,9 @@ trait GracefulStopSupport {
                               stopMessage.getClass.getName)
     internalTarget.sendSystemMessage(Watch(internalTarget, ref))
     target.tell(stopMessage, Actor.noSender)
-    ref.result.future.transform({
+    ref.result.future.transform(
       case Terminated(t) if t.path == target.path ⇒ true
       case _ ⇒
         { internalTarget.sendSystemMessage(Unwatch(target, ref)); false }
-    }, t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t })(
+    , t ⇒ { internalTarget.sendSystemMessage(Unwatch(target, ref)); t })(
         ref.internalCallingThreadExecutionContext)
-  }
-}

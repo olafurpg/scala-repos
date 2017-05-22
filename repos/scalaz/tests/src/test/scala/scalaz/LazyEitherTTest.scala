@@ -4,7 +4,7 @@ import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 import std.AllInstances._
 
-object LazyEitherTTest extends SpecLite {
+object LazyEitherTTest extends SpecLite
 
   import LazyEitherTest.LazyEitherEqual
 
@@ -22,25 +22,23 @@ object LazyEitherTTest extends SpecLite {
   checkAll(bindRec.laws[LazyEitherTListInt])
   checkAll(monadError.laws[LazyEitherTListInt, Int])
 
-  "tail recursive tailrecM" in {
+  "tail recursive tailrecM" in
     import Scalaz.Id
     type LazyEitherId[A] = LazyEitherT[Id, Int, A]
 
     val times = 10000
 
-    val result = BindRec[LazyEitherId].tailrecM[Int, Int] { i =>
+    val result = BindRec[LazyEitherId].tailrecM[Int, Int]  i =>
       LazyEitherT[Id, Int, Int \/ Int](
           LazyEither.lazyRight(if (i < 10000) \/.left(i + 1) else \/.right(i)))
-    }(0)
+    (0)
     result.getOrElse(0) must_=== times
-  }
 
-  private def lazyEitherTUcompilationTest: Unit = {
+  private def lazyEitherTUcompilationTest: Unit =
     val a: String \/ LazyEither[Int, Boolean] = null
     LazyEitherT.lazyEitherTU(a)
-  }
 
-  object instances {
+  object instances
     def functor[F[_]: Functor, A] = Functor[LazyEitherT[F, A, ?]]
     def plus[F[_]: Monad, A : Semigroup] = Plus[LazyEitherT[F, A, ?]]
     def monad[F[_]: Monad, A] = Monad[LazyEitherT[F, A, ?]]
@@ -63,5 +61,3 @@ object LazyEitherTTest extends SpecLite {
     def foldable[F[_]: Traverse, A] = Foldable[LazyEitherT[F, A, ?]]
     def bifunctor[F[_]: Traverse] = Bifunctor[LazyEitherT[F, ?, ?]]
     def bifoldable[F[_]: Traverse] = Bifoldable[LazyEitherT[F, ?, ?]]
-  }
-}

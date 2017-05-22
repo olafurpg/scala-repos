@@ -2,8 +2,8 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.reflect.{ClassTag, classTag}
 
-object Test extends App {
-  def test[T : ClassTag : TypeTag](x: T) = {
+object Test extends App
+  def test[T : ClassTag : TypeTag](x: T) =
     println(s"========${classTag[T].runtimeClass}========")
     println(
         cm.reflect(x)
@@ -11,7 +11,6 @@ object Test extends App {
     println(
         cm.reflect(x)
           .reflectMethod(typeOf[T].member(TermName("toString")).asMethod)())
-  }
 
   test(2.toByte)
   test(2.toShort)
@@ -22,4 +21,3 @@ object Test extends App {
   test('2')
   test(true)
   test(())
-}

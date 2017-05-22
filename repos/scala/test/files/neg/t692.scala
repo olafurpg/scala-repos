@@ -1,4 +1,4 @@
-abstract class test3 {
+abstract class test3
   trait Type0[+T0];
   trait Type[T0] extends Type0[T];
   trait ClassType0[+C <: AnyRef] extends Type0[C];
@@ -18,4 +18,3 @@ abstract class test3 {
 
   class Foo[A <: AnyRef];
   class Bar[A <: Foo](implicit tpeA: Type[A]) extends Foo;
-}

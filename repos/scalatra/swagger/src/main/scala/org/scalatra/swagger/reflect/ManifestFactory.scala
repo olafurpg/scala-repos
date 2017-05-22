@@ -4,18 +4,17 @@ import java.lang.reflect.{GenericArrayType, ParameterizedType, Type, TypeVariabl
 
 import scala.reflect.Manifest
 
-private[swagger] object ManifestFactory {
-  def manifestOf(t: Type): Manifest[_] = t match {
+private[swagger] object ManifestFactory
+  def manifestOf(t: Type): Manifest[_] = t match
 
     case pt: ParameterizedType =>
       val clazz = manifestOf(pt.getRawType).runtimeClass
       val typeArgs = pt.getActualTypeArguments map manifestOf
 
-      if (pt.getOwnerType == null) {
+      if (pt.getOwnerType == null)
         manifestOf(clazz, typeArgs)
-      } else {
+      else
         Manifest.classType(manifestOf(pt.getOwnerType), clazz, typeArgs: _*)
-      }
 
     case at: GenericArrayType =>
       val componentManifest = manifestOf(at.getGenericComponentType)
@@ -34,29 +33,25 @@ private[swagger] object ManifestFactory {
       else manifestOf(classOf[AnyRef])
 
     case c: Class[_] => fromClass(c)
-  }
 
-  def manifestOf(erasure: Class[_], typeArgs: Seq[Manifest[_]]): Manifest[_] = {
-    if (typeArgs.size == 0) {
+  def manifestOf(erasure: Class[_], typeArgs: Seq[Manifest[_]]): Manifest[_] =
+    if (typeArgs.size == 0)
       fromClass(erasure)
-    } else {
+    else
       val normalizedErasure =
         if (erasure.getName == "scala.Array")
           typeArgs(0).arrayManifest.runtimeClass
         else erasure
 
       Manifest.classType(normalizedErasure, typeArgs.head, typeArgs.tail: _*)
-    }
-  }
 
-  def manifestOf(st: ScalaType): Manifest[_] = st match {
+  def manifestOf(st: ScalaType): Manifest[_] = st match
     case t: ManifestScalaType => t.manifest
     case _ =>
       val typeArgs = st.typeArgs map manifestOf
       manifestOf(st.erasure, typeArgs)
-  }
 
-  private def fromClass(clazz: Class[_]): Manifest[_] = clazz match {
+  private def fromClass(clazz: Class[_]): Manifest[_] = clazz match
     case java.lang.Byte.TYPE => Manifest.Byte
     case java.lang.Short.TYPE => Manifest.Short
     case java.lang.Character.TYPE => Manifest.Char
@@ -67,5 +62,3 @@ private[swagger] object ManifestFactory {
     case java.lang.Boolean.TYPE => Manifest.Boolean
     case java.lang.Void.TYPE => Manifest.Unit
     case _ => Manifest.classType(clazz)
-  }
-}

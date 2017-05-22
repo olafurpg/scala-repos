@@ -29,16 +29,15 @@ import org.junit.runner.RunWith
   * Tests basic parsers that are used by the more complex parsing steps.
   */
 @RunWith(classOf[JUnitRunner])
-class BaseParsersTest extends FlatSpec with ShouldMatchers with BaseParsers {
+class BaseParsersTest extends FlatSpec with ShouldMatchers with BaseParsers
 
-  "The BaseParsers" should "parse a newline" in {
+  "The BaseParsers" should "parse a newline" in
     val p = nl
     apply(p, "\n") should equal("\n")
     evaluating(apply(p, "\r\n")) should produce[IllegalArgumentException]
     evaluating(apply(p, "  \n")) should produce[IllegalArgumentException]
-  }
 
-  it should "parse whitespace" in {
+  it should "parse whitespace" in
     val p = ws
     apply(p, " ") should equal(" ")
     apply(p, "\t") should equal("\t")
@@ -47,22 +46,20 @@ class BaseParsersTest extends FlatSpec with ShouldMatchers with BaseParsers {
     apply(p, "  \t  \t  ") should equal("  \t  \t  ")
     //we want newlines to be treated diferrently from other ws
     evaluating(apply(p, "\n")) should produce[IllegalArgumentException]
-  }
 
-  it should "be able to look behind" in {
-    apply(((elem('a') ~ lookbehind(Set('a')) ~ elem('b')) ^^ {
+  it should "be able to look behind" in
+    apply(((elem('a') ~ lookbehind(Set('a')) ~ elem('b')) ^^
           case a ~ lb ~ b => a + "" + b
-        }), "ab") should equal("ab")
-    evaluating {
-      apply(((elem('a') ~ lookbehind(Set('b')) ~ elem('b')) ^^ {
+        ), "ab") should equal("ab")
+    evaluating
+      apply(((elem('a') ~ lookbehind(Set('b')) ~ elem('b')) ^^
             case a ~ b => a + "" + b
-          }), "ab")
-    } should produce[IllegalArgumentException]
+          ), "ab")
+    should produce[IllegalArgumentException]
 
     apply((elem('a') ~ not(lookbehind(Set(' ', '\t', '\n'))) ~ '*'), "a*")
-  }
 
-  it should "parse chars in ranges" in {
+  it should "parse chars in ranges" in
     val p = ranges(SortedMap('A' -> 'Z', '0' -> '9'))
     apply(p, "B") should equal('B')
     apply(p, "A") should equal('A')
@@ -73,5 +70,3 @@ class BaseParsersTest extends FlatSpec with ShouldMatchers with BaseParsers {
     evaluating(apply(p, "a")) should produce[IllegalArgumentException]
     evaluating(apply(p, "z")) should produce[IllegalArgumentException]
     evaluating(apply(p, "<")) should produce[IllegalArgumentException]
-  }
-}

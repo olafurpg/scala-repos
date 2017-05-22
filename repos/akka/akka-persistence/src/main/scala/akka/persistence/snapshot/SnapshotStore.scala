@@ -14,14 +14,14 @@ import akka.pattern.CircuitBreaker
 /**
   * Abstract snapshot store.
   */
-trait SnapshotStore extends Actor with ActorLogging {
+trait SnapshotStore extends Actor with ActorLogging
   import SnapshotProtocol._
   import context.dispatcher
 
   private val extension = Persistence(context.system)
   private val publish = extension.settings.internal.publishPluginCommands
 
-  private val breaker = {
+  private val breaker =
     val cfg = extension.configFor(self)
     val maxFailures = cfg.getInt("circuit-breaker.max-failures")
     val callTimeout =
@@ -30,49 +30,45 @@ trait SnapshotStore extends Actor with ActorLogging {
       cfg.getDuration("circuit-breaker.reset-timeout", MILLISECONDS).millis
     CircuitBreaker(
         context.system.scheduler, maxFailures, callTimeout, resetTimeout)
-  }
 
   final def receive =
     receiveSnapshotStore.orElse[Any, Unit](receivePluginInternal)
 
-  final val receiveSnapshotStore: Actor.Receive = {
+  final val receiveSnapshotStore: Actor.Receive =
     case LoadSnapshot(persistenceId, criteria, toSequenceNr) ⇒
       breaker.withCircuitBreaker(
-          loadAsync(persistenceId, criteria.limit(toSequenceNr))) map { sso ⇒
+          loadAsync(persistenceId, criteria.limit(toSequenceNr))) map  sso ⇒
         LoadSnapshotResult(sso, toSequenceNr)
-      } recover {
+      recover
         case e ⇒ LoadSnapshotResult(None, toSequenceNr)
-      } pipeTo senderPersistentActor()
+      pipeTo senderPersistentActor()
 
     case SaveSnapshot(metadata, snapshot) ⇒
       val md = metadata.copy(timestamp = System.currentTimeMillis)
-      breaker.withCircuitBreaker(saveAsync(md, snapshot)) map { _ ⇒
+      breaker.withCircuitBreaker(saveAsync(md, snapshot)) map  _ ⇒
         SaveSnapshotSuccess(md)
-      } recover {
+      recover
         case e ⇒ SaveSnapshotFailure(metadata, e)
-      } to (self, senderPersistentActor())
+      to (self, senderPersistentActor())
 
     case evt: SaveSnapshotSuccess ⇒
       try tryReceivePluginInternal(evt) finally senderPersistentActor ! evt // sender is persistentActor
     case evt @ SaveSnapshotFailure(metadata, _) ⇒
-      try {
+      try
         tryReceivePluginInternal(evt)
         breaker.withCircuitBreaker(deleteAsync(metadata))
-      } finally senderPersistentActor() ! evt // sender is persistentActor
+      finally senderPersistentActor() ! evt // sender is persistentActor
 
     case d @ DeleteSnapshot(metadata) ⇒
       breaker
         .withCircuitBreaker(deleteAsync(metadata))
-        .map {
+        .map
           case _ ⇒ DeleteSnapshotSuccess(metadata)
-        }
-        .recover {
+        .recover
           case e ⇒ DeleteSnapshotFailure(metadata, e)
-        }
         .pipeTo(self)(senderPersistentActor())
-        .onComplete {
+        .onComplete
           case _ ⇒ if (publish) context.system.eventStream.publish(d)
-        }
 
     case evt: DeleteSnapshotSuccess ⇒
       try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt
@@ -82,22 +78,18 @@ trait SnapshotStore extends Actor with ActorLogging {
     case d @ DeleteSnapshots(persistenceId, criteria) ⇒
       breaker
         .withCircuitBreaker(deleteAsync(persistenceId, criteria))
-        .map {
+        .map
           case _ ⇒ DeleteSnapshotsSuccess(criteria)
-        }
-        .recover {
+        .recover
           case e ⇒ DeleteSnapshotsFailure(criteria, e)
-        }
         .pipeTo(self)(senderPersistentActor())
-        .onComplete {
+        .onComplete
           case _ ⇒ if (publish) context.system.eventStream.publish(d)
-        }
 
     case evt: DeleteSnapshotsFailure ⇒
       try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt // sender is persistentActor
     case evt: DeleteSnapshotsSuccess ⇒
       try tryReceivePluginInternal(evt) finally senderPersistentActor() ! evt
-  }
 
   /** Documents intent that the sender() is expected to be the PersistentActor */
   @inline private final def senderPersistentActor(): ActorRef = sender()
@@ -156,4 +148,3 @@ trait SnapshotStore extends Actor with ActorLogging {
     */
   def receivePluginInternal: Actor.Receive = Actor.emptyBehavior
   //#snapshot-store-plugin-api
-}

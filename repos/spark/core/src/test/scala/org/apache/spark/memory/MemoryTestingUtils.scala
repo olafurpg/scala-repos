@@ -22,8 +22,8 @@ import org.apache.spark.{SparkEnv, TaskContext, TaskContextImpl}
 /**
   * Helper methods for mocking out memory-management-related classes in tests.
   */
-object MemoryTestingUtils {
-  def fakeTaskContext(env: SparkEnv): TaskContext = {
+object MemoryTestingUtils
+  def fakeTaskContext(env: SparkEnv): TaskContext =
     val taskMemoryManager = new TaskMemoryManager(env.memoryManager, 0)
     new TaskContextImpl(stageId = 0,
                         partitionId = 0,
@@ -31,5 +31,3 @@ object MemoryTestingUtils {
                         attemptNumber = 0,
                         taskMemoryManager = taskMemoryManager,
                         metricsSystem = env.metricsSystem)
-  }
-}

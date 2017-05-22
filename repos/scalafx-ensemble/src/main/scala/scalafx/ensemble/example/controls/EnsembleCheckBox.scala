@@ -38,23 +38,21 @@ import scalafx.scene.layout.{Priority, VBox}
   * @related controls/buttons/GraphicButton
   * @related controls/buttons/RadioButtons
   */
-class EnsembleCheckBox extends EnsembleExample {
+class EnsembleCheckBox extends EnsembleExample
 
-  def getContent = new VBox {
+  def getContent = new VBox
     vgrow = Priority.Always
     hgrow = Priority.Always
     spacing = 10
     padding = Insets(20)
-    children = List(new CheckBox {
+    children = List(new CheckBox
       text = "Simple CheckBox"
-    }, new CheckBox {
+    , new CheckBox
       text = "Three state checkbox"
       allowIndeterminate = true
       indeterminate = false
-    }, new CheckBox {
+    , new CheckBox
       text = "Disabled"
       selected = true
       disable = true
-    })
-  }
-}
+    )

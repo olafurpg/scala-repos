@@ -30,7 +30,7 @@ import com.twitter.summingbird.scalding._
   */
 class InitialBatchedStore[K, V](
     val firstNonZero: BatchID, override val proxy: BatchedStore[K, V])
-    extends ProxyBatchedStore[K, V] {
+    extends ProxyBatchedStore[K, V]
   import OrderedFromOrderingExt._
   override def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
       implicit flowDef: FlowDef, mode: Mode) =
@@ -42,7 +42,7 @@ class InitialBatchedStore[K, V](
   // Here is where we switch:
   override def readLast(
       exclusiveUB: BatchID,
-      mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
+      mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] =
     if (exclusiveUB > firstNonZero) proxy.readLast(exclusiveUB, mode)
     else if (exclusiveUB == firstNonZero)
       Right((firstNonZero.prev, Scalding.emptyFlowProducer[(K, V)]))
@@ -50,9 +50,7 @@ class InitialBatchedStore[K, V](
       Left(
           List("Earliest batch set at :" + firstNonZero +
               " but tried to read: " + exclusiveUB))
-  }
 
   override def toString =
     "InitialBatchedStore(firstNonZero=%s, proxyingFor=%s)".format(
         firstNonZero.toString, proxy.toString)
-}

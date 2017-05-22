@@ -26,33 +26,31 @@ import org.apache.hadoop.fs.Path
 
 import scala.sys.process._
 
-object Runner extends Logging {
+object Runner extends Logging
   def envStringToMap(env: String): Map[String, String] =
     env
       .split(',')
       .flatMap(p =>
-            p.split('=') match {
+            p.split('=') match
           case Array(k, v) => List(k -> v)
           case _ => Nil
-      })
+      )
       .toMap
 
   def argumentValue(
-      arguments: Seq[String], argumentName: String): Option[String] = {
+      arguments: Seq[String], argumentName: String): Option[String] =
     val argumentIndex = arguments.indexOf(argumentName)
-    try {
+    try
       arguments(argumentIndex) // just to make it error out if index is -1
       Some(arguments(argumentIndex + 1))
-    } catch {
+    catch
       case e: IndexOutOfBoundsException => None
-    }
-  }
 
   def handleScratchFile(fileSystem: Option[FileSystem],
                         uri: Option[URI],
-                        localFile: File): String = {
+                        localFile: File): String =
     val localFilePath = localFile.getCanonicalPath
-    (fileSystem, uri) match {
+    (fileSystem, uri) match
       case (Some(fs), Some(u)) =>
         val dest = fs.makeQualified(
             Path.mergePaths(new Path(u), new Path(localFilePath)))
@@ -60,45 +58,37 @@ object Runner extends Logging {
         fs.copyFromLocalFile(new Path(localFilePath), dest)
         dest.toUri.toString
       case _ => localFile.toURI.toString
-    }
-  }
 
-  def cleanup(fs: Option[FileSystem], uri: Option[URI]): Unit = {
-    (fs, uri) match {
+  def cleanup(fs: Option[FileSystem], uri: Option[URI]): Unit =
+    (fs, uri) match
       case (Some(f), Some(u)) =>
         f.close()
       case _ => Unit
-    }
-  }
 
   def detectFilePaths(fileSystem: Option[FileSystem],
                       uri: Option[URI],
-                      args: Seq[String]): Seq[String] = {
-    args map { arg =>
-      val f = try {
+                      args: Seq[String]): Seq[String] =
+    args map  arg =>
+      val f = try
         new File(new URI(arg))
-      } catch {
+      catch
         case e: Throwable => new File(arg)
-      }
-      if (f.exists()) {
+      if (f.exists())
         handleScratchFile(fileSystem, uri, f)
-      } else {
+      else
         arg
-      }
-    }
-  }
 
   def runOnSpark(className: String,
                  classArgs: Seq[String],
                  ca: ConsoleArgs,
-                 extraJars: Seq[URI]): Int = {
+                 extraJars: Seq[URI]): Int =
     // Return error for unsupported cases
     val deployMode = argumentValue(ca.common.sparkPassThrough, "--deploy-mode")
       .getOrElse("client")
     val master =
       argumentValue(ca.common.sparkPassThrough, "--master").getOrElse("local")
 
-    (ca.common.scratchUri, deployMode, master) match {
+    (ca.common.scratchUri, deployMode, master) match
       case (Some(u), "client", m) if m != "yarn-cluster" =>
         error("--scratch-uri cannot be set when deploy mode is client")
         return 1
@@ -107,13 +97,11 @@ object Runner extends Logging {
             "Using cluster deploy mode with Spark standalone cluster is not supported")
         return 1
       case _ => Unit
-    }
 
     // Initialize HDFS API for scratch URI
     val fs =
-      ca.common.scratchUri map { uri =>
+      ca.common.scratchUri map  uri =>
         FileSystem.get(uri, new Configuration())
-      }
 
     // Collect and serialize PIO_* environmental variables
     val pioEnvVars = sys.env
@@ -133,58 +121,51 @@ object Runner extends Logging {
 
     // Extra JARs that are needed by the driver
     val driverClassPathPrefix =
-      argumentValue(ca.common.sparkPassThrough, "--driver-class-path") map {
+      argumentValue(ca.common.sparkPassThrough, "--driver-class-path") map
         v =>
           Seq(v)
-      } getOrElse {
+      getOrElse
         Nil
-      }
 
     val extraClasspaths =
       driverClassPathPrefix ++ WorkflowUtils.thirdPartyClasspaths
 
     // Extra files that are needed to be passed to --files
     val extraFiles =
-      WorkflowUtils.thirdPartyConfFiles map { f =>
+      WorkflowUtils.thirdPartyConfFiles map  f =>
         handleScratchFile(fs, ca.common.scratchUri, new File(f))
-      }
 
     val deployedJars =
-      extraJars map { j =>
+      extraJars map  j =>
         handleScratchFile(fs, ca.common.scratchUri, new File(j))
-      }
 
     val sparkSubmitCommand = Seq(
         Seq(sparkHome, "bin", "spark-submit").mkString(File.separator))
 
     val sparkSubmitJars =
-      if (extraJars.nonEmpty) {
+      if (extraJars.nonEmpty)
         Seq("--jars", deployedJars.map(_.toString).mkString(","))
-      } else {
+      else
         Nil
-      }
 
     val sparkSubmitFiles =
-      if (extraFiles.nonEmpty) {
+      if (extraFiles.nonEmpty)
         Seq("--files", extraFiles.mkString(","))
-      } else {
+      else
         Nil
-      }
 
     val sparkSubmitExtraClasspaths =
-      if (extraClasspaths.nonEmpty) {
+      if (extraClasspaths.nonEmpty)
         Seq("--driver-class-path", extraClasspaths.mkString(":"))
-      } else {
+      else
         Nil
-      }
 
     val sparkSubmitKryo =
-      if (ca.common.sparkKryo) {
+      if (ca.common.sparkKryo)
         Seq("--conf",
             "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-      } else {
+      else
         Nil
-      }
 
     val verbose = if (ca.common.verbose) Seq("--verbose") else Nil
 
@@ -205,13 +186,10 @@ object Runner extends Logging {
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
     Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
-      def run(): Unit = {
+        new Thread(new Runnable
+      def run(): Unit =
         cleanup(fs, ca.common.scratchUri)
         proc.destroy()
-      }
-    }))
+    ))
     cleanup(fs, ca.common.scratchUri)
     proc.exitValue()
-  }
-}

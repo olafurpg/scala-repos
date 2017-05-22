@@ -59,7 +59,7 @@ import org.apache.spark.streaming.dstream.DStream
 @DeveloperApi
 abstract class StreamingLinearAlgorithm[
     M <: GeneralizedLinearModel, A <: GeneralizedLinearAlgorithm[M]]
-    extends Logging {
+    extends Logging
 
   /** The model to be updated and used for prediction. */
   protected var model: Option[M]
@@ -72,9 +72,8 @@ abstract class StreamingLinearAlgorithm[
     *
     */
   @Since("1.1.0")
-  def latestModel(): M = {
+  def latestModel(): M =
     model.get
-  }
 
   /**
     * Update the model by training on batches of data from a DStream.
@@ -85,24 +84,19 @@ abstract class StreamingLinearAlgorithm[
     * @param data DStream containing labeled data
     */
   @Since("1.1.0")
-  def trainOn(data: DStream[LabeledPoint]): Unit = {
-    if (model.isEmpty) {
+  def trainOn(data: DStream[LabeledPoint]): Unit =
+    if (model.isEmpty)
       throw new IllegalArgumentException(
           "Model must be initialized before starting training.")
-    }
-    data.foreachRDD { (rdd, time) =>
-      if (!rdd.isEmpty) {
+    data.foreachRDD  (rdd, time) =>
+      if (!rdd.isEmpty)
         model = Some(algorithm.run(rdd, model.get.weights))
         logInfo(s"Model updated at time ${time.toString}")
-        val display = model.get.weights.size match {
+        val display = model.get.weights.size match
           case x if x > 100 =>
             model.get.weights.toArray.take(100).mkString("[", ",", "...")
           case _ => model.get.weights.toArray.mkString("[", ",", "]")
-        }
         logInfo(s"Current model: weights, ${display}")
-      }
-    }
-  }
 
   /**
     * Java-friendly version of `trainOn`.
@@ -118,25 +112,21 @@ abstract class StreamingLinearAlgorithm[
     *
     */
   @Since("1.1.0")
-  def predictOn(data: DStream[Vector]): DStream[Double] = {
-    if (model.isEmpty) {
+  def predictOn(data: DStream[Vector]): DStream[Double] =
+    if (model.isEmpty)
       throw new IllegalArgumentException(
           "Model must be initialized before starting prediction.")
-    }
-    data.map { x =>
+    data.map  x =>
       model.get.predict(x)
-    }
-  }
 
   /**
     * Java-friendly version of `predictOn`.
     *
     */
   @Since("1.3.0")
-  def predictOn(data: JavaDStream[Vector]): JavaDStream[java.lang.Double] = {
+  def predictOn(data: JavaDStream[Vector]): JavaDStream[java.lang.Double] =
     JavaDStream.fromDStream(
         predictOn(data.dstream).asInstanceOf[DStream[java.lang.Double]])
-  }
 
   /**
     * Use the model to make predictions on the values of a DStream and carry over its keys.
@@ -147,15 +137,12 @@ abstract class StreamingLinearAlgorithm[
     */
   @Since("1.1.0")
   def predictOnValues[K : ClassTag](
-      data: DStream[(K, Vector)]): DStream[(K, Double)] = {
-    if (model.isEmpty) {
+      data: DStream[(K, Vector)]): DStream[(K, Double)] =
+    if (model.isEmpty)
       throw new IllegalArgumentException(
           "Model must be initialized before starting prediction")
-    }
-    data.mapValues { x =>
+    data.mapValues  x =>
       model.get.predict(x)
-    }
-  }
 
   /**
     * Java-friendly version of `predictOnValues`.
@@ -163,9 +150,7 @@ abstract class StreamingLinearAlgorithm[
     */
   @Since("1.3.0")
   def predictOnValues[K](data: JavaPairDStream[K, Vector])
-    : JavaPairDStream[K, java.lang.Double] = {
+    : JavaPairDStream[K, java.lang.Double] =
     implicit val tag = fakeClassTag[K]
     JavaPairDStream.fromPairDStream(predictOnValues(data.dstream)
           .asInstanceOf[DStream[(K, java.lang.Double)]])
-  }
-}

@@ -18,15 +18,14 @@ class Member private[cluster](
     private[cluster] val upNumber: Int, // INTERNAL API
     val status: MemberStatus,
     val roles: Set[String])
-    extends Serializable {
+    extends Serializable
 
   def address: Address = uniqueAddress.address
 
   override def hashCode = uniqueAddress.##
-  override def equals(other: Any) = other match {
+  override def equals(other: Any) = other match
     case m: Member ⇒ uniqueAddress == m.uniqueAddress
     case _ ⇒ false
-  }
   override def toString = s"Member(address = ${address}, status = ${status})"
 
   def hasRole(role: String): Boolean = roles.contains(role)
@@ -48,25 +47,21 @@ class Member private[cluster](
       Member.addressOrdering.compare(address, other.address) < 0
     else upNumber < other.upNumber
 
-  def copy(status: MemberStatus): Member = {
+  def copy(status: MemberStatus): Member =
     val oldStatus = this.status
     if (status == oldStatus) this
-    else {
+    else
       require(allowedTransitions(oldStatus)(status),
               s"Invalid member status transition [ ${this} -> ${status}]")
       new Member(uniqueAddress, upNumber, status, roles)
-    }
-  }
 
-  def copyUp(upNumber: Int): Member = {
+  def copyUp(upNumber: Int): Member =
     new Member(uniqueAddress, upNumber, status, roles).copy(Up)
-  }
-}
 
 /**
   * Module with factory and ordering methods for Member instances.
   */
-object Member {
+object Member
 
   val none = Set.empty[Member]
 
@@ -88,14 +83,13 @@ object Member {
     * `Address` ordering type class, sorts addresses by host and port.
     */
   implicit val addressOrdering: Ordering[Address] =
-    Ordering.fromLessThan[Address] { (a, b) ⇒
+    Ordering.fromLessThan[Address]  (a, b) ⇒
       // cluster node identifier is the host and port of the address; protocol and system is assumed to be the same
       if (a eq b) false
       else if (a.host != b.host)
         a.host.getOrElse("").compareTo(b.host.getOrElse("")) < 0
       else if (a.port != b.port) a.port.getOrElse(0) < b.port.getOrElse(0)
       else false
-    }
 
   /**
     * INTERNAL API
@@ -103,8 +97,8 @@ object Member {
     * Joining, Exiting and Down are ordered last (in that order).
     */
   private[cluster] val leaderStatusOrdering: Ordering[Member] =
-    Ordering.fromLessThan[Member] { (a, b) ⇒
-      (a.status, b.status) match {
+    Ordering.fromLessThan[Member]  (a, b) ⇒
+      (a.status, b.status) match
         case (as, bs) if as == bs ⇒ ordering.compare(a, b) <= 0
         case (Down, _) ⇒ false
         case (_, Down) ⇒ true
@@ -115,50 +109,42 @@ object Member {
         case (WeaklyUp, _) ⇒ false
         case (_, WeaklyUp) ⇒ true
         case _ ⇒ ordering.compare(a, b) <= 0
-      }
-    }
 
   /**
     * `Member` ordering type class, sorts members by host and port.
     */
-  implicit val ordering: Ordering[Member] = new Ordering[Member] {
-    def compare(a: Member, b: Member): Int = {
+  implicit val ordering: Ordering[Member] = new Ordering[Member]
+    def compare(a: Member, b: Member): Int =
       a.uniqueAddress compare b.uniqueAddress
-    }
-  }
 
   /**
     * Sort members by age, i.e. using [[Member#isOlderThan]].
     */
-  val ageOrdering: Ordering[Member] = Ordering.fromLessThan[Member] { (a, b) ⇒
+  val ageOrdering: Ordering[Member] = Ordering.fromLessThan[Member]  (a, b) ⇒
     a.isOlderThan(b)
-  }
 
-  def pickHighestPriority(a: Set[Member], b: Set[Member]): Set[Member] = {
+  def pickHighestPriority(a: Set[Member], b: Set[Member]): Set[Member] =
     // group all members by Address => Seq[Member]
     val groupedByAddress = (a.toSeq ++ b.toSeq).groupBy(_.uniqueAddress)
     // pick highest MemberStatus
-    (Member.none /: groupedByAddress) {
+    (Member.none /: groupedByAddress)
       case (acc, (_, members)) ⇒
         if (members.size == 2) acc + members.reduceLeft(highestPriorityOf)
-        else {
+        else
           val m = members.head
           if (Gossip.removeUnreachableWithMemberStatus(m.status))
             acc // removed
           else acc + m
-        }
-    }
-  }
 
   /**
     * Picks the Member with the highest "priority" MemberStatus.
     */
-  def highestPriorityOf(m1: Member, m2: Member): Member = {
+  def highestPriorityOf(m1: Member, m2: Member): Member =
     if (m1.status == m2.status)
       // preserve the oldest in case of different upNumber
       if (m1.isOlderThan(m2)) m1 else m2
     else
-      (m1.status, m2.status) match {
+      (m1.status, m2.status) match
         case (Removed, _) ⇒ m1
         case (_, Removed) ⇒ m2
         case (Down, _) ⇒ m1
@@ -172,9 +158,6 @@ object Member {
         case (WeaklyUp, _) ⇒ m2
         case (_, WeaklyUp) ⇒ m1
         case (Up, Up) ⇒ m1
-      }
-  }
-}
 
 /**
   * Defines the current status of a cluster member node
@@ -183,7 +166,7 @@ object Member {
   */
 sealed abstract class MemberStatus
 
-object MemberStatus {
+object MemberStatus
   @SerialVersionUID(1L)
   case object Joining extends MemberStatus
 
@@ -252,7 +235,6 @@ object MemberStatus {
         Down -> Set(Removed),
         Exiting -> Set(Removed, Down),
         Removed -> Set.empty[MemberStatus])
-}
 
 /**
   * Member identifier consisting of address and random `uid`.
@@ -261,13 +243,11 @@ object MemberStatus {
   */
 @SerialVersionUID(1L)
 final case class UniqueAddress(address: Address, uid: Int)
-    extends Ordered[UniqueAddress] {
+    extends Ordered[UniqueAddress]
   override def hashCode = uid
 
-  def compare(that: UniqueAddress): Int = {
+  def compare(that: UniqueAddress): Int =
     val result = Member.addressOrdering.compare(this.address, that.address)
     if (result == 0)
       if (this.uid < that.uid) -1 else if (this.uid == that.uid) 0 else 1
     else result
-  }
-}

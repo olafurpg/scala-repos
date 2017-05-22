@@ -9,7 +9,7 @@ package backend.jvm
 import scala.reflect.internal.util.Statistics
 
 // Enable with `-Ystatistics:jvm`
-object BackendStats {
+object BackendStats
   import Statistics.{newTimer, newSubTimer}
   val bcodeTimer = newTimer("time in backend", "jvm")
 
@@ -18,8 +18,6 @@ object BackendStats {
   val methodOptTimer = newSubTimer("intra-method optimizations", bcodeTimer)
   val bcodeWriteTimer = newSubTimer("classfile writing", bcodeTimer)
 
-  def timed[T](timer: Statistics.Timer)(body: => T): T = {
+  def timed[T](timer: Statistics.Timer)(body: => T): T =
     val start = Statistics.startTimer(timer)
     try body finally Statistics.stopTimer(timer, start)
-  }
-}

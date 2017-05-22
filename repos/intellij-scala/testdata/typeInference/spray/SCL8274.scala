@@ -1,11 +1,9 @@
 import spray.routing.HttpService
 
-trait SCL8274 extends HttpService {
-  val testRoutes = post {
+trait SCL8274 extends HttpService
+  val testRoutes = post
     /*start*/
-    path("foo") {
+    path("foo")
       complete("foo")
-    } /*end*/
-  }
-}
+    /*end*/
 //routing.Route

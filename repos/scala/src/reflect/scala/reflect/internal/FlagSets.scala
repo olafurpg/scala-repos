@@ -4,7 +4,7 @@ package internal
 
 import scala.language.implicitConversions
 
-trait FlagSets extends api.FlagSets { self: SymbolTable =>
+trait FlagSets extends api.FlagSets  self: SymbolTable =>
 
   type FlagSet = Long
   implicit val FlagSetTag = ClassTag[FlagSet](classOf[FlagSet])
@@ -12,13 +12,12 @@ trait FlagSets extends api.FlagSets { self: SymbolTable =>
   implicit def addFlagOps(left: FlagSet): FlagOps =
     new FlagOpsImpl(left)
 
-  private class FlagOpsImpl(left: Long) extends FlagOps {
+  private class FlagOpsImpl(left: Long) extends FlagOps
     def |(right: Long): Long = left | right
-  }
 
   val NoFlags: FlagSet = 0L
 
-  object Flag extends FlagValues {
+  object Flag extends FlagValues
     val TRAIT: FlagSet = Flags.TRAIT
     val INTERFACE: FlagSet = Flags.INTERFACE
     val MUTABLE: FlagSet = Flags.MUTABLE
@@ -48,5 +47,3 @@ trait FlagSets extends api.FlagSets { self: SymbolTable =>
     val SYNTHETIC: FlagSet = Flags.SYNTHETIC
     val ARTIFACT: FlagSet = Flags.ARTIFACT
     val STABLE: FlagSet = Flags.STABLE
-  }
-}

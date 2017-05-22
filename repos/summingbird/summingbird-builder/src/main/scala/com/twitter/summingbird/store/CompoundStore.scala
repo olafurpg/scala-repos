@@ -31,13 +31,12 @@ import com.twitter.summingbird.scalding.batch.BatchedStore
 class CompoundStore[K, V] private (
     @transient offline: Option[BatchedStore[K, V]],
     online: Option[() => Mergeable[(K, BatchID), V]])
-    extends Serializable {
+    extends Serializable
   private val offlineBox = Externalizer(offline)
   def offlineStore: Option[BatchedStore[K, V]] = offlineBox.get
   def onlineSupplier: Option[() => Mergeable[(K, BatchID), V]] = online
-}
 
-object CompoundStore {
+object CompoundStore
   def fromOnline[K, V](
       onlineSupplier: => Mergeable[(K, BatchID), V]): CompoundStore[K, V] =
     new CompoundStore(None, Some(() => onlineSupplier))
@@ -49,4 +48,3 @@ object CompoundStore {
       offlineStore: BatchedStore[K, V],
       onlineSupplier: => Mergeable[(K, BatchID), V]): CompoundStore[K, V] =
     new CompoundStore(Some(offlineStore), Some(() => onlineSupplier))
-}

@@ -8,14 +8,14 @@ import lila.db.Types.Coll
 import lila.rating.{Glicko, Perf}
 import lila.user.{User, UserRepo}
 
-private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
+private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll)
 
   private val maxTime = 5 * 60 * 1000
 
   def apply(puzzle: Puzzle,
             user: User,
             data: DataForm.AttemptData): Fu[(Attempt, Option[Boolean])] =
-    api.attempt.find(puzzle.id, user.id) flatMap {
+    api.attempt.find(puzzle.id, user.id) flatMap
       case Some(a) => fuccess(a -> data.isWin.some)
       case None =>
         val userRating = user.perfs.puzzle.toRating
@@ -41,7 +41,7 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
             puzzleRatingDiff = puzzlePerf.intRating - puzzle.perf.intRating,
             userRating = user.perfs.puzzle.intRating,
             userRatingDiff = userPerf.intRating - user.perfs.puzzle.intRating)
-        ((api.attempt add a) >> {
+        ((api.attempt add a) >>
               puzzleColl.update(
                   BSONDocument("_id" -> puzzle.id),
                   BSONDocument("$inc" -> BSONDocument(
@@ -52,8 +52,7 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
                           Puzzle.BSONFields.perf -> Perf.perfBSONHandler.write(
                               puzzlePerf)
                       ))) zip UserRepo.setPerf(user.id, "puzzle", userPerf)
-            }) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
-    }
+            ) recover lila.db.recoverDuplicateKey(_ => ()) inject (a -> none)
 
   private val VOLATILITY = Glicko.default.volatility
   private val TAU = 0.75d
@@ -65,17 +64,13 @@ private[puzzle] final class Finisher(api: PuzzleApi, puzzleColl: Coll) {
                perf.glicko.volatility,
                perf.nb)
 
-  private def updateRatings(u1: Rating, u2: Rating, result: Glicko.Result) {
+  private def updateRatings(u1: Rating, u2: Rating, result: Glicko.Result)
     val results = new RatingPeriodResults()
-    result match {
+    result match
       case Glicko.Result.Draw => results.addDraw(u1, u2)
       case Glicko.Result.Win => results.addResult(u1, u2)
       case Glicko.Result.Loss => results.addResult(u2, u1)
-    }
-    try {
+    try
       system.updateRatings(results)
-    } catch {
+    catch
       case e: Exception => logger.error("finisher", e)
-    }
-  }
-}

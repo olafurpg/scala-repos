@@ -10,10 +10,10 @@ import org.jetbrains.plugins.scala.settings.ScalaApplicationSettings
   * 2014-03-26
   */
 class ScalaDelegateMethodTest
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
 
   def runTest(
-      fileText: String, expectedText: String, specifyType: Boolean = true) {
+      fileText: String, expectedText: String, specifyType: Boolean = true)
     configureFromFileTextAdapter(
         "dummy.scala", fileText.replace("\r", "").stripMargin.trim)
     val oldSpecifyType =
@@ -23,9 +23,8 @@ class ScalaDelegateMethodTest
       .invoke(getProjectAdapter, getEditorAdapter, getFileAdapter)
     checkResultByText(expectedText.replace("\r", "").stripMargin.trim)
     ScalaApplicationSettings.getInstance.SPECIFY_RETURN_TYPE_EXPLICITLY = oldSpecifyType
-  }
 
-  def testVal() {
+  def testVal()
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -44,9 +43,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, resultText)
-  }
 
-  def testVar() {
+  def testVar()
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -65,9 +63,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, resultText)
-  }
 
-  def testDefParameterless() {
+  def testDefParameterless()
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -86,9 +83,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, resultText)
-  }
 
-  def testDefEmptyParen() {
+  def testDefEmptyParen()
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -107,9 +103,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d().foo(x)
         |}"""
     runTest(text, resultText)
-  }
 
-  def testDelegateCompoundType() {
+  def testDelegateCompoundType()
     val text = """trait DT {
         |  def foo(x: Int): Int = x
         |}
@@ -132,9 +127,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, resultText)
-  }
 
-  def testTargetFromBaseClass() {
+  def testTargetFromBaseClass()
     val text = """class Base {
         |  val d = new D()
         |}
@@ -158,9 +152,8 @@ class ScalaDelegateMethodTest
         |  def foo(): Unit = d.foo()
         |}"""
     runTest(text, result)
-  }
 
-  def testPrivateFromBaseClass() {
+  def testPrivateFromBaseClass()
     val text = """class Base {
         |  private val d = new D()
         |}
@@ -185,9 +178,8 @@ class ScalaDelegateMethodTest
         |
         |}"""
     runTest(text, result)
-  }
 
-  def testOverride() {
+  def testOverride()
     val text = """trait DT {
         |  def foo(x: Int): Int = x
         |}
@@ -210,9 +202,8 @@ class ScalaDelegateMethodTest
         |  override def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, result)
-  }
 
-  def testInInner() {
+  def testInInner()
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -234,9 +225,8 @@ class ScalaDelegateMethodTest
         |  }
         |}"""
     runTest(text, result)
-  }
 
-  def testInInner2() = {
+  def testInInner2() =
     val text = """class D {
         |  def foo(x: Int): Int = x
         |}
@@ -257,9 +247,8 @@ class ScalaDelegateMethodTest
         |  }
         |}"""
     runTest(text, result)
-  }
 
-  def testMultipleParamList() {
+  def testMultipleParamList()
     val text = """class D {
         |  def foo(x: Int)(y: Int): Int = x
         |}
@@ -278,9 +267,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int)(y: Int): Int = d.foo(x)(y)
         |}"""
     runTest(text, result)
-  }
 
-  def testGenericDelegate() {
+  def testGenericDelegate()
     val text = """class D[T] {
         |  def foo(x: T): T = x
         |}
@@ -299,9 +287,8 @@ class ScalaDelegateMethodTest
         |  def foo(x: Int): Int = d.foo(x)
         |}"""
     runTest(text, result)
-  }
 
-  def testMethodCallNeedTypeParam() {
+  def testMethodCallNeedTypeParam()
     val text = """class D[T] {
         |  def foo[S <: T](x: T): T = x
         |}
@@ -320,9 +307,8 @@ class ScalaDelegateMethodTest
         |  def foo[S <: AnyRef](x: AnyRef): AnyRef = d.foo[S](x)
         |}"""
     runTest(text, result)
-  }
 
-  def testNeedTypeParamWithoutRetType() {
+  def testNeedTypeParamWithoutRetType()
     val text = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
@@ -341,9 +327,8 @@ class ScalaDelegateMethodTest
         |  def foo[S >: AnyRef](x: Int) = d.foo[S](x)
         |}"""
     runTest(text, result, specifyType = false)
-  }
 
-  def testNoTypeParamWithReturn() {
+  def testNoTypeParamWithReturn()
     val text = """class D[T] {
         |  def foo[S >: AnyRef](x: T): S = null
         |}
@@ -362,5 +347,3 @@ class ScalaDelegateMethodTest
         |  def foo[S >: AnyRef](x: Int): S = d.foo(x)
         |}"""
     runTest(text, result)
-  }
-}

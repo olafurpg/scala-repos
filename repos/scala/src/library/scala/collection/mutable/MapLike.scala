@@ -46,7 +46,7 @@ import scala.collection.parallel.mutable.ParMap
 trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     extends scala.collection.MapLike[A, B, This] with Builder[(A, B), This]
     with Growable[(A, B)] with Shrinkable[A]
-    with Cloneable[This] with Parallelizable[(A, B), ParMap[A, B]] {
+    with Cloneable[This] with Parallelizable[(A, B), ParMap[A, B]]
   self =>
 
   /** A common implementation of `newBuilder` for all mutable maps
@@ -62,12 +62,11 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *
     * ```Note```: assumes a fast `size` method.  Subclasses should override if this is not true.
     */
-  override def toSeq: collection.Seq[(A, B)] = {
+  override def toSeq: collection.Seq[(A, B)] =
     // ArrayBuffer for efficiency, preallocated to the right size.
     val result = new ArrayBuffer[(A, B)](size)
     foreach(result += _)
     result
-  }
 
   /** Adds a new key/value pair to this map and optionally returns previously bound value.
     *  If the map already contains a
@@ -79,11 +78,10 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *         before the `put` operation was executed, or `None` if `key`
     *         was not defined in the map before.
     */
-  def put(key: A, value: B): Option[B] = {
+  def put(key: A, value: B): Option[B] =
     val r = get(key)
     update(key, value)
     r
-  }
 
   /** Adds a new key/value pair to this map.
     *  If the map already contains a
@@ -164,11 +162,10 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *  @return   an option value containing the value associated previously with `key`,
     *            or `None` if `key` was not defined in the map before.
     */
-  def remove(key: A): Option[B] = {
+  def remove(key: A): Option[B] =
     val r = get(key)
     this -= key
     r
-  }
 
   /** Removes a key from this map.
     *  @param    key the key to be removed
@@ -207,10 +204,9 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     *              of executing the method).
     */
   def getOrElseUpdate(key: A, op: => B): B =
-    get(key) match {
+    get(key) match
       case Some(v) => v
       case None => val d = op; this(key) = d; d
-    }
 
   /** Applies a transformation function to all values contained in this map.
     *  The transformation function produces new values from existing keys
@@ -219,24 +215,21 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
     * @param f  the transformation to apply
     * @return   the map itself.
     */
-  def transform(f: (A, B) => B): this.type = {
-    this.iterator foreach {
+  def transform(f: (A, B) => B): this.type =
+    this.iterator foreach
       case (key, value) => update(key, f(key, value))
-    }
     this
-  }
 
   /** Retains only those mappings for which the predicate
     *  `p` returns `true`.
     *
     * @param p  The test predicate
     */
-  def retain(p: (A, B) => Boolean): this.type = {
+  def retain(p: (A, B) => Boolean): this.type =
     for ((k, v) <- this.toList) // SI-7269 toList avoids ConcurrentModificationException
     if (!p(k, v)) this -= k
 
     this
-  }
 
   override def clone(): This = empty ++= repr
 
@@ -271,4 +264,3 @@ trait MapLike[A, B, +This <: MapLike[A, B, This] with Map[A, B]]
       "`--` creates a new map. Use `--=` to remove an element from this map and return that map itself.",
       "2.8.0")
   override def --(xs: GenTraversableOnce[A]): This = clone() --= xs.seq
-}

@@ -21,14 +21,14 @@ import org.junit.Assert._
 
 import shapeless.test._
 
-class HMapTests {
+class HMapTests
 
   class BiMapIS[K, V]
   implicit val intToString = new BiMapIS[Int, String]
   implicit val stringToInt = new BiMapIS[String, Int]
 
   @Test
-  def testBasics {
+  def testBasics
     val hm = HMap[BiMapIS](23 -> "foo", "bar" -> 13)
 
     illTyped("""
@@ -44,10 +44,9 @@ class HMapTests {
     assertTrue(isDefined(i1))
     typed[Option[Int]](i1)
     assertEquals(Some(13), i1)
-  }
 
   @Test
-  def testPoly {
+  def testPoly
     val hm = HMap[BiMapIS](23 -> "foo", "bar" -> 13)
     import hm._
 
@@ -64,10 +63,9 @@ class HMapTests {
     val a1 = pairApply(hm)
     typed[(String, Int)](a1)
     assertEquals(("foo", 13), a1)
-  }
 
   @Test
-  def testNatTrans {
+  def testNatTrans
     val nt = HMap[(Set ~?> Option)#λ](
         Set("foo") -> Option("bar"), Set(23) -> Option(13))
 
@@ -90,10 +88,9 @@ class HMapTests {
     assertTrue(isDefined(o2))
     typed[Option[Option[Int]]](o2)
     assertEquals(Some(Some(13)), o2)
-  }
 
   @Test
-  def testPolyNatTrans {
+  def testPolyNatTrans
     val nt = HMap[(Set ~?> Option)#λ](
         Set("foo") -> Option("bar"), Set(23) -> Option(13))
     import nt._
@@ -115,10 +112,9 @@ class HMapTests {
     val a1 = pairApply(nt)
     typed[(Option[String], Option[Int])](a1)
     assertEquals((Option("bar"), Option(13)), a1)
-  }
 
   @Test
-  def testIdKeyNatTrans {
+  def testIdKeyNatTrans
     val nt = HMap[(Id ~?> Option)#λ]("foo" -> Option("bar"), 23 -> Option(13))
 
     illTyped("""
@@ -140,10 +136,9 @@ class HMapTests {
     assertTrue(isDefined(o2))
     typed[Option[Option[Int]]](o2)
     assertEquals(Some(Some(13)), o2)
-  }
 
   @Test
-  def testIdValueNatTrans {
+  def testIdValueNatTrans
     val nt = HMap[(Option ~?> Id)#λ](Option("foo") -> "bar", Option(23) -> 13)
 
     illTyped("""
@@ -165,7 +160,6 @@ class HMapTests {
     assertTrue(isDefined(o2))
     typed[Option[Int]](o2)
     assertEquals(Some(13), o2)
-  }
 
   trait M[A]
 
@@ -179,7 +173,7 @@ class HMapTests {
   object Y
 
   @Test
-  def testSingleton {
+  def testSingleton
 
     val hm = HMap[Mapping](X -> X(13), Y -> Y("foo"))
 
@@ -196,5 +190,3 @@ class HMapTests {
     assertTrue(isDefined(y))
     typed[Option[Y]](y)
     assertEquals(Some(Y("foo")), y)
-  }
-}

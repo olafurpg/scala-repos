@@ -25,9 +25,9 @@ import org.apache.spark.sql.test.SQLTestUtils
   * A set of tests that validates support for Hive Explain command.
   */
 class HiveExplainSuite
-    extends QueryTest with SQLTestUtils with TestHiveSingleton {
+    extends QueryTest with SQLTestUtils with TestHiveSingleton
 
-  test("explain extended command") {
+  test("explain extended command")
     checkExistence(sql(" explain   select * from src where key=123 "),
                    true,
                    "== Physical Plan ==")
@@ -42,9 +42,8 @@ class HiveExplainSuite
                    "== Analyzed Logical Plan ==",
                    "== Optimized Logical Plan ==",
                    "== Physical Plan ==")
-  }
 
-  test("explain create table command") {
+  test("explain create table command")
     checkExistence(
         sql("explain create table temp__b as select * from src limit 2"),
         true,
@@ -83,10 +82,9 @@ class HiveExplainSuite
         "InsertIntoHiveTable",
         "Limit",
         "src")
-  }
 
-  test("SPARK-6212: The EXPLAIN output of CTAS only shows the analyzed plan") {
-    withTempTable("jt") {
+  test("SPARK-6212: The EXPLAIN output of CTAS only shows the analyzed plan")
+    withTempTable("jt")
       val rdd = sparkContext.parallelize(
           (1 to 10).map(i => s"""{"a":$i, "b":"str$i"}"""))
       hiveContext.read.json(rdd).registerTempTable("jt")
@@ -99,14 +97,10 @@ class HiveExplainSuite
 
       val shouldContain =
         "== Parsed Logical Plan ==" :: "== Analyzed Logical Plan ==" :: "Subquery" :: "== Optimized Logical Plan ==" :: "== Physical Plan ==" :: "CreateTableAsSelect" :: "InsertIntoHiveTable" :: "jt" :: Nil
-      for (key <- shouldContain) {
+      for (key <- shouldContain)
         assert(outputs.contains(key), s"$key doesn't exist in result")
-      }
 
       val physicalIndex = outputs.indexOf("== Physical Plan ==")
       assert(
           !outputs.substring(physicalIndex).contains("Subquery"),
           "Physical Plan should not contain Subquery since it's eliminated by optimizer")
-    }
-  }
-}

@@ -9,38 +9,33 @@ import reactivemongo.bson._
 import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.ByteArray
 
-private[game] object GameDiff {
+private[game] object GameDiff
 
   type Set = (String, BSONValue)
   type Unset = (String, BSONBoolean)
 
-  def apply(a: Game, b: Game): (List[Set], List[Unset]) = {
+  def apply(a: Game, b: Game): (List[Set], List[Unset]) =
 
     val setBuilder = scala.collection.mutable.ListBuffer[Set]()
     val unsetBuilder = scala.collection.mutable.ListBuffer[Unset]()
 
-    def d[A, B <: BSONValue](name: String, getter: Game => A, toBson: A => B) {
+    def d[A, B <: BSONValue](name: String, getter: Game => A, toBson: A => B)
       val (va, vb) = (getter(a), getter(b))
-      if (va != vb) {
+      if (va != vb)
         if (vb == None || vb == null || vb == "")
           unsetBuilder += (name -> BSONBoolean(true))
         else setBuilder += name -> toBson(vb)
-      }
-    }
 
     def dOpt[A, B <: BSONValue](
-        name: String, getter: Game => A, toBson: A => Option[B]) {
+        name: String, getter: Game => A, toBson: A => Option[B])
       val (va, vb) = (getter(a), getter(b))
-      if (va != vb) {
+      if (va != vb)
         if (vb == None || vb == null || vb == "")
           unsetBuilder += (name -> BSONBoolean(true))
         else
-          toBson(vb) match {
+          toBson(vb) match
             case None => unsetBuilder += (name -> BSONBoolean(true))
             case Some(x) => setBuilder += name -> x
-          }
-      }
-    }
 
     val w = lila.db.BSON.writer
 
@@ -59,9 +54,9 @@ private[game] object GameDiff {
     dOpt(clock,
          _.clock,
          (o: Option[Clock]) =>
-           o map { c =>
+           o map  c =>
              BSONHandlers.clockBSONWrite(a.createdAt, c)
-         })
+         )
     dOpt(checkCount,
          _.checkCount,
          (o: CheckCount) =>
@@ -71,7 +66,7 @@ private[game] object GameDiff {
            _.crazyData,
            (o: Option[Crazyhouse.Data]) =>
              o map BSONHandlers.crazyhouseDataBSONHandler.write)
-    for (i ← 0 to 1) {
+    for (i ← 0 to 1)
       import Player.BSONFields._
       val name = s"p$i."
       val player: Game => Player =
@@ -83,15 +78,11 @@ private[game] object GameDiff {
       dOpt(s"$name$isOfferingRematch", player(_).isOfferingRematch, w.boolO)
       dOpt(s"$name$proposeTakebackAt", player(_).proposeTakebackAt, w.intO)
       dOpt(s"$name$blurs", player(_).blurs, w.intO)
-    }
 
     (addUa(setBuilder.toList), unsetBuilder.toList)
-  }
 
-  private def addUa(sets: List[Set]): List[Set] = sets match {
+  private def addUa(sets: List[Set]): List[Set] = sets match
     case Nil => Nil
     case sets =>
       (Game.BSONFields.updatedAt -> BSONJodaDateTimeHandler.write(
               DateTime.now)) :: sets
-  }
-}

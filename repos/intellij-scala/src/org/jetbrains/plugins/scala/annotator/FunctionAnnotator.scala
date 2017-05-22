@@ -13,17 +13,15 @@ import org.jetbrains.plugins.scala.lang.psi.types.{Any => AnyType, Bounds, ScTyp
 /**
   * Pavel.Fatin, 18.05.2010
   */
-trait FunctionAnnotator {
+trait FunctionAnnotator
   def annotateFunction(function: ScFunctionDefinition,
                        holder: AnnotationHolder,
-                       typeAware: Boolean) {
-    if (!function.hasExplicitType && !function.returnTypeIsDefined) {
-      function.recursiveReferences.foreach { ref =>
+                       typeAware: Boolean)
+    if (!function.hasExplicitType && !function.returnTypeIsDefined)
+      function.recursiveReferences.foreach  ref =>
         val message = ScalaBundle.message(
             "function.recursive.need.result.type", function.name)
         holder.createErrorAnnotation(ref.element, message)
-      }
-    }
 
     val tailrecAnnotation = function.annotations.find(
         _.typeElement
@@ -32,8 +30,8 @@ trait FunctionAnnotator {
           .filter(_ == "_root_.scala.annotation.tailrec")
           .isDefined)
 
-    tailrecAnnotation.foreach { it =>
-      if (!function.canBeTailRecursive) {
+    tailrecAnnotation.foreach  it =>
+      if (!function.canBeTailRecursive)
         val annotation = holder.createErrorAnnotation(
             function.nameId,
             "Method annotated with @tailrec is neither private nor final (so can be overriden)")
@@ -41,38 +39,32 @@ trait FunctionAnnotator {
         annotation.registerFix(new AddModifierQuickFix(function, "final"))
         annotation.registerFix(
             new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
-      }
 
-      if (typeAware) {
+      if (typeAware)
         val recursiveReferences = function.recursiveReferences
 
-        if (recursiveReferences.isEmpty) {
+        if (recursiveReferences.isEmpty)
           val annotation = holder.createErrorAnnotation(
               function.nameId,
               "Method annotated with @tailrec contains no recursive calls")
           annotation.registerFix(
               new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
-        } else {
-          recursiveReferences.filter(!_.isTailCall).foreach { ref =>
-            val target = ref.element.getParent match {
+        else
+          recursiveReferences.filter(!_.isTailCall).foreach  ref =>
+            val target = ref.element.getParent match
               case call: ScMethodCall => call
               case _ => ref.element
-            }
             val annotation = holder.createErrorAnnotation(
                 target,
                 "Recursive call not in tail position (in @tailrec annotated method)")
             annotation.registerFix(
                 new RemoveElementQuickFix(it, "Remove @tailrec annotation"))
-          }
-        }
-      }
-    }
 
-    for {
+    for
       functionType <- function.returnType
       usage <- function.returnUsages()
       usageType <- typeOf(usage)
-    } {
+    
 
       val explicitType = function.hasExplicitType
       val unitType = functionType == UnitType
@@ -86,72 +78,58 @@ trait FunctionAnnotator {
       val anyReturn = usageType == AnyType
       val underCatchBlock = usage.getContext.isInstanceOf[ScCatchBlock]
 
-      if (explicitReturn && hasAssign && !explicitType) {
+      if (explicitReturn && hasAssign && !explicitType)
         needsTypeAnnotation()
-      } else if (unitFunction && explicitReturn && !emptyReturn) {
+      else if (unitFunction && explicitReturn && !emptyReturn)
         redundantReturnExpression()
-      } else if (!unitFunction && !anyReturn && !underCatchBlock &&
-                 !usageType.conforms(functionType)) {
+      else if (!unitFunction && !anyReturn && !underCatchBlock &&
+                 !usageType.conforms(functionType))
         typeMismatch()
-      }
 
-      def needsTypeAnnotation() = {
+      def needsTypeAnnotation() =
         val message = ScalaBundle.message(
             "function.must.define.type.explicitly", function.name)
         val returnTypes =
-          function.returnUsages(withBooleanInfix = false).toSeq.collect {
+          function.returnUsages(withBooleanInfix = false).toSeq.collect
             case retStmt: ScReturnStmt =>
               retStmt.expr.flatMap(_.getType().toOption).getOrElse(AnyType)
             case expr: ScExpression => expr.getType().getOrAny
-          }
         val lub = Bounds.lub(returnTypes)
         val annotation = holder.createErrorAnnotation(
             usage.asInstanceOf[ScReturnStmt].returnKeyword, message)
         annotation.registerFix(new AddReturnTypeFix(function, lub))
-      }
 
-      def redundantReturnExpression() = {
+      def redundantReturnExpression() =
         val message = ScalaBundle.message(
             "return.expression.is.redundant", usageType.presentableText)
         holder.createWarningAnnotation(
             usage.asInstanceOf[ScReturnStmt].expr.get, message)
-      }
 
-      def typeMismatch() {
-        if (typeAware) {
+      def typeMismatch()
+        if (typeAware)
           val (usageTypeText, functionTypeText) =
             ScTypePresentation.different(usageType, functionType)
           val message = ScalaBundle.message(
               "type.mismatch.found.required", usageTypeText, functionTypeText)
           val returnExpression =
             if (explicitReturn) usage.asInstanceOf[ScReturnStmt].expr else None
-          val expr = returnExpression.getOrElse(usage) match {
+          val expr = returnExpression.getOrElse(usage) match
             case b: ScBlockExpr => b.getRBrace.map(_.getPsi).getOrElse(b)
             case b: ScBlock =>
-              b.getParent match {
+              b.getParent match
                 case t: ScTryBlock =>
-                  t.getRBrace match {
+                  t.getRBrace match
                     case Some(brace) => brace.getPsi
                     case _ => b
-                  }
                 case _ => b
-              }
             case e => e
-          }
           val annotation = holder.createErrorAnnotation(expr, message)
           annotation.registerFix(ReportHighlightingErrorQuickFix)
-        }
-      }
-    }
-  }
 
-  private def typeOf(element: PsiElement): TypeResult[ScType] = element match {
+  private def typeOf(element: PsiElement): TypeResult[ScType] = element match
     case r: ScReturnStmt =>
-      r.expr match {
+      r.expr match
         case Some(e) => e.getTypeAfterImplicitConversion().tr
         case None => Success(UnitType, None)
-      }
     case e: ScExpression => e.getTypeAfterImplicitConversion().tr
     case _ => Success(AnyType, None)
-  }
-}

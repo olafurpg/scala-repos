@@ -28,7 +28,7 @@ import org.apache.spark.sql.catalyst.util._
   * that should be included. Additionally, there is support for whitelisting and blacklisting
   * tests as development progresses.
   */
-abstract class HiveQueryFileTest extends HiveComparisonTest {
+abstract class HiveQueryFileTest extends HiveComparisonTest
 
   /** A list of tests deemed out of scope and thus completely disregarded */
   def blackList: Seq[String] = Nil
@@ -52,27 +52,23 @@ abstract class HiveQueryFileTest extends HiveComparisonTest {
     .getOrElse(whiteList)
 
   // Go through all the test cases and add them to scala test.
-  testCases.sorted.foreach {
+  testCases.sorted.foreach
     case (testCaseName, testCaseFile) =>
       if (blackList
             .map(_.r.pattern.matcher(testCaseName).matches())
-            .reduceLeft(_ || _)) {
+            .reduceLeft(_ || _))
         logDebug(s"Blacklisted test skipped $testCaseName")
-      } else if (realWhiteList
+      else if (realWhiteList
                    .map(_.r.pattern.matcher(testCaseName).matches())
-                   .reduceLeft(_ || _) || runAll) {
+                   .reduceLeft(_ || _) || runAll)
         // Build a test case and submit it to scala test framework...
         val queriesString = fileToString(testCaseFile)
         createQueryTest(testCaseName,
                         queriesString,
                         reset = true,
                         tryWithoutResettingFirst = true)
-      } else {
+      else
         // Only output warnings for the built in whitelist as this clutters the output when the user
         // trying to execute a single test from the commandline.
-        if (System.getProperty(whiteListProperty) == null && !runAll) {
+        if (System.getProperty(whiteListProperty) == null && !runAll)
           ignore(testCaseName) {}
-        }
-      }
-  }
-}

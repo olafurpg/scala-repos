@@ -8,7 +8,7 @@ import breeze.util.SerializableLogging
   * Note that this is not Karmarkar's algorithm.
   * @author dlwh
   */
-class AffineScaling extends SerializableLogging {
+class AffineScaling extends SerializableLogging
 
   /**
     * Maximize c dot x s.t. Ax <= b
@@ -18,11 +18,11 @@ class AffineScaling extends SerializableLogging {
                c: DenseVector[Double],
                x0: DenseVector[Double],
                gamma: Double = 0.5,
-               eps: Double = 1E-5) = {
+               eps: Double = 1E-5) =
     var converged = false
     var x = x0
     var cv = x dot c
-    while (!converged) {
+    while (!converged)
       val vk = b - A * x
       val D = diag(vk :^ -2.0)
       val hx = (A.t * D * A).asInstanceOf[DenseMatrix[Double]] \ c
@@ -38,11 +38,8 @@ class AffineScaling extends SerializableLogging {
       if ((cvn - cv).abs / (1.0 max cvn) < eps) converged = true
       cv = cvn
       x = xn
-    }
     x
-  }
 
   object UnboundedProblem extends Exception
-}
 
 object AffineScaling extends AffineScaling

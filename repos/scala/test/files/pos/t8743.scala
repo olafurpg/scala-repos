@@ -1,6 +1,6 @@
 import annotation.varargs
 
-object VarArgs {
+object VarArgs
   @varargs
   def foo[A](x: A, xs: String*): A = ???
 
@@ -12,4 +12,3 @@ object VarArgs {
 
   @varargs
   def boz[A](x: A, xs: String*): Nothing = ???
-}

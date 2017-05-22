@@ -6,8 +6,6 @@ import com.intellij.openapi.fileTypes.{FileTypeConsumer, FileTypeFactory}
 /**
   * @author Pavel Fatin
   */
-class SbtFileTypeFactory extends FileTypeFactory {
-  def createFileTypes(consumer: FileTypeConsumer) {
+class SbtFileTypeFactory extends FileTypeFactory
+  def createFileTypes(consumer: FileTypeConsumer)
     consumer.consume(SbtFileType)
-  }
-}

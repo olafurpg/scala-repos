@@ -43,8 +43,7 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class WindowEventSpec
     extends SimpleSFXDelegateSpec[jfxs.WindowEvent, WindowEvent](
-        classOf[jfxs.WindowEvent], classOf[WindowEvent]) {
+        classOf[jfxs.WindowEvent], classOf[WindowEvent])
 
   override protected def getJavaClassInstance =
     new jfxs.WindowEvent(null, null)
-}

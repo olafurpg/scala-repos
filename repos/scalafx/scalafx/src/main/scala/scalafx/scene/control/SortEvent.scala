@@ -39,7 +39,7 @@ import scalafx.event.Event
   *
   * @since 8.0
   */
-object SortEvent {
+object SortEvent
 
   /**
     * Converts a ScalaFX SortEvent to its JavaFX couterpart.
@@ -58,7 +58,6 @@ object SortEvent {
 
   def sortEvent[C]: jfxe.EventType[jfxsc.SortEvent[C]] =
     jfxsc.SortEvent.sortEvent()
-}
 
 /**
   * Wraps a $JFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/SortEvent.html SortEvent]].
@@ -71,7 +70,7 @@ object SortEvent {
   * @define JFX JavaFX
   */
 class SortEvent[C](override val delegate: jfxsc.SortEvent[C])
-    extends Event(delegate) with SFXDelegate[jfxsc.SortEvent[C]] {
+    extends Event(delegate) with SFXDelegate[jfxsc.SortEvent[C]]
 
   /**
     * Constructor with source and target
@@ -82,4 +81,3 @@ class SortEvent[C](override val delegate: jfxsc.SortEvent[C])
     */
   def this(source: C, target: jfxe.EventTarget) =
     this(new jfxsc.SortEvent[C](source, target))
-}

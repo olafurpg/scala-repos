@@ -2,7 +2,7 @@ import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 import language._
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code = """
     import scala.reflect.macros.blackbox.Context
@@ -21,4 +21,3 @@ object Test extends ScaladocModelTest {
   def scaladocSettings = ""
   override def extraSettings = super.extraSettings + " -Ymacro-expand:none"
   def testModel(root: Package) = ()
-}

@@ -4,7 +4,7 @@ package runtime
 import scala.reflect.internal.Flags._
 import scala.reflect.runtime.ReflectionUtils
 
-trait MacroRuntimes extends JavaReflectionRuntimes {
+trait MacroRuntimes extends JavaReflectionRuntimes
   self: scala.tools.nsc.typechecker.Analyzer =>
 
   import global._
@@ -27,17 +27,15 @@ trait MacroRuntimes extends JavaReflectionRuntimes {
     */
   private val macroRuntimesCache =
     perRunCaches.newWeakMap[Symbol, MacroRuntime]
-  def standardMacroRuntime(expandee: Tree): MacroRuntime = {
+  def standardMacroRuntime(expandee: Tree): MacroRuntime =
     val macroDef = expandee.symbol
     macroLogVerbose(s"looking for macro implementation: $macroDef")
-    if (fastTrack contains macroDef) {
+    if (fastTrack contains macroDef)
       macroLogVerbose("macro expansion is serviced by a fast track")
       fastTrack(macroDef)
-    } else {
+    else
       macroRuntimesCache.getOrElseUpdate(
           macroDef, new MacroRuntimeResolver(macroDef).resolveRuntime())
-    }
-  }
 
   /** Macro classloader that is used to resolve and run macro implementations.
     *  Loads classes from from -cp (aka the library classpath).
@@ -53,31 +51,26 @@ trait MacroRuntimes extends JavaReflectionRuntimes {
     */
   type MacroRuntime = MacroArgs => Any
   class MacroRuntimeResolver(val macroDef: Symbol)
-      extends JavaReflectionResolvers {
+      extends JavaReflectionResolvers
     val binding = loadMacroImplBinding(macroDef).get
     val isBundle = binding.isBundle
     val className = binding.className
     val methName = binding.methName
 
-    def resolveRuntime(): MacroRuntime = {
+    def resolveRuntime(): MacroRuntime =
       if (className == Predef_???.owner.javaClassName &&
-          methName == Predef_???.name.encoded) { args =>
+          methName == Predef_???.name.encoded)  args =>
         throw new AbortMacroException(
             args.c.enclosingPosition, "macro implementation is missing")
-      } else {
-        try {
+      else
+        try
           macroLogVerbose(
               s"resolving macro implementation as $className.$methName (isBundle = $isBundle)")
           macroLogVerbose(
               s"classloader is: ${ReflectionUtils.show(defaultMacroClassloader)}")
           resolveJavaReflectionRuntime(defaultMacroClassloader)
-        } catch {
+        catch
           case ex: Exception =>
             macroLogVerbose(s"macro runtime failed to load: ${ex.toString}")
             macroDef setFlag IS_ERROR
             null
-        }
-      }
-    }
-  }
-}

@@ -22,12 +22,11 @@ import cascading.tuple.Fields
 import com.twitter.scalding.{JsonLine => StandardJsonLine, _}
 import org.scalatest.WordSpec
 
-object JsonLine {
+object JsonLine
   def apply(p: String,
             fields: Fields = Fields.ALL,
             failOnEmptyLines: Boolean = true) =
     new JsonLine(p, fields, failOnEmptyLines)
-}
 
 class JsonLine(p: String, fields: Fields, failOnEmptyLines: Boolean)
     extends StandardJsonLine(p,
@@ -37,80 +36,66 @@ class JsonLine(p: String, fields: Fields, failOnEmptyLines: Boolean)
                              transformInTest = true,
                              failOnEmptyLines = failOnEmptyLines)
 
-class JsonLineJob(args: Args) extends Job(args) {
-  try {
+class JsonLineJob(args: Args) extends Job(args)
+  try
     Tsv("input0", ('query, 'queryStats)).read.write(JsonLine("output0"))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class JsonLineRestrictedFieldsJob(args: Args) extends Job(args) {
-  try {
+class JsonLineRestrictedFieldsJob(args: Args) extends Job(args)
+  try
     Tsv("input0", ('query, 'queryStats)).read
       .write(JsonLine("output0", Tuple1('query)))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace()
-  }
-}
 
-class JsonLineInputJob(args: Args) extends Job(args) {
-  try {
+class JsonLineInputJob(args: Args) extends Job(args)
+  try
     JsonLine("input0", ('foo, 'bar)).read
       .project('foo, 'bar)
       .write(Tsv("output0"))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace
-  }
-}
 
-class JsonLineInputJobSkipEmptyLines(args: Args) extends Job(args) {
-  try {
+class JsonLineInputJobSkipEmptyLines(args: Args) extends Job(args)
+  try
     JsonLine("input0", ('foo, 'bar), failOnEmptyLines = false).read
       .project('foo, 'bar)
       .write(Tsv("output0"))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace
-  }
-}
 
-class JsonLineNestedInputJob(args: Args) extends Job(args) {
-  try {
+class JsonLineNestedInputJob(args: Args) extends Job(args)
+  try
     JsonLine("input0", (Symbol("foo.too"), 'bar)).read
       .rename((Symbol("foo.too") -> ('foo)))
       .project('foo, 'bar)
       .write(Tsv("output0"))
-  } catch {
+  catch
     case e: Exception => e.printStackTrace
-  }
-}
 
-class JsonLineTest extends WordSpec {
+class JsonLineTest extends WordSpec
   import com.twitter.scalding.Dsl._
 
-  "A JsonLine sink" should {
+  "A JsonLine sink" should
     JobTest(new JsonLineJob(_))
       .source(Tsv("input0", ('query, 'queryStats)),
               List(("doctor's mask", List(42.1f, 17.1f))))
-      .sink[String](JsonLine("output0")) { buf =>
+      .sink[String](JsonLine("output0"))  buf =>
         val json = buf.head
-        "not stringify lists or numbers and not escape single quotes" in {
+        "not stringify lists or numbers and not escape single quotes" in
           assert(
               json === """{"query":"doctor's mask","queryStats":[42.1,17.1]}""")
-        }
-      }
       .run
       .finish
 
     JobTest(new JsonLineRestrictedFieldsJob(_))
       .source(Tsv("input0", ('query, 'queryStats)),
               List(("doctor's mask", List(42.1f, 17.1f))))
-      .sink[String](JsonLine("output0", Tuple1('query))) { buf =>
+      .sink[String](JsonLine("output0", Tuple1('query)))  buf =>
         val json = buf.head
-        "only sink requested fields" in {
+        "only sink requested fields" in
           assert(json === """{"query":"doctor's mask"}""")
-        }
-      }
       .run
       .finish
 
@@ -118,11 +103,9 @@ class JsonLineTest extends WordSpec {
 
     JobTest(new JsonLineInputJob(_))
       .source(JsonLine("input0", ('foo, 'bar)), List((0, json)))
-      .sink[(Int, String)](Tsv("output0")) { outBuf =>
-        "read json line input" in {
+      .sink[(Int, String)](Tsv("output0"))  outBuf =>
+        "read json line input" in
           assert(outBuf.toList === List((3, "baz")))
-        }
-      }
       .run
       .finish
 
@@ -130,11 +113,9 @@ class JsonLineTest extends WordSpec {
 
     JobTest(new JsonLineInputJob(_))
       .source(JsonLine("input0", ('foo, 'bar)), List((0, json), (1, json2)))
-      .sink[(Int, String)](Tsv("output0")) { outBuf =>
-        "handle missing fields" in {
+      .sink[(Int, String)](Tsv("output0"))  outBuf =>
+        "handle missing fields" in
           assert(outBuf.toList === List((3, "baz"), (7, null)))
-        }
-      }
       .run
       .finish
 
@@ -143,36 +124,27 @@ class JsonLineTest extends WordSpec {
     JobTest(new JsonLineNestedInputJob(_))
       .source(JsonLine("input0", (Symbol("foo.too"), 'bar)),
               List((0, json), (1, json3)))
-      .sink[(Int, String)](Tsv("output0")) { outBuf =>
-        "handle nested fields" in {
+      .sink[(Int, String)](Tsv("output0"))  outBuf =>
+        "handle nested fields" in
           assert(outBuf.toList === List((0, "baz"), (9, null)))
-        }
-      }
       .run
       .finish
 
-    "fail on empty lines by default" in {
-      intercept[FlowException] {
+    "fail on empty lines by default" in
+      intercept[FlowException]
         JobTest(new JsonLineInputJob(_))
           .source(JsonLine("input0", ('foo, 'bar)),
                   List((0, json), (1, json2), (2, ""), (3, "   ")))
-          .sink[(Int, String)](Tsv("output0")) { outBuf =>
+          .sink[(Int, String)](Tsv("output0"))  outBuf =>
             outBuf.toList
-          }
           .run
           .finish
-      }
-    }
 
     JobTest(new JsonLineInputJobSkipEmptyLines(_))
       .source(JsonLine("input0", ('foo, 'bar)),
               List((0, json), (1, json2), (2, ""), (3, "   ")))
-      .sink[(Int, String)](Tsv("output0")) { outBuf =>
-        "handle empty lines when `failOnEmptyLines` is set to false" in {
+      .sink[(Int, String)](Tsv("output0"))  outBuf =>
+        "handle empty lines when `failOnEmptyLines` is set to false" in
           assert(outBuf.toList.size === 2)
-        }
-      }
       .run
       .finish
-  }
-}

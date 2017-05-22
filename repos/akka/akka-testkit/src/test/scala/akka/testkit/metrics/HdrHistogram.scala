@@ -18,24 +18,20 @@ import org.{HdrHistogram ⇒ hdr}
 private[akka] class HdrHistogram(highestTrackableValue: Long,
                                  numberOfSignificantValueDigits: Int,
                                  val unit: String = "")
-    extends Metric {
+    extends Metric
 
   private val hist =
     new hdr.Histogram(highestTrackableValue, numberOfSignificantValueDigits)
 
-  def update(value: Long) {
-    try hist.recordValue(value) catch {
+  def update(value: Long)
+    try hist.recordValue(value) catch
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
-    }
-  }
 
-  def updateWithCount(value: Long, count: Long) {
-    try hist.recordValueWithCount(value, count) catch {
+  def updateWithCount(value: Long, count: Long)
+    try hist.recordValueWithCount(value, count) catch
       case ex: ArrayIndexOutOfBoundsException ⇒
         throw wrapHistogramOutOfBoundsException(value, ex)
-    }
-  }
 
   private def wrapHistogramOutOfBoundsException(
       value: Long,
@@ -46,4 +42,3 @@ private[akka] class HdrHistogram(highestTrackableValue: Long,
         ex)
 
   def getData = hist.copy().getHistogramData
-}

@@ -11,7 +11,7 @@ import collection.mutable.{Map => MutableMap}
  *
  * You need to have the appropriate shared libraries on your java.library.path
  */
-object OpenSSL {
+object OpenSSL
   type MapOfStrings = java.util.Map[java.lang.String, java.lang.String]
 
   private[this] val log = Logger.getLogger(getClass.getName)
@@ -27,7 +27,7 @@ object OpenSSL {
   /*
    * Deal with initialization of the native library
    */
-  class Linker {
+  class Linker
     private[this] def classNamed(name: String): Class[_] =
       Class.forName("org.apache.tomcat.jni." + name)
 
@@ -56,7 +56,7 @@ object OpenSSL {
     val sslEngineCtor =
       sslEngineClass.getConstructor(contextHolderClass, bufferPoolClass)
 
-    if (initializedLibrary.compareAndSet(false, true)) {
+    if (initializedLibrary.compareAndSet(false, true))
       aprInitMethod.invoke(aprClass, null)
       sslInitMethod.invoke(sslClass, null)
       mallocPool = poolCreateMethod
@@ -69,8 +69,6 @@ object OpenSSL {
       bufferPool = bufferPoolCtor
         .newInstance(capacity.asInstanceOf[AnyRef])
         .asInstanceOf[AnyRef]
-    }
-  }
 
   private[this] val contextHolderCache: MutableMap[String, Object] =
     MutableMap.empty
@@ -84,27 +82,25 @@ object OpenSSL {
              caPath: String,
              ciphers: String,
              nextProtos: String,
-             useCache: Boolean = true): Option[Engine] = {
-    try {
-      synchronized {
+             useCache: Boolean = true): Option[Engine] =
+    try
+      synchronized
         if (null == linker) linker = new Linker()
-      }
-    } catch {
+    catch
       case e: Exception =>
         // This is a warning rather than a Throwable because we fall back to JSSE
         log.log(Level.FINEST,
                 "APR/OpenSSL could not be loaded: " + e.getClass().getName() +
                 ": " + e.getMessage())
         return None
-    }
 
-    def makeContextHolder = {
+    def makeContextHolder =
       val configMap = new java.util.HashMap[java.lang.String, java.lang.String]
       configMap.put("ssl.cert_path", certificatePath)
       configMap.put("ssl.key_path", keyPath)
-      configMap.put("ssl.cipher_spec", Option(ciphers).getOrElse {
+      configMap.put("ssl.cipher_spec", Option(ciphers).getOrElse
         defaultCiphers
-      })
+      )
 
       if (caPath != null) configMap.put("ssl.ca_path", caPath)
 
@@ -119,13 +115,11 @@ object OpenSSL {
       linker.contextHolderCtor
         .newInstance(mallocPool, config.asInstanceOf[AnyRef])
         .asInstanceOf[AnyRef]
-    }
 
-    val contextHolder = synchronized {
+    val contextHolder = synchronized
       if (useCache)
         contextHolderCache.getOrElseUpdate(certificatePath, makeContextHolder)
       else makeContextHolder
-    }
 
     val engine: SSLEngine = linker.sslEngineCtor
       .newInstance(
@@ -135,5 +129,3 @@ object OpenSSL {
       .asInstanceOf[SSLEngine]
 
     Some(new Engine(engine, true))
-  }
-}

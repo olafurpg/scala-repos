@@ -8,40 +8,36 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DefaultPoolTest extends FunSuite {
-  class MockServiceFactory extends ServiceFactory[Unit, Unit] {
+class DefaultPoolTest extends FunSuite
+  class MockServiceFactory extends ServiceFactory[Unit, Unit]
     override def apply(conn: ClientConnection): Future[Service[Unit, Unit]] =
       Future.value(new MockService())
 
     override def close(deadline: Time): Future[Unit] = Future.Done
-  }
 
-  class MockService extends Service[Unit, Unit] {
+  class MockService extends Service[Unit, Unit]
     @volatile var closed = false
 
     override def apply(unit: Unit): Future[Unit] =
       if (closed) Future.exception(new Exception) else Future.Done
 
-    override def close(deadline: Time): Future[Unit] = {
+    override def close(deadline: Time): Future[Unit] =
       closed = true
       Future.Done
-    }
 
     override def status: Status =
       if (closed) Status.Closed else Status.Open
-  }
 
-  trait DefaultPoolHelper {
+  trait DefaultPoolHelper
     val underlying = new MockServiceFactory()
     val sr = new InMemoryStatsReceiver()
     val factory = DefaultPool[Unit, Unit](2, 3)(sr)(underlying)
-  }
 
   test(
       "DefaultPool should be able to maintain high - low connections in the " +
-      "pool, and low connection in watermark") {
+      "pool, and low connection in watermark")
 
-    new DefaultPoolHelper {
+    new DefaultPoolHelper
       val c1 = Await.result(factory())
       assert(sr.gauges(Seq("pool_cached"))() == 0)
       assert(sr.gauges(Seq("pool_size"))() == 1)
@@ -60,13 +56,11 @@ class DefaultPoolTest extends FunSuite {
       c3.close()
       assert(sr.gauges(Seq("pool_cached"))() == 1)
       assert(sr.gauges(Seq("pool_size"))() == 2)
-    }
-  }
 
   test(
       "DefaultPool should be able to reuse connections after they have been " +
-      "released.") {
-    new DefaultPoolHelper {
+      "released.")
+    new DefaultPoolHelper
       val c1 = Await.result(factory())
       val c2 = Await.result(factory())
       val c3 = Await.result(factory())
@@ -81,6 +75,3 @@ class DefaultPoolTest extends FunSuite {
       assert(Await.result(c4(()).liftToTry) == Return.Unit)
       assert(Await.result(c5(()).liftToTry) == Return.Unit)
       assert(Await.result(c6(()).liftToTry) == Return.Unit)
-    }
-  }
-}

@@ -8,22 +8,19 @@ import scala.concurrent.duration._
 import akka.testkit._
 import akka.actor._
 
-object RemoteWatcherSpec {
+object RemoteWatcherSpec
 
-  class TestActorProxy(testActor: ActorRef) extends Actor {
-    def receive = {
+  class TestActorProxy(testActor: ActorRef) extends Actor
+    def receive =
       case msg ⇒ testActor forward msg
-    }
-  }
 
-  class MyActor extends Actor {
+  class MyActor extends Actor
     def receive = Actor.emptyBehavior
-  }
 
   // turn off all periodic activity
   val TurnOff = 5.minutes
 
-  def createFailureDetector(): FailureDetectorRegistry[Address] = {
+  def createFailureDetector(): FailureDetectorRegistry[Address] =
     def createFailureDetector(): FailureDetector =
       new PhiAccrualFailureDetector(threshold = 8.0,
                                     maxSampleSize = 200,
@@ -32,19 +29,17 @@ object RemoteWatcherSpec {
                                     firstHeartbeatEstimate = 1.second)
 
     new DefaultFailureDetectorRegistry(() ⇒ createFailureDetector())
-  }
 
-  object TestRemoteWatcher {
+  object TestRemoteWatcher
     final case class AddressTerm(address: Address)
     final case class Quarantined(address: Address, uid: Option[Int])
-  }
 
   class TestRemoteWatcher(heartbeatExpectedResponseAfter: FiniteDuration)
       extends RemoteWatcher(
           createFailureDetector,
           heartbeatInterval = TurnOff,
           unreachableReaperInterval = TurnOff,
-          heartbeatExpectedResponseAfter = heartbeatExpectedResponseAfter) {
+          heartbeatExpectedResponseAfter = heartbeatExpectedResponseAfter)
 
     def this() = this(heartbeatExpectedResponseAfter = TurnOff)
 
@@ -54,13 +49,10 @@ object RemoteWatcherSpec {
       context.system.eventStream
         .publish(TestRemoteWatcher.AddressTerm(address))
 
-    override def quarantine(address: Address, uid: Option[Int]): Unit = {
+    override def quarantine(address: Address, uid: Option[Int]): Unit =
       // don't quarantine in remoting, but publish a testable message
       context.system.eventStream
         .publish(TestRemoteWatcher.Quarantined(address, uid))
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class RemoteWatcherSpec
@@ -72,7 +64,7 @@ class RemoteWatcherSpec
          hostname = localhost
          port = 0
        }
-     }""") with ImplicitSender {
+     }""") with ImplicitSender
 
   import RemoteWatcherSpec._
   import RemoteWatcher._
@@ -89,22 +81,20 @@ class RemoteWatcherSpec
           akka.remote.transport.ActorTransportAdapter.DisassociateUnderlying.getClass)(
           _))
 
-  override def afterTermination() {
+  override def afterTermination()
     shutdown(remoteSystem)
-  }
 
   val heartbeatRspB = HeartbeatRsp(remoteAddressUid)
 
-  def createRemoteActor(props: Props, name: String): InternalActorRef = {
+  def createRemoteActor(props: Props, name: String): InternalActorRef =
     remoteSystem.actorOf(props, name)
     system.actorSelection(RootActorPath(remoteAddress) / "user" / name) ! Identify(
         name)
     expectMsgType[ActorIdentity].ref.get.asInstanceOf[InternalActorRef]
-  }
 
-  "A RemoteWatcher" must {
+  "A RemoteWatcher" must
 
-    "have correct interaction when watching" in {
+    "have correct interaction when watching" in
 
       val fd = createFailureDetector()
       val monitorA = system.actorOf(Props[TestRemoteWatcher], "monitor1")
@@ -166,9 +156,8 @@ class RemoteWatcherSpec
 
       // make sure nothing floods over to next test
       expectNoMsg(2 seconds)
-    }
 
-    "generate AddressTerminated when missing heartbeats" in {
+    "generate AddressTerminated when missing heartbeats" in
       val p = TestProbe()
       val q = TestProbe()
       system.eventStream.subscribe(p.ref,
@@ -194,8 +183,8 @@ class RemoteWatcherSpec
       expectMsg(Heartbeat)
       monitorA.tell(heartbeatRspB, monitorB)
 
-      within(10 seconds) {
-        awaitAssert {
+      within(10 seconds)
+        awaitAssert
           monitorA ! HeartbeatTick
           expectMsg(Heartbeat)
           // but no HeartbeatRsp
@@ -204,14 +193,11 @@ class RemoteWatcherSpec
           q.expectMsg(1 second,
                       TestRemoteWatcher.Quarantined(b.path.address,
                                                     Some(remoteAddressUid)))
-        }
-      }
 
       // make sure nothing floods over to next test
       expectNoMsg(2 seconds)
-    }
 
-    "generate AddressTerminated when missing first heartbeat" in {
+    "generate AddressTerminated when missing first heartbeat" in
       val p = TestProbe()
       val q = TestProbe()
       system.eventStream.subscribe(p.ref,
@@ -237,8 +223,8 @@ class RemoteWatcherSpec
       expectMsg(Heartbeat)
       // no HeartbeatRsp sent
 
-      within(20 seconds) {
-        awaitAssert {
+      within(20 seconds)
+        awaitAssert
           monitorA ! HeartbeatTick
           expectMsg(Heartbeat)
           // but no HeartbeatRsp
@@ -247,14 +233,11 @@ class RemoteWatcherSpec
           // no real quarantine when missing first heartbeat, uid unknown
           q.expectMsg(1 second,
                       TestRemoteWatcher.Quarantined(b.path.address, None))
-        }
-      }
 
       // make sure nothing floods over to next test
       expectNoMsg(2 seconds)
-    }
 
-    "generate AddressTerminated for new watch after broken connection that was re-established and broken again" in {
+    "generate AddressTerminated for new watch after broken connection that was re-established and broken again" in
       val p = TestProbe()
       val q = TestProbe()
       system.eventStream.subscribe(p.ref,
@@ -280,8 +263,8 @@ class RemoteWatcherSpec
       expectMsg(Heartbeat)
       monitorA.tell(heartbeatRspB, monitorB)
 
-      within(10 seconds) {
-        awaitAssert {
+      within(10 seconds)
+        awaitAssert
           monitorA ! HeartbeatTick
           expectMsg(Heartbeat)
           // but no HeartbeatRsp
@@ -290,15 +273,12 @@ class RemoteWatcherSpec
           q.expectMsg(1 second,
                       TestRemoteWatcher.Quarantined(b.path.address,
                                                     Some(remoteAddressUid)))
-        }
-      }
 
       // real AddressTerminated would trigger Terminated for b6, simulate that here
       remoteSystem.stop(b)
-      awaitAssert {
+      awaitAssert
         monitorA ! Stats
         expectMsg(Stats.empty)
-      }
       expectNoMsg(2 seconds)
 
       // assume that connection comes up again, or remote system is restarted
@@ -327,8 +307,8 @@ class RemoteWatcherSpec
       q.expectNoMsg(1 second)
 
       // then stop heartbeating again, should generate new AddressTerminated
-      within(10 seconds) {
-        awaitAssert {
+      within(10 seconds)
+        awaitAssert
           monitorA ! HeartbeatTick
           expectMsg(Heartbeat)
           // but no HeartbeatRsp
@@ -337,11 +317,6 @@ class RemoteWatcherSpec
           q.expectMsg(1 second,
                       TestRemoteWatcher.Quarantined(c.path.address,
                                                     Some(remoteAddressUid)))
-        }
-      }
 
       // make sure nothing floods over to next test
       expectNoMsg(2 seconds)
-    }
-  }
-}

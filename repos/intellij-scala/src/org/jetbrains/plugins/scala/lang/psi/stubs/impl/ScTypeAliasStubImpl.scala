@@ -21,7 +21,7 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScTypeAlias](parent, elemType)
-    with ScTypeAliasStub {
+    with ScTypeAliasStub
   private var name: StringRef = _
   private var declaration: Boolean = false
   private var typeElementText: StringRef = _
@@ -42,7 +42,7 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
            lowerTypeElementText: String,
            upperTypeElementText: String,
            isLocal: Boolean,
-           stableQualifier: Boolean) = {
+           stableQualifier: Boolean) =
     this(
         parent,
         elemType
@@ -54,7 +54,6 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
     this.upperTypeElementText = StringRef.fromString(upperTypeElementText)
     this._stableQualifier = stableQualifier
     local = isLocal
-  }
 
   def isLocal: Boolean = local
 
@@ -62,50 +61,43 @@ class ScTypeAliasStubImpl[ParentPsi <: PsiElement](
 
   def isDeclaration = declaration
 
-  def getTypeElement: ScTypeElement = {
-    if (myTypeElement != null) {
+  def getTypeElement: ScTypeElement =
+    if (myTypeElement != null)
       val typeElement = myTypeElement.get
       if (typeElement != null && (typeElement.getContext eq getPsi))
         return typeElement
-    }
     if (getTypeElementText == "") return null
     val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
         getTypeElementText, getPsi, null)
     myTypeElement = new SofterReference[ScTypeElement](res)
     res
-  }
 
   def getTypeElementText: String = typeElementText.toString
 
-  def getUpperBoundTypeElement: ScTypeElement = {
-    if (myUpperTypeElement != null) {
+  def getUpperBoundTypeElement: ScTypeElement =
+    if (myUpperTypeElement != null)
       val upperTypeElement = myUpperTypeElement.get
       if (upperTypeElement != null && (upperTypeElement.getContext eq getPsi))
         return upperTypeElement
-    }
     if (getUpperBoundElementText == "") return null
     val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
         getUpperBoundElementText, getPsi, null)
     myUpperTypeElement = new SofterReference[ScTypeElement](res)
     res
-  }
 
   def getUpperBoundElementText: String = upperTypeElementText.toString
 
-  def getLowerBoundTypeElement: ScTypeElement = {
-    if (myLowerTypeElement != null) {
+  def getLowerBoundTypeElement: ScTypeElement =
+    if (myLowerTypeElement != null)
       val lowerTypeElement = myLowerTypeElement.get
       if (lowerTypeElement != null && (lowerTypeElement.getContext eq getPsi))
         return lowerTypeElement
-    }
     if (getLowerBoundElementText == "") return null
     val res: ScTypeElement = ScalaPsiElementFactory.createTypeElementFromText(
         getLowerBoundElementText, getPsi, null)
     myLowerTypeElement = new SofterReference[ScTypeElement](res)
     res
-  }
 
   def getLowerBoundElementText: String = lowerTypeElementText.toString
 
   def isStableQualifier: Boolean = _stableQualifier
-}

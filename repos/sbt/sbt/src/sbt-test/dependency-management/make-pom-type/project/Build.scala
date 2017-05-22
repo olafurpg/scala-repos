@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object build extends Build {
+object build extends Build
   override def settings = super.settings ++ Seq(
       organization := "org.example",
       version := "1.0",
@@ -32,7 +32,7 @@ object build extends Build {
 		</dependency>
 
   def checkTask(expectedDep: xml.Elem) =
-    TaskKey[Unit]("check-pom") <<= makePom map { file =>
+    TaskKey[Unit]("check-pom") <<= makePom map  file =>
       val pom = xml.XML.loadFile(file)
       val actual = pom \\ "dependencies"
       val expected = <d>
@@ -46,5 +46,3 @@ object build extends Build {
       assert(expectedString == actualString,
              "Expected dependencies section:\n" + expectedString +
              "\n\nActual:\n" + actualString)
-    }
-}

@@ -8,11 +8,11 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.prop.Checkers
 
 @RunWith(classOf[JUnitRunner])
-class WindowedMaxTest extends FunSuite with Checkers {
-  test("return max") {
-    check {
-      forAll { ary: Array[Long] =>
-        forAll(Gen.posNum[Int]) { window: Int =>
+class WindowedMaxTest extends FunSuite with Checkers
+  test("return max")
+    check
+      forAll  ary: Array[Long] =>
+        forAll(Gen.posNum[Int])  window: Int =>
           val w = new WindowedMax(window)
           for (v <- ary) w.add(v)
 
@@ -22,8 +22,3 @@ class WindowedMaxTest extends FunSuite with Checkers {
             else ary.takeRight(window).max
 
           expected == w.get
-        }
-      }
-    }
-  }
-}

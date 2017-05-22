@@ -3,7 +3,7 @@ package example
 
 import Scalaz._
 
-object IListUsage extends App {
+object IListUsage extends App
 
   // Construct using elements
   val ns = IList(1, 2, 3)
@@ -40,10 +40,9 @@ object IListUsage extends App {
     ns.uncons("empty", (h, t) => "head is %s and tail is %s".format(h, t))
 
   // Destructure with matching
-  val s2 = ns match {
+  val s2 = ns match
     case INil() => "empty"
     case ICons(h, t) => "head is %s and tail is %s".format(h, t)
-  }
 
   // Same typeclass instances as List
   val xprod = (IList(1, 2) |@| IList(true, false)).tupled
@@ -59,4 +58,3 @@ object IListUsage extends App {
   // Or less familiar
   val estr = ns.toEphemeralStream
   val zmap = ns.map(n => (n, "x" * n)).toMap // Int ==>> String
-}

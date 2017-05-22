@@ -30,19 +30,19 @@ import scala.collection.mutable
   */
 trait ScBlock
     extends ScExpression with ScDeclarationSequenceHolder
-    with ScImportsHolder {
+    with ScImportsHolder
 
-  protected override def innerType(ctx: TypingContext): TypeResult[ScType] = {
-    if (hasCaseClauses) {
+  protected override def innerType(ctx: TypingContext): TypeResult[ScType] =
+    if (hasCaseClauses)
       val caseClauses = findChildByClassScala(classOf[ScCaseClauses])
       val clauses: Seq[ScCaseClause] = caseClauses.caseClauses
       val clausesType = clauses.foldLeft(types.Nothing: ScType)((tp, clause) =>
-            Bounds.lub(tp, clause.expr match {
+            Bounds.lub(tp, clause.expr match
           case Some(expr) => expr.getType(TypingContext.empty).getOrNothing
           case _ => types.Nothing
-        }))
+        ))
 
-      getContext match {
+      getContext match
         case c: ScCatchBlock =>
           val manager = ScalaPsiManager.instance(getProject)
           val funs =
@@ -64,7 +64,7 @@ trait ScBlock
           val et =
             expectedType(fromUnderscore = false).getOrElse(return Failure(
                     "Cannot infer type without expected type", Some(this)))
-          return et match {
+          return et match
             case f @ ScFunctionType(_, params) =>
               Success(ScFunctionType(clausesType,
                                      params.map(_.removeVarianceAbstracts(1)))(
@@ -79,21 +79,17 @@ trait ScBlock
               Failure(
                   "Cannot infer type without expected type of scala.FunctionN or scala.PartialFunction",
                   Some(this))
-          }
-      }
-    }
-    val inner = lastExpr match {
+    val inner = lastExpr match
       case None =>
-        ScalaPsiUtil.fileContext(this) match {
+        ScalaPsiUtil.fileContext(this) match
           case scalaFile: ScalaFile if scalaFile.isCompiled => Nothing
           case _ => Unit
-        }
       case Some(e) =>
         val m = new mutable.HashMap[String, ScExistentialArgument]
-        def existize(t: ScType, visited: HashSet[ScType]): ScType = {
+        def existize(t: ScType, visited: HashSet[ScType]): ScType =
           if (visited.contains(t)) return t
           val visitedWithT = visited + t
-          t match {
+          t match
             case ScDesignatorType(p: ScParameter)
                 if p.owner.isInstanceOf[ScFunctionExpr] &&
                 p.owner.asInstanceOf[ScFunctionExpr].result == Some(this) =>
@@ -112,7 +108,7 @@ trait ScBlock
               new ScTypeVariable(typed.name)
             case ScDesignatorType(des)
                 if PsiTreeUtil.isContextAncestor(this, des, true) =>
-              des match {
+              des match
                 case obj: ScObject =>
                   val t = existize(leastClassType(obj), visitedWithT)
                   m.put(
@@ -120,9 +116,9 @@ trait ScBlock
                   new ScTypeVariable(obj.name)
                 case clazz: ScTypeDefinition =>
                   val t = existize(leastClassType(clazz), visitedWithT)
-                  val vars = clazz.typeParameters.map { tp =>
+                  val vars = clazz.typeParameters.map  tp =>
                     ScalaPsiManager.typeVariable(tp)
-                  }.toList
+                  .toList
                   m.put(clazz.name,
                         new ScExistentialArgument(clazz.name, vars, t, t))
                   new ScTypeVariable(clazz.name)
@@ -133,21 +129,19 @@ trait ScBlock
                         new ScExistentialArgument(typed.name, Nil, t, t))
                   new ScTypeVariable(typed.name)
                 case _ => t
-              }
             case proj @ ScProjectionType(p, elem, s) =>
               ScProjectionType(existize(p, visitedWithT), elem, s)
             case ScCompoundType(comps, signatureMap, typesMap) =>
               new ScCompoundType(
-                  comps.map(existize(_, visitedWithT)), signatureMap.map {
+                  comps.map(existize(_, visitedWithT)), signatureMap.map
                 case (s: Signature, tp) =>
-                  def updateTypeParam(tp: TypeParameter): TypeParameter = {
+                  def updateTypeParam(tp: TypeParameter): TypeParameter =
                     new TypeParameter(
                         tp.name,
                         tp.typeParams.map(updateTypeParam),
                         () => existize(tp.lowerType(), visitedWithT),
                         () => existize(tp.upperType(), visitedWithT),
                         tp.ptp)
-                  }
 
                   val pTypes: List[Seq[() => ScType]] = s.substitutedTypes.map(
                       _.map(f => () => existize(f(), visitedWithT)))
@@ -160,7 +154,7 @@ trait ScBlock
                                  s.paramLength,
                                  tParams,
                                  ScSubstitutor.empty,
-                                 s.namedElement match {
+                                 s.namedElement match
                                    case fun: ScFunction =>
                                      ScFunction.getCompoundCopy(
                                          pTypes.map(_.map(_ ()).toList),
@@ -172,13 +166,13 @@ trait ScBlock
                                    case f: ScFieldId =>
                                      ScFieldId.getCompoundCopy(rt, f)
                                    case named => named
-                                 },
+                                 ,
                                  s.hasRepeatedParam),
                    rt)
-              }, typesMap.map {
+              , typesMap.map
                 case (s, sign) =>
                   (s, sign.updateTypes(existize(_, visitedWithT)))
-              })
+              )
             case JavaArrayType(arg) =>
               JavaArrayType(existize(arg, visitedWithT))
             case ScParameterizedType(des, typeArgs) =>
@@ -186,39 +180,33 @@ trait ScBlock
                                   typeArgs.map(existize(_, visitedWithT)))
             case ex @ ScExistentialType(q, wildcards) =>
               new ScExistentialType(
-                  existize(q, visitedWithT), wildcards.map { ex =>
+                  existize(q, visitedWithT), wildcards.map  ex =>
                 new ScExistentialArgument(
                     ex.name,
                     ex.args,
                     existize(ex.lowerBound, visitedWithT),
                     existize(ex.upperBound, visitedWithT))
-              })
+              )
             case _ => t
-          }
-        }
         val t = existize(
             e.getType(TypingContext.empty).getOrAny, HashSet.empty)
         if (m.size == 0) t
         else new ScExistentialType(t, m.values.toList).simplify()
-    }
     Success(inner, Some(this))
-  }
 
-  private def leastClassType(t: ScTemplateDefinition): ScType = {
+  private def leastClassType(t: ScTemplateDefinition): ScType =
     val (holders, aliases): (Seq[ScDeclaredElementsHolder],
-    Seq[ScTypeAlias]) = t.extendsBlock.templateBody match {
+    Seq[ScTypeAlias]) = t.extendsBlock.templateBody match
       case Some(b: ScTemplateBody) =>
         // jzaugg: Without these type annotations, a class cast exception occured above. I'm not entirely sure why.
         (b.holders: Seq[ScDeclaredElementsHolder], b.aliases: Seq[ScTypeAlias])
       case None => (Seq.empty, Seq.empty)
-    }
 
     val superTypes = t.extendsBlock.superTypes
-    if (superTypes.length > 1 || !holders.isEmpty || !aliases.isEmpty) {
+    if (superTypes.length > 1 || !holders.isEmpty || !aliases.isEmpty)
       ScCompoundType.fromPsi(
           superTypes, holders.toList, aliases.toList, ScSubstitutor.empty)
-    } else superTypes(0)
-  }
+    else superTypes(0)
 
   def hasCaseClauses: Boolean = false
   def isInCatchBlock: Boolean = getContext.isInstanceOf[ScCatchBlock]
@@ -233,20 +221,18 @@ trait ScBlock
     getNode.getChildren(TokenSet.create(ScalaTokenTypes.tRBRACE)).length == 1
 
   def getRBrace: Option[ASTNode] =
-    getNode.getChildren(TokenSet.create(ScalaTokenTypes.tRBRACE)) match {
+    getNode.getChildren(TokenSet.create(ScalaTokenTypes.tRBRACE)) match
       case Array(node) => Some(node)
       case _ => None
-    }
 
   def lastExpr = findLastChild(classOf[ScExpression])
   def lastStatement = findLastChild(classOf[ScBlockStatement])
 
-  def addDefinition(decl: ScMember, before: PsiElement): Boolean = {
+  def addDefinition(decl: ScMember, before: PsiElement): Boolean =
     getNode.addChild(decl.getNode, before.getNode)
     getNode.addChild(
         ScalaPsiElementFactory.createNewLineNode(getManager), before.getNode)
     true
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
@@ -257,9 +243,7 @@ trait ScBlock
       .processDeclarations(processor, state, lastParent, place)
 
   def needCheckExpectedType = true
-}
 
-object ScBlock {
+object ScBlock
   def unapplySeq(block: ScBlock): Option[Seq[ScBlockStatement]] =
     Option(block.statements)
-}

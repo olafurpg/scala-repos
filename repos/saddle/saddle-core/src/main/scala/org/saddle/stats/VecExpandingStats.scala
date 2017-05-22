@@ -24,7 +24,7 @@ import org.saddle.scalar._
   * Expanding statistical methods made available on numeric Vec objects via enrichment.
   * These methods scan over the Vec and compute cumulative values.
   */
-trait VecExpandingStats[@spec(Int, Long, Double) A] {
+trait VecExpandingStats[@spec(Int, Long, Double) A]
 
   /**
     * Cumulative sum; each successive element of the output is the cumulative
@@ -55,9 +55,8 @@ trait VecExpandingStats[@spec(Int, Long, Double) A] {
     * product from the initial element, ignoring NAs.
     */
   def cumProd: Vec[A]
-}
 
-class DoubleExpandingStats(r: Vec[Double]) extends VecExpandingStats[Double] {
+class DoubleExpandingStats(r: Vec[Double]) extends VecExpandingStats[Double]
   private val sd = ScalarTagDouble
 
   def cumSum: Vec[Double] = r.filterScanLeft(sd.notMissing)(0d)(_ + _)
@@ -69,9 +68,8 @@ class DoubleExpandingStats(r: Vec[Double]) extends VecExpandingStats[Double] {
     r.filterScanLeft(sd.notMissing)(sd.negInf)(
         (x: Double, y: Double) => if (x > y) x else y)
   def cumProd: Vec[Double] = r.filterScanLeft(sd.notMissing)(1d)(_ * _)
-}
 
-class IntExpandingStats(r: Vec[Int]) extends VecExpandingStats[Int] {
+class IntExpandingStats(r: Vec[Int]) extends VecExpandingStats[Int]
   private val sa = ScalarTagInt
 
   def cumSum: Vec[Int] = r.filterScanLeft(sa.notMissing)(0)(_ + _)
@@ -83,9 +81,8 @@ class IntExpandingStats(r: Vec[Int]) extends VecExpandingStats[Int] {
     r.filterScanLeft(sa.notMissing)(sa.negInf)(
         (x: Int, y: Int) => if (x > y) x else y)
   def cumProd: Vec[Int] = r.filterScanLeft(sa.notMissing)(1)(_ * _)
-}
 
-class LongExpandingStats(r: Vec[Long]) extends VecExpandingStats[Long] {
+class LongExpandingStats(r: Vec[Long]) extends VecExpandingStats[Long]
   private val sl = ScalarTagLong
 
   def cumSum: Vec[Long] = r.filterScanLeft(sl.notMissing)(0L)(_ + _)
@@ -97,4 +94,3 @@ class LongExpandingStats(r: Vec[Long]) extends VecExpandingStats[Long] {
     r.filterScanLeft(sl.notMissing)(sl.negInf)(
         (x: Long, y: Long) => if (x > y) x else y)
   def cumProd: Vec[Long] = r.filterScanLeft(sl.notMissing)(1L)(_ * _)
-}

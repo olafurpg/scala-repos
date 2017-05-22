@@ -3,7 +3,7 @@ package lila.coordinate
 import lila.db.Types.Coll
 import reactivemongo.bson._
 
-final class CoordinateApi(scoreColl: Coll) {
+final class CoordinateApi(scoreColl: Coll)
 
   private implicit val scoreBSONHandler = Macros.handler[Score]
 
@@ -26,4 +26,3 @@ final class CoordinateApi(scoreColl: Coll) {
               )),
           upsert = true)
       .void
-}

@@ -25,7 +25,7 @@ import scala.xml.Node
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[ui] class HistoryNotFoundPage(parent: MasterWebUI)
-    extends WebUIPage("history/not-found") {
+    extends WebUIPage("history/not-found")
 
   /**
     * Render a page that conveys failure in loading application history.
@@ -37,7 +37,7 @@ private[ui] class HistoryNotFoundPage(parent: MasterWebUI)
     *
     * Parameters "msg" and "exception" are assumed to be UTF-8 encoded.
     */
-  def render(request: HttpServletRequest): Seq[Node] = {
+  def render(request: HttpServletRequest): Seq[Node] =
     val titleParam = request.getParameter("title")
     val msgParam = request.getParameter("msg")
     val exceptionParam = request.getParameter("exception")
@@ -55,18 +55,16 @@ private[ui] class HistoryNotFoundPage(parent: MasterWebUI)
       </div>
 
     val title = Option(titleParam).getOrElse(defaultTitle)
-    val content = Option(msgParam).map { msg =>
+    val content = Option(msgParam).map  msg =>
       URLDecoder.decode(msg, "UTF-8")
-    }.map { msg =>
+    .map  msg =>
       <div class="row-fluid">
           <div class="span12" style="font-size:14px">{msg}</div>
-        </div> ++ Option(exceptionParam).map { e =>
+        </div> ++ Option(exceptionParam).map  e =>
         URLDecoder.decode(e, "UTF-8")
-      }.map { e =>
+      .map  e =>
         <pre>{e}</pre>
-      }.getOrElse(Seq.empty)
-    }.getOrElse(defaultContent)
+      .getOrElse(Seq.empty)
+    .getOrElse(defaultContent)
 
     UIUtils.basicSparkPage(content, title)
-  }
-}

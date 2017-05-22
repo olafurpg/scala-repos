@@ -6,9 +6,9 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class CookieTest extends FunSuite {
+class CookieTest extends FunSuite
 
-  test("mutate underlying") {
+  test("mutate underlying")
     val cookie = new Cookie("name", "value")
     cookie.comment = "hello"
     cookie.commentUrl = "hello.com"
@@ -34,5 +34,3 @@ class CookieTest extends FunSuite {
     assert(cookie.httpOnly == true)
     assert(cookie.isDiscard == false)
     assert(cookie.isSecure == true)
-  }
-}

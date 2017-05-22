@@ -19,7 +19,7 @@ import scala.util.matching.Regex
 import akka.util.ByteString
 import akka.actor._
 
-package object util {
+package object util
   private[http] val UTF8 = Charset.forName("UTF8")
   private[http] val ASCII = Charset.forName("ASCII")
   private[http] val ISO88591 = Charset.forName("ISO-8859-1")
@@ -28,11 +28,10 @@ package object util {
 
   private[http] def actorSystem(
       implicit refFactory: ActorRefFactory): ExtendedActorSystem =
-    refFactory match {
+    refFactory match
       case x: ActorContext ⇒ actorSystem(x.system)
       case x: ExtendedActorSystem ⇒ x
       case _ ⇒ throw new IllegalStateException
-    }
 
   private[http] implicit def enhanceByteArray(
       array: Array[Byte]): EnhancedByteArray = new EnhancedByteArray(array)
@@ -52,74 +51,62 @@ package object util {
 
   private[http] def printEvent[T](marker: String): Flow[T, T, NotUsed] =
     Flow[T].transform(() ⇒
-          new PushPullStage[T, T] {
-        override def onPush(element: T, ctx: Context[T]): SyncDirective = {
+          new PushPullStage[T, T]
+        override def onPush(element: T, ctx: Context[T]): SyncDirective =
           println(s"$marker: $element")
           ctx.push(element)
-        }
-        override def onPull(ctx: Context[T]): SyncDirective = {
+        override def onPull(ctx: Context[T]): SyncDirective =
           println(s"$marker: PULL")
           ctx.pull()
-        }
         override def onUpstreamFailure(
-            cause: Throwable, ctx: Context[T]): TerminationDirective = {
+            cause: Throwable, ctx: Context[T]): TerminationDirective =
           println(s"$marker: Error $cause")
           super.onUpstreamFailure(cause, ctx)
-        }
-        override def onUpstreamFinish(ctx: Context[T]): TerminationDirective = {
+        override def onUpstreamFinish(ctx: Context[T]): TerminationDirective =
           println(s"$marker: Complete")
           super.onUpstreamFinish(ctx)
-        }
         override def onDownstreamFinish(
-            ctx: Context[T]): TerminationDirective = {
+            ctx: Context[T]): TerminationDirective =
           println(s"$marker: Cancel")
           super.onDownstreamFinish(ctx)
-        }
-    })
+    )
 
   private[this] var eventStreamLogger: ActorRef = _
   private[http] def installEventStreamLoggerFor(channel: Class[_])(
-      implicit system: ActorSystem): Unit = {
-    synchronized {
+      implicit system: ActorSystem): Unit =
+    synchronized
       if (eventStreamLogger == null)
         eventStreamLogger = system.actorOf(
             Props[util.EventStreamLogger]().withDeploy(Deploy.local),
             name = "event-stream-logger")
-    }
     system.eventStream.subscribe(eventStreamLogger, channel)
-  }
   private[http] def installEventStreamLoggerFor[T](
       implicit ct: ClassTag[T], system: ActorSystem): Unit =
     installEventStreamLoggerFor(ct.runtimeClass)
 
-  private[http] implicit class AddFutureAwaitResult[T](future: Future[T]) {
+  private[http] implicit class AddFutureAwaitResult[T](future: Future[T])
 
     /** "Safe" Await.result that doesn't throw away half of the stacktrace */
-    def awaitResult(atMost: Duration): T = {
+    def awaitResult(atMost: Duration): T =
       Await.ready(future, atMost)
-      future.value.get match {
+      future.value.get match
         case Success(t) ⇒ t
         case Failure(ex) ⇒
           throw new RuntimeException(
               "Trying to await result of failed Future, see the cause for the original problem.",
               ex)
-      }
-    }
-  }
 
-  private[http] def humanReadableByteCount(bytes: Long, si: Boolean): String = {
+  private[http] def humanReadableByteCount(bytes: Long, si: Boolean): String =
     val unit = if (si) 1000 else 1024
-    if (bytes >= unit) {
+    if (bytes >= unit)
       val exp = (math.log(bytes) / math.log(unit)).toInt
       val pre =
         if (si) "kMGTPE".charAt(exp - 1).toString
         else "KMGTPE".charAt(exp - 1).toString + 'i'
       "%.1f %sB" format (bytes / math.pow(unit, exp), pre)
-    } else bytes.toString + "  B"
-  }
-}
+    else bytes.toString + "  B"
 
-package util {
+package util
 
   import akka.http.scaladsl.model.{ContentType, HttpEntity}
   import akka.stream.impl.fusing.GraphStages.SimpleLinearGraphStage
@@ -131,9 +118,9 @@ package util {
     */
   private[http] final case class MapError[T](
       f: PartialFunction[Throwable, Throwable])
-      extends SimpleLinearGraphStage[T] {
+      extends SimpleLinearGraphStage[T]
     override def createLogic(attr: Attributes) =
-      new GraphStageLogic(shape) with InHandler with OutHandler {
+      new GraphStageLogic(shape) with InHandler with OutHandler
         override def onPush(): Unit = push(out, grab(in))
 
         override def onUpstreamFailure(ex: Throwable): Unit =
@@ -143,12 +130,10 @@ package util {
         override def onPull(): Unit = pull(in)
 
         setHandlers(in, out, this)
-      }
-  }
 
   private[http] class ToStrict(
       timeout: FiniteDuration, contentType: ContentType)
-      extends GraphStage[FlowShape[ByteString, HttpEntity.Strict]] {
+      extends GraphStage[FlowShape[ByteString, HttpEntity.Strict]]
 
     val in = Inlet[ByteString]("in")
     val out = Outlet[HttpEntity.Strict]("out")
@@ -159,57 +144,47 @@ package util {
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
-      new TimerGraphStageLogic(shape) {
+      new TimerGraphStageLogic(shape)
         val bytes = ByteString.newBuilder
         private var emptyStream = false
 
         override def preStart(): Unit =
           scheduleOnce("ToStrictTimeoutTimer", timeout)
 
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
-            if (emptyStream) {
+        setHandler(out, new OutHandler
+          override def onPull(): Unit =
+            if (emptyStream)
               push(out, HttpEntity.Strict(contentType, ByteString.empty))
               completeStage()
-            } else pull(in)
-          }
-        })
+            else pull(in)
+        )
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
+        setHandler(in, new InHandler
+          override def onPush(): Unit =
             bytes ++= grab(in)
             pull(in)
-          }
-          override def onUpstreamFinish(): Unit = {
-            if (isAvailable(out)) {
+          override def onUpstreamFinish(): Unit =
+            if (isAvailable(out))
               push(out, HttpEntity.Strict(contentType, bytes.result()))
               completeStage()
-            } else emptyStream = true
-          }
-        })
+            else emptyStream = true
+        )
 
         override def onTimer(key: Any): Unit =
           failStage(
               new java.util.concurrent.TimeoutException(
                   s"HttpEntity.toStrict timed out after $timeout while still waiting for outstanding data"))
-      }
 
     override def toString = "ToStrict"
-  }
 
-  private[http] class EventStreamLogger extends Actor with ActorLogging {
+  private[http] class EventStreamLogger extends Actor with ActorLogging
     def receive = { case x ⇒ log.warning(x.toString) }
-  }
 
-  private[http] trait LogMessages extends ActorLogging {
+  private[http] trait LogMessages extends ActorLogging
     this: Actor ⇒
     def logMessages(mark: String = "")(r: Receive): Receive =
-      new Receive {
+      new Receive
         def isDefinedAt(x: Any): Boolean = r.isDefinedAt(x)
-        def apply(x: Any): Unit = {
+        def apply(x: Any): Unit =
           log.debug(s"[$mark] received: $x")
           r(x)
-        }
-      }
-  }
-}

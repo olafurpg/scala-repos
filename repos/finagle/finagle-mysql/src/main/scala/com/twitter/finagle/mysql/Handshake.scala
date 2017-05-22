@@ -29,39 +29,36 @@ case object IncompatibleCharset
         "This client is only compatible with UTF-8 and Latin-1 charset encoding"
     )
 
-object Handshake {
+object Handshake
 
   /**
     * A class eligible for configuring a mysql client's credentials during
     * the Handshake phase.
     */
   case class Credentials(username: Option[String], password: Option[String])
-  implicit object Credentials extends Stack.Param[Credentials] {
+  implicit object Credentials extends Stack.Param[Credentials]
     val default = Credentials(None, None)
-  }
 
   /**
     * A class eligible for configuring a mysql client's database during
     * the Handshake phase.
     */
   case class Database(db: Option[String])
-  implicit object Database extends Stack.Param[Database] {
+  implicit object Database extends Stack.Param[Database]
     val default = Database(None)
-  }
 
   /**
     * A class eligible for configuring a mysql client's charset during
     * the Handshake phase.
     */
   case class Charset(charset: Short)
-  implicit object Charset extends Stack.Param[Charset] {
+  implicit object Charset extends Stack.Param[Charset]
     val default = Charset(Utf8_general_ci)
-  }
 
   /**
     * Creates a Handshake from a collection of [[com.twitter.finagle.Stack.Params]].
     */
-  def apply(prms: Stack.Params): Handshake = {
+  def apply(prms: Stack.Params): Handshake =
     val Credentials(u, p) = prms[Credentials]
     val Database(db) = prms[Database]
     val Charset(cs) = prms[Charset]
@@ -71,8 +68,6 @@ object Handshake {
         database = db,
         charset = cs
     )
-  }
-}
 
 /**
   * Bridges a server handshake (HandshakeInit) with a
@@ -106,7 +101,7 @@ case class Handshake(
     charset: Short = Utf8_general_ci,
     maxPacketSize: StorageUnit = 1.gigabyte
 )
-    extends (HandshakeInit => Try[HandshakeResponse]) {
+    extends (HandshakeInit => Try[HandshakeResponse])
   import Capability._
   require(
       maxPacketSize <= 1.gigabyte, "max packet size can't exceed 1 gigabyte")
@@ -123,11 +118,11 @@ case class Handshake(
     if (Charset.isCompatible(init.charset)) Return(true)
     else Throw(IncompatibleCharset)
 
-  def apply(init: HandshakeInit) = {
-    for {
+  def apply(init: HandshakeInit) =
+    for
       _ <- isCompatibleVersion(init)
       _ <- isCompatibleCharset(init)
-    } yield
+    yield
       HandshakeResponse(
           username,
           password,
@@ -138,5 +133,3 @@ case class Handshake(
           charset,
           maxPacketSize.inBytes.toInt
       )
-  }
-}

@@ -18,39 +18,33 @@ class ConnectionHandler(
     broadcaster: ActorRef,
     target: ActorRef
 )
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     broadcaster ! Broadcaster.Register
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     broadcaster ! Broadcaster.Unregister
-  }
 
   // not Receive, thanks to https://issues.scala-lang.org/browse/SI-8861
   // (fixed in 2.11.7)
   def receive: PartialFunction[Any, Unit] =
     receiveRpc orElse LoggingReceive { receiveEvents }
 
-  def receiveRpc: Receive = {
+  def receiveRpc: Receive =
     case req: RpcRequestEnvelope =>
       val handler = RequestHandler(Canonised(req), project, self)
       context.actorOf(handler, s"${req.callId}")
 
     case outgoing: RpcResponseEnvelope =>
       target forward Canonised(outgoing)
-  }
 
-  def receiveEvents: Receive = {
+  def receiveEvents: Receive =
     case outgoing: EnsimeEvent =>
       target forward RpcResponseEnvelope(None, Canonised(outgoing))
-  }
-}
-object ConnectionHandler {
+object ConnectionHandler
   def apply(
       project: ActorRef,
       broadcaster: ActorRef,
       target: ActorRef
   ): Props = Props(classOf[ConnectionHandler], project, broadcaster, target)
-}

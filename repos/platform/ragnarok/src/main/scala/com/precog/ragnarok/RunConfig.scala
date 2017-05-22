@@ -38,35 +38,30 @@ case class RunConfig(
     rootDir: Option[File] = None,
     ingest: List[(String, File)] = Nil,
     queryTimeout: Int = 5 * 60,
-    output: Option[File] = None) {
+    output: Option[File] = None)
   def tails: Int = (runs * (outliers / 2)).toInt
-}
 
-object RunConfig {
+object RunConfig
 
   sealed trait OutputFormat
-  object OutputFormat {
+  object OutputFormat
     case object Json extends OutputFormat
     case object Legible extends OutputFormat
-  }
 
-  implicit object semigroup extends Semigroup[RunConfig] {
+  implicit object semigroup extends Semigroup[RunConfig]
     def append(a: RunConfig, b: => RunConfig) = b
-  }
 
   val NonNegativeInt = """([0-9]+)""".r
   val PositiveInt = """([1-9][0-9]*)""".r
 
-  object OutlierPercentage {
+  object OutlierPercentage
     def unapply(str: String): Option[Double] =
-      try {
+      try
         val p = str.toDouble
         if (p >= 0.0 && p < 0.5) Some(p) else None
-      } catch {
+      catch
         case _: NumberFormatException =>
           None
-      }
-  }
 
   def fromCommandLine(args: Array[String]): ValidationNel[String, RunConfig] =
     fromCommandLine(args.toList)
@@ -75,29 +70,27 @@ object RunConfig {
   def fromCommandLine(
       args: List[String],
       config: ValidationNel[String, RunConfig] = RunConfig().successNel)
-    : ValidationNel[String, RunConfig] = args match {
+    : ValidationNel[String, RunConfig] = args match
     case Nil =>
       config
 
     case "--baseline" :: file :: args =>
       val f = new File(file)
-      if (f.isFile && f.canRead) {
+      if (f.isFile && f.canRead)
         fromCommandLine(args, config map (_.copy(baseline = Some(f))))
-      } else {
+      else
         fromCommandLine(
             args,
             config *> "The baseline file must be regular and readable.".failureNel)
-      }
 
     case "--output" :: file :: args =>
       val f = new File(file)
-      if (f.canWrite || !f.exists) {
+      if (f.canWrite || !f.exists)
         fromCommandLine(args, config map (_.copy(output = Some(f))))
-      } else {
+      else
         fromCommandLine(
             args,
             config *> "The output file must be regular and writable.".failureNel)
-      }
 
     case "--json" :: args =>
       fromCommandLine(args, config map (_.copy(format = OutputFormat.Json)))
@@ -134,9 +127,9 @@ object RunConfig {
           args, config map (_.copy(rootDir = Some(new File(rootDir)))))
 
     case "--ingest" :: db :: file :: args =>
-      fromCommandLine(args, config map { cfg =>
+      fromCommandLine(args, config map  cfg =>
         cfg.copy(ingest = cfg.ingest :+ (db -> new File(file)))
-      })
+      )
 
     case "--timeout" :: NonNegativeInt(to) :: args =>
       fromCommandLine(args, config map (_.copy(queryTimeout = to.toInt)))
@@ -147,16 +140,13 @@ object RunConfig {
           config *> "The argument to --timeout must be a non-negative number".failureNel)
 
     case test :: args =>
-      fromCommandLine(args, config map { config =>
-        val g = { (path: List[String], _: Any) =>
+      fromCommandLine(args, config map  config =>
+        val g =  (path: List[String], _: Any) =>
           path contains test
-        }
         val select =
-          config.select map { f => (path: List[String], test: PerfTest) =>
+          config.select map  f => (path: List[String], test: PerfTest) =>
             (f(path, test) || g(path, test))
-          } orElse Some(g)
+          orElse Some(g)
 
         config.copy(select = select)
-      })
-  }
-}
+      )

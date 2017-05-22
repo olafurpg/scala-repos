@@ -8,24 +8,20 @@ import org.scalatest.exceptions.TestFailedException
 import org.scalatest.{BeforeAndAfterAll, Suite}
 
 //# source-quote
-trait TestFrameworkInterface {
+trait TestFrameworkInterface
 
   def cleanUp()
 
   def failTest(msg: String): Nothing
-}
 //#
 
-object TestFrameworkInterface {
+object TestFrameworkInterface
 
-  trait Scalatest extends TestFrameworkInterface with BeforeAndAfterAll {
+  trait Scalatest extends TestFrameworkInterface with BeforeAndAfterAll
     this: Suite ⇒
 
     def failTest(msg: String) = throw new TestFailedException(msg, 11)
 
-    abstract override protected def afterAll(): Unit = {
+    abstract override protected def afterAll(): Unit =
       cleanUp()
       super.afterAll()
-    }
-  }
-}

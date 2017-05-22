@@ -19,18 +19,17 @@ import scala.io.Source
 /**
   * Pavel.Fatin, 14.01.2010
   */
-abstract class LineMarkerTestBase extends LightCodeInsightFixtureTestCase {
+abstract class LineMarkerTestBase extends LightCodeInsightFixtureTestCase
   val marker = "// -"
 
   protected override def getBasePath =
     TestUtils.getTestDataPath + "/methodSeparator/"
 
-  override def setUp() = {
+  override def setUp() =
     super.setUp()
     myFixture.setTestDataPath(getBasePath)
-  }
 
-  def doTest() = {
+  def doTest() =
     val path = getBasePath + getTestName(false) + ".test"
     val input = Source.fromFile(new File(path)).getLines().mkString("\n")
     myFixture.configureByText(
@@ -42,21 +41,17 @@ abstract class LineMarkerTestBase extends LightCodeInsightFixtureTestCase {
     val expected = getSeparatorsFrom(input)
     val actual = getSeparatorsFrom(myFixture.getEditor, myFixture.getProject)
     assertEquals(expected.mkString(", "), actual.mkString(", "))
-  }
 
-  def getSeparatorsFrom(text: String) = {
+  def getSeparatorsFrom(text: String) =
     for { (line, i) <- text.split("\n").zipWithIndex if line.contains(marker) } yield
       i + 1
-  }
 
-  def getSeparatorsFrom(editor: Editor, project: Project) = {
-    val separators = for {
+  def getSeparatorsFrom(editor: Editor, project: Project) =
+    val separators = for
       each <- DaemonCodeAnalyzerImpl.getLineMarkers(
                  editor.getDocument, project)
                  if each.separatorPlacement == SeparatorPlacement.TOP
       index = editor.getDocument.getLineNumber(
           each.getElement.getTextRange.getStartOffset)
-    } yield index + 1
+    yield index + 1
     separators.sortWith(_ < _)
-  }
-}

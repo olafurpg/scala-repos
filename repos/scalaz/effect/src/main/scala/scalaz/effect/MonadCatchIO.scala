@@ -1,17 +1,15 @@
 package scalaz
 package effect
 
-trait MonadCatchIO[M[_]] extends MonadIO[M] {
+trait MonadCatchIO[M[_]] extends MonadIO[M]
 
   /** Executes the handler if an exception is raised. */
   def except[A](ma: M[A])(handler: Throwable => M[A]): M[A]
-}
 
-object MonadCatchIO extends MonadCatchIOFunctions {
+object MonadCatchIO extends MonadCatchIOFunctions
   @inline def apply[M[_]](implicit M: MonadCatchIO[M]): MonadCatchIO[M] = M
-}
 
-sealed abstract class MonadCatchIOFunctions {
+sealed abstract class MonadCatchIOFunctions
   def except[M[_], A](ma: M[A])(handler: Throwable => M[A])(
       implicit M: MonadCatchIO[M]): M[A] =
     M.except(ma)(handler)
@@ -26,10 +24,10 @@ sealed abstract class MonadCatchIOFunctions {
       p: Throwable => Option[B], handler: B => M[A]): M[A] =
     except(ma)(
         e =>
-          p(e) match {
+          p(e) match
         case Some(z) => handler(z)
         case None => throw e
-    })
+    )
 
   /**
     * Returns a disjunction result which is right if no exception was raised, or left if an
@@ -48,25 +46,25 @@ sealed abstract class MonadCatchIOFunctions {
   def onException[M[_]: MonadCatchIO, A, B](ma: M[A], action: M[B]): M[A] =
     except(ma)(
         e =>
-          for {
+          for
         _ <- action
         a <- (throw e): M[A]
-      } yield a)
+      yield a)
 
   def bracket[M[_]: MonadCatchIO, A, B, C](before: M[A])(
       after: A => M[B])(during: A => M[C]): M[C] =
-    for {
+    for
       a <- before
       r <- onException(during(a), after(a))
       _ <- after(a)
-    } yield r
+    yield r
 
   /**Like "bracket", but takes only a computation to run afterward. Generalizes "finally". */
   def ensuring[M[_]: MonadCatchIO, A, B](ma: M[A], sequel: M[B]): M[A] =
-    for {
+    for
       r <- onException(ma, sequel)
       _ <- sequel
-    } yield r
+    yield r
 
   /**A variant of "bracket" where the return value of this computation is not needed. */
   def bracket_[M[_]: MonadCatchIO, A, B, C](before: M[A])(after: M[B])(
@@ -76,10 +74,10 @@ sealed abstract class MonadCatchIOFunctions {
   /**A variant of "bracket" that performs the final action only if there was an error. */
   def bracketOnError[M[_]: MonadCatchIO, A, B, C](before: M[A])(
       after: A => M[B])(during: A => M[C]): M[C] =
-    for {
+    for
       a <- before
       r <- onException(during(a), after(a))
-    } yield r
+    yield r
 
   /** An automatic resource management. */
   def using[M[_], A, B](ma: M[A])(f: A => M[B])(
@@ -89,10 +87,8 @@ sealed abstract class MonadCatchIOFunctions {
   implicit def KleisliMonadCatchIO[F[_], R](
       implicit F: MonadCatchIO[F]): MonadCatchIO[Kleisli[F, R, ?]] =
     new MonadCatchIO[Kleisli[F, R, ?]]
-    with MonadIO.FromLiftIO[Kleisli[F, R, ?]] {
+    with MonadIO.FromLiftIO[Kleisli[F, R, ?]]
       def FM = MonadIO.kleisliMonadIO[F, R]
       def FLO = MonadIO.kleisliMonadIO[F, R]
       def except[A](k: Kleisli[F, R, A])(h: Throwable => Kleisli[F, R, A]) =
         Kleisli(r => F.except(k.run(r))(t => h(t).run(r)))
-    }
-}

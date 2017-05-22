@@ -40,7 +40,7 @@ class ErrorFormatter(showExpected: Boolean = true,
                      showTraces: Boolean = false,
                      showFrameStartOffset: Boolean = true,
                      expandTabs: Int = -1,
-                     traceCutOff: Int = 120) {
+                     traceCutOff: Int = 120)
 
   /**
     * Formats the given [[ParseError]] into a String using the settings configured for this formatter instance.
@@ -54,7 +54,7 @@ class ErrorFormatter(showExpected: Boolean = true,
     */
   def format(sb: JStringBuilder,
              error: ParseError,
-             input: ParserInput): JStringBuilder = {
+             input: ParserInput): JStringBuilder =
     formatProblem(sb, error, input)
     import error._
     if (showExpected) formatExpected(sb, error)
@@ -67,7 +67,6 @@ class ErrorFormatter(showExpected: Boolean = true,
     if (showLine) formatErrorLine(sb.append(':').append('\n'), error, input)
     if (showTraces) sb.append('\n').append('\n').append(formatTraces(error))
     else sb
-  }
 
   /**
     * Formats a description of the error's cause into a single line String.
@@ -80,9 +79,9 @@ class ErrorFormatter(showExpected: Boolean = true,
     */
   def formatProblem(sb: JStringBuilder,
                     error: ParseError,
-                    input: ParserInput): JStringBuilder = {
+                    input: ParserInput): JStringBuilder =
     val ix = error.position.index
-    if (ix < input.length) {
+    if (ix < input.length)
       val chars = mismatchLength(error)
       if (chars == 1)
         sb.append("Invalid input '")
@@ -92,8 +91,7 @@ class ErrorFormatter(showExpected: Boolean = true,
         sb.append("Invalid input \"")
           .append(CharUtils.escape(input.sliceString(ix, ix + chars)))
           .append('"')
-    } else sb.append("Unexpected end of input")
-  }
+    else sb.append("Unexpected end of input")
 
   /**
     * Determines the number of characters to be shown as "mismatched" for the given [[ParseError]].
@@ -104,17 +102,15 @@ class ErrorFormatter(showExpected: Boolean = true,
     // reaches further than the PEL. In these cases we want to show the complete inner match as "mismatched",
     // not just the piece up to the PEL. This is what this method corrects for.
     error.effectiveTraces
-      .foldLeft(error.principalPosition.index - error.position.index + 1) {
+      .foldLeft(error.principalPosition.index - error.position.index + 1)
       (len, trace) ⇒
         import RuleTrace._
-        trace.terminal match {
+        trace.terminal match
           case NotPredicate(_, x) ⇒
-            math.max(trace.prefix.collectFirst {
+            math.max(trace.prefix.collectFirst
               case NonTerminal(Atomic, off) ⇒ off + x
-            } getOrElse x, len)
+            getOrElse x, len)
           case _ ⇒ len
-        }
-    }
 
   /**
     * Formats what is expected at the error location into a single line String including text padding.
@@ -138,25 +134,22 @@ class ErrorFormatter(showExpected: Boolean = true,
     * Formats what is expected at the error location into the given StringBuilder.
     */
   def formatExpectedAsString(
-      sb: JStringBuilder, error: ParseError): JStringBuilder = {
+      sb: JStringBuilder, error: ParseError): JStringBuilder =
     @tailrec def rec(remaining: List[String]): JStringBuilder =
-      remaining match {
+      remaining match
         case Nil ⇒ sb.append("???")
         case head :: Nil ⇒ sb.append(head)
         case head :: last :: Nil ⇒ sb.append(head).append(" or ").append(last)
         case head :: tail ⇒ sb.append(head).append(", "); rec(tail)
-      }
     rec(formatExpectedAsList(error))
-  }
 
   /**
     * Formats what is expected at the error location as a [[List]] of Strings.
     */
-  def formatExpectedAsList(error: ParseError): List[String] = {
+  def formatExpectedAsList(error: ParseError): List[String] =
     val distinctStrings: Set[String] =
       error.effectiveTraces.map(formatAsExpected)(collection.breakOut)
     distinctStrings.toList
-  }
 
   /**
     * Formats the given trace into an "expected" string.
@@ -178,40 +171,37 @@ class ErrorFormatter(showExpected: Boolean = true,
     */
   def formatErrorLine(sb: JStringBuilder,
                       error: ParseError,
-                      input: ParserInput): JStringBuilder = {
+                      input: ParserInput): JStringBuilder =
     import error.position._
     val (expandedCol, expandedLine) = expandErrorLineTabs(
         input getLine line, column)
     sb.append(expandedLine).append('\n')
     for (i ← 1 until expandedCol) sb.append(' ')
     sb.append('^')
-  }
 
   /**
     * Performs tab expansion as configured by the `expandTabs` member.
     * The `errorColumn` as well as the returned [[Int]] value are both 1-based.
     */
-  def expandErrorLineTabs(line: String, errorColumn: Int): (Int, String) = {
+  def expandErrorLineTabs(line: String, errorColumn: Int): (Int, String) =
     val sb = new StringBuilder
     @tailrec def rec(inCol: Int, errorCol: Int): Int =
-      if (inCol < line.length) {
+      if (inCol < line.length)
         val ec = if (inCol == errorColumn - 1) sb.length else errorCol
-        line.charAt(inCol) match {
+        line.charAt(inCol) match
           case '\t' ⇒
             sb.append(new String(Array.fill[Char](
                         expandTabs - (sb.length % expandTabs))(' ')))
           case c ⇒ sb.append(c)
-        }
         rec(inCol + 1, ec)
-      } else errorCol + 1
+      else errorCol + 1
     if (expandTabs >= 0) rec(0, 0) -> sb.toString()
     else errorColumn -> line
-  }
 
   /**
     * Formats a [[Vector]] of [[RuleTrace]] instances into a String.
     */
-  def formatTraces(error: ParseError): String = {
+  def formatTraces(error: ParseError): String =
     import error._
     traces
       .map(formatTrace(_, position.index))
@@ -219,12 +209,11 @@ class ErrorFormatter(showExpected: Boolean = true,
                 " mismatched at error location:\n  ",
                 "\n  ",
                 "\n")
-  }
 
   /**
     * Formats a [[RuleTrace]] into a String.
     */
-  def formatTrace(trace: RuleTrace, errorIndex: Int): String = {
+  def formatTrace(trace: RuleTrace, errorIndex: Int): String =
     import RuleTrace._
     val sb = new JStringBuilder
     val doSep: String ⇒ JStringBuilder = sb.append
@@ -235,7 +224,7 @@ class ErrorFormatter(showExpected: Boolean = true,
     def rec(remainingPrefix: List[RuleTrace.NonTerminal],
             names: List[String],
             sep: String ⇒ JStringBuilder): JStringBuilder =
-      remainingPrefix match {
+      remainingPrefix match
         case NonTerminal(Named(name), _) :: tail ⇒
           rec(tail, name :: names, sep)
         case NonTerminal(RuleCall, _) :: tail ⇒
@@ -253,22 +242,20 @@ class ErrorFormatter(showExpected: Boolean = true,
           sep(" / ")
             .append(render(names, ":"))
             .append(formatTerminal(trace.terminal))
-      }
     rec(trace.prefix, Nil, dontSep)
     if (sb.length > traceCutOff)
       "..." + sb.substring(math.max(sb.length - traceCutOff - 3, 0))
     else sb.toString
-  }
 
   /**
     * Formats the head element of a [[RuleTrace]] into a String.
     */
   def formatNonTerminal(
       nonTerminal: RuleTrace.NonTerminal,
-      showFrameStartOffset: Boolean = showFrameStartOffset): String = {
+      showFrameStartOffset: Boolean = showFrameStartOffset): String =
     import RuleTrace._
     import CharUtils.escape
-    val keyString = nonTerminal.key match {
+    val keyString = nonTerminal.key match
       case Action ⇒ "<action>"
       case Atomic ⇒ "atomic"
       case AndPredicate ⇒ "&"
@@ -288,15 +275,13 @@ class ErrorFormatter(showExpected: Boolean = true,
       case x: StringMatch ⇒ '"' + escape(x.string) + '"'
       case x: Times ⇒ "times"
       case ZeroOrMore ⇒ "*"
-    }
     if (nonTerminal.offset != 0 && showFrameStartOffset)
       keyString + ':' + nonTerminal.offset else keyString
-  }
 
-  def formatTerminal(terminal: RuleTrace.Terminal): String = {
+  def formatTerminal(terminal: RuleTrace.Terminal): String =
     import RuleTrace._
     import CharUtils.escape
-    terminal match {
+    terminal match
       case ANY ⇒ "ANY"
       case AnyOf(s) ⇒ '[' + escape(s) + ']'
       case CharMatch(c) ⇒ "'" + escape(c) + '\''
@@ -310,6 +295,3 @@ class ErrorFormatter(showExpected: Boolean = true,
       case NotPredicate(NotPredicate.Named(n), _) ⇒ "!" + n
       case NotPredicate(NotPredicate.Anonymous, _) ⇒ "!<anon>"
       case SemanticPredicate ⇒ "test"
-    }
-  }
-}

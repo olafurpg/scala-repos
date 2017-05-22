@@ -16,7 +16,6 @@
   */
 package kafka.utils
 
-object Os {
+object Os
   val name = System.getProperty("os.name").toLowerCase
   val isWindows = name.startsWith("windows")
-}

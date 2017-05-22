@@ -1,8 +1,8 @@
 package scalaz
 
-object IdTTest extends SpecLite {
+object IdTTest extends SpecLite
 
-  object instances {
+  object instances
     def equal[F[_], A](implicit F: Equal[F[A]]) = Equal[IdT[F, A]]
     def order[F[_], A](implicit F: Order[F[A]]) = Order[IdT[F, A]]
     def functor[F[_]: Functor] = Functor[IdT[F, ?]]
@@ -26,5 +26,3 @@ object IdTTest extends SpecLite {
     def apply[F[_]: ApplicativePlus : BindRec] = Apply[IdT[F, ?]]
     def apply[F[_]: Monad : BindRec] = Apply[IdT[F, ?]]
     def foldable[F[_]: Traverse] = Foldable[IdT[F, ?]]
-  }
-}

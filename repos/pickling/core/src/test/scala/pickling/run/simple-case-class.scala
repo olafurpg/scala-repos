@@ -5,8 +5,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 
 case class Person(name: String, age: Int)
 
-class SimpleCaseClassTest extends FunSuite {
-  test("main") {
+class SimpleCaseClassTest extends FunSuite
+  test("main")
     val expectedPickle = """
     |{
     |  "$type": "scala.pickling.simple.case.class.Person",
@@ -19,5 +19,3 @@ class SimpleCaseClassTest extends FunSuite {
     val pickle = person.pickle
     assert(pickle.value === expectedPickle)
     assert(pickle.unpickle[Person] === person)
-  }
-}

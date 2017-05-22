@@ -16,7 +16,7 @@ import scala.collection.mutable
   *  @author Martin Odersky
   *  @version 2.10
   */
-abstract class ExtensionMethods extends Transform with TypingTransformers {
+abstract class ExtensionMethods extends Transform with TypingTransformers
 
   import global._ // the global environment
   import definitions._ // standard classes and methods
@@ -37,7 +37,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     *  in `extensionMethod` if the first name has the wrong type. We thereby gain a level of insensitivity
     *  of how overloaded types are ordered between phases and picklings.
     */
-  private def extensionNames(imeth: Symbol): Stream[Name] = {
+  private def extensionNames(imeth: Symbol): Stream[Name] =
     val decl = imeth.owner.info.decl(imeth.name)
 
     // Bridge generation is done at phase `erasure`, but new scopes are only generated
@@ -48,7 +48,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     // must do the filtering here.
     val declTypeNoBridge = decl.filter(sym => !sym.isBridge).tpe
 
-    declTypeNoBridge match {
+    declTypeNoBridge match
       case OverloadedType(_, alts) =>
         val index = alts indexOf imeth
         assert(index >= 0, alts + " does not contain " + imeth)
@@ -61,17 +61,14 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
                imeth.name + " not found in " + imeth.owner + "'s decls: " +
                imeth.owner.info.decls)
         Stream(newTermName(imeth.name + "$extension"))
-    }
-  }
 
-  private def companionModuleForce(sym: Symbol) = {
+  private def companionModuleForce(sym: Symbol) =
     sym.andAlso(_.owner.initialize) // See SI-6976. `companionModule` only calls `rawInfo`. (Why?)
     sym.companionModule
-  }
 
   /** Return the extension method that corresponds to given instance method `meth`. */
   def extensionMethod(imeth: Symbol): Symbol =
-    enteringPhase(currentRun.refchecksPhase) {
+    enteringPhase(currentRun.refchecksPhase)
       val companionInfo = companionModuleForce(imeth.owner).info
       val candidates =
         extensionNames(imeth) map (companionInfo.decl(_)) filter (_.exists)
@@ -88,13 +85,12 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
            |
            | Candidates (signatures normalized):
            |
-           | ${candidates
+           | $candidates
         .map(c => c.name + ":" + normalize(c.tpe, imeth.owner))
-        .mkString("\n")}
+        .mkString("\n")
            |
            | Eligible Names: ${extensionNames(imeth).mkString(",")}" """)
       matching.head
-    }
 
   /** Recognize a MethodType which represents an extension method.
     *
@@ -104,14 +100,12 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     *  list with `$this` as the first parameter, in which case that parameter is
     *  removed from the list.
     */
-  object ExtensionMethodType {
-    def unapply(tp: Type) = tp match {
+  object ExtensionMethodType
+    def unapply(tp: Type) = tp match
       case MethodType(thiz :: rest, restpe) if thiz.name == nme.SELF =>
         Some((thiz, if (rest.isEmpty) restpe else MethodType(rest, restpe)))
       case _ =>
         None
-    }
-  }
 
   /** This method removes the `$this` argument from the parameter list a method.
     *
@@ -119,7 +113,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
     *  type params from its nested `MethodType`.  Or it may be a MethodType, as
     *  described at the ExtensionMethodType extractor.
     */
-  private def normalize(stpe: Type, clazz: Symbol): Type = stpe match {
+  private def normalize(stpe: Type, clazz: Symbol): Type = stpe match
     case PolyType(tparams, restpe) =>
       // method type parameters, class type parameters
       val (mtparams, ctparams) =
@@ -131,19 +125,17 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       etpe.substituteTypes(thiz :: Nil, clazz.thisType :: Nil)
     case _ =>
       stpe
-  }
 
-  class Extender(unit: CompilationUnit) extends TypingTransformer(unit) {
+  class Extender(unit: CompilationUnit) extends TypingTransformer(unit)
     private val extensionDefs = mutable.Map[Symbol, mutable.ListBuffer[Tree]]()
 
     def checkNonCyclic(pos: Position, seen: Set[Symbol], clazz: Symbol): Unit =
       if (seen contains clazz)
         reporter.error(pos, "value class may not unbox to itself")
-      else {
+      else
         val unboxed = definitions.underlyingOfValueClass(clazz).typeSymbol
         if (unboxed.isDerivedValueClass)
           checkNonCyclic(pos, seen + clazz, unboxed)
-      }
 
     /** We will need to clone the info of the original method (which obtains clones
       *  of the method type parameters), clone the type parameters of the value class,
@@ -162,7 +154,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       *  some higher level facilities.
       */
     def extensionMethInfo(
-        extensionMeth: Symbol, origInfo: Type, clazz: Symbol): Type = {
+        extensionMeth: Symbol, origInfo: Type, clazz: Symbol): Type =
       val GenPolyType(tparamsFromMethod, methodResult) =
         origInfo cloneInfo extensionMeth
       // Start with the class type parameters - clones will be method type parameters
@@ -203,12 +195,11 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       //
       //  bad: [B#16154 >: A#16149, A#16155 <: AnyRef#2189]($this#16156: Foo#6965[A#16155])(x#16157: B#16154)List#2457[B#16154]
       // good: [B#16151 >: A#16149, A#16149 <: AnyRef#2189]($this#16150: Foo#6965[A#16149])(x#16153: B#16151)List#2457[B#16151]
-    }
 
-    override def transform(tree: Tree): Tree = {
-      tree match {
+    override def transform(tree: Tree): Tree =
+      tree match
         case Template(_, _, _) =>
-          if (currentOwner.isDerivedValueClass) {
+          if (currentOwner.isDerivedValueClass)
             /* This is currently redundant since value classes may not
              wrap over other value classes anyway.
             checkNonCyclic(currentOwner.pos, Set(), currentOwner) */
@@ -220,9 +211,9 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
               .filter(sym => sym.isParamAccessor && sym.isMethod)
             paramAccessors.foreach(_.makeNotPrivate(currentOwner))
             super.transform(tree)
-          } else if (currentOwner.isStaticOwner) {
+          else if (currentOwner.isStaticOwner)
             super.transform(tree)
-          } else tree
+          else tree
         case DefDef(_, _, tparams, vparamss, _, rhs)
             if tree.symbol.isMethodWithExtension =>
           val origMeth = tree.symbol
@@ -232,7 +223,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           val origParams = vparamss.flatten map (_.symbol)
           val companion = origThis.companionModule
 
-          def makeExtensionMethodSymbol = {
+          def makeExtensionMethodSymbol =
             val extensionName = extensionNames(origMeth).head.toTermName
             val extensionMeth =
               (companion.moduleClass.newMethod(
@@ -241,7 +232,6 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
                       origMeth.flags & ~OVERRIDE & ~PROTECTED & ~PRIVATE & ~LOCAL | FINAL) setAnnotations origMeth.annotations)
             origMeth.removeAnnotation(TailrecClass) // it's on the extension method, now.
             companion.info.decls.enter(extensionMeth)
-          }
 
           val extensionMeth = makeExtensionMethodSymbol
           val newInfo = extensionMethInfo(
@@ -256,7 +246,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
           val extensionThis =
             gen.mkAttributedStableRef(thiz setPos extensionMeth.pos)
 
-          val extensionBody: Tree = {
+          val extensionBody: Tree =
             val tree = rhs
               .substituteSymbols(origTpeParams, extensionTpeParams)
               .substituteSymbols(origParams, extensionParams)
@@ -264,7 +254,6 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
               .changeOwner(origMeth -> extensionMeth)
             new SubstututeRecursion(origMeth, extensionMeth, unit)
               .transform(tree)
-          }
           val castBody =
             if (extensionBody.tpe <:< extensionMono.finalResultType)
               extensionBody
@@ -297,34 +286,29 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
               ))
         case _ =>
           super.transform(tree)
-      }
-    }
 
     override def transformStats(
         stats: List[Tree], exprOwner: Symbol): List[Tree] =
-      super.transformStats(stats, exprOwner) map {
+      super.transformStats(stats, exprOwner) map
         case md @ ModuleDef(_, _, _) =>
-          val extraStats = extensionDefs remove md.symbol match {
+          val extraStats = extensionDefs remove md.symbol match
             case Some(defns) =>
               defns.toList map
               (defn =>
                     atOwner(md.symbol)(
                         localTyper.typedPos(md.pos.focus)(defn.duplicate)))
             case _ => Nil
-          }
           if (extraStats.isEmpty) md
           else
             deriveModuleDef(md)(tmpl => deriveTemplate(tmpl)(_ ++ extraStats))
         case stat =>
           stat
-      }
-  }
 
   final class SubstututeRecursion(origMeth: Symbol,
                                   extensionMeth: Symbol,
                                   unit: CompilationUnit)
-      extends TypingTransformer(unit) {
-    override def transform(tree: Tree): Tree = tree match {
+      extends TypingTransformer(unit)
+    override def transform(tree: Tree): Tree = tree match
       // SI-6574 Rewrite recursive calls against the extension method so they can
       //         be tail call optimized later. The tailcalls phases comes before
       //         erasure, which performs this translation more generally at all call
@@ -339,7 +323,7 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
       //                        = { meth$extension[M', C']({ <expr>: C[C'] })(a1) } }
       case treeInfo.Applied(sel @ Select(qual, _), targs, argss)
           if sel.symbol == origMeth =>
-        localTyper.typedPos(tree.pos) {
+        localTyper.typedPos(tree.pos)
           val allArgss = List(qual) :: argss
           val origThis = extensionMeth.owner.companionClass
           val baseType = qual.tpe.baseType(origThis)
@@ -349,8 +333,4 @@ abstract class ExtensionMethods extends Transform with TypingTransformers {
               extensionMeth,
               allTargs)
           allArgss.foldLeft(fun)(Apply(_, _))
-        }
       case _ => super.transform(tree)
-    }
-  }
-}

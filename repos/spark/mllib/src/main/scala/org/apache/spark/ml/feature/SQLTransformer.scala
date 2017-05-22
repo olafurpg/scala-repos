@@ -41,7 +41,7 @@ import org.apache.spark.sql.types.StructType
 @Experimental
 @Since("1.6.0")
 class SQLTransformer @Since("1.6.0")(override val uid: String)
-    extends Transformer with DefaultParamsWritable {
+    extends Transformer with DefaultParamsWritable
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("sql"))
@@ -65,16 +65,15 @@ class SQLTransformer @Since("1.6.0")(override val uid: String)
   private val tableIdentifier: String = "__THIS__"
 
   @Since("1.6.0")
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val tableName = Identifiable.randomUID(uid)
     dataset.registerTempTable(tableName)
     val realStatement = $(statement).replace(tableIdentifier, tableName)
     val outputDF = dataset.sqlContext.sql(realStatement)
     outputDF
-  }
 
   @Since("1.6.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val sc = SparkContext.getOrCreate()
     val sqlContext = SQLContext.getOrCreate(sc)
     val dummyRDD = sc.parallelize(Seq(Row.empty))
@@ -82,15 +81,12 @@ class SQLTransformer @Since("1.6.0")(override val uid: String)
     dummyDF.registerTempTable(tableIdentifier)
     val outputSchema = sqlContext.sql($(statement)).schema
     outputSchema
-  }
 
   @Since("1.6.0")
   override def copy(extra: ParamMap): SQLTransformer = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object SQLTransformer extends DefaultParamsReadable[SQLTransformer] {
+object SQLTransformer extends DefaultParamsReadable[SQLTransformer]
 
   @Since("1.6.0")
   override def load(path: String): SQLTransformer = super.load(path)
-}

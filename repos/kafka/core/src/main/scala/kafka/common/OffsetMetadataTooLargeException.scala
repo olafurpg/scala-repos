@@ -21,6 +21,5 @@ package kafka.common
   * maximum size in bytes
   */
 class OffsetMetadataTooLargeException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

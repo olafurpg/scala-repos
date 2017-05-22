@@ -27,9 +27,8 @@ import org.apache.spark.util.Utils
 
 private[spark] class PartitionwiseSampledRDDPartition(
     val prev: Partition, val seed: Long)
-    extends Partition with Serializable {
+    extends Partition with Serializable
   override val index: Int = prev.index
-}
 
 /**
   * A RDD sampled from its parent RDD partition-wise. For each partition of the parent RDD,
@@ -49,25 +48,22 @@ private[spark] class PartitionwiseSampledRDD[T : ClassTag, U : ClassTag](
     sampler: RandomSampler[T, U],
     preservesPartitioning: Boolean,
     @transient private val seed: Long = Utils.random.nextLong)
-    extends RDD[U](prev) {
+    extends RDD[U](prev)
 
   @transient override val partitioner =
     if (preservesPartitioning) prev.partitioner else None
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     val random = new Random(seed)
     firstParent[T].partitions
       .map(x => new PartitionwiseSampledRDDPartition(x, random.nextLong()))
-  }
 
   override def getPreferredLocations(split: Partition): Seq[String] =
     firstParent[T].preferredLocations(
         split.asInstanceOf[PartitionwiseSampledRDDPartition].prev)
 
-  override def compute(splitIn: Partition, context: TaskContext): Iterator[U] = {
+  override def compute(splitIn: Partition, context: TaskContext): Iterator[U] =
     val split = splitIn.asInstanceOf[PartitionwiseSampledRDDPartition]
     val thisSampler = sampler.clone
     thisSampler.setSeed(split.seed)
     thisSampler.sample(firstParent[T].iterator(split.prev, context))
-  }
-}

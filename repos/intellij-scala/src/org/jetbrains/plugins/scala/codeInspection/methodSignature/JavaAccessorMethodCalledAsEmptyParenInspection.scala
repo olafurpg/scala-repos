@@ -15,17 +15,17 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.CollectMethodsProcesso
 class JavaAccessorMethodCalledAsEmptyParenInspection
     extends AbstractMethodSignatureInspection(
         "ScalaJavaAccessorMethodCalledAsEmptyParen",
-        "Java accessor method called as empty-paren") {
+        "Java accessor method called as empty-paren")
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case e: ScReferenceExpression =>
-      e.getParent match {
+      e.getParent match
         case call: ScMethodCall =>
-          call.getParent match {
+          call.getParent match
             case callParent: ScMethodCall => // do nothing
             case _ =>
-              if (call.argumentExpressions.isEmpty) {
-                e.resolve() match {
+              if (call.argumentExpressions.isEmpty)
+                e.resolve() match
                   case _: ScalaPsiElement => // do nothing
                   case (m: PsiMethod)
                       if m.isAccessor && !isOverloadedMethod(e) &&
@@ -34,27 +34,18 @@ class JavaAccessorMethodCalledAsEmptyParenInspection
                                            getDisplayName,
                                            new RemoveCallParentheses(call))
                   case _ =>
-                }
-              }
-          }
         case _ =>
-      }
-  }
 
-  private def isOverloadedMethod(ref: ScReferenceExpression) = {
+  private def isOverloadedMethod(ref: ScReferenceExpression) =
     val processor = new CollectMethodsProcessor(ref, ref.refName)
     ref.bind().flatMap(_.fromType).forall(processor.processType(_, ref))
     processor.candidatesS.size > 1
-  }
 
-  private def hasSameType(call: ScMethodCall, ref: ScReferenceExpression) = {
+  private def hasSameType(call: ScMethodCall, ref: ScReferenceExpression) =
     val callType = call.getType().toOption
     val refType = ref
       .getType()
       .toOption
-      (callType, refType) match {
+      (callType, refType) match
       case (Some(t1), Some(t2)) => t1.equiv(t2)
       case _ => false
-    }
-  }
-}

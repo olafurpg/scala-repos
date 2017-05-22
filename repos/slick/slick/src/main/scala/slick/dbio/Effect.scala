@@ -7,7 +7,7 @@ package slick.dbio
   * writes go to a master database but reads can also be performed by a slave). */
 trait Effect
 
-object Effect {
+object Effect
 
   /** Effect for DBIOActions that read from the database ("DQL") */
   trait Read extends Effect
@@ -27,4 +27,3 @@ object Effect {
     * used by `DBIO` and `StreamingDBIO`, so you either have to define your own type aliases
     * or spell out the proper `DBIOAction` types in type annotations. */
   trait All extends Read with Write with Schema with Transactional
-}

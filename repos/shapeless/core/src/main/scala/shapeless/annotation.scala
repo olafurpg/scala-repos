@@ -41,22 +41,19 @@ import scala.reflect.macros.whitebox
   *
   * @author Alexandre Archambault
   */
-trait Annotation[A, T] extends Serializable {
+trait Annotation[A, T] extends Serializable
   def apply(): A
-}
 
-object Annotation {
+object Annotation
   def apply[A, T](implicit annotation: Annotation[A, T]): Annotation[A, T] =
     annotation
 
   def mkAnnotation[A, T](annotation: => A): Annotation[A, T] =
-    new Annotation[A, T] {
+    new Annotation[A, T]
       def apply() = annotation
-    }
 
   implicit def materialize[A, T]: Annotation[A, T] = macro AnnotationMacros
     .materializeAnnotation[A, T]
-}
 
 /**
   * Provides the annotations of type `A` of the fields or constructors of case class-like or sum type `T`.
@@ -101,11 +98,10 @@ object Annotation {
   *
   * @author Alexandre Archambault
   */
-trait Annotations[A, T] extends DepFn0 with Serializable {
+trait Annotations[A, T] extends DepFn0 with Serializable
   type Out <: HList
-}
 
-object Annotations {
+object Annotations
   def apply[A, T](
       implicit annotations: Annotations[A, T]): Aux[A, T, annotations.Out] =
     annotations
@@ -114,38 +110,34 @@ object Annotations {
 
   def mkAnnotations[A, T, Out0 <: HList](
       annotations: => Out0): Aux[A, T, Out0] =
-    new Annotations[A, T] {
+    new Annotations[A, T]
       type Out = Out0
       def apply() = annotations
-    }
 
   implicit def materialize[A, T, Out <: HList]: Aux[A, T, Out] = macro AnnotationMacros
     .materializeAnnotations[A, T, Out]
-}
 
 @macrocompat.bundle
-class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
+class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros
   import c.universe._
 
   def someTpe = typeOf[Some[_]].typeConstructor
   def noneTpe = typeOf[None.type]
 
   // FIXME Most of the content of this method is cut-n-pasted from generic.scala
-  def construct(tpe: Type): List[Tree] => Tree = {
+  def construct(tpe: Type): List[Tree] => Tree =
     // FIXME Cut-n-pasted from generic.scala
     val sym = tpe.typeSymbol
     val isCaseClass = sym.asClass.isCaseClass
-    def hasNonGenericCompanionMember(name: String): Boolean = {
+    def hasNonGenericCompanionMember(name: String): Boolean =
       val mSym = sym.companion.typeSignature.member(TermName(name))
       mSym != NoSymbol && !isNonGeneric(mSym)
-    }
 
     if (isCaseClass || hasNonGenericCompanionMember("apply"))
       args => q"${companionRef(tpe)}(..$args)"
     else args => q"new $tpe(..$args)"
-  }
 
-  def materializeAnnotation[A : WeakTypeTag, T : WeakTypeTag]: Tree = {
+  def materializeAnnotation[A : WeakTypeTag, T : WeakTypeTag]: Tree =
     val annTpe = weakTypeOf[A]
 
     if (!isProduct(annTpe)) abort(s"$annTpe is not a case class-like type")
@@ -154,20 +146,17 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
 
     val tpe = weakTypeOf[T]
 
-    val annTreeOpt = tpe.typeSymbol.annotations.collectFirst {
+    val annTreeOpt = tpe.typeSymbol.annotations.collectFirst
       case ann if ann.tree.tpe =:= annTpe => construct0(ann.tree.children.tail)
-    }
 
-    annTreeOpt match {
+    annTreeOpt match
       case Some(annTree) =>
         q"_root_.shapeless.Annotation.mkAnnotation[$annTpe, $tpe]($annTree)"
       case None =>
         abort(s"No $annTpe annotation found on $tpe")
-    }
-  }
 
   def materializeAnnotations[
-      A : WeakTypeTag, T : WeakTypeTag, Out : WeakTypeTag]: Tree = {
+      A : WeakTypeTag, T : WeakTypeTag, Out : WeakTypeTag]: Tree =
     val annTpe = weakTypeOf[A]
 
     if (!isProduct(annTpe)) abort(s"$annTpe is not a case class-like type")
@@ -177,47 +166,39 @@ class AnnotationMacros(val c: whitebox.Context) extends CaseClassMacros {
     val tpe = weakTypeOf[T]
 
     val annTreeOpts =
-      if (isProduct(tpe)) {
+      if (isProduct(tpe))
         val constructorSyms = tpe
           .member(termNames.CONSTRUCTOR)
           .asMethod
           .paramLists
           .flatten
-          .map { sym =>
+          .map  sym =>
             sym.name.decodedName.toString -> sym
-          }
           .toMap
 
-        fieldsOf(tpe).map {
+        fieldsOf(tpe).map
           case (name, _) =>
             val paramConstrSym = constructorSyms(name.decodedName.toString)
 
-            paramConstrSym.annotations.collectFirst {
+            paramConstrSym.annotations.collectFirst
               case ann if ann.tree.tpe =:= annTpe =>
                 construct0(ann.tree.children.tail)
-            }
-        }
-      } else if (isCoproduct(tpe))
-        ctorsOf(tpe).map { cTpe =>
-          cTpe.typeSymbol.annotations.collectFirst {
+      else if (isCoproduct(tpe))
+        ctorsOf(tpe).map  cTpe =>
+          cTpe.typeSymbol.annotations.collectFirst
             case ann if ann.tree.tpe =:= annTpe =>
               construct0(ann.tree.children.tail)
-          }
-        } else
+        else
         abort(
             s"$tpe is not case class like or the root of a sealed family of types")
 
-    val wrapTpeTrees = annTreeOpts.map {
+    val wrapTpeTrees = annTreeOpts.map
       case Some(annTree) =>
         appliedType(someTpe, annTpe) -> q"_root_.scala.Some($annTree)"
       case None => noneTpe -> q"_root_.scala.None"
-    }
 
     val outTpe = mkHListTpe(wrapTpeTrees.map { case (aTpe, _) => aTpe })
-    val outTree = wrapTpeTrees.foldRight(q"_root_.shapeless.HNil": Tree) {
+    val outTree = wrapTpeTrees.foldRight(q"_root_.shapeless.HNil": Tree)
       case ((_, bound), acc) => pq"_root_.shapeless.::($bound, $acc)"
-    }
 
     q"_root_.shapeless.Annotations.mkAnnotations[$annTpe, $tpe, $outTpe]($outTree)"
-  }
-}

@@ -32,6 +32,5 @@ import scalafx.scene.Node
 /**
   * @author Jarek Sacha 
   */
-trait DisplayablePage {
+trait DisplayablePage
   def getPage: Node
-}

@@ -5,7 +5,7 @@ import java.io.FileWriter
 import slick.SlickException
 
 /** Output-related code-generation utilities. */
-trait OutputHelpers {
+trait OutputHelpers
   def code: String
 
   /** The parent type of the generated main trait. This can be overridden in subclasses. */
@@ -21,19 +21,17 @@ trait OutputHelpers {
     *  @group Output
     */
   def writeStringToFile(
-      content: String, folder: String, pkg: String, fileName: String) {
+      content: String, folder: String, pkg: String, fileName: String)
     val folder2: String = folder + "/" + (pkg.replace(".", "/")) + "/"
     new File(folder2).mkdirs()
     val file = new File(folder2 + fileName)
-    if (!file.exists()) {
+    if (!file.exists())
       file.createNewFile();
-    }
     val fw = new FileWriter(file.getAbsoluteFile());
     val bw = new BufferedWriter(fw);
     bw.write(content);
     if (!content.endsWith("\n")) bw.write("\n");
     bw.close();
-  }
 
   /**
     * Generates code and writes it to a file.
@@ -50,12 +48,11 @@ trait OutputHelpers {
                   folder: String,
                   pkg: String,
                   container: String = "Tables",
-                  fileName: String = "Tables.scala") {
+                  fileName: String = "Tables.scala")
     writeStringToFile(packageCode(profile, pkg, container, parentType),
                       folder,
                       pkg,
                       fileName)
-  }
 
   /**
     * Generates code providing the data model as trait and object in a Scala package
@@ -67,7 +64,7 @@ trait OutputHelpers {
   def packageCode(profile: String,
                   pkg: String,
                   container: String,
-                  parentType: Option[String]): String = {
+                  parentType: Option[String]): String =
     s"""
 package ${pkg}
 // AUTO-GENERATED Slick data model
@@ -83,5 +80,3 @@ trait ${container}${parentType.map(t => s" extends $t").getOrElse("")} {
   ${indent(code)}
 }
       """.trim()
-  }
-}

@@ -1,17 +1,16 @@
 package java.nio
 
-private[nio] object GenHeapBuffer {
+private[nio] object GenHeapBuffer
   def apply[B <: Buffer](self: B): GenHeapBuffer[B] =
     new GenHeapBuffer(self)
 
-  trait NewHeapBuffer[BufferType <: Buffer, ElementType] {
+  trait NewHeapBuffer[BufferType <: Buffer, ElementType]
     def apply(capacity: Int,
               array: Array[ElementType],
               arrayOffset: Int,
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean): BufferType
-  }
 
   @inline
   def generic_wrap[BufferType <: Buffer, ElementType](
@@ -22,7 +21,7 @@ private[nio] object GenHeapBuffer {
       initialLength: Int,
       isReadOnly: Boolean)(
       implicit newHeapBuffer: NewHeapBuffer[BufferType, ElementType])
-    : BufferType = {
+    : BufferType =
     if (arrayOffset < 0 || capacity < 0 ||
         arrayOffset + capacity > array.length)
       throw new IndexOutOfBoundsException
@@ -35,17 +34,15 @@ private[nio] object GenHeapBuffer {
                   initialPosition,
                   initialLimit,
                   isReadOnly)
-  }
-}
 
 private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
-    extends AnyVal {
+    extends AnyVal
   import self._
 
   type NewThisHeapBuffer = GenHeapBuffer.NewHeapBuffer[BufferType, ElementType]
 
   @inline
-  def generic_slice()(implicit newHeapBuffer: NewThisHeapBuffer): BufferType = {
+  def generic_slice()(implicit newHeapBuffer: NewThisHeapBuffer): BufferType =
     val newCapacity = remaining
     newHeapBuffer(newCapacity,
                   _array,
@@ -53,28 +50,25 @@ private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
                   0,
                   newCapacity,
                   isReadOnly)
-  }
 
   @inline
   def generic_duplicate()(
-      implicit newHeapBuffer: NewThisHeapBuffer): BufferType = {
+      implicit newHeapBuffer: NewThisHeapBuffer): BufferType =
     val result = newHeapBuffer(
         capacity, _array, _arrayOffset, position, limit, isReadOnly)
     result._mark = _mark
     result
-  }
 
   @inline
   def generic_asReadOnlyBuffer()(
-      implicit newHeapBuffer: NewThisHeapBuffer): BufferType = {
+      implicit newHeapBuffer: NewThisHeapBuffer): BufferType =
     val result = newHeapBuffer(
         capacity, _array, _arrayOffset, position, limit, true)
     result._mark = _mark
     result
-  }
 
   @inline
-  def generic_compact(): BufferType = {
+  def generic_compact(): BufferType =
     ensureNotReadOnly()
 
     val len = remaining
@@ -84,7 +78,6 @@ private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
     limit(capacity)
     position(len)
     self
-  }
 
   @inline
   def generic_load(index: Int): ElementType =
@@ -107,4 +100,3 @@ private[nio] final class GenHeapBuffer[B <: Buffer](val self: B)
                     offset: Int,
                     length: Int): Unit =
     System.arraycopy(src, offset, _array, _arrayOffset + startIndex, length)
-}

@@ -19,8 +19,8 @@ package com.twitter.conversions
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
-object string {
-  final class RichString(wrapped: String) {
+object string
+  final class RichString(wrapped: String)
 
     /**
       * For every section of a string that matches a regular expression, call
@@ -44,24 +44,20 @@ object string {
       *     returns a string to substitute
       * @return the resulting string with replacements made
       */
-    def regexSub(re: Regex)(replace: Regex.MatchData => String): String = {
+    def regexSub(re: Regex)(replace: Regex.MatchData => String): String =
       var offset = 0
       val out = new StringBuilder()
 
-      for (m <- re.findAllIn(wrapped).matchData) {
-        if (m.start > offset) {
+      for (m <- re.findAllIn(wrapped).matchData)
+        if (m.start > offset)
           out.append(wrapped.substring(offset, m.start))
-        }
 
         out.append(replace(m))
         offset = m.end
-      }
 
-      if (offset < wrapped.length) {
+      if (offset < wrapped.length)
         out.append(wrapped.substring(offset))
-      }
       out.toString
-    }
 
     private val QUOTE_RE = "[\u0000-\u001f\u007f-\uffff\\\\\"]".r
 
@@ -75,23 +71,19 @@ object string {
       *
       * @return a quoted string, suitable for ASCII display
       */
-    def quoteC(): String = {
-      regexSub(QUOTE_RE) { m =>
-        m.matched.charAt(0) match {
+    def quoteC(): String =
+      regexSub(QUOTE_RE)  m =>
+        m.matched.charAt(0) match
           case '\r' => "\\r"
           case '\n' => "\\n"
           case '\t' => "\\t"
           case '"' => "\\\""
           case '\\' => "\\\\"
           case c =>
-            if (c <= 255) {
+            if (c <= 255)
               "\\x%02x".format(c.asInstanceOf[Int])
-            } else {
+            else
               "\\u%04x" format c.asInstanceOf[Int]
-            }
-        }
-      }
-    }
 
     // we intentionally don't unquote "\$" here, so it can be used to escape interpolation later.
     private val UNQUOTE_RE =
@@ -106,9 +98,9 @@ object string {
       *
       * @return an unquoted unicode string
       */
-    def unquoteC() = {
-      regexSub(UNQUOTE_RE) { m =>
-        val ch = m.group(1).charAt(0) match {
+    def unquoteC() =
+      regexSub(UNQUOTE_RE)  m =>
+        val ch = m.group(1).charAt(0) match
           // holy crap! this is terrible:
           case 'u' =>
             Character.valueOf(Integer
@@ -124,48 +116,37 @@ object string {
           case 'n' => '\n'
           case 't' => '\t'
           case x => x
-        }
         ch.toString
-      }
-    }
 
     /**
       * Turn a string of hex digits into a byte array. This does the exact
       * opposite of `Array[Byte]#hexlify`.
       */
-    def unhexlify(): Array[Byte] = {
+    def unhexlify(): Array[Byte] =
       val buffer = new Array[Byte]((wrapped.length + 1) / 2)
-      wrapped.grouped(2).toSeq.zipWithIndex.foreach {
+      wrapped.grouped(2).toSeq.zipWithIndex.foreach
         case (substr, i) =>
           buffer(i) = Integer.parseInt(substr, 16).toByte
-      }
       buffer
-    }
-  }
 
-  def hexlify(array: Array[Byte], from: Int, to: Int): String = {
+  def hexlify(array: Array[Byte], from: Int, to: Int): String =
     val out = new StringBuffer
-    for (i <- from until to) {
+    for (i <- from until to)
       val b = array(i)
       val s = (b.toInt & 0xff).toHexString
-      if (s.length < 2) {
+      if (s.length < 2)
         out append '0'
-      }
       out append s
-    }
     out.toString
-  }
 
-  final class RichByteArray(wrapped: Array[Byte]) {
+  final class RichByteArray(wrapped: Array[Byte])
 
     /**
       * Turn an `Array[Byte]` into a string of hex digits.
       */
     def hexlify: String = string.hexlify(wrapped, 0, wrapped.length)
-  }
 
   implicit def stringToConfiggyString(s: String): RichString =
     new RichString(s)
   implicit def byteArrayToConfiggyByteArray(b: Array[Byte]): RichByteArray =
     new RichByteArray(b)
-}

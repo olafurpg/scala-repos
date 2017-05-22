@@ -23,7 +23,7 @@ import scala.util.Random
 
 import org.apache.spark.SparkFunSuite
 
-class TimeStampedHashMapSuite extends SparkFunSuite {
+class TimeStampedHashMapSuite extends SparkFunSuite
 
   // Test the testMap function - a Scala HashMap should obviously pass
   testMap(new mutable.HashMap[String, String]())
@@ -32,7 +32,7 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
   testMap(new TimeStampedHashMap[String, String]())
   testMapThreadSafety(new TimeStampedHashMap[String, String]())
 
-  test("TimeStampedHashMap - clearing by timestamp") {
+  test("TimeStampedHashMap - clearing by timestamp")
     // clearing by insertion time
     val map =
       new TimeStampedHashMap[String, String](updateTimeStampOnGet = false)
@@ -62,16 +62,15 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
     map1.clearOldValues(threshTime1) // should only clear k1
     assert(map1.get("k1") === None)
     assert(map1.get("k2").isDefined)
-  }
 
   /** Test basic operations of a Scala mutable Map. */
-  def testMap(hashMapConstructor: => mutable.Map[String, String]) {
+  def testMap(hashMapConstructor: => mutable.Map[String, String])
     def newMap() = hashMapConstructor
     val testMap1 = newMap()
     val testMap2 = newMap()
     val name = testMap1.getClass.getSimpleName
 
-    test(name + " - basic test") {
+    test(name + " - basic test")
       // put, get, and apply
       testMap1 += (("k1", "v1"))
       assert(testMap1.get("k1").isDefined)
@@ -88,9 +87,8 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
       testMap1.remove("k1")
       assert(testMap1.get("k1").isEmpty)
       testMap1.remove("k2")
-      intercept[NoSuchElementException] {
+      intercept[NoSuchElementException]
         testMap1("k2") // Map.apply(<non-existent-key>) causes exception
-      }
       testMap1 -= "k3"
       assert(testMap1.get("k3").isEmpty)
 
@@ -132,32 +130,28 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
       assert(testMap4.size === 1)
       assert(testMap4.get("k1").isDefined)
       assert(testMap4.get("k1").get === "v1")
-    }
-  }
 
   /** Test thread safety of a Scala mutable map. */
-  def testMapThreadSafety(hashMapConstructor: => mutable.Map[String, String]) {
+  def testMapThreadSafety(hashMapConstructor: => mutable.Map[String, String])
     def newMap() = hashMapConstructor
     val name = newMap().getClass.getSimpleName
     val testMap = newMap()
     @volatile var error = false
 
-    def getRandomKey(m: mutable.Map[String, String]): Option[String] = {
+    def getRandomKey(m: mutable.Map[String, String]): Option[String] =
       val keys = testMap.keysIterator.toSeq
-      if (keys.nonEmpty) {
+      if (keys.nonEmpty)
         Some(keys(Random.nextInt(keys.size)))
-      } else {
+      else
         None
-      }
-    }
 
     val threads =
       (1 to 25).map(i =>
-            new Thread() {
-          override def run() {
-            try {
-              for (j <- 1 to 1000) {
-                Random.nextInt(3) match {
+            new Thread()
+          override def run()
+            try
+              for (j <- 1 to 1000)
+                Random.nextInt(3) match
                   case 0 =>
                     testMap(Random.nextString(10)) = Random
                       .nextDouble()
@@ -166,20 +160,13 @@ class TimeStampedHashMapSuite extends SparkFunSuite {
                     getRandomKey(testMap).map(testMap.get) // get
                   case 2 =>
                     getRandomKey(testMap).map(testMap.remove) // remove
-                }
-              }
-            } catch {
+            catch
               case t: Throwable =>
                 error = true
                 throw t
-            }
-          }
-      })
+      )
 
-    test(name + " - threading safety test") {
+    test(name + " - threading safety test")
       threads.map(_.start)
       threads.map(_.join)
       assert(!error)
-    }
-  }
-}

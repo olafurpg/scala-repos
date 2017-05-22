@@ -24,7 +24,7 @@ package util.control
   *  Calls to break from one instantiation of `Breaks` will never
   *  target breakable objects of some other instantiation.
   */
-class Breaks {
+class Breaks
 
   private val breakException = new BreakControl
 
@@ -33,18 +33,15 @@ class Breaks {
     * executed further down in the call stack provided that it is called on the
     * exact same instance of `Breaks`.
     */
-  def breakable(op: => Unit) {
-    try {
+  def breakable(op: => Unit)
+    try
       op
-    } catch {
+    catch
       case ex: BreakControl =>
         if (ex ne breakException) throw ex
-    }
-  }
 
-  sealed trait TryBlock[T] {
+  sealed trait TryBlock[T]
     def catchBreak(onBreak: => T): T
-  }
 
   /**
     * This variant enables the execution of a code block in case of a `break()`:
@@ -58,16 +55,14 @@ class Breaks {
     * }
     * }}}
     */
-  def tryBreakable[T](op: => T) = new TryBlock[T] {
+  def tryBreakable[T](op: => T) = new TryBlock[T]
     def catchBreak(onBreak: => T) =
-      try {
+      try
         op
-      } catch {
+      catch
         case ex: BreakControl =>
           if (ex ne breakException) throw ex
           onBreak
-      }
-  }
 
   /**
     * Break from dynamically closest enclosing breakable block using this exact
@@ -76,7 +71,6 @@ class Breaks {
     * @note This might be different than the statically closest enclosing block!
     */
   def break(): Nothing = { throw breakException }
-}
 
 /** An object that can be used for the break control abstraction.
   *  Example usage:

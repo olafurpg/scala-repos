@@ -9,13 +9,13 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * Nikolay.Tropin
   * 12/27/13
   */
-class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
+class ImplementAbstractMethodTest extends ScalaIntentionTestBase
   def familyName: String = new ImplementAbstractMethodAction().getFamilyName
 
   val START = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_START
   val END = ScalaLightCodeInsightFixtureTestAdapter.SELECTION_END
 
-  def testFromTrait() {
+  def testFromTrait()
     val text = """
         |trait A {
         |  def <caret>f: Int
@@ -32,9 +32,8 @@ class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
         |  override def f: Int = $START???$END
         |}"""
     doTest(text, result)
-  }
 
-  def testFromAbstractClass() {
+  def testFromAbstractClass()
     val text = """
         |abstract class A {
         |  def <caret>f: Int
@@ -51,9 +50,8 @@ class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
         |  override def f: Int = $START???$END
         |}"""
     doTest(text, result)
-  }
 
-  def testParameterizedTrait() {
+  def testParameterizedTrait()
     val text = """
         |trait A[T] {
         |  def <caret>f: T
@@ -70,9 +68,8 @@ class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
         |  override def f: Int = $START???$END
         |}"""
     doTest(text, result)
-  }
 
-  def testFunDefInTrait() {
+  def testFunDefInTrait()
     val text = """
         |trait A {
         |  def <caret>f: Int = 0
@@ -81,9 +78,8 @@ class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
         |class AA extends A
       """
     checkIntentionIsNotAvailable(text)
-  }
 
-  def testUnitReturn() {
+  def testUnitReturn()
     val text = """
         |trait A {
         |  def <caret>f
@@ -100,5 +96,3 @@ class ImplementAbstractMethodTest extends ScalaIntentionTestBase {
         |  override def f: Unit = $START???$END
         |}"""
     doTest(text, result)
-  }
-}

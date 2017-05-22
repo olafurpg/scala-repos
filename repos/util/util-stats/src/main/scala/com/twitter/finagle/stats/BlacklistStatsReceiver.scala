@@ -11,7 +11,7 @@ package com.twitter.finagle.stats
   */
 class BlacklistStatsReceiver(
     underlying: StatsReceiver, blacklisted: Seq[String] => Boolean)
-    extends StatsReceiver {
+    extends StatsReceiver
   val repr = underlying.repr
   override def isNull = underlying.isNull
 
@@ -28,4 +28,3 @@ class BlacklistStatsReceiver(
 
   override def toString: String =
     s"BlacklistStatsReceiver($underlying)"
-}

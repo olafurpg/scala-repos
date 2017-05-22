@@ -8,7 +8,7 @@ import akka.stream.javadsl.Flow
 import akka.http.javadsl.model._
 import akka.http.impl.util.JavaMapping.Implicits._
 
-object WebSocket {
+object WebSocket
 
   /**
     * If a given request is a WebSocket request a response accepting the request is returned using the given handler to
@@ -17,12 +17,10 @@ object WebSocket {
     */
   def handleWebSocketRequestWith(
       request: HttpRequest, handler: Flow[Message, Message, _]): HttpResponse =
-    request.asScala.header[UpgradeToWebSocket] match {
+    request.asScala.header[UpgradeToWebSocket] match
       case Some(header) ⇒ header.handleMessagesWith(handler)
       case None ⇒
         HttpResponse
           .create()
           .withStatus(StatusCodes.BAD_REQUEST)
           .withEntity("Expected WebSocket request")
-    }
-}

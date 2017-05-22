@@ -13,27 +13,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.types.ScInfixTypeElement
   * @author Alexander Podkhalyuzin
   * Date: 28.05.2008
   */
-class ForSomeFilter extends ElementFilter {
-  def isAcceptable(element: Object, context: PsiElement): Boolean = {
+class ForSomeFilter extends ElementFilter
+  def isAcceptable(element: Object, context: PsiElement): Boolean =
     if (context.isInstanceOf[PsiComment]) return false
     val leaf = getLeafByOffset(context.getTextRange.getStartOffset, context)
-    if (leaf != null) {
+    if (leaf != null)
       val parent = leaf.getParent
       if (parent == null) return false
-      parent.getParent match {
+      parent.getParent match
         case _: ScInfixTypeElement => return true
         case _ => return false
-      }
-    }
     false
-  }
 
-  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean = {
+  def isClassAcceptable(hintClass: java.lang.Class[_]): Boolean =
     true
-  }
 
   @NonNls
-  override def toString: String = {
+  override def toString: String =
     "'forSome' keyword filter"
-  }
-}

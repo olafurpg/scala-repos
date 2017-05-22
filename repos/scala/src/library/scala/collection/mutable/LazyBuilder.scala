@@ -20,14 +20,12 @@ package mutable
   *  @tparam Elem    type of the elements for this builder.
   *  @tparam To      type of the collection this builder builds.
   */
-abstract class LazyBuilder[Elem, +To] extends ReusableBuilder[Elem, To] {
+abstract class LazyBuilder[Elem, +To] extends ReusableBuilder[Elem, To]
 
   /** The different segments of elements to be added to the builder, represented as iterators */
   protected var parts = new ListBuffer[TraversableOnce[Elem]]
   def +=(x: Elem): this.type = { parts += List(x); this }
-  override def ++=(xs: TraversableOnce[Elem]): this.type = {
+  override def ++=(xs: TraversableOnce[Elem]): this.type =
     parts += xs; this
-  }
   def result(): To
   def clear() { parts.clear() }
-}

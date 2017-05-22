@@ -30,7 +30,7 @@ import com.precog.util.IdGen
 
 trait ArrayLibSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import Function._
@@ -40,15 +40,13 @@ trait ArrayLibSpecs[M[+ _]]
 
   import library._
 
-  def testEval(graph: DepGraph): Set[SEvent] = {
-    consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph): Set[SEvent] =
+    consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => results
       case Failure(error) => throw error
-    }
-  }
 
-  "array utilities" should {
-    "flatten a homogeneous set" in {
+  "array utilities" should
+    "flatten a homogeneous set" in
       val line = Line(1, 1, "")
 
       val input = dag.Morph1(
@@ -59,9 +57,8 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(25)
 
       val values =
-        result collect {
+        result collect
           case (ids, SDecimal(d)) if ids.length == 2 => d
-        }
 
       values mustEqual Set(-9,
                            -42,
@@ -88,9 +85,8 @@ trait ArrayLibSpecs[M[+ _]]
                            244,
                            13,
                            11)
-    }
 
-    "flatten a heterogeneous set" in {
+    "flatten a heterogeneous set" in
       val line = Line(1, 1, "")
 
       val input = dag.Morph1(
@@ -101,9 +97,8 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(26)
 
       val values =
-        result collect {
+        result collect
           case (ids, jv) if ids.length == 2 => jv
-        }
 
       values mustEqual Set(SDecimal(-9),
                            SDecimal(-42),
@@ -135,9 +130,8 @@ trait ArrayLibSpecs[M[+ _]]
                                          SDecimal(42),
                                          SDecimal(87),
                                          SDecimal(4))))
-    }
 
-    "flattened set is related to original set" in {
+    "flattened set is related to original set" in
       val line = Line(1, 1, "")
 
       val input =
@@ -162,35 +156,28 @@ trait ArrayLibSpecs[M[+ _]]
       result must haveSize(26)
 
       val values =
-        result collect {
+        result collect
           case (ids, jv) if ids.length == 2 => jv
-        }
-      values must haveAllElementsLike {
+      values must haveAllElementsLike
         case SObject(obj) =>
           obj.keySet mustEqual Set("arr", "val")
           val SArray(elems) = obj("arr")
           elems must contain(obj("val"))
         case _ => ko
-      }
-    }
 
-    "flatten a non-array without exploding" in {
+    "flatten a non-array without exploding" in
       val line = Line(1, 1, "")
 
       val input =
         dag.Morph1(Flatten, Const(CString("/het/arrays"))(line))(line)
 
       testEval(input) must haveSize(0)
-    }
 
-    "flatten an empty set without exploding" in {
+    "flatten an empty set without exploding" in
       val line = Line(1, 1, "")
 
       val input = dag.Morph1(Flatten, Undefined(line))(line)
 
       testEval(input) must haveSize(0)
-    }
-  }
-}
 
 object ArrayLibSpecs extends ArrayLibSpecs[test.YId] with test.YIdInstances

@@ -27,22 +27,20 @@ import org.apache.spark.streaming.{StreamingContext, TestSuiteBase}
 import org.apache.spark.streaming.dstream.DStream
 
 class StreamingLogisticRegressionSuite
-    extends SparkFunSuite with TestSuiteBase {
+    extends SparkFunSuite with TestSuiteBase
 
   // use longer wait time to ensure job completion
   override def maxWaitTimeMillis: Int = 30000
 
   var ssc: StreamingContext = _
 
-  override def afterFunction() {
+  override def afterFunction()
     super.afterFunction()
-    if (ssc != null) {
+    if (ssc != null)
       ssc.stop()
-    }
-  }
 
   // Test if we can accurately learn B for Y = logistic(BX) on streaming data
-  test("parameter accuracy") {
+  test("parameter accuracy")
 
     val nPoints = 100
     val B = 1.5
@@ -55,26 +53,23 @@ class StreamingLogisticRegressionSuite
 
     // generate sequence of simulated data
     val numBatches = 20
-    val input = (0 until numBatches).map { i =>
+    val input = (0 until numBatches).map  i =>
       LogisticRegressionSuite.generateLogisticInput(
           0.0, B, nPoints, 42 * (i + 1))
-    }
 
     // apply model training to input stream
     ssc = setupStreams(input,
                        (inputDStream: DStream[LabeledPoint]) =>
-                         {
                            model.trainOn(inputDStream)
                            inputDStream.count()
-                       })
+                       )
     runStreams(ssc, numBatches, numBatches)
 
     // check accuracy of final parameter estimates
     assert(model.latestModel().weights(0) ~== B relTol 0.1)
-  }
 
   // Test that parameter estimates improve when learning Y = logistic(BX) on streaming data
-  test("parameter convergence") {
+  test("parameter convergence")
 
     val B = 1.5
     val nPoints = 100
@@ -87,10 +82,9 @@ class StreamingLogisticRegressionSuite
 
     // generate sequence of simulated data
     val numBatches = 20
-    val input = (0 until numBatches).map { i =>
+    val input = (0 until numBatches).map  i =>
       LogisticRegressionSuite.generateLogisticInput(
           0.0, B, nPoints, 42 * (i + 1))
-    }
 
     // create buffer to store intermediate fits
     val history = new ArrayBuffer[Double](numBatches)
@@ -100,12 +94,11 @@ class StreamingLogisticRegressionSuite
     ssc = setupStreams(
         input,
         (inputDStream: DStream[LabeledPoint]) =>
-          {
             model.trainOn(inputDStream)
             inputDStream.foreachRDD(x =>
                   history.append(math.abs(model.latestModel().weights(0) - B)))
             inputDStream.count()
-        })
+        )
     runStreams(ssc, numBatches, numBatches)
 
     // compute change in error
@@ -114,10 +107,9 @@ class StreamingLogisticRegressionSuite
     assert(deltas.forall(x => (x._1 - x._2) <= 0.1))
     // check that error shrunk on at least 2 batches
     assert(deltas.map(x => if ((x._1 - x._2) < 0) 1 else 0).sum > 1)
-  }
 
   // Test predictions on a stream
-  test("predictions") {
+  test("predictions")
 
     val B = 1.5
     val nPoints = 100
@@ -130,18 +122,16 @@ class StreamingLogisticRegressionSuite
 
     // generate sequence of simulated data for testing
     val numBatches = 10
-    val testInput = (0 until numBatches).map { i =>
+    val testInput = (0 until numBatches).map  i =>
       LogisticRegressionSuite.generateLogisticInput(
           0.0, B, nPoints, 42 * (i + 1))
-    }
 
     // apply model predictions to test stream
     ssc = setupStreams(
         testInput,
         (inputDStream: DStream[LabeledPoint]) =>
-          {
             model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+        )
 
     // collect the output as (true, estimated) tuples
     val output: Seq[Seq[(Double, Double)]] =
@@ -152,10 +142,9 @@ class StreamingLogisticRegressionSuite
       output.map(batch => batch.map(p => math.abs(p._1 - p._2)).sum / nPoints)
 
     assert(errors.forall(x => x <= 0.4))
-  }
 
   // Test training combined with prediction
-  test("training and prediction") {
+  test("training and prediction")
     // create model initialized with zero weights
     val model = new StreamingLogisticRegressionWithSGD()
       .setInitialWeights(Vectors.dense(-0.1))
@@ -165,19 +154,17 @@ class StreamingLogisticRegressionSuite
     // generate sequence of simulated data for testing
     val numBatches = 10
     val nPoints = 100
-    val testInput = (0 until numBatches).map { i =>
+    val testInput = (0 until numBatches).map  i =>
       LogisticRegressionSuite.generateLogisticInput(
           0.0, 5.0, nPoints, 42 * (i + 1))
-    }
 
     // train and predict
     ssc = setupStreams(
         testInput,
         (inputDStream: DStream[LabeledPoint]) =>
-          {
             model.trainOn(inputDStream)
             model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+        )
 
     val output: Seq[Seq[(Double, Double)]] =
       runStreams(ssc, numBatches, numBatches)
@@ -187,10 +174,9 @@ class StreamingLogisticRegressionSuite
       .map(batch => batch.map(p => math.abs(p._1 - p._2)).sum / nPoints)
       .toList
     assert(error.head > 0.8 & error.last < 0.2)
-  }
 
   // Test empty RDDs in a stream
-  test("handling empty RDDs in a stream") {
+  test("handling empty RDDs in a stream")
     val model = new StreamingLogisticRegressionWithSGD()
       .setInitialWeights(Vectors.dense(-0.1))
       .setStepSize(0.01)
@@ -200,11 +186,8 @@ class StreamingLogisticRegressionSuite
     ssc = setupStreams(
         emptyInput,
         (inputDStream: DStream[LabeledPoint]) =>
-          {
             model.trainOn(inputDStream)
             model.predictOnValues(inputDStream.map(x => (x.label, x.features)))
-        })
+        )
     val output: Seq[Seq[(Double, Double)]] =
       runStreams(ssc, numBatches, numBatches)
-  }
-}

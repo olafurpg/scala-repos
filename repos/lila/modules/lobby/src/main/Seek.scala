@@ -18,7 +18,7 @@ case class Seek(_id: String,
                 color: String,
                 user: LobbyUser,
                 ratingRange: String,
-                createdAt: DateTime) {
+                createdAt: DateTime)
 
   def id = _id
 
@@ -34,10 +34,9 @@ case class Seek(_id: String,
     (realColor compatibleWith h.realColor) && ratingRangeCompatibleWith(h) &&
     h.ratingRangeCompatibleWith(this)
 
-  private def ratingRangeCompatibleWith(h: Seek) = realRatingRange.fold(true) {
+  private def ratingRangeCompatibleWith(h: Seek) = realRatingRange.fold(true)
     range =>
       h.rating ?? range.contains
-  }
 
   private def compatibilityProperties = (variant, mode, daysPerTurn)
 
@@ -62,9 +61,8 @@ case class Seek(_id: String,
 
   lazy val perfType =
     PerfPicker.perfType(Speed.Correspondence, realVariant, daysPerTurn)
-}
 
-object Seek {
+object Seek
 
   val idSize = 8
 
@@ -99,4 +97,3 @@ object Seek {
   import lila.db.BSON.BSONJodaDateTimeHandler
   private[lobby] implicit val lobbyUserBSONHandler = Macros.handler[LobbyUser]
   private[lobby] implicit val seekBSONHandler = Macros.handler[Seek]
-}

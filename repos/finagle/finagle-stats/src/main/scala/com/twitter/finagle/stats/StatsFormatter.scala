@@ -9,23 +9,22 @@ object format
     extends GlobalFlag[String](
         "commonsmetrics",
         "Format style for metric names (ostrich|commonsmetrics|commonsstats)"
-    ) {
+    )
   private[stats] val Ostrich = "ostrich"
   private[stats] val CommonsMetrics = "commonsmetrics"
   private[stats] val CommonsStats = "commonsstats"
-}
 
 /**
   * Allows for customization of how stat names get formatted.
   */
-private[stats] sealed trait StatsFormatter {
+private[stats] sealed trait StatsFormatter
 
-  def apply(values: SampledValues): Map[String, Number] = {
+  def apply(values: SampledValues): Map[String, Number] =
     val results = new mutable.HashMap[String, Number]()
     results ++= values.gauges
     results ++= values.counters
 
-    values.histograms.foreach {
+    values.histograms.foreach
       case (name, snapshot) =>
         results += histoName(name, "count") -> snapshot.count
         results += histoName(name, "sum") -> snapshot.sum
@@ -33,13 +32,10 @@ private[stats] sealed trait StatsFormatter {
         results += histoName(name, labelMin) -> snapshot.min
         results += histoName(name, labelMax) -> snapshot.max
 
-        for (p <- snapshot.percentiles) {
+        for (p <- snapshot.percentiles)
           val percentileName = histoName(name, labelPercentile(p.getQuantile))
           results += percentileName -> p.getValue
-        }
-    }
     results
-  }
 
   /**
     * Returns the full formatted name of histogram.
@@ -61,57 +57,52 @@ private[stats] sealed trait StatsFormatter {
 
   /** Label applied for the average of a histogram */
   protected def labelAverage: String
-}
 
-private[stats] object StatsFormatter {
+private[stats] object StatsFormatter
 
   /**
     * Uses the global flag, [[format]], to select the formatter used.
     */
   def default: StatsFormatter =
-    format() match {
+    format() match
       case format.Ostrich => Ostrich
       case format.CommonsMetrics => CommonsMetrics
       case format.CommonsStats => CommonsStats
-    }
 
   /**
     * The default behavior for formatting as done by Commons Metrics.
     *
     * See Commons Metrics' `Metrics.sample()`.
     */
-  object CommonsMetrics extends StatsFormatter {
+  object CommonsMetrics extends StatsFormatter
     protected def histoName(name: String, component: String): String =
       s"$name.$component"
 
-    protected def labelPercentile(p: Double): String = {
+    protected def labelPercentile(p: Double): String =
       // this has a strange quirk that p999 gets formatted as p9990
       val gname: String = "p" + (p * 10000).toInt
-      if (3 < gname.length && ("00" == gname.substring(3))) {
+      if (3 < gname.length && ("00" == gname.substring(3)))
         gname.substring(0, 3)
-      } else {
+      else
         gname
-      }
-    }
 
     protected def labelMin: String = "min"
 
     protected def labelMax: String = "max"
 
     protected def labelAverage: String = "avg"
-  }
 
   /**
     * Replicates the behavior for formatting Ostrich stats.
     *
     * See Ostrich's `Distribution.toMap`.
     */
-  object Ostrich extends StatsFormatter {
+  object Ostrich extends StatsFormatter
     protected def histoName(name: String, component: String): String =
       s"$name.$component"
 
-    protected def labelPercentile(p: Double): String = {
-      p match {
+    protected def labelPercentile(p: Double): String =
+      p match
         case 0.5d => "p50"
         case 0.9d => "p90"
         case 0.95d => "p95"
@@ -121,32 +112,29 @@ private[stats] object StatsFormatter {
         case _ =>
           val padded = (p * 10000).toInt
           s"p$padded"
-      }
-    }
 
     protected def labelMin: String = "minimum"
 
     protected def labelMax: String = "maximum"
 
     protected def labelAverage: String = "average"
-  }
 
   /**
     * Replicates the behavior for formatting Commons Stats stats.
     *
     * See Commons Stats' `Stats.getVariables()`.
     */
-  object CommonsStats extends StatsFormatter {
+  object CommonsStats extends StatsFormatter
 
     private[this] def inMegabytes(l: Number): Number = l.longValue() / 1048576L
     private[this] def inSeconds(l: Number): Number = l.longValue() / 1000L
     private[this] val gcCycles: Regex = "^jvm_mem_(.*)_cycles$".r
     private[this] val gcMsec: Regex = "^jvm_mem_(.*)_msec$".r
 
-    override def apply(values: SampledValues): Map[String, Number] = {
+    override def apply(values: SampledValues): Map[String, Number] =
       val original = super.apply(values)
 
-      original.map {
+      original.map
         case ("jvm_num_cpus", n) => "jvm_available_processors" -> n
         case ("jvm_classes_current_loaded", n) => "jvm_class_loaded_count" -> n
         case ("jvm_classes_total_loaded", n) =>
@@ -174,8 +162,6 @@ private[stats] object StatsFormatter {
         case (gcCycles(gc), n) => s"jvm_gc_${gc}_collection_count" -> n
         case (gcMsec(gc), n) => s"jvm_gc_${gc}_collection_time_ms" -> n
         case kv => kv
-      }
-    }
 
     protected def histoName(name: String, component: String): String =
       s"${name}_$component"
@@ -188,5 +174,3 @@ private[stats] object StatsFormatter {
     protected def labelMax: String = "max"
 
     protected def labelAverage: String = "avg"
-  }
-}

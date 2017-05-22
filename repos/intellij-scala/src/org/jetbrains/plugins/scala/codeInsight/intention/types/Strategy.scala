@@ -7,7 +7,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.{ScFunctionDefinition
 /**
   * Pavel.Fatin, 28.04.2010
   */
-trait Strategy {
+trait Strategy
   def addToFunction(function: ScFunctionDefinition)
 
   def removeFromFunction(function: ScFunctionDefinition)
@@ -29,4 +29,3 @@ trait Strategy {
   def addToParameter(param: ScParameter)
 
   def removeFromParameter(param: ScParameter)
-}

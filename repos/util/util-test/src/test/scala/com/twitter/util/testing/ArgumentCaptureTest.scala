@@ -9,8 +9,8 @@ import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
 class ArgumentCaptureTest
-    extends FunSuite with MockitoSugar with ArgumentCapture {
-  class MockSubject {
+    extends FunSuite with MockitoSugar with ArgumentCapture
+  class MockSubject
     def method1(arg: String): Long = 0L
     def method2(arg1: String, arg2: String): Long = 0L
     def method3(arg1: String, arg2: String, arg3: String): Long = 0L
@@ -21,9 +21,8 @@ class ArgumentCaptureTest
                 arg3: String,
                 arg4: String,
                 arg5: String): Long = 0L
-  }
 
-  test("captureOne should handle 1-ary functions") {
+  test("captureOne should handle 1-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method1(any[String])).thenReturn(123L)
 
@@ -31,9 +30,8 @@ class ArgumentCaptureTest
 
     val captured = capturingOne(verify(theMockSubject).method1 _)
     assert(captured == "foo")
-  }
 
-  test("captureOne should handle 2-ary functions") {
+  test("captureOne should handle 2-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method2(any[String], any[String])).thenReturn(456L)
 
@@ -41,9 +39,8 @@ class ArgumentCaptureTest
 
     val captured = capturingOne(verify(theMockSubject).method2 _)
     assert(captured == (("foo", "bar")))
-  }
 
-  test("captureOne should handle 3-ary functions") {
+  test("captureOne should handle 3-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method3(any[String], any[String], any[String]))
       .thenReturn(136L)
@@ -52,9 +49,8 @@ class ArgumentCaptureTest
 
     val captured = capturingOne(verify(theMockSubject).method3 _)
     assert(captured == (("foo", "bar", "baz")))
-  }
 
-  test("captureOne should handle 4-ary functions") {
+  test("captureOne should handle 4-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method4(
             any[String], any[String], any[String], any[String]))
@@ -64,9 +60,8 @@ class ArgumentCaptureTest
 
     val captured = capturingOne(verify(theMockSubject).method4 _)
     assert(captured == (("north", "east", "south", "west")))
-  }
 
-  test("captureOne should handle 5-ary functions") {
+  test("captureOne should handle 5-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method5(
             any[String], any[String], any[String], any[String], any[String]))
@@ -76,9 +71,8 @@ class ArgumentCaptureTest
 
     val captured = capturingOne(verify(theMockSubject).method5 _)
     assert(captured == (("doh", "ray", "mi", "fa", "so")))
-  }
 
-  test("captureAll should handle 1-ary functions") {
+  test("captureAll should handle 1-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method1(any[String])).thenReturn(123L)
     assert(theMockSubject.method1("foo") == 123L)
@@ -86,9 +80,8 @@ class ArgumentCaptureTest
 
     val captured = capturingAll(verify(theMockSubject, times(2)).method1 _)
     assert(captured == Seq("foo", "bar"))
-  }
 
-  test("captureAll should handle 2-ary functions") {
+  test("captureAll should handle 2-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method2(any[String], any[String])).thenReturn(456L)
     assert(theMockSubject.method2("foo", "bar") == 456L)
@@ -96,9 +89,8 @@ class ArgumentCaptureTest
 
     val captured = capturingAll(verify(theMockSubject, times(2)).method2 _)
     assert(captured == Seq(("foo", "bar"), ("baz", "spam")))
-  }
 
-  test("captureAll should handle 3-ary functions") {
+  test("captureAll should handle 3-ary functions")
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method3(any[String], any[String], any[String]))
       .thenReturn(136L)
@@ -112,9 +104,8 @@ class ArgumentCaptureTest
             ("foo", "bar", "baz"),
             ("spam", "ham", "eggs")
         ))
-  }
 
-  test("captureAll should handle 4-ary functions") {
+  test("captureAll should handle 4-ary functions")
     // This is really just a test of zip4
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method4(
@@ -129,9 +120,8 @@ class ArgumentCaptureTest
             ("foo", "bar", "baz", "spam"),
             ("north", "east", "south", "west")
         ))
-  }
 
-  test("captureAll should handle 5-ary functions") {
+  test("captureAll should handle 5-ary functions")
     // This is really just a test of zip5
     val theMockSubject = mock[MockSubject]
     when(theMockSubject.method5(
@@ -146,5 +136,3 @@ class ArgumentCaptureTest
             ("foo", "bar", "baz", "spam", "ham"),
             ("doh", "ray", "mi", "fa", "so")
         ))
-  }
-}

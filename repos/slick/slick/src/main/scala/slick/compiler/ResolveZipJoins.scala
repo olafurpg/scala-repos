@@ -13,7 +13,7 @@ import slick.util.ConstArray
   *
   * @param rownumStyle Whether to use `Subquery` boundaries suitable for Oracle-style ROWNUM
   *                    semantics instead of standard ROW_NUMBER(). */
-class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
+class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase
   type State = Boolean
   val name = "resolveZipJoins"
 
@@ -22,9 +22,9 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
   val condBelow: Subquery.Condition =
     if (rownumStyle) Subquery.BelowRownum else Subquery.BelowRowNumber
 
-  def apply(state: CompilerState) = {
+  def apply(state: CompilerState) =
     val n2 = state.tree
-      .replace({
+      .replace(
         case b @ Bind(s1,
                       Join(_,
                            _,
@@ -49,10 +49,9 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
           val b2 = transformZip(s1, jlsym, jrsym, l, ldefs, r, rdefs, sel)
           logger.debug("Transformed zip:", b2)
           b2
-      }, bottomUp = true)
+      , bottomUp = true)
       .infer()
     state + (this -> (n2 ne state.tree)) withNode n2
-  }
 
   /** Transform a `zipWithIndex` operation of the form
     * `Bind(s1, Join(_, _, Bind(ls, from, Pure(StructNode(defs), _)), RangeFrom(offset), JoinType.Zip, LiteralNode(true)), p)`
@@ -63,7 +62,7 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
                             from: Node,
                             defs: ConstArray[(TermSymbol, Node)],
                             offset: Long,
-                            p: Node): Node = {
+                            p: Node): Node =
     val idxSym = new AnonSymbol
     val idxExpr =
       if (offset == 1L) RowNumber()
@@ -71,12 +70,11 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
     val lbind = Bind(ls,
                      Subquery(from, condBelow),
                      Pure(StructNode(defs :+ (idxSym, idxExpr))))
-    Bind(s1, Subquery(lbind, condAbove), p.replace {
+    Bind(s1, Subquery(lbind, condAbove), p.replace
       case Select(Ref(s), ElementSymbol(1)) if s == s1 => Ref(s1)
       case Select(Ref(s), ElementSymbol(2)) if s == s1 =>
         Select(Ref(s1), idxSym)
-    }).infer()
-  }
+    ).infer()
 
   /** Transform a `zip` operation of the form
     * `Bind(s1, Join(jlsym, jrsym, l @ Bind(_, _, Pure(StructNode(ldefs), _)), r @ Bind(_, _, Pure(StructNode(rdefs), _)), JoinType.Zip, LiteralNode(true)), sel)`
@@ -89,20 +87,20 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
                    ldefs: ConstArray[(TermSymbol, Node)],
                    r: Bind,
                    rdefs: ConstArray[(TermSymbol, Node)],
-                   sel: Node): Node = {
+                   sel: Node): Node =
     val lmap = ldefs.iterator.map(t => (t._1, new AnonSymbol)).toMap
     val rmap = rdefs.iterator.map(t => (t._1, new AnonSymbol)).toMap
     val lisym, risym, l2sym, r2sym = new AnonSymbol
     val l2 = transformZipWithIndex(
-        l2sym, l.generator, l.from, ldefs, 1L, Pure(StructNode(ldefs.map {
+        l2sym, l.generator, l.from, ldefs, 1L, Pure(StructNode(ldefs.map
       case (f, _) =>
         (lmap(f) -> FwdPath(List(l2sym, ElementSymbol(1), f)))
-    } :+ (lisym -> FwdPath(List(l2sym, ElementSymbol(2)))))))
+    :+ (lisym -> FwdPath(List(l2sym, ElementSymbol(2)))))))
     val r2 = transformZipWithIndex(
-        r2sym, r.generator, r.from, rdefs, 1L, Pure(StructNode(rdefs.map {
+        r2sym, r.generator, r.from, rdefs, 1L, Pure(StructNode(rdefs.map
       case (f, _) =>
         (rmap(f) -> FwdPath(List(r2sym, ElementSymbol(1), f)))
-    } :+ (risym -> FwdPath(List(r2sym, ElementSymbol(2)))))))
+    :+ (risym -> FwdPath(List(r2sym, ElementSymbol(2)))))))
     val j2 = Join(jlsym,
                   jrsym,
                   l2,
@@ -110,11 +108,9 @@ class ResolveZipJoins(rownumStyle: Boolean = false) extends Phase {
                   JoinType.Inner,
                   Library.==.typed[Boolean](
                       Select(Ref(jlsym), lisym), Select(Ref(jrsym), risym)))
-    Bind(s1, j2, sel.replace {
+    Bind(s1, j2, sel.replace
       case FwdPath(Seq(s, ElementSymbol(1), f)) if s == s1 =>
         FwdPath(List(s, ElementSymbol(1), lmap(f)))
       case FwdPath(Seq(s, ElementSymbol(2), f)) if s == s1 =>
         FwdPath(List(s, ElementSymbol(2), rmap(f)))
-    }).infer()
-  }
-}
+    ).infer()

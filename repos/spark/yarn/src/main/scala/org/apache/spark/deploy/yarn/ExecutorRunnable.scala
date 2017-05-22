@@ -55,22 +55,21 @@ private[yarn] class ExecutorRunnable(container: Container,
                                      executorCores: Int,
                                      appId: String,
                                      securityMgr: SecurityManager)
-    extends Runnable with Logging {
+    extends Runnable with Logging
 
   var rpc: YarnRPC = YarnRPC.create(conf)
   var nmClient: NMClient = _
   val yarnConf: YarnConfiguration = new YarnConfiguration(conf)
   lazy val env = prepareEnvironment(container)
 
-  override def run(): Unit = {
+  override def run(): Unit =
     logInfo("Starting Executor Container")
     nmClient = NMClient.createNMClient()
     nmClient.init(yarnConf)
     nmClient.start()
     startContainer()
-  }
 
-  def startContainer(): java.util.Map[String, ByteBuffer] = {
+  def startContainer(): java.util.Map[String, ByteBuffer] =
     logInfo("Setting up ContainerLaunchContext")
 
     val ctx = Records
@@ -112,31 +111,27 @@ private[yarn] class ExecutorRunnable(container: Container,
     // If external shuffle service is enabled, register with the Yarn shuffle service already
     // started on the NodeManager and, if authentication is enabled, provide it with our secret
     // key for fetching shuffle files later
-    if (sparkConf.get(SHUFFLE_SERVICE_ENABLED)) {
+    if (sparkConf.get(SHUFFLE_SERVICE_ENABLED))
       val secretString = securityMgr.getSecretKey()
       val secretBytes =
-        if (secretString != null) {
+        if (secretString != null)
           // This conversion must match how the YarnShuffleService decodes our secret
           JavaUtils.stringToBytes(secretString)
-        } else {
+        else
           // Authentication is not enabled, so just provide dummy metadata
           ByteBuffer.allocate(0)
-        }
       ctx.setServiceData(
           Collections.singletonMap("spark_shuffle", secretBytes))
-    }
 
     // Send the start request to the ContainerManager
-    try {
+    try
       nmClient.startContainer(container, ctx)
-    } catch {
+    catch
       case ex: Exception =>
         throw new SparkException(
             s"Exception while starting container ${container.getId}" +
             s" on host $hostname",
             ex)
-    }
-  }
 
   private def prepareCommand(
       masterAddress: String,
@@ -145,7 +140,7 @@ private[yarn] class ExecutorRunnable(container: Container,
       executorMemory: Int,
       executorCores: Int,
       appId: String,
-      localResources: HashMap[String, LocalResource]): List[String] = {
+      localResources: HashMap[String, LocalResource]): List[String] =
     // Extra options for the JVM
     val javaOpts = ListBuffer[String]()
 
@@ -159,18 +154,15 @@ private[yarn] class ExecutorRunnable(container: Container,
     javaOpts += "-Xmx" + executorMemoryString
 
     // Set extra Java options for the executor, if defined
-    sparkConf.get(EXECUTOR_JAVA_OPTIONS).foreach { opts =>
+    sparkConf.get(EXECUTOR_JAVA_OPTIONS).foreach  opts =>
       javaOpts ++=
         Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
-    }
-    sys.env.get("SPARK_JAVA_OPTS").foreach { opts =>
+    sys.env.get("SPARK_JAVA_OPTS").foreach  opts =>
       javaOpts ++=
         Utils.splitCommandString(opts).map(YarnSparkHadoopUtil.escapeForShell)
-    }
-    sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach { p =>
+    sparkConf.get(EXECUTOR_LIBRARY_PATH).foreach  p =>
       prefixEnv = Some(
           Client.getClusterPath(sparkConf, Utils.libraryPathEnvPrefix(Seq(p))))
-    }
 
     javaOpts += "-Djava.io.tmpdir=" + new Path(
         YarnSparkHadoopUtil.expandEnvironment(Environment.PWD),
@@ -181,11 +173,10 @@ private[yarn] class ExecutorRunnable(container: Container,
     // registers with the Scheduler and transfers the spark configs. Since the Executor backend
     // uses RPC to connect to the scheduler, the RPC settings are needed as well as the
     // authentication settings.
-    sparkConf.getAll.filter {
+    sparkConf.getAll.filter
       case (k, v) => SparkConf.isExecutorStartupConf(k)
-    }.foreach {
+    .foreach
       case (k, v) => javaOpts += YarnSparkHadoopUtil.escapeForShell(s"-D$k=$v")
-    }
 
     // Commenting it out for now - so that people can refer to the properties if required. Remove
     // it once cpuset version is pushed out.
@@ -221,15 +212,13 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     val userClassPath = Client
       .getUserClasspath(sparkConf)
-      .flatMap { uri =>
+      .flatMap  uri =>
         val absPath =
-          if (new File(uri.getPath()).isAbsolute()) {
+          if (new File(uri.getPath()).isAbsolute())
             Client.getClusterPath(sparkConf, uri.getPath())
-          } else {
+          else
             Client.buildPath(Environment.PWD.$(), uri.getPath())
-          }
         Seq("--user-class-path", "file:" + absPath)
-      }
       .toSeq
 
     val commands =
@@ -261,7 +250,6 @@ private[yarn] class ExecutorRunnable(container: Container,
 
     // TODO: it would be nicer to just make sure there are no null commands here
     commands.map(s => if (s == null) "null" else s).toList
-  }
 
   private def setupDistributedCache(
       file: String,
@@ -269,7 +257,7 @@ private[yarn] class ExecutorRunnable(container: Container,
       localResources: HashMap[String, LocalResource],
       timestamp: String,
       size: String,
-      vis: String): Unit = {
+      vis: String): Unit =
     val uri = new URI(file)
     val amJarRsrc = Records.newRecord(classOf[LocalResource])
     amJarRsrc.setType(rtype)
@@ -278,13 +266,12 @@ private[yarn] class ExecutorRunnable(container: Container,
     amJarRsrc.setTimestamp(timestamp.toLong)
     amJarRsrc.setSize(size.toLong)
     localResources(uri.getFragment()) = amJarRsrc
-  }
 
-  private def prepareLocalResources: HashMap[String, LocalResource] = {
+  private def prepareLocalResources: HashMap[String, LocalResource] =
     logInfo("Preparing Local resources")
     val localResources = HashMap[String, LocalResource]()
 
-    if (System.getenv("SPARK_YARN_CACHE_FILES") != null) {
+    if (System.getenv("SPARK_YARN_CACHE_FILES") != null)
       val timeStamps =
         System.getenv("SPARK_YARN_CACHE_FILES_TIME_STAMPS").split(',')
       val fileSizes =
@@ -292,17 +279,15 @@ private[yarn] class ExecutorRunnable(container: Container,
       val distFiles = System.getenv("SPARK_YARN_CACHE_FILES").split(',')
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_FILES_VISIBILITIES").split(',')
-      for (i <- 0 to distFiles.length - 1) {
+      for (i <- 0 to distFiles.length - 1)
         setupDistributedCache(distFiles(i),
                               LocalResourceType.FILE,
                               localResources,
                               timeStamps(i),
                               fileSizes(i),
                               visibilities(i))
-      }
-    }
 
-    if (System.getenv("SPARK_YARN_CACHE_ARCHIVES") != null) {
+    if (System.getenv("SPARK_YARN_CACHE_ARCHIVES") != null)
       val timeStamps =
         System.getenv("SPARK_YARN_CACHE_ARCHIVES_TIME_STAMPS").split(',')
       val fileSizes =
@@ -310,22 +295,19 @@ private[yarn] class ExecutorRunnable(container: Container,
       val distArchives = System.getenv("SPARK_YARN_CACHE_ARCHIVES").split(',')
       val visibilities =
         System.getenv("SPARK_YARN_CACHE_ARCHIVES_VISIBILITIES").split(',')
-      for (i <- 0 to distArchives.length - 1) {
+      for (i <- 0 to distArchives.length - 1)
         setupDistributedCache(distArchives(i),
                               LocalResourceType.ARCHIVE,
                               localResources,
                               timeStamps(i),
                               fileSizes(i),
                               visibilities(i))
-      }
-    }
 
     logInfo("Prepared Local resources " + localResources)
     localResources
-  }
 
   private def prepareEnvironment(
-      container: Container): HashMap[String, String] = {
+      container: Container): HashMap[String, String] =
     val env = new HashMap[String, String]()
     Client.populateClasspath(null,
                              yarnConf,
@@ -334,17 +316,15 @@ private[yarn] class ExecutorRunnable(container: Container,
                              false,
                              sparkConf.get(EXECUTOR_CLASS_PATH))
 
-    sparkConf.getExecutorEnv.foreach {
+    sparkConf.getExecutorEnv.foreach
       case (key, value) =>
         // This assumes each executor environment variable set here is a path
         // This is kept for backward compatibility and consistency with hadoop
         YarnSparkHadoopUtil.addPathToEnvironment(env, key, value)
-    }
 
     // Keep this for backwards compatibility but users should move to the config
-    sys.env.get("SPARK_YARN_USER_ENV").foreach { userEnvs =>
+    sys.env.get("SPARK_YARN_USER_ENV").foreach  userEnvs =>
       YarnSparkHadoopUtil.setEnvFromInputString(env, userEnvs)
-    }
 
     // lookup appropriate http scheme for container log urls
     val yarnHttpPolicy = yarnConf.get(
@@ -355,7 +335,7 @@ private[yarn] class ExecutorRunnable(container: Container,
       if (yarnHttpPolicy == "HTTPS_ONLY") "https://" else "http://"
 
     // Add log urls
-    sys.env.get("SPARK_USER").foreach { user =>
+    sys.env.get("SPARK_USER").foreach  user =>
       val containerId = ConverterUtils.toString(container.getId)
       val address = container.getNodeHttpAddress
       val baseUrl =
@@ -363,11 +343,7 @@ private[yarn] class ExecutorRunnable(container: Container,
 
       env("SPARK_LOG_URL_STDERR") = s"$baseUrl/stderr?start=-4096"
       env("SPARK_LOG_URL_STDOUT") = s"$baseUrl/stdout?start=-4096"
-    }
 
-    System.getenv().asScala.filterKeys(_.startsWith("SPARK")).foreach {
+    System.getenv().asScala.filterKeys(_.startsWith("SPARK")).foreach
       case (k, v) => env(k) = v
-    }
     env
-  }
-}

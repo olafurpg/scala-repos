@@ -36,27 +36,23 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
-object LightBase {
+object LightBase
   implicit def sfxLightBase2jfx(lb: LightBase): jfxs.LightBase =
     if (lb != null) lb.delegate else null
-}
 
 /** The LightBase class provides definitions of common properties for objects that represent a form of Light source. */
 abstract class LightBase(override val delegate: jfxs.LightBase)
-    extends Node(delegate) with SFXDelegate[jfxs.LightBase] {
+    extends Node(delegate) with SFXDelegate[jfxs.LightBase]
 
   /** Specifies the color of light source. */
   def color: ObjectProperty[jfxsp.Color] = delegate.colorProperty
-  def color_=(v: Color) {
+  def color_=(v: Color)
     ObjectProperty.fillProperty[jfxsp.Color](this.color, v)
-  }
 
   /** Defines the light on or off. */
   def lightOn: BooleanProperty = delegate.lightOnProperty
-  def lightOn_=(v: Boolean) {
+  def lightOn_=(v: Boolean)
     lightOn() = v
-  }
 
   /** Gets the list of nodes that specifies the hierarchical scope of this Light. */
   def scope: ObservableBuffer[jfxs.Node] = delegate.getScope
-}

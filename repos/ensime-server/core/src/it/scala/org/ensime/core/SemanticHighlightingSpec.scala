@@ -11,7 +11,7 @@ import scala.reflect.internal.util.RangePosition
 class SemanticHighlightingSpec
     extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
-    with ReallyRichPresentationCompilerFixture {
+    with ReallyRichPresentationCompilerFixture
 
   def original = EnsimeConfigFixture.EmptyTestProject
 
@@ -20,18 +20,16 @@ class SemanticHighlightingSpec
       cc: RichCompilerControl,
       content: String,
       tpes: List[SourceSymbol] = SourceSymbol.allSymbols
-  ): List[(SourceSymbol, String)] = {
+  ): List[(SourceSymbol, String)] =
 
     val file = srcFile(config, "abc.scala", contents(content))
     cc.askLoadedTyped(file)
     val pos = new RangePosition(file, 0, 0, file.length)
     val sds = cc.askSymbolDesignationsInRegion(pos, tpes)
-    sds.syms.sortWith((a, b) => a.start < b.start).map { sym =>
+    sds.syms.sortWith((a, b) => a.start < b.start).map  sym =>
       (sym.symType, content.substring(sym.start, sym.end))
-    }
-  }
 
-  "SemanticHighlighting" should "highlight classes" in withPresCompiler {
+  "SemanticHighlighting" should "highlight classes" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -61,9 +59,8 @@ class SemanticHighlightingSpec
               (ClassSymbol, "Any"),
               (ClassSymbol, "Test")
           ))
-  }
 
-  it should "highlight constructors" in withPresCompiler { (config, cc) =>
+  it should "highlight constructors" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -89,9 +86,8 @@ class SemanticHighlightingSpec
             (ConstructorSymbol, "X2"),
             (ConstructorSymbol, "new   X3")
         ))
-  }
 
-  it should "highlight function calls" in withPresCompiler { (config, cc) =>
+  it should "highlight function calls" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -114,9 +110,8 @@ class SemanticHighlightingSpec
             (FunctionCallSymbol, "substring"),
             (FunctionCallSymbol, "quux")
         ))
-  }
 
-  it should "highlight deprecated symbols" in withPresCompiler {
+  it should "highlight deprecated symbols" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -174,9 +169,8 @@ class SemanticHighlightingSpec
               (DeprecatedSymbol, "Y"),
               (DeprecatedSymbol, "goo")
           ))
-  }
 
-  it should "support custom deprecated symbol names" in withPresCompiler {
+  it should "support custom deprecated symbol names" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -197,9 +191,8 @@ class SemanticHighlightingSpec
       sds should ===(List(
               (DeprecatedSymbol, "BadTrait")
           ))
-  }
 
-  it should "highlight imported names" in withPresCompiler { (config, cc) =>
+  it should "highlight imported names" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -217,9 +210,8 @@ class SemanticHighlightingSpec
             (ImportedNameSymbol, "Matchers"),
             (ImportedNameSymbol, "FunSpec")
         ))
-  }
 
-  it should "highlight objects" in withPresCompiler { (config, cc) =>
+  it should "highlight objects" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -246,9 +238,8 @@ class SemanticHighlightingSpec
             // TODO two problems there: "c" should be a varField ; E should be highlighted.
             (ObjectSymbol, "c")
         ))
-  }
 
-  it should "highlight operators" in withPresCompiler { (config, cc) =>
+  it should "highlight operators" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -266,9 +257,8 @@ class SemanticHighlightingSpec
             (OperatorFieldSymbol, "+"),
             (OperatorFieldSymbol, "*")
         ))
-  }
 
-  it should "highlight packages" in withPresCompiler { (config, cc) =>
+  it should "highlight packages" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -284,9 +274,8 @@ class SemanticHighlightingSpec
             (PackageSymbol, "example"),
             (PackageSymbol, "other")
         ))
-  }
 
-  it should "highlight params" in withPresCompiler { (config, cc) =>
+  it should "highlight params" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -305,9 +294,8 @@ class SemanticHighlightingSpec
             (ParamSymbol, "v"),
             (ParamSymbol, "u")
         ))
-  }
 
-  it should "highlight traits" in withPresCompiler { (config, cc) =>
+  it should "highlight traits" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -339,9 +327,8 @@ class SemanticHighlightingSpec
             (TraitSymbol, "X5[ String]"),
             (TraitSymbol, "v2 .X6")
         ))
-  }
 
-  it should "highlight typeParams" in withPresCompiler { (config, cc) =>
+  it should "highlight typeParams" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -364,9 +351,8 @@ class SemanticHighlightingSpec
             (TypeParamSymbol, "XX"),
             (TypeParamSymbol, "YY")
         ))
-  }
 
-  it should "highlight vals" in withPresCompiler { (config, cc) =>
+  it should "highlight vals" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -388,9 +374,8 @@ class SemanticHighlightingSpec
             (ValSymbol, "v"),
             (ValSymbol, "u")
         ))
-  }
 
-  it should "highlight valFields" in withPresCompiler { (config, cc) =>
+  it should "highlight valFields" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -414,9 +399,8 @@ class SemanticHighlightingSpec
             (ValFieldSymbol, "u"),
             (ValFieldSymbol, "v")
         ))
-  }
 
-  it should "highlight vars" in withPresCompiler { (config, cc) =>
+  it should "highlight vars" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -438,9 +422,8 @@ class SemanticHighlightingSpec
             (VarSymbol, "v"),
             (VarSymbol, "u")
         ))
-  }
 
-  it should "highlight varFields" in withPresCompiler { (config, cc) =>
+  it should "highlight varFields" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -464,9 +447,8 @@ class SemanticHighlightingSpec
             (VarFieldSymbol, "u"),
             (VarFieldSymbol, "v")
         ))
-  }
 
-  it should "highlight lazy val fields correctly as vals" in withPresCompiler {
+  it should "highlight lazy val fields correctly as vals" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -488,9 +470,8 @@ class SemanticHighlightingSpec
               (ValFieldSymbol, "u"),
               (ValFieldSymbol, "v")
           ))
-  }
 
-  it should "highlight setter operators" in withPresCompiler { (config, cc) =>
+  it should "highlight setter operators" in withPresCompiler  (config, cc) =>
     val sds = getSymbolDesignations(
         config,
         cc,
@@ -510,9 +491,8 @@ class SemanticHighlightingSpec
     sds should ===(List(
             (OperatorFieldSymbol, "value")
         ))
-  }
 
-  it should "not be confused by whitespace" in withPresCompiler {
+  it should "not be confused by whitespace" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -527,9 +507,8 @@ class SemanticHighlightingSpec
               (PackageSymbol, "com"),
               (PackageSymbol, "example")
           ))
-  }
 
-  it should "highlight negation operators" in withPresCompiler {
+  it should "highlight negation operators" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -547,9 +526,8 @@ class SemanticHighlightingSpec
               (OperatorFieldSymbol, "!"),
               (OperatorFieldSymbol, "==")
           ))
-  }
 
-  it should "highlight implicit conversions" in withPresCompiler {
+  it should "highlight implicit conversions" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -568,9 +546,8 @@ class SemanticHighlightingSpec
       sds should ===(List(
               (ImplicitConversionSymbol, "\"sample\"")
           ))
-  }
 
-  it should "highlight implicit parameters" in withPresCompiler {
+  it should "highlight implicit parameters" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -591,9 +568,8 @@ class SemanticHighlightingSpec
       sds should ===(List(
               (ImplicitParamsSymbol, "zz(1)")
           ))
-  }
 
-  it should "highlight method calls after operators" in withPresCompiler {
+  it should "highlight method calls after operators" in withPresCompiler
     (config, cc) =>
       val sds = getSymbolDesignations(
           config,
@@ -612,5 +588,3 @@ class SemanticHighlightingSpec
               (FunctionCallSymbol, "fun"),
               (FunctionCallSymbol, "foo")
           ))
-  }
-}

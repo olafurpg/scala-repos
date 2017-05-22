@@ -25,7 +25,7 @@ import scala.language.existentials // SI-6541
   *  and/or joining a discussion of a somewhat related potential language feature at [[https://groups.google.com/forum/#!topic/scala-debate/f4CLmYShX6Q]].
   *  We also welcome questions and suggestions on our mailing lists, where we would be happy to further discuss this matter.
   */
-trait Enclosures { self: blackbox.Context =>
+trait Enclosures  self: blackbox.Context =>
 
   /** The tree that undergoes macro expansion.
     *  Can be useful to get an offset or a range position of the entire tree being processed.
@@ -129,4 +129,3 @@ trait Enclosures { self: blackbox.Context =>
   case class EnclosureException(expected: Class[_], enclosingTrees: List[Tree])
       extends Exception(
           s"Couldn't find a tree of type $expected among enclosing trees $enclosingTrees")
-}

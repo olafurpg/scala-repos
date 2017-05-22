@@ -26,7 +26,7 @@ import scala.util.{Try, Success, Failure}
   * @group Event Data
   */
 @DeveloperApi
-object EventJson4sSupport {
+object EventJson4sSupport
 
   /** This is set to org.json4s.DefaultFormats. Do not use JSON4S to serialize
     * or deserialize Joda-Time DateTime because it has some issues with timezone
@@ -40,12 +40,12 @@ object EventJson4sSupport {
     * @return deserialization routine used by [[APISerializer]]
     */
   @DeveloperApi
-  def readJson: PartialFunction[JValue, Event] = {
-    case JObject(x) => {
+  def readJson: PartialFunction[JValue, Event] =
+    case JObject(x) =>
         val fields = new DataMap(x.toMap)
         // use get() if required in json
         // use getOpt() if not required in json
-        try {
+        try
           val event = fields.get[String]("event")
           val entityType = fields.get[String]("entityType")
           val entityId = fields.get[String]("entityId")
@@ -57,14 +57,12 @@ object EventJson4sSupport {
           lazy val currentTime = DateTime.now(EventValidation.defaultTimeZone)
           val eventTime = fields
             .getOpt[String]("eventTime")
-            .map { s =>
-              try {
+            .map  s =>
+              try
                 DataUtils.stringToDateTime(s)
-              } catch {
+              catch
                 case _: Exception =>
                   throw new MappingException(s"Fail to extract eventTime ${s}")
-              }
-            }
             .getOrElse(currentTime)
 
           // disable tags from API for now.
@@ -98,11 +96,8 @@ object EventJson4sSupport {
           )
           EventValidation.validate(newEvent)
           newEvent
-        } catch {
+        catch
           case e: Exception => throw new MappingException(e.toString, e)
-        }
-      }
-  }
 
   /** :: DeveloperApi ::
     * Convert [[Event]] to JSON for use by the Event Server
@@ -110,8 +105,8 @@ object EventJson4sSupport {
     * @return serialization routine used by [[APISerializer]]
     */
   @DeveloperApi
-  def writeJson: PartialFunction[Any, JValue] = {
-    case d: Event => {
+  def writeJson: PartialFunction[Any, JValue] =
+    case d: Event =>
         JObject(
             JField("eventId",
                    d.eventId.map(eid => JString(eid)).getOrElse(JNothing)) :: JField(
@@ -130,8 +125,6 @@ object EventJson4sSupport {
             JField("prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: // don't show creationTime for now
             JField("creationTime",
                    JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
-      }
-  }
 
   /** :: DeveloperApi ::
     * Convert JSON4S JValue to [[Event]]
@@ -139,8 +132,8 @@ object EventJson4sSupport {
     * @return deserialization routine used by [[DBSerializer]]
     */
   @DeveloperApi
-  def deserializeFromJValue: PartialFunction[JValue, Event] = {
-    case jv: JValue => {
+  def deserializeFromJValue: PartialFunction[JValue, Event] =
+    case jv: JValue =>
         val event = (jv \ "event").extract[String]
         val entityType = (jv \ "entityType").extract[String]
         val entityId = (jv \ "entityId").extract[String]
@@ -164,8 +157,6 @@ object EventJson4sSupport {
               tags = tags,
               prId = prId,
               creationTime = creationTime)
-      }
-  }
 
   /** :: DeveloperApi ::
     * Convert [[Event]] to JSON4S JValue
@@ -173,8 +164,8 @@ object EventJson4sSupport {
     * @return serialization routine used by [[DBSerializer]]
     */
   @DeveloperApi
-  def serializeToJValue: PartialFunction[Any, JValue] = {
-    case d: Event => {
+  def serializeToJValue: PartialFunction[Any, JValue] =
+    case d: Event =>
         JObject(
             JField("event", JString(d.event)) :: JField(
                 "entityType", JString(d.entityType)) :: JField(
@@ -190,8 +181,6 @@ object EventJson4sSupport {
                 "prId", d.prId.map(JString(_)).getOrElse(JNothing)) :: JField(
                 "creationTime",
                 JString(DataUtils.dateTimeToString(d.creationTime))) :: Nil)
-      }
-  }
 
   /** :: DeveloperApi ::
     * Custom JSON4S serializer for [[Event]] intended to be used by database
@@ -209,27 +198,21 @@ object EventJson4sSupport {
   @DeveloperApi
   class APISerializer
       extends CustomSerializer[Event](format => (readJson, writeJson))
-}
 
 @DeveloperApi
-object BatchEventsJson4sSupport {
+object BatchEventsJson4sSupport
   implicit val formats = DefaultFormats
 
   @DeveloperApi
-  def readJson: PartialFunction[JValue, Seq[Try[Event]]] = {
-    case JArray(events) => {
-        events.map { event =>
-          try {
+  def readJson: PartialFunction[JValue, Seq[Try[Event]]] =
+    case JArray(events) =>
+        events.map  event =>
+          try
             Success(EventJson4sSupport.readJson(event))
-          } catch {
+          catch
             case e: Exception => Failure(e)
-          }
-        }
-      }
-  }
 
   @DeveloperApi
   class APISerializer
       extends CustomSerializer[Seq[Try[Event]]](
           format => (readJson, Map.empty))
-}

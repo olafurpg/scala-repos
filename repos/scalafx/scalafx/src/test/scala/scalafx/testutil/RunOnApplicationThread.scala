@@ -31,9 +31,9 @@ import javafx.application.Platform
 
 import org.scalatest.{Outcome, Suite, SuiteMixin}
 
-trait RunOnApplicationThread extends SuiteMixin {
+trait RunOnApplicationThread extends SuiteMixin
   this: Suite =>
-  abstract override def withFixture(test: NoArgTest): Outcome = {
+  abstract override def withFixture(test: NoArgTest): Outcome =
     BootstrapApplication.launch()
     val appThreadLatch = new CountDownLatch(1)
     val superWith =
@@ -41,21 +41,16 @@ trait RunOnApplicationThread extends SuiteMixin {
     var testException: Exception = null
     var outcome: Outcome = null
     Platform.runLater(
-        new Runnable() {
-      override def run() {
-        try {
+        new Runnable()
+      override def run()
+        try
           outcome = superWith(test)
-        } catch {
+        catch
           case e: Exception => testException = e
-        } finally {
+        finally
           appThreadLatch.countDown()
-        }
-      }
-    })
+    )
     appThreadLatch.await()
-    if (testException != null) {
+    if (testException != null)
       throw testException
-    }
     outcome
-  }
-}

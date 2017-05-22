@@ -35,7 +35,7 @@ import scala.runtime.ScalaRunTime.arrayElementClass
   */
 @scala.annotation.implicitNotFound(msg = "No ClassTag available for ${T}")
 trait ClassTag[T]
-    extends ClassManifestDeprecatedApis[T] with Equals with Serializable {
+    extends ClassManifestDeprecatedApis[T] with Equals with Serializable
   // please, don't add any APIs here, like it was with `newWrappedArray` and `newArrayBuilder`
   // class tags, and all tags in general, should be as minimalistic as possible
 
@@ -49,7 +49,7 @@ trait ClassTag[T]
 
   /** Produces a new array with element type `T` and length `len` */
   override def newArray(len: Int): Array[T] =
-    runtimeClass match {
+    runtimeClass match
       case java.lang.Byte.TYPE => new Array[Byte](len).asInstanceOf[Array[T]]
       case java.lang.Short.TYPE => new Array[Short](len).asInstanceOf[Array[T]]
       case java.lang.Character.TYPE =>
@@ -66,7 +66,6 @@ trait ClassTag[T]
         java.lang.reflect.Array
           .newInstance(runtimeClass, len)
           .asInstanceOf[Array[T]]
-    }
 
   /** A ClassTag[T] can serve as an extractor that matches only objects of type T.
     *
@@ -123,18 +122,16 @@ trait ClassTag[T]
     x.isInstanceOf[ClassTag[_]] &&
     this.runtimeClass == x.asInstanceOf[ClassTag[_]].runtimeClass
   override def hashCode = scala.runtime.ScalaRunTime.hash(runtimeClass)
-  override def toString = {
+  override def toString =
     def prettyprint(clazz: jClass[_]): String =
       if (clazz.isArray) s"Array[${prettyprint(arrayElementClass(clazz))}]"
       else clazz.getName
     prettyprint(runtimeClass)
-  }
-}
 
 /**
   * Class tags corresponding to primitive types and constructor/extractor for ClassTags.
   */
-object ClassTag {
+object ClassTag
   private val ObjectTYPE = classOf[java.lang.Object]
   private val NothingTYPE = classOf[scala.runtime.Nothing$]
   private val NullTYPE = classOf[scala.runtime.Null$]
@@ -156,7 +153,7 @@ object ClassTag {
   val Null: ClassTag[scala.Null] = Manifest.Null
 
   def apply[T](runtimeClass1: jClass[_]): ClassTag[T] =
-    runtimeClass1 match {
+    runtimeClass1 match
       case java.lang.Byte.TYPE => ClassTag.Byte.asInstanceOf[ClassTag[T]]
       case java.lang.Short.TYPE => ClassTag.Short.asInstanceOf[ClassTag[T]]
       case java.lang.Character.TYPE => ClassTag.Char.asInstanceOf[ClassTag[T]]
@@ -170,7 +167,5 @@ object ClassTag {
       case NothingTYPE => ClassTag.Nothing.asInstanceOf[ClassTag[T]]
       case NullTYPE => ClassTag.Null.asInstanceOf[ClassTag[T]]
       case _ => new ClassTag[T] { def runtimeClass = runtimeClass1 }
-    }
 
   def unapply[T](ctag: ClassTag[T]): Option[Class[_]] = Some(ctag.runtimeClass)
-}

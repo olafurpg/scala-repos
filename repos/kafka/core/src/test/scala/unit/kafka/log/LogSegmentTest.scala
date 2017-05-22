@@ -27,12 +27,12 @@ import kafka.utils.SystemTime
 
 import scala.collection._
 
-class LogSegmentTest {
+class LogSegmentTest
 
   val segments = mutable.ArrayBuffer[LogSegment]()
 
   /* create a segment with the given base offset */
-  def createSegment(offset: Long): LogSegment = {
+  def createSegment(offset: Long): LogSegment =
     val msFile = TestUtils.tempFile()
     val ms = new FileMessageSet(msFile)
     val idxFile = TestUtils.tempFile()
@@ -41,55 +41,49 @@ class LogSegmentTest {
     val seg = new LogSegment(ms, idx, offset, 10, 0, SystemTime)
     segments += seg
     seg
-  }
 
   /* create a ByteBufferMessageSet for the given messages starting from the given offset */
-  def messages(offset: Long, messages: String*): ByteBufferMessageSet = {
+  def messages(offset: Long, messages: String*): ByteBufferMessageSet =
     new ByteBufferMessageSet(
         compressionCodec = NoCompressionCodec,
         offsetCounter = new LongRef(offset),
         messages = messages.map(s => new Message(s.getBytes)): _*)
-  }
 
   @After
-  def teardown() {
-    for (seg <- segments) {
+  def teardown()
+    for (seg <- segments)
       seg.index.delete()
       seg.log.delete()
-    }
-  }
 
   /**
     * A read on an empty log segment should return null
     */
   @Test
-  def testReadOnEmptySegment() {
+  def testReadOnEmptySegment()
     val seg = createSegment(40)
     val read = seg.read(startOffset = 40, maxSize = 300, maxOffset = None)
     assertNull(
         "Read beyond the last offset in the segment should be null", read)
-  }
 
   /**
     * Reading from before the first offset in the segment should return messages
     * beginning with the first message in the segment
     */
   @Test
-  def testReadBeforeFirstOffset() {
+  def testReadBeforeFirstOffset()
     val seg = createSegment(40)
     val ms = messages(50, "hello", "there", "little", "bee")
     seg.append(50, ms)
     val read =
       seg.read(startOffset = 41, maxSize = 300, maxOffset = None).messageSet
     assertEquals(ms.toList, read.toList)
-  }
 
   /**
     * If we set the startOffset and maxOffset for the read to be the same value
     * we should get only the first message in the log
     */
   @Test
-  def testMaxOffset() {
+  def testMaxOffset()
     val baseOffset = 50
     val seg = createSegment(baseOffset)
     val ms = messages(baseOffset, "hello", "there", "beautiful")
@@ -105,27 +99,25 @@ class LogSegmentTest {
     validate(50)
     validate(51)
     validate(52)
-  }
 
   /**
     * If we read from an offset beyond the last offset in the segment we should get null
     */
   @Test
-  def testReadAfterLast() {
+  def testReadAfterLast()
     val seg = createSegment(40)
     val ms = messages(50, "hello", "there")
     seg.append(50, ms)
     val read = seg.read(startOffset = 52, maxSize = 200, maxOffset = None)
     assertNull(
         "Read beyond the last offset in the segment should give null", read)
-  }
 
   /**
     * If we read from an offset which doesn't exist we should get a message set beginning
     * with the least offset greater than the given startOffset.
     */
   @Test
-  def testReadFromGap() {
+  def testReadFromGap()
     val seg = createSegment(40)
     val ms = messages(50, "hello", "there")
     seg.append(50, ms)
@@ -133,17 +125,16 @@ class LogSegmentTest {
     seg.append(60, ms2)
     val read = seg.read(startOffset = 55, maxSize = 200, maxOffset = None)
     assertEquals(ms2.toList, read.messageSet.toList)
-  }
 
   /**
     * In a loop append two messages then truncate off the second of those messages and check that we can read
     * the first but not the second message.
     */
   @Test
-  def testTruncate() {
+  def testTruncate()
     val seg = createSegment(40)
     var offset = 40
-    for (i <- 0 until 30) {
+    for (i <- 0 until 30)
       val ms1 = messages(offset, "hello")
       seg.append(offset, ms1)
       val ms2 = messages(offset + 1, "hello")
@@ -157,38 +148,34 @@ class LogSegmentTest {
       assertEquals(1, read2.messageSet.size)
       assertEquals(ms1.head, read2.messageSet.head)
       offset += 1
-    }
-  }
 
   /**
     * Test truncating the whole segment, and check that we can reappend with the original offset.
     */
   @Test
-  def testTruncateFull() {
+  def testTruncateFull()
     // test the case where we fully truncate the log
     val seg = createSegment(40)
     seg.append(40, messages(40, "hello", "there"))
     seg.truncateTo(0)
     assertNull("Segment should be empty.", seg.read(0, None, 1024))
     seg.append(40, messages(40, "hello", "there"))
-  }
 
   /**
     * Test that offsets are assigned sequentially and that the nextOffset variable is incremented
     */
   @Test
-  def testNextOffsetCalculation() {
+  def testNextOffsetCalculation()
     val seg = createSegment(40)
     assertEquals(40, seg.nextOffset)
     seg.append(50, messages(50, "hello", "there", "you"))
     assertEquals(53, seg.nextOffset())
-  }
 
   /**
     * Test that we can change the file suffixes for the log and index files
     */
   @Test
-  def testChangeFileSuffixes() {
+  def testChangeFileSuffixes()
     val seg = createSegment(40)
     val logFile = seg.log.file
     val indexFile = seg.index.file
@@ -199,14 +186,13 @@ class LogSegmentTest {
         indexFile.getAbsolutePath + ".deleted", seg.index.file.getAbsolutePath)
     assertTrue(seg.log.file.exists)
     assertTrue(seg.index.file.exists)
-  }
 
   /**
     * Create a segment with some data and an index. Then corrupt the index,
     * and recover the segment, the entries should all be readable.
     */
   @Test
-  def testRecoveryFixesCorruptIndex() {
+  def testRecoveryFixesCorruptIndex()
     val seg = createSegment(0)
     for (i <- 0 until 100) seg.append(i, messages(i, i.toString))
     val indexFile = seg.index.file
@@ -214,15 +200,14 @@ class LogSegmentTest {
     seg.recover(64 * 1024)
     for (i <- 0 until 100) assertEquals(
         i, seg.read(i, Some(i + 1), 1024).messageSet.head.offset)
-  }
 
   /**
     * Randomly corrupt a log a number of times and attempt recovery.
     */
   @Test
-  def testRecoveryWithCorruptMessage() {
+  def testRecoveryWithCorruptMessage()
     val messagesAppended = 20
-    for (iteration <- 0 until 10) {
+    for (iteration <- 0 until 10)
       val seg = createSegment(0)
       for (i <- 0 until messagesAppended) seg.append(
           i, messages(i, i.toString))
@@ -238,14 +223,12 @@ class LogSegmentTest {
                    (0 until offsetToBeginCorruption).toList,
                    seg.log.map(_.offset).toList)
       seg.delete()
-    }
-  }
 
   /* create a segment with   pre allocate */
   def createSegment(offset: Long,
                     fileAlreadyExists: Boolean = false,
                     initFileSize: Int = 0,
-                    preallocate: Boolean = false): LogSegment = {
+                    preallocate: Boolean = false): LogSegment =
     val tempDir = TestUtils.tempDir()
     val seg = new LogSegment(tempDir,
                              offset,
@@ -258,11 +241,10 @@ class LogSegmentTest {
                              preallocate = preallocate)
     segments += seg
     seg
-  }
 
   /* create a segment with   pre allocate, put message to it and verify */
   @Test
-  def testCreateWithInitFileSizeAppendMessage() {
+  def testCreateWithInitFileSizeAppendMessage()
     val seg = createSegment(40, false, 512 * 1024 * 1024, true)
     val ms = messages(50, "hello", "there")
     seg.append(50, ms)
@@ -270,11 +252,10 @@ class LogSegmentTest {
     seg.append(60, ms2)
     val read = seg.read(startOffset = 55, maxSize = 200, maxOffset = None)
     assertEquals(ms2.toList, read.messageSet.toList)
-  }
 
   /* create a segment with   pre allocate and clearly shut down*/
   @Test
-  def testCreateWithInitFileSizeClearShutdown() {
+  def testCreateWithInitFileSizeClearShutdown()
     val tempDir = TestUtils.tempDir()
     val seg = new LogSegment(
         tempDir, 40, 10, 1000, 0, SystemTime, false, 512 * 1024 * 1024, true)
@@ -306,5 +287,3 @@ class LogSegmentTest {
     assertEquals(oldPosition, position)
     assertEquals(oldSize, size)
     assertEquals(size, fileSize)
-  }
-}

@@ -19,7 +19,7 @@ import java.util.TimeZone
 
 import org.apache.hadoop.conf.Configuration
 
-object TimePathedSource {
+object TimePathedSource
   val YEAR_MONTH_DAY = "/%1$tY/%1$tm/%1$td"
   val YEAR_MONTH_DAY_HOUR = "/%1$tY/%1$tm/%1$td/%1$tH"
 
@@ -30,9 +30,9 @@ object TimePathedSource {
     List("%1$tH" -> Hours(1),
          "%1$td" -> Days(1)(tz),
          "%1$tm" -> Months(1)(tz),
-         "%1$tY" -> Years(1)(tz)).find { unitDur: (String, Duration) =>
+         "%1$tY" -> Years(1)(tz)).find  unitDur: (String, Duration) =>
       pattern.contains(unitDur._1)
-    }.map(_._2)
+    .map(_._2)
 
   /**
     * Gives all paths in the given daterange with windows based on the provided duration.
@@ -42,42 +42,36 @@ object TimePathedSource {
                            dateRange: DateRange,
                            tz: TimeZone): Iterable[String] =
     // This method is exhaustive, but too expensive for Cascading's JobConf writing.
-    dateRange.each(duration).map { dr: DateRange =>
+    dateRange.each(duration).map  dr: DateRange =>
       toPath(pattern, dr.start, tz)
-    }
 
   /**
     * Gives all read paths in the given daterange.
     */
   def readPathsFor(pattern: String,
                    dateRange: DateRange,
-                   tz: TimeZone): Iterable[String] = {
-    TimePathedSource.stepSize(pattern, tz) match {
+                   tz: TimeZone): Iterable[String] =
+    TimePathedSource.stepSize(pattern, tz) match
       case Some(duration) =>
         allPathsWithDuration(pattern, duration, dateRange, tz)
       case None => sys.error(s"No suitable step size for pattern: $pattern")
-    }
-  }
 
   /**
     * Gives the write path based on daterange end.
     */
   def writePathFor(
-      pattern: String, dateRange: DateRange, tz: TimeZone): String = {
+      pattern: String, dateRange: DateRange, tz: TimeZone): String =
     assert(pattern != "/*", "Pattern must not be /*")
     assert(pattern.takeRight(2) == "/*", "Pattern must end with /* " + pattern)
     val stripped = pattern.dropRight(2)
     toPath(stripped, dateRange.end, tz)
-  }
-}
 
 abstract class TimeSeqPathedSource(
     val patterns: Seq[String], val dateRange: DateRange, val tz: TimeZone)
-    extends FileSource {
+    extends FileSource
 
-  override def hdfsPaths = patterns.flatMap { pattern: String =>
+  override def hdfsPaths = patterns.flatMap  pattern: String =>
     Globifier(pattern)(tz).globify(dateRange)
-  }
 
   /**
     * Override this if you have for instance an hourly pattern but want to run every 6 hours.
@@ -87,11 +81,10 @@ abstract class TimeSeqPathedSource(
     TimePathedSource.stepSize(pattern, tz)
 
   protected def allPathsFor(pattern: String): Iterable[String] =
-    defaultDurationFor(pattern) match {
+    defaultDurationFor(pattern) match
       case Some(duration) =>
         TimePathedSource.allPathsWithDuration(pattern, duration, dateRange, tz)
       case None => sys.error(s"No suitable step size for pattern: $pattern")
-    }
 
   /** These are all the paths we will read for this data completely enumerated */
   def allPaths: Iterable[String] =
@@ -102,20 +95,17 @@ abstract class TimeSeqPathedSource(
     * (which by default checks that there is at least on file in that directory)
     */
   def getPathStatuses(conf: Configuration): Iterable[(String, Boolean)] =
-    allPaths.map { path =>
+    allPaths.map  path =>
       (path, pathIsGood(path, conf))
-    }
 
   // Override because we want to check UNGLOBIFIED paths that each are present.
   override def hdfsReadPathsAreGood(conf: Configuration): Boolean =
-    getPathStatuses(conf).forall {
+    getPathStatuses(conf).forall
       case (path, good) =>
-        if (!good) {
+        if (!good)
           System.err.println(
               "[ERROR] Path: " + path + " is missing in: " + toString)
-        }
         good
-    }
 
   override def toString =
     "TimeSeqPathedSource(" + patterns.mkString(",") + ", " + dateRange + ", " +
@@ -129,7 +119,6 @@ abstract class TimeSeqPathedSource(
 
   override def hashCode =
     patterns.hashCode + 31 * dateRange.hashCode + (31 ^ 2) * tz.hashCode
-}
 
 /**
   * This will automatically produce a globbed version of the given path.
@@ -138,22 +127,20 @@ abstract class TimeSeqPathedSource(
   */
 abstract class TimePathedSource(
     val pattern: String, dateRange: DateRange, tz: TimeZone)
-    extends TimeSeqPathedSource(Seq(pattern), dateRange, tz) {
+    extends TimeSeqPathedSource(Seq(pattern), dateRange, tz)
 
   //Write to the path defined by the end time:
   override def hdfsWritePath =
     TimePathedSource.writePathFor(pattern, dateRange, tz)
 
-  override def localPaths = patterns.flatMap { pattern: String =>
+  override def localPaths = patterns.flatMap  pattern: String =>
     Globifier(pattern)(tz).globify(dateRange)
-  }
-}
 
 /*
  * A source that contains the most recent existing path in this date range.
  */
 abstract class MostRecentGoodSource(p: String, dr: DateRange, t: TimeZone)
-    extends TimePathedSource(p, dr, t) {
+    extends TimePathedSource(p, dr, t)
 
   override def toString =
     "MostRecentGoodSource(" + p + ", " + dr + ", " + t + ")"
@@ -163,4 +150,3 @@ abstract class MostRecentGoodSource(p: String, dr: DateRange, t: TimeZone)
 
   override def hdfsReadPathsAreGood(conf: Configuration) =
     getPathStatuses(conf).exists(_._2)
-}

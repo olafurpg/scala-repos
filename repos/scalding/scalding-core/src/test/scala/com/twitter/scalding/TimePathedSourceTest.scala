@@ -19,28 +19,21 @@ import java.util.TimeZone
 
 import org.scalatest.{Matchers, WordSpec}
 
-class TimePathedSourceTest extends WordSpec with Matchers {
-  "TimePathedSource.hdfsWritePath" should {
+class TimePathedSourceTest extends WordSpec with Matchers
+  "TimePathedSource.hdfsWritePath" should
     val dateRange = DateRange(RichDate(0L), RichDate(0L))
     val utcTZ = DateOps.UTC
 
-    "crib if path == /*" in {
-      intercept[AssertionError] {
+    "crib if path == /*" in
+      intercept[AssertionError]
         TestTimePathedSource("/*", dateRange, utcTZ).hdfsWritePath
-      }
-    }
 
-    "crib if path doesn't end with /*" in {
-      intercept[AssertionError] {
+    "crib if path doesn't end with /*" in
+      intercept[AssertionError]
         TestTimePathedSource("/my/invalid/path", dateRange, utcTZ).hdfsWritePath
-      }
-    }
 
-    "work for path ending with /*" in {
+    "work for path ending with /*" in
       TestTimePathedSource("/my/path/*", dateRange, utcTZ).hdfsWritePath startsWith "/my/path"
-    }
-  }
-}
 
 case class TestTimePathedSource(p: String, dr: DateRange, t: TimeZone)
     extends TimePathedSource(p, dr, t)

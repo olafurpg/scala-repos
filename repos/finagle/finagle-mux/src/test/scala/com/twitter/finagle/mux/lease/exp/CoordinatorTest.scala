@@ -14,16 +14,15 @@ import org.scalatest.mock.MockitoSugar
 import scala.collection.mutable.Buffer
 
 @RunWith(classOf[JUnitRunner])
-class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
-  trait Ctx {
+class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar
+  trait Ctx
     val ctr = mock[ByteCounter]
     val coord = new Coordinator(ctr)
     val nfo = mock[JvmInfo]
     when(ctr.info).thenReturn(nfo)
     when(ctr.rate()).thenReturn(1)
-  }
 
-  test("Coordinator gateCycles properly") {
+  test("Coordinator gateCycles properly")
     val ctx = new Ctx {}
     import ctx._
 
@@ -33,22 +32,18 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
         coord.gateCycle()
-      }
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         when(nfo.remaining()).thenReturn(80.bytes)
         ctl.advance(48.milliseconds) // 4/5 of 60 bytes * 1000 bps == 48.ms
-      }
 
       conduct()
-    }
-  }
 
-  test("Coordinator warms up properly") {
+  test("Coordinator warms up properly")
     val ctx = new Ctx {}
     import ctx._
 
@@ -58,22 +53,18 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
         coord.warmup()
-      }
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         when(nfo.remaining()).thenReturn(10.megabytes - 2.byte)
         ctl.advance(10.millisecond)
-      }
 
       conduct()
-    }
-  }
 
-  test("Coordinator sleeps until gc") {
+  test("Coordinator sleeps until gc")
     val ctx = new Ctx {}
     import ctx._
 
@@ -86,24 +77,20 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
-        coord.sleepUntilGc({ () =>
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
+        coord.sleepUntilGc( () =>
           when(nfo.generation()).thenReturn(x)
-        }, 20.milliseconds)
-      }
+        , 20.milliseconds)
 
-      localThread(conductor) {
+      localThread(conductor)
         waitForBeat(1)
         x = 1
         ctl.advance(20.millisecond)
-      }
 
       conduct()
-    }
-  }
 
-  test("test parallelGc scrapes the right beans") {
+  test("test parallelGc scrapes the right beans")
     val edenBean = mock[MemoryPoolMXBean]
     when(edenBean.getName).thenReturn("PS Eden Space")
     val scavBean = mock[GarbageCollectorMXBean]
@@ -113,9 +100,8 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val garbages = Buffer(scavBean, oldBean)
     val memories = Buffer(edenBean)
     assert(Coordinator.parallelGc(memories, garbages).isDefined)
-  }
 
-  test("test parNewCMS scrapes the right beans") {
+  test("test parNewCMS scrapes the right beans")
     val edenBean = mock[MemoryPoolMXBean]
     when(edenBean.getName).thenReturn("Par Eden Space")
     val scavBean = mock[GarbageCollectorMXBean]
@@ -125,10 +111,9 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val garbages = Buffer(scavBean, oldBean)
     val memories = Buffer(edenBean)
     assert(Coordinator.parNewCMS(memories, garbages).isDefined)
-  }
 
   if (!sys.props.contains("SKIP_FLAKY"))
-    test("Coordinator sleeps until discount remaining") {
+    test("Coordinator sleeps until discount remaining")
       val ctx = new Ctx {}
       import ctx._
 
@@ -141,24 +126,19 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
       val conductor = new Conductor
       import conductor._
 
-      Time.withCurrentTimeFrozen { ctl =>
-        localThread(conductor) {
+      Time.withCurrentTimeFrozen  ctl =>
+        localThread(conductor)
           coord.sleepUntilDiscountRemaining(space, () => incr += 1)
-        }
 
-        localThread(conductor) {
+        localThread(conductor)
           waitForBeat(1)
           when(nfo.remaining()).thenReturn(5.megabytes)
           ctl.advance(100.milliseconds)
-        }
-      }
 
-      localWhenFinished(conductor) {
+      localWhenFinished(conductor)
         assert(incr == 2)
-      }
-    }
 
-  test("Coordinator sleeps until finished draining") {
+  test("Coordinator sleeps until finished draining")
     val ctx = new Ctx {}
     import ctx._
 
@@ -176,22 +156,17 @@ class CoordinatorTest extends FunSuite with LocalConductors with MockitoSugar {
     val conductor = new Conductor
     import conductor._
 
-    Time.withCurrentTimeFrozen { ctl =>
-      localThread(conductor) {
+    Time.withCurrentTimeFrozen  ctl =>
+      localThread(conductor)
         coord.sleepUntilFinishedDraining(
             space,
             maxWait,
             () => npending,
             log
         )
-      }
 
-      localThread(conductor) {
+      localThread(conductor)
         npending = 0
         ctl.advance(100.milliseconds)
-      }
 
       conduct()
-    }
-  }
-}

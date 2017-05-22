@@ -26,9 +26,9 @@ import org.apache.spark.mllib.regression.LabeledPoint
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object LogisticRegressionWithLBFGSExample {
+object LogisticRegressionWithLBFGSExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("LogisticRegressionWithLBFGSExample")
     val sc = new SparkContext(conf)
 
@@ -46,11 +46,10 @@ object LogisticRegressionWithLBFGSExample {
       new LogisticRegressionWithLBFGS().setNumClasses(10).run(training)
 
     // Compute raw scores on the test set.
-    val predictionAndLabels = test.map {
+    val predictionAndLabels = test.map
       case LabeledPoint(label, features) =>
         val prediction = model.predict(features)
         (prediction, label)
-    }
 
     // Get evaluation metrics.
     val metrics = new MulticlassMetrics(predictionAndLabels)
@@ -64,6 +63,4 @@ object LogisticRegressionWithLBFGSExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

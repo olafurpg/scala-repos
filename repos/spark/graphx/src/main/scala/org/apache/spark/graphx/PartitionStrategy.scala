@@ -21,17 +21,16 @@ package org.apache.spark.graphx
   * Represents the way edges are assigned to edge partitions based on their source and destination
   * vertex IDs.
   */
-trait PartitionStrategy extends Serializable {
+trait PartitionStrategy extends Serializable
 
   /** Returns the partition number for a given edge. */
   def getPartition(
       src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID
-}
 
 /**
   * Collection of built-in [[PartitionStrategy]] implementations.
   */
-object PartitionStrategy {
+object PartitionStrategy
 
   /**
     * Assigns edges to partitions using a 2D partitioning of the sparse edge adjacency matrix,
@@ -74,19 +73,19 @@ object PartitionStrategy {
     * method where the last column can have a different number of rows than the others while still
     * maintaining the same size per block.
     */
-  case object EdgePartition2D extends PartitionStrategy {
+  case object EdgePartition2D extends PartitionStrategy
     override def getPartition(
-        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID = {
+        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID =
       val ceilSqrtNumParts: PartitionID = math.ceil(math.sqrt(numParts)).toInt
       val mixingPrime: VertexId = 1125899906842597L
-      if (numParts == ceilSqrtNumParts * ceilSqrtNumParts) {
+      if (numParts == ceilSqrtNumParts * ceilSqrtNumParts)
         // Use old method for perfect squared to ensure we get same results
         val col: PartitionID =
           (math.abs(src * mixingPrime) % ceilSqrtNumParts).toInt
         val row: PartitionID =
           (math.abs(dst * mixingPrime) % ceilSqrtNumParts).toInt
         (col * ceilSqrtNumParts + row) % numParts
-      } else {
+      else
         // Otherwise use new method
         val cols = ceilSqrtNumParts
         val rows = (numParts + cols - 1) / cols
@@ -95,56 +94,44 @@ object PartitionStrategy {
         val row = (math.abs(dst * mixingPrime) %
             (if (col < cols - 1) rows else lastColRows)).toInt
         col * rows + row
-      }
-    }
-  }
 
   /**
     * Assigns edges to partitions using only the source vertex ID, colocating edges with the same
     * source.
     */
-  case object EdgePartition1D extends PartitionStrategy {
+  case object EdgePartition1D extends PartitionStrategy
     override def getPartition(
-        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID = {
+        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID =
       val mixingPrime: VertexId = 1125899906842597L
       (math.abs(src * mixingPrime) % numParts).toInt
-    }
-  }
 
   /**
     * Assigns edges to partitions by hashing the source and destination vertex IDs, resulting in a
     * random vertex cut that colocates all same-direction edges between two vertices.
     */
-  case object RandomVertexCut extends PartitionStrategy {
+  case object RandomVertexCut extends PartitionStrategy
     override def getPartition(
-        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID = {
+        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID =
       math.abs((src, dst).hashCode()) % numParts
-    }
-  }
 
   /**
     * Assigns edges to partitions by hashing the source and destination vertex IDs in a canonical
     * direction, resulting in a random vertex cut that colocates all edges between two vertices,
     * regardless of direction.
     */
-  case object CanonicalRandomVertexCut extends PartitionStrategy {
+  case object CanonicalRandomVertexCut extends PartitionStrategy
     override def getPartition(
-        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID = {
-      if (src < dst) {
+        src: VertexId, dst: VertexId, numParts: PartitionID): PartitionID =
+      if (src < dst)
         math.abs((src, dst).hashCode()) % numParts
-      } else {
+      else
         math.abs((dst, src).hashCode()) % numParts
-      }
-    }
-  }
 
   /** Returns the PartitionStrategy with the specified name. */
-  def fromString(s: String): PartitionStrategy = s match {
+  def fromString(s: String): PartitionStrategy = s match
     case "RandomVertexCut" => RandomVertexCut
     case "EdgePartition1D" => EdgePartition1D
     case "EdgePartition2D" => EdgePartition2D
     case "CanonicalRandomVertexCut" => CanonicalRandomVertexCut
     case _ =>
       throw new IllegalArgumentException("Invalid PartitionStrategy: " + s)
-  }
-}

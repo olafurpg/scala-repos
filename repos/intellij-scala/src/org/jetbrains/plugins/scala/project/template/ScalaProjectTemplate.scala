@@ -8,7 +8,7 @@ import org.jetbrains.plugins.scala.icons.Icons
 /**
   * @author Pavel Fatin
   */
-class ScalaProjectTemplate extends ProjectTemplate {
+class ScalaProjectTemplate extends ProjectTemplate
   protected val libraryDescription: CustomLibraryDescription =
     ScalaLibraryDescription
 
@@ -22,4 +22,3 @@ class ScalaProjectTemplate extends ProjectTemplate {
     new ScalaModuleBuilder(getName, libraryDescription)
 
   def validateSettings() = null
-}

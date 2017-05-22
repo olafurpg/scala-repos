@@ -24,7 +24,7 @@ import org.apache.spark.annotation.{Experimental, Since}
   * @tparam DF Return type of `degreesOfFreedom`.
   */
 @Since("1.1.0")
-trait TestResult[DF] {
+trait TestResult[DF]
 
   /**
     * The probability of obtaining a test statistic result at least as extreme as the one that was
@@ -57,24 +57,21 @@ trait TestResult[DF] {
     * Specific classes implementing this trait should override this method to output test-specific
     * information.
     */
-  override def toString: String = {
+  override def toString: String =
 
     // String explaining what the p-value indicates.
     val pValueExplain =
-      if (pValue <= 0.01) {
+      if (pValue <= 0.01)
         s"Very strong presumption against null hypothesis: $nullHypothesis."
-      } else if (0.01 < pValue && pValue <= 0.05) {
+      else if (0.01 < pValue && pValue <= 0.05)
         s"Strong presumption against null hypothesis: $nullHypothesis."
-      } else if (0.05 < pValue && pValue <= 0.1) {
+      else if (0.05 < pValue && pValue <= 0.1)
         s"Low presumption against null hypothesis: $nullHypothesis."
-      } else {
+      else
         s"No presumption against null hypothesis: $nullHypothesis."
-      }
 
     s"degrees of freedom = ${degreesOfFreedom.toString} \n" +
     s"statistic = $statistic \n" + s"pValue = $pValue \n" + pValueExplain
-  }
-}
 
 /**
   * Object containing the test results for the chi-squared hypothesis test.
@@ -86,12 +83,10 @@ class ChiSqTestResult private[stat](
     @Since("1.1.0") override val statistic: Double,
     @Since("1.1.0") val method: String,
     @Since("1.1.0") override val nullHypothesis: String)
-    extends TestResult[Int] {
+    extends TestResult[Int]
 
-  override def toString: String = {
+  override def toString: String =
     "Chi squared test summary:\n" + s"method: $method\n" + super.toString
-  }
-}
 
 /**
   * :: Experimental ::
@@ -103,15 +98,13 @@ class KolmogorovSmirnovTestResult private[stat](
     @Since("1.5.0") override val pValue: Double,
     @Since("1.5.0") override val statistic: Double,
     @Since("1.5.0") override val nullHypothesis: String)
-    extends TestResult[Int] {
+    extends TestResult[Int]
 
   @Since("1.5.0")
   override val degreesOfFreedom = 0
 
-  override def toString: String = {
+  override def toString: String =
     "Kolmogorov-Smirnov test summary:\n" + super.toString
-  }
-}
 
 /**
   * :: Experimental ::
@@ -125,9 +118,7 @@ private[stat] class StreamingTestResult @Since("1.6.0")(
     @Since("1.6.0") override val statistic: Double,
     @Since("1.6.0") val method: String,
     @Since("1.6.0") override val nullHypothesis: String)
-    extends TestResult[Double] with Serializable {
+    extends TestResult[Double] with Serializable
 
-  override def toString: String = {
+  override def toString: String =
     "Streaming test summary:\n" + s"method: $method\n" + super.toString
-  }
-}

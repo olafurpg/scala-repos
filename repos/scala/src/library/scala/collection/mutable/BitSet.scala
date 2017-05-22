@@ -37,7 +37,7 @@ import BitSetLike.{LogWL, MaxSize}
 @SerialVersionUID(8483111450368547763L)
 class BitSet(protected final var elems: Array[Long])
     extends AbstractSet[Int] with SortedSet[Int] with scala.collection.BitSet
-    with BitSetLike[BitSet] with SetLike[Int, BitSet] with Serializable {
+    with BitSetLike[BitSet] with SetLike[Int, BitSet] with Serializable
 
   override def empty = BitSet.empty
 
@@ -60,43 +60,37 @@ class BitSet(protected final var elems: Array[Long])
   protected def word(idx: Int): Long =
     if (idx < nwords) elems(idx) else 0L
 
-  protected final def updateWord(idx: Int, w: Long) {
+  protected final def updateWord(idx: Int, w: Long)
     ensureCapacity(idx)
     elems(idx) = w
-  }
 
-  protected final def ensureCapacity(idx: Int) {
+  protected final def ensureCapacity(idx: Int)
     require(idx < MaxSize)
-    if (idx >= nwords) {
+    if (idx >= nwords)
       var newlen = nwords
       while (idx >= newlen) newlen = (newlen * 2) min MaxSize
       val elems1 = new Array[Long](newlen)
       Array.copy(elems, 0, elems1, 0, nwords)
       elems = elems1
-    }
-  }
 
   protected def fromBitMaskNoCopy(words: Array[Long]): BitSet =
     new BitSet(words)
 
-  override def add(elem: Int): Boolean = {
+  override def add(elem: Int): Boolean =
     require(elem >= 0)
     if (contains(elem)) false
-    else {
+    else
       val idx = elem >> LogWL
       updateWord(idx, word(idx) | (1L << elem))
       true
-    }
-  }
 
-  override def remove(elem: Int): Boolean = {
+  override def remove(elem: Int): Boolean =
     require(elem >= 0)
-    if (contains(elem)) {
+    if (contains(elem))
       val idx = elem >> LogWL
       updateWord(idx, word(idx) & ~(1L << elem))
       true
-    } else false
-  }
+    else false
 
   @deprecatedOverriding(
       "Override add to prevent += and add from exhibiting different behavior.",
@@ -113,50 +107,45 @@ class BitSet(protected final var elems: Array[Long])
     *  @param   other  the bitset to form the union with.
     *  @return  the bitset itself.
     */
-  def |=(other: BitSet): this.type = {
+  def |=(other: BitSet): this.type =
     ensureCapacity(other.nwords - 1)
     for (i <- 0 until other.nwords) elems(i) = elems(i) | other.word(i)
     this
-  }
 
   /** Updates this bitset to the intersection with another bitset by performing a bitwise "and".
     *
     *  @param   other  the bitset to form the intersection with.
     *  @return  the bitset itself.
     */
-  def &=(other: BitSet): this.type = {
+  def &=(other: BitSet): this.type =
     // Different from other operations: no need to ensure capacity because
     // anything beyond the capacity is 0.  Since we use other.word which is 0
     // off the end, we also don't need to make sure we stay in bounds there.
     for (i <- 0 until nwords) elems(i) = elems(i) & other.word(i)
     this
-  }
 
   /** Updates this bitset to the symmetric difference with another bitset by performing a bitwise "xor".
     *
     *  @param   other  the bitset to form the symmetric difference with.
     *  @return  the bitset itself.
     */
-  def ^=(other: BitSet): this.type = {
+  def ^=(other: BitSet): this.type =
     ensureCapacity(other.nwords - 1)
     for (i <- 0 until other.nwords) elems(i) = elems(i) ^ other.word(i)
     this
-  }
 
   /** Updates this bitset to the difference with another bitset by performing a bitwise "and-not".
     *
     *  @param   other  the bitset to form the difference with.
     *  @return  the bitset itself.
     */
-  def &~=(other: BitSet): this.type = {
+  def &~=(other: BitSet): this.type =
     ensureCapacity(other.nwords - 1)
     for (i <- 0 until other.nwords) elems(i) = elems(i) & ~other.word(i)
     this
-  }
 
-  override def clear() {
+  override def clear()
     elems = new Array[Long](elems.length)
-  }
 
   /** Wraps this bitset as an immutable bitset backed by the array of bits
     *  of this bitset.
@@ -172,18 +161,16 @@ class BitSet(protected final var elems: Array[Long])
       "2.11.6")
   def toImmutable = immutable.BitSet.fromBitMaskNoCopy(elems)
 
-  override def clone(): BitSet = {
+  override def clone(): BitSet =
     val elems1 = new Array[Long](elems.length)
     Array.copy(elems, 0, elems1, 0, elems.length)
     new BitSet(elems1)
-  }
-}
 
 /** $factoryInfo
   *  @define coll bitset
   *  @define Coll `BitSet`
   */
-object BitSet extends BitSetFactory[BitSet] {
+object BitSet extends BitSetFactory[BitSet]
   def empty: BitSet = new BitSet
 
   /** A growing builder for mutable Sets. */
@@ -194,15 +181,13 @@ object BitSet extends BitSetFactory[BitSet] {
     bitsetCanBuildFrom
 
   /** A bitset containing all the bits in an array */
-  def fromBitMask(elems: Array[Long]): BitSet = {
+  def fromBitMask(elems: Array[Long]): BitSet =
     val len = elems.length
     val a = new Array[Long](len)
     Array.copy(elems, 0, a, 0, len)
     new BitSet(a)
-  }
 
   /** A bitset containing all the bits in an array, wrapping the existing
     *  array without copying.
     */
   def fromBitMaskNoCopy(elems: Array[Long]): BitSet = new BitSet(elems)
-}

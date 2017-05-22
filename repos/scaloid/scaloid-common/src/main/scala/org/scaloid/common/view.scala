@@ -43,50 +43,40 @@ import android.widget._
 import scala.language.implicitConversions
 import ViewImplicits._
 
-trait PressAndHoldable[+This <: View] {
+trait PressAndHoldable[+This <: View]
   def basis: This
 
   class PressAndHoldListener(interval: Int, onPressed: () => Unit)
-      extends View.OnTouchListener with View.OnLongClickListener {
+      extends View.OnTouchListener with View.OnLongClickListener
     var autoIncrementing: Boolean = false
     private val repeatUpdateHandler = new android.os.Handler()
 
-    override def onTouch(v: View, event: MotionEvent): Boolean = {
-      if (event.getAction == MotionEvent.ACTION_UP && autoIncrementing) {
+    override def onTouch(v: View, event: MotionEvent): Boolean =
+      if (event.getAction == MotionEvent.ACTION_UP && autoIncrementing)
         autoIncrementing = false
-      }
       false
-    }
 
-    override def onLongClick(p1: View): Boolean = {
+    override def onLongClick(p1: View): Boolean =
       autoIncrementing = true
       if (interval == 0) onPressed()
       else repeatUpdateHandler.post(new RptUpdater)
       false
-    }
 
-    class RptUpdater extends Runnable {
-      override def run() {
-        if (autoIncrementing) {
+    class RptUpdater extends Runnable
+      override def run()
+        if (autoIncrementing)
           onPressed()
           repeatUpdateHandler.postDelayed(this, interval)
-        }
-      }
-    }
-  }
 
-  def onPressAndHold(interval: Int, onPressed: => Unit): This = {
+  def onPressAndHold(interval: Int, onPressed: => Unit): This =
     val listener = new PressAndHoldListener(interval, () => onPressed)
     basis.onTouchListener(listener)
     basis.onLongClickListener(listener)
-  }
-}
 
-trait ViewOnClickListener {
+trait ViewOnClickListener
   def func: View => Unit
 
   def onClickListener: View.OnClickListener
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/View.html android.view.View]]`.
@@ -98,19 +88,17 @@ class RichView[This <: android.view.View](val basis: This)
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/View.html android.view.View]]`. This contains several property accessors.
   */
 trait TraitView[This <: android.view.View]
-    extends ConstantsSupport with PressAndHoldable[This] {
+    extends ConstantsSupport with PressAndHoldable[This]
 
   def basis: This
 
   @inline def find[V <: View](id: Int): V =
     basis.findViewById(id).asInstanceOf[V]
 
-  @inline def uniqueId(implicit activity: Activity): Int = {
-    if (basis.getId < 0) {
+  @inline def uniqueId(implicit activity: Activity): Int =
+    if (basis.getId < 0)
       basis.setId(getUniqueId)
-    }
     basis.getId
-  }
 
   /**
     * Place the widget into a ViewGroup.
@@ -123,11 +111,10 @@ trait TraitView[This <: android.view.View]
     */
   @inline
   def here[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     val parent = parentViewGroupIfExists
     if (parent != null) parent += basis
     basis
-  }
 
   /**
     * Place the widget into a ViewGroup, without applying styles.
@@ -143,11 +130,10 @@ trait TraitView[This <: android.view.View]
     */
   @inline
   def hereWithoutStyle[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     val parent = parentViewGroupIfExists
     if (parent != null)(parent.basis.asInstanceOf[ViewGroup]).addView(basis) // TODO remove asInstanceOf
     basis
-  }
 
   @deprecated("", "")
   val FILL_PARENT = ViewGroup.LayoutParams.FILL_PARENT
@@ -156,31 +142,27 @@ trait TraitView[This <: android.view.View]
 
   @inline
   def fill[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     <<.fill
     basis
-  }
 
   @inline
   def wrap[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     <<.wrap
     basis
-  }
 
   @inline
   def wf[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     <<.wf
     basis
-  }
 
   @inline
   def fw[LP <: ViewGroupLayoutParams[_, _]](
-      implicit defaultLayoutParam: This => LP) = {
+      implicit defaultLayoutParam: This => LP) =
     <<.fw
     basis
-  }
 
   def <<[LP <: ViewGroupLayoutParams[_, _]](
       implicit defaultLayoutParam: This => LP): LP =
@@ -189,34 +171,30 @@ trait TraitView[This <: android.view.View]
   // TODO: Make the return type as Option[TraitViewGroup[_]]
   protected def parentViewGroupIfExists[LP <: ViewGroupLayoutParams[_, _]](
       implicit defaultLayoutParam: This => LP = (v: This) =>
-          null): TraitViewGroup[_] = {
+          null): TraitViewGroup[_] =
     val lp = defaultLayoutParam(basis)
     if (lp == null) null else lp.parent
-  }
 
   def <<[LP <: ViewGroupLayoutParams[_, _]](width: Int, height: Int)(
-      implicit defaultLayoutParam: This => LP): LP = {
+      implicit defaultLayoutParam: This => LP): LP =
     val lp = defaultLayoutParam(basis)
     lp.height = height
     lp.width = width
     lp
-  }
 
   val parentViewGroup: TraitViewGroup[_] = null
 
-  @inline def padding_=(p: Int) = {
+  @inline def padding_=(p: Int) =
     basis.setPadding(p, p, p, p)
     basis
-  }
 
   @inline def padding(p: Int) = padding_=(p)
 
   @inline def padding: Int = 0
 
-  @inline def padding(p1: Int, p2: Int, p3: Int, p4: Int) = {
+  @inline def padding(p1: Int, p2: Int, p3: Int, p4: Int) =
     basis.setPadding(p1, p2, p3, p4)
     basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setBackground(android.graphics.drawable.Drawable) setBackground(android.graphics.drawable.Drawable)]]`
@@ -227,9 +205,9 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setBackground(android.graphics.drawable.Drawable) setBackground(android.graphics.drawable.Drawable)]]`
     */
-  @inline def background_=(p: android.graphics.drawable.Drawable) = {
+  @inline def background_=(p: android.graphics.drawable.Drawable) =
     basis.setBackgroundDrawable(p); basis
-  } // to avoid compatibility issue on API Level < 16, calls setBackgroundDrawable() although it is deprecated.
+  // to avoid compatibility issue on API Level < 16, calls setBackgroundDrawable() although it is deprecated.
 
   @inline
   def accessibilityDelegate(implicit no: NoGetterForThisProperty): Nothing =
@@ -247,9 +225,8 @@ trait TraitView[This <: android.view.View]
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setAccessibilityDelegate(android.view.View.AccessibilityDelegate) setAccessibilityDelegate(android.view.View.AccessibilityDelegate)]]`
     */
   @inline
-  def accessibilityDelegate_=(p: android.view.View.AccessibilityDelegate) = {
+  def accessibilityDelegate_=(p: android.view.View.AccessibilityDelegate) =
     basis.setAccessibilityDelegate(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getAccessibilityNodeProvider() getAccessibilityNodeProvider()]]`
@@ -299,9 +276,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setAnimation(android.view.animation.Animation) setAnimation(android.view.animation.Animation)]]`
     */
-  @inline def animation_=(p: android.view.animation.Animation) = {
+  @inline def animation_=(p: android.view.animation.Animation) =
     basis.setAnimation(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getApplicationWindowToken() getApplicationWindowToken()]]`
@@ -325,9 +301,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setBackgroundColor(int) setBackgroundColor(int)]]`
     */
-  @inline def backgroundColor_=(p: Int) = {
+  @inline def backgroundColor_=(p: Int) =
     basis.setBackgroundColor(p); basis
-  }
 
   @inline
   def backgroundDrawable(implicit no: NoGetterForThisProperty): Nothing =
@@ -345,9 +320,8 @@ trait TraitView[This <: android.view.View]
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setBackgroundDrawable(android.graphics.drawable.Drawable) setBackgroundDrawable(android.graphics.drawable.Drawable)]]`
     */
   @deprecated("", "")
-  @inline def backgroundDrawable_=(p: android.graphics.drawable.Drawable) = {
+  @inline def backgroundDrawable_=(p: android.graphics.drawable.Drawable) =
     basis.setBackgroundDrawable(p); basis
-  }
 
   @inline
   def backgroundResource(implicit no: NoGetterForThisProperty): Nothing =
@@ -362,9 +336,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setBackgroundResource(int) setBackgroundResource(int)]]`
     */
-  @inline def backgroundResource_=(p: Int) = {
+  @inline def backgroundResource_=(p: Int) =
     basis.setBackgroundResource(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getBaseline() getBaseline()]]`
@@ -399,9 +372,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setCameraDistance(float) setCameraDistance(float)]]`
     */
-  @inline def cameraDistance_=(p: Float) = {
+  @inline def cameraDistance_=(p: Float) =
     basis.setCameraDistance(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isClickable() isClickable()]]`
@@ -432,9 +404,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setContentDescription(java.lang.CharSequence) setContentDescription(java.lang.CharSequence)]]`
     */
-  @inline def contentDescription_=(p: java.lang.CharSequence) = {
+  @inline def contentDescription_=(p: java.lang.CharSequence) =
     basis.setContentDescription(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getContext() getContext()]]`
@@ -466,9 +437,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setDrawingCacheBackgroundColor(int) setDrawingCacheBackgroundColor(int)]]`
     */
-  @inline def drawingCacheBackgroundColor_=(p: Int) = {
+  @inline def drawingCacheBackgroundColor_=(p: Int) =
     basis.setDrawingCacheBackgroundColor(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isDrawingCacheEnabled() isDrawingCacheEnabled()]]`
@@ -483,16 +453,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setDrawingCacheEnabled(boolean) setDrawingCacheEnabled(boolean)]]`
     */
-  @inline def drawingCacheEnabled_=(p: Boolean) = {
+  @inline def drawingCacheEnabled_=(p: Boolean) =
     basis.setDrawingCacheEnabled(p); basis
-  }
 
-  @inline def enableDrawingCache() = {
+  @inline def enableDrawingCache() =
     basis.setDrawingCacheEnabled(true); basis
-  }
-  @inline def disableDrawingCache() = {
+  @inline def disableDrawingCache() =
     basis.setDrawingCacheEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getDrawingCacheQuality() getDrawingCacheQuality()]]`
@@ -507,9 +474,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setDrawingCacheQuality(int) setDrawingCacheQuality(int)]]`
     */
-  @inline def drawingCacheQuality_=(p: Int) = {
+  @inline def drawingCacheQuality_=(p: Int) =
     basis.setDrawingCacheQuality(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getDrawingTime() getDrawingTime()]]`
@@ -530,16 +496,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setDuplicateParentStateEnabled(boolean) setDuplicateParentStateEnabled(boolean)]]`
     */
-  @inline def duplicateParentStateEnabled_=(p: Boolean) = {
+  @inline def duplicateParentStateEnabled_=(p: Boolean) =
     basis.setDuplicateParentStateEnabled(p); basis
-  }
 
-  @inline def enableDuplicateParentState() = {
+  @inline def enableDuplicateParentState() =
     basis.setDuplicateParentStateEnabled(true); basis
-  }
-  @inline def disableDuplicateParentState() = {
+  @inline def disableDuplicateParentState() =
     basis.setDuplicateParentStateEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isEnabled() isEnabled()]]`
@@ -571,9 +534,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setFadingEdgeLength(int) setFadingEdgeLength(int)]]`
     */
-  @inline def fadingEdgeLength_=(p: Int) = {
+  @inline def fadingEdgeLength_=(p: Int) =
     basis.setFadingEdgeLength(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getFilterTouchesWhenObscured() getFilterTouchesWhenObscured()]]`
@@ -589,9 +551,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setFilterTouchesWhenObscured(boolean) setFilterTouchesWhenObscured(boolean)]]`
     */
-  @inline def filterTouchesWhenObscured_=(p: Boolean) = {
+  @inline def filterTouchesWhenObscured_=(p: Boolean) =
     basis.setFilterTouchesWhenObscured(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getFitsSystemWindows() getFitsSystemWindows()]]`
@@ -606,9 +567,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setFitsSystemWindows(boolean) setFitsSystemWindows(boolean)]]`
     */
-  @inline def fitsSystemWindows_=(p: Boolean) = {
+  @inline def fitsSystemWindows_=(p: Boolean) =
     basis.setFitsSystemWindows(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isFocusable() isFocusable()]]`
@@ -638,9 +598,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setFocusableInTouchMode(boolean) setFocusableInTouchMode(boolean)]]`
     */
-  @inline def focusableInTouchMode_=(p: Boolean) = {
+  @inline def focusableInTouchMode_=(p: Boolean) =
     basis.setFocusableInTouchMode(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getHandler() getHandler()]]`
@@ -660,16 +619,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setHapticFeedbackEnabled(boolean) setHapticFeedbackEnabled(boolean)]]`
     */
-  @inline def hapticFeedbackEnabled_=(p: Boolean) = {
+  @inline def hapticFeedbackEnabled_=(p: Boolean) =
     basis.setHapticFeedbackEnabled(p); basis
-  }
 
-  @inline def enableHapticFeedback() = {
+  @inline def enableHapticFeedback() =
     basis.setHapticFeedbackEnabled(true); basis
-  }
-  @inline def disableHapticFeedback() = {
+  @inline def disableHapticFeedback() =
     basis.setHapticFeedbackEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setHasTransientState(boolean) setHasTransientState(boolean)]]`
@@ -679,9 +635,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setHasTransientState(boolean) setHasTransientState(boolean)]]`
     */
-  @inline def hasTransientState_=(p: Boolean) = {
+  @inline def hasTransientState_=(p: Boolean) =
     basis.setHasTransientState(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getHeight() getHeight()]]`
@@ -702,16 +657,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setHorizontalFadingEdgeEnabled(boolean) setHorizontalFadingEdgeEnabled(boolean)]]`
     */
-  @inline def horizontalFadingEdgeEnabled_=(p: Boolean) = {
+  @inline def horizontalFadingEdgeEnabled_=(p: Boolean) =
     basis.setHorizontalFadingEdgeEnabled(p); basis
-  }
 
-  @inline def enableHorizontalFadingEdge() = {
+  @inline def enableHorizontalFadingEdge() =
     basis.setHorizontalFadingEdgeEnabled(true); basis
-  }
-  @inline def disableHorizontalFadingEdge() = {
+  @inline def disableHorizontalFadingEdge() =
     basis.setHorizontalFadingEdgeEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getHorizontalFadingEdgeLength() getHorizontalFadingEdgeLength()]]`
@@ -732,16 +684,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setHorizontalScrollBarEnabled(boolean) setHorizontalScrollBarEnabled(boolean)]]`
     */
-  @inline def horizontalScrollBarEnabled_=(p: Boolean) = {
+  @inline def horizontalScrollBarEnabled_=(p: Boolean) =
     basis.setHorizontalScrollBarEnabled(p); basis
-  }
 
-  @inline def enableHorizontalScrollBar() = {
+  @inline def enableHorizontalScrollBar() =
     basis.setHorizontalScrollBarEnabled(true); basis
-  }
-  @inline def disableHorizontalScrollBar() = {
+  @inline def disableHorizontalScrollBar() =
     basis.setHorizontalScrollBarEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isHovered() isHovered()]]`
@@ -787,9 +736,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setImportantForAccessibility(int) setImportantForAccessibility(int)]]`
     */
-  @inline def importantForAccessibility_=(p: Int) = {
+  @inline def importantForAccessibility_=(p: Int) =
     basis.setImportantForAccessibility(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getKeepScreenOn() getKeepScreenOn()]]`
@@ -830,9 +778,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setLayoutParams(android.view.ViewGroup.LayoutParams) setLayoutParams(android.view.ViewGroup.LayoutParams)]]`
     */
-  @inline def layoutParams_=(p: android.view.ViewGroup.LayoutParams) = {
+  @inline def layoutParams_=(p: android.view.ViewGroup.LayoutParams) =
     basis.setLayoutParams(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getLeft() getLeft()]]`
@@ -862,9 +809,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setLongClickable(boolean) setLongClickable(boolean)]]`
     */
-  @inline def longClickable_=(p: Boolean) = {
+  @inline def longClickable_=(p: Boolean) =
     basis.setLongClickable(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getMatrix() getMatrix()]]`
@@ -939,9 +885,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setNextFocusDownId(int) setNextFocusDownId(int)]]`
     */
-  @inline def nextFocusDownId_=(p: Int) = {
+  @inline def nextFocusDownId_=(p: Int) =
     basis.setNextFocusDownId(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getNextFocusForwardId() getNextFocusForwardId()]]`
@@ -956,9 +901,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setNextFocusForwardId(int) setNextFocusForwardId(int)]]`
     */
-  @inline def nextFocusForwardId_=(p: Int) = {
+  @inline def nextFocusForwardId_=(p: Int) =
     basis.setNextFocusForwardId(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getNextFocusLeftId() getNextFocusLeftId()]]`
@@ -973,9 +917,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setNextFocusLeftId(int) setNextFocusLeftId(int)]]`
     */
-  @inline def nextFocusLeftId_=(p: Int) = {
+  @inline def nextFocusLeftId_=(p: Int) =
     basis.setNextFocusLeftId(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getNextFocusRightId() getNextFocusRightId()]]`
@@ -990,9 +933,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setNextFocusRightId(int) setNextFocusRightId(int)]]`
     */
-  @inline def nextFocusRightId_=(p: Int) = {
+  @inline def nextFocusRightId_=(p: Int) =
     basis.setNextFocusRightId(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getNextFocusUpId() getNextFocusUpId()]]`
@@ -1022,9 +964,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnClickListener(android.view.View.OnClickListener) setOnClickListener(android.view.View.OnClickListener)]]`
     */
-  @inline def onClickListener_=(p: android.view.View.OnClickListener) = {
+  @inline def onClickListener_=(p: android.view.View.OnClickListener) =
     basis.setOnClickListener(p); basis
-  }
 
   @inline
   def onCreateContextMenuListener(
@@ -1045,9 +986,8 @@ trait TraitView[This <: android.view.View]
     */
   @inline
   def onCreateContextMenuListener_=(
-      p: android.view.View.OnCreateContextMenuListener) = {
+      p: android.view.View.OnCreateContextMenuListener) =
     basis.setOnCreateContextMenuListener(p); basis
-  }
 
   @inline def onDragListener(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'onDragListener'")
@@ -1061,9 +1001,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnDragListener(android.view.View.OnDragListener) setOnDragListener(android.view.View.OnDragListener)]]`
     */
-  @inline def onDragListener_=(p: android.view.View.OnDragListener) = {
+  @inline def onDragListener_=(p: android.view.View.OnDragListener) =
     basis.setOnDragListener(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getOnFocusChangeListener() getOnFocusChangeListener()]]`
@@ -1081,9 +1020,8 @@ trait TraitView[This <: android.view.View]
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnFocusChangeListener(android.view.View.OnFocusChangeListener) setOnFocusChangeListener(android.view.View.OnFocusChangeListener)]]`
     */
   @inline
-  def onFocusChangeListener_=(p: android.view.View.OnFocusChangeListener) = {
+  def onFocusChangeListener_=(p: android.view.View.OnFocusChangeListener) =
     basis.setOnFocusChangeListener(p); basis
-  }
 
   @inline
   def onGenericMotionListener(implicit no: NoGetterForThisProperty): Nothing =
@@ -1101,9 +1039,8 @@ trait TraitView[This <: android.view.View]
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnGenericMotionListener(android.view.View.OnGenericMotionListener) setOnGenericMotionListener(android.view.View.OnGenericMotionListener)]]`
     */
   @inline
-  def onGenericMotionListener_=(p: android.view.View.OnGenericMotionListener) = {
+  def onGenericMotionListener_=(p: android.view.View.OnGenericMotionListener) =
     basis.setOnGenericMotionListener(p); basis
-  }
 
   @inline def onHoverListener(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
@@ -1118,9 +1055,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnHoverListener(android.view.View.OnHoverListener) setOnHoverListener(android.view.View.OnHoverListener)]]`
     */
-  @inline def onHoverListener_=(p: android.view.View.OnHoverListener) = {
+  @inline def onHoverListener_=(p: android.view.View.OnHoverListener) =
     basis.setOnHoverListener(p); basis
-  }
 
   @inline def onKeyListener(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'onKeyListener'")
@@ -1134,9 +1070,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnKeyListener(android.view.View.OnKeyListener) setOnKeyListener(android.view.View.OnKeyListener)]]`
     */
-  @inline def onKeyListener_=(p: android.view.View.OnKeyListener) = {
+  @inline def onKeyListener_=(p: android.view.View.OnKeyListener) =
     basis.setOnKeyListener(p); basis
-  }
 
   @inline
   def onLongClickListener(implicit no: NoGetterForThisProperty): Nothing =
@@ -1152,9 +1087,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnLongClickListener(android.view.View.OnLongClickListener) setOnLongClickListener(android.view.View.OnLongClickListener)]]`
     */
-  @inline def onLongClickListener_=(p: android.view.View.OnLongClickListener) = {
+  @inline def onLongClickListener_=(p: android.view.View.OnLongClickListener) =
     basis.setOnLongClickListener(p); basis
-  }
 
   @inline
   def onSystemUiVisibilityChangeListener(
@@ -1175,9 +1109,8 @@ trait TraitView[This <: android.view.View]
     */
   @inline
   def onSystemUiVisibilityChangeListener_=(
-      p: android.view.View.OnSystemUiVisibilityChangeListener) = {
+      p: android.view.View.OnSystemUiVisibilityChangeListener) =
     basis.setOnSystemUiVisibilityChangeListener(p); basis
-  }
 
   @inline def onTouchListener(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
@@ -1192,9 +1125,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setOnTouchListener(android.view.View.OnTouchListener) setOnTouchListener(android.view.View.OnTouchListener)]]`
     */
-  @inline def onTouchListener_=(p: android.view.View.OnTouchListener) = {
+  @inline def onTouchListener_=(p: android.view.View.OnTouchListener) =
     basis.setOnTouchListener(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getOverScrollMode() getOverScrollMode()]]`
@@ -1387,16 +1319,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setSaveFromParentEnabled(boolean) setSaveFromParentEnabled(boolean)]]`
     */
-  @inline def saveFromParentEnabled_=(p: Boolean) = {
+  @inline def saveFromParentEnabled_=(p: Boolean) =
     basis.setSaveFromParentEnabled(p); basis
-  }
 
-  @inline def enableSaveFromParent() = {
+  @inline def enableSaveFromParent() =
     basis.setSaveFromParentEnabled(true); basis
-  }
-  @inline def disableSaveFromParent() = {
+  @inline def disableSaveFromParent() =
     basis.setSaveFromParentEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getScaleX() getScaleX()]]`
@@ -1443,9 +1372,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setScrollBarDefaultDelayBeforeFade(int) setScrollBarDefaultDelayBeforeFade(int)]]`
     */
-  @inline def scrollBarDefaultDelayBeforeFade_=(p: Int) = {
+  @inline def scrollBarDefaultDelayBeforeFade_=(p: Int) =
     basis.setScrollBarDefaultDelayBeforeFade(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getScrollBarFadeDuration() getScrollBarFadeDuration()]]`
@@ -1460,9 +1388,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setScrollBarFadeDuration(int) setScrollBarFadeDuration(int)]]`
     */
-  @inline def scrollBarFadeDuration_=(p: Int) = {
+  @inline def scrollBarFadeDuration_=(p: Int) =
     basis.setScrollBarFadeDuration(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getScrollBarSize() getScrollBarSize()]]`
@@ -1507,9 +1434,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setScrollContainer(boolean) setScrollContainer(boolean)]]`
     */
-  @inline def scrollContainer_=(p: Boolean) = {
+  @inline def scrollContainer_=(p: Boolean) =
     basis.setScrollContainer(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getScrollX() getScrollX()]]`
@@ -1554,16 +1480,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setScrollbarFadingEnabled(boolean) setScrollbarFadingEnabled(boolean)]]`
     */
-  @inline def scrollbarFadingEnabled_=(p: Boolean) = {
+  @inline def scrollbarFadingEnabled_=(p: Boolean) =
     basis.setScrollbarFadingEnabled(p); basis
-  }
 
-  @inline def enableScrollbarFading() = {
+  @inline def enableScrollbarFading() =
     basis.setScrollbarFadingEnabled(true); basis
-  }
-  @inline def disableScrollbarFading() = {
+  @inline def disableScrollbarFading() =
     basis.setScrollbarFadingEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#isSelected() isSelected()]]`
@@ -1598,16 +1521,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setSoundEffectsEnabled(boolean) setSoundEffectsEnabled(boolean)]]`
     */
-  @inline def soundEffectsEnabled_=(p: Boolean) = {
+  @inline def soundEffectsEnabled_=(p: Boolean) =
     basis.setSoundEffectsEnabled(p); basis
-  }
 
-  @inline def enableSoundEffects() = {
+  @inline def enableSoundEffects() =
     basis.setSoundEffectsEnabled(true); basis
-  }
-  @inline def disableSoundEffects() = {
+  @inline def disableSoundEffects() =
     basis.setSoundEffectsEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getSystemUiVisibility() getSystemUiVisibility()]]`
@@ -1622,9 +1542,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setSystemUiVisibility(int) setSystemUiVisibility(int)]]`
     */
-  @inline def systemUiVisibility_=(p: Int) = {
+  @inline def systemUiVisibility_=(p: Int) =
     basis.setSystemUiVisibility(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getTag() getTag()]]`
@@ -1669,9 +1588,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setTouchDelegate(android.view.TouchDelegate) setTouchDelegate(android.view.TouchDelegate)]]`
     */
-  @inline def touchDelegate_=(p: android.view.TouchDelegate) = {
+  @inline def touchDelegate_=(p: android.view.TouchDelegate) =
     basis.setTouchDelegate(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getTouchables() getTouchables()]]`
@@ -1722,16 +1640,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setVerticalFadingEdgeEnabled(boolean) setVerticalFadingEdgeEnabled(boolean)]]`
     */
-  @inline def verticalFadingEdgeEnabled_=(p: Boolean) = {
+  @inline def verticalFadingEdgeEnabled_=(p: Boolean) =
     basis.setVerticalFadingEdgeEnabled(p); basis
-  }
 
-  @inline def enableVerticalFadingEdge() = {
+  @inline def enableVerticalFadingEdge() =
     basis.setVerticalFadingEdgeEnabled(true); basis
-  }
-  @inline def disableVerticalFadingEdge() = {
+  @inline def disableVerticalFadingEdge() =
     basis.setVerticalFadingEdgeEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getVerticalFadingEdgeLength() getVerticalFadingEdgeLength()]]`
@@ -1752,16 +1667,13 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setVerticalScrollBarEnabled(boolean) setVerticalScrollBarEnabled(boolean)]]`
     */
-  @inline def verticalScrollBarEnabled_=(p: Boolean) = {
+  @inline def verticalScrollBarEnabled_=(p: Boolean) =
     basis.setVerticalScrollBarEnabled(p); basis
-  }
 
-  @inline def enableVerticalScrollBar() = {
+  @inline def enableVerticalScrollBar() =
     basis.setVerticalScrollBarEnabled(true); basis
-  }
-  @inline def disableVerticalScrollBar() = {
+  @inline def disableVerticalScrollBar() =
     basis.setVerticalScrollBarEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getVerticalScrollbarPosition() getVerticalScrollbarPosition()]]`
@@ -1777,9 +1689,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setVerticalScrollbarPosition(int) setVerticalScrollbarPosition(int)]]`
     */
-  @inline def verticalScrollbarPosition_=(p: Int) = {
+  @inline def verticalScrollbarPosition_=(p: Int) =
     basis.setVerticalScrollbarPosition(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#getVerticalScrollbarWidth() getVerticalScrollbarWidth()]]`
@@ -1819,9 +1730,8 @@ trait TraitView[This <: android.view.View]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setWillNotCacheDrawing(boolean) setWillNotCacheDrawing(boolean)]]`
     */
-  @inline def willNotCacheDrawing_=(p: Boolean) = {
+  @inline def willNotCacheDrawing_=(p: Boolean) =
     basis.setWillNotCacheDrawing(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/View.html#setWillNotDraw(boolean) setWillNotDraw(boolean)]]`
@@ -1878,154 +1788,137 @@ trait TraitView[This <: android.view.View]
     */
   @inline def y_=(p: Float) = { basis.setY(p); basis }
 
-  @inline def onClick[U](f: android.view.View => U): This = {
+  @inline def onClick[U](f: android.view.View => U): This =
     basis.setOnClickListener(
-        new android.view.View.OnClickListener {
+        new android.view.View.OnClickListener
       def onClick(p: android.view.View): Unit = { f(p) }
-    })
+    )
     basis
-  }
 
-  @inline def onClick[U](f: => U): This = {
+  @inline def onClick[U](f: => U): This =
     basis.setOnClickListener(
-        new android.view.View.OnClickListener {
+        new android.view.View.OnClickListener
       def onClick(p: android.view.View): Unit = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onCreateContextMenu[U](f: (android.view.ContextMenu, android.view.View,
-      android.view.ContextMenu.ContextMenuInfo) => U): This = {
+      android.view.ContextMenu.ContextMenuInfo) => U): This =
     basis.setOnCreateContextMenuListener(
-        new android.view.View.OnCreateContextMenuListener {
+        new android.view.View.OnCreateContextMenuListener
       def onCreateContextMenu(p1: android.view.ContextMenu,
                               p2: android.view.View,
                               p3: android.view.ContextMenu.ContextMenuInfo)
         : Unit = { f(p1, p2, p3) }
-    })
+    )
     basis
-  }
 
-  @inline def onCreateContextMenu[U](f: => U): This = {
+  @inline def onCreateContextMenu[U](f: => U): This =
     basis.setOnCreateContextMenuListener(
-        new android.view.View.OnCreateContextMenuListener {
+        new android.view.View.OnCreateContextMenuListener
       def onCreateContextMenu(
           p1: android.view.ContextMenu,
           p2: android.view.View,
           p3: android.view.ContextMenu.ContextMenuInfo): Unit = { f }
-    })
+    )
     basis
-  }
 
   @inline
-  def onDrag(f: (android.view.View, android.view.DragEvent) => Boolean): This = {
+  def onDrag(f: (android.view.View, android.view.DragEvent) => Boolean): This =
     basis.setOnDragListener(
-        new android.view.View.OnDragListener {
-      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean = {
+        new android.view.View.OnDragListener
+      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean =
         f(p1, p2)
-      }
-    })
+    )
     basis
-  }
 
-  @inline def onDrag(f: => Boolean): This = {
+  @inline def onDrag(f: => Boolean): This =
     basis.setOnDragListener(
-        new android.view.View.OnDragListener {
-      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean = {
+        new android.view.View.OnDragListener
+      def onDrag(p1: android.view.View, p2: android.view.DragEvent): Boolean =
         f
-      }
-    })
+    )
     basis
-  }
 
-  @inline def onFocusChange[U](f: (android.view.View, Boolean) => U): This = {
+  @inline def onFocusChange[U](f: (android.view.View, Boolean) => U): This =
     basis.setOnFocusChangeListener(
-        new android.view.View.OnFocusChangeListener {
-      def onFocusChange(p1: android.view.View, p2: Boolean): Unit = {
+        new android.view.View.OnFocusChangeListener
+      def onFocusChange(p1: android.view.View, p2: Boolean): Unit =
         f(p1, p2)
-      }
-    })
+    )
     basis
-  }
 
-  @inline def onFocusChange[U](f: => U): This = {
+  @inline def onFocusChange[U](f: => U): This =
     basis.setOnFocusChangeListener(
-        new android.view.View.OnFocusChangeListener {
+        new android.view.View.OnFocusChangeListener
       def onFocusChange(p1: android.view.View, p2: Boolean): Unit = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onGenericMotion(
-      f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
+      f: (android.view.View, android.view.MotionEvent) => Boolean): This =
     basis.setOnGenericMotionListener(
-        new android.view.View.OnGenericMotionListener {
+        new android.view.View.OnGenericMotionListener
       def onGenericMotion(
           p1: android.view.View,
           p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
-    })
+    )
     basis
-  }
 
-  @inline def onGenericMotion(f: => Boolean): This = {
+  @inline def onGenericMotion(f: => Boolean): This =
     basis.setOnGenericMotionListener(
-        new android.view.View.OnGenericMotionListener {
+        new android.view.View.OnGenericMotionListener
       def onGenericMotion(
           p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onHover(
-      f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
+      f: (android.view.View, android.view.MotionEvent) => Boolean): This =
     basis.setOnHoverListener(
-        new android.view.View.OnHoverListener {
+        new android.view.View.OnHoverListener
       def onHover(p1: android.view.View,
                   p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
-    })
+    )
     basis
-  }
 
-  @inline def onHover(f: => Boolean): This = {
+  @inline def onHover(f: => Boolean): This =
     basis.setOnHoverListener(
-        new android.view.View.OnHoverListener {
+        new android.view.View.OnHoverListener
       def onHover(
           p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onKey(
-      f: (android.view.View, Int, android.view.KeyEvent) => Boolean): This = {
+      f: (android.view.View, Int, android.view.KeyEvent) => Boolean): This =
     basis.setOnKeyListener(
-        new android.view.View.OnKeyListener {
+        new android.view.View.OnKeyListener
       def onKey(p1: android.view.View,
                 p2: Int,
                 p3: android.view.KeyEvent): Boolean = { f(p1, p2, p3) }
-    })
+    )
     basis
-  }
 
-  @inline def onKey(f: => Boolean): This = {
+  @inline def onKey(f: => Boolean): This =
     basis.setOnKeyListener(
-        new android.view.View.OnKeyListener {
+        new android.view.View.OnKeyListener
       def onKey(p1: android.view.View,
                 p2: Int,
                 p3: android.view.KeyEvent): Boolean = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onLayoutChange[U](
       f: (android.view.View, Int, Int, Int, Int, Int, Int, Int,
-      Int) => U): This = {
+      Int) => U): This =
     basis.addOnLayoutChangeListener(
-        new android.view.View.OnLayoutChangeListener {
+        new android.view.View.OnLayoutChangeListener
       def onLayoutChange(
           p1: android.view.View,
           p2: Int,
@@ -2036,13 +1929,12 @@ trait TraitView[This <: android.view.View]
           p7: Int,
           p8: Int,
           p9: Int): Unit = { f(p1, p2, p3, p4, p5, p6, p7, p8, p9) }
-    })
+    )
     basis
-  }
 
-  @inline def onLayoutChange[U](f: => U): This = {
+  @inline def onLayoutChange[U](f: => U): This =
     basis.addOnLayoutChangeListener(
-        new android.view.View.OnLayoutChangeListener {
+        new android.view.View.OnLayoutChangeListener
       def onLayoutChange(p1: android.view.View,
                          p2: Int,
                          p3: Int,
@@ -2052,119 +1944,104 @@ trait TraitView[This <: android.view.View]
                          p7: Int,
                          p8: Int,
                          p9: Int): Unit = { f }
-    })
+    )
     basis
-  }
 
-  @inline def onLongClick(f: android.view.View => Boolean): This = {
+  @inline def onLongClick(f: android.view.View => Boolean): This =
     basis.setOnLongClickListener(
-        new android.view.View.OnLongClickListener {
+        new android.view.View.OnLongClickListener
       def onLongClick(p: android.view.View): Boolean = { f(p) }
-    })
+    )
     basis
-  }
 
-  @inline def onLongClick(f: => Boolean): This = {
+  @inline def onLongClick(f: => Boolean): This =
     basis.setOnLongClickListener(
-        new android.view.View.OnLongClickListener {
+        new android.view.View.OnLongClickListener
       def onLongClick(p: android.view.View): Boolean = { f }
-    })
+    )
     basis
-  }
 
-  @inline def onSystemUiVisibilityChange[U](f: Int => U): This = {
+  @inline def onSystemUiVisibilityChange[U](f: Int => U): This =
     basis.setOnSystemUiVisibilityChangeListener(
-        new android.view.View.OnSystemUiVisibilityChangeListener {
+        new android.view.View.OnSystemUiVisibilityChangeListener
       def onSystemUiVisibilityChange(p: Int): Unit = { f(p) }
-    })
+    )
     basis
-  }
 
-  @inline def onSystemUiVisibilityChange[U](f: => U): This = {
+  @inline def onSystemUiVisibilityChange[U](f: => U): This =
     basis.setOnSystemUiVisibilityChangeListener(
-        new android.view.View.OnSystemUiVisibilityChangeListener {
+        new android.view.View.OnSystemUiVisibilityChangeListener
       def onSystemUiVisibilityChange(p: Int): Unit = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onTouch(
-      f: (android.view.View, android.view.MotionEvent) => Boolean): This = {
+      f: (android.view.View, android.view.MotionEvent) => Boolean): This =
     basis.setOnTouchListener(
-        new android.view.View.OnTouchListener {
+        new android.view.View.OnTouchListener
       def onTouch(p1: android.view.View,
                   p2: android.view.MotionEvent): Boolean = { f(p1, p2) }
-    })
+    )
     basis
-  }
 
-  @inline def onTouch(f: => Boolean): This = {
+  @inline def onTouch(f: => Boolean): This =
     basis.setOnTouchListener(
-        new android.view.View.OnTouchListener {
+        new android.view.View.OnTouchListener
       def onTouch(
           p1: android.view.View, p2: android.view.MotionEvent): Boolean = { f }
-    })
+    )
     basis
-  }
 
-  @inline def onViewAttachedToWindow[U](f: android.view.View => U): This = {
+  @inline def onViewAttachedToWindow[U](f: android.view.View => U): This =
     basis.addOnAttachStateChangeListener(
-        new android.view.View.OnAttachStateChangeListener {
+        new android.view.View.OnAttachStateChangeListener
       def onViewAttachedToWindow(p: android.view.View): Unit = { f(p) }
       def onViewDetachedFromWindow(p: android.view.View): Unit = {}
-    })
+    )
     basis
-  }
 
-  @inline def onViewAttachedToWindow[U](f: => U): This = {
+  @inline def onViewAttachedToWindow[U](f: => U): This =
     basis.addOnAttachStateChangeListener(
-        new android.view.View.OnAttachStateChangeListener {
+        new android.view.View.OnAttachStateChangeListener
       def onViewAttachedToWindow(p: android.view.View): Unit = { f }
       def onViewDetachedFromWindow(p: android.view.View): Unit = {}
-    })
+    )
     basis
-  }
 
-  @inline def onViewDetachedFromWindow[U](f: android.view.View => U): This = {
+  @inline def onViewDetachedFromWindow[U](f: android.view.View => U): This =
     basis.addOnAttachStateChangeListener(
-        new android.view.View.OnAttachStateChangeListener {
+        new android.view.View.OnAttachStateChangeListener
       def onViewAttachedToWindow(p: android.view.View): Unit = {}
       def onViewDetachedFromWindow(p: android.view.View): Unit = { f(p) }
-    })
+    )
     basis
-  }
 
-  @inline def onViewDetachedFromWindow[U](f: => U): This = {
+  @inline def onViewDetachedFromWindow[U](f: => U): This =
     basis.addOnAttachStateChangeListener(
-        new android.view.View.OnAttachStateChangeListener {
+        new android.view.View.OnAttachStateChangeListener
       def onViewAttachedToWindow(p: android.view.View): Unit = {}
       def onViewDetachedFromWindow(p: android.view.View): Unit = { f }
-    })
+    )
     basis
-  }
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/view/View.html android.view.View]]`.
   */
 class SView()(implicit context: android.content.Context,
               parentVGroup: TraitViewGroup[_] = null)
-    extends android.view.View(context) with TraitView[SView] {
+    extends android.view.View(context) with TraitView[SView]
 
   def basis = this
   override val parentViewGroup = parentVGroup
-}
 
-object SView {
+object SView
   def apply[LP <: ViewGroupLayoutParams[_, SView]]()(
       implicit context: android.content.Context,
-      defaultLayoutParam: SView => LP): SView = {
+      defaultLayoutParam: SView => LP): SView =
     val v = new SView
     v.<<.parent.+=(v)
     v
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/ViewGroup.html android.view.ViewGroup]]`.
@@ -2175,32 +2052,28 @@ class RichViewGroup[This <: android.view.ViewGroup](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/ViewGroup.html android.view.ViewGroup]]`. This contains several property accessors.
   */
-trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
+trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This]
 
   implicit val parentVG = this
 
-  def applyStyle(v: View): View = {
+  def applyStyle(v: View): View =
     var viw = v
     if (parentViewGroup != null) viw = parentViewGroup.applyStyle(viw)
-    styles.foreach { st =>
+    styles.foreach  st =>
       if (st.isDefinedAt(viw)) viw = st(viw)
-    }
     viw
-  }
 
-  def +=(v: View) = {
+  def +=(v: View) =
     var viw = v
     viw = applyStyle(viw)
     basis.addView(viw)
     basis
-  }
 
   var styles = Vector[View PartialFunction View]()
 
-  def style(stl: View PartialFunction View) = {
+  def style(stl: View PartialFunction View) =
     styles :+= stl
     basis
-  }
 
   // Fix https://github.com/pocorall/scaloid/issues/112
   def debug(str: String)(implicit tag: LoggerTag) =
@@ -2214,9 +2087,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setAddStatesFromChildren(boolean) setAddStatesFromChildren(boolean)]]`
     */
-  @inline def addStatesFromChildren_=(p: Boolean) = {
+  @inline def addStatesFromChildren_=(p: Boolean) =
     basis.setAddStatesFromChildren(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#isAlwaysDrawnWithCacheEnabled() isAlwaysDrawnWithCacheEnabled()]]`
@@ -2232,16 +2104,13 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setAlwaysDrawnWithCacheEnabled(boolean) setAlwaysDrawnWithCacheEnabled(boolean)]]`
     */
-  @inline def alwaysDrawnWithCacheEnabled_=(p: Boolean) = {
+  @inline def alwaysDrawnWithCacheEnabled_=(p: Boolean) =
     basis.setAlwaysDrawnWithCacheEnabled(p); basis
-  }
 
-  @inline def enableAlwaysDrawnWithCache() = {
+  @inline def enableAlwaysDrawnWithCache() =
     basis.setAlwaysDrawnWithCacheEnabled(true); basis
-  }
-  @inline def disableAlwaysDrawnWithCache() = {
+  @inline def disableAlwaysDrawnWithCache() =
     basis.setAlwaysDrawnWithCacheEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#isAnimationCacheEnabled() isAnimationCacheEnabled()]]`
@@ -2256,16 +2125,13 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setAnimationCacheEnabled(boolean) setAnimationCacheEnabled(boolean)]]`
     */
-  @inline def animationCacheEnabled_=(p: Boolean) = {
+  @inline def animationCacheEnabled_=(p: Boolean) =
     basis.setAnimationCacheEnabled(p); basis
-  }
 
-  @inline def enableAnimationCache() = {
+  @inline def enableAnimationCache() =
     basis.setAnimationCacheEnabled(true); basis
-  }
-  @inline def disableAnimationCache() = {
+  @inline def disableAnimationCache() =
     basis.setAnimationCacheEnabled(false); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getChildCount() getChildCount()]]`
@@ -2296,9 +2162,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setClipToPadding(boolean) setClipToPadding(boolean)]]`
     */
-  @inline def clipToPadding_=(p: Boolean) = {
+  @inline def clipToPadding_=(p: Boolean) =
     basis.setClipToPadding(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getDescendantFocusability() getDescendantFocusability()]]`
@@ -2313,9 +2178,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setDescendantFocusability(int) setDescendantFocusability(int)]]`
     */
-  @inline def descendantFocusability_=(p: Int) = {
+  @inline def descendantFocusability_=(p: Int) =
     basis.setDescendantFocusability(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getFocusedChild() getFocusedChild()]]`
@@ -2338,9 +2202,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setLayoutAnimation(android.view.animation.LayoutAnimationController) setLayoutAnimation(android.view.animation.LayoutAnimationController)]]`
     */
   @inline
-  def layoutAnimation_=(p: android.view.animation.LayoutAnimationController) = {
+  def layoutAnimation_=(p: android.view.animation.LayoutAnimationController) =
     basis.setLayoutAnimation(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getLayoutAnimationListener() getLayoutAnimationListener()]]`
@@ -2360,9 +2223,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
     */
   @inline
   def layoutAnimationListener_=(
-      p: android.view.animation.Animation.AnimationListener) = {
+      p: android.view.animation.Animation.AnimationListener) =
     basis.setLayoutAnimationListener(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getLayoutTransition() getLayoutTransition()]]`
@@ -2378,9 +2240,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setLayoutTransition(android.animation.LayoutTransition) setLayoutTransition(android.animation.LayoutTransition)]]`
     */
-  @inline def layoutTransition_=(p: android.animation.LayoutTransition) = {
+  @inline def layoutTransition_=(p: android.animation.LayoutTransition) =
     basis.setLayoutTransition(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#isMotionEventSplittingEnabled() isMotionEventSplittingEnabled()]]`
@@ -2396,16 +2257,13 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setMotionEventSplittingEnabled(boolean) setMotionEventSplittingEnabled(boolean)]]`
     */
-  @inline def motionEventSplittingEnabled_=(p: Boolean) = {
+  @inline def motionEventSplittingEnabled_=(p: Boolean) =
     basis.setMotionEventSplittingEnabled(p); basis
-  }
 
-  @inline def enableMotionEventSplitting() = {
+  @inline def enableMotionEventSplitting() =
     basis.setMotionEventSplittingEnabled(true); basis
-  }
-  @inline def disableMotionEventSplitting() = {
+  @inline def disableMotionEventSplitting() =
     basis.setMotionEventSplittingEnabled(false); basis
-  }
 
   @inline
   def onHierarchyChangeListener(
@@ -2426,9 +2284,8 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
     */
   @inline
   def onHierarchyChangeListener_=(
-      p: android.view.ViewGroup.OnHierarchyChangeListener) = {
+      p: android.view.ViewGroup.OnHierarchyChangeListener) =
     basis.setOnHierarchyChangeListener(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#getPersistentDrawingCache() getPersistentDrawingCache()]]`
@@ -2443,211 +2300,185 @@ trait TraitViewGroup[This <: android.view.ViewGroup] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewGroup.html#setPersistentDrawingCache(int) setPersistentDrawingCache(int)]]`
     */
-  @inline def persistentDrawingCache_=(p: Int) = {
+  @inline def persistentDrawingCache_=(p: Int) =
     basis.setPersistentDrawingCache(p); basis
-  }
 
   @inline
-  def onAnimationEnd[U](f: android.view.animation.Animation => U): This = {
+  def onAnimationEnd[U](f: android.view.animation.Animation => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = { f(p) }
       def onAnimationRepeat(p: android.view.animation.Animation): Unit = {}
       def onAnimationStart(p: android.view.animation.Animation): Unit = {}
-    })
+    )
     basis
-  }
 
-  @inline def onAnimationEnd[U](f: => U): This = {
+  @inline def onAnimationEnd[U](f: => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = { f }
       def onAnimationRepeat(p: android.view.animation.Animation): Unit = {}
       def onAnimationStart(p: android.view.animation.Animation): Unit = {}
-    })
+    )
     basis
-  }
 
   @inline
-  def onAnimationRepeat[U](f: android.view.animation.Animation => U): This = {
+  def onAnimationRepeat[U](f: android.view.animation.Animation => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = {}
-      def onAnimationRepeat(p: android.view.animation.Animation): Unit = {
+      def onAnimationRepeat(p: android.view.animation.Animation): Unit =
         f(p)
-      }
       def onAnimationStart(p: android.view.animation.Animation): Unit = {}
-    })
+    )
     basis
-  }
 
-  @inline def onAnimationRepeat[U](f: => U): This = {
+  @inline def onAnimationRepeat[U](f: => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = {}
       def onAnimationRepeat(p: android.view.animation.Animation): Unit = { f }
       def onAnimationStart(p: android.view.animation.Animation): Unit = {}
-    })
+    )
     basis
-  }
 
   @inline
-  def onAnimationStart[U](f: android.view.animation.Animation => U): This = {
+  def onAnimationStart[U](f: android.view.animation.Animation => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = {}
       def onAnimationRepeat(p: android.view.animation.Animation): Unit = {}
-      def onAnimationStart(p: android.view.animation.Animation): Unit = {
+      def onAnimationStart(p: android.view.animation.Animation): Unit =
         f(p)
-      }
-    })
+    )
     basis
-  }
 
-  @inline def onAnimationStart[U](f: => U): This = {
+  @inline def onAnimationStart[U](f: => U): This =
     basis.setLayoutAnimationListener(
-        new android.view.animation.Animation.AnimationListener {
+        new android.view.animation.Animation.AnimationListener
       def onAnimationEnd(p: android.view.animation.Animation): Unit = {}
       def onAnimationRepeat(p: android.view.animation.Animation): Unit = {}
       def onAnimationStart(p: android.view.animation.Animation): Unit = { f }
-    })
+    )
     basis
-  }
 
   @inline
   def onChildViewAdded[U](
-      f: (android.view.View, android.view.View) => U): This = {
+      f: (android.view.View, android.view.View) => U): This =
     basis.setOnHierarchyChangeListener(
-        new android.view.ViewGroup.OnHierarchyChangeListener {
+        new android.view.ViewGroup.OnHierarchyChangeListener
       def onChildViewAdded(
           p1: android.view.View, p2: android.view.View): Unit = { f(p1, p2) }
       def onChildViewRemoved(
           p1: android.view.View, p2: android.view.View): Unit = {}
-    })
+    )
     basis
-  }
 
-  @inline def onChildViewAdded[U](f: => U): This = {
+  @inline def onChildViewAdded[U](f: => U): This =
     basis.setOnHierarchyChangeListener(
-        new android.view.ViewGroup.OnHierarchyChangeListener {
+        new android.view.ViewGroup.OnHierarchyChangeListener
       def onChildViewAdded(
           p1: android.view.View, p2: android.view.View): Unit = { f }
       def onChildViewRemoved(
           p1: android.view.View, p2: android.view.View): Unit = {}
-    })
+    )
     basis
-  }
 
   @inline
   def onChildViewRemoved[U](
-      f: (android.view.View, android.view.View) => U): This = {
+      f: (android.view.View, android.view.View) => U): This =
     basis.setOnHierarchyChangeListener(
-        new android.view.ViewGroup.OnHierarchyChangeListener {
+        new android.view.ViewGroup.OnHierarchyChangeListener
       def onChildViewAdded(
           p1: android.view.View, p2: android.view.View): Unit = {}
       def onChildViewRemoved(
           p1: android.view.View, p2: android.view.View): Unit = { f(p1, p2) }
-    })
+    )
     basis
-  }
 
-  @inline def onChildViewRemoved[U](f: => U): This = {
+  @inline def onChildViewRemoved[U](f: => U): This =
     basis.setOnHierarchyChangeListener(
-        new android.view.ViewGroup.OnHierarchyChangeListener {
+        new android.view.ViewGroup.OnHierarchyChangeListener
       def onChildViewAdded(
           p1: android.view.View, p2: android.view.View): Unit = {}
       def onChildViewRemoved(
           p1: android.view.View, p2: android.view.View): Unit = { f }
-    })
+    )
     basis
-  }
-}
 
 trait ViewGroupLayoutParams[+This <: ViewGroupLayoutParams[_, _], V <: View]
-    extends ViewGroup.LayoutParams {
+    extends ViewGroup.LayoutParams
   def basis: This
 
   /**
     * A shorthand for <<(MATCH_PARENT, MATCH_PARENT)
     */
-  def fill = {
+  def fill =
     width = ViewGroup.LayoutParams.MATCH_PARENT
     height = ViewGroup.LayoutParams.MATCH_PARENT
     basis
-  }
 
   /**
     * A shorthand for <<(WRAP_CONTENT, WRAP_CONTENT)
     */
-  def wrap = {
+  def wrap =
     width = ViewGroup.LayoutParams.WRAP_CONTENT
     height = ViewGroup.LayoutParams.WRAP_CONTENT
     basis
-  }
 
   /**
     * A shorthand for <<(MATCH_PARENT, WRAP_CONTENT)
     */
-  def fw = {
+  def fw =
     width = ViewGroup.LayoutParams.MATCH_PARENT
     height = ViewGroup.LayoutParams.WRAP_CONTENT
     basis
-  }
 
   /**
     * A shorthand for <<(WRAP_CONTENT, MATCH_PARENT)
     */
-  def wf = {
+  def wf =
     width = ViewGroup.LayoutParams.WRAP_CONTENT
     height = ViewGroup.LayoutParams.MATCH_PARENT
     basis
-  }
 
   def parent: TraitViewGroup[_]
 
   def >> : V
-}
 
 trait ViewGroupMarginLayoutParams[
     +This <: ViewGroupMarginLayoutParams[_, _], V <: View]
-    extends ViewGroup.MarginLayoutParams with ViewGroupLayoutParams[This, V] {
+    extends ViewGroup.MarginLayoutParams with ViewGroupLayoutParams[This, V]
 
-  def marginBottom(size: Int) = {
+  def marginBottom(size: Int) =
     bottomMargin = size
     basis
-  }
 
-  def marginTop(size: Int) = {
+  def marginTop(size: Int) =
     topMargin = size
     basis
-  }
 
-  def marginLeft(size: Int) = {
+  def marginLeft(size: Int) =
     leftMargin = size
     basis
-  }
 
-  def marginRight(size: Int) = {
+  def marginRight(size: Int) =
     rightMargin = size
     basis
-  }
 
-  def margin(size: Int) = {
+  def margin(size: Int) =
     bottomMargin = size
     topMargin = size
     leftMargin = size
     rightMargin = size
     basis
-  }
 
-  def margin(top: Int, right: Int, bottom: Int, left: Int) = {
+  def margin(top: Int, right: Int, bottom: Int, left: Int) =
     bottomMargin = bottom
     topMargin = top
     leftMargin = left
     rightMargin = right
     basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/Menu.html android.view.Menu]]`.
@@ -2658,17 +2489,16 @@ class RichMenu[This <: android.view.Menu](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/Menu.html android.view.Menu]]`. This contains several property accessors.
   */
-trait TraitMenu[This <: android.view.Menu] {
+trait TraitMenu[This <: android.view.Menu]
 
   def basis: This
 
   @inline def +=(txt: CharSequence) = basis.add(txt)
 
-  @inline def inflate(id: Int)(implicit activity: Activity) = {
+  @inline def inflate(id: Int)(implicit activity: Activity) =
     val inflater = activity.getMenuInflater
     inflater.inflate(id, basis)
     true
-  }
 
   @inline def qwertyMode(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'qwertyMode'")
@@ -2682,7 +2512,6 @@ trait TraitMenu[This <: android.view.Menu] {
     * Shortcut for `[[https://developer.android.com/reference/android/view/Menu.html#setQwertyMode(boolean) setQwertyMode(boolean)]]`
     */
   @inline def qwertyMode_=(p: Boolean) = { basis.setQwertyMode(p); basis }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/ContextMenu.html android.view.ContextMenu]]`.
@@ -2693,7 +2522,7 @@ class RichContextMenu[This <: android.view.ContextMenu](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/ContextMenu.html android.view.ContextMenu]]`. This contains several property accessors.
   */
-trait TraitContextMenu[This <: android.view.ContextMenu] {
+trait TraitContextMenu[This <: android.view.ContextMenu]
 
   def basis: This
 
@@ -2719,9 +2548,8 @@ trait TraitContextMenu[This <: android.view.ContextMenu] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ContextMenu.html#setHeaderIcon(android.graphics.drawable.Drawable) setHeaderIcon(android.graphics.drawable.Drawable)]]`
     */
-  @inline def headerIcon_=(p: android.graphics.drawable.Drawable) = {
+  @inline def headerIcon_=(p: android.graphics.drawable.Drawable) =
     basis.setHeaderIcon(p); basis
-  }
 
   @inline def headerTitle(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'headerTitle'")
@@ -2744,9 +2572,8 @@ trait TraitContextMenu[This <: android.view.ContextMenu] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ContextMenu.html#setHeaderTitle(java.lang.CharSequence) setHeaderTitle(java.lang.CharSequence)]]`
     */
-  @inline def headerTitle_=(p: java.lang.CharSequence) = {
+  @inline def headerTitle_=(p: java.lang.CharSequence) =
     basis.setHeaderTitle(p); basis
-  }
 
   @inline def headerView(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'headerView'")
@@ -2759,10 +2586,8 @@ trait TraitContextMenu[This <: android.view.ContextMenu] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ContextMenu.html#setHeaderView(android.view.View) setHeaderView(android.view.View)]]`
     */
-  @inline def headerView_=(p: android.view.View) = {
+  @inline def headerView_=(p: android.view.View) =
     basis.setHeaderView(p); basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/SurfaceView.html android.view.SurfaceView]]`.
@@ -2774,7 +2599,7 @@ class RichSurfaceView[This <: android.view.SurfaceView](val basis: This)
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/SurfaceView.html android.view.SurfaceView]]`. This contains several property accessors.
   */
 trait TraitSurfaceView[This <: android.view.SurfaceView]
-    extends TraitView[This] {
+    extends TraitView[This]
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/SurfaceView.html#getHolder() getHolder()]]`
@@ -2794,9 +2619,8 @@ trait TraitSurfaceView[This <: android.view.SurfaceView]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/SurfaceView.html#setZOrderMediaOverlay(boolean) setZOrderMediaOverlay(boolean)]]`
     */
-  @inline def zOrderMediaOverlay_=(p: Boolean) = {
+  @inline def zOrderMediaOverlay_=(p: Boolean) =
     basis.setZOrderMediaOverlay(p); basis
-  }
 
   @inline def zOrderOnTop(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'zOrderOnTop'")
@@ -2810,7 +2634,6 @@ trait TraitSurfaceView[This <: android.view.SurfaceView]
     * Shortcut for `[[https://developer.android.com/reference/android/view/SurfaceView.html#setZOrderOnTop(boolean) setZOrderOnTop(boolean)]]`
     */
   @inline def zOrderOnTop_=(p: Boolean) = { basis.setZOrderOnTop(p); basis }
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/view/SurfaceView.html android.view.SurfaceView]]`.
@@ -2818,21 +2641,18 @@ trait TraitSurfaceView[This <: android.view.SurfaceView]
 class SSurfaceView()(implicit context: android.content.Context,
                      parentVGroup: TraitViewGroup[_] = null)
     extends android.view.SurfaceView(context)
-    with TraitSurfaceView[SSurfaceView] {
+    with TraitSurfaceView[SSurfaceView]
 
   def basis = this
   override val parentViewGroup = parentVGroup
-}
 
-object SSurfaceView {
+object SSurfaceView
   def apply[LP <: ViewGroupLayoutParams[_, SSurfaceView]]()(
       implicit context: android.content.Context,
-      defaultLayoutParam: SSurfaceView => LP): SSurfaceView = {
+      defaultLayoutParam: SSurfaceView => LP): SSurfaceView =
     val v = new SSurfaceView
     v.<<.parent.+=(v)
     v
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/ViewStub.html android.view.ViewStub]]`.
@@ -2843,7 +2663,7 @@ class RichViewStub[This <: android.view.ViewStub](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/ViewStub.html android.view.ViewStub]]`. This contains several property accessors.
   */
-trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This] {
+trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This]
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewStub.html#getInflatedId() getInflatedId()]]`
@@ -2874,9 +2694,8 @@ trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewStub.html#setLayoutInflater(android.view.LayoutInflater) setLayoutInflater(android.view.LayoutInflater)]]`
     */
-  @inline def layoutInflater_=(p: android.view.LayoutInflater) = {
+  @inline def layoutInflater_=(p: android.view.LayoutInflater) =
     basis.setLayoutInflater(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewStub.html#getLayoutResource() getLayoutResource()]]`
@@ -2907,31 +2726,25 @@ trait TraitViewStub[This <: android.view.ViewStub] extends TraitView[This] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/ViewStub.html#setOnInflateListener(android.view.ViewStub.OnInflateListener) setOnInflateListener(android.view.ViewStub.OnInflateListener)]]`
     */
-  @inline def onInflateListener_=(p: android.view.ViewStub.OnInflateListener) = {
+  @inline def onInflateListener_=(p: android.view.ViewStub.OnInflateListener) =
     basis.setOnInflateListener(p); basis
-  }
 
   @inline
-  def onInflate[U](f: (android.view.ViewStub, android.view.View) => U): This = {
+  def onInflate[U](f: (android.view.ViewStub, android.view.View) => U): This =
     basis.setOnInflateListener(
-        new android.view.ViewStub.OnInflateListener {
-      def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit = {
+        new android.view.ViewStub.OnInflateListener
+      def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit =
         f(p1, p2)
-      }
-    })
+    )
     basis
-  }
 
-  @inline def onInflate[U](f: => U): This = {
+  @inline def onInflate[U](f: => U): This =
     basis.setOnInflateListener(
-        new android.view.ViewStub.OnInflateListener {
-      def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit = {
+        new android.view.ViewStub.OnInflateListener
+      def onInflate(p1: android.view.ViewStub, p2: android.view.View): Unit =
         f
-      }
-    })
+    )
     basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/ActionProvider.html android.view.ActionProvider]]`.
@@ -2942,7 +2755,7 @@ class RichActionProvider[This <: android.view.ActionProvider](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/ActionProvider.html android.view.ActionProvider]]`. This contains several property accessors.
   */
-trait TraitActionProvider[This <: android.view.ActionProvider] {
+trait TraitActionProvider[This <: android.view.ActionProvider]
 
   def basis: This
 
@@ -2962,26 +2775,22 @@ trait TraitActionProvider[This <: android.view.ActionProvider] {
     * Shortcut for `[[https://developer.android.com/reference/android/view/ActionProvider.html#setVisibilityListener(android.view.ActionProvider.VisibilityListener) setVisibilityListener(android.view.ActionProvider.VisibilityListener)]]`
     */
   @inline
-  def visibilityListener_=(p: android.view.ActionProvider.VisibilityListener) = {
+  def visibilityListener_=(p: android.view.ActionProvider.VisibilityListener) =
     basis.setVisibilityListener(p); basis
-  }
 
-  @inline def onActionProviderVisibilityChanged[U](f: Boolean => U): This = {
+  @inline def onActionProviderVisibilityChanged[U](f: Boolean => U): This =
     basis.setVisibilityListener(
-        new android.view.ActionProvider.VisibilityListener {
+        new android.view.ActionProvider.VisibilityListener
       def onActionProviderVisibilityChanged(p: Boolean): Unit = { f(p) }
-    })
+    )
     basis
-  }
 
-  @inline def onActionProviderVisibilityChanged[U](f: => U): This = {
+  @inline def onActionProviderVisibilityChanged[U](f: => U): This =
     basis.setVisibilityListener(
-        new android.view.ActionProvider.VisibilityListener {
+        new android.view.ActionProvider.VisibilityListener
       def onActionProviderVisibilityChanged(p: Boolean): Unit = { f }
-    })
+    )
     basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/view/TextureView.html android.view.TextureView]]`.
@@ -2993,7 +2802,7 @@ class RichTextureView[This <: android.view.TextureView](val basis: This)
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/view/TextureView.html android.view.TextureView]]`. This contains several property accessors.
   */
 trait TraitTextureView[This <: android.view.TextureView]
-    extends TraitView[This] {
+    extends TraitView[This]
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/TextureView.html#getBitmap() getBitmap()]]`
@@ -3027,9 +2836,8 @@ trait TraitTextureView[This <: android.view.TextureView]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/TextureView.html#setSurfaceTexture(android.graphics.SurfaceTexture) setSurfaceTexture(android.graphics.SurfaceTexture)]]`
     */
-  @inline def surfaceTexture_=(p: android.graphics.SurfaceTexture) = {
+  @inline def surfaceTexture_=(p: android.graphics.SurfaceTexture) =
     basis.setSurfaceTexture(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/TextureView.html#getSurfaceTextureListener() getSurfaceTextureListener()]]`
@@ -3049,9 +2857,8 @@ trait TraitTextureView[This <: android.view.TextureView]
     */
   @inline
   def surfaceTextureListener_=(
-      p: android.view.TextureView.SurfaceTextureListener) = {
+      p: android.view.TextureView.SurfaceTextureListener) =
     basis.setSurfaceTextureListener(p); basis
-  }
 
   @inline def transform(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'transform'")
@@ -3064,10 +2871,8 @@ trait TraitTextureView[This <: android.view.TextureView]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/view/TextureView.html#setTransform(android.graphics.Matrix) setTransform(android.graphics.Matrix)]]`
     */
-  @inline def transform_=(p: android.graphics.Matrix) = {
+  @inline def transform_=(p: android.graphics.Matrix) =
     basis.setTransform(p); basis
-  }
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/view/TextureView.html android.view.TextureView]]`.
@@ -3075,23 +2880,20 @@ trait TraitTextureView[This <: android.view.TextureView]
 class STextureView()(implicit context: android.content.Context,
                      parentVGroup: TraitViewGroup[_] = null)
     extends android.view.TextureView(context)
-    with TraitTextureView[STextureView] {
+    with TraitTextureView[STextureView]
 
   def basis = this
   override val parentViewGroup = parentVGroup
-}
 
-object STextureView {
+object STextureView
   def apply[LP <: ViewGroupLayoutParams[_, STextureView]]()(
       implicit context: android.content.Context,
-      defaultLayoutParam: STextureView => LP): STextureView = {
+      defaultLayoutParam: STextureView => LP): STextureView =
     val v = new STextureView
     v.<<.parent.+=(v)
     v
-  }
-}
 
-trait ViewImplicits {
+trait ViewImplicits
   @inline implicit def view2RichView[V <: android.view.View](view: V) =
     new RichView[V](view)
   @inline implicit def viewGroup2RichViewGroup[V <: android.view.ViewGroup](
@@ -3112,5 +2914,4 @@ trait ViewImplicits {
   @inline implicit def textureView2RichTextureView[
       V <: android.view.TextureView](textureView: V) =
     new RichTextureView[V](textureView)
-}
 object ViewImplicits extends ViewImplicits

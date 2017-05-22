@@ -27,7 +27,7 @@ import com.twitter.bijection.macros.impl.IsCaseClassImpl
   * This class contains the core macro implementations. This is in a separate module to allow it to be in
   * a separate compilation unit, which makes it easier to provide helper methods interfacing with macros.
   */
-object TypeDescriptorProviderImpl {
+object TypeDescriptorProviderImpl
 
   def caseClassTypeDescriptorImpl[T](c: Context)(
       implicit T: c.WeakTypeTag[T]): c.Expr[TypeDescriptor[T]] =
@@ -50,7 +50,7 @@ object TypeDescriptorProviderImpl {
     * Option[T] is not evident (we can't tell Some(None) from None).
     */
   def evidentColumn(c: Context, allowUnknown: Boolean = false)(
-      tpe: c.universe.Type): Option[Int] = {
+      tpe: c.universe.Type): Option[Int] =
     import c.universe._
 
     def flattenOnce(t: Type): List[Type] =
@@ -58,9 +58,9 @@ object TypeDescriptorProviderImpl {
         .map(_.returnType.asSeenFrom(t, t.typeSymbol.asClass))
         .toList
 
-    def go(t: Type, offset: Int): (Int, Option[Int]) = {
+    def go(t: Type, offset: Int): (Int, Option[Int]) =
       val thisColumn = (offset + 1, Some(offset))
-      t match {
+      t match
         case tpe if tpe =:= typeOf[String] =>
           // if we don't allowUnknown here, we treat null and "" is indistinguishable
           // for text formats
@@ -80,9 +80,8 @@ object TypeDescriptorProviderImpl {
         case tpe
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
           val flattened =
-            flattenOnce(tpe).scanLeft((offset, Option.empty[Int])) {
+            flattenOnce(tpe).scanLeft((offset, Option.empty[Int]))
               case ((off, _), t) => go(t, off)
-            }
 
           val nextPos = flattened.last._1
           val ev = flattened.collectFirst { case (_, Some(col)) => col }
@@ -92,17 +91,14 @@ object TypeDescriptorProviderImpl {
           c.abort(
               c.enclosingPosition,
               s"Case class ${tpe} at $t is not pure primitives or nested case classes")
-      }
-    }
     go(tpe, 0)._2
-  }
 
   def optionInner(c: Context)(opt: c.universe.Type): Option[c.universe.Type] =
-    if (opt.erasure =:= c.universe.typeOf[Option[Any]]) {
+    if (opt.erasure =:= c.universe.typeOf[Option[Any]])
       Some(opt.asInstanceOf[c.universe.TypeRefApi].args.head)
-    } else None
+    else None
 
-  def isTuple[T](c: Context)(implicit T: c.WeakTypeTag[T]): Boolean = {
+  def isTuple[T](c: Context)(implicit T: c.WeakTypeTag[T]): Boolean =
     import c.universe._
     val tupleTypes = List(
         typeOf[Tuple1[Any]],
@@ -294,11 +290,10 @@ object TypeDescriptorProviderImpl {
                        Any,
                        Any]])
     (tupleTypes.exists { _ =:= T.tpe.erasure })
-  }
 
   def caseClassTypeDescriptorCommonImpl[T](
       c: Context, allowUnknownTypes: Boolean)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[TypeDescriptor[T]] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[TypeDescriptor[T]] =
     import c.universe._
 
     val converter = TupleConverterImpl.caseClassTupleConverterCommonImpl[T](
@@ -319,5 +314,3 @@ object TypeDescriptorProviderImpl {
     }
     """
     c.Expr[TypeDescriptor[T]](res)
-  }
-}

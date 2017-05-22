@@ -22,7 +22,7 @@ import scala.reflect.ClassTag
 /**
   * @see [[ClusterSharding$ ClusterSharding extension]]
   */
-object ShardRegion {
+object ShardRegion
 
   /**
     * INTERNAL API
@@ -104,7 +104,7 @@ object ShardRegion {
     * shard id, and the message to send to the entity from an
     * incoming message.
     */
-  trait MessageExtractor {
+  trait MessageExtractor
 
     /**
       * Extract the entity id from an incoming `message`. If `null` is returned
@@ -125,7 +125,6 @@ object ShardRegion {
       * function will be used as input to this function.
       */
     def shardId(message: Any): String
-  }
 
   /**
     * Convenience implementation of [[ShardRegion.MessageExtractor]] that
@@ -133,7 +132,7 @@ object ShardRegion {
     * of unique shards is limited by the given `maxNumberOfShards`.
     */
   abstract class HashCodeMessageExtractor(maxNumberOfShards: Int)
-      extends MessageExtractor {
+      extends MessageExtractor
 
     /**
       * Default implementation pass on the message as is.
@@ -142,7 +141,6 @@ object ShardRegion {
 
     override def shardId(message: Any): String =
       (math.abs(entityId(message).hashCode) % maxNumberOfShards).toString
-  }
 
   sealed trait ShardRegionCommand
 
@@ -204,16 +202,14 @@ object ShardRegion {
     * Reply to `GetCurrentRegions`
     */
   @SerialVersionUID(1L)
-  final case class CurrentRegions(regions: Set[Address]) {
+  final case class CurrentRegions(regions: Set[Address])
 
     /**
       * Java API
       */
-    def getRegions: java.util.Set[Address] = {
+    def getRegions: java.util.Set[Address] =
       import scala.collection.JavaConverters._
       regions.asJava
-    }
-  }
 
   /**
     * Send this message to the `ShardRegion` actor to request for [[ClusterShardingStats]],
@@ -234,16 +230,14 @@ object ShardRegion {
     */
   @SerialVersionUID(1L)
   final case class ClusterShardingStats(
-      regions: Map[Address, ShardRegionStats]) {
+      regions: Map[Address, ShardRegionStats])
 
     /**
       * Java API
       */
-    def getRegions(): java.util.Map[Address, ShardRegionStats] = {
+    def getRegions(): java.util.Map[Address, ShardRegionStats] =
       import scala.collection.JavaConverters._
       regions.asJava
-    }
-  }
 
   /**
     * Send this message to the `ShardRegion` actor to request for [[ShardRegionStats]],
@@ -263,16 +257,14 @@ object ShardRegion {
   def getRegionStatsInstance = GetShardRegionStats
 
   @SerialVersionUID(1L)
-  final case class ShardRegionStats(stats: Map[ShardId, Int]) {
+  final case class ShardRegionStats(stats: Map[ShardId, Int])
 
     /**
       * Java API
       */
-    def getStats(): java.util.Map[ShardId, Int] = {
+    def getStats(): java.util.Map[ShardId, Int] =
       import scala.collection.JavaConverters._
       stats.asJava
-    }
-  }
 
   /**
     * Send this message to a `ShardRegion` actor instance to request a
@@ -294,30 +286,26 @@ object ShardRegion {
     * If gathering the shard information times out the set of shards will be empty.
     */
   @SerialVersionUID(1L)
-  final case class CurrentShardRegionState(shards: Set[ShardState]) {
+  final case class CurrentShardRegionState(shards: Set[ShardState])
 
     /**
       * Java API:
       *
       * If gathering the shard information times out the set of shards will be empty.
       */
-    def getShards(): java.util.Set[ShardState] = {
+    def getShards(): java.util.Set[ShardState] =
       import scala.collection.JavaConverters._
       shards.asJava
-    }
-  }
 
   @SerialVersionUID(1L)
-  final case class ShardState(shardId: ShardId, entityIds: Set[EntityId]) {
+  final case class ShardState(shardId: ShardId, entityIds: Set[EntityId])
 
     /**
       * Java API:
       */
-    def getEntityIds(): java.util.Set[EntityId] = {
+    def getEntityIds(): java.util.Set[EntityId] =
       import scala.collection.JavaConverters._
       entityIds.asJava
-    }
-  }
 
   private case object Retry extends ShardRegionCommand
 
@@ -338,25 +326,21 @@ object ShardRegion {
                                      replyTo: ActorRef,
                                      entities: Set[ActorRef],
                                      stopMessage: Any)
-      extends Actor {
+      extends Actor
     import ShardCoordinator.Internal.ShardStopped
 
-    entities.foreach { a ⇒
+    entities.foreach  a ⇒
       context watch a
       a ! stopMessage
-    }
 
     var remaining = entities
 
-    def receive = {
+    def receive =
       case Terminated(ref) ⇒
         remaining -= ref
-        if (remaining.isEmpty) {
+        if (remaining.isEmpty)
           replyTo ! ShardStopped(shard)
           context stop self
-        }
-    }
-  }
 
   private[akka] def handOffStopperProps(shard: String,
                                         replyTo: ActorRef,
@@ -364,7 +348,6 @@ object ShardRegion {
                                         stopMessage: Any): Props =
     Props(new HandOffStopper(shard, replyTo, entities, stopMessage))
       .withDeploy(Deploy.local)
-}
 
 /**
   * This actor creates children entity actors on demand for the shards that it is told to be
@@ -380,7 +363,7 @@ class ShardRegion(typeName: String,
                   extractEntityId: ShardRegion.ExtractEntityId,
                   extractShardId: ShardRegion.ExtractShardId,
                   handOffStopMessage: Any)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   import ShardCoordinator.Internal._
   import ShardRegion._
@@ -404,9 +387,8 @@ class ShardRegion(typeName: String,
   var handingOff = Set.empty[ActorRef]
   var gracefulShutdownInProgress = false
 
-  def totalBufferSize = shardBuffers.foldLeft(0) { (sum, entity) ⇒
+  def totalBufferSize = shardBuffers.foldLeft(0)  (sum, entity) ⇒
     sum + entity._2.size
-  }
 
   import context.dispatcher
   val retryTask = context.system.scheduler
@@ -414,20 +396,17 @@ class ShardRegion(typeName: String,
   var retryCount = 0
 
   // subscribe to MemberEvent, re-subscribe when restart
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     cluster.subscribe(self, classOf[MemberEvent])
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     super.postStop()
     cluster.unsubscribe(self)
     retryTask.cancel()
-  }
 
-  def matchingRole(member: Member): Boolean = role match {
+  def matchingRole(member: Member): Boolean = role match
     case None ⇒ true
     case Some(r) ⇒ member.hasRole(r)
-  }
 
   def coordinatorSelection: Option[ActorSelection] =
     membersByAge.headOption.map(
@@ -435,21 +414,19 @@ class ShardRegion(typeName: String,
 
   var coordinator: Option[ActorRef] = None
 
-  def changeMembers(newMembers: immutable.SortedSet[Member]): Unit = {
+  def changeMembers(newMembers: immutable.SortedSet[Member]): Unit =
     val before = membersByAge.headOption
     val after = newMembers.headOption
     membersByAge = newMembers
-    if (before != after) {
+    if (before != after)
       if (log.isDebugEnabled)
         log.debug("Coordinator moved from [{}] to [{}]",
                   before.map(_.address).getOrElse(""),
                   after.map(_.address).getOrElse(""))
       coordinator = None
       register()
-    }
-  }
 
-  def receive = {
+  def receive =
     case Terminated(ref) ⇒ receiveTerminated(ref)
     case ShardInitialized(shardId) ⇒ initializeShard(shardId, sender())
     case evt: ClusterDomainEvent ⇒ receiveClusterEvent(evt)
@@ -460,15 +437,13 @@ class ShardRegion(typeName: String,
     case msg if extractEntityId.isDefinedAt(msg) ⇒
       deliverMessage(msg, sender())
     case msg: RestartShard ⇒ deliverMessage(msg, sender())
-  }
 
-  def receiveClusterState(state: CurrentClusterState): Unit = {
+  def receiveClusterState(state: CurrentClusterState): Unit =
     changeMembers(
         immutable.SortedSet.empty(ageOrdering) union state.members.filter(
             m ⇒ m.status == MemberStatus.Up && matchingRole(m)))
-  }
 
-  def receiveClusterEvent(evt: ClusterDomainEvent): Unit = evt match {
+  def receiveClusterEvent(evt: ClusterDomainEvent): Unit = evt match
     case MemberUp(m) ⇒
       if (matchingRole(m)) changeMembers(membersByAge - m + m) // replace
 
@@ -479,9 +454,8 @@ class ShardRegion(typeName: String,
     case _: MemberEvent ⇒ // these are expected, no need to warn about them
 
     case _ ⇒ unhandled(evt)
-  }
 
-  def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match {
+  def receiveCoordinatorMessage(msg: CoordinatorMessage): Unit = msg match
     case HostShard(shard) ⇒
       log.debug("Host Shard [{}] ", shard)
       regionByShard = regionByShard.updated(shard, self)
@@ -495,13 +469,12 @@ class ShardRegion(typeName: String,
 
     case ShardHome(shard, ref) ⇒
       log.debug("Shard [{}] located at [{}]", shard, ref)
-      regionByShard.get(shard) match {
+      regionByShard.get(shard) match
         case Some(r) if r == self && ref != self ⇒
           // should not happen, inconsistency between ShardRegion and ShardCoordinator
           throw new IllegalStateException(
               s"Unexpected change of shard [${shard}] from self to [${ref}]")
         case _ ⇒
-      }
       regionByShard = regionByShard.updated(shard, ref)
       regions = regions.updated(ref, regions.getOrElse(ref, Set.empty) + shard)
 
@@ -518,13 +491,12 @@ class ShardRegion(typeName: String,
 
     case BeginHandOff(shard) ⇒
       log.debug("BeginHandOff shard [{}]", shard)
-      if (regionByShard.contains(shard)) {
+      if (regionByShard.contains(shard))
         val regionRef = regionByShard(shard)
         val updatedShards = regions(regionRef) - shard
         if (updatedShards.isEmpty) regions -= regionRef
         else regions = regions.updated(regionRef, updatedShards)
         regionByShard -= shard
-      }
       sender() ! BeginHandOffAck(shard)
 
     case msg @ HandOff(shard) ⇒
@@ -533,28 +505,25 @@ class ShardRegion(typeName: String,
       // must drop requests that came in between the BeginHandOff and now,
       // because they might be forwarded from other regions and there
       // is a risk or message re-ordering otherwise
-      if (shardBuffers.contains(shard)) {
+      if (shardBuffers.contains(shard))
         shardBuffers -= shard
         loggedFullBufferWarning = false
-      }
 
-      if (shards.contains(shard)) {
+      if (shards.contains(shard))
         handingOff += shards(shard)
         shards(shard) forward msg
-      } else sender() ! ShardStopped(shard)
+      else sender() ! ShardStopped(shard)
 
     case _ ⇒ unhandled(msg)
-  }
 
-  def receiveCommand(cmd: ShardRegionCommand): Unit = cmd match {
+  def receiveCommand(cmd: ShardRegionCommand): Unit = cmd match
     case Retry ⇒
       if (shardBuffers.nonEmpty) retryCount += 1
       if (coordinator.isEmpty) register()
-      else {
+      else
         sendGracefulShutdownToCoordinator()
         requestShardBufferHomes()
         tryCompleteGracefulShutdown()
-      }
 
     case GracefulShutdown ⇒
       log.debug("Starting graceful shutdown of region and all its shards")
@@ -563,14 +532,12 @@ class ShardRegion(typeName: String,
       tryCompleteGracefulShutdown()
 
     case _ ⇒ unhandled(cmd)
-  }
 
-  def receiveQuery(query: ShardRegionQuery): Unit = query match {
+  def receiveQuery(query: ShardRegionQuery): Unit = query match
     case GetCurrentRegions ⇒
-      coordinator match {
+      coordinator match
         case Some(c) ⇒ c.forward(GetCurrentRegions)
         case None ⇒ sender() ! CurrentRegions(Set.empty)
-      }
 
     case GetShardRegionState ⇒
       replyToRegionStateQuery(sender())
@@ -582,11 +549,10 @@ class ShardRegion(typeName: String,
       coordinator.fold(sender ! ClusterShardingStats(Map.empty))(_ forward msg)
 
     case _ ⇒ unhandled(query)
-  }
 
-  def receiveTerminated(ref: ActorRef): Unit = {
+  def receiveTerminated(ref: ActorRef): Unit =
     if (coordinator.exists(_ == ref)) coordinator = None
-    else if (regions.contains(ref)) {
+    else if (regions.contains(ref))
       val shards = regions(ref)
       regionByShard --= shards
       regions -= ref
@@ -594,169 +560,147 @@ class ShardRegion(typeName: String,
         log.debug("Region [{}] with shards [{}] terminated",
                   ref,
                   shards.mkString(", "))
-    } else if (shardsByRef.contains(ref)) {
+    else if (shardsByRef.contains(ref))
       val shardId: ShardId = shardsByRef(ref)
 
       shardsByRef = shardsByRef - ref
       shards = shards - shardId
       startingShards -= shardId
-      if (handingOff.contains(ref)) {
+      if (handingOff.contains(ref))
         handingOff = handingOff - ref
         log.debug("Shard [{}] handoff complete", shardId)
-      } else {
+      else
         // if persist fails it will stop
         log.debug("Shard [{}]  terminated while not being handed off", shardId)
-        if (rememberEntities) {
+        if (rememberEntities)
           context.system.scheduler
             .scheduleOnce(shardFailureBackoff, self, RestartShard(shardId))
-        }
-      }
 
       tryCompleteGracefulShutdown()
-    }
-  }
 
-  def replyToRegionStateQuery(ref: ActorRef): Unit = {
-    askAllShards[Shard.CurrentShardState](Shard.GetCurrentShardState).map {
+  def replyToRegionStateQuery(ref: ActorRef): Unit =
+    askAllShards[Shard.CurrentShardState](Shard.GetCurrentShardState).map
       shardStates ⇒
-        CurrentShardRegionState(shardStates.map {
+        CurrentShardRegionState(shardStates.map
           case (shardId, state) ⇒
             ShardRegion.ShardState(shardId, state.entityIds)
-        }.toSet)
-    }.recover {
+        .toSet)
+    .recover
       case x: AskTimeoutException ⇒ CurrentShardRegionState(Set.empty)
-    }.pipeTo(ref)
-  }
+    .pipeTo(ref)
 
-  def replyToRegionStatsQuery(ref: ActorRef): Unit = {
-    askAllShards[Shard.ShardStats](Shard.GetShardStats).map { shardStats ⇒
-      ShardRegionStats(shardStats.map {
+  def replyToRegionStatsQuery(ref: ActorRef): Unit =
+    askAllShards[Shard.ShardStats](Shard.GetShardStats).map  shardStats ⇒
+      ShardRegionStats(shardStats.map
         case (shardId, stats) ⇒ (shardId, stats.entityCount)
-      }.toMap)
-    }.recover {
+      .toMap)
+    .recover
       case x: AskTimeoutException ⇒ ShardRegionStats(Map.empty)
-    }.pipeTo(ref)
-  }
+    .pipeTo(ref)
 
-  def askAllShards[T : ClassTag](msg: Any): Future[Seq[(ShardId, T)]] = {
+  def askAllShards[T : ClassTag](msg: Any): Future[Seq[(ShardId, T)]] =
     implicit val timeout: Timeout = 3.seconds
     Future.sequence(
-        shards.toSeq.map {
+        shards.toSeq.map
       case (shardId, ref) ⇒ (ref ? msg).mapTo[T].map(t ⇒ (shardId, t))
-    })
-  }
+    )
 
   private def tryCompleteGracefulShutdown() =
     if (gracefulShutdownInProgress && shards.isEmpty && shardBuffers.isEmpty)
       context.stop(self) // all shards have been rebalanced, complete graceful shutdown
 
-  def register(): Unit = {
+  def register(): Unit =
     coordinatorSelection.foreach(_ ! registrationMessage)
     if (shardBuffers.nonEmpty && retryCount >= 5)
       log.warning(
           "Trying to register to coordinator at [{}], but no acknowledgement. Total [{}] buffered messages.",
           coordinatorSelection,
           totalBufferSize)
-  }
 
   def registrationMessage: Any =
     if (entityProps.isDefined) Register(self) else RegisterProxy(self)
 
-  def requestShardBufferHomes(): Unit = {
-    shardBuffers.foreach {
+  def requestShardBufferHomes(): Unit =
+    shardBuffers.foreach
       case (shard, buf) ⇒
-        coordinator.foreach { c ⇒
+        coordinator.foreach  c ⇒
           val logMsg =
             "Retry request for shard [{}] homes from coordinator at [{}]. [{}] buffered messages."
           if (retryCount >= 5) log.warning(logMsg, shard, c, buf.size)
           else log.debug(logMsg, shard, c, buf.size)
 
           c ! GetShardHome(shard)
-        }
-    }
-  }
 
-  def initializeShard(id: ShardId, shard: ActorRef): Unit = {
+  def initializeShard(id: ShardId, shard: ActorRef): Unit =
     log.debug("Shard was initialized {}", id)
     startingShards -= id
     deliverBufferedMessages(id, shard)
-  }
 
-  def bufferMessage(shardId: ShardId, msg: Any, snd: ActorRef) = {
+  def bufferMessage(shardId: ShardId, msg: Any, snd: ActorRef) =
     val totBufSize = totalBufferSize
-    if (totBufSize >= bufferSize) {
+    if (totBufSize >= bufferSize)
       if (loggedFullBufferWarning)
         log.debug("Buffer is full, dropping message for shard [{}]", shardId)
-      else {
+      else
         log.warning("Buffer is full, dropping message for shard [{}]", shardId)
         loggedFullBufferWarning = true
-      }
       context.system.deadLetters ! msg
-    } else {
+    else
       val buf = shardBuffers.getOrElse(shardId, Vector.empty)
       shardBuffers = shardBuffers.updated(shardId, buf :+ ((msg, snd)))
 
       // log some insight to how buffers are filled up every 10% of the buffer capacity
       val tot = totBufSize + 1
-      if (tot % (bufferSize / 10) == 0) {
+      if (tot % (bufferSize / 10) == 0)
         val logMsg =
           s"ShardRegion for [$typeName] is using [${100.0 * tot / bufferSize} %] of its buffer capacity."
         if (tot <= bufferSize / 2) log.info(logMsg)
         else
           log.warning(logMsg +
               " The coordinator might not be available. You might want to check cluster membership status.")
-      }
-    }
-  }
 
-  def deliverBufferedMessages(shardId: ShardId, receiver: ActorRef): Unit = {
-    shardBuffers.get(shardId) match {
+  def deliverBufferedMessages(shardId: ShardId, receiver: ActorRef): Unit =
+    shardBuffers.get(shardId) match
       case Some(buf) ⇒
         log.debug(
             "Deliver [{}] buffered messages for shard [{}]", buf.size, shardId)
         buf.foreach { case (msg, snd) ⇒ receiver.tell(msg, snd) }
         shardBuffers -= shardId
       case None ⇒
-    }
     loggedFullBufferWarning = false
     retryCount = 0
-  }
 
   def deliverMessage(msg: Any, snd: ActorRef): Unit =
-    msg match {
+    msg match
       case RestartShard(shardId) ⇒
-        regionByShard.get(shardId) match {
+        regionByShard.get(shardId) match
           case Some(ref) ⇒
             if (ref == self) getShard(shardId)
           case None ⇒
-            if (!shardBuffers.contains(shardId)) {
+            if (!shardBuffers.contains(shardId))
               log.debug("Request shard [{}] home", shardId)
               coordinator.foreach(_ ! GetShardHome(shardId))
-            }
             val buf = shardBuffers.getOrElse(shardId, Vector.empty)
             log.debug(
                 "Buffer message for shard [{}]. Total [{}] buffered messages.",
                 shardId,
                 buf.size + 1)
             shardBuffers = shardBuffers.updated(shardId, buf :+ ((msg, snd)))
-        }
 
       case _ ⇒
         val shardId = extractShardId(msg)
-        regionByShard.get(shardId) match {
+        regionByShard.get(shardId) match
           case Some(ref) if ref == self ⇒
-            getShard(shardId) match {
+            getShard(shardId) match
               case Some(shard) ⇒
-                shardBuffers.get(shardId) match {
+                shardBuffers.get(shardId) match
                   case Some(buf) ⇒
                     // Since now messages to a shard is buffered then those messages must be in right order
                     bufferMessage(shardId, msg, snd)
                     deliverBufferedMessages(shardId, shard)
                   case None ⇒
                     shard.tell(msg, snd)
-                }
               case None ⇒ bufferMessage(shardId, msg, snd)
-            }
           case Some(ref) ⇒
             log.debug(
                 "Forwarding request for shard [{}] to [{}]", shardId, ref)
@@ -766,20 +710,17 @@ class ShardRegion(typeName: String,
                         msg.getClass.getName)
             context.system.deadLetters ! msg
           case None ⇒
-            if (!shardBuffers.contains(shardId)) {
+            if (!shardBuffers.contains(shardId))
               log.debug("Request shard [{}] home", shardId)
               coordinator.foreach(_ ! GetShardHome(shardId))
-            }
             bufferMessage(shardId, msg, snd)
-        }
-    }
 
-  def getShard(id: ShardId): Option[ActorRef] = {
+  def getShard(id: ShardId): Option[ActorRef] =
     if (startingShards.contains(id)) None
-    else {
+    else
       shards
         .get(id)
-        .orElse(entityProps match {
+        .orElse(entityProps match
           case Some(props) if !shardsByRef.values.exists(_ == id) ⇒
             log.debug("Starting shard [{}] in region", id)
 
@@ -804,11 +745,8 @@ class ShardRegion(typeName: String,
           case None ⇒
             throw new IllegalStateException(
                 "Shard must not be allocated to a proxy only ShardRegion")
-        })
-    }
-  }
+        )
 
   def sendGracefulShutdownToCoordinator(): Unit =
     if (gracefulShutdownInProgress)
       coordinator.foreach(_ ! GracefulShutdownReq(self))
-}

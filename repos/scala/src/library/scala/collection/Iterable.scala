@@ -18,7 +18,7 @@ import mutable.Builder
 trait Iterable[+A]
     extends Traversable[A] with GenIterable[A]
     with GenericTraversableTemplate[A, Iterable]
-    with IterableLike[A, Iterable[A]] {
+    with IterableLike[A, Iterable[A]]
   override def companion: GenericCompanion[Iterable] = Iterable
 
   override def seq = this
@@ -32,21 +32,19 @@ trait Iterable[+A]
   override def view
   override def view(from: Int, until: Int)
  */
-}
 
 /** $factoryInfo
   *  The current default implementation of a $Coll is a `List`.
   *  @define coll iterable collection
   *  @define Coll `Iterable`
   */
-object Iterable extends TraversableFactory[Iterable] {
+object Iterable extends TraversableFactory[Iterable]
 
   /** $genericCanBuildFromInfo */
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, Iterable[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, Iterable[A]] = immutable.Iterable.newBuilder[A]
-}
 
 /** Explicit instantiation of the `Iterable` trait to reduce class file size in subclasses. */
 abstract class AbstractIterable[+A]

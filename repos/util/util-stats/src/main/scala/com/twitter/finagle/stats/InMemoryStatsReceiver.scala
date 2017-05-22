@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
   * assert(isr.counters(Seq("a", "b", "bar") == 0)) // fail
   * }}}
   **/
-class InMemoryStatsReceiver extends StatsReceiver {
+class InMemoryStatsReceiver extends StatsReceiver
   val repr = this
 
   val counters: mutable.Map[Seq[String], Int] =
@@ -40,101 +40,85 @@ class InMemoryStatsReceiver extends StatsReceiver {
     * Creates a [[ReadableCounter]] of the given `name`.
     */
   def counter(name: String*): ReadableCounter =
-    new ReadableCounter {
+    new ReadableCounter
 
-      def incr(delta: Int): Unit = counters.synchronized {
+      def incr(delta: Int): Unit = counters.synchronized
         val oldValue = apply()
         counters(name) = oldValue + delta
-      }
       def apply(): Int = counters.getOrElse(name, 0)
 
       override def toString: String =
         s"Counter(${name.mkString("/")}=${apply()})"
-    }
 
   /**
     * Creates a [[ReadableStat]] of the given `name`.
     */
   def stat(name: String*): ReadableStat =
-    new ReadableStat {
-      def add(value: Float): Unit = stats.synchronized {
+    new ReadableStat
+      def add(value: Float): Unit = stats.synchronized
         val oldValue = apply()
         stats(name) = oldValue :+ value
-      }
       def apply(): Seq[Float] = stats.getOrElse(name, Seq.empty)
 
-      override def toString: String = {
+      override def toString: String =
         val vals = apply()
         val valStr =
-          if (vals.length <= 3) {
+          if (vals.length <= 3)
             vals.mkString("[", ",", "]")
-          } else {
+          else
             val numOmitted = vals.length - 3
             vals
               .take(3)
               .mkString("[", ",", s"... (omitted $numOmitted value(s))]")
-          }
         s"Stat(${name.mkString("/")}=$valStr)"
-      }
-    }
 
   /**
     * Creates a [[Gauge]] of the given `name`.
     */
-  def addGauge(name: String*)(f: => Float): Gauge = {
-    val gauge = new Gauge {
-      def remove(): Unit = {
+  def addGauge(name: String*)(f: => Float): Gauge =
+    val gauge = new Gauge
+      def remove(): Unit =
         gauges -= name
-      }
 
-      override def toString: String = {
+      override def toString: String =
         // avoid holding a reference to `f`
-        val current = gauges.get(name) match {
+        val current = gauges.get(name) match
           case Some(fn) => fn()
           case None => -0.0f
-        }
         s"Gauge(${name.mkString("/")}=$current)"
-      }
-    }
     gauges += name -> (() => f)
     gauge
-  }
 
   override def toString: String = "InMemoryStatsReceiver"
 
   /**
     * Dumps this in-memory stats receiver to the given [[PrintStream]].
     */
-  def print(p: PrintStream): Unit = {
+  def print(p: PrintStream): Unit =
     for ((k, v) <- counters) p.printf(
         "%s %d\n", k.mkString("/"), v: java.lang.Integer)
     for ((k, g) <- gauges) p.printf(
         "%s %f\n", k.mkString("/"), g(): java.lang.Float)
     for ((k, s) <- stats if s.size > 0) p.printf(
         "%s %f\n", k.mkString("/"), (s.sum / s.size): java.lang.Float)
-  }
 
   /**
     * Clears all registered counters, gauges and stats.
     * @note this is not atomic. If new metrics are added while this method is executing, those metrics may remain.
     */
-  def clear(): Unit = {
+  def clear(): Unit =
     counters.clear()
     stats.clear()
     gauges.clear()
-  }
-}
 
 /**
   * A variation of [[Counter]] that also supports reading of the current value via the `apply` method.
   */
-trait ReadableCounter extends Counter {
+trait ReadableCounter extends Counter
   def apply(): Int
-}
 
 /**
   * A variation of [[Stat]] that also supports reading of the current time series via the `apply` method.
   */
-trait ReadableStat extends Stat {
+trait ReadableStat extends Stat
   def apply(): Seq[Float]
-}

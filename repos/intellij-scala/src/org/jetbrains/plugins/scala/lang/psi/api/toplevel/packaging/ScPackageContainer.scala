@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTypeDefinitio
 /**
   * @author ilyas
   */
-trait ScPackageContainer extends ScalaPsiElement {
+trait ScPackageContainer extends ScalaPsiElement
 
   def prefix: String
   def ownNamePart: String
@@ -25,4 +25,3 @@ trait ScPackageContainer extends ScalaPsiElement {
   def packagings: Seq[ScPackaging]
 
   def typeDefs: Seq[ScTypeDefinition]
-}

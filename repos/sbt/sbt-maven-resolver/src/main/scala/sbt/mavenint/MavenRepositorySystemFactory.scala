@@ -16,17 +16,16 @@ import org.eclipse.aether.spi.connector.layout.RepositoryLayoutFactory
 import org.eclipse.aether.spi.connector.transport.{TransporterFactory, _}
 
 /** Helper methods for dealing with starting up Aether. */
-object MavenRepositorySystemFactory {
-  def newRepositorySystemImpl: RepositorySystem = {
+object MavenRepositorySystemFactory
+  def newRepositorySystemImpl: RepositorySystem =
     // For now we just log Aether instantiation issues.  These should probably cause fatal errors.
     val locator = MavenRepositorySystemUtils.newServiceLocator()
     locator.setErrorHandler(
-        new DefaultServiceLocator.ErrorHandler {
+        new DefaultServiceLocator.ErrorHandler
       override def serviceCreationFailed(
-          tpe: Class[_], impl: Class[_], exception: Throwable): Unit = {
+          tpe: Class[_], impl: Class[_], exception: Throwable): Unit =
         Message.error(s"Failed to create $tpe, of class $impl")
-      }
-    })
+    )
     // Here we register the Ivy <-> Aether transport bridge
     locator.addService(
         classOf[TransporterFactory], classOf[MyTransportFactory])
@@ -49,9 +48,8 @@ object MavenRepositorySystemFactory {
                        classOf[SbtArtifactDescriptorReader])
     // Finally, use the DI to create our repository system.
     locator.getService(classOf[RepositorySystem])
-  }
   def newSessionImpl(system: RepositorySystem,
-                     localRepoDir: File): RepositorySystemSession = {
+                     localRepoDir: File): RepositorySystemSession =
     val session = MavenRepositorySystemUtils.newSession()
     val localRepo = new LocalRepository(localRepoDir)
     session setLocalRepositoryManager
@@ -64,9 +62,6 @@ object MavenRepositorySystemFactory {
           /* ignoreMissing */ false, /* ignoreInvalid. */ true)
     session.setArtifactDescriptorPolicy(descriptorPolicy)
     session
-  }
 
-  def defaultLocalRepo: java.io.File = {
+  def defaultLocalRepo: java.io.File =
     new java.io.File(s"${sys.props("user.home")}/.m2/repository")
-  }
-}

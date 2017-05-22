@@ -29,51 +29,47 @@ final class Env(config: Config,
                 getSimul: Simul.ID => Fu[Option[Simul]],
                 getSimulName: Simul.ID => Option[String],
                 getTournamentName: String => Option[String],
-                val isProd: Boolean) {
+                val isProd: Boolean)
 
   val CliUsername = config getString "cli.username"
 
   private[api] val apiToken = config getString "api.token"
 
-  object Net {
+  object Net
     val Domain = config getString "net.domain"
     val Protocol = config getString "net.protocol"
     val BaseUrl = config getString "net.base_url"
     val Port = config getInt "http.port"
     val AssetDomain = config getString "net.asset.domain"
     val AssetVersion = config getInt "net.asset.version"
-  }
   val PrismicApiUrl = config getString "prismic.api_url"
   val EditorAnimationDuration = config duration "editor.animation.duration"
   val ExplorerEndpoint = config getString "explorer.endpoint"
 
-  object assetVersion {
+  object assetVersion
     import reactivemongo.bson._
     private val coll = db("flag")
     private val cache = lila.memo.MixedCache.single[Int](
         f = coll
             .find(BSONDocument("_id" -> "asset"))
             .one[BSONDocument]
-            .map {
+            .map
             _.flatMap(_.getAs[BSONNumberLike]("version"))
               .fold(Net.AssetVersion)(_.toInt max Net.AssetVersion)
-          },
+          ,
         timeToLive = 30.seconds,
         default = Net.AssetVersion,
         logger = lila.log("assetVersion"))
     def get = cache get true
-  }
 
-  object Accessibility {
+  object Accessibility
     val blindCookieName = config getString "accessibility.blind.cookie.name"
     val blindCookieMaxAge = config getInt "accessibility.blind.cookie.max_age"
     private val blindCookieSalt =
       config getString "accessibility.blind.cookie.salt"
-    def hash(implicit ctx: lila.user.UserContext) = {
+    def hash(implicit ctx: lila.user.UserContext) =
       import com.roundeights.hasher.Implicits._
       (ctx.userId | "anon").salt(blindCookieSalt).md5.hex
-    }
-  }
 
   val pgnDump = new PgnDump(dumper = gamePgnDump,
                             simulName = getSimulName,
@@ -121,9 +117,8 @@ final class Env(config: Config,
       Props(new KamonPusher(
               countUsers = () => userEnv.onlineUserIdMemo.count
           )))
-}
 
-object Env {
+object Env
 
   lazy val current =
     "api" boot new Env(
@@ -149,4 +144,3 @@ object Env {
         system = lila.common.PlayApp.system,
         scheduler = lila.common.PlayApp.scheduler,
         isProd = lila.common.PlayApp.isProd)
-}

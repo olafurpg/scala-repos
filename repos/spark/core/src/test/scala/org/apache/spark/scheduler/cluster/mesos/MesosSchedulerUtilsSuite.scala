@@ -27,57 +27,50 @@ import org.scalatest.mock.MockitoSugar
 import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite}
 
 class MesosSchedulerUtilsSuite
-    extends SparkFunSuite with Matchers with MockitoSugar {
+    extends SparkFunSuite with Matchers with MockitoSugar
 
   // scalastyle:off structural.type
   // this is the documented way of generating fixtures in scalatest
   def fixture: Object { val sc: SparkContext; val sparkConf: SparkConf } =
-    new {
+    new
       val sparkConf = new SparkConf
       val sc = mock[SparkContext]
       when(sc.conf).thenReturn(sparkConf)
-    }
   val utils = new MesosSchedulerUtils {}
   // scalastyle:on structural.type
 
-  test("use at-least minimum overhead") {
+  test("use at-least minimum overhead")
     val f = fixture
     when(f.sc.executorMemory).thenReturn(512)
     utils.executorMemory(f.sc) shouldBe 896
-  }
 
-  test("use overhead if it is greater than minimum value") {
+  test("use overhead if it is greater than minimum value")
     val f = fixture
     when(f.sc.executorMemory).thenReturn(4096)
     utils.executorMemory(f.sc) shouldBe 4505
-  }
 
-  test("use spark.mesos.executor.memoryOverhead (if set)") {
+  test("use spark.mesos.executor.memoryOverhead (if set)")
     val f = fixture
     when(f.sc.executorMemory).thenReturn(1024)
     f.sparkConf.set("spark.mesos.executor.memoryOverhead", "512")
     utils.executorMemory(f.sc) shouldBe 1536
-  }
 
-  test("parse a non-empty constraint string correctly") {
+  test("parse a non-empty constraint string correctly")
     val expectedMap = Map(
         "tachyon" -> Set("true"),
         "zone" -> Set("us-east-1a", "us-east-1b")
     )
     utils.parseConstraintString("tachyon:true;zone:us-east-1a,us-east-1b") should be(
         expectedMap)
-  }
 
-  test("parse an empty constraint string correctly") {
+  test("parse an empty constraint string correctly")
     utils.parseConstraintString("") shouldBe Map()
-  }
 
-  test("throw an exception when the input is malformed") {
+  test("throw an exception when the input is malformed")
     an[IllegalArgumentException] should be thrownBy utils
       .parseConstraintString("tachyon;zone:us-east")
-  }
 
-  test("empty values for attributes' constraints matches all values") {
+  test("empty values for attributes' constraints matches all values")
     val constraintsStr = "tachyon:"
     val parsedConstraints = utils.parseConstraintString(constraintsStr)
 
@@ -97,9 +90,8 @@ class MesosSchedulerUtilsSuite
     utils.matchesAttributeRequirements(parsedConstraints, noTachyonOffer) shouldBe false
     utils.matchesAttributeRequirements(parsedConstraints, tachyonTrueOffer) shouldBe true
     utils.matchesAttributeRequirements(parsedConstraints, tachyonFalseOffer) shouldBe true
-  }
 
-  test("subset match is performed for set attributes") {
+  test("subset match is performed for set attributes")
     val supersetConstraint =
       Map("tachyon" -> Value.Text.newBuilder().setValue("true").build(),
           "zone" -> Value.Set
@@ -113,9 +105,8 @@ class MesosSchedulerUtilsSuite
     val parsedConstraints = utils.parseConstraintString(zoneConstraintStr)
 
     utils.matchesAttributeRequirements(parsedConstraints, supersetConstraint) shouldBe true
-  }
 
-  test("less than equal match is performed on scalar attributes") {
+  test("less than equal match is performed on scalar attributes")
     val offerAttribs =
       Map("gpus" -> Value.Scalar.newBuilder().setValue(3).build())
 
@@ -126,9 +117,8 @@ class MesosSchedulerUtilsSuite
     utils.matchesAttributeRequirements(ltConstraint, offerAttribs) shouldBe true
     utils.matchesAttributeRequirements(eqConstraint, offerAttribs) shouldBe true
     utils.matchesAttributeRequirements(gtConstraint, offerAttribs) shouldBe false
-  }
 
-  test("contains match is performed for range attributes") {
+  test("contains match is performed for range attributes")
     val offerAttribs = Map(
         "ports" -> Value.Range
           .newBuilder()
@@ -144,9 +134,8 @@ class MesosSchedulerUtilsSuite
     utils.matchesAttributeRequirements(eqConstraint, offerAttribs) shouldBe true
     utils.matchesAttributeRequirements(gtConstraint, offerAttribs) shouldBe false
     utils.matchesAttributeRequirements(multiConstraint, offerAttribs) shouldBe true
-  }
 
-  test("equality match is performed for text attributes") {
+  test("equality match is performed for text attributes")
     val offerAttribs =
       Map("tachyon" -> Value.Text.newBuilder().setValue("true").build())
 
@@ -155,5 +144,3 @@ class MesosSchedulerUtilsSuite
 
     utils.matchesAttributeRequirements(trueConstraint, offerAttribs) shouldBe true
     utils.matchesAttributeRequirements(falseConstraint, offerAttribs) shouldBe false
-  }
-}

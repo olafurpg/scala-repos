@@ -34,7 +34,7 @@ import org.apache.spark.sql.types.StructType
 
 private[clustering] trait LDAParams
     extends Params with HasFeaturesCol with HasMaxIter with HasSeed
-    with HasCheckpointInterval {
+    with HasCheckpointInterval
 
   /**
     * Param for the number of topics (clusters) to infer. Must be > 1. Default: 10.
@@ -86,13 +86,11 @@ private[clustering] trait LDAParams
   def getDocConcentration: Array[Double] = $(docConcentration)
 
   /** Get docConcentration used by spark.mllib LDA */
-  protected def getOldDocConcentration: Vector = {
-    if (isSet(docConcentration)) {
+  protected def getOldDocConcentration: Vector =
+    if (isSet(docConcentration))
       Vectors.dense(getDocConcentration)
-    } else {
+    else
       Vectors.dense(-1.0)
-    }
-  }
 
   /**
     * Concentration parameter (commonly named "beta" or "eta") for the prior placed on topics'
@@ -130,13 +128,11 @@ private[clustering] trait LDAParams
   def getTopicConcentration: Double = $(topicConcentration)
 
   /** Get topicConcentration used by spark.mllib LDA */
-  protected def getOldTopicConcentration: Double = {
-    if (isSet(topicConcentration)) {
+  protected def getOldTopicConcentration: Double =
+    if (isSet(topicConcentration))
       getTopicConcentration
-    } else {
+    else
       -1.0
-    }
-  }
 
   /** Supported values for Param [[optimizer]]. */
   @Since("1.6.0")
@@ -286,16 +282,15 @@ private[clustering] trait LDAParams
     * @param schema input schema
     * @return output schema
     */
-  protected def validateAndTransformSchema(schema: StructType): StructType = {
-    if (isSet(docConcentration)) {
-      if (getDocConcentration.length != 1) {
+  protected def validateAndTransformSchema(schema: StructType): StructType =
+    if (isSet(docConcentration))
+      if (getDocConcentration.length != 1)
         require(
             getDocConcentration.length == getK,
             s"LDA docConcentration was of length" +
             s" ${getDocConcentration.length}, but k = $getK.  docConcentration must be an array of" +
             s" length either 1 (scalar) or k (num topics).")
-      }
-      getOptimizer match {
+      getOptimizer match
         case "online" =>
           require(
               getDocConcentration.forall(_ >= 0),
@@ -306,10 +301,8 @@ private[clustering] trait LDAParams
               getDocConcentration.forall(_ >= 0),
               "For EM optimizer, docConcentration values must be >= 1.  Found values: " +
               getDocConcentration.mkString(","))
-      }
-    }
-    if (isSet(topicConcentration)) {
-      getOptimizer match {
+    if (isSet(topicConcentration))
+      getOptimizer match
         case "online" =>
           require(getTopicConcentration >= 0,
                   s"For Online LDA optimizer, topicConcentration" +
@@ -318,14 +311,11 @@ private[clustering] trait LDAParams
           require(getTopicConcentration >= 0,
                   s"For EM optimizer, topicConcentration" +
                   s" must be >= 1.  Found value: $getTopicConcentration")
-      }
-    }
     SchemaUtils.checkColumnType(schema, $(featuresCol), new VectorUDT)
     SchemaUtils.appendColumn(schema, $(topicDistributionCol), new VectorUDT)
-  }
 
   private[clustering] def getOldOptimizer: OldLDAOptimizer =
-    getOptimizer match {
+    getOptimizer match
       case "online" =>
         new OldOnlineLDAOptimizer()
           .setTau0($(learningOffset))
@@ -334,8 +324,6 @@ private[clustering] trait LDAParams
           .setOptimizeDocConcentration($(optimizeDocConcentration))
       case "em" =>
         new OldEMLDAOptimizer()
-    }
-}
 
 /**
   * :: Experimental ::
@@ -350,7 +338,7 @@ sealed abstract class LDAModel private[ml](
     @Since("1.6.0") override val uid: String,
     @Since("1.6.0") val vocabSize: Int,
     @Since("1.6.0") @transient protected val sqlContext: SQLContext)
-    extends Model[LDAModel] with LDAParams with Logging with MLWritable {
+    extends Model[LDAModel] with LDAParams with Logging with MLWritable
 
   // NOTE to developers:
   //  This abstraction should contain all important functionality for basic LDA usage.
@@ -388,23 +376,20 @@ sealed abstract class LDAModel private[ml](
     *          This implementation may be changed in the future.
     */
   @Since("1.6.0")
-  override def transform(dataset: DataFrame): DataFrame = {
-    if ($(topicDistributionCol).nonEmpty) {
+  override def transform(dataset: DataFrame): DataFrame =
+    if ($(topicDistributionCol).nonEmpty)
       val t = udf(
           oldLocalModel.getTopicDistributionMethod(sqlContext.sparkContext))
       dataset.withColumn($(topicDistributionCol), t(col($(featuresCol))))
-    } else {
+    else
       logWarning(
           "LDAModel.transform was called without any output columns. Set an output column" +
           " such as topicDistributionCol to produce results.")
       dataset
-    }
-  }
 
   @Since("1.6.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
 
   /**
     * Value for [[docConcentration]] estimated from data.
@@ -443,10 +428,9 @@ sealed abstract class LDAModel private[ml](
     * @return variational lower bound on the log likelihood of the entire corpus
     */
   @Since("1.6.0")
-  def logLikelihood(dataset: DataFrame): Double = {
+  def logLikelihood(dataset: DataFrame): Double =
     val oldDataset = LDA.getOldDataset(dataset, $(featuresCol))
     oldLocalModel.logLikelihood(oldDataset)
-  }
 
   /**
     * Calculate an upper bound bound on perplexity.  (Lower is better.)
@@ -460,10 +444,9 @@ sealed abstract class LDAModel private[ml](
     * @return Variational upper bound on log perplexity per token.
     */
   @Since("1.6.0")
-  def logPerplexity(dataset: DataFrame): Double = {
+  def logPerplexity(dataset: DataFrame): Double =
     val oldDataset = LDA.getOldDataset(dataset, $(featuresCol))
     oldLocalModel.logPerplexity(oldDataset)
-  }
 
   /**
     * Return the topics described by their top-weighted terms.
@@ -477,19 +460,16 @@ sealed abstract class LDAModel private[ml](
     *           - "termWeights": ArrayType(DoubleType): corresponding sorted term weights
     */
   @Since("1.6.0")
-  def describeTopics(maxTermsPerTopic: Int): DataFrame = {
-    val topics = getModel.describeTopics(maxTermsPerTopic).zipWithIndex.map {
+  def describeTopics(maxTermsPerTopic: Int): DataFrame =
+    val topics = getModel.describeTopics(maxTermsPerTopic).zipWithIndex.map
       case ((termIndices, termWeights), topic) =>
         (topic, termIndices.toSeq, termWeights.toSeq)
-    }
     sqlContext
       .createDataFrame(topics)
       .toDF("topic", "termIndices", "termWeights")
-  }
 
   @Since("1.6.0")
   def describeTopics(): DataFrame = describeTopics(10)
-}
 
 /**
   * :: Experimental ::
@@ -505,13 +485,12 @@ class LocalLDAModel private[ml](
     vocabSize: Int,
     @Since("1.6.0") override protected val oldLocalModel: OldLocalLDAModel,
     sqlContext: SQLContext)
-    extends LDAModel(uid, vocabSize, sqlContext) {
+    extends LDAModel(uid, vocabSize, sqlContext)
 
   @Since("1.6.0")
-  override def copy(extra: ParamMap): LocalLDAModel = {
+  override def copy(extra: ParamMap): LocalLDAModel =
     val copied = new LocalLDAModel(uid, vocabSize, oldLocalModel, sqlContext)
     copyValues(copied, extra).setParent(parent).asInstanceOf[LocalLDAModel]
-  }
 
   override protected def getModel: OldLDAModel = oldLocalModel
 
@@ -520,13 +499,12 @@ class LocalLDAModel private[ml](
 
   @Since("1.6.0")
   override def write: MLWriter = new LocalLDAModel.LocalLDAModelWriter(this)
-}
 
 @Since("1.6.0")
-object LocalLDAModel extends MLReadable[LocalLDAModel] {
+object LocalLDAModel extends MLReadable[LocalLDAModel]
 
   private[LocalLDAModel] class LocalLDAModelWriter(instance: LocalLDAModel)
-      extends MLWriter {
+      extends MLWriter
 
     private case class Data(vocabSize: Int,
                             topicsMatrix: Matrix,
@@ -534,7 +512,7 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
                             topicConcentration: Double,
                             gammaShape: Double)
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val oldModel = instance.oldLocalModel
       val data = Data(instance.vocabSize,
@@ -548,14 +526,12 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
         .repartition(1)
         .write
         .parquet(dataPath)
-    }
-  }
 
-  private class LocalLDAModelReader extends MLReader[LocalLDAModel] {
+  private class LocalLDAModelReader extends MLReader[LocalLDAModel]
 
     private val className = classOf[LocalLDAModel].getName
 
-    override def load(path: String): LocalLDAModel = {
+    override def load(path: String): LocalLDAModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val dataPath = new Path(path, "data").toString
       val data = sqlContext.read
@@ -577,15 +553,12 @@ object LocalLDAModel extends MLReadable[LocalLDAModel] {
           metadata.uid, vocabSize, oldModel, sqlContext)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[LocalLDAModel] = new LocalLDAModelReader
 
   @Since("1.6.0")
   override def load(path: String): LocalLDAModel = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -607,14 +580,12 @@ class DistributedLDAModel private[ml](
     private val oldDistributedModel: OldDistributedLDAModel,
     sqlContext: SQLContext,
     private var oldLocalModelOption: Option[OldLocalLDAModel])
-    extends LDAModel(uid, vocabSize, sqlContext) {
+    extends LDAModel(uid, vocabSize, sqlContext)
 
-  override protected def oldLocalModel: OldLocalLDAModel = {
-    if (oldLocalModelOption.isEmpty) {
+  override protected def oldLocalModel: OldLocalLDAModel =
+    if (oldLocalModelOption.isEmpty)
       oldLocalModelOption = Some(oldDistributedModel.toLocal)
-    }
     oldLocalModelOption.get
-  }
 
   override protected def getModel: OldLDAModel = oldDistributedModel
 
@@ -629,12 +600,11 @@ class DistributedLDAModel private[ml](
     new LocalLDAModel(uid, vocabSize, oldLocalModel, sqlContext)
 
   @Since("1.6.0")
-  override def copy(extra: ParamMap): DistributedLDAModel = {
+  override def copy(extra: ParamMap): DistributedLDAModel =
     val copied = new DistributedLDAModel(
         uid, vocabSize, oldDistributedModel, sqlContext, oldLocalModelOption)
     copyValues(copied, extra).setParent(parent)
     copied
-  }
 
   @Since("1.6.0")
   override def isDistributed: Boolean = true
@@ -665,28 +635,25 @@ class DistributedLDAModel private[ml](
   @Since("1.6.0")
   override def write: MLWriter =
     new DistributedLDAModel.DistributedWriter(this)
-}
 
 @Since("1.6.0")
-object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
+object DistributedLDAModel extends MLReadable[DistributedLDAModel]
 
   private[DistributedLDAModel] class DistributedWriter(
       instance: DistributedLDAModel)
-      extends MLWriter {
+      extends MLWriter
 
-    override protected def saveImpl(path: String): Unit = {
+    override protected def saveImpl(path: String): Unit =
       DefaultParamsWriter.saveMetadata(instance, path, sc)
       val modelPath = new Path(path, "oldModel").toString
       instance.oldDistributedModel.save(sc, modelPath)
-    }
-  }
 
   private class DistributedLDAModelReader
-      extends MLReader[DistributedLDAModel] {
+      extends MLReader[DistributedLDAModel]
 
     private val className = classOf[DistributedLDAModel].getName
 
-    override def load(path: String): DistributedLDAModel = {
+    override def load(path: String): DistributedLDAModel =
       val metadata = DefaultParamsReader.loadMetadata(path, sc, className)
       val modelPath = new Path(path, "oldModel").toString
       val oldModel = OldDistributedLDAModel.load(sc, modelPath)
@@ -694,8 +661,6 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
           metadata.uid, oldModel.vocabSize, oldModel, sqlContext, None)
       DefaultParamsReader.getAndSetParams(model, metadata)
       model
-    }
-  }
 
   @Since("1.6.0")
   override def read: MLReader[DistributedLDAModel] =
@@ -703,7 +668,6 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
 
   @Since("1.6.0")
   override def load(path: String): DistributedLDAModel = super.load(path)
-}
 
 /**
   * :: Experimental ::
@@ -733,7 +697,7 @@ object DistributedLDAModel extends MLReadable[DistributedLDAModel] {
 @Since("1.6.0")
 @Experimental
 class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
-    extends Estimator[LDAModel] with LDAParams with DefaultParamsWritable {
+    extends Estimator[LDAModel] with LDAParams with DefaultParamsWritable
 
   @Since("1.6.0")
   def this() = this(Identifiable.randomUID("lda"))
@@ -818,7 +782,7 @@ class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
   override def copy(extra: ParamMap): LDA = defaultCopy(extra)
 
   @Since("1.6.0")
-  override def fit(dataset: DataFrame): LDAModel = {
+  override def fit(dataset: DataFrame): LDAModel =
     transformSchema(dataset.schema, logging = true)
     val oldLDA = new OldLDA()
       .setK($(k))
@@ -831,36 +795,29 @@ class LDA @Since("1.6.0")(@Since("1.6.0") override val uid: String)
     // TODO: persist here, or in old LDA?
     val oldData = LDA.getOldDataset(dataset, $(featuresCol))
     val oldModel = oldLDA.run(oldData)
-    val newModel = oldModel match {
+    val newModel = oldModel match
       case m: OldLocalLDAModel =>
         new LocalLDAModel(uid, m.vocabSize, m, dataset.sqlContext)
       case m: OldDistributedLDAModel =>
         new DistributedLDAModel(uid, m.vocabSize, m, dataset.sqlContext, None)
-    }
     copyValues(newModel).setParent(this)
-  }
 
   @Since("1.6.0")
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     validateAndTransformSchema(schema)
-  }
-}
 
-private[clustering] object LDA extends DefaultParamsReadable[LDA] {
+private[clustering] object LDA extends DefaultParamsReadable[LDA]
 
   /** Get dataset for spark.mllib LDA */
   def getOldDataset(
-      dataset: DataFrame, featuresCol: String): RDD[(Long, Vector)] = {
+      dataset: DataFrame, featuresCol: String): RDD[(Long, Vector)] =
     dataset
       .withColumn("docId", monotonicallyIncreasingId())
       .select("docId", featuresCol)
       .rdd
-      .map {
+      .map
         case Row(docId: Long, features: Vector) =>
           (docId, features)
-      }
-  }
 
   @Since("1.6.0")
   override def load(path: String): LDA = super.load(path)
-}

@@ -12,22 +12,21 @@ import breeze.numerics.isOdd
   * @author ktakagaki
   * @date 2/28/14.
   */
-trait CanFilterMedian[Input] {
+trait CanFilterMedian[Input]
   def apply(data: DenseVector[Input],
             windowLength: Int,
             overhang: OptOverhang): DenseVector[Input]
-}
 
-object CanFilterMedian {
+object CanFilterMedian
 
   //Int, Long and Float will calculate in Double (see algorithm, needs infinitesimal small numbers for ordering)
   @expand
   implicit def dvFilterMedianT[
       @expand.args(Int, Long, Double, Float) T]: CanFilterMedian[T] =
-    new CanFilterMedian[T] {
+    new CanFilterMedian[T]
       def apply(data: DenseVector[T],
                 windowLength: Int,
-                overhang: OptOverhang): DenseVector[T] = {
+                overhang: OptOverhang): DenseVector[T] =
 
         require(
             isOdd(windowLength),
@@ -36,14 +35,14 @@ object CanFilterMedian {
         require(windowLength >= 1, "window length must be longer than 1")
 
         if (windowLength == 1) data.copy
-        else {
+        else
 
           var tempret = new Array[T](data.length)
           val halfWindow = (windowLength - 1) / 2
           var index = halfWindow
 
-          overhang match {
-            case OptOverhang.PreserveLength => {
+          overhang match
+            case OptOverhang.PreserveLength =>
                 //calculate beginning and end separately, for partial-windows (no overhang)
                 for (indexFromBeginning <- 0 until halfWindow) tempret(
                     indexFromBeginning) = median(
@@ -51,12 +50,10 @@ object CanFilterMedian {
                 for (indexToEnd <- 0 until halfWindow) tempret(
                     data.length - indexToEnd - 1) = median(
                     data(data.length - 2 * indexToEnd - 1 until data.length))
-              }
             case OptOverhang.None => {}
             case opt: OptOverhang =>
               throw new IllegalArgumentException(
                   "Option " + opt + " is invalid here.")
-          }
 
           //first full-window value must be initialized separately
           index = halfWindow
@@ -65,13 +62,13 @@ object CanFilterMedian {
           tempret(index) = currentMedian
           index += 1
 
-          while (index < data.length - halfWindow) {
+          while (index < data.length - halfWindow)
             //data value which the window has passed by
             val nowObsoleteWindowValue: T = data(index - halfWindow - 1)
             val newWindowValue: T = data(index + halfWindow)
 
             //if the obsolete value is not equal to the new value...
-            if (nowObsoleteWindowValue != newWindowValue) {
+            if (nowObsoleteWindowValue != newWindowValue)
               //replace now obsolete value with new data value within temporary array
               findAndReplaceInstanceInPlace(tempDataExtract,
                                             nowObsoleteWindowValue,
@@ -81,61 +78,47 @@ object CanFilterMedian {
               if ((nowObsoleteWindowValue >= currentMedian ||
                       newWindowValue >= currentMedian) &&
                   (nowObsoleteWindowValue <= currentMedian ||
-                      newWindowValue <= currentMedian)) {
+                      newWindowValue <= currentMedian))
                 //then the median needs to be recalculated
                 currentMedian = quickSelectImpl(tempDataExtract, halfWindow)
-              }
-            }
             //...if the two values are the same, do nothing
 
             tempret(index) = currentMedian
             index += 1
-          }
 
-          overhang match {
+          overhang match
             case OptOverhang.PreserveLength => DenseVector(tempret)
             case OptOverhang.None =>
               DenseVector(tempret.slice(halfWindow, data.length - halfWindow))
-          }
-        }
-      }
 
       def findAndReplaceInstanceInPlace(
-          arr: Array[T], fromValue: T, toValue: T, pivotPoint: Int): Unit = {
+          arr: Array[T], fromValue: T, toValue: T, pivotPoint: Int): Unit =
         val pivotValue: T = arr(pivotPoint)
         var found = false
 
-        if (fromValue == pivotValue) {
+        if (fromValue == pivotValue)
           arr(pivotPoint) = toValue
           found = true
-        } else if (fromValue < pivotValue) {
+        else if (fromValue < pivotValue)
           var count = pivotPoint - 1
-          while (count >= 0) {
-            if (arr(count) == fromValue) {
+          while (count >= 0)
+            if (arr(count) == fromValue)
               arr(count) = toValue
               count = Int.MinValue
               found = true
-            } else {
+            else
               count -= 1
-            }
-          }
-        } else {
+        else
           //if( fromValue > pivotValue ){
           var count = pivotPoint + 1
-          while (count < arr.length) {
-            if (arr(count) == fromValue) {
+          while (count < arr.length)
+            if (arr(count) == fromValue)
               arr(count) = toValue
               count = Int.MaxValue
               found = true
-            } else {
+            else
               count += 1
-            }
-          }
-        }
 
         require(
             found,
             "The fromValue was not found within the given array, something is wrong!")
-      }
-    }
-}

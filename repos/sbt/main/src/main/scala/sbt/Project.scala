@@ -18,7 +18,7 @@ import sbt.internal.util.{AttributeKey, AttributeMap, Dag, Relation, Settings, S
 
 import language.experimental.macros
 
-sealed trait ProjectDefinition[PR <: ProjectReference] {
+sealed trait ProjectDefinition[PR <: ProjectReference]
 
   /**
     * The project ID is used to uniquely identify a project within a build.
@@ -74,12 +74,11 @@ sealed trait ProjectDefinition[PR <: ProjectReference] {
 
   override final def hashCode: Int =
     id.hashCode ^ base.hashCode ^ getClass.hashCode
-  override final def equals(o: Any) = o match {
+  override final def equals(o: Any) = o match
     case p: ProjectDefinition[_] =>
       p.getClass == this.getClass && p.id == id && p.base == base
     case _ => false
-  }
-  override def toString = {
+  override def toString =
     val agg = ifNonEmpty("aggregate", aggregate)
     val dep = ifNonEmpty("dependencies", dependencies)
     val conf = ifNonEmpty("configurations", configurations)
@@ -88,12 +87,10 @@ sealed trait ProjectDefinition[PR <: ProjectReference] {
       s"id $id" :: s"base: $base" :: agg ::: dep ::: conf :::
       (s"plugins: List($plugins)" :: autos)
     s"Project(${fields.mkString(", ")})"
-  }
   private[this] def ifNonEmpty[T](
       label: String, ts: Iterable[T]): List[String] =
     if (ts.isEmpty) Nil else s"$label: $ts" :: Nil
-}
-sealed trait Project extends ProjectDefinition[ProjectReference] {
+sealed trait Project extends ProjectDefinition[ProjectReference]
   // TODO: add parameters for plugins in 0.14.0 (not reasonable to do in a binary compatible way in 0.13)
   def copy(id: String = id,
            base: File = base,
@@ -114,7 +111,7 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
                plugins,
                autoPlugins)
 
-  def resolve(resolveRef: ProjectReference => ProjectRef): ResolvedProject = {
+  def resolve(resolveRef: ProjectReference => ProjectRef): ResolvedProject =
     def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
     def resolveDeps(ds: Seq[ClasspathDep[ProjectReference]]) =
       ds map resolveDep
@@ -130,8 +127,7 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
              auto,
              plugins,
              autoPlugins)
-  }
-  def resolveBuild(resolveRef: ProjectReference => ProjectReference): Project = {
+  def resolveBuild(resolveRef: ProjectReference => ProjectReference): Project =
     def resolveRefs(prs: Seq[ProjectReference]) = prs map resolveRef
     def resolveDeps(ds: Seq[ClasspathDep[ProjectReference]]) =
       ds map resolveDep
@@ -147,7 +143,6 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
                auto,
                plugins,
                autoPlugins)
-  }
 
   /**
     * Applies the given functions to this Project.
@@ -233,7 +228,7 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
         Plugins.and(
             plugins, Plugins.And(ps.map(p => Plugins.Exclude(p)).toList)))
 
-  private[this] def setPlugins(ns: Plugins): Project = {
+  private[this] def setPlugins(ns: Plugins): Project =
     // TODO: for 0.14.0, use copy when it has the additional `plugins` parameter
     unresolved(id,
                base,
@@ -245,10 +240,9 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
                auto,
                ns,
                autoPlugins)
-  }
 
   /** Definitively set the [[AutoPlugin]]s for this project. */
-  private[sbt] def setAutoPlugins(autos: Seq[AutoPlugin]): Project = {
+  private[sbt] def setAutoPlugins(autos: Seq[AutoPlugin]): Project =
     // TODO: for 0.14.0, use copy when it has the additional `autoPlugins` parameter
     unresolved(id,
                base,
@@ -260,17 +254,13 @@ sealed trait Project extends ProjectDefinition[ProjectReference] {
                auto,
                plugins,
                autos)
-  }
-}
-sealed trait ResolvedProject extends ProjectDefinition[ProjectRef] {
+sealed trait ResolvedProject extends ProjectDefinition[ProjectRef]
 
   /** The [[AutoPlugin]]s enabled for this project as computed from [[plugins]].*/
   def autoPlugins: Seq[AutoPlugin]
-}
 
-sealed trait ClasspathDep[PR <: ProjectReference] {
+sealed trait ClasspathDep[PR <: ProjectReference]
   def project: PR; def configuration: Option[String]
-}
 final case class ResolvedClasspathDependency(
     project: ProjectRef, configuration: Option[String])
     extends ClasspathDep[ProjectRef]
@@ -278,7 +268,7 @@ final case class ClasspathDependency(
     project: ProjectReference, configuration: Option[String])
     extends ClasspathDep[ProjectReference]
 
-object Project extends ProjectExtra {
+object Project extends ProjectExtra
   @deprecated("Use Def.Setting", "0.13.0")
   type Setting[T] = Def.Setting[T]
 
@@ -324,14 +314,13 @@ object Project extends ProjectExtra {
       val auto: AddSettings,
       val plugins: Plugins,
       val autoPlugins: Seq[AutoPlugin])
-      extends ProjectDefinition[PR] {
+      extends ProjectDefinition[PR]
     lazy val aggregate = aggregate0
     lazy val dependencies = dependencies0
     lazy val delegates = delegates0
     lazy val settings = settings0
 
     Dag.topologicalSort(configurations)(_.extendsConfigs) // checks for cyclic references here instead of having to do it in Scope.delegates
-  }
 
   // TODO: add parameter for plugins in 0.14.0
   // TODO: Modify default settings to be the core settings, and automatically add the IvyModule + JvmPlugins.
@@ -356,7 +345,7 @@ object Project extends ProjectExtra {
 
   /** This is a variation of def apply that mixes in GeneratedRootProject. */
   private[sbt] def mkGeneratedRoot(
-      id: String, base: File, aggregate: => Seq[ProjectReference]): Project = {
+      id: String, base: File, aggregate: => Seq[ProjectReference]): Project =
     validProjectID(id).foreach(
         errMsg => sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
@@ -370,7 +359,6 @@ object Project extends ProjectExtra {
                                      Plugins.empty,
                                      Nil) with Project
     with GeneratedRootProject
-  }
 
   /** Returns None if `id` is a valid Project ID or Some containing the parser error message if it is not.*/
   def validProjectID(id: String): Option[String] =
@@ -379,14 +367,13 @@ object Project extends ProjectExtra {
     DefaultParsers.parse(id, DefaultParsers.IDStart).isRight
 
   /** Constructs a valid Project ID based on `id` and returns it in Right or returns the error message in Left if one cannot be constructed.*/
-  def normalizeProjectID(id: String): Either[String, String] = {
+  def normalizeProjectID(id: String): Either[String, String] =
     val attempt = normalizeBase(id)
     val refined =
       if (attempt.length < 1) "root"
       else if (!validProjectIDStart(attempt.substring(0, 1))) "root-" + attempt
       else attempt
     validProjectID(refined).toLeft(refined)
-  }
   private[this] def normalizeBase(s: String) =
     s.toLowerCase(Locale.ENGLISH).replaceAll("""\W+""", "-")
 
@@ -446,7 +433,7 @@ object Project extends ProjectExtra {
                          configurations: Seq[Configuration],
                          auto: AddSettings,
                          plugins: Plugins,
-                         autoPlugins: Seq[AutoPlugin]): Project = {
+                         autoPlugins: Seq[AutoPlugin]): Project =
     validProjectID(id).foreach(
         errMsg => sys.error("Invalid project ID: " + errMsg))
     new ProjectDef[ProjectReference](id,
@@ -459,19 +446,17 @@ object Project extends ProjectExtra {
                                      auto,
                                      plugins,
                                      autoPlugins) with Project
-  }
 
   @deprecated(
       "Use Defaults.coreDefaultSettings instead, combined with AutoPlugins.",
       "0.13.2")
   def defaultSettings: Seq[Def.Setting[_]] = Defaults.defaultSettings
 
-  final class Constructor(p: ProjectReference) {
+  final class Constructor(p: ProjectReference)
     def %(conf: Configuration): ClasspathDependency = %(conf.name)
 
     def %(conf: String): ClasspathDependency =
       new ClasspathDependency(p, Some(conf))
-  }
 
   def getOrError[T](state: State, key: AttributeKey[T], msg: String): T =
     state get key getOrElse sys.error(msg)
@@ -489,9 +474,8 @@ object Project extends ProjectExtra {
 
   def getProjectForReference(
       ref: Reference, structure: BuildStructure): Option[ResolvedProject] =
-    ref match {
+    ref match
       case pr: ProjectRef => getProject(pr, structure); case _ => None
-    }
   def getProject(
       ref: ProjectRef, structure: BuildStructure): Option[ResolvedProject] =
     getProject(ref, structure.units)
@@ -502,12 +486,11 @@ object Project extends ProjectExtra {
                  units: Map[URI, LoadedBuildUnit]): Option[ResolvedProject] =
     (units get ref.build).flatMap(_.defined get ref.project)
 
-  def runUnloadHooks(s: State): State = {
+  def runUnloadHooks(s: State): State =
     val previousOnUnload = orIdentity(s get Keys.onUnload.key)
     previousOnUnload(s.runExitHooks())
-  }
   def setProject(
-      session: SessionSettings, structure: BuildStructure, s: State): State = {
+      session: SessionSettings, structure: BuildStructure, s: State): State =
     val unloaded = runUnloadHooks(s)
     val (onLoad, onUnload) = getHooks(structure.data)
     val newAttrs = unloaded.attributes
@@ -517,7 +500,6 @@ object Project extends ProjectExtra {
     val newState = unloaded.copy(attributes = newAttrs)
     onLoad(
         LogManager.setGlobalLogLevels(updateCurrent(newState), structure.data))
-  }
 
   def orIdentity[T](opt: Option[T => T]): T => T = opt getOrElse idFun
   def getHook[T](key: SettingKey[T => T], data: Settings[Scope]): T => T =
@@ -526,7 +508,7 @@ object Project extends ProjectExtra {
     (getHook(Keys.onLoad, data), getHook(Keys.onUnload, data))
 
   def current(state: State): ProjectRef = session(state).current
-  def updateCurrent(s: State): State = {
+  def updateCurrent(s: State): State =
     val structure = Project.structure(s)
     val ref = Project.current(s)
     val project = Load.getProject(structure.units, ref.build, ref.project)
@@ -551,14 +533,12 @@ object Project extends ProjectExtra {
       .put(historyPath.key, history)
     s.copy(attributes = setCond(shellPrompt.key, prompt, newAttrs),
            definedCommands = newDefinedCommands)
-  }
   def setCond[T](key: AttributeKey[T],
                  vopt: Option[T],
                  attributes: AttributeMap): AttributeMap =
-    vopt match {
+    vopt match
       case Some(v) => attributes.put(key, v);
       case None => attributes.remove(key)
-    }
   @deprecated("Use Def.make", "0.13.0")
   def makeSettings(settings: Seq[Def.Setting[_]],
                    delegates: Scope => Seq[Scope],
@@ -566,34 +546,29 @@ object Project extends ProjectExtra {
       implicit display: Show[ScopedKey[_]]) =
     Def.make(settings)(delegates, scopeLocal, display)
 
-  private[sbt] def checkTargets(data: Settings[Scope]): Option[String] = {
+  private[sbt] def checkTargets(data: Settings[Scope]): Option[String] =
     val dups = overlappingTargets(allTargets(data))
     if (dups.isEmpty) None
-    else {
+    else
       val dupStrs =
-        dups map {
+        dups map
           case (dir, scopes) =>
             s"${dir.getAbsolutePath}:\n\t${scopes.mkString("\n\t")}"
-        }
       Some(s"Overlapping output directories:${dupStrs.mkString}")
-    }
-  }
   private[this] def overlappingTargets(
       targets: Seq[(ProjectRef, File)]): Map[File, Seq[ProjectRef]] =
     targets.groupBy(_._2).filter(_._2.size > 1).mapValues(_.map(_._1))
 
   private[this] def allTargets(
-      data: Settings[Scope]): Seq[(ProjectRef, File)] = {
+      data: Settings[Scope]): Seq[(ProjectRef, File)] =
     import ScopeFilter._
     val allProjects = ScopeFilter(Make.inAnyProject)
-    val targetAndRef = Def.setting {
+    val targetAndRef = Def.setting
       (Keys.thisProjectRef.value, Keys.target.value)
-    }
     new SettingKeyAll(Def.optional(targetAndRef)(idFun))
       .all(allProjects)
       .evaluate(data)
       .flatMap(x => x)
-  }
 
   def equal(a: ScopedKey[_], b: ScopedKey[_], mask: ScopeMask): Boolean =
     a.key == b.key && Scope.equal(a.scope, b.scope, mask)
@@ -601,21 +576,18 @@ object Project extends ProjectExtra {
   def fillTaskAxis(scoped: ScopedKey[_]): ScopedKey[_] =
     ScopedKey(Scope.fillTaskAxis(scoped.scope, scoped.key), scoped.key)
 
-  def mapScope(f: Scope => Scope) = new (ScopedKey ~> ScopedKey) {
+  def mapScope(f: Scope => Scope) = new (ScopedKey ~> ScopedKey)
     def apply[T](key: ScopedKey[T]) =
       ScopedKey(f(key.scope), key.key)
-  }
 
   def transform(
-      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
+      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] =
     val f = mapScope(g)
     ss.map(_ mapKey f mapReferenced f)
-  }
   def transformRef(
-      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] = {
+      g: Scope => Scope, ss: Seq[Def.Setting[_]]): Seq[Def.Setting[_]] =
     val f = mapScope(g)
     ss.map(_ mapReferenced f)
-  }
 
   def delegates(structure: BuildStructure,
                 scope: Scope,
@@ -625,39 +597,34 @@ object Project extends ProjectExtra {
   def scopedKeyData(structure: BuildStructure,
                     scope: Scope,
                     key: AttributeKey[_]): Option[ScopedKeyData[_]] =
-    structure.data.get(scope, key) map { v =>
+    structure.data.get(scope, key) map  v =>
       ScopedKeyData(ScopedKey(scope, key), v)
-    }
 
   def details(structure: BuildStructure,
               actual: Boolean,
               scope: Scope,
               key: AttributeKey[_])(
-      implicit display: Show[ScopedKey[_]]): String = {
+      implicit display: Show[ScopedKey[_]]): String =
     val scoped = ScopedKey(scope, key)
 
     val data =
-      scopedKeyData(structure, scope, key) map { _.description } getOrElse {
+      scopedKeyData(structure, scope, key) map { _.description } getOrElse
         "No entry for key."
-      }
-    val description = key.description match {
+    val description = key.description match
       case Some(desc) => "Description:\n\t" + desc + "\n"; case None => ""
-    }
 
     val definingScope = structure.data.definingScope(scope, key)
-    val providedBy = definingScope match {
+    val providedBy = definingScope match
       case Some(sc) => "Provided by:\n\t" + Scope.display(sc, key.label) + "\n"
       case None => ""
-    }
-    val definingScoped = definingScope match {
+    val definingScoped = definingScope match
       case Some(sc) => ScopedKey(sc, key); case None => scoped
-    }
     val comp = Def.compiled(structure.settings, actual)(
         structure.delegates, structure.scopeLocal, display)
     val definedAt =
-      comp get definingScoped map { c =>
+      comp get definingScoped map  c =>
         Def.definedAtString(c.settings).capitalize
-      } getOrElse ""
+      getOrElse ""
 
     val cMap = Def.flattenLocals(comp)
     val related = cMap.keys.filter(k => k.key == key && k.scope != scope)
@@ -668,9 +635,8 @@ object Project extends ProjectExtra {
         .toList
         .flatten
 
-    val depends = cMap.get(scoped) match {
+    val depends = cMap.get(scoped) match
       case Some(c) => c.dependencies.toSet; case None => Set.empty
-    }
     val derivedDepends: Set[ScopedKey[_]] =
       derivedDependencies(definingScoped).toSet
 
@@ -682,54 +648,49 @@ object Project extends ProjectExtra {
     def printDepScopes(baseLabel: String,
                        derivedLabel: String,
                        scopes: Iterable[ScopedKey[_]],
-                       derived: Set[ScopedKey[_]]): String = {
+                       derived: Set[ScopedKey[_]]): String =
       val label =
         s"$baseLabel${if (derived.isEmpty) "" else s" (D=$derivedLabel)"}"
       val prefix: ScopedKey[_] => String =
         if (derived.isEmpty) const("")
         else sk => if (derived(sk)) "D " else "  "
       printScopes(label, scopes, prefix = prefix)
-    }
 
     def printScopes(label: String,
                     scopes: Iterable[ScopedKey[_]],
                     max: Int = Int.MaxValue,
                     prefix: ScopedKey[_] => String = const("")) =
       if (scopes.isEmpty) ""
-      else {
+      else
         val (limited, more) =
           if (scopes.size <= max) (scopes, "\n")
           else (scopes.take(max), "\n...\n")
         limited
           .map(sk => prefix(sk) + display(sk))
           .mkString(label + ":\n\t", "\n\t", more)
-      }
 
     data + "\n" + description + providedBy + definedAt +
     printDepScopes("Dependencies", "derived from", depends, derivedDepends) +
     printDepScopes("Reverse dependencies", "derives", reverse, derivedReverse) +
     printScopes("Delegates", delegates(structure, scope, key)) + printScopes(
         "Related", related, 10)
-  }
   def settingGraph(
       structure: BuildStructure, basedir: File, scoped: ScopedKey[_])(
       implicit display: Show[ScopedKey[_]]): SettingGraph =
     SettingGraph(structure, basedir, scoped, 0)
   def graphSettings(structure: BuildStructure, basedir: File)(
-      implicit display: Show[ScopedKey[_]]): Unit = {
+      implicit display: Show[ScopedKey[_]]): Unit =
     def graph(actual: Boolean, name: String) =
       graphSettings(structure, actual, name, new File(basedir, name + ".dot"))
     graph(true, "actual_dependencies")
     graph(false, "declared_dependencies")
-  }
   def graphSettings(structure: BuildStructure,
                     actual: Boolean,
                     graphName: String,
-                    file: File)(implicit display: Show[ScopedKey[_]]): Unit = {
+                    file: File)(implicit display: Show[ScopedKey[_]]): Unit =
     val rel = relation(structure, actual)
     val keyToString = display.apply _
     DotGraph.generateGraph(file, graphName, rel, keyToString, keyToString)
-  }
   def relation(structure: BuildStructure, actual: Boolean)(
       implicit display: Show[ScopedKey[_]])
     : Relation[ScopedKey[_], ScopedKey[_]] =
@@ -739,14 +700,12 @@ object Project extends ProjectExtra {
   private[sbt] def relation(settings: Seq[Def.Setting[_]], actual: Boolean)(
       implicit delegates: Scope => Seq[Scope],
       scopeLocal: Def.ScopeLocal,
-      display: Show[ScopedKey[_]]): Relation[ScopedKey[_], ScopedKey[_]] = {
+      display: Show[ScopedKey[_]]): Relation[ScopedKey[_], ScopedKey[_]] =
     type Rel = Relation[ScopedKey[_], ScopedKey[_]]
     val cMap = Def.flattenLocals(Def.compiled(settings, actual))
-    ((Relation.empty: Rel) /: cMap) {
+    ((Relation.empty: Rel) /: cMap)
       case (r, (key, value)) =>
         r + (key, value.dependencies)
-    }
-  }
 
   def showDefinitions(key: AttributeKey[_], defs: Seq[Scope])(
       implicit display: Show[ScopedKey[_]]): String =
@@ -761,14 +720,12 @@ object Project extends ProjectExtra {
   def definitions(
       structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(
       implicit display: Show[ScopedKey[_]]): Seq[Scope] =
-    relation(structure, actual)(display)._1s.toSeq flatMap { sk =>
+    relation(structure, actual)(display)._1s.toSeq flatMap  sk =>
       if (sk.key == key) sk.scope :: Nil else Nil
-    }
   def usedBy(structure: BuildStructure, actual: Boolean, key: AttributeKey[_])(
       implicit display: Show[ScopedKey[_]]): Seq[ScopedKey[_]] =
-    relation(structure, actual)(display).all.toSeq flatMap {
+    relation(structure, actual)(display).all.toSeq flatMap
       case (a, b) => if (b.key == key) List[ScopedKey[_]](a) else Nil
-    }
   def reverseDependencies(cMap: Map[ScopedKey[_], Flattened],
                           scoped: ScopedKey[_]): Iterable[ScopedKey[_]] =
     for ((key, compiled) <- cMap; dep <- compiled.dependencies
@@ -794,9 +751,8 @@ object Project extends ProjectExtra {
   def updateExtraBuilds(s: State, f: List[URI] => List[URI]): State =
     setExtraBuilds(s, f(extraBuilds(s)))
 
-  object LoadAction extends Enumeration {
+  object LoadAction extends Enumeration
     val Return, Current, Plugins = Value
-  }
   import LoadAction._
   import DefaultParsers._
 
@@ -809,19 +765,17 @@ object Project extends ProjectExtra {
   def inPluginProject(s: State): Boolean = projectReturn(s).length > 1
   def setProjectReturn(s: State, pr: List[File]): State =
     s.copy(attributes = s.attributes.put(ProjectReturn, pr))
-  def loadAction(s: State, action: LoadAction.Value) = action match {
+  def loadAction(s: State, action: LoadAction.Value) = action match
     case Return =>
-      projectReturn(s) match {
+      projectReturn(s) match
         case current :: returnTo :: rest =>
           (setProjectReturn(s, returnTo :: rest), returnTo)
         case _ => sys.error("Not currently in a plugin definition")
-      }
     case Current =>
       val base = s.configuration.baseDirectory
-      projectReturn(s) match {
+      projectReturn(s) match
         case Nil => (setProjectReturn(s, base :: Nil), base);
         case x :: xs => (s, x)
-      }
     case Plugins =>
       val (newBase, oldStack) =
         if (Project.isProjectLoaded(s))
@@ -831,7 +785,6 @@ object Project extends ProjectExtra {
           (BuildPaths.projectStandard(s.baseDir), s.baseDir :: Nil)
       val newS = setProjectReturn(s, newBase :: oldStack)
       (newS, newBase)
-  }
   @deprecated(
       "This method does not apply state changes requested during task execution.  Use 'runTask' instead, which does.",
       "0.11.1")
@@ -848,58 +801,53 @@ object Project extends ProjectExtra {
 
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
-                 checkCycles: Boolean = false): Option[(State, Result[T])] = {
+                 checkCycles: Boolean = false): Option[(State, Result[T])] =
     val extracted = Project.extract(state)
     val ch = EvaluateTask.cancelStrategy(extracted, extracted.structure, state)
     val p = EvaluateTask.executeProgress(extracted, extracted.structure, state)
     val r = EvaluateTask.restrictions(state)
     val fgc = EvaluateTask.forcegc(extracted, extracted.structure)
     runTask(taskKey, state, EvaluateTaskConfig(r, checkCycles, p, ch, fgc))
-  }
   @deprecated("Use EvaluateTaskConfig option instead.", "0.13.5")
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
-                 config: EvaluateConfig): Option[(State, Result[T])] = {
+                 config: EvaluateConfig): Option[(State, Result[T])] =
     val extracted = Project.extract(state)
     EvaluateTask(
         extracted.structure, taskKey, state, extracted.currentRef, config)
-  }
   def runTask[T](taskKey: ScopedKey[Task[T]],
                  state: State,
-                 config: EvaluateTaskConfig): Option[(State, Result[T])] = {
+                 config: EvaluateTaskConfig): Option[(State, Result[T])] =
     val extracted = Project.extract(state)
     EvaluateTask(
         extracted.structure, taskKey, state, extracted.currentRef, config)
-  }
 
   implicit def projectToRef(p: Project): ProjectReference = LocalProject(p.id)
 
-  final class RichTaskSessionVar[S](i: Def.Initialize[Task[S]]) {
+  final class RichTaskSessionVar[S](i: Def.Initialize[Task[S]])
     import SessionVar.{persistAndSet, resolveContext, set, transform => tx}
 
     def updateState(f: (State, S) => State): Def.Initialize[Task[S]] =
       i(t => tx(t, f))
     def storeAs(key: TaskKey[S])(
         implicit f: sbinary.Format[S]): Def.Initialize[Task[S]] =
-      (Keys.resolvedScoped, i) { (scoped, task) =>
+      (Keys.resolvedScoped, i)  (scoped, task) =>
         tx(task,
            (state, value) =>
              persistAndSet(resolveContext(key, scoped.scope, state),
                            state,
                            value)(f))
-      }
     def keepAs(key: TaskKey[S]): Def.Initialize[Task[S]] =
       (i, Keys.resolvedScoped)(
           (t, scoped) =>
             tx(t,
                (state, value) =>
                  set(resolveContext(key, scoped.scope, state), state, value)))
-  }
 
   import scala.reflect._
   import reflect.macros._
 
-  def projectMacroImpl(c: Context): c.Expr[Project] = {
+  def projectMacroImpl(c: Context): c.Expr[Project] =
     import c.universe._
     val enclosingValName = std.KeyMacro.definingValName(
         c,
@@ -907,12 +855,10 @@ object Project extends ProjectExtra {
           s"""$methodName must be directly assigned to a val, such as `val x = $methodName`.""")
     val name = c.Expr[String](Literal(Constant(enclosingValName)))
     reify { Project(name.splice, new File(name.splice)) }
-  }
-}
 
 private[sbt] trait GeneratedRootProject
 
-trait ProjectExtra {
+trait ProjectExtra
   implicit def configDependencyConstructor[T <% ProjectReference](
       p: T): Constructor = new Constructor(p)
   implicit def classpathDependency[T <% ProjectReference](
@@ -958,4 +904,3 @@ trait ProjectExtra {
     * The name of the val is used as the project ID and the name of the base directory of the project.
     */
   def project: Project = macro Project.projectMacroImpl
-}

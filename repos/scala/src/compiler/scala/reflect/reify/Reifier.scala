@@ -12,7 +12,7 @@ import scala.reflect.reify.utils.Utils
   *  @version  2.10
   *  @since    2.10
   */
-abstract class Reifier extends States with Phases with Errors with Utils {
+abstract class Reifier extends States with Phases with Errors with Utils
 
   val global: Global
   import global._
@@ -49,12 +49,12 @@ abstract class Reifier extends States with Phases with Errors with Utils {
     *
     *  This is not a method, but a value to indicate the fact that Reifier instances are a one-off.
     */
-  lazy val reification: Tree = {
-    try {
+  lazy val reification: Tree =
+    try
       if (universe exists (_.isErroneous)) CannotReifyErroneousPrefix(universe)
       if (universe.tpe == null) CannotReifyUntypedPrefix(universe)
 
-      val result = reifee match {
+      val result = reifee match
         case tree: Tree =>
           reifyTrace("reifying = ")(
               if (settings.Xshowtrees || settings.XshowtreesCompact ||
@@ -95,7 +95,6 @@ abstract class Reifier extends States with Phases with Errors with Utils {
               "reifee %s of type %s is not supported".format(
                   reifee,
                   if (reifee == null) "null" else reifee.getClass.toString))
-      }
 
       // todo. why do we reset attrs?
       //
@@ -139,24 +138,23 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       importantSymbols ++= importantSymbols map (_.linkedClassOfClass)
       def isImportantSymbol(sym: Symbol): Boolean =
         sym != null && sym != NoSymbol && importantSymbols(sym)
-      val untyped = brutallyResetAttrs(result, leaveAlone = {
+      val untyped = brutallyResetAttrs(result, leaveAlone =
         case ValDef(_, u, _, _) if u == nme.UNIVERSE_SHORT => true
         case ValDef(_, m, _, _) if m == nme.MIRROR_SHORT => true
         case tree if symtab.syms contains tree.symbol => true
         case tree if isImportantSymbol(tree.symbol) => true
         case _ => false
-      })
+      )
 
-      if (reifyCopypaste) {
+      if (reifyCopypaste)
         if (reifyDebug) println("=============================")
         println(reifiedNodeToString(untyped))
         if (reifyDebug) println("=============================")
-      } else {
+      else
         reifyTrace("reification = ")(untyped)
-      }
 
       untyped
-    } catch {
+    catch
       case ex: ReificationException =>
         throw ex
       case ex: UnexpectedReificationException =>
@@ -164,6 +162,3 @@ abstract class Reifier extends States with Phases with Errors with Utils {
       case ex: Throwable =>
         throw new UnexpectedReificationException(
             defaultErrorPosition, "reification crashed", ex)
-    }
-  }
-}

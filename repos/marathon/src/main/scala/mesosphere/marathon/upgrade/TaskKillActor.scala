@@ -16,26 +16,21 @@ class TaskKillActor(val driver: SchedulerDriver,
                     val eventBus: EventStream,
                     tasksToKill: Iterable[Task.Id],
                     val promise: Promise[Unit])
-    extends StoppingBehavior {
+    extends StoppingBehavior
 
   override var idsToKill = tasksToKill.to[mutable.Set]
 
-  def initializeStop(): Unit = {
+  def initializeStop(): Unit =
     log.info(s"Killing ${tasksToKill.size} instances")
-    for (taskId <- tasksToKill) {
+    for (taskId <- tasksToKill)
       driver.killTask(taskId.mesosTaskId)
-    }
-  }
-}
 
-object TaskKillActor {
+object TaskKillActor
   def props(driver: SchedulerDriver,
             appId: PathId,
             taskTracker: TaskTracker,
             eventBus: EventStream,
             tasksToKill: Iterable[Task.Id],
-            promise: Promise[Unit]): Props = {
+            promise: Promise[Unit]): Props =
     Props(new TaskKillActor(
             driver, appId, taskTracker, eventBus, tasksToKill, promise))
-  }
-}

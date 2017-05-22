@@ -5,20 +5,19 @@ import scala.collection.mutable.{ArrayBuffer, Builder}
 import scala.collection.SeqLike
 import scala.collection.generic.CanBuildFrom
 
-sealed trait Op[+A] {
+sealed trait Op[+A]
 
   def flatMap[B](f: A => Op[B]): Op[B] =
-    this match {
+    this match
       case FlatMap(a, g) => FlatMap(a, (x: Any) => g(x).flatMap(f))
       case o => FlatMap(o, f)
-    }
 
   def map[B](f: A => B): Op[B] =
     flatMap(a => Const(f(a)))
 
   @tailrec
   final def resume(gen: Generator): Either[() => Op[A], A] =
-    this match {
+    this match
       case Const(a) =>
         Right(a)
       case More(k) =>
@@ -26,45 +25,38 @@ sealed trait Op[+A] {
       case Next(f) =>
         Right(f(gen))
       case FlatMap(a, f) =>
-        a match {
+        a match
           case Const(x) => f(x).resume(gen)
           case More(k) => Left(() => FlatMap(k(), f))
           case Next(g) => f(g(gen)).resume(gen)
           case FlatMap(b, g) =>
             (FlatMap(b, (x: Any) => FlatMap(g(x), f)): Op[A]).resume(gen)
-        }
-    }
 
-  def run(gen: Generator): A = {
-    def loop(e: Either[() => Op[A], A]): A = e match {
+  def run(gen: Generator): A =
+    def loop(e: Either[() => Op[A], A]): A = e match
       case Right(a) => a
       case Left(k) => loop(k().resume(gen))
-    }
     loop(resume(gen))
-  }
-}
 
 case class Const[+A](a: A) extends Op[A]
 case class More[+A](k: () => Op[A]) extends Op[A]
 case class Next[+A](f: Generator => A) extends Op[A]
 case class FlatMap[A, +B](sub: Op[A], k: A => Op[B]) extends Op[B]
 
-object Random extends RandomCompanion[rng.Cmwc5] {
+object Random extends RandomCompanion[rng.Cmwc5]
   def initGenerator(): spire.random.rng.Cmwc5 = rng.Cmwc5.fromTime()
 
   def spawn[B](op: Op[B]): RandomCmwc5[B] = new RandomCmwc5(op)
-}
 
-trait RandomCompanion[G <: Generator] { self =>
+trait RandomCompanion[G <: Generator]  self =>
   type R[X] = Random[X, G]
 
   def initGenerator(): G //IO
 
-  def generatorFromSeed(seed: Seed): G = {
+  def generatorFromSeed(seed: Seed): G =
     val gen = initGenerator()
     gen.setSeedBytes(seed.bytes)
     gen
-  }
 
   def spawn[B](op: Op[B]): R[B]
 
@@ -93,41 +85,37 @@ trait RandomCompanion[G <: Generator] { self =>
 
   def stringOfSize(n: Int): Random[String, G] =
     char
-      .foldLeftOfSize(n)(new StringBuilder) { (sb, c) =>
+      .foldLeftOfSize(n)(new StringBuilder)  (sb, c) =>
         sb.append(c); sb
-      }
       .map(_.toString)
 
-  implicit class RandomOps[A](lhs: R[A]) {
+  implicit class RandomOps[A](lhs: R[A])
     def collection[CC[_]](size: Size)(
         implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
       size.random(self).flatMap(collectionOfSize(_))
 
     def collectionOfSize[CC[_]](n: Int)(
         implicit cbf: CanBuildFrom[CC[A], A, CC[A]]): Random[CC[A], G] =
-      foldLeftOfSize(n)(cbf()) { (b, a) =>
+      foldLeftOfSize(n)(cbf())  (b, a) =>
         b += a; b
-      }.map(_.result)
+      .map(_.result)
 
-    def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] = {
+    def foldLeftOfSize[B](n: Int)(init: => B)(f: (B, A) => B): Random[B, G] =
       def loop(n: Int, ma: Op[A]): Op[B] =
         if (n <= 0) Const(init)
         else More(() => loop(n - 1, ma)).flatMap(b => ma.map(a => f(b, a)))
       spawn(loop(n, More(() => lhs.op)))
-    }
 
-    def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] = {
+    def unfold[B](init: B)(f: (B, A) => Option[B]): Random[B, G] =
       def loop(mb: Op[B], ma: Op[A]): Op[B] =
         mb.flatMap(
             b =>
               ma.flatMap(a =>
-                    f(b, a) match {
+                    f(b, a) match
               case Some(b2) => More(() => loop(Const(b2), ma))
               case None => Const(b)
-          }))
+          ))
       spawn(loop(Const(init), More(() => lhs.op)))
-    }
-  }
 
   def tuple2[A, B](r1: R[A], r2: R[B]): R[(A, B)] =
     r1 and r2
@@ -136,9 +124,8 @@ trait RandomCompanion[G <: Generator] { self =>
   def tuple4[A, B, C, D](
       r1: R[A], r2: R[B], r3: R[C], r4: R[D]): R[(A, B, C, D)] =
     for { a <- r1; b <- r2; c <- r3; d <- r4 } yield (a, b, c, d)
-}
 
-abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
+abstract class Random[+A, G <: Generator](val op: Op[A])  self =>
 
   def companion: RandomCompanion[G]
 
@@ -151,12 +138,11 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
   def run(): A =
     op.run(companion.initGenerator) //IO
 
-  def run(seed: Seed): A = {
+  def run(seed: Seed): A =
     //IO
     val gen = companion.initGenerator()
     gen.setSeedBytes(seed.bytes)
     op.run(gen)
-  }
 
   def some: Random[Some[A], G] = map(Some(_))
   def left: Random[Left[A, Nothing], G] = map(Left(_))
@@ -181,37 +167,30 @@ abstract class Random[+A, G <: Generator](val op: Op[A]) { self =>
     companion
       .RandomOps(this)
       .foldLeftOfSize(n)(List.empty[A])((as, a) => a :: as)
-}
 
-class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op) {
+class RandomCmwc5[+A](op: Op[A]) extends Random[A, rng.Cmwc5](op)
   def companion: Random.type = Random
-}
 
-sealed trait Size {
+sealed trait Size
   def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G]
-}
 
-object Size {
+object Size
   def apply(n: Int): Size = Exact(n)
   def upTo(n: Int): Size = Between(0, n)
   def between(n1: Int, n2: Int): Size = Between(n1, n2)
 
-  case class Exact(n: Int) extends Size {
+  case class Exact(n: Int) extends Size
     def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G] =
       r.spawn(Const(n))
-  }
 
-  case class Between(n1: Int, n2: Int) extends Size {
+  case class Between(n1: Int, n2: Int) extends Size
     def random[G <: Generator](r: RandomCompanion[G]): Random[Int, G] =
       r.int(n1, n2)
-  }
-}
 
 class Seed private[spire](private[spire] val bytes: Array[Byte])
 
-object Seed {
+object Seed
   val zero = Seed(Array[Byte](0, 0, 0, 0))
   def apply(n: Int): Seed = new Seed(spire.util.Pack.intToBytes(n))
   def apply(n: Long): Seed = new Seed(spire.util.Pack.longToBytes(n))
   def apply(bytes: Array[Byte]): Seed = new Seed(bytes.clone)
-}

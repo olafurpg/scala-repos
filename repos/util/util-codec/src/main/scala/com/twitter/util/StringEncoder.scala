@@ -7,10 +7,9 @@ import org.apache.commons.codec.binary.Base64
 
 import com.twitter.io.StreamIO
 
-trait StringEncoder {
+trait StringEncoder
   def encode(bytes: Array[Byte]): String = new String(bytes)
   def decode(str: String): Array[Byte] = str.getBytes
-}
 
 /**
   * A utility for encoding strings and byte arrays to a base64 string, and
@@ -18,11 +17,10 @@ trait StringEncoder {
   *
   * The encoding for strings is UTF-8.
   */
-trait Base64StringEncoder extends StringEncoder {
+trait Base64StringEncoder extends StringEncoder
   private[this] def codec = new Base64()
   override def encode(bytes: Array[Byte]): String = codec.encodeToString(bytes)
   override def decode(str: String): Array[Byte] = codec.decode(str)
-}
 
 /**
   * A utility for encoding strings and byte arrays to a URL-safe base64 string,
@@ -30,13 +28,12 @@ trait Base64StringEncoder extends StringEncoder {
   *
   * The encoding for strings is UTF-8.
   */
-trait Base64UrlSafeStringEncoder extends StringEncoder {
+trait Base64UrlSafeStringEncoder extends StringEncoder
   // This uses a null line separator since maximum line length (0) is disabled.
   private[this] def codec = new Base64(0, null, true)
 
   override def encode(bytes: Array[Byte]): String = codec.encodeToString(bytes)
   override def decode(str: String): Array[Byte] = codec.decode(str)
-}
 
 object StringEncoder extends StringEncoder
 object Base64StringEncoder extends Base64StringEncoder
@@ -54,34 +51,29 @@ object Base64UrlSafeStringEncoder extends Base64UrlSafeStringEncoder
   * gzipping inherently includes base64 encoding (the GZIP utilities from java
   * will complain otherwise!)
   */
-trait GZIPStringEncoder extends StringEncoder {
-  override def encode(bytes: Array[Byte]): String = {
+trait GZIPStringEncoder extends StringEncoder
+  override def encode(bytes: Array[Byte]): String =
     val baos = new ByteArrayOutputStream
     val gos = new GZIPOutputStream(baos)
-    try {
+    try
       gos.write(bytes)
-    } finally {
+    finally
       gos.close()
-    }
     Base64StringEncoder.encode(baos.toByteArray)
-  }
 
   def encodeString(str: String) = encode(str.getBytes("UTF-8"))
 
-  override def decode(str: String): Array[Byte] = {
+  override def decode(str: String): Array[Byte] =
     val baos = new ByteArrayOutputStream
     val gis = new GZIPInputStream(
         new ByteArrayInputStream(Base64StringEncoder.decode(str)))
-    try {
+    try
       StreamIO.copy(gis, baos)
-    } finally {
+    finally
       gis.close()
-    }
 
     baos.toByteArray
-  }
 
   def decodeString(str: String): String = new String(decode(str), "UTF-8")
-}
 
 object GZIPStringEncoder extends GZIPStringEncoder

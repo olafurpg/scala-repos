@@ -11,12 +11,12 @@ import play.api.mvc.{Cookie, Results, Result => ScalaResult}
 /**
   *
   */
-object ResultSpec extends Specification {
+object ResultSpec extends Specification
 
-  "Result" should {
+  "Result" should
 
     // This is in Scala because building wrapped scala results is easier.
-    "test for cookies" in {
+    "test for cookies" in
 
       val javaResult =
         Results.Ok("Hello world").withCookies(Cookie("name1", "value1")).asJava
@@ -26,6 +26,3 @@ object ResultSpec extends Specification {
 
       cookie.name() must be_==("name1")
       cookie.value() must be_==("value1")
-    }
-  }
-}

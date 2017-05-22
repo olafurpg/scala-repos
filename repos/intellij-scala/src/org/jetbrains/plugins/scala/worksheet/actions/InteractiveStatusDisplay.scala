@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetUiConstructor
   * User: Dmitry.Naydanov
   * Date: 23.11.15.
   */
-class InteractiveStatusDisplay extends TopComponentDisplayable {
+class InteractiveStatusDisplay extends TopComponentDisplayable
   import InteractiveStatusDisplay._
 
   private val myPanel = new JPanel()
@@ -29,57 +29,50 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
 
   private var current: AnimatedIcon = null
 
-  override def init(panel: JPanel): Unit = {
+  override def init(panel: JPanel): Unit =
     myPanel.add(createSimpleIcon(EMPTY_ICON), 0)
     panel.add(myPanel, 0)
     setBorder(OTHER_BORDER)
     WorksheetUiConstructor.fixUnboundMaxSize(myPanel)
-  }
 
-  def onStartCompiling() {
+  def onStartCompiling()
     setCurrentIcon(successIcon)
     current.resume()
     setBorder(OTHER_BORDER)
-  }
 
-  def onFailedCompiling() {
+  def onFailedCompiling()
     setCurrentIcon(failIcon)
     current.suspend()
     setBorder(ERROR_BORDER)
-  }
 
-  def onSuccessfulCompiling() {
+  def onSuccessfulCompiling()
     setCurrentIcon(successIcon)
     current.suspend()
     setBorder(OK_BORDER)
-  }
 
-  private def setBorder(border: LineBorder) {
+  private def setBorder(border: LineBorder)
     if (isBorderEnabled)
-      ApplicationManager.getApplication.invokeLater(new Runnable {
+      ApplicationManager.getApplication.invokeLater(new Runnable
         override def run(): Unit = myPanel.setBorder(border)
-      })
-  }
+      )
 
   private def isBorderEnabled = false //right now we don't need it (?) 
 
-  private def setCurrentIcon(icon: AnimatedIcon) {
+  private def setCurrentIcon(icon: AnimatedIcon)
     if (current == icon) return
 
     current = icon
     clearAndAdd()
-  }
 
-  private def clearAndAdd() {
+  private def clearAndAdd()
     myPanel.removeAll()
     myPanel.add(current, 0)
-  }
 
   private def createSimpleIcon(icon: Icon): JComponent =
     new ScalableIconComponent(icon)
 
   private def createAnimatedIcon(
-      icon1: Icon, icon2: Icon, steps: Int): AnimatedIcon = {
+      icon1: Icon, icon2: Icon, steps: Int): AnimatedIcon =
     val pi2 = Math.PI * 2
     val step = pi2 / steps
 
@@ -92,10 +85,8 @@ class InteractiveStatusDisplay extends TopComponentDisplayable {
     )
     i.resume()
     i
-  }
-}
 
-object InteractiveStatusDisplay {
+object InteractiveStatusDisplay
   private val MY_ERROR_ICON = AllIcons.General.Error
   private val MY_OK_ICON = AllIcons.General.InspectionsOK
   private val MY_COMPILE_ACTION = AllIcons.Actions.ForceRefresh
@@ -108,10 +99,10 @@ object InteractiveStatusDisplay {
   private val ERROR_BORDER = new LineBorder(Color.RED)
   private val OTHER_BORDER = new LineBorder(Color.LIGHT_GRAY)
 
-  private class RotatedIcon(delegate: Icon, rotation: Double) extends Icon {
+  private class RotatedIcon(delegate: Icon, rotation: Double) extends Icon
     override def getIconHeight: Int = delegate.getIconWidth
 
-    override def paintIcon(c: Component, g: Graphics, x: Int, y: Int) {
+    override def paintIcon(c: Component, g: Graphics, x: Int, y: Int)
       val xn = getIconWidth / 2 + x
       val yn = getIconHeight / 2 + y
 
@@ -120,8 +111,5 @@ object InteractiveStatusDisplay {
       g.asInstanceOf[Graphics2D].setTransform(tx)
 
       delegate.paintIcon(c, g, x, y)
-    }
 
     override def getIconWidth: Int = delegate.getIconHeight
-  }
-}

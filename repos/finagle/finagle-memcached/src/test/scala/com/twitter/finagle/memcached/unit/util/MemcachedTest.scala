@@ -20,8 +20,8 @@ import org.scalatest.mock.MockitoSugar
 @RunWith(classOf[JUnitRunner])
 class MemcachedTest
     extends FunSuite with MockitoSugar with Eventually
-    with IntegrationPatience {
-  test("Memcached.Client has expected stack and params") {
+    with IntegrationPatience
+  test("Memcached.Client has expected stack and params")
     val markDeadFor = Backoff.const(1.second)
     val failureAccrualPolicy =
       FailureAccrualPolicy.consecutiveFailures(20, markDeadFor)
@@ -43,29 +43,27 @@ class MemcachedTest
     assert(policy() == failureAccrualPolicy)
     assert(
         markDeadFor.take(10).force.toSeq ===
-        (0 until 10 map { _ =>
+        (0 until 10 map  _ =>
           1.second
-        }))
+        ))
     assert(params[Transporter.ConnectTimeout] == Transporter.ConnectTimeout(
             100.milliseconds))
     assert(params[Memcached.param.EjectFailedHost] == Memcached.param
           .EjectFailedHost(false))
     assert(params[FailFastFactory.FailFast] == FailFastFactory.FailFast(false))
-  }
 
-  test("Memcache.newPartitionedClient enables FactoryToService") {
+  test("Memcache.newPartitionedClient enables FactoryToService")
     val st = new InMemoryStatsReceiver
     val client = Memcached.client
       .configured(Stats(st))
       .newRichClient("memcache=127.0.0.1:12345")
 
     // wait until we have at least 1 node, or risk getting a ShardNotAvailable exception
-    eventually {
+    eventually
       assert(st.gauges(Seq("memcache", "live_nodes"))() >= 1)
-    }
 
     val numberRequests = 10
-    Time.withCurrentTimeFrozen { _ =>
+    Time.withCurrentTimeFrozen  _ =>
       for (i <- 0 until numberRequests) intercept[WriteException](
           Await.result(client.get("foo"), 3.seconds))
       // Since FactoryToService is enabled, number of requeues should be
@@ -74,6 +72,3 @@ class MemcachedTest
       // number of requeues = maxRetriesPerReq * numRequests
       assert(
           st.counters(Seq("memcache", "retries", "requeues")) > numberRequests)
-    }
-  }
-}

@@ -12,7 +12,7 @@ import akka.actor.{ActorSystem, ActorRef}
   * S is the Subscriber type
   * C is the Classifier type
   */
-trait EventBus[E, S, C] {
+trait EventBus[E, S, C]
 
   /**
     * Attempts to register the subscriber to the specified Classifier
@@ -35,7 +35,6 @@ trait EventBus[E, S, C] {
     * Publishes the specified Event to this bus
     */
   def publish(event: E): Unit
-}
 
 /**
   * Java API: See documentation for [[akka.event.LookupClassification]]
@@ -43,9 +42,9 @@ trait EventBus[E, S, C] {
   * S is the Subscriber type
   * C is the Classifier type
   */
-abstract class LookupEventBus[E, S, C] extends EventBus[E, S, C] {
+abstract class LookupEventBus[E, S, C] extends EventBus[E, S, C]
   private val bus = new akka.event.EventBus
-  with akka.event.LookupClassification {
+  with akka.event.LookupClassification
     type Event = E
     type Subscriber = S
     type Classifier = C
@@ -60,7 +59,6 @@ abstract class LookupEventBus[E, S, C] extends EventBus[E, S, C] {
 
     override protected def publish(event: E, subscriber: S): Unit =
       LookupEventBus.this.publish(event, subscriber)
-  }
 
   /**
     * This is a size hint for the number of Classifiers you expect to have (use powers of 2)
@@ -88,7 +86,6 @@ abstract class LookupEventBus[E, S, C] extends EventBus[E, S, C] {
     bus.unsubscribe(subscriber, from)
   override def unsubscribe(subscriber: S): Unit = bus.unsubscribe(subscriber)
   override def publish(event: E): Unit = bus.publish(event)
-}
 
 /**
   * Java API: See documentation for [[akka.event.SubchannelClassification]]
@@ -96,9 +93,9 @@ abstract class LookupEventBus[E, S, C] extends EventBus[E, S, C] {
   * S is the Subscriber type
   * C is the Classifier type
   */
-abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C] {
+abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C]
   private val bus = new akka.event.EventBus
-  with akka.event.SubchannelClassification {
+  with akka.event.SubchannelClassification
     type Event = E
     type Subscriber = S
     type Classifier = C
@@ -112,7 +109,6 @@ abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C] {
     override protected def publish(
         event: Event, subscriber: Subscriber): Unit =
       SubchannelEventBus.this.publish(event, subscriber)
-  }
 
   /**
     * The logic to form sub-class hierarchy
@@ -135,7 +131,6 @@ abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C] {
     bus.unsubscribe(subscriber, from)
   override def unsubscribe(subscriber: S): Unit = bus.unsubscribe(subscriber)
   override def publish(event: E): Unit = bus.publish(event)
-}
 
 /**
   * Java API: See documentation for [[akka.event.ScanningClassification]]
@@ -143,9 +138,9 @@ abstract class SubchannelEventBus[E, S, C] extends EventBus[E, S, C] {
   * S is the Subscriber type
   * C is the Classifier type
   */
-abstract class ScanningEventBus[E, S, C] extends EventBus[E, S, C] {
+abstract class ScanningEventBus[E, S, C] extends EventBus[E, S, C]
   private val bus = new akka.event.EventBus
-  with akka.event.ScanningClassification {
+  with akka.event.ScanningClassification
     type Event = E
     type Subscriber = S
     type Classifier = C
@@ -161,7 +156,6 @@ abstract class ScanningEventBus[E, S, C] extends EventBus[E, S, C] {
 
     override protected def publish(event: E, subscriber: S): Unit =
       ScanningEventBus.this.publish(event, subscriber)
-  }
 
   /**
     * Provides a total ordering of Classifiers (think java.util.Comparator.compare)
@@ -189,7 +183,6 @@ abstract class ScanningEventBus[E, S, C] extends EventBus[E, S, C] {
     bus.unsubscribe(subscriber, from)
   override def unsubscribe(subscriber: S): Unit = bus.unsubscribe(subscriber)
   override def publish(event: E): Unit = bus.publish(event)
-}
 
 /**
   * Java API: See documentation for [[akka.event.ManagedActorClassification]]
@@ -198,9 +191,9 @@ abstract class ScanningEventBus[E, S, C] extends EventBus[E, S, C] {
   * E is the Event type
   */
 abstract class ManagedActorEventBus[E](system: ActorSystem)
-    extends EventBus[E, ActorRef, ActorRef] {
+    extends EventBus[E, ActorRef, ActorRef]
   private val bus = new akka.event.ActorEventBus
-  with akka.event.ManagedActorClassification with akka.event.ActorClassifier {
+  with akka.event.ManagedActorClassification with akka.event.ActorClassifier
     type Event = E
 
     override val system = ManagedActorEventBus.this.system
@@ -209,7 +202,6 @@ abstract class ManagedActorEventBus[E](system: ActorSystem)
 
     override protected def classify(event: E): ActorRef =
       ManagedActorEventBus.this.classify(event)
-  }
 
   /**
     * This is a size hint for the number of Classifiers you expect to have (use powers of 2)
@@ -228,7 +220,6 @@ abstract class ManagedActorEventBus[E](system: ActorSystem)
   override def unsubscribe(subscriber: ActorRef): Unit =
     bus.unsubscribe(subscriber)
   override def publish(event: E): Unit = bus.publish(event)
-}
 
 /**
   * Java API: See documentation for [[akka.event.ActorClassification]]
@@ -237,16 +228,15 @@ abstract class ManagedActorEventBus[E](system: ActorSystem)
   * E is the Event type
   */
 @deprecated("Use ManagedActorEventBus instead", "2.4")
-abstract class ActorEventBus[E] extends EventBus[E, ActorRef, ActorRef] {
+abstract class ActorEventBus[E] extends EventBus[E, ActorRef, ActorRef]
   private val bus = new akka.event.ActorEventBus
-  with akka.event.ActorClassification with akka.event.ActorClassifier {
+  with akka.event.ActorClassification with akka.event.ActorClassifier
     type Event = E
 
     override protected def mapSize: Int = ActorEventBus.this.mapSize
 
     override protected def classify(event: E): ActorRef =
       ActorEventBus.this.classify(event)
-  }
 
   /**
     * This is a size hint for the number of Classifiers you expect to have (use powers of 2)
@@ -265,4 +255,3 @@ abstract class ActorEventBus[E] extends EventBus[E, ActorRef, ActorRef] {
   override def unsubscribe(subscriber: ActorRef): Unit =
     bus.unsubscribe(subscriber)
   override def publish(event: E): Unit = bus.publish(event)
-}

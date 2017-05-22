@@ -20,11 +20,11 @@ package org.apache.spark.sql.internal
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.RuntimeConfig
 
-class RuntimeConfigSuite extends SparkFunSuite {
+class RuntimeConfigSuite extends SparkFunSuite
 
   private def newConf(): RuntimeConfig = new RuntimeConfigImpl
 
-  test("set and get") {
+  test("set and get")
     val conf = newConf()
     conf.set("k1", "v1").set("k2", 2).set("k3", value = false)
 
@@ -32,50 +32,39 @@ class RuntimeConfigSuite extends SparkFunSuite {
     assert(conf.get("k2") == "2")
     assert(conf.get("k3") == "false")
 
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       conf.get("notset")
-    }
-  }
 
-  test("getOption") {
+  test("getOption")
     val conf = newConf().set("k1", "v1")
     assert(conf.getOption("k1") == Some("v1"))
     assert(conf.getOption("notset") == None)
-  }
 
-  test("unset") {
+  test("unset")
     val conf = newConf().set("k1", "v1")
     assert(conf.get("k1") == "v1")
     conf.unset("k1")
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       conf.get("k1")
-    }
-  }
 
-  test("set and get hadoop configuration") {
+  test("set and get hadoop configuration")
     val conf = newConf()
     conf.setHadoop("k1", "v1").setHadoop("k2", "v2")
 
     assert(conf.getHadoop("k1") == "v1")
     assert(conf.getHadoop("k2") == "v2")
 
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       conf.get("notset")
-    }
-  }
 
-  test("getHadoopOption") {
+  test("getHadoopOption")
     val conf = newConf().setHadoop("k1", "v1")
     assert(conf.getHadoopOption("k1") == Some("v1"))
     assert(conf.getHadoopOption("notset") == None)
-  }
 
-  test("unsetHadoop") {
+  test("unsetHadoop")
     val conf = newConf().setHadoop("k1", "v1")
     assert(conf.getHadoop("k1") == "v1")
     conf.unsetHadoop("k1")
-    intercept[NoSuchElementException] {
+    intercept[NoSuchElementException]
       conf.getHadoop("k1")
-    }
-  }
-}

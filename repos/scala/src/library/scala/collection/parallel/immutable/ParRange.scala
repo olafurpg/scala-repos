@@ -31,7 +31,7 @@ import scala.collection.Iterator
   *  @define coll immutable parallel range
   */
 @SerialVersionUID(1L)
-class ParRange(val range: Range) extends ParSeq[Int] with Serializable {
+class ParRange(val range: Range) extends ParSeq[Int] with Serializable
   self =>
 
   override def seq = range
@@ -42,7 +42,7 @@ class ParRange(val range: Range) extends ParSeq[Int] with Serializable {
 
   def splitter = new ParRangeIterator
 
-  class ParRangeIterator(range: Range = self.range) extends SeqSplitter[Int] {
+  class ParRangeIterator(range: Range = self.range) extends SeqSplitter[Int]
     override def toString = "ParRangeIterator(over: " + range + ")"
     private var ind = 0
     private val len = range.length
@@ -52,17 +52,17 @@ class ParRange(val range: Range) extends ParSeq[Int] with Serializable {
     final def hasNext = ind < len
 
     final def next =
-      if (hasNext) {
+      if (hasNext)
         val r = range.apply(ind)
         ind += 1
         r
-      } else Iterator.empty.next()
+      else Iterator.empty.next()
 
     private def rangeleft = range.drop(ind)
 
     def dup = new ParRangeIterator(rangeleft)
 
-    def split = {
+    def split =
       val rleft = rangeleft
       val elemleft = rleft.length
       if (elemleft < 2) Seq(new ParRangeIterator(rleft))
@@ -71,46 +71,36 @@ class ParRange(val range: Range) extends ParSeq[Int] with Serializable {
             new ParRangeIterator(rleft.take(elemleft / 2)),
             new ParRangeIterator(rleft.drop(elemleft / 2))
         )
-    }
 
-    def psplit(sizes: Int*) = {
+    def psplit(sizes: Int*) =
       var rleft = rangeleft
-      for (sz <- sizes) yield {
+      for (sz <- sizes) yield
         val fronttaken = rleft.take(sz)
         rleft = rleft.drop(sz)
         new ParRangeIterator(fronttaken)
-      }
-    }
 
     /* accessors */
 
-    override def foreach[U](f: Int => U): Unit = {
+    override def foreach[U](f: Int => U): Unit =
       rangeleft.foreach(f.asInstanceOf[Int => Unit])
       ind = len
-    }
 
-    override def reduce[U >: Int](op: (U, U) => U): U = {
+    override def reduce[U >: Int](op: (U, U) => U): U =
       val r = rangeleft.reduceLeft(op)
       ind = len
       r
-    }
 
     /* transformers */
 
     override def map2combiner[S, That](
-        f: Int => S, cb: Combiner[S, That]): Combiner[S, That] = {
-      while (hasNext) {
+        f: Int => S, cb: Combiner[S, That]): Combiner[S, That] =
+      while (hasNext)
         cb += f(next)
-      }
       cb
-    }
-  }
-}
 
-object ParRange {
+object ParRange
   def apply(start: Int, end: Int, step: Int, inclusive: Boolean) =
     new ParRange(
         if (inclusive) new Range.Inclusive(start, end, step)
         else new Range(start, end, step)
     )
-}

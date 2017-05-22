@@ -6,47 +6,40 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
-class StringOpsTest {
+class StringOpsTest
   @Test
-  def prefixOfNone(): Unit = {
+  def prefixOfNone(): Unit =
     val so = new StringOps {}
     val ss = Nil
     val lcp = so longestCommonPrefix ss
     assert(lcp == "")
-  }
   @Test
-  def prefixWithEmpty(): Unit = {
+  def prefixWithEmpty(): Unit =
     val so = new StringOps {}
     val ss = List("abc", "", "abd")
     val lcp = so longestCommonPrefix ss
     assert(lcp == "")
-  }
   @Test
-  def prefixOfOne(): Unit = {
+  def prefixOfOne(): Unit =
     val so = new StringOps {}
     val ss = List("abc")
     val lcp = so longestCommonPrefix ss
     assert(lcp == "abc")
-  }
   @Test
-  def prefixOfMany(): Unit = {
+  def prefixOfMany(): Unit =
     val so = new StringOps {}
     val ss = List("abc", "abd", "abe")
     val lcp = so longestCommonPrefix ss
     assert(lcp == "ab")
-  }
   @Test
-  def prefixOfPrefix(): Unit = {
+  def prefixOfPrefix(): Unit =
     val so = new StringOps {}
     val ss = List("abc", "abcd")
     val lcp = so longestCommonPrefix ss
     assert(lcp == "abc")
-  }
   @Test
-  def prefixOfPrefixMiddling(): Unit = {
+  def prefixOfPrefixMiddling(): Unit =
     val so = new StringOps {}
     val ss = List("abce", "abc", "abcd")
     val lcp = so longestCommonPrefix ss
     assert(lcp == "abc")
-  }
-}

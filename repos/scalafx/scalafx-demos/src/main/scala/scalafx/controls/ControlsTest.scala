@@ -33,49 +33,41 @@ import scalafx.scene.Scene
 import scalafx.scene.control._
 import scalafx.scene.layout._
 
-object ControlsTest extends JFXApp {
+object ControlsTest extends JFXApp
 
-  val indicatorPane = new VBox {
+  val indicatorPane = new VBox
     children = List(
-        new Label {
+        new Label
       text = "LEFT"
-    })
-  }
+    )
 
-  val controlsPane = new VBox {
+  val controlsPane = new VBox
     children = List(
-        new Label {
+        new Label
       text = "RIGHT"
-    })
-  }
+    )
 
-  val centerPane = new BorderPane {
-    top = new Label {
+  val centerPane = new BorderPane
+    top = new Label
       text = "Label"
-    }
-    center = new StackPane {
+    center = new StackPane
       children = List(
-          new Button {
+          new Button
         text = "Button"
-      })
-    }
-  }
+      )
 
-  val mainContent = new BorderPane {
+  val mainContent = new BorderPane
     left = indicatorPane
     center = centerPane
     right = controlsPane
-  }
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "CheckBox Test"
     width = 800
     height = 600
-    scene = new Scene {
+    scene = new Scene
       //      fill = Color.LIGHTGRAY
       content = mainContent
-    }
-  }
   mainContent.prefHeight <== stage.scene().height
   mainContent.prefWidth <== stage.scene().width
   //  setPrefSize(stage.scene.width.get, stage.scene.height.get)
@@ -86,4 +78,3 @@ object ControlsTest extends JFXApp {
   controlsPane.prefWidth <== mainContent.width * 0.2
   //  centerPane.prefHeight <== stage.scene.height
   //  centerPane.prefWidth <== stage.scene.width * 0.6
-}

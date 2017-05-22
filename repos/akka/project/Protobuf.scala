@@ -10,7 +10,7 @@ import com.typesafe.sbt.preprocess.Preprocess._
 
 import java.io.File
 
-object Protobuf {
+object Protobuf
   val paths = SettingKey[Seq[File]](
       "protobuf-paths", "The paths that contain *.proto files.")
   val outputPaths = SettingKey[Seq[File]](
@@ -31,7 +31,7 @@ object Protobuf {
                          (sourceDirectory in Test).value).map(_ / "java"),
       protoc := "protoc",
       protocVersion := "2.5.0",
-      generate := {
+      generate :=
         val sourceDirs = paths.value
         val targetDirs = outputPaths.value
 
@@ -39,7 +39,7 @@ object Protobuf {
           sys.error(
               s"Unbalanced number of paths and destination paths!\nPaths: $sourceDirs\nDestination Paths: $targetDirs")
 
-        if (sourceDirs exists (_.exists)) {
+        if (sourceDirs exists (_.exists))
           val cmd = protoc.value
           val log = streams.value.log
           checkProtocVersion(cmd, protocVersion.value, log)
@@ -49,7 +49,7 @@ object Protobuf {
           val targets = target.value
           val cache = targets / "protoc" / "cache"
 
-          (sourceDirs zip targetDirs) map {
+          (sourceDirs zip targetDirs) map
             case (src, dst) =>
               val relative = src
                 .relativeTo(sources)
@@ -67,63 +67,53 @@ object Protobuf {
                       _.replace("com.google.protobuf", "akka.protobuf")),
                   cache,
                   log)
-          }
-        }
-      }
   )
 
   private def callProtoc[T](protoc: String,
                             args: Seq[String],
                             log: Logger,
                             thunk: (ProcessBuilder, Logger) => T): T =
-    try {
+    try
       val proc = Process(protoc, args)
       thunk(proc, log)
-    } catch {
+    catch
       case e: Exception =>
         throw new RuntimeException(
             "error while executing '%s' with args: %s" format
             (protoc, args.mkString(" ")),
             e)
-    }
 
   private def checkProtocVersion(
-      protoc: String, protocVersion: String, log: Logger): Unit = {
-    val res = callProtoc(protoc, Seq("--version"), log, { (p, l) =>
+      protoc: String, protocVersion: String, log: Logger): Unit =
+    val res = callProtoc(protoc, Seq("--version"), log,  (p, l) =>
       p !! l
-    })
+    )
     val version = res.split(" ").last.trim
-    if (version != protocVersion) {
+    if (version != protocVersion)
       sys.error("Wrong protoc version! Expected %s but got %s" format
           (protocVersion, version))
-    }
-  }
 
   private def generate(
-      protoc: String, srcDir: File, targetDir: File, log: Logger): Unit = {
+      protoc: String, srcDir: File, targetDir: File, log: Logger): Unit =
     val protoFiles = (srcDir ** "*.proto").get
     if (srcDir.exists)
       if (protoFiles.isEmpty)
         log.info("Skipping empty source directory %s" format srcDir)
-      else {
+      else
         targetDir.mkdirs()
 
         log.info("Generating %d protobuf files from %s to %s".format(
                 protoFiles.size, srcDir, targetDir))
-        protoFiles.foreach { proto =>
+        protoFiles.foreach  proto =>
           log.info("Compiling %s" format proto)
-        }
 
         val exitCode = callProtoc(
             protoc,
             Seq("-I" + srcDir.absolutePath,
                 "--java_out=%s" format targetDir.absolutePath) ++ protoFiles
               .map(_.absolutePath),
-            log, { (p, l) =>
+            log,  (p, l) =>
               p ! l
-            })
+            )
         if (exitCode != 0)
           sys.error("protoc returned exit code: %d" format exitCode)
-      }
-  }
-}

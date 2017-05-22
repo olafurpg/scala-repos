@@ -8,16 +8,15 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 3/5/12
   */
 class XmlAttributeQuotesTypingTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
 
-  def testQuotesAfterFirstAttribute() {
+  def testQuotesAfterFirstAttribute()
     val text = "class A { val xml = <aaa attr" + CARET_MARKER + "\n}"
     val assumedStub = "class A { val xml = <aaa attr=\"\"\n}"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '=')
-  }
 
-  def testQuotesAfterSecondAttribute() {
+  def testQuotesAfterSecondAttribute()
     val text =
       "class A { val xml = <aaa attr1=\"blahlbha\" attr2" + CARET_MARKER +
       "\n}"
@@ -25,37 +24,31 @@ class XmlAttributeQuotesTypingTest
       "class A { val xml = <aaa attr1=\"blahlbha\" attr2=\"\"\n}"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '=')
-  }
 
-  def testSecondQuoteTypingEmptyValue() {
+  def testSecondQuoteTypingEmptyValue()
     val text = "class A { val xml = <aaa attr=\"" + CARET_MARKER + "\"  }"
     val assumedStub =
       "class A { val xml = <aaa attr=\"\"" + CARET_MARKER + "  }"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testSeconQuoteTypingNonEmptyValue() {
+  def testSeconQuoteTypingNonEmptyValue()
     val text =
       "class A {val xml = <aaa attr=\"blah blah" + CARET_MARKER + "\"\n}"
     val assumedStub =
       "class A {val xml = <aaa attr=\"blah blah\"" + CARET_MARKER + "\n}"
 
     checkGeneratedTextAfterTyping(text, assumedStub, '\"')
-  }
 
-  def testDeleteFirstQuote1() {
+  def testDeleteFirstQuote1()
     val text = "class A { val xml = <aaa attr=\"" + CARET_MARKER + "\"   }"
     val assumedStub = "class A { val xml = <aaa attr=   }"
 
     checkGeneratedTextAfterBackspace(text, assumedStub)
-  }
 
-  def testDeleteFirstQuote2() {
+  def testDeleteFirstQuote2()
     val text =
       "class A { val xml = <aaa attr=\"" + CARET_MARKER + "\"></aaa>  }"
     val assumedStub = "class A { val xml = <aaa attr=></aaa>  }"
 
     checkGeneratedTextAfterBackspace(text, assumedStub)
-  }
-}

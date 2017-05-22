@@ -12,7 +12,7 @@ import InteractiveReader._
 import Properties.isMac
 
 /** Reads lines from an input stream */
-trait InteractiveReader {
+trait InteractiveReader
   def postInit(): Unit = {}
 
   val interactive: Boolean
@@ -23,12 +23,11 @@ trait InteractiveReader {
   def redrawLine(): Unit
 
   def readYesOrNo(prompt: String, alt: => Boolean): Boolean =
-    readOneKey(prompt) match {
+    readOneKey(prompt) match
       case 'y' => true
       case 'n' => false
       case -1 => false // EOF
       case _ => alt
-    }
 
   protected def readOneLine(prompt: String): String
   protected def readOneKey(prompt: String): Int
@@ -37,16 +36,13 @@ trait InteractiveReader {
     // hack necessary for OSX jvm suspension because read calls are not restarted after SIGTSTP
     if (isMac) restartSysCalls(readOneLine(prompt), reset())
     else readOneLine(prompt)
-}
 
-object InteractiveReader {
+object InteractiveReader
   val msgEINTR = "Interrupted system call"
   def restartSysCalls[R](body: => R, reset: => Unit): R =
-    try body catch {
+    try body catch
       case e: IOException if e.getMessage == msgEINTR => reset; body
-    }
 
   def apply(): InteractiveReader = SimpleReader()
   @deprecated("Use `apply` instead.", "2.9.0")
   def createDefault(): InteractiveReader = apply() // used by sbt
-}

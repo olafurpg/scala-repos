@@ -41,13 +41,13 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     serializer: String,
     packageNames: Array[Byte],
     broadcastVars: Array[Broadcast[Object]])
-    extends RDD[U](parent) with Logging {
+    extends RDD[U](parent) with Logging
   protected var dataStream: DataInputStream = _
   private var bootTime: Double = _
   override def getPartitions: Array[Partition] = parent.partitions
 
   override def compute(
-      partition: Partition, context: TaskContext): Iterator[U] = {
+      partition: Partition, context: TaskContext): Iterator[U] =
 
     // Timing start
     bootTime = System.currentTimeMillis / 1000.0
@@ -80,48 +80,41 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
     dataStream = new DataInputStream(inputStream)
     serverSocket.close()
 
-    try {
+    try
 
-      return new Iterator[U] {
-        def next(): U = {
+      return new Iterator[U]
+        def next(): U =
           val obj = _nextObj
-          if (hasNext) {
+          if (hasNext)
             _nextObj = read()
-          }
           obj
-        }
 
         var _nextObj = read()
 
-        def hasNext(): Boolean = {
+        def hasNext(): Boolean =
           val hasMore = (_nextObj != null)
-          if (!hasMore) {
+          if (!hasMore)
             dataStream.close()
-          }
           hasMore
-        }
-      }
-    } catch {
+    catch
       case e: Exception =>
         throw new SparkException(
             "R computation failed with\n " + errThread.getLines())
-    }
-  }
 
   /**
     * Start a thread to write RDD data to the R process.
     */
   private def startStdinThread[T](
-      output: OutputStream, iter: Iterator[T], partition: Int): Unit = {
+      output: OutputStream, iter: Iterator[T], partition: Int): Unit =
 
     val env = SparkEnv.get
     val taskContext = TaskContext.get()
     val bufferSize = System.getProperty("spark.buffer.size", "65536").toInt
     val stream = new BufferedOutputStream(output, bufferSize)
 
-    new Thread("writer for R") {
-      override def run(): Unit = {
-        try {
+    new Thread("writer for R")
+      override def run(): Unit =
+        try
           SparkEnv.set(env)
           TaskContext.setTaskContext(taskContext)
           val dataOut = new DataOutputStream(stream)
@@ -137,68 +130,59 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
           dataOut.write(func)
 
           dataOut.writeInt(broadcastVars.length)
-          broadcastVars.foreach { broadcast =>
+          broadcastVars.foreach  broadcast =>
             // TODO(shivaram): Read a Long in R to avoid this cast
             dataOut.writeInt(broadcast.id.toInt)
             // TODO: Pass a byte array from R to avoid this cast ?
             val broadcastByteArr = broadcast.value.asInstanceOf[Array[Byte]]
             dataOut.writeInt(broadcastByteArr.length)
             dataOut.write(broadcastByteArr)
-          }
 
           dataOut.writeInt(numPartitions)
 
-          if (!iter.hasNext) {
+          if (!iter.hasNext)
             dataOut.writeInt(0)
-          } else {
+          else
             dataOut.writeInt(1)
-          }
 
           val printOut = new PrintStream(stream)
 
-          def writeElem(elem: Any): Unit = {
-            if (deserializer == SerializationFormats.BYTE) {
+          def writeElem(elem: Any): Unit =
+            if (deserializer == SerializationFormats.BYTE)
               val elemArr = elem.asInstanceOf[Array[Byte]]
               dataOut.writeInt(elemArr.length)
               dataOut.write(elemArr)
-            } else if (deserializer == SerializationFormats.ROW) {
+            else if (deserializer == SerializationFormats.ROW)
               dataOut.write(elem.asInstanceOf[Array[Byte]])
-            } else if (deserializer == SerializationFormats.STRING) {
+            else if (deserializer == SerializationFormats.STRING)
               // write string(for StringRRDD)
               // scalastyle:off println
               printOut.println(elem)
               // scalastyle:on println
-            }
-          }
 
-          for (elem <- iter) {
-            elem match {
+          for (elem <- iter)
+            elem match
               case (key, value) =>
                 writeElem(key)
                 writeElem(value)
               case _ =>
                 writeElem(elem)
-            }
-          }
           stream.flush()
-        } catch {
+        catch
           // TODO: We should propogate this error to the task thread
           case e: Exception =>
             logError("R Writer thread got an exception", e)
-        } finally {
+        finally
           Try(output.close())
-        }
-      }
-    }.start()
-  }
+    .start()
 
   protected def readData(length: Int): U
 
-  protected def read(): U = {
-    try {
+  protected def read(): U =
+    try
       val length = dataStream.readInt()
 
-      length match {
+      length match
         case SpecialLengths.TIMING_DATA =>
           // Timing data from R worker
           val boot = dataStream.readDouble - bootTime
@@ -221,14 +205,10 @@ private abstract class BaseRRDD[T : ClassTag, U : ClassTag](
           read()
         case length if length >= 0 =>
           readData(length)
-      }
-    } catch {
+    catch
       case eof: EOFException =>
         throw new SparkException(
             "R worker exited unexpectedly (cranshed)", eof)
-    }
-  }
-}
 
 /**
   * Form an RDD[(Int, Array[Byte])] from key-value pairs returned from R.
@@ -247,10 +227,10 @@ private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
         deserializer,
         SerializationFormats.BYTE,
         packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]]))
 
-  override protected def readData(length: Int): (Int, Array[Byte]) = {
-    length match {
+  override protected def readData(length: Int): (Int, Array[Byte]) =
+    length match
       case length if length == 2 =>
         val hashedKey = dataStream.readInt()
         val contentPairsLength = dataStream.readInt()
@@ -258,12 +238,9 @@ private class PairwiseRRDD[T : ClassTag](parent: RDD[T],
         dataStream.readFully(contentPairs)
         (hashedKey, contentPairs)
       case _ => null
-    }
-  }
 
   lazy val asJavaPairRDD: JavaPairRDD[Int, Array[Byte]] =
     JavaPairRDD.fromRDD(this)
-}
 
 /**
   * An RDD that stores serialized R objects as Array[Byte].
@@ -281,20 +258,17 @@ private class RRDD[T : ClassTag](parent: RDD[T],
         deserializer,
         serializer,
         packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]]))
 
-  override protected def readData(length: Int): Array[Byte] = {
-    length match {
+  override protected def readData(length: Int): Array[Byte] =
+    length match
       case length if length > 0 =>
         val obj = new Array[Byte](length)
         dataStream.readFully(obj)
         obj
       case _ => null
-    }
-  }
 
   lazy val asJavaRDD: JavaRDD[Array[Byte]] = JavaRDD.fromRDD(this)
-}
 
 /**
   * An RDD that stores R objects as Array[String].
@@ -311,48 +285,39 @@ private class StringRRDD[T : ClassTag](parent: RDD[T],
         deserializer,
         SerializationFormats.STRING,
         packageNames,
-        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]])) {
+        broadcastVars.map(x => x.asInstanceOf[Broadcast[Object]]))
 
-  override protected def readData(length: Int): String = {
-    length match {
+  override protected def readData(length: Int): String =
+    length match
       case length if length > 0 =>
         SerDe.readStringBytes(dataStream, length)
       case _ => null
-    }
-  }
 
   lazy val asJavaRDD: JavaRDD[String] = JavaRDD.fromRDD(this)
-}
 
-private object SpecialLengths {
+private object SpecialLengths
   val TIMING_DATA = -1
-}
 
 private[r] class BufferedStreamThread(
     in: InputStream, name: String, errBufferSize: Int)
-    extends Thread(name) with Logging {
+    extends Thread(name) with Logging
   val lines = new Array[String](errBufferSize)
   var lineIdx = 0
-  override def run() {
-    for (line <- Source.fromInputStream(in).getLines) {
-      synchronized {
+  override def run()
+    for (line <- Source.fromInputStream(in).getLines)
+      synchronized
         lines(lineIdx) = line
         lineIdx = (lineIdx + 1) % errBufferSize
-      }
       logInfo(line)
-    }
-  }
 
-  def getLines(): String = synchronized {
-    (0 until errBufferSize).filter { x =>
+  def getLines(): String = synchronized
+    (0 until errBufferSize).filter  x =>
       lines((x + lineIdx) % errBufferSize) != null
-    }.map { x =>
+    .map  x =>
       lines((x + lineIdx) % errBufferSize)
-    }.mkString("\n")
-  }
-}
+    .mkString("\n")
 
-private[r] object RRDD {
+private[r] object RRDD
   // Because forking processes from Java is expensive, we prefer to launch
   // a single R daemon (daemon.R) and tell it to fork new workers for our tasks.
   // This daemon currently only works on UNIX-based systems now, so we should
@@ -366,46 +331,40 @@ private[r] object RRDD {
       sparkHome: String,
       jars: Array[String],
       sparkEnvirMap: JMap[Object, Object],
-      sparkExecutorEnvMap: JMap[Object, Object]): JavaSparkContext = {
+      sparkExecutorEnvMap: JMap[Object, Object]): JavaSparkContext =
 
     val sparkConf = new SparkConf().setAppName(appName).setSparkHome(sparkHome)
 
     // Override `master` if we have a user-specified value
-    if (master != "") {
+    if (master != "")
       sparkConf.setMaster(master)
-    } else {
+    else
       // If conf has no master set it to "local" to maintain
       // backwards compatibility
       sparkConf.setIfMissing("spark.master", "local")
-    }
 
-    for ((name, value) <- sparkEnvirMap.asScala) {
+    for ((name, value) <- sparkEnvirMap.asScala)
       sparkConf.set(name.toString, value.toString)
-    }
-    for ((name, value) <- sparkExecutorEnvMap.asScala) {
+    for ((name, value) <- sparkExecutorEnvMap.asScala)
       sparkConf.setExecutorEnv(name.toString, value.toString)
-    }
 
     val jsc = new JavaSparkContext(sparkConf)
-    jars.foreach { jar =>
+    jars.foreach  jar =>
       jsc.addJar(jar)
-    }
     jsc
-  }
 
   /**
     * Start a thread to print the process's stderr to ours
     */
-  private def startStdoutThread(proc: Process): BufferedStreamThread = {
+  private def startStdoutThread(proc: Process): BufferedStreamThread =
     val BUFFER_SIZE = 100
     val thread = new BufferedStreamThread(
         proc.getInputStream, "stdout reader for R", BUFFER_SIZE)
     thread.setDaemon(true)
     thread.start()
     thread
-  }
 
-  private def createRProcess(port: Int, script: String): BufferedStreamThread = {
+  private def createRProcess(port: Int, script: String): BufferedStreamThread =
     // "spark.sparkr.r.command" is deprecated and replaced by "spark.r.command",
     // but kept here for backward compatibility.
     val sparkConf = SparkEnv.get.conf
@@ -427,17 +386,16 @@ private[r] object RRDD {
     val proc = pb.start()
     val errThread = startStdoutThread(proc)
     errThread
-  }
 
   /**
     * ProcessBuilder used to launch worker R processes.
     */
-  def createRWorker(port: Int): BufferedStreamThread = {
+  def createRWorker(port: Int): BufferedStreamThread =
     val useDaemon =
       SparkEnv.get.conf.getBoolean("spark.sparkr.use.daemon", true)
-    if (!Utils.isWindows && useDaemon) {
-      synchronized {
-        if (daemonChannel == null) {
+    if (!Utils.isWindows && useDaemon)
+      synchronized
+        if (daemonChannel == null)
           // we expect one connections
           val serverSocket =
             new ServerSocket(0, 1, InetAddress.getByName("localhost"))
@@ -449,11 +407,10 @@ private[r] object RRDD {
           daemonChannel = new DataOutputStream(
               new BufferedOutputStream(sock.getOutputStream))
           serverSocket.close()
-        }
-        try {
+        try
           daemonChannel.writeInt(port)
           daemonChannel.flush()
-        } catch {
+        catch
           case e: IOException =>
             // daemon process died
             daemonChannel.close()
@@ -461,20 +418,14 @@ private[r] object RRDD {
             errThread = null
             // fail the current task, retry by scheduler
             throw e
-        }
         errThread
-      }
-    } else {
+    else
       createRProcess(port, "worker.R")
-    }
-  }
 
   /**
     * Create an RRDD given a sequence of byte arrays. Used to create RRDD when `parallelize` is
     * called from R.
     */
   def createRDDFromArray(
-      jsc: JavaSparkContext, arr: Array[Array[Byte]]): JavaRDD[Array[Byte]] = {
+      jsc: JavaSparkContext, arr: Array[Array[Byte]]): JavaRDD[Array[Byte]] =
     JavaRDD.fromRDD(jsc.sc.parallelize(arr, arr.length))
-  }
-}

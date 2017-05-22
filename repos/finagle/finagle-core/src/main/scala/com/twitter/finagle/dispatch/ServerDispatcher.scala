@@ -6,12 +6,11 @@ import com.twitter.finagle.{Service, NoStacktrace, CancelledRequestException}
 import com.twitter.util._
 import java.util.concurrent.atomic.AtomicReference
 
-object GenSerialServerDispatcher {
+object GenSerialServerDispatcher
   private val Eof = Future.exception(new Exception("EOF") with NoStacktrace)
   // We don't use Future.never here, because object equality is important here
   private val Idle = new NoFuture
   private val Closed = new NoFuture
-}
 
 /**
   * A generic version of
@@ -20,7 +19,7 @@ object GenSerialServerDispatcher {
   */
 abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
     trans: Transport[In, Out])
-    extends Closable {
+    extends Closable
 
   import GenSerialServerDispatcher._
 
@@ -41,48 +40,41 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
   protected def dispatch(req: Out, eos: Promise[Unit]): Future[Rep]
   protected def handle(rep: Rep): Future[Unit]
 
-  private[this] def loop(): Future[Unit] = {
+  private[this] def loop(): Future[Unit] =
     state.set(Idle)
-    trans.read() flatMap { req =>
+    trans.read() flatMap  req =>
       val p = new Promise[Rep]
-      if (state.compareAndSet(Idle, p)) {
+      if (state.compareAndSet(Idle, p))
         val eos = new Promise[Unit]
         val save = Local.save()
-        try {
+        try
           Contexts.local.let(RemoteInfo.Upstream.AddressCtx,
-                             trans.remoteAddress) {
-            trans.peerCertificate match {
+                             trans.remoteAddress)
+            trans.peerCertificate match
               case None => p.become(dispatch(req, eos))
               case Some(cert) =>
-                Contexts.local.let(Transport.peerCertCtx, cert) {
+                Contexts.local.let(Transport.peerCertCtx, cert)
                   p.become(dispatch(req, eos))
-                }
-            }
-          }
-        } finally Local.restore(save)
-        p map { res =>
+        finally Local.restore(save)
+        p map  res =>
           (res, eos)
-        }
-      } else Eof
-    } flatMap {
+      else Eof
+    flatMap
       case (rep, eos) =>
         Future.join(handle(rep), eos).unit
-    } respond {
+    respond
       case Return(()) if state.get ne Closed =>
         loop()
 
       case _ =>
         trans.close()
-    }
-  }
 
   // Clear all locals to start the loop; we want a clean slate.
   private[this] val looping = Local.letClear { loop() }
 
-  trans.onClose ensure {
+  trans.onClose ensure
     looping.raise(cancelled)
     state.getAndSet(Closed).raise(cancelled)
-  }
 
   /** Exposed for testing */
   protected[dispatch] def isClosing: Boolean = state.get() eq Closed
@@ -90,11 +82,9 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
   // Note: this is racy, but that's inherent in draining (without
   // protocol support). Presumably, half-closing TCP connection is
   // also possible.
-  def close(deadline: Time) = {
+  def close(deadline: Time) =
     if (state.getAndSet(Closed) eq Idle) trans.close(deadline)
     trans.onClose.unit
-  }
-}
 
 /**
   * Dispatch requests from transport one at a time, queueing
@@ -105,14 +95,12 @@ abstract class GenSerialServerDispatcher[Req, Rep, In, Out](
   */
 class SerialServerDispatcher[Req, Rep](
     trans: Transport[Rep, Req], service: Service[Req, Rep])
-    extends GenSerialServerDispatcher[Req, Rep, Rep, Req](trans) {
+    extends GenSerialServerDispatcher[Req, Rep, Rep, Req](trans)
 
-  trans.onClose ensure {
+  trans.onClose ensure
     service.close()
-  }
 
   protected def dispatch(req: Req, eos: Promise[Unit]) =
     service(req) ensure eos.setDone()
 
   protected def handle(rep: Rep) = trans.write(rep)
-}

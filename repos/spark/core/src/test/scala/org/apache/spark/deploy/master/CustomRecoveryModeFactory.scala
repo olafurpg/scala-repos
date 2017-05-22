@@ -32,7 +32,7 @@ class CustomRecoveryModeFactory(
     conf: SparkConf,
     serializer: Serializer
 )
-    extends StandaloneRecoveryModeFactory(conf, serializer) {
+    extends StandaloneRecoveryModeFactory(conf, serializer)
 
   CustomRecoveryModeFactory.instantiationAttempts += 1
 
@@ -50,14 +50,12 @@ class CustomRecoveryModeFactory(
   override def createLeaderElectionAgent(
       master: LeaderElectable): LeaderElectionAgent =
     new CustomLeaderElectionAgent(master)
-}
 
-object CustomRecoveryModeFactory {
+object CustomRecoveryModeFactory
   @volatile var instantiationAttempts = 0
-}
 
 class CustomPersistenceEngine(serializer: Serializer)
-    extends PersistenceEngine {
+    extends PersistenceEngine
   val data = mutable.HashMap[String, Array[Byte]]()
 
   CustomPersistenceEngine.lastInstance = Some(this)
@@ -66,43 +64,37 @@ class CustomPersistenceEngine(serializer: Serializer)
     * Defines how the object is serialized and persisted. Implementation will
     * depend on the store used.
     */
-  override def persist(name: String, obj: Object): Unit = {
+  override def persist(name: String, obj: Object): Unit =
     CustomPersistenceEngine.persistAttempts += 1
     val serialized = serializer.newInstance().serialize(obj)
     val bytes = new Array[Byte](serialized.remaining())
     serialized.get(bytes)
     data += name -> bytes
-  }
 
   /**
     * Defines how the object referred by its name is removed from the store.
     */
-  override def unpersist(name: String): Unit = {
+  override def unpersist(name: String): Unit =
     CustomPersistenceEngine.unpersistAttempts += 1
     data -= name
-  }
 
   /**
     * Gives all objects, matching a prefix. This defines how objects are
     * read/deserialized back.
     */
-  override def read[T : ClassTag](prefix: String): Seq[T] = {
+  override def read[T : ClassTag](prefix: String): Seq[T] =
     CustomPersistenceEngine.readAttempts += 1
     val results = for ((name, bytes) <- data; if name.startsWith(prefix)) yield
       serializer.newInstance().deserialize[T](ByteBuffer.wrap(bytes))
     results.toSeq
-  }
-}
 
-object CustomPersistenceEngine {
+object CustomPersistenceEngine
   @volatile var persistAttempts = 0
   @volatile var unpersistAttempts = 0
   @volatile var readAttempts = 0
 
   @volatile var lastInstance: Option[CustomPersistenceEngine] = None
-}
 
 class CustomLeaderElectionAgent(val masterInstance: LeaderElectable)
-    extends LeaderElectionAgent {
+    extends LeaderElectionAgent
   masterInstance.electedLeader()
-}

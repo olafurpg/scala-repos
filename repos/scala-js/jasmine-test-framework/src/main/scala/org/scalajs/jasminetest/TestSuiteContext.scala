@@ -11,7 +11,7 @@ package org.scalajs.jasminetest
 import scala.scalajs.js
 import js.annotation.JSExport
 
-trait TestSuiteContext {
+trait TestSuiteContext
   def describe(title: String)(test: => Unit): Unit
   def it(title: String)(test: => Unit): Unit
   def xdescribe(title: String)(test: => Unit): Unit
@@ -40,10 +40,9 @@ trait TestSuiteContext {
   def unlessAny(tags: String*): TestSuiteContext =
     if (!tags.exists(TestSuiteContext.hasTag)) this
     else new TestSuiteContext.IgnoredContext(this)
-}
 
 @JSExport
-object TestSuiteContext {
+object TestSuiteContext
   // Stores tags in this Jasmine node. Is only modified by runner, which is
   // guaranteed to be unique by contract of the test framework.
   private var tags = Set.empty[String]
@@ -58,7 +57,7 @@ object TestSuiteContext {
   def hasTag(tag: String): Boolean = tags.contains(tag)
 
   private class IgnoredContext(baseContext: TestSuiteContext)
-      extends TestSuiteContext {
+      extends TestSuiteContext
     def describe(title: String)(test: => Unit): Unit =
       baseContext.xdescribe(title)(test)
     def it(title: String)(test: => Unit): Unit =
@@ -67,5 +66,3 @@ object TestSuiteContext {
       baseContext.xdescribe(title)(test)
     def xit(title: String)(test: => Unit): Unit =
       baseContext.xit(title)(test)
-  }
-}

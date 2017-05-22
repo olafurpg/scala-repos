@@ -21,11 +21,11 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
+class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext
   val obs = List[Double](77, 85, 62, 55, 63, 88, 57, 81, 51)
   val eps = 1E-5
 
-  test("regression metrics for unbiased (includes intercept term) predictor") {
+  test("regression metrics for unbiased (includes intercept term) predictor")
     /* Verify results in R:
         y = c(77, 85, 62, 55, 63, 88, 57, 81, 51)
         x = c(16, 22, 14, 10, 13, 19, 12, 18, 11)
@@ -64,9 +64,8 @@ class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(metrics.rootMeanSquaredError ~== 4.18802 absTol eps,
            "root mean squared error mismatch")
     assert(metrics.r2 ~== 0.89968225 absTol eps, "r2 score mismatch")
-  }
 
-  test("regression metrics for biased (no intercept term) predictor") {
+  test("regression metrics for biased (no intercept term) predictor")
     /* Verify results in R:
         y = c(77, 85, 62, 55, 63, 88, 57, 81, 51)
         x = c(16, 22, 14, 10, 13, 19, 12, 18, 11)
@@ -106,9 +105,8 @@ class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(metrics.rootMeanSquaredError ~== 6.3212903 absTol eps,
            "root mean squared error mismatch")
     assert(metrics.r2 ~== 0.99185395 absTol eps, "r2 score mismatch")
-  }
 
-  test("regression metrics with complete fitting") {
+  test("regression metrics with complete fitting")
     /* Verify results in R:
         y = c(77, 85, 62, 55, 63, 88, 57, 81, 51)
         preds = y
@@ -140,5 +138,3 @@ class RegressionMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(metrics.rootMeanSquaredError ~== 0.0 absTol eps,
            "root mean squared error mismatch")
     assert(metrics.r2 ~== 1.0 absTol eps, "r2 score mismatch")
-  }
-}

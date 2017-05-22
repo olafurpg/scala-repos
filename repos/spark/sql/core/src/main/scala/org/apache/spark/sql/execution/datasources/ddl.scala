@@ -33,7 +33,7 @@ import org.apache.spark.sql.types._
   *                   It is effective only when the table is a Hive table.
   */
 case class DescribeCommand(table: TableIdentifier, isExtended: Boolean)
-    extends LogicalPlan with logical.Command {
+    extends LogicalPlan with logical.Command
 
   override def children: Seq[LogicalPlan] = Seq.empty
 
@@ -58,7 +58,6 @@ case class DescribeCommand(table: TableIdentifier, isExtended: Boolean)
                            .putString("comment", "comment of the column")
                            .build())()
     )
-}
 
 /**
   * Used to represent the operation of create table using a data source.
@@ -73,11 +72,10 @@ case class CreateTableUsing(tableIdent: TableIdentifier,
                             options: Map[String, String],
                             allowExisting: Boolean,
                             managedIfNoPath: Boolean)
-    extends LogicalPlan with logical.Command {
+    extends LogicalPlan with logical.Command
 
   override def output: Seq[Attribute] = Seq.empty
   override def children: Seq[LogicalPlan] = Seq.empty
-}
 
 /**
   * A node used to support CTAS statements and saveAsTable for the data source API.
@@ -93,17 +91,16 @@ case class CreateTableUsingAsSelect(tableIdent: TableIdentifier,
                                     mode: SaveMode,
                                     options: Map[String, String],
                                     child: LogicalPlan)
-    extends logical.UnaryNode {
+    extends logical.UnaryNode
   override def output: Seq[Attribute] = Seq.empty[Attribute]
-}
 
 case class CreateTempTableUsing(tableIdent: TableIdentifier,
                                 userSpecifiedSchema: Option[StructType],
                                 provider: String,
                                 options: Map[String, String])
-    extends RunnableCommand {
+    extends RunnableCommand
 
-  def run(sqlContext: SQLContext): Seq[Row] = {
+  def run(sqlContext: SQLContext): Seq[Row] =
     val dataSource = DataSource(sqlContext,
                                 userSpecifiedSchema = userSpecifiedSchema,
                                 className = provider,
@@ -116,8 +113,6 @@ case class CreateTempTableUsing(tableIdent: TableIdentifier,
           .logicalPlan)
 
     Seq.empty[Row]
-  }
-}
 
 case class CreateTempTableUsingAsSelect(tableIdent: TableIdentifier,
                                         provider: String,
@@ -125,9 +120,9 @@ case class CreateTempTableUsingAsSelect(tableIdent: TableIdentifier,
                                         mode: SaveMode,
                                         options: Map[String, String],
                                         query: LogicalPlan)
-    extends RunnableCommand {
+    extends RunnableCommand
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     val df = Dataset.newDataFrame(sqlContext, query)
     val dataSource = DataSource(sqlContext,
                                 className = provider,
@@ -140,12 +135,10 @@ case class CreateTempTableUsingAsSelect(tableIdent: TableIdentifier,
         Dataset.newDataFrame(sqlContext, LogicalRelation(result)).logicalPlan)
 
     Seq.empty[Row]
-  }
-}
 
-case class RefreshTable(tableIdent: TableIdentifier) extends RunnableCommand {
+case class RefreshTable(tableIdent: TableIdentifier) extends RunnableCommand
 
-  override def run(sqlContext: SQLContext): Seq[Row] = {
+  override def run(sqlContext: SQLContext): Seq[Row] =
     // Refresh the given table's metadata first.
     sqlContext.sessionState.catalog.refreshTable(tableIdent)
 
@@ -156,7 +149,7 @@ case class RefreshTable(tableIdent: TableIdentifier) extends RunnableCommand {
     // Use lookupCachedData directly since RefreshTable also takes databaseName.
     val isCached =
       sqlContext.cacheManager.lookupCachedData(logicalPlan).nonEmpty
-    if (isCached) {
+    if (isCached)
       // Create a data frame to represent the table.
       // TODO: Use uncacheTable once it supports database name.
       val df = Dataset.newDataFrame(sqlContext, logicalPlan)
@@ -164,17 +157,14 @@ case class RefreshTable(tableIdent: TableIdentifier) extends RunnableCommand {
       sqlContext.cacheManager.tryUncacheQuery(df, blocking = true)
       // Cache it again.
       sqlContext.cacheManager.cacheQuery(df, Some(tableIdent.table))
-    }
 
     Seq.empty[Row]
-  }
-}
 
 /**
   * Builds a map in which keys are case insensitive
   */
 class CaseInsensitiveMap(map: Map[String, String])
-    extends Map[String, String] with Serializable {
+    extends Map[String, String] with Serializable
 
   val baseMap = map.map(kv => kv.copy(_1 = kv._1.toLowerCase))
 
@@ -186,4 +176,3 @@ class CaseInsensitiveMap(map: Map[String, String])
   override def iterator: Iterator[(String, String)] = baseMap.iterator
 
   override def -(key: String): Map[String, String] = baseMap - key.toLowerCase
-}

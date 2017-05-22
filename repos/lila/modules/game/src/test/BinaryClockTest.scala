@@ -8,7 +8,7 @@ import org.specs2.specification._
 
 import lila.db.ByteArray
 
-class BinaryClockTest extends Specification {
+class BinaryClockTest extends Specification
 
   val _0_ = "00000000"
   val since = org.joda.time.DateTime.now.minusHours(1)
@@ -23,22 +23,19 @@ class BinaryClockTest extends Specification {
       .clock(since)
       .read(BinaryFormat.clock(since) write c, false, false))(chess.White)
 
-  "binary Clock" should {
+  "binary Clock" should
     val clock = Clock(120, 2)
     val bits22 = List("00000010", "00000010")
-    "write" in {
-      write(clock) must_== {
+    "write" in
+      write(clock) must_==
         bits22 ::: List.fill(10)(_0_)
-      }
-      write(clock.giveTime(chess.White, 0.03f)) must_== {
+      write(clock.giveTime(chess.White, 0.03f)) must_==
         bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(7)(
             _0_)
-      }
-      write(clock.giveTime(chess.White, -0.03f)) must_== {
+      write(clock.giveTime(chess.White, -0.03f)) must_==
         bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(7)(
             _0_)
-      }
-      write(Clock(0, 3)) must_== {
+      write(Clock(0, 3)) must_==
         List("00000000",
              "00000011",
              "10000000",
@@ -47,22 +44,16 @@ class BinaryClockTest extends Specification {
              "10000000",
              "00000001",
              "00101100") ::: List.fill(4)(_0_)
-      }
-    }
-    "read" in {
-      read(bits22 ::: List.fill(11)(_0_)) must_== {
+    "read" in
+      read(bits22 ::: List.fill(11)(_0_)) must_==
         clock
-      }
       read(bits22 ::: List("10000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+              8)(_0_)) must_==
         clock.giveTime(chess.White, 0.03f)
-      }
       read(bits22 ::: List("00000000", "00000000", "00000011") ::: List.fill(
-              8)(_0_)) must_== {
+              8)(_0_)) must_==
         clock.giveTime(chess.White, -0.03f)
-      }
-    }
-    "isomorphism" in {
+    "isomorphism" in
 
       isomorphism(clock) must_== clock
 
@@ -75,9 +66,5 @@ class BinaryClockTest extends Specification {
       val c4 = clock.start
       isomorphism(c4).timerOption.get must beCloseTo(c4.timerOption.get, 1)
 
-      Clock(120, 60) |> { c =>
+      Clock(120, 60) |>  c =>
         isomorphism(c) must_== c
-      }
-    }
-  }
-}

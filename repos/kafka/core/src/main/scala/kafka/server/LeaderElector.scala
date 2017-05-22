@@ -22,7 +22,7 @@ import kafka.utils.Logging
   * This trait defines a leader elector If the existing leader is dead, this class will handle automatic
   * re-election and if it succeeds, it invokes the leader state change callback
   */
-trait LeaderElector extends Logging {
+trait LeaderElector extends Logging
   def startup
 
   def amILeader: Boolean
@@ -30,4 +30,3 @@ trait LeaderElector extends Logging {
   def elect: Boolean
 
   def close
-}

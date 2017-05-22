@@ -46,11 +46,10 @@ class ShortStringConverterSpec
                                                 ShortStringConverter](
         classOf[jfxuc.ShortStringConverter],
         classOf[ShortStringConverter],
-        classOf[Short]) {
+        classOf[Short])
 
   val examples = List((0.toShort, "0"),
                       (123.toShort, "123"),
                       (-123.toShort, "-123"),
                       (Short.MaxValue, Short.MaxValue.toString),
                       (Short.MinValue, Short.MinValue.toString))
-}

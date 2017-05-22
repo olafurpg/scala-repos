@@ -36,25 +36,23 @@ import Constants._
  * It has two primary modes, reading a SummerConstructor setting directly and using its contents, or via the legacy route.
  * Reading all the options internally.
  */
-object BuildSummer {
+object BuildSummer
   @transient private val logger = LoggerFactory.getLogger(BuildSummer.getClass)
 
-  def apply(storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
+  def apply(storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) =
     val opSummerConstructor = storm.get[SummerConstructor](dag, node).map(_._2)
     logger.debug(
         s"Node (${dag.getNodeName(node)}): Queried for SummerConstructor, got $opSummerConstructor")
 
-    opSummerConstructor match {
+    opSummerConstructor match
       case Some(cons) =>
         logger.debug(
             s"Node (${dag.getNodeName(node)}): Using user supplied SummerConstructor: $cons")
         cons.get
       case None => legacyBuilder(storm, dag, node, jobID)
-    }
-  }
 
   private[this] final def legacyBuilder(
-      storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) = {
+      storm: Storm, dag: Dag[Storm], node: StormNode, jobID: JobId) =
     val nodeName = dag.getNodeName(node)
     val cacheSize = storm.getOrElse(dag, node, DEFAULT_FM_CACHE)
     require(
@@ -70,16 +68,14 @@ object BuildSummer {
     val insertCounter = counter(jobID, Group(nodeName), Name("inserts"))
     val insertFailCounter = counter(jobID, Group(nodeName), Name("insertFail"))
 
-    if (cacheSize.lowerBound == 0) {
-      new SummerBuilder {
+    if (cacheSize.lowerBound == 0)
+      new SummerBuilder
         def getSummer[
             K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-            (K, V), Map[K, V]] = {
+            (K, V), Map[K, V]] =
           new com.twitter.algebird.util.summer.NullSummer[K, V](
               tupleInCounter, tupleOutCounter)
-        }
-      }
-    } else {
+    else
       val softMemoryFlush =
         storm.getOrElse(dag, node, DEFAULT_SOFT_MEMORY_FLUSH_PERCENT)
       logger.info(s"[$nodeName] softMemoryFlush : ${softMemoryFlush.get}")
@@ -90,11 +86,11 @@ object BuildSummer {
       val useAsyncCache = storm.getOrElse(dag, node, DEFAULT_USE_ASYNC_CACHE)
       logger.info(s"[$nodeName] useAsyncCache : ${useAsyncCache.get}")
 
-      if (!useAsyncCache.get) {
-        new SummerBuilder {
+      if (!useAsyncCache.get)
+        new SummerBuilder
           def getSummer[
               K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
+              (K, V), Map[K, V]] =
             new SyncSummingQueue[K, V](BufferSize(cacheSize.lowerBound),
                                        FlushFrequency(flushFrequency.get),
                                        MemoryFlushPercent(softMemoryFlush.get),
@@ -104,9 +100,7 @@ object BuildSummer {
                                        insertCounter,
                                        tupleInCounter,
                                        tupleOutCounter)
-          }
-        }
-      } else {
+      else
         val asyncPoolSize = storm.getOrElse(dag, node, DEFAULT_ASYNC_POOL_SIZE)
         logger.info(s"[$nodeName] asyncPoolSize : ${asyncPoolSize.get}")
 
@@ -115,10 +109,10 @@ object BuildSummer {
         logger.info(
             s"[$nodeName] valueCombinerCrushSize : ${valueCombinerCrushSize.get}")
 
-        new SummerBuilder {
+        new SummerBuilder
           def getSummer[
               K, V : Semigroup]: com.twitter.algebird.util.summer.AsyncSummer[
-              (K, V), Map[K, V]] = {
+              (K, V), Map[K, V]] =
             val executor = Executors.newFixedThreadPool(asyncPoolSize.get)
             val futurePool = FuturePool(executor)
             val summer = new AsyncListSum[K, V](
@@ -137,19 +131,11 @@ object BuildSummer {
                 CompactionSize(0))
             summer.withCleanup(
                 () =>
-                  {
-                Future {
+                Future
                   executor.shutdown
                   executor.awaitTermination(10, TimeUnit.SECONDS)
-                }
-            })
-          }
-        }
-      }
-    }
-  }
+            )
 
   def counter(jobID: JobId, nodeName: Group, counterName: Name) =
     new Counter(Group("summingbird." + nodeName.getString), counterName)(jobID)
     with Incrementor
-}

@@ -1,5 +1,4 @@
 package foo
 
-package object bar {
+package object bar
   case class Bippy(x: Int) {}
-}

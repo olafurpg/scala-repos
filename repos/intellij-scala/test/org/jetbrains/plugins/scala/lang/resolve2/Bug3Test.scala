@@ -1,9 +1,8 @@
 package org.jetbrains.plugins.scala.lang.resolve2
 
-class Bug3Test extends ResolveTestBase {
-  override def folderPath: String = {
+class Bug3Test extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "bug3/"
-  }
   def testSCL1707() { doTest() }
   def testSCL2073() { doTest() }
   def testSCL2109() { doTest() }
@@ -88,4 +87,3 @@ class Bug3Test extends ResolveTestBase {
   def testSOE() { doTest() }
   def testAccessiblePattern() { doTest() }
   def testConstructorNamedParameters() { doTest() }
-}

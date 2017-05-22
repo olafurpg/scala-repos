@@ -34,16 +34,15 @@ import scalafx.beans.property.ReadOnlyBooleanProperty
 import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 
-object Parent {
+object Parent
   implicit def sfxParent2jfx(v: Parent): jfxs.Parent =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/Parent.html]].
   */
 abstract class Parent(override val delegate: jfxs.Parent)
-    extends Node(delegate) with SFXDelegate[jfxs.Parent] {
+    extends Node(delegate) with SFXDelegate[jfxs.Parent]
 
   /**
     * Indicates that this Node and its subnodes requires a layout pass on the next pulse.
@@ -61,7 +60,5 @@ abstract class Parent(override val delegate: jfxs.Parent)
     *
     * @param c list of stylesheets URLs to replace prior content.
     */
-  def stylesheets_=(c: Iterable[String]) {
+  def stylesheets_=(c: Iterable[String])
     fillCollection(this.stylesheets, c)
-  }
-}

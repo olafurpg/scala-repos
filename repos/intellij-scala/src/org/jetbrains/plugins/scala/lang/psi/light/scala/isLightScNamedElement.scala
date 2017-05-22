@@ -8,9 +8,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScNamedElement
   * Nikolay.Tropin
   * 2014-08-15
   */
-object isLightScNamedElement {
+object isLightScNamedElement
   def unapply(lightElem: LightElement): Option[ScNamedElement] =
-    lightElem match {
+    lightElem match
       case light: ScLightBindingPattern => Some(light.b)
       case light: ScLightFieldId => Some(light.f)
       case light: ScLightFunctionDeclaration => Some(light.fun)
@@ -19,5 +19,3 @@ object isLightScNamedElement {
       case light: ScLightTypeAliasDeclaration => Some(light.ta)
       case light: ScLightTypeAliasDefinition => Some(light.ta)
       case _ => None
-    }
-}

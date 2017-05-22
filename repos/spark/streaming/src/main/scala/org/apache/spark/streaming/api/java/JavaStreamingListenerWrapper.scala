@@ -26,10 +26,10 @@ import org.apache.spark.streaming.scheduler._
   */
 private[streaming] class JavaStreamingListenerWrapper(
     javaStreamingListener: JavaStreamingListener)
-    extends StreamingListener {
+    extends StreamingListener
 
   private def toJavaReceiverInfo(
-      receiverInfo: ReceiverInfo): JavaReceiverInfo = {
+      receiverInfo: ReceiverInfo): JavaReceiverInfo =
     JavaReceiverInfo(
         receiverInfo.streamId,
         receiverInfo.name,
@@ -40,20 +40,18 @@ private[streaming] class JavaStreamingListenerWrapper(
         receiverInfo.lastError,
         receiverInfo.lastErrorTime
     )
-  }
 
   private def toJavaStreamInputInfo(
-      streamInputInfo: StreamInputInfo): JavaStreamInputInfo = {
+      streamInputInfo: StreamInputInfo): JavaStreamInputInfo =
     JavaStreamInputInfo(
         streamInputInfo.inputStreamId,
         streamInputInfo.numRecords: Long,
         streamInputInfo.metadata.asJava,
         streamInputInfo.metadataDescription.orNull
     )
-  }
 
   private def toJavaOutputOperationInfo(
-      outputOperationInfo: OutputOperationInfo): JavaOutputOperationInfo = {
+      outputOperationInfo: OutputOperationInfo): JavaOutputOperationInfo =
     JavaOutputOperationInfo(
         outputOperationInfo.batchTime,
         outputOperationInfo.id,
@@ -63,9 +61,8 @@ private[streaming] class JavaStreamingListenerWrapper(
         outputOperationInfo.endTime.getOrElse(-1),
         outputOperationInfo.failureReason.orNull
     )
-  }
 
-  private def toJavaBatchInfo(batchInfo: BatchInfo): JavaBatchInfo = {
+  private def toJavaBatchInfo(batchInfo: BatchInfo): JavaBatchInfo =
     JavaBatchInfo(
         batchInfo.batchTime,
         batchInfo.streamIdToInputInfo
@@ -82,64 +79,54 @@ private[streaming] class JavaStreamingListenerWrapper(
           .mapValues(toJavaOutputOperationInfo(_))
           .asJava
       )
-  }
 
   override def onReceiverStarted(
-      receiverStarted: StreamingListenerReceiverStarted): Unit = {
+      receiverStarted: StreamingListenerReceiverStarted): Unit =
     javaStreamingListener.onReceiverStarted(
         new JavaStreamingListenerReceiverStarted(
             toJavaReceiverInfo(receiverStarted.receiverInfo)))
-  }
 
   override def onReceiverError(
-      receiverError: StreamingListenerReceiverError): Unit = {
+      receiverError: StreamingListenerReceiverError): Unit =
     javaStreamingListener.onReceiverError(
         new JavaStreamingListenerReceiverError(
             toJavaReceiverInfo(receiverError.receiverInfo)))
-  }
 
   override def onReceiverStopped(
-      receiverStopped: StreamingListenerReceiverStopped): Unit = {
+      receiverStopped: StreamingListenerReceiverStopped): Unit =
     javaStreamingListener.onReceiverStopped(
         new JavaStreamingListenerReceiverStopped(
             toJavaReceiverInfo(receiverStopped.receiverInfo)))
-  }
 
   override def onBatchSubmitted(
-      batchSubmitted: StreamingListenerBatchSubmitted): Unit = {
+      batchSubmitted: StreamingListenerBatchSubmitted): Unit =
     javaStreamingListener.onBatchSubmitted(
         new JavaStreamingListenerBatchSubmitted(
             toJavaBatchInfo(batchSubmitted.batchInfo)))
-  }
 
   override def onBatchStarted(
-      batchStarted: StreamingListenerBatchStarted): Unit = {
+      batchStarted: StreamingListenerBatchStarted): Unit =
     javaStreamingListener.onBatchStarted(new JavaStreamingListenerBatchStarted(
             toJavaBatchInfo(batchStarted.batchInfo)))
-  }
 
   override def onBatchCompleted(
-      batchCompleted: StreamingListenerBatchCompleted): Unit = {
+      batchCompleted: StreamingListenerBatchCompleted): Unit =
     javaStreamingListener.onBatchCompleted(
         new JavaStreamingListenerBatchCompleted(
             toJavaBatchInfo(batchCompleted.batchInfo)))
-  }
 
   override def onOutputOperationStarted(
       outputOperationStarted: StreamingListenerOutputOperationStarted)
-    : Unit = {
+    : Unit =
     javaStreamingListener.onOutputOperationStarted(
         new JavaStreamingListenerOutputOperationStarted(
             toJavaOutputOperationInfo(
                 outputOperationStarted.outputOperationInfo)))
-  }
 
   override def onOutputOperationCompleted(
       outputOperationCompleted: StreamingListenerOutputOperationCompleted)
-    : Unit = {
+    : Unit =
     javaStreamingListener.onOutputOperationCompleted(
         new JavaStreamingListenerOutputOperationCompleted(
             toJavaOutputOperationInfo(
                 outputOperationCompleted.outputOperationInfo)))
-  }
-}

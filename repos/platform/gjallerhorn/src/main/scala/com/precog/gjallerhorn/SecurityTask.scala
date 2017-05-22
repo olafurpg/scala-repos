@@ -26,9 +26,9 @@ import org.specs2.mutable._
 import specs2._
 
 class SecurityTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
-  "security web service" should {
-    "create derivative apikeys" in {
+    extends Task(settings: Settings) with Specification
+  "security web service" should
+    "create derivative apikeys" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
 
       val req =
@@ -57,9 +57,8 @@ class SecurityTask(settings: Settings)
         (json \ "grants").children.flatMap(o => (o \ "permissions").children)
       perms.map(_ \ "accessType") must_== List(JString("write"))
       perms.map(_ \ "path") must_== List(JString("%sfoo/" format rootPath))
-    }
 
-    "list API keys" in {
+    "list API keys" in
       val account = createAccount
       val k1 = deriveAPIKey(account)
       val k2 = deriveAPIKey(account)
@@ -68,20 +67,17 @@ class SecurityTask(settings: Settings)
       val res = Http(req OK as.String)
       val json = JParser.parseFromString(res()).valueOr(throw _)
       val apiKeys =
-        json.children map { obj =>
+        json.children map  obj =>
           (obj \ "apiKey").deserialize[String]
-        }
       apiKeys must haveTheSameElementsAs(List(k1, k2, k3))
-    }
 
-    "delete API key" in {
+    "delete API key" in
       val account = createAccount
 
       deleteAPIKey(account.apiKey) must not(throwA[StatusCode])
       deriveAPIKey(account) must throwA[Exception]
-    }
 
-    "deleted child API keys are removed from API key listing" in {
+    "deleted child API keys are removed from API key listing" in
       val account = createAccount
       val k1 = deriveAPIKey(account)
       val k2 = deriveAPIKey(account)
@@ -93,19 +89,17 @@ class SecurityTask(settings: Settings)
       val res = Http(req OK as.String)
       val json = JParser.parseFromString(res()).valueOr(throw _)
       val apiKeys =
-        json.children map { obj =>
+        json.children map  obj =>
           (obj \ "apiKey").deserialize[String]
-        }
       apiKeys must haveTheSameElementsAs(List(k1, k3))
-    }
 
-    "list grants" in {
+    "list grants" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
-      listGrantsFor(apiKey, authApiKey = apiKey).jvalue must beLike {
+      listGrantsFor(apiKey, authApiKey = apiKey).jvalue must beLike
         case JArray(List(obj)) =>
-          val perms = (obj \ "permissions").children.map { o =>
+          val perms = (obj \ "permissions").children.map  o =>
             (o \ "path", o \ "ownerAccountIds", o \ "accessType")
-          }.toSet
+          .toSet
 
           perms must_== Set(
               (JString("/"),
@@ -115,10 +109,8 @@ class SecurityTask(settings: Settings)
               (JString(rootPath), JArray(Nil), JString("write")),
               (JString(rootPath), JArray(Nil), JString("delete"))
           )
-      }
-    }
 
-    "create a new grant" in {
+    "create a new grant" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
 
       val subPath = rootPath + "qux/"
@@ -132,9 +124,8 @@ class SecurityTask(settings: Settings)
 
       val grantId = (g \ "grantId").deserialize[String]
       (g \ "permissions") must_== JArray(p :: Nil)
-    }
 
-    "creating multiple grants works" in {
+    "creating multiple grants works" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
 
       val p = rootPath + text(3) + "/" + text(4) + "/"
@@ -143,9 +134,8 @@ class SecurityTask(settings: Settings)
 
       (g1 \ "grantId") must_!= (g2 \ "grantId")
       (g1 \ "permissions") must_== (g2 \ "permissions")
-    }
 
-    "add a grant to an api key" in {
+    "add a grant to an api key" in
       val Account(user1, pass1, accountId1, apiKey1, rootPath1) = createAccount
       val Account(user2, pass2, accountId2, apiKey2, rootPath2) = createAccount
 
@@ -159,9 +149,8 @@ class SecurityTask(settings: Settings)
       addToGrant(apiKey2, apiKey1, grantId).complete()
       listGrantsFor(apiKey2, authApiKey = apiKey1).jvalue.children must contain(
           g)
-    }
 
-    "remove a grant from an api key" in {
+    "remove a grant from an api key" in
       val Account(user1, pass1, accountId1, apiKey1, rootPath1) = createAccount
       val Account(user2, pass2, accountId2, apiKey2, rootPath2) = createAccount
 
@@ -178,25 +167,21 @@ class SecurityTask(settings: Settings)
       removeGrant(apiKey2, apiKey1, grantId).complete()
       listGrantsFor(apiKey2, authApiKey = apiKey1).jvalue.children must not(
           contain(g))
-    }
 
-    "describe a grant" in {
+    "describe a grant" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
       val p = rootPath + text(3) + "/" + text(3) + "/" + text(3)
       val g = createGrant(apiKey, ("read", p, accountId :: Nil) :: Nil).jvalue
       val gg =
         describeGrant(apiKey, (g \ "grantId").deserialize[String]).jvalue
       g must_== gg
-    }
 
-    "not describe invalid grants" in {
+    "not describe invalid grants" in
       val Account(user, pass, accountId, apiKey, rootPath) = createAccount
-      describeGrant(apiKey, "does not exist") must beLike {
+      describeGrant(apiKey, "does not exist") must beLike
         case ApiFailure(404, "\"Unable to find grant does not exist\"") => ok
-      }
-    }
 
-    "create child grants" in {
+    "create child grants" in
       val Account(user1, pass1, accountId1, apiKey1, rootPath1) = createAccount
       val Account(user2, pass2, accountId2, apiKey2, rootPath2) = createAccount
 
@@ -212,9 +197,8 @@ class SecurityTask(settings: Settings)
       val childId = (child \ "grantId").deserialize[String]
 
       describeGrant(apiKey1, childId).jvalue must_== child
-    }
 
-    "prevent illegal child grants #1" in {
+    "prevent illegal child grants #1" in
       val Account(user1, pass1, accountId1, apiKey1, rootPath1) = createAccount
       val Account(user2, pass2, accountId2, apiKey2, rootPath2) = createAccount
 
@@ -226,15 +210,13 @@ class SecurityTask(settings: Settings)
       val p2 = p + text(4) + "/"
       createChildGrant(apiKey2,
                        grantId,
-                       ("read", p2, accountId1 :: Nil) :: Nil) must beLike {
+                       ("read", p2, accountId1 :: Nil) :: Nil) must beLike
         case ApiFailure(
             400,
             "{\"error\":\"Requestor lacks permissions to create grant.\"}") =>
           ok
-      }
-    }
 
-    "prevent illegal child grants #2" in {
+    "prevent illegal child grants #2" in
       val Account(user1, pass1, accountId1, apiKey1, rootPath1) = createAccount
       val Account(user2, pass2, accountId2, apiKey2, rootPath2) = createAccount
 
@@ -247,16 +229,11 @@ class SecurityTask(settings: Settings)
       val p2 = p + text(4) + "/"
       createChildGrant(apiKey2,
                        grantId,
-                       ("read", p2, accountId2 :: Nil) :: Nil) must beLike {
+                       ("read", p2, accountId2 :: Nil) :: Nil) must beLike
         case ApiFailure(
             400,
             "{\"error\":\"Requestor lacks permissions to create grant.\"}") =>
           ok
-      }
-    }
-  }
-}
 
-object RunSecurity extends Runner {
+object RunSecurity extends Runner
   def tasks(settings: Settings) = new SecurityTask(settings) :: Nil
-}

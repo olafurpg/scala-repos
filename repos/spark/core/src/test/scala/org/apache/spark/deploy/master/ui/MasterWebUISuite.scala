@@ -33,29 +33,26 @@ import org.apache.spark.deploy.DeployTestUtils._
 import org.apache.spark.deploy.master._
 import org.apache.spark.rpc.RpcEnv
 
-class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
+class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter
 
   val masterPage = mock(classOf[MasterPage])
-  val master = {
+  val master =
     val conf = new SparkConf
     val securityMgr = new SecurityManager(conf)
     val rpcEnv =
       RpcEnv.create(Master.SYSTEM_NAME, "localhost", 0, conf, securityMgr)
     val master = new Master(rpcEnv, rpcEnv.address, 0, securityMgr, conf)
     master
-  }
   val masterWebUI = new MasterWebUI(
       master, 0, customMasterPage = Some(masterPage))
 
-  before {
+  before
     masterWebUI.bind()
-  }
 
-  after {
+  after
     masterWebUI.stop()
-  }
 
-  test("list applications") {
+  test("list applications")
     val worker = createWorkerInfo()
     val appDesc = createAppDesc()
     // use new start date so it isn't filtered by UI
@@ -93,5 +90,3 @@ class MasterWebUISuite extends SparkFunSuite with BeforeAndAfter {
     assert(firstApp \ "maxCores" === JInt(4))
     assert(firstApp \ "memoryPerExecutorMB" === JInt(1234))
     assert(firstApp \ "coresPerExecutor" === JNothing)
-  }
-}

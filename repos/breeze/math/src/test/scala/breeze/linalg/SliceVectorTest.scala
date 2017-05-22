@@ -6,9 +6,9 @@ import org.scalatest.FunSuite
   *
   * @author dlwh
   */
-class SliceVectorTest extends FunSuite {
+class SliceVectorTest extends FunSuite
 
-  test("basic slices of a counter") {
+  test("basic slices of a counter")
     val ctr = Counter('a -> 1, 'b -> 2, 'c -> 42)
     val v: Vector[Int] = ctr(Seq('c, 'b))
     assert(v(0) === 42)
@@ -18,9 +18,8 @@ class SliceVectorTest extends FunSuite {
     assert(ctr('c) === 10)
     ctr('b) = 1
     assert(v(1) === 1)
-  }
 
-  test("negative indexing tests") {
+  test("negative indexing tests")
 
     val tempDV = DenseVector(0, 1, 2, 3, 4, 5, 6)
     assert(tempDV(0 to 3) == DenseVector(0, 1, 2, 3),
@@ -39,11 +38,8 @@ class SliceVectorTest extends FunSuite {
            "Failed> tempDV( 4 to 0 by -2 ) = " + tempDV(4 to 0 by -2))
     assert(tempDV(-1) == 6, "Failed> tempDV( -1 ) = " + tempDV(-1))
     assert(tempDV(-7) == 0, "Failed> tempDV( -7 ) = " + tempDV(-7))
-  }
 
-  test("map on SliceVector") {
+  test("map on SliceVector")
     val tempDV = DenseVector(0, 1, 2, 3, 4, 5, 6)
     val slice = tempDV(IndexedSeq(6, 4, 3, 2, 5))
     assert(slice.mapValues(k => k * 2) === DenseVector(12, 8, 6, 4, 10))
-  }
-}

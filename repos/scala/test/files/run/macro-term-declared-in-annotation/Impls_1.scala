@@ -1,7 +1,7 @@
 import scala.reflect.macros.blackbox.Context
 
-object Impls {
-  def foo(c: Context) = {
+object Impls
+  def foo(c: Context) =
     import c.{prefix => prefix}
     import c.universe._
     val printPrefix = Apply(
@@ -10,5 +10,3 @@ object Impls {
     val body = Block(
         List(printPrefix), Literal(Constant("this is deprecated")))
     c.Expr[String](body)
-  }
-}

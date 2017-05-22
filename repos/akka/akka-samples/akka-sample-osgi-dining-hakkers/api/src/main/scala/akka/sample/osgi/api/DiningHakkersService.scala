@@ -17,7 +17,6 @@ package akka.sample.osgi.api
 
 import akka.actor.ActorRef
 
-trait DiningHakkersService {
+trait DiningHakkersService
   def getHakker(name: String, chairNumber: Int): ActorRef
   def getTracker(): ActorRef
-}

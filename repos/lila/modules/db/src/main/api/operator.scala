@@ -5,7 +5,7 @@ import play.api.libs.json._
 import reactivemongo.bson._
 
 object $operator extends $operator
-trait $operator {
+trait $operator
   import play.modules.reactivemongo.json._
 
   def $set[A : Writes](pairs: (String, A)*) =
@@ -22,9 +22,9 @@ trait $operator {
     Json.obj("$inc" -> Json.obj(wrap(pairs): _*))
   def $incBson(pairs: (String, Int)*) =
     BSONDocument(
-        "$inc" -> BSONDocument(pairs map {
+        "$inc" -> BSONDocument(pairs map
       case (k, v) => k -> BSONInteger(v)
-    }))
+    ))
   def $push[A : Writes](field: String, value: A) =
     Json.obj("$push" -> Json.obj(field -> value))
   def $pushSlice[A : Writes](field: String, value: A, max: Int) =
@@ -59,7 +59,5 @@ trait $operator {
   def $date(value: DateTime) = BSONFormats toJSON BSONDateTime(value.getMillis)
 
   private def wrap[K, V : Writes](
-      pairs: Seq[(K, V)]): Seq[(K, Json.JsValueWrapper)] = pairs map {
+      pairs: Seq[(K, V)]): Seq[(K, Json.JsValueWrapper)] = pairs map
     case (k, v) => k -> Json.toJsFieldJsValueWrapper(v)
-  }
-}

@@ -25,64 +25,56 @@ import java.io.{PrintStream, PrintWriter}
 class Performance(
     warmupDefaults: BenchmarkParameters = Performance.warmupDefaults,
     benchmarkDefaults: BenchmarkParameters = Performance.benchmarkDefaults,
-    profileDefaults: BenchmarkParameters = Performance.profileDefaults) {
+    profileDefaults: BenchmarkParameters = Performance.profileDefaults)
 
   def profile[T](
-      test: => T, profileParams: BenchmarkParameters = profileDefaults) = {
+      test: => T, profileParams: BenchmarkParameters = profileDefaults) =
     benchmarkOnly(test, profileParams)
-  }
 
   def benchmark[T](test: => T,
                    warmupParams: BenchmarkParameters = warmupDefaults,
                    benchmarkParams: BenchmarkParameters = benchmarkDefaults)
-    : BenchmarkResults[T] = {
+    : BenchmarkResults[T] =
     benchmarkOnly(test, warmupParams)
     benchmarkOnly(test, benchmarkParams)
-  }
 
   def benchmarkOnly[T](
       test: => T, parameters: BenchmarkParameters = benchmarkDefaults)
-    : BenchmarkResults[T] = {
+    : BenchmarkResults[T] =
 
     @tailrec
     def benchmark[A](
-        test: => A, result: BenchmarkResults[A]): BenchmarkResults[A] = {
-      if (result.testRuns < parameters.testRuns) {
+        test: => A, result: BenchmarkResults[A]): BenchmarkResults[A] =
+      if (result.testRuns < parameters.testRuns)
         val (t, r) = time(result.repCount, test)
         parameters.restBetweenTests foreach { Thread.sleep }
         benchmark(test, result.add(t, r))
-      } else {
+      else
         result
-      }
-    }
 
-    def attemptGC() = {
+    def attemptGC() =
       import System.gc
       gc; gc; gc; gc; gc;
       gc; gc; gc; gc; gc;
       gc
-    }
 
-    def repeatsRequired(reps: Int = 1): Int = {
+    def repeatsRequired(reps: Int = 1): Int =
       val (t, _) = time(reps, test)
-      if (t < parameters.runMillisGoal * 1000000L) {
+      if (t < parameters.runMillisGoal * 1000000L)
         repeatsRequired(reps * 2)
-      } else {
+      else
         reps
-      }
-    }
 
     def noop = ()
 
     val overhead =
-      if (parameters.calcOverhead) {
+      if (parameters.calcOverhead)
         val baseline = benchmark(
             noop,
             BenchmarkResults(0, 10, 0, Vector.empty[Long], Vector.empty[Unit]))
         baseline.meanRepTime()
-      } else {
+      else
         0.0
-      }
 
     benchmark(test,
               BenchmarkResults(0,
@@ -90,25 +82,20 @@ class Performance(
                                overhead,
                                Vector.empty[Long],
                                Vector.empty[T]))
-  }
 
-  def time[T](repeat: Int, f: => T): (Long, T) = {
-    def rep(r: Int = 0): T = {
-      if (r < repeat - 1) {
+  def time[T](repeat: Int, f: => T): (Long, T) =
+    def rep(r: Int = 0): T =
+      if (r < repeat - 1)
         f
         rep(r + 1)
-      } else {
+      else
         f
-      }
-    }
     val start = System.nanoTime()
     val r = rep()
     val t = System.nanoTime() - start
     (t, r)
-  }
-}
 
-object Performance {
+object Performance
 
   val warmupDefaults = BenchmarkParameters(10, 1000)
   val benchmarkDefaults = BenchmarkParameters(200, 1000)
@@ -118,13 +105,12 @@ object Performance {
   def apply(warmupDefaults: BenchmarkParameters = this.warmupDefaults,
             benchmarkDefaults: BenchmarkParameters = this.benchmarkDefaults) =
     new Performance(warmupDefaults, benchmarkDefaults)
-}
 
 case class BenchmarkResults[T](testRuns: Int,
                                repCount: Int,
                                baseline: Double,
                                timings: Vector[Long],
-                               results: Vector[T] = Vector.empty[T]) {
+                               results: Vector[T] = Vector.empty[T])
   def add(timing: Long, result: T): BenchmarkResults[T] =
     BenchmarkResults(
         testRuns + 1, repCount, baseline, timings :+ timing, results :+ result)
@@ -143,7 +129,7 @@ Measurement overhead:        %10.02f%%
 
   def report(out: PrintStream): Unit = report("test", out)
 
-  def report(label: String, out: PrintStream) {
+  def report(label: String, out: PrintStream)
     val maxIndex = testRuns - 1
     val mean = meanRepTime
     val p90 = ptile(0.9)
@@ -170,17 +156,12 @@ Measurement overhead:        %10.02f%%
             1 / ts(p99),
             baseline * 100.0 / mean
         ))
-  }
-  def ptile(p: Double): Int = {
+  def ptile(p: Double): Int =
     (p * (testRuns - 1)).toInt
-  }
-  def meanRepTime(): Double = {
+  def meanRepTime(): Double =
     val denom = timings.length * repCount * 1000000000.0
-    timings.foldLeft(0.0) {
+    timings.foldLeft(0.0)
       case (acc, el) => acc + (el / denom)
-    }
-  }
-}
 
 case class BenchmarkParameters(
     testRuns: Int,

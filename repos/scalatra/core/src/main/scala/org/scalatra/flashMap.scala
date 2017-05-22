@@ -17,7 +17,7 @@ import scala.collection.JavaConverters._
   *
   * @see FlashMapSupport
   */
-class FlashMap extends MutableMapWithIndifferentAccess[Any] with Serializable {
+class FlashMap extends MutableMapWithIndifferentAccess[Any] with Serializable
 
   private[this] val m = new ConcurrentHashMap[String, Any]().asScala
 
@@ -27,73 +27,63 @@ class FlashMap extends MutableMapWithIndifferentAccess[Any] with Serializable {
     * Removes an entry from the flash map.  It is no longer available for this
     * request or the next.
     */
-  def -=(key: String): FlashMap.this.type = {
+  def -=(key: String): FlashMap.this.type =
     m -= key
     this
-  }
 
   /**
     * Adds an entry to the flash map.  Clears the sweep flag for the key.
     */
-  def +=(kv: (String, Any)): FlashMap.this.type = {
+  def +=(kv: (String, Any)): FlashMap.this.type =
     flagged -= kv._1
     m += kv
     this
-  }
 
   /**
     * Creates a new iterator over the values of the flash map.  These are the
     * values that were added during the last request.
     */
-  def iterator = new Iterator[(String, Any)] {
+  def iterator = new Iterator[(String, Any)]
     private[this] val it = m.iterator
 
     def hasNext = it.hasNext
 
-    def next = {
+    def next =
       val kv = it.next
       flagged += kv._1
       kv
-    }
-  }
 
   /**
     * Returns the value associated with a key and flags it to be swept.
     */
-  def get(key: String): Option[Any] = {
+  def get(key: String): Option[Any] =
     flagged += key
     m.get(key)
-  }
 
   /**
     * Removes all flagged entries.
     */
-  def sweep(): Unit = {
-    flagged foreach { key =>
+  def sweep(): Unit =
+    flagged foreach  key =>
       m -= key
-    }
-  }
 
   /**
     * Clears all flags so no entries are removed on the next sweep.
     */
-  def keep(): Unit = {
+  def keep(): Unit =
     flagged.clear()
-  }
 
   /**
     * Clears the flag for the specified key so its entry is not removed on the next sweep.
     */
-  def keep(key: String): Unit = {
+  def keep(key: String): Unit =
     flagged -= key
-  }
 
   /**
     * Flags all current keys so the entire map is cleared on the next sweep.
     */
-  def flag(): Unit = {
+  def flag(): Unit =
     flagged ++= m.keys
-  }
 
   /**
     * Sets a value for the current request only.  It will be removed before the next request unless explicitly kept.
@@ -103,23 +93,19 @@ class FlashMap extends MutableMapWithIndifferentAccess[Any] with Serializable {
     * flash("notice") // "logged in succesfully"
     * }}}
     */
-  object now {
+  object now
 
-    def update(key: String, value: Any) = {
+    def update(key: String, value: Any) =
       flagged += key
       m += key -> value
-    }
-  }
-}
 
-object FlashMapSupport {
+object FlashMapSupport
 
   val SessionKey = FlashMapSupport.getClass.getName + ".flashMap"
 
   val LockKey = FlashMapSupport.getClass.getName + ".lock"
 
   val FlashMapKey = "org.scalatra.FlashMap"
-}
 
 /**
   * Allows an action to set key-value pairs in a transient state that is accessible only to the next action and is expired immediately after that.
@@ -137,18 +123,18 @@ object FlashMapSupport {
   * }}}
   * @see FlashMap
   */
-trait FlashMapSupport extends Handler {
+trait FlashMapSupport extends Handler
   this: ScalatraBase =>
 
   import org.scalatra.FlashMapSupport._
 
   abstract override def handle(
-      req: HttpServletRequest, res: HttpServletResponse): Unit = {
-    withRequest(req) {
+      req: HttpServletRequest, res: HttpServletResponse): Unit =
+    withRequest(req)
       val f = flash
       val isOutermost = !request.contains(LockKey)
 
-      ScalatraBase onCompleted { _ =>
+      ScalatraBase onCompleted  _ =>
         /*
          * http://github.com/scalatra/scalatra/issues/41
          * http://github.com/scalatra/scalatra/issues/57
@@ -156,48 +142,38 @@ trait FlashMapSupport extends Handler {
          * Only the outermost FlashMapSupport sweeps it at the end.
          * This deals with both nested filters and redirects to other servlets.
          */
-        if (isOutermost) {
+        if (isOutermost)
           f.sweep()
-        }
         flashMapSetSession(f)
-      }
 
-      if (isOutermost) {
+      if (isOutermost)
         req(LockKey) = "locked"
-        if (sweepUnusedFlashEntries(req)) {
+        if (sweepUnusedFlashEntries(req))
           f.flag()
-        }
-      }
 
       super.handle(req, res)
-    }
-  }
 
   /**
     * Override to implement custom session retriever, or sanity checks if session is still active
     * @param f
     */
-  def flashMapSetSession(f: FlashMap): Unit = {
-    try {
+  def flashMapSetSession(f: FlashMap): Unit =
+    try
       // Save flashMap to Session after (a session could stop existing during a request, so catch exception)
       session(SessionKey) = f
-    } catch {
+    catch
       case e: Throwable =>
-    }
-  }
 
   private[this] def getFlash(req: HttpServletRequest): FlashMap =
-    req.get(SessionKey).map(_.asInstanceOf[FlashMap]).getOrElse {
+    req.get(SessionKey).map(_.asInstanceOf[FlashMap]).getOrElse
       val map = session
         .get(SessionKey)
-        .map {
+        .map
           _.asInstanceOf[FlashMap]
-        }
         .getOrElse(new FlashMap)
 
       req.setAttribute(SessionKey, map)
       map
-    }
 
   /**
     * Returns the [[org.scalatra.FlashMap]] instance for the current request.
@@ -212,4 +188,3 @@ trait FlashMapSupport extends Handler {
     */
   protected def sweepUnusedFlashEntries(req: HttpServletRequest): Boolean =
     false
-}

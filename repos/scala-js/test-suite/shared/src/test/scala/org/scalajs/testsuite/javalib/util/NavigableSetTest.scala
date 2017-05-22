@@ -17,11 +17,11 @@ import org.scalajs.testsuite.javalib.util.concurrent.ConcurrentSkipListSetFactor
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 
-trait NavigableSetTest extends SetTest {
+trait NavigableSetTest extends SetTest
 
   def factory: NavigableSetFactory
 
-  @Test def `should_retrieve_ceiling(ordered)_elements`(): Unit = {
+  @Test def `should_retrieve_ceiling(ordered)_elements`(): Unit =
     val lInt = asJavaCollection(Set(1, 5, 2, 3, 4))
     val nsInt = factory.empty[Int]
 
@@ -42,9 +42,8 @@ trait NavigableSetTest extends SetTest {
     assertEquals("a", nsString.ceiling("a"))
     assertEquals("d", nsString.ceiling("d"))
     assertNull(nsString.ceiling("z"))
-  }
 
-  @Test def `should_retrieve_floor(ordered)_elements`(): Unit = {
+  @Test def `should_retrieve_floor(ordered)_elements`(): Unit =
     val lInt = asJavaCollection(Set(1, 5, 2, 3, 4))
     val nsInt = factory.empty[Int]
 
@@ -65,9 +64,8 @@ trait NavigableSetTest extends SetTest {
     assertEquals("b", nsString.floor("b"))
     assertEquals("a", nsString.floor("a"))
     assertNull(nsString.floor("0"))
-  }
 
-  @Test def `should_retrieve_higher(ordered)_elements`(): Unit = {
+  @Test def `should_retrieve_higher(ordered)_elements`(): Unit =
     val lInt = asJavaCollection(Set(1, 5, 2, 3, 4))
     val nsInt = factory.empty[Int]
 
@@ -88,9 +86,8 @@ trait NavigableSetTest extends SetTest {
     assertEquals("c", nsString.higher("b"))
     assertEquals("b", nsString.higher("a"))
     assertEquals("a", nsString.higher("0"))
-  }
 
-  @Test def `should_retrieve_lower(ordered)_elements`(): Unit = {
+  @Test def `should_retrieve_lower(ordered)_elements`(): Unit =
     val lInt = asJavaCollection(Set(1, 5, 2, 3, 4))
     val nsInt = factory.empty[Int]
 
@@ -111,9 +108,8 @@ trait NavigableSetTest extends SetTest {
     assertEquals("a", nsString.lower("b"))
     assertNull(nsString.lower("a"))
     assertNull(nsString.lower("0"))
-  }
 
-  @Test def should_poll_first_and_last_elements(): Unit = {
+  @Test def should_poll_first_and_last_elements(): Unit =
     val lInt = asJavaCollection(Set(1, 5, 2, 3, 4))
     val ns = factory.empty[Int]
 
@@ -127,14 +123,10 @@ trait NavigableSetTest extends SetTest {
     assertEquals(4, ns.pollLast())
     assertEquals(3, ns.pollFirst())
     assertTrue(ns.isEmpty())
-  }
-}
 
-object NavigableSetFactory {
+object NavigableSetFactory
   def allFactories: Iterator[NavigableSetFactory] =
     ConcurrentSkipListSetFactory.allFactories
-}
 
-trait NavigableSetFactory extends SetFactory {
+trait NavigableSetFactory extends SetFactory
   def empty[E : ClassTag]: ju.NavigableSet[E]
-}

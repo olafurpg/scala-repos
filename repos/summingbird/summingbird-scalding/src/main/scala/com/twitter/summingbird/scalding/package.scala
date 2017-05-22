@@ -27,7 +27,7 @@ import com.twitter.summingbird
 import com.twitter.summingbird.batch.Timestamp
 import org.apache.hadoop.io.Writable
 
-package object scalding {
+package object scalding
 
   /** How we represent the streams in scalding */
   type TimedPipe[+T] = TypedPipe[(Timestamp, T)]
@@ -73,11 +73,9 @@ package object scalding {
   implicit def toPipeFactoryOps[T](pipeF: PipeFactory[T]) =
     new PipeFactoryOps(pipeF)
 
-  def toTry(e: Throwable, msg: String = ""): Try[Nothing] = {
+  def toTry(e: Throwable, msg: String = ""): Try[Nothing] =
     val writer = new java.io.StringWriter
     val printWriter = new java.io.PrintWriter(writer)
     e.printStackTrace(printWriter)
     printWriter.flush
     Left(List(msg + writer.toString))
-  }
-}

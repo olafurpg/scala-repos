@@ -26,7 +26,7 @@ package mutable
     "Comprehensive synchronization via selective overriding of methods is inherently unreliable.  Consider java.util.concurrent.ConcurrentSkipListSet as an alternative.",
     "2.11.0")
 class SynchronizedPriorityQueue[A](implicit ord: Ordering[A])
-    extends PriorityQueue[A] {
+    extends PriorityQueue[A]
 
   /** Checks if the queue is empty.
     *
@@ -38,23 +38,19 @@ class SynchronizedPriorityQueue[A](implicit ord: Ordering[A])
     *
     *  @param  elem        the element to insert
     */
-  override def +=(elem: A): this.type = {
-    synchronized {
+  override def +=(elem: A): this.type =
+    synchronized
       super.+=(elem)
-    }
     this
-  }
 
   /** Adds all elements of a traversable object into the priority queue.
     *
     *  @param  xs        a traversable object
     */
-  override def ++=(xs: TraversableOnce[A]): this.type = {
-    synchronized {
+  override def ++=(xs: TraversableOnce[A]): this.type =
+    synchronized
       super.++=(xs)
-    }
     this
-  }
 
   /** Adds all elements to the queue.
     *
@@ -99,4 +95,3 @@ class SynchronizedPriorityQueue[A](implicit ord: Ordering[A])
     *  @return the string representation of this queue.
     */
   override def toString(): String = synchronized { super.toString() }
-}

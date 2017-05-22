@@ -21,7 +21,7 @@ import scala.collection.immutable
 import akka.parboiled2.support._
 import akka.shapeless._
 
-trait RuleDSLCombinators {
+trait RuleDSLCombinators
 
   /**
     * Runs its inner rule and succeeds even if the inner rule doesn't.
@@ -96,7 +96,7 @@ trait RuleDSLCombinators {
   implicit def int2NTimes(i: Int): NTimes = `n/a`
   @compileTimeOnly("Calls to `range2NTimes` must be inside `rule` macro")
   implicit def range2NTimes(range: Range): NTimes = `n/a`
-  sealed trait NTimes {
+  sealed trait NTimes
 
     /**
       * Repeats the given sub rule `r` the given number of times.
@@ -112,13 +112,10 @@ trait RuleDSLCombinators {
     def times[I <: HList, O <: HList](
         r: Rule[I, O])(implicit s: Lifter[immutable.Seq, I, O])
       : Rule[s.In, s.StrictOut] with Repeated
-  }
 
   @compileTimeOnly(
       "Calls to `rule2WithSeparatedBy` constructor must be inside `rule` macro")
   implicit def rule2WithSeparatedBy[I <: HList, O <: HList](
       r: Rule[I, O] with Repeated): WithSeparatedBy[I, O] = `n/a`
-  trait WithSeparatedBy[I <: HList, O <: HList] {
+  trait WithSeparatedBy[I <: HList, O <: HList]
     def separatedBy(separator: Rule0): Rule[I, O] = `n/a`
-  }
-}

@@ -25,12 +25,12 @@ import scala.xml.Node
 
 import org.apache.commons.lang3.StringEscapeUtils
 
-private[streaming] object UIUtils {
+private[streaming] object UIUtils
 
   /**
     * Return the short string for a `TimeUnit`.
     */
-  def shortTimeUnitString(unit: TimeUnit): String = unit match {
+  def shortTimeUnitString(unit: TimeUnit): String = unit match
     case TimeUnit.NANOSECONDS => "ns"
     case TimeUnit.MICROSECONDS => "us"
     case TimeUnit.MILLISECONDS => "ms"
@@ -38,38 +38,32 @@ private[streaming] object UIUtils {
     case TimeUnit.MINUTES => "min"
     case TimeUnit.HOURS => "hrs"
     case TimeUnit.DAYS => "days"
-  }
 
   /**
     * Find the best `TimeUnit` for converting milliseconds to a friendly string. Return the value
     * after converting, also with its TimeUnit.
     */
-  def normalizeDuration(milliseconds: Long): (Double, TimeUnit) = {
-    if (milliseconds < 1000) {
+  def normalizeDuration(milliseconds: Long): (Double, TimeUnit) =
+    if (milliseconds < 1000)
       return (milliseconds, TimeUnit.MILLISECONDS)
-    }
     val seconds = milliseconds.toDouble / 1000
-    if (seconds < 60) {
+    if (seconds < 60)
       return (seconds, TimeUnit.SECONDS)
-    }
     val minutes = seconds / 60
-    if (minutes < 60) {
+    if (minutes < 60)
       return (minutes, TimeUnit.MINUTES)
-    }
     val hours = minutes / 60
-    if (hours < 24) {
+    if (hours < 24)
       return (hours, TimeUnit.HOURS)
-    }
     val days = hours / 24
     (days, TimeUnit.DAYS)
-  }
 
   /**
     * Convert `milliseconds` to the specified `unit`. We cannot use `TimeUnit.convert` because it
     * will discard the fractional part.
     */
   def convertToTimeUnit(milliseconds: Long, unit: TimeUnit): Double =
-    unit match {
+    unit match
       case TimeUnit.NANOSECONDS => milliseconds * 1000 * 1000
       case TimeUnit.MICROSECONDS => milliseconds * 1000
       case TimeUnit.MILLISECONDS => milliseconds
@@ -77,19 +71,16 @@ private[streaming] object UIUtils {
       case TimeUnit.MINUTES => milliseconds / 1000.0 / 60.0
       case TimeUnit.HOURS => milliseconds / 1000.0 / 60.0 / 60.0
       case TimeUnit.DAYS => milliseconds / 1000.0 / 60.0 / 60.0 / 24.0
-    }
 
   // SimpleDateFormat is not thread-safe. Don't expose it to avoid improper use.
-  private val batchTimeFormat = new ThreadLocal[SimpleDateFormat]() {
+  private val batchTimeFormat = new ThreadLocal[SimpleDateFormat]()
     override def initialValue(): SimpleDateFormat =
       new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-  }
 
   private val batchTimeFormatWithMilliseconds =
-    new ThreadLocal[SimpleDateFormat]() {
+    new ThreadLocal[SimpleDateFormat]()
       override def initialValue(): SimpleDateFormat =
         new SimpleDateFormat("yyyy/MM/dd HH:mm:ss.SSS")
-    }
 
   /**
     * If `batchInterval` is less than 1 second, format `batchTime` with milliseconds. Otherwise,
@@ -104,69 +95,59 @@ private[streaming] object UIUtils {
   def formatBatchTime(batchTime: Long,
                       batchInterval: Long,
                       showYYYYMMSS: Boolean = true,
-                      timezone: TimeZone = null): String = {
+                      timezone: TimeZone = null): String =
     val oldTimezones = (batchTimeFormat.get.getTimeZone,
                         batchTimeFormatWithMilliseconds.get.getTimeZone)
-    if (timezone != null) {
+    if (timezone != null)
       batchTimeFormat.get.setTimeZone(timezone)
       batchTimeFormatWithMilliseconds.get.setTimeZone(timezone)
-    }
-    try {
+    try
       val formattedBatchTime =
-        if (batchInterval < 1000) {
+        if (batchInterval < 1000)
           batchTimeFormatWithMilliseconds.get.format(batchTime)
-        } else {
+        else
           // If batchInterval >= 1 second, don't show milliseconds
           batchTimeFormat.get.format(batchTime)
-        }
-      if (showYYYYMMSS) {
+      if (showYYYYMMSS)
         formattedBatchTime
-      } else {
+      else
         formattedBatchTime.substring(formattedBatchTime.indexOf(' ') + 1)
-      }
-    } finally {
-      if (timezone != null) {
+    finally
+      if (timezone != null)
         batchTimeFormat.get.setTimeZone(oldTimezones._1)
         batchTimeFormatWithMilliseconds.get.setTimeZone(oldTimezones._2)
-      }
-    }
-  }
 
-  def createOutputOperationFailureForUI(failure: String): String = {
-    if (failure.startsWith("org.apache.spark.Spark")) {
+  def createOutputOperationFailureForUI(failure: String): String =
+    if (failure.startsWith("org.apache.spark.Spark"))
       // SparkException or SparkDriverExecutionException
       "Failed due to Spark job error\n" + failure
-    } else {
+    else
       var nextLineIndex = failure.indexOf("\n")
-      if (nextLineIndex < 0) {
+      if (nextLineIndex < 0)
         nextLineIndex = failure.length
-      }
       val firstLine = failure.substring(0, nextLineIndex)
       s"Failed due to error: $firstLine\n$failure"
-    }
-  }
 
   def failureReasonCell(
       failureReason: String,
       rowspan: Int = 1,
-      includeFirstLineInExpandDetails: Boolean = true): Seq[Node] = {
+      includeFirstLineInExpandDetails: Boolean = true): Seq[Node] =
     val isMultiline = failureReason.indexOf('\n') >= 0
     // Display the first line by default
     val failureReasonSummary = StringEscapeUtils.escapeHtml4(
-        if (isMultiline) {
+        if (isMultiline)
       failureReason.substring(0, failureReason.indexOf('\n'))
-    } else {
+    else
       failureReason
-    })
+    )
     val failureDetails =
-      if (isMultiline && !includeFirstLineInExpandDetails) {
+      if (isMultiline && !includeFirstLineInExpandDetails)
         // Skip the first line
         failureReason.substring(failureReason.indexOf('\n') + 1)
-      } else {
+      else
         failureReason
-      }
     val details =
-      if (isMultiline) {
+      if (isMultiline)
         // scalastyle:off
         <span onclick="this.parentNode.querySelector('.stacktrace-details').classList.toggle('collapsed')"
             class="expand-details">
@@ -175,16 +156,12 @@ private[streaming] object UIUtils {
           <pre>{failureDetails}</pre>
         </div>
         // scalastyle:on
-      } else {
+      else
         ""
-      }
 
-    if (rowspan == 1) {
+    if (rowspan == 1)
       <td valign="middle" style="max-width: 300px">{failureReasonSummary}{details}</td>
-    } else {
+    else
       <td valign="middle" style="max-width: 300px" rowspan={rowspan.toString}>
         {failureReasonSummary}{details}
       </td>
-    }
-  }
-}

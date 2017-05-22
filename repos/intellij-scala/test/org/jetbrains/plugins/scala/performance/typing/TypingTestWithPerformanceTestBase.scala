@@ -14,8 +14,8 @@ import org.jetbrains.plugins.scala.util.TestUtils
   * Author: Svyatoslav Ilinskiy
   * Date: 10/29/15.
   */
-abstract class TypingTestWithPerformanceTestBase extends ScalaFixtureTestCase {
-  def doTest(stringsToType: List[String], timeoutInMillis: Int) {
+abstract class TypingTestWithPerformanceTestBase extends ScalaFixtureTestCase
+  def doTest(stringsToType: List[String], timeoutInMillis: Int)
     val fileName = getTestName(true) + ".test"
     val filePath = folderPath + fileName
     val ioFile = new File(filePath)
@@ -26,23 +26,18 @@ abstract class TypingTestWithPerformanceTestBase extends ScalaFixtureTestCase {
     PlatformTestUtil
       .startPerformanceTest("TypingTest" + getTestName(false),
                             timeoutInMillis,
-                            new ThrowableRunnable[Nothing] {
-                              override def run(): Unit = {
+                            new ThrowableRunnable[Nothing]
+                              override def run(): Unit =
                                 stringsToType.foreach(myFixture.`type`)
-                              }
-                            })
+                            )
       .ioBound()
       .assertTiming()
-  }
 
   protected def folderPath: String = TestUtils.getTestDataPath + "/typing/"
 
-  protected def separateText(fileText: String): (String, Option[String]) = {
-    fileText.indexOf("-----") match {
+  protected def separateText(fileText: String): (String, Option[String]) =
+    fileText.indexOf("-----") match
       case -1 => (fileText, None)
       case other =>
         val (before, after) = fileText.splitAt(other)
         (before, Some(after.dropWhile(c => c == '-' || c == '\n')))
-    }
-  }
-}

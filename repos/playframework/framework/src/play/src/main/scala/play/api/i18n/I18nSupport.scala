@@ -18,7 +18,7 @@ import play.api.mvc.{RequestHeader, Result}
   *   }
   * }}}
   */
-trait I18nSupport extends I18NSupportLowPriorityImplicits {
+trait I18nSupport extends I18NSupportLowPriorityImplicits
 
   /** The [[MessagesApi]] to use. */
   def messagesApi: MessagesApi
@@ -32,7 +32,7 @@ trait I18nSupport extends I18NSupportLowPriorityImplicits {
   /**
     * Adds convenient methods to handle the client-side language
     */
-  implicit class ResultWithLang(result: Result) {
+  implicit class ResultWithLang(result: Result)
 
     /**
       * Sets the user's language permanently for future requests by storing it in a cookie.
@@ -61,10 +61,8 @@ trait I18nSupport extends I18NSupportLowPriorityImplicits {
       */
     def clearingLang: Result =
       messagesApi.clearLang(result)
-  }
-}
 
-trait I18NSupportLowPriorityImplicits {
+trait I18NSupportLowPriorityImplicits
   this: I18nSupport =>
 
   /**
@@ -72,4 +70,3 @@ trait I18NSupportLowPriorityImplicits {
     */
   implicit def lang2Messages(implicit lang: Lang): Messages =
     Messages(lang, messagesApi)
-}

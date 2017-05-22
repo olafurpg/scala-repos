@@ -1,3 +1,2 @@
-object Test extends App {
+object Test extends App
   println(implicitly[Complex[Foo]])
-}

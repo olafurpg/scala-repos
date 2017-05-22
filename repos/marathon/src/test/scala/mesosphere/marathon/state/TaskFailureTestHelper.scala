@@ -2,7 +2,7 @@ package mesosphere.marathon.state
 
 import org.apache.mesos.{Protos => mesos}
 
-object TaskFailureTestHelper {
+object TaskFailureTestHelper
   lazy val taskFailure = TaskFailure(
       appId = PathId("/group/app"),
       taskId = mesos.TaskID.newBuilder.setValue("group_app-12345").build,
@@ -12,4 +12,3 @@ object TaskFailureTestHelper {
       version = Timestamp(1000),
       timestamp = Timestamp(2000)
   )
-}

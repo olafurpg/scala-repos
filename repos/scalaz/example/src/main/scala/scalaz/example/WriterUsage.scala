@@ -1,6 +1,6 @@
 package scalaz.example
 
-object WriterUsage extends App {
+object WriterUsage extends App
 
   import scalaz._
   import std.list._
@@ -13,7 +13,7 @@ object WriterUsage extends App {
   case class Person(name: String, age: Int, address: Option[Address] = None)
   case class Address(street: String, city: String)
 
-  val drWatson = for {
+  val drWatson = for
     watson <- Person("Watson", 40).set(List("Create Watson"))
     address <- Address("Baker Street", "London").set(List("Create address."))
     _ <- List(
@@ -21,7 +21,7 @@ object WriterUsage extends App {
     moveWatson <- watson
       .copy(address = Some(address))
       .set(List("Move to new address."))
-  } yield moveWatson
+  yield moveWatson
 
   // print log
   drWatson.written.map(println)
@@ -29,13 +29,13 @@ object WriterUsage extends App {
   // get value
   drWatson.value.map(println)
 
-  val sherlockHolmes = for {
+  val sherlockHolmes = for
     holmes <- Person("Holmes", 40).set(List("Create Holmes"))
     address <- Address("Baker Street", "London").set(List("Create address."))
     moveHolmes <- holmes
       .copy(address = Some(address))
       .set(List("Move to new address."))
-  } yield (moveHolmes)
+  yield (moveHolmes)
 
   // map lets you map over the value side
   val mapValue: Logger[Option[Address]] = sherlockHolmes.map(x => x.address)
@@ -47,9 +47,8 @@ object WriterUsage extends App {
   mapWritten.written.map(println)
 
   // with mapValue you can map over both sides
-  val mValue: Logger[Option[Address]] = sherlockHolmes.mapValue {
+  val mValue: Logger[Option[Address]] = sherlockHolmes.mapValue
     case (log, p) => (log :+ "Extracting address", p.address)
-  }
   mValue.written.map(println)
 
   // with :++> you can append to the log side of things
@@ -59,9 +58,8 @@ object WriterUsage extends App {
 
   // with :++>> you can append using a function
   val resultFappend: Logger[Person] =
-    sherlockHolmes :++>> { x =>
+    sherlockHolmes :++>>  x =>
       List("Finished", "--- new Person " + x + " ready ---")
-    }
   resultFappend.written.map(println)
 
   // <++: and <<++: work like :++>, :++>> only to prepend information
@@ -74,8 +72,6 @@ object WriterUsage extends App {
   logNoGood.written.map(println)
 
   // Writer is an applicative, you can easily combine different results.
-  val combined: Logger[List[Person]] = (sherlockHolmes |@| drWatson) {
+  val combined: Logger[List[Person]] = (sherlockHolmes |@| drWatson)
     List(_) |+| List(_)
-  }
   combined.written.map(println)
-}

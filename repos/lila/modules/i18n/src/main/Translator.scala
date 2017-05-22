@@ -4,7 +4,7 @@ import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
 import play.twirl.api.Html
 
-private[i18n] final class Translator(messages: Messages, pool: I18nPool) {
+private[i18n] final class Translator(messages: Messages, pool: I18nPool)
 
   private val defaultMessages =
     messages.get("default") err "No default messages"
@@ -22,24 +22,21 @@ private[i18n] final class Translator(messages: Messages, pool: I18nPool) {
     messages get lang.code flatMap (_ get key)
 
   private def defaultTranslation(key: String, args: Seq[Any]): Option[String] =
-    defaultMessages get key flatMap { pattern =>
+    defaultMessages get key flatMap  pattern =>
       formatTranslation(key, pattern, args)
-    }
 
   private def translate(key: String, args: Seq[Any])(
       lang: Lang): Option[String] =
     if (lang.language == pool.default.language) defaultTranslation(key, args)
     else
-      messages get lang.code flatMap (_ get key) flatMap { pattern =>
+      messages get lang.code flatMap (_ get key) flatMap  pattern =>
         formatTranslation(key, pattern, args)
-      } orElse defaultTranslation(key, args)
+      orElse defaultTranslation(key, args)
 
   private def formatTranslation(key: String, pattern: String, args: Seq[Any]) =
-    try {
+    try
       Some(if (args.isEmpty) pattern else pattern.format(args: _*))
-    } catch {
+    catch
       case e: Exception =>
         logger.warn(s"Failed to translate $key -> $pattern ($args)", e)
         None
-    }
-}

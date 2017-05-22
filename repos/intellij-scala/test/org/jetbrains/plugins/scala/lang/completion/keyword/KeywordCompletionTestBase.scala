@@ -18,12 +18,12 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaNamesUtil
   * @author Alexander Podkhalyuzin
   */
 abstract class KeywordCompletionTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val caretMarker = "/*caret*/"
 
   def folderPath: String = baseRootPath() + "keywordCompletion/"
 
-  protected def doTest() {
+  protected def doTest()
     import org.junit.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -57,13 +57,10 @@ abstract class KeywordCompletionTestBase
 
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
-    }
     assertEquals(output, res.trim)
-  }
-}

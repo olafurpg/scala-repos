@@ -17,7 +17,6 @@
 package kafka.common
 
 class ControllerMovedException(message: String, cause: Throwable)
-    extends RuntimeException(message, cause) {
+    extends RuntimeException(message, cause)
   def this(message: String) = this(message, null)
   def this() = this(null, null)
-}

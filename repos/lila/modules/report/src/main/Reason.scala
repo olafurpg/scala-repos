@@ -1,11 +1,10 @@
 package lila.report
 
-sealed trait Reason {
+sealed trait Reason
 
   def name = toString.toLowerCase
-}
 
-object Reason {
+object Reason
 
   case object Cheat extends Reason
   case object CheatPrint extends Reason
@@ -18,9 +17,8 @@ object Reason {
 
   val all = List(Cheat, CheatPrint, Insult, Troll, Boost, Other)
   val names = all map (_.name)
-  val byName = all map { v =>
+  val byName = all map  v =>
     (v.name, v)
-  } toMap
+  toMap
 
   def apply(name: String): Option[Reason] = byName get name
-}

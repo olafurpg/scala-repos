@@ -21,7 +21,7 @@ package algebra
   * false     true        = 1.0     (corresponds to x > y)
   *
   */
-trait PartialOrder[@sp A] extends Any with Eq[A] { self =>
+trait PartialOrder[@sp A] extends Any with Eq[A]  self =>
 
   /** Result of comparing `x` with `y`. Returns NaN if operands
     * are not comparable. If operands are comparable, returns a
@@ -39,26 +39,23 @@ trait PartialOrder[@sp A] extends Any with Eq[A] { self =>
     * - zero     iff `x == y`
     * - positive iff `x > y`
     */
-  def tryCompare(x: A, y: A): Option[Int] = {
+  def tryCompare(x: A, y: A): Option[Int] =
     val c = partialCompare(x, y)
     if (c.isNaN) None else Some(c.signum)
-  }
 
   /** Returns Some(x) if x <= y, Some(y) if x > y, otherwise None. */
-  def pmin(x: A, y: A): Option[A] = {
+  def pmin(x: A, y: A): Option[A] =
     val c = partialCompare(x, y)
     if (c <= 0) Some(x)
     else if (c > 0) Some(y)
     else None
-  }
 
   /** Returns Some(x) if x >= y, Some(y) if x < y, otherwise None. */
-  def pmax(x: A, y: A): Option[A] = {
+  def pmax(x: A, y: A): Option[A] =
     val c = partialCompare(x, y)
     if (c >= 0) Some(x)
     else if (c < 0) Some(y)
     else None
-  }
 
   // The following should be overriden in priority for performance
   def eqv(x: A, y: A): Boolean = partialCompare(x, y) == 0
@@ -79,43 +76,36 @@ trait PartialOrder[@sp A] extends Any with Eq[A] { self =>
     * Defines a partial order on `A` where all arrows switch direction.
     */
   def reverse: PartialOrder[A] = new ReversedPartialOrder(this)
-}
 
 private[algebra] class MappedPartialOrder[@sp A, @sp B](
     partialOrder: PartialOrder[B])(f: A => B)
-    extends PartialOrder[A] {
+    extends PartialOrder[A]
   def partialCompare(x: A, y: A): Double =
     partialOrder.partialCompare(f(x), f(y))
-}
 
 private[algebra] class ReversedPartialOrder[@sp A](
     partialOrder: PartialOrder[A])
-    extends PartialOrder[A] {
+    extends PartialOrder[A]
   def partialCompare(x: A, y: A): Double = partialOrder.partialCompare(y, x)
-}
 
-object PartialOrder {
+object PartialOrder
   @inline final def apply[A](implicit po: PartialOrder[A]): PartialOrder[A] =
     po
 
   def by[@sp A, @sp B](f: A => B)(
       implicit po: PartialOrder[B]): PartialOrder[A] = po.on(f)
 
-  def from[@sp A](f: (A, A) => Double): PartialOrder[A] = new PartialOrder[A] {
+  def from[@sp A](f: (A, A) => Double): PartialOrder[A] = new PartialOrder[A]
     def partialCompare(x: A, y: A): Double = f(x, y)
-  }
 
   implicit def partialOrdering[A](
       implicit po: PartialOrder[A]): PartialOrdering[A] =
-    new PartialOrdering[A] {
+    new PartialOrdering[A]
       def tryCompare(x: A, y: A): Option[Int] = po.tryCompare(x, y)
       def lteq(x: A, y: A): Boolean = po.lteqv(x, y)
-    }
-}
 
 private[algebra] class DerivedPartialOrdering[@sp A](
     partialOrder: PartialOrder[A])
-    extends PartialOrdering[A] {
+    extends PartialOrdering[A]
   def tryCompare(x: A, y: A): Option[Int] = partialOrder.tryCompare(x, y)
   def lteq(x: A, y: A): Boolean = partialOrder.lteqv(x, y)
-}

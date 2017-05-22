@@ -24,7 +24,7 @@ import org.apache.spark.sql.types.StructType
   * monotonically increasing notion of progress that can be represented as an [[Offset]]. Spark
   * will regularly query each [[Source]] to see if any more data is available.
   */
-trait Source {
+trait Source
 
   /** Returns the schema of the data from this source */
   def schema: StructType
@@ -33,4 +33,3 @@ trait Source {
     * Returns the next batch of data that is available after `start`, if any is available.
     */
   def getNextBatch(start: Option[Offset]): Option[Batch]
-}

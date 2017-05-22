@@ -16,15 +16,14 @@ import scala.concurrent.duration.FiniteDuration
   * Timeouts will always throw an exception (no need to wrap in assert in tests).
   * Timeouts are multiplied by the testing time factor for Jenkins builds.
   */
-object TestLatch {
+object TestLatch
   val DefaultTimeout = Duration(5, TimeUnit.SECONDS)
 
   def apply(count: Int = 1)(implicit system: ActorSystem) =
     new TestLatch(count)
-}
 
 class TestLatch(count: Int = 1)(implicit system: ActorSystem)
-    extends Awaitable[Unit] {
+    extends Awaitable[Unit]
   private var latch = new CountDownLatch(count)
 
   def countDown() = latch.countDown()
@@ -33,22 +32,18 @@ class TestLatch(count: Int = 1)(implicit system: ActorSystem)
   def reset() = latch = new CountDownLatch(count)
 
   @throws(classOf[TimeoutException])
-  def ready(atMost: Duration)(implicit permit: CanAwait) = {
-    val waitTime = atMost match {
+  def ready(atMost: Duration)(implicit permit: CanAwait) =
+    val waitTime = atMost match
       case f: FiniteDuration ⇒ f
       case _ ⇒
         throw new IllegalArgumentException(
             "TestLatch does not support waiting for " + atMost)
-    }
     val opened = latch.await(waitTime.dilated.toNanos, TimeUnit.NANOSECONDS)
     if (!opened)
       throw new TimeoutException(
           "Timeout of %s with time factor of %s" format
           (atMost.toString, TestKitExtension(system).TestTimeFactor))
     this
-  }
   @throws(classOf[Exception])
-  def result(atMost: Duration)(implicit permit: CanAwait): Unit = {
+  def result(atMost: Duration)(implicit permit: CanAwait): Unit =
     ready(atMost)
-  }
-}

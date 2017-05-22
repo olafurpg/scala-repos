@@ -7,6 +7,5 @@ package breeze.linalg.support
   *
   *
   */
-trait CanTabulate[I, V, E] {
+trait CanTabulate[I, V, E]
   def apply(d: I, f: I => E): V
-}

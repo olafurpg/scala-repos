@@ -38,7 +38,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @since 8.0
   */
-object TreeTableCell {
+object TreeTableCell
 
   /**
     * Converts a ScalaFX TreeTableCell to its JavaFX counterpart.
@@ -50,7 +50,6 @@ object TreeTableCell {
   implicit def sfxTreeTableCell2jfx[S, T](
       ttc: TreeTableCell[S, T]): jfxsc.TreeTableCell[S, T] =
     if (ttc != null) ttc.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $TTC]].
@@ -70,7 +69,7 @@ class TreeTableCell[S, T](
     override val delegate: jfxsc.TreeTableCell[S, T] = new jfxsc.TreeTableCell[
           S, T])
     extends IndexedCell[T](delegate)
-    with SFXDelegate[jfxsc.TreeTableCell[S, T]] {
+    with SFXDelegate[jfxsc.TreeTableCell[S, T]]
 
   /**
     * @see $URL0#tableColumnProperty $ORIGINALDOC
@@ -98,25 +97,21 @@ class TreeTableCell[S, T](
     *
     * @see $URL0#updateTreeTableView-javafx.scene.control.TreeTableView- $ORIGINALDOC
     */
-  def updateTreeTableView(tv: TreeTableView[S]) {
+  def updateTreeTableView(tv: TreeTableView[S])
     delegate.updateTreeTableView(tv)
-  }
 
   /**
     * Updates the TreeTableRow associated with this $TTC.
     *
     * @see $URL0#updateTreeTableRow-javafx.scene.control.TreeTableRow- $ORIGINALDOC
     */
-  def updateTreeTableRow(treeTableRow: TreeTableRow[S]) {
+  def updateTreeTableRow(treeTableRow: TreeTableRow[S])
     delegate.updateTreeTableRow(treeTableRow)
-  }
 
   /**
     * Updates the TreeTableColumn associated with this $TTC.
     *
     * @see $URL0#updateTreeTableColumn-javafx.scene.control.TreeTableColumn- $ORIGINALDOC
     */
-  def updateTreeTableColumn(col: TreeTableColumn[S, T]) {
+  def updateTreeTableColumn(col: TreeTableColumn[S, T])
     delegate.updateTreeTableColumn(col)
-  }
-}

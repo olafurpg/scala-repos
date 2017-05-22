@@ -25,7 +25,7 @@ import com.typesafe.sbteclipse.plugin.EclipsePlugin.{EclipseKeys, EclipseCreateS
 import de.johoop.cpd4sbt.CopyPasteDetector._
 import net.virtualvoid.sbt.graph.Plugin.graphSettings
 
-object PlatformBuild extends Build {
+object PlatformBuild extends Build
   val jprofilerLib =
     SettingKey[String]("jprofiler-lib", "The library file used by jprofiler")
   val jprofilerConf = SettingKey[String](
@@ -64,21 +64,21 @@ object PlatformBuild extends Build {
       organization := "com.precog",
       version := "2.6.0-SNAPSHOT",
       addCompilerPlugin("org.scala-tools.sxr" % "sxr_2.9.0" % "0.2.7"),
-      scalacOptions <+= scalaSource in Compile map {
+      scalacOptions <+= scalaSource in Compile map
         "-P:sxr:base-directory:" + _.getAbsolutePath
-      },
-      scalacOptions ++= {
+      ,
+      scalacOptions ++=
         //Seq("-Ywarn-value-discard", "-unchecked", "-g:none") ++
         Seq("-unchecked", "-g:none") ++ Option(
-            System.getProperty("com.precog.build.optimize")).map { _ =>
+            System.getProperty("com.precog.build.optimize")).map  _ =>
           Seq("-optimize")
-        }.getOrElse(Seq())
-      },
+        .getOrElse(Seq())
+      ,
       javacOptions ++= Seq("-source", "1.6", "-target", "1.6"),
       scalaVersion := "2.9.2",
-      jarName in assembly <<= (name) map { name =>
+      jarName in assembly <<= (name) map  name =>
         name + "-assembly-" + ("git describe".!!.trim) + ".jar"
-      },
+      ,
       target in assembly <<= target,
       EclipseKeys.createSrc :=
         EclipseCreateSrc.Default + EclipseCreateSrc.Resource,
@@ -133,13 +133,12 @@ object PlatformBuild extends Build {
           jprofilerLib,
           jprofilerConf,
           jprofilerId,
-          baseDirectory) map { (opts, lib, conf, id, d) =>
+          baseDirectory) map  (opts, lib, conf, id, d) =>
         // download jnilib if necessary. a bit sketchy, but convenient
         Process("./jprofiler/setup-jnilib.py").!!
         opts ++ Seq(
             "-agentpath:%s/jprofiler.jnilib=offline,config=%s/%s,id=%s" format
             (d, d, conf, id))
-      }
   )
 
   val commonPluginsSettings =
@@ -323,4 +322,3 @@ object PlatformBuild extends Build {
   lazy val ratatoskr = Project(id = "ratatoskr", base = file("ratatoskr"))
     .settings(commonAssemblySettings: _*)
     .dependsOn(mimir, ingest, auth, accounts)
-}

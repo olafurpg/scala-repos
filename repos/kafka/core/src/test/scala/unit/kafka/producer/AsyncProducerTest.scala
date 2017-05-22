@@ -37,12 +37,11 @@ import kafka.utils._
 @deprecated(
     "This test has been deprecated and it will be removed in a future release.",
     "0.10.0.0")
-class AsyncProducerTest {
+class AsyncProducerTest
 
   class NegativePartitioner(props: VerifiableProperties = null)
-      extends Partitioner {
+      extends Partitioner
     def partition(data: Any, numPartitions: Int): Int = -1
-  }
 
   // One of the few cases we can just set a fixed port because the producer is mocked out here since this uses mocks
   val props = Seq(createBrokerConfig(1, "127.0.0.1:1", port = 65534))
@@ -54,16 +53,14 @@ class AsyncProducerTest {
     .mkString(",")
 
   @Test
-  def testProducerQueueSize() {
+  def testProducerQueueSize()
     // a mock event handler that blocks
-    val mockEventHandler = new EventHandler[String, String] {
+    val mockEventHandler = new EventHandler[String, String]
 
-      def handle(events: Seq[KeyedMessage[String, String]]) {
+      def handle(events: Seq[KeyedMessage[String, String]])
         Thread.sleep(500)
-      }
 
       def close {}
-    }
 
     val props = new Properties()
     props.put("serializer.class", "kafka.serializer.StringEncoder")
@@ -76,35 +73,31 @@ class AsyncProducerTest {
     val config = new ProducerConfig(props)
     val produceData = getProduceData(12)
     val producer = new Producer[String, String](config, mockEventHandler)
-    try {
+    try
       // send all 10 messages, should hit the batch size and then reach broker
       producer.send(produceData: _*)
       fail("Queue should be full")
-    } catch {
+    catch
       case e: QueueFullException => //expected
-    } finally {
+    finally
       producer.close()
-    }
-  }
 
   @Test
-  def testProduceAfterClosed() {
+  def testProduceAfterClosed()
     val produceData = getProduceData(10)
     val producer = createProducer[String, String](
         brokerList, encoder = classOf[StringEncoder].getName)
 
     producer.close
 
-    try {
+    try
       producer.send(produceData: _*)
       fail("should complain that producer is already closed")
-    } catch {
+    catch
       case e: ProducerClosedException => //expected
-    }
-  }
 
   @Test
-  def testBatchSize() {
+  def testBatchSize()
 
     /**
       *  Send a total of 10 messages with batch size of 5. Expect 2 calls to the handler, one for each batch.
@@ -127,10 +120,9 @@ class AsyncProducerTest {
 
     producerSendThread.shutdown
     EasyMock.verify(mockHandler)
-  }
 
   @Test
-  def testQueueTimeExpired() {
+  def testQueueTimeExpired()
 
     /**
       *  Send a total of 2 messages with batch size of 5 and queue time of 200ms.
@@ -154,10 +146,9 @@ class AsyncProducerTest {
     Thread.sleep(queueExpirationTime + 100)
     EasyMock.verify(mockHandler)
     producerSendThread.shutdown
-  }
 
   @Test
-  def testPartitionAndCollateEvents() {
+  def testPartitionAndCollateEvents()
     val producerDataList = new ArrayBuffer[KeyedMessage[Int, Message]]
     // use bogus key and partition key override for some messages
     producerDataList.append(new KeyedMessage[Int, Message](
@@ -197,10 +188,9 @@ class AsyncProducerTest {
     topicPartitionInfos.put("topic1", topic1Metadata)
     topicPartitionInfos.put("topic2", topic2Metadata)
 
-    val intPartitioner = new Partitioner {
+    val intPartitioner = new Partitioner
       def partition(key: Any, numPartitions: Int): Int =
         key.asInstanceOf[Int] % numPartitions
-    }
     val config = new ProducerConfig(props)
 
     val producerPool = new ProducerPool(config)
@@ -236,10 +226,9 @@ class AsyncProducerTest {
 
     val actualResult = handler.partitionAndCollate(producerDataList)
     assertEquals(expectedResult, actualResult)
-  }
 
   @Test
-  def testSerializeEvents() {
+  def testSerializeEvents()
     val produceData = TestUtils
       .getMsgStrings(5)
       .map(m => new KeyedMessage[String, String]("topic1", m))
@@ -277,10 +266,9 @@ class AsyncProducerTest {
     TestUtils.checkEquals(produceData.iterator, deserializedData.iterator)
     TestUtils.checkEquals(
         produceData.iterator, deserializedStreamData.iterator)
-  }
 
   @Test
-  def testInvalidPartition() {
+  def testInvalidPartition()
     val producerDataList = new ArrayBuffer[KeyedMessage[String, Message]]
     producerDataList.append(new KeyedMessage[String, Message](
             "topic1", "key1", new Message("msg1".getBytes)))
@@ -304,16 +292,14 @@ class AsyncProducerTest {
         keyEncoder = null.asInstanceOf[Encoder[String]],
         producerPool = producerPool,
         topicPartitionInfos = topicPartitionInfos)
-    try {
+    try
       handler.partitionAndCollate(producerDataList)
-    } catch {
+    catch
       // should not throw any exception
       case e: Throwable => fail("Should not throw any exception")
-    }
-  }
 
   @Test
-  def testNoBroker() {
+  def testNoBroker()
     val props = new Properties()
     props.put("metadata.broker.list", brokerList)
 
@@ -336,16 +322,14 @@ class AsyncProducerTest {
         keyEncoder = new StringEncoder,
         producerPool = producerPool,
         topicPartitionInfos = topicPartitionInfos)
-    try {
+    try
       handler.handle(producerDataList)
       fail("Should fail with FailedToSendMessageException")
-    } catch {
+    catch
       case e: FailedToSendMessageException => // we retry on any exception now
-    }
-  }
 
   @Test
-  def testIncompatibleEncoder() {
+  def testIncompatibleEncoder()
     val props = new Properties()
     // no need to retry since the send will always fail
     props.put("message.send.max.retries", "0")
@@ -355,18 +339,16 @@ class AsyncProducerTest {
         keyEncoder = classOf[DefaultEncoder].getName,
         producerProps = props)
 
-    try {
+    try
       producer.send(getProduceData(1): _*)
       fail("Should fail with ClassCastException due to incompatible Encoder")
-    } catch {
+    catch
       case e: ClassCastException =>
-    } finally {
+    finally
       producer.close()
-    }
-  }
 
   @Test
-  def testRandomPartitioner() {
+  def testRandomPartitioner()
     val props = new Properties()
     props.put("metadata.broker.list", brokerList)
     val config = new ProducerConfig(props)
@@ -397,19 +379,16 @@ class AsyncProducerTest {
             "topic1", new Message("msg3".getBytes)))
 
     val partitionedDataOpt = handler.partitionAndCollate(producerDataList)
-    partitionedDataOpt match {
+    partitionedDataOpt match
       case Some(partitionedData) =>
-        for ((brokerId, dataPerBroker) <- partitionedData) {
+        for ((brokerId, dataPerBroker) <- partitionedData)
           for ((TopicAndPartition(topic, partitionId), dataPerTopic) <- dataPerBroker) assertTrue(
               partitionId == 0)
-        }
       case None =>
         fail("Failed to collate requests by topic, partition")
-    }
-  }
 
   @Test
-  def testFailedSendRetryLogic() {
+  def testFailedSendRetryLogic()
     val props = new Properties()
     props.put("metadata.broker.list", brokerList)
     props.put("request.required.acks", "1")
@@ -487,11 +466,10 @@ class AsyncProducerTest {
       .times(4)
     EasyMock.expect(producerPool.close())
     EasyMock.replay(producerPool)
-    val time = new Time {
+    val time = new Time
       override def nanoseconds: Long = 0L
       override def milliseconds: Long = 0L
       override def sleep(ms: Long): Unit = {}
-    }
     val handler = new DefaultEventHandler[Int, String](
         config,
         partitioner = new FixedValuePartitioner(),
@@ -508,18 +486,16 @@ class AsyncProducerTest {
 
     EasyMock.verify(mockSyncProducer)
     EasyMock.verify(producerPool)
-  }
 
   @Test
-  def testJavaProducer() {
+  def testJavaProducer()
     val topic = "topic1"
     val msgs = TestUtils.getMsgStrings(5)
     val scalaProducerData =
       msgs.map(m => new KeyedMessage[String, String](topic, m))
-    val javaProducerData: java.util.List[KeyedMessage[String, String]] = {
+    val javaProducerData: java.util.List[KeyedMessage[String, String]] =
       import scala.collection.JavaConversions._
       scalaProducerData
-    }
 
     val mockScalaProducer =
       EasyMock.createMock(classOf[kafka.producer.Producer[String, String]])
@@ -535,58 +511,51 @@ class AsyncProducerTest {
     javaProducer.send(javaProducerData)
 
     EasyMock.verify(mockScalaProducer)
-  }
 
   @Test
-  def testInvalidConfiguration() {
+  def testInvalidConfiguration()
     val props = new Properties()
     props.put("serializer.class", "kafka.serializer.StringEncoder")
     props.put("producer.type", "async")
-    try {
+    try
       new ProducerConfig(props)
       fail("should complain about wrong config")
-    } catch {
+    catch
       case e: IllegalArgumentException => //expected
-    }
-  }
 
-  def getProduceData(nEvents: Int): Seq[KeyedMessage[String, String]] = {
+  def getProduceData(nEvents: Int): Seq[KeyedMessage[String, String]] =
     val producerDataList = new ArrayBuffer[KeyedMessage[String, String]]
     for (i <- 0 until nEvents) producerDataList.append(
         new KeyedMessage[String, String]("topic1", null, "msg" + i))
     producerDataList
-  }
 
   private def getTopicMetadata(topic: String,
                                partition: Int,
                                brokerId: Int,
                                brokerHost: String,
-                               brokerPort: Int): TopicMetadata = {
+                               brokerPort: Int): TopicMetadata =
     getTopicMetadata(topic, List(partition), brokerId, brokerHost, brokerPort)
-  }
 
   private def getTopicMetadata(topic: String,
                                partition: Seq[Int],
                                brokerId: Int,
                                brokerHost: String,
-                               brokerPort: Int): TopicMetadata = {
+                               brokerPort: Int): TopicMetadata =
     val broker1 = new BrokerEndPoint(brokerId, brokerHost, brokerPort)
     new TopicMetadata(
         topic,
         partition.map(new PartitionMetadata(_, Some(broker1), List(broker1))))
-  }
 
-  def messagesToSet(messages: Seq[String]): ByteBufferMessageSet = {
+  def messagesToSet(messages: Seq[String]): ByteBufferMessageSet =
     new ByteBufferMessageSet(NoCompressionCodec,
                              messages.map(
                                  m =>
                                    new Message(m.getBytes,
                                                0L,
                                                Message.MagicValue_V1)): _*)
-  }
 
   def messagesToSet(
-      key: Array[Byte], messages: Seq[Array[Byte]]): ByteBufferMessageSet = {
+      key: Array[Byte], messages: Seq[Array[Byte]]): ByteBufferMessageSet =
     new ByteBufferMessageSet(
         NoCompressionCodec,
         messages.map(
@@ -595,5 +564,3 @@ class AsyncProducerTest {
                           bytes = m,
                           timestamp = 0L,
                           magicValue = Message.MagicValue_V1)): _*)
-  }
-}

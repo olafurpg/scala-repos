@@ -15,12 +15,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 class ScalaStructureViewBuilder(
     private val myPsiFile: ScalaFile,
     private val console: ScalaLanguageConsole = null)
-    extends TreeBasedStructureViewBuilder {
+    extends TreeBasedStructureViewBuilder
 
   @NotNull
-  override def createStructureViewModel(editor: Editor): StructureViewModel = {
+  override def createStructureViewModel(editor: Editor): StructureViewModel =
     new ScalaStructureViewModel(myPsiFile, console)
-  }
 
   override def isRootNodeShown: Boolean = false
-}

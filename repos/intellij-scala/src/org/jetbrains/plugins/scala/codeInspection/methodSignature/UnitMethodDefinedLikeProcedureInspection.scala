@@ -15,14 +15,12 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
 class UnitMethodDefinedLikeProcedureInspection
     extends AbstractMethodSignatureInspection(
         InspectionBundle.message("unit.method.like.procedure.id"),
-        InspectionBundle.message("unit.method.like.procedure.name")) {
+        InspectionBundle.message("unit.method.like.procedure.name"))
 
-  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+  def actionFor(holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case funDef: ScFunctionDefinition
         if funDef.hasUnitResultType && !funDef.hasAssign &&
         !funDef.isSecondaryConstructor &&
         IntentionAvailabilityChecker.checkInspection(this, funDef) =>
       holder.registerProblem(
           funDef.nameId, getDisplayName, new InsertReturnTypeAndEquals(funDef))
-  }
-}

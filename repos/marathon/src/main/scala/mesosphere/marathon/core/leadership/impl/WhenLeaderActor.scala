@@ -5,27 +5,25 @@ import akka.event.LoggingReceive
 import mesosphere.marathon.core.leadership.PreparationMessages.{PrepareForStart, Prepared}
 import mesosphere.marathon.core.leadership.impl.WhenLeaderActor.{Stop, Stopped}
 
-private[leadership] object WhenLeaderActor {
-  def props(childProps: Props): Props = {
+private[leadership] object WhenLeaderActor
+  def props(childProps: Props): Props =
     Props(new WhenLeaderActor(childProps))
-  }
 
   case object Stop
   case object Stopped
-}
 
 /**
   * Wraps an actor which is only started when we are currently the leader.
   */
 private class WhenLeaderActor(childProps: => Props)
-    extends Actor with ActorLogging with Stash {
+    extends Actor with ActorLogging with Stash
 
   private[this] var leadershipCycle = 1
 
   override def receive: Receive = suspended
 
   private[this] val suspended: Receive =
-    LoggingReceive.withLabel("suspended") {
+    LoggingReceive.withLabel("suspended")
       case PrepareForStart =>
         val childRef = context.actorOf(childProps, leadershipCycle.toString)
         leadershipCycle += 1
@@ -38,11 +36,10 @@ private class WhenLeaderActor(childProps: => Props)
         log.debug("unhandled message in suspend: {}", unhandled)
         sender() ! Status.Failure(
             new IllegalStateException(s"not currently active ($self)"))
-    }
 
   private[impl] def starting(
       coordinatorRef: ActorRef, childRef: ActorRef): Receive =
-    LoggingReceive.withLabel("starting") {
+    LoggingReceive.withLabel("starting")
       case Prepared(`childRef`) =>
         coordinatorRef ! Prepared(self)
         unstashAll()
@@ -56,17 +53,15 @@ private class WhenLeaderActor(childProps: => Props)
       case unhandled: Any =>
         log.debug("waiting for startup, stashing {}", unhandled)
         stash()
-    }
 
   private[impl] def active(childRef: ActorRef): Receive =
-    LoggingReceive.withLabel("active") {
+    LoggingReceive.withLabel("active")
       case PrepareForStart => sender() ! Prepared(self)
       case Stop => stop(childRef)
       case unhandled: Any => childRef.forward(unhandled)
-    }
 
   private[impl] def dying(stopAckRef: ActorRef, childRef: ActorRef): Receive =
-    LoggingReceive.withLabel("dying") {
+    LoggingReceive.withLabel("dying")
       case Terminated(`childRef`) =>
         unstashAll()
         stopAckRef ! Stopped
@@ -76,12 +71,9 @@ private class WhenLeaderActor(childProps: => Props)
       case unhandled: Any =>
         log.debug("waiting for termination, stashing {}", unhandled)
         stash()
-    }
 
-  private[this] def stop(childRef: ActorRef): Unit = {
+  private[this] def stop(childRef: ActorRef): Unit =
     context.watch(childRef)
     childRef ! PoisonPill
     unstashAll()
     context.become(dying(sender(), childRef))
-  }
-}

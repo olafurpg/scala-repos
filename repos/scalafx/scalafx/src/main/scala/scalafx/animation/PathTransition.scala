@@ -43,7 +43,7 @@ import scalafx.util.Duration
   * @define PT `PathTransition`
   * @define OT `OrientationType`
   */
-object PathTransition extends AnimationStatics {
+object PathTransition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $PT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/PathTransition.html $PT]],
@@ -60,7 +60,7 @@ object PathTransition extends AnimationStatics {
     */
   object OrientationType
       extends SFXEnumDelegateCompanion[
-          jfxa.PathTransition.OrientationType, OrientationType] {
+          jfxa.PathTransition.OrientationType, OrientationType]
 
     /**
       * The targeted node's rotation matrix stays unchanged along the geometric path.
@@ -83,7 +83,6 @@ object PathTransition extends AnimationStatics {
 
     protected override def unsortedValues: Array[OrientationType] =
       Array(None, OrthogonalToTangent)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/PathTransition.OrientationType.html $OT]].
@@ -94,7 +93,6 @@ object PathTransition extends AnimationStatics {
   sealed case class OrientationType(
       override val delegate: jfxa.PathTransition.OrientationType)
       extends SFXEnumDelegate[jfxa.PathTransition.OrientationType]
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/PathTransition.html PathTransition]].
@@ -107,7 +105,7 @@ object PathTransition extends AnimationStatics {
   */
 class PathTransition(
     override val delegate: jfxa.PathTransition = new jfxa.PathTransition)
-    extends Transition(delegate) with SFXDelegate[jfxa.PathTransition] {
+    extends Transition(delegate) with SFXDelegate[jfxa.PathTransition]
 
   /**
     * $CONSTR
@@ -132,32 +130,27 @@ class PathTransition(
     * The target node of this $PT.
     */
   def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-  def node_=(n: Node) {
+  def node_=(n: Node)
     node() = n
-  }
 
   /**
     * The duration of this `Transition`.
     */
   def duration: ObjectProperty[jfxu.Duration] = delegate.durationProperty
-  def duration_=(d: Duration) {
+  def duration_=(d: Duration)
     duration() = d
-  }
 
   /**
     * The shape on which outline the node should be animated.
     */
   def path: ObjectProperty[jfxss.Shape] = delegate.pathProperty
-  def path_=(s: Shape) {
+  def path_=(s: Shape)
     path() = s
-  }
 
   /**
     * Specifies the upright orientation of node along the path.
     */
   def orientation: ObjectProperty[jfxa.PathTransition.OrientationType] =
     delegate.orientationProperty
-  def orientation_=(o: PathTransition.OrientationType) {
+  def orientation_=(o: PathTransition.OrientationType)
     orientation() = o
-  }
-}

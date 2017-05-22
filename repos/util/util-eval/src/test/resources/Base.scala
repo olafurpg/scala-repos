@@ -1,3 +1,2 @@
-trait Base extends (() => String) {
+trait Base extends (() => String)
   def apply() = "hello"
-}

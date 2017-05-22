@@ -1,6 +1,6 @@
 package lila.round
 
-object Fixtures {
+object Fixtures
 
   private[round] def prod500standard =
     List(
@@ -504,4 +504,3 @@ object Fixtures {
         """e4 c5 Nc3 e6 f4 a6 e5 h5 Nf3 Nh6 Ne4 Nc6 d3 d5 exd6 Bxd6 c3 Be7 Be3 b6 h3 Bb7 Qd2 Nf5 O-O-O Qc7 Bf2 h4 Rg1 Ng3 Nxg3 hxg3 Bxg3 O-O-O Be2 f5 Ne5 Nxe5 fxe5 g5 Qe3 f4 Bxf4 gxf4 Qxf4 Rdg8 g4 Bg5 Qxg5 Rxg5 Kc2 Rxe5 Rde1 Re3 g5 Rhxh3 g6 Rh8 Bg4 Rxe1 Rxe1 Bd5 c4 Qh2+ Re2 Qg3 cxd5 Qxg4 dxe6 Qxg6 e7 Re8 Kc3 Qg7+ Kc2 Rxe7 Rxe7 Qxe7""",
         """e4 e5 Nf3 Bd6 Nc3 Nf6 d3 Nc6 b3 b6 Nb5 a6 Nxd6+ cxd6 Ba3 Qc7 d4 b5 dxe5 dxe5 c4 Qa5+ Nd2 Qxa3 g3 Qa5 Bh3 Nxe4 b4 Qxb4 Rb1 Qa5 O-O Nxd2 Qg4 Nxb1 Rxb1 Qxa2 Qxg7 Qxb1+ Kg2 Qe4+ Kg1 Rf8 c5 Bb7 Bg2 Qe1+ Bf1 O-O-O Qxh7""",
         """d4 Nf6 c4 d6 e3 g6 Nf3 Bg7 Be2 O-O O-O c5 Nc3 cxd4 exd4 b6 Bg5 Bb7 d5 Nbd7 Qd2 Nc5 Rac1 Nce4 Nxe4 Nxe4 Qe3 Nxg5 Qxg5 Bxb2 Rc2 Bg7 Re1 e5 Qd2 Rc8 Rb1 Qc7 a4 f5 Ng5 Bxd5 Qxd5+ Kh8 Ne6""")
-}

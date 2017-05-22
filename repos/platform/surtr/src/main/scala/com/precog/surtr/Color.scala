@@ -19,7 +19,7 @@
  */
 package com.precog.surtr
 
-class Color(val enabled: Boolean) {
+class Color(val enabled: Boolean)
   val Bold = "\u001B[1m"
 
   val RedForeground = "\u001B[31m"
@@ -40,4 +40,3 @@ class Color(val enabled: Boolean) {
 
   private def format(escape: String, str: String) =
     "%s%s%s".format(escape, str, Reset)
-}

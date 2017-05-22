@@ -9,29 +9,27 @@ import scala.tools.asm.Opcodes._
 import scala.tools.partest.ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object DirectCompileTest extends ClearAfterClass.Clearable {
+object DirectCompileTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:l:method")
   def clear(): Unit = { compiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class DirectCompileTest extends ClearAfterClass {
+class DirectCompileTest extends ClearAfterClass
   ClearAfterClass.stateToClear = DirectCompileTest
 
   val compiler = DirectCompileTest.compiler
 
   @Test
-  def testCompile(): Unit = {
+  def testCompile(): Unit =
     val List(("C.class", bytes)) = compile(compiler)("""class C {
         |  def f = 1
         |}
       """.stripMargin)
     def s(i: Int, n: Int) = (bytes(i) & 0xff) << n
     assertTrue((s(0, 24) | s(1, 16) | s(2, 8) | s(3, 0)) == 0xcafebabe) // mocha java latte macchiato surpreme dark roasted espresso
-  }
 
   @Test
-  def testCompileClasses(): Unit = {
+  def testCompileClasses(): Unit =
     val List(cClass, cModuleClass) =
       compileClasses(compiler)("class C; object C")
 
@@ -42,10 +40,9 @@ class DirectCompileTest extends ClearAfterClass {
 
     assertTrue(dMirror.name == "D")
     assertTrue(dModuleClass.name == "D$")
-  }
 
   @Test
-  def testCompileMethods(): Unit = {
+  def testCompileMethods(): Unit =
     val List(f, g) = compileMethods(compiler)("""def f = 10
         |def g = f
       """.stripMargin)
@@ -59,10 +56,9 @@ class DirectCompileTest extends ClearAfterClass {
                    List(VarOp(ALOAD, 0),
                         Invoke(INVOKEVIRTUAL, "C", "f", "()I", itf = false),
                         Op(IRETURN)))
-  }
 
   @Test
-  def testDropNonOpAliveLabels(): Unit = {
+  def testDropNonOpAliveLabels(): Unit =
     // makes sure that dropNoOp doesn't drop labels that are being used
     val List(f) =
       compileMethods(compiler)("""def f(x: Int) = if (x == 0) "a" else "b"""")
@@ -79,23 +75,19 @@ class DirectCompileTest extends ClearAfterClass {
                        Op(ARETURN),
                        Label(11)
                    ))
-  }
 
   @Test
-  def testSeparateCompilation(): Unit = {
+  def testSeparateCompilation(): Unit =
     val codeA = "class A { def f = 1 }"
     val codeB = "class B extends A { def g = f }"
     val List(a, b) = compileClassesSeparately(List(codeA, codeB))
     val ins = getSingleMethod(b, "g").instructions
-    assert(ins exists {
+    assert(ins exists
       case Invoke(_, "B", "f", _, _) => true
       case _ => false
-    }, ins)
-  }
+    , ins)
 
   @Test
-  def compileErroneous(): Unit = {
+  def compileErroneous(): Unit =
     compileClasses(compiler)("class C { def f: String = 1 }",
                              allowMessage = _.msg contains "type mismatch")
-  }
-}

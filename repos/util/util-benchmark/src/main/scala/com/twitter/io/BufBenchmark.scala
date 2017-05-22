@@ -7,7 +7,7 @@ import org.openjdk.jmh.infra.Blackhole
 import scala.util.Random
 
 @State(Scope.Benchmark)
-class BufBenchmark extends StdBenchAnnotations {
+class BufBenchmark extends StdBenchAnnotations
 
   @Param(Array("1000"))
   var size: Int = 1000
@@ -21,7 +21,7 @@ class BufBenchmark extends StdBenchAnnotations {
   private[this] var stringBuf: Buf = _
 
   @Setup(Level.Iteration)
-  def setup(): Unit = {
+  def setup(): Unit =
     val cap = size * 2
     val start = cap / 4
     val end = start + size
@@ -39,15 +39,12 @@ class BufBenchmark extends StdBenchAnnotations {
     val rnd = new Random(120412421512L)
     string = rnd.nextString(size)
     stringBuf = Buf.Utf8(string)
-  }
 
-  private[this] def equality(buf: Buf, hole: Blackhole): Unit = {
+  private[this] def equality(buf: Buf, hole: Blackhole): Unit =
     var i = 0
-    while (i < all.length) {
+    while (i < all.length)
       hole.consume(buf == all(i))
       i += 1
-    }
-  }
 
   @Benchmark
   def equalityByteArrayBuf(hole: Blackhole): Unit =
@@ -140,8 +137,6 @@ class BufBenchmark extends StdBenchAnnotations {
     Buf.Utf8(string)
 
   @Benchmark
-  def utf8BufToString(): String = {
+  def utf8BufToString(): String =
     val Buf.Utf8(str) = stringBuf
     str
-  }
-}

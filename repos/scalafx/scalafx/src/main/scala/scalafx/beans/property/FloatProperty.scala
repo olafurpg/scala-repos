@@ -31,7 +31,7 @@ import javafx.beans.{property => jfxbp}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object FloatProperty {
+object FloatProperty
   implicit def sfxFloatProperty2jfx(fp: FloatProperty): jfxbp.FloatProperty =
     if (fp != null) fp.delegate else null
 
@@ -43,12 +43,11 @@ object FloatProperty {
     */
   def apply(value: Float) =
     new FloatProperty(new jfxbp.SimpleFloatProperty(value))
-}
 
 class FloatProperty(
     override val delegate: jfxbp.FloatProperty = new jfxbp.SimpleFloatProperty)
     extends ReadOnlyFloatProperty(delegate) with Property[Float, Number]
-    with SFXDelegate[jfxbp.FloatProperty] {
+    with SFXDelegate[jfxbp.FloatProperty]
 
   def this(bean: Object, name: String) =
     this(new jfxbp.SimpleFloatProperty(bean, name))
@@ -56,10 +55,7 @@ class FloatProperty(
   def this(bean: Object, name: String, initialValue: Float) =
     this(new jfxbp.SimpleFloatProperty(bean, name, initialValue))
 
-  def value_=(v: Float) {
+  def value_=(v: Float)
     delegate.set(v)
-  }
-  def value_=(v: Number) {
+  def value_=(v: Number)
     delegate.set(v.floatValue)
-  }
-}

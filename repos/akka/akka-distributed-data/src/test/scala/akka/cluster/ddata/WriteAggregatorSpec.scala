@@ -13,7 +13,7 @@ import akka.cluster.ddata.Replicator.Internal._
 import akka.cluster.ddata.Replicator._
 import akka.actor.ActorSelection
 
-object WriteAggregatorSpec {
+object WriteAggregatorSpec
 
   val key = GSetKey[String]("a")
 
@@ -30,36 +30,32 @@ object WriteAggregatorSpec {
                             nodes: Set[Address],
                             replyTo: ActorRef)
       extends WriteAggregator(
-          key, DataEnvelope(data), consistency, None, nodes, replyTo) {
+          key, DataEnvelope(data), consistency, None, nodes, replyTo)
 
     override def replica(address: Address): ActorSelection =
       context.actorSelection(probes(address).path)
 
     override def senderAddress(): Address =
       probes.find { case (a, r) ⇒ r == sender() }.get._1
-  }
 
   def writeAckAdapterProps(replica: ActorRef): Props =
     Props(new WriteAckAdapter(replica))
 
-  class WriteAckAdapter(replica: ActorRef) extends Actor {
+  class WriteAckAdapter(replica: ActorRef) extends Actor
     var replicator: Option[ActorRef] = None
 
-    def receive = {
+    def receive =
       case WriteAck ⇒
         replicator.foreach(_ ! WriteAck)
       case msg ⇒
         replicator = Some(sender())
         replica ! msg
-    }
-  }
-}
 
 class WriteAggregatorSpec
     extends AkkaSpec("""
       akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
       akka.remote.netty.tcp.port=0
-      """) with ImplicitSender {
+      """) with ImplicitSender
 
   val nodeA = Address("akka.tcp", "Sys", "a", 2552)
   val nodeB = nodeA.copy(host = Some("b"))
@@ -79,8 +75,8 @@ class WriteAggregatorSpec
           _ -> system.actorOf(WriteAggregatorSpec.writeAckAdapterProps(probe)))
       .toMap
 
-  "WriteAggregator" must {
-    "send to at least N/2+1 replicas when WriteMajority" in {
+  "WriteAggregator" must
+    "send to at least N/2+1 replicas when WriteMajority" in
       val probe = TestProbe()
       val aggr = system.actorOf(WriteAggregatorSpec.writeAggregatorProps(
               data, writeMajority, probes(probe.ref), nodes, testActor))
@@ -92,9 +88,8 @@ class WriteAggregatorSpec
       expectMsg(UpdateSuccess(WriteAggregatorSpec.key, None))
       watch(aggr)
       expectTerminated(aggr)
-    }
 
-    "send to more when no immediate reply" in {
+    "send to more when no immediate reply" in
       val probe = TestProbe()
       val aggr = system.actorOf(WriteAggregatorSpec.writeAggregatorProps(
               data, writeMajority, probes(probe.ref), nodes, testActor))
@@ -111,9 +106,8 @@ class WriteAggregatorSpec
       expectMsg(UpdateSuccess(WriteAggregatorSpec.key, None))
       watch(aggr)
       expectTerminated(aggr)
-    }
 
-    "timeout when less than required acks" in {
+    "timeout when less than required acks" in
       val probe = TestProbe()
       val aggr = system.actorOf(WriteAggregatorSpec.writeAggregatorProps(
               data, writeMajority, probes(probe.ref), nodes, testActor))
@@ -129,6 +123,3 @@ class WriteAggregatorSpec
       expectMsg(UpdateTimeout(WriteAggregatorSpec.key, None))
       watch(aggr)
       expectTerminated(aggr)
-    }
-  }
-}

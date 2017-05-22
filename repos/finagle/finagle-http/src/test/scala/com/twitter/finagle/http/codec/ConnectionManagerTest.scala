@@ -15,7 +15,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ConnectionManagerTest extends FunSuite with MockitoSugar {
+class ConnectionManagerTest extends FunSuite with MockitoSugar
   // > further tests
   //   - malformed requests/responses
   //   - methods other than GET
@@ -26,25 +26,21 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
   val cFuture = new DefaultChannelFuture(c, false)
   when(me.getChannel).thenReturn(c)
 
-  def makeRequest(version: Version, headers: (String, String)*) = {
+  def makeRequest(version: Version, headers: (String, String)*) =
     val request = Request(version, Method.Get, "/")
-    headers foreach {
+    headers foreach
       case (k, v) =>
         request.headers.set(k, v)
-    }
     request
-  }
 
-  def makeResponse(version: Version, headers: (String, String)*) = {
+  def makeResponse(version: Version, headers: (String, String)*) =
     val response = Response(version, Status.Ok)
-    headers foreach {
+    headers foreach
       case (k, v) =>
         response.headers.set(k, v)
-    }
     response
-  }
 
-  def perform(request: Request, response: Response, shouldMarkDead: Boolean) {
+  def perform(request: Request, response: Response, shouldMarkDead: Boolean)
     val closeP = new Promise[Throwable]
     val trans = mock[Transport[Any, Any]]
     when(trans.close).thenReturn(Future.Done)
@@ -71,38 +67,32 @@ class ConnectionManagerTest extends FunSuite with MockitoSugar {
     assert(f.isDefined == false)
     rp.setValue(response.httpResponse)
 
-    f.poll match {
+    f.poll match
       case Some(Return(r)) =>
         assert(r.version == response.version)
         assert(r.status == response.status)
 
       case _ =>
         fail()
-    }
 
     if (shouldMarkDead) verify(trans, times(1)).close
-  }
 
-  test("not terminate regular http/1.1 connections") {
+  test("not terminate regular http/1.1 connections")
     perform(makeRequest(Version.Http11),
             makeResponse(Version.Http11, Fields.ContentLength -> "1"),
             false)
-  }
 
   // Note: by way of the codec, this reply is already taken care of.
-  test("terminate http/1.1 connections without content length") {
+  test("terminate http/1.1 connections without content length")
     perform(
         makeRequest(Version.Http11),
         makeResponse(Version.Http11),
         true
     )
-  }
 
-  test("terminate http/1.1 connections with Connection: close") {
+  test("terminate http/1.1 connections with Connection: close")
     perform(
         makeRequest(Version.Http11, "Connection" -> "close"),
         makeResponse(Version.Http11),
         true
     )
-  }
-}

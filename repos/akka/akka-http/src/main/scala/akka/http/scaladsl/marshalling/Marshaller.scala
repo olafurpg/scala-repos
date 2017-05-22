@@ -9,7 +9,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.util.FastFuture
 import akka.http.scaladsl.util.FastFuture._
 
-sealed abstract class Marshaller[-A, +B] {
+sealed abstract class Marshaller[-A, +B]
 
   def apply(value: A)(
       implicit ec: ExecutionContext): Future[List[Marshalling[B]]]
@@ -38,11 +38,11 @@ sealed abstract class Marshaller[-A, +B] {
   def wrapWithEC[C, D >: B](newMediaType: MediaType)(
       f: ExecutionContext ⇒ C ⇒ A)(
       implicit cto: ContentTypeOverrider[D]): Marshaller[C, D] =
-    Marshaller { implicit ec ⇒ value ⇒
+    Marshaller  implicit ec ⇒ value ⇒
       import Marshalling._
-      this(f(ec)(value)).fast map {
-        _ map {
-          (_, newMediaType) match {
+      this(f(ec)(value)).fast map
+        _ map
+          (_, newMediaType) match
             case (WithFixedContentType(_, marshal), newMT: MediaType.Binary) ⇒
               WithFixedContentType(newMT, () ⇒ cto(marshal(), newMT))
             case (WithFixedContentType(oldCT: ContentType.Binary, marshal),
@@ -74,49 +74,41 @@ sealed abstract class Marshaller[-A, +B] {
             case x ⇒
               sys.error(
                   s"Illegal marshaller wrapping. Marshalling `$x` cannot be wrapped with MediaType `$newMediaType`")
-          }
-        }
-      }
-    }
 
   def compose[C](f: C ⇒ A): Marshaller[C, B] =
     Marshaller(implicit ec ⇒ c ⇒ apply(f(c)))
 
   def composeWithEC[C](f: ExecutionContext ⇒ C ⇒ A): Marshaller[C, B] =
     Marshaller(implicit ec ⇒ c ⇒ apply(f(ec)(c)))
-}
 
 //# marshaller-creation
 object Marshaller
     extends GenericMarshallers with PredefinedToEntityMarshallers
-    with PredefinedToResponseMarshallers with PredefinedToRequestMarshallers {
+    with PredefinedToResponseMarshallers with PredefinedToRequestMarshallers
 
   /**
     * Creates a [[Marshaller]] from the given function.
     */
   def apply[A, B](f: ExecutionContext ⇒ A ⇒ Future[List[Marshalling[B]]])
     : Marshaller[A, B] =
-    new Marshaller[A, B] {
+    new Marshaller[A, B]
       def apply(value: A)(implicit ec: ExecutionContext) =
         try f(ec)(value) catch { case NonFatal(e) ⇒ FastFuture.failed(e) }
-    }
 
   /**
     * Helper for creating a [[Marshaller]] using the given function.
     */
   def strict[A, B](f: A ⇒ Marshalling[B]): Marshaller[A, B] =
-    Marshaller { _ ⇒ a ⇒
+    Marshaller  _ ⇒ a ⇒
       FastFuture.successful(f(a) :: Nil)
-    }
 
   /**
     * Helper for creating a "super-marshaller" from a number of "sub-marshallers".
     * Content-negotiation determines, which "sub-marshaller" eventually gets to do the job.
     */
   def oneOf[A, B](marshallers: Marshaller[A, B]*): Marshaller[A, B] =
-    Marshaller { implicit ec ⇒ a ⇒
+    Marshaller  implicit ec ⇒ a ⇒
       FastFuture.sequence(marshallers.map(_ (a))).fast.map(_.flatten.toList)
-    }
 
   /**
     * Helper for creating a "super-marshaller" from a number of values and a function producing "sub-marshallers"
@@ -130,26 +122,23 @@ object Marshaller
     */
   def withFixedContentType[A, B](contentType: ContentType)(
       marshal: A ⇒ B): Marshaller[A, B] =
-    strict { value ⇒
+    strict  value ⇒
       Marshalling.WithFixedContentType(contentType, () ⇒ marshal(value))
-    }
 
   /**
     * Helper for creating a synchronous [[Marshaller]] to content with a negotiable charset from the given function.
     */
   def withOpenCharset[A, B](mediaType: MediaType.WithOpenCharset)(
       marshal: (A, HttpCharset) ⇒ B): Marshaller[A, B] =
-    strict { value ⇒
+    strict  value ⇒
       Marshalling.WithOpenCharset(mediaType, charset ⇒ marshal(value, charset))
-    }
 
   /**
     * Helper for creating a synchronous [[Marshaller]] to non-negotiable content from the given function.
     */
   def opaque[A, B](marshal: A ⇒ B): Marshaller[A, B] =
-    strict { value ⇒
+    strict  value ⇒
       Marshalling.Opaque(() ⇒ marshal(value))
-    }
 
   /**
     * Helper for creating a [[Marshaller]] combined of the provided `marshal` function
@@ -157,48 +146,41 @@ object Marshaller
     */
   def combined[A, B, C](
       marshal: A ⇒ B)(implicit m2: Marshaller[B, C]): Marshaller[A, C] =
-    Marshaller[A, C] { ec ⇒ a ⇒
+    Marshaller[A, C]  ec ⇒ a ⇒
       m2.compose(marshal).apply(a)(ec)
-    }
-}
 //#
 
 //# marshalling
 /**
   * Describes one possible option for marshalling a given value.
   */
-sealed trait Marshalling[+A] {
+sealed trait Marshalling[+A]
   def map[B](f: A ⇒ B): Marshalling[B]
-}
 
-object Marshalling {
+object Marshalling
 
   /**
     * A Marshalling to a specific [[akka.http.scaladsl.model.ContentType]].
     */
   final case class WithFixedContentType[A](contentType: ContentType,
                                            marshal: () ⇒ A)
-      extends Marshalling[A] {
+      extends Marshalling[A]
     def map[B](f: A ⇒ B): WithFixedContentType[B] =
       copy(marshal = () ⇒ f(marshal()))
-  }
 
   /**
     * A Marshalling to a specific [[akka.http.scaladsl.model.MediaType]] with a flexible charset.
     */
   final case class WithOpenCharset[A](mediaType: MediaType.WithOpenCharset,
                                       marshal: HttpCharset ⇒ A)
-      extends Marshalling[A] {
+      extends Marshalling[A]
     def map[B](f: A ⇒ B): WithOpenCharset[B] =
       copy(marshal = cs ⇒ f(marshal(cs)))
-  }
 
   /**
     * A Marshalling to an unknown MediaType and charset.
     * Circumvents content negotiation.
     */
-  final case class Opaque[A](marshal: () ⇒ A) extends Marshalling[A] {
+  final case class Opaque[A](marshal: () ⇒ A) extends Marshalling[A]
     def map[B](f: A ⇒ B): Opaque[B] = copy(marshal = () ⇒ f(marshal()))
-  }
-}
 //#

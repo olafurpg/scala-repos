@@ -11,13 +11,11 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.ScFunction
 class AccessorLikeMethodIsEmptyParenInspection
     extends AbstractMethodSignatureInspection(
         "ScalaAccessorLikeMethodIsEmptyParen",
-        "Method with accessor-like name is empty-paren") {
+        "Method with accessor-like name is empty-paren")
 
-  def actionFor(holder: ProblemsHolder) = {
+  def actionFor(holder: ProblemsHolder) =
     case f: ScFunction
         if f.hasQueryLikeName && f.isEmptyParen && !f.hasUnitResultType &&
         f.superMethods.isEmpty && !isScalaJSFacade(f.getContainingClass) =>
       holder.registerProblem(
           f.nameId, getDisplayName, new RemoveParentheses(f))
-  }
-}

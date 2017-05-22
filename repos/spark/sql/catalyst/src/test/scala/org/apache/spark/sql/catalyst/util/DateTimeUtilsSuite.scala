@@ -25,28 +25,25 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.util.DateTimeUtils._
 import org.apache.spark.unsafe.types.UTF8String
 
-class DateTimeUtilsSuite extends SparkFunSuite {
+class DateTimeUtilsSuite extends SparkFunSuite
 
-  private[this] def getInUTCDays(timestamp: Long): Int = {
+  private[this] def getInUTCDays(timestamp: Long): Int =
     val tz = TimeZone.getDefault
     ((timestamp + tz.getOffset(timestamp)) / MILLIS_PER_DAY).toInt
-  }
 
-  test("timestamp and us") {
+  test("timestamp and us")
     val now = new Timestamp(System.currentTimeMillis())
     now.setNanos(1000)
     val ns = fromJavaTimestamp(now)
     assert(ns % 1000000L === 1)
     assert(toJavaTimestamp(ns) === now)
 
-    List(-111111111111L, -1L, 0, 1L, 111111111111L).foreach { t =>
+    List(-111111111111L, -1L, 0, 1L, 111111111111L).foreach  t =>
       val ts = toJavaTimestamp(t)
       assert(fromJavaTimestamp(ts) === t)
       assert(toJavaTimestamp(fromJavaTimestamp(ts)) === ts)
-    }
-  }
 
-  test("us and julian day") {
+  test("us and julian day")
     val (d, ns) = toJulianDay(0)
     assert(d === JULIAN_DAY_OF_EPOCH)
     assert(ns === 0)
@@ -54,19 +51,16 @@ class DateTimeUtilsSuite extends SparkFunSuite {
 
     Seq(Timestamp.valueOf("2015-06-11 10:10:10.100"),
         Timestamp.valueOf("2015-06-11 20:10:10.100"),
-        Timestamp.valueOf("1900-06-11 20:10:10.100")).foreach { t =>
+        Timestamp.valueOf("1900-06-11 20:10:10.100")).foreach  t =>
       val (d, ns) = toJulianDay(fromJavaTimestamp(t))
       assert(ns > 0)
       val t1 = toJavaTimestamp(fromJulianDay(d, ns))
       assert(t.equals(t1))
-    }
-  }
 
-  test("SPARK-6785: java date conversion before and after epoch") {
-    def checkFromToJavaDate(d1: Date): Unit = {
+  test("SPARK-6785: java date conversion before and after epoch")
+    def checkFromToJavaDate(d1: Date): Unit =
       val d2 = toJavaDate(fromJavaDate(d1))
       assert(d2.toString === d1.toString)
-    }
 
     val df1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
     val df2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z")
@@ -97,9 +91,8 @@ class DateTimeUtilsSuite extends SparkFunSuite {
 
     checkFromToJavaDate(new Date(df1.parse("1776-07-04 10:30:00").getTime))
     checkFromToJavaDate(new Date(df2.parse("1776-07-04 18:30:00 UTC").getTime))
-  }
 
-  test("string to date") {
+  test("string to date")
 
     var c = Calendar.getInstance()
     c.set(2015, 0, 28, 0, 0, 0)
@@ -148,9 +141,8 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     assert(stringToDate(UTF8String.fromString("015-03-18")).isEmpty)
     assert(stringToDate(UTF8String.fromString("015")).isEmpty)
     assert(stringToDate(UTF8String.fromString("02015")).isEmpty)
-  }
 
-  test("string to time") {
+  test("string to time")
     // Tests with UTC.
     val c = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     c.set(Calendar.MILLISECOND, 0)
@@ -181,9 +173,8 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     c.set(2000, 11, 30, 10, 0, 0)
     assert(stringToTime("2000-12-30 10:00:00") === new Timestamp(
             c.getTimeInMillis()))
-  }
 
-  test("string to timestamp") {
+  test("string to timestamp")
     var c = Calendar.getInstance()
     c.set(1969, 11, 31, 16, 0, 0)
     c.set(Calendar.MILLISECOND, 0)
@@ -359,83 +350,72 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     assert(stringToTimestamp(UTF8String.fromString(
                 "2015-03-18T12:03:17.123456789+0:00")).get === c.getTimeInMillis * 1000 +
         123456)
-  }
 
-  test("hours") {
+  test("hours")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 13, 2, 11)
     assert(getHours(c.getTimeInMillis * 1000) === 13)
     c.set(2015, 12, 8, 2, 7, 9)
     assert(getHours(c.getTimeInMillis * 1000) === 2)
-  }
 
-  test("minutes") {
+  test("minutes")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 13, 2, 11)
     assert(getMinutes(c.getTimeInMillis * 1000) === 2)
     c.set(2015, 2, 8, 2, 7, 9)
     assert(getMinutes(c.getTimeInMillis * 1000) === 7)
-  }
 
-  test("seconds") {
+  test("seconds")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 13, 2, 11)
     assert(getSeconds(c.getTimeInMillis * 1000) === 11)
     c.set(2015, 2, 8, 2, 7, 9)
     assert(getSeconds(c.getTimeInMillis * 1000) === 9)
-  }
 
-  test("hours / minutes / seconds") {
+  test("hours / minutes / seconds")
     Seq(Timestamp.valueOf("2015-06-11 10:12:35.789"),
         Timestamp.valueOf("2015-06-11 20:13:40.789"),
         Timestamp.valueOf("1900-06-11 12:14:50.789"),
-        Timestamp.valueOf("1700-02-28 12:14:50.123456")).foreach { t =>
+        Timestamp.valueOf("1700-02-28 12:14:50.123456")).foreach  t =>
       val us = fromJavaTimestamp(t)
       assert(toJavaTimestamp(us) === t)
-    }
-  }
 
-  test("get day in year") {
+  test("get day in year")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 0, 0, 0)
     assert(getDayInYear(getInUTCDays(c.getTimeInMillis)) === 77)
     c.set(2012, 2, 18, 0, 0, 0)
     assert(getDayInYear(getInUTCDays(c.getTimeInMillis)) === 78)
-  }
 
-  test("get year") {
+  test("get year")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 0, 0, 0)
     assert(getYear(getInUTCDays(c.getTimeInMillis)) === 2015)
     c.set(2012, 2, 18, 0, 0, 0)
     assert(getYear(getInUTCDays(c.getTimeInMillis)) === 2012)
-  }
 
-  test("get quarter") {
+  test("get quarter")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 0, 0, 0)
     assert(getQuarter(getInUTCDays(c.getTimeInMillis)) === 1)
     c.set(2012, 11, 18, 0, 0, 0)
     assert(getQuarter(getInUTCDays(c.getTimeInMillis)) === 4)
-  }
 
-  test("get month") {
+  test("get month")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 0, 0, 0)
     assert(getMonth(getInUTCDays(c.getTimeInMillis)) === 3)
     c.set(2012, 11, 18, 0, 0, 0)
     assert(getMonth(getInUTCDays(c.getTimeInMillis)) === 12)
-  }
 
-  test("get day of month") {
+  test("get day of month")
     val c = Calendar.getInstance()
     c.set(2015, 2, 18, 0, 0, 0)
     assert(getDayOfMonth(getInUTCDays(c.getTimeInMillis)) === 18)
     c.set(2012, 11, 24, 0, 0, 0)
     assert(getDayOfMonth(getInUTCDays(c.getTimeInMillis)) === 24)
-  }
 
-  test("date add months") {
+  test("date add months")
     val c1 = Calendar.getInstance()
     c1.set(1997, 1, 28, 10, 30, 0)
     val days1 = millisToDays(c1.getTimeInMillis)
@@ -444,9 +424,8 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     assert(dateAddMonths(days1, 36) === millisToDays(c2.getTimeInMillis))
     c2.set(1996, 0, 31)
     assert(dateAddMonths(days1, -13) === millisToDays(c2.getTimeInMillis))
-  }
 
-  test("timestamp add months") {
+  test("timestamp add months")
     val c1 = Calendar.getInstance()
     c1.set(1997, 1, 28, 10, 30, 0)
     c1.set(Calendar.MILLISECOND, 0)
@@ -456,9 +435,8 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     c2.set(Calendar.MILLISECOND, 123)
     val ts2 = c2.getTimeInMillis * 1000L
     assert(timestampAddInterval(ts1, 36, 123000) === ts2)
-  }
 
-  test("monthsBetween") {
+  test("monthsBetween")
     val c1 = Calendar.getInstance()
     c1.set(1997, 1, 28, 10, 30, 0)
     val c2 = Calendar.getInstance()
@@ -474,33 +452,27 @@ class DateTimeUtilsSuite extends SparkFunSuite {
     c2.set(1996, 2, 31, 0, 0, 0)
     assert(monthsBetween(c1.getTimeInMillis * 1000L,
                          c2.getTimeInMillis * 1000L) === 11)
-  }
 
-  test("from UTC timestamp") {
-    def test(utc: String, tz: String, expected: String): Unit = {
+  test("from UTC timestamp")
+    def test(utc: String, tz: String, expected: String): Unit =
       assert(toJavaTimestamp(fromUTCTime(
                   fromJavaTimestamp(Timestamp.valueOf(utc)),
                   tz)).toString === expected)
-    }
     test("2011-12-25 09:00:00.123456", "UTC", "2011-12-25 09:00:00.123456")
     test("2011-12-25 09:00:00.123456", "JST", "2011-12-25 18:00:00.123456")
     test("2011-12-25 09:00:00.123456", "PST", "2011-12-25 01:00:00.123456")
     test("2011-12-25 09:00:00.123456",
          "Asia/Shanghai",
          "2011-12-25 17:00:00.123456")
-  }
 
-  test("to UTC timestamp") {
-    def test(utc: String, tz: String, expected: String): Unit = {
+  test("to UTC timestamp")
+    def test(utc: String, tz: String, expected: String): Unit =
       assert(
           toJavaTimestamp(toUTCTime(fromJavaTimestamp(Timestamp.valueOf(utc)),
                                     tz)).toString === expected)
-    }
     test("2011-12-25 09:00:00.123456", "UTC", "2011-12-25 09:00:00.123456")
     test("2011-12-25 18:00:00.123456", "JST", "2011-12-25 09:00:00.123456")
     test("2011-12-25 01:00:00.123456", "PST", "2011-12-25 09:00:00.123456")
     test("2011-12-25 17:00:00.123456",
          "Asia/Shanghai",
          "2011-12-25 09:00:00.123456")
-  }
-}

@@ -1,5 +1,5 @@
-class ForSomeVsUnapply {
-  def test {
+class ForSomeVsUnapply
+  def test
     def makeWrap: Wrap = ???
     def useRep[e](rep: (e, X[e])) = ()
 
@@ -9,13 +9,11 @@ class ForSomeVsUnapply {
     val Wrap(rep0) = makeWrap
     useRep(rep0) // error
 
-    val rep = makeWrap match {
+    val rep = makeWrap match
       case Wrap(r) => r
-    };
+    ;
 
     useRep(rep) // error
-  }
-}
 
 class X[e]
 

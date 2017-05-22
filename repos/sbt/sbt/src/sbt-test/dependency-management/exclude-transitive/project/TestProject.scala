@@ -2,7 +2,7 @@ import sbt._
 import Import._
 import Keys._
 
-object TestProject extends Build {
+object TestProject extends Build
   lazy val root =
     Project("root", file(".")) settings
     (ivyPaths <<= (baseDirectory, target)(
@@ -16,20 +16,17 @@ object TestProject extends Build {
     if ((base / "transitive").exists) dep else dep.intransitive()
 
   private def check(transitive: Boolean) =
-    (dependencyClasspath in Compile) map { downloaded =>
+    (dependencyClasspath in Compile) map  downloaded =>
       val jars = downloaded.size
-      if (transitive) {
+      if (transitive)
         if (jars <= 2)
           sys.error(
-              s"Transitive dependencies not downloaded, found:\n * ${downloaded
-            .mkString("\n * ")}")
+              s"Transitive dependencies not downloaded, found:\n * $downloaded
+            .mkString("\n * ")")
         else ()
-      } else {
+      else
         if (jars > 2)
           sys.error(
-              s"Transitive dependencies not downloaded, found:\n * ${downloaded
-            .mkString("\n * ")}")
+              s"Transitive dependencies not downloaded, found:\n * $downloaded
+            .mkString("\n * ")")
         else ()
-      }
-    }
-}

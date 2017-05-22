@@ -20,7 +20,7 @@ package org.apache.spark.deploy.master
 sealed trait MasterMessages extends Serializable
 
 /** Contains messages seen only by the Master and its associated entities. */
-private[master] object MasterMessages {
+private[master] object MasterMessages
 
   // LeaderElectionAgent to Master
 
@@ -43,4 +43,3 @@ private[master] object MasterMessages {
       rpcEndpointPort: Int, webUIPort: Int, restPort: Option[Int])
 
   case class AttachCompletedRebuildUI(appId: String)
-}

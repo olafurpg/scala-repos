@@ -39,13 +39,12 @@ import org.apache.spark.streaming.kafka._
   *      org.apache.spark.examples.streaming.KafkaWordCount zoo01,zoo02,zoo03 \
   *      my-consumer-group topic1,topic2 1`
   */
-object KafkaWordCount {
-  def main(args: Array[String]) {
-    if (args.length < 4) {
+object KafkaWordCount
+  def main(args: Array[String])
+    if (args.length < 4)
       System.err.println(
           "Usage: KafkaWordCount <zkQuorum> <group> <topics> <numThreads>")
       System.exit(1)
-    }
 
     StreamingExamples.setStreamingLogLevels()
 
@@ -65,19 +64,16 @@ object KafkaWordCount {
 
     ssc.start()
     ssc.awaitTermination()
-  }
-}
 
 // Produces some random words between 1 and 100.
-object KafkaWordCountProducer {
+object KafkaWordCountProducer
 
-  def main(args: Array[String]) {
-    if (args.length < 4) {
+  def main(args: Array[String])
+    if (args.length < 4)
       System.err.println(
           "Usage: KafkaWordCountProducer <metadataBrokerList> <topic> " +
           "<messagesPerSec> <wordsPerMessage>")
       System.exit(1)
-    }
 
     val Array(brokers, topic, messagesPerSec, wordsPerMessage) = args
 
@@ -92,18 +88,14 @@ object KafkaWordCountProducer {
     val producer = new KafkaProducer[String, String](props)
 
     // Send some messages
-    while (true) {
-      (1 to messagesPerSec.toInt).foreach { messageNum =>
+    while (true)
+      (1 to messagesPerSec.toInt).foreach  messageNum =>
         val str = (1 to wordsPerMessage.toInt)
           .map(x => scala.util.Random.nextInt(10).toString)
           .mkString(" ")
 
         val message = new ProducerRecord[String, String](topic, null, str)
         producer.send(message)
-      }
 
       Thread.sleep(1000)
-    }
-  }
-}
 // scalastyle:on println

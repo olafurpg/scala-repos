@@ -36,7 +36,7 @@ import scalafx.scene.Node
 /**
   * Companion Object for [[scalafx.embed.swing.SwingNode]].
   */
-object SwingNode {
+object SwingNode
 
   /**
     * Converts a ScalaFX SwingNode to its JavaFX counterpart.
@@ -46,7 +46,6 @@ object SwingNode {
     */
   implicit def sfxPanel2jfx(node: SwingNode): jfxes.SwingNode =
     if (node != null) node.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/embed/swing/SwingNode.html JavaFX
@@ -58,13 +57,11 @@ object SwingNode {
   * @since 8.0
   */
 class SwingNode(override val delegate: jfxes.SwingNode = new jfxes.SwingNode)
-    extends Node(delegate) with SFXDelegate[jfxes.SwingNode] {
+    extends Node(delegate) with SFXDelegate[jfxes.SwingNode]
 
   /**
     * the JComponent instance attached to this SwingNode.
     */
   def content: JComponent = delegate.getContent
-  def content_=(c: JComponent) {
+  def content_=(c: JComponent)
     delegate.setContent(c)
-  }
-}

@@ -7,7 +7,7 @@ import com.intellij.openapi.module.ModuleType
 /**
   * @author Pavel Fatin
   */
-class SbtModuleType extends ModuleType[EmptyModuleBuilder]("SBT_MODULE") {
+class SbtModuleType extends ModuleType[EmptyModuleBuilder]("SBT_MODULE")
   def createModuleBuilder() = new EmptyModuleBuilder()
 
   def getName = Sbt.BuildModuleName
@@ -17,11 +17,9 @@ class SbtModuleType extends ModuleType[EmptyModuleBuilder]("SBT_MODULE") {
   def getBigIcon = Sbt.Icon
 
   override def getNodeIcon(isOpened: Boolean) = Sbt.Icon
-}
 
-object SbtModuleType {
+object SbtModuleType
   val instance = Class
     .forName("org.jetbrains.sbt.project.module.SbtModuleType")
     .newInstance
     .asInstanceOf[SbtModuleType]
-}

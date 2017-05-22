@@ -18,8 +18,7 @@ class ModuleExtData(val owner: ProjectSystemId,
                     val javacOptions: Seq[String])
     extends AbstractExternalEntityData(owner)
 
-object ModuleExtData {
+object ModuleExtData
   val Key: Key[ModuleExtData] = new Key(
       classOf[ModuleExtData].getName,
       ProjectKeys.LIBRARY_DEPENDENCY.getProcessingWeight + 1)
-}

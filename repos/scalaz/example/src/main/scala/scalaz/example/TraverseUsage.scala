@@ -1,6 +1,6 @@
 package scalaz.example
 
-object TraverseUsage extends App {
+object TraverseUsage extends App
   import scalaz._
 
   import scalaz.std.list._
@@ -91,12 +91,11 @@ object TraverseUsage extends App {
 
   import scalaz.State._
   // state stores the last seen Int, returns whether of not the current was a repeat
-  val checkForRepeats: Int => State[Option[Int], Boolean] = { next =>
-    for {
+  val checkForRepeats: Int => State[Option[Int], Boolean] =  next =>
+    for
       last <- get
       _ <- put(some(next))
-    } yield (last === some(next))
-  }
+    yield (last === some(next))
 
   val nonRepeating = List(1, 2, 3, 4)
   val repeating = List(1, 2, 3, 3, 4)
@@ -118,4 +117,3 @@ object TraverseUsage extends App {
   import scalaz.Applicative.monoidApplicative
   assert(Tag.unwrap(res1.traverseU(Tags.Disjunction(_))) === false)
   assert(Tag.unwrap(res2.traverseU(Tags.Disjunction(_))) === true)
-}

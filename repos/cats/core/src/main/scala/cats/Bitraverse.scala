@@ -5,7 +5,7 @@ import cats.functor.Bifunctor
 /**
   *  A type class abstracting over types that give rise to two independent [[cats.Traverse]]s.
   */
-trait Bitraverse[F[_, _]] extends Bifoldable[F] with Bifunctor[F] { self =>
+trait Bitraverse[F[_, _]] extends Bifoldable[F] with Bifunctor[F]  self =>
 
   /** Traverse each side of the structure with the given functions */
   def bitraverse[G[_]: Applicative, A, B, C, D](fab: F[A, B])(
@@ -18,22 +18,19 @@ trait Bitraverse[F[_, _]] extends Bifoldable[F] with Bifunctor[F] { self =>
   /** If F and G are both [[cats.Bitraverse]] then so is their composition F[G[_, _], G[_, _]] */
   def compose[G[_, _]](implicit ev: Bitraverse[G])
     : Bifoldable[Lambda[(A, B) => F[G[A, B], G[A, B]]]] =
-    new CompositeBitraverse[F, G] {
+    new CompositeBitraverse[F, G]
       val F = self
       val G = ev
-    }
 
   override def bimap[A, B, C, D](fab: F[A, B])(f: A => C, g: B => D): F[C, D] =
     bitraverse[Id, A, B, C, D](fab)(f, g)
-}
 
-object Bitraverse {
+object Bitraverse
   def apply[F[_, _]](implicit F: Bitraverse[F]): Bitraverse[F] = F
-}
 
 trait CompositeBitraverse[F[_, _], G[_, _]]
     extends Bitraverse[Lambda[(A, B) => F[G[A, B], G[A, B]]]]
-    with CompositeBifoldable[F, G] {
+    with CompositeBifoldable[F, G]
   def F: Bitraverse[F]
   def G: Bitraverse[G]
 
@@ -45,4 +42,3 @@ trait CompositeBitraverse[F[_, _], G[_, _]]
         gab => G.bitraverse(gab)(f, g),
         gab => G.bitraverse(gab)(f, g)
     )
-}

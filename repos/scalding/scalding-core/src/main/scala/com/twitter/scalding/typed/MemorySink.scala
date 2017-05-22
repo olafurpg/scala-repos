@@ -30,7 +30,7 @@ import cascading.tuple.Tuple
  * This is useful for in-memory testing with Execution
  * It only works for CascadingLocal mode.
  */
-class MemorySink[T] extends TypedSink[T] {
+class MemorySink[T] extends TypedSink[T]
   private[this] val buf = Buffer[Tuple]()
   private[this] val name: String = UUID.randomUUID.toString
 
@@ -40,12 +40,10 @@ class MemorySink[T] extends TypedSink[T] {
 
   def setter[U <: T] = TupleSetter.asSubSetter(TupleSetter.singleSetter[T])
   def writeFrom(pipe: Pipe)(implicit flowDef: FlowDef, mode: Mode): Pipe =
-    mode match {
+    mode match
       case cl: CascadingLocal =>
         val tap = new MemoryTap(new NullScheme(sinkFields, sinkFields), buf)
         flowDef.addSink(name, tap)
         flowDef.addTail(new Pipe(name, pipe))
         pipe
       case _ => sys.error("MemorySink only usable with cascading local")
-    }
-}

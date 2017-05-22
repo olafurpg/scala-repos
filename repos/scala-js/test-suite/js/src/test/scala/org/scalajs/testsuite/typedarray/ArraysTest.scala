@@ -17,9 +17,9 @@ import org.scalajs.testsuite.utils.Requires
 
 object ArraysTest extends Requires.TypedArray
 
-class ArraysTest extends javalib.util.ArraysTest {
+class ArraysTest extends javalib.util.ArraysTest
 
-  override def Array[T : ClassTag](v: T*): scala.Array[T] = classTag[T] match {
+  override def Array[T : ClassTag](v: T*): scala.Array[T] = classTag[T] match
     case ClassTag.Byte =>
       new Int8Array(v.asInstanceOf[Seq[Byte]].toJSArray).toArray
         .asInstanceOf[scala.Array[T]]
@@ -36,5 +36,3 @@ class ArraysTest extends javalib.util.ArraysTest {
       new Float64Array(v.asInstanceOf[Seq[Double]].toJSArray).toArray
         .asInstanceOf[scala.Array[T]]
     case _ => scala.Array(v: _*)
-  }
-}

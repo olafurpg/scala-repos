@@ -4,7 +4,7 @@ import org.joda.time.DateTime
 
 import scala.concurrent.duration.Duration
 
-trait Cache {
+trait Cache
   def get[V](key: String): Option[V]
 
   def put[V](key: String, value: V, ttl: Option[Duration]): V
@@ -12,4 +12,3 @@ trait Cache {
   def remove(key: String)
 
   def flush()
-}

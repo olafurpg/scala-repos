@@ -30,16 +30,14 @@ private[spark] case class ApplicationAttemptInfo(attemptId: Option[String],
                                                  completed: Boolean = false)
 
 private[spark] case class ApplicationHistoryInfo(
-    id: String, name: String, attempts: List[ApplicationAttemptInfo]) {
+    id: String, name: String, attempts: List[ApplicationAttemptInfo])
 
   /**
     * Has this application completed?
     * @return true if the most recent attempt has completed
     */
-  def completed: Boolean = {
+  def completed: Boolean =
     attempts.nonEmpty && attempts.head.completed
-  }
-}
 
 /**
   *  A probe which can be invoked to see if a loaded Web UI has been updated.
@@ -48,7 +46,7 @@ private[spark] case class ApplicationHistoryInfo(
   *  the probe returned with it is the one that must be used to check for it
   *  being out of date; previous probes must be discarded.
   */
-private[history] abstract class HistoryUpdateProbe {
+private[history] abstract class HistoryUpdateProbe
 
   /**
     * Return true if the history provider has a later version of the application
@@ -56,7 +54,6 @@ private[history] abstract class HistoryUpdateProbe {
     * @return
     */
   def isUpdated(): Boolean
-}
 
 /**
   * All the information returned from a call to `getAppUI()`: the new UI
@@ -67,7 +64,7 @@ private[history] abstract class HistoryUpdateProbe {
 private[history] case class LoadedAppUI(
     ui: SparkUI, updateProbe: () => Boolean)
 
-private[history] abstract class ApplicationHistoryProvider {
+private[history] abstract class ApplicationHistoryProvider
 
   /**
     * Returns a list of applications available for the history server to show.
@@ -107,4 +104,3 @@ private[history] abstract class ApplicationHistoryProvider {
   def writeEventLogs(appId: String,
                      attemptId: Option[String],
                      zipStream: ZipOutputStream): Unit
-}

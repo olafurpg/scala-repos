@@ -1,7 +1,7 @@
 package scala.reflect.reify
 package codegen
 
-trait GenPositions { self: Reifier =>
+trait GenPositions  self: Reifier =>
 
   import global._
 
@@ -12,4 +12,3 @@ trait GenPositions { self: Reifier =>
   // however both macros and toolboxes have their own means to report errors in synthetic trees
   def reifyPosition(pos: Position): Tree =
     reifyMirrorObject(NoPosition)
-}

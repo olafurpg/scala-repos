@@ -7,7 +7,7 @@ import scala.collection.mutable
 // A mostly empty implementation so that we can successfully
 // mock it.
 class MockScheduledExecutorService
-    extends AbstractExecutorService with ScheduledExecutorService {
+    extends AbstractExecutorService with ScheduledExecutorService
   val schedules = mutable.Buffer[(Runnable, Long, Long, TimeUnit)]()
 
   def schedule[V](c: Callable[V], delay: Long, unit: TimeUnit) =
@@ -27,8 +27,6 @@ class MockScheduledExecutorService
   def scheduleAtFixedRate(r: Runnable,
                           initialDelay: Long,
                           period: Long,
-                          unit: TimeUnit): ScheduledFuture[_] = {
+                          unit: TimeUnit): ScheduledFuture[_] =
     schedules += ((r, initialDelay, period, unit))
     null
-  }
-}

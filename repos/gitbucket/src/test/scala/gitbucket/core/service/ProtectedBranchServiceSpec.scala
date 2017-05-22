@@ -10,22 +10,20 @@ import org.scalatest.FunSpec
 
 class ProtectedBranchServiceSpec
     extends FunSpec with ServiceSpecBase with ProtectedBranchService
-    with CommitStatusService {
+    with CommitStatusService
 
   val receiveHook = new ProtectedBranchReceiveHook()
   val now = new java.util.Date()
   val sha = "0c77148632618b59b6f70004e3084002be2b8804"
   val sha2 = "0c77148632618b59b6f70004e3084002be2b8805"
 
-  describe("getProtectedBranchInfo") {
-    it("should empty is disabled") {
-      withTestDB { implicit session =>
+  describe("getProtectedBranchInfo")
+    it("should empty is disabled")
+      withTestDB  implicit session =>
         assert(getProtectedBranchInfo("user1", "repo1", "branch") == ProtectedBranchInfo
               .disabled("user1", "repo1"))
-      }
-    }
-    it("should enable and update and disable") {
-      withTestDB { implicit session =>
+    it("should enable and update and disable")
+      withTestDB  implicit session =>
         generateNewUserWithDBRepository("user1", "repo1")
         enableBranchProtection("user1", "repo1", "branch", false, Nil)
         assert(
@@ -39,10 +37,8 @@ class ProtectedBranchServiceSpec
         disableBranchProtection("user1", "repo1", "branch")
         assert(getProtectedBranchInfo("user1", "repo1", "branch") == ProtectedBranchInfo
               .disabled("user1", "repo1"))
-      }
-    }
-    it("should empty contexts is no-include-administrators") {
-      withTestDB { implicit session =>
+    it("should empty contexts is no-include-administrators")
+      withTestDB  implicit session =>
         generateNewUserWithDBRepository("user1", "repo1")
         enableBranchProtection("user1", "repo1", "branch", false, Nil)
         assert(
@@ -50,25 +46,20 @@ class ProtectedBranchServiceSpec
         enableBranchProtection("user1", "repo1", "branch", true, Nil)
         assert(
             getProtectedBranchInfo("user1", "repo1", "branch").includeAdministrators == false)
-      }
-    }
-    it("getProtectedBranchList") {
-      withTestDB { implicit session =>
+    it("getProtectedBranchList")
+      withTestDB  implicit session =>
         generateNewUserWithDBRepository("user1", "repo1")
         enableBranchProtection("user1", "repo1", "branch", false, Nil)
         enableBranchProtection("user1", "repo1", "branch2", false, Seq("fuga"))
         enableBranchProtection("user1", "repo1", "branch3", true, Seq("hoge"))
         assert(getProtectedBranchList("user1", "repo1").toSet == Set(
                 "branch", "branch2", "branch3"))
-      }
-    }
-    it("getBranchProtectedReason on force push from admin") {
-      withTestDB { implicit session =>
-        withTestRepository { git =>
+    it("getBranchProtectedReason on force push from admin")
+      withTestDB  implicit session =>
+        withTestRepository  git =>
           val rp =
-            new ReceivePack(git.getRepository) <| {
+            new ReceivePack(git.getRepository) <|
               _.setAllowNonFastForwards(true)
-            }
           val rc =
             new ReceiveCommand(ObjectId.fromString(sha),
                                ObjectId.fromString(sha2),
@@ -81,16 +72,12 @@ class ProtectedBranchServiceSpec
           assert(
               receiveHook.preReceive("user1", "repo1", rp, rc, "user1") == Some(
                   "Cannot force-push to a protected branch"))
-        }
-      }
-    }
-    it("getBranchProtectedReason on force push from other") {
-      withTestDB { implicit session =>
-        withTestRepository { git =>
+    it("getBranchProtectedReason on force push from other")
+      withTestDB  implicit session =>
+        withTestRepository  git =>
           val rp =
-            new ReceivePack(git.getRepository) <| {
+            new ReceivePack(git.getRepository) <|
               _.setAllowNonFastForwards(true)
-            }
           val rc =
             new ReceiveCommand(ObjectId.fromString(sha),
                                ObjectId.fromString(sha2),
@@ -103,16 +90,12 @@ class ProtectedBranchServiceSpec
           assert(
               receiveHook.preReceive("user1", "repo1", rp, rc, "user2") == Some(
                   "Cannot force-push to a protected branch"))
-        }
-      }
-    }
-    it("getBranchProtectedReason check status on push from other") {
-      withTestDB { implicit session =>
-        withTestRepository { git =>
+    it("getBranchProtectedReason check status on push from other")
+      withTestDB  implicit session =>
+        withTestRepository  git =>
           val rp =
-            new ReceivePack(git.getRepository) <| {
+            new ReceivePack(git.getRepository) <|
               _.setAllowNonFastForwards(false)
-            }
           val rc = new ReceiveCommand(ObjectId.fromString(sha),
                                       ObjectId.fromString(sha2),
                                       "refs/heads/branch",
@@ -165,16 +148,12 @@ class ProtectedBranchServiceSpec
                              user1)
           assert(
               receiveHook.preReceive("user1", "repo1", rp, rc, "user2") == None)
-        }
-      }
-    }
-    it("getBranchProtectedReason check status on push from admin") {
-      withTestDB { implicit session =>
-        withTestRepository { git =>
+    it("getBranchProtectedReason check status on push from admin")
+      withTestDB  implicit session =>
+        withTestRepository  git =>
           val rp =
-            new ReceivePack(git.getRepository) <| {
+            new ReceivePack(git.getRepository) <|
               _.setAllowNonFastForwards(false)
-            }
           val rc = new ReceiveCommand(ObjectId.fromString(sha),
                                       ObjectId.fromString(sha2),
                                       "refs/heads/branch",
@@ -234,21 +213,15 @@ class ProtectedBranchServiceSpec
                              user1)
           assert(
               receiveHook.preReceive("user1", "repo1", rp, rc, "user1") == None)
-        }
-      }
-    }
-  }
-  describe("ProtectedBranchInfo") {
-    it("administrator is owner") {
-      withTestDB { implicit session =>
+  describe("ProtectedBranchInfo")
+    it("administrator is owner")
+      withTestDB  implicit session =>
         generateNewUserWithDBRepository("user1", "repo1")
         val x = ProtectedBranchInfo("user1", "repo1", true, Nil, false)
         assert(x.isAdministrator("user1") == true)
         assert(x.isAdministrator("user2") == false)
-      }
-    }
-    it("administrator is manager") {
-      withTestDB { implicit session =>
+    it("administrator is manager")
+      withTestDB  implicit session =>
         val x = ProtectedBranchInfo("grp1", "repo1", true, Nil, false)
         x.createGroup("grp1", None)
         generateNewAccount("user1")
@@ -259,10 +232,8 @@ class ProtectedBranchServiceSpec
         assert(x.isAdministrator("user1") == true)
         assert(x.isAdministrator("user2") == false)
         assert(x.isAdministrator("user3") == false)
-      }
-    }
-    it("unSuccessedContexts") {
-      withTestDB { implicit session =>
+    it("unSuccessedContexts")
+      withTestDB  implicit session =>
         val user1 = generateNewUserWithDBRepository("user1", "repo1")
         val x =
           ProtectedBranchInfo("user1", "repo1", true, List("must"), false)
@@ -317,10 +288,8 @@ class ProtectedBranchServiceSpec
                            now,
                            user1)
         assert(x.unSuccessedContexts(sha) == Set())
-      }
-    }
-    it("unSuccessedContexts when empty") {
-      withTestDB { implicit session =>
+    it("unSuccessedContexts when empty")
+      withTestDB  implicit session =>
         val user1 = generateNewUserWithDBRepository("user1", "repo1")
         val x = ProtectedBranchInfo("user1", "repo1", true, Nil, false)
         val sha = "0c77148632618b59b6f70004e3084002be2b8804"
@@ -335,16 +304,12 @@ class ProtectedBranchServiceSpec
                            now,
                            user1)
         assert(x.unSuccessedContexts(sha) == Set())
-      }
-    }
-    it("if disabled, needStatusCheck is false") {
-      withTestDB { implicit session =>
+    it("if disabled, needStatusCheck is false")
+      withTestDB  implicit session =>
         assert(ProtectedBranchInfo("user1", "repo1", false, Seq("must"), true)
               .needStatusCheck("user1") == false)
-      }
-    }
-    it("needStatusCheck includeAdministrators") {
-      withTestDB { implicit session =>
+    it("needStatusCheck includeAdministrators")
+      withTestDB  implicit session =>
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), false)
               .needStatusCheck("user2") == true)
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), false)
@@ -353,7 +318,3 @@ class ProtectedBranchServiceSpec
               .needStatusCheck("user2") == true)
         assert(ProtectedBranchInfo("user1", "repo1", true, Seq("must"), true)
               .needStatusCheck("user1") == true)
-      }
-    }
-  }
-}

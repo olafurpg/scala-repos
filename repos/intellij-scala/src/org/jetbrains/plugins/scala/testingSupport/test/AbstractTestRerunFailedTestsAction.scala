@@ -24,26 +24,24 @@ import scala.collection.mutable.ArrayBuffer
   */
 class AbstractTestRerunFailedTestsAction(
     consoleView: BaseTestsOutputConsoleView)
-    extends AbstractRerunFailedTestsActionAdapter(consoleView) {
+    extends AbstractRerunFailedTestsActionAdapter(consoleView)
   copyFrom(ActionManager.getInstance.getAction("RerunFailedTests"))
   registerCustomShortcutSet(getShortcutSet, consoleView.getComponent)
 
-  override def getRunProfile: MyRunProfileAdapter = {
+  override def getRunProfile: MyRunProfileAdapter =
     val properties: TestConsoleProperties = getModel.getProperties
     val configuration =
       properties.getConfiguration.asInstanceOf[AbstractTestRunConfiguration]
-    new MyRunProfileAdapter(configuration) {
+    new MyRunProfileAdapter(configuration)
       def getModules: Array[Module] = configuration.getModules
 
-      def getTestName(failed: AbstractTestProxy): String = {
-        failed.getLocation(getProject, GlobalSearchScope.allScope(getProject)) match {
+      def getTestName(failed: AbstractTestProxy): String =
+        failed.getLocation(getProject, GlobalSearchScope.allScope(getProject)) match
           case PsiLocationWithName(_, _, testName) => testName
           case _ => failed.getName
-        }
-      }
 
       def getState(
-          executor: Executor, env: ExecutionEnvironment): RunProfileState = {
+          executor: Executor, env: ExecutionEnvironment): RunProfileState =
         val extensionConfiguration =
           properties.asInstanceOf[PropertiesExtension].getRunConfigurationBase
         val state = configuration.getState(executor, env)
@@ -53,19 +51,18 @@ class AbstractTestRerunFailedTestsAction(
         val classNames = patcher.getClasses
           .map(
               s =>
-                {
               val i = s.lastIndexOf(".")
               if (i < 0) s
               else s.substring(i + 1)
-            } -> s)
+            -> s)
           .toMap
         import scala.collection.JavaConversions._
-        for (failed <- failedTests) {
+        for (failed <- failedTests)
           //todo: fix after adding location API
-          def tail() {
+          def tail()
             var parent = failed.getParent
-            while (parent != null) {
-              classNames.get(parent.getName) match {
+            while (parent != null)
+              classNames.get(parent.getName) match
                 case None =>
                   parent = parent.getParent
                   if (parent == null)
@@ -74,51 +71,37 @@ class AbstractTestRerunFailedTestsAction(
                 case Some(s) =>
                   buffer += ((s, getTestName(failed)))
                   parent = null
-              }
-            }
-          }
           if (extensionConfiguration != this &&
               extensionConfiguration.isInstanceOf[MyRunProfileAdapter] &&
               extensionConfiguration
                 .asInstanceOf[MyRunProfileAdapter]
-                .previoslyFailed != null) {
+                .previoslyFailed != null)
             var added = false
             for (f <- extensionConfiguration
                        .asInstanceOf[MyRunProfileAdapter]
-                       .previoslyFailed if !added) {
-              if (f._2 == getTestName(failed)) {
+                       .previoslyFailed if !added)
+              if (f._2 == getTestName(failed))
                 buffer += f
                 added = true
-              }
-            }
             if (!added) tail()
-          } else {
+          else
             tail()
-          }
-        }
         previoslyFailed = buffer
         patcher.setFailedTests(buffer)
         patcher.setConfiguration(this)
         state
-      }
-    }
-  }
 
-  private def isFailed(test: AbstractTestProxy): Boolean = {
+  private def isFailed(test: AbstractTestProxy): Boolean =
     if (!test.isLeaf) return false
-    test match {
+    test match
       case test: SMTestProxy =>
         val info = test.getMagnitudeInfo
         info == Magnitude.FAILED_INDEX || info == Magnitude.ERROR_INDEX
       case _ => !test.isPassed
-    }
-  }
 
-  override def getFailedTests(project: Project): List[AbstractTestProxy] = {
+  override def getFailedTests(project: Project): List[AbstractTestProxy] =
     val list = new ArrayList[AbstractTestProxy]()
     val allTests = getModel.getRoot.getAllTests
     import scala.collection.JavaConversions._
     for (test <- allTests if isFailed(test)) list add test
     list
-  }
-}

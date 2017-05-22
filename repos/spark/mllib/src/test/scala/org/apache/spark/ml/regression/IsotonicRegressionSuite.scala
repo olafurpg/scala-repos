@@ -26,23 +26,20 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 class IsotonicRegressionSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  private def generateIsotonicInput(labels: Seq[Double]): DataFrame = {
+  private def generateIsotonicInput(labels: Seq[Double]): DataFrame =
     sqlContext
       .createDataFrame(
-          labels.zipWithIndex.map {
+          labels.zipWithIndex.map
             case (label, i) => (label, i.toDouble, 1.0)
-          }
       )
       .toDF("label", "features", "weight")
-  }
 
-  private def generatePredictionInput(features: Seq[Double]): DataFrame = {
+  private def generatePredictionInput(features: Seq[Double]): DataFrame =
     sqlContext.createDataFrame(features.map(Tuple1.apply)).toDF("features")
-  }
 
-  test("isotonic regression predictions") {
+  test("isotonic regression predictions")
     val dataset = generateIsotonicInput(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18))
     val ir = new IsotonicRegression().setIsotonic(true)
 
@@ -52,10 +49,9 @@ class IsotonicRegressionSuite
       .transform(dataset)
       .select("prediction")
       .rdd
-      .map {
+      .map
         case Row(pred) =>
           pred
-      }
       .collect()
 
     assert(predictions === Array(1, 2, 2, 2, 6, 16.5, 16.5, 17, 18))
@@ -64,9 +60,8 @@ class IsotonicRegressionSuite
     assert(model.predictions === Vectors.dense(
             1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
     assert(model.getIsotonic)
-  }
 
-  test("antitonic regression predictions") {
+  test("antitonic regression predictions")
     val dataset = generateIsotonicInput(Seq(7, 5, 3, 5, 1))
     val ir = new IsotonicRegression().setIsotonic(false)
 
@@ -78,23 +73,20 @@ class IsotonicRegressionSuite
       .transform(features)
       .select("prediction")
       .rdd
-      .map {
+      .map
         case Row(pred) => pred
-      }
       .collect()
 
     assert(predictions === Array(7, 7, 6, 5.5, 5, 4, 1))
-  }
 
-  test("params validation") {
+  test("params validation")
     val dataset = generateIsotonicInput(Seq(1, 2, 3))
     val ir = new IsotonicRegression
     ParamsSuite.checkParams(ir)
     val model = ir.fit(dataset)
     ParamsSuite.checkParams(model)
-  }
 
-  test("default params") {
+  test("default params")
     val dataset = generateIsotonicInput(Seq(1, 2, 3))
     val ir = new IsotonicRegression()
     assert(ir.getLabelCol === "label")
@@ -121,9 +113,8 @@ class IsotonicRegressionSuite
     assert(model.getIsotonic)
     assert(model.getFeatureIndex === 0)
     assert(model.hasParent)
-  }
 
-  test("set parameters") {
+  test("set parameters")
     val isotonicRegression = new IsotonicRegression()
       .setIsotonic(false)
       .setWeightCol("w")
@@ -136,32 +127,26 @@ class IsotonicRegressionSuite
     assert(isotonicRegression.getFeaturesCol === "f")
     assert(isotonicRegression.getLabelCol === "l")
     assert(isotonicRegression.getPredictionCol === "p")
-  }
 
-  test("missing column") {
+  test("missing column")
     val dataset = generateIsotonicInput(Seq(1, 2, 3))
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new IsotonicRegression().setWeightCol("w").fit(dataset)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new IsotonicRegression().setFeaturesCol("f").fit(dataset)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new IsotonicRegression().setLabelCol("l").fit(dataset)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       new IsotonicRegression()
         .fit(dataset)
         .setFeaturesCol("f")
         .transform(dataset)
-    }
-  }
 
-  test("vector features column with feature index") {
+  test("vector features column with feature index")
     val dataset = sqlContext
       .createDataFrame(Seq((4.0, Vectors.dense(0.0, 1.0)),
                            (3.0, Vectors.dense(0.0, 2.0)),
@@ -178,31 +163,26 @@ class IsotonicRegressionSuite
       .transform(features)
       .select("prediction")
       .rdd
-      .map {
+      .map
         case Row(pred) => pred
-      }
       .collect()
 
     assert(predictions === Array(3.5, 5.0, 5.0, 5.0))
-  }
 
-  test("read/write") {
+  test("read/write")
     val dataset = generateIsotonicInput(Seq(1, 2, 3, 1, 6, 17, 16, 17, 18))
 
     def checkModelData(model: IsotonicRegressionModel,
-                       model2: IsotonicRegressionModel): Unit = {
+                       model2: IsotonicRegressionModel): Unit =
       assert(model.boundaries === model2.boundaries)
       assert(model.predictions === model2.predictions)
       assert(model.isotonic === model2.isotonic)
-    }
 
     val ir = new IsotonicRegression()
     testEstimatorAndModelReadWrite(
         ir, dataset, IsotonicRegressionSuite.allParamSettings, checkModelData)
-  }
-}
 
-object IsotonicRegressionSuite {
+object IsotonicRegressionSuite
 
   /**
     * Mapping from all Params to valid settings which differ from the defaults.
@@ -214,4 +194,3 @@ object IsotonicRegressionSuite {
       "isotonic" -> true,
       "featureIndex" -> 0
   )
-}

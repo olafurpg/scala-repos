@@ -13,7 +13,7 @@ import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration._
 
-class StageActorRefSpec extends AkkaSpec with ImplicitSender {
+class StageActorRefSpec extends AkkaSpec with ImplicitSender
   implicit val materializer = ActorMaterializer()
 
   import StageActorRefSpec._
@@ -21,9 +21,9 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
 
   def sumStage(probe: ActorRef) = SumTestStage(probe)
 
-  "A Graph Stage's ActorRef" must {
+  "A Graph Stage's ActorRef" must
 
-    "receive messages" in {
+    "receive messages" in
       val (_, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -34,9 +34,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
       stageRef ! StopNow
 
       res.futureValue should ===(6)
-    }
 
-    "be able to be replied to" in {
+    "be able to be replied to" in
       val (_, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -49,9 +48,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
 
       stageRef ! StopNow
       res.futureValue should ===(10)
-    }
 
-    "yield the same 'self' ref each time" in {
+    "yield the same 'self' ref each time" in
       val (_, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -68,9 +66,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
 
       stageRef ! StopNow
       res.futureValue should ===(6)
-    }
 
-    "be watchable" in {
+    "be watchable" in
       val (source, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -82,9 +79,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
 
       res.futureValue should ===(1)
       expectTerminated(stageRef)
-    }
 
-    "be able to become" in {
+    "be able to become" in
       val (source, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -100,9 +96,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
       source.success(None)
       res.futureValue should ===(1)
       expectTerminated(stageRef)
-    }
 
-    "reply Terminated when terminated stage is watched" in {
+    "reply Terminated when terminated stage is watched" in
       val (source, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -118,9 +113,8 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
       val p = TestProbe()
       p.watch(stageRef)
       p.expectTerminated(stageRef)
-    }
 
-    "be un-watchable" in {
+    "be un-watchable" in
       val (source, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
@@ -133,19 +127,17 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
 
       res.futureValue should ===(1)
       expectNoMsg(100.millis)
-    }
 
-    "ignore and log warnings for PoisonPill and Kill messages" in {
+    "ignore and log warnings for PoisonPill and Kill messages" in
       val (source, res) =
         Source.maybe[Int].toMat(sumStage(testActor))(Keep.both).run()
 
       val stageRef = expectMsgType[ActorRef]
       stageRef ! Add(40)
 
-      val filter = EventFilter.custom {
+      val filter = EventFilter.custom
         case e: Logging.Warning ⇒ true
         case _ ⇒ false
-      }
       system.eventStream.publish(TestEvent.Mute(filter))
       system.eventStream.subscribe(testActor, classOf[Logging.Warning])
 
@@ -154,94 +146,77 @@ class StageActorRefSpec extends AkkaSpec with ImplicitSender {
       val expectedMsg =
         s"[PoisonPill|Kill] message sent to StageActorRef($actorName) will be ignored,since it is not a real Actor. " +
         "Use a custom message type to communicate with it instead."
-      expectMsgPF(1.second, expectedMsg) {
+      expectMsgPF(1.second, expectedMsg)
         case Logging.Warning(_, _, msg) ⇒
           expectedMsg.r.pattern.matcher(msg.toString).matches()
-      }
 
       stageRef ! Kill // should log a warning, and NOT stop the stage.
-      expectMsgPF(1.second, expectedMsg) {
+      expectMsgPF(1.second, expectedMsg)
         case Logging.Warning(_, _, msg) ⇒
           expectedMsg.r.pattern.matcher(msg.toString).matches()
-      }
 
       source.success(Some(2))
       res.futureValue should ===(42)
-    }
-  }
-}
 
-object StageActorRefSpec {
+object StageActorRefSpec
 
-  object ControlProtocol {
+  object ControlProtocol
     case class Add(n: Int) extends NoSerializationVerificationNeeded
     case class AddAndTell(n: Int) extends NoSerializationVerificationNeeded
     case object CallInitStageActorRef extends NoSerializationVerificationNeeded
     case object BecomeStringEcho extends NoSerializationVerificationNeeded
     case object PullNow extends NoSerializationVerificationNeeded
     case object StopNow extends NoSerializationVerificationNeeded
-  }
 
   import ControlProtocol._
 
   case class SumTestStage(probe: ActorRef)
-      extends GraphStageWithMaterializedValue[SinkShape[Int], Future[Int]] {
+      extends GraphStageWithMaterializedValue[SinkShape[Int], Future[Int]]
     val in = Inlet[Int]("IntSum.in")
     override val shape: SinkShape[Int] = SinkShape.of(in)
 
     override def createLogicAndMaterializedValue(
-        inheritedAttributes: Attributes): (GraphStageLogic, Future[Int]) = {
+        inheritedAttributes: Attributes): (GraphStageLogic, Future[Int]) =
       val p: Promise[Int] = Promise()
 
-      val logic = new GraphStageLogic(shape) {
+      val logic = new GraphStageLogic(shape)
         implicit def self =
           stageActor.ref // must be a `def`; we want self to be the sender for our replies
         var sum: Int = 0
 
-        override def preStart(): Unit = {
+        override def preStart(): Unit =
           pull(in)
           probe ! getStageActor(behaviour).ref
-        }
 
-        def behaviour(m: (ActorRef, Any)): Unit = {
-          m match {
+        def behaviour(m: (ActorRef, Any)): Unit =
+          m match
             case (sender, Add(n)) ⇒ sum += n
             case (sender, PullNow) ⇒ pull(in)
             case (sender, CallInitStageActorRef) ⇒
               sender ! getStageActor(behaviour).ref
             case (sender, BecomeStringEcho) ⇒
-              getStageActor {
+              getStageActor
                 case (theSender, msg) ⇒ theSender ! msg.toString
-              }
             case (sender, StopNow) ⇒
               p.trySuccess(sum)
               completeStage()
             case (sender, AddAndTell(n)) ⇒
               sum += n
               sender ! sum
-          }
-        }
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
+        setHandler(in, new InHandler
+          override def onPush(): Unit =
             sum += grab(in)
             p.trySuccess(sum)
             completeStage()
-          }
 
-          override def onUpstreamFinish(): Unit = {
+          override def onUpstreamFinish(): Unit =
             p.trySuccess(sum)
             completeStage()
-          }
 
-          override def onUpstreamFailure(ex: Throwable): Unit = {
+          override def onUpstreamFailure(ex: Throwable): Unit =
             p.tryFailure(ex)
             failStage(ex)
-          }
-        })
-      }
+        )
 
       logic -> p.future
-    }
-  }
-}

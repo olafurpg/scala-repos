@@ -1,5 +1,4 @@
 package injar
 
-object Test {
+object Test
   def foo: Option[String] = None
-}

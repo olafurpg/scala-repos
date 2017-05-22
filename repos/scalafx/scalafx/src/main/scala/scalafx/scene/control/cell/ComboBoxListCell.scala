@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define CONVPARAM A [[scalafx.util.StringConverter]] to convert the given item (of type T) to a String for displaying to the user.
   * @define RET A function that will return a ListCell that is able to work on the type of element contained within the ListView. 
   */
-object ComboBoxListCell {
+object ComboBoxListCell
 
   /**
     * Converts a ScalaFX $CBLC to its JavaFX counterpart.
@@ -132,7 +132,6 @@ object ComboBoxListCell {
   def forListView[T](items: T*): (ListView[T] => ListCell[T]) =
     (view: ListView[T]) =>
       jfxscc.ComboBoxListCell.forListView[T](items: _*).call(view)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxTreeCell.html $CBLC]]
@@ -157,7 +156,7 @@ class ComboBoxListCell[T](
     with ComboBoxEditableCell[jfxscc.ComboBoxListCell[T], T]
     with UpdatableCell[jfxscc.ComboBoxListCell[T], T]
     with ItemableCell[jfxscc.ComboBoxListCell[T], T]
-    with SFXDelegate[jfxscc.ComboBoxListCell[T]] {
+    with SFXDelegate[jfxscc.ComboBoxListCell[T]]
 
   /**
     * $CONSTITEMS
@@ -191,4 +190,3 @@ class ComboBoxListCell[T](
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ComboBoxListCell[T](items: _*))
-}

@@ -15,7 +15,7 @@ import akka.testkit.TestProbe
 import akka.actor.ActorRef
 import akka.serialization.SerializationExtension
 
-object DistributedDataDocSpec {
+object DistributedDataDocSpec
 
   val config = """
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
@@ -55,11 +55,10 @@ object DistributedDataDocSpec {
   import akka.cluster.ddata.Replicator
   import akka.cluster.ddata.Replicator._
 
-  object DataBot {
+  object DataBot
     private case object Tick
-  }
 
-  class DataBot extends Actor with ActorLogging {
+  class DataBot extends Actor with ActorLogging
     import DataBot._
 
     val replicator = DistributedData(context.system).replicator
@@ -73,35 +72,31 @@ object DistributedDataDocSpec {
 
     replicator ! Subscribe(DataKey, self)
 
-    def receive = {
+    def receive =
       case Tick =>
         val s = ThreadLocalRandom.current().nextInt(97, 123).toChar.toString
-        if (ThreadLocalRandom.current().nextBoolean()) {
+        if (ThreadLocalRandom.current().nextBoolean())
           // add
           log.info("Adding: {}", s)
           replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ + s)
-        } else {
+        else
           // remove
           log.info("Removing: {}", s)
           replicator ! Update(DataKey, ORSet.empty[String], WriteLocal)(_ - s)
-        }
 
       case _: UpdateResponse[_] => // ignore
 
       case c @ Changed(DataKey) =>
         val data = c.get(DataKey)
         log.info("Current elements: {}", data.elements)
-    }
 
     override def postStop(): Unit = tickTask.cancel()
-  }
   //#data-bot
-}
 
-class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
+class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config)
   import Replicator._
 
-  "demonstrate update" in {
+  "demonstrate update" in
     val probe = TestProbe()
     implicit val self = probe.ref
 
@@ -127,14 +122,13 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     replicator ! Update(ActiveFlagKey, Flag.empty, writeAll)(_.switchOn)
     //#update
 
-    probe.expectMsgType[UpdateResponse[_]] match {
+    probe.expectMsgType[UpdateResponse[_]] match
       //#update-response1
       case UpdateSuccess(Counter1Key, req) => // ok
       //#update-response1
       case unexpected => fail("Unexpected response: " + unexpected)
-    }
 
-    probe.expectMsgType[UpdateResponse[_]] match {
+    probe.expectMsgType[UpdateResponse[_]] match
       //#update-response2
       case UpdateSuccess(Set1Key, req) => // ok
       case UpdateTimeout(Set1Key, req) =>
@@ -142,10 +136,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
       //#update-response2
       case UpdateSuccess(Set2Key, None) =>
       case unexpected => fail("Unexpected response: " + unexpected)
-    }
-  }
 
-  "demonstrate update with request context" in {
+  "demonstrate update with request context" in
     import Actor.Receive
     val probe = TestProbe()
     implicit val self = probe.ref
@@ -157,7 +149,7 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val writeTwo = WriteTo(n = 2, timeout = 3.second)
     val Counter1Key = PNCounterKey("counter1")
 
-    def receive: Receive = {
+    def receive: Receive =
       case "increment" =>
         // incoming command to increase the counter
         val upd = Update(Counter1Key,
@@ -170,11 +162,9 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
         replyTo ! "ack"
       case UpdateTimeout(Counter1Key, Some(replyTo: ActorRef)) =>
         replyTo ! "nack"
-    }
     //#update-request-context
-  }
 
-  "demonstrate get" in {
+  "demonstrate get" in
     val probe = TestProbe()
     implicit val self = probe.ref
 
@@ -197,16 +187,15 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     replicator ! Get(ActiveFlagKey, readAll)
     //#get
 
-    probe.expectMsgType[GetResponse[_]] match {
+    probe.expectMsgType[GetResponse[_]] match
       //#get-response1
       case g @ GetSuccess(Counter1Key, req) =>
         val value = g.get(Counter1Key).value
       case NotFound(Counter1Key, req) => // key counter1 does not exist
       //#get-response1
       case unexpected => fail("Unexpected response: " + unexpected)
-    }
 
-    probe.expectMsgType[GetResponse[_]] match {
+    probe.expectMsgType[GetResponse[_]] match
       //#get-response2
       case g @ GetSuccess(Set1Key, req) =>
         val elements = g.get(Set1Key).elements
@@ -217,10 +206,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
       case g @ GetSuccess(Set2Key, None) =>
         val elements = g.get(Set2Key).elements
       case unexpected => fail("Unexpected response: " + unexpected)
-    }
-  }
 
-  "demonstrate get with request context" in {
+  "demonstrate get with request context" in
     import Actor.Receive
     val probe = TestProbe()
     implicit val self = probe.ref
@@ -232,7 +219,7 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val readTwo = ReadFrom(n = 2, timeout = 3.second)
     val Counter1Key = PNCounterKey("counter1")
 
-    def receive: Receive = {
+    def receive: Receive =
       case "get-count" =>
         // incoming request to retrieve current value of the counter
         replicator ! Get(Counter1Key, readTwo, request = Some(sender()))
@@ -244,11 +231,9 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
         replyTo ! -1L
       case NotFound(Counter1Key, Some(replyTo: ActorRef)) =>
         replyTo ! 0L
-    }
     //#get-request-context
-  }
 
-  "demonstrate subscribe" in {
+  "demonstrate subscribe" in
     import Actor.Receive
     val probe = TestProbe()
     implicit val self = probe.ref
@@ -261,17 +246,15 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     replicator ! Subscribe(Counter1Key, self)
     var currentValue = BigInt(0)
 
-    def receive: Receive = {
+    def receive: Receive =
       case c @ Changed(Counter1Key) =>
         currentValue = c.get(Counter1Key).value
       case "get-count" =>
         // incoming request to retrieve current value of the counter
         sender() ! currentValue
-    }
     //#subscribe
-  }
 
-  "demonstrate delete" in {
+  "demonstrate delete" in
     val probe = TestProbe()
     implicit val self = probe.ref
 
@@ -285,9 +268,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val writeMajority = WriteMajority(timeout = 5.seconds)
     replicator ! Delete(Set2Key, writeMajority)
     //#delete
-  }
 
-  "demonstrate PNCounter" in {
+  "demonstrate PNCounter" in
     def println(o: Any): Unit = ()
     //#pncounter
     implicit val node = Cluster(system)
@@ -297,9 +279,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val c3: PNCounter = c2 - 2
     println(c3.value) // 6
     //#pncounter
-  }
 
-  "demonstrate PNCounterMap" in {
+  "demonstrate PNCounterMap" in
     def println(o: Any): Unit = ()
     //#pncountermap
     implicit val node = Cluster(system)
@@ -310,9 +291,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     println(m3.get("a")) // 5
     m3.entries.foreach { case (key, value) => println(s"$key -> $value") }
     //#pncountermap
-  }
 
-  "demonstrate GSet" in {
+  "demonstrate GSet" in
     def println(o: Any): Unit = ()
     //#gset
     val s0 = GSet.empty[String]
@@ -320,9 +300,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val s2 = s1 + "b" + "c"
     if (s2.contains("a")) println(s2.elements) // a, b, c
     //#gset
-  }
 
-  "demonstrate ORSet" in {
+  "demonstrate ORSet" in
     def println(o: Any): Unit = ()
     //#orset
     implicit val node = Cluster(system)
@@ -332,9 +311,8 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val s3 = s2 - "a"
     println(s3.elements) // b
     //#orset
-  }
 
-  "demonstrate ORMultiMap" in {
+  "demonstrate ORMultiMap" in
     def println(o: Any): Unit = ()
     //#ormultimap
     implicit val node = Cluster(system)
@@ -345,18 +323,16 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val m4 = m3.addBinding("b", 1)
     println(m4.entries)
     //#ormultimap
-  }
 
-  "demonstrate Flag" in {
+  "demonstrate Flag" in
     def println(o: Any): Unit = ()
     //#flag
     val f0 = Flag.empty
     val f1 = f0.switchOn
     println(f1.enabled)
     //#flag
-  }
 
-  "demonstrate LWWRegister" in {
+  "demonstrate LWWRegister" in
     def println(o: Any): Unit = ()
     //#lwwregister
     implicit val node = Cluster(system)
@@ -365,18 +341,16 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     println(s"${r1.value} by ${r1.updatedBy} at ${r1.timestamp}")
     //#lwwregister
     r2.value should be("Hi")
-  }
 
-  "demonstrate LWWRegister with custom clock" in {
+  "demonstrate LWWRegister with custom clock" in
     def println(o: Any): Unit = ()
     //#lwwregister-custom-clock
     case class Record(version: Int, name: String, address: String)
 
     implicit val node = Cluster(system)
-    implicit val recordClock = new LWWRegister.Clock[Record] {
+    implicit val recordClock = new LWWRegister.Clock[Record]
       override def apply(currentTimestamp: Long, value: Record): Long =
         value.version
-    }
 
     val record1 = Record(version = 1, "Alice", "Union Square")
     val r1 = LWWRegister(record1)
@@ -389,18 +363,16 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     //#lwwregister-custom-clock
 
     r3.value.address should be("Madison Square")
-  }
 
-  "test TwoPhaseSetSerializer" in {
+  "test TwoPhaseSetSerializer" in
     val s1 = TwoPhaseSet().add("a").add("b").add("c").remove("b")
     s1.elements should be(Set("a", "c"))
     val serializer = SerializationExtension(system).findSerializerFor(s1)
     val blob = serializer.toBinary(s1)
     val s2 = serializer.fromBinary(blob, None)
     s1 should be(s1)
-  }
 
-  "test japi.TwoPhaseSetSerializer" in {
+  "test japi.TwoPhaseSetSerializer" in
     import scala.collection.JavaConverters._
     val s1 = japi.TwoPhaseSet.create().add("a").add("b").add("c").remove("b")
     s1.getElements.asScala should be(Set("a", "c"))
@@ -408,5 +380,3 @@ class DistributedDataDocSpec extends AkkaSpec(DistributedDataDocSpec.config) {
     val blob = serializer.toBinary(s1)
     val s2 = serializer.fromBinary(blob, None)
     s1 should be(s1)
-  }
-}

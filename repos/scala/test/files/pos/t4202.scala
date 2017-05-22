@@ -1,18 +1,9 @@
-object t4202_1 { () =>
-  {
-    trait T {
+object t4202_1  () =>
+    trait T
       def t = ()
-    }
-}
-}
 
-object t4202_2 { () =>
-  {
-    trait T {
+object t4202_2  () =>
+    trait T
       def t = ()
-    }
-    object T2 extends T {
+    object T2 extends T
       t
-    }
-}
-}

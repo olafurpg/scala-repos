@@ -21,7 +21,7 @@ import org.jboss.netty.buffer.ChannelBuffer
   */
 object Mux
     extends Client[mux.Request, mux.Response]
-    with Server[mux.Request, mux.Response] {
+    with Server[mux.Request, mux.Response]
 
   /**
     * The current version of the mux protocol.
@@ -32,38 +32,33 @@ object Mux
       process: String,
       val role: Stack.Role
   )
-      extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]] {
+      extends Stack.Module0[ServiceFactory[mux.Request, mux.Response]]
     val description = s"Mux specific $process traces"
 
     private[this] val tracingFilter =
-      new SimpleFilter[mux.Request, mux.Response] {
+      new SimpleFilter[mux.Request, mux.Response]
         def apply(
             req: mux.Request,
-            svc: Service[mux.Request, mux.Response]): Future[mux.Response] = {
+            svc: Service[mux.Request, mux.Response]): Future[mux.Response] =
           Trace.recordBinary(s"$process/mux/enabled", true)
           svc(req)
-        }
-      }
 
     def make(next: ServiceFactory[mux.Request, mux.Response]) =
       tracingFilter andThen next
-  }
 
   private[finagle] class ClientProtoTracing
       extends ProtoTracing("clnt", StackClient.Role.protoTracing)
 
   /** Prepends bound residual paths to outbound Mux requests's destinations. */
   private[finagle] object MuxBindingFactory
-      extends BindingFactory.Module[mux.Request, mux.Response] {
+      extends BindingFactory.Module[mux.Request, mux.Response]
 
     protected[this] def boundPathFilter(residual: Path) =
-      Filter.mk[mux.Request, mux.Response, mux.Request, mux.Response] {
+      Filter.mk[mux.Request, mux.Response, mux.Request, mux.Response]
         (req, service) =>
           service(mux.Request(residual ++ req.destination, req.body))
-      }
-  }
 
-  object Client {
+  object Client
     val stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       StackClient.newStack
         .replace(StackClient.Role.pool,
@@ -71,14 +66,13 @@ object Mux
         .replace(StackClient.Role.protoTracing, new ClientProtoTracing)
         .replace(BindingFactory.role, MuxBindingFactory)
         .prepend(PayloadSizeFilter.module(_.body.length, _.body.length))
-  }
 
   case class Client(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Client.stack,
       params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
             "mux"))
       extends StdStackClient[mux.Request, mux.Response, Client]
-      with WithDefaultLoadBalancer[Client] {
+      with WithDefaultLoadBalancer[Client]
 
     protected def copy1(
         stack: Stack[ServiceFactory[mux.Request, mux.Response]] = this.stack,
@@ -93,7 +87,7 @@ object Mux
 
     protected def newDispatcher(
         transport: Transport[In, Out]
-    ): Service[mux.Request, mux.Response] = {
+    ): Service[mux.Request, mux.Response] =
       val param.Stats(sr) = params[param.Stats]
       val param.Label(name) = params[param.Label]
 
@@ -111,8 +105,6 @@ object Mux
                                           sr.scope("mux"))
 
       mux.ClientDispatcher.newRequestResponse(session)
-    }
-  }
 
   val client = Client()
 
@@ -127,19 +119,18 @@ object Mux
   private[finagle] class ServerProtoTracing
       extends ProtoTracing("srv", StackServer.Role.protoTracing)
 
-  object Server {
+  object Server
     val stack: Stack[ServiceFactory[mux.Request, mux.Response]] =
       StackServer.newStack
         .remove(TraceInitializerFilter.role)
         .replace(StackServer.Role.protoTracing, new ServerProtoTracing)
         .prepend(PayloadSizeFilter.module(_.body.length, _.body.length))
-  }
 
   case class Server(
       stack: Stack[ServiceFactory[mux.Request, mux.Response]] = Server.stack,
       params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
             "mux"))
-      extends StdStackServer[mux.Request, mux.Response, Server] {
+      extends StdStackServer[mux.Request, mux.Response, Server]
 
     protected def copy1(
         stack: Stack[ServiceFactory[mux.Request, mux.Response]] = this.stack,
@@ -149,10 +140,9 @@ object Mux
     protected type In = ChannelBuffer
     protected type Out = ChannelBuffer
 
-    private[this] val statsReceiver = {
+    private[this] val statsReceiver =
       val param.Stats(statsReceiver) = params[param.Stats]
       statsReceiver.scope("mux")
-    }
 
     protected def newListener(): Listener[In, Out] =
       Netty3Listener(Netty3Framer, params)
@@ -160,7 +150,7 @@ object Mux
     protected def newDispatcher(
         transport: Transport[In, Out],
         service: Service[mux.Request, mux.Response]
-    ): Closable = {
+    ): Closable =
       val param.Tracer(tracer) = params[param.Tracer]
       val Lessor.Param(lessor) = params[Lessor.Param]
 
@@ -175,8 +165,6 @@ object Mux
                                               lessor,
                                               tracer,
                                               statsReceiver)
-    }
-  }
 
   val server = Server()
 
@@ -184,4 +172,3 @@ object Mux
       addr: SocketAddress,
       service: ServiceFactory[mux.Request, mux.Response]
   ): ListeningServer = server.serve(addr, service)
-}

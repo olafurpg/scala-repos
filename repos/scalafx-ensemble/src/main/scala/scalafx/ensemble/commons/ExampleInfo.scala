@@ -29,7 +29,7 @@ package scalafx.ensemble.commons
 
 import scala.util.matching.Regex
 
-object ExampleInfo {
+object ExampleInfo
 
   val examplesDir = "/scalafx/ensemble/example/"
 
@@ -49,10 +49,9 @@ object ExampleInfo {
   def className(exampleName: String, groupName: String): String =
     "scalafx.ensemble.example." + groupName.toLowerCase + ".Ensemble" +
     ExampleInfo.formatNoSpaces(exampleName)
-}
 
 /** Creates stand alone example source code. */
-class ExampleInfo(exampleName: String, exampleGroupName: String) {
+class ExampleInfo(exampleName: String, exampleGroupName: String)
 
   import ExampleInfo._
 
@@ -61,14 +60,12 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
       sourcecodePath(exampleName, exampleGroupName))
 
   /** Name of example's main class, extracted from the source code, excluding package prefix. */
-  lazy val classSimpleName: String = {
+  lazy val classSimpleName: String =
     val pattern = "object\\s*(\\S*)\\s*extends\\s*JFXApp".r
-    pattern findFirstIn sourceCode match {
+    pattern findFirstIn sourceCode match
       case Some(pattern(name)) => name
       case None =>
         throw new IllegalArgumentException("Cannot extract sample class name.")
-    }
-  }
 
   /** Samples package stated in sample source code. */
   lazy val packageName: String = extractPackageName(sourceCode)
@@ -77,43 +74,36 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
   lazy val packagePath: String = packageName.replaceAll("\\.", "/")
 
   /** Collection of resources used by this example */
-  lazy val resources: Set[String] = {
-    def extract(pattern: Regex): Seq[String] = {
+  lazy val resources: Set[String] =
+    def extract(pattern: Regex): Seq[String] =
       val resources = for (pattern(resourcePath) <- pattern findAllIn sourceCode) yield
         resourcePath
       resources
         .map(r => if (r.startsWith("/")) r else "/" + packagePath + "/" + r)
         .toSeq
-    }
 
     extract("""@resource\s*(\S*)""".r).toSet
-  }
 
-  private def extractPackageName(source: String): String = {
+  private def extractPackageName(source: String): String =
     val pattern = ".*package\\s(\\S*)".r
-    pattern findFirstIn source match {
+    pattern findFirstIn source match
       case Some(pattern(name)) => name.trim
       case None => ""
-    }
-  }
 
-  private def extractSampleName(source: String): String = {
+  private def extractSampleName(source: String): String =
     val pattern =
       """class\s*Ensemble(\S*)\s*extends\s*EnsembleExample\s*\{""".r
-    pattern findFirstIn source match {
+    pattern findFirstIn source match
       case Some(pattern(name)) => name.trim
       case None => ""
-    }
-  }
 
-  private def extractStageProperties(sourceRaw: String): Seq[String] = {
+  private def extractStageProperties(sourceRaw: String): Seq[String] =
     val pattern = """@stage-property\s*(.*)""".r
     val properties = for (pattern(property) <- pattern findAllIn sourceRaw) yield
       property.trim
     properties.toSeq
-  }
 
-  private def loadAndConvertSourceCode(path: String): String = {
+  private def loadAndConvertSourceCode(path: String): String =
 
     // Load source code text
     val sourceRaw = IOUtils.loadResourceAsString(this, path)
@@ -164,37 +154,30 @@ class ExampleInfo(exampleName: String, exampleGroupName: String) {
     source = source.replaceAll("""\r\n""", "\n")
 
     // Locate code that needs additional braces since two were introduced in `stageHeader`
-    val openingBraceIndex = {
+    val openingBraceIndex =
       val start = source.indexOf(stageHeader)
       require(start >= 0, "Internal error, failed to find `stageHeader`.")
       source.indexOf("{", start + stageHeader.length)
-    }
     require(openingBraceIndex >= 0,
             "Internal error, failed to find `stageHeader`.")
     // Get index of closing brace
-    val closingBraceIndex = {
+    val closingBraceIndex =
       var braceCount = 1
       var index = openingBraceIndex
-      while (braceCount > 0) {
+      while (braceCount > 0)
         index += 1
-        source(index) match {
+        source(index) match
           case '{' => braceCount += 1
           case '}' => braceCount -= 1
           case _ =>
-        }
-      }
       index
-    }
 
     // Ident body of the code that used to be `getContent` but now is assigned to scene.root.
     val prefix = source.substring(0, openingBraceIndex + 1)
-    val bodyIndented = {
+    val bodyIndented =
       val body = source.substring(openingBraceIndex + 1, closingBraceIndex + 1)
       body.lines.mkString("\n    ")
-    }
     val postfix = source.substring(closingBraceIndex + 1)
 
     // Combine final code
     prefix + bodyIndented + "\n" + "    }\n" + "  }" + postfix
-  }
-}

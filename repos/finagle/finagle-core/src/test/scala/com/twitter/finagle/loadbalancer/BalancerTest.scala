@@ -14,11 +14,11 @@ import org.scalatest.prop.GeneratorDrivenPropertyChecks
 @RunWith(classOf[JUnitRunner])
 private class BalancerTest
     extends FunSuite with Conductors with IntegrationPatience
-    with GeneratorDrivenPropertyChecks {
+    with GeneratorDrivenPropertyChecks
 
   private class TestBalancer(
       protected val statsReceiver: InMemoryStatsReceiver = new InMemoryStatsReceiver)
-      extends Balancer[Unit, Unit] {
+      extends Balancer[Unit, Unit]
     def maxEffort: Int = 5
     def emptyException: Throwable = ???
 
@@ -38,34 +38,29 @@ private class BalancerTest
     def rebuildDistributor() {}
 
     case class Distributor(vector: Vector[Node], gen: Int = 1)
-        extends DistributorT[Node] {
+        extends DistributorT[Node]
       type This = Distributor
       def pick(): Node = vector.head
       def needsRebuild = false
-      def rebuild(): This = {
+      def rebuild(): This =
         rebuildDistributor()
         copy(gen = gen + 1)
-      }
-      def rebuild(vector: Vector[Node]): This = {
+      def rebuild(vector: Vector[Node]): This =
         rebuildDistributor()
         copy(vector, gen = gen + 1)
-      }
-    }
 
     class Node(val factory: ServiceFactory[Unit, Unit])
-        extends NodeT[Unit, Unit] {
+        extends NodeT[Unit, Unit]
       type This = Node
       def load: Double = ???
       def pending: Int = ???
       def token: Int = ???
       def close(deadline: Time): Future[Unit] =
-        TestBalancer.this.synchronized {
+        TestBalancer.this.synchronized
           factory.close()
           Future.Done
-        }
       def apply(conn: ClientConnection): Future[Service[Unit, Unit]] =
         Future.never
-    }
 
     protected def newNode(
         factory: ServiceFactory[Unit, Unit],
@@ -75,20 +70,17 @@ private class BalancerTest
     protected def failingNode(cause: Throwable): Node = ???
 
     protected def initDistributor(): Distributor = Distributor(Vector.empty)
-  }
 
-  def newFac(_status: Status = Status.Open) = new ServiceFactory[Unit, Unit] {
+  def newFac(_status: Status = Status.Open) = new ServiceFactory[Unit, Unit]
     def apply(conn: ClientConnection) = Future.never
 
     override def status = _status
 
     @volatile var ncloses = 0
 
-    def close(deadline: Time) = {
+    def close(deadline: Time) =
       synchronized { ncloses += 1 }
       Future.Done
-    }
-  }
 
   val genStatus = Gen.oneOf(Status.Open, Status.Busy, Status.Closed)
   val genSvcFac = genStatus.map(newFac)
@@ -96,23 +88,20 @@ private class BalancerTest
   val genNodes =
     Gen.containerOf[List, ServiceFactory[Unit, Unit]](genLoadedNode)
 
-  test("status: balancer with no nodes is Closed") {
+  test("status: balancer with no nodes is Closed")
     val bal = new TestBalancer
     assert(bal.nodes.isEmpty)
     assert(bal.status == Status.Closed)
-  }
 
-  test("status: balancer status is bestOf underlying nodes") {
-    forAll(genNodes) { loadedNodes =>
+  test("status: balancer status is bestOf underlying nodes")
+    forAll(genNodes)  loadedNodes =>
       val bal = new TestBalancer
       bal.update(loadedNodes)
       val best =
         Status.bestOf[ServiceFactory[Unit, Unit]](loadedNodes, _.status)
       assert(bal.status == best)
-    }
-  }
 
-  test("status: balancer with at least one Open node is Open") {
+  test("status: balancer with at least one Open node is Open")
     val bal = new TestBalancer
     val f1, f2 = newFac(Status.Closed)
     val f3 = newFac(Status.Open)
@@ -128,9 +117,8 @@ private class BalancerTest
     val busy = newFac(Status.Busy)
     bal.update(Seq(f1, f2, busy))
     assert(bal.status == Status.Busy)
-  }
 
-  test("max_effort_exhausted counter updated properly") {
+  test("max_effort_exhausted counter updated properly")
     val stats = new InMemoryStatsReceiver()
     val bal = new TestBalancer(stats)
     val closed = newFac(Status.Closed)
@@ -145,9 +133,8 @@ private class BalancerTest
     bal.update(Seq(open))
     bal(ClientConnection.nil)
     assert(1 == stats.counters(Seq("max_effort_exhausted")))
-  }
 
-  test("updater: keeps nodes up to date") {
+  test("updater: keeps nodes up to date")
     val bal = new TestBalancer
     val f1, f2, f3 = newFac()
 
@@ -180,34 +167,30 @@ private class BalancerTest
     assert(size() == 3)
     assert(adds() == 4)
     assert(rems() == 1)
-  }
 
   if (!sys.props.contains("SKIP_FLAKY")) // CSL-1685
-    test("Coalesces updates") {
+    test("Coalesces updates")
       val conductor = new Conductor
       import conductor._
 
-      val bal = new TestBalancer {
+      val bal = new TestBalancer
         val beat = new AtomicInteger(1)
         @volatile var updateThreads: Set[Long] = Set.empty
 
-        override def rebuildDistributor() {
+        override def rebuildDistributor()
           synchronized { updateThreads += Thread.currentThread.getId() }
           waitForBeat(beat.getAndIncrement())
           waitForBeat(beat.getAndIncrement())
-        }
-      }
       val f1, f2, f3 = newFac()
 
       @volatile var thread1Id: Long = -1
 
-      thread("updater1") {
+      thread("updater1")
         thread1Id = Thread.currentThread.getId()
         bal.update(Seq.empty) // waits for 1, 2
         // (then waits for 3, 4, in this thread)
-      }
 
-      thread("updater2") {
+      thread("updater2")
         waitForBeat(1)
         bal._rebuild()
         bal.update(Seq(f1))
@@ -217,12 +200,8 @@ private class BalancerTest
         bal._rebuild()
         assert(beat == 1)
         waitForBeat(2)
-      }
 
-      whenFinished {
+      whenFinished
         assert(bal.factories == Set(f3))
         assert(bal._dist().gen == 3)
         assert(bal.updateThreads == Set(thread1Id))
-      }
-    }
-}

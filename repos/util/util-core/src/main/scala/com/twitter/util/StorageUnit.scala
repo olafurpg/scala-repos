@@ -18,15 +18,15 @@ package com.twitter.util
 
 import java.util.Locale
 
-object StorageUnit {
+object StorageUnit
   val infinite = new StorageUnit(Long.MaxValue)
   val zero = new StorageUnit(0)
 
-  private def factor(s: String) = {
+  private def factor(s: String) =
     var lower = s.toLowerCase
     if (lower endsWith "s") lower = lower dropRight 1
 
-    lower match {
+    lower match
       case "byte" => 1L
       case "kilobyte" => 1L << 10
       case "megabyte" => 1L << 20
@@ -36,14 +36,12 @@ object StorageUnit {
       case "exabyte" => 1L << 60
       case badUnit =>
         throw new NumberFormatException("Unrecognized unit %s".format(badUnit))
-    }
-  }
 
   /**
     * Note, this can cause overflows of the Long used to represent the
     * number of bytes.
     */
-  def parse(s: String): StorageUnit = s.split("\\.") match {
+  def parse(s: String): StorageUnit = s.split("\\.") match
     case Array(v, u) =>
       val vv = v.toLong
       val uu = factor(u)
@@ -52,8 +50,6 @@ object StorageUnit {
     case _ =>
       throw new NumberFormatException(
           "invalid storage unit string: %s".format(s))
-  }
-}
 
 /**
   * Representation of storage units.
@@ -64,7 +60,7 @@ object StorageUnit {
   * Note: operations can cause overflows of the Long used to represent the
   * number of bytes.
   */
-class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
+class StorageUnit(val bytes: Long) extends Ordered[StorageUnit]
   def inBytes = bytes
   def inKilobytes = bytes / (1024L)
   def inMegabytes = bytes / (1024L * 1024)
@@ -82,14 +78,12 @@ class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
   def *(scalar: Long): StorageUnit = new StorageUnit(this.bytes * scalar)
   def /(scalar: Long): StorageUnit = new StorageUnit(this.bytes / scalar)
 
-  override def equals(other: Any) = {
-    other match {
+  override def equals(other: Any) =
+    other match
       case other: StorageUnit =>
         inBytes == other.inBytes
       case _ =>
         false
-    }
-  }
 
   override def hashCode: Int = bytes.hashCode
 
@@ -104,19 +98,15 @@ class StorageUnit(val bytes: Long) extends Ordered[StorageUnit] {
 
   override def toString() = inBytes + ".bytes"
 
-  def toHuman(): String = {
+  def toHuman(): String =
     val prefix = "KMGTPE"
     var prefixIndex = -1
     var display = bytes.toDouble.abs
-    while (display > 1126.0) {
+    while (display > 1126.0)
       prefixIndex += 1
       display /= 1024.0
-    }
-    if (prefixIndex < 0) {
+    if (prefixIndex < 0)
       "%d B".format(bytes)
-    } else {
+    else
       "%.1f %ciB".formatLocal(
           Locale.ENGLISH, display * bytes.signum, prefix.charAt(prefixIndex))
-    }
-  }
-}

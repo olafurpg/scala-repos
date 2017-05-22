@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   println(
       for (a <- Some(1);
       b <- Some(2);
@@ -45,4 +45,3 @@ object Test extends App {
 //    r <- Some(18);
 //    s <- Some(19)
       ) yield a)
-}

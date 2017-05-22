@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 18.01.2015.
   */
-trait SpecialCharactersTest extends ScalaTestTestCase {
+trait SpecialCharactersTest extends ScalaTestTestCase
 
   val commaTestPath = List(
       "[root]", "TestComma", "Comma , test", "should contain , comma")
@@ -40,7 +40,7 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
           |
         """.stripMargin)
 
-  def testComma() {
+  def testComma()
     val testName = "TestComma"
     addSpecialCharactersTest(testName)
 
@@ -51,9 +51,8 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         checkConfigAndSettings(
             _, testName, "Comma , test should contain , comma"),
         root => checkResultTreeHasExactNamedPath(root, commaTestPath: _*))
-  }
 
-  def testExclamation() {
+  def testExclamation()
     val testName = "TestExclamation"
     addSpecialCharactersTest(testName)
 
@@ -64,9 +63,8 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         checkConfigAndSettings(_, testName, "! test should contain !"),
         root =>
           checkResultTreeHasExactNamedPath(root, exclamationTestPath: _*))
-  }
 
-  def testTick() {
+  def testTick()
     val testName = "TestTick"
     addSpecialCharactersTest(testName)
     runTestByLocation(
@@ -75,9 +73,8 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         testName + ".scala",
         checkConfigAndSettings(_, testName, "tick ' test should contain '"),
         root => checkResultTreeHasExactNamedPath(root, tickTestPath: _*))
-  }
 
-  def testTilde() {
+  def testTilde()
     val testName = "TestTilde"
     addSpecialCharactersTest(testName)
     runTestByLocation(
@@ -86,9 +83,8 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         testName + ".scala",
         checkConfigAndSettings(_, testName, "tilde ~ test should contain ~"),
         root => checkResultTreeHasExactNamedPath(root, tildeTestPath: _*))
-  }
 
-  def testBacktick() {
+  def testBacktick()
     val testName = "TestBacktick"
     addSpecialCharactersTest(testName)
     runTestByLocation(
@@ -98,5 +94,3 @@ trait SpecialCharactersTest extends ScalaTestTestCase {
         checkConfigAndSettings(
             _, testName, "backtick ` test should contain `"),
         root => checkResultTreeHasExactNamedPath(root, backtickTestPath: _*))
-  }
-}

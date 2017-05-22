@@ -14,7 +14,7 @@ package math
   *  @author  Martin Odersky
   *  @version 1.0, 23/04/2004
   */
-trait PartiallyOrdered[+A] {
+trait PartiallyOrdered[+A]
 
   /** Result of comparing `'''this'''` with operand `that`.
     *  Returns `None` if operands are not comparable.
@@ -26,23 +26,18 @@ trait PartiallyOrdered[+A] {
   def tryCompareTo[B >: A <% PartiallyOrdered[B]](that: B): Option[Int]
 
   def <[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this tryCompareTo that) match
       case Some(x) if x < 0 => true
       case _ => false
-    }
   def >[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this tryCompareTo that) match
       case Some(x) if x > 0 => true
       case _ => false
-    }
   def <=[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this tryCompareTo that) match
       case Some(x) if x <= 0 => true
       case _ => false
-    }
   def >=[B >: A <% PartiallyOrdered[B]](that: B): Boolean =
-    (this tryCompareTo that) match {
+    (this tryCompareTo that) match
       case Some(x) if x >= 0 => true
       case _ => false
-    }
-}

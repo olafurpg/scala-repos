@@ -1,5 +1,5 @@
-object SCL4559A {
-  trait Z {
+object SCL4559A
+  trait Z
     type A
     type B
 
@@ -12,8 +12,7 @@ object SCL4559A {
     def foo(x: A, zz: ZZ1) = 1
 
     def foo(x: B, zz: ZZ2) = false
-  }
-  object Z extends Z {
+  object Z extends Z
     trait AA
     trait BB extends AA
     type A = AA
@@ -21,12 +20,10 @@ object SCL4559A {
 
     /*start*/
     foo(new BB {}, new ZZ2) /*end*/
-  }
 
   import Z._
 
   val b: BB = new BB {}
 
   b.contains("text")
-}
 //Boolean

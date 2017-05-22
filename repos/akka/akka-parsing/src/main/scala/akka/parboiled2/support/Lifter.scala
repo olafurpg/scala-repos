@@ -22,30 +22,27 @@ import akka.shapeless._
 @implicitNotFound(
     "The `optional`, `zeroOrMore`, `oneOrMore` and `times` modifiers " +
     "can only be used on rules of type `Rule0`, `Rule1[T]` and `Rule[I, O <: I]`!")
-sealed trait Lifter[M[_], I <: HList, O <: HList] {
+sealed trait Lifter[M[_], I <: HList, O <: HList]
   type In <: HList
   type StrictOut <: HList
   type OptionalOut <: HList
-}
 
-object Lifter extends LowerPriorityLifter {
-  implicit def forRule0[M[_]]: Lifter[M, HNil, HNil] {
+object Lifter extends LowerPriorityLifter
+  implicit def forRule0[M[_]]: Lifter[M, HNil, HNil]
     type In = HNil
     type StrictOut = HNil
     type OptionalOut = StrictOut
-  } = `n/a`
+  = `n/a`
 
-  implicit def forRule1[M[_], T]: Lifter[M, HNil, T :: HNil] {
+  implicit def forRule1[M[_], T]: Lifter[M, HNil, T :: HNil]
     type In = HNil
     type StrictOut = M[T] :: HNil
     type OptionalOut = StrictOut
-  } = `n/a`
-}
+  = `n/a`
 
-sealed abstract class LowerPriorityLifter {
-  implicit def forReduction[M[_], L <: HList, R <: L]: Lifter[M, L, R] {
+sealed abstract class LowerPriorityLifter
+  implicit def forReduction[M[_], L <: HList, R <: L]: Lifter[M, L, R]
     type In = L
     type StrictOut = R
     type OptionalOut = L
-  } = `n/a`
-}
+  = `n/a`

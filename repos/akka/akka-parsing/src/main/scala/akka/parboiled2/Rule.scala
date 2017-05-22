@@ -33,7 +33,7 @@ sealed trait RuleX
   * At runtime there are only two instances of this class which signal whether the rule has matched (or mismatched)
   * at the current point in the input.
   */
-sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
+sealed class Rule[-I <: HList, +O <: HList] extends RuleX
   // Note: we could model `Rule` as a value class, however, tests have shown that this doesn't result in any measurable
   // performance benefit and, in addition, comes with other drawbacks (like generated bridge methods)
 
@@ -121,21 +121,18 @@ sealed class Rule[-I <: HList, +O <: HList] extends RuleX {
       implicit l: Lifter[
           immutable.Seq, I @uncheckedVariance, O @uncheckedVariance])
     : Rule[l.In, l.StrictOut] = `n/a`
-}
 
 /**
   * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
   */
-object Rule extends Rule0 {
+object Rule extends Rule0
 
   /**
     * THIS IS NOT PUBLIC API and might become hidden in future. Use only if you know what you are doing!
     */
-  implicit class Runnable[L <: HList](rule: RuleN[L]) {
+  implicit class Runnable[L <: HList](rule: RuleN[L])
     def run()(implicit scheme: Parser.DeliveryScheme[L]): scheme.Result = macro ParserMacros
       .runImpl[L]
-  }
-}
 
 abstract class RuleDSL
     extends RuleDSLBasics with RuleDSLCombinators with RuleDSLActions

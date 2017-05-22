@@ -22,61 +22,50 @@ class ShardingService[Req, Rep](
     distributor: Distributor[Service[Req, Rep]],
     hash: Req => Option[Long]
 )
-    extends Service[Req, Rep] {
+    extends Service[Req, Rep]
 
-  def apply(request: Req): Future[Rep] = {
-    hash(request) map { hash =>
+  def apply(request: Req): Future[Rep] =
+    hash(request) map  hash =>
       val shard = distributor.nodeForHash(hash)
       // TODO: a sharding service may consider fine-grained statuses.
       if (shard.status != Status.Closed) shard(request)
       else Future.exception(ShardingService.ShardNotAvailableException)
-    } getOrElse (Future.exception(ShardingService.NotShardableException))
-  }
+    getOrElse (Future.exception(ShardingService.NotShardableException))
 
   override def status: Status =
     Status.bestOf[Service[Req, Rep]](distributor.nodes, _.status)
   override def close(deadline: Time) =
     Closable.all(distributor.nodes: _*).close(deadline)
-}
 
-private[service] object ShardingService {
+private[service] object ShardingService
   val NotShardableException = new NotShardableException
   val ShardNotAvailableException = new ShardNotAvailableException
-}
 
 case class KetamaShardingServiceBuilder[Req, Rep](
     _nodes: Option[Seq[KetamaNode[Service[Req, Rep]]]] = None,
     _hash: Option[Req => Option[Long]] = None,
     _numReps: Int = 160
-) {
+)
 
-  def nodesAndWeights(nodes: Seq[(String, Int, Service[Req, Rep])]) = {
+  def nodesAndWeights(nodes: Seq[(String, Int, Service[Req, Rep])]) =
     copy(_nodes = Some(nodes map Function.tupled { KetamaNode(_, _, _) }))
-  }
 
-  def nodes(services: Seq[(String, Service[Req, Rep])]) = {
+  def nodes(services: Seq[(String, Service[Req, Rep])]) =
     nodesAndWeights(services map Function.tupled { (_, 1, _) })
-  }
 
-  def numReps(numReps: Int) = {
+  def numReps(numReps: Int) =
     copy(_numReps = numReps)
-  }
 
-  def withHash(f: Req => Option[Long]) = {
+  def withHash(f: Req => Option[Long]) =
     copy(_hash = Some(f))
-  }
 
-  def buildFactory() = {
-    if (_nodes.isEmpty) {
+  def buildFactory() =
+    if (_nodes.isEmpty)
       throw new Exception("Nodes unspecified for KetamaShardingServiceBuilder")
-    }
-    if (_hash.isEmpty) {
+    if (_hash.isEmpty)
       throw new Exception(
           "Key function unspecified for KetamaShardingServiceBuilder")
-    }
 
     val distributor = new KetamaDistributor(_nodes.get, _numReps)
 
     new SingletonFactory(new ShardingService(distributor, _hash.get))
-  }
-}

@@ -3,7 +3,7 @@ package lila.user
 import play.api.data._
 import play.api.data.Forms._
 
-object DataForm {
+object DataForm
 
   val note = Form(
       single(
@@ -24,9 +24,8 @@ object DataForm {
 
   private def nameField = optional(nonEmptyText(minLength = 2, maxLength = 20))
 
-  case class Passwd(oldPasswd: String, newPasswd1: String, newPasswd2: String) {
+  case class Passwd(oldPasswd: String, newPasswd1: String, newPasswd2: String)
     def samePasswords = newPasswd1 == newPasswd2
-  }
 
   val passwd = Form(
       mapping(
@@ -39,4 +38,3 @@ object DataForm {
       ))
 
   val title = Form(single("title" -> optional(nonEmptyText)))
-}

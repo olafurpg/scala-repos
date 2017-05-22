@@ -1,4 +1,4 @@
-class C {
+class C
   println( /* resolved: false */ HashMap.getClass)
   println(classOf[ /* resolved: false */ HashMap])
 
@@ -6,4 +6,3 @@ class C {
 
   println( /* */ HashMap.getClass)
   println(classOf[ /* */ HashMap])
-}

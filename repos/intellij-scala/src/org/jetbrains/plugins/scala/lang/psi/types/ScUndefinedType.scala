@@ -12,26 +12,24 @@ import scala.collection.immutable.HashSet
   * In conformance using ScUndefinedSubstitutor you can accumulate information
   * about possible generic type.
   */
-case class ScUndefinedType(tpt: ScTypeParameterType) extends NonValueType {
+case class ScUndefinedType(tpt: ScTypeParameterType) extends NonValueType
   var level = 0
 
-  def visitType(visitor: ScalaTypeVisitor) {
+  def visitType(visitor: ScalaTypeVisitor)
     visitor.visitUndefinedType(this)
-  }
 
-  def this(tpt: ScTypeParameterType, level: Int) {
+  def this(tpt: ScTypeParameterType, level: Int)
     this(tpt)
     this.level = level
-  }
 
   def inferValueType: ValueType = tpt
 
   override def equivInner(
       r: ScType,
       subst: ScUndefinedSubstitutor,
-      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) =
     var undefinedSubst = subst
-    r match {
+    r match
       case _ if falseUndef => (false, undefinedSubst)
       case u2: ScUndefinedType if u2.level > level =>
         (true, undefinedSubst.addUpper((u2.tpt.name, u2.tpt.getId), this))
@@ -43,9 +41,6 @@ case class ScUndefinedType(tpt: ScTypeParameterType) extends NonValueType {
         undefinedSubst = undefinedSubst.addLower((tpt.name, tpt.getId), rt)
         undefinedSubst = undefinedSubst.addUpper((tpt.name, tpt.getId), rt)
         (true, undefinedSubst)
-    }
-  }
-}
 
 /**
   * This type works like undefined type, but you cannot use this type
@@ -54,48 +49,41 @@ case class ScUndefinedType(tpt: ScTypeParameterType) extends NonValueType {
   */
 case class ScAbstractType(
     tpt: ScTypeParameterType, lower: ScType, upper: ScType)
-    extends NonValueType {
+    extends NonValueType
   private var hash: Int = -1
 
-  override def toString: String = {
+  override def toString: String =
     val buffer = new StringBuilder
     buffer.append("?")
     buffer.append(super.toString)
     buffer.append("/*")
-    if (!lower.equiv(Nothing)) {
+    if (!lower.equiv(Nothing))
       val lowerText: String = " >: " + lower.toString
       buffer.append(lowerText)
-    }
-    if (!upper.equiv(Any)) {
+    if (!upper.equiv(Any))
       val upperText: String = " <: " + upper.toString
       buffer.append(upperText)
-    }
     buffer.append("*/")
     buffer.toString()
-  }
 
-  override def hashCode: Int = {
-    if (hash == -1) {
+  override def hashCode: Int =
+    if (hash == -1)
       hash = (upper.hashCode() * 31 + lower.hashCode()) * 31 +
       tpt.args.hashCode()
-    }
     hash
-  }
 
-  override def equals(obj: scala.Any): Boolean = {
-    obj match {
+  override def equals(obj: scala.Any): Boolean =
+    obj match
       case ScAbstractType(oTpt, oLower, oUpper) =>
         lower.equals(oLower) && upper.equals(oUpper) &&
         tpt.args.equals(oTpt.args)
       case _ => false
-    }
-  }
 
   override def equivInner(
       r: ScType,
       uSubst: ScUndefinedSubstitutor,
-      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) = {
-    r match {
+      falseUndef: Boolean): (Boolean, ScUndefinedSubstitutor) =
+    r match
       case _ if falseUndef => (false, uSubst)
       case rt =>
         var t: (Boolean, ScUndefinedSubstitutor) =
@@ -104,49 +92,41 @@ case class ScAbstractType(
         t = Conformance.conformsInner(r, lower, Set.empty, t._2)
         if (!t._1) return (false, uSubst)
         (true, t._2)
-    }
-  }
 
   def inferValueType = tpt
 
-  def simplifyType: ScType = {
+  def simplifyType: ScType =
     if (upper.equiv(Any)) lower else if (lower.equiv(Nothing)) upper else lower
-  }
 
   override def removeAbstracts = simplifyType
 
   override def recursiveUpdate(update: ScType => (Boolean, ScType),
-                               visited: HashSet[ScType]): ScType = {
-    if (visited.contains(this)) {
-      return update(this) match {
+                               visited: HashSet[ScType]): ScType =
+    if (visited.contains(this))
+      return update(this) match
         case (true, res) => res
         case _ => this
-      }
-    }
     val newVisited = visited + this
-    update(this) match {
+    update(this) match
       case (true, res) => res
       case _ =>
-        try {
+        try
           ScAbstractType(tpt
                            .recursiveUpdate(update, newVisited)
                            .asInstanceOf[ScTypeParameterType],
                          lower.recursiveUpdate(update, newVisited),
                          upper.recursiveUpdate(update, newVisited))
-        } catch {
+        catch
           case cce: ClassCastException => throw new RecursiveUpdateException
-        }
-    }
-  }
 
   override def recursiveVarianceUpdateModifiable[T](
       data: T,
       update: (ScType, Int, T) => (Boolean, ScType, T),
-      variance: Int = 1): ScType = {
-    update(this, variance, data) match {
+      variance: Int = 1): ScType =
+    update(this, variance, data) match
       case (true, res, _) => res
       case (_, _, newData) =>
-        try {
+        try
           ScAbstractType(
               tpt
                 .recursiveVarianceUpdateModifiable(newData, update, variance)
@@ -155,13 +135,8 @@ case class ScAbstractType(
                   newData, update, -variance),
               upper.recursiveVarianceUpdateModifiable(
                   newData, update, variance))
-        } catch {
+        catch
           case cce: ClassCastException => throw new RecursiveUpdateException
-        }
-    }
-  }
 
-  def visitType(visitor: ScalaTypeVisitor) {
+  def visitType(visitor: ScalaTypeVisitor)
     visitor.visitAbstractType(this)
-  }
-}

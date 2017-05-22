@@ -22,59 +22,48 @@ import org.jboss.netty.channel.Channel
   * A rich client with a *very* basic URL fetcher. (It does not handle
   * redirects, does not have a cookie jar, etc.)
   */
-trait HttpRichClient { self: Client[Request, Response] =>
+trait HttpRichClient  self: Client[Request, Response] =>
   def fetchUrl(url: String): Future[Response] = fetchUrl(new java.net.URL(url))
-  def fetchUrl(url: java.net.URL): Future[Response] = {
-    val addr = {
+  def fetchUrl(url: java.net.URL): Future[Response] =
+    val addr =
       val port = if (url.getPort < 0) url.getDefaultPort else url.getPort
       Address(url.getHost, port)
-    }
     val req = http.RequestBuilder().url(url).buildGet()
     val service = newService(Name.bound(addr), "")
-    service(req) ensure {
+    service(req) ensure
       service.close()
-    }
-  }
-}
 
 /**
   * Http protocol support, including client and server.
   */
 object Http
     extends Client[Request, Response] with HttpRichClient
-    with Server[Request, Response] {
+    with Server[Request, Response]
 
-  object param {
-    case class MaxRequestSize(size: StorageUnit) {
+  object param
+    case class MaxRequestSize(size: StorageUnit)
       require(size < 2.gigabytes,
               s"MaxRequestSize should be less than 2 Gb, but was $size")
-    }
-    implicit object MaxRequestSize extends Stack.Param[MaxRequestSize] {
+    implicit object MaxRequestSize extends Stack.Param[MaxRequestSize]
       val default = MaxRequestSize(5.megabytes)
-    }
 
-    case class MaxResponseSize(size: StorageUnit) {
+    case class MaxResponseSize(size: StorageUnit)
       require(size < 2.gigabytes,
               s"MaxResponseSize should be less than 2 Gb, but was $size")
-    }
-    implicit object MaxResponseSize extends Stack.Param[MaxResponseSize] {
+    implicit object MaxResponseSize extends Stack.Param[MaxResponseSize]
       val default = MaxResponseSize(5.megabytes)
-    }
 
     case class Streaming(enabled: Boolean)
-    implicit object Streaming extends Stack.Param[Streaming] {
+    implicit object Streaming extends Stack.Param[Streaming]
       val default = Streaming(false)
-    }
 
     case class Decompression(enabled: Boolean)
-    implicit object Decompression extends Stack.Param[Decompression] {
+    implicit object Decompression extends Stack.Param[Decompression]
       val default = Decompression(enabled = true)
-    }
 
     case class CompressionLevel(level: Int)
-    implicit object CompressionLevel extends Stack.Param[CompressionLevel] {
+    implicit object CompressionLevel extends Stack.Param[CompressionLevel]
       val default = CompressionLevel(-1)
-    }
 
     private[Http] def applyToCodec(
         params: Stack.Params, codec: http.Http): http.Http =
@@ -84,12 +73,11 @@ object Http
         .streaming(params[Streaming].enabled)
         .decompressionEnabled(params[Decompression].enabled)
         .compressionLevel(params[CompressionLevel].level)
-  }
 
   // Only record payload sizes when streaming is disabled.
   private[this] val nonChunkedPayloadSize: Stackable[
       ServiceFactory[Request, Response]] = new Stack.Module2[
-      param.Streaming, Stats, ServiceFactory[Request, Response]] {
+      param.Streaming, Stats, ServiceFactory[Request, Response]]
     override def role: Stack.Role = PayloadSizeFilter.Role
     override def description: String = PayloadSizeFilter.Description
 
@@ -97,34 +85,31 @@ object Http
         streaming: param.Streaming,
         stats: Stats,
         next: ServiceFactory[Request, Response]
-    ): ServiceFactory[Request, Response] = {
+    ): ServiceFactory[Request, Response] =
       if (!streaming.enabled)
         new PayloadSizeFilter[Request, Response](
             stats.statsReceiver, _.content.length, _.content.length)
           .andThen(next)
       else next
-    }
-  }
 
-  object Client {
+  object Client
     val stack: Stack[ServiceFactory[Request, Response]] = StackClient.newStack
       .replace(TraceInitializerFilter.role,
                new HttpClientTraceInitializer[Request, Response])
       .prepend(http.TlsFilter.module)
       .prepend(nonChunkedPayloadSize)
-  }
 
   case class Client(
       stack: Stack[ServiceFactory[Request, Response]] = Client.stack,
       params: Stack.Params = StackClient.defaultParams + ProtocolLibrary(
             "http"))
       extends StdStackClient[Request, Response, Client]
-      with WithSessionPool[Client] with WithDefaultLoadBalancer[Client] {
+      with WithSessionPool[Client] with WithDefaultLoadBalancer[Client]
 
     protected type In = Any
     protected type Out = Any
 
-    protected def newTransporter(): Transporter[Any, Any] = {
+    protected def newTransporter(): Transporter[Any, Any] =
       val com.twitter.finagle.param.Label(label) =
         params[com.twitter.finagle.param.Label]
       val codec = param
@@ -135,7 +120,6 @@ object Http
       Netty3Transporter(
           codec.pipelineFactory,
           params + Netty3Transporter.TransportFactory(newTransport))
-    }
 
     protected def copy1(
         stack: Stack[ServiceFactory[Request, Response]] = this.stack,
@@ -143,7 +127,7 @@ object Http
     ): Client = copy(stack, params)
 
     protected def newDispatcher(
-        transport: Transport[Any, Any]): Service[Request, Response] = {
+        transport: Transport[Any, Any]): Service[Request, Response] =
       val dispatcher = new HttpClientDispatcher(
           transport,
           params[Stats].statsReceiver
@@ -151,7 +135,6 @@ object Http
       )
 
       new ClientContextFilter[Request, Response].andThen(dispatcher)
-    }
 
     def withTls(cfg: Netty3TransporterTLSConfig): Client =
       configured(Transport.TLSClientEngine(Some(cfg.newEngine)))
@@ -214,7 +197,6 @@ object Http
     override def filtered(
         filter: Filter[Request, Response, Request, Response]): Client =
       super.filtered(filter)
-  }
 
   val client: Http.Client = Client()
 
@@ -224,24 +206,23 @@ object Http
   def newClient(dest: Name, label: String): ServiceFactory[Request, Response] =
     client.newClient(dest, label)
 
-  object Server {
+  object Server
     val stack: Stack[ServiceFactory[Request, Response]] = StackServer.newStack
       .replace(TraceInitializerFilter.role,
                new HttpServerTraceInitializer[Request, Response])
       .replace(StackServer.Role.preparer, HttpNackFilter.module)
       .prepend(nonChunkedPayloadSize)
-  }
 
   case class Server(
       stack: Stack[ServiceFactory[Request, Response]] = Server.stack,
       params: Stack.Params = StackServer.defaultParams + ProtocolLibrary(
             "http"))
-      extends StdStackServer[Request, Response, Server] {
+      extends StdStackServer[Request, Response, Server]
 
     protected type In = Any
     protected type Out = Any
 
-    protected def newListener(): Listener[Any, Any] = {
+    protected def newListener(): Listener[Any, Any] =
       val com.twitter.finagle.param.Label(label) =
         params[com.twitter.finagle.param.Label]
       val httpPipeline = param
@@ -249,10 +230,9 @@ object Http
         .server(ServerCodecConfig(label, new SocketAddress {}))
         .pipelineFactory
       Netty3Listener(httpPipeline, params)
-    }
 
     protected def newDispatcher(
-        transport: Transport[In, Out], service: Service[Request, Response]) = {
+        transport: Transport[In, Out], service: Service[Request, Response]) =
       val dtab = new DtabFilter.Finagle[Request]
       val context = new ServerContextFilter[Request, Response]
       val Stats(stats) = params[Stats]
@@ -261,7 +241,6 @@ object Http
 
       new HttpServerDispatcher(
           new HttpTransport(transport), endpoint, stats.scope("dispatch"))
-    }
 
     protected def copy1(
         stack: Stack[ServiceFactory[Request, Response]] = this.stack,
@@ -310,11 +289,9 @@ object Http
 
     override def configured[P](psp: (P, Stack.Param[P])): Server =
       super.configured(psp)
-  }
 
   val server: Http.Server = Server()
 
   def serve(addr: SocketAddress,
             service: ServiceFactory[Request, Response]): ListeningServer =
     server.serve(addr, service)
-}

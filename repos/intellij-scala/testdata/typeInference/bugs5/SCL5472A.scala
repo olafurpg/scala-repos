@@ -1,4 +1,4 @@
-class SCL5472A {
+class SCL5472A
   class C
 
   class A
@@ -12,5 +12,4 @@ class SCL5472A {
 
   /*start*/
   (foo(new C { type T = A }), foo(new C { type T = D })) /*end*/
-}
 //(String, Int)

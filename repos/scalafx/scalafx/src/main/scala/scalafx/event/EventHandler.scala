@@ -49,12 +49,12 @@ object EventHandler {}
   * def buildEventDispatchChain(chain: jfxe.EventDispatchChain): jfxe.EventDispatchChain
   * }}}
   */
-trait EventHandlerDelegate {
+trait EventHandlerDelegate
 
   /**
     *
     */
-  type EventHandled = {
+  type EventHandled =
     // Registers an event handler to this type.
     def addEventHandler[E <: jfxe.Event](
         eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_])
@@ -74,7 +74,6 @@ trait EventHandlerDelegate {
     // Construct an event dispatch chain for this target.
     def buildEventDispatchChain(
         chain: jfxe.EventDispatchChain): jfxe.EventDispatchChain
-  }
 
   /**
     * Returns a object that implements [[scalafx.event.EventHandlerDelegate.EventHandled]].
@@ -92,56 +91,42 @@ trait EventHandlerDelegate {
     * @param eventHandler the handler to register that will manipulate event
     */
   def addEventHandler[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E])
     eventHandlerDelegate.addEventHandler(eventType, eventHandler)
-  }
 
   /**
     * Trait implementing [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
     * to avoid compilation error "ambiguous reference to overloaded definition"
     */
-  sealed trait HandlerMagnet[J <: jfxe.Event, S <: SFXDelegate[J]] {
+  sealed trait HandlerMagnet[J <: jfxe.Event, S <: SFXDelegate[J]]
     protected val eventHandler: jfxe.EventHandler[J]
 
-    def apply(eventType: EventType[J]): Subscription = {
+    def apply(eventType: EventType[J]): Subscription =
       EventHandlerDelegate.this.addEventHandler(
           eventType.delegate, eventHandler)
-      new Subscription {
-        def cancel() {
+      new Subscription
+        def cancel()
           EventHandlerDelegate.this.removeEventHandler(
               eventType.delegate, eventHandler)
-        }
-      }
-    }
-  }
 
   /**
     * Companion object implementing Magnet Pattern [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
     * to avoid compilation error "ambiguous reference to overloaded definition"
     */
-  object HandlerMagnet {
+  object HandlerMagnet
     implicit def fromParen[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-        op: () => Unit): HandlerMagnet[J, S] = {
-      new HandlerMagnet[J, S] {
-        override val eventHandler = new jfxe.EventHandler[J] {
-          def handle(event: J) {
+        op: () => Unit): HandlerMagnet[J, S] =
+      new HandlerMagnet[J, S]
+        override val eventHandler = new jfxe.EventHandler[J]
+          def handle(event: J)
             op()
-          }
-        }
-      }
-    }
 
     implicit def fromEvent[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-        op: S => Unit)(implicit jfx2sfx: J => S): HandlerMagnet[J, S] = {
-      new HandlerMagnet[J, S] {
-        override val eventHandler = new jfxe.EventHandler[J] {
-          def handle(event: J) {
+        op: S => Unit)(implicit jfx2sfx: J => S): HandlerMagnet[J, S] =
+      new HandlerMagnet[J, S]
+        override val eventHandler = new jfxe.EventHandler[J]
+          def handle(event: J)
             op(jfx2sfx(event))
-          }
-        }
-      }
-    }
-  }
 
   /**
     * Registers an event handler. The handler is called when the node receives an Event of the specified type during the bubbling phase of event delivery.
@@ -170,9 +155,8 @@ trait EventHandlerDelegate {
     * @return Returns a subscription that can be used to cancel/remove this event handler
     */
   def handleEvent[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-      eventType: EventType[J])(handler: HandlerMagnet[J, S]): Subscription = {
+      eventType: EventType[J])(handler: HandlerMagnet[J, S]): Subscription =
     handler(eventType)
-  }
 
   /**
     * Unregisters a previously registered event handler from this task. One handler might have been
@@ -184,9 +168,8 @@ trait EventHandlerDelegate {
     * @param eventHandler  the handler to unregister
     */
   def removeEventHandler[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E])
     eventHandlerDelegate.removeEventHandler(eventType, eventHandler)
-  }
 
   /**
     * Registers an event filter to this task. Registered event filters get an event before any
@@ -197,55 +180,41 @@ trait EventHandlerDelegate {
     * @param eventHandler the filter to register that will filter event
     */
   def addEventFilter[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E])
     eventHandlerDelegate.addEventFilter(eventType, eventHandler)
-  }
 
   /**
     * Trait implementing [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
     * to avoid compilation error "ambiguous reference to overloaded definition"
     */
-  sealed trait FilterMagnet[J <: jfxe.Event, S <: SFXDelegate[J]] {
+  sealed trait FilterMagnet[J <: jfxe.Event, S <: SFXDelegate[J]]
     protected val eventFilter: jfxe.EventHandler[J]
 
-    def apply(eventType: EventType[J]): Subscription = {
+    def apply(eventType: EventType[J]): Subscription =
       EventHandlerDelegate.this.addEventFilter(eventType.delegate, eventFilter)
-      new Subscription {
-        def cancel() {
+      new Subscription
+        def cancel()
           EventHandlerDelegate.this.removeEventFilter(
               eventType.delegate, eventFilter)
-        }
-      }
-    }
-  }
 
   /**
     * Companion object implementing Magnet Pattern [[http://spray.io/blog/2012-12-13-the-magnet-pattern/ Magnet Pattern]]
     * to avoid compilation error "ambiguous reference to overloaded definition"
     */
-  object FilterMagnet {
+  object FilterMagnet
     implicit def fromParen[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-        op: () => Unit): FilterMagnet[J, S] = {
-      new FilterMagnet[J, S] {
-        override val eventFilter = new jfxe.EventHandler[J] {
-          def handle(event: J) {
+        op: () => Unit): FilterMagnet[J, S] =
+      new FilterMagnet[J, S]
+        override val eventFilter = new jfxe.EventHandler[J]
+          def handle(event: J)
             op()
-          }
-        }
-      }
-    }
 
     implicit def fromEvent[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-        op: S => Unit)(implicit jfx2sfx: J => S): FilterMagnet[J, S] = {
-      new FilterMagnet[J, S] {
-        override val eventFilter = new jfxe.EventHandler[J] {
-          def handle(event: J) {
+        op: S => Unit)(implicit jfx2sfx: J => S): FilterMagnet[J, S] =
+      new FilterMagnet[J, S]
+        override val eventFilter = new jfxe.EventHandler[J]
+          def handle(event: J)
             op(jfx2sfx(event))
-          }
-        }
-      }
-    }
-  }
 
   /**
     * Registers an event filter. Registered event filters get an event before any associated event handlers.
@@ -279,9 +248,8 @@ trait EventHandlerDelegate {
     * @tparam S ScalaFX type for `J` type wrapper.
     */
   def filterEvent[J <: jfxe.Event, S <: Event with SFXDelegate[J]](
-      eventType: EventType[J])(filter: FilterMagnet[J, S]): Subscription = {
+      eventType: EventType[J])(filter: FilterMagnet[J, S]): Subscription =
     filter(eventType)
-  }
 
   /**
     * Unregisters a previously registered event filter from this task. One filter might have been
@@ -293,13 +261,11 @@ trait EventHandlerDelegate {
     * @param eventHandler the filter to unregister
     */
   def removeEventFilter[E <: jfxe.Event](
-      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E]) {
+      eventType: jfxe.EventType[E], eventHandler: jfxe.EventHandler[_ >: E])
     eventHandlerDelegate.removeEventFilter(eventType, eventHandler)
-  }
 
   /**
     * Construct an event dispatch chain for this target.
     */
   def buildEventDispatchChain(chain: jfxe.EventDispatchChain) =
     eventHandlerDelegate.buildEventDispatchChain(chain)
-}

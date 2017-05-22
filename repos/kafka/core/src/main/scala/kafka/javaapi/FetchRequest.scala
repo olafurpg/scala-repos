@@ -26,13 +26,12 @@ class FetchRequest(
     clientId: String,
     maxWait: Int,
     minBytes: Int,
-    requestInfo: java.util.Map[TopicAndPartition, PartitionFetchInfo]) {
+    requestInfo: java.util.Map[TopicAndPartition, PartitionFetchInfo])
 
-  val underlying = {
-    val scalaMap: Map[TopicAndPartition, PartitionFetchInfo] = {
+  val underlying =
+    val scalaMap: Map[TopicAndPartition, PartitionFetchInfo] =
       import scala.collection.JavaConversions._
       (requestInfo: mutable.Map[TopicAndPartition, PartitionFetchInfo]).toMap
-    }
     kafka.api.FetchRequest(
         correlationId = correlationId,
         clientId = clientId,
@@ -41,16 +40,13 @@ class FetchRequest(
         minBytes = minBytes,
         requestInfo = scalaMap
     )
-  }
 
   override def toString = underlying.toString
 
-  override def equals(other: Any) = canEqual(other) && {
+  override def equals(other: Any) = canEqual(other) &&
     val otherFetchRequest = other.asInstanceOf[kafka.javaapi.FetchRequest]
     this.underlying.equals(otherFetchRequest.underlying)
-  }
 
   def canEqual(other: Any) = other.isInstanceOf[kafka.javaapi.FetchRequest]
 
   override def hashCode = underlying.hashCode
-}

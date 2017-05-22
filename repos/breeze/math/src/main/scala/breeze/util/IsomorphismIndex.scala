@@ -7,7 +7,7 @@ package breeze.util
 @SerialVersionUID(1)
 class IsomorphismIndex[T, U](val innerIndex: Index[T])(
     implicit iso: Isomorphism[T, U])
-    extends Index[U] with Serializable {
+    extends Index[U] with Serializable
   def apply(u: U): Int = innerIndex(iso.backward(u))
 
   /**
@@ -27,4 +27,3 @@ class IsomorphismIndex[T, U](val innerIndex: Index[T])(
   override def contains(u: U): Boolean = innerIndex.contains(iso.backward(u))
 
   override def get(i: Int): U = iso.forward(innerIndex.get(i))
-}

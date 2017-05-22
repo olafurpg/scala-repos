@@ -11,18 +11,16 @@ import scala.reflect.internal.util.SourceFile
   * Simulate methods that were added in later versions of the scalac
   * API, or to generate fake methods that we can use in both versions.
   */
-trait PresentationCompilerBackCompat {
+trait PresentationCompilerBackCompat
   this: RichPresentationCompiler =>
 
-  implicit class RichSymbols(sym: Symbol) {
+  implicit class RichSymbols(sym: Symbol)
     def isLocalToBlock: Boolean = sym.isLocal
 
     def paramLists: List[List[Symbol]] = sym.paramss
-  }
-}
 
-trait PositionBackCompat {
-  implicit class RichPosition(pos: Position) {
+trait PositionBackCompat
+  implicit class RichPosition(pos: Position)
     def withSource(src: SourceFile): Position =
       pos.withSource(src, 0)
 
@@ -32,5 +30,3 @@ trait PositionBackCompat {
     // I wish we could override `start` and `end`
     def startOrCursor: Int = pos.startOrPoint
     def endOrCursor: Int = pos.endOrPoint
-  }
-}

@@ -1,5 +1,4 @@
 package test3
 
-trait C {
+trait C
   def abc(a: A): Int = a.foo
-}

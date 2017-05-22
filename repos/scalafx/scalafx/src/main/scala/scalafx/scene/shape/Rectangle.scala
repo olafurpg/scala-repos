@@ -34,7 +34,7 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{DimensionDelegate, PositionDelegate, SFXDelegate}
 import scalafx.scene.paint._
 
-object Rectangle {
+object Rectangle
   implicit def sfxRectangle2jfx(v: Rectangle): jfxss.Rectangle =
     if (v != null) v.delegate else null
 
@@ -46,7 +46,6 @@ object Rectangle {
 
   def apply(width: Double, height: Double, fill: Paint) =
     new Rectangle(new jfxss.Rectangle(width, height, fill))
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/Rectangle.html]]
@@ -54,21 +53,18 @@ object Rectangle {
   */
 class Rectangle(override val delegate: jfxss.Rectangle = new jfxss.Rectangle())
     extends Shape(delegate) with PositionDelegate[jfxss.Rectangle]
-    with DimensionDelegate[jfxss.Rectangle] with SFXDelegate[jfxss.Rectangle] {
+    with DimensionDelegate[jfxss.Rectangle] with SFXDelegate[jfxss.Rectangle]
 
   /**
     * Defines the vertical diameter of the arc at the four corners of the rectangle.
     */
   def arcWidth: DoubleProperty = delegate.arcWidthProperty
-  def arcWidth_=(v: Double) {
+  def arcWidth_=(v: Double)
     arcWidth() = v
-  }
 
   /**
     * Defines the horizontal diameter of the arc at the four corners of the rectangle.
     */
   def arcHeight: DoubleProperty = delegate.arcHeightProperty
-  def arcHeight_=(v: Double) {
+  def arcHeight_=(v: Double)
     arcHeight() = v
-  }
-}

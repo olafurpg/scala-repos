@@ -57,7 +57,7 @@ import parallel.mutable.ParSet
 trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     extends scala.collection.SetLike[A, This] with Scriptable[A]
     with Builder[A, This] with Growable[A] with Shrinkable[A]
-    with Cloneable[mutable.Set[A]] with Parallelizable[A, ParSet[A]] {
+    with Cloneable[mutable.Set[A]] with Parallelizable[A, ParSet[A]]
   self =>
 
   /** A common implementation of `newBuilder` for all mutable sets
@@ -72,34 +72,31 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *
     * ```Note```: assumes a fast `size` method.  Subclasses should override if this is not true.
     */
-  override def toSeq: collection.Seq[A] = {
+  override def toSeq: collection.Seq[A] =
     // ArrayBuffer for efficiency, preallocated to the right size.
     val result = new ArrayBuffer[A](size)
     foreach(result += _)
     result
-  }
 
   /** Adds an element to this $coll.
     *
     *  @param elem the element to be added
     *  @return `true` if the element was not yet present in the set, `false` otherwise.
     */
-  def add(elem: A): Boolean = {
+  def add(elem: A): Boolean =
     val r = contains(elem)
     this += elem
     !r
-  }
 
   /** Removes an element from this set.
     *
     *  @param elem  The element to be removed.
     *  @return  `true` if the element was previously present in the set, `false` otherwise.
     */
-  def remove(elem: A): Boolean = {
+  def remove(elem: A): Boolean =
     val r = contains(elem)
     this -= elem
     r
-  }
 
   /** Updates the presence of a single element in this set.
     *
@@ -114,9 +111,8 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  @param elem     the element to be added or removed
     *  @param included a flag indicating whether element should be included or excluded.
     */
-  def update(elem: A, included: Boolean) {
+  def update(elem: A, included: Boolean)
     if (included) this += elem else this -= elem
-  }
 
   // abstract methods from Growable/Shrinkable
 
@@ -232,7 +228,7 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     *  if the message was not understood.
     */
   @deprecated("Scripting is deprecated.", "2.11.0")
-  def <<(cmd: Message[A]): Unit = cmd match {
+  def <<(cmd: Message[A]): Unit = cmd match
     case Include(_, x) => this += x
     case Remove(_, x) => this -= x
     case Reset() => clear()
@@ -240,5 +236,3 @@ trait SetLike[A, +This <: SetLike[A, This] with Set[A]]
     case _ =>
       throw new UnsupportedOperationException(
           "message " + cmd + " not understood")
-  }
-}

@@ -34,7 +34,7 @@ package com.twitter.summingbird
   *
   * @author Sam Ritchie
   */
-object Predef {
+object Predef
   // Core types
   type AbstractJob = com.twitter.summingbird.AbstractJob
   type Env = com.twitter.summingbird.Env
@@ -56,4 +56,3 @@ object Predef {
   // Common options
   type CacheSize = com.twitter.summingbird.option.CacheSize
   val CacheSize = com.twitter.summingbird.option.CacheSize
-}

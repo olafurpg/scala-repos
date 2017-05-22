@@ -22,21 +22,19 @@ import scala.language.implicitConversions
   *
   * @group Engine
   */
-trait Deployment extends EngineFactory {
+trait Deployment extends EngineFactory
   protected[this] var _engine: BaseEngine[_, _, _, _] = _
   protected[this] var engineSet: Boolean = false
 
   /** Returns the [[Engine]] of this [[Deployment]] */
-  def apply(): BaseEngine[_, _, _, _] = {
+  def apply(): BaseEngine[_, _, _, _] =
     assert(engineSet, "Engine not set")
     _engine
-  }
 
   /** Returns the [[Engine]] contained in this [[Deployment]]. */
-  private[prediction] def engine: BaseEngine[_, _, _, _] = {
+  private[prediction] def engine: BaseEngine[_, _, _, _] =
     assert(engineSet, "Engine not set")
     _engine
-  }
 
   /** Sets the [[Engine]] for this [[Deployment]]
     *
@@ -46,9 +44,7 @@ trait Deployment extends EngineFactory {
     * @tparam P Predicted result class
     * @tparam A Actual result class
     */
-  def engine_=[EI, Q, P, A](engine: BaseEngine[EI, Q, P, A]) {
+  def engine_=[EI, Q, P, A](engine: BaseEngine[EI, Q, P, A])
     assert(!engineSet, "Engine can be set at most once")
     _engine = engine
     engineSet = true
-  }
-}

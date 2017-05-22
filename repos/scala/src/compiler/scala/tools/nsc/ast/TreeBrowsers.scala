@@ -27,7 +27,7 @@ import scala.text._
   * @author Iulian Dragos
   * @version 1.0
   */
-abstract class TreeBrowsers {
+abstract class TreeBrowsers
   val global: Global
   import global._
   import nme.EMPTY
@@ -37,24 +37,22 @@ abstract class TreeBrowsers {
   def create(): SwingBrowser = new SwingBrowser()
 
   /** Pseudo tree class, so that all JTree nodes are treated uniformly */
-  case class ProgramTree(units: List[UnitTree]) extends Tree {
+  case class ProgramTree(units: List[UnitTree]) extends Tree
     override def toString: String = "Program"
-  }
 
   /** Pseudo tree class, so that all JTree nodes are treated uniformly */
-  case class UnitTree(unit: CompilationUnit) extends Tree {
+  case class UnitTree(unit: CompilationUnit) extends Tree
     override def toString: String = unit.toString
-  }
 
   /**
     * Java Swing pretty printer for Scala abstract syntax trees.
     */
-  class SwingBrowser {
+  class SwingBrowser
     def browse(pName: String, units: Iterator[CompilationUnit]): Unit =
       browse(pName, units.toList)
 
     /** print the whole program */
-    def browse(pName: String, units: List[CompilationUnit]): Unit = {
+    def browse(pName: String, units: List[CompilationUnit]): Unit =
       var unitList: List[UnitTree] = Nil
 
       for (i <- units) unitList = UnitTree(i) :: unitList
@@ -68,11 +66,9 @@ abstract class TreeBrowsers {
 
       // wait for the frame to be closed
       lock.acquire()
-    }
-  }
 
   /** Tree model for abstract syntax trees */
-  class ASTTreeModel(val program: Tree) extends TreeModel {
+  class ASTTreeModel(val program: Tree) extends TreeModel
     var listeners: List[TreeModelListener] = Nil
 
     /** Add a listener to this tree */
@@ -108,7 +104,6 @@ abstract class TreeBrowsers {
       */
     def packChildren(t: AnyRef): List[AnyRef] =
       TreeInfo.children(t.asInstanceOf[Tree])
-  }
 
   /**
     * A window that can host the Tree widget and provide methods for
@@ -117,15 +112,14 @@ abstract class TreeBrowsers {
     * @author Iulian Dragos
     * @version 1.0
     */
-  class BrowserFrame(phaseName: String = "unknown") {
-    try {
+  class BrowserFrame(phaseName: String = "unknown")
+    try
       UIManager.setLookAndFeel(
           "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel")
-    } catch {
+    catch
       case _: Throwable =>
         UIManager.setLookAndFeel(
             UIManager.getCrossPlatformLookAndFeelClassName())
-    }
 
     val frame = new JFrame("Scala AST after " + phaseName + " phase")
     frame.setJMenuBar(new ASTMenuBar())
@@ -141,18 +135,15 @@ abstract class TreeBrowsers {
 
     val infoPanel = new TextInfoPanel()
 
-    private def setExpansionState(root: JTree, expand: Boolean): Unit = {
-      def _setExpansionState(root: JTree, path: TreePath): Unit = {
+    private def setExpansionState(root: JTree, expand: Boolean): Unit =
+      def _setExpansionState(root: JTree, path: TreePath): Unit =
         val last = path.getLastPathComponent
-        for (i <- 0 until root.getModel.getChildCount(last)) {
+        for (i <- 0 until root.getModel.getChildCount(last))
           val child = root.getModel.getChild(last, i)
           val childPath = path pathByAddingChild child
           _setExpansionState(root, childPath)
-        }
         if (expand) { jTree expandPath path } else { jTree collapsePath path }
-      }
       _setExpansionState(root, new TreePath(root.getModel.getRoot))
-    }
 
     def expandAll(subtree: JTree) = setExpansionState(subtree, expand = true)
     def collapseAll(subtree: JTree) =
@@ -166,19 +157,19 @@ abstract class TreeBrowsers {
       * would continue. However, this is not what we want, as the tree and
       * especially symbols/types would change while the window is visible.
       */
-    def createFrame(lock: Lock): Unit = {
+    def createFrame(lock: Lock): Unit =
       lock.acquire() // keep the lock until the user closes the window
 
       frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
 
       frame.addWindowListener(
-          new WindowAdapter() {
+          new WindowAdapter()
 
         /** Release the lock, so compilation may resume after the window is closed. */
         override def windowClosed(e: WindowEvent): Unit = lock.release()
-      })
+      )
 
-      jTree = new JTree(treeModel) {
+      jTree = new JTree(treeModel)
 
         /** Return the string for a tree node. */
         override def convertValueToText(value: Any,
@@ -186,20 +177,17 @@ abstract class TreeBrowsers {
                                         exp: Boolean,
                                         leaf: Boolean,
                                         row: Int,
-                                        hasFocus: Boolean) = {
+                                        hasFocus: Boolean) =
           val (cls, name) = TreeInfo.treeName(value.asInstanceOf[Tree])
           if (name != EMPTY) cls + "[" + name + "]"
           else cls
-        }
-      }
 
       jTree.addTreeSelectionListener(
-          new javax.swing.event.TreeSelectionListener() {
-        def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit = {
+          new javax.swing.event.TreeSelectionListener()
+        def valueChanged(e: javax.swing.event.TreeSelectionEvent): Unit =
           textArea.setText(e.getPath().getLastPathComponent().toString)
           infoPanel.update(e.getPath().getLastPathComponent())
-        }
-      })
+      )
 
       val topSplitPane = new JSplitPane(
           JSplitPane.HORIZONTAL_SPLIT, topLeftPane, topRightPane)
@@ -218,9 +206,8 @@ abstract class TreeBrowsers {
       frame.getContentPane().add(splitPane)
       frame.pack()
       frame.setVisible(true)
-    }
 
-    class ASTMenuBar extends JMenuBar {
+    class ASTMenuBar extends JMenuBar
       val menuKey = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()
       val shiftKey = InputEvent.SHIFT_MASK
       val jmFile = new JMenu("File")
@@ -242,59 +229,50 @@ abstract class TreeBrowsers {
           .postEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING))
 
       val jmiCancel = new JMenuItem(
-          new AbstractAction("Cancel Compilation") {
+          new AbstractAction("Cancel Compilation")
             putValue(Action.ACCELERATOR_KEY,
                      KeyStroke.getKeyStroke(
                          KeyEvent.VK_Q, menuKey + shiftKey, false))
-            override def actionPerformed(e: ActionEvent) {
+            override def actionPerformed(e: ActionEvent)
               closeWindow()
               global.currentRun.cancel()
-            }
-          }
       )
       jmFile add jmiCancel
 
       val jmiExit = new JMenuItem(
-          new AbstractAction("Exit") {
+          new AbstractAction("Exit")
             putValue(Action.ACCELERATOR_KEY,
                      KeyStroke.getKeyStroke(KeyEvent.VK_Q, menuKey, false))
             override def actionPerformed(e: ActionEvent) = closeWindow()
-          }
       )
       jmFile add jmiExit
       add(jmFile)
 
       val jmView = new JMenu("View")
       val jmiExpand = new JMenuItem(
-          new AbstractAction("Expand All Nodes") {
+          new AbstractAction("Expand All Nodes")
             putValue(Action.ACCELERATOR_KEY,
                      KeyStroke.getKeyStroke(KeyEvent.VK_E, menuKey, false))
-            override def actionPerformed(e: ActionEvent) {
+            override def actionPerformed(e: ActionEvent)
               expandAll(jTree)
-            }
-          }
       )
       jmView add jmiExpand
       val jmiCollapse = new JMenuItem(
-          new AbstractAction("Collapse All Nodes") {
+          new AbstractAction("Collapse All Nodes")
             putValue(Action.ACCELERATOR_KEY,
                      KeyStroke.getKeyStroke(KeyEvent.VK_L, menuKey, false))
-            override def actionPerformed(e: ActionEvent) {
+            override def actionPerformed(e: ActionEvent)
               collapseAll(jTree)
-            }
-          }
       )
       jmView add jmiCollapse
       add(jmView)
-    }
 
     def setTreeModel(tm: ASTTreeModel): Unit = treeModel = tm
-  }
 
   /**
     * Present detailed information about the selected tree node.
     */
-  class TextInfoPanel extends JTextArea(20, 50) {
+  class TextInfoPanel extends JTextArea(20, 50)
 
     setBorder(
         BorderFactory.createEmptyBorder(
@@ -302,12 +280,12 @@ abstract class TreeBrowsers {
     setEditable(false)
     setFont(new Font("monospaced", Font.PLAIN, 12))
 
-    def update(v: AnyRef): Unit = {
+    def update(v: AnyRef): Unit =
       val t: Tree = v.asInstanceOf[Tree]
       val str = new StringBuilder()
       var buf = new StringWriter()
 
-      t match {
+      t match
         case ProgramTree(_) => ()
         case UnitTree(_) => ()
         case _ =>
@@ -319,21 +297,19 @@ abstract class TreeBrowsers {
             .append(if ((t.symbol ne null) && t.symbol != NoSymbol)
                   t.symbol.owner.toString
                 else "NoSymbol has no owner")
-          if ((t.symbol ne null) && t.symbol.isType) {
+          if ((t.symbol ne null) && t.symbol.isType)
             str.append("\ntermSymbol: " + t.symbol.tpe.termSymbol +
                 "\ntypeSymbol: " + t.symbol.tpe.typeSymbol)
             if (t.symbol.isTypeSkolem)
               str.append("\nSkolem of: " + t.symbol.deSkolemize)
-          }
           str.append("\nSymbol tpe: ")
-          if (t.symbol ne null) {
+          if (t.symbol ne null)
             str.append(t.symbol.tpe).append("\n")
             buf = new StringWriter()
             TypePrinter
               .toDocument(t.symbol.tpe)
               .format(getWidth() / getColumnWidth(), buf)
             str.append(buf.toString)
-          }
           str.append("\n\nSymbol info: \n")
           TreeInfo.symbolTypeDoc(t).format(getWidth() / getColumnWidth(), buf)
           str.append(buf.toString)
@@ -341,28 +317,24 @@ abstract class TreeBrowsers {
             .append("\n\nSymbol Attributes: \n")
             .append(TreeInfo.symbolAttributes(t))
           str.append("\ntree.tpe: ")
-          if (t.tpe ne null) {
+          if (t.tpe ne null)
             str.append(t.tpe.toString).append("\n")
             buf = new StringWriter()
             TypePrinter
               .toDocument(t.tpe)
               .format(getWidth() / getColumnWidth(), buf)
             str.append(buf.toString)
-          }
-      }
       setText(str.toString)
-    }
-  }
 
   /** Computes different information about a tree node. It
     *  is used as central place to do all pattern matching against
     *  Tree.
     */
-  object TreeInfo {
+  object TreeInfo
 
     /** Return the case class name and the Name, if the node defines one */
     def treeName(t: Tree): (String, Name) =
-      ((t.productPrefix, t match {
+      ((t.productPrefix, t match
         case UnitTree(unit) => newTermName("" + unit)
         case Super(_, mix) => newTermName("mix: " + mix)
         case This(qual) => qual
@@ -371,10 +343,10 @@ abstract class TreeBrowsers {
         case SelectFromTypeTree(_, selector) => selector
         case x: DefTree => x.name
         case _ => EMPTY
-      }))
+      ))
 
     /** Return a list of children for the given tree node */
-    def children(t: Tree): List[Tree] = t match {
+    def children(t: Tree): List[Tree] = t match
       case ProgramTree(units) =>
         units
 
@@ -384,11 +356,10 @@ abstract class TreeBrowsers {
       case DocDef(comment, definition) =>
         List(definition)
 
-      case ClassDef(mods, name, tparams, impl) => {
+      case ClassDef(mods, name, tparams, impl) =>
           var children: List[Tree] = List()
           children = tparams ::: children
           mods.annotations ::: impl :: children
-        }
 
       case PackageDef(pid, stats) =>
         stats
@@ -512,42 +483,37 @@ abstract class TreeBrowsers {
 
       case Star(t) =>
         List(t)
-    }
 
     /** Return a textual representation of this t's symbol */
-    def symbolText(t: Tree): String = {
+    def symbolText(t: Tree): String =
       val prefix =
         if (t.hasSymbolField) "[has] "
         else if (t.isDef) "[defines] "
         else ""
 
       prefix + t.symbol
-    }
 
     /** Return t's symbol type  */
-    def symbolTypeDoc(t: Tree): Document = {
+    def symbolTypeDoc(t: Tree): Document =
       val s = t.symbol
       if (s ne null) TypePrinter.toDocument(s.info)
       else DocNil
-    }
 
     /** Return a textual representation of (some of) the symbol's
       * attributes */
-    def symbolAttributes(t: Tree): String = {
+    def symbolAttributes(t: Tree): String =
       val s = t.symbol
 
-      if ((s ne null) && (s != NoSymbol)) {
+      if ((s ne null) && (s != NoSymbol))
         var str = s.flagString
         if (s.isStaticMember) str = str + " isStatic "
         (str + " annotations: " + s.annotations.mkString("", " ", "") +
             (if (s.isTypeSkolem)
                "\ndeSkolemized annotations: " +
                s.deSkolemize.annotations.mkString("", " ", "") else ""))
-      } else ""
-    }
-  }
+      else ""
 
-  object TypePrinter {
+  object TypePrinter
 
     ///////////////// Document pretty printer ////////////////
 
@@ -556,23 +522,21 @@ abstract class TreeBrowsers {
     def toDocument(sym: Symbol): Document =
       toDocument(sym.info)
 
-    def symsToDocument(syms: List[Symbol]): Document = syms match {
+    def symsToDocument(syms: List[Symbol]): Document = syms match
       case Nil => DocNil
       case s :: Nil => Document.group(toDocument(s))
       case _ =>
         Document.group(syms.tail.foldLeft(toDocument(syms.head) :: ", ")(
                 (d: Document, s2: Symbol) => toDocument(s2) :: ", " :/: d))
-    }
 
-    def toDocument(ts: List[Type]): Document = ts match {
+    def toDocument(ts: List[Type]): Document = ts match
       case Nil => DocNil
       case t :: Nil => Document.group(toDocument(t))
       case _ =>
         Document.group(ts.tail.foldLeft(toDocument(ts.head) :: ", ")(
                 (d: Document, t2: Type) => toDocument(t2) :: ", " :/: d))
-    }
 
-    def toDocument(t: Type): Document = t match {
+    def toDocument(t: Type): Document = t match
       case ErrorType => "ErrorType()"
       case WildcardType => "WildcardType()"
       case NoType => "NoType()"
@@ -667,6 +631,3 @@ abstract class TreeBrowsers {
                     supertpe) :: ")"))
       case _ =>
         sys.error("Unknown case: " + t.toString + ", " + t.getClass)
-    }
-  }
-}

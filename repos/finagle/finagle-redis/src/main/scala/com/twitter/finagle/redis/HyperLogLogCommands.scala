@@ -5,7 +5,7 @@ import com.twitter.finagle.redis.protocol.{IntegerReply, PFMerge, PFCount, PFAdd
 import com.twitter.util.Future
 import org.jboss.netty.buffer.ChannelBuffer
 
-trait HyperLogLogs { self: BaseClient =>
+trait HyperLogLogs  self: BaseClient =>
 
   /**
     * Adds elements to a HyperLogLog data structure.
@@ -17,9 +17,8 @@ trait HyperLogLogs { self: BaseClient =>
     */
   def pfAdd(
       key: ChannelBuffer, elements: List[ChannelBuffer]): Future[JBoolean] =
-    doRequest(PFAdd(key, elements)) {
+    doRequest(PFAdd(key, elements))
       case IntegerReply(n) => Future.value(n == 1)
-    }
 
   /**
     * Get the approximated cardinality of sets observed by the HyperLogLog at key(s)
@@ -28,9 +27,8 @@ trait HyperLogLogs { self: BaseClient =>
     * @see http://redis.io/commands/pfcount
     */
   def pfCount(keys: Seq[ChannelBuffer]): Future[JLong] =
-    doRequest(PFCount(keys)) {
+    doRequest(PFCount(keys))
       case IntegerReply(n) => Future.value(n)
-    }
 
   /**
     * Merge HyperLogLogs at srcKeys to create a new HyperLogLog at destKey
@@ -40,7 +38,5 @@ trait HyperLogLogs { self: BaseClient =>
     */
   def pfMerge(
       destKey: ChannelBuffer, srcKeys: Seq[ChannelBuffer]): Future[Unit] =
-    doRequest(PFMerge(destKey, srcKeys)) {
+    doRequest(PFMerge(destKey, srcKeys))
       case StatusReply(_) => Future.Unit
-    }
-}

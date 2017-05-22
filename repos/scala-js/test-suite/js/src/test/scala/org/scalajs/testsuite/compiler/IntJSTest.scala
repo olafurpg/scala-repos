@@ -20,7 +20,7 @@ import org.scalajs.testsuite.utils.Platform._
  * Since constant folding is performed on the JVM, we know it has the right
  * semantics.
  */
-class IntJSTest {
+class IntJSTest
 
   // final val without type ascription to make sure these are constant-folded
   final val MinVal = Int.MinValue
@@ -28,7 +28,7 @@ class IntJSTest {
   final val AlmostMinVal = Int.MinValue + 43
   final val AlmostMaxVal = Int.MaxValue - 36
 
-  @Test def `should_support_%`(): Unit = {
+  @Test def `should_support_%`(): Unit =
     assumeFalse(executingInPhantomJS) // see #593
 
     def test(a: Int, b: Int, expected: Int): Unit =
@@ -55,5 +55,3 @@ class IntJSTest {
     test(AlmostMaxVal, -14, AlmostMaxVal % -14)
     test(AlmostMinVal, 100, AlmostMinVal % 100)
     test(AlmostMaxVal, -123, AlmostMaxVal % -123)
-  }
-}

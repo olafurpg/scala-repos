@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong
   */
 private class ForkJoinScheduler(
     nthreads: Int, statsReceiver: StatsReceiver = NullStatsReceiver)
-    extends Scheduler {
+    extends Scheduler
   private trait IsManagedThread
 
   private[this] val numBlocks = statsReceiver.counter("blocks")
@@ -27,22 +27,18 @@ private class ForkJoinScheduler(
   private[this] val local = new LocalScheduler
 
   private[this] val threadFactory =
-    new ForkJoinPool.ForkJoinWorkerThreadFactory {
-      def newThread(pool: ForkJoinPool) = {
+    new ForkJoinPool.ForkJoinWorkerThreadFactory
+      def newThread(pool: ForkJoinPool) =
         val thread = new ForkJoinWorkerThread(pool) with IsManagedThread
         thread.setName(
             "Finagle ForkJoin Worker #" + (threadCount.getAndIncrement()))
         thread.setDaemon(true)
         threadsMade.incr()
         thread
-      }
-    }
 
-  private[this] val exceptionHandler = new Thread.UncaughtExceptionHandler {
-    def uncaughtException(t: Thread, exc: Throwable) {
+  private[this] val exceptionHandler = new Thread.UncaughtExceptionHandler
+    def uncaughtException(t: Thread, exc: Throwable)
       Monitor.handle(exc)
-    }
-  }
 
   private[this] val pool = new ForkJoinPool(
       nthreads,
@@ -64,18 +60,18 @@ private class ForkJoinScheduler(
       statsReceiver.addGauge("pool_size") { pool.getPoolSize() },
       // Returns an estimate of the number of tasks submitted to this
       // pool that have not yet begun executing.
-      statsReceiver.addGauge("queued_submissions") {
+      statsReceiver.addGauge("queued_submissions")
         pool.getQueuedSubmissionCount()
-      },
+      ,
       // Returns an estimate of the total number of tasks currently
       // held in queues by worker threads (but not including tasks
       // submitted to the pool that have not begun executing).
       statsReceiver.addGauge("queued_tasks") { pool.getQueuedTaskCount() },
       // Returns an estimate of the number of worker threads that are not
       // blocked waiting to join tasks or for other managed synchronization.
-      statsReceiver.addGauge("running_threads") {
+      statsReceiver.addGauge("running_threads")
         pool.getRunningThreadCount()
-      },
+      ,
       // Returns an estimate of the total number of tasks stolen from one thread's
       // work queue by another.
       statsReceiver.addGauge("steals") { pool.getStealCount() },
@@ -83,56 +79,47 @@ private class ForkJoinScheduler(
       statsReceiver.addGauge("splits") { splitCount.get }
   )
 
-  def submit(r: Runnable) {
-    Thread.currentThread() match {
+  def submit(r: Runnable)
+    Thread.currentThread() match
       case t: ForkJoinWorkerThread if t.getPool eq pool =>
         local.submit(r)
 
       case _ =>
-        try pool.execute(ForkJoinTask.adapt(r)) catch {
+        try pool.execute(ForkJoinTask.adapt(r)) catch
           // ForkJoin pools reject execution only when its internal
           // resources are exhausted. It is a serious, nonrecoverable
           // error.
           case cause: RejectedExecutionException =>
             throw new Error("Resource exhaustion in ForkJoin pool", cause)
-        }
-    }
-  }
 
-  def blocking[T](f: => T)(implicit perm: CanAwait): T = {
-    Thread.currentThread() match {
+  def blocking[T](f: => T)(implicit perm: CanAwait): T =
+    Thread.currentThread() match
       case _: IsManagedThread =>
         // Flush out our local scheduler before proceeding.
         var n = 0
-        while (local.hasNext) {
+        while (local.hasNext)
           ForkJoinTask.adapt(local.next()).fork()
           n += 1
-        }
         if (n > 0) splitCount.addAndGet(n)
 
         var res: T = null.asInstanceOf[T]
-        ForkJoinPool.managedBlock(new ForkJoinPool.ManagedBlocker {
+        ForkJoinPool.managedBlock(new ForkJoinPool.ManagedBlocker
           @volatile private[this] var ok = false
-          override def block() = {
+          override def block() =
             numBlocks.incr()
             activeBlocks.incrementAndGet()
-            res = try f finally {
+            res = try f finally
               ok = true
               activeBlocks.decrementAndGet()
-            }
             true
-          }
           override def isReleasable = ok
-        })
+        )
         res
 
       case _ =>
         // There's nothing we can do.
         f
-    }
-  }
 
   // We can't provide useful/cheap implementations of these.
   def numDispatches = -1L
   def flush() = ()
-}

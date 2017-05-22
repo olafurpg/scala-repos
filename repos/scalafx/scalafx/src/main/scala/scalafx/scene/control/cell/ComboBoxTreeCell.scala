@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define CONVPARAM A [[scalafx.util.StringConverter]] to convert the given item (of type T) to a String for displaying to the user.
   * @define RET A function that will return a TableCell that is able to work on the type of element contained within the TableColumn.
   */
-object ComboBoxTreeCell {
+object ComboBoxTreeCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -142,7 +142,6 @@ object ComboBoxTreeCell {
   @deprecated(message = "Use forTreeView[T](T*)", since = "1.0")
   def forTreeView[T](items: Array[T]) =
     jfxscc.ComboBoxTreeCell.forTreeView[T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTreeCell.html $CBTC]]
@@ -167,7 +166,7 @@ class ComboBoxTreeCell[T](
     with ComboBoxEditableCell[jfxscc.ComboBoxTreeCell[T], T]
     with UpdatableCell[jfxscc.ComboBoxTreeCell[T], T]
     with ItemableCell[jfxscc.ComboBoxTreeCell[T], T]
-    with SFXDelegate[jfxscc.ComboBoxTreeCell[T]] {
+    with SFXDelegate[jfxscc.ComboBoxTreeCell[T]]
 
   /**
     * $CONSTITEMS
@@ -201,4 +200,3 @@ class ComboBoxTreeCell[T](
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ComboBoxTreeCell[T](items: _*))
-}

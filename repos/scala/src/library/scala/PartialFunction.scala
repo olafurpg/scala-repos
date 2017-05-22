@@ -51,7 +51,7 @@ package scala
   *  @author  Martin Odersky, Pavel Pavlov, Adriaan Moors
   *  @version 1.0, 16/07/2003
   */
-trait PartialFunction[-A, +B] extends (A => B) { self =>
+trait PartialFunction[-A, +B] extends (A => B)  self =>
   import PartialFunction._
 
   /** Checks if a value is contained in the function's domain.
@@ -137,11 +137,9 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
     *           runs `action(this(x))` where `this` is defined.
     *  @since   2.10
     */
-  def runWith[U](action: B => U): A => Boolean = { x =>
+  def runWith[U](action: B => U): A => Boolean =  x =>
     val z = applyOrElse(x, checkFallback[B])
     if (!fallbackOccurred(z)) { action(z); true } else false
-  }
-}
 
 /** A few handy operations which leverage the extra bit of information
   *  available in partial functions.  Examples:
@@ -158,42 +156,38 @@ trait PartialFunction[-A, +B] extends (A => B) { self =>
   *  @author  Paul Phillips
   *  @since   2.8
   */
-object PartialFunction {
+object PartialFunction
 
   /** Composite function produced by `PartialFunction#orElse` method
     */
   private class OrElse[-A, +B](
       f1: PartialFunction[A, B], f2: PartialFunction[A, B])
-      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
+      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable
     def isDefinedAt(x: A) = f1.isDefinedAt(x) || f2.isDefinedAt(x)
 
     override def apply(x: A): B = f1.applyOrElse(x, f2)
 
-    override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
+    override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 =
       val z = f1.applyOrElse(x, checkFallback[B])
       if (!fallbackOccurred(z)) z else f2.applyOrElse(x, default)
-    }
 
     override def orElse[A1 <: A, B1 >: B](that: PartialFunction[A1, B1]) =
       new OrElse[A1, B1](f1, f2 orElse that)
 
     override def andThen[C](k: B => C) =
       new OrElse[A, C](f1 andThen k, f2 andThen k)
-  }
 
   /** Composite function produced by `PartialFunction#andThen` method
     */
   private class AndThen[-A, B, +C](pf: PartialFunction[A, B], k: B => C)
-      extends PartialFunction[A, C] with Serializable {
+      extends PartialFunction[A, C] with Serializable
     def isDefinedAt(x: A) = pf.isDefinedAt(x)
 
     def apply(x: A): C = k(pf(x))
 
-    override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 = {
+    override def applyOrElse[A1 <: A, C1 >: C](x: A1, default: A1 => C1): C1 =
       val z = pf.applyOrElse(x, checkFallback[B])
       if (!fallbackOccurred(z)) k(z) else default(x)
-    }
-  }
 
   /** To implement patterns like {{{ if(pf isDefinedAt x) f1(pf(x)) else f2(x) }}} efficiently
     *  the following trick is used:
@@ -216,59 +210,51 @@ object PartialFunction {
     *
     *  Here `fallback_pf` is used as both unique marker object and special fallback function that returns it.
     */
-  private[this] val fallback_pf: PartialFunction[Any, Any] = {
+  private[this] val fallback_pf: PartialFunction[Any, Any] =
     case _ => fallback_pf
-  }
   private def checkFallback[B] =
     fallback_pf.asInstanceOf[PartialFunction[Any, B]]
   private def fallbackOccurred[B](x: B) =
     (fallback_pf eq x.asInstanceOf[AnyRef])
 
   private class Lifted[-A, +B](val pf: PartialFunction[A, B])
-      extends scala.runtime.AbstractFunction1[A, Option[B]] with Serializable {
+      extends scala.runtime.AbstractFunction1[A, Option[B]] with Serializable
 
-    def apply(x: A): Option[B] = {
+    def apply(x: A): Option[B] =
       val z = pf.applyOrElse(x, checkFallback[B])
       if (!fallbackOccurred(z)) Some(z) else None
-    }
-  }
 
   private class Unlifted[A, B](f: A => Option[B])
-      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable {
+      extends scala.runtime.AbstractPartialFunction[A, B] with Serializable
     def isDefinedAt(x: A): Boolean = f(x).isDefined
 
-    override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 = {
+    override def applyOrElse[A1 <: A, B1 >: B](x: A1, default: A1 => B1): B1 =
       val z = f(x)
       if (!z.isEmpty) z.get else default(x)
-    }
 
     override def lift = f
-  }
 
   private[scala] def unlifted[A, B](f: A => Option[B]): PartialFunction[A, B] =
-    f match {
+    f match
       case lf: Lifted[A, B] => lf.pf
       case ff => new Unlifted(ff)
-    }
 
   /** Converts ordinary function to partial one
     *  @since   2.10
     */
   def apply[A, B](f: A => B): PartialFunction[A, B] = { case x => f(x) }
 
-  private[this] val constFalse: Any => Boolean = { _ =>
+  private[this] val constFalse: Any => Boolean =  _ =>
     false
-  }
 
   private[this] val empty_pf: PartialFunction[Any, Nothing] =
-    new PartialFunction[Any, Nothing] with Serializable {
+    new PartialFunction[Any, Nothing] with Serializable
       def isDefinedAt(x: Any) = false
       def apply(x: Any) = throw new MatchError(x)
       override def orElse[A1, B1](that: PartialFunction[A1, B1]) = that
       override def andThen[C](k: Nothing => C) = this
       override val lift = (x: Any) => None
       override def runWith[U](action: Nothing => U) = constFalse
-    }
 
   /** The partial function with empty domain.
     *  Any attempt to invoke empty partial function leads to throwing [[scala.MatchError]] exception.
@@ -298,4 +284,3 @@ object PartialFunction {
     *  @return `Some(pf(x))` if `pf isDefinedAt x`, `None` otherwise.
     */
   def condOpt[T, U](x: T)(pf: PartialFunction[T, U]): Option[U] = pf.lift(x)
-}

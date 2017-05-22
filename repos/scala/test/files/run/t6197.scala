@@ -1,6 +1,6 @@
 import scala.collection.immutable._
 
-object Test extends App {
+object Test extends App
 
   // test that a HashTrieSet with one leaf element is not created!
   val x = HashSet.empty + 1 + 2
@@ -19,4 +19,3 @@ object Test extends App {
   // However, it is also not necessary. Removing the ability of a HashTrieSet to have
   // one child of type HashTrieSet completely breaks the HashSet, so that many other
   // tests fail
-}

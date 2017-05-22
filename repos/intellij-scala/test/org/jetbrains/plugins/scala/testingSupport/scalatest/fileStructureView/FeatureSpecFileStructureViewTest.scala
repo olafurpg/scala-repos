@@ -8,21 +8,19 @@ import org.jetbrains.plugins.scala.testingSupport.test.structureView.TestNodePro
   * @author Roman.Shein
   * @since 19.04.2015.
   */
-trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
+trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase
 
   private val className = "FeatureSpecViewTest"
 
-  private def runTest(status: Int, names: String*) {
+  private def runTest(status: Int, names: String*)
     addFeatureSpec()
     runFileStructureViewTest(className, status, names: _*)
-  }
 
-  private def runTest(testName: String, parent: Option[String] = None): Unit = {
+  private def runTest(testName: String, parent: Option[String] = None): Unit =
     addFeatureSpec()
     runFileStructureViewTest(className, testName, parent)
-  }
 
-  def addFeatureSpec() {
+  def addFeatureSpec()
     addFileToProject(className + ".scala",
                      """
         |import org.scalatest._
@@ -39,7 +37,6 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
         | }
         |}
       """.stripMargin.trim())
-  }
 
   def testFeatureSpecNormal(): Unit =
     runTest("scenario(\"child1\")", Some("feature(\"parent\")"))
@@ -53,4 +50,3 @@ trait FeatureSpecFileStructureViewTest extends ScalaTestTestCase {
   def testFeatureSpecIgnoredHierarchy(): Unit =
     runTest("scenario(\"ignored_inner\")",
             Some("ignore(\"ignored2\")" + TestNodeProvider.ignoredSuffix))
-}

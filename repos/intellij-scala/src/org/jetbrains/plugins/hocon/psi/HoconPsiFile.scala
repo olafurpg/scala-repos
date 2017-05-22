@@ -10,34 +10,29 @@ import org.jetbrains.plugins.scala.extensions.PsiElementExt
 import scala.annotation.tailrec
 
 class HoconPsiFile(provider: FileViewProvider)
-    extends PsiFileImpl(HoconFileElementType, HoconFileElementType, provider) {
+    extends PsiFileImpl(HoconFileElementType, HoconFileElementType, provider)
   def accept(visitor: PsiElementVisitor): Unit =
     visitor.visitFile(this)
 
   def getFileType: FileType =
     HoconFileType
 
-  def toplevelEntries = {
+  def toplevelEntries =
     @tailrec
-    def entriesInner(child: PsiElement): HObjectEntries = child match {
+    def entriesInner(child: PsiElement): HObjectEntries = child match
       case obj: HObject => obj.entries
       case ets: HObjectEntries => ets
       case comment: PsiComment =>
         entriesInner(comment.getNextSiblingNotWhitespace)
-    }
 
     entriesInner(getFirstChild)
-  }
 
-  def toplevelObject = getFirstChild match {
+  def toplevelObject = getFirstChild match
     case obj: HObject => Some(obj)
     case _ => None
-  }
 
-  def elementsAt(offset: Int): Iterator[PsiElement] = {
+  def elementsAt(offset: Int): Iterator[PsiElement] =
     val leaf = findElementAt(offset)
     Iterator
       .iterate(leaf)(_.getParent)
       .takeWhile(e => e != null && (e ne this))
-  }
-}

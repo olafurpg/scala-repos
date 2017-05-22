@@ -27,7 +27,7 @@ import org.apache.commons.math3.random.MersenneTwister
 class ChiSquaredTest
     extends FunSuite with Checkers with UnivariateContinuousDistrTestBase
     with MomentsTestBase[Double] with ExpFamTest[ChiSquared, Double]
-    with HasCdfTestBase {
+    with HasCdfTestBase
   type Distr = ChiSquared
   import Arbitrary.arbitrary
 
@@ -35,9 +35,8 @@ class ChiSquaredTest
 
   override val numSamples = 40000
 
-  def arbParameter = Arbitrary {
+  def arbParameter = Arbitrary
     for (shape <- arbitrary[Double].map { _.abs % 200.0 + 4.2 }) yield shape
-  }
 
   def paramsClose(p: Double, b: Double) = breeze.numerics.closeTo(p, b, 5E-2)
 
@@ -45,24 +44,19 @@ class ChiSquaredTest
 
   def fromDouble(x: Double) = x
 
-  implicit def arbDistr = Arbitrary {
-    for (shape <- arbitrary[Double].map { x =>
+  implicit def arbDistr = Arbitrary
+    for (shape <- arbitrary[Double].map  x =>
       math.abs(x) % 1000.0 + 4.2
-    }) yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
-  }
+    ) yield new ChiSquared(shape)(new RandBasis(new MersenneTwister(0)))
 
   override val VARIANCE_TOLERANCE: Double = 1E-2
 
-  test("endpoint, k > 2") {
+  test("endpoint, k > 2")
     val g = new ChiSquared(3)
     assert(g.pdf(0.0) == 0)
-  }
-  test("endpoint, k == 2") {
+  test("endpoint, k == 2")
     val g = new ChiSquared(2.0)
     assert(g.pdf(0.0) == 0.5)
-  }
-  test("endpoint, k < 2") {
+  test("endpoint, k < 2")
     val g = new ChiSquared(1.5)
     assert(g.pdf(0.0) == Double.PositiveInfinity)
-  }
-}

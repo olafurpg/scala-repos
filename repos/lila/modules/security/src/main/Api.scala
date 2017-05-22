@@ -13,7 +13,7 @@ import lila.user.{User, UserRepo}
 final class Api(firewall: Firewall,
                 tor: Tor,
                 geoIP: GeoIP,
-                emailAddress: EmailAddress) {
+                emailAddress: EmailAddress)
 
   val AccessUri = "access_uri"
 
@@ -29,45 +29,35 @@ final class Api(firewall: Firewall,
       implicit req: RequestHeader): Fu[String] =
     if (tor isExitNode req.remoteAddress) fufail(Api.AuthFromTorExitNode)
     else
-      UserRepo mustConfirmEmail userId flatMap {
+      UserRepo mustConfirmEmail userId flatMap
         case true => fufail(Api MustConfirmEmail userId)
         case false =>
           val sessionId = Random nextStringUppercase 12
           Store.save(sessionId, userId, req, apiVersion) inject sessionId
-      }
 
   // blocking function, required by Play2 form
   private def authenticateUser(
       usernameOrEmail: String, password: String): Option[User] =
-    (emailAddress.validate(usernameOrEmail) match {
+    (emailAddress.validate(usernameOrEmail) match
       case Some(email) => UserRepo.authenticateByEmail(email, password)
       case None =>
         UserRepo.authenticateById(User normalize usernameOrEmail, password)
-    }) awaitSeconds 2
+    ) awaitSeconds 2
 
   def restoreUser(req: RequestHeader): Fu[Option[FingerprintedUser]] =
-    firewall accepts req flatMap {
-      _ ?? {
-        reqSessionId(req) ?? { sessionId =>
-          Store userIdAndFingerprint sessionId flatMap {
-            _ ?? { d =>
-              UserRepo.byId(d.user) map {
-                _ map {
+    firewall accepts req flatMap
+      _ ??
+        reqSessionId(req) ??  sessionId =>
+          Store userIdAndFingerprint sessionId flatMap
+            _ ??  d =>
+              UserRepo.byId(d.user) map
+                _ map
                   FingerprintedUser(_, d.fp.isDefined)
-                }
-              }
-            }
-          }
-        }
-      }
-    }
 
   def locatedOpenSessions(userId: String, nb: Int): Fu[List[LocatedSession]] =
-    Store.openSessions(userId, nb) map {
-      _.map { session =>
+    Store.openSessions(userId, nb) map
+      _.map  session =>
         LocatedSession(session, geoIP(session.ip))
-      }
-    }
 
   def dedup(userId: String, req: RequestHeader): Funit =
     reqSessionId(req) ?? { Store.dedup(userId, _) }
@@ -90,7 +80,7 @@ final class Api(firewall: Firewall,
           BSONDocument("user" -> userId,
                        field -> BSONDocument("$exists" -> true)).some
       )
-      .flatMap {
+      .flatMap
         case Nil => fuccess(Nil)
         case values =>
           tube.storeColl.distinct(
@@ -100,7 +90,6 @@ final class Api(firewall: Firewall,
                   "user" -> BSONDocument("$ne" -> userId)
               ).some
           ) map lila.db.BSON.asStrings
-      }
 
   def recentUserIdsByFingerprint = recentUserIdsByField("fp") _
 
@@ -115,10 +104,8 @@ final class Api(firewall: Firewall,
             "date" -> BSONDocument("$gt" -> DateTime.now.minusYears(1))
         ).some
     ) map lila.db.BSON.asStrings
-}
 
-object Api {
+object Api
 
   case object AuthFromTorExitNode extends Exception
   case class MustConfirmEmail(userId: String) extends Exception
-}

@@ -6,7 +6,7 @@ import lila.rating.RatingRange
 case class FilterConfig(variant: List[chess.variant.Variant],
                         mode: List[Mode],
                         speed: List[Speed],
-                        ratingRange: RatingRange) {
+                        ratingRange: RatingRange)
 
   def >> =
     (
@@ -27,9 +27,8 @@ case class FilterConfig(variant: List[chess.variant.Variant],
     copy(variant = variant.isEmpty.fold(FilterConfig.default.variant, variant),
          mode = mode.isEmpty.fold(FilterConfig.default.mode, mode),
          speed = speed.isEmpty.fold(FilterConfig.default.speed, speed))
-}
 
-object FilterConfig {
+object FilterConfig
 
   val variants = List(chess.variant.Standard,
                       chess.variant.Chess960,
@@ -61,7 +60,7 @@ object FilterConfig {
   import lila.db.BSON
 
   private[setup] implicit val filterConfigBSONHandler =
-    new BSON[FilterConfig] {
+    new BSON[FilterConfig]
 
       def reads(r: BSON.Reader): FilterConfig =
         FilterConfig(
@@ -75,7 +74,5 @@ object FilterConfig {
                      "m" -> o.mode.map(_.id),
                      "s" -> o.speed.map(_.id),
                      "e" -> o.ratingRange.toString)
-    }
 
   private[setup] val tube = lila.db.BsTube(filterConfigBSONHandler)
-}

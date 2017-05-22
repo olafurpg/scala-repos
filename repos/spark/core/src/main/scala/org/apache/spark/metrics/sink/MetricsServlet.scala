@@ -32,7 +32,7 @@ import org.apache.spark.ui.JettyUtils._
 private[spark] class MetricsServlet(val property: Properties,
                                     val registry: MetricRegistry,
                                     securityMgr: SecurityManager)
-    extends Sink {
+    extends Sink
 
   val SERVLET_KEY_PATH = "path"
   val SERVLET_KEY_SAMPLE = "sample"
@@ -48,7 +48,7 @@ private[spark] class MetricsServlet(val property: Properties,
   val mapper = new ObjectMapper().registerModule(new MetricsModule(
           TimeUnit.SECONDS, TimeUnit.MILLISECONDS, servletShowSample))
 
-  def getHandlers(conf: SparkConf): Array[ServletContextHandler] = {
+  def getHandlers(conf: SparkConf): Array[ServletContextHandler] =
     Array[ServletContextHandler](
         createServletHandler(
             servletPath,
@@ -57,15 +57,12 @@ private[spark] class MetricsServlet(val property: Properties,
             securityMgr,
             conf)
     )
-  }
 
-  def getMetricsSnapshot(request: HttpServletRequest): String = {
+  def getMetricsSnapshot(request: HttpServletRequest): String =
     mapper.writeValueAsString(registry)
-  }
 
   override def start() {}
 
   override def stop() {}
 
   override def report() {}
-}

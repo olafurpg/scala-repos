@@ -37,9 +37,8 @@ case class Include(prefix: String, router: String) extends Rule
 /**
   * An HTTP verb
   */
-case class HttpVerb(value: String) {
+case class HttpVerb(value: String)
   override def toString = value
-}
 
 /**
   * A call to the handler.
@@ -55,14 +54,13 @@ case class HandlerCall(packageName: String,
                        instantiate: Boolean,
                        method: String,
                        parameters: Option[Seq[Parameter]])
-    extends Positional {
+    extends Positional
   val dynamic = if (instantiate) "@" else ""
   override def toString =
     dynamic + packageName + "." + controller + dynamic + "." + method +
-    parameters.map { params =>
+    parameters.map  params =>
       "(" + params.mkString(", ") + ")"
-    }.getOrElse("")
-}
+    .getOrElse("")
 
 /**
   * A parameter for a controller method.
@@ -76,11 +74,10 @@ case class Parameter(name: String,
                      typeName: String,
                      fixed: Option[String],
                      default: Option[String])
-    extends Positional {
+    extends Positional
   override def toString =
     name + ":" + typeName + fixed.map(" = " + _).getOrElse("") +
     default.map(" ?= " + _).getOrElse("")
-}
 
 /**
   * A comment from the routes file.
@@ -100,39 +97,35 @@ trait PathPart
   * @param encode Whether this part should be encoded or not.
   */
 case class DynamicPart(name: String, constraint: String, encode: Boolean)
-    extends PathPart with Positional {
+    extends PathPart with Positional
   override def toString =
     """DynamicPart("""" + name + "\", \"\"\"" + constraint + "\"\"\"," +
     encode + ")" //"
-}
 
 /**
   * A static part of the path, which is matched as is.
   */
-case class StaticPart(value: String) extends PathPart {
+case class StaticPart(value: String) extends PathPart
   override def toString = """StaticPart("""" + value + """")"""
-}
 
 /**
   * A complete path pattern, consisting of a sequence of path parts.
   */
-case class PathPattern(parts: Seq[PathPart]) {
+case class PathPattern(parts: Seq[PathPart])
 
   /**
     * Whether this path pattern has a parameter by the given name.
     */
-  def has(key: String): Boolean = parts.exists {
+  def has(key: String): Boolean = parts.exists
     case DynamicPart(name, _, _) if name == key => true
     case _ => false
-  }
 
   override def toString =
-    parts.map {
+    parts.map
       case DynamicPart(name, constraint, encode) =>
         "$" + name + "<" + constraint + ">"
       case StaticPart(path) => path
-    }.mkString
-}
+    .mkString
 
 /**
   * A routes compilation error

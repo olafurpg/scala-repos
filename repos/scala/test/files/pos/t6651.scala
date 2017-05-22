@@ -1,17 +1,14 @@
-class YouAreYourself[A <: AnyRef](val you: A) extends AnyVal {
+class YouAreYourself[A <: AnyRef](val you: A) extends AnyVal
   def yourself: you.type = you
-}
 
-object Test {
+object Test
   val s = ""
   val s1: s.type = new YouAreYourself[s.type](s).yourself
-}
 
-trait Path {
+trait Path
   type Dep <: AnyRef
-}
 
-final class ValueClass[P <: Path](val path: P) extends AnyVal {
+final class ValueClass[P <: Path](val path: P) extends AnyVal
   import path.Dep
 
   def apply(dep: Dep)(d2: dep.type, foo: Int): (Dep, d2.type) = (d2, d2)
@@ -29,4 +26,3 @@ final class ValueClass[P <: Path](val path: P) extends AnyVal {
   // An better alternative would be to add a type parameter for the (singleton) type of
   // the wrapped value.
   def bounds[D <: Dep](dep: D)(d2: dep.type, foo: Int): (D, d2.type) = (d2, d2)
-}

@@ -5,15 +5,14 @@ import org.scalatest.FunSuite
 
 import spire.implicits._
 
-class CooperativeEqualityTest extends FunSuite {
+class CooperativeEqualityTest extends FunSuite
 
   def testEquals[A, B](a: A, aname: String, b: B, bname: String) =
-    if (aname == bname) {
+    if (aname == bname)
       test(s"$aname == $aname") { assert(a == b) }
-    } else {
+    else
       test(s"$aname == $bname") { assert(a == b) }
       test(s"$bname == $aname") { assert(b == a) }
-    }
 
   // test Natural
   testEquals(3.toByte, "Byte", Natural(3), "Natural")
@@ -94,12 +93,11 @@ class CooperativeEqualityTest extends FunSuite {
   testEquals(Algebraic(3), "Algebraic", Real(3), "Real")
   testEquals(Real(3), "Real", Real(3), "Real")
 
-  def testComplex[A : ConvertableFrom](a: A, name: String): Unit = {
+  def testComplex[A : ConvertableFrom](a: A, name: String): Unit =
     testEquals(a, name, Complex(a.toFloat), "Complex[Float]")
     testEquals(a, name, Complex(a.toDouble), "Complex[Double]")
     // testEquals(a, name, Complex(a.toBigDecimal), "Complex[BigDecimal]")
     testEquals(a, name, Complex(Real(a.toRational)), "Complex[Real]")
-  }
 
   testComplex(3.toByte, "Byte")
   testComplex(3.toShort, "Short")
@@ -114,12 +112,11 @@ class CooperativeEqualityTest extends FunSuite {
   testComplex(Algebraic(3), "Algebraic")
   testComplex(Real(3), "Real")
 
-  def testQuaternion[A : ConvertableFrom](a: A, name: String): Unit = {
+  def testQuaternion[A : ConvertableFrom](a: A, name: String): Unit =
     testEquals(a, name, Quaternion(a.toFloat), "Quaternion[Float]")
     testEquals(a, name, Quaternion(a.toDouble), "Quaternion[Double]")
     // testEquals(a, name, Quaternion(a.toBigDecimal), "Quaternion[BigDecimal]")
     testEquals(a, name, Quaternion(Real(a.toRational)), "Quaternion[Real]")
-  }
 
   testQuaternion(3.toByte, "Byte")
   testQuaternion(3.toShort, "Short")
@@ -133,4 +130,3 @@ class CooperativeEqualityTest extends FunSuite {
   testQuaternion(Number(3), "Number")
   testQuaternion(Algebraic(3), "Algebraic")
   testQuaternion(Real(3), "Real")
-}

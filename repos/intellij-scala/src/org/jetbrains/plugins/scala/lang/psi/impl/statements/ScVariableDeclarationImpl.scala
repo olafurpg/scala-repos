@@ -22,39 +22,32 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
 class ScVariableDeclarationImpl private (
     stub: StubElement[ScVariable], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScVariableDeclaration {
+    with ScVariableDeclaration
   def this(node: ASTNode) = { this(null, null, node) }
 
-  def this(stub: ScVariableStub) = {
+  def this(stub: ScVariableStub) =
     this(stub, ScalaElementTypes.VARIABLE_DECLARATION, null)
-  }
 
   override def toString: String =
     "ScVariableDeclaration: " + declaredElements.map(_.name).mkString(", ")
 
-  def getType(ctx: TypingContext) = wrap(typeElement) flatMap {
+  def getType(ctx: TypingContext) = wrap(typeElement) flatMap
     _.getType(TypingContext.empty)
-  }
 
   def declaredElements = getIdList.fieldIds
 
-  def typeElement: Option[ScTypeElement] = {
+  def typeElement: Option[ScTypeElement] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.asInstanceOf[ScVariableStub].getTypeElement
-    } else findChild(classOf[ScTypeElement])
-  }
+    else findChild(classOf[ScTypeElement])
 
   def getIdList: ScIdList = findChildByClass(classOf[ScIdList])
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitVariableDeclaration(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case s: ScalaElementVisitor => s.visitVariableDeclaration(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

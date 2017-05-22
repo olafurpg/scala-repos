@@ -26,20 +26,19 @@ import http.{S, LiftSession}
 /**
   * Systems under specification for DB.
   */
-object DbSpec extends Specification {
+object DbSpec extends Specification
   "DB Specification".title
 
   val provider = DbProviders.H2MemoryProvider
   val logF = Schemifier.infoF _
 
-  def cleanup() {
+  def cleanup()
     provider.setupDB
     Schemifier.destroyTables_!!(DefaultConnectionIdentifier, logF, User)
     Schemifier.schemify(true, logF, DefaultConnectionIdentifier, User)
-  }
 
-  "DB" should {
-    "collect queries when queryCollector is added as logFunc" in {
+  "DB" should
+    "collect queries when queryCollector is added as logFunc" in
       cleanup()
       DB.addLogFunc(DB.queryCollector)
 
@@ -48,13 +47,9 @@ object DbSpec extends Specification {
       S.addAnalyzer((r, t, ss) => statements = ss)
 
       val session = new LiftSession("hello", "", Empty)
-      val elwood = S.initIfUninitted(session) {
+      val elwood = S.initIfUninitted(session)
         val r = User.find(By(User.firstName, "Elwood"))
         S.queryLog.size must_== 1
         r
-      }
       statements.size must_== 1
       elwood.map(_.firstName.get) must_== Full("Elwood")
-    }
-  }
-}

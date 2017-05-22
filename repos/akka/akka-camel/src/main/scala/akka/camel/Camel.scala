@@ -18,7 +18,7 @@ import scala.collection.immutable
   * '''Note:''' `CamelContext` and `ProducerTemplate` are stopped when the associated actor system is shut down.
   * This trait can be obtained through the [[akka.camel.CamelExtension]] object.
   */
-trait Camel extends Extension with Activation {
+trait Camel extends Extension with Activation
 
   /**
     * Underlying camel context.
@@ -52,14 +52,13 @@ trait Camel extends Extension with Activation {
     * Returns the associated ActorSystem.
     */
   private[camel] def system: ActorSystem
-}
 
 /**
   * Settings for the Camel Extension
   * @param config the config
   */
 class CamelSettings private[camel](
-    config: Config, dynamicAccess: DynamicAccess) {
+    config: Config, dynamicAccess: DynamicAccess)
   import akka.util.Helpers.ConfigOps
 
   /**
@@ -92,47 +91,40 @@ class CamelSettings private[camel](
   final val StreamingCache: Boolean =
     config.getBoolean("akka.camel.streamingCache")
 
-  final val Conversions: (String, RouteDefinition) ⇒ RouteDefinition = {
-    val specifiedConversions = {
+  final val Conversions: (String, RouteDefinition) ⇒ RouteDefinition =
+    val specifiedConversions =
       import scala.collection.JavaConverters.asScalaSetConverter
       val section = config.getConfig("akka.camel.conversions")
       section.entrySet.asScala.map(e ⇒ (e.getKey, section.getString(e.getKey)))
-    }
     val conversions =
-      (Map[String, Class[_ <: AnyRef]]() /: specifiedConversions) {
+      (Map[String, Class[_ <: AnyRef]]() /: specifiedConversions)
         case (m, (key, fqcn)) ⇒
           m.updated(key,
                     dynamicAccess
                       .getClassFor[AnyRef](fqcn)
-                      .recover {
+                      .recover
                         case e ⇒
                           throw new ConfigurationException(
                               "Could not find/load Camel Converter class [" +
                               fqcn + "]",
                               e)
-                      }
                       .get)
-      }
 
     (s: String, r: RouteDefinition) ⇒
       conversions.get(s).fold(r)(r.convertBodyTo)
-  }
 
   /**
     * Configured setting, determine the class used to load/retrieve the instance of the Camel Context
     */
-  final val ContextProvider: ContextProvider = {
+  final val ContextProvider: ContextProvider =
     val fqcn = config.getString("akka.camel.context-provider")
     dynamicAccess
       .createInstanceFor[ContextProvider](fqcn, immutable.Seq.empty)
-      .recover {
+      .recover
         case e ⇒
           throw new ConfigurationException(
               "Could not find/load Context Provider class [" + fqcn + "]", e)
-      }
       .get
-  }
-}
 
 /**
   * This class can be used to get hold of an instance of the Camel class bound to the actor system.
@@ -146,18 +138,16 @@ class CamelSettings private[camel](
   * @see akka.actor.ExtensionId
   * @see akka.actor.ExtensionIdProvider
   */
-object CamelExtension extends ExtensionId[Camel] with ExtensionIdProvider {
+object CamelExtension extends ExtensionId[Camel] with ExtensionIdProvider
 
   /**
     * Creates a new instance of Camel and makes sure it gets stopped when the actor system is shutdown.
     */
-  override def createExtension(system: ExtendedActorSystem): Camel = {
+  override def createExtension(system: ExtendedActorSystem): Camel =
     val camel = new DefaultCamel(system).start()
     system.registerOnTermination(camel.shutdown())
     camel
-  }
 
   override def lookup(): ExtensionId[Camel] = CamelExtension
 
   override def get(system: ActorSystem): Camel = super.get(system)
-}

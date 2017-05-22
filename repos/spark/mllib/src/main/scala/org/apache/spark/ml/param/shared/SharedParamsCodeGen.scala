@@ -27,9 +27,9 @@ import scala.reflect.ClassTag
   *   build/sbt "mllib/runMain org.apache.spark.ml.param.shared.SharedParamsCodeGen"
   * }}}
   */
-private[shared] object SharedParamsCodeGen {
+private[shared] object SharedParamsCodeGen
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val params = Seq(
         ParamDesc[Double]("regParam",
                           "regularization parameter (>= 0)",
@@ -119,7 +119,6 @@ private[shared] object SharedParamsCodeGen {
     val writer = new PrintWriter(file)
     writer.write(code)
     writer.close()
-  }
 
   /** Description of a param. */
   private case class ParamDesc[T : ClassTag](
@@ -127,14 +126,14 @@ private[shared] object SharedParamsCodeGen {
       doc: String,
       defaultValueStr: Option[String] = None,
       isValid: String = "",
-      finalMethods: Boolean = true) {
+      finalMethods: Boolean = true)
 
     require(name.matches("[a-z][a-zA-Z0-9]*"), s"Param name $name is invalid.")
     require(doc.nonEmpty) // TODO: more rigorous on doc
 
-    def paramTypeName: String = {
+    def paramTypeName: String =
       val c = implicitly[ClassTag[T]].runtimeClass
-      c match {
+      c match
         case _ if c == classOf[Int] => "IntParam"
         case _ if c == classOf[Long] => "LongParam"
         case _ if c == classOf[Float] => "FloatParam"
@@ -145,16 +144,13 @@ private[shared] object SharedParamsCodeGen {
         case _ if c.isArray && c.getComponentType == classOf[Double] =>
           s"DoubleArrayParam"
         case _ => s"Param[${getTypeString(c)}]"
-      }
-    }
 
-    def valueTypeName: String = {
+    def valueTypeName: String =
       val c = implicitly[ClassTag[T]].runtimeClass
       getTypeString(c)
-    }
 
-    private def getTypeString(c: Class[_]): String = {
-      c match {
+    private def getTypeString(c: Class[_]): String =
+      c match
         case _ if c == classOf[Int] => "Int"
         case _ if c == classOf[Long] => "Long"
         case _ if c == classOf[Float] => "Float"
@@ -162,38 +158,33 @@ private[shared] object SharedParamsCodeGen {
         case _ if c == classOf[Boolean] => "Boolean"
         case _ if c == classOf[String] => "String"
         case _ if c.isArray => s"Array[${getTypeString(c.getComponentType)}]"
-      }
-    }
-  }
 
   /** Generates the HasParam trait code for the input param. */
-  private def genHasParamTrait(param: ParamDesc[_]): String = {
+  private def genHasParamTrait(param: ParamDesc[_]): String =
     val name = param.name
     val Name = name(0).toUpper +: name.substring(1)
     val Param = param.paramTypeName
     val T = param.valueTypeName
     val doc = param.doc
     val defaultValue = param.defaultValueStr
-    val defaultValueDoc = defaultValue.map { v =>
+    val defaultValueDoc = defaultValue.map  v =>
       s" (default: $v)"
-    }.getOrElse("")
-    val setDefault = defaultValue.map { v =>
+    .getOrElse("")
+    val setDefault = defaultValue.map  v =>
       s"""
          |  setDefault($name, $v)
          |""".stripMargin
-    }.getOrElse("")
+    .getOrElse("")
     val isValid =
-      if (param.isValid != "") {
+      if (param.isValid != "")
         ", " + param.isValid
-      } else {
+      else
         ""
-      }
     val methodStr =
-      if (param.finalMethods) {
+      if (param.finalMethods)
         "final def"
-      } else {
+      else
         "def"
-      }
 
     s"""
       |/**
@@ -211,10 +202,9 @@ private[shared] object SharedParamsCodeGen {
       |  $methodStr get$Name: $T = $$($name)
       |}
       |""".stripMargin
-  }
 
   /** Generates Scala source code for the input params with header. */
-  private def genSharedParams(params: Seq[ParamDesc[_]]): String = {
+  private def genSharedParams(params: Seq[ParamDesc[_]]): String =
     val header =
       """/*
         | * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -247,5 +237,3 @@ private[shared] object SharedParamsCodeGen {
     val traits = params.map(genHasParamTrait).mkString
 
     header + traits + footer
-  }
-}

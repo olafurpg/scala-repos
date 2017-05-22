@@ -24,11 +24,11 @@ import org.apache.spark.streaming.dstream.DStream
 import org.apache.spark.util.StatCounter
 import org.apache.spark.util.random.XORShiftRandom
 
-class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
+class StreamingTestSuite extends SparkFunSuite with TestSuiteBase
 
   override def maxWaitTimeMillis: Int = 30000
 
-  test("accuracy for null hypothesis using welch t-test") {
+  test("accuracy for null hypothesis using welch t-test")
     // set parameters
     val testMethod = "welch"
     val numBatches = 2
@@ -55,9 +55,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(outputBatches.flatten.forall(
             res => res.pValue > 0.05 && res.method == WelchTTest.methodName))
-  }
 
-  test("accuracy for alternative hypothesis using welch t-test") {
+  test("accuracy for alternative hypothesis using welch t-test")
     // set parameters
     val testMethod = "welch"
     val numBatches = 2
@@ -84,9 +83,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(outputBatches.flatten.forall(
             res => res.pValue < 0.05 && res.method == WelchTTest.methodName))
-  }
 
-  test("accuracy for null hypothesis using student t-test") {
+  test("accuracy for null hypothesis using student t-test")
     // set parameters
     val testMethod = "student"
     val numBatches = 2
@@ -113,9 +111,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(outputBatches.flatten.forall(
             res => res.pValue > 0.05 && res.method == StudentTTest.methodName))
-  }
 
-  test("accuracy for alternative hypothesis using student t-test") {
+  test("accuracy for alternative hypothesis using student t-test")
     // set parameters
     val testMethod = "student"
     val numBatches = 2
@@ -142,9 +139,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(outputBatches.flatten.forall(
             res => res.pValue < 0.05 && res.method == StudentTTest.methodName))
-  }
 
-  test("batches within same test window are grouped") {
+  test("batches within same test window are grouped")
     // set parameters
     val testWindow = 3
     val numBatches = 5
@@ -168,19 +164,17 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
     val outputCounts = outputBatches.flatten.map(_._2.count)
 
     // number of batches seen so far does not exceed testWindow, expect counts to continue growing
-    for (i <- 0 until testWindow) {
+    for (i <- 0 until testWindow)
       assert(outputCounts
             .slice(2 * i, 2 * i + 2)
             .forall(_ == (i + 1) * pointsPerBatch / 2))
-    }
 
     // number of batches seen exceeds testWindow, expect counts to be constant
     assert(outputCounts
           .drop(2 * (testWindow - 1))
           .forall(_ == testWindow * pointsPerBatch / 2))
-  }
 
-  test("entries in peace period are dropped") {
+  test("entries in peace period are dropped")
     // set parameters
     val peacePeriod = 3
     val numBatches = 7
@@ -205,9 +199,8 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(
         outputBatches.flatten.length == (numBatches - peacePeriod) * pointsPerBatch)
-  }
 
-  test("null hypothesis when only data from one group is present") {
+  test("null hypothesis when only data from one group is present")
     // set parameters
     val numBatches = 2
     val pointsPerBatch = 1000
@@ -231,7 +224,6 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
 
     assert(outputBatches.flatten.forall(
             result => (result.pValue - 1.0).abs < 0.001))
-  }
 
   // Generate testing input with half of the entries in group A and half in group B
   private def generateTestData(
@@ -241,17 +233,13 @@ class StreamingTestSuite extends SparkFunSuite with TestSuiteBase {
       stdevA: Double,
       meanB: Double,
       stdevB: Double,
-      seed: Int): (IndexedSeq[IndexedSeq[BinarySample]]) = {
+      seed: Int): (IndexedSeq[IndexedSeq[BinarySample]]) =
     val rand = new XORShiftRandom(seed)
     val numTrues = pointsPerBatch / 2
-    val data = (0 until numBatches).map { i =>
-      (0 until numTrues).map { idx =>
+    val data = (0 until numBatches).map  i =>
+      (0 until numTrues).map  idx =>
         BinarySample(true, meanA + stdevA * rand.nextGaussian())
-      } ++ (pointsPerBatch / 2 until pointsPerBatch).map { idx =>
+      ++ (pointsPerBatch / 2 until pointsPerBatch).map  idx =>
         BinarySample(false, meanB + stdevB * rand.nextGaussian())
-      }
-    }
 
     data
-  }
-}

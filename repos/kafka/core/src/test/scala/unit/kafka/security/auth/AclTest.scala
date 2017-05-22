@@ -21,7 +21,7 @@ import org.apache.kafka.common.security.auth.KafkaPrincipal
 import org.junit.{Test, Assert}
 import org.scalatest.junit.JUnitSuite
 
-class AclTest extends JUnitSuite {
+class AclTest extends JUnitSuite
 
   val AclJson =
     "{\"version\": 1, \"acls\": [{\"host\": \"host1\",\"permissionType\": \"Deny\",\"operation\": \"READ\", \"principal\": \"User:alice\"  },  " +
@@ -29,7 +29,7 @@ class AclTest extends JUnitSuite {
     "{  \"host\": \"host1\",  \"permissionType\": \"Deny\",  \"operation\":   \"Read\" ,  \"principal\": \"User:bob\"}  ]}"
 
   @Test
-  def testAclJsonConversion(): Unit = {
+  def testAclJsonConversion(): Unit =
     val acl1 = new Acl(new KafkaPrincipal(KafkaPrincipal.USER_TYPE, "alice"),
                        Deny,
                        "host1",
@@ -46,5 +46,3 @@ class AclTest extends JUnitSuite {
 
     Assert.assertEquals(acls, Acl.fromJson(jsonAcls))
     Assert.assertEquals(acls, Acl.fromJson(AclJson))
-  }
-}

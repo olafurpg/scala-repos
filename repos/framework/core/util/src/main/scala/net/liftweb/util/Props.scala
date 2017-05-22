@@ -24,7 +24,7 @@ import scala.collection.JavaConverters._
 import Helpers._
 import common._
 
-private[util] trait Props extends Logger {
+private[util] trait Props extends Logger
   type PropProvider = scala.collection.Map[String, String]
   type InterpolationValues = scala.collection.Map[String, String]
 
@@ -34,32 +34,27 @@ private[util] trait Props extends Logger {
     * @param name key for the property to get
     * @return the value of the property if defined
     */
-  def get(name: String): Box[String] = {
+  def get(name: String): Box[String] =
     lockedProviders.flatMap(_.get(name)).headOption.map(interpolate)
-  }
 
   private[this] val interpolateRegex = """(.*?)\Q${\E(.*?)\Q}\E([^$]*)""".r
 
-  private[this] def interpolate(value: String): String = {
-    def lookup(key: String) = {
+  private[this] def interpolate(value: String): String =
+    def lookup(key: String) =
       lockedInterpolationValues.flatMap(_.get(key)).headOption
-    }
 
-    val interpolated = for {
+    val interpolated = for
       interpolateRegex(before, key, after) <- interpolateRegex.findAllMatchIn(
           value.toString)
-    } yield {
+    yield
       val lookedUp = lookup(key).getOrElse(("${" + key + "}"))
 
       before + lookedUp + after
-    }
 
-    if (interpolated.isEmpty) {
+    if (interpolated.isEmpty)
       value.toString
-    } else {
+    else
       interpolated.mkString
-    }
-  }
 
   // def apply(name: String): String = props(name)
 
@@ -87,15 +82,13 @@ private[util] trait Props extends Logger {
     * Ensure that all of the specified properties exist; throw an exception if
     * any of the specified values are not keys for available properties.
     */
-  def requireOrDie(what: String*) {
-    require(what: _*).toList match {
+  def requireOrDie(what: String*)
+    require(what: _*).toList match
       case Nil =>
       case bad =>
         throw new Exception(
             "The following required properties are not defined: " +
             bad.mkString(","))
-    }
-  }
 
   /**
     * Updates Props to find property values in the argument AFTER first looking
@@ -105,9 +98,8 @@ private[util] trait Props extends Logger {
     *
     * @param provider Arbitrary map of property key -> property value.
     */
-  def appendProvider(provider: PropProvider): List[PropProvider] = {
+  def appendProvider(provider: PropProvider): List[PropProvider] =
     updateProviders(_ :+ provider)
-  }
 
   /**
     * Updates Props to find property values in the argument BEFORE looking in
@@ -118,9 +110,8 @@ private[util] trait Props extends Logger {
     * @param provider Arbitrary map of property key -> property value to be used
     *                 for property lookup.
     */
-  def prependProvider(provider: PropProvider): List[PropProvider] = {
+  def prependProvider(provider: PropProvider): List[PropProvider] =
     updateProviders(provider :: _)
-  }
 
   /**
     * Passes the current `PropProvider`s to the passed `updater`, then sets the
@@ -133,10 +124,9 @@ private[util] trait Props extends Logger {
     *                the new ones to use.
     */
   def updateProviders(updater: (List[PropProvider]) => List[PropProvider])
-    : List[PropProvider] = {
+    : List[PropProvider] =
     providers = updater(providers)
     providers
-  }
 
   /**
     * Updates Props to find values in the argument when interpolating values found in providers.
@@ -147,9 +137,8 @@ private[util] trait Props extends Logger {
     *                 for interpolation.
     */
   def appendInterpolationValues(
-      interpolationValues: InterpolationValues): Seq[InterpolationValues] = {
+      interpolationValues: InterpolationValues): Seq[InterpolationValues] =
     updateInterpolationValues(_ :+ interpolationValues)
-  }
 
   /**
     * Passes the current `InterpolationValues`s to the passed `updater`, then sets the
@@ -163,10 +152,9 @@ private[util] trait Props extends Logger {
     */
   def updateInterpolationValues(
       updater: (List[InterpolationValues]) => List[InterpolationValues])
-    : List[InterpolationValues] = {
+    : List[InterpolationValues] =
     interpolationValues = updater(interpolationValues)
     interpolationValues
-  }
 
   import Props.RunModes._
 
@@ -179,9 +167,9 @@ private[util] trait Props extends Logger {
     * Recognized modes are "development", "test", "profile", "pilot", "staging" and "production"
     * with the default run mode being development.
     */
-  lazy val mode: Props.RunModes.Value = {
+  lazy val mode: Props.RunModes.Value =
     runModeInitialised = true
-    Box.legacyNullTest((System.getProperty("run.mode"))).map(_.toLowerCase) match {
+    Box.legacyNullTest((System.getProperty("run.mode"))).map(_.toLowerCase) match
       case Full("test") => Test
       case Full("production") => Production
       case Full("staging") => Staging
@@ -189,8 +177,6 @@ private[util] trait Props extends Logger {
       case Full("profile") => Profile
       case Full("development") => Development
       case _ => (autoDetectRunModeFn.get)()
-    }
-  }
 
   @volatile private[util] var runModeInitialised: Boolean = false
 
@@ -200,7 +186,7 @@ private[util] trait Props extends Logger {
     *
     * @param name The property name (used to make logging messages clearer, no functional impact).
     */
-  class RunModeProperty[T](name: String, initialValue: T) extends Logger {
+  class RunModeProperty[T](name: String, initialValue: T) extends Logger
     @volatile private[this] var value = initialValue
 
     def get = value
@@ -211,21 +197,18 @@ private[util] trait Props extends Logger {
       * @return Whether the new property was installed. `false` means modification is no longer allowed.
       */
     def set(newValue: T): Boolean =
-      if (allowModification) {
+      if (allowModification)
         value = newValue
         true
-      } else {
+      else
         onModificationProhibited()
         false
-      }
 
     def allowModification = !runModeInitialised
 
-    def onModificationProhibited() {
+    def onModificationProhibited()
       warn("Setting property " + name +
           " has no effect. Run mode already initialised to " + mode + ".")
-    }
-  }
 
   /**
     * The default run-mode auto-detection routine uses this function to infer whether Lift is being run in a test.
@@ -238,7 +221,6 @@ private[util] trait Props extends Logger {
     new RunModeProperty[Array[StackTraceElement] => Boolean](
         "doesStackTraceContainKnownTestRunner",
         (st: Array[StackTraceElement]) =>
-          {
             val names = List(
                 "org.apache.maven.surefire.booter.SurefireBooter",
                 "sbt.TestRunner",
@@ -253,7 +235,7 @@ private[util] trait Props extends Logger {
                 "org.specs2.specification.core.Execution"
             )
             st.exists(e => names.exists(e.getClassName.startsWith))
-        })
+        )
 
   /**
     * When the `run.mode` environment variable isn't set or recognised, this function is invoked to determine the
@@ -266,11 +248,10 @@ private[util] trait Props extends Logger {
   val autoDetectRunModeFn = new RunModeProperty[() => Props.RunModes.Value](
       "autoDetectRunModeFn",
       () =>
-        {
           val st = Thread.currentThread.getStackTrace
           if ((doesStackTraceContainKnownTestRunner.get)(st)) Test
           else Development
-      })
+      )
 
   /**
     * Is the system running in production mode (apply full optimizations)
@@ -292,21 +273,19 @@ private[util] trait Props extends Logger {
   /**
     * The resource path segment corresponding to the current mode.
     */
-  lazy val modeName = mode match {
+  lazy val modeName = mode match
     case Test => "test"
     case Staging => "staging"
     case Production => "production"
     case Pilot => "pilot"
     case Profile => "profile"
     case _ => ""
-  }
 
   private lazy val _modeName = dotLen(modeName)
 
-  private def dotLen(in: String): String = in match {
+  private def dotLen(in: String): String = in match
     case null | "" => in
     case x => x + "."
-  }
 
   /**
     * The resource path segment corresponding to the current system user
@@ -359,7 +338,7 @@ private[util] trait Props extends Logger {
   /**
     * The map of key/value pairs retrieved from the property file.
     */
-  lazy val props: Map[String, String] = {
+  lazy val props: Map[String, String] =
     import java.io.{ByteArrayInputStream}
     import java.util.InvalidPropertiesFormatException
     import java.util.{Map => JMap}
@@ -371,77 +350,65 @@ private[util] trait Props extends Logger {
             if (modeName == "") "(Development)" else modeName))
 
     def vendStreams: List[(String, () => Box[InputStream])] =
-      whereToLook() ::: toTry.map { f =>
-        {
+      whereToLook() ::: toTry.map  f =>
           val name = f() + "props"
-          name -> { () =>
+          name ->  () =>
             val res = tryo { getClass.getResourceAsStream(name) }
               .filter(_ ne null)
             trace("Trying to open resource %s. Result=%s".format(name, res))
             res
-          }
-        }
-      }
 
     // find the first property file that is available
-    first(vendStreams) {
+    first(vendStreams)
       case (str, streamBox) =>
         tried ::= str
-        for {
+        for
           stream <- streamBox()
-        } yield {
+        yield
           val ret = new Properties
           val ba = Helpers.readWholeStream(stream)
-          try {
+          try
             ret.loadFromXML(new ByteArrayInputStream(ba))
             debug("Loaded XML properties from resource %s".format(str))
-          } catch {
+          catch
             case _: InvalidPropertiesFormatException =>
               ret.load(new ByteArrayInputStream(ba))
               debug("Loaded key/value properties from resource %s".format(str))
-          }
           ret
-        }
-    } match {
+    match
       // if we've got a propety file, create name/value pairs and turn them into a Map
       case Full(prop) =>
         Map(
-            prop.entrySet.toArray.flatMap {
+            prop.entrySet.toArray.flatMap
           case s: JMap.Entry[_, _] =>
             List((s.getKey.toString, s.getValue.toString))
           case _ => Nil
-        }: _*)
+        : _*)
 
       case _ =>
         error(
             "Failed to find a properties file (but properties were accessed).  Searched: " +
             tried.reverse.mkString(", "))
         Map()
-    }
-  }
 
   // None before they've first been looked up/modified/whatever, Some after.
   // We use this to lazy-load `props`, so that `whereToLook` can be updated
   // by the user.
   private[this] var providersAccumulator: Option[List[PropProvider]] = None
 
-  private[this] def providers = {
-    providersAccumulator getOrElse {
+  private[this] def providers =
+    providersAccumulator getOrElse
       val baseProviders = List(props)
       providersAccumulator = Some(baseProviders)
 
       baseProviders
-    }
-  }
-  private[this] def providers_=(newProviders: List[PropProvider]) = {
+  private[this] def providers_=(newProviders: List[PropProvider]) =
     providersAccumulator = Some(newProviders)
-  }
 
   private[this] var interpolationValues: List[InterpolationValues] = Nil
 
   private[this] lazy val lockedProviders = providers
   private[this] lazy val lockedInterpolationValues = interpolationValues
-}
 
 /**
   * Configuration management utilities.
@@ -467,17 +434,15 @@ private[util] trait Props extends Logger {
   * "test", "staging", "production", "pilot", "profile", or "default".
   * The standard Lift properties file extension is "props".
   */
-object Props extends Props {
+object Props extends Props
 
   /**
     * Enumeration of available run modes.
     */
-  object RunModes extends Enumeration {
+  object RunModes extends Enumeration
     val Development = Value(1, "Development")
     val Test = Value(2, "Test")
     val Staging = Value(3, "Staging")
     val Production = Value(4, "Production")
     val Pilot = Value(5, "Pilot")
     val Profile = Value(6, "Profile")
-  }
-}

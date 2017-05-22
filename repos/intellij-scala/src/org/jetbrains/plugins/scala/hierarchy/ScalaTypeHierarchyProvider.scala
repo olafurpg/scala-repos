@@ -12,26 +12,20 @@ import scala.collection.immutable.HashSet
   * User: Alexander Podkhalyuzin
   * Date: 09.06.2009
   */
-class ScalaTypeHierarchyProvider extends JavaTypeHierarchyProvider {
-  override def createHierarchyBrowser(target: PsiElement): HierarchyBrowser = {
-    target match {
+class ScalaTypeHierarchyProvider extends JavaTypeHierarchyProvider
+  override def createHierarchyBrowser(target: PsiElement): HierarchyBrowser =
+    target match
       case clazz: ScTypeDefinition =>
         collectSupers(clazz, new HashSet[ScTypeDefinition])
       case _ =>
-    }
     super.createHierarchyBrowser(target)
-  }
 
   def collectSupers(
-      clazz: ScTypeDefinition, visited: HashSet[ScTypeDefinition]) {
-    clazz.supers.foreach {
+      clazz: ScTypeDefinition, visited: HashSet[ScTypeDefinition])
+    clazz.supers.foreach
       case clazz: ScTypeDefinition =>
-        if (visited.contains(clazz)) {
+        if (visited.contains(clazz))
           println("clazz.getText = " + clazz.getText)
-        } else {
+        else
           collectSupers(clazz, visited + clazz)
-        }
       case _ =>
-    }
-  }
-}

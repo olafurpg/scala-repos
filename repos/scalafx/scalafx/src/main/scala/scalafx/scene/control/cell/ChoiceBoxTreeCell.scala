@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   * @define FTVRET A Function  that will return a `TreeCell` that is able to work on the type of element contained within the `TreeView`.
   */
-object ChoiceBoxTreeCell {
+object ChoiceBoxTreeCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -142,7 +142,6 @@ object ChoiceBoxTreeCell {
   @deprecated(message = "Use forTreeView[T](T*)", since = "1.0")
   def forTreeView[T](items: Array[T]) =
     jfxscc.ChoiceBoxTreeCell.forTreeView[T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxTreeCell.html $CBTC]]
@@ -163,7 +162,7 @@ class ChoiceBoxTreeCell[T](
     with ConvertableCell[jfxscc.ChoiceBoxTreeCell[T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxTreeCell[T], T]
     with ItemableCell[jfxscc.ChoiceBoxTreeCell[T], T]
-    with SFXDelegate[jfxscc.ChoiceBoxTreeCell[T]] {
+    with SFXDelegate[jfxscc.ChoiceBoxTreeCell[T]]
 
   /**
     * Creates a default $CBTC instance with the given items being used to populate the ChoiceBox when
@@ -201,4 +200,3 @@ class ChoiceBoxTreeCell[T](
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ChoiceBoxTreeCell[T](items: _*))
-}

@@ -31,7 +31,7 @@ import scala.xml.{NodeSeq, Elem}
   * easier to build.
   * @author nafg
   */
-object Util {
+object Util
 
   /**
     * Binds all nodes whose names are names of fields on the specified mapper.
@@ -45,14 +45,12 @@ object Util {
     * argument.
     */
   def bindFields[T <: Mapper[T]](
-      mapper: T, nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq = {
+      mapper: T, nsfn: MappedField[_, T] => NodeSeq): NodeSeq => NodeSeq =
     case xml.Elem(_, name, _, _, _ *) =>
-      mapper.fieldByName(name) match {
+      mapper.fieldByName(name) match
         case Full(field) => nsfn(field)
         case _ => NodeSeq.Empty
-      }
     case ns => ns
-  }
 
   /**
     * Iterates over the fields of the specified mapper. If the node currently being processed by bind
@@ -72,42 +70,34 @@ object Util {
       mapper: T,
       fn: MappedField[_, T] => CssSel,
       filter: MappedField[_, T] => Boolean
-  ): NodeSeq => NodeSeq = {
-    def fieldBindIfWanted(fieldName: String) = {
-      mapper.fieldByName(fieldName).filter(filter) match {
+  ): NodeSeq => NodeSeq =
+    def fieldBindIfWanted(fieldName: String) =
+      mapper.fieldByName(fieldName).filter(filter) match
         case Full(field) =>
           Some(fn(field))
         case _ =>
           None
-      }
-    }
 
-    "^" #> { ns: NodeSeq =>
+    "^" #>  ns: NodeSeq =>
       val fieldsAttribute = (ns \ "@fields")
 
       val bind: Seq[CssSel] =
-        if (fieldsAttribute.nonEmpty) {
-          for {
+        if (fieldsAttribute.nonEmpty)
+          for
             fieldName <- fieldsAttribute.text.split("\\s+")
             // the following hackery is brought to you by the Scala compiler not
             // properly typing MapperField[_, T] in the context of the for
             // comprehension
             fieldBind <- fieldBindIfWanted(fieldName)
-          } yield {
+          yield
             ".field" #> fieldBind
-          }
-        } else {
-          mapper.formFields.filter(filter).map {
+        else
+          mapper.formFields.filter(filter).map
             case field: MappedField[_, T] =>
               ".field" #> fn(field)
-          }
-        }
 
       bind.map(_ (ns))
-    }
-  }
   def eachField[T <: net.liftweb.mapper.Mapper[T]](
       mapper: T,
       fn: MappedField[_, T] => CssSel
   ): NodeSeq => NodeSeq = eachField(mapper, fn, (f: MappedField[_, T]) => true)
-}

@@ -10,9 +10,8 @@ import java.util.{List => JavaList}
   * A trait that has some helpful implicit conversions from
   * Iterable[NodeSeq], Seq[String], Box[String], and Option[String]
   */
-trait IterableConst {
+trait IterableConst
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq]
-}
 
 import scala.collection.JavaConversions._
 
@@ -20,68 +19,62 @@ import scala.collection.JavaConversions._
   * The implementation for a NodeSeq Iterable Const
   */
 final case class NodeSeqIterableConst(it: Iterable[NodeSeq])
-    extends IterableConst {
+    extends IterableConst
   def this(it: JavaList[NodeSeq]) = this(it: Iterable[NodeSeq])
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toSeq
-}
 
 /**
   * The implementation for a NodeSeq => NodeSeq Iterable Const
   */
 final case class NodeSeqFuncIterableConst(it: Iterable[NodeSeq => NodeSeq])
-    extends IterableConst {
+    extends IterableConst
   def this(it: JavaList[NodeSeq => NodeSeq]) =
     this(it: Iterable[NodeSeq => NodeSeq])
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] =
     Helpers.ensureUniqueId(it.map(_ (nodeSeq)).toSeq)
-}
 
 /**
   * The implementation for a Box[NodeSeq => Node] Iterable Const
   */
 final case class BoxNodeSeqFuncIterableConst(it: Box[NodeSeq => NodeSeq])
-    extends IterableConst {
+    extends IterableConst
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_ (nodeSeq))
-}
 
 /**
   * The implementation for a Option[NodeSeq => Node] Iterable Const
   */
 final case class OptionNodeSeqFuncIterableConst(it: Option[NodeSeq => NodeSeq])
-    extends IterableConst {
+    extends IterableConst
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.toList.map(_ (nodeSeq))
-}
 
 /**
   * Sequence of String iterable const
   */
 final case class SeqStringIterableConst(it: Iterable[String])
-    extends IterableConst {
+    extends IterableConst
   def this(it: JavaList[String]) = this(it: Iterable[String])
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.map(a => Text(a)).toSeq
-}
 
 /**
   * Sequence of Bindable iterable const
   */
 final case class SeqBindableIterableConst(it: Iterable[Bindable])
-    extends IterableConst {
+    extends IterableConst
   def this(it: JavaList[Bindable]) = this(it: Iterable[Bindable])
 
   def constList(nodeSeq: NodeSeq): Seq[NodeSeq] = it.map(_.asHtml).toSeq
-}
 
 /**
   * The companion object that does the helpful promotion of common
   * collection types into an IterableConst,
   * e.g. Iterable[NodeSeq], Seq[String], Box[String], and Option[String]
   */
-object IterableConst {
+object IterableConst
   import scala.language.implicitConversions
 
   /**
@@ -151,4 +144,3 @@ object IterableConst {
   implicit def optionStringPromotable[T](o: Option[T])(
       implicit view: T => StringPromotable) =
     optionString(o.map(view(_).toString))
-}

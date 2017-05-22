@@ -16,7 +16,7 @@ import com.twitter.finagle.service.{FailureAccrualFactory, FailFastFactory}
   * @see [[https://twitter.github.io/finagle/guide/Clients.html#circuit-breaking]]
   */
 class SessionQualificationParams[A <: Stack.Parameterized[A]](
-    self: Stack.Parameterized[A]) {
+    self: Stack.Parameterized[A])
 
   /**
     * Disables the Fail Fast module on this client (default: enabled).
@@ -52,4 +52,3 @@ class SessionQualificationParams[A <: Stack.Parameterized[A]](
     */
   def noFailureAccrual: A =
     self.configured(FailureAccrualFactory.Disabled)
-}

@@ -3,27 +3,23 @@ package lila.evaluation
 import Math.{pow, abs, sqrt, E, exp}
 import scalaz.NonEmptyList
 
-object Statistics {
+object Statistics
   import Erf._
   import scala.annotation._
 
-  def variance[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double = {
+  def variance[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double =
     val mean = average(a)
     a.map(i => pow(n.toDouble(i) - mean, 2)).list.sum / a.size
-  }
 
   def deviation[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double =
     sqrt(variance(a))
 
-  def average[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double = {
-    @tailrec def average(a: List[T], sum: T, depth: Int): Double = {
-      a match {
+  def average[T](a: NonEmptyList[T])(implicit n: Numeric[T]): Double =
+    @tailrec def average(a: List[T], sum: T, depth: Int): Double =
+      a match
         case Nil => n.toDouble(sum) / depth
         case x :: xs => average(xs, n.plus(sum, x), depth + 1)
-      }
-    }
     average(a.tail, a.head, 1)
-  }
 
   // Coefficient of Variance
   def coefVariation(a: NonEmptyList[Int]): Double =
@@ -55,20 +51,17 @@ object Statistics {
   def confInterval[T](x: T, avg: T, sd: T)(implicit n: Numeric[T]): Double =
     1 - cdf(n.abs(x), avg, sd) + cdf(n.times(n.fromInt(-1), n.abs(x)), avg, sd)
 
-  def listAverage[T](x: List[T])(implicit n: Numeric[T]): Double = x match {
+  def listAverage[T](x: List[T])(implicit n: Numeric[T]): Double = x match
     case Nil => 0
     case a :: Nil => n.toDouble(a)
     case a :: b => average(NonEmptyList.nel(a, b))
-  }
 
-  def listDeviation[T](x: List[T])(implicit n: Numeric[T]): Double = x match {
+  def listDeviation[T](x: List[T])(implicit n: Numeric[T]): Double = x match
     case Nil => 0
     case _ :: Nil => 0
     case a :: b => deviation(NonEmptyList.nel(a, b))
-  }
-}
 
-object Erf {
+object Erf
   // constants
   val a1: Double = 0.254829592
   val a2: Double = -0.284496736
@@ -77,7 +70,7 @@ object Erf {
   val a5: Double = 1.061405429
   val p: Double = 0.3275911
 
-  def erf(x: Double): Double = {
+  def erf(x: Double): Double =
     // Save the sign of x
     val sign = if (x < 0) -1 else 1
     val absx = abs(x)
@@ -87,5 +80,3 @@ object Erf {
     val y =
       1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * exp(-x * x);
     sign * y
-  }
-}

@@ -8,7 +8,7 @@ import com.intellij.openapi.module.ModuleType
   * @author Pavel Fatin
   */
 class SharedSourcesModuleType
-    extends ModuleType[EmptyModuleBuilder]("SHARED_SOURCES_MODULE") {
+    extends ModuleType[EmptyModuleBuilder]("SHARED_SOURCES_MODULE")
   def createModuleBuilder() = new EmptyModuleBuilder()
 
   def getName = "Shared sources module"
@@ -19,11 +19,9 @@ class SharedSourcesModuleType
   def getBigIcon = AllIcons.Modules.SourceFolder
 
   override def getNodeIcon(isOpened: Boolean) = AllIcons.Modules.SourceFolder
-}
 
-object SharedSourcesModuleType {
+object SharedSourcesModuleType
   val instance = Class
     .forName("org.jetbrains.sbt.project.sources.SharedSourcesModuleType")
     .newInstance
     .asInstanceOf[SharedSourcesModuleType]
-}

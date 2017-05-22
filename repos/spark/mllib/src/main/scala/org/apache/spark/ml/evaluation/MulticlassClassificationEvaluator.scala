@@ -34,7 +34,7 @@ import org.apache.spark.sql.types.DoubleType
 class MulticlassClassificationEvaluator @Since("1.5.0")(
     @Since("1.5.0") override val uid: String)
     extends Evaluator with HasPredictionCol with HasLabelCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   @Since("1.5.0")
   def this() = this(Identifiable.randomUID("mcEval"))
@@ -45,7 +45,7 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
     * @group param
     */
   @Since("1.5.0")
-  val metricName: Param[String] = {
+  val metricName: Param[String] =
     val allowedParams = ParamValidators.inArray(
         Array("f1",
               "precision",
@@ -57,7 +57,6 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
               "metric name in evaluation " +
               "(f1|precision|recall|weightedPrecision|weightedRecall)",
               allowedParams)
-  }
 
   /** @group getParam */
   @Since("1.5.0")
@@ -78,46 +77,40 @@ class MulticlassClassificationEvaluator @Since("1.5.0")(
   setDefault(metricName -> "f1")
 
   @Since("1.5.0")
-  override def evaluate(dataset: DataFrame): Double = {
+  override def evaluate(dataset: DataFrame): Double =
     val schema = dataset.schema
     SchemaUtils.checkColumnType(schema, $(predictionCol), DoubleType)
     SchemaUtils.checkColumnType(schema, $(labelCol), DoubleType)
 
     val predictionAndLabels =
-      dataset.select($(predictionCol), $(labelCol)).rdd.map {
+      dataset.select($(predictionCol), $(labelCol)).rdd.map
         case Row(prediction: Double, label: Double) =>
           (prediction, label)
-      }
     val metrics = new MulticlassMetrics(predictionAndLabels)
-    val metric = $(metricName) match {
+    val metric = $(metricName) match
       case "f1" => metrics.weightedFMeasure
       case "precision" => metrics.precision
       case "recall" => metrics.recall
       case "weightedPrecision" => metrics.weightedPrecision
       case "weightedRecall" => metrics.weightedRecall
-    }
     metric
-  }
 
   @Since("1.5.0")
-  override def isLargerBetter: Boolean = $(metricName) match {
+  override def isLargerBetter: Boolean = $(metricName) match
     case "f1" => true
     case "precision" => true
     case "recall" => true
     case "weightedPrecision" => true
     case "weightedRecall" => true
-  }
 
   @Since("1.5.0")
   override def copy(extra: ParamMap): MulticlassClassificationEvaluator =
     defaultCopy(extra)
-}
 
 @Since("1.6.0")
 object MulticlassClassificationEvaluator
-    extends DefaultParamsReadable[MulticlassClassificationEvaluator] {
+    extends DefaultParamsReadable[MulticlassClassificationEvaluator]
 
   @Since("1.6.0")
   override def load(path: String): MulticlassClassificationEvaluator =
     super.load(path)
-}

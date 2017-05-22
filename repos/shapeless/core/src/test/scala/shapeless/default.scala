@@ -12,7 +12,7 @@ import shapeless.testutil.assertTypedEquals
 case class DefaultCC(
     i: Int, s: String = "b", flagOpt: Option[Boolean] = Some(true))
 
-object DefaultTestDefinitions {
+object DefaultTestDefinitions
 
   case class CC(i: Int, s: String = "b", flagOpt: Option[Boolean] = Some(true))
 
@@ -21,43 +21,36 @@ object DefaultTestDefinitions {
 
   trait Dummy
 
-  trait Definitions {
+  trait Definitions
     case class CC(
         i: Int, s: String = "b", flagOpt: Option[Boolean] = Some(true))
-  }
 
   val definitions = new Definitions {}
 
-  object ApplyWithDefault1 {
+  object ApplyWithDefault1
     case class CC(i: Int, s: String)
-    object CC {
+    object CC
       def apply(i: Int = 0): CC = CC(i, "")
-    }
-  }
 
-  object ApplyWithDefault2 {
+  object ApplyWithDefault2
     case class CC(i: Int, s: String)
-    object CC {
+    object CC
       def apply(i: Int, d: Int = 0): CC = CC(i, d.toString)
-    }
-  }
-}
 
-class DefaultTests {
+class DefaultTests
   import DefaultTestDefinitions._
 
   @Test
-  def simple {
+  def simple
     val default = Default[CC].apply()
     assertTypedEquals[
         None.type :: Some[String] :: Some[Option[Boolean]] :: HNil](
         None :: Some("b") :: Some(Some(true)) :: HNil,
         default
     )
-  }
 
   @Test
-  def topLevel {
+  def topLevel
     // See https://github.com/milessabin/shapeless/issues/474
     val default = Default[DefaultCC].apply()
     assertTypedEquals[
@@ -65,20 +58,18 @@ class DefaultTests {
         None :: Some("b") :: Some(Some(true)) :: HNil,
         default
     )
-  }
 
   @Test
-  def simpleFromPath {
+  def simpleFromPath
     val default = Default[definitions.CC].apply()
     assertTypedEquals[
         None.type :: Some[String] :: Some[Option[Boolean]] :: HNil](
         None :: Some("b") :: Some(Some(true)) :: HNil,
         default
     )
-  }
 
   @Test
-  def invalid {
+  def invalid
     illTyped(" Default[Base] ",
              "could not find implicit value for parameter default: .*")
 
@@ -91,28 +82,25 @@ class DefaultTests {
              "could not find implicit value for parameter default: .*")
     illTyped(" Default[Array[Int]] ",
              "could not find implicit value for parameter default: .*")
-  }
 
   @Test
-  def simpleAsRecord {
+  def simpleAsRecord
     val default = Default.AsRecord[CC].apply()
     assertTypedEquals[Record.`'s -> String, 'flagOpt -> Option[Boolean]`.T](
         Record(s = "b", flagOpt = Some(true)),
         default
     )
-  }
 
   @Test
-  def simpleFromPathAsRecord {
+  def simpleFromPathAsRecord
     val default = Default.AsRecord[definitions.CC].apply()
     assertTypedEquals[Record.`'s -> String, 'flagOpt -> Option[Boolean]`.T](
         Record(s = "b", flagOpt = Some(true)),
         default
     )
-  }
 
   @Test
-  def invalidAsRecord {
+  def invalidAsRecord
     illTyped(" Default.AsRecord[Base] ",
              "could not find implicit value for parameter default: .*")
 
@@ -125,10 +113,9 @@ class DefaultTests {
              "could not find implicit value for parameter default: .*")
     illTyped(" Default.AsRecord[Array[Int]] ",
              "could not find implicit value for parameter default: .*")
-  }
 
   @Test
-  def simpleAsOptions {
+  def simpleAsOptions
     illTyped(
         " val default0: None.type :: Some[String] :: Some[Option[Boolean]] :: HNil = Default.AsOptions[CC].apply() ",
         "type mismatch.*"
@@ -140,10 +127,9 @@ class DefaultTests {
         None :: Some("b") :: Some(Some(true)) :: HNil,
         default
     )
-  }
 
   @Test
-  def simpleFromPathAsOptions {
+  def simpleFromPathAsOptions
     illTyped(
         " val default0: None.type :: Some[String] :: Some[Option[Boolean]] :: HNil = Default.AsOptions[definitions.CC].apply() ",
         "type mismatch.*"
@@ -155,10 +141,9 @@ class DefaultTests {
         None :: Some("b") :: Some(Some(true)) :: HNil,
         default
     )
-  }
 
   @Test
-  def invalidAsOptions {
+  def invalidAsOptions
     illTyped(" Default.AsOptions[Base] ",
              "could not find implicit value for parameter default: .*")
 
@@ -171,10 +156,9 @@ class DefaultTests {
              "could not find implicit value for parameter default: .*")
     illTyped(" Default.AsOptions[Array[Int]] ",
              "could not find implicit value for parameter default: .*")
-  }
 
   @Test
-  def localClass {
+  def localClass
     case class Default0(d: Double = 1.0)
 
     val default0 = Default[Default0].apply()
@@ -190,23 +174,19 @@ class DefaultTests {
         None :: Some("b") :: Some(Default0()) :: HNil,
         default1
     )
-  }
 
   @Test
-  def applyWithDefault1 {
+  def applyWithDefault1
     val default = Default[ApplyWithDefault1.CC].apply()
     assertTypedEquals[None.type :: None.type :: HNil](
         None :: None :: HNil,
         default
     )
-  }
 
   @Test
-  def applyWithDefault2 {
+  def applyWithDefault2
     val default = Default[ApplyWithDefault2.CC].apply()
     assertTypedEquals[None.type :: None.type :: HNil](
         None :: None :: HNil,
         default
     )
-  }
-}

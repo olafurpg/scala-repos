@@ -39,7 +39,7 @@ import blueeyes.json.JPath
 import scala.annotation.tailrec
 import JDBMProjection._
 
-object JDBMSlice {
+object JDBMSlice
   private lazy val logger =
     LoggerFactory.getLogger("com.precog.yggdrasil.jdbm3.JDBMSlice")
 
@@ -47,15 +47,15 @@ object JDBMSlice {
       size: Int,
       source: () => Iterator[java.util.Map.Entry[Array[Byte], Array[Byte]]],
       keyDecoder: ColumnDecoder,
-      valDecoder: ColumnDecoder): (Array[Byte], Array[Byte], Int) = {
+      valDecoder: ColumnDecoder): (Array[Byte], Array[Byte], Int) =
     var firstKey: Array[Byte] = null.asInstanceOf[Array[Byte]]
     var lastKey: Array[Byte] = null.asInstanceOf[Array[Byte]]
 
     @tailrec
     def consumeRows(
         source: Iterator[java.util.Map.Entry[Array[Byte], Array[Byte]]],
-        row: Int): Int = {
-      if (source.hasNext) {
+        row: Int): Int =
+      if (source.hasNext)
         val entry = source.next
         val rowKey = entry.getKey
         if (row == 0) { firstKey = rowKey }
@@ -65,40 +65,33 @@ object JDBMSlice {
         valDecoder.decodeToRow(row, entry.getValue)
 
         consumeRows(source, row + 1)
-      } else {
+      else
         row
-      }
-    }
 
-    val rows = {
+    val rows =
       // FIXME: Looping here is a blatantly poor way to work around ConcurrentModificationExceptions
       // From the Javadoc for CME, the exception is an indication of a bug
       var finalCount = -1
       var tries = 0
-      while (tries < JDBMProjection.MAX_SPINS && finalCount == -1) {
-        try {
+      while (tries < JDBMProjection.MAX_SPINS && finalCount == -1)
+        try
           finalCount = consumeRows(source().take(size), 0)
-        } catch {
+        catch
           case t: Throwable =>
             logger.warn("Error during block read, retrying")
             Thread.sleep(50)
-        }
         tries += 1
-      }
-      if (finalCount == -1) {
+      if (finalCount == -1)
         throw new VicciniException(
             "Block read failed with too many concurrent mods.")
-      } else {
+      else
         finalCount
-      }
-    }
 
     (firstKey, lastKey, rows)
-  }
 
   def columnFor(prefix: CPath, sliceSize: Int)(
       ref: ColumnRef): (ColumnRef, ArrayColumn[_]) =
-    (ref.copy(selector = (prefix \ ref.selector)), (ref.ctype match {
+    (ref.copy(selector = (prefix \ ref.selector)), (ref.ctype match
       case CString => ArrayStrColumn.empty(sliceSize)
       case CBoolean => ArrayBoolColumn.empty()
       case CLong => ArrayLongColumn.empty(sliceSize)
@@ -112,5 +105,4 @@ object JDBMSlice {
       case CArrayType(elemType) =>
         ArrayHomogeneousArrayColumn.empty(sliceSize)(elemType)
       case CUndefined => sys.error("CUndefined cannot be serialized")
-    }))
-}
+    ))

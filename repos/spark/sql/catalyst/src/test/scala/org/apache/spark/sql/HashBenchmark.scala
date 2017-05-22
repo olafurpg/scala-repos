@@ -27,9 +27,9 @@ import org.apache.spark.util.Benchmark
   * Benchmark for the previous interpreted hash function(InternalRow.hashCode) vs the new codegen
   * hash expression(Murmur3Hash).
   */
-object HashBenchmark {
+object HashBenchmark
 
-  def test(name: String, schema: StructType, numRows: Int, iters: Int): Unit = {
+  def test(name: String, schema: StructType, numRows: Int, iters: Int): Unit =
     val generator = RandomDataGenerator.forType(schema, nullable = false).get
     val encoder = RowEncoder(schema)
     val attrs = schema.toAttributes
@@ -43,33 +43,26 @@ object HashBenchmark {
       .toArray
 
     val benchmark = new Benchmark("Hash For " + name, iters * numRows)
-    benchmark.addCase("interpreted version") { _: Int =>
-      for (_ <- 0L until iters) {
+    benchmark.addCase("interpreted version")  _: Int =>
+      for (_ <- 0L until iters)
         var sum = 0
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += rows(i).hashCode()
           i += 1
-        }
-      }
-    }
 
     val getHashCode =
       UnsafeProjection.create(new Murmur3Hash(attrs) :: Nil, attrs)
-    benchmark.addCase("codegen version") { _: Int =>
-      for (_ <- 0L until iters) {
+    benchmark.addCase("codegen version")  _: Int =>
+      for (_ <- 0L until iters)
         var sum = 0
         var i = 0
-        while (i < numRows) {
+        while (i < numRows)
           sum += getHashCode(rows(i)).getInt(0)
           i += 1
-        }
-      }
-    }
     benchmark.run()
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val simple = new StructType().add("i", IntegerType)
     /*
     Intel(R) Core(TM) i7-4960HQ CPU @ 2.60GHz
@@ -129,5 +122,3 @@ object HashBenchmark {
     codegen version                           205 /  223          0.0       49936.5       8.9X
      */
     test("map", map, 1 << 6, 1 << 6)
-  }
-}

@@ -5,20 +5,20 @@ import java.lang.UnsupportedOperationException
 import scala.reflect.reify.{Reifier => ReflectReifier}
 import scala.reflect.internal.Flags._
 
-trait Reifiers { self: Quasiquotes =>
+trait Reifiers  self: Quasiquotes =>
   import global._
   import global.build._
   import global.definitions._
   import Rank._
   import universeTypes._
 
-  abstract class Reifier(val isReifyingExpressions: Boolean) extends {
+  abstract class Reifier(val isReifyingExpressions: Boolean) extends
     val global: self.global.type = self.global
     val universe = self.universe
     val reifee = EmptyTree
     val mirror = EmptyTree
     val concrete = false
-  } with ReflectReifier {
+  with ReflectReifier
     lazy val typer = throw new UnsupportedOperationException
 
     def isReifyingPatterns: Boolean = !isReifyingExpressions
@@ -29,9 +29,8 @@ trait Reifiers { self: Quasiquotes =>
       *  This information is used to reify names created by calls to freshTermName and freshTypeName.
       */
     val nameMap =
-      collection.mutable.HashMap.empty[Name, Set[TermName]].withDefault { _ =>
+      collection.mutable.HashMap.empty[Name, Set[TermName]].withDefault  _ =>
         Set()
-      }
 
     /** Wraps expressions into:
       *    a block which starts with a sequence of vals that correspond
@@ -59,8 +58,8 @@ trait Reifiers { self: Quasiquotes =>
       *    which check that pairs of names in nameMap.values are equal between each other.
       */
     def wrap(tree: Tree) =
-      if (isReifyingExpressions) {
-        val freshdefs = nameMap.iterator.map {
+      if (isReifyingExpressions)
+        val freshdefs = nameMap.iterator.map
           case (origname, names) =>
             assert(names.size == 1)
             val FreshName(prefix) = origname
@@ -76,24 +75,23 @@ trait Reifiers { self: Quasiquotes =>
                                        nme.reificationSupport),
                                 freshName),
                          Literal(Constant(prefix)) :: Nil))
-        }.toList
+        .toList
         // q"..$freshdefs; $tree"
         SyntacticBlock(freshdefs :+ tree)
-      } else {
+      else
         val freevars = holeMap.keysIterator.map(Ident(_)).toList
-        val isVarPattern = tree match {
+        val isVarPattern = tree match
           case Bind(name, Ident(nme.WILDCARD)) => true
           case _ => false
-        }
         val cases =
-          if (isVarPattern) {
+          if (isVarPattern)
             val Ident(name) :: Nil = freevars
             // cq"$name: $treeType => $SomeModule($name)" :: Nil
             CaseDef(Bind(name, Typed(Ident(nme.WILDCARD), TypeTree(treeType))),
                     EmptyTree,
                     Apply(Ident(SomeModule), List(Ident(name)))) :: Nil
-          } else {
-            val (succ, fail) = freevars match {
+          else
+            val (succ, fail) = freevars match
               case Nil =>
                 // (q"true", q"false")
                 (Literal(Constant(true)), Literal(Constant(false)))
@@ -104,24 +102,20 @@ trait Reifiers { self: Quasiquotes =>
                 // (q"$SomeModule((..$vars))", q"$NoneModule")
                 (Apply(Ident(SomeModule), List(SyntacticTuple(vars))),
                  Ident(NoneModule))
-            }
-            val guard = nameMap.collect {
+            val guard = nameMap.collect
               case (_, nameset) if nameset.size >= 2 =>
-                nameset.toList.sliding(2).map {
+                nameset.toList.sliding(2).map
                   case List(n1, n2) =>
                     // q"$n1 == $n2"
                     Apply(Select(Ident(n1), nme.EQ), List(Ident(n2)))
-                }
-            }.flatten
-              .reduceOption[Tree] { (l, r) =>
+            .flatten
+              .reduceOption[Tree]  (l, r) =>
                 // q"$l && $r"
                 Apply(Select(l, nme.ZAND), List(r))
-              }
               .getOrElse { EmptyTree }
             // cq"$tree if $guard => $succ" :: cq"_ => $fail" :: Nil
             CaseDef(tree, guard, succ) :: CaseDef(
                 Ident(nme.WILDCARD), EmptyTree, fail) :: Nil
-          }
         // q"new { def unapply(tree: $AnyClass) = { ..${unlifters.preamble()}; tree match { case ..$cases } } }.unapply(..$args)"
         Apply(Select(SyntacticNew(Nil,
                                   Nil,
@@ -142,20 +136,17 @@ trait Reifiers { self: Quasiquotes =>
                                                      cases))))),
                      nme.unapply),
               args)
-      }
 
-    def reifyFillingHoles(tree: Tree): Tree = {
+    def reifyFillingHoles(tree: Tree): Tree =
       val reified = reifyTree(tree)
-      holeMap.unused.foreach { hole =>
+      holeMap.unused.foreach  hole =>
         c.abort(holeMap(hole).pos, s"Don't know how to $action here")
-      }
       wrap(reified)
-    }
 
     override def reifyTree(tree: Tree): Tree =
       reifyTreePlaceholder(tree) orElse reifyTreeSyntactically(tree)
 
-    def reifyTreePlaceholder(tree: Tree): Tree = tree match {
+    def reifyTreePlaceholder(tree: Tree): Tree = tree match
       case Placeholder(hole: ApplyHole) if hole.tpe <:< treeType => hole.tree
       case Placeholder(Hole(tree, NoDot)) if isReifyingPatterns => tree
       case Placeholder(hole @ Hole(_, rank @ Dot())) =>
@@ -179,9 +170,8 @@ trait Reifiers { self: Quasiquotes =>
       // desugaring of the for loop in SyntacticFor & SyntacticForYield
       case ForEnumPlaceholder(hole) => hole.tree
       case _ => EmptyTree
-    }
 
-    override def reifyTreeSyntactically(tree: Tree) = tree match {
+    override def reifyTreeSyntactically(tree: Tree) = tree match
       case RefTree(qual, SymbolPlaceholder(Hole(tree, _)))
           if isReifyingExpressions =>
         mirrorBuildCall(nme.mkRefTree, reify(qual), tree)
@@ -318,9 +308,8 @@ trait Reifiers { self: Quasiquotes =>
         reifyBuildCall(ctor, qual, name)
       case _ =>
         super.reifyTreeSyntactically(tree)
-    }
 
-    override def reifyName(name: Name): Tree = name match {
+    override def reifyName(name: Name): Tree = name match
       case Placeholder(hole: ApplyHole) =>
         if (!(hole.tpe <:< nameType))
           c.abort(hole.pos, s"$nameType expected but ${hole.tpe} found")
@@ -337,9 +326,8 @@ trait Reifiers { self: Quasiquotes =>
               nameMap.get(name).map { _.head }.getOrElse { introduceName() })
       case _ =>
         super.reifyName(name)
-    }
 
-    def reifyTuple(args: List[Tree]) = args match {
+    def reifyTuple(args: List[Tree]) = args match
       case Nil => reify(Literal(Constant(())))
       case List(hole @ Placeholder(Hole(_, NoDot))) => reify(hole)
       case List(Placeholder(_)) => reifyBuildCall(nme.SyntacticTuple, args)
@@ -348,23 +336,20 @@ trait Reifiers { self: Quasiquotes =>
       // just an expression wrapped in parentheses
       case List(other) => reify(other)
       case _ => reifyBuildCall(nme.SyntacticTuple, args)
-    }
 
-    def reifyTupleType(args: List[Tree]) = args match {
+    def reifyTupleType(args: List[Tree]) = args match
       case Nil => reify(Select(Ident(nme.scala_), tpnme.Unit))
       case List(hole @ Placeholder(Hole(_, NoDot))) => reify(hole)
       case List(Placeholder(_)) => reifyBuildCall(nme.SyntacticTupleType, args)
       case List(other) => reify(other)
       case _ => reifyBuildCall(nme.SyntacticTupleType, args)
-    }
 
     def reifyFunctionType(argtpes: List[Tree], restpe: Tree) =
       reifyBuildCall(nme.SyntacticFunctionType, argtpes, restpe)
 
-    def reifyConstructionCheck(name: TermName, hole: Hole) = hole match {
+    def reifyConstructionCheck(name: TermName, hole: Hole) = hole match
       case _: UnapplyHole => hole.tree
       case _: ApplyHole => mirrorBuildCall(name, hole.tree)
-    }
 
     def reifyRefineStat(hole: Hole) =
       reifyConstructionCheck(nme.mkRefineStat, hole)
@@ -378,11 +363,10 @@ trait Reifiers { self: Quasiquotes =>
     def reifyPackageStat(hole: Hole) =
       reifyConstructionCheck(nme.mkPackageStat, hole)
 
-    def reifyVparamss(vparamss: List[List[ValDef]]) = {
+    def reifyVparamss(vparamss: List[List[ValDef]]) =
       val build.ImplicitParams(paramss, implparams) = vparamss
       if (implparams.isEmpty) reify(paramss)
       else reifyBuildCall(nme.ImplicitParams, paramss, implparams)
-    }
 
     /** Splits list into a list of groups where subsequent elements are considered
       *  similar by the corresponding function.
@@ -394,13 +378,12 @@ trait Reifiers { self: Quasiquotes =>
       *
       */
     def group[T](lst: List[T])(similar: (T, T) => Boolean) =
-      lst.foldLeft[List[List[T]]](List()) {
+      lst.foldLeft[List[List[T]]](List())
         case (Nil, el) => List(List(el))
         case (ll :+ (last @ (lastinit :+ lastel)), el)
             if similar(lastel, el) =>
           ll :+ (last :+ el)
         case (ll, el) => ll :+ List(el)
-      }
 
     /** Reifies list filling all the valid holeMap.
       *
@@ -433,7 +416,7 @@ trait Reifiers { self: Quasiquotes =>
     def reifyHighRankList(xs: List[Any])(fill: PartialFunction[Any, Tree])(
         fallback: Any => Tree): Tree
 
-    val fillListHole: PartialFunction[Any, Tree] = {
+    val fillListHole: PartialFunction[Any, Tree] =
       case Placeholder(Hole(tree, DotDot)) => tree
       case CasePlaceholder(Hole(tree, DotDot)) => tree
       case RefineStatPlaceholder(h @ Hole(_, DotDot)) => reifyRefineStat(h)
@@ -447,12 +430,10 @@ trait Reifiers { self: Quasiquotes =>
           if h.tpe <:< treeType =>
         mirrorBuildCall(
             nme.SyntacticPatDef, reify(mods), h.tree, reify(tpt), reify(rhs))
-    }
 
-    val fillListOfListsHole: PartialFunction[Any, Tree] = {
+    val fillListOfListsHole: PartialFunction[Any, Tree] =
       case List(ParamPlaceholder(Hole(tree, DotDotDot))) => tree
       case List(Placeholder(Hole(tree, DotDotDot))) => tree
-    }
 
     /** Reifies arbitrary list filling ..$x and ...$y holeMap when they are put
       *  in the correct position. Fallbacks to regular reification for zero rank
@@ -462,15 +443,14 @@ trait Reifiers { self: Quasiquotes =>
       reifyHighRankList(xs)(fillListHole.orElse(fillListOfListsHole))(reify)
 
     def reifyAnnotList(annots: List[Tree]): Tree =
-      reifyHighRankList(annots) {
+      reifyHighRankList(annots)
         case AnnotPlaceholder(h @ Hole(_, DotDot)) => reifyAnnotation(h)
-      } {
+      
         case AnnotPlaceholder(h: ApplyHole) if h.tpe <:< treeType =>
           reifyAnnotation(h)
         case AnnotPlaceholder(h: UnapplyHole) if h.rank == NoDot =>
           reifyAnnotation(h)
         case other => reify(other)
-      }
 
     // These are explicit flags except those that are used
     // to overload the same tree for two different concepts:
@@ -478,7 +458,7 @@ trait Reifiers { self: Quasiquotes =>
     // - TRAIT that is used to override ClassDef for traits
     val nonOverloadedExplicitFlags = ExplicitFlags & ~MUTABLE & ~TRAIT
 
-    def ensureNoExplicitFlags(m: Modifiers, pos: Position) = {
+    def ensureNoExplicitFlags(m: Modifiers, pos: Position) =
       // Traits automatically have ABSTRACT flag assigned to
       // them so in that case it's not an explicit flag
       val flags = if (m.isTrait) m.flags & ~ABSTRACT else m.flags
@@ -486,7 +466,6 @@ trait Reifiers { self: Quasiquotes =>
         c.abort(
             pos,
             s"Can't $action modifiers together with flags, consider merging flags into modifiers")
-    }
 
     override def mirrorSelect(name: String): Tree =
       Select(universe, TermName(name))
@@ -502,42 +481,35 @@ trait Reifiers { self: Quasiquotes =>
 
     override def scalaFactoryCall(name: String, args: Tree*): Tree =
       call("scala." + name, args: _*)
-  }
 
-  class ApplyReifier extends Reifier(isReifyingExpressions = true) {
+  class ApplyReifier extends Reifier(isReifyingExpressions = true)
     def reifyHighRankList(xs: List[Any])(fill: PartialFunction[Any, Tree])(
         fallback: Any => Tree): Tree =
       if (xs.isEmpty) mkList(Nil)
-      else {
-        def reifyGroup(group: List[Any]): Tree = group match {
+      else
+        def reifyGroup(group: List[Any]): Tree = group match
           case List(elem) if fill.isDefinedAt(elem) => fill(elem)
           case elems => mkList(elems.map(fallback))
-        }
-        val head :: tail = group(xs) { (a, b) =>
+        val head :: tail = group(xs)  (a, b) =>
           !fill.isDefinedAt(a) && !fill.isDefinedAt(b)
-        }
-        tail.foldLeft[Tree](reifyGroup(head)) { (tree, lst) =>
+        tail.foldLeft[Tree](reifyGroup(head))  (tree, lst) =>
           Apply(Select(tree, nme.PLUSPLUS), List(reifyGroup(lst)))
-        }
-      }
 
     override def reifyModifiers(m: Modifiers) =
       if (m == NoMods) super.reifyModifiers(m)
-      else {
-        val (modsPlaceholders, annots) = m.annotations.partition {
+      else
+        val (modsPlaceholders, annots) = m.annotations.partition
           case ModsPlaceholder(_) => true
           case _ => false
-        }
-        val (mods, flags) = modsPlaceholders.map {
+        val (mods, flags) = modsPlaceholders.map
           case ModsPlaceholder(hole: ApplyHole) => hole
-        }.partition { hole =>
+        .partition  hole =>
           if (hole.tpe <:< modsType) true
           else if (hole.tpe <:< flagsType) false
           else
             c.abort(hole.pos,
                     s"$flagsType or $modsType expected but ${hole.tpe} found")
-        }
-        mods match {
+        mods match
           case hole :: Nil =>
             if (flags.nonEmpty)
               c.abort(
@@ -555,17 +527,13 @@ trait Reifiers { self: Quasiquotes =>
                 "Can't unquote multiple modifiers, consider merging them into a single modifiers instance")
           case _ =>
             val baseFlags = reifyFlags(m.flags)
-            val reifiedFlags = flags.foldLeft[Tree](baseFlags) {
+            val reifiedFlags = flags.foldLeft[Tree](baseFlags)
               case (flag, hole) => Apply(Select(flag, nme.OR), List(hole.tree))
-            }
             mirrorFactoryCall(nme.Modifiers,
                               reifiedFlags,
                               reify(m.privateWithin),
                               reifyAnnotList(annots))
-        }
-      }
-  }
-  class UnapplyReifier extends Reifier(isReifyingExpressions = false) {
+  class UnapplyReifier extends Reifier(isReifyingExpressions = false)
     private def collection = ScalaDot(nme.collection)
     private def collectionColonPlus = Select(collection, nme.COLONPLUS)
     private def collectionCons =
@@ -580,18 +548,15 @@ trait Reifiers { self: Quasiquotes =>
       Apply(collectionCons, lhs :: rhs :: Nil)
 
     def reifyHighRankList(xs: List[Any])(
-        fill: PartialFunction[Any, Tree])(fallback: Any => Tree): Tree = {
-      val grouped = group(xs) { (a, b) =>
+        fill: PartialFunction[Any, Tree])(fallback: Any => Tree): Tree =
+      val grouped = group(xs)  (a, b) =>
         !fill.isDefinedAt(a) && !fill.isDefinedAt(b)
-      }
-      def appended(lst: List[Any], init: Tree) = lst.foldLeft(init) { (l, r) =>
+      def appended(lst: List[Any], init: Tree) = lst.foldLeft(init)  (l, r) =>
         append(l, fallback(r))
-      }
-      def prepended(lst: List[Any], init: Tree) = lst.foldRight(init) {
+      def prepended(lst: List[Any], init: Tree) = lst.foldRight(init)
         (l, r) =>
           cons(fallback(l), r)
-      }
-      grouped match {
+      grouped match
         case init :: List(hole) :: last :: Nil if fill.isDefinedAt(hole) =>
           appended(last, prepended(init, fill(hole)))
         case init :: List(hole) :: Nil if fill.isDefinedAt(hole) =>
@@ -600,16 +565,13 @@ trait Reifiers { self: Quasiquotes =>
           appended(last, fill(hole))
         case List(hole) :: Nil if fill.isDefinedAt(hole) => fill(hole)
         case _ => prepended(xs, collectionNil)
-      }
-    }
 
     override def reifyModifiers(m: Modifiers) =
       if (m == NoMods) super.reifyModifiers(m)
-      else {
-        val mods = m.annotations.collect {
+      else
+        val mods = m.annotations.collect
           case ModsPlaceholder(hole: UnapplyHole) => hole
-        }
-        mods match {
+        mods match
           case hole :: Nil =>
             if (m.annotations.length != 1)
               c.abort(
@@ -626,7 +588,3 @@ trait Reifiers { self: Quasiquotes =>
                               reifyFlags(m.flags),
                               reify(m.privateWithin),
                               reifyAnnotList(m.annotations))
-        }
-      }
-  }
-}

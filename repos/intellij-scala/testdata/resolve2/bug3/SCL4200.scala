@@ -1,10 +1,8 @@
-object A {
-  class A {
+object A
+  class A
     def foo(x: Int) = 1
-  }
-  class B {
+  class B
     def foo(x: C) = 2
-  }
   class C
   implicit def foo(a: A): B = new B
   implicit def too(a: A): C = new C
@@ -12,4 +10,3 @@ object A {
   val a: A = new A
 
   a. /* resolved: false */ foo(new A)
-}

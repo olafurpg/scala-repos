@@ -18,7 +18,7 @@ import BackendReporting._
 
 import scala.collection.convert.decorateAsScala._
 
-object InlineInfoTest extends ClearAfterClass.Clearable {
+object InlineInfoTest extends ClearAfterClass.Clearable
   var compiler = newCompiler(extraArgs = "-Yopt:l:classpath")
   def clear(): Unit = { compiler = null }
 
@@ -27,21 +27,19 @@ object InlineInfoTest extends ClearAfterClass.Clearable {
          compiler.genBCode.bTypes.byteCodeRepository.compilingClasses,
          compiler.genBCode.bTypes.byteCodeRepository.parsedClasses)
   notPerRun foreach compiler.perRunCaches.unrecordCache
-}
 
 @RunWith(classOf[JUnit4])
-class InlineInfoTest extends ClearAfterClass {
+class InlineInfoTest extends ClearAfterClass
   ClearAfterClass.stateToClear = InlineInfoTest
 
   val compiler = InlineInfoTest.compiler
 
-  def compile(code: String) = {
+  def compile(code: String) =
     InlineInfoTest.notPerRun.foreach(_.clear())
     compileClasses(compiler)(code)
-  }
 
   @Test
-  def inlineInfosFromSymbolAndAttribute(): Unit = {
+  def inlineInfosFromSymbolAndAttribute(): Unit =
     val code = """trait T {
         |  @inline def f: Int
         |  @noinline final def g = 0
@@ -73,12 +71,9 @@ class InlineInfoTest extends ClearAfterClass {
 
     val fromAttrs = classes.map(
         c =>
-          {
         assert(c.attrs.asScala.exists(_.isInstanceOf[InlineInfoAttribute]),
                c.attrs)
         compiler.genBCode.bTypes.inlineInfoFromClassfile(c)
-    })
+    )
 
     assert(fromSyms == fromAttrs)
-  }
-}

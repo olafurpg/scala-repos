@@ -1,30 +1,22 @@
-object typerep {
+object typerep
 
-  class TypeRep[T] {
+  class TypeRep[T]
     def getType: TypeRep[T] = this
-  }
 
-  object BooleanRep extends TypeRep[Boolean] {
+  object BooleanRep extends TypeRep[Boolean]
     override def toString = "Boolean"
-  }
-  object CharRep extends TypeRep[Char] {
+  object CharRep extends TypeRep[Char]
     override def toString = "Char"
-  }
-  object IntRep extends TypeRep[Int] {
+  object IntRep extends TypeRep[Int]
     override def toString = "Int"
-  }
-  object LongRep extends TypeRep[Long] {
+  object LongRep extends TypeRep[Long]
     override def toString = "Long"
-  }
-  object FloatRep extends TypeRep[Float] {
+  object FloatRep extends TypeRep[Float]
     override def toString = "Float"
-  }
-  object DoubleRep extends TypeRep[Double] {
+  object DoubleRep extends TypeRep[Double]
     override def toString = "Double"
-  }
-  class ListRep[U, T <: List[U]](val elemRep: TypeRep[U]) extends TypeRep[T] {
+  class ListRep[U, T <: List[U]](val elemRep: TypeRep[U]) extends TypeRep[T]
     override def toString = "List[" + elemRep + "]"
-  }
 
   implicit def typeRep(x: Boolean): TypeRep[Boolean] = BooleanRep
   implicit def typeRep(x: Char): TypeRep[Char] = CharRep
@@ -38,10 +30,8 @@ object typerep {
    */
   implicit def typeRep[T <% TypeRep[T]](xs: List[T]): TypeRep[List[T]] =
     new ListRep(xs.head)
-}
 
-object test extends App {
+object test extends App
   import typerep._
   println(3.getType)
   println(List(3).getType)
-}

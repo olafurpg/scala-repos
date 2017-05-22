@@ -25,38 +25,33 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
 class IsotonicRegressionSuite
-    extends SparkFunSuite with MLlibTestSparkContext with Matchers {
+    extends SparkFunSuite with MLlibTestSparkContext with Matchers
 
-  private def round(d: Double) = {
+  private def round(d: Double) =
     math.round(d * 100).toDouble / 100
-  }
 
   private def generateIsotonicInput(
-      labels: Seq[Double]): Seq[(Double, Double, Double)] = {
+      labels: Seq[Double]): Seq[(Double, Double, Double)] =
     Seq.tabulate(labels.size)(i => (labels(i), i.toDouble, 1d))
-  }
 
   private def generateIsotonicInput(
       labels: Seq[Double],
-      weights: Seq[Double]): Seq[(Double, Double, Double)] = {
+      weights: Seq[Double]): Seq[(Double, Double, Double)] =
     Seq.tabulate(labels.size)(i => (labels(i), i.toDouble, weights(i)))
-  }
 
   private def runIsotonicRegression(
       labels: Seq[Double],
       weights: Seq[Double],
-      isotonic: Boolean): IsotonicRegressionModel = {
+      isotonic: Boolean): IsotonicRegressionModel =
     val trainRDD =
       sc.parallelize(generateIsotonicInput(labels, weights)).cache()
     new IsotonicRegression().setIsotonic(isotonic).run(trainRDD)
-  }
 
   private def runIsotonicRegression(
-      labels: Seq[Double], isotonic: Boolean): IsotonicRegressionModel = {
+      labels: Seq[Double], isotonic: Boolean): IsotonicRegressionModel =
     runIsotonicRegression(labels, Array.fill(labels.size)(1d), isotonic)
-  }
 
-  test("increasing isotonic regression") {
+  test("increasing isotonic regression")
     /*
      The following result could be re-produced with sklearn.
 
@@ -76,9 +71,8 @@ class IsotonicRegressionSuite
     assert(model.boundaries === Array(0, 1, 3, 4, 5, 6, 7, 8))
     assert(model.predictions === Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0))
     assert(model.isotonic)
-  }
 
-  test("model save/load") {
+  test("model save/load")
     val boundaries = Array(0.0, 1.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0)
     val predictions = Array(1, 2, 2, 6, 16.5, 16.5, 17.0, 18.0)
     val model = new IsotonicRegressionModel(boundaries, predictions, true)
@@ -87,105 +81,91 @@ class IsotonicRegressionSuite
     val path = tempDir.toURI.toString
 
     // Save model, load it back, and compare.
-    try {
+    try
       model.save(sc, path)
       val sameModel = IsotonicRegressionModel.load(sc, path)
       assert(model.boundaries === sameModel.boundaries)
       assert(model.predictions === sameModel.predictions)
       assert(model.isotonic === model.isotonic)
-    } finally {
+    finally
       Utils.deleteRecursively(tempDir)
-    }
-  }
 
-  test("isotonic regression with size 0") {
+  test("isotonic regression with size 0")
     val model = runIsotonicRegression(Seq(), true)
 
     assert(model.predictions === Array())
-  }
 
-  test("isotonic regression with size 1") {
+  test("isotonic regression with size 1")
     val model = runIsotonicRegression(Seq(1), true)
 
     assert(model.predictions === Array(1.0))
-  }
 
-  test("isotonic regression strictly increasing sequence") {
+  test("isotonic regression strictly increasing sequence")
     val model = runIsotonicRegression(Seq(1, 2, 3, 4, 5), true)
 
     assert(model.predictions === Array(1, 2, 3, 4, 5))
-  }
 
-  test("isotonic regression strictly decreasing sequence") {
+  test("isotonic regression strictly decreasing sequence")
     val model = runIsotonicRegression(Seq(5, 4, 3, 2, 1), true)
 
     assert(model.boundaries === Array(0, 4))
     assert(model.predictions === Array(3, 3))
-  }
 
-  test("isotonic regression with last element violating monotonicity") {
+  test("isotonic regression with last element violating monotonicity")
     val model = runIsotonicRegression(Seq(1, 2, 3, 4, 2), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
     assert(model.predictions === Array(1, 2, 3, 3))
-  }
 
-  test("isotonic regression with first element violating monotonicity") {
+  test("isotonic regression with first element violating monotonicity")
     val model = runIsotonicRegression(Seq(4, 2, 3, 4, 5), true)
 
     assert(model.boundaries === Array(0, 2, 3, 4))
     assert(model.predictions === Array(3, 3, 4, 5))
-  }
 
-  test("isotonic regression with negative labels") {
+  test("isotonic regression with negative labels")
     val model = runIsotonicRegression(Seq(-1, -2, 0, 1, -1), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
     assert(model.predictions === Array(-1.5, -1.5, 0, 0))
-  }
 
-  test("isotonic regression with unordered input") {
+  test("isotonic regression with unordered input")
     val trainRDD = sc
       .parallelize(generateIsotonicInput(Seq(1, 2, 3, 4, 5)).reverse, 2)
       .cache()
 
     val model = new IsotonicRegression().run(trainRDD)
     assert(model.predictions === Array(1, 2, 3, 4, 5))
-  }
 
-  test("weighted isotonic regression") {
+  test("weighted isotonic regression")
     val model =
       runIsotonicRegression(Seq(1, 2, 3, 4, 2), Seq(1, 1, 1, 1, 2), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
     assert(model.predictions === Array(1, 2, 2.75, 2.75))
-  }
 
-  test("weighted isotonic regression with weights lower than 1") {
+  test("weighted isotonic regression with weights lower than 1")
     val model =
       runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(1, 1, 1, 0.1, 0.1), true)
 
     assert(model.boundaries === Array(0, 1, 2, 4))
     assert(model.predictions.map(round) === Array(1, 2, 3.3 / 1.2, 3.3 / 1.2))
-  }
 
-  test("weighted isotonic regression with negative weights") {
+  test("weighted isotonic regression with negative weights")
     val model =
       runIsotonicRegression(Seq(1, 2, 3, 2, 1), Seq(-1, 1, -3, 1, -5), true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
     assert(model.predictions === Array(1.0, 10.0 / 6, 10.0 / 6))
-  }
 
-  test("weighted isotonic regression with zero weights") {
+  test("weighted isotonic regression with zero weights")
     val model = runIsotonicRegression(
         Seq[Double](1, 2, 3, 2, 1), Seq[Double](0, 0, 0, 1, 0), true)
 
     assert(model.boundaries === Array(0.0, 1.0, 4.0))
     assert(model.predictions === Array(1, 2, 2))
-  }
 
-  test("isotonic regression prediction") {
+  test("isotonic regression prediction")
     val model = runIsotonicRegression(Seq(1, 2, 7, 1, 2), true)
 
     assert(model.predict(-2) === 1)
@@ -195,9 +175,8 @@ class IsotonicRegressionSuite
     assert(model.predict(1) === 2)
     assert(model.predict(2) === 10d / 3)
     assert(model.predict(9) === 10d / 3)
-  }
 
-  test("isotonic regression prediction with duplicate features") {
+  test("isotonic regression prediction with duplicate features")
     val trainRDD = sc
       .parallelize(Seq[(Double, Double, Double)]((2, 1, 1),
                                                  (1, 1, 1),
@@ -213,9 +192,8 @@ class IsotonicRegressionSuite
     assert(model.predict(1.5) === 2)
     assert(model.predict(2.5) === 4.5)
     assert(model.predict(4) === 6)
-  }
 
-  test("antitonic regression prediction with duplicate features") {
+  test("antitonic regression prediction with duplicate features")
     val trainRDD = sc
       .parallelize(Seq[(Double, Double, Double)]((5, 1, 1),
                                                  (6, 1, 1),
@@ -231,9 +209,8 @@ class IsotonicRegressionSuite
     assert(model.predict(1.5) === 4.5)
     assert(model.predict(2.5) === 2)
     assert(model.predict(4) === 1)
-  }
 
-  test("isotonic regression RDD prediction") {
+  test("isotonic regression RDD prediction")
     val model = runIsotonicRegression(Seq(1, 2, 7, 1, 2), true)
 
     val testRDD =
@@ -241,9 +218,8 @@ class IsotonicRegressionSuite
     val predictions =
       testRDD.map(x => (x, model.predict(x))).collect().sortBy(_._1).map(_._2)
     assert(predictions === Array(1, 1, 1.5, 1.75, 2, 10.0 / 3, 10.0 / 3))
-  }
 
-  test("antitonic regression prediction") {
+  test("antitonic regression prediction")
     val model = runIsotonicRegression(Seq(7, 5, 3, 5, 1), false)
 
     assert(model.predict(-2) === 7)
@@ -253,9 +229,8 @@ class IsotonicRegressionSuite
     assert(model.predict(1) === 5)
     assert(model.predict(2) === 4)
     assert(model.predict(9) === 1)
-  }
 
-  test("model construction") {
+  test("model construction")
     val model = new IsotonicRegressionModel(
         Array(0.0, 1.0), Array(1.0, 2.0), isotonic = true)
     assert(model.predict(-0.5) === 1.0)
@@ -264,27 +239,21 @@ class IsotonicRegressionSuite
     assert(model.predict(1.0) === 2.0)
     assert(model.predict(1.5) === 2.0)
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // different array sizes.
       new IsotonicRegressionModel(Array(0.0, 1.0), Array(1.0), isotonic = true)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // unordered boundaries
       new IsotonicRegressionModel(
           Array(1.0, 0.0), Array(1.0, 2.0), isotonic = true)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // unordered predictions (isotonic)
       new IsotonicRegressionModel(
           Array(0.0, 1.0), Array(2.0, 1.0), isotonic = true)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       // unordered predictions (antitonic)
       new IsotonicRegressionModel(
           Array(0.0, 1.0), Array(1.0, 2.0), isotonic = false)
-    }
-  }
-}

@@ -11,7 +11,7 @@ import akka.http.impl.settings.HostConnectionPoolSetup
 
 import scala.concurrent.ExecutionContextExecutor
 
-abstract class HostConnectionPool private[http] {
+abstract class HostConnectionPool private[http]
   def setup: HostConnectionPoolSetup
 
   /**
@@ -20,4 +20,3 @@ abstract class HostConnectionPool private[http] {
     * The produced [[CompletionStage]] is fulfilled when the shutdown has been completed.
     */
   def shutdown(ec: ExecutionContextExecutor): CompletionStage[Done]
-}

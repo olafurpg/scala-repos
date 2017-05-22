@@ -2,86 +2,76 @@ trait Contravariant[-X]
 trait Invariant[X]
 trait Covariant[+X]
 
-abstract class M {
+abstract class M
   type H
   type L <: H
   type T >: L <: H
 
-  def h1(x: Contravariant[H]) = {
+  def h1(x: Contravariant[H]) =
     /* nowarn */
     println(x.isInstanceOf[Contravariant[H]])
     /* nowarn */
     println(x.isInstanceOf[Contravariant[T]])
     /* nowarn */
     println(x.isInstanceOf[Contravariant[L]])
-  }
-  def h2(x: Contravariant[T]) = {
+  def h2(x: Contravariant[T]) =
     /*   warn */
     println(x.isInstanceOf[Contravariant[H]])
     /* nowarn */
     println(x.isInstanceOf[Contravariant[T]])
     /* nowarn */
     println(x.isInstanceOf[Contravariant[L]])
-  }
-  def h3(x: Contravariant[L]) = {
+  def h3(x: Contravariant[L]) =
     /*   warn */
     println(x.isInstanceOf[Contravariant[H]])
     /*   warn */
     println(x.isInstanceOf[Contravariant[T]])
     /* nowarn */
     println(x.isInstanceOf[Contravariant[L]])
-  }
-  def h4(x: Invariant[H]) = {
+  def h4(x: Invariant[H]) =
     /* nowarn */
     println(x.isInstanceOf[Invariant[H]])
     /*   warn */
     println(x.isInstanceOf[Invariant[T]])
     /*   warn */
     println(x.isInstanceOf[Invariant[L]])
-  }
-  def h5(x: Invariant[T]) = {
+  def h5(x: Invariant[T]) =
     /*   warn */
     println(x.isInstanceOf[Invariant[H]])
     /* nowarn */
     println(x.isInstanceOf[Invariant[T]])
     /*   warn */
     println(x.isInstanceOf[Invariant[L]])
-  }
-  def h6(x: Invariant[L]) = {
+  def h6(x: Invariant[L]) =
     /*   warn */
     println(x.isInstanceOf[Invariant[H]])
     /*   warn */
     println(x.isInstanceOf[Invariant[T]])
     /* nowarn */
     println(x.isInstanceOf[Invariant[L]])
-  }
-  def h7(x: Covariant[H]) = {
+  def h7(x: Covariant[H]) =
     /* nowarn */
     println(x.isInstanceOf[Covariant[H]])
     /*   warn */
     println(x.isInstanceOf[Covariant[T]])
     /*   warn */
     println(x.isInstanceOf[Covariant[L]])
-  }
-  def h8(x: Covariant[T]) = {
+  def h8(x: Covariant[T]) =
     /* nowarn */
     println(x.isInstanceOf[Covariant[H]])
     /* nowarn */
     println(x.isInstanceOf[Covariant[T]])
     /*   warn */
     println(x.isInstanceOf[Covariant[L]])
-  }
-  def h9(x: Covariant[L]) = {
+  def h9(x: Covariant[L]) =
     /* nowarn */
     println(x.isInstanceOf[Covariant[H]])
     /* nowarn */
     println(x.isInstanceOf[Covariant[T]])
     /* nowarn */
     println(x.isInstanceOf[Covariant[L]])
-  }
-}
 
-object Test extends M {
+object Test extends M
   type H = Any
   type T = Int
   type L = Nothing
@@ -98,7 +88,7 @@ object Test extends M {
   val covt = new Covariant[T] {}
   val covl = new Covariant[L] {}
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     h1(conh)
     h2(conh)
     h2(cont)
@@ -116,5 +106,3 @@ object Test extends M {
     h8(covt)
     h8(covl)
     h9(covl)
-  }
-}

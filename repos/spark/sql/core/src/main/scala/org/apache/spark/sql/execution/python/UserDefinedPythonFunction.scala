@@ -26,15 +26,12 @@ import org.apache.spark.sql.types.DataType
   * A user-defined Python function. This is used by the Python API.
   */
 case class UserDefinedPythonFunction(
-    name: String, func: PythonFunction, dataType: DataType) {
+    name: String, func: PythonFunction, dataType: DataType)
 
-  def builder(e: Seq[Expression]): PythonUDF = {
+  def builder(e: Seq[Expression]): PythonUDF =
     PythonUDF(name, func, dataType, e)
-  }
 
   /** Returns a [[Column]] that will evaluate to calling this UDF with the given input. */
-  def apply(exprs: Column*): Column = {
+  def apply(exprs: Column*): Column =
     val udf = builder(exprs.map(_.expr))
     Column(udf)
-  }
-}

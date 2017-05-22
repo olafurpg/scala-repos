@@ -21,9 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.BLAS._
 import org.apache.spark.mllib.util.TestingUtils._
 
-class BLASSuite extends SparkFunSuite {
+class BLASSuite extends SparkFunSuite
 
-  test("copy") {
+  test("copy")
     val sx = Vectors.sparse(4, Array(0, 2), Array(1.0, -2.0))
     val dx = Vectors.dense(1.0, 0.0, -2.0, 0.0)
     val sy = Vectors.sparse(4, Array(0, 1, 3), Array(2.0, 1.0, 1.0))
@@ -37,22 +37,17 @@ class BLASSuite extends SparkFunSuite {
     copy(dx, dy2)
     assert(dy2 ~== dx absTol 1e-15)
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       copy(sx, sy)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       copy(dx, sy)
-    }
 
-    withClue("vector sizes must match") {
-      intercept[Exception] {
+    withClue("vector sizes must match")
+      intercept[Exception]
         copy(sx, Vectors.dense(0.0, 1.0, 2.0))
-      }
-    }
-  }
 
-  test("scal") {
+  test("scal")
     val a = 0.1
     val sx = Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0))
     val dx = Vectors.dense(1.0, 0.0, -2.0)
@@ -63,9 +58,8 @@ class BLASSuite extends SparkFunSuite {
 
     scal(a, dx)
     assert(dx ~== Vectors.dense(0.1, 0.0, -0.2) absTol 1e-15)
-  }
 
-  test("axpy") {
+  test("axpy")
     val alpha = 0.1
     val sx = Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0))
     val dx = Vectors.dense(1.0, 0.0, -2.0)
@@ -82,22 +76,17 @@ class BLASSuite extends SparkFunSuite {
 
     val sy = Vectors.sparse(4, Array(0, 1), Array(2.0, 1.0))
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       axpy(alpha, sx, sy)
-    }
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       axpy(alpha, dx, sy)
-    }
 
-    withClue("vector sizes must match") {
-      intercept[Exception] {
+    withClue("vector sizes must match")
+      intercept[Exception]
         axpy(alpha, sx, Vectors.dense(1.0, 2.0))
-      }
-    }
-  }
 
-  test("dot") {
+  test("dot")
     val sx = Vectors.sparse(3, Array(0, 2), Array(1.0, -2.0))
     val dx = Vectors.dense(1.0, 0.0, -2.0)
     val sy = Vectors.sparse(3, Array(0, 1), Array(2.0, 1.0))
@@ -122,14 +111,11 @@ class BLASSuite extends SparkFunSuite {
     assert(dot(sx1, sx2) ~== 20.0 absTol 1e-15)
     assert(dot(sx2, sx1) ~== 20.0 absTol 1e-15)
 
-    withClue("vector sizes must match") {
-      intercept[Exception] {
+    withClue("vector sizes must match")
+      intercept[Exception]
         dot(sx, Vectors.dense(2.0, 1.0))
-      }
-    }
-  }
 
-  test("spr") {
+  test("spr")
     // test dense vector
     val alpha = 0.1
     val x = new DenseVector(Array(1.0, 2, 2.1, 4))
@@ -141,11 +127,9 @@ class BLASSuite extends SparkFunSuite {
     assert(U ~== expected absTol 1e-9)
 
     val matrix33 = new DenseVector(Array(1.0, 2, 3, 4, 5))
-    withClue("Size of vector must match the rank of matrix") {
-      intercept[Exception] {
+    withClue("Size of vector must match the rank of matrix")
+      intercept[Exception]
         spr(alpha, x, matrix33)
-      }
-    }
 
     // test sparse vector
     val sv = new SparseVector(4, Array(0, 3), Array(1.0, 2))
@@ -154,9 +138,8 @@ class BLASSuite extends SparkFunSuite {
     val expectedSparse =
       new DenseVector(Array(1.1, 2.0, 2.0, 3.0, 3.0, 3.0, 4.2, 4.0, 4.0, 4.4))
     assert(U2 ~== expectedSparse absTol 1e-15)
-  }
 
-  test("syr") {
+  test("syr")
     val dA = new DenseMatrix(4,
                              4,
                              Array(0.0,
@@ -206,28 +189,22 @@ class BLASSuite extends SparkFunSuite {
         4,
         Array(0.0, 1.2, 2.2, 3.1, 1.2, 3.2, 5.3, 4.6, 2.2, 5.3, 1.8, 3.0))
 
-    withClue("Matrix A must be a symmetric Matrix") {
-      intercept[Exception] {
+    withClue("Matrix A must be a symmetric Matrix")
+      intercept[Exception]
         syr(alpha, x, dB)
-      }
-    }
 
     val dC =
       new DenseMatrix(3, 3, Array(0.0, 1.2, 2.2, 1.2, 3.2, 5.3, 2.2, 5.3, 1.8))
 
-    withClue("Size of vector must match the rank of matrix") {
-      intercept[Exception] {
+    withClue("Size of vector must match the rank of matrix")
+      intercept[Exception]
         syr(alpha, x, dC)
-      }
-    }
 
     val y = new DenseVector(Array(0.0, 2.7, 3.5, 2.1, 1.5))
 
-    withClue("Size of vector must match the rank of matrix") {
-      intercept[Exception] {
+    withClue("Size of vector must match the rank of matrix")
+      intercept[Exception]
         syr(alpha, y, dA)
-      }
-    }
 
     val xSparse = new SparseVector(4, Array(0, 2, 3), Array(1.0, 3.0, 4.0))
     val dD = new DenseMatrix(4,
@@ -268,9 +245,8 @@ class BLASSuite extends SparkFunSuite {
                                                4.2,
                                                2.4))
     assert(dD ~== expectedSparse absTol 1e-15)
-  }
 
-  test("gemm") {
+  test("gemm")
     val dA = new DenseMatrix(
         4,
         3,
@@ -326,11 +302,9 @@ class BLASSuite extends SparkFunSuite {
     gemm(1.0, sA, B, 0.0, C17)
     assert(C17 ~== expected absTol 1e-15)
 
-    withClue("columns of A don't match the rows of B") {
-      intercept[Exception] {
+    withClue("columns of A don't match the rows of B")
+      intercept[Exception]
         gemm(1.0, dA.transpose, B, 2.0, C1)
-      }
-    }
 
     val dATman = new DenseMatrix(
         3,
@@ -376,9 +350,8 @@ class BLASSuite extends SparkFunSuite {
     assert(C14 ~== expected4 absTol 1e-15)
     assert(C15 ~== expected5 absTol 1e-15)
     assert(C16 ~== expected5 absTol 1e-15)
-  }
 
-  test("gemv") {
+  test("gemv")
 
     val dA = new DenseMatrix(
         4,
@@ -468,20 +441,15 @@ class BLASSuite extends SparkFunSuite {
     assert(y15 ~== expected3 absTol 1e-15)
     assert(y16 ~== expected3 absTol 1e-15)
 
-    withClue("columns of A don't match the rows of B") {
-      intercept[Exception] {
+    withClue("columns of A don't match the rows of B")
+      intercept[Exception]
         gemv(1.0, dA.transpose, dx, 2.0, y1)
-      }
-      intercept[Exception] {
+      intercept[Exception]
         gemv(1.0, sA.transpose, dx, 2.0, y1)
-      }
-      intercept[Exception] {
+      intercept[Exception]
         gemv(1.0, dA.transpose, sx, 2.0, y1)
-      }
-      intercept[Exception] {
+      intercept[Exception]
         gemv(1.0, sA.transpose, sx, 2.0, y1)
-      }
-    }
 
     val dAT = new DenseMatrix(
         3,
@@ -500,5 +468,3 @@ class BLASSuite extends SparkFunSuite {
     assert(sATT.multiply(dx) ~== expected absTol 1e-15)
     assert(dATT.multiply(sx) ~== expected absTol 1e-15)
     assert(sATT.multiply(sx) ~== expected absTol 1e-15)
-  }
-}

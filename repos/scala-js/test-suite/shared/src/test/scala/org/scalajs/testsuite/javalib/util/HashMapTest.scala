@@ -11,16 +11,14 @@ import java.{util => ju}
 
 import scala.reflect.ClassTag
 
-class HashMapTest extends MapTest {
+class HashMapTest extends MapTest
   def factory(): HashMapFactory = new HashMapFactory
-}
 
-object HashMapFactory {
+object HashMapFactory
   def allFactories: Iterator[MapFactory] =
     Iterator(new HashMapFactory) ++ LinkedHashMapFactory.allFactories
-}
 
-class HashMapFactory extends AbstractMapFactory {
+class HashMapFactory extends AbstractMapFactory
   override def implementationName: String =
     "java.util.HashMap"
 
@@ -29,4 +27,3 @@ class HashMapFactory extends AbstractMapFactory {
 
   def allowsNullKeys: Boolean = true
   def allowsNullValues: Boolean = true
-}

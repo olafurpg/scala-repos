@@ -9,7 +9,7 @@ import com.intellij.refactoring.changeSignature.ThrownExceptionInfo
   * Nikolay.Tropin
   * 2014-08-28
   */
-private[changeInfo] trait UnsupportedJavaInfo {
+private[changeInfo] trait UnsupportedJavaInfo
 
   def getNewExceptions: Array[ThrownExceptionInfo] = Array()
 
@@ -19,4 +19,3 @@ private[changeInfo] trait UnsupportedJavaInfo {
 
   def getMethodsToPropagateParameters: util.Collection[PsiMethod] =
     util.Collections.emptyList()
-}

@@ -15,19 +15,16 @@ package kafka.api
 import kafka.zk.ZooKeeperTestHarness
 import org.junit.{After, Before}
 
-trait SaslTestHarness extends ZooKeeperTestHarness with SaslSetup {
+trait SaslTestHarness extends ZooKeeperTestHarness with SaslSetup
   protected val zkSaslEnabled: Boolean
 
   @Before
-  override def setUp() {
+  override def setUp()
     if (zkSaslEnabled) startSasl(Both)
     else startSasl(KafkaSasl)
     super.setUp
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     super.tearDown
     closeSasl()
-  }
-}

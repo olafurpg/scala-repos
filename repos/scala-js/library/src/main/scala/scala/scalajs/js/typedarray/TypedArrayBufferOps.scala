@@ -21,7 +21,7 @@ import java.nio._
   */
 final class TypedArrayBufferOps[ // scalastyle:ignore
     TypedArrayType <: TypedArray[_, TypedArrayType]](val buffer: Buffer)
-    extends AnyVal {
+    extends AnyVal
 
   /** Tests whether this buffer has a valid associated [[ArrayBuffer]].
     *
@@ -83,12 +83,11 @@ final class TypedArrayBufferOps[ // scalastyle:ignore
     TypedArrayBufferBridge
       .Buffer_typedArray(buffer)
       .asInstanceOf[TypedArrayType]
-}
 
 /** Extensions to [[java.nio.Buffer Buffer]]s for interoperability with
   *  JavaScript Typed Arrays.
   */
-object TypedArrayBufferOps {
+object TypedArrayBufferOps
   implicit def bufferOps(
       buffer: Buffer): TypedArrayBufferOps[_ <: TypedArray[_, _]] =
     new TypedArrayBufferOps(buffer)
@@ -120,4 +119,3 @@ object TypedArrayBufferOps {
   implicit def doubleBufferOps(
       buffer: DoubleBuffer): TypedArrayBufferOps[Float64Array] =
     new TypedArrayBufferOps(buffer)
-}

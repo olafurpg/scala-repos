@@ -2,18 +2,16 @@ import scala.language._
 
 trait R[+Repr]
 
-trait TraversableOps {
+trait TraversableOps
   implicit val R: R[Nothing] = ???
 
   // Removing the implicit parameter in both fixes the crash
   // removing it into one only gives a valid compiler error.
-  trait OpsDup1[Repr] {
+  trait OpsDup1[Repr]
     def force(implicit bf: R[Repr]): Any
-  }
 
-  trait Ops[Repr] extends OpsDup1[Repr] {
+  trait Ops[Repr] extends OpsDup1[Repr]
     def force(implicit bf: R[Repr], dummy: DummyImplicit): Any
-  }
 
   implicit def ct2ops[T, C[+X]](t: C[T]): Ops[C[T]]
 
@@ -29,4 +27,3 @@ trait TraversableOps {
   instantiated <:< pt
    */
   def foo[T, C[+X]]: Ops[C[T]]
-}

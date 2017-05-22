@@ -28,12 +28,11 @@ import org.apache.spark.sql.internal.{SessionState, SQLConf}
   * A class that holds all session-specific state in a given [[HiveContext]].
   */
 private[hive] class HiveSessionState(ctx: HiveContext)
-    extends SessionState(ctx) {
+    extends SessionState(ctx)
 
-  override lazy val conf: SQLConf = new SQLConf {
+  override lazy val conf: SQLConf = new SQLConf
     override def caseSensitiveAnalysis: Boolean =
       getConf(SQLConf.CASE_SENSITIVE, false)
-  }
 
   /**
     * A metadata catalog that points to the Hive metastore.
@@ -45,23 +44,20 @@ private[hive] class HiveSessionState(ctx: HiveContext)
     * Internal catalog for managing functions registered by the user.
     * Note that HiveUDFs will be overridden by functions registered in this context.
     */
-  override lazy val functionRegistry: FunctionRegistry = {
+  override lazy val functionRegistry: FunctionRegistry =
     new HiveFunctionRegistry(
         FunctionRegistry.builtin.copy(), ctx.executionHive)
-  }
 
   /**
     * An analyzer that uses the Hive metastore.
     */
-  override lazy val analyzer: Analyzer = {
-    new Analyzer(catalog, functionRegistry, conf) {
+  override lazy val analyzer: Analyzer =
+    new Analyzer(catalog, functionRegistry, conf)
       override val extendedResolutionRules =
         catalog.ParquetConversions :: catalog.CreateTables :: catalog.PreInsertionCasts :: python.ExtractPythonUDFs :: PreInsertCastAndRename :: DataSourceAnalysis ::
         (if (conf.runSQLOnFile) new ResolveDataSource(ctx) :: Nil else Nil)
 
       override val extendedCheckRules = Seq(PreWriteCheck(catalog))
-    }
-  }
 
   /**
     * Parser for HiveQl query texts.
@@ -71,12 +67,12 @@ private[hive] class HiveSessionState(ctx: HiveContext)
   /**
     * Planner that takes into account Hive-specific strategies.
     */
-  override lazy val planner: SparkPlanner = {
+  override lazy val planner: SparkPlanner =
     new SparkPlanner(ctx.sparkContext, conf, experimentalMethods)
-    with HiveStrategies {
+    with HiveStrategies
       override val hiveContext = ctx
 
-      override def strategies: Seq[Strategy] = {
+      override def strategies: Seq[Strategy] =
         experimentalMethods.extraStrategies ++ Seq(
             FileSourceStrategy,
             DataSourceStrategy,
@@ -96,7 +92,3 @@ private[hive] class HiveSessionState(ctx: HiveContext)
             CartesianProduct,
             DefaultJoin
         )
-      }
-    }
-  }
-}

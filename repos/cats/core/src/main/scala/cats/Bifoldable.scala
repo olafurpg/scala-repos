@@ -3,7 +3,7 @@ package cats
 /**
   * A type class abstracting over types that give rise to two independent [[cats.Foldable]]s.
   */
-trait Bifoldable[F[_, _]] extends Any with Serializable { self =>
+trait Bifoldable[F[_, _]] extends Any with Serializable  self =>
 
   /** Collapse the structure with a left-associative function */
   def bifoldLeft[A, B, C](fab: F[A, B], c: C)(
@@ -23,18 +23,15 @@ trait Bifoldable[F[_, _]] extends Any with Serializable { self =>
 
   def compose[G[_, _]](implicit ev: Bifoldable[G])
     : Bifoldable[Lambda[(A, B) => F[G[A, B], G[A, B]]]] =
-    new CompositeBifoldable[F, G] {
+    new CompositeBifoldable[F, G]
       val F = self
       val G = ev
-    }
-}
 
-object Bifoldable {
+object Bifoldable
   def apply[F[_, _]](implicit F: Bifoldable[F]): Bifoldable[F] = F
-}
 
 trait CompositeBifoldable[F[_, _], G[_, _]]
-    extends Bifoldable[Lambda[(A, B) => F[G[A, B], G[A, B]]]] {
+    extends Bifoldable[Lambda[(A, B) => F[G[A, B], G[A, B]]]]
   implicit def F: Bifoldable[F]
   implicit def G: Bifoldable[G]
 
@@ -51,4 +48,3 @@ trait CompositeBifoldable[F[_, _], G[_, _]]
         (gab: G[A, B], c: Eval[C]) => G.bifoldRight(gab, c)(f, g),
         (gab: G[A, B], c: Eval[C]) => G.bifoldRight(gab, c)(f, g)
     )
-}

@@ -13,7 +13,7 @@ import scala.annotation.tailrec
   * little bit of extra cost. If you want a cheaper Publisher, use
   * RelaxedPublisher.
   */
-private[streams] abstract class CheckingPublisher[T] extends Publisher[T] {
+private[streams] abstract class CheckingPublisher[T] extends Publisher[T]
   self: SubscriptionFactory[T] =>
 
   /**
@@ -23,33 +23,28 @@ private[streams] abstract class CheckingPublisher[T] extends Publisher[T] {
     new AtomicReference[List[SubscriptionHandle[_]]](Nil)
 
   // Streams method
-  final override def subscribe(subr: Subscriber[_ >: T]): Unit = {
+  final override def subscribe(subr: Subscriber[_ >: T]): Unit =
     val handle: SubscriptionHandle[_] = createSubscription(
         subr, removeSubscription)
 
     @tailrec
-    def addSubscription(): Unit = {
+    def addSubscription(): Unit =
       val oldSubscriptions = subscriptions.get
-      if (oldSubscriptions.exists(s => (s.subscriber eq subr) && s.isActive)) {
+      if (oldSubscriptions.exists(s => (s.subscriber eq subr) && s.isActive))
         subr.onError(new IllegalStateException(
                 "Subscriber is already subscribed to this Publisher"))
-      } else {
+      else
         val newSubscriptions: List[SubscriptionHandle[_]] =
           handle :: oldSubscriptions
-        if (subscriptions.compareAndSet(oldSubscriptions, newSubscriptions)) {
+        if (subscriptions.compareAndSet(oldSubscriptions, newSubscriptions))
           handle.start()
-        } else addSubscription()
-      }
-    }
+        else addSubscription()
     addSubscription()
-  }
 
   @tailrec
-  private def removeSubscription(subscription: SubscriptionHandle[_]): Unit = {
+  private def removeSubscription(subscription: SubscriptionHandle[_]): Unit =
     val oldSubscriptions = subscriptions.get
     val newSubscriptions =
       oldSubscriptions.filterNot(_.subscriber eq subscription.subscriber)
     if (subscriptions.compareAndSet(oldSubscriptions, newSubscriptions)) ()
     else removeSubscription(subscription)
-  }
-}

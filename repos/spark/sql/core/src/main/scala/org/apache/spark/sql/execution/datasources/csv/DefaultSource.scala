@@ -38,7 +38,7 @@ import org.apache.spark.util.collection.BitSet
 /**
   * Provides access to CSV data from pure SQL statements.
   */
-class DefaultSource extends FileFormat with DataSourceRegister {
+class DefaultSource extends FileFormat with DataSourceRegister
 
   override def shortName(): String = "csv"
 
@@ -48,7 +48,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
 
   override def inferSchema(sqlContext: SQLContext,
                            options: Map[String, String],
-                           files: Seq[FileStatus]): Option[StructType] = {
+                           files: Seq[FileStatus]): Option[StructType] =
     val csvOptions = new CSVOptions(options)
 
     // TODO: Move filtering.
@@ -59,38 +59,32 @@ class DefaultSource extends FileFormat with DataSourceRegister {
     val firstRow = new LineCsvReader(csvOptions).parseLine(firstLine)
 
     val header =
-      if (csvOptions.headerFlag) {
+      if (csvOptions.headerFlag)
         firstRow
-      } else {
+      else
         firstRow.zipWithIndex.map { case (value, index) => s"C$index" }
-      }
 
     val parsedRdd = tokenRdd(sqlContext, csvOptions, header, paths)
     val schema =
-      if (csvOptions.inferSchemaFlag) {
+      if (csvOptions.inferSchemaFlag)
         CSVInferSchema.infer(parsedRdd, header, csvOptions.nullValue)
-      } else {
+      else
         // By default fields are assumed to be StringType
-        val schemaFields = header.map { fieldName =>
+        val schemaFields = header.map  fieldName =>
           StructField(fieldName.toString, StringType, nullable = true)
-        }
         StructType(schemaFields)
-      }
     Some(schema)
-  }
 
   override def prepareWrite(sqlContext: SQLContext,
                             job: Job,
                             options: Map[String, String],
-                            dataSchema: StructType): OutputWriterFactory = {
+                            dataSchema: StructType): OutputWriterFactory =
     val conf = job.getConfiguration
     val csvOptions = new CSVOptions(options)
-    csvOptions.compressionCodec.foreach { codec =>
+    csvOptions.compressionCodec.foreach  codec =>
       CompressionCodecs.setCodecConfiguration(conf, codec)
-    }
 
     new CSVOutputWriterFactory(csvOptions)
-  }
 
   /**
     * This supports to eliminate unneeded columns before producing an RDD
@@ -106,7 +100,7 @@ class DefaultSource extends FileFormat with DataSourceRegister {
       bucketSet: Option[BitSet],
       inputFiles: Seq[FileStatus],
       broadcastedConf: Broadcast[SerializableConfiguration],
-      options: Map[String, String]): RDD[InternalRow] = {
+      options: Map[String, String]): RDD[InternalRow] =
     // TODO: Filter before calling buildInternalScan.
     val csvFiles = inputFiles.filterNot(_.getPath.getName startsWith "_")
 
@@ -123,56 +117,47 @@ class DefaultSource extends FileFormat with DataSourceRegister {
 
     val requiredDataSchema = StructType(
         requiredColumns.map(c => dataSchema.find(_.name == c).get))
-    rows.mapPartitions { iterator =>
+    rows.mapPartitions  iterator =>
       val unsafeProjection = UnsafeProjection.create(requiredDataSchema)
       iterator.map(unsafeProjection)
-    }
-  }
 
   private def baseRdd(sqlContext: SQLContext,
                       options: CSVOptions,
-                      inputPaths: Seq[String]): RDD[String] = {
+                      inputPaths: Seq[String]): RDD[String] =
     readText(sqlContext, options, inputPaths.mkString(","))
-  }
 
   private def tokenRdd(sqlContext: SQLContext,
                        options: CSVOptions,
                        header: Array[String],
-                       inputPaths: Seq[String]): RDD[Array[String]] = {
+                       inputPaths: Seq[String]): RDD[Array[String]] =
     val rdd = baseRdd(sqlContext, options, inputPaths)
     // Make sure firstLine is materialized before sending to executors
     val firstLine =
       if (options.headerFlag) findFirstLine(options, rdd) else null
     CSVRelation.univocityTokenizer(rdd, header, firstLine, options)
-  }
 
   /**
     * Returns the first line of the first non-empty file in path
     */
-  private def findFirstLine(options: CSVOptions, rdd: RDD[String]): String = {
-    if (options.isCommentSet) {
+  private def findFirstLine(options: CSVOptions, rdd: RDD[String]): String =
+    if (options.isCommentSet)
       val comment = options.comment.toString
-      rdd.filter { line =>
+      rdd.filter  line =>
         line.trim.nonEmpty && !line.startsWith(comment)
-      }.first()
-    } else {
-      rdd.filter { line =>
+      .first()
+    else
+      rdd.filter  line =>
         line.trim.nonEmpty
-      }.first()
-    }
-  }
+      .first()
 
   private def readText(sqlContext: SQLContext,
                        options: CSVOptions,
-                       location: String): RDD[String] = {
-    if (Charset.forName(options.charset) == StandardCharsets.UTF_8) {
+                       location: String): RDD[String] =
+    if (Charset.forName(options.charset) == StandardCharsets.UTF_8)
       sqlContext.sparkContext.textFile(location)
-    } else {
+    else
       val charset = options.charset
       sqlContext.sparkContext
         .hadoopFile[LongWritable, Text, TextInputFormat](location)
         .mapPartitions(_.map(pair =>
                   new String(pair._2.getBytes, 0, pair._2.getLength, charset)))
-    }
-  }
-}

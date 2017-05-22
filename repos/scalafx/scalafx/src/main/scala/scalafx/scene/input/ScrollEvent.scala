@@ -33,14 +33,14 @@ import scalafx.Includes._
 import scalafx.delegate.{SFXDelegate, SFXEnumDelegate, SFXEnumDelegateCompanion}
 import scalafx.event.EventType
 
-object ScrollEvent {
+object ScrollEvent
   implicit def sfxScrollEvent2jfx(se: ScrollEvent): jfxsi.ScrollEvent =
     if (se != null) se.delegate else null
 
   object HorizontalTextScrollUnits
       extends SFXEnumDelegateCompanion[
           jfxsi.ScrollEvent.HorizontalTextScrollUnits,
-          HorizontalTextScrollUnits] {
+          HorizontalTextScrollUnits]
 
     /**
       * The horizontal text-based scrolling amount is a number of characters to scroll.
@@ -63,7 +63,6 @@ object ScrollEvent {
 
     protected override def unsortedValues: Array[HorizontalTextScrollUnits] =
       Array(None, Characters)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ScrollEvent.HorizontalTextScrollUnits.html]]
@@ -74,7 +73,7 @@ object ScrollEvent {
 
   object VerticalTextScrollUnits
       extends SFXEnumDelegateCompanion[
-          jfxsi.ScrollEvent.VerticalTextScrollUnits, VerticalTextScrollUnits] {
+          jfxsi.ScrollEvent.VerticalTextScrollUnits, VerticalTextScrollUnits]
 
     /**
       * The vertical text-based scrolling amount is a number of lines to scroll.
@@ -105,7 +104,6 @@ object ScrollEvent {
 
     protected override def unsortedValues: Array[VerticalTextScrollUnits] =
       Array(None, Lines, Pages)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ScrollEvent.VerticalTextScrollUnits.html]]
@@ -149,13 +147,12 @@ object ScrollEvent {
       "Use ScrollStarted; SCROLL_STARTED will be removed in a future release",
       "8.0.60-R10")
   val SCROLL_STARTED = ScrollStarted
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/ScrollEvent.html]]
   */
 class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
-    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ScrollEvent] {
+    extends GestureEvent(delegate) with SFXDelegate[jfxsi.ScrollEvent]
 
   /**
     * Gets the horizontal scroll amount.
@@ -190,4 +187,3 @@ class ScrollEvent(override val delegate: jfxsi.ScrollEvent)
   def textDeltaYUnits: ScrollEvent.VerticalTextScrollUnits =
     ScrollEvent.VerticalTextScrollUnits.jfxEnum2sfx(
         delegate.getTextDeltaYUnits)
-}

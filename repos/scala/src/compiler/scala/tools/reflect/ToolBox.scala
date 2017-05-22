@@ -1,7 +1,7 @@
 package scala.tools
 package reflect
 
-trait ToolBox[U <: scala.reflect.api.Universe] {
+trait ToolBox[U <: scala.reflect.api.Universe]
 
   /** Underlying universe of a ToolBox
     */
@@ -151,7 +151,6 @@ trait ToolBox[U <: scala.reflect.api.Universe] {
     *  Is equivalent to `compile(tree)()`.
     */
   def eval(tree: u.Tree): Any
-}
 
 /** Represents an error during toolboxing
   */

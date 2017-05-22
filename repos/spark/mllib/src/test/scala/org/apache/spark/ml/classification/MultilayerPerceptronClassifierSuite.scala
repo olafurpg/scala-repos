@@ -27,10 +27,10 @@ import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.sql.Row
 
 class MultilayerPerceptronClassifierSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite with MLlibTestSparkContext
 
   test(
-      "XOR function learning as binary classification problem with two outputs.") {
+      "XOR function learning as binary classification problem with two outputs.")
     val dataFrame = sqlContext
       .createDataFrame(Seq((Vectors.dense(0.0, 0.0), 0.0),
                            (Vectors.dense(0.0, 1.0), 1.0),
@@ -46,14 +46,12 @@ class MultilayerPerceptronClassifierSuite
     val model = trainer.fit(dataFrame)
     val result = model.transform(dataFrame)
     val predictionAndLabels = result.select("prediction", "label").collect()
-    predictionAndLabels.foreach {
+    predictionAndLabels.foreach
       case Row(p: Double, l: Double) =>
         assert(p == l)
-    }
-  }
 
   // TODO: implement a more rigorous test
-  test("3 class classification with 2 hidden layers") {
+  test("3 class classification with 2 hidden layers")
     val nPoints = 1000
 
     // The following coefficients are taken from OneVsRestSuite.scala
@@ -90,9 +88,8 @@ class MultilayerPerceptronClassifierSuite
       dataFrame.select("features").first().getAs[Vector](0).size
     assert(model.numFeatures === numFeatures)
     val mlpPredictionAndLabels =
-      model.transform(dataFrame).select("prediction", "label").rdd.map {
+      model.transform(dataFrame).select("prediction", "label").rdd.map
         case Row(p: Double, l: Double) => (p, l)
-      }
     // train multinomial logistic regression
     val lr = new LogisticRegressionWithLBFGS()
       .setIntercept(true)
@@ -105,5 +102,3 @@ class MultilayerPerceptronClassifierSuite
     val lrMetrics = new MulticlassMetrics(lrPredictionAndLabels)
     val mlpMetrics = new MulticlassMetrics(mlpPredictionAndLabels)
     assert(mlpMetrics.confusionMatrix ~== lrMetrics.confusionMatrix absTol 100)
-  }
-}

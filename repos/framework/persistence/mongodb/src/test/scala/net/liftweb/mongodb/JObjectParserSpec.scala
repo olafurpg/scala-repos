@@ -26,37 +26,29 @@ import org.specs2.mutable.Specification
 
 import com.mongodb.DBObject
 
-object JObjectParserSpec extends Specification {
+object JObjectParserSpec extends Specification
   "JObjectParser Specification".title
 
-  def buildTestData: (ObjectId, DBObject) = {
+  def buildTestData: (ObjectId, DBObject) =
     val oid = ObjectId.get
     val dbo = JObjectParser.parse(("x" -> oid.toString))(DefaultFormats)
     (oid, dbo)
-  }
 
-  "JObjectParser" should {
-    "convert strings to ObjectId by default" in {
+  "JObjectParser" should
+    "convert strings to ObjectId by default" in
       val (oid, dbo) = buildTestData
       val xval = tryo(dbo.get("x").asInstanceOf[ObjectId])
 
-      xval.toList map { x =>
+      xval.toList map  x =>
         x must_== oid
-      }
 
       xval.isDefined must_== true
-    }
-    "not convert strings to ObjectId when configured not to" in {
-      JObjectParser.stringProcessor.doWith((s: String) => s) {
+    "not convert strings to ObjectId when configured not to" in
+      JObjectParser.stringProcessor.doWith((s: String) => s)
         val (oid, dbo) = buildTestData
         val xval = tryo(dbo.get("x").asInstanceOf[String])
 
-        xval.toList map { x =>
+        xval.toList map  x =>
           x must_== oid.toString
-        }
 
         xval.isDefined must_== true
-      }
-    }
-  }
-}

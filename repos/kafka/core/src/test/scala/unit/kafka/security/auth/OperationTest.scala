@@ -20,18 +20,15 @@ import kafka.common.{KafkaException}
 import org.junit.{Test, Assert}
 import org.scalatest.junit.JUnitSuite
 
-class OperationTest extends JUnitSuite {
+class OperationTest extends JUnitSuite
 
   @Test
-  def testFromString(): Unit = {
+  def testFromString(): Unit =
     val op = Operation.fromString("READ")
     Assert.assertEquals(Read, op)
 
-    try {
+    try
       Operation.fromString("badName")
       fail("Expected exception on invalid operation name.")
-    } catch {
+    catch
       case e: KafkaException => // expected
-    }
-  }
-}

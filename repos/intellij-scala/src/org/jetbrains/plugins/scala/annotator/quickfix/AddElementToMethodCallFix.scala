@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScMethodCall
   */
 class AddElementToMethodCallFix(
     call: ScMethodCall, elementToAdd: PsiElement, nameOfElement: String)
-    extends IntentionAction {
+    extends IntentionAction
   override def getText: String = s"Add $nameOfElement"
 
   override def getFamilyName: String = getText
@@ -23,7 +23,5 @@ class AddElementToMethodCallFix(
       project: Project, editor: Editor, file: PsiFile): Boolean =
     call.isValid && call.getManager.isInProject(file) && elementToAdd != null
 
-  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
+  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit =
     call.addAfter(elementToAdd, call.getLastChild)
-  }
-}

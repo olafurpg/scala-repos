@@ -26,7 +26,7 @@ import scala.concurrent.duration._
 
 class DeploymentActorTest
     extends MarathonSpec with Matchers with BeforeAndAfterAll
-    with MockitoSugar {
+    with MockitoSugar
 
   var tracker: TaskTracker = _
   var queue: LaunchQueue = _
@@ -37,16 +37,15 @@ class DeploymentActorTest
 
   implicit val defaultTimeout: Timeout = 5.seconds
 
-  before {
+  before
     driver = mock[SchedulerDriver]
     tracker = mock[TaskTracker]
     queue = mock[LaunchQueue]
     scheduler = mock[SchedulerActions]
     storage = mock[StorageProvider]
     hcManager = mock[HealthCheckManager]
-  }
 
-  test("Deploy") {
+  test("Deploy")
     implicit val system = ActorSystem("TestSystem")
     val managerProbe = TestProbe()
     val receiverProbe = TestProbe()
@@ -87,8 +86,8 @@ class DeploymentActorTest
     when(tracker.appTasksLaunchedSync(app4.id)).thenReturn(Set(task4_1))
 
     when(driver.killTask(task1_2.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(
             MesosStatusUpdateEvent(slaveId = "",
                                    taskId = Task.Id("task1_2"),
@@ -100,12 +99,11 @@ class DeploymentActorTest
                                    ports = Nil,
                                    version = app1New.version.toString))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
     when(driver.killTask(task2_1.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(
             MesosStatusUpdateEvent(slaveId = "",
                                    taskId = Task.Id("task2_1"),
@@ -117,11 +115,10 @@ class DeploymentActorTest
                                    ports = Nil,
                                    version = app2.version.toString))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
-    when(queue.add(same(app2New), any[Int])).thenAnswer(new Answer[Boolean] {
-      def answer(invocation: InvocationOnMock): Boolean = {
+    when(queue.add(same(app2New), any[Int])).thenAnswer(new Answer[Boolean]
+      def answer(invocation: InvocationOnMock): Boolean =
         println(invocation.getArguments.toSeq)
         for (i <- 0 until invocation.getArguments()(1).asInstanceOf[Int]) system.eventStream
           .publish(MesosStatusUpdateEvent(slaveId = "",
@@ -134,19 +131,17 @@ class DeploymentActorTest
                                           ports = Nil,
                                           version = app2New.version.toString))
         true
-      }
-    })
+    )
 
     when(scheduler.startApp(driver, app3))
-      .thenAnswer(new Answer[Future[Unit]] {
-      def answer(invocation: InvocationOnMock): Future[Unit] = {
+      .thenAnswer(new Answer[Future[Unit]]
+      def answer(invocation: InvocationOnMock): Future[Unit] =
         // system.eventStream.publish(MesosStatusUpdateEvent("", "task3_1", "TASK_RUNNING", "", app3.id, "", "", Nil, app3.version.toString))
         Future.successful(())
-      }
-    })
+    )
 
-    when(scheduler.scale(driver, app3)).thenAnswer(new Answer[Future[Unit]] {
-      def answer(invocation: InvocationOnMock): Future[Unit] = {
+    when(scheduler.scale(driver, app3)).thenAnswer(new Answer[Future[Unit]]
+      def answer(invocation: InvocationOnMock): Future[Unit] =
         system.eventStream.publish(
             MesosStatusUpdateEvent(slaveId = "",
                                    taskId = Task.Id("task3_1"),
@@ -158,12 +153,11 @@ class DeploymentActorTest
                                    ports = Nil,
                                    version = app3.version.toString))
         Future.successful(())
-      }
-    })
+    )
 
     when(driver.killTask(task4_1.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(MesosStatusUpdateEvent(
                 slaveId = "",
                 taskId = Task.Id("task4_1"),
@@ -176,10 +170,9 @@ class DeploymentActorTest
                 version = app4.version.toString
             ))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
-    try {
+    try
       TestActorRef(
           DeploymentActor.props(
               managerProbe.ref,
@@ -195,23 +188,20 @@ class DeploymentActorTest
           )
       )
 
-      plan.steps.zipWithIndex.foreach {
+      plan.steps.zipWithIndex.foreach
         case (step, num) =>
           managerProbe.expectMsg(5.seconds,
                                  DeploymentStepInfo(plan, step, num + 1))
-      }
 
       managerProbe.expectMsg(5.seconds, DeploymentFinished(plan))
 
       verify(scheduler).startApp(driver, app3.copy(instances = 0))
       verify(driver, times(1)).killTask(task1_2.taskId.mesosTaskId)
       verify(scheduler).stopApp(driver, app4.copy(instances = 0))
-    } finally {
+    finally
       system.shutdown()
-    }
-  }
 
-  test("Restart app") {
+  test("Restart app")
     implicit val system = ActorSystem("TestSystem")
     val managerProbe = TestProbe()
     val receiverProbe = TestProbe()
@@ -240,8 +230,8 @@ class DeploymentActorTest
                      Timestamp.now())
 
     when(driver.killTask(task1_1.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(
             MesosStatusUpdateEvent("",
                                    Task.Id("task1_1"),
@@ -253,12 +243,11 @@ class DeploymentActorTest
                                    Nil,
                                    app.version.toString))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
     when(driver.killTask(task1_2.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(
             MesosStatusUpdateEvent("",
                                    Task.Id("task1_2"),
@@ -270,17 +259,16 @@ class DeploymentActorTest
                                    Nil,
                                    app.version.toString))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
     val taskIDs = Iterator.from(3)
 
-    when(queue.count(appNew.id)).thenAnswer(new Answer[Int] {
+    when(queue.count(appNew.id)).thenAnswer(new Answer[Int]
       override def answer(p1: InvocationOnMock): Int = appNew.instances
-    })
+    )
 
-    when(queue.add(same(appNew), any[Int])).thenAnswer(new Answer[Boolean] {
-      def answer(invocation: InvocationOnMock): Boolean = {
+    when(queue.add(same(appNew), any[Int])).thenAnswer(new Answer[Boolean]
+      def answer(invocation: InvocationOnMock): Boolean =
         for (i <- 0 until invocation.getArguments()(1).asInstanceOf[Int]) system.eventStream
           .publish(MesosStatusUpdateEvent("",
                                           Task.Id(s"task1_${taskIDs.next()}"),
@@ -292,10 +280,9 @@ class DeploymentActorTest
                                           Nil,
                                           appNew.version.toString))
         true
-      }
-    })
+    )
 
-    try {
+    try
       TestActorRef(
           DeploymentActor.props(
               managerProbe.ref,
@@ -316,12 +303,10 @@ class DeploymentActorTest
       verify(driver).killTask(task1_1.taskId.mesosTaskId)
       verify(driver).killTask(task1_2.taskId.mesosTaskId)
       verify(queue).add(appNew, 2)
-    } finally {
+    finally
       system.shutdown()
-    }
-  }
 
-  test("Restart suspended app") {
+  test("Restart suspended app")
     implicit val system = ActorSystem("TestSystem")
     val managerProbe = TestProbe()
     val receiverProbe = TestProbe()
@@ -343,7 +328,7 @@ class DeploymentActorTest
 
     when(tracker.appTasksLaunchedSync(app.id)).thenReturn(Iterable.empty[Task])
 
-    try {
+    try
       TestActorRef(
           DeploymentActor.props(
               managerProbe.ref,
@@ -360,12 +345,10 @@ class DeploymentActorTest
       )
 
       receiverProbe.expectMsg(DeploymentFinished(plan))
-    } finally {
+    finally
       system.shutdown()
-    }
-  }
 
-  test("Scale with tasksToKill") {
+  test("Scale with tasksToKill")
     implicit val system = ActorSystem("TestSystem")
     val managerProbe = TestProbe()
     val receiverProbe = TestProbe()
@@ -393,8 +376,8 @@ class DeploymentActorTest
       .thenReturn(Set(task1_1, task1_2, task1_3))
 
     when(driver.killTask(task1_2.taskId.mesosTaskId))
-      .thenAnswer(new Answer[Status] {
-      def answer(invocation: InvocationOnMock): Status = {
+      .thenAnswer(new Answer[Status]
+      def answer(invocation: InvocationOnMock): Status =
         system.eventStream.publish(
             MesosStatusUpdateEvent("",
                                    Task.Id("task1_2"),
@@ -406,10 +389,9 @@ class DeploymentActorTest
                                    Nil,
                                    app1New.version.toString))
         Status.DRIVER_RUNNING
-      }
-    })
+    )
 
-    try {
+    try
       TestActorRef(
           DeploymentActor.props(
               managerProbe.ref,
@@ -425,18 +407,14 @@ class DeploymentActorTest
           )
       )
 
-      plan.steps.zipWithIndex.foreach {
+      plan.steps.zipWithIndex.foreach
         case (step, num) =>
           managerProbe.expectMsg(5.seconds,
                                  DeploymentStepInfo(plan, step, num + 1))
-      }
 
       managerProbe.expectMsg(5.seconds, DeploymentFinished(plan))
 
       verify(driver, times(1)).killTask(task1_2.taskId.mesosTaskId)
       verifyNoMoreInteractions(driver)
-    } finally {
+    finally
       system.shutdown()
-    }
-  }
-}

@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionNamedTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionNamedTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/named/"
-  }
 
   def testClash1() = doTest()
   def testClash2() = doTest()
@@ -21,4 +20,3 @@ class FunctionNamedTest extends ResolveTestBase {
   //TODO
 //  def testUnnamed2 = doTest
   def testUnresolved() = doTest()
-}

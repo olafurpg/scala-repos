@@ -26,13 +26,12 @@ import org.apache.hadoop.mapred.RecordReader
 import org.apache.hadoop.mapred.OutputCollector
 
 class MockMappable[T](val id: String)(implicit tconv: TupleConverter[T])
-    extends ScaldingSource with Mappable[T] {
+    extends ScaldingSource with Mappable[T]
   def converter[U >: T] = TupleConverter.asSuperConverter(tconv)
   override def toString = id
-  override def equals(that: Any) = that match {
+  override def equals(that: Any) = that match
     case m: MockMappable[_] => m.id == id
     case _ => false
-  }
   override def hashCode = id.hashCode
 
   override def createTap(readOrWrite: AccessMode)(
@@ -44,4 +43,3 @@ class MockMappable[T](val id: String)(implicit tconv: TupleConverter[T])
                        OutputCollector[_, _],
                        T,
                        T](Fields.ALL, Fields.ALL)).createTap(readOrWrite)
-}

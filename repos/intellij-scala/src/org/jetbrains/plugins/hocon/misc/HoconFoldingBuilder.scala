@@ -5,13 +5,13 @@ import com.intellij.lang.folding.{FoldingBuilder, FoldingDescriptor}
 import com.intellij.openapi.editor.Document
 import com.intellij.psi.tree.TokenSet
 
-class HoconFoldingBuilder extends FoldingBuilder {
+class HoconFoldingBuilder extends FoldingBuilder
 
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
   import org.jetbrains.plugins.hocon.parser.HoconElementType._
 
   def buildFoldRegions(
-      node: ASTNode, document: Document): Array[FoldingDescriptor] = {
+      node: ASTNode, document: Document): Array[FoldingDescriptor] =
     val foldableTypes = TokenSet.create(Object, Array, MultilineString)
     def nodesIterator(root: ASTNode): Iterator[ASTNode] =
       Iterator(root) ++ Iterator
@@ -19,19 +19,16 @@ class HoconFoldingBuilder extends FoldingBuilder {
         .takeWhile(_ != null)
         .flatMap(nodesIterator)
 
-    nodesIterator(node).collect {
+    nodesIterator(node).collect
       case n
           if foldableTypes.contains(n.getElementType) && n.getTextLength > 0 =>
         new FoldingDescriptor(n, n.getTextRange)
-    }.toArray
-  }
+    .toArray
 
   def isCollapsedByDefault(node: ASTNode) =
     false
 
-  def getPlaceholderText(node: ASTNode) = node.getElementType match {
+  def getPlaceholderText(node: ASTNode) = node.getElementType match
     case Object => "{...}"
     case Array => "[...]"
     case MultilineString => "\"\"\"...\"\"\""
-  }
-}

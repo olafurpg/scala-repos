@@ -21,7 +21,7 @@ import akka.shapeless.ops.hlist.Prepend
 import akka.parboiled2.support._
 import akka.shapeless._
 
-trait RuleDSLActions {
+trait RuleDSLActions
 
   /**
     * Pushes the input text matched by its inner rule onto the value stack
@@ -85,7 +85,5 @@ trait RuleDSLActions {
       "Calls to `rule2ActionOperator` must be inside `rule` macro")
   implicit def rule2ActionOperator[I <: HList, O <: HList](r: Rule[I, O])(
       implicit ops: ActionOps[I, O]): ActionOperator[I, O, ops.Out] = `n/a`
-  sealed trait ActionOperator[I <: HList, O <: HList, Ops] {
+  sealed trait ActionOperator[I <: HList, O <: HList, Ops]
     def ~> : Ops
-  }
-}

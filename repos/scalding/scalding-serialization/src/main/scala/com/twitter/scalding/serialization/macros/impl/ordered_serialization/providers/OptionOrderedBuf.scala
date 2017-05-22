@@ -23,17 +23,16 @@ import com.twitter.scalding.serialization.macros.impl.ordered_serialization.{Com
 import CompileTimeLengthTypes._
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object OptionOrderedBuf {
+object OptionOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe.erasure =:= c.universe.typeOf[Option[Any]] =>
       OptionOrderedBuf(c)(buildDispatcher, tpe)
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
-      outerType: c.Type): TreeOrderedBuf[c.type] = {
+      outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val dispatcher = buildDispatcher
@@ -41,7 +40,7 @@ object OptionOrderedBuf {
     val innerType = outerType.asInstanceOf[TypeRefApi].args.head
     val innerBuf: TreeOrderedBuf[c.type] = dispatcher(innerType)
 
-    def genBinaryCompare(inputStreamA: TermName, inputStreamB: TermName) = {
+    def genBinaryCompare(inputStreamA: TermName, inputStreamB: TermName) =
       val valueOfA = freshT("valueOfA")
       val valueOfB = freshT("valueOfB")
       val tmpHolder = freshT("tmpHolder")
@@ -56,9 +55,8 @@ object OptionOrderedBuf {
           ${innerBuf.compareBinary(inputStreamA, inputStreamB)}
         }
       """
-    }
 
-    def genHashFn(element: TermName) = {
+    def genHashFn(element: TermName) =
       val innerValue = freshT("innerValue")
       q"""
         if($element.isEmpty)
@@ -68,18 +66,16 @@ object OptionOrderedBuf {
           ${innerBuf.hash(innerValue)}
         }
       """
-    }
 
-    def genGetFn(inputStreamA: TermName) = {
+    def genGetFn(inputStreamA: TermName) =
       val tmpGetHolder = freshT("tmpGetHolder")
       q"""
         val $tmpGetHolder = $inputStreamA.readByte
         if($tmpGetHolder == (0: _root_.scala.Byte)) None
         else Some(${innerBuf.get(inputStreamA)})
       """
-    }
 
-    def genPutFn(inputStream: TermName, element: TermName) = {
+    def genPutFn(inputStream: TermName, element: TermName) =
       val tmpPutVal = freshT("tmpPutVal")
       val innerValue = freshT("innerValue")
       q"""
@@ -91,9 +87,8 @@ object OptionOrderedBuf {
           $inputStream.writeByte(0: _root_.scala.Byte)
         }
       """
-    }
 
-    def genCompareFn(elementA: TermName, elementB: TermName) = {
+    def genCompareFn(elementA: TermName, elementB: TermName) =
       val aIsDefined = freshT("aIsDefined")
       val bIsDefined = freshT("bIsDefined")
       val innerValueA = freshT("innerValueA")
@@ -114,9 +109,8 @@ object OptionOrderedBuf {
           }
         }
       """
-    }
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -131,8 +125,8 @@ object OptionOrderedBuf {
         genCompareFn(elementA, elementB)
       override val lazyOuterVariables: Map[String, ctx.Tree] =
         innerBuf.lazyOuterVariables
-      override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
-        innerBuf.length(q"$element.get") match {
+      override def length(element: Tree): CompileTimeLengthTypes[c.type] =
+        innerBuf.length(q"$element.get") match
           case const: ConstantLengthCalculation[_] =>
             FastLengthCalculation(c)(q"""
             if($element.isDefined) { 1 + ${const.toInt} }
@@ -153,8 +147,3 @@ object OptionOrderedBuf {
             else { $dynlen(1) }
           """)
           case _ => NoLengthCalculationAvailable(c)
-        }
-      }
-    }
-  }
-}

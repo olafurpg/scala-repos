@@ -35,7 +35,7 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.shape.{StrokeLineCap, StrokeLineJoin, StrokeType}
 
-object BorderStrokeStyle {
+object BorderStrokeStyle
   implicit def sfxBorderStrokeStyle2jfx(
       v: BorderStrokeStyle): jfxsl.BorderStrokeStyle =
     if (v != null) v.delegate else null
@@ -59,7 +59,6 @@ object BorderStrokeStyle {
     * A predefined solid line to be used for stroking
     */
   val Solid: BorderStrokeStyle = jfxsl.BorderStrokeStyle.SOLID
-}
 
 /**
   * Defines the style of the stroke to use on one side of a BorderStroke.
@@ -67,7 +66,7 @@ object BorderStrokeStyle {
   * Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/BorderStrokeStyle.html javafx.scene.layout.BorderStrokeStyle]].
   */
 class BorderStrokeStyle(override val delegate: jfxsl.BorderStrokeStyle)
-    extends SFXDelegate[jfxsl.BorderStrokeStyle] {
+    extends SFXDelegate[jfxsl.BorderStrokeStyle]
 
   /**
     * Creates a new BorderStrokeStyle.
@@ -113,4 +112,3 @@ class BorderStrokeStyle(override val delegate: jfxsl.BorderStrokeStyle)
     * is applied to the boundary of the shape.
     */
   def strokeType: StrokeType = delegate.getType
-}

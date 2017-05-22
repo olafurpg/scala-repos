@@ -1,4 +1,4 @@
-class Foo {
+class Foo
   val v = new Object
   v.toS /*!*/
 
@@ -6,4 +6,3 @@ class Foo {
   m(1).toS /*!*/
   m(1). /*!*/
   println()
-}

@@ -4,7 +4,7 @@ import org.junit.Test
 import org.scalajs.testsuite.javalib.util.concurrent.CopyOnWriteArrayListFactory
 import org.scalajs.testsuite.utils.CollectionsTestBase
 
-class CollectionsOnCopyOnWriteArrayListTestOnJDK8 extends CollectionsTestBase {
+class CollectionsOnCopyOnWriteArrayListTestOnJDK8 extends CollectionsTestBase
 
   val factory = new CopyOnWriteArrayListFactory
 
@@ -13,4 +13,3 @@ class CollectionsOnCopyOnWriteArrayListTestOnJDK8 extends CollectionsTestBase {
 
   @Test def sort_with_comparator(): Unit =
     CollectionsOnListTest.sort_with_comparator(factory)
-}

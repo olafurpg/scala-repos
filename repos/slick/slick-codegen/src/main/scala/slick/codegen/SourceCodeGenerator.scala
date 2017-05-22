@@ -31,11 +31,11 @@ import slick.util.ConfigExtensionMethods.configExtensionMethods
   * @param model Slick data model for which code should be generated.
   */
 class SourceCodeGenerator(model: m.Model)
-    extends AbstractSourceCodeGenerator(model) with OutputHelpers {
+    extends AbstractSourceCodeGenerator(model) with OutputHelpers
   // "Tying the knot": making virtual classes concrete
   type Table = TableDef
   def Table = new TableDef(_)
-  class TableDef(model: m.Table) extends super.TableDef(model) {
+  class TableDef(model: m.Table) extends super.TableDef(model)
     // Using defs instead of (caching) lazy vals here to provide consitent interface to the user.
     // Performance should really not be critical in the code generator. Models shouldn't be huge.
     // Also lazy vals don't inherit docs from defs
@@ -55,11 +55,9 @@ class SourceCodeGenerator(model: m.Model)
     def ForeignKey = new ForeignKey(_)
     type Index = IndexDef
     def Index = new Index(_)
-  }
-}
 
 /** A runnable class to execute the code generator without further setup */
-object SourceCodeGenerator {
+object SourceCodeGenerator
 
   def run(profile: String,
           jdbcDriver: String,
@@ -68,7 +66,7 @@ object SourceCodeGenerator {
           pkg: String,
           user: Option[String],
           password: Option[String],
-          ignoreInvalidDefaults: Boolean): Unit = {
+          ignoreInvalidDefaults: Boolean): Unit =
     val profileInstance: JdbcProfile = Class
       .forName(profile + "$")
       .getField("MODULE$")
@@ -80,37 +78,35 @@ object SourceCodeGenerator {
                               user = user.getOrElse(null),
                               password = password.getOrElse(null),
                               keepAliveConnection = true)
-    try {
+    try
       val m = Await.result(db.run(profileInstance
                                  .createModel(None, ignoreInvalidDefaults)(
                                      ExecutionContext.global)
                                  .withPinnedSession),
                            Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, outputDir, pkg)
-    } finally db.close
-  }
+    finally db.close
 
   def run(uri: URI,
           outputDir: Option[String],
-          ignoreInvalidDefaults: Boolean = true): Unit = {
+          ignoreInvalidDefaults: Boolean = true): Unit =
     val dc = DatabaseConfig.forURI[JdbcProfile](uri)
     val pkg = dc.config.getString("codegen.package")
     val out =
       outputDir.getOrElse(dc.config.getStringOr("codegen.outputDir", "."))
     val profile =
       if (dc.profileIsObject) dc.profileName else "new " + dc.profileName
-    try {
+    try
       val m = Await.result(dc.db.run(dc.profile
                                  .createModel(None, ignoreInvalidDefaults)(
                                      ExecutionContext.global)
                                  .withPinnedSession),
                            Duration.Inf)
       new SourceCodeGenerator(m).writeToFile(profile, out, pkg)
-    } finally dc.db.close
-  }
+    finally dc.db.close
 
-  def main(args: Array[String]): Unit = {
-    args.toList match {
+  def main(args: Array[String]): Unit =
+    args.toList match
       case uri :: Nil =>
         run(new URI(uri), None)
       case uri :: outputDir :: Nil =>
@@ -135,7 +131,7 @@ object SourceCodeGenerator {
             Some(user),
             Some(password),
             ignoreInvalidDefaults.toBoolean)
-      case _ => {
+      case _ =>
           println("""
             |Usage:
             |  SourceCodeGenerator configURI [outputDir]
@@ -158,7 +154,3 @@ object SourceCodeGenerator {
             |"codegen.outputDir". The latter can be overridden on the command line.
           """.stripMargin.trim)
           System.exit(1)
-        }
-    }
-  }
-}

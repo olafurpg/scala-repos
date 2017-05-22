@@ -15,7 +15,7 @@ import scala.collection.mutable
 import scala.language.{implicitConversions, existentials}
 
 trait ScalaSettings
-    extends AbsScalaSettings with StandardScalaSettings with Warnings {
+    extends AbsScalaSettings with StandardScalaSettings with Warnings
   self: MutableSettings =>
 
   /** Set of settings */
@@ -40,10 +40,9 @@ trait ScalaSettings
         version, help, Xhelp, Yhelp, showPlugins, showPhases, genPhaseGraph)
 
   /** Any -multichoice:help? Nicer if any option could report that it had help to offer. */
-  private def multihelp = allSettings exists {
+  private def multihelp = allSettings exists
     case s: MultiChoiceSetting[_] => s.isHelping
     case _ => false
-  }
 
   /** Is an info setting set? */
   def isInfo = (infoSettings exists (_.isSetByUser)) || multihelp
@@ -80,7 +79,7 @@ trait ScalaSettings
 
   // Would be nice to build this dynamically from scala.languageFeature.
   // The two requirements: delay error checking until you have symbols, and let compiler command build option-specific help.
-  object languageFeatures extends MultiChoiceEnumeration {
+  object languageFeatures extends MultiChoiceEnumeration
     val dynamics = Choice(
         "dynamics", "Allow direct or indirect subclasses of scala.Dynamic")
     val postfixOps = Choice(
@@ -99,8 +98,7 @@ trait ScalaSettings
     val macros = Choice(
         "experimental.macros",
         "Allow macro definition (besides implementation and application)")
-  }
-  val language = {
+  val language =
     val description = "Enable or disable language features"
     MultiChoiceSetting(
         name = "-language",
@@ -108,7 +106,6 @@ trait ScalaSettings
         descr = description,
         domain = languageFeatures
     )
-  }
 
   /*
    * The previous "-source" option is intended to be used mainly
@@ -242,11 +239,10 @@ trait ScalaSettings
       "Retains pre 2.10 behavior of less aggressive truncation of least upper bounds.")
 
   // XML parsing options
-  object XxmlSettings extends MultiChoiceEnumeration {
+  object XxmlSettings extends MultiChoiceEnumeration
     val coalescing = Choice(
         "coalescing", "Convert PCData to Text and coalesce sibling nodes")
     def isCoalescing = Xxml contains coalescing
-  }
   val Xxml = MultiChoiceSetting(
       name = "-Xxml",
       helpArg = "property",
@@ -403,7 +399,7 @@ trait ScalaSettings
       List("inline", "method"),
       "method")
 
-  object YoptChoices extends MultiChoiceEnumeration {
+  object YoptChoices extends MultiChoiceEnumeration
     val unreachableCode = Choice(
         "unreachable-code",
         "Eliminate unreachable code, exception handlers guarding no instructions, redundant metadata (debug information, line numbers).")
@@ -472,7 +468,6 @@ trait ScalaSettings
         "Enable cross-method optimizations across the entire classpath: " +
         classpathChoices.mkString("", ",", "."),
         expandsTo = classpathChoices)
-  }
 
   // We don't use the `default` parameter of `MultiChoiceSetting`: it specifies the default values
   // when `-Yopt` is passed without explicit choices. When `-Yopt` is not explicitly specified, the
@@ -482,12 +477,10 @@ trait ScalaSettings
                                 descr = "Enable optimizations",
                                 domain = YoptChoices)
 
-  private def optEnabled(choice: YoptChoices.Choice) = {
-    !Yopt.contains(YoptChoices.lNone) && {
+  private def optEnabled(choice: YoptChoices.Choice) =
+    !Yopt.contains(YoptChoices.lNone) &&
       Yopt.contains(choice) || !Yopt.isSetByUser &&
       YoptChoices.lDefault.expandsTo.contains(choice)
-    }
-  }
 
   def YoptNone = Yopt.contains(YoptChoices.lNone)
   def YoptUnreachableCode = optEnabled(YoptChoices.unreachableCode)
@@ -514,7 +507,7 @@ trait ScalaSettings
       choices = List("at-inline-annotated", "everything", "default"),
       default = "default")
 
-  object YoptWarningsChoices extends MultiChoiceEnumeration {
+  object YoptWarningsChoices extends MultiChoiceEnumeration
     val none = Choice("none", "No optimizer warnings.")
     val atInlineFailedSummary = Choice(
         "at-inline-failed-summary",
@@ -534,7 +527,6 @@ trait ScalaSettings
     val noInlineMissingScalaInlineInfoAttr = Choice(
         "no-inline-missing-attribute",
         "Warn if an inlining decision cannot be made because a Scala classfile does not have a ScalaInlineInfo attribute.")
-  }
 
   val YoptWarnings = MultiChoiceSetting(
       name = "-Yopt-warnings",
@@ -570,10 +562,9 @@ trait ScalaSettings
   private def removalIn212 =
     "This flag is scheduled for removal in 2.12. If you have a case where you need this flag then please report a bug."
 
-  object YstatisticsPhases extends MultiChoiceEnumeration {
+  object YstatisticsPhases extends MultiChoiceEnumeration
     val parser, typer, patmat, erasure, cleanup, jvm = Value
-  }
-  val Ystatistics = {
+  val Ystatistics =
     val description = "Print compiler statistics for specific phases"
     MultiChoiceSetting(
         name = "-Ystatistics",
@@ -581,10 +572,8 @@ trait ScalaSettings
         descr = description,
         domain = YstatisticsPhases,
         default = Some(List("_"))
-    ) withPostSetHook { _ =>
+    ) withPostSetHook  _ =>
       scala.reflect.internal.util.Statistics.enabled = true
-    }
-  }
 
   def YstatisticsEnabled = Ystatistics.value.nonEmpty
 
@@ -676,13 +665,12 @@ trait ScalaSettings
   /** Test whether this is scaladoc we're looking at */
   def isScaladoc = false
 
-  object MacroExpand {
+  object MacroExpand
     val None = "none"
     val Normal = "normal"
     val Discard = "discard"
-  }
 
-  def conflictWarning: Option[String] = {
+  def conflictWarning: Option[String] =
     // See cd878232b5 for an example how to warn about conflicting settings
 
     /*
@@ -695,10 +683,7 @@ trait ScalaSettings
      */
 
     None
-  }
-}
 
-object ClassPathRepresentationType {
+object ClassPathRepresentationType
   val Flat = "flat"
   val Recursive = "recursive"
-}

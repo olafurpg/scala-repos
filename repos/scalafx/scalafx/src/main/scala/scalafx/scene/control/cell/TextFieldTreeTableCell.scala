@@ -45,7 +45,7 @@ import scalafx.util.StringConverter.sfxStringConverter2jfx
   * @define FLVINIT Provides a `TextField that allows editing of the cell content when the cell is double-clicked, or when TreeView.edit(javafx.scene.control.TreeItem) is called.
   * @define FLVRET A Function that can be inserted into the cell factory property of a `TreeView`, that enables textual editing of the content.
   */
-object TextFieldTreeTableCell {
+object TextFieldTreeTableCell
 
   /**
     * Converts a ScalaFX $TFTC to its JavaFX counterpart.
@@ -89,7 +89,6 @@ object TextFieldTreeTableCell {
               since = "1.0")
   def forTreeTableColumn[S, T](converter: jfxu.StringConverter[T]) =
     jfxscc.TextFieldTreeTableCell.forTreeTableColumn[S, T](converter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/TextFieldTreeTableCell.html $TFTC]]
@@ -105,7 +104,7 @@ class TextFieldTreeTableCell[S, T](override val delegate: jfxscc.TextFieldTreeTa
     extends TreeTableCell[S, T](delegate)
     with ConvertableCell[jfxscc.TextFieldTreeTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.TextFieldTreeTableCell[S, T], T]
-    with SFXDelegate[jfxscc.TextFieldTreeTableCell[S, T]] {
+    with SFXDelegate[jfxscc.TextFieldTreeTableCell[S, T]]
 
   /**
     * Creates a `TextFieldTreeTableCell` that provides a `TextField` when put into editing mode that allows editing of the
@@ -115,4 +114,3 @@ class TextFieldTreeTableCell[S, T](override val delegate: jfxscc.TextFieldTreeTa
     */
   def this(converter: StringConverter[T]) =
     this(new jfxscc.TextFieldTreeTableCell[S, T](converter))
-}

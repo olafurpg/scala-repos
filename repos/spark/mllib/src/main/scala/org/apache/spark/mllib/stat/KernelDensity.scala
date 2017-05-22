@@ -38,7 +38,7 @@ import org.apache.spark.rdd.RDD
   * }}}
   */
 @Since("1.4.0")
-class KernelDensity extends Serializable {
+class KernelDensity extends Serializable
 
   import KernelDensity._
 
@@ -52,35 +52,32 @@ class KernelDensity extends Serializable {
     * Sets the bandwidth (standard deviation) of the Gaussian kernel (default: `1.0`).
     */
   @Since("1.4.0")
-  def setBandwidth(bandwidth: Double): this.type = {
+  def setBandwidth(bandwidth: Double): this.type =
     require(bandwidth > 0, s"Bandwidth must be positive, but got $bandwidth.")
     this.bandwidth = bandwidth
     this
-  }
 
   /**
     * Sets the sample to use for density estimation.
     */
   @Since("1.4.0")
-  def setSample(sample: RDD[Double]): this.type = {
+  def setSample(sample: RDD[Double]): this.type =
     this.sample = sample
     this
-  }
 
   /**
     * Sets the sample to use for density estimation (for Java users).
     */
   @Since("1.4.0")
-  def setSample(sample: JavaRDD[java.lang.Double]): this.type = {
+  def setSample(sample: JavaRDD[java.lang.Double]): this.type =
     this.sample = sample.rdd.asInstanceOf[RDD[Double]]
     this
-  }
 
   /**
     * Estimates probability density function at the given array of points.
     */
   @Since("1.4.0")
-  def estimate(points: Array[Double]): Array[Double] = {
+  def estimate(points: Array[Double]): Array[Double] =
     val sample = this.sample
     val bandwidth = this.bandwidth
 
@@ -92,35 +89,28 @@ class KernelDensity extends Serializable {
       math.log(bandwidth) + 0.5 * math.log(2 * math.Pi)
     val (densities, count) = sample.aggregate((new Array[Double](n), 0L))(
         (x, y) =>
-          {
             var i = 0
-            while (i < n) {
+            while (i < n)
               x._1(i) += normPdf(
                   y, bandwidth, logStandardDeviationPlusHalfLog2Pi, points(i))
               i += 1
-            }
             (x._1, x._2 + 1)
-        },
+        ,
         (x, y) =>
-          {
             blas.daxpy(n, 1.0, y._1, 1, x._1, 1)
             (x._1, x._2 + y._2)
-        })
+        )
     blas.dscal(n, 1.0 / count, densities, 1)
     densities
-  }
-}
 
-private object KernelDensity {
+private object KernelDensity
 
   /** Evaluates the PDF of a normal distribution. */
   def normPdf(mean: Double,
               standardDeviation: Double,
               logStandardDeviationPlusHalfLog2Pi: Double,
-              x: Double): Double = {
+              x: Double): Double =
     val x0 = x - mean
     val x1 = x0 / standardDeviation
     val logDensity = -0.5 * x1 * x1 - logStandardDeviationPlusHalfLog2Pi
     math.exp(logDensity)
-  }
-}

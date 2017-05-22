@@ -3,7 +3,7 @@ import collection._
 /** Sorted maps should have `filterKeys` and `mapValues` which return sorted maps.
   *  Mapping, filtering, etc. on these views should return sorted maps again.
   */
-object Test extends App {
+object Test extends App
 
   val sortedmap = SortedMap(1 -> false, 2 -> true, 3 -> false, 4 -> true)
   println(sortedmap.filterKeys(_ % 2 == 0): SortedMap[Int, Boolean])
@@ -37,4 +37,3 @@ object Test extends App {
   println(
       immsortedmap.mapValues(_ + "!").filter(t => t._1 < 2): immutable.SortedMap[
           Int, String])
-}

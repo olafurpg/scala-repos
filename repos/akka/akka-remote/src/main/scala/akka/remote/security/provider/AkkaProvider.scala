@@ -12,9 +12,9 @@ object AkkaProvider
     extends Provider(
         "Akka",
         1.0,
-        "Akka provider 1.0 that implements a secure AES random number generator") {
-  AccessController.doPrivileged(new PrivilegedAction[this.type] {
-    def run = {
+        "Akka provider 1.0 that implements a secure AES random number generator")
+  AccessController.doPrivileged(new PrivilegedAction[this.type]
+    def run =
       //SecureRandom
       put("SecureRandom.AES128CounterSecureRNG",
           classOf[AES128CounterSecureRNG].getName)
@@ -31,6 +31,4 @@ object AkkaProvider
       put("SecureRandom.AES128CounterInetRNG ImplementedIn", "Software")
       put("SecureRandom.AES256CounterInetRNG ImplementedIn", "Software")
       null //Magic null is magic
-    }
-  })
-}
+  )

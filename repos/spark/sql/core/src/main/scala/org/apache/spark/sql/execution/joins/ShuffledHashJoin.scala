@@ -36,13 +36,13 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
                             condition: Option[Expression],
                             left: SparkPlan,
                             right: SparkPlan)
-    extends BinaryNode with HashJoin {
+    extends BinaryNode with HashJoin
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
                                                      "number of output rows"))
 
-  override def outputPartitioning: Partitioning = joinType match {
+  override def outputPartitioning: Partitioning = joinType match
     case Inner =>
       PartitioningCollection(
           Seq(left.outputPartitioning, right.outputPartitioning))
@@ -54,20 +54,19 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
     case x =>
       throw new IllegalArgumentException(
           s"ShuffledHashJoin should not take $x as the JoinType")
-  }
 
   override def requiredChildDistribution: Seq[Distribution] =
     ClusteredDistribution(leftKeys) :: ClusteredDistribution(rightKeys) :: Nil
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val numOutputRows = longMetric("numOutputRows")
 
-    streamedPlan.execute().zipPartitions(buildPlan.execute()) {
+    streamedPlan.execute().zipPartitions(buildPlan.execute())
       (streamIter, buildIter) =>
         val hashed =
           HashedRelation(buildIter.map(_.copy()), buildSideKeyGenerator)
         val joinedRow = new JoinedRow
-        joinType match {
+        joinType match
           case Inner =>
             hashJoin(streamIter, hashed, numOutputRows)
 
@@ -79,7 +78,6 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
             val resultProj = createResultProjection
             streamIter.flatMap(
                 currentRow =>
-                  {
                 val rowKey = keyGenerator(currentRow)
                 joinedRow.withLeft(currentRow)
                 leftOuterIterator(rowKey,
@@ -87,14 +85,13 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
                                   hashed.get(rowKey),
                                   resultProj,
                                   numOutputRows)
-            })
+            )
 
           case RightOuter =>
             val keyGenerator = streamSideKeyGenerator
             val resultProj = createResultProjection
             streamIter.flatMap(
                 currentRow =>
-                  {
                 val rowKey = keyGenerator(currentRow)
                 joinedRow.withRight(currentRow)
                 rightOuterIterator(rowKey,
@@ -102,12 +99,8 @@ case class ShuffledHashJoin(leftKeys: Seq[Expression],
                                    joinedRow,
                                    resultProj,
                                    numOutputRows)
-            })
+            )
 
           case x =>
             throw new IllegalArgumentException(
                 s"ShuffledHashJoin should not take $x as the JoinType")
-        }
-    }
-  }
-}

@@ -1,15 +1,14 @@
 package lila.rating
 
-case class RatingRange(min: Int, max: Int) {
+case class RatingRange(min: Int, max: Int)
 
   def contains(rating: Int) = rating >= min && rating <= max
 
   def notBroad: Option[RatingRange] = (this != RatingRange.broad) option this
 
   override def toString = "%d-%d".format(min, max)
-}
 
-object RatingRange {
+object RatingRange
 
   val min = 800
   val max = 2900
@@ -19,11 +18,11 @@ object RatingRange {
 
   // ^\d{3,4}\-\d{3,4}$
   def apply(from: String): Option[RatingRange] =
-    for {
+    for
       min ← parseIntOption(from takeWhile ('-' !=)) if acceptable(min)
       max ← parseIntOption(from dropWhile ('-' !=) tail) if acceptable(max)
            if min <= max
-    } yield RatingRange(min, max)
+    yield RatingRange(min, max)
 
   def orDefault(from: String) = apply(from) | default
 
@@ -32,4 +31,3 @@ object RatingRange {
   def valid(from: String) = apply(from).isDefined
 
   private def acceptable(rating: Int) = broad contains rating
-}

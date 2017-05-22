@@ -10,19 +10,16 @@ case class MVersionColumn(column: String,
                           columnSize: Option[Int],
                           bufferLength: Int,
                           decimalDigits: Option[Int],
-                          pseudoColumn: Option[Boolean]) {
+                          pseudoColumn: Option[Boolean])
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
-}
 
-object MVersionColumn {
+object MVersionColumn
   def getVersionColumns(table: MQName) =
     ResultSetAction[MVersionColumn](_.metaData.getVersionColumns(
-            table.catalog_?, table.schema_?, table.name)) { r =>
-      MVersionColumn(r.skip.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match {
+            table.catalog_?, table.schema_?, table.name))  r =>
+      MVersionColumn(r.skip.<<, r.<<, r.<<, r.<<, r.<<, r.<<, r.nextInt match
         case DatabaseMetaData.versionColumnPseudo => Some(true)
         case DatabaseMetaData.versionColumnNotPseudo => Some(false)
         case _ => None
-      })
-    }
-}
+      )

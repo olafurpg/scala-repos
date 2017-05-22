@@ -31,30 +31,29 @@ import org.apache.spark.internal.Logging
   */
 private[streaming] class FileBasedWriteAheadLogReader(
     path: String, conf: Configuration)
-    extends Iterator[ByteBuffer] with Closeable with Logging {
+    extends Iterator[ByteBuffer] with Closeable with Logging
 
   private val instream = HdfsUtils.getInputStream(path, conf)
   private var closed =
     (instream == null) // the file may be deleted as we're opening the stream
   private var nextItem: Option[ByteBuffer] = None
 
-  override def hasNext: Boolean = synchronized {
-    if (closed) {
+  override def hasNext: Boolean = synchronized
+    if (closed)
       return false
-    }
 
-    if (nextItem.isDefined) {
+    if (nextItem.isDefined)
       // handle the case where hasNext is called without calling next
       true
-    } else {
-      try {
+    else
+      try
         val length = instream.readInt()
         val buffer = new Array[Byte](length)
         instream.readFully(buffer)
         nextItem = Some(ByteBuffer.wrap(buffer))
         logTrace("Read next item " + nextItem.get)
         true
-      } catch {
+      catch
         case e: EOFException =>
           logDebug("Error reading next item, EOF reached", e)
           close()
@@ -65,37 +64,28 @@ private[streaming] class FileBasedWriteAheadLogReader(
               "this should be okay.",
               e)
           close()
-          if (HdfsUtils.checkFileExists(path, conf)) {
+          if (HdfsUtils.checkFileExists(path, conf))
             // If file exists, this could be a legitimate error
             throw e
-          } else {
+          else
             // File was deleted. This can occur when the daemon cleanup thread takes time to
             // delete the file during recovery.
             false
-          }
 
         case e: Exception =>
           logWarning("Error while trying to read data from HDFS.", e)
           close()
           throw e
-      }
-    }
-  }
 
-  override def next(): ByteBuffer = synchronized {
-    val data = nextItem.getOrElse {
+  override def next(): ByteBuffer = synchronized
+    val data = nextItem.getOrElse
       close()
       throw new IllegalStateException(
           "next called without calling hasNext or after hasNext returned false")
-    }
     nextItem = None // Ensure the next hasNext call loads new data.
     data
-  }
 
-  override def close(): Unit = synchronized {
-    if (!closed) {
+  override def close(): Unit = synchronized
+    if (!closed)
       instream.close()
-    }
     closed = true
-  }
-}

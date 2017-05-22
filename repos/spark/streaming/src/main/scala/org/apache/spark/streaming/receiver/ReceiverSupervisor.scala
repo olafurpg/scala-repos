@@ -37,13 +37,12 @@ private[streaming] abstract class ReceiverSupervisor(
     receiver: Receiver[_],
     conf: SparkConf
 )
-    extends Logging {
+    extends Logging
 
   /** Enumeration to identify current state of the Receiver */
-  object ReceiverState extends Enumeration {
+  object ReceiverState extends Enumeration
     type CheckpointState = Value
     val Initialized, Started, Stopped = Value
-  }
   import ReceiverState._
 
   // Attach the supervisor to the receiver
@@ -129,48 +128,43 @@ private[streaming] abstract class ReceiverSupervisor(
   protected def onReceiverStop(message: String, error: Option[Throwable]) {}
 
   /** Start the supervisor */
-  def start() {
+  def start()
     onStart()
     startReceiver()
-  }
 
   /** Mark the supervisor and the receiver for stopping */
-  def stop(message: String, error: Option[Throwable]) {
+  def stop(message: String, error: Option[Throwable])
     stoppingError = error.orNull
     stopReceiver(message, error)
     onStop(message, error)
     futureExecutionContext.shutdownNow()
     stopLatch.countDown()
-  }
 
   /** Start receiver */
-  def startReceiver(): Unit = synchronized {
-    try {
-      if (onReceiverStart()) {
+  def startReceiver(): Unit = synchronized
+    try
+      if (onReceiverStart())
         logInfo(s"Starting receiver $streamId")
         receiverState = Started
         receiver.onStart()
         logInfo(s"Called receiver $streamId onStart")
-      } else {
+      else
         // The driver refused us
         stop(
             "Registered unsuccessfully because Driver refused to start receiver " +
             streamId,
             None)
-      }
-    } catch {
+    catch
       case NonFatal(t) =>
         stop("Error starting receiver " + streamId, Some(t))
-    }
-  }
 
   /** Stop receiver */
   def stopReceiver(message: String, error: Option[Throwable]): Unit =
-    synchronized {
-      try {
+    synchronized
+      try
         logInfo("Stopping receiver with message: " + message + ": " +
             error.getOrElse(""))
-        receiverState match {
+        receiverState match
           case Initialized =>
             logWarning("Skip stopping receiver because it has not yet stared")
           case Started =>
@@ -180,22 +174,18 @@ private[streaming] abstract class ReceiverSupervisor(
             onReceiverStop(message, error)
           case Stopped =>
             logWarning("Receiver has been stopped")
-        }
-      } catch {
+      catch
         case NonFatal(t) =>
           logError(
               s"Error stopping receiver $streamId ${Utils.exceptionString(t)}")
-      }
-    }
 
   /** Restart receiver with delay */
-  def restartReceiver(message: String, error: Option[Throwable] = None) {
+  def restartReceiver(message: String, error: Option[Throwable] = None)
     restartReceiver(message, error, defaultRestartDelay)
-  }
 
   /** Restart receiver with delay */
-  def restartReceiver(message: String, error: Option[Throwable], delay: Int) {
-    Future {
+  def restartReceiver(message: String, error: Option[Throwable], delay: Int)
+    Future
       // This is a blocking action so we should use "futureExecutionContext" which is a cached
       // thread pool.
       logWarning("Restarting receiver with delay " + delay + " ms: " + message,
@@ -207,30 +197,24 @@ private[streaming] abstract class ReceiverSupervisor(
       logInfo("Starting receiver again")
       startReceiver()
       logInfo("Receiver started again")
-    }(futureExecutionContext)
-  }
+    (futureExecutionContext)
 
   /** Check if receiver has been marked for starting */
-  def isReceiverStarted(): Boolean = {
+  def isReceiverStarted(): Boolean =
     logDebug("state = " + receiverState)
     receiverState == Started
-  }
 
   /** Check if receiver has been marked for stopping */
-  def isReceiverStopped(): Boolean = {
+  def isReceiverStopped(): Boolean =
     logDebug("state = " + receiverState)
     receiverState == Stopped
-  }
 
   /** Wait the thread until the supervisor is stopped */
-  def awaitTermination() {
+  def awaitTermination()
     logInfo("Waiting for receiver to be stopped")
     stopLatch.await()
-    if (stoppingError != null) {
+    if (stoppingError != null)
       logError("Stopped receiver with error: " + stoppingError)
       throw stoppingError
-    } else {
+    else
       logInfo("Stopped receiver without error")
-    }
-  }
-}

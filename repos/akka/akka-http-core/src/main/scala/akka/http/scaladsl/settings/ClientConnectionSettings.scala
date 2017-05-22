@@ -23,7 +23,7 @@ import scala.collection.JavaConverters._
   * Public API but not intended for subclassing
   */
 abstract class ClientConnectionSettings private[akka]()
-    extends akka.http.javadsl.settings.ClientConnectionSettings {
+    extends akka.http.javadsl.settings.ClientConnectionSettings
   self: ClientConnectionSettingsImpl ⇒
   def userAgentHeader: Option[`User-Agent`]
   def connectingTimeout: FiniteDuration
@@ -44,9 +44,8 @@ abstract class ClientConnectionSettings private[akka]()
     OptionConverters.toJava(userAgentHeader)
   final override def getRequestHeaderSizeHint: Int = requestHeaderSizeHint
   final override def getWebsocketRandomFactory: Supplier[Random] =
-    new Supplier[Random] {
+    new Supplier[Random]
       override def get(): Random = websocketRandomFactory()
-    }
 
   // ---
 
@@ -72,12 +71,10 @@ abstract class ClientConnectionSettings private[akka]()
     self.copy(socketOptions = newValue)
   def withParserSettings(newValue: ParserSettings): ClientConnectionSettings =
     self.copy(parserSettings = newValue)
-}
 
 object ClientConnectionSettings
-    extends SettingsCompanion[ClientConnectionSettings] {
+    extends SettingsCompanion[ClientConnectionSettings]
   override def apply(config: Config): ClientConnectionSettings =
     ClientConnectionSettingsImpl(config)
   override def apply(configOverrides: String): ClientConnectionSettings =
     ClientConnectionSettingsImpl(configOverrides)
-}

@@ -22,14 +22,13 @@ import java.io.{InputStream}
 import java.util.{Locale}
 import net.liftweb.common.{Box}
 
-object RetryState extends Enumeration {
+object RetryState extends Enumeration
   val SUSPENDED, TIMED_OUT, RESUMED = Value
-}
 
 /**
   * The representation of a HTTP request state
   */
-trait HTTPRequest {
+trait HTTPRequest
 
   /**
     * @return - cookies from this request. Nil if there are no cookies.
@@ -236,4 +235,3 @@ trait HTTPRequest {
     * The User-Agent of the request
     */
   def userAgent: Box[String]
-}

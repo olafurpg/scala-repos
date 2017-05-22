@@ -24,40 +24,35 @@ import spire.syntax.cfor._
 /**
   * Created by dlwh on 8/14/15.
   */
-class DenseMulScalarBenchmark extends BreezeBenchmark {
+class DenseMulScalarBenchmark extends BreezeBenchmark
   assert(usingNatives)
 
   val dv, dv2 = DenseVector.rand[Double](10000)
 
-  def timeSmallDVMulScalar(reps: Int) = {
+  def timeSmallDVMulScalar(reps: Int) =
     var sum = 0.0
     var q = dv2
-    cforRange(0 until reps) { rep =>
+    cforRange(0 until reps)  rep =>
       q = dv :* q
-    }
     q
-  }
 
-  def timeSmallDVInlineRange(reps: Int) = {
+  def timeSmallDVInlineRange(reps: Int) =
     var result = new Array[Double](dv.length)
     var b = dv2
-    cforRange(0 until reps) { rep =>
+    cforRange(0 until reps)  rep =>
       val ad = dv.data
       val bd = b.data
-      cforRange(0 until dv.length) { i =>
+      cforRange(0 until dv.length)  i =>
         result(i) = ad(i) * bd(i)
-      }
       b = new DenseVector(result)
       result = new Array[Double](dv.length)
-    }
     b
-  }
 
-  def timeSmallDVScaleAddInline(reps: Int) = {
+  def timeSmallDVScaleAddInline(reps: Int) =
     val dv = this.dv.data
     var dv2 = this.dv2.data
     var result = new Array[Double](dv.length)
-    cforRange(0 until reps) { rep =>
+    cforRange(0 until reps)  rep =>
       result = new Array[Double](dv.length)
       result(0) += dv2(0) * dv(0)
       result(1) += dv2(1) * dv(1)
@@ -70,10 +65,7 @@ class DenseMulScalarBenchmark extends BreezeBenchmark {
       result(8) += dv2(8) * dv(8)
       result(9) += dv2(9) * dv(9)
       dv2 = result
-    }
     result
-  }
-}
 
 object DenseMulScalarBenchmark
     extends MyRunner(classOf[DenseMulScalarBenchmark])

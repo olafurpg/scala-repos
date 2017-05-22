@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object SomeBuild extends Build {
+object SomeBuild extends Build
   val buildSettings = Seq(
       organization := "com.softwaremill",
       version := "0.0.1-SNAPSHOT",
@@ -18,4 +18,3 @@ object SomeBuild extends Build {
     Project("sub1", file("sub1")).settings(buildSettings: _*).dependsOn(parent)
   lazy val sub2: Project =
     Project("sub2", file("sub2")).settings(buildSettings: _*).dependsOn(parent)
-}

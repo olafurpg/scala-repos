@@ -2,9 +2,9 @@ package play.api.routing
 
 import org.specs2.mutable.Specification
 
-class JavaScriptReverseRouterSpec extends Specification {
-  "JavaScriptReverseRouter" should {
-    "Create a JavaScript router with the right script" in {
+class JavaScriptReverseRouterSpec extends Specification
+  "JavaScriptReverseRouter" should
+    "Create a JavaScript router with the right script" in
       val foo = "function(foo) { return null; }"
       val bar = "function(bar) { return null; }"
       val router = JavaScriptReverseRouter(
@@ -20,6 +20,3 @@ class JavaScriptReverseRouterSpec extends Specification {
           s"_root['controllers']['FooController']['foo'] = $foo")
       router.body must contain(
           s"_root['controllers']['BarController']['bar'] = $bar")
-    }
-  }
-}

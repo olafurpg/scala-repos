@@ -16,14 +16,13 @@ import scala.language.postfixOps
  *
  *  @author  Burak Emir, Stephane Micheloud, Geoffrey Washburn, Paul Phillips
  */
-object genprod extends App {
+object genprod extends App
   val MAX_ARITY = 22
   def arities = (1 to MAX_ARITY).toList
 
-  class Group(val name: String) {
+  class Group(val name: String)
     def className(i: Int) = name + i
     def fileName(i: Int) = className(i) + ".scala"
-  }
 
   def productFiles  = arities map Product.make
   def tupleFiles    = arities map Tuple.make
@@ -31,7 +30,7 @@ object genprod extends App {
   def absFunctionFiles = (0 :: arities) map AbstractFunction.make
   def allfiles      = productFiles ::: tupleFiles ::: functionFiles ::: absFunctionFiles
 
-  trait Arity extends Group {
+  trait Arity extends Group
     def i: Int    // arity
 
     def typeArgsString(xs: Seq[String]) = xs.mkString("[", ", ", "]")
@@ -72,22 +71,18 @@ object genprod extends App {
 package %s
 %s
 """.trim.format(genprodString, packageDef, imports)
-  }
 
-  if (args.length != 1) {
+  if (args.length != 1)
     println("please give path of output directory")
     sys.exit(-1)
-  }
   val out = args(0)
-  def writeFile(node: scala.xml.Node) {
+  def writeFile(node: scala.xml.Node)
     import scala.tools.nsc.io._
     val f = Path(out) / node.attributes("name").toString
     f.parent.createDirectory(force = true)
     f.toFile writeAll node.text
-  }
 
   allfiles foreach writeFile
-}
 import genprod._
 
 
@@ -95,7 +90,7 @@ import genprod._
                              F U N C T I O N
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz */
 
-object FunctionZero extends Function(0) {
+object FunctionZero extends Function(0)
   override def genprodString  = "\n// genprod generated these sources at: " + new java.util.Date()
   override def covariantSpecs = "@specialized(Specializable.Primitives) "
   override def descriptiveComment = "  " + functionNTemplate.format("javaVersion", "anonfun0",
@@ -108,9 +103,8 @@ object FunctionZero extends Function(0) {
  *    assert(javaVersion() == anonfun0())
  * """)
   override def moreMethods = ""
-}
 
-object FunctionOne extends Function(1) {
+object FunctionOne extends Function(1)
   override def classAnnotation    = "@annotation.implicitNotFound(msg = \"No implicit view available from ${T1} => ${R}.\")\n"
   override def contravariantSpecs = "@specialized(scala.Int, scala.Long, scala.Float, scala.Double) "
   override def covariantSpecs     = "@specialized(scala.Unit, scala.Boolean, scala.Int, scala.Float, scala.Long, scala.Double) "
@@ -144,9 +138,8 @@ object FunctionOne extends Function(1) {
    */
   @annotation.unspecialized def andThen[A](g: R => A): T1 => A = { x => g(apply(x)) }
 """
-}
 
-object FunctionTwo extends Function(2) {
+object FunctionTwo extends Function(2)
   override def contravariantSpecs = "@specialized(scala.Int, scala.Long, scala.Double) "
   override def covariantSpecs = "@specialized(scala.Unit, scala.Boolean, scala.Int, scala.Float, scala.Long, scala.Double) "
 
@@ -159,19 +152,16 @@ object FunctionTwo extends Function(2) {
  *    }
  *    assert(max(0, 1) == anonfun2(0, 1))
  * """)
-}
 
-object Function {
+object Function
   def make(i: Int) = apply(i)()
-  def apply(i: Int) = i match {
+  def apply(i: Int) = i match
     case 0    => FunctionZero
     case 1    => FunctionOne
     case 2    => FunctionTwo
     case _    => new Function(i)
-  }
-}
 
-class Function(val i: Int) extends Group("Function") with Arity {
+class Function(val i: Int) extends Group("Function") with Arity
   def descriptiveComment  = ""
   def functionNTemplate =
 """
@@ -183,7 +173,7 @@ class Function(val i: Int) extends Group("Function") with Arity {
  *  }}}"""
 
   def toStr() = "\"" + ("<function%d>" format i) + "\""
-  def apply() = {
+  def apply() =
 <file name={fileName}>{header}
 
 /** A function of {i} parameter{s}.
@@ -198,15 +188,13 @@ class Function(val i: Int) extends Group("Function") with Arity {
   override def toString() = {toStr}
 }}
 </file>
-}
 
   private def commaXs = xdefs.mkString("(", ", ", ")")
 
   // (x1: T1) => (x2: T2) => (x3: T3) => (x4: T4) => apply(x1,x2,x3,x4)
-  def shortCurry = {
+  def shortCurry =
     val body = "apply" + commaXs
     (xdefs, targs).zipped.map("(%s: %s) => ".format(_, _)).mkString("", "", body)
-  }
 
   // (x1: T1) => ((x2: T2, x3: T3, x4: T4, x5: T5, x6: T6, x7: T7) => self.apply(x1,x2,x3,x4,x5,x6,x7)).curried
   def longCurry = ((xdefs, targs).zipped.map(_ + ": " + _) drop 1).mkString(
@@ -216,14 +204,13 @@ class Function(val i: Int) extends Group("Function") with Arity {
   )
 
   // f(x1,x2,x3,x4,x5,x6)  == (f.curried)(x1)(x2)(x3)(x4)(x5)(x6)
-  def curryComment = {
+  def curryComment =
 """  /** Creates a curried version of this function.
    *
    *  @return   a function `f` such that `f%s == apply%s`
    */""".format(xdefs map ("(" + _ + ")") mkString, commaXs)
-  }
 
-  def tupleMethod = {
+  def tupleMethod =
     def comment =
 """  /** Creates a tupled version of this function: instead of %d arguments,
    *  it accepts a single [[scala.Tuple%d]] argument.
@@ -234,44 +221,37 @@ class Function(val i: Int) extends Group("Function") with Arity {
     def body = "case Tuple%d%s => apply%s".format(i, commaXs, commaXs)
 
     comment + "\n  @annotation.unspecialized def tupled: Tuple%d%s => R = {\n    %s\n  }".format(i, invariantArgs, body)
-  }
 
-  def curryMethod = {
+  def curryMethod =
     val body = if (i < 5) shortCurry else longCurry
 
     curryComment +
     "\n  @annotation.unspecialized def curried: %s => R = {\n    %s\n  }\n".format(
       targs mkString " => ", body
     )
-  }
 
   override def moreMethods = curryMethod + tupleMethod
-} // object Function
+// object Function
 
 
 /* zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
                                      T U P L E
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz */
 
-object Tuple {
+object Tuple
   val zipImports = ""
 
   def make(i: Int) = apply(i)()
-  def apply(i: Int) = i match {
+  def apply(i: Int) = i match
     case 1  => TupleOne
     case 2  => TupleTwo
     case 3  => TupleThree
     case _  => new Tuple(i)
-  }
-}
 
 object TupleOne extends Tuple(1)
-{
   override def covariantSpecs = "@specialized(Int, Long, Double) "
-}
 
 object TupleTwo extends Tuple(2)
-{
   override def imports = Tuple.zipImports
   override def covariantSpecs = "@specialized(Int, Long, Double, Char, Boolean/*, AnyRef*/) "
   override def moreMethods = """
@@ -281,13 +261,11 @@ object TupleTwo extends Tuple(2)
    */
   def swap: Tuple2[T2,T1] = Tuple2(_2, _1)
 """
-}
 
-object TupleThree extends Tuple(3) {
+object TupleThree extends Tuple(3)
   override def imports = Tuple.zipImports
-}
 
-class Tuple(val i: Int) extends Group("Tuple") with Arity {
+class Tuple(val i: Int) extends Group("Tuple") with Arity
   private def idiomatic =
     if (i < 2) ""
     else " Note that it is more idiomatic to create a %s via `(%s)`".format(className, constructorArgs)
@@ -297,17 +275,15 @@ class Tuple(val i: Int) extends Group("Tuple") with Arity {
   ) mkString "\n"
 
   // prettifies it a little if it's overlong
-  def mkToString() = {
+  def mkToString() =
   def str(xs: List[String]) = xs.mkString(""" + "," + """)
     if (i <= MAX_ARITY / 2) str(mdefs)
-    else {
+    else
       val s1 = str(mdefs take (i / 2))
       val s2 = str(mdefs drop (i / 2))
       s1 + " +\n    \",\" + " + s2
-    }
-  }
 
-  def apply() = {
+  def apply() =
 <file name={fileName}>{header}
 
 /** A tuple of {i} elements; the canonical representation of a [[scala.{Product.className(i)}]].
@@ -322,8 +298,8 @@ case class {className}{covariantArgs}({fields})
   override def toString() = "(" + {mkToString} + ")"
   {moreMethods}
 }}
-</file>}
-} // object Tuple
+</file>
+// object Tuple
 
 
 /* zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
@@ -331,26 +307,19 @@ case class {className}{covariantArgs}({fields})
 zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz */
 
 object Product extends Group("Product")
-{
   def make(i: Int) = apply(i)()
-  def apply(i: Int) = i match {
+  def apply(i: Int) = i match
     case 1  => ProductOne
     case 2  => ProductTwo
     case _ => new Product(i)
-  }
-}
 
 object ProductOne extends Product(1)
-{
   override def covariantSpecs = "@specialized(Int, Long, Double) "
-}
 
 object ProductTwo extends Product(2)
-{
   override def covariantSpecs = "@specialized(Int, Long, Double) "
-}
 
-class Product(val i: Int) extends Group("Product") with Arity {
+class Product(val i: Int) extends Group("Product") with Arity
   val productElementComment = """
   /** Returns the n-th projection of this product if 0 <= n < productArity,
    *  otherwise throws an `IndexOutOfBoundsException`.
@@ -361,22 +330,20 @@ class Product(val i: Int) extends Group("Product") with Arity {
    */
 """
 
-  def cases = {
+  def cases =
     val xs = for ((x, i) <- mdefs.zipWithIndex) yield "case %d => %s".format(i, x)
     val default = "case _ => throw new IndexOutOfBoundsException(n.toString())"
     "\n" + ((xs ::: List(default)) map ("    " + _ + "\n") mkString)
-  }
-  def proj = {
-    (mdefs,targs).zipped.map( (_,_) ).zipWithIndex.map { case ((method,typeName),index) =>
+  def proj =
+    (mdefs,targs).zipped.map( (_,_) ).zipWithIndex.map  case ((method,typeName),index) =>
       """|  /** A projection of element %d of this Product.
          |   *  @return   A projection of element %d.
          |   */
          |  def %s: %s
          |""".stripMargin.format(index + 1, index + 1, method, typeName)
-    } mkString
-  }
+    mkString
 
-  def apply() = {
+  def apply() =
 <file name={fileName}>{header}
 object {className} {{
   def unapply{invariantArgs}(x: {className}{invariantArgs}): Option[{className}{invariantArgs}] =
@@ -399,47 +366,38 @@ trait {className}{covariantArgs} extends Any with Product {{
 {proj}
 {moreMethods}
 }}
-</file>}
+</file>
 
-}
 
 /** Abstract functions **/
 
-object AbstractFunctionZero extends AbstractFunction(0) {
+object AbstractFunctionZero extends AbstractFunction(0)
   override def covariantSpecs = FunctionZero.covariantSpecs
-}
 
-object AbstractFunctionOne extends AbstractFunction(1) {
+object AbstractFunctionOne extends AbstractFunction(1)
   override def covariantSpecs = FunctionOne.covariantSpecs
   override def contravariantSpecs = FunctionOne.contravariantSpecs
-}
 
-object AbstractFunctionTwo extends AbstractFunction(2) {
+object AbstractFunctionTwo extends AbstractFunction(2)
   override def covariantSpecs = FunctionTwo.covariantSpecs
   override def contravariantSpecs = FunctionTwo.contravariantSpecs
-}
 
 class AbstractFunction(val i: Int) extends Group("AbstractFunction") with Arity
-{
   override def packageDef = "scala.runtime"
 
   val superTypeArgs = typeArgsString(targs ::: List("R"))
 
-  def apply() = {
+  def apply() =
 <file name={"runtime/" + fileName}>{header}
 abstract class {className}{contraCoArgs} extends Function{i}{superTypeArgs} {{
 {moreMethods}
 }}
-</file>}
+</file>
 
-}
 object AbstractFunction
-{
   def make(i: Int) = apply(i)()
-  def apply(i: Int) = i match {
+  def apply(i: Int) = i match
     case 0    => AbstractFunctionZero
     case 1    => AbstractFunctionOne
     case 2    => AbstractFunctionTwo
     case _    => new AbstractFunction(i)
-  }
-}

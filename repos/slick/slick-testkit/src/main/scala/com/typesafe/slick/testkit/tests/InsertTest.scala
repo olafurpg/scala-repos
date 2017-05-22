@@ -2,17 +2,16 @@ package com.typesafe.slick.testkit.tests
 
 import com.typesafe.slick.testkit.util.{JdbcTestDB, AsyncTest}
 
-class InsertTest extends AsyncTest[JdbcTestDB] {
+class InsertTest extends AsyncTest[JdbcTestDB]
   import tdb.profile.api._
 
-  def testSimple = {
+  def testSimple =
     class TestTable(tag: Tag, tname: String)
-        extends Table[(Int, String)](tag, tname) {
+        extends Table[(Int, String)](tag, tname)
       def id = column[Int]("id")
       def name = column[String]("name")
       def * = (id, name)
       def ins = (id, name)
-    }
 
     val src1 = TableQuery(new TestTable(_, "src1_q"))
     val dst1 = TableQuery(new TestTable(_, "dst1_q"))
@@ -47,13 +46,11 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
             dst3comp.result.map(
                 v => v.to[Set] shouldBe Set((1, "A"), (2, "B")))
         ))
-  }
 
-  def testEmptyInsert = {
-    class A(tag: Tag) extends Table[Int](tag, "A_EMPTYINSERT") {
+  def testEmptyInsert =
+    class A(tag: Tag) extends Table[Int](tag, "A_EMPTYINSERT")
       def id = column[Int]("id", O.AutoInc, O.PrimaryKey)
       def * = id
-    }
     val as = TableQuery[A]
 
     DBIO.seq(
@@ -61,15 +58,13 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
         as += 42,
         as.result.map(_ shouldBe Seq(1))
     )
-  }
 
-  def testReturning = ifCap(jcap.returnInsertKey) {
-    class A(tag: Tag) extends Table[(Int, String, String)](tag, "A") {
+  def testReturning = ifCap(jcap.returnInsertKey)
+    class A(tag: Tag) extends Table[(Int, String, String)](tag, "A")
       def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
       def s1 = column[String]("S1")
       def s2 = column[String]("S2")
       def * = (id, s1, s2)
-    }
     val as = TableQuery[A]
     def ins1 = as.map(a => (a.s1, a.s2)) returning as.map(_.id)
     def ins2 = as.map(a => (a.s1, a.s2)) returning as.map(a => (a.id, a.s1))
@@ -78,36 +73,28 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
       ((v, i) => (i, v._1, v._2))
     def ins4 = as.map(a => (a.s1, a.s2)) returning as.map(a => a)
 
-    (for {
+    (for
       _ <- as.schema.create
-      _ <- (ins1 += ("a", "b")) map { id1: Int =>
+      _ <- (ins1 += ("a", "b")) map  id1: Int =>
         id1 shouldBe 1
-      }
-      _ <- ifCap(jcap.returnInsertOther) {
-        (ins2 += ("c", "d")) map { id2: (Int, String) =>
+      _ <- ifCap(jcap.returnInsertOther)
+        (ins2 += ("c", "d")) map  id2: (Int, String) =>
           id2 shouldBe (2, "c")
-        }
-      }
-      _ <- ifNotCap(jcap.returnInsertOther) {
-        (ins1 += ("c", "d")) map { id2: Int =>
+      _ <- ifNotCap(jcap.returnInsertOther)
+        (ins1 += ("c", "d")) map  id2: Int =>
           id2 shouldBe 2
-        }
-      }
       _ <- (ins1 ++= Seq(("e", "f"), ("g", "h"))) map (_ shouldBe Seq(3, 4))
       _ <- (ins3 += ("i", "j")) map (_ shouldBe (5, "i", "j"))
-      _ <- ifCap(jcap.returnInsertOther) {
-        (ins4 += ("k", "l")) map { id5: (Int, String, String) =>
+      _ <- ifCap(jcap.returnInsertOther)
+        (ins4 += ("k", "l")) map  id5: (Int, String, String) =>
           id5 shouldBe (6, "k", "l")
-        }
-      }
-    } yield
+    yield
       ()).withPinnedSession // Some database servers (e.g. DB2) preallocate ID blocks per session
-  }
 
-  def testForced = {
+  def testForced =
     class T(tname: String)(tag: Tag)
         extends Table[(Int, String, Int, Boolean, String, String, Int)](
-            tag, tname) {
+            tag, tname)
       def id = column[Int]("id", O.AutoInc, O.PrimaryKey)
       def name = column[String]("name")
       def i1 = column[Int]("i1")
@@ -118,7 +105,6 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
 
       def * = (id, name, i1, b, s1, s2, i2)
       def ins = (id, name, i1, b, s1, s2, i2)
-    }
     val ts = TableQuery(new T("t_forced")(_))
     val src = TableQuery(new T("src_forced")(_))
 
@@ -147,18 +133,16 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
                   .map(_ shouldBe Some((90, "X", 1, false, "S1", "S2", 0)))
               ))
       )
-  }
 
-  def testInsertOrUpdatePlain = {
-    class T(tag: Tag) extends Table[(Int, String)](tag, "t_merge") {
+  def testInsertOrUpdatePlain =
+    class T(tag: Tag) extends Table[(Int, String)](tag, "t_merge")
       def id = column[Int]("id", O.PrimaryKey)
       def name = column[String]("name")
       def * = (id, name)
       def ins = (id, name)
-    }
     val ts = TableQuery[T]
 
-    for {
+    for
       _ <- ts.schema.create
       _ <- ts ++= Seq((1, "a"), (2, "b"))
       _ <- ts.insertOrUpdate((3, "c")).map(_ shouldBe 1)
@@ -167,19 +151,17 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
         .sortBy(_.id)
         .result
         .map(_ shouldBe Seq((1, "d"), (2, "b"), (3, "c")))
-    } yield ()
-  }
+    yield ()
 
-  def testInsertOrUpdateAutoInc = {
-    class T(tag: Tag) extends Table[(Int, String)](tag, "T_MERGE2") {
+  def testInsertOrUpdateAutoInc =
+    class T(tag: Tag) extends Table[(Int, String)](tag, "T_MERGE2")
       def id = column[Int]("ID", O.AutoInc, O.PrimaryKey)
       def name = column[String]("NAME")
       def * = (id, name)
       def ins = (id, name)
-    }
     val ts = TableQuery[T]
 
-    (for {
+    (for
       _ <- ts.schema.create
       _ <- ts ++= Seq((1, "a"), (2, "b"))
       _ <- ts.insertOrUpdate((0, "c")).map(_ shouldBe 1)
@@ -188,17 +170,14 @@ class InsertTest extends AsyncTest[JdbcTestDB] {
         .sortBy(_.id)
         .result
         .map(_ shouldBe Seq((1, "d"), (2, "b"), (3, "c")))
-      _ <- ifCap(jcap.returnInsertKey) {
+      _ <- ifCap(jcap.returnInsertKey)
         val q = ts returning ts.map(_.id)
-        for {
+        for
           _ <- q.insertOrUpdate((0, "e")).map(_ shouldBe Some(4))
           _ <- q.insertOrUpdate((1, "f")).map(_ shouldBe None)
           _ <- ts
             .sortBy(_.id)
             .result
             .map(_ shouldBe Seq((1, "f"), (2, "b"), (3, "c"), (4, "e")))
-        } yield ()
-      }
-    } yield ()).withPinnedSession
-  }
-}
+        yield ()
+    yield ()).withPinnedSession

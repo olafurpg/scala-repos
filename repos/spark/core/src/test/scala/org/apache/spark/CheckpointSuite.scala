@@ -27,7 +27,7 @@ import org.apache.spark.rdd._
 import org.apache.spark.storage.{BlockId, StorageLevel, TestBlockId}
 import org.apache.spark.util.Utils
 
-trait RDDCheckpointTester { self: SparkFunSuite =>
+trait RDDCheckpointTester  self: SparkFunSuite =>
 
   protected val partitioner = new HashPartitioner(2)
 
@@ -50,7 +50,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
   protected def testRDD[U : ClassTag](
       op: (RDD[Int]) => RDD[U],
       reliableCheckpoint: Boolean,
-      collectFunc: RDD[U] => Any = defaultCollectFunc[U] _): Unit = {
+      collectFunc: RDD[U] => Any = defaultCollectFunc[U] _): Unit =
     // Generate the final RDD using given RDD operation
     val baseRDD = generateFatRDD()
     val operatedRDD = op(baseRDD)
@@ -80,13 +80,12 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         operatedRDD.toDebugString)
 
     // Test whether the checkpoint file has been created
-    if (reliableCheckpoint) {
+    if (reliableCheckpoint)
       assert(operatedRDD.getCheckpointFile.nonEmpty)
       val recoveredRDD =
         sparkContext.checkpointFile[U](operatedRDD.getCheckpointFile.get)
       assert(collectFunc(recoveredRDD) === result)
       assert(recoveredRDD.partitioner === operatedRDD.partitioner)
-    }
 
     // Test whether dependencies have been changed from its earlier parent RDD
     assert(operatedRDD.dependencies.head != parentDependency)
@@ -112,7 +111,6 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         "Size of " + rddType + " did not reduce after checkpointing " + " [" +
         rddSizeBeforeCheckpoint + " --> " + rddSizeAfterCheckpoint + "]"
     )
-  }
 
   /**
     * Test whether checkpointing of the parent of the generated RDD also
@@ -131,7 +129,7 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
   protected def testRDDPartitions[U : ClassTag](
       op: (RDD[Int]) => RDD[U],
       reliableCheckpoint: Boolean,
-      collectFunc: RDD[U] => Any = defaultCollectFunc[U] _): Unit = {
+      collectFunc: RDD[U] => Any = defaultCollectFunc[U] _): Unit =
     // Generate the final RDD using given RDD operation
     val baseRDD = generateFatRDD()
     val operatedRDD = op(baseRDD)
@@ -149,9 +147,8 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
     val (rddSizeBeforeCheckpoint, partitionSizeBeforeCheckpoint) =
       getSerializedSizes(operatedRDD)
     // checkpoint the parent RDD, not the generated one
-    parentRDDs.foreach { rdd =>
+    parentRDDs.foreach  rdd =>
       checkpoint(rdd, reliableCheckpoint)
-    }
     val result = collectFunc(operatedRDD) // force checkpointing
     operatedRDD.collect() // force re-initialization of post-checkpoint lazy variables
     val (rddSizeAfterCheckpoint, partitionSizeAfterCheckpoint) =
@@ -175,13 +172,12 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         " [" + partitionSizeBeforeCheckpoint + " --> " +
         partitionSizeAfterCheckpoint + "]"
     )
-  }
 
   /**
     * Get serialized sizes of the RDD and its partitions, in order to test whether the size shrinks
     * upon checkpointing. Ignores the checkpointData field, which may grow when we checkpoint.
     */
-  private def getSerializedSizes(rdd: RDD[_]): (Int, Int) = {
+  private def getSerializedSizes(rdd: RDD[_]): (Int, Int) =
     val rddSize = Utils.serialize(rdd).size
     val rddCpDataSize = Utils.serialize(rdd.checkpointData).size
     val rddPartitionSize = Utils.serialize(rdd.partitions).size
@@ -201,90 +197,77 @@ trait RDDCheckpointTester { self: SparkFunSuite =>
         rddSize + ")"
     )
     (rddSize - rddCpDataSize, rddPartitionSize)
-  }
 
   /**
     * Serialize and deserialize an object. This is useful to verify the objects
     * contents after deserialization (e.g., the contents of an RDD split after
     * it is sent to a slave along with a task)
     */
-  protected def serializeDeserialize[T](obj: T): T = {
+  protected def serializeDeserialize[T](obj: T): T =
     val bytes = Utils.serialize(obj)
     Utils.deserialize[T](bytes)
-  }
 
   /**
     * Recursively force the initialization of the all members of an RDD and it parents.
     */
-  private def initializeRdd(rdd: RDD[_]): Unit = {
+  private def initializeRdd(rdd: RDD[_]): Unit =
     rdd.partitions // forces the initialization of the partitions
     rdd.dependencies.map(_.rdd).foreach(initializeRdd)
-  }
 
   /** Checkpoint the RDD either locally or reliably. */
-  protected def checkpoint(rdd: RDD[_], reliableCheckpoint: Boolean): Unit = {
-    if (reliableCheckpoint) {
+  protected def checkpoint(rdd: RDD[_], reliableCheckpoint: Boolean): Unit =
+    if (reliableCheckpoint)
       rdd.checkpoint()
-    } else {
+    else
       rdd.localCheckpoint()
-    }
-  }
 
   /** Run a test twice, once for local checkpointing and once for reliable checkpointing. */
   protected def runTest(
       name: String,
       skipLocalCheckpoint: Boolean = false
-  )(body: Boolean => Unit): Unit = {
+  )(body: Boolean => Unit): Unit =
     test(name + " [reliable checkpoint]")(body(true))
-    if (!skipLocalCheckpoint) {
+    if (!skipLocalCheckpoint)
       test(name + " [local checkpoint]")(body(false))
-    }
-  }
 
   /**
     * Generate an RDD such that both the RDD and its partitions have large size.
     */
-  protected def generateFatRDD(): RDD[Int] = {
+  protected def generateFatRDD(): RDD[Int] =
     new FatRDD(sparkContext.makeRDD(1 to 100, 4)).map(x => x)
-  }
 
   /**
     * Generate an pair RDD (with partitioner) such that both the RDD and its partitions
     * have large size.
     */
-  protected def generateFatPairRDD(): RDD[(Int, Int)] = {
+  protected def generateFatPairRDD(): RDD[(Int, Int)] =
     new FatPairRDD(sparkContext.makeRDD(1 to 100, 4), partitioner)
       .mapValues(x => x)
-  }
-}
 
 /**
   * Test suite for end-to-end checkpointing functionality.
   * This tests both reliable checkpoints and local checkpoints.
   */
 class CheckpointSuite
-    extends SparkFunSuite with RDDCheckpointTester with LocalSparkContext {
+    extends SparkFunSuite with RDDCheckpointTester with LocalSparkContext
   private var checkpointDir: File = _
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
     checkpointDir = File.createTempFile("temp", "", Utils.createTempDir())
     checkpointDir.delete()
     sc = new SparkContext("local", "test")
     sc.setCheckpointDir(checkpointDir.toString)
-  }
 
-  override def afterEach(): Unit = {
-    try {
+  override def afterEach(): Unit =
+    try
       Utils.deleteRecursively(checkpointDir)
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
   override def sparkContext: SparkContext = sc
 
-  runTest("basic checkpointing") { reliableCheckpoint: Boolean =>
+  runTest("basic checkpointing")  reliableCheckpoint: Boolean =>
     val parCollection = sc.makeRDD(1 to 4)
     val flatMappedRDD = parCollection.flatMap(x => 1 to x)
     checkpoint(flatMappedRDD, reliableCheckpoint)
@@ -292,14 +275,13 @@ class CheckpointSuite
     val result = flatMappedRDD.collect()
     assert(flatMappedRDD.dependencies.head.rdd != parCollection)
     assert(flatMappedRDD.collect() === result)
-  }
 
-  runTest("checkpointing partitioners", skipLocalCheckpoint = true) {
+  runTest("checkpointing partitioners", skipLocalCheckpoint = true)
     _: Boolean =>
       def testPartitionerCheckpointing(
           partitioner: Partitioner,
           corruptPartitionerFile: Boolean = false
-      ): Unit = {
+      ): Unit =
         val rddWithPartitioner =
           sc.makeRDD(1 to 4).map { _ -> 1 }.partitionBy(partitioner)
         rddWithPartitioner.checkpoint()
@@ -307,7 +289,7 @@ class CheckpointSuite
         assert(rddWithPartitioner.getCheckpointFile.get.nonEmpty,
                "checkpointing was not successful")
 
-        if (corruptPartitionerFile) {
+        if (corruptPartitionerFile)
           // Overwrite the partitioner file with garbage data
           val checkpointDir =
             new Path(rddWithPartitioner.getCheckpointFile.get)
@@ -321,30 +303,26 @@ class CheckpointSuite
           val output = fs.create(partitionerFile.get, true)
           output.write(100)
           output.close()
-        }
 
         val newRDD = sc.checkpointFile[(Int, Int)](
             rddWithPartitioner.getCheckpointFile.get)
         assert(newRDD.collect().toSet === rddWithPartitioner.collect().toSet,
                "RDD not recovered")
 
-        if (!corruptPartitionerFile) {
+        if (!corruptPartitionerFile)
           assert(newRDD.partitioner != None, "partitioner not recovered")
           assert(newRDD.partitioner === rddWithPartitioner.partitioner,
                  "recovered partitioner does not match")
-        } else {
+        else
           assert(
               newRDD.partitioner == None, "partitioner unexpectedly recovered")
-        }
-      }
 
       testPartitionerCheckpointing(partitioner)
 
       // Test that corrupted partitioner file does not prevent recovery of RDD
       testPartitionerCheckpointing(partitioner, corruptPartitionerFile = true)
-  }
 
-  runTest("RDDs with one-to-one dependencies") { reliableCheckpoint: Boolean =>
+  runTest("RDDs with one-to-one dependencies")  reliableCheckpoint: Boolean =>
     testRDD(_.map(x => x.toString), reliableCheckpoint)
     testRDD(_.flatMap(x => 1 to x), reliableCheckpoint)
     testRDD(_.filter(_ % 2 == 0), reliableCheckpoint)
@@ -357,27 +335,24 @@ class CheckpointSuite
         _.map(x => (x % 2, 1)).reduceByKey(_ + _).flatMapValues(x => 1 to x),
         reliableCheckpoint)
     testRDD(_.pipe(Seq("cat")), reliableCheckpoint)
-  }
 
-  runTest("ParallelCollectionRDD") { reliableCheckpoint: Boolean =>
+  runTest("ParallelCollectionRDD")  reliableCheckpoint: Boolean =>
     val parCollection = sc.makeRDD(1 to 4, 2)
     val numPartitions = parCollection.partitions.size
     checkpoint(parCollection, reliableCheckpoint)
     assert(parCollection.dependencies === Nil)
     val result = parCollection.collect()
-    if (reliableCheckpoint) {
+    if (reliableCheckpoint)
       assert(sc
             .checkpointFile[Int](parCollection.getCheckpointFile.get)
             .collect() === result)
-    }
     assert(parCollection.dependencies != Nil)
     assert(parCollection.partitions.length === numPartitions)
     assert(
         parCollection.partitions.toList === parCollection.checkpointData.get.getPartitions.toList)
     assert(parCollection.collect() === result)
-  }
 
-  runTest("BlockRDD") { reliableCheckpoint: Boolean =>
+  runTest("BlockRDD")  reliableCheckpoint: Boolean =>
     val blockId = TestBlockId("id")
     val blockManager = SparkEnv.get.blockManager
     blockManager.putSingle(blockId, "test", StorageLevel.MEMORY_ONLY)
@@ -385,34 +360,29 @@ class CheckpointSuite
     val numPartitions = blockRDD.partitions.size
     checkpoint(blockRDD, reliableCheckpoint)
     val result = blockRDD.collect()
-    if (reliableCheckpoint) {
+    if (reliableCheckpoint)
       assert(
           sc.checkpointFile[String](blockRDD.getCheckpointFile.get).collect() === result)
-    }
     assert(blockRDD.dependencies != Nil)
     assert(blockRDD.partitions.length === numPartitions)
     assert(
         blockRDD.partitions.toList === blockRDD.checkpointData.get.getPartitions.toList)
     assert(blockRDD.collect() === result)
-  }
 
-  runTest("ShuffleRDD") { reliableCheckpoint: Boolean =>
+  runTest("ShuffleRDD")  reliableCheckpoint: Boolean =>
     testRDD(rdd =>
-              {
                 // Creating ShuffledRDD directly as PairRDDFunctions.combineByKey produces a MapPartitionedRDD
                 new ShuffledRDD[Int, Int, Int](rdd.map(x => (x % 2, 1)),
                                                partitioner)
-            },
+            ,
             reliableCheckpoint)
-  }
 
-  runTest("UnionRDD") { reliableCheckpoint: Boolean =>
+  runTest("UnionRDD")  reliableCheckpoint: Boolean =>
     def otherRDD: RDD[Int] = sc.makeRDD(1 to 10, 1)
     testRDD(_.union(otherRDD), reliableCheckpoint)
     testRDDPartitions(_.union(otherRDD), reliableCheckpoint)
-  }
 
-  runTest("CartesianRDD") { reliableCheckpoint: Boolean =>
+  runTest("CartesianRDD")  reliableCheckpoint: Boolean =>
     def otherRDD: RDD[Int] = sc.makeRDD(1 to 10, 1)
     testRDD(new CartesianRDD(sc, _, otherRDD), reliableCheckpoint)
     testRDDPartitions(new CartesianRDD(sc, _, otherRDD), reliableCheckpoint)
@@ -433,9 +403,8 @@ class CheckpointSuite
         (splitAfterCheckpoint.s2.getClass != splitBeforeCheckpoint.s2.getClass),
         "CartesianRDD.s1 and CartesianRDD.s2 not updated after parent RDD is checkpointed"
     )
-  }
 
-  runTest("CoalescedRDD") { reliableCheckpoint: Boolean =>
+  runTest("CoalescedRDD")  reliableCheckpoint: Boolean =>
     testRDD(_.coalesce(2), reliableCheckpoint)
     testRDDPartitions(_.coalesce(2), reliableCheckpoint)
 
@@ -455,9 +424,8 @@ class CheckpointSuite
         splitAfterCheckpoint.parents.head.getClass != splitBeforeCheckpoint.parents.head.getClass,
         "CoalescedRDDPartition.parents not updated after parent RDD is checkpointed"
     )
-  }
 
-  runTest("CoGroupedRDD") { reliableCheckpoint: Boolean =>
+  runTest("CoGroupedRDD")  reliableCheckpoint: Boolean =>
     val longLineageRDD1 = generateFatPairRDD()
 
     // Collect the RDD as sequences instead of arrays to enable equality tests in testRDD
@@ -465,26 +433,23 @@ class CheckpointSuite
       rdd.map { case (p, a) => (p, a.toSeq) }.collect(): Any
 
     testRDD(rdd =>
-              {
                 CheckpointSuite.cogroup(
                     longLineageRDD1, rdd.map(x => (x % 2, 1)), partitioner)
-            },
+            ,
             reliableCheckpoint,
             seqCollectFunc)
 
     val longLineageRDD2 = generateFatPairRDD()
     testRDDPartitions(
         rdd =>
-          {
             CheckpointSuite.cogroup(longLineageRDD2,
                                     sc.makeRDD(1 to 2, 2).map(x => (x % 2, 1)),
                                     partitioner)
-        },
+        ,
         reliableCheckpoint,
         seqCollectFunc)
-  }
 
-  runTest("ZippedPartitionsRDD") { reliableCheckpoint: Boolean =>
+  runTest("ZippedPartitionsRDD")  reliableCheckpoint: Boolean =>
     testRDD(rdd => rdd.zip(rdd.map(x => x)), reliableCheckpoint)
     testRDDPartitions(rdd => rdd.zip(rdd.map(x => x)), reliableCheckpoint)
 
@@ -510,31 +475,28 @@ class CheckpointSuite
           .getClass,
         "ZippedPartitionsRDD partition 0 (or 1) not updated after parent RDDs are checkpointed"
     )
-  }
 
-  runTest("PartitionerAwareUnionRDD") { reliableCheckpoint: Boolean =>
+  runTest("PartitionerAwareUnionRDD")  reliableCheckpoint: Boolean =>
     testRDD(
         rdd =>
-          {
             new PartitionerAwareUnionRDD[(Int, Int)](
                 sc,
                 Array(
                     generateFatPairRDD(),
                     rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _)
                 ))
-        },
+        ,
         reliableCheckpoint)
 
     testRDDPartitions(
         rdd =>
-          {
             new PartitionerAwareUnionRDD[(Int, Int)](
                 sc,
                 Array(
                     generateFatPairRDD(),
                     rdd.map(x => (x % 2, 1)).reduceByKey(partitioner, _ + _)
                 ))
-        },
+        ,
         reliableCheckpoint)
 
     // Test that the PartitionerAwareUnionRDD updates parent partitions
@@ -555,9 +517,8 @@ class CheckpointSuite
         partitionBeforeCheckpoint.parents.head.getClass != partitionAfterCheckpoint.parents.head.getClass,
         "PartitionerAwareUnionRDDPartition.parents not updated after parent RDD is checkpointed"
     )
-  }
 
-  runTest("CheckpointRDD with zero partitions") {
+  runTest("CheckpointRDD with zero partitions")
     reliableCheckpoint: Boolean =>
       val rdd = new BlockRDD[Int](sc, Array[BlockId]())
       assert(rdd.partitions.size === 0)
@@ -570,21 +531,19 @@ class CheckpointSuite
       assert(rdd.isCheckpointed === true)
       assert(rdd.isCheckpointedAndMaterialized === true)
       assert(rdd.partitions.size === 0)
-  }
 
-  runTest("checkpointAllMarkedAncestors") { reliableCheckpoint: Boolean =>
+  runTest("checkpointAllMarkedAncestors")  reliableCheckpoint: Boolean =>
     testCheckpointAllMarkedAncestors(
         reliableCheckpoint, checkpointAllMarkedAncestors = true)
     testCheckpointAllMarkedAncestors(
         reliableCheckpoint, checkpointAllMarkedAncestors = false)
-  }
 
   private def testCheckpointAllMarkedAncestors(
       reliableCheckpoint: Boolean,
-      checkpointAllMarkedAncestors: Boolean): Unit = {
+      checkpointAllMarkedAncestors: Boolean): Unit =
     sc.setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS,
                         checkpointAllMarkedAncestors.toString)
-    try {
+    try
       val rdd1 = sc.parallelize(1 to 10)
       checkpoint(rdd1, reliableCheckpoint)
       val rdd2 = rdd1.map(_ + 1)
@@ -592,59 +551,47 @@ class CheckpointSuite
       rdd2.count()
       assert(rdd1.isCheckpointed === checkpointAllMarkedAncestors)
       assert(rdd2.isCheckpointed === true)
-    } finally {
+    finally
       sc.setLocalProperty(RDD.CHECKPOINT_ALL_MARKED_ANCESTORS, null)
-    }
-  }
-}
 
 /** RDD partition that has large serialized size. */
-class FatPartition(val partition: Partition) extends Partition {
+class FatPartition(val partition: Partition) extends Partition
   val bigData = new Array[Byte](10000)
   def index: Int = partition.index
-}
 
 /** RDD that has large serialized size. */
-class FatRDD(parent: RDD[Int]) extends RDD[Int](parent) {
+class FatRDD(parent: RDD[Int]) extends RDD[Int](parent)
   val bigData = new Array[Byte](100000)
 
-  protected def getPartitions: Array[Partition] = {
+  protected def getPartitions: Array[Partition] =
     parent.partitions.map(p => new FatPartition(p))
-  }
 
-  def compute(split: Partition, context: TaskContext): Iterator[Int] = {
+  def compute(split: Partition, context: TaskContext): Iterator[Int] =
     parent.compute(split.asInstanceOf[FatPartition].partition, context)
-  }
-}
 
 /** Pair RDD that has large serialized size. */
 class FatPairRDD(parent: RDD[Int], _partitioner: Partitioner)
-    extends RDD[(Int, Int)](parent) {
+    extends RDD[(Int, Int)](parent)
   val bigData = new Array[Byte](100000)
 
-  protected def getPartitions: Array[Partition] = {
+  protected def getPartitions: Array[Partition] =
     parent.partitions.map(p => new FatPartition(p))
-  }
 
   @transient override val partitioner = Some(_partitioner)
 
-  def compute(split: Partition, context: TaskContext): Iterator[(Int, Int)] = {
+  def compute(split: Partition, context: TaskContext): Iterator[(Int, Int)] =
     parent
       .compute(split.asInstanceOf[FatPartition].partition, context)
       .map(x => (x, x))
-  }
-}
 
-object CheckpointSuite {
+object CheckpointSuite
   // This is a custom cogroup function that does not use mapValues like
   // the PairRDDFunctions.cogroup()
   def cogroup[K : ClassTag, V : ClassTag](
       first: RDD[(K, V)],
       second: RDD[(K, V)],
-      part: Partitioner): RDD[(K, Array[Iterable[V]])] = {
+      part: Partitioner): RDD[(K, Array[Iterable[V]])] =
     new CoGroupedRDD[K](
         Seq(first.asInstanceOf[RDD[(K, _)]], second.asInstanceOf[RDD[(K, _)]]),
         part
     ).asInstanceOf[RDD[(K, Array[Iterable[V]])]]
-  }
-}

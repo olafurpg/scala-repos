@@ -25,15 +25,15 @@ import org.apache.spark.{LocalSparkContext, SparkContext, SparkFunSuite}
 import org.apache.spark.util.Utils
 
 class JdbcRDDSuite
-    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext {
+    extends SparkFunSuite with BeforeAndAfter with LocalSparkContext
 
-  before {
+  before
     Utils.classForName("org.apache.derby.jdbc.EmbeddedDriver")
     val conn = DriverManager.getConnection(
         "jdbc:derby:target/JdbcRDDSuiteDb;create=true")
-    try {
+    try
 
-      try {
+      try
         val create = conn.createStatement
         create.execute("""
           CREATE TABLE FOO(
@@ -42,39 +42,33 @@ class JdbcRDDSuite
           )""")
         create.close()
         val insert = conn.prepareStatement("INSERT INTO FOO(DATA) VALUES(?)")
-        (1 to 100).foreach { i =>
+        (1 to 100).foreach  i =>
           insert.setInt(1, i * 2)
           insert.executeUpdate
-        }
         insert.close()
-      } catch {
+      catch
         case e: SQLException if e.getSQLState == "X0Y32" =>
         // table exists
-      }
 
-      try {
+      try
         val create = conn.createStatement
         create.execute(
             "CREATE TABLE BIGINT_TEST(ID BIGINT NOT NULL, DATA INTEGER)")
         create.close()
         val insert =
           conn.prepareStatement("INSERT INTO BIGINT_TEST VALUES(?,?)")
-        (1 to 100).foreach { i =>
+        (1 to 100).foreach  i =>
           insert.setLong(1, 100000000000000000L + 4000000000000000L * i)
           insert.setInt(2, i)
           insert.executeUpdate
-        }
         insert.close()
-      } catch {
+      catch
         case e: SQLException if e.getSQLState == "X0Y32" =>
         // table exists
-      }
-    } finally {
+    finally
       conn.close()
-    }
-  }
 
-  test("basic functionality") {
+  test("basic functionality")
     sc = new SparkContext("local", "test")
     val rdd = new JdbcRDD(
         sc,
@@ -88,9 +82,8 @@ class JdbcRDDSuite
 
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 10100)
-  }
 
-  test("large id overflow") {
+  test("large id overflow")
     sc = new SparkContext("local", "test")
     val rdd = new JdbcRDD(
         sc,
@@ -103,16 +96,12 @@ class JdbcRDDSuite
         (r: ResultSet) => { r.getInt(1) }).cache()
     assert(rdd.count === 100)
     assert(rdd.reduce(_ + _) === 5050)
-  }
 
-  after {
-    try {
+  after
+    try
       DriverManager.getConnection(
           "jdbc:derby:target/JdbcRDDSuiteDb;shutdown=true")
-    } catch {
+    catch
       case se: SQLException if se.getSQLState == "08006" =>
       // Normal single database shutdown
       // https://db.apache.org/derby/docs/10.2/ref/rrefexcept71493.html
-    }
-  }
-}

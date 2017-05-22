@@ -15,7 +15,7 @@ class IndexController
     with AccountService with RepositorySearchService with IssuesService
     with UsersAuthenticator with ReferrerAuthenticator
 
-trait IndexControllerBase extends ControllerBase {
+trait IndexControllerBase extends ControllerBase
   self: RepositoryService with ActivityService with AccountService with RepositorySearchService with UsersAuthenticator with ReferrerAuthenticator =>
 
   case class SignInForm(userName: String, password: String)
@@ -33,16 +33,16 @@ trait IndexControllerBase extends ControllerBase {
 
   case class SearchForm(query: String, owner: String, repository: String)
 
-  get("/") {
+  get("/")
     val loginAccount = context.loginAccount
-    if (loginAccount.isEmpty) {
+    if (loginAccount.isEmpty)
       gitbucket.core.html.index(
           getRecentActivities(),
           getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-          loginAccount.map { account =>
+          loginAccount.map  account =>
             getUserRepositories(account.userName, withoutPhysicalInfo = true)
-          }.getOrElse(Nil))
-    } else {
+          .getOrElse(Nil))
+    else
       val loginUserName = loginAccount.get.userName
       val loginUserGroups = getGroupsByUserName(loginUserName)
       var visibleOwnerSet: Set[String] = Set(loginUserName)
@@ -52,68 +52,55 @@ trait IndexControllerBase extends ControllerBase {
       gitbucket.core.html.index(
           getRecentActivitiesByOwners(visibleOwnerSet),
           getVisibleRepositories(loginAccount, withoutPhysicalInfo = true),
-          loginAccount.map { account =>
+          loginAccount.map  account =>
             getUserRepositories(account.userName, withoutPhysicalInfo = true)
-          }.getOrElse(Nil))
-    }
-  }
+          .getOrElse(Nil))
 
-  get("/signin") {
+  get("/signin")
     val redirect = params.get("redirect")
-    if (redirect.isDefined && redirect.get.startsWith("/")) {
+    if (redirect.isDefined && redirect.get.startsWith("/"))
       flash += Keys.Flash.Redirect -> redirect.get
-    }
     gitbucket.core.html.signin()
-  }
 
-  post("/signin", signinForm) { form =>
-    authenticate(context.settings, form.userName, form.password) match {
+  post("/signin", signinForm)  form =>
+    authenticate(context.settings, form.userName, form.password) match
       case Some(account) => signin(account)
       case None => redirect("/signin")
-    }
-  }
 
-  get("/signout") {
+  get("/signout")
     session.invalidate
     redirect("/")
-  }
 
-  get("/activities.atom") {
+  get("/activities.atom")
     contentType = "application/atom+xml; type=feed"
     xml.feed(getRecentActivities())
-  }
 
   /**
     * Set account information into HttpSession and redirect.
     */
-  private def signin(account: Account) = {
+  private def signin(account: Account) =
     session.setAttribute(Keys.Session.LoginAccount, account)
     updateLastLoginDate(account.userName)
 
-    if (LDAPUtil.isDummyMailAddress(account)) {
+    if (LDAPUtil.isDummyMailAddress(account))
       redirect("/" + account.userName + "/_edit")
-    }
 
     flash
       .get(Keys.Flash.Redirect)
       .asInstanceOf[Option[String]]
-      .map { redirectUrl =>
-        if (redirectUrl.stripSuffix("/") == request.getContextPath) {
+      .map  redirectUrl =>
+        if (redirectUrl.stripSuffix("/") == request.getContextPath)
           redirect("/")
-        } else {
+        else
           redirect(redirectUrl)
-        }
-      }
-      .getOrElse {
+      .getOrElse
         redirect("/")
-      }
-  }
 
   /**
     * JSON API for collaborator completion.
     */
   get("/_user/proposals")(
-      usersOnly {
+      usersOnly
     contentType = formats("json")
     org.json4s.jackson.Serialization.write(
         Map("options" -> getAllUsers(false)
@@ -121,33 +108,31 @@ trait IndexControllerBase extends ControllerBase {
               .map(_.userName)
               .toArray)
       )
-  })
+  )
 
   /**
     * JSON API for checking user existence.
     */
-  post("/_user/existence")(usersOnly {
+  post("/_user/existence")(usersOnly
     getAccountByUserName(params("userName")).isDefined
-  })
+  )
 
   // TODO Move to RepositoryViwerController?
-  post("/search", searchForm) { form =>
+  post("/search", searchForm)  form =>
     redirect(
         s"/${form.owner}/${form.repository}/search?q=${StringUtil.urlEncode(form.query)}")
-  }
 
   // TODO Move to RepositoryViwerController?
-  get("/:owner/:repository/search")(referrersOnly { repository =>
-    defining(params("q").trim, params.getOrElse("type", "code")) {
+  get("/:owner/:repository/search")(referrersOnly  repository =>
+    defining(params("q").trim, params.getOrElse("type", "code"))
       case (query, target) =>
-        val page = try {
+        val page = try
           val i = params.getOrElse("page", "1").toInt
           if (i <= 0) 1 else i
-        } catch {
+        catch
           case e: NumberFormatException => 1
-        }
 
-        target.toLowerCase match {
+        target.toLowerCase match
           case "issue" =>
             gitbucket.core.search.html.issues(
                 searchIssues(repository.owner, repository.name, query),
@@ -163,7 +148,4 @@ trait IndexControllerBase extends ControllerBase {
                 query,
                 page,
                 repository)
-        }
-    }
-  })
-}
+  )

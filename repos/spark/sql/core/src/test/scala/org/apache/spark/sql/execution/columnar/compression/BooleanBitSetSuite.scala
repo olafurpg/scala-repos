@@ -23,10 +23,10 @@ import org.apache.spark.sql.catalyst.expressions.GenericMutableRow
 import org.apache.spark.sql.execution.columnar.{BOOLEAN, NoopColumnStats}
 import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 
-class BooleanBitSetSuite extends SparkFunSuite {
+class BooleanBitSetSuite extends SparkFunSuite
   import BooleanBitSet._
 
-  def skeleton(count: Int) {
+  def skeleton(count: Int)
     // -------------
     // Tests encoder
     // -------------
@@ -44,10 +44,9 @@ class BooleanBitSetSuite extends SparkFunSuite {
 
     // Compression scheme ID + element count + bitset words
     val compressedSize =
-      4 + 4 + {
+      4 + 4 +
         val extra = if (count % BITS_PER_LONG == 0) 0 else 1
         (count / BITS_PER_LONG + extra) * 8
-      }
 
     // 4 extra bytes for compression scheme type ID
     assertResult(headerSize + compressedSize, "Wrong buffer capacity")(
@@ -60,13 +59,11 @@ class BooleanBitSetSuite extends SparkFunSuite {
     assertResult(count, "Wrong element count")(buffer.getInt())
 
     var word = 0: Long
-    for (i <- 0 until count) {
+    for (i <- 0 until count)
       val bit = i % BITS_PER_LONG
       word = if (bit == 0) buffer.getLong() else word
-      assertResult(values(i), s"Wrong value in compressed buffer, index=$i") {
+      assertResult(values(i), s"Wrong value in compressed buffer, index=$i")
         (word & ((1: Long) << bit)) != 0
-      }
-    }
 
     // -------------
     // Tests decoder
@@ -77,35 +74,25 @@ class BooleanBitSetSuite extends SparkFunSuite {
 
     val decoder = BooleanBitSet.decoder(buffer, BOOLEAN)
     val mutableRow = new GenericMutableRow(1)
-    if (values.nonEmpty) {
-      values.foreach {
+    if (values.nonEmpty)
+      values.foreach
         assert(decoder.hasNext)
-        assertResult(_, "Wrong decoded value") {
+        assertResult(_, "Wrong decoded value")
           decoder.next(mutableRow, 0)
           mutableRow.getBoolean(0)
-        }
-      }
-    }
     assert(!decoder.hasNext)
-  }
 
-  test(s"$BooleanBitSet: empty") {
+  test(s"$BooleanBitSet: empty")
     skeleton(0)
-  }
 
-  test(s"$BooleanBitSet: less than 1 word") {
+  test(s"$BooleanBitSet: less than 1 word")
     skeleton(BITS_PER_LONG - 1)
-  }
 
-  test(s"$BooleanBitSet: exactly 1 word") {
+  test(s"$BooleanBitSet: exactly 1 word")
     skeleton(BITS_PER_LONG)
-  }
 
-  test(s"$BooleanBitSet: multiple whole words") {
+  test(s"$BooleanBitSet: multiple whole words")
     skeleton(BITS_PER_LONG * 2)
-  }
 
-  test(s"$BooleanBitSet: multiple words and 1 more bit") {
+  test(s"$BooleanBitSet: multiple words and 1 more bit")
     skeleton(BITS_PER_LONG * 2 + 1)
-  }
-}

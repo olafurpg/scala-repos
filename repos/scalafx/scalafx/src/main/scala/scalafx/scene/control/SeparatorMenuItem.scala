@@ -35,11 +35,10 @@ import scalafx.delegate.SFXDelegate
 /**
   * Object companion for [[scalafx.scene.control.SeparatorMenuItem]].
   */
-object SeparatorMenuItem {
+object SeparatorMenuItem
   implicit def sfxSeparatorMenuItem2jfx(
       s: SeparatorMenuItem): jfxsc.SeparatorMenuItem =
     if (s != null) s.delegate else null
-}
 
 /**
   * A [[MenuItem]] that as the name suggests allows for a horizontal Separator to be embedded within it,
@@ -57,8 +56,6 @@ object SeparatorMenuItem {
   */
 class SeparatorMenuItem(override val delegate: jfxsc.SeparatorMenuItem)
     extends CustomMenuItem(delegate)
-    with SFXDelegate[jfxsc.SeparatorMenuItem] {
-  def this() = {
+    with SFXDelegate[jfxsc.SeparatorMenuItem]
+  def this() =
     this(new jfxsc.SeparatorMenuItem)
-  }
-}

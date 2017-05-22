@@ -26,10 +26,10 @@ import org.apache.spark.sql.types.DecimalType
 case class Fact(
     date: Int, hour: Int, minute: Int, room_name: String, temp: Double)
 
-class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
+class DataFrameAggregateSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("groupBy") {
+  test("groupBy")
     checkAnswer(
         testData2.groupBy("a").agg(sum($"b")),
         Seq(Row(1, 3), Row(2, 3), Row(3, 3))
@@ -62,9 +62,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
         df1.groupBy("key").min("value2"),
         Seq(Row("a", 0), Row("b", 4))
     )
-  }
 
-  test("rollup") {
+  test("rollup")
     checkAnswer(
         courseSales.rollup("course", "year").sum("earnings"),
         Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
@@ -75,9 +74,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                                                             null,
                                                             113000.0) :: Nil
     )
-  }
 
-  test("cube") {
+  test("cube")
     checkAnswer(
         courseSales.cube("course", "year").sum("earnings"),
         Row("Java", 2012, 20000.0) :: Row("Java", 2013, 30000.0) :: Row(
@@ -100,9 +98,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
     val cube0 =
       df0.cube("date", "hour", "minute", "room_name").agg(Map("temp" -> "avg"))
     assert(cube0.where("date IS NULL").count > 0)
-  }
 
-  test("grouping and grouping_id") {
+  test("grouping and grouping_id")
     checkAnswer(
         courseSales
           .cube("course", "year")
@@ -119,15 +116,12 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                                                                     3) :: Nil
     )
 
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       courseSales.groupBy().agg(grouping("course")).explain()
-    }
-    intercept[AnalysisException] {
+    intercept[AnalysisException]
       courseSales.groupBy().agg(grouping_id("course")).explain()
-    }
-  }
 
-  test("grouping/grouping_id inside window function") {
+  test("grouping/grouping_id inside window function")
 
     val w = Window.orderBy(sum("earnings"))
     checkAnswer(
@@ -162,9 +156,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                                                                   3,
                                                                   1) :: Nil
     )
-  }
 
-  test("rollup overlapping columns") {
+  test("rollup overlapping columns")
     checkAnswer(
         testData2
           .rollup($"a" + $"b" as "foo", $"b" as "bar")
@@ -184,9 +177,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
             1) :: Row(3, 2, 2) :: Row(1, null, 3) :: Row(2, null, 3) :: Row(
             3, null, 3) :: Row(null, null, 9) :: Nil
     )
-  }
 
-  test("cube overlapping columns") {
+  test("cube overlapping columns")
     checkAnswer(
         testData2.cube($"a" + $"b", $"b").agg(sum($"a" - $"b")),
         Row(2, 1, 0) :: Row(3, 2, -1) :: Row(3, 1, 1) :: Row(4, 2, 0) :: Row(
@@ -207,9 +199,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                                                                      null,
                                                                      9) :: Nil
     )
-  }
 
-  test("spark.sql.retainGroupColumns config") {
+  test("spark.sql.retainGroupColumns config")
     checkAnswer(
         testData2.groupBy("a").agg(sum($"b")),
         Seq(Row(1, 3), Row(2, 3), Row(3, 3))
@@ -221,23 +212,20 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
         Seq(Row(3), Row(3), Row(3))
     )
     sqlContext.conf.setConf(SQLConf.DATAFRAME_RETAIN_GROUP_COLUMNS, true)
-  }
 
-  test("agg without groups") {
+  test("agg without groups")
     checkAnswer(
         testData2.agg(sum('b)),
         Row(9)
     )
-  }
 
-  test("agg without groups and functions") {
+  test("agg without groups and functions")
     checkAnswer(
         testData2.agg(lit(1)),
         Row(1)
     )
-  }
 
-  test("average") {
+  test("average")
     checkAnswer(testData2.agg(avg('a), mean('a)), Row(2.0, 2.0))
 
     checkAnswer(testData2.agg(avg('a), sumDistinct('a)), // non-partial
@@ -256,33 +244,29 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
         decimalData.agg(avg('a cast DecimalType(10, 2)),
                         sumDistinct('a cast DecimalType(10, 2))),
         Row(new java.math.BigDecimal(2.0), new java.math.BigDecimal(6)) :: Nil)
-  }
 
-  test("null average") {
+  test("null average")
     checkAnswer(testData3.agg(avg('b)), Row(2.0))
 
     checkAnswer(testData3.agg(avg('b), countDistinct('b)), Row(2.0, 1))
 
     checkAnswer(testData3.agg(avg('b), sumDistinct('b)), // non-partial
                 Row(2.0, 2.0))
-  }
 
-  test("zero average") {
+  test("zero average")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(emptyTableData.agg(avg('a)), Row(null))
 
     checkAnswer(emptyTableData.agg(avg('a), sumDistinct('b)), // non-partial
                 Row(null, null))
-  }
 
-  test("count") {
+  test("count")
     assert(testData2.count() === testData2.rdd.map(_ => 1).count())
 
     checkAnswer(testData2.agg(count('a), sumDistinct('a)), // non-partial
                 Row(6, 6.0))
-  }
 
-  test("null count") {
+  test("null count")
     checkAnswer(
         testData3.groupBy('a).agg(count('b)),
         Seq(Row(1, 0), Row(2, 1))
@@ -306,9 +290,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
         testData3.agg(count('b), countDistinct('b), sumDistinct('b)), // non-partial
         Row(1, 1, 2)
     )
-  }
 
-  test("multiple column distinct count") {
+  test("multiple column distinct count")
     val df1 =
       Seq(("a", "b", "c"),
           ("a", "b", "c"),
@@ -330,40 +313,34 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
         df1.groupBy('key1).agg(countDistinct('key2, 'key3)),
         Seq(Row("a", 2), Row("x", 1))
     )
-  }
 
-  test("zero count") {
+  test("zero count")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(emptyTableData.agg(count('a), sumDistinct('a)), // non-partial
                 Row(0, null))
-  }
 
-  test("stddev") {
+  test("stddev")
     val testData2ADev = math.sqrt(4.0 / 5.0)
     checkAnswer(testData2.agg(stddev('a), stddev_pop('a), stddev_samp('a)),
                 Row(testData2ADev, math.sqrt(4 / 6.0), testData2ADev))
     checkAnswer(testData2.agg(stddev("a"), stddev_pop("a"), stddev_samp("a")),
                 Row(testData2ADev, math.sqrt(4 / 6.0), testData2ADev))
-  }
 
-  test("zero stddev") {
+  test("zero stddev")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(
         emptyTableData.agg(stddev('a), stddev_pop('a), stddev_samp('a)),
         Row(null, null, null))
-  }
 
-  test("zero sum") {
+  test("zero sum")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(emptyTableData.agg(sum('a)), Row(null))
-  }
 
-  test("zero sum distinct") {
+  test("zero sum distinct")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
     checkAnswer(emptyTableData.agg(sumDistinct('a)), Row(null))
-  }
 
-  test("moments") {
+  test("moments")
     val absTol = 1e-8
 
     val sparkVariance = testData2.agg(variance('a))
@@ -380,9 +357,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
 
     val sparkKurtosis = testData2.agg(kurtosis('a))
     checkAggregatesWithTol(sparkKurtosis, Row(-1.5), absTol)
-  }
 
-  test("zero moments") {
+  test("zero moments")
     val input = Seq((1, 2)).toDF("a", "b")
     checkAnswer(input.agg(stddev('a),
                           stddev_samp('a),
@@ -417,9 +393,8 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                     0.0,
                     Double.NaN,
                     Double.NaN))
-  }
 
-  test("null moments") {
+  test("null moments")
     val emptyTableData = Seq.empty[(Int, Int)].toDF("a", "b")
 
     checkAnswer(emptyTableData.agg(variance('a),
@@ -435,5 +410,3 @@ class DataFrameAggregateSuite extends QueryTest with SharedSQLContext {
                                    expr("skewness(a)"),
                                    expr("kurtosis(a)")),
                 Row(null, null, null, null, null))
-  }
-}

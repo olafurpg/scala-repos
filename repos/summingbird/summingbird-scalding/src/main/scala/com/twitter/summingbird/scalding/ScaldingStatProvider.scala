@@ -12,25 +12,24 @@ import org.slf4j.LoggerFactory
 // Returned to the Summingbird Counter object to call incrBy function in Summingbird job code
 private[summingbird] case class ScaldingCounterIncrementor(
     group: Group, name: Name, fp: FlowProcess[_])
-    extends CounterIncrementor {
+    extends CounterIncrementor
   def incrBy(by: Long): Unit =
     fp.increment(group.getString, name.getString, by)
-}
 
-private[summingbird] object ScaldingStatProvider extends PlatformStatProvider {
+private[summingbird] object ScaldingStatProvider extends PlatformStatProvider
   @transient private val logger =
     LoggerFactory.getLogger(ScaldingStatProvider.getClass)
 
   private def pullInScaldingRuntimeForJobID(
       jobID: JobId): Option[FlowProcess[_]] =
-    ScalaTry[FlowProcess[_]] {
+    ScalaTry[FlowProcess[_]]
       ScaldingRuntimeStats.getFlowProcessForUniqueId(UniqueID(jobID.get))
-    }.recoverWith {
+    .recoverWith
       case NonFatal(e) =>
         logger.debug(
             s"Unable to get Scalding FlowProcess for jobID $jobID, error $e")
         Failure(e)
-    }.toOption
+    .toOption
 
   // Incrementor from PlatformStatProvicer
   // We use a partially applied function: if successful, ScaldingRuntimeStats.getFlowProcessForUniqueId
@@ -39,11 +38,8 @@ private[summingbird] object ScaldingStatProvider extends PlatformStatProvider {
   def counterIncrementor(jobID: JobId,
                          group: Group,
                          name: Name): Option[ScaldingCounterIncrementor] =
-    pullInScaldingRuntimeForJobID(jobID).map { flowP: FlowProcess[_] =>
+    pullInScaldingRuntimeForJobID(jobID).map  flowP: FlowProcess[_] =>
       ScaldingCounterIncrementor(group, name, flowP)
-    }
-}
 
-private[summingbird] object ScaldingRuntimeStatsProvider {
+private[summingbird] object ScaldingRuntimeStatsProvider
   SummingbirdRuntimeStats.addPlatformStatProvider(ScaldingStatProvider)
-}

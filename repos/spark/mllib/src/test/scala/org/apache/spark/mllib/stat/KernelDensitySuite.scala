@@ -22,8 +22,8 @@ import org.apache.commons.math3.distribution.NormalDistribution
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class KernelDensitySuite extends SparkFunSuite with MLlibTestSparkContext {
-  test("kernel density single sample") {
+class KernelDensitySuite extends SparkFunSuite with MLlibTestSparkContext
+  test("kernel density single sample")
     val rdd = sc.parallelize(Array(5.0))
     val evaluationPoints = Array(5.0, 6.0)
     val densities = new KernelDensity()
@@ -34,9 +34,8 @@ class KernelDensitySuite extends SparkFunSuite with MLlibTestSparkContext {
     val acceptableErr = 1e-6
     assert(math.abs(densities(0) - normal.density(5.0)) < acceptableErr)
     assert(math.abs(densities(1) - normal.density(6.0)) < acceptableErr)
-  }
 
-  test("kernel density multiple samples") {
+  test("kernel density multiple samples")
     val rdd = sc.parallelize(Array(5.0, 10.0))
     val evaluationPoints = Array(5.0, 6.0)
     val densities = new KernelDensity()
@@ -50,5 +49,3 @@ class KernelDensitySuite extends SparkFunSuite with MLlibTestSparkContext {
             (normal1.density(5.0) + normal2.density(5.0)) / 2) < acceptableErr)
     assert(math.abs(densities(1) -
             (normal1.density(6.0) + normal2.density(6.0)) / 2) < acceptableErr)
-  }
-}

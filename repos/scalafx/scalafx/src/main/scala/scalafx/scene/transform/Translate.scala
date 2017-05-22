@@ -33,17 +33,16 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.{PositionDelegate, SFXDelegate}
 
-object Translate {
+object Translate
   implicit def sfxTranslate2jfx(v: Translate): jfxst.Translate =
     if (v != null) v.delegate else null
-}
 
 /**
   *
   */
 class Translate(override val delegate: jfxst.Translate = new jfxst.Translate)
     extends Transform(delegate) with PositionDelegate[jfxst.Translate]
-    with SFXDelegate[jfxst.Translate] {
+    with SFXDelegate[jfxst.Translate]
 
   def this(x: Double, y: Double) = this(new jfxst.Translate(x, y))
 
@@ -54,7 +53,5 @@ class Translate(override val delegate: jfxst.Translate = new jfxst.Translate)
     * Defines the distance by which coordinates are translated in the Z axis direction
     */
   def z: DoubleProperty = delegate.zProperty
-  def z_=(v: Double) {
+  def z_=(v: Double)
     z() = v
-  }
-}

@@ -4,19 +4,18 @@ package codeInsight.intention.types
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 class ConvertScalaToJavaCollectionIntentionTest
-    extends ScalaIntentionTestBase {
+    extends ScalaIntentionTestBase
 
   def familyName: String = ConvertScalaToJavaCollectionIntention.getFamilyName
 
-  def testIntentionIsAvailable() {
+  def testIntentionIsAvailable()
     checkIntentionIsAvailable("""
         |class UsesScalaCollections {
         |  val list = N<caret>il
         |}
       """)
-  }
 
-  def testIntentionIsAvailable2() {
+  def testIntentionIsAvailable2()
     checkIntentionIsAvailable(
         """
         |class UsesScalaCollections {
@@ -25,9 +24,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_MutableMap() {
+  def testIntentionIsAvailable_MutableMap()
     checkIntentionIsAvailable(
         """
         |import scala.collection.mutable
@@ -38,9 +36,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Seq() {
+  def testIntentionIsAvailable_Seq()
     checkIntentionIsAvailable(
         """
         |class UsesScalaCollections {
@@ -49,9 +46,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Set() {
+  def testIntentionIsAvailable_Set()
     checkIntentionIsAvailable(
         """
         |class UsesScalaCollections {
@@ -60,9 +56,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Iterator() {
+  def testIntentionIsAvailable_Iterator()
     checkIntentionIsAvailable(
         """
         |class UsesScalaCollections {
@@ -71,9 +66,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Iterable() {
+  def testIntentionIsAvailable_Iterable()
     checkIntentionIsAvailable(
         """
         |class UsesScalaCollections {
@@ -82,9 +76,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsNotAvailable() {
+  def testIntentionIsNotAvailable()
     checkIntentionIsNotAvailable("""
         |import scala.collection.JavaConverters._
         |
@@ -92,9 +85,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val list = List<caret>(1,2,3).asJava
         |}
       """)
-  }
 
-  def testIntentionIsNotAvailable2() {
+  def testIntentionIsNotAvailable2()
     checkIntentionIsNotAvailable("""
         |import scala.collection.JavaConverters._
         |
@@ -103,9 +95,8 @@ class ConvertScalaToJavaCollectionIntentionTest
         |  val javaIter = iter.as<caret>Java
         |}
       """)
-  }
 
-  def testIntentionAction_Simple() {
+  def testIntentionAction_Simple()
     val text = """
         |import scala.collection.immutable
         |
@@ -123,9 +114,8 @@ class ConvertScalaToJavaCollectionIntentionTest
       """
 
     doTest(text, resultText)
-  }
 
-  def testIntentionAction_Import_Already_Exists() {
+  def testIntentionAction_Import_Already_Exists()
     val text = """
         |import scala.collection.mutable
         |import scala.collection.JavaConverters._
@@ -144,5 +134,3 @@ class ConvertScalaToJavaCollectionIntentionTest
       """
 
     doTest(text, resultText)
-  }
-}

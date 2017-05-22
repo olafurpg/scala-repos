@@ -10,7 +10,7 @@ import akka.persistence.query.EventEnvelope
 /**
   * A plugin may optionally support this query by implementing this trait.
   */
-trait CurrentEventsByTagQuery extends ReadJournal {
+trait CurrentEventsByTagQuery extends ReadJournal
 
   /**
     * Same type of query as [[EventsByTagQuery#eventsByTag]] but the event stream
@@ -19,4 +19,3 @@ trait CurrentEventsByTagQuery extends ReadJournal {
     */
   def currentEventsByTag(
       tag: String, offset: Long): Source[EventEnvelope, NotUsed]
-}

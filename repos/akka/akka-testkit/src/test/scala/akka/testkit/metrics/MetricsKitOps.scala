@@ -13,7 +13,7 @@ import com.codahale.metrics.jvm.MemoryUsageGaugeSet
   *
   * Extracted to give easy overview of user-API detached from MetricsKit internals.
   */
-private[akka] trait MetricsKitOps extends MetricKeyDSL {
+private[akka] trait MetricsKitOps extends MetricKeyDSL
   this: MetricsKit ⇒
 
   type MetricKey = MetricKeyDSL#MetricKey
@@ -31,11 +31,10 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     *
     * Do not use for short running pieces of code.
     */
-  def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T = {
+  def timedWithKnownOps[T](key: MetricKey, ops: Long)(run: ⇒ T): T =
     val c = getOrRegister(
         key.toString, new KnownOpsInTimespanTimer(expectedOps = ops))
     try run finally c.stop()
-  }
 
   /**
     * Use when measuring for 9x'th percentiles as well as min / max / mean values.
@@ -58,15 +57,13 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     *
     * Backed by codahale `ExponentiallyDecayingReservoir`.
     */
-  def histogram(key: MetricKey): Histogram = {
+  def histogram(key: MetricKey): Histogram =
     registry.histogram((key / "histogram").toString)
-  }
 
   /** Yet another delegate to `System.gc()` */
-  def gc() {
+  def gc()
     // todo add some form of logging, to differentiate manual gc calls from "normal" ones
     System.gc()
-  }
 
   /**
     * Enable memory measurements - will be logged by `ScheduledReporter`s if enabled.
@@ -75,36 +72,31 @@ private[akka] trait MetricsKitOps extends MetricKeyDSL {
     * Also allows to `MemoryUsageSnapshotting.getHeapSnapshot` to obtain memory usage numbers at given point in time.
     */
   def measureMemory(
-      key: MetricKey): MemoryUsageGaugeSet with MemoryUsageSnapshotting = {
-    val gaugeSet = new jvm.MemoryUsageGaugeSet() with MemoryUsageSnapshotting {
+      key: MetricKey): MemoryUsageGaugeSet with MemoryUsageSnapshotting =
+    val gaugeSet = new jvm.MemoryUsageGaugeSet() with MemoryUsageSnapshotting
       val prefix = key / "mem"
-    }
 
     registry.registerAll(gaugeSet)
     gaugeSet
-  }
 
   /** Enable GC measurements */
   def measureGc(key: MetricKey) =
     registry.registerAll(
-        new jvm.GarbageCollectorMetricSet() with MetricsPrefix {
+        new jvm.GarbageCollectorMetricSet() with MetricsPrefix
       val prefix = key / "gc"
-    })
+    )
 
   /** Enable File Descriptor measurements */
   def measureFileDescriptors(key: MetricKey) =
     registry.registerAll(
-        new FileDescriptorMetricSet() with MetricsPrefix {
+        new FileDescriptorMetricSet() with MetricsPrefix
       val prefix = key / "file-descriptors"
-    })
-}
+    )
 
-private[metrics] trait MetricsPrefix extends MetricSet {
+private[metrics] trait MetricsPrefix extends MetricSet
   def prefix: MetricKeyDSL#MetricKey
 
-  abstract override def getMetrics: util.Map[String, Metric] = {
+  abstract override def getMetrics: util.Map[String, Metric] =
     // does not have to be fast, is only called once during registering registry
     import collection.JavaConverters._
     (super.getMetrics.asScala.map { case (k, v) ⇒ (prefix / k).toString -> v }).asJava
-  }
-}

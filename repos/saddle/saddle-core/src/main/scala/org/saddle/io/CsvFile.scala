@@ -36,7 +36,7 @@ import org.saddle.UTF8
   * @param path Path to file
   * @param encoding Encoding of text file
   */
-class CsvFile(path: String, encoding: String = UTF8) extends CsvSource {
+class CsvFile(path: String, encoding: String = UTF8) extends CsvSource
   private val file = new RandomAccessFile(path, "r")
   private val chan = file.getChannel
 
@@ -45,16 +45,13 @@ class CsvFile(path: String, encoding: String = UTF8) extends CsvSource {
   private val reader = new BufferedReader(
       new InputStreamReader(stream, encoding))
 
-  def readLine = {
+  def readLine =
     val line = reader.readLine()
     if (line == null) file.close()
     line
-  }
 
   override def toString = "CsvFile(%s, encoding: %s)".format(path, encoding)
-}
 
-object CsvFile {
+object CsvFile
   def apply(path: String, encoding: String = UTF8) =
     new CsvFile(path, encoding)
-}

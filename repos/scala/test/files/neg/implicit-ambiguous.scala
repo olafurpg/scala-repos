@@ -1,4 +1,4 @@
-object Test {
+object Test
   trait =!=[C, D]
 
   implicit def neq[E, F]: E =!= F = null
@@ -8,4 +8,3 @@ object Test {
   implicit def neqAmbig2[I]: I =!= I = null
 
   implicitly[Int =!= Int]
-}

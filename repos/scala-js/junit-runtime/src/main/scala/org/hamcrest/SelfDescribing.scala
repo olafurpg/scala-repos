@@ -3,6 +3,5 @@
  */
 package org.hamcrest
 
-trait SelfDescribing {
+trait SelfDescribing
   def describeTo(description: Description): Unit
-}

@@ -4,13 +4,12 @@ import scala.collection._
 
 import com.twitter.util.{Duration, Time}
 
-trait GenerationalQueue[A] {
+trait GenerationalQueue[A]
   def touch(a: A)
   def add(a: A)
   def remove(a: A)
   def collect(d: Duration): Option[A]
   def collectAll(d: Duration): Iterable[A]
-}
 
 /**
   * Generational Queue keep track of elements based on their last activity.
@@ -19,11 +18,10 @@ trait GenerationalQueue[A] {
   * - collect(age: Duration) collect the oldest element (age of elem must be > age)
   * - collectAll(age: Duration) collect all the elements which age > age in parameter
   */
-class ExactGenerationalQueue[A] extends GenerationalQueue[A] {
+class ExactGenerationalQueue[A] extends GenerationalQueue[A]
   private[this] val container = mutable.HashMap.empty[A, Time]
-  private[this] implicit val ordering = Ordering.by[(A, Time), Time] {
+  private[this] implicit val ordering = Ordering.by[(A, Time), Time]
     case (_, ts) => ts
-  }
 
   /**
     * touch insert the element if it is not yet present
@@ -34,19 +32,15 @@ class ExactGenerationalQueue[A] extends GenerationalQueue[A] {
 
   def remove(a: A) = synchronized { container.remove(a) }
 
-  def collect(age: Duration): Option[A] = synchronized {
+  def collect(age: Duration): Option[A] = synchronized
     if (container.isEmpty) None
     else
-      container.min match {
+      container.min match
         case (a, t) if (t.untilNow > age) => Some(a)
         case _ => None
-      }
-  }
 
-  def collectAll(age: Duration): Iterable[A] = synchronized {
+  def collectAll(age: Duration): Iterable[A] = synchronized
     (container filter { case (_, t) => t.untilNow > age }).keys
-  }
-}
 
 /**
   * Improved GenerationalQueue: using a list of buckets responsible for containing elements belonging
@@ -61,24 +55,22 @@ class ExactGenerationalQueue[A] extends GenerationalQueue[A] {
   * that aren't expired.
   */
 class BucketGenerationalQueue[A](timeout: Duration)
-    extends GenerationalQueue[A] {
-  object TimeBucket {
+    extends GenerationalQueue[A]
+  object TimeBucket
     def empty[B] = new TimeBucket[B](Time.now, timeSlice)
-  }
   class TimeBucket[B](var origin: Time, var span: Duration)
-      extends mutable.HashSet[B] {
+      extends mutable.HashSet[B]
 
     // return the age of the potential youngest element of the bucket (may be negative if the
     // bucket is not yet expired)
     def age(now: Time = Time.now): Duration = (origin + span).until(now)
 
-    def ++=(other: TimeBucket[B]) = {
+    def ++=(other: TimeBucket[B]) =
       origin = List(origin, other.origin).min
       span = List(origin + span, other.origin + other.span).max - origin
 
       super.++=(other)
       this
-    }
 
     override def toString() =
       "TimeBucket(origin=%d, size=%d, age=%s, count=%d)".format(
@@ -87,57 +79,48 @@ class BucketGenerationalQueue[A](timeout: Duration)
           age().toString,
           super.size
       )
-  }
 
   private[this] val timeSlice = timeout / 3
   private[this] var buckets = List[TimeBucket[A]]()
 
-  private[this] def maybeGrowChain() = {
+  private[this] def maybeGrowChain() =
     // NB: age of youngest element is negative when bucket isn't expired
     val growChain = buckets.headOption
       .map((bucket) =>
-            {
           bucket.age() > Duration.Zero
-      })
+      )
       .getOrElse(true)
 
     if (growChain) buckets = TimeBucket.empty[A] :: buckets
     growChain
-  }
 
-  private[this] def compactChain(): List[TimeBucket[A]] = {
+  private[this] def compactChain(): List[TimeBucket[A]] =
     val now = Time.now
     // partition equivalent to takeWhile/dropWhile because buckets are ordered
     val (news, olds) = buckets.partition(_.age(now) < timeout)
     if (olds.isEmpty) news
-    else {
+    else
       val tailBucket = olds.head
       olds drop 1 foreach { tailBucket ++= _ }
       if (tailBucket.isEmpty) news
       else news ::: List(tailBucket)
-    }
-  }
 
-  private[this] def updateBuckets() {
+  private[this] def updateBuckets()
     if (maybeGrowChain()) buckets = compactChain()
-  }
 
-  def touch(a: A) = synchronized {
+  def touch(a: A) = synchronized
     buckets drop 1 foreach { _.remove(a) }
     add(a)
-  }
 
-  def add(a: A) = synchronized {
+  def add(a: A) = synchronized
     updateBuckets()
     buckets.head.add(a)
-  }
 
-  def remove(a: A) = synchronized {
+  def remove(a: A) = synchronized
     buckets foreach { _.remove(a) }
     buckets = compactChain()
-  }
 
-  def collect(d: Duration): Option[A] = synchronized {
+  def collect(d: Duration): Option[A] = synchronized
     if (buckets.isEmpty) return None
 
     if (buckets.last.isEmpty) buckets = compactChain()
@@ -147,9 +130,6 @@ class BucketGenerationalQueue[A](timeout: Duration)
     val oldestBucket = buckets.last
     if (d < oldestBucket.age()) oldestBucket.headOption
     else None
-  }
 
-  def collectAll(d: Duration): Iterable[A] = synchronized {
+  def collectAll(d: Duration): Iterable[A] = synchronized
     (buckets dropWhile (_.age() < d)).flatten
-  }
-}

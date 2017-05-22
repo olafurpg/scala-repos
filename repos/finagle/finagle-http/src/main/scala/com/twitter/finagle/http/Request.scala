@@ -21,7 +21,7 @@ import Bijections._
   *
   * Use RequestProxy to create an even richer subclass.
   */
-abstract class Request extends Message with HttpRequestProxy {
+abstract class Request extends Message with HttpRequestProxy
 
   /**
     * Arbitrary user-defined context associated with this request object.
@@ -80,27 +80,22 @@ abstract class Request extends Message with HttpRequestProxy {
 
   /** Path from URI. */
   @BeanProperty
-  def path: String = {
+  def path: String =
     val u = uri
-    u.indexOf('?') match {
+    u.indexOf('?') match
       case -1 => u
       case n => u.substring(0, n)
-    }
-  }
 
   /** File extension.  Empty string if none. */
   @BeanProperty
-  def fileExtension: String = {
+  def fileExtension: String =
     val p = path
-    val leaf = p.lastIndexOf('/') match {
+    val leaf = p.lastIndexOf('/') match
       case -1 => p
       case n => p.substring(n + 1)
-    }
-    leaf.lastIndexOf('.') match {
+    leaf.lastIndexOf('.') match
       case -1 => ""
       case n => leaf.substring(n + 1).toLowerCase
-    }
-  }
 
   /** Remote InetSocketAddress */
   @BeanProperty
@@ -170,12 +165,12 @@ abstract class Request extends Message with HttpRequestProxy {
 
   /** Get all parameters. */
   def getParams(): JList[JMap.Entry[String, String]] =
-    (params.toList.map {
+    (params.toList.map
       case (k, v) =>
         // cast to appease asJava
         (new AbstractMap.SimpleImmutableEntry(k, v))
           .asInstanceOf[JMap.Entry[String, String]]
-    }).asJava
+    ).asJava
 
   /** Check if parameter exists. */
   def containsParam(name: String): Boolean =
@@ -192,25 +187,22 @@ abstract class Request extends Message with HttpRequestProxy {
   def getResponse(): Response = response
 
   /** Encode an HTTP message to String */
-  def encodeString(): String = {
+  def encodeString(): String =
     new String(encodeBytes(), "UTF-8")
-  }
 
   /** Encode an HTTP message to Array[Byte] */
-  def encodeBytes(): Array[Byte] = {
+  def encodeBytes(): Array[Byte] =
     val encoder = new EncoderEmbedder[ChannelBuffer](new HttpRequestEncoder)
     encoder.offer(from[Request, HttpRequest](this))
     val buffer = encoder.poll()
     val bytes = new Array[Byte](buffer.readableBytes())
     buffer.readBytes(bytes)
     bytes
-  }
 
   override def toString: String =
     "Request(\"" + method + " " + uri + "\", from " + remoteSocketAddress + ")"
-}
 
-object Request {
+object Request
 
   /**
     * [[com.twitter.collection.RecordSchema RecordSchema]] declaration, used
@@ -220,22 +212,19 @@ object Request {
   val Schema: RecordSchema = new RecordSchema
 
   /** Decode a Request from a String */
-  def decodeString(s: String): Request = {
+  def decodeString(s: String): Request =
     decodeBytes(s.getBytes(Charsets.Utf8))
-  }
 
   /** Decode a Request from Array[Byte] */
-  def decodeBytes(b: Array[Byte]): Request = {
+  def decodeBytes(b: Array[Byte]): Request =
     val decoder = new DecoderEmbedder(
         new HttpRequestDecoder(Int.MaxValue, Int.MaxValue, Int.MaxValue))
     decoder.offer(ChannelBuffers.wrappedBuffer(b))
     val req = decoder.poll().asInstanceOf[HttpRequest]
     assert(req ne null)
-    new Request {
+    new Request
       val httpRequest = req
       lazy val remoteSocketAddress = new InetSocketAddress(0)
-    }
-  }
 
   /**
     * Create an HTTP/1.1 GET Request from query string parameters.
@@ -251,14 +240,12 @@ object Request {
     *
     * @param params a list of key-value pairs representing the query string.
     */
-  def apply(uri: String, params: Tuple2[String, String]*): Request = {
+  def apply(uri: String, params: Tuple2[String, String]*): Request =
     val encoder = new QueryStringEncoder(uri)
-    params.foreach {
+    params.foreach
       case (key, value) =>
         encoder.addParam(key, value)
-    }
     apply(Method.Get, encoder.toString)
-  }
 
   /**
     * Create an HTTP/1.1 GET Request from URI string.
@@ -275,13 +262,11 @@ object Request {
   /**
     * Create an HTTP/1.1 GET Request from version, method, and URI string.
     */
-  def apply(version: Version, method: Method, uri: String): Request = {
+  def apply(version: Version, method: Method, uri: String): Request =
     val reqIn = new DefaultHttpRequest(from(version), from(method), uri)
-    new Request {
+    new Request
       val httpRequest = reqIn
       lazy val remoteSocketAddress = new InetSocketAddress(0)
-    }
-  }
 
   /**
     * Create an HTTP/1.1 GET Request from Version, Method, URI, and Reader.
@@ -306,40 +291,35 @@ object Request {
       method: Method,
       uri: String,
       reader: Reader
-  ): Request = {
+  ): Request =
     val httpReq = new DefaultHttpRequest(from(version), from(method), uri)
     httpReq.setChunked(true)
     apply(httpReq, reader, new InetSocketAddress(0))
-  }
 
   private[http] def apply(
       reqIn: HttpRequest,
       readerIn: Reader,
       remoteAddr: InetSocketAddress
-  ): Request = new Request {
+  ): Request = new Request
     override val reader = readerIn
     val httpRequest = reqIn
     lazy val remoteSocketAddress = remoteAddr
-  }
 
   /** Create Request from HttpRequest and Channel.  Used by Codec. */
   private[finagle] def apply(
       httpRequestArg: HttpRequest, channel: Channel): Request =
-    new Request {
+    new Request
       val httpRequest = httpRequestArg
       lazy val remoteSocketAddress =
         channel.getRemoteAddress.asInstanceOf[InetSocketAddress]
-    }
 
   /** Create a query string from URI and parameters. */
-  def queryString(uri: String, params: Tuple2[String, String]*): String = {
+  def queryString(uri: String, params: Tuple2[String, String]*): String =
     val encoder = new QueryStringEncoder(uri)
-    params.foreach {
+    params.foreach
       case (key, value) =>
         encoder.addParam(key, value)
-    }
     encoder.toString
-  }
 
   /**
     * Create a query string from parameters.  The results begins with "?" only if
@@ -358,4 +338,3 @@ object Request {
     */
   def queryString(params: Map[String, String]): String =
     queryString("", params.toSeq: _*)
-}

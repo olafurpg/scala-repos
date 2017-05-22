@@ -20,18 +20,15 @@ import kafka.common.KafkaException
 import org.junit.{Test, Assert}
 import org.scalatest.junit.JUnitSuite
 
-class ResourceTypeTest extends JUnitSuite {
+class ResourceTypeTest extends JUnitSuite
 
   @Test
-  def testFromString(): Unit = {
+  def testFromString(): Unit =
     val resourceType = ResourceType.fromString("Topic")
     Assert.assertEquals(Topic, resourceType)
 
-    try {
+    try
       ResourceType.fromString("badName")
       fail("Expected exception on invalid ResourceType name.")
-    } catch {
+    catch
       case e: KafkaException => // expected
-    }
-  }
-}

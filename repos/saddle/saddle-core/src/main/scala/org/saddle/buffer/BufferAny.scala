@@ -21,34 +21,29 @@ import org.saddle.Buffer
 /**
   * Buffer instance for Any type
   */
-class BufferAny[T : ST](sz: Int = 16) extends Buffer[T] {
+class BufferAny[T : ST](sz: Int = 16) extends Buffer[T]
   var list = Array.ofDim[T](sz)
   var count = 0
   var remain = sz
 
   def apply(loc: Int) = list(loc)
 
-  def add(i: T) {
-    if (remain == 0) {
+  def add(i: T)
+    if (remain == 0)
       remain = list.length
       val newList = Array.ofDim[T](remain * 2)
       Array.copy(list, 0, newList, 0, list.length)
       list = newList
-    }
 
     list(count) = i
     count += 1
     remain -= 1
-  }
 
-  def toArray: Array[T] = {
+  def toArray: Array[T] =
     val newList = Array.ofDim[T](count)
     Array.copy(list, 0, newList, 0, count)
     newList
-  }
-}
 
-object BufferAny {
+object BufferAny
   def apply[T : ST](sz: Int) = new BufferAny[T](sz)
   def apply[T : ST]() = new BufferAny[T]()
-}

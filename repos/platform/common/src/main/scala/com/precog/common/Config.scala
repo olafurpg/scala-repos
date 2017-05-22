@@ -21,6 +21,5 @@ package com.precog.common
 
 import org.streum.configrity.Configuration
 
-trait Config {
+trait Config
   def config: Configuration
-}

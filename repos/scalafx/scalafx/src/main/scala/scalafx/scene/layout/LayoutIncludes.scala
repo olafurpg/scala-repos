@@ -59,7 +59,7 @@ object LayoutIncludes extends LayoutIncludes
   * @define TLPN TilePane
   * @define VBOX  VBox
   */
-trait LayoutIncludes {
+trait LayoutIncludes
 
   /**
     * $START$ACPN.html $ACPN$END
@@ -243,4 +243,3 @@ trait LayoutIncludes {
     */
   implicit def jfxVBox2sfx(v: jfxsl.VBox): VBox =
     if (v != null) new VBox(v) else null
-}

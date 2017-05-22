@@ -17,7 +17,7 @@ package scalaz
   *  @see [[scalaz.Applicative.ApplicativeLaw]]
   */
 ////
-trait Applicative[F[_]] extends Apply[F] { self =>
+trait Applicative[F[_]] extends Apply[F]  self =>
   ////
   def point[A](a: => A): F[A]
 
@@ -53,11 +53,10 @@ trait Applicative[F[_]] extends Apply[F] { self =>
 
   /** Filter `l` according to an applicative predicate. */
   def filterM[A](l: List[A])(f: A => F[Boolean]): F[List[A]] =
-    l match {
+    l match
       case Nil => point(List())
       case h :: t =>
         ap(filterM(t)(f))(map(f(h))(b => t => if (b) h :: t else t))
-    }
 
   /**
     * Returns the given argument if `cond` is `false`, otherwise, unit lifted into F.
@@ -74,30 +73,27 @@ trait Applicative[F[_]] extends Apply[F] { self =>
   /**The composition of Applicatives `F` and `G`, `[x]F[G[x]]`, is an Applicative */
   def compose[G[_]](
       implicit G0: Applicative[G]): Applicative[λ[α => F[G[α]]]] =
-    new CompositionApplicative[F, G] {
+    new CompositionApplicative[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The product of Applicatives `F` and `G`, `[x](F[x], G[x]])`, is an Applicative */
   def product[G[_]](
       implicit G0: Applicative[G]): Applicative[λ[α => (F[α], G[α])]] =
-    new ProductApplicative[F, G] {
+    new ProductApplicative[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /** An `Applicative` for `F` in which effects happen in the opposite order. */
   def flip: Applicative[F] =
-    new Applicative[F] {
+    new Applicative[F]
       val F = Applicative.this
       def point[A](a: => A) = F.point(a)
       def ap[A, B](fa: => F[A])(f: => F[A => B]): F[B] =
         F.ap(f)(F.map(fa)(a => (f: A => B) => f(a)))
       override def flip = self
-    }
 
-  trait ApplicativeLaw extends ApplyLaw {
+  trait ApplicativeLaw extends ApplyLaw
 
     /** `point(identity)` is a no-op. */
     def identityAp[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
@@ -117,16 +113,13 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     def mapLikeDerived[A, B](f: A => B, fa: F[A])(
         implicit FB: Equal[F[B]]): Boolean =
       FB.equal(map(fa)(f), ap(fa)(point(f)))
-  }
   def applicativeLaw = new ApplicativeLaw {}
 
   ////
-  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F] {
+  val applicativeSyntax = new scalaz.syntax.ApplicativeSyntax[F]
     def F = Applicative.this
-  }
-}
 
-object Applicative {
+object Applicative
   @inline def apply[F[_]](implicit F: Applicative[F]): Applicative[F] = F
 
   ////
@@ -135,4 +128,3 @@ object Applicative {
     Monoid[M].applicative
 
   ////
-}

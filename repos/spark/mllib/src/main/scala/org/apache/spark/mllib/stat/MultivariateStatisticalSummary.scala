@@ -24,7 +24,7 @@ import org.apache.spark.mllib.linalg.Vector
   * Trait for multivariate statistical summary of a data matrix.
   */
 @Since("1.0.0")
-trait MultivariateStatisticalSummary {
+trait MultivariateStatisticalSummary
 
   /**
     * Sample mean vector.
@@ -73,4 +73,3 @@ trait MultivariateStatisticalSummary {
     */
   @Since("1.2.0")
   def normL1: Vector
-}

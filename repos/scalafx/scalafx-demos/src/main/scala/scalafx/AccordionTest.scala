@@ -39,17 +39,17 @@ import scalafx.scene.control._
 import scalafx.scene.paint.Color
 import scalafx.scene.shape._
 
-object AccordionTest extends JFXApp {
+object AccordionTest extends JFXApp
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     width = 600
     height = 450
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGreen
-      content = new Accordion {
+      content = new Accordion
         panes = List(
-            new TitledPane {
-              content = new Arc {
+            new TitledPane
+              content = new Arc
                 radiusX = 25
                 radiusY = 50
                 startAngle = 135
@@ -57,10 +57,4 @@ object AccordionTest extends JFXApp {
                 fill = Color.Black
                 stroke = Color.Yellow
                 strokeWidth = 3
-              }
-            }
         )
-      }
-    }
-  }
-}

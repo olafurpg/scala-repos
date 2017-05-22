@@ -25,7 +25,7 @@ package syntax
   *
   * @author Miles Sabin
   */
-final class HListOps[L <: HList](l: L) {
+final class HListOps[L <: HList](l: L)
   import ops.hlist._
 
   /**
@@ -37,4 +37,3 @@ final class HListOps[L <: HList](l: L) {
     * Reverses this `HList`.
     */
   def reverse(implicit reverse: Reverse[L]): reverse.Out = reverse(l)
-}

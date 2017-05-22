@@ -1,6 +1,6 @@
-package scala {
+package scala
 
-  trait T {
+  trait T
     @scala.annotation.bridge
     def bridge(a: String) = 0
 
@@ -13,5 +13,3 @@ package scala {
     bridge
     /*resolved: true, line: 10, applicable: false*/
     foo
-  }
-}

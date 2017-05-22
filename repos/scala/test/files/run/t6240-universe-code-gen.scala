@@ -1,6 +1,6 @@
 import scala.tools.partest.nest.FileManager._
 
-object Test extends App {
+object Test extends App
   val cm = reflect.runtime.currentMirror
   val u = cm.universe
   import u._
@@ -8,17 +8,16 @@ object Test extends App {
   val JavaUniverseTpe = typeOf[reflect.runtime.JavaUniverse]
   val DefinitionsModule = JavaUniverseTpe.member(TermName("definitions"))
 
-  def forceCode(prefix: String, tp: Type): String = {
+  def forceCode(prefix: String, tp: Type): String =
     def isLazyAccessorOrObject(sym: Symbol) = ((sym.isMethod &&
             sym.asMethod.isLazy) || sym.isModule)
     val forceables = tp.members.sorted.filter(isLazyAccessorOrObject)
-    forceables.map { sym =>
+    forceables.map  sym =>
       val path = s"$prefix.${sym.name}"
       "    " +
       (if (sym.isPrivate || sym.isProtected) s"// inaccessible: $path"
        else path)
-    }.mkString("\n")
-  }
+    .mkString("\n")
 
   val code =
     s"""|// Generated Code, validated by run/t6240-universe-code-gen.scala
@@ -50,12 +49,12 @@ object Test extends App {
         |
         |${forceCode("this", JavaUniverseTpe)}
         |${forceCode("definitions", DefinitionsModule.info)}
-        |${forceCode(
-           "refChecks", typeOf[scala.reflect.internal.transform.RefChecks])}
-        |${forceCode(
-           "uncurry", typeOf[scala.reflect.internal.transform.UnCurry])}
-        |${forceCode(
-           "erasure", typeOf[scala.reflect.internal.transform.Erasure])}
+        |$forceCode(
+           "refChecks", typeOf[scala.reflect.internal.transform.RefChecks])
+        |$forceCode(
+           "uncurry", typeOf[scala.reflect.internal.transform.UnCurry])
+        |$forceCode(
+           "erasure", typeOf[scala.reflect.internal.transform.Erasure])
         |  }
         |}""".stripMargin
 
@@ -66,7 +65,7 @@ object Test extends App {
   val actual = scala.io.Source.fromFile(actualFile)
   val actualLines = actual.getLines.toList
   val generatedLines = code.lines.toList
-  if (actualLines != generatedLines) {
+  if (actualLines != generatedLines)
     val msg = s"""|${actualFile} must be updated.
                   |===========================================================
                   | DIFF:
@@ -78,5 +77,3 @@ object Test extends App {
                   |${code}""".stripMargin
 
     assert(false, msg)
-  }
-}

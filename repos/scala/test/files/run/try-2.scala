@@ -3,55 +3,47 @@
  *
  */
 
-object Test {
+object Test
 
   def tryAllUnit: Unit =
-    try {
+    try
       throw new Error();
-    } catch {
+    catch
       case _: Throwable => Console.println("exception happened\n");
-    }
 
   def tryUnitAll: Unit =
-    try {
+    try
       Console.println("Nothin");
-    } catch {
+    catch
       case _: Throwable => sys.error("Bad, bad, lama!");
-    }
 
   def tryAllAll: Unit =
-    try {
+    try
       throw new Error();
-    } catch {
+    catch
       case _: Throwable => sys.error("Bad, bad, lama!");
-    }
 
   def tryUnitUnit: Unit =
-    try {
+    try
       Console.println("Nothin");
-    } catch {
+    catch
       case _: Throwable => Console.println("Nothin");
-    }
 
   def tryIntUnit: Unit =
-    try {
+    try
       10;
-    } catch {
+    catch
       case _: Throwable => Console.println("Huh?");
-    }
 
   def execute(f: => Unit) =
-    try {
+    try
       f;
-    } catch {
+    catch
       case _: Throwable => ();
-    }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     execute(tryAllUnit);
     execute(tryUnitAll);
     execute(tryAllAll);
     execute(tryUnitUnit);
     execute(tryIntUnit);
-  }
-}

@@ -5,17 +5,16 @@ import org.scalatest._
 import spire.algebra._
 import spire.implicits._
 
-class JetTest extends FunSuite with Matchers {
+class JetTest extends FunSuite with Matchers
 
   // Default test with 3-dimensional Jet's
   implicit val dim = JetDim(3)
   val maxError = 1.0e-12
 
-  test("JetDim") {
+  test("JetDim")
     dim.dimension should equal(3)
-  }
 
-  test("Jet(scalar, array) constructor") {
+  test("Jet(scalar, array) constructor")
     val a = Array[Double](2.3, 3.4, 4.5)
     val j = new Jet[Double](8.9, a)
     j.dimension should equal(dim.dimension)
@@ -23,46 +22,40 @@ class JetTest extends FunSuite with Matchers {
     j.infinitesimal.size should equal(dim.dimension)
     j.real should equal(8.9)
     j.infinitesimal.toArray should equal(a.toArray)
-  }
-  test("Jet() constructor yields a zero jet") {
+  test("Jet() constructor yields a zero jet")
     val jz = Jet[Double]()
     jz.real should equal(0)
     jz.isReal should be(true)
     jz.infinitesimal.size should equal(dim.dimension)
     jz.isInfinitesimal should be(false)
     jz.isZero should be(true)
-  }
-  test("Jet.zero yields a zero jet") {
+  test("Jet.zero yields a zero jet")
     val jzz = Jet.zero[Double]
     jzz.real should equal(0)
     jzz.isReal should be(true)
     jzz.infinitesimal.size should equal(dim.dimension)
     jzz.isInfinitesimal should be(false)
     jzz.isZero should be(true)
-  }
-  test("Jet.one yields a unitary jet") {
+  test("Jet.one yields a unitary jet")
     val jo = Jet.one[Double]
     jo.real should equal(1.0)
     jo.isReal should be(true)
     jo.infinitesimal.size should equal(dim.dimension)
     jo.isInfinitesimal should be(false)
-  }
-  test("Jet.h yields an infinitesimal jet") {
+  test("Jet.h yields an infinitesimal jet")
     val jk = Jet.h[Double](k = 1)
     jk.real should equal(0.0)
     jk.isReal should be(false)
     jk.isInfinitesimal should be(true)
     jk.infinitesimal.toArray should equal(Array(0.0, 1.0, 0.0))
-  }
   test(
-      "Jet(x, k) yields a jet for evaluating a function and its k-th partial derivative") {
+      "Jet(x, k) yields a jet for evaluating a function and its k-th partial derivative")
     val jk = Jet(2.3, k = 2)
     jk.real should equal(2.3)
     jk.isReal should be(false)
     jk.isInfinitesimal should be(false)
     jk.infinitesimal.toArray should equal(Array(0.0, 0.0, 1.0))
-  }
-  test("Jet(x) constructors from scalars") {
+  test("Jet(x) constructors from scalars")
     val jf = Jet(2.0f)
     jf.real should equal(2.0f)
     jf.isReal should be(true)
@@ -86,8 +79,7 @@ class JetTest extends FunSuite with Matchers {
     jfi.isReal should be(true)
     jfi.infinitesimal.size should equal(dim.dimension)
     jfi.isInfinitesimal should be(false)
-  }
-  test("Conversions from scalars") {
+  test("Conversions from scalars")
     val jfi = Jet.intToJet(2)
     jfi.real should equal(2.0)
     jfi.isReal should be(true)
@@ -123,8 +115,7 @@ class JetTest extends FunSuite with Matchers {
     jfbd.isReal should be(true)
     jfbd.infinitesimal.size should equal(dim.dimension)
     jfbd.isInfinitesimal should be(false)
-  }
-  test("Conversions to scalars") {
+  test("Conversions to scalars")
     val j = Jet(8.7, Array(7.97, 9.31, 0.0))
     j.doubleValue should equal(8.7)
     j.floatValue should equal(8.7f)
@@ -132,30 +123,25 @@ class JetTest extends FunSuite with Matchers {
     j.intValue should equal(8)
     j.shortValue should equal(8.toShort)
     j.byteValue should equal(8.toByte)
-  }
-  test("Conversion to tuple") {
+  test("Conversion to tuple")
     val j = Jet(-3.1, Array(1.0, 2.1, 3.3))
     val tj = j.asTuple
     tj._1 should be(j.real)
     tj._2 should be(j.infinitesimal)
-  }
-  test("Signed") {
+  test("Signed")
     Jet(9.1).signum should equal(1)
     Jet(-3.1, Array(1.0, 2.1, 3.3)).signum should equal(-1)
-  }
-  test("isWhole iff real and integer") {
+  test("isWhole iff real and integer")
     Jet(4.0f).isWhole should be(true)
     Jet(9.2).isWhole should be(false)
     Jet(3.0f, Array(1.0f, 2.0f, 3.0f)).isWhole should be(false)
-  }
-  test("isValidInt iff real, whole and in range") {
+  test("isValidInt iff real, whole and in range")
     Jet(-4.0).isValidInt should be(true)
     Jet(4.1).isValidInt should be(false)
     Jet(3.0f, Array(1.0f, 2.0f, 3.0f)).isValidInt should be(false)
     Jet(Int.MinValue.toDouble - 1000.0).isValidInt should be(false)
     Jet(Int.MaxValue.toDouble + 1000.0).isValidInt should be(false)
-  }
-  test("Equality-comparable and hashable") {
+  test("Equality-comparable and hashable")
     val r = 13.0f
     val i = Array(1.0f, 2.0f, 3.0f)
     val a = Jet(r, i)
@@ -187,18 +173,15 @@ class JetTest extends FunSuite with Matchers {
     b.hashCode should equal(a.hashCode)
     b.hashCode should equal(c.hashCode)
     a.hashCode should equal(c.hashCode)
-  }
-  test("Prints into a human-readable string") {
+  test("Prints into a human-readable string")
     Jet(2.4, k = 2).toString should equal("(2.4 + [0.0, 0.0, 1.0]h)")
-  }
-  test("Unary minus operator") {
+  test("Unary minus operator")
     val r = -13.0f
     val i = Array(1.0f, 2.0f, 3.0f)
     val a = Jet(r, i)
     -a should equal(new Jet(-r, -i))
     -(-a) should equal(a)
-  }
-  test("Arithmetic combinations with scalars") {
+  test("Arithmetic combinations with scalars")
     val r = 13.0f
     val i = Array(1.0f, 2.0f, 3.0f)
     val a = Jet(r, i)
@@ -207,16 +190,14 @@ class JetTest extends FunSuite with Matchers {
     (a - b) should equal(a.copy(real = r - b))
     (a * b) should equal(a.copy(real = r * b, infinitesimal = i :* b))
     (a / b) should equal(a.copy(real = r / b, infinitesimal = i :/ b))
-  }
-  test("Arithmetic combinations with scalar and non-scalar Jets") {
+  test("Arithmetic combinations with scalar and non-scalar Jets")
     val a = Jet(1.0, Array(2.0, 3.0, 4.0))
     val b = Jet(2.0)
     (a + b) should equal(Jet(a.real + b.real, a.infinitesimal))
     (a - b) should equal(Jet(a.real - b.real, a.infinitesimal))
     (a * b) should equal(Jet(a.real * b.real, a.infinitesimal :* b.real))
     (a / b) should equal(Jet(a.real / b.real, a.infinitesimal :/ b.real))
-  }
-  test("Evaluation and differentiation of arithmetic operations") {
+  test("Evaluation and differentiation of arithmetic operations")
     def a[@sp(Double) T : Field : Trig](x: T): T =
       2.0 * x + spire.math.cos[T](x)
     def b[@sp(Double) T : Field : Trig](x: T): T =
@@ -244,8 +225,7 @@ class JetTest extends FunSuite with Matchers {
     a_div_b(jx).real should be(a(x) / b(x))
     a_div_b(jx).infinitesimal(0) should be(
         (da(x) * b(x) - a(x) * db(x)) / (b(x) * b(x)) +- maxError)
-  }
-  test("Evaluation and differentiation of exponential and logarithm") {
+  test("Evaluation and differentiation of exponential and logarithm")
     val x = 27.98847750
     val jx = x + Jet.h[Double](0)
     val lx = spire.math.log(jx)
@@ -255,8 +235,7 @@ class JetTest extends FunSuite with Matchers {
     val ex = spire.math.exp(jx)
     ex.real should be(scala.math.exp(x))
     ex.infinitesimal(0) should be(scala.math.exp(x) +- maxError)
-  }
-  test("Evaluation and differentiation of powers and roots") {
+  test("Evaluation and differentiation of powers and roots")
     // Constant integer exponent: x ** n
     val x = 9.3874983
     val jx = x + Jet.h[Double](0)
@@ -282,8 +261,7 @@ class JetTest extends FunSuite with Matchers {
     val sq = spire.math.sqrt(jx)
     sq.real should be(scala.math.sqrt(x))
     sq.infinitesimal(0) should be(0.5 / scala.math.sqrt(x))
-  }
-  test("Evaluation and differentiation of trigonometric functions") {
+  test("Evaluation and differentiation of trigonometric functions")
     val x = 0.8377469
     val jx = x + Jet.h[Double](0)
     spire.math.cos(jx).real should be(scala.math.cos(x))
@@ -297,8 +275,7 @@ class JetTest extends FunSuite with Matchers {
     spire.math.tan(jx).real should be(scala.math.tan(x))
     spire.math.tan(jx).infinitesimal(0) should be(
         1.0 + scala.math.tan(x) * scala.math.tan(x) +- maxError)
-  }
-  test("Evaluation and differentiation of inverse trigonometric functions") {
+  test("Evaluation and differentiation of inverse trigonometric functions")
     val x = 0.133645
     val jx = x + Jet.h[Double](0)
     spire.math.acos(jx).real should be(scala.math.acos(x))
@@ -319,8 +296,7 @@ class JetTest extends FunSuite with Matchers {
     spire.math.atan2(jy, jx).real should be(scala.math.atan2(y, x))
     axy2.infinitesimal(0) should be(-y / (x * x + y * y) +- maxError)
     axy2.infinitesimal(1) should be(x / (x * x + y * y) +- maxError)
-  }
-  test("Evaluation and differentiation of hyperbolic functions") {
+  test("Evaluation and differentiation of hyperbolic functions")
     val x = 0.9472836
     val jx = x + Jet.h[Double](0)
     spire.math.cosh(jx).real should be(scala.math.cosh(x))
@@ -334,8 +310,7 @@ class JetTest extends FunSuite with Matchers {
     spire.math.tanh(jx).real should be(scala.math.tanh(x))
     spire.math.tanh(jx).infinitesimal(0) should be(
         1.0 - scala.math.tanh(x) * scala.math.tanh(x) +- maxError)
-  }
-  test("Chain-rule differentiation") {
+  test("Chain-rule differentiation")
     def a[@sp(Double) T : Field : Trig](x: T): T =
       2.0 * x * x - 3.14 * x + 2.71
     def b[@sp(Double) T : Field : Trig](x: T): T =
@@ -360,8 +335,7 @@ class JetTest extends FunSuite with Matchers {
     c(jx).infinitesimal(0) should be(dc(x) +- maxError)
     abc(jx).infinitesimal(0) should be(dabc(x) +- maxError)
     abc(jx).real should be(abc(x))
-  }
-  test("Evaluation and differentiation of a generic function") {
+  test("Evaluation and differentiation of a generic function")
     def func[@sp(Double) T : Field : Trig](x: T): T =
       3.14 * x * x - spire.math.tan(x)
     def dfunc(x: Double) =
@@ -371,8 +345,7 @@ class JetTest extends FunSuite with Matchers {
     val jfunc = func(jx)
     jfunc.real should be(func(x))
     jfunc.infinitesimal(0) should be(dfunc(x) +- maxError)
-  }
-  test("Evaluation and differentiation of a generic function of two variables") {
+  test("Evaluation and differentiation of a generic function of two variables")
     def func[@sp(Double) T : Field : Trig](x: T, y: T): T =
       3.14 * x * y - spire.math.tan(x - y)
     def dfuncX(x: Double, y: Double) =
@@ -387,5 +360,3 @@ class JetTest extends FunSuite with Matchers {
     jfunc.real should be(func(x, y))
     jfunc.infinitesimal(0) should be(dfuncX(x, y) +- maxError)
     jfunc.infinitesimal(1) should be(dfuncY(x, y) +- maxError)
-  }
-}

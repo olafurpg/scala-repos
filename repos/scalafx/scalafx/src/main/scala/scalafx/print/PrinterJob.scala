@@ -38,7 +38,7 @@ import scalafx.stage.Window
 /**
   * Companion Object for [[scalafx.print.PrinterJob]].
   */
-object PrinterJob {
+object PrinterJob
 
   /**
     * Converts a ScalaFX PrinterJob to its JavaFX counterpart.
@@ -56,7 +56,7 @@ object PrinterJob {
     */
   object JobStatus
       extends SFXEnumDelegateCompanion[
-          jfxp.PrinterJob.JobStatus, PrinterJob.JobStatus] {
+          jfxp.PrinterJob.JobStatus, PrinterJob.JobStatus]
 
     /**
       * The job has been cancelled by the application.
@@ -85,7 +85,6 @@ object PrinterJob {
 
     protected override def unsortedValues: Array[PrinterJob.JobStatus] =
       Array(Canceled, Done, Error, NotStarted, Printing)
-  }
 
   /**
     * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrinterJob.JobStatus.html JavaFX JobStatus]].
@@ -117,7 +116,6 @@ object PrinterJob {
               since = "8.0")
   def createPrinterJob(printer: jfxp.Printer): jfxp.PrinterJob =
     jfxp.PrinterJob.createPrinterJob(printer)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrinterJob.html JavaFX PrinterJob]].
@@ -128,7 +126,7 @@ object PrinterJob {
   * @since 8.0
   */
 final class PrinterJob(override val delegate: jfxp.PrinterJob)
-    extends SFXDelegate[jfxp.PrinterJob] {
+    extends SFXDelegate[jfxp.PrinterJob]
 
   /**
     * The JobSettings encapsulates all the API supported job configuration options such as
@@ -146,9 +144,8 @@ final class PrinterJob(override val delegate: jfxp.PrinterJob)
     * Property representing the Printer for this job.
     */
   def printer: ObjectProperty[jfxp.Printer] = delegate.printerProperty
-  def printer_=(v: Printer) {
+  def printer_=(v: Printer)
     printer() = v
-  }
 
   /**
     * Cancel the underlying print job at the earliest opportunity.
@@ -196,4 +193,3 @@ final class PrinterJob(override val delegate: jfxp.PrinterJob)
     *         That is if it has already started, has failed, or has been cancelled, or ended.
     */
   def showPrintDialog(owner: Window): Boolean = delegate.showPrintDialog(owner)
-}

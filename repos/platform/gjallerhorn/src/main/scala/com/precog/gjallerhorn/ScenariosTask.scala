@@ -31,19 +31,19 @@ import specs2._
 import scalaz._
 
 class ScenariosTask(settings: Settings)
-    extends Task(settings: Settings) with Specification {
+    extends Task(settings: Settings) with Specification
   val dummyEvents = """
 { "data": "Hello world" }
 { "data": "Goodbye cruel world" }
 """
 
-  "aggregated services" should {
-    "create account, ingest data, query" in {
+  "aggregated services" should
+    "create account, ingest data, query" in
       val account = createAccount
       val res = ingestString(account, dummyEvents, "application/json")(
           _ / account.bareRootPath / "foo")
 
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val res =
           (analytics / "fs" / account.bareRootPath) <<? List(
               "apiKey" -> account.apiKey, "q" -> "count(//foo)")
@@ -52,109 +52,89 @@ class ScenariosTask(settings: Settings)
           JParser.parseFromString(Http(res OK as.String)()).valueOr(throw _)
         val count = json(0).deserialize[Double]
         count must_== 2
-      }
-    }
 
-    "support ingesting under own account root" in {
+    "support ingesting under own account root" in
       val account = createAccount
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / account.bareRootPath / "foo") match {
+            _ / account.bareRootPath / "foo") match
           case Left(thr) => Failure(thr)
           case Right(s) => JParser.parseFromString(s)
-        }
 
-      res must beLike {
+      res must beLike
         case Success(jobj) => ok
-      }
-    }
 
-    "support ingesting under own account root with other owner" in {
+    "support ingesting under own account root with other owner" in
       val account1 = createAccount
       val account2 = createAccount
 
       val res = ingestString(
           account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          _ / account1.bareRootPath / "foo") match
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
-      }
 
-      res must beLike {
+      res must beLike
         case Success(jobj) => ok
-      }
-    }
 
-    "support browsing of own data under own account root" in {
+    "support browsing of own data under own account root" in
       val account = createAccount
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / account.bareRootPath / "foo") match {
+            _ / account.bareRootPath / "foo") match
           case Left(thr) => Failure(thr)
           case Right(s) => JParser.parseFromString(s)
-        }
 
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val json =
           metadataFor(account.apiKey)(_ / account.bareRootPath / "foo")
         (json \ "size").deserialize[Long] must_== 2
-      }
-    }
 
-    "prevent ingesting under an unauthorized path" in {
+    "prevent ingesting under an unauthorized path" in
       val account = createAccount
 
       val res =
         ingestString(account.apiKey, account, dummyEvents, "application/json")(
-            _ / ("not-" + account.bareRootPath) / "foo") match {
+            _ / ("not-" + account.bareRootPath) / "foo") match
           case Left(thr) => Failure(thr)
           case Right(s) => JParser.parseFromString(s)
-        }
 
-      res must beLike {
+      res must beLike
         case Failure(StatusCode(403)) => ok
-      }
-    }
 
-    "support browsing of own data under other account root" in {
+    "support browsing of own data under other account root" in
       val account1 = createAccount
       val account2 = createAccount
 
       val res = ingestString(
           account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          _ / account1.bareRootPath / "foo") match
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
-      }
 
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val json =
           metadataFor(account2.apiKey)(_ / account1.bareRootPath / "foo")
         (json \ "size").deserialize[Long] must_== 2
-      }
-    }
 
-    "prevent browsing of other data under own account root" in {
+    "prevent browsing of other data under own account root" in
       val account1 = createAccount
       val account2 = createAccount
 
       val res = ingestString(
           account1.apiKey, account2, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          _ / account1.bareRootPath / "foo") match
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
-      }
 
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val json =
           metadataFor(account1.apiKey)(_ / account1.bareRootPath / "foo")
         (json \ "size").deserialize[Long] must_== 0
-      }
-    }
 
-    "support delegation of ability to write as self to own root to others" in {
+    "support delegation of ability to write as self to own root to others" in
       val account1 = createAccount
       val account2 = createAccount
 
@@ -172,24 +152,17 @@ class ScenariosTask(settings: Settings)
 
       val res = ingestString(
           delegateAPIKey, account1, dummyEvents, "application/json")(
-          _ / account1.bareRootPath / "foo") match {
+          _ / account1.bareRootPath / "foo") match
         case Left(thr) => Failure(thr)
         case Right(s) => JParser.parseFromString(s)
-      }
 
-      res must beLike {
+      res must beLike
         case Success(jobj) => ok
-      }
 
-      EventuallyResults.eventually(10, 1.second) {
+      EventuallyResults.eventually(10, 1.second)
         val json =
           metadataFor(account1.apiKey)(_ / account1.bareRootPath / "foo")
         (json \ "size").deserialize[Long] must_== 2
-      }
-    }
-  }
-}
 
-object RunScenarios extends Runner {
+object RunScenarios extends Runner
   def tasks(settings: Settings) = new ScenariosTask(settings) :: Nil
-}

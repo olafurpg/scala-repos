@@ -3,7 +3,7 @@ package lila.explorer
 import akka.actor._
 import com.typesafe.config.Config
 
-final class Env(config: Config, system: ActorSystem) {
+final class Env(config: Config, system: ActorSystem)
 
   private val Endpoint = config getString "endpoint"
   private val MassImportEndpoint = config getString "mass_import.endpoint"
@@ -12,35 +12,28 @@ final class Env(config: Config, system: ActorSystem) {
   private lazy val indexer = new ExplorerIndexer(
       endpoint = Endpoint, massImportEndpoint = MassImportEndpoint)
 
-  def cli = new lila.common.Cli {
-    def process = {
+  def cli = new lila.common.Cli
+    def process =
       case "explorer" :: "index" :: since :: Nil =>
         indexer(since) inject "done"
-    }
-  }
 
-  def fetchPgn(id: String): Fu[Option[String]] = {
+  def fetchPgn(id: String): Fu[Option[String]] =
     import play.api.libs.ws.WS
     import play.api.Play.current
-    WS.url(s"$Endpoint/master/pgn/$id").get() map {
+    WS.url(s"$Endpoint/master/pgn/$id").get() map
       case res if res.status == 200 => res.body.some
       case _ => None
-    }
-  }
 
   if (IndexFlow)
     system.actorOf(
-        Props(new Actor {
+        Props(new Actor
       context.system.lilaBus.subscribe(self, 'finishGame)
-      def receive = {
+      def receive =
         case lila.game.actorApi.FinishGame(game, _, _) => indexer(game)
-      }
-    }))
-}
+    ))
 
-object Env {
+object Env
 
   lazy val current =
     "explorer" boot new Env(config = lila.common.PlayApp loadConfig "explorer",
                             system = lila.common.PlayApp.system)
-}

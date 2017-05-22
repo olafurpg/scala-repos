@@ -7,11 +7,11 @@ package scala
 package reflect
 package internal
 
-trait InfoTransformers { self: SymbolTable =>
+trait InfoTransformers  self: SymbolTable =>
 
   /* Syncnote: This should not need to be protected, as reflection does not run in multiple phases.
    */
-  abstract class InfoTransformer {
+  abstract class InfoTransformer
     var prev: InfoTransformer = this
     var next: InfoTransformer = this
 
@@ -19,14 +19,14 @@ trait InfoTransformers { self: SymbolTable =>
     val changesBaseClasses: Boolean
     def transform(sym: Symbol, tpe: Type): Type
 
-    def insert(that: InfoTransformer) {
+    def insert(that: InfoTransformer)
       assert(this.pid != that.pid, this.pid)
 
-      if (that.pid < this.pid) {
+      if (that.pid < this.pid)
         prev insert that
-      } else if (next.pid <= that.pid && next.pid != NoPhase.id) {
+      else if (next.pid <= that.pid && next.pid != NoPhase.id)
         next insert that
-      } else {
+      else
         log(
             "Inserting info transformer %s following %s".format(
                 phaseOf(that.pid), phaseOf(this.pid)))
@@ -34,8 +34,6 @@ trait InfoTransformers { self: SymbolTable =>
         that.prev = this
         next.prev = that
         this.next = that
-      }
-    }
 
     /** The InfoTransformer whose (pid == from).
       *  If no such exists, the InfoTransformer with the next
@@ -48,5 +46,3 @@ trait InfoTransformers { self: SymbolTable =>
         else prev.nextFrom(from)
       else if (next.pid == NoPhase.id) next
       else next.nextFrom(from)
-  }
-}

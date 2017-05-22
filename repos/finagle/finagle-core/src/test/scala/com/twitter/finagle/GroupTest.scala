@@ -6,18 +6,16 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class GroupTest extends FunSuite {
-  class Ctx {
+class GroupTest extends FunSuite
+  class Ctx
     val group = Group.mutable[Int]()
     var mapped = mutable.Buffer[Int]()
     val derived =
-      group map { i =>
+      group map  i =>
         mapped += i
         i + 1
-      }
-  }
 
-  test("map each value once, lazily and persistently") {
+  test("map each value once, lazily and persistently")
     val ctx = new Ctx
     import ctx._
 
@@ -32,9 +30,8 @@ class GroupTest extends FunSuite {
     assert(derived() == Set(2, 3, 4))
     assert(Set(mapped: _*) == Set(1, 2, 3))
     assert(derived() eq derived())
-  }
 
-  test("remap elements that re-appear") {
+  test("remap elements that re-appear")
     val ctx = new Ctx
     import ctx._
 
@@ -45,9 +42,8 @@ class GroupTest extends FunSuite {
     group() = Set(1, 2)
     assert(derived() == Set(2, 3))
     assert(Set(mapped: _*) == Set(1, 2))
-  }
 
-  test("collect") {
+  test("collect")
     val ctx = new Ctx
     import ctx._
 
@@ -62,16 +58,14 @@ class GroupTest extends FunSuite {
 
     // Object identity:
     assert(group2() eq group2())
-  }
 
-  test("convert from builder group") {
+  test("convert from builder group")
     val bc = builder.StaticCluster(Seq(1, 2, 3, 4))
     val group = Group.fromCluster(bc)
     assert(group() == Set(1, 2, 3, 4))
     assert(group() eq group())
-  }
 
-  test("convert from dynamic builder group") {
+  test("convert from dynamic builder group")
     val bc = new builder.ClusterInt
     val group = Group.fromCluster(bc)
 
@@ -86,15 +80,13 @@ class GroupTest extends FunSuite {
     assert(group() == Set(1))
     bc.add(2)
     assert(group() == Set(1, 2))
-  }
 
-  test("combined groups") {
+  test("combined groups")
     val combined = Group[Int](1, 2) + Group[Int](3, 4) + Group[Int](5, 6)
     assert(combined.members == Set(1, 2, 3, 4, 5, 6))
     assert(combined.members == combined.members)
-  }
 
-  test("object identity") {
+  test("object identity")
     val g = Group.mutable[Object]()
     g() += new Object {}
     g() += new Object {}
@@ -105,5 +97,3 @@ class GroupTest extends FunSuite {
     g() += new Object {}
     assert(g() ne snap)
     assert(g() eq g())
-  }
-}

@@ -21,10 +21,9 @@ import scala.collection.mutable.ArrayBuffer
   * Date: 07.03.2008
   */
 trait ScPrimaryConstructor
-    extends ScMember with ScMethodLike with ScAnnotationsHolder {
-  def hasMalformedSignature = parameterList.clauses.exists {
+    extends ScMember with ScMethodLike with ScAnnotationsHolder
+  def hasMalformedSignature = parameterList.clauses.exists
     _.parameters.dropRight(1).exists(_.isRepeatedParameter)
-  }
 
   /**
     *  @return has access modifier
@@ -51,22 +50,20 @@ trait ScPrimaryConstructor
     * In addition, view and context bounds generate an additional implicit parameter section.
     */
   @CachedInsidePsiElement(this, ModCount.getBlockModificationCount)
-  def effectiveParameterClauses: Seq[ScParameterClause] = {
+  def effectiveParameterClauses: Seq[ScParameterClause] =
     def emptyParameterList: ScParameterClause =
       ScalaPsiElementFactory.createEmptyClassParamClauseWithContext(
           getManager, parameterList)
-    val clausesWithInitialEmpty = parameterList.clauses match {
+    val clausesWithInitialEmpty = parameterList.clauses match
       case Seq() => Seq(emptyParameterList)
       case Seq(clause) if clause.isImplicit => Seq(emptyParameterList, clause)
       case clauses => clauses
-    }
     clausesWithInitialEmpty ++ syntheticParamClause
-  }
 
   def effectiveFirstParameterSection: Seq[ScClassParameter] =
     effectiveParameterClauses.head.unsafeClassParameters
 
-  private def syntheticParamClause: Option[ScParameterClause] = {
+  private def syntheticParamClause: Option[ScParameterClause] =
     val hasImplicit = parameterList.clauses.exists(_.isImplicit)
     if (hasImplicit) None
     else
@@ -74,12 +71,11 @@ trait ScPrimaryConstructor
           containingClass.asInstanceOf[ScTypeParametersOwner],
           parameterList,
           classParam = true)
-  }
 
-  def methodType(result: Option[ScType]): ScType = {
+  def methodType(result: Option[ScType]): ScType =
     val parameters: ScParameters = parameterList
     val clauses = parameters.clauses
-    val returnType: ScType = result.getOrElse({
+    val returnType: ScType = result.getOrElse(
       val clazz = getParent.asInstanceOf[ScTypeDefinition]
       val typeParameters = clazz.typeParameters
       val parentClazz = ScalaPsiUtil.getPlaceTd(clazz)
@@ -89,36 +85,32 @@ trait ScPrimaryConstructor
               ScThisType(parentClazz), clazz, superReference = false)
         else ScDesignatorType(clazz)
       if (typeParameters.isEmpty) designatorType
-      else {
+      else
         ScParameterizedType(
             designatorType,
             typeParameters.map(
                 new ScTypeParameterType(_, ScSubstitutor.empty)))
-      }
-    })
+    )
     if (clauses.isEmpty)
       return new ScMethodType(returnType, Seq.empty, false)(
           getProject, getResolveScope)
-    val res = clauses.foldRight[ScType](returnType) {
+    val res = clauses.foldRight[ScType](returnType)
       (clause: ScParameterClause, tp: ScType) =>
         new ScMethodType(tp, clause.getSmartParameters, clause.isImplicit)(
             getProject, getResolveScope)
-    }
     res.asInstanceOf[ScMethodType]
-  }
 
-  def polymorphicType: ScType = {
+  def polymorphicType: ScType =
     val typeParameters =
       getParent.asInstanceOf[ScTypeDefinition].typeParameters
     if (typeParameters.isEmpty) methodType
     else
       ScTypePolymorphicType(
           methodType, typeParameters.map(new TypeParameter(_)))
-  }
 
   def getParamByName(
-      name: String, clausePosition: Int = -1): Option[ScParameter] = {
-    clausePosition match {
+      name: String, clausePosition: Int = -1): Option[ScParameter] =
+    clausePosition match
       case -1 =>
         for (param <- parameters if ScalaPsiUtil.memberNamesEquals(
                          param.name, name)) return Some(param)
@@ -130,36 +122,26 @@ trait ScPrimaryConstructor
         for (param <- clause.parameters if ScalaPsiUtil.memberNamesEquals(
                          param.name, name)) return Some(param)
         None
-    }
-  }
 
   @Cached(synchronized = false, ModCount.getBlockModificationCount, this)
-  def getFunctionWrappers: Seq[ScPrimaryConstructorWrapper] = {
+  def getFunctionWrappers: Seq[ScPrimaryConstructorWrapper] =
     val buffer = new ArrayBuffer[ScPrimaryConstructorWrapper]()
     buffer += new ScPrimaryConstructorWrapper(this)
-    for {
+    for
       first <- parameterList.clauses.headOption if first.hasRepeatedParam
               if hasAnnotation("scala.annotation.varargs").isDefined
-    } {
+    
       buffer += new ScPrimaryConstructorWrapper(this, isJavaVarargs = true)
-    }
 
     val params = parameters
-    for (i <- params.indices if params(i).baseDefaultParam) {
+    for (i <- params.indices if params(i).baseDefaultParam)
       buffer += new ScPrimaryConstructorWrapper(this, forDefault = Some(i + 1))
-    }
 
     buffer.toSeq
-  }
-}
 
-object ScPrimaryConstructor {
-  object ofClass {
-    def unapply(pc: ScPrimaryConstructor): Option[ScClass] = {
-      pc.containingClass match {
+object ScPrimaryConstructor
+  object ofClass
+    def unapply(pc: ScPrimaryConstructor): Option[ScClass] =
+      pc.containingClass match
         case c: ScClass => Some(c)
         case _ => None
-      }
-    }
-  }
-}

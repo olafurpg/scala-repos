@@ -3,10 +3,10 @@ package std.java.math
 
 import java.math.BigInteger
 
-trait BigIntegerInstances {
+trait BigIntegerInstances
   implicit val bigIntegerInstance: Monoid[BigInteger] with Enum[BigInteger] with Show[
       BigInteger] = new Monoid[BigInteger] with Enum[BigInteger]
-  with Show[BigInteger] {
+  with Show[BigInteger]
     override def shows(f: BigInteger) = f.toString
 
     def append(f1: BigInteger, f2: => BigInteger) = f1 add f2
@@ -21,12 +21,10 @@ trait BigIntegerInstances {
     override def min = None
     override def max = None
 
-    def order(x: BigInteger, y: BigInteger) = x.compareTo(y) match {
+    def order(x: BigInteger, y: BigInteger) = x.compareTo(y) match
       case x if x < 0 => Ordering.LT
       case x if x == 0 => Ordering.EQ
       case x if x > 0 => Ordering.GT
-    }
-  }
 
   import Tags.Multiplication
 
@@ -34,7 +32,7 @@ trait BigIntegerInstances {
       BigInteger @@ Multiplication] with Show[BigInteger @@ Multiplication] =
     new Monoid[BigInteger @@ Multiplication]
     with Order[BigInteger @@ Multiplication]
-    with Show[BigInteger @@ Multiplication] {
+    with Show[BigInteger @@ Multiplication]
       override def shows(f: scalaz.@@[BigInteger, Multiplication]) = f.toString
 
       def append(f1: BigInteger @@ Multiplication,
@@ -45,12 +43,9 @@ trait BigIntegerInstances {
 
       def order(
           x: BigInteger @@ Multiplication, y: BigInteger @@ Multiplication) =
-        Tag.unwrap(x).compareTo(Tag.unwrap(y)) match {
+        Tag.unwrap(x).compareTo(Tag.unwrap(y)) match
           case x if x < 0 => Ordering.LT
           case x if x == 0 => Ordering.EQ
           case x if x > 0 => Ordering.GT
-        }
-    }
-}
 
 object bigInteger extends BigIntegerInstances {}

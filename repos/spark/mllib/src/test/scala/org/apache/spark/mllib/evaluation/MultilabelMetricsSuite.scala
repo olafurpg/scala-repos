@@ -21,8 +21,8 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.rdd.RDD
 
-class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
-  test("Multilabel evaluation metrics") {
+class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext
+  test("Multilabel evaluation metrics")
     /*
      * Documents true labels (5x class0, 3x class1, 4x class2):
      * doc 0 - predict 0, 1 - class 0, 2
@@ -103,5 +103,3 @@ class MultilabelMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(math.abs(metrics.subsetAccuracy - strictAccuracy) < delta)
     assert(math.abs(metrics.accuracy - accuracy) < delta)
     assert(metrics.labels.sameElements(Array(0.0, 1.0, 2.0)))
-  }
-}

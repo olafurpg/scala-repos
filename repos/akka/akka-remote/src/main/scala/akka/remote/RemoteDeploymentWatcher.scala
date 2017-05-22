@@ -13,9 +13,8 @@ import akka.dispatch.{UnboundedMessageQueueSemantics, RequiresMessageQueue}
 /**
   * INTERNAL API
   */
-private[akka] object RemoteDeploymentWatcher {
+private[akka] object RemoteDeploymentWatcher
   final case class WatchRemote(actor: ActorRef, supervisor: ActorRef)
-}
 
 /**
   * INTERNAL API
@@ -24,11 +23,11 @@ private[akka] object RemoteDeploymentWatcher {
   * goes down (jvm crash, network failure), i.e. triggered by [[akka.actor.AddressTerminated]].
   */
 private[akka] class RemoteDeploymentWatcher
-    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics] {
+    extends Actor with RequiresMessageQueue[UnboundedMessageQueueSemantics]
   import RemoteDeploymentWatcher._
   var supervisors = Map.empty[ActorRef, InternalActorRef]
 
-  def receive = {
+  def receive =
     case WatchRemote(a, supervisor: InternalActorRef) ⇒
       supervisors += (a -> supervisor)
       context.watch(a)
@@ -42,5 +41,3 @@ private[akka] class RemoteDeploymentWatcher
       supervisors -= a
 
     case _: Terminated ⇒
-  }
-}

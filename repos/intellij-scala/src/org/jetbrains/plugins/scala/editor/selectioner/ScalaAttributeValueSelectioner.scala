@@ -12,28 +12,25 @@ import org.jetbrains.plugins.scala.lang.lexer.ScalaXmlTokenTypes._
 /**
   * @author Pavel Fatin
   */
-class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase {
+class ScalaAttributeValueSelectioner extends ExtendWordSelectionHandlerBase
   def canSelect(e: PsiElement) = isPartOfAttributeValue(e)
 
   override def select(e: PsiElement,
                       editorText: CharSequence,
                       cursorOffset: Int,
-                      editor: Editor) = {
+                      editor: Editor) =
     val result = super.select(e, editorText, cursorOffset, editor)
 
     val start = e.prevElements.toSeq.takeWhile(isPartOfAttributeValue).last
     val end = e.nextElements.toSeq.takeWhile(isPartOfAttributeValue).last
 
-    if (start != end) {
+    if (start != end)
       result.add(new TextRange(start.getTextRange.getStartOffset,
                                end.getTextRange.getEndOffset))
-    }
 
     result
-  }
-}
 
-private object ScalaAttributeValueSelectioner {
+private object ScalaAttributeValueSelectioner
   private val ValueTokenTypes: Set[IElementType] = Set(
       XML_ATTRIBUTE_VALUE_START_DELIMITER,
       XML_ATTRIBUTE_VALUE_TOKEN,
@@ -41,4 +38,3 @@ private object ScalaAttributeValueSelectioner {
 
   private def isPartOfAttributeValue(e: PsiElement): Boolean =
     ValueTokenTypes.contains(e.getNode.getElementType)
-}

@@ -25,7 +25,7 @@ import org.apache.spark.storage.StorageLevel
 /**
   * Provides utilities for loading [[Graph]]s from files.
   */
-object GraphLoader extends Logging {
+object GraphLoader extends Logging
 
   /**
     * Loads a graph from an edge list formatted file where each line contains two integers: a source
@@ -60,35 +60,30 @@ object GraphLoader extends Logging {
                    numEdgePartitions: Int = -1,
                    edgeStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY,
                    vertexStorageLevel: StorageLevel = StorageLevel.MEMORY_ONLY)
-    : Graph[Int, Int] = {
+    : Graph[Int, Int] =
     val startTime = System.currentTimeMillis
 
     // Parse the edge data table directly into edge partitions
     val lines =
-      if (numEdgePartitions > 0) {
+      if (numEdgePartitions > 0)
         sc.textFile(path, numEdgePartitions).coalesce(numEdgePartitions)
-      } else {
+      else
         sc.textFile(path)
-      }
-    val edges = lines.mapPartitionsWithIndex { (pid, iter) =>
+    val edges = lines.mapPartitionsWithIndex  (pid, iter) =>
       val builder = new EdgePartitionBuilder[Int, Int]
-      iter.foreach { line =>
-        if (!line.isEmpty && line(0) != '#') {
+      iter.foreach  line =>
+        if (!line.isEmpty && line(0) != '#')
           val lineArray = line.split("\\s+")
-          if (lineArray.length < 2) {
+          if (lineArray.length < 2)
             throw new IllegalArgumentException("Invalid line: " + line)
-          }
           val srcId = lineArray(0).toLong
           val dstId = lineArray(1).toLong
-          if (canonicalOrientation && srcId > dstId) {
+          if (canonicalOrientation && srcId > dstId)
             builder.add(dstId, srcId, 1)
-          } else {
+          else
             builder.add(srcId, dstId, 1)
-          }
-        }
-      }
       Iterator((pid, builder.toEdgePartition))
-    }.persist(edgeStorageLevel)
+    .persist(edgeStorageLevel)
       .setName("GraphLoader.edgeListFile - edges (%s)".format(path))
     edges.count()
 
@@ -99,5 +94,4 @@ object GraphLoader extends Logging {
                                  defaultVertexAttr = 1,
                                  edgeStorageLevel = edgeStorageLevel,
                                  vertexStorageLevel = vertexStorageLevel)
-  } // end of edgeListFile
-}
+  // end of edgeListFile

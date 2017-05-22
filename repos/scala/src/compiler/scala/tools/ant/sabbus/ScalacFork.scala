@@ -38,40 +38,35 @@ import scala.reflect.internal.util.ScalaClassLoader
   *
   *  @author Gilles Dubochet
   */
-class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
+class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs
 
   private def originOfThis: String =
     ScalaClassLoader.originOfClass(classOf[ScalacFork]) map (_.toString) getOrElse "<unknown>"
 
   /** Sets the `srcdir` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `sourceDir`. */
-  def setSrcdir(input: File) {
+  def setSrcdir(input: File)
     sourceDir = Some(input)
-  }
 
   /** Sets the `failonerror` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `failOnError`. */
-  def setFailOnError(input: Boolean) {
+  def setFailOnError(input: Boolean)
     failOnError = input
-  }
 
   /** Sets the `timeout` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `timeout`. */
-  def setTimeout(input: Long) {
+  def setTimeout(input: Long)
     timeout = Some(input)
-  }
 
   /** Sets the `jvmargs` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `jvmArgs`. */
-  def setJvmArgs(input: String) {
+  def setJvmArgs(input: String)
     jvmArgs = Some(input)
-  }
 
   /** Sets the `argfile` attribute. Used by [[http://ant.apache.org Ant]].
     *  @param input The value of `argfile`. */
-  def setArgfile(input: File) {
+  def setArgfile(input: File)
     argfile = Some(input)
-  }
 
   private var sourceDir: Option[File] = None
   private var failOnError: Boolean = true
@@ -79,16 +74,15 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
   private var jvmArgs: Option[String] = None
   private var argfile: Option[File] = None
 
-  private def createMapper() = {
+  private def createMapper() =
     val mapper = new GlobPatternMapper()
     val extension = "*.class"
     mapper setTo extension
     mapper setFrom "*.scala"
 
     mapper
-  }
 
-  override def execute() {
+  override def execute()
     def plural(x: Int) = if (x > 1) "s" else ""
 
     log("Executing ant task scalacfork, origin: %s".format(originOfThis),
@@ -144,12 +138,12 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
 
     // Encode scalac/javac args for use in a file to be read back via "@file.txt"
     def encodeScalacArgsFile(t: Traversable[String]) =
-      t map { s =>
+      t map  s =>
         if (s.find(c => c <= ' ' || "\"'\\".contains(c)).isDefined)
           "\"" +
           s.flatMap(c => (if (c == '"' || c == '\\') "\\" else "") + c) + "\""
         else s
-      } mkString "\n"
+      mkString "\n"
 
     // dump the arguments to a file and do "java @file"
     val tempArgFile = io.File.makeTemp("scalacfork")
@@ -164,5 +158,3 @@ class ScalacFork extends ScalaMatchingTask with ScalacShared with TaskArgs {
       throw new BuildException(
           "Compilation failed because of an internal compiler error;" +
           " see the error output for details.")
-  }
-}

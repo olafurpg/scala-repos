@@ -8,7 +8,7 @@ import optimize.DiffFunction
   * 
   * @author dlwh
   */
-trait ExponentialFamily[D, T] {
+trait ExponentialFamily[D, T]
   type Parameter;
   type SufficientStatistic <: distributions.SufficientStatistic[
       SufficientStatistic];
@@ -17,4 +17,3 @@ trait ExponentialFamily[D, T] {
   def mle(stats: SufficientStatistic): Parameter
   def likelihoodFunction(stats: SufficientStatistic): DiffFunction[Parameter]
   def distribution(p: Parameter): D;
-}

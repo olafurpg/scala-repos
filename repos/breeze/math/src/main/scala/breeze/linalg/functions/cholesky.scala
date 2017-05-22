@@ -12,10 +12,10 @@ import breeze.linalg._
   * TODO: For higher dimensionalities, the return value really should be a sparse matrix
   *       due to its inherent lower triangular nature.
   */
-object cholesky extends UFunc {
+object cholesky extends UFunc
   implicit object ImplCholesky_DM
-      extends Impl[DenseMatrix[Double], DenseMatrix[Double]] {
-    def apply(X: DenseMatrix[Double]): DenseMatrix[Double] = {
+      extends Impl[DenseMatrix[Double], DenseMatrix[Double]]
+    def apply(X: DenseMatrix[Double]): DenseMatrix[Double] =
       requireNonEmptyMatrix(X)
 
       // As LAPACK doesn't check if the given matrix is in fact symmetric,
@@ -45,6 +45,3 @@ object cholesky extends UFunc {
         throw new NotConvergedException(NotConvergedException.Iterations)
 
       A
-    }
-  }
-}

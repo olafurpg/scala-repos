@@ -13,7 +13,7 @@ import play.data.FormFactory
 import play.data.format.Formatters
 import javax.validation.Validation
 
-class PartialValidationSpec extends Specification {
+class PartialValidationSpec extends Specification
 
   val messagesApi = new DefaultMessagesApi(
       Environment.simple(),
@@ -25,22 +25,20 @@ class PartialValidationSpec extends Specification {
       new Formatters(jMessagesApi),
       Validation.buildDefaultValidatorFactory().getValidator())
 
-  "partial validation" should {
-    "not fail when fields not in the same group fail validation" in {
+  "partial validation" should
+    "not fail when fields not in the same group fail validation" in
       val form = formFactory
         .form(classOf[SomeForm], classOf[Partial])
         .bind(Map("prop2" -> "Hello", "prop3" -> "abc").asJava)
       form.errors().asScala must beEmpty
-    }
 
-    "fail when a field in the group fails validation" in {
+    "fail when a field in the group fails validation" in
       val form = formFactory
         .form(classOf[SomeForm], classOf[Partial])
         .bind(Map("prop3" -> "abc").asJava)
       form.hasErrors must_== true
-    }
 
-    "support multiple validations for the same group" in {
+    "support multiple validations for the same group" in
       val form1 = formFactory
         .form(classOf[SomeForm])
         .bind(Map("prop2" -> "Hello").asJava)
@@ -49,13 +47,10 @@ class PartialValidationSpec extends Specification {
         .form(classOf[SomeForm])
         .bind(Map("prop2" -> "Hello", "prop3" -> "abcd").asJava)
       form2.hasErrors must_== true
-    }
-  }
-}
 
 trait Partial
 
-class SomeForm {
+class SomeForm
 
   @BeanProperty
   @Required
@@ -69,4 +64,3 @@ class SomeForm {
   @Required(groups = Array(classOf[Partial]))
   @MaxLength(value = 3, groups = Array(classOf[Partial]))
   var prop3: String = _
-}

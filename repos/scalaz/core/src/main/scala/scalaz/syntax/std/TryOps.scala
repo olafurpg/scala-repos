@@ -6,7 +6,7 @@ import scala.util.Try
 
 import scalaz.std.{`try` => t}
 
-final class TryOps[A](val self: Try[A]) extends AnyVal {
+final class TryOps[A](val self: Try[A]) extends AnyVal
 
   final def cata[B](success: A => B, failure: Throwable => B): B =
     t.cata(self)(success, failure)
@@ -17,8 +17,6 @@ final class TryOps[A](val self: Try[A]) extends AnyVal {
 
   final def toValidationNel: ValidationNel[Throwable, A] =
     t.toValidationNel(self)
-}
 
-trait ToTryOps {
+trait ToTryOps
   implicit def ToTryOpsFromTry[A](a: Try[A]): TryOps[A] = new TryOps(a)
-}

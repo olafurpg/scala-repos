@@ -16,15 +16,14 @@ import play.core.{DefaultWebCommands, ApplicationProvider}
 import scala.util.{Success, Failure}
 import scala.concurrent.Future
 
-trait WebSocketable {
+trait WebSocketable
   def getHeader(header: String): String
   def check: Boolean
-}
 
 /**
   * Provides generic server behaviour for Play applications.
   */
-trait Server extends ServerWithStop {
+trait Server extends ServerWithStop
 
   def mode: Mode.Mode
 
@@ -39,42 +38,34 @@ trait Server extends ServerWithStop {
     * - If an exception is thrown.
     */
   def getHandlerFor(request: RequestHeader)
-    : Either[Future[Result], (RequestHeader, Handler, Application)] = {
+    : Either[Future[Result], (RequestHeader, Handler, Application)] =
 
     // Common code for handling an exception and returning an error result
-    def logExceptionAndGetResult(e: Throwable): Left[Future[Result], Nothing] = {
+    def logExceptionAndGetResult(e: Throwable): Left[Future[Result], Nothing] =
       Left(DefaultHttpErrorHandler.onServerError(request, e))
-    }
 
-    try {
-      applicationProvider.handleWebCommand(request) match {
+    try
+      applicationProvider.handleWebCommand(request) match
         case Some(result) =>
           Left(Future.successful(result))
         case None =>
-          applicationProvider.get match {
+          applicationProvider.get match
             case Success(application) =>
-              application.requestHandler.handlerForRequest(request) match {
+              application.requestHandler.handlerForRequest(request) match
                 case (requestHeader, handler) =>
                   Right((requestHeader, handler, application))
-              }
             case Failure(e) => logExceptionAndGetResult(e)
-          }
-      }
-    } catch {
+    catch
       case e: ThreadDeath => throw e
       case e: VirtualMachineError => throw e
       case e: Throwable =>
         logExceptionAndGetResult(e)
-    }
-  }
 
   def applicationProvider: ApplicationProvider
 
-  def stop() {
-    applicationProvider.current.foreach { app =>
+  def stop()
+    applicationProvider.current.foreach  app =>
       LoggerConfigurator(app.classloader).foreach(_.shutdown())
-    }
-  }
 
   /**
     * Returns the HTTP port of the server.
@@ -93,12 +84,11 @@ trait Server extends ServerWithStop {
     * @return The HTTPS port the server is bound to, if the HTTPS connector is enabled.
     */
   def httpsPort: Option[Int]
-}
 
 /**
   * Utilities for creating a server that runs around a block of code.
   */
-object Server {
+object Server
 
   /**
     * Run a block of code with a server for the given application.
@@ -116,15 +106,13 @@ object Server {
   def withApplication[T](application: Application,
                          config: ServerConfig = ServerConfig(
                                port = Some(0), mode = Mode.Test))(
-      block: Port => T)(implicit provider: ServerProvider): T = {
+      block: Port => T)(implicit provider: ServerProvider): T =
     Play.start(application)
     val server = provider.createServer(config, application)
-    try {
+    try
       block(new Port((server.httpPort orElse server.httpsPort).get))
-    } finally {
+    finally
       server.stop()
-    }
-  }
 
   /**
     * Run a block of code with a server for the given routes.
@@ -142,25 +130,23 @@ object Server {
   def withRouter[T](
       config: ServerConfig = ServerConfig(port = Some(0), mode = Mode.Test))(
       routes: PartialFunction[RequestHeader, Handler])(block: Port => T)(
-      implicit provider: ServerProvider): T = {
+      implicit provider: ServerProvider): T =
     val application = new BuiltInComponentsFromContext(
         ApplicationLoader.Context(
             Environment.simple(path = config.rootDir, mode = config.mode),
             None,
             new DefaultWebCommands(),
             Configuration(ConfigFactory.load())
-        )) {
+        ))
       def router = Router.from(routes)
-    }.application
+    .application
     withApplication(application, config)(block)
-  }
-}
 
-private[play] object JavaServerHelper {
+private[play] object JavaServerHelper
   def forRouter(router: Router,
                 mode: Mode.Mode,
                 httpPort: Option[Integer],
-                sslPort: Option[Integer]): Server = {
+                sslPort: Option[Integer]): Server =
     val r = router
     val application = new BuiltInComponentsFromContext(
         ApplicationLoader.Context(
@@ -168,13 +154,11 @@ private[play] object JavaServerHelper {
             None,
             new DefaultWebCommands(),
             Configuration(ConfigFactory.load())
-        )) {
+        ))
       def router = r
-    }.application
+    .application
     Play.start(application)
     val serverConfig = ServerConfig(mode = mode,
                                     port = httpPort.map(_.intValue),
                                     sslPort = sslPort.map(_.intValue))
     implicitly[ServerProvider].createServer(serverConfig, application)
-  }
-}

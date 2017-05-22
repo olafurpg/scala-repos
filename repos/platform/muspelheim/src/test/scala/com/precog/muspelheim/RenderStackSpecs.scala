@@ -36,7 +36,7 @@ import org.joda.time.DateTime
 import scalaz._
 import scalaz.syntax.comonad._
 
-trait RenderStackSpecs extends EvalStackSpecs with Logging {
+trait RenderStackSpecs extends EvalStackSpecs with Logging
   type TestStack <: EvalStackLike with ParseEvalStack[Future] with ColumnarTableModule[
       Future] with MemoryDatasetConsumer[Future]
 
@@ -54,8 +54,8 @@ trait RenderStackSpecs extends EvalStackSpecs with Logging {
     EvaluationContext(
         "dummyAPIKey", dummyAccount, Path.Root, Path.Root, new DateTime)
 
-  "full stack rendering" should {
-    def evalTable(str: String, debug: Boolean = false): Table = {
+  "full stack rendering" should
+    def evalTable(str: String, debug: Boolean = false): Table =
       import trans._
 
       logger.debug("Beginning evaluation of query: " + str)
@@ -69,18 +69,14 @@ trait RenderStackSpecs extends EvalStackSpecs with Logging {
       tree.errors must beEmpty
       val Right(dag) = decorate(emit(tree))
       val tableM = evaluator.eval(dag, dummyEvaluationContext, true)
-      tableM map {
+      tableM map
         _ transform DerefObjectStatic(Leaf(Source), CPathField("value"))
-      } copoint
-    }
+      copoint
 
-    "render a set of numbers interleaved by delimiters" in {
+    "render a set of numbers interleaved by delimiters" in
       val stream =
         evalTable("(//tutorial/transactions).quantity").renderJson("", ",", "")
       val strings = stream map { _.toString }
       val str = strings.foldLeft("") { _ + _ } copoint
 
       str must contain(",")
-    }
-  }
-}

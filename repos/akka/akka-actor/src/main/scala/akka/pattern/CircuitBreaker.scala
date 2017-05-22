@@ -19,7 +19,7 @@ import akka.dispatch.ExecutionContexts.sameThreadExecutionContext
 /**
   * Companion object providing factory methods for Circuit Breaker which runs callbacks in caller's thread
   */
-object CircuitBreaker {
+object CircuitBreaker
 
   /**
     * Create a new CircuitBreaker.
@@ -57,7 +57,6 @@ object CircuitBreaker {
              callTimeout: FiniteDuration,
              resetTimeout: FiniteDuration): CircuitBreaker =
     apply(scheduler, maxFailures, callTimeout, resetTimeout)
-}
 
 /**
   * Provides circuit breaker functionality to provide stability when working with "dangerous" operations, e.g. calls to
@@ -84,15 +83,14 @@ class CircuitBreaker(
     maxFailures: Int,
     callTimeout: FiniteDuration,
     resetTimeout: FiniteDuration)(implicit executor: ExecutionContext)
-    extends AbstractCircuitBreaker {
+    extends AbstractCircuitBreaker
 
   def this(executor: ExecutionContext,
            scheduler: Scheduler,
            maxFailures: Int,
            callTimeout: FiniteDuration,
-           resetTimeout: FiniteDuration) = {
+           resetTimeout: FiniteDuration) =
     this(scheduler, maxFailures, callTimeout, resetTimeout)(executor)
-  }
 
   /**
     * Holds reference to current state of CircuitBreaker - *access only via helper methods*
@@ -157,9 +155,9 @@ class CircuitBreaker(
     * @return The result of the call
     */
   def withSyncCircuitBreaker[T](body: ⇒ T): T =
-    Await.result(withCircuitBreaker(try Future.successful(body) catch {
+    Await.result(withCircuitBreaker(try Future.successful(body) catch
       case NonFatal(t) ⇒ Future.failed(t)
-    }), callTimeout)
+    ), callTimeout)
 
   /**
     * Java API for [[#withSyncCircuitBreaker]]. Throws [[java.util.concurrent.TimeoutException]] if the call timed out.
@@ -187,10 +185,9 @@ class CircuitBreaker(
     * @param callback Handler to be invoked on state change
     * @return CircuitBreaker for fluent usage
     */
-  def onOpen(callback: Runnable): CircuitBreaker = {
+  def onOpen(callback: Runnable): CircuitBreaker =
     Open addListener callback
     this
-  }
 
   /**
     * Adds a callback to execute when circuit breaker transitions to half-open
@@ -209,10 +206,9 @@ class CircuitBreaker(
     * @param callback Handler to be invoked on state change
     * @return CircuitBreaker for fluent usage
     */
-  def onHalfOpen(callback: Runnable): CircuitBreaker = {
+  def onHalfOpen(callback: Runnable): CircuitBreaker =
     HalfOpen addListener callback
     this
-  }
 
   /**
     * Adds a callback to execute when circuit breaker state closes
@@ -231,10 +227,9 @@ class CircuitBreaker(
     * @param callback Handler to be invoked on state change
     * @return CircuitBreaker for fluent usage
     */
-  def onClose(callback: Runnable): CircuitBreaker = {
+  def onClose(callback: Runnable): CircuitBreaker =
     Closed addListener callback
     this
-  }
 
   /**
     * Retrieves current failure count.
@@ -249,10 +244,9 @@ class CircuitBreaker(
     * @param fromState State being transitioning from
     * @param toState State being transitioning from
     */
-  private def transition(fromState: State, toState: State): Unit = {
+  private def transition(fromState: State, toState: State): Unit =
     if (swapState(fromState, toState)) toState.enter()
     // else some other thread already swapped state
-  }
 
   /**
     * Trips breaker to an open state.  This is valid from Closed or Half-Open states.
@@ -279,7 +273,7 @@ class CircuitBreaker(
   /**
     * Internal state abstraction
     */
-  private sealed trait State {
+  private sealed trait State
     private val listeners = new CopyOnWriteArrayList[Runnable]
 
     /**
@@ -301,15 +295,12 @@ class CircuitBreaker(
       *
       * @return Promise which executes listener in supplied [[scala.concurrent.ExecutionContext]]
       */
-    protected def notifyTransitionListeners() {
-      if (hasListeners) {
+    protected def notifyTransitionListeners()
+      if (hasListeners)
         val iterator = listeners.iterator
-        while (iterator.hasNext) {
+        while (iterator.hasNext)
           val listener = iterator.next
           executor.execute(listener)
-        }
-      }
-    }
 
     /**
       * Shared implementation of call across all states.  Thrown exception or execution of the call beyond the allowed
@@ -318,34 +309,28 @@ class CircuitBreaker(
       * @param body Implementation of the call
       * @return Future containing the result of the call
       */
-    def callThrough[T](body: ⇒ Future[T]): Future[T] = {
+    def callThrough[T](body: ⇒ Future[T]): Future[T] =
 
-      def materialize[U](value: ⇒ Future[U]): Future[U] = try value catch {
+      def materialize[U](value: ⇒ Future[U]): Future[U] = try value catch
         case NonFatal(t) ⇒ Future.failed(t)
-      }
 
-      if (callTimeout == Duration.Zero) {
+      if (callTimeout == Duration.Zero)
         materialize(body)
-      } else {
+      else
         val p = Promise[T]()
 
         implicit val ec = sameThreadExecutionContext
-        p.future.onComplete {
+        p.future.onComplete
           case s: Success[_] ⇒ callSucceeds()
           case _ ⇒ callFails()
-        }
 
-        val timeout = scheduler.scheduleOnce(callTimeout) {
+        val timeout = scheduler.scheduleOnce(callTimeout)
           p tryCompleteWith timeoutFuture
-        }
 
-        materialize(body).onComplete { result ⇒
+        materialize(body).onComplete  result ⇒
           p tryComplete result
           timeout.cancel
-        }
         p.future
-      }
-    }
 
     /**
       * Abstract entry point for all states
@@ -372,22 +357,20 @@ class CircuitBreaker(
       * method _enter
       *
       */
-    final def enter(): Unit = {
+    final def enter(): Unit =
       _enter()
       notifyTransitionListeners()
-    }
 
     /**
       * Template method for concrete traits
       *
       */
     def _enter(): Unit
-  }
 
   /**
     * Concrete implementation of Closed state
     */
-  private object Closed extends AtomicInteger with State {
+  private object Closed extends AtomicInteger with State
 
     /**
       * Implementation of invoke, which simply attempts the call
@@ -426,12 +409,11 @@ class CircuitBreaker(
       * @return
       */
     override def toString: String = "Closed with failure count = " + get()
-  }
 
   /**
     * Concrete implementation of half-open state
     */
-  private object HalfOpen extends AtomicBoolean(true) with State {
+  private object HalfOpen extends AtomicBoolean(true) with State
 
     /**
       * Allows a single call through, during which all other callers fail-fast.  If the call fails, the breaker reopens.
@@ -472,12 +454,11 @@ class CircuitBreaker(
       */
     override def toString: String =
       "Half-Open currently testing call for success = " + get()
-  }
 
   /**
     * Concrete implementation of Open state
     */
-  private object Open extends AtomicLong with State {
+  private object Open extends AtomicLong with State
 
     /**
       * Fail-fast on any invocation
@@ -495,11 +476,10 @@ class CircuitBreaker(
       *
       * @return duration to when the breaker will attempt a reset by transitioning to half-open
       */
-    private def remainingDuration(): FiniteDuration = {
+    private def remainingDuration(): FiniteDuration =
       val diff = System.nanoTime() - get
       if (diff <= 0L) Duration.Zero
       else diff.nanos
-    }
 
     /**
       * No-op for open, calls are never executed so cannot succeed or fail
@@ -521,12 +501,10 @@ class CircuitBreaker(
       *
       * @return
       */
-    override def _enter(): Unit = {
+    override def _enter(): Unit =
       set(System.nanoTime())
-      scheduler.scheduleOnce(resetTimeout) {
+      scheduler.scheduleOnce(resetTimeout)
         attemptReset()
-      }
-    }
 
     /**
       * Override for more descriptive toString
@@ -534,8 +512,6 @@ class CircuitBreaker(
       * @return
       */
     override def toString: String = "Open"
-  }
-}
 
 /**
   * Exception thrown when Circuit Breaker is open.

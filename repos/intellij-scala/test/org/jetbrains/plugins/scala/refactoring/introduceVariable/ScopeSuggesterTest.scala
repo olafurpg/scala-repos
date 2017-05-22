@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.refactoring.introduceVariable
   * Created by user 
   * on 10/15/15
   */
-class ScopeSuggesterTest extends AbstractScopeSuggesterTest {
+class ScopeSuggesterTest extends AbstractScopeSuggesterTest
   def testOkSimple() = doTest(Seq("class OkSimple"))
 
   def testOkTypeAlias() = doTest(Seq("trait B"))
@@ -14,4 +14,3 @@ class ScopeSuggesterTest extends AbstractScopeSuggesterTest {
   def testOkTypeParam() = doTest(Seq("class Inner"))
 
   def testNokFunction() = doTest(Seq(""))
-}

@@ -3,7 +3,7 @@ package scalaz
 import Scalaz.Id
 import std.AllInstances._
 
-object OptionalTest extends SpecLite {
+object OptionalTest extends SpecLite
 
   def definedTests[F[_], A](
       context: F[A], value: A, default: => A, alternative: => F[A])(
@@ -11,7 +11,7 @@ object OptionalTest extends SpecLite {
       EA: Equal[A],
       EFA: Equal[F[A]],
       SA: Show[A],
-      SFA: Show[F[A]]) = {
+      SFA: Show[F[A]]) =
     O.getOrElse(context)(default) must_=== (value)
     O.isDefined(context) must_=== (true)
     O.orElse(context)(alternative) must_=== (context)
@@ -20,14 +20,13 @@ object OptionalTest extends SpecLite {
     O.?(context)(1, 0) must_=== (1)
     O.toOption(context) must_=== (Option(value))
     O.toMaybe(context) must_=== (Maybe.just(value))
-  }
 
   def undefinedTests[F[_], A](
       context: F[A], default: A, alternative: F[A])(implicit O: Optional[F],
                                                     EA: Equal[A],
                                                     EFA: Equal[F[A]],
                                                     SA: Show[A],
-                                                    SFA: Show[F[A]]) = {
+                                                    SFA: Show[F[A]]) =
     O.getOrElse(context)(default) must_=== (default)
     O.isDefined(context) must_=== (false)
     O.orElse(context)(alternative) must_=== (alternative)
@@ -36,9 +35,8 @@ object OptionalTest extends SpecLite {
     O.?(context)(1, 0) must_=== (0)
     O.toOption(context) must_=== (Option.empty[A])
     O.toMaybe(context) must_=== (Maybe.empty[A])
-  }
 
-  """\/ instance tests""" in {
+  """\/ instance tests""" in
     type EitherInt[A] = Int \/ A
 
     def right(a: Int): EitherInt[Int] = \/.right(a)
@@ -46,7 +44,6 @@ object OptionalTest extends SpecLite {
 
     definedTests(right(1), 1, 0, right(0))
     undefinedTests(left(0), 0, right(0))
-  }
 
   // currently there are no Equal[LazyEither], Show[LazyEither]
 //  """LazyEither instance tests""" in {
@@ -63,12 +60,11 @@ object OptionalTest extends SpecLite {
 //    undefinedTests(LazyOption.lazyNone[Int], 0, LazyOption.lazySome(0))
 //  }
 
-  "Option instance tests" in {
+  "Option instance tests" in
     definedTests(Option(1), 1, 0, Option(0))
     undefinedTests(Option.empty[Int], 0, Option(0))
-  }
 
-  """Validation instance tests""" in {
+  """Validation instance tests""" in
     type VString[A] = Validation[String, A]
 
     def success(a: Int): VString[Int] = Validation.success(a)
@@ -76,9 +72,8 @@ object OptionalTest extends SpecLite {
 
     definedTests[VString, Int](success(1), 1, 0, success(0))
     undefinedTests[VString, Int](failure("oO"), 0, success(0))
-  }
 
-  """ValidationNel instance tests""" in {
+  """ValidationNel instance tests""" in
     type VStringNel[A] = ValidationNel[String, A]
 
     def successNel(a: Int): VStringNel[Int] = Validation.success(a)
@@ -86,18 +81,15 @@ object OptionalTest extends SpecLite {
 
     definedTests[VStringNel, Int](successNel(1), 1, 0, successNel(0))
     undefinedTests[VStringNel, Int](failureNel("oO"), 0, successNel(0))
-  }
 
-  "Id instance tests" in {
+  "Id instance tests" in
     definedTests[Id, Int](1, 1, 0, 0)
-  }
 
-  "Maybe instance tests" in {
+  "Maybe instance tests" in
     definedTests(Maybe.just(1), 1, 0, Maybe.just(0))
     undefinedTests(Maybe.empty[Int], 0, Maybe.just(0))
-  }
 
-  "syntax test" in {
+  "syntax test" in
     import syntax.optional._
 
     val value = Option(1)
@@ -109,5 +101,3 @@ object OptionalTest extends SpecLite {
     (value.isEmpty) must_=== (false)
     (value ? 1 | 0) must_=== (1)
     (value.toOption) must_=== (value)
-  }
-}

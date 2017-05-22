@@ -7,6 +7,5 @@ sealed trait IvoryTower
 
 object IvoryTower extends IvoryTowers
 
-trait IvoryTowers {
+trait IvoryTowers
   private[effect] val ivoryTower = Tower[IvoryTower]()
-}

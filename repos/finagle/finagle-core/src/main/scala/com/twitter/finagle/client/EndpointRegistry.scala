@@ -12,7 +12,7 @@ import scala.collection.mutable
   * `addObservation`. A path is removed for a given client and Dtab by calling
   * `removeObservation`.
   */
-private[twitter] object EndpointRegistry {
+private[twitter] object EndpointRegistry
 
   private type Observation = (AtomicReference[Addr], Closable)
 
@@ -20,9 +20,8 @@ private[twitter] object EndpointRegistry {
   private type DtabMap = mutable.Map[Dtab, EndpointMap]
 
   val registry = new EndpointRegistry()
-}
 
-private[twitter] class EndpointRegistry {
+private[twitter] class EndpointRegistry
   import EndpointRegistry._
 
   // synchronized on `this`
@@ -33,15 +32,13 @@ private[twitter] class EndpointRegistry {
     *
     * @param client Name of the client
     */
-  def endpoints(client: String): Map[Dtab, Map[String, Addr]] = synchronized {
-    registry.get(client) match {
+  def endpoints(client: String): Map[Dtab, Map[String, Addr]] = synchronized
+    registry.get(client) match
       case Some(dtabMap) =>
-        dtabMap.mapValues { paths =>
+        dtabMap.mapValues  paths =>
           paths.mapValues { case (observation, _) => observation.get() }.toMap
-        }.toMap
+        .toMap
       case None => Map.empty
-    }
-  }
 
   /**
     * Register a collection of endpoints for a given client, Dtab, and path.
@@ -57,28 +54,24 @@ private[twitter] class EndpointRegistry {
       dtab: Dtab,
       path: String,
       endpoints: Var[Addr]
-  ): Unit = {
+  ): Unit =
     val ar: AtomicReference[Addr] = new AtomicReference()
     val closable = endpoints.changes.register(Witness(ar))
     val observation = (ar, closable)
-    synchronized {
-      registry.get(client) match {
+    synchronized
+      registry.get(client) match
         case Some(dtabMap) =>
-          dtabMap.get(dtab) match {
+          dtabMap.get(dtab) match
             case Some(dtabEntry) =>
               // If the path already exists, replace it and close the observation
               val prev = dtabEntry.put(path, observation)
               prev.foreach { case (_, closable) => closable.close() }
             case None =>
               dtabMap += ((dtab, mutable.Map(path -> observation)))
-          }
         case None =>
           val endpointMap: EndpointMap = mutable.Map(path -> observation)
           val dtabMap: DtabMap = mutable.Map(dtab -> endpointMap)
           registry.put(client, dtabMap)
-      }
-    }
-  }
 
   /**
     * Deregister a dtab and path to observe for a given client. If, after removal,
@@ -91,17 +84,11 @@ private[twitter] class EndpointRegistry {
     * @param path Path to remove observation for
     */
   def removeObservation(client: String, dtab: Dtab, path: String) =
-    synchronized {
-      registry.get(client).foreach { dtabEntries =>
-        dtabEntries.get(dtab).foreach { entry =>
+    synchronized
+      registry.get(client).foreach  dtabEntries =>
+        dtabEntries.get(dtab).foreach  entry =>
           entry.remove(path).foreach { case (_, closable) => closable.close() }
-          if (entry.isEmpty) {
+          if (entry.isEmpty)
             dtabEntries.remove(dtab)
-            if (dtabEntries.isEmpty) {
+            if (dtabEntries.isEmpty)
               registry.remove(client)
-            }
-          }
-        }
-      }
-    }
-}

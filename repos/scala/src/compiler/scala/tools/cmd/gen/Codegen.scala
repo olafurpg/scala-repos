@@ -6,14 +6,14 @@
 package scala.tools.cmd
 package gen
 
-class Codegen(args: List[String]) extends {
+class Codegen(args: List[String]) extends
   val parsed = CodegenSpec(args: _*)
-} with CodegenSpec with Instance
+with CodegenSpec with Instance
 
-object Codegen {
+object Codegen
   def echo(msg: String) = Console println msg
 
-  def main(args0: Array[String]): Unit = {
+  def main(args0: Array[String]): Unit =
     val runner = new Codegen(args0.toList)
     import runner._
 
@@ -24,15 +24,11 @@ object Codegen {
 
     echo("Generating sources into " + out)
 
-    if (anyvals || all) {
+    if (anyvals || all)
       val av = new AnyVals {}
 
-      av.make() foreach {
+      av.make() foreach
         case (name, code) =>
           val file = (out / (name + ".scala")).toFile
           echo("Writing: " + file)
           file writeAll code
-      }
-    }
-  }
-}

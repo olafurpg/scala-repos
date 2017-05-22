@@ -6,17 +6,16 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FeatureSp
   * @author Roman.Shein
   * @since 05.05.2015.
   */
-trait FeatureSpecScopeTest extends FeatureSpecGenerator {
-  def testFeatureSpecEmptyScope() {
+trait FeatureSpecScopeTest extends FeatureSpecGenerator
+  def testFeatureSpecEmptyScope()
     addFeatureSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(21, 7, featureSpecFileName),
             featureSpecClassName))
-  }
 
-  def testFeatureSpecScope() {
+  def testFeatureSpecScope()
     addFeatureSpec()
     val testNames = Seq("Feature: Feature 1 Scenario: Scenario A",
                         "Feature: Feature 1 Scenario: Scenario B")
@@ -38,5 +37,3 @@ trait FeatureSpecScopeTest extends FeatureSpecGenerator {
           checkResultTreeHasExactNamedPath(root, aPath: _*) &&
           checkResultTreeHasExactNamedPath(root, bPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "Feature: Feature 2"))
-  }
-}

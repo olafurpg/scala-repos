@@ -36,7 +36,7 @@ case class Settings(host: String,
                     shardPath: String,
                     secure: Boolean)
 
-object Settings {
+object Settings
   private val HostRegex = """^host (.+)$""".r
   private val IdRegex = """^id (.+)$""".r
   private val TokenRegex = """^token ([-A-F0-9]+)$""".r
@@ -52,7 +52,7 @@ object Settings {
   private val ShardPath = """^bifrost\-path (.+)$""".r
   private val SecureRegex = """^secure (true|false)$""".r
 
-  def fromFile(f: File): Settings = {
+  def fromFile(f: File): Settings =
     if (!f.canRead) sys.error("Can't read %s. Is bifrost running?" format f)
 
     case class PartialSettings(host: Option[String] = None,
@@ -68,9 +68,9 @@ object Settings {
                                jobsPath: Option[String] = None,
                                shardPort: Option[Int] = None,
                                shardPath: Option[String] = None,
-                               secure: Option[Boolean] = None) {
+                               secure: Option[Boolean] = None)
 
-      def missing: List[String] = {
+      def missing: List[String] =
         def q(o: Option[_], s: String): List[String] =
           if (o.isDefined) Nil else s :: Nil
 
@@ -82,10 +82,9 @@ object Settings {
             jobsPort, "jobsPort") ++ q(jobsPath, "jobsPath") ++ q(
             shardPort, "shardPort") ++ q(shardPath, "shardPath") ++ q(
             secure, "secure")
-      }
 
       def settings: Option[Settings] =
-        for {
+        for
           h <- host
           i <- id
           t <- token
@@ -100,10 +99,8 @@ object Settings {
           sh <- shardPort
           shp <- shardPath
           sec <- secure
-        } yield {
+        yield
           Settings(h, i, t, ac, acp, au, aup, in, inp, j, jp, sh, shp, sec)
-        }
-    }
 
     val lines = io.Source.fromFile(f).getLines
 
@@ -115,8 +112,8 @@ object Settings {
                                    jobsPath = Some("jobs/v1"),
                                    secure = Some(false))
 
-    val ps = lines.foldLeft(defaults) { (ps, s) =>
-      val ps2 = s match {
+    val ps = lines.foldLeft(defaults)  (ps, s) =>
+      val ps2 = s match
         case HostRegex(s) => ps.copy(host = Some(s))
         case IdRegex(s) => ps.copy(id = Some(s))
         case TokenRegex(s) => ps.copy(token = Some(s))
@@ -125,10 +122,9 @@ object Settings {
         case AuthPort(n) => ps.copy(authPort = Some(n.toInt))
         case AuthPath(p) => ps.copy(authPath = Some(p))
         case _ => ps
-      }
 
       // split to avoid a bug in the pattern matcher
-      s match {
+      s match
         case IngestPort(n) => ps2.copy(ingestPort = Some(n.toInt))
         case IngestPath(p) => ps2.copy(ingestPath = Some(p))
         case JobsPort(n) => ps2.copy(jobsPort = Some(n.toInt))
@@ -137,11 +133,6 @@ object Settings {
         case ShardPath(p) => ps2.copy(shardPath = Some(p))
         case SecureRegex(s) => ps2.copy(secure = Some(s.toBoolean))
         case _ => ps2
-      }
-    }
-    ps.settings.getOrElse {
+    ps.settings.getOrElse
       sys.error("missing settings in %s:\n  %s" format
           (f, ps.missing.mkString("\n  ")))
-    }
-  }
-}

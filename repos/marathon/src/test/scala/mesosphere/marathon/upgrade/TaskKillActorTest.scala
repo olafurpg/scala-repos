@@ -20,17 +20,16 @@ import scala.concurrent.{Await, Promise}
 
 class TaskKillActorTest
     extends MarathonActorSupport with FunSuiteLike with Matchers
-    with BeforeAndAfterAll with BeforeAndAfter with MockitoSugar {
+    with BeforeAndAfterAll with BeforeAndAfter with MockitoSugar
 
   var taskTracker: TaskTracker = _
   var driver: SchedulerDriver = _
 
-  before {
+  before
     taskTracker = mock[TaskTracker]
     driver = mock[SchedulerDriver]
-  }
 
-  test("Kill tasks") {
+  test("Kill tasks")
     val taskA = MarathonTestHelper.runningTask("taskA_id")
     val taskB = MarathonTestHelper.runningTask("taskB_id")
 
@@ -73,9 +72,8 @@ class TaskKillActorTest
     verify(driver).killTask(taskB.taskId.mesosTaskId)
 
     expectTerminated(ref)
-  }
 
-  test("Kill tasks with empty task list") {
+  test("Kill tasks with empty task list")
     val tasks = Iterable.empty[Task]
     val promise = Promise[Unit]()
 
@@ -93,9 +91,8 @@ class TaskKillActorTest
 
     verifyZeroInteractions(driver)
     expectTerminated(ref)
-  }
 
-  test("Cancelled") {
+  test("Cancelled")
     val taskA = MarathonTestHelper.runningTask("taskA_id")
     val taskB = MarathonTestHelper.runningTask("taskB_id")
 
@@ -114,14 +111,13 @@ class TaskKillActorTest
 
     system.stop(ref)
 
-    intercept[TaskUpgradeCanceledException] {
+    intercept[TaskUpgradeCanceledException]
       Await.result(promise.future, 5.seconds)
-    }.getMessage should equal("The operation has been cancelled")
+    .getMessage should equal("The operation has been cancelled")
 
     expectTerminated(ref)
-  }
 
-  test("Task synchronization") {
+  test("Task synchronization")
     val app = AppDefinition(id = PathId("/app"), instances = 2)
     val promise = Promise[Unit]()
     val taskA = MarathonTestHelper.runningTask("taskA_id")
@@ -147,9 +143,8 @@ class TaskKillActorTest
     Await.result(promise.future, 5.seconds) should be(())
 
     expectTerminated(ref)
-  }
 
-  test("Send kill again after synchronization with task tracker") {
+  test("Send kill again after synchronization with task tracker")
     val taskA = MarathonTestHelper.runningTask("taskA_id")
     val taskB = MarathonTestHelper.runningTask("taskB_id")
     val appId = PathId("/test")
@@ -200,5 +195,3 @@ class TaskKillActorTest
     verify(driver, times(2)).killTask(taskB.launchedMesosId.get)
 
     expectTerminated(ref)
-  }
-}

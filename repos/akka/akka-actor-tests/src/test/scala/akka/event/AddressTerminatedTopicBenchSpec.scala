@@ -10,29 +10,26 @@ import akka.actor.ActorSystem
 import akka.actor.Props
 import akka.testkit._
 
-object AddressTerminatedTopicBenchSpec {
+object AddressTerminatedTopicBenchSpec
 
-  class Subscriber(testActor: ActorRef) extends Actor {
+  class Subscriber(testActor: ActorRef) extends Actor
     AddressTerminatedTopic(context.system).subscribe(self)
     testActor ! "started"
 
-    override def postStop(): Unit = {
+    override def postStop(): Unit =
       AddressTerminatedTopic(context.system).unsubscribe(self)
-    }
 
     def receive = Actor.emptyBehavior
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class AddressTerminatedTopicBenchSpec extends AkkaSpec("akka.loglevel=INFO") {
+class AddressTerminatedTopicBenchSpec extends AkkaSpec("akka.loglevel=INFO")
   import AddressTerminatedTopicBenchSpec._
 
-  "Subscribe and unsubscribe of AddressTerminated" must {
+  "Subscribe and unsubscribe of AddressTerminated" must
 
-    "be quick" in {
+    "be quick" in
       val sys = ActorSystem(system.name + "2", system.settings.config)
-      try {
+      try
         val num = 20000
 
         val t1 = System.nanoTime()
@@ -48,9 +45,5 @@ class AddressTerminatedTopicBenchSpec extends AkkaSpec("akka.loglevel=INFO") {
         log.info("Stopping {} actors took {} ms",
                  num,
                  (System.nanoTime() - t2).nanos.toMillis)
-      } finally {
+      finally
         if (!sys.isTerminated) shutdown(sys)
-      }
-    }
-  }
-}

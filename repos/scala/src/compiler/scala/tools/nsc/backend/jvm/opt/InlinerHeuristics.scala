@@ -14,37 +14,35 @@ import scala.tools.nsc.backend.jvm.BTypes.InternalName
 import scala.collection.convert.decorateAsScala._
 import scala.tools.nsc.backend.jvm.BackendReporting.OptimizerWarning
 
-class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
+class InlinerHeuristics[BT <: BTypes](val bTypes: BT)
   import bTypes._
   import inliner._
   import callGraph._
 
-  case class InlineRequest(callsite: Callsite, post: List[InlineRequest]) {
+  case class InlineRequest(callsite: Callsite, post: List[InlineRequest])
     // invariant: all post inline requests denote callsites in the callee of the main callsite
     for (pr <- post) assert(
         pr.callsite.callsiteMethod == callsite.callee.get.callee,
         s"Callsite method mismatch: main $callsite - post ${pr.callsite}")
-  }
 
   /**
     * Select callsites from the call graph that should be inlined, grouped by the containing method.
     * Cyclic inlining requests are allowed, the inliner will eliminate requests to break cycles.
     */
-  def selectCallsitesForInlining: Map[MethodNode, Set[InlineRequest]] = {
+  def selectCallsitesForInlining: Map[MethodNode, Set[InlineRequest]] =
     // We should only create inlining requests for callsites being compiled (not for callsites in
     // classes on the classpath). The call graph may contain callsites of classes parsed from the
     // classpath. In order to get only the callsites being compiled, we start at the map of
     // compilingClasses in the byteCodeRepository.
-    val compilingMethods = for {
+    val compilingMethods = for
       classNode <- byteCodeRepository.compilingClasses.valuesIterator
       methodNode <- classNode.methods.iterator.asScala
-    } yield methodNode
+    yield methodNode
 
     compilingMethods
       .map(methodNode =>
-            {
           var requests = Set.empty[InlineRequest]
-          callGraph.callsites(methodNode).valuesIterator foreach {
+          callGraph.callsites(methodNode).valuesIterator foreach
             case callsite @ Callsite(_,
                                      _,
                                      _,
@@ -63,25 +61,24 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                                      pos,
                                      _,
                                      _) =>
-              inlineRequest(callsite) match {
+              inlineRequest(callsite) match
                 case Some(Right(req)) => requests += req
                 case Some(Left(w)) =>
                   if ((calleeAnnotatedInline &&
                           bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) ||
-                      w.emitWarning(compilerSettings)) {
+                      w.emitWarning(compilerSettings))
                     val annotWarn =
                       if (calleeAnnotatedInline) " is annotated @inline but"
                       else ""
-                    val msg = s"${BackendReporting.methodSignature(
-                        calleeDeclClass.internalName, callee)}$annotWarn could not be inlined:\n$w"
+                    val msg = s"$BackendReporting.methodSignature(
+                        calleeDeclClass.internalName, callee)$annotWarn could not be inlined:\n$w"
                     backendReporting.inlinerWarning(callsite.callsitePosition,
                                                     msg)
-                  }
 
                 case None =>
                   if (canInlineFromSource && calleeAnnotatedInline &&
                       !callsite.annotatedNoInline &&
-                      bTypes.compilerSettings.YoptWarningEmitAtInlineFailed) {
+                      bTypes.compilerSettings.YoptWarningEmitAtInlineFailed)
                     // if the callsite is annotated @inline, we report an inline warning even if the underlying
                     // reason is, for example, mixed compilation (which has a separate -Yopt-warning flag).
                     def initMsg =
@@ -103,27 +100,23 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
                     else
                       backendReporting.inlinerWarning(pos,
                                                       s"$initMsg." + warnMsg)
-                  } else if (callsiteWarning.isDefined && callsiteWarning.get
-                               .emitWarning(compilerSettings)) {
+                  else if (callsiteWarning.isDefined && callsiteWarning.get
+                               .emitWarning(compilerSettings))
                     // when annotatedInline is false, and there is some warning, the callsite metadata is possibly incomplete.
                     backendReporting.inlinerWarning(
                         pos,
                         s"there was a problem determining if method ${callee.name} can be inlined: \n" +
                         callsiteWarning.get)
-                  }
-              }
 
             case Callsite(ins, _, _, Left(warning), _, _, _, pos, _, _) =>
               if (warning.emitWarning(compilerSettings))
                 backendReporting.inlinerWarning(
                     pos,
                     s"failed to determine if ${ins.name} should be inlined:\n$warning")
-          }
           (methodNode, requests)
-      })
+      )
       .filterNot(_._2.isEmpty)
       .toMap
-  }
 
   /**
     * Returns the inline request for a callsite if the callsite should be inlined according to the
@@ -140,16 +133,15 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
     *         `Some(Right)` if the callsite should be and can be inlined
     */
   def inlineRequest(
-      callsite: Callsite): Option[Either[OptimizerWarning, InlineRequest]] = {
+      callsite: Callsite): Option[Either[OptimizerWarning, InlineRequest]] =
     val callee = callsite.callee.get
     def requestIfCanInline(
         callsite: Callsite): Either[OptimizerWarning, InlineRequest] =
-      inliner.earlyCanInlineCheck(callsite) match {
+      inliner.earlyCanInlineCheck(callsite) match
         case Some(w) => Left(w)
         case None => Right(InlineRequest(callsite, Nil))
-      }
 
-    compilerSettings.YoptInlineHeuristics.value match {
+    compilerSettings.YoptInlineHeuristics.value match
       case "everything" =>
         if (callee.safeToInline) Some(requestIfCanInline(callsite))
         else None
@@ -161,18 +153,16 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
 
       case "default" =>
         if (callee.safeToInline && !callee.annotatedNoInline &&
-            !callsite.annotatedNoInline) {
+            !callsite.annotatedNoInline)
           def shouldInlineHO =
             callee.samParamTypes.nonEmpty &&
-            (callee.samParamTypes exists {
+            (callee.samParamTypes exists
                   case (index, _) => callsite.argInfos.contains(index)
-                })
+                )
           if (callee.annotatedInline || callsite.annotatedInline ||
               shouldInlineHO) Some(requestIfCanInline(callsite))
           else None
-        } else None
-    }
-  }
+        else None
 
   /*
   // using http://lihaoyi.github.io/Ammonite/
@@ -332,4 +322,3 @@ class InlinerHeuristics[BT <: BTypes](val bTypes: BT) {
   )
   def javaSam(internalName: InternalName): Option[String] =
     javaSams.get(internalName)
-}

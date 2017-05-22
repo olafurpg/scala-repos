@@ -26,23 +26,18 @@ import com.twitter.scalding.typed.TypedSink
   * This is a test sink that assumes single threaded testing with
   * cascading local mode
   */
-class TestSink[T] extends Sink[T] {
+class TestSink[T] extends Sink[T]
   private var data: Vector[(Timestamp, T)] = Vector.empty
 
   def write(incoming: PipeFactory[T]): PipeFactory[T] =
     // three functors deep:
-    incoming.map { state =>
-      state.map { reader =>
-        reader.map { timeItem =>
+    incoming.map  state =>
+      state.map  reader =>
+        reader.map  timeItem =>
           data = data :+ timeItem
           timeItem
-        }
-      }
-    }
 
-  def reset: Vector[(Timestamp, T)] = {
+  def reset: Vector[(Timestamp, T)] =
     val oldData = data
     data = Vector.empty
     oldData
-  }
-}

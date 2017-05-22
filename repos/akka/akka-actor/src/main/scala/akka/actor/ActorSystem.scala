@@ -20,19 +20,17 @@ import scala.util.{Failure, Success, Try}
 import scala.util.control.{NonFatal, ControlThrowable}
 import java.util.Locale
 
-object ActorSystem {
+object ActorSystem
 
   val Version: String = akka.Version.current // generated file
 
-  val EnvHome: Option[String] = System.getenv("AKKA_HOME") match {
+  val EnvHome: Option[String] = System.getenv("AKKA_HOME") match
     case null | "" | "." ⇒ None
     case value ⇒ Some(value)
-  }
 
-  val SystemHome: Option[String] = System.getProperty("akka.home") match {
+  val SystemHome: Option[String] = System.getProperty("akka.home") match
     case null | "" ⇒ None
     case value ⇒ Some(value)
-  }
 
   val GlobalHome: Option[String] = SystemHome orElse EnvHome
 
@@ -150,12 +148,11 @@ object ActorSystem {
             config: Option[Config] = None,
             classLoader: Option[ClassLoader] = None,
             defaultExecutionContext: Option[ExecutionContext] = None)
-    : ActorSystem = {
+    : ActorSystem =
     val cl = classLoader.getOrElse(findClassLoader())
     val appConfig = config.getOrElse(ConfigFactory.load(cl))
     new ActorSystemImpl(name, appConfig, cl, defaultExecutionContext, None)
       .start()
-  }
 
   /**
     * Settings are the overall ActorSystem Settings which also provides a convenient access to the Config object.
@@ -164,19 +161,18 @@ object ActorSystem {
     *
     * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
     */
-  class Settings(classLoader: ClassLoader, cfg: Config, final val name: String) {
+  class Settings(classLoader: ClassLoader, cfg: Config, final val name: String)
 
     /**
       * The backing Config of this ActorSystem's Settings
       *
       * @see <a href="http://typesafehub.github.io/config/v1.3.0/" target="_blank">The Typesafe Config Library API Documentation</a>
       */
-    final val config: Config = {
+    final val config: Config =
       val config =
         cfg.withFallback(ConfigFactory.defaultReference(classLoader))
       config.checkValid(ConfigFactory.defaultReference(classLoader), "akka")
       config
-    }
 
     import akka.util.Helpers.ConfigOps
     import config._
@@ -206,11 +202,10 @@ object ActorSystem {
       config.getBoolean("akka.log-config-on-start")
     final val LogDeadLetters: Int = config
       .getString("akka.log-dead-letters")
-      .toLowerCase(Locale.ROOT) match {
+      .toLowerCase(Locale.ROOT) match
       case "off" | "false" ⇒ 0
       case "on" | "true" ⇒ Int.MaxValue
       case _ ⇒ config.getInt("akka.log-dead-letters")
-    }
     final val LogDeadLettersDuringShutdown: Boolean =
       config.getBoolean("akka.log-dead-letters-during-shutdown")
 
@@ -228,10 +223,9 @@ object ActorSystem {
     final val DebugRouterMisconfiguration: Boolean = getBoolean(
         "akka.actor.debug.router-misconfiguration")
 
-    final val Home: Option[String] = config.getString("akka.home") match {
+    final val Home: Option[String] = config.getString("akka.home") match
       case "" ⇒ None
       case x ⇒ Some(x)
-    }
 
     final val SchedulerClass: String = getString(
         "akka.scheduler.implementation")
@@ -251,29 +245,25 @@ object ActorSystem {
       * Returns the String representation of the Config that this Settings is backed by
       */
     override def toString: String = config.root.render
-  }
 
   /**
     * INTERNAL API
     */
-  private[akka] def findClassLoader(): ClassLoader = {
+  private[akka] def findClassLoader(): ClassLoader =
     def findCaller(get: Int ⇒ Class[_]): ClassLoader =
-      Iterator.from(2 /*is the magic number, promise*/ ).map(get) dropWhile {
+      Iterator.from(2 /*is the magic number, promise*/ ).map(get) dropWhile
         c ⇒
           c != null &&
           (c.getName.startsWith("akka.actor.ActorSystem") ||
               c.getName.startsWith("scala.Option") ||
               c.getName.startsWith("scala.collection.Iterator") ||
               c.getName.startsWith("akka.util.Reflect"))
-      } next () match {
+      next () match
         case null ⇒ getClass.getClassLoader
         case c ⇒ c.getClassLoader
-      }
 
     Option(Thread.currentThread.getContextClassLoader) orElse
     (Reflect.getCallerClass map findCaller) getOrElse getClass.getClassLoader
-  }
-}
 
 /**
   * An actor system is a hierarchical group of actors which share common
@@ -306,7 +296,7 @@ object ActorSystem {
   * extending [[akka.actor.ExtendedActorSystem]] instead, but beware that you
   * are completely on your own in that case!
   */
-abstract class ActorSystem extends ActorRefFactory {
+abstract class ActorSystem extends ActorRefFactory
   import ActorSystem._
 
   /**
@@ -497,7 +487,6 @@ abstract class ActorSystem extends ActorRefFactory {
     * of the payload, if is in the process of registration from another Thread of execution
     */
   def hasExtension(ext: ExtensionId[_ <: Extension]): Boolean
-}
 
 /**
   * More powerful interface to the actor system’s implementation which is presented to extensions (see [[akka.actor.Extension]]).
@@ -508,7 +497,7 @@ abstract class ActorSystem extends ActorRefFactory {
   * actually roll your own Akka, beware that you are completely on your own in
   * that case!
   */
-abstract class ExtendedActorSystem extends ActorSystem {
+abstract class ExtendedActorSystem extends ActorSystem
 
   /**
     * The ActorRefProvider is the only entity which creates all actor references within this actor system.
@@ -557,7 +546,6 @@ abstract class ExtendedActorSystem extends ActorSystem {
     * helping debugging in case something already went terminally wrong.
     */
   private[akka] def printTree: String
-}
 
 private[akka] class ActorSystemImpl(
     val name: String,
@@ -565,7 +553,7 @@ private[akka] class ActorSystemImpl(
     classLoader: ClassLoader,
     defaultExecutionContext: Option[ExecutionContext],
     val guardianProps: Option[Props])
-    extends ExtendedActorSystem {
+    extends ExtendedActorSystem
 
   if (!name.matches("""^[a-zA-Z0-9][a-zA-Z0-9-_]*$"""))
     throw new IllegalArgumentException("invalid ActorSystem name [" + name +
@@ -578,15 +566,15 @@ private[akka] class ActorSystemImpl(
       classLoader, applicationConfig, name)
 
   protected def uncaughtExceptionHandler: Thread.UncaughtExceptionHandler =
-    new Thread.UncaughtExceptionHandler() {
-      def uncaughtException(thread: Thread, cause: Throwable): Unit = {
-        cause match {
+    new Thread.UncaughtExceptionHandler()
+      def uncaughtException(thread: Thread, cause: Throwable): Unit =
+        cause match
           case NonFatal(_) | _: InterruptedException | _: NotImplementedError |
               _: ControlThrowable ⇒
             log.error(cause, "Uncaught error from thread [{}]", thread.getName)
           case _ ⇒
-            if (settings.JvmExitOnFatalError) {
-              try {
+            if (settings.JvmExitOnFatalError)
+              try
                 log.error(
                     cause,
                     "Uncaught error from thread [{}] shutting down JVM since 'akka.jvm-exit-on-fatal-error' is enabled",
@@ -600,20 +588,15 @@ private[akka] class ActorSystemImpl(
                 err.println("]")
                 cause.printStackTrace(System.err)
                 System.err.flush()
-              } finally {
+              finally
                 System.exit(-1)
-              }
-            } else {
+            else
               log.error(
                   cause,
                   "Uncaught fatal error from thread [{}] shutting down ActorSystem [{}]",
                   thread.getName,
                   name)
               terminate()
-            }
-        }
-      }
-    }
 
   final val threadFactory: MonitorableThreadFactory = MonitorableThreadFactory(
       name,
@@ -652,16 +635,14 @@ private[akka] class ActorSystemImpl(
       throw new UnsupportedOperationException(
           "cannot create top-level actor from the outside on ActorSystem with custom user guardian")
 
-  def stop(actor: ActorRef): Unit = {
+  def stop(actor: ActorRef): Unit =
     val path = actor.path
     val guard = guardian.path
     val sys = systemGuardian.path
-    path.parent match {
+    path.parent match
       case `guard` ⇒ guardian ! StopChild(actor)
       case `sys` ⇒ systemGuardian ! StopChild(actor)
       case _ ⇒ actor.asInstanceOf[InternalActorRef].stop()
-    }
-  }
 
   import settings._
 
@@ -669,13 +650,12 @@ private[akka] class ActorSystemImpl(
   val eventStream = new EventStream(this, DebugEventStream)
   eventStream.startStdoutLogger(settings)
 
-  val logFilter: LoggingFilter = {
+  val logFilter: LoggingFilter =
     val arguments = Vector(
         classOf[Settings] -> settings, classOf[EventStream] -> eventStream)
     dynamicAccess
       .createInstanceFor[LoggingFilter](LoggingFilter, arguments)
       .get
-  }
 
   val log: LoggingAdapter = new BusLogging(eventStream,
                                            getClass.getName + "(" + name + ")",
@@ -684,7 +664,7 @@ private[akka] class ActorSystemImpl(
 
   val scheduler: Scheduler = createScheduler()
 
-  val provider: ActorRefProvider = try {
+  val provider: ActorRefProvider = try
     val arguments = Vector(classOf[String] -> name,
                            classOf[Settings] -> settings,
                            classOf[EventStream] -> eventStream,
@@ -693,11 +673,10 @@ private[akka] class ActorSystemImpl(
     dynamicAccess
       .createInstanceFor[ActorRefProvider](ProviderClass, arguments)
       .get
-  } catch {
+  catch
     case NonFatal(e) ⇒
       Try(stopScheduler())
       throw e
-  }
 
   def deadLetters: ActorRef = provider.deadLetters
 
@@ -720,13 +699,13 @@ private[akka] class ActorSystemImpl(
   val internalCallingThreadExecutionContext: ExecutionContext = dynamicAccess
     .getObjectFor[ExecutionContext](
         "scala.concurrent.Future$InternalCallbackExecutor$")
-    .getOrElse(new ExecutionContext with BatchingExecutor {
+    .getOrElse(new ExecutionContext with BatchingExecutor
       override protected def unbatchedExecute(r: Runnable): Unit = r.run()
       override protected def resubmitOnBlock: Boolean =
         false // Since we execute inline, no gain in resubmitting
       override def reportFailure(t: Throwable): Unit =
         dispatcher reportFailure t
-    })
+    )
 
   private[this] final val terminationCallbacks =
     new TerminationCallbacks(provider.terminationFuture)(dispatcher)
@@ -740,7 +719,7 @@ private[akka] class ActorSystemImpl(
   def /(actorName: String): ActorPath = guardian.path / actorName
   def /(path: Iterable[String]): ActorPath = guardian.path / path
 
-  private lazy val _start: this.type = try {
+  private lazy val _start: this.type = try
     registerOnTermination(stopScheduler())
     // the provider is expected to start default loggers, LocalActorRefProvider does this
     provider.init(this)
@@ -751,31 +730,27 @@ private[akka] class ActorSystemImpl(
     loadExtensions()
     if (LogConfigOnStart) logConfiguration()
     this
-  } catch {
+  catch
     case NonFatal(e) ⇒
       try terminate() catch { case NonFatal(_) ⇒ Try(stopScheduler()) }
       throw e
-  }
 
   def start(): this.type = _start
-  def registerOnTermination[T](code: ⇒ T) {
+  def registerOnTermination[T](code: ⇒ T)
     registerOnTermination(new Runnable { def run = code })
-  }
   def registerOnTermination(code: Runnable) { terminationCallbacks.add(code) }
-  override def awaitTermination(timeout: Duration) {
+  override def awaitTermination(timeout: Duration)
     Await.ready(whenTerminated, timeout)
-  }
   override def awaitTermination() = awaitTermination(Duration.Inf)
   override def isTerminated = whenTerminated.isCompleted
 
   override def shutdown(): Unit = terminate()
 
-  override def terminate(): Future[Terminated] = {
+  override def terminate(): Future[Terminated] =
     if (!settings.LogDeadLettersDuringShutdown)
       logDeadLetterListener foreach stop
     guardian.stop()
     whenTerminated
-  }
 
   @volatile var aborting = false
 
@@ -785,10 +760,9 @@ private[akka] class ActorSystemImpl(
     * wait for remote-deployed child actors to terminate before terminating their
     * parents.
     */
-  def abort(): Unit = {
+  def abort(): Unit =
     aborting = true
     terminate()
-  }
 
   //#create-scheduler
   /**
@@ -816,10 +790,9 @@ private[akka] class ActorSystemImpl(
    * after the last dispatcher has had its chance to schedule its shutdown
    * action.
    */
-  protected def stopScheduler(): Unit = scheduler match {
+  protected def stopScheduler(): Unit = scheduler match
     case x: Closeable ⇒ x.close()
     case _ ⇒
-  }
 
   private val extensions = new ConcurrentHashMap[ExtensionId[_], AnyRef]
 
@@ -828,25 +801,24 @@ private[akka] class ActorSystemImpl(
     */
   @tailrec
   private def findExtension[T <: Extension](ext: ExtensionId[T]): T =
-    extensions.get(ext) match {
+    extensions.get(ext) match
       case c: CountDownLatch ⇒
         c.await(); findExtension(ext) //Registration in process, await completion and retry
       case t: Throwable ⇒ throw t //Initialization failed, throw same again
       case other ⇒
         other.asInstanceOf[T] //could be a T or null, in which case we return the null as T
-    }
 
   @tailrec
-  final def registerExtension[T <: Extension](ext: ExtensionId[T]): T = {
-    findExtension(ext) match {
+  final def registerExtension[T <: Extension](ext: ExtensionId[T]): T =
+    findExtension(ext) match
       case null ⇒ //Doesn't already exist, commence registration
         val inProcessOfRegistration = new CountDownLatch(1)
-        extensions.putIfAbsent(ext, inProcessOfRegistration) match {
+        extensions.putIfAbsent(ext, inProcessOfRegistration) match
           // Signal that registration is in process
           case null ⇒
-            try {
+            try
               // Signal was successfully sent
-              ext.createExtension(this) match {
+              ext.createExtension(this) match
                 // Create and initialize the extension
                 case null ⇒
                   throw new IllegalStateException(
@@ -855,38 +827,32 @@ private[akka] class ActorSystemImpl(
                 case instance ⇒
                   extensions.replace(ext, inProcessOfRegistration, instance) //Replace our in process signal with the initialized extension
                   instance //Profit!
-              }
-            } catch {
+            catch
               case t: Throwable ⇒
                 extensions.replace(ext, inProcessOfRegistration, t) //In case shit hits the fan, remove the inProcess signal
                 throw t //Escalate to caller
-            } finally {
+            finally
               inProcessOfRegistration.countDown //Always notify listeners of the inProcess signal
-            }
           case other ⇒
             registerExtension(ext) //Someone else is in process of registering an extension for this Extension, retry
-        }
       case existing ⇒ existing.asInstanceOf[T]
-    }
-  }
 
   def extension[T <: Extension](ext: ExtensionId[T]): T =
-    findExtension(ext) match {
+    findExtension(ext) match
       case null ⇒
         throw new IllegalArgumentException(
             "Trying to get non-registered extension [" + ext + "]")
       case some ⇒ some.asInstanceOf[T]
-    }
 
   def hasExtension(ext: ExtensionId[_ <: Extension]): Boolean =
     findExtension(ext) != null
 
-  private def loadExtensions() {
-    immutableSeq(settings.config.getStringList("akka.extensions")) foreach {
+  private def loadExtensions()
+    immutableSeq(settings.config.getStringList("akka.extensions")) foreach
       fqcn ⇒
-        dynamicAccess.getObjectFor[AnyRef](fqcn) recoverWith {
+        dynamicAccess.getObjectFor[AnyRef](fqcn) recoverWith
           case _ ⇒ dynamicAccess.createInstanceFor[AnyRef](fqcn, Nil)
-        } match {
+        match
           case Success(p: ExtensionIdProvider) ⇒ registerExtension(p.lookup())
           case Success(p: ExtensionId[_]) ⇒ registerExtension(p)
           case Success(other) ⇒
@@ -897,29 +863,26 @@ private[akka] class ActorSystemImpl(
             log.error(problem,
                       "While trying to load extension [{}], skipping...",
                       fqcn)
-        }
-    }
-  }
 
   override def toString: String = lookupRoot.path.root.address.toString
 
-  override def printTree: String = {
-    def printNode(node: ActorRef, indent: String): String = {
-      node match {
+  override def printTree: String =
+    def printNode(node: ActorRef, indent: String): String =
+      node match
         case wc: ActorRefWithCell ⇒
           val cell = wc.underlying
           (if (indent.isEmpty) "-> " else indent.dropRight(1) + "⌊-> ") +
           node.path.name + " " + Logging.simpleName(node) + " " +
-          (cell match {
+          (cell match
                 case real: ActorCell ⇒
                   if (real.actor ne null) real.actor.getClass else "null"
                 case _ ⇒ Logging.simpleName(cell)
-              }) +
-          (cell match {
+              ) +
+          (cell match
                 case real: ActorCell ⇒ " status=" + real.mailbox.currentStatus
                 case _ ⇒ ""
-              }) + " " +
-          (cell.childrenRefs match {
+              ) + " " +
+          (cell.childrenRefs match
                 case ChildrenContainer.TerminatingChildrenContainer(
                     _, toDie, reason) ⇒
                   "Terminating(" + reason + ")" +
@@ -932,29 +895,25 @@ private[akka] class ActorSystemImpl(
                 case n: ChildrenContainer.NormalChildrenContainer ⇒
                   n.c.size + " children"
                 case x ⇒ Logging.simpleName(x)
-              }) + (if (cell.childrenRefs.children.isEmpty) "" else "\n") +
-          ({
+              ) + (if (cell.childrenRefs.children.isEmpty) "" else "\n") +
+          (
             val children = cell.childrenRefs.children.toSeq.sorted
             val bulk =
               children.dropRight(1) map (printNode(_, indent + "   |"))
             bulk ++ (children.lastOption map (printNode(_, indent + "    ")))
-          } mkString ("\n"))
+          mkString ("\n"))
         case _ ⇒
           indent + node.path.name + " " + Logging.simpleName(node)
-      }
-    }
     printNode(lookupRoot, "")
-  }
 
   final class TerminationCallbacks[T](upStreamTerminated: Future[T])(
-      implicit ec: ExecutionContext) {
+      implicit ec: ExecutionContext)
     private[this] final val done = Promise[T]()
     private[this] final val ref = new AtomicReference(done)
 
     // onComplete never fires twice so safe to avoid null check
-    upStreamTerminated onComplete { t ⇒
+    upStreamTerminated onComplete  t ⇒
       ref.getAndSet(null).complete(t)
-    }
 
     /**
       * Adds a Runnable that will be executed on ActorSystem termination.
@@ -962,21 +921,17 @@ private[akka] class ActorSystemImpl(
       * @param r The callback to be executed on ActorSystem termination
       * Throws RejectedExecutionException if called after ActorSystem has been terminated.
       */
-    final def add(r: Runnable): Unit = {
-      @tailrec def addRec(r: Runnable, p: Promise[T]): Unit = ref.get match {
+    final def add(r: Runnable): Unit =
+      @tailrec def addRec(r: Runnable, p: Promise[T]): Unit = ref.get match
         case null ⇒
           throw new RejectedExecutionException(
               "ActorSystem already terminated.")
         case some if ref.compareAndSet(some, p) ⇒
           some.completeWith(p.future.andThen { case _ ⇒ r.run() })
         case _ ⇒ addRec(r, p)
-      }
       addRec(r, Promise[T]())
-    }
 
     /**
       * Returns a Future which will be completed once all registered callbacks have been executed.
       */
     def terminationFuture: Future[T] = done.future
-  }
-}

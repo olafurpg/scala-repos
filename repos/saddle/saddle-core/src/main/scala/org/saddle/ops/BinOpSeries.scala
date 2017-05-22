@@ -23,15 +23,14 @@ import index._
   * instances provide implicit support for [[org.saddle.ops.NumericOps]] methods which are
   * inherited by Series.
   */
-trait BinOpSeries {
+trait BinOpSeries
   // ***************
 
   // Binary element-wise operation on one series and one scalar
   final class SrScEOp[OP <: ScalarOp, X : ST : ORD, A, B, C : ST](
       op: BinOp[OP, Vec[A], B, Vec[C]])
-      extends BinOp[OP, Series[X, A], B, Series[X, C]] {
+      extends BinOp[OP, Series[X, A], B, Series[X, C]]
     def apply(v1: Series[X, A], v2: B) = Series(op(v1.values, v2), v1.index)
-  }
 
   // concrete implementations
   implicit def SrScEOpDDD[Op <: ScalarOp, X](
@@ -143,20 +142,17 @@ trait BinOpSeries {
   // Binary element-wise operation on two series
   final class SrSrEOp[OP <: ScalarOp, X : ST : ORD, A, B, C : ST](
       opv: BinOp[OP, Vec[A], Vec[B], Vec[C]])
-      extends BinOp[OP, Series[X, A], Series[X, B], Series[X, C]] {
-    def apply(v1: Series[X, A], v2: Series[X, B]) = {
-      if (v1.index == v2.index) {
+      extends BinOp[OP, Series[X, A], Series[X, B], Series[X, C]]
+    def apply(v1: Series[X, A], v2: Series[X, B]) =
+      if (v1.index == v2.index)
         Series(opv(v1.values, v2.values), v1.index)
-      } else {
+      else
         val joined = v1.index.join(v2.index, OuterJoin)
         val lvec: Vec[A] =
           joined.lTake.map(locs => v1.values.take(locs)).getOrElse(v1.values)
         val rvec: Vec[B] =
           joined.rTake.map(locs => v2.values.take(locs)).getOrElse(v2.values)
         Series(opv(lvec, rvec), joined.index)
-      }
-    }
-  }
 
   // concrete implementations
 
@@ -263,4 +259,3 @@ trait BinOpSeries {
       cmp: ORD[X],
       opv: BinOp[Op, Vec[Boolean], Vec[Boolean], Vec[Boolean]]) =
     new SrSrEOp[Op, X, Boolean, Boolean, Boolean](opv)
-}

@@ -5,12 +5,12 @@ package discipline
 import org.scalacheck.Prop._
 import org.scalacheck.Arbitrary
 
-trait MonoidKTests[F[_]] extends SemigroupKTests[F] {
+trait MonoidKTests[F[_]] extends SemigroupKTests[F]
   def laws: MonoidKLaws[F]
 
   def monoidK[A : Arbitrary](
-      implicit ArbFA: Arbitrary[F[A]], EqFA: Eq[F[A]]): RuleSet = {
-    new RuleSet {
+      implicit ArbFA: Arbitrary[F[A]], EqFA: Eq[F[A]]): RuleSet =
+    new RuleSet
       val name = "monoidK"
       val bases = Nil
       val parents = Seq(semigroupK[A])
@@ -18,11 +18,7 @@ trait MonoidKTests[F[_]] extends SemigroupKTests[F] {
           "monoidK left identity" -> forAll(laws.monoidKLeftIdentity[A] _),
           "monoidK right identity" -> forAll(laws.monoidKRightIdentity[A] _)
       )
-    }
-  }
-}
 
-object MonoidKTests {
+object MonoidKTests
   def apply[F[_]: MonoidK]: MonoidKTests[F] =
     new MonoidKTests[F] { def laws: MonoidKLaws[F] = MonoidKLaws[F] }
-}

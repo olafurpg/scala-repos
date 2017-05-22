@@ -7,7 +7,7 @@ import org.apache.mesos.{Protos => Mesos}
 
 import scala.concurrent.Future
 
-object OfferMatcher {
+object OfferMatcher
 
   /**
     * A TaskOp with a [[TaskOpSource]].
@@ -15,11 +15,10 @@ object OfferMatcher {
     * The [[TaskOpSource]] is informed whether the op is ultimately send to Mesos or if it is rejected
     * (e.g. by throttling logic).
     */
-  case class TaskOpWithSource(source: TaskOpSource, op: TaskOp) {
+  case class TaskOpWithSource(source: TaskOpSource, op: TaskOp)
     def taskId: Task.Id = op.taskId
     def accept(): Unit = source.taskOpAccepted(op)
     def reject(reason: String): Unit = source.taskOpRejected(op, reason)
-  }
 
   /**
     * Reply from an offer matcher to a MatchOffer. If the offer match
@@ -43,33 +42,28 @@ object OfferMatcher {
     */
   case class MatchedTaskOps(offerId: Mesos.OfferID,
                             opsWithSource: Seq[TaskOpWithSource],
-                            resendThisOffer: Boolean = false) {
+                            resendThisOffer: Boolean = false)
 
     /** all included [TaskOp] without the source information. */
     def ops: Iterable[TaskOp] = opsWithSource.view.map(_.op)
 
     /** All TaskInfos of launched tasks. */
-    def launchedTaskInfos: Iterable[Mesos.TaskInfo] = ops.view.collect {
+    def launchedTaskInfos: Iterable[Mesos.TaskInfo] = ops.view.collect
       case TaskOp.Launch(taskInfo, _, _, _) => taskInfo
-    }
-  }
 
-  object MatchedTaskOps {
+  object MatchedTaskOps
     def noMatch(offerId: Mesos.OfferID,
                 resendThisOffer: Boolean = false): MatchedTaskOps =
       new MatchedTaskOps(offerId, Seq.empty, resendThisOffer = resendThisOffer)
-  }
 
-  trait TaskOpSource {
+  trait TaskOpSource
     def taskOpAccepted(taskOp: TaskOp)
     def taskOpRejected(taskOp: TaskOp, reason: String)
-  }
-}
 
 /**
   * Tries to match offers with given tasks.
   */
-trait OfferMatcher {
+trait OfferMatcher
 
   /**
     * Process offer and return the ops that this matcher wants to execute on this offer.
@@ -86,4 +80,3 @@ trait OfferMatcher {
     * If the filter matches, the offer matcher manager has higher priority than other matchers.
     */
   def precedenceFor: Option[PathId] = None
-}

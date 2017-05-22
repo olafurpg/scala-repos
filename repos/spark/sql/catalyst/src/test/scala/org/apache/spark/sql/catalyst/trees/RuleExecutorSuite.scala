@@ -21,36 +21,27 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.expressions.{Expression, IntegerLiteral, Literal}
 import org.apache.spark.sql.catalyst.rules.{Rule, RuleExecutor}
 
-class RuleExecutorSuite extends SparkFunSuite {
-  object DecrementLiterals extends Rule[Expression] {
-    def apply(e: Expression): Expression = e transform {
+class RuleExecutorSuite extends SparkFunSuite
+  object DecrementLiterals extends Rule[Expression]
+    def apply(e: Expression): Expression = e transform
       case IntegerLiteral(i) if i > 0 => Literal(i - 1)
-    }
-  }
 
-  test("only once") {
-    object ApplyOnce extends RuleExecutor[Expression] {
+  test("only once")
+    object ApplyOnce extends RuleExecutor[Expression]
       val batches = Batch("once", Once, DecrementLiterals) :: Nil
-    }
 
     assert(ApplyOnce.execute(Literal(10)) === Literal(9))
-  }
 
-  test("to fixed point") {
-    object ToFixedPoint extends RuleExecutor[Expression] {
+  test("to fixed point")
+    object ToFixedPoint extends RuleExecutor[Expression]
       val batches =
         Batch("fixedPoint", FixedPoint(100), DecrementLiterals) :: Nil
-    }
 
     assert(ToFixedPoint.execute(Literal(10)) === Literal(0))
-  }
 
-  test("to maxIterations") {
-    object ToFixedPoint extends RuleExecutor[Expression] {
+  test("to maxIterations")
+    object ToFixedPoint extends RuleExecutor[Expression]
       val batches =
         Batch("fixedPoint", FixedPoint(10), DecrementLiterals) :: Nil
-    }
 
     assert(ToFixedPoint.execute(Literal(100)) === Literal(90))
-  }
-}

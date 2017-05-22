@@ -16,7 +16,7 @@ private[play] case class PlayCoreTestApplication(
     config: Map[String, Any] = Map(),
     path: File = new File("."),
     mode: Mode.Mode = Mode.Test)
-    extends Application {
+    extends Application
   val classloader = Thread.currentThread.getContextClassLoader
   lazy val configuration = Configuration.from(config)
   private val lazyActorSystem =
@@ -26,4 +26,3 @@ private[play] case class PlayCoreTestApplication(
   def stop() = lazyActorSystem.close()
   val errorHandler = DefaultHttpErrorHandler
   val requestHandler = NotImplementedHttpRequestHandler
-}

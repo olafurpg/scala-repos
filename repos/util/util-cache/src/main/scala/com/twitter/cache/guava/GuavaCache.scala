@@ -17,12 +17,11 @@ import java.util.concurrent.Callable
   * [[GuavaCache$.fromCache]].
   */
 class GuavaCache[K, V](cache: GCache[K, Future[V]])
-    extends ConcurrentMapCache[K, V](cache.asMap) {
+    extends ConcurrentMapCache[K, V](cache.asMap)
   override def getOrElseUpdate(k: K)(v: => Future[V]): Future[V] =
-    cache.get(k, new Callable[Future[V]] {
+    cache.get(k, new Callable[Future[V]]
       def call(): Future[V] = v
-    })
-}
+    )
 
 /**
   * A [[com.twitter.cache.FutureCache]] backed by a
@@ -36,26 +35,23 @@ class GuavaCache[K, V](cache: GCache[K, Future[V]])
   * [[GuavaCache$.fromLoadingCache]].
   */
 class LoadingFutureCache[K, V](cache: LoadingCache[K, Future[V]])
-    extends GuavaCache[K, V](cache) {
+    extends GuavaCache[K, V](cache)
   // the contract for LoadingCache is that it can't return null from get.
   def apply(key: K): Future[V] = cache.get(key)
 
   override def get(key: K): Option[Future[V]] = Some(apply(key))
-}
 
-object GuavaCache {
+object GuavaCache
 
   /**
     * Creates a function which properly handles the asynchronous behavior of
     * [[com.google.common.cache.LoadingCache]].
     */
   def fromLoadingCache[K, V](
-      cache: LoadingCache[K, Future[V]]): K => Future[V] = {
+      cache: LoadingCache[K, Future[V]]): K => Future[V] =
     val evicting = EvictingCache.lazily(new LoadingFutureCache(cache));
-    { key: K =>
+    key: K =>
       evicting.get(key).get.interruptible()
-    }
-  }
 
   /**
     * Creates a function which caches the results of `fn` in a
@@ -64,4 +60,3 @@ object GuavaCache {
   def fromCache[K, V](
       fn: K => Future[V], cache: GCache[K, Future[V]]): K => Future[V] =
     FutureCache.default(fn, new GuavaCache(cache))
-}

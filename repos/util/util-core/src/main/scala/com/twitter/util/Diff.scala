@@ -6,7 +6,7 @@ import scala.language.higherKinds
   * A Diff stores the necessary instructions required to bring two
   * version of a data structure into agreement.
   */
-trait Diff[CC[_], T] {
+trait Diff[CC[_], T]
 
   /**
     * Patch up the given collection so that it matches
@@ -26,13 +26,12 @@ trait Diff[CC[_], T] {
     * }}}
     */
   def map[U](f: T => U): Diff[CC, U]
-}
 
 /**
   * A type class that tells how to compute a [[Diff]] between
   * two versions of a collection `CC[T]`.
   */
-trait Diffable[CC[_]] {
+trait Diffable[CC[_]]
 
   /**
     * Compute a [[Diff]] that may later be used to bring two
@@ -58,14 +57,13 @@ trait Diffable[CC[_]] {
     * The identity collection CC[T].
     */
   def empty[T]: CC[T]
-}
 
 /**
   * Diffable defines common type class instances for [[Diffable]].
   */
-object Diffable {
+object Diffable
   private case class SetDiff[T](add: Set[T], remove: Set[T])
-      extends Diff[Set, T] {
+      extends Diff[Set, T]
     def patch(coll: Set[T]): Set[T] =
       coll ++ add -- remove
 
@@ -73,48 +71,42 @@ object Diffable {
       SetDiff(add.map(f), remove.map(f))
 
     override def toString = s"Diff(+$add, -$remove)"
-  }
 
   private case class SeqDiff[T](limit: Int, insert: Map[Int, T])
-      extends Diff[Seq, T] {
-    def patch(coll: Seq[T]): Seq[T] = {
+      extends Diff[Seq, T]
+    def patch(coll: Seq[T]): Seq[T] =
       val out = new Array[Any](limit)
       coll.copyToArray(out, 0, limit)
 
       for ((i, v) <- insert) out(i) = v
 
       out.toSeq.asInstanceOf[Seq[T]]
-    }
 
     def map[U](f: T => U): SeqDiff[U] =
       SeqDiff(limit, insert.mapValues(f))
-  }
 
-  implicit val ofSet: Diffable[Set] = new Diffable[Set] {
+  implicit val ofSet: Diffable[Set] = new Diffable[Set]
     def diff[T](left: Set[T], right: Set[T]) =
       SetDiff(right -- left, left -- right)
     def empty[T] = Set.empty
-  }
 
-  implicit val ofSeq: Diffable[Seq] = new Diffable[Seq] {
+  implicit val ofSeq: Diffable[Seq] = new Diffable[Seq]
     def diff[T](left: Seq[T], right: Seq[T]): SeqDiff[T] =
-      if (left.length < right.length) {
+      if (left.length < right.length)
         val SeqDiff(_, insert) = diff(left, right.take(left.length))
         SeqDiff(right.length,
                 insert ++
-                ((left.length until right.length) map { i =>
+                ((left.length until right.length) map  i =>
                       (i -> right(i))
-                    }))
-      } else if (left.length > right.length) {
+                    ))
+      else if (left.length > right.length)
         diff(left.take(right.length), right)
-      } else {
+      else
         val insert = for (((x, y), i) <- left.zip(right).zipWithIndex
                                             if x != y) yield (i -> y)
         SeqDiff(left.length, insert.toMap)
-      }
 
     def empty[T] = Seq.empty
-  }
 
   /**
     * Compute a [[Diff]] that may later be used to bring two
@@ -132,4 +124,3 @@ object Diffable {
     */
   def empty[CC[_]: Diffable, T]: CC[T] =
     implicitly[Diffable[CC]].empty
-}

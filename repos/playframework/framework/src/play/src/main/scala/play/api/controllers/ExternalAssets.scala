@@ -27,7 +27,7 @@ import java.io._
   * }}}
   *
   */
-class ExternalAssets @Inject()(environment: Environment) extends Controller {
+class ExternalAssets @Inject()(environment: Environment) extends Controller
 
   val AbsolutePath = """^(/|[a-zA-Z]:\\).*""".r
 
@@ -37,24 +37,18 @@ class ExternalAssets @Inject()(environment: Environment) extends Controller {
     * @param rootPath the root folder for searching the static resource files such as `"/home/peter/public"`, `C:\external` or `relativeToYourApp`
     * @param file the file part extracted from the URL
     */
-  def at(rootPath: String, file: String): Action[AnyContent] = Action {
+  def at(rootPath: String, file: String): Action[AnyContent] = Action
     request =>
-      environment.mode match {
+      environment.mode match
         case Mode.Prod => NotFound
-        case _ => {
+        case _ =>
 
-            val fileToServe = rootPath match {
+            val fileToServe = rootPath match
               case AbsolutePath(_) => new File(rootPath, file)
               case _ => new File(environment.getFile(rootPath), file)
-            }
 
-            if (fileToServe.exists) {
+            if (fileToServe.exists)
               Ok.sendFile(fileToServe, inline = true)
                 .withHeaders(CACHE_CONTROL -> "max-age=3600")
-            } else {
+            else
               NotFound
-            }
-          }
-      }
-  }
-}

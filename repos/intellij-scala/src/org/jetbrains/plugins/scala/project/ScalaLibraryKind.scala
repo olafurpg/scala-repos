@@ -10,6 +10,5 @@ object ScalaLibraryKind
     extends PersistentLibraryKind[ScalaLibraryProperties]("Scala")
     with ScalaLibraryKind
 
-trait ScalaLibraryKind extends PersistentLibraryKind[ScalaLibraryProperties] {
+trait ScalaLibraryKind extends PersistentLibraryKind[ScalaLibraryProperties]
   override def createDefaultProperties() = new ScalaLibraryProperties()
-}

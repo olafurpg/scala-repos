@@ -27,15 +27,14 @@ import org.apache.spark.sql.types._
   * This is here for now so I can make sure Tungsten project is tested without refactoring existing
   * end-to-end test infra. In the long run this should just go away.
   */
-class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
+class DataFrameTungstenSuite extends QueryTest with SharedSQLContext
   import testImplicits._
 
-  test("test simple types") {
+  test("test simple types")
     val df = sparkContext.parallelize(Seq((1, 2))).toDF("a", "b")
     assert(df.select(struct("a", "b")).first().getStruct(0) === Row(1, 2))
-  }
 
-  test("test struct type") {
+  test("test struct type")
     val struct = Row(1, 2L, 3.0F, 3.0)
     val data = sparkContext.parallelize(Seq(Row(1, struct)))
 
@@ -50,9 +49,8 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(struct))
-  }
 
-  test("test nested struct type") {
+  test("test nested struct type")
     val innerStruct = Row(1, "abcd")
     val outerStruct = Row(1, 2L, 3.0F, 3.0, innerStruct, "efg")
     val data = sparkContext.parallelize(Seq(Row(1, outerStruct)))
@@ -73,5 +71,3 @@ class DataFrameTungstenSuite extends QueryTest with SharedSQLContext {
 
     val df = sqlContext.createDataFrame(data, schema)
     assert(df.select("b").first() === Row(outerStruct))
-  }
-}

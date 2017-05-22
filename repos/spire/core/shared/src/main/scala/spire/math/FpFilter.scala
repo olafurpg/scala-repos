@@ -35,7 +35,7 @@ import spire.macros.fpf._
   * [1] Burnikel, Funke, Seel. Exact Geometric Computation Using Cascading. SoCG 1998.
   */
 final class FpFilter[A](
-    val apx: Double, val mes: Double, val ind: Int, exact0: => A) {
+    val apx: Double, val mes: Double, val ind: Int, exact0: => A)
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
   def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
@@ -62,13 +62,12 @@ final class FpFilter[A](
   def signum(implicit ev: Signed[A]): Int = macro FpFilter.signImpl[A]
 
   // Avoid using this.
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: FpFilter[_] =>
       if (this.error == 0 && that.error == 0) this.apx == that.apx
       else this.exact == that.exact
     case _ =>
       false
-  }
 
   // Avoid using this.
   override def hashCode: Int = 23 * exact.hashCode
@@ -76,9 +75,8 @@ final class FpFilter[A](
   def error: Double = mes * ind * FpFilter.Eps
 
   lazy val exact: A = exact0
-}
 
-final class FpFilterApprox[A](val exact: A) extends AnyVal {
+final class FpFilterApprox[A](val exact: A) extends AnyVal
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_-(implicit ev: Rng[A]): FpFilter[A] = macro FpFilter.negateImpl[A]
   def +(rhs: FpFilter[A])(implicit ev: Semiring[A]): FpFilter[A] = macro FpFilter
@@ -100,16 +98,13 @@ final class FpFilterApprox[A](val exact: A) extends AnyVal {
     .gtEqImpl[A]
   def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
     .eqImpl[A]
-}
 
-object FpFilterApprox {
-  implicit def liftApprox[A : IsReal](approx: FpFilterApprox[A]): FpFilter[A] = {
+object FpFilterApprox
+  implicit def liftApprox[A : IsReal](approx: FpFilterApprox[A]): FpFilter[A] =
     val apx = IsReal[A].toDouble(approx.exact)
     new FpFilter[A](apx, spire.math.abs(apx), 1, approx.exact)
-  }
-}
 
-final class FpFilterExact[A](val value: Double) extends AnyVal {
+final class FpFilterExact[A](val value: Double) extends AnyVal
   def abs(implicit ev: Signed[A]): FpFilter[A] = macro FpFilter.absImpl[A]
   def unary_- : FpFilterExact[A] = new FpFilterExact[A](-value)
   def +(rhs: FpFilter[A])(implicit ev: Field[A]): FpFilter[A] = macro FpFilter
@@ -131,17 +126,15 @@ final class FpFilterExact[A](val value: Double) extends AnyVal {
     .gtEqImpl[A]
   def ===(rhs: FpFilter[A])(implicit ev0: Signed[A], ev1: Rng[A]): Boolean = macro FpFilter
     .eqImpl[A]
-}
 
-object FpFilterExact {
+object FpFilterExact
   implicit def liftExact[A : Field](exact: FpFilterExact[A]): FpFilter[A] =
     new FpFilter(exact.value,
                  spire.math.abs(exact.value),
                  0,
                  Field[A].fromDouble(exact.value))
-}
 
-object FpFilter {
+object FpFilter
   final val Eps = java.lang.Double.longBitsToDouble((1023L - 52) << 52)
 
   @inline final def exact[A](value: Double): FpFilterExact[A] =
@@ -218,4 +211,3 @@ object FpFilter {
       ev0: c.Expr[Signed[A]], ev1: c.Expr[Rng[A]]): c.Expr[Boolean] =
     c.Expr[Boolean](Fuser[c.type, A](c)
           .comp(c.prefix.tree, rhs.tree)(ev0.tree, ev1.tree)(Cmp.Eq))
-}

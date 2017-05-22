@@ -1,3 +1,2 @@
-class C(p: Int) {
+class C(p: Int)
   println(this. /* offset: 8 */ p)
-}

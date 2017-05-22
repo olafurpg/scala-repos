@@ -14,9 +14,9 @@ import Configurations.Compile
 
 import sbt.io.{Hash, IO}
 
-object Script {
+object Script
   final val Name = "script"
-  lazy val command = Command.command(Name) { state =>
+  lazy val command = Command.command(Name)  state =>
     val scriptArg =
       state.remainingCommands.headOption getOrElse sys.error(
           "No script file specified")
@@ -30,13 +30,12 @@ object Script {
     val extracted = Project.extract(session, structure)
     import extracted._
 
-    val embeddedSettings = blocks(script).flatMap { block =>
+    val embeddedSettings = blocks(script).flatMap  block =>
       evaluate(eval(),
                script,
                block.lines,
                currentUnit.imports,
                block.offset + 1)(currentLoader)
-    }
     val scriptAsSource = sources in Compile := script :: Nil
     val asScript =
       scalacOptions ++= Seq("-Xscript", script.getName.stripSuffix(".scala"))
@@ -55,30 +54,23 @@ object Script {
       arguments.mkString("run ", " ", "") :: state.copy(
           remainingCommands = Nil)
     Project.setProject(session, newStructure, newState)
-  }
 
   final case class Block(offset: Int, lines: Seq[String])
-  def blocks(file: File): Seq[Block] = {
+  def blocks(file: File): Seq[Block] =
     val lines = IO.readLines(file).toIndexedSeq
     def blocks(b: Block, acc: List[Block]): List[Block] =
       if (b.lines.isEmpty) acc.reverse
-      else {
-        val (dropped, blockToEnd) = b.lines.span { line =>
+      else
+        val (dropped, blockToEnd) = b.lines.span  line =>
           !line.startsWith(BlockStart)
-        }
-        val (block, remaining) = blockToEnd.span { line =>
+        val (block, remaining) = blockToEnd.span  line =>
           !line.startsWith(BlockEnd)
-        }
         val offset = b.offset + dropped.length
         blocks(Block(offset + block.length, remaining),
                Block(offset, block.drop(1)) :: acc)
-      }
     blocks(Block(0, lines), Nil)
-  }
   val BlockStart = "/***"
   val BlockEnd = "*/"
-  def fail(s: State, msg: String): State = {
+  def fail(s: State, msg: String): State =
     System.err.println(msg)
     s.fail
-  }
-}

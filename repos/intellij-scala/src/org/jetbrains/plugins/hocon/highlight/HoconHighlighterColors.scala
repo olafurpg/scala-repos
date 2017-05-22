@@ -4,7 +4,7 @@ import com.intellij.codeInsight.daemon.impl.HighlightInfoType
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.editor.{DefaultLanguageHighlighterColors => DLHC, HighlighterColors}
 
-object HoconHighlighterColors {
+object HoconHighlighterColors
   final val BadCharacter = key(
       "HOCON_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
   final val HashComment = key("HOCON_HASH_COMMENT", DLHC.LINE_COMMENT)
@@ -42,4 +42,3 @@ object HoconHighlighterColors {
 
   private def key(name: String, prototype: TextAttributesKey) =
     TextAttributesKey.createTextAttributesKey(name, prototype)
-}

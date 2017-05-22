@@ -13,9 +13,9 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 
 @RunWith(classOf[JUnit4])
-class SimplifyJumpsTest {
+class SimplifyJumpsTest
   @Test
-  def simpleGotoReturn(): Unit = {
+  def simpleGotoReturn(): Unit =
     val ops = List(
         Jump(GOTO, Label(2)), // replaced by RETURN
         Op(ICONST_1), // need some code, otherwise removeJumpToSuccessor kicks in
@@ -28,10 +28,9 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), Op(RETURN) :: ops.tail)
-  }
 
   @Test
-  def simpleGotoThrow(): Unit = {
+  def simpleGotoThrow(): Unit =
     val rest = List(
         Op(ICONST_1), // need some code, otherwise removeJumpToSuccessor kicks in
         Op(POP),
@@ -47,10 +46,9 @@ class SimplifyJumpsTest {
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(
         instructionsFromMethod(method), Op(ACONST_NULL) :: Op(ATHROW) :: rest)
-  }
 
   @Test
-  def gotoThrowInTry(): Unit = {
+  def gotoThrowInTry(): Unit =
     val handler = List(
         ExceptionHandler(
             Label(1), Label(2), Label(4), Some("java/lang/Throwable")))
@@ -75,10 +73,9 @@ class SimplifyJumpsTest {
     assertTrue(LocalOptImpls.simplifyJumps(optMethod))
     assertSameCode(instructionsFromMethod(optMethod).take(3),
                    List(Label(1), Op(ACONST_NULL), Op(ATHROW)))
-  }
 
   @Test
-  def simplifyBranchOverGoto(): Unit = {
+  def simplifyBranchOverGoto(): Unit =
     val begin = List(
         VarOp(ILOAD, 1),
         Jump(IFGE, Label(2))
@@ -119,10 +116,9 @@ class SimplifyJumpsTest {
                         VarOp(ILOAD, 1),
                         Jump(IFLT, Label(3)),
                         Label(22)) ::: rest.tail)
-  }
 
   @Test
-  def ensureGotoRemoved(): Unit = {
+  def ensureGotoRemoved(): Unit =
     def code(jumps: Instruction*) =
       List(VarOp(ILOAD, 1)) ::: jumps.toList ::: List(
           Label(2),
@@ -137,10 +133,9 @@ class SimplifyJumpsTest {
       genMethod()(code(Jump(IFGE, Label(2)), Jump(GOTO, Label(3))): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), code(Jump(IFLT, Label(3))))
-  }
 
   @Test
-  def removeJumpToSuccessor(): Unit = {
+  def removeJumpToSuccessor(): Unit =
     val ops = List(
         Jump(GOTO, Label(1)),
         Label(11),
@@ -152,10 +147,9 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops: _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), ops.tail)
-  }
 
   @Test
-  def collapseJumpChains(): Unit = {
+  def collapseJumpChains(): Unit =
     def ops(target1: Int, target2: Int, target3: Int) = List(
         VarOp(ILOAD, 1),
         Jump(IFGE, Label(target1)), // initially 1, then 3
@@ -174,10 +168,9 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops(1, 2, 3): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), ops(3, 3, 3))
-  }
 
   @Test
-  def collapseJumpChainLoop(): Unit = {
+  def collapseJumpChainLoop(): Unit =
     def ops(target: Int) = List(
         VarOp(ILOAD, 1),
         Jump(IFGE, Label(target)),
@@ -196,10 +189,9 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops(2): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), ops(3))
-  }
 
   @Test
-  def simplifyThenElseSameTarget(): Unit = {
+  def simplifyThenElseSameTarget(): Unit =
     def ops(jumpOp: Instruction) = List(
         VarOp(ILOAD, 1),
         jumpOp,
@@ -215,10 +207,9 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops(Jump(IFGE, Label(1))): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), ops(Op(POP)))
-  }
 
   @Test
-  def thenElseSameTargetLoop(): Unit = {
+  def thenElseSameTargetLoop(): Unit =
     def ops(br: List[Instruction]) =
       List(VarOp(ILOAD, 1), VarOp(ILOAD, 2)) ::: br ::: List(
           Label(1),
@@ -227,5 +218,3 @@ class SimplifyJumpsTest {
     val method = genMethod()(ops(List(Jump(IF_ICMPGE, Label(1)))): _*)
     assertTrue(LocalOptImpls.simplifyJumps(method))
     assertSameCode(instructionsFromMethod(method), ops(List(Op(POP), Op(POP))))
-  }
-}

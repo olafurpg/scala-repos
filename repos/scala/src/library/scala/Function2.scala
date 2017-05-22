@@ -33,7 +33,7 @@ trait Function2[@specialized(scala.Int, scala.Long, scala.Double) -T1,
                              scala.Float,
                              scala.Long,
                              scala.Double) +R]
-    extends AnyRef { self =>
+    extends AnyRef  self =>
 
   /** Apply the body of this function to the arguments.
     *  @return   the result of function application.
@@ -45,9 +45,8 @@ trait Function2[@specialized(scala.Int, scala.Long, scala.Double) -T1,
     *  @return   a function `f` such that `f(x1)(x2) == apply(x1, x2)`
     */
   @annotation.unspecialized
-  def curried: T1 => T2 => R = { (x1: T1) => (x2: T2) =>
+  def curried: T1 => T2 => R =  (x1: T1) => (x2: T2) =>
     apply(x1, x2)
-  }
 
   /** Creates a tupled version of this function: instead of 2 arguments,
     *  it accepts a single [[scala.Tuple2]] argument.
@@ -55,8 +54,6 @@ trait Function2[@specialized(scala.Int, scala.Long, scala.Double) -T1,
     *  @return   a function `f` such that `f((x1, x2)) == f(Tuple2(x1, x2)) == apply(x1, x2)`
     */
   @annotation.unspecialized
-  def tupled: Tuple2[T1, T2] => R = {
+  def tupled: Tuple2[T1, T2] => R =
     case Tuple2(x1, x2) => apply(x1, x2)
-  }
   override def toString() = "<function2>"
-}

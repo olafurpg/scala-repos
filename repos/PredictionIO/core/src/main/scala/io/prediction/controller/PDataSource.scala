@@ -29,7 +29,7 @@ import org.apache.spark.rdd.RDD
   * @tparam A Actual value class.
   * @group Data Source
   */
-abstract class PDataSource[TD, EI, Q, A] extends BaseDataSource[TD, EI, Q, A] {
+abstract class PDataSource[TD, EI, Q, A] extends BaseDataSource[TD, EI, Q, A]
 
   def readTrainingBase(sc: SparkContext): TD = readTraining(sc)
 
@@ -51,4 +51,3 @@ abstract class PDataSource[TD, EI, Q, A] extends BaseDataSource[TD, EI, Q, A] {
 
   @deprecated("Use readEval() instead.", "0.9.0")
   def read(sc: SparkContext): Seq[(TD, EI, RDD[(Q, A)])] = readEval(sc)
-}

@@ -15,7 +15,7 @@ class ScClassFileViewProvider(manager: PsiManager,
                               physical: Boolean,
                               isScalaFile: Boolean)
     extends SingleRootFileViewProvider(
-        manager, file, physical, ScalaFileType.SCALA_FILE_TYPE.getLanguage) {
+        manager, file, physical, ScalaFileType.SCALA_FILE_TYPE.getLanguage)
 
   override def getContents: CharSequence =
     if (!isScalaFile) ""
@@ -26,17 +26,14 @@ class ScClassFileViewProvider(manager: PsiManager,
         .replace("\r", "")
 
   override def createFile(
-      project: Project, vFile: VirtualFile, fileType: FileType): PsiFile = {
+      project: Project, vFile: VirtualFile, fileType: FileType): PsiFile =
     if (!isScalaFile) null
-    else {
+    else
       val file = new ScalaFileImpl(this)
       val adj = file.asInstanceOf[CompiledFileAdjuster]
       adj.setCompiled(c = true)
       adj.setVirtualFile(vFile)
       file
-    }
-  }
 
   override def createCopy(copy: VirtualFile): SingleRootFileViewProvider =
     new ScClassFileViewProvider(getManager, copy, false, isScalaFile)
-}

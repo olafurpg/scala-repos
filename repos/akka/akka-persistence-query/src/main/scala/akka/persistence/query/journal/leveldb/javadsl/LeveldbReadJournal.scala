@@ -30,7 +30,7 @@ class LeveldbReadJournal(
     extends ReadJournal with AllPersistenceIdsQuery
     with CurrentPersistenceIdsQuery with EventsByPersistenceIdQuery
     with CurrentEventsByPersistenceIdQuery with EventsByTagQuery
-    with CurrentEventsByTagQuery {
+    with CurrentEventsByTagQuery
 
   /**
     * `allPersistenceIds` is used for retrieving all `persistenceIds` of all
@@ -156,9 +156,8 @@ class LeveldbReadJournal(
   override def currentEventsByTag(
       tag: String, offset: Long): Source[EventEnvelope, NotUsed] =
     scaladslReadJournal.currentEventsByTag(tag, offset).asJava
-}
 
-object LeveldbReadJournal {
+object LeveldbReadJournal
 
   /**
     * The default identifier for [[LeveldbReadJournal]] to be used with
@@ -169,4 +168,3 @@ object LeveldbReadJournal {
     */
   final val Identifier =
     akka.persistence.query.journal.leveldb.scaladsl.LeveldbReadJournal.Identifier
-}

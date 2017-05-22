@@ -22,7 +22,7 @@ import scala.collection.immutable
 case class ParseError(position: Position,
                       principalPosition: Position,
                       traces: immutable.Seq[RuleTrace])
-    extends RuntimeException {
+    extends RuntimeException
   require(principalPosition.index >= position.index,
           "principalPosition must be > position")
   def format(parser: Parser): String = format(parser.input)
@@ -36,14 +36,12 @@ case class ParseError(position: Position,
     s"ParseError($position, $principalPosition, <${traces.size} traces>)"
 
   lazy val effectiveTraces: immutable.Seq[RuleTrace] =
-    traces map {
+    traces map
       val commonPrefixLen = RuleTrace.commonNonAtomicPrefixLength(traces)
       if (commonPrefixLen > 0)
         t ⇒
           t.copy(prefix = t.prefix.drop(commonPrefixLen)).dropUnreportedPrefix
       else _.dropUnreportedPrefix
-    }
-}
 
 /**
   * Defines a position in an [[ParserInput]].
@@ -54,19 +52,17 @@ case class ParseError(position: Position,
   */
 case class Position(index: Int, line: Int, column: Int)
 
-object Position {
-  def apply(index: Int, input: ParserInput): Position = {
+object Position
+  def apply(index: Int, input: ParserInput): Position =
     @tailrec def rec(ix: Int, line: Int, col: Int): Position =
       if (ix >= index) Position(index, line, col)
       else if (ix >= input.length || input.charAt(ix) != '\n')
         rec(ix + 1, line, col + 1)
       else rec(ix + 1, line + 1, 1)
     rec(ix = 0, line = 1, col = 1)
-  }
-}
 
 case class RuleTrace(
-    prefix: List[RuleTrace.NonTerminal], terminal: RuleTrace.Terminal) {
+    prefix: List[RuleTrace.NonTerminal], terminal: RuleTrace.Terminal)
   import RuleTrace._
 
   /**
@@ -74,11 +70,11 @@ case class RuleTrace(
     * offset from the reported error index is zero (e.g. the [[RuleTrace.Terminal]]).
     * If this is wrapped in one or more [[RuleTrace.NonTerminal.Named]] the outermost of these is returned instead.
     */
-  def dropUnreportedPrefix: RuleTrace = {
+  def dropUnreportedPrefix: RuleTrace =
     @tailrec
     def rec(current: List[NonTerminal],
             named: List[NonTerminal]): List[NonTerminal] =
-      current match {
+      current match
         case NonTerminal(Named(_), _) :: tail ⇒
           rec(tail, if (named.isEmpty) current else named)
         case NonTerminal(RuleCall, _) :: tail ⇒
@@ -88,36 +84,31 @@ case class RuleTrace(
         case x :: tail ⇒
           if (x.offset >= 0 && named.nonEmpty) named else rec(tail, Nil)
         case Nil ⇒ named
-      }
     val newPrefix = rec(prefix, Nil)
     if (newPrefix ne prefix) copy(prefix = newPrefix) else this
-  }
 
   /**
     * Wraps this trace with a [[RuleTrace.Named]] wrapper if the given name is non-empty.
     */
-  def named(name: String): RuleTrace = {
+  def named(name: String): RuleTrace =
     val newHead = NonTerminal(
         Named(name), if (prefix.isEmpty) 0 else prefix.head.offset)
     if (name.isEmpty) this else copy(prefix = newHead :: prefix)
-  }
-}
 
-object RuleTrace {
+object RuleTrace
 
   def commonNonAtomicPrefixLength(traces: Seq[RuleTrace]): Int =
-    if (traces.size > 1) {
+    if (traces.size > 1)
       val tracesTail = traces.tail
       def hasElem(ix: Int, elem: NonTerminal): RuleTrace ⇒ Boolean =
-        _.prefix.drop(ix) match {
+        _.prefix.drop(ix) match
           case `elem` :: _ ⇒ true
           case _ ⇒ false
-        }
       @tailrec
       def rec(current: List[NonTerminal], namedIx: Int, ix: Int): Int =
-        current match {
+        current match
           case head :: tail if tracesTail forall hasElem(ix, head) ⇒
-            head.key match {
+            head.key match
               case Named(_) ⇒
                 rec(tail, if (namedIx >= 0) namedIx else ix, ix + 1)
               case RuleCall ⇒
@@ -126,11 +117,9 @@ object RuleTrace {
                 if (namedIx >= 0) namedIx else ix // Atomic elements always terminate a common prefix
               case _ ⇒
                 rec(tail, -1, ix + 1) // otherwise the name chain is broken
-            }
           case _ ⇒ if (namedIx >= 0) namedIx else ix
-        }
       rec(traces.head.prefix, namedIx = -1, ix = 0)
-    } else 0
+    else 0
 
   // offset: the number of characters before the reported error index that the rule corresponding
   // to this trace head started matching.
@@ -170,11 +159,9 @@ object RuleTrace {
       extends Terminal
   case object SemanticPredicate extends Terminal
 
-  object NotPredicate {
+  object NotPredicate
     sealed trait Base
     case object Anonymous extends Base
     final case class Named(name: String) extends Base
     final case class RuleCall(target: String) extends Base
     final case class Terminal(terminal: RuleTrace.Terminal) extends Base
-  }
-}

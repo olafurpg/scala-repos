@@ -16,37 +16,30 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *                 | Refinement
  */
 
-object CompoundType {
-  def parse(builder: ScalaPsiBuilder, isPattern: Boolean): Boolean = {
+object CompoundType
+  def parse(builder: ScalaPsiBuilder, isPattern: Boolean): Boolean =
     val compoundMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
-        if (Refinement parse builder) {
+        if (Refinement parse builder)
           compoundMarker.done(ScalaElementTypes.COMPOUND_TYPE)
           true
-        } else {
+        else
           compoundMarker.drop()
           false
-        }
       case _ =>
-        if (!AnnotType.parse(builder, isPattern)) {
+        if (!AnnotType.parse(builder, isPattern))
           compoundMarker.drop()
           false
-        } else {
+        else
           var isCompound = false
-          while (builder.getTokenType == ScalaTokenTypes.kWITH) {
+          while (builder.getTokenType == ScalaTokenTypes.kWITH)
             isCompound = true
             builder.advanceLexer() //Ate with
-            if (!AnnotType.parse(builder, isPattern)) {
+            if (!AnnotType.parse(builder, isPattern))
               builder error ScalaBundle.message("wrong.type")
-            }
-          }
           val hasRefinement = Refinement parse builder
-          if (isCompound || hasRefinement) {
+          if (isCompound || hasRefinement)
             compoundMarker.done(ScalaElementTypes.COMPOUND_TYPE)
-          } else compoundMarker.drop()
+          else compoundMarker.drop()
           true
-        }
-    }
-  }
-}

@@ -11,13 +11,13 @@ import akka.event.EventHandler
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-class RemoteEventHandler extends Actor {
+class RemoteEventHandler extends Actor
   import EventHandler._
 
   self.id = ID
   self.dispatcher = EventHandlerDispatcher
 
-  def receive = {
+  def receive =
 
     // client
     case RemoteClientError(cause, client, address) =>
@@ -73,5 +73,3 @@ class RemoteEventHandler extends Actor {
           "RemoteServerClientClosed - Address[%s]" format clientAddress.toString)
 
     case _ => //ignore other
-  }
-}

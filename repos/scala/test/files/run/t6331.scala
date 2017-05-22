@@ -1,28 +1,28 @@
 import scala.tools.partest.DirectTest
 
 // Test of Constant#equals, which must must account for floating point intricacies.
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def code = ""
 
-  override def show() {
+  override def show()
     val global = newCompiler()
     import global._
 
-    def check(c1: Any, c2: Any): Unit = {
+    def check(c1: Any, c2: Any): Unit =
       val const1 = Constant(c1)
       val const2 = Constant(c2)
       val equal = const1 == const2
       def show(a: Any) =
         "" + a +
-        (a match {
+        (a match
               case _: Byte => ".toByte"
               case _: Short => ".toShort"
               case _: Long => "L"
               case _: Float => "f"
               case _: Double => "d"
               case _ => ""
-            })
+            )
       val op = if (equal) "==" else "!="
       println(f"${show(c1)}%12s $op ${show(c2)}")
 
@@ -33,7 +33,6 @@ object Test extends DirectTest {
       if (hashBroken)
         println(
             f"$hash1%12s != $hash2 // hash codes differ for equal objects!!")
-    }
 
     check((), ())
 
@@ -66,5 +65,3 @@ object Test extends DirectTest {
     check(0, 0d)
     check(0, 0L)
     check(0d, 0f)
-  }
-}

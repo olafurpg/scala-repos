@@ -27,19 +27,18 @@ import org.apache.spark.scheduler.cluster.mesos.{MesosClusterRetryState, MesosCl
 import org.apache.spark.ui.{UIUtils, WebUIPage}
 
 private[ui] class DriverPage(parent: MesosClusterUI)
-    extends WebUIPage("driver") {
+    extends WebUIPage("driver")
 
-  override def render(request: HttpServletRequest): Seq[Node] = {
+  override def render(request: HttpServletRequest): Seq[Node] =
     val driverId = request.getParameter("id")
     require(driverId != null && driverId.nonEmpty, "Missing id parameter")
 
     val state = parent.scheduler.getDriverState(driverId)
-    if (state.isEmpty) {
+    if (state.isEmpty)
       val content = <div>
           <p>Cannot find driver {driverId}</p>
         </div>
       return UIUtils.basicSparkPage(content, s"Details for Job $driverId")
-    }
     val driverState = state.get
     val driverHeaders = Seq("Driver property", "Value")
     val schedulerHeaders = Seq("Scheduler property", "Value")
@@ -90,11 +89,10 @@ private[ui] class DriverPage(parent: MesosClusterUI)
         </div>;
 
     UIUtils.basicSparkPage(content, s"Details for Job $driverId")
-  }
 
   private def launchedRow(
-      submissionState: Option[MesosClusterSubmissionState]): Seq[Node] = {
-    submissionState.map { state =>
+      submissionState: Option[MesosClusterSubmissionState]): Seq[Node] =
+    submissionState.map  state =>
       <tr>
         <td>Mesos Slave ID</td>
         <td>{state.slaveId.getValue}</td>
@@ -115,20 +113,18 @@ private[ui] class DriverPage(parent: MesosClusterUI)
         <td>Last Task Status</td>
         <td>{state.mesosTaskStatus.map(_.toString).getOrElse("")}</td>
       </tr>
-    }.getOrElse(Seq[Node]())
-  }
+    .getOrElse(Seq[Node]())
 
   private def propertiesRow(
-      properties: collection.Map[String, String]): Seq[Node] = {
-    properties.map {
+      properties: collection.Map[String, String]): Seq[Node] =
+    properties.map
       case (k, v) =>
         <tr>
         <td>{k}</td><td>{v}</td>
       </tr>
-    }.toSeq
-  }
+    .toSeq
 
-  private def commandRow(command: Command): Seq[Node] = {
+  private def commandRow(command: Command): Seq[Node] =
     <tr>
       <td>Main class</td><td>{command.mainClass}</td>
     </tr>
@@ -144,9 +140,8 @@ private[ui] class DriverPage(parent: MesosClusterUI)
     <tr>
       <td>Library path entries</td><td>{command.libraryPathEntries.mkString((" "))}</td>
     </tr>
-  }
 
-  private def driverRow(driver: MesosDriverDescription): Seq[Node] = {
+  private def driverRow(driver: MesosDriverDescription): Seq[Node] =
     <tr>
       <td>Name</td><td>{driver.name}</td>
     </tr>
@@ -165,10 +160,9 @@ private[ui] class DriverPage(parent: MesosClusterUI)
     <tr>
       <td>Supervise</td><td>{driver.supervise}</td>
     </tr>
-  }
 
-  private def retryRow(retryState: Option[MesosClusterRetryState]): Seq[Node] = {
-    retryState.map { state =>
+  private def retryRow(retryState: Option[MesosClusterRetryState]): Seq[Node] =
+    retryState.map  state =>
       <tr>
         <td>
           {state.lastFailureStatus}
@@ -180,6 +174,4 @@ private[ui] class DriverPage(parent: MesosClusterUI)
           {state.retries}
         </td>
       </tr>
-    }.getOrElse(Seq[Node]())
-  }
-}
+    .getOrElse(Seq[Node]())

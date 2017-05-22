@@ -8,7 +8,7 @@ import sbt.Keys._
 import com.typesafe.tools.mima.plugin.MimaPlugin
 import com.typesafe.tools.mima.plugin.MimaPlugin.autoImport._
 
-object MiMa extends AutoPlugin {
+object MiMa extends AutoPlugin
 
   override def requires = MimaPlugin
   override def trigger = allRequirements
@@ -21,8 +21,8 @@ object MiMa extends AutoPlugin {
 
   def akkaPreviousArtifacts(projectName: String,
                             organization: String,
-                            scalaBinaryVersion: String): Set[sbt.ModuleID] = {
-    val versions = {
+                            scalaBinaryVersion: String): Set[sbt.ModuleID] =
+    val versions =
       val akka23Versions = Seq("2.3.11", "2.3.12", "2.3.13", "2.3.14")
       val akka24NoStreamVersions = Seq("2.4.0", "2.4.1")
       val akka24StreamVersions = Seq("2.4.2")
@@ -44,7 +44,7 @@ object MiMa extends AutoPlugin {
           "akka-http-spray-json-experimental",
           "akka-http-xml-experimental"
       )
-      scalaBinaryVersion match {
+      scalaBinaryVersion match
         case "2.11"
             if !(akka24NewArtifacts ++ akka242NewArtifacts).contains(
                 projectName) =>
@@ -53,34 +53,27 @@ object MiMa extends AutoPlugin {
           akka24StreamVersions
         case _ =>
           akka24NoStreamVersions ++ akka24StreamVersions // Only Akka 2.4.x for scala > than 2.11
-      }
-    }
 
     // check against all binary compatible artifacts
     versions.map(organization %% projectName % _).toSet
-  }
 
   case class FilterAnyProblem(name: String)
-      extends com.typesafe.tools.mima.core.ProblemFilter {
+      extends com.typesafe.tools.mima.core.ProblemFilter
     import com.typesafe.tools.mima.core._
-    override def apply(p: Problem): Boolean = p match {
+    override def apply(p: Problem): Boolean = p match
       case t: TemplateProblem =>
         t.ref.fullName != name && t.ref.fullName != (name + '$')
       case m: MemberProblem =>
         m.ref.owner.fullName != name && m.ref.owner.fullName != (name + '$')
-    }
-  }
 
   case class FilterAnyProblemStartingWith(start: String)
-      extends com.typesafe.tools.mima.core.ProblemFilter {
+      extends com.typesafe.tools.mima.core.ProblemFilter
     import com.typesafe.tools.mima.core._
-    override def apply(p: Problem): Boolean = p match {
+    override def apply(p: Problem): Boolean = p match
       case t: TemplateProblem => !t.ref.fullName.startsWith(start)
       case m: MemberProblem => !m.ref.owner.fullName.startsWith(start)
-    }
-  }
 
-  val mimaIgnoredProblems = {
+  val mimaIgnoredProblems =
     import com.typesafe.tools.mima.core._
 
     val bcIssuesBetween23and24 = Seq(
@@ -1253,5 +1246,3 @@ object MiMa extends AutoPlugin {
                 "akka.persistence.Eventsourced#ProcessingState.onWriteMessageComplete")
         )
     )
-  }
-}

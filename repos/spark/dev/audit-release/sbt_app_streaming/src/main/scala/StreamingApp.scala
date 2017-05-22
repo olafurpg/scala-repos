@@ -25,14 +25,13 @@ import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.StreamingContext
 import org.apache.spark.streaming._
 
-object SparkStreamingExample {
+object SparkStreamingExample
 
-  def main(args: Array[String]) {
-    val conf = sys.env.get("SPARK_AUDIT_MASTER") match {
+  def main(args: Array[String])
+    val conf = sys.env.get("SPARK_AUDIT_MASTER") match
       case Some(master) =>
         new SparkConf().setAppName("Simple Streaming App").setMaster(master)
       case None => new SparkConf().setAppName("Simple Streaming App")
-    }
     val ssc = new StreamingContext(conf, Seconds(1))
     val seen = ListBuffer[RDD[Int]]()
 
@@ -47,12 +46,10 @@ object SparkStreamingExample {
     ssc.start()
     Thread.sleep(5000)
 
-    def test(f: => Boolean, failureMsg: String) = {
-      if (!f) {
+    def test(f: => Boolean, failureMsg: String) =
+      if (!f)
         println(failureMsg)
         System.exit(-1)
-      }
-    }
 
     val rddCounts = seen.map(rdd => rdd.count()).filter(_ > 0)
     test(rddCounts.length == 3, "Did not collect three RDD's from stream")
@@ -62,6 +59,4 @@ object SparkStreamingExample {
     println("Test succeeded")
 
     ssc.stop()
-  }
-}
 // scalastyle:on println

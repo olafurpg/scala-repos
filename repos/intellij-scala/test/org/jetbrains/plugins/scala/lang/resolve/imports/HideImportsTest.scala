@@ -7,12 +7,12 @@ import com.intellij.psi.PsiPolyVariantReference
 import org.jetbrains.plugins.scala.extensions.PsiNamedElementExt
 import org.junit.Assert
 
-class HideImportsTest extends ScalaResolveTestCase {
+class HideImportsTest extends ScalaResolveTestCase
   override def folderPath: String =
     super.folderPath() + "resolve/imports/simple/"
 
-  def testHidePredefImplicit() {
-    findReferenceAtCaret() match {
+  def testHidePredefImplicit()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -22,6 +22,3 @@ class HideImportsTest extends ScalaResolveTestCase {
         val srr = res.asInstanceOf[ScalaResolveResult]
         Assert.assertEquals("caPitalize", srr.element.name)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
-}

@@ -38,79 +38,66 @@ import org.apache.spark.util.{ResetSystemProperties, Utils}
 // of properties that needed to be cleared after tests.
 class SparkSubmitSuite
     extends SparkFunSuite with Matchers with BeforeAndAfterEach
-    with ResetSystemProperties with Timeouts {
+    with ResetSystemProperties with Timeouts
 
-  override def beforeEach() {
+  override def beforeEach()
     super.beforeEach()
     System.setProperty("spark.testing", "true")
-  }
 
-  private val noOpOutputStream = new OutputStream {
+  private val noOpOutputStream = new OutputStream
     def write(b: Int) = {}
-  }
 
   /** Simple PrintStream that reads data into a buffer */
-  private class BufferPrintStream extends PrintStream(noOpOutputStream) {
+  private class BufferPrintStream extends PrintStream(noOpOutputStream)
     var lineBuffer = ArrayBuffer[String]()
     // scalastyle:off println
-    override def println(line: String) {
+    override def println(line: String)
       lineBuffer += line
-    }
     // scalastyle:on println
-  }
 
   /** Returns true if the script exits and the given search string is printed. */
-  private def testPrematureExit(input: Array[String], searchString: String) = {
+  private def testPrematureExit(input: Array[String], searchString: String) =
     val printStream = new BufferPrintStream()
     SparkSubmit.printStream = printStream
 
     @volatile var exitedCleanly = false
     SparkSubmit.exitFn = (_) => exitedCleanly = true
 
-    val thread = new Thread {
+    val thread = new Thread
       override def run() =
-        try {
+        try
           SparkSubmit.main(input)
-        } catch {
+        catch
           // If exceptions occur after the "exit" has happened, fine to ignore them.
           // These represent code paths not reachable during normal execution.
           case e: Exception => if (!exitedCleanly) throw e
-        }
-    }
     thread.start()
     thread.join()
     val joined = printStream.lineBuffer.mkString("\n")
-    if (!joined.contains(searchString)) {
+    if (!joined.contains(searchString))
       fail(s"Search string '$searchString' not found in $joined")
-    }
-  }
 
   // scalastyle:off println
-  test("prints usage on empty input") {
+  test("prints usage on empty input")
     testPrematureExit(Array[String](), "Usage: spark-submit")
-  }
 
-  test("prints usage with only --help") {
+  test("prints usage with only --help")
     testPrematureExit(Array("--help"), "Usage: spark-submit")
-  }
 
-  test("prints error with unrecognized options") {
+  test("prints error with unrecognized options")
     testPrematureExit(Array("--blarg"), "Unrecognized option '--blarg'")
     testPrematureExit(Array("-bleg"), "Unrecognized option '-bleg'")
-  }
 
-  test("handle binary specified but not class") {
+  test("handle binary specified but not class")
     testPrematureExit(Array("foo.jar"), "No main class")
-  }
 
-  test("handles arguments with --key=val") {
+  test("handles arguments with --key=val")
     val clArgs = Seq("--jars=one.jar,two.jar,three.jar", "--name=myApp")
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.jars should include regex (".*one.jar,.*two.jar,.*three.jar")
     appArgs.name should be("myApp")
-  }
 
-  test("handles arguments to user program") {
+  test("handles arguments to user program")
     val clArgs = Seq("--name",
                      "myApp",
                      "--class",
@@ -121,9 +108,8 @@ class SparkSubmitSuite
                      "args")
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.childArgs should be(Seq("some", "--weird", "args"))
-  }
 
-  test("handles arguments to user program with name collision") {
+  test("handles arguments to user program with name collision")
     val clArgs = Seq("--name",
                      "myApp",
                      "--class",
@@ -137,9 +123,8 @@ class SparkSubmitSuite
     val appArgs = new SparkSubmitArguments(clArgs)
     appArgs.childArgs should be(
         Seq("--master", "local", "some", "--weird", "args"))
-  }
 
-  test("specify deploy mode through configuration") {
+  test("specify deploy mode through configuration")
     val clArgs = Seq(
         "--master",
         "yarn",
@@ -187,9 +172,8 @@ class SparkSubmitSuite
     val (_, _, sysProps2, _) = prepareSubmitEnvironment(appArgs2)
     appArgs2.deployMode should be("client")
     sysProps2("spark.submit.deployMode") should be("client")
-  }
 
-  test("handles YARN cluster mode") {
+  test("handles YARN cluster mode")
     val clArgs = Seq("--deploy-mode",
                      "cluster",
                      "--master",
@@ -241,9 +225,8 @@ class SparkSubmitSuite
     sysProps("spark.ui.enabled") should be("false")
     sysProps("SPARK_SUBMIT") should be("true")
     sysProps.keys should not contain ("spark.jars")
-  }
 
-  test("handles YARN client mode") {
+  test("handles YARN client mode")
     val clArgs = Seq("--deploy-mode",
                      "client",
                      "--master",
@@ -296,21 +279,18 @@ class SparkSubmitSuite
     (".*one.jar,.*two.jar,.*three.jar,.*thejar.jar")
     sysProps("SPARK_SUBMIT") should be("true")
     sysProps("spark.ui.enabled") should be("false")
-  }
 
-  test("handles standalone cluster mode") {
+  test("handles standalone cluster mode")
     testStandaloneCluster(useRest = true)
-  }
 
-  test("handles legacy standalone cluster mode") {
+  test("handles legacy standalone cluster mode")
     testStandaloneCluster(useRest = false)
-  }
 
   /**
     * Test whether the launch environment is correctly set up in standalone cluster mode.
     * @param useRest whether to use the REST submission gateway introduced in Spark 1.3
     */
-  private def testStandaloneCluster(useRest: Boolean): Unit = {
+  private def testStandaloneCluster(useRest: Boolean): Unit =
     val clArgs = Seq("--deploy-mode",
                      "cluster",
                      "--master",
@@ -332,14 +312,13 @@ class SparkSubmitSuite
     val (childArgs, classpath, sysProps, mainClass) = prepareSubmitEnvironment(
         appArgs)
     val childArgsStr = childArgs.mkString(" ")
-    if (useRest) {
+    if (useRest)
       childArgsStr should endWith("thejar.jar org.SomeClass arg1 arg2")
       mainClass should be("org.apache.spark.deploy.rest.RestSubmissionClient")
-    } else {
+    else
       childArgsStr should startWith("--supervise --memory 4g --cores 5")
       childArgsStr should include regex "launch spark://h:p .*thejar.jar org.SomeClass arg1 arg2"
       mainClass should be("org.apache.spark.deploy.Client")
-    }
     classpath should have size 0
     sysProps should have size 9
     sysProps.keys should contain("SPARK_SUBMIT")
@@ -352,9 +331,8 @@ class SparkSubmitSuite
     sysProps.keys should contain("spark.ui.enabled")
     sysProps.keys should contain("spark.submit.deployMode")
     sysProps("spark.ui.enabled") should be("false")
-  }
 
-  test("handles standalone client mode") {
+  test("handles standalone client mode")
     val clArgs = Seq("--deploy-mode",
                      "client",
                      "--master",
@@ -382,9 +360,8 @@ class SparkSubmitSuite
     sysProps("spark.executor.memory") should be("5g")
     sysProps("spark.cores.max") should be("5")
     sysProps("spark.ui.enabled") should be("false")
-  }
 
-  test("handles mesos client mode") {
+  test("handles mesos client mode")
     val clArgs = Seq("--deploy-mode",
                      "client",
                      "--master",
@@ -412,9 +389,8 @@ class SparkSubmitSuite
     sysProps("spark.executor.memory") should be("5g")
     sysProps("spark.cores.max") should be("5")
     sysProps("spark.ui.enabled") should be("false")
-  }
 
-  test("handles confs with flag equivalents") {
+  test("handles confs with flag equivalents")
     val clArgs = Seq("--deploy-mode",
                      "cluster",
                      "--executor-memory",
@@ -434,9 +410,8 @@ class SparkSubmitSuite
     sysProps("spark.master") should be("yarn")
     sysProps("spark.submit.deployMode") should be("cluster")
     mainClass should be("org.apache.spark.deploy.yarn.Client")
-  }
 
-  test("launch simple application with spark-submit") {
+  test("launch simple application with spark-submit")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val args = Seq("--class",
                    SimpleApplicationTest.getClass.getName.stripSuffix("$"),
@@ -450,9 +425,8 @@ class SparkSubmitSuite
                    "spark.master.rest.enabled=false",
                    unusedJar.toString)
     runSparkSubmit(args)
-  }
 
-  test("includes jars passed in through --jars") {
+  test("includes jars passed in through --jars")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val jar1 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassA"))
     val jar2 = TestUtils.createJarWithClasses(Seq("SparkSubmitClassB"))
@@ -473,14 +447,13 @@ class SparkSubmitSuite
                    "SparkSubmitClassA",
                    "SparkSubmitClassB")
     runSparkSubmit(args)
-  }
 
   // SPARK-7287
-  test("includes jars passed in through --packages") {
+  test("includes jars passed in through --packages")
     val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
     val main = MavenCoordinate("my.great.lib", "mylib", "0.1")
     val dep = MavenCoordinate("my.great.dep", "mylib", "0.1")
-    IvyTestUtils.withRepository(main, Some(dep.toString), None) { repo =>
+    IvyTestUtils.withRepository(main, Some(dep.toString), None)  repo =>
       val args = Seq("--class",
                      JarCreationTest.getClass.getName.stripSuffix("$"),
                      "--name",
@@ -499,12 +472,10 @@ class SparkSubmitSuite
                      "my.great.lib.MyLib",
                      "my.great.dep.MyLib")
       runSparkSubmit(args)
-    }
-  }
 
   // TODO(SPARK-9603): Building a package is flaky on Jenkins Maven builds.
   // See https://gist.github.com/shivaram/3a2fecce60768a603dac for a error log
-  ignore("correctly builds R packages included in a jar with --packages") {
+  ignore("correctly builds R packages included in a jar with --packages")
     assume(RUtils.isRInstalled, "R isn't installed on this machine.")
     val main = MavenCoordinate("my.great.lib", "mylib", "0.1")
     val sparkHome = sys.props.getOrElse(
@@ -513,7 +484,7 @@ class SparkSubmitSuite
       Seq(sparkHome, "R", "pkg", "inst", "tests", "packageInAJarTest.R")
         .mkString(File.separator)
     assert(new File(rScriptDir).exists)
-    IvyTestUtils.withRepository(main, None, None, withR = true) { repo =>
+    IvyTestUtils.withRepository(main, None, None, withR = true)  repo =>
       val args = Seq("--name",
                      "testApp",
                      "--master",
@@ -527,10 +498,8 @@ class SparkSubmitSuite
                      "spark.ui.enabled=false",
                      rScriptDir)
       runSparkSubmit(args)
-    }
-  }
 
-  test("resolves command line argument paths correctly") {
+  test("resolves command line argument paths correctly")
     val jars = "/jar1,/jar2" // --jars
     val files = "hdfs:/file1,file2" // --files
     val archives = "file:/archive1,archive2" // --archives
@@ -586,9 +555,8 @@ class SparkSubmitSuite
     appArgs3.pyFiles should be(Utils.resolveURIs(pyFiles))
     sysProps3("spark.submit.pyFiles") should be(
         PythonRunner.formatPaths(Utils.resolveURIs(pyFiles)).mkString(","))
-  }
 
-  test("resolves config paths correctly") {
+  test("resolves config paths correctly")
     val jars = "/jar1,/jar2" // spark.jars
     val files = "hdfs:/file1,file2" // spark.files / spark.yarn.dist.files
     val archives = "file:/archive1,archive2" // spark.yarn.dist.archives
@@ -653,9 +621,8 @@ class SparkSubmitSuite
     val sysProps3 = SparkSubmit.prepareSubmitEnvironment(appArgs3)._3
     sysProps3("spark.submit.pyFiles") should be(
         PythonRunner.formatPaths(Utils.resolveURIs(pyFiles)).mkString(","))
-  }
 
-  test("user classpath first in driver") {
+  test("user classpath first in driver")
     val systemJar =
       TestUtils.createJarWithFiles(Map("test.resource" -> "SYSTEM"))
     val userJar = TestUtils.createJarWithFiles(Map("test.resource" -> "USER"))
@@ -675,10 +642,9 @@ class SparkSubmitSuite
                    "spark.master.rest.enabled=false",
                    userJar.toString)
     runSparkSubmit(args)
-  }
 
-  test("SPARK_CONF_DIR overrides spark-defaults.conf") {
-    forConfDir(Map("spark.executor.memory" -> "2.3g")) { path =>
+  test("SPARK_CONF_DIR overrides spark-defaults.conf")
+    forConfDir(Map("spark.executor.memory" -> "2.3g"))  path =>
       val unusedJar = TestUtils.createJarWithClasses(Seq.empty)
       val args = Seq("--class",
                      SimpleApplicationTest.getClass.getName.stripSuffix("$"),
@@ -692,12 +658,10 @@ class SparkSubmitSuite
       assert(appArgs.propertiesFile != null)
       assert(appArgs.propertiesFile.startsWith(path))
       appArgs.executorMemory should be("2.3g")
-    }
-  }
   // scalastyle:on println
 
   // NOTE: This is an expensive operation in terms of time (10 seconds+). Use sparingly.
-  private def runSparkSubmit(args: Seq[String]): Unit = {
+  private def runSparkSubmit(args: Seq[String]): Unit =
     val sparkHome = sys.props.getOrElse(
         "spark.test.home", fail("spark.test.home is not set!"))
     val process = Utils.executeCommand(
@@ -705,19 +669,16 @@ class SparkSubmitSuite
         new File(sparkHome),
         Map("SPARK_TESTING" -> "1", "SPARK_HOME" -> sparkHome))
 
-    try {
+    try
       val exitCode = failAfter(60 seconds) { process.waitFor() }
-      if (exitCode != 0) {
+      if (exitCode != 0)
         fail(
             s"Process returned with exit code $exitCode. See the log4j logs for more detail.")
-      }
-    } finally {
+    finally
       // Ensure we still kill the process in case it timed out
       process.destroy()
-    }
-  }
 
-  private def forConfDir(defaults: Map[String, String])(f: String => Unit) = {
+  private def forConfDir(defaults: Map[String, String])(f: String => Unit) =
     val tmpDir = Utils.createTempDir()
 
     val defaultsConf = new File(tmpDir.getAbsolutePath, "spark-defaults.conf")
@@ -727,77 +688,61 @@ class SparkSubmitSuite
 
     writer.close()
 
-    try {
+    try
       f(tmpDir.getAbsolutePath)
-    } finally {
+    finally
       Utils.deleteRecursively(tmpDir)
-    }
-  }
-}
 
-object JarCreationTest extends Logging {
-  def main(args: Array[String]) {
+object JarCreationTest extends Logging
+  def main(args: Array[String])
     Utils.configTestLog4j("INFO")
     val conf = new SparkConf()
     val sc = new SparkContext(conf)
     val result = sc
       .makeRDD(1 to 100, 10)
-      .mapPartitions { x =>
+      .mapPartitions  x =>
         var exception: String = null
-        try {
+        try
           Utils.classForName(args(0))
           Utils.classForName(args(1))
-        } catch {
+        catch
           case t: Throwable =>
             exception = t + "\n" + Utils.exceptionString(t)
             exception = exception.replaceAll("\n", "\n\t")
-        }
         Option(exception).toSeq.iterator
-      }
       .collect()
-    if (result.nonEmpty) {
+    if (result.nonEmpty)
       throw new Exception("Could not load user class from jar:\n" + result(0))
-    }
     sc.stop()
-  }
-}
 
-object SimpleApplicationTest {
-  def main(args: Array[String]) {
+object SimpleApplicationTest
+  def main(args: Array[String])
     Utils.configTestLog4j("INFO")
     val conf = new SparkConf()
     val sc = new SparkContext(conf)
     val configs = Seq("spark.master", "spark.app.name")
-    for (config <- configs) {
+    for (config <- configs)
       val masterValue = conf.get(config)
       val executorValues = sc
         .makeRDD(1 to 100, 10)
         .map(x => SparkEnv.get.conf.get(config))
         .collect()
         .distinct
-      if (executorValues.size != 1) {
+      if (executorValues.size != 1)
         throw new SparkException(
             s"Inconsistent values for $config: $executorValues")
-      }
       val executorValue = executorValues(0)
-      if (executorValue != masterValue) {
+      if (executorValue != masterValue)
         throw new SparkException(
             s"Master had $config=$masterValue but executor had $config=$executorValue")
-      }
-    }
     sc.stop()
-  }
-}
 
-object UserClasspathFirstTest {
-  def main(args: Array[String]) {
+object UserClasspathFirstTest
+  def main(args: Array[String])
     val ccl = Thread.currentThread().getContextClassLoader()
     val resource = ccl.getResourceAsStream("test.resource")
     val bytes = ByteStreams.toByteArray(resource)
     val contents = new String(bytes, 0, bytes.length, StandardCharsets.UTF_8)
-    if (contents != "USER") {
+    if (contents != "USER")
       throw new SparkException(
           "Should have read user resource, but instead read: " + contents)
-    }
-  }
-}

@@ -27,7 +27,7 @@ import org.apache.spark.storage._
 /**
   * Test various functionality in the StorageListener that supports the StorageTab.
   */
-class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
+class StorageTabSuite extends SparkFunSuite with BeforeAndAfter
   private var bus: LiveListenerBus = _
   private var storageStatusListener: StorageStatusListener = _
   private var storageListener: StorageListener = _
@@ -44,15 +44,14 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
   private def rddInfo3 = new RDDInfo(3, "grace", 400, memAndDisk, Seq(10))
   private val bm1 = BlockManagerId("big", "dog", 1)
 
-  before {
+  before
     bus = new LiveListenerBus
     storageStatusListener = new StorageStatusListener(new SparkConf())
     storageListener = new StorageListener(storageStatusListener)
     bus.addListener(storageStatusListener)
     bus.addListener(storageListener)
-  }
 
-  test("stage submitted / completed") {
+  test("stage submitted / completed")
     assert(storageListener._rddInfoMap.isEmpty)
     assert(storageListener.rddInfoList.isEmpty)
 
@@ -93,9 +92,8 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     bus.postToAll(SparkListenerStageCompleted(stageInfo0))
     assert(storageListener._rddInfoMap.size === 2)
     assert(storageListener.rddInfoList.size === 2)
-  }
 
-  test("unpersist") {
+  test("unpersist")
     val rddInfo0Cached = rddInfo0
     val rddInfo1Cached = rddInfo1
     rddInfo0Cached.numCachedPartitions = 1
@@ -119,9 +117,8 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     bus.postToAll(SparkListenerUnpersistRDD(1))
     assert(storageListener._rddInfoMap.size === 0)
     assert(storageListener.rddInfoList.size === 0)
-  }
 
-  test("task end") {
+  test("task end")
     val myRddInfo0 = rddInfo0
     val myRddInfo1 = rddInfo1
     val myRddInfo2 = rddInfo2
@@ -186,9 +183,8 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     assert(storageListener._rddInfoMap(2).numCachedPartitions === 0)
     assert(!storageListener._rddInfoMap(2).isCached)
     assert(storageListener._rddInfoMap(2).numCachedPartitions === 0)
-  }
 
-  test("verify StorageTab contains all cached rdds") {
+  test("verify StorageTab contains all cached rdds")
 
     val rddInfo0 = new RDDInfo(0, "rdd0", 1, memOnly, Seq(4))
     val rddInfo1 = new RDDInfo(1, "rdd1", 1, memOnly, Seq(4))
@@ -217,5 +213,3 @@ class StorageTabSuite extends SparkFunSuite with BeforeAndAfter {
     assert(storageListener.rddInfoList.size === 2)
     bus.postToAll(SparkListenerStageCompleted(stageInfo1))
     assert(storageListener.rddInfoList.size === 2)
-  }
-}

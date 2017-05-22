@@ -1,20 +1,18 @@
 package gitbucket.core.model
 
-trait Comment {
+trait Comment
   val commentedUserName: String
   val registeredDate: java.util.Date
-}
 
-trait IssueCommentComponent extends TemplateComponent { self: Profile =>
+trait IssueCommentComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
-  lazy val IssueComments = new TableQuery(tag => new IssueComments(tag)) {
+  lazy val IssueComments = new TableQuery(tag => new IssueComments(tag))
     def autoInc = this returning this.map(_.commentId)
-  }
 
   class IssueComments(tag: Tag)
-      extends Table[IssueComment](tag, "ISSUE_COMMENT") with IssueTemplate {
+      extends Table[IssueComment](tag, "ISSUE_COMMENT") with IssueTemplate
     val commentId = column[Int]("COMMENT_ID", O AutoInc)
     val action = column[String]("ACTION")
     val commentedUserName = column[String]("COMMENTED_USER_NAME")
@@ -33,8 +31,6 @@ trait IssueCommentComponent extends TemplateComponent { self: Profile =>
        updatedDate) <> (IssueComment.tupled, IssueComment.unapply)
 
     def byPrimaryKey(commentId: Int) = this.commentId === commentId.bind
-  }
-}
 
 case class IssueComment(
     userName: String,
@@ -49,16 +45,15 @@ case class IssueComment(
 )
     extends Comment
 
-trait CommitCommentComponent extends TemplateComponent { self: Profile =>
+trait CommitCommentComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
-  lazy val CommitComments = new TableQuery(tag => new CommitComments(tag)) {
+  lazy val CommitComments = new TableQuery(tag => new CommitComments(tag))
     def autoInc = this returning this.map(_.commentId)
-  }
 
   class CommitComments(tag: Tag)
-      extends Table[CommitComment](tag, "COMMIT_COMMENT") with CommitTemplate {
+      extends Table[CommitComment](tag, "COMMIT_COMMENT") with CommitTemplate
     val commentId = column[Int]("COMMENT_ID", O AutoInc)
     val commentedUserName = column[String]("COMMENTED_USER_NAME")
     val content = column[String]("CONTENT")
@@ -83,8 +78,6 @@ trait CommitCommentComponent extends TemplateComponent { self: Profile =>
        issueId) <> (CommitComment.tupled, CommitComment.unapply)
 
     def byPrimaryKey(commentId: Int) = this.commentId === commentId.bind
-  }
-}
 
 case class CommitComment(
     userName: String,

@@ -1,6 +1,5 @@
-class a {
+class a
   2 + /*caret*/
-}
 /*
 false
 match

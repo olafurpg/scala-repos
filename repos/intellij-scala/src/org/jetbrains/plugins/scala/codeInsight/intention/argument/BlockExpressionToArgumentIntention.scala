@@ -13,22 +13,20 @@ import org.jetbrains.plugins.scala.util.IntentionAvailabilityChecker
   * Pavel Fatin
   */
 class BlockExpressionToArgumentIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName = "Convert to argument in parentheses"
 
   override def getText: String = getFamilyName
 
-  def isAvailable(project: Project, editor: Editor, element: PsiElement) = {
-    element match {
+  def isAvailable(project: Project, editor: Editor, element: PsiElement) =
+    element match
       case Both(
           Parent(block: ScBlockExpr), Parent(Parent(list: ScArgumentExprList)))
           if list.exprs.size == 1 && block.caseClauses.isEmpty =>
         IntentionAvailabilityChecker.checkIntention(this, element)
       case _ => false
-    }
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val block = element.getParent.asInstanceOf[ScBlockExpr]
     val s = block.getText
     val text =
@@ -39,9 +37,6 @@ class BlockExpressionToArgumentIntention
       .findByType(classOf[ScArgumentExprList])
       .get
     val replacement = block.getParent.replace(arguments)
-    replacement.getPrevSibling match {
+    replacement.getPrevSibling match
       case ws: PsiWhiteSpace => ws.delete()
       case _ =>
-    }
-  }
-}

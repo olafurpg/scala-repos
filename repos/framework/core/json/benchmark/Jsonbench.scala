@@ -4,18 +4,17 @@
   * - jackson-mapper-asl-1.4.1.jar
   * - lift-json-???.jar
   */
-object Jsonbench extends Benchmark {
+object Jsonbench extends Benchmark
   import scala.util.parsing.json.JSON
   import org.codehaus.jackson._
   import org.codehaus.jackson.map._
   import net.liftweb.json.JsonParser
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) =
     benchmark("Scala std") { JSON.parse(json) }
     val mapper = new ObjectMapper
     benchmark("Jackson") { mapper.readValue(json, classOf[JsonNode]) }
     benchmark("lift-json") { JsonParser.parse(json) }
-  }
 
   def benchmark(name: String)(f: => Any) = run(name, 50000, 50000)(f)
 
@@ -44,4 +43,3 @@ object Jsonbench extends Benchmark {
   }
 }
 """
-}

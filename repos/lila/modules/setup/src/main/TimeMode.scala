@@ -2,7 +2,7 @@ package lila.setup
 
 sealed abstract class TimeMode(val id: Int)
 
-object TimeMode {
+object TimeMode
 
   case object Unlimited extends TimeMode(0)
   case object RealTime extends TimeMode(1)
@@ -14,9 +14,9 @@ object TimeMode {
 
   val ids = all map (_.id)
 
-  val byId = all map { v =>
+  val byId = all map  v =>
     (v.id, v)
-  } toMap
+  toMap
 
   def apply(id: Int): Option[TimeMode] = byId get id
 
@@ -26,4 +26,3 @@ object TimeMode {
     if (game.hasClock) RealTime
     else if (game.hasCorrespondenceClock) Correspondence
     else Unlimited
-}

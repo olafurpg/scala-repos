@@ -1,8 +1,8 @@
 import scala.reflect.{ClassTag, classTag}
 
 @deprecated("Suppress warnings", since = "2.11")
-object Test extends App {
-  def testValueClass(tag: ClassTag[_]) {
+object Test extends App
+  def testValueClass(tag: ClassTag[_])
     println(s"runtimeClass = ${tag.runtimeClass}, toString = ${tag.toString}")
     println(tag <:< tag)
     println(tag <:< ClassTag.AnyVal)
@@ -13,7 +13,6 @@ object Test extends App {
     println(ClassTag.Null <:< tag)
     println(tag <:< ClassTag.Object)
     println(ClassTag.Object <:< tag)
-  }
 
   testValueClass(ClassTag.Byte)
   testValueClass(ClassTag.Short)
@@ -24,4 +23,3 @@ object Test extends App {
   testValueClass(ClassTag.Double)
   testValueClass(ClassTag.Unit)
   testValueClass(ClassTag.Boolean)
-}

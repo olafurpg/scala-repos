@@ -29,7 +29,7 @@ import cascading.operation.Debug.Output
 case class PipeDebug(output: Output = Output.STDERR,
                      prefix: String = null,
                      printFieldsEvery: Option[Int] = None,
-                     printTuplesEvery: Int = 1) {
+                     printTuplesEvery: Int = 1)
 
   def toStdOut: PipeDebug = copy(output = Output.STDOUT)
   def toStdErr: PipeDebug = copy(output = Output.STDERR)
@@ -38,14 +38,11 @@ case class PipeDebug(output: Output = Output.STDERR,
   def printFieldsEvery(i: Option[Int]): PipeDebug = copy(printFieldsEvery = i)
   def printTuplesEvery(i: Int): PipeDebug = copy(printTuplesEvery = i)
 
-  def toDebug: Debug = {
+  def toDebug: Debug =
     val debug = new Debug(output, prefix, printFieldsEvery.isDefined)
-    printFieldsEvery.foreach { x =>
+    printFieldsEvery.foreach  x =>
       debug.setPrintFieldsEvery(x)
-    }
     debug.setPrintTupleEvery(printTuplesEvery)
     debug
-  }
 
   def apply(p: Pipe): Pipe = new Each(p, toDebug)
-}

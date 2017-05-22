@@ -16,12 +16,11 @@ import org.jdom.Document
   * @since 21/05/14.
   */
 class ImportPanelConverterProvider
-    extends ConverterProvider("ImportPanelConverterProvider") {
-  override def getConversionDescription: String = {
+    extends ConverterProvider("ImportPanelConverterProvider")
+  override def getConversionDescription: String =
     "Scala imports settings will be moved to Code Style settings."
-  }
 
-  override def createConverter(context: ConversionContext): ProjectConverter = {
+  override def createConverter(context: ConversionContext): ProjectConverter =
     import org.jdom.Element
     val actualSettingsSet = Set(
         "addFullQualifiedImports",
@@ -33,79 +32,63 @@ class ImportPanelConverterProvider
         "sortImports"
     )
 
-    def getElements: Seq[Element] = {
+    def getElements: Seq[Element] =
       context.getSettingsBaseDir
         .listFiles()
-        .find(_.getName == "scala_settings.xml") match {
+        .find(_.getName == "scala_settings.xml") match
         case Some(file) =>
           import com.intellij.conversion.impl.ConversionContextImpl
-          context match {
+          context match
             case context: ConversionContextImpl =>
               val settings = new ComponentManagerSettingsImpl(file, context) {}
               val children = settings.getRootElement.getChildren
               import scala.collection.JavaConversions._
-              children.find(_.getName == "component") match {
+              children.find(_.getName == "component") match
                 case Some(componentChild) =>
-                  componentChild.getChildren.filter { elem =>
+                  componentChild.getChildren.filter  elem =>
                     elem.getName == "option" &&
                     elem.getAttribute("name") != null &&
                     actualSettingsSet.contains(
                         elem.getAttribute("name").getValue)
-                  }
                 case None => Seq.empty
-              }
             case _ => Seq.empty
-          }
         case _ => Seq.empty
-      }
-    }
 
-    new ProjectConverter {
-      override def isConversionNeeded: Boolean = {
+    new ProjectConverter
+      override def isConversionNeeded: Boolean =
         import com.intellij.openapi.components.StorageScheme
         if (context.getStorageScheme == StorageScheme.DEFAULT) return false
         getElements.nonEmpty
-      }
 
-      override def getAdditionalAffectedFiles: util.Collection[File] = {
+      override def getAdditionalAffectedFiles: util.Collection[File] =
         context.getSettingsBaseDir
           .listFiles()
-          .find(_.getName == "codeStyleSettings.xml") match {
+          .find(_.getName == "codeStyleSettings.xml") match
           case Some(file) => Collections.singleton(file)
           case None => Collections.emptyList()
-        }
-      }
 
-      override def processingFinished(): Unit = {
+      override def processingFinished(): Unit =
         context.getSettingsBaseDir
           .listFiles()
-          .find(_.getName == "codeStyleSettings.xml") match {
+          .find(_.getName == "codeStyleSettings.xml") match
           case Some(file) =>
-            context match {
+            context match
               case context: ConversionContextImpl =>
                 val settings =
                   new ComponentManagerSettingsImpl(file, context) {}
                 val root = settings.getRootElement
-                for {
+                for
                   component <- Option(root.getChild("component"))
                   option <- Option(component.getChild("option"))
                   value <- Option(option.getChild("value"))
-                } {
+                
                   var settingsValue = value.getChild("ScalaCodeStyleSettings")
-                  if (settingsValue == null) {
+                  if (settingsValue == null)
                     settingsValue = new Element("ScalaCodeStyleSettings")
                     value.addContent(settingsValue)
-                  }
                   getElements.foreach(
                       elem => settingsValue.addContent(elem.clone()))
-                }
                 JDOMUtil.writeDocument(new Document(root.clone()),
                                        file,
                                        SystemProperties.getLineSeparator)
-            }
           case _ =>
-        }
-      }
-    }
-  }
-}

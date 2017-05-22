@@ -45,7 +45,7 @@ object AnimationIncludes extends AnimationIncludes
   * @define GENERATE Generates a ScalaFX
   * @define FROM from its JavaFX counterparty.
   */
-trait AnimationIncludes {
+trait AnimationIncludes
 
   /**
     *
@@ -115,9 +115,8 @@ trait AnimationIncludes {
     */
   implicit def sfxFunction2jfxInterpolatable[T](
       f: ((T, Double) => T)): jfxa.Interpolatable[T] =
-    new jfxa.Interpolatable[T] {
+    new jfxa.Interpolatable[T]
       def interpolate(endValue: T, t: Double): T = f(endValue, t)
-    }
 
   /**
     * $GENERATE `Animation` $FROM
@@ -234,4 +233,3 @@ trait AnimationIncludes {
   implicit def jfxTranslateTransition2sfx(
       v: jfxa.TranslateTransition): TranslateTransition =
     if (v != null) new TranslateTransition(v) else null
-}

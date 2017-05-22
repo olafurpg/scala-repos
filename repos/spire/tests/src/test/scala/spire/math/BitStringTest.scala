@@ -7,13 +7,13 @@ import org.scalacheck.Arbitrary._
 import spire.implicits._
 import spire.tests._
 
-class BitStringTest extends SpireTests {
+class BitStringTest extends SpireTests
 
   case class I[A : BitString](
       b: A, bc: Int, hob: A, lob: A, nlz: Int, ntz: Int)
 
   def testCases[A : BitString](cases: List[I[A]]): Unit =
-    cases.foreach { expected =>
+    cases.foreach  expected =>
       val b = expected.b
       val found = I(
           b,
@@ -24,9 +24,8 @@ class BitStringTest extends SpireTests {
           b.numberOfTrailingZeros
       )
       found shouldBe expected
-    }
 
-  test("BitString[Byte]") {
+  test("BitString[Byte]")
     import spire.syntax.literals._
     testCases(
         I(b"0", 0, b"0", b"0", 8, 8) :: I(b"7", 3, b"4", b"1", 5, 0) :: I(
@@ -38,9 +37,8 @@ class BitStringTest extends SpireTests {
             1) :: I(b"127", 7, b"64", b"1", 1, 0) :: I(
             b"-128", 1, b"-128", b"-128", 0, 7) :: I(
             b"-1", 8, b"-128", b"1", 0, 0) :: Nil)
-  }
 
-  test("BitString[Short]") {
+  test("BitString[Short]")
     import spire.syntax.literals._
     testCases(
         I(h"0", 0, h"0", h"0", 16, 16) :: I(h"7", 3, h"4", h"1", 13, 0) :: I(
@@ -57,9 +55,8 @@ class BitStringTest extends SpireTests {
             h"32767", 15, h"16384", h"1", 1, 0) :: I(
             h"-32768", 1, h"-32768", h"-32768", 0, 15) :: I(
             h"-1", 16, h"32768", h"1", 0, 0) :: Nil)
-  }
 
-  test("BitString[Int]") {
+  test("BitString[Int]")
     testCases(I(0, 0, 0, 0, 32, 32) :: I(7, 3, 4, 1, 29, 0) :: I(
             62, 5, 32, 2, 26, 1) :: I(127, 7, 64, 1, 25, 0) :: I(
             128, 1, 128, 128, 24, 7) :: I(255, 8, 128, 1, 24, 0) :: I(
@@ -74,9 +71,8 @@ class BitStringTest extends SpireTests {
             2147483647, 31, 1073741824, 1, 1, 0) :: I(
             -2147483648, 1, -2147483648, -2147483648, 0, 31) :: I(
             -1, 32, -2147483648, 1, 0, 0) :: Nil)
-  }
 
-  test("BitString[Long]") {
+  test("BitString[Long]")
     testCases(
         I(0L, 0, 0L, 0L, 64, 64) :: I(7L, 3, 4L, 1L, 61, 0) :: I(
             62L, 5, 32L, 2L, 58, 1) :: I(127L, 7, 64L, 1L, 57, 0) :: I(
@@ -102,7 +98,6 @@ class BitStringTest extends SpireTests {
                                                                    1L,
                                                                    32,
                                                                    0) :: Nil)
-  }
 
   def ls[A : BitString](n: A, i: Int): A = n << i
   def rs[A : BitString](n: A, i: Int): A = n >>> i
@@ -111,7 +106,7 @@ class BitStringTest extends SpireTests {
   def eval[A](n: A)(f: (A, Int) => A): List[A] =
     List(f(n, 0), f(n, 1), f(n, 3), f(n, 4), f(n, 7))
 
-  test("byte shifting") {
+  test("byte shifting")
     import spire.syntax.literals._
 
     eval(b"1")(ls) shouldBe List(b"1", b"2", b"8", b"16", b"-128")
@@ -133,19 +128,14 @@ class BitStringTest extends SpireTests {
     eval(b"-128")(ls) shouldBe List(b"-128", b"0", b"0", b"0", b"0")
     eval(b"-128")(rs) shouldBe List(b"-128", b"64", b"16", b"8", b"1")
     eval(b"-128")(srs) shouldBe List(b"-128", b"-64", b"-16", b"-8", b"-1")
-  }
-}
 
-class BitStringCheck extends SpireProperties {
-  property("operator mappings") {
+class BitStringCheck extends SpireProperties
+  property("operator mappings")
     def byOp[A : BitString](n: A, i: Int): List[A] =
       List(n << i, n >>> i, n >> i)
 
     def byName[A](n: A, i: Int)(implicit bs: BitString[A]): List[A] =
       List(bs.leftShift(n, i), bs.rightShift(n, i), bs.signedRightShift(n, i))
 
-    forAll { (n: Byte, i: Int) =>
+    forAll  (n: Byte, i: Int) =>
       byOp(n, i) shouldBe byName(n, i)
-    }
-  }
-}

@@ -13,7 +13,7 @@ import org.jetbrains.sbt.project.settings._
 class SbtExternalSystemConfigurable(project: Project)
     extends AbstractExternalSystemConfigurable[
         SbtProjectSettings, SbtProjectSettingsListener, SbtSystemSettings](
-        project, SbtProjectSystem.Id) {
+        project, SbtProjectSystem.Id)
 
   def createProjectSettingsControl(settings: SbtProjectSettings) =
     new SbtProjectSettingsControl(Configuration, settings)
@@ -26,4 +26,3 @@ class SbtExternalSystemConfigurable(project: Project)
   def getId = "sbt.project.settings.configurable"
 
   def getHelpTopic = null
-}

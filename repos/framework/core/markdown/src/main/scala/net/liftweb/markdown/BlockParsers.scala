@@ -31,7 +31,7 @@ import util.parsing.combinator.{Parsers, RegexParsers}
   * A parser for the markdown language.
   * Works on pre-parsed lines that can be created by a LineParser.
   */
-trait BlockParsers extends Parsers {
+trait BlockParsers extends Parsers
   type Elem = MarkdownLine
   //why does this not allow us to access the lookup map in the lookup parser?
   //override type Input  = MarkdownLineReader
@@ -51,7 +51,7 @@ trait BlockParsers extends Parsers {
 
   /** A markdown block element.
     */
-  sealed abstract class MarkdownBlock extends InlineParsers {
+  sealed abstract class MarkdownBlock extends InlineParsers
     override def deco = BlockParsers.this.deco
 
     /** adds the resulting xhtml snippet to the given string builder
@@ -60,12 +60,10 @@ trait BlockParsers extends Parsers {
 
     /** returns the resulting xhtml snippet as a string
       */
-    def result(): String = {
+    def result(): String =
       val sb = new StringBuilder
       addResult(0, sb)
       sb.toString
-    }
-  }
 
   //////////////////////////
   // non-recursive blocks //
@@ -74,81 +72,69 @@ trait BlockParsers extends Parsers {
   /**:?
     * Represents a block of verbatim xml
     */
-  class VerbatimXml(line: XmlChunk) extends MarkdownBlock {
+  class VerbatimXml(line: XmlChunk) extends MarkdownBlock
     def addResult(level: Int, out: StringBuilder) { out.append(line.content) }
-  }
 
   /**
     * Represents a horizontal ruler
     */
-  object Ruler extends MarkdownBlock {
-    def addResult(level: Int, out: StringBuilder) {
+  object Ruler extends MarkdownBlock
+    def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateRuler)
-    }
-  }
 
   /**
     * Represents a header
     */
   case class Header(
       content: String, headerLevel: Int, lookup: Map[String, LinkDefinition])
-      extends MarkdownBlock {
-    def addResult(level: Int, out: StringBuilder) {
+      extends MarkdownBlock
+    def addResult(level: Int, out: StringBuilder)
       out
         .append(indent(level))
         .append(deco.decorateHeaderOpen(headerLevel))
         .append(applyInline(content, lookup))
         .append(indent(level))
         .append(deco.decorateHeaderClose(headerLevel))
-    }
-  }
 
   /**
     * Represents a block of verbatim qouted code
     */
-  class CodeBlock(lines: List[MarkdownLine]) extends MarkdownBlock {
-    def addResult(level: Int, out: StringBuilder) {
+  class CodeBlock(lines: List[MarkdownLine]) extends MarkdownBlock
+    def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateCodeBlockOpen)
-      for (line <- lines) {
+      for (line <- lines)
         val escaped = escapeXml(line.payload)
         out.append(escaped).append('\n')
         //out.append(line.content)
-      }
       out.append(indent(level)).append(deco.decorateCodeBlockClose)
-    }
-  }
 
   class FencedCodeBlock(language: String, lines: List[MarkdownLine])
-      extends MarkdownBlock {
-    def addResult(level: Int, out: StringBuilder) {
+      extends MarkdownBlock
+    def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateCodeBlockOpen)
-      for (line <- lines) {
+      for (line <- lines)
         val escaped = escapeXml(line.fullLine)
         out.append(escaped).append('\n')
         //out.append(line.content)
-      }
       out.append(indent(level)).append(deco.decorateCodeBlockClose)
-    }
-  }
 
   /**
     * Represents a paragraph of text
     */
   class Paragraph(
       lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
-      extends MarkdownBlock {
+      extends MarkdownBlock
 
-    def addResult(level: Int, out: StringBuilder) {
+    def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateParagraphOpen)
       addResultPlain(level, out)
       out.append(indent(level)).append(deco.decorateParagraphClose)
-    }
 
     /**
       * Adds the result without any decoration, (no wrapping tags)
       * Used for building list items that don't have their content wrappend in paragraphs
       */
-    def addResultPlain(level: Int, out: StringBuilder) {
+    def addResultPlain(level: Int, out: StringBuilder)
 
       val temp = new StringBuilder()
       lines.foreach(
@@ -161,8 +147,6 @@ trait BlockParsers extends Parsers {
       //drop last newline so paragraph closing tag ends the line
       if (!out.isEmpty && out.charAt(out.length - 1) == '\n')
         out.deleteCharAt(out.length - 1)
-    }
-  }
 
   //////////////////////
   // recursive blocks //
@@ -173,8 +157,8 @@ trait BlockParsers extends Parsers {
     */
   class Blockquote(
       lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
-      extends MarkdownBlock {
-    def addResult(level: Int, out: StringBuilder) {
+      extends MarkdownBlock
+    def addResult(level: Int, out: StringBuilder)
       //the block parser needs to recurse:
       val innerLines = lines.map(line => line.payload)
       val reader =
@@ -185,8 +169,6 @@ trait BlockParsers extends Parsers {
       out.append(indent(level)).append(deco.decorateBlockQuoteOpen)
       innerBlocks.foreach(block => block.addResult(level + 1, out))
       out.append(indent(level)).append(deco.decorateBlockQuoteClose)
-    }
-  }
 
   /**
     * Helper class to build lists. Allows easy checking if an item ends with empty lines and
@@ -194,11 +176,11 @@ trait BlockParsers extends Parsers {
     */
   class ListItem(
       val lines: List[MarkdownLine], lookup: Map[String, LinkDefinition])
-      extends LineParsers {
+      extends LineParsers
     def endsWithNewline =
       lines.size > 1 && (lines.last.isInstanceOf[EmptyLine])
 
-    def addResult(level: Int, out: StringBuilder, paragraph_? : Boolean) {
+    def addResult(level: Int, out: StringBuilder, paragraph_? : Boolean)
       out.append(indent(level)).append(deco.decorateItemOpen)
       //the block parser needs to recurse:
       val innerLines = lines.map(line => line.payload)
@@ -206,19 +188,16 @@ trait BlockParsers extends Parsers {
         BlockParsers.this.tokenizer.innerTokenize(innerLines, lookup)
       //now apply the normal markdown parser to the new content
       val innerBlocks = BlockParsers.this.applyBlocks(reader)
-      innerBlocks match {
+      innerBlocks match
         case (p: Paragraph) :: Nil if (!paragraph_?) =>
           p.addResultPlain(level + 1, out)
         case _ => innerBlocks.foreach(block => block.addResult(level + 1, out))
-      }
       out.append(indent(level)).append(deco.decorateItemClose)
-    }
-  }
 
   /**
     * Base class for ordered and unordered lists, allows for correct handling of paragraphs in lists.
     */
-  abstract class ListBlock(items: List[ListItem]) extends MarkdownBlock {
+  abstract class ListBlock(items: List[ListItem]) extends MarkdownBlock
 
     /**
       * This method recursively goes through the given list and adds the items contents.
@@ -229,43 +208,35 @@ trait BlockParsers extends Parsers {
       */
     protected def addResult(
         level: Int, out: StringBuilder, list: List[ListItem]): Unit =
-      list match {
-        case last :: current :: rest => {
+      list match
+        case last :: current :: rest =>
             current.addResult(level + 1, out, last.endsWithNewline)
             addResult(level, out, current :: rest)
-          }
         case _ => {} //end of recursion, list with one item or less
-      }
 
     /**
       * calls recursive handling of nested items
       */
-    def addResult(level: Int, out: StringBuilder) {
+    def addResult(level: Int, out: StringBuilder)
       addResult(level, out, items.head :: items)
-    }
-  }
 
   /**
     * An ordered (i.e. numbered) list of items.
     */
-  class OList(items: List[ListItem]) extends ListBlock(items) {
-    override def addResult(level: Int, out: StringBuilder) {
+  class OList(items: List[ListItem]) extends ListBlock(items)
+    override def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateOListOpen)
       super.addResult(level, out)
       out.append(indent(level)).append(deco.decorateOListClose)
-    }
-  }
 
   /**
     * An unordered list of items.
     */
-  class UList(items: List[ListItem]) extends ListBlock(items) {
-    override def addResult(level: Int, out: StringBuilder) {
+  class UList(items: List[ListItem]) extends ListBlock(items)
+    override def addResult(level: Int, out: StringBuilder)
       out.append(indent(level)).append(deco.decorateUListOpen)
       super.addResult(level, out)
       out.append(indent(level)).append(deco.decorateUListClose)
-    }
-  }
 
   /////////////////////////////////////////////////////////////
   //////////////// helpers                /////////////////////
@@ -274,27 +245,24 @@ trait BlockParsers extends Parsers {
   /**
     * Parses a line of the given type T
     */
-  def line[T](c: Class[T]): Parser[T] = Parser { in =>
+  def line[T](c: Class[T]): Parser[T] = Parser  in =>
     if (in.first.getClass == c) Success(in.first.asInstanceOf[T], in.rest)
     else Failure("Not a fitting line.", in)
-  }
 
   /** 
     * Parses a line of any type *but* T
     */
-  def notLine[T](c: Class[T]): Parser[MarkdownLine] = Parser { in =>
+  def notLine[T](c: Class[T]): Parser[MarkdownLine] = Parser  in =>
     if (in.atEnd) Failure("At end of input.", in)
     else if (in.first.getClass == c) Failure("Not a fitting line.", in)
     else Success(in.first, in.rest)
-  }
 
   /**
     * Parses any line.
     */
-  def anyLine: Parser[MarkdownLine] = Parser { in =>
+  def anyLine: Parser[MarkdownLine] = Parser  in =>
     if (in.atEnd) Failure("End of input reached.", in)
     else Success(in.first, in.rest)
-  }
 
   def emptyLine: Parser[EmptyLine] = line(classOf[EmptyLine])
 
@@ -309,24 +277,21 @@ trait BlockParsers extends Parsers {
   /** returns the current link lookup from the reader
     * always succeeds, never consumes input
     */
-  def lookup: Parser[Map[String, LinkDefinition]] = Parser { in =>
+  def lookup: Parser[Map[String, LinkDefinition]] = Parser  in =>
     //why is the instanceof necessary? re-declaring type Input above does not change anything :(
     Success(in.asInstanceOf[MarkdownLineReader].lookup, in)
-  }
 
   ///////////////////
   // Block parsers //
   ///////////////////
 
-  def atxHeader: Parser[Header] = line(classOf[AtxHeaderLine]) ~ lookup ^^ {
+  def atxHeader: Parser[Header] = line(classOf[AtxHeaderLine]) ~ lookup ^^
     case l ~ lu => new Header(l.trimHashes, l.headerLevel, lu)
-  }
 
   def setExtHeader: Parser[Header] =
-    not(emptyLine) ~> anyLine ~ line(classOf[SetExtHeaderLine]) ~ lookup ^^ {
+    not(emptyLine) ~> anyLine ~ line(classOf[SetExtHeaderLine]) ~ lookup ^^
       case l ~ setext ~ lu =>
         new Header(l.fullLine.trim, setext.headerLevel, lu)
-    }
 
   /** parses a horizontal ruler
     */
@@ -335,17 +300,15 @@ trait BlockParsers extends Parsers {
 
   /** parses a verbatim xml block
     */
-  def verbatimXml: Parser[VerbatimXml] = line(classOf[XmlChunk]) ^^ {
+  def verbatimXml: Parser[VerbatimXml] = line(classOf[XmlChunk]) ^^
     new VerbatimXml(_)
-  }
 
   /** parses a code block
     */
   def codeBlock: Parser[CodeBlock] =
-    line(classOf[CodeLine]) ~ ((optEmptyLines ~ line(classOf[CodeLine])) *) ^^ {
+    line(classOf[CodeLine]) ~ ((optEmptyLines ~ line(classOf[CodeLine])) *) ^^
       case l ~ pairs =>
         new CodeBlock(l :: pairs.map({ case (a ~ b) => a ++ List(b) }).flatten)
-    }
 
   /**
     * Parses a fenced code block: a line starting a fenced code block with 
@@ -357,11 +320,10 @@ trait BlockParsers extends Parsers {
     */
   def fencedCodeBlock: Parser[FencedCodeBlock] =
     (line(classOf[ExtendedFencedCode]) | line(classOf[FencedCode])) ~
-    (notLine(classOf[FencedCode]) *) ~ opt(line(classOf[FencedCode])) ^^ {
+    (notLine(classOf[FencedCode]) *) ~ opt(line(classOf[FencedCode])) ^^
       case (start: ExtendedFencedCode) ~ lines ~ _ =>
         new FencedCodeBlock(start.languageFormat, lines)
       case _ ~ lines ~ _ => new FencedCodeBlock("", lines)
-    }
 
   //line(classOf[FencedCodeStart]) ~ 
   //((not(line(classOf[FencedCodeEnd]))*) ~ 
@@ -372,9 +334,8 @@ trait BlockParsers extends Parsers {
   /** a consecutive block of paragraph lines
     *  returns the content of the matched block wrapped in <p> tags
     */
-  def paragraph: Parser[Paragraph] = lookup ~ (line(classOf[OtherLine]) +) ^^ {
+  def paragraph: Parser[Paragraph] = lookup ~ (line(classOf[OtherLine]) +) ^^
     case lu ~ ls => new Paragraph(ls, lu)
-  }
 
   /**
     * Parses a blockquote fragment: a block starting with a blockquote line followed
@@ -383,18 +344,16 @@ trait BlockParsers extends Parsers {
   def blockquoteFragment: Parser[List[MarkdownLine]] =
     line(classOf[BlockQuoteLine]) ~
     ((line(classOf[BlockQuoteLine]) | line(classOf[OtherLine])) *) ~
-    (optEmptyLines) ^^ {
+    (optEmptyLines) ^^
       case l ~ ls ~ e => (l :: ls ++ e)
-    }
 
   /**
     * Parses a quoted block. A quoted block starts with a line starting with "> "
     * followed by more blockquote lines, paragraph lines following blockqoute lines
     * and may be interspersed with empty lines
     */
-  def blockquote: Parser[Blockquote] = lookup ~ (blockquoteFragment +) ^^ {
+  def blockquote: Parser[Blockquote] = lookup ~ (blockquoteFragment +) ^^
     case lu ~ fs => new Blockquote(fs.flatten, lu)
-  }
 
   /**
     * parses a list of lines that may make up the body of a list item
@@ -408,23 +367,20 @@ trait BlockParsers extends Parsers {
     * lines followed by empty lines
     */
   def itemContinuation: Parser[List[MarkdownLine]] =
-    optEmptyLines ~ line(classOf[CodeLine]) ~ itemLines ^^ {
+    optEmptyLines ~ line(classOf[CodeLine]) ~ itemLines ^^
       case e ~ c ~ cs => e ++ (c :: cs)
-    }
 
   /**parses an item in an unsorted list
     */
   def uItem: Parser[ListItem] =
-    lookup ~ line(classOf[UItemStartLine]) ~ itemLines ~ (itemContinuation *) ~ optEmptyLines ^^ {
+    lookup ~ line(classOf[UItemStartLine]) ~ itemLines ~ (itemContinuation *) ~ optEmptyLines ^^
       case lu ~ s ~ ls ~ cs ~ e => new ListItem(s :: ls ++ cs.flatten ++ e, lu)
-    }
 
   /**parses an item in a sorted list
     */
   def oItem: Parser[ListItem] =
-    lookup ~ line(classOf[OItemStartLine]) ~ itemLines ~ (itemContinuation *) ~ optEmptyLines ^^ {
+    lookup ~ line(classOf[OItemStartLine]) ~ itemLines ~ (itemContinuation *) ~ optEmptyLines ^^
       case lu ~ s ~ ls ~ cs ~ e => new ListItem(s :: ls ++ cs.flatten ++ e, lu)
-    }
 
   /** parses an unordered list
     */
@@ -447,11 +403,11 @@ trait BlockParsers extends Parsers {
   /**
     * speed up block processing by looking ahead
     */
-  def fastBlock: Parser[MarkdownBlock] = Parser { in =>
-    if (in.atEnd) {
+  def fastBlock: Parser[MarkdownBlock] = Parser  in =>
+    if (in.atEnd)
       Failure("End of Input.", in)
-    } else {
-      in.first match {
+    else
+      in.first match
         case l: AtxHeaderLine => atxHeader(in)
         case l: RulerLine => ruler(in)
         //setext headers have been processed before we are called, so this is safe
@@ -463,9 +419,6 @@ trait BlockParsers extends Parsers {
         case l: OItemStartLine => oList(in)
         case l: UItemStartLine => uList(in)
         case _ => paragraph(in)
-      }
-    }
-  }
 
   /**
     * parses inner blocks (everything excluding xml)
@@ -480,14 +433,12 @@ trait BlockParsers extends Parsers {
 
   /** Generic apply method to run one of our pasers on the given input.
     */
-  def apply[T](p: Parser[T], in: MarkdownLineReader): T = {
-    phrase(p)(in) match {
+  def apply[T](p: Parser[T], in: MarkdownLineReader): T =
+    phrase(p)(in) match
       case Success(t, _) => t
       case e: NoSuccess =>
         throw new IllegalArgumentException(
             "Could not parse '" + in + "': " + e)
-    }
-  }
 
   /** parses all blocks from the given reader
     */
@@ -501,15 +452,11 @@ trait BlockParsers extends Parsers {
 
   /** Parses the given input as a markdown document and returns the string result
     */
-  def apply(in: MarkdownLineReader): String = {
-    phrase(markdown)(in) match {
-      case Success(bs, _) => {
+  def apply(in: MarkdownLineReader): String =
+    phrase(markdown)(in) match
+      case Success(bs, _) =>
           val builder = new StringBuilder()
           bs.foreach(block => block.addResult(0, builder))
           builder.toString
-        }
       case e: NoSuccess =>
         throw new IllegalArgumentException("Could not parse " + in + ": " + e)
-    }
-  }
-}

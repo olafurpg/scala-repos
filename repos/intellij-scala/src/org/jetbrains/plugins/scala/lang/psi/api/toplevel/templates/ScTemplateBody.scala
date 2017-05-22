@@ -15,7 +15,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef._
   * Date: 22.02.2008
   * Time: 9:38:36
   */
-trait ScTemplateBody extends ScalaPsiElement with ScControlFlowOwner {
+trait ScTemplateBody extends ScalaPsiElement with ScControlFlowOwner
   def members: Array[ScMember]
 
   def holders: Array[ScDeclaredElementsHolder]
@@ -29,4 +29,3 @@ trait ScTemplateBody extends ScalaPsiElement with ScControlFlowOwner {
   def exprs: Array[ScExpression]
 
   def selfTypeElement: Option[ScSelfTypeElement]
-}

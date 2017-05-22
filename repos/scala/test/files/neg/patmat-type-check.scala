@@ -1,4 +1,4 @@
-object Test {
+object Test
   def s1 = "bob".toList match { case Seq('b', 'o', 'b') => true } // list ok
 
   // not final, allowed
@@ -11,9 +11,8 @@ object Test {
 
   // contravariance, allowed
   final class Bop5[T, U, -V]
-  def s4[T1, T2](x: Bop5[_, T1, T2]) = x match {
+  def s4[T1, T2](x: Bop5[_, T1, T2]) = x match
     case Seq('b', 'o', 'b') => true
-  }
 
   // free type parameter, allowed
   final class Bop3[T]
@@ -29,4 +28,3 @@ object Test {
 
   // final, invariant type parameter, should be disallowed
   def f4[T](x: Bop3[Char]) = x match { case Seq('b', 'o', 'b') => true } // fail
-}

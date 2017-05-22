@@ -11,12 +11,11 @@ class CompilingEvaluatorTest
 class CompilingEvaluatorTest_212
     extends CompilingEvaluatorTestBase with ScalaVersion_2_12
 
-abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
+abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     super.setUp()
     CompileServerLauncher.ensureServerRunning(getProject)
-  }
 
   addFileWithBreakpoints("SimplePlace.scala",
                          s"""
@@ -34,7 +33,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
       |}
     """.stripMargin.trim)
 
-  def testSimplePlace(): Unit = {
+  def testSimplePlace(): Unit =
     evaluateCodeFragments(
         "Seq(i, x).map(z => z * z).mkString(\", \")" -> "9, 1",
         """val result = for (z <- Seq(3, 4)) yield z * z
@@ -55,7 +54,6 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
         |AAA("a", 1).toString
       """ -> "AAA(a,1)"
     )
-  }
 
   addFileWithBreakpoints("InForStmt.scala",
                          s"""
@@ -70,7 +68,7 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim)
-  def testInForStmt(): Unit = {
+  def testInForStmt(): Unit =
     evaluateCodeFragments(
         "Seq(x, 2).map(z => z * z).mkString(\", \")" -> "4, 4",
         """def sqr(x: Int) = x * x
@@ -79,7 +77,6 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
         |a + b
       """ -> "145"
     )
-  }
 
   addFileWithBreakpoints("InConstructor.scala",
                          s"""
@@ -96,12 +93,11 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
       |  }
       |}
     """.stripMargin.trim)
-  def testInConstructor(): Unit = {
+  def testInConstructor(): Unit =
     evaluateCodeFragments(
         "None.getOrElse(a)" -> "a",
         "foo().map(_.toUpper)" -> "FOO"
     )
-  }
 
   addFileWithBreakpoints("AddBraces.scala",
                          s"""
@@ -113,12 +109,10 @@ abstract class CompilingEvaluatorTestBase extends ScalaDebuggerTestCase {
     |  def foo(): String = "foo"$bp
     |}
   """.stripMargin.trim)
-  def testAddBraces(): Unit = {
+  def testAddBraces(): Unit =
     evaluateCodeFragments(
         "None.getOrElse(foo())" -> "foo",
         """def bar = "bar"
         |foo() + bar
       """ -> "foobar"
     )
-  }
-}

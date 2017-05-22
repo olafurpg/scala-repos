@@ -11,7 +11,7 @@ import play.api.{PlayException, Mode, Environment, Configuration}
 import play.api.i18n.Messages.MessageSource
 import play.core.test.FakeRequest
 
-object MessagesSpec extends Specification {
+object MessagesSpec extends Specification
   val testMessages = Map(
       "default" -> Map("title" -> "English Title",
                        "foo" -> "English foo",
@@ -22,19 +22,17 @@ object MessagesSpec extends Specification {
       new Environment(new File("."), this.getClass.getClassLoader, Mode.Dev),
       Configuration.reference,
       new DefaultLangs(Configuration.reference ++ Configuration.from(
-              Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH"))))) {
+              Map("play.i18n.langs" -> Seq("en", "fr", "fr-CH")))))
     override protected def loadAllMessages = testMessages
-  }
 
-  def translate(msg: String, lang: String, reg: String): Option[String] = {
+  def translate(msg: String, lang: String, reg: String): Option[String] =
     api.translate(msg, Nil)(Lang(lang, reg))
-  }
 
   def isDefinedAt(msg: String, lang: String, reg: String): Boolean =
     api.isDefinedAt(msg)(Lang(lang, reg))
 
-  "MessagesApi" should {
-    "fall back to less specific translation" in {
+  "MessagesApi" should
+    "fall back to less specific translation" in
       // Direct lookups
       translate("title", "fr", "CH") must be equalTo Some("Titre suisse")
       translate("title", "fr", "") must be equalTo Some("Titre francais")
@@ -58,9 +56,8 @@ object MessagesSpec extends Specification {
       // Missing translation
       translate("garbled", "fr", "CH") must be equalTo None
       isDefinedAt("garbled", "fr", "CH") must be equalTo false
-    }
 
-    "support setting the language on a result" in {
+    "support setting the language on a result" in
       val cookie = Cookies
         .decodeSetCookieHeader(api
               .setLang(Results.Ok, Lang("en-AU"))
@@ -69,39 +66,32 @@ object MessagesSpec extends Specification {
         .head
       cookie.name must_== "PLAY_LANG"
       cookie.value must_== "en-AU"
-    }
 
-    "support getting a preferred lang from a Scala request" in {
-      "when an accepted lang is available" in {
+    "support getting a preferred lang from a Scala request" in
+      "when an accepted lang is available" in
         api
           .preferred(FakeRequest().withHeaders("Accept-Language" -> "fr"))
           .lang must_== Lang("fr")
-      }
-      "when an accepted lang is not available" in {
+      "when an accepted lang is not available" in
         api
           .preferred(FakeRequest().withHeaders("Accept-Language" -> "de"))
           .lang must_== Lang("en")
-      }
-      "when the lang cookie available" in {
+      "when the lang cookie available" in
         api
           .preferred(FakeRequest().withCookies(Cookie("PLAY_LANG", "fr")))
           .lang must_== Lang("fr")
-      }
-      "when the lang cookie is not available" in {
+      "when the lang cookie is not available" in
         api
           .preferred(FakeRequest().withCookies(Cookie("PLAY_LANG", "de")))
           .lang must_== Lang("en")
-      }
-      "when a cookie and an acceptable lang are available" in {
+      "when a cookie and an acceptable lang are available" in
         api
           .preferred(FakeRequest()
                 .withCookies(Cookie("PLAY_LANG", "fr"))
                 .withHeaders("Accept-Language" -> "en"))
           .lang must_== Lang("fr")
-      }
-    }
 
-    "report error for invalid lang" in {
+    "report error for invalid lang" in
       new DefaultMessagesApi(
           new Environment(new File("."),
                           this.getClass.getClassLoader,
@@ -110,8 +100,6 @@ object MessagesSpec extends Specification {
           new DefaultLangs(Configuration.reference ++ Configuration.from(
                   Map("play.i18n.langs" -> Seq("invalid_language"))))) must throwA[
           PlayException]
-    }
-  }
 
   val testMessageFile = """
 # this is a comment
@@ -127,12 +115,12 @@ backslash.dummy=\a\b\c\e\f
 
 """
 
-  "MessagesPlugin" should {
-    "parse file" in {
+  "MessagesPlugin" should
+    "parse file" in
 
-      val parser = new Messages.MessagesParser(new MessageSource {
+      val parser = new Messages.MessagesParser(new MessageSource
         def read = testMessageFile
-      }, "messages")
+      , "messages")
 
       val messages =
         parser.parse.right.toSeq.flatten.map(x => x.key -> x.pattern).toMap
@@ -144,6 +132,3 @@ backslash.dummy=\a\b\c\e\f
       messages("multiline.inline") must ===("line1\nline2")
       messages("backslash.escape") must ===("\\")
       messages("backslash.dummy") must ===("\\a\\b\\c\\e\\f")
-    }
-  }
-}

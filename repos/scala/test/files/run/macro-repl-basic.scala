@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
     |import language.experimental.macros
@@ -37,4 +37,3 @@ object Test extends ReplTest {
     |import Macros.Shmacros._
     |println(foo(2) + Macros.bar(2) * new Macros().quux(4))
     |""".stripMargin
-}

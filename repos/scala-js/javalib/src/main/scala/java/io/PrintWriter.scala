@@ -3,7 +3,7 @@ package java.io
 import java.util.Formatter
 
 class PrintWriter(protected[io] var out: Writer, autoFlush: Boolean)
-    extends Writer {
+    extends Writer
 
   def this(out: Writer) = this(out, false)
 
@@ -31,35 +31,31 @@ class PrintWriter(protected[io] var out: Writer, autoFlush: Boolean)
   def flush(): Unit =
     ensureOpenAndTrapIOExceptions(out.flush())
 
-  def close(): Unit = trapIOExceptions {
-    if (!closed) {
+  def close(): Unit = trapIOExceptions
+    if (!closed)
       flush()
       closed = true
       out.close()
-    }
-  }
 
-  def checkError(): Boolean = {
-    if (closed) {
+  def checkError(): Boolean =
+    if (closed)
       /* Just check the error flag.
        * Common sense would tell us to look at the underlying writer's
        * checkError() result too (like we do in the not closed case below).
        * But the JDK does not behave like that. So we don't either.
        */
       errorFlag
-    } else {
+    else
       flush()
       /* If the underlying writer is also a PrintWriter, we also check its
        * checkError() result. This is not clearly specified by the JavaDoc,
        * but, experimentally, the JDK seems to behave that way.
        */
       errorFlag ||
-      (out match {
+      (out match
             case out: PrintWriter => out.checkError()
             case _ => false
-          })
-    }
-  }
+          )
 
   protected[io] def setError(): Unit = errorFlag = true
   protected[io] def clearError(): Unit = errorFlag = false
@@ -89,10 +85,9 @@ class PrintWriter(protected[io] var out: Writer, autoFlush: Boolean)
   def print(s: String): Unit = write(if (s == null) "null" else s)
   def print(obj: AnyRef): Unit = write(String.valueOf(obj))
 
-  def println(): Unit = {
+  def println(): Unit =
     write('\n') // In Scala.js the line separator is always LF
     if (autoFlush) flush()
-  }
 
   def println(b: Boolean): Unit = { print(b); println() }
   def println(c: Char): Unit = { print(c); println() }
@@ -110,41 +105,33 @@ class PrintWriter(protected[io] var out: Writer, autoFlush: Boolean)
   // Not implemented:
   //def printf(l: java.util.Locale, fmt: String, args: Array[Object]): PrintWriter = ???
 
-  def format(fmt: String, args: Array[Object]): PrintWriter = {
+  def format(fmt: String, args: Array[Object]): PrintWriter =
     new Formatter(this).format(fmt, args)
     if (autoFlush) flush()
     this
-  }
 
   // Not implemented:
   //def format(l: java.util.Locale, fmt: String, args: Array[Object]): PrintWriter = ???
 
-  override def append(csq: CharSequence): PrintWriter = {
+  override def append(csq: CharSequence): PrintWriter =
     super.append(csq)
     this
-  }
 
-  override def append(csq: CharSequence, start: Int, end: Int): PrintWriter = {
+  override def append(csq: CharSequence, start: Int, end: Int): PrintWriter =
     super.append(csq, start, end)
     this
-  }
 
-  override def append(c: Char): PrintWriter = {
+  override def append(c: Char): PrintWriter =
     super.append(c)
     this
-  }
 
-  @inline private[this] def trapIOExceptions(body: => Unit): Unit = {
-    try {
+  @inline private[this] def trapIOExceptions(body: => Unit): Unit =
+    try
       body
-    } catch {
+    catch
       case _: IOException => setError()
-    }
-  }
 
   @inline private[this] def ensureOpenAndTrapIOExceptions(
-      body: => Unit): Unit = {
+      body: => Unit): Unit =
     if (closed) setError()
     else trapIOExceptions(body)
-  }
-}

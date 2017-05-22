@@ -14,16 +14,15 @@ import akka.http.scaladsl.model.headers._
   * The model of an HTTP header. In its most basic form headers are simple name-value pairs. Header names
   * are compared in a case-insensitive way.
   */
-abstract class HttpHeader extends jm.HttpHeader with ToStringRenderable {
+abstract class HttpHeader extends jm.HttpHeader with ToStringRenderable
   def name: String
   def value: String
   def lowercaseName: String
   def is(nameInLowerCase: String): Boolean = lowercaseName == nameInLowerCase
   def isNot(nameInLowerCase: String): Boolean =
     lowercaseName != nameInLowerCase
-}
 
-object HttpHeader {
+object HttpHeader
 
   /**
     * Extract name and value from a header.
@@ -59,39 +58,34 @@ object HttpHeader {
             value: String,
             settings: HeaderParser.Settings = HeaderParser.DefaultSettings)
     : ParsingResult =
-    if (name.forall(CharacterClasses.tchar)) {
+    if (name.forall(CharacterClasses.tchar))
       import akka.parboiled2.Parser.DeliveryScheme.Try
       val parser = new HeaderParser(value, settings)
-      parser.`header-field-value`.run() match {
+      parser.`header-field-value`.run() match
         case Success(preProcessedValue) ⇒
-          try {
+          try
             HeaderParser.parseFull(
-                name.toLowerCase, preProcessedValue, settings) match {
+                name.toLowerCase, preProcessedValue, settings) match
               case Right(header) ⇒ ParsingResult.Ok(header, Nil)
               case Left(info) ⇒
                 val errors =
                   info.withSummaryPrepended(s"Illegal HTTP header '$name'") :: Nil
                 ParsingResult.Ok(RawHeader(name, preProcessedValue), errors)
-            }
-          } catch {
+          catch
             case HeaderParser.RuleNotFoundException ⇒
               ParsingResult.Ok(RawHeader(name, preProcessedValue), Nil)
-          }
         case Failure(error) ⇒
-          val info = error match {
+          val info = error match
             case e: ParseError ⇒ parser.parseError(e)
             case e ⇒ parser.failure(e)
-          }
           ParsingResult.Error(
               info.left.get.withSummaryPrepended(s"Illegal HTTP header value"))
-      }
-    } else ParsingResult.Error(ErrorInfo(s"Illegal HTTP header name", name))
+    else ParsingResult.Error(ErrorInfo(s"Illegal HTTP header name", name))
 
-  sealed trait ParsingResult {
+  sealed trait ParsingResult
     def errors: List[ErrorInfo]
-  }
 
-  object ParsingResult {
+  object ParsingResult
 
     /**
       * The parsing run produced a result. If there were parsing errors (which did not prevent the run from
@@ -103,8 +97,5 @@ object HttpHeader {
     /**
       * The parsing run failed due to a fatal parsing error.
       */
-    final case class Error(error: ErrorInfo) extends ParsingResult {
+    final case class Error(error: ErrorInfo) extends ParsingResult
       def errors = error :: Nil
-    }
-  }
-}

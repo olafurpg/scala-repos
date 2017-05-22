@@ -1,9 +1,6 @@
-class SimplePrivateAccess {
-  object A {
+class SimplePrivateAccess
+  object A
     private val x = 34
-  }
 
-  object B {
+  object B
     A. /* accessible: false */ x
-  }
-}

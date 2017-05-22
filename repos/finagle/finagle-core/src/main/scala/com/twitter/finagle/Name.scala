@@ -33,7 +33,7 @@ import com.twitter.finagle.util.Showable
   */
 sealed trait Name
 
-object Name {
+object Name
 
   /**
     * Path names comprise a [[com.twitter.finagle.Path Path]] denoting a
@@ -58,20 +58,18 @@ object Name {
       val id: Any,
       val path: com.twitter.finagle.Path
   )
-      extends Name with Proxy {
+      extends Name with Proxy
     def self = id
 
     // Workaround for https://issues.scala-lang.org/browse/SI-4807
     def canEqual(that: Any) = true
 
     def idStr: String =
-      id match {
+      id match
         case path: com.twitter.finagle.Path => path.show
         case _ => id.toString
-      }
-  }
 
-  object Bound {
+  object Bound
     def apply(
         addr: Var[Addr], id: Any, path: com.twitter.finagle.Path): Name.Bound =
       new Bound(addr, id, path)
@@ -85,19 +83,15 @@ object Name {
       * Create a singleton address, equal only to itself.
       */
     def singleton(addr: Var[Addr]): Name.Bound = Name.Bound(addr, new Object())
-  }
 
   // So that we can print NameTree[Name]
-  implicit val showable: Showable[Name] = new Showable[Name] {
-    def show(name: Name) = name match {
+  implicit val showable: Showable[Name] = new Showable[Name]
+    def show(name: Name) = name match
       case Path(path) => path.show
       case bound @ Bound(_) =>
-        bound.id match {
+        bound.id match
           case id: com.twitter.finagle.Path => id.show
           case id => id.toString
-        }
-    }
-  }
 
   /**
     * Create a pre-bound address.
@@ -119,29 +113,26 @@ object Name {
     * negative resolutions. A failed address is only returned if the Group
     * contains a [[SocketAddress]] that is not an [[InetSocketAddress]].
     */
-  def fromGroup(g: Group[SocketAddress]): Name.Bound = g match {
+  def fromGroup(g: Group[SocketAddress]): Name.Bound = g match
     case NameGroup(name) => name
     case group =>
-      Name.Bound({
+      Name.Bound(
         // Group doesn't support the abstraction of "not yet bound" so
         // this is a bit of a hack
         @volatile var first = true
 
-        group.set map {
+        group.set map
           case newSet if first && newSet.isEmpty => Addr.Pending
           case newSet =>
             first = false
-            newSet.foldLeft[Addr](Addr.Bound()) {
+            newSet.foldLeft[Addr](Addr.Bound())
               case (Addr.Bound(set, metadata), ia: InetSocketAddress) =>
                 Addr.Bound(set + Address(ia), metadata)
               case (Addr.Bound(_, _), sa) =>
                 Addr.Failed(new IllegalArgumentException(
                         s"Unsupported SocketAddress of type '${sa.getClass.getName}': $sa"))
               case (addr, _) => addr
-            }
-        }
-      }, group)
-  }
+      , group)
 
   /**
     * Create a path-based Name which is interpreted vis-à-vis
@@ -162,28 +153,25 @@ object Name {
   private[finagle] def all(names: Set[Name.Bound]): Name.Bound =
     if (names.isEmpty) empty
     else if (names.size == 1) names.head
-    else {
+    else
       val va =
-        Var.collect(names map (_.addr)) map {
-          case addrs if addrs.exists({
+        Var.collect(names map (_.addr)) map
+          case addrs if addrs.exists(
                 case Addr.Bound(_, _) => true; case _ => false
-              }) =>
-            val endpointAddrs = addrs.flatMap {
+              ) =>
+            val endpointAddrs = addrs.flatMap
               case Addr.Bound(as, _) => as
               case _ => Set.empty[Address]
-            }.toSet
+            .toSet
             Addr.Bound(endpointAddrs, Addr.Metadata.empty)
 
           case addrs if addrs.forall(_ == Addr.Neg) => Addr.Neg
-          case addrs if addrs.forall({
+          case addrs if addrs.forall(
                 case Addr.Failed(_) => true; case _ => false
-              }) =>
+              ) =>
             Addr.Failed(new Exception)
 
           case _ => Addr.Pending
-        }
 
       val id = names map { case bound @ Name.Bound(_) => bound.id }
       Name.Bound(va, id)
-    }
-}

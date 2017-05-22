@@ -15,7 +15,7 @@ import slick.relational.RelationalProfile
   * @see http://lampwww.epfl.ch/~odersky/papers/ScalableComponent.html
   */
 abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
-    extends GeneratorHelpers[Code, TermName, TypeName] { codegen =>
+    extends GeneratorHelpers[Code, TermName, TypeName]  codegen =>
   model.assertConsistency
 
   /** Enables DDL Generation. */
@@ -50,21 +50,20 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
     * @group Basic customization overrides
     * @param model corresponding Slick meta model component
     */
-  abstract case class TableDef(val model: m.Table) { table =>
+  abstract case class TableDef(val model: m.Table)  table =>
 
     /** Column code generators in the order they appear in the model. */
     final lazy val columnsPositional: IndexedSeq[Column] =
       model.columns.map(Column).toIndexedSeq
 
     /** Database column positions in the desired user-facing order. Currently just moves the positions of AutoInc columns to the end if autoIncLastAsOption is enabled. */
-    lazy val desiredColumnOrder: Seq[Int] = {
+    lazy val desiredColumnOrder: Seq[Int] =
       val withIndex = columnsPositional.zipWithIndex
       if (autoIncLastAsOption)
         // put auto inc column last
         (withIndex.filterNot(_._1.autoInc) ++ withIndex.filter(_._1.autoInc))
           .map(_._2)
       else withIndex.map(_._2)
-    }
 
     /** Column code generators in the desired user-facing order. */
     final lazy val columns: Seq[Column] =
@@ -137,7 +136,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /** Entity case class or type alias generator definition (Mapped case class holding a complete row of data of this table).
         @group Basic customization overrides */
-    trait EntityTypeDef extends TypeDef {
+    trait EntityTypeDef extends TypeDef
 
       /** Column types */
       def types: Code = compoundType(columns.map(_.exposedType))
@@ -145,14 +144,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       /** Indicated whether a case class should be generated. Otherwise a type alias. */
       def classEnabled = mappingEnabled
       def doc =
-        if (classEnabled) {
+        if (classEnabled)
           s"Entity class storing rows of table ${TableValue.name}\n" +
           columns.map(c => "@param " + c.name + " " + c.doc).mkString("\n")
-        } else {
+        else
           s"Row type of table ${TableValue.name}\n"
-        }
       def rawName: String = entityName(model.name.table)
-    }
 
     /** Plain SQL GetResult mapper generator virtual class */
     type PlainSqlMapper <: PlainSqlMapperDef
@@ -163,11 +160,10 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /** Plain SQL GetResult mapper generator definition 
         @group Basic customization overrides */
-    trait PlainSqlMapperDef extends TermDef {
+    trait PlainSqlMapperDef extends TermDef
       def doc =
         s"GetResult implicit for fetching ${EntityType.name} objects using plain SQL queries"
       def rawName: String = "GetResult" + EntityType.rawName
-    }
 
     /** Table class generator virtual class */
     type TableClass <: TableClassDef
@@ -178,7 +174,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /** Table class generator definition 
         @group Basic customization overrides */
-    trait TableClassDef extends TypeDef {
+    trait TableClassDef extends TypeDef
 
       /** The type of the elements this table yields. */
       def elementType: TypeName = EntityType.name
@@ -196,34 +192,31 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       /** Function that constructs an Option of an entity object from the unmapped Option values */
       def optionFactory: Code
       def doc =
-        s"Table description of table ${model.name.table}. Objects of this class serve as prototypes for rows in queries." + {
+        s"Table description of table ${model.name.table}. Objects of this class serve as prototypes for rows in queries." +
           val collidingTerms = columns.map(_.rawName) intersect scalaKeywords
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala keywords and were escaped: " +
             collidingTerms.mkString(", ") else ""
-        } + {
+        +
           val collidingTerms =
             columns.map(_.rawName) intersect slickTableTermMembersNoArgs
           if (collidingTerms.nonEmpty)
             "\nNOTE: The following names collided with Scala method names and were disambiguated: " +
             collidingTerms.mkString(", ") else ""
-        }
       def rawName: String = tableName(model.name.table)
       def code: Code
 
       /** All definitions in this table class including disabled ones grouped into logical groups. */
-      def definitions = {
-        def OptionDef = new Def {
+      def definitions =
+        def OptionDef = new Def
           def doc = "Maps whole row to an option. Useful for outer joins."
           override def enabled = optionEnabled
           def code = option
           def rawName = ???
-        }
-        def StarDef = new Def {
+        def StarDef = new Def
           def doc = ""
           def code = star
           def rawName = ???
-        }
 
         Seq[Seq[Def]](
             Seq(StarDef, OptionDef),
@@ -232,14 +225,12 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
             foreignKeys,
             indices
         )
-      }
 
       /** Code for enabled definitions in this table class grouped into logical groups. */
       def body: Seq[Seq[Code]] =
         definitions
           .map(_.flatMap(_.getEnabled).map(_.docWithCode))
           .filter(_.nonEmpty)
-    }
 
     /** Table value generator virtual class */
     type TableValue <: TableValueDef
@@ -250,12 +241,11 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
     /** Table value generator definition (generates a collection-like value representing this database table). 
         @group Basic customization overrides */
-    trait TableValueDef extends TermDef {
+    trait TableValueDef extends TermDef
       def doc =
         s"Collection-like TableQuery object for table ${TableValue.name}"
       def rawName: String = tableName(model.name.table)
       def code: Code
-    }
 
     /** Column generator virtual class */
     type Column <: ColumnDef
@@ -269,7 +259,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       * @group Basic customization overrides 
       * @param model corresponding Slick meta model component
       */
-    abstract case class ColumnDef(val model: m.Column) extends TermDef {
+    abstract case class ColumnDef(val model: m.Column) extends TermDef
 
       /**
         * Underlying Scala type of this column.
@@ -301,10 +291,10 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates code for the ColumnOptions (DBType, AutoInc, etc.) */
       def options: Iterable[Code] =
-        model.options.filter {
+        model.options.filter
           case t: SqlProfile.ColumnOption.SqlType => dbType
           case _ => true
-        }.flatMap(columnOptionCode(_).toSeq)
+        .flatMap(columnOptionCode(_).toSeq)
 
       /** Indicates if a (non-portable) DBType ColumnOption should be generated */
       def dbType: Boolean = false
@@ -314,16 +304,15 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
 
       /** Generates a literal represenation of the default value or None in case of an Option-typed autoinc column */
       def default: Option[Code] =
-        model.options.collect {
+        model.options.collect
           case RelationalProfile.ColumnOption.Default(value) => value
           case _ if fakeNullable => None
-        }.map(defaultCode).headOption
+        .map(defaultCode).headOption
 
       def rawName: String = model.name.toCamelCase.uncapitalize
       def doc: String =
         "Database column " + model.name + " " +
         model.options.map(_.toString).mkString(", ")
-    }
 
     /** Primary key generator virtual class */
     type PrimaryKey <: PrimaryKeyDef
@@ -339,7 +328,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       * @param model corresponding Slick meta model component
       */
     abstract case class PrimaryKeyDef(val model: m.PrimaryKey)
-        extends TermDef {
+        extends TermDef
 
       /** Columns code generators in correct order */
       final lazy val columns: Seq[Column] =
@@ -350,13 +339,11 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       def rawName = disambiguateTerm("pk")
       def doc =
         "Primary key of " + TableValue.name + s" (database name ${dbName})"
-    }
 
     private var _freshFkId = 0
-    private def freshFkId = {
+    private def freshFkId =
       _freshFkId += 1
       _freshFkId
-    }
 
     /** Foreign key generator virtual class */
     type ForeignKey <: ForeignKeyDef
@@ -371,7 +358,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       * @param model corresponding Slick meta model component
       */
     abstract case class ForeignKeyDef(val model: m.ForeignKey)
-        extends TermDef {
+        extends TermDef
       private val id = freshFkId
 
       /** Referencing Table code generator */
@@ -396,7 +383,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       final def onUpdate: Code = actionCode(model.onUpdate)
       final def onDelete: Code = actionCode(model.onDelete)
       def rawName: String =
-        disambiguateTerm({
+        disambiguateTerm(
           val fksToSameTable =
             foreignKeys.filter(_.referencedTable == referencedTable)
           require(
@@ -406,16 +393,14 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
           val baseName = referencedTable.TableClass.rawName.uncapitalize + "Fk"
           disambiguateTerm(
               if (fksToSameTable.size > 1) baseName + id else baseName)
-        })
+        )
       def doc =
         s"Foreign key referencing ${referencedTable.TableValue.name} (database name ${dbName})"
-    }
 
     private var _freshIdxId = 0
-    private def freshIdxId = {
+    private def freshIdxId =
       _freshIdxId += 1
       _freshIdxId
-    }
 
     /** Index generator virtual class */
     type Index <: IndexDef
@@ -429,7 +414,7 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       * @group Basic customization overrides 
       * @param model corresponding Slick meta model component
       */
-    abstract case class IndexDef(val model: m.Index) extends TermDef {
+    abstract case class IndexDef(val model: m.Index) extends TermDef
       private val id = freshIdxId
 
       /** Columns code generators */
@@ -444,10 +429,9 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
         (if (model.unique) "Uniqueness " else "") + "Index over " +
         columns.map(_.name).mkString("(", ",", ")") +
         s" (database name ${dbName})"
-    }
 
     /** Common interface for any kind of definition within the generated code */
-    trait Def {
+    trait Def
 
       /** Indicates whether this will be included in the generated code
         @group Basic customization overrides */
@@ -470,11 +454,10 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       /** Name as desired in Scala Code. (Allowed to collide with Scala keywords. Will be automatically escaped.)
         @group Basic customization overrides */
       def rawName: String
-    }
 
     /** Common interface for definitions that define a term (val, def, ...) within the generated code */
-    trait TermDef extends Def {
-      override def docWithCode: Code = {
+    trait TermDef extends Def
+      override def docWithCode: Code =
         val newdoc =
           doc +
           (if (scalaKeywords.contains(rawName))
@@ -484,24 +467,21 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
              s"\nNOTE: The name was disambiguated because it collided with Slick's method Table#$rawName."
            else "")
         codegen.docWithCode(newdoc, code)
-      }
 
       /** Name (escaped if colliding with Scala keyword). */
-      final def name: TermName = termName {
-        if (slickTableTermMembersNoArgs.contains(rawName)) {
+      final def name: TermName = termName
+        if (slickTableTermMembersNoArgs.contains(rawName))
           disambiguateTerm(rawName)
-        } else rawName
-      }
+        else rawName
 
       /** Adds one or more X to the end of the given string to avoid collisions with column names. */
       def disambiguateTerm(name: String, postfix: String = "X"): String =
         if ((columns.map(_.rawName) ++ slickTableTermMembersNoArgs)
               .contains(name)) disambiguateTerm(name + postfix)
         else name
-    }
 
     /** Common interface for definitions that define a type (class, case class, ...) within the generated code */
-    trait TypeDef extends Def {
+    trait TypeDef extends Def
 
       /** Name (escaped if colliding with Scala keyword). */
       final def name: TypeName = typeName(rawName)
@@ -509,18 +489,13 @@ abstract class AbstractGenerator[Code, TermName, TypeName](model: m.Model)
       /** Inherited traits.
         @group Basic customization overrides */
       def parents: Seq[Code] = Seq()
-    }
-  }
-}
 
 /** Helper methods for code generation */
-trait GeneratorHelpers[Code, TermName, TypeName] {
-  def indent(code: String): String = {
+trait GeneratorHelpers[Code, TermName, TypeName]
+  def indent(code: String): String =
     val lines = code.split("\n")
-    lines.tail.foldLeft(lines.head) { (out, line) =>
+    lines.tail.foldLeft(lines.head)  (out, line) =>
       out + '\n' + (if (line.isEmpty) line else "  " + line)
-    }
-  }
 
   /** Assemble doc comment with scala code */
   def docWithCode(comment: String, code: Code): Code
@@ -624,7 +599,7 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
   def parseType(tpe: String): Code
 
   /** Slick code generator string extension methods. (Warning: Not unicode-safe, uses String#apply) */
-  implicit class StringExtensions(val str: String) {
+  implicit class StringExtensions(val str: String)
 
     /** Lowercases the first (16 bit) character. (Warning: Not unicode-safe, uses String#apply) */
     final def uncapitalize: String = str(0).toString.toLowerCase + str.tail
@@ -637,11 +612,9 @@ trait GeneratorHelpers[Code, TermName, TypeName] {
     final def toCamelCase: String =
       str.toLowerCase
         .split("_")
-        .map {
+        .map
           case "" => "_"
           case s => s
-        } // avoid possible collisions caused by multiple '_'
+        // avoid possible collisions caused by multiple '_'
         .map(_.capitalize)
         .mkString("")
-  }
-}

@@ -27,7 +27,7 @@ import org.apache.spark.rdd.RDD
   * @tparam A Actual result class
   */
 @DeveloperApi
-abstract class BaseDataSource[TD, EI, Q, A] extends AbstractDoer {
+abstract class BaseDataSource[TD, EI, Q, A] extends AbstractDoer
 
   /** :: DeveloperApi ::
     * Engine developer should not use this directly. This is called by workflow
@@ -49,4 +49,3 @@ abstract class BaseDataSource[TD, EI, Q, A] extends AbstractDoer {
     */
   @DeveloperApi
   def readEvalBase(sc: SparkContext): Seq[(TD, EI, RDD[(Q, A)])]
-}

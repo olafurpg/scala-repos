@@ -30,7 +30,7 @@ import akka.actor.ActorRef
   * Smoothing of the data for each monitored process is delegated to the
   * [[EWMA]] for exponential weighted moving average.
   */
-class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
+class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension
 
   /**
     * Metrics extension configuration.
@@ -47,13 +47,12 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
     .createInstanceFor[SupervisorStrategy](
         SupervisorStrategyProvider,
         immutable.Seq(classOf[Config] -> SupervisorStrategyConfiguration))
-    .getOrElse {
+    .getOrElse
       val log: LoggingAdapter = Logging(system, getClass.getName)
       log.error(
-          s"Configured strategy provider ${SupervisorStrategyProvider} failed to load, using default ${classOf[
-          ClusterMetricsStrategy].getName}.")
+          s"Configured strategy provider ${SupervisorStrategyProvider} failed to load, using default $classOf[
+          ClusterMetricsStrategy].getName.")
       new ClusterMetricsStrategy(SupervisorStrategyConfiguration)
-    }
 
   /**
     * Supervisor actor.
@@ -69,29 +68,25 @@ class ClusterMetricsExtension(system: ExtendedActorSystem) extends Extension {
     * Subscribe user metrics listener actor unto [[ClusterMetricsEvent]]
     * events published by extension on the system event bus.
     */
-  def subscribe(metricsListener: ActorRef): Unit = {
+  def subscribe(metricsListener: ActorRef): Unit =
     system.eventStream.subscribe(metricsListener, classOf[ClusterMetricsEvent])
-  }
 
   /**
     * Unsubscribe user metrics listener actor from [[ClusterMetricsEvent]]
     * events published by extension on the system event bus.
     */
-  def unsubscribe(metricsListenter: ActorRef): Unit = {
+  def unsubscribe(metricsListenter: ActorRef): Unit =
     system.eventStream.unsubscribe(
         metricsListenter, classOf[ClusterMetricsEvent])
-  }
-}
 
 /**
   * Cluster metrics extension provider.
   */
 object ClusterMetricsExtension
-    extends ExtensionId[ClusterMetricsExtension] with ExtensionIdProvider {
+    extends ExtensionId[ClusterMetricsExtension] with ExtensionIdProvider
   override def lookup = ClusterMetricsExtension
   override def get(system: ActorSystem): ClusterMetricsExtension =
     super.get(system)
   override def createExtension(
       system: ExtendedActorSystem): ClusterMetricsExtension =
     new ClusterMetricsExtension(system)
-}

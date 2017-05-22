@@ -19,38 +19,36 @@ import akka.pattern.pipe
   *
   * Journal backed by a local LevelDB store. For production use.
   */
-private[persistence] class LeveldbJournal extends {
+private[persistence] class LeveldbJournal extends
   val configPath = "akka.persistence.journal.leveldb"
-} with AsyncWriteJournal with LeveldbStore {
+with AsyncWriteJournal with LeveldbStore
   import LeveldbJournal._
 
-  override def receivePluginInternal: Receive = {
+  override def receivePluginInternal: Receive =
     case r @ ReplayTaggedMessages(
         fromSequenceNr, toSequenceNr, max, tag, replyTo) ⇒
       import context.dispatcher
       val readHighestSequenceNrFrom = math.max(0L, fromSequenceNr - 1)
       asyncReadHighestSequenceNr(tagAsPersistenceId(tag),
-                                 readHighestSequenceNrFrom).flatMap {
+                                 readHighestSequenceNrFrom).flatMap
         highSeqNr ⇒
           val toSeqNr = math.min(toSequenceNr, highSeqNr)
           if (highSeqNr == 0L || fromSequenceNr > toSeqNr)
             Future.successful(highSeqNr)
-          else {
-            asyncReplayTaggedMessages(tag, fromSequenceNr, toSeqNr, max) {
+          else
+            asyncReplayTaggedMessages(tag, fromSequenceNr, toSeqNr, max)
               case ReplayedTaggedMessage(p, tag, offset) ⇒
-                adaptFromJournal(p).foreach { adaptedPersistentRepr ⇒
+                adaptFromJournal(p).foreach  adaptedPersistentRepr ⇒
                   replyTo.tell(ReplayedTaggedMessage(adaptedPersistentRepr,
                                                      tag,
                                                      offset),
                                Actor.noSender)
-                }
-            }.map(_ ⇒ highSeqNr)
-          }
-      }.map { highSeqNr ⇒
+            .map(_ ⇒ highSeqNr)
+      .map  highSeqNr ⇒
         RecoverySuccess(highSeqNr)
-      }.recover {
+      .recover
         case e ⇒ ReplayMessagesFailure(e)
-      }.pipeTo(replyTo)
+      .pipeTo(replyTo)
 
     case SubscribePersistenceId(persistenceId: String) ⇒
       addPersistenceIdSubscriber(sender(), persistenceId)
@@ -63,13 +61,11 @@ private[persistence] class LeveldbJournal extends {
       context.watch(sender())
     case Terminated(ref) ⇒
       removeSubscriber(ref)
-  }
-}
 
 /**
   * INTERNAL API.
   */
-private[persistence] object LeveldbJournal {
+private[persistence] object LeveldbJournal
   sealed trait SubscriptionCommand
 
   /**
@@ -114,32 +110,28 @@ private[persistence] object LeveldbJournal {
   final case class ReplayedTaggedMessage(
       persistent: PersistentRepr, tag: String, offset: Long)
       extends DeadLetterSuppression with NoSerializationVerificationNeeded
-}
 
 /**
   * INTERNAL API.
   *
   * Journal backed by a [[SharedLeveldbStore]]. For testing only.
   */
-private[persistence] class SharedLeveldbJournal extends AsyncWriteProxy {
+private[persistence] class SharedLeveldbJournal extends AsyncWriteProxy
   val timeout: Timeout = context.system.settings.config
     .getMillisDuration("akka.persistence.journal.leveldb-shared.timeout")
 
-  override def receivePluginInternal: Receive = {
+  override def receivePluginInternal: Receive =
     case cmd: LeveldbJournal.SubscriptionCommand ⇒
       // forward subscriptions, they are used by query-side
-      store match {
+      store match
         case Some(s) ⇒ s.forward(cmd)
         case None ⇒
           log.error(
               "Failed {} request. " +
               "Store not initialized. Use `SharedLeveldbJournal.setStore(sharedStore, system)`",
               cmd)
-      }
-  }
-}
 
-object SharedLeveldbJournal {
+object SharedLeveldbJournal
 
   /**
     * Sets the shared LevelDB `store` for the given actor `system`.
@@ -148,4 +140,3 @@ object SharedLeveldbJournal {
     */
   def setStore(store: ActorRef, system: ActorSystem): Unit =
     Persistence(system).journalFor(null) ! AsyncWriteProxy.SetStore(store)
-}

@@ -14,8 +14,8 @@ import xsbti.{DependencyContext, Position, Severity}
   * 11/18/13
   */
 class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
-    extends AbstractCompiler {
-  def compile(compilationData: CompilationData, client: Client): Unit = {
+    extends AbstractCompiler
+  def compile(compilationData: CompilationData, client: Client): Unit =
     val progress = getProgress(client)
     val reporter = getReporter(client)
     val logger = getLogger(client)
@@ -38,27 +38,21 @@ class IdeaIncrementalCompiler(scalac: AnalyzingCompiler)
                        reporter,
                        CompilerCache.fresh,
                        logger,
-                       Option(progress)) catch {
+                       Option(progress)) catch
       case _: xsbti.CompileFailed =>
       // the error should be already handled via the `reporter`
-    }
-  }
-}
 
-private class ClientCallback(client: Client) extends ClientCallbackBase {
+private class ClientCallback(client: Client) extends ClientCallbackBase
 
-  override def generatedClass(source: File, module: File, name: String) {
+  override def generatedClass(source: File, module: File, name: String)
     client.generated(source, module, name)
-  }
 
-  override def endSource(source: File) {
+  override def endSource(source: File)
     client.processed(source)
-  }
 
   override def nameHashing() = false
-}
 
-abstract class ClientCallbackBase extends xsbti.AnalysisCallback {
+abstract class ClientCallbackBase extends xsbti.AnalysisCallback
   override def sourceDependency(
       dependsOn: File, source: File, publicInherited: Boolean): Unit = {}
   override def sourceDependency(
@@ -82,10 +76,8 @@ abstract class ClientCallbackBase extends xsbti.AnalysisCallback {
                        severity: Severity,
                        reported: Boolean): Unit = {}
   override def usedName(p1: File, p2: String) = {}
-}
 
-private object emptyChanges extends DependencyChanges {
+private object emptyChanges extends DependencyChanges
   val modifiedBinaries = new Array[File](0)
   val modifiedClasses = new Array[String](0)
   def isEmpty = true
-}

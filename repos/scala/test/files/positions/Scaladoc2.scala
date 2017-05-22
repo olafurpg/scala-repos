@@ -1,5 +1,5 @@
-object Scaladoc2 {
-  def f {
+object Scaladoc2
+  def f
 
     /**
       * Foo
@@ -11,7 +11,5 @@ object Scaladoc2 {
      */
     def h {}
     h
-  }
 
   def h {}
-}

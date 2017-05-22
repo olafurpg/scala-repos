@@ -8,7 +8,6 @@ package api
   *
   * @group ReflectionAPI
   */
-abstract class TypeCreator extends Serializable {
+abstract class TypeCreator extends Serializable
   def apply[U <: Universe with Singleton](
       m: scala.reflect.api.Mirror[U]): U#Type
-}

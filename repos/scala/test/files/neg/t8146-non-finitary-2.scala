@@ -3,6 +3,5 @@
 trait N[-Z]
 trait D[Y]
 trait C[X] extends N[N[C[D[X]]]]
-object Test {
+object Test
   def foo(c: C[Int]): N[C[Int]] = c
-}

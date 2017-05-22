@@ -8,15 +8,14 @@ import scala.collection.JavaConversions._
 
 class ConcurrentSkipListSet[E] private (inner: TreeSet[E])
     extends AbstractSet[E] with NavigableSet[E] with Cloneable
-    with Serializable {
+    with Serializable
 
-  def this(collection: Collection[_ <: E]) = {
+  def this(collection: Collection[_ <: E]) =
     this(
-        new TreeSet[E](collection) {
+        new TreeSet[E](collection)
       override def add(e: E): Boolean =
         inner.add(Box(e))
-    })
-  }
+    )
 
   def this() =
     this(Collections.emptySet[E]: Collection[E])
@@ -110,4 +109,3 @@ class ConcurrentSkipListSet[E] private (inner: TreeSet[E])
 
   def descendingSet(): NavigableSet[E] =
     inner.descendingSet()
-}

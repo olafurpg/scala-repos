@@ -30,9 +30,8 @@ import kafka.common.TopicAndPartition
   *   }
   * }}}
   */
-trait HasOffsetRanges {
+trait HasOffsetRanges
   def offsetRanges: Array[OffsetRange]
-}
 
 /**
   * Represents a range of offsets from a single Kafka TopicAndPartition. Instances of this class
@@ -46,7 +45,7 @@ final class OffsetRange private (val topic: String,
                                  val partition: Int,
                                  val fromOffset: Long,
                                  val untilOffset: Long)
-    extends Serializable {
+    extends Serializable
   import OffsetRange.OffsetRangeTuple
 
   /** Kafka TopicAndPartition object, for convenience */
@@ -56,31 +55,27 @@ final class OffsetRange private (val topic: String,
   /** Number of messages this OffsetRange refers to */
   def count(): Long = untilOffset - fromOffset
 
-  override def equals(obj: Any): Boolean = obj match {
+  override def equals(obj: Any): Boolean = obj match
     case that: OffsetRange =>
       this.topic == that.topic && this.partition == that.partition &&
       this.fromOffset == that.fromOffset &&
       this.untilOffset == that.untilOffset
     case _ => false
-  }
 
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     toTuple.hashCode()
-  }
 
-  override def toString(): String = {
+  override def toString(): String =
     s"OffsetRange(topic: '$topic', partition: $partition, range: [$fromOffset -> $untilOffset])"
-  }
 
   /** this is to avoid ClassNotFoundException during checkpoint restore */
   private[streaming] def toTuple: OffsetRangeTuple =
     (topic, partition, fromOffset, untilOffset)
-}
 
 /**
   * Companion object the provides methods to create instances of [[OffsetRange]].
   */
-object OffsetRange {
+object OffsetRange
   def create(topic: String,
              partition: Int,
              fromOffset: Long,
@@ -114,4 +109,3 @@ object OffsetRange {
 
   private[kafka] def apply(t: OffsetRangeTuple) =
     new OffsetRange(t._1, t._2, t._3, t._4)
-}

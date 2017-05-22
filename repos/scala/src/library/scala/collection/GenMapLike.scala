@@ -24,7 +24,7 @@ package collection
   */
 trait GenMapLike[A, +B, +Repr]
     extends GenIterableLike[(A, B), Repr] with Equals
-    with Parallelizable[(A, B), parallel.ParMap[A, B]] {
+    with Parallelizable[(A, B), parallel.ParMap[A, B]]
   def default(key: A): B
   def get(key: A): Option[B]
   def apply(key: A): B
@@ -112,23 +112,17 @@ trait GenMapLike[A, +B, +Repr]
     *  @return     `true` if both maps contain exactly the
     *              same mappings, `false` otherwise.
     */
-  override def equals(that: Any): Boolean = that match {
+  override def equals(that: Any): Boolean = that match
     case that: GenMap[b, _] =>
-      (this eq that) || (that canEqual this) && (this.size == that.size) && {
-        try {
-          this forall {
+      (this eq that) || (that canEqual this) && (this.size == that.size) &&
+        try
+          this forall
             case (k, v) =>
-              that.get(k.asInstanceOf[b]) match {
+              that.get(k.asInstanceOf[b]) match
                 case Some(`v`) =>
                   true
                 case _ => false
-              }
-          }
-        } catch {
+        catch
           case ex: ClassCastException => false
-        }
-      }
     case _ =>
       false
-  }
-}

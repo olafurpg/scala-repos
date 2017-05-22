@@ -16,38 +16,31 @@ limitations under the License.
 
 package com.twitter.scalding
 
-object RangedArgs {
+object RangedArgs
   implicit def rangedFromArgs(args: Args) = new RangedArgs(args)
-}
 
-case class Range[T](lower: T, upper: T)(implicit ord: Ordering[T]) {
+case class Range[T](lower: T, upper: T)(implicit ord: Ordering[T])
   assert(ord.lteq(lower, upper), "Bad range: " + lower + " > " + upper)
 
-  def assertLowerBound(min: T) {
+  def assertLowerBound(min: T)
     assert(ord.lteq(min, lower), "Range out of bounds: " + lower + " < " + min)
-  }
 
-  def assertUpperBound(max: T) {
+  def assertUpperBound(max: T)
     assert(ord.gteq(max, upper), "Range out of bounds: " + upper + " > " + max)
-  }
 
-  def assertBounds(min: T, max: T) {
+  def assertBounds(min: T, max: T)
     assertLowerBound(min)
     assertUpperBound(max)
-  }
 
-  def mkString(sep: String) = {
-    if (ord.equiv(lower, upper)) {
+  def mkString(sep: String) =
+    if (ord.equiv(lower, upper))
       lower.toString
-    } else {
+    else
       lower.toString + sep + upper.toString
-    }
-  }
-}
 
-class RangedArgs(args: Args) {
+class RangedArgs(args: Args)
   def range[T](argName: String)(cnv: String => T)(
-      implicit ord: Ordering[T]): Range[T] = args.list(argName) match {
+      implicit ord: Ordering[T]): Range[T] = args.list(argName) match
     case List(v) =>
       Range(cnv(v), cnv(v))
     case List(v1, v2) =>
@@ -55,5 +48,3 @@ class RangedArgs(args: Args) {
     case _ =>
       throw new IllegalArgumentException(
           argName + " must have either 1 or 2 values specified")
-  }
-}

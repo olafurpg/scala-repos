@@ -11,23 +11,21 @@ import org.scalatest.mock.MockitoSugar
 import com.twitter.conversions.time._
 import com.twitter.util.{Await, Future, MockTimer, Promise, Return, Time}
 
-class SimpleOffer[T](var futures: Stream[Future[Tx[T]]]) extends Offer[T] {
+class SimpleOffer[T](var futures: Stream[Future[Tx[T]]]) extends Offer[T]
   def this(fut: Future[Tx[T]]) = this(Stream.continually(fut))
   def this(tx: Tx[T]) = this(Stream.continually(Future.value(tx)))
 
-  def prepare() = {
+  def prepare() =
     val next #:: rest = futures
     futures = rest
     next
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class OfferTest extends WordSpec with MockitoSugar {
+class OfferTest extends WordSpec with MockitoSugar
   import Tx.{Commit, Abort}
 
-  "Offer.map" should {
-    "apply f in after Tx.ack()" in {
+  "Offer.map" should
+    "apply f in after Tx.ack()" in
       // mockito can't spy on anonymous classes.
       val tx = mock[Tx[Int]]
       val result = Future.value(Commit(123))
@@ -37,79 +35,62 @@ class OfferTest extends WordSpec with MockitoSugar {
       val offer = spy(new SimpleOffer(tx))
 
       val mapped =
-        offer map { i =>
+        offer map  i =>
           (i - 100).toString
-        }
 
       val f =
-        mapped.prepare() flatMap { tx =>
+        mapped.prepare() flatMap  tx =>
           tx.ack()
-        }
-      f match {
+      f match
         case Future(Return(Commit("23"))) => assert(true)
-      }
-    }
-  }
 
-  "Offer.choose" should {
-    class OfferSpecHelper {
+  "Offer.choose" should
+    class OfferSpecHelper
       val pendingTxs =
-        0 until 3 map { _ =>
+        0 until 3 map  _ =>
           new Promise[Tx[Int]]
-        }
       val offers =
-        pendingTxs map { tx =>
+        pendingTxs map  tx =>
           spy(new SimpleOffer(tx))
-        }
       val offer = Offer.choose(offers: _*)
-    }
 
-    "when a tx is already ready" should {
-      class TxReadyHelper extends OfferSpecHelper {
+    "when a tx is already ready" should
+      class TxReadyHelper extends OfferSpecHelper
         val tx1 = mock[Tx[Int]]
         pendingTxs(1).setValue(tx1)
-      }
 
-      "prepare() prepares all" in {
+      "prepare() prepares all" in
         val h = new TxReadyHelper
         import h._
 
-        offers foreach { of =>
+        offers foreach  of =>
           verify(of, never()).prepare()
-        }
         assert(offer.prepare().isDefined == true)
-        offers foreach { of =>
+        offers foreach  of =>
           verify(of).prepare()
-        }
-      }
 
-      "select it" in {
+      "select it" in
         val h = new TxReadyHelper
         import h._
 
-        offer.prepare() match {
+        offer.prepare() match
           case Future(Return(tx)) => assert(tx eq tx1)
-        }
         verify(tx1, never()).ack()
         verify(tx1, never()).nack()
-      }
 
-      "nack losers" in {
+      "nack losers" in
         val h = new TxReadyHelper
         import h._
 
         offer.prepare()
         val tx = mock[Tx[Int]]
-        for (i <- Seq(0, 2)) {
+        for (i <- Seq(0, 2))
           pendingTxs(i).setValue(tx)
-        }
         verify(tx, times(2)).nack()
         verify(tx, never()).ack()
-      }
-    }
 
-    "when a tx is ready after prepare()" should {
-      "select it" in {
+    "when a tx is ready after prepare()" should
+      "select it" in
         val h = new OfferSpecHelper
         import h._
 
@@ -117,74 +98,60 @@ class OfferTest extends WordSpec with MockitoSugar {
         assert(tx.isDefined == false)
         val tx0 = mock[Tx[Int]]
         pendingTxs(0).setValue(tx0)
-        tx match {
+        tx match
           case Future(Return(tx)) => assert(tx eq tx0)
-        }
-      }
 
-      "nack losers" in {
+      "nack losers" in
         val h = new OfferSpecHelper
         import h._
 
         offer.prepare()
         pendingTxs(0).setValue(mock[Tx[Int]])
-        for (i <- Seq(1, 2)) {
+        for (i <- Seq(1, 2))
           val tx = mock[Tx[Int]]
           pendingTxs(i).setValue(tx)
           verify(tx).nack()
           verify(tx, never()).ack()
-        }
-      }
-    }
 
-    "when all txs are ready" should {
-      class AllTxsReadyHelper extends OfferSpecHelper {
-        val txs = for (p <- pendingTxs) yield {
+    "when all txs are ready" should
+      class AllTxsReadyHelper extends OfferSpecHelper
+        val txs = for (p <- pendingTxs) yield
           val tx = mock[Tx[Int]]
           p.setValue(tx)
           tx
-        }
-      }
 
-      "shuffle winner" in Time.withTimeAt(Time.epoch) { tc =>
+      "shuffle winner" in Time.withTimeAt(Time.epoch)  tc =>
         val h = new AllTxsReadyHelper
         import h._
 
         val shuffledOffer =
           Offer.choose(Some(new Random(Time.now.inNanoseconds)), offers)
         val histo = new Array[Int](3)
-        for (_ <- 0 until 1000) {
+        for (_ <- 0 until 1000)
           for (tx <- shuffledOffer.prepare()) histo(txs.indexOf(tx)) += 1
-        }
 
         assert(histo(0) == 311)
         assert(histo(1) == 346)
         assert(histo(2) == 343)
-      }
 
-      "nack losers" in {
+      "nack losers" in
         val h = new AllTxsReadyHelper
         import h._
 
-        offer.prepare() match {
+        offer.prepare() match
           case Future(Return(tx)) =>
             for (loser <- txs if loser ne tx) verify(loser).nack()
             assert(true)
-        }
-      }
-    }
 
-    "work with 0 offers" in {
+    "work with 0 offers" in
       val h = new OfferSpecHelper
 
       val of = Offer.choose()
       assert(of.sync().poll == None)
-    }
-  }
 
-  "Offer.sync" should {
-    "when Tx.prepare is immediately available" should {
-      "when it commits" in {
+  "Offer.sync" should
+    "when Tx.prepare is immediately available" should
+      "when it commits" in
         val txp = new Promise[Tx[Int]]
         val offer = spy(new SimpleOffer(txp))
         val tx = mock[Tx[Int]]
@@ -193,14 +160,12 @@ class OfferTest extends WordSpec with MockitoSugar {
 
         assert(tx.ack() == (result))
         txp.setValue(tx)
-        offer.sync() match {
+        offer.sync() match
           case Future(Return(123)) => assert(true)
-        }
         verify(tx, times(2)).ack()
         verify(tx, never()).nack()
-      }
 
-      "retry when it aborts" in {
+      "retry when it aborts" in
         val txps =
           new Promise[Tx[Int]] #:: new Promise[Tx[Int]] #:: Stream.empty
         val offer = spy(new SimpleOffer(txps))
@@ -228,51 +193,41 @@ class OfferTest extends WordSpec with MockitoSugar {
 
         verify(okTx, times(2)).ack()
         verify(offer, times(2)).prepare()
-      }
-    }
 
-    "when Tx.prepare is delayed" should {
-      "when it commits" in {
+    "when Tx.prepare is delayed" should
+      "when it commits" in
         val tx = mock[Tx[Int]]
         val result = Future.value(Commit(123))
         when(tx.ack()).thenReturn(result)
         assert(tx.ack() == (result))
         val offer = spy(new SimpleOffer(tx))
 
-        offer.sync() match {
+        offer.sync() match
           case Future(Return(123)) => assert(true)
-        }
         verify(tx, times(2)).ack()
         verify(tx, never()).nack()
         verify(offer).prepare()
-      }
-    }
-  }
 
-  "Offer.const" should {
-    "always provide the same result" in {
+  "Offer.const" should
+    "always provide the same result" in
       val offer = Offer.const(123)
 
       assert(offer.sync().poll == Some(Return(123)))
       assert(offer.sync().poll == Some(Return(123)))
-    }
 
-    "evaluate argument for each prepare()" in {
+    "evaluate argument for each prepare()" in
       var i = 0
       val offer = Offer.const { i = i + 1; i }
       assert(offer.sync().poll == Some(Return(1)))
       assert(offer.sync().poll == Some(Return(2)))
-    }
-  }
 
-  "Offer.orElse" should {
-    "with const orElse" should {
-      class OfferOrElseHelper {
+  "Offer.orElse" should
+    "with const orElse" should
+      class OfferOrElseHelper
         val txp = new Promise[Tx[Int]]
         val e0 = spy(new SimpleOffer(txp))
-      }
 
-      "prepare orElse event when prepare isn't immediately available" in {
+      "prepare orElse event when prepare isn't immediately available" in
         val h = new OfferOrElseHelper
         import h._
 
@@ -284,9 +239,8 @@ class OfferTest extends WordSpec with MockitoSugar {
         txp.setValue(tx)
         verify(tx).nack()
         verify(tx, never()).ack()
-      }
 
-      "not prepare orElse event when the result is immediately available" in {
+      "not prepare orElse event when the result is immediately available" in
         val h = new OfferOrElseHelper
         import h._
 
@@ -303,19 +257,16 @@ class OfferTest extends WordSpec with MockitoSugar {
         verify(tx, times(2)).ack()
         verify(tx, never()).nack()
         verify(e1, never).prepare()
-      }
-    }
 
-    "sync integration: when first transaction aborts" should {
-      class SyncIntegrationHelper {
+    "sync integration: when first transaction aborts" should
+      class SyncIntegrationHelper
         val tx2 = new Promise[Tx[Int]]
         val e0 = spy(
             new SimpleOffer(Future.value(Tx.aborted: Tx[Int]) #:: (tx2: Future[
                     Tx[Int]]) #:: Stream.empty))
         val offer = e0 orElse Offer.const(123)
-      }
 
-      "select first again if tx2 is ready" in {
+      "select first again if tx2 is ready" in
         val h = new SyncIntegrationHelper
         import h._
 
@@ -330,9 +281,8 @@ class OfferTest extends WordSpec with MockitoSugar {
         verify(e0, times(2)).prepare()
         verify(tx, times(2)).ack()
         verify(tx, never()).nack()
-      }
 
-      "select alternative if not ready the second time" in {
+      "select alternative if not ready the second time" in
         val h = new SyncIntegrationHelper
         import h._
 
@@ -342,27 +292,21 @@ class OfferTest extends WordSpec with MockitoSugar {
         val tx = mock[Tx[Int]]
         tx2.setValue(tx)
         verify(tx).nack()
-      }
-    }
-  }
 
-  "Offer.foreach" should {
-    "synchronize on offers forever" in {
+  "Offer.foreach" should
+    "synchronize on offers forever" in
       val b = new Broker[Int]
       var count = 0
-      b.recv foreach { _ =>
+      b.recv foreach  _ =>
         count += 1
-      }
       assert(count == 0)
       assert(b.send(1).sync().isDefined == true)
       assert(count == 1)
       assert(b.send(1).sync().isDefined == true)
       assert(count == 2)
-    }
-  }
 
-  "Offer.timeout" should {
-    "be available after timeout (prepare)" in Time.withTimeAt(Time.epoch) {
+  "Offer.timeout" should
+    "be available after timeout (prepare)" in Time.withTimeAt(Time.epoch)
       tc =>
         implicit val timer = new MockTimer
         val e = Offer.timeout(10.seconds)
@@ -373,18 +317,15 @@ class OfferTest extends WordSpec with MockitoSugar {
         tc.advance(1.second)
         timer.tick()
         assert(e.prepare().isDefined == true)
-    }
 
-    "cancel timer tasks when losing" in Time.withTimeAt(Time.epoch) { tc =>
+    "cancel timer tasks when losing" in Time.withTimeAt(Time.epoch)  tc =>
       implicit val timer = new MockTimer
       val e10 =
-        Offer.timeout(10.seconds) map { _ =>
+        Offer.timeout(10.seconds) map  _ =>
           10
-        }
       val e5 =
-        Offer.timeout(5.seconds) map { _ =>
+        Offer.timeout(5.seconds) map  _ =>
           5
-        }
 
       val item = Offer.select(e5, e10)
       assert(item.poll == None)
@@ -397,27 +338,22 @@ class OfferTest extends WordSpec with MockitoSugar {
       assert(item.poll == Some(Return(5)))
       assert(timer.tasks.size == 0)
       assert(timer.nCancelled == 1)
-    }
-  }
 
-  "Offer.prioritize" should {
-    "prioritize high priority offer" in {
+  "Offer.prioritize" should
+    "prioritize high priority offer" in
       val offers =
-        0 until 10 map { i =>
+        0 until 10 map  i =>
           val tx = mock[Tx[Int]]
           val result = Future.value(Commit(i))
           when(tx.ack()).thenReturn(result)
           new SimpleOffer(Future.value(tx))
-        }
       val chosenOffer = Offer.prioritize(offers: _*)
       val of = chosenOffer.sync()
       assert(of.isDefined == true)
       assert(Await.result(of) == 0)
-    }
-  }
 
-  "Integration" should {
-    "select across multiple brokers" in {
+  "Integration" should
+    "select across multiple brokers" in
       val b0 = new Broker[Int]
       val b1 = new Broker[String]
 
@@ -442,6 +378,3 @@ class OfferTest extends WordSpec with MockitoSugar {
 
       // syncing again fails.
       assert(o.sync().isDefined == false)
-    }
-  }
-}

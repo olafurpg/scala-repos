@@ -20,7 +20,7 @@ import sbt.util.{AbstractLogger, Logger}
 final class ScriptedTests(resourceBaseDirectory: File,
                           bufferLog: Boolean,
                           launcher: File,
-                          launchOpts: Seq[String]) {
+                          launchOpts: Seq[String])
   import ScriptedTests._
   private val testResources = new Resources(resourceBaseDirectory)
 
@@ -37,78 +37,66 @@ final class ScriptedTests(resourceBaseDirectory: File,
   def scriptedTest(group: String,
                    name: String,
                    prescripted: File => Unit,
-                   log: Logger): Seq[() => Option[String]] = {
+                   log: Logger): Seq[() => Option[String]] =
     import Path._
     import GlobFilter._
     var failed = false
     for (groupDir <- (resourceBaseDirectory * group).get;
-    nme <- (groupDir * name).get) yield {
+    nme <- (groupDir * name).get) yield
       val g = groupDir.getName
       val n = nme.getName
       val str = s"$g / $n"
       () =>
-        {
           println("Running " + str)
-          testResources.readWriteResourceDirectory(g, n) { testDirectory =>
+          testResources.readWriteResourceDirectory(g, n)  testDirectory =>
             val disabled = new File(testDirectory, "disabled").isFile
-            if (disabled) {
+            if (disabled)
               log.info("D " + str + " [DISABLED]")
               None
-            } else {
-              try { scriptedTest(str, testDirectory, prescripted, log); None } catch {
+            else
+              try { scriptedTest(str, testDirectory, prescripted, log); None } catch
                 case _: TestException | _: PendingTestSuccessException =>
                   Some(str)
-              }
-            }
-          }
-        }
-    }
-  }
 
   private def scriptedTest(label: String,
                            testDirectory: File,
                            prescripted: File => Unit,
-                           log: Logger): Unit = {
+                           log: Logger): Unit =
     val buffered = new BufferedLogger(new FullLogger(log))
     if (bufferLog) buffered.record()
 
-    def createParser() = {
+    def createParser() =
       val fileHandler = new FileCommands(testDirectory)
       val sbtHandler = new SbtHandler(
           testDirectory, launcher, buffered, launchOpts)
       new TestScriptParser(
           Map('$' -> fileHandler, '>' -> sbtHandler, '#' -> CommentHandler))
-    }
-    val (file, pending) = {
+    val (file, pending) =
       val normal = new File(testDirectory, ScriptFilename)
       val pending = new File(testDirectory, PendingScriptFilename)
       if (pending.isFile) (pending, true) else (normal, false)
-    }
     val pendingString = if (pending) " [PENDING]" else ""
 
-    def runTest() = {
+    def runTest() =
       val run = new ScriptRunner
       val parser = createParser()
       run(parser.parse(file))
-    }
-    def testFailed(): Unit = {
+    def testFailed(): Unit =
       if (pending) buffered.clear() else buffered.stop()
       buffered.error("x " + label + pendingString)
-    }
 
-    try {
+    try
       prescripted(testDirectory)
       runTest()
       buffered.info("+ " + label + pendingString)
       if (pending) throw new PendingTestSuccessException(label)
-    } catch {
+    catch
       case e: TestException =>
         testFailed()
-        e.getCause match {
+        e.getCause match
           case null | _: java.net.SocketException =>
             buffered.error("   " + e.getMessage)
           case _ => e.printStackTrace
-        }
         if (!pending) throw e
       case e: PendingTestSuccessException =>
         testFailed()
@@ -117,15 +105,12 @@ final class ScriptedTests(resourceBaseDirectory: File,
       case e: Exception =>
         testFailed()
         if (!pending) throw e
-    } finally { buffered.clear() }
-  }
-}
+    finally { buffered.clear() }
 
-object ScriptedTests extends ScriptedRunner {
-  val emptyCallback: File => Unit = { _ =>
+object ScriptedTests extends ScriptedRunner
+  val emptyCallback: File => Unit =  _ =>
     ()
-  }
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val directory = new File(args(0))
     val buffer = args(1).toBoolean
     val sbtVersion = args(2)
@@ -141,10 +126,8 @@ object ScriptedTests extends ScriptedRunner {
         bootProperties,
         Array(),
         emptyCallback)
-  }
-}
 
-class ScriptedRunner {
+class ScriptedRunner
   import ScriptedTests._
 
   @deprecated("No longer used", "0.13.9")
@@ -174,9 +157,9 @@ class ScriptedRunner {
         tests,
         ConsoleLogger(),
         bootProperties,
-        launchOpts, { f: File =>
+        launchOpts,  f: File =>
           prescripted.add(f); ()
-        }) //new FullLogger(Logger.xlog2Log(log)))
+        ) //new FullLogger(Logger.xlog2Log(log)))
 
   @deprecated("No longer used", "0.13.9")
   def run(resourceBaseDirectory: File,
@@ -214,21 +197,18 @@ class ScriptedRunner {
           logger: AbstractLogger,
           bootProperties: File,
           launchOpts: Array[String],
-          prescripted: File => Unit): Unit = {
+          prescripted: File => Unit): Unit =
     val runner = new ScriptedTests(
         resourceBaseDirectory, bufferLog, bootProperties, launchOpts)
     val allTests =
-      get(tests, resourceBaseDirectory, logger) flatMap {
+      get(tests, resourceBaseDirectory, logger) flatMap
         case ScriptedTest(group, name) =>
           runner.scriptedTest(group, name, prescripted, logger)
-      }
     runAll(allTests)
-  }
-  def runAll(tests: Seq[() => Option[String]]): Unit = {
+  def runAll(tests: Seq[() => Option[String]]): Unit =
     val errors = for (test <- tests; err <- test()) yield err
     if (errors.nonEmpty)
       sys.error(errors.mkString("Failed tests:\n\t", "\n\t", "\n"))
-  }
   def get(tests: Seq[String],
           baseDirectory: File,
           log: Logger): Seq[ScriptedTest] =
@@ -236,62 +216,49 @@ class ScriptedRunner {
   def listTests(baseDirectory: File, log: Logger): Seq[ScriptedTest] =
     (new ListTests(baseDirectory, _ => true, log)).listTests
   def parseTests(in: Seq[String]): Seq[ScriptedTest] =
-    for (testString <- in) yield {
+    for (testString <- in) yield
       val Array(group, name) = testString.split("/").map(_.trim)
       ScriptedTest(group, name)
-    }
-}
 
-final case class ScriptedTest(group: String, name: String) extends NotNull {
+final case class ScriptedTest(group: String, name: String) extends NotNull
   override def toString = group + "/" + name
-}
-private[test] object ListTests {
+private[test] object ListTests
   def list(directory: File, filter: java.io.FileFilter) =
     wrapNull(directory.listFiles(filter))
-}
 import ListTests._
 private[test] final class ListTests(
     baseDirectory: File, accept: ScriptedTest => Boolean, log: Logger)
-    extends NotNull {
+    extends NotNull
   def filter = DirectoryFilter -- HiddenFileFilter
-  def listTests: Seq[ScriptedTest] = {
-    list(baseDirectory, filter) flatMap { group =>
+  def listTests: Seq[ScriptedTest] =
+    list(baseDirectory, filter) flatMap  group =>
       val groupName = group.getName
       listTests(group).map(ScriptedTest(groupName, _))
-    }
-  }
-  private[this] def listTests(group: File): Set[String] = {
+  private[this] def listTests(group: File): Set[String] =
     val groupName = group.getName
     val allTests = list(group, filter)
-    if (allTests.isEmpty) {
+    if (allTests.isEmpty)
       log.warn("No tests in test group " + groupName)
       Set.empty
-    } else {
+    else
       val (included, skipped) = allTests.toList.partition(
           test => accept(ScriptedTest(groupName, test.getName)))
       if (included.isEmpty) log.warn("Test group " + groupName + " skipped.")
-      else if (skipped.nonEmpty) {
+      else if (skipped.nonEmpty)
         log.warn("Tests skipped in group " + group.getName + ":")
         skipped.foreach(testName => log.warn(" " + testName.getName))
-      }
       Set(included.map(_.getName): _*)
-    }
-  }
-}
 
-object CompatibilityLevel extends Enumeration {
+object CompatibilityLevel extends Enumeration
   val Full, Basic, Minimal, Minimal27, Minimal28 = Value
 
   def defaultVersions(level: Value) =
-    level match {
+    level match
       case Full => "2.7.4 2.7.7 2.9.0.RC1 2.8.0 2.8.1"
       case Basic => "2.7.7 2.7.4 2.8.1 2.8.0"
       case Minimal => "2.7.7 2.8.1"
       case Minimal27 => "2.7.7"
       case Minimal28 => "2.8.1"
-    }
-}
-class PendingTestSuccessException(label: String) extends Exception {
+class PendingTestSuccessException(label: String) extends Exception
   override def getMessage: String =
     s"The pending test $label succeeded. Mark this test as passing to remove this failure."
-}

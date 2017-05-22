@@ -6,11 +6,11 @@ import slick.ast._
 
 /** Verify that all monadic joins have been transformed into applicative joins and that the
   * resulting tree does not contain references to unreachable symbols. */
-class VerifySymbols extends Phase {
+class VerifySymbols extends Phase
   val name = "verifySymbols"
 
-  def apply(state: CompilerState) = state.map { n2 =>
-    def verifyScoping(n: Node, syms: Set[TermSymbol]): Unit = n match {
+  def apply(state: CompilerState) = state.map  n2 =>
+    def verifyScoping(n: Node, syms: Set[TermSymbol]): Unit = n match
       case FwdPath(s :: _) if !syms.contains(s) =>
         val all = n2
           .collectAll[(TermSymbol, Node)] { case d: DefNode => d.generators }
@@ -44,8 +44,5 @@ class VerifySymbols extends Phase {
         verifyScoping(on, syms + s1 + s2)
       case n =>
         n.childrenForeach(ch => verifyScoping(ch, syms))
-    }
     verifyScoping(n2, Set.empty)
     n2
-  }
-}

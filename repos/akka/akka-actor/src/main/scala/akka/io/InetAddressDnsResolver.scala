@@ -9,27 +9,23 @@ import com.typesafe.config.Config
 import scala.collection.immutable
 
 class InetAddressDnsResolver(cache: SimpleDnsCache, config: Config)
-    extends Actor {
+    extends Actor
   val positiveTtl = config.getDuration("positive-ttl", TimeUnit.MILLISECONDS)
   val negativeTtl = config.getDuration("negative-ttl", TimeUnit.MILLISECONDS)
 
-  override def receive = {
+  override def receive =
     case Dns.Resolve(name) ⇒
-      val answer = cache.cached(name) match {
+      val answer = cache.cached(name) match
         case Some(a) ⇒ a
         case None ⇒
-          try {
+          try
             val answer = Dns.Resolved(name, InetAddress.getAllByName(name))
             cache.put(answer, positiveTtl)
             answer
-          } catch {
+          catch
             case e: UnknownHostException ⇒
               val answer =
                 Dns.Resolved(name, immutable.Seq.empty, immutable.Seq.empty)
               cache.put(answer, negativeTtl)
               answer
-          }
-      }
       sender() ! answer
-  }
-}

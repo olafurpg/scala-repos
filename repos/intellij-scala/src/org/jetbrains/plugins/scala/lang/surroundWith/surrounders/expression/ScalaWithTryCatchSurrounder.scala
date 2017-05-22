@@ -16,27 +16,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
 /**
   * Surrounds block with try - catch: try { Block } catch { <Cursor> } 
   */
-class ScalaWithTryCatchSurrounder extends ScalaExpressionSurrounder {
-  override def getTemplateAsString(elements: Array[PsiElement]): String = {
+class ScalaWithTryCatchSurrounder extends ScalaExpressionSurrounder
+  override def getTemplateAsString(elements: Array[PsiElement]): String =
     val arrow =
       if (elements.length == 0) "=>"
       else ScalaPsiUtil.functionArrow(elements(0).getProject)
     "try {\n" + super.getTemplateAsString(elements) +
     s"\n} catch {\n case _ $arrow \n}"
-  }
 
   override def getTemplateDescription = "try / catch"
 
   override def getSurroundSelectionRange(
-      withTryCatchNode: ASTNode): TextRange = {
-    val element: PsiElement = withTryCatchNode.getPsi match {
+      withTryCatchNode: ASTNode): TextRange =
+    val element: PsiElement = withTryCatchNode.getPsi match
       case x: ScParenthesisedExpr =>
-        x.expr match {
+        x.expr match
           case Some(y) => y
           case _ => return x.getTextRange
-        }
       case x => x
-    }
 
     val tryCatchStmt = element.asInstanceOf[ScTryStmt]
 
@@ -53,5 +50,3 @@ class ScalaWithTryCatchSurrounder extends ScalaExpressionSurrounder {
     tryCatchStmt.getNode.removeChild(caseClause.getNode)
 
     new TextRange(offset, offset)
-  }
-}

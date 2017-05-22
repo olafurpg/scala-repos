@@ -6,7 +6,7 @@ import mesosphere.marathon.Protos.ResidencyDefinition.TaskLostBehavior
 case class Residency(
     relaunchEscalationTimeoutSeconds: Long, taskLostBehavior: TaskLostBehavior)
 
-object Residency {
+object Residency
   def default: Residency =
     Residency(
         defaultRelaunchEscalationTimeoutSeconds, defaultTaskLostBehaviour)
@@ -16,7 +16,5 @@ object Residency {
   val defaultResidency: Residency = Residency(
       defaultRelaunchEscalationTimeoutSeconds, defaultTaskLostBehaviour)
 
-  implicit val residencyValidator = validator[Residency] { residency =>
+  implicit val residencyValidator = validator[Residency]  residency =>
     residency.relaunchEscalationTimeoutSeconds >= 0
-  }
-}

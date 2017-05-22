@@ -16,7 +16,7 @@ import akka.remote.RemoteWatcher
 /**
   * INTERNAL API
   */
-private[cluster] object ClusterRemoteWatcher {
+private[cluster] object ClusterRemoteWatcher
 
   /**
     * Factory method for `ClusterRemoteWatcher` [[akka.actor.Props]].
@@ -30,7 +30,6 @@ private[cluster] object ClusterRemoteWatcher {
           heartbeatInterval,
           unreachableReaperInterval,
           heartbeatExpectedResponseAfter).withDeploy(Deploy.local)
-}
 
 /**
   * INTERNAL API
@@ -51,53 +50,46 @@ private[cluster] class ClusterRemoteWatcher(
     extends RemoteWatcher(failureDetector,
                           heartbeatInterval,
                           unreachableReaperInterval,
-                          heartbeatExpectedResponseAfter) {
+                          heartbeatExpectedResponseAfter)
 
   val cluster = Cluster(context.system)
   import cluster.selfAddress
 
   var clusterNodes: Set[Address] = Set.empty
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     super.preStart()
     cluster.subscribe(self, classOf[MemberEvent])
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     super.postStop()
     cluster.unsubscribe(self)
-  }
 
   override def receive = receiveClusterEvent orElse super.receive
 
-  def receiveClusterEvent: Actor.Receive = {
+  def receiveClusterEvent: Actor.Receive =
     case state: CurrentClusterState ⇒
-      clusterNodes = state.members.collect {
+      clusterNodes = state.members.collect
         case m if m.address != selfAddress ⇒ m.address
-      }
       clusterNodes foreach takeOverResponsibility
       unreachable = unreachable diff clusterNodes
     case MemberUp(m) ⇒ memberUp(m)
     case MemberWeaklyUp(m) ⇒ memberUp(m)
     case MemberRemoved(m, previousStatus) ⇒ memberRemoved(m, previousStatus)
     case _: MemberEvent ⇒ // not interesting
-  }
 
   def memberUp(m: Member): Unit =
-    if (m.address != selfAddress) {
+    if (m.address != selfAddress)
       clusterNodes += m.address
       takeOverResponsibility(m.address)
       unreachable -= m.address
-    }
 
   def memberRemoved(m: Member, previousStatus: MemberStatus): Unit =
-    if (m.address != selfAddress) {
+    if (m.address != selfAddress)
       clusterNodes -= m.address
-      if (previousStatus == MemberStatus.Down) {
+      if (previousStatus == MemberStatus.Down)
         quarantine(m.address, Some(m.uniqueAddress.uid))
-      }
       publishAddressTerminated(m.address)
-    }
 
   override def watchNode(watchee: InternalActorRef) =
     if (!clusterNodes(watchee.path.address)) super.watchNode(watchee)
@@ -108,8 +100,6 @@ private[cluster] class ClusterRemoteWatcher(
     * by super RemoteWatcher.
     */
   def takeOverResponsibility(address: Address): Unit =
-    if (watchingNodes(address)) {
+    if (watchingNodes(address))
       log.debug("Cluster is taking over responsibility of node: [{}]", address)
       unwatchNode(address)
-    }
-}

@@ -26,15 +26,12 @@ import com.typesafe.sbt.web.SbtWeb.autoImport._
   * Pattern-matches an attributed file, extracting its module organization,
   * name, and revision if available in its attributes.
   */
-object MatchingModule {
-  def unapply(file: Attributed[File]): Option[(String, String, String)] = {
-    file.get(moduleID.key).map { moduleInfo =>
+object MatchingModule
+  def unapply(file: Attributed[File]): Option[(String, String, String)] =
+    file.get(moduleID.key).map  moduleInfo =>
       (moduleInfo.organization, moduleInfo.name, moduleInfo.revision)
-    }
-  }
-}
 
-object BuildDef extends Build {
+object BuildDef extends Build
 
   /**
     * A helper that returns the revision and JAR file for a given dependency.
@@ -42,14 +39,12 @@ object BuildDef extends Build {
     */
   def findManagedDependency(classpath: Seq[Attributed[File]],
                             organization: String,
-                            name: String): Option[(String, File)] = {
-    classpath.collectFirst {
+                            name: String): Option[(String, File)] =
+    classpath.collectFirst
       case entry @ MatchingModule(moduleOrganization, moduleName, revision)
           if moduleOrganization == organization &&
           moduleName.startsWith(name) =>
         (revision, entry.data)
-    }
-  }
 
   lazy val liftProjects = core ++ web ++ persistence
 
@@ -77,16 +72,16 @@ object BuildDef extends Build {
   lazy val markdown = coreProject("markdown").settings(
       description := "Markdown Parser",
       parallelExecution in Test := false,
-      libraryDependencies <++= scalaVersion { sv =>
+      libraryDependencies <++= scalaVersion  sv =>
         Seq(scalatest, junit, scala_xml, scala_parser)
-      })
+      )
 
   lazy val json = coreProject("json").settings(
       description := "JSON Library",
       parallelExecution in Test := false,
-      libraryDependencies <++= scalaVersion { sv =>
+      libraryDependencies <++= scalaVersion  sv =>
         Seq(scalap(sv), paranamer)
-      })
+      )
 
   lazy val documentationHelpers = coreProject("documentation-helpers")
     .settings(description := "Documentation Helpers")
@@ -107,7 +102,7 @@ object BuildDef extends Build {
     .dependsOn(actor, json, markdown)
     .settings(description := "Utilities Library",
               parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
+              libraryDependencies <++= scalaVersion  sv =>
                 Seq(scala_compiler(sv),
                     joda_time,
                     joda_convert,
@@ -116,7 +111,7 @@ object BuildDef extends Build {
                     log4j,
                     htmlparser,
                     xerces)
-              })
+              )
 
   // Web Projects
   // ------------
@@ -133,18 +128,18 @@ object BuildDef extends Build {
     .settings(yuiCompressor.Plugin.yuiSettings: _*)
     .settings(description := "Webkit Library",
               parallelExecution in Test := false,
-              libraryDependencies <++= scalaVersion { sv =>
+              libraryDependencies <++= scalaVersion  sv =>
                 Seq(commons_fileupload,
                     rhino,
                     servlet_api,
                     specs2.copy(configurations = Some("provided")),
                     jetty6,
                     jwebunit)
-              },
-              initialize in Test <<= (sourceDirectory in Test) { src =>
+              ,
+              initialize in Test <<= (sourceDirectory in Test)  src =>
                 System.setProperty("net.liftweb.webapptest.src.test.webapp",
                                    (src / "webapp").absString)
-              },
+              ,
               (compile in Compile) <<= (compile in Compile) dependsOn
               (WebKeys.assets),
               /**
@@ -152,18 +147,17 @@ object BuildDef extends Build {
                 * so that other tests (MenuSpec in particular) run before the SiteMap
                 * is set.
                 */
-              testGrouping in Test <<= (definedTests in Test).map { tests =>
+              testGrouping in Test <<= (definedTests in Test).map  tests =>
                 import Tests._
 
-                val (webapptests, others) = tests.partition { test =>
+                val (webapptests, others) = tests.partition  test =>
                   test.name.startsWith("net.liftweb.webapptest")
-                }
 
                 Seq(
                     new Group("others", others, InProcess),
                     new Group("webapptests", webapptests, InProcess)
                 )
-              })
+              )
     .enablePlugins(SbtWeb)
 
   // Persistence Projects
@@ -182,10 +176,10 @@ object BuildDef extends Build {
     .settings(description := "Mapper Library",
               parallelExecution in Test := false,
               libraryDependencies ++= Seq(h2, derby),
-              initialize in Test <<= (crossTarget in Test) { ct =>
+              initialize in Test <<= (crossTarget in Test)  ct =>
                 System.setProperty("derby.stream.error.file",
                                    (ct / "derby.log").absolutePath)
-              })
+              )
 
   lazy val record = persistenceProject("record").dependsOn(proto)
 
@@ -197,10 +191,10 @@ object BuildDef extends Build {
     .dependsOn(json_ext, util)
     .settings(parallelExecution in Test := false,
               libraryDependencies += mongo_driver,
-              initialize in Test <<= (resourceDirectory in Test) { rd =>
+              initialize in Test <<= (resourceDirectory in Test)  rd =>
                 System.setProperty("java.util.logging.config.file",
                                    (rd / "logging.properties").absolutePath)
-              })
+              )
 
   lazy val mongodb_record = persistenceProject("mongodb-record")
     .dependsOn(record, mongodb)
@@ -225,21 +219,18 @@ object BuildDef extends Build {
         id = if (module.startsWith(prefix)) module else prefix + module,
         base = file(base) / module.stripPrefix(prefix))
 
-  def liftProject(id: String, base: File): Project = {
+  def liftProject(id: String, base: File): Project =
     Project(id, base)
       .settings(liftBuildSettings: _*)
       .settings(
           scalacOptions ++= List("-feature", "-language:implicitConversions"))
       .settings(
           autoAPIMappings := true,
-          apiMappings ++= {
+          apiMappings ++=
             val cp: Seq[Attributed[File]] = (fullClasspath in Compile).value
 
-            findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map {
+            findManagedDependency(cp, "org.scala-lang.modules", "scala-xml").map
               case (revision, file) =>
                 (file -> url("http://www.scala-lang.org/api/" + version))
-            }.toMap
-          }
+            .toMap
       )
-  }
-}

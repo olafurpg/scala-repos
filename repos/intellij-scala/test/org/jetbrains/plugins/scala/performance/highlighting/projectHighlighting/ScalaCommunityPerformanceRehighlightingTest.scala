@@ -12,29 +12,25 @@ import org.junit.experimental.categories.Category
 @Category(Array(classOf[SlowTests]))
 class ScalaCommunityPerformanceRehighlightingTest
     extends RehighlightingPerformanceTypingTestBase
-    with ScalaCommunityDownloadingAndImportingTestCase {
+    with ScalaCommunityDownloadingAndImportingTestCase
 
-  def testTypingInScalaPsiUtil(): Unit = {
+  def testTypingInScalaPsiUtil(): Unit =
     doTest("ScalaPsiUtil.scala",
            4.seconds,
            Seq("val i = Some(10)\n"),
            new LogicalPosition(80, 1),
            Some("def foo() = {\n"))
-  }
 
-  def testTypingInScalaPsiUtilInClassBody(): Unit = {
+  def testTypingInScalaPsiUtilInClassBody(): Unit =
     doTest("ScalaPsiUtil.scala",
            40.seconds,
            Seq("val i = Some(10)\n"),
            new LogicalPosition(80, 1),
            None)
-  }
 
-  def testTypingInsideFunctionWithDefinedReturnType(): Unit = {
+  def testTypingInsideFunctionWithDefinedReturnType(): Unit =
     doTest("ScalaPsiUtil.scala",
            3.seconds,
            Seq("val i = Some(10)\n"),
            new LogicalPosition(80, 1),
            Some("def foo(): Unit = {\n"))
-  }
-}

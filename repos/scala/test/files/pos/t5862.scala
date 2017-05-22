@@ -4,9 +4,8 @@ import java.io.DataOutput
 import java.io.DataInput
 
 /** Interface for writing outputs from a DoFn. */
-trait Emitter[A] {
+trait Emitter[A]
   def emit(value: A): Unit
-}
 
 /** A wrapper for a 'map' function tagged for a specific output channel. */
 abstract class TaggedMapper[A, K, V](val tags: Set[Int])(
@@ -22,7 +21,7 @@ abstract class TaggedMapper[A, K, V](val tags: Set[Int])(
 /** Type-class for sending types across the Hadoop wire. */
 trait WireFormat[A]
 
-class MapReduceJob {
+class MapReduceJob
   trait DataSource
 
   import scala.collection.mutable.{Set => MSet, Map => MMap}
@@ -30,11 +29,8 @@ class MapReduceJob {
     MMap.empty
 
   def addTaggedMapper[A, K, V](
-      input: DataSource, m: TaggedMapper[A, K, V]): Unit = {
+      input: DataSource, m: TaggedMapper[A, K, V]): Unit =
     if (!mappers.contains(input)) mappers += (input -> MSet(m))
     else mappers(input) += m // : Unit
 
-    m.tags.foreach { tag =>
-    }
-  }
-}
+    m.tags.foreach  tag =>

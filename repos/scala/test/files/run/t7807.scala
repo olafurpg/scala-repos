@@ -1,18 +1,13 @@
-object Test {
-  def main(args: Array[String]) {
-    try {
+object Test
+  def main(args: Array[String])
+    try
       println("...")
-    } finally {
-      try {
+    finally
+      try
         println("...")
-      } finally {
-        try {
+      finally
+        try
           println("...")
-        } catch {
+        catch
           case ct: scala.util.control.ControlThrowable => throw (ct)
           case t: Throwable => t.printStackTrace()
-        }
-      }
-    }
-  }
-}

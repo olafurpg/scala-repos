@@ -31,42 +31,38 @@ import org.apache.spark.util.StatCounter
 private[spark] class GroupedMeanEvaluator[T](
     totalOutputs: Int, confidence: Double)
     extends ApproximateEvaluator[
-        JHashMap[T, StatCounter], Map[T, BoundedDouble]] {
+        JHashMap[T, StatCounter], Map[T, BoundedDouble]]
 
   var outputsMerged = 0
   var sums = new JHashMap[T, StatCounter] // Sum of counts for each key
 
-  override def merge(outputId: Int, taskResult: JHashMap[T, StatCounter]) {
+  override def merge(outputId: Int, taskResult: JHashMap[T, StatCounter])
     outputsMerged += 1
     val iter = taskResult.entrySet.iterator()
-    while (iter.hasNext) {
+    while (iter.hasNext)
       val entry = iter.next()
       val old = sums.get(entry.getKey)
-      if (old != null) {
+      if (old != null)
         old.merge(entry.getValue)
-      } else {
+      else
         sums.put(entry.getKey, entry.getValue)
-      }
-    }
-  }
 
-  override def currentResult(): Map[T, BoundedDouble] = {
-    if (outputsMerged == totalOutputs) {
+  override def currentResult(): Map[T, BoundedDouble] =
+    if (outputsMerged == totalOutputs)
       val result = new JHashMap[T, BoundedDouble](sums.size)
       val iter = sums.entrySet.iterator()
-      while (iter.hasNext) {
+      while (iter.hasNext)
         val entry = iter.next()
         val mean = entry.getValue.mean
         result.put(entry.getKey, new BoundedDouble(mean, 1.0, mean, mean))
-      }
       result.asScala
-    } else if (outputsMerged == 0) {
+    else if (outputsMerged == 0)
       new HashMap[T, BoundedDouble]
-    } else {
+    else
       val studentTCacher = new StudentTCacher(confidence)
       val result = new JHashMap[T, BoundedDouble](sums.size)
       val iter = sums.entrySet.iterator()
-      while (iter.hasNext) {
+      while (iter.hasNext)
         val entry = iter.next()
         val counter = entry.getValue
         val mean = counter.mean
@@ -76,8 +72,4 @@ private[spark] class GroupedMeanEvaluator[T](
         val high = mean + confFactor * stdev
         result.put(
             entry.getKey, new BoundedDouble(mean, confidence, low, high))
-      }
       result.asScala
-    }
-  }
-}

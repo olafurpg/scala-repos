@@ -9,18 +9,16 @@ import akka.cluster.singleton.ClusterSingletonManagerSettings
 import akka.cluster.singleton.ClusterSingletonProxy
 import akka.cluster.singleton.ClusterSingletonProxySettings
 
-object StatsSampleOneMaster {
-  def main(args: Array[String]): Unit = {
-    if (args.isEmpty) {
+object StatsSampleOneMaster
+  def main(args: Array[String]): Unit =
+    if (args.isEmpty)
       startup(Seq("2551", "2552", "0"))
       StatsSampleOneMasterClient.main(Array.empty)
-    } else {
+    else
       startup(args)
-    }
-  }
 
-  def startup(ports: Seq[String]): Unit = {
-    ports foreach { port =>
+  def startup(ports: Seq[String]): Unit =
+    ports foreach  port =>
       // Override the configuration of the port when specified as program argument
       val config = ConfigFactory
         .parseString(s"akka.remote.netty.tcp.port=" + port)
@@ -46,15 +44,10 @@ object StatsSampleOneMaster {
                              .withRole("compute")),
                      name = "statsServiceProxy")
       //#singleton-proxy
-    }
-  }
-}
 
-object StatsSampleOneMasterClient {
-  def main(args: Array[String]): Unit = {
+object StatsSampleOneMasterClient
+  def main(args: Array[String]): Unit =
     // note that client is not a compute node, role not defined
     val system = ActorSystem("ClusterSystem")
     system.actorOf(
         Props(classOf[StatsSampleClient], "/user/statsServiceProxy"), "client")
-  }
-}

@@ -27,28 +27,24 @@ Check the output:
   cat tutorial/data/output6.tsv
 
   **/
-class Tutorial6(args: Args) extends Job(args) {
+class Tutorial6(args: Args) extends Job(args)
 
   /** When a data set has a large number of fields, and we want to specify those fields conveniently
     in code, we can use, for example, a Tuple of Symbols (as most of the other tutorials show), or a List of Symbols.
     Note that Tuples can only be used if the number of fields is at most 22, since Scala Tuples cannot have more
     than 22 elements. Another alternative is to use Enumerations, which we show here **/
-  object Schema extends Enumeration {
+  object Schema extends Enumeration
     val first, last, phone, age, country = Value // arbitrary number of fields
-  }
 
   import Schema._
 
-  object Other extends Enumeration {
+  object Other extends Enumeration
     val full = Value
-  }
 
   import Other._
 
   Csv("tutorial/data/phones.txt", separator = " ", fields = Schema).read
-    .map((first, last) -> full) { name: (String, String) =>
+    .map((first, last) -> full)  name: (String, String) =>
       name._1 + ' ' + name._2
-    }
     .project(full, age)
     .write(Tsv("tutorial/data/output6.tsv"))
-}

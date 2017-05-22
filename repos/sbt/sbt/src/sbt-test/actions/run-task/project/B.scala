@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import Import._
 
-object B extends Build {
+object B extends Build
   lazy val root =
     Project("root", file(".")) settings
     (myRun, fork in demo := true, javaOptions in demo :=
@@ -13,4 +13,3 @@ object B extends Build {
 
   def myRun = fullRunTask(demo, Compile, "A", "1", "1")
   def myIn = fullRunInputTask(demoIn, Compile, "A", "1")
-}

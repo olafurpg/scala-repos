@@ -15,41 +15,34 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  * ClassParamClause ::= [nl] '(' [ClassParam {',' ClassParam}] ')'
  */
 
-object ClassParamClause {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ClassParamClause
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val classParamMarker = builder.mark
-    if (builder.twoNewlinesBeforeCurrentToken) {
+    if (builder.twoNewlinesBeforeCurrentToken)
       classParamMarker.rollbackTo()
       return false
-    }
     //Look for '('
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLPARENTHESIS =>
         builder.advanceLexer //Ate '('
         builder.disableNewlines
-        builder.getTokenType match {
-          case ScalaTokenTypes.kIMPLICIT => {
+        builder.getTokenType match
+          case ScalaTokenTypes.kIMPLICIT =>
               classParamMarker.rollbackTo
               builder.restoreNewlinesState
               return false
-            }
           case _ => {}
-        }
         //ok, let's parse parameters
-        if (ClassParam parse builder) {
-          while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+        if (ClassParam parse builder)
+          while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
             builder.advanceLexer //Ate ,
-            if (!(ClassParam parse builder)) {
+            if (!(ClassParam parse builder))
               builder error ErrMsg("wrong.parameter")
-            }
-          }
-        }
       case _ =>
         classParamMarker.rollbackTo
         return false
-    }
     //Look for ')'
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tRPARENTHESIS =>
         builder.advanceLexer //Ate )
         builder.restoreNewlinesState
@@ -60,6 +53,3 @@ object ClassParamClause {
         builder error ErrMsg("rparenthesis.expected")
         builder.restoreNewlinesState
         return true
-    }
-  }
-}

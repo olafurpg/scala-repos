@@ -7,10 +7,8 @@ import scala.tools.partest.BytecodeTest
 // import asm.tree.{ClassNode, InsnList}
 // import scala.collection.JavaConverters._
 
-object Test extends BytecodeTest {
-  def show: Unit = {
+object Test extends BytecodeTest
+  def show: Unit =
     val classNode1 = loadClassNode("ValueExtract")
     val classNode2 = loadClassNode("Direct")
     sameMethodAndFieldDescriptors(classNode1, classNode2)
-  }
-}

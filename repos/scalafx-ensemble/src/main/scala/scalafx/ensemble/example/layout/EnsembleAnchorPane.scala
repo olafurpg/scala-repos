@@ -38,16 +38,15 @@ import scalafx.scene.layout.AnchorPane
   * @see scalafx.scene.layout.AnchorPane
   * @resource /scalafx/ensemble/images/icon-48x48.png
   */
-class EnsembleAnchorPane extends EnsembleExample {
+class EnsembleAnchorPane extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     val label = Label("We are all in an AnchorPane.")
     val button = new Button("Submit")
-    val imageView = new ImageView {
+    val imageView = new ImageView
       image = new Image(
           this.getClass
             .getResourceAsStream("/scalafx/ensemble/images/icon-48x48.png"))
-    }
 
     AnchorPane.setTopAnchor(label, 2.0)
     AnchorPane.setLeftAnchor(label, 20.0)
@@ -56,9 +55,6 @@ class EnsembleAnchorPane extends EnsembleExample {
     AnchorPane.setTopAnchor(imageView, 75.0)
     AnchorPane.setLeftAnchor(imageView, 20.0)
 
-    new AnchorPane {
+    new AnchorPane
       padding = Insets(20)
       children = List(label, button, imageView)
-    }
-  }
-}

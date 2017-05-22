@@ -32,7 +32,7 @@ import javafx.scene.{shape => jfxss}
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/shape/DrawMode.html javafx.scene.shape.DrawMode]] */
-object DrawMode extends SFXEnumDelegateCompanion[jfxss.DrawMode, DrawMode] {
+object DrawMode extends SFXEnumDelegateCompanion[jfxss.DrawMode, DrawMode]
 
   /**
     * Render polygonal faces as solid surfaces.
@@ -59,7 +59,6 @@ object DrawMode extends SFXEnumDelegateCompanion[jfxss.DrawMode, DrawMode] {
   val LINE = Line
 
   protected override def unsortedValues: Array[DrawMode] = Array(Fill, Line)
-}
 
 sealed case class DrawMode(override val delegate: jfxss.DrawMode)
     extends SFXEnumDelegate[jfxss.DrawMode]

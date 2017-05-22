@@ -21,7 +21,7 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._
 
-class CatalystTypeConvertersSuite extends SparkFunSuite {
+class CatalystTypeConvertersSuite extends SparkFunSuite
 
   private val simpleTypes: Seq[DataType] = Seq(StringType,
                                                DateType,
@@ -35,7 +35,7 @@ class CatalystTypeConvertersSuite extends SparkFunSuite {
                                                DecimalType.SYSTEM_DEFAULT,
                                                DecimalType.USER_DEFAULT)
 
-  test("null handling in rows") {
+  test("null handling in rows")
     val schema =
       StructType(simpleTypes.map(t => StructField(t.getClass.getName, t)))
     val convertToCatalyst =
@@ -44,24 +44,18 @@ class CatalystTypeConvertersSuite extends SparkFunSuite {
 
     val scalaRow = Row.fromSeq(Seq.fill(simpleTypes.length)(null))
     assert(convertToScala(convertToCatalyst(scalaRow)) === scalaRow)
-  }
 
-  test("null handling for individual values") {
-    for (dataType <- simpleTypes) {
+  test("null handling for individual values")
+    for (dataType <- simpleTypes)
       assert(
           CatalystTypeConverters.createToScalaConverter(dataType)(null) === null)
-    }
-  }
 
-  test("option handling in convertToCatalyst") {
+  test("option handling in convertToCatalyst")
     // convertToCatalyst doesn't handle unboxing from Options. This is inconsistent with
     // createToCatalystConverter but it may not actually matter as this is only called internally
     // in a handful of places where we don't expect to receive Options.
     assert(CatalystTypeConverters.convertToCatalyst(Some(123)) === Some(123))
-  }
 
-  test("option handling in createToCatalystConverter") {
+  test("option handling in createToCatalystConverter")
     assert(CatalystTypeConverters.createToCatalystConverter(IntegerType)(
             Some(123)) === 123)
-  }
-}

@@ -29,15 +29,14 @@ import emitter._
 object PhasesSpecs
     extends Specification with StubPhases with CompilerUtils with Compiler
     with ProvenanceChecker with GroupSolver with RawErrors
-    with RandomLibrarySpec {
+    with RandomLibrarySpec
 
-  "full compiler" should {
-    "self-populate AST errors atom" in {
+  "full compiler" should
+    "self-populate AST errors atom" in
       val tree = compileSingle("fubar")
       tree.errors must not(beEmpty)
-    }
 
-    "propagate binder errors through tree shaking" in {
+    "propagate binder errors through tree shaking" in
       val input = """
         | f( x ) :=
         |   new x ~ new x
@@ -47,11 +46,7 @@ object PhasesSpecs
 
       val forest = compile(input)
       val validForest =
-        forest filter { tree =>
+        forest filter  tree =>
           tree.errors forall isWarning
-        }
 
       validForest must beEmpty
-    }
-  }
-}

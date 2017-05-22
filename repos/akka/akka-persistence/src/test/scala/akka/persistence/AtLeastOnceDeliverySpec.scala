@@ -12,7 +12,7 @@ import scala.concurrent.duration._
 import scala.util.Failure
 import scala.util.control.NoStackTrace
 
-object AtLeastOnceDeliverySpec {
+object AtLeastOnceDeliverySpec
 
   case class Req(payload: String)
   case object ReqAck
@@ -54,14 +54,14 @@ object AtLeastOnceDeliverySpec {
                destinations: Map[String, ActorPath],
                async: Boolean,
                actorSelectionDelivery: Boolean)
-      extends PersistentActor with AtLeastOnceDelivery with ActorLogging {
+      extends PersistentActor with AtLeastOnceDelivery with ActorLogging
 
     override def persistenceId: String = name
 
     // simplistic confirmation mechanism, to tell the requester that a snapshot succeeded
     var lastSnapshotAskedForBy: Option[ActorRef] = None
 
-    def updateState(evt: Evt): Unit = evt match {
+    def updateState(evt: Evt): Unit = evt match
       case AcceptedReq(payload, destination) if actorSelectionDelivery ⇒
         log.debug(
             s"deliver(destination, deliveryId ⇒ Action(deliveryId, $payload)), recovery: " +
@@ -78,34 +78,30 @@ object AtLeastOnceDeliverySpec {
       case ReqDone(id) ⇒
         log.debug(s"confirmDelivery($id), recovery: " + recoveryRunning)
         confirmDelivery(id)
-    }
 
-    val receiveCommand: Receive = {
+    val receiveCommand: Receive =
       case Req(payload) ⇒
         if (payload.isEmpty) sender() ! InvalidReq
-        else {
+        else
           val destination = destinations(payload.take(1).toUpperCase)
           if (async)
-            persistAsync(AcceptedReq(payload, destination)) { evt ⇒
+            persistAsync(AcceptedReq(payload, destination))  evt ⇒
               updateState(evt)
               sender() ! ReqAck
-            } else
-            persist(AcceptedReq(payload, destination)) { evt ⇒
+            else
+            persist(AcceptedReq(payload, destination))  evt ⇒
               updateState(evt)
               sender() ! ReqAck
-            }
-        }
 
       case ActionAck(id) ⇒
         log.debug("Sender got ack {}", id)
         if (confirmDelivery(id))
           if (async)
-            persistAsync(ReqDone(id)) { evt ⇒
+            persistAsync(ReqDone(id))  evt ⇒
               updateState(evt)
-            } else
-            persist(ReqDone(id)) { evt ⇒
+            else
+            persist(ReqDone(id))  evt ⇒
               updateState(evt)
-            }
 
       case Boom ⇒
         log.debug("Boom!")
@@ -123,79 +119,66 @@ object AtLeastOnceDeliverySpec {
       case w: UnconfirmedWarning ⇒
         log.debug("Sender got unconfirmed warning {}", w)
         testActor ! w
-    }
 
-    def receiveRecover: Receive = {
+    def receiveRecover: Receive =
       case evt: Evt ⇒
         updateState(evt)
 
       case SnapshotOffer(_, Snap(deliverySnapshot)) ⇒
         setDeliverySnapshot(deliverySnapshot)
-    }
-  }
 
   def destinationProps(testActor: ActorRef): Props =
     Props(new Destination(testActor))
 
-  class Destination(testActor: ActorRef) extends Actor with ActorLogging {
+  class Destination(testActor: ActorRef) extends Actor with ActorLogging
 
     var allReceived = Set.empty[Long]
 
-    def receive = {
+    def receive =
       case a @ Action(id, payload) ⇒
         // discard duplicates (naive impl)
-        if (!allReceived.contains(id)) {
+        if (!allReceived.contains(id))
           log.debug(
               "Destination got {}, all count {}", a, allReceived.size + 1)
           testActor ! a
           allReceived += id
-        }
         sender() ! ActionAck(id)
-    }
-  }
 
   def unreliableProps(dropMod: Int, target: ActorRef): Props =
     Props(new Unreliable(dropMod, target))
 
   class Unreliable(dropMod: Int, target: ActorRef)
-      extends Actor with ActorLogging {
+      extends Actor with ActorLogging
     var count = 0
-    def receive = {
+    def receive =
       case msg ⇒
         count += 1
-        if (count % dropMod != 0) {
+        if (count % dropMod != 0)
           log.debug("Pass msg {} count {}", msg, count)
           target forward msg
-        } else {
+        else
           log.debug("Drop msg {} count {}", msg, count)
-        }
-    }
-  }
 
   class DeliverToStarSelection(name: String)
-      extends PersistentActor with AtLeastOnceDelivery {
+      extends PersistentActor with AtLeastOnceDelivery
     override def persistenceId = name
 
-    override def receiveCommand = {
+    override def receiveCommand =
       case any ⇒
         // this is not supported currently, so expecting exception
-        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id") catch {
+        try deliver(context.actorSelection("*"))(id ⇒ s"$any$id") catch
           case ex: Exception ⇒ sender() ! Failure(ex)
-        }
-    }
 
     override def receiveRecover = Actor.emptyBehavior
-  }
-}
 
 abstract class AtLeastOnceDeliverySpec(config: Config)
-    extends PersistenceSpec(config) with ImplicitSender {
+    extends PersistenceSpec(config) with ImplicitSender
   import akka.persistence.AtLeastOnceDeliverySpec._
 
-  "AtLeastOnceDelivery" must {
-    List(true, false).foreach { deliverUsingActorSelection ⇒
+  "AtLeastOnceDelivery" must
+    List(true, false).foreach  deliverUsingActorSelection ⇒
       s"deliver messages in order when nothing is lost (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+      (TimingTest) in
         val probe = TestProbe()
         val probeA = TestProbe()
         val destinations =
@@ -212,10 +195,9 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         probe.expectMsg(ReqAck)
         probeA.expectMsg(Action(1, "a"))
         probeA.expectNoMsg(1.second)
-      }
 
       s"re-deliver lost messages (using actorSelection: $deliverUsingActorSelection)" taggedAs
-      (TimingTest) in {
+      (TimingTest) in
         val probe = TestProbe()
         val probeA = TestProbe()
         val dst = system.actorOf(destinationProps(probeA.ref))
@@ -248,15 +230,12 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         // and then re-delivered
         probeA.expectMsg(Action(3, "a-3"))
         probeA.expectNoMsg(1.second)
-      }
-    }
 
-    "not allow using actorSelection with wildcards" in {
+    "not allow using actorSelection with wildcards" in
       system.actorOf(Props(classOf[DeliverToStarSelection], name)) ! "anything, really."
       expectMsgType[Failure[_]].toString should include("not supported")
-    }
 
-    "re-deliver lost messages after restart" taggedAs (TimingTest) in {
+    "re-deliver lost messages after restart" taggedAs (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))
@@ -296,10 +275,9 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       probeA.expectMsg(Action(5, "a-5"))
 
       probeA.expectNoMsg(1.second)
-    }
 
     "re-send replayed deliveries with an 'initially in-order' strategy, before delivering fresh messages" taggedAs
-    (TimingTest) in {
+    (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))
@@ -341,9 +319,8 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
                             Action(4, "a-4")) // re-delivered, 3rd time
 
       probeA.expectNoMsg(1.second)
-    }
 
-    "restore state from snapshot" taggedAs (TimingTest) in {
+    "restore state from snapshot" taggedAs (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))
@@ -387,9 +364,8 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       probeA.expectMsg(Action(5, "a-5"))
 
       probeA.expectNoMsg(1.second)
-    }
 
-    "warn about unconfirmed messages" taggedAs (TimingTest) in {
+    "warn about unconfirmed messages" taggedAs (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val probeB = TestProbe()
@@ -409,18 +385,16 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       probe.expectMsg(ReqAck)
       probe.expectMsg(ReqAck)
       val unconfirmed = probe
-        .receiveWhile(5.seconds) {
+        .receiveWhile(5.seconds)
           case UnconfirmedWarning(unconfirmed) ⇒ unconfirmed
-        }
         .flatten
       unconfirmed.map(_.destination).toSet should ===(
           Set(probeA.ref.path, probeB.ref.path))
       unconfirmed.map(_.message).toSet should be(
           Set(Action(1, "a-1"), Action(2, "b-1"), Action(3, "b-2")))
       system.stop(snd)
-    }
 
-    "re-deliver many lost messages" taggedAs (TimingTest) in {
+    "re-deliver many lost messages" taggedAs (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val probeB = TestProbe()
@@ -441,15 +415,12 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
                                            async = true),
                                name)
       val N = 100
-      for (n ← 1 to N) {
+      for (n ← 1 to N)
         snd.tell(Req("a-" + n), probe.ref)
-      }
-      for (n ← 1 to N) {
+      for (n ← 1 to N)
         snd.tell(Req("b-" + n), probe.ref)
-      }
-      for (n ← 1 to N) {
+      for (n ← 1 to N)
         snd.tell(Req("c-" + n), probe.ref)
-      }
       val deliverWithin = 20.seconds
       probeA
         .receiveN(N, deliverWithin)
@@ -463,9 +434,8 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
         .receiveN(N, deliverWithin)
         .map { case a: Action ⇒ a.payload }
         .toSet should ===((1 to N).map(n ⇒ "c-" + n).toSet)
-    }
 
-    "limit the number of messages redelivered at once" taggedAs (TimingTest) in {
+    "limit the number of messages redelivered at once" taggedAs (TimingTest) in
       val probe = TestProbe()
       val probeA = TestProbe()
       val dst = system.actorOf(destinationProps(probeA.ref))
@@ -478,9 +448,8 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
           name)
 
       val N = 10
-      for (n ← 1 to N) {
+      for (n ← 1 to N)
         snd.tell(Req("a-" + n), probe.ref)
-      }
 
       // initially all odd messages should go through
       for (n ← 1 to N if n % 2 == 1) probeA.expectMsg(Action(n, s"a-$n"))
@@ -489,15 +458,11 @@ abstract class AtLeastOnceDeliverySpec(config: Config)
       // at each redelivery round, 2 (even) messages are sent, the first goes through
       // without throttling, at each round half of the messages would go through
       var toDeliver = (1 to N).filter(_ % 2 == 0).map(_.toLong).toSet
-      for (n ← 1 to N if n % 2 == 0) {
+      for (n ← 1 to N if n % 2 == 0)
         toDeliver -= probeA.expectMsgType[Action].id
         probeA.expectNoMsg(100.millis)
-      }
 
       toDeliver should ===(Set.empty[Long])
-    }
-  }
-}
 
 class LeveldbAtLeastOnceDeliverySpec
     extends AtLeastOnceDeliverySpec(

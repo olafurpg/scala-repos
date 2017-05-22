@@ -6,7 +6,7 @@ import org.openjdk.jmh.annotations._
 import org.openjdk.jmh.infra.Blackhole
 
 @State(Scope.Benchmark)
-class StatusBenchmark extends StdBenchAnnotations {
+class StatusBenchmark extends StdBenchAnnotations
 
   private[this] val all = Array(Open, Busy, Closed)
 
@@ -14,22 +14,17 @@ class StatusBenchmark extends StdBenchAnnotations {
     (l, r)
 
   @Benchmark
-  def best(hole: Blackhole): Unit = {
+  def best(hole: Blackhole): Unit =
     var i = 0
-    while (i < combinations.length) {
+    while (i < combinations.length)
       val statuses = combinations(i)
       hole.consume(Status.best(statuses._1, statuses._2))
       i += 1
-    }
-  }
 
   @Benchmark
-  def worst(hole: Blackhole): Unit = {
+  def worst(hole: Blackhole): Unit =
     var i = 0
-    while (i < combinations.length) {
+    while (i < combinations.length)
       val statuses = combinations(i)
       hole.consume(Status.worst(statuses._1, statuses._2))
       i += 1
-    }
-  }
-}

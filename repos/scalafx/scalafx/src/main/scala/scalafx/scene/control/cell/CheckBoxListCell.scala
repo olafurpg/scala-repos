@@ -45,7 +45,7 @@ import scalafx.util.StringConverter
   *         ListView[T] list), will return an ObservableValue[Boolean] that represents whether the given item is selected or
   *         not.
   */
-object CheckBoxListCell {
+object CheckBoxListCell
 
   /**
     * Converts a ScalaFX $CBLC to its JavaFX counterpart.
@@ -63,9 +63,8 @@ object CheckBoxListCell {
     */
   def forListView[T](
       selectedProperty: T => ObservableValue[Boolean, java.lang.Boolean])
-    : (ListView[T] => ListCell[T]) = { (view: ListView[T]) =>
+    : (ListView[T] => ListCell[T]) =  (view: ListView[T]) =>
     jfxscc.CheckBoxListCell.forListView(selectedProperty).call(view)
-  }
 
   /**
     * Added to satisfy Spec tests.
@@ -85,12 +84,11 @@ object CheckBoxListCell {
     */
   def forListView[T](
       selectedProperty: T => ObservableValue[Boolean, java.lang.Boolean],
-      converter: StringConverter[T]): (ListView[T] => ListCell[T]) = {
+      converter: StringConverter[T]): (ListView[T] => ListCell[T]) =
     (view: ListView[T]) =>
       jfxscc.CheckBoxListCell
         .forListView(selectedProperty, converter)
         .call(view)
-  }
 
   /**
     * Added to satisfy Spec tests.
@@ -102,7 +100,6 @@ object CheckBoxListCell {
                          T, jfxbv.ObservableValue[java.lang.Boolean]],
                      converter: jfxu.StringConverter[T]) =
     jfxscc.CheckBoxListCell.forListView(getSelectedProperty, converter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/CheckBoxListCell.html $CBLC]]
@@ -121,7 +118,7 @@ class CheckBoxListCell[T](
     with ConvertableCell[jfxscc.CheckBoxListCell[T], T, T]
     with StateSelectableCell[jfxscc.CheckBoxListCell[T], T, T]
     with UpdatableCell[jfxscc.CheckBoxListCell[T], T]
-    with SFXDelegate[jfxscc.CheckBoxListCell[T]] {
+    with SFXDelegate[jfxscc.CheckBoxListCell[T]]
 
   /**
     * Creates a default $CBLC from a function that takes a T instance and extracts a boolean.
@@ -141,4 +138,3 @@ class CheckBoxListCell[T](
   def this(selectedProperty: T => ObservableValue[Boolean, java.lang.Boolean],
            converter: StringConverter[T]) =
     this(new jfxscc.CheckBoxListCell[T](selectedProperty, converter))
-}

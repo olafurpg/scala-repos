@@ -2,100 +2,86 @@
  */
 
 // 0 inherited fields
-class A {
+class A
   val x = 1
   val y = 2
   var z = 3
-}
 
 // 3 inherited fields
-class B extends A {
+class B extends A
   val b1 = 1
   var b2 = 2
-}
 
-trait T {
+trait T
   val t1 = 1
   var t2 = 2
-}
 
 // Should not throw
-class D extends B with T {
+class D extends B with T
   val sum = x + y + z + b1 + b2 + t1 + t2
   override def toString =
     "sum = " + sum
-}
 
-abstract class NeedsXEarly {
+abstract class NeedsXEarly
   val x: Int
   val y = x + 1
-}
 
 // should pass
 class GoodX extends { val x = 1 } with NeedsXEarly {}
 
 // should throw
-class BadX extends NeedsXEarly {
+class BadX extends NeedsXEarly
   val x = 1
   println(y)
-}
 
 // should pass
-class UglyX extends NeedsXEarly {
+class UglyX extends NeedsXEarly
   lazy val x = 1
   println(y)
-}
 
-trait XY {
+trait XY
   val x = 1
   val y = 2
-}
 
 // needs x and y early
-trait LazyFields {
+trait LazyFields
   lazy val lz1 = 1
   lazy val lz2 = 2
   val x: Int
   val y: Int
-  val needsSomeEarly = {
+  val needsSomeEarly =
     println("x = " + x)
     println("y = " + y)
     println("lz1 = " + lz1)
     println("lz2 = " + lz2)
     x + y + lz1 + lz2
-  }
-}
 
 // will fail at init
-class BadMixin extends LazyFields with XY {
+class BadMixin extends LazyFields with XY
   println("[OK]: " + needsSomeEarly)
-}
 
 // should print 24
-class GoodMixin extends {
+class GoodMixin extends
   override val x = 10
   override val y = 11
-} with LazyFields with XY {
+with LazyFields with XY
   println("[OK]: " + needsSomeEarly)
-}
 
-class TestInterference extends {
+class TestInterference extends
   override val x = 10
   override val y = 11
-} with A with T with LazyFields {
+with A with T with LazyFields
   println("[OK]: " + needsSomeEarly)
-}
 
-object Test extends App {
+object Test extends App
 
   def shouldThrow(t: => Unit) =
-    try {
+    try
       t
       println("[FAIL]: No UFE thrown")
-    } catch {
+    catch
       case UninitializedFieldError(msg) =>
         println("[OK] Caught UFE: " + msg)
-    }
 
   val d = new D()
   println(d)
@@ -108,4 +94,3 @@ object Test extends App {
   (new GoodMixin)
 
   (new TestInterference)
-}

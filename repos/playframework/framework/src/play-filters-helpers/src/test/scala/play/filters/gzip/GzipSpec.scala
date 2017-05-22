@@ -15,14 +15,14 @@ import org.specs2.mutable.Specification
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-object GzipSpec extends Specification {
+object GzipSpec extends Specification
 
-  "gzip" should {
+  "gzip" should
 
     /**
       * Uses both Java's GZIPOutputStream and GZIPInputStream to verify correctness.
       */
-    def test(values: String*) = {
+    def test(values: String*) =
       import java.io._
       import java.util.zip._
 
@@ -40,11 +40,9 @@ object GzipSpec extends Specification {
       os.close()
       val baosResult = baos.toByteArray
 
-      for (i <- 0 until result.length) {
-        if (result(i) != baosResult(i)) {
+      for (i <- 0 until result.length)
+        if (result(i) != baosResult(i))
           result(i) must_== baosResult(i)
-        }
-      }
 
       result must_== baos.toByteArray
 
@@ -55,110 +53,85 @@ object GzipSpec extends Specification {
           Enumerator.fromStream(is) |>>> Iteratee.consume[Array[Byte]](),
           10.seconds)
       values.mkString("") must_== new String(check, "utf-8")
-    }
 
-    "gzip simple input" in {
+    "gzip simple input" in
       test("Hello world")
-    }
 
-    "gzip multiple inputs" in {
+    "gzip multiple inputs" in
       test("Hello", " ", "world")
-    }
 
-    "gzip large repeating input" in {
+    "gzip large repeating input" in
       val bigString = Seq.fill(1000)("Hello world").mkString("")
       test(bigString)
-    }
 
-    "gzip multiple large repeating inputs" in {
+    "gzip multiple large repeating inputs" in
       val bigString = Seq.fill(1000)("Hello world").mkString("")
       test(bigString, bigString, bigString)
-    }
 
-    "gzip large random input" in {
+    "gzip large random input" in
       test(scala.util.Random.nextString(10000))
-    }
 
-    "gzip multiple large random inputs" in {
+    "gzip multiple large random inputs" in
       test(scala.util.Random.nextString(10000),
            scala.util.Random.nextString(10000),
            scala.util.Random.nextString(10000))
-    }
-  }
 
-  "gunzip" should {
+  "gunzip" should
 
-    def gzip(value: String): Array[Byte] = {
+    def gzip(value: String): Array[Byte] =
       val baos = new ByteArrayOutputStream()
       val gzipStream = new GZIPOutputStream(baos)
       gzipStream.write(value.getBytes("utf-8"))
       gzipStream.close()
       baos.toByteArray
-    }
 
-    def read(resource: String): Array[Byte] = {
+    def read(resource: String): Array[Byte] =
       val is = GzipSpec.getClass.getClassLoader.getResourceAsStream(resource)
-      try {
+      try
         IOUtils.toByteArray(is)
-      } finally {
+      finally
         is.close()
-      }
-    }
 
     def test(value: String,
              gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(),
-             chunkSize: Option[Int] = None) = {
+             chunkSize: Option[Int] = None) =
       testInput(gzip(value), value, gunzip, chunkSize)
-    }
 
     def testInput(input: Array[Byte],
                   expected: String,
                   gunzip: Enumeratee[Array[Byte], Array[Byte]] = Gzip.gunzip(),
-                  chunkSize: Option[Int] = None) = {
-      val gzipEnumerator = chunkSize match {
+                  chunkSize: Option[Int] = None) =
+      val gzipEnumerator = chunkSize match
         case Some(size) => Enumerator.enumerate(input.grouped(size))
         case None => Enumerator(input)
-      }
       val future =
         gzipEnumerator &> gunzip |>>> Iteratee.consume[Array[Byte]]()
       val result = new String(Await.result(future, 10.seconds), "utf-8")
       result must_== expected
-    }
 
-    "gunzip simple input" in {
+    "gunzip simple input" in
       test("Hello world")
-    }
 
-    "gunzip simple input in small chunks" in {
+    "gunzip simple input in small chunks" in
       test("Hello world", chunkSize = Some(5))
-    }
 
-    "gunzip simple input in individual bytes" in {
+    "gunzip simple input in individual bytes" in
       test("Hello world", chunkSize = Some(1))
-    }
 
-    "gunzip large repeating input" in {
+    "gunzip large repeating input" in
       test(Seq.fill(1000)("Hello world").mkString(""))
-    }
 
-    "gunzip large repeating input in small chunks" in {
+    "gunzip large repeating input in small chunks" in
       test(Seq.fill(1000)("Hello world").mkString(""), chunkSize = Some(100))
-    }
 
-    "gunzip large random input" in {
+    "gunzip large random input" in
       test(scala.util.Random.nextString(10000))
-    }
 
-    "gunzip large random input in small chunks" in {
+    "gunzip large random input in small chunks" in
       test(scala.util.Random.nextString(10000), chunkSize = Some(100))
-    }
 
-    "gunzip a stream with a filename" in {
+    "gunzip a stream with a filename" in
       testInput(read("helloWorld.txt.gz"), "Hello world")
-    }
 
-    "gunzip a stream with a filename in individual bytes" in {
+    "gunzip a stream with a filename in individual bytes" in
       testInput(read("helloWorld.txt.gz"), "Hello world", chunkSize = Some(1))
-    }
-  }
-}

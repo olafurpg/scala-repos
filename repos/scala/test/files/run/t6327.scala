@@ -1,6 +1,6 @@
 import language._
 
-object Test extends App {
+object Test extends App
 
   case class R[+T](s: String) { def x() = println(s) }
 
@@ -8,9 +8,8 @@ object Test extends App {
   object R { implicit val StringR = R[String]("A") }
   implicit val Default = R[Any]("B")
 
-  class B() extends Dynamic {
+  class B() extends Dynamic
     def selectDynamic[T](f: String)(implicit r: R[T]): Unit = r.x()
-  }
 
   val b = new B()
 
@@ -19,4 +18,3 @@ object Test extends App {
   b.baz[String]
   val c = b.selectDynamic[String]("baz")
   val d = b.baz[String]
-}

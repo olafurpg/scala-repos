@@ -23,24 +23,22 @@ import scala.annotation.tailrec
   * Nikolay.Tropin
   * 2014-08-29
   */
-class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
+class ScalaChangeSignatureHandler extends ChangeSignatureHandler
 
-  def invokeWithDialog(project: Project, fun: ScMethodLike) {
+  def invokeWithDialog(project: Project, fun: ScMethodLike)
     UsageTrigger.trigger(ScalaChangeSignatureHandler.id)
     val dialog = new ScalaChangeSignatureDialog(
         project, new ScalaMethodDescriptor(fun))
     dialog.show()
-  }
 
   private def invokeOnElement(
-      project: Project, editor: Editor, element: PsiElement): Unit = {
-    def showErrorHint(message: String) = {
+      project: Project, editor: Editor, element: PsiElement): Unit =
+    def showErrorHint(message: String) =
       val name = ChangeSignatureHandler.REFACTORING_NAME
       CommonRefactoringUtil.showErrorHint(
           project, editor, message, name, HelpID.CHANGE_SIGNATURE)
-    }
-    def isSupportedFor(fun: ScMethodLike): Boolean = {
-      fun match {
+    def isSupportedFor(fun: ScMethodLike): Boolean =
+      fun match
         case fun: ScFunction
             if fun.paramClauses.clauses.exists(_.isImplicit) =>
           val message = ScalaBundle.message(
@@ -59,112 +57,93 @@ class ScalaChangeSignatureHandler extends ChangeSignatureHandler {
           showErrorHint(message)
           false
         case _ => true
-      }
-    }
 
     @tailrec
-    def unwrapMethod(element: PsiElement): Option[PsiMethod] = element match {
+    def unwrapMethod(element: PsiElement): Option[PsiMethod] = element match
       case null => None
       case isWrapper(fun: ScFunction) => unwrapMethod(fun)
       case fun: ScFunction if fun.isSynthetic =>
         fun.syntheticCaseClass.flatMap(_.constructor)
       case m: PsiMethod => Some(m)
       case _ => None
-    }
 
-    unwrapMethod(element) match {
+    unwrapMethod(element) match
       case Some(method) =>
         if (!CommonRefactoringUtil.checkReadOnlyStatus(project, method)) return
-        method match {
+        method match
           case f: ScFunction if f.isSynthetic => return
           case _ =>
-        }
 
         val newMethod = SuperMethodWarningUtil.checkSuperMethod(
             method, RefactoringBundle.message("to.refactor"))
-        unwrapMethod(newMethod) match {
+        unwrapMethod(newMethod) match
           case Some(fun: ScMethodLike) =>
             if (isSupportedFor(fun)) invokeWithDialog(project, fun)
           case Some(m) if m != method =>
             ChangeSignatureUtil.invokeChangeSignatureOn(m, project)
           case _ =>
-        }
       case None =>
         val message =
           RefactoringBundle.getCannotRefactorMessage(getTargetNotFoundMessage)
         showErrorHint(message)
-    }
-  }
 
   override def invoke(project: Project,
                       editor: Editor,
                       file: PsiFile,
-                      dataContext: DataContext): Unit = {
+                      dataContext: DataContext): Unit =
     editor.getScrollingModel.scrollToCaret(ScrollType.MAKE_VISIBLE)
     val element = Option(findTargetMember(file, editor))
       .getOrElse(CommonDataKeys.PSI_ELEMENT.getData(dataContext))
 
     invokeOnElement(project, editor, element)
-  }
 
   override def invoke(project: Project,
                       elements: Array[PsiElement],
-                      dataContext: DataContext): Unit = {
+                      dataContext: DataContext): Unit =
     if (elements.length != 1) return
     val editor: Editor =
       if (dataContext == null) null
       else CommonDataKeys.EDITOR.getData(dataContext)
     invokeOnElement(project, editor, elements(0))
-  }
 
   override def getTargetNotFoundMessage: String =
     ScalaBundle.message("error.wrong.caret.position.method.name")
 
-  override def findTargetMember(element: PsiElement): PsiElement = {
+  override def findTargetMember(element: PsiElement): PsiElement =
     if (element.isInstanceOf[PsiMethod]) return element
 
     def resolvedMethod =
-      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement]) match {
+      PsiTreeUtil.getParentOfType(element, classOf[ScReferenceElement]) match
         case null => null
         case ResolvesTo(m: PsiMethod) => m
         case _ => null
-      }
     def currentFunction =
-      PsiTreeUtil.getParentOfType(element, classOf[ScFunction]) match {
+      PsiTreeUtil.getParentOfType(element, classOf[ScFunction]) match
         case null => null
         case funDef: ScFunctionDefinition
             if !funDef.body.exists(_.isAncestorOf(element)) =>
           funDef
         case decl: ScFunctionDeclaration => decl
         case _ => null
-      }
     def primaryConstr =
-      PsiTreeUtil.getParentOfType(element, classOf[ScClass]) match {
+      PsiTreeUtil.getParentOfType(element, classOf[ScClass]) match
         case null => null
         case c: ScClass =>
-          c.constructor match {
+          c.constructor match
             case Some(constr)
                 if PsiTreeUtil.isAncestor(c.nameId, element, false) ||
                 PsiTreeUtil.isAncestor(constr, element, false) =>
               constr
             case _ => null
-          }
-      }
     Option(resolvedMethod) orElse Option(currentFunction) getOrElse primaryConstr
-  }
 
-  override def findTargetMember(file: PsiFile, editor: Editor): PsiElement = {
+  override def findTargetMember(file: PsiFile, editor: Editor): PsiElement =
     val offset = editor.getCaretModel.getOffset
     val element = file.findElementAt(offset)
-    Option(findTargetMember(element)) getOrElse {
-      file.findReferenceAt(offset) match {
+    Option(findTargetMember(element)) getOrElse
+      file.findReferenceAt(offset) match
         case ResolvesTo(m: PsiMethod) => m
         case _ => null
-      }
-    }
-  }
-}
 
-object ScalaChangeSignatureHandler {
+object ScalaChangeSignatureHandler
   val id = "scala.change.signature"
-}

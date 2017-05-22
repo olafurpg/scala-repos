@@ -1,3 +1,2 @@
-object Test extends JavaClass[AnyRef] {
+object Test extends JavaClass[AnyRef]
   var field: InnerClass = null
-}

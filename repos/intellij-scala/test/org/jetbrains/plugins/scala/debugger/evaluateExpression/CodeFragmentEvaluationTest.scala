@@ -10,7 +10,7 @@ class CodeFragmentEvaluationTest
 class CodeFragmentEvaluationTest_212
     extends CodeFragmentEvaluationTestBase with ScalaVersion_2_12
 
-abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
+abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase
 
   addFileWithBreakpoints("CodeFragments.scala",
                          s"""
@@ -23,7 +23,7 @@ abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
        |}
       """.stripMargin.trim())
 
-  def testCodeFragments(): Unit = {
+  def testCodeFragments(): Unit =
     evaluateCodeFragments(
         """1 + 1
         |2 + 2
@@ -75,5 +75,3 @@ abstract class CodeFragmentEvaluationTestBase extends ScalaDebuggerTestCase {
         |}
         |sum""" -> "15"
     )
-  }
-}

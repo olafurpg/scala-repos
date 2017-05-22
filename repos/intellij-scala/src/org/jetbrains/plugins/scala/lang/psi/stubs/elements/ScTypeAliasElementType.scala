@@ -17,18 +17,16 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.index.ScalaIndexKeys
   * Date: 18.10.2008
   */
 abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
-    extends ScStubElementType[ScTypeAliasStub, ScTypeAlias](debugName) {
+    extends ScStubElementType[ScTypeAliasStub, ScTypeAlias](debugName)
   def createStubImpl[ParentPsi <: PsiElement](
       psi: ScTypeAlias,
-      parentStub: StubElement[ParentPsi]): ScTypeAliasStub = {
+      parentStub: StubElement[ParentPsi]): ScTypeAliasStub =
     val isDeclaration = psi.isInstanceOf[ScTypeAliasDeclaration]
-    val typeElementText = {
+    val typeElementText =
       if (isDeclaration) ""
-      else {
+      else
         psi.asInstanceOf[ScTypeAliasDefinition].aliasedTypeElement.getText
-      }
-    }
-    val lower = {
+    val lower =
       if (!isDeclaration) ""
       else
         psi
@@ -36,8 +34,7 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
           .lowerTypeElement
           .map(_.getText)
           .getOrElse("")
-    }
-    val upper = {
+    val upper =
       if (!isDeclaration) ""
       else
         psi
@@ -45,7 +42,6 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
           .upperTypeElement
           .map(_.getText)
           .getOrElse("")
-    }
     val containingClass = psi.containingClass
     val isStableQualifier =
       ScalaPsiUtil.hasStablePath(psi) && containingClass.isInstanceOf[ScObject]
@@ -58,9 +54,8 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
                                        upper,
                                        containingClass == null,
                                        isStableQualifier)
-  }
 
-  def serialize(stub: ScTypeAliasStub, dataStream: StubOutputStream) {
+  def serialize(stub: ScTypeAliasStub, dataStream: StubOutputStream)
     dataStream.writeName(stub.getName)
     dataStream.writeBoolean(stub.isDeclaration)
     dataStream.writeName(stub.getTypeElementText)
@@ -68,10 +63,9 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
     dataStream.writeName(stub.getUpperBoundElementText)
     dataStream.writeBoolean(stub.isLocal)
     dataStream.writeBoolean(stub.isStableQualifier)
-  }
 
   def deserializeImpl(
-      dataStream: StubInputStream, parentStub: Any): ScTypeAliasStub = {
+      dataStream: StubInputStream, parentStub: Any): ScTypeAliasStub =
     val name = StringRef.toString(dataStream.readName)
     val isDecl = dataStream.readBoolean
     val parent = parentStub.asInstanceOf[StubElement[PsiElement]]
@@ -89,15 +83,10 @@ abstract class ScTypeAliasElementType[Func <: ScTypeAlias](debugName: String)
                             upper,
                             isLocal,
                             isStable)
-  }
 
-  def indexStub(stub: ScTypeAliasStub, sink: IndexSink) {
+  def indexStub(stub: ScTypeAliasStub, sink: IndexSink)
     val name = stub.getName
-    if (name != null) {
+    if (name != null)
       sink.occurrence(ScalaIndexKeys.TYPE_ALIAS_NAME_KEY, name)
-      if (stub.isStableQualifier) {
+      if (stub.isStableQualifier)
         sink.occurrence(ScalaIndexKeys.STABLE_ALIAS_NAME_KEY, name)
-      }
-    }
-  }
-}

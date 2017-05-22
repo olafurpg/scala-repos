@@ -23,52 +23,41 @@ import org.scalatest.{Matchers, WordSpec}
 import scala.language.experimental.macros
 
 class ScroogeMacrosUnitTests
-    extends WordSpec with Matchers with PropertyChecks {
+    extends WordSpec with Matchers with PropertyChecks
   import ScroogeGenerators._
   import TestHelper._
   import Macros._
 
-  "MacroGenerated TBaseOrderedSerialization" should {
+  "MacroGenerated TBaseOrderedSerialization" should
 
-    "Should generate serializers" in {
+    "Should generate serializers" in
       Macros.scroogeOrdSer[TestTypes]
       Macros.scroogeOrdSer[TestLists]
       Macros.scroogeOrdSer[TestMaps]
       Macros.scroogeOrdSer[TestOptionTypes]
       Macros.scroogeOrdSer[A]
-    }
 
-    "Should RT" in {
-      forAll { a1: TestLists =>
+    "Should RT" in
+      forAll  a1: TestLists =>
         assert(oBufCompare(rt(a1), a1) == 0)
-      }
-    }
 
-    "Should Compare Equal" in {
+    "Should Compare Equal" in
       val x1 = ScroogeGenerators.dataProvider[TestLists](1)
       val x2 = ScroogeGenerators.dataProvider[TestLists](1)
       compareSerialized(x1, x2) shouldEqual OrderedSerialization.Equal
       compareSerialized(x1, x2)(Macros.scroogeOrdSer[TestLists]) shouldEqual OrderedSerialization.Equal
-    }
 
-    "Should Compare Not Equal" in {
+    "Should Compare Not Equal" in
       val x1 = ScroogeGenerators.dataProvider[TestLists](1)
       val x2 = ScroogeGenerators.dataProvider[TestLists](2)
       assert(compareSerialized(x1, x2) != OrderedSerialization.Equal)
-    }
 
-    "Should RT correctly" in {
-      class Container[T](implicit oSer: OrderedSerialization[T]) {
-        def ord: OrderedSerialization[(Long, T)] = {
+    "Should RT correctly" in
+      class Container[T](implicit oSer: OrderedSerialization[T])
+        def ord: OrderedSerialization[(Long, T)] =
           implicitly[OrderedSerialization[(Long, T)]]
-        }
-      }
 
       val ordSer = (new Container[TestLists]).ord
 
-      forAll { a1: (Long, TestLists) =>
+      forAll  a1: (Long, TestLists) =>
         assert(oBufCompare(rt(a1)(ordSer), a1)(ordSer) == 0)
-      }
-    }
-  }
-}

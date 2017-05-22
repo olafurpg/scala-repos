@@ -47,7 +47,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
                                     private[log] val start: Int,
                                     private[log] val end: Int,
                                     isSlice: Boolean)
-    extends MessageSet with Logging {
+    extends MessageSet with Logging
 
   /* the size of the message set in bytes */
   private val _size =
@@ -116,7 +116,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
     *
     * @return A sliced wrapper on this message set limited based on the given position and size
     */
-  def read(position: Int, size: Int): FileMessageSet = {
+  def read(position: Int, size: Int): FileMessageSet =
     if (position < 0)
       throw new IllegalArgumentException("Invalid position: " + position)
     if (size < 0) throw new IllegalArgumentException("Invalid size: " + size)
@@ -125,7 +125,6 @@ class FileMessageSet private[kafka](@volatile var file: File,
         channel,
         start = this.start + position,
         end = math.min(this.start + position + size, sizeInBytes()))
-  }
 
   /**
     * Search forward for the file position of the last offset that is greater than or equal to the target offset
@@ -133,11 +132,11 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * @param targetOffset The offset to search for.
     * @param startingPosition The starting position in the file to begin searching from.
     */
-  def searchFor(targetOffset: Long, startingPosition: Int): OffsetPosition = {
+  def searchFor(targetOffset: Long, startingPosition: Int): OffsetPosition =
     var position = startingPosition
     val buffer = ByteBuffer.allocate(MessageSet.LogOverhead)
     val size = sizeInBytes()
-    while (position + MessageSet.LogOverhead < size) {
+    while (position + MessageSet.LogOverhead < size)
       buffer.rewind()
       channel.read(buffer, position)
       if (buffer.hasRemaining)
@@ -151,9 +150,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
       if (messageSize < Message.MinMessageOverhead)
         throw new IllegalStateException("Invalid message size: " + messageSize)
       position += MessageSet.LogOverhead + messageSize
-    }
     null
-  }
 
   /**
     * Write some of this set to the given channel.
@@ -164,26 +161,24 @@ class FileMessageSet private[kafka](@volatile var file: File,
     */
   def writeTo(destChannel: GatheringByteChannel,
               writePosition: Long,
-              size: Int): Int = {
+              size: Int): Int =
     // Ensure that the underlying size has not changed.
     val newSize = math.min(channel.size().toInt, end) - start
-    if (newSize < _size.get()) {
+    if (newSize < _size.get())
       throw new KafkaException(
           "Size of FileMessageSet %s has been truncated during write: old size %d, new size %d"
             .format(file.getAbsolutePath, _size.get(), newSize))
-    }
     val position = start + writePosition
     val count = math.min(size, sizeInBytes)
-    val bytesTransferred = (destChannel match {
+    val bytesTransferred = (destChannel match
       case tl: TransportLayer => tl.transferFrom(channel, position, count)
       case dc => channel.transferTo(position, count, dc)
-    }).toInt
+    ).toInt
     trace(
         "FileMessageSet " + file.getAbsolutePath + " : bytes transferred : " +
         bytesTransferred + " bytes requested for transfer : " +
         math.min(size, sizeInBytes))
     bytesTransferred
-  }
 
   /**
     * This method is called before we write messages to the socket using zero-copy transfer. We need to
@@ -193,12 +188,12 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * @return true if all messages have expected magic value, false otherwise
     */
   override def isMagicValueInAllWrapperMessages(
-      expectedMagicValue: Byte): Boolean = {
+      expectedMagicValue: Byte): Boolean =
     var location = start
     val offsetAndSizeBuffer = ByteBuffer.allocate(MessageSet.LogOverhead)
     val crcAndMagicByteBuffer =
       ByteBuffer.allocate(Message.CrcLength + Message.MagicLength)
-    while (location < end) {
+    while (location < end)
       offsetAndSizeBuffer.rewind()
       channel.read(offsetAndSizeBuffer, location)
       if (offsetAndSizeBuffer.hasRemaining) return true
@@ -212,31 +207,26 @@ class FileMessageSet private[kafka](@volatile var file: File,
       if (crcAndMagicByteBuffer.get(Message.MagicOffset) != expectedMagicValue)
         return false
       location += (MessageSet.LogOverhead + messageSize)
-    }
     true
-  }
 
   /**
     * Convert this message set to use the specified message format.
     */
-  def toMessageFormat(toMagicValue: Byte): ByteBufferMessageSet = {
+  def toMessageFormat(toMagicValue: Byte): ByteBufferMessageSet =
     val offsets = new ArrayBuffer[Long]
     val newMessages = new ArrayBuffer[Message]
-    this.foreach { messageAndOffset =>
+    this.foreach  messageAndOffset =>
       val message = messageAndOffset.message
-      if (message.compressionCodec == NoCompressionCodec) {
+      if (message.compressionCodec == NoCompressionCodec)
         newMessages += message.toFormatVersion(toMagicValue)
         offsets += messageAndOffset.offset
-      } else {
+      else
         // File message set only has shallow iterator. We need to do deep iteration here if needed.
         val deepIter = ByteBufferMessageSet.deepIterator(messageAndOffset)
-        for (innerMessageAndOffset <- deepIter) {
+        for (innerMessageAndOffset <- deepIter)
           newMessages +=
             innerMessageAndOffset.message.toFormatVersion(toMagicValue)
           offsets += innerMessageAndOffset.offset
-        }
-      }
-    }
 
     // We use the offset seq to assign offsets so the offset of the messages does not change.
     new ByteBufferMessageSet(compressionCodec = this.headOption
@@ -244,7 +234,6 @@ class FileMessageSet private[kafka](@volatile var file: File,
                                  .getOrElse(NoCompressionCodec),
                              offsetSeq = offsets,
                              newMessages: _*)
-  }
 
   /**
     * Get a shallow iterator over the messages in the set.
@@ -257,12 +246,12 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * If we encounter a message larger than this we throw an InvalidMessageException.
     * @return The iterator.
     */
-  def iterator(maxMessageSize: Int): Iterator[MessageAndOffset] = {
-    new IteratorTemplate[MessageAndOffset] {
+  def iterator(maxMessageSize: Int): Iterator[MessageAndOffset] =
+    new IteratorTemplate[MessageAndOffset]
       var location = start
       val sizeOffsetBuffer = ByteBuffer.allocate(12)
 
-      override def makeNext(): MessageAndOffset = {
+      override def makeNext(): MessageAndOffset =
         if (location >= end) return allDone()
 
         // read the size of the item
@@ -288,9 +277,6 @@ class FileMessageSet private[kafka](@volatile var file: File,
         // increment the location and return the item
         location += size + 12
         new MessageAndOffset(new Message(buffer), offset)
-      }
-    }
-  }
 
   /**
     * The number of bytes taken up by this file set
@@ -300,42 +286,37 @@ class FileMessageSet private[kafka](@volatile var file: File,
   /**
     * Append these messages to the message set
     */
-  def append(messages: ByteBufferMessageSet) {
+  def append(messages: ByteBufferMessageSet)
     val written = messages.writeTo(channel, 0, messages.sizeInBytes)
     _size.getAndAdd(written)
-  }
 
   /**
     * Commit all written data to the physical disk
     */
-  def flush() = {
+  def flush() =
     channel.force(true)
-  }
 
   /**
     * Close this message set
     */
-  def close() {
+  def close()
     flush()
     trim()
     channel.close()
-  }
 
   /**
     * Trim file when close or roll to next file
     */
-  def trim() {
+  def trim()
     truncateTo(sizeInBytes())
-  }
 
   /**
     * Delete this message set from the filesystem
     * @return True iff this message set was deleted.
     */
-  def delete(): Boolean = {
+  def delete(): Boolean =
     CoreUtils.swallow(channel.close())
     file.delete()
-  }
 
   /**
     * Truncate this file message set to the given size in bytes. Note that this API does no checking that the
@@ -343,7 +324,7 @@ class FileMessageSet private[kafka](@volatile var file: File,
     * @param targetSize The size to truncate to.
     * @return The number of bytes truncated off
     */
-  def truncateTo(targetSize: Int): Int = {
+  def truncateTo(targetSize: Int): Int =
     val originalSize = sizeInBytes
     if (targetSize > originalSize || targetSize < 0)
       throw new KafkaException(
@@ -354,27 +335,23 @@ class FileMessageSet private[kafka](@volatile var file: File,
     channel.position(targetSize)
     _size.set(targetSize)
     originalSize - targetSize
-  }
 
   /**
     * Read from the underlying file into the buffer starting at the given position
     */
-  def readInto(buffer: ByteBuffer, relativePosition: Int): ByteBuffer = {
+  def readInto(buffer: ByteBuffer, relativePosition: Int): ByteBuffer =
     channel.read(buffer, relativePosition + this.start)
     buffer.flip()
     buffer
-  }
 
   /**
     * Rename the file that backs this message set
     * @throws IOException if rename fails.
     */
-  def renameTo(f: File) {
+  def renameTo(f: File)
     try Utils.atomicMoveWithFallback(file.toPath, f.toPath) finally this.file = f
-  }
-}
 
-object FileMessageSet {
+object FileMessageSet
 
   /**
     * Open a channel for the given file
@@ -390,22 +367,18 @@ object FileMessageSet {
                   mutable: Boolean,
                   fileAlreadyExists: Boolean = false,
                   initFileSize: Int = 0,
-                  preallocate: Boolean = false): FileChannel = {
-    if (mutable) {
+                  preallocate: Boolean = false): FileChannel =
+    if (mutable)
       if (fileAlreadyExists) new RandomAccessFile(file, "rw").getChannel()
-      else {
-        if (preallocate) {
+      else
+        if (preallocate)
           val randomAccessFile = new RandomAccessFile(file, "rw")
           randomAccessFile.setLength(initFileSize)
           randomAccessFile.getChannel()
-        } else new RandomAccessFile(file, "rw").getChannel()
-      }
-    } else new FileInputStream(file).getChannel()
-  }
-}
+        else new RandomAccessFile(file, "rw").getChannel()
+    else new FileInputStream(file).getChannel()
 
-object LogFlushStats extends KafkaMetricsGroup {
+object LogFlushStats extends KafkaMetricsGroup
   val logFlushTimer = new KafkaTimer(
       newTimer(
           "LogFlushRateAndTimeMs", TimeUnit.MILLISECONDS, TimeUnit.SECONDS))
-}

@@ -12,165 +12,122 @@ class Bottle(val of: String)
 class BottleSerializer
     extends CustomSerializer[Bottle](
         implicit formats =>
-          ({
+          (
         case json: JValue =>
-          val b = for {
+          val b = for
             of <- (json \ "of").extractOpt[String]
-          } yield (new Bottle(of))
+          yield (new Bottle(of))
           b.get
-      }, {
+      ,
         case a: Bottle => JObject(JField("of", JString(a.of)))
-      })) {}
+      )) {}
 
-class JValueResultSpec extends MutableScalatraSpec {
+class JValueResultSpec extends MutableScalatraSpec
 
   val jValue = JObject(JField("name", JString("tom")) :: Nil)
 
-  addServlet(new ScalatraServlet with JacksonJsonSupport {
+  addServlet(new ScalatraServlet with JacksonJsonSupport
 
     implicit protected def jsonFormats: Formats =
       DefaultFormats + new BottleSerializer
 
-    notFound {
+    notFound
       status = 404
       "the custom not found"
-    }
 
-    get("/jvalue") {
+    get("/jvalue")
       jValue
-    }
-    get("/actionresult") {
+    get("/actionresult")
       Created(jValue)
-    }
-    get("/unit") {
+    get("/unit")
       response.writer.println("printed")
-    }
-    get("/namedthing") {
+    get("/namedthing")
       contentType = formats("json")
       NamedThing()
-    }
-    get("/empty-not-found") {
+    get("/empty-not-found")
       NotFound()
-    }
-    get("/halted-not-found") {
+    get("/halted-not-found")
       halt(NotFound())
-    }
-    get("/null-value.:format") {
+    get("/null-value.:format")
       params.getAs[String]("format").foreach(f => contentType = formats(f))
       null
-    }
-    get("/null-value") {
+    get("/null-value")
       ""
-    }
-    get("/empty-halt") {
+    get("/empty-halt")
       halt(400, null)
-    }
-    get("/jnull") {
+    get("/jnull")
       JNull
-    }
 
-    get("/class") {
+    get("/class")
       contentType = formats("json")
       new Bottle("rum")
-    }
 
-    get("/class-list") {
+    get("/class-list")
       contentType = formats("json")
       List(new Bottle("rum"), new Bottle("soda"))
-    }
 
-    get("/mixed-list") {
+    get("/mixed-list")
       contentType = formats("json")
       List(new Bottle("rum"), NamedThing())
-    }
 
-    get("/map") {
+    get("/map")
       contentType = formats("json")
       Map("rum" -> new Bottle("rum"), "thing" -> NamedThing())
-    }
 
-    error {
+    error
       case t: Throwable =>
         t.printStackTrace()
-    }
-  }, "/*")
+  , "/*")
 
-  "The JValueResult trait" should {
-    "render a JValue result" in {
-      get("/jvalue") {
+  "The JValueResult trait" should
+    "render a JValue result" in
+      get("/jvalue")
         parse(body) must_== jValue
-      }
-    }
-    "render an ActionResult result" in {
-      get("/actionresult") {
+    "render an ActionResult result" in
+      get("/actionresult")
         status must_== 201
         parse(body) must_== jValue
-      }
-    }
-    "render a Unit result" in {
-      get("/unit") {
+    "render a Unit result" in
+      get("/unit")
         body must_== "printed" + System.lineSeparator
-      }
-    }
-    "render a NamedThing result" in {
+    "render a NamedThing result" in
       get("/namedthing") { parse(body) must_== jValue }
-    }
-    "render an empty not found" in {
-      get("/empty-not-found") {
+    "render an empty not found" in
+      get("/empty-not-found")
         status must_== 404
         body must_== "the custom not found"
-      }
-    }
-    "render a null value as JSON body" in {
-      get("/null-value.json") {
+    "render a null value as JSON body" in
+      get("/null-value.json")
         body must_== ""
-      }
-    }
-    "render a null value as HTML body" in {
-      get("/null-value.html") {
+    "render a null value as HTML body" in
+      get("/null-value.html")
         body must_== ""
-      }
-    }
-    "render a halted empty not found" in {
-      get("/halted-not-found") {
+    "render a halted empty not found" in
+      get("/halted-not-found")
         status must_== 404
         body must_== "the custom not found"
-      }
-    }
 
     val bottleRum = JObject(JField("of", JString("rum")))
     val bottleSoda = JObject(JField("of", JString("soda")))
 
-    "render a class" in {
-      get("/class") {
+    "render a class" in
+      get("/class")
         parse(body) must_== bottleRum
-      }
-    }
 
-    "render a class list" in {
-      get("/class-list") {
+    "render a class list" in
+      get("/class-list")
         parse(body) must_== JArray(List(bottleRum, bottleSoda))
-      }
-    }
 
-    "render a mixed list" in {
-      get("/mixed-list") {
+    "render a mixed list" in
+      get("/mixed-list")
         parse(body) must_== JArray(List(bottleRum, jValue))
-      }
-    }
 
-    "render a map" in {
-      get("/map") {
+    "render a map" in
+      get("/map")
         parse(body) must_==
           JObject(List(JField("rum", bottleRum), JField("thing", jValue)))
-      }
-    }
 
-    "render null for JNull" in {
-      get("/jnull") {
+    "render null for JNull" in
+      get("/jnull")
         body must_== "null"
         parse(body) must_== JNull
-      }
-    }
-  }
-}

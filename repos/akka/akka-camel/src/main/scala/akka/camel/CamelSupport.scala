@@ -5,7 +5,7 @@ package akka.camel
 
 import akka.actor.Actor
 
-private[camel] trait CamelSupport {
+private[camel] trait CamelSupport
   this: Actor ⇒
 
   /**
@@ -19,4 +19,3 @@ private[camel] trait CamelSupport {
     * The camelContext is defined implicit for simplifying the use of CamelMessage from the Scala API.
     */
   protected implicit def camelContext = camel.context
-}

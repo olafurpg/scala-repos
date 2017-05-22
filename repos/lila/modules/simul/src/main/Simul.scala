@@ -19,7 +19,7 @@ case class Simul(_id: Simul.ID,
                  startedAt: Option[DateTime],
                  finishedAt: Option[DateTime],
                  hostSeenAt: Option[DateTime],
-                 color: Option[String]) {
+                 color: Option[String])
 
   def id = _id
 
@@ -39,24 +39,21 @@ case class Simul(_id: Simul.ID,
 
   def hasUser(userId: String) = hasApplicant(userId) || hasPairing(userId)
 
-  def addApplicant(applicant: SimulApplicant) = Created {
+  def addApplicant(applicant: SimulApplicant) = Created
     if (!hasApplicant(applicant.player.user) &&
         variants.contains(applicant.player.variant))
       copy(applicants = applicants :+ applicant)
     else this
-  }
 
-  def removeApplicant(userId: String) = Created {
+  def removeApplicant(userId: String) = Created
     copy(applicants = applicants filterNot (_ is userId))
-  }
 
-  def accept(userId: String, v: Boolean) = Created {
+  def accept(userId: String, v: Boolean) = Created
     copy(
-        applicants = applicants map {
+        applicants = applicants map
       case a if a is userId => a.copy(accepted = v)
       case a => a
-    })
-  }
+    )
 
   def removePairing(userId: String) =
     copy(pairings = pairings filterNot (_ is userId)).finishIfDone
@@ -67,17 +64,17 @@ case class Simul(_id: Simul.ID,
     startable option copy(status = SimulStatus.Started,
                           startedAt = DateTime.now.some,
                           applicants = Nil,
-                          pairings = applicants collect {
+                          pairings = applicants collect
                             case a if a.accepted => SimulPairing(a.player)
-                          },
+                          ,
                           hostSeenAt = none)
 
   def updatePairing(gameId: String, f: SimulPairing => SimulPairing) =
     copy(
-        pairings = pairings collect {
+        pairings = pairings collect
       case p if p.gameId == gameId => f(p)
       case p => p
-    }).finishIfDone
+    ).finishIfDone
 
   def ejectCheater(userId: String): Option[Simul] =
     hasUser(userId) option removeApplicant(userId).removePairing(userId)
@@ -91,11 +88,10 @@ case class Simul(_id: Simul.ID,
 
   def gameIds = pairings.map(_.gameId)
 
-  def perfTypes: List[lila.rating.PerfType] = variants.flatMap { variant =>
+  def perfTypes: List[lila.rating.PerfType] = variants.flatMap  variant =>
     lila.game.PerfPicker.perfType(speed = chess.Speed(clock.chessClock.some),
                                   variant = variant,
                                   daysPerTurn = none)
-  }
 
   def applicantRatio = s"${applicants.count(_.accepted)}/${applicants.size}"
 
@@ -115,9 +111,8 @@ case class Simul(_id: Simul.ID,
   def isNotBrandNew = createdAt isBefore DateTime.now.minusSeconds(10)
 
   private def Created(s: => Simul): Simul = if (isCreated) s else this
-}
 
-object Simul {
+object Simul
 
   type ID = String
 
@@ -130,14 +125,13 @@ object Simul {
           status = SimulStatus.Created,
           clock = clock,
           hostId = host.id,
-          hostRating = host.perfs.bestRatingIn {
-            variants flatMap { variant =>
+          hostRating = host.perfs.bestRatingIn
+            variants flatMap  variant =>
               lila.game.PerfPicker.perfType(
                   speed = chess.Speed(clock.chessClock.some),
                   variant = variant,
                   daysPerTurn = none)
-            }
-          },
+          ,
           hostGameId = none,
           createdAt = DateTime.now,
           variants = variants,
@@ -147,4 +141,3 @@ object Simul {
           finishedAt = none,
           hostSeenAt = DateTime.now.some,
           color = color.some)
-}

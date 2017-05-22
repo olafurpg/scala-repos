@@ -9,7 +9,7 @@ object WsApi extends fastparse.WhitespaceApi.Wrapper(Lexical.wscomment)
   *
   * Manually transcribed from https://docs.python.org/2/reference/lexical_analysis.html
   */
-object Lexical {
+object Lexical
   import fastparse.all._
   def kw(s: String) = s ~ !(letter | digit | "_")
   val comment = P("#" ~ CharsWhile(_ != '\n', min = 0))
@@ -110,4 +110,3 @@ object Lexical {
   val exponent: P0 = P(("e" | "E") ~ ("+" | "-").? ~ digit.rep(1))
 
   val imagnumber = P((floatnumber | intpart) ~ ("j" | "J"))
-}

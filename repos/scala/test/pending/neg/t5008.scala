@@ -38,8 +38,8 @@
 // That is, "this" is in the prefix somewhere, it's just not a "this"
 // which has any bearing.
 
-package foo {
-  class A {
+package foo
+  class A
     trait Foo
 
     protected trait FooProt1
@@ -86,9 +86,8 @@ package foo {
       0 // !!! isn't the private type now in the signature of the (public) method?
     def fpriv_alt2(x: FooPriv2) =
       0 // !!! isn't the private[this] type now in the signature of the (public) method?
-  }
   // Same package, subclass
-  class B extends A {
+  class B extends A
     val xprot1 = new BarProt1 {}
     val xprot2 = new BarProt2 {}
     val xprot3 = new BarProt3 {}
@@ -108,9 +107,8 @@ package foo {
     // override def fpriv2(x: BarPriv2) = x
     override def fpriv3(x: BarPriv3) = x
     override def fpriv4(x: BarPriv4) = x
-  }
   // Same package, unrelated class
-  class C {
+  class C
     val a = new A
     import a._
 
@@ -123,12 +121,10 @@ package foo {
     // val xpriv2 = new BarPriv2 { }
     val xpriv3 = new BarPriv3 {}
     val xpriv4 = new BarPriv4 {}
-  }
-}
 
-package bar {
+package bar
   // Different package, subclass
-  class B extends foo.A {
+  class B extends foo.A
     val xprot1 = new BarProt1 {}
     val xprot2 = new BarProt2 {}
     val xprot3 = new BarProt3 {}
@@ -148,9 +144,8 @@ package bar {
     // override def fpriv2(x: BarPriv2) = x
     override def fpriv3(x: BarPriv3) = x
     override def fpriv4(x: BarPriv4) = x
-  }
   // Different package, unrelated class
-  class C {
+  class C
     val a = new foo.A
     import a._
 
@@ -163,5 +158,3 @@ package bar {
     // val xpriv2 = new BarPriv2 { }
     val xpriv3 = new BarPriv3 {}
     val xpriv4 = new BarPriv4 {}
-  }
-}

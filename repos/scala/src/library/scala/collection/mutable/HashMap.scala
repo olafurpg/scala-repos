@@ -41,7 +41,7 @@ class HashMap[A, B] private[collection](
     contents: HashTable.Contents[A, DefaultEntry[A, B]])
     extends AbstractMap[A, B] with Map[A, B] with MapLike[A, B, HashMap[A, B]]
     with HashTable[A, DefaultEntry[A, B]]
-    with CustomParallelizable[(A, B), ParHashMap[A, B]] with Serializable {
+    with CustomParallelizable[(A, B), ParHashMap[A, B]] with Serializable
   initWithContents(contents)
 
   type Entry = DefaultEntry[A, B]
@@ -57,37 +57,32 @@ class HashMap[A, B] private[collection](
   // contains and apply overridden to avoid option allocations.
   override def contains(key: A): Boolean = findEntry(key) != null
 
-  override def apply(key: A): B = {
+  override def apply(key: A): B =
     val result = findEntry(key)
     if (result eq null) default(key)
     else result.value
-  }
 
-  def get(key: A): Option[B] = {
+  def get(key: A): Option[B] =
     val e = findEntry(key)
     if (e eq null) None
     else Some(e.value)
-  }
 
-  override def put(key: A, value: B): Option[B] = {
+  override def put(key: A, value: B): Option[B] =
     val e = findOrAddEntry(key, value)
     if (e eq null) None
     else { val v = e.value; e.value = value; Some(v) }
-  }
 
   override def update(key: A, value: B): Unit = put(key, value)
 
-  override def remove(key: A): Option[B] = {
+  override def remove(key: A): Option[B] =
     val e = removeEntry(key)
     if (e ne null) Some(e.value)
     else None
-  }
 
-  def +=(kv: (A, B)): this.type = {
+  def +=(kv: (A, B)): this.type =
     val e = findOrAddEntry(kv._1, kv._2)
     if (e ne null) e.value = kv._2
     this
-  }
 
   def -=(key: A): this.type = { removeEntry(key); this }
 
@@ -97,59 +92,50 @@ class HashMap[A, B] private[collection](
     foreachEntry(e => f((e.key, e.value)))
 
   /* Override to avoid tuple allocation in foreach */
-  override def keySet: scala.collection.Set[A] = new DefaultKeySet {
+  override def keySet: scala.collection.Set[A] = new DefaultKeySet
     override def foreach[U](f: A => U) = foreachEntry(e => f(e.key))
-  }
 
   /* Override to avoid tuple allocation in foreach */
   override def values: scala.collection.Iterable[B] =
-    new DefaultValuesIterable {
+    new DefaultValuesIterable
       override def foreach[U](f: B => U) = foreachEntry(e => f(e.value))
-    }
 
   /* Override to avoid tuple allocation */
-  override def keysIterator: Iterator[A] = new AbstractIterator[A] {
+  override def keysIterator: Iterator[A] = new AbstractIterator[A]
     val iter = entriesIterator
     def hasNext = iter.hasNext
     def next() = iter.next().key
-  }
 
   /* Override to avoid tuple allocation */
-  override def valuesIterator: Iterator[B] = new AbstractIterator[B] {
+  override def valuesIterator: Iterator[B] = new AbstractIterator[B]
     val iter = entriesIterator
     def hasNext = iter.hasNext
     def next() = iter.next().value
-  }
 
   /** Toggles whether a size map is used to track hash map statistics.
     */
   def useSizeMap(t: Boolean) =
-    if (t) {
+    if (t)
       if (!isSizeMapDefined) sizeMapInitAndRebuild()
-    } else sizeMapDisable()
+    else sizeMapDisable()
 
-  protected def createNewEntry[B1](key: A, value: B1): Entry = {
+  protected def createNewEntry[B1](key: A, value: B1): Entry =
     new Entry(key, value.asInstanceOf[B])
-  }
 
-  private def writeObject(out: java.io.ObjectOutputStream) {
-    serializeTo(out, { entry =>
+  private def writeObject(out: java.io.ObjectOutputStream)
+    serializeTo(out,  entry =>
       out.writeObject(entry.key)
       out.writeObject(entry.value)
-    })
-  }
+    )
 
-  private def readObject(in: java.io.ObjectInputStream) {
+  private def readObject(in: java.io.ObjectInputStream)
     init(in, createNewEntry(in.readObject().asInstanceOf[A], in.readObject()))
-  }
-}
 
 /** $factoryInfo
   *  @define Coll `mutable.HashMap`
   *  @define coll mutable hash map
   */
-object HashMap extends MutableMapFactory[HashMap] {
+object HashMap extends MutableMapFactory[HashMap]
   implicit def canBuildFrom[A, B]: CanBuildFrom[Coll, (A, B), HashMap[A, B]] =
     new MapCanBuildFrom[A, B]
   def empty[A, B]: HashMap[A, B] = new HashMap[A, B]
-}

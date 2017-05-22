@@ -29,11 +29,11 @@ import org.apache.spark.util.collection.OpenHashMap
 /**
   * Test suite for [[RandomForest]].
   */
-class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
+class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext
 
   import RandomForestSuite.mapToVec
 
-  test("computeFeatureImportance, featureImportances") {
+  test("computeFeatureImportance, featureImportances")
     /* Build tree for testing, with this structure:
           grandParent
       left2       parent
@@ -57,11 +57,10 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
     val grandImp = grandParent.impurityStats
 
     // Test feature importance computed at different subtrees.
-    def testNode(node: Node, expected: Map[Int, Double]): Unit = {
+    def testNode(node: Node, expected: Map[Int, Double]): Unit =
       val map = new OpenHashMap[Int, Double]()
       RandomForest.computeFeatureImportance(node, map)
       assert(mapToVec(map.toMap) ~== mapToVec(expected) relTol 0.01)
-    }
 
     // Leaf node
     testNode(left, Map.empty[Int, Double])
@@ -82,33 +81,27 @@ class RandomForestSuite extends SparkFunSuite with MLlibTestSparkContext {
         grandParent, Map(0 -> feature0importance, 1 -> feature1importance))
 
     // Forest consisting of (full tree) + (internal node with 2 leafs)
-    val trees = Array(parent, grandParent).map { root =>
+    val trees = Array(parent, grandParent).map  root =>
       new DecisionTreeClassificationModel(
           root, numFeatures = 2, numClasses = 3)
         .asInstanceOf[DecisionTreeModel]
-    }
     val importances: Vector = RandomForest.featureImportances(trees, 2)
     val tree2norm = feature0importance + feature1importance
     val expected = Vectors.dense((1.0 + feature0importance / tree2norm) / 2.0,
                                  (feature1importance / tree2norm) / 2.0)
     assert(importances ~== expected relTol 0.01)
-  }
 
-  test("normalizeMapValues") {
+  test("normalizeMapValues")
     val map = new OpenHashMap[Int, Double]()
     map(0) = 1.0
     map(2) = 2.0
     RandomForest.normalizeMapValues(map)
     val expected = Map(0 -> 1.0 / 3.0, 2 -> 2.0 / 3.0)
     assert(mapToVec(map.toMap) ~== mapToVec(expected) relTol 0.01)
-  }
-}
 
-private object RandomForestSuite {
+private object RandomForestSuite
 
-  def mapToVec(map: Map[Int, Double]): Vector = {
+  def mapToVec(map: Map[Int, Double]): Vector =
     val size = (map.keys.toSeq :+ 0).max + 1
     val (indices, values) = map.toSeq.sortBy(_._1).unzip
     Vectors.sparse(size, indices.toArray, values.toArray)
-  }
-}

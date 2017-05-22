@@ -16,51 +16,42 @@ import org.scalatest.junit.JUnitRunner
 @RunWith(classOf[JUnitRunner])
 class LoadBalancerFactoryTest
     extends FunSuite with StringClient with StringServer with Eventually
-    with IntegrationPatience {
+    with IntegrationPatience
   val echoService = Service.mk[String, String](Future.value(_))
 
-  trait PerHostFlagCtx extends App {
+  trait PerHostFlagCtx extends App
     val label = "myclient"
     val client = stringClient.configured(param.Label(label))
     val port = "localhost:8080"
     val perHostStatKey = Seq(label, port, "available")
-  }
 
-  test("reports per-host stats when flag is true") {
-    new PerHostFlagCtx {
+  test("reports per-host stats when flag is true")
+    new PerHostFlagCtx
       val sr = new InMemoryHostStatsReceiver
       val sr1 = new InMemoryStatsReceiver
 
-      perHostStats.let(true) {
+      perHostStats.let(true)
         client.configured(LoadBalancerFactory.HostStats(sr)).newService(port)
-        eventually {
+        eventually
           assert(sr.self.gauges(perHostStatKey).apply == 1.0)
-        }
 
         client.configured(LoadBalancerFactory.HostStats(sr1)).newService(port)
-        eventually {
+        eventually
           assert(sr1.gauges(perHostStatKey).apply == 1.0)
-        }
-      }
-    }
-  }
 
-  test("does not report per-host stats when flag is false") {
-    new PerHostFlagCtx {
+  test("does not report per-host stats when flag is false")
+    new PerHostFlagCtx
       val sr = new InMemoryHostStatsReceiver
       val sr1 = new InMemoryStatsReceiver
 
-      perHostStats.let(false) {
+      perHostStats.let(false)
         client.configured(LoadBalancerFactory.HostStats(sr)).newService(port)
         assert(sr.self.gauges.contains(perHostStatKey) == false)
 
         client.configured(LoadBalancerFactory.HostStats(sr1)).newService(port)
         assert(sr1.gauges.contains(perHostStatKey) == false)
-      }
-    }
-  }
 
-  test("make service factory stack") {
+  test("make service factory stack")
     val addr1 = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val server1 = stringServer.serve(addr1, echoService)
 
@@ -78,33 +69,29 @@ class LoadBalancerFactoryTest
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 2)
     assert(Await.result(client("hello\n")) == "hello")
-  }
 
-  test("throws NoBrokersAvailableException with negative addresses") {
+  test("throws NoBrokersAvailableException with negative addresses")
     val next: Stack[ServiceFactory[String, String]] =
       Stack.Leaf(Stack.Role("mock"),
                  ServiceFactory.const[String, String](
                      Service.mk[String, String](req => Future.value(s"$req"))))
 
-    val stack = new LoadBalancerFactory.StackModule[String, String] {
+    val stack = new LoadBalancerFactory.StackModule[String, String]
       val description = "mock"
-    }.toStack(next)
+    .toStack(next)
 
     val addrs = Seq(Addr.Neg)
-    addrs.foreach { addr =>
+    addrs.foreach  addr =>
       val dest = LoadBalancerFactory.Dest(Var(addr))
       val factory = stack.make(Stack.Params.empty + dest)
       intercept[NoBrokersAvailableException](Await.result(factory()))
-    }
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
 class ConcurrentLoadBalancerFactoryTest
-    extends FunSuite with StringClient with StringServer {
+    extends FunSuite with StringClient with StringServer
   val echoService = Service.mk[String, String](Future.value(_))
 
-  test("makes service factory stack") {
+  test("makes service factory stack")
     val address = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val server = stringServer.serve(address, echoService)
 
@@ -122,9 +109,8 @@ class ConcurrentLoadBalancerFactoryTest
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 4)
     assert(Await.result(client("hello\n")) == "hello")
-  }
 
-  test("creates fixed number of service factories based on params") {
+  test("creates fixed number of service factories based on params")
     val addr1 = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
     val server1 = stringServer.serve(addr1, echoService)
 
@@ -146,5 +132,3 @@ class ConcurrentLoadBalancerFactoryTest
           "client")
 
     assert(sr.counters(Seq("client", "loadbalancer", "adds")) == 6)
-  }
-}

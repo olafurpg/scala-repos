@@ -31,7 +31,7 @@ import javafx.{scene => jfxs}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Cursor {
+object Cursor
   implicit def sfxCursor2jfx(c: Cursor): jfxs.Cursor =
     if (c != null) c.delegate else null
 
@@ -201,7 +201,6 @@ object Cursor {
   @deprecated(
       "Use Wait; WAIT will be removed in a future release", "8.0.60-R10")
   val WAIT = Wait
-}
 
 abstract class Cursor(override val delegate: jfxs.Cursor)
     extends SFXDelegate[jfxs.Cursor]

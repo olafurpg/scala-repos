@@ -33,14 +33,13 @@ import org.apache.spark.rdd.RDD
   */
 @Since("1.1.0")
 class StandardScaler @Since("1.1.0")(withMean: Boolean, withStd: Boolean)
-    extends Logging {
+    extends Logging
 
   @Since("1.1.0")
   def this() = this(false, true)
 
-  if (!(withMean || withStd)) {
+  if (!(withMean || withStd))
     logWarning("Both withMean and withStd are false. The model does nothing.")
-  }
 
   /**
     * Computes the mean and variance and stores as a model to be used for later scaling.
@@ -49,7 +48,7 @@ class StandardScaler @Since("1.1.0")(withMean: Boolean, withStd: Boolean)
     * @return a StandardScalarModel
     */
   @Since("1.1.0")
-  def fit(data: RDD[Vector]): StandardScalerModel = {
+  def fit(data: RDD[Vector]): StandardScalerModel =
     // TODO: skip computation if both withMean and withStd are false
     val summary = data.treeAggregate(new MultivariateOnlineSummarizer)(
         (aggregator, data) => aggregator.add(data),
@@ -59,8 +58,6 @@ class StandardScaler @Since("1.1.0")(withMean: Boolean, withStd: Boolean)
         summary.mean,
         withStd,
         withMean)
-  }
-}
 
 /**
   * Represents a StandardScaler model that can transform vectors.
@@ -76,41 +73,37 @@ class StandardScalerModel @Since("1.3.0")(
     @Since("1.1.0") val mean: Vector,
     @Since("1.3.0") var withStd: Boolean,
     @Since("1.3.0") var withMean: Boolean)
-    extends VectorTransformer {
+    extends VectorTransformer
 
   /**
     */
   @Since("1.3.0")
-  def this(std: Vector, mean: Vector) {
+  def this(std: Vector, mean: Vector)
     this(std, mean, withStd = std != null, withMean = mean != null)
     require(this.withStd || this.withMean,
             "at least one of std or mean vectors must be provided")
-    if (this.withStd && this.withMean) {
+    if (this.withStd && this.withMean)
       require(mean.size == std.size,
               "mean and std vectors must have equal size if both are provided")
-    }
-  }
 
   @Since("1.3.0")
   def this(std: Vector) = this(std, null)
 
   @Since("1.3.0")
   @DeveloperApi
-  def setWithMean(withMean: Boolean): this.type = {
+  def setWithMean(withMean: Boolean): this.type =
     require(!(withMean && this.mean == null),
             "cannot set withMean to true while mean is null")
     this.withMean = withMean
     this
-  }
 
   @Since("1.3.0")
   @DeveloperApi
-  def setWithStd(withStd: Boolean): this.type = {
+  def setWithStd(withStd: Boolean): this.type =
     require(!(withStd && this.std == null),
             "cannot set withStd to true while std is null")
     this.withStd = withStd
     this
-  }
 
   // Since `shift` will be only used in `withMean` branch, we have it as
   // `lazy val` so it will be evaluated in that branch. Note that we don't
@@ -125,46 +118,41 @@ class StandardScalerModel @Since("1.3.0")(
     *         for the column with zero std.
     */
   @Since("1.1.0")
-  override def transform(vector: Vector): Vector = {
+  override def transform(vector: Vector): Vector =
     require(mean.size == vector.size)
-    if (withMean) {
+    if (withMean)
       // By default, Scala generates Java methods for member variables. So every time when
       // the member variables are accessed, `invokespecial` will be called which is expensive.
       // This can be avoid by having a local reference of `shift`.
       val localShift = shift
-      vector match {
+      vector match
         case DenseVector(vs) =>
           val values = vs.clone()
           val size = values.length
-          if (withStd) {
+          if (withStd)
             var i = 0
-            while (i < size) {
+            while (i < size)
               values(i) = if (std(i) != 0.0)
                 (values(i) - localShift(i)) * (1.0 / std(i)) else 0.0
               i += 1
-            }
-          } else {
+          else
             var i = 0
-            while (i < size) {
+            while (i < size)
               values(i) -= localShift(i)
               i += 1
-            }
-          }
           Vectors.dense(values)
         case v =>
           throw new IllegalArgumentException(
               "Do not support vector type " + v.getClass)
-      }
-    } else if (withStd) {
-      vector match {
+    else if (withStd)
+      vector match
         case DenseVector(vs) =>
           val values = vs.clone()
           val size = values.length
           var i = 0
-          while (i < size) {
+          while (i < size)
             values(i) *= (if (std(i) != 0.0) 1.0 / std(i) else 0.0)
             i += 1
-          }
           Vectors.dense(values)
         case SparseVector(size, indices, vs) =>
           // For sparse vector, the `index` array inside sparse vector object will not be changed,
@@ -172,19 +160,14 @@ class StandardScalerModel @Since("1.3.0")(
           val values = vs.clone()
           val nnz = values.length
           var i = 0
-          while (i < nnz) {
+          while (i < nnz)
             values(i) *=
             (if (std(indices(i)) != 0.0) 1.0 / std(indices(i)) else 0.0)
             i += 1
-          }
           Vectors.sparse(size, indices, values)
         case v =>
           throw new IllegalArgumentException(
               "Do not support vector type " + v.getClass)
-      }
-    } else {
+    else
       // Note that it's safe since we always assume that the data in RDD should be immutable.
       vector
-    }
-  }
-}

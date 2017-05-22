@@ -42,19 +42,17 @@ final class EvalResult(val tpe: String,
 final class EvalDefinitions(val loader: ClassLoader => ClassLoader,
                             val generated: Seq[File],
                             val enclosingModule: String,
-                            val valNames: Seq[String]) {
-  def values(parent: ClassLoader): Seq[Any] = {
+                            val valNames: Seq[String])
+  def values(parent: ClassLoader): Seq[Any] =
     val module = getModule(enclosingModule, loader(parent))
     for (n <- valNames) yield module.getClass.getMethod(n).invoke(module)
-  }
-}
 
 final class EvalException(msg: String) extends RuntimeException(msg)
 // not thread safe, since it reuses a Global instance
 final class Eval(optionsNoncp: Seq[String],
                  classpath: Seq[File],
                  mkReporter: Settings => Reporter,
-                 backing: Option[File]) {
+                 backing: Option[File])
   def this(mkReporter: Settings => Reporter, backing: Option[File]) =
     this(Nil, IO.classLocationFile[Product] :: Nil, mkReporter, backing)
   def this() = this(s => new ConsoleReporter(s), None)
@@ -63,11 +61,10 @@ final class Eval(optionsNoncp: Seq[String],
   val classpathString = Path.makeString(classpath ++ backing.toList)
   val options = "-cp" +: classpathString +: optionsNoncp
 
-  lazy val settings = {
+  lazy val settings =
     val s = new Settings(println)
     val command = new CompilerCommand(options.toList, s)
     s
-  }
   lazy val reporter = mkReporter(settings)
 
   /**
@@ -75,18 +72,16 @@ final class Eval(optionsNoncp: Seq[String],
     * See for rationale https://issues.scala-lang.org/browse/SI-8794
     */
   final class EvalGlobal(settings: Settings, reporter: Reporter)
-      extends Global(settings, reporter) {
+      extends Global(settings, reporter)
     override def currentRun: Run = curRun
     var curRun: Run = null
-  }
   lazy val global: EvalGlobal = new EvalGlobal(settings, reporter)
   import global._
   import definitions._
 
-  private[sbt] def unlinkDeferred(): Unit = {
+  private[sbt] def unlinkDeferred(): Unit =
     toUnlinkLater foreach unlink
     toUnlinkLater = Nil
-  }
 
   private[this] var toUnlinkLater = List[Symbol]()
   private[this] def unlink(sym: Symbol) = sym.owner.info.decls.unlink(sym)
@@ -95,65 +90,56 @@ final class Eval(optionsNoncp: Seq[String],
            imports: EvalImports = noImports,
            tpeName: Option[String] = None,
            srcName: String = "<setting>",
-           line: Int = DefaultStartLine): EvalResult = {
-    val ev = new EvalType[String] {
+           line: Int = DefaultStartLine): EvalResult =
+    val ev = new EvalType[String]
       def makeUnit = mkUnit(srcName, line, expression)
       def unlink = true
       def unitBody(unit: CompilationUnit,
                    importTrees: Seq[Tree],
-                   moduleName: String): Tree = {
+                   moduleName: String): Tree =
         val (parser, tree) = parse(unit, settingErrorStrings, _.expr())
         val tpt: Tree = expectedType(tpeName)
         augment(parser, importTrees, tree, tpt, moduleName)
-      }
       def extra(run: Run, unit: CompilationUnit) =
         atPhase(run.typerPhase.next) { (new TypeExtractor).getType(unit.body) }
       def read(file: File) = IO.read(file)
       def write(value: String, f: File) = IO.write(f, value)
       def extraHash = ""
-    }
     val i = evalCommon(expression :: Nil, imports, tpeName, ev)
     val value = (cl: ClassLoader) =>
       getValue[Any](i.enclosingModule, i.loader(cl))
     new EvalResult(i.extra, value, i.generated, i.enclosingModule)
-  }
   def evalDefinitions(definitions: Seq[(String, scala.Range)],
                       imports: EvalImports,
                       srcName: String,
                       file: Option[File],
-                      valTypes: Seq[String]): EvalDefinitions = {
+                      valTypes: Seq[String]): EvalDefinitions =
     require(definitions.nonEmpty, "Definitions to evaluate cannot be empty.")
-    val ev = new EvalType[Seq[String]] {
+    val ev = new EvalType[Seq[String]]
       lazy val (fullUnit, defUnits) = mkDefsUnit(srcName, definitions)
       def makeUnit = fullUnit
       def unlink = false
       def unitBody(unit: CompilationUnit,
                    importTrees: Seq[Tree],
-                   moduleName: String): Tree = {
+                   moduleName: String): Tree =
         val fullParser = new syntaxAnalyzer.UnitParser(unit)
         val trees = defUnits flatMap parseDefinitions
         syntheticModule(fullParser, importTrees, trees.toList, moduleName)
-      }
-      def extra(run: Run, unit: CompilationUnit) = {
-        atPhase(run.typerPhase.next) {
+      def extra(run: Run, unit: CompilationUnit) =
+        atPhase(run.typerPhase.next)
           (new ValExtractor(valTypes.toSet)).getVals(unit.body)
-        }
-      }
       def read(file: File) = IO.readLines(file)
       def write(value: Seq[String], file: File) = IO.writeLines(file, value)
-      def extraHash = file match {
+      def extraHash = file match
         case Some(f) => f.getAbsolutePath
         case None => ""
-      }
-    }
     val i = evalCommon(definitions.map(_._1), imports, Some(""), ev)
     new EvalDefinitions(i.loader, i.generated, i.enclosingModule, i.extra)
-  }
 
   private[this] def evalCommon[T](content: Seq[String],
                                   imports: EvalImports,
                                   tpeName: Option[String],
-                                  ev: EvalType[T]): EvalIntermediate[T] = {
+                                  ev: EvalType[T]): EvalIntermediate[T] =
     import Eval._
     // TODO - We also encode the source of the setting into the hash to avoid conflicts where the exact SAME setting
     // is defined in multiple evaluated instances with a backing.  This leads to issues with finding a previous
@@ -166,32 +152,27 @@ final class Eval(optionsNoncp: Seq[String],
                     ev.extraHash) :: Nil)))
     val moduleName = makeModuleName(hash)
 
-    lazy val unit = {
+    lazy val unit =
       reporter.reset
       ev.makeUnit
-    }
-    lazy val run = new Run {
+    lazy val run = new Run
       override def units = (unit :: Nil).iterator
-    }
     def unlinkAll(): Unit =
       for ((sym, _) <- run.symSource) if (ev.unlink) unlink(sym)
       else toUnlinkLater ::= sym
 
-    val (extra, loader) = backing match {
+    val (extra, loader) = backing match
       case Some(back) if classExists(back, moduleName) =>
         val loader = (parent: ClassLoader) =>
           new URLClassLoader(Array(back.toURI.toURL), parent)
         val extra = ev.read(cacheFile(back, moduleName))
         (extra, loader)
       case _ =>
-        try { compileAndLoad(run, unit, imports, backing, moduleName, ev) } finally {
+        try { compileAndLoad(run, unit, imports, backing, moduleName, ev) } finally
           unlinkAll()
-        }
-    }
 
     val generatedFiles = getGeneratedFiles(backing, moduleName)
     new EvalIntermediate(extra, loader, generatedFiles, moduleName)
-  }
   // location of the cached type or definition information
   private[this] def cacheFile(base: File, moduleName: String): File =
     new File(base, moduleName + ".cache")
@@ -201,7 +182,7 @@ final class Eval(optionsNoncp: Seq[String],
       imports: EvalImports,
       backing: Option[File],
       moduleName: String,
-      ev: EvalType[T]): (T, ClassLoader => ClassLoader) = {
+      ev: EvalType[T]): (T, ClassLoader => ClassLoader) =
     global.curRun = run
     run.currentUnit = unit
     val dir = outputDirectory(backing)
@@ -210,14 +191,12 @@ final class Eval(optionsNoncp: Seq[String],
     val importTrees = parseImports(imports)
     unit.body = ev.unitBody(unit, importTrees, moduleName)
 
-    def compile(phase: Phase): Unit = {
+    def compile(phase: Phase): Unit =
       globalPhase = phase
       if (phase == null || phase == phase.next || reporter.hasErrors) ()
-      else {
+      else
         atPhase(phase) { phase.run }
         compile(phase.next)
-      }
-    }
 
     compile(run.namerPhase)
     checkError("Type error in expression")
@@ -227,19 +206,16 @@ final class Eval(optionsNoncp: Seq[String],
     val loader = (parent: ClassLoader) =>
       new AbstractFileClassLoader(dir, parent)
     (extra, loader)
-  }
 
   private[this] def expectedType(tpeName: Option[String]): Tree =
-    tpeName match {
+    tpeName match
       case Some(tpe) => parseType(tpe)
       case None => TypeTree(NoType)
-    }
 
   private[this] def outputDirectory(backing: Option[File]): AbstractFile =
-    backing match {
+    backing match
       case None => new VirtualDirectory("<virtual>", None);
       case Some(dir) => new PlainFile(dir)
-    }
 
   def load(dir: AbstractFile, moduleName: String): ClassLoader => Any =
     parent =>
@@ -254,14 +230,13 @@ final class Eval(optionsNoncp: Seq[String],
               imports: Seq[Tree],
               tree: Tree,
               tpt: Tree,
-              objectName: String): Tree = {
+              objectName: String): Tree =
     val method = DefDef(NoMods, newTermName(WrapValName), Nil, Nil, tpt, tree)
     syntheticModule(parser, imports, method :: Nil, objectName)
-  }
   private[this] def syntheticModule(parser: global.syntaxAnalyzer.UnitParser,
                                     imports: Seq[Tree],
                                     definitions: List[Tree],
-                                    objectName: String): Tree = {
+                                    objectName: String): Tree =
     val emptyTypeName = nme.EMPTY.toTypeName
     def emptyPkg = parser.atPos(0, 0, 0) { Ident(nme.EMPTY_PACKAGE_NAME) }
     def emptyInit = DefDef(
@@ -281,35 +256,28 @@ final class Eval(optionsNoncp: Seq[String],
           List(gen.scalaAnyRefConstr), emptyValDef, emptyInit :: definitions)
     def moduleDef = ModuleDef(NoMods, newTermName(objectName), moduleBody)
     parser.makePackaging(0, emptyPkg, (imports :+ moduleDef).toList)
-  }
 
-  private[this] final class TypeExtractor extends Traverser {
+  private[this] final class TypeExtractor extends Traverser
     private[this] var result = ""
     def getType(t: Tree) = { result = ""; traverse(t); result }
-    override def traverse(tree: Tree): Unit = tree match {
+    override def traverse(tree: Tree): Unit = tree match
       case d: DefDef if d.symbol.nameString == WrapValName =>
         result = d.symbol.tpe.finalResultType.toString
       case _ => super.traverse(tree)
-    }
-  }
 
   /** Tree traverser that obtains the names of vals in a top-level module whose type is a subtype of one of `types`.*/
-  private[this] final class ValExtractor(tpes: Set[String]) extends Traverser {
+  private[this] final class ValExtractor(tpes: Set[String]) extends Traverser
     private[this] var vals = List[String]()
     def getVals(t: Tree): List[String] = { vals = Nil; traverse(t); vals }
-    def isAcceptableType(tpe: Type): Boolean = {
-      tpe.baseClasses.exists { sym =>
+    def isAcceptableType(tpe: Type): Boolean =
+      tpe.baseClasses.exists  sym =>
         tpes.contains(sym.fullName)
-      }
-    }
-    override def traverse(tree: Tree): Unit = tree match {
+    override def traverse(tree: Tree): Unit = tree match
       case ValDef(_, n, actualTpe, _)
           if isTopLevelModule(tree.symbol.owner) &&
           isAcceptableType(actualTpe.tpe) =>
         vals ::= nme.localToGetter(n).encoded
       case _ => super.traverse(tree)
-    }
-  }
   // inlined implemented of Symbol.isTopLevelModule that was removed in e5b050814deb2e7e1d6d05511d3a6cb6b013b549
   private[this] def isTopLevelModule(s: Symbol): Boolean =
     s.hasFlag(reflect.internal.Flags.MODULE) && s.owner.isPackageClass
@@ -325,26 +293,22 @@ final class Eval(optionsNoncp: Seq[String],
   // TODO: use the code from Analyzer
   private[this] def getGeneratedFiles(
       backing: Option[File], moduleName: String): Seq[File] =
-    backing match {
+    backing match
       case None => Nil
       case Some(dir) => dir listFiles moduleFileFilter(moduleName)
-    }
   private[this] def getClassFiles(
       backing: Option[File], moduleName: String): Seq[File] =
-    backing match {
+    backing match
       case None => Nil
       case Some(dir) => dir listFiles moduleClassFilter(moduleName)
-    }
   private[this] def moduleFileFilter(moduleName: String) =
-    new java.io.FilenameFilter {
+    new java.io.FilenameFilter
       def accept(dir: File, s: String) =
         (s contains moduleName)
-    }
   private[this] def moduleClassFilter(moduleName: String) =
-    new java.io.FilenameFilter {
+    new java.io.FilenameFilter
       def accept(dir: File, s: String) =
         (s contains moduleName) && (s endsWith ".class")
-    }
 
   private[this] class ParseErrorStrings(val base: String,
                                         val extraBlank: String,
@@ -370,62 +334,54 @@ final class Eval(optionsNoncp: Seq[String],
   private[this] def parse[T](
       unit: CompilationUnit,
       errors: ParseErrorStrings,
-      f: syntaxAnalyzer.UnitParser => T): (syntaxAnalyzer.UnitParser, T) = {
+      f: syntaxAnalyzer.UnitParser => T): (syntaxAnalyzer.UnitParser, T) =
     val parser = new syntaxAnalyzer.UnitParser(unit)
 
     val tree = f(parser)
-    val extra = parser.in.token match {
+    val extra = parser.in.token match
       case EOF => errors.extraBlank
       case _ => ""
-    }
     checkError(errors.base + extra)
 
     parser.accept(EOF)
-    val extra2 = parser.in.token match {
+    val extra2 = parser.in.token match
       case SEMI => errors.extraSemi
       case NEWLINE | NEWLINES => errors.missingBlank
       case _ => ""
-    }
     checkError(errors.base + extra2)
 
     (parser, tree)
-  }
-  private[this] def parseType(tpe: String): Tree = {
+  private[this] def parseType(tpe: String): Tree =
     val tpeParser = new syntaxAnalyzer.UnitParser(
         mkUnit("<expected-type>", DefaultStartLine, tpe))
     val tpt0: Tree = tpeParser.typ()
     tpeParser.accept(EOF)
     checkError("Error parsing expression type.")
     tpt0
-  }
   private[this] def parseImports(imports: EvalImports): Seq[Tree] =
-    imports.strings flatMap {
+    imports.strings flatMap
       case (s, line) => parseImport(mkUnit(imports.srcName, line, s))
-    }
-  private[this] def parseImport(importUnit: CompilationUnit): Seq[Tree] = {
+  private[this] def parseImport(importUnit: CompilationUnit): Seq[Tree] =
     val parser = new syntaxAnalyzer.UnitParser(importUnit)
     val trees: Seq[Tree] = parser.importClause()
     parser.accept(EOF)
     checkError("Error parsing imports for expression.")
     trees
-  }
   private[this] def parseDefinitions(du: CompilationUnit): Seq[Tree] =
     parse(du, definitionErrorStrings, parseDefinitions)._2
 
   /** Parses one or more definitions (defs, vals, lazy vals, classes, traits, modules). */
   private[this] def parseDefinitions(
-      parser: syntaxAnalyzer.UnitParser): Seq[Tree] = {
+      parser: syntaxAnalyzer.UnitParser): Seq[Tree] =
     var defs = parser.nonLocalDefOrDcl
     parser.acceptStatSepOpt()
-    while (!parser.isStatSeqEnd) {
+    while (!parser.isStatSeqEnd)
       val next = parser.nonLocalDefOrDcl
       defs ++= next
       parser.acceptStatSepOpt()
-    }
     defs
-  }
 
-  private[this] trait EvalType[T] {
+  private[this] trait EvalType[T]
 
     /** Extracts additional information after the compilation unit is evaluated.*/
     def extra(run: Run, unit: CompilationUnit): T
@@ -457,7 +413,6 @@ final class Eval(optionsNoncp: Seq[String],
 
     /** Extra information to include in the hash'd object name to help avoid collisions. */
     def extraHash: String
-  }
 
   val DefaultStartLine = 0
   private[this] def makeModuleName(hash: String): String =
@@ -470,12 +425,11 @@ final class Eval(optionsNoncp: Seq[String],
 
   private[this] final class EvalSourceFile(
       name: String, startLine: Int, contents: String)
-      extends BatchSourceFile(name, contents) {
+      extends BatchSourceFile(name, contents)
     override def lineToOffset(line: Int): Int =
       super.lineToOffset((line - startLine) max 0)
     override def offsetToLine(offset: Int): Int =
       super.offsetToLine(offset) + startLine
-  }
 
   /**
     * Constructs a CompilationUnit for each definition, which can be used to independently parse the definition into a Tree.
@@ -483,7 +437,7 @@ final class Eval(optionsNoncp: Seq[String],
     */
   private[this] def mkDefsUnit(
       srcName: String, definitions: Seq[(String, scala.Range)])
-    : (CompilationUnit, Seq[CompilationUnit]) = {
+    : (CompilationUnit, Seq[CompilationUnit]) =
     def fragmentUnit(content: String, lineMap: Array[Int]) =
       new CompilationUnit(fragmentSourceFile(srcName, content, lineMap))
 
@@ -491,16 +445,14 @@ final class Eval(optionsNoncp: Seq[String],
     val lines = new ListBuffer[Int]()
     val defs = new ListBuffer[CompilationUnit]()
     val fullContent = new java.lang.StringBuilder()
-    for ((defString, range) <- definitions) {
+    for ((defString, range) <- definitions)
       defs += fragmentUnit(defString, range.toArray)
       fullContent.append(defString)
       lines ++= range
       fullContent.append("\n\n")
       lines ++= (range.end :: range.end :: Nil)
-    }
     val fullUnit = fragmentUnit(fullContent.toString, lines.toArray)
     (fullUnit, defs.toSeq)
-  }
 
   /**
     * Source file that can map the offset in the file to and from line numbers that may discontinuous.
@@ -508,7 +460,7 @@ final class Eval(optionsNoncp: Seq[String],
     */
   private[this] def fragmentSourceFile(
       srcName: String, content: String, lineMap: Array[Int]) =
-    new BatchSourceFile(srcName, content) {
+    new BatchSourceFile(srcName, content)
       override def lineToOffset(line: Int): Int =
         super.lineToOffset(lineMap.indexWhere(_ == line) max 0)
       override def offsetToLine(offset: Int): Int =
@@ -517,9 +469,7 @@ final class Eval(optionsNoncp: Seq[String],
       override def toString = new File(srcName).getName
       private[this] def index(a: Array[Int], i: Int): Int =
         if (i < 0 || i >= a.length) 0 else a(i)
-    }
-}
-private[sbt] object Eval {
+private[sbt] object Eval
   def optBytes[T](o: Option[T])(f: T => Array[Byte]): Array[Byte] =
     seqBytes(o.toSeq)(f)
   def stringSeqBytes(s: Seq[String]): Array[Byte] = seqBytes(s)(bytes)
@@ -537,16 +487,14 @@ private[sbt] object Eval {
     bytes(f.exists) ++ bytes(f.getAbsolutePath)
 
   def bytes(s: String): Array[Byte] = s getBytes "UTF-8"
-  def bytes(l: Long): Array[Byte] = {
+  def bytes(l: Long): Array[Byte] =
     val buffer = ByteBuffer.allocate(8)
     buffer.putLong(l)
     buffer.array
-  }
-  def bytes(i: Int): Array[Byte] = {
+  def bytes(i: Int): Array[Byte] =
     val buffer = ByteBuffer.allocate(4)
     buffer.putInt(i)
     buffer.array
-  }
 
   /** The name of the synthetic val in the synthetic module that an expression is assigned to. */
   final val WrapValName = "$sbtdef"
@@ -555,19 +503,16 @@ private[sbt] object Eval {
     * Gets the value of the expression wrapped in module `objectName`, which is accessible via `loader`.
     * The module name should not include the trailing `$`.
     */
-  def getValue[T](objectName: String, loader: ClassLoader): T = {
+  def getValue[T](objectName: String, loader: ClassLoader): T =
     val module = getModule(objectName, loader)
     val accessor = module.getClass.getMethod(WrapValName)
     val value = accessor.invoke(module)
     value.asInstanceOf[T]
-  }
 
   /** Gets the top-level module `moduleName` from the provided class `loader`.  The module name should not include the trailing `$`.*/
-  def getModule(moduleName: String, loader: ClassLoader): Any = {
+  def getModule(moduleName: String, loader: ClassLoader): Any =
     val clazz = Class.forName(moduleName + "$", true, loader)
     clazz.getField("MODULE$").get(null)
-  }
 
   private val classDirFilter: FileFilter =
     DirectoryFilter || GlobFilter("*.class")
-}

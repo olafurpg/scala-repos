@@ -22,9 +22,9 @@ import org.junit.Assert._
 import test._
 import syntax.zipper._
 
-class ZipperTests {
+class ZipperTests
   @Test
-  def testTraversal {
+  def testTraversal
     val l = 1 :: "foo" :: 3.0 :: HNil
 
     val z = l.toZipper
@@ -52,10 +52,9 @@ class ZipperTests {
     val i2 = zf.get
     typed[Int](i2)
     assertEquals(1, i2)
-  }
 
   @Test
-  def testUpdate {
+  def testUpdate
     val l = 1 :: "foo" :: 3.0 :: HNil
 
     val l2 = l.toZipper.right.put("wibble", 45).reify
@@ -77,10 +76,9 @@ class ZipperTests {
     val l6 = l.toZipper.right.modify(_.toUpperCase).reify
     typed[Int :: String :: Double :: HNil](l6)
     assertEquals(1 :: "FOO" :: 3.0 :: HNil, l6)
-  }
 
   @Test
-  def testTypeIndexing {
+  def testTypeIndexing
     val l = 1 :: "foo" :: 3.0 :: HNil
 
     val l6 = l.toZipper.rightTo[Double]
@@ -92,10 +90,9 @@ class ZipperTests {
     val i7 = l7.get
     typed[Int](i7)
     assertEquals(1, i7)
-  }
 
   @Test
-  def testNatIndexing {
+  def testNatIndexing
     val l = 1 :: "foo" :: 3.0 :: HNil
 
     val l8 = l.toZipper.rightBy(2)
@@ -107,17 +104,15 @@ class ZipperTests {
     val s9 = l9.get
     typed[String](s9)
     assertEquals("foo", s9)
-  }
 
   @Test
-  def testEmpty {
+  def testEmpty
     val l = HNil
     val z = l.toZipper
 
     val l2 = z.insert(23).insert("foo").insert(true).reify
     typed[Int :: String :: Boolean :: HNil](l2)
     assertEquals(23 :: "foo" :: true :: HNil, l2)
-  }
 
   case class Address(street: String, city: String, postcode: String)
   case class Person(name: String, age: Int, address: Address)
@@ -137,7 +132,7 @@ class ZipperTests {
   )
 
   @Test
-  def testCaseClasses {
+  def testCaseClasses
     val z = p1.toZipper
 
     val name = z.get
@@ -238,5 +233,3 @@ class ZipperTests {
             Employee("Menelaus", 3000) :: Employee("Achilles", 3000) :: Employee(
                 "Odysseus", 4000) :: HNil),
         z3)
-  }
-}

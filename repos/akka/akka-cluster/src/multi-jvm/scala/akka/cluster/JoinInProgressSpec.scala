@@ -10,7 +10,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.testkit._
 import scala.concurrent.duration._
 
-object JoinInProgressMultiJvmSpec extends MultiNodeConfig {
+object JoinInProgressMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -26,39 +26,31 @@ object JoinInProgressMultiJvmSpec extends MultiNodeConfig {
             }
           }""")
             .withFallback(MultiNodeClusterSpec.clusterConfig)))
-}
 
 class JoinInProgressMultiJvmNode1 extends JoinInProgressSpec
 class JoinInProgressMultiJvmNode2 extends JoinInProgressSpec
 
 abstract class JoinInProgressSpec
     extends MultiNodeSpec(JoinInProgressMultiJvmSpec)
-    with MultiNodeClusterSpec {
+    with MultiNodeClusterSpec
 
   import JoinInProgressMultiJvmSpec._
 
-  "A cluster node" must {
-    "send heartbeats immediately when joining to avoid false failure detection due to delayed gossip" taggedAs LongRunningTest in {
+  "A cluster node" must
+    "send heartbeats immediately when joining to avoid false failure detection due to delayed gossip" taggedAs LongRunningTest in
 
-      runOn(first) {
+      runOn(first)
         startClusterNode()
-      }
 
       enterBarrier("first-started")
 
-      runOn(second) {
+      runOn(second)
         cluster.join(first)
-      }
 
-      runOn(first) {
+      runOn(first)
         val until = Deadline.now + 5.seconds
-        while (!until.isOverdue) {
+        while (!until.isOverdue)
           Thread.sleep(200)
           cluster.failureDetector.isAvailable(second) should ===(true)
-        }
-      }
 
       enterBarrier("after")
-    }
-  }
-}

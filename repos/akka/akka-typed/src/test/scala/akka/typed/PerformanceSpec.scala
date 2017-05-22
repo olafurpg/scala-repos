@@ -11,30 +11,30 @@ class PerformanceSpec
     extends TypedSpec(ConfigFactory.parseString("""
       # increase this if you do real benchmarking
       akka.typed.PerformanceSpec.iterations=100000
-      """)) {
+      """))
 
-  object `A static behavior` {
+  object `A static behavior`
 
-    object `must be fast` {
+    object `must be fast`
 
       case class Ping(x: Int, pong: ActorRef[Pong], report: ActorRef[Pong])
       case class Pong(x: Int, ping: ActorRef[Ping], report: ActorRef[Pong])
 
       def behavior(pairs: Int, pings: Int, count: Int, executor: String) =
-        StepWise[Pong] { (ctx, startWith) ⇒
-          startWith {
+        StepWise[Pong]  (ctx, startWith) ⇒
+          startWith
 
             val pinger = Props(SelfAware[Ping](self ⇒
-                      Static { msg ⇒
-                if (msg.x == 0) {
+                      Static  msg ⇒
+                if (msg.x == 0)
                   msg.report ! Pong(0, self, msg.report)
-                } else msg.pong ! Pong(msg.x - 1, self, msg.report)
-            })).withDispatcher(executor)
+                else msg.pong ! Pong(msg.x - 1, self, msg.report)
+            )).withDispatcher(executor)
 
             val ponger = Props(SelfAware[Pong](self ⇒
-                      Static { msg ⇒
+                      Static  msg ⇒
                 msg.ping ! Ping(msg.x, self, msg.report)
-            })).withDispatcher(executor)
+            )).withDispatcher(executor)
 
             val actors = for (i ← 1 to pairs) yield
               (ctx.spawn(pinger, s"pinger-$i"),
@@ -42,19 +42,17 @@ class PerformanceSpec
 
             val start = Deadline.now
 
-            for {
+            for
               (ping, pong) ← actors
               _ ← 1 to pings
-            } ping ! Ping(count, pong, ctx.self)
+            ping ! Ping(count, pong, ctx.self)
 
             start
-          }.expectMultipleMessages(60.seconds, pairs * pings) { (msgs, start) ⇒
+          .expectMultipleMessages(60.seconds, pairs * pings)  (msgs, start) ⇒
             val stop = Deadline.now
 
             val rate = 2L * count * pairs * pings / (stop - start).toMillis
             info(s"messaging rate was $rate/ms")
-          }
-        }
 
       val iterations =
         system.settings.config.getInt("akka.typed.PerformanceSpec.iterations")
@@ -77,6 +75,3 @@ class PerformanceSpec
         sync(runTest("08")(behavior(8, 1, iterations, "dispatcher-8")))
       def `09 when using 8 pairs with 10 messages`(): Unit =
         sync(runTest("09")(behavior(8, 10, iterations, "dispatcher-8")))
-    }
-  }
-}

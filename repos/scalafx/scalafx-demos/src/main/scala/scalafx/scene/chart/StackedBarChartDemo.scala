@@ -31,7 +31,7 @@ import scalafx.application.JFXApp
 import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 
-object StackedBarChartDemo extends JFXApp {
+object StackedBarChartDemo extends JFXApp
 
   val years = Seq("2007", "2008", "2009")
 
@@ -43,10 +43,10 @@ object StackedBarChartDemo extends JFXApp {
       tickUnit = 1000
   )
 
-  stage = new JFXApp.PrimaryStage {
+  stage = new JFXApp.PrimaryStage
     title = "StackedBarChartDemo"
-    scene = new Scene {
-      root = new StackedBarChart(xAxis, yAxis) {
+    scene = new Scene
+      root = new StackedBarChart(xAxis, yAxis)
         title = "Stacked Bar Chart"
         categoryGap = 25
         data = ObservableBuffer(
@@ -54,17 +54,12 @@ object StackedBarChartDemo extends JFXApp {
             xySeries("Region 2", Seq(956, 1665, 2559)),
             xySeries("Region 3", Seq(1154, 1927, 2774))
         )
-      }
-    }
-  }
 
   /** Create XYChart.Series from a sequence of numbers matching year strings. */
-  def xySeries(name: String, data: Seq[Int]) = {
+  def xySeries(name: String, data: Seq[Int]) =
     val series = years zip data
     XYChart.Series[String, Number](
         name,
         ObservableBuffer(
             series.map { case (x, y) => XYChart.Data[String, Number](x, y) })
     )
-  }
-}

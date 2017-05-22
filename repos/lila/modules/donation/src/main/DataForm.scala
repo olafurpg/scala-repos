@@ -3,7 +3,7 @@ package lila.donation
 import play.api.data._
 import play.api.data.Forms._
 
-object DataForm {
+object DataForm
 
   private val txnTypes = Set(
       "express_checkout", "web_accept", "recurring_payment", "subscr_payment")
@@ -30,12 +30,10 @@ object DataForm {
                  userId: Option[String],
                  email: Option[String],
                  firstName: Option[String],
-                 lastName: Option[String]) {
+                 lastName: Option[String])
 
     def name = (firstName |@| lastName) apply { _ + " " + _ }
 
     def grossCents = (gross * 100).toInt
 
     def feeCents = (fee * 100).toInt
-  }
-}

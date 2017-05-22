@@ -1,12 +1,11 @@
-object Test extends App {
+object Test extends App
   import collection._
   val xs: SeqView[(String, Int), Seq[_]] = List("x").view.zip(Stream.from(0))
   println(xs)
 
   val ys =
-    List(1, 2, 3).view map { x =>
+    List(1, 2, 3).view map  x =>
       println("mapping " + x); x + 1
-    }
   println("ys defined")
   println(ys.head)
   println(ys.tail)
@@ -22,7 +21,6 @@ object Test extends App {
   assert(cs.force.deep == Array(4, 2, 1).deep)
   assert(zs(2) == 4)
   assert(bs.deep == Array(2, 3, 4).deep)
-}
 
 /* crash confirmed.
 2.8 regression: CCE when zipping list projection with stream

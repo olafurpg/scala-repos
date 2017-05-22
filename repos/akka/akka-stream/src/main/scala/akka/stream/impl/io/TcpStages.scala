@@ -36,7 +36,7 @@ private[stream] class ConnectionSourceStage(
     val bindShutdownTimeout: FiniteDuration)
     extends GraphStageWithMaterializedValue[
         SourceShape[StreamTcp.IncomingConnection],
-        Future[StreamTcp.ServerBinding]] {
+        Future[StreamTcp.ServerBinding]]
   import ConnectionSourceStage._
 
   val out: Outlet[StreamTcp.IncomingConnection] = Outlet(
@@ -46,26 +46,25 @@ private[stream] class ConnectionSourceStage(
 
   // TODO: Timeout on bind
   override def createLogicAndMaterializedValue(inheritedAttributes: Attributes)
-    : (GraphStageLogic, Future[ServerBinding]) = {
+    : (GraphStageLogic, Future[ServerBinding]) =
     val bindingPromise = Promise[ServerBinding]
 
-    val logic = new TimerGraphStageLogic(shape) {
+    val logic = new TimerGraphStageLogic(shape)
       implicit def self: ActorRef = stageActor.ref
 
       val connectionFlowsAwaitingInitialization = new AtomicLong()
       var listener: ActorRef = _
       var unbindPromise = Promise[Unit]()
 
-      override def preStart(): Unit = {
+      override def preStart(): Unit =
         getStageActor(receive)
         tcpManager ! Tcp.Bind(
             self, endpoint, backlog, options, pullMode = true)
-      }
 
-      private def receive(evt: (ActorRef, Any)): Unit = {
+      private def receive(evt: (ActorRef, Any)): Unit =
         val sender = evt._1
         val msg = evt._2
-        msg match {
+        msg match
           case Bound(localAddress) ⇒
             listener = sender
             stageActor.watch(listener)
@@ -89,83 +88,68 @@ private[stream] class ConnectionSourceStage(
           case Terminated(ref) if ref == listener ⇒
             failStage(new IllegalStateException(
                     "IO Listener actor terminated unexpectedly"))
-        }
-      }
 
-      setHandler(out, new OutHandler {
-        override def onPull(): Unit = {
+      setHandler(out, new OutHandler
+        override def onPull(): Unit =
           // Ignore if still binding
           if (listener ne null) listener ! ResumeAccepting(1)
-        }
 
         override def onDownstreamFinish(): Unit = tryUnbind()
-      })
+      )
 
       private def connectionFor(
           connected: Connected,
-          connection: ActorRef): StreamTcp.IncomingConnection = {
+          connection: ActorRef): StreamTcp.IncomingConnection =
         connectionFlowsAwaitingInitialization.incrementAndGet()
 
         val tcpFlow = Flow
           .fromGraph(new IncomingConnectionStage(
                   connection, connected.remoteAddress, halfClose))
           .via(detacher[ByteString]) // must read ahead for proper completions
-          .mapMaterializedValue { m ⇒
+          .mapMaterializedValue  m ⇒
             connectionFlowsAwaitingInitialization.decrementAndGet()
             m
-          }
 
         // FIXME: Previous code was wrong, must add new tests
-        val handler = idleTimeout match {
+        val handler = idleTimeout match
           case d: FiniteDuration ⇒
             tcpFlow.join(
                 BidiFlow.bidirectionalIdleTimeout[ByteString, ByteString](d))
           case _ ⇒ tcpFlow
-        }
 
         StreamTcp.IncomingConnection(connected.localAddress,
                                      connected.remoteAddress,
                                      handler)
-      }
 
-      private def tryUnbind(): Unit = {
-        if (listener ne null) {
+      private def tryUnbind(): Unit =
+        if (listener ne null)
           stageActor.unwatch(listener)
           setKeepGoing(true)
           listener ! Unbind
-        }
-      }
 
-      override def onTimer(timerKey: Any): Unit = timerKey match {
+      override def onTimer(timerKey: Any): Unit = timerKey match
         case BindShutdownTimer ⇒
           completeStage() // TODO need to manually shut down instead right?
-      }
 
-      override def postStop(): Unit = {
+      override def postStop(): Unit =
         unbindPromise.trySuccess(())
         bindingPromise.tryFailure(new NoSuchElementException(
                 "Binding was unbound before it was completely finished"))
-      }
-    }
 
     (logic, bindingPromise.future)
-  }
-}
 
-private[stream] object ConnectionSourceStage {
+private[stream] object ConnectionSourceStage
   val BindTimer = "BindTimer"
   val BindShutdownTimer = "BindTimer"
-}
 
 /**
   * INTERNAL API
   */
-private[stream] object TcpConnectionStage {
+private[stream] object TcpConnectionStage
   case object WriteAck extends Tcp.Event
 
-  trait TcpRole {
+  trait TcpRole
     def halfClose: Boolean
-  }
   case class Outbound(manager: ActorRef,
                       connectCmd: Connect,
                       localAddressPromise: Promise[InetSocketAddress],
@@ -182,7 +166,7 @@ private[stream] object TcpConnectionStage {
    */
   class TcpStreamLogic(
       val shape: FlowShape[ByteString, ByteString], val role: TcpRole)
-      extends GraphStageLogic(shape) {
+      extends GraphStageLogic(shape)
     implicit def self: ActorRef = stageActor.ref
 
     private def bytesIn = shape.in
@@ -190,13 +174,13 @@ private[stream] object TcpConnectionStage {
     private var connection: ActorRef = _
 
     // No reading until role have been decided
-    setHandler(bytesOut, new OutHandler {
+    setHandler(bytesOut, new OutHandler
       override def onPull(): Unit = ()
-    })
+    )
 
-    override def preStart(): Unit = {
+    override def preStart(): Unit =
       setKeepGoing(true)
-      role match {
+      role match
         case Inbound(conn, _) ⇒
           setHandler(bytesOut, readHandler)
           connection = conn
@@ -207,13 +191,11 @@ private[stream] object TcpConnectionStage {
         case ob @ Outbound(manager, cmd, _, _) ⇒
           getStageActor(connecting(ob)).watch(manager)
           manager ! cmd
-      }
-    }
 
-    private def connecting(ob: Outbound)(evt: (ActorRef, Any)): Unit = {
+    private def connecting(ob: Outbound)(evt: (ActorRef, Any)): Unit =
       val sender = evt._1
       val msg = evt._2
-      msg match {
+      msg match
         case Terminated(_) ⇒
           failStage(new StreamTcpException(
                   "The IO manager actor (TCP) has terminated. Stopping now."))
@@ -233,13 +215,11 @@ private[stream] object TcpConnectionStage {
               self, keepOpenOnPeerClosed = true, useResumeWriting = false)
           if (isAvailable(bytesOut)) connection ! ResumeReading
           pull(bytesIn)
-      }
-    }
 
-    private def connected(evt: (ActorRef, Any)): Unit = {
+    private def connected(evt: (ActorRef, Any)): Unit =
       val sender = evt._1
       val msg = evt._2
-      msg match {
+      msg match
         case Terminated(_) ⇒
           failStage(new StreamTcpException(
                   "The connection actor has terminated. Stopping now."))
@@ -261,68 +241,55 @@ private[stream] object TcpConnectionStage {
           else push(bytesOut, data)
 
         case WriteAck ⇒ if (!isClosed(bytesIn)) pull(bytesIn)
-      }
-    }
 
-    val readHandler = new OutHandler {
-      override def onPull(): Unit = {
+    val readHandler = new OutHandler
+      override def onPull(): Unit =
         connection ! ResumeReading
-      }
 
-      override def onDownstreamFinish(): Unit = {
+      override def onDownstreamFinish(): Unit =
         if (!isClosed(bytesIn)) connection ! ResumeReading
-        else {
+        else
           connection ! Abort
           completeStage()
-        }
-      }
-    }
 
-    setHandler(bytesIn, new InHandler {
-      override def onPush(): Unit = {
+    setHandler(bytesIn, new InHandler
+      override def onPush(): Unit =
         val elem = grab(bytesIn)
         ReactiveStreamsCompliance.requireNonNullElement(elem)
         connection ! Write(elem.asInstanceOf[ByteString], WriteAck)
-      }
 
-      override def onUpstreamFinish(): Unit = {
+      override def onUpstreamFinish(): Unit =
         // Reading has stopped before, either because of cancel, or PeerClosed, so just Close now
         // (or half-close is turned off)
         if (isClosed(bytesOut) || !role.halfClose) connection ! Close
         // We still read, so we only close the write side
         else if (connection != null) connection ! ConfirmedClose
         else completeStage()
-      }
 
-      override def onUpstreamFailure(ex: Throwable): Unit = {
-        if (connection != null) {
-          if (interpreter.log.isDebugEnabled) {
+      override def onUpstreamFailure(ex: Throwable): Unit =
+        if (connection != null)
+          if (interpreter.log.isDebugEnabled)
             interpreter.log.debug(
                 "Aborting tcp connection because of upstream failure: {}\n{}",
                 ex.getMessage,
                 ex.getStackTrace.mkString("\n"))
-          }
           connection ! Abort
-        } else failStage(ex)
-      }
-    })
+        else failStage(ex)
+    )
 
-    override def postStop(): Unit = role match {
+    override def postStop(): Unit = role match
       case Outbound(_, _, localAddressPromise, _) ⇒
         // Fail if has not been completed with an address earlier
         localAddressPromise.tryFailure(
             new StreamTcpException("Connection failed."))
       case _ ⇒ // do nothing...
-    }
-  }
-}
 
 /**
   * INTERNAL API
   */
 private[stream] class IncomingConnectionStage(
     connection: ActorRef, remoteAddress: InetSocketAddress, halfClose: Boolean)
-    extends GraphStage[FlowShape[ByteString, ByteString]] {
+    extends GraphStage[FlowShape[ByteString, ByteString]]
   import TcpConnectionStage._
 
   private val hasBeenCreated = new AtomicBoolean(false)
@@ -332,17 +299,15 @@ private[stream] class IncomingConnectionStage(
   override def initialAttributes = Attributes.name("IncomingConnection")
   val shape: FlowShape[ByteString, ByteString] = FlowShape(bytesIn, bytesOut)
 
-  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic = {
+  override def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
     if (hasBeenCreated.get)
       throw new IllegalStateException(
           "Cannot materialize an incoming connection Flow twice.")
     hasBeenCreated.set(true)
 
     new TcpStreamLogic(shape, Inbound(connection, halfClose))
-  }
 
   override def toString = s"TCP-from($remoteAddress)"
-}
 
 /**
   * INTERNAL API
@@ -356,7 +321,7 @@ private[stream] class OutgoingConnectionStage(
     connectTimeout: Duration = Duration.Inf)
     extends GraphStageWithMaterializedValue[
         FlowShape[ByteString, ByteString],
-        Future[StreamTcp.OutgoingConnection]] {
+        Future[StreamTcp.OutgoingConnection]]
   import TcpConnectionStage._
 
   val bytesIn: Inlet[ByteString] = Inlet("IncomingTCP.in")
@@ -365,12 +330,11 @@ private[stream] class OutgoingConnectionStage(
   val shape: FlowShape[ByteString, ByteString] = FlowShape(bytesIn, bytesOut)
 
   override def createLogicAndMaterializedValue(inheritedAttributes: Attributes)
-    : (GraphStageLogic, Future[StreamTcp.OutgoingConnection]) = {
+    : (GraphStageLogic, Future[StreamTcp.OutgoingConnection]) =
     // FIXME: A method like this would make soo much sense on Duration (i.e. toOption)
-    val connTimeout = connectTimeout match {
+    val connTimeout = connectTimeout match
       case x: FiniteDuration ⇒ Some(x)
       case _ ⇒ None
-    }
 
     val localAddressPromise = Promise[InetSocketAddress]
     val logic = new TcpStreamLogic(shape,
@@ -386,7 +350,5 @@ private[stream] class OutgoingConnectionStage(
     (logic,
      localAddressPromise.future.map(OutgoingConnection(remoteAddress, _))(
          ExecutionContexts.sameThreadExecutionContext))
-  }
 
   override def toString = s"TCP-to($remoteAddress)"
-}

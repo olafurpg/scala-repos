@@ -4,7 +4,7 @@ package pickler
 import scala.collection.generic.CanBuildFrom
 import scala.collection.mutable.ArrayBuffer
 
-trait ArrayBufferPicklers {
+trait ArrayBufferPicklers
   // TODO(jsuereth) - Add pickler generator
   implicit def arrayBufferPickler[T : FastTypeTag](
       implicit elemPickler: Pickler[T],
@@ -13,4 +13,3 @@ trait ArrayBufferPicklers {
       cbf: CanBuildFrom[ArrayBuffer[T], T, ArrayBuffer[T]])
     : Pickler[ArrayBuffer[T]] with Unpickler[ArrayBuffer[T]] =
     SeqSetPickler[T, ArrayBuffer]
-}

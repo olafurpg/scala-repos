@@ -5,12 +5,11 @@ import scala.tools.reflect.ToolBox
 
 class C
 
-object Test extends App {
-  val Block(List(ValDef(_, _, tpt: CompoundTypeTree, _)), _) = reify {
+object Test extends App
+  val Block(List(ValDef(_, _, tpt: CompoundTypeTree, _)), _) = reify
     val x: C {} = ???
-  }.tree
+  .tree
   println(tpt)
   println(tpt.templ.parents)
   println(tpt.templ.self)
   println(tpt.templ.body)
-}

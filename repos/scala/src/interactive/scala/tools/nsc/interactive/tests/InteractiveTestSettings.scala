@@ -10,7 +10,7 @@ import core.Reporter
 import core.TestSettings
 
 trait InteractiveTestSettings
-    extends TestSettings with PresentationCompilerInstance {
+    extends TestSettings with PresentationCompilerInstance
 
   /** Character delimiter for comments in .opts file */
   private final val CommentStartDelimiter = "#"
@@ -26,25 +26,22 @@ trait InteractiveTestSettings
     *        bootclasspath takes precedence over the scala-library used to run the current
     *        test.
     */
-  override protected def prepareSettings(settings: Settings) {
-    def adjustPaths(paths: settings.PathSetting*) {
-      for (p <- paths if argsString.contains(p.name)) p.value = p.value.map {
+  override protected def prepareSettings(settings: Settings)
+    def adjustPaths(paths: settings.PathSetting*)
+      for (p <- paths if argsString.contains(p.name)) p.value = p.value.map
         case '/' => separatorChar
         case ':' => pathSeparatorChar
         case c => c
-      }
-    }
 
     // need this so that the classpath comes from what partest
     // instead of scala.home
     settings.usejavacp.value = !argsString.contains("-bootclasspath")
 
     // pass any options coming from outside
-    settings.processArgumentString(argsString) match {
+    settings.processArgumentString(argsString) match
       case (false, rest) =>
         println("error processing arguments (unprocessed: %s)".format(rest))
       case _ => ()
-    }
 
     // Make the --sourcepath path provided in the .flags file (if any) relative to the test's base directory
     if (settings.sourcepath.isSetByUser)
@@ -54,23 +51,18 @@ trait InteractiveTestSettings
                 settings.classpath,
                 settings.javabootclasspath,
                 settings.sourcepath)
-  }
 
   /** If there's a file ending in .opts, read it and parse it for cmd line arguments. */
-  protected val argsString = {
+  protected val argsString =
     val optsFile =
       outDir / "%s.%s".format(
           System.getProperty("partest.testname"), TestOptionsFileExtension)
-    val str = try File(optsFile).slurp() catch {
+    val str = try File(optsFile).slurp() catch
       case e: java.io.IOException => ""
-    }
     str.lines.filter(!_.startsWith(CommentStartDelimiter)).mkString(" ")
-  }
 
-  override protected def printClassPath(implicit reporter: Reporter) {
+  override protected def printClassPath(implicit reporter: Reporter)
     reporter.println("\toutDir: %s".format(outDir.path))
     reporter.println("\tbaseDir: %s".format(baseDir.path))
     reporter.println("\targsString: %s".format(argsString))
     super.printClassPath(reporter)
-  }
-}

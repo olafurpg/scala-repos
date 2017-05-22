@@ -17,7 +17,7 @@ case class Topic(id: String,
                  lastPostIdTroll: String,
                  troll: Boolean,
                  closed: Boolean,
-                 hidden: Boolean) {
+                 hidden: Boolean)
 
   def updatedAt(troll: Boolean): DateTime =
     troll.fold(updatedAtTroll, updatedAt)
@@ -38,14 +38,12 @@ case class Topic(id: String,
          updatedAtTroll = post.createdAt)
 
   def incNbPosts = copy(nbPosts = nbPosts + 1)
-}
 
-object Topic {
+object Topic
 
-  def nameToId(name: String) = (lila.common.String slugify name) |> { slug =>
+  def nameToId(name: String) = (lila.common.String slugify name) |>  slug =>
     // if most chars are not latin, go for random slug
     (slug.size > (name.size / 2)).fold(slug, Random nextStringUppercase 8)
-  }
 
   val idSize = 8
 
@@ -88,4 +86,3 @@ object Topic {
           (writeDate('createdAt) andThen writeDate('updatedAt) andThen writeDate(
                   'updatedAtTroll)))
   )
-}

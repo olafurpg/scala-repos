@@ -25,7 +25,7 @@ import org.apache.spark.sql.catalyst.TableIdentifier
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
 class ListTablesSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll {
+    extends QueryTest with TestHiveSingleton with BeforeAndAfterAll
   import hiveContext._
   import hiveContext.implicits._
 
@@ -33,25 +33,23 @@ class ListTablesSuite
     .parallelize((1 to 10).map(i => (i, s"str$i")))
     .toDF("key", "value")
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     // The catalog in HiveContext is a case insensitive one.
     sessionState.catalog.registerTable(
         TableIdentifier("ListTablesSuiteTable"), df.logicalPlan)
     sql("CREATE TABLE HiveListTablesSuiteTable (key int, value string)")
     sql("CREATE DATABASE IF NOT EXISTS ListTablesSuiteDB")
     sql("CREATE TABLE ListTablesSuiteDB.HiveInDBListTablesSuiteTable (key int, value string)")
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     sessionState.catalog.unregisterTable(
         TableIdentifier("ListTablesSuiteTable"))
     sql("DROP TABLE IF EXISTS HiveListTablesSuiteTable")
     sql("DROP TABLE IF EXISTS ListTablesSuiteDB.HiveInDBListTablesSuiteTable")
     sql("DROP DATABASE IF EXISTS ListTablesSuiteDB")
-  }
 
-  test("get all tables of current database") {
-    Seq(tables(), sql("SHOW TABLes")).foreach {
+  test("get all tables of current database")
+    Seq(tables(), sql("SHOW TABLes")).foreach
       case allTables =>
         // We are using default DB.
         checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
@@ -61,11 +59,9 @@ class ListTablesSuite
         assert(allTables
               .filter("tableName = 'hiveindblisttablessuitetable'")
               .count() === 0)
-    }
-  }
 
-  test("getting all tables with a database name") {
-    Seq(tables("listtablessuiteDb"), sql("SHOW TABLes in listTablesSuitedb")).foreach {
+  test("getting all tables with a database name")
+    Seq(tables("listtablessuiteDb"), sql("SHOW TABLes in listTablesSuitedb")).foreach
       case allTables =>
         checkAnswer(allTables.filter("tableName = 'listtablessuitetable'"),
                     Row("listtablessuitetable", true))
@@ -75,6 +71,3 @@ class ListTablesSuite
         checkAnswer(
             allTables.filter("tableName = 'hiveindblisttablessuitetable'"),
             Row("hiveindblisttablessuitetable", false))
-    }
-  }
-}

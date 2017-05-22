@@ -5,7 +5,7 @@ import play.api.libs.json._
 import reactivemongo.bson._
 import Types._
 
-object $query {
+object $query
   import play.modules.reactivemongo.json._
 
   def all[A : InColl] = builder
@@ -20,4 +20,3 @@ object $query {
     apply($select byIds ids)
 
   def builder[A : InColl] = implicitly[InColl[A]].coll.genericQueryBuilder
-}

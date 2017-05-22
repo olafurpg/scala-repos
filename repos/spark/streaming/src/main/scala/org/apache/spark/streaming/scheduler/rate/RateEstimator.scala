@@ -24,7 +24,7 @@ import org.apache.spark.streaming.Duration
   * A component that estimates the rate at wich an InputDStream should ingest
   * elements, based on updates at every batch completion.
   */
-private[streaming] trait RateEstimator extends Serializable {
+private[streaming] trait RateEstimator extends Serializable
 
   /**
     * Computes the number of elements the stream attached to this `RateEstimator`
@@ -40,9 +40,8 @@ private[streaming] trait RateEstimator extends Serializable {
               elements: Long,
               processingDelay: Long,
               schedulingDelay: Long): Option[Double]
-}
 
-object RateEstimator {
+object RateEstimator
 
   /**
     * Return a new RateEstimator based on the value of `spark.streaming.RateEstimator`.
@@ -54,7 +53,7 @@ object RateEstimator {
     *         known estimators.
     */
   def create(conf: SparkConf, batchInterval: Duration): RateEstimator =
-    conf.get("spark.streaming.backpressure.rateEstimator", "pid") match {
+    conf.get("spark.streaming.backpressure.rateEstimator", "pid") match
       case "pid" =>
         val proportional =
           conf.getDouble("spark.streaming.backpressure.pid.proportional", 1.0)
@@ -73,5 +72,3 @@ object RateEstimator {
       case estimator =>
         throw new IllegalArgumentException(
             s"Unkown rate estimator: $estimator")
-    }
-}

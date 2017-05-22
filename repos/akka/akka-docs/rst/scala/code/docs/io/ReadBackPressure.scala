@@ -13,9 +13,9 @@ import akka.util.ByteString
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
-object PullReadingExample {
+object PullReadingExample
 
-  class Listener(monitor: ActorRef) extends Actor {
+  class Listener(monitor: ActorRef) extends Actor
 
     import context.system
 
@@ -25,7 +25,7 @@ object PullReadingExample {
           self, new InetSocketAddress("localhost", 0), pullMode = true)
     //#pull-mode-bind
 
-    def receive = {
+    def receive =
       //#pull-accepting
       case Bound(localAddress) =>
         // Accept connections one by one
@@ -33,36 +33,30 @@ object PullReadingExample {
         context.become(listening(sender()))
         //#pull-accepting
         monitor ! localAddress
-    }
 
     //#pull-accepting-cont
-    def listening(listener: ActorRef): Receive = {
+    def listening(listener: ActorRef): Receive =
       case Connected(remote, local) =>
         val handler = context.actorOf(Props(classOf[PullEcho], sender()))
         sender() ! Register(handler, keepOpenOnPeerClosed = true)
         listener ! ResumeAccepting(batchSize = 1)
-    }
     //#pull-accepting-cont
-  }
 
   case object Ack extends Event
 
-  class PullEcho(connection: ActorRef) extends Actor {
+  class PullEcho(connection: ActorRef) extends Actor
 
     //#pull-reading-echo
     override def preStart: Unit = connection ! ResumeReading
 
-    def receive = {
+    def receive =
       case Received(data) => connection ! Write(data, Ack)
       case Ack => connection ! ResumeReading
-    }
     //#pull-reading-echo
-  }
-}
 
-class PullReadingSpec extends AkkaSpec with ImplicitSender {
+class PullReadingSpec extends AkkaSpec with ImplicitSender
 
-  "demonstrate pull reading" in {
+  "demonstrate pull reading" in
     val probe = TestProbe()
     system.actorOf(
         Props(classOf[PullReadingExample.Listener], probe.ref), "server")
@@ -81,5 +75,3 @@ class PullReadingSpec extends AkkaSpec with ImplicitSender {
     client.expectMsg(Received(ByteString("hello")))
 
     Await.ready(system.terminate(), Duration.Inf)
-  }
-}

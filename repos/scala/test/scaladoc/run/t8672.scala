@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
   override def code = """
   class C {
     
@@ -21,12 +21,9 @@ object Test extends ScaladocModelTest {
 
   def scaladocSettings = ""
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     import access._
     val ms = List("method1", "method2", "method3")
-    for (m <- ms) {
+    for (m <- ms)
       val method = root._class("C")._method(m)
       println(method.comment.get.body.summary)
-    }
-  }
-}

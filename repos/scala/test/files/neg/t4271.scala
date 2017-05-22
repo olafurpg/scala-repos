@@ -1,4 +1,4 @@
-object foo {
+object foo
   object Donotuseme
   implicit def Ensuring[A](x: A) = Donotuseme
   implicit def doubleWrapper(x: Int) = Donotuseme
@@ -9,4 +9,3 @@ object foo {
   3 to 5
   5 ensuring true
   3 -> 5
-}

@@ -6,13 +6,13 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FlatSpecG
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait FlatSpecSingleTestTest extends FlatSpecGenerator {
+trait FlatSpecSingleTestTest extends FlatSpecGenerator
   val flatSpecTestPath = List("[root]",
                               "FlatSpecTest",
                               "A FlatSpecTest",
                               "should be able to run single test")
 
-  def testFlatSpec() {
+  def testFlatSpec()
     addFlatSpec()
 
     runTestByLocation(
@@ -27,5 +27,3 @@ trait FlatSpecSingleTestTest extends FlatSpecGenerator {
           checkResultTreeHasExactNamedPath(root, flatSpecTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
         debug = true)
-  }
-}

@@ -1,23 +1,19 @@
-object SCL6783 {
+object SCL6783
   class O[T]
-  object K {
+  object K
     implicit val x: O[Int] = new O[Int]
-  }
 
   class Z[T](x: T)(implicit o: O[T])
 
-  object L {
+  object L
     import K.x
 
     class K extends Z(123)
-  }
 
-  object T {
+  object T
     import K.x
 
     class K extends Z[Int](123)
-  }
-}
 /*
 object SCL6783 {
   class O[T]

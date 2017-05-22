@@ -16,13 +16,12 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.packaging.ScPackaging
 trait ScalaFile
     extends ScalaPsiElement with ScToplevelElement with PsiClassOwnerEx
     with ScDeclarationSequenceHolder with PsiImportHolder with ScImportsHolder
-    with PsiFileWithStubSupport {
+    with PsiFileWithStubSupport
 
   @Deprecated
-  def importClass(aClass: PsiClass): Boolean = {
+  def importClass(aClass: PsiClass): Boolean =
     addImportForClass(aClass)
     true
-  }
 
   def getPackagings: Array[ScPackaging]
 
@@ -40,4 +39,3 @@ trait ScalaFile
   def isScriptFile(withCaching: Boolean = true): Boolean
 
   def isWorksheetFile: Boolean
-}

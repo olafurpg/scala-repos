@@ -11,7 +11,7 @@ package scala.tools.ant
 import org.apache.tools.ant.{Task, BuildException}
 import org.apache.tools.ant.taskdefs.MatchingTask
 
-trait ScalaTask { self: Task =>
+trait ScalaTask  self: Task =>
 
   /** Generates a build error. Error location will be the
     *  current task in the ant file.
@@ -21,6 +21,5 @@ trait ScalaTask { self: Task =>
     */
   protected def buildError(message: String): Nothing =
     throw new BuildException(message, getLocation())
-}
 
 abstract class ScalaMatchingTask extends MatchingTask with ScalaTask

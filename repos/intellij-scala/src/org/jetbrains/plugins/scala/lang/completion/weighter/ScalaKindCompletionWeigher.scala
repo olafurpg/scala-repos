@@ -16,52 +16,44 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
   * lift fields before methods. threat class params as field.
   * on 1/18/16
   */
-class ScalaKindCompletionWeigher extends CompletionWeigher {
+class ScalaKindCompletionWeigher extends CompletionWeigher
   override def weigh(
-      element: LookupElement, location: CompletionLocation): Comparable[_] = {
+      element: LookupElement, location: CompletionLocation): Comparable[_] =
     val position = ScalaCompletionUtil.positionFromParameters(
         location.getCompletionParameters)
 
     import KindWeights._
 
     def handleMember(
-        inMember: PsiMember, position: PsiElement): KindWeights.Value = {
+        inMember: PsiMember, position: PsiElement): KindWeights.Value =
       val cclass = inMember.getContainingClass
       val noClass = cclass == null
 
       if (noClass) return normal
-      inMember match {
+      inMember match
         case f: ScValue => field
         case f: ScVariable => field
         case f: PsiField => field
         case m: PsiMethod => method
         case _ => member
-      }
-    }
 
     def weight =
-      ScalaLookupItem.original(element) match {
+      ScalaLookupItem.original(element) match
         case s: ScalaLookupItem =>
-          s.element match {
+          s.element match
             case p: ScClassParameter => KindWeights.field
             case patt: ScTypedDefinition =>
-              patt.nameContext match {
+              patt.nameContext match
                 case m: PsiMember => handleMember(m, position)
                 case _ => null
-              }
             case m: PsiMember => handleMember(m, position)
             case _ => null
-          }
         case _ => null
-      }
 
     weight
-  }
 
   def inFunction(psiElement: PsiElement): Boolean =
     PsiTreeUtil.getParentOfType(psiElement, classOf[ScBlockExpr]) != null
 
-  object KindWeights extends Enumeration {
+  object KindWeights extends Enumeration
     val normal, member, method, field = Value
-  }
-}

@@ -24,9 +24,9 @@ import org.apache.spark.sql.catalyst.plans._
 import org.apache.spark.sql.catalyst.plans.logical._
 import org.apache.spark.sql.catalyst.rules._
 
-class InferFiltersFromConstraintsSuite extends PlanTest {
+class InferFiltersFromConstraintsSuite extends PlanTest
 
-  object Optimize extends RuleExecutor[LogicalPlan] {
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("InferFilters", FixedPoint(5), InferFiltersFromConstraints) :: Batch(
           "PredicatePushdown",
@@ -34,11 +34,10 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
           PushPredicateThroughJoin) :: Batch("CombineFilters",
                                              FixedPoint(5),
                                              CombineFilters) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int, 'c.int)
 
-  test("filter: filter out constraints in condition") {
+  test("filter: filter out constraints in condition")
     val originalQuery = testRelation.where('a === 1 && 'a === 'b).analyze
     val correctAnswer = testRelation
       .where(
@@ -46,9 +45,8 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("single inner join: filter out values on either side on equi-join keys") {
+  test("single inner join: filter out values on either side on equi-join keys")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
     val originalQuery =
@@ -63,9 +61,8 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       left.join(right, condition = Some("x.a".attr === "y.a".attr)).analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("single inner join: filter out nulls on either side on non equal keys") {
+  test("single inner join: filter out nulls on either side on non equal keys")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
     val originalQuery =
@@ -79,10 +76,9 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       left.join(right, condition = Some("x.a".attr =!= "y.a".attr)).analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
-      "single inner join with pre-existing filters: filter out values on either side") {
+      "single inner join with pre-existing filters: filter out values on either side")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
     val originalQuery = x
@@ -100,19 +96,17 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("single outer join: no null filters are generated") {
+  test("single outer join: no null filters are generated")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
     val originalQuery =
       x.join(y, FullOuter, condition = Some("x.a".attr === "y.a".attr)).analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, originalQuery)
-  }
 
   test(
-      "multiple inner joins: filter out values on all sides on equi-join keys") {
+      "multiple inner joins: filter out values on all sides on equi-join keys")
     val t1 = testRelation.subquery('t1)
     val t2 = testRelation.subquery('t2)
     val t3 = testRelation.subquery('t3)
@@ -135,10 +129,9 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
-      "inner join with filter: filter out values on all sides on equi-join keys") {
+      "inner join with filter: filter out values on all sides on equi-join keys")
     val x = testRelation.subquery('x)
     val y = testRelation.subquery('y)
 
@@ -154,5 +147,3 @@ class InferFiltersFromConstraintsSuite extends PlanTest {
       .analyze
     val optimized = Optimize.execute(originalQuery)
     comparePlans(optimized, correctAnswer)
-  }
-}

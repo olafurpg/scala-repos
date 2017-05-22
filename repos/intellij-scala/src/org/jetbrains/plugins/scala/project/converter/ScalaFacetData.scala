@@ -13,8 +13,8 @@ private case class ScalaFacetData(languageLevel: String,
                                   compilerLibrary: Option[LibraryReference],
                                   maximumHeapSize: Int,
                                   vmOptions: Seq[String],
-                                  compilerSettings: ScalaCompilerSettings) {
-  def removeFrom(module: ModuleSettings) {
+                                  compilerSettings: ScalaCompilerSettings)
+  def removeFrom(module: ModuleSettings)
     val facetElement = ScalaFacetData
       .scalaFacetElementIn(module)
       .getOrElse(throw new IllegalStateException(
@@ -22,10 +22,8 @@ private case class ScalaFacetData(languageLevel: String,
               module.getModuleName))
 
     facetElement.detach()
-  }
-}
 
-private object ScalaFacetData {
+private object ScalaFacetData
   def isPresentIn(module: ModuleSettings): Boolean =
     scalaFacetElementIn(module).isDefined
 
@@ -36,15 +34,14 @@ private object ScalaFacetData {
     scalaFacetElementIn(module).map(
         element => ScalaFacetData(new FacetProperties(element)))
 
-  def apply(properties: FacetProperties): ScalaFacetData = {
+  def apply(properties: FacetProperties): ScalaFacetData =
     val compilerSettings = ScalaCompilerSettings.from(properties)
 
-    val compilerLibraryId = properties.option("compilerLibraryLevel").flatMap {
+    val compilerLibraryId = properties.option("compilerLibraryLevel").flatMap
       level =>
         properties
           .option("compilerLibraryName")
           .map(LibraryReference(Level.fromFacetTitle(level), _))
-    }
 
     new ScalaFacetData(
         languageLevel = properties.string("languageLevel", "SCALA_2_11"),
@@ -54,5 +51,3 @@ private object ScalaFacetData {
         maximumHeapSize = properties.int("maximumHeapSize", 512),
         vmOptions = properties.seq("vmOptions", Seq("-Xss1m", "-server")),
         compilerSettings = compilerSettings)
-  }
-}

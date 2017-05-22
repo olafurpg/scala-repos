@@ -19,10 +19,10 @@ package org.apache.spark.graphx
 
 import org.apache.spark.SparkFunSuite
 
-class PregelSuite extends SparkFunSuite with LocalSparkContext {
+class PregelSuite extends SparkFunSuite with LocalSparkContext
 
-  test("1 iteration") {
-    withSpark { sc =>
+  test("1 iteration")
+    withSpark  sc =>
       val n = 5
       val starEdges = (1 to n).map(x => (0: VertexId, x: VertexId))
       val star =
@@ -32,11 +32,9 @@ class PregelSuite extends SparkFunSuite with LocalSparkContext {
           et => Iterator.empty,
           (a: Int, b: Int) => throw new Exception("mergeMsg run unexpectedly"))
       assert(result.vertices.collect.toSet === star.vertices.collect.toSet)
-    }
-  }
 
-  test("chain propagation") {
-    withSpark { sc =>
+  test("chain propagation")
+    withSpark  sc =>
       val n = 5
       val chain = Graph
         .fromEdgeTuples(
@@ -47,9 +45,9 @@ class PregelSuite extends SparkFunSuite with LocalSparkContext {
       assert(chain.vertices.collect.toSet === (1 to n)
             .map(x => (x: VertexId, 0))
             .toSet)
-      val chainWithSeed = chain.mapVertices { (vid, attr) =>
+      val chainWithSeed = chain.mapVertices  (vid, attr) =>
         if (vid == 1) 1 else 0
-      }.cache()
+      .cache()
       assert(chainWithSeed.vertices.collect.toSet === Set((1: VertexId, 1)) ++
           (2 to n).map(x => (x: VertexId, 0)).toSet)
       val result =
@@ -60,10 +58,7 @@ class PregelSuite extends SparkFunSuite with LocalSparkContext {
                                    else Iterator.empty,
                                  (a: Int, b: Int) => math.max(a, b))
       assert(
-          result.vertices.collect.toSet === chain.vertices.mapValues {
+          result.vertices.collect.toSet === chain.vertices.mapValues
         (vid, attr) =>
           attr + 1
-      }.collect.toSet)
-    }
-  }
-}
+      .collect.toSet)

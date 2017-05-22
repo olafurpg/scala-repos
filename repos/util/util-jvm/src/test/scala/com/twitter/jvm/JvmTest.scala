@@ -9,52 +9,44 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.mutable
 
 @RunWith(classOf[JUnitRunner])
-class JvmTest extends WordSpec with TestLogging {
-  "Jvm" should {
-    class JvmHelper {
-      object jvm extends Jvm {
+class JvmTest extends WordSpec with TestLogging
+  "Jvm" should
+    class JvmHelper
+      object jvm extends Jvm
         @volatile private[this] var currentSnap: Snapshot =
           Snapshot(Time.epoch, Heap(0, 0, Seq()), Seq())
 
-        val opts = new Opts {
+        val opts = new Opts
           def compileThresh = None
-        }
         def snapCounters = Map()
-        def setSnap(snap: Snapshot) {
+        def setSnap(snap: Snapshot)
           currentSnap = snap
-        }
 
         override val executor = new MockScheduledExecutorService
 
         def snap = currentSnap
 
-        def pushGc(gc: Gc) {
+        def pushGc(gc: Gc)
           val gcs = snap.lastGcs filter (_.name != gc.name)
           setSnap(snap.copy(lastGcs = gc +: gcs))
-        }
 
         def forceGc() = ()
         def edenPool = NilJvm.edenPool
         def metaspaceUsage = NilJvm.metaspaceUsage
         def safepoint = NilJvm.safepoint
-      }
-    }
 
-    "ProcessId" should {
+    "ProcessId" should
       val supported = Seq("Mac OS X", "Linux")
 
       val osIsSupported =
         Option(System.getProperty("os.name")).exists(supported.contains)
 
-      if (osIsSupported) {
-        "define process id on supported platforms" in {
+      if (osIsSupported)
+        "define process id on supported platforms" in
           assert(Jvm.ProcessId.isDefined)
-        }
-      }
-    }
 
-    "foreachGc" should {
-      "Capture interleaving GCs with different names" in {
+    "foreachGc" should
+      "Capture interleaving GCs with different names" in
         val h = new JvmHelper
         import h._
         val b = mutable.Buffer[Gc]()
@@ -86,17 +78,15 @@ class JvmTest extends WordSpec with TestLogging {
         assert(b.size == 4)
         assert(b(2) == gc.copy(count = 1))
         assert(b(3) == gc1.copy(count = 1))
-      }
 
-      "Complain when sampling rate is too low, every 30 minutes" in Time.withCurrentTimeFrozen {
+      "Complain when sampling rate is too low, every 30 minutes" in Time.withCurrentTimeFrozen
         tc =>
           val h = new JvmHelper
           import h._
 
           traceLogger(Level.DEBUG)
 
-          jvm foreachGc { _ => /*ignore*/
-          }
+          jvm foreachGc  _ => /*ignore*/
           assert(jvm.executor.schedules.size == 1)
           val Seq((r, _, _, _)) = jvm.executor.schedules
           val gc = Gc(0, "pcopy", Time.now, 1.millisecond)
@@ -122,11 +112,9 @@ class JvmTest extends WordSpec with TestLogging {
                   "Missed 1 collections for pcopy due to sampling",
                   "Missed 8 collections for pcopy due to sampling"
               ))
-      }
-    }
 
-    "monitorsGcs" should {
-      "queries gcs in range, in reverse chronological order" in Time.withCurrentTimeFrozen {
+    "monitorsGcs" should
+      "queries gcs in range, in reverse chronological order" in Time.withCurrentTimeFrozen
         tc =>
           val h = new JvmHelper
           import h._
@@ -149,11 +137,9 @@ class JvmTest extends WordSpec with TestLogging {
           jvm.pushGc(gc3)
           r.run()
           assert(query(10.seconds.ago) == Seq(gc3, gc2))
-      }
-    }
 
-    "safepoint" should {
-      "show an increase in total time spent after a gc" in {
+    "safepoint" should
+      "show an increase in total time spent after a gc" in
         val j = Jvm()
         val preGc = j.safepoint
         val totalTimePreGc = preGc.totalTimeMillis
@@ -161,7 +147,3 @@ class JvmTest extends WordSpec with TestLogging {
         val postGc = j.safepoint
         val totalTimePostGc = postGc.totalTimeMillis
         assert(totalTimePostGc > totalTimePreGc)
-      }
-    }
-  }
-}

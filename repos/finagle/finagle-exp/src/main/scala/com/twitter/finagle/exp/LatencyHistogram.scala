@@ -2,11 +2,10 @@ package com.twitter.finagle.exp
 
 import com.twitter.util.WindowedAdder
 
-private[finagle] object LatencyHistogram {
+private[finagle] object LatencyHistogram
 
   /** Default number of slices to use for [[WindowedAdder]] */
   val DefaultSlices = 5
-}
 
 /**
   * A concurrent histogram implementation.
@@ -40,7 +39,7 @@ private[finagle] class LatencyHistogram(clipDuration: Long,
                                         error: Double,
                                         history: Long,
                                         slices: Int,
-                                        now: () => Long) {
+                                        now: () => Long)
 
   require(clipDuration.toInt > 0)
   require(error >= 0.0 && error <= 1.0,
@@ -54,9 +53,8 @@ private[finagle] class LatencyHistogram(clipDuration: Long,
   private[this] val numBuckets: Int = (clipDuration / width).toInt + 1
 
   private[this] val n = WindowedAdder(history, slices, now)
-  private[this] val tab = Array.fill(numBuckets) {
+  private[this] val tab = Array.fill(numBuckets)
     WindowedAdder(history, slices, now)
-  }
 
   /**
     * Compute the quantile `which` from the underlying
@@ -65,20 +63,19 @@ private[finagle] class LatencyHistogram(clipDuration: Long,
     *
     * @param which the quantile to compute, in [0, 100)
     */
-  def quantile(which: Int): Long = {
+  def quantile(which: Int): Long =
     require(which < 100 && which >= 0)
 
     // The number of samples before the request quantile.
     val target = n.sum() * which / 100 + 1
     var i = 0
     var sum = 0L
-    do {
+    do
       sum += tab(i).sum()
       i += 1
-    } while (i < numBuckets && sum < target)
+    while (i < numBuckets && sum < target)
 
     ((i - 1) * width) + (width / 2)
-  }
 
   /**
     * Adds `d` to the histogram.
@@ -87,11 +84,8 @@ private[finagle] class LatencyHistogram(clipDuration: Long,
     * as the constructor arguments. This value is ignored if
     * its `<= 0` and will be capped at [[clipDuration]].
     */
-  def add(d: Long): Unit = {
-    if (d >= 0) {
+  def add(d: Long): Unit =
+    if (d >= 0)
       val ms: Long = math.min(d, clipDuration)
       tab((ms / width).toInt).incr()
       n.incr()
-    }
-  }
-}

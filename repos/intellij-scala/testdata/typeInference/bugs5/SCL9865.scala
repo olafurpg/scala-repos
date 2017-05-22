@@ -1,19 +1,15 @@
 package something
 
-trait B {
+trait B
   def foo(): Int = 123
-}
 
-object X {
+object X
   class A
-}
 
-object Y {
+object Y
   class A extends Object
-}
 
-object Z {
+object Z
   /*start*/
   (new X.A().foo(), new Y.A().foo()) /*end*/
-}
 //(Int, Int)

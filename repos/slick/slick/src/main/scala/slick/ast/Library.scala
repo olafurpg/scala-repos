@@ -5,15 +5,13 @@ import slick.util.ConstArray
 /**
   * The standard library for query operators.
   */
-object Library {
+object Library
   trait AggregateFunctionSymbol extends TermSymbol
-  class JdbcFunction(name: String) extends FunctionSymbol(name) {
+  class JdbcFunction(name: String) extends FunctionSymbol(name)
     override def hashCode = name.hashCode
-    override def equals(o: Any) = o match {
+    override def equals(o: Any) = o match
       case o: JdbcFunction => name == o.name
       case _ => false
-    }
-  }
   class SqlFunction(name: String) extends FunctionSymbol(name)
   class SqlOperator(name: String) extends FunctionSymbol(name)
   class AggregateFunction(name: String)
@@ -98,10 +96,9 @@ object Library {
   // Sequence operations
   val NextValue = new FunctionSymbol("NextValue")
   val CurrentValue = new FunctionSymbol("CurrentValue")
-}
 
 /** A Symbol that represents a library function or operator */
-class FunctionSymbol(val name: String) extends TermSymbol {
+class FunctionSymbol(val name: String) extends TermSymbol
 
   /** Match an Apply of this Symbol */
   def unapplySeq(a: Apply) =
@@ -116,4 +113,3 @@ class FunctionSymbol(val name: String) extends TermSymbol {
     Apply(this, ConstArray.from(ch))(implicitly[ScalaBaseType[T]])
 
   override def toString = "Function " + name
-}

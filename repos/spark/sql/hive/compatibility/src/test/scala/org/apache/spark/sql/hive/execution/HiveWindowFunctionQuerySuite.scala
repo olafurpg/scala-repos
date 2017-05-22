@@ -33,12 +33,12 @@ import org.apache.spark.util.Utils
   * files, every `createQueryTest` calls should explicitly set `reset` to `false`.
   */
 class HiveWindowFunctionQuerySuite
-    extends HiveComparisonTest with BeforeAndAfter {
+    extends HiveComparisonTest with BeforeAndAfter
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()
 
-  override def beforeAll() {
+  override def beforeAll()
     TestHive.cacheTables = true
     // Timezone is fixed to America/Los_Angeles for those timezone sensitive tests (timestamp_*)
     TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
@@ -95,15 +95,13 @@ class HiveWindowFunctionQuerySuite
     sql(s"set fs.default.name=file://$testTempDir/")
     // Ask Hive to run jobs in-process as a single map and reduce task.
     sql("set mapred.job.tracker=local")
-  }
 
-  override def afterAll() {
+  override def afterAll()
     TestHive.cacheTables = false
     TimeZone.setDefault(originalTimeZone)
     Locale.setDefault(originalLocale)
     TestHive.reset()
     super.afterAll()
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests based on windowing_multipartitioning.q
@@ -815,15 +813,14 @@ class HiveWindowFunctionQuerySuite
       |order by p_name
     """.stripMargin,
                   reset = false)
-}
 
 class HiveWindowFunctionQueryFileSuite
-    extends HiveCompatibilitySuite with BeforeAndAfter {
+    extends HiveCompatibilitySuite with BeforeAndAfter
   private val originalTimeZone = TimeZone.getDefault
   private val originalLocale = Locale.getDefault
   private val testTempDir = Utils.createTempDir()
 
-  override def beforeAll() {
+  override def beforeAll()
     TestHive.cacheTables = true
     // Timezone is fixed to America/Los_Angeles for those timezone sensitive tests (timestamp_*)
     TimeZone.setDefault(TimeZone.getTimeZone("America/Los_Angeles"))
@@ -838,14 +835,12 @@ class HiveWindowFunctionQueryFileSuite
     // sql(s"set fs.default.name=file://$testTempDir/")
     // Ask Hive to run jobs in-process as a single map and reduce task.
     // sql("set mapred.job.tracker=local")
-  }
 
-  override def afterAll() {
+  override def afterAll()
     TestHive.cacheTables = false
     TimeZone.setDefault(originalTimeZone)
     Locale.setDefault(originalLocale)
     TestHive.reset()
-  }
 
   override def blackList: Seq[String] = Seq(
       // Partitioned table functions are not supported.
@@ -876,7 +871,5 @@ class HiveWindowFunctionQueryFileSuite
   )
 
   // Only run those query tests in the realWhileList (do not try other ignored query files).
-  override def testCases: Seq[(String, File)] = super.testCases.filter {
+  override def testCases: Seq[(String, File)] = super.testCases.filter
     case (name, _) => realWhiteList.contains(name)
-  }
-}

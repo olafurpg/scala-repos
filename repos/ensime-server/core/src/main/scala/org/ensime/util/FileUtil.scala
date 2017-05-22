@@ -11,105 +11,89 @@ import org.apache.commons.vfs2.FileObject
 import org.ensime.api._
 import org.ensime.util.file._
 
-object RichFileObject {
-  implicit class RichFileObject(val fo: FileObject) extends AnyVal {
+object RichFileObject
+  implicit class RichFileObject(val fo: FileObject) extends AnyVal
     // None if the fo is not an entry in an archive
-    def pathWithinArchive: Option[String] = {
+    def pathWithinArchive: Option[String] =
       val uri = fo.getName.getURI
       if (uri.startsWith("jar") || uri.startsWith("zip"))
         Some(fo.getName.getRoot.getRelativeName(fo.getName))
       else None
-    }
 
     // assumes it is a local file
-    def asLocalFile: File = {
+    def asLocalFile: File =
       require(fo.getName.getURI.startsWith("file"))
       new File(new URI(fo.getName.getURI))
-    }
-  }
-}
 
-object FileUtils {
+object FileUtils
 
   implicit def toSourceFileInfo(
       f: Either[File, SourceFileInfo]): SourceFileInfo =
     f.fold(l => SourceFileInfo(l, None, None), r => r)
 
-  def exists(f: SourceFileInfo) = f match {
+  def exists(f: SourceFileInfo) = f match
     case SourceFileInfo(f, _, _) if f.exists() => true
     case SourceFileInfo(_, Some(c), _) => true
     case SourceFileInfo(_, _, Some(f)) if f.exists() => true
     case _ => false
-  }
 
   // prefer file.readString()
   def readFile(f: File, cs: Charset): Either[IOException, String] =
-    try Right(f.readString()(cs)) catch {
+    try Right(f.readString()(cs)) catch
       case e: IOException => Left(e)
-    }
 
   def writeChanges(
-      changes: List[FileEdit], cs: Charset): Either[Exception, List[File]] = {
+      changes: List[FileEdit], cs: Charset): Either[Exception, List[File]] =
     val editsByFile = changes.collect { case ed: TextEdit => ed }
       .groupBy(_.file)
     val newFiles = changes.collect { case ed: NewFile => ed }
-    try {
+    try
       val rewriteList =
-        newFiles.map { ed =>
+        newFiles.map  ed =>
           (ed.file, ed.text)
-        } ++ editsByFile.map {
+        ++ editsByFile.map
           case (file, fileChanges) =>
-            readFile(file, cs) match {
+            readFile(file, cs) match
               case Right(contents) =>
                 val newContents =
                   FileEditHelper.applyEdits(fileChanges.toList, contents)
                 (file, newContents)
               case Left(e) => throw e
-            }
-        }
 
       val deleteFiles = changes.collect { case ed: DeleteFile => ed }
-      for (ed <- deleteFiles) {
+      for (ed <- deleteFiles)
         ed.file.delete()
-      }
 
       Right(
-          for {
+          for
             (file, contents) <- rewriteList
-          } yield {
+          yield
             file.writeString(contents)(cs)
             file
-          }
       )
-    } catch {
+    catch
       case e: Exception => Left(e)
-    }
-  }
 
   def writeDiffChanges(
-      changes: List[FileEdit], cs: Charset): Either[Exception, File] = {
+      changes: List[FileEdit], cs: Charset): Either[Exception, File] =
     //TODO: add support for NewFile and DeleteFile
     val editsByFile = changes.collect { case ed: TextEdit => ed }
       .groupBy(_.file)
-    try {
-      val diffContents = editsByFile.map {
+    try
+      val diffContents = editsByFile.map
         case (file, fileChanges) =>
-          readFile(file, cs) match {
+          readFile(file, cs) match
             case Right(contents) =>
               FileEditHelper.diffFromTextEdits(
                   fileChanges, contents, file, file)
             case Left(e) => throw e
-          }
-      }.mkString("\n")
+      .mkString("\n")
 
-      Right({
+      Right(
         val diffFile =
           java.io.File.createTempFile("ensime-diff-", ".tmp").canon
         diffFile.writeString(diffContents)
         diffFile
-      })
-    } catch {
+      )
+    catch
       case e: Exception => Left(e)
-    }
-  }
-}

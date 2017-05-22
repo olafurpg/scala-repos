@@ -8,22 +8,20 @@ import scala.reflect.macros.blackbox.Context
 
 /** AST builder used by the SQL interpolation macros. */
 private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
-    paramsList: List[C#Expr[Any]]) {
+    paramsList: List[C#Expr[Any]])
   import c.universe._
 
   def abort(msg: String) = c.abort(c.enclosingPosition, msg)
 
   // create a list of strings passed to this interpolation
-  lazy val rawQueryParts: List[String] = {
+  lazy val rawQueryParts: List[String] =
     //Deconstruct macro application to determine the passed string and the actual parameters
     val Apply(Select(Apply(_, List(Apply(_, strArg))), _), paramList) =
       c.macroApplication
-    strArg map {
+    strArg map
       case Literal(Constant(x: String)) => x
       case _ =>
         abort("The interpolation contained something other than constants...")
-    }
-  }
 
   /**
     * Create a Tree of the static name of a class
@@ -31,17 +29,15 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
     * Select(Select(Select(Ident(nme.ROOTPKG), "java"), "lang"), "String")
     */
   private def createClassTreeFromString(
-      classString: String, generator: String => Name): Tree = {
+      classString: String, generator: String => Name): Tree =
     val tokens = classString.split('.').toList
     val packages = tokens.dropRight(1) map (TermName(_))
     val classType = generator(tokens.last)
     val firstPackage = Ident(termNames.ROOTPKG)
     val others = (packages :+ classType)
     others.foldLeft[Tree](firstPackage)((prev, elem) =>
-          {
         Select(prev, elem)
-    })
-  }
+    )
 
   /**
     * Creates a tree equivalent to an implicity resolution of a given type
@@ -76,9 +72,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
   /**
     * Creates the tree for GetResult[] of the tsql macro
     */
-  def rconvTree(resultTypes: Vector[ClassTag[_]]) = {
+  def rconvTree(resultTypes: Vector[ClassTag[_]]) =
     val resultTypeTrees = resultTypes.map(
-        _.runtimeClass.getCanonicalName match {
+        _.runtimeClass.getCanonicalName match
       case "int" => TypeTree(typeOf[Int])
       case "byte" => TypeTree(typeOf[Byte])
       case "long" => TypeTree(typeOf[Long])
@@ -87,9 +83,9 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
       case "double" => TypeTree(typeOf[Double])
       case "boolean" => TypeTree(typeOf[Boolean])
       case x => TypeTree(c.mirror.staticClass(x).selfType)
-    })
+    )
 
-    resultTypes.size match {
+    resultTypes.size match
       case 0 => implicitTree(TypeTree(typeOf[Int]), GetResultTypeTree)
       case 1 => implicitTree(resultTypeTrees(0), GetResultTypeTree)
       case n if (n <= 22) =>
@@ -101,15 +97,13 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
             ),
             GetResultTypeTree)
       case n =>
-        val rtypeTree = {
+        val rtypeTree =
           val zero = TypeTree(
               typeOf[slick.collection.heterogeneous.syntax.HNil])
           val :: = Select(Select(HeterogenousTree, TermName("syntax")),
                           TypeName("$colon$colon"))
-          resultTypeTrees.foldRight[TypTree](zero) { (typ, prev) =>
+          resultTypeTrees.foldRight[TypTree](zero)  (typ, prev) =>
             AppliedTypeTree(::, List(typ, prev))
-          }
-        }
         val zero = Select(HeterogenousTree, TermName("HNil"))
         val zipped = (0 until n) zip resultTypeTrees
         val << = Select(Ident(TermName("p")), TermName("$less$less"))
@@ -125,14 +119,14 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                                 TypeTree(),
                                 EmptyTree)),
                     Block(
-                        zipped.map { tup =>
+                        zipped.map  tup =>
                           val (i: Int, typ: Tree) = tup
                           ValDef(Modifiers(),
                                  TermName("gr" + i),
                                  TypeTree(),
                                  implicitTree(typ, GetResultTypeTree))
-                        }.toList,
-                        zipped.foldRight[Tree](zero) { (tup, prev) =>
+                        .toList,
+                        zipped.foldRight[Tree](zero)  (tup, prev) =>
                           val (i: Int, typ: Tree) = tup
                           Block(
                               List(ValDef(
@@ -144,56 +138,50 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                               Apply(Select(prev, TermName("$colon$colon")),
                                     List(Ident(TermName("pv" + i))))
                           )
-                        }
                     )
                 )
             )
         )
-    }
-  }
 
   /**
     * Processing of the query to fill in constants and prepare
     * the query to be used and a list of SetParameter[]
     */
-  private lazy val interpolationResultParams: (List[Tree], Tree) = {
-    def decode(s: String): (String, Boolean) = {
-      if (s.endsWith("##")) {
+  private lazy val interpolationResultParams: (List[Tree], Tree) =
+    def decode(s: String): (String, Boolean) =
+      if (s.endsWith("##"))
         val (str, bool) = decode(s.substring(0, s.length - 2))
         (str + "#", bool)
-      } else if (s.endsWith("#")) {
+      else if (s.endsWith("#"))
         (s.substring(0, s.length - 1), true)
-      } else {
+      else
         (s, false)
-      }
-    }
 
     /** Fuse adjacent string literals */
-    def fuse(l: List[Tree]): List[Tree] = l match {
+    def fuse(l: List[Tree]): List[Tree] = l match
       case Literal(Constant(s1: String)) :: Literal(Constant(s2: String)) :: ss =>
         fuse(Literal(Constant(s1 + s2)) :: ss)
       case s :: ss => s :: fuse(ss)
       case Nil => Nil
-    }
 
     if (rawQueryParts.length == 1)
       (List(Literal(Constant(rawQueryParts.head))),
        Select(SetParameterTree, TermName("SetUnit")))
-    else {
+    else
       val queryString = new ListBuffer[Tree]
       val remaining = new ListBuffer[c.Expr[SetParameter[Unit]]]
       paramsList
         .asInstanceOf[List[c.Expr[Any]]]
         .iterator
         .zip(rawQueryParts.iterator)
-        .foreach {
+        .foreach
           case (param, rawQueryPart) =>
             val (queryPart, append) = decode(rawQueryPart)
             queryString.append(Literal(Constant(queryPart)))
             if (append) queryString.append(param.tree)
-            else {
+            else
               queryString.append(Literal(Constant("?")))
-              remaining += c.Expr[SetParameter[Unit]] {
+              remaining += c.Expr[SetParameter[Unit]]
                 Apply(
                     Select(
                         implicitTree(TypeTree(param.actualType),
@@ -202,9 +190,6 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
                     ),
                     List(param.tree)
                 )
-              }
-            }
-        }
       queryString.append(Literal(Constant(rawQueryParts.last)))
       val pconv =
         if (remaining.isEmpty) Select(SetParameterTree, TermName("SetUnit"))
@@ -237,19 +222,15 @@ private[jdbc] class MacroTreeBuilder[C <: Context](val c: C)(
               )
           )
       (fuse(queryString.result()), pconv)
-    }
-  }
 
   lazy val queryParts: Tree = Apply(
       Select(VectorTree, TermName("apply")), interpolationResultParams._1)
 
-  def staticQueryString: String = interpolationResultParams._1 match {
+  def staticQueryString: String = interpolationResultParams._1 match
     case Literal(Constant(s: String)) :: Nil => s
     case _ =>
       c.abort(
           c.enclosingPosition,
           "Only constant strings may be used after '#$' in 'tsql' interpolation")
-  }
 
   lazy val pconvTree: Tree = interpolationResultParams._2
-}

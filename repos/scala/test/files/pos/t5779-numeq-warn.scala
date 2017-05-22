@@ -1,5 +1,5 @@
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val d: Double = (BigInt(1) << 64).toDouble
     val f: Float = d.toFloat
     val n: java.lang.Number = d.toFloat
@@ -8,5 +8,3 @@ object Test {
     assert(n == d) // was: Number and Double are unrelated: they will most likely never compare equal
     assert(f == n)
     assert(n == f)
-  }
-}

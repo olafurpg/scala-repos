@@ -1,9 +1,7 @@
 case class Token(text: String, startIndex: Int)
 
-object Comment {
+object Comment
   def unapply(s: String): Option[Token] = None
-}
 
-object HiddenTokens {
+object HiddenTokens
   "foo" match { case Comment(_) => }
-}

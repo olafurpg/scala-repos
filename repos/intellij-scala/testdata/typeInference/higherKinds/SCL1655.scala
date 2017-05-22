@@ -1,5 +1,5 @@
 // http://youtrack.jetbrains.net/issue/SCL-1655
-sealed trait MA[M[_], A] {
+sealed trait MA[M[_], A]
   def ma1[M[_], A](a: M[A]): MA[M, A]
 
   /**
@@ -17,5 +17,4 @@ sealed trait MA[M[_], A] {
   )
   /*start*/
   a /*end*/
-}
 //(MA[M, M[Int]], MA[M, M[Int]], MA[M, M[Int]], MA[M, M[Int]])

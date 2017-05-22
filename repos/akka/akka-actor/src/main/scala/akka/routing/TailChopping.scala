@@ -48,13 +48,11 @@ final case class TailChoppingRoutingLogic(scheduler: Scheduler,
                                           within: FiniteDuration,
                                           interval: FiniteDuration,
                                           context: ExecutionContext)
-    extends RoutingLogic {
+    extends RoutingLogic
   override def select(
-      message: Any, routees: immutable.IndexedSeq[Routee]): Routee = {
+      message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else TailChoppingRoutees(scheduler, routees, within, interval)(context)
-  }
-}
 
 /**
   * INTERNAL API
@@ -65,9 +63,9 @@ private[akka] final case class TailChoppingRoutees(
     routees: immutable.IndexedSeq[Routee],
     within: FiniteDuration,
     interval: FiniteDuration)(implicit ec: ExecutionContext)
-    extends Routee {
+    extends Routee
 
-  override def send(message: Any, sender: ActorRef): Unit = {
+  override def send(message: Any, sender: ActorRef): Unit =
     implicit val timeout = Timeout(within)
     val promise = Promise[Any]()
     val shuffled = Random.shuffle(routees)
@@ -75,32 +73,26 @@ private[akka] final case class TailChoppingRoutees(
     val aIdx = new AtomicInteger()
     val size = shuffled.length
 
-    val tryWithNext = scheduler.schedule(0.millis, interval) {
+    val tryWithNext = scheduler.schedule(0.millis, interval)
       val idx = aIdx.getAndIncrement
-      if (idx < size) {
-        shuffled(idx) match {
+      if (idx < size)
+        shuffled(idx) match
           case ActorRefRoutee(ref) ⇒
             promise.tryCompleteWith(ref.ask(message))
           case ActorSelectionRoutee(sel) ⇒
             promise.tryCompleteWith(sel.ask(message))
           case _ ⇒
-        }
-      }
-    }
 
     val sendTimeout = scheduler.scheduleOnce(within)(
         promise.tryFailure(new AskTimeoutException(
                 s"Ask timed out on [$sender] after [$within.toMillis} ms]")))
 
     val f = promise.future
-    f.onComplete {
+    f.onComplete
       case _ ⇒
         tryWithNext.cancel()
         sendTimeout.cancel()
-    }
     f.pipeTo(sender)
-  }
-}
 
 /**
   * A router pool with retry logic, intended for cases where a return message is expected in
@@ -156,7 +148,7 @@ final case class TailChoppingPool(
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[TailChoppingPool] {
+    extends Pool with PoolOverrideUnsetConfig[TailChoppingPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -210,7 +202,6 @@ final case class TailChoppingPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}
 
 /**
   * A router group with retry logic, intended for cases where a return message is expected in
@@ -245,7 +236,7 @@ final case class TailChoppingGroup(
     within: FiniteDuration,
     interval: FiniteDuration,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(paths = immutableSeq(config.getStringList("routees.paths")),
@@ -283,4 +274,3 @@ final case class TailChoppingGroup(
     */
   def withDispatcher(dispatcherId: String): TailChoppingGroup =
     copy(routerDispatcher = dispatcherId)
-}

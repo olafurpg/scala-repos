@@ -9,38 +9,31 @@ import akka.testkit._
 import scala.util.control.NoStackTrace
 import akka.actor.SupervisorStrategy
 
-object BackoffSupervisorSpec {
+object BackoffSupervisorSpec
 
   class TestException extends RuntimeException with NoStackTrace
 
-  object Child {
+  object Child
     def props(probe: ActorRef): Props =
       Props(new Child(probe))
-  }
 
-  class Child(probe: ActorRef) extends Actor {
-    def receive = {
+  class Child(probe: ActorRef) extends Actor
+    def receive =
       case "boom" ⇒ throw new TestException
       case msg ⇒ probe ! msg
-    }
-  }
 
-  object ManualChild {
+  object ManualChild
     def props(probe: ActorRef): Props =
       Props(new ManualChild(probe))
-  }
 
-  class ManualChild(probe: ActorRef) extends Actor {
-    def receive = {
+  class ManualChild(probe: ActorRef) extends Actor
+    def receive =
       case "boom" ⇒ throw new TestException
       case msg ⇒
         probe ! msg
         context.parent ! BackoffSupervisor.Reset
-    }
-  }
-}
 
-class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender {
+class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender
   import BackoffSupervisorSpec._
 
   def onStopOptions(props: Props = Child.props(testActor)) =
@@ -50,61 +43,51 @@ class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender {
   def create(options: BackoffOptions) =
     system.actorOf(BackoffSupervisor.props(options))
 
-  "BackoffSupervisor" must {
-    "start child again when it stops when using `Backoff.onStop`" in {
+  "BackoffSupervisor" must
+    "start child again when it stops when using `Backoff.onStop`" in
       val supervisor = create(onStopOptions())
       supervisor ! BackoffSupervisor.GetCurrentChild
       val c1 = expectMsgType[BackoffSupervisor.CurrentChild].ref.get
       watch(c1)
       c1 ! PoisonPill
       expectTerminated(c1)
-      awaitAssert {
+      awaitAssert
         supervisor ! BackoffSupervisor.GetCurrentChild
         // new instance
         expectMsgType[BackoffSupervisor.CurrentChild].ref.get should !==(c1)
-      }
-    }
 
-    "forward messages to the child" in {
-      def assertForward(supervisor: ActorRef) = {
+    "forward messages to the child" in
+      def assertForward(supervisor: ActorRef) =
         supervisor ! "hello"
         expectMsg("hello")
-      }
       assertForward(create(onStopOptions()))
       assertForward(create(onFailureOptions()))
-    }
 
-    "support custom supervision strategy" in {
-      def assertCustomStrategy(supervisor: ActorRef) = {
+    "support custom supervision strategy" in
+      def assertCustomStrategy(supervisor: ActorRef) =
         supervisor ! BackoffSupervisor.GetCurrentChild
         val c1 = expectMsgType[BackoffSupervisor.CurrentChild].ref.get
         watch(c1)
         c1 ! "boom"
         expectTerminated(c1)
-        awaitAssert {
+        awaitAssert
           supervisor ! BackoffSupervisor.GetCurrentChild
           // new instance
           expectMsgType[BackoffSupervisor.CurrentChild].ref.get should !==(c1)
-        }
-      }
-      filterException[TestException] {
-        val stoppingStrategy = OneForOneStrategy() {
+      filterException[TestException]
+        val stoppingStrategy = OneForOneStrategy()
           case _: TestException ⇒ SupervisorStrategy.Stop
-        }
-        val restartingStrategy = OneForOneStrategy() {
+        val restartingStrategy = OneForOneStrategy()
           case _: TestException ⇒ SupervisorStrategy.Restart
-        }
 
         assertCustomStrategy(
             create(onStopOptions().withSupervisorStrategy(stoppingStrategy)))
 
         assertCustomStrategy(create(
                 onFailureOptions().withSupervisorStrategy(restartingStrategy)))
-      }
-    }
 
-    "support default stopping strategy when using `Backoff.onStop`" in {
-      filterException[TestException] {
+    "support default stopping strategy when using `Backoff.onStop`" in
+      filterException[TestException]
         val supervisor = create(onStopOptions().withDefaultStoppingStrategy)
         supervisor ! BackoffSupervisor.GetCurrentChild
         val c1 = expectMsgType[BackoffSupervisor.CurrentChild].ref.get
@@ -114,36 +97,31 @@ class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender {
 
         c1 ! "boom"
         expectTerminated(c1)
-        awaitAssert {
+        awaitAssert
           supervisor ! BackoffSupervisor.GetCurrentChild
           // new instance
           expectMsgType[BackoffSupervisor.CurrentChild].ref.get should !==(c1)
-        }
         supervisor ! BackoffSupervisor.GetRestartCount
         expectMsg(BackoffSupervisor.RestartCount(1))
-      }
-    }
 
-    "support manual reset" in {
-      filterException[TestException] {
-        def assertManualReset(supervisor: ActorRef) = {
+    "support manual reset" in
+      filterException[TestException]
+        def assertManualReset(supervisor: ActorRef) =
           supervisor ! BackoffSupervisor.GetCurrentChild
           val c1 = expectMsgType[BackoffSupervisor.CurrentChild].ref.get
           watch(c1)
           c1 ! "boom"
           expectTerminated(c1)
 
-          awaitAssert {
+          awaitAssert
             supervisor ! BackoffSupervisor.GetRestartCount
             expectMsg(BackoffSupervisor.RestartCount(1))
-          }
 
-          awaitAssert {
+          awaitAssert
             supervisor ! BackoffSupervisor.GetCurrentChild
             // new instance
             expectMsgType[BackoffSupervisor.CurrentChild].ref.get should !==(
                 c1)
-          }
 
           supervisor ! "hello"
           expectMsg("hello")
@@ -154,14 +132,11 @@ class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender {
 
           supervisor ! BackoffSupervisor.GetRestartCount
           expectMsg(BackoffSupervisor.RestartCount(0))
-        }
 
-        val stoppingStrategy = OneForOneStrategy() {
+        val stoppingStrategy = OneForOneStrategy()
           case _: TestException ⇒ SupervisorStrategy.Stop
-        }
-        val restartingStrategy = OneForOneStrategy() {
+        val restartingStrategy = OneForOneStrategy()
           case _: TestException ⇒ SupervisorStrategy.Restart
-        }
 
         assertManualReset(
             create(onStopOptions(ManualChild.props(testActor)).withManualReset
@@ -170,7 +145,3 @@ class BackoffSupervisorSpec extends AkkaSpec with ImplicitSender {
         assertManualReset(create(
                 onFailureOptions(ManualChild.props(testActor)).withManualReset
                   .withSupervisorStrategy(restartingStrategy)))
-      }
-    }
-  }
-}

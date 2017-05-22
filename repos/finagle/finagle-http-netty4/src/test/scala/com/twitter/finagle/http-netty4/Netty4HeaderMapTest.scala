@@ -8,9 +8,9 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
-class Netty4HeaderMapTest extends FunSuite {
+class Netty4HeaderMapTest extends FunSuite
 
-  test("Netty4HeaderMap proxies updates and reads to netty headers") {
+  test("Netty4HeaderMap proxies updates and reads to netty headers")
     val netty = new NettyHeaders()
     val wrapper: FinagleHeaders = new Netty4HeaderMap(netty)
     netty.add("foo", "bar")
@@ -28,14 +28,12 @@ class Netty4HeaderMapTest extends FunSuite {
 
     assert(wrapper.remove("foo") == Some("bar"))
 
-    val all = netty.entries.asScala.map { e =>
+    val all = netty.entries.asScala.map  e =>
       e.getKey -> e.getValue
-    }.toSet
+    .toSet
 
     assert(all == Set("key" -> "val", "qux" -> "something"))
 
     netty.remove("key")
 
     assert(wrapper.toSet == Set("qux" -> "something"))
-  }
-}

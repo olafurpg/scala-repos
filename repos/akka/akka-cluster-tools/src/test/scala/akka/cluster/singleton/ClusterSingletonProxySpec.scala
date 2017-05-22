@@ -11,7 +11,7 @@ import akka.cluster.Cluster
 import scala.concurrent.duration._
 
 class ClusterSingletonProxySpec
-    extends WordSpecLike with Matchers with BeforeAndAfterAll {
+    extends WordSpecLike with Matchers with BeforeAndAfterAll
 
   import ClusterSingletonProxySpec._
 
@@ -21,33 +21,29 @@ class ClusterSingletonProxySpec
   val testSystems =
     (0 until 4).map(_ ⇒ new ActorSys(joinTo = Some(seed.cluster.selfAddress))) :+ seed
 
-  "The cluster singleton proxy" must {
-    "correctly identify the singleton" in {
+  "The cluster singleton proxy" must
+    "correctly identify the singleton" in
       testSystems.foreach(_.testProxy("Hello"))
       testSystems.foreach(_.testProxy("World"))
-    }
-  }
 
   override def afterAll() = testSystems.foreach(_.system.terminate())
-}
 
-object ClusterSingletonProxySpec {
+object ClusterSingletonProxySpec
 
   class ActorSys(name: String = "ClusterSingletonProxySystem",
                  joinTo: Option[Address] = None)
-      extends TestKit(ActorSystem(name, ConfigFactory.parseString(cfg))) {
+      extends TestKit(ActorSystem(name, ConfigFactory.parseString(cfg)))
 
     val cluster = Cluster(system)
     joinTo.foreach(address ⇒ cluster.join(address))
 
-    cluster.registerOnMemberUp {
+    cluster.registerOnMemberUp
       system.actorOf(ClusterSingletonManager.props(
                          singletonProps = Props[Singleton],
                          terminationMessage = PoisonPill,
                          settings = ClusterSingletonManagerSettings(system)
                              .withRemovalMargin(5.seconds)),
                      name = "singletonManager")
-    }
 
     val proxy = system.actorOf(
         ClusterSingletonProxy.props(
@@ -55,13 +51,11 @@ object ClusterSingletonProxySpec {
             settings = ClusterSingletonProxySettings(system)),
         s"singletonProxy-${cluster.selfAddress.port.getOrElse(0)}")
 
-    def testProxy(msg: String) {
+    def testProxy(msg: String)
       val probe = TestProbe()
       probe.send(proxy, msg)
       // 25 seconds to make sure the singleton was started up
       probe.expectMsg(25.seconds, "Got " + msg)
-    }
-  }
 
   val cfg = """akka {
 
@@ -85,13 +79,10 @@ object ClusterSingletonProxySpec {
               }
             """
 
-  class Singleton extends Actor with ActorLogging {
+  class Singleton extends Actor with ActorLogging
 
     log.info("Singleton created on {}", Cluster(context.system).selfAddress)
 
-    def receive: Actor.Receive = {
+    def receive: Actor.Receive =
       case msg ⇒
         sender() ! "Got " + msg
-    }
-  }
-}

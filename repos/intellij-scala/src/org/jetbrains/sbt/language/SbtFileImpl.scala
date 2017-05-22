@@ -18,7 +18,7 @@ import scala.collection.JavaConverters._
   */
 class SbtFileImpl(provider: FileViewProvider)
     extends ScalaFileImpl(provider, SbtFileType)
-    with ScDeclarationSequenceHolder {
+    with ScDeclarationSequenceHolder
   override def isScriptFile(withCashing: Boolean) = false
 
   override def immediateTypeDefinitions = Seq.empty
@@ -38,13 +38,13 @@ class SbtFileImpl(provider: FileViewProvider)
   private def processImplicitImports(processor: PsiScopeProcessor,
                                      state: ResolveState,
                                      lastParent: PsiElement,
-                                     place: PsiElement): Boolean = {
+                                     place: PsiElement): Boolean =
     val expressions =
       implicitImportExpressions ++ localObjectsWithDefinitions.map(
           _.qualifiedName + "._")
 
     // TODO this is a workaround, we need to find out why references stopped resolving via the chained imports
-    val expressions0 = expressions.map {
+    val expressions0 = expressions.map
       case "Keys._" => "sbt.Keys._"
       case "Build._" => "sbt.Build._"
       // TODO: this is a workaround. `processDeclarations` does not resolve "Play.autoImport -> PlayImport"
@@ -52,22 +52,19 @@ class SbtFileImpl(provider: FileViewProvider)
       //    everything is resolved, but PlayImport and Play are in different files.
       case "_root_.play.Play.autoImport._" => "_root_.play.PlayImport._"
       case it => it
-    }
 
-    expressions0.isEmpty || {
+    expressions0.isEmpty ||
       val code = s"import ${expressions0.mkString(", ")};"
       val file = ScalaPsiElementFactory.parseFile(code, getManager)
       file.processDeclarations(processor, state, file.lastChild.get, place)
-    }
-  }
 
   private def implicitImportExpressions =
     projectDefinitionModule
       .orElse(fileModule)
       .fold(Seq.empty[String])(SbtModule.getImportsFrom)
 
-  private def localObjectsWithDefinitions: Seq[PsiClass] = {
-    projectDefinitionModule.fold(Seq.empty[PsiClass]) { module =>
+  private def localObjectsWithDefinitions: Seq[PsiClass] =
+    projectDefinitionModule.fold(Seq.empty[PsiClass])  module =>
       val manager = ScalaPsiManager.instance(getProject)
 
       val moduleScope = module.getModuleScope
@@ -77,20 +74,16 @@ class SbtFileImpl(provider: FileViewProvider)
         .flatMap(manager.getCachedClasses(moduleWithLibrariesScope, _))
         .flatMap(
             ClassInheritorsSearch.search(_, moduleScope, true).findAll.asScala)
-    }
-  }
 
   override def getFileResolveScope: GlobalSearchScope =
     projectDefinitionModule.fold(super.getFileResolveScope)(
         _.getModuleWithLibrariesScope)
 
-  private def projectDefinitionModule: Option[Module] = fileModule.flatMap {
+  private def projectDefinitionModule: Option[Module] = fileModule.flatMap
     module =>
       Option(ModuleManager
             .getInstance(getProject)
             .findModuleByName(module.getName + Sbt.BuildModuleSuffix))
-  }
 
   private def fileModule: Option[Module] =
     Option(ModuleUtilCore.findModuleForPsiElement(this))
-}

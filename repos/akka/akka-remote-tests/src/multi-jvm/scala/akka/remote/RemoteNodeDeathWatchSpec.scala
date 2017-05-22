@@ -19,7 +19,7 @@ import akka.remote.testkit.MultiNodeSpec
 import akka.remote.testkit.STMultiNodeSpec
 import akka.testkit._
 
-object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig {
+object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -41,8 +41,8 @@ object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig {
     */
   final case class WrappedTerminated(t: Terminated)
 
-  class ProbeActor(testActor: ActorRef) extends Actor {
-    def receive = {
+  class ProbeActor(testActor: ActorRef) extends Actor
+    def receive =
       case WatchIt(watchee) ⇒
         context watch watchee
         sender() ! Ack
@@ -52,9 +52,6 @@ object RemoteNodeDeathWatchMultiJvmSpec extends MultiNodeConfig {
       case t: Terminated ⇒
         testActor forward WrappedTerminated(t)
       case msg ⇒ testActor forward msg
-    }
-  }
-}
 
 // Several different variations of the test
 
@@ -64,9 +61,8 @@ class RemoteNodeDeathWatchFastMultiJvmNode2
     extends RemoteNodeDeathWatchFastSpec
 class RemoteNodeDeathWatchFastMultiJvmNode3
     extends RemoteNodeDeathWatchFastSpec
-abstract class RemoteNodeDeathWatchFastSpec extends RemoteNodeDeathWatchSpec {
+abstract class RemoteNodeDeathWatchFastSpec extends RemoteNodeDeathWatchSpec
   override def scenario = "fast"
-}
 
 class RemoteNodeDeathWatchSlowMultiJvmNode1
     extends RemoteNodeDeathWatchSlowSpec
@@ -74,14 +70,13 @@ class RemoteNodeDeathWatchSlowMultiJvmNode2
     extends RemoteNodeDeathWatchSlowSpec
 class RemoteNodeDeathWatchSlowMultiJvmNode3
     extends RemoteNodeDeathWatchSlowSpec
-abstract class RemoteNodeDeathWatchSlowSpec extends RemoteNodeDeathWatchSpec {
+abstract class RemoteNodeDeathWatchSlowSpec extends RemoteNodeDeathWatchSpec
   override def scenario = "slow"
   override def sleep(): Unit = Thread.sleep(3000)
-}
 
 abstract class RemoteNodeDeathWatchSpec
     extends MultiNodeSpec(RemoteNodeDeathWatchMultiJvmSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
 
   import RemoteNodeDeathWatchMultiJvmSpec._
   import RemoteWatcher._
@@ -94,30 +89,25 @@ abstract class RemoteNodeDeathWatchSpec
 
   muteDeadLetters(Heartbeat.getClass)()
 
-  lazy val remoteWatcher: ActorRef = {
+  lazy val remoteWatcher: ActorRef =
     system.actorSelection("/system/remote-watcher") ! Identify(None)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  def identify(role: RoleName, actorName: String): ActorRef = {
+  def identify(role: RoleName, actorName: String): ActorRef =
     system.actorSelection(node(role) / "user" / actorName) ! Identify(
         actorName)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  def assertCleanup(timeout: FiniteDuration = 5.seconds): Unit = {
-    within(timeout) {
-      awaitAssert {
+  def assertCleanup(timeout: FiniteDuration = 5.seconds): Unit =
+    within(timeout)
+      awaitAssert
         remoteWatcher ! Stats
         expectMsg(Stats.empty)
-      }
-    }
-  }
 
-  "RemoteNodeDeathWatch (" + scenario + ")" must {
+  "RemoteNodeDeathWatch (" + scenario + ")" must
 
-    "receive Terminated when remote actor is stopped" in {
-      runOn(first) {
+    "receive Terminated when remote actor is stopped" in
+      runOn(first)
         val watcher =
           system.actorOf(Props(classOf[ProbeActor], testActor), "watcher1")
         enterBarrier("actors-started-1")
@@ -131,9 +121,8 @@ abstract class RemoteNodeDeathWatchSpec
 
         sleep()
         expectMsgType[WrappedTerminated].t.actor should ===(subject)
-      }
 
-      runOn(second) {
+      runOn(second)
         val subject =
           system.actorOf(Props(classOf[ProbeActor], testActor), "subject1")
         enterBarrier("actors-started-1")
@@ -144,13 +133,11 @@ abstract class RemoteNodeDeathWatchSpec
 
         sleep()
         system.stop(subject)
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("actors-started-1")
         enterBarrier("hello1-message-sent")
         enterBarrier("watch-established-1")
-      }
 
       enterBarrier("terminated-verified-1")
 
@@ -160,10 +147,9 @@ abstract class RemoteNodeDeathWatchSpec
       assertCleanup()
 
       enterBarrier("after-1")
-    }
 
-    "cleanup after watch/unwatch" in {
-      runOn(first) {
+    "cleanup after watch/unwatch" in
+      runOn(first)
         val watcher =
           system.actorOf(Props(classOf[ProbeActor], testActor), "watcher2")
         enterBarrier("actors-started-2")
@@ -177,16 +163,13 @@ abstract class RemoteNodeDeathWatchSpec
         watcher ! UnwatchIt(subject)
         expectMsg(1 second, Ack)
         enterBarrier("unwatch-2")
-      }
 
-      runOn(second) {
+      runOn(second)
         system.actorOf(Props(classOf[ProbeActor], testActor), "subject2")
-      }
-      runOn(second, third) {
+      runOn(second, third)
         enterBarrier("actors-started-2")
         enterBarrier("watch-2")
         enterBarrier("unwatch-2")
-      }
 
       // verify that things are cleaned up, and heartbeating is stopped
       assertCleanup()
@@ -194,10 +177,9 @@ abstract class RemoteNodeDeathWatchSpec
       assertCleanup()
 
       enterBarrier("after-2")
-    }
 
-    "cleanup after bi-directional watch/unwatch" in {
-      runOn(first, second) {
+    "cleanup after bi-directional watch/unwatch" in
+      runOn(first, second)
         val watcher =
           system.actorOf(Props(classOf[ProbeActor], testActor), "watcher3")
         system.actorOf(Props(classOf[ProbeActor], testActor), "subject3")
@@ -213,13 +195,11 @@ abstract class RemoteNodeDeathWatchSpec
         watcher ! UnwatchIt(subject)
         expectMsg(1 second, Ack)
         enterBarrier("unwatch-3")
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("actors-started-3")
         enterBarrier("watch-3")
         enterBarrier("unwatch-3")
-      }
 
       // verify that things are cleaned up, and heartbeating is stopped
       assertCleanup()
@@ -227,10 +207,9 @@ abstract class RemoteNodeDeathWatchSpec
       assertCleanup()
 
       enterBarrier("after-3")
-    }
 
-    "cleanup after bi-directional watch/stop/unwatch" in {
-      runOn(first, second) {
+    "cleanup after bi-directional watch/stop/unwatch" in
+      runOn(first, second)
         val watcher1 =
           system.actorOf(Props(classOf[ProbeActor], testActor), "w1")
         val watcher2 =
@@ -260,15 +239,13 @@ abstract class RemoteNodeDeathWatchSpec
         enterBarrier("stop-s2-4")
 
         expectMsgType[WrappedTerminated].t.actor should ===(subject2)
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("actors-started-4")
         enterBarrier("watch-4")
         enterBarrier("unwatch-s1-4")
         enterBarrier("stop-s1-4")
         enterBarrier("stop-s2-4")
-      }
 
       // verify that things are cleaned up, and heartbeating is stopped
       assertCleanup()
@@ -276,10 +253,9 @@ abstract class RemoteNodeDeathWatchSpec
       assertCleanup()
 
       enterBarrier("after-4")
-    }
 
-    "cleanup after stop" in {
-      runOn(first) {
+    "cleanup after stop" in
+      runOn(first)
         val p1, p2, p3 = TestProbe()
         val a1 = system.actorOf(Props(classOf[ProbeActor], p1.ref), "a1")
         val a2 = system.actorOf(Props(classOf[ProbeActor], p2.ref), "a2")
@@ -316,9 +292,8 @@ abstract class RemoteNodeDeathWatchSpec
         assertCleanup()
         expectNoMsg(2.seconds)
         assertCleanup()
-      }
 
-      runOn(second) {
+      runOn(second)
         val p1, p2, p3 = TestProbe()
         val b1 = system.actorOf(Props(classOf[ProbeActor], p1.ref), "b1")
         val b2 = system.actorOf(Props(classOf[ProbeActor], p2.ref), "b2")
@@ -360,20 +335,17 @@ abstract class RemoteNodeDeathWatchSpec
         p2.expectNoMsg(100 millis)
         p3.expectNoMsg(100 millis)
         assertCleanup()
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("actors-started-5")
         enterBarrier("watch-established-5")
         enterBarrier("stopped-5")
         enterBarrier("terminated-verified-5")
-      }
 
       enterBarrier("after-5")
-    }
 
-    "receive Terminated when watched node crash" in {
-      runOn(first) {
+    "receive Terminated when watched node crash" in
+      runOn(first)
         val watcher =
           system.actorOf(Props(classOf[ProbeActor], testActor), "watcher6")
         val watcher2 =
@@ -405,26 +377,22 @@ abstract class RemoteNodeDeathWatchSpec
         assertCleanup()
         expectNoMsg(2.seconds)
         assertCleanup()
-      }
 
-      runOn(second) {
+      runOn(second)
         system.actorOf(Props(classOf[ProbeActor], testActor), "subject6")
         enterBarrier("actors-started-6")
 
         expectMsg(3 seconds, "hello6")
         enterBarrier("watch-established-6")
-      }
 
-      runOn(third) {
+      runOn(third)
         enterBarrier("actors-started-6")
         enterBarrier("watch-established-6")
-      }
 
       enterBarrier("after-6")
-    }
 
-    "cleanup when watching node crash" in {
-      runOn(third) {
+    "cleanup when watching node crash" in
+      runOn(third)
         val watcher =
           system.actorOf(Props(classOf[ProbeActor], testActor), "watcher7")
         enterBarrier("actors-started-7")
@@ -434,9 +402,8 @@ abstract class RemoteNodeDeathWatchSpec
         expectMsg(1 second, Ack)
         subject ! "hello7"
         enterBarrier("watch-established-7")
-      }
 
-      runOn(first) {
+      runOn(first)
         system.actorOf(Props(classOf[ProbeActor], testActor), "subject7")
         enterBarrier("actors-started-7")
 
@@ -451,9 +418,5 @@ abstract class RemoteNodeDeathWatchSpec
         assertCleanup(20 seconds)
         expectNoMsg(2.seconds)
         assertCleanup()
-      }
 
       enterBarrier("after-7")
-    }
-  }
-}

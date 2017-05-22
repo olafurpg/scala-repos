@@ -5,7 +5,7 @@ import scala.language.higherKinds
 
 /** Aliases for lifted embedding features. This trait can be mixed into aliasing
   * objects which simplify the use of the lifted embedding. */
-trait Aliases {
+trait Aliases
   type Query[+E, U, C[_]] = lifted.Query[E, U, C]
   val Query = lifted.Query
   type TableQuery[E <: AbstractTable[_]] = lifted.TableQuery[E]
@@ -68,4 +68,3 @@ trait Aliases {
   type Streaming[+T] = dbio.Streaming[T]
   type AsyncExecutor = util.AsyncExecutor
   val AsyncExecutor = util.AsyncExecutor
-}

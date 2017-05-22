@@ -3,9 +3,9 @@ package mesosphere.marathon.io
 import mesosphere.marathon.MarathonSpec
 import org.scalatest.{Matchers, GivenWhenThen}
 
-class IOTest extends MarathonSpec with GivenWhenThen with Matchers {
+class IOTest extends MarathonSpec with GivenWhenThen with Matchers
 
-  test("Compress / unCompress works") {
+  test("Compress / unCompress works")
     Given("A byte array")
     val hello = 1
       .to(100)
@@ -20,5 +20,3 @@ class IOTest extends MarathonSpec with GivenWhenThen with Matchers {
     Then("compressed is smaller and round trip works")
     compressed.length should be < uncompressed.length
     uncompressed should be(hello)
-  }
-}

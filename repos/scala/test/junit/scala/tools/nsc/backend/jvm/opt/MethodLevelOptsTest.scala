@@ -18,13 +18,12 @@ import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 import scala.collection.convert.decorateAsScala._
 
-object MethodLevelOptsTest extends ClearAfterClass.Clearable {
+object MethodLevelOptsTest extends ClearAfterClass.Clearable
   var methodOptCompiler = newCompiler(extraArgs = "-Yopt:l:method")
   def clear(): Unit = { methodOptCompiler = null }
-}
 
 @RunWith(classOf[JUnit4])
-class MethodLevelOptsTest extends ClearAfterClass {
+class MethodLevelOptsTest extends ClearAfterClass
   ClearAfterClass.stateToClear = MethodLevelOptsTest
 
   val methodOptCompiler = MethodLevelOptsTest.methodOptCompiler
@@ -38,25 +37,23 @@ class MethodLevelOptsTest extends ClearAfterClass {
       .sortBy(_._2)
 
   @Test
-  def eliminateEmptyTry(): Unit = {
+  def eliminateEmptyTry(): Unit =
     val code = "def f = { try {} catch { case _: Throwable => 0; () }; 1 }"
     val warn = "a pure expression does nothing in statement position"
     assertSameCode(singleMethodInstructions(methodOptCompiler)(
                        code, allowMessage = _.msg contains warn),
                    wrapInDefault(Op(ICONST_1), Op(IRETURN)))
-  }
 
   @Test
-  def eliminateLoadBoxedUnit(): Unit = {
+  def eliminateLoadBoxedUnit(): Unit =
     // the compiler inserts a boxed into the try block. it's therefore non-empty (and live) and not eliminated.
     val code = "def f = { try {} catch { case _: Throwable => 0 }; 1 }"
     val m = singleMethod(methodOptCompiler)(code)
     assertTrue(m.handlers.length == 0)
     assertSameCode(m, List(Op(ICONST_1), Op(IRETURN)))
-  }
 
   @Test
-  def inlineThrowInCatchNotTry(): Unit = {
+  def inlineThrowInCatchNotTry(): Unit =
     // the try block does not contain the `ATHROW` instruction, but in the catch block, `ATHROW` is inlined
     val code =
       "def f(e: Exception) = throw { try e catch { case _: Throwable => e } }"
@@ -72,10 +69,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                       Op(POP),
                       VarOp(ALOAD, 1),
                       Op(ATHROW)))
-  }
 
   @Test
-  def inlineReturnInCatchNotTry(): Unit = {
+  def inlineReturnInCatchNotTry(): Unit =
     val code = "def f: Int = return { try 1 catch { case _: Throwable => 2 } }"
     // cannot inline the IRETURN into the try block (because RETURN may throw IllegalMonitorState)
     val m = singleMethod(methodOptCompiler)(code)
@@ -90,10 +86,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                       Op(POP),
                       Op(ICONST_2),
                       Op(IRETURN)))
-  }
 
   @Test
-  def simplifyJumpsInTryCatchFinally(): Unit = {
+  def simplifyJumpsInTryCatchFinally(): Unit =
     val code = """def f: Int =
         |  try {
         |    return 1
@@ -110,10 +105,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val m = singleMethod(methodOptCompiler)(code)
     assertTrue(m.handlers.isEmpty)
     assertSameCode(m, List(Op(ICONST_3), Op(IRETURN)))
-  }
 
   @Test
-  def nullStoreLoadElim(): Unit = {
+  def nullStoreLoadElim(): Unit =
     // point of this test: we have two cleanups
     //   - remove `ACONST_NULL; ASTORE x` if x is otherwise not live
     //   - remove `ASTORE x; ALOAD x` if x is otherwise not live
@@ -135,10 +129,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                                "()Ljava/lang/String;",
                                false),
                         Op(ARETURN)))
-  }
 
   @Test
-  def deadStoreReferenceElim(): Unit = {
+  def deadStoreReferenceElim(): Unit =
     val code =
       """class C {
         |  def t = {
@@ -151,10 +144,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertSameCode(getSingleMethod(c, "t"), List(Ldc(LDC, "c"), Op(ARETURN)))
-  }
 
   @Test
-  def deadStoreReferenceKeepNull(): Unit = {
+  def deadStoreReferenceKeepNull(): Unit =
     val code =
       """class C {
         |  def t = {
@@ -187,10 +179,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
              VarOp(ASTORE, 1),
              VarOp(ALOAD, 1),
              Op(ARETURN)))
-  }
 
   @Test
-  def elimUnusedTupleObjectStringBox(): Unit = {
+  def elimUnusedTupleObjectStringBox(): Unit =
     val code =
       """class C {
         |  def t(x: Int, y: Int): Int = {
@@ -213,10 +204,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                         VarOp(ILOAD, 2),
                         Op(IADD),
                         Op(IRETURN)))
-  }
 
   @Test
-  def noElimImpureConstructor(): Unit = {
+  def noElimImpureConstructor(): Unit =
     val code = """class C {
         |  def t(x: Int, y: Int): Int = {
         |    val a = new java.lang.Integer("nono")
@@ -237,10 +227,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                         VarOp(ILOAD, 2),
                         Op(IADD),
                         Op(IRETURN)))
-  }
 
   @Test
-  def elimUnusedBoxUnbox(): Unit = {
+  def elimUnusedBoxUnbox(): Unit =
     val code =
       """class C {
         |  def t(a: Long): Int = {
@@ -261,10 +250,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertSameCode(getSingleMethod(c, "t"), List(Op(ICONST_0), Op(IRETURN)))
-  }
 
   @Test
-  def elimUnusedClosure(): Unit = {
+  def elimUnusedClosure(): Unit =
     val code = """class C {
         |  def t(x: Int, y: Int): Int = {
         |    val f = (a: Int) => a + x + y
@@ -284,10 +272,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
              VarOp(ILOAD, 3),
              Invoke(INVOKESTATIC, "C", "C$$$anonfun$1", "(III)I", false),
              Op(IRETURN)))
-  }
 
   @Test
-  def rewriteSpecializedClosureCall(): Unit = {
+  def rewriteSpecializedClosureCall(): Unit =
     val code =
       """class C {
         |  def t = {
@@ -301,10 +288,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     val List(c) = compileClasses(methodOptCompiler)(code)
     val t = getSingleMethod(c, "t")
     assert(!t.instructions.exists(_.opcode == INVOKEDYNAMIC), t)
-  }
 
   @Test
-  def boxUnboxPrimitive(): Unit = {
+  def boxUnboxPrimitive(): Unit =
     val code =
       """class C {
         |  def t1 = {
@@ -393,9 +379,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertSameSummary(getSingleMethod(c, "t8"), List(ICONST_0, IRETURN))
     assertNoInvoke(getSingleMethod(c, "t9"))
     // t10: no invocation of unbox
-    assertEquals(getSingleMethod(c, "t10").instructions collect {
+    assertEquals(getSingleMethod(c, "t10").instructions collect
       case Invoke(_, owner, name, _, _) => (owner, name)
-    }, List(("java/lang/Integer", "valueOf"), ("C", "escape")))
+    , List(("java/lang/Integer", "valueOf"), ("C", "escape")))
 
     assertSameSummary(getSingleMethod(c, "t11"),
                       List(BIPUSH,
@@ -419,16 +405,15 @@ class MethodLevelOptsTest extends ClearAfterClass {
                            IRETURN))
 
     // no unbox invocations
-    assertEquals(getSingleMethod(c, "t12").instructions collect {
+    assertEquals(getSingleMethod(c, "t12").instructions collect
                    case Invoke(_, owner, name, _, _) => (owner, name)
-                 },
+                 ,
                  List(("java/lang/Integer", "valueOf"),
                       ("java/lang/Integer", "valueOf"),
                       ("C", "escape")))
-  }
 
   @Test
-  def refEliminiation(): Unit = {
+  def refEliminiation(): Unit =
     val code =
       """class C {
         |  import runtime._
@@ -478,18 +463,17 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertNoInvoke(getSingleMethod(c, "t2"))
     assertSameSummary(getSingleMethod(c, "t3"), List(LDC, LDC, LADD, LRETURN))
     assertNoInvoke(getSingleMethod(c, "t4"))
-    assertEquals(getSingleMethod(c, "t5").instructions collect {
+    assertEquals(getSingleMethod(c, "t5").instructions collect
       case Field(_, owner, name, _) => s"$owner.$name"
-    }, List("scala/runtime/IntRef.elem"))
-    assertEquals(getSingleMethod(c, "t6").instructions collect {
+    , List("scala/runtime/IntRef.elem"))
+    assertEquals(getSingleMethod(c, "t6").instructions collect
                    case Field(op, owner, name, _) => s"$op $owner.$name"
-                 },
+                 ,
                  List(s"$PUTFIELD scala/runtime/IntRef.elem",
                       s"$GETFIELD scala/runtime/IntRef.elem"))
-  }
 
   @Test
-  def tupleElimination(): Unit = {
+  def tupleElimination(): Unit =
     val code =
       """class C {
         |  def t1(b: Boolean) = {
@@ -549,9 +533,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
         getSingleMethod(c, "t3"), List(ICONST_3, ICONST_4, IADD, IRETURN))
     assertSameSummary(
         getSingleMethod(c, "t4"), List(ICONST_3, "boxToInteger", ARETURN))
-    assertEquals(getSingleMethod(c, "t5").instructions collect {
+    assertEquals(getSingleMethod(c, "t5").instructions collect
                    case Invoke(_, owner, name, _, _) => (owner, name)
-                 },
+                 ,
                  List(("scala/runtime/BoxesRunTime", "boxToInteger"),
                       ("scala/runtime/BoxesRunTime", "boxToInteger"),
                       ("C", "tpl"),
@@ -573,10 +557,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                            IRETURN))
     assertNoInvoke(getSingleMethod(c, "t8"))
     assertNoInvoke(getSingleMethod(c, "t9"))
-  }
 
   @Test
-  def nullnessOpts(): Unit = {
+  def nullnessOpts(): Unit =
     val code =
       """class C {
         |  def t1 = {
@@ -631,10 +614,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertSameCode(
         getSingleMethod(c, "t6"), List(Op(ACONST_NULL), Op(ARETURN)))
     assertSameCode(getSingleMethod(c, "t7"), List(Op(ICONST_0), Op(IRETURN)))
-  }
 
   @Test
-  def elimRedundantNullCheck(): Unit = {
+  def elimRedundantNullCheck(): Unit =
     val code = """class C {
         |  def t(x: Object) = {
         |    val bool = x == null
@@ -651,10 +633,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
                         Label(6),
                         Op(ICONST_0),
                         Op(IRETURN)))
-  }
 
   @Test
-  def t5313(): Unit = {
+  def t5313(): Unit =
     val code =
       """class C {
         |  def randomBoolean = scala.util.Random.nextInt % 2 == 0
@@ -747,10 +728,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertEquals(locals(c, "t5"), List(("this", 0), ("kept6", 1)))
     assert(stores("t5") == List(VarOp(ASTORE, 1), VarOp(ASTORE, 1)),
            textify(findAsmMethod(c, "t5")))
-  }
 
   @Test
-  def testCpp(): Unit = {
+  def testCpp(): Unit =
     // copied from an old test (run/test-cpp.scala)
     val code = """class C {
         |  import scala.util.Random._
@@ -810,10 +790,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertEquals(locals(c, "t3"), List(("this", 0)))
     assertEquals(locals(c, "t4"), List(("this", 0), ("x", 1)))
     assertEquals(locals(c, "t5"), List(("this", 0), ("x", 1)))
-  }
 
   @Test
-  def t7006(): Unit = {
+  def t7006(): Unit =
     val code = """class C {
         |  def t: Unit = {
         |    try {
@@ -830,10 +809,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
     assertEquals(t.handlers, Nil)
     assertEquals(locals(c, "t"), List(("this", 0)))
     assertSameSummary(t, List(GETSTATIC, LDC, "print", -1, GOTO))
-  }
 
   @Test
-  def booleanOrderingCompare(): Unit = {
+  def booleanOrderingCompare(): Unit =
     val code = """class C {
         |  def compare(x: Boolean, y: Boolean) = (x, y) match {
         |    case (false, true) => -1
@@ -844,10 +822,9 @@ class MethodLevelOptsTest extends ClearAfterClass {
       """.stripMargin
     val List(c) = compileClasses(methodOptCompiler)(code)
     assertNoInvoke(getSingleMethod(c, "compare"))
-  }
 
   @Test
-  def t8790(): Unit = {
+  def t8790(): Unit =
     val code = """class C {
         |  def t(x: Int, y: Int): String = (x, y) match {
         |    case (7, 8) => "a"
@@ -873,5 +850,3 @@ class MethodLevelOptsTest extends ClearAfterClass {
                            -1,
                            ALOAD,
                            ARETURN))
-  }
-}

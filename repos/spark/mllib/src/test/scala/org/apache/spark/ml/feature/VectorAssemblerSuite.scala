@@ -28,13 +28,12 @@ import org.apache.spark.sql.functions.col
 
 class VectorAssemblerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new VectorAssembler)
-  }
 
-  test("assemble") {
+  test("assemble")
     import org.apache.spark.ml.feature.VectorAssembler.assemble
     assert(assemble(0.0) === Vectors.sparse(1, Array.empty, Array.empty))
     assert(assemble(0.0, 1.0) === Vectors.sparse(2, Array(1), Array(1.0)))
@@ -44,21 +43,18 @@ class VectorAssemblerSuite
     val sv = Vectors.sparse(2, Array(0, 1), Array(3.0, 4.0))
     assert(assemble(0.0, dv, 1.0, sv) === Vectors.sparse(
             6, Array(1, 3, 4, 5), Array(2.0, 1.0, 3.0, 4.0)))
-    for (v <- Seq(1, "a", null)) {
+    for (v <- Seq(1, "a", null))
       intercept[SparkException](assemble(v))
       intercept[SparkException](assemble(1.0, v))
-    }
-  }
 
-  test("assemble should compress vectors") {
+  test("assemble should compress vectors")
     import org.apache.spark.ml.feature.VectorAssembler.assemble
     val v1 = assemble(0.0, 0.0, 0.0, Vectors.dense(4.0))
     assert(v1.isInstanceOf[SparseVector])
     val v2 = assemble(1.0, 2.0, 3.0, Vectors.sparse(1, Array(0), Array(4.0)))
     assert(v2.isInstanceOf[DenseVector])
-  }
 
-  test("VectorAssembler") {
+  test("VectorAssembler")
     val df = sqlContext
       .createDataFrame(
           Seq(
@@ -73,27 +69,23 @@ class VectorAssemblerSuite
     val assembler = new VectorAssembler()
       .setInputCols(Array("x", "y", "z", "n"))
       .setOutputCol("features")
-    assembler.transform(df).select("features").collect().foreach {
+    assembler.transform(df).select("features").collect().foreach
       case Row(v: Vector) =>
         assert(v === Vectors.sparse(
                 6, Array(1, 2, 4, 5), Array(1.0, 2.0, 3.0, 10.0)))
-    }
-  }
 
-  test("transform should throw an exception in case of unsupported type") {
+  test("transform should throw an exception in case of unsupported type")
     val df =
       sqlContext.createDataFrame(Seq(("a", "b", "c"))).toDF("a", "b", "c")
     val assembler = new VectorAssembler()
       .setInputCols(Array("a", "b", "c"))
       .setOutputCol("features")
-    val thrown = intercept[SparkException] {
+    val thrown = intercept[SparkException]
       assembler.transform(df)
-    }
     assert(
         thrown.getMessage contains "VectorAssembler does not support the StringType type")
-  }
 
-  test("ML attributes") {
+  test("ML attributes")
     val browser =
       NominalAttribute.defaultAttr.withValues("chrome", "firefox", "safari")
     val hour = NumericAttribute.defaultAttr.withMin(0.0).withMax(24.0)
@@ -150,12 +142,9 @@ class VectorAssemblerSuite
     assert(features.getAttr(6) === NumericAttribute.defaultAttr
           .withIndex(6)
           .withName("ad_1"))
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new VectorAssembler()
       .setInputCols(Array("myInputCol", "myInputCol2"))
       .setOutputCol("myOutputCol")
     testDefaultReadWrite(t)
-  }
-}

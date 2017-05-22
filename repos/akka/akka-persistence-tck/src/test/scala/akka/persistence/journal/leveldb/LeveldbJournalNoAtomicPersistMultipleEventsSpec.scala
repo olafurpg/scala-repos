@@ -10,7 +10,7 @@ class LeveldbJournalNoAtomicPersistMultipleEventsSpec
               "LeveldbJournalNoAtomicPersistMultipleEventsSpec",
               extraConfig = Some(
                     "akka.persistence.journal.leveldb.native = off")))
-    with PluginCleanup {
+    with PluginCleanup
 
   /**
     * Setting to false to test the single message atomic write behaviour of JournalSpec
@@ -18,4 +18,3 @@ class LeveldbJournalNoAtomicPersistMultipleEventsSpec
   override def supportsAtomicPersistAllOfSeveralEvents = false
 
   override def supportsRejectingNonSerializableObjects = true
-}

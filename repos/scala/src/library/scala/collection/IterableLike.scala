@@ -49,7 +49,7 @@ import immutable.Stream
   */
 trait IterableLike[+A, +Repr]
     extends Any with Equals with TraversableLike[A, Repr]
-    with GenIterableLike[A, Repr] {
+    with GenIterableLike[A, Repr]
   self =>
 
   override protected[this] def thisCollection: Iterable[A] =
@@ -110,62 +110,52 @@ trait IterableLike[+A, +Repr]
   override /*TraversableLike*/ def head: A =
     iterator.next()
 
-  override /*TraversableLike*/ def slice(from: Int, until: Int): Repr = {
+  override /*TraversableLike*/ def slice(from: Int, until: Int): Repr =
     val lo = math.max(from, 0)
     val elems = until - lo
     val b = newBuilder
     if (elems <= 0) b.result()
-    else {
+    else
       b.sizeHintBounded(elems, this)
       var i = 0
       val it = iterator drop lo
-      while (i < elems && it.hasNext) {
+      while (i < elems && it.hasNext)
         b += it.next
         i += 1
-      }
       b.result()
-    }
-  }
 
-  override /*TraversableLike*/ def take(n: Int): Repr = {
+  override /*TraversableLike*/ def take(n: Int): Repr =
     val b = newBuilder
 
     if (n <= 0) b.result()
-    else {
+    else
       b.sizeHintBounded(n, this)
       var i = 0
       val it = iterator
-      while (i < n && it.hasNext) {
+      while (i < n && it.hasNext)
         b += it.next
         i += 1
-      }
       b.result()
-    }
-  }
 
-  override /*TraversableLike*/ def drop(n: Int): Repr = {
+  override /*TraversableLike*/ def drop(n: Int): Repr =
     val b = newBuilder
     val lo = math.max(0, n)
     b.sizeHint(this, -lo)
     var i = 0
     val it = iterator
-    while (i < n && it.hasNext) {
+    while (i < n && it.hasNext)
       it.next()
       i += 1
-    }
     (b ++= it).result()
-  }
 
-  override /*TraversableLike*/ def takeWhile(p: A => Boolean): Repr = {
+  override /*TraversableLike*/ def takeWhile(p: A => Boolean): Repr =
     val b = newBuilder
     val it = iterator
-    while (it.hasNext) {
+    while (it.hasNext)
       val x = it.next()
       if (!p(x)) return b.result()
       b += x
-    }
     b.result()
-  }
 
   /** Partitions elements in fixed size ${coll}s.
     *  @see [[scala.collection.Iterator]], method `grouped`
@@ -175,11 +165,10 @@ trait IterableLike[+A, +Repr]
     *          last will be less than size `size` if the elements don't divide evenly.
     */
   def grouped(size: Int): Iterator[Repr] =
-    for (xs <- iterator grouped size) yield {
+    for (xs <- iterator grouped size) yield
       val b = newBuilder
       b ++= xs
       b.result()
-    }
 
   /** Groups elements in fixed size blocks by passing a "sliding window"
     *  over them (as opposed to partitioning them, as is done in grouped.)
@@ -205,11 +194,10 @@ trait IterableLike[+A, +Repr]
     *          fewer elements than size.
     */
   def sliding(size: Int, step: Int): Iterator[Repr] =
-    for (xs <- iterator.sliding(size, step)) yield {
+    for (xs <- iterator.sliding(size, step)) yield
       val b = newBuilder
       b ++= xs
       b.result()
-    }
 
   /** Selects last ''n'' elements.
     *  $orderDependent
@@ -218,18 +206,16 @@ trait IterableLike[+A, +Repr]
     *  @return a $coll consisting only of the last `n` elements of this $coll, or else the
     *          whole $coll, if it has less than `n` elements.
     */
-  def takeRight(n: Int): Repr = {
+  def takeRight(n: Int): Repr =
     val b = newBuilder
     b.sizeHintBounded(n, this)
     val lead = this.iterator drop n
     val it = this.iterator
-    while (lead.hasNext) {
+    while (lead.hasNext)
       lead.next()
       it.next()
-    }
     while (it.hasNext) b += it.next()
     b.result()
-  }
 
   /** Selects all elements except last ''n'' ones.
     *  $orderDependent
@@ -238,41 +224,36 @@ trait IterableLike[+A, +Repr]
     *  @return a $coll consisting of all elements of this $coll except the last `n` ones, or else the
     *          empty $coll, if this $coll has less than `n` elements.
     */
-  def dropRight(n: Int): Repr = {
+  def dropRight(n: Int): Repr =
     val b = newBuilder
     if (n >= 0) b.sizeHint(this, -n)
     val lead = iterator drop n
     val it = iterator
-    while (lead.hasNext) {
+    while (lead.hasNext)
       b += it.next
       lead.next()
-    }
     b.result()
-  }
 
   override /*TraversableLike*/ def copyToArray[B >: A](
-      xs: Array[B], start: Int, len: Int) {
+      xs: Array[B], start: Int, len: Int)
     var i = start
     val end = (start + len) min xs.length
     val it = iterator
-    while (i < end && it.hasNext) {
+    while (i < end && it.hasNext)
       xs(i) = it.next()
       i += 1
-    }
-  }
 
   def zip[A1 >: A, B, That](that: GenIterable[B])(
-      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That = {
+      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That =
     val b = bf(repr)
     val these = this.iterator
     val those = that.iterator
     while (these.hasNext && those.hasNext) b += ((these.next(), those.next()))
     b.result()
-  }
 
   def zipAll[B, A1 >: A, That](
       that: GenIterable[B], thisElem: A1, thatElem: B)(
-      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That = {
+      implicit bf: CanBuildFrom[Repr, (A1, B), That]): That =
     val b = bf(repr)
     val these = this.iterator
     val those = that.iterator
@@ -280,27 +261,23 @@ trait IterableLike[+A, +Repr]
     while (these.hasNext) b += ((these.next(), thatElem))
     while (those.hasNext) b += ((thisElem, those.next()))
     b.result()
-  }
 
   def zipWithIndex[A1 >: A, That](
-      implicit bf: CanBuildFrom[Repr, (A1, Int), That]): That = {
+      implicit bf: CanBuildFrom[Repr, (A1, Int), That]): That =
     val b = bf(repr)
     var i = 0
-    for (x <- this) {
+    for (x <- this)
       b += ((x, i))
       i += 1
-    }
     b.result()
-  }
 
-  def sameElements[B >: A](that: GenIterable[B]): Boolean = {
+  def sameElements[B >: A](that: GenIterable[B]): Boolean =
     val these = this.iterator
     val those = that.iterator
     while (these.hasNext && those.hasNext) if (these.next != those.next)
       return false
 
     !these.hasNext && !those.hasNext
-  }
 
   override /*TraversableLike*/ def toStream: Stream[A] = iterator.toStream
 
@@ -312,11 +289,9 @@ trait IterableLike[+A, +Repr]
     */
   override /*TraversableLike*/ def canEqual(that: Any) = true
 
-  override /*TraversableLike*/ def view = new IterableView[A, Repr] {
+  override /*TraversableLike*/ def view = new IterableView[A, Repr]
     protected lazy val underlying = self.repr
     override def iterator = self.iterator
-  }
 
   override /*TraversableLike*/ def view(from: Int, until: Int) =
     view.slice(from, until)
-}

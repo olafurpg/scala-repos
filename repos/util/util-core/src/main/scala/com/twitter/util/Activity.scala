@@ -23,7 +23,7 @@ import scala.reflect.ClassTag
   * where Op is like a [[com.twitter.util.Try Try]] with an additional
   * pending state.)
   */
-case class Activity[+T](run: Var[Activity.State[T]]) {
+case class Activity[+T](run: Var[Activity.State[T]])
   import Activity._
 
   /**
@@ -36,13 +36,11 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * `f` is not defined for this activity's current value, the derived
     * activity becomes pending.
     */
-  def collect[U](f: PartialFunction[T, U]): Activity[U] = flatMap {
+  def collect[U](f: PartialFunction[T, U]): Activity[U] = flatMap
     case t if f.isDefinedAt(t) =>
-      try Activity.value(f(t)) catch {
+      try Activity.value(f(t)) catch
         case NonFatal(exc) => Activity.exception(exc)
-      }
     case _ => Activity.pending
-  }
 
   /**
     * Join two activities.
@@ -55,16 +53,15 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     */
   def flatMap[U](f: T => Activity[U]): Activity[U] =
     Activity(
-        run flatMap {
+        run flatMap
       case Ok(v) =>
-        val a = try f(v) catch {
+        val a = try f(v) catch
           case NonFatal(exc) => Activity.exception(exc)
-        }
 
         a.run
       case Pending => Var.value(Activity.Pending)
       case exc @ Failed(_) => Var.value(exc)
-    })
+    )
 
   /**
     * The activity which behaves as `f`  to the state
@@ -72,23 +69,21 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     */
   def transform[U](f: Activity.State[T] => Activity[U]): Activity[U] =
     Activity(
-        run flatMap { act =>
-      val a = try f(act) catch {
+        run flatMap  act =>
+      val a = try f(act) catch
         case NonFatal(exc) => Activity.exception(exc)
-      }
       a.run
-    })
+    )
 
   /**
     * Recover a failed activity.
     */
   def handle[U >: T](h: PartialFunction[Throwable, U]): Activity[U] =
-    transform {
+    transform
       case Activity.Failed(e) if h.isDefinedAt(e) => Activity.value(h(e))
       case Activity.Pending => Activity.pending
       case Activity.Failed(e) => Activity.exception(e)
       case Activity.Ok(t) => Activity.value(t)
-    }
 
   /**
     * An [[com.twitter.util.Event Event]] of states.
@@ -99,37 +94,33 @@ case class Activity[+T](run: Var[Activity.State[T]]) {
     * An [[com.twitter.util.Event Event]] containing only nonpending
     * values.
     */
-  def values: Event[Try[T]] = states collect {
+  def values: Event[Try[T]] = states collect
     case Ok(v) => Return(v)
     case Failed(exc) => Throw(exc)
-  }
 
   /**
     * Sample the current value of this activity. Sample throws an
     * exception if the activity is in pending state or has failed.
     */
   def sample(): T = Activity.sample(this)
-}
 
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.util.Activities]].
   */
-object Activity {
+object Activity
 
   /**
     * Create a new pending activity. The activity's state is updated by
     * the given witness.
     */
-  def apply[T](): (Activity[T], Witness[Try[T]]) = {
+  def apply[T](): (Activity[T], Witness[Try[T]]) =
     val v = Var(Pending: State[T])
     val w: Witness[Try[T]] =
-      Witness(v) comap {
+      Witness(v) comap
         case Return(v) => Ok(v)
         case Throw(exc) => Failed(exc)
-      }
 
     (Activity(v), w)
-  }
 
   /**
     * Constructs an Activity from a state Event.
@@ -146,37 +137,32 @@ object Activity {
     *   @inheritdoc
     */
   def collect[T : ClassTag, CC[X] <: Traversable[X]](acts: CC[Activity[T]])(
-      implicit newBuilder: CanBuild[T, CC[T]]): Activity[CC[T]] = {
+      implicit newBuilder: CanBuild[T, CC[T]]): Activity[CC[T]] =
     if (acts.isEmpty) return Activity.value(newBuilder().result)
 
     val states: Traversable[Var[State[T]]] = acts.map(_.run)
     val stateVar: Var[Traversable[State[T]]] = Var.collect(states)
 
-    def flip(states: Traversable[State[T]]): State[CC[T]] = {
+    def flip(states: Traversable[State[T]]): State[CC[T]] =
       val notOk =
-        states find {
+        states find
           case Pending | Failed(_) => true
           case Ok(_) => false
-        }
 
-      notOk match {
+      notOk match
         case None =>
         case Some(Pending) => return Pending
         case Some(f @ Failed(_)) => return f
         case Some(_) => assert(false)
-      }
 
       val ts = newBuilder()
-      states foreach {
+      states foreach
         case Ok(t) => ts += t
         case _ => assert(false)
-      }
 
       Ok(ts.result)
-    }
 
     Activity(stateVar map flip)
-  }
 
   /**
     * Join 2 Activities. The returned Activity is complete when all
@@ -184,9 +170,8 @@ object Activity {
     * do.
     */
   def join[A, B](a: Activity[A], b: Activity[B]): Activity[(A, B)] =
-    collect(Seq(a, b)) map { ss =>
+    collect(Seq(a, b)) map  ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B])
-    }
 
   /**
     * Join 3 Activities. The returned Activity is complete when all
@@ -195,9 +180,8 @@ object Activity {
     */
   def join[A, B, C](
       a: Activity[A], b: Activity[B], c: Activity[C]): Activity[(A, B, C)] =
-    collect(Seq(a, b, c)) map { ss =>
+    collect(Seq(a, b, c)) map  ss =>
       (ss(0).asInstanceOf[A], ss(1).asInstanceOf[B], ss(2).asInstanceOf[C])
-    }
 
   /**
     * Join 4 Activities. The returned Activity is complete when all
@@ -208,12 +192,11 @@ object Activity {
                        b: Activity[B],
                        c: Activity[C],
                        d: Activity[D]): Activity[(A, B, C, D)] =
-    collect(Seq(a, b, c, d)) map { ss =>
+    collect(Seq(a, b, c, d)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
        ss(3).asInstanceOf[D])
-    }
 
   /**
     * Join 5 Activities. The returned Activity is complete when all
@@ -225,13 +208,12 @@ object Activity {
                           c: Activity[C],
                           d: Activity[D],
                           e: Activity[E]): Activity[(A, B, C, D, E)] =
-    collect(Seq(a, b, c, d, e)) map { ss =>
+    collect(Seq(a, b, c, d, e)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
        ss(3).asInstanceOf[D],
        ss(4).asInstanceOf[E])
-    }
 
   /**
     * Join 6 Activities. The returned Activity is complete when all
@@ -244,14 +226,13 @@ object Activity {
                              d: Activity[D],
                              e: Activity[E],
                              f: Activity[F]): Activity[(A, B, C, D, E, F)] =
-    collect(Seq(a, b, c, d, e, f)) map { ss =>
+    collect(Seq(a, b, c, d, e, f)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
        ss(3).asInstanceOf[D],
        ss(4).asInstanceOf[E],
        ss(5).asInstanceOf[F])
-    }
 
   /**
     * Join 7 Activities. The returned Activity is complete when all
@@ -266,7 +247,7 @@ object Activity {
       e: Activity[E],
       f: Activity[F],
       g: Activity[G]): Activity[(A, B, C, D, E, F, G)] =
-    collect(Seq(a, b, c, d, e, f, g)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -274,7 +255,6 @@ object Activity {
        ss(4).asInstanceOf[E],
        ss(5).asInstanceOf[F],
        ss(6).asInstanceOf[G])
-    }
 
   /**
     * Join 8 Activities. The returned Activity is complete when all
@@ -290,7 +270,7 @@ object Activity {
       f: Activity[F],
       g: Activity[G],
       h: Activity[H]): Activity[(A, B, C, D, E, F, G, H)] =
-    collect(Seq(a, b, c, d, e, f, g, h)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -299,7 +279,6 @@ object Activity {
        ss(5).asInstanceOf[F],
        ss(6).asInstanceOf[G],
        ss(7).asInstanceOf[H])
-    }
 
   /**
     * Join 9 Activities. The returned Activity is complete when all
@@ -316,7 +295,7 @@ object Activity {
       g: Activity[G],
       h: Activity[H],
       i: Activity[I]): Activity[(A, B, C, D, E, F, G, H, I)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -326,7 +305,6 @@ object Activity {
        ss(6).asInstanceOf[G],
        ss(7).asInstanceOf[H],
        ss(8).asInstanceOf[I])
-    }
 
   /**
     * Join 10 Activities. The returned Activity is complete when all
@@ -344,7 +322,7 @@ object Activity {
       h: Activity[H],
       i: Activity[I],
       j: Activity[J]): Activity[(A, B, C, D, E, F, G, H, I, J)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -355,7 +333,6 @@ object Activity {
        ss(7).asInstanceOf[H],
        ss(8).asInstanceOf[I],
        ss(9).asInstanceOf[J])
-    }
 
   /**
     * Join 11 Activities. The returned Activity is complete when all
@@ -374,7 +351,7 @@ object Activity {
       i: Activity[I],
       j: Activity[J],
       k: Activity[K]): Activity[(A, B, C, D, E, F, G, H, I, J, K)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -386,7 +363,6 @@ object Activity {
        ss(8).asInstanceOf[I],
        ss(9).asInstanceOf[J],
        ss(10).asInstanceOf[K])
-    }
 
   /**
     * Join 12 Activities. The returned Activity is complete when all
@@ -406,7 +382,7 @@ object Activity {
       j: Activity[J],
       k: Activity[K],
       l: Activity[L]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -419,7 +395,6 @@ object Activity {
        ss(9).asInstanceOf[J],
        ss(10).asInstanceOf[K],
        ss(11).asInstanceOf[L])
-    }
 
   /**
     * Join 13 Activities. The returned Activity is complete when all
@@ -440,7 +415,7 @@ object Activity {
       k: Activity[K],
       l: Activity[L],
       m: Activity[M]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -454,7 +429,6 @@ object Activity {
        ss(10).asInstanceOf[K],
        ss(11).asInstanceOf[L],
        ss(12).asInstanceOf[M])
-    }
 
   /**
     * Join 14 Activities. The returned Activity is complete when all
@@ -476,7 +450,7 @@ object Activity {
       l: Activity[L],
       m: Activity[M],
       n: Activity[N]): Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -491,7 +465,6 @@ object Activity {
        ss(11).asInstanceOf[L],
        ss(12).asInstanceOf[M],
        ss(13).asInstanceOf[N])
-    }
 
   /**
     * Join 15 Activities. The returned Activity is complete when all
@@ -514,7 +487,7 @@ object Activity {
                                                         n: Activity[N],
                                                         o: Activity[O])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -530,7 +503,6 @@ object Activity {
        ss(12).asInstanceOf[M],
        ss(13).asInstanceOf[N],
        ss(14).asInstanceOf[O])
-    }
 
   /**
     * Join 16 Activities. The returned Activity is complete when all
@@ -554,7 +526,7 @@ object Activity {
                                                            o: Activity[O],
                                                            p: Activity[P])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -571,7 +543,6 @@ object Activity {
        ss(13).asInstanceOf[N],
        ss(14).asInstanceOf[O],
        ss(15).asInstanceOf[P])
-    }
 
   /**
     * Join 17 Activities. The returned Activity is complete when all
@@ -596,7 +567,7 @@ object Activity {
                                                               p: Activity[P],
                                                               q: Activity[Q])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map { ss =>
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -614,7 +585,6 @@ object Activity {
        ss(14).asInstanceOf[O],
        ss(15).asInstanceOf[P],
        ss(16).asInstanceOf[Q])
-    }
 
   /**
     * Join 18 Activities. The returned Activity is complete when all
@@ -641,7 +611,7 @@ object Activity {
       q: Activity[Q],
       r: Activity[R])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -661,7 +631,6 @@ object Activity {
          ss(15).asInstanceOf[P],
          ss(16).asInstanceOf[Q],
          ss(17).asInstanceOf[R])
-    }
 
   /**
     * Join 19 Activities. The returned Activity is complete when all
@@ -689,7 +658,7 @@ object Activity {
       r: Activity[R],
       s: Activity[S])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -710,7 +679,6 @@ object Activity {
          ss(16).asInstanceOf[Q],
          ss(17).asInstanceOf[R],
          ss(18).asInstanceOf[S])
-    }
 
   /**
     * Join 20 Activities. The returned Activity is complete when all
@@ -739,7 +707,7 @@ object Activity {
       s: Activity[S],
       t: Activity[T])
     : Activity[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -761,7 +729,6 @@ object Activity {
          ss(17).asInstanceOf[R],
          ss(18).asInstanceOf[S],
          ss(19).asInstanceOf[T])
-    }
 
   /**
     * Join 21 Activities. The returned Activity is complete when all
@@ -791,7 +758,7 @@ object Activity {
       t: Activity[T],
       u: Activity[U]): Activity[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map {
+    collect(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map
       ss =>
         (ss(0).asInstanceOf[A],
          ss(1).asInstanceOf[B],
@@ -814,7 +781,6 @@ object Activity {
          ss(18).asInstanceOf[S],
          ss(19).asInstanceOf[T],
          ss(20).asInstanceOf[U])
-    }
 
   /**
     * Join 22 Activities. The returned Activity is complete when all
@@ -866,7 +832,7 @@ object Activity {
                 s,
                 t,
                 u,
-                v)) map { ss =>
+                v)) map  ss =>
       (ss(0).asInstanceOf[A],
        ss(1).asInstanceOf[B],
        ss(2).asInstanceOf[C],
@@ -889,26 +855,23 @@ object Activity {
        ss(19).asInstanceOf[T],
        ss(20).asInstanceOf[U],
        ss(21).asInstanceOf[V])
-    }
 
   /**
     * A Java friendly method for `Activity.collect()`.
     */
   def collect[T <: Object](
-      activities: JList[Activity[T]]): Activity[JList[T]] = {
+      activities: JList[Activity[T]]): Activity[JList[T]] =
     val list = activities.asScala.asInstanceOf[Buffer[Activity[Object]]]
     collect(list).map(_.asJava).asInstanceOf[Activity[JList[T]]]
-  }
 
   /**
     * Sample given `Activity`.
     */
   def sample[T](act: Activity[T]): T =
-    act.run.sample() match {
+    act.run.sample() match
       case Ok(t) => t
       case Pending => throw new IllegalStateException("Still pending")
       case Failed(exc) => throw exc
-    }
 
   /**
     * Create a new static activity with value `v`.
@@ -927,14 +890,12 @@ object Activity {
     * `close()` on observations of `Activity.run` will not result in the
     * cancellation of the original `Future`.
     */
-  def future[T](f: Future[T]): Activity[T] = {
+  def future[T](f: Future[T]): Activity[T] =
     val run = Var(Pending: State[T])
-    f respond {
+    f respond
       case Return(v) => run() = Ok(v)
       case Throw(e) => run() = Failed(e)
-    }
     Activity(run)
-  }
 
   /**
     * Create a new static activity with exception `exc`.
@@ -966,4 +927,3 @@ object Activity {
     * The activity has failed, with exception `exc`.
     */
   case class Failed(exc: Throwable) extends State[Nothing]
-}

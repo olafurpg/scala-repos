@@ -72,7 +72,7 @@ import slick.util.MacroSupport.macroSupportInterpolation
   *     >https://db.apache.org/derby/docs/10.10/ref/rrefsqlj29026.html</a></li>
   * </ul>
   */
-trait DerbyProfile extends JdbcProfile {
+trait DerbyProfile extends JdbcProfile
 
   override protected def computeCapabilities: Set[Capability] =
     (super.computeCapabilities - RelationalCapabilities.functionDatabase -
@@ -87,13 +87,11 @@ trait DerbyProfile extends JdbcProfile {
 
   class ModelBuilder(mTables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
       implicit ec: ExecutionContext)
-      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults) {
+      extends JdbcModelBuilder(mTables, ignoreInvalidDefaults)
     override def createTableNamer(mTable: MTable): TableNamer =
-      new TableNamer(mTable) {
+      new TableNamer(mTable)
         override def schema =
           super.schema.filter(_ != "APP") // remove default schema
-      }
-  }
 
   override def createModelBuilder(
       tables: Seq[MTable], ignoreInvalidDefaults: Boolean)(
@@ -119,27 +117,26 @@ trait DerbyProfile extends JdbcProfile {
       seq: Sequence[_]): SequenceDDLBuilder[_] = new SequenceDDLBuilder(seq)
 
   override def defaultSqlTypeName(
-      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match {
+      tmd: JdbcType[_], sym: Option[FieldSymbol]): String = tmd.sqlType match
     case java.sql.Types.BOOLEAN => "SMALLINT"
     /* Derby does not have a TINYINT type, so we use SMALLINT instead. */
     case java.sql.Types.TINYINT => "SMALLINT"
     case _ => super.defaultSqlTypeName(tmd, sym)
-  }
 
   override val scalarFrom = Some("sysibm.sysdummy1")
 
   class QueryBuilder(tree: Node, state: CompilerState)
-      extends super.QueryBuilder(tree, state) {
+      extends super.QueryBuilder(tree, state)
     override protected val concatOperator = Some("||")
     override protected val supportsTuples = false
     override protected val supportsLiteralGroupBy = true
     override protected val quotedJdbcFns = Some(Vector(Library.User))
 
-    override def expr(c: Node, skipParens: Boolean = false): Unit = c match {
+    override def expr(c: Node, skipParens: Boolean = false): Unit = c match
       case Library.Cast(ch @ _ *) =>
         /* Work around DERBY-2072 by casting numeric values first to CHAR and
          * then to VARCHAR. */
-        val (toVarchar, tn) = {
+        val (toVarchar, tn) =
           val tn =
             (if (ch.length == 2)
                ch(1).asInstanceOf[LiteralNode].value.asInstanceOf[String]
@@ -148,7 +145,6 @@ trait DerbyProfile extends JdbcProfile {
             (true, columnTypes.stringJdbcType.sqlTypeName(None))
           else if (tn.startsWith("varchar")) (true, tn)
           else (false, tn)
-        }
         if (toVarchar &&
             jdbcTypeFor(ch(0).nodeType).isInstanceOf[NumericTypedType])
           b"trim(cast(cast(${ch(0)} as char(30)) as $tn))"
@@ -170,24 +166,21 @@ trait DerbyProfile extends JdbcProfile {
          * NullPointerException when using bind variables in a SELECT clause.
          * This should be fixed in Derby 10.6.1.1. The workaround is to add an
          * explicit type annotation (in the form of a CAST expression). */
-        if (c.volatileHint || !ti.hasLiteralForm) {
+        if (c.volatileHint || !ti.hasLiteralForm)
           b"cast("
-          b +?= { (p, idx, param) =>
+          b +?=  (p, idx, param) =>
             if (option) ti.setOption(v.asInstanceOf[Option[Any]], p, idx)
             else ti.setValue(v, p, idx)
-          }
           b" as ${ti.sqlTypeName(None)})"
-        } else super.expr(c, skipParens)
+        else super.expr(c, skipParens)
       case Library.NextValue(SequenceNode(name)) => b"(next value for `$name)"
       case Library.CurrentValue(_ *) =>
         throw new SlickException("Derby does not support CURRVAL")
       case _ => super.expr(c, skipParens)
-    }
-  }
 
-  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table) {
-    override protected def createIndex(idx: Index) = {
-      if (idx.unique) {
+  class TableDDLBuilder(table: Table[_]) extends super.TableDDLBuilder(table)
+    override protected def createIndex(idx: Index) =
+      if (idx.unique)
         /* Create a UNIQUE CONSTRAINT (with an automatically generated backing
          * index) because Derby does not allow a FOREIGN KEY CONSTRAINT to
          * reference columns which have a UNIQUE INDEX but not a nominal UNIQUE
@@ -199,23 +192,19 @@ trait DerbyProfile extends JdbcProfile {
         addIndexColumnList(idx.on, sb, idx.table.tableName)
         sb append ")"
         sb.toString
-      } else super.createIndex(idx)
-    }
-  }
+      else super.createIndex(idx)
 
   class ColumnDDLBuilder(column: FieldSymbol)
-      extends super.ColumnDDLBuilder(column) {
-    override protected def appendOptions(sb: StringBuilder) {
+      extends super.ColumnDDLBuilder(column)
+    override protected def appendOptions(sb: StringBuilder)
       if (defaultLiteral ne null) sb append " DEFAULT " append defaultLiteral
       if (notNull) sb append " NOT NULL"
       if (primaryKey) sb append " PRIMARY KEY"
       if (autoIncrement) sb append " GENERATED BY DEFAULT AS IDENTITY"
-    }
-  }
 
   class SequenceDDLBuilder[T](seq: Sequence[T])
-      extends super.SequenceDDLBuilder(seq) {
-    override def buildDDL: DDL = {
+      extends super.SequenceDDLBuilder(seq)
+    override def buildDDL: DDL =
       import seq.integral._
       val increment = seq._increment.getOrElse(one)
       val desc = increment < zero
@@ -233,25 +222,19 @@ trait DerbyProfile extends JdbcProfile {
        * workaround available AFAICT. */
       if (seq._cycle) b append " CYCLE"
       DDL(b.toString, "DROP SEQUENCE " + quoteIdentifier(seq.name))
-    }
-  }
 
-  class JdbcTypes extends super.JdbcTypes {
+  class JdbcTypes extends super.JdbcTypes
     override val booleanJdbcType = new BooleanJdbcType
     override val uuidJdbcType = new UUIDJdbcType
 
     /* Derby does not have a proper BOOLEAN type. The suggested workaround is
      * SMALLINT with constants 1 and 0 for TRUE and FALSE. */
-    class BooleanJdbcType extends super.BooleanJdbcType {
+    class BooleanJdbcType extends super.BooleanJdbcType
       override def valueToSQLLiteral(value: Boolean) = if (value) "1" else "0"
-    }
 
-    class UUIDJdbcType extends super.UUIDJdbcType {
+    class UUIDJdbcType extends super.UUIDJdbcType
       override def sqlType = java.sql.Types.BINARY
       override def sqlTypeName(sym: Option[FieldSymbol]) =
         "CHAR(16) FOR BIT DATA"
-    }
-  }
-}
 
 object DerbyProfile extends DerbyProfile

@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/text/FontWeight.html javafx.scene.text.FontWeight]] */
 object FontWeight
-    extends SFXEnumDelegateCompanion[jfxst.FontWeight, FontWeight] {
+    extends SFXEnumDelegateCompanion[jfxst.FontWeight, FontWeight]
 
   val Thin = new FontWeight(jfxst.FontWeight.THIN)
   @deprecated("Use Thin; THIN will be removed in a future release", "2.2.60")
@@ -90,11 +90,9 @@ object FontWeight
     */
   def findByWeight(weight: Int): FontWeight =
     jfxst.FontWeight.findByWeight(weight)
-}
 
 sealed case class FontWeight(override val delegate: jfxst.FontWeight)
-    extends SFXEnumDelegate[jfxst.FontWeight] {
+    extends SFXEnumDelegate[jfxst.FontWeight]
 
   /** Return the visual weight (degree of blackness or thickness) specified by this FontWeight.  */
   def weight = delegate.getWeight
-}

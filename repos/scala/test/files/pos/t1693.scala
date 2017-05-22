@@ -1,4 +1,4 @@
-object Test {
+object Test
   class Foo
   class SomeOps(x: Foo) { def foo(x: String) = 1 }
   class OtherOps(x: Foo) { def foo(x: Int) = 1 }
@@ -6,4 +6,3 @@ object Test {
   implicit def mkOtherOps(x: Foo): OtherOps = new OtherOps(x)
 
   (new Foo).foo(1)
-}

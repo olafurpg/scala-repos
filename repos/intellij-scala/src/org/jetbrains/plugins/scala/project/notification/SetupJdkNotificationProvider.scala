@@ -19,20 +19,19 @@ import org.jetbrains.plugins.scala.extensions._
   */
 class SetupJdkNotificationProvider(
     project: Project, notifications: EditorNotifications)
-    extends EditorNotifications.Provider[EditorNotificationPanel] {
+    extends EditorNotifications.Provider[EditorNotificationPanel]
 
   project.getMessageBus
     .connect(project)
-    .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter {
-      override def rootsChanged(event: ModuleRootEvent) {
+    .subscribe(ProjectTopics.PROJECT_ROOTS, new ModuleRootAdapter
+      override def rootsChanged(event: ModuleRootEvent)
         notifications.updateAllNotifications()
-      }
-    })
+    )
 
   override def getKey = ProviderKey
 
   override def createNotificationPanel(
-      file: VirtualFile, fileEditor: FileEditor) = {
+      file: VirtualFile, fileEditor: FileEditor) =
     val jdk = Option(PsiManager.getInstance(project).findFile(file))
       .filter(_.getLanguage == ScalaLanguage.Instance)
       .flatMap(psiFile =>
@@ -42,33 +41,24 @@ class SetupJdkNotificationProvider(
     if (jdk.exists(_ == null))
       createPanel(project, PsiManager.getInstance(project).findFile(file))
     else null
-  }
-}
 
-object SetupJdkNotificationProvider {
+object SetupJdkNotificationProvider
   private val ProviderKey = Key.create[EditorNotificationPanel]("Setup JDK")
 
   private def createPanel(
-      project: Project, file: PsiFile): EditorNotificationPanel = {
+      project: Project, file: PsiFile): EditorNotificationPanel =
     val panel = new EditorNotificationPanel()
     panel.setText("Project JDK is not defined")
-    panel.createActionLabel("Setup JDK", new Runnable {
-      override def run() {
+    panel.createActionLabel("Setup JDK", new Runnable
+      override def run()
         setupSdk(project, file)
-      }
-    })
+    )
     panel
-  }
 
-  private def setupSdk(project: Project, file: PsiFile) {
-    Option(ProjectSettingsService.getInstance(project).chooseAndSetSdk()).foreach {
+  private def setupSdk(project: Project, file: PsiFile)
+    Option(ProjectSettingsService.getInstance(project).chooseAndSetSdk()).foreach
       projectSdk =>
-        Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach {
+        Option(ModuleUtilCore.findModuleForPsiElement(file)).foreach
           module =>
-            inWriteAction {
+            inWriteAction
               ModuleRootModificationUtil.setSdkInherited(module)
-            }
-        }
-    }
-  }
-}

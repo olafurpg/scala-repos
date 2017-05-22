@@ -3,14 +3,13 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.tools.reflect.ToolBox
 
-object Test extends App {
-  val code = reify {
+object Test extends App
+  val code = reify
     val x = 2
     val inner = reify { x }
     inner.splice
-  };
+  ;
 
   val toolbox = cm.mkToolBox()
   val evaluated = toolbox.eval(code.tree)
   println("evaluated = " + evaluated)
-}

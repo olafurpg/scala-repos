@@ -8,15 +8,15 @@ import akka.stream.testkit._
 import scala.concurrent.duration._
 import akka.testkit.AkkaSpec
 
-class FlowBatchWeightedSpec extends AkkaSpec {
+class FlowBatchWeightedSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "BatchWeighted" must {
-    "Not aggregate heavy elements" in {
+  "BatchWeighted" must
+    "Not aggregate heavy elements" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.manualProbe[Int]()
 
@@ -41,6 +41,3 @@ class FlowBatchWeightedSpec extends AkkaSpec {
       subscriber.expectNext(3)
 
       sub.cancel()
-    }
-  }
-}

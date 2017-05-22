@@ -10,7 +10,7 @@ import org.scalajs.jsenv._
 
 import scala.collection.mutable
 
-private[sbtplugin] final class FrameworkDetector(jsEnv: JSEnv) {
+private[sbtplugin] final class FrameworkDetector(jsEnv: JSEnv)
 
   import FrameworkDetector._
 
@@ -26,7 +26,7 @@ private[sbtplugin] final class FrameworkDetector(jsEnv: JSEnv) {
     *
     *  Note: No JavaScript type tests are performed by this method
     */
-  def detect(frameworks: Seq[TestFramework]): Map[TestFramework, String] = {
+  def detect(frameworks: Seq[TestFramework]): Map[TestFramework, String] =
     val data = frameworks.map(_.implClassNames.toList).toList.toJSON
 
     val code = s"""
@@ -67,22 +67,17 @@ private[sbtplugin] final class FrameworkDetector(jsEnv: JSEnv) {
 
     // Filter jsDependencies unexpected output
     val results =
-      console.buf collect {
+      console.buf collect
         case s if s.startsWith(ConsoleFrameworkPrefix) =>
           s.stripPrefix(ConsoleFrameworkPrefix)
-      }
 
     assert(results.size == frameworks.size)
 
     (frameworks zip results).filter(_._2.nonEmpty).toMap
-  }
-}
 
-object FrameworkDetector {
-  private class StoreConsole extends JSConsole {
+object FrameworkDetector
+  private class StoreConsole extends JSConsole
     val buf = mutable.Buffer.empty[String]
     def log(msg: Any): Unit = buf += msg.toString
-  }
 
   private val ConsoleFrameworkPrefix = "@scalajs-test-framework-detector:"
-}

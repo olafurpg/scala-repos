@@ -23,7 +23,7 @@ private[camel] class ConsumerActorRouteBuilder(endpointUri: String,
                                                consumer: ActorRef,
                                                config: ConsumerConfig,
                                                settings: CamelSettings)
-    extends RouteBuilder {
+    extends RouteBuilder
 
   protected def targetActorUri =
     CamelPath.toUri(consumer, config.autoAck, config.replyTimeout)
@@ -36,4 +36,3 @@ private[camel] class ConsumerActorRouteBuilder(endpointUri: String,
 
   def applyUserRouteCustomization(rd: RouteDefinition) =
     config.onRouteDefinition(rd)
-}

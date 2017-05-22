@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.MinMaxScaler
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object MinMaxScalerExample {
-  def main(args: Array[String]): Unit = {
+object MinMaxScalerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("MinMaxScalerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -46,6 +46,4 @@ object MinMaxScalerExample {
     scaledData.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

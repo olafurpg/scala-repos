@@ -5,7 +5,7 @@ import cats.laws.discipline.{BitraverseTests, TraverseTests, MonadTests, Seriali
 import cats.laws.discipline.eq._
 import algebra.laws.OrderLaws
 
-class EitherTests extends CatsSuite {
+class EitherTests extends CatsSuite
 
   implicit val iso = CartesianTests.Isomorphisms.invariant[Either[Int, ?]]
 
@@ -35,7 +35,6 @@ class EitherTests extends CatsSuite {
   val monad = implicitly[Monad[Either[Int, ?]]]
   val show = implicitly[Show[Either[Int, String]]]
 
-  {
     implicit val S = ListWrapper.eqv[String]
     implicit val I = ListWrapper.eqv[Int]
     checkAll("Either[ListWrapper[String], ListWrapper[Int]]",
@@ -43,22 +42,17 @@ class EitherTests extends CatsSuite {
     checkAll("Eq[Either[ListWrapper[String], ListWrapper[Int]]]",
              SerializableTests.serializable(
                  Eq[Either[ListWrapper[String], ListWrapper[Int]]]))
-  }
 
   val orderLaws = OrderLaws[Either[Int, String]]
   checkAll("Either[Int, String]", orderLaws.partialOrder(partialOrder))
   checkAll("Either[Int, String]", orderLaws.order(order))
 
-  test("implicit instances resolve specifically") {
+  test("implicit instances resolve specifically")
     val eq = eitherEq[Int, String]
     assert(!eq.isInstanceOf[PartialOrder[_]])
     assert(!eq.isInstanceOf[Order[_]])
     assert(!partialOrder.isInstanceOf[Order[_]])
-  }
 
-  test("show isn't empty") {
-    forAll { (e: Either[Int, String]) =>
+  test("show isn't empty")
+    forAll  (e: Either[Int, String]) =>
       show.show(e).nonEmpty should ===(true)
-    }
-  }
-}

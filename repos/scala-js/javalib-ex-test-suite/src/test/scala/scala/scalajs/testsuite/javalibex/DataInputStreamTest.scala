@@ -7,33 +7,31 @@ import org.scalajs.jasminetest.JasmineTest
 import scala.scalajs.js.typedarray._
 import scala.scalajs.js.JSConverters._
 
-object DataInputStreamTest extends JasmineTest {
+object DataInputStreamTest extends JasmineTest
 
-  def tests(name: String)(inFromBytes: Seq[Byte] => InputStream): Unit = {
+  def tests(name: String)(inFromBytes: Seq[Byte] => InputStream): Unit =
     def newStream(data: Int*) =
       new DataInputStream(inFromBytes(data.map(_.toByte)))
 
-    when("typedarray").describe(name) {
+    when("typedarray").describe(name)
 
-      it("should provide `readBoolean`") {
+      it("should provide `readBoolean`")
         val data = Seq(0x00, 0x01, 0xF1, 0x00, 0x01)
         val stream = newStream(data: _*)
 
         for (d <- data) expect(stream.readBoolean()).toBe(d != 0)
 
         expect(() => stream.readBoolean()).toThrow // EOF
-      }
 
-      it("should provide `readByte`") {
+      it("should provide `readByte`")
         val data = Seq(0x00, 0x01, 0xF1, 0x7D, 0x35)
         val stream = newStream(data: _*)
 
         for (d <- data) expect(stream.readByte()).toBe(d.toByte)
 
         expect(() => stream.readBoolean()).toThrow // EOF
-      }
 
-      it("should provide `readChar`") {
+      it("should provide `readChar`")
         val stream = newStream(
             0x00,
             0x48, // H
@@ -66,9 +64,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(res).toEqual("Höllö Wărȴđ")
 
         expect(() => stream.readChar()).toThrow // Dangling + EOF
-      }
 
-      it("should provide `readDouble`") {
+      it("should provide `readDouble`")
         val stream = newStream(
             0x3f,
             0xe6,
@@ -148,9 +145,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readDouble()).toBe(Double.NegativeInfinity)
         expect(stream.readDouble()).toBe(0)
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readFloat`") {
+      it("should provide `readFloat`")
         val stream = newStream(
             0xbf,
             0x80,
@@ -196,9 +192,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readFloat()).toBeCloseTo(-0.002f, 6)
         expect(stream.readFloat()).toBe(Float.NegativeInfinity)
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readInt`") {
+      it("should provide `readInt`")
         val stream = newStream(0x00,
                                0x00,
                                0x00,
@@ -241,9 +236,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readInt()).toBe(Int.MinValue)
         expect(stream.readInt()).toBe(1)
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readLong`") {
+      it("should provide `readLong`")
         val stream = newStream(0x00,
                                0x01,
                                0xf0,
@@ -318,9 +312,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readLong() == -34524L).toBeTruthy
         expect(stream.readLong() == 47L).toBeTruthy
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readShort`") {
+      it("should provide `readShort`")
         val stream = newStream(
             0x01,
             0xc5,
@@ -350,18 +343,16 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readShort()).toBe(-346)
         expect(stream.readShort()).toBe(34)
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readUnsignedByte`") {
+      it("should provide `readUnsignedByte`")
         val data = Seq(0x00, 0x01, 0xF1, 0x7D, 0x35)
         val stream = newStream(data: _*)
 
         for (d <- data) expect(stream.readUnsignedByte()).toBe(d)
 
         expect(() => stream.readBoolean()).toThrow // EOF
-      }
 
-      it("should provide `readUnsignedShort`") {
+      it("should provide `readUnsignedShort`")
         val stream = newStream(
             0xfe,
             0x4c,
@@ -391,9 +382,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readUnsignedShort()).toBe(342)
         expect(stream.readUnsignedShort()).toBe(25643)
         expect(() => stream.readDouble()).toThrow
-      }
 
-      it("should provide `readFully` (1 arg & 3 arg)") {
+      it("should provide `readFully` (1 arg & 3 arg)")
         val stream = newStream(-100 to 99: _*)
         val buf = new Array[Byte](50)
 
@@ -418,26 +408,21 @@ object DataInputStreamTest extends JasmineTest {
         expect(buf.toJSArray).toEqual((10 to 59).toJSArray)
 
         expect(() => stream.readFully(buf)).toThrow
-      }
 
-      it("should provide `readFully` for bursty streams") {
-        class BurstyStream(length: Int, burst: Int) extends InputStream {
+      it("should provide `readFully` for bursty streams")
+        class BurstyStream(length: Int, burst: Int) extends InputStream
           private var i: Int = 0
           def read(): Int = if (i < length) { i += 1; i } else -1
-          override def read(buf: Array[Byte], off: Int, reqLen: Int): Int = {
+          override def read(buf: Array[Byte], off: Int, reqLen: Int): Int =
             val len = Math.min(Math.min(reqLen, burst), length - i)
             if (reqLen == 0) 0
             else if (len == 0) -1
-            else {
+            else
               var j: Int = 0
-              while (j < len) {
+              while (j < len)
                 buf(off + j) = read().toByte
                 j += 1
-              }
               len
-            }
-          }
-        }
 
         val stream = new DataInputStream(new BurstyStream(100, 5))
         val buf = new Array[Byte](50)
@@ -449,9 +434,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(buf.toJSArray).toEqual(((1 to 40) ++ (51 to 60)).toJSArray)
 
         expect(() => stream.readFully(buf)).toThrow
-      }
 
-      it("should provide `readUTF`") {
+      it("should provide `readUTF`")
         val stream = newStream(0x00,
                                0x10,
                                0x48,
@@ -497,9 +481,8 @@ object DataInputStreamTest extends JasmineTest {
 
         val badStream = newStream(0x00, 0x01, 0xC0, 0x82)
         expect(() => badStream.readUTF).toThrow
-      }
 
-      it("should provide `readLine`") {
+      it("should provide `readLine`")
         val stream = newStream(
             "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
 
@@ -509,9 +492,8 @@ object DataInputStreamTest extends JasmineTest {
         expect(stream.readLine()).toEqual("Mac (old)")
         expect(stream.readLine()).toEqual("Stuff")
         expect(stream.readLine()).toBe(null)
-      }
 
-      it("should allow marking even when `readLine` has to push back") {
+      it("should allow marking even when `readLine` has to push back")
         val stream = newStream(
             "Hello World\nUNIX\nWindows\r\nMac (old)\rStuff".map(_.toInt): _*)
 
@@ -527,9 +509,6 @@ object DataInputStreamTest extends JasmineTest {
         stream.reset()
         expect(stream.readLine()).toEqual("Stuff")
         expect(stream.readLine()).toBe(null)
-      }
-    }
-  }
 
   tests("java.io.DataInputStream - generic case")(
       bytes => new ByteArrayInputStream(bytes.toArray))
@@ -538,7 +517,7 @@ object DataInputStreamTest extends JasmineTest {
         new ArrayBufferInputStream(new Int8Array(bytes.toJSArray).buffer))
 
   tests(
-      "java.io.DataInputStream - partially consumed ArrayBufferInputStream case") {
+      "java.io.DataInputStream - partially consumed ArrayBufferInputStream case")
     bytes =>
       val addBytes = Seq[Byte](0, 0, 0, 0)
       val allBytes = addBytes ++ bytes
@@ -548,5 +527,3 @@ object DataInputStreamTest extends JasmineTest {
       for (_ <- addBytes) in.read()
 
       in
-  }
-}

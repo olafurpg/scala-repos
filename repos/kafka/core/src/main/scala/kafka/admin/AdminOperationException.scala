@@ -17,7 +17,6 @@
 package kafka.admin
 
 class AdminOperationException(val error: String, cause: Throwable)
-    extends RuntimeException(error, cause) {
+    extends RuntimeException(error, cause)
   def this(error: Throwable) = this(error.getMessage, error)
   def this(msg: String) = this(msg, null)
-}

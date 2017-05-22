@@ -9,18 +9,17 @@ import scala.collection.mutable
 import scala.reflect.internal.util.Position
 import scala.tools.nsc.{Global, Settings}
 
-object TestSolver extends Logic with Solving {
+object TestSolver extends Logic with Solving
 
   val global: Global = new Global(new Settings())
 
   // disable max recursion depth in order to get all solutions
   global.settings.YpatmatExhaustdepth.tryToSet("off" :: Nil)
 
-  object TestSolver extends Solver {
+  object TestSolver extends Solver
 
-    class Const {
+    class Const
       override def toString: String = "Const"
-    }
 
     val NullConst = new Const
     type Type = Int
@@ -31,24 +30,21 @@ object TestSolver extends Logic with Solving {
 
     case class ValueConst(i: Int) extends Const
 
-    object ValueConst extends ValueConstExtractor {
+    object ValueConst extends ValueConstExtractor
       def apply(t: Tree): Const = ???
-    }
 
     case class Tree(name: String)
 
-    class Var(val x: Tree) extends AbsVar {
+    class Var(val x: Tree) extends AbsVar
 
-      override def equals(other: scala.Any): Boolean = other match {
+      override def equals(other: scala.Any): Boolean = other match
         case that: Var => this.x == that.x
         case _ => false
-      }
 
       override def hashCode(): Int = x.hashCode()
 
-      override def toString: String = {
+      override def toString: String =
         s"Var($x)"
-      }
 
       def domainSyms = None
 
@@ -65,13 +61,11 @@ object TestSolver extends Logic with Solving {
       def registerNull() = ()
 
       def symForStaticTp = None
-    }
 
-    object Var extends VarExtractor {
+    object Var extends VarExtractor
       def apply(x: Tree): Var = new Var(x)
 
       def unapply(v: Var): Some[Tree] = Some(v.x)
-    }
 
     def prepareNewAnalysis() = {}
 
@@ -91,7 +85,7 @@ object TestSolver extends Logic with Solving {
       * i.e., {a = true} will be expanded to {a = true, b = true} and
       * {a = true, b = false}.
       */
-    def expandUnassigned(solution: Solution): List[Model] = {
+    def expandUnassigned(solution: Solution): List[Model] =
       import solution._
 
       // the number of solutions is doubled for every unassigned variable
@@ -105,27 +99,24 @@ object TestSolver extends Logic with Solving {
 
       // we use double buffering:
       // read from `current` and create a two models for each model in `next`
-      for {
+      for
         s <- unassigned
-      } {
-        for {
+      
+        for
           model <- current
-        } {
+        
           def force(s: Sym, pol: Boolean) = model + (s -> pol)
 
           next += force(s, pol = true)
           next += force(s, pol = false)
-        }
 
         val tmp = current
         current = next
         next = tmp
 
         next.clear()
-      }
 
       current.toList
-    }
 
     /**
       * Old CNF conversion code, used for reference:
@@ -133,7 +124,7 @@ object TestSolver extends Logic with Solving {
       *   (i.e., no negated terms, only negated variables)
       * - use distributive laws to convert into CNF
       */
-    def eqFreePropToSolvableViaDistribution(p: Prop) = {
+    def eqFreePropToSolvableViaDistribution(p: Prop) =
       val symbolMapping = new SymbolMapping(gatherSymbols(p))
 
       type Formula = Array[TestSolver.Clause]
@@ -142,30 +133,28 @@ object TestSolver extends Logic with Solving {
 
       def merge(a: Clause, b: Clause) = a ++ b
 
-      def negationNormalFormNot(p: Prop): Prop = p match {
+      def negationNormalFormNot(p: Prop): Prop = p match
         case And(ps) => Or(ps map negationNormalFormNot)
         case Or(ps) => And(ps map negationNormalFormNot)
         case Not(p) => negationNormalForm(p)
         case True => False
         case False => True
         case s: Sym => Not(s)
-      }
 
-      def negationNormalForm(p: Prop): Prop = p match {
+      def negationNormalForm(p: Prop): Prop = p match
         case Or(ps) => Or(ps map negationNormalForm)
         case And(ps) => And(ps map negationNormalForm)
         case Not(negated) => negationNormalFormNot(negated)
         case True | False | (_: Sym) => p
-      }
 
       val TrueF: Formula = Array()
       val FalseF = Array(clause())
       def lit(sym: Sym) = Array(clause(symbolMapping.lit(sym)))
       def negLit(sym: Sym) = Array(clause(-symbolMapping.lit(sym)))
 
-      def conjunctiveNormalForm(p: Prop): Formula = {
+      def conjunctiveNormalForm(p: Prop): Formula =
         def distribute(a: Formula, b: Formula): Formula =
-          (a, b) match {
+          (a, b) match
             // true \/ _ = true
             // _ \/ true = true
             case (trueA, trueB) if trueA.size == 0 || trueB.size == 0 => TrueF
@@ -177,9 +166,8 @@ object TestSolver extends Logic with Solving {
             case (cs, ds) =>
               val (big, small) = if (cs.size > ds.size) (cs, ds) else (ds, cs)
               big flatMap (c => distribute(formula(c), small))
-          }
 
-        p match {
+        p match
           case True => TrueF
           case False => FalseF
           case s: Sym => lit(s)
@@ -187,86 +175,73 @@ object TestSolver extends Logic with Solving {
           case And(ps) =>
             ps.toArray flatMap conjunctiveNormalForm
           case Or(ps) =>
-            ps map conjunctiveNormalForm reduceLeft { (a, b) =>
+            ps map conjunctiveNormalForm reduceLeft  (a, b) =>
               distribute(a, b)
-            }
-        }
-      }
       val cnf = conjunctiveNormalForm(negationNormalForm(p))
       Solvable(cnf, symbolMapping)
-    }
-  }
-}
 
 /**
   * Testing CNF conversion via Tseitin vs NNF & expansion.
   */
 @RunWith(classOf[JUnit4])
-class SolvingTest {
+class SolvingTest
 
   import scala.tools.nsc.transform.patmat.TestSolver.TestSolver._
 
-  object SymName {
-    def unapply(s: Sym): Option[String] = {
+  object SymName
+    def unapply(s: Sym): Option[String] =
       val Var(Tree(name)) = s.variable
       Some(name)
-    }
-  }
 
-  implicit val ModelOrd: Ordering[TestSolver.TestSolver.Model] = Ordering.by {
-    _.toSeq.sortWith {
+  implicit val ModelOrd: Ordering[TestSolver.TestSolver.Model] = Ordering.by
+    _.toSeq.sortWith
       case ((sym1, v1), (sym2, v2)) =>
         val SymName(name1) = sym1
         val SymName(name2) = sym2
         if (name1 < name2) true
         else if (name1 > name2) false
         else v1 < v2
-    }.toIterable
-  }
+    .toIterable
 
   implicit val SolutionOrd: Ordering[TestSolver.TestSolver.Solution] =
     Ordering.by(_.model)
 
-  def formatSolution(solution: Solution): String = {
+  def formatSolution(solution: Solution): String =
     formatModel(solution.model)
-  }
 
-  def formatModel(model: Model): String = {
-    (for {
+  def formatModel(model: Model): String =
+    (for
       (SymName(name), value) <- model
-    } yield {
+    yield
       val v = if (value) "T" else "F"
       s"$name -> $v"
-    }).mkString(", ")
-  }
+    ).mkString(", ")
 
   def sym(name: String) = Sym(Var(Tree(name)), NullConst)
 
   @Test
-  def testSymCreation() {
+  def testSymCreation()
     val s1 = sym("hello")
     val s2 = sym("hello")
     assertEquals(s1, s2)
-  }
 
   /**
     * Simplest possible test: solve a formula and check the solution(s)
     */
   @Test
-  def testUnassigned() {
+  def testUnassigned()
     val pSym = sym("p")
     val solvable = propToSolvable(Or(pSym, Not(pSym)))
     val solutions = TestSolver.TestSolver.findAllModelsFor(solvable)
     val expected = List(Solution(Map(), List(pSym)))
     assertEquals(expected, solutions)
-  }
 
   /**
     * Unassigned variables must be expanded
     * for stable results
     */
   @Test
-  def testNoUnassigned() {
+  def testNoUnassigned()
     val pSym = sym("p")
     val qSym = sym("q")
     val solvable = propToSolvable(Or(pSym, Not(qSym)))
@@ -279,10 +254,9 @@ class SolvingTest {
     ).sorted
 
     assertEquals(expected, expanded)
-  }
 
   @Test
-  def testTseitinVsExpansionFrom_t7020() {
+  def testTseitinVsExpansionFrom_t7020()
     val formulas = Seq(
         And(And(And(Not(sym("V1=null")),
                     sym("V1=scala.collection.immutable.::[?]")),
@@ -592,7 +566,7 @@ class SolvingTest {
       sym("V3=scala.collection.immutable.::[?]")
     )
 
-    formulas foreach { f =>
+    formulas foreach  f =>
       // build CNF
       val tseitinCnf = propToSolvable(f)
       val expansionCnf = eqFreePropToSolvableViaDistribution(f)
@@ -608,21 +582,17 @@ class SolvingTest {
       val expansionNoUnassigned =
         expansionSolutins.flatMap(expandUnassigned).sorted
       assertEquals(tseitinNoUnassigned, expansionNoUnassigned)
-    }
-  }
 
-  def pairWiseEncoding(ops: List[Sym]) = {
+  def pairWiseEncoding(ops: List[Sym]) =
     And(
         ops
           .combinations(2)
-          .collect {
+          .collect
         case a :: b :: Nil => Or(Not(a), Not(b))
-      }
           .toSet[TestSolver.TestSolver.Prop])
-  }
 
   @Test
-  def testAtMostOne() {
+  def testAtMostOne()
     val dummySym = sym("dummy")
     val syms = "pqrstu".map(c => sym(c.toString)).toList
     // expand unassigned variables
@@ -634,5 +604,3 @@ class SolvingTest {
       .findAllModelsFor(propToSolvable(And(dummySym, AtMostOne(syms))))
       .flatMap(expandUnassigned)
     assertEquals(expected.toSet, actual.toSet)
-  }
-}

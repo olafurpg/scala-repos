@@ -35,17 +35,15 @@ import org.apache.spark.mllib.util.MLUtils
   * A synthetic dataset is located at `data/mllib/sample_binary_classification_data.txt`.
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object BinaryClassification {
+object BinaryClassification
 
-  object Algorithm extends Enumeration {
+  object Algorithm extends Enumeration
     type Algorithm = Value
     val SVM, LR = Value
-  }
 
-  object RegType extends Enumeration {
+  object RegType extends Enumeration
     type RegType = Value
     val L1, L2 = Value
-  }
 
   import Algorithm._
   import RegType._
@@ -58,10 +56,10 @@ object BinaryClassification {
                     regParam: Double = 0.01)
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("BinaryClassification") {
+    val parser = new OptionParser[Params]("BinaryClassification")
       head("BinaryClassification: an example app for binary classification.")
       opt[Int]("numIterations")
         .text("number of iterations")
@@ -92,16 +90,13 @@ object BinaryClassification {
           |  --algorithm LR --regType L2 --regParam 1.0 \
           |  data/mllib/sample_binary_classification_data.txt
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       sys.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"BinaryClassification with $params")
     val sc = new SparkContext(conf)
 
@@ -119,12 +114,11 @@ object BinaryClassification {
 
     examples.unpersist(blocking = false)
 
-    val updater = params.regType match {
+    val updater = params.regType match
       case L1 => new L1Updater()
       case L2 => new SquaredL2Updater()
-    }
 
-    val model = params.algorithm match {
+    val model = params.algorithm match
       case LR =>
         val algorithm = new LogisticRegressionWithLBFGS()
         algorithm.optimizer
@@ -140,7 +134,6 @@ object BinaryClassification {
           .setUpdater(updater)
           .setRegParam(params.regParam)
         algorithm.run(training).clearThreshold()
-    }
 
     val prediction = model.predict(test.map(_.features))
     val predictionAndLabel = prediction.zip(test.map(_.label))
@@ -151,6 +144,4 @@ object BinaryClassification {
     println(s"Test areaUnderROC = ${metrics.areaUnderROC()}.")
 
     sc.stop()
-  }
-}
 // scalastyle:on println

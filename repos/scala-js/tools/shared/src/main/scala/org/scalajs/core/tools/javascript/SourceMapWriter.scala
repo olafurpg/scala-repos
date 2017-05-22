@@ -19,7 +19,7 @@ import ir.Position
 import ir.Position._
 import ir.Utils
 
-private object SourceMapWriter {
+private object SourceMapWriter
   private val Base64Map =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ" + "abcdefghijklmnopqrstuvwxyz" +
     "0123456789+/"
@@ -31,13 +31,12 @@ private object SourceMapWriter {
   private final val VLQBaseMask = VLQBase - 1
   private final val VLQContinuationBit = VLQBase
 
-  private def printJSONString(s: String, out: Writer) = {
+  private def printJSONString(s: String, out: Writer) =
     out.write('\"')
     Utils.printEscapeJS(s, out)
     out.write('\"')
-  }
 
-  private final class NodePosStack {
+  private final class NodePosStack
     private var topIndex: Int = -1
     private var posStack: Array[Position] = new Array(128)
     private var nameStack: Array[String] = new Array(128)
@@ -51,25 +50,21 @@ private object SourceMapWriter {
     def topName: String =
       nameStack(topIndex)
 
-    def push(pos: Position, originalName: String): Unit = {
+    def push(pos: Position, originalName: String): Unit =
       val newTopIdx = topIndex + 1
       topIndex = newTopIdx
       if (newTopIdx >= posStack.length) growStack()
       posStack(newTopIdx) = pos
       nameStack(newTopIdx) = originalName
-    }
 
-    private def growStack(): Unit = {
+    private def growStack(): Unit =
       val newSize = 2 * posStack.length
       posStack = ju.Arrays.copyOf(posStack, newSize)
       nameStack = ju.Arrays.copyOf(nameStack, newSize)
-    }
-  }
-}
 
 class SourceMapWriter(val out: Writer,
                       val generatedFile: String,
-                      val relativizeBaseURI: Option[URI] = None) {
+                      val relativizeBaseURI: Option[URI] = None)
 
   import SourceMapWriter._
 
@@ -99,43 +94,37 @@ class SourceMapWriter(val out: Writer,
 
   writeHeader()
 
-  private def sourceToIndex(source: SourceFile): Int = {
-    if (_srcToIndex.contains(source)) {
+  private def sourceToIndex(source: SourceFile): Int =
+    if (_srcToIndex.contains(source))
       _srcToIndex(source)
-    } else {
+    else
       val index = sources.size
       _srcToIndex.put(source, index)
       sources += sourceToURI(source)
       index
-    }
-  }
 
   /** Relatively hacky way to get a Web-friendly URI to the source file */
-  private def sourceToURI(source: SourceFile): String = {
+  private def sourceToURI(source: SourceFile): String =
     val uri = source
     val relURI = relativizeBaseURI.fold(uri)(Utils.relativize(_, uri))
 
     Utils.fixFileURI(relURI).toASCIIString
-  }
 
-  private def nameToIndex(name: String): Int = {
-    if (_nameToIndex.contains(name)) {
+  private def nameToIndex(name: String): Int =
+    if (_nameToIndex.contains(name))
       _nameToIndex(name)
-    } else {
+    else
       val index = names.size
       _nameToIndex.put(name, index)
       names += name
       index
-    }
-  }
 
-  private def writeHeader(): Unit = {
+  private def writeHeader(): Unit =
     out.write("{\n\"version\": 3,\n\"file\": ")
     printJSONString(generatedFile, out)
     out.write(",\n\"mappings\": \"")
-  }
 
-  def nextLine(): Unit = {
+  def nextLine(): Unit =
     writePendingSegment()
     out.write(';')
     lineCountInGenerated += 1
@@ -144,30 +133,26 @@ class SourceMapWriter(val out: Writer,
     pendingColumnInGenerated = -1
     pendingPos = nodePosStack.topPos
     pendingName = nodePosStack.topName
-  }
 
-  def startNode(column: Int, originalPos: Position): Unit = {
+  def startNode(column: Int, originalPos: Position): Unit =
     nodePosStack.push(originalPos, null)
     startSegment(column, originalPos, null)
-  }
 
   def startNode(column: Int,
                 originalPos: Position,
-                optOriginalName: Option[String]): Unit = {
+                optOriginalName: Option[String]): Unit =
     val originalName =
       if (optOriginalName.isDefined) optOriginalName.get
       else null
     nodePosStack.push(originalPos, originalName)
     startSegment(column, originalPos, originalName)
-  }
 
-  def endNode(column: Int): Unit = {
+  def endNode(column: Int): Unit =
     nodePosStack.pop()
     startSegment(column, nodePosStack.topPos, nodePosStack.topName)
-  }
 
   private def startSegment(
-      startColumn: Int, originalPos: Position, originalName: String): Unit = {
+      startColumn: Int, originalPos: Position, originalName: String): Unit =
     // There is no point in outputting a segment with the same information
     if ((originalPos == pendingPos) && (originalName == pendingName)) return
 
@@ -178,9 +163,8 @@ class SourceMapWriter(val out: Writer,
     pendingColumnInGenerated = startColumn
     pendingPos = originalPos
     pendingName = originalName
-  }
 
-  private def writePendingSegment() {
+  private def writePendingSegment()
     if (pendingColumnInGenerated < 0) return
 
     // Segments of a line are separated by ','
@@ -201,15 +185,14 @@ class SourceMapWriter(val out: Writer,
     val column = pendingPos1.column
 
     // Source index field
-    if (source eq lastSource) {
+    if (source eq lastSource)
       // highly likely
       writeBase64VLQ0()
-    } else {
+    else
       val sourceIndex = sourceToIndex(source)
       writeBase64VLQ(sourceIndex - lastSourceIndex)
       lastSource = source
       lastSourceIndex = sourceIndex
-    }
 
     // Line field
     writeBase64VLQ(line - lastLine)
@@ -220,41 +203,36 @@ class SourceMapWriter(val out: Writer,
     lastColumn = column
 
     // Name field
-    if (pendingName != null) {
+    if (pendingName != null)
       val nameIndex = nameToIndex(pendingName)
       writeBase64VLQ(nameIndex - lastNameIndex)
       lastNameIndex = nameIndex
-    }
-  }
 
-  def complete(): Unit = {
+  def complete(): Unit =
     writePendingSegment()
 
     var restSources = sources.result()
     out.write("\",\n\"sources\": [")
-    while (restSources.nonEmpty) {
+    while (restSources.nonEmpty)
       printJSONString(restSources.head, out)
       restSources = restSources.tail
       if (restSources.nonEmpty) out.write(", ")
-    }
 
     var restNames = names.result()
     out.write("],\n\"names\": [")
-    while (restNames.nonEmpty) {
+    while (restNames.nonEmpty)
       printJSONString(restNames.head, out)
       restNames = restNames.tail
       if (restNames.nonEmpty) out.write(", ")
-    }
     out.write("],\n\"lineCount\": ")
     out.write(lineCountInGenerated.toString)
     out.write("\n}\n")
-  }
 
   /** Write the Base 64 VLQ of an integer to the mappings
     *  Inspired by the implementation in Closure Compiler:
     *  http://code.google.com/p/closure-compiler/source/browse/src/com/google/debugging/sourcemap/Base64VLQ.java
     */
-  private def writeBase64VLQ(value0: Int): Unit = {
+  private def writeBase64VLQ(value0: Int): Unit =
     /* The sign is encoded in the least significant bit, while the
      * absolute value is shifted one bit to the left.
      * So in theory the "definition" of `value` is:
@@ -281,22 +259,18 @@ class SourceMapWriter(val out: Writer,
       (((value0 ^ signExtended) - signExtended) << 1) | (signExtended & 1)
 
     // Write as many base-64 digits as necessary to encode value
-    if (value < 26) {
+    if (value < 26)
       return out.write('A' + value)
-    } else {
-      def writeBase64VLQSlowPath(value0: Int): Unit = {
+    else
+      def writeBase64VLQSlowPath(value0: Int): Unit =
         var value = value0
-        do {
+        do
           var digit = value & VLQBaseMask
           value = value >>> VLQBaseShift
           if (value != 0) digit |= VLQContinuationBit
           out.write(Base64Map.charAt(digit))
-        } while (value != 0)
-      }
+        while (value != 0)
       writeBase64VLQSlowPath(value)
-    }
-  }
 
   private def writeBase64VLQ0(): Unit =
     out.write('A')
-}

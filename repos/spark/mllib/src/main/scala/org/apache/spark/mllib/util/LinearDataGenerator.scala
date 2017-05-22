@@ -36,7 +36,7 @@ import org.apache.spark.rdd.RDD
   */
 @DeveloperApi
 @Since("0.8.0")
-object LinearDataGenerator {
+object LinearDataGenerator
 
   /**
     * Return a Java List of synthetic data randomly generated according to a multi
@@ -52,9 +52,8 @@ object LinearDataGenerator {
                                 weights: Array[Double],
                                 nPoints: Int,
                                 seed: Int,
-                                eps: Double): java.util.List[LabeledPoint] = {
+                                eps: Double): java.util.List[LabeledPoint] =
     generateLinearInput(intercept, weights, nPoints, seed, eps).asJava
-  }
 
   /**
     * For compatibility, the generated data without specifying the mean and variance
@@ -74,7 +73,7 @@ object LinearDataGenerator {
                           weights: Array[Double],
                           nPoints: Int,
                           seed: Int,
-                          eps: Double = 0.1): Seq[LabeledPoint] = {
+                          eps: Double = 0.1): Seq[LabeledPoint] =
     generateLinearInput(intercept,
                         weights,
                         Array.fill[Double](weights.length)(0.0),
@@ -82,7 +81,6 @@ object LinearDataGenerator {
                         nPoints,
                         seed,
                         eps)
-  }
 
   /**
     * @param intercept Data intercept
@@ -103,10 +101,9 @@ object LinearDataGenerator {
                           xVariance: Array[Double],
                           nPoints: Int,
                           seed: Int,
-                          eps: Double): Seq[LabeledPoint] = {
+                          eps: Double): Seq[LabeledPoint] =
     generateLinearInput(
         intercept, weights, xMean, xVariance, nPoints, seed, eps, 0.0)
-  }
 
   /**
     * @param intercept Data intercept
@@ -130,16 +127,15 @@ object LinearDataGenerator {
                           nPoints: Int,
                           seed: Int,
                           eps: Double,
-                          sparsity: Double): Seq[LabeledPoint] = {
+                          sparsity: Double): Seq[LabeledPoint] =
     require(0.0 <= sparsity && sparsity <= 1.0)
 
     val rnd = new Random(seed)
-    def rndElement(i: Int) = {
+    def rndElement(i: Int) =
       (rnd.nextDouble() - 0.5) * math.sqrt(12.0 * xVariance(i)) + xMean(i)
-    }
 
-    if (sparsity == 0.0) {
-      (0 until nPoints).map { _ =>
+    if (sparsity == 0.0)
+      (0 until nPoints).map  _ =>
         val features =
           Vectors.dense(weights.indices.map { rndElement(_) }.toArray)
         val label =
@@ -147,12 +143,10 @@ object LinearDataGenerator {
           eps * rnd.nextGaussian()
         // Return LabeledPoints with DenseVector
         LabeledPoint(label, features)
-      }
-    } else {
-      (0 until nPoints).map { _ =>
-        val indices = weights.indices.filter { _ =>
+    else
+      (0 until nPoints).map  _ =>
+        val indices = weights.indices.filter  _ =>
           rnd.nextDouble() <= sparsity
-        }
         val values = indices.map { rndElement(_) }
         val features =
           Vectors.sparse(weights.length, indices.toArray, values.toArray)
@@ -161,9 +155,6 @@ object LinearDataGenerator {
           eps * rnd.nextGaussian()
         // Return LabeledPoints with SparseVector
         LabeledPoint(label, features)
-      }
-    }
-  }
 
   /**
     * Generate an RDD containing sample data for Linear Regression models - including Ridge, Lasso,
@@ -183,31 +174,28 @@ object LinearDataGenerator {
                         nfeatures: Int,
                         eps: Double,
                         nparts: Int = 2,
-                        intercept: Double = 0.0): RDD[LabeledPoint] = {
+                        intercept: Double = 0.0): RDD[LabeledPoint] =
     val random = new Random(42)
     // Random values distributed uniformly in [-0.5, 0.5]
     val w = Array.fill(nfeatures)(random.nextDouble() - 0.5)
 
     val data: RDD[LabeledPoint] =
-      sc.parallelize(0 until nparts, nparts).flatMap { p =>
+      sc.parallelize(0 until nparts, nparts).flatMap  p =>
         val seed = 42 + p
         val examplesInPartition = nexamples / nparts
         generateLinearInput(
             intercept, w.toArray, examplesInPartition, seed, eps)
-      }
     data
-  }
 
   @Since("0.8.0")
-  def main(args: Array[String]) {
-    if (args.length < 2) {
+  def main(args: Array[String])
+    if (args.length < 2)
       // scalastyle:off println
       println(
           "Usage: LinearDataGenerator " +
           "<master> <output_dir> [num_examples] [num_features] [num_partitions]")
       // scalastyle:on println
       System.exit(1)
-    }
 
     val sparkMaster: String = args(0)
     val outputPath: String = args(1)
@@ -222,5 +210,3 @@ object LinearDataGenerator {
     data.saveAsTextFile(outputPath)
 
     sc.stop()
-  }
-}

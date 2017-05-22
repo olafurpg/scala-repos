@@ -33,13 +33,12 @@ import scalafx.Includes._
 import scalafx.beans.property.BooleanProperty
 import scalafx.delegate.SFXDelegate
 
-object CheckBox {
+object CheckBox
   implicit def sfxCheckBox2jfx(v: CheckBox): jfxsc.CheckBox =
     if (v != null) v.delegate else null
-}
 
 class CheckBox(override val delegate: jfxsc.CheckBox = new jfxsc.CheckBox)
-    extends ButtonBase(delegate) with SFXDelegate[jfxsc.CheckBox] {
+    extends ButtonBase(delegate) with SFXDelegate[jfxsc.CheckBox]
 
   /**
     * Creates a check box with the specified text as its label.
@@ -51,23 +50,19 @@ class CheckBox(override val delegate: jfxsc.CheckBox = new jfxsc.CheckBox)
     * checked, unchecked, and undefined.
     */
   def allowIndeterminate: BooleanProperty = delegate.allowIndeterminateProperty
-  def allowIndeterminate_=(b: Boolean) {
+  def allowIndeterminate_=(b: Boolean)
     allowIndeterminate() = b
-  }
 
   /**
     * Determines whether the CheckBox is in the indeterminate state.
     */
   def indeterminate: BooleanProperty = delegate.indeterminateProperty
-  def indeterminate_=(b: Boolean) {
+  def indeterminate_=(b: Boolean)
     indeterminate() = b
-  }
 
   /**
     * Indicates whether this CheckBox is checked.
     */
   def selected: BooleanProperty = delegate.selectedProperty
-  def selected_=(b: Boolean) {
+  def selected_=(b: Boolean)
     selected() = b
-  }
-}

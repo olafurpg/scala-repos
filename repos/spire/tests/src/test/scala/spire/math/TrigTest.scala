@@ -5,20 +5,18 @@ import org.scalatest.FunSuite
 import spire.math._
 import spire.implicits.{eqOps => _, _}
 
-class TrigTest extends FunSuite {
+class TrigTest extends FunSuite
 
   val epsilon: Double = 1e-15
 
-  final class RelativeOps(lhs: Double) {
-    def within(rhs: Double) = {
+  final class RelativeOps(lhs: Double)
+    def within(rhs: Double) =
       val ok = abs(lhs - rhs) < epsilon
       if (!ok) println("failed: abs(%s - %s) < %s" format (lhs, rhs, epsilon))
       assert(ok)
-    }
-  }
   implicit def relativeOps(lhs: Double) = new RelativeOps(lhs)
 
-  test("Trig[Double]") {
+  test("Trig[Double]")
     val t = implicitly[Trig[Double]]
 
     assert(t.e === spire.math.e)
@@ -43,5 +41,3 @@ class TrigTest extends FunSuite {
     assert(abs(t.tan(t.pi / 2)) > 1.633e16)
     t.tan(3 * t.pi / 4) within -1.0
     t.tan(t.pi) within 0.0
-  }
-}

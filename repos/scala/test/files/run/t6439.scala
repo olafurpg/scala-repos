@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
 
   def code =
     """
@@ -30,4 +30,3 @@ object lookup {
 }
 lookup("F") // this now works as a result of changing .typeSymbol to .typeSymbolDirect in IMain#Request#definedSymbols
              """
-}

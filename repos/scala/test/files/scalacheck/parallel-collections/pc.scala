@@ -7,11 +7,11 @@ import org.scalacheck._
 import scala.collection.parallel._
 
 // package here to be able access the package-private implementation and shutdown the pool
-package scala {
+package scala
 
-  class ParCollProperties extends Properties("Parallel collections") {
+  class ParCollProperties extends Properties("Parallel collections")
 
-    def includeAllTestsWith(support: TaskSupport) {
+    def includeAllTestsWith(support: TaskSupport)
       // parallel arrays with default task support
       include(new mutable.IntParallelArrayCheck(support))
 
@@ -35,7 +35,6 @@ package scala {
 
       // parallel vectors
       include(new immutable.IntParallelVectorCheck(support))
-    }
 
     includeAllTestsWith(defaultTaskSupport)
 
@@ -46,10 +45,8 @@ package scala {
 
     // no post test hooks in scalacheck, so cannot do:
     // ec.shutdown()
-  }
-}
 
-object Test extends scala.ParCollProperties {
+object Test extends scala.ParCollProperties
   /*
   def main(args: Array[String]) {
     val pc = new ParCollProperties
@@ -66,4 +63,3 @@ object Test extends scala.ParCollProperties {
     )
   }
  */
-}

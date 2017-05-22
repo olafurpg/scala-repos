@@ -33,17 +33,16 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object Sphere {
+object Sphere
   implicit def sfxSphere2jfx(s: Sphere): jfxss.Sphere =
     if (s != null) s.delegate else null
-}
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/Sphere.html]].
   *
   * Creates a new instance of Sphere of radius of 1.0.
   */
 class Sphere(override val delegate: jfxss.Sphere = new jfxss.Sphere())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.Sphere] {
+    extends Shape3D(delegate) with SFXDelegate[jfxss.Sphere]
 
   /** Creates a new instance of Sphere of a given radius. */
   def this(radius: Double) = this(new jfxss.Sphere(radius))
@@ -56,7 +55,5 @@ class Sphere(override val delegate: jfxss.Sphere = new jfxss.Sphere())
 
   /** Defines the radius of the Sphere. */
   def radius: DoubleProperty = delegate.radiusProperty
-  def radius_=(v: Double) {
+  def radius_=(v: Double)
     radius() = v
-  }
-}

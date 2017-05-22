@@ -69,7 +69,7 @@ import scala.language.higherKinds
 trait TraversableLike[+A, +Repr]
     extends Any with HasNewBuilder[A, Repr] with FilterMonadic[A, Repr]
     with TraversableOnce[A] with GenTraversableLike[A, Repr]
-    with Parallelizable[A, ParIterable[A]] {
+    with Parallelizable[A, ParIterable[A]]
   self =>
 
   import Traversable.breaks._
@@ -126,28 +126,24 @@ trait TraversableLike[+A, +Repr]
     *
     *  @return    `true` if the $coll contain no elements, `false` otherwise.
     */
-  def isEmpty: Boolean = {
+  def isEmpty: Boolean =
     var result = true
-    breakable {
-      for (x <- this) {
+    breakable
+      for (x <- this)
         result = false
         break
-      }
-    }
     result
-  }
 
   def hasDefiniteSize = true
 
   def ++[B >: A, That](that: GenTraversableOnce[B])(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     val b = bf(repr)
     if (that.isInstanceOf[IndexedSeqLike[_, _]])
       b.sizeHint(this, that.seq.size)
     b ++= thisCollection
     b ++= that.seq
     b.result
-  }
 
   /** As with `++`, returns a new collection containing the elements from the left operand followed by the
     *  elements from the right operand.
@@ -182,13 +178,12 @@ trait TraversableLike[+A, +Repr]
     *                  followed by all elements of `that`.
     */
   def ++:[B >: A, That](that: TraversableOnce[B])(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     val b = bf(repr)
     if (that.isInstanceOf[IndexedSeqLike[_, _]]) b.sizeHint(this, that.size)
     b ++= that
     b ++= thisCollection
     b.result
-  }
 
   /** As with `++`, returns a new collection containing the elements from the
     *  left operand followed by the elements from the right operand.
@@ -227,33 +222,29 @@ trait TraversableLike[+A, +Repr]
       implicit bf: CanBuildFrom[Repr, B, That]): That =
     (that ++ seq)(breakOut)
 
-  def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Repr, B, That]): That = {
-    def builder = {
+  def map[B, That](f: A => B)(implicit bf: CanBuildFrom[Repr, B, That]): That =
+    def builder =
       // extracted to keep method size under 35 bytes, so that it can be JIT-inlined
       val b = bf(repr)
       b.sizeHint(this)
       b
-    }
     val b = builder
     for (x <- this) b += f(x)
     b.result
-  }
 
   def flatMap[B, That](f: A => GenTraversableOnce[B])(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     def builder =
       bf(repr) // extracted to keep method size under 35 bytes, so that it can be JIT-inlined
     val b = builder
     for (x <- this) b ++= f(x).seq
     b.result
-  }
 
-  private[scala] def filterImpl(p: A => Boolean, isFlipped: Boolean): Repr = {
+  private[scala] def filterImpl(p: A => Boolean, isFlipped: Boolean): Repr =
     val b = newBuilder
     for (x <- this) if (p(x) != isFlipped) b += x
 
     b.result
-  }
 
   /** Selects all elements of this $coll which satisfy a predicate.
     *
@@ -272,11 +263,10 @@ trait TraversableLike[+A, +Repr]
   def filterNot(p: A => Boolean): Repr = filterImpl(p, isFlipped = true)
 
   def collect[B, That](pf: PartialFunction[A, B])(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     val b = bf(repr)
     foreach(pf.runWith(b += _))
     b.result
-  }
 
   /** Builds a new collection by applying an option-valued function to all
     *  elements of this $coll on which the function is defined.
@@ -314,32 +304,27 @@ trait TraversableLike[+A, +Repr]
     *           that don't. The relative order of the elements in the resulting ${coll}s
     *           is the same as in the original $coll.
     */
-  def partition(p: A => Boolean): (Repr, Repr) = {
+  def partition(p: A => Boolean): (Repr, Repr) =
     val l, r = newBuilder
     for (x <- this) (if (p(x)) l else r) += x
     (l.result, r.result)
-  }
 
-  def groupBy[K](f: A => K): immutable.Map[K, Repr] = {
+  def groupBy[K](f: A => K): immutable.Map[K, Repr] =
     val m = mutable.Map.empty[K, Builder[A, Repr]]
-    for (elem <- this) {
+    for (elem <- this)
       val key = f(elem)
       val bldr = m.getOrElseUpdate(key, newBuilder)
       bldr += elem
-    }
     val b = immutable.Map.newBuilder[K, Repr]
     for ((k, v) <- m) b += ((k, v.result))
 
     b.result
-  }
 
-  def forall(p: A => Boolean): Boolean = {
+  def forall(p: A => Boolean): Boolean =
     var result = true
-    breakable {
+    breakable
       for (x <- this) if (!p(x)) { result = false; break }
-    }
     result
-  }
 
   /** Tests whether a predicate holds for at least one element of this $coll.
     *
@@ -349,66 +334,56 @@ trait TraversableLike[+A, +Repr]
     *  @return        `false` if this $coll is empty, otherwise `true` if the given predicate `p`
     *                holds for some of the elements of this $coll, otherwise `false`
     */
-  def exists(p: A => Boolean): Boolean = {
+  def exists(p: A => Boolean): Boolean =
     var result = false
-    breakable {
+    breakable
       for (x <- this) if (p(x)) { result = true; break }
-    }
     result
-  }
 
-  def find(p: A => Boolean): Option[A] = {
+  def find(p: A => Boolean): Option[A] =
     var result: Option[A] = None
-    breakable {
+    breakable
       for (x <- this) if (p(x)) { result = Some(x); break }
-    }
     result
-  }
 
   def scan[B >: A, That](z: B)(op: (B, B) => B)(
       implicit cbf: CanBuildFrom[Repr, B, That]): That = scanLeft(z)(op)
 
   def scanLeft[B, That](z: B)(op: (B, A) => B)(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     val b = bf(repr)
     b.sizeHint(this, 1)
     var acc = z
     b += acc
     for (x <- this) { acc = op(acc, x); b += acc }
     b.result
-  }
 
   @migration(
       "The behavior of `scanRight` has changed. The previous behavior can be reproduced with scanRight.reverse.",
       "2.9.0")
   def scanRight[B, That](z: B)(op: (A, B) => B)(
-      implicit bf: CanBuildFrom[Repr, B, That]): That = {
+      implicit bf: CanBuildFrom[Repr, B, That]): That =
     var scanned = List(z)
     var acc = z
-    for (x <- reversed) {
+    for (x <- reversed)
       acc = op(x, acc)
       scanned ::= acc
-    }
     val b = bf(repr)
     for (elem <- scanned) b += elem
     b.result
-  }
 
   /** Selects the first element of this $coll.
     *  $orderDependent
     *  @return  the first element of this $coll.
     *  @throws NoSuchElementException if the $coll is empty.
     */
-  def head: A = {
+  def head: A =
     var result: () => A = () => throw new NoSuchElementException
-    breakable {
-      for (x <- this) {
+    breakable
+      for (x <- this)
         result = () => x
         break
-      }
-    }
     result()
-  }
 
   /** Optionally selects the first element.
     *  $orderDependent
@@ -423,21 +398,19 @@ trait TraversableLike[+A, +Repr]
     *           except the first one.
     *  @throws `UnsupportedOperationException` if the $coll is empty.
     */
-  override def tail: Repr = {
+  override def tail: Repr =
     if (isEmpty) throw new UnsupportedOperationException("empty.tail")
     drop(1)
-  }
 
   /** Selects the last element.
     * $orderDependent
     * @return The last element of this $coll.
     * @throws NoSuchElementException If the $coll is empty.
     */
-  def last: A = {
+  def last: A =
     var lst = head
     for (x <- this) lst = x
     lst
-  }
 
   /** Optionally selects the last element.
     *  $orderDependent
@@ -452,107 +425,89 @@ trait TraversableLike[+A, +Repr]
     *           except the last one.
     *  @throws UnsupportedOperationException if the $coll is empty.
     */
-  def init: Repr = {
+  def init: Repr =
     if (isEmpty) throw new UnsupportedOperationException("empty.init")
     var lst = head
     var follow = false
     val b = newBuilder
     b.sizeHint(this, -1)
-    for (x <- this) {
+    for (x <- this)
       if (follow) b += lst
       else follow = true
       lst = x
-    }
     b.result
-  }
 
   def take(n: Int): Repr = slice(0, n)
 
   def drop(n: Int): Repr =
-    if (n <= 0) {
+    if (n <= 0)
       val b = newBuilder
       b.sizeHint(this)
       (b ++= thisCollection).result
-    } else sliceWithKnownDelta(n, Int.MaxValue, -n)
+    else sliceWithKnownDelta(n, Int.MaxValue, -n)
 
   def slice(from: Int, until: Int): Repr =
     sliceWithKnownBound(scala.math.max(from, 0), until)
 
   // Precondition: from >= 0, until > 0, builder already configured for building.
   private[this] def sliceInternal(
-      from: Int, until: Int, b: Builder[A, Repr]): Repr = {
+      from: Int, until: Int, b: Builder[A, Repr]): Repr =
     var i = 0
-    breakable {
-      for (x <- this) {
+    breakable
+      for (x <- this)
         if (i >= from) b += x
         i += 1
         if (i >= until) break
-      }
-    }
     b.result
-  }
   // Precondition: from >= 0
   private[scala] def sliceWithKnownDelta(
-      from: Int, until: Int, delta: Int): Repr = {
+      from: Int, until: Int, delta: Int): Repr =
     val b = newBuilder
     if (until <= from) b.result
-    else {
+    else
       b.sizeHint(this, delta)
       sliceInternal(from, until, b)
-    }
-  }
   // Precondition: from >= 0
-  private[scala] def sliceWithKnownBound(from: Int, until: Int): Repr = {
+  private[scala] def sliceWithKnownBound(from: Int, until: Int): Repr =
     val b = newBuilder
     if (until <= from) b.result
-    else {
+    else
       b.sizeHintBounded(until - from, this)
       sliceInternal(from, until, b)
-    }
-  }
 
-  def takeWhile(p: A => Boolean): Repr = {
+  def takeWhile(p: A => Boolean): Repr =
     val b = newBuilder
-    breakable {
-      for (x <- this) {
+    breakable
+      for (x <- this)
         if (!p(x)) break
         b += x
-      }
-    }
     b.result
-  }
 
-  def dropWhile(p: A => Boolean): Repr = {
+  def dropWhile(p: A => Boolean): Repr =
     val b = newBuilder
     var go = false
-    for (x <- this) {
+    for (x <- this)
       if (!go && !p(x)) go = true
       if (go) b += x
-    }
     b.result
-  }
 
-  def span(p: A => Boolean): (Repr, Repr) = {
+  def span(p: A => Boolean): (Repr, Repr) =
     val l, r = newBuilder
     var toLeft = true
-    for (x <- this) {
+    for (x <- this)
       toLeft = toLeft && p(x)
       (if (toLeft) l else r) += x
-    }
     (l.result, r.result)
-  }
 
-  def splitAt(n: Int): (Repr, Repr) = {
+  def splitAt(n: Int): (Repr, Repr) =
     val l, r = newBuilder
     l.sizeHintBounded(n, this)
     if (n >= 0) r.sizeHint(this, -n)
     var i = 0
-    for (x <- this) {
+    for (x <- this)
       (if (i < n) l else r) += x
       i += 1
-    }
     (l.result, r.result)
-  }
 
   /** Iterates over the tails of this $coll. The first value will be this
     *  $coll and the final one will be an empty $coll, with the intervening
@@ -572,17 +527,14 @@ trait TraversableLike[+A, +Repr]
     */
   def inits: Iterator[Repr] = iterateUntilEmpty(_.init)
 
-  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int) {
+  def copyToArray[B >: A](xs: Array[B], start: Int, len: Int)
     var i = start
     val end = (start + len) min xs.length
-    breakable {
-      for (x <- this) {
+    breakable
+      for (x <- this)
         if (i >= end) break
         xs(i) = x
         i += 1
-      }
-    }
-  }
 
   @deprecatedOverriding(
       "Enforce contract of toTraversable that if it is Traversable it returns itself.",
@@ -593,12 +545,11 @@ trait TraversableLike[+A, +Repr]
   def toStream: Stream[A] = toBuffer.toStream
   // Override to provide size hint.
   override def to[Col[_]](
-      implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] = {
+      implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV] =
     val b = cbf()
     b.sizeHint(this)
     b ++= thisCollection
     b.result
-  }
 
   /** Converts this $coll to a string.
     *
@@ -614,23 +565,21 @@ trait TraversableLike[+A, +Repr]
     *           applied to this $coll. By default the string prefix is the
     *           simple name of the collection class $coll.
     */
-  def stringPrefix: String = {
+  def stringPrefix: String =
     var string = repr.getClass.getName
     val idx1 = string.lastIndexOf('.': Int)
     if (idx1 != -1) string = string.substring(idx1 + 1)
     val idx2 = string.indexOf('$')
     if (idx2 != -1) string = string.substring(0, idx2)
     string
-  }
 
   /** Creates a non-strict view of this $coll.
     *
     *  @return a non-strict view of this $coll.
     */
-  def view = new TraversableView[A, Repr] {
+  def view = new TraversableView[A, Repr]
     protected lazy val underlying = self.repr
     override def foreach[U](f: A => U) = self foreach f
-  }
 
   /** Creates a non-strict view of a slice of this $coll.
     *
@@ -667,7 +616,7 @@ trait TraversableLike[+A, +Repr]
   /** A class supporting filtered operations. Instances of this class are
     *  returned by method `withFilter`.
     */
-  class WithFilter(p: A => Boolean) extends FilterMonadic[A, Repr] {
+  class WithFilter(p: A => Boolean) extends FilterMonadic[A, Repr]
 
     /** Builds a new collection by applying a function to all elements of the
       *  outer $coll containing this `WithFilter` instance that satisfy predicate `p`.
@@ -688,11 +637,10 @@ trait TraversableLike[+A, +Repr]
       *                  predicate `p` and collecting the results.
       */
     def map[B, That](f: A => B)(
-        implicit bf: CanBuildFrom[Repr, B, That]): That = {
+        implicit bf: CanBuildFrom[Repr, B, That]): That =
       val b = bf(repr)
       for (x <- self) if (p(x)) b += f(x)
       b.result
-    }
 
     /** Builds a new collection by applying a function to all elements of the
       *  outer $coll containing this `WithFilter` instance that satisfy
@@ -719,11 +667,10 @@ trait TraversableLike[+A, +Repr]
       *                  the results.
       */
     def flatMap[B, That](f: A => GenTraversableOnce[B])(
-        implicit bf: CanBuildFrom[Repr, B, That]): That = {
+        implicit bf: CanBuildFrom[Repr, B, That]): That =
       val b = bf(repr)
       for (x <- self) if (p(x)) b ++= f(x).seq
       b.result
-    }
 
     /** Applies a function `f` to all elements of the outer $coll containing
       *  this `WithFilter` instance that satisfy predicate `p`.
@@ -751,12 +698,9 @@ trait TraversableLike[+A, +Repr]
       */
     def withFilter(q: A => Boolean): WithFilter =
       new WithFilter(x => p(x) && q(x))
-  }
 
   // A helper for tails and inits.
   private def iterateUntilEmpty(
-      f: Traversable[A @uV] => Traversable[A @uV]): Iterator[Repr] = {
+      f: Traversable[A @uV] => Traversable[A @uV]): Iterator[Repr] =
     val it = Iterator.iterate(thisCollection)(f) takeWhile (x => !x.isEmpty)
     it ++ Iterator(Nil) map (x => (newBuilder ++= x).result)
-  }
-}

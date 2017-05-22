@@ -15,42 +15,36 @@ import org.jetbrains.sbt.project.settings.SbtLocalSettings
   * @author Pavel Fatin
   */
 class LegacyProjectFormatNotifier(project: Project)
-    extends AbstractProjectComponent(project) {
-  override def projectOpened() {
+    extends AbstractProjectComponent(project)
+  override def projectOpened()
 
     val sbtSettings = SbtLocalSettings.getInstance(project)
 
-    if (!sbtSettings.sbtSupportSuggested) {
+    if (!sbtSettings.sbtSupportSuggested)
       val modules = ModuleManager.getInstance(project).getModules.toSeq
 
       val fromGenIdea =
         modules.exists(_.getModuleFilePath.contains(".idea_modules"))
 
-      if (fromGenIdea) {
+      if (fromGenIdea)
         sbtSettings.sbtSupportSuggested = true
 
         val builder = NotificationUtil
           .builder(project, Message)
           .setNotificationType(NotificationType.WARNING)
 
-        builder.setHandler { ref =>
+        builder.setHandler  ref =>
           val manager = ActionManager.getInstance
-          Option(manager.getAction("ImportProject")).foreach { action =>
+          Option(manager.getAction("ImportProject")).foreach  action =>
             manager.tryToExecute(action,
                                  ActionCommand.getInputEvent("ImportProject"),
                                  null,
                                  ActionPlaces.UNKNOWN,
                                  true)
-          }
-        }
 
         builder.show()
-      }
-    }
-  }
-}
 
-object LegacyProjectFormatNotifier {
+object LegacyProjectFormatNotifier
   def Message =
     "<html>" +
     "<p>This IDEA project is converted from an SBT project by <b>gen-idea</b> tool," +
@@ -58,4 +52,3 @@ object LegacyProjectFormatNotifier {
     "<br />" +
     "<p>Please consider using built-in SBT support via the <a href=\"ftp://import\">Import project</a> action.</p>" +
     "</html>"
-}

@@ -2,7 +2,7 @@ import scala.tools.nsc.doc
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
   override def scaladocSettings = ""
   override def code = """
 
@@ -22,10 +22,8 @@ object Test extends ScaladocModelTest {
 
   """
 
-  def testModel(rootPackage: Package) {
+  def testModel(rootPackage: Package)
     import access._
 
     val f = rootPackage._object("Test")._method("f")
     println(f.comment.get.short)
-  }
-}

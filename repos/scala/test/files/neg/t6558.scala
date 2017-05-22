@@ -1,4 +1,4 @@
-class AnnotNotFound {
+class AnnotNotFound
   def foo(a: Any) = ()
 
   @classs
@@ -9,4 +9,3 @@ class AnnotNotFound {
   class E(
       @valueparam x: Any
   )
-}

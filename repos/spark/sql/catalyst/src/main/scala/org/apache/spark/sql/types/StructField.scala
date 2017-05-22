@@ -31,23 +31,20 @@ import org.json4s.JsonDSL._
 case class StructField(name: String,
                        dataType: DataType,
                        nullable: Boolean = true,
-                       metadata: Metadata = Metadata.empty) {
+                       metadata: Metadata = Metadata.empty)
 
   /** No-arg constructor for kryo. */
   protected def this() = this(null, null)
 
   private[sql] def buildFormattedString(
-      prefix: String, builder: StringBuilder): Unit = {
+      prefix: String, builder: StringBuilder): Unit =
     builder.append(
         s"$prefix-- $name: ${dataType.typeName} (nullable = $nullable)\n")
     DataType.buildFormattedString(dataType, s"$prefix    |", builder)
-  }
 
   // override the default toString to be compatible with legacy parquet files.
   override def toString: String = s"StructField($name,$dataType,$nullable)"
 
-  private[sql] def jsonValue: JValue = {
+  private[sql] def jsonValue: JValue =
     ("name" -> name) ~ ("type" -> dataType.jsonValue) ~
     ("nullable" -> nullable) ~ ("metadata" -> metadata.jsonValue)
-  }
-}

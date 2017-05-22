@@ -15,7 +15,7 @@ limitations under the License.
  */
 package com.twitter.scalding
 
-object CascadingTokenUpdater {
+object CascadingTokenUpdater
   private final val lowestAllowed = 128 // cascading rules
 
   // Take a cascading string of tokens and turns it into a map
@@ -30,9 +30,8 @@ object CascadingTokenUpdater {
         .toIterator
         .map(_.split("="))
         .filter(_.size == 2)
-        .map { ary =>
+        .map  ary =>
           (ary(0).toInt, ary(1))
-        }
         .toMap
 
   // does the inverse of the previous function, given a Map of index to class
@@ -51,13 +50,12 @@ object CascadingTokenUpdater {
   private def assignTokens(
       first: Int, names: Iterable[String]): Map[Int, String] =
     names
-      .foldLeft((first, Map[Int, String]())) { (idMap, clz) =>
+      .foldLeft((first, Map[Int, String]()))  (idMap, clz) =>
         val (id, m) = idMap
         (id + 1, m + (id -> clz))
-      }
       ._2
 
-  def update(config: Config, clazzes: Set[Class[_]]): Config = {
+  def update(config: Config, clazzes: Set[Class[_]]): Config =
     val toks = config.getCascadingSerializationTokens
     // We don't want to assign tokens to classes already in the map
     val newClasses: Iterable[String] = clazzes.map { _.getName } -- toks.values
@@ -65,5 +63,3 @@ object CascadingTokenUpdater {
     config +
     (Config.CascadingSerializationTokens -> toksToString(
             toks ++ assignTokens(firstAvailableToken(toks), newClasses)))
-  }
-}

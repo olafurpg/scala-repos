@@ -5,8 +5,8 @@ package lang.completeStatement
   * @author Ksenia.Sautina
   * @since 2/25/13
   */
-class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
-  def testFormat() {
+class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase
+  def testFormat()
     val fileText = """
         |class B {
         |  val d=7+7+7+77<caret>
@@ -19,9 +19,8 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testFormat2() {
+  def testFormat2()
     val fileText = """
         |class B {
         |  if (true) {
@@ -40,9 +39,8 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testFormat3() {
+  def testFormat3()
     val fileText = """
         |class B {
         |  if (true) {
@@ -63,9 +61,8 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testFormatJava() {
+  def testFormatJava()
     val fileText = """
         |class B {
         |    int d=7+7+7+77;<caret>
@@ -78,5 +75,3 @@ class ScalaCompleteFormatTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkJavaFileByText(fileText, resultText)
-  }
-}

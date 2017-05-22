@@ -51,23 +51,22 @@ class DataServiceHandler[A](
     platform: Platform[Future, Slice, StreamT[Future, Slice]])(
     implicit M: Monad[Future])
     extends CustomHttpService[
-        A, (APIKey, Path) => Future[HttpResponse[ByteChunk]]] with Logging {
+        A, (APIKey, Path) => Future[HttpResponse[ByteChunk]]] with Logging
 
   val service = (request: HttpRequest[A]) =>
-    Success {
+    Success
       import ResourceError._
 
       (apiKey: APIKey, path: Path) =>
-        {
           val mimeTypes =
             request.headers.header[Accept].toSeq.flatMap(_.mimeTypes)
           platform.vfs
             .readResource(apiKey, path, Version.Current, AccessMode.Read)
-            .run flatMap {
+            .run flatMap
             _.fold(
                 resourceError =>
-                  M point {
-                    resourceError match {
+                  M point
+                    resourceError match
                       case Corrupt(message) =>
                         logger.error(
                             "Corrupt resource found for current version of path %s: %s"
@@ -100,14 +99,13 @@ class DataServiceHandler[A](
                       case multiple: ResourceErrors =>
                         multiple.fold(
                             fatal =>
-                              {
                                 logger.error(
                                     "Multiple errors encountered serving readResource of path %s: %s"
                                       .format(path.path,
                                               fatal.messages.list
                                                 .mkString("[\n", ",\n", "]")))
                                 HttpResponse(InternalServerError)
-                            },
+                            ,
                             userError =>
                               HttpResponse(
                                   HttpStatus(BadRequest,
@@ -123,10 +121,9 @@ class DataServiceHandler[A](
                                                       .map(JString(_)): _*)).renderPretty
                                               .getBytes("UTF-8"))))
                         )
-                    }
-                },
+                ,
                 resource =>
-                  resource.byteStream(mimeTypes).run map {
+                  resource.byteStream(mimeTypes).run map
                     case Some((reportedType, byteStream)) =>
                       HttpResponse(
                           OK,
@@ -138,15 +135,10 @@ class DataServiceHandler[A](
                           HttpStatus(HttpStatusCodes.NotFound,
                                      "Could not locate content for path " +
                                      path))
-                }
             )
-          } recover {
+          recover
             case ex =>
               logger.error("Exception thrown in readResource evaluation.", ex)
               HttpResponse(InternalServerError)
-          }
-        }
-  }
 
   val metadata = NoMetadata //FIXME
-}

@@ -14,10 +14,10 @@ trait CSet[T] extends CIterableLike[T, CSet[T]] with Parallelizable[PSet[T]]
 trait CMap[K, V]
     extends CIterableLike[(K, V), CMap[K, V]] with Parallelizable[PMap[K, V]]
 
-object Test {
+object Test
   var x = 0
 
-  def main() {
+  def main()
     val map: CMap[Int, CSet[Int]] = new CMap[Int, CSet[Int]] {}
     val set: CSet[Int] = new CSet[Int] {}
 
@@ -28,12 +28,8 @@ object Test {
     // or, maybe it could also infer existential types:
     //map.synchronized[CIterableLike[Any, _] with Parallelizable[PIterableLike[Any, _]]] {
 
-    map.synchronized {
-      if (x == 0) {
+    map.synchronized
+      if (x == 0)
         map
-      } else {
+      else
         set
-      }
-    }
-  }
-}

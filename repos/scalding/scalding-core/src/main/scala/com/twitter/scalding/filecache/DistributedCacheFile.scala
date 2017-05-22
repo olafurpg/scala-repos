@@ -9,7 +9,7 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapreduce.filecache.{DistributedCache => HDistributedCache}
 import org.apache.hadoop.fs.Path
 
-object URIHasher {
+object URIHasher
   private[this] final val HashFunc = MurmurHash128(1L)
 
   private[this] def deSign(b: Byte): Int =
@@ -24,12 +24,10 @@ object URIHasher {
     * @return a hex-encoded string of the bytes of the 128 bit hash. The results are zero padded on the left, so
     *         this string will always be 32 characters long.
     */
-  def apply(uri: URI): String = {
+  def apply(uri: URI): String =
     val (h1, h2) = HashFunc(uri.toASCIIString)
     val bytes = ByteBuffer.allocate(16).putLong(h1).putLong(h2).array()
     bytes.map(deSign).map("%02x".format(_)).reduceLeft(_ + _) // lifted gently from com.twitter.util.U64
-  }
-}
 
 /**
   * The distributed cache is simply hadoop's method for allowing each node local access to a
@@ -57,7 +55,7 @@ object URIHasher {
   * }}}
   *
   */
-object DistributedCacheFile {
+object DistributedCacheFile
 
   /**
     * Create an object that can be used to register a given URI (representing an hdfs file)
@@ -72,41 +70,36 @@ object DistributedCacheFile {
   def apply(path: String)(implicit mode: Mode): CachedFile =
     UncachedFile(Left(path)).add()
 
-  def symlinkNameFor(uri: URI): String = {
+  def symlinkNameFor(uri: URI): String =
     val hexsum = URIHasher(uri)
     val fileName = new File(uri.toString).getName
 
     Seq(hexsum, fileName).mkString("-")
-  }
 
   def symlinkedUriFor(sourceUri: URI): URI =
     new URI(sourceUri.getScheme,
             sourceUri.getSchemeSpecificPart,
             symlinkNameFor(sourceUri))
-}
 
-final case class UncachedFile private[scalding](source: Either[String, URI]) {
+final case class UncachedFile private[scalding](source: Either[String, URI])
 
   import DistributedCacheFile._
 
   def add()(implicit mode: Mode): CachedFile =
-    mode match {
+    mode match
       case Hdfs(_, conf) => addHdfs(conf)
       case HadoopTest(conf, _) => addHdfs(conf)
       case (Local(_) | Test(_)) => addLocal()
       case _ => throw new RuntimeException("unhandled mode: %s".format(mode))
-    }
 
-  private[this] def addLocal(): CachedFile = {
-    val path = source match {
+  private[this] def addLocal(): CachedFile =
+    val path = source match
       case Left(strPath) => strPath
       case Right(uri) => uri.getPath
-    }
 
     LocallyCachedFile(path)
-  }
 
-  private[this] def addHdfs(conf: Configuration): CachedFile = {
+  private[this] def addHdfs(conf: Configuration): CachedFile =
     HDistributedCache.createSymlink(conf)
 
     def makeQualifiedStr(path: String, conf: Configuration): URI =
@@ -118,36 +111,30 @@ final case class UncachedFile private[scalding](source: Either[String, URI]) {
     def makeQualified(p: Path, conf: Configuration): URI =
       p.makeQualified(p.getFileSystem(conf)).toUri // make sure we have fully-qualified URI
 
-    val sourceUri = source match {
+    val sourceUri = source match
       case Left(strPath) => makeQualifiedStr(strPath, conf)
       case Right(uri) => makeQualifiedURI(uri, conf)
-    }
 
     HDistributedCache.addCacheFile(symlinkedUriFor(sourceUri), conf)
     HadoopCachedFile(sourceUri)
-  }
-}
 
-sealed abstract class CachedFile {
+sealed abstract class CachedFile
 
   /** The path to the cahced file on disk (the symlink registered at configuration time) */
   def path: String
 
   /** The path to the cached file on disk as a File object. */
   def file: File
-}
 
 final case class LocallyCachedFile private[scalding](sourcePath: String)
-    extends CachedFile {
+    extends CachedFile
   def path = file.getCanonicalPath
   def file = new File(sourcePath).getCanonicalFile
-}
 
 final case class HadoopCachedFile private[scalding](sourceUri: URI)
-    extends CachedFile {
+    extends CachedFile
 
   import DistributedCacheFile._
 
   def path: String = Seq("./", symlinkNameFor(sourceUri)).mkString("")
   def file: File = new File(path)
-}

@@ -16,102 +16,86 @@ import java.net.InetAddress
 import akka.remote.testkit.{STMultiNodeSpec, MultiNodeSpec, MultiNodeConfig}
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 
-object TestConductorMultiJvmSpec extends MultiNodeConfig {
+object TestConductorMultiJvmSpec extends MultiNodeConfig
   commonConfig(debugConfig(on = false))
 
   val master = role("master")
   val slave = role("slave")
 
   testTransport(on = true)
-}
 
 class TestConductorMultiJvmNode1 extends TestConductorSpec
 class TestConductorMultiJvmNode2 extends TestConductorSpec
 
 class TestConductorSpec
     extends MultiNodeSpec(TestConductorMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   import TestConductorMultiJvmSpec._
 
   def initialParticipants = 2
 
-  lazy val echo = {
+  lazy val echo =
     system.actorSelection(node(master) / "user" / "echo") ! Identify(None)
     expectMsgType[ActorIdentity].ref.get
-  }
 
-  "A TestConductor" must {
+  "A TestConductor" must
 
-    "enter a barrier" taggedAs LongRunningTest in {
-      runOn(master) {
-        system.actorOf(Props(new Actor {
-          def receive = {
+    "enter a barrier" taggedAs LongRunningTest in
+      runOn(master)
+        system.actorOf(Props(new Actor
+          def receive =
             case x ⇒ testActor ! x; sender() ! x
-          }
-        }).withDeploy(Deploy.local), "echo")
-      }
+        ).withDeploy(Deploy.local), "echo")
 
       enterBarrier("name")
-    }
 
-    "support throttling of network connections" taggedAs LongRunningTest in {
+    "support throttling of network connections" taggedAs LongRunningTest in
 
-      runOn(slave) {
+      runOn(slave)
         // start remote network connection so that it can be throttled
         echo ! "start"
-      }
 
       expectMsg("start")
 
-      runOn(master) {
+      runOn(master)
         testConductor
           .throttle(slave, master, Direction.Send, rateMBit = 0.01)
           .await
-      }
 
       enterBarrier("throttled_send")
 
-      runOn(slave) {
+      runOn(slave)
         for (i ← 0 to 9) echo ! i
-      }
 
-      within(0.6 seconds, 2 seconds) {
+      within(0.6 seconds, 2 seconds)
         expectMsg(500 millis, 0)
         receiveN(9) should ===(1 to 9)
-      }
 
       enterBarrier("throttled_send2")
 
-      runOn(master) {
+      runOn(master)
         testConductor.throttle(slave, master, Direction.Send, -1).await
         testConductor
           .throttle(slave, master, Direction.Receive, rateMBit = 0.01)
           .await
-      }
 
       enterBarrier("throttled_recv")
 
-      runOn(slave) {
+      runOn(slave)
         for (i ← 10 to 19) echo ! i
-      }
 
       val (min, max) =
         if (isNode(master)) (0 seconds, 500 millis)
         else (0.3 seconds, 3 seconds)
 
-      within(min, max) {
+      within(min, max)
         expectMsg(500 millis, 10)
         receiveN(9) should ===(11 to 19)
-      }
 
       enterBarrier("throttled_recv2")
 
-      runOn(master) {
+      runOn(master)
         testConductor.throttle(slave, master, Direction.Receive, -1).await
-      }
 
       enterBarrier("after")
-    }
-  }
-}

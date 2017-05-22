@@ -9,7 +9,7 @@ import lila.history.HistoryApi
 import lila.rating.{Glicko, Perf, PerfType => PT}
 import lila.user.{UserRepo, User, Perfs, RankingApi}
 
-final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
+final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi)
 
   private val VOLATILITY = Glicko.default.volatility
   private val TAU = 0.75d
@@ -19,13 +19,13 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
            white: User,
            black: User,
            resetGameRatings: Boolean = false): Funit =
-    PerfPicker.main(game) ?? { mainPerf =>
+    PerfPicker.main(game) ??  mainPerf =>
       (game.rated && game.finished && game.accountable && !white.lame &&
-          !black.lame) ?? {
+          !black.lame) ??
         val ratingsW = mkRatings(white.perfs)
         val ratingsB = mkRatings(black.perfs)
         val result = resultOf(game)
-        game.ratingVariant match {
+        game.ratingVariant match
           case chess.variant.Chess960 =>
             updateRatings(ratingsW.chess960, ratingsB.chess960, result, system)
           case chess.variant.KingOfTheHill =>
@@ -48,7 +48,7 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
             updateRatings(
                 ratingsW.crazyhouse, ratingsB.crazyhouse, result, system)
           case chess.variant.Standard =>
-            game.speed match {
+            game.speed match
               case Speed.Bullet =>
                 updateRatings(ratingsW.bullet, ratingsB.bullet, result, system)
               case Speed.Blitz =>
@@ -61,9 +61,7 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
                               ratingsB.correspondence,
                               result,
                               system)
-            }
           case _ =>
-        }
         val perfsW = mkPerfs(ratingsW, white.perfs, game)
         val perfsB = mkPerfs(ratingsB, black.perfs, game)
         def intRatingLens(perfs: Perfs) = mainPerf(perfs).glicko.intRating
@@ -87,8 +85,7 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
             perfsW) zip historyApi.add(black, game, perfsB) zip rankingApi
           .save(white.id, game.perfType, perfsW) zip rankingApi.save(
             black.id, game.perfType, perfsB)
-      }.void
-    }
+      .void
 
   private final case class Ratings(chess960: Rating,
                                    kingOfTheHill: Rating,
@@ -118,30 +115,26 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
                 correspondence = perfs.correspondence.toRating)
 
   private def resultOf(game: Game): Glicko.Result =
-    game.winnerColor match {
+    game.winnerColor match
       case Some(chess.White) => Glicko.Result.Win
       case Some(chess.Black) => Glicko.Result.Loss
       case None => Glicko.Result.Draw
-    }
 
   private def updateRatings(white: Rating,
                             black: Rating,
                             result: Glicko.Result,
-                            system: RatingCalculator) {
+                            system: RatingCalculator)
     val results = new RatingPeriodResults()
-    result match {
+    result match
       case Glicko.Result.Draw => results.addDraw(white, black)
       case Glicko.Result.Win => results.addResult(white, black)
       case Glicko.Result.Loss => results.addResult(black, white)
-    }
-    try {
+    try
       system.updateRatings(results)
-    } catch {
+    catch
       case e: Exception => logger.error("update ratings", e)
-    }
-  }
 
-  private def mkPerfs(ratings: Ratings, perfs: Perfs, game: Game): Perfs = {
+  private def mkPerfs(ratings: Ratings, perfs: Perfs, game: Game): Perfs =
     val speed = game.speed
     val isStd = game.ratingVariant.standard
     val date = game.updatedAt | game.createdAt
@@ -198,5 +191,3 @@ final class PerfsUpdater(historyApi: HistoryApi, rankingApi: RankingApi) {
         correspondence = r(
               PT.Correspondence, perfs.correspondence, perfs1.correspondence))
     if (isStd) perfs2.updateStandard else perfs2
-  }
-}

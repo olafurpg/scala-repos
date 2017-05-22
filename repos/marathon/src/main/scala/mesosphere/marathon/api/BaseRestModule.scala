@@ -14,7 +14,7 @@ import mesosphere.chaos.http.{HelpServlet, LogConfigServlet, PingServlet, Servic
   * * Jackson serialization
   * * ConstraintViolationExceptionMapper (which depends on Jackson serialization)
   */
-class BaseRestModule extends ServletModule {
+class BaseRestModule extends ServletModule
 
   // Override these in a subclass to mount resources at a different path
   val pingUrl = "/ping"
@@ -25,7 +25,7 @@ class BaseRestModule extends ServletModule {
   val statusUrl = "/status"
   val statusCatchAllUrl = "/status/*"
 
-  protected override def configureServlets() {
+  protected override def configureServlets()
     bind(classOf[PingServlet]).in(Scopes.SINGLETON)
     bind(classOf[MetricsServlet]).in(Scopes.SINGLETON)
     bind(classOf[LogConfigServlet]).in(Scopes.SINGLETON)
@@ -43,5 +43,3 @@ class BaseRestModule extends ServletModule {
     serve(metricsUrl).`with`(classOf[MetricsServlet])
     serve(loggingUrl).`with`(classOf[LogConfigServlet])
     serve(guiceContainerUrl).`with`(classOf[GuiceContainer])
-  }
-}

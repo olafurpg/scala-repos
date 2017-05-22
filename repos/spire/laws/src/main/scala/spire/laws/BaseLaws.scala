@@ -9,14 +9,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object BaseLaws {
-  def apply[A : Eq : Arbitrary] = new BaseLaws[A] {
+object BaseLaws
+  def apply[A : Eq : Arbitrary] = new BaseLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait BaseLaws[A] extends Laws {
+trait BaseLaws[A] extends Laws
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
@@ -47,6 +45,5 @@ trait BaseLaws[A] extends Laws {
               (MSA.distance(a1, a2) +
                   MSA.distance(a2, a3)) >= MSA.distance(a1, a3))
     )
-}
 
 // vim: expandtab:ts=2:sw=2

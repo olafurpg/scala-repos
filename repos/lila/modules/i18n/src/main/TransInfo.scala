@@ -6,7 +6,7 @@ case class TransInfo(lang: Lang,
                      name: String,
                      contributors: List[String],
                      nbTranslated: Int,
-                     nbMissing: Int) {
+                     nbMissing: Int)
 
   def code = lang.language
 
@@ -19,26 +19,24 @@ case class TransInfo(lang: Lang,
   def complete = percent == 100
 
   def nonComplete = !complete
-}
 
-private[i18n] case class TransInfos(all: List[TransInfo]) {
+private[i18n] case class TransInfos(all: List[TransInfo])
 
-  lazy val byCode = all map { info =>
+  lazy val byCode = all map  info =>
     info.code -> info
-  } toMap
+  toMap
 
   def get(code: String): Option[TransInfo] = byCode get code
 
   def get(lang: Lang): Option[TransInfo] = get(lang.language)
-}
 
-private[i18n] object TransInfos {
+private[i18n] object TransInfos
 
   val defaultCode = "en"
 
-  def apply(messages: Messages, keys: I18nKeys): TransInfos = TransInfos {
+  def apply(messages: Messages, keys: I18nKeys): TransInfos = TransInfos
     val nbMessages = keys.count
-    LangList.sortedList.filter(_._1 != defaultCode) map {
+    LangList.sortedList.filter(_._1 != defaultCode) map
       case (code, name) =>
         TransInfo(
             lang = Lang(code),
@@ -47,6 +45,3 @@ private[i18n] object TransInfos {
             nbTranslated = messages.get(code) ?? (_.size),
             nbMissing = nbMessages - (messages.get(code) ?? (_.size))
         )
-    }
-  }
-}

@@ -33,10 +33,9 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object EventTarget {
+object EventTarget
   implicit def sfxEventTarget2jfx(v: EventTarget): jfxe.EventTarget =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $FC]].
@@ -47,7 +46,7 @@ object EventTarget {
   * @define ORIGINALDOC Original Documentation]].
   */
 abstract class EventTarget(override val delegate: jfxe.EventTarget)
-    extends SFXDelegate[jfxe.EventTarget] {
+    extends SFXDelegate[jfxe.EventTarget]
 
   /**
     * Construct an event dispatch chain for this target. The event dispatch
@@ -74,4 +73,3 @@ abstract class EventTarget(override val delegate: jfxe.EventTarget)
     */
   def buildEventDispatchChain(tail: EventDispatchChain): EventDispatchChain =
     delegate.buildEventDispatchChain(tail)
-}

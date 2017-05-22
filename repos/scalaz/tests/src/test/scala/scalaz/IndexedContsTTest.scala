@@ -1,8 +1,8 @@
 package scalaz
 
-object IndexedContsTTest extends SpecLite {
+object IndexedContsTTest extends SpecLite
 
-  object instances {
+  object instances
     def functorRight[W[_]: Functor, M[_], R, O] =
       Functor[IndexedContsT[W, M, R, O, ?]]
     def functorLeft[W[_], M[_]: Functor, O, A] =
@@ -18,5 +18,3 @@ object IndexedContsTTest extends SpecLite {
     def functor[W[_]: Comonad, M[_], R] = Functor[ContsT[W, M, R, ?]]
     def functor[W[_]: Cobind, M[_], R] = Functor[ContsT[W, M, R, ?]]
     def bind[W[_]: Comonad, M[_], R] = Bind[ContsT[W, M, R, ?]]
-  }
-}

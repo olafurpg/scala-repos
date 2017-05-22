@@ -7,7 +7,7 @@ import akka.actor._
 import akka.persistence._
 import akka.testkit.{TestProbe, AkkaSpec}
 
-object SharedLeveldbJournalSpec {
+object SharedLeveldbJournalSpec
   val config =
     """
       akka {
@@ -39,49 +39,41 @@ object SharedLeveldbJournalSpec {
     """
 
   class ExamplePersistentActor(probe: ActorRef, name: String)
-      extends NamedPersistentActor(name) {
-    override def receiveRecover = {
+      extends NamedPersistentActor(name)
+    override def receiveRecover =
       case RecoveryCompleted ⇒ // ignore
       case payload ⇒ probe ! payload
-    }
-    override def receiveCommand = {
+    override def receiveCommand =
       case payload ⇒
-        persist(payload) { _ ⇒
+        persist(payload)  _ ⇒
           probe ! payload
-        }
-    }
-  }
 
-  class ExampleApp(probe: ActorRef, storePath: ActorPath) extends Actor {
+  class ExampleApp(probe: ActorRef, storePath: ActorPath) extends Actor
     val p = context.actorOf(
         Props(classOf[ExamplePersistentActor], probe, context.system.name))
 
-    def receive = {
+    def receive =
       case ActorIdentity(1, Some(store)) ⇒
         SharedLeveldbJournal.setStore(store, context.system)
       case m ⇒ p forward m
-    }
 
     override def preStart(): Unit =
       context.actorSelection(storePath) ! Identify(1)
-  }
-}
 
 class SharedLeveldbJournalSpec
-    extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup {
+    extends AkkaSpec(SharedLeveldbJournalSpec.config) with Cleanup
   import SharedLeveldbJournalSpec._
 
   val systemA = ActorSystem("SysA", system.settings.config)
   val systemB = ActorSystem("SysB", system.settings.config)
 
-  override protected def afterTermination() {
+  override protected def afterTermination()
     shutdown(systemA)
     shutdown(systemB)
     super.afterTermination()
-  }
 
-  "A LevelDB store" can {
-    "be shared by multiple actor systems" in {
+  "A LevelDB store" can
+    "be shared by multiple actor systems" in
 
       val probeA = new TestProbe(systemA)
       val probeB = new TestProbe(systemB)
@@ -117,6 +109,3 @@ class SharedLeveldbJournalSpec
 
       probeB.expectMsg("b1")
       probeB.expectMsg("b2")
-    }
-  }
-}

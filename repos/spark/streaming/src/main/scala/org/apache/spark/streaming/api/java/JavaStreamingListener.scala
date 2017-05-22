@@ -19,7 +19,7 @@ package org.apache.spark.streaming.api.java
 
 import org.apache.spark.streaming.Time
 
-private[streaming] trait PythonStreamingListener {
+private[streaming] trait PythonStreamingListener
 
   /** Called when a receiver has been started */
   def onReceiverStarted(
@@ -48,67 +48,57 @@ private[streaming] trait PythonStreamingListener {
   /** Called when processing of a job of a batch has completed. */
   def onOutputOperationCompleted(
       outputOperationCompleted: JavaStreamingListenerOutputOperationCompleted) {}
-}
 
 private[streaming] class PythonStreamingListenerWrapper(
     listener: PythonStreamingListener)
-    extends JavaStreamingListener {
+    extends JavaStreamingListener
 
   /** Called when a receiver has been started */
   override def onReceiverStarted(
-      receiverStarted: JavaStreamingListenerReceiverStarted): Unit = {
+      receiverStarted: JavaStreamingListenerReceiverStarted): Unit =
     listener.onReceiverStarted(receiverStarted)
-  }
 
   /** Called when a receiver has reported an error */
   override def onReceiverError(
-      receiverError: JavaStreamingListenerReceiverError): Unit = {
+      receiverError: JavaStreamingListenerReceiverError): Unit =
     listener.onReceiverError(receiverError)
-  }
 
   /** Called when a receiver has been stopped */
   override def onReceiverStopped(
-      receiverStopped: JavaStreamingListenerReceiverStopped): Unit = {
+      receiverStopped: JavaStreamingListenerReceiverStopped): Unit =
     listener.onReceiverStopped(receiverStopped)
-  }
 
   /** Called when a batch of jobs has been submitted for processing. */
   override def onBatchSubmitted(
-      batchSubmitted: JavaStreamingListenerBatchSubmitted): Unit = {
+      batchSubmitted: JavaStreamingListenerBatchSubmitted): Unit =
     listener.onBatchSubmitted(batchSubmitted)
-  }
 
   /** Called when processing of a batch of jobs has started.  */
   override def onBatchStarted(
-      batchStarted: JavaStreamingListenerBatchStarted): Unit = {
+      batchStarted: JavaStreamingListenerBatchStarted): Unit =
     listener.onBatchStarted(batchStarted)
-  }
 
   /** Called when processing of a batch of jobs has completed. */
   override def onBatchCompleted(
-      batchCompleted: JavaStreamingListenerBatchCompleted): Unit = {
+      batchCompleted: JavaStreamingListenerBatchCompleted): Unit =
     listener.onBatchCompleted(batchCompleted)
-  }
 
   /** Called when processing of a job of a batch has started. */
   override def onOutputOperationStarted(
       outputOperationStarted: JavaStreamingListenerOutputOperationStarted)
-    : Unit = {
+    : Unit =
     listener.onOutputOperationStarted(outputOperationStarted)
-  }
 
   /** Called when processing of a job of a batch has completed. */
   override def onOutputOperationCompleted(
       outputOperationCompleted: JavaStreamingListenerOutputOperationCompleted)
-    : Unit = {
+    : Unit =
     listener.onOutputOperationCompleted(outputOperationCompleted)
-  }
-}
 
 /**
   * A listener interface for receiving information about an ongoing streaming  computation.
   */
-private[streaming] class JavaStreamingListener {
+private[streaming] class JavaStreamingListener
 
   /** Called when a receiver has been started */
   def onReceiverStarted(
@@ -142,7 +132,6 @@ private[streaming] class JavaStreamingListener {
   def onOutputOperationCompleted(
       outputOperationCompleted: JavaStreamingListenerOutputOperationCompleted)
     : Unit = {}
-}
 
 /**
   * Base trait for events related to JavaStreamingListener

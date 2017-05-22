@@ -33,7 +33,7 @@ import com.twitter.util.{Await, Duration, Future, Promise, Time, Timer}
   *
   * Note: There is a Java-friendly API for this trait: [[com.twitter.concurrent.AbstractOffer]].
   */
-trait Offer[+T] { self =>
+trait Offer[+T]  self =>
   import Offer.LostSynchronization
 
   /**
@@ -48,12 +48,10 @@ trait Offer[+T] { self =>
     * of the synchronization.
     */
   def sync(): Future[T] =
-    prepare() flatMap { tx =>
-      tx.ack() flatMap {
+    prepare() flatMap  tx =>
+      tx.ack() flatMap
         case Tx.Commit(v) => Future.value(v)
         case Tx.Abort => sync()
-      }
-    }
 
   /**
     * Synonym for `sync()`
@@ -68,19 +66,15 @@ trait Offer[+T] { self =>
     * translation (performed by {{f}}) is done after the {{Offer[T]}} has
     * successfully synchronized.
     */
-  def map[U](f: T => U): Offer[U] = new Offer[U] {
-    def prepare() = self.prepare() map { tx =>
-      new Tx[U] {
+  def map[U](f: T => U): Offer[U] = new Offer[U]
+    def prepare() = self.prepare() map  tx =>
+      new Tx[U]
         import Tx.{Commit, Abort}
-        def ack() = tx.ack() map {
+        def ack() = tx.ack() map
           case Commit(t) => Commit(f(t))
           case Abort => Abort
-        }
 
         def nack() { tx.nack() }
-      }
-    }
-  }
 
   /**
     * Synonym for `map()`. Useful in combination with `Offer.choose()`
@@ -91,9 +85,8 @@ trait Offer[+T] { self =>
   /**
     * Like {{map}}, but to a constant (call-by-name).
     */
-  def const[U](f: => U): Offer[U] = map { _ =>
+  def const[U](f: => U): Offer[U] = map  _ =>
     f
-  }
 
   /**
     * Java-friendly analog of `const()`.
@@ -114,19 +107,15 @@ trait Offer[+T] { self =>
     * offer orElse Offer.const { computeDefaultValue() }
     * }}}
     */
-  def orElse[U >: T](other: Offer[U]): Offer[U] = new Offer[U] {
-    def prepare() = {
+  def orElse[U >: T](other: Offer[U]): Offer[U] = new Offer[U]
+    def prepare() =
       val ourTx = self.prepare()
       if (ourTx.isDefined) ourTx
-      else {
-        ourTx foreach { tx =>
+      else
+        ourTx foreach  tx =>
           tx.nack()
-        }
         ourTx.raise(LostSynchronization)
         other.prepare()
-      }
-    }
-  }
 
   def or[U](other: Offer[U]): Offer[Either[T, U]] =
     Offer.choose(this map { Left(_) }, other map { Right(_) })
@@ -136,22 +125,18 @@ trait Offer[+T] { self =>
     * with each successfully synchronized value.  A receiver can use
     * this to enumerate over all received values.
     */
-  def foreach(f: T => Unit) {
-    sync() foreach { v =>
+  def foreach(f: T => Unit)
+    sync() foreach  v =>
       f(v)
       foreach(f)
-    }
-  }
 
   /**
     * Synchronize (discarding the value), and then invoke the given
     * closure.  Convenient for loops.
     */
-  def andThen(f: => Unit) {
-    sync() onSuccess { _ =>
+  def andThen(f: => Unit)
+    sync() onSuccess  _ =>
       f
-    }
-  }
 
   /**
     * Synchronize this offer, blocking for the result. See {{sync()}}
@@ -170,7 +155,6 @@ trait Offer[+T] { self =>
     * Synchronize, blocking for the result.
     */
   def ?? = syncWait()
-}
 
 /**
   * Abstract `Offer` class for Java compatibility.
@@ -180,7 +164,7 @@ abstract class AbstractOffer[T] extends Offer[T]
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.concurrent.Offers]].
   */
-object Offer {
+object Offer
 
   /**
     * A constant offer: synchronizes the given value always. This is
@@ -188,16 +172,14 @@ object Offer {
     *
     * Note: Updates here must also be done at [[com.twitter.concurrent.Offers.newConstOffer()]].
     */
-  def const[T](x: => T): Offer[T] = new Offer[T] {
+  def const[T](x: => T): Offer[T] = new Offer[T]
     def prepare() = Future.value(Tx.const(x))
-  }
 
   /**
     * An offer that never synchronizes.
     */
-  val never: Offer[Nothing] = new Offer[Nothing] {
+  val never: Offer[Nothing] = new Offer[Nothing]
     def prepare() = Future.never
-  }
 
   private[this] val rng = Some(new Random(Time.now.inNanoseconds))
 
@@ -223,69 +205,56 @@ object Offer {
     * Package-exposed for testing.
     */
   private[concurrent] def choose[T](
-      random: Option[Random], evs: Seq[Offer[T]]): Offer[T] = {
+      random: Option[Random], evs: Seq[Offer[T]]): Offer[T] =
     if (evs.isEmpty) Offer.never
     else
-      new Offer[T] {
-        def prepare(): Future[Tx[T]] = {
+      new Offer[T]
+        def prepare(): Future[Tx[T]] =
           // to avoid unnecessary allocations we do a bunch of manual looping and shuffling
           val inputSize = evs.size
           val prepd = new Array[Future[Tx[T]]](inputSize)
           val iter = evs.iterator
           var i = 0
-          while (i < inputSize) {
+          while (i < inputSize)
             prepd(i) = iter.next().prepare()
             i += 1
-          }
           // We use match instead of foreach to reduce allocations.
-          random match {
+          random match
             case None =>
             // Shuffle only if random is defined
             case Some(r) =>
-              while (i > 1) {
+              while (i > 1)
                 // i starts at evs.size
                 val nextPos = r.nextInt(i)
                 val tmp = prepd(i - 1)
                 prepd(i - 1) = prepd(nextPos)
                 prepd(nextPos) = tmp
                 i -= 1
-              }
-          }
           i = 0
           var foundPos = -1
-          while (foundPos < 0 && i < prepd.length) {
+          while (foundPos < 0 && i < prepd.length)
             val winner = prepd(i)
             if (winner.isDefined) foundPos = i
             i += 1
-          }
 
           def updateLosers(
-              winPos: Int, prepd: Array[Future[Tx[T]]]): Future[Tx[T]] = {
+              winPos: Int, prepd: Array[Future[Tx[T]]]): Future[Tx[T]] =
             val winner = prepd(winPos)
             var j = 0
-            while (j < prepd.length) {
+            while (j < prepd.length)
               val loser = prepd(j)
-              if (loser ne winner) {
-                loser onSuccess { tx =>
+              if (loser ne winner)
+                loser onSuccess  tx =>
                   tx.nack()
-                }
                 loser.raise(LostSynchronization)
-              }
               j += 1
-            }
             winner
-          }
 
-          if (foundPos >= 0) {
+          if (foundPos >= 0)
             updateLosers(foundPos, prepd)
-          } else {
-            Future.selectIndex(prepd) flatMap { winPos =>
+          else
+            Future.selectIndex(prepd) flatMap  winPos =>
               updateLosers(winPos, prepd)
-            }
-          }
-        }
-      }
-  }
 
   /**
     * `Offer.choose()` and synchronize it.
@@ -298,21 +267,16 @@ object Offer {
     * An offer that is available after the given time out.
     */
   def timeout(timeout: Duration)(implicit timer: Timer): Offer[Unit] =
-    new Offer[Unit] {
+    new Offer[Unit]
       private[this] val deadline = timeout.fromNow
 
-      def prepare() = {
+      def prepare() =
         if (deadline <= Time.now) FutureTxUnit
-        else {
+        else
           val p = new Promise[Tx[Unit]]
           val task = timer.schedule(deadline) { p.setValue(Tx.Unit) }
           p.setInterruptHandler { case _cause => task.cancel() }
           p
-        }
-      }
-    }
 
-  object LostSynchronization extends Exception {
+  object LostSynchronization extends Exception
     override def fillInStackTrace = this
-  }
-}

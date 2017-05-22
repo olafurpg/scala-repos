@@ -26,9 +26,9 @@ import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.linalg.distributed.RowMatrix
 // $example off$
 
-object PCAOnRowMatrixExample {
+object PCAOnRowMatrixExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val conf = new SparkConf().setAppName("PCAOnRowMatrixExample")
     val sc = new SparkContext(conf)
@@ -51,9 +51,6 @@ object PCAOnRowMatrixExample {
     // $example off$
     val collect = projected.rows.collect()
     println("Projected Row Matrix of principal component:")
-    collect.foreach { vector =>
+    collect.foreach  vector =>
       println(vector)
-    }
-  }
-}
 // scalastyle:on println

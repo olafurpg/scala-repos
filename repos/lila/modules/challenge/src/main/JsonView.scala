@@ -4,7 +4,7 @@ import play.api.libs.json._
 
 import lila.common.PimpedJson._
 
-final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
+final class JsonView(getLightUser: String => Option[lila.common.LightUser])
 
   import Challenge._
 
@@ -30,7 +30,7 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
         "initialFen" -> c.initialFen,
         "rated" -> c.mode.rated,
         "timeControl" ->
-        (c.timeControl match {
+        (c.timeControl match
               case c @ TimeControl.Clock(l, i) =>
                 Json.obj("type" -> "clock",
                          "limit" -> l,
@@ -39,7 +39,7 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
               case TimeControl.Correspondence(d) =>
                 Json.obj("type" -> "correspondence", "daysPerTurn" -> d)
               case TimeControl.Unlimited => Json.obj("type" -> "unlimited")
-            }),
+            ),
         "color" -> c.colorChoice.toString.toLowerCase,
         "perf" -> Json.obj("icon" -> iconChar(c).toString,
                            "name" -> c.perfType.name)
@@ -49,7 +49,7 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
     if (c.variant == chess.variant.FromPosition) '*'
     else c.perfType.iconChar
 
-  private implicit val RegisteredWrites = OWrites[Registered] { r =>
+  private implicit val RegisteredWrites = OWrites[Registered]  r =>
     val light = getLightUser(r.id)
     Json
       .obj(
@@ -60,5 +60,3 @@ final class JsonView(getLightUser: String => Option[lila.common.LightUser]) {
           "provisional" -> r.rating.provisional
       )
       .noNull
-  }
-}

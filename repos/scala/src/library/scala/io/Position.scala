@@ -34,7 +34,7 @@ package io
   *  @author Burak Emir (translated from work by Matthias Zenger and others)
   */
 @deprecated("This class will be removed.", "2.10.0")
-private[scala] abstract class Position {
+private[scala] abstract class Position
 
   /** Definable behavior for overflow conditions.
     */
@@ -52,12 +52,11 @@ private[scala] abstract class Position {
   final val COLUMN_MASK = (1 << COLUMN_BITS) - 1
 
   /** Encodes a position into a single integer. */
-  final def encode(line: Int, column: Int): Int = {
+  final def encode(line: Int, column: Int): Int =
     checkInput(line, column)
 
     if (line >= LINE_MASK) LINE_MASK << COLUMN_BITS
     else (line << COLUMN_BITS) | scala.math.min(COLUMN_MASK, column)
-  }
 
   /** Returns the line number of the encoded position. */
   final def line(pos: Int): Int = (pos >> COLUMN_BITS) & LINE_MASK
@@ -67,14 +66,11 @@ private[scala] abstract class Position {
 
   /** Returns a string representation of the encoded position. */
   def toString(pos: Int): String = line(pos) + ":" + column(pos)
-}
 
-private[scala] object Position extends Position {
-  def checkInput(line: Int, column: Int) {
+private[scala] object Position extends Position
+  def checkInput(line: Int, column: Int)
     if (line < 0) throw new IllegalArgumentException(line + " < 0")
     if ((line == 0) && (column != 0))
       throw new IllegalArgumentException(line + "," + column + " not allowed")
     if (column < 0)
       throw new IllegalArgumentException(line + "," + column + " not allowed")
-  }
-}

@@ -9,17 +9,16 @@
 
 package scala
 
-object Product7 {
+object Product7
   def unapply[T1, T2, T3, T4, T5, T6, T7](
       x: Product7[T1, T2, T3, T4, T5, T6, T7])
     : Option[Product7[T1, T2, T3, T4, T5, T6, T7]] =
     Some(x)
-}
 
 /** Product7 is a cartesian product of 7 components.
   *  @since 2.3
   */
-trait Product7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Any with Product {
+trait Product7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Any with Product
 
   /** The arity of this product.
     *  @return 7
@@ -34,7 +33,7 @@ trait Product7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Any with Product {
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
@@ -43,7 +42,6 @@ trait Product7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Any with Product {
     case 5 => _6
     case 6 => _7
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -79,4 +77,3 @@ trait Product7[+T1, +T2, +T3, +T4, +T5, +T6, +T7] extends Any with Product {
     *  @return   A projection of element 7.
     */
   def _7: T7
-}

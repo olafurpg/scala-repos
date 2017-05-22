@@ -19,6 +19,5 @@ package scala
 @deprecatedInheritance(
     "Tuples will be made final in a future version.", "2.11.0")
 case class Tuple3[+T1, +T2, +T3](_1: T1, _2: T2, _3: T3)
-    extends Product3[T1, T2, T3] {
+    extends Product3[T1, T2, T3]
   override def toString() = "(" + _1 + "," + _2 + "," + _3 + ")"
-}

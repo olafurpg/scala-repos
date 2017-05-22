@@ -33,7 +33,7 @@ private[storage] class BlockManagerSlaveEndpoint(
     override val rpcEnv: RpcEnv,
     blockManager: BlockManager,
     mapOutputTracker: MapOutputTracker)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint with Logging
 
   private val asyncThreadPool = ThreadUtils.newDaemonCachedThreadPool(
       "block-manager-slave-async-thread-pool")
@@ -42,30 +42,25 @@ private[storage] class BlockManagerSlaveEndpoint(
 
   // Operations that involve removing blocks may be slow and should be done asynchronously
   override def receiveAndReply(
-      context: RpcCallContext): PartialFunction[Any, Unit] = {
+      context: RpcCallContext): PartialFunction[Any, Unit] =
     case RemoveBlock(blockId) =>
-      doAsync[Boolean]("removing block " + blockId, context) {
+      doAsync[Boolean]("removing block " + blockId, context)
         blockManager.removeBlock(blockId)
         true
-      }
 
     case RemoveRdd(rddId) =>
-      doAsync[Int]("removing RDD " + rddId, context) {
+      doAsync[Int]("removing RDD " + rddId, context)
         blockManager.removeRdd(rddId)
-      }
 
     case RemoveShuffle(shuffleId) =>
-      doAsync[Boolean]("removing shuffle " + shuffleId, context) {
-        if (mapOutputTracker != null) {
+      doAsync[Boolean]("removing shuffle " + shuffleId, context)
+        if (mapOutputTracker != null)
           mapOutputTracker.unregisterShuffle(shuffleId)
-        }
         SparkEnv.get.shuffleManager.unregisterShuffle(shuffleId)
-      }
 
     case RemoveBroadcast(broadcastId, _) =>
-      doAsync[Int]("removing broadcast " + broadcastId, context) {
+      doAsync[Int]("removing broadcast " + broadcastId, context)
         blockManager.removeBroadcast(broadcastId, tellMaster = true)
-      }
 
     case GetBlockStatus(blockId, _) =>
       context.reply(blockManager.getStatus(blockId))
@@ -75,28 +70,21 @@ private[storage] class BlockManagerSlaveEndpoint(
 
     case TriggerThreadDump =>
       context.reply(Utils.getThreadDump())
-  }
 
   private def doAsync[T](actionMessage: String, context: RpcCallContext)(
-      body: => T) {
-    val future = Future {
+      body: => T)
+    val future = Future
       logDebug(actionMessage)
       body
-    }
-    future.onSuccess {
+    future.onSuccess
       case response =>
         logDebug("Done " + actionMessage + ", response is " + response)
         context.reply(response)
         logDebug("Sent response: " + response + " to " + context.senderAddress)
-    }
-    future.onFailure {
+    future.onFailure
       case t: Throwable =>
         logError("Error in " + actionMessage, t)
         context.sendFailure(t)
-    }
-  }
 
-  override def onStop(): Unit = {
+  override def onStop(): Unit =
     asyncThreadPool.shutdownNow()
-  }
-}

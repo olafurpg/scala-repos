@@ -35,7 +35,7 @@ import kafka.zk.ZooKeeperTestHarness
 import org.apache.kafka.common.errors.TimeoutException
 import org.junit.Assert._
 
-class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
+class UncleanLeaderElectionTest extends ZooKeeperTestHarness
   val brokerId1 = 0
   val brokerId2 = 1
 
@@ -62,29 +62,27 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
       classOf[kafka.producer.async.DefaultEventHandler[Object, Object]])
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     configProps1 = createBrokerConfig(brokerId1, zkConnect)
     configProps2 = createBrokerConfig(brokerId2, zkConnect)
 
-    for (configProps <- List(configProps1, configProps2)) {
+    for (configProps <- List(configProps1, configProps2))
       configProps.put("controlled.shutdown.enable",
                       String.valueOf(enableControlledShutdown))
       configProps.put("controlled.shutdown.max.retries", String.valueOf(1))
       configProps.put(
           "controlled.shutdown.retry.backoff.ms", String.valueOf(1000))
-    }
 
     // temporarily set loggers to a higher level so that tests run quietly
     kafkaApisLogger.setLevel(Level.FATAL)
     networkProcessorLogger.setLevel(Level.FATAL)
     syncProducerLogger.setLevel(Level.FATAL)
     eventHandlerLogger.setLevel(Level.FATAL)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     servers.foreach(server => shutdownServer(server))
     servers.foreach(server => CoreUtils.rm(server.config.logDirs))
 
@@ -95,19 +93,16 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     eventHandlerLogger.setLevel(Level.ERROR)
 
     super.tearDown()
-  }
 
-  private def startBrokers(cluster: Seq[Properties]) {
-    for (props <- cluster) {
+  private def startBrokers(cluster: Seq[Properties])
+    for (props <- cluster)
       val config = KafkaConfig.fromProps(props)
       val server = createServer(config)
       configs ++= List(config)
       servers ++= List(server)
-    }
-  }
 
   @Test
-  def testUncleanLeaderElectionEnabled {
+  def testUncleanLeaderElectionEnabled
     // unclean leader election is enabled by default
     startBrokers(Seq(configProps1, configProps2))
 
@@ -116,10 +111,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
         zkUtils, topic, Map(partitionId -> Seq(brokerId1, brokerId2)))
 
     verifyUncleanLeaderElectionEnabled
-  }
 
   @Test
-  def testUncleanLeaderElectionDisabled {
+  def testUncleanLeaderElectionDisabled
     // disable unclean leader election
     configProps1.put("unclean.leader.election.enable", String.valueOf(false))
     configProps2.put("unclean.leader.election.enable", String.valueOf(false))
@@ -130,10 +124,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
         zkUtils, topic, Map(partitionId -> Seq(brokerId1, brokerId2)))
 
     verifyUncleanLeaderElectionDisabled
-  }
 
   @Test
-  def testUncleanLeaderElectionEnabledByTopicOverride {
+  def testUncleanLeaderElectionEnabledByTopicOverride
     // disable unclean leader election globally, but enable for our specific test topic
     configProps1.put("unclean.leader.election.enable", String.valueOf(false))
     configProps2.put("unclean.leader.election.enable", String.valueOf(false))
@@ -149,10 +142,9 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
         topicProps)
 
     verifyUncleanLeaderElectionEnabled
-  }
 
   @Test
-  def testCleanLeaderElectionDisabledByTopicOverride {
+  def testCleanLeaderElectionDisabledByTopicOverride
     // enable unclean leader election globally, but disable for our specific test topic
     configProps1.put("unclean.leader.election.enable", String.valueOf(true))
     configProps2.put("unclean.leader.election.enable", String.valueOf(true))
@@ -168,23 +160,20 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
         topicProps)
 
     verifyUncleanLeaderElectionDisabled
-  }
 
   @Test
-  def testUncleanLeaderElectionInvalidTopicOverride {
+  def testUncleanLeaderElectionInvalidTopicOverride
     startBrokers(Seq(configProps1))
 
     // create topic with an invalid value for unclean leader election
     val topicProps = new Properties()
     topicProps.put("unclean.leader.election.enable", "invalid")
 
-    intercept[ConfigException] {
+    intercept[ConfigException]
       AdminUtils.createOrUpdateTopicPartitionAssignmentPathInZK(
           zkUtils, topic, Map(partitionId -> Seq(brokerId1)), topicProps)
-    }
-  }
 
-  def verifyUncleanLeaderElectionEnabled {
+  def verifyUncleanLeaderElectionEnabled
     // wait until leader is elected
     val leaderIdOpt = waitUntilLeaderIsElectedOrChanged(
         zkUtils, topic, partitionId)
@@ -226,9 +215,8 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // second message was lost due to unclean election
     assertEquals(List("first", "third"), consumeAllMessages(topic))
-  }
 
-  def verifyUncleanLeaderElectionDisabled {
+  def verifyUncleanLeaderElectionDisabled
     // wait until leader is elected
     val leaderIdOpt = waitUntilLeaderIsElectedOrChanged(
         zkUtils, topic, partitionId)
@@ -267,14 +255,13 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
         zkUtils, topic, partitionId, newLeaderOpt = Some(-1))
 
     // message production and consumption should both fail while leader is down
-    try {
+    try
       produceMessage(servers, topic, "third")
       fail(
           "Message produced while leader is down should fail, but it succeeded")
-    } catch {
+    catch
       case e: ExecutionException
           if e.getCause.isInstanceOf[TimeoutException] => // expected
-    }
 
     assertEquals(List.empty[String], consumeAllMessages(topic))
 
@@ -297,14 +284,12 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
 
     // verify messages can be consumed from ISR follower that was just promoted to leader
     assertEquals(List("first", "second", "third"), consumeAllMessages(topic))
-  }
 
-  private def shutdownServer(server: KafkaServer) = {
+  private def shutdownServer(server: KafkaServer) =
     server.shutdown()
     server.awaitShutdown()
-  }
 
-  private def consumeAllMessages(topic: String): List[String] = {
+  private def consumeAllMessages(topic: String): List[String] =
     // use a fresh consumer group every time so that we don't need to mess with disabling auto-commit or
     // resetting the ZK offset
     val consumerProps = createConsumerProperties(
@@ -317,5 +302,3 @@ class UncleanLeaderElectionTest extends ZooKeeperTestHarness {
     consumerConnector.shutdown
 
     messages
-  }
-}

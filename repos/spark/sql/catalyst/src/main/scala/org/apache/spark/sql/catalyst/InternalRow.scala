@@ -24,7 +24,7 @@ import org.apache.spark.sql.types.{DataType, StructType}
   * An abstract class for row used internal in Spark SQL, which only contain the columns as
   * internal types.
   */
-abstract class InternalRow extends SpecializedGetters with Serializable {
+abstract class InternalRow extends SpecializedGetters with Serializable
 
   def numFields: Int
 
@@ -44,23 +44,20 @@ abstract class InternalRow extends SpecializedGetters with Serializable {
   /**
     * Return a Scala Seq representing the row. Elements are placed in the same order in the Seq.
     */
-  def toSeq(fieldTypes: Seq[DataType]): Seq[Any] = {
+  def toSeq(fieldTypes: Seq[DataType]): Seq[Any] =
     val len = numFields
     assert(len == fieldTypes.length)
 
     val values = new Array[Any](len)
     var i = 0
-    while (i < len) {
+    while (i < len)
       values(i) = get(i, fieldTypes(i))
       i += 1
-    }
     values
-  }
 
   def toSeq(schema: StructType): Seq[Any] = toSeq(schema.map(_.dataType))
-}
 
-object InternalRow {
+object InternalRow
 
   /**
     * This method can be used to construct a [[InternalRow]] with the given values.
@@ -75,4 +72,3 @@ object InternalRow {
 
   /** Returns an empty [[InternalRow]]. */
   val empty = apply()
-}

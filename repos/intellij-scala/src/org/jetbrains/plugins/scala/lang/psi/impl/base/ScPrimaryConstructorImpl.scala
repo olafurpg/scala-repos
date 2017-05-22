@@ -31,26 +31,23 @@ class ScPrimaryConstructorImpl private (
     nodeType: IElementType,
     node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScPrimaryConstructor {
+    with ScPrimaryConstructor
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScPrimaryConstructorStub) = {
+  def this(stub: ScPrimaryConstructorStub) =
     this(stub, ScalaElementTypes.PRIMARY_CONSTRUCTOR, null)
-  }
 
   override def getIcon(flags: Int): Icon = Icons.FUNCTION
 
   //todo rewrite me!
   override def hasModifier: Boolean = false
 
-  def getClassNameText: String = {
+  def getClassNameText: String =
     getNode.getTreeParent.getPsi.asInstanceOf[ScTypeDefinition].name
-  }
 
   override def toString: String = "PrimaryConstructor"
 
-  def parameterList: ScParameters = {
+  def parameterList: ScParameters =
     getStubOrPsiChild(ScalaElementTypes.PARAM_CLAUSES)
-  }
 
   override def getName: String = this.containingClass.name
 
@@ -103,4 +100,3 @@ class ScPrimaryConstructorImpl private (
   def getDocComment: PsiDocComment = null
 
   def isDeprecated: Boolean = false
-}

@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
   |:kind scala.Option
   |:k (Int, Int) => Int
@@ -9,4 +9,3 @@ object Test extends ReplTest {
   |:k new { def empty = false }
   |:k Nonexisting
   """.stripMargin
-}

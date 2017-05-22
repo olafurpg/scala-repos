@@ -6,8 +6,8 @@ package lang.completeStatement
   * @author Dmitry.Naydanov
   * @since 2/25/13
   */
-class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
-  def testWhileCondition1() {
+class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase
+  def testWhileCondition1()
     val fileText = """
         |class B {
         |  def method() {
@@ -26,9 +26,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition2() {
+  def testWhileCondition2()
     val fileText = """
         |class B {
         |  def method() {
@@ -47,9 +46,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition3() {
+  def testWhileCondition3()
     val fileText = """
         |class B {
         |  def method() {
@@ -68,9 +66,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition4() {
+  def testWhileCondition4()
     val fileText = """
         |class B {
         |  def method() {
@@ -91,9 +88,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition5() {
+  def testWhileCondition5()
     val fileText = """
         |class B {
         |  def method() {
@@ -112,9 +108,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition6() {
+  def testWhileCondition6()
     val fileText = """
         |class B {
         |  def method() {
@@ -136,9 +131,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin('|').replaceAll("\r", "").trim()
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition7() {
+  def testWhileCondition7()
     val fileText = """
         |class B {
         |  def method() {
@@ -157,9 +151,8 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin
 
     checkScalaFileByText(fileText, resultText)
-  }
 
-  def testWhileCondition8() {
+  def testWhileCondition8()
     val fileText = """
         |object A {
         |  while (true)<caret>
@@ -175,5 +168,3 @@ class ScalaCompleteWhileConditionTest extends ScalaCompleteStatementTestBase {
       """.stripMargin
 
     checkScalaFileByText(fileText, resultText)
-  }
-}

@@ -7,9 +7,9 @@ import org.scalatest.{Matchers, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class BroadcastStatsReceiverTest extends FunSuite with Matchers {
+class BroadcastStatsReceiverTest extends FunSuite with Matchers
 
-  test("counter") {
+  test("counter")
     val recv1 = new InMemoryStatsReceiver
     val recvA = recv1.scope("scopeA")
     val recvB = recv1.scope("scopeB")
@@ -31,9 +31,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
     assert(2 == recv1.counters(Seq("hi")))
     assert(1 == recv1.counters(Seq("scopeA", "hi")))
     assert(1 == recv1.counters(Seq("scopeB", "hi")))
-  }
 
-  test("stat") {
+  test("stat")
     val recv1 = new InMemoryStatsReceiver
     val recvA = recv1.scope("scopeA")
     val recvB = recv1.scope("scopeB")
@@ -55,9 +54,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
     assert(Seq(5f, 10f) == recv1.stats(Seq("hi")).sorted)
     assert(Seq(5f) == recv1.stats(Seq("scopeA", "hi")))
     assert(Seq(10f) == recv1.stats(Seq("scopeB", "hi")))
-  }
 
-  test("gauge") {
+  test("gauge")
     val recv1 = new InMemoryStatsReceiver
     val recvA = recv1.scope("scopeA")
 
@@ -72,9 +70,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
     gaugeA.remove()
     assert(None == recv1.gauges.get(Seq("hi")))
     assert(None == recv1.gauges.get(Seq("scopeA", "hi")))
-  }
 
-  test("scope") {
+  test("scope")
     val base = new InMemoryStatsReceiver
     val scoped = base.scope("scoped")
     val subscoped =
@@ -85,9 +82,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
 
     assert(9 == base.counters(Seq("subscoped", "yolo")))
     assert(9 == base.counters(Seq("scoped", "subscoped", "yolo")))
-  }
 
-  test("scopeSuffix") {
+  test("scopeSuffix")
     val base = new InMemoryStatsReceiver
     val scoped = base.scope("scoped")
     val subscoped = BroadcastStatsReceiver(Seq(base, scoped))
@@ -99,9 +95,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
 
     assert(9 == base.counters(Seq("sub", "suffixed", "yolo")))
     assert(9 == base.counters(Seq("scoped", "sub", "suffixed", "yolo")))
-  }
 
-  test("time") {
+  test("time")
     val recv1 = new InMemoryStatsReceiver
     val recv2 = new InMemoryStatsReceiver
     val recv = BroadcastStatsReceiver(Seq(recv1, recv2))
@@ -119,9 +114,8 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
     Stat.time(stat) { () }
     recv1.stats(statName).size should be(2)
     recv2.stats(statName).size should be(2)
-  }
 
-  test("timeFuture") {
+  test("timeFuture")
     val recv1 = new InMemoryStatsReceiver
     val recv2 = new InMemoryStatsReceiver
     val recv = BroadcastStatsReceiver(Seq(recv1, recv2))
@@ -137,5 +131,3 @@ class BroadcastStatsReceiverTest extends FunSuite with Matchers {
     Await.result(Stat.timeFuture(recv.stat("meh"))(Future.Unit))
     recv1.stats(statName).size should be(2)
     recv2.stats(statName).size should be(2)
-  }
-}

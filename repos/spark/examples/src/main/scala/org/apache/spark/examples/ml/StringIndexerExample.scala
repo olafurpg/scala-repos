@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.StringIndexer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object StringIndexerExample {
-  def main(args: Array[String]): Unit = {
+object StringIndexerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("StringIndexerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -44,6 +44,4 @@ object StringIndexerExample {
     indexed.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

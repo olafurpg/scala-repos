@@ -9,13 +9,13 @@ import javax.swing._
   * 2014-09-05
   */
 class DefaultValuesUsagePanel(labelText: String = "Default values:")
-    extends JPanel {
+    extends JPanel
   private val myRbModifyCalls: JRadioButton = new JRadioButton
   private val myRbAddDefaultArg: JRadioButton = new JRadioButton
 
   init()
 
-  def init() {
+  def init()
     val boxLayout: BoxLayout = new BoxLayout(this, BoxLayout.X_AXIS)
     setLayout(boxLayout)
 
@@ -33,14 +33,11 @@ class DefaultValuesUsagePanel(labelText: String = "Default values:")
     val bg: ButtonGroup = new ButtonGroup
     Seq(myRbAddDefaultArg, myRbModifyCalls).foreach(bg.add)
 
-    val listener = new ItemListener {
-      def itemStateChanged(e: ItemEvent) {
+    val listener = new ItemListener
+      def itemStateChanged(e: ItemEvent)
         stateModified()
-      }
-    }
     myRbModifyCalls.addItemListener(listener)
     myRbAddDefaultArg.addItemListener(listener)
-  }
 
   protected def stateModified() {}
 
@@ -48,14 +45,11 @@ class DefaultValuesUsagePanel(labelText: String = "Default values:")
 
   def isModifyCalls: Boolean = myRbModifyCalls.isSelected
 
-  def forceIsModifyCalls() = {
+  def forceIsModifyCalls() =
     myRbModifyCalls.setSelected(true)
     myRbModifyCalls.setEnabled(false)
     myRbAddDefaultArg.setEnabled(false)
-  }
 
-  def release() = {
+  def release() =
     myRbModifyCalls.setEnabled(true)
     myRbAddDefaultArg.setEnabled(true)
-  }
-}

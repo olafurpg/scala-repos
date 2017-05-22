@@ -32,7 +32,7 @@ import headers._
   * party libraries.
   */
 class HttpModelIntegrationSpec
-    extends WordSpec with Matchers with BeforeAndAfterAll {
+    extends WordSpec with Matchers with BeforeAndAfterAll
 
   val testConf: Config =
     ConfigFactory.parseString("""
@@ -44,9 +44,9 @@ class HttpModelIntegrationSpec
 
   implicit val materializer = ActorMaterializer()
 
-  "External HTTP libraries" should {
+  "External HTTP libraries" should
 
-    "be able to get String headers and an Array[Byte] body out of an HttpRequest" in {
+    "be able to get String headers and an Array[Byte] body out of an HttpRequest" in
 
       // First create an incoming HttpRequest for the external HTTP library
       // to deal with. We're going to convert this request into the library's
@@ -71,13 +71,12 @@ class HttpModelIntegrationSpec
 
       val partialTextHeaders: Seq[(String, String)] =
         request.headers.map(h ⇒ (h.name, h.value))
-      val entityTextHeaders: Seq[(String, String)] = request.entity match {
+      val entityTextHeaders: Seq[(String, String)] = request.entity match
         case HttpEntity.Default(contentType, contentLength, _) ⇒
           Seq(("Content-Type", contentType.toString),
               ("Content-Length", contentLength.toString))
         case _ ⇒
           ???
-      }
       val textHeaders: Seq[(String, String)] =
         entityTextHeaders ++ partialTextHeaders
       textHeaders shouldEqual Seq("Content-Type" -> "application/json",
@@ -90,9 +89,8 @@ class HttpModelIntegrationSpec
       val entityBytes: Array[Byte] =
         Await.result(request.entity.toStrict(1.second), 2.seconds).data.toArray
       entityBytes.to[Seq] shouldEqual ByteString("hello").to[Seq]
-    }
 
-    "be able to build an HttpResponse from String headers and Array[Byte] body" in {
+    "be able to build an HttpResponse from String headers and Array[Byte] body" in
 
       // External HTTP libraries (such as Play) will model HTTP differently
       // to Akka HTTP. One model uses a Seq[(String, String)] for headers and
@@ -122,22 +120,19 @@ class HttpModelIntegrationSpec
       // the HttpEntity. These headers need to be stripped out of the main
       // Seq[Header] and dealt with separately.
 
-      val normalHeaders = convertedHeaders.filter {
+      val normalHeaders = convertedHeaders.filter
         case _: `Content-Type` ⇒ false
         case _: `Content-Length` ⇒ false
         case _ ⇒ true
-      }
       normalHeaders.head shouldEqual RawHeader("X-Greeting", "Hello")
       normalHeaders.tail shouldEqual Nil
 
-      val contentType = convertedHeaders.collectFirst {
+      val contentType = convertedHeaders.collectFirst
         case ct: `Content-Type` ⇒ ct.contentType
-      }
       contentType shouldEqual Some(ContentTypes.`text/plain(UTF-8)`)
 
-      val contentLength = convertedHeaders.collectFirst {
+      val contentLength = convertedHeaders.collectFirst
         case cl: `Content-Length` ⇒ cl.length
-      }
       contentLength shouldEqual Some(3)
 
       // We're going to model the HttpEntity as an HttpEntity.Default, so
@@ -150,57 +145,48 @@ class HttpModelIntegrationSpec
 
       HttpResponse(entity = HttpEntity.Default(
                 contentType.get, contentLength.get, publisherBody))
-    }
 
-    "be able to wrap HttpHeaders with custom typed headers" in {
+    "be able to wrap HttpHeaders with custom typed headers" in
 
       // This HTTP model is typed. It uses Akka HTTP types internally, but
       // no Akka HTTP types are visible to users. This typed model is a
       // model that Play Framework may eventually move to.
 
-      object ExampleLibrary {
+      object ExampleLibrary
 
-        trait TypedHeader {
+        trait TypedHeader
           def name: String
           def value: String
-        }
 
         private[ExampleLibrary] case class GenericHeader(internal: HttpHeader)
-            extends TypedHeader {
+            extends TypedHeader
           def name: String = internal.name
           def value: String = internal.value
-        }
         private[ExampleLibrary] case class ContentTypeHeader(
             contentType: ContentType)
-            extends TypedHeader {
+            extends TypedHeader
           def name: String = "Content-Type"
           def value: String = contentType.toString
-        }
         private[ExampleLibrary] case class ContentLengthHeader(length: Long)
-            extends TypedHeader {
+            extends TypedHeader
           def name: String = "Content-Length"
           def value: String = length.toString
-        }
 
         // Headers can be created from strings.
-        def header(name: String, value: String): TypedHeader = {
-          val parsedHeader = HttpHeader.parse(name, value) match {
+        def header(name: String, value: String): TypedHeader =
+          val parsedHeader = HttpHeader.parse(name, value) match
             case HttpHeader.ParsingResult.Ok(h, Nil) ⇒ h
             case x ⇒ sys.error(s"Failed to parse: ${x.errors}")
-          }
-          parsedHeader match {
+          parsedHeader match
             case `Content-Type`(contentType) ⇒ ContentTypeHeader(contentType)
             case `Content-Length`(length) ⇒ ContentLengthHeader(length)
             case _ ⇒ GenericHeader(parsedHeader)
-          }
-        }
 
         // Or they can be created more directly, without parsing.
         def contentType(contentType: ContentType): TypedHeader =
           new ContentTypeHeader(contentType)
         def contentLength(length: Long): TypedHeader =
           new ContentLengthHeader(length)
-      }
 
       // Users of ExampleLibrary should be able to create headers by
       // parsing strings
@@ -214,6 +200,3 @@ class HttpModelIntegrationSpec
       // headers.
       ExampleLibrary.contentLength(3)
       ExampleLibrary.contentType(ContentTypes.`text/plain(UTF-8)`)
-    }
-  }
-}

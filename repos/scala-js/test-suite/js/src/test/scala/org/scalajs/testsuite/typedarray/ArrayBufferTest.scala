@@ -16,23 +16,19 @@ import scala.scalajs.js.typedarray._
 
 object ArrayBufferTest extends Requires.TypedArray
 
-class ArrayBufferTest {
+class ArrayBufferTest
 
-  @Test def lengthConstructor(): Unit = {
+  @Test def lengthConstructor(): Unit =
     val x = new ArrayBuffer(100)
     assertTrue(x.isInstanceOf[ArrayBuffer])
     assertEquals(100, x.byteLength)
-  }
 
-  @Test def slice_with_one_arg(): Unit = {
+  @Test def slice_with_one_arg(): Unit =
     val x = new ArrayBuffer(100)
     val y = x.slice(10)
     assertEquals(90, y.byteLength)
-  }
 
-  @Test def slice_with_two_args(): Unit = {
+  @Test def slice_with_two_args(): Unit =
     val x = new ArrayBuffer(100)
     val y = x.slice(10, 20)
     assertEquals(10, y.byteLength)
-  }
-}

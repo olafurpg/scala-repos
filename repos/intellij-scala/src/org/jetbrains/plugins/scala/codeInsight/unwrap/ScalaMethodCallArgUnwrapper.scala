@@ -14,39 +14,33 @@ import scala.annotation.tailrec
   * 2014-06-26
   */
 class ScalaMethodCallArgUnwrapper
-    extends ScalaUnwrapper with ShortTextDescription {
+    extends ScalaUnwrapper with ShortTextDescription
 
   override def getDescription(e: PsiElement) = super.getDescription(e)
 
   override def isApplicableTo(e: PsiElement) =
     forMethodCallArg(e)((_, _) => true)(false)
 
-  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) = {
-    forMethodCallArg(element) { (expr, call) =>
+  override def doUnwrap(element: PsiElement, context: ScalaUnwrapContext) =
+    forMethodCallArg(element)  (expr, call) =>
       context.extractBlockOrSingleStatement(expr, call)
       context.delete(call)
-    } {}
-  }
+    {}
 
   override def collectAffectedElements(
-      e: PsiElement, toExtract: util.List[PsiElement]) = {
-    forMethodCallArg[PsiElement](e) { (expr, call) =>
+      e: PsiElement, toExtract: util.List[PsiElement]) =
+    forMethodCallArg[PsiElement](e)  (expr, call) =>
       super.collectAffectedElements(e, toExtract)
       call
-    }(e)
-  }
+    (e)
 
   private def forMethodCallArg[T](e: PsiElement)(
-      ifArg: (ScExpression, ScMethodCall) => T)(ifNot: => T) = {
-    e match {
+      ifArg: (ScExpression, ScMethodCall) => T)(ifNot: => T) =
+    e match
       case (expr: ScExpression) childOf ((_: ScArgumentExprList) childOf (call: ScMethodCall)) =>
         @tailrec
-        def maxCall(call: ScMethodCall): ScMethodCall = call.getParent match {
+        def maxCall(call: ScMethodCall): ScMethodCall = call.getParent match
           case parCall: ScMethodCall => maxCall(parCall)
           case _ => call
-        }
         ifArg(expr, maxCall(call))
       case _ => ifNot
-    }
-  }
-}

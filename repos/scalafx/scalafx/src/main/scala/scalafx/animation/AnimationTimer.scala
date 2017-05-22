@@ -36,7 +36,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define AT `AnimationTimer`
   */
-object AnimationTimer {
+object AnimationTimer
 
   /**
     * Converts a ScalaFX $AT to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/AnimationTimer.html $AT]], 
@@ -56,12 +56,10 @@ object AnimationTimer {
     */
   def apply(handler: Long => Unit): AnimationTimer =
     new AnimationTimer(
-        new jfxa.AnimationTimer {
-      def handle(now: Long) {
+        new jfxa.AnimationTimer
+      def handle(now: Long)
         handler(now)
-      }
-    }) {}
-}
+    ) {}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Animation.html $AT]].
@@ -72,7 +70,7 @@ object AnimationTimer {
   * @define AT `AnimationTimer`
   */
 abstract class AnimationTimer(override val delegate: jfxa.AnimationTimer)
-    extends SFXDelegate[jfxa.AnimationTimer] {
+    extends SFXDelegate[jfxa.AnimationTimer]
 
   /**
     * This method needs to be overridden by extending classes.
@@ -80,21 +78,17 @@ abstract class AnimationTimer(override val delegate: jfxa.AnimationTimer)
     * @param now The timestamp of the current frame given in nanoseconds. This value will be the same for all $AT's
     *            called during one frame.
     */
-  def handle(now: Long) {
+  def handle(now: Long)
     delegate.handle(now)
-  }
 
   /**
     * Starts the $AT's.
     */
-  def start() {
+  def start()
     delegate.start()
-  }
 
   /**
     * Stops the $AT's. It can be activated again by calling `start`.
     */
-  def stop() {
+  def stop()
     delegate.stop()
-  }
-}

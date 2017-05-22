@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object SitaClustering extends PerfTestSuite {
+object SitaClustering extends PerfTestSuite
   query(
       """
     import std::stats::*
@@ -32,4 +32,3 @@ object SitaClustering extends PerfTestSuite {
     kMedians(points, 5)
     """
   )
-}

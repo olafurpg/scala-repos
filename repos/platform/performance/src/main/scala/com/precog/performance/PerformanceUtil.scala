@@ -44,11 +44,11 @@ import org.joda.time.format._
 import scalaz._
 import Scalaz._
 
-class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
+class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String)
 
   val format = ISODateTimeFormat.dateTime
 
-  class BenchmarkDecomposer[T] extends Decomposer[BenchmarkResults[T]] {
+  class BenchmarkDecomposer[T] extends Decomposer[BenchmarkResults[T]]
     override def decompose(results: BenchmarkResults[T]): JValue =
       JObject(
           List(
@@ -61,7 +61,6 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
               JField("baseline", results.baseline),
               JField("times", results.timings.serialize)
           ))
-  }
 
 //  class BenchmarkExtractor[T] extends ValidatedExtraction[BenchmarkResults[T]] {    
 //    override def validated(obj: JValue): Validation[Error, BenchmarkResults[T]] =
@@ -77,7 +76,7 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
   private val basePath = "vfs/" + path
   private val baseUrl = apiEndpoint + basePath
 
-  def uploadResults[T](testId: String, results: BenchmarkResults[T]) {
+  def uploadResults[T](testId: String, results: BenchmarkResults[T])
     val content = resultsToJson(results)
 
     val client = new HttpClientXLightWeb
@@ -88,17 +87,14 @@ class PerformanceUtil(apiEndpoint: String, apiKey: String, path: String) {
       .post[JValue](testId)(content)
 
     val r = Await.result(result, Duration(100, "seconds"))
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val results =
       BenchmarkResults[Int](10, 10, 0.0, Vector(100, 100, 100, 100))
     uploadResults[Int]("test_query", results)
     AkkaDefaults.actorSystem.shutdown
-  }
-}
 
-object PerformanceUtil {
+object PerformanceUtil
   val matheson = new PerformanceUtil("http://beta2012v1.precog.io/v1/",
                                      "D45C1ABE-6B4C-4651-85D1-4FFD783CE1EC",
                                      "/matheson/beta/perf/")
@@ -106,4 +102,3 @@ object PerformanceUtil {
                                         "C79AAFEA-C9A5-4451-92CE-EF49E5BB5113",
                                         "/perf_results/beta/v1/")
   val default = precog_test
-}

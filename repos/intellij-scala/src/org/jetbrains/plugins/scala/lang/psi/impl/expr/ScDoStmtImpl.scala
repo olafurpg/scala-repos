@@ -16,29 +16,23 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr._
   * Date: 06.03.2008
   */
 class ScDoStmtImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScDoStmt {
+    extends ScalaPsiElementImpl(node) with ScDoStmt
   override def toString: String = "DoStatement"
 
   def getExprBody: Option[ScExpression] = findChild(classOf[ScExpression])
-  def hasExprBody: Boolean = {
-    getExprBody match {
+  def hasExprBody: Boolean =
+    getExprBody match
       case None => false
       case Some(_) => true
-    }
-  }
 
-  def condition = {
+  def condition =
     val rpar = findChildByType[PsiElement](ScalaTokenTypes.tLPARENTHESIS)
     val c =
       if (rpar != null)
         PsiTreeUtil.getNextSiblingOfType(rpar, classOf[ScExpression]) else null
     if (c == null) None else Some(c)
-  }
 
-  override def accept(visitor: PsiElementVisitor): Unit = {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor): Unit =
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
-}

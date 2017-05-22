@@ -4,7 +4,7 @@ package resolve
 
 import org.jetbrains.plugins.scala.lang.resolve.ResolveTargets._
 
-object StdKinds {
+object StdKinds
   val stableQualRef = ValueSet(PACKAGE, OBJECT, VAL)
   val stableQualOrClass = stableQualRef + CLASS
   val noPackagesClassCompletion = ValueSet(OBJECT, VAL, CLASS)
@@ -25,4 +25,3 @@ object StdKinds {
   val varsRef = ValueSet(VAR)
 
   val packageRef = ValueSet(PACKAGE)
-}

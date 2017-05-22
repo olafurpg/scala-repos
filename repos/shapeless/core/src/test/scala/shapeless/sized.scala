@@ -22,12 +22,12 @@ import org.junit.Assert._
 import shapeless.test._
 import testutil._
 
-class SizedTests {
+class SizedTests
   import nat._
   import syntax.sized._
 
   @Test
-  def testBasics {
+  def testBasics
     val l0 = List.empty[Int]
     val l1 = List(1)
     val l2 = List(1, 2)
@@ -137,14 +137,12 @@ class SizedTests {
     val s = cl.get.size
     val evens = cl.get.filter(_ % 2 == 0)
 
-    val p = cl.get match {
-      case Sized(a, b, _ *) => {
+    val p = cl.get match
+      case Sized(a, b, _ *) =>
           typed[Int](a)
           typed[Int](b)
           (a - b, a + b)
-        }
       case _ => (9, 10)
-    }
     typed[(Int, Int)](p)
     assertEquals((-1, 3), p)
 
@@ -206,7 +204,6 @@ class SizedTests {
     illTyped(""" Sized[Set](1, 1, 1) """)
 
     illTyped(""" new Sized[Set[Int], _3](Set(1, 1, 1)) """)
-  }
 
   trait Fruit
   case class Apple() extends Fruit
@@ -281,7 +278,7 @@ class SizedTests {
     Sized[List](m2iExist, m2sExist, m2iExist, m2iExist, m2dExist)
 
   @Test
-  def testToHList {
+  def testToHList
     def equalInferredTypes[A, B](a: A, b: B)(implicit eq: A =:= B) {}
 
     val hlApap = apapSized.toHList
@@ -374,10 +371,9 @@ class SizedTests {
     typed[M2[_ >: Double with Int with String, _]](
         hlM2eim2esm2eim2eem2ed(Nat._4))
     assertEquals(m2eim2esm2eim2eem2ed, hlM2eim2esm2eim2eem2ed)
-  }
 
   @Test
-  def testAt {
+  def testAt
     val ss = Sized[List](0, 1, 2)
     typed[Int](ss(0))
     typed[Int](ss(1))
@@ -405,10 +401,9 @@ class SizedTests {
     illTyped("""
       ss(3)
     """)
-  }
 
   @Test
-  def testTupled {
+  def testTupled
     val ss = Sized[List](0, 1, 2)
     val r1 = ss.tupled
     assertTypedEquals[(Int, Int, Int)]((0, 1, 2), r1)
@@ -417,5 +412,3 @@ class SizedTests {
     assertTypedEquals[Int](0, x)
     assertTypedEquals[Int](1, y)
     assertTypedEquals[Int](2, z)
-  }
-}

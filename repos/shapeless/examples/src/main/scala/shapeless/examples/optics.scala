@@ -23,7 +23,7 @@ import shapeless._
  * 
  * @author Miles Sabin
  */
-package opticDemoDatatypes {
+package opticDemoDatatypes
   case class Address(street: String, city: String)
   case class Person(name: String, age: Int, address: Address)
 
@@ -33,9 +33,8 @@ package opticDemoDatatypes {
 
   case class Foo(i: Int, s: String)
   case class Bar(i: Int, b: Boolean)
-}
 
-object OpticExamples extends App {
+object OpticExamples extends App
   import opticDemoDatatypes._
 
   // 1. Basic nested case classes
@@ -114,4 +113,3 @@ object OpticExamples extends App {
 
   val bar2 = update(bar)(7)
   assert(bar2 == Bar(7, true))
-}

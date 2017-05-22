@@ -8,7 +8,7 @@ package free
   * we have forgotten that `F` is a functor.
   * Can be seen as a partially applied `map` for the functor `F`.
   */
-abstract class Yoneda[F[_], A] extends Serializable { self =>
+abstract class Yoneda[F[_], A] extends Serializable  self =>
   def apply[B](f: A => B): F[B]
 
   /**
@@ -25,26 +25,21 @@ abstract class Yoneda[F[_], A] extends Serializable { self =>
     * Simple function composition. Allows map fusion without traversing an `F`.
     */
   def map[B](f: A => B): Yoneda[F, B] =
-    new Yoneda[F, B] {
+    new Yoneda[F, B]
       def apply[C](g: B => C): F[C] = self(f andThen g)
-    }
-}
 
-object Yoneda {
+object Yoneda
 
   /**
     * `Yoneda[F, _]` is a functor for any `F`.
     */
   implicit def yonedaFunctor[F[_]]: Functor[Yoneda[F, ?]] =
-    new Functor[Yoneda[F, ?]] {
+    new Functor[Yoneda[F, ?]]
       def map[A, B](ya: Yoneda[F, A])(f: A => B): Yoneda[F, B] = ya map f
-    }
 
   /**
     * `F[A]` converts to `Yoneda[F, A]` for any functor `F`.
     */
   def apply[F[_], A](fa: F[A])(implicit F: Functor[F]): Yoneda[F, A] =
-    new Yoneda[F, A] {
+    new Yoneda[F, A]
       def apply[B](f: A => B): F[B] = F.map(fa)(f)
-    }
-}

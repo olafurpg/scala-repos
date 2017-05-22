@@ -18,7 +18,7 @@ import org.scalatest.mock.MockitoSugar
 import scala.collection.JavaConverters._
 
 @RunWith(classOf[JUnitRunner])
-class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
+class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar
   val port1 = 80 // not bound
   val port2 = 53 // ditto
 
@@ -30,7 +30,7 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
   )(
       f: (ZookeeperServerSetCluster, (InetSocketAddress,
       EndpointMap) => Unit) => Unit
-  ) {
+  )
     val serverSet = mock[ServerSet]
     val monitorCaptor =
       ArgumentCaptor.forClass(classOf[HostChangeMonitor[ServiceInstance]])
@@ -42,12 +42,11 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
     val clusterMonitor = monitorCaptor.getValue()
 
     def registerHost(
-        socketAddr: InetSocketAddress, extraEndpoints: EndpointMap) {
+        socketAddr: InetSocketAddress, extraEndpoints: EndpointMap)
       val additionalEndpoints =
-        extraEndpoints map {
+        extraEndpoints map
           case (name, addr) =>
             name -> new Endpoint(addr.getHostName, addr.getPort)
-        }
 
       val serviceInstance = new ServiceInstance(
           new Endpoint(socketAddr.getHostName, socketAddr.getPort),
@@ -58,12 +57,10 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
         ImmutableSet.builder[ServiceInstance].add(serviceInstance).build()
 
       clusterMonitor.onChange(serviceInstances)
-    }
 
     f(cluster, registerHost)
-  }
 
-  test("ZookeeperServerSetCluster registers the server with ZooKeeper") {
+  test("ZookeeperServerSetCluster registers the server with ZooKeeper")
     val serverSet = mock[ServerSet]
     when(
         serverSet.join(anyObject, anyObject, anyObject[Status])
@@ -76,10 +73,9 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
     cluster.join(localAddress)
 
     verify(serverSet).join(localAddress, EmptyEndpointMap.asJava, Status.ALIVE)
-  }
 
   test(
-      "ZookeeperServerSetCluster registers the server with multiple endpoints") {
+      "ZookeeperServerSetCluster registers the server with multiple endpoints")
     val serverSet = mock[ServerSet]
     when(
         serverSet.join(anyObject, anyObject, anyObject[Status])
@@ -95,12 +91,11 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
 
     verify(serverSet).join(
         localAddress, Map("alt" -> altLocalAddress).asJava, Status.ALIVE)
-  }
 
   // CSL-2175
-  if (!sys.props.contains("SKIP_FLAKY")) {
-    test("ZookeeperServerSetCluster receives a registration from ZooKeeper") {
-      forClient(None) { (cluster, registerHost) =>
+  if (!sys.props.contains("SKIP_FLAKY"))
+    test("ZookeeperServerSetCluster receives a registration from ZooKeeper")
+      forClient(None)  (cluster, registerHost) =>
         val (current, futureChanges) = cluster.snap
         assert(current.isEmpty)
 
@@ -109,11 +104,9 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
 
         val changes = Await.result(futureChanges, 1.minute)
         assert(changes.head == Cluster.Add(remoteAddress: SocketAddress))
-      }
-    }
 
-    test("ZookeeperServerSetCluster is able to block till server set is ready") {
-      forClient(None) { (cluster, registerHost) =>
+    test("ZookeeperServerSetCluster is able to block till server set is ready")
+      forClient(None)  (cluster, registerHost) =>
         assert(!cluster.ready.isDefined)
 
         val remoteAddress = new InetSocketAddress("host", port1)
@@ -122,11 +115,9 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
         assert(cluster.ready.isDefined)
         val (hosts, _) = cluster.snap
         assert(hosts == Seq(remoteAddress: SocketAddress))
-      }
-    }
 
-    test("ZookeeperServerSetCluster is able to use an additional endpoint") {
-      forClient(Some("other-endpoint")) { (cluster, registerHost) =>
+    test("ZookeeperServerSetCluster is able to use an additional endpoint")
+      forClient(Some("other-endpoint"))  (cluster, registerHost) =>
         val (current, futureChanges) = cluster.snap
         assert(current.isEmpty)
 
@@ -137,16 +128,10 @@ class ZookeeperServerSetClusterSpec extends FunSuite with MockitoSugar {
 
         val changes = Await.result(futureChanges, 1.minute)
         assert(changes.head == Cluster.Add(otherRemoteAddress: SocketAddress))
-      }
-    }
 
     test(
-        "ZookeeperServerSetCluster ignores a server which does not specify the additional endpoint") {
-      forClient(Some("this-endpoint")) { (cluster, registerHost) =>
+        "ZookeeperServerSetCluster ignores a server which does not specify the additional endpoint")
+      forClient(Some("this-endpoint"))  (cluster, registerHost) =>
         val remoteAddress = new InetSocketAddress("host", port1)
         registerHost(remoteAddress, EmptyEndpointMap)
         assert(!cluster.ready.isDefined)
-      }
-    }
-  }
-}

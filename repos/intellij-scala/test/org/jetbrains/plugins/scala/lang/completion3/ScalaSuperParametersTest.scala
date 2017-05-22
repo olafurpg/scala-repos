@@ -8,8 +8,8 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
   * @author Alefas
   * @since 04.09.13
   */
-class ScalaSuperParametersTest extends ScalaCodeInsightTestBase {
-  def testConstructorCall() {
+class ScalaSuperParametersTest extends ScalaCodeInsightTestBase
+  def testConstructorCall()
     val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
@@ -35,9 +35,8 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
-  }
 
-  def testConstructorCall2() {
+  def testConstructorCall2()
     val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
@@ -63,9 +62,8 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
-  }
 
-  def testConstructorCall2Smart() {
+  def testConstructorCall2Smart()
     val fileText = """
 class TUI {
   class A(x: Int, y: Int) {
@@ -91,9 +89,8 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
-  }
 
-  def testSuperCall() {
+  def testSuperCall()
     val fileText = """
 class TUI {
   class A {
@@ -129,9 +126,8 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "x, y").get)
     checkResultByText(resultText)
-  }
 
-  def testSuperCall2() {
+  def testSuperCall2()
     val fileText = """
 class TUI {
   class A {
@@ -167,5 +163,3 @@ class TUI {
     completeLookupItem(
         activeLookup.find(le => le.getLookupString == "x, y, z").get)
     checkResultByText(resultText)
-  }
-}

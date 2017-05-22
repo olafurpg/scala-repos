@@ -12,29 +12,27 @@ import scala.concurrent.duration._
 import akka.stream.testkit.scaladsl.TestSink
 import akka.stream.testkit.Utils
 
-class FlowDetacherSpec extends AkkaSpec {
+class FlowDetacherSpec extends AkkaSpec
 
   implicit val materializer = ActorMaterializer()
 
-  "A Detacher" must {
+  "A Detacher" must
 
-    "pass through all elements" in Utils.assertAllStagesStopped {
+    "pass through all elements" in Utils.assertAllStagesStopped
       Source(1 to 100).detach.runWith(Sink.seq).futureValue should ===(
           1 to 100)
-    }
 
-    "pass through failure" in Utils.assertAllStagesStopped {
+    "pass through failure" in Utils.assertAllStagesStopped
       val ex = new Exception("buh")
       val result = Source(1 to 100)
         .map(x ⇒ if (x == 50) throw ex else x)
         .detach
         .runWith(Sink.seq)
-      intercept[Exception] {
+      intercept[Exception]
         Await.result(result, 2.seconds)
-      } should ===(ex)
-    }
+      should ===(ex)
 
-    "emit the last element when completed without demand" in Utils.assertAllStagesStopped {
+    "emit the last element when completed without demand" in Utils.assertAllStagesStopped
       Source
         .single(42)
         .detach
@@ -42,6 +40,3 @@ class FlowDetacherSpec extends AkkaSpec {
         .ensureSubscription()
         .expectNoMsg(500.millis)
         .requestNext() should ===(42)
-    }
-  }
-}

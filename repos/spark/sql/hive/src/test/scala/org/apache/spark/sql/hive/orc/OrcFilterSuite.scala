@@ -33,21 +33,21 @@ import org.apache.spark.sql.sources.HadoopFsRelation
 /**
   * A test suite that tests ORC filter API based filter pushdown optimization.
   */
-class OrcFilterSuite extends QueryTest with OrcTest {
+class OrcFilterSuite extends QueryTest with OrcTest
   private def checkFilterPredicate(df: DataFrame,
                                    predicate: Predicate,
-                                   checker: (SearchArgument) => Unit): Unit = {
+                                   checker: (SearchArgument) => Unit): Unit =
     val output = predicate.collect { case a: Attribute => a }.distinct
     val query =
       df.select(output.map(e => Column(e)): _*).where(Column(predicate))
 
     var maybeRelation: Option[HadoopFsRelation] = None
-    val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan.collect {
+    val maybeAnalyzedPredicate = query.queryExecution.optimizedPlan.collect
       case PhysicalOperation(
           _, filters, LogicalRelation(orcRelation: HadoopFsRelation, _, _)) =>
         maybeRelation = Some(orcRelation)
         filters
-    }.flatten.reduceLeftOption(_ && _)
+    .flatten.reduceLeftOption(_ && _)
     assert(maybeAnalyzedPredicate.isDefined,
            "No filter is analyzed from the given query")
 
@@ -59,35 +59,28 @@ class OrcFilterSuite extends QueryTest with OrcTest {
     assert(maybeFilter.isDefined,
            s"Couldn't generate filter predicate for $selectedFilters")
     checker(maybeFilter.get)
-  }
 
   private def checkFilterPredicate(
       predicate: Predicate, filterOperator: PredicateLeaf.Operator)(
-      implicit df: DataFrame): Unit = {
-    def checkComparisonOperator(filter: SearchArgument) = {
+      implicit df: DataFrame): Unit =
+    def checkComparisonOperator(filter: SearchArgument) =
       val operator = filter.getLeaves.asScala
       assert(operator.map(_.getOperator).contains(filterOperator))
-    }
     checkFilterPredicate(df, predicate, checkComparisonOperator)
-  }
 
   private def checkFilterPredicate(predicate: Predicate, stringExpr: String)(
-      implicit df: DataFrame): Unit = {
-    def checkLogicalOperator(filter: SearchArgument) = {
+      implicit df: DataFrame): Unit =
+    def checkLogicalOperator(filter: SearchArgument) =
       assert(filter.toString == stringExpr)
-    }
     checkFilterPredicate(df, predicate, checkLogicalOperator)
-  }
 
-  test("filter pushdown - boolean") {
-    withOrcDataFrame((true :: false :: Nil).map(b => Tuple1.apply(Option(b)))) {
+  test("filter pushdown - boolean")
+    withOrcDataFrame((true :: false :: Nil).map(b => Tuple1.apply(Option(b))))
       implicit df =>
         checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
-    }
-  }
 
-  test("filter pushdown - integer") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i)))) { implicit df =>
+  test("filter pushdown - integer")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i))))  implicit df =>
       checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
 
       checkFilterPredicate('_1 === 1, PredicateLeaf.Operator.EQUALS)
@@ -107,11 +100,9 @@ class OrcFilterSuite extends QueryTest with OrcTest {
       checkFilterPredicate(Literal(1) >= '_1,
                            PredicateLeaf.Operator.LESS_THAN_EQUALS)
       checkFilterPredicate(Literal(4) <= '_1, PredicateLeaf.Operator.LESS_THAN)
-    }
-  }
 
-  test("filter pushdown - long") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toLong)))) {
+  test("filter pushdown - long")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toLong))))
       implicit df =>
         checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
 
@@ -135,11 +126,9 @@ class OrcFilterSuite extends QueryTest with OrcTest {
                              PredicateLeaf.Operator.LESS_THAN_EQUALS)
         checkFilterPredicate(Literal(4) <= '_1,
                              PredicateLeaf.Operator.LESS_THAN)
-    }
-  }
 
-  test("filter pushdown - float") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toFloat)))) {
+  test("filter pushdown - float")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toFloat))))
       implicit df =>
         checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
 
@@ -163,11 +152,9 @@ class OrcFilterSuite extends QueryTest with OrcTest {
                              PredicateLeaf.Operator.LESS_THAN_EQUALS)
         checkFilterPredicate(Literal(4) <= '_1,
                              PredicateLeaf.Operator.LESS_THAN)
-    }
-  }
 
-  test("filter pushdown - double") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toDouble)))) {
+  test("filter pushdown - double")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i.toDouble))))
       implicit df =>
         checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
 
@@ -191,11 +178,9 @@ class OrcFilterSuite extends QueryTest with OrcTest {
                              PredicateLeaf.Operator.LESS_THAN_EQUALS)
         checkFilterPredicate(Literal(4) <= '_1,
                              PredicateLeaf.Operator.LESS_THAN)
-    }
-  }
 
-  test("filter pushdown - string") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(i.toString))) { implicit df =>
+  test("filter pushdown - string")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(i.toString)))  implicit df =>
       checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
 
       checkFilterPredicate('_1 === "1", PredicateLeaf.Operator.EQUALS)
@@ -218,21 +203,16 @@ class OrcFilterSuite extends QueryTest with OrcTest {
                            PredicateLeaf.Operator.LESS_THAN_EQUALS)
       checkFilterPredicate(Literal("4") <= '_1,
                            PredicateLeaf.Operator.LESS_THAN)
-    }
-  }
 
-  test("filter pushdown - binary") {
-    implicit class IntToBinary(int: Int) {
+  test("filter pushdown - binary")
+    implicit class IntToBinary(int: Int)
       def b: Array[Byte] = int.toString.getBytes(StandardCharsets.UTF_8)
-    }
 
-    withOrcDataFrame((1 to 4).map(i => Tuple1(i.b))) { implicit df =>
+    withOrcDataFrame((1 to 4).map(i => Tuple1(i.b)))  implicit df =>
       checkFilterPredicate('_1.isNull, PredicateLeaf.Operator.IS_NULL)
-    }
-  }
 
-  test("filter pushdown - combinations with logical operators") {
-    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i)))) { implicit df =>
+  test("filter pushdown - combinations with logical operators")
+    withOrcDataFrame((1 to 4).map(i => Tuple1(Option(i))))  implicit df =>
       // Because `ExpressionTree` is not accessible at Hive 1.2.x, this should be checked
       // in string form in order to check filter creation including logical operators
       // such as `and`, `or` or `not`. So, this function uses `SearchArgument.toString()`
@@ -268,6 +248,3 @@ class OrcFilterSuite extends QueryTest with OrcTest {
           |leaf-2 = (LESS_THAN_EQUALS _1 3)
           |expr = (and (not leaf-0) leaf-1 (not leaf-2))""".stripMargin.trim
       )
-    }
-  }
-}

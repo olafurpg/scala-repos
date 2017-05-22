@@ -13,16 +13,12 @@ import play.api.inject.bind
 import router.RoutingDslBuilder
 
 //#load
-class AppLoader extends ApplicationLoader {
-  def load(context: Context) = {
+class AppLoader extends ApplicationLoader
+  def load(context: Context) =
     new MyComponents(context).application
-  }
-}
 
 class MyComponents(context: Context)
-    extends BuiltInComponentsFromContext(context) {
-  lazy val router = Router.from {
+    extends BuiltInComponentsFromContext(context)
+  lazy val router = Router.from
     RoutingDslBuilder.getRouter.asScala.routes
-  }
-}
 //#load

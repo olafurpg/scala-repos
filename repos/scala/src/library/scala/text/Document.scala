@@ -31,7 +31,7 @@ case class DocCons(hd: Document, tl: Document) extends Document
   * @version 1.0
   */
 @deprecated("This class will be removed.", "2.11.0")
-abstract class Document {
+abstract class Document
   def ::(hd: Document): Document = DocCons(hd, this)
   def ::(hd: String): Document = DocCons(DocText(hd), this)
   def :/:(hd: Document): Document = hd :: DocBreak :: this
@@ -41,10 +41,10 @@ abstract class Document {
     * Format this document on `writer` and try to set line
     * breaks so that the result fits in `width` columns.
     */
-  def format(width: Int, writer: Writer) {
+  def format(width: Int, writer: Writer)
     type FmtState = (Int, Boolean, Document)
 
-    def fits(w: Int, state: List[FmtState]): Boolean = state match {
+    def fits(w: Int, state: List[FmtState]): Boolean = state match
       case _ if w < 0 =>
         false
       case List() =>
@@ -63,18 +63,16 @@ abstract class Document {
         true
       case (i, _, DocGroup(d)) :: z =>
         fits(w, (i, false, d) :: z)
-    }
 
-    def spaces(n: Int) {
+    def spaces(n: Int)
       var rem = n
       while (rem >= 16) { writer write "                "; rem -= 16 }
       if (rem >= 8) { writer write "        "; rem -= 8 }
       if (rem >= 4) { writer write "    "; rem -= 4 }
       if (rem >= 2) { writer write "  "; rem -= 2 }
       if (rem == 1) { writer write " " }
-    }
 
-    def fmt(k: Int, state: List[FmtState]): Unit = state match {
+    def fmt(k: Int, state: List[FmtState]): Unit = state match
       case List() => ()
       case (_, _, DocNil) :: z =>
         fmt(k, z)
@@ -97,14 +95,11 @@ abstract class Document {
         fmt(k, (i, !fitsFlat, d) :: z)
       case _ =>
         ()
-    }
 
     fmt(0, (0, false, DocGroup(this)) :: Nil)
-  }
-}
 
 @deprecated("This object will be removed.", "2.11.0")
-object Document {
+object Document
 
   /** The empty document */
   def empty = DocNil
@@ -123,4 +118,3 @@ object Document {
 
   /** A nested document, which will be indented as specified. */
   def nest(i: Int, d: Document): Document = DocNest(i, d)
-}

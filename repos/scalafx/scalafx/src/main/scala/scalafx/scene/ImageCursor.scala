@@ -35,7 +35,7 @@ import scalafx.beans.property.{ReadOnlyDoubleProperty, ReadOnlyObjectProperty}
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.image.Image
 
-object ImageCursor {
+object ImageCursor
   implicit def sfxImageCursor2jfx(c: ImageCursor): jfxs.ImageCursor =
     if (c != null) c.delegate else null
 
@@ -56,11 +56,10 @@ object ImageCursor {
     * Returns the maximum number of colors supported in a custom image cursor palette.
     */
   def getMaximumColors = jfxs.ImageCursor.getMaximumColors
-}
 
 class ImageCursor(
     override val delegate: jfxs.ImageCursor = new jfxs.ImageCursor)
-    extends Cursor(delegate) with SFXDelegate[jfxs.ImageCursor] {
+    extends Cursor(delegate) with SFXDelegate[jfxs.ImageCursor]
 
   /**
     * Constructs an ImageCursor from the specified image.
@@ -87,4 +86,3 @@ class ImageCursor(
     * The image to display when the cursor is active.
     */
   def image: ReadOnlyObjectProperty[jfxsi.Image] = delegate.imageProperty
-}

@@ -10,20 +10,19 @@ import play.api.db.{Database, Databases}
 
 // TODO: fuctional test with InvalidDatabaseRevision exception
 
-object EvolutionsSpec extends Specification {
+object EvolutionsSpec extends Specification
 
   sequential
 
   import TestEvolutions._
 
-  "Evolutions" should {
+  "Evolutions" should
 
-    trait CreateSchema {
+    trait CreateSchema
       this: WithEvolutions =>
       execute("create schema testschema")
-    }
 
-    trait UpScripts {
+    trait UpScripts
       this: WithEvolutions =>
       val scripts = evolutions.scripts(Seq(a1, a2, a3))
 
@@ -38,9 +37,8 @@ object EvolutionsSpec extends Specification {
       resultSet.getString(2) must_== "alice"
       resultSet.getInt(3) must_== 42
       resultSet.next must beFalse
-    }
 
-    trait DownScripts {
+    trait DownScripts
       this: WithEvolutions =>
       val original = evolutions.scripts(Seq(a1, a2, a3))
       evolutions.evolve(original, autocommit = true)
@@ -63,9 +61,8 @@ object EvolutionsSpec extends Specification {
       resultSet.getString(2) must_== "bob"
       resultSet.getInt(3) must_== 42
       resultSet.next must beFalse
-    }
 
-    trait ReportInconsistentStateAndResolve {
+    trait ReportInconsistentStateAndResolve
       this: WithEvolutions =>
       val broken = evolutions.scripts(Seq(c1, a2, a3))
       val fixed = evolutions.scripts(Seq(a1, a2, a3))
@@ -80,9 +77,8 @@ object EvolutionsSpec extends Specification {
       evolutions.resolve(1)
 
       evolutions.evolve(fixed, autocommit = true)
-    }
 
-    trait ResetDatabase {
+    trait ResetDatabase
       this: WithEvolutions =>
       val scripts = evolutions.scripts(Seq(a1, a2, a3))
       evolutions.evolve(scripts, autocommit = true)
@@ -96,30 +92,26 @@ object EvolutionsSpec extends Specification {
 
       // Should be no table because all downs should have been executed
       executeQuery("select * from test") must throwA[SQLException]
-    }
 
-    trait ProvideHelperForTesting {
+    trait ProvideHelperForTesting
       this: WithEvolutions =>
       Evolutions.withEvolutions(
-          database, SimpleEvolutionsReader.forDefault(a1, a2, a3)) {
+          database, SimpleEvolutionsReader.forDefault(a1, a2, a3))
         // Check that there's data in the database
         val resultSet = executeQuery("select * from test")
         resultSet.next must beTrue
         resultSet.close()
-      }
 
       // Check that cleanup was done afterwards
       executeQuery("select * from test") must throwA[SQLException]
-    }
 
-    trait ProvideHelperForTestingSchema {
+    trait ProvideHelperForTestingSchema
       this: WithEvolutions =>
       // Check if the play_evolutions table was created within the testschema
       val resultSet =
         executeQuery("select count(0) from testschema.play_evolutions")
       resultSet.next must beTrue
       resultSet.close()
-    }
 
     "apply up scripts" in new UpScripts with WithEvolutions
     "apply up scripts derby" in new UpScripts with WithDerbyEvolutions
@@ -147,9 +139,8 @@ object EvolutionsSpec extends Specification {
     with WithDerbyEvolutionsSchema
     "provide a helper for testing derby schema" in new ProvideHelperForTestingSchema
     with WithDerbyEvolutionsSchema
-  }
 
-  trait WithEvolutions extends After {
+  trait WithEvolutions extends After
     lazy val database = Databases.inMemory("default")
 
     lazy val evolutions = new DatabaseEvolutions(database)
@@ -161,27 +152,23 @@ object EvolutionsSpec extends Specification {
 
     def execute(sql: String): Boolean = connection.createStatement.execute(sql)
 
-    def after = {
+    def after =
       connection.close()
       database.shutdown()
-    }
-  }
 
-  trait WithDerbyEvolutions extends WithEvolutions {
+  trait WithDerbyEvolutions extends WithEvolutions
     override lazy val database: Database = Databases(
         driver = "org.apache.derby.jdbc.EmbeddedDriver",
         url = "jdbc:derby:memory:default;create=true"
     )
-  }
 
-  trait WithDerbyEvolutionsSchema extends WithDerbyEvolutions {
+  trait WithDerbyEvolutionsSchema extends WithDerbyEvolutions
     override lazy val evolutions: DatabaseEvolutions = new DatabaseEvolutions(
         database = database,
         schema = "testschema"
     )
-  }
 
-  object TestEvolutions {
+  object TestEvolutions
     val a1 = Evolution(
         1,
         "create table test (id bigint not null, name varchar(255));",
@@ -216,5 +203,3 @@ object EvolutionsSpec extends Specification {
         1,
         "creaTYPOe table test (id bigint not null, name varchar(255));"
     )
-  }
-}

@@ -7,7 +7,7 @@ import lila.db.BSON._
 import lila.db.Types.Coll
 import lila.user.User
 
-private final class DeviceApi(coll: Coll) {
+private final class DeviceApi(coll: Coll)
 
   private implicit val DeviceBSONHandler = Macros.handler[Device]
 
@@ -27,7 +27,7 @@ private final class DeviceApi(coll: Coll) {
       .sort(BSONDocument("seenAt" -> -1))
       .one[Device]
 
-  def register(user: User, platform: String, deviceId: String) = {
+  def register(user: User, platform: String, deviceId: String) =
     lila.mon.push.register.in(platform)()
     coll
       .update(BSONDocument("_id" -> deviceId),
@@ -39,10 +39,7 @@ private final class DeviceApi(coll: Coll) {
               ),
               upsert = true)
       .void
-  }
 
-  def unregister(user: User) = {
+  def unregister(user: User) =
     lila.mon.push.register.out()
     coll.remove(BSONDocument("userId" -> user.id)).void
-  }
-}

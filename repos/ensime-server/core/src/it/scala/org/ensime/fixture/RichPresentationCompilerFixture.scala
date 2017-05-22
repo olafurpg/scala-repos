@@ -16,20 +16,19 @@ import scala.tools.nsc.Settings
 import scala.tools.nsc.interactive.Global
 import scala.tools.nsc.reporters.StoreReporter
 
-trait RichPresentationCompilerFixture {
+trait RichPresentationCompilerFixture
   def withRichPresentationCompiler(
       testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
   ): Any
-}
 
-object RichPresentationCompilerFixture {
+object RichPresentationCompilerFixture
   private[fixture] def create(
       config: EnsimeConfig,
       search: SearchService
   )(
       implicit system: ActorSystem,
       vfs: EnsimeVFS
-  ): RichPresentationCompiler = {
+  ): RichPresentationCompiler =
     val scalaLib = config.allJars.find(_.getName.contains("scala-library")).get
 
     val presCompLog = LoggerFactory.getLogger(classOf[Global])
@@ -54,47 +53,37 @@ object RichPresentationCompilerFixture {
         indexer.ref,
         search
     )
-  }
-}
 
 trait IsolatedRichPresentationCompilerFixture
     extends RichPresentationCompilerFixture with IsolatedEnsimeVFSFixture
-    with IsolatedTestKitFixture with IsolatedSearchServiceFixture {
+    with IsolatedTestKitFixture with IsolatedSearchServiceFixture
 
   override def withRichPresentationCompiler(
       testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
-  ): Any = {
-    withVFS { implicit vfs =>
-      withTestKit { testkit =>
+  ): Any =
+    withVFS  implicit vfs =>
+      withTestKit  testkit =>
         import testkit._
-        withSearchService { (config, search) =>
+        withSearchService  (config, search) =>
           import org.ensime.fixture.RichPresentationCompilerFixture._
           val pc = create(config, search)
-          try {
+          try
             testCode(testkit, config, pc)
-          } finally {
+          finally
             pc.askShutdown()
-          }
-        }
-      }
-    }
-  }
-}
 
 trait SharedRichPresentationCompilerFixture
     extends RichPresentationCompilerFixture with SharedTestKitFixture
-    with SharedSearchServiceFixture {
+    with SharedSearchServiceFixture
 
   private[fixture] var pc: RichPresentationCompiler = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     import org.ensime.fixture.RichPresentationCompilerFixture._
     implicit val system = _testkit.system
     pc = create(_config, _search)
-  }
 
   override def withRichPresentationCompiler(
       testCode: (TestKitFix, EnsimeConfig, RichPresentationCompiler) => Any
   ): Any = testCode(_testkit, _config, pc)
-}

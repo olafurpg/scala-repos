@@ -10,7 +10,7 @@ final class Matcher private[regex](private var pattern0: Pattern,
                                    private var input0: CharSequence,
                                    private var regionStart0: Int,
                                    private var regionEnd0: Int)
-    extends AnyRef with MatchResult {
+    extends AnyRef with MatchResult
 
   import Matcher._
 
@@ -30,7 +30,7 @@ final class Matcher private[regex](private var pattern0: Pattern,
 
   // Lookup methods
 
-  def matches(): Boolean = {
+  def matches(): Boolean =
     reset()
     find()
     // TODO this check is wrong with non-greedy patterns
@@ -39,44 +39,40 @@ final class Matcher private[regex](private var pattern0: Pattern,
     // - They might not behave as expected when newline characters are present
     if ((lastMatch ne null) && (start != 0 || end != inputstr.length)) reset()
     lastMatch ne null
-  }
 
-  def lookingAt(): Boolean = {
+  def lookingAt(): Boolean =
     reset()
     find()
     if ((lastMatch ne null) && (start != 0)) reset()
     lastMatch ne null
-  }
 
   def find(): Boolean =
-    if (canStillFind) {
+    if (canStillFind)
       lastMatchIsValid = true
       lastMatch = regexp.exec(inputstr)
-      if (lastMatch ne null) {
+      if (lastMatch ne null)
         if (lastMatch(0).get.isEmpty) regexp.lastIndex += 1
-      } else {
+      else
         canStillFind = false
-      }
       lastMatch ne null
-    } else false
+    else false
 
-  def find(start: Int): Boolean = {
+  def find(start: Int): Boolean =
     reset()
     regexp.lastIndex = start
     find()
-  }
 
   // Replace methods
 
-  def appendReplacement(sb: StringBuffer, replacement: String): Matcher = {
+  def appendReplacement(sb: StringBuffer, replacement: String): Matcher =
     sb.append(inputstr.substring(appendPos, start))
 
     @inline def isDigit(c: Char) = c >= '0' && c <= '9'
 
     val len = replacement.length
     var i = 0
-    while (i < len) {
-      replacement.charAt(i) match {
+    while (i < len)
+      replacement.charAt(i) match
         case '$' =>
           i += 1
           val j = i
@@ -92,79 +88,67 @@ final class Matcher private[regex](private var pattern0: Pattern,
         case c =>
           sb.append(c)
           i += 1
-      }
-    }
 
     appendPos = end
     this
-  }
 
-  def appendTail(sb: StringBuffer): StringBuffer = {
+  def appendTail(sb: StringBuffer): StringBuffer =
     sb.append(inputstr.substring(appendPos))
     appendPos = inputstr.length
     sb
-  }
 
-  def replaceFirst(replacement: String): String = {
+  def replaceFirst(replacement: String): String =
     reset()
 
-    if (find()) {
+    if (find())
       val sb = new StringBuffer
       appendReplacement(sb, replacement)
       appendTail(sb)
       sb.toString
-    } else {
+    else
       inputstr
-    }
-  }
 
-  def replaceAll(replacement: String): String = {
+  def replaceAll(replacement: String): String =
     reset()
 
     val sb = new StringBuffer
-    while (find()) {
+    while (find())
       appendReplacement(sb, replacement)
-    }
     appendTail(sb)
 
     sb.toString
-  }
 
   // Reset methods
 
-  def reset(): Matcher = {
+  def reset(): Matcher =
     regexp.lastIndex = 0
     lastMatch = null
     lastMatchIsValid = false
     canStillFind = true
     appendPos = 0
     this
-  }
 
-  def reset(input: CharSequence): Matcher = {
+  def reset(input: CharSequence): Matcher =
     regionStart0 = 0
     regionEnd0 = input.length()
     input0 = input
     inputstr = input0.toString
     reset()
-  }
 
-  def usePattern(pattern: Pattern): Matcher = {
+  def usePattern(pattern: Pattern): Matcher =
     val prevLastIndex = regexp.lastIndex
     pattern0 = pattern
     regexp = pattern.newJSRegExp()
     regexp.lastIndex = prevLastIndex
     lastMatch = null
     this
-  }
 
   // Query state methods - implementation of MatchResult
 
-  private def ensureLastMatch: js.RegExp.ExecResult = {
+  private def ensureLastMatch: js.RegExp.ExecResult =
     if (lastMatch == null)
       throw new IllegalStateException("No match available")
     lastMatch
-  }
 
   def groupCount(): Int = ensureLastMatch.length - 1
 
@@ -172,23 +156,19 @@ final class Matcher private[regex](private var pattern0: Pattern,
   def end(): Int = start() + group().length
   def group(): String = ensureLastMatch(0).get
 
-  def start(group: Int): Int = {
+  def start(group: Int): Int =
     if (group == 0) start()
-    else {
+    else
       val last = ensureLastMatch
       // not provided by JS RegExp, so we make up something that at least
       // will have some sound behavior from scala.util.matching.Regex
-      last(group).fold(-1) { groupStr =>
+      last(group).fold(-1)  groupStr =>
         inputstr.indexOf(groupStr, last.index)
-      }
-    }
-  }
 
-  def end(group: Int): Int = {
+  def end(group: Int): Int =
     val s = start(group)
     if (s == -1) -1
     else s + this.group(group).length
-  }
 
   def group(group: Int): String = ensureLastMatch(group).orNull
 
@@ -215,27 +195,24 @@ final class Matcher private[regex](private var pattern0: Pattern,
 
   def hasAnchoringBounds(): Boolean = true
   //def useAnchoringBounds(b: Boolean): Matcher
-}
 
-object Matcher {
-  def quoteReplacement(s: String): String = {
+object Matcher
+  def quoteReplacement(s: String): String =
     var result = ""
     var i = 0
-    while (i < s.length) {
+    while (i < s.length)
       val c = s.charAt(i)
       result +=
-      ((c: @switch) match {
+      ((c: @switch) match
             case '\\' | '$' => "\\" + c
             case _ => c
-          })
+          )
       i += 1
-    }
     result
-  }
 
   private final class SealedResult(
       inputstr: String, lastMatch: js.RegExp.ExecResult)
-      extends MatchResult {
+      extends MatchResult
 
     def groupCount(): Int = ensureLastMatch.length - 1
 
@@ -243,31 +220,24 @@ object Matcher {
     def end(): Int = start() + group().length
     def group(): String = ensureLastMatch(0).get
 
-    def start(group: Int): Int = {
+    def start(group: Int): Int =
       if (group == 0) start()
-      else {
+      else
         val last = ensureLastMatch
 
         // not provided by JS RegExp, so we make up something that at least
         // will have some sound behavior from scala.util.matching.Regex
-        last(group).fold(-1) { groupStr =>
+        last(group).fold(-1)  groupStr =>
           inputstr.indexOf(groupStr, last.index)
-        }
-      }
-    }
 
-    def end(group: Int): Int = {
+    def end(group: Int): Int =
       val s = start(group)
       if (s == -1) -1
       else s + this.group(group).length
-    }
 
     def group(group: Int): String = ensureLastMatch(group).orNull
 
-    private def ensureLastMatch: js.RegExp.ExecResult = {
+    private def ensureLastMatch: js.RegExp.ExecResult =
       if (lastMatch == null)
         throw new IllegalStateException("No match available")
       lastMatch
-    }
-  }
-}

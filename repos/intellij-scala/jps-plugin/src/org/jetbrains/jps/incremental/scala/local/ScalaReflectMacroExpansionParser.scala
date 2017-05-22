@@ -9,12 +9,11 @@ import org.jetbrains.plugin.scala.util.{Place, MacroExpansion}
 
 import scala.collection.mutable
 
-object ScalaReflectMacroExpansionParser {
+object ScalaReflectMacroExpansionParser
 
-  object ParsingState extends Enumeration {
+  object ParsingState extends Enumeration
     type ParsingState = Value
     val INIT, PLACE, DELIM, EXPANSION = Value
-  }
 
   var parsingState = ParsingState.INIT
 
@@ -31,56 +30,47 @@ object ScalaReflectMacroExpansionParser {
   val expansionRegex =
     Pattern.compile("^(.+)\\n[^\\n]+$", Pattern.DOTALL | Pattern.MULTILINE)
 
-  def isMacroMessage(message: String): Boolean = {
+  def isMacroMessage(message: String): Boolean =
     import ParsingState._
-    parsingState match {
+    parsingState match
       case INIT | EXPANSION => message.startsWith(placePrefix)
       case PLACE => message == delim
 //      case DELIM            => message.startsWith(expansionPrefix)
       case DELIM => true
-    }
-  }
 
-  def processMessage(message: String): Unit = {
+  def processMessage(message: String): Unit =
     import ParsingState._
-    parsingState match {
+    parsingState match
       case INIT | EXPANSION =>
         val matcher = placeRegex.matcher(message)
         if (!matcher.matches()) reset()
-        else {
+        else
           expansions += MacroExpansion(Place(matcher.group(1),
                                              matcher.group(2),
                                              matcher.group(3).toInt,
                                              matcher.group(4).toInt),
                                        "")
           parsingState = PLACE
-        }
       case PLACE =>
         if (message != delim) reset()
         else parsingState = DELIM
       case DELIM =>
         val matcher = expansionRegex.matcher(message)
         if (!matcher.matches()) reset()
-        else {
+        else
           expansions(expansions.length - 1) = MacroExpansion(
               expansions.last.place, matcher.group(1))
           parsingState = EXPANSION
-        }
-    }
-  }
 
   def reset() = parsingState = ParsingState.INIT
 
-  def serializeExpansions(context: CompileContext) = {
+  def serializeExpansions(context: CompileContext) =
     val file = new File(
         System.getProperty("java.io.tmpdir") +
         s"/../../expansion-${context.getProjectDescriptor.getProject.getName}")
     val fo = new BufferedOutputStream(new FileOutputStream(file))
     val so = new ObjectOutputStream(fo)
-    for (expansion <- expansions) {
+    for (expansion <- expansions)
       so.writeObject(expansion)
-    }
     so.close()
     fo.close()
-  }
-}

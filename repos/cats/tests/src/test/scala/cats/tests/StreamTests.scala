@@ -4,7 +4,7 @@ package tests
 import cats.laws.discipline.{CoflatMapTests, MonadCombineTests, SerializableTests, TraverseTests, CartesianTests}
 import cats.laws.discipline.eq.tuple3Eq
 
-class StreamTests extends CatsSuite {
+class StreamTests extends CatsSuite
   checkAll("Stream[Int]", CartesianTests[Stream].cartesian[Int, Int, Int])
   checkAll(
       "Cartesian[Stream]", SerializableTests.serializable(Cartesian[Stream]))
@@ -24,14 +24,13 @@ class StreamTests extends CatsSuite {
   checkAll(
       "Traverse[Stream]", SerializableTests.serializable(Traverse[Stream]))
 
-  test("show") {
+  test("show")
     Stream(1, 2, 3).show should ===("Stream(1, ?)")
     Stream.empty[Int].show should ===("Stream()")
-  }
 
-  test("Show[Stream] is referentially transparent, unlike Stream.toString") {
-    forAll { stream: Stream[Int] =>
-      if (!stream.isEmpty) {
+  test("Show[Stream] is referentially transparent, unlike Stream.toString")
+    forAll  stream: Stream[Int] =>
+      if (!stream.isEmpty)
         val unevaluatedStream = stream map identity
         val initialShow = unevaluatedStream.show
 
@@ -40,9 +39,5 @@ class StreamTests extends CatsSuite {
         // consistent values independent of internal state.
         unevaluatedStream.tail
         initialShow should ===(unevaluatedStream.show)
-      } else {
+      else
         stream.show should ===(stream.toString)
-      }
-    }
-  }
-}

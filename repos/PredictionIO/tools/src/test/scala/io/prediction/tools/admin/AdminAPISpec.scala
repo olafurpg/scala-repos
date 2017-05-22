@@ -8,7 +8,7 @@ import spray.http._
 import spray.httpx.RequestBuilding._
 import spray.util._
 
-class AdminAPISpec extends Specification {
+class AdminAPISpec extends Specification
 
   val system = ActorSystem(Utils.actorSystemNameFrom(getClass))
   val config = AdminServerConfig(ip = "localhost", port = 7071)
@@ -22,8 +22,8 @@ class AdminAPISpec extends Specification {
   val adminActor =
     system.actorOf(Props(classOf[AdminServiceActor], commandClient))
 
-  "GET / request" should {
-    "properly produce OK HttpResponses" in {
+  "GET / request" should
+    "properly produce OK HttpResponses" in
       val probe = TestProbe()(system)
       probe.send(adminActor, Get("/"))
 
@@ -37,11 +37,9 @@ class AdminAPISpec extends Specification {
           )
       )
       success
-    }
-  }
 
-  "GET /cmd/app request" should {
-    "properly produce OK HttpResponses" in {
+  "GET /cmd/app request" should
+    "properly produce OK HttpResponses" in
       /*
       val probe = TestProbe()(system)
       probe.send(adminActor,Get("/cmd/app"))
@@ -57,8 +55,5 @@ class AdminAPISpec extends Specification {
         )
       )*/
       pending
-    }
-  }
 
   step(system.shutdown())
-}

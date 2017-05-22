@@ -8,7 +8,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
 /**
   * @author ilyas
   */
-trait ScFileStub extends PsiClassHolderFileStub[ScalaFile] {
+trait ScFileStub extends PsiClassHolderFileStub[ScalaFile]
 
   def packageName: String
 
@@ -17,4 +17,3 @@ trait ScFileStub extends PsiClassHolderFileStub[ScalaFile] {
   def isCompiled: Boolean
 
   def isScript: Boolean
-}

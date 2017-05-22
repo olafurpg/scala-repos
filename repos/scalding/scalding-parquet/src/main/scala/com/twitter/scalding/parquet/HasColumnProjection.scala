@@ -2,16 +2,14 @@ package com.twitter.scalding.parquet
 
 import org.slf4j.LoggerFactory
 
-object HasColumnProjection {
+object HasColumnProjection
   val LOG = LoggerFactory.getLogger(this.getClass)
 
-  def requireNoSemiColon(glob: String) = {
+  def requireNoSemiColon(glob: String) =
     require(!glob.contains(";"),
             "A column projection glob cannot contain a ; character")
-  }
-}
 
-trait HasColumnProjection {
+trait HasColumnProjection
   import com.twitter.scalding.parquet.HasColumnProjection._
 
   /**
@@ -42,7 +40,7 @@ trait HasColumnProjection {
     * Parquet accepts globs separated by the ; character
     */
   protected[parquet] final def columnProjectionString: Option[
-      ColumnProjectionString] = {
+      ColumnProjectionString] =
     val deprecated = withColumns
     val strict = withColumnProjections
 
@@ -52,22 +50,18 @@ trait HasColumnProjection {
     deprecated.foreach(requireNoSemiColon)
     strict.foreach(requireNoSemiColon)
 
-    if (deprecated.nonEmpty) {
+    if (deprecated.nonEmpty)
       LOG.warn(
           "withColumns is deprecated. Please use withColumnProjections, which uses a different glob syntax")
       Some(DeprecatedColumnProjectionString(deprecated))
-    } else if (strict.nonEmpty) {
+    else if (strict.nonEmpty)
       Some(StrictColumnProjectionString(strict))
-    } else {
+    else
       None
-    }
-  }
-}
 
-sealed trait ColumnProjectionString {
+sealed trait ColumnProjectionString
   def globStrings: Set[String]
   def asSemicolonString: String = globStrings.mkString(";")
-}
 case class DeprecatedColumnProjectionString(globStrings: Set[String])
     extends ColumnProjectionString
 case class StrictColumnProjectionString(globStrings: Set[String])

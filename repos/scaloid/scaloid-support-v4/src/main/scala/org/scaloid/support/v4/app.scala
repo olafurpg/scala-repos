@@ -49,7 +49,7 @@ class RichFragment[This <: android.support.v4.app.Fragment](val basis: This)
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html android.support.v4.app.Fragment]]`. This contains several property accessors.
   */
-trait TraitFragment[This <: android.support.v4.app.Fragment] {
+trait TraitFragment[This <: android.support.v4.app.Fragment]
 
   def basis: This
 
@@ -64,11 +64,10 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
     */
   implicit def ctx = basis.getActivity
 
-  def inTransaction(f: FragmentTransaction => Unit) = {
+  def inTransaction(f: FragmentTransaction => Unit) =
     val txn = basis.getFragmentManager.beginTransaction()
     f(txn)
     txn.commit()
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getActivity() getActivity()]]`
@@ -88,9 +87,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setArguments(android.os.Bundle) setArguments(android.os.Bundle)]]`
     */
-  @inline def arguments_=(p: android.os.Bundle) = {
+  @inline def arguments_=(p: android.os.Bundle) =
     basis.setArguments(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getFragmentManager() getFragmentManager()]]`
@@ -108,9 +106,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setHasOptionsMenu(boolean) setHasOptionsMenu(boolean)]]`
     */
-  @inline def hasOptionsMenu_=(p: Boolean) = {
+  @inline def hasOptionsMenu_=(p: Boolean) =
     basis.setHasOptionsMenu(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getId() getId()]]`
@@ -133,9 +130,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setInitialSavedState(android.support.v4.app.Fragment.SavedState) setInitialSavedState(android.support.v4.app.Fragment.SavedState)]]`
     */
   @inline
-  def initialSavedState_=(p: android.support.v4.app.Fragment.SavedState) = {
+  def initialSavedState_=(p: android.support.v4.app.Fragment.SavedState) =
     basis.setInitialSavedState(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getLoaderManager() getLoaderManager()]]`
@@ -153,9 +149,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setMenuVisibility(boolean) setMenuVisibility(boolean)]]`
     */
-  @inline def menuVisibility_=(p: Boolean) = {
+  @inline def menuVisibility_=(p: Boolean) =
     basis.setMenuVisibility(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getResources() getResources()]]`
@@ -175,9 +170,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setRetainInstance(boolean) setRetainInstance(boolean)]]`
     */
-  @inline def retainInstance_=(p: Boolean) = {
+  @inline def retainInstance_=(p: Boolean) =
     basis.setRetainInstance(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getTag() getTag()]]`
@@ -207,9 +201,8 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#setUserVisibleHint(boolean) setUserVisibleHint(boolean)]]`
     */
-  @inline def userVisibleHint_=(p: Boolean) = {
+  @inline def userVisibleHint_=(p: Boolean) =
     basis.setUserVisibleHint(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html#getView() getView()]]`
@@ -223,24 +216,20 @@ trait TraitFragment[This <: android.support.v4.app.Fragment] {
   def startActivityForResult[T : ClassTag](p: Int)(
       implicit context: Context): Unit =
     basis.startActivityForResult(SIntent[T], p)
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/Fragment.html android.support.v4.app.Fragment]]`.
   */
 class SFragment()
-    extends android.support.v4.app.Fragment() with TraitFragment[SFragment] {
+    extends android.support.v4.app.Fragment() with TraitFragment[SFragment]
 
   def basis = this
-}
 
-object SFragment {
-  def apply(): SFragment = {
+object SFragment
+  def apply(): SFragment =
     val v = new SFragment
 
     v
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/support/v4/app/FragmentActivity.html android.support.v4.app.FragmentActivity]]`.
@@ -253,7 +242,7 @@ class RichFragmentActivity[This <: android.support.v4.app.FragmentActivity](
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/FragmentActivity.html android.support.v4.app.FragmentActivity]]`. This contains several property accessors.
   */
 trait TraitFragmentActivity[This <: android.support.v4.app.FragmentActivity]
-    extends TraitActivity[This] {
+    extends TraitActivity[This]
 
   override def basis: This
 
@@ -272,25 +261,21 @@ trait TraitFragmentActivity[This <: android.support.v4.app.FragmentActivity]
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentActivity.html#getSupportLoaderManager() getSupportLoaderManager()]]`
     */
   @inline def supportLoaderManager = basis.getSupportLoaderManager
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/FragmentActivity.html android.support.v4.app.FragmentActivity]]`.
   */
 class SFragmentActivity()
     extends android.support.v4.app.FragmentActivity()
-    with TraitFragmentActivity[SFragmentActivity] {
+    with TraitFragmentActivity[SFragmentActivity]
 
   def basis = this
-}
 
-object SFragmentActivity {
-  def apply(): SFragmentActivity = {
+object SFragmentActivity
+  def apply(): SFragmentActivity =
     val v = new SFragmentActivity
 
     v
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/support/v4/app/FragmentManager.html android.support.v4.app.FragmentManager]]`.
@@ -302,7 +287,7 @@ class RichFragmentManager[This <: android.support.v4.app.FragmentManager](
 /**
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/FragmentManager.html android.support.v4.app.FragmentManager]]`. This contains several property accessors.
   */
-trait TraitFragmentManager[This <: android.support.v4.app.FragmentManager] {
+trait TraitFragmentManager[This <: android.support.v4.app.FragmentManager]
 
   def basis: This
 
@@ -311,14 +296,12 @@ trait TraitFragmentManager[This <: android.support.v4.app.FragmentManager] {
     */
   @inline def backStackEntryCount = basis.getBackStackEntryCount
 
-  @inline def onBackStackChanged[U](f: => U): This = {
+  @inline def onBackStackChanged[U](f: => U): This =
     basis.addOnBackStackChangedListener(
-        new android.support.v4.app.FragmentManager.OnBackStackChangedListener {
+        new android.support.v4.app.FragmentManager.OnBackStackChangedListener
       def onBackStackChanged(): Unit = { f }
-    })
+    )
     basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html android.support.v4.app.FragmentTransaction]]`.
@@ -331,7 +314,7 @@ class RichFragmentTransaction[
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html android.support.v4.app.FragmentTransaction]]`. This contains several property accessors.
   */
 trait TraitFragmentTransaction[
-    This <: android.support.v4.app.FragmentTransaction] {
+    This <: android.support.v4.app.FragmentTransaction]
 
   def basis: This
 
@@ -348,9 +331,8 @@ trait TraitFragmentTransaction[
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbShortTitle(int) setBreadCrumbShortTitle(int)]]`
     */
-  @inline def breadCrumbShortTitle_=(p: Int) = {
+  @inline def breadCrumbShortTitle_=(p: Int) =
     basis.setBreadCrumbShortTitle(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbShortTitle(java.lang.CharSequence) setBreadCrumbShortTitle(java.lang.CharSequence)]]`
@@ -361,9 +343,8 @@ trait TraitFragmentTransaction[
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbShortTitle(java.lang.CharSequence) setBreadCrumbShortTitle(java.lang.CharSequence)]]`
     */
-  @inline def breadCrumbShortTitle_=(p: java.lang.CharSequence) = {
+  @inline def breadCrumbShortTitle_=(p: java.lang.CharSequence) =
     basis.setBreadCrumbShortTitle(p); basis
-  }
 
   @inline def breadCrumbTitle(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error(
@@ -377,9 +358,8 @@ trait TraitFragmentTransaction[
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbTitle(int) setBreadCrumbTitle(int)]]`
     */
-  @inline def breadCrumbTitle_=(p: Int) = {
+  @inline def breadCrumbTitle_=(p: Int) =
     basis.setBreadCrumbTitle(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbTitle(java.lang.CharSequence) setBreadCrumbTitle(java.lang.CharSequence)]]`
@@ -389,9 +369,8 @@ trait TraitFragmentTransaction[
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setBreadCrumbTitle(java.lang.CharSequence) setBreadCrumbTitle(java.lang.CharSequence)]]`
     */
-  @inline def breadCrumbTitle_=(p: java.lang.CharSequence) = {
+  @inline def breadCrumbTitle_=(p: java.lang.CharSequence) =
     basis.setBreadCrumbTitle(p); basis
-  }
 
   @inline def transition(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'transition'")
@@ -418,10 +397,8 @@ trait TraitFragmentTransaction[
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/FragmentTransaction.html#setTransitionStyle(int) setTransitionStyle(int)]]`
     */
-  @inline def transitionStyle_=(p: Int) = {
+  @inline def transitionStyle_=(p: Int) =
     basis.setTransitionStyle(p); basis
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html android.support.v4.app.ListFragment]]`.
@@ -434,7 +411,7 @@ class RichListFragment[This <: android.support.v4.app.ListFragment](
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html android.support.v4.app.ListFragment]]`. This contains several property accessors.
   */
 trait TraitListFragment[This <: android.support.v4.app.ListFragment]
-    extends TraitFragment[This] {
+    extends TraitFragment[This]
 
   @inline def emptyText(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'emptyText'")
@@ -447,9 +424,8 @@ trait TraitListFragment[This <: android.support.v4.app.ListFragment]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#setEmptyText(java.lang.CharSequence) setEmptyText(java.lang.CharSequence)]]`
     */
-  @inline def emptyText_=(p: java.lang.CharSequence) = {
+  @inline def emptyText_=(p: java.lang.CharSequence) =
     basis.setEmptyText(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#getListAdapter() getListAdapter()]]`
@@ -464,9 +440,8 @@ trait TraitListFragment[This <: android.support.v4.app.ListFragment]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#setListAdapter(android.widget.ListAdapter) setListAdapter(android.widget.ListAdapter)]]`
     */
-  @inline def listAdapter_=(p: android.widget.ListAdapter) = {
+  @inline def listAdapter_=(p: android.widget.ListAdapter) =
     basis.setListAdapter(p); basis
-  }
 
   @inline def listShown(implicit no: NoGetterForThisProperty): Nothing =
     throw new Error("Android does not support the getter for 'listShown'")
@@ -494,9 +469,8 @@ trait TraitListFragment[This <: android.support.v4.app.ListFragment]
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#setListShownNoAnimation(boolean) setListShownNoAnimation(boolean)]]`
     */
-  @inline def listShownNoAnimation_=(p: Boolean) = {
+  @inline def listShownNoAnimation_=(p: Boolean) =
     basis.setListShownNoAnimation(p); basis
-  }
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#getListView() getListView()]]`
@@ -525,25 +499,21 @@ trait TraitListFragment[This <: android.support.v4.app.ListFragment]
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html#setSelection(int) setSelection(int)]]`
     */
   @inline def selection_=(p: Int) = { basis.setSelection(p); basis }
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/ListFragment.html android.support.v4.app.ListFragment]]`.
   */
 class SListFragment()
     extends android.support.v4.app.ListFragment()
-    with TraitListFragment[SListFragment] {
+    with TraitListFragment[SListFragment]
 
   def basis = this
-}
 
-object SListFragment {
-  def apply(): SListFragment = {
+object SListFragment
+  def apply(): SListFragment =
     val v = new SListFragment
 
     v
-  }
-}
 
 /**
   * Automatically generated enriching class of `[[https://developer.android.com/reference/android/support/v4/app/DialogFragment.html android.support.v4.app.DialogFragment]]`.
@@ -556,7 +526,7 @@ class RichDialogFragment[This <: android.support.v4.app.DialogFragment](
   * Automatically generated helper trait of `[[https://developer.android.com/reference/android/support/v4/app/DialogFragment.html android.support.v4.app.DialogFragment]]`. This contains several property accessors.
   */
 trait TraitDialogFragment[This <: android.support.v4.app.DialogFragment]
-    extends TraitFragment[This] {
+    extends TraitFragment[This]
 
   /**
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/DialogFragment.html#isCancelable() isCancelable()]]`
@@ -597,22 +567,18 @@ trait TraitDialogFragment[This <: android.support.v4.app.DialogFragment]
     * Shortcut for `[[https://developer.android.com/reference/android/support/v4/app/DialogFragment.html#getTheme() getTheme()]]`
     */
   @inline def theme = basis.getTheme
-}
 
 /**
   * Automatically generated concrete helper class of `[[https://developer.android.com/reference/android/support/v4/app/DialogFragment.html android.support.v4.app.DialogFragment]]`.
   */
 class SDialogFragment()
     extends android.support.v4.app.DialogFragment()
-    with TraitDialogFragment[SDialogFragment] {
+    with TraitDialogFragment[SDialogFragment]
 
   def basis = this
-}
 
-object SDialogFragment {
-  def apply(): SDialogFragment = {
+object SDialogFragment
+  def apply(): SDialogFragment =
     val v = new SDialogFragment
 
     v
-  }
-}

@@ -18,8 +18,8 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.types.ParamType
  * ClassParam ::= {Annotation} [{Modifier} ('val' | 'var')] id ':' ParamType ['=' Expr]
  */
 
-object ClassParam {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ClassParam
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val classParamMarker = builder.mark
     val annotationsMarker = builder.mark
     while (Annotation.parse(builder)) {}
@@ -27,48 +27,38 @@ object ClassParam {
     //parse modifiers
     val modifierMarker = builder.mark
     var isModifier = false
-    while (Modifier.parse(builder)) {
+    while (Modifier.parse(builder))
       isModifier = true
-    }
     modifierMarker.done(ScalaElementTypes.MODIFIERS)
     //Look for var or val
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.kVAR | ScalaTokenTypes.kVAL =>
         builder.advanceLexer() //Let's ate this!
       case _ =>
-        if (isModifier) {
+        if (isModifier)
           builder error ScalaBundle.message("val.var.expected")
-        }
-    }
     //Look for identifier
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
         builder.advanceLexer() //Ate identifier
       case _ =>
         classParamMarker.rollbackTo()
         return false
-    }
     //Try to parse tale
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tCOLON =>
         builder.advanceLexer() //Ate ':'
-        if (!ParamType.parse(builder)) {
+        if (!ParamType.parse(builder))
           builder.error(ScalaBundle.message("parameter.type.expected"))
-        }
       case _ =>
         builder.error(ScalaBundle.message("colon.expected"))
-    }
 
     //default param
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tASSIGN =>
         builder.advanceLexer() //Ate '='
-        if (!Expr.parse(builder)) {
+        if (!Expr.parse(builder))
           builder error ScalaBundle.message("wrong.expression")
-        }
       case _ =>
-    }
     classParamMarker.done(ScalaElementTypes.CLASS_PARAM)
     true
-  }
-}

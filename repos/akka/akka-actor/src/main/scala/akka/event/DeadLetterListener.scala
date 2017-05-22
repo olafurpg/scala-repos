@@ -7,7 +7,7 @@ import akka.actor.Actor
 import akka.actor.DeadLetter
 import akka.event.Logging.Info
 
-class DeadLetterListener extends Actor {
+class DeadLetterListener extends Actor
 
   val eventStream = context.system.eventStream
   val maxCount = context.system.settings.LogDeadLetters
@@ -25,7 +25,7 @@ class DeadLetterListener extends Actor {
   override def postStop(): Unit =
     eventStream.unsubscribe(self)
 
-  def receive = {
+  def receive =
     case DeadLetter(message, snd, rcp) ⇒
       count += 1
       val done = maxCount != Int.MaxValue && count >= maxCount
@@ -38,5 +38,3 @@ class DeadLetterListener extends Actor {
               "This logging can be turned off or adjusted with configuration settings 'akka.log-dead-letters' " +
               "and 'akka.log-dead-letters-during-shutdown'."))
       if (done) context.stop(self)
-  }
-}

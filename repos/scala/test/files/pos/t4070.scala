@@ -1,22 +1,18 @@
-package a {
+package a
   // method before classes
-  trait Foo {
+  trait Foo
     def crash(x: Dingus[_]): Unit = x match { case m: Bippy[tv] => () }
 
     class Dingus[T]
     class Bippy[CC[X] <: Seq[X]]() extends Dingus[CC[Int]]
-  }
-}
 
-package b {
+package b
   // classes before method
-  trait Foo {
+  trait Foo
     class Dingus[T]
     class Bippy[CC[X] <: Seq[X]]() extends Dingus[CC[Int]]
 
     def crash(x: Dingus[_]): Unit = x match { case m: Bippy[tv] => () }
-  }
-}
 /*
 // With crash below the classes:
 % scalac -Dscalac.debug.tvar ./a.scala

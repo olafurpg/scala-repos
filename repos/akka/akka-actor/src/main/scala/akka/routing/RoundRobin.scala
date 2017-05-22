@@ -11,26 +11,24 @@ import akka.actor.SupervisorStrategy
 import akka.japi.Util.immutableSeq
 import akka.actor.ActorSystem
 
-object RoundRobinRoutingLogic {
+object RoundRobinRoutingLogic
   def apply(): RoundRobinRoutingLogic = new RoundRobinRoutingLogic
-}
 
 /**
   * Uses round-robin to select a routee. For concurrent calls,
   * round robin is just a best effort.
   */
 @SerialVersionUID(1L)
-final class RoundRobinRoutingLogic extends RoutingLogic {
+final class RoundRobinRoutingLogic extends RoutingLogic
   val next = new AtomicLong
 
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
-    if (routees.nonEmpty) {
+    if (routees.nonEmpty)
       val size = routees.size
       val index = (next.getAndIncrement % size).asInstanceOf[Int]
       routees(if (index < 0) size + index - 1 else index)
-    } else NoRoutee
-}
+    else NoRoutee
 
 /**
   * A router pool that uses round-robin to select a routee. For concurrent calls,
@@ -70,7 +68,7 @@ final case class RoundRobinPool(
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[RoundRobinPool] {
+    extends Pool with PoolOverrideUnsetConfig[RoundRobinPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -114,7 +112,6 @@ final case class RoundRobinPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}
 
 /**
   * A router group that uses round-robin to select a routee. For concurrent calls,
@@ -134,7 +131,7 @@ final case class RoundRobinPool(
 final case class RoundRobinGroup(
     override val paths: immutable.Iterable[String],
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(paths = immutableSeq(config.getStringList("routees.paths")))
@@ -159,4 +156,3 @@ final case class RoundRobinGroup(
     */
   def withDispatcher(dispatcherId: String): RoundRobinGroup =
     copy(routerDispatcher = dispatcherId)
-}

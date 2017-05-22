@@ -31,13 +31,12 @@ import javafx.scene.{media => jfxsm}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object VideoTrack {
+object VideoTrack
   implicit def sfxVideoTrack2jfx(at: VideoTrack): jfxsm.VideoTrack =
     if (at != null) at.delegate else null
-}
 
 class VideoTrack(override val delegate: jfxsm.VideoTrack)
-    extends Track(delegate) with SFXDelegate[jfxsm.VideoTrack] {
+    extends Track(delegate) with SFXDelegate[jfxsm.VideoTrack]
 
   /**
     * Retrieves the height of the track.
@@ -48,4 +47,3 @@ class VideoTrack(override val delegate: jfxsm.VideoTrack)
     * Retrieves the width of the track.
     */
   def width = delegate.getWidth
-}

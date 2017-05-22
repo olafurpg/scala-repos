@@ -7,7 +7,7 @@ import java.util.Locale
 
 import scala.concurrent.duration._
 
-object PrettyDuration {
+object PrettyDuration
 
   /**
     * JAVA API
@@ -24,16 +24,16 @@ object PrettyDuration {
     duration.pretty(includeNanos, precision)
 
   implicit class PrettyPrintableDuration(val duration: Duration)
-      extends AnyVal {
+      extends AnyVal
 
     /** Selects most apropriate TimeUnit for given duration and formats it accordingly, with 4 digits precision **/
     def pretty: String = pretty(includeNanos = false)
 
     /** Selects most apropriate TimeUnit for given duration and formats it accordingly */
-    def pretty(includeNanos: Boolean, precision: Int = 4): String = {
+    def pretty(includeNanos: Boolean, precision: Int = 4): String =
       require(precision > 0, "precision must be > 0")
 
-      duration match {
+      duration match
         case d: FiniteDuration ⇒
           val nanos = d.toNanos
           val unit = chooseUnit(nanos)
@@ -48,10 +48,8 @@ object PrettyDuration {
         case Duration.MinusInf ⇒ s"-∞ (minus infinity)"
         case Duration.Inf ⇒ s"∞ (infinity)"
         case _ ⇒ "undefined"
-      }
-    }
 
-    def chooseUnit(nanos: Long): TimeUnit = {
+    def chooseUnit(nanos: Long): TimeUnit =
       val d = nanos.nanos
 
       if (d.toDays > 0) DAYS
@@ -61,9 +59,8 @@ object PrettyDuration {
       else if (d.toMillis > 0) MILLISECONDS
       else if (d.toMicros > 0) MICROSECONDS
       else NANOSECONDS
-    }
 
-    def abbreviate(unit: TimeUnit): String = unit match {
+    def abbreviate(unit: TimeUnit): String = unit match
       case NANOSECONDS ⇒ "ns"
       case MICROSECONDS ⇒ "μs"
       case MILLISECONDS ⇒ "ms"
@@ -71,6 +68,3 @@ object PrettyDuration {
       case MINUTES ⇒ "min"
       case HOURS ⇒ "h"
       case DAYS ⇒ "d"
-    }
-  }
-}

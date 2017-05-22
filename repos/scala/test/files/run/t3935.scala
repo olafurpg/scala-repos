@@ -1,11 +1,8 @@
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val q = scala.collection.mutable.Queue[String]()
     assert(q.length == 0)
-    try {
+    try
       assert(q.front != null)
-    } catch {
+    catch
       case _: Throwable =>
-    }
-  }
-}

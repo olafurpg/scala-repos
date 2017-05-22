@@ -10,7 +10,7 @@ import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.CompletionStage
 import scala.compat.java8.FutureConverters._
 
-object Patterns {
+object Patterns
   import akka.japi
   import akka.actor.{ActorRef}
   import akka.pattern.{ask ⇒ scalaAsk, pipe ⇒ scalaPipe, gracefulStop ⇒ scalaGracefulStop, after ⇒ scalaAfter}
@@ -289,9 +289,8 @@ object Patterns {
                context: ExecutionContext,
                value: Future[T]): Future[T] =
     scalaAfter(duration, scheduler)(value)(context)
-}
 
-object PatternsCS {
+object PatternsCS
   import akka.japi
   import akka.actor.{ActorRef}
   import akka.pattern.{ask ⇒ scalaAsk, gracefulStop ⇒ scalaGracefulStop}
@@ -577,4 +576,3 @@ object PatternsCS {
                context: ExecutionContext,
                value: CompletionStage[T]): CompletionStage[T] =
     afterCompletionStage(duration, scheduler)(value)(context)
-}

@@ -4,7 +4,7 @@ import pl.project13.scala.sbt.JmhPlugin
 import sbtunidoc.Plugin.unidocSettings
 import scoverage.ScoverageSbtPlugin
 
-object Util extends Build {
+object Util extends Build
   val branch =
     Process("git" :: "rev-parse" :: "--abbrev-ref" :: "HEAD" :: Nil).!!.trim
   val suffix = if (branch == "master") "" else "-SNAPSHOT"
@@ -19,15 +19,13 @@ object Util extends Build {
         ExclusionRule("com.sun.jmx", "jmxri"),
         ExclusionRule("javax.jms", "jms"))
 
-  val parserCombinators = scalaVersion { sv =>
-    CrossVersion.partialVersion(sv) match {
+  val parserCombinators = scalaVersion  sv =>
+    CrossVersion.partialVersion(sv) match
       case Some((2, x)) if x >= 11 =>
         Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
       case _ => Nil
-    }
-  }
 
-  def scalacOptionsVersion(sv: String): Seq[String] = {
+  def scalacOptionsVersion(sv: String): Seq[String] =
     Seq(
         // Note: Add -deprecation when deprecated methods are removed
         "-unchecked",
@@ -35,12 +33,11 @@ object Util extends Build {
         "-encoding",
         "utf8"
     ) ++
-    (CrossVersion.partialVersion(sv) match {
+    (CrossVersion.partialVersion(sv) match
           // Needs -missing-interpolator due to https://issues.scala-lang.org/browse/SI-8761
           case Some((2, x)) if x >= 11 => Seq("-Xlint:-missing-interpolator")
           case _ => Seq("-Xlint")
-        })
-  }
+        )
 
   val sharedSettings = Seq(
       version := libVersion,
@@ -57,10 +54,10 @@ object Util extends Build {
       ),
       resolvers += "twitter repo" at "https://maven.twttr.com",
       ScoverageSbtPlugin.ScoverageKeys.coverageHighlighting :=
-      (CrossVersion.partialVersion(scalaVersion.value) match {
+      (CrossVersion.partialVersion(scalaVersion.value) match
             case Some((2, 10)) => false
             case _ => true
-          }),
+          ),
       scalacOptions := scalacOptionsVersion(scalaVersion.value),
       // Note: Use -Xlint rather than -Xlint:unchecked when TestThriftStructure
       // warnings are resolved
@@ -71,9 +68,9 @@ object Util extends Build {
       parallelExecution in Test := false,
       // Sonatype publishing
       publishArtifact in Test := false,
-      pomIncludeRepository := { _ =>
+      pomIncludeRepository :=  _ =>
         false
-      },
+      ,
       publishMavenStyle := true,
       autoAPIMappings := true,
       apiURL := Some(url("https://twitter.github.io/util/docs/")),
@@ -95,19 +92,18 @@ object Util extends Build {
           <url>https://www.twitter.com/</url>
         </developer>
       </developers>,
-      publishTo <<= version { (v: String) =>
+      publishTo <<= version  (v: String) =>
         val nexus = "https://oss.sonatype.org/"
         if (v.trim.endsWith("SNAPSHOT"))
           Some("snapshots" at nexus + "content/repositories/snapshots")
         else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-      },
+      ,
       // Prevent eviction warnings
-      dependencyOverrides <++= scalaVersion { vsn =>
+      dependencyOverrides <++= scalaVersion  vsn =>
         Set(
             "com.twitter.common.zookeeper" % "client" % zkClientVersion,
             "com.twitter.common.zookeeper" % "group" % zkGroupVersion
         )
-      }
   )
 
   lazy val util =
@@ -206,7 +202,7 @@ object Util extends Build {
         ),
         libraryDependencies <++= parserCombinators,
         resourceGenerators in Compile <+=
-          (resourceManaged in Compile, name, version) map { (dir, name, ver) =>
+          (resourceManaged in Compile, name, version) map  (dir, name, ver) =>
           val file = dir / "com" / "twitter" / name / "build.properties"
           val buildRev = Process("git" :: "rev-parse" :: "HEAD" :: Nil).!!.trim
           val buildName = new java.text.SimpleDateFormat("yyyyMMdd-HHmmss")
@@ -215,7 +211,6 @@ object Util extends Build {
             s"name=$name\nversion=$ver\nbuild_revision=$buildRev\nbuild_name=$buildName"
           IO.write(file, contents)
           Seq(file)
-        }
     )
     .dependsOn(utilFunction)
 
@@ -225,9 +220,8 @@ object Util extends Build {
       settings = Defaults.coreDefaultSettings ++ sharedSettings
   ).settings(
         name := "util-eval",
-        libraryDependencies <+= scalaVersion {
+        libraryDependencies <+= scalaVersion
           "org.scala-lang" % "scala-compiler" % _ % "compile"
-        }
     )
     .dependsOn(utilCore)
 
@@ -392,4 +386,3 @@ object Util extends Build {
           zkDependency
       )
   )
-}

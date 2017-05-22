@@ -1,5 +1,5 @@
 sealed abstract class Z
-object Z {
+object Z
   object Z0 extends Z
   case class Z1() extends Z
   object Z2 extends Z
@@ -20,12 +20,9 @@ object Z {
   case class Z17() extends Z
   object Z18 extends Z
   case class Z19() extends Z
-}
 
-object Test {
+object Test
   import Z._
-  def foo(z: Z) = z match {
+  def foo(z: Z) = z match
     case Z0 | Z1() | Z2 | Z3() | Z4 | Z5() | Z6 | Z7() | Z8 | Z9() | Z10 |
         Z12 | Z13() | Z14 | Z15() | Z16 | Z17() | Z18 | Z19() =>
-  }
-}

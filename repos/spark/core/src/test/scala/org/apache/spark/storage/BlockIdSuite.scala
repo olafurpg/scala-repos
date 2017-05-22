@@ -19,31 +19,27 @@ package org.apache.spark.storage
 
 import org.apache.spark.SparkFunSuite
 
-class BlockIdSuite extends SparkFunSuite {
-  def assertSame(id1: BlockId, id2: BlockId) {
+class BlockIdSuite extends SparkFunSuite
+  def assertSame(id1: BlockId, id2: BlockId)
     assert(id1.name === id2.name)
     assert(id1.hashCode === id2.hashCode)
     assert(id1 === id2)
-  }
 
-  def assertDifferent(id1: BlockId, id2: BlockId) {
+  def assertDifferent(id1: BlockId, id2: BlockId)
     assert(id1.name != id2.name)
     assert(id1.hashCode != id2.hashCode)
     assert(id1 != id2)
-  }
 
-  test("test-bad-deserialization") {
-    try {
+  test("test-bad-deserialization")
+    try
       // Try to deserialize an invalid block id.
       BlockId("myblock")
       fail()
-    } catch {
+    catch
       case e: IllegalStateException => // OK
       case _: Throwable => fail()
-    }
-  }
 
-  test("rdd") {
+  test("rdd")
     val id = RDDBlockId(1, 2)
     assertSame(id, RDDBlockId(1, 2))
     assertDifferent(id, RDDBlockId(1, 1))
@@ -52,9 +48,8 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.asRDDId.get.splitIndex === 2)
     assert(id.isRDD)
     assertSame(id, BlockId(id.toString))
-  }
 
-  test("shuffle") {
+  test("shuffle")
     val id = ShuffleBlockId(1, 2, 3)
     assertSame(id, ShuffleBlockId(1, 2, 3))
     assertDifferent(id, ShuffleBlockId(3, 2, 3))
@@ -65,9 +60,8 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.reduceId === 3)
     assert(id.isShuffle)
     assertSame(id, BlockId(id.toString))
-  }
 
-  test("broadcast") {
+  test("broadcast")
     val id = BroadcastBlockId(42)
     assertSame(id, BroadcastBlockId(42))
     assertDifferent(id, BroadcastBlockId(123))
@@ -76,9 +70,8 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.broadcastId === 42)
     assert(id.isBroadcast)
     assertSame(id, BlockId(id.toString))
-  }
 
-  test("taskresult") {
+  test("taskresult")
     val id = TaskResultBlockId(60)
     assertSame(id, TaskResultBlockId(60))
     assertDifferent(id, TaskResultBlockId(61))
@@ -87,9 +80,8 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.taskId === 60)
     assert(!id.isRDD)
     assertSame(id, BlockId(id.toString))
-  }
 
-  test("stream") {
+  test("stream")
     val id = StreamBlockId(1, 100)
     assertSame(id, StreamBlockId(1, 100))
     assertDifferent(id, StreamBlockId(2, 101))
@@ -99,9 +91,8 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.uniqueId === 100)
     assert(!id.isBroadcast)
     assertSame(id, BlockId(id.toString))
-  }
 
-  test("test") {
+  test("test")
     val id = TestBlockId("abc")
     assertSame(id, TestBlockId("abc"))
     assertDifferent(id, TestBlockId("ab"))
@@ -110,5 +101,3 @@ class BlockIdSuite extends SparkFunSuite {
     assert(id.id === "abc")
     assert(!id.isShuffle)
     assertSame(id, BlockId(id.toString))
-  }
-}

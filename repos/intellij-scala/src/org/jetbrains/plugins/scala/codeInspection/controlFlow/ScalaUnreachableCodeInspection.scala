@@ -20,24 +20,21 @@ import scala.annotation.tailrec
   * 2014-04-22
   */
 class ScalaUnreachableCodeInspection
-    extends AbstractInspection("ScalaUnreachableCode", "Unreachable code") {
+    extends AbstractInspection("ScalaUnreachableCode", "Unreachable code")
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case funDef: ScFunctionDefinition =>
       val cfg = funDef.getControlFlow()
       val components = ControlFlowUtil.detectConnectedComponents(cfg)
-      if (components.length > 1) {
-        for {
+      if (components.length > 1)
+        for
           comp <- components.tail
           unreachable = comp.diff(components.head)
           fragm <- fragments(unreachable)
-        } {
+        
           registerProblem(fragm, holder)
-        }
-      }
-  }
 
-  def getElementsRange(start: PsiElement, end: PsiElement): Seq[PsiElement] = {
+  def getElementsRange(start: PsiElement, end: PsiElement): Seq[PsiElement] =
     val commonParent = PsiTreeUtil.findCommonParent(start, end)
     if (start == commonParent || end == commonParent) return Seq(commonParent)
 
@@ -48,23 +45,20 @@ class ScalaUnreachableCodeInspection
     val firstIdx = children.indexWhere(_.getTextRange.contains(startRange))
     val lastIdx = children.indexWhere(_.getTextRange.contains(endRange))
     children.slice(firstIdx, lastIdx + 1)
-  }
 
   private def fragments(
-      instructions: Iterable[Instruction]): Iterable[Seq[PsiElement]] = {
+      instructions: Iterable[Instruction]): Iterable[Seq[PsiElement]] =
     if (instructions.isEmpty) return Seq.empty
 
     @tailrec
-    def getParentStmt(element: PsiElement): Option[PsiElement] = {
-      element.getParent match {
+    def getParentStmt(element: PsiElement): Option[PsiElement] =
+      element.getParent match
         case _: ScBlock => Some(element)
         case _: ScFunctionDefinition => Some(element)
         case doStmt: ScDoStmt if doStmt.condition.contains(element) =>
           Some(element)
         case null => None
         case parent => getParentStmt(parent)
-      }
-    }
 
     val elements = instructions.toSeq
       .sortBy(_.num)
@@ -72,21 +66,19 @@ class ScalaUnreachableCodeInspection
       .map(e => getParentStmt(e).getOrElse(e))
       .distinct
     elements.groupBy(_.getParent).values
-  }
 
   private def registerProblem(
-      fragment: Seq[PsiElement], holder: ProblemsHolder) {
+      fragment: Seq[PsiElement], holder: ProblemsHolder)
     if (fragment.isEmpty) return
 
-    val descriptor = {
+    val descriptor =
       val message = "Unreachable code"
 
-      val fix = fragment match {
+      val fix = fragment match
         case Seq(e childOf (doStmt: ScDoStmt))
             if doStmt.condition.contains(e) =>
           new UnwrapDoStmtFix(doStmt)
         case _ => new RemoveFragmentQuickFix(fragment)
-      }
       new ProblemDescriptorImpl(fragment.head,
                                 fragment.last,
                                 message,
@@ -96,16 +88,13 @@ class ScalaUnreachableCodeInspection
                                 null,
                                 null,
                                 false)
-    }
 
     holder.registerProblem(descriptor)
-  }
-}
 
 class RemoveFragmentQuickFix(fragment: Seq[PsiElement])
     extends AbstractFixOnPsiElement(
-        "Remove unreachable code", fragment.head, fragment.last) {
-  override def doApplyFix(project: Project): Unit = {
+        "Remove unreachable code", fragment.head, fragment.last)
+  override def doApplyFix(project: Project): Unit =
     val startElement: PsiElement = getStartElement
     if (startElement == null) return
 
@@ -113,19 +102,14 @@ class RemoveFragmentQuickFix(fragment: Seq[PsiElement])
     val endElem = getEndElement
     if (endElem != null) parent.deleteChildRange(startElement, getEndElement)
     else startElement.delete()
-  }
-}
 
 class UnwrapDoStmtFix(doStmt: ScDoStmt)
-    extends AbstractFixOnPsiElement("Unwrap do-statement", doStmt) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement("Unwrap do-statement", doStmt)
+  override def doApplyFix(project: Project): Unit =
     val doSt = Option(getElement)
-    doSt.flatMap(_.getExprBody) match {
+    doSt.flatMap(_.getExprBody) match
       case Some(expr) =>
         val unwrapContext = new ScalaUnwrapContext
         unwrapContext.setIsEffective(true)
         new ScalaWhileUnwrapper().doUnwrap(doSt.get, unwrapContext)
       case _ =>
-    }
-  }
-}

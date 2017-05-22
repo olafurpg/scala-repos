@@ -8,61 +8,53 @@ import org.jetbrains.plugins.scala.base.ScalaLightCodeInsightFixtureTestAdapter
   * Date: 3/3/12
   */
 class XmlClosingTagAutoCompletionTest
-    extends ScalaLightCodeInsightFixtureTestAdapter {
+    extends ScalaLightCodeInsightFixtureTestAdapter
 
-  private def checkGeneratedTextGt(text: String, assumedStub: String) {
+  private def checkGeneratedTextGt(text: String, assumedStub: String)
     checkGeneratedTextAfterTyping(text, assumedStub, '>')
-  }
 
-  private def checkGeneratedTextSlash(text: String, assumedStub: String) {
+  private def checkGeneratedTextSlash(text: String, assumedStub: String)
     checkGeneratedTextAfterTyping(text, assumedStub, '/')
-  }
 
-  def testSimpleTag() {
+  def testSimpleTag()
     val text = "class A { val xml1 = <aaa" + CARET_MARKER + " }"
     val assumedStub = "class A { val xml1 = <aaa></aaa> }"
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testSimpleEmptyTag() {
+  def testSimpleEmptyTag()
     val text = "class A { val xml = <aaa" + CARET_MARKER + " }"
     val assumedStub = "class A { val xml = <aaa/> }"
 
     checkGeneratedTextSlash(text, assumedStub)
-  }
 
-  def testComplicatedTag() {
+  def testComplicatedTag()
     val text =
       "class A { val xml = <a>blah blah <blah/> <b" + CARET_MARKER + "</a> }"
     val assumedStub = "class A { val xml = <a>blah blah <blah/> <b></b></a> }"
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testComplicatedEmptyTag() {
+  def testComplicatedEmptyTag()
     val text =
       "class A { val xml = <a>blah blah <blah/> <abc" + CARET_MARKER + "</a> }"
     val assumedStub = "class A { val xml = <a>blah blah <blah/> <abc/></a> }"
 
     checkGeneratedTextSlash(text, assumedStub)
-  }
 
-  def testTagWithParams() {
+  def testTagWithParams()
     val text = "class A { <a param1=\"blah blah\"" + CARET_MARKER + " }"
     val assumedStub = "class A { <a param1=\"blah blah\"></a> }"
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testEmptyTagWithParams() {
+  def testEmptyTagWithParams()
     val text = "class A { <a param1=\"blah blah\"" + CARET_MARKER + " }"
     val assumedStub = "class A { <a param1=\"blah blah\"/> }"
 
     checkGeneratedTextSlash(text, assumedStub)
-  }
 
-  def testBigXml() {
+  def testBigXml()
     val text = ("""
       |<lift:TD.list all_id="all_todos">
       |  <div id="all_todos">
@@ -116,9 +108,8 @@ class XmlClosingTagAutoCompletionTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testXmlPattern1() {
+  def testXmlPattern1()
     val text = ("""
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
@@ -132,9 +123,8 @@ class XmlClosingTagAutoCompletionTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testXmlPaternWithEmptyTag1() {
+  def testXmlPaternWithEmptyTag1()
     val text = ("""
       | xml match {
       |   case <aaa""" + CARET_MARKER + """
@@ -148,9 +138,8 @@ class XmlClosingTagAutoCompletionTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextSlash(text, assumedStub)
-  }
 
-  def testXmlPattern2() {
+  def testXmlPattern2()
     val text = ("""
       | xml match {
       |   case <a></a> =>
@@ -166,9 +155,8 @@ class XmlClosingTagAutoCompletionTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextGt(text, assumedStub)
-  }
 
-  def testXmlPatternWithEmpryTag2() {
+  def testXmlPatternWithEmpryTag2()
     val text = ("""
       | xml match {
       |   case <a></a> =>
@@ -184,15 +172,13 @@ class XmlClosingTagAutoCompletionTest
       """.stripMargin.replace("\r", "")
 
     checkGeneratedTextSlash(text, assumedStub)
-  }
 
-  def testSwallowGtAfterEmptyTagEnd() {
+  def testSwallowGtAfterEmptyTagEnd()
     val text = "class A { val xml = <aaa/>" + CARET_MARKER + " }"
 
     checkGeneratedTextGt(text, text)
-  }
 
-  def testSwallowGtAfterEmptyTagEndInXmlPattern() {
+  def testSwallowGtAfterEmptyTagEndInXmlPattern()
     val header = """
         |val xml = <aaa attr="<aaa//>" />
         |xml match { 
@@ -203,5 +189,3 @@ class XmlClosingTagAutoCompletionTest
     val stub = header + ">" + CARET_MARKER + "  => 1  }"
 
     checkGeneratedTextGt(text, stub)
-  }
-}

@@ -24,10 +24,8 @@ import org.apache.kafka.common.utils.Utils
     "It has been replaced by org.apache.kafka.clients.producer.internals.DefaultPartitioner.",
     "0.10.0.0")
 class DefaultPartitioner(props: VerifiableProperties = null)
-    extends Partitioner {
+    extends Partitioner
   private val random = new java.util.Random
 
-  def partition(key: Any, numPartitions: Int): Int = {
+  def partition(key: Any, numPartitions: Int): Int =
     Utils.abs(key.hashCode) % numPartitions
-  }
-}

@@ -15,9 +15,9 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, Promise}
 import java.util.concurrent.TimeoutException
 
-object AkkaProtocolSpec {
+object AkkaProtocolSpec
 
-  class TestFailureDetector extends FailureDetector {
+  class TestFailureDetector extends FailureDetector
     @volatile var isAvailable: Boolean = true
 
     def isMonitoring: Boolean = called
@@ -25,14 +25,12 @@ object AkkaProtocolSpec {
     @volatile var called: Boolean = false
 
     def heartbeat(): Unit = called = true
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class AkkaProtocolSpec
     extends AkkaSpec(
         """akka.actor.provider = "akka.remote.RemoteActorRefProvider" """)
-    with ImplicitSender {
+    with ImplicitSender
 
   val conf = ConfigFactory
     .parseString("""
@@ -89,7 +87,7 @@ class AkkaProtocolSpec
         codec.constructAssociate(
             HandshakeInfo(remoteAkkaAddress, uid, cookie)))
 
-  def collaborators = {
+  def collaborators =
     val registry = new AssociationRegistry
     val transport: TestTransport = new TestTransport(localAddress, registry)
     val handle: TestAssociationHandle = new TestAssociationHandle(
@@ -98,53 +96,46 @@ class AkkaProtocolSpec
     // silently drop writes -- we do not have another endpoint under test, so nobody to forward to
     transport.writeBehavior.pushConstant(true)
     (new TestFailureDetector, registry, transport, handle)
-  }
 
   def lastActivityIsHeartbeat(registry: AssociationRegistry) =
     if (registry.logSnapshot.isEmpty) false
     else
-      registry.logSnapshot.last match {
+      registry.logSnapshot.last match
         case WriteAttempt(sender, recipient, payload)
             if sender == localAddress && recipient == remoteAddress ⇒
-          codec.decodePdu(payload) match {
+          codec.decodePdu(payload) match
             case Heartbeat ⇒ true
             case _ ⇒ false
-          }
         case _ ⇒ false
-      }
 
   def lastActivityIsAssociate(
       registry: AssociationRegistry, uid: Long, cookie: Option[String]) =
     if (registry.logSnapshot.isEmpty) false
     else
-      registry.logSnapshot.last match {
+      registry.logSnapshot.last match
         case WriteAttempt(sender, recipient, payload)
             if sender == localAddress && recipient == remoteAddress ⇒
-          codec.decodePdu(payload) match {
+          codec.decodePdu(payload) match
             case Associate(info) ⇒
               info.cookie == cookie && info.origin == localAddress &&
               info.uid == uid
             case _ ⇒ false
-          }
         case _ ⇒ false
-      }
 
   def lastActivityIsDisassociate(registry: AssociationRegistry) =
     if (registry.logSnapshot.isEmpty) false
     else
-      registry.logSnapshot.last match {
+      registry.logSnapshot.last match
         case WriteAttempt(sender, recipient, payload)
             if sender == localAddress && recipient == remoteAddress ⇒
-          codec.decodePdu(payload) match {
+          codec.decodePdu(payload) match
             case Disassociate(_) ⇒ true
             case _ ⇒ false
-          }
         case _ ⇒ false
-      }
 
-  "ProtocolStateActor" must {
+  "ProtocolStateActor" must
 
-    "register itself as reader on injecteted handles" in {
+    "register itself as reader on injecteted handles" in
       val (failureDetector, _, _, handle) = collaborators
 
       system.actorOf(
@@ -157,9 +148,8 @@ class AkkaProtocolSpec
               failureDetector))
 
       awaitCond(handle.readHandlerPromise.isCompleted)
-    }
 
-    "in inbound mode accept payload after Associate PDU received" in {
+    "in inbound mode accept payload after Associate PDU received" in
       val (failureDetector, registry, _, handle) = collaborators
 
       val reader = system.actorOf(
@@ -175,11 +165,10 @@ class AkkaProtocolSpec
 
       awaitCond(failureDetector.called)
 
-      val wrappedHandle = expectMsgPF() {
+      val wrappedHandle = expectMsgPF()
         case InboundAssociation(h: AkkaProtocolHandle) ⇒
           h.handshakeInfo.uid should ===(33)
           h
-      }
 
       wrappedHandle.readHandlerPromise.success(
           ActorHandleEventListener(testActor))
@@ -191,12 +180,10 @@ class AkkaProtocolSpec
 
       reader ! testPayload
 
-      expectMsgPF() {
+      expectMsgPF()
         case InboundPayload(p) ⇒ p should ===(testEnvelope)
-      }
-    }
 
-    "in inbound mode disassociate when an unexpected message arrives instead of Associate" in {
+    "in inbound mode disassociate when an unexpected message arrives instead of Associate" in
       val (failureDetector, registry, _, handle) = collaborators
 
       val reader = system.actorOf(
@@ -214,13 +201,12 @@ class AkkaProtocolSpec
       // this associate will now be ignored
       reader ! testAssociate(uid = 33, cookie = None)
 
-      awaitCond(registry.logSnapshot.exists {
+      awaitCond(registry.logSnapshot.exists
         case DisassociateAttempt(requester, remote) ⇒ true
         case _ ⇒ false
-      })
-    }
+      )
 
-    "in outbound mode delay readiness until hadnshake finished" in {
+    "in outbound mode delay readiness until hadnshake finished" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -248,17 +234,15 @@ class AkkaProtocolSpec
       // finish connection by sending back an associate message
       reader ! testAssociate(33, None)
 
-      Await.result(statusPromise.future, 3.seconds) match {
+      Await.result(statusPromise.future, 3.seconds) match
         case h: AkkaProtocolHandle ⇒
           h.remoteAddress should ===(remoteAkkaAddress)
           h.localAddress should ===(localAkkaAddress)
           h.handshakeInfo.uid should ===(33)
 
         case _ ⇒ fail()
-      }
-    }
 
-    "ignore incoming associations with wrong cookie" in {
+    "ignore incoming associations with wrong cookie" in
       val (failureDetector, registry, _, handle) = collaborators
 
       val reader = system.actorOf(
@@ -275,13 +259,12 @@ class AkkaProtocolSpec
 
       reader ! testAssociate(uid = 33, Some("xyzzy"))
 
-      awaitCond(registry.logSnapshot.exists {
+      awaitCond(registry.logSnapshot.exists
         case DisassociateAttempt(requester, remote) ⇒ true
         case _ ⇒ false
-      })
-    }
+      )
 
-    "accept incoming associations with correct cookie" in {
+    "accept incoming associations with correct cookie" in
       val (failureDetector, registry, _, handle) = collaborators
 
       val reader = system.actorOf(
@@ -299,12 +282,11 @@ class AkkaProtocolSpec
       // Send the correct cookie
       reader ! testAssociate(uid = 33, Some("abcde"))
 
-      val wrappedHandle = expectMsgPF() {
+      val wrappedHandle = expectMsgPF()
         case InboundAssociation(h: AkkaProtocolHandle) ⇒
           h.handshakeInfo.uid should ===(33)
           h.handshakeInfo.cookie should ===(Some("abcde"))
           h
-      }
 
       wrappedHandle.readHandlerPromise.success(
           ActorHandleEventListener(testActor))
@@ -313,9 +295,8 @@ class AkkaProtocolSpec
 
       // Heartbeat was sent in response to Associate
       awaitCond(lastActivityIsHeartbeat(registry))
-    }
 
-    "send cookie in Associate PDU if configured to do so" in {
+    "send cookie in Associate PDU if configured to do so" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -337,9 +318,8 @@ class AkkaProtocolSpec
 
       awaitCond(
           lastActivityIsAssociate(registry, uid = 42, cookie = Some("abcde")))
-    }
 
-    "handle explicit disassociate messages" in {
+    "handle explicit disassociate messages" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -360,14 +340,13 @@ class AkkaProtocolSpec
 
       reader ! testAssociate(uid = 33, cookie = None)
 
-      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match {
+      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match
         case h: AssociationHandle ⇒
           h.remoteAddress should ===(remoteAkkaAddress)
           h.localAddress should ===(localAkkaAddress)
           h
 
         case _ ⇒ fail()
-      }
 
       wrappedHandle.readHandlerPromise.success(
           ActorHandleEventListener(testActor))
@@ -375,9 +354,8 @@ class AkkaProtocolSpec
       reader ! testDisassociate(AssociationHandle.Unknown)
 
       expectMsg(Disassociated(AssociationHandle.Unknown))
-    }
 
-    "handle transport level disassociations" in {
+    "handle transport level disassociations" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -398,14 +376,13 @@ class AkkaProtocolSpec
 
       reader ! testAssociate(uid = 33, cookie = None)
 
-      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match {
+      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match
         case h: AssociationHandle ⇒
           h.remoteAddress should ===(remoteAkkaAddress)
           h.localAddress should ===(localAkkaAddress)
           h
 
         case _ ⇒ fail()
-      }
 
       wrappedHandle.readHandlerPromise.success(
           ActorHandleEventListener(testActor))
@@ -413,9 +390,8 @@ class AkkaProtocolSpec
       reader ! Disassociated(AssociationHandle.Unknown)
 
       expectMsg(Disassociated(AssociationHandle.Unknown))
-    }
 
-    "disassociate when failure detector signals failure" in {
+    "disassociate when failure detector signals failure" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -436,14 +412,13 @@ class AkkaProtocolSpec
 
       stateActor ! testAssociate(uid = 33, cookie = None)
 
-      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match {
+      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match
         case h: AssociationHandle ⇒
           h.remoteAddress should ===(remoteAkkaAddress)
           h.localAddress should ===(localAkkaAddress)
           h
 
         case _ ⇒ fail()
-      }
 
       wrappedHandle.readHandlerPromise.success(
           ActorHandleEventListener(testActor))
@@ -454,9 +429,8 @@ class AkkaProtocolSpec
       failureDetector.isAvailable = false
 
       expectMsg(Disassociated(AssociationHandle.Unknown))
-    }
 
-    "handle correctly when the handler is registered only after the association is already closed" in {
+    "handle correctly when the handler is registered only after the association is already closed" in
       val (failureDetector, registry, transport, handle) = collaborators
       transport.associateBehavior.pushConstant(handle)
 
@@ -477,14 +451,13 @@ class AkkaProtocolSpec
 
       stateActor ! testAssociate(uid = 33, cookie = None)
 
-      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match {
+      val wrappedHandle = Await.result(statusPromise.future, 3.seconds) match
         case h: AssociationHandle ⇒
           h.remoteAddress should ===(remoteAkkaAddress)
           h.localAddress should ===(localAkkaAddress)
           h
 
         case _ ⇒ fail()
-      }
 
       stateActor ! Disassociated(AssociationHandle.Unknown)
 
@@ -492,9 +465,8 @@ class AkkaProtocolSpec
           ActorHandleEventListener(testActor))
 
       expectMsg(Disassociated(AssociationHandle.Unknown))
-    }
 
-    "give up outbound after connection timeout" in {
+    "give up outbound after connection timeout" in
       val (failureDetector, registry, transport, handle) = collaborators
       handle.writable = false // nothing will be written
       transport.associateBehavior.pushConstant(handle)
@@ -517,13 +489,11 @@ class AkkaProtocolSpec
               refuseUid = None))
 
       watch(stateActor)
-      intercept[TimeoutException] {
+      intercept[TimeoutException]
         Await.result(statusPromise.future, 5.seconds)
-      }
       expectTerminated(stateActor)
-    }
 
-    "give up inbound after connection timeout" in {
+    "give up inbound after connection timeout" in
       val (failureDetector, registry, _, handle) = collaborators
 
       val conf2 = ConfigFactory
@@ -541,6 +511,3 @@ class AkkaProtocolSpec
 
       watch(reader)
       expectTerminated(reader)
-    }
-  }
-}

@@ -6,7 +6,7 @@ import java.lang.{Double => JDouble, Integer => JInteger}
   *  This class and its methods are only here to properly support reflective
   *  calls on numbers.
   */
-class NumberReflectiveCall(value: Double) {
+class NumberReflectiveCall(value: Double)
 
   // Methods of java.lang.Double and java.lang.Integer
 
@@ -162,4 +162,3 @@ class NumberReflectiveCall(value: Double) {
   def ^(x: scala.Char): scala.Int = value.toInt ^ x
   def ^(x: scala.Int): scala.Int = value.toInt ^ x
   def ^(x: scala.Long): scala.Long = value.toInt ^ x
-}

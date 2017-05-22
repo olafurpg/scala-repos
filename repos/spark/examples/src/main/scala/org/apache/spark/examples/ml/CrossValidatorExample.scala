@@ -39,9 +39,9 @@ import org.apache.spark.sql.{Row, SQLContext}
   * bin/run-example ml.CrossValidatorExample
   * }}}
   */
-object CrossValidatorExample {
+object CrossValidatorExample
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("CrossValidatorExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -101,12 +101,9 @@ object CrossValidatorExample {
       .transform(test.toDF())
       .select("id", "text", "probability", "prediction")
       .collect()
-      .foreach {
+      .foreach
         case Row(id: Long, text: String, prob: Vector, prediction: Double) =>
           println(s"($id, $text) --> prob=$prob, prediction=$prediction")
-      }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

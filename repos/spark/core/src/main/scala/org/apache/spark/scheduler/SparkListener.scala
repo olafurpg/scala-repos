@@ -38,10 +38,9 @@ import org.apache.spark.util.{Distribution, Utils}
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS,
               include = JsonTypeInfo.As.PROPERTY,
               property = "Event")
-trait SparkListenerEvent {
+trait SparkListenerEvent
   /* Whether output this event to the event log */
   protected[spark] def logEvent: Boolean = true
-}
 
 @DeveloperApi
 case class SparkListenerStageSubmitted(
@@ -76,11 +75,10 @@ case class SparkListenerJobStart(jobId: Int,
                                  time: Long,
                                  stageInfos: Seq[StageInfo],
                                  properties: Properties = null)
-    extends SparkListenerEvent {
+    extends SparkListenerEvent
   // Note: this is here for backwards-compatibility with older versions of this event which
   // only stored stageIds and not StageInfos:
   val stageIds: Seq[Int] = stageInfos.map(_.stageId)
-}
 
 @DeveloperApi
 case class SparkListenerJobEnd(jobId: Int, time: Long, jobResult: JobResult)
@@ -152,13 +150,12 @@ private[spark] case class SparkListenerLogStart(sparkVersion: String)
   * Interface for creating history listeners defined in other modules like SQL, which are used to
   * rebuild the history UI.
   */
-private[spark] trait SparkHistoryListenerFactory {
+private[spark] trait SparkHistoryListenerFactory
 
   /**
     * Create listeners used to rebuild the history UI.
     */
   def createListeners(conf: SparkConf, sparkUI: SparkUI): Seq[SparkListener]
-}
 
 /**
   * :: DeveloperApi ::
@@ -167,7 +164,7 @@ private[spark] trait SparkHistoryListenerFactory {
   * {@link JavaSparkListener}
   */
 @DeveloperApi
-trait SparkListener {
+trait SparkListener
 
   /**
     * Called when a stage completes successfully or fails, with information on the completed stage.
@@ -261,28 +258,25 @@ trait SparkListener {
     * Called when other events like SQL-specific events are posted.
     */
   def onOtherEvent(event: SparkListenerEvent) {}
-}
 
 /**
   * :: DeveloperApi ::
   * Simple SparkListener that logs a few summary statistics when each stage completes
   */
 @DeveloperApi
-class StatsReportListener extends SparkListener with Logging {
+class StatsReportListener extends SparkListener with Logging
 
   import org.apache.spark.scheduler.StatsReportListener._
 
   private val taskInfoMetrics = mutable.Buffer[(TaskInfo, TaskMetrics)]()
 
-  override def onTaskEnd(taskEnd: SparkListenerTaskEnd) {
+  override def onTaskEnd(taskEnd: SparkListenerTaskEnd)
     val info = taskEnd.taskInfo
     val metrics = taskEnd.taskMetrics
-    if (info != null && metrics != null) {
+    if (info != null && metrics != null)
       taskInfoMetrics += ((info, metrics))
-    }
-  }
 
-  override def onStageCompleted(stageCompleted: SparkListenerStageCompleted) {
+  override def onStageCompleted(stageCompleted: SparkListenerStageCompleted)
     implicit val sc = stageCompleted
     this.logInfo(
         s"Finished stage: ${getStatusDetail(stageCompleted.stageInfo)}")
@@ -309,10 +303,9 @@ class StatsReportListener extends SparkListener with Logging {
                           taskInfoMetrics)
 
     // Runtime breakdown
-    val runtimePcts = taskInfoMetrics.map {
+    val runtimePcts = taskInfoMetrics.map
       case (info, metrics) =>
         RuntimePercentage(info.duration, metrics)
-    }
     showDistribution("executor (non-fetch) time pct: ",
                      Distribution(runtimePcts.map(_.executorPct * 100)),
                      "%2.0f %%")
@@ -324,9 +317,8 @@ class StatsReportListener extends SparkListener with Logging {
                      Distribution(runtimePcts.map(_.other * 100)),
                      "%2.0f %%")
     taskInfoMetrics.clear()
-  }
 
-  private def getStatusDetail(info: StageInfo): String = {
+  private def getStatusDetail(info: StageInfo): String =
     val failureReason = info.failureReason.map("(" + _ + ")").getOrElse("")
     val timeTaken = info.submissionTime
       .map(
@@ -337,10 +329,8 @@ class StatsReportListener extends SparkListener with Logging {
     s"Stage(${info.stageId}, ${info.attemptId}); Name: '${info.name}'; " +
     s"Status: ${info.getStatusString}$failureReason; numTasks: ${info.numTasks}; " +
     s"Took: $timeTaken msec"
-  }
-}
 
-private[spark] object StatsReportListener extends Logging {
+private[spark] object StatsReportListener extends Logging
 
   // For profiling, the extremes are more interesting
   val percentiles = Array[Int](0, 5, 10, 25, 50, 75, 90, 95, 100)
@@ -350,86 +340,73 @@ private[spark] object StatsReportListener extends Logging {
   def extractDoubleDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
       getMetric: (TaskInfo,
-      TaskMetrics) => Option[Double]): Option[Distribution] = {
+      TaskMetrics) => Option[Double]): Option[Distribution] =
     Distribution(
-        taskInfoMetrics.flatMap {
+        taskInfoMetrics.flatMap
       case (info, metric) => getMetric(info, metric)
-    })
-  }
+    )
 
   // Is there some way to setup the types that I can get rid of this completely?
   def extractLongDistribution(
       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)],
       getMetric: (TaskInfo,
-      TaskMetrics) => Option[Long]): Option[Distribution] = {
+      TaskMetrics) => Option[Long]): Option[Distribution] =
     extractDoubleDistribution(
         taskInfoMetrics,
         (info, metric) => { getMetric(info, metric).map(_.toDouble) })
-  }
 
   def showDistribution(
-      heading: String, d: Distribution, formatNumber: Double => String) {
+      heading: String, d: Distribution, formatNumber: Double => String)
     val stats = d.statCounter
     val quantiles = d.getQuantiles(probabilities).map(formatNumber)
     logInfo(heading + stats)
     logInfo(percentilesHeader)
     logInfo("\t" + quantiles.mkString("\t"))
-  }
 
   def showDistribution(heading: String,
                        dOpt: Option[Distribution],
-                       formatNumber: Double => String) {
-    dOpt.foreach { d =>
+                       formatNumber: Double => String)
+    dOpt.foreach  d =>
       showDistribution(heading, d, formatNumber)
-    }
-  }
 
   def showDistribution(
-      heading: String, dOpt: Option[Distribution], format: String) {
+      heading: String, dOpt: Option[Distribution], format: String)
     def f(d: Double): String = format.format(d)
     showDistribution(heading, dOpt, f _)
-  }
 
   def showDistribution(heading: String,
                        format: String,
                        getMetric: (TaskInfo, TaskMetrics) => Option[Double],
-                       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
+                       taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)])
     showDistribution(
         heading, extractDoubleDistribution(taskInfoMetrics, getMetric), format)
-  }
 
   def showBytesDistribution(heading: String,
                             getMetric: (TaskInfo, TaskMetrics) => Option[Long],
-                            taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
+                            taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)])
     showBytesDistribution(
         heading, extractLongDistribution(taskInfoMetrics, getMetric))
-  }
 
-  def showBytesDistribution(heading: String, dOpt: Option[Distribution]) {
-    dOpt.foreach { dist =>
+  def showBytesDistribution(heading: String, dOpt: Option[Distribution])
+    dOpt.foreach  dist =>
       showBytesDistribution(heading, dist)
-    }
-  }
 
-  def showBytesDistribution(heading: String, dist: Distribution) {
+  def showBytesDistribution(heading: String, dist: Distribution)
     showDistribution(
         heading, dist, (d => Utils.bytesToString(d.toLong)): Double => String)
-  }
 
-  def showMillisDistribution(heading: String, dOpt: Option[Distribution]) {
+  def showMillisDistribution(heading: String, dOpt: Option[Distribution])
     showDistribution(
         heading,
         dOpt,
         (d => StatsReportListener.millisToString(d.toLong)): Double => String)
-  }
 
   def showMillisDistribution(heading: String,
                              getMetric: (TaskInfo,
                              TaskMetrics) => Option[Long],
-                             taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)]) {
+                             taskInfoMetrics: Seq[(TaskInfo, TaskMetrics)])
     showMillisDistribution(
         heading, extractLongDistribution(taskInfoMetrics, getMetric))
-  }
 
   val seconds = 1000L
   val minutes = seconds * 60
@@ -438,31 +415,26 @@ private[spark] object StatsReportListener extends Logging {
   /**
     * Reformat a time interval in milliseconds to a prettier format for output
     */
-  def millisToString(ms: Long): String = {
+  def millisToString(ms: Long): String =
     val (size, units) =
-      if (ms > hours) {
+      if (ms > hours)
         (ms.toDouble / hours, "hours")
-      } else if (ms > minutes) {
+      else if (ms > minutes)
         (ms.toDouble / minutes, "min")
-      } else if (ms > seconds) {
+      else if (ms > seconds)
         (ms.toDouble / seconds, "s")
-      } else {
+      else
         (ms.toDouble, "ms")
-      }
     "%.1f %s".format(size, units)
-  }
-}
 
 private case class RuntimePercentage(
     executorPct: Double, fetchPct: Option[Double], other: Double)
 
-private object RuntimePercentage {
-  def apply(totalTime: Long, metrics: TaskMetrics): RuntimePercentage = {
+private object RuntimePercentage
+  def apply(totalTime: Long, metrics: TaskMetrics): RuntimePercentage =
     val denom = totalTime.toDouble
     val fetchTime = metrics.shuffleReadMetrics.map(_.fetchWaitTime)
     val fetch = fetchTime.map(_ / denom)
     val exec = (metrics.executorRunTime - fetchTime.getOrElse(0L)) / denom
     val other = 1.0 - (exec + fetch.getOrElse(0d))
     RuntimePercentage(exec, fetch, other)
-  }
-}

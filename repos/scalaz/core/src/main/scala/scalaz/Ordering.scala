@@ -7,11 +7,10 @@ package scalaz
   *       `Int`s returned by [[scala.math.Ordering]].
   */
 sealed abstract class Ordering(val toInt: Int, val name: String)
-    extends Product with Serializable {
+    extends Product with Serializable
   def complement: Ordering
-}
 
-object Ordering extends OrderingInstances {
+object Ordering extends OrderingInstances
   case object LT extends Ordering(-1, "LT") { def complement = GT }
   case object EQ extends Ordering(0, "EQ") { def complement = EQ }
   case object GT extends Ordering(1, "GT") { def complement = LT }
@@ -23,16 +22,15 @@ object Ordering extends OrderingInstances {
 
   def fromInt(intOrdering: Int): Ordering =
     if (intOrdering < 0) LT else if (intOrdering > 0) GT else EQ
-}
 
-sealed abstract class OrderingInstances {
+sealed abstract class OrderingInstances
 
   import Ordering._
 
   implicit val orderingInstance: Enum[Ordering] with Show[Ordering] with Monoid[
       Ordering] = new Enum[Ordering] with Show[Ordering]
-  with Monoid[Ordering] {
-    def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match {
+  with Monoid[Ordering]
+    def order(a1: Ordering, a2: Ordering): Ordering = (a1, a2) match
       case (LT, LT) => EQ
       case (LT, EQ | GT) => LT
       case (EQ, LT) => GT
@@ -40,27 +38,23 @@ sealed abstract class OrderingInstances {
       case (EQ, GT) => LT
       case (GT, LT | EQ) => GT
       case (GT, GT) => EQ
-    }
 
     override def shows(f: Ordering) = f.name
 
-    def append(f1: Ordering, f2: => Ordering): Ordering = f1 match {
+    def append(f1: Ordering, f2: => Ordering): Ordering = f1 match
       case Ordering.EQ => f2
       case o => o
-    }
 
     def zero: Ordering = Ordering.EQ
 
-    def succ(b: Ordering) = b match {
+    def succ(b: Ordering) = b match
       case Ordering.LT => Ordering.EQ
       case Ordering.EQ => Ordering.GT
       case Ordering.GT => Ordering.LT
-    }
-    def pred(b: Ordering) = b match {
+    def pred(b: Ordering) = b match
       case Ordering.GT => Ordering.EQ
       case Ordering.EQ => Ordering.LT
       case Ordering.LT => Ordering.GT
-    }
     override def succn(a: Int, b: Ordering) =
       if (a < 0) predn(-a, b)
       else if (a % 3 == 0) b
@@ -73,5 +67,3 @@ sealed abstract class OrderingInstances {
       else pred(pred(b))
     override def min = Some(LT)
     override def max = Some(GT)
-  }
-}

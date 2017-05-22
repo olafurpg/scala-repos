@@ -40,7 +40,7 @@ import org.apache.spark.util.Utils
   * @param _ssc Streaming context that will execute this input stream
   */
 abstract class InputDStream[T : ClassTag](_ssc: StreamingContext)
-    extends DStream[T](_ssc) {
+    extends DStream[T](_ssc)
 
   private[streaming] var lastValidTime: Time = null
 
@@ -53,7 +53,7 @@ abstract class InputDStream[T : ClassTag](_ssc: StreamingContext)
   protected[streaming] val rateController: Option[RateController] = None
 
   /** A human-readable name of this InputDStream */
-  private[streaming] def name: String = {
+  private[streaming] def name: String =
     // e.g. FlumePollingDStream -> "Flume polling stream"
     val newName = Utils
       .getFormattedClassName(this)
@@ -64,7 +64,6 @@ abstract class InputDStream[T : ClassTag](_ssc: StreamingContext)
       .toLowerCase
       .capitalize
     s"$newName [$id]"
-  }
 
   /**
     * The base scope associated with the operation that created this DStream.
@@ -72,13 +71,12 @@ abstract class InputDStream[T : ClassTag](_ssc: StreamingContext)
     * For InputDStreams, we use the name of this DStream as the scope name.
     * If an outer scope is given, we assume that it includes an alternative name for this stream.
     */
-  protected[streaming] override val baseScope: Option[String] = {
+  protected[streaming] override val baseScope: Option[String] =
     val scopeName =
-      Option(ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY)).map { json =>
+      Option(ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY)).map  json =>
         RDDOperationScope.fromJson(json).name + s" [$id]"
-      }.getOrElse(name.toLowerCase)
+      .getOrElse(name.toLowerCase)
     Some(new RDDOperationScope(scopeName).toJson)
-  }
 
   /**
     * Checks whether the 'time' is valid wrt slideDuration for generating RDD.
@@ -86,32 +84,27 @@ abstract class InputDStream[T : ClassTag](_ssc: StreamingContext)
     * This ensures that InputDStream.compute() is called strictly on increasing
     * times.
     */
-  override private[streaming] def isTimeValid(time: Time): Boolean = {
-    if (!super.isTimeValid(time)) {
+  override private[streaming] def isTimeValid(time: Time): Boolean =
+    if (!super.isTimeValid(time))
       false // Time not valid
-    } else {
+    else
       // Time is valid, but check it it is more than lastValidTime
-      if (lastValidTime != null && time < lastValidTime) {
+      if (lastValidTime != null && time < lastValidTime)
         logWarning("isTimeValid called with " + time +
             " where as last valid time is " + lastValidTime)
-      }
       lastValidTime = time
       true
-    }
-  }
 
   override def dependencies: List[DStream[_]] = List()
 
-  override def slideDuration: Duration = {
+  override def slideDuration: Duration =
     if (ssc == null) throw new Exception("ssc is null")
     if (ssc.graph.batchDuration == null)
       throw new Exception("batchDuration is null")
     ssc.graph.batchDuration
-  }
 
   /** Method called to start receiving data. Subclasses must implement this method. */
   def start()
 
   /** Method called to stop receiving data. Subclasses must implement this method. */
   def stop()
-}

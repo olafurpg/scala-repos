@@ -24,7 +24,7 @@ import io.prediction.annotation.Experimental
   * @tparam P Predicted result class
   */
 @DeveloperApi
-abstract class BaseServing[Q, P] extends AbstractDoer {
+abstract class BaseServing[Q, P] extends AbstractDoer
 
   /** :: Experimental ::
     * Engine developers should not use this directly. This is called by serving
@@ -47,4 +47,3 @@ abstract class BaseServing[Q, P] extends AbstractDoer {
     */
   @DeveloperApi
   def serveBase(q: Q, ps: Seq[P]): P
-}

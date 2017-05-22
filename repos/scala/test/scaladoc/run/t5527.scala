@@ -5,7 +5,7 @@ import scala.tools.cmd.CommandLineParser
 import scala.tools.nsc.doc.{Settings, DocFactory}
 import scala.tools.nsc.reporters.ConsoleReporter
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String =
     "-usejavacp -Xprint:parser -Yrangepos -Ystop-after:parser -d " +
@@ -139,21 +139,18 @@ object Test extends DirectTest {
     }
   """.trim
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
     compile()
     System.setErr(prevErr)
-  }
 
-  override def newCompiler(args: String*): Global = {
+  override def newCompiler(args: String*): Global =
     // we want the Scaladoc compiler here, because it keeps DocDef nodes in the tree
     val settings = new Settings(_ => ())
     val command = new ScalaDoc.Command(
         (CommandLineParser tokenize extraSettings) ++ args.toList, settings)
     new DocFactory(new ConsoleReporter(settings), settings).compiler
-  }
 
   override def isDebug = false // so we don't get the newSettings warning
-}

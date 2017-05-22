@@ -12,8 +12,7 @@ class ScalaAssertPostfixTemplate
     extends ScalaStringBasedPostfixTemplate(
         "assert",
         "assert(expr)",
-        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost)) {
+        new AncestorSelector(SelectorConditions.BOOLEAN_EXPR, Topmost))
 
   override def getTemplateString(element: PsiElement): String =
     "assert($expr$)"
-}

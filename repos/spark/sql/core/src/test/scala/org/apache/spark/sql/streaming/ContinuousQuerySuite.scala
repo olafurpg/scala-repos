@@ -22,12 +22,12 @@ import org.apache.spark.sql.StreamTest
 import org.apache.spark.sql.execution.streaming.{CompositeOffset, LongOffset, MemoryStream, StreamExecution}
 import org.apache.spark.sql.test.SharedSQLContext
 
-class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
+class ContinuousQuerySuite extends StreamTest with SharedSQLContext
 
   import AwaitTerminationTester._
   import testImplicits._
 
-  testQuietly("lifecycle states and awaitTermination") {
+  testQuietly("lifecycle states and awaitTermination")
     val inputData = MemoryStream[Int]
     val mapped = inputData.toDS().map { 6 / _ }
 
@@ -62,9 +62,8 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
                           .toCompositeOffset(Seq(inputData)),
                       "incorrect start offset on exception")
     )
-  }
 
-  testQuietly("source and sink statuses") {
+  testQuietly("source and sink statuses")
     val inputData = MemoryStream[Int]
     val mapped = inputData.toDS().map(6 / _)
 
@@ -90,7 +89,6 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         AssertOnQuery(
             _.sinkStatus.offset === Some(CompositeOffset.fill(LongOffset(1))))
     )
-  }
 
   /**
     * A [[StreamAction]] to test the behavior of `ContinuousQuery.awaitTermination()`.
@@ -110,14 +108,12 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
           TestAwaitTermination.assertOnQueryCondition(
               expectedBehavior, timeoutMs, expectedReturnValue),
           "Error testing awaitTermination behavior"
-      ) {
-    override def toString(): String = {
+      )
+    override def toString(): String =
       s"TestAwaitTermination($expectedBehavior, timeoutMs = $timeoutMs, " +
       s"expectedReturnValue = $expectedReturnValue)"
-    }
-  }
 
-  object TestAwaitTermination {
+  object TestAwaitTermination
 
     /**
       * Tests the behavior of `ContinuousQuery.awaitTermination`.
@@ -132,19 +128,14 @@ class ContinuousQuerySuite extends StreamTest with SharedSQLContext {
         expectedBehavior: ExpectedBehavior,
         timeoutMs: Int,
         expectedReturnValue: Boolean
-    )(q: StreamExecution): Boolean = {
+    )(q: StreamExecution): Boolean =
 
-      def awaitTermFunc(): Unit = {
-        if (timeoutMs <= 0) {
+      def awaitTermFunc(): Unit =
+        if (timeoutMs <= 0)
           q.awaitTermination()
-        } else {
+        else
           val returnedValue = q.awaitTermination(timeoutMs)
           assert(returnedValue === expectedReturnValue,
                  "Returned value does not match expected")
-        }
-      }
       AwaitTerminationTester.test(expectedBehavior, awaitTermFunc)
       true // If the control reached here, then everything worked as expected
-    }
-  }
-}

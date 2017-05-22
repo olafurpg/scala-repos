@@ -7,11 +7,11 @@ import scala.collection.immutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RecipeFlattenSeq extends RecipeSpec {
+class RecipeFlattenSeq extends RecipeSpec
 
-  "Recipe for flatteing a stream of seqs" must {
+  "Recipe for flatteing a stream of seqs" must
 
-    "work" in {
+    "work" in
 
       val someDataSource =
         Source(List(List("1"), List("2"), List("3", "4", "5"), List("6", "7")))
@@ -23,6 +23,3 @@ class RecipeFlattenSeq extends RecipeSpec {
 
       Await.result(flattened.limit(8).runWith(Sink.seq), 3.seconds) should be(
           List("1", "2", "3", "4", "5", "6", "7"))
-    }
-  }
-}

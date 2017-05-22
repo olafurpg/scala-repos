@@ -31,10 +31,9 @@ import javafx.scene.{control => jfxsc}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object ProgressBar {
+object ProgressBar
   implicit def sfxProgressBar2jfx(v: ProgressBar): jfxsc.ProgressBar =
     if (v != null) v.delegate else null
-}
 
 class ProgressBar(
     override val delegate: jfxsc.ProgressBar = new jfxsc.ProgressBar)

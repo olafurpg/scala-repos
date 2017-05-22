@@ -6,16 +6,15 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FunSpecGe
   * @author Roman.Shein
   * @since 05.05.2015.
   */
-trait FunSpecScopeTest extends FunSpecGenerator {
-  def testFunSpecEmptyScope() {
+trait FunSpecScopeTest extends FunSpecGenerator
+  def testFunSpecEmptyScope()
     addFunSpec()
 
     assert(
         checkConfigAndSettings(
             createTestFromLocation(17, 15, funSpecFileName), funSpecClassName))
-  }
 
-  def testFunSpecScope() {
+  def testFunSpecScope()
     addFunSpec()
 
     val testNames = Seq("FunSpecTest should launch single test",
@@ -36,5 +35,3 @@ trait FunSpecScopeTest extends FunSpecGenerator {
           checkResultTreeHasExactNamedPath(root, path1: _*) &&
           checkResultTreeHasExactNamedPath(root, path2: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "OtherScope"))
-  }
-}

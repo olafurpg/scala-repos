@@ -4,7 +4,7 @@ import Def.Initialize
 
 import scala.language.reflectiveCalls
 
-object Scripted {
+object Scripted
   def scriptedPath = file("scripted")
   lazy val scripted = InputKey[Unit]("scripted")
   lazy val scriptedUnpublished = InputKey[Unit](
@@ -20,14 +20,13 @@ object Scripted {
   import DefaultParsers._
   // Paging, 1-index based.
   case class ScriptedTestPage(page: Int, total: Int)
-  def scriptedParser(scriptedBase: File): Parser[Seq[String]] = {
+  def scriptedParser(scriptedBase: File): Parser[Seq[String]] =
     val scriptedFiles: NameFilter = ("test": NameFilter) | "pending"
     val pairs =
-      (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get map {
+      (scriptedBase * AllPassFilter * AllPassFilter * scriptedFiles).get map
         (f: File) =>
           val p = f.getParentFile
           (p.getParentFile.getName, p.getName)
-      }
     val pairMap = pairs.groupBy(_._1).mapValues(_.map(_._2).toSet);
 
     val id = charClass(c => !c.isWhitespace && c != '/').+.string
@@ -35,52 +34,47 @@ object Scripted {
 
     // A parser for page definitions
     val pageP: Parser[ScriptedTestPage] =
-      ("*" ~ NatBasic ~ "of" ~ NatBasic) map {
+      ("*" ~ NatBasic ~ "of" ~ NatBasic) map
         case _ ~ page ~ _ ~ total => ScriptedTestPage(page, total)
-      }
     // Grabs the filenames from a given test group in the current page definition.
-    def pagedFilenames(group: String, page: ScriptedTestPage): Seq[String] = {
+    def pagedFilenames(group: String, page: ScriptedTestPage): Seq[String] =
       val files = pairMap(group).toSeq.sortBy(_.toLowerCase)
       val pageSize = files.size / page.total
       // The last page may loose some values, so we explicitly keep them
       val dropped = files.drop(pageSize * (page.page - 1))
       if (page.page == page.total) dropped
       else dropped.take(pageSize)
-    }
-    def nameP(group: String) = {
+    def nameP(group: String) =
       token("*".id | id.examples(pairMap(group)))
-    }
-    val PagedIds: Parser[Seq[String]] = for {
+    val PagedIds: Parser[Seq[String]] = for
       group <- groupP
       page <- pageP
       files = pagedFilenames(group, page)
       // TODO -  Fail the parser if we don't have enough files for the given page size
       //if !files.isEmpty
-    } yield files map (f => group + '/' + f)
+    yield files map (f => group + '/' + f)
 
     val testID = (for (group <- groupP; name <- nameP(group)) yield
       (group, name))
     val testIdAsGroup = matched(testID) map (test => Seq(test))
     //(token(Space) ~> matched(testID)).*
     (token(Space) ~> (PagedIds | testIdAsGroup)).* map (_.flatten)
-  }
 
   // Interface to cross class loader
-  type SbtScriptedRunner = {
+  type SbtScriptedRunner =
     def run(resourceBaseDirectory: File,
             bufferLog: Boolean,
             tests: Array[String],
             bootProperties: File,
             launchOpts: Array[String],
             prescripted: java.util.List[File]): Unit
-  }
 
   def doScripted(launcher: File,
                  scriptedSbtClasspath: Seq[Attributed[File]],
                  scriptedSbtInstance: ScalaInstance,
                  sourcePath: File,
                  args: Seq[String],
-                 prescripted: File => Unit): Unit = {
+                 prescripted: File => Unit): Unit =
     System.err.println(
         s"About to run tests: ${args.mkString("\n * ", "\n * ", "\n")}")
     val noJLine =
@@ -91,25 +85,20 @@ object Scripted {
     val bridge = bridgeClass.newInstance.asInstanceOf[SbtScriptedRunner]
     val launcherVmOptions =
       Array("-XX:MaxPermSize=256M", "-Xmx1G") // increased after a failure in scripted source-dependencies/macro
-    try {
+    try
       // Using java.util.List to encode File => Unit.
-      val callback = new java.util.AbstractList[File] {
-        override def add(x: File): Boolean = {
+      val callback = new java.util.AbstractList[File]
+        override def add(x: File): Boolean =
           prescripted(x)
           false
-        }
         def get(x: Int): sbt.File = ???
         def size(): Int = 0
-      }
       bridge.run(sourcePath,
                  true,
                  args.toArray,
                  launcher,
                  launcherVmOptions,
                  callback)
-    } catch {
+    catch
       case ite: java.lang.reflect.InvocationTargetException =>
         throw ite.getCause
-    }
-  }
-}

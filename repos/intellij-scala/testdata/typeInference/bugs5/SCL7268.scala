@@ -1,20 +1,16 @@
-object SCL7268 {
-  class Low {
+object SCL7268
+  class Low
     implicit val x: B = new B
-  }
 
-  object B extends Low {
+  object B extends Low
     implicit def foo(implicit s: String): B = new B
-  }
 
   class B
-  class C {
+  class C
     type Out
-  }
 
-  object C {
+  object C
     implicit def g(implicit s: Boolean): C = new C { type Out = String }
-  }
 
   implicit val s: String = "text"
 
@@ -23,5 +19,4 @@ object SCL7268 {
 
   /*start*/
   foo /*end*/
-}
 //Int

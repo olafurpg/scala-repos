@@ -14,54 +14,47 @@ import org.jetbrains.plugins.scala.lang.psi.types._
   * @author Alefas
   * @since 10/06/14.
   */
-object MacroInferUtil {
+object MacroInferUtil
   //todo fix decompiler and replace parameter by ScMacroDefinition
   def checkMacro(f: ScFunction,
                  expectedType: Option[ScType],
-                 place: PsiElement): Option[ScType] = {
+                 place: PsiElement): Option[ScType] =
     if (!f.isInstanceOf[ScMacroDefinition] && !f
           .hasAnnotation("scala.reflect.macros.internal.macroImpl")
-          .isDefined) {
+          .isDefined)
       return None
-    }
 
-    class Checker(l: List[() => Option[ScType]] = List.empty) {
+    class Checker(l: List[() => Option[ScType]] = List.empty)
       def withCheck(checker: () => Option[ScType]): Checker =
         new Checker(checker :: l)
       def withCheck(functionName: String,
                     classFqn: String,
-                    typeEval: () => Option[ScType]): Checker = {
+                    typeEval: () => Option[ScType]): Checker =
         withCheck(
             () =>
-              {
             if (f.name != functionName) None
-            else {
+            else
               val clazz = f.containingClass
               if (clazz == null) None
-              else {
+              else
                 if (clazz.qualifiedName != classFqn) None
                 else typeEval()
-              }
-            }
-        })
-      }
+        )
 
-      def check(): Option[ScType] = {
-        for {
+      def check(): Option[ScType] =
+        for
           f <- l
           res <- f()
-        } return Some(res)
+        return Some(res)
         None
-      }
-    }
 
-    def calcProduct(): Option[ScType] = {
-      expectedType match {
+    def calcProduct(): Option[ScType] =
+      expectedType match
         case Some(tp) =>
           val manager = ScalaPsiManager.instance(place.getProject)
           val clazz = manager.getCachedClass(
               "shapeless.Generic", place.getResolveScope, ClassCategory.TYPE)
-          clazz match {
+          clazz match
             case c: ScTypeDefinition =>
               val tpt = c.typeParameters
               if (tpt.length == 0) return None
@@ -72,7 +65,7 @@ object MacroInferUtil {
               val (res, undefSubst) = Conformance.conformsInner(
                   genericType, tp, Set.empty, new ScUndefinedSubstitutor())
               if (!res) return None
-              undefSubst.getSubstitutor match {
+              undefSubst.getSubstitutor match
                 case Some(subst) =>
                   val productLikeType = subst.subst(undef)
                   val parts =
@@ -87,17 +80,15 @@ object MacroInferUtil {
                                                     place.getResolveScope,
                                                     ClassCategory.TYPE)
                   if (hnil == null) return None
-                  val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
+                  val repr = parts.foldRight(ScDesignatorType(hnil): ScType)
                     case (part, resultType) =>
                       ScParameterizedType(
                           ScDesignatorType(coloncolon), Seq(part, resultType))
-                  }
-                  ScalaPsiUtil.getCompanionModule(c) match {
+                  ScalaPsiUtil.getCompanionModule(c) match
                     case Some(obj: ScObject) =>
-                      val elem = obj.members.find {
+                      val elem = obj.members.find
                         case a: ScTypeAlias if a.name == "Aux" => true
                         case _ => false
-                      }
                       if (!elem.isDefined) return None
                       Some(
                           ScParameterizedType(
@@ -107,23 +98,17 @@ object MacroInferUtil {
                                   superReference = false),
                               Seq(productLikeType, repr)))
                     case _ => None
-                  }
                 case _ => None
-              }
             case _ => None
-          }
         case None => None
-      }
-    }
 
     new Checker()
       .withCheck("product", "shapeless.Generic", calcProduct)
       .withCheck("apply", "shapeless.LowPriorityGeneric", calcProduct)
       .check()
-  }
 
-  def isMacro(n: PsiNamedElement): Option[ScFunction] = {
-    n match {
+  def isMacro(n: PsiNamedElement): Option[ScFunction] =
+    n match
       case f: ScMacroDefinition => Some(f)
       //todo: fix decompiler to avoid this check:
       case f: ScFunction
@@ -132,6 +117,3 @@ object MacroInferUtil {
             .isDefined =>
         Some(f)
       case _ => None
-    }
-  }
-}

@@ -17,17 +17,14 @@ package com.twitter.scalding.serialization.macros.impl.ordered_serialization.run
 
 import com.twitter.scalding.serialization.{EquivSerialization, OrderedSerialization}
 
-object MacroEqualityOrderedSerialization {
+object MacroEqualityOrderedSerialization
   private val seed = "MacroEqualityOrderedSerialization".hashCode
-}
 
 abstract class MacroEqualityOrderedSerialization[T]
-    extends OrderedSerialization[T] with EquivSerialization[T] {
+    extends OrderedSerialization[T] with EquivSerialization[T]
   def uniqueId: String
   override def hashCode =
     MacroEqualityOrderedSerialization.seed ^ uniqueId.hashCode
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case o: MacroEqualityOrderedSerialization[_] => o.uniqueId == uniqueId
     case _ => false
-  }
-}

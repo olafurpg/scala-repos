@@ -11,7 +11,7 @@ import scala.sys._
 import Prop._
 import java.util.{Formattable, FormattableFlags, Formatter}
 
-class ReplProps {
+class ReplProps
   private def bool(name: String) = BooleanProp.keyExists(name)
   private def int(name: String) = Prop[Int](name)
 
@@ -23,11 +23,11 @@ class ReplProps {
   val trace = bool("scala.repl.trace")
   val power = bool("scala.repl.power")
 
-  def enversion(s: String) = {
+  def enversion(s: String) =
     import FormattableFlags._
-    val v = new Formattable {
+    val v = new Formattable
       override def formatTo(
-          formatter: Formatter, flags: Int, width: Int, precision: Int) = {
+          formatter: Formatter, flags: Int, width: Int, precision: Int) =
         val version =
           if ((flags & ALTERNATE) != 0) versionNumberString else versionString
         val left = if ((flags & LEFT_JUSTIFY) != 0) "-" else ""
@@ -35,14 +35,10 @@ class ReplProps {
         val p = if (precision >= 0) s".$precision" else ""
         val fmt = s"%${left}${w}${p}s"
         formatter.format(fmt, version)
-      }
-    }
     s.format(v, javaVersion, javaVmName)
-  }
-  def encolor(s: String) = {
+  def encolor(s: String) =
     import scala.io.AnsiColor.{MAGENTA, RESET}
     if (colorOk) s"$MAGENTA$s$RESET" else s
-  }
 
   // Handy system prop for shell prompt, or else pick it up from compiler.properties
   val promptString =
@@ -54,19 +50,17 @@ class ReplProps {
   // Prompt for continued input, will be right-adjusted to width of the primary prompt
   val continueString =
     Prop[String]("scala.repl.continue").option getOrElse "| "
-  val continueText = {
+  val continueText =
     val text = enversion(continueString)
     val margin = promptText.lines.toList.last.length - text.length
     if (margin > 0) " " * margin + text else text
-  }
   val continuePrompt = encolor(continueText)
 
   // Next time.
   //def welcome = enversion(Prop[String]("scala.repl.welcome") or shellWelcomeString)
-  def welcome = enversion {
+  def welcome = enversion
     val p = Prop[String]("scala.repl.welcome")
     if (p.isSet) p.get else shellWelcomeString
-  }
 
   val pasteDelimiter = Prop[String]("scala.repl.here")
 
@@ -83,4 +77,3 @@ class ReplProps {
 
   val vids = bool("scala.repl.vids")
   val maxPrintString = int("scala.repl.maxprintstring")
-}

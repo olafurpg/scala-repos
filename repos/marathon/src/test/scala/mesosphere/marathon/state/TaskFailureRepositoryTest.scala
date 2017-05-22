@@ -7,11 +7,11 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{Matchers, GivenWhenThen}
 
 class TaskFailureRepositoryTest
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
   import TaskFailureTestHelper.taskFailure
   import mesosphere.FutureTestSupport._
 
-  test("store and fetch") {
+  test("store and fetch")
     Given("an empty taskRepository")
     val f = new Fixture
 
@@ -24,9 +24,8 @@ class TaskFailureRepositoryTest
 
     Then("the resulting failure is the one we stored")
     readFailure should be(Some(taskFailure))
-  }
 
-  test("the last store wins") {
+  test("the last store wins")
     Given("an empty taskRepository")
     val f = new Fixture
 
@@ -45,9 +44,8 @@ class TaskFailureRepositoryTest
 
     Then("the resulting failure is the one we stored LAST")
     readFailure should be(Some(anotherTaskFailure))
-  }
 
-  test("expunge works") {
+  test("expunge works")
     Given("an empty taskRepository")
     val f = new Fixture
 
@@ -63,9 +61,8 @@ class TaskFailureRepositoryTest
 
     Then("the result is None")
     readFailure should be(None)
-  }
 
-  class Fixture {
+  class Fixture
     lazy val inMemoryStore = new InMemoryStore()
     lazy val entityStore = new MarathonStore[TaskFailure](
         inMemoryStore,
@@ -77,5 +74,3 @@ class TaskFailureRepositoryTest
     lazy val metrics = new Metrics(metricRegistry)
     lazy val taskFailureRepo = new TaskFailureRepository(
         entityStore, maxVersions = Some(1), metrics)
-  }
-}

@@ -24,11 +24,11 @@ import io.prediction.workflow.WorkflowUtils
 
 import scala.sys.process._
 
-object RunServer extends Logging {
+object RunServer extends Logging
   def runServer(ca: ConsoleArgs,
                 core: File,
                 em: EngineManifest,
-                engineInstanceId: String): Int = {
+                engineInstanceId: String): Int =
     val pioEnvVars = sys.env
       .filter(kv => kv._1.startsWith("PIO_"))
       .map(kv => s"${kv._1}=${kv._2}")
@@ -42,36 +42,31 @@ object RunServer extends Logging {
     val driverClassPathIndex =
       ca.common.sparkPassThrough.indexOf("--driver-class-path")
     val driverClassPathPrefix =
-      if (driverClassPathIndex != -1) {
+      if (driverClassPathIndex != -1)
         Seq(ca.common.sparkPassThrough(driverClassPathIndex + 1))
-      } else {
+      else
         Seq()
-      }
     val extraClasspaths =
       driverClassPathPrefix ++ WorkflowUtils.thirdPartyClasspaths
 
     val deployModeIndex = ca.common.sparkPassThrough.indexOf("--deploy-mode")
     val deployMode =
-      if (deployModeIndex != -1) {
+      if (deployModeIndex != -1)
         ca.common.sparkPassThrough(deployModeIndex + 1)
-      } else {
+      else
         "client"
-      }
 
     val mainJar =
-      if (ca.build.uberJar) {
-        if (deployMode == "cluster") {
+      if (ca.build.uberJar)
+        if (deployMode == "cluster")
           em.files.filter(_.startsWith("hdfs")).head
-        } else {
+        else
           em.files.filterNot(_.startsWith("hdfs")).head
-        }
-      } else {
-        if (deployMode == "cluster") {
+      else
+        if (deployMode == "cluster")
           em.files.filter(_.contains("pio-assembly")).head
-        } else {
+        else
           core.getCanonicalPath
-        }
-      }
 
     val jarFiles = (em.files ++ Option(
             new File(ca.common.pioHome.get, "plugins").listFiles())
@@ -84,25 +79,25 @@ object RunServer extends Logging {
           "io.prediction.workflow.CreateServer",
           "--name",
           s"PredictionIO Engine Instance: ${engineInstanceId}") ++
-      (if (!ca.build.uberJar) {
+      (if (!ca.build.uberJar)
          Seq("--jars", jarFiles)
-       } else Seq()) ++
-      (if (extraFiles.size > 0) {
+       else Seq()) ++
+      (if (extraFiles.size > 0)
          Seq("--files", extraFiles.mkString(","))
-       } else {
+       else
          Seq()
-       }) ++
-      (if (extraClasspaths.size > 0) {
+       ) ++
+      (if (extraClasspaths.size > 0)
          Seq("--driver-class-path", extraClasspaths.mkString(":"))
-       } else {
+       else
          Seq()
-       }) ++
-      (if (ca.common.sparkKryo) {
+       ) ++
+      (if (ca.common.sparkKryo)
          Seq("--conf",
              "spark.serializer=org.apache.spark.serializer.KryoSerializer")
-       } else {
+       else
          Seq()
-       }) ++ Seq(mainJar,
+       ) ++ Seq(mainJar,
                  "--engineInstanceId",
                  engineInstanceId,
                  "--ip",
@@ -113,11 +108,11 @@ object RunServer extends Logging {
                  ca.eventServer.ip,
                  "--event-server-port",
                  ca.eventServer.port.toString) ++
-      (if (ca.accessKey.accessKey != "") {
+      (if (ca.accessKey.accessKey != "")
          Seq("--accesskey", ca.accessKey.accessKey)
-       } else {
+       else
          Seq()
-       }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
+       ) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Seq()) ++
       (if (ca.common.batch != "")
          Seq("--batch", ca.common.batch) else Seq()) ++
       (if (ca.common.verbose) Seq("--verbose") else Seq()) ++ ca.deploy.logUrl
@@ -134,16 +129,14 @@ object RunServer extends Logging {
                        "CLASSPATH" -> "",
                        "SPARK_YARN_USER_ENV" -> pioEnvVars).run()
     Runtime.getRuntime.addShutdownHook(
-        new Thread(new Runnable {
-      def run(): Unit = {
+        new Thread(new Runnable
+      def run(): Unit =
         proc.destroy()
-      }
-    }))
+    ))
     proc.exitValue()
-  }
 
   def newRunServer(
-      ca: ConsoleArgs, em: EngineManifest, engineInstanceId: String): Int = {
+      ca: ConsoleArgs, em: EngineManifest, engineInstanceId: String): Int =
     val jarFiles =
       em.files.map(new URI(_)) ++ Option(
           new File(ca.common.pioHome.get, "plugins").listFiles())
@@ -162,11 +155,11 @@ object RunServer extends Logging {
           ca.eventServer.ip,
           "--event-server-port",
           ca.eventServer.port.toString) ++
-      (if (ca.accessKey.accessKey != "") {
+      (if (ca.accessKey.accessKey != "")
          Seq("--accesskey", ca.accessKey.accessKey)
-       } else {
+       else
          Nil
-       }) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
+       ) ++ (if (ca.eventServer.enabled) Seq("--feedback") else Nil) ++
       (if (ca.common.batch != "") Seq("--batch", ca.common.batch) else Nil) ++
       (if (ca.common.verbose) Seq("--verbose") else Nil) ++ ca.deploy.logUrl
         .map(x => Seq("--log-url", x))
@@ -177,5 +170,3 @@ object RunServer extends Logging {
 
     Runner.runOnSpark(
         "io.prediction.workflow.CreateServer", args, ca, jarFiles)
-  }
-}

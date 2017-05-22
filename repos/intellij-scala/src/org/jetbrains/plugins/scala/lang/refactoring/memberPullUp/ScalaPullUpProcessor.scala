@@ -28,7 +28,7 @@ class ScalaPullUpProcessor(project: Project,
                            sourceClass: ScTemplateDefinition,
                            targetClass: ScTemplateDefinition,
                            memberInfos: Seq[ScalaExtractMemberInfo])
-    extends BaseRefactoringProcessor(project) {
+    extends BaseRefactoringProcessor(project)
   override def createUsageViewDescriptor(
       usages: Array[UsageInfo]): UsageViewDescriptor =
     new PullUpUsageViewDescriptor
@@ -43,28 +43,27 @@ class ScalaPullUpProcessor(project: Project,
   /**
     * Should be invoked in write action
     * */
-  def moveMembersToBase() {
+  def moveMembersToBase()
     val manager = targetClass.getManager
     val extendsBlock = targetClass.extendsBlock
-    val templateBody = extendsBlock.templateBody match {
+    val templateBody = extendsBlock.templateBody match
       case Some(tb) => tb
       case None =>
         extendsBlock.add(ScalaPsiElementFactory.createTemplateBody(manager))
-    }
     val anchor = templateBody.getLastChild
 
-    val collectImportScope = memberInfos.collect {
+    val collectImportScope = memberInfos.collect
       case ScalaExtractMemberInfo(m, false) => m
-    } //extracted declarations are handled with ScalaPsiUtil.adjustTypes
+    //extracted declarations are handled with ScalaPsiUtil.adjustTypes
 
     ScalaChangeContextUtil.encodeContextInfo(collectImportScope)
 
-    extensions.withDisabledPostprocessFormatting(project) {
+    extensions.withDisabledPostprocessFormatting(project)
       val movedDefinitions = ArrayBuffer[ScMember]()
-      for {
+      for
         info <- memberInfos
         memberCopy <- memberCopiesToExtract(info)
-      } {
+      
         handleOldMember(info)
 
         templateBody.addBefore(
@@ -73,21 +72,17 @@ class ScalaPullUpProcessor(project: Project,
           templateBody.addBefore(memberCopy, anchor).asInstanceOf[ScMember]
         if (info.isToAbstract) TypeAdjuster.markToAdjust(added)
         else movedDefinitions += added
-      }
       templateBody.addBefore(
           ScalaPsiElementFactory.createNewLine(manager), anchor)
 
       ScalaChangeContextUtil.decodeContextInfo(movedDefinitions)
-    }
 
-    for (tb <- sourceClass.extendsBlock.templateBody if tb.members.isEmpty) {
+    for (tb <- sourceClass.extendsBlock.templateBody if tb.members.isEmpty)
       tb.delete()
-    }
 
     reformatAfter()
-  }
 
-  private def reformatAfter() {
+  private def reformatAfter()
     val documentManager = PsiDocumentManager.getInstance(project)
     val csManager = CodeStyleManager.getInstance(project)
     val targetDocument =
@@ -99,11 +94,10 @@ class ScalaPullUpProcessor(project: Project,
     documentManager.doPostponedOperationsAndUnblockDocument(sourceDocument)
     csManager.adjustLineIndent(
         sourceClass.getContainingFile, sourceClass.getTextRange)
-  }
 
   private def memberCopiesToExtract(
-      info: ScalaExtractMemberInfo): Seq[ScMember] = {
-    info match {
+      info: ScalaExtractMemberInfo): Seq[ScMember] =
+    info match
       case ScalaExtractMemberInfo(decl: ScDeclaration, _) =>
         val member = decl.copy().asInstanceOf[ScMember]
         Seq(member)
@@ -119,51 +113,42 @@ class ScalaPullUpProcessor(project: Project,
         ScalaChangeContextUtil.shiftAssociations(copy, -shift)
         Seq(copy)
       case _ => Seq(info.getMember.copy().asInstanceOf[ScMember])
-    }
-  }
 
-  private def handleOldMember(info: ScalaExtractMemberInfo) = {
-    info match {
+  private def handleOldMember(info: ScalaExtractMemberInfo) =
+    info match
       case ScalaExtractMemberInfo(m: ScDeclaration, _) => m.delete()
       case ScalaExtractMemberInfo(m, false) => m.delete()
       case ScalaExtractMemberInfo(m, true) =>
         m.setModifierProperty("override", value = true)
-    }
-  }
 
-  private def declarationsText(m: ScMember): Seq[String] = {
-    def textForBinding(b: ScBindingPattern) = {
-      val typeText = b.getType(TypingContext.empty) match {
+  private def declarationsText(m: ScMember): Seq[String] =
+    def textForBinding(b: ScBindingPattern) =
+      val typeText = b.getType(TypingContext.empty) match
         case Success(t, _) => s": ${t.canonicalText}"
         case _ => ""
-      }
       s"${b.name}$typeText"
-    }
-    m match {
+    m match
       case decl: ScDeclaration => Seq(decl.getText)
       case funDef: ScFunctionDefinition =>
         val copy = funDef.copy().asInstanceOf[ScFunctionDefinition]
         copy.setModifierProperty("override", value = false)
         Seq(copy.assignment, copy.body).flatten.foreach(_.delete())
         copy.accept(
-            new ScalaRecursiveElementVisitor() {
-          override def visitSimpleTypeElement(te: ScSimpleTypeElement) = {
+            new ScalaRecursiveElementVisitor()
+          override def visitSimpleTypeElement(te: ScSimpleTypeElement) =
             val tpe = te.calcType
             te.replace(ScalaPsiElementFactory.createTypeElementFromText(
                     tpe.canonicalText, te.getManager))
-          }
-        })
+        )
         Seq(copy.getText)
       case valDef: ScPatternDefinition =>
         val copy = valDef.copy().asInstanceOf[ScPatternDefinition]
-        copy.bindings.collect {
+        copy.bindings.collect
           case b: ScBindingPattern => "val " + textForBinding(b)
-        }
       case varDef: ScVariableDefinition =>
         val copy = varDef.copy().asInstanceOf[ScVariableDefinition]
-        copy.bindings.collect {
+        copy.bindings.collect
           case b: ScBindingPattern => "var " + textForBinding(b)
-        }
       case ta: ScTypeAliasDefinition =>
         val copy = ta.copy().asInstanceOf[ScTypeAliasDefinition]
         Seq(
@@ -176,10 +161,8 @@ class ScalaPullUpProcessor(project: Project,
       case _ =>
         throw new IllegalArgumentException(
             s"Cannot create declaration text from member ${m.getText}")
-    }
-  }
 
-  private class PullUpUsageViewDescriptor extends UsageViewDescriptor {
+  private class PullUpUsageViewDescriptor extends UsageViewDescriptor
     def getProcessedElementsHeader: String = "Pull up members from"
 
     def getElements: Array[PsiElement] = Array[PsiElement](sourceClass)
@@ -189,5 +172,3 @@ class ScalaPullUpProcessor(project: Project,
 
     def getCommentReferencesText(usagesCount: Int, filesCount: Int): String =
       null
-  }
-}

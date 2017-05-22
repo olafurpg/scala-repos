@@ -2,7 +2,7 @@ package com.twitter.scalding
 
 import com.twitter.algebird.Semigroup
 
-object ExecutionUtil {
+object ExecutionUtil
 
   /**
     * Generate a list of executions from a date range
@@ -27,13 +27,12 @@ object ExecutionUtil {
     */
   def runDatesWithParallelism[T](duration: Duration, parallelism: Int = 1)(
       fn: DateRange => Execution[T])(
-      implicit dr: DateRange): Execution[Seq[(DateRange, T)]] = {
+      implicit dr: DateRange): Execution[Seq[(DateRange, T)]] =
 
     val dates = dr.each(duration).toSeq
     Execution
       .withParallelism(dates.map(fn), parallelism)
       .map(e => dates.zip(e))
-  }
 
   /**
     * Split a DateRange and allow for max parallel running of executions
@@ -67,10 +66,8 @@ object ExecutionUtil {
     */
   def runDateRangeWithParallelismSum[T](
       duration: Duration, parallelism: Int = 1)(fn: DateRange => Execution[T])(
-      implicit dr: DateRange, semigroup: Semigroup[T]): Execution[T] = {
+      implicit dr: DateRange, semigroup: Semigroup[T]): Execution[T] =
     require(dr.each(duration).nonEmpty, s"Date Range can not be empty")
 
     runDateRangeWithParallelism(duration, parallelism)(fn)(dr)
       .map(_.reduceLeft[T] { case (l, r) => Semigroup.plus(l, r) })
-  }
-}

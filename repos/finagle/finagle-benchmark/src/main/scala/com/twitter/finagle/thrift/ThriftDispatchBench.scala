@@ -10,8 +10,8 @@ import org.apache.thrift.protocol._
 import org.apache.thrift.transport._
 import org.openjdk.jmh.annotations._
 
-object ThriftDispatchBench {
-  val payload = {
+object ThriftDispatchBench
+  val payload =
     val buf = new TMemoryBuffer(32)
     val out = new TBinaryProtocol(buf)
     out.writeMessageBegin(new TMessage("echo", TMessageType.CALL, 0))
@@ -23,10 +23,9 @@ object ThriftDispatchBench {
     out.writeStructEnd()
     out.writeMessageEnd()
     Arrays.copyOfRange(buf.getArray(), 0, buf.length())
-  }
 
-  val service = new Service[ThriftClientRequest, Array[Byte]] {
-    val response = Future.value {
+  val service = new Service[ThriftClientRequest, Array[Byte]]
+    val response = Future.value
       val buf = new TMemoryBuffer(32)
       val out = new TBinaryProtocol(buf)
       out.writeMessageBegin(new TMessage("echo", TMessageType.REPLY, 0))
@@ -38,25 +37,20 @@ object ThriftDispatchBench {
       out.writeStructEnd()
       out.writeMessageEnd()
       Arrays.copyOfRange(buf.getArray(), 0, buf.length())
-    }
 
     def apply(req: ThriftClientRequest) = response
-  }
 
-  def scroogeService(prot: TProtocolFactory) = {
-    val impl = new Hello.FutureIface {
+  def scroogeService(prot: TProtocolFactory) =
+    val impl = new Hello.FutureIface
       def echo(body: String) = Future.value(body)
-    }
     new Hello.FinagledService(impl, prot)
-  }
 
   def scroogeClient(prot: TProtocolFactory) =
     new Hello.FinagledClient(service, prot)
-}
 
 @Threads(1)
 @State(Scope.Benchmark)
-class ThriftDispatchBench extends StdBenchAnnotations {
+class ThriftDispatchBench extends StdBenchAnnotations
   import ThriftDispatchBench._
 
   // standard TBinaryProtocol
@@ -70,22 +64,17 @@ class ThriftDispatchBench extends StdBenchAnnotations {
       Protocols.binaryFactory(statsReceiver = NullStatsReceiver))
 
   @Benchmark
-  def scroogeDispatch_StdTBinaryProt(): Array[Byte] = {
+  def scroogeDispatch_StdTBinaryProt(): Array[Byte] =
     Await.result(scroogeService0(payload))
-  }
 
   @Benchmark
-  def scroogeProxy_StdBinaryProt(): String = {
+  def scroogeProxy_StdBinaryProt(): String =
     Await.result(scroogeClient0.echo("hello world"))
-  }
 
   @Benchmark
-  def scroogeDispatch_CustomTBinaryProt(): Array[Byte] = {
+  def scroogeDispatch_CustomTBinaryProt(): Array[Byte] =
     Await.result(scroogeService1(payload))
-  }
 
   @Benchmark
-  def scroogeProxy_CustomTBinaryProt(): String = {
+  def scroogeProxy_CustomTBinaryProt(): String =
     Await.result(scroogeClient1.echo("hello world"))
-  }
-}

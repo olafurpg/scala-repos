@@ -44,7 +44,6 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 class LineToSpec
     extends SimpleSFXDelegateSpec[jfxss.LineTo, LineTo](
         classOf[jfxss.LineTo], classOf[LineTo])
-    with PositionDelegateSpec[LineTo] {
+    with PositionDelegateSpec[LineTo]
 
   val positionDelegate = getScalaClassInstance
-}

@@ -12,7 +12,7 @@ import org.scalatra.servlet.ScalatraListener
   */
 class JettyServer(
     socketAddress: InetSocketAddress = new InetSocketAddress(8080),
-    resourceBase: String = "src/main/webapp") {
+    resourceBase: String = "src/main/webapp")
   val context = new ServletContextHandler(ServletContextHandler.SESSIONS)
   context.setContextPath("/")
   context.addEventListener(new ScalatraListener)
@@ -21,18 +21,14 @@ class JettyServer(
   val server = new Server(socketAddress)
   server.setHandler(context)
 
-  def start(): this.type = {
+  def start(): this.type =
     server.start()
     this
-  }
 
-  def stop(): this.type = {
+  def stop(): this.type =
     server.stop()
     this
-  }
 
-  def join(): this.type = {
+  def join(): this.type =
     server.join
     this
-  }
-}

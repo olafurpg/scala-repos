@@ -21,9 +21,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.catalyst.dsl.expressions._
 import org.apache.spark.sql.catalyst.expressions.ExpressionEvalHelper
 
-class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper {
+class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper
 
-  test("basic") {
+  test("basic")
     val leftInput =
       Seq(create_row(1, "a"), create_row(1, "b"), create_row(2, "c")).iterator
     val rightInput =
@@ -35,21 +35,20 @@ class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper {
     val cogrouped =
       new CoGroupedIterator(leftGrouped, rightGrouped, Seq('i.int))
 
-    val result = cogrouped.map {
+    val result = cogrouped.map
       case (key, leftData, rightData) =>
         assert(key.numFields == 1)
         (key.getInt(0), leftData.toSeq, rightData.toSeq)
-    }.toSeq
+    .toSeq
     assert(
         result == (1,
                    Seq(create_row(1, "a"), create_row(1, "b")),
                    Seq(create_row(1, 2L))) :: (
             2, Seq(create_row(2, "c")), Seq(create_row(2, 3L))) :: (
             3, Seq.empty, Seq(create_row(3, 4L))) :: Nil)
-  }
 
   test(
-      "SPARK-11393: respect the fact that GroupedIterator.hasNext is not idempotent") {
+      "SPARK-11393: respect the fact that GroupedIterator.hasNext is not idempotent")
     val leftInput = Seq(create_row(2, "a")).iterator
     val rightInput = Seq(create_row(1, 2L)).iterator
     val leftGrouped =
@@ -59,13 +58,11 @@ class CoGroupedIteratorSuite extends SparkFunSuite with ExpressionEvalHelper {
     val cogrouped =
       new CoGroupedIterator(leftGrouped, rightGrouped, Seq('i.int))
 
-    val result = cogrouped.map {
+    val result = cogrouped.map
       case (key, leftData, rightData) =>
         assert(key.numFields == 1)
         (key.getInt(0), leftData.toSeq, rightData.toSeq)
-    }.toSeq
+    .toSeq
 
     assert(result == (1, Seq.empty, Seq(create_row(1, 2L))) :: (
             2, Seq(create_row(2, "a")), Seq.empty) :: Nil)
-  }
-}

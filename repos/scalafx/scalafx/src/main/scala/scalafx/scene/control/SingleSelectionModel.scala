@@ -31,7 +31,7 @@ import javafx.scene.{control => jfxsc}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object SingleSelectionModel {
+object SingleSelectionModel
   implicit def sfxSingleSelectionModel2jfx[T](
       v: SingleSelectionModel[T]): jfxsc.SingleSelectionModel[T] =
     if (v != null) v.delegate else null
@@ -55,11 +55,10 @@ object SingleSelectionModel {
     */
   def apply[T](modelItem: Int => T, itemCount: => Int) =
     new SingleSelectionModel[T](
-        new jfxsc.SingleSelectionModel[T] {
+        new jfxsc.SingleSelectionModel[T]
       protected def getModelItem(index: Int): T = modelItem(index)
       protected def getItemCount = itemCount
-    }) {}
-}
+    ) {}
 
 abstract class SingleSelectionModel[T](
     override val delegate: jfxsc.SingleSelectionModel[T])

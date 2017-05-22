@@ -1,4 +1,4 @@
-trait SI_5054_q5 {
+trait SI_5054_q5
 
   /**
     * A simple comment
@@ -7,4 +7,3 @@ trait SI_5054_q5 {
     * @usecase def test(): Int
     */
   def test(implicit lost: Int): Int = lost
-}

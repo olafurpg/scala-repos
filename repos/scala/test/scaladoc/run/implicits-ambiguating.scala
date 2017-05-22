@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   // test a file instead of a piece of code
   override def resourceFile = "implicits-ambiguating-res.scala"
@@ -9,7 +9,7 @@ object Test extends ScaladocModelTest {
   // start implicits
   def scaladocSettings = "-implicits"
 
-  def testModel(root: Package) = {
+  def testModel(root: Package) =
     // get the quick access implicit defs in scope (_package(s), _class(es), _trait(s), object(s) _method(s), _value(s))
     import access._
 
@@ -47,19 +47,17 @@ object Test extends ScaladocModelTest {
       *  - conv8 should be ambiguous
       *  - conv9 should be ambiguous
       *  - conv10 and conv11 should not be ambiguous */
-    def check1to9(cls: String): Unit = {
-      for (conv <- (1 to 5).map("conv" + _)) {
+    def check1to9(cls: String): Unit =
+      for (conv <- (1 to 5).map("conv" + _))
         assert(isAmbiguous(conv1._member(conv)),
                cls + " - AtoX." + conv + " is ambiguous")
         assert(isAmbiguous(conv2._member(conv)),
                cls + " - AtoZ." + conv + " is ambiguous")
-      }
-      for (conv <- (6 to 7).map("conv" + _)) {
+      for (conv <- (6 to 7).map("conv" + _))
         assert(!isAmbiguous(conv1._member(conv)),
                cls + " - AtoX." + conv + " is not ambiguous")
         assert(!isAmbiguous(conv2._member(conv)),
                cls + " - AtoZ." + conv + " is not ambiguous")
-      }
       assert(isAmbiguous(conv1._member("conv8")),
              cls + " - AtoX.conv8 is ambiguous")
       assert(isAmbiguous(conv2._member("conv8")),
@@ -68,7 +66,6 @@ object Test extends ScaladocModelTest {
              cls + " - AtoX.conv9 is ambiguous")
       assert(isAmbiguous(conv2._member("conv9")),
              cls + " - AtoZ.conv9 is ambiguous")
-    }
     check1to9("A")
     assert(!isAmbiguous(conv1._member("conv10")),
            "A - AtoX.conv10 is not ambiguous")
@@ -144,5 +141,3 @@ object Test extends ScaladocModelTest {
         isAmbiguous(conv1._member("conv11")), "D - AtoX.conv11 is ambiguous")
     assert(
         isAmbiguous(conv2._member("conv11")), "D - AtoZ.conv11 is ambiguous")
-  }
-}

@@ -3,7 +3,7 @@ package java.util.zip
 // scalastyle:off equals.hash.code
 
 /** Pure Scala implementation of ZipEntry */
-class ZipEntry(private[this] val _name: String) extends Cloneable {
+class ZipEntry(private[this] val _name: String) extends Cloneable
 
   private[this] var _comment: String = null
   private[this] var _csize: Long = -1
@@ -13,7 +13,7 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
   private[this] var _size: Long = -1
   private[this] var _time: Long = -1
 
-  def this(e: ZipEntry) = {
+  def this(e: ZipEntry) =
     this(e.getName())
     setComment(e.getComment())
     setCompressedSize(e.getCompressedSize())
@@ -22,14 +22,12 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
     setMethod(e.getMethod())
     setSize(e.getSize())
     setTime(e.getTime())
-  }
 
-  override def clone(): Object = {
+  override def clone(): Object =
     val result = super.clone()
     if (getExtra() != null)
       setExtra(getExtra().clone().asInstanceOf[Array[Byte]])
     result
-  }
 
   def getComment(): String = _comment
   def getCompressedSize(): Long = _csize
@@ -41,7 +39,7 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
   def getTime(): Long = _time
 
   // Strangely, the Javalib defines hashCode, but not equals.
-  override def hashCode(): Int = {
+  override def hashCode(): Int =
     import scala.util.hashing.MurmurHash3._
 
     var acc = 0x45322
@@ -54,7 +52,6 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
     acc = mix(acc, getSize.##)
     acc = mixLast(acc, getTime.##)
     finalizeHash(acc, 8)
-  }
 
   def isDirectory(): Boolean = _name.endsWith("/")
 
@@ -66,4 +63,3 @@ class ZipEntry(private[this] val _name: String) extends Cloneable {
   def setSize(size: Long): Unit = { _size = size }
   def setTime(time: Long): Unit = { _time = time }
   override def toString(): String = _name
-}

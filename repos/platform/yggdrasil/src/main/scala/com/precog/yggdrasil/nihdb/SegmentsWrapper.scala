@@ -29,7 +29,7 @@ import com.precog.niflheim._
 
 case class SegmentsWrapper(
     segments: Seq[Segment], projectionId: Int, blockId: Long)
-    extends Slice {
+    extends Slice
   import TransSpecModule.paths
 
   val logger =
@@ -37,48 +37,42 @@ case class SegmentsWrapper(
 
   // FIXME: This should use an identity of Array[Long](projectionId,
   // blockId), but the evaluator will cry if we do that right now
-  private def keyFor(row: Int): Long = {
+  private def keyFor(row: Int): Long =
     (projectionId.toLong << 44) ^ (blockId << 16) ^ row.toLong
-  }
 
-  private def buildKeyColumns(length: Int): Set[(ColumnRef, Column)] = {
+  private def buildKeyColumns(length: Int): Set[(ColumnRef, Column)] =
     val hoId = (projectionId.toLong << 32) | (blockId >>> 32)
     val loId0 = (blockId & 0xFFFFFFFFL) << 32
     def loId(row: Int): Long = loId0 | row.toLong
 
-    val hoKey = new LongColumn {
+    val hoKey = new LongColumn
       def isDefinedAt(row: Int) = row >= 0 && row < length
       def apply(row: Int) = hoId
-    }
 
-    val loKey = new LongColumn {
+    val loKey = new LongColumn
       def isDefinedAt(row: Int) = row >= 0 && row < length
       def apply(row: Int) = loId(row)
-    }
 
     Set((ColumnRef(CPath(paths.Key) \ 0 \ 0, CLong), loKey),
         (ColumnRef(CPath(paths.Key) \ 0 \ 1, CLong), hoKey))
-  }
 
-  private def buildKeyColumn(length: Int): (ColumnRef, Column) = {
+  private def buildKeyColumn(length: Int): (ColumnRef, Column) =
     val keys = new Array[Long](length)
     var i = 0
-    while (i < length) {
+    while (i < length)
       keys(i) = keyFor(i)
       i += 1
-    }
     (ColumnRef(CPath(paths.Key) \ 0, CLong), ArrayLongColumn(keys))
-  }
 
   private def buildColumnRef(seg: Segment) =
     ColumnRef(CPath(paths.Value) \ seg.cpath, seg.ctype)
 
-  private def buildColumn(seg: Segment): Column = seg match {
+  private def buildColumn(seg: Segment): Column = seg match
     case segment: ArraySegment[a] =>
       val ctype: CValueType[a] = segment.ctype
       val defined: BitSet = segment.defined
       val values: Array[a] = segment.values
-      ctype match {
+      ctype match
         case CString => new ArrayStrColumn(defined, values)
         case CDate => new ArrayDateColumn(defined, values)
         case CPeriod => new ArrayPeriodColumn(defined, values)
@@ -88,13 +82,12 @@ case class SegmentsWrapper(
         case cat: CArrayType[_] =>
           new ArrayHomogeneousArrayColumn(defined, values)(cat)
         case CBoolean => sys.error("impossible")
-      }
 
     case BooleanSegment(_, _, defined, values, _) =>
       new ArrayBoolColumn(defined, values)
 
     case NullSegment(_, _, ctype, defined, _) =>
-      ctype match {
+      ctype match
         case CNull =>
           NullColumn(defined)
         case CEmptyObject =>
@@ -103,8 +96,6 @@ case class SegmentsWrapper(
           new MutableEmptyArrayColumn(defined)
         case CUndefined =>
           sys.error("also impossible")
-      }
-  }
 
   private def buildMap(segments: Seq[Segment]): Map[ColumnRef, Column] =
     segments.map(seg => (buildColumnRef(seg), buildColumn(seg))).toMap
@@ -113,14 +104,11 @@ case class SegmentsWrapper(
     buildMap(segments) + buildKeyColumn(
         segments.headOption map (_.length) getOrElse 0)
 
-  val size: Int = {
+  val size: Int =
     val sz = segments.foldLeft(0)(_ max _.length)
-    if (logger.isTraceEnabled) {
+    if (logger.isTraceEnabled)
       logger.trace(
           "Computed size %d from:\n  %s".format(sz, segments.mkString("\n  ")))
-    }
     sz
-  }
 
   def columns: Map[ColumnRef, Column] = cols
-}

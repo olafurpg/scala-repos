@@ -7,7 +7,7 @@ import scala.concurrent.Future
   * The main idea is to handle serializing/deserializing of specific entities.
   * @tparam T the specific type of entities that are handled by this specific store.
   */
-trait EntityStore[T] {
+trait EntityStore[T]
 
   type Deserialize = () => T //returns deserialized T value.
   type Update = Deserialize => T //Update function Gets an Read and returns the (modified) T
@@ -29,4 +29,3 @@ trait EntityStore[T] {
   def expunge(key: String, onSuccess: () => Unit = () => ()): Future[Boolean]
 
   def names(): Future[Seq[String]]
-}

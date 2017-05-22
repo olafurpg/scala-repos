@@ -1,4 +1,4 @@
-class AnyVals {
+class AnyVals
   def f1 = (5: Any).getClass
   def f2 = (5: AnyVal).getClass
   def f3 = 5.getClass
@@ -20,9 +20,8 @@ class AnyVals {
   // f3: java.lang.Class<java.lang.Object>
   // f4: java.lang.Class<? extends java.lang.Integer>
   // f5: java.lang.Class<?>
-}
 
-class AnyRefs {
+class AnyRefs
   class A
   class B extends A
 
@@ -37,9 +36,8 @@ class AnyRefs {
   def f6 = f0[AnyRef]
   def f7 = f0[A]
   def f8 = f0[B]
-}
 
-class MoreAnyRefs {
+class MoreAnyRefs
   trait A
   trait B
 
@@ -48,18 +46,15 @@ class MoreAnyRefs {
   def f2 = (new B with A {}).getClass()
   def f3 = (new { def bippy() = 5 }).getClass()
   def f4 = (new A { def bippy() = 5 }).getClass()
-}
 
 @deprecated("Suppress warnings", since = "2.11")
-object Test {
+object Test
   def returnTypes[T : Manifest] =
     (manifest[T].runtimeClass.getMethods.toList filter
         (_.getName startsWith "f") sortBy (_.getName) map
         (m => m.getName + ": " + m.getGenericReturnType.toString))
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     returnTypes[AnyVals] foreach println
     returnTypes[AnyRefs] foreach println
     returnTypes[MoreAnyRefs] foreach println
-  }
-}

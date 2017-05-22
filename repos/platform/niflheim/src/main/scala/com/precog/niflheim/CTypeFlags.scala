@@ -31,8 +31,8 @@ import scala.collection.mutable
 
 import scalaz.{Validation, Success, Failure}
 
-object CTypeFlags {
-  object Flags {
+object CTypeFlags
+  object Flags
     val FBoolean: Byte = 1
     val FString: Byte = 2
     val FLong: Byte = 3
@@ -43,17 +43,16 @@ object CTypeFlags {
     val FNull: Byte = 16
     val FEmptyArray: Byte = 17
     val FEmptyObject: Byte = 18
-  }
 
-  def getFlagFor(ctype: CType): Array[Byte] = {
+  def getFlagFor(ctype: CType): Array[Byte] =
     import Flags._
 
     val buffer = new mutable.ArrayBuffer[Byte]()
 
-    def flagForCType(t: CType) {
+    def flagForCType(t: CType)
       @tailrec
-      def flagForCValueType(t: CValueType[_]) {
-        t match {
+      def flagForCValueType(t: CValueType[_])
+        t match
           case CString => buffer += FString
           case CBoolean => buffer += FBoolean
           case CLong => buffer += FLong
@@ -63,10 +62,8 @@ object CTypeFlags {
           case CArrayType(tpe) =>
             buffer += FArray
             flagForCValueType(tpe)
-        }
-      }
 
-      t match {
+      t match
         case t: CValueType[_] =>
           flagForCValueType(t)
         case CNull =>
@@ -78,21 +75,18 @@ object CTypeFlags {
         case CUndefined =>
           sys.error(
               "Unexpected CUndefined type. Undefined segments don't exist!")
-      }
-    }
 
     flagForCType(ctype)
     buffer.toArray
-  }
 
   def cTypeForFlag(flag: Array[Byte]): CType =
     readCType(ByteBuffer.wrap(flag)).fold(throw _, identity)
 
-  def readCType(buffer: ByteBuffer): Validation[IOException, CType] = {
+  def readCType(buffer: ByteBuffer): Validation[IOException, CType] =
     import Flags._
 
     def readCValueType(flag: Byte): Validation[IOException, CValueType[_]] =
-      flag match {
+      flag match
         case FBoolean => Success(CBoolean)
         case FString => Success(CString)
         case FLong => Success(CLong)
@@ -103,13 +97,9 @@ object CTypeFlags {
         case flag =>
           Failure(
               new IOException("Unexpected segment type flag: %x" format flag))
-      }
 
-    buffer.get() match {
+    buffer.get() match
       case FNull => Success(CNull)
       case FEmptyArray => Success(CEmptyArray)
       case FEmptyObject => Success(CEmptyObject)
       case flag => readCValueType(flag)
-    }
-  }
-}

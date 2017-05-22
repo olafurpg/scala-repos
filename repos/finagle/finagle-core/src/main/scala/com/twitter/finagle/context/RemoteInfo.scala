@@ -9,12 +9,12 @@ import java.net.SocketAddress
   */
 sealed trait RemoteInfo
 
-object RemoteInfo {
+object RemoteInfo
 
   /**
     * Contains functions to get information about the sender of the request.
     */
-  object Upstream {
+  object Upstream
 
     /**
       * Context propagated from server to client.
@@ -22,15 +22,13 @@ object RemoteInfo {
     val AddressCtx = new Contexts.local.Key[SocketAddress]
 
     def addr: Option[SocketAddress] = Contexts.local.get(AddressCtx)
-  }
 
   /**
     * Represents the case where remote information is not available,
     * or has not yet been set.
     */
-  object NotAvailable extends RemoteInfo {
+  object NotAvailable extends RemoteInfo
     override def toString(): String = "Not Available"
-  }
 
   /**
     * Represents the case where remote information is available:
@@ -43,27 +41,21 @@ object RemoteInfo {
                        downstreamAddr: Option[SocketAddress],
                        downstreamId: Option[ClientId],
                        traceId: TraceId)
-      extends RemoteInfo {
-    private[this] val upstreamAddrStr = upstreamAddr match {
+      extends RemoteInfo
+    private[this] val upstreamAddrStr = upstreamAddr match
       case Some(addr) => addr.toString
       case None => "Not Available"
-    }
-    private[this] val upstreamIdStr = upstreamId match {
+    private[this] val upstreamIdStr = upstreamId match
       case Some(clientId) => clientId.name
       case None => "Not Available"
-    }
-    private[this] val downstreamAddrStr = downstreamAddr match {
+    private[this] val downstreamAddrStr = downstreamAddr match
       case Some(addr) => addr.toString
       case None => "Not Available"
-    }
-    private[this] val downstreamIdStr = downstreamId match {
+    private[this] val downstreamIdStr = downstreamId match
       case Some(clientId) => clientId.name
       case None => "Not Available"
-    }
 
     override def toString(): String =
       s"Upstream Address: $upstreamAddrStr, Upstream Client Id: $upstreamIdStr, " +
       s"Downstream Address: $downstreamAddrStr, Downstream Client Id: $downstreamIdStr, " +
       s"Trace Id: $traceId"
-  }
-}

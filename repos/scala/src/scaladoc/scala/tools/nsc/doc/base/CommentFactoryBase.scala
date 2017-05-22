@@ -19,7 +19,7 @@ import scala.language.postfixOps
   *
   * @author Manohar Jonnalagedda
   * @author Gilles Dubochet */
-trait CommentFactoryBase {
+trait CommentFactoryBase
   this: MemberLookupBase =>
 
   val global: Global
@@ -50,7 +50,7 @@ trait CommentFactoryBase {
       groupPrio0: Map[String, Body] = Map.empty,
       hideImplicitConversions0: List[Body] = List.empty,
       shortDescription0: List[Body] = List.empty
-  ): Comment = new Comment {
+  ): Comment = new Comment
     val body = body0 getOrElse Body(Seq.empty)
     val authors = authors0
     val see = see0
@@ -68,50 +68,41 @@ trait CommentFactoryBase {
     val inheritDiagram = inheritDiagram0
     val contentDiagram = contentDiagram0
     val groupDesc = groupDesc0
-    val group = group0 match {
+    val group = group0 match
       case Some(Body(List(Paragraph(Chain(List(Summary(Text(groupId)))))))) =>
         Some(groupId.toString.trim)
       case _ => None
-    }
     val groupPrio =
-      groupPrio0 flatMap {
+      groupPrio0 flatMap
         case (group, body) =>
-          try {
-            body match {
+          try
+            body match
               case Body(List(Paragraph(Chain(List(Summary(Text(prio))))))) =>
                 List(group -> prio.trim.toInt)
               case _ => List()
-            }
-          } catch {
+          catch
             case _: java.lang.NumberFormatException => List()
-          }
-      }
     val groupNames =
-      groupNames0 flatMap {
+      groupNames0 flatMap
         case (group, body) =>
-          body match {
+          body match
             case Body(List(Paragraph(Chain(List(Summary(Text(name)))))))
                 if (!name.trim.contains("\n")) =>
               List(group -> (name.trim))
             case _ => List()
-          }
-      }
 
     override val shortDescription: Option[Text] =
-      shortDescription0.lastOption collect {
+      shortDescription0.lastOption collect
         case Body(List(Paragraph(Chain(List(Summary(Text(e)))))))
             if !e.trim.contains("\n") =>
           Text(e)
-      }
 
     override val hideImplicitConversions: List[String] =
-      hideImplicitConversions0 flatMap {
+      hideImplicitConversions0 flatMap
         case Body(List(Paragraph(Chain(List(Summary(Text(e)))))))
             if !e.trim.contains("\n") =>
           List(e)
         case _ => List()
-      }
-  }
 
   private val endOfText = '\u0003'
   private val endOfLine = '\u000A'
@@ -132,7 +123,7 @@ trait CommentFactoryBase {
   /** Maps a dangerous HTML tag to a safe wiki replacement, or an empty string
     * if it cannot be salvaged. */
   private def htmlReplacement(mtch: Regex.Match): String =
-    mtch.group(1) match {
+    mtch.group(1) match
       case "p" | "div" => "\n\n"
       case "h1" => "\n= "
       case "/h1" => " =\n"
@@ -144,7 +135,6 @@ trait CommentFactoryBase {
       case "/h4" | "/h5" | "/h6" => " ====\n"
       case "li" => "\n *  - "
       case _ => ""
-    }
 
   /** Javadoc tags that should be replaced by something useful, such as wiki
     * syntax, or that should be dropped. */
@@ -152,8 +142,8 @@ trait CommentFactoryBase {
       """\{\@(code|docRoot|linkplain|link|literal|value)\p{Zs}*([^}]*)\}""")
 
   /** Maps a javadoc tag to a useful wiki replacement, or an empty string if it cannot be salvaged. */
-  private def javadocReplacement(mtch: Regex.Match): String = {
-    mtch.group(1) match {
+  private def javadocReplacement(mtch: Regex.Match): String =
+    mtch.group(1) match
       case "code" => "<code>" + mtch.group(2) + "</code>"
       case "docRoot" => ""
       case "link" => "`[[" + mtch.group(2) + "]]`"
@@ -161,8 +151,6 @@ trait CommentFactoryBase {
       case "literal" => "`" + mtch.group(2) + "`"
       case "value" => "`" + mtch.group(2) + "`"
       case _ => ""
-    }
-  }
 
   /** Safe HTML tags that can be kept. */
   private val SafeTags = new Regex(
@@ -192,9 +180,8 @@ trait CommentFactoryBase {
   /** A key used for a tag map. The key is built from the name of the tag and
     * from the linked symbol if the tag has one.
     * Equality on tag keys is structural. */
-  private sealed abstract class TagKey {
+  private sealed abstract class TagKey
     def name: String
-  }
 
   private final case class SimpleTagKey(name: String) extends TagKey
   private final case class SymbolTagKey(name: String, symbol: String)
@@ -209,32 +196,29 @@ trait CommentFactoryBase {
   protected def parseAtSymbol(comment: String,
                               src: String,
                               pos: Position,
-                              site: Symbol = NoSymbol): Comment = {
+                              site: Symbol = NoSymbol): Comment =
 
     /** The cleaned raw comment as a list of lines. Cleaning removes comment
       * start and end markers, line start markers  and unnecessary whitespace. */
-    def clean(comment: String): List[String] = {
-      def cleanLine(line: String): String = {
+    def clean(comment: String): List[String] =
+      def cleanLine(line: String): String =
         // Remove trailing whitespaces
-        TrailingWhitespaceRegex.replaceAllIn(line, "") match {
+        TrailingWhitespaceRegex.replaceAllIn(line, "") match
           case CleanCommentLine(ctl) => ctl
           case tl => tl
-        }
-      }
       val strippedComment = comment.trim.stripPrefix("/*").stripSuffix("*/")
-      val safeComment = DangerousTags.replaceAllIn(strippedComment, {
+      val safeComment = DangerousTags.replaceAllIn(strippedComment,
         htmlReplacement(_)
-      })
-      val javadoclessComment = JavadocTags.replaceAllIn(safeComment, {
+      )
+      val javadoclessComment = JavadocTags.replaceAllIn(safeComment,
         javadocReplacement(_)
-      })
-      val markedTagComment = SafeTags.replaceAllIn(javadoclessComment, {
+      )
+      val markedTagComment = SafeTags.replaceAllIn(javadoclessComment,
         mtch =>
           java.util.regex.Matcher
             .quoteReplacement(safeTagMarker + mtch.matched + safeTagMarker)
-      })
+      )
       markedTagComment.lines.toList map (cleanLine(_))
-    }
 
     /** Parses a comment (in the form of a list of lines) to a `Comment`
       * instance, recursively on lines. To do so, it splits the whole comment
@@ -253,7 +237,7 @@ trait CommentFactoryBase {
         lastTagKey: Option[TagKey],
         remaining: List[String],
         inCodeBlock: Boolean
-    ): Comment = remaining match {
+    ): Comment = remaining match
 
       case CodeBlockStartRegex(before, marker, after) :: ls
           if (!inCodeBlock) =>
@@ -276,12 +260,11 @@ trait CommentFactoryBase {
                  marker :: after :: ls,
                  inCodeBlock = true)
         else
-          lastTagKey match {
+          lastTagKey match
             case Some(key) =>
-              val value = ( (tags get key): @unchecked) match {
+              val value = ( (tags get key): @unchecked) match
                 case Some(b :: bs) => (b + endOfLine + marker) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
-              }
               parse0(docBody,
                      tags + (key -> value),
                      lastTagKey,
@@ -293,9 +276,8 @@ trait CommentFactoryBase {
                      lastTagKey,
                      ls,
                      inCodeBlock = true)
-          }
 
-      case CodeBlockEndRegex(before, marker, after) :: ls => {
+      case CodeBlockEndRegex(before, marker, after) :: ls =>
           if (!before.trim.isEmpty && !after.trim.isEmpty)
             parse0(docBody,
                    tags,
@@ -315,13 +297,12 @@ trait CommentFactoryBase {
                    marker :: after :: ls,
                    inCodeBlock = false)
           else
-            lastTagKey match {
+            lastTagKey match
               case Some(key) =>
-                val value = ( (tags get key): @unchecked) match {
+                val value = ( (tags get key): @unchecked) match
                   case Some(b :: bs) => (b + endOfLine + marker) :: bs
                   case None =>
                     oops("lastTagKey set when no tag exists for key")
-                }
                 parse0(docBody,
                        tags + (key -> value),
                        lastTagKey,
@@ -333,62 +314,52 @@ trait CommentFactoryBase {
                        lastTagKey,
                        ls,
                        inCodeBlock = false)
-            }
-        }
 
-      case SymbolTagRegex(name, sym, body) :: ls if (!inCodeBlock) => {
+      case SymbolTagRegex(name, sym, body) :: ls if (!inCodeBlock) =>
           val key = SymbolTagKey(name, sym)
           val value = body :: tags.getOrElse(key, Nil)
           parse0(docBody, tags + (key -> value), Some(key), ls, inCodeBlock)
-        }
 
-      case SimpleTagRegex(name, body) :: ls if (!inCodeBlock) => {
+      case SimpleTagRegex(name, body) :: ls if (!inCodeBlock) =>
           val key = SimpleTagKey(name)
           val value = body :: tags.getOrElse(key, Nil)
           parse0(docBody, tags + (key -> value), Some(key), ls, inCodeBlock)
-        }
 
-      case SingleTagRegex(name) :: ls if (!inCodeBlock) => {
+      case SingleTagRegex(name) :: ls if (!inCodeBlock) =>
           val key = SimpleTagKey(name)
           val value = "" :: tags.getOrElse(key, Nil)
           parse0(docBody, tags + (key -> value), Some(key), ls, inCodeBlock)
-        }
 
-      case line :: ls if (lastTagKey.isDefined) => {
+      case line :: ls if (lastTagKey.isDefined) =>
           val newtags =
-            if (!line.isEmpty) {
+            if (!line.isEmpty)
               val key = lastTagKey.get
-              val value = ( (tags get key): @unchecked) match {
+              val value = ( (tags get key): @unchecked) match
                 case Some(b :: bs) => (b + endOfLine + line) :: bs
                 case None => oops("lastTagKey set when no tag exists for key")
-              }
               tags + (key -> value)
-            } else tags
+            else tags
           parse0(docBody, newtags, lastTagKey, ls, inCodeBlock)
-        }
 
-      case line :: ls => {
+      case line :: ls =>
           if (docBody.length > 0) docBody append endOfLine
           docBody append line
           parse0(docBody, tags, lastTagKey, ls, inCodeBlock)
-        }
 
-      case Nil => {
+      case Nil =>
           // Take the {inheritance, content} diagram keys aside, as it doesn't need any parsing
           val inheritDiagramTag = SimpleTagKey("inheritanceDiagram")
           val contentDiagramTag = SimpleTagKey("contentDiagram")
 
           val inheritDiagramText: List[String] =
-            tags.get(inheritDiagramTag) match {
+            tags.get(inheritDiagramTag) match
               case Some(list) => list
               case None => List.empty
-            }
 
           val contentDiagramText: List[String] =
-            tags.get(contentDiagramTag) match {
+            tags.get(contentDiagramTag) match
               case Some(list) => list
               case None => List.empty
-            }
 
           val stripTags = List(inheritDiagramTag,
                                contentDiagramTag,
@@ -398,28 +369,27 @@ trait CommentFactoryBase {
             tags.filterNot(pair => stripTags.contains(pair._1))
 
           val bodyTags: mutable.Map[TagKey, List[Body]] = mutable.Map(
-              tagsWithoutDiagram mapValues { tag =>
+              tagsWithoutDiagram mapValues  tag =>
             tag map (parseWikiAtSymbol(_, pos, site))
-          } toSeq: _*)
+          toSeq: _*)
 
           def oneTag(
               key: SimpleTagKey, filterEmpty: Boolean = true): Option[Body] =
-            ( (bodyTags remove key): @unchecked) match {
+            ( (bodyTags remove key): @unchecked) match
               case Some(r :: rs) if !(filterEmpty && r.blocks.isEmpty) =>
                 if (!rs.isEmpty)
                   reporter.warning(
                       pos, s"Only one '@${key.name}' tag is allowed")
                 Some(r)
               case _ => None
-            }
 
           def allTags(key: SimpleTagKey): List[Body] =
             (bodyTags remove key).getOrElse(Nil).filterNot(_.blocks.isEmpty)
 
           def allSymsOneTag(
-              key: TagKey, filterEmpty: Boolean = true): Map[String, Body] = {
+              key: TagKey, filterEmpty: Boolean = true): Map[String, Body] =
             val keys: Seq[SymbolTagKey] =
-              bodyTags.keys.toSeq flatMap {
+              bodyTags.keys.toSeq flatMap
                 case stk: SymbolTagKey if (stk.name == key.name) => Some(stk)
                 case stk: SimpleTagKey if (stk.name == key.name) =>
                   reporter.warning(
@@ -427,35 +397,29 @@ trait CommentFactoryBase {
                       s"Tag '@${stk.name}' must be followed by a symbol name")
                   None
                 case _ => None
-              }
-            val pairs: Seq[(String, Body)] = for (key <- keys) yield {
+            val pairs: Seq[(String, Body)] = for (key <- keys) yield
               val bs = (bodyTags remove key).get
               if (bs.length > 1)
                 reporter.warning(
                     pos,
                     s"Only one '@${key.name}' tag for symbol ${key.symbol} is allowed")
               (key.symbol, bs.head)
-            }
             Map.empty[String, Body] ++
             (if (filterEmpty) pairs.filterNot(_._2.blocks.isEmpty) else pairs)
-          }
 
-          def linkedExceptions: Map[String, Body] = {
+          def linkedExceptions: Map[String, Body] =
             val m = allSymsOneTag(SimpleTagKey("throws"), filterEmpty = false)
 
-            m.map {
+            m.map
               case (name, body) =>
                 val link = memberLookup(pos, name, site)
-                val newBody = body match {
+                val newBody = body match
                   case Body(List(Paragraph(Chain(content)))) =>
                     val descr = Text(" ") +: content
                     val entityLink = EntityLink(Monospace(Text(name)), link)
                     Body(List(Paragraph(Chain(entityLink +: descr))))
                   case _ => body
-                }
                 (name, newBody)
-            }
-          }
 
           val com = createComment(
               body0 = Some(parseWikiAtSymbol(docBody.toString, pos, site)),
@@ -489,15 +453,12 @@ trait CommentFactoryBase {
               pos, s"Tag '@${key.name}' is not recognised")
 
           com
-        }
-    }
 
     parse0(new StringBuilder(comment.size),
            Map.empty,
            None,
            clean(comment),
            inCodeBlock = false)
-  }
 
   /** Parses a string containing wiki syntax into a `Comment` object.
     * Note that the string is assumed to be clean:
@@ -515,27 +476,24 @@ trait CommentFactoryBase {
     * @author Gilles Dubochet */
   protected final class WikiParser(
       val buffer: String, pos: Position, site: Symbol)
-      extends CharReader(buffer) { wiki =>
+      extends CharReader(buffer)  wiki =>
     var summaryParsed = false
 
-    def document(): Body = {
+    def document(): Body =
       val blocks = new mutable.ListBuffer[Block]
       while (char != endOfText) blocks += block()
       Body(blocks.toList)
-    }
 
     /* BLOCKS */
 
     /** {{{ block ::= code | title | hrule | listBlock | para }}} */
-    def block(): Block = {
+    def block(): Block =
       if (checkSkipInitWhitespace("{{{")) code()
       else if (checkSkipInitWhitespace('=')) title()
       else if (checkSkipInitWhitespace("----")) hrule()
       else if (checkList) listBlock
-      else {
+      else
         para()
-      }
-    }
 
     /** listStyle ::= '-' spc | '1.' spc | 'I.' spc | 'i.' spc | 'A.' spc | 'a.' spc
       * Characters used to build lists and their constructors */
@@ -558,7 +516,7 @@ trait CommentFactoryBase {
       *      nLine ::= nSpc listStyle para '\n'
       * }}}
       * Where n and m stand for the number of spaces. When `m > n`, a new list is nested. */
-    def listBlock(): Block = {
+    def listBlock(): Block =
 
       /** Consumes one list item block and returns it, or None if the block is
         * not a list or a different list. */
@@ -566,34 +524,30 @@ trait CommentFactoryBase {
         if (countWhitespace > indent && checkList) Some(listBlock)
         else if (countWhitespace != indent || !checkSkipInitWhitespace(style))
           None
-        else {
+        else
           jumpWhitespace()
           jump(style)
           val p = Paragraph(inline(isInlineEnd = false))
           blockEnded("end of list line ")
           Some(p)
-        }
 
       /** Consumes all list item blocks (possibly with nested lists) of the
         * same list and returns the list block. */
-      def listLevel(indent: Int, style: String): Block = {
+      def listLevel(indent: Int, style: String): Block =
         val lines = mutable.ListBuffer.empty[Block]
         var line: Option[Block] = listLine(indent, style)
-        while (line.isDefined) {
+        while (line.isDefined)
           lines += line.get
           line = listLine(indent, style)
-        }
         val constructor = listStyles(style)
         constructor(lines)
-      }
 
       val indent = countWhitespace
       val style = (listStyles.keys find { checkSkipInitWhitespace(_) })
         .getOrElse(listStyles.keys.head)
       listLevel(indent, style)
-    }
 
-    def code(): Block = {
+    def code(): Block =
       jumpWhitespace()
       jump("{{{")
       val str = readUntil("}}}")
@@ -601,10 +555,9 @@ trait CommentFactoryBase {
       else jump("}}}")
       blockEnded("code block")
       Code(normalizeIndentation(str))
-    }
 
     /** {{{ title ::= ('=' inline '=' | "==" inline "==" | ...) '\n' }}} */
-    def title(): Block = {
+    def title(): Block =
       jumpWhitespace()
       val inLevel = repeatJump('=')
       val text = inline(check("=" * inLevel))
@@ -613,186 +566,157 @@ trait CommentFactoryBase {
         reportError(pos, "unbalanced or unclosed heading")
       blockEnded("heading")
       Title(text, inLevel)
-    }
 
     /** {{{ hrule ::= "----" { '-' } '\n' }}} */
-    def hrule(): Block = {
+    def hrule(): Block =
       jumpWhitespace()
       repeatJump('-')
       blockEnded("horizontal rule")
       HorizontalRule()
-    }
 
     /** {{{ para ::= inline '\n' }}} */
-    def para(): Block = {
+    def para(): Block =
       val p =
         if (summaryParsed) Paragraph(inline(isInlineEnd = false))
-        else {
+        else
           val s = summary()
           val r =
             if (checkParaEnded()) List(s)
             else List(s, inline(isInlineEnd = false))
           summaryParsed = true
           Paragraph(Chain(r))
-        }
       while (char == endOfLine && char != endOfText) nextChar()
       p
-    }
 
     /* INLINES */
 
     val OPEN_TAG = "^<([A-Za-z]+)( [^>]*)?(/?)>$".r
     val CLOSE_TAG = "^</([A-Za-z]+)>$".r
-    private def readHTMLFrom(begin: HtmlTag): String = {
+    private def readHTMLFrom(begin: HtmlTag): String =
       val list = mutable.ListBuffer.empty[String]
       val stack = mutable.ListBuffer.empty[String]
 
-      begin.close match {
+      begin.close match
         case Some(HtmlTag(CLOSE_TAG(s))) =>
           stack += s
         case _ =>
           return ""
-      }
 
-      do {
+      do
         val str = readUntil { char == safeTagMarker || char == endOfText }
         nextChar()
 
         list += str
 
-        str match {
-          case OPEN_TAG(s, _, standalone) => {
-              if (standalone != "/") {
+        str match
+          case OPEN_TAG(s, _, standalone) =>
+              if (standalone != "/")
                 stack += s
-              }
-            }
-          case CLOSE_TAG(s) => {
-              if (s == stack.last) {
+          case CLOSE_TAG(s) =>
+              if (s == stack.last)
                 stack.remove(stack.length - 1)
-              }
-            }
           case _ => ;
-        }
-      } while (stack.length > 0 && char != endOfText)
+      while (stack.length > 0 && char != endOfText)
 
       list mkString ""
-    }
 
-    def inline(isInlineEnd: => Boolean): Inline = {
+    def inline(isInlineEnd: => Boolean): Inline =
 
-      def inline0(): Inline = {
-        if (char == safeTagMarker) {
+      def inline0(): Inline =
+        if (char == safeTagMarker)
           val tag = htmlTag()
           HtmlTag(tag.data + readHTMLFrom(tag))
-        } else if (check("'''")) bold()
+        else if (check("'''")) bold()
         else if (check("''")) italic()
         else if (check("`")) monospace()
         else if (check("__")) underline()
         else if (check("^")) superscript()
         else if (check(",,")) subscript()
         else if (check("[[")) link()
-        else {
-          val str = readUntil {
+        else
+          val str = readUntil
             char == safeTagMarker || check("''") || char == '`' ||
             check("__") || char == '^' || check(",,") || check("[[") ||
             isInlineEnd || checkParaEnded || char == endOfLine
-          }
           Text(str)
-        }
-      }
 
-      val inlines: List[Inline] = {
+      val inlines: List[Inline] =
         val iss = mutable.ListBuffer.empty[Inline]
         iss += inline0()
-        while (!isInlineEnd && !checkParaEnded) {
+        while (!isInlineEnd && !checkParaEnded)
           val skipEndOfLine =
-            if (char == endOfLine) {
+            if (char == endOfLine)
               nextChar()
               true
-            } else {
+            else
               false
-            }
 
           val current = inline0()
-          (iss.last, current) match {
+          (iss.last, current) match
             case (Text(t1), Text(t2)) if skipEndOfLine =>
               iss.update(iss.length - 1, Text(t1 + endOfLine + t2))
             case (i1, i2) if skipEndOfLine =>
               iss ++= List(Text(endOfLine.toString), i2)
             case _ => iss += current
-          }
-        }
         iss.toList
-      }
 
-      inlines match {
+      inlines match
         case Nil => Text("")
         case i :: Nil => i
         case is => Chain(is)
-      }
-    }
 
-    def htmlTag(): HtmlTag = {
+    def htmlTag(): HtmlTag =
       jump(safeTagMarker)
       val read = readUntil(safeTagMarker)
       if (char != endOfText) jump(safeTagMarker)
       HtmlTag(read)
-    }
 
-    def bold(): Inline = {
+    def bold(): Inline =
       jump("'''")
       val i = inline(check("'''"))
       jump("'''")
       Bold(i)
-    }
 
-    def italic(): Inline = {
+    def italic(): Inline =
       jump("''")
       val i = inline(check("''"))
       jump("''")
       Italic(i)
-    }
 
-    def monospace(): Inline = {
+    def monospace(): Inline =
       jump("`")
       val i = inline(check("`"))
       jump("`")
       Monospace(i)
-    }
 
-    def underline(): Inline = {
+    def underline(): Inline =
       jump("__")
       val i = inline(check("__"))
       jump("__")
       Underline(i)
-    }
 
-    def superscript(): Inline = {
+    def superscript(): Inline =
       jump("^")
       val i = inline(check("^"))
-      if (jump("^")) {
+      if (jump("^"))
         Superscript(i)
-      } else {
+      else
         Chain(Seq(Text("^"), i))
-      }
-    }
 
-    def subscript(): Inline = {
+    def subscript(): Inline =
       jump(",,")
       val i = inline(check(",,"))
       jump(",,")
       Subscript(i)
-    }
 
-    def summary(): Inline = {
+    def summary(): Inline =
       val i = inline(checkSentenceEnded())
       Summary(
           if (jump(".")) Chain(List(i, Text(".")))
           else i
       )
-    }
 
-    def link(): Inline = {
+    def link(): Inline =
       val SchemeUri = """([a-z]+:.*)""".r
       jump("[[")
       val parens = 2 + repeatJump('[')
@@ -800,32 +724,28 @@ trait CommentFactoryBase {
       val target = readUntil { check(stop) || isWhitespaceOrNewLine(char) }
       val title =
         if (!check(stop))
-          Some({
+          Some(
             jumpWhitespaceOrNewLine()
             inline(check(stop))
-          })
+          )
         else None
       jump(stop)
 
-      (target, title) match {
+      (target, title) match
         case (SchemeUri(uri), optTitle) =>
           Link(uri, optTitle getOrElse Text(uri))
         case (qualName, optTitle) =>
           makeEntityLink(optTitle getOrElse Text(target), pos, target, site)
-      }
-    }
 
     /* UTILITY */
 
     /** {{{ eol ::= { whitespace } '\n' }}} */
-    def blockEnded(blockType: String): Unit = {
-      if (char != endOfLine && char != endOfText) {
+    def blockEnded(blockType: String): Unit =
+      if (char != endOfLine && char != endOfText)
         reportError(
             pos, "no additional content on same line after " + blockType)
         jumpUntil(endOfLine)
-      }
       while (char == endOfLine) nextChar()
-    }
 
     /**
       *  Eliminates the (common) leading spaces in all lines, based on the first line
@@ -838,7 +758,7 @@ trait CommentFactoryBase {
       *       ^ this is the least whitespace prefix
       *    }}}
       */
-    def normalizeIndentation(_code: String): String = {
+    def normalizeIndentation(_code: String): String =
 
       val code =
         _code.replaceAll("\\s+$", "").dropWhile(_ == '\n') // right-trim + remove all leading '\n'
@@ -854,64 +774,54 @@ trait CommentFactoryBase {
       lines
         .map(line => if (line.trim.nonEmpty) line.substring(maxSkip) else line)
         .mkString("\n")
-    }
 
-    def checkParaEnded(): Boolean = {
+    def checkParaEnded(): Boolean =
       (char == endOfText) ||
-      ((char == endOfLine) && {
+      ((char == endOfLine) &&
             val poff = offset
             nextChar() // read EOL
-            val ok = {
+            val ok =
               checkSkipInitWhitespace(endOfLine) ||
               checkSkipInitWhitespace('=') || checkSkipInitWhitespace("{{{") ||
               checkList || checkSkipInitWhitespace('\u003D')
-            }
             offset = poff
             ok
-          })
-    }
+          )
 
-    def checkSentenceEnded(): Boolean = {
-      (char == '.') && {
+    def checkSentenceEnded(): Boolean =
+      (char == '.') &&
         val poff = offset
         nextChar() // read '.'
         val ok = char == endOfText || char == endOfLine || isWhitespace(char)
         offset = poff
         ok
-      }
-    }
 
-    def reportError(pos: Position, message: String) {
+    def reportError(pos: Position, message: String)
       reporter.warning(pos, message)
-    }
-  }
 
-  protected sealed class CharReader(buffer: String) { reader =>
+  protected sealed class CharReader(buffer: String)  reader =>
 
     var offset: Int = 0
     def char: Char =
       if (offset >= buffer.length) endOfText else buffer charAt offset
 
-    final def nextChar() {
+    final def nextChar()
       offset += 1
-    }
 
-    final def check(chars: String): Boolean = {
+    final def check(chars: String): Boolean =
       val poff = offset
       val ok = jump(chars)
       offset = poff
       ok
-    }
 
-    def checkSkipInitWhitespace(c: Char): Boolean = {
+    def checkSkipInitWhitespace(c: Char): Boolean =
       val poff = offset
       jumpWhitespace()
       val ok = jump(c)
       offset = poff
       ok
-    }
 
-    def checkSkipInitWhitespace(chars: String): Boolean = {
+    def checkSkipInitWhitespace(chars: String): Boolean =
       val poff = offset
       jumpWhitespace()
       val (ok0, chars0) =
@@ -920,65 +830,54 @@ trait CommentFactoryBase {
       val ok = ok0 && jump(chars0)
       offset = poff
       ok
-    }
 
-    def countWhitespace: Int = {
+    def countWhitespace: Int =
       var count = 0
       val poff = offset
-      while (isWhitespace(char) && char != endOfText) {
+      while (isWhitespace(char) && char != endOfText)
         nextChar()
         count += 1
-      }
       offset = poff
       count
-    }
 
     /* JUMPERS */
 
     /** jumps a character and consumes it
       * @return true only if the correct character has been jumped */
-    final def jump(ch: Char): Boolean = {
-      if (char == ch) {
+    final def jump(ch: Char): Boolean =
+      if (char == ch)
         nextChar()
         true
-      } else false
-    }
+      else false
 
     /** jumps all the characters in chars, consuming them in the process.
       * @return true only if the correct characters have been jumped */
-    final def jump(chars: String): Boolean = {
+    final def jump(chars: String): Boolean =
       var index = 0
       while (index < chars.length && char == chars.charAt(index) &&
-      char != endOfText) {
+      char != endOfText)
         nextChar()
         index += 1
-      }
       index == chars.length
-    }
 
-    final def repeatJump(c: Char, max: Int = Int.MaxValue): Int = {
+    final def repeatJump(c: Char, max: Int = Int.MaxValue): Int =
       var count = 0
       while (jump(c) && count < max) count += 1
       count
-    }
 
-    final def jumpUntil(ch: Char): Int = {
+    final def jumpUntil(ch: Char): Int =
       var count = 0
-      while (char != ch && char != endOfText) {
+      while (char != ch && char != endOfText)
         nextChar()
         count += 1
-      }
       count
-    }
 
-    final def jumpUntil(pred: => Boolean): Int = {
+    final def jumpUntil(pred: => Boolean): Int =
       var count = 0
-      while (!pred && char != endOfText) {
+      while (!pred && char != endOfText)
         nextChar()
         count += 1
-      }
       count
-    }
 
     def jumpWhitespace() = jumpUntil(!isWhitespace(char))
 
@@ -986,43 +885,31 @@ trait CommentFactoryBase {
 
     /* READERS */
 
-    final def readUntil(c: Char): String = {
-      withRead {
-        while (char != c && char != endOfText) {
+    final def readUntil(c: Char): String =
+      withRead
+        while (char != c && char != endOfText)
           nextChar()
-        }
-      }
-    }
 
-    final def readUntil(chars: String): String = {
+    final def readUntil(chars: String): String =
       assert(chars.length > 0)
-      withRead {
+      withRead
         val c = chars.charAt(0)
-        while (!check(chars) && char != endOfText) {
+        while (!check(chars) && char != endOfText)
           nextChar()
           while (char != c && char != endOfText) nextChar()
-        }
-      }
-    }
 
-    final def readUntil(pred: => Boolean): String = {
-      withRead {
-        while (char != endOfText && !pred) {
+    final def readUntil(pred: => Boolean): String =
+      withRead
+        while (char != endOfText && !pred)
           nextChar()
-        }
-      }
-    }
 
-    private def withRead(read: => Unit): String = {
+    private def withRead(read: => Unit): String =
       val start = offset
       read
       buffer.substring(start, offset)
-    }
 
     /* CHARS CLASSES */
 
     def isWhitespace(c: Char) = c == ' ' || c == '\t'
 
     def isWhitespaceOrNewLine(c: Char) = isWhitespace(c) || c == '\n'
-  }
-}

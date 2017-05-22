@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ImportPathTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ImportPathTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "import/path/"
-  }
 
   protected override def rootPath(): String = folderPath
 
@@ -16,4 +15,3 @@ class ImportPathTest extends ResolveTestBase {
   def testDirThenLocal() = doTest()
   //TODO ok
 //  def testTwoLocal = doTest
-}

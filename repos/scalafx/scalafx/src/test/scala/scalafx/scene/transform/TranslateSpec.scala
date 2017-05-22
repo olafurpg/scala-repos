@@ -43,7 +43,6 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 class TranslateSpec
     extends SimpleSFXDelegateSpec[jfxst.Translate, Translate](
         classOf[jfxst.Translate], classOf[Translate])
-    with PositionDelegateSpec[Translate] {
+    with PositionDelegateSpec[Translate]
 
   val positionDelegate = getScalaClassInstance
-}

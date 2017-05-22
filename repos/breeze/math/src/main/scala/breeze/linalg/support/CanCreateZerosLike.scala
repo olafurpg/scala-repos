@@ -23,25 +23,21 @@ import scala.reflect.ClassTag
   *
   * @author dramage
   */
-trait CanCreateZerosLike[From, +To] {
+trait CanCreateZerosLike[From, +To]
   // Should not inherit from Form=>To because the compiler will try to use it to coerce types.
   def apply(from: From): To
-}
 
-object CanCreateZerosLike {
+object CanCreateZerosLike
 
   class OpArray[@specialized V : ClassTag : Semiring]
-      extends CanCreateZerosLike[Array[V], Array[V]] {
-    override def apply(from: Array[V]) = {
+      extends CanCreateZerosLike[Array[V], Array[V]]
+    override def apply(from: Array[V]) =
       Array.fill(from.length)(implicitly[Semiring[V]].zero)
-    }
-  }
 
   class OpMapValues[From, A, To](
       implicit op: Semiring[A], map: CanMapValues[From, A, A, To])
-      extends CanCreateZerosLike[From, To] {
+      extends CanCreateZerosLike[From, To]
     def apply(v: From) = map(v, _ => op.zero)
-  }
 
   implicit def opMapValues[From, A, To](
       implicit map: CanMapValues[From, A, A, To],
@@ -56,4 +52,3 @@ object CanCreateZerosLike {
   implicit object OpArrayL extends OpArray[Long]
   implicit object OpArrayF extends OpArray[Float]
   implicit object OpArrayD extends OpArray[Double]
-}

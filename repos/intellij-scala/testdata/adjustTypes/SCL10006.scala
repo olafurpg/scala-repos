@@ -1,4 +1,4 @@
-trait SCL10006 {
+trait SCL10006
 
   import cats._
 
@@ -9,7 +9,6 @@ trait SCL10006 {
                             Either,
                             String,
                             Int]#A]] /*end*/
-}
 /*
 trait SCL10006 {
 

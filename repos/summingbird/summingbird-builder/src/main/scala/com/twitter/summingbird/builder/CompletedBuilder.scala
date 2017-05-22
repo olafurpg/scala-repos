@@ -33,7 +33,7 @@ import java.io.Serializable
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object CompletedBuilder {
+object CompletedBuilder
   def injectionRegistrar[T : Manifest](injection: Injection[T, Array[Byte]]) =
     InjectionRegistrar(
         manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
@@ -42,7 +42,6 @@ object CompletedBuilder {
       injection: Injection[T, Array[Byte]]) =
     InjectionDefaultRegistrar(
         manifest[T].runtimeClass.asInstanceOf[Class[T]], injection)
-}
 
 case class CompletedBuilder[P <: Platform[P], K, V](
     @transient node: Summer[P, K, V],
@@ -53,7 +52,7 @@ case class CompletedBuilder[P <: Platform[P], K, V](
     id: String,
     @transient opts: Map[String, Options])(
     implicit val keyMf: Manifest[K], val valMf: Manifest[V])
-    extends Serializable {
+    extends Serializable
   import SourceBuilder.adjust
   import CompletedBuilder._
 
@@ -64,9 +63,7 @@ case class CompletedBuilder[P <: Platform[P], K, V](
   )
 
   // Set any Option
-  def set[T](opt: T)(implicit env: Env) = {
+  def set[T](opt: T)(implicit env: Env) =
     val cb = copy(opts = adjust(opts, id)(_.set(opt)))
     env.builder = cb
     cb
-  }
-}

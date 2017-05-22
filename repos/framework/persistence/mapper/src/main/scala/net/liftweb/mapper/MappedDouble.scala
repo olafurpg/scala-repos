@@ -29,14 +29,13 @@ import js._
 import net.liftweb.json._
 
 abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
-    extends MappedField[Double, T] {
+    extends MappedField[Double, T]
   private var data: Double = defaultValue
   private var orgData: Double = defaultValue
 
-  private def st(in: Double) {
+  private def st(in: Double)
     data = in
     orgData = in
-  }
 
   def defaultValue: Double = 0.0
   def dbFieldClass = classOf[Double]
@@ -44,9 +43,8 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
   protected def i_is_! = data
   protected def i_was_! = orgData
 
-  override def doneWithSave() {
+  override def doneWithSave()
     orgData = data
-  }
 
   import scala.reflect.runtime.universe._
   def manifest: TypeTag[Double] = typeTag[Double]
@@ -56,7 +54,7 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
     * @return the source field metadata for the field
     */
   def sourceInfoMetadata(): SourceFieldMetadata { type ST = Double } =
-    SourceFieldMetadataRep(name, manifest, new FieldConverter {
+    SourceFieldMetadataRep(name, manifest, new FieldConverter
 
       /**
         * The type of the field
@@ -91,10 +89,10 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
         * @return the field as a sequence of SourceFields
         */
       def asSeq(v: T): Box[Seq[SourceFieldInfo]] = Empty
-    })
+    )
 
-  def toDouble(in: Any): Double = {
-    in match {
+  def toDouble(in: Any): Double =
+    in match
       case null => 0.0
       case i: Int => i
       case n: Long => n
@@ -107,28 +105,24 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
       case s: String => s.toDouble
       case x :: xs => toDouble(x)
       case o => toDouble(o.toString)
-    }
-  }
 
   override def readPermission_? = true
   override def writePermission_? = true
 
   protected def i_obscure_!(in: Double) = defaultValue
 
-  protected def real_i_set_!(value: Double): Double = {
-    if (value != data) {
+  protected def real_i_set_!(value: Double): Double =
+    if (value != data)
       data = value
       dirty_?(true)
-    }
     data
-  }
 
   def asJsExp: JsExp = JE.Num(get)
 
   def asJsonValue: Box[JsonAST.JValue] = Full(JsonAST.JDouble(get))
 
-  override def setFromAny(in: Any): Double = {
-    in match {
+  override def setFromAny(in: Any): Double =
+    in match
       case JsonAST.JDouble(db) => this.set(db)
       case JsonAST.JInt(bi) => this.set(bi.doubleValue)
       case n: Double => this.set(n)
@@ -140,8 +134,6 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
       case null => this.set(0L)
       case s: String => this.set(toDouble(s))
       case o => this.set(toDouble(o))
-    }
-  }
 
   def real_convertToJDBCFriendly(value: Double): Object =
     new java.lang.Double(value)
@@ -157,10 +149,10 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
   def buildSetDateValue(
       accessor: Method, columnName: String): (T, Date) => Unit =
     (inst, v) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDouble[T] =>
           f.st(if (v == null) defaultValue else v.getTime)
-      })
+      )
 
   def buildSetStringValue(
       accessor: Method, columnName: String): (T, String) => Unit =
@@ -170,9 +162,9 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
   def buildSetLongValue(
       accessor: Method, columnName: String): (T, Long, Boolean) => Unit =
     (inst, v, isNull) =>
-      doField(inst, accessor, {
+      doField(inst, accessor,
         case f: MappedDouble[T] => f.st(if (isNull) defaultValue else v)
-      })
+      )
 
   def buildSetActualValue(accessor: Method,
                           data: AnyRef,
@@ -182,4 +174,3 @@ abstract class MappedDouble[T <: Mapper[T]](val fieldOwner: T)
 
   def fieldCreatorString(dbType: DriverType, colName: String): String =
     colName + " " + dbType.doubleColumnType + notNullAppender()
-}

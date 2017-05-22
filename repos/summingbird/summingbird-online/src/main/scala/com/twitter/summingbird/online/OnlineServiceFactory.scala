@@ -24,6 +24,5 @@ import com.twitter.storehaus.ReadableStore
  *
  * The Function1 here is to allow cleaner diasy chaining of operations via andThen.
  */
-trait OnlineServiceFactory[-K, +V] extends java.io.Serializable {
+trait OnlineServiceFactory[-K, +V] extends java.io.Serializable
   def serviceStore: () => ReadableStore[K, V]
-}

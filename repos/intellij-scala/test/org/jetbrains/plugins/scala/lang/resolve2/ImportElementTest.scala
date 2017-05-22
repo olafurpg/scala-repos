@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class ImportElementTest extends ResolveTestBase {
-  override def folderPath: String = {
+class ImportElementTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "import/element/"
-  }
 
   def testCaseClass() { doTest() }
   def testCompanion() { doTest() }
@@ -20,4 +19,3 @@ class ImportElementTest extends ResolveTestBase {
   def testTypeAlias() { doTest() }
   //TODO classparameter
 //  def testCaseClassParameter = doTest
-}

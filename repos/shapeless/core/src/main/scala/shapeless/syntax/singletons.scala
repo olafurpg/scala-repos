@@ -19,15 +19,14 @@ package syntax
 
 import scala.language.experimental.macros
 
-object singleton {
+object singleton
   implicit def mkSingletonOps(t: Any): SingletonOps = macro SingletonTypeMacros.mkSingletonOps
 
   import tag._
   implicit def narrowSymbol[S <: String](t: Symbol): Symbol @@ S = macro SingletonTypeMacros
     .narrowSymbol[S]
-}
 
-trait SingletonOps {
+trait SingletonOps
   import labelled._
 
   type T
@@ -46,4 +45,3 @@ trait SingletonOps {
     * Returns the provided value tagged with the singleton type of this value as its key in a record-like structure.
     */
   def ->>[V](v: V): FieldType[T, V] = field[T](v)
-}

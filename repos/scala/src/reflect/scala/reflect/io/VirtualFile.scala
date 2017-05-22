@@ -17,7 +17,7 @@ import java.io.{ByteArrayInputStream, ByteArrayOutputStream, InputStream, Output
   *  ''Note:  This library is considered experimental and should not be used unless you know what you are doing.''
   */
 class VirtualFile(val name: String, override val path: String)
-    extends AbstractFile {
+    extends AbstractFile
 
   /**
     * Initializes this instance with the specified name and an
@@ -29,10 +29,9 @@ class VirtualFile(val name: String, override val path: String)
   def this(name: String) = this(name, name)
 
   override def hashCode = path.hashCode
-  override def equals(that: Any) = that match {
+  override def equals(that: Any) = that match
     case x: VirtualFile => x.path == path
     case _ => false
-  }
 
   private var content = Array.emptyByteArray
 
@@ -45,14 +44,11 @@ class VirtualFile(val name: String, override val path: String)
 
   def input: InputStream = new ByteArrayInputStream(content)
 
-  override def output: OutputStream = {
-    new ByteArrayOutputStream() {
-      override def close() {
+  override def output: OutputStream =
+    new ByteArrayOutputStream()
+      override def close()
         super.close()
         content = toByteArray()
-      }
-    }
-  }
 
   def container: AbstractFile = NoAbstractFile
 
@@ -71,10 +67,9 @@ class VirtualFile(val name: String, override val path: String)
   def lastModified: Long = 0
 
   /** Returns all abstract subfiles of this abstract directory. */
-  def iterator: Iterator[AbstractFile] = {
+  def iterator: Iterator[AbstractFile] =
     assert(isDirectory, "not a directory '" + this + "'")
     Iterator.empty
-  }
 
   /** Does this abstract file denote an existing file? */
   def create(): Unit = unsupported()
@@ -88,13 +83,11 @@ class VirtualFile(val name: String, override val path: String)
     * argument "directory" tells whether to look for a directory or
     * or a regular file.
     */
-  def lookupName(name: String, directory: Boolean): AbstractFile = {
+  def lookupName(name: String, directory: Boolean): AbstractFile =
     assert(isDirectory, "not a directory '" + this + "'")
     null
-  }
 
   /** Returns an abstract file with the given name. It does not
     *  check that it exists.
     */
   def lookupNameUnchecked(name: String, directory: Boolean) = unsupported()
-}

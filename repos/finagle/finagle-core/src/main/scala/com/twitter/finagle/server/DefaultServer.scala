@@ -56,7 +56,7 @@ case class DefaultServer[Req, Rep, In, Out](
     newTraceInitializer: Stackable[ServiceFactory[Req, Rep]] = TraceInitializerFilter
         .serverModule[Req, Rep]
 )
-    extends Server[Req, Rep] {
+    extends Server[Req, Rep]
 
   val stack = StackServer
     .newStack[Req, Rep]
@@ -70,7 +70,7 @@ case class DefaultServer[Req, Rep, In, Out](
       stack: Stack[ServiceFactory[Req, Rep]] = stack,
       params: Stack.Params = Stack.Params.empty
   )
-      extends StdStackServer[Req, Rep, Server] {
+      extends StdStackServer[Req, Rep, Server]
     protected def copy1(
         stack: Stack[ServiceFactory[Req, Rep]] = this.stack,
         params: Stack.Params = this.params
@@ -82,7 +82,6 @@ case class DefaultServer[Req, Rep, In, Out](
     protected def newDispatcher(
         transport: Transport[In, Out], service: Service[Req, Rep]) =
       serviceTransport(transport, service)
-  }
 
   val underlying: StackServer[Req, Rep] = Server()
 
@@ -105,4 +104,3 @@ case class DefaultServer[Req, Rep, In, Out](
   def serve(addr: SocketAddress,
             factory: ServiceFactory[Req, Rep]): ListeningServer =
     configured.serve(addr, factory)
-}

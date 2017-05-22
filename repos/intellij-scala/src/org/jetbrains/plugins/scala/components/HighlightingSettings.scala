@@ -5,10 +5,9 @@ import scala.beans.BeanProperty
 /**
   * @author Pavel Fatin
   */
-class HighlightingSettings {
+class HighlightingSettings
   @BeanProperty
   var TYPE_AWARE_HIGHLIGHTING_ENABLED: Boolean = true
 
   @BeanProperty
   var SUGGEST_TYPE_AWARE_HIGHLIGHTING: Boolean = false
-}

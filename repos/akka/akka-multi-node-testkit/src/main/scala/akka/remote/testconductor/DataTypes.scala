@@ -68,13 +68,12 @@ private[akka] final case class AddressReply(node: RoleName, addr: Address)
 
 private[akka] abstract class Done
     extends ServerOp with UnconfirmedClientOp with NetworkOp
-private[akka] case object Done extends Done {
+private[akka] case object Done extends Done
   def getInstance: Done = this
-}
 
 private[akka] final case class Remove(node: RoleName) extends CommandOp
 
-private[akka] class MsgEncoder extends OneToOneEncoder {
+private[akka] class MsgEncoder extends OneToOneEncoder
 
   implicit def address2proto(addr: Address): TCP.Address =
     TCP.Address.newBuilder
@@ -84,17 +83,16 @@ private[akka] class MsgEncoder extends OneToOneEncoder {
       .setPort(addr.port.get)
       .build
 
-  implicit def direction2proto(dir: Direction): TCP.Direction = dir match {
+  implicit def direction2proto(dir: Direction): TCP.Direction = dir match
     case Direction.Send ⇒ TCP.Direction.Send
     case Direction.Receive ⇒ TCP.Direction.Receive
     case Direction.Both ⇒ TCP.Direction.Both
-  }
 
   def encode(ctx: ChannelHandlerContext, ch: Channel, msg: AnyRef): AnyRef =
-    msg match {
+    msg match
       case x: NetworkOp ⇒
         val w = TCP.Wrapper.newBuilder
-        x match {
+        x match
           case Hello(name, addr) ⇒
             w.setHello(TCP.Hello.newBuilder.setName(name).setAddress(addr))
           case EnterBarrier(name, timeout) ⇒
@@ -139,32 +137,28 @@ private[akka] class MsgEncoder extends OneToOneEncoder {
                 TCP.AddressRequest.newBuilder.setNode(node.name).setAddr(addr))
           case _: Done ⇒
             w.setDone("")
-        }
         w.build
       case _ ⇒ throw new IllegalArgumentException("wrong message " + msg)
-    }
-}
 
-private[akka] class MsgDecoder extends OneToOneDecoder {
+private[akka] class MsgDecoder extends OneToOneDecoder
 
   implicit def address2scala(addr: TCP.Address): Address =
     Address(addr.getProtocol, addr.getSystem, addr.getHost, addr.getPort)
 
-  implicit def direction2scala(dir: TCP.Direction): Direction = dir match {
+  implicit def direction2scala(dir: TCP.Direction): Direction = dir match
     case TCP.Direction.Send ⇒ Direction.Send
     case TCP.Direction.Receive ⇒ Direction.Receive
     case TCP.Direction.Both ⇒ Direction.Both
-  }
 
   def decode(ctx: ChannelHandlerContext, ch: Channel, msg: AnyRef): AnyRef =
-    msg match {
+    msg match
       case w: TCP.Wrapper if w.getAllFields.size == 1 ⇒
-        if (w.hasHello) {
+        if (w.hasHello)
           val h = w.getHello
           Hello(h.getName, h.getAddress)
-        } else if (w.hasBarrier) {
+        else if (w.hasBarrier)
           val barrier = w.getBarrier
-          barrier.getOp match {
+          barrier.getOp match
             case BarrierOp.Succeeded ⇒ BarrierResult(barrier.getName, true)
             case BarrierOp.Failed ⇒ BarrierResult(barrier.getName, false)
             case BarrierOp.Fail ⇒ FailBarrier(barrier.getName)
@@ -173,11 +167,10 @@ private[akka] class MsgDecoder extends OneToOneDecoder {
                            if (barrier.hasTimeout)
                              Option(Duration.fromNanos(barrier.getTimeout))
                            else None)
-          }
-        } else if (w.hasFailure) {
+        else if (w.hasFailure)
           val f = w.getFailure
           import TCP.{FailType ⇒ FT}
-          f.getFailure match {
+          f.getFailure match
             case FT.Throttle ⇒
               ThrottleMsg(f.getAddress, f.getDirection, f.getRateMBit)
             case FT.Abort ⇒ DisconnectMsg(f.getAddress, true)
@@ -185,16 +178,12 @@ private[akka] class MsgDecoder extends OneToOneDecoder {
             case FT.Exit ⇒ TerminateMsg(Right(f.getExitValue))
             case FT.Shutdown ⇒ TerminateMsg(Left(false))
             case FT.ShutdownAbrupt ⇒ TerminateMsg(Left(true))
-          }
-        } else if (w.hasAddr) {
+        else if (w.hasAddr)
           val a = w.getAddr
           if (a.hasAddr) AddressReply(RoleName(a.getNode), a.getAddr)
           else GetAddress(RoleName(a.getNode))
-        } else if (w.hasDone) {
+        else if (w.hasDone)
           Done
-        } else {
+        else
           throw new IllegalArgumentException("unknown message " + msg)
-        }
       case _ ⇒ throw new IllegalArgumentException("wrong message " + msg)
-    }
-}

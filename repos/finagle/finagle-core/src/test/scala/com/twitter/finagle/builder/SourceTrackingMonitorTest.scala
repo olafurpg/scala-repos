@@ -11,8 +11,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class SourceTrackingMonitorTest extends FunSuite with MockitoSugar {
-  test("handles unrolling properly") {
+class SourceTrackingMonitorTest extends FunSuite with MockitoSugar
+  test("handles unrolling properly")
     val logger = mock[Logger]
     val monitor = new SourceTrackingMonitor(logger, "qux")
     val e = new Exception
@@ -29,17 +29,15 @@ class SourceTrackingMonitorTest extends FunSuite with MockitoSugar {
         " threw an exception",
         exc
     )
-  }
 
-  test("logs IOExceptions at Level.FINE") {
+  test("logs IOExceptions at Level.FINE")
     val logger = mock[Logger]
     val ioEx = new IOException("hi")
     val monitor = new SourceTrackingMonitor(logger, "umm")
     monitor.handle(ioEx)
     verify(logger).log(mockitoEq(Level.FINE), any(), mockitoEq(ioEx))
-  }
 
-  test("logs Failure.rejected at Level.FINE") {
+  test("logs Failure.rejected at Level.FINE")
     val logger = mock[Logger]
     val monitor = new SourceTrackingMonitor(logger, "umm")
     val rejected = Failure.rejected("try again")
@@ -48,5 +46,3 @@ class SourceTrackingMonitorTest extends FunSuite with MockitoSugar {
     verify(logger).log(mockitoEq(Level.FINE), any(), mockitoEq(rejected))
     verify(logger, never())
       .log(mockitoEq(Level.WARNING), any(), mockitoEq(rejected))
-  }
-}

@@ -20,11 +20,10 @@ package io.prediction.controller
   *
   * @group Helper
   */
-trait SanityCheck {
+trait SanityCheck
 
   /** Implement this method to perform checks on your data. This method should
     * contain assertions that throw exceptions when your data does not meet
     * your pre-defined requirement.
     */
   def sanityCheck(): Unit
-}

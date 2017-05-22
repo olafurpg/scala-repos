@@ -1,37 +1,32 @@
-object SCL5030 {
+object SCL5030
   import java.lang.{Long => JLong}
 
-  object stuff {
+  object stuff
     import Test._
 
-    trait TaggedField[T, U] {
+    trait TaggedField[T, U]
       def asTagged: U
-    }
 
-    class MyIdField(val value: Long) extends TaggedField[Long, MyId] {
+    class MyIdField(val value: Long) extends TaggedField[Long, MyId]
       override def asTagged: MyId = Tag[JLong, _MyId](value)
-    }
 
     implicit def idToField(id: MyId): MyIdField = new MyIdField(id)
     implicit def fieldToId(f: MyIdField): MyId = f.asTagged
-  }
 
   import stuff._
 
-  object Tag {
+  object Tag
     type Tagged[U] = { type Tag = U }
     type @@[T, U] = T with Tagged[U] with Object
     @inline def apply[A, T](a: A): A @@ T = a.asInstanceOf[A @@ T]
-  }
 
-  object Test {
+  object Test
     import Tag._
 
     sealed trait _MyId
     type MyId = JLong @@ _MyId
-  }
 
-  class Foo {
+  class Foo
     import Test._
     def foo(x: MyId): Int = 1
     def foo(x: String): String = x
@@ -42,6 +37,4 @@ object SCL5030 {
     val x: MyId = new MyIdField(4)
     /*start*/
     (foo(new MyIdField(4)), goo(x)) /*end*/
-  }
-}
 //(Int, Int)

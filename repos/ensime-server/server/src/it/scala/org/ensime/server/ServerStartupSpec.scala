@@ -12,31 +12,27 @@ import scala.util.{Properties, Try}
 
 class ServerStartupSpec
     extends EnsimeSpec with IsolatedEnsimeConfigFixture
-    with IsolatedTestKitFixture {
+    with IsolatedTestKitFixture
 
   val original = EnsimeConfigFixture.EmptyTestProject
 
   Properties.setProp("ensime.server.test", "true")
 
-  "Server" should "start up and bind to random ports" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
+  "Server" should "start up and bind to random ports" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
         import tk._
 
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
 
-        eventually(timeout(30 seconds), interval(1 second)) {
+        eventually(timeout(30 seconds), interval(1 second))
           PortUtil.port(config.cacheDir, "http").isDefined
           PortUtil.port(config.cacheDir, "port").isDefined
-        }
-      }
-    }
-  }
 
-  it should "start up and bind to preferred ports" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
+  it should "start up and bind to preferred ports" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
         import tk._
 
         // this can fail randomly. No general solution.
@@ -49,27 +45,22 @@ class ServerStartupSpec
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
 
-        eventually(timeout(30 seconds), interval(1 second)) {
+        eventually(timeout(30 seconds), interval(1 second))
           val http = new Socket
           val tcp = new Socket
 
-          try {
+          try
             http.connect(new InetSocketAddress("127.0.0.1", preferredHttp))
             tcp.connect(new InetSocketAddress("127.0.0.1", preferredTcp))
 
             http.isConnected() && tcp.isConnected()
-          } finally {
+          finally
             Try(http.close())
             Try(tcp.close())
-          }
-        }
-      }
-    }
-  }
 
-  it should "shutdown if preferred TCP port is not available" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
+  it should "shutdown if preferred TCP port is not available" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
         import tk._
 
         val preferredTcp = 10004
@@ -80,16 +71,12 @@ class ServerStartupSpec
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
 
-        eventually(timeout(30 seconds), interval(1 second)) {
+        eventually(timeout(30 seconds), interval(1 second))
           system.isTerminated
-        }
-      }
-    }
-  }
 
-  it should "shutdown if preferred HTTP port is not available" in {
-    withEnsimeConfig { implicit config =>
-      withTestKit { implicit tk =>
+  it should "shutdown if preferred HTTP port is not available" in
+    withEnsimeConfig  implicit config =>
+      withTestKit  implicit tk =>
         import tk._
 
         val preferredHttp = 10003
@@ -101,10 +88,5 @@ class ServerStartupSpec
         val protocol = new SwankProtocol
         system.actorOf(Props(new ServerActor(config, protocol)), "ensime-main")
 
-        eventually(timeout(30 seconds), interval(1 second)) {
+        eventually(timeout(30 seconds), interval(1 second))
           system.isTerminated
-        }
-      }
-    }
-  }
-}

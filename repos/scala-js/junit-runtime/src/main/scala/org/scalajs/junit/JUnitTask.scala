@@ -7,18 +7,17 @@ import org.scalajs.testinterface.TestUtils
 import scala.util.{Try, Success, Failure}
 
 final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
-    extends sbt.testing.Task {
+    extends sbt.testing.Task
 
   def tags: Array[String] = Array.empty
 
   def execute(eventHandler: EventHandler,
               loggers: Array[Logger],
-              continuation: Array[Task] => Unit): Unit = {
+              continuation: Array[Task] => Unit): Unit =
     continuation(execute(eventHandler, loggers))
-  }
 
   def execute(
-      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] = {
+      eventHandler: EventHandler, loggers: Array[Logger]): Array[Task] =
     val richLogger = new RichLogger(
         loggers, runner.runSettings, taskDef.fullyQualifiedName)
 
@@ -30,7 +29,7 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
 
     val startTime = System.nanoTime
 
-    Try(TestUtils.loadModule(bootstrapperName, runner.testClassLoader)) match {
+    Try(TestUtils.loadModule(bootstrapperName, runner.testClassLoader)) match
       case Success(classMetadata: JUnitTestBootstrapper) =>
         new JUnitExecuteTest(
             taskDef, runner, classMetadata, richLogger, eventHandler)
@@ -46,11 +45,10 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
         richLogger.error(
             "Error while loading test class: " + taskDef.fullyQualifiedName,
             exception)
-    }
 
     runner.taskDone()
 
-    if (runner.runSettings.verbose) {
+    if (runner.runSettings.verbose)
       val time = System.nanoTime - startTime
       val failed = runner.taskFailedCount
       val ignored = runner.taskIgnoredCount
@@ -62,8 +60,5 @@ final class JUnitTask(val taskDef: TaskDef, runner: JUnitBaseRunner)
           c(s"$total total,", INFO),
           c(s"${time.toDouble / 1000000000}s", INFO))
       richLogger.info(msg.mkString(" "))
-    }
 
     Array()
-  }
-}

@@ -15,9 +15,9 @@ import java.lang.Math
 
 import org.scalajs.testsuite.utils.Platform._
 
-class MathTest {
+class MathTest
 
-  @Test def abs(): Unit = {
+  @Test def abs(): Unit =
     assertEquals(0, Math.abs(0))
     assertEquals(42, Math.abs(42))
     assertEquals(42, Math.abs(-42))
@@ -32,9 +32,8 @@ class MathTest {
     assertTrue(Math.abs(Double.NaN).isNaN)
     assertEquals(Long.MaxValue, Math.abs(Long.MaxValue))
     assertEquals(Long.MinValue, Math.abs(Long.MinValue))
-  }
 
-  @Test def max(): Unit = {
+  @Test def max(): Unit =
     assertEquals(0, Math.max(0, 0))
     assertEquals(2, Math.max(0, 2))
     assertEquals(2, Math.max(2, 0))
@@ -51,9 +50,8 @@ class MathTest {
     assertTrue(Math.max(0.0, Double.NaN).isNaN)
     assertEquals(Long.MaxValue, Math.max(Long.MaxValue, 0))
     assertEquals(0L, Math.max(Long.MinValue, 0))
-  }
 
-  @Test def min(): Unit = {
+  @Test def min(): Unit =
     assertEquals(0, Math.min(0, 0))
     assertEquals(0, Math.min(0, 2))
     assertEquals(0, Math.min(2, 0))
@@ -70,29 +68,25 @@ class MathTest {
     assertTrue(Math.min(0.0, Double.NaN).isNaN)
     assertEquals(0L, Math.min(Long.MaxValue, 0))
     assertEquals(Long.MinValue, Math.min(Long.MinValue, 0))
-  }
 
-  @Test def cbrt(): Unit = {
+  @Test def cbrt(): Unit =
     assertTrue(1 / Math.cbrt(-0.0) < 0)
     assertEquals(3.0, Math.cbrt(27.0), 0.0)
     assertEquals(100.0, Math.cbrt(1000000.0), 0.0)
     assertEquals(1000.0, Math.cbrt(1000000000.0), 0.0)
     assertEquals(-100000000.0, Math.cbrt(-1.0E24), 0.0)
     assertEquals(-4039.0E8, Math.cbrt(-65890311319.0E24), 0.0)
-  }
 
-  @Test def log1p(): Unit = {
+  @Test def log1p(): Unit =
     assertTrue(Math.log1p(-2.0).isNaN)
     assertTrue(Math.log1p(Double.NaN).isNaN)
     assertEquals(0.0, Math.log1p(0.0), 0.0)
-  }
 
-  @Test def log10(): Unit = {
+  @Test def log10(): Unit =
     assertTrue(Math.log10(-230.0).isNaN)
     assertTrue(Math.log10(Double.NaN).isNaN)
-  }
 
-  @Test def signum_for_Double(): Unit = {
+  @Test def signum_for_Double(): Unit =
     assertEquals(1.0, Math.signum(234394.2198273), 0.0)
     assertEquals(-1.0, Math.signum(-124937498.58), 0.0)
 
@@ -103,9 +97,8 @@ class MathTest {
     assertTrue(1 / Math.signum(-0.0) < 0)
 
     assertTrue(Math.signum(Double.NaN).isNaN)
-  }
 
-  @Test def signum_for_Float(): Unit = {
+  @Test def signum_for_Float(): Unit =
     assertEquals(1.0f, Math.signum(234394.2198273f), 0.0f)
     assertEquals(-1.0f, Math.signum(-124937498.58f), 0.0f)
 
@@ -116,9 +109,8 @@ class MathTest {
     assertTrue(1 / Math.signum(-0.0f) < 0)
 
     assertTrue(Math.signum(Float.NaN).isNaN)
-  }
 
-  @Test def nextUp_for_Double(): Unit = {
+  @Test def nextUp_for_Double(): Unit =
     assertEquals(
         Double.PositiveInfinity, Math.nextUp(Double.PositiveInfinity), 0.0)
     assertEquals(Double.MinValue, Math.nextUp(Double.NegativeInfinity), 0.0)
@@ -131,9 +123,8 @@ class MathTest {
     assertEquals(9007199254740994.0, Math.nextUp(9007199254740992.0), 0.0)
     assertEquals(
         1 + 2.2204460492503130808472633361816E-16, Math.nextUp(1.0), 0.0)
-  }
 
-  @Test def nextAfter_for_Double(): Unit = {
+  @Test def nextAfter_for_Double(): Unit =
     assertTrue(Math.nextAfter(1.0, Double.NaN).isNaN)
     assertTrue(Math.nextAfter(Double.NaN, 1.0).isNaN)
     assertEquals(0.0, Math.nextAfter(0.0, 0.0), 0.0)
@@ -161,23 +152,20 @@ class MathTest {
                  Math.nextAfter(-Double.MaxValue, Double.NegativeInfinity),
                  0.0)
     assertEquals(1.0, Math.nextAfter(1.0, 1.0), 0.0)
-  }
 
-  @Test def ulp_for_Double(): Unit = {
+  @Test def ulp_for_Double(): Unit =
     assertEquals(4.440892098500626E-16, Math.ulp(3.4), 0.0)
     assertEquals(4.1718496795330275E93, Math.ulp(3.423E109), 0.0)
     assertEquals(Double.MinPositiveValue, Math.ulp(0.0), 0.0)
-  }
 
-  @Test def hypot(): Unit = {
+  @Test def hypot(): Unit =
     assertEquals(0.0, Math.hypot(0.0, 0.0), 0.01)
     assertEquals(5.0, Math.hypot(3.0, 4.0), 0.01)
     assertTrue(Math.hypot(3.0, Double.NaN).isNaN)
     assertEquals(
         Double.PositiveInfinity, Math.hypot(Double.NegativeInfinity, 4.0), 0.0)
-  }
 
-  @Test def expm1(): Unit = {
+  @Test def expm1(): Unit =
     assertTrue(1 / Math.expm1(-0.0) < 0)
     assertEquals(0.0, Math.expm1(-0.0), 0.01)
     assertEquals(19.085536923187668, Math.expm1(3.0), 0.01)
@@ -187,34 +175,30 @@ class MathTest {
         Double.PositiveInfinity, Math.expm1(Double.PositiveInfinity), 0.0)
     assertEquals(-1.0, Math.expm1(Double.NegativeInfinity), 0.01)
     assertEquals(4.9E-324, Math.expm1(4.9E-324), 0.01)
-  }
 
-  @Test def sinh(): Unit = {
+  @Test def sinh(): Unit =
     assertEquals(Double.NegativeInfinity, Math.sinh(-1234.56), 0.0)
     assertEquals(Double.PositiveInfinity, Math.sinh(1234.56), 0.0)
     assertEquals(0.0, Math.sinh(0.0), 0.01)
     assertEquals(
         Double.PositiveInfinity, Math.sinh(Double.PositiveInfinity), 0.0)
-  }
 
-  @Test def cosh(): Unit = {
+  @Test def cosh(): Unit =
     assertEquals(Double.PositiveInfinity, Math.cosh(-1234.56), 0.0)
     assertEquals(Double.PositiveInfinity, Math.cosh(1234.56), 0.0)
     assertEquals(1.0, Math.cosh(-0.0), 0.01)
     assertEquals(
         Double.PositiveInfinity, Math.cosh(Double.PositiveInfinity), 0.0)
-  }
 
-  @Test def tanh(): Unit = {
+  @Test def tanh(): Unit =
     assertEquals(-1.0, Math.tanh(-1234.56), 0.01)
     assertEquals(-1.0, Math.tanh(-120.56), 0.01)
     assertEquals(1.0, Math.tanh(1234.56), 0.01)
     assertEquals(0.0, Math.tanh(0.0), 0.01)
     assertEquals(1.0, Math.tanh(Double.PositiveInfinity), 0.01)
     assertEquals(-1.0, Math.tanh(Double.NegativeInfinity), 0.01)
-  }
 
-  @Test def rint_for_Double(): Unit = {
+  @Test def rint_for_Double(): Unit =
     // js.Math.round() is buggy on Rhino
     assumeFalse("Executing in rhino", executingInRhino)
 
@@ -258,5 +242,3 @@ class MathTest {
     assertEquals(-2.0, rint(-2.5), 0.0)
     assertEquals(Double.MinValue, rint(Double.MinValue), 0.0)
     assertEquals(-4503599627370496.0, rint(-4503599627370495.5), 0.0) // -MaxSafeInt / 2
-  }
-}

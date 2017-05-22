@@ -45,7 +45,7 @@ import scala.collection.mutable.ListBuffer
 abstract class InteractiveTest
     extends AskParse with AskShutdown with AskReload with AskLoadedTyped
     with PresentationCompilerInstance with CoreTestDefs
-    with InteractiveTestSettings {
+    with InteractiveTestSettings
   self =>
 
   protected val runRandomTests = false
@@ -57,32 +57,28 @@ abstract class InteractiveTest
     *  `CompletionAction`, `TypeAction` and `HyperlinkAction`.
     *  Override this member if you need to change the default set of executed test actions.
     */
-  protected lazy val testActions: ListBuffer[PresentationCompilerTestDef] = {
+  protected lazy val testActions: ListBuffer[PresentationCompilerTestDef] =
     ListBuffer(new TypeCompletionAction(compiler),
                new ScopeCompletionAction(compiler),
                new TypeAction(compiler),
                new HyperlinkAction(compiler))
-  }
 
   /** Add new presentation compiler actions to test. Presentation compiler's test
     *  need to extends trait `PresentationCompilerTestDef`.
     */
-  protected def ++(tests: PresentationCompilerTestDef*) {
+  protected def ++(tests: PresentationCompilerTestDef*)
     testActions ++= tests
-  }
 
   /** Test's entry point */
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     try execute() finally askShutdown()
-  }
 
-  protected def execute(): Unit = {
+  protected def execute(): Unit =
     loadSources()
     runDefaultTests()
-  }
 
   /** Load all sources before executing the test. */
-  protected def loadSources() {
+  protected def loadSources()
     // ask the presentation compiler to track all sources. We do
     // not wait for the file to be entirely typed because we do want
     // to exercise the presentation compiler on scoped type requests.
@@ -91,13 +87,11 @@ abstract class InteractiveTest
     // is because test may depend on the sources having been parsed at
     // least once
     askParse(sourceFiles)
-  }
 
   /** Run all defined `PresentationCompilerTestDef` */
-  protected def runDefaultTests() {
+  protected def runDefaultTests()
     //TODO: integrate random tests!, i.e.: if (runRandomTests) randomTests(20, sourceFiles)
     testActions.foreach(_.runTest())
-  }
 
   /** Perform n random tests with random changes. */
   /****
@@ -109,4 +103,3 @@ abstract class InteractiveTest
     tester.run()
   }
   ****/
-}

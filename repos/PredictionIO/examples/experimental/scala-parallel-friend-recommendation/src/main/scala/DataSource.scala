@@ -29,17 +29,15 @@ case class TrainingData(
     extends Serializable
 
 class DataSource(val dsp: DataSourceParams)
-    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     // In the interest of space (since we calculate at most n*n simrank scores),
     // each of the n vertices should have vertexID in the range 0 to n-1
     // val g2 = DeltaSimRankRDD.normalizeGraph(g)
     val identity = DeltaSimRankRDD.identityMatrix(sc, g.vertices.count())
     new TrainingData(g, identity)
-  }
-}
 
 case class NodeSamplingDSParams(
     val graphEdgelistPath: String,
@@ -48,15 +46,13 @@ case class NodeSamplingDSParams(
     extends Params
 
 class NodeSamplingDataSource(val dsp: NodeSamplingDSParams)
-    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     val sampled = Sampling.nodeSampling(sc, g, dsp.sampleFraction)
     val identity = DeltaSimRankRDD.identityMatrix(sc, g.vertices.count())
     new TrainingData(sampled, identity)
-  }
-}
 
 case class FFSamplingDSParams(
     val graphEdgelistPath: String,
@@ -66,14 +62,12 @@ case class FFSamplingDSParams(
     extends Params
 
 class ForestFireSamplingDataSource(val dsp: FFSamplingDSParams)
-    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double] {
+    extends PDataSource[TrainingData, EmptyEvaluationInfo, Query, Double]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val g = GraphLoader.edgeListFile(sc, dsp.graphEdgelistPath)
     val sampled = Sampling.forestFireSamplingInduced(
         sc, g, dsp.sampleFraction, dsp.geoParam)
 
     val identity = DeltaSimRankRDD.identityMatrix(sc, g.vertices.count())
     new TrainingData(sampled, identity)
-  }
-}

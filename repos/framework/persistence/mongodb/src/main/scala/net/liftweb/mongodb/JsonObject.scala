@@ -26,15 +26,14 @@ import org.bson.types.ObjectId
  * and their companion objects. Used by MongoDocument, JsonObjectField, and
  * MongoJsonObjectListField
  */
-trait JsonObject[BaseDocument] { self: BaseDocument =>
+trait JsonObject[BaseDocument]  self: BaseDocument =>
 
   def meta: JsonObjectMeta[BaseDocument]
 
   // convert class to a json value
   def asJObject()(implicit formats: Formats): JObject = meta.toJObject(this)
-}
 
-class JsonObjectMeta[BaseDocument](implicit mf: Manifest[BaseDocument]) {
+class JsonObjectMeta[BaseDocument](implicit mf: Manifest[BaseDocument])
 
   import net.liftweb.json.Extraction._
 
@@ -45,7 +44,6 @@ class JsonObjectMeta[BaseDocument](implicit mf: Manifest[BaseDocument]) {
   // convert class to a JObject
   def toJObject(in: BaseDocument)(implicit formats: Formats): JObject =
     decompose(in)(formats).asInstanceOf[JObject]
-}
 
 /*
  * Case class for a db reference (foreign key). To be used in a JsonObject

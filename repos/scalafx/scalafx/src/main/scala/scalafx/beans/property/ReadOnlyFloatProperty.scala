@@ -32,22 +32,20 @@ import scala.language.implicitConversions
 import scalafx.beans.binding.NumberExpression
 import scalafx.delegate.SFXDelegate
 
-object ReadOnlyFloatProperty {
+object ReadOnlyFloatProperty
   implicit def sfxReadOnlyFloatProperty2jfx(
       rofp: ReadOnlyFloatProperty): jfxbp.ReadOnlyFloatProperty =
     if (rofp != null) rofp.delegate else null
-}
 
 class ReadOnlyFloatProperty(override val delegate: jfxbp.ReadOnlyFloatProperty)
     extends NumberExpression(delegate) with ReadOnlyProperty[Float, Number]
-    with SFXDelegate[jfxbp.ReadOnlyFloatProperty] {
+    with SFXDelegate[jfxbp.ReadOnlyFloatProperty]
   def this(bean: Object, name: String, value: Float) =
     this(
-        new jfxbp.ReadOnlyFloatPropertyBase() {
+        new jfxbp.ReadOnlyFloatPropertyBase()
       def getBean = bean
       def getName = name
       def get = value
-    })
+    )
 
   override def value = delegate.get
-}

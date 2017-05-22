@@ -7,7 +7,7 @@ package object sbt
     with sbt.internal.librarymanagement.impl.DependencyBuilders
     with sbt.io.PathExtra with sbt.ProjectExtra
     with sbt.internal.librarymanagement.DependencyFilterExtra
-    with sbt.BuildExtra with sbt.TaskMacroExtra with sbt.ScopeFilter.Make {
+    with sbt.BuildExtra with sbt.TaskMacroExtra with sbt.ScopeFilter.Make
   type Setting[T] = Def.Setting[T]
   type ScopedKey[T] = Def.ScopedKey[T]
   type SettingsDefinition = Def.SettingsDefinition
@@ -15,11 +15,10 @@ package object sbt
   type URI = java.net.URI
   type URL = java.net.URL
 
-  object CompileOrder {
+  object CompileOrder
     val JavaThenScala = xsbti.compile.CompileOrder.JavaThenScala
     val ScalaThenJava = xsbti.compile.CompileOrder.ScalaThenJava
     val Mixed = xsbti.compile.CompileOrder.Mixed
-  }
   type CompileOrder = xsbti.compile.CompileOrder
 
   implicit def maybeToOption[S](m: xsbti.Maybe[S]): Option[S] =
@@ -50,4 +49,3 @@ package object sbt
     .taskKeyImpl[T]
   def inputKey[T](description: String): InputKey[T] = macro std.KeyMacro
     .inputKeyImpl[T]
-}

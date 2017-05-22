@@ -17,7 +17,7 @@ import scala.concurrent.Future
 /**
   * Java API: Factories to create sinks and sources from files
   */
-object FileIO {
+object FileIO
 
   import Sink.{shape ⇒ sinkShape}
   import Source.{shape ⇒ sourceShape}
@@ -60,4 +60,3 @@ object FileIO {
     : Sink[ByteString, Future[IOResult]] =
     new Sink(new FileSink(
             f, options, DefaultAttributes.fileSink, sinkShape("FileSink")))
-}

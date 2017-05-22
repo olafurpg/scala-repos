@@ -9,13 +9,13 @@ import org.jetbrains.plugins.scala.conversion.copy.{Associations, ScalaCopyPaste
   * Nikolay.Tropin
   * 2014-05-27
   */
-object ScalaChangeContextUtil {
+object ScalaChangeContextUtil
 
   private val ASSOCIATIONS_KEY: Key[Associations] = Key.create("ASSOCIATIONS")
   val processor = new ScalaCopyPastePostProcessor
 
-  def encodeContextInfo(scope: Seq[PsiElement]) {
-    def collectDataForElement(elem: PsiElement) = {
+  def encodeContextInfo(scope: Seq[PsiElement])
+    def collectDataForElement(elem: PsiElement) =
       val range: TextRange = elem.getTextRange
       val associations = processor.collectTransferableData(
           elem.getContainingFile,
@@ -25,34 +25,25 @@ object ScalaChangeContextUtil {
       elem.putCopyableUserData(ASSOCIATIONS_KEY,
                                if (associations.isEmpty) null
                                else associations.get(0))
-    }
     scope.foreach(collectDataForElement)
-  }
 
-  def decodeContextInfo(scope: Seq[PsiElement]) {
-    def restoreForElement(elem: PsiElement) {
+  def decodeContextInfo(scope: Seq[PsiElement])
+    def restoreForElement(elem: PsiElement)
       val associations: Associations =
         elem.getCopyableUserData(ASSOCIATIONS_KEY)
-      if (associations != null) {
-        try {
+      if (associations != null)
+        try
           processor.restoreAssociations(associations,
                                         elem.getContainingFile,
                                         elem.getTextRange.getStartOffset,
                                         elem.getProject)
-        } finally {
+        finally
           elem.putCopyableUserData(ASSOCIATIONS_KEY, null)
-        }
-      }
-    }
     scope.foreach(restoreForElement)
-  }
 
-  def shiftAssociations(elem: PsiElement, offsetChange: Int) {
-    elem.getCopyableUserData(ASSOCIATIONS_KEY) match {
+  def shiftAssociations(elem: PsiElement, offsetChange: Int)
+    elem.getCopyableUserData(ASSOCIATIONS_KEY) match
       case null =>
       case as: Associations =>
         as.associations.foreach(
             a => a.range = a.range.shiftRight(offsetChange))
-    }
-  }
-}

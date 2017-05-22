@@ -14,22 +14,20 @@ import org.jboss.netty.{util => netty}
   * An Epoch is a Event that notifies its listener
   * once per `period`
   */
-private[serverset2] object Epoch {
+private[serverset2] object Epoch
   def apply(period: Duration)(implicit timer: Timer): Epoch =
-    new Epoch(new Event[Unit] {
+    new Epoch(new Event[Unit]
       override def register(w: Witness[Unit]): Closable =
-        timer.schedule(period) {
+        timer.schedule(period)
           w.notify(())
-        }
-    }, period)
-}
+    , period)
 
 private[serverset2] class Epoch(
     val event: Event[Unit],
     val period: Duration
 )
 
-private[serverset2] object Stabilizer {
+private[serverset2] object Stabilizer
 
   // Use our own timer to avoid doing work in the global timer's thread and causing timer deviation
   // the notify() run each epoch can trigger some slow work.
@@ -59,15 +57,13 @@ private[serverset2] object Stabilizer {
   // Create an event of epochs for the given duration.
   def epochs(period: Duration): Epoch =
     new Epoch(
-        new Event[Unit] {
-          def register(w: Witness[Unit]) = {
-            epochTimer.schedule(period) {
+        new Event[Unit]
+          def register(w: Witness[Unit]) =
+            epochTimer.schedule(period)
               val elapsed = Stopwatch.start()
               w.notify(())
               notifyMs.add(elapsed().inMilliseconds)
-            }
-          }
-        },
+        ,
         period
     )
 
@@ -99,7 +95,7 @@ private[serverset2] object Stabilizer {
     * one update per batchEpoch, delaying adds by at most one batchEpoch.
     */
   def apply(va: Var[Addr], removalEpoch: Epoch, batchEpoch: Epoch): Var[Addr] =
-    Var.async(Addr.Pending: Addr) { u =>
+    Var.async(Addr.Pending: Addr)  u =>
       // We construct an Event[State] representing states after
       // successive address observations. The state contains two sets
       // of addresses: the "active" set is the set of all observed
@@ -121,10 +117,10 @@ private[serverset2] object Stabilizer {
       // triggered at most once per batchEpoch.
 
       val states: Event[State] =
-        (va.changes select removalEpoch.event).foldLeft(initState) {
+        (va.changes select removalEpoch.event).foldLeft(initState)
           // Addr update
           case (st @ State(limbo, active, last), Left(addr)) =>
-            addr match {
+            addr match
               case Addr.Failed(_) =>
                 State(None,
                       Some(active.getOrElse(Set.empty) ++ limbo.getOrElse(
@@ -145,11 +141,10 @@ private[serverset2] object Stabilizer {
                 // and limbo have to expire in order for this address to
                 // propagate.
                 st.copy(addr = addr)
-            }
 
           // The removalEpoch turned
           case (st @ State(limbo, active, last), Right(())) =>
-            last match {
+            last match
               case Addr.Bound(bound, _) =>
                 State(active, Some(bound), last)
 
@@ -162,29 +157,25 @@ private[serverset2] object Stabilizer {
                 // when nonbound, since that would eventually promote
                 // the address
                 st
-            }
-        }
 
-      val addrs = states.map {
+      val addrs = states.map
         case State(limbo, active, last) =>
           val all =
             merge(limbo.getOrElse(Set.empty), active.getOrElse(Set.empty))
-          if (all.nonEmpty) {
+          if (all.nonEmpty)
             Addr.Bound(all)
-          } else if (limbo != None || active != None) {
+          else if (limbo != None || active != None)
             Addr.Neg
-          } else {
+          else
             last
-          }
-      }
 
       // Trigger at most one change to state per batchEpoch
       val init = States(Some(Addr.Pending), Addr.Pending, None, Time.Zero)
       val batchedUpdates = (addrs select batchEpoch.event)
-        .foldLeft(init) {
+        .foldLeft(init)
           case (st, ev) =>
             val now = Time.now
-            ev match {
+            ev match
               case Left(newAddr) =>
                 // There's a change to the serverset but it's not different. Noop
                 if (newAddr == st.last) st.copy(publish = None)
@@ -195,7 +186,7 @@ private[serverset2] object Stabilizer {
                 else States(Some(newAddr), newAddr, None, now)
 
               case Right(_) =>
-                st.next match {
+                st.next match
                   // Epoch turned, but we have published in < batchEpoch. Noop
                   case _ if now - st.lastEmit < batchEpoch.period =>
                     st.copy(publish = None)
@@ -205,28 +196,20 @@ private[serverset2] object Stabilizer {
                   // Epoch turned, there's a next state, and we haven't published in >= batchEpoch. Publish.
                   case Some(next) =>
                     States(Some(next), next, None, now)
-                }
-            }
-        }
-        .collect {
+        .collect
           case States(Some(publish), _, _, _) => publish
-        }
 
       batchedUpdates.register(Witness(u))
-    }
 
   /**
     * Merge WeightedSocketAddresses with same underlying SocketAddress
     * preferring weights from `next` over `prev`.
     */
-  private def merge(prev: Set[Address], next: Set[Address]): Set[Address] = {
+  private def merge(prev: Set[Address], next: Set[Address]): Set[Address] =
     val nextUnweighted = next.map(WeightedAddress.extract(_)._1)
 
-    val legacy = prev.filter { addr =>
+    val legacy = prev.filter  addr =>
       val (unweighted, _) = WeightedAddress.extract(addr)
       !nextUnweighted.contains(unweighted)
-    }
 
     legacy ++ next
-  }
-}

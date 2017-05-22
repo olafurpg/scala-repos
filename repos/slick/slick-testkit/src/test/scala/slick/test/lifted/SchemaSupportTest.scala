@@ -4,16 +4,15 @@ import org.junit.Test
 import org.junit.Assert._
 
 /** Test case for the SQL schema support in table definitions */
-class SchemaSupportTest {
+class SchemaSupportTest
 
   @Test
-  def testSchemaSupport {
+  def testSchemaSupport
     import slick.jdbc.H2Profile.api._
 
-    class T(tag: Tag) extends Table[Int](tag, Some("myschema"), "mytable") {
+    class T(tag: Tag) extends Table[Int](tag, Some("myschema"), "mytable")
       def id = column[Int]("id")
       def * = id
-    }
     val ts = TableQuery[T]
 
     val s1 = ts.filter(_.id < 5).result.statements.head
@@ -47,5 +46,3 @@ class SchemaSupportTest {
         s =>
           assertTrue("DDL (drop) uses schema name",
                      s contains """ "myschema"."mytable""""))
-  }
-}

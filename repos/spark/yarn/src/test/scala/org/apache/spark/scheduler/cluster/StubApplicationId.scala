@@ -26,18 +26,15 @@ import org.apache.hadoop.yarn.api.records.ApplicationId
   * @param clusterTimestamp timestamp
   */
 private[spark] class StubApplicationId(id: Int, clusterTimestamp: Long)
-    extends ApplicationId {
-  override def getId: Int = {
+    extends ApplicationId
+  override def getId: Int =
     id
-  }
 
-  override def getClusterTimestamp: Long = {
+  override def getClusterTimestamp: Long =
     clusterTimestamp
-  }
 
   override def setId(id: Int): Unit = {}
 
   override def setClusterTimestamp(clusterTimestamp: Long): Unit = {}
 
   override def build(): Unit = {}
-}

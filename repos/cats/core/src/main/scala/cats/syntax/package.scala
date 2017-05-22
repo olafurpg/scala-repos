@@ -1,6 +1,6 @@
 package cats
 
-package object syntax {
+package object syntax
   object all extends AllSyntax
   object applicative extends ApplicativeSyntax
   object apply extends ApplySyntax
@@ -36,4 +36,3 @@ package object syntax {
   object xor extends XorSyntax
   object validated extends ValidatedSyntax
   object writer extends WriterSyntax
-}

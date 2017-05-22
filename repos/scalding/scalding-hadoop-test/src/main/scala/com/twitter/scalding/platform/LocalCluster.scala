@@ -28,15 +28,14 @@ import org.apache.hadoop.mapred.{JobConf, MiniMRCluster}
 import org.slf4j.LoggerFactory
 import org.slf4j.impl.Log4jLoggerAdapter
 
-object LocalCluster {
+object LocalCluster
   private final val HADOOP_CLASSPATH_DIR = new Path(
       "/tmp/hadoop-classpath-lib")
   private final val MUTEX = new RandomAccessFile("NOTICE", "rw").getChannel
 
   def apply() = new LocalCluster()
-}
 
-class LocalCluster(mutex: Boolean = true) {
+class LocalCluster(mutex: Boolean = true)
   org.apache.log4j.Logger
     .getLogger("org.apache.hadoop")
     .setLevel(org.apache.log4j.Level.ERROR)
@@ -68,32 +67,28 @@ class LocalCluster(mutex: Boolean = true) {
   // running without colliding. Thus we implement our own mutex. Mkdir should be atomic so
   // there should be no race. Just to be careful, however, we make sure that the file
   // is what we expected, or else we fail.
-  private[this] def acquireMutex() {
+  private[this] def acquireMutex()
     LOG.debug("Attempting to acquire mutex")
     lock = Some(LocalCluster.MUTEX.lock())
     LOG.debug("Mutex file acquired")
-  }
 
-  private[this] def releaseMutex() {
+  private[this] def releaseMutex()
     LOG.debug("Releasing mutex")
     lock.foreach { _.release() }
     LOG.debug("Mutex released")
     lock = None
-  }
 
   /**
     * Start up the local cluster instance.
     *
     * @param inConf  override default configuration
     */
-  def initialize(inConf: Config = Config.empty): this.type = {
-    if (mutex) {
+  def initialize(inConf: Config = Config.empty): this.type =
+    if (mutex)
       acquireMutex()
-    }
 
-    if (Option(System.getProperty("hadoop.log.dir")).isEmpty) {
+    if (Option(System.getProperty("hadoop.log.dir")).isEmpty)
       System.setProperty("hadoop.log.dir", "build/test/logs")
-    }
     new File(System.getProperty("hadoop.log.dir")).mkdirs()
 
     val conf = new Configuration
@@ -157,21 +152,18 @@ class LocalCluster(mutex: Boolean = true) {
            classOf[com.esotericsoftware.kryo.KryoSerializable],
            classOf[com.twitter.chill.hadoop.KryoSerialization],
            classOf[com.twitter.maple.tap.TupleMemoryInputFormat],
-           classOf[org.apache.commons.configuration.Configuration]).foreach {
+           classOf[org.apache.commons.configuration.Configuration]).foreach
         addClassSourceToClassPath(_)
-      }
     this
-  }
 
-  def addClassSourceToClassPath[T](clazz: Class[T]) {
+  def addClassSourceToClassPath[T](clazz: Class[T])
     addFileToHadoopClassPath(getFileForClass(clazz))
-  }
 
   def addFileToHadoopClassPath(resourceDir: File): Boolean =
-    if (classpath.contains(resourceDir)) {
+    if (classpath.contains(resourceDir))
       LOG.debug("Already on Hadoop classpath: " + resourceDir)
       false
-    } else {
+    else
       LOG.debug("Not yet on Hadoop classpath: " + resourceDir)
       val localJarFile =
         if (resourceDir.isDirectory) MakeJar(resourceDir) else resourceDir
@@ -184,30 +176,24 @@ class LocalCluster(mutex: Boolean = true) {
       LOG.debug("Added to Hadoop classpath: " + localJarFile)
       classpath += resourceDir
       true
-    }
 
   private def getFileForClass[T](clazz: Class[T]): File =
     new File(clazz.getProtectionDomain.getCodeSource.getLocation.toURI)
 
   def mode: Mode = Hdfs(true, jobConf)
 
-  def putFile(file: File, location: String): Boolean = {
+  def putFile(file: File, location: String): Boolean =
     val hdfsLocation = new Path(location)
     val exists = fileSystem.exists(hdfsLocation)
     if (!exists) FileUtil.copy(file, fileSystem, hdfsLocation, false, jobConf)
     exists
-  }
 
   //TODO is there a way to know if we need to wait on anything to shut down, etc?
-  def shutdown() {
-    hadoop.foreach {
+  def shutdown()
+    hadoop.foreach
       case (dfs, mr, _) =>
         dfs.shutdown()
         mr.shutdown()
-    }
     hadoop = None
-    if (mutex) {
+    if (mutex)
       releaseMutex()
-    }
-  }
-}

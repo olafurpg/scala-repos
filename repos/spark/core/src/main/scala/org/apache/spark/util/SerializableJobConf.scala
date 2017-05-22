@@ -22,16 +22,13 @@ import java.io.{ObjectInputStream, ObjectOutputStream}
 import org.apache.hadoop.mapred.JobConf
 
 private[spark] class SerializableJobConf(@transient var value: JobConf)
-    extends Serializable {
+    extends Serializable
   private def writeObject(out: ObjectOutputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       out.defaultWriteObject()
       value.write(out)
-    }
 
   private def readObject(in: ObjectInputStream): Unit =
-    Utils.tryOrIOException {
+    Utils.tryOrIOException
       value = new JobConf(false)
       value.readFields(in)
-    }
-}

@@ -9,7 +9,7 @@ import org.apache.commons.codec.binary.Hex
 /**
   * Utilities for Codecs operations.
   */
-object Codecs {
+object Codecs
 
   /**
     * Computes the SHA-1 digest for a byte array.
@@ -50,4 +50,3 @@ object Codecs {
     */
   def hexStringToByte(hexString: String): Array[Byte] =
     Hex.decodeHex(hexString.toCharArray)
-}

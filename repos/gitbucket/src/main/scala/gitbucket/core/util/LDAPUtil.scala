@@ -12,7 +12,7 @@ import scala.annotation.tailrec
 /**
   * Utility for LDAP authentication.
   */
-object LDAPUtil {
+object LDAPUtil
 
   private val LDAP_VERSION: Int = LDAPConnection.LDAP_V3
   private val logger = LoggerFactory.getLogger(getClass().getName())
@@ -22,9 +22,8 @@ object LDAPUtil {
   /**
     * Returns true if mail address ends with "@ldap-devnull"
     */
-  def isDummyMailAddress(account: Account): Boolean = {
+  def isDummyMailAddress(account: Account): Boolean =
     account.mailAddress.endsWith(LDAP_DUMMY_MAL)
-  }
 
   /**
     * Creates dummy address (userName@ldap-devnull) for LDAP login.
@@ -33,9 +32,8 @@ object LDAPUtil {
     * GitBucket does not send any mails to this dummy address. And these users must input their mail address
     * at the first step after LDAP authentication.
     */
-  def createDummyMailAddress(userName: String): String = {
+  def createDummyMailAddress(userName: String): String =
     userName + LDAP_DUMMY_MAL
-  }
 
   /**
     * Try authentication by LDAP using given configuration.
@@ -43,7 +41,7 @@ object LDAPUtil {
     */
   def authenticate(ldapSettings: Ldap,
                    userName: String,
-                   password: String): Either[String, LDAPUserInfo] = {
+                   password: String): Either[String, LDAPUserInfo] =
     bind(
         host = ldapSettings.host,
         port = ldapSettings.port.getOrElse(
@@ -54,24 +52,21 @@ object LDAPUtil {
         ssl = ldapSettings.ssl.getOrElse(false),
         keystore = ldapSettings.keystore.getOrElse(""),
         error = "System LDAP authentication failed."
-    ) { conn =>
+    )  conn =>
       findUser(conn,
                userName,
                ldapSettings.baseDN,
                ldapSettings.userNameAttribute,
-               ldapSettings.additionalFilterCondition) match {
+               ldapSettings.additionalFilterCondition) match
         case Some(userDN) =>
           userAuthentication(ldapSettings, userDN, userName, password)
         case None => Left("User does not exist.")
-      }
-    }
-  }
 
   private def userAuthentication(
       ldapSettings: Ldap,
       userDN: String,
       userName: String,
-      password: String): Either[String, LDAPUserInfo] = {
+      password: String): Either[String, LDAPUserInfo] =
     bind(
         host = ldapSettings.host,
         port = ldapSettings.port.getOrElse(
@@ -82,50 +77,45 @@ object LDAPUtil {
         ssl = ldapSettings.ssl.getOrElse(false),
         keystore = ldapSettings.keystore.getOrElse(""),
         error = "User LDAP Authentication Failed."
-    ) { conn =>
-      if (ldapSettings.mailAttribute.getOrElse("").isEmpty) {
+    )  conn =>
+      if (ldapSettings.mailAttribute.getOrElse("").isEmpty)
         Right(
             LDAPUserInfo(userName = userName,
-                         fullName = ldapSettings.fullNameAttribute.flatMap {
+                         fullName = ldapSettings.fullNameAttribute.flatMap
                        fullNameAttribute =>
                          findFullName(conn,
                                       userDN,
                                       ldapSettings.userNameAttribute,
                                       userName,
                                       fullNameAttribute)
-                     }.getOrElse(userName),
+                     .getOrElse(userName),
                          mailAddress = createDummyMailAddress(userName)))
-      } else {
+      else
         findMailAddress(conn,
                         userDN,
                         ldapSettings.userNameAttribute,
                         userName,
-                        ldapSettings.mailAttribute.get) match {
+                        ldapSettings.mailAttribute.get) match
           case Some(mailAddress) =>
             Right(
                 LDAPUserInfo(
                     userName = getUserNameFromMailAddress(userName),
-                    fullName = ldapSettings.fullNameAttribute.flatMap {
+                    fullName = ldapSettings.fullNameAttribute.flatMap
                   fullNameAttribute =>
                     findFullName(conn,
                                  userDN,
                                  ldapSettings.userNameAttribute,
                                  userName,
                                  fullNameAttribute)
-                }.getOrElse(userName),
+                .getOrElse(userName),
                     mailAddress = mailAddress))
           case None => Left("Can't find mail address.")
-        }
-      }
-    }
-  }
 
-  private def getUserNameFromMailAddress(userName: String): String = {
-    (userName.indexOf('@') match {
+  private def getUserNameFromMailAddress(userName: String): String =
+    (userName.indexOf('@') match
       case i if i >= 0 => userName.substring(0, i)
       case i => userName
-    }).replaceAll("[^a-zA-Z0-9\\-_.]", "").replaceAll("^[_\\-]", "")
-  }
+    ).replaceAll("[^a-zA-Z0-9\\-_.]", "").replaceAll("^[_\\-]", "")
 
   private def bind[A](host: String,
                       port: Int,
@@ -135,52 +125,44 @@ object LDAPUtil {
                       ssl: Boolean,
                       keystore: String,
                       error: String)(
-      f: LDAPConnection => Either[String, A]): Either[String, A] = {
-    if (tls) {
+      f: LDAPConnection => Either[String, A]): Either[String, A] =
+    if (tls)
       // Dynamically set Sun as the security provider
       Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider())
 
-      if (keystore.compareTo("") != 0) {
+      if (keystore.compareTo("") != 0)
         // Dynamically set the property that JSSE uses to identify
         // the keystore that holds trusted root certificates
         System.setProperty("javax.net.ssl.trustStore", keystore)
-      }
-    }
 
     val conn: LDAPConnection =
-      if (ssl) {
+      if (ssl)
         new LDAPConnection(new LDAPJSSESecureSocketFactory())
-      } else {
+      else
         new LDAPConnection(new LDAPJSSEStartTLSFactory())
-      }
 
-    try {
+    try
       // Connect to the server
       conn.connect(host, port)
 
-      if (tls) {
+      if (tls)
         // Secure the connection
         conn.startTLS()
-      }
 
       // Bind to the server
       conn.bind(LDAP_VERSION, dn, password.getBytes)
 
       // Execute a given function and returns a its result
       f(conn)
-    } catch {
-      case e: Exception => {
+    catch
+      case e: Exception =>
           // Provide more information if something goes wrong
           logger.info("" + e)
 
-          if (conn.isConnected) {
+          if (conn.isConnected)
             conn.disconnect()
-          }
           // Returns an error message
           Left(error)
-        }
-    }
-  }
 
   /**
     * Search a specified user and returns userDN if exists.
@@ -190,38 +172,33 @@ object LDAPUtil {
       userName: String,
       baseDN: String,
       userNameAttribute: String,
-      additionalFilterCondition: Option[String]): Option[String] = {
+      additionalFilterCondition: Option[String]): Option[String] =
     @tailrec
     def getEntries(results: LDAPSearchResults,
-                   entries: List[Option[LDAPEntry]] = Nil): List[LDAPEntry] = {
-      if (results.hasMore) {
+                   entries: List[Option[LDAPEntry]] = Nil): List[LDAPEntry] =
+      if (results.hasMore)
         getEntries(
             results,
             entries :+
-            (try {
+            (try
                   Option(results.next)
-                } catch {
+                catch
                   case ex: LDAPReferralException =>
                     None // NOTE(tanacasino): Referral follow is off. so ignores it.(for AD)
-                }))
-      } else {
+                ))
+      else
         entries.flatten
-      }
-    }
 
-    val filterCond = additionalFilterCondition.getOrElse("") match {
+    val filterCond = additionalFilterCondition.getOrElse("") match
       case "" => userNameAttribute + "=" + userName
       case x => "(&(" + x + ")(" + userNameAttribute + "=" + userName + "))"
-    }
 
     getEntries(conn.search(baseDN,
                            LDAPConnection.SCOPE_SUB,
                            filterCond,
                            null,
-                           false)).collectFirst {
+                           false)).collectFirst
       case x => x.getDN
-    }
-  }
 
   private def findMailAddress(conn: LDAPConnection,
                               userDN: String,
@@ -233,11 +210,10 @@ object LDAPUtil {
                     LDAPConnection.SCOPE_BASE,
                     userNameAttribute + "=" + userName,
                     Array[String](mailAttribute),
-                    false)) { results =>
-      if (results.hasMore) {
+                    false))  results =>
+      if (results.hasMore)
         Option(results.next.getAttribute(mailAttribute)).map(_.getStringValue)
-      } else None
-    }
+      else None
 
   private def findFullName(conn: LDAPConnection,
                            userDN: String,
@@ -249,12 +225,10 @@ object LDAPUtil {
                     LDAPConnection.SCOPE_BASE,
                     userNameAttribute + "=" + userName,
                     Array[String](nameAttribute),
-                    false)) { results =>
-      if (results.hasMore) {
+                    false))  results =>
+      if (results.hasMore)
         Option(results.next.getAttribute(nameAttribute)).map(_.getStringValue)
-      } else None
-    }
+      else None
 
   case class LDAPUserInfo(
       userName: String, fullName: String, mailAddress: String)
-}

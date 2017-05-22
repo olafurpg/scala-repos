@@ -12,10 +12,10 @@ import org.apache.tools.ant.Project
 import org.apache.tools.ant.taskdefs.Java
 import scala.tools.nsc.io
 
-trait ScalacShared extends ScalaMatchingTask {
+trait ScalacShared extends ScalaMatchingTask
   val MainClass = "scala.tools.nsc.Main"
 
-  def execWithArgFiles(java: Java, paths: List[String]) = {
+  def execWithArgFiles(java: Java, paths: List[String]) =
     paths foreach (p => java.createArg() setValue ("@" + p))
 
     val debugString =
@@ -23,5 +23,3 @@ trait ScalacShared extends ScalaMatchingTask {
     log(java.getCommandLine.getCommandline.mkString("", " ", debugString),
         Project.MSG_VERBOSE)
     java.executeJava()
-  }
-}

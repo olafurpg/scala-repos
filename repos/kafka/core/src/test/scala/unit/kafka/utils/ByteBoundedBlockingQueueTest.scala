@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit
 import org.junit.Assert._
 import org.junit.Test
 
-class ByteBoundedBlockingQueueTest {
+class ByteBoundedBlockingQueueTest
   val sizeFunction = (a: String) => a.length
   val queue = new ByteBoundedBlockingQueue[String](5, 15, Some(sizeFunction))
 
   @Test
-  def testByteBoundedBlockingQueue() {
+  def testByteBoundedBlockingQueue()
     assertEquals(5, queue.remainingSize)
     assertEquals(15, queue.remainingByteSize)
 
@@ -92,5 +92,3 @@ class ByteBoundedBlockingQueueTest {
     assertEquals("c", queue.poll())
     assertEquals("d", queue.poll())
     assertEquals(null, queue.poll(10, TimeUnit.MILLISECONDS))
-  }
-}

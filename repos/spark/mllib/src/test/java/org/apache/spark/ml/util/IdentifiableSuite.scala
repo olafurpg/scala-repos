@@ -19,22 +19,18 @@ package org.apache.spark.ml.util
 
 import org.apache.spark.SparkFunSuite
 
-class IdentifiableSuite extends SparkFunSuite {
+class IdentifiableSuite extends SparkFunSuite
 
   import IdentifiableSuite.Test
 
-  test("Identifiable") {
+  test("Identifiable")
     val test0 = new Test("test_0")
     assert(test0.uid === "test_0")
 
     val test1 = new Test
     assert(test1.uid.startsWith("test_"))
-  }
-}
 
-object IdentifiableSuite {
+object IdentifiableSuite
 
-  class Test(override val uid: String) extends Identifiable {
+  class Test(override val uid: String) extends Identifiable
     def this() = this(Identifiable.randomUID("test"))
-  }
-}

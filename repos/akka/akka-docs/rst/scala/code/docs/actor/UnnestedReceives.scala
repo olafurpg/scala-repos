@@ -13,7 +13,7 @@ import scala.collection.mutable.ListBuffer
   * Then it has to wait for a GoAhead signal to begin processing the new events
   * It mustn't "miss" events that happen between catching up with the old events and getting the GoAhead signal
   */
-class UnnestedReceives extends Actor {
+class UnnestedReceives extends Actor
   import context.become
   //If you need to store sender/senderFuture you can change it to ListBuffer[(Any, Channel)]
   val queue = new ListBuffer[Any]()
@@ -25,31 +25,26 @@ class UnnestedReceives extends Actor {
   //This method retrieves all prior messages/events
   def allOldMessages() = List()
 
-  override def preStart {
+  override def preStart
     //We override preStart to be sure that the first message the actor gets is
     //'Replay, that message will start to be processed _after_ the actor is started
     self ! 'Replay
     //Then we subscribe to the stream of messages/events
     subscribe()
-  }
 
-  def receive = {
+  def receive =
     case 'Replay =>
       //Our first message should be a 'Replay message, all others are invalid
       allOldMessages() foreach process //Process all old messages/events
-      become {
+      become
         //Switch behavior to look for the GoAhead signal
         case 'GoAhead =>
           //When we get the GoAhead signal we process all our buffered messages/events
           queue foreach process
           queue.clear
-          become {
+          become
             //Then we change behaviour to process incoming messages/events as they arrive
             case msg => process(msg)
-          }
         case msg =>
           //While we haven't gotten the GoAhead signal, buffer all incoming messages
           queue += msg //Here you have full control, you can handle overflow etc
-      }
-  }
-}

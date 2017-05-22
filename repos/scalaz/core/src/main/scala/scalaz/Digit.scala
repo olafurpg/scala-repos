@@ -1,55 +1,44 @@
 package scalaz
 
 /**An algebraic data type representing the digits 0 - 9 */
-sealed abstract class Digit extends Product with Serializable {
+sealed abstract class Digit extends Product with Serializable
   val toInt: Int
 
   final def toLong: Long = toInt.toLong
 
   final def toChar: Char = (toLong + 48).toChar
-}
 
-object Digit extends DigitInstances {
+object Digit extends DigitInstances
 
-  case object _0 extends Digit {
+  case object _0 extends Digit
     override val toInt = 0
-  }
 
-  case object _1 extends Digit {
+  case object _1 extends Digit
     override val toInt = 1
-  }
 
-  case object _2 extends Digit {
+  case object _2 extends Digit
     override val toInt = 2
-  }
 
-  case object _3 extends Digit {
+  case object _3 extends Digit
     override val toInt = 3
-  }
 
-  case object _4 extends Digit {
+  case object _4 extends Digit
     override val toInt = 4
-  }
 
-  case object _5 extends Digit {
+  case object _5 extends Digit
     override val toInt = 5
-  }
 
-  case object _6 extends Digit {
+  case object _6 extends Digit
     override val toInt = 6
-  }
 
-  case object _7 extends Digit {
+  case object _7 extends Digit
     override val toInt = 7
-  }
 
-  case object _8 extends Digit {
+  case object _8 extends Digit
     override val toInt = 8
-  }
 
-  case object _9 extends Digit {
+  case object _9 extends Digit
     override val toInt = 9
-  }
 
   val digits: List[Digit] = List(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9)
 
@@ -65,7 +54,7 @@ object Digit extends DigitInstances {
     digits.find(_.toLong == i)
 
   def mod10Digit(i: Int): Digit =
-    i match {
+    i match
       case 0 => _0
       case 1 => _1
       case 2 => _2
@@ -77,7 +66,6 @@ object Digit extends DigitInstances {
       case 8 => _8
       case 9 => _9
       case _ => mod10Digit(scala.math.abs(i) % 10)
-    }
 
   def longDigits[F[_]](digits: F[Digit])(implicit F: Foldable[F]): Long =
     F.foldLeft(digits, 0L)((n, a) => n * 10L + (a: Digit))
@@ -93,29 +81,27 @@ object Digit extends DigitInstances {
       chars: F[Char])(implicit F: MonadPlus[F]): F[Digit] =
     F.bind(chars)(
         a =>
-          Digit.digitFromChar(a) match {
+          Digit.digitFromChar(a) match
         case None => F.empty[Digit]
         case Some(d) => F.point(d)
-    })
+    )
 
   def traverseDigits[F[_]](chars: F[Char])(
-      implicit F: Traverse[F]): Option[F[Digit]] = {
+      implicit F: Traverse[F]): Option[F[Digit]] =
     import std.option._
     F.sequence(digits(chars).run)
-  }
 
   def traverseDigitsOr[F[_]](chars: F[Char], d: => F[Digit])(
       implicit F: Traverse[F]): F[Digit] =
     traverseDigits(chars) getOrElse d
-}
 
-sealed abstract class DigitInstances {
+sealed abstract class DigitInstances
   implicit val digitInstances: Enum[Digit] with Show[Digit] with Monoid[Digit] =
-    new Enum[Digit] with Show[Digit] with Monoid[Digit] {
+    new Enum[Digit] with Show[Digit] with Monoid[Digit]
 
       import std.anyVal._
 
-      def succ(d: Digit) = d match {
+      def succ(d: Digit) = d match
         case Digit._0 => Digit._1
         case Digit._1 => Digit._2
         case Digit._2 => Digit._3
@@ -126,9 +112,8 @@ sealed abstract class DigitInstances {
         case Digit._7 => Digit._8
         case Digit._8 => Digit._9
         case Digit._9 => Digit._0
-      }
 
-      def pred(d: Digit) = d match {
+      def pred(d: Digit) = d match
         case Digit._0 => Digit._9
         case Digit._1 => Digit._0
         case Digit._2 => Digit._1
@@ -139,7 +124,6 @@ sealed abstract class DigitInstances {
         case Digit._7 => Digit._6
         case Digit._8 => Digit._7
         case Digit._9 => Digit._8
-      }
 
       override def succn(n: Int, a: Digit) =
         super.succn(n % 10, a)
@@ -158,5 +142,3 @@ sealed abstract class DigitInstances {
       def append(f1: Digit, f2: => Digit): Digit =
         Digit.mod10Digit(f1.toInt + f2.toInt)
       def zero: Digit = Digit._0
-    }
-}

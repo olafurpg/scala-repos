@@ -10,8 +10,8 @@ import org.scalatest.junit.JUnitRunner
 import scala.collection.mutable.ArrayBuffer
 
 @RunWith(classOf[JUnitRunner])
-class StatsReceiverTest extends FunSuite {
-  test("RollupStatsReceiver counter/stats") {
+class StatsReceiverTest extends FunSuite
+  test("RollupStatsReceiver counter/stats")
     val mem = new InMemoryStatsReceiver
     val receiver = new RollupStatsReceiver(mem)
 
@@ -25,13 +25,11 @@ class StatsReceiverTest extends FunSuite {
     assert(mem.counters(Seq("toto", "titi")) == 2)
     assert(mem.counters(Seq("toto", "titi", "tata")) == 1)
     assert(mem.counters(Seq("toto", "titi", "tutu")) == 1)
-  }
 
-  test("Broadcast Counter/Stat") {
-    class MemCounter extends Counter {
+  test("Broadcast Counter/Stat")
+    class MemCounter extends Counter
       var c = 0
       def incr(delta: Int) { c += delta }
-    }
     val c1 = new MemCounter
     val c2 = new MemCounter
     val broadcastCounter = BroadcastCounter(Seq(c1, c2))
@@ -42,10 +40,9 @@ class StatsReceiverTest extends FunSuite {
     assert(c1.c == 1)
     assert(c2.c == 1)
 
-    class MemStat extends Stat {
+    class MemStat extends Stat
       var values: Seq[Float] = ArrayBuffer.empty[Float]
       def add(f: Float) { values = values :+ f }
-    }
     val s1 = new MemStat
     val s2 = new MemStat
     val broadcastStat = BroadcastStat(Seq(s1, s2))
@@ -55,9 +52,8 @@ class StatsReceiverTest extends FunSuite {
     broadcastStat.add(1F)
     assert(s1.values == Seq(1F))
     assert(s2.values == Seq(1F))
-  }
 
-  test("StatsReceiver time") {
+  test("StatsReceiver time")
     val receiver = spy(new InMemoryStatsReceiver)
 
     Stat.time(receiver.stat("er", "mah", "gerd")) { () }
@@ -71,9 +67,8 @@ class StatsReceiverTest extends FunSuite {
 
     Stat.time(stat, TimeUnit.DAYS) { () }
     verify(receiver, times(3)).stat("er", "mah", "gerd")
-  }
 
-  test("StatsReceiver timeFuture") {
+  test("StatsReceiver timeFuture")
     val receiver = spy(new InMemoryStatsReceiver)
 
     Await.ready(Stat.timeFuture(receiver.stat("2", "chainz")) { Future.Unit },
@@ -81,9 +76,9 @@ class StatsReceiverTest extends FunSuite {
     verify(receiver, times(1)).stat("2", "chainz")
 
     Await.ready(
-        Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES) {
+        Stat.timeFuture(receiver.stat("2", "chainz"), TimeUnit.MINUTES)
       Future.Unit
-    }, 1.second)
+    , 1.second)
     verify(receiver, times(2)).stat("2", "chainz")
 
     val stat = receiver.stat("2", "chainz")
@@ -92,9 +87,8 @@ class StatsReceiverTest extends FunSuite {
     Await.result(
         Stat.timeFuture(stat, TimeUnit.HOURS) { Future.Unit }, 1.second)
     verify(receiver, times(3)).stat("2", "chainz")
-  }
 
-  test("StatsReceiver.scope: prefix stats by a scope string") {
+  test("StatsReceiver.scope: prefix stats by a scope string")
     val receiver = new InMemoryStatsReceiver
     val scoped = receiver.scope("foo")
     receiver.counter("bar").incr()
@@ -102,9 +96,8 @@ class StatsReceiverTest extends FunSuite {
 
     assert(receiver.counters(Seq("bar")) == 1)
     assert(receiver.counters(Seq("foo", "baz")) == 1)
-  }
 
-  test("StatsReceiver.scope: don't prefix with the empty string") {
+  test("StatsReceiver.scope: don't prefix with the empty string")
     val receiver = new InMemoryStatsReceiver
     val scoped = receiver.scope("")
     receiver.counter("bar").incr()
@@ -112,35 +105,30 @@ class StatsReceiverTest extends FunSuite {
 
     assert(receiver.counters(Seq("bar")) == 1)
     assert(receiver.counters(Seq("baz")) == 1)
-  }
 
-  test("StatsReceiver.scope: no namespace") {
+  test("StatsReceiver.scope: no namespace")
     val receiver = new InMemoryStatsReceiver
     val scoped = receiver.scope()
     receiver.counter("bar").incr()
 
     assert(receiver.counters(Seq("bar")) == 1)
-  }
 
-  test("StatsReceiver.scope: multiple prefixes") {
+  test("StatsReceiver.scope: multiple prefixes")
     val receiver = new InMemoryStatsReceiver
     val scoped = receiver.scope("foo", "bar", "shoe")
     scoped.counter("baz").incr()
 
     assert(receiver.counters(Seq("foo", "bar", "shoe", "baz")) == 1)
-  }
 
-  test("Scoped equality") {
+  test("Scoped equality")
     val sr = new InMemoryStatsReceiver
     assert(sr == sr)
     assert(sr.scope("foo") != sr.scope("bar"))
-  }
 
-  test("Scoped forwarding to NullStatsReceiver") {
+  test("Scoped forwarding to NullStatsReceiver")
     assert(NullStatsReceiver.scope("foo").scope("bar").isNull)
-  }
 
-  test("toString") {
+  test("toString")
     assert("NullStatsReceiver" == NullStatsReceiver.toString)
     assert(
         "NullStatsReceiver" == NullStatsReceiver
@@ -150,9 +138,9 @@ class StatsReceiverTest extends FunSuite {
 
     assert(
         "BlacklistStatsReceiver(NullStatsReceiver)" == new BlacklistStatsReceiver(
-            NullStatsReceiver, { _ =>
+            NullStatsReceiver,  _ =>
       false
-    }).toString)
+    ).toString)
 
     val inMem = new InMemoryStatsReceiver()
     assert("InMemoryStatsReceiver" == inMem.toString)
@@ -184,5 +172,3 @@ class StatsReceiverTest extends FunSuite {
     assert(
         "Broadcast(InMemoryStatsReceiver, InMemoryStatsReceiver, InMemoryStatsReceiver)" == BroadcastStatsReceiver(
             Seq(inMem, inMem, inMem)).toString)
-  }
-}

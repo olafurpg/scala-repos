@@ -3,7 +3,7 @@ package com.twitter.scalding
 /**
   * This class is used to assist with testing a TypedPipe
   */
-object TypedPipeChecker {
+object TypedPipeChecker
 
   /*
    * Takes a List and a transform function.
@@ -31,7 +31,5 @@ object TypedPipeChecker {
       .toList
 
   implicit class InMemoryToListEnrichment[T](val pipe: TypedPipe[T])
-      extends AnyVal {
+      extends AnyVal
     def inMemoryToList: List[T] = TypedPipeChecker.inMemoryToList(pipe)
-  }
-}

@@ -31,7 +31,7 @@ import javafx.scene.{layout => jfxsl}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object BackgroundSize {
+object BackgroundSize
   implicit def sfxBackgroundSize2jfx(v: BackgroundSize): jfxsl.BackgroundSize =
     if (v != null) v.delegate else null
 
@@ -46,13 +46,12 @@ object BackgroundSize {
     * The default BackgroundSize used by BackgroundImages when an explicit size is not defined.
     */
   val Default = new BackgroundSize(jfxsl.BackgroundSize.DEFAULT)
-}
 
 /**
   * @author Jarek Sacha 
   */
 class BackgroundSize(override val delegate: jfxsl.BackgroundSize)
-    extends SFXDelegate[jfxsl.BackgroundSize] {
+    extends SFXDelegate[jfxsl.BackgroundSize]
 
   /** Create a new BackgroundSize. */
   def this(width: Double,
@@ -74,4 +73,3 @@ class BackgroundSize(override val delegate: jfxsl.BackgroundSize)
 
   /** The width of the area within the Region where the associated BackgroundImage should render. */
   def height: Double = delegate.getWidth
-}

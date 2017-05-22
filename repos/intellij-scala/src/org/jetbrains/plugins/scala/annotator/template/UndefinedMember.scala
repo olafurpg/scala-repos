@@ -9,28 +9,24 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.{ScObject, ScTe
 /**
   * Pavel Fatin
   */
-object UndefinedMember extends AnnotatorPart[ScTemplateDefinition] {
+object UndefinedMember extends AnnotatorPart[ScTemplateDefinition]
   val Message = "Only classes can have declared but undefined members"
 
   def kind = classOf[ScTemplateDefinition]
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
+               typeAware: Boolean)
     val isNew = definition.isInstanceOf[ScNewTemplateDefinition]
     val isObject = definition.isInstanceOf[ScObject]
 
     if (!isNew && !isObject) return
 
-    definition.members.foreach {
+    definition.members.foreach
       case declaration: ScDeclaration =>
-        val isNative = declaration match {
+        val isNative = declaration match
           case a: ScAnnotationsHolder =>
             a.hasAnnotation("scala.native").isDefined
           case _ => false
-        }
         if (!isNative) holder.createErrorAnnotation(declaration, Message)
       case _ =>
-    }
-  }
-}

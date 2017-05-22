@@ -28,18 +28,17 @@ import util._
   * directly.  Use LiftRules to call them.  So, why make them
   * public?  So, we can document the default behaviors.
   */
-object DefaultRoutines {
+object DefaultRoutines
   private val resourceMap: LRUMap[(String, List[String]), Box[ResourceBundle]] =
     new LRUMap(2000)
 
   private def rawResBundle(
-      loc: Locale, path: List[String]): Box[ResourceBundle] = {
-    val realPath = path match {
+      loc: Locale, path: List[String]): Box[ResourceBundle] =
+    val realPath = path match
       case Nil => List("_resources")
       case x => x
-    }
 
-    for {
+    for
       xml <- Templates(realPath, loc) or Templates(
           "templates-hidden" :: realPath, loc) or Templates(
           realPath.dropRight(1) :::
@@ -47,22 +46,18 @@ object DefaultRoutines {
           loc)
 
       bundle <- BundleBuilder.convert(xml, loc)
-    } yield bundle
-  }
+    yield bundle
 
   private def resBundleFor(
       loc: Locale, path: List[String]): Box[ResourceBundle] =
-    resourceMap.synchronized {
+    resourceMap.synchronized
       val key = loc.toString -> path
-      resourceMap.get(key) match {
+      resourceMap.get(key) match
         case Full(x) => x
-        case _ => {
+        case _ =>
             val res = rawResBundle(loc, path)
             if (!Props.devMode) resourceMap(key) = res
             res
-          }
-      }
-    }
 
   /**
     * Returns the resources for the current request.  In development
@@ -94,16 +89,14 @@ object DefaultRoutines {
     * @see BundleBuilder.convert
     * 
     */
-  def resourceForCurrentReq(): List[ResourceBundle] = {
+  def resourceForCurrentReq(): List[ResourceBundle] =
     val loc = S.locale
-    val cb = for {
+    val cb = for
       req <- S.originalRequest
       path = req.path.partPath.dropRight(1) ::: req.path.partPath
         .takeRight(1)
         .map(s => "_resources_" + s)
       bundle <- resBundleFor(loc, path)
-    } yield bundle
+    yield bundle
 
     cb.toList ::: resBundleFor(loc, Nil).toList
-  }
-}

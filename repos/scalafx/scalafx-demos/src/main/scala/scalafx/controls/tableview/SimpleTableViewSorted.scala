@@ -32,7 +32,7 @@ import scalafx.collections.ObservableBuffer
 import scalafx.scene.Scene
 import scalafx.scene.control.{TableColumn, TableView}
 
-object SimpleTableViewSorted extends JFXApp {
+object SimpleTableViewSorted extends JFXApp
 
   val characters = ObservableBuffer[Person](
       new Person("Peggy", "Sue", "555-6798"),
@@ -41,29 +41,22 @@ object SimpleTableViewSorted extends JFXApp {
       new Person("Molly", "Raccoon", "555-0789")
   )
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Simple Table View Sorted"
-    scene = new Scene {
-      val firstNameColumn = new TableColumn[Person, String] {
+    scene = new Scene
+      val firstNameColumn = new TableColumn[Person, String]
         text = "First Name"
         cellValueFactory = { _.value.firstName }
         prefWidth = 180
-      }
-      val lastNameColumn = new TableColumn[Person, String] {
+      val lastNameColumn = new TableColumn[Person, String]
         text = "Last Name"
         cellValueFactory = { _.value.lastName }
         prefWidth = 180
-      }
-      val phoneColumn = new TableColumn[Person, String] {
+      val phoneColumn = new TableColumn[Person, String]
         text = "Phone"
         cellValueFactory = { _.value.phone }
         prefWidth = 180
-      }
 
-      content = new TableView[Person](characters) {
+      content = new TableView[Person](characters)
         columns += (firstNameColumn, lastNameColumn, phoneColumn)
         sortOrder += (phoneColumn, lastNameColumn, firstNameColumn)
-      }
-    }
-  }
-}

@@ -25,16 +25,15 @@ import org.apache.spark.sql.catalyst.plans.PlanTest
 import org.apache.spark.sql.catalyst.plans.logical.{LocalRelation, LogicalPlan}
 import org.apache.spark.sql.catalyst.rules.RuleExecutor
 
-class CollapseProjectSuite extends PlanTest {
-  object Optimize extends RuleExecutor[LogicalPlan] {
+class CollapseProjectSuite extends PlanTest
+  object Optimize extends RuleExecutor[LogicalPlan]
     val batches =
       Batch("Subqueries", FixedPoint(10), EliminateSubqueryAliases) :: Batch(
           "CollapseProject", Once, CollapseProject) :: Nil
-  }
 
   val testRelation = LocalRelation('a.int, 'b.int)
 
-  test("collapse two deterministic, independent projects into one") {
+  test("collapse two deterministic, independent projects into one")
     val query = testRelation
       .select(('a + 1).as('a_plus_1), 'b)
       .select('a_plus_1, ('b + 1).as('b_plus_1))
@@ -45,9 +44,8 @@ class CollapseProjectSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("collapse two deterministic, dependent projects into one") {
+  test("collapse two deterministic, dependent projects into one")
     val query = testRelation
       .select(('a + 1).as('a_plus_1), 'b)
       .select(('a_plus_1 + 1).as('a_plus_2), 'b)
@@ -59,9 +57,8 @@ class CollapseProjectSuite extends PlanTest {
       .analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("do not collapse nondeterministic projects") {
+  test("do not collapse nondeterministic projects")
     val query = testRelation
       .select(Rand(10).as('rand))
       .select(('rand + 1).as('rand1), ('rand + 2).as('rand2))
@@ -70,9 +67,8 @@ class CollapseProjectSuite extends PlanTest {
     val correctAnswer = query.analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
-  test("collapse two nondeterministic, independent projects into one") {
+  test("collapse two nondeterministic, independent projects into one")
     val query =
       testRelation.select(Rand(10).as('rand)).select(Rand(20).as('rand2))
 
@@ -81,10 +77,9 @@ class CollapseProjectSuite extends PlanTest {
     val correctAnswer = testRelation.select(Rand(20).as('rand2)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
 
   test(
-      "collapse one nondeterministic, one deterministic, independent projects into one") {
+      "collapse one nondeterministic, one deterministic, independent projects into one")
     val query = testRelation
       .select(Rand(10).as('rand), 'a)
       .select(('a + 1).as('a_plus_1))
@@ -94,5 +89,3 @@ class CollapseProjectSuite extends PlanTest {
     val correctAnswer = testRelation.select(('a + 1).as('a_plus_1)).analyze
 
     comparePlans(optimized, correctAnswer)
-  }
-}

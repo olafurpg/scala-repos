@@ -22,7 +22,7 @@ import breeze.linalg
   * @author dlwh
   */
 trait Ring[@specialized(Int, Short, Long, Float, Double) V]
-    extends Semiring[V] {
+    extends Semiring[V]
 
   def -(a: V, b: V): V
   def negate(s: V): V = this.-(zero, s)
@@ -30,9 +30,8 @@ trait Ring[@specialized(Int, Short, Long, Float, Double) V]
 
   implicit val normImpl: linalg.norm.Impl[V, Double]
   def sNorm(a: V): Double = linalg.norm(a)
-}
 
-object Ring {
+object Ring
   import Field._
   implicit val ringD: Ring[Double] = fieldDouble
   implicit val ringFloat: Ring[Float] = fieldFloat
@@ -43,4 +42,3 @@ object Ring {
   implicit val ringComplex: Ring[Complex] = Complex.scalar
 
   implicit def ringFromField[T](implicit field: Field[T]): Ring[T] = field
-}

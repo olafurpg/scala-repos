@@ -12,7 +12,7 @@ import scala.concurrent.Future
 /**
   * Helpers to create secure actions.
   */
-object Security {
+object Security
 
   /**
     * Wraps another action, allowing only authenticated HTTP requests.
@@ -42,16 +42,13 @@ object Security {
     */
   def Authenticated[A](userinfo: RequestHeader => Option[A],
                        onUnauthorized: RequestHeader => Result)(
-      action: A => EssentialAction): EssentialAction = {
+      action: A => EssentialAction): EssentialAction =
 
-    EssentialAction { request =>
-      userinfo(request).map { user =>
+    EssentialAction  request =>
+      userinfo(request).map  user =>
         action(user)(request)
-      }.getOrElse {
+      .getOrElse
         Accumulator.done(onUnauthorized(request))
-      }
-    }
-  }
 
   /**
     * Key of the username attribute stored in session.
@@ -135,7 +132,7 @@ object Security {
       userinfo: RequestHeader => Option[U],
       onUnauthorized: RequestHeader => Result = _ =>
           Unauthorized(views.html.defaultpages.unauthorized()))
-      extends ActionBuilder[({ type R[A] = AuthenticatedRequest[A, U] })#R] {
+      extends ActionBuilder[({ type R[A] = AuthenticatedRequest[A, U] })#R]
 
     def invokeBlock[A](request: Request[A],
                        block: (AuthenticatedRequest[A, U]) => Future[Result]) =
@@ -146,14 +143,11 @@ object Security {
       */
     def authenticate[A](
         request: Request[A],
-        block: (AuthenticatedRequest[A, U]) => Future[Result]) = {
-      userinfo(request).map { user =>
+        block: (AuthenticatedRequest[A, U]) => Future[Result]) =
+      userinfo(request).map  user =>
         block(new AuthenticatedRequest(user, request))
-      } getOrElse {
+      getOrElse
         Future.successful(onUnauthorized(request))
-      }
-    }
-  }
 
   /**
     * An authenticated action builder.
@@ -188,7 +182,7 @@ object Security {
     * }
     * }}}
     */
-  object AuthenticatedBuilder {
+  object AuthenticatedBuilder
 
     /**
       * Create an authenticated builder
@@ -207,5 +201,3 @@ object Security {
       */
     def apply(): AuthenticatedBuilder[String] =
       apply[String](req => req.session.get(username))
-  }
-}

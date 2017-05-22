@@ -9,7 +9,7 @@ package macros
   *  provides facilities to communicate with the compiler's front end
   *  (emit warnings, errors and other sorts of messages).
   */
-trait FrontEnds { self: blackbox.Context =>
+trait FrontEnds  self: blackbox.Context =>
 
   /** For sending a message which should not be labelled as a warning/error,
     *  but also shouldn't require -verbose to be visible.
@@ -44,4 +44,3 @@ trait FrontEnds { self: blackbox.Context =>
     *  Use `enclosingPosition` if you're in doubt what position to pass to `pos`.
     */
   def abort(pos: Position, msg: String): Nothing
-}

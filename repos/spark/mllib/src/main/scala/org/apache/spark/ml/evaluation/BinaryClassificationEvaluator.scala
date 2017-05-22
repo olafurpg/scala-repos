@@ -37,7 +37,7 @@ import org.apache.spark.sql.types.DoubleType
 class BinaryClassificationEvaluator @Since("1.4.0")(
     @Since("1.4.0") override val uid: String)
     extends Evaluator with HasRawPredictionCol with HasLabelCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   @Since("1.2.0")
   def this() = this(Identifiable.randomUID("binEval"))
@@ -47,14 +47,13 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
     * @group param
     */
   @Since("1.2.0")
-  val metricName: Param[String] = {
+  val metricName: Param[String] =
     val allowedParams =
       ParamValidators.inArray(Array("areaUnderROC", "areaUnderPR"))
     new Param(this,
               "metricName",
               "metric name in evaluation (areaUnderROC|areaUnderPR)",
               allowedParams)
-  }
 
   /** @group getParam */
   @Since("1.2.0")
@@ -84,7 +83,7 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
   setDefault(metricName -> "areaUnderROC")
 
   @Since("1.2.0")
-  override def evaluate(dataset: DataFrame): Double = {
+  override def evaluate(dataset: DataFrame): Double =
     val schema = dataset.schema
     SchemaUtils.checkColumnTypes(
         schema, $(rawPredictionCol), Seq(DoubleType, new VectorUDT))
@@ -92,37 +91,31 @@ class BinaryClassificationEvaluator @Since("1.4.0")(
 
     // TODO: When dataset metadata has been implemented, check rawPredictionCol vector length = 2.
     val scoreAndLabels =
-      dataset.select($(rawPredictionCol), $(labelCol)).rdd.map {
+      dataset.select($(rawPredictionCol), $(labelCol)).rdd.map
         case Row(rawPrediction: Vector, label: Double) =>
           (rawPrediction(1), label)
         case Row(rawPrediction: Double, label: Double) =>
           (rawPrediction, label)
-      }
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
-    val metric = $(metricName) match {
+    val metric = $(metricName) match
       case "areaUnderROC" => metrics.areaUnderROC()
       case "areaUnderPR" => metrics.areaUnderPR()
-    }
     metrics.unpersist()
     metric
-  }
 
   @Since("1.5.0")
-  override def isLargerBetter: Boolean = $(metricName) match {
+  override def isLargerBetter: Boolean = $(metricName) match
     case "areaUnderROC" => true
     case "areaUnderPR" => true
-  }
 
   @Since("1.4.1")
   override def copy(extra: ParamMap): BinaryClassificationEvaluator =
     defaultCopy(extra)
-}
 
 @Since("1.6.0")
 object BinaryClassificationEvaluator
-    extends DefaultParamsReadable[BinaryClassificationEvaluator] {
+    extends DefaultParamsReadable[BinaryClassificationEvaluator]
 
   @Since("1.6.0")
   override def load(path: String): BinaryClassificationEvaluator =
     super.load(path)
-}

@@ -35,15 +35,14 @@ case class AppUpdate(id: Option[PathId] = None,
                      acceptedResourceRoles: Option[Set[String]] = None,
                      version: Option[Timestamp] = None,
                      ipAddress: Option[IpAddress] = None,
-                     residency: Option[Residency] = None) {
+                     residency: Option[Residency] = None)
 
   require(version.isEmpty || onlyVersionOrIdSet,
           "The 'version' field may only be combined with the 'id' field.")
 
-  protected[api] def onlyVersionOrIdSet: Boolean = productIterator forall {
+  protected[api] def onlyVersionOrIdSet: Boolean = productIterator forall
     case x @ Some(_) => x == version || x == id
     case _ => true
-  }
 
   /**
     * Returns the supplied [[mesosphere.marathon.state.AppDefinition]]
@@ -93,10 +92,9 @@ case class AppUpdate(id: Option[PathId] = None,
       id = id.map(_.canonicalPath(base)),
       dependencies = dependencies.map(_.map(_.canonicalPath(base)))
   )
-}
 
-object AppUpdate {
-  implicit val appUpdateValidator = validator[AppUpdate] { appUp =>
+object AppUpdate
+  implicit val appUpdateValidator = validator[AppUpdate]  appUp =>
     appUp.id is valid
     appUp.dependencies is valid
     appUp.upgradeStrategy is valid
@@ -109,5 +107,3 @@ object AppUpdate {
     appUp.cpus should optional(be >= 0.0)
     appUp.instances should optional(be >= 0)
     appUp.disk should optional(be >= 0.0)
-  }
-}

@@ -19,7 +19,7 @@ import scala.concurrent.Future
 class AppRepository(val store: EntityStore[AppDefinition],
                     val maxVersions: Option[Int] = None,
                     val metrics: Metrics)
-    extends EntityRepository[AppDefinition] {
+    extends EntityRepository[AppDefinition]
   import scala.concurrent.ExecutionContext.Implicits.global
 
   def allPathIds(): Future[Iterable[PathId]] =
@@ -54,7 +54,6 @@ class AppRepository(val store: EntityStore[AppDefinition],
     */
   def currentAppVersions(): Future[Map[PathId, Timestamp]] =
     for (as <- apps()) yield
-      as.map { a =>
+      as.map  a =>
         a.id -> a.version
-      }.toMap
-}
+      .toMap

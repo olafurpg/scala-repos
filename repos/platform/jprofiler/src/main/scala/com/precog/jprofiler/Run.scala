@@ -21,18 +21,16 @@ package com.precog.jprofiler
 
 import com.precog.ragnarok._
 
-class Suite(name: String)(qs: List[String]) extends PerfTestSuite {
+class Suite(name: String)(qs: List[String]) extends PerfTestSuite
   override def suiteName = name
   qs.foreach(q => query(q))
-}
 
-object Run {
-  def main(args: Array[String]): Unit = {
+object Run
+  def main(args: Array[String]): Unit =
     val cwd = new java.io.File(".").getCanonicalFile
-    val db = cwd.getName match {
+    val db = cwd.getName match
       case "jprofiler" => "jprofiler.db"
       case _ => "jprofiler/jprofiler.db"
-    }
 
     val args2 = args.toList ++ List("--root-dir", db)
     val config =
@@ -80,7 +78,7 @@ object Run {
 //      """
     )
 
-    config.rootDir match {
+    config.rootDir match
       case Some(d) if d.exists =>
         println("starting benchmark")
         new Suite("jprofiling")(queries).run(config)
@@ -93,6 +91,3 @@ object Run {
       case None =>
         println("ERROR: --root-dir is missing somehow")
         println("default should have been %s" format db)
-    }
-  }
-}

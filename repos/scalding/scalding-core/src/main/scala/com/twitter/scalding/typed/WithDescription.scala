@@ -18,22 +18,19 @@ package com.twitter.scalding.typed
 /**
   * Used for objects that may have a description set to be used in .dot and MR step names.
   */
-trait HasDescription {
+trait HasDescription
   def descriptions: Seq[String]
-}
 
 /**
   * Used for objects that may _set_ a description to be used in .dot and MR step names.
   */
-trait WithDescription[+This <: WithDescription[This]] extends HasDescription {
+trait WithDescription[+This <: WithDescription[This]] extends HasDescription
   self: This =>
 
   /** never mutates this, instead returns a new item. */
   def withDescription(description: String): This
 
   def withDescription(descriptionOpt: Option[String]): This =
-    descriptionOpt match {
+    descriptionOpt match
       case Some(description) => withDescription(description)
       case None => self
-    }
-}

@@ -32,13 +32,12 @@ import javafx.scene.{media => jfxsm}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object AudioTrack {
+object AudioTrack
   implicit def sfxAudioTrack2jfx(at: AudioTrack): jfxsm.AudioTrack =
     if (at != null) at.delegate else null
-}
 
 class AudioTrack(override val delegate: jfxsm.AudioTrack)
-    extends Track(delegate) with SFXDelegate[jfxsm.AudioTrack] {
+    extends Track(delegate) with SFXDelegate[jfxsm.AudioTrack]
 
   /**
     * Retrieves the language of the audio track.
@@ -49,4 +48,3 @@ class AudioTrack(override val delegate: jfxsm.AudioTrack)
       "ScalaFX 8.0.0-R5")
   def language =
     locale // <-- Calling 'getLocale' instead of the deprecated 'getLanguage' removes a compilation warning while building ScalaFX.
-}

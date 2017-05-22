@@ -37,7 +37,7 @@ import org.apache.spark.sql.types.DataType
 @Experimental
 class PolynomialExpansion(override val uid: String)
     extends UnaryTransformer[Vector, Vector, PolynomialExpansion]
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("poly"))
 
@@ -59,14 +59,12 @@ class PolynomialExpansion(override val uid: String)
   /** @group setParam */
   def setDegree(value: Int): this.type = set(degree, value)
 
-  override protected def createTransformFunc: Vector => Vector = { v =>
+  override protected def createTransformFunc: Vector => Vector =  v =>
     PolynomialExpansion.expand(v, $(degree))
-  }
 
   override protected def outputDataType: DataType = new VectorUDT()
 
   override def copy(extra: ParamMap): PolynomialExpansion = defaultCopy(extra)
-}
 
 /**
   * The expansion is done via recursion. Given n features and degree d, the size after expansion is
@@ -81,11 +79,10 @@ class PolynomialExpansion(override val uid: String)
   * current index and increment it properly for sparse input.
   */
 @Since("1.6.0")
-object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
+object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion]
 
-  private def choose(n: Int, k: Int): Int = {
+  private def choose(n: Int, k: Int): Int =
     Range(n, n - k, -1).product / Range(k, 1, -1).product
-  }
 
   private def getPolySize(numFeatures: Int, degree: Int): Int =
     choose(numFeatures + degree, degree)
@@ -95,29 +92,25 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
                           degree: Int,
                           multiplier: Double,
                           polyValues: Array[Double],
-                          curPolyIdx: Int): Int = {
-    if (multiplier == 0.0) {
+                          curPolyIdx: Int): Int =
+    if (multiplier == 0.0)
       // do nothing
-    } else if (degree == 0 || lastIdx < 0) {
-      if (curPolyIdx >= 0) {
+    else if (degree == 0 || lastIdx < 0)
+      if (curPolyIdx >= 0)
         // skip the very first 1
         polyValues(curPolyIdx) = multiplier
-      }
-    } else {
+    else
       val v = values(lastIdx)
       val lastIdx1 = lastIdx - 1
       var alpha = multiplier
       var i = 0
       var curStart = curPolyIdx
-      while (i <= degree && alpha != 0.0) {
+      while (i <= degree && alpha != 0.0)
         curStart = expandDense(
             values, lastIdx1, degree - i, alpha, polyValues, curStart)
         i += 1
         alpha *= v
-      }
-    }
     curPolyIdx + getPolySize(lastIdx + 1, degree)
-  }
 
   private def expandSparse(indices: Array[Int],
                            values: Array[Double],
@@ -127,16 +120,15 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
                            multiplier: Double,
                            polyIndices: mutable.ArrayBuilder[Int],
                            polyValues: mutable.ArrayBuilder[Double],
-                           curPolyIdx: Int): Int = {
-    if (multiplier == 0.0) {
+                           curPolyIdx: Int): Int =
+    if (multiplier == 0.0)
       // do nothing
-    } else if (degree == 0 || lastIdx < 0) {
-      if (curPolyIdx >= 0) {
+    else if (degree == 0 || lastIdx < 0)
+      if (curPolyIdx >= 0)
         // skip the very first 1
         polyIndices += curPolyIdx
         polyValues += multiplier
-      }
-    } else {
+    else
       // Skip all zeros at the tail.
       val v = values(lastIdx)
       val lastIdx1 = lastIdx - 1
@@ -144,7 +136,7 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
       var alpha = multiplier
       var curStart = curPolyIdx
       var i = 0
-      while (i <= degree && alpha != 0.0) {
+      while (i <= degree && alpha != 0.0)
         curStart = expandSparse(indices,
                                 values,
                                 lastIdx1,
@@ -156,20 +148,16 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
                                 curStart)
         i += 1
         alpha *= v
-      }
-    }
     curPolyIdx + getPolySize(lastFeatureIdx + 1, degree)
-  }
 
-  private def expand(dv: DenseVector, degree: Int): DenseVector = {
+  private def expand(dv: DenseVector, degree: Int): DenseVector =
     val n = dv.size
     val polySize = getPolySize(n, degree)
     val polyValues = new Array[Double](polySize - 1)
     expandDense(dv.values, n - 1, degree, 1.0, polyValues, -1)
     new DenseVector(polyValues)
-  }
 
-  private def expand(sv: SparseVector, degree: Int): SparseVector = {
+  private def expand(sv: SparseVector, degree: Int): SparseVector =
     val polySize = getPolySize(sv.size, degree)
     val nnz = sv.values.length
     val nnzPolySize = getPolySize(nnz, degree)
@@ -187,16 +175,12 @@ object PolynomialExpansion extends DefaultParamsReadable[PolynomialExpansion] {
                  polyValues,
                  -1)
     new SparseVector(polySize - 1, polyIndices.result(), polyValues.result())
-  }
 
-  private[feature] def expand(v: Vector, degree: Int): Vector = {
-    v match {
+  private[feature] def expand(v: Vector, degree: Int): Vector =
+    v match
       case dv: DenseVector => expand(dv, degree)
       case sv: SparseVector => expand(sv, degree)
       case _ => throw new IllegalArgumentException
-    }
-  }
 
   @Since("1.6.0")
   override def load(path: String): PolynomialExpansion = super.load(path)
-}

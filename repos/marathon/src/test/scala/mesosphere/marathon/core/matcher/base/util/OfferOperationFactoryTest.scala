@@ -8,9 +8,9 @@ import org.apache.mesos.{Protos => Mesos}
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class OfferOperationFactoryTest
-    extends MarathonSpec with GivenWhenThen with Mockito with Matchers {
+    extends MarathonSpec with GivenWhenThen with Mockito with Matchers
 
-  test("Launch operation succeeds even if principal/role are not set") {
+  test("Launch operation succeeds even if principal/role are not set")
     val f = new Fixture
 
     Given("a factory without principal or role")
@@ -23,43 +23,38 @@ class OfferOperationFactoryTest
     Then("the Offer Operation is created")
     operation.hasLaunch shouldEqual true
     operation.getLaunch.getTaskInfos(0) shouldEqual taskInfo
-  }
 
-  test("Reserve operation fails when principal is not set") {
+  test("Reserve operation fails when principal is not set")
     val f = new Fixture
 
     Given("a factory without principal")
     val factory = new OfferOperationFactory(None, Some("role"))
 
     When("We create a reserve operation")
-    val error = intercept[WrongConfigurationException] {
+    val error = intercept[WrongConfigurationException]
       factory.reserve(f.frameworkId,
                       Task.Id.forApp(PathId("/test")),
                       Seq(Mesos.Resource.getDefaultInstance))
-    }
 
     Then("A meaningful exception is thrown")
     error.getMessage should startWith("No principal set")
-  }
 
-  test("Reserve operation fails when role is not set") {
+  test("Reserve operation fails when role is not set")
     val f = new Fixture
 
     Given("a factory without role")
     val factory = new OfferOperationFactory(Some("principal"), None)
 
     When("We create a reserve operation")
-    val error = intercept[WrongConfigurationException] {
+    val error = intercept[WrongConfigurationException]
       factory.reserve(f.frameworkId,
                       Task.Id.forApp(PathId("/test")),
                       Seq(Mesos.Resource.getDefaultInstance))
-    }
 
     Then("A meaningful exception is thrown")
     error.getMessage should startWith("No role set")
-  }
 
-  test("Reserve operation succeeds") {
+  test("Reserve operation succeeds")
     val f = new Fixture
 
     import scala.collection.JavaConverters._
@@ -85,9 +80,8 @@ class OfferOperationFactoryTest
     resource.getRole shouldEqual "role"
     resource.hasReservation shouldEqual true
     resource.getReservation.getPrincipal shouldEqual "principal"
-  }
 
-  test("CreateVolumes operation succeeds") {
+  test("CreateVolumes operation succeeds")
     val f = new Fixture
 
     Given("a factory without principal")
@@ -118,20 +112,16 @@ class OfferOperationFactoryTest
     volume.getDisk.hasVolume shouldEqual true
     volume.getDisk.getVolume.getContainerPath shouldEqual originalVolume.persistentVolume.containerPath
     volume.getDisk.getVolume.getMode shouldEqual originalVolume.persistentVolume.mode
-  }
 
-  class Fixture {
+  class Fixture
     val frameworkId = MarathonTestHelper.frameworkId
     val principal = Some("principal")
     val role = Some("role")
     val factory = new OfferOperationFactory(principal, role)
 
-    def localVolume(containerPath: String): Task.LocalVolume = {
+    def localVolume(containerPath: String): Task.LocalVolume =
       val appId = PathId("/my-app")
       val pv = PersistentVolume(containerPath = containerPath,
                                 persistent = PersistentVolumeInfo(size = 10),
                                 mode = Mesos.Volume.Mode.RW)
       Task.LocalVolume(Task.LocalVolumeId(appId, pv), pv)
-    }
-  }
-}

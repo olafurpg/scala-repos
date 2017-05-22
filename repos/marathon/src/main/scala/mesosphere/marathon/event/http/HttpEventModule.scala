@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-trait HttpEventConfiguration extends ScallopConf {
+trait HttpEventConfiguration extends ScallopConf
 
   lazy val httpEventEndpoints = opt[String](
       "http_endpoints",
@@ -39,19 +39,17 @@ trait HttpEventConfiguration extends ScallopConf {
 
   def slowConsumerTimeout: FiniteDuration =
     httpEventCallbackSlowConsumerTimeout().millis
-}
 
 class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
-    extends AbstractModule {
+    extends AbstractModule
 
   val log = LoggerFactory.getLogger(getClass.getName)
 
-  def configure() {
+  def configure()
     bind(classOf[HttpEventActor.HttpEventActorMetrics]).in(Scopes.SINGLETON)
     bind(classOf[HttpCallbackEventSubscriber]).asEagerSingleton()
     bind(classOf[HttpCallbackSubscriptionService]).in(Scopes.SINGLETON)
     bind(classOf[HttpEventConfiguration]).toInstance(httpEventConfiguration)
-  }
 
   @Provides
   @Named(HttpEventModule.StatusUpdateActor)
@@ -59,10 +57,9 @@ class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
       system: ActorSystem,
       @Named(HttpEventModule.SubscribersKeeperActor) subscribersKeeper: ActorRef,
       metrics: HttpEventActor.HttpEventActorMetrics,
-      clock: Clock): ActorRef = {
+      clock: Clock): ActorRef =
     system.actorOf(Props(new HttpEventActor(
                 httpEventConfiguration, subscribersKeeper, metrics, clock)))
-  }
 
   @Provides
   @Named(HttpEventModule.SubscribersKeeperActor)
@@ -70,33 +67,28 @@ class HttpEventModule(httpEventConfiguration: HttpEventConfiguration)
       conf: HttpEventConfiguration,
       system: ActorSystem,
       @Named(STORE_EVENT_SUBSCRIBERS) store: EntityStore[EventSubscribers])
-    : ActorRef = {
+    : ActorRef =
     implicit val timeout = HttpEventModule.timeout
     val local_ip = java.net.InetAddress.getLocalHost.getHostAddress
 
     val actor = system.actorOf(Props(new SubscribersKeeperActor(store)))
-    conf.httpEventEndpoints.get foreach { urls =>
+    conf.httpEventEndpoints.get foreach  urls =>
       log.info(
           s"http_endpoints($urls) are specified at startup. Those will be added to subscribers list.")
-      urls foreach { url =>
+      urls foreach  url =>
         val f =
           (actor ? Subscribe(local_ip, url)).mapTo[MarathonSubscriptionEvent]
-        f.onFailure {
+        f.onFailure
           case th: Throwable =>
             log.warn(
                 s"Failed to add $url to event subscribers. exception message => ${th.getMessage}")
-        }(ExecutionContext.global)
-      }
-    }
+        (ExecutionContext.global)
 
     actor
-  }
-}
 
-object HttpEventModule {
+object HttpEventModule
   final val StatusUpdateActor = "EventsActor"
   final val SubscribersKeeperActor = "SubscriberKeeperActor"
 
   //TODO(everpeace) this should be configurable option?
   val timeout = Timeout(10 seconds)
-}

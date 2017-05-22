@@ -34,7 +34,7 @@ import scalafx.beans.property.DoubleProperty
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object BarChart {
+object BarChart
   implicit def sfxBarChart2jfx[X, Y](v: BarChart[X, Y]): jfxsc.BarChart[X, Y] =
     if (v != null) v.delegate else null
 
@@ -52,35 +52,28 @@ object BarChart {
                   categoryGap: Double) =
     new BarChart[X, Y](
         new jfxsc.BarChart[X, Y](xAxis, yAxis, data, categoryGap))
-}
 
 class BarChart[X, Y](override val delegate: jfxsc.BarChart[X, Y])
-    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.BarChart[X, Y]] {
+    extends XYChart[X, Y](delegate) with SFXDelegate[jfxsc.BarChart[X, Y]]
 
-  def this(xAxis: Axis[X], yAxis: Axis[Y]) {
+  def this(xAxis: Axis[X], yAxis: Axis[Y])
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis))
-  }
 
   def this(xAxis: Axis[X],
            yAxis: Axis[Y],
-           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+           data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]])
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis, data))
-  }
 
   def this(xAxis: Axis[X],
            yAxis: Axis[Y],
            data: ObservableBuffer[jfxsc.XYChart.Series[X, Y]],
-           categoryGap: Double) {
+           categoryGap: Double)
     this(new jfxsc.BarChart[X, Y](xAxis, yAxis, data, categoryGap))
-  }
 
   def barGap: DoubleProperty = delegate.barGapProperty
-  def barGap_=(v: Double) {
+  def barGap_=(v: Double)
     barGap() = v
-  }
 
   def categoryGap: DoubleProperty = delegate.categoryGapProperty
-  def categoryGap_=(v: Double) {
+  def categoryGap_=(v: Double)
     categoryGap() = v
-  }
-}

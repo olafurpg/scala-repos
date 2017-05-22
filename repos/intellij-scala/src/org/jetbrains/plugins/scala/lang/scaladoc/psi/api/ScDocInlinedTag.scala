@@ -11,6 +11,5 @@ import com.intellij.psi.javadoc.PsiDocTagValue
   * User: Alexander Podkhalyuzin
   * Date: 22.07.2008
   */
-trait ScDocInlinedTag extends ScalaPsiElement {
+trait ScDocInlinedTag extends ScalaPsiElement
   def getValueElement: PsiDocTagValue
-}

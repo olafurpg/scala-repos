@@ -22,28 +22,25 @@ import org.junit.Assert._
 
 import test._
 
-class StackOverflow1 {
+class StackOverflow1
   // http://stackoverflow.com/questions/7606587
 
-  trait FoldCurry[L <: HList, F, Out] {
+  trait FoldCurry[L <: HList, F, Out]
     def apply(l: L, f: F): Out
-  }
 
-  implicit def foldCurry1[H, Out] = new FoldCurry[H :: HNil, H => Out, Out] {
+  implicit def foldCurry1[H, Out] = new FoldCurry[H :: HNil, H => Out, Out]
     def apply(l: H :: HNil, f: H => Out) = f(l.head)
-  }
 
   implicit def foldCurry2[H, T <: HList, FT, Out](
       implicit fct: FoldCurry[T, FT, Out]) =
-    new FoldCurry[H :: T, H => FT, Out] {
+    new FoldCurry[H :: T, H => FT, Out]
       def apply(l: H :: T, f: H => FT) = fct(l.tail, f(l.head))
-    }
 
   def foldCurry[L <: HList, F, Out](l: L, f: F)(
       implicit fc: FoldCurry[L, F, Out]): Out = fc(l, f)
 
   @Test
-  def testFoldCurry {
+  def testFoldCurry
     val f1 = (i: Int, j: Int, k: Int, l: Int) => i + j + k + l
     val f1c = f1.curried
 
@@ -61,5 +58,3 @@ class StackOverflow1 {
     val r2 = foldCurry(l2, f2c)
     typed[(Int, Int, Double)](r2)
     assertEquals((24, 3, 4.0), r2)
-  }
-}

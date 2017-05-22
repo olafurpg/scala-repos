@@ -14,64 +14,55 @@ import java.lang.System.{currentTimeMillis ⇒ newTimestamp}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricNumericConverterSpec
-    extends WordSpec with Matchers with MetricNumericConverter {
+    extends WordSpec with Matchers with MetricNumericConverter
 
-  "MetricNumericConverter" must {
+  "MetricNumericConverter" must
 
-    "convert" in {
+    "convert" in
       convertNumber(0).isLeft should ===(true)
       convertNumber(1).left.get should ===(1)
       convertNumber(1L).isLeft should ===(true)
       convertNumber(0.0).isRight should ===(true)
-    }
 
-    "define a new metric" in {
+    "define a new metric" in
       val Some(metric) =
         Metric.create(HeapMemoryUsed, 256L, decayFactor = Some(0.18))
       metric.name should ===(HeapMemoryUsed)
       metric.value should ===(256L)
       metric.isSmooth should ===(true)
       metric.smoothValue should ===(256.0 +- 0.0001)
-    }
 
-    "define an undefined value with a None " in {
+    "define an undefined value with a None " in
       Metric.create("x", -1, None).isDefined should ===(false)
       Metric.create("x", java.lang.Double.NaN, None).isDefined should ===(
           false)
       Metric.create("x", Failure(new RuntimeException), None).isDefined should ===(
           false)
-    }
 
-    "recognize whether a metric value is defined" in {
+    "recognize whether a metric value is defined" in
       defined(0) should ===(true)
       defined(0.0) should ===(true)
-    }
 
-    "recognize whether a metric value is not defined" in {
+    "recognize whether a metric value is not defined" in
       defined(-1) should ===(false)
       defined(-1.0) should ===(false)
       defined(Double.NaN) should ===(false)
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class NodeMetricsSpec extends WordSpec with Matchers {
+class NodeMetricsSpec extends WordSpec with Matchers
 
   val node1 = Address("akka.tcp", "sys", "a", 2554)
   val node2 = Address("akka.tcp", "sys", "a", 2555)
 
-  "NodeMetrics must" must {
+  "NodeMetrics must" must
 
-    "return correct result for 2 'same' nodes" in {
+    "return correct result for 2 'same' nodes" in
       (NodeMetrics(node1, 0) sameAs NodeMetrics(node1, 0)) should ===(true)
-    }
 
-    "return correct result for 2 not 'same' nodes" in {
+    "return correct result for 2 not 'same' nodes" in
       (NodeMetrics(node1, 0) sameAs NodeMetrics(node2, 0)) should ===(false)
-    }
 
-    "merge 2 NodeMetrics by most recent" in {
+    "merge 2 NodeMetrics by most recent" in
       val sample1 = NodeMetrics(node1,
                                 1,
                                 Set(Metric.create("a", 10, None),
@@ -86,9 +77,8 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       merged.metric("a").map(_.value) should ===(Some(11))
       merged.metric("b").map(_.value) should ===(Some(20))
       merged.metric("c").map(_.value) should ===(Some(30))
-    }
 
-    "not merge 2 NodeMetrics if master is more recent" in {
+    "not merge 2 NodeMetrics if master is more recent" in
       val sample1 = NodeMetrics(node1,
                                 1,
                                 Set(Metric.create("a", 10, None),
@@ -101,9 +91,8 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       val merged = sample1 merge sample2 // older and not same
       merged.timestamp should ===(sample1.timestamp)
       merged.metrics should ===(sample1.metrics)
-    }
 
-    "update 2 NodeMetrics by most recent" in {
+    "update 2 NodeMetrics by most recent" in
       val sample1 = NodeMetrics(node1,
                                 1,
                                 Set(Metric.create("a", 10, None),
@@ -120,9 +109,8 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       updated.metric("a").map(_.value) should ===(Some(11))
       updated.metric("b").map(_.value) should ===(Some(20))
       updated.metric("c").map(_.value) should ===(Some(30))
-    }
 
-    "update 3 NodeMetrics with ewma applied" in {
+    "update 3 NodeMetrics with ewma applied" in
       import MetricsConfig._
 
       val decay = Some(defaultDecayFactor)
@@ -155,14 +143,11 @@ class NodeMetricsSpec extends WordSpec with Matchers {
       updated.metric("b").map(_.smoothValue).get should ===(4.000 +- epsilon)
       updated.metric("c").map(_.smoothValue).get should ===(5.000 +- epsilon)
       updated.metric("d").map(_.smoothValue).get should ===(6.000 +- epsilon)
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricsGossipSpec
     extends AkkaSpec(MetricsConfig.defaultEnabled) with ImplicitSender
-    with MetricsCollectorFactory {
+    with MetricsCollectorFactory
 
   val collector = createMetricsCollector
 
@@ -170,13 +155,12 @@ class MetricsGossipSpec
     * sometimes Sigar will not be able to return a valid value (NaN and such) so must ensure they
     * have the same Metric types
     */
-  def newSample(previousSample: Set[Metric]): Set[Metric] = {
+  def newSample(previousSample: Set[Metric]): Set[Metric] =
     // Metric.equals is based on name equality
     collector.sample.metrics.filter(previousSample.contains) ++ previousSample
-  }
 
-  "A MetricsGossip" must {
-    "add new NodeMetrics" in {
+  "A MetricsGossip" must
+    "add new NodeMetrics" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -195,9 +179,8 @@ class MetricsGossipSpec
       g2.nodes.size should ===(2)
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
 
-    "merge peer metrics" in {
+    "merge peer metrics" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -217,13 +200,11 @@ class MetricsGossipSpec
       g2.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(
           Some(m2Updated.metrics))
-      g2.nodes collect {
+      g2.nodes collect
         case peer if peer.address == m2.address ⇒
           peer.timestamp should ===(m2Updated.timestamp)
-      }
-    }
 
-    "merge an existing metric set for a node and update node ring" in {
+    "merge an existing metric set for a node and update node ring" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -255,17 +236,15 @@ class MetricsGossipSpec
       mergedGossip.nodes.foreach(_.metrics.size should be > (3))
       mergedGossip.nodeMetricsFor(m2.address).map(_.timestamp) should ===(
           Some(m2Updated.timestamp))
-    }
 
-    "get the current NodeMetrics if it exists in the local nodes" in {
+    "get the current NodeMetrics if it exists in the local nodes" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
       val g1 = MetricsGossip.empty :+ m1
       g1.nodeMetricsFor(m1.address).map(_.metrics) should ===(Some(m1.metrics))
-    }
 
-    "remove a node if it is no longer Up" in {
+    "remove a node if it is no longer Up" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -280,9 +259,8 @@ class MetricsGossipSpec
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
 
-    "filter nodes" in {
+    "filter nodes" in
       val m1 = NodeMetrics(Address("akka.tcp", "sys", "a", 2554),
                            newTimestamp,
                            collector.sample.metrics)
@@ -297,14 +275,11 @@ class MetricsGossipSpec
       g2.nodes.exists(_.address == m1.address) should ===(false)
       g2.nodeMetricsFor(m1.address) should ===(None)
       g2.nodeMetricsFor(m2.address).map(_.metrics) should ===(Some(m2.metrics))
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MetricValuesSpec
     extends AkkaSpec(MetricsConfig.defaultEnabled)
-    with MetricsCollectorFactory {
+    with MetricsCollectorFactory
   import akka.cluster.metrics.StandardMetrics._
 
   val collector = createMetricsCollector
@@ -314,27 +289,23 @@ class MetricValuesSpec
   val node2 = NodeMetrics(
       Address("akka.tcp", "sys", "a", 2555), 1, collector.sample.metrics)
 
-  val nodes: Seq[NodeMetrics] = {
-    (1 to 100).foldLeft(List(node1, node2)) { (nodes, _) ⇒
-      nodes map { n ⇒
+  val nodes: Seq[NodeMetrics] =
+    (1 to 100).foldLeft(List(node1, node2))  (nodes, _) ⇒
+      nodes map  n ⇒
         n.copy(metrics = collector.sample.metrics.flatMap(latest ⇒
-                    n.metrics.collect {
+                    n.metrics.collect
             case streaming if latest sameAs streaming ⇒ streaming :+ latest
-        }))
-      }
-    }
-  }
+        ))
 
-  "NodeMetrics.MetricValues" must {
-    "extract expected metrics for load balancing" in {
+  "NodeMetrics.MetricValues" must
+    "extract expected metrics for load balancing" in
       val stream1 = node2.metric(HeapMemoryCommitted).get.value.longValue
       val stream2 = node1.metric(HeapMemoryUsed).get.value.longValue
       stream1 should be >= (stream2)
-    }
 
-    "extract expected MetricValue types for load balancing" in {
-      nodes foreach { node ⇒
-        node match {
+    "extract expected MetricValue types for load balancing" in
+      nodes foreach  node ⇒
+        node match
           case HeapMemory(address, _, used, committed, _) ⇒
             used should be > (0L)
             committed should be >= (used)
@@ -343,9 +314,8 @@ class MetricValuesSpec
             // we don't check the heap max value in this test.
             // extract is the java api
             StandardMetrics.extractHeapMemory(node) should not be (null)
-        }
 
-        node match {
+        node match
           case Cpu(address,
                    _,
                    systemLoadAverageOption,
@@ -355,18 +325,11 @@ class MetricValuesSpec
             processors should be > (0)
             if (systemLoadAverageOption.isDefined)
               systemLoadAverageOption.get should be >= (0.0)
-            if (cpuCombinedOption.isDefined) {
+            if (cpuCombinedOption.isDefined)
               cpuCombinedOption.get should be <= (1.0)
               cpuCombinedOption.get should be >= (0.0)
-            }
-            if (cpuStolenOption.isDefined) {
+            if (cpuStolenOption.isDefined)
               cpuStolenOption.get should be <= (1.0)
               cpuStolenOption.get should be >= (0.0)
-            }
             // extract is the java api
             StandardMetrics.extractCpu(node) should not be (null)
-        }
-      }
-    }
-  }
-}

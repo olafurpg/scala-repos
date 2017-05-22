@@ -19,27 +19,24 @@ import com.zaxxer.hikari.{HikariDataSource, HikariConfig}
 /**
   * HikariCP runtime inject module.
   */
-class HikariCPModule extends Module {
-  def bindings(environment: Environment, configuration: Configuration) = {
+class HikariCPModule extends Module
+  def bindings(environment: Environment, configuration: Configuration) =
     Seq(
         bind[ConnectionPool].to[HikariCPConnectionPool]
     )
-  }
-}
 
 /**
   * HikariCP components (for compile-time injection).
   */
-trait HikariCPComponents {
+trait HikariCPComponents
   def environment: Environment
 
   lazy val connectionPool: ConnectionPool = new HikariCPConnectionPool(
       environment)
-}
 
 @Singleton
 class HikariCPConnectionPool @Inject()(environment: Environment)
-    extends ConnectionPool {
+    extends ConnectionPool
 
   import HikariCPConnectionPool._
 
@@ -52,50 +49,44 @@ class HikariCPConnectionPool @Inject()(environment: Environment)
     */
   override def create(name: String,
                       dbConfig: DatabaseConfig,
-                      configuration: Config): DataSource = {
+                      configuration: Config): DataSource =
     val config = PlayConfig(configuration)
 
-    Try {
+    Try
       Logger.info(s"Creating Pool for datasource '$name'")
 
       val hikariConfig = new HikariCPConfig(dbConfig, config).toHikariConfig
       val datasource = new HikariDataSource(hikariConfig)
 
       // Bind in JNDI
-      dbConfig.jndiName.foreach { jndiName =>
+      dbConfig.jndiName.foreach  jndiName =>
         JNDI.initialContext.rebind(jndiName, datasource)
         logger.info(s"datasource [$name] bound to JNDI as $jndiName")
-      }
 
       datasource
-    } match {
+    match
       case Success(datasource) => datasource
       case Failure(ex) =>
         throw config.reportError(name, ex.getMessage, Some(ex))
-    }
-  }
 
   /**
     * Close the given data source.
     *
     * @param dataSource the data source to close
     */
-  override def close(dataSource: DataSource) = {
+  override def close(dataSource: DataSource) =
     Logger.info("Shutting down connection pool.")
-    dataSource match {
+    dataSource match
       case ds: HikariDataSource => ds.close()
       case _ =>
         sys.error("Unable to close data source: not a HikariDataSource")
-    }
-  }
-}
 
 /**
   * HikariCP config
   */
-class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig) {
+class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig)
 
-  def toHikariConfig: HikariConfig = {
+  def toHikariConfig: HikariConfig =
     val hikariConfig = new HikariConfig()
 
     val config = configuration.get[PlayConfig]("hikaricp")
@@ -114,15 +105,13 @@ class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig) {
     import scala.collection.JavaConverters._
 
     val dataSourceConfig = config.get[PlayConfig]("dataSource")
-    dataSourceConfig.underlying.root().keySet().asScala.foreach { key =>
+    dataSourceConfig.underlying.root().keySet().asScala.foreach  key =>
       hikariConfig.addDataSourceProperty(
           key, dataSourceConfig.get[String](key))
-    }
 
-    def toMillis(duration: Duration) = {
+    def toMillis(duration: Duration) =
       if (duration.isFinite()) duration.toMillis
       else 0l
-    }
 
     // Frequently used
     hikariConfig.setAutoCommit(config.get[Boolean]("autoCommit"))
@@ -160,9 +149,6 @@ class HikariCPConfig(dbConfig: DatabaseConfig, configuration: PlayConfig) {
 
     hikariConfig.validate()
     hikariConfig
-  }
-}
 
-object HikariCPConnectionPool {
+object HikariCPConnectionPool
   private val logger = Logger(classOf[HikariCPConnectionPool])
-}

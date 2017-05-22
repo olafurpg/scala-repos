@@ -14,7 +14,7 @@ import org.ensime.util.file._
 
 import org.ensime.api._
 
-object EnsimeConfigProtocol {
+object EnsimeConfigProtocol
   object Protocol
       extends DefaultSexpProtocol with OptionAltFormat with ScalariformFormat
       with CamelCaseToDashes
@@ -25,10 +25,9 @@ object EnsimeConfigProtocol {
   private implicit val moduleFormat = SexpFormat[EnsimeModule]
   private implicit val configFormat = SexpFormat[EnsimeConfig]
 
-  def parse(config: String): EnsimeConfig = {
+  def parse(config: String): EnsimeConfig =
     val raw = config.parseSexp.convertTo[EnsimeConfig]
     validated(raw).copy(javaLibs = inferJavaLibs(raw.javaHome))
-  }
 
   // there are lots of JRE libs, but most people only care about
   // rt.jar --- this could be parameterised.
@@ -49,13 +48,11 @@ object EnsimeConfigProtocol {
    directories and then re-canon them, which is - admittedly - a weird
    side-effect.
    */
-  private[config] def validated(m: EnsimeModule): EnsimeModule = {
-    (m.targetDirs ++ m.testTargetDirs ++ m.sourceRoots).foreach { dir =>
-      if (!dir.exists() && !dir.isJar) {
+  private[config] def validated(m: EnsimeModule): EnsimeModule =
+    (m.targetDirs ++ m.testTargetDirs ++ m.sourceRoots).foreach  dir =>
+      if (!dir.exists() && !dir.isJar)
         log.warn(s"$dir does not exist, creating")
         dir.mkdirs()
-      }
-    }
     Canonised(
         m.copy(
             target = None,
@@ -64,5 +61,3 @@ object EnsimeConfigProtocol {
             testTargets = m.testTargetDirs,
             sourceRoots = m.sourceRoots
         ))
-  }
-}

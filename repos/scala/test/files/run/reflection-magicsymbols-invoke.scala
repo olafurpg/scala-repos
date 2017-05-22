@@ -2,38 +2,33 @@ import scala.reflect.runtime.universe._
 import scala.reflect.runtime.universe.definitions._
 import scala.reflect.runtime.{currentMirror => cm}
 
-package scala {
-  object ExceptionUtils {
+package scala
+  object ExceptionUtils
     def unwrapThrowable(ex: Throwable): Throwable =
       scala.reflect.runtime.ReflectionUtils.unwrapThrowable(ex)
-  }
-}
 
-object Test extends App {
+object Test extends App
   def key(sym: Symbol) = sym + ": " + sym.info
-  def test(tpe: Type, receiver: Any, method: String, args: Any*) {
+  def test(tpe: Type, receiver: Any, method: String, args: Any*)
     def wrap[T](op: => T) =
-      try {
+      try
         var result = op.asInstanceOf[AnyRef]
         if (scala.runtime.ScalaRunTime.isArray(result))
           result = scala.runtime.ScalaRunTime.toObjectArray(result).toList
         println(result)
-      } catch {
+      catch
         case ex: Throwable =>
           val realex = scala.ExceptionUtils.unwrapThrowable(ex)
           println(realex.getClass + ": " + realex.getMessage)
-      }
     print(s"testing ${tpe.typeSymbol.name}.$method: ")
-    wrap({
-      if (method == termNames.CONSTRUCTOR.toString) {
+    wrap(
+      if (method == termNames.CONSTRUCTOR.toString)
         val ctor = tpe.decl(termNames.CONSTRUCTOR).asMethod
         cm.reflectClass(ctor.owner.asClass).reflectConstructor(ctor)(args: _*)
-      } else {
+      else
         val meth = tpe.decl(TermName(method).encodedName.toTermName).asMethod
         cm.reflect(receiver).reflectMethod(meth)(args: _*)
-      }
-    })
-  }
+    )
 
   println("============\nAny")
   println("it's important to print the list of Any's members")
@@ -105,4 +100,3 @@ object Test extends App {
        scala.reflect.runtime.universe,
        "reify",
        "2")
-}

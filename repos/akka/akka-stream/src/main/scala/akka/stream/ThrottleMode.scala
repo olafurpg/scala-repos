@@ -8,7 +8,7 @@ package akka.stream
   */
 sealed abstract class ThrottleMode
 
-object ThrottleMode {
+object ThrottleMode
 
   /**
     *  Tells throttle to make pauses before emitting messages to meet throttle rate
@@ -29,7 +29,6 @@ object ThrottleMode {
     * Java API: Makes throttle fail with exception when upstream is faster than throttle rate
     */
   def enforcing = Enforcing
-}
 
 /**
   * Exception that is thrown when rated controlled by stream is exceeded

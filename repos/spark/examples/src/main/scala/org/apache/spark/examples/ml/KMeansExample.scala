@@ -33,9 +33,9 @@ import org.apache.spark.sql.{DataFrame, SQLContext}
   * bin/run-example ml.KMeansExample
   * }}}
   */
-object KMeansExample {
+object KMeansExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     // Creates a Spark context and a SQL context
     val conf = new SparkConf().setAppName(s"${this.getClass.getSimpleName}")
     val sc = new SparkContext(conf)
@@ -68,6 +68,4 @@ object KMeansExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

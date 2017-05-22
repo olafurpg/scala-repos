@@ -28,8 +28,8 @@ import org.apache.spark.ml.regression.DecisionTreeRegressor
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object DecisionTreeRegressionExample {
-  def main(args: Array[String]): Unit = {
+object DecisionTreeRegressionExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("DecisionTreeRegressionExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -79,6 +79,4 @@ object DecisionTreeRegressionExample {
     val treeModel = model.stages(1).asInstanceOf[DecisionTreeRegressionModel]
     println("Learned regression tree model:\n" + treeModel.toDebugString)
     // $example off$
-  }
-}
 // scalastyle:on println

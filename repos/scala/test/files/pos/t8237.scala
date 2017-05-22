@@ -1,6 +1,6 @@
 import scala.language.higherKinds
 
-object TestExplicit {
+object TestExplicit
   trait TC[A]
   def fTt[A, E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
   implicit def tc[T]: TC[T] = ???
@@ -17,13 +17,11 @@ object TestExplicit {
   // As we check if the argument conforms to the formal, we would have
   // AppliedTypeVars sharing the same TypeConstraints on the LHS and RHS,
   // which leads to a cyclic constraint.
-}
 
-object TestImplicit {
+object TestImplicit
   trait TC[A]
   def fTt[A, E[X] <: List[X]](a: A)(implicit tt: TC[E[A]]) = a
   implicit def tc[T]: TC[T] = ???
 
   // Oddly enough, this one works.
   fTt(1)
-}

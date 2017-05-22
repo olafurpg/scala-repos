@@ -11,18 +11,16 @@ import Id._
   * from [[scalaz.Distributive]] give rise to `([a]T[A[a]]) ~>
   * ([a]A[T[a]])`, for varying `A` and `T` constraints.
   */
-trait NaturalTransformation[-F[_], +G[_]] { self =>
+trait NaturalTransformation[-F[_], +G[_]]  self =>
   def apply[A](fa: F[A]): G[A]
 
-  def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G) {
+  def compose[E[_]](f: E ~> F): E ~> G = new (E ~> G)
     def apply[A](ea: E[A]) = self(f(ea))
-  }
 
   def andThen[H[_]](f: G ~> H): F ~> H =
     f compose self
-}
 
-trait NaturalTransformations {
+trait NaturalTransformations
 
   /** A function type encoded as a natural transformation by adding a
     * phantom parameter.
@@ -31,53 +29,44 @@ trait NaturalTransformations {
 
   /** `refl` specialized to [[scalaz.Id.Id]]. */
   def id =
-    new (Id ~> Id) {
+    new (Id ~> Id)
       def apply[A](a: A) = a
-    }
 
   /** A universally quantified identity function */
   def refl[F[_]] =
-    new (F ~> F) {
+    new (F ~> F)
       def apply[A](fa: F[A]) = fa
-    }
 
   /** Reify a `NaturalTransformation`. */
   implicit def natToFunction[F[_], G[_], A](f: F ~> G): F[A] => G[A] =
     x => f(x)
-}
 
 object NaturalTransformation extends NaturalTransformations
 
 /** A function universally quantified over two parameters. */
-trait BiNaturalTransformation[-F[_, _], +G[_, _]] { self =>
+trait BiNaturalTransformation[-F[_, _], +G[_, _]]  self =>
   def apply[A, B](f: F[A, B]): G[A, B]
 
   def compose[E[_, _]](f: BiNaturalTransformation[E, F]) =
-    new BiNaturalTransformation[E, G] {
+    new BiNaturalTransformation[E, G]
       def apply[A, B](eab: E[A, B]): G[A, B] = self(f(eab))
-    }
-}
 
 /** A constrained natural transformation */
-trait ConstrainedNaturalTransformation[F[_], G[_], E[_]] {
+trait ConstrainedNaturalTransformation[F[_], G[_], E[_]]
   def apply[A : E](f: F[A]): G[A]
-}
 
 /** A constrained transformation natural in both sides of a bifunctor */
-trait BiConstrainedNaturalTransformation[F[_, _], G[_, _], C[_], E[_]] {
+trait BiConstrainedNaturalTransformation[F[_, _], G[_, _], C[_], E[_]]
   def apply[A : C, B : E](f: F[A, B]): G[A, B]
-}
 
-trait DiNaturalTransformation[F[_, _], G[_, _]] {
+trait DiNaturalTransformation[F[_, _], G[_, _]]
   def apply[A](f: F[A, A]): G[A, A]
-}
 
 // TODO needed, or just use type lambdas?
 //type Thunk[A] = () => A
 //
-trait Konst[A] {
+trait Konst[A]
   type Apply[B] = A
-}
 //
 //trait Biff[P[_,_], F[_], G[_]] {
 //  type Apply[A, B] = P[F[A], G[B]]

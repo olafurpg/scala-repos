@@ -1,7 +1,7 @@
 /**
   * Copyright (C) 2009-2016 Lightbend Inc. <http://www.lightbend.com>
   */
-package docs.serialization {
+package docs.serialization
 
   import akka.testkit._
   //#imports
@@ -17,7 +17,7 @@ package docs.serialization {
   import java.nio.charset.StandardCharsets
 
   //#my-own-serializer
-  class MyOwnSerializer extends Serializer {
+  class MyOwnSerializer extends Serializer
 
     // This is whether "fromBinary" requires a "clazz" or not
     def includeManifest: Boolean = true
@@ -28,26 +28,23 @@ package docs.serialization {
     def identifier = 1234567
 
     // "toBinary" serializes the given object to an Array of Bytes
-    def toBinary(obj: AnyRef): Array[Byte] = {
+    def toBinary(obj: AnyRef): Array[Byte] =
       // Put the code that serializes the object here
       //#...
       Array[Byte]()
       //#...
-    }
 
     // "fromBinary" deserializes the given array,
     // using the type hint (if any, see "includeManifest" above)
-    def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+    def fromBinary(bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef =
       // Put your code that deserializes here
       //#...
       null
       //#...
-    }
-  }
   //#my-own-serializer
 
   //#my-own-serializer2
-  class MyOwnSerializer2 extends SerializerWithStringManifest {
+  class MyOwnSerializer2 extends SerializerWithStringManifest
 
     val CustomerManifest = "customer"
     val UserManifest = "user"
@@ -61,40 +58,34 @@ package docs.serialization {
     // The manifest (type hint) that will be provided in the fromBinary method
     // Use `""` if manifest is not needed.
     def manifest(obj: AnyRef): String =
-      obj match {
+      obj match
         case _: Customer => CustomerManifest
         case _: User => UserManifest
-      }
 
     // "toBinary" serializes the given object to an Array of Bytes
-    def toBinary(obj: AnyRef): Array[Byte] = {
+    def toBinary(obj: AnyRef): Array[Byte] =
       // Put the real code that serializes the object here
-      obj match {
+      obj match
         case Customer(name) => name.getBytes(UTF_8)
         case User(name) => name.getBytes(UTF_8)
-      }
-    }
 
     // "fromBinary" deserializes the given array,
     // using the type hint
-    def fromBinary(bytes: Array[Byte], manifest: String): AnyRef = {
+    def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
       // Put the real code that deserializes here
-      manifest match {
+      manifest match
         case CustomerManifest =>
           Customer(new String(bytes, UTF_8))
         case UserManifest =>
           User(new String(bytes, UTF_8))
-      }
-    }
-  }
   //#my-own-serializer2
 
   trait MyOwnSerializable
   final case class Customer(name: String) extends MyOwnSerializable
   final case class User(name: String) extends MyOwnSerializable
 
-  class SerializationDocSpec extends AkkaSpec {
-    "demonstrate configuration of serialize messages" in {
+  class SerializationDocSpec extends AkkaSpec
+    "demonstrate configuration of serialize messages" in
       val config = ConfigFactory.parseString("""
       #//#serialize-messages-config
       akka {
@@ -107,9 +98,8 @@ package docs.serialization {
       val a = ActorSystem("system", config)
       a.settings.SerializeAllMessages should be(true)
       shutdown(a)
-    }
 
-    "demonstrate configuration of serialize creators" in {
+    "demonstrate configuration of serialize creators" in
       val config = ConfigFactory.parseString("""
       #//#serialize-creators-config
       akka {
@@ -122,9 +112,8 @@ package docs.serialization {
       val a = ActorSystem("system", config)
       a.settings.SerializeAllCreators should be(true)
       shutdown(a)
-    }
 
-    "demonstrate configuration of serializers" in {
+    "demonstrate configuration of serializers" in
       val config =
         ConfigFactory.parseString("""
       #//#serialize-serializers-config
@@ -141,9 +130,8 @@ package docs.serialization {
       """)
       val a = ActorSystem("system", config)
       shutdown(a)
-    }
 
-    "demonstrate configuration of serialization-bindings" in {
+    "demonstrate configuration of serialization-bindings" in
       val config =
         ConfigFactory.parseString("""
       #//#serialization-bindings-config
@@ -175,9 +163,8 @@ package docs.serialization {
         .serializerFor(classOf[java.lang.Boolean])
         .getClass should be(classOf[MyOwnSerializer])
       shutdown(a)
-    }
 
-    "demonstrate the programmatic API" in {
+    "demonstrate the programmatic API" in
       //#programmatic
       val system = ActorSystem("example")
 
@@ -201,9 +188,8 @@ package docs.serialization {
 
       //#programmatic
       shutdown(system)
-    }
 
-    "demonstrate serialization of ActorRefs" in {
+    "demonstrate serialization of ActorRefs" in
       val theActorRef: ActorRef = system.deadLetters
       val extendedSystem: ExtendedActorSystem =
         system.asInstanceOf[ExtendedActorSystem]
@@ -225,33 +211,27 @@ package docs.serialization {
       //#external-address
       object ExternalAddress extends ExtensionKey[ExternalAddressExt]
 
-      class ExternalAddressExt(system: ExtendedActorSystem) extends Extension {
+      class ExternalAddressExt(system: ExtendedActorSystem) extends Extension
         def addressFor(remoteAddr: Address): Address =
           system.provider.getExternalAddressFor(remoteAddr) getOrElse
           (throw new UnsupportedOperationException(
                   "cannot send to " + remoteAddr))
-      }
 
       def serializeTo(ref: ActorRef, remote: Address): String =
         ref.path.toSerializationFormatWithAddress(
             ExternalAddress(extendedSystem).addressFor(remote))
       //#external-address
-    }
 
-    "demonstrate how to do default Akka serialization of ActorRef" in {
+    "demonstrate how to do default Akka serialization of ActorRef" in
       val theActorSystem: ActorSystem = system
 
       //#external-address-default
       object ExternalAddress extends ExtensionKey[ExternalAddressExt]
 
-      class ExternalAddressExt(system: ExtendedActorSystem) extends Extension {
+      class ExternalAddressExt(system: ExtendedActorSystem) extends Extension
         def addressForAkka: Address = system.provider.getDefaultAddress
-      }
 
       def serializeAkkaDefault(ref: ActorRef): String =
         ref.path.toSerializationFormatWithAddress(
             ExternalAddress(theActorSystem).addressForAkka)
       //#external-address-default
-    }
-  }
-}

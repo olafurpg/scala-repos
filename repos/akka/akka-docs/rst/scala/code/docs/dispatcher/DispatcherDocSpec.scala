@@ -14,7 +14,7 @@ import akka.actor._
 import docs.dispatcher.DispatcherDocSpec.MyBoundedActor
 import akka.dispatch.RequiresMessageQueue
 
-object DispatcherDocSpec {
+object DispatcherDocSpec
   val javaConfig =
     """
      //#prio-dispatcher-config-java
@@ -207,7 +207,7 @@ object DispatcherDocSpec {
   class MyPrioMailbox(settings: ActorSystem.Settings, config: Config)
       extends UnboundedStablePriorityMailbox(
           // Create a new PriorityGenerator, lower prio means more important
-          PriorityGenerator {
+          PriorityGenerator
         // 'highpriority messages should be treated first if possible
         case 'highpriority => 0
 
@@ -219,7 +219,7 @@ object DispatcherDocSpec {
 
         // We default to 1, which is in between high and low
         case otherwise => 1
-      })
+      )
   //#prio-mailbox
 
   //#control-aware-mailbox-messages
@@ -228,11 +228,9 @@ object DispatcherDocSpec {
   case object MyControlMessage extends ControlMessage
   //#control-aware-mailbox-messages
 
-  class MyActor extends Actor {
-    def receive = {
+  class MyActor extends Actor
+    def receive =
       case x =>
-    }
-  }
 
   //#required-mailbox-class
   import akka.dispatch.RequiresMessageQueue
@@ -245,92 +243,80 @@ object DispatcherDocSpec {
   //#require-mailbox-on-actor
   class MySpecialActor
       extends Actor
-      with RequiresMessageQueue[MyUnboundedMessageQueueSemantics] {
+      with RequiresMessageQueue[MyUnboundedMessageQueueSemantics]
     //#require-mailbox-on-actor
-    def receive = {
+    def receive =
       case _ =>
-    }
     //#require-mailbox-on-actor
     // ...
-  }
   //#require-mailbox-on-actor
-}
 
-class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
+class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config)
 
   import DispatcherDocSpec._
 
-  "defining dispatcher in config" in {
+  "defining dispatcher in config" in
     val context = system
     //#defining-dispatcher-in-config
     import akka.actor.Props
     val myActor = context.actorOf(Props[MyActor], "myactor")
     //#defining-dispatcher-in-config
-  }
 
-  "defining dispatcher in code" in {
+  "defining dispatcher in code" in
     val context = system
     //#defining-dispatcher-in-code
     import akka.actor.Props
     val myActor = context.actorOf(
         Props[MyActor].withDispatcher("my-dispatcher"), "myactor1")
     //#defining-dispatcher-in-code
-  }
 
-  "defining dispatcher with bounded queue" in {
+  "defining dispatcher with bounded queue" in
     val dispatcher = system.dispatchers.lookup("my-dispatcher-bounded-queue")
-  }
 
-  "defining fixed-pool-size dispatcher" in {
+  "defining fixed-pool-size dispatcher" in
     val context = system
     //#defining-fixed-pool-size-dispatcher
     val myActor = context.actorOf(
         Props[MyActor].withDispatcher("blocking-io-dispatcher"), "myactor2")
     //#defining-fixed-pool-size-dispatcher
-  }
 
-  "defining pinned dispatcher" in {
+  "defining pinned dispatcher" in
     val context = system
     //#defining-pinned-dispatcher
     val myActor = context.actorOf(
         Props[MyActor].withDispatcher("my-pinned-dispatcher"), "myactor3")
     //#defining-pinned-dispatcher
-  }
 
-  "looking up a dispatcher" in {
+  "looking up a dispatcher" in
     //#lookup
     // for use with Futures, Scheduler, etc.
     implicit val executionContext = system.dispatchers.lookup("my-dispatcher")
     //#lookup
-  }
 
-  "defining mailbox in config" in {
+  "defining mailbox in config" in
     val context = system
     //#defining-mailbox-in-config
     import akka.actor.Props
     val myActor = context.actorOf(Props[MyActor], "priomailboxactor")
     //#defining-mailbox-in-config
-  }
 
-  "defining mailbox in code" in {
+  "defining mailbox in code" in
     val context = system
     //#defining-mailbox-in-code
     import akka.actor.Props
     val myActor = context.actorOf(Props[MyActor].withMailbox("prio-mailbox"))
     //#defining-mailbox-in-code
-  }
 
-  "using a required mailbox" in {
+  "using a required mailbox" in
     val context = system
     val myActor = context.actorOf(Props[MyBoundedActor])
-  }
 
-  "defining priority dispatcher" in {
-    new AnyRef {
+  "defining priority dispatcher" in
+    new AnyRef
       //#prio-dispatcher
 
       // We create a new Actor that just prints out what it processes
-      class Logger extends Actor {
+      class Logger extends Actor
         val log: LoggingAdapter = Logging(context.system, this)
 
         self ! 'lowpriority
@@ -342,10 +328,8 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
         self ! 'highpriority
         self ! PoisonPill
 
-        def receive = {
+        def receive =
           case x => log.info(x.toString)
-        }
-      }
       val a = system.actorOf(
           Props(classOf[Logger], this).withDispatcher("prio-dispatcher"))
 
@@ -363,15 +347,13 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
 
       watch(a)
       expectMsgPF() { case Terminated(`a`) => () }
-    }
-  }
 
-  "defining control aware dispatcher" in {
-    new AnyRef {
+  "defining control aware dispatcher" in
+    new AnyRef
       //#control-aware-dispatcher
 
       // We create a new Actor that just prints out what it processes
-      class Logger extends Actor {
+      class Logger extends Actor
         val log: LoggingAdapter = Logging(context.system, this)
 
         self ! 'foo
@@ -379,10 +361,8 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
         self ! MyControlMessage
         self ! PoisonPill
 
-        def receive = {
+        def receive =
           case x => log.info(x.toString)
-        }
-      }
       val a = system.actorOf(Props(classOf[Logger], this)
             .withDispatcher("control-aware-dispatcher"))
 
@@ -396,15 +376,10 @@ class DispatcherDocSpec extends AkkaSpec(DispatcherDocSpec.config) {
 
       watch(a)
       expectMsgPF() { case Terminated(`a`) => () }
-    }
-  }
 
-  "require custom mailbox on dispatcher" in {
+  "require custom mailbox on dispatcher" in
     val myActor =
       system.actorOf(Props[MyActor].withDispatcher("custom-dispatcher"))
-  }
 
-  "require custom mailbox on actor" in {
+  "require custom mailbox on actor" in
     val myActor = system.actorOf(Props[MySpecialActor])
-  }
-}

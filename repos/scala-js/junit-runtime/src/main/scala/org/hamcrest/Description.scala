@@ -3,19 +3,18 @@
  */
 package org.hamcrest
 
-object Description {
+object Description
   val NONE: Description = new NullDescription
 
-  final class NullDescription extends Description {
+  final class NullDescription extends Description
     override def appendDescriptionOf(value: SelfDescribing): Description = this
 
     override def appendList(
         start: String,
         separator: String,
         end: String,
-        values: java.lang.Iterable[SelfDescribing]): Description = {
+        values: java.lang.Iterable[SelfDescribing]): Description =
       this
-    }
 
     override def appendText(text: String): Description = this
 
@@ -24,23 +23,19 @@ object Description {
     override def appendValueList[T](start: String,
                                     separator: String,
                                     end: String,
-                                    values: T*): Description = {
+                                    values: T*): Description =
       this
-    }
 
     override def appendValueList[T](
         start: String,
         separator: String,
         end: String,
-        values: java.lang.Iterable[T]): Description = {
+        values: java.lang.Iterable[T]): Description =
       this
-    }
 
     override def toString(): String = ""
-  }
-}
 
-trait Description {
+trait Description
   def appendText(text: String): Description
 
   def appendDescriptionOf(value: SelfDescribing): Description
@@ -59,4 +54,3 @@ trait Description {
                  separator: String,
                  end: String,
                  values: java.lang.Iterable[SelfDescribing]): Description
-}

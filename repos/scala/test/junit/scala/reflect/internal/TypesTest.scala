@@ -8,13 +8,13 @@ import scala.collection.mutable
 import scala.tools.nsc.symtab.SymbolTableForUnitTesting
 
 @RunWith(classOf[JUnit4])
-class TypesTest {
+class TypesTest
 
   object symbolTable extends SymbolTableForUnitTesting
   import symbolTable._, definitions._
 
   @Test
-  def testRefinedTypeSI8611(): Unit = {
+  def testRefinedTypeSI8611(): Unit =
     def stringNarrowed = StringTpe.narrow
     assert(stringNarrowed != stringNarrowed)
     assert(!(stringNarrowed =:= stringNarrowed))
@@ -34,10 +34,9 @@ class TypesTest {
     val uniquelyNarrowed2 = refinedType(
         boolWithString1narrow2 :: Nil, NoSymbol)
     assert(uniquelyNarrowed1 =:= uniquelyNarrowed2)
-  }
 
   @Test
-  def testTransitivityWithModuleTypeRef(): Unit = {
+  def testTransitivityWithModuleTypeRef(): Unit =
     import rootMirror.EmptyPackageClass
     val (module, moduleClass) =
       EmptyPackageClass.newModuleAndClassSymbol(TermName("O"), NoPosition, 0L)
@@ -49,18 +48,14 @@ class TypesTest {
     val tp3 = ThisType(moduleClass)
     val tps = List(tp1, tp2, tp3)
     val results = mutable.Buffer[String]()
-    tps.permutations.foreach {
+    tps.permutations.foreach
       case ts @ List(a, b, c) =>
         def tsShownRaw = ts.map(t => showRaw(t)).mkString(", ")
         if (a <:< b && b <:< c && !(a <:< c))
           results += s"<:< intransitive: $tsShownRaw"
         if (a =:= b && b =:= c && !(a =:= c))
           results += s"=:= intransitive: $tsShownRaw"
-    }
-    results.toList match {
+    results.toList match
       case Nil => // okay
       case xs =>
         Assert.fail(xs.mkString("\n"))
-    }
-  }
-}

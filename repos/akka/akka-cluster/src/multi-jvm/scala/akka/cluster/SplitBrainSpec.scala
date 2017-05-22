@@ -16,7 +16,7 @@ import scala.collection.immutable
 import akka.remote.transport.ThrottlerTransportAdapter.Direction
 
 final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
   val third = role("third")
@@ -35,7 +35,6 @@ final case class SplitBrainMultiNodeConfig(failureDetectorPuppet: Boolean)
             MultiNodeClusterSpec.clusterConfig(failureDetectorPuppet)))
 
   testTransport(on = true)
-}
 
 class SplitBrainWithFailureDetectorPuppetMultiJvmNode1
     extends SplitBrainSpec(failureDetectorPuppet = true)
@@ -60,7 +59,7 @@ class SplitBrainWithAccrualFailureDetectorMultiJvmNode5
     extends SplitBrainSpec(failureDetectorPuppet = false)
 
 abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
-    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec {
+    extends MultiNodeSpec(multiNodeConfig) with MultiNodeClusterSpec
 
   def this(failureDetectorPuppet: Boolean) =
     this(SplitBrainMultiNodeConfig(failureDetectorPuppet))
@@ -72,41 +71,33 @@ abstract class SplitBrainSpec(multiNodeConfig: SplitBrainMultiNodeConfig)
   val side1 = Vector(first, second)
   val side2 = Vector(third, fourth, fifth)
 
-  "A cluster of 5 members" must {
+  "A cluster of 5 members" must
 
-    "reach initial convergence" taggedAs LongRunningTest in {
+    "reach initial convergence" taggedAs LongRunningTest in
       awaitClusterUp(first, second, third, fourth, fifth)
 
       enterBarrier("after-1")
-    }
 
     "detect network partition and mark nodes on other side as unreachable and form new cluster" taggedAs LongRunningTest in within(
-        30 seconds) {
+        30 seconds)
       enterBarrier("before-split")
 
-      runOn(first) {
+      runOn(first)
         // split the cluster in two parts (first, second) / (third, fourth, fifth)
-        for (role1 ← side1; role2 ← side2) {
+        for (role1 ← side1; role2 ← side2)
           testConductor.blackhole(role1, role2, Direction.Both).await
-        }
-      }
       enterBarrier("after-split")
 
-      runOn(side1: _*) {
+      runOn(side1: _*)
         for (role ← side2) markNodeAsUnavailable(role)
         // auto-down
         awaitMembersUp(side1.size, side2.toSet map address)
         assertLeader(side1: _*)
-      }
 
-      runOn(side2: _*) {
+      runOn(side2: _*)
         for (role ← side1) markNodeAsUnavailable(role)
         // auto-down
         awaitMembersUp(side2.size, side1.toSet map address)
         assertLeader(side2: _*)
-      }
 
       enterBarrier("after-2")
-    }
-  }
-}

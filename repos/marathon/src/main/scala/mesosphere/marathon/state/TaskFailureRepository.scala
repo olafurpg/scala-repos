@@ -10,7 +10,7 @@ import scala.concurrent.Future
 class TaskFailureRepository(protected val store: EntityStore[TaskFailure],
                             protected val maxVersions: Option[Int] = Some(1),
                             protected val metrics: Metrics)
-    extends EntityRepository[TaskFailure] {
+    extends EntityRepository[TaskFailure]
 
   def store(id: PathId, value: TaskFailure): Future[TaskFailure] =
     super.storeByName(id.safePath, value)
@@ -20,4 +20,3 @@ class TaskFailureRepository(protected val store: EntityStore[TaskFailure],
 
   def current(id: PathId): Future[Option[TaskFailure]] =
     super.currentVersion(id.safePath)
-}

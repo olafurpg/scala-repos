@@ -28,11 +28,11 @@ import joptsimple._
 import org.apache.kafka.clients.producer.{ProducerConfig, ProducerRecord}
 import org.apache.kafka.common.utils.Utils
 
-object ConsoleProducer {
+object ConsoleProducer
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
-    try {
+    try
       val config = new ProducerConfig(args)
       val reader = Class
         .forName(config.readerClass)
@@ -41,44 +41,39 @@ object ConsoleProducer {
       reader.init(System.in, getReaderProps(config))
 
       val producer =
-        if (config.useOldProducer) {
+        if (config.useOldProducer)
           new OldProducer(getOldProducerProps(config))
-        } else {
+        else
           new NewShinyProducer(getNewProducerProps(config))
-        }
 
       Runtime.getRuntime.addShutdownHook(
-          new Thread() {
-        override def run() {
+          new Thread()
+        override def run()
           producer.close()
-        }
-      })
+      )
 
       var message: ProducerRecord[Array[Byte], Array[Byte]] = null
-      do {
+      do
         message = reader.readMessage()
         if (message != null)
           producer.send(message.topic, message.key, message.value)
-      } while (message != null)
-    } catch {
+      while (message != null)
+    catch
       case e: joptsimple.OptionException =>
         System.err.println(e.getMessage)
         System.exit(1)
       case e: Exception =>
         e.printStackTrace
         System.exit(1)
-    }
     System.exit(0)
-  }
 
-  def getReaderProps(config: ProducerConfig): Properties = {
+  def getReaderProps(config: ProducerConfig): Properties =
     val props = new Properties
     props.put("topic", config.topic)
     props.putAll(config.cmdLineProps)
     props
-  }
 
-  def getOldProducerProps(config: ProducerConfig): Properties = {
+  def getOldProducerProps(config: ProducerConfig): Properties =
     val props = producerProps(config)
 
     props.put("metadata.broker.list", config.brokerList)
@@ -102,18 +97,16 @@ object ConsoleProducer {
     props.put("client.id", "console-producer")
 
     props
-  }
 
-  private def producerProps(config: ProducerConfig): Properties = {
+  private def producerProps(config: ProducerConfig): Properties =
     val props =
       if (config.options.has(config.producerConfigOpt))
         Utils.loadProps(config.options.valueOf(config.producerConfigOpt))
       else new Properties
     props.putAll(config.extraProducerProps)
     props
-  }
 
-  def getNewProducerProps(config: ProducerConfig): Properties = {
+  def getNewProducerProps(config: ProducerConfig): Properties =
     val props = producerProps(config)
 
     props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.brokerList)
@@ -141,9 +134,8 @@ object ConsoleProducer {
               "org.apache.kafka.common.serialization.ByteArraySerializer")
 
     props
-  }
 
-  class ProducerConfig(args: Array[String]) {
+  class ProducerConfig(args: Array[String])
     val parser = new OptionParser
     val topicOpt = parser
       .accepts("topic", "REQUIRED: The topic id to produce messages to.")
@@ -359,9 +351,8 @@ object ConsoleProducer {
     val maxPartitionMemoryBytes = options.valueOf(maxPartitionMemoryBytesOpt)
     val metadataExpiryMs = options.valueOf(metadataExpiryMsOpt)
     val maxBlockMs = options.valueOf(maxBlockMsOpt)
-  }
 
-  class LineMessageReader extends MessageReader {
+  class LineMessageReader extends MessageReader
     var topic: String = null
     var reader: BufferedReader = null
     var parseKey = false
@@ -369,7 +360,7 @@ object ConsoleProducer {
     var ignoreError = false
     var lineNumber = 0
 
-    override def init(inputStream: InputStream, props: Properties) {
+    override def init(inputStream: InputStream, props: Properties)
       topic = props.getProperty("topic")
       if (props.containsKey("parse.key"))
         parseKey = props
@@ -386,14 +377,13 @@ object ConsoleProducer {
           .toLowerCase
           .equals("true")
       reader = new BufferedReader(new InputStreamReader(inputStream))
-    }
 
-    override def readMessage() = {
+    override def readMessage() =
       lineNumber += 1
-      (reader.readLine(), parseKey) match {
+      (reader.readLine(), parseKey) match
         case (null, _) => null
         case (line, true) =>
-          line.indexOf(keySeparator) match {
+          line.indexOf(keySeparator) match
             case -1 =>
               if (ignoreError) new ProducerRecord(topic, line.getBytes)
               else
@@ -403,10 +393,5 @@ object ConsoleProducer {
               val value = (if (n + keySeparator.size > line.size) ""
                            else line.substring(n + keySeparator.size)).getBytes
               new ProducerRecord(topic, line.substring(0, n).getBytes, value)
-          }
         case (line, false) =>
           new ProducerRecord(topic, line.getBytes)
-      }
-    }
-  }
-}

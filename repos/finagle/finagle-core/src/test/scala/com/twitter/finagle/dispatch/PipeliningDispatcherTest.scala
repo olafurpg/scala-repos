@@ -11,8 +11,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class PipeliningDispatcherTest extends FunSuite with MockitoSugar {
-  test("PipeliningDispatcher: should treat interrupts properly") {
+class PipeliningDispatcherTest extends FunSuite with MockitoSugar
+  test("PipeliningDispatcher: should treat interrupts properly")
     val closeP = new Promise[Throwable]
     val trans = mock[Transport[Unit, Unit]]
     when(trans.write(())).thenReturn(Future.Done)
@@ -22,9 +22,8 @@ class PipeliningDispatcherTest extends FunSuite with MockitoSugar {
     val f = dispatch(())
     f.raise(new Exception())
     verify(trans, never()).close()
-  }
 
-  test("queue_size gauge") {
+  test("queue_size gauge")
     val stats = new InMemoryStatsReceiver()
 
     def assertGaugeSize(size: Int): Unit =
@@ -59,5 +58,3 @@ class PipeliningDispatcherTest extends FunSuite with MockitoSugar {
 
     p1.setValue("1")
     assertGaugeSize(0)
-  }
-}

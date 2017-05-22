@@ -10,10 +10,10 @@ package org.scalajs.core.ir
 
 import Trees._
 
-object Traversers {
+object Traversers
 
-  class Traverser {
-    def traverse(tree: Tree): Unit = tree match {
+  class Traverser
+    def traverse(tree: Tree): Unit = tree match
       // Definitions
 
       case VarDef(ident, vtpe, mutable, rhs) =>
@@ -175,9 +175,8 @@ object Traversers {
         items foreach traverse
 
       case JSObjectConstr(fields) =>
-        fields foreach { f =>
+        fields foreach  f =>
           traverse(f._2)
-        }
 
       // Atomic expressions
 
@@ -208,6 +207,3 @@ object Traversers {
           _: FieldDef | _: JSClassExportDef | _: ModuleExportDef | EmptyTree =>
       case _ =>
         sys.error(s"Invalid tree in traverse() of class ${tree.getClass}")
-    }
-  }
-}

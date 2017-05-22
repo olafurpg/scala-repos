@@ -3,8 +3,8 @@ case object NoNull extends ColumnOption
 case object PrimaryKey extends ColumnOption
 case object lower extends ColumnOption
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     val l = List(PrimaryKey, NoNull, lower)
 
     // withFilter must be generated in these
@@ -15,5 +15,3 @@ object Test {
     // no withFilter
     for (X <- List("A single ident is always a pattern")) println(X)
     for (`x` <- List("A single ident is always a pattern")) println(`x`)
-  }
-}

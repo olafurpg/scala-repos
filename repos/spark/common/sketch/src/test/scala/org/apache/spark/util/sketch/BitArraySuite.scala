@@ -21,32 +21,29 @@ import scala.util.Random
 
 import org.scalatest.FunSuite // scalastyle:ignore funsuite
 
-class BitArraySuite extends FunSuite {
+class BitArraySuite extends FunSuite
   // scalastyle:ignore funsuite
 
-  test("error case when create BitArray") {
+  test("error case when create BitArray")
     intercept[IllegalArgumentException](new BitArray(0))
     intercept[IllegalArgumentException](
         new BitArray(64L * Integer.MAX_VALUE + 1))
-  }
 
-  test("bitSize") {
+  test("bitSize")
     assert(new BitArray(64).bitSize() == 64)
     // BitArray is word-aligned, so 65~128 bits need 2 long to store, which is 128 bits.
     assert(new BitArray(65).bitSize() == 128)
     assert(new BitArray(127).bitSize() == 128)
     assert(new BitArray(128).bitSize() == 128)
-  }
 
-  test("set") {
+  test("set")
     val bitArray = new BitArray(64)
     assert(bitArray.set(1))
     // Only returns true if the bit changed.
     assert(!bitArray.set(1))
     assert(bitArray.set(2))
-  }
 
-  test("normal operation") {
+  test("normal operation")
     // use a fixed seed to make the test predictable.
     val r = new Random(37)
 
@@ -56,9 +53,8 @@ class BitArraySuite extends FunSuite {
     indexes.foreach(bitArray.set)
     indexes.foreach(i => assert(bitArray.get(i)))
     assert(bitArray.cardinality() == indexes.length)
-  }
 
-  test("merge") {
+  test("merge")
     // use a fixed seed to make the test predictable.
     val r = new Random(37)
 
@@ -75,5 +71,3 @@ class BitArraySuite extends FunSuite {
     indexes1.foreach(i => assert(bitArray1.get(i)))
     indexes2.foreach(i => assert(bitArray1.get(i)))
     assert(bitArray1.cardinality() == (indexes1 ++ indexes2).distinct.length)
-  }
-}

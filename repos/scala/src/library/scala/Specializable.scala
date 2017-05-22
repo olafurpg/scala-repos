@@ -13,7 +13,7 @@ package scala
   */
 trait Specializable
 
-object Specializable {
+object Specializable
   // No type parameter in @specialized annotation.
   trait SpecializedGroup {}
 
@@ -29,4 +29,3 @@ object Specializable {
   final val AllNumeric = new Group(
       (Byte, Short, Int, Long, Char, Float, Double))
   final val BestOfBreed = new Group((Int, Double, Boolean, Unit, AnyRef))
-}

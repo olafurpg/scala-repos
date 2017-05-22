@@ -15,7 +15,7 @@ import scala.util.{Failure, Success}
   * This is an Actor which implements the circuit breaker pattern,
   * you may also be interested in the raw circuit breaker [[akka.pattern.CircuitBreaker]]
   */
-object CircuitBreakerProxy {
+object CircuitBreakerProxy
 
   /**
     * Creates an circuit breaker actor proxying a target actor intended for request-reply interactions.
@@ -83,10 +83,10 @@ object CircuitBreakerProxy {
       callTimeout: Timeout,
       resetTimeout: Timeout,
       circuitEventListener: Option[ActorRef] = None,
-      failureDetector: Any ⇒ Boolean = { _ ⇒
+      failureDetector: Any ⇒ Boolean =  _ ⇒
         false
-      },
-      openCircuitFailureConverter: CircuitOpenFailure ⇒ Any = identity) {
+      ,
+      openCircuitFailureConverter: CircuitOpenFailure ⇒ Any = identity)
 
     def withMaxFailures(value: Int) = copy(maxFailures = value)
     def withCallTimeout(value: Timeout) = copy(callTimeout = value)
@@ -111,14 +111,11 @@ object CircuitBreakerProxy {
                                 circuitEventListener,
                                 failureDetector,
                                 openCircuitFailureConverter)
-  }
 
-  private[CircuitBreakerProxy] object CircuitBreakerInternalEvents {
+  private[CircuitBreakerProxy] object CircuitBreakerInternalEvents
     sealed trait CircuitBreakerInternalEvent
     case object CallFailed extends CircuitBreakerInternalEvent
     case object CallSucceeded extends CircuitBreakerInternalEvent
-  }
-}
 
 import akka.contrib.circuitbreaker.CircuitBreakerProxy._
 
@@ -130,7 +127,7 @@ final class CircuitBreakerProxy(target: ActorRef,
                                 failureDetector: Any ⇒ Boolean,
                                 failureMap: CircuitOpenFailure ⇒ Any)
     extends Actor with ActorLogging
-    with FSM[CircuitBreakerState, CircuitBreakerStateData] {
+    with FSM[CircuitBreakerState, CircuitBreakerStateData]
 
   import CircuitBreakerInternalEvents._
 
@@ -138,39 +135,35 @@ final class CircuitBreakerProxy(target: ActorRef,
 
   startWith(Closed, CircuitBreakerStateData(failureCount = 0))
 
-  def callSucceededHandling: StateFunction = {
+  def callSucceededHandling: StateFunction =
     case Event(CallSucceeded, state) ⇒
       log.debug(
           "Received call succeeded notification in state {} resetting counter",
           state)
       goto(Closed) using CircuitBreakerStateData(
           failureCount = 0, firstHalfOpenMessageSent = false)
-  }
 
-  def passthroughHandling: StateFunction = {
+  def passthroughHandling: StateFunction =
     case Event(Passthrough(message), state) ⇒
       log.debug(
           "Received a passthrough message in state {}, forwarding the message to the target actor without altering current state",
           state)
       target ! message
       stay
-  }
 
-  def targetTerminationHandling: StateFunction = {
+  def targetTerminationHandling: StateFunction =
     case Event(Terminated(`target`), state) ⇒
       log.debug(
           "Target actor {} terminated while in state {}, terminating this proxy too",
           target,
           state)
       stop
-  }
 
-  def commonStateHandling: StateFunction = {
+  def commonStateHandling: StateFunction =
     callSucceededHandling orElse passthroughHandling orElse targetTerminationHandling
-  }
 
-  when(Closed) {
-    commonStateHandling orElse {
+  when(Closed)
+    commonStateHandling orElse
       case Event(TellOnly(message), _) ⇒
         log.debug("Closed: Sending message {} without expecting any response",
                   message)
@@ -182,11 +175,10 @@ final class CircuitBreakerProxy(target: ActorRef,
             "Received call failed notification in state {} incrementing counter",
             state)
         val newState = state.copy(failureCount = state.failureCount + 1)
-        if (newState.failureCount < maxFailures) {
+        if (newState.failureCount < maxFailures)
           stay using newState
-        } else {
+        else
           goto(Open) using newState
-        }
 
       case Event(message, state) ⇒
         log.debug(
@@ -196,11 +188,9 @@ final class CircuitBreakerProxy(target: ActorRef,
         val currentSender = sender()
         forwardRequest(message, sender, state, log)
         stay
-    }
-  }
 
-  when(Open, stateTimeout = resetTimeout.duration) {
-    commonStateHandling orElse {
+  when(Open, stateTimeout = resetTimeout.duration)
+    commonStateHandling orElse
       case Event(StateTimeout, state) ⇒
         log.debug("Timeout expired for state OPEN, going to half open")
         goto(HalfOpen) using state.copy(firstHalfOpenMessageSent = false)
@@ -225,11 +215,9 @@ final class CircuitBreakerProxy(target: ActorRef,
             sender)
         sender ! failureNotification
         stay
-    }
-  }
 
-  when(HalfOpen) {
-    commonStateHandling orElse {
+  when(HalfOpen)
+    commonStateHandling orElse
       case Event(TellOnly(message), _) ⇒
         log.debug("HalfOpen: Dropping TellOnly request for message {}",
                   message)
@@ -262,16 +250,14 @@ final class CircuitBreakerProxy(target: ActorRef,
             sender)
         sender ! failureNotification
         stay
-    }
-  }
 
   def forwardRequest(message: Any,
                      currentSender: ActorRef,
                      state: CircuitBreakerStateData,
-                     log: LoggingAdapter) = {
+                     log: LoggingAdapter) =
     import context.dispatcher
 
-    target.ask(message)(callTimeout).onComplete {
+    target.ask(message)(callTimeout).onComplete
       case Success(response) ⇒
         log.debug(
             "Request '{}' has been replied to with response {}, forwarding to original sender {}",
@@ -282,14 +268,14 @@ final class CircuitBreakerProxy(target: ActorRef,
 
         val isFailure = failureDetector(response)
 
-        if (isFailure) {
+        if (isFailure)
           log.debug(
               "Response '{}' is considered as failure sending self-message to ask incrementing failure count (origin state was {})",
               response,
               state)
 
           self ! CallFailed
-        } else {
+        else
 
           log.debug(
               "Request '{}' succeeded with response {}, returning response to sender {} and sending message to ask to reset failure count (origin state was {})",
@@ -299,7 +285,6 @@ final class CircuitBreakerProxy(target: ActorRef,
               state)
 
           self ! CallSucceeded
-        }
 
       case Failure(reason) ⇒
         log.debug(
@@ -310,10 +295,8 @@ final class CircuitBreakerProxy(target: ActorRef,
             state)
 
         self ! CallFailed
-    }
-  }
 
-  onTransition {
+  onTransition
     case from -> Closed ⇒
       log.debug("Moving from state {} to state CLOSED", from)
       circuitEventListener foreach { _ ! CircuitClosed(self) }
@@ -325,5 +308,3 @@ final class CircuitBreakerProxy(target: ActorRef,
     case from -> Open ⇒
       log.debug("Moving from state {} to state OPEN", from)
       circuitEventListener foreach { _ ! CircuitOpen(self) }
-  }
-}

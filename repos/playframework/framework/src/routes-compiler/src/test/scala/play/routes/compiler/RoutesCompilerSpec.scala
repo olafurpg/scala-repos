@@ -9,30 +9,27 @@ import org.specs2.mutable.Specification
 import org.specs2.matcher.FileMatchers
 import play.routes.compiler.RoutesCompiler.RoutesCompilerTask
 
-object RoutesCompilerSpec extends Specification with FileMatchers {
+object RoutesCompilerSpec extends Specification with FileMatchers
 
   sequential
 
-  "route file compiler" should {
+  "route file compiler" should
 
-    def withTempDir[T](block: File => T) = {
+    def withTempDir[T](block: File => T) =
       val tmp = File.createTempFile("RoutesCompilerSpec", "")
       tmp.delete()
       tmp.mkdir()
-      try {
+      try
         block(tmp)
-      } finally {
-        def rm(file: File): Unit = file match {
+      finally
+        def rm(file: File): Unit = file match
           case dir if dir.isDirectory =>
             dir.listFiles().foreach(rm)
             dir.delete()
           case f => f.delete()
-        }
         rm(tmp)
-      }
-    }
 
-    "generate routes classes for route definitions that pass the checks" in withTempDir {
+    "generate routes classes for route definitions that pass the checks" in withTempDir
       tmp =>
         val file = new File(this.getClass.getClassLoader
               .getResource("generating.routes")
@@ -47,9 +44,8 @@ object RoutesCompilerSpec extends Specification with FileMatchers {
         new File(tmp, "controllers/ReverseRoutes.scala") must exist
         new File(tmp, "controllers/javascript/JavaScriptReverseRoutes.scala") must exist
         new File(tmp, "controllers/routes.java") must exist
-    }
 
-    "check if there are no routes using overloaded handler methods" in withTempDir {
+    "check if there are no routes using overloaded handler methods" in withTempDir
       tmp =>
         val file = new File(this.getClass.getClassLoader
               .getResource("duplicateHandlers.routes")
@@ -58,9 +54,8 @@ object RoutesCompilerSpec extends Specification with FileMatchers {
             RoutesCompilerTask(file, Seq.empty, true, true, false),
             StaticRoutesGenerator,
             tmp) must beLeft
-    }
 
-    "check if routes with type projection are compiled" in withTempDir { tmp =>
+    "check if routes with type projection are compiled" in withTempDir  tmp =>
       val file = new File(this.getClass.getClassLoader
             .getResource("complexTypes.routes")
             .toURI)
@@ -68,9 +63,8 @@ object RoutesCompilerSpec extends Specification with FileMatchers {
           RoutesCompilerTask(file, Seq.empty, true, true, false),
           StaticRoutesGenerator,
           tmp) must beRight
-    }
 
-    "check if routes with complex names are compiled" in withTempDir { tmp =>
+    "check if routes with complex names are compiled" in withTempDir  tmp =>
       val file = new File(this.getClass.getClassLoader
             .getResource("complexNames.routes")
             .toURI)
@@ -78,6 +72,3 @@ object RoutesCompilerSpec extends Specification with FileMatchers {
           RoutesCompilerTask(file, Seq.empty, true, true, false),
           StaticRoutesGenerator,
           tmp) must beRight
-    }
-  }
-}

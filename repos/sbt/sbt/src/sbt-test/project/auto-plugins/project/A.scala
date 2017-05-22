@@ -4,11 +4,10 @@
 import sbt._
 import sbt.Keys._
 
-object TopLevelImports {
+object TopLevelImports
   lazy val topLevelDemo = settingKey[String]("A top level demo setting.")
-}
 
-object TopA extends AutoPlugin {
+object TopA extends AutoPlugin
 
   import TopLevelImports._
   import sbttest.Imports._
@@ -23,9 +22,8 @@ object TopA extends AutoPlugin {
       topLevelDemo := s"TopA: topLevelDemo project ${name.value}",
       demo := s"TopA: demo project ${name.value}"
   )
-}
 
-object TopB extends AutoPlugin {
+object TopB extends AutoPlugin
 
   import TopLevelImports._
 
@@ -34,12 +32,9 @@ object TopB extends AutoPlugin {
   override def projectSettings: Seq[Setting[_]] = Seq(
       topLevelDemo := s"TopB: topLevelDemo project ${name.value}"
   )
-}
 
-object TopC extends AutoPlugin {
+object TopC extends AutoPlugin
 
-  object autoImport {
+  object autoImport
     lazy val topLevelKeyTest =
       settingKey[String]("A top level setting declared in a plugin.")
-  }
-}

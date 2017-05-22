@@ -26,8 +26,8 @@ import org.apache.spark.mllib.tree.model.GradientBoostedTreesModel
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object GradientBoostingClassificationExample {
-  def main(args: Array[String]): Unit = {
+object GradientBoostingClassificationExample
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("GradientBoostedTreesClassificationExample")
     val sc = new SparkContext(conf)
@@ -50,10 +50,9 @@ object GradientBoostingClassificationExample {
     val model = GradientBoostedTrees.train(trainingData, boostingStrategy)
 
     // Evaluate model on test instances and compute test error
-    val labelAndPreds = testData.map { point =>
+    val labelAndPreds = testData.map  point =>
       val prediction = model.predict(point.features)
       (point.label, prediction)
-    }
     val testErr =
       labelAndPreds.filter(r => r._1 != r._2).count.toDouble / testData.count()
     println("Test Error = " + testErr)
@@ -64,6 +63,4 @@ object GradientBoostingClassificationExample {
     val sameModel = GradientBoostedTreesModel.load(
         sc, "target/tmp/myGradientBoostingClassificationModel")
     // $example off$
-  }
-}
 // scalastyle:on println

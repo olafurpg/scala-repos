@@ -47,7 +47,7 @@ import scala.language.higherKinds
   *  @author Aleksandar Prokopec
   *  @since 2.9
   */
-trait GenTraversableOnce[+A] extends Any {
+trait GenTraversableOnce[+A] extends Any
 
   /** Applies a function `f` to all elements of this $coll.
     *
@@ -658,4 +658,3 @@ trait GenTraversableOnce[+A] extends Any {
     */
   def to[Col[_]](
       implicit cbf: CanBuildFrom[Nothing, A, Col[A @uV]]): Col[A @uV]
-}

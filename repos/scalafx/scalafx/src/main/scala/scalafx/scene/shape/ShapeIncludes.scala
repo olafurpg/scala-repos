@@ -73,7 +73,7 @@ object ShapeIncludes extends ShapeIncludes
   * @define SVP SVGPath
   * @define VLT VLineTo
   */
-trait ShapeIncludes {
+trait ShapeIncludes
 
   /**
     * $START$ARC.html $ARC$END
@@ -359,4 +359,3 @@ trait ShapeIncludes {
     */
   implicit def jfxVLineTo2sfx(v: jfxss.VLineTo): VLineTo =
     if (v != null) new VLineTo(v) else null
-}

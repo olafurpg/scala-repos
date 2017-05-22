@@ -16,7 +16,7 @@ package akka.persistence.query
   * One of the implementations can delegate to the other.
   *
   */
-trait ReadJournalProvider {
+trait ReadJournalProvider
 
   /**
     * The `ReadJournal` implementation for the Scala API.
@@ -29,4 +29,3 @@ trait ReadJournalProvider {
     * This corresponds to the instance that is returned by [[PersistenceQuery#getReadJournalFor]].
     */
   def javadslReadJournal(): javadsl.ReadJournal
-}

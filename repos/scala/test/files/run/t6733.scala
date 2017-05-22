@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-trait Foo {
+trait Foo
   private[this] val pri1a = 0
   // private[this] val pri1b: Int
   private[this] def pri2a = 1
@@ -28,10 +28,8 @@ trait Foo {
   protected[this] class Pro6
   protected[this] trait Pro7
   protected[this] object Pro8
-}
 
-object Test extends App {
+object Test extends App
   typeOf[Foo].decls.sorted.foreach(m =>
         println(
             s"$m: isPrivateThis = ${m.isPrivateThis}, isProtectedThis = ${m.isProtectedThis}"))
-}

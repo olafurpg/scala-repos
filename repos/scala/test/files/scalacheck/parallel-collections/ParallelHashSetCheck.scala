@@ -12,7 +12,7 @@ import scala.collection._
 import scala.collection.parallel.ops._
 
 abstract class ParallelHashSetCheck[T](tp: String)
-    extends ParallelSetCheck[T]("mutable.ParHashSet[" + tp + "]") {
+    extends ParallelSetCheck[T]("mutable.ParHashSet[" + tp + "]")
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -24,36 +24,31 @@ abstract class ParallelHashSetCheck[T](tp: String)
 
   def tasksupport: TaskSupport
 
-  def ofSize(vals: Seq[Gen[T]], sz: Int) = {
+  def ofSize(vals: Seq[Gen[T]], sz: Int) =
     val hm = new mutable.HashSet[T]
     val gen = vals(rnd.nextInt(vals.size))
     for (i <- 0 until sz) hm += sample(gen)
     hm
-  }
 
-  def fromTraversable(t: Traversable[T]) = {
+  def fromTraversable(t: Traversable[T]) =
     val phs = new ParHashSet[T]
     phs.tasksupport = tasksupport
     var i = 0
-    for (kv <- t.toList) {
+    for (kv <- t.toList)
       phs += kv
       i += 1
-    }
     phs
-  }
-}
 
 class IntParallelHashSetCheck(val tasksupport: TaskSupport)
-    extends ParallelHashSetCheck[Int]("Int") with IntOperators with IntValues {
-  override def printDataStructureDebugInfo(ds: AnyRef) = ds match {
+    extends ParallelHashSetCheck[Int]("Int") with IntOperators with IntValues
+  override def printDataStructureDebugInfo(ds: AnyRef) = ds match
     case pm: ParHashSet[t] =>
       println("Mutable parallel hash set")
     case _ =>
       println("could not match data structure type: " + ds.getClass)
-  }
 
   override def checkDataStructureInvariants(
-      orig: Traversable[Int], ds: AnyRef) = ds match {
+      orig: Traversable[Int], ds: AnyRef) = ds match
     // case pm: ParHashSet[t] if 1 == 0 =>
     //   // for an example of how not to write code proceed below
     //   val invs = pm.brokenInvariants
@@ -76,5 +71,3 @@ class IntParallelHashSetCheck(val tasksupport: TaskSupport)
     //     false
     //   }
     case _ => true
-  }
-}

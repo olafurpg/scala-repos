@@ -9,7 +9,7 @@ import scala.collection.immutable.Seq
 case class FetchUri(uri: String,
                     extract: Boolean = true,
                     executable: Boolean = false,
-                    cache: Boolean = false) {
+                    cache: Boolean = false)
 
   def toProto(): mesos.CommandInfo.URI =
     mesos.CommandInfo.URI
@@ -19,9 +19,8 @@ case class FetchUri(uri: String,
       .setExtract(extract)
       .setCache(cache)
       .build()
-}
 
-object FetchUri {
+object FetchUri
 
   val empty: Seq[FetchUri] = Seq.empty
 
@@ -33,9 +32,7 @@ object FetchUri {
         cache = uri.getCache
     )
 
-  def isExtract(uri: String): Boolean = {
+  def isExtract(uri: String): Boolean =
     uri.endsWith(".tgz") || uri.endsWith(".tar.gz") || uri.endsWith(".tbz2") ||
     uri.endsWith(".tar.bz2") || uri.endsWith(".txz") ||
     uri.endsWith(".tar.xz") || uri.endsWith(".zip")
-  }
-}

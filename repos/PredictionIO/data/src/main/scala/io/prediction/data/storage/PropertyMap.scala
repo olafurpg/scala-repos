@@ -35,7 +35,7 @@ class PropertyMap(
     val firstUpdated: DateTime,
     val lastUpdated: DateTime
 )
-    extends DataMap(fields) {
+    extends DataMap(fields)
 
   override def toString: String =
     s"PropertyMap(${fields}, ${firstUpdated}, ${lastUpdated})"
@@ -44,24 +44,20 @@ class PropertyMap(
     41 * (41 * (41 + fields.hashCode) + firstUpdated.hashCode) +
     lastUpdated.hashCode
 
-  override def equals(other: Any): Boolean = other match {
-    case that: PropertyMap => {
+  override def equals(other: Any): Boolean = other match
+    case that: PropertyMap =>
         (that.canEqual(this)) && (super.equals(that)) &&
         (this.firstUpdated.equals(that.firstUpdated)) &&
         (this.lastUpdated.equals(that.lastUpdated))
-      }
-    case that: DataMap => {
+    case that: DataMap =>
         // for testing purpose
         super.equals(that)
-      }
     case _ => false
-  }
 
   override def canEqual(other: Any): Boolean = other.isInstanceOf[PropertyMap]
-}
 
 /** Companion object of the [[PropertyMap]] class. */
-object PropertyMap {
+object PropertyMap
 
   /** Create an PropertyMap from a Map of String to JValue,
     * firstUpdated and lastUpdated time.
@@ -90,4 +86,3 @@ object PropertyMap {
         firstUpdated = firstUpdated,
         lastUpdated = lastUpdated
     )
-}

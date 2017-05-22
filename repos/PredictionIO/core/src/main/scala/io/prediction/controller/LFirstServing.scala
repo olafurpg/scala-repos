@@ -21,21 +21,19 @@ import io.prediction.core.BaseAlgorithm
   *
   * @group Serving
   */
-class LFirstServing[Q, P] extends LServing[Q, P] {
+class LFirstServing[Q, P] extends LServing[Q, P]
 
   /** Returns the first algorithm's prediction. */
   def serve(query: Q, predictions: Seq[P]): P = predictions.head
-}
 
 /** A concrete implementation of [[LServing]] returning the first algorithm's
   * prediction result directly without any modification.
   *
   * @group Serving
   */
-object LFirstServing {
+object LFirstServing
 
   /** Returns an instance of [[LFirstServing]]. */
   def apply[Q, P](
       a: Class[_ <: BaseAlgorithm[_, _, Q, P]]): Class[LFirstServing[Q, P]] =
     classOf[LFirstServing[Q, P]]
-}

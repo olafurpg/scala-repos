@@ -5,7 +5,7 @@ import Def._
 /**
   * This trait injected to `Def` object to provide `sequential` functions for tasks.
   */
-trait TaskSequential {
+trait TaskSequential
   def sequential[B](last: Initialize[Task[B]]): Initialize[Task[B]] =
     sequential(Nil, last)
   def sequential[A0, B](task0: Initialize[Task[A0]],
@@ -689,20 +689,16 @@ trait TaskSequential {
 
   def sequential[B](tasks: Seq[Initialize[Task[Unit]]],
                     last: Initialize[Task[B]]): Initialize[Task[B]] =
-    tasks.toList match {
+    tasks.toList match
       case Nil => Def.task { last.value }
       case x :: xs =>
-        Def.taskDyn {
+        Def.taskDyn
           val _ = x.value
           sequential(xs, last)
-        }
-    }
   private def unitTask[A](task: Initialize[Task[A]]): Initialize[Task[Unit]] =
-    Def.task {
+    Def.task
       task.value
       ()
-    }
-}
 
 // for {
 //   i <- 0 to 21

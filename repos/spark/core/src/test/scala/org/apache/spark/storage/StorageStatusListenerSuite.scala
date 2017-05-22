@@ -24,7 +24,7 @@ import org.apache.spark.scheduler._
 /**
   * Test the behavior of StorageStatusListener in response to all relevant events.
   */
-class StorageStatusListenerSuite extends SparkFunSuite {
+class StorageStatusListenerSuite extends SparkFunSuite
   private val bm1 = BlockManagerId("big", "dog", 1)
   private val bm2 = BlockManagerId("fat", "duck", 2)
   private val taskInfo1 = new TaskInfo(
@@ -33,7 +33,7 @@ class StorageStatusListenerSuite extends SparkFunSuite {
       0, 0, 0, 0, "fat", "duck", TaskLocality.ANY, false)
   private val conf = new SparkConf()
 
-  test("block manager added/removed") {
+  test("block manager added/removed")
     conf.set("spark.ui.retainedDeadExecutors", "1")
     val listener = new StorageStatusListener(conf)
 
@@ -77,9 +77,8 @@ class StorageStatusListenerSuite extends SparkFunSuite {
           .blockManagerId
           .executorId
           .equals("fat"))
-  }
 
-  test("task end without updated blocks") {
+  test("task end without updated blocks")
     val listener = new StorageStatusListener(conf)
     listener.onBlockManagerAdded(
         SparkListenerBlockManagerAdded(1L, bm1, 1000L))
@@ -98,9 +97,8 @@ class StorageStatusListenerSuite extends SparkFunSuite {
             1, 0, "obliteration", Success, taskInfo2, taskMetrics))
     assert(listener.executorIdToStorageStatus("big").numBlocks === 0)
     assert(listener.executorIdToStorageStatus("fat").numBlocks === 0)
-  }
 
-  test("task end with updated blocks") {
+  test("task end with updated blocks")
     val listener = new StorageStatusListener(conf)
     listener.onBlockManagerAdded(
         SparkListenerBlockManagerAdded(1L, bm1, 1000L))
@@ -179,9 +177,8 @@ class StorageStatusListenerSuite extends SparkFunSuite {
           .executorIdToStorageStatus("big")
           .containsBlock(RDDBlockId(1, 2)))
     assert(listener.executorIdToStorageStatus("fat").numBlocks === 0)
-  }
 
-  test("unpersist RDD") {
+  test("unpersist RDD")
     val listener = new StorageStatusListener(conf)
     listener.onBlockManagerAdded(
         SparkListenerBlockManagerAdded(1L, bm1, 1000L))
@@ -214,5 +211,3 @@ class StorageStatusListenerSuite extends SparkFunSuite {
           .containsBlock(RDDBlockId(1, 2)))
     listener.onUnpersistRDD(SparkListenerUnpersistRDD(1))
     assert(listener.executorIdToStorageStatus("big").numBlocks === 0)
-  }
-}

@@ -34,7 +34,7 @@ import scalaz.syntax.monad._
 import Permission._
 
 class StaticAPIKeyFinder[M[+ _]](apiKey: APIKey)(implicit val M: Monad[M])
-    extends APIKeyFinder[M] with Logging { self =>
+    extends APIKeyFinder[M] with Logging  self =>
   private val permissions = Set[Permission](
       ReadPermission(Path("/"), WrittenByAny),
       WritePermission(Path("/"), WriteAs.any),
@@ -63,17 +63,14 @@ class StaticAPIKeyFinder[M[+ _]](apiKey: APIKey)(implicit val M: Monad[M])
 
   def createAPIKey(accountId: AccountId,
                    keyName: Option[String] = None,
-                   keyDesc: Option[String] = None): M[v1.APIKeyDetails] = {
+                   keyDesc: Option[String] = None): M[v1.APIKeyDetails] =
     throw new UnsupportedOperationException(
         "API key management unavailable for standalone system.")
-  }
 
-  def addGrant(accountKey: APIKey, grantId: GrantId): M[Boolean] = {
+  def addGrant(accountKey: APIKey, grantId: GrantId): M[Boolean] =
     throw new UnsupportedOperationException(
         "Grant management unavailable for standalone system.")
-  }
 
   def hasCapability(apiKey: APIKey,
                     perms: Set[Permission],
                     at: Option[DateTime]): M[Boolean] = M.point(true)
-}

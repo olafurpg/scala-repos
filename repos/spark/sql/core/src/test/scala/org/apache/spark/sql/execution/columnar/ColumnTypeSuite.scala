@@ -28,14 +28,14 @@ import org.apache.spark.sql.catalyst.expressions.{GenericMutableRow, UnsafeProje
 import org.apache.spark.sql.execution.columnar.ColumnarTestUtils._
 import org.apache.spark.sql.types._
 
-class ColumnTypeSuite extends SparkFunSuite with Logging {
+class ColumnTypeSuite extends SparkFunSuite with Logging
   private val DEFAULT_BUFFER_SIZE = 512
   private val MAP_TYPE = MAP(MapType(IntegerType, StringType))
   private val ARRAY_TYPE = ARRAY(ArrayType(IntegerType))
   private val STRUCT_TYPE = STRUCT(
       StructType(StructField("a", StringType) :: Nil))
 
-  test("defaultSize") {
+  test("defaultSize")
     val checks = Map(NULL -> 0,
                      BOOLEAN -> 1,
                      BYTE -> 1,
@@ -52,26 +52,21 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
                      ARRAY_TYPE -> 16,
                      MAP_TYPE -> 32)
 
-    checks.foreach {
+    checks.foreach
       case (columnType, expectedSize) =>
-        assertResult(expectedSize, s"Wrong defaultSize for $columnType") {
+        assertResult(expectedSize, s"Wrong defaultSize for $columnType")
           columnType.defaultSize
-        }
-    }
-  }
 
-  test("actualSize") {
+  test("actualSize")
     def checkActualSize(
-        columnType: ColumnType[_], value: Any, expected: Int): Unit = {
+        columnType: ColumnType[_], value: Any, expected: Int): Unit =
 
-      assertResult(expected, s"Wrong actualSize for $columnType") {
+      assertResult(expected, s"Wrong actualSize for $columnType")
         val row = new GenericMutableRow(1)
         row.update(0, CatalystTypeConverters.convertToCatalyst(value))
         val proj =
           UnsafeProjection.create(Array[DataType](columnType.dataType))
         columnType.actualSize(proj(row), 0)
-      }
-    }
 
     checkActualSize(NULL, null, 0)
     checkActualSize(BOOLEAN, true, 1)
@@ -89,7 +84,6 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
     checkActualSize(ARRAY_TYPE, Array[Any](1), 16)
     checkActualSize(MAP_TYPE, Map(1 -> "a"), 29)
     checkActualSize(STRUCT_TYPE, Row("hello"), 28)
-  }
 
   testNativeColumnType(BOOLEAN)
   testNativeColumnType(BYTE)
@@ -109,11 +103,10 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
   testColumnType(MAP_TYPE)
 
   def testNativeColumnType[T <: AtomicType](
-      columnType: NativeColumnType[T]): Unit = {
+      columnType: NativeColumnType[T]): Unit =
     testColumnType[T#InternalType](columnType)
-  }
 
-  def testColumnType[JvmType](columnType: ColumnType[JvmType]): Unit = {
+  def testColumnType[JvmType](columnType: ColumnType[JvmType]): Unit =
 
     val buffer =
       ByteBuffer.allocate(DEFAULT_BUFFER_SIZE).order(ByteOrder.nativeOrder())
@@ -122,12 +115,12 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
       CatalystTypeConverters.createToScalaConverter(columnType.dataType)
     val seq = (0 until 4).map(_ => proj(makeRandomRow(columnType)).copy())
 
-    test(s"$columnType append/extract") {
+    test(s"$columnType append/extract")
       buffer.rewind()
       seq.foreach(columnType.append(_, 0, buffer))
 
       buffer.rewind()
-      seq.foreach { row =>
+      seq.foreach  row =>
         logInfo("buffer = " + buffer + ", expected = " + row)
         val expected = converter(row.get(0, columnType.dataType))
         val extracted = converter(columnType.extract(buffer))
@@ -135,29 +128,19 @@ class ColumnTypeSuite extends SparkFunSuite with Logging {
             expected === extracted,
             s"Extracted value didn't equal to the original one. $expected != $extracted, buffer =" +
             dumpBuffer(buffer.duplicate().rewind().asInstanceOf[ByteBuffer]))
-      }
-    }
-  }
 
-  private def dumpBuffer(buff: ByteBuffer): Any = {
+  private def dumpBuffer(buff: ByteBuffer): Any =
     val sb = new StringBuilder()
-    while (buff.hasRemaining) {
+    while (buff.hasRemaining)
       val b = buff.get()
       sb.append(Integer.toHexString(b & 0xff)).append(' ')
-    }
     if (sb.nonEmpty) sb.setLength(sb.length - 1)
     sb.toString()
-  }
 
-  test("column type for decimal types with different precision") {
-    (1 to 18).foreach { i =>
-      assertResult(COMPACT_DECIMAL(i, 0)) {
+  test("column type for decimal types with different precision")
+    (1 to 18).foreach  i =>
+      assertResult(COMPACT_DECIMAL(i, 0))
         ColumnType(DecimalType(i, 0))
-      }
-    }
 
-    assertResult(LARGE_DECIMAL(19, 0)) {
+    assertResult(LARGE_DECIMAL(19, 0))
       ColumnType(DecimalType(19, 0))
-    }
-  }
-}

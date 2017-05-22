@@ -5,9 +5,9 @@ import org.scalatest.FunSuite
 
 object TopLevelObject
 
-class SingletonGeneratorTest extends FunSuite {
+class SingletonGeneratorTest extends FunSuite
 
-  test("topLevelObject") {
+  test("topLevelObject")
 
     import scala.pickling.Defaults.{refUnpickler}
     import scala.pickling.json._
@@ -17,5 +17,3 @@ class SingletonGeneratorTest extends FunSuite {
     val y: TopLevelObject.type =
       scala.pickling.functions.unpickle[TopLevelObject.type](pickle)
     assert(x == y)
-  }
-}

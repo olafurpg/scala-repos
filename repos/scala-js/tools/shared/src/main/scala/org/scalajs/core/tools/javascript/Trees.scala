@@ -14,24 +14,21 @@ import org.scalajs.core.ir
 import ir.Position
 import ir.Position.NoPosition
 
-object Trees {
+object Trees
   import ir.Trees.requireValidIdent
 
   /** AST node of JavaScript. */
-  abstract sealed class Tree {
+  abstract sealed class Tree
     val pos: Position
 
-    def show: String = {
+    def show: String =
       val writer = new java.io.StringWriter
       val printer = new Printers.JSTreePrinter(writer)
       printer.printTree(this, isStat = true)
       writer.toString()
-    }
-  }
 
-  case object EmptyTree extends Tree {
+  case object EmptyTree extends Tree
     val pos = NoPosition
-  }
 
   // Comments
 
@@ -39,35 +36,30 @@ object Trees {
 
   // Identifiers and properties
 
-  sealed trait PropertyName {
+  sealed trait PropertyName
     def name: String
     def pos: Position
-  }
 
   case class Ident(name: String, originalName: Option[String])(
       implicit val pos: Position)
-      extends PropertyName {
+      extends PropertyName
     requireValidIdent(name)
-  }
 
-  object Ident {
+  object Ident
     def apply(name: String)(implicit pos: Position): Ident =
       new Ident(name, Some(name))
-  }
 
   // Definitions
 
-  sealed trait LocalDef extends Tree {
+  sealed trait LocalDef extends Tree
     def name: Ident
     def mutable: Boolean
 
     def ref(implicit pos: Position): Tree = VarRef(name)
-  }
 
   case class VarDef(name: Ident, rhs: Tree)(implicit val pos: Position)
-      extends LocalDef {
+      extends LocalDef
     def mutable: Boolean = true
-  }
 
   /** ES6 let or const (depending on the mutable flag). */
   case class Let(name: Ident, mutable: Boolean, rhs: Tree)(
@@ -75,51 +67,44 @@ object Trees {
       extends LocalDef
 
   case class ParamDef(name: Ident, rest: Boolean)(implicit val pos: Position)
-      extends LocalDef {
+      extends LocalDef
     def mutable: Boolean = true
-  }
 
   // Control flow constructs
 
   case class Skip()(implicit val pos: Position) extends Tree
 
   class Block private (val stats: List[Tree])(implicit val pos: Position)
-      extends Tree {
+      extends Tree
     override def toString(): String =
       stats.mkString("Block(", ",", ")")
-  }
 
-  object Block {
-    def apply(stats: List[Tree])(implicit pos: Position): Tree = {
+  object Block
+    def apply(stats: List[Tree])(implicit pos: Position): Tree =
       val flattenedStats =
-        stats flatMap {
+        stats flatMap
           case Skip() => Nil
           case Block(subStats) => subStats
           case other => other :: Nil
-        }
-      flattenedStats match {
+      flattenedStats match
         case Nil => Skip()
         case only :: Nil => only
         case _ => new Block(flattenedStats)
-      }
-    }
 
     def apply(stats: Tree*)(implicit pos: Position): Tree =
       apply(stats.toList)
 
     def unapply(block: Block): Some[List[Tree]] = Some(block.stats)
-  }
 
   case class Labeled(label: Ident, body: Tree)(implicit val pos: Position)
       extends Tree
 
   case class Assign(lhs: Tree, rhs: Tree)(implicit val pos: Position)
-      extends Tree {
-    require(lhs match {
+      extends Tree
+    require(lhs match
       case _: VarRef | _: DotSelect | _: BracketSelect => true
       case _ => false
-    }, s"Invalid lhs for Assign: $lhs")
-  }
+    , s"Invalid lhs for Assign: $lhs")
 
   case class Return(expr: Tree)(implicit val pos: Position) extends Tree
 
@@ -182,12 +167,11 @@ object Trees {
     */
   case class Spread(items: Tree)(implicit val pos: Position) extends Tree
 
-  case class Delete(prop: Tree)(implicit val pos: Position) extends Tree {
-    require(prop match {
+  case class Delete(prop: Tree)(implicit val pos: Position) extends Tree
+    require(prop match
       case _: DotSelect | _: BracketSelect => true
       case _ => false
-    }, s"Invalid prop for Delete: $prop")
-  }
+    , s"Invalid prop for Delete: $prop")
 
   /** Unary operation (always preserves pureness).
     *
@@ -197,11 +181,10 @@ object Trees {
   case class UnaryOp(op: UnaryOp.Code, lhs: Tree)(implicit val pos: Position)
       extends Tree
 
-  object UnaryOp {
+  object UnaryOp
 
     /** Codes are the same as in the IR. */
     type Code = ir.Trees.JSUnaryOp.Code
-  }
 
   /** Binary operation (always preserves pureness).
     *
@@ -212,11 +195,10 @@ object Trees {
       implicit val pos: Position)
       extends Tree
 
-  object BinaryOp {
+  object BinaryOp
 
     /** Codes are the same as in the IR. */
     type Code = ir.Trees.JSBinaryOp.Code
-  }
 
   case class ArrayConstr(items: List[Tree])(implicit val pos: Position)
       extends Tree
@@ -243,9 +225,8 @@ object Trees {
       extends Literal
 
   case class StringLiteral(value: String)(implicit val pos: Position)
-      extends Literal with PropertyName {
+      extends Literal with PropertyName
     override def name = value
-  }
 
   // Atomic expressions
 
@@ -285,4 +266,3 @@ object Trees {
       extends Tree
 
   case class Super()(implicit val pos: Position) extends Tree
-}

@@ -8,21 +8,18 @@ package scala.concurrent.impl
   *
   * @author Tobias Schlatter
   */
-abstract class AbstractPromise {
+abstract class AbstractPromise
 
   private var state: AnyRef = _
 
   protected final def updateState(
-      oldState: AnyRef, newState: AnyRef): Boolean = {
-    if (state eq oldState) {
+      oldState: AnyRef, newState: AnyRef): Boolean =
+    if (state eq oldState)
       state = newState
       true
-    } else false
-  }
+    else false
 
   protected final def getState: AnyRef = state
-}
 
-object AbstractPromise {
+object AbstractPromise
   protected def updater = ???
-}

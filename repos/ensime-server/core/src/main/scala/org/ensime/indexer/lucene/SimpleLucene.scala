@@ -17,9 +17,8 @@ import org.apache.lucene.util._
 import scala.collection.JavaConverters._
 import scala.collection.mutable
 
-object SimpleLucene {
+object SimpleLucene
   private val LuceneVersion = Version.LUCENE_47
-}
 
 /**
   * Lightweight convenience wrapper over Lucene that does some sanity
@@ -40,7 +39,7 @@ object SimpleLucene {
   * filtering rules based on tags.
   */
 class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
-    extends SLF4JLogging {
+    extends SLF4JLogging
   import org.ensime.indexer.lucene.SimpleLucene._
 
   path.mkdirs()
@@ -49,14 +48,12 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
   private val directory = FSDirectory.open(path)
 
   // our fallback analyzer
-  class LowercaseAnalyzer extends Analyzer {
+  class LowercaseAnalyzer extends Analyzer
     override protected def createComponents(
-        fieldName: String, reader: Reader) = {
+        fieldName: String, reader: Reader) =
       val source = new KeywordTokenizer(reader)
       val filtered = new LowerCaseFilter(SimpleLucene.LuceneVersion, source)
       new Analyzer.TokenStreamComponents(source, filtered)
-    }
-  }
   private val analyzer = new PerFieldAnalyzerWrapper(
       new LowercaseAnalyzer,
       analyzers.asJava
@@ -69,17 +66,15 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
 
   // nature of the beast is that this becomes stale
   private var lastReader = DirectoryReader.open(directory)
-  private def reader() = {
+  private def reader() =
     // non-atomic, but worth it to avoid blocking
     val latest = DirectoryReader.openIfChanged(lastReader)
     if (latest == null) lastReader
-    else {
+    else
       lastReader = latest
       latest
-    }
-  }
 
-  def search(query: Query, limit: Int): List[Document] = {
+  def search(query: Query, limit: Int): List[Document] =
     val searcher = new IndexSearcher(reader())
 
     // TODO: use FieldCacheTermsFilter for fast restriction by module
@@ -88,19 +83,16 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
     searcher.search(query, collector)
 
     val results = mutable.ListBuffer.empty[Document]
-    for (hit <- collector.topDocs().scoreDocs.take(limit)) {
+    for (hit <- collector.topDocs().scoreDocs.take(limit))
       val result = searcher.doc(hit.doc)
       results += result
-      if (log.isTraceEnabled) {
+      if (log.isTraceEnabled)
         val explanation = searcher.explain(query, hit.doc)
         log.trace("" + result + " scored " + explanation)
-      }
-    }
 
     assert(results.size <= limit)
 
     results.toList
-  }
 
   /**
     * Lucene does not offer an out-of-the-box UPDATE, so we have to
@@ -113,22 +105,18 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
     */
   def update(delete: Seq[Query],
              create: Seq[Document],
-             commit: Boolean = true): Unit = this.synchronized {
+             commit: Boolean = true): Unit = this.synchronized
     // Lucene 4.7.2 concurrency bugs: best to synchronise writes
     // https://issues.apache.org/jira/browse/LUCENE-5923
 
-    if (delete.nonEmpty) {
+    if (delete.nonEmpty)
       writer.deleteDocuments(delete.toArray: _*)
       if (commit) writer.commit()
-    }
 
-    if (create.nonEmpty) {
-      create foreach { doc =>
+    if (create.nonEmpty)
+      create foreach  doc =>
         writer addDocument doc
-      }
       if (commit) writer.commit()
-    }
-  }
 
   def create(docs: Seq[Document], commit: Boolean = true): Unit =
     update(Nil, docs, commit)
@@ -137,4 +125,3 @@ class SimpleLucene(path: File, analyzers: Map[String, Analyzer])
 
   // for manual committing after multiple insertions
   def commit(): Unit = writer.commit()
-}

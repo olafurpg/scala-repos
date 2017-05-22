@@ -45,19 +45,14 @@ import scalafx.scene.shape.Rectangle
   *   root = new StackPane {
   * }}}
   */
-object SceneRootAssignmentDemo extends JFXApp {
+object SceneRootAssignmentDemo extends JFXApp
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Scene.root Assignment Demo"
-    scene = new Scene {
-      root = new StackPane {
+    scene = new Scene
+      root = new StackPane
         padding = Insets(20)
-        children = new Rectangle {
+        children = new Rectangle
           width = 200
           height = 200
           fill = Color.DeepSkyBlue
-        }
-      }
-    }
-  }
-}

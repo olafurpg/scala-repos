@@ -1,12 +1,10 @@
-class UnitReturnNoOutput {
-  def foo(i: Int) {
+class UnitReturnNoOutput
+  def foo(i: Int)
     /*start*/
     if (true) return
     println(i)
     /*end*/
     println()
-  }
-}
 /*
 class UnitReturnNoOutput {
   def foo(i: Int) {

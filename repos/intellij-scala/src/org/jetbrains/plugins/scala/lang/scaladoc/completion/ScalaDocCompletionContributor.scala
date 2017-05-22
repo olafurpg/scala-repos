@@ -18,22 +18,21 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocComment
   * User: Dmitry Naydanov
   * Date: 11/26/11
   */
-class ScalaDocCompletionContributor extends ScalaCompletionContributor {
+class ScalaDocCompletionContributor extends ScalaCompletionContributor
   extend(
       CompletionType.BASIC,
       PlatformPatterns.psiElement(ScalaDocTokenType.DOC_TAG_NAME),
-      new CompletionProvider[CompletionParameters]() {
+      new CompletionProvider[CompletionParameters]()
         def addCompletions(parameters: CompletionParameters,
                            context: ProcessingContext,
-                           result: CompletionResultSet) {
+                           result: CompletionResultSet)
           var posParent = positionFromParameters(parameters).getContext
-          while (posParent != null && !posParent.isInstanceOf[ScDocComment]) {
+          while (posParent != null && !posParent.isInstanceOf[ScDocComment])
             posParent = posParent.getContext
-          }
 
-          if (posParent != null) {
+          if (posParent != null)
             val allowedTags =
-              posParent.asInstanceOf[ScDocComment].getOwner match {
+              posParent.asInstanceOf[ScDocComment].getOwner match
                 case _: ScFunction => MyScaladocParsing.allTags
                 case _: ScClass =>
                   MyScaladocParsing.allTags - MyScaladocParsing.RETURN_TAG
@@ -45,15 +44,10 @@ class ScalaDocCompletionContributor extends ScalaCompletionContributor {
                 case _ =>
                   MyScaladocParsing.allTags -- MyScaladocParsing.tagsWithParameters -
                   MyScaladocParsing.RETURN_TAG
-              }
 
-            for (tag <- allowedTags) {
-              result.addElement(new LookupElement {
+            for (tag <- allowedTags)
+              result.addElement(new LookupElement
                 def getLookupString: String = tag.substring(1)
-              })
-            }
-          }
+              )
           result.stopHere()
-        }
-      })
-}
+      )

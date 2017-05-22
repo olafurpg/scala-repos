@@ -17,11 +17,11 @@ case class DataSourceParams(appId: Int) extends Params
 
 class DataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult] {
+        TrainingData, EmptyEvaluationInfo, Query, EmptyActualResult]
 
   @transient lazy val logger = Logger[this.type]
 
-  override def readTraining(sc: SparkContext): TrainingData = {
+  override def readTraining(sc: SparkContext): TrainingData =
     val eventsDb = Storage.getPEvents()
 
     val itemsRDD: RDD[Item] = eventsDb
@@ -29,18 +29,16 @@ class DataSource(val dsp: DataSourceParams)
           appId = dsp.appId,
           entityType = "item"
       )(sc)
-      .map {
+      .map
         case (entityId, properties) =>
-          try {
+          try
             Item(id = entityId,
                  categories = properties.get[List[String]]("categories"))
-          } catch {
+          catch
             case e: Exception =>
               logger.error(s"Failed to get properties ${properties} of" +
                   s" item ${entityId}. Exception: ${e}.")
               throw e
-          }
-      }
 
     val rateEventsRDD: RDD[Event] = eventsDb.find(
         appId = dsp.appId,
@@ -49,28 +47,23 @@ class DataSource(val dsp: DataSourceParams)
         // targetEntityType is optional field of an event.
         targetEntityType = Some(Some("item")))(sc)
 
-    val ratingsRDD: RDD[Rating] = rateEventsRDD.map { event =>
-      val rating = try {
-        val ratingValue: Double = event.event match {
+    val ratingsRDD: RDD[Rating] = rateEventsRDD.map  event =>
+      val rating = try
+        val ratingValue: Double = event.event match
           case "rate" => event.properties.get[Double]("rating")
           case "buy" => 4.0 // map buy event to rating value of 4
           case _ => throw new Exception(s"Unexpected event ${event} is read.")
-        }
         // entityId and targetEntityId is String
         Rating(event.entityId, event.targetEntityId.get, ratingValue)
-      } catch {
-        case e: Exception => {
+      catch
+        case e: Exception =>
             logger.error(
                 s"Cannot convert ${event} to Rating. Exception: ${e}.")
             throw e
-          }
-      }
       rating
-    }.cache()
+    .cache()
 
     new TrainingData(itemsRDD, ratingsRDD)
-  }
-}
 
 case class Item(
     id: String,
@@ -87,9 +80,7 @@ class TrainingData(
     val items: RDD[Item],
     val ratings: RDD[Rating]
 )
-    extends Serializable {
-  override def toString = {
+    extends Serializable
+  override def toString =
     s"items: [${items.count()}] (${items.take(2).toList}...)" +
     s" ratings: [${ratings.count()}] (${ratings.take(2).toList}...)"
-  }
-}

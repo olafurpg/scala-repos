@@ -30,7 +30,7 @@ class TestKitUsageSpec
         ActorSystem("TestKitUsageSpec",
                     ConfigFactory.parseString(TestKitUsageSpec.config)))
     with DefaultTimeout with ImplicitSender with WordSpecLike with Matchers
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
   import TestKitUsageSpec._
 
   val echoRef = system.actorOf(TestActors.echoActorProps)
@@ -43,30 +43,23 @@ class TestKitUsageSpec
   val seqRef = system.actorOf(
       Props(classOf[SequencingActor], testActor, headList, tailList))
 
-  override def afterAll {
+  override def afterAll
     shutdown()
-  }
 
-  "An EchoActor" should {
-    "Respond with the same message it receives" in {
-      within(500 millis) {
+  "An EchoActor" should
+    "Respond with the same message it receives" in
+      within(500 millis)
         echoRef ! "test"
         expectMsg("test")
-      }
-    }
-  }
-  "A ForwardingActor" should {
-    "Forward a message it receives" in {
-      within(500 millis) {
+  "A ForwardingActor" should
+    "Forward a message it receives" in
+      within(500 millis)
         forwardRef ! "test"
         expectMsg("test")
-      }
-    }
-  }
-  "A FilteringActor" should {
-    "Filter all messages, except expected messagetypes it receives" in {
+  "A FilteringActor" should
+    "Filter all messages, except expected messagetypes it receives" in
       var messages = Seq[String]()
-      within(500 millis) {
+      within(500 millis)
         filterRef ! "test"
         expectMsg("test")
         filterRef ! 1
@@ -77,33 +70,23 @@ class TestKitUsageSpec
         filterRef ! "text"
         filterRef ! 1
 
-        receiveWhile(500 millis) {
+        receiveWhile(500 millis)
           case msg: String => messages = msg +: messages
-        }
-      }
       messages.length should be(3)
       messages.reverse should be(Seq("some", "more", "text"))
-    }
-  }
-  "A SequencingActor" should {
-    "receive an interesting message at some point " in {
-      within(500 millis) {
-        ignoreMsg {
+  "A SequencingActor" should
+    "receive an interesting message at some point " in
+      within(500 millis)
+        ignoreMsg
           case msg: String => msg != "something"
-        }
         seqRef ! "something"
         expectMsg("something")
-        ignoreMsg {
+        ignoreMsg
           case msg: String => msg == "1"
-        }
         expectNoMsg
         ignoreNoMsg
-      }
-    }
-  }
-}
 
-object TestKitUsageSpec {
+object TestKitUsageSpec
   // Define your test specific configuration here
   val config = """
     akka {
@@ -114,21 +97,17 @@ object TestKitUsageSpec {
   /**
     * An Actor that forwards every message to a next Actor
     */
-  class ForwardingActor(next: ActorRef) extends Actor {
-    def receive = {
+  class ForwardingActor(next: ActorRef) extends Actor
+    def receive =
       case msg => next ! msg
-    }
-  }
 
   /**
     * An Actor that only forwards certain messages to a next Actor
     */
-  class FilteringActor(next: ActorRef) extends Actor {
-    def receive = {
+  class FilteringActor(next: ActorRef) extends Actor
+    def receive =
       case msg: String => next ! msg
       case _ => None
-    }
-  }
 
   /**
     * An actor that sends a sequence of messages with a random head list, an
@@ -139,14 +118,10 @@ object TestKitUsageSpec {
   class SequencingActor(next: ActorRef,
                         head: immutable.Seq[String],
                         tail: immutable.Seq[String])
-      extends Actor {
-    def receive = {
-      case msg => {
+      extends Actor
+    def receive =
+      case msg =>
           head foreach { next ! _ }
           next ! msg
           tail foreach { next ! _ }
-        }
-    }
-  }
-}
 //#testkit-usage

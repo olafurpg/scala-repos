@@ -11,7 +11,7 @@ import scala.util.Try
 // - Content encoding --------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 /** Represents an HTTP content encoding. */
-trait ContentEncoding {
+trait ContentEncoding
 
   /** Name of the encoding, as used in the `Content-Encoding` and `Accept-Encoding` headers. */
   def name: String
@@ -29,60 +29,50 @@ trait ContentEncoding {
 
   def apply(request: HttpServletRequest): HttpServletRequest =
     new DecodedServletRequest(request, this)
-}
 
-object ContentEncoding {
+object ContentEncoding
 
   private def create(id: String,
                      e: OutputStream => OutputStream,
-                     d: InputStream => InputStream): ContentEncoding = {
-    new ContentEncoding {
+                     d: InputStream => InputStream): ContentEncoding =
+    new ContentEncoding
       override def name: String = id
       override def encode(out: OutputStream): OutputStream = e(out)
       override def decode(in: InputStream): InputStream = d(in)
-    }
-  }
 
-  val GZip: ContentEncoding = {
+  val GZip: ContentEncoding =
     create("gzip",
            out => new GZIPOutputStream(out),
            in => new GZIPInputStream(in))
-  }
 
-  val Deflate: ContentEncoding = {
+  val Deflate: ContentEncoding =
     create("deflate",
            out => new DeflaterOutputStream(out),
            in => new InflaterInputStream(in))
-  }
 
-  def forName(name: String): Option[ContentEncoding] = name.toLowerCase match {
+  def forName(name: String): Option[ContentEncoding] = name.toLowerCase match
     case "gzip" => Some(GZip)
     case "deflate" => Some(Deflate)
     case _ => None
-  }
-}
 
 // - Request decoding --------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 private class DecodedServletRequest(
     req: HttpServletRequest, enc: ContentEncoding)
-    extends HttpServletRequestWrapper(req) {
+    extends HttpServletRequestWrapper(req)
 
-  override lazy val getInputStream: EncodedInputStream = {
+  override lazy val getInputStream: EncodedInputStream =
     val raw = req.getInputStream
     new EncodedInputStream(enc.decode(raw), raw)
-  }
 
-  override lazy val getReader: BufferedReader = {
+  override lazy val getReader: BufferedReader =
     new BufferedReader(
         new InputStreamReader(getInputStream, getCharacterEncoding))
-  }
 
   override def getContentLength: Int = -1
-}
 
 private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
-    extends ServletInputStream {
+    extends ServletInputStream
 
   override def isFinished: Boolean = raw.isFinished
   override def isReady: Boolean = raw.isReady
@@ -93,61 +83,55 @@ private class EncodedInputStream(encoded: InputStream, raw: ServletInputStream)
   override def read(b: Array[Byte]): Int = read(b, 0, b.length)
   override def read(b: Array[Byte], off: Int, len: Int) =
     encoded.read(b, off, len)
-}
 
 // - Response encoding -------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 /** Encodes any output written to a servlet response. */
 private class EncodedServletResponse(
     res: HttpServletResponse, enc: ContentEncoding)
-    extends HttpServletResponseWrapper(res) {
+    extends HttpServletResponseWrapper(res)
 
   // Object to flush when complete, if any.
   // Note that while this is essentially a mutable shared state, it's not really an issue here - or rather, if multiple
   // threads are accessing your output stream at the same time, you have other, more important issues to deal with.
   private var toFlush: Option[Flushable] = None
 
-  override lazy val getOutputStream: EncodedOutputStream = {
+  override lazy val getOutputStream: EncodedOutputStream =
     val raw = super.getOutputStream
     val out = new EncodedOutputStream(enc.encode(raw), raw)
 
     addHeader("Content-Encoding", enc.name)
     toFlush = Some(out)
     out
-  }
 
-  override lazy val getWriter: PrintWriter = {
+  override lazy val getWriter: PrintWriter =
     val writer = new PrintWriter(
         new OutputStreamWriter(getOutputStream, getCharset))
     toFlush = Some(writer)
     writer
-  }
 
   /** Returns the charset with which to encode the response. */
   private def getCharset: Charset =
-    (for {
+    (for
       name <- Option(getCharacterEncoding)
       charset <- Try(Charset.forName(name)).toOption
-    } yield charset).getOrElse {
+    yield charset).getOrElse
       // The charset is either not known or not supported, defaults to ISO 8859 1, as per RFC and servlet documentation.
       setCharacterEncoding("ISO-8859-1")
       Charset.forName("ISO-8859-1")
-    }
 
   /** Ensures that whatever byte- or char-stream we have open is properly flushed. */
-  override def flushBuffer(): Unit = {
+  override def flushBuffer(): Unit =
     toFlush.foreach(_.flush())
     super.flushBuffer()
-  }
 
   // Encoded responses do not have a content length.
   override def setContentLength(i: Int) = {}
   override def setContentLengthLong(len: Long): Unit = {}
-}
 
 /** Wraps the specified raw and servlet output streams into one servlet output stream. */
 private class EncodedOutputStream(out: OutputStream, orig: ServletOutputStream)
-    extends ServletOutputStream {
+    extends ServletOutputStream
 
   // - Raw writing -----------------------------------------------------------------------------------------------------
   // -------------------------------------------------------------------------------------------------------------------
@@ -166,4 +150,3 @@ private class EncodedOutputStream(out: OutputStream, orig: ServletOutputStream)
   override def setWriteListener(writeListener: WriteListener): Unit =
     orig.setWriteListener(writeListener)
   override def isReady: Boolean = orig.isReady
-}

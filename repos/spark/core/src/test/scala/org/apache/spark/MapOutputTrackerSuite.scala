@@ -27,18 +27,17 @@ import org.apache.spark.scheduler.{CompressedMapStatus, MapStatus}
 import org.apache.spark.shuffle.FetchFailedException
 import org.apache.spark.storage.{BlockManagerId, ShuffleBlockId}
 
-class MapOutputTrackerSuite extends SparkFunSuite {
+class MapOutputTrackerSuite extends SparkFunSuite
   private val conf = new SparkConf
 
   def createRpcEnv(name: String,
                    host: String = "localhost",
                    port: Int = 0,
                    securityManager: SecurityManager = new SecurityManager(
-                         conf)): RpcEnv = {
+                         conf)): RpcEnv =
     RpcEnv.create(name, host, port, conf, securityManager)
-  }
 
-  test("master start and stop") {
+  test("master start and stop")
     val rpcEnv = createRpcEnv("test")
     val tracker = new MapOutputTrackerMaster(conf)
     tracker.trackerEndpoint = rpcEnv.setupEndpoint(
@@ -46,9 +45,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
         new MapOutputTrackerMasterEndpoint(rpcEnv, tracker, conf))
     tracker.stop()
     rpcEnv.shutdown()
-  }
 
-  test("master register shuffle and fetch") {
+  test("master register shuffle and fetch")
     val rpcEnv = createRpcEnv("test")
     val tracker = new MapOutputTrackerMaster(conf)
     tracker.trackerEndpoint = rpcEnv.setupEndpoint(
@@ -75,9 +73,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
              ArrayBuffer((ShuffleBlockId(10, 1, 0), size10000)))).toSet)
     tracker.stop()
     rpcEnv.shutdown()
-  }
 
-  test("master register and unregister shuffle") {
+  test("master register and unregister shuffle")
     val rpcEnv = createRpcEnv("test")
     val tracker = new MapOutputTrackerMaster(conf)
     tracker.trackerEndpoint = rpcEnv.setupEndpoint(
@@ -104,9 +101,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
     tracker.stop()
     rpcEnv.shutdown()
-  }
 
-  test("master register shuffle and unregister map output and fetch") {
+  test("master register shuffle and unregister map output and fetch")
     val rpcEnv = createRpcEnv("test")
     val tracker = new MapOutputTrackerMaster(conf)
     tracker.trackerEndpoint = rpcEnv.setupEndpoint(
@@ -139,9 +135,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
     tracker.stop()
     rpcEnv.shutdown()
-  }
 
-  test("remote fetch") {
+  test("remote fetch")
     val hostname = "localhost"
     val rpcEnv = createRpcEnv("spark", hostname, 0, new SecurityManager(conf))
 
@@ -159,9 +154,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
     masterTracker.registerShuffle(10, 1)
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
-    intercept[FetchFailedException] {
+    intercept[FetchFailedException]
       slaveTracker.getMapSizesByExecutorId(10, 0)
-    }
 
     val size1000 = MapStatus.decompressSize(MapStatus.compressSize(1000L))
     masterTracker.registerMapOutput(
@@ -176,22 +170,19 @@ class MapOutputTrackerSuite extends SparkFunSuite {
         10, 0, BlockManagerId("a", "hostA", 1000))
     masterTracker.incrementEpoch()
     slaveTracker.updateEpoch(masterTracker.getEpoch)
-    intercept[FetchFailedException] {
+    intercept[FetchFailedException]
       slaveTracker.getMapSizesByExecutorId(10, 0)
-    }
 
     // failure should be cached
-    intercept[FetchFailedException] {
+    intercept[FetchFailedException]
       slaveTracker.getMapSizesByExecutorId(10, 0)
-    }
 
     masterTracker.stop()
     slaveTracker.stop()
     rpcEnv.shutdown()
     slaveRpcEnv.shutdown()
-  }
 
-  test("remote fetch below max RPC message size") {
+  test("remote fetch below max RPC message size")
     val newConf = new SparkConf
     newConf.set("spark.rpc.message.maxSize", "1")
     newConf.set("spark.rpc.askTimeout", "1") // Fail fast
@@ -217,9 +208,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
 //    masterTracker.stop() // this throws an exception
     rpcEnv.shutdown()
-  }
 
-  test("remote fetch exceeds max RPC message size") {
+  test("remote fetch exceeds max RPC message size")
     val newConf = new SparkConf
     newConf.set("spark.rpc.message.maxSize", "1")
     newConf.set("spark.rpc.askTimeout", "1") // Fail fast
@@ -234,13 +224,12 @@ class MapOutputTrackerSuite extends SparkFunSuite {
     // Note that the size is hand-selected here because map output statuses are compressed before
     // being sent.
     masterTracker.registerShuffle(20, 100)
-    (0 until 100).foreach { i =>
+    (0 until 100).foreach  i =>
       masterTracker.registerMapOutput(
           20,
           i,
           new CompressedMapStatus(BlockManagerId("999", "mps", 1000),
                                   Array.fill[Long](4000000)(0)))
-    }
     val senderAddress = RpcAddress("localhost", 12345)
     val rpcCallContext = mock(classOf[RpcCallContext])
     when(rpcCallContext.senderAddress).thenReturn(senderAddress)
@@ -250,9 +239,8 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
 //    masterTracker.stop() // this throws an exception
     rpcEnv.shutdown()
-  }
 
-  test("getLocationsWithLargestOutputs with multiple outputs in same machine") {
+  test("getLocationsWithLargestOutputs with multiple outputs in same machine")
     val rpcEnv = createRpcEnv("test")
     val tracker = new MapOutputTrackerMaster(conf)
     tracker.trackerEndpoint = rpcEnv.setupEndpoint(
@@ -287,5 +275,3 @@ class MapOutputTrackerSuite extends SparkFunSuite {
 
     tracker.stop()
     rpcEnv.shutdown()
-  }
-}

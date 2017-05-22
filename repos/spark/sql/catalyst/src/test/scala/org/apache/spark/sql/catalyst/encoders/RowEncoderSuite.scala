@@ -25,55 +25,47 @@ import org.apache.spark.sql.catalyst.util.{ArrayData, GenericArrayData}
 import org.apache.spark.sql.types._
 
 @SQLUserDefinedType(udt = classOf[ExamplePointUDT])
-class ExamplePoint(val x: Double, val y: Double) extends Serializable {
+class ExamplePoint(val x: Double, val y: Double) extends Serializable
   override def hashCode: Int = 41 * (41 + x.toInt) + y.toInt
-  override def equals(that: Any): Boolean = {
-    if (that.isInstanceOf[ExamplePoint]) {
+  override def equals(that: Any): Boolean =
+    if (that.isInstanceOf[ExamplePoint])
       val e = that.asInstanceOf[ExamplePoint]
       (this.x == e.x || (this.x.isNaN && e.x.isNaN) ||
           (this.x.isInfinity && e.x.isInfinity)) &&
       (this.y == e.y || (this.y.isNaN && e.y.isNaN) ||
           (this.y.isInfinity && e.y.isInfinity))
-    } else {
+    else
       false
-    }
-  }
-}
 
 /**
   * User-defined type for [[ExamplePoint]].
   */
-class ExamplePointUDT extends UserDefinedType[ExamplePoint] {
+class ExamplePointUDT extends UserDefinedType[ExamplePoint]
 
   override def sqlType: DataType = ArrayType(DoubleType, false)
 
   override def pyUDT: String = "pyspark.sql.tests.ExamplePointUDT"
 
-  override def serialize(p: ExamplePoint): GenericArrayData = {
+  override def serialize(p: ExamplePoint): GenericArrayData =
     val output = new Array[Any](2)
     output(0) = p.x
     output(1) = p.y
     new GenericArrayData(output)
-  }
 
-  override def deserialize(datum: Any): ExamplePoint = {
-    datum match {
+  override def deserialize(datum: Any): ExamplePoint =
+    datum match
       case values: ArrayData =>
-        if (values.numElements() > 1) {
+        if (values.numElements() > 1)
           new ExamplePoint(values.getDouble(0), values.getDouble(1))
-        } else {
+        else
           val random = new Random()
           new ExamplePoint(random.nextDouble(), random.nextDouble())
-        }
-    }
-  }
 
   override def userClass: Class[ExamplePoint] = classOf[ExamplePoint]
 
   private[spark] override def asNullable: ExamplePointUDT = this
-}
 
-class RowEncoderSuite extends SparkFunSuite {
+class RowEncoderSuite extends SparkFunSuite
 
   private val structOfString = new StructType().add("str", StringType)
   private val structOfUDT =
@@ -133,7 +125,7 @@ class RowEncoderSuite extends SparkFunSuite {
                .add("map", mapOfString))
         .add("structOfUDT", structOfUDT))
 
-  test(s"encode/decode: Product") {
+  test(s"encode/decode: Product")
     val schema = new StructType().add("structAsProduct",
                                       new StructType()
                                         .add("int", IntegerType)
@@ -146,29 +138,23 @@ class RowEncoderSuite extends SparkFunSuite {
     val row = encoder.toRow(input)
     val convertedBack = encoder.fromRow(row)
     assert(input.getStruct(0) == convertedBack.getStruct(0))
-  }
 
-  private def encodeDecodeTest(schema: StructType): Unit = {
-    test(s"encode/decode: ${schema.simpleString}") {
+  private def encodeDecodeTest(schema: StructType): Unit =
+    test(s"encode/decode: ${schema.simpleString}")
       val encoder = RowEncoder(schema)
       val inputGenerator =
         RandomDataGenerator.forType(schema, nullable = false).get
 
       var input: Row = null
-      try {
-        for (_ <- 1 to 5) {
+      try
+        for (_ <- 1 to 5)
           input = inputGenerator.apply().asInstanceOf[Row]
           val row = encoder.toRow(input)
           val convertedBack = encoder.fromRow(row)
           assert(input == convertedBack)
-        }
-      } catch {
+      catch
         case e: Exception =>
           fail(s"""
                |schema: ${schema.simpleString}
                |input: ${input}
              """.stripMargin, e)
-      }
-    }
-  }
-}

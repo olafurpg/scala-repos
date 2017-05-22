@@ -19,7 +19,7 @@ import scala.scalajs.js
   *  [[timers]] as they are more Scala-like.
   */
 @js.native
-object RawTimers extends js.GlobalScope {
+object RawTimers extends js.GlobalScope
 
   /** Schedule `handler` for execution in `interval` milliseconds.
     *
@@ -53,4 +53,3 @@ object RawTimers extends js.GlobalScope {
     *  @param handle The handle returned by [[setInterval]]
     */
   def clearInterval(handle: SetIntervalHandle): Unit = js.native
-}

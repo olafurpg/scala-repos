@@ -25,8 +25,8 @@ import org.apache.spark.mllib.tree.model.RandomForestModel
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object RandomForestClassificationExample {
-  def main(args: Array[String]): Unit = {
+object RandomForestClassificationExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("RandomForestClassificationExample")
     val sc = new SparkContext(conf)
     // $example on$
@@ -56,10 +56,9 @@ object RandomForestClassificationExample {
                                              maxBins)
 
     // Evaluate model on test instances and compute test error
-    val labelAndPreds = testData.map { point =>
+    val labelAndPreds = testData.map  point =>
       val prediction = model.predict(point.features)
       (point.label, prediction)
-    }
     val testErr =
       labelAndPreds.filter(r => r._1 != r._2).count.toDouble / testData.count()
     println("Test Error = " + testErr)
@@ -70,6 +69,4 @@ object RandomForestClassificationExample {
     val sameModel = RandomForestModel.load(
         sc, "target/tmp/myRandomForestClassificationModel")
     // $example off$
-  }
-}
 // scalastyle:on println

@@ -12,7 +12,7 @@ import slick.util.GlobalConfig
 import com.typesafe.config.{ConfigFactory, Config}
 
 /** The basic functionality that has to be implemented by all profiles. */
-trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
+trait BasicProfile extends BasicActionComponent  self: BasicProfile =>
 
   /** The external interface of this profile which defines the API. */
   @deprecated(
@@ -40,11 +40,10 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     * dropping database entities. Schema descriptions can be combined for
     * creating or dropping multiple entities together, even if they have
     * circular dependencies. */
-  trait SchemaDescriptionDef {
+  trait SchemaDescriptionDef
     def ++(other: SchemaDescription): SchemaDescription
-  }
 
-  trait API extends Aliases with ExtensionMethodConversions {
+  trait API extends Aliases with ExtensionMethodConversions
     type Database = Backend#Database
     val Database = backend.Database
     type Session = Backend#Session
@@ -87,7 +86,6 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
       : QueryActionExtensionMethods[R, NoStream] =
       createQueryActionExtensionMethods[R, NoStream](
           queryCompiler.run(shape.toNode(q)).tree, ())
-  }
 
   /** The API for using the query language with a single import
     * statement. This provides the profile's implicits, the Database API
@@ -126,28 +124,23 @@ trait BasicProfile extends BasicActionComponent { self: BasicProfile =>
     * runtime class until it finds a class or trait with a name matching "slick.[...]Profile"
     * and then returns uses this name as a path in the application config. If no configuration
     * exists at this path, an empty Config object is returned. */
-  protected[this] def loadProfileConfig: Config = {
+  protected[this] def loadProfileConfig: Config =
     def findConfigName(classes: Vector[Class[_]]): Option[String] =
-      classes.iterator.map { cl =>
+      classes.iterator.map  cl =>
         val n = cl.getName
         if (n.startsWith("slick.") && n.endsWith("Profile")) Some(n) else None
-      }.find(_.isDefined).getOrElse {
-        val parents = classes.flatMap { cl =>
+      .find(_.isDefined).getOrElse
+        val parents = classes.flatMap  cl =>
           Option(cl.getSuperclass) ++: cl.getInterfaces.toVector
-        }
         if (parents.isEmpty) None else findConfigName(parents)
-      }
     GlobalConfig.profileConfig(findConfigName(Vector(getClass)).get)
-  }
 
-  override def toString = {
+  override def toString =
     val n = getClass.getName
     if (n.startsWith("slick.") && n.endsWith("Profile$")) n
     else super.toString
-  }
-}
 
-trait BasicActionComponent { self: BasicProfile =>
+trait BasicActionComponent  self: BasicProfile =>
 
   type ProfileAction [+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
   type StreamingProfileAction [+R, +T, -E <: Effect] <: BasicStreamingAction[
@@ -173,25 +166,21 @@ trait BasicActionComponent { self: BasicProfile =>
   def createStreamingQueryActionExtensionMethods[R, T](
       tree: Node, param: Any): StreamingQueryActionExtensionMethods[R, T]
 
-  trait QueryActionExtensionMethodsImpl[R, S <: NoStream] {
+  trait QueryActionExtensionMethodsImpl[R, S <: NoStream]
 
     /** An Action that runs this query. */
     def result: ProfileAction[R, S, Effect.Read]
-  }
 
   trait StreamingQueryActionExtensionMethodsImpl[R, T]
-      extends QueryActionExtensionMethodsImpl[R, Streaming[T]] {
+      extends QueryActionExtensionMethodsImpl[R, Streaming[T]]
     def result: StreamingProfileAction[R, T, Effect.Read]
-  }
-}
 
 trait BasicAction[+R, +S <: NoStream, -E <: Effect]
-    extends DatabaseAction[R, S, E] {
+    extends DatabaseAction[R, S, E]
   type ResultAction [+R, +S <: NoStream, -E <: Effect] <: BasicAction[R, S, E]
-}
 
 trait BasicStreamingAction[+R, +T, -E <: Effect]
-    extends BasicAction[R, Streaming[T], E] {
+    extends BasicAction[R, Streaming[T], E]
 
   /** Create an Action that returns only the first value of this stream of data. The Action will
     * fail if the stream is empty. Only available on streaming Actions. */
@@ -200,12 +189,10 @@ trait BasicStreamingAction[+R, +T, -E <: Effect]
   /** Create an Action that returns only the first value of this stream of data as an `Option`.
     * Only available on streaming Actions. */
   def headOption: ResultAction[Option[T], NoStream, E]
-}
 
 trait FixedBasicAction[+R, +S <: NoStream, -E <: Effect]
-    extends BasicAction[R, S, E] {
+    extends BasicAction[R, S, E]
   type ResultAction[+R, +S <: NoStream, -E <: Effect] = BasicAction[R, S, E]
-}
 
 trait FixedBasicStreamingAction[+R, +T, -E <: Effect]
     extends BasicStreamingAction[R, T, E]

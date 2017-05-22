@@ -19,33 +19,30 @@ package org.apache.spark.sql.catalyst.expressions.codegen
 
 import org.apache.spark.SparkFunSuite
 
-class CodeFormatterSuite extends SparkFunSuite {
+class CodeFormatterSuite extends SparkFunSuite
 
-  def testCase(name: String)(input: String)(expected: String): Unit = {
-    test(name) {
+  def testCase(name: String)(input: String)(expected: String): Unit =
+    test(name)
       assert(CodeFormatter.format(input).trim === expected.trim)
-    }
-  }
 
-  testCase("basic example") {
+  testCase("basic example")
     """class A {
       |blahblah;
       |}""".stripMargin
-  } {
+  
     """
       |/* 001 */ class A {
       |/* 002 */   blahblah;
       |/* 003 */ }
     """.stripMargin
-  }
 
-  testCase("nested example") {
+  testCase("nested example")
     """class A {
       | if (c) {
       |duh;
       |}
       |}""".stripMargin
-  } {
+  
     """
       |/* 001 */ class A {
       |/* 002 */   if (c) {
@@ -53,43 +50,38 @@ class CodeFormatterSuite extends SparkFunSuite {
       |/* 004 */   }
       |/* 005 */ }
     """.stripMargin
-  }
 
-  testCase("single line") {
+  testCase("single line")
     """class A {
       | if (c) {duh;}
       |}""".stripMargin
-  } {
+  
     """
       |/* 001 */ class A {
       |/* 002 */   if (c) {duh;}
       |/* 003 */ }
     """.stripMargin
-  }
 
-  testCase("if else on the same line") {
+  testCase("if else on the same line")
     """class A {
       | if (c) {duh;} else {boo;}
       |}""".stripMargin
-  } {
+  
     """
       |/* 001 */ class A {
       |/* 002 */   if (c) {duh;} else {boo;}
       |/* 003 */ }
     """.stripMargin
-  }
 
-  testCase("function calls") {
+  testCase("function calls")
     """foo(
       |a,
       |b,
       |c)""".stripMargin
-  } {
+  
     """
       |/* 001 */ foo(
       |/* 002 */   a,
       |/* 003 */   b,
       |/* 004 */   c)
     """.stripMargin
-  }
-}

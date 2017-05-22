@@ -2,7 +2,7 @@ package slick
 
 import slick.basic.BasicProfile
 
-package object backend {
+package object backend
   @deprecated(
       "Use type `slick.basic.BasicBackend` instead of `slick.backend.DatabaseComponent`",
       "3.2")
@@ -31,4 +31,3 @@ package object backend {
       "Use type `slick.basic.StaticDatabaseConfig` instead of `slick.backend.StaticDatabaseConfig`",
       "3.2")
   type StaticDatabaseConfig = slick.basic.StaticDatabaseConfig
-}

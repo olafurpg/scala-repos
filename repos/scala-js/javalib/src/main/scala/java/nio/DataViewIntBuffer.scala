@@ -8,7 +8,7 @@ private[nio] final class DataViewIntBuffer private (
     _initialLimit: Int,
     _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
-    extends IntBuffer(_dataView.byteLength / 4, null, -1) {
+    extends IntBuffer(_dataView.byteLength / 4, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -90,24 +90,20 @@ private[nio] final class DataViewIntBuffer private (
   override private[nio] def store(
       startIndex: Int, src: Array[Int], offset: Int, length: Int): Unit =
     GenBuffer(this).generic_store(startIndex, src, offset, length)
-}
 
-private[nio] object DataViewIntBuffer {
+private[nio] object DataViewIntBuffer
   private[nio] implicit object NewDataViewIntBuffer
-      extends GenDataViewBuffer.NewDataViewBuffer[IntBuffer] {
+      extends GenDataViewBuffer.NewDataViewBuffer[IntBuffer]
     def bytesPerElem: Int = 4
 
     def apply(dataView: DataView,
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean,
-              isBigEndian: Boolean): IntBuffer = {
+              isBigEndian: Boolean): IntBuffer =
       new DataViewIntBuffer(
           dataView, initialPosition, initialLimit, readOnly, isBigEndian)
-    }
-  }
 
   @inline
   def fromTypedArrayByteBuffer(byteBuffer: TypedArrayByteBuffer): IntBuffer =
     GenDataViewBuffer.generic_fromTypedArrayByteBuffer(byteBuffer)
-}

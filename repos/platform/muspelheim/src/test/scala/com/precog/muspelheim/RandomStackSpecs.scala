@@ -22,10 +22,10 @@ package muspelheim
 
 import com.precog.yggdrasil._
 
-trait RandomStackSpecs extends EvalStackSpecs {
+trait RandomStackSpecs extends EvalStackSpecs
   import stack._
-  "random functionality" should {
-    "guarantee observe of uniform returns values between 0 and 1" in {
+  "random functionality" should
+    "guarantee observe of uniform returns values between 0 and 1" in
       val input = """
         | clicks := //clicks
         |
@@ -41,22 +41,19 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(0))
           d must be_<(BigDecimal(1))
-      }
-    }
 
-    "give error if distribution is returned unobserved" in {
+    "give error if distribution is returned unobserved" in
       val input = """std::random::uniform(12)"""
 
       evalE(input) must throwAn[AssertionError]
-    }
 
-    "guarantee observe of uniform joins with original dataset" in {
+    "guarantee observe of uniform joins with original dataset" in
       val input = """
         | clicks := //clicks
         |
@@ -73,26 +70,23 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      val pageIds: Set[SValue] = (0 to 4).map { i =>
+      val pageIds: Set[SValue] = (0 to 4).map  i =>
         SString("page-" + i.toString)
-      }.toSet
+      .toSet
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(fields)) =>
           ids must haveSize(1)
           fields.keys mustEqual Set("pageId", "rand")
 
           pageIds must contain(fields("pageId"))
 
-          fields("rand") must beLike {
+          fields("rand") must beLike
             case SDecimal(d) =>
               d must be_>=(BigDecimal(0))
               d must be_<(BigDecimal(1))
-          }
-      }
-    }
 
-    "accept a query like Nathan's" in {
+    "accept a query like Nathan's" in
       val input = """
         | clicks := //clicks
         |
@@ -117,20 +111,17 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SObject(fields)) =>
           ids must haveSize(2)
 
           fields.keys must contain("predict")
 
-          fields("predict") must beLike {
+          fields("predict") must beLike
             case SString(str) =>
               Set("foo", "bar") must contain(str)
-          }
-      }
-    }
 
-    "work" in {
+    "work" in
       val input = """
         | clicks := //clicks
         |
@@ -145,16 +136,15 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(0))
           d must be_<(BigDecimal(0.5))
-      }
-    }.pendingUntilFixed
+    .pendingUntilFixed
 
-    "work" in {
+    "work" in
       val input = """
         | clicks := //clicks
         |
@@ -169,14 +159,13 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(1)
           d mustEqual (0)
-      }
-    }.pendingUntilFixed
+    .pendingUntilFixed
 
-    "work" in {
+    "work" in
       val input = """
         | clicks := //clicks
         |
@@ -191,13 +180,10 @@ trait RandomStackSpecs extends EvalStackSpecs {
 
       result must haveSize(resultClicks.size)
 
-      result must haveAllElementsLike {
+      result must haveAllElementsLike
         case (ids, SDecimal(d)) =>
           ids must haveSize(1)
 
           d must be_>=(BigDecimal(10))
           d must be_<(BigDecimal(11))
-      }
-    }.pendingUntilFixed
-  }
-}
+    .pendingUntilFixed

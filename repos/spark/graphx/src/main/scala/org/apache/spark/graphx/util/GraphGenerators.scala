@@ -27,7 +27,7 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.rdd.RDD
 
 /** A collection of graph generating functions. */
-object GraphGenerators extends Logging {
+object GraphGenerators extends Logging
 
   val RMATa = 0.45
   val RMATb = 0.15
@@ -58,7 +58,7 @@ object GraphGenerators extends Logging {
                      numEParts: Int = 0,
                      mu: Double = 4.0,
                      sigma: Double = 1.3,
-                     seed: Long = -1): Graph[Long, Int] = {
+                     seed: Long = -1): Graph[Long, Int] =
 
     val evalNumEParts =
       if (numEParts == 0) sc.defaultParallelism else numEParts
@@ -69,18 +69,15 @@ object GraphGenerators extends Logging {
     val seed2 = seedRand.nextInt()
 
     val vertices: RDD[(VertexId, Long)] =
-      sc.parallelize(0 until numVertices, evalNumEParts).map { src =>
+      sc.parallelize(0 until numVertices, evalNumEParts).map  src =>
         (src, sampleLogNormal(mu, sigma, numVertices, seed = (seed1 ^ src)))
-      }
 
-    val edges = vertices.flatMap {
+    val edges = vertices.flatMap
       case (src, degree) =>
         generateRandomEdges(
             src.toInt, degree.toInt, numVertices, seed = (seed2 ^ src))
-    }
 
     Graph(vertices, edges, 0)
-  }
 
   // Right now it just generates a bunch of edges where
   // the edge data is the weight (default 1)
@@ -89,10 +86,9 @@ object GraphGenerators extends Logging {
   def generateRandomEdges(src: Int,
                           numEdges: Int,
                           maxVertexId: Int,
-                          seed: Long = -1): Array[Edge[Int]] = {
+                          seed: Long = -1): Array[Edge[Int]] =
     val rand = if (seed == -1) new Random() else new Random(seed)
     Array.fill(numEdges) { Edge[Int](src, rand.nextInt(maxVertexId), 1) }
-  }
 
   /**
     * Randomly samples from a log normal distribution whose corresponding normal distribution has
@@ -107,7 +103,7 @@ object GraphGenerators extends Logging {
     * @param seed optional seed
     */
   private[spark] def sampleLogNormal(
-      mu: Double, sigma: Double, maxVal: Int, seed: Long = -1): Int = {
+      mu: Double, sigma: Double, maxVal: Int, seed: Long = -1): Int =
     val rand = if (seed == -1) new Random() else new Random(seed)
 
     val sigmaSq = sigma * sigma
@@ -117,12 +113,10 @@ object GraphGenerators extends Logging {
     // Z ~ N(0, 1)
     var X: Double = maxVal
 
-    while (X >= maxVal) {
+    while (X >= maxVal)
       val Z = rand.nextGaussian()
       X = math.exp(mu + sigma * Z)
-    }
     math.floor(X).toInt
-  }
 
   /**
     * A random graph generator using the R-MAT model, proposed in
@@ -132,7 +126,7 @@ object GraphGenerators extends Logging {
     */
   def rmatGraph(sc: SparkContext,
                 requestedNumVertices: Int,
-                numEdges: Int): Graph[Int, Int] = {
+                numEdges: Int): Graph[Int, Int] =
     // let N = requestedNumVertices
     // the number of vertices is 2^n where n=ceil(log2[N])
     // This ensures that the 4 quadrants are the same size at all recursion levels
@@ -142,39 +136,33 @@ object GraphGenerators extends Logging {
       .toInt
     val numEdgesUpperBound =
       math.pow(2.0, 2 * ((math.log(numVertices) / math.log(2.0)) - 1)).toInt
-    if (numEdgesUpperBound < numEdges) {
+    if (numEdgesUpperBound < numEdges)
       throw new IllegalArgumentException(
           s"numEdges must be <= $numEdgesUpperBound but was $numEdges")
-    }
     var edges: Set[Edge[Int]] = Set()
-    while (edges.size < numEdges) {
-      if (edges.size % 100 == 0) {
+    while (edges.size < numEdges)
+      if (edges.size % 100 == 0)
         logDebug(edges.size + " edges")
-      }
       edges += addEdge(numVertices)
-    }
     outDegreeFromEdges(sc.parallelize(edges.toList))
-  }
 
   private def outDegreeFromEdges[ED : ClassTag](
-      edges: RDD[Edge[ED]]): Graph[Int, ED] = {
-    val vertices = edges.flatMap { edge =>
+      edges: RDD[Edge[ED]]): Graph[Int, ED] =
+    val vertices = edges.flatMap  edge =>
       List((edge.srcId, 1))
-    }.reduceByKey(_ + _).map { case (vid, degree) => (vid, degree) }
+    .reduceByKey(_ + _).map { case (vid, degree) => (vid, degree) }
     Graph(vertices, edges, 0)
-  }
 
   /**
     * @param numVertices Specifies the total number of vertices in the graph (used to get
     * the dimensions of the adjacency matrix
     */
-  private def addEdge(numVertices: Int): Edge[Int] = {
+  private def addEdge(numVertices: Int): Edge[Int] =
     // val (src, dst) = chooseCell(numVertices/2.0, numVertices/2.0, numVertices/2.0)
     val v = math.round(numVertices.toFloat / 2.0).toInt
 
     val (src, dst) = chooseCell(v, v, v)
     Edge[Int](src, dst, 1)
-  }
 
   /**
     * This method recursively subdivides the adjacency matrix into quadrants
@@ -209,36 +197,30 @@ object GraphGenerators extends Logging {
     * }}}
     */
   @tailrec
-  private def chooseCell(x: Int, y: Int, t: Int): (Int, Int) = {
-    if (t <= 1) {
+  private def chooseCell(x: Int, y: Int, t: Int): (Int, Int) =
+    if (t <= 1)
       (x, y)
-    } else {
+    else
       val newT = math.round(t.toFloat / 2.0).toInt
-      pickQuadrant(RMATa, RMATb, RMATc, RMATd) match {
+      pickQuadrant(RMATa, RMATb, RMATc, RMATd) match
         case 0 => chooseCell(x, y, newT)
         case 1 => chooseCell(x + newT, y, newT)
         case 2 => chooseCell(x, y + newT, newT)
         case 3 => chooseCell(x + newT, y + newT, newT)
-      }
-    }
-  }
 
   // TODO(crankshaw) turn result into an enum (or case class for pattern matching}
-  private def pickQuadrant(a: Double, b: Double, c: Double, d: Double): Int = {
-    if (a + b + c + d != 1.0) {
+  private def pickQuadrant(a: Double, b: Double, c: Double, d: Double): Int =
+    if (a + b + c + d != 1.0)
       throw new IllegalArgumentException(
           "R-MAT probability parameters sum to " + (a + b + c + d) +
           ", should sum to 1.0")
-    }
     val rand = new Random()
     val result = rand.nextDouble()
-    result match {
+    result match
       case x if x < a => 0 // 0 corresponds to quadrant a
       case x if (x >= a && x < a + b) => 1 // 1 corresponds to b
       case x if (x >= a + b && x < a + b + c) => 2 // 2 corresponds to c
       case _ => 3 // 3 corresponds to d
-    }
-  }
 
   /**
     * Create `rows` by `cols` grid graph with each vertex connected to its
@@ -253,25 +235,24 @@ object GraphGenerators extends Logging {
     * as their attributes and edge values as 1.0.
     */
   def gridGraph(
-      sc: SparkContext, rows: Int, cols: Int): Graph[(Int, Int), Double] = {
+      sc: SparkContext, rows: Int, cols: Int): Graph[(Int, Int), Double] =
     // Convert row column address into vertex ids (row major order)
     def sub2ind(r: Int, c: Int): VertexId = r * cols + c
 
     val vertices: RDD[(VertexId, (Int, Int))] =
-      sc.parallelize(0 until rows).flatMap { r =>
+      sc.parallelize(0 until rows).flatMap  r =>
         (0 until cols).map(c => (sub2ind(r, c), (r, c)))
-      }
-    val edges: RDD[Edge[Double]] = vertices.flatMap {
+    val edges: RDD[Edge[Double]] = vertices.flatMap
       case (vid, (r, c)) =>
-        (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else {
+        (if (r + 1 < rows) { Seq((sub2ind(r, c), sub2ind(r + 1, c))) } else
            Seq.empty
-         }) ++
-        (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else {
+         ) ++
+        (if (c + 1 < cols) { Seq((sub2ind(r, c), sub2ind(r, c + 1))) } else
            Seq.empty
-         })
-    }.map { case (src, dst) => Edge(src, dst, 1.0) }
+         )
+    .map { case (src, dst) => Edge(src, dst, 1.0) }
     Graph(vertices, edges)
-  } // end of gridGraph
+  // end of gridGraph
 
   /**
     * Create a star graph with vertex 0 being the center.
@@ -282,9 +263,9 @@ object GraphGenerators extends Logging {
     * @return A star graph containing `nverts` vertices with vertex 0
     * being the center vertex.
     */
-  def starGraph(sc: SparkContext, nverts: Int): Graph[Int, Int] = {
+  def starGraph(sc: SparkContext, nverts: Int): Graph[Int, Int] =
     val edges: RDD[(VertexId, VertexId)] =
       sc.parallelize(1 until nverts).map(vid => (vid, 0))
     Graph.fromEdgeTuples(edges, 1)
-  } // end of starGraph
-} // end of Graph Generators
+  // end of starGraph
+// end of Graph Generators

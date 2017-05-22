@@ -18,20 +18,18 @@ package shapeless
 package syntax
 package std
 
-trait LowPriorityTuple {
+trait LowPriorityTuple
   implicit def productTupleOps[P <: Product](p: P): TupleOps[P] =
     new TupleOps(p)
-}
 
-object tuple extends LowPriorityTuple {
+object tuple extends LowPriorityTuple
   implicit def unitTupleOps(u: Unit): TupleOps[Unit] = new TupleOps(u)
 
   // Duplicated here from shapeless.HList so that explicit imports of tuple._ don't
   // clobber the conversion to HListOps.
   implicit def hlistOps[L <: HList](l: L): HListOps[L] = new HListOps(l)
-}
 
-final class TupleOps[T](t: T) extends Serializable {
+final class TupleOps[T](t: T) extends Serializable
   import ops.tuple._
 
   /**
@@ -161,10 +159,9 @@ final class TupleOps[T](t: T) extends Serializable {
   def replace[U](u: U)(implicit replacer: Replacer[T, U, U]): replacer.Out =
     replacer(t, u)
 
-  class ReplaceTypeAux[U] {
+  class ReplaceTypeAux[U]
     def apply[V](v: V)(implicit replacer: Replacer[T, V, U]): replacer.Out =
       replacer(t, v)
-  }
 
   /**
     * Replaces the first element of type `U` of this tuple with the supplied value of type `V`, returning both the
@@ -183,11 +180,10 @@ final class TupleOps[T](t: T) extends Serializable {
   def updatedElem[U, R](u: U)(
       implicit replacer: Replacer.Aux[T, U, U, (U, R)]): R = replacer(t, u)._2
 
-  class UpdatedTypeAux[U] {
+  class UpdatedTypeAux[U]
     def apply[V, R](v: V)(
         implicit replacer: Replacer.Aux[T, V, U, (U, R)]): R =
       replacer(t, v)._2
-  }
 
   /**
     * Replaces the first element of type `U` of this tuple with the supplied value of type `V`. An explicit type
@@ -196,11 +192,10 @@ final class TupleOps[T](t: T) extends Serializable {
     */
   def updatedType[U] = new UpdatedTypeAux[U]
 
-  class UpdateWithAux[U] {
+  class UpdateWithAux[U]
     def apply[V, R](f: U => V)(
         implicit modifier: Modifier.Aux[T, U, V, (U, R)]): R =
       modifier(t, f)._2
-  }
 
   /**
     * Replaces the first element of type `U` of this tuple with the result of its transformation to a `V` via the
@@ -218,11 +213,10 @@ final class TupleOps[T](t: T) extends Serializable {
       f: n.instance.Out => U)(
       implicit upd: ModifierAt[T, n.N, n.instance.Out, U]): upd.Out = upd(t, f)
 
-  class UpdatedAtAux[N <: Nat] {
+  class UpdatedAtAux[N <: Nat]
     def apply[U, V, R](u: U)(
         implicit replacer: ReplaceAt.Aux[T, N, U, (V, R)]): R =
       replacer(t, u)._2
-  }
 
   /**
     * Replaces the ''nth' element of this tuple with the supplied value of type `U`. An explicit type argument
@@ -541,10 +535,9 @@ final class TupleOps[T](t: T) extends Serializable {
     */
   def patch[N <: Nat, M <: Nat] = new PatchAux[N, M]
 
-  class PatchAux[N <: Nat, M <: Nat] {
+  class PatchAux[N <: Nat, M <: Nat]
     def apply[In](in: In)(
         implicit patcher: Patcher[N, M, T, In]): patcher.Out = patcher(t, in)
-  }
 
   /**
     * Groups the elements of this `Tuple` into tuples of `n` elements, offset by `step`
@@ -562,4 +555,3 @@ final class TupleOps[T](t: T) extends Serializable {
   def group[Pad](n: Nat, step: Nat, pad: Pad)(
       implicit grouper: PaddedGrouper[T, n.N, step.N, Pad]): grouper.Out =
     grouper(t, pad)
-}

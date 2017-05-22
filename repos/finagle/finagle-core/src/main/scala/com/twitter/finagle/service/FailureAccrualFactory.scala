@@ -12,7 +12,7 @@ import com.twitter.util._
 import java.util.logging.Logger
 import scala.util.Random
 
-object FailureAccrualFactory {
+object FailureAccrualFactory
   private[finagle] def wrapper(
       statsReceiver: StatsReceiver,
       failureAccrualPolicy: FailureAccrualPolicy,
@@ -22,8 +22,8 @@ object FailureAccrualFactory {
       responseClassifier: ResponseClassifier
   )(
       timer: Timer
-  ): ServiceFactoryWrapper = {
-    new ServiceFactoryWrapper {
+  ): ServiceFactoryWrapper =
+    new ServiceFactoryWrapper
       def andThen[Req, Rep](factory: ServiceFactory[Req, Rep]) =
         new FailureAccrualFactory(factory,
                                   failureAccrualPolicy,
@@ -33,8 +33,6 @@ object FailureAccrualFactory {
                                   logger,
                                   endpoint,
                                   responseClassifier)
-    }
-  }
 
   private[this] val rng = new Random
 
@@ -62,10 +60,8 @@ object FailureAccrualFactory {
       rand: Random = rng
   ): () => Duration =
     () =>
-      {
         val ms = markDeadFor.inMilliseconds
         (ms + ms * rand.nextFloat() * perturbation).toInt.milliseconds
-    }
 
   val role = Stack.Role("FailureAccrual")
 
@@ -76,11 +72,10 @@ object FailureAccrualFactory {
     * 2. [[Param.Replaced]] - replaces the standard implementation with the given one
     * 3. [[Param.Disabled]] - completely disables this role in the underlying stack
     */
-  sealed trait Param {
+  sealed trait Param
     def mk(): (Param, Stack.Param[Param]) = (this, Param.param)
-  }
 
-  private[finagle] object Param {
+  private[finagle] object Param
     case class Configured(failureAccrualPolicy: () => FailureAccrualPolicy)
         extends Param
     case class Replaced(factory: Timer => ServiceFactoryWrapper) extends Param
@@ -88,7 +83,6 @@ object FailureAccrualFactory {
 
     implicit val param: Stack.Param[Param] =
       Stack.Param(Param.Configured(defaultPolicy))
-  }
 
   // -Implementation notes-
   //
@@ -166,7 +160,7 @@ object FailureAccrualFactory {
     * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.service.FailureAccrualFactory]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.ModuleParams[ServiceFactory[Req, Rep]] {
+    new Stack.ModuleParams[ServiceFactory[Req, Rep]]
       val role: Role = FailureAccrualFactory.role
       val description: String =
         "Backoff from hosts that we cannot successfully make requests to"
@@ -180,8 +174,8 @@ object FailureAccrualFactory {
       )
 
       def make(params: Params,
-               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] = {
-        params[FailureAccrualFactory.Param] match {
+               next: ServiceFactory[Req, Rep]): ServiceFactory[Req, Rep] =
+        params[FailureAccrualFactory.Param] match
           case Param.Configured(p) =>
             val timer = params[param.Timer].timer
             val statsReceiver = params[param.Stats].statsReceiver
@@ -198,9 +192,6 @@ object FailureAccrualFactory {
 
           case Param.Disabled =>
             next
-        }
-      }
-    }
 
   // The FailureAccrualFactory transitions between Alive, Dead, ProbeOpen,
   // and ProbeClosed. The factory starts in the Alive state. After numFailures
@@ -224,7 +215,6 @@ object FailureAccrualFactory {
   protected[finagle] object Dead extends State
   protected[finagle] object ProbeOpen extends State
   protected[finagle] object ProbeClosed extends State
-}
 
 /**
   * A [[com.twitter.finagle.ServiceFactory]] that accrues failures, marking
@@ -252,7 +242,7 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
     logger: Logger = DefaultLogger,
     endpoint: Address = Address.failing,
     responseClassifier: ResponseClassifier = ResponseClassifier.Default)
-    extends ServiceFactory[Req, Rep] { svcFacSelf =>
+    extends ServiceFactory[Req, Rep]  svcFacSelf =>
   import FailureAccrualFactory._
 
   def this(
@@ -304,10 +294,10 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
   private[this] val probesCounter = statsReceiver.counter("probes")
   private[this] val removedForCounter = statsReceiver.counter("removed_for_ms")
 
-  private[this] def didFail() = svcFacSelf.synchronized {
-    state match {
+  private[this] def didFail() = svcFacSelf.synchronized
+    state match
       case Alive | ProbeClosed =>
-        failureAccrualPolicy.markDeadOnFailure() match {
+        failureAccrualPolicy.markDeadOnFailure() match
           case Some(duration) => markDeadFor(duration)
           case None if state == ProbeClosed =>
             // The probe request failed, but the policy tells us that we
@@ -316,34 +306,27 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
             // fixed period of time, or even mark alive.
             startProbing()
           case None =>
-        }
       case _ =>
-    }
-  }
 
-  private[this] val onServiceAcquisitionFailure: Throwable => Unit = { _ =>
+  private[this] val onServiceAcquisitionFailure: Throwable => Unit =  _ =>
     didFail()
-  }
 
   protected def isSuccess(reqRep: ReqRep): Boolean =
-    responseClassifier.applyOrElse(reqRep, ResponseClassifier.Default) match {
+    responseClassifier.applyOrElse(reqRep, ResponseClassifier.Default) match
       case ResponseClass.Successful(_) => true
       case ResponseClass.Failed(_) => false
-    }
 
-  protected def didSucceed(): Unit = svcFacSelf.synchronized {
+  protected def didSucceed(): Unit = svcFacSelf.synchronized
     // Only count revivals when the probe succeeds.
-    state match {
+    state match
       case ProbeClosed =>
         revivalCounter.incr()
         failureAccrualPolicy.revived()
         state = Alive
       case _ =>
-    }
     failureAccrualPolicy.recordSuccess()
-  }
 
-  private[this] def markDeadFor(duration: Duration) = svcFacSelf.synchronized {
+  private[this] def markDeadFor(duration: Duration) = svcFacSelf.synchronized
 
     // In order to have symmetry with the revival counter, don't count removals
     // when probing fails.
@@ -362,7 +345,6 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
     removedForCounter.incr(duration.inMilliseconds.toInt)
 
     didMarkDead()
-  }
 
   /**
     * Called by FailureAccrualFactory after marking an endpoint dead. Override
@@ -374,64 +356,52 @@ class FailureAccrualFactory[Req, Rep] private[finagle](
     * Enter 'Probing' state.
     * The service must satisfy one request before accepting more.
     */
-  protected def startProbing() = svcFacSelf.synchronized {
+  protected def startProbing() = svcFacSelf.synchronized
     state = ProbeOpen
     cancelReviveTimerTask()
-  }
 
-  def apply(conn: ClientConnection) = {
-    underlying(conn).map { service =>
+  def apply(conn: ClientConnection) =
+    underlying(conn).map  service =>
       // N.B. the reason we can't simply filter the service factory is so that
       // we can override the session status to reflect the broader endpoint status.
-      new Service[Req, Rep] {
-        def apply(request: Req): Future[Rep] = {
+      new Service[Req, Rep]
+        def apply(request: Req): Future[Rep] =
           // If service has just been revived, accept no further requests.
           // Note: Another request may have come in before state transitions to
           // ProbeClosed, so > 1 requests may be processing while in the
           // ProbeClosed state. The result of first to complete will determine
           // whether the factory transitions to Alive (successful) or Dead
           // (unsuccessful).
-          state match {
+          state match
             case ProbeOpen =>
               probesCounter.incr()
-              svcFacSelf.synchronized {
-                state match {
+              svcFacSelf.synchronized
+                state match
                   case ProbeOpen => state = ProbeClosed
                   case _ =>
-                }
-              }
             case _ =>
-          }
 
-          service(request).respond { rep =>
+          service(request).respond  rep =>
             if (isSuccess(ReqRep(request, rep))) didSucceed()
             else didFail()
-          }
-        }
 
         override def close(deadline: Time): Future[Unit] =
           service.close(deadline)
         override def status: Status =
           Status.worst(service.status, FailureAccrualFactory.this.status)
-      }
-    }.onFailure(onServiceAcquisitionFailure)
-  }
+    .onFailure(onServiceAcquisitionFailure)
 
-  override def status: Status = state match {
+  override def status: Status = state match
     case Alive | ProbeOpen => underlying.status
     case Dead | ProbeClosed => Status.Busy
-  }
 
   protected[this] def getState: State = state
 
-  private[this] def cancelReviveTimerTask(): Unit = svcFacSelf.synchronized {
+  private[this] def cancelReviveTimerTask(): Unit = svcFacSelf.synchronized
     reviveTimerTask.foreach(_.cancel())
     reviveTimerTask = None
-  }
 
-  def close(deadline: Time): Future[Unit] = underlying.close(deadline).ensure {
+  def close(deadline: Time): Future[Unit] = underlying.close(deadline).ensure
     cancelReviveTimerTask()
-  }
 
   override def toString = s"failure_accrual_${underlying.toString}"
-}

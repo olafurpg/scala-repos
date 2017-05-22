@@ -19,9 +19,9 @@ package org.apache.spark.mllib.fpm
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
+class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("association rules using String type") {
+  test("association rules using String type")
     val freqItemsets = sc.parallelize(
         Seq(
             (Set("s"), 3L),
@@ -42,9 +42,9 @@ class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
             (Set("t", "y", "z"), 3L),
             (Set("t", "y", "x"), 3L),
             (Set("t", "y", "x", "z"), 3L)
-        ).map {
+        ).map
       case (items, freq) => new FPGrowth.FreqItemset(items.toArray, freq)
-    })
+    )
 
     val ar = new AssociationRules()
 
@@ -93,5 +93,3 @@ class AssociationRulesSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(results2.size === 30)
     assert(
         results2.count(rule => math.abs(rule.confidence - 1.0D) < 1e-6) == 23)
-  }
-}

@@ -16,15 +16,13 @@ private case class ResolvedRecord(
     flags: Int, ifIndex: Int, fullName: String, hostName: String, port: Int)
 
 private class Listener(f: PartialFunction[(String, Array[Object]), Unit])
-    extends InvocationHandler {
-  def invoke(proxy: Object, method: Method, args: Array[Object]) = {
+    extends InvocationHandler
+  def invoke(proxy: Object, method: Method, args: Array[Object]) =
     val fArgs = (method.getName, args)
     if (f.isDefinedAt(fArgs)) f(fArgs)
     null
-  }
-}
 
-private class DNSSD {
+private class DNSSD
   def newProxy[T](klass: Class[_])(
       f: PartialFunction[(String, Array[Object]), Unit]) =
     Proxy.newProxyInstance(klass.getClassLoader, Array(klass), new Listener(f))
@@ -77,22 +75,19 @@ private class DNSSD {
       domain: String,
       host: String,
       port: Int
-  ): Future[Announcement] = {
+  ): Future[Announcement] =
     val reply = new Promise[Announcement]
 
-    val proxy = newProxy(RegisterListenerClass) {
+    val proxy = newProxy(RegisterListenerClass)
       case ("serviceRegistered", args) =>
-        val announcement = new Announcement {
-          def unannounce() = {
+        val announcement = new Announcement
+          def unannounce() =
             registrationStopMethod.invoke(args(0))
             Future.Done
-          }
-        }
         reply.setValue(announcement)
 
       case ("operationFailed", _) =>
         reply.setException(new Exception("Registration failed"))
-    }
 
     registerMethod.invoke(DNSSDClass,
                           UNIQUE.asInstanceOf[Object],
@@ -106,11 +101,10 @@ private class DNSSD {
                           proxy)
 
     reply
-  }
 
-  def resolve(record: Record): Future[ResolvedRecord] = {
+  def resolve(record: Record): Future[ResolvedRecord] =
     val reply = new Promise[ResolvedRecord]
-    val proxy = newProxy(ResolveListenerClass) {
+    val proxy = newProxy(ResolveListenerClass)
       case ("serviceResolved", args) =>
         reply.setValue(
             ResolvedRecord(flags = args(1).asInstanceOf[Int],
@@ -121,7 +115,6 @@ private class DNSSD {
 
       case ("operationFailed", _) =>
         reply.setException(new Exception("Resolve failed"))
-    }
 
     resolveMethod.invoke(DNSSDClass,
                          record.flags.asInstanceOf[Object],
@@ -132,35 +125,31 @@ private class DNSSD {
                          proxy)
 
     reply
-  }
-}
 
-private object DNSSD {
+private object DNSSD
   lazy val instance = new DNSSD
 
-  def check() {
+  def check()
     // Throws ClassNotFoundException when
     // DNSSD is not present
     instance
-  }
 
-  def resolve(regType: String, domain: String): Var[Addr] = {
+  def resolve(regType: String, domain: String): Var[Addr] =
     val services = new mutable.HashMap[String, Address]()
     val v = Var[Addr](Addr.Pending)
 
-    def mkRecord(args: Array[Object]) = {
+    def mkRecord(args: Array[Object]) =
       assert(args.size > 5)
       Record(flags = args(1).asInstanceOf[Int],
              ifIndex = args(2).asInstanceOf[Int],
              serviceName = args(3).asInstanceOf[String],
              regType = args(4).asInstanceOf[String],
              domain = args(5).asInstanceOf[String])
-    }
 
-    val proxy = instance.newProxy(instance.BrowseListenerClass) {
+    val proxy = instance.newProxy(instance.BrowseListenerClass)
       case ("serviceFound", args) =>
         val record = mkRecord(args)
-        instance.resolve(record) foreach { resolved =>
+        instance.resolve(record) foreach  resolved =>
           val metadata = MdnsAddrMetadata(record.serviceName,
                                           record.regType,
                                           record.domain)
@@ -168,19 +157,15 @@ private object DNSSD {
               new InetSocketAddress(resolved.hostName, resolved.port),
               MdnsAddrMetadata.toAddrMetadata(metadata))
 
-          synchronized {
+          synchronized
             services.put(record.serviceName, addr)
             v() = Addr.Bound(services.values.toSet: Set[Address])
-          }
-        }
 
       case ("serviceLost", args) =>
         val record = mkRecord(args)
-        synchronized {
+        synchronized
           if (services.remove(record.serviceName).isDefined)
             v() = Addr.Bound(services.values.toSet: Set[Address])
-        }
-    }
 
     instance.browseMethod.invoke(instance.DNSSDClass,
                                  instance.UNIQUE.asInstanceOf[Object],
@@ -190,10 +175,8 @@ private object DNSSD {
                                  proxy)
 
     v
-  }
-}
 
-private class DNSSDAnnouncer extends MDNSAnnouncerIface {
+private class DNSSDAnnouncer extends MDNSAnnouncerIface
   DNSSD.check()
 
   private[this] val dnssd = DNSSD.instance
@@ -201,11 +184,9 @@ private class DNSSDAnnouncer extends MDNSAnnouncerIface {
   def announce(
       addr: InetSocketAddress, name: String, regType: String, domain: String) =
     dnssd.register(name, regType, domain, addr.getHostName, addr.getPort)
-}
 
-private class DNSSDResolver extends MDNSResolverIface {
+private class DNSSDResolver extends MDNSResolverIface
   DNSSD.check()
 
   def resolve(regType: String, domain: String) =
     DNSSD.resolve(regType, domain)
-}

@@ -4,7 +4,7 @@ trait T[X]
 trait U[X]
 trait TC[M[_]]
 
-object Test extends App {
+object Test extends App
   def foo[M[_]: TC, A](ma: M[A]) = ()
   implicit val TCofT: TC[T] = new TC[T] {}
   implicit def any2T[A](a: A): T[A] = new T[A] {}
@@ -12,4 +12,3 @@ object Test extends App {
 
   val x = foo[T, Int](1)
   val y = foo(1)
-}

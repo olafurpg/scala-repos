@@ -32,20 +32,18 @@ class BatchedDeltaService[K, V : Semigroup](
     val store: batch.BatchedStore[K, V],
     val deltas: batch.BatchedSink[(K, V)],
     override val reducers: Option[Int] = None)
-    extends batch.BatchedService[K, V] {
+    extends batch.BatchedService[K, V]
 
   assert(store.batcher == deltas.batcher, "Batchers do not match")
 
   override def ordering = store.ordering
   override def batcher = store.batcher
   override def readStream(batchID: BatchID, mode: Mode) =
-    deltas.readStream(batchID, mode).map { fp =>
-      fp.map { pipe =>
-        pipe.mapValues { kv: (K, V) =>
+    deltas.readStream(batchID, mode).map  fp =>
+      fp.map  pipe =>
+        pipe.mapValues  kv: (K, V) =>
           (kv._1, Some(kv._2))
-        } // case confused compiler here
-      }
-    }
+        // case confused compiler here
   override def readLast(exclusiveUB: BatchID, mode: Mode) =
     store.readLast(exclusiveUB, mode)
 
@@ -56,13 +54,10 @@ class BatchedDeltaService[K, V : Semigroup](
     */
   override def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
                          servStream: TypedPipe[(Timestamp, (K, Option[V]))])
-    : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
+    : TypedPipe[(Timestamp, (K, (W, Option[V])))] =
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)
 
     implicit val ord = ordering
-    LookupJoin.rightSumming(incoming, servStream, reducers).map {
+    LookupJoin.rightSumming(incoming, servStream, reducers).map
       case (t, (k, (w, optoptv))) => (t, (k, (w, flatOpt(optoptv))))
-    }
-  }
-}

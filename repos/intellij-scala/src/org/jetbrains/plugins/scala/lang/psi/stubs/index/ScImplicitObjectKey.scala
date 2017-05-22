@@ -9,7 +9,7 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScImplicitObjectKey extends StringStubIndexExtension[ScObject] {
+class ScImplicitObjectKey extends StringStubIndexExtension[ScObject]
 
   override def get(fqn: String,
                    project: Project,
@@ -17,8 +17,6 @@ class ScImplicitObjectKey extends StringStubIndexExtension[ScObject] {
     super.get(fqn, project, new ScalaSourceFilterScope(scope, project))
 
   def getKey = ScImplicitObjectKey.KEY
-}
 
-object ScImplicitObjectKey {
+object ScImplicitObjectKey
   val KEY = ScalaIndexKeys.IMPLICIT_OBJECT_KEY
-}

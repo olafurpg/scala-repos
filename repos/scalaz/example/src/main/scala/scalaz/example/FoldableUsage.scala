@@ -1,6 +1,6 @@
 package scalaz.example
 
-object FoldableUsage extends App {
+object FoldableUsage extends App
   import scalaz._
   import scalaz.std.stream._
   import scalaz.std.list._
@@ -79,11 +79,10 @@ object FoldableUsage extends App {
 
   // Monadic Folds: we can fold over a structure with a function
   // which returns its value in a Monad, 
-  val sumEvens: (Int, Int) => Option[Int] = { (x, y) =>
+  val sumEvens: (Int, Int) => Option[Int] =  (x, y) =>
     // if the right int is even, add it to the left
     // otherwise return None
     if ((y % 2) == 0) Some(x + y) else None
-  }
 
   // all numbers are even, so we end up with Some
   val allEvens = List(2, 4, 6, 8, 10)
@@ -92,4 +91,3 @@ object FoldableUsage extends App {
   // when the 7 is encountered, the entire computation results in None
   val notAllEvens = List(2, 4, 7, 8, 10)
   assert(notAllEvens.foldLeftM[Option, Int](0)(sumEvens) === None)
-}

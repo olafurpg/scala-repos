@@ -7,9 +7,9 @@ import com.intellij.openapi.util.SystemInfo
   * @author Nikolay Obedin
   * @since 8/22/14.
   */
-class IvyCacheTest extends IndexingTestCase with UsefulTestCaseHelper {
+class IvyCacheTest extends IndexingTestCase with UsefulTestCaseHelper
 
-  def testIndexUpdate() = {
+  def testIndexUpdate() =
     val testIndex = createAndUpdateIndex(
         new SbtResolver(SbtResolver.Kind.Ivy,
                         "Test repo",
@@ -18,21 +18,17 @@ class IvyCacheTest extends IndexingTestCase with UsefulTestCaseHelper {
                               Set("org.jetbrains"),
                               Set("test-one", "test-two"),
                               Set("0.0.1", "0.0.2"))
-  }
 
-  def testNonExistentIndexUpdate() = {
+  def testNonExistentIndexUpdate() =
     if (SystemInfo.isWindows)
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
-                         "C:\\non-existent-dir"))) {
+                         "C:\\non-existent-dir")))
         createAndUpdateIndex(SbtResolver(
                 SbtResolver.Kind.Ivy, "Test repo", "C:\\non-existent-dir"))
-      } else
+      else
       assertException[InvalidRepository](
           Some(SbtBundle("sbt.resolverIndexer.invalidRepository",
-                         "/non-existent-dir"))) {
+                         "/non-existent-dir")))
         createAndUpdateIndex(SbtResolver(
                 SbtResolver.Kind.Ivy, "Test repo", "/non-existent-dir"))
-      }
-  }
-}

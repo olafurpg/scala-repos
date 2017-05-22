@@ -1,5 +1,5 @@
-class NoReturnSeveralOutput {
-  def foo(i: Int) {
+class NoReturnSeveralOutput
+  def foo(i: Int)
     /*start*/
 
     val x = 0
@@ -8,8 +8,6 @@ class NoReturnSeveralOutput {
     val zz = "1"
     /*end*/
     println(x + y + z + zz)
-  }
-}
 /*
 class NoReturnSeveralOutput {
   def foo(i: Int) {

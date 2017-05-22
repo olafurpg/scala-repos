@@ -24,9 +24,9 @@ import org.apache.spark.ml.regression.LinearRegression
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object LinearRegressionWithElasticNetExample {
+object LinearRegressionWithElasticNetExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf =
       new SparkConf().setAppName("LinearRegressionWithElasticNetExample")
     val sc = new SparkContext(conf)
@@ -60,6 +60,4 @@ object LinearRegressionWithElasticNetExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

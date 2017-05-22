@@ -39,17 +39,17 @@ import org.apache.spark.storage.{BlockId, StorageLevel}
   */
 class NettyBlockRpcServer(
     appId: String, serializer: Serializer, blockManager: BlockDataManager)
-    extends RpcHandler with Logging {
+    extends RpcHandler with Logging
 
   private val streamManager = new OneForOneStreamManager()
 
   override def receive(client: TransportClient,
                        rpcMessage: ByteBuffer,
-                       responseContext: RpcResponseCallback): Unit = {
+                       responseContext: RpcResponseCallback): Unit =
     val message = BlockTransferMessage.Decoder.fromByteBuffer(rpcMessage)
     logTrace(s"Received request: $message")
 
-    message match {
+    message match
       case openBlocks: OpenBlocks =>
         val blocks: Seq[ManagedBuffer] =
           openBlocks.blockIds.map(BlockId.apply).map(blockManager.getBlockData)
@@ -68,8 +68,5 @@ class NettyBlockRpcServer(
         val blockId = BlockId(uploadBlock.blockId)
         blockManager.putBlockData(blockId, data, level)
         responseContext.onSuccess(ByteBuffer.allocate(0))
-    }
-  }
 
   override def getStreamManager(): StreamManager = streamManager
-}

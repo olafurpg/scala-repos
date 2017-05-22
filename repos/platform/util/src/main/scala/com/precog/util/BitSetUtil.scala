@@ -23,8 +23,8 @@ import scala.collection.mutable
 
 import scala.annotation.tailrec
 
-object BitSetUtil {
-  class BitSetOperations(bs: BitSet) {
+object BitSetUtil
+  class BitSetOperations(bs: BitSet)
     def toUnboxedArray(): Array[Long] = bitSetToArray(bs)
     def toList(): List[Int] = bitSetToList(bs)
 
@@ -45,168 +45,138 @@ object BitSetUtil {
     def isEmpty(): Boolean =
       bs.nextSetBit(0) < 0
 
-    def min(): Int = {
+    def min(): Int =
       val n = bs.nextSetBit(0)
       if (n < 0) sys.error("can't take min of empty set") else n
-    }
 
-    def max(): Int = {
+    def max(): Int =
       @tailrec
-      def findBit(i: Int, last: Int): Int = {
+      def findBit(i: Int, last: Int): Int =
         val j = bs.nextSetBit(i)
         if (j < 0) last else findBit(j + 1, j)
-      }
 
       val ns = bs.getBits
       var i = ns.length - 1
-      while (i >= 0) {
+      while (i >= 0)
         if (ns(i) != 0) return findBit(i * 64, -1)
         i -= 1
-      }
       sys.error("can't find max of empty set")
-    }
 
-    def foreach(f: Int => Unit) = {
+    def foreach(f: Int => Unit) =
       var b = bs.nextSetBit(0)
-      while (b >= 0) {
+      while (b >= 0)
         f(b)
         b = bs.nextSetBit(b + 1)
-      }
-    }
-  }
 
-  object Implicits {
+  object Implicits
     implicit def bitSetOps(bs: BitSet) = new BitSetOperations(bs)
-  }
 
-  def fromArray(arr: Array[Long]) = {
+  def fromArray(arr: Array[Long]) =
     val bs = new BitSet()
     bs.setBits(arr)
     bs
-  }
 
   def create(): BitSet = new BitSet()
 
-  def create(ns: Array[Int]): BitSet = {
+  def create(ns: Array[Int]): BitSet =
     val bs = new BitSet()
     var i = 0
     val len = ns.length
-    while (i < len) {
+    while (i < len)
       bs.set(ns(i))
       i += 1
-    }
     bs
-  }
 
-  def create(ns: Seq[Int]): BitSet = {
+  def create(ns: Seq[Int]): BitSet =
     val bs = new BitSet()
     ns.foreach(n => bs.set(n))
     bs
-  }
 
-  def range(start: Int, end: Int): BitSet = {
+  def range(start: Int, end: Int): BitSet =
     val bs = new BitSet()
     Loop.range(start, end)(i => bs.set(i))
     bs
-  }
 
-  def takeRange(from: Int, to: Int)(bitset: BitSet): BitSet = {
+  def takeRange(from: Int, to: Int)(bitset: BitSet): BitSet =
     val len = bitset.length
-    if (from <= 0) {
+    if (from <= 0)
       val bits = bitset.copy()
       if (to >= len) bits
-      else {
+      else
         bits.clear(to, len)
         bits
-      }
-    } else {
+    else
       var i = from
       val bits = new BitSet()
-      while (i < to) {
+      while (i < to)
         bits(i - from) = bitset(i)
         i += 1
-      }
       bits
-    }
-  }
 
-  def filteredRange(start: Int, end: Int)(pred: Int => Boolean): BitSet = {
+  def filteredRange(start: Int, end: Int)(pred: Int => Boolean): BitSet =
     val bs = new BitSet()
     Loop.range(start, end)(i => if (pred(i)) bs.set(i))
     bs
-  }
 
   @inline final def filteredRange(r: Range)(pred: Int => Boolean): BitSet =
     filteredRange(r.start, r.end)(pred)
 
-  def filteredList[A](as: List[A])(pred: A => Boolean): BitSet = {
+  def filteredList[A](as: List[A])(pred: A => Boolean): BitSet =
     val bs = new BitSet
     @inline
-    @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
+    @tailrec def loop(lst: List[A], i: Int): Unit = lst match
       case h :: t =>
         if (pred(h)) bs.set(i)
         loop(t, i + 1)
       case Nil =>
-    }
     loop(as, 0)
     bs
-  }
 
-  def filteredSeq[A](as: List[A])(pred: A => Boolean): BitSet = {
+  def filteredSeq[A](as: List[A])(pred: A => Boolean): BitSet =
     val bs = new BitSet
     @inline
-    @tailrec def loop(lst: List[A], i: Int): Unit = lst match {
+    @tailrec def loop(lst: List[A], i: Int): Unit = lst match
       case h :: t =>
         if (pred(h)) bs.set(i)
         loop(t, i + 1)
       case Nil =>
-    }
     loop(as, 0)
     bs
-  }
 
-  def bitSetToArray(bs: BitSet): Array[Long] = {
+  def bitSetToArray(bs: BitSet): Array[Long] =
     var j = 0
     val arr = new Array[Long](bs.size)
 
     @tailrec
-    def loopBits(long: Long, bit: Int, base: Int) {
-      if (((long >> bit) & 1) == 1) {
+    def loopBits(long: Long, bit: Int, base: Int)
+      if (((long >> bit) & 1) == 1)
         arr(j) = base + bit
         j += 1
-      }
       if (bit < 63) loopBits(long, bit + 1, base)
-    }
 
     @tailrec
-    def loopLongs(i: Int, longs: Array[Long], last: Int, base: Int) {
+    def loopLongs(i: Int, longs: Array[Long], last: Int, base: Int)
       loopBits(longs(i), 0, base)
       if (i < last) loopLongs(i + 1, longs, last, base + 64)
-    }
 
     loopLongs(0, bs.getBits, bs.getBitsLength - 1, 0)
     arr
-  }
 
-  def bitSetToList(bs: BitSet): List[Int] = {
+  def bitSetToList(bs: BitSet): List[Int] =
     @tailrec
     def loopBits(
-        long: Long, bit: Int, base: Int, sofar: List[Int]): List[Int] = {
+        long: Long, bit: Int, base: Int, sofar: List[Int]): List[Int] =
       if (bit < 0) sofar
       else if (((long >> bit) & 1) == 1)
         loopBits(long, bit - 1, base, (base + bit) :: sofar)
       else loopBits(long, bit - 1, base, sofar)
-    }
 
     @tailrec
     def loopLongs(
-        i: Int, longs: Array[Long], base: Int, sofar: List[Int]): List[Int] = {
+        i: Int, longs: Array[Long], base: Int, sofar: List[Int]): List[Int] =
       if (i < 0) sofar
       else
         loopLongs(i - 1, longs, base - 64, loopBits(longs(i), 63, base, sofar))
-    }
 
     val last = bs.getBitsLength - 1
     loopLongs(last, bs.getBits, last * 64, Nil)
-  }
-}

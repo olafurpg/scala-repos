@@ -36,71 +36,58 @@ import scalafx.beans.property.{BooleanProperty, DoubleProperty, ReadOnlyObjectPr
 import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 
-object PieChart {
+object PieChart
   implicit def sfxPieChart2jfx(v: PieChart): jfxsc.PieChart =
     if (v != null) v.delegate else null
 
-  object Data {
+  object Data
     implicit def sfxPieChartData2jfx(v: PieChart.Data): jfxsc.PieChart.Data =
       if (v != null) v.delegate else null
 
     def apply(name: String, value: Double) =
       new jfxsc.PieChart.Data(name, value)
-  }
 
   class Data(override val delegate: jfxsc.PieChart.Data)
-      extends SFXDelegate[jfxsc.PieChart.Data] {
+      extends SFXDelegate[jfxsc.PieChart.Data]
     def chart: ReadOnlyObjectProperty[jfxsc.PieChart] = delegate.chartProperty
 
     def name: StringProperty = delegate.nameProperty
-    def name_=(v: String) {
+    def name_=(v: String)
       name() = v
-    }
 
     def pieValue: DoubleProperty = delegate.pieValueProperty
-    def pieValue_=(v: Double) {
+    def pieValue_=(v: Double)
       pieValue() = v
-    }
 
     def node: ReadOnlyObjectProperty[jfxs.Node] = delegate.nodeProperty()
-  }
 
   def apply(data: ObservableBuffer[jfxsc.PieChart.Data]) =
     new PieChart(new jfxsc.PieChart(data))
-}
 
 class PieChart(override val delegate: jfxsc.PieChart = new jfxsc.PieChart())
-    extends Chart(delegate) with SFXDelegate[jfxsc.PieChart] {
+    extends Chart(delegate) with SFXDelegate[jfxsc.PieChart]
 
-  def this(data: ObservableBuffer[jfxsc.PieChart.Data]) {
+  def this(data: ObservableBuffer[jfxsc.PieChart.Data])
     this(new jfxsc.PieChart(data))
-  }
 
   def clockwise: BooleanProperty = delegate.clockwiseProperty
-  def clockwise_=(v: Boolean) {
+  def clockwise_=(v: Boolean)
     clockwise() = v
-  }
 
   def data = delegate.dataProperty
-  def data_=(v: ObservableBuffer[jfxsc.PieChart.Data]) {
+  def data_=(v: ObservableBuffer[jfxsc.PieChart.Data])
     data() = v
-  }
-  def data_=(v: Seq[jfxsc.PieChart.Data]) {
+  def data_=(v: Seq[jfxsc.PieChart.Data])
     data() = ObservableBuffer(v)
-  }
 
   def labelLineLength: DoubleProperty = delegate.labelLineLengthProperty
-  def labelLineLength_=(v: Double) {
+  def labelLineLength_=(v: Double)
     labelLineLength() = v
-  }
 
   def labelsVisible: BooleanProperty = delegate.labelsVisibleProperty
-  def labelsVisible_=(v: Boolean) {
+  def labelsVisible_=(v: Boolean)
     labelsVisible() = v
-  }
 
   def startAngle: DoubleProperty = delegate.startAngleProperty
-  def startAngle_=(v: Double) {
+  def startAngle_=(v: Double)
     startAngle() = v
-  }
-}

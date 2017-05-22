@@ -1,4 +1,4 @@
-class MegaClass {
+class MegaClass
   def method0: Int = 0
   def method1: Int = 0
   def method2: Int = 0
@@ -2999,4 +2999,3 @@ class MegaClass {
   def method2997: Int = 0
   def method2998: Int = 0
   def method2999: Int = 0
-}

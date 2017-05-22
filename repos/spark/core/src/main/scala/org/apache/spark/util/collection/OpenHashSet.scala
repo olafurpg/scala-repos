@@ -43,7 +43,7 @@ import org.apache.spark.annotation.Private
 @Private
 class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     initialCapacity: Int, loadFactor: Double)
-    extends Serializable {
+    extends Serializable
 
   require(
       initialCapacity <= OpenHashSet.MAX_CAPACITY,
@@ -62,7 +62,7 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
   // specialization to work (specialized class extends the non-specialized one and needs access
   // to the "private" variables).
 
-  protected val hasher: Hasher[T] = {
+  protected val hasher: Hasher[T] =
     // It would've been more natural to write the following using pattern matching. But Scala 2.9.x
     // compiler has a bug when specialization is used together with this pattern matching, and
     // throws:
@@ -73,14 +73,12 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     //         at scala.tools.nsc.typechecker.Infer$Inferencer.error(Infer.scala:207)
     //         ...
     val mt = classTag[T]
-    if (mt == ClassTag.Long) {
+    if (mt == ClassTag.Long)
       (new LongHasher).asInstanceOf[Hasher[T]]
-    } else if (mt == ClassTag.Int) {
+    else if (mt == ClassTag.Int)
       (new IntHasher).asInstanceOf[Hasher[T]]
-    } else {
+    else
       new Hasher[T]
-    }
-  }
 
   protected var _capacity = nextPowerOf2(initialCapacity)
   protected var _mask = _capacity - 1
@@ -109,18 +107,15 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     * Add an element to the set. If the set is over capacity after the insertion, grow the set
     * and rehash all elements.
     */
-  def add(k: T) {
+  def add(k: T)
     addWithoutResize(k)
     rehashIfNeeded(k, grow, move)
-  }
 
-  def union(other: OpenHashSet[T]): OpenHashSet[T] = {
+  def union(other: OpenHashSet[T]): OpenHashSet[T] =
     val iterator = other.iterator
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       add(iterator.next())
-    }
     this
-  }
 
   /**
     * Add an element to the set. This one differs from add in that it doesn't trigger rehashing.
@@ -132,27 +127,24 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     * @return The position where the key is placed, plus the highest order bit is set if the key
     *         does not exists previously.
     */
-  def addWithoutResize(k: T): Int = {
+  def addWithoutResize(k: T): Int =
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
-    while (true) {
-      if (!_bitset.get(pos)) {
+    while (true)
+      if (!_bitset.get(pos))
         // This is a new key.
         _data(pos) = k
         _bitset.set(pos)
         _size += 1
         return pos | NONEXISTENCE_MASK
-      } else if (_data(pos) == k) {
+      else if (_data(pos) == k)
         // Found an existing key.
         return pos
-      } else {
+      else
         // quadratic probing with values increase by 1, 2, 3, ...
         pos = (pos + delta) & _mask
         delta += 1
-      }
-    }
     throw new RuntimeException("Should never reach here.")
-  }
 
   /**
     * Rehash the set if it is overloaded.
@@ -163,50 +155,42 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     *                 to a new position (in the new data array).
     */
   def rehashIfNeeded(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
-    if (_size > _growThreshold) {
+      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit)
+    if (_size > _growThreshold)
       rehash(k, allocateFunc, moveFunc)
-    }
-  }
 
   /**
     * Return the position of the element in the underlying array, or INVALID_POS if it is not found.
     */
-  def getPos(k: T): Int = {
+  def getPos(k: T): Int =
     var pos = hashcode(hasher.hash(k)) & _mask
     var delta = 1
-    while (true) {
-      if (!_bitset.get(pos)) {
+    while (true)
+      if (!_bitset.get(pos))
         return INVALID_POS
-      } else if (k == _data(pos)) {
+      else if (k == _data(pos))
         return pos
-      } else {
+      else
         // quadratic probing with values increase by 1, 2, 3, ...
         pos = (pos + delta) & _mask
         delta += 1
-      }
-    }
     throw new RuntimeException("Should never reach here.")
-  }
 
   /** Return the value at the specified position. */
   def getValue(pos: Int): T = _data(pos)
 
-  def iterator: Iterator[T] = new Iterator[T] {
+  def iterator: Iterator[T] = new Iterator[T]
     var pos = nextPos(0)
     override def hasNext: Boolean = pos != INVALID_POS
-    override def next(): T = {
+    override def next(): T =
       val tmp = getValue(pos)
       pos = nextPos(pos + 1)
       tmp
-    }
-  }
 
   /** Return the value at the specified position. */
-  def getValueSafe(pos: Int): T = {
+  def getValueSafe(pos: Int): T =
     assert(_bitset.get(pos))
     _data(pos)
-  }
 
   /**
     * Return the next position with an element stored, starting from the given position inclusively.
@@ -225,7 +209,7 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     *                 to a new position (in the new data array).
     */
   private def rehash(
-      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit) {
+      k: T, allocateFunc: (Int) => Unit, moveFunc: (Int, Int) => Unit)
     val newCapacity = _capacity * 2
     require(
         newCapacity > 0 && newCapacity <= OpenHashSet.MAX_CAPACITY,
@@ -236,50 +220,43 @@ class OpenHashSet[@specialized(Long, Int) T : ClassTag](
     val newMask = newCapacity - 1
 
     var oldPos = 0
-    while (oldPos < capacity) {
-      if (_bitset.get(oldPos)) {
+    while (oldPos < capacity)
+      if (_bitset.get(oldPos))
         val key = _data(oldPos)
         var newPos = hashcode(hasher.hash(key)) & newMask
         var i = 1
         var keepGoing = true
         // No need to check for equality here when we insert so this has one less if branch than
         // the similar code path in addWithoutResize.
-        while (keepGoing) {
-          if (!newBitset.get(newPos)) {
+        while (keepGoing)
+          if (!newBitset.get(newPos))
             // Inserting the key at newPos
             newData(newPos) = key
             newBitset.set(newPos)
             moveFunc(oldPos, newPos)
             keepGoing = false
-          } else {
+          else
             val delta = i
             newPos = (newPos + delta) & newMask
             i += 1
-          }
-        }
-      }
       oldPos += 1
-    }
 
     _bitset = newBitset
     _data = newData
     _capacity = newCapacity
     _mask = newMask
     _growThreshold = (loadFactor * newCapacity).toInt
-  }
 
   /**
     * Re-hash a value to deal better with hash functions that don't differ in the lower bits.
     */
   private def hashcode(h: Int): Int = Hashing.murmur3_32().hashInt(h).asInt()
 
-  private def nextPowerOf2(n: Int): Int = {
+  private def nextPowerOf2(n: Int): Int =
     val highBit = Integer.highestOneBit(n)
     if (highBit == n) n else highBit << 1
-  }
-}
 
-private[spark] object OpenHashSet {
+private[spark] object OpenHashSet
 
   val MAX_CAPACITY = 1 << 30
   val INVALID_POS = -1
@@ -290,21 +267,17 @@ private[spark] object OpenHashSet {
     * A set of specialized hash function implementation to avoid boxing hash code computation
     * in the specialized implementation of OpenHashSet.
     */
-  sealed class Hasher[@specialized(Long, Int) T] extends Serializable {
+  sealed class Hasher[@specialized(Long, Int) T] extends Serializable
     def hash(o: T): Int = o.hashCode()
-  }
 
-  class LongHasher extends Hasher[Long] {
+  class LongHasher extends Hasher[Long]
     override def hash(o: Long): Int = (o ^ (o >>> 32)).toInt
-  }
 
-  class IntHasher extends Hasher[Int] {
+  class IntHasher extends Hasher[Int]
     override def hash(o: Int): Int = o
-  }
 
   private def grow1(newSize: Int) {}
   private def move1(oldPos: Int, newPos: Int) {}
 
   private val grow = grow1 _
   private val move = move1 _
-}

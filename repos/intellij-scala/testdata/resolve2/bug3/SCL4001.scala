@@ -1,22 +1,17 @@
-package a {
+package a
 
   class X
 
-  class Y(x: X) {
+  class Y(x: X)
     def y = 8
-  }
 
-  object Y {
+  object Y
     private[a] implicit def x2y(x: X) = new Y(x)
-  }
-}
 
-package b {
+package b
 
   import a.X
   import a.Y._
 
-  object tst {
+  object tst
     new X(). /* resolved: false */ y
-  }
-}

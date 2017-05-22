@@ -25,7 +25,7 @@ import org.openjdk.jmh.annotations.Level
 @Warmup(iterations = 4)
 @Measurement(iterations = 5)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-class ORSetMergeBenchmark {
+class ORSetMergeBenchmark
 
   @Param(Array("1", "10", "20", "100"))
   var set1Size = 0
@@ -48,7 +48,7 @@ class ORSetMergeBenchmark {
   var elem2: String = _
 
   @Setup(Level.Trial)
-  def setup(): Unit = {
+  def setup(): Unit =
     set1 = (1 to set1Size).foldLeft(ORSet.empty[String])(
         (s, n) => s.add(nextNode(), "elem" + n))
     addFromSameNode = set1.add(nodeA, "elem" + set1Size + 1).merge(set1)
@@ -61,16 +61,14 @@ class ORSetMergeBenchmark {
     complex2 = set1.add(nodeA, "a").add(nodeA, "c").add(nodeB, "d").merge(set1)
     elem1 = "elem" + (set1Size + 1)
     elem2 = "elem" + (set1Size + 2)
-  }
 
   @Benchmark
-  def mergeAddFromSameNode: ORSet[String] = {
+  def mergeAddFromSameNode: ORSet[String] =
     // this is the scenario when updating and then merging with local value
     // set2 produced by modify function
     val set2 = set1.add(nodeA, elem1).add(nodeA, elem2)
     // replicator merges with local value
     set1.merge(set2)
-  }
 
   @Benchmark
   def mergeAddFromOtherNode: ORSet[String] = set1.merge(addFromOtherNode)
@@ -81,4 +79,3 @@ class ORSetMergeBenchmark {
 
   @Benchmark
   def mergeComplex: ORSet[String] = complex1.merge(complex2)
-}

@@ -36,7 +36,7 @@ import org.apache.spark.sql.types.{DataType, StructField, StructType}
   */
 @DeveloperApi
 @Since("1.3.0")
-trait Saveable {
+trait Saveable
 
   /**
     * Save this model to the given path.
@@ -56,7 +56,6 @@ trait Saveable {
 
   /** Current version of model save/load format. */
   protected def formatVersion: String
-}
 
 /**
   * :: DeveloperApi ::
@@ -66,7 +65,7 @@ trait Saveable {
   */
 @DeveloperApi
 @Since("1.3.0")
-trait Loader[M <: Saveable] {
+trait Loader[M <: Saveable]
 
   /**
     * Load a model from the given path.
@@ -79,12 +78,11 @@ trait Loader[M <: Saveable] {
     */
   @Since("1.3.0")
   def load(sc: SparkContext, path: String): M
-}
 
 /**
   * Helper methods for loading models from files.
   */
-private[mllib] object Loader {
+private[mllib] object Loader
 
   /** Returns URI for path/data using the Hadoop filesystem */
   def dataPath(path: String): String = new Path(path, "data").toUri.toString
@@ -103,13 +101,13 @@ private[mllib] object Loader {
     * @param loadedSchema  Schema for model data loaded from file.
     * @tparam Data  Expected data type from which an expected schema can be derived.
     */
-  def checkSchema[Data : TypeTag](loadedSchema: StructType): Unit = {
+  def checkSchema[Data : TypeTag](loadedSchema: StructType): Unit =
     // Check schema explicitly since erasure makes it hard to use match-case for checking.
     val expectedFields: Array[StructField] =
       ScalaReflection.schemaFor[Data].dataType.asInstanceOf[StructType].fields
     val loadedFields: Map[String, DataType] =
       loadedSchema.map(field => field.name -> field.dataType).toMap
-    expectedFields.foreach { field =>
+    expectedFields.foreach  field =>
       assert(
           loadedFields.contains(field.name),
           s"Unable to parse model data." +
@@ -119,18 +117,14 @@ private[mllib] object Loader {
           loadedFields(field.name).sameType(field.dataType),
           s"Unable to parse model data.  Expected field $field but found field" +
           s" with different type: ${loadedFields(field.name)}")
-    }
-  }
 
   /**
     * Load metadata from the given path.
     * @return (class name, version, metadata)
     */
-  def loadMetadata(sc: SparkContext, path: String): (String, String, JValue) = {
+  def loadMetadata(sc: SparkContext, path: String): (String, String, JValue) =
     implicit val formats = DefaultFormats
     val metadata = parse(sc.textFile(metadataPath(path)).first())
     val clazz = (metadata \ "class").extract[String]
     val version = (metadata \ "version").extract[String]
     (clazz, version, metadata)
-  }
-}

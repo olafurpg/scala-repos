@@ -13,16 +13,15 @@ import java.io.{IOException, PrintWriter}
 import java.util.jar.Attributes.{Name => AttributeName}
 
 /** Loads `library.properties` from the jar. */
-object Properties extends PropertiesTrait {
+object Properties extends PropertiesTrait
   protected def propCategory = "library"
   protected def pickJarBasedOn = classOf[Option[_]]
 
   /** Scala manifest attributes.
     */
   val ScalaCompilerVersion = new AttributeName("Scala-Compiler-Version")
-}
 
-private[scala] trait PropertiesTrait {
+private[scala] trait PropertiesTrait
   protected def propCategory: String // specializes the remainder of the values
   protected def pickJarBasedOn: Class[_] // props file comes from jar containing this
 
@@ -30,18 +29,16 @@ private[scala] trait PropertiesTrait {
   protected val propFilename = "/" + propCategory + ".properties"
 
   /** The loaded properties */
-  protected lazy val scalaProps: java.util.Properties = {
+  protected lazy val scalaProps: java.util.Properties =
     val props = new java.util.Properties
     val stream = pickJarBasedOn getResourceAsStream propFilename
     if (stream ne null) quietlyDispose(props load stream, stream.close)
 
     props
-  }
 
   private def quietlyDispose(action: => Unit, disposal: => Unit) =
-    try { action } finally {
+    try { action } finally
       try { disposal } catch { case _: IOException => }
-    }
 
   def propIsSet(name: String) = System.getProperty(name) != null
   def propIsSetTo(name: String, value: String) = propOrNull(name) == value
@@ -76,9 +73,9 @@ private[scala] trait PropertiesTrait {
     *  it is an RC, Beta, etc. or was built from source, or if the version
     *  cannot be read.
     */
-  val releaseVersion = for {
+  val releaseVersion = for
     v <- scalaPropOrNone("maven.version.number") if !(v endsWith "-SNAPSHOT")
-  } yield v
+  yield v
 
   /** The development Scala version, if this is not a final release.
     *  The precise contents are not guaranteed, but it aims to provide a
@@ -88,10 +85,10 @@ private[scala] trait PropertiesTrait {
     *  @return Some(version) if this is a non-final version, None if this
     *  is a final release or the version cannot be read.
     */
-  val developmentVersion = for {
+  val developmentVersion = for
     v <- scalaPropOrNone("maven.version.number") if v endsWith "-SNAPSHOT"
     ov <- scalaPropOrNone("version.number")
-  } yield ov
+  yield ov
 
   /** Either the development or release version if known, otherwise
     *  the empty string.
@@ -182,20 +179,16 @@ private[scala] trait PropertiesTrait {
     * isJavaAtLeast("1.8")            // false
     * }}}
     */
-  def isJavaAtLeast(version: String): Boolean = {
-    def parts(x: String) = {
+  def isJavaAtLeast(version: String): Boolean =
+    def parts(x: String) =
       val i = x.indexOf('.')
       if (i < 0) throw new NumberFormatException("Not a version: " + x)
       (x.substring(0, i), x.substring(i + 1, x.length))
-    }
     val (v, _v) = parts(version)
     val (s, _s) = parts(javaSpecVersion)
     s.toInt >= v.toInt && _s.toInt >= _v.toInt
-  }
 
   // provide a main method so version info can be obtained by running this
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val writer = new PrintWriter(Console.err, true)
     writer println versionMsg
-  }
-}

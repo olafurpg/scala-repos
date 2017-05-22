@@ -22,10 +22,10 @@ import scala.util.control.NonFatal
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.test.SQLTestUtils
 
-class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
+class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils
   import testImplicits._
 
-  protected override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit =
     sql("DROP TABLE IF EXISTS t0")
     sql("DROP TABLE IF EXISTS t1")
     sql("DROP TABLE IF EXISTS t2")
@@ -44,18 +44,16 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
       .select('id as 'a, 'id as 'b, 'id as 'c, 'id as 'd)
       .write
       .saveAsTable("t2")
-  }
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     sql("DROP TABLE IF EXISTS t0")
     sql("DROP TABLE IF EXISTS t1")
     sql("DROP TABLE IF EXISTS t2")
-  }
 
-  private def checkSqlGeneration(hiveQl: String): Unit = {
+  private def checkSqlGeneration(hiveQl: String): Unit =
     val df = sql(hiveQl)
 
-    val convertedSQL = try new SQLBuilder(df).toSQL catch {
+    val convertedSQL = try new SQLBuilder(df).toSQL catch
       case NonFatal(e) =>
         fail(
             s"""Cannot convert the following HiveQL query plan back to SQL query string:
@@ -66,11 +64,10 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
             |# Resolved query plan:
             |${df.queryExecution.analyzed.treeString}
            """.stripMargin)
-    }
 
-    try {
+    try
       checkAnswer(sql(convertedSQL), df)
-    } catch {
+    catch
       case cause: Throwable =>
         fail(s"""Failed to execute converted SQL string or got wrong answer:
           |
@@ -83,10 +80,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
           |# Resolved query plan:
           |${df.queryExecution.analyzed.treeString}
          """.stripMargin, cause)
-    }
-  }
 
-  test("misc non-aggregate functions") {
+  test("misc non-aggregate functions")
     checkSqlGeneration("SELECT abs(15), abs(-15)")
     checkSqlGeneration("SELECT array(1,2,3)")
     checkSqlGeneration("SELECT coalesce(null, 1, 2)")
@@ -104,9 +99,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT rand(1)")
     checkSqlGeneration("SELECT randn(3)")
     checkSqlGeneration("SELECT struct(1,2,3)")
-  }
 
-  test("math functions") {
+  test("math functions")
     checkSqlGeneration("SELECT acos(-1)")
     checkSqlGeneration("SELECT asin(-1)")
     checkSqlGeneration("SELECT atan(1)")
@@ -150,9 +144,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT sqrt(100.0)")
     checkSqlGeneration("SELECT tan(1.0)")
     checkSqlGeneration("SELECT tanh(1.0)")
-  }
 
-  test("aggregate functions") {
+  test("aggregate functions")
     checkSqlGeneration(
         "SELECT approx_count_distinct(value) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT avg(value) FROM t1 GROUP BY key")
@@ -176,9 +169,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT variance(value) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT var_pop(value) FROM t1 GROUP BY key")
     checkSqlGeneration("SELECT var_samp(value) FROM t1 GROUP BY key")
-  }
 
-  test("string functions") {
+  test("string functions")
     checkSqlGeneration("SELECT ascii('SparkSql')")
     checkSqlGeneration("SELECT base64(a) FROM t0")
     checkSqlGeneration("SELECT concat('This ', 'is ', 'a ', 'test')")
@@ -220,9 +212,8 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT unbase64('SparkSql')")
     checkSqlGeneration("SELECT unhex(41)")
     checkSqlGeneration("SELECT upper('SparkSql')")
-  }
 
-  test("datetime functions") {
+  test("datetime functions")
     checkSqlGeneration("SELECT add_months('2001-03-31', 1)")
     checkSqlGeneration("SELECT count(current_date())")
     checkSqlGeneration("SELECT count(current_timestamp())")
@@ -257,15 +248,13 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
 
     checkSqlGeneration(
         "SELECT interval 3 years - 3 month 7 week 123 microseconds as i")
-  }
 
-  test("collection functions") {
+  test("collection functions")
     checkSqlGeneration("SELECT array_contains(array(2, 9, 8), 9)")
     checkSqlGeneration("SELECT size(array('b', 'd', 'c', 'a'))")
     checkSqlGeneration("SELECT sort_array(array('b', 'd', 'c', 'a'))")
-  }
 
-  test("misc functions") {
+  test("misc functions")
     checkSqlGeneration("SELECT crc32('Spark')")
     checkSqlGeneration("SELECT md5('Spark')")
     checkSqlGeneration("SELECT hash('Spark')")
@@ -275,10 +264,7 @@ class ExpressionToSQLSuite extends SQLBuilderTest with SQLTestUtils {
     checkSqlGeneration("SELECT spark_partition_id()")
     checkSqlGeneration("SELECT input_file_name()")
     checkSqlGeneration("SELECT monotonically_increasing_id()")
-  }
 
-  test("subquery") {
+  test("subquery")
     checkSqlGeneration("SELECT 1 + (SELECT 2)")
     checkSqlGeneration("SELECT 1 + (SELECT 2 + (SELECT 3 as a))")
-  }
-}

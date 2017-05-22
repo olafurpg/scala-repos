@@ -39,7 +39,7 @@ import scalafx.scene.layout.{Priority, VBox}
   * @see scalafx.scene.control.ComboBox
   * @see scalafx.scene.control.ComboBoxBuilder
   */
-class EnsembleComboBox extends EnsembleExample {
+class EnsembleComboBox extends EnsembleExample
 
   val strings = ObservableBuffer("Option 1",
                                  "Option 2",
@@ -54,22 +54,19 @@ class EnsembleComboBox extends EnsembleExample {
                                  "Option 10",
                                  "Option 12")
 
-  def getContent = {
-    new VBox {
+  def getContent =
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       spacing = 15
       padding = Insets(20)
-      children = List(new ComboBox[String] {
+      children = List(new ComboBox[String]
         maxWidth = 200
         promptText = "Make a choice..."
         items = strings
-      }, new ComboBox[String] {
+      , new ComboBox[String]
         maxWidth = 200
         promptText = "Edit or Choose..."
         editable = true
         items = strings
-      })
-    }
-  }
-}
+      )

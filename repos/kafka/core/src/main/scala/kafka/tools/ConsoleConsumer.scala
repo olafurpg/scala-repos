@@ -38,44 +38,41 @@ import scala.collection.JavaConverters._
 /**
   * Consumer that dumps messages to standard out.
   */
-object ConsoleConsumer extends Logging {
+object ConsoleConsumer extends Logging
 
   var messageCount = 0
 
   private val shutdownLatch = new CountDownLatch(1)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val conf = new ConsumerConfig(args)
-    try {
+    try
       run(conf)
-    } catch {
+    catch
       case e: Throwable =>
         error("Unknown error when running consumer: ", e)
         System.exit(1);
-    }
-  }
 
-  def run(conf: ConsumerConfig) {
+  def run(conf: ConsumerConfig)
 
     val consumer =
-      if (conf.useNewConsumer) {
+      if (conf.useNewConsumer)
         val timeoutMs =
           if (conf.timeoutMs >= 0) conf.timeoutMs else Long.MaxValue
         new NewShinyConsumer(Option(conf.topicArg),
                              Option(conf.whitelistArg),
                              getNewConsumerProps(conf),
                              timeoutMs)
-      } else {
+      else
         checkZk(conf)
         new OldConsumer(conf.filterSpec, getOldConsumerProps(conf))
-      }
 
     addShutdownHook(consumer, conf)
 
-    try {
+    try
       process(
           conf.maxMessages, conf.formatter, consumer, conf.skipMessageOnError)
-    } finally {
+    finally
       consumer.cleanup()
       reportRecordCount()
 
@@ -86,47 +83,40 @@ object ConsoleConsumer extends Logging {
             "/consumers/" + conf.consumerProps.get("group.id"))
 
       shutdownLatch.countDown()
-    }
-  }
 
-  def checkZk(config: ConsumerConfig) {
+  def checkZk(config: ConsumerConfig)
     if (!checkZkPathExists(
-            config.options.valueOf(config.zkConnectOpt), "/brokers/ids")) {
+            config.options.valueOf(config.zkConnectOpt), "/brokers/ids"))
       System.err.println("No brokers found in ZK.")
       System.exit(1)
-    }
 
     if (!config.options.has(config.deleteConsumerOffsetsOpt) &&
         config.options.has(config.resetBeginningOpt) &&
         checkZkPathExists(config.options.valueOf(config.zkConnectOpt),
                           "/consumers/" + config.consumerProps.getProperty(
-                              "group.id") + "/offsets")) {
+                              "group.id") + "/offsets"))
       System.err.println("Found previous offset information for this group " +
           config.consumerProps.getProperty("group.id") +
           ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
-    }
-  }
 
-  def addShutdownHook(consumer: BaseConsumer, conf: ConsumerConfig) {
+  def addShutdownHook(consumer: BaseConsumer, conf: ConsumerConfig)
     Runtime.getRuntime.addShutdownHook(
-        new Thread() {
-      override def run() {
+        new Thread()
+      override def run()
         consumer.stop()
 
         shutdownLatch.await()
-      }
-    })
-  }
+    )
 
   def process(maxMessages: Integer,
               formatter: MessageFormatter,
               consumer: BaseConsumer,
-              skipMessageOnError: Boolean) {
-    while (messageCount < maxMessages || maxMessages == -1) {
-      val msg: BaseConsumerRecord = try {
+              skipMessageOnError: Boolean)
+    while (messageCount < maxMessages || maxMessages == -1)
+      val msg: BaseConsumerRecord = try
         consumer.receive()
-      } catch {
+      catch
         case nse: StreamEndException =>
           trace(
               "Caught StreamEndException because consumer is shutdown, ignore and terminate.")
@@ -141,9 +131,8 @@ object ConsoleConsumer extends Logging {
           error("Error processing message, terminating consumer process: ", e)
           // Consumer will be closed
           return
-      }
       messageCount += 1
-      try {
+      try
         formatter.writeTo(new ConsumerRecord(msg.topic,
                                              msg.partition,
                                              msg.offset,
@@ -155,33 +144,26 @@ object ConsoleConsumer extends Logging {
                                              msg.key,
                                              msg.value),
                           System.out)
-      } catch {
+      catch
         case e: Throwable =>
-          if (skipMessageOnError) {
+          if (skipMessageOnError)
             error("Error processing message, skipping this message: ", e)
-          } else {
+          else
             // Consumer will be closed
             throw e
-          }
-      }
       checkErr(formatter)
-    }
-  }
 
-  def reportRecordCount() {
+  def reportRecordCount()
     System.err.println(s"Processed a total of $messageCount messages")
-  }
 
-  def checkErr(formatter: MessageFormatter) {
-    if (System.out.checkError()) {
+  def checkErr(formatter: MessageFormatter)
+    if (System.out.checkError())
       // This means no one is listening to our output stream any more, time to shutdown
       System.err.println("Unable to write to standard out, closing consumer.")
       formatter.close()
       System.exit(1)
-    }
-  }
 
-  def getOldConsumerProps(config: ConsumerConfig): Properties = {
+  def getOldConsumerProps(config: ConsumerConfig): Properties =
     val props = new Properties
 
     props.putAll(config.consumerProps)
@@ -192,12 +174,11 @@ object ConsoleConsumer extends Logging {
     if (!config.options.has(config.deleteConsumerOffsetsOpt) &&
         config.options.has(config.resetBeginningOpt) && checkZkPathExists(
             config.options.valueOf(config.zkConnectOpt),
-            "/consumers/" + props.getProperty("group.id") + "/offsets")) {
+            "/consumers/" + props.getProperty("group.id") + "/offsets"))
       System.err.println("Found previous offset information for this group " +
           props.getProperty("group.id") +
           ". Please use --delete-consumer-offsets to delete previous offsets metadata")
       System.exit(1)
-    }
 
     if (config.options.has(config.deleteConsumerOffsetsOpt))
       ZkUtils.maybeDeletePath(
@@ -207,9 +188,8 @@ object ConsoleConsumer extends Logging {
       props.put("consumer.timeout.ms", config.timeoutMs.toString)
 
     props
-  }
 
-  def getNewConsumerProps(config: ConsumerConfig): Properties = {
+  def getNewConsumerProps(config: ConsumerConfig): Properties =
     val props = new Properties
 
     props.putAll(config.consumerProps)
@@ -227,9 +207,8 @@ object ConsoleConsumer extends Logging {
                 "org.apache.kafka.common.serialization.ByteArrayDeserializer")
 
     props
-  }
 
-  class ConsumerConfig(args: Array[String]) {
+  class ConsumerConfig(args: Array[String])
     val parser = new OptionParser
     val topicIdOpt = parser
       .accepts("topic", "The topic id to consume on.")
@@ -340,14 +319,14 @@ object ConsoleConsumer extends Logging {
     var topicArg: String = null
     var whitelistArg: String = null
     var filterSpec: TopicFilter = null
-    if (useNewConsumer) {
+    if (useNewConsumer)
       val topicOrFilterOpt = List(topicIdOpt, whitelistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
         CommandLineUtils.printUsageAndDie(
             parser, "Exactly one of whitelist/topic is required.")
       topicArg = options.valueOf(topicIdOpt)
       whitelistArg = options.valueOf(whitelistOpt)
-    } else {
+    else
       val topicOrFilterOpt =
         List(topicIdOpt, whitelistOpt, blacklistOpt).filter(options.has)
       if (topicOrFilterOpt.size != 1)
@@ -356,7 +335,6 @@ object ConsoleConsumer extends Logging {
       topicArg = options.valueOf(topicOrFilterOpt.head)
       filterSpec = if (options.has(blacklistOpt)) new Blacklist(topicArg)
       else new Whitelist(topicArg)
-    }
     val consumerProps =
       if (options.has(consumerConfigOpt))
         Utils.loadProps(options.valueOf(consumerConfigOpt))
@@ -387,7 +365,7 @@ object ConsoleConsumer extends Logging {
                                        if (useNewConsumer) bootstrapServerOpt
                                        else zkConnectOpt)
 
-    if (options.has(csvMetricsReporterEnabledOpt)) {
+    if (options.has(csvMetricsReporterEnabledOpt))
       val csvReporterProps = new Properties()
       csvReporterProps.put("kafka.metrics.polling.interval.secs", "5")
       csvReporterProps.put(
@@ -399,35 +377,27 @@ object ConsoleConsumer extends Logging {
       csvReporterProps.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(csvReporterProps)
       KafkaMetricsReporter.startReporters(verifiableProps)
-    }
 
     //Provide the consumer with a randomly assigned group id
-    if (!consumerProps.containsKey(ConsumerConfig.GROUP_ID_CONFIG)) {
+    if (!consumerProps.containsKey(ConsumerConfig.GROUP_ID_CONFIG))
       consumerProps.put(ConsumerConfig.GROUP_ID_CONFIG,
                         s"console-consumer-${new Random().nextInt(100000)}")
       groupIdPassed = false
-    }
 
-    def tryParse(parser: OptionParser, args: Array[String]) = {
-      try parser.parse(args: _*) catch {
+    def tryParse(parser: OptionParser, args: Array[String]) =
+      try parser.parse(args: _*) catch
         case e: OptionException =>
           Utils.croak(e.getMessage)
           null
-      }
-    }
-  }
 
-  def checkZkPathExists(zkUrl: String, path: String): Boolean = {
-    try {
+  def checkZkPathExists(zkUrl: String, path: String): Boolean =
+    try
       val zk = ZkUtils.createZkClient(zkUrl, 30 * 1000, 30 * 1000)
       zk.exists(path)
-    } catch {
+    catch
       case _: Throwable => false
-    }
-  }
-}
 
-class DefaultMessageFormatter extends MessageFormatter {
+class DefaultMessageFormatter extends MessageFormatter
   var printKey = false
   var printTimestamp = false
   var keySeparator = "\t".getBytes
@@ -436,7 +406,7 @@ class DefaultMessageFormatter extends MessageFormatter {
   var keyDeserializer: Option[Deserializer[_]] = None
   var valueDeserializer: Option[Deserializer[_]] = None
 
-  override def init(props: Properties) {
+  override def init(props: Properties)
     if (props.containsKey("print.timestamp"))
       printTimestamp = props
         .getProperty("print.timestamp")
@@ -463,72 +433,63 @@ class DefaultMessageFormatter extends MessageFormatter {
             .forName(props.getProperty("value.deserializer"))
             .newInstance()
             .asInstanceOf[Deserializer[_]])
-  }
 
   def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
-              output: PrintStream) {
+              output: PrintStream)
 
     def write(deserializer: Option[Deserializer[_]],
               sourceBytes: Array[Byte],
-              separator: Array[Byte]) {
+              separator: Array[Byte])
       val nonNullBytes = Option(sourceBytes).getOrElse("null".getBytes)
       val convertedBytes = deserializer
         .map(_.deserialize(null, nonNullBytes).toString.getBytes)
         .getOrElse(nonNullBytes)
       output.write(convertedBytes)
       output.write(separator)
-    }
 
     import consumerRecord._
 
-    if (printTimestamp) {
+    if (printTimestamp)
       if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
         output.write(s"$timestampType:$timestamp".getBytes)
       else output.write(s"NO_TIMESTAMP".getBytes)
       output.write(keySeparator)
-    }
 
     if (printKey) write(keyDeserializer, key, keySeparator)
     write(valueDeserializer, value, lineSeparator)
-  }
-}
 
-class LoggingMessageFormatter extends MessageFormatter {
+class LoggingMessageFormatter extends MessageFormatter
   private val defaultWriter: DefaultMessageFormatter =
     new DefaultMessageFormatter
   val logger = Logger.getLogger(getClass().getName)
 
   def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
-              output: PrintStream): Unit = {
+              output: PrintStream): Unit =
     import consumerRecord._
     defaultWriter.writeTo(consumerRecord, output)
     if (logger.isInfoEnabled)
-      logger.info({
+      logger.info(
         if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
           s"$timestampType:$timestamp, " else ""
-      } + s"key:${if (key == null) "null" else new String(key)}, " +
+      + s"key:${if (key == null) "null" else new String(key)}, " +
       s"value:${if (value == null) "null" else new String(value)}")
-  }
-}
 
-class NoOpMessageFormatter extends MessageFormatter {
+class NoOpMessageFormatter extends MessageFormatter
   override def init(props: Properties) {}
 
   def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
               output: PrintStream) {}
-}
 
-class ChecksumMessageFormatter extends MessageFormatter {
+class ChecksumMessageFormatter extends MessageFormatter
   private var topicStr: String = _
 
-  override def init(props: Properties) {
+  override def init(props: Properties)
     topicStr = props.getProperty("topic")
     if (topicStr != null) topicStr = topicStr + ":"
     else topicStr = ""
-  }
 
   def writeTo(consumerRecord: ConsumerRecord[Array[Byte], Array[Byte]],
-              output: PrintStream) {
+              output: PrintStream)
     import consumerRecord._
     val chksum =
       if (timestampType != TimestampType.NO_TIMESTAMP_TYPE)
@@ -543,5 +504,3 @@ class ChecksumMessageFormatter extends MessageFormatter {
       else
         new Message(value, key, Message.NoTimestamp, Message.MagicValue_V0).checksum
     output.println(topicStr + "checksum:" + chksum)
-  }
-}

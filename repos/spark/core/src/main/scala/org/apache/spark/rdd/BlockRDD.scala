@@ -23,75 +23,62 @@ import org.apache.spark._
 import org.apache.spark.storage.{BlockId, BlockManager}
 
 private[spark] class BlockRDDPartition(val blockId: BlockId, idx: Int)
-    extends Partition {
+    extends Partition
   val index = idx
-}
 
 private[spark] class BlockRDD[T : ClassTag](
     sc: SparkContext, @transient val blockIds: Array[BlockId])
-    extends RDD[T](sc, Nil) {
+    extends RDD[T](sc, Nil)
 
   @transient lazy val _locations =
     BlockManager.blockIdsToHosts(blockIds, SparkEnv.get)
   @volatile private var _isValid = true
 
-  override def getPartitions: Array[Partition] = {
+  override def getPartitions: Array[Partition] =
     assertValid()
     (0 until blockIds.length)
       .map(i =>
-            {
           new BlockRDDPartition(blockIds(i), i).asInstanceOf[Partition]
-      })
+      )
       .toArray
-  }
 
-  override def compute(split: Partition, context: TaskContext): Iterator[T] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[T] =
     assertValid()
     val blockManager = SparkEnv.get.blockManager
     val blockId = split.asInstanceOf[BlockRDDPartition].blockId
-    blockManager.get(blockId) match {
+    blockManager.get(blockId) match
       case Some(block) => block.data.asInstanceOf[Iterator[T]]
       case None =>
         throw new Exception(
             "Could not compute split, block " + blockId + " not found")
-    }
-  }
 
-  override def getPreferredLocations(split: Partition): Seq[String] = {
+  override def getPreferredLocations(split: Partition): Seq[String] =
     assertValid()
     _locations(split.asInstanceOf[BlockRDDPartition].blockId)
-  }
 
   /**
     * Remove the data blocks that this BlockRDD is made from. NOTE: This is an
     * irreversible operation, as the data in the blocks cannot be recovered back
     * once removed. Use it with caution.
     */
-  private[spark] def removeBlocks() {
-    blockIds.foreach { blockId =>
+  private[spark] def removeBlocks()
+    blockIds.foreach  blockId =>
       sparkContext.env.blockManager.master.removeBlock(blockId)
-    }
     _isValid = false
-  }
 
   /**
     * Whether this BlockRDD is actually usable. This will be false if the data blocks have been
     * removed using `this.removeBlocks`.
     */
-  private[spark] def isValid: Boolean = {
+  private[spark] def isValid: Boolean =
     _isValid
-  }
 
   /** Check if this BlockRDD is valid. If not valid, exception is thrown. */
-  private[spark] def assertValid() {
-    if (!isValid) {
+  private[spark] def assertValid()
+    if (!isValid)
       throw new SparkException(
           "Attempted to use %s after its blocks have been removed!".format(
               toString))
-    }
-  }
 
-  protected def getBlockIdLocations(): Map[BlockId, Seq[String]] = {
+  protected def getBlockIdLocations(): Map[BlockId, Seq[String]] =
     _locations
-  }
-}

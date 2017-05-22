@@ -43,7 +43,7 @@ import java.util.concurrent.atomic.AtomicReference
   *
   * No locks are held by this class, only atomic operations are used.
   */
-private[play] final class RunQueue {
+private[play] final class RunQueue
 
   import RunQueue._
 
@@ -62,9 +62,8 @@ private[play] final class RunQueue {
     *
     * The operation will execute in the given ExecutionContext.
     */
-  def schedule[A](body: => Future[A])(implicit ec: ExecutionContext): Unit = {
+  def schedule[A](body: => Future[A])(implicit ec: ExecutionContext): Unit =
     schedule(Op(() => body.asInstanceOf[Future[Unit]], ec.prepare))
-  }
 
   /**
     * Schedule a simple synchronous operation to be run. The operation is considered
@@ -84,12 +83,10 @@ private[play] final class RunQueue {
     *
     * The operation will execute in the given ExecutionContext.
     */
-  def scheduleSimple(body: => Unit)(implicit ec: ExecutionContext): Unit = {
-    schedule {
+  def scheduleSimple(body: => Unit)(implicit ec: ExecutionContext): Unit =
+    schedule
       body
       Future.successful(())
-    }
-  }
 
   /**
     * Schedule a reified operation for execution. If no other operations
@@ -101,28 +98,24 @@ private[play] final class RunQueue {
     * it may be retried.
     */
   @tailrec
-  private def schedule(op: Op): Unit = {
+  private def schedule(op: Op): Unit =
     val prevState = state.get
-    val newState = prevState match {
+    val newState = prevState match
       case null => Vector.empty
       case pending => pending :+ op
-    }
-    if (state.compareAndSet(prevState, newState)) {
-      prevState match {
+    if (state.compareAndSet(prevState, newState))
+      prevState match
         case null =>
           // We've update the state to say that we're running an op,
           // so we need to actually start it running.
           execute(op)
         case _ =>
-      }
-    } else schedule(op) // Try again
-  }
+    else schedule(op) // Try again
 
-  private def execute(op: Op): Unit = {
+  private def execute(op: Op): Unit =
     val f1: Future[Future[Unit]] = Future(op.thunk())(op.ec)
     val f2: Future[Unit] = f1.flatMap(identity)(Execution.trampoline)
     f2.onComplete(_ => opExecutionComplete())(Execution.trampoline)
-  }
 
   /**
     * *De*schedule a reified operation for execution. If no other operations
@@ -130,26 +123,22 @@ private[play] final class RunQueue {
     * Otherwise, the first pending item will be scheduled for execution.
     */
   @tailrec
-  private def opExecutionComplete(): Unit = {
+  private def opExecutionComplete(): Unit =
     val prevState = state.get
-    val newState = prevState match {
+    val newState = prevState match
       case null =>
         throw new IllegalStateException(
             "Can't be inactive, must have a queue of pending elements")
       case pending if pending.isEmpty => null
       case pending => pending.tail
-    }
-    if (state.compareAndSet(prevState, newState)) {
-      prevState match {
+    if (state.compareAndSet(prevState, newState))
+      prevState match
         // We have a pending operation to execute
         case pending if !pending.isEmpty => execute(pending.head)
         case _ =>
-      }
-    } else opExecutionComplete() // Try again
-  }
-}
+    else opExecutionComplete() // Try again
 
-private object RunQueue {
+private object RunQueue
 
   /**
     * A reified operation to be executed.
@@ -158,4 +147,3 @@ private object RunQueue {
     * @param ec The ExecutionContext to use for execution. Already prepared.
     */
   final case class Op(thunk: () => Future[Unit], ec: ExecutionContext)
-}

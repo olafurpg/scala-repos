@@ -9,9 +9,8 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.patterns._
   * @since 01.03.14.
   */
 class ScInterpolationPatternImpl(node: ASTNode)
-    extends ScConstructorPatternImpl(node) with ScInterpolationPattern {
+    extends ScConstructorPatternImpl(node) with ScInterpolationPattern
 
   override def toString: String = "InterpolationPattern"
 
   override def isMultiLineString: Boolean = getText.endsWith("\"\"\"")
-}

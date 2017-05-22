@@ -21,8 +21,8 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Matrices
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 
-class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
-  test("Multiclass evaluation metrics") {
+class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext
+  test("Multiclass evaluation metrics")
     /*
      * Confusion matrix for 3-class classification with total 9 instances:
      * |2|1|1| true class0 (4 instances)
@@ -97,5 +97,3 @@ class MulticlassMetricsSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(math.abs(metrics.weightedFMeasure(2.0) -
             ((4.0 / 9) * f2measure0 + (4.0 / 9) * f2measure1 + (1.0 / 9) * f2measure2)) < delta)
     assert(metrics.labels.sameElements(labels))
-  }
-}

@@ -24,39 +24,31 @@ import akka.testkit.TestEvent
 import akka.event.Logging
 import akka.testkit.EventFilter
 
-object UntrustedSpec {
+object UntrustedSpec
   final case class IdentifyReq(path: String)
   final case class StopChild(name: String)
 
-  class Receptionist(testActor: ActorRef) extends Actor {
+  class Receptionist(testActor: ActorRef) extends Actor
     context.actorOf(Props(classOf[Child], testActor), "child1")
     context.actorOf(Props(classOf[Child], testActor), "child2")
     context.actorOf(Props(classOf[FakeUser], testActor), "user")
 
-    def receive = {
+    def receive =
       case IdentifyReq(path) ⇒
         context.actorSelection(path).tell(Identify(None), sender())
       case StopChild(name) ⇒ context.child(name) foreach context.stop
       case msg ⇒ testActor forward msg
-    }
-  }
 
-  class Child(testActor: ActorRef) extends Actor {
-    override def postStop(): Unit = {
+  class Child(testActor: ActorRef) extends Actor
+    override def postStop(): Unit =
       testActor ! s"${self.path.name} stopped"
-    }
-    def receive = {
+    def receive =
       case msg ⇒ testActor forward msg
-    }
-  }
 
-  class FakeUser(testActor: ActorRef) extends Actor {
+  class FakeUser(testActor: ActorRef) extends Actor
     context.actorOf(Props(classOf[Child], testActor), "receptionist")
-    def receive = {
+    def receive =
       case msg ⇒ testActor forward msg
-    }
-  }
-}
 
 class UntrustedSpec
     extends AkkaSpec("""
@@ -65,7 +57,7 @@ akka.remote.untrusted-mode = on
 akka.remote.trusted-selection-paths = ["/user/receptionist", ]    
 akka.remote.netty.tcp.port = 0
 akka.loglevel = DEBUG
-""") with ImplicitSender {
+""") with ImplicitSender
 
   import UntrustedSpec._
 
@@ -81,87 +73,75 @@ akka.loglevel = DEBUG
   val receptionist =
     system.actorOf(Props(classOf[Receptionist], testActor), "receptionist")
 
-  lazy val remoteDaemon = {
-    {
+  lazy val remoteDaemon =
       val p = TestProbe()(client)
       client
         .actorSelection(RootActorPath(addr) / receptionist.path.elements)
         .tell(IdentifyReq("/remote"), p.ref)
       p.expectMsgType[ActorIdentity].ref.get
-    }
-  }
 
-  lazy val target2 = {
+  lazy val target2 =
     val p = TestProbe()(client)
     client
       .actorSelection(RootActorPath(addr) / receptionist.path.elements)
       .tell(IdentifyReq("child2"), p.ref)
     p.expectMsgType[ActorIdentity].ref.get
-  }
 
-  override def afterTermination() {
+  override def afterTermination()
     shutdown(client)
-  }
 
   // need to enable debug log-level without actually printing those messages
   system.eventStream.publish(TestEvent.Mute(EventFilter.debug()))
 
-  "UntrustedMode" must {
+  "UntrustedMode" must
 
-    "allow actor selection to configured white list" in {
+    "allow actor selection to configured white list" in
       val sel =
         client.actorSelection(RootActorPath(addr) / receptionist.path.elements)
       sel ! "hello"
       expectMsg("hello")
-    }
 
-    "discard harmful messages to /remote" in {
+    "discard harmful messages to /remote" in
       val logProbe = TestProbe()
       // but instead install our own listener
-      system.eventStream.subscribe(system.actorOf(Props(new Actor {
+      system.eventStream.subscribe(system.actorOf(Props(new Actor
         import Logging._
-        def receive = {
+        def receive =
           case d @ Debug(_, _, msg: String) if msg contains "dropping" ⇒
             logProbe.ref ! d
           case _ ⇒
-        }
-      }).withDeploy(Deploy.local), "debugSniffer"), classOf[Logging.Debug])
+      ).withDeploy(Deploy.local), "debugSniffer"), classOf[Logging.Debug])
 
       remoteDaemon ! "hello"
       logProbe.expectMsgType[Logging.Debug]
-    }
 
-    "discard harmful messages to testActor" in {
+    "discard harmful messages to testActor" in
       target2 ! Terminated(remoteDaemon)(existenceConfirmed = true,
                                          addressTerminated = false)
       target2 ! PoisonPill
       client.stop(target2)
       target2 ! "blech"
       expectMsg("blech")
-    }
 
-    "discard watch messages" in {
+    "discard watch messages" in
       client.actorOf(
-          Props(new Actor {
+          Props(new Actor
         context.watch(target2)
-        def receive = {
+        def receive =
           case x ⇒ testActor forward x
-        }
-      }).withDeploy(Deploy.local))
+      ).withDeploy(Deploy.local))
       receptionist ! StopChild("child2")
       expectMsg("child2 stopped")
       // no Terminated msg, since watch was discarded
       expectNoMsg(1.second)
-    }
 
-    "discard actor selection" in {
+    "discard actor selection" in
       val sel =
         client.actorSelection(RootActorPath(addr) / testActor.path.elements)
       sel ! "hello"
       expectNoMsg(1.second)
-    }
 
-    "discard actor selection with non root anchor" in {
+    "discard actor selection with non root anchor" in
       val p = TestProbe()(client)
       client
         .actorSelection(RootActorPath(addr) / receptionist.path.elements)
@@ -172,27 +152,21 @@ akka.loglevel = DEBUG
                                receptionist.path.toStringWithoutAddress)
       sel ! "hello"
       expectNoMsg(1.second)
-    }
 
-    "discard actor selection to child of matching white list" in {
+    "discard actor selection to child of matching white list" in
       val sel = client.actorSelection(
           RootActorPath(addr) / receptionist.path.elements / "child1")
       sel ! "hello"
       expectNoMsg(1.second)
-    }
 
-    "discard actor selection with wildcard" in {
+    "discard actor selection with wildcard" in
       val sel = client.actorSelection(
           RootActorPath(addr) / receptionist.path.elements / "*")
       sel ! "hello"
       expectNoMsg(1.second)
-    }
 
-    "discard actor selection containing harmful message" in {
+    "discard actor selection containing harmful message" in
       val sel =
         client.actorSelection(RootActorPath(addr) / receptionist.path.elements)
       sel ! PoisonPill
       expectNoMsg(1.second)
-    }
-  }
-}

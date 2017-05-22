@@ -27,11 +27,10 @@ import org.apache.kafka.clients.producer.ProducerRecord
   *
   * This is used by the `ConsoleProducer`.
   */
-trait MessageReader {
+trait MessageReader
 
   def init(inputStream: InputStream, props: Properties) {}
 
   def readMessage(): ProducerRecord[Array[Byte], Array[Byte]]
 
   def close() {}
-}

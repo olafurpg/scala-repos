@@ -9,10 +9,10 @@ import org.jetbrains.plugins.scala.lang.formatting.settings.ScalaCodeStyleSettin
   * Nikolay.Tropin
   * 2014-03-20
   */
-class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
+class ImportAllMembersIntentionTest extends ScalaIntentionTestBase
   override def familyName: String = ImportAllMembersIntention.familyName
 
-  def testParameterizedDef() {
+  def testParameterizedDef()
     val text = """object A {
         |  scala.<caret>Option.empty[Int]
         |}
@@ -23,9 +23,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  <caret>empty[Int]
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testWithExistedImport() {
+  def testWithExistedImport()
     val text = """import math.E
         |
         |object A {
@@ -38,9 +37,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  <caret>Pi
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testLongRef1() {
+  def testLongRef1()
     val text =
       """object A {
         |  math.BigDecimal.RoundingMode.CEILING
@@ -54,9 +52,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  val x: <caret>RoundingMode = null
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testLongRef2() {
+  def testLongRef2()
     val text = """object A {
         |  math.BigD<caret>ecimal.RoundingMode.CEILING
         |  val x: math.BigDecimal.RoundingMode.RoundingMode = null
@@ -69,9 +66,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  val x: RoundingMode.RoundingMode = null
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testClasses() {
+  def testClasses()
     val text = """abstract class A extends ma<caret>th.Integral {
         |  val obj = math.BigDecimal
         |  val instance: math.BigDecimal = null
@@ -87,9 +83,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |}
       """.stripMargin
     doTest(text, result)
-  }
 
-  def testAddToExistedImport() {
+  def testAddToExistedImport()
     val text = """import scala.math.Pi
         |
         |object A {
@@ -102,9 +97,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  <caret>E + Pi
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testInfixExprWithNesting() {
+  def testInfixExprWithNesting()
     val text = """object A {
         |  <caret>math floor math.Pi
         |}
@@ -115,9 +109,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  <caret>floor(Pi)
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testPostfix() {
+  def testPostfix()
     val text = """object A {
         |  println(<caret>math Pi)
         |}
@@ -128,9 +121,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  println(<caret>Pi)
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testJavaStatic() {
+  def testJavaStatic()
     val text = """object A {
         |  java.lang.<caret>Math.sin(java.lang.Math.PI)
         |}
@@ -141,25 +133,22 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  sin(PI)
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testNonStatic() {
+  def testNonStatic()
     val text = """object A {
         |  math.<caret>Pi.toString
         |}
       """.stripMargin
     checkIntentionIsNotAvailable(text)
-  }
 
-  def testInfixNonStatic() {
+  def testInfixNonStatic()
     val text = """object A {
         |  math.<caret>Pi + 1
         |}
       """.stripMargin
     checkIntentionIsNotAvailable(text)
-  }
 
-  def testInImport() {
+  def testInImport()
     val text = """import m<caret>ath.E
         |
         |object A {
@@ -174,9 +163,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  Pi
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testImportConflicts() {
+  def testImportConflicts()
     val text = """import java.lang.Math._
         |
         |import scala.math.{abs, sin => sine}
@@ -194,9 +182,8 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |  abs(sine(Pi + E))
         |}""".stripMargin
     doTest(text, result)
-  }
 
-  def testImportConflictsNoMerge() {
+  def testImportConflictsNoMerge()
     val settings = ScalaCodeStyleSettings.getInstance(getProject)
     settings.setCollectImports(false)
     val text = """import java.lang.Math._
@@ -218,5 +205,3 @@ class ImportAllMembersIntentionTest extends ScalaIntentionTestBase {
         |}""".stripMargin
     doTest(text, result)
     settings.setCollectImports(true)
-  }
-}

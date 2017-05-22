@@ -27,25 +27,23 @@ import org.apache.spark.sql.types._
   * This is a data type parser that can be used to parse string representations of data types
   * provided in SQL queries. This parser is mixed in with DDLParser and SqlParser.
   */
-private[sql] trait DataTypeParser extends StandardTokenParsers {
+private[sql] trait DataTypeParser extends StandardTokenParsers
 
   // This is used to create a parser from a regex. We are using regexes for data type strings
   // since these strings can be also used as column names or field names.
   import lexical.Identifier
   implicit def regexToParser(regex: Regex): Parser[String] = acceptMatch(
-      s"identifier matching regex ${regex}", {
+      s"identifier matching regex ${regex}",
         case Identifier(str) if regex.unapplySeq(str).isDefined => str
-      }
   )
 
   protected lazy val primitiveType: Parser[DataType] =
     "(?i)string".r ^^^ StringType | "(?i)float".r ^^^ FloatType | "(?i)(?:int|integer)".r ^^^ IntegerType | "(?i)tinyint".r ^^^ ByteType | "(?i)smallint".r ^^^ ShortType | "(?i)double".r ^^^ DoubleType | "(?i)(?:bigint|long)".r ^^^ LongType | "(?i)binary".r ^^^ BinaryType | "(?i)boolean".r ^^^ BooleanType | fixedDecimalType | "(?i)decimal".r ^^^ DecimalType.USER_DEFAULT | "(?i)date".r ^^^ DateType | "(?i)timestamp".r ^^^ TimestampType | varchar | char
 
   protected lazy val fixedDecimalType: Parser[DataType] =
-    ("(?i)decimal".r ~> "(" ~> numericLit) ~ ("," ~> numericLit <~ ")") ^^ {
+    ("(?i)decimal".r ~> "(" ~> numericLit) ~ ("," ~> numericLit <~ ")") ^^
       case precision ~ scale =>
         DecimalType(precision.toInt, scale.toInt)
-    }
 
   protected lazy val char: Parser[DataType] =
     "(?i)char".r ~> "(" ~> (numericLit <~ ")") ^^^ StringType
@@ -54,51 +52,42 @@ private[sql] trait DataTypeParser extends StandardTokenParsers {
     "(?i)varchar".r ~> "(" ~> (numericLit <~ ")") ^^^ StringType
 
   protected lazy val arrayType: Parser[DataType] =
-    "(?i)array".r ~> "<" ~> dataType <~ ">" ^^ {
+    "(?i)array".r ~> "<" ~> dataType <~ ">" ^^
       case tpe => ArrayType(tpe)
-    }
 
   protected lazy val mapType: Parser[DataType] =
-    "(?i)map".r ~> "<" ~> dataType ~ "," ~ dataType <~ ">" ^^ {
+    "(?i)map".r ~> "<" ~> dataType ~ "," ~ dataType <~ ">" ^^
       case t1 ~ _ ~ t2 => MapType(t1, t2)
-    }
 
   protected lazy val structField: Parser[StructField] =
-    ident ~ ":" ~ dataType ^^ {
+    ident ~ ":" ~ dataType ^^
       case name ~ _ ~ tpe => StructField(name, tpe, nullable = true)
-    }
 
   protected lazy val structType: Parser[DataType] =
-    ("(?i)struct".r ~> "<" ~> repsep(structField, ",") <~ ">" ^^ {
+    ("(?i)struct".r ~> "<" ~> repsep(structField, ",") <~ ">" ^^
           case fields => new StructType(fields.toArray)
-        }) | ("(?i)struct".r ~ "<>" ^^^ StructType(Nil))
+        ) | ("(?i)struct".r ~ "<>" ^^^ StructType(Nil))
 
   protected lazy val dataType: Parser[DataType] =
     arrayType | mapType | structType | primitiveType
 
-  def toDataType(dataTypeString: String): DataType = synchronized {
-    phrase(dataType)(new lexical.Scanner(dataTypeString)) match {
+  def toDataType(dataTypeString: String): DataType = synchronized
+    phrase(dataType)(new lexical.Scanner(dataTypeString)) match
       case Success(result, _) => result
       case failure: NoSuccess =>
         throw new DataTypeException(failMessage(dataTypeString))
-    }
-  }
 
-  private def failMessage(dataTypeString: String): String = {
+  private def failMessage(dataTypeString: String): String =
     s"Unsupported dataType: $dataTypeString. If you have a struct and a field name of it has " +
     "any special characters, please use backticks (`) to quote that field name, e.g. `x+y`. " +
     "Please note that backtick itself is not supported in a field name."
-  }
-}
 
-private[sql] object DataTypeParser {
-  lazy val dataTypeParser = new DataTypeParser {
+private[sql] object DataTypeParser
+  lazy val dataTypeParser = new DataTypeParser
     override val lexical = new SqlLexical
-  }
 
   def parse(dataTypeString: String): DataType =
     dataTypeParser.toDataType(dataTypeString)
-}
 
 /** The exception thrown from the [[DataTypeParser]]. */
 private[sql] class DataTypeException(message: String)

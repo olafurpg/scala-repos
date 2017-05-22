@@ -19,7 +19,7 @@ import akka.actor.ActorLogging
 import akka.remote.testconductor.TestConductor
 import akka.testkit.TestProbe
 
-object RemoteReDeploymentMultiJvmSpec extends MultiNodeConfig {
+object RemoteReDeploymentMultiJvmSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -37,68 +37,59 @@ object RemoteReDeploymentMultiJvmSpec extends MultiNodeConfig {
 
   deployOn(second, "/parent/hello.remote = \"@first@\"")
 
-  class Parent extends Actor {
+  class Parent extends Actor
     val monitor = context.actorSelection("/user/echo")
-    def receive = {
+    def receive =
       case (p: Props, n: String) ⇒ context.actorOf(p, n)
       case msg ⇒ monitor ! msg
-    }
-  }
 
-  class Hello extends Actor {
+  class Hello extends Actor
     val monitor = context.actorSelection("/user/echo")
     context.parent ! "HelloParent"
     override def preStart(): Unit = monitor ! "PreStart"
     override def postStop(): Unit = monitor ! "PostStop"
     def receive = Actor.emptyBehavior
-  }
 
-  class Echo(target: ActorRef) extends Actor with ActorLogging {
-    def receive = {
+  class Echo(target: ActorRef) extends Actor with ActorLogging
+    def receive =
       case msg ⇒
         log.info(s"received $msg from ${sender()}")
         target ! msg
-    }
-  }
   def echoProps(target: ActorRef) = Props(new Echo(target))
-}
 
 class RemoteReDeploymentFastMultiJvmNode1
     extends RemoteReDeploymentFastMultiJvmSpec
 class RemoteReDeploymentFastMultiJvmNode2
     extends RemoteReDeploymentFastMultiJvmSpec
 abstract class RemoteReDeploymentFastMultiJvmSpec
-    extends RemoteReDeploymentMultiJvmSpec {
+    extends RemoteReDeploymentMultiJvmSpec
   override def sleepAfterKill =
     0.seconds // new association will come in while old is still “healthy”
   override def expectQuarantine = false
-}
 
 class RemoteReDeploymentMediumMultiJvmNode1
     extends RemoteReDeploymentMediumMultiJvmSpec
 class RemoteReDeploymentMediumMultiJvmNode2
     extends RemoteReDeploymentMediumMultiJvmSpec
 abstract class RemoteReDeploymentMediumMultiJvmSpec
-    extends RemoteReDeploymentMultiJvmSpec {
+    extends RemoteReDeploymentMultiJvmSpec
   override def sleepAfterKill =
     1.seconds // new association will come in while old is gated in ReliableDeliverySupervisor
   override def expectQuarantine = false
-}
 
 class RemoteReDeploymentSlowMultiJvmNode1
     extends RemoteReDeploymentSlowMultiJvmSpec
 class RemoteReDeploymentSlowMultiJvmNode2
     extends RemoteReDeploymentSlowMultiJvmSpec
 abstract class RemoteReDeploymentSlowMultiJvmSpec
-    extends RemoteReDeploymentMultiJvmSpec {
+    extends RemoteReDeploymentMultiJvmSpec
   override def sleepAfterKill =
     10.seconds // new association will come in after old has been quarantined
   override def expectQuarantine = true
-}
 
 abstract class RemoteReDeploymentMultiJvmSpec
     extends MultiNodeSpec(RemoteReDeploymentMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender {
+    with ImplicitSender
 
   def sleepAfterKill: FiniteDuration
   def expectQuarantine: Boolean
@@ -107,64 +98,54 @@ abstract class RemoteReDeploymentMultiJvmSpec
 
   import RemoteReDeploymentMultiJvmSpec._
 
-  "A remote deployment target system" must {
+  "A remote deployment target system" must
 
-    "terminate the child when its parent system is replaced by a new one" in {
+    "terminate the child when its parent system is replaced by a new one" in
 
       val echo = system.actorOf(echoProps(testActor), "echo")
       enterBarrier("echo-started")
 
-      runOn(second) {
+      runOn(second)
         system.actorOf(Props[Parent], "parent") ! ((Props[Hello], "hello"))
         expectMsg(15.seconds, "HelloParent")
-      }
 
-      runOn(first) {
+      runOn(first)
         expectMsg(15.seconds, "PreStart")
-      }
 
       enterBarrier("first-deployed")
 
-      runOn(first) {
+      runOn(first)
         testConductor.blackhole(second, first, Both).await
         testConductor.shutdown(second, abort = true).await
         if (expectQuarantine)
-          within(sleepAfterKill) {
+          within(sleepAfterKill)
             expectMsg("PostStop")
             expectNoMsg()
-          } else expectNoMsg(sleepAfterKill)
+          else expectNoMsg(sleepAfterKill)
         awaitAssert(node(second), 10.seconds, 100.millis)
-      }
 
       var sys: ActorSystem = null
 
-      runOn(second) {
+      runOn(second)
         Await.ready(system.whenTerminated, 30.seconds)
         expectNoMsg(sleepAfterKill)
         sys = startNewSystem()
-      }
 
       enterBarrier("cable-cut")
 
-      runOn(second) {
+      runOn(second)
         val p = TestProbe()(sys)
         sys.actorOf(echoProps(p.ref), "echo")
         p.send(sys.actorOf(Props[Parent], "parent"), (Props[Hello], "hello"))
         p.expectMsg(15.seconds, "HelloParent")
-      }
 
       enterBarrier("re-deployed")
 
-      runOn(first) {
-        within(15.seconds) {
+      runOn(first)
+        within(15.seconds)
           if (expectQuarantine) expectMsg("PreStart")
           else expectMsgAllOf("PostStop", "PreStart")
-        }
-      }
 
       enterBarrier("the-end")
 
       expectNoMsg(1.second)
-    }
-  }
-}

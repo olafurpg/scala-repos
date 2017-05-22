@@ -20,47 +20,38 @@ import org.scalatest.junit.{JUnitRunner, AssertionsForJUnit}
 @RunWith(classOf[JUnitRunner])
 class DefaultClientTest
     extends FunSuite with Eventually with IntegrationPatience
-    with AssertionsForJUnit {
-  trait StatsReceiverHelper {
+    with AssertionsForJUnit
+  trait StatsReceiverHelper
     val statsReceiver = new InMemoryStatsReceiver()
-  }
 
-  trait QueueTransportHelper {
+  trait QueueTransportHelper
     val qIn = new AsyncQueue[Int]()
     val qOut = new AsyncQueue[Int]()
 
     val transporter: (SocketAddress,
-    StatsReceiver) => Future[Transport[Int, Int]] = {
+    StatsReceiver) => Future[Transport[Int, Int]] =
       case (_, _) =>
         Future.value(new QueueTransport(qIn, qOut))
-    }
-  }
 
-  trait DispatcherHelper {
+  trait DispatcherHelper
     val dispatcher: Transport[Int, Int] => Service[Int, Int]
-  }
 
-  trait SourcedExceptionDispatcherHelper extends DispatcherHelper {
-    val dispatcher: Transport[Int, Int] => Service[Int, Int] = { _ =>
-      Service.mk { _ =>
+  trait SourcedExceptionDispatcherHelper extends DispatcherHelper
+    val dispatcher: Transport[Int, Int] => Service[Int, Int] =  _ =>
+      Service.mk  _ =>
         throw new SourcedException {}
-      }
-    }
-  }
 
-  trait ServiceHelper { self: QueueTransportHelper with DispatcherHelper =>
+  trait ServiceHelper  self: QueueTransportHelper with DispatcherHelper =>
     val endPointer = Bridge[Int, Int, Int, Int](transporter, dispatcher)
     val name = "name"
     val socket = new InetSocketAddress(0)
     val client: Client[Int, Int]
     lazy val service: Service[Int, Int] =
       client.newService(Name.bound(Address(socket)), name)
-  }
 
-  trait BaseClientHelper extends ServiceHelper {
+  trait BaseClientHelper extends ServiceHelper
     self: QueueTransportHelper with DispatcherHelper =>
     val client: Client[Int, Int] = DefaultClient[Int, Int](name, endPointer)
-  }
 
   trait SourcedExceptionHelper
       extends QueueTransportHelper with SourcedExceptionDispatcherHelper
@@ -70,36 +61,30 @@ class DefaultClientTest
       extends QueueTransportHelper with SerialDispatcherHelper
       with BaseClientHelper
 
-  test("DefaultClient should successfully add sourcedexception") {
-    new SourcedExceptionHelper {
+  test("DefaultClient should successfully add sourcedexception")
+    new SourcedExceptionHelper
       val f = service(3)
       qOut.offer(3)
-      val e = intercept[SourcedException] {
+      val e = intercept[SourcedException]
         Await.result(f)
-      }
       assert(e.serviceName == name)
-    }
-  }
 
-  trait TimingHelper {
+  trait TimingHelper
     val timer = new MockTimer()
-  }
 
-  trait SerialDispatcherHelper extends DispatcherHelper {
+  trait SerialDispatcherHelper extends DispatcherHelper
     val dispatcher: Transport[Int, Int] => Service[Int, Int] =
       new SerialClientDispatcher(_)
-  }
 
   trait TimeoutHelper
       extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with ServiceHelper {
+      with SerialDispatcherHelper with ServiceHelper
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
-  }
 
-  test("DefaultClient should time out on dispatch, not on queueing") {
+  test("DefaultClient should time out on dispatch, not on queueing")
     val rTimeout = 1.second
 
-    new TimeoutHelper {
+    new TimeoutHelper
       val client = DefaultClient(
           name,
           endPointer,
@@ -108,7 +93,7 @@ class DefaultClientTest
           timer = timer
       )
 
-      Time.withCurrentTimeFrozen { control =>
+      Time.withCurrentTimeFrozen  control =>
         val f1 = service(3) // has a connection
         val f2 = service(4) // is queued
 
@@ -118,25 +103,20 @@ class DefaultClientTest
         control.advance(rTimeout)
         timer.tick()
         assert(f1.isDefined) // times out
-        intercept[IndividualRequestTimeoutException] {
+        intercept[IndividualRequestTimeoutException]
           Await.result(f1)
-        }
         assert(!f2.isDefined)
         // f2 is now moved from the queue to dispatched
 
         control.advance(rTimeout)
         timer.tick()
         assert(f2.isDefined) // times out
-        intercept[IndividualRequestTimeoutException] {
+        intercept[IndividualRequestTimeoutException]
           Await.result(f2)
-        }
-      }
-    }
-  }
 
   trait StatsHelper
       extends TimingHelper with QueueTransportHelper
-      with SerialDispatcherHelper with StatsReceiverHelper with ServiceHelper {
+      with SerialDispatcherHelper with StatsReceiverHelper with ServiceHelper
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
     val client = new DefaultClient[Int, Int](
@@ -146,14 +126,13 @@ class DefaultClientTest
         timer = timer,
         statsReceiver = statsReceiver
     )
-  }
 
   test(
-      "DefaultClient statsfilter should time stats on dispatch, not on queueing") {
+      "DefaultClient statsfilter should time stats on dispatch, not on queueing")
     val dur = 1.second
 
-    new StatsHelper {
-      Time.withCurrentTimeFrozen { control =>
+    new StatsHelper
+      Time.withCurrentTimeFrozen  control =>
         val f1 = service(3)
         val f2 = service(4)
 
@@ -166,60 +145,49 @@ class DefaultClientTest
         timer.tick()
         qOut.offer(4)
         Await.result(f2)
-      }
 
       assert(statsReceiver.stats(Seq(name, "request_latency_ms")) ==
           (Seq(dur, dur) map (_.inMillis)))
-    }
-  }
 
-  test("Services should be able to be closed even if they can't be resolved") {
-    new DefaultClientHelper {
+  test("Services should be able to be closed even if they can't be resolved")
+    new DefaultClientHelper
       val dest = Name.Bound.singleton(Var.value(Addr.Pending))
       val svc = client.newService(dest, "test")
       val f = svc.close()
       eventually { assert(f.isDefined) }
       assert(Await.result(f.liftToTry) == Return.Unit)
-    }
-  }
 
-  test("Bound Vars should be closable") {
-    new DefaultClientHelper {
+  test("Bound Vars should be closable")
+    new DefaultClientHelper
       @volatile var closed = false
 
       val dest = Name.Bound.singleton(
-          Var.async(Addr.Bound(Seq.empty[Address]: _*)) { _ =>
-        Closable.make { _ =>
+          Var.async(Addr.Bound(Seq.empty[Address]: _*))  _ =>
+        Closable.make  _ =>
           closed = true
           Future.Done
-        }
-      })
+      )
       val svc = client.newService(dest, "test")
       assert(!closed, "client closed too early")
       val f = svc.close()
       eventually { assert(f.poll == Some(Return.Unit)) }
       assert(closed, "client not closed")
-    }
-  }
 
   class FailureAccrualException extends Exception
 
-  trait FailureAccuralDispatchHelper extends DispatcherHelper {
+  trait FailureAccuralDispatchHelper extends DispatcherHelper
     var initialFailures: Int = 5 // default failure accrual
 
-    val dispatcher: Transport[Int, Int] => Service[Int, Int] = { _ =>
-      Service.mk { _ =>
+    val dispatcher: Transport[Int, Int] => Service[Int, Int] =  _ =>
+      Service.mk  _ =>
         initialFailures -= 1
         if (initialFailures >= 0) Future.exception(new FailureAccrualException)
         else Future.value(3)
-      }
-    }
-  }
 
   trait DefaultFailureAccrualHelper
       extends TimingHelper with QueueTransportHelper
       with FailureAccuralDispatchHelper with StatsReceiverHelper
-      with ServiceHelper {
+      with ServiceHelper
 
     val pool = new DefaultPool[Int, Int](0, 1, timer = timer) // pool of size 1
 
@@ -230,17 +198,14 @@ class DefaultClientTest
         timer = timer,
         statsReceiver = statsReceiver
     )
-  }
 
-  test("DefaultClient should handle failureAccrual default") {
-    new DefaultFailureAccrualHelper {
+  test("DefaultClient should handle failureAccrual default")
+    new DefaultFailureAccrualHelper
       0 until 10 foreach { service(_) }
       assert(statsReceiver.counters(Seq("failure_accrual", "removals")) == 1)
-    }
-  }
 
-  test("DefaultClient should handle passed-in failure accrual") {
-    new DefaultFailureAccrualHelper {
+  test("DefaultClient should handle passed-in failure accrual")
+    new DefaultFailureAccrualHelper
       initialFailures = 10
       override val client = new DefaultClient[Int, Int](
           name,
@@ -248,7 +213,7 @@ class DefaultClientTest
           pool = pool,
           timer = timer,
           statsReceiver = statsReceiver,
-          failureAccrual = { factory: ServiceFactory[Int, Int] =>
+          failureAccrual =  factory: ServiceFactory[Int, Int] =>
             FailureAccrualFactory.wrapper(
                 statsReceiver,
                 FailureAccrualPolicy.consecutiveFailures(
@@ -257,17 +222,12 @@ class DefaultClientTest
                 DefaultLogger,
                 failing,
                 ResponseClassifier.Default)(timer) andThen factory
-          }
       )
 
-      Time.withCurrentTimeFrozen { control =>
+      Time.withCurrentTimeFrozen  control =>
         0 until 10 foreach { service(_) }
         assert(statsReceiver.counters(Seq("failure_accrual", "removals")) == 1)
         control.advance(4.seconds)
         timer.tick()
         assert(
             statsReceiver.counters.get(Seq("failure_accrual", "revivals")) == None)
-      }
-    }
-  }
-}

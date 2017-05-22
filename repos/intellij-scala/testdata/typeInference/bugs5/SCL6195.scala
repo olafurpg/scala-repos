@@ -1,14 +1,12 @@
-object SCL6195 {
+object SCL6195
 
   case class Blah(a: Int, b: Int)
 
-  trait C {
+  trait C
     val c: Int
-  }
 
-  trait D {
+  trait D
     val d: Int
-  }
 
   type BlahWithC = Blah with C
 
@@ -17,9 +15,8 @@ object SCL6195 {
 
   /*start*/
   foo(
-      new Blah(2, 2) with C with D {
+      new Blah(2, 2) with C with D
     val c = 2
     val d = 6
-  }) /*end*/
-}
+  ) /*end*/
 //Int

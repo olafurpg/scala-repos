@@ -1,6 +1,6 @@
 import scala.tools.nsc._
 
-object Test {
+object Test
 
   // works
   def mkReifier(global: Global)(typer: global.analyzer.Typer) = typer
@@ -10,4 +10,3 @@ object Test {
       class Reifier(global: Global)(typer: global.analyzer.Typer) { }
    */
   class Reifier(global: Global)(typer: global.analyzer.Typer) {}
-}

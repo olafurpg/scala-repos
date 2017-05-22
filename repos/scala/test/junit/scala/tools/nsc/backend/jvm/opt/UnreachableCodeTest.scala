@@ -15,38 +15,35 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 import scala.tools.testing.ClearAfterClass
 
-object UnreachableCodeTest extends ClearAfterClass.Clearable {
+object UnreachableCodeTest extends ClearAfterClass.Clearable
   // jvm-1.6 enables emitting stack map frames, which impacts the code generation wrt dead basic blocks,
   // see comment in BCodeBodyBuilder
   var methodOptCompiler = newCompiler(extraArgs = "-Yopt:l:method")
   var dceCompiler = newCompiler(extraArgs = "-Yopt:unreachable-code")
   var noOptCompiler = newCompiler(extraArgs = "-Yopt:l:none")
 
-  def clear(): Unit = {
+  def clear(): Unit =
     methodOptCompiler = null
     dceCompiler = null
     noOptCompiler = null
-  }
-}
 
 @RunWith(classOf[JUnit4])
-class UnreachableCodeTest extends ClearAfterClass {
+class UnreachableCodeTest extends ClearAfterClass
   ClearAfterClass.stateToClear = UnreachableCodeTest
 
   val methodOptCompiler = UnreachableCodeTest.methodOptCompiler
   val dceCompiler = UnreachableCodeTest.dceCompiler
   val noOptCompiler = UnreachableCodeTest.noOptCompiler
 
-  def assertEliminateDead(code: (Instruction, Boolean)*): Unit = {
+  def assertEliminateDead(code: (Instruction, Boolean)*): Unit =
     val method = genMethod()(code.map(_._1): _*)
     dceCompiler.genBCode.bTypes.localOpt.removeUnreachableCodeImpl(method, "C")
     val nonEliminated = instructionsFromMethod(method)
     val expectedLive = code.filter(_._2).map(_._1).toList
     assertSameCode(nonEliminated, expectedLive)
-  }
 
   @Test
-  def basicElimination(): Unit = {
+  def basicElimination(): Unit =
     assertEliminateDead(
         Op(ACONST_NULL),
         Op(ATHROW),
@@ -62,20 +59,18 @@ class UnreachableCodeTest extends ClearAfterClass {
         Op(ACONST_NULL).dead,
         Op(ATHROW).dead
     )
-  }
 
   @Test
-  def eliminateNop(): Unit = {
+  def eliminateNop(): Unit =
     assertEliminateDead(
         // reachable, but removed anyway.
         Op(NOP).dead,
         Op(RETURN),
         Op(NOP).dead
     )
-  }
 
   @Test
-  def eliminateBranchOver(): Unit = {
+  def eliminateBranchOver(): Unit =
     assertEliminateDead(
         Jump(GOTO, Label(1)),
         Op(ACONST_NULL).dead,
@@ -89,10 +84,9 @@ class UnreachableCodeTest extends ClearAfterClass {
         Label(1),
         Op(RETURN)
     )
-  }
 
   @Test
-  def deadLabelsRemain(): Unit = {
+  def deadLabelsRemain(): Unit =
     assertEliminateDead(
         Op(RETURN),
         Jump(GOTO, Label(1)).dead,
@@ -100,20 +94,18 @@ class UnreachableCodeTest extends ClearAfterClass {
         // will need a different opt to get rid of them
         Label(1)
     )
-  }
 
   @Test
-  def pushPopNotEliminated(): Unit = {
+  def pushPopNotEliminated(): Unit =
     assertEliminateDead(
         // not dead, visited by data flow analysis.
         Op(ACONST_NULL),
         Op(POP),
         Op(RETURN)
     )
-  }
 
   @Test
-  def nullnessNotConsidered(): Unit = {
+  def nullnessNotConsidered(): Unit =
     assertEliminateDead(
         Op(ACONST_NULL),
         Jump(IFNULL, Label(1)),
@@ -121,10 +113,9 @@ class UnreachableCodeTest extends ClearAfterClass {
         Label(1),
         Op(RETURN)
     )
-  }
 
   @Test
-  def basicEliminationCompiler(): Unit = {
+  def basicEliminationCompiler(): Unit =
     val code = "def f: Int = { return 1; 2 }"
     val withDce = singleMethodInstructions(dceCompiler)(code)
     assertSameCode(withDce.dropNonOp, List(Op(ICONST_1), Op(IRETURN)))
@@ -148,10 +139,9 @@ class UnreachableCodeTest extends ClearAfterClass {
     // a comment in BCodeBodyBuilder.
     assertSameCode(noDce.dropNonOp,
                    List(Op(ICONST_1), Op(IRETURN), Op(ATHROW), Op(ATHROW)))
-  }
 
   @Test
-  def eliminateDeadCatchBlocks(): Unit = {
+  def eliminateDeadCatchBlocks(): Unit =
     // the Label(1) is live: it's used in the local variable descriptor table (local variable "this" has a range from 0 to 1).
     def wrapInDefault(code: Instruction*) =
       List(Label(0), LineNumber(1, Label(0))) ::: code.toList ::: List(
@@ -181,10 +171,9 @@ class UnreachableCodeTest extends ClearAfterClass {
       "def f: Unit = { try { try { } catch { case _: Exception => () } } catch { case _: Exception => () }; () }"
     assertSameCode(singleMethodInstructions(methodOptCompiler)(code4),
                    wrapInDefault(Op(RETURN)))
-  }
 
   @Test // test the dce-testing tools
-  def metaTest(): Unit = {
+  def metaTest(): Unit =
     assertThrows[AssertionError](
         assertEliminateDead(Op(RETURN).dead),
         _.contains("Expected: List()\nActual  : List(Op(RETURN))")
@@ -195,10 +184,9 @@ class UnreachableCodeTest extends ClearAfterClass {
         _.contains(
             "Expected: List(Op(RETURN), Op(RETURN))\nActual  : List(Op(RETURN))")
     )
-  }
 
   @Test
-  def bytecodeEquivalence: Unit = {
+  def bytecodeEquivalence: Unit =
     assertTrue(List(VarOp(ILOAD, 1)) === List(VarOp(ILOAD, 2)))
     assertTrue(
         List(VarOp(ILOAD, 1), VarOp(ISTORE, 1)) === List(VarOp(ILOAD, 2),
@@ -242,10 +230,9 @@ class UnreachableCodeTest extends ClearAfterClass {
                                            List("java/lang/Object", Label(3))),
                                 Label(1),
                                 Label(3)))
-  }
 
   @Test
-  def loadNullNothingBytecode(): Unit = {
+  def loadNullNothingBytecode(): Unit =
     val code = """class C {
         |  def nl: Null = null
         |  def nt: Nothing = throw new Error("")
@@ -291,5 +278,3 @@ class UnreachableCodeTest extends ClearAfterClass {
                       List(ALOAD, NEW, DUP, LDC, "<init>", ATHROW))
     assertSameSummary(
         getSingleMethod(cDCE, "t4"), List(ALOAD, ALOAD, "nt", ATHROW))
-  }
-}

@@ -1,9 +1,8 @@
 package com.twitter.scalding
 
-sealed trait DescribedArg {
+sealed trait DescribedArg
   def key: String
   def description: String
-}
 
 case class RequiredArg(key: String, description: String) extends DescribedArg
 case class OptionalArg(key: String, description: String) extends DescribedArg
@@ -13,7 +12,7 @@ case class BooleanArg(key: String, description: String) extends DescribedArg
 class HelpException extends RuntimeException("User asked for help")
 class DescriptionValidationException(msg: String) extends RuntimeException(msg)
 
-trait ArgHelper {
+trait ArgHelper
 
   /**
     * Similar to describe but validate all args are described
@@ -23,30 +22,26 @@ trait ArgHelper {
     * @return Output Execution
     */
   def validatedDescribe[T](
-      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] = {
-    Execution.getArgs.flatMap { args =>
+      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] =
+    Execution.getArgs.flatMap  args =>
       validatedDescribe(describedArgs, args)
       ex
-    }
-  }
 
   /**
     * Describe a set of Args given Descriptions and validate all Args are described
     * @param describedArgs List of Argument Descriptions
     * @param args Job Arguments
     */
-  def validatedDescribe(describedArgs: Seq[DescribedArg], args: Args): Unit = {
+  def validatedDescribe(describedArgs: Seq[DescribedArg], args: Args): Unit =
     describe(describedArgs, args)
 
     val describedKeys = describedArgs.map(_.key).toSet
     val missingKeys = args.m.keySet.filter(_.nonEmpty).diff(describedKeys)
 
-    if (missingKeys.nonEmpty) {
+    if (missingKeys.nonEmpty)
       val msg = missingKeys.mkString(", ")
       throw new DescriptionValidationException(
           s"Must describe missing keys : $msg")
-    }
-  }
 
   /**
     * Describe the Arguments of this Execution.  By running --help the args will output
@@ -57,12 +52,10 @@ trait ArgHelper {
     * @return Output Execution
     */
   def describe[T](
-      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] = {
-    Execution.getArgs.flatMap { args =>
+      describedArgs: Seq[DescribedArg], ex: Execution[T]): Execution[T] =
+    Execution.getArgs.flatMap  args =>
       describe(describedArgs, args)
       ex
-    }
-  }
 
   /**
     * Describe a set of Args given Descriptions
@@ -74,7 +67,7 @@ trait ArgHelper {
     if (args.boolean("help")) helpRequest(describedArgs)
     else ()
 
-  def helpRequest(describedArgs: Seq[DescribedArg]): Nothing = {
+  def helpRequest(describedArgs: Seq[DescribedArg]): Nothing =
     val top =
       "\n###########################################################################\n\n"
     val usage = s"Command Line Args :: ${argString(describedArgs)}\n\n\n"
@@ -84,7 +77,6 @@ trait ArgHelper {
     println(top + usage + help(describedArgs) + bottom)
 
     throw new HelpException()
-  }
 
   /**
     * Command line arg string given the Described Args
@@ -92,18 +84,16 @@ trait ArgHelper {
     * @param describedArgs List of Argument Descriptions
     * @return Command Line Parameters
     */
-  private[this] def argString(describedArgs: Seq[DescribedArg]): String = {
-    describedArgs.foldLeft("") {
+  private[this] def argString(describedArgs: Seq[DescribedArg]): String =
+    describedArgs.foldLeft("")
       case (str, describedArg) =>
-        val msg = describedArg match {
+        val msg = describedArg match
           case RequiredArg(key, _) => s"--$key VALUE "
           case OptionalArg(key, _) => s"[--$key VALUE] "
           case ListArg(key, _) => s"[--$key VALUE VALUE2] "
           case BooleanArg(key, _) => s"[--$key] "
-        }
         str + msg
-    } + "[--help]"
-  }
+    + "[--help]"
 
   /**
     * More detailed help command for these described arguments
@@ -111,10 +101,10 @@ trait ArgHelper {
     * @param describedArgs List of Argument Descriptions
     * @return Detailed Help for the Args
     */
-  private[this] def help(describedArgs: Seq[DescribedArg]): String = {
-    describedArgs.foldLeft("") {
+  private[this] def help(describedArgs: Seq[DescribedArg]): String =
+    describedArgs.foldLeft("")
       case (str, describedArg) =>
-        val msg = describedArg match {
+        val msg = describedArg match
           case RequiredArg(key, description) =>
             s"--$key(Required) :: $description \n"
           case OptionalArg(key, description) =>
@@ -122,10 +112,7 @@ trait ArgHelper {
           case ListArg(key, description) => s"--$key(List) :: $description \n"
           case BooleanArg(key, description) =>
             s"--$key(Boolean) :: $description \n"
-        }
         str + msg
-    } + "--help :: Show this help message."
-  }
-}
+    + "--help :: Show this help message."
 
 object ArgHelp extends ArgHelper

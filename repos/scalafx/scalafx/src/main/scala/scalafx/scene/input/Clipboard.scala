@@ -39,7 +39,7 @@ import scalafx.scene.image.ImageIncludes.jfxImage2sfx
 import scalafx.scene.input.DataFormat._
 import scalafx.scene.input.InputIncludes.jfxClipboard2sfx
 
-object Clipboard {
+object Clipboard
   implicit def sfxClipboard2jfx(c: Clipboard): jfxsi.Clipboard =
     if (c != null) c.delegate else null
 
@@ -47,7 +47,6 @@ object Clipboard {
     * Gets the current system clipboard, through which data can be stored and retrieved.
     */
   def systemClipboard: Clipboard = jfxsi.Clipboard.getSystemClipboard
-}
 
 /**
   * Represents an operating system clipboard, on which data may be placed during, for example, cut, copy, and paste operations.
@@ -97,14 +96,13 @@ object Clipboard {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Clipboard(override val delegate: jfxsi.Clipboard)
-    extends SFXDelegate[jfxsi.Clipboard] {
+    extends SFXDelegate[jfxsi.Clipboard]
 
   /**
     * Clears the clipboard of any and all content.
     */
-  def clear(): Unit = {
+  def clear(): Unit =
     delegate.clear()
-  }
 
   /**
     * Returns the content stored in this clipboard of the given type, or null if there is no content with this type.
@@ -185,12 +183,10 @@ class Clipboard(override val delegate: jfxsi.Clipboard)
   /**
     * Return a ```copy``` of the clipboard content.
     */
-  def content: ClipboardContent = {
-    val v = contentTypes.map { df =>
+  def content: ClipboardContent =
+    val v = contentTypes.map  df =>
       new DataFormat(df) -> delegate.getContent(df)
-    }
     ClipboardContent(v.toSeq: _*)
-  }
 
   /**
     * Puts content onto the clipboard.
@@ -201,4 +197,3 @@ class Clipboard(override val delegate: jfxsi.Clipboard)
     * @throws java.lang.NullPointerException - if null data reference is passed for any format
     */
   def content_=(content: ClipboardContent): Unit = delegate.setContent(content)
-}

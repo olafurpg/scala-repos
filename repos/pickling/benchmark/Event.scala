@@ -25,7 +25,6 @@ import java.net.URLEncoder
   * can have clones with different paths.
   * 
   */
-trait Event extends Serializable {
+trait Event extends Serializable
   val id: String
   val timestamp: Int
-}

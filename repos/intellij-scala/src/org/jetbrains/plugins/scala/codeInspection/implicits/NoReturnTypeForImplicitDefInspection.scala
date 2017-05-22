@@ -16,9 +16,9 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.ScTypedDefinition
   * 2014-09-23
   */
 class NoReturnTypeForImplicitDefInspection
-    extends AbstractInspection(id, description) {
+    extends AbstractInspection(id, description)
   override def actionFor(
-      holder: ProblemsHolder): PartialFunction[PsiElement, Any] = {
+      holder: ProblemsHolder): PartialFunction[PsiElement, Any] =
     case fun: ScFunctionDefinition
         if fun.hasModifierProperty("implicit") && fun.parameters.size == 1 &&
         !fun.paramClauses.clauses.exists(_.isImplicit) &&
@@ -29,17 +29,12 @@ class NoReturnTypeForImplicitDefInspection
           fun.parameterList.getTextRange.getEndOffset -
           fun.getModifierList.getTextRange.getStartOffset)
       holder.registerProblem(fun, range, descr, new AddReturnTypeQuickFix(fun))
-  }
-}
 
-object NoReturnTypeForImplicitDefInspection {
+object NoReturnTypeForImplicitDefInspection
   val id = "NoReturnTypeImplicitDef"
   val description = "No return type for implicit function"
-}
 
 class AddReturnTypeQuickFix(td: ScTypedDefinition)
-    extends AbstractFixOnPsiElement("Add explicit return type", td) {
-  override def doApplyFix(project: Project): Unit = {
+    extends AbstractFixOnPsiElement("Add explicit return type", td)
+  override def doApplyFix(project: Project): Unit =
     ToggleTypeAnnotation.complete(AddOnlyStrategy.withoutEditor, getElement)
-  }
-}

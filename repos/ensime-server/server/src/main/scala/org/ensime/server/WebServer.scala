@@ -17,7 +17,7 @@ import org.ensime.jerk._
 
 import scala.concurrent.Future
 
-trait WebServer {
+trait WebServer
   implicit def system: ActorSystem
   implicit def timeout: Timeout
   implicit def mat: Materializer
@@ -46,46 +46,34 @@ trait WebServer {
   import SprayJsonSupport._
   import WebSocketBoilerplate._
 
-  val route = seal {
-    path("rpc") {
-      post {
-        entity(as[RpcRequest]) { request =>
-          complete {
+  val route = seal
+    path("rpc")
+      post
+        entity(as[RpcRequest])  request =>
+          complete
             restHandler(request)
-          }
-        }
-      }
-    } ~ path("docs") {
-      complete {
+    ~ path("docs")
+      complete
         <html>
           <head></head>
           <body>
             <h1>ENSIME: Your Project's Documentation</h1>
-            <ul>{
-              docJars().toList.map(_.getName).sorted.map { f =>
+            <ul>
+              docJars().toList.map(_.getName).sorted.map  f =>
                 <li><a href={ s"docs/$f/index.html" }>{ f }</a> </li>
-              }
-            }</ul>
+            </ul>
           </body>
         </html>
-      }
-    } ~ path("docs" / """[^/]+\.jar""".r / Rest) { (filename, entry) =>
-      rejectEmptyResponse {
-        complete {
-          for {
+    ~ path("docs" / """[^/]+\.jar""".r / Rest)  (filename, entry) =>
+      rejectEmptyResponse
+        complete
+          for
             media <- MediaTypes.forExtension(Files.getFileExtension(entry))
             content <- docJarContent(filename, entry)
-          } yield {
+          yield
             HttpResponse(
                 entity = HttpEntity(ContentType(media, None), content))
-          }
-        }
-      }
-    } ~ path("jerky") {
-      get {
+    ~ path("jerky")
+      get
         jsonWebsocket[RpcRequestEnvelope, RpcResponseEnvelope](
             websocketHandler)
-      }
-    }
-  }
-}

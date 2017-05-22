@@ -9,7 +9,7 @@ package sbt.testing
   *
   *  Implementations of this interface must be thread-safe.
   */
-trait Logger {
+trait Logger
 
   /** True if ANSI color codes are understood by this instance. */
   def ansiCodesSupported(): Boolean
@@ -43,4 +43,3 @@ trait Logger {
     *  @param t the <code>Throwable</code> containing the stack trace being logged
     */
   def trace(t: Throwable): Unit
-}

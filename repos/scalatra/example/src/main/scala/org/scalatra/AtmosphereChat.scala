@@ -10,12 +10,12 @@ import org.scalatra.json.JacksonJsonSupport
 import scala.concurrent.ExecutionContext
 
 class AtmosphereChat
-    extends ScalatraServlet with JacksonJsonSupport with AtmosphereSupport {
+    extends ScalatraServlet with JacksonJsonSupport with AtmosphereSupport
   implicit protected val jsonFormats: Formats = DefaultFormats
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  get("/") {
+  get("/")
     Template.page(
         title = "Scalatra Atmosphere Chat",
         content = bodyHtml,
@@ -23,31 +23,27 @@ class AtmosphereChat
         scripts = "/jquery/jquery.atmosphere.js" :: "/jquery/application.js" :: Nil,
         defaultScripts = "/assets/js/jquery.min.js" :: "/assets/js/bootstrap.min.js" :: Nil
     )
-  }
 
-  get("/print-broadcasters") {
+  get("/print-broadcasters")
     val bcs = AtmosphereClient.lookupAll()
     bcs foreach println
     bcs.mkString("[", ", ", "]")
-  }
 
-  get("/broadcast") {
+  get("/broadcast")
     val jv =
       ("author" -> "System") ~ ("message" -> "big brother speaking") ~
       ("time" -> (new Date().getTime.toString))
     AtmosphereClient.broadcast(routeBasePath + "/the-chat", jv)
-  }
 
-  get("/broadcast-all") {
+  get("/broadcast-all")
     val jv =
       ("author" -> "System") ~ ("message" -> "big brother speaking") ~
       ("time" -> (new Date().getTime.toString))
     AtmosphereClient.broadcastAll(jv)
-  }
 
-  atmosphere("/the-chat") {
-    new AtmosphereClient {
-      def receive: AtmoReceive = {
+  atmosphere("/the-chat")
+    new AtmosphereClient
+      def receive: AtmoReceive =
         case Connected =>
           println("Client %s is connected" format uuid)
           broadcast(
@@ -75,15 +71,12 @@ class AtmosphereChat
             json merge (("time" -> (new Date().getTime.toString)): JValue)
           broadcast(msg) // by default a broadcast is to everyone but self
         //          send(msg) // also send to the sender
-      }
-    }
-  }
 
-  atmosphere("/multiroom/:id") {
+  atmosphere("/multiroom/:id")
     println("id: " + params("id"))
     val room = params("id")
-    new AtmosphereClient {
-      def receive: AtmoReceive = {
+    new AtmosphereClient
+      def receive: AtmoReceive =
         case Connected =>
           println("Client %s is connected" format uuid)
           broadcast(("author" -> "Someone") ~
@@ -113,12 +106,8 @@ class AtmosphereChat
             json merge (("time" -> (new Date().getTime.toString)): JValue)
           broadcast(msg) // by default a broadcast is to everyone but self
         //          send(msg) // also send to the sender
-      }
-    }
-  }
-  error {
+  error
     case t: Throwable => t.printStackTrace()
-  }
 
   val bodyHtml = <div class="row">
       <div id="header" class="span6 offset3"><h5>Atmosphere Chat. Default transport is WebSocket, fallback is long-polling</h5></div>
@@ -129,4 +118,3 @@ class AtmosphereChat
         <input type="text" id="input" disabled="disabled"/>
       </div>
     </div>
-}

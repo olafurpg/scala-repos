@@ -14,31 +14,26 @@ import com.intellij.psi.{PsiElement, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.lang.psi.ScalaPsiUtil
 import org.jetbrains.plugins.scala.lang.psi.api.expr._;
 
-class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
-  override def isApplicable(elements: Array[PsiElement]): Boolean = {
+class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder
+  override def isApplicable(elements: Array[PsiElement]): Boolean =
     if (elements.length > 1) return false
     for (element <- elements) if (!isApplicable(element)) return false
     true
-  }
-  override def isApplicable(element: PsiElement): Boolean = {
-    element match {
+  override def isApplicable(element: PsiElement): Boolean =
+    element match
       case _: ScBlockExpr => true
       case _: ScBlock => false
       case _: ScExpression | _: PsiWhiteSpace => true
       case e => ScalaPsiUtil.isLineTerminator(e)
-    }
-  }
 
-  private def needBraces(expr: PsiElement): Boolean = {
-    expr match {
+  private def needBraces(expr: PsiElement): Boolean =
+    expr match
       case _: ScDoStmt | _: ScIfStmt | _: ScTryStmt | _: ScForStatement |
           _: ScWhileStmt | _: ScThrowStmt | _: ScReturnStmt =>
         true
       case _ => false
-    }
-  }
 
-  override def getTemplateAsString(elements: Array[PsiElement]): String = {
+  override def getTemplateAsString(elements: Array[PsiElement]): String =
     val arrow =
       if (elements.length == 0) "=>"
       else ScalaPsiUtil.functionArrow(elements(0).getProject)
@@ -46,19 +41,16 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
          !needBraces(elements(0))) super.getTemplateAsString(elements)
      else "(" + super.getTemplateAsString(elements) + ")") +
     s" match {\ncase a  $arrow\n}"
-  }
 
   override def getTemplateDescription = "match"
 
-  override def getSurroundSelectionRange(withMatchNode: ASTNode): TextRange = {
-    val element: PsiElement = withMatchNode.getPsi match {
+  override def getSurroundSelectionRange(withMatchNode: ASTNode): TextRange =
+    val element: PsiElement = withMatchNode.getPsi match
       case x: ScParenthesisedExpr =>
-        x.expr match {
+        x.expr match
           case Some(y) => y
           case _ => return x.getTextRange
-        }
       case x => x
-    }
 
     val whileStmt = element.asInstanceOf[ScMatchStmt]
 
@@ -68,5 +60,3 @@ class ScalaWithMatchSurrounder extends ScalaExpressionSurrounder {
     patternNode.getTreeParent.removeChild(patternNode)
 
     new TextRange(offset, offset)
-  }
-}

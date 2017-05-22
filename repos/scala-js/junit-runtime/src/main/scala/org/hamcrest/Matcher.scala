@@ -3,8 +3,7 @@
  */
 package org.hamcrest
 
-trait Matcher[+T] extends SelfDescribing {
+trait Matcher[+T] extends SelfDescribing
   def matches(item: AnyRef): Boolean
 
   def describeMismatch(item: AnyRef, mismatchDescription: Description): Unit
-}

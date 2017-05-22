@@ -3,7 +3,7 @@ package laws
 
 import cats.implicits._
 
-trait ReducibleLaws[F[_]] extends FoldableLaws[F] {
+trait ReducibleLaws[F[_]] extends FoldableLaws[F]
   implicit def F: Reducible[F]
 
   def reduceLeftToConsistentWithReduceMap[A, B](
@@ -19,9 +19,7 @@ trait ReducibleLaws[F[_]] extends FoldableLaws[F] {
     fa.reduceMap(f) <-> fa
       .reduceRightTo(f)((a, eb) => eb.map(f(a) |+| _))
       .value
-}
 
-object ReducibleLaws {
+object ReducibleLaws
   def apply[F[_]](implicit ev: Reducible[F]): ReducibleLaws[F] =
     new ReducibleLaws[F] { def F: Reducible[F] = ev }
-}

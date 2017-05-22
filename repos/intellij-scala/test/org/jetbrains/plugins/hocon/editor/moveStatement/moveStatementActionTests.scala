@@ -30,7 +30,6 @@ object HoconMoveStatementUpActionTest
 @RunWith(classOf[AllTests])
 class HoconMoveStatementUpActionTest
     extends HoconEditorActionTest(
-        IdeActions.ACTION_MOVE_STATEMENT_UP_ACTION, "moveStatement/both") {
+        IdeActions.ACTION_MOVE_STATEMENT_UP_ACTION, "moveStatement/both")
 
   override protected def preprocessData(parts: Seq[String]) = parts.reverse
-}

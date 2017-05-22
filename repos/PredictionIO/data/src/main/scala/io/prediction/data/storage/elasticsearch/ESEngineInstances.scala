@@ -31,18 +31,17 @@ import org.json4s.native.Serialization.write
 
 class ESEngineInstances(
     client: Client, config: StorageClientConfig, index: String)
-    extends EngineInstances with Logging {
+    extends EngineInstances with Logging
   implicit val formats = DefaultFormats + new EngineInstanceSerializer
   private val estype = "engine_instances"
 
   val indices = client.admin.indices
   val indexExistResponse = indices.prepareExists(index).get
-  if (!indexExistResponse.isExists) {
+  if (!indexExistResponse.isExists)
     indices.prepareCreate(index).get
-  }
   val typeExistResponse =
     indices.prepareTypesExists(index).setTypes(estype).get
-  if (!typeExistResponse.isExists) {
+  if (!typeExistResponse.isExists)
     val json =
       (estype ->
           ("properties" ->
@@ -71,49 +70,41 @@ class ESEngineInstances(
       .setType(estype)
       .setSource(compact(render(json)))
       .get
-  }
 
-  def insert(i: EngineInstance): String = {
-    try {
+  def insert(i: EngineInstance): String =
+    try
       val response = client.prepareIndex(index, estype).setSource(write(i)).get
       response.getId
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         ""
-    }
-  }
 
-  def get(id: String): Option[EngineInstance] = {
-    try {
+  def get(id: String): Option[EngineInstance] =
+    try
       val response = client.prepareGet(index, estype, id).get
-      if (response.isExists) {
+      if (response.isExists)
         Some(read[EngineInstance](response.getSourceAsString))
-      } else {
+      else
         None
-      }
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         None
-    }
-  }
 
-  def getAll(): Seq[EngineInstance] = {
-    try {
+  def getAll(): Seq[EngineInstance] =
+    try
       val builder = client.prepareSearch(index).setTypes(estype)
       ESUtils.getAll[EngineInstance](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq()
-    }
-  }
 
   def getCompleted(engineId: String,
                    engineVersion: String,
-                   engineVariant: String): Seq[EngineInstance] = {
-    try {
+                   engineVariant: String): Seq[EngineInstance] =
+    try
       val builder = client
         .prepareSearch(index)
         .setTypes(estype)
@@ -123,31 +114,24 @@ class ESEngineInstances(
                                  termFilter("engineVariant", engineVariant)))
         .addSort("startTime", SortOrder.DESC)
       ESUtils.getAll[EngineInstance](client, builder)
-    } catch {
+    catch
       case e: ElasticsearchException =>
         error(e.getMessage)
         Seq()
-    }
-  }
 
   def getLatestCompleted(engineId: String,
                          engineVersion: String,
                          engineVariant: String): Option[EngineInstance] =
     getCompleted(engineId, engineVersion, engineVariant).headOption
 
-  def update(i: EngineInstance): Unit = {
-    try {
+  def update(i: EngineInstance): Unit =
+    try
       client.prepareUpdate(index, estype, i.id).setDoc(write(i)).get
-    } catch {
+    catch
       case e: ElasticsearchException => error(e.getMessage)
-    }
-  }
 
-  def delete(id: String): Unit = {
-    try {
+  def delete(id: String): Unit =
+    try
       val response = client.prepareDelete(index, estype, id).get
-    } catch {
+    catch
       case e: ElasticsearchException => error(e.getMessage)
-    }
-  }
-}

@@ -27,27 +27,24 @@ import org.apache.spark.sql.hive.execution._
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 
-class StatisticsSuite extends QueryTest with TestHiveSingleton {
+class StatisticsSuite extends QueryTest with TestHiveSingleton
   import hiveContext.sql
 
   val parser = new HiveQl(SimpleParserConf())
 
-  test("parse analyze commands") {
-    def assertAnalyzeCommand(analyzeCommand: String, c: Class[_]) {
+  test("parse analyze commands")
+    def assertAnalyzeCommand(analyzeCommand: String, c: Class[_])
       val parsed = parser.parsePlan(analyzeCommand)
-      val operators = parsed.collect {
+      val operators = parsed.collect
         case a: AnalyzeTable => a
         case o => o
-      }
 
       assert(operators.size === 1)
-      if (operators(0).getClass() != c) {
+      if (operators(0).getClass() != c)
         fail(s"""$analyzeCommand expected command: $c, but got ${operators(0)}
              |parsed command:
              |$parsed
            """.stripMargin)
-      }
-    }
 
     assertAnalyzeCommand(
         "ANALYZE TABLE Table1 COMPUTE STATISTICS", classOf[HiveNativeCommand])
@@ -66,9 +63,8 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
 
     assertAnalyzeCommand("ANALYZE TABLE Table1 COMPUTE STATISTICS nOscAn",
                          classOf[AnalyzeTable])
-  }
 
-  test("analyze MetastoreRelations") {
+  test("analyze MetastoreRelations")
     def queryTotalSize(tableName: String): BigInt =
       hiveContext.sessionState.catalog
         .lookupRelation(TableIdentifier(tableName))
@@ -114,39 +110,34 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
 
     // Try to analyze a temp table
     sql("""SELECT * FROM src""").registerTempTable("tempTable")
-    intercept[UnsupportedOperationException] {
+    intercept[UnsupportedOperationException]
       hiveContext.analyze("tempTable")
-    }
     hiveContext.sessionState.catalog
       .unregisterTable(TableIdentifier("tempTable"))
-  }
 
-  test("estimates the size of a test MetastoreRelation") {
+  test("estimates the size of a test MetastoreRelation")
     val df = sql("""SELECT * FROM src""")
-    val sizes = df.queryExecution.analyzed.collect {
+    val sizes = df.queryExecution.analyzed.collect
       case mr: MetastoreRelation =>
         mr.statistics.sizeInBytes
-    }
     assert(sizes.size === 1, s"Size wrong for:\n ${df.queryExecution}")
     assert(sizes(0).equals(BigInt(5812)),
            s"expected exact size 5812 for test table 'src', got: ${sizes(0)}")
-  }
 
-  test("auto converts to broadcast hash join, by size estimate of a relation") {
+  test("auto converts to broadcast hash join, by size estimate of a relation")
     def mkTest(before: () => Unit,
                after: () => Unit,
                query: String,
                expectedAnswer: Seq[Row],
-               ct: ClassTag[_]): Unit = {
+               ct: ClassTag[_]): Unit =
       before()
 
       var df = sql(query)
 
       // Assert src has a size smaller than the threshold.
-      val sizes = df.queryExecution.analyzed.collect {
+      val sizes = df.queryExecution.analyzed.collect
         case r if ct.runtimeClass.isAssignableFrom(r.getClass) =>
           r.statistics.sizeInBytes
-      }
       assert(
           sizes.size === 2 &&
           sizes(0) <= hiveContext.conf.autoBroadcastJoinThreshold &&
@@ -155,39 +146,34 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
 
       // Using `sparkPlan` because for relevant patterns in HashJoin to be
       // matched, other strategies need to be applied.
-      var bhj = df.queryExecution.sparkPlan.collect {
+      var bhj = df.queryExecution.sparkPlan.collect
         case j: BroadcastHashJoin => j
-      }
       assert(
           bhj.size === 1,
           s"actual query plans do not contain broadcast join: ${df.queryExecution}")
 
       checkAnswer(df, expectedAnswer) // check correctness of output
 
-      hiveContext.conf.settings.synchronized {
+      hiveContext.conf.settings.synchronized
         val tmp = hiveContext.conf.autoBroadcastJoinThreshold
 
         sql(s"""SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=-1""")
         df = sql(query)
-        bhj = df.queryExecution.sparkPlan.collect {
+        bhj = df.queryExecution.sparkPlan.collect
           case j: BroadcastHashJoin => j
-        }
         assert(
             bhj.isEmpty,
             "BroadcastHashJoin still planned even though it is switched off")
 
-        val shj = df.queryExecution.sparkPlan.collect {
+        val shj = df.queryExecution.sparkPlan.collect
           case j: SortMergeJoin => j
-        }
         assert(
             shj.size === 1,
             "SortMergeJoin should be planned when BroadcastHashJoin is turned off")
 
         sql(s"""SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=$tmp""")
-      }
 
       after()
-    }
 
     /** Tests for MetastoreRelation */
     val metastoreQuery =
@@ -200,10 +186,9 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
         metastoreAnswer,
         implicitly[ClassTag[MetastoreRelation]]
     )
-  }
 
   test(
-      "auto converts to broadcast left semi join, by size estimate of a relation") {
+      "auto converts to broadcast left semi join, by size estimate of a relation")
     val leftSemiJoinQuery =
       """SELECT * FROM src a
         |left semi JOIN src b ON a.key=86 and a.key = b.key""".stripMargin
@@ -212,12 +197,11 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
     var df = sql(leftSemiJoinQuery)
 
     // Assert src has a size smaller than the threshold.
-    val sizes = df.queryExecution.analyzed.collect {
+    val sizes = df.queryExecution.analyzed.collect
       case r
           if implicitly[ClassTag[MetastoreRelation]].runtimeClass
             .isAssignableFrom(r.getClass) =>
         r.statistics.sizeInBytes
-    }
     assert(
         sizes.size === 2 &&
         sizes(1) <= hiveContext.conf.autoBroadcastJoinThreshold &&
@@ -226,34 +210,28 @@ class StatisticsSuite extends QueryTest with TestHiveSingleton {
 
     // Using `sparkPlan` because for relevant patterns in HashJoin to be
     // matched, other strategies need to be applied.
-    var bhj = df.queryExecution.sparkPlan.collect {
+    var bhj = df.queryExecution.sparkPlan.collect
       case j: BroadcastHashJoin => j
-    }
     assert(
         bhj.size === 1,
         s"actual query plans do not contain broadcast join: ${df.queryExecution}")
 
     checkAnswer(df, answer) // check correctness of output
 
-    hiveContext.conf.settings.synchronized {
+    hiveContext.conf.settings.synchronized
       val tmp = hiveContext.conf.autoBroadcastJoinThreshold
 
       sql(s"SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=-1")
       df = sql(leftSemiJoinQuery)
-      bhj = df.queryExecution.sparkPlan.collect {
+      bhj = df.queryExecution.sparkPlan.collect
         case j: BroadcastHashJoin => j
-      }
       assert(bhj.isEmpty,
              "BroadcastHashJoin still planned even though it is switched off")
 
-      val shj = df.queryExecution.sparkPlan.collect {
+      val shj = df.queryExecution.sparkPlan.collect
         case j: ShuffledHashJoin => j
-      }
       assert(
           shj.size === 1,
           "LeftSemiJoinHash should be planned when BroadcastHashJoin is turned off")
 
       sql(s"SET ${SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key}=$tmp")
-    }
-  }
-}

@@ -19,16 +19,13 @@ package org.apache.spark.scheduler.cluster
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-private[spark] class SimpleExtensionService extends SchedulerExtensionService {
+private[spark] class SimpleExtensionService extends SchedulerExtensionService
 
   /** started flag; set in the `start()` call, stopped in `stop()`. */
   val started = new AtomicBoolean(false)
 
-  override def start(binding: SchedulerExtensionServiceBinding): Unit = {
+  override def start(binding: SchedulerExtensionServiceBinding): Unit =
     started.set(true)
-  }
 
-  override def stop(): Unit = {
+  override def stop(): Unit =
     started.set(false)
-  }
-}

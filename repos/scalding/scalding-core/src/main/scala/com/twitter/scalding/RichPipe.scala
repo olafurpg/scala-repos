@@ -27,7 +27,7 @@ import scala.util.Random
 import java.util.concurrent.atomic.AtomicInteger
 import scala.collection.immutable.Queue
 
-object RichPipe extends java.io.Serializable {
+object RichPipe extends java.io.Serializable
   private val nextPipe = new AtomicInteger(-1)
 
   def apply(p: Pipe): RichPipe = new RichPipe(p)
@@ -44,62 +44,52 @@ object RichPipe extends java.io.Serializable {
     * Gets the underlying config for this pipe and sets the number of reducers
     * useful for cascading GroupBy/CoGroup pipes.
     */
-  def setReducers(p: Pipe, reducers: Int): Pipe = {
-    if (reducers > 0) {
+  def setReducers(p: Pipe, reducers: Int): Pipe =
+    if (reducers > 0)
       p.getStepConfigDef().setProperty(REDUCER_KEY, reducers.toString)
       p.getStepConfigDef()
         .setProperty(Config.WithReducersSetExplicitly, "true")
-    } else if (reducers != -1) {
+    else if (reducers != -1)
       throw new IllegalArgumentException(
           s"Number of reducers must be non-negative. Got: ${reducers}")
-    }
     p
-  }
 
   // A pipe can have more than one description when merged together, so we store them delimited with 255.toChar.
   // Cannot use 1.toChar as we get an error if it is not a printable character.
-  private def encodePipeDescriptions(descriptions: Seq[String]): String = {
+  private def encodePipeDescriptions(descriptions: Seq[String]): String =
     descriptions
       .map(_.replace(255.toChar, ' '))
       .filter(_.nonEmpty)
       .mkString(255.toChar.toString)
-  }
 
-  private def decodePipeDescriptions(encoding: String): Seq[String] = {
+  private def decodePipeDescriptions(encoding: String): Seq[String] =
     encoding.split(255.toChar).toSeq
-  }
 
-  def getPipeDescriptions(p: Pipe): Seq[String] = {
+  def getPipeDescriptions(p: Pipe): Seq[String] =
     if (p.getStepConfigDef.isEmpty) Nil
-    else {
+    else
       // We use empty getter so we can get latest config value of Config.PipeDescriptions in the step ConfigDef.
       val encodedResult =
-        p.getStepConfigDef.apply(Config.PipeDescriptions, new Getter {
+        p.getStepConfigDef.apply(Config.PipeDescriptions, new Getter
           override def update(s: String, s1: String): String = ???
           override def get(s: String): String = null
-        })
+        )
       Option(encodedResult)
         .filterNot(_.isEmpty)
         .map(decodePipeDescriptions)
         .getOrElse(Nil)
-    }
-  }
 
-  def setPipeDescriptions(p: Pipe, descriptions: Seq[String]): Pipe = {
+  def setPipeDescriptions(p: Pipe, descriptions: Seq[String]): Pipe =
     p.getStepConfigDef()
       .setProperty(
           Config.PipeDescriptions,
           encodePipeDescriptions(getPipeDescriptions(p) ++ descriptions))
     p
-  }
 
-  def setPipeDescriptionFrom(p: Pipe, ste: Option[StackTraceElement]): Pipe = {
-    ste.foreach { ste =>
+  def setPipeDescriptionFrom(p: Pipe, ste: Option[StackTraceElement]): Pipe =
+    ste.foreach  ste =>
       setPipeDescriptions(p, List(ste.toString))
-    }
     p
-  }
-}
 
 /**
   * This is an enrichment-pattern class for cascading.pipe.Pipe.
@@ -107,7 +97,7 @@ object RichPipe extends java.io.Serializable {
   * only to add methods to Pipe.
   */
 class RichPipe(val pipe: Pipe)
-    extends java.io.Serializable with JoinAlgorithms {
+    extends java.io.Serializable with JoinAlgorithms
   // We need this for the implicits
   import Dsl._
   import RichPipe.assignName
@@ -121,7 +111,7 @@ class RichPipe(val pipe: Pipe)
     * Beginning of block with access to expensive nonserializable state. The state object should
     * contain a function release() for resource management purpose.
     */
-  def using[C <: { def release() }](bf: => C) = new {
+  def using[C <: { def release() }](bf: => C) = new
 
     /**
       * For pure side effect.
@@ -130,47 +120,43 @@ class RichPipe(val pipe: Pipe)
         f: Fields)(fn: (C, A) => Unit)(implicit conv: TupleConverter[A],
                                        set: TupleSetter[Unit],
                                        flowDef: FlowDef,
-                                       mode: Mode) = {
+                                       mode: Mode) =
       conv.assertArityMatches(f)
       val newPipe = new Each(
           pipe,
           f,
           new SideEffectMapFunction(
-              bf, fn, new Function1[C, Unit] with java.io.Serializable {
+              bf, fn, new Function1[C, Unit] with java.io.Serializable
             def apply(c: C) { c.release() }
-          }, Fields.NONE, conv, set))
+          , Fields.NONE, conv, set))
       NullSource.writeFrom(newPipe)(flowDef, mode)
       newPipe
-    }
 
     /**
       * map with state
       */
     def map[A, T](fs: (Fields, Fields))(fn: (C, A) => T)(
-        implicit conv: TupleConverter[A], set: TupleSetter[T]) = {
+        implicit conv: TupleConverter[A], set: TupleSetter[T]) =
       conv.assertArityMatches(fs._1)
       set.assertArityMatches(fs._2)
       val mf = new SideEffectMapFunction(
-          bf, fn, new Function1[C, Unit] with java.io.Serializable {
+          bf, fn, new Function1[C, Unit] with java.io.Serializable
         def apply(c: C) { c.release() }
-      }, fs._2, conv, set)
+      , fs._2, conv, set)
       new Each(pipe, fs._1, mf, defaultMode(fs._1, fs._2))
-    }
 
     /**
       * flatMap with state
       */
     def flatMap[A, T](fs: (Fields, Fields))(fn: (C, A) => TraversableOnce[T])(
-        implicit conv: TupleConverter[A], set: TupleSetter[T]) = {
+        implicit conv: TupleConverter[A], set: TupleSetter[T]) =
       conv.assertArityMatches(fs._1)
       set.assertArityMatches(fs._2)
       val mf = new SideEffectFlatMapFunction(
-          bf, fn, new Function1[C, Unit] with java.io.Serializable {
+          bf, fn, new Function1[C, Unit] with java.io.Serializable
         def apply(c: C) { c.release() }
-      }, fs._2, conv, set)
+      , fs._2, conv, set)
       new Each(pipe, fs._1, mf, defaultMode(fs._1, fs._2))
-    }
-  }
 
   /**
     * Keep only the given fields, and discard the rest.
@@ -222,16 +208,14 @@ class RichPipe(val pipe: Pipe)
   /**
     * Merge or Concatenate several pipes together with this one:
     */
-  def ++(that: Pipe): Pipe = {
-    if (this.pipe == that) {
+  def ++(that: Pipe): Pipe =
+    if (this.pipe == that)
       // Cascading fails on self merge:
       // solution by Jack Guo
       new Merge(
           assignName(this.pipe), assignName(new Each(that, new Identity)))
-    } else {
+    else
       new Merge(assignName(this.pipe), assignName(that))
-    }
-  }
 
   /**
     * Group all tuples down to one reducer.
@@ -252,9 +236,9 @@ class RichPipe(val pipe: Pipe)
     * or count all the rows.
     */
   def groupAll(gs: GroupBuilder => GroupBuilder) =
-    map(() -> '__groupAll__) { (u: Unit) =>
+    map(() -> '__groupAll__)  (u: Unit) =>
       1
-    }.groupBy('__groupAll__) { gs(_).reducers(1) }.discard('__groupAll__)
+    .groupBy('__groupAll__) { gs(_).reducers(1) }.discard('__groupAll__)
 
   /**
     * Force a random shuffle of all the data to exactly n reducers
@@ -287,22 +271,18 @@ class RichPipe(val pipe: Pipe)
   // by relying on cascading to use java's hashCode, which hash ints
   // to themselves
   protected def groupRandomlyAux(n: Int, optSeed: Option[Long])(
-      gs: GroupBuilder => GroupBuilder): Pipe = {
+      gs: GroupBuilder => GroupBuilder): Pipe =
     using(statefulRandom(optSeed))
-      .map(() -> '__shard__) { (r: Random, _: Unit) =>
+      .map(() -> '__shard__)  (r: Random, _: Unit) =>
         r.nextInt(n)
-      }
       .groupBy('__shard__) { gs(_).reducers(n) }
       .discard('__shard__)
-  }
 
-  private def statefulRandom(optSeed: Option[Long]): Random with Stateful = {
+  private def statefulRandom(optSeed: Option[Long]): Random with Stateful =
     val random = new Random with Stateful
-    optSeed.foreach { x =>
+    optSeed.foreach  x =>
       random.setSeed(x)
-    }
     random
-  }
 
   /**
     * Put all rows in random order
@@ -329,16 +309,13 @@ class RichPipe(val pipe: Pipe)
     groupAndShuffleRandomlyAux(reducers, Some(seed))(gs)
 
   private def groupAndShuffleRandomlyAux(reducers: Int, optSeed: Option[Long])(
-      gs: GroupBuilder => GroupBuilder): Pipe = {
+      gs: GroupBuilder => GroupBuilder): Pipe =
     using(statefulRandom(optSeed))
-      .map(() -> ('__shuffle__)) { (r: Random, _: Unit) =>
+      .map(() -> ('__shuffle__))  (r: Random, _: Unit) =>
         r.nextDouble()
-      }
-      .groupRandomlyAux(reducers, optSeed) { g: GroupBuilder =>
+      .groupRandomlyAux(reducers, optSeed)  g: GroupBuilder =>
         gs(g.sortBy('__shuffle__))
-      }
       .discard('__shuffle__)
-  }
 
   /**
     * Adds a field with a constant value.
@@ -349,9 +326,9 @@ class RichPipe(val pipe: Pipe)
     * }}}
     */
   def insert[A](fs: Fields, value: A)(implicit setter: TupleSetter[A]): Pipe =
-    map[Unit, A](() -> fs) { _: Unit =>
+    map[Unit, A](() -> fs)  _: Unit =>
       value
-    }(implicitly[TupleConverter[Unit]], setter)
+    (implicitly[TupleConverter[Unit]], setter)
 
   /**
     * Rename some set of N fields as another set of N fields
@@ -368,23 +345,21 @@ class RichPipe(val pipe: Pipe)
     * but the compiler doesn't resolve the ambiguity.  YOU MUST CALL THIS WITH
     * A TUPLE2!  If you don't, expect the unexpected.
     */
-  def rename(fields: (Fields, Fields)): Pipe = {
+  def rename(fields: (Fields, Fields)): Pipe =
     val (fromFields, toFields) = fields
     val in_arity = fromFields.size
     val out_arity = toFields.size
     assert(
         in_arity == out_arity, "Number of field names must match for rename")
     new Each(pipe, fromFields, new Identity(toFields), Fields.SWAP)
-  }
 
   /**
     * Keep only items that satisfy this predicate.
     */
   def filter[A](f: Fields)(fn: (A) => Boolean)(
-      implicit conv: TupleConverter[A]): Pipe = {
+      implicit conv: TupleConverter[A]): Pipe =
     conv.assertArityMatches(f)
     new Each(pipe, f, new FilterFunction(fn, conv))
-  }
 
   /**
     * Keep only items that don't satisfy this predicate.
@@ -404,11 +379,9 @@ class RichPipe(val pipe: Pipe)
     * Text files can have corrupted data. If you use this function and a
     * cascading trap you can filter out corrupted data from your pipe.
     */
-  def verifyTypes[A](f: Fields)(implicit conv: TupleConverter[A]): Pipe = {
-    pipe.filter(f) { (a: A) =>
+  def verifyTypes[A](f: Fields)(implicit conv: TupleConverter[A]): Pipe =
+    pipe.filter(f)  (a: A) =>
       true
-    }
-  }
 
   /**
     * Given a function, partitions the pipe into several groups based on the
@@ -424,7 +397,7 @@ class RichPipe(val pipe: Pipe)
   def partition[A, R](fs: (Fields, Fields))(fn: (A) => R)(
       builder: GroupBuilder => GroupBuilder)(implicit conv: TupleConverter[A],
                                              ord: Ordering[R],
-                                             rset: TupleSetter[R]): Pipe = {
+                                             rset: TupleSetter[R]): Pipe =
     val (fromFields, toFields) = fs
     conv.assertArityMatches(fromFields)
     rset.assertArityMatches(toFields)
@@ -434,11 +407,10 @@ class RichPipe(val pipe: Pipe)
 
     map(fromFields -> tmpFields)(fn)(conv, TupleSetter.singleSetter[R])
       .groupBy(tmpFields)(builder)
-      .map[R, R](tmpFields -> toFields) { (r: R) =>
+      .map[R, R](tmpFields -> toFields)  (r: R) =>
         r
-      }(TupleConverter.singleConverter[R], rset)
+      (TupleConverter.singleConverter[R], rset)
       .discard(tmpFields)
-  }
 
   /**
     * If you use a map function that does not accept TupleEntry args,
@@ -471,45 +443,39 @@ class RichPipe(val pipe: Pipe)
     * selecting just the output fields
     */
   def map[A, T](fs: (Fields, Fields))(fn: A => T)(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     each(fs)(new MapFunction[A, T](fn, _, conv, setter))
-  }
   def mapTo[A, T](fs: (Fields, Fields))(fn: A => T)(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     eachTo(fs)(new MapFunction[A, T](fn, _, conv, setter))
-  }
   def flatMap[A, T](fs: (Fields, Fields))(fn: A => TraversableOnce[T])(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     each(fs)(new FlatMapFunction[A, T](fn, _, conv, setter))
-  }
   def flatMapTo[A, T](fs: (Fields, Fields))(fn: A => TraversableOnce[T])(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     eachTo(fs)(new FlatMapFunction[A, T](fn, _, conv, setter))
-  }
 
   /**
     * Filters all data that is defined for this partial function and then applies that function
     */
   def collect[A, T](fs: (Fields, Fields))(fn: PartialFunction[A, T])(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     pipe.each(fs)(new CollectFunction[A, T](fn, _, conv, setter))
-  }
   def collectTo[A, T](fs: (Fields, Fields))(fn: PartialFunction[A, T])(
-      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe = {
+      implicit conv: TupleConverter[A], setter: TupleSetter[T]): Pipe =
     conv.assertArityMatches(fs._1)
     setter.assertArityMatches(fs._2)
     pipe.eachTo(fs)(new CollectFunction[A, T](fn, _, conv, setter))
-  }
 
   /**
     * the same as
@@ -523,9 +489,9 @@ class RichPipe(val pipe: Pipe)
   def flatten[T](fs: (Fields, Fields))(
       implicit conv: TupleConverter[TraversableOnce[T]],
       setter: TupleSetter[T]): Pipe =
-    flatMap[TraversableOnce[T], T](fs)({ it: TraversableOnce[T] =>
+    flatMap[TraversableOnce[T], T](fs)( it: TraversableOnce[T] =>
       it
-    })(conv, setter)
+    )(conv, setter)
 
   /**
     * the same as
@@ -539,9 +505,9 @@ class RichPipe(val pipe: Pipe)
   def flattenTo[T](
       fs: (Fields, Fields))(implicit conv: TupleConverter[TraversableOnce[T]],
                             setter: TupleSetter[T]): Pipe =
-    flatMapTo[TraversableOnce[T], T](fs)({ it: TraversableOnce[T] =>
+    flatMapTo[TraversableOnce[T], T](fs)( it: TraversableOnce[T] =>
       it
-    })(conv, setter)
+    )(conv, setter)
 
   /**
     * Force a materialization to disk in the flow.
@@ -553,16 +519,14 @@ class RichPipe(val pipe: Pipe)
   /**
     * Convenience method for integrating with existing cascading Functions
     */
-  def each(fs: (Fields, Fields))(fn: Fields => Function[_]) = {
+  def each(fs: (Fields, Fields))(fn: Fields => Function[_]) =
     new Each(pipe, fs._1, fn(fs._2), defaultMode(fs._1, fs._2))
-  }
 
   /**
     * Same as above, but only keep the results field.
     */
-  def eachTo(fs: (Fields, Fields))(fn: Fields => Function[_]) = {
+  def eachTo(fs: (Fields, Fields))(fn: Fields => Function[_]) =
     new Each(pipe, fs._1, fn(fs._2), Fields.RESULTS)
-  }
 
   /**
     * This is an analog of the SQL/Excel unpivot function which converts columns of data
@@ -589,16 +553,14 @@ class RichPipe(val pipe: Pipe)
     * }}}
     * etc...
     */
-  def unpivot(fieldDef: (Fields, Fields)): Pipe = {
+  def unpivot(fieldDef: (Fields, Fields)): Pipe =
     assert(fieldDef._2.size == 2,
            "Must specify exactly two Field names for the results")
     // toKeyValueList comes from TupleConversions
     pipe
-      .flatMap(fieldDef) { te: TupleEntry =>
+      .flatMap(fieldDef)  te: TupleEntry =>
         TupleConverter.KeyValueList(te)
-      }
       .discard(fieldDef._1)
-  }
 
   /**
     * Keep at most n elements.  This is implemented by keeping
@@ -641,20 +603,18 @@ class RichPipe(val pipe: Pipe)
   /**
     * Write all the tuples to the given source and return this Pipe
     */
-  def write(outsource: Source)(implicit flowDef: FlowDef, mode: Mode) = {
+  def write(outsource: Source)(implicit flowDef: FlowDef, mode: Mode) =
     /* This code is to hack around a known Cascading bug that they have decided not to fix. In a graph:
     A -> FlatMap -> write(tsv) -> FlatMap
     in the second flatmap cascading will read from the written tsv for running it. However TSV's use toString and so is not a bijection.
     here we stick in an identity function before the tsv write to keep to force cascading to do any fork/split beforehand.
      */
-    val writePipe: Pipe = outsource match {
+    val writePipe: Pipe = outsource match
       case t: Tsv =>
         new Each(pipe, Fields.ALL, IdentityFunction, Fields.REPLACE)
       case _ => pipe
-    }
     outsource.writeFrom(writePipe)(flowDef, mode)
     pipe
-  }
 
   /**
     * Adds a trap to the current pipe,
@@ -667,10 +627,9 @@ class RichPipe(val pipe: Pipe)
     *
     * There can only be at most one trap for each pipe.
     */
-  def addTrap(trapsource: Source)(implicit flowDef: FlowDef, mode: Mode) = {
+  def addTrap(trapsource: Source)(implicit flowDef: FlowDef, mode: Mode) =
     flowDef.addTrap(pipe, trapsource.createTap(Write)(mode))
     pipe
-  }
 
   /**
     * Divides sum of values for this variable by their sum; assumes without checking that division is supported
@@ -680,17 +639,15 @@ class RichPipe(val pipe: Pipe)
     *
     * in some cases, crossWithTiny has been broken, the implementation supports a work-around
     */
-  def normalize(f: Fields, useTiny: Boolean = true): Pipe = {
+  def normalize(f: Fields, useTiny: Boolean = true): Pipe =
     val total = groupAll { _.sum[Double](f -> '__total_for_normalize__) }
-    (if (useTiny) {
+    (if (useTiny)
        crossWithTiny(total)
-     } else {
+     else
        crossWithSmaller(total)
-     }).map(Fields.merge(f, '__total_for_normalize__) -> f) {
+     ).map(Fields.merge(f, '__total_for_normalize__) -> f)
       args: (Double, Double) =>
         args._1 / args._2
-    }
-  }
 
   /**
     * Maps the input fields into an output field of type T. For example:
@@ -704,27 +661,25 @@ class RichPipe(val pipe: Pipe)
     *
     */
   def pack[T](fs: (Fields, Fields))(
-      implicit packer: TuplePacker[T], setter: TupleSetter[T]): Pipe = {
+      implicit packer: TuplePacker[T], setter: TupleSetter[T]): Pipe =
     val (fromFields, toFields) = fs
     assert(toFields.size == 1, "Can only output 1 field in pack")
     val conv = packer.newConverter(fromFields)
-    pipe.map(fs) { input: T =>
+    pipe.map(fs)  input: T =>
       input
-    }(conv, setter)
-  }
+    (conv, setter)
 
   /**
     * Same as pack but only the to fields are preserved.
     */
   def packTo[T](fs: (Fields, Fields))(
-      implicit packer: TuplePacker[T], setter: TupleSetter[T]): Pipe = {
+      implicit packer: TuplePacker[T], setter: TupleSetter[T]): Pipe =
     val (fromFields, toFields) = fs
     assert(toFields.size == 1, "Can only output 1 field in pack")
     val conv = packer.newConverter(fromFields)
-    pipe.mapTo(fs) { input: T =>
+    pipe.mapTo(fs)  input: T =>
       input
-    }(conv, setter)
-  }
+    (conv, setter)
 
   /**
     * The opposite of pack. Unpacks the input field of type `T` into
@@ -737,29 +692,27 @@ class RichPipe(val pipe: Pipe)
     * will unpack 'field1 into 'field2 and 'field3
     */
   def unpack[T](fs: (Fields, Fields))(
-      implicit unpacker: TupleUnpacker[T], conv: TupleConverter[T]): Pipe = {
+      implicit unpacker: TupleUnpacker[T], conv: TupleConverter[T]): Pipe =
     val (fromFields, toFields) = fs
     assert(fromFields.size == 1, "Can only take 1 input field in unpack")
     val fields = (fromFields, unpacker.getResultFields(toFields))
     val setter = unpacker.newSetter(toFields)
-    pipe.map(fields) { input: T =>
+    pipe.map(fields)  input: T =>
       input
-    }(conv, setter)
-  }
+    (conv, setter)
 
   /**
     * Same as unpack but only the to fields are preserved.
     */
   def unpackTo[T](fs: (Fields, Fields))(
-      implicit unpacker: TupleUnpacker[T], conv: TupleConverter[T]): Pipe = {
+      implicit unpacker: TupleUnpacker[T], conv: TupleConverter[T]): Pipe =
     val (fromFields, toFields) = fs
     assert(fromFields.size == 1, "Can only take 1 input field in unpack")
     val fields = (fromFields, unpacker.getResultFields(toFields))
     val setter = unpacker.newSetter(toFields)
-    pipe.mapTo(fields) { input: T =>
+    pipe.mapTo(fields)  input: T =>
       input
-    }(conv, setter)
-  }
+    (conv, setter)
 
   /**
     * Set of pipes reachable from this pipe (transitive closure of 'Pipe.getPrevious')
@@ -777,50 +730,39 @@ class RichPipe(val pipe: Pipe)
     * flowdef. We then find all the pipes back in the DAG from this pipe and apply
     * those serializations.
     */
-  private[scalding] def applyFlowConfigProperties(flowDef: FlowDef): Pipe = {
-    case class ToVisit[T](queue: Queue[T], inQueue: Set[T]) {
+  private[scalding] def applyFlowConfigProperties(flowDef: FlowDef): Pipe =
+    case class ToVisit[T](queue: Queue[T], inQueue: Set[T])
       def maybeAdd(t: T): ToVisit[T] =
         if (inQueue(t)) this
-        else {
+        else
           ToVisit(queue :+ t, inQueue + t)
-        }
       def next: Option[(T, ToVisit[T])] =
         if (inQueue.isEmpty) None
         else Some((queue.head, ToVisit(queue.tail, inQueue - queue.head)))
-    }
 
     @annotation.tailrec
-    def go(p: Pipe, visited: Set[Pipe], toVisit: ToVisit[Pipe]): Set[Pipe] = {
+    def go(p: Pipe, visited: Set[Pipe], toVisit: ToVisit[Pipe]): Set[Pipe] =
       val notSeen: Set[Pipe] =
         p.getPrevious.filter(i => !visited.contains(i)).toSet
       val nextVisited: Set[Pipe] = visited + p
-      val nextToVisit = notSeen.foldLeft(toVisit) {
+      val nextToVisit = notSeen.foldLeft(toVisit)
         case (prev, n) => prev.maybeAdd(n)
-      }
 
-      nextToVisit.next match {
+      nextToVisit.next match
         case Some((h, innerNextToVisit)) =>
           go(h, nextVisited, innerNextToVisit)
         case _ => nextVisited
-      }
-    }
     val allPipes = go(pipe, Set[Pipe](), ToVisit[Pipe](Queue.empty, Set.empty))
 
-    FlowStateMap.get(flowDef).foreach { fstm =>
-      fstm.flowConfigUpdates.foreach {
+    FlowStateMap.get(flowDef).foreach  fstm =>
+      fstm.flowConfigUpdates.foreach
         case (k, v) =>
-          allPipes.foreach { p =>
+          allPipes.foreach  p =>
             p.getStepConfigDef().setProperty(k, v)
-          }
-      }
-    }
     pipe
-  }
-}
 
 /**
   * A simple trait for releasable resource. Provides noop implementation.
   */
-trait Stateful {
+trait Stateful
   def release() {}
-}

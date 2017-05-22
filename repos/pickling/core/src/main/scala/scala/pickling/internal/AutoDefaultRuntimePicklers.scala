@@ -10,8 +10,8 @@ import scala.pickling.spi.PicklerRegistry
   *
   * Note: Currently this only handles Tuple2s
   */
-trait RuntimePicklerRegistryHelper extends PicklerRegistry {
-  final def autoRegisterDefaults(): Unit = {
+trait RuntimePicklerRegistryHelper extends PicklerRegistry
+  final def autoRegisterDefaults(): Unit =
     val tpes = List(
         "scala.Tuple2",
         "scala.Tuple2$mcII$sp",
@@ -40,20 +40,17 @@ trait RuntimePicklerRegistryHelper extends PicklerRegistry {
         "scala.Tuple2$mcZZ$sp"
     )
 
-    for (tpe <- tpes) {
+    for (tpe <- tpes)
       registerPicklerGenerator(tpe, tuplePicklerGenerator)
       registerUnpicklerGenerator(tpe, tupleUnpicklerGenerator)
-    }
-  }
 
   def tuplePicklerGenerator: AppliedType => Pickler[(Any, Any)] with Unpickler[
-      (Any, Any)] = { tpe =>
+      (Any, Any)] =  tpe =>
     // TODO - Actually extract the tpe of the internal things.
     val tag = FastTypeTag.apply(internal.currentMirror, tpe.toString)
     new Tuple2RTPickler()
-  }
 
-  def tupleUnpicklerGenerator: AppliedType => Unpickler[(Any, Any)] = {
+  def tupleUnpicklerGenerator: AppliedType => Unpickler[(Any, Any)] =
     case AppliedType(_, List(left, right)) =>
       val lhs = currentRuntime.picklers
         .lookupUnpickler(left.toString)
@@ -65,5 +62,3 @@ trait RuntimePicklerRegistryHelper extends PicklerRegistry {
         .asInstanceOf[Unpickler[Any]]
       new Tuple2RTKnownTagUnpickler(lhs, rhs)
     case tpe => new Tuple2RTPickler()
-  }
-}

@@ -14,19 +14,17 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * 2014-09-23
   */
 class AddReturnTypeFix(fun: ScFunctionDefinition, tp: ScType)
-    extends IntentionAction {
+    extends IntentionAction
   override def getText: String = "Add return type"
 
   override def getFamilyName: String = getText
 
-  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit = {
+  override def invoke(project: Project, editor: Editor, file: PsiFile): Unit =
     new AddOnlyStrategy(Option(editor))
       .addTypeAnnotation(tp, fun.getParent, fun.parameterList)
-  }
 
   override def startInWriteAction(): Boolean = true
 
   override def isAvailable(
       project: Project, editor: Editor, file: PsiFile): Boolean =
     fun.returnTypeElement.isEmpty
-}

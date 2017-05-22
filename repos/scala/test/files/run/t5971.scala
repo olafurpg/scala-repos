@@ -6,12 +6,10 @@
   *  case with `takeWhile`.
   *  Mind blowing, I know.
   */
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     println("bar".view.reverse.filter(_ > 'a').mkString(","))
     println("bar".view.reverse.take(1).mkString(","))
     println("bar".view.reverse.dropWhile(_ > 'a').mkString(","))
     println("bar".view.reverse.takeWhile(_ => true).mkString(","))
-  }
-}

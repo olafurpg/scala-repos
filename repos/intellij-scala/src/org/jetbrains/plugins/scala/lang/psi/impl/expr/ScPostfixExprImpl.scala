@@ -16,7 +16,7 @@ import scala.collection.Seq
   * Date: 06.03.2008
   */
 class ScPostfixExprImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScPostfixExpr {
+    extends ScalaPsiElementImpl(node) with ScPostfixExpr
   override def toString: String = "PostfixExpression"
 
   def argumentExpressions: Seq[ScExpression] = Seq.empty
@@ -25,14 +25,10 @@ class ScPostfixExprImpl(node: ASTNode)
 
   def argsElement: PsiElement = operation
 
-  override def accept(visitor: ScalaElementVisitor) {
+  override def accept(visitor: ScalaElementVisitor)
     visitor.visitPostfixExpression(this)
-  }
 
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => visitor.visitPostfixExpression(this)
       case _ => super.accept(visitor)
-    }
-  }
-}

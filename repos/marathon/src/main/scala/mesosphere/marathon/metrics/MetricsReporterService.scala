@@ -17,20 +17,17 @@ import org.coursera.metrics.datadog.transport.{HttpTransport, UdpTransport}
 
 import scala.collection.JavaConverters._
 
-object MetricsReporterService {
+object MetricsReporterService
 
-  object QueryParam {
-    def unapply(str: String): Option[(String, String)] = str.split("=") match {
+  object QueryParam
+    def unapply(str: String): Option[(String, String)] = str.split("=") match
       case Array(key: String, value: String) => Some(key -> value)
       case _ => None
-    }
-  }
-}
 
 //scalastyle:off magic.number
 class MetricsReporterService @Inject()(
     config: MetricsReporterConf, registry: MetricRegistry)
-    extends AbstractIdleService {
+    extends AbstractIdleService
 
   private val log = Logger.getLogger(getClass.getName)
 
@@ -50,7 +47,7 @@ class MetricsReporterService @Inject()(
     * Example:
     *   tcp://localhost:2003?prefix=marathon-test&interval=10
     */
-  private[this] def startGraphiteReporter(graphUrl: String): GraphiteReporter = {
+  private[this] def startGraphiteReporter(graphUrl: String): GraphiteReporter =
     val url = new URI(graphUrl)
     val params = Option(url.getQuery)
       .getOrElse("")
@@ -72,7 +69,6 @@ class MetricsReporterService @Inject()(
         s"Graphite reporter configured $reporter with $interval seconds interval (url: $graphUrl)")
     reporter.start(interval, TimeUnit.SECONDS)
     reporter
-  }
 
   /**
     * Report to datadog.
@@ -95,7 +91,7 @@ class MetricsReporterService @Inject()(
     *   http://datadog?apiKey=abc&prefix=marathon-test&tags=marathon&interval=10
     *   udp://localhost:8125?prefix=marathon-test&tags=marathon&interval=10
     */
-  private[this] def startDatadog(dataDog: String): DatadogReporter = {
+  private[this] def startDatadog(dataDog: String): DatadogReporter =
     val url = new URI(dataDog)
     val params = Option(url.getQuery)
       .getOrElse("")
@@ -103,7 +99,7 @@ class MetricsReporterService @Inject()(
       .collect { case QueryParam(k, v) => k -> v }
       .toMap
 
-    val transport = url.getScheme match {
+    val transport = url.getScheme match
       case "http" | "https" =>
         val transport = new HttpTransport.Builder()
         params.get("apiKey").map(transport.withApiKey)
@@ -116,7 +112,6 @@ class MetricsReporterService @Inject()(
       case unknown: String =>
         throw new WrongConfigurationException(
             s"Datadog: Unknown protocol $unknown")
-    }
 
     val expansions = params
       .get("expansions")
@@ -159,15 +154,11 @@ class MetricsReporterService @Inject()(
         s"Datadog reporter configured $reporter with $interval seconds interval (url: $dataDog)")
     reporter.start(interval, TimeUnit.SECONDS)
     reporter
-  }
 
-  def startUp() {
+  def startUp()
     this.graphite = config.graphite.get.map(startGraphiteReporter)
     this.datadog = config.dataDog.get.map(startDatadog)
-  }
 
-  def shutDown() {
+  def shutDown()
     graphite.foreach(_.stop)
     datadog.foreach(_.stop)
-  }
-}

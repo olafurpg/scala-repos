@@ -22,31 +22,26 @@ hand checking:
 @Fork(5)
 @Warmup(iterations = 1000)
 @Measurement(iterations = 4000)
-class ActorCreationBenchmark {
+class ActorCreationBenchmark
   implicit val system: ActorSystem = ActorSystem()
 
   final val props = Props[MyActor]
 
   var i = 1
-  def name = {
+  def name =
     i += 1
     "some-rather-long-actor-name-actor-" + i
-  }
 
   @TearDown(Level.Trial)
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
-  }
 
   @Benchmark
   @OutputTimeUnit(TimeUnit.MICROSECONDS)
   def synchronousStarting =
     system.actorOf(props, name)
-}
 
-class MyActor extends Actor {
-  override def receive: Receive = {
+class MyActor extends Actor
+  override def receive: Receive =
     case _ ⇒
-  }
-}

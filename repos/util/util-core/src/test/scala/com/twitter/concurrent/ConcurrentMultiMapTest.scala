@@ -7,8 +7,8 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ConcurrentMultiMapTest extends WordSpec {
-  "behave like a multimap" in {
+class ConcurrentMultiMapTest extends WordSpec
+  "behave like a multimap" in
     val map = new ConcurrentMultiMap[Int, Int]
     map += 1 -> 2
     map += 1 -> 3
@@ -28,5 +28,3 @@ class ConcurrentMultiMapTest extends WordSpec {
     assert(map.get(3) == List(30))
     assert(map.get(10) == List(40))
     assert(map.get(110) == List())
-  }
-}

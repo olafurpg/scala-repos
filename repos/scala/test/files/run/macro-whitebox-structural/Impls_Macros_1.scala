@@ -1,8 +1,8 @@
 import scala.reflect.macros.whitebox.Context
 import scala.language.experimental.macros
 
-object Macros {
-  def impl(c: Context) = {
+object Macros
+  def impl(c: Context) =
     import c.universe._
     q"""
       trait Foo {
@@ -10,7 +10,5 @@ object Macros {
       }
       new Foo {}
     """
-  }
 
   def foo: Any = macro impl
-}

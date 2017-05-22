@@ -11,7 +11,7 @@ class AssumptionViolatedException protected (fAssumption: String,
                                              fMatcher: Matcher[_],
                                              fValue: AnyRef)
     extends org.junit.internal.AssumptionViolatedException(
-        fAssumption, fValueMatcher, fMatcher, fValue) {
+        fAssumption, fValueMatcher, fMatcher, fValue)
 
   @Deprecated
   def this(actual: Any, matcher: Matcher[_]) =
@@ -27,8 +27,6 @@ class AssumptionViolatedException protected (fAssumption: String,
   def this(message: String) =
     this(message, false, null, null)
 
-  def this(assumption: String, t: Throwable) = {
+  def this(assumption: String, t: Throwable) =
     this(assumption, false, null, null)
     initCause(t)
-  }
-}

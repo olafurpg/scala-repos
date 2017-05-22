@@ -33,15 +33,14 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object ColorAdjust {
+object ColorAdjust
   implicit def sfxColorAdjust2jfx(ca: ColorAdjust): jfxse.ColorAdjust =
     if (ca != null) ca.delegate else null
-}
 
 class ColorAdjust(
     override val delegate: jfxse.ColorAdjust = new jfxse.ColorAdjust)
     extends Effect(delegate) with InputDelegate[jfxse.ColorAdjust]
-    with SFXDelegate[jfxse.ColorAdjust] {
+    with SFXDelegate[jfxse.ColorAdjust]
 
   /**
     * Creates a new instance of ColorAdjust with the specified hue, saturation, brightness, and contrast.
@@ -54,31 +53,26 @@ class ColorAdjust(
     * The brightness adjustment value.
     */
   def brightness: DoubleProperty = delegate.brightnessProperty
-  def brightness_=(v: Double) {
+  def brightness_=(v: Double)
     brightness() = v
-  }
 
   /**
     * The contrast adjustment value.
     */
   def contrast: DoubleProperty = delegate.contrastProperty
-  def contrast_=(v: Double) {
+  def contrast_=(v: Double)
     contrast() = v
-  }
 
   /**
     * The hue adjustment value.
     */
   def hue: DoubleProperty = delegate.hueProperty
-  def hue_=(v: Double) {
+  def hue_=(v: Double)
     hue() = v
-  }
 
   /**
     * The saturation adjustment value.
     */
   def saturation: DoubleProperty = delegate.saturationProperty
-  def saturation_=(v: Double) {
+  def saturation_=(v: Double)
     saturation() = v
-  }
-}

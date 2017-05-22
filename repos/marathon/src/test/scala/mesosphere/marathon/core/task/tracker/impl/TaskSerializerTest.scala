@@ -11,11 +11,11 @@ import org.apache.mesos.{Protos => MesosProtos}
 import org.scalatest.{FunSuite, GivenWhenThen, Matchers}
 
 class TaskSerializerTest
-    extends FunSuite with Mockito with Matchers with GivenWhenThen {
+    extends FunSuite with Mockito with Matchers with GivenWhenThen
   import scala.collection.JavaConverters._
   val f = new Fixture
 
-  test("minimal marathonTask => Task") {
+  test("minimal marathonTask => Task")
     Given("a minimal MarathonTask")
     val now = MarathonTestHelper.clock.now()
     val marathonTask = MarathonTask
@@ -40,9 +40,8 @@ class TaskSerializerTest
 
     Then("we get the original state back")
     marathonTask2 should equal(marathonTask)
-  }
 
-  test("full marathonTask with no networking => Task") {
+  test("full marathonTask with no networking => Task")
     val f = new Fixture
 
     Given("a MarathonTask with all fields and host ports")
@@ -61,9 +60,8 @@ class TaskSerializerTest
 
     Then("we get the original state back")
     marathonTask2 should equal(marathonTask)
-  }
 
-  test("full marathonTask with host ports => Task") {
+  test("full marathonTask with host ports => Task")
     val f = new Fixture
 
     Given("a MarathonTask with all fields and host ports")
@@ -86,9 +84,8 @@ class TaskSerializerTest
 
     Then("we get the original state back")
     marathonTask2 should equal(marathonTask)
-  }
 
-  test("full marathonTask with NetworkInfoList => Task") {
+  test("full marathonTask with NetworkInfoList => Task")
     val f = new Fixture
 
     Given("a MarathonTask with all fields and host ports")
@@ -110,9 +107,8 @@ class TaskSerializerTest
 
     Then("we get the original state back")
     marathonTask2 should equal(marathonTask)
-  }
 
-  test("Reserved <=> Proto") {
+  test("Reserved <=> Proto")
     val f = new Fixture
 
     Given("a reserved task")
@@ -129,9 +125,8 @@ class TaskSerializerTest
 
     Then("We get the original state back")
     serialized should equal(proto)
-  }
 
-  test("LaunchedOnReservation <=> Proto") {
+  test("LaunchedOnReservation <=> Proto")
     val f = new Fixture
 
     Given("a LaunchedOnReservation proto")
@@ -148,24 +143,21 @@ class TaskSerializerTest
 
     Then("We get the original state back")
     serialized should equal(proto)
-  }
 
-  test("Failure case: Reserved has no Reservation") {
+  test("Failure case: Reserved has no Reservation")
     val f = new Fixture
 
     Given("a Reserved proto missing reservation")
     val proto = f.Resident.reservedProtoWithoutReservation
 
     When("We convert it to a task")
-    val error = intercept[SerializationFailedException] {
+    val error = intercept[SerializationFailedException]
       TaskSerializer.fromProto(proto)
-    }
 
     Then("We get a SerializationFailedException")
     error.message should startWith("Unable to deserialize")
-  }
 
-  class Fixture {
+  class Fixture
     private[this] val appId = PathId.fromSafePath("/test")
     val taskId = Task.Id("task")
     val sampleHost: String = "host.some"
@@ -226,7 +218,7 @@ class TaskSerializerTest
       .build()
 
     private[this] def attribute(
-        name: String, textValue: String): MesosProtos.Attribute = {
+        name: String, textValue: String): MesosProtos.Attribute =
       val text = MesosProtos.Value.Text.newBuilder().setValue(textValue)
       MesosProtos.Attribute
         .newBuilder()
@@ -234,9 +226,8 @@ class TaskSerializerTest
         .setType(MesosProtos.Value.Type.TEXT)
         .setText(text)
         .build()
-    }
 
-    object Resident {
+    object Resident
       import scala.collection.JavaConverters._
       import scala.concurrent.duration._
 
@@ -330,6 +321,3 @@ class TaskSerializerTest
 
       def reservedProtoWithoutReservation =
         reservedProto.toBuilder.clearReservation().build()
-    }
-  }
-}

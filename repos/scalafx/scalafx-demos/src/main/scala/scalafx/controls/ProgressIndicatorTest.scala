@@ -34,27 +34,23 @@ import scalafx.scene.control.ProgressIndicator
 import scalafx.scene.layout.{BorderPane, Priority}
 import scalafx.scene.paint.Color
 
-object ProgressIndicatorTest extends JFXApp {
+object ProgressIndicatorTest extends JFXApp
 
   val progressIndicator = new ProgressIndicator
 
   val progressIndicatorController = new ProgressIndicatorControls(
       progressIndicator)
 
-  val mainPane = new BorderPane {
+  val mainPane = new BorderPane
     top = progressIndicator
     center = progressIndicatorController
     vgrow = Priority.Always
     hgrow = Priority.Always
-  }
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ProgressIndicator Test"
     width = 300
     height = 225
-    scene = new Scene {
+    scene = new Scene
       fill = Color.LightGray
       content = mainPane
-    }
-  }
-}

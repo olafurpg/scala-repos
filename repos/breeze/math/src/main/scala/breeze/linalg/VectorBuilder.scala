@@ -48,7 +48,7 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
     private var used: Int,
     var length: Int)(implicit ring: Semiring[E],
                      zero: Zero[E])
-    extends NumericOps[VectorBuilder[E]] with Serializable {
+    extends NumericOps[VectorBuilder[E]] with Serializable
 
   def this(length: Int, initialNonZero: Int = 0)(implicit ring: Semiring[E],
                                                  man: ClassTag[E],
@@ -69,51 +69,43 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 
   def contains(i: Int) = _index.contains(i)
 
-  def apply(i: Int) = {
+  def apply(i: Int) =
     boundsCheck(i)
 
     var off = 0
     var acc = ring.zero
-    while (off < used) {
+    while (off < used)
       if (_index(off) == i) acc = ring.+(acc, _data(off))
       off += 1
-    }
 
     acc
-  }
 
-  private def boundsCheck(i: Int): Unit = {
+  private def boundsCheck(i: Int): Unit =
     if (length >= 0 && (i < 0 || i >= size))
       throw new scala.IndexOutOfBoundsException(i + " not in [0," + size + ")")
-  }
 
-  def update(i: Int, v: E) {
+  def update(i: Int, v: E)
     boundsCheck(i)
     var marked = false
     var off = 0
-    while (off < used) {
-      if (_index(off) == i) {
+    while (off < used)
+      if (_index(off) == i)
         if (!marked) _data(off) = v
         else _data(off) = ring.zero
         marked = true
-      }
 
       off += 1
-    }
-  }
 
-  def add(i: Int, v: E) {
+  def add(i: Int, v: E)
     boundsCheck(i)
 
-    if (_data.length <= used) {
+    if (_data.length <= used)
       _data = ArrayUtil.copyOf(_data, math.max(_data.length * 2, 1))
       _index = ArrayUtil.copyOf(_index, math.max(_index.length * 2, 1))
-    }
 
     _data(used) = v
     _index(used) = i
     used += 1
-  }
 
   def activeIterator = toHashVector.activeIterator
 
@@ -127,81 +119,69 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
 
   def isActive(rawIndex: Int) = rawIndex < used && rawIndex > 0
 
-  override def toString = {
+  override def toString =
     (index.iterator zip data.iterator)
       .take(used)
       .mkString(s"VectorBuilder($length)(", ", ", ")")
-  }
 
-  def copy: VectorBuilder[E] = {
+  def copy: VectorBuilder[E] =
     new VectorBuilder[E](ArrayUtil.copyOf(index, index.length),
                          ArrayUtil.copyOf(data, index.length),
                          activeSize,
                          size)
-  }
 
-  def zerosLike: VectorBuilder[E] = {
+  def zerosLike: VectorBuilder[E] =
     new VectorBuilder[E](
         new Array[Int](0), ArrayUtil.newArrayLike(data, 0), 0, size)
-  }
 
-  def reserve(nnz: Int) {
-    if (nnz < _data.length) {
+  def reserve(nnz: Int)
+    if (nnz < _data.length)
       _data = ArrayUtil.copyOf(_data, nnz)
       _index = ArrayUtil.copyOf(_index, nnz)
-    }
-  }
 
-  def toHashVector: HashVector[E] = {
+  def toHashVector: HashVector[E] =
     requirePositiveLength()
     implicit val man =
       ClassTag[E](_data.getClass.getComponentType.asInstanceOf[Class[E]])
     val hv = HashVector.zeros[E](length)
     var i = 0
-    while (i < used) {
+    while (i < used)
       hv(index(i)) = ring.+(hv(index(i)), data(i))
       i += 1
-    }
     hv
-  }
 
-  private def requirePositiveLength(): Unit = {
-    if (size < 0) {
+  private def requirePositiveLength(): Unit =
+    if (size < 0)
       throw new scala.UnsupportedOperationException(
           "Can't make a vector with a negative length!")
-    }
-  }
 
-  def toDenseVector: DenseVector[E] = {
+  def toDenseVector: DenseVector[E] =
     requirePositiveLength()
     implicit val man =
       ClassTag[E](_data.getClass.getComponentType.asInstanceOf[Class[E]])
     val hv = DenseVector.zeros[E](length)
     var i = 0
-    while (i < used) {
+    while (i < used)
       hv(index(i)) = ring.+(hv(index(i)), data(i))
       i += 1
-    }
     hv
-  }
 
   def toSparseVector: SparseVector[E] = toSparseVector(alreadySorted = false)
 
   def toSparseVector(alreadySorted: Boolean = false,
-                     keysAlreadyUnique: Boolean = false): SparseVector[E] = {
+                     keysAlreadyUnique: Boolean = false): SparseVector[E] =
     requirePositiveLength()
     val index = this.index
     val values = this.data
-    if (alreadySorted && keysAlreadyUnique) {
+    if (alreadySorted && keysAlreadyUnique)
       return new SparseVector(index, values, used, length)
-    }
 
     val outIndex = new Array[Int](index.length)
     val outValues = ArrayUtil.newArrayLike(values, values.length)
 
     val ord =
       if (!alreadySorted) sortedIndices(index) else VectorBuilder.range(used)
-    if (ord.length > 0) {
+    if (ord.length > 0)
       outIndex(0) = index(ord(0))
       outValues(0) = values(ord(0))
       if (index(ord.last) >= length)
@@ -209,68 +189,57 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
             "Index " + index(ord.last) + " exceeds dimension " + length)
       else if (outIndex(0) < 0)
         throw new RuntimeException("Index " + outIndex(0) + " is less than 0!")
-    }
     var i = 1
     var out = 0
-    if (keysAlreadyUnique) {
-      while (i < ord.length) {
+    if (keysAlreadyUnique)
+      while (i < ord.length)
         out += 1
         outIndex(out) = index(ord(i))
         outValues(out) = values(ord(i))
         i += 1
-      }
-    } else {
-      while (i < ord.length) {
-        if (outIndex(out) == index(ord(i))) {
+    else
+      while (i < ord.length)
+        if (outIndex(out) == index(ord(i)))
           outValues(out) = ring.+(outValues(out), values(ord(i)))
-        } else {
+        else
           out += 1
           outIndex(out) = index(ord(i))
           outValues(out) = values(ord(i))
-        }
         i += 1
-      }
-    }
 
     if (ord.length > 0) out += 1
 
     require(ord.length == 0 || length > outIndex.last,
             "Index out of bounds in constructing sparse vector.")
     new SparseVector(outIndex, outValues, out, length)
-  }
 
-  private def sortedIndices(indices: Array[Int]) = {
+  private def sortedIndices(indices: Array[Int]) =
     val arr = VectorBuilder.range(used)
     Sorting.indexSort(arr, 0, used, indices)
     arr
-  }
 
-  def compact() {
+  def compact()
     val ah = toSparseVector
     clear()
     reserve(ah.activeSize)
     var i = 0
-    while (i < ah.iterableSize) {
-      if (ah.isActive(i)) {
+    while (i < ah.iterableSize)
+      if (ah.isActive(i))
         add(ah.index(i), ah.data(i))
-      }
       i += 1
-    }
-  }
 
-  def clear() {
+  def clear()
     used = 0
     _index = new Array[Int](0)
     _data = ArrayUtil.newArrayLike(data, 0)
-  }
 
   override def equals(p1: Any): Boolean =
     (this eq p1.asInstanceOf[AnyRef]) ||
-    (p1 match {
+    (p1 match
           case vb: VectorBuilder[_] =>
             this.length == vb.length && vb.toHashVector == this.toHashVector
           case _ => false
-        })
+        )
 
   /**
     * Sets the underlying sparse array to use this data
@@ -278,14 +247,13 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
     * @param data values corresponding to the index
     * @param activeSize number of active elements. The first activeSize will be used.
     */
-  def use(index: Array[Int], data: Array[E], activeSize: Int) {
+  def use(index: Array[Int], data: Array[E], activeSize: Int)
     require(activeSize >= 0, "activeSize must be non-negative")
     require(data.length >= activeSize,
             "activeSize must be no greater than array length...")
     _data = data
     _index = index
     used = activeSize
-  }
 
   /**
     * same as data(i). Gives the value at the underlying offset.
@@ -307,17 +275,14 @@ class VectorBuilder[@spec(Double, Int, Float, Long) E](
     */
   def allVisitableIndicesActive: Boolean = true
 
-  def toVector = {
+  def toVector =
     requirePositiveLength()
-    if (size < 40 || activeSize > size / 2) {
+    if (size < 40 || activeSize > size / 2)
       toDenseVector
-    } else {
+    else
       toSparseVector
-    }
-  }
-}
 
-object VectorBuilder extends VectorBuilderOps {
+object VectorBuilder extends VectorBuilderOps
 
   def zeros[@spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero](
       size: Int, initialNonzero: Int = 16) =
@@ -335,70 +300,54 @@ object VectorBuilder extends VectorBuilderOps {
       size: Int)(f: Int => V): VectorBuilder[V] =
     apply(Array.tabulate(size)(f))
 
-  def apply[V : ClassTag : Semiring : Zero](length: Int)(values: (Int, V)*) = {
+  def apply[V : ClassTag : Semiring : Zero](length: Int)(values: (Int, V)*) =
     val r = zeros[V](length)
-    for ((i, v) <- values) {
+    for ((i, v) <- values)
       r.add(i, v)
-    }
     r
-  }
 
   // implicits
   class CanCopyBuilder[
       @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]
-      extends CanCopy[VectorBuilder[V]] {
-    def apply(v1: VectorBuilder[V]) = {
+      extends CanCopy[VectorBuilder[V]]
+    def apply(v1: VectorBuilder[V]) =
       v1.copy
-    }
-  }
 
   class CanZerosBuilder[
       @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]
-      extends CanCreateZerosLike[VectorBuilder[V], VectorBuilder[V]] {
-    def apply(v1: VectorBuilder[V]) = {
+      extends CanCreateZerosLike[VectorBuilder[V], VectorBuilder[V]]
+    def apply(v1: VectorBuilder[V]) =
       v1.zerosLike
-    }
-  }
 
   implicit def canCopyBuilder[
       @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]: CanCopyBuilder[
-      V] = {
+      V] =
     new CanCopyBuilder[V]
-  }
   implicit def canZerosBuilder[
       @spec(Double, Int, Float, Long) V : ClassTag : Semiring : Zero]: CanZerosBuilder[
-      V] = {
+      V] =
     new CanZerosBuilder[V]
-  }
 
   implicit def canZeroBuilder[
       @spec(Double, Int, Float, Long) V : Semiring : Zero : ClassTag]: CanCreateZeros[
-      VectorBuilder[V], Int] = {
-    new CanCreateZeros[VectorBuilder[V], Int] {
+      VectorBuilder[V], Int] =
+    new CanCreateZeros[VectorBuilder[V], Int]
       def apply(d: Int): VectorBuilder[V] = zeros(d)
-    }
-  }
 
   implicit def negFromScale[@spec(Double, Int, Float, Long) V](
       implicit scale: OpMulScalar.Impl2[VectorBuilder[V], V, VectorBuilder[V]],
-      field: Ring[V]): OpNeg.Impl[VectorBuilder[V], VectorBuilder[V]] = {
-    new OpNeg.Impl[VectorBuilder[V], VectorBuilder[V]] {
-      override def apply(a: VectorBuilder[V]) = {
+      field: Ring[V]): OpNeg.Impl[VectorBuilder[V], VectorBuilder[V]] =
+    new OpNeg.Impl[VectorBuilder[V], VectorBuilder[V]]
+      override def apply(a: VectorBuilder[V]) =
         scale(a, field.negate(field.one))
-      }
-    }
-  }
 
   // private stuff
 
   // Sigh, Array.range is slow.
-  private[linalg] def range(length: Int) = {
+  private[linalg] def range(length: Int) =
     val result = new Array[Int](length)
     var i = 0
-    while (i < length) {
+    while (i < length)
       result(i) = i
       i += 1
-    }
     result
-  }
-}

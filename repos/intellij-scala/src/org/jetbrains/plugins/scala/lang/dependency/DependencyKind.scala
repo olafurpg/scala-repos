@@ -6,8 +6,7 @@ package lang.dependency
   */
 sealed trait DependencyKind
 
-object DependencyKind {
+object DependencyKind
   case object Reference extends DependencyKind
 
   case object Conversion extends DependencyKind
-}

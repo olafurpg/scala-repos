@@ -20,7 +20,7 @@ import org.joda.time.DateTime
 /**
   * Helpful prepackaged recurrence rules
   */
-object RRules {
+object RRules
 
   /**
     * Rule representing Monday through Friday
@@ -83,10 +83,7 @@ object RRules {
   /**
     * Conforms a datetime to a recurrence rule either forward or backward.
     */
-  def conform(rule: RRule, dt: DateTime, forward: Boolean = true): DateTime = {
-    forward match {
+  def conform(rule: RRule, dt: DateTime, forward: Boolean = true): DateTime =
+    forward match
       case true => rule counting -1 from { rule counting +1 from dt }
       case false => rule counting +1 from { rule counting -1 from dt }
-    }
-  }
-}

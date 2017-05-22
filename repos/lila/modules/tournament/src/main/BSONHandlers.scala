@@ -7,21 +7,19 @@ import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.rating.PerfType
 import reactivemongo.bson._
 
-object BSONHandlers {
+object BSONHandlers
 
   private implicit val startingPositionBSONHandler =
-    new BSONHandler[BSONString, StartingPosition] {
+    new BSONHandler[BSONString, StartingPosition]
       def read(bsonStr: BSONString): StartingPosition =
         StartingPosition.byEco(bsonStr.value) err s"No such starting position: ${bsonStr.value}"
       def write(x: StartingPosition) = BSONString(x.eco)
-    }
 
   private implicit val statusBSONHandler =
-    new BSONHandler[BSONInteger, Status] {
+    new BSONHandler[BSONInteger, Status]
       def read(bsonInt: BSONInteger): Status =
         Status(bsonInt.value) err s"No such status: ${bsonInt.value}"
       def write(x: Status) = BSONInteger(x.id)
-    }
 
   private implicit val tournamentClockBSONHandler =
     Macros.handler[TournamentClock]
@@ -29,15 +27,14 @@ object BSONHandlers {
   private implicit val spotlightBSONHandler = Macros.handler[Spotlight]
 
   private implicit val leaderboardRatio =
-    new BSONHandler[BSONInteger, LeaderboardApi.Ratio] {
+    new BSONHandler[BSONInteger, LeaderboardApi.Ratio]
       def read(b: BSONInteger) =
         LeaderboardApi.Ratio(b.value.toDouble / 100000)
       def write(x: LeaderboardApi.Ratio) =
         BSONInteger((x.value * 100000).toInt)
-    }
 
-  implicit val tournamentHandler = new BSON[Tournament] {
-    def reads(r: BSON.Reader) = {
+  implicit val tournamentHandler = new BSON[Tournament]
+    def reads(r: BSON.Reader) =
       val variant =
         r.intO("variant").fold[Variant](Variant.default)(Variant.orDefault)
       val position =
@@ -56,11 +53,11 @@ object BSONHandlers {
           position = position,
           mode = r.intO("mode") flatMap Mode.apply getOrElse Mode.Rated,
           `private` = r boolD "private",
-          schedule = for {
+          schedule = for
             doc <- r.getO[BSONDocument]("schedule")
             freq <- doc.getAs[String]("freq") flatMap Schedule.Freq.apply
             speed <- doc.getAs[String]("speed") flatMap Schedule.Speed.apply
-          } yield Schedule(freq, speed, variant, position, startsAt),
+          yield Schedule(freq, speed, variant, position, startsAt),
           nbPlayers = r int "nbPlayers",
           createdAt = r date "createdAt",
           createdBy = r str "createdBy",
@@ -68,7 +65,6 @@ object BSONHandlers {
           winnerId = r strO "winner",
           featuredId = r strO "featured",
           spotlight = r.getO[Spotlight]("spotlight"))
-    }
     def writes(w: BSON.Writer, o: Tournament) =
       BSONDocument(
           "_id" -> o.id,
@@ -81,9 +77,9 @@ object BSONHandlers {
           "eco" -> o.position.some.filterNot(_.initial).map(_.eco),
           "mode" -> o.mode.some.filterNot(_.rated).map(_.id),
           "private" -> w.boolO(o.`private`),
-          "schedule" -> o.schedule.map { s =>
+          "schedule" -> o.schedule.map  s =>
             BSONDocument("freq" -> s.freq.name, "speed" -> s.speed.name)
-          },
+          ,
           "nbPlayers" -> o.nbPlayers,
           "createdAt" -> w.date(o.createdAt),
           "createdBy" -> w.str(o.createdBy),
@@ -91,9 +87,8 @@ object BSONHandlers {
           "winner" -> o.winnerId,
           "featured" -> o.featuredId,
           "spotlight" -> o.spotlight)
-  }
 
-  implicit val playerBSONHandler = new BSON[Player] {
+  implicit val playerBSONHandler = new BSON[Player]
     def reads(r: BSON.Reader) =
       Player(_id = r str "_id",
              tourId = r str "tid",
@@ -118,10 +113,9 @@ object BSONHandlers {
                    "m" -> o.magicScore,
                    "f" -> w.boolO(o.fire),
                    "e" -> o.performance)
-  }
 
-  implicit val pairingHandler = new BSON[Pairing] {
-    def reads(r: BSON.Reader) = {
+  implicit val pairingHandler = new BSON[Pairing]
+    def reads(r: BSON.Reader) =
       val users = r strsD "u"
       val user1 = users.headOption err "tournament pairing first user"
       val user2 = users lift 1 err "tournament pairing second user"
@@ -134,7 +128,6 @@ object BSONHandlers {
               turns = r intO "t",
               berserk1 = r intD "b1",
               berserk2 = r intD "b2")
-    }
     def writes(w: BSON.Writer, o: Pairing) =
       BSONDocument("_id" -> o.id,
                    "tid" -> o.tourId,
@@ -144,9 +137,8 @@ object BSONHandlers {
                    "t" -> o.turns,
                    "b1" -> w.intO(o.berserk1),
                    "b2" -> w.intO(o.berserk2))
-  }
 
-  implicit val leaderboardEntryHandler = new BSON[LeaderboardApi.Entry] {
+  implicit val leaderboardEntryHandler = new BSON[LeaderboardApi.Entry]
     def reads(r: BSON.Reader) =
       LeaderboardApi.Entry(
           id = r str "_id",
@@ -173,9 +165,7 @@ object BSONHandlers {
                    "p" -> o.speed.map(_.id),
                    "v" -> o.perf.id,
                    "d" -> w.date(o.date))
-  }
 
   import LeaderboardApi.ChartData.AggregationResult
   implicit val leaderboardAggregationResultBSONHandler =
     Macros.handler[AggregationResult]
-}

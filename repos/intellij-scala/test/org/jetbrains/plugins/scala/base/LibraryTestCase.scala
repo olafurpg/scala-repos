@@ -6,10 +6,10 @@ import org.jetbrains.plugins.scala.util.TestUtils
 /**
   * @author Pavel Fatin
   */
-abstract class LibraryTestCase extends LightCodeInsightFixtureTestCase {
+abstract class LibraryTestCase extends LightCodeInsightFixtureTestCase
   private var libraryLoader: Option[ScalaLibraryLoader] = None
 
-  override def setUp() {
+  override def setUp()
     super.setUp()
 
     val loader = ScalaLibraryLoader.withMockJdk(
@@ -17,13 +17,9 @@ abstract class LibraryTestCase extends LightCodeInsightFixtureTestCase {
     libraryLoader = Some(loader)
 
     loader.loadScala(TestUtils.DEFAULT_SCALA_SDK_VERSION)
-  }
 
-  override def tearDown() {
-    try {
+  override def tearDown()
+    try
       libraryLoader.foreach(_.clean())
-    } finally {
+    finally
       super.tearDown()
-    }
-  }
-}

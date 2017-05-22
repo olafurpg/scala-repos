@@ -1,13 +1,12 @@
-object Foo {
+object Foo
   class A
   class B
   class C
   class X
   class Y
   class Z
-}
 
-object Test {
+object Test
   import Foo.{A, B, C, D, E, X, Y, Z}
 
   val a = new A
@@ -18,4 +17,3 @@ object Test {
   val x = new X
   val y = new Y
   val z = new Z
-}

@@ -10,7 +10,7 @@ import org.jetbrains.plugins.scala.icons.Icons
   * User: Alexander Podkhalyuzin
   * Date: 22.02.2009
   */
-class ScalaTestConfigurationType extends ConfigurationType {
+class ScalaTestConfigurationType extends ConfigurationType
 
   val confFactory = new ScalaTestRunConfigurationFactory(this)
 
@@ -26,4 +26,3 @@ class ScalaTestConfigurationType extends ConfigurationType {
     "ScalaTestRunConfiguration" //if you want to change id, change it in Android plugin too
 
   def getIcon: Icon = Icons.SCALA_TEST
-}

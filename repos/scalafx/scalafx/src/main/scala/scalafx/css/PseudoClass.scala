@@ -35,7 +35,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion object for [[scalafx.css.PseudoClass]].
   */
-object PseudoClass {
+object PseudoClass
 
   /**
     * Converts a ScalaFX PseudoClass to its JavaFX counterpart.
@@ -54,7 +54,6 @@ object PseudoClass {
     */
   def apply(pseudoClass: String): PseudoClass =
     jfxcss.PseudoClass.getPseudoClass(pseudoClass)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/css/PseudoClass.html JavaFX PseudoClass]].
@@ -65,10 +64,9 @@ object PseudoClass {
   * @since 8.0
   */
 abstract class PseudoClass(override val delegate: jfxcss.PseudoClass)
-    extends SFXDelegate[jfxcss.PseudoClass] {
+    extends SFXDelegate[jfxcss.PseudoClass]
 
   /**
     * There is only one `PseudoClass` instance for a given pseudoClass.
     */
   def pseudoClassName = delegate.getPseudoClassName
-}

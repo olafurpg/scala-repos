@@ -28,14 +28,12 @@ case class ColumnDefinition(jdbcType: SqlType,
                             defaultValue: Option[String])
     extends Serializable
 
-trait ColumnDefinitionProvider[T] extends Serializable {
+trait ColumnDefinitionProvider[T] extends Serializable
   def columns: Iterable[ColumnDefinition]
   def resultSetExtractor: ResultSetExtractor[T]
-}
 
 class JdbcValidationException(msg: String) extends RuntimeException(msg)
 
-trait ResultSetExtractor[T] {
+trait ResultSetExtractor[T]
   def validate(rsmd: java.sql.ResultSetMetaData): scala.util.Try[Unit]
   def toCaseClass(rs: java.sql.ResultSet, c: TupleConverter[T]): T
-}

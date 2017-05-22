@@ -9,7 +9,7 @@ import org.scalatest.{Suite, BeforeAndAfterAll}
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 
-trait WithMaterializerSpec extends BeforeAndAfterAll {
+trait WithMaterializerSpec extends BeforeAndAfterAll
   _: Suite ⇒
   lazy val testConf: Config =
     ConfigFactory.parseString("""
@@ -19,4 +19,3 @@ trait WithMaterializerSpec extends BeforeAndAfterAll {
 
   implicit lazy val materializer = ActorMaterializer()
   override def afterAll() = system.terminate()
-}

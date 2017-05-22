@@ -3,7 +3,7 @@ package com.twitter.finagle.thrift
 /**
   * Support for finagle tracing in thrift.
   */
-private[finagle] object ThriftTracing {
+private[finagle] object ThriftTracing
 
   /**
     * v1: transaction id frame
@@ -11,4 +11,3 @@ private[finagle] object ThriftTracing {
     * v3: zipkin
     */
   val CanTraceMethodName = "__can__finagle__trace__v3__"
-}

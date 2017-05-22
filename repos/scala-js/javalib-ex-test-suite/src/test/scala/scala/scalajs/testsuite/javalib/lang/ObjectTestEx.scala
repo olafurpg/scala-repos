@@ -17,24 +17,22 @@ import scala.scalajs.js
   *  If moved to testSuite, those tests "fail to fail" due to mass effects
   *  produced by the immensity of the testSuite codebase.
   */
-object ObjectTestEx extends JasmineTest {
+object ObjectTestEx extends JasmineTest
 
-  describe("java.lang.Object ex") {
+  describe("java.lang.Object ex")
 
-    it("clone() - #2010") {
-      class NotCloneable extends Object {
+    it("clone() - #2010")
+      class NotCloneable extends Object
         override def clone(): NotCloneable =
           super.clone().asInstanceOf[NotCloneable]
-      }
 
       expect(() => new NotCloneable().clone()).toThrow
 
-      class SomeCloneable(val x: Int) extends Object with Cloneable {
+      class SomeCloneable(val x: Int) extends Object with Cloneable
         override def clone(): SomeCloneable =
           super.clone().asInstanceOf[SomeCloneable]
 
         @noinline def y(): Int = x + 3
-      }
 
       val o = new SomeCloneable(5)
       val o2 = o.clone()
@@ -43,6 +41,3 @@ object ObjectTestEx extends JasmineTest {
         .toBe(classOf[SomeCloneable].asInstanceOf[js.Any])
       expect(o2.x).toEqual(5)
       expect(o2.y()).toEqual(8)
-    }
-  }
-}

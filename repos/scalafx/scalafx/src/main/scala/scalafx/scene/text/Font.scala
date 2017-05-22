@@ -32,7 +32,7 @@ import scala.collection.JavaConversions._
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Font {
+object Font
   implicit def sfxFont2jfx(v: Font): jfxst.Font =
     if (v != null) v.delegate else null
 
@@ -119,9 +119,8 @@ object Font {
     */
   def loadFont(urlStr: String, size: Double) =
     jfxst.Font.loadFont(urlStr, size)
-}
 
-class Font(val delegate: jfxst.Font) extends SFXDelegate[jfxst.Font] {
+class Font(val delegate: jfxst.Font) extends SFXDelegate[jfxst.Font]
 
   /**
     * Constructs a font using the default face "System".
@@ -152,4 +151,3 @@ class Font(val delegate: jfxst.Font) extends SFXDelegate[jfxst.Font] {
     * The font specified string describing the style within the font family.
     */
   def style = delegate.getStyle
-}

@@ -39,7 +39,7 @@ package scala.scalajs.js
   * MDN
   */
 @native
-class Function(args: String*) extends Object {
+class Function(args: String*) extends Object
 
   /**
     * length is a property of a function object, and indicates how many arguments
@@ -96,58 +96,48 @@ class Function(args: String*) extends Object {
     * MDN
     */
   def bind(thisArg: Any, argArray: Any*): Dynamic = native
-}
 
 @native
-object Function extends Object {
+object Function extends Object
   def apply(args: String*): Function = native
-}
 
 // scalastyle:off line.size.limit
 
 @native
-trait Function0[+R] extends Function {
+trait Function0[+R] extends Function
   def apply(): R
-}
 
 @native
-trait Function1[-T1, +R] extends Function {
+trait Function1[-T1, +R] extends Function
   def apply(arg1: T1): R
-}
 
 @native
-trait Function2[-T1, -T2, +R] extends Function {
+trait Function2[-T1, -T2, +R] extends Function
   def apply(arg1: T1, arg2: T2): R
-}
 
 @native
-trait Function3[-T1, -T2, -T3, +R] extends Function {
+trait Function3[-T1, -T2, -T3, +R] extends Function
   def apply(arg1: T1, arg2: T2, arg3: T3): R
-}
 
 @native
-trait Function4[-T1, -T2, -T3, -T4, +R] extends Function {
+trait Function4[-T1, -T2, -T3, -T4, +R] extends Function
   def apply(arg1: T1, arg2: T2, arg3: T3, arg4: T4): R
-}
 
 @native
-trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends Function {
+trait Function5[-T1, -T2, -T3, -T4, -T5, +R] extends Function
   def apply(arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5): R
-}
 
 @native
-trait Function6[-T1, -T2, -T3, -T4, -T5, -T6, +R] extends Function {
+trait Function6[-T1, -T2, -T3, -T4, -T5, -T6, +R] extends Function
   def apply(arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6): R
-}
 
 @native
-trait Function7[-T1, -T2, -T3, -T4, -T5, -T6, -T7, +R] extends Function {
+trait Function7[-T1, -T2, -T3, -T4, -T5, -T6, -T7, +R] extends Function
   def apply(
       arg1: T1, arg2: T2, arg3: T3, arg4: T4, arg5: T5, arg6: T6, arg7: T7): R
-}
 
 @native
-trait Function8[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, +R] extends Function {
+trait Function8[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, +R] extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -156,11 +146,10 @@ trait Function8[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, +R] extends Function {
             arg6: T6,
             arg7: T7,
             arg8: T8): R
-}
 
 @native
 trait Function9[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -170,11 +159,10 @@ trait Function9[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, +R]
             arg7: T7,
             arg8: T8,
             arg9: T9): R
-}
 
 @native
 trait Function10[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -185,11 +173,10 @@ trait Function10[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, +R]
             arg8: T8,
             arg9: T9,
             arg10: T10): R
-}
 
 @native
 trait Function11[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, -T11, +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -201,12 +188,11 @@ trait Function11[-T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, -T11, +R]
             arg9: T9,
             arg10: T10,
             arg11: T11): R
-}
 
 @native
 trait Function12[
     -T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, -T11, -T12, +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -219,12 +205,11 @@ trait Function12[
             arg10: T10,
             arg11: T11,
             arg12: T12): R
-}
 
 @native
 trait Function13[
     -T1, -T2, -T3, -T4, -T5, -T6, -T7, -T8, -T9, -T10, -T11, -T12, -T13, +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -238,7 +223,6 @@ trait Function13[
             arg11: T11,
             arg12: T12,
             arg13: T13): R
-}
 
 @native
 trait Function14[-T1,
@@ -256,7 +240,7 @@ trait Function14[-T1,
                  -T13,
                  -T14,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -271,7 +255,6 @@ trait Function14[-T1,
             arg12: T12,
             arg13: T13,
             arg14: T14): R
-}
 
 @native
 trait Function15[-T1,
@@ -290,7 +273,7 @@ trait Function15[-T1,
                  -T14,
                  -T15,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -306,7 +289,6 @@ trait Function15[-T1,
             arg13: T13,
             arg14: T14,
             arg15: T15): R
-}
 
 @native
 trait Function16[-T1,
@@ -326,7 +308,7 @@ trait Function16[-T1,
                  -T15,
                  -T16,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -343,7 +325,6 @@ trait Function16[-T1,
             arg14: T14,
             arg15: T15,
             arg16: T16): R
-}
 
 @native
 trait Function17[-T1,
@@ -364,7 +345,7 @@ trait Function17[-T1,
                  -T16,
                  -T17,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -382,7 +363,6 @@ trait Function17[-T1,
             arg15: T15,
             arg16: T16,
             arg17: T17): R
-}
 
 @native
 trait Function18[-T1,
@@ -404,7 +384,7 @@ trait Function18[-T1,
                  -T17,
                  -T18,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -423,7 +403,6 @@ trait Function18[-T1,
             arg16: T16,
             arg17: T17,
             arg18: T18): R
-}
 
 @native
 trait Function19[-T1,
@@ -446,7 +425,7 @@ trait Function19[-T1,
                  -T18,
                  -T19,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -466,7 +445,6 @@ trait Function19[-T1,
             arg17: T17,
             arg18: T18,
             arg19: T19): R
-}
 
 @native
 trait Function20[-T1,
@@ -490,7 +468,7 @@ trait Function20[-T1,
                  -T19,
                  -T20,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -511,7 +489,6 @@ trait Function20[-T1,
             arg18: T18,
             arg19: T19,
             arg20: T20): R
-}
 
 @native
 trait Function21[-T1,
@@ -536,7 +513,7 @@ trait Function21[-T1,
                  -T20,
                  -T21,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -558,7 +535,6 @@ trait Function21[-T1,
             arg19: T19,
             arg20: T20,
             arg21: T21): R
-}
 
 @native
 trait Function22[-T1,
@@ -584,7 +560,7 @@ trait Function22[-T1,
                  -T21,
                  -T22,
                  +R]
-    extends Function {
+    extends Function
   def apply(arg1: T1,
             arg2: T2,
             arg3: T3,
@@ -607,6 +583,5 @@ trait Function22[-T1,
             arg20: T20,
             arg21: T21,
             arg22: T22): R
-}
 
 // scalastyle:on line.size.limit

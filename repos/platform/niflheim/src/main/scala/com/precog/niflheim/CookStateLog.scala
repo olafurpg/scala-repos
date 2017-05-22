@@ -31,13 +31,12 @@ import java.util.concurrent.ScheduledExecutorService
 
 import scala.collection.immutable.SortedMap
 
-object CookStateLog {
+object CookStateLog
   final val lockName = "txLog"
   final val logName = "CookStateLog"
-}
 
 class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
-    extends Logging {
+    extends Logging
   import CookStateLog._
 
   private[this] val workLock = FileLock(baseDir, lockName)
@@ -53,14 +52,12 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
   txLog.open()
   txLog.setAutoMark(false) // We only mark when we're ready to write to a new raw log
 
-  def close = {
-    if (pendingCookIds0.size > 0) {
+  def close =
+    if (pendingCookIds0.size > 0)
       logger.warn("Closing txLog with pending cooks: " +
           pendingCookIds0.keys.mkString("[", ", ", "]"))
-    }
     txLog.close()
     workLock.release
-  }
 
   // Maps from blockId to txKey
   private[this] var pendingCookIds0 = SortedMap.empty[Long, Long]
@@ -72,23 +69,22 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
   def currentBlockId: Long = currentBlockId0
 
   // Run from the last mark to reconstruct state
-  txLog.replay(new ReplayListener {
+  txLog.replay(new ReplayListener
     // We need to provide the record that will be filled in on each callback
     // Currently all actions are 10 bytes of data
     val record = new LogRecord(10)
 
     def getLogRecord = record
-    def onError(e: LogException) = {
+    def onError(e: LogException) =
       logger.error("Error reading TX log", e)
       throw e
-    }
-    def onRecord(r: LogRecord) = {
-      r.`type` match {
+    def onRecord(r: LogRecord) =
+      r.`type` match
         case LogRecordType.END_OF_LOG =>
           logger.debug("TXLog Replay complete in " + baseDir.getCanonicalPath)
 
         case LogRecordType.USER =>
-          TXLogEntry(r) match {
+          TXLogEntry(r) match
             case StartCook(blockId) =>
               pendingCookIds0 += (blockId -> r.key)
               currentBlockId0 = currentBlockId0 max blockId
@@ -96,25 +92,21 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
             case CompleteCook(blockId) =>
               pendingCookIds0 -= blockId
               currentBlockId0 = currentBlockId0 max blockId
-          }
 
         case other =>
           logger.warn("Unknown LogRecord type: " + other)
-      }
-    }
-  })
+  )
 
   currentBlockId0 += 1
 
-  def startCook(blockId: Long) = {
+  def startCook(blockId: Long) =
     val txKey = txLog.put(TXLogEntry.toBytes(StartCook(blockId)), true)
     pendingCookIds0 += (blockId -> txKey)
 
     // Redundant, but consistent
     currentBlockId0 = currentBlockId0 max (blockId + 1)
-  }
 
-  def completeCook(blockId: Long) = {
+  def completeCook(blockId: Long) =
     assert(pendingCookIds0 contains blockId)
 
     val completeTxKey =
@@ -127,25 +119,22 @@ class CookStateLog(baseDir: File, scheduler: ScheduledExecutorService)
     pendingCookIds0 -= blockId
 
     txLog.mark(
-        pendingCookIds0.headOption match {
+        pendingCookIds0.headOption match
       case Some((_, txKey)) => txKey
       case None => completeTxKey
-    })
-  }
-}
+    )
 
-sealed trait TXLogEntry {
+sealed trait TXLogEntry
   def blockId: Long
-}
 
 case class StartCook(blockId: Long) extends TXLogEntry
 case class CompleteCook(blockId: Long) extends TXLogEntry
 
-object TXLogEntry extends Logging {
-  def apply(record: LogRecord) = {
+object TXLogEntry extends Logging
+  def apply(record: LogRecord) =
     val buffer = ByteBuffer.wrap(record.getFields()(0))
 
-    buffer.getShort match {
+    buffer.getShort match
       case 0x1 => StartCook(buffer.getLong)
       case 0x2 => CompleteCook(buffer.getLong)
       case other =>
@@ -155,14 +144,11 @@ object TXLogEntry extends Logging {
                       record.isCTRL,
                       record.isEOB,
                       record.data.mkString("[", ", ", "]")))
-    }
-  }
 
-  def toBytes(entry: TXLogEntry): Array[Array[Byte]] = {
-    val (tpe, size) = entry match {
+  def toBytes(entry: TXLogEntry): Array[Array[Byte]] =
+    val (tpe, size) = entry match
       case StartCook(blockId) => (0x1, 42)
       case CompleteCook(blockId) => (0x2, 42)
-    }
 
     val record = new Array[Byte](size)
     val buffer = ByteBuffer.wrap(record)
@@ -171,5 +157,3 @@ object TXLogEntry extends Logging {
     buffer.putLong(entry.blockId)
 
     Array[Array[Byte]](record)
-  }
-}

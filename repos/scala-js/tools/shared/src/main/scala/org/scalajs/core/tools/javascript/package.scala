@@ -1,6 +1,6 @@
 package org.scalajs.core.tools
 
-package object javascript {
+package object javascript
   // Backward source compatibility for build files
 
   @deprecated(
@@ -10,4 +10,3 @@ package object javascript {
   @deprecated(
       "Use org.scalajs.core.tools.linker.backend.OutputMode instead.", "0.6.6")
   lazy val OutputMode = org.scalajs.core.tools.linker.backend.OutputMode
-}

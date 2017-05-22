@@ -13,7 +13,7 @@ import com.twitter.finagle.util.Rng
   * Randomized Load Balancing. IEEE Trans. Parallel Distrib. Syst. 12,
   * 10 (October 2001), 1094-1104.
   */
-private trait P2C[Req, Rep] { self: Balancer[Req, Rep] =>
+private trait P2C[Req, Rep]  self: Balancer[Req, Rep] =>
 
   /**
     * Our sturdy coin flipper.
@@ -21,15 +21,14 @@ private trait P2C[Req, Rep] { self: Balancer[Req, Rep] =>
   protected def rng: Rng
 
   protected class Distributor(val vector: Vector[Node])
-      extends DistributorT[Node] {
+      extends DistributorT[Node]
     type This = Distributor
 
     // Indicates if we've seen any down nodes during pick which we expected to be available
     @volatile private[this] var sawDown = false
 
-    private[this] val nodeUp: Node => Boolean = { node =>
+    private[this] val nodeUp: Node => Boolean =  node =>
       node.status == Status.Open
-    }
 
     private[this] val (up, down) = vector.partition(nodeUp)
 
@@ -40,7 +39,7 @@ private trait P2C[Req, Rep] { self: Balancer[Req, Rep] =>
     def rebuild(vec: Vector[Node]): This = new Distributor(vec)
 
     // TODO: consider consolidating some of this code with `Aperture.Distributor.pick`
-    def pick(): Node = {
+    def pick(): Node =
       if (vector.isEmpty) return failingNode(emptyException)
 
       // if all nodes are down, we might as well try to send requests somewhere
@@ -49,16 +48,15 @@ private trait P2C[Req, Rep] { self: Balancer[Req, Rep] =>
       val size = vec.size
 
       if (size == 1) vec.head
-      else {
+      else
         val a = rng.nextInt(size)
         var b = rng.nextInt(size)
 
         // Try to pick b, b != a, up to 10 times.
         var i = 10
-        while (a == b && i > 0) {
+        while (a == b && i > 0)
           b = rng.nextInt(size)
           i -= 1
-        }
 
         val nodeA = vec(a)
         val nodeB = vec(b)
@@ -67,9 +65,5 @@ private trait P2C[Req, Rep] { self: Balancer[Req, Rep] =>
           sawDown = true
 
         if (nodeA.load < nodeB.load) nodeA else nodeB
-      }
-    }
-  }
 
   protected def initDistributor() = new Distributor(Vector.empty)
-}

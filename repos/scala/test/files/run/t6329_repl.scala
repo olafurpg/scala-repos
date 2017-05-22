@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
     |import scala.reflect.classTag
     |classManifest[scala.List[_]]
@@ -12,4 +12,3 @@ object Test extends ReplTest {
     |classManifest[scala.collection.immutable.Set[_]]
     |classTag[scala.collection.immutable.Set[_]]
   """.stripMargin
-}

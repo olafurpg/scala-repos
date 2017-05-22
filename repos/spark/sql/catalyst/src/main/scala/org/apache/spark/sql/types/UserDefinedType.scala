@@ -38,7 +38,7 @@ import org.apache.spark.annotation.DeveloperApi
   */
 @DeveloperApi
 abstract class UserDefinedType[UserType >: Null]
-    extends DataType with Serializable {
+    extends DataType with Serializable
 
   /** Underlying storage type for this UDT */
   def sqlType: DataType
@@ -57,10 +57,9 @@ abstract class UserDefinedType[UserType >: Null]
   /** Convert a SQL datum to the user type */
   def deserialize(datum: Any): UserType
 
-  override private[sql] def jsonValue: JValue = {
+  override private[sql] def jsonValue: JValue =
     ("type" -> "udt") ~ ("class" -> this.getClass.getName) ~
     ("pyClass" -> pyUDT) ~ ("sqlType" -> sqlType.jsonValue)
-  }
 
   /**
     * Class object for the UserType
@@ -80,11 +79,9 @@ abstract class UserDefinedType[UserType >: Null]
 
   override def sql: String = sqlType.sql
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case that: UserDefinedType[_] => this.acceptsType(that)
     case _ => false
-  }
-}
 
 /**
   * ::DeveloperApi::
@@ -96,7 +93,7 @@ private[sql] class PythonUserDefinedType(
     val sqlType: DataType,
     override val pyUDT: String,
     override val serializedPyClass: String)
-    extends UserDefinedType[Any] {
+    extends UserDefinedType[Any]
 
   /* The serialization is handled by UDT class in Python */
   override def serialize(obj: Any): Any = obj
@@ -105,13 +102,10 @@ private[sql] class PythonUserDefinedType(
   /* There is no Java class for Python UDT */
   override def userClass: java.lang.Class[Any] = null
 
-  override private[sql] def jsonValue: JValue = {
+  override private[sql] def jsonValue: JValue =
     ("type" -> "udt") ~ ("pyClass" -> pyUDT) ~
     ("serializedClass" -> serializedPyClass) ~ ("sqlType" -> sqlType.jsonValue)
-  }
 
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case that: PythonUserDefinedType => this.pyUDT.equals(that.pyUDT)
     case _ => false
-  }
-}

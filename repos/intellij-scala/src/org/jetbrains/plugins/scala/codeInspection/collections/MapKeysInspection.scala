@@ -6,16 +6,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 /**
   * @author Nikolay.Tropin
   */
-class MapKeysInspection extends OperationOnCollectionInspection {
+class MapKeysInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(MapKeys)
-}
 
-object MapKeys extends SimplificationType {
+object MapKeys extends SimplificationType
   override def hint: String = InspectionBundle.message("replace.with.keys")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case qual `.map`(`_._1`()) `.toIterator` () if isMap(qual) =>
         val iteratorHint =
           InspectionBundle.message("replace.with.keysIterator")
@@ -37,5 +36,3 @@ object MapKeys extends SimplificationType {
               .withText(invocationText(qual, "keys"))
               .highlightFrom(qual))
       case _ => None
-    }
-}

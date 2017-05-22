@@ -11,44 +11,37 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ContextFilterTest extends FunSuite {
+class ContextFilterTest extends FunSuite
 
-  test("parses Finagle-Ctx headers") {
+  test("parses Finagle-Ctx headers")
     val writtenDeadline = Deadline.ofTimeout(5.seconds)
     val service =
       new ClientContextFilter[Request, Response] andThen new ServerContextFilter[
-          Request, Response] andThen Service.mk[Request, Response] { req =>
+          Request, Response] andThen Service.mk[Request, Response]  req =>
         assert(Deadline.current.get == writtenDeadline)
         Future.value(Response())
-      }
 
-    Contexts.broadcast.let(Deadline, writtenDeadline) {
+    Contexts.broadcast.let(Deadline, writtenDeadline)
       val req = Request()
       HttpContext.write(req)
 
       // Clear the deadline value in the context
-      Contexts.broadcast.letClear(Deadline) {
+      Contexts.broadcast.letClear(Deadline)
         // ensure the deadline was cleared
         assert(Deadline.current == None)
 
         val rsp = Await.result(service(req))
         assert(rsp.status == Status.Ok)
-      }
-    }
-  }
 
-  test("does not set incorrectly encoded context headers") {
+  test("does not set incorrectly encoded context headers")
     val service =
       new ClientContextFilter[Request, Response] andThen new ServerContextFilter[
-          Request, Response] andThen Service.mk[Request, Response] { _ =>
+          Request, Response] andThen Service.mk[Request, Response]  _ =>
         assert(Contexts.broadcast.marshal.isEmpty)
         Future.value(Response())
-      }
 
     val req = Request()
     req.headers().add("Finagle-Ctx-com.twitter.finagle.Deadline", "foo")
 
     val rsp = Await.result(service(req))
     assert(rsp.status == Status.Ok)
-  }
-}

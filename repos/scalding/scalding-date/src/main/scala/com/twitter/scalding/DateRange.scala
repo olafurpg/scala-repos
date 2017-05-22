@@ -19,7 +19,7 @@ import scala.annotation.tailrec
 
 import java.util.TimeZone
 
-object DateRange extends java.io.Serializable {
+object DateRange extends java.io.Serializable
 
   /**
     * Parse this string into a range.
@@ -42,26 +42,24 @@ object DateRange extends java.io.Serializable {
     * ("2011-01-02T04", "2011-01-02T05") includes two full hours (all of 4 and all of 5)
     */
   def parse(iso8601start: String, iso8601inclusiveUpper: String)(
-      implicit tz: TimeZone, dp: DateParser): DateRange = {
+      implicit tz: TimeZone, dp: DateParser): DateRange =
 
     val start = RichDate(iso8601start)
     val end = RichDate.upperBound(iso8601inclusiveUpper)
     //Make sure the end is not before the beginning:
     assert(start <= end, "end of date range must occur after the start")
     DateRange(start, end)
-  }
 
   /**
     * Pass one or two args (from a scalding.Args .list) to parse into a DateRange
     */
   def parse(fromArgs: Seq[String])(
-      implicit tz: TimeZone, dp: DateParser): DateRange = fromArgs match {
+      implicit tz: TimeZone, dp: DateParser): DateRange = fromArgs match
     case Seq(s, e) => parse(s, e)
     case Seq(o) => parse(o)
     case x =>
       sys.error("--date must have exactly one or two date[time]s. Got: " +
           x.toString)
-  }
 
   /**
     * DateRanges are inclusive. Use this to create a DateRange that excludes
@@ -69,7 +67,6 @@ object DateRange extends java.io.Serializable {
     */
   def exclusiveUpper(include: RichDate, exclude: RichDate): DateRange =
     DateRange(include, exclude - Millisecs(1))
-}
 
 /**
   * represents a closed interval of time.
@@ -77,7 +74,7 @@ object DateRange extends java.io.Serializable {
   * TODO: This should be Range[RichDate, Duration] for an appropriate notion
   * of Range
   */
-case class DateRange(val start: RichDate, val end: RichDate) {
+case class DateRange(val start: RichDate, val end: RichDate)
   import DateOps._
   require(start <= end,
           s"""The start "${start}" must be before or on the end "${end}".""")
@@ -116,27 +113,23 @@ case class DateRange(val start: RichDate, val end: RichDate) {
     * If it is passed an integral unit of time (not a DurationList), it stops at boundaries
     * which are set by the start timezone, else break at start + k * span.
     */
-  def each(span: Duration): Iterable[DateRange] = {
+  def each(span: Duration): Iterable[DateRange] =
     //tail recursive method which produces output (as a stack, so it is
     //reversed). acc is the accumulated list so far:
     @tailrec
-    def eachRec(acc: List[DateRange], nextDr: DateRange): List[DateRange] = {
+    def eachRec(acc: List[DateRange], nextDr: DateRange): List[DateRange] =
       val next_start = span.floorOf(nextDr.start) + span
       //the smallest grain of time we count is 1 millisecond
       val this_end = next_start - Millisecs(1)
-      if (nextDr.end <= this_end) {
+      if (nextDr.end <= this_end)
         //This is the last block, output and end:
         nextDr :: acc
-      } else {
+      else
         //Put today's portion, and then start on tomorrow:
         val today = DateRange(nextDr.start, this_end)
         eachRec(today :: acc, DateRange(next_start, nextDr.end))
-      }
-    }
     //have to reverse because eachDayRec produces backwards
     eachRec(Nil, this).reverse
-  }
 
   def length: AbsoluteDuration =
     AbsoluteDuration.fromMillisecs(end.timestamp - start.timestamp + 1L)
-}

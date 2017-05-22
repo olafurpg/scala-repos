@@ -13,7 +13,7 @@ import rx.lang.scala.Observable
 /**
   * This module contains code for managing the flow/backpressure of the application.
   */
-class FlowModule(leadershipModule: LeadershipModule) {
+class FlowModule(leadershipModule: LeadershipModule)
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   /**
@@ -31,9 +31,9 @@ class FlowModule(leadershipModule: LeadershipModule) {
       conf: ReviveOffersConfig,
       marathonEventStream: EventStream,
       offersWanted: Observable[Boolean],
-      driverHolder: MarathonSchedulerDriverHolder): Option[OfferReviver] = {
+      driverHolder: MarathonSchedulerDriverHolder): Option[OfferReviver] =
 
-    if (conf.reviveOffersForNewApps()) {
+    if (conf.reviveOffersForNewApps())
       lazy val reviveOffersActor = ReviveOffersActor.props(
           clock,
           conf,
@@ -46,12 +46,10 @@ class FlowModule(leadershipModule: LeadershipModule) {
       log.info(
           s"Calling reviveOffers is enabled. Use --disable_revive_offers_for_new_apps to disable.")
       Some(new OfferReviverDelegate(actorRef))
-    } else {
+    else
       log.info(
           s"Calling reviveOffers is disabled. Use --revive_offers_for_new_apps to enable.")
       None
-    }
-  }
 
   /**
     * Refills the launch tokens of the OfferMatcherManager periodically. See [[LaunchTokenConfig]] for configuration.
@@ -64,7 +62,7 @@ class FlowModule(leadershipModule: LeadershipModule) {
   def refillOfferMatcherManagerLaunchTokens(
       conf: LaunchTokenConfig,
       taskStatusObservables: TaskStatusObservables,
-      offerMatcherManager: OfferMatcherManager): Unit = {
+      offerMatcherManager: OfferMatcherManager): Unit =
     lazy val offerMatcherLaunchTokensProps =
       OfferMatcherLaunchTokensActor.props(
           conf,
@@ -73,5 +71,3 @@ class FlowModule(leadershipModule: LeadershipModule) {
       )
     leadershipModule.startWhenLeader(
         offerMatcherLaunchTokensProps, "offerMatcherLaunchTokens")
-  }
-}

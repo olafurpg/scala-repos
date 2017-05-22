@@ -4,16 +4,13 @@ import language.experimental.macros
 trait Tree
 case object SomeTree extends Tree
 
-object NewQuasiquotes {
-  implicit class QuasiquoteInterpolation(c: StringContext) {
-    object nq {
+object NewQuasiquotes
+  implicit class QuasiquoteInterpolation(c: StringContext)
+    object nq
       def unapply(t: Tree): Any = macro QuasiquoteMacros.unapplyImpl
-    }
-  }
-}
 
-object QuasiquoteMacros {
-  def unapplyImpl(c: Context)(t: c.Tree) = {
+object QuasiquoteMacros
+  def unapplyImpl(c: Context)(t: c.Tree) =
     import c.universe._
     q"""
       new {
@@ -24,5 +21,3 @@ object QuasiquoteMacros {
         def unapply(t: Tree) = this
       }.unapply($t)
     """
-  }
-}

@@ -17,16 +17,15 @@ import generic._
   *  @version 2.8
   *  @since   2.4
   */
-trait SortedSet[A] extends Set[A] with SortedSetLike[A, SortedSet[A]] {
+trait SortedSet[A] extends Set[A] with SortedSetLike[A, SortedSet[A]]
 
   /** Needs to be overridden in subclasses. */
   override def empty: SortedSet[A] = SortedSet.empty[A]
-}
 
 /**
   * @since 2.8
   */
-object SortedSet extends SortedSetFactory[SortedSet] {
+object SortedSet extends SortedSetFactory[SortedSet]
   def empty[A](implicit ord: Ordering[A]): immutable.SortedSet[A] =
     immutable.SortedSet.empty[A](ord)
   def canBuildFrom[A](
@@ -36,4 +35,3 @@ object SortedSet extends SortedSetFactory[SortedSet] {
   override implicit def newCanBuildFrom[A](
       implicit ord: Ordering[A]): CanBuildFrom[Coll, A, SortedSet[A]] =
     super.newCanBuildFrom
-}

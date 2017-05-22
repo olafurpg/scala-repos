@@ -5,6 +5,5 @@ package processor
 
 import com.intellij.openapi.util.Key
 
-object ResolverEnv {
+object ResolverEnv
   val nameKey: Key[String] = Key.create("ResolverEnv.nameKey")
-}

@@ -18,7 +18,7 @@ import org.jscience.mathematics.number
 object RatComparisonBenchmarks
     extends MyRunner(classOf[RatComparisonBenchmarks])
 
-class RatComparisonBenchmarks extends MyBenchmark {
+class RatComparisonBenchmarks extends MyBenchmark
   @Param(Array("100"))
   var size: Int = 0
 
@@ -29,25 +29,23 @@ class RatComparisonBenchmarks extends MyBenchmark {
   var nums: Array[Int] = null
   var denoms: Array[Int] = null
 
-  override protected def setUp(): Unit = {
+  override protected def setUp(): Unit =
     nums = init(size)(nextInt)
     denoms = init(size)(nextInt)
 
     spires = new Array[Rational](size)
     aps = new Array[Aprational](size)
     jscis = new Array[number.Rational](size)
-    for (i <- 0 until size) {
+    for (i <- 0 until size)
       spires(i) = Rational(nums(i), denoms(i))
       aps(i) = new Aprational(new Apint(nums(i)), new Apint(denoms(i)))
       jscis(i) = number.Rational.valueOf(
           number.LargeInteger.valueOf(nums(i)),
           number.LargeInteger.valueOf(denoms(i))
       )
-    }
 
     // set to true to verify that both methods produce the same result
     if (false) assert(verify())
-  }
 
   def spireToAp(r: Rational) = new Aprational(
       new Apint(r.numerator.toBigInt.bigInteger),
@@ -60,7 +58,7 @@ class RatComparisonBenchmarks extends MyBenchmark {
   )
 
   // this is slow... it probably takes as long as one full run of the benchmark
-  def verify() = {
+  def verify() =
     val len = size
     var i = 0
 
@@ -71,7 +69,7 @@ class RatComparisonBenchmarks extends MyBenchmark {
         number.LargeInteger.valueOf(1)
     )
 
-    while (i < len) {
+    while (i < len)
       val r = spires(i)
       val a = aps(i)
       val j = jscis(i)
@@ -91,67 +89,55 @@ class RatComparisonBenchmarks extends MyBenchmark {
         sys.error("totals %s and %s differ (from %s)" format (x, z, t3))
 
       i += 1
-    }
     true
-  }
 
-  def timeBuildSpire(reps: Int) = run(reps) {
+  def timeBuildSpire(reps: Int) = run(reps)
     val len = size
     val ns = Array.ofDim[Rational](len)
     var i = 0
-    while (i < len) {
+    while (i < len)
       ns(i) = Rational(nums(i), denoms(i))
       i += 1
-    }
     ns.length
-  }
 
-  def timeBuildAp(reps: Int) = run(reps) {
+  def timeBuildAp(reps: Int) = run(reps)
     val len = size
     val ns = Array.ofDim[Aprational](len)
     var i = 0
-    while (i < len) {
+    while (i < len)
       ns(i) = new Aprational(new Apint(nums(i)), new Apint(denoms(i)))
       i += 1
-    }
     ns.length
-  }
 
-  def timeBuildJsci(reps: Int) = run(reps) {
+  def timeBuildJsci(reps: Int) = run(reps)
     val len = size
     val ns = Array.ofDim[number.Rational](len)
     var i = 0
-    while (i < len) {
+    while (i < len)
       ns(i) = number.Rational.valueOf(
           number.LargeInteger.valueOf(nums(i)),
           number.LargeInteger.valueOf(denoms(i))
       )
       i += 1
-    }
     ns.length
-  }
 
-  def timeSumSpire(reps: Int) = run(reps) {
+  def timeSumSpire(reps: Int) = run(reps)
     val len = size
     var total = Rational(0, 1)
     var i = 0
     while (i < len) { total += spires(i); i += 1 }
     total
-  }
 
-  def timeSumAp(reps: Int) = run(reps) {
+  def timeSumAp(reps: Int) = run(reps)
     val len = size
     var total = new Aprational(new Apint(0), new Apint(1))
     var i = 0
     while (i < len) { total = total.add(aps(i)); i += 1 }
     total
-  }
 
-  def timeSumJsci(reps: Int) = run(reps) {
+  def timeSumJsci(reps: Int) = run(reps)
     val len = size
     var total = number.Rational.ZERO
     var i = 0
     while (i < len) { total = total.plus(jscis(i)); i += 1 }
     total
-  }
-}

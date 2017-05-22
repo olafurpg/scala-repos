@@ -21,7 +21,7 @@ import java.util.regex.{PatternSyntaxException, Pattern}
 import kafka.common.Topic
 import org.apache.kafka.common.internals.TopicConstants
 
-sealed abstract class TopicFilter(rawRegex: String) extends Logging {
+sealed abstract class TopicFilter(rawRegex: String) extends Logging
 
   val regex = rawRegex.trim
     .replace(',', '|')
@@ -29,20 +29,18 @@ sealed abstract class TopicFilter(rawRegex: String) extends Logging {
     .replaceAll("""^["']+""", "")
     .replaceAll("""["']+$""", "") // property files may bring quotes
 
-  try {
+  try
     Pattern.compile(regex)
-  } catch {
+  catch
     case e: PatternSyntaxException =>
       throw new RuntimeException(regex + " is an invalid regex.")
-  }
 
   override def toString = regex
 
   def isTopicAllowed(topic: String, excludeInternalTopics: Boolean): Boolean
-}
 
-case class Whitelist(rawRegex: String) extends TopicFilter(rawRegex) {
-  override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) = {
+case class Whitelist(rawRegex: String) extends TopicFilter(rawRegex)
+  override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) =
     val allowed =
       topic.matches(regex) &&
       !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
@@ -51,11 +49,9 @@ case class Whitelist(rawRegex: String) extends TopicFilter(rawRegex) {
     debug("%s %s".format(topic, if (allowed) "allowed" else "filtered"))
 
     allowed
-  }
-}
 
-case class Blacklist(rawRegex: String) extends TopicFilter(rawRegex) {
-  override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) = {
+case class Blacklist(rawRegex: String) extends TopicFilter(rawRegex)
+  override def isTopicAllowed(topic: String, excludeInternalTopics: Boolean) =
     val allowed =
       (!topic.matches(regex)) &&
       !(TopicConstants.INTERNAL_TOPICS.contains(topic) &&
@@ -64,5 +60,3 @@ case class Blacklist(rawRegex: String) extends TopicFilter(rawRegex) {
     debug("%s %s".format(topic, if (allowed) "allowed" else "filtered"))
 
     allowed
-  }
-}

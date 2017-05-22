@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object Event {
+object Event
   implicit def sfxEvent2jfx(e: Event): jfxe.Event =
     if (e != null) e.delegate else null
 
@@ -42,9 +42,8 @@ object Event {
   /**
     * Fires the specified event.
     */
-  def fireEvent(eventTarget: jfxe.EventTarget, event: jfxe.Event) {
+  def fireEvent(eventTarget: jfxe.EventTarget, event: jfxe.Event)
     jfxe.Event.fireEvent(eventTarget, event)
-  }
 
   /**
     * Common supertype for all event types.
@@ -59,13 +58,12 @@ object Event {
       "Use NullSourceTarget; NULL_SOURCE_TARGET will be removed in a future release",
       "8.0.60-R10")
   val NULL_SOURCE_TARGET = NullSourceTarget
-}
 
 /**
   * Wrapper class for [[http://docs.oracle.com/javase/8/javafx/api/javafx/event/Event.html Event]].
   */
 class Event(override val delegate: jfxe.Event)
-    extends SFXDelegate[jfxe.Event] {
+    extends SFXDelegate[jfxe.Event]
 
   /**
     * Construct a new Event with the specified event type.
@@ -89,9 +87,8 @@ class Event(override val delegate: jfxe.Event)
   /**
     * Marks this Event as consumed. This stops its further propagation.
     */
-  def consume() {
+  def consume()
     delegate.consume()
-  }
 
   /**
     * Indicates whether this Event has been consumed by any filter or handler.
@@ -118,4 +115,3 @@ class Event(override val delegate: jfxe.Event)
     * Returns the event target of this event.
     */
   def target: jfxe.EventTarget = delegate.getTarget
-}

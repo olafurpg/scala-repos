@@ -17,7 +17,7 @@ import akka.event.Logging.InitializeLogger
 import scala.Some
 import akka.event.Logging.Warning
 
-object LoggerSpec {
+object LoggerSpec
 
   val defaultConfig =
     ConfigFactory.parseString("""
@@ -89,9 +89,9 @@ object LoggerSpec {
   class TestLogger1 extends TestLogger(1)
   class TestLogger2 extends TestLogger(2)
   abstract class TestLogger(qualifier: Int)
-      extends Actor with Logging.StdOutLogger {
+      extends Actor with Logging.StdOutLogger
     var target: Option[ActorRef] = None
-    override def receive: Receive = {
+    override def receive: Receive =
       case InitializeLogger(bus) ⇒
         bus.subscribe(context.self, classOf[SetTarget])
         sender() ! LoggerInitialized
@@ -104,85 +104,69 @@ object LoggerSpec {
       case event: LogEvent ⇒
         print(event)
         target foreach { _ ! event.message }
-    }
-  }
 
-  class SlowLogger extends Logging.DefaultLogger {
-    override def aroundReceive(r: Receive, msg: Any): Unit = {
-      msg match {
+  class SlowLogger extends Logging.DefaultLogger
+    override def aroundReceive(r: Receive, msg: Any): Unit =
+      msg match
         case event: LogEvent ⇒
           if (event.message.toString.startsWith("msg1"))
             Thread.sleep(500) // slow
           super.aroundReceive(r, msg)
         case _ ⇒ super.aroundReceive(r, msg)
-      }
-    }
-  }
 
-  class ActorWithMDC extends Actor with DiagnosticActorLogging {
+  class ActorWithMDC extends Actor with DiagnosticActorLogging
     var reqId = 0
 
-    override def mdc(currentMessage: Any): MDC = {
+    override def mdc(currentMessage: Any): MDC =
       reqId += 1
       val always = Map("requestId" -> reqId)
       val cmim = "Current Message in MDC"
-      val perMessage = currentMessage match {
+      val perMessage = currentMessage match
         case `cmim` ⇒
           Map[String, Any](
               "currentMsg" -> cmim, "currentMsgLength" -> cmim.length)
         case _ ⇒ Map()
-      }
       always ++ perMessage
-    }
 
-    def receive: Receive = {
+    def receive: Receive =
       case m: String ⇒ log.warning(m)
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class LoggerSpec extends WordSpec with Matchers {
+class LoggerSpec extends WordSpec with Matchers
 
   import LoggerSpec._
 
   private def createSystemAndLogToBuffer(
-      name: String, config: Config, shouldLog: Boolean) = {
+      name: String, config: Config, shouldLog: Boolean) =
     val out = new java.io.ByteArrayOutputStream()
-    Console.withOut(out) {
+    Console.withOut(out)
       implicit val system = ActorSystem(name, config)
-      try {
+      try
         val probe = TestProbe()
         system.eventStream.publish(SetTarget(probe.ref, qualifier = 1))
         probe.expectMsg("OK")
         system.log.error("Danger! Danger!")
         // since logging is asynchronous ensure that it propagates
-        if (shouldLog) {
-          probe.fishForMessage(0.5.seconds.dilated) {
+        if (shouldLog)
+          probe.fishForMessage(0.5.seconds.dilated)
             case "Danger! Danger!" ⇒ true
             case _ ⇒ false
-          }
-        } else {
+        else
           probe.expectNoMsg(0.5.seconds.dilated)
-        }
-      } finally {
+      finally
         TestKit.shutdownActorSystem(system)
-      }
-    }
     out
-  }
 
-  "A normally configured actor system" must {
+  "A normally configured actor system" must
 
-    "log messages to standard output" in {
+    "log messages to standard output" in
       val out =
         createSystemAndLogToBuffer("defaultLogger", defaultConfig, true)
       out.size should be > (0)
-    }
 
-    "drain logger queue on system.terminate" in {
+    "drain logger queue on system.terminate" in
       val out = new java.io.ByteArrayOutputStream()
-      Console.withOut(out) {
+      Console.withOut(out)
         val sys = ActorSystem("defaultLogger", slowConfig)
         sys.log.error("msg1")
         sys.log.error("msg2")
@@ -190,29 +174,24 @@ class LoggerSpec extends WordSpec with Matchers {
         TestKit.shutdownActorSystem(sys, verifySystemShutdown = true)
         out.flush()
         out.close()
-      }
 
       val logMessages = new String(out.toByteArray).split("\n")
       logMessages.head should include("msg1")
       logMessages.last should include("msg3")
       logMessages.size should ===(3)
-    }
-  }
 
-  "An actor system configured with the logging turned off" must {
+  "An actor system configured with the logging turned off" must
 
-    "not log messages to standard output" in {
+    "not log messages to standard output" in
       val out = createSystemAndLogToBuffer("noLogging", noLoggingConfig, false)
       out.size should ===(0)
-    }
-  }
 
-  "An actor system configured with multiple loggers" must {
+  "An actor system configured with multiple loggers" must
 
-    "use several loggers" in {
-      Console.withOut(new java.io.ByteArrayOutputStream()) {
+    "use several loggers" in
+      Console.withOut(new java.io.ByteArrayOutputStream())
         implicit val system = ActorSystem("multipleLoggers", multipleConfig)
-        try {
+        try
           val probe1 = TestProbe()
           val probe2 = TestProbe()
           system.eventStream.publish(SetTarget(probe1.ref, qualifier = 1))
@@ -223,18 +202,14 @@ class LoggerSpec extends WordSpec with Matchers {
           system.log.warning("log it")
           probe1.expectMsg("log it")
           probe2.expectMsg("log it")
-        } finally {
+        finally
           TestKit.shutdownActorSystem(system)
-        }
-      }
-    }
-  }
 
-  "Ticket 3671" must {
+  "Ticket 3671" must
 
-    "log message with given MDC values" in {
+    "log message with given MDC values" in
       implicit val system = ActorSystem("ticket-3671", ticket3671Config)
-      try {
+      try
         val probe = TestProbe()
         system.eventStream.publish(SetTarget(probe.ref, qualifier = 1))
         probe.expectMsg("OK")
@@ -242,38 +217,31 @@ class LoggerSpec extends WordSpec with Matchers {
         val ref = system.actorOf(Props[ActorWithMDC])
 
         ref ! "Processing new Request"
-        probe.expectMsgPF(max = 3.seconds) {
+        probe.expectMsgPF(max = 3.seconds)
           case w @ Warning(_, _, "Processing new Request")
               if w.mdc.size == 1 && w.mdc("requestId") == 1 ⇒
-        }
 
         ref ! "Processing another Request"
-        probe.expectMsgPF(max = 3.seconds) {
+        probe.expectMsgPF(max = 3.seconds)
           case w @ Warning(_, _, "Processing another Request")
               if w.mdc.size == 1 && w.mdc("requestId") == 2 ⇒
-        }
 
         ref ! "Current Message in MDC"
-        probe.expectMsgPF(max = 3.seconds) {
+        probe.expectMsgPF(max = 3.seconds)
           case w @ Warning(_, _, "Current Message in MDC")
               if w.mdc.size == 3 && w.mdc("requestId") == 3 &&
               w.mdc("currentMsg") == "Current Message in MDC" &&
               w.mdc("currentMsgLength") == 22 ⇒
-        }
 
         ref ! "Current Message removed from MDC"
-        probe.expectMsgPF(max = 3.seconds) {
+        probe.expectMsgPF(max = 3.seconds)
           case w @ Warning(_, _, "Current Message removed from MDC")
               if w.mdc.size == 1 && w.mdc("requestId") == 4 ⇒
-        }
-      } finally {
+      finally
         TestKit.shutdownActorSystem(system)
-      }
-    }
-  }
 
-  "Ticket 3080" must {
-    "format currentTimeMillis to a valid UTC String" in {
+  "Ticket 3080" must
+    "format currentTimeMillis to a valid UTC String" in
       val timestamp = System.currentTimeMillis
       val c = new GregorianCalendar(TimeZone.getTimeZone("UTC"))
       c.setTime(new Date(timestamp))
@@ -283,17 +251,11 @@ class LoggerSpec extends WordSpec with Matchers {
       val ms = c.get(Calendar.MILLISECOND)
       Helpers.currentTimeMillisToUTCString(timestamp) should ===(
           f"$hours%02d:$minutes%02d:$seconds%02d.$ms%03dUTC")
-    }
-  }
 
-  "Ticket 3165 - serialize-messages and dual-entry serialization of LogEvent" must {
-    "not cause StackOverflowError" in {
+  "Ticket 3165 - serialize-messages and dual-entry serialization of LogEvent" must
+    "not cause StackOverflowError" in
       implicit val s = ActorSystem("foo", ticket3165Config)
-      try {
+      try
         SerializationExtension(s).serialize(Warning("foo", classOf[String]))
-      } finally {
+      finally
         TestKit.shutdownActorSystem(s)
-      }
-    }
-  }
-}

@@ -4,8 +4,8 @@ package org.jetbrains.plugins.scala.testingSupport.specs2
   * @author Roman.Shein
   * @since 11.02.2015.
   */
-abstract class Specs2WholeSuiteTest extends Specs2TestCase {
-  def testSpecification() {
+abstract class Specs2WholeSuiteTest extends Specs2TestCase
+  def testSpecification()
     addFileToProject("SpecificationTest.scala",
                      """
         |import org.specs2.mutable.Specification
@@ -41,5 +41,3 @@ abstract class Specs2WholeSuiteTest extends Specs2TestCase {
                                            "SpecificationTest",
                                            "The 'SpecificationTest' should",
                                            "ignore other test"))
-  }
-}

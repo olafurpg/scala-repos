@@ -10,10 +10,10 @@ import com.intellij.psi.PsiFile
 /**
   * Pavel Fatin
   */
-class PackageSplitLinesProcessor extends SmartEnterProcessor {
+class PackageSplitLinesProcessor extends SmartEnterProcessor
   private val Package = "(\\s*)package .+".r
 
-  def process(project: Project, editor: Editor, psiFile: PsiFile) = {
+  def process(project: Project, editor: Editor, psiFile: PsiFile) =
     val document = editor.getDocument
     val offset = editor.getCaretModel.getOffset
 
@@ -23,18 +23,14 @@ class PackageSplitLinesProcessor extends SmartEnterProcessor {
 
     val line = document.getText(new TextRange(start, end))
 
-    line match {
+    line match
       case Package(prefix) =>
         val i = offset - start
         val dotIndex = line.indexOf('.', i)
         if (dotIndex == -1) false
-        else {
+        else
           val tail = line.substring(dotIndex + 1)
           document.replaceString(
               start + dotIndex, end, "\n%spackage %s".format(prefix, tail))
           true
-        }
       case _ => false
-    }
-  }
-}

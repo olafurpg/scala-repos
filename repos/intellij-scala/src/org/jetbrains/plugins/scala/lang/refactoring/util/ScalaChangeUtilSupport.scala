@@ -18,68 +18,54 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * User: Alexander Podkhalyuzin
   * Date: 15.09.2009
   */
-class ScalaChangeUtilSupport extends TreeCopyHandler {
+class ScalaChangeUtilSupport extends TreeCopyHandler
   def encodeInformation(element: TreeElement,
                         original: ASTNode,
-                        encodingState: Map[Object, Object]): Unit = {
+                        encodingState: Map[Object, Object]): Unit =
     if (!element.isInstanceOf[ScalaPsiElement]) return
-    if (original.isInstanceOf[CompositeElement]) {
-      original.getElementType match {
+    if (original.isInstanceOf[CompositeElement])
+      original.getElementType match
         case ScalaElementTypes.REFERENCE |
             ScalaElementTypes.REFERENCE_EXPRESSION |
-            ScalaElementTypes.TYPE_PROJECTION => {
+            ScalaElementTypes.TYPE_PROJECTION =>
             val res = original.getPsi.asInstanceOf[ScReferenceElement].bind
-            res match {
+            res match
               case Some(resolveResult @ ScalaResolveResult(
-                  elem: PsiNamedElement, subst: ScSubstitutor)) => {
+                  elem: PsiNamedElement, subst: ScSubstitutor)) =>
                   element.putCopyableUserData(
                       ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY, elem)
-                }
               case _ =>
-            }
-          }
         case _ =>
-      }
-    }
-  }
 
   def decodeInformation(element: TreeElement,
-                        decodingState: Map[Object, Object]): TreeElement = {
+                        decodingState: Map[Object, Object]): TreeElement =
     if (!element.isInstanceOf[ScalaPsiElement]) return null
-    if (element.isInstanceOf[CompositeElement]) {
+    if (element.isInstanceOf[CompositeElement])
       if (element.getElementType == ScalaElementTypes.REFERENCE ||
           element.getElementType == ScalaElementTypes.REFERENCE_EXPRESSION ||
-          element.getElementType == ScalaElementTypes.TYPE_PROJECTION) {
+          element.getElementType == ScalaElementTypes.TYPE_PROJECTION)
         var ref = SourceTreeToPsiMap
           .treeElementToPsi(element)
           .asInstanceOf[ScReferenceElement]
         val named: PsiNamedElement = element.getCopyableUserData(
             ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY)
-        if (named != null) {
+        if (named != null)
           element.putCopyableUserData(
               ScalaChangeUtilSupport.REFERENCED_MEMBER_KEY, null)
           val res = ref.resolve
-          if (!element.getManager.areElementsEquivalent(res, named)) {
-            try {
-              if (ref.qualifier == None) {
+          if (!element.getManager.areElementsEquivalent(res, named))
+            try
+              if (ref.qualifier == None)
                 ref = ref.bindToElement(named).asInstanceOf[ScReferenceElement]
-              }
-            } catch {
+            catch
               case ignored: IncorrectOperationException =>
-            }
             return SourceTreeToPsiMap
               .psiElementToTree(ref)
               .asInstanceOf[TreeElement]
-          } //todo: else
-        }
-      }
+          //todo: else
       return element
-    }
     return null
-  }
-}
 
-object ScalaChangeUtilSupport {
+object ScalaChangeUtilSupport
   val REFERENCED_MEMBER_KEY: Key[PsiNamedElement] =
     Key.create("REFERENCED_MEMBER_KEY")
-}

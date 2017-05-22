@@ -6,6 +6,5 @@ import javax.swing.JPanel
   * User: Dmitry.Naydanov
   * Date: 23.11.15.
   */
-trait TopComponentDisplayable {
+trait TopComponentDisplayable
   def init(panel: JPanel): Unit
-}

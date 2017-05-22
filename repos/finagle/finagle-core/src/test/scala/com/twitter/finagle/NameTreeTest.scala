@@ -8,7 +8,7 @@ import org.scalatest.junit.JUnitRunner
 import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
-class NameTreeTest extends FunSuite {
+class NameTreeTest extends FunSuite
   val rng = new Random(1234L)
 
   val words = Seq("Lorem",
@@ -83,11 +83,10 @@ class NameTreeTest extends FunSuite {
 
   def pick[T](xs: Seq[T]): T = xs(rng.nextInt(xs.length))
 
-  test("NameTree.{read,show}") {
-    def newPath(): NameTree[Path] = {
+  test("NameTree.{read,show}")
+    def newPath(): NameTree[Path] =
       val elems = Seq.fill(1 + rng.nextInt(10)) { pick(words) }
       NameTree.Leaf(Path.Utf8(elems: _*))
-    }
 
     val leaves = Seq[() => NameTree[Path]](() => NameTree.Fail,
                                            () => NameTree.Empty,
@@ -97,16 +96,15 @@ class NameTreeTest extends FunSuite {
     def newLeaf(): NameTree[Path] = pick(leaves).apply()
 
     def newTree(depth: Int): NameTree[Path] =
-      rng.nextInt(3) match {
+      rng.nextInt(3) match
         case _ if depth == 0 => newLeaf()
         case 0 => newLeaf()
 
         case 1 =>
-          val trees = Seq.fill(1 + rng.nextInt(3)) {
+          val trees = Seq.fill(1 + rng.nextInt(3))
             // TODO(jdonham) test fractional weights
             val weight = rng.nextInt(10).toDouble
             NameTree.Weighted(weight, newTree(depth - 1))
-          }
           if (trees.size == 1) trees(0).tree
           else NameTree.Union(trees: _*)
 
@@ -114,28 +112,23 @@ class NameTreeTest extends FunSuite {
           val trees = Seq.fill(1 + rng.nextInt(3)) { newTree(depth - 1) }
           if (trees.size == 1) trees(0)
           else NameTree.Alt(trees: _*)
-      }
 
     val trees = Seq.fill(100) { newTree(2) }
-    for (tree <- trees) try {
+    for (tree <- trees) try
       assert(NameTree.read(tree.show) == tree)
-    } catch {
+    catch
       case NonFatal(exc) =>
         fail("Exception %s while parsing %s: %s".format(exc, tree.show, tree))
-    }
-  }
 
-  test("NameTree.bind: infinite loop") {
+  test("NameTree.bind: infinite loop")
     val dtab = Dtab.read("""
       /foo/bar => /bar/foo;
       /bar/foo => /foo/bar""")
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       DefaultInterpreter.bind(dtab, Path.read("/foo/bar")).sample()
-    }
-  }
 
-  test("NameTree.eval/simplified") {
+  test("NameTree.eval/simplified")
     val cases = Seq[(String, Option[Set[String]])](
         "~" -> None,
         "/ok" -> Some(Set("/ok")),
@@ -152,16 +145,11 @@ class NameTreeTest extends FunSuite {
         "~ | /ok | !" -> Some(Set("/ok"))
     )
 
-    for ((tree, res) <- cases) {
+    for ((tree, res) <- cases)
       val expect =
-        res map { set =>
-          set map { el: String =>
+        res map  set =>
+          set map  el: String =>
             Path.read(el)
-          }
-        }
 
       assert(NameTree.read(tree).eval == expect)
       assert(NameTree.read(tree).simplified.eval == expect)
-    }
-  }
-}

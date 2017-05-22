@@ -13,7 +13,7 @@ class PrintersTest
     extends BasePrintTests with ClassPrintTests with TraitPrintTests
     with ValAndDefPrintTests with QuasiTreesPrintTests with PackagePrintTests
 
-object PrinterHelper {
+object PrinterHelper
   val toolbox = cm.mkToolBox()
 
   import scala.reflect.internal.Chars._
@@ -23,16 +23,15 @@ object PrinterHelper {
   def assertResultCode(code: String)(parsedCode: String = "",
                                      typedCode: String = "",
                                      wrap: Boolean = false,
-                                     printRoot: Boolean = false) = {
+                                     printRoot: Boolean = false) =
     def toolboxTree(tree: => Tree) =
-      try {
+      try
         tree
-      } catch {
+      catch
         case e: scala.tools.reflect.ToolBoxError =>
           throw new Exception(e.getMessage + ": " + code, e)
-      }
 
-    def wrapCode(source: String) = {
+    def wrapCode(source: String) =
       val context = sm"""
       |trait PrintersContext {
       |  class baz extends scala.annotation.Annotation with scala.annotation.StaticAnnotation;
@@ -45,47 +44,40 @@ object PrinterHelper {
       |}"""
 
       if (wrap) context.trim() else source.trim
-    }
 
     val parsedTree = toolboxTree(toolbox.parse(wrapCode(code)))
     if (!parsedCode.isEmpty())
       assertEquals("using toolbox parser" + LF,
                    wrapCode(parsedCode),
                    normalizeEOL(showCode(parsedTree)))
-    if (!typedCode.isEmpty()) {
+    if (!typedCode.isEmpty())
       val typedTree = toolboxTree(toolbox.typecheck(parsedTree))
       assertEquals("using toolbox typechecker" + LF,
                    wrapCode(typedCode),
                    normalizeEOL(showCode(typedTree, printRootPkg = printRoot)))
-    }
-  }
 
-  def assertTreeCode(tree: Tree, typecheck: Boolean = false)(code: String) = {
-    if (typecheck) {
+  def assertTreeCode(tree: Tree, typecheck: Boolean = false)(code: String) =
+    if (typecheck)
       assertEquals("using quasiquote or given tree (typechecked)" + LF,
                    code.trim,
                    normalizeEOL(showCode(toolbox.typecheck(tree))))
-    } else {
+    else
       assertEquals("using quasiquote or given tree" + LF,
                    code.trim,
                    normalizeEOL(showCode(tree)))
-    }
-  }
 
   def assertPrintedCode(source: String,
                         checkTypedTree: Boolean = true,
-                        wrapCode: Boolean = false) = {
+                        wrapCode: Boolean = false) =
     if (checkTypedTree) assertResultCode(source)(source, source, wrapCode)
     else assertResultCode(source)(parsedCode = source, wrap = wrapCode)
-  }
 
   implicit class StrContextStripMarginOps(val stringContext: StringContext)
       extends util.StripMarginInterpolator
-}
 
 import PrinterHelper._
 
-trait BasePrintTests {
+trait BasePrintTests
   @Test def testIdent = assertTreeCode(Ident("*"))("*")
 
   @Test def testConstant1 = assertTreeCode(Literal(Constant("*")))("\"*\"")
@@ -364,9 +356,8 @@ trait BasePrintTests {
     assertPrintedCode("import java.lang.{String=>Str, Object=>_, _}")
 
   @Test def testImport4 = assertPrintedCode("import scala.collection._")
-}
 
-trait ClassPrintTests {
+trait ClassPrintTests
   @Test def testClass = assertPrintedCode("class *")
 
   @Test def testClassWithBody = assertPrintedCode(sm"""
@@ -862,9 +853,8 @@ trait ClassPrintTests {
     |    case (e @ ((_): scala.`package`.Exception)) => scala.Predef.println("e")
     |  } finally scala.Predef.println("finally")
     |}""")
-}
 
-trait TraitPrintTests {
+trait TraitPrintTests
   @Test def testTrait = assertPrintedCode("trait *")
 
   @Test def testTraitWithBody = assertPrintedCode(sm"""
@@ -986,9 +976,8 @@ trait TraitPrintTests {
     |  protected type C;
     |  type D <: scala.AnyRef
     |}""")
-}
 
-trait ValAndDefPrintTests {
+trait ValAndDefPrintTests
   @Test def testVal1 = assertPrintedCode("val a: scala.Unit = ()")
 
   @Test def testVal2 = assertPrintedCode("val * : scala.Unit = ()")
@@ -1010,7 +999,7 @@ trait ValAndDefPrintTests {
   @Test def testDef6 = assertPrintedCode("def a_(b_ : scala.Int) = ()")
 
   @Test def testDef7 =
-    assertTreeCode {
+    assertTreeCode
       Block(
           DefDef(NoMods,
                  newTermName("test1"),
@@ -1025,13 +1014,13 @@ trait ValAndDefPrintTests {
                  EmptyTree,
                  Literal(Constant(())))
       )
-    }(sm"""
+    (sm"""
     |{
     |  def test1 = ();
     |  def test2() = ()
     |}""")
 
-  @Test def testDef8 = {
+  @Test def testDef8 =
     val arg = ValDef(
         Modifiers(Flag.IMPLICIT),
         newTermName("a"),
@@ -1048,7 +1037,6 @@ trait ValAndDefPrintTests {
                       Literal(Constant(())))
 
     assertTreeCode(tree)("def test[X](implicit a: R[X]) = ()")
-  }
 
   @Test def testDef9 =
     assertPrintedCode(
@@ -1168,9 +1156,8 @@ trait ValAndDefPrintTests {
     |  }
     |}""",
                       wrapCode = true)
-}
 
-trait PackagePrintTests {
+trait PackagePrintTests
   @Test def testPackage1 = assertPrintedCode(sm"""
     |package foo.bar {
     |  
@@ -1214,9 +1201,8 @@ trait PackagePrintTests {
     |  } with AnyRef
     |}""",
                       checkTypedTree = false)
-}
 
-trait QuasiTreesPrintTests {
+trait QuasiTreesPrintTests
   @Test def testQuasiIdent = assertTreeCode(q"*")("*")
 
   @Test def testQuasiVal =
@@ -1299,4 +1285,3 @@ trait QuasiTreesPrintTests {
     |  };
     |  ()
     |}""")
-}

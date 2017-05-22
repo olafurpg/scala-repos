@@ -8,7 +8,7 @@ private[nio] final class HeapByteBufferCharView private (
     _initialLimit: Int,
     _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
-    extends CharBuffer(_capacity, null, -1) {
+    extends CharBuffer(_capacity, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -32,7 +32,7 @@ private[nio] final class HeapByteBufferCharView private (
   def asReadOnlyBuffer(): CharBuffer =
     GenHeapBufferView(this).generic_asReadOnlyBuffer()
 
-  def subSequence(start: Int, end: Int): CharBuffer = {
+  def subSequence(start: Int, end: Int): CharBuffer =
     if (start < 0 || end < start || end > remaining)
       throw new IndexOutOfBoundsException
     new HeapByteBufferCharView(capacity,
@@ -42,7 +42,6 @@ private[nio] final class HeapByteBufferCharView private (
                                position + end,
                                isReadOnly,
                                isBigEndian)
-  }
 
   @noinline
   def get(): Char =
@@ -85,11 +84,10 @@ private[nio] final class HeapByteBufferCharView private (
   @inline
   private[nio] def store(index: Int, elem: Char): Unit =
     GenHeapBufferView(this).byteArrayBits.storeChar(index, elem)
-}
 
-private[nio] object HeapByteBufferCharView {
+private[nio] object HeapByteBufferCharView
   private[nio] implicit object NewHeapByteBufferCharView
-      extends GenHeapBufferView.NewHeapBufferView[CharBuffer] {
+      extends GenHeapBufferView.NewHeapBufferView[CharBuffer]
     def bytesPerElem: Int = 2
 
     def apply(capacity: Int,
@@ -98,7 +96,7 @@ private[nio] object HeapByteBufferCharView {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean,
-              isBigEndian: Boolean): CharBuffer = {
+              isBigEndian: Boolean): CharBuffer =
       new HeapByteBufferCharView(capacity,
                                  byteArray,
                                  byteArrayOffset,
@@ -106,10 +104,7 @@ private[nio] object HeapByteBufferCharView {
                                  initialLimit,
                                  readOnly,
                                  isBigEndian)
-    }
-  }
 
   @inline
   private[nio] def fromHeapByteBuffer(byteBuffer: HeapByteBuffer): CharBuffer =
     GenHeapBufferView.generic_fromHeapByteBuffer(byteBuffer)
-}

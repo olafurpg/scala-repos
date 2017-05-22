@@ -36,7 +36,7 @@ import scala.collection._
   * This is an integration test that tests the fully integrated log cleaner
   */
 @RunWith(value = classOf[Parameterized])
-class LogCleanerIntegrationTest(compressionCodec: String) {
+class LogCleanerIntegrationTest(compressionCodec: String)
 
   val time = new MockTime()
   val segmentSize = 100
@@ -49,7 +49,7 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
                      TopicAndPartition("log", 2))
 
   @Test
-  def cleanerTest() {
+  def cleanerTest()
     val cleaner = makeCleaner(parts = 3)
     val log = cleaner.logs.get(topics(0))
 
@@ -113,27 +113,24 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
     // we expect partition 0 to be gone
     assert(!checkpoints.contains(topics(0)))
     cleaner.shutdown()
-  }
 
-  def readFromLog(log: Log): Iterable[(Int, Int)] = {
+  def readFromLog(log: Log): Iterable[(Int, Int)] =
     for (segment <- log.logSegments; entry <- segment.log;
-    messageAndOffset <- {
+    messageAndOffset <-
       // create single message iterator or deep iterator depending on compression codec
       if (entry.message.compressionCodec == NoCompressionCodec)
         Stream.cons(entry, Stream.empty).iterator
       else ByteBufferMessageSet.deepIterator(entry)
-    }) yield {
+    ) yield
       val key = TestUtils.readString(messageAndOffset.message.key).toInt
       val value = TestUtils.readString(messageAndOffset.message.payload).toInt
       key -> value
-    }
-  }
 
   def writeDups(numKeys: Int,
                 numDups: Int,
                 log: Log,
-                codec: CompressionCodec): Seq[(Int, Int)] = {
-    for (dup <- 0 until numDups; key <- 0 until numKeys) yield {
+                codec: CompressionCodec): Seq[(Int, Int)] =
+    for (dup <- 0 until numDups; key <- 0 until numKeys) yield
       val count = counter
       log.append(
           TestUtils.singleMessageSet(payload = counter.toString.getBytes,
@@ -142,25 +139,22 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
           assignOffsets = true)
       counter += 1
       (key, count)
-    }
-  }
 
   @After
-  def teardown() {
+  def teardown()
     time.scheduler.shutdown()
     CoreUtils.rm(logDir)
-  }
 
   /* create a cleaner instance and logs with the given parameters */
   def makeCleaner(parts: Int,
                   minCleanableDirtyRatio: Float = 0.0F,
                   numThreads: Int = 1,
                   defaultPolicy: String = "compact",
-                  policyOverrides: Map[String, String] = Map()): LogCleaner = {
+                  policyOverrides: Map[String, String] = Map()): LogCleaner =
 
     // create partitions and add them to the pool
     val logs = new Pool[TopicAndPartition, Log]()
-    for (i <- 0 until parts) {
+    for (i <- 0 until parts)
       val dir = new File(logDir, "log-" + i)
       dir.mkdirs()
       val logProps = new Properties()
@@ -179,20 +173,15 @@ class LogCleanerIntegrationTest(compressionCodec: String) {
                         scheduler = time.scheduler,
                         time = time)
       logs.put(TopicAndPartition("log", i), log)
-    }
 
     new LogCleaner(CleanerConfig(numThreads = numThreads),
                    logDirs = Array(logDir),
                    logs = logs,
                    time = time)
-  }
-}
 
-object LogCleanerIntegrationTest {
+object LogCleanerIntegrationTest
   @Parameters
-  def parameters: java.util.Collection[Array[String]] = {
+  def parameters: java.util.Collection[Array[String]] =
     val list = new java.util.ArrayList[Array[String]]()
     for (codec <- CompressionType.values) list.add(Array(codec.name))
     list
-  }
-}

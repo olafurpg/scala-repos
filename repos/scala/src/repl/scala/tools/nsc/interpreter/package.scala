@@ -30,7 +30,7 @@ import scala.util.Try
   *  InteractiveReader contains { history: History, completion: Completion }
   *  IMain contains { global: Global }
   */
-package object interpreter extends ReplConfig with ReplStrings {
+package object interpreter extends ReplConfig with ReplStrings
   type JFile = java.io.File
   type JClass = java.lang.Class[_]
   type JList[T] = java.util.List[T]
@@ -45,10 +45,9 @@ package object interpreter extends ReplConfig with ReplStrings {
     scala.language.postfixOps // make all postfix ops in this package compile without warning
 
   private[interpreter] implicit def javaCharSeqCollectionToScala(
-      xs: JCollection[_ <: CharSequence]): List[String] = {
+      xs: JCollection[_ <: CharSequence]): List[String] =
     import scala.collection.JavaConverters._
     xs.asScala.toList map ("" + _)
-  }
 
   private[nsc] implicit def enrichClass[T](clazz: Class[T]) =
     new RichClass[T](clazz)
@@ -58,45 +57,42 @@ package object interpreter extends ReplConfig with ReplStrings {
   private val ourClassloader = getClass.getClassLoader
 
   def staticTypeTag[T : ClassTag]: ru.TypeTag[T] =
-    ru.TypeTag[T](ru.runtimeMirror(ourClassloader), new TypeCreator {
+    ru.TypeTag[T](ru.runtimeMirror(ourClassloader), new TypeCreator
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         m.staticClass(classTag[T].runtimeClass.getName)
           .toTypeConstructor
           .asInstanceOf[U#Type]
-    })
+    )
 
   /** This class serves to trick the compiler into treating a var
     *  (intp, in ILoop) as a stable identifier.
     */
-  implicit class IMainOps(val intp: IMain) {
+  implicit class IMainOps(val intp: IMain)
     import intp._
     import global.{reporter => _, _}
     import definitions._
 
-    protected def echo(msg: String) = {
+    protected def echo(msg: String) =
       Console.out println msg
       Console.out.flush()
-    }
 
-    def implicitsCommand(line: String): String = {
+    def implicitsCommand(line: String): String =
       def p(x: Any) = intp.reporter.printMessage("" + x)
 
       // If an argument is given, only show a source with that
       // in its name somewhere.
       val args = line split "\\s+"
       val filtered =
-        intp.implicitSymbolsBySource filter {
+        intp.implicitSymbolsBySource filter
           case (source, syms) =>
-            (args contains "-v") || {
+            (args contains "-v") ||
               if (line == "") (source.fullName.toString != "scala.Predef")
               else (args exists (source.name.toString contains _))
-            }
-        }
 
       if (filtered.isEmpty)
         return "No implicits have been imported other than those in Predef."
 
-      filtered foreach {
+      filtered foreach
         case (source, syms) =>
           p("/* " + syms.size + " implicit members imported from " +
               source.fullName + " */")
@@ -104,18 +100,17 @@ package object interpreter extends ReplConfig with ReplStrings {
           // This groups the members by where the symbol is defined
           val byOwner = syms groupBy (_.owner)
           val sortedOwners =
-            byOwner.toList sortBy {
+            byOwner.toList sortBy
               case (owner, _) =>
                 exitingTyper(source.info.baseClasses indexOf owner)
-            }
 
-          sortedOwners foreach {
+          sortedOwners foreach
             case (owner, members) =>
               // Within each owner, we cluster results based on the final result type
               // if there are more than a couple, and sort each cluster based on name.
               // This is really just trying to make the 100 or so implicits imported
               // by default into something readable.
-              val memberGroups: List[List[Symbol]] = {
+              val memberGroups: List[List[Symbol]] =
                 val groups = members groupBy (_.tpe.finalResultType) toList
                 val (big, small) = groups partition (_._2.size > 3)
                 val xss =
@@ -123,64 +118,48 @@ package object interpreter extends ReplConfig with ReplStrings {
                       (small flatMap (_._2)))
 
                 xss map (xs => xs sortBy (_.name.toString))
-              }
 
               val ownerMessage =
                 if (owner == source) " defined in " else " inherited from "
               p("  /* " + members.size + ownerMessage + owner.fullName + " */")
 
-              memberGroups foreach { group =>
+              memberGroups foreach  group =>
                 group foreach (s => p("  " + intp.symbolDefString(s)))
                 p("")
-              }
-          }
           p("")
-      }
       ""
-    }
 
-    def kindCommandInternal(expr: String, verbose: Boolean): Unit = {
+    def kindCommandInternal(expr: String, verbose: Boolean): Unit =
       val catcher = catching(classOf[MissingRequirementError],
                              classOf[ScalaReflectionException])
-      def typeFromTypeString: Option[ClassSymbol] = catcher opt {
+      def typeFromTypeString: Option[ClassSymbol] = catcher opt
         exprTyper.typeOfTypeString(expr).typeSymbol.asClass
-      }
-      def typeFromNameTreatedAsTerm: Option[ClassSymbol] = catcher opt {
+      def typeFromNameTreatedAsTerm: Option[ClassSymbol] = catcher opt
         val moduleClass = exprTyper.typeOfExpression(expr).typeSymbol
         moduleClass.linkedClassOfClass.asClass
-      }
-      def typeFromFullName: Option[ClassSymbol] = catcher opt {
+      def typeFromFullName: Option[ClassSymbol] = catcher opt
         intp.global.rootMirror.staticClass(expr)
-      }
       def typeOfTerm: Option[TypeSymbol] =
-        replInfo(symbolOfLine(expr)).typeSymbol match {
+        replInfo(symbolOfLine(expr)).typeSymbol match
           case sym: TypeSymbol => Some(sym)
           case _ => None
-        }
-      (typeFromTypeString orElse typeFromNameTreatedAsTerm orElse typeFromFullName orElse typeOfTerm) foreach {
+      (typeFromTypeString orElse typeFromNameTreatedAsTerm orElse typeFromFullName orElse typeOfTerm) foreach
         sym =>
-          val (kind, tpe) = exitingTyper {
+          val (kind, tpe) = exitingTyper
             val tpe = sym.tpeHK
             (intp.global.inferKind(NoPrefix)(tpe, sym.owner), tpe)
-          }
           echoKind(tpe, kind, verbose)
-      }
-    }
 
-    def echoKind(tpe: Type, kind: Kind, verbose: Boolean) {
-      def typeString(tpe: Type): String = {
-        tpe match {
+    def echoKind(tpe: Type, kind: Kind, verbose: Boolean)
+      def typeString(tpe: Type): String =
+        tpe match
           case TypeRef(_, sym, _) => typeString(sym.info)
           case RefinedType(_, _) => tpe.toString
           case _ => tpe.typeSymbol.fullName
-        }
-      }
       printAfterTyper(typeString(tpe) + "'s kind is " + kind.scalaNotation)
-      if (verbose) {
+      if (verbose)
         echo(kind.starNotation)
         echo(kind.description)
-      }
-    }
 
     /** TODO -
       *  -n normalize
@@ -199,25 +178,20 @@ package object interpreter extends ReplConfig with ReplStrings {
     def echoTypeStructure(sym: Symbol) =
       printAfterTyper("" + deconstruct.show(replInfo(sym)))
 
-    def echoTypeSignature(sym: Symbol, verbose: Boolean) = {
+    def echoTypeSignature(sym: Symbol, verbose: Boolean) =
       if (verbose) echo("// Type signature")
       printAfterTyper("" + replInfo(sym))
 
-      if (verbose) {
+      if (verbose)
         echo("\n// Internal Type structure")
         echoTypeStructure(sym)
-      }
-    }
-  }
 
   /* debug assist
   private[nsc] implicit class `smart stringifier`(val sc: StringContext) extends AnyVal {
     import StringContext._, runtime.ScalaRunTime.stringOf
     def ss(args: Any*): String = sc.standardInterpolator(treatEscapes, args map stringOf)
   } debug assist */
-  private[nsc] implicit class `try lastly`[A](val t: Try[A]) extends AnyVal {
+  private[nsc] implicit class `try lastly`[A](val t: Try[A]) extends AnyVal
     private def effect[X](last: => Unit)(a: X): Try[A] = { last; t }
     def lastly(last: => Unit): Try[A] =
       t transform (effect(last) _, effect(last) _)
-  }
-}

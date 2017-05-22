@@ -21,7 +21,7 @@ import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.catalyst.plans.logical.LocalRelation
 import org.apache.spark.sql.types._
 
-object TestRelations {
+object TestRelations
   val testRelation = LocalRelation(
       AttributeReference("a", IntegerType, nullable = true)())
 
@@ -61,4 +61,3 @@ object TestRelations {
 
   val mapRelation = LocalRelation(
       AttributeReference("map", MapType(IntegerType, IntegerType))())
-}

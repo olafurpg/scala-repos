@@ -17,14 +17,14 @@ package io.prediction.data.webhooks.segmentio
 import io.prediction.data.webhooks.{ConnectorException, JsonConnector}
 import org.json4s._
 
-private[prediction] object SegmentIOConnector extends JsonConnector {
+private[prediction] object SegmentIOConnector extends JsonConnector
 
   // private lazy val supportedAPI = Vector("2", "2.0", "2.0.0")
 
   implicit val json4sFormats: Formats = DefaultFormats
 
-  override def toEventJson(data: JObject): JObject = {
-    try {
+  override def toEventJson(data: JObject): JObject =
+    try
       val version: String = data.values("version").toString
 /*
       if (!supportedAPI.contains(version)) {
@@ -33,23 +33,21 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
         )
       }
      */
-    } catch {
+    catch
       case _: Throwable ⇒
         throw new ConnectorException(s"Failed to get segment.io API version.")
-    }
 
-    val common = try {
+    val common = try
       data.extract[Common]
-    } catch {
+    catch
       case e: Throwable ⇒
         throw new ConnectorException(
             s"Cannot extract Common field from $data. ${e.getMessage}",
             e
         )
-    }
 
-    try {
-      common.`type` match {
+    try
+      common.`type` match
         case "identify" ⇒
           toEventJson(
               common = common,
@@ -90,82 +88,70 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
           throw new ConnectorException(
               s"Cannot convert unknown type ${common.`type`} to event JSON."
           )
-      }
-    } catch {
+    catch
       case e: ConnectorException => throw e
       case e: Exception =>
         throw new ConnectorException(
             s"Cannot convert $data to event JSON. ${e.getMessage}",
             e
         )
-    }
-  }
 
-  def toEventJson(common: Common, identify: Events.Identify): JObject = {
+  def toEventJson(common: Common, identify: Events.Identify): JObject =
     import org.json4s.JsonDSL._
     val eventProperties = "traits" → identify.traits
     toJson(common, eventProperties)
-  }
 
-  def toEventJson(common: Common, track: Events.Track): JObject = {
+  def toEventJson(common: Common, track: Events.Track): JObject =
     import org.json4s.JsonDSL._
     val eventProperties =
       ("properties" → track.properties) ~ ("event" → track.event)
     toJson(common, eventProperties)
-  }
 
-  def toEventJson(common: Common, alias: Events.Alias): JObject = {
+  def toEventJson(common: Common, alias: Events.Alias): JObject =
     import org.json4s.JsonDSL._
     toJson(common, "previous_id" → alias.previous_id)
-  }
 
-  def toEventJson(common: Common, screen: Events.Screen): JObject = {
+  def toEventJson(common: Common, screen: Events.Screen): JObject =
     import org.json4s.JsonDSL._
     val eventProperties =
       ("name" → screen.name) ~ ("properties" → screen.properties)
     toJson(common, eventProperties)
-  }
 
-  def toEventJson(common: Common, page: Events.Page): JObject = {
+  def toEventJson(common: Common, page: Events.Page): JObject =
     import org.json4s.JsonDSL._
     val eventProperties =
       ("name" → page.name) ~ ("properties" → page.properties)
     toJson(common, eventProperties)
-  }
 
-  def toEventJson(common: Common, group: Events.Group): JObject = {
+  def toEventJson(common: Common, group: Events.Group): JObject =
     import org.json4s.JsonDSL._
     val eventProperties =
       ("group_id" → group.group_id) ~ ("traits" → group.traits)
     toJson(common, eventProperties)
-  }
 
-  private def toJson(common: Common, props: JObject): JsonAST.JObject = {
+  private def toJson(common: Common, props: JObject): JsonAST.JObject =
     val commonFields = commonToJson(common)
     JObject(("properties" → properties(common, props)) :: commonFields.obj)
-  }
 
-  private def properties(common: Common, eventProps: JObject): JObject = {
+  private def properties(common: Common, eventProps: JObject): JObject =
     import org.json4s.JsonDSL._
-    common.context map { context ⇒
-      try {
+    common.context map  context ⇒
+      try
         ("context" → Extraction.decompose(context)) ~ eventProps
-      } catch {
+      catch
         case e: Throwable ⇒
           throw new ConnectorException(
               s"Cannot convert $context to event JSON. ${e.getMessage}",
               e
           )
-      }
-    } getOrElse eventProps
-  }
+    getOrElse eventProps
 
   private def commonToJson(common: Common): JObject =
     commonToJson(common, common.`type`)
 
-  private def commonToJson(common: Common, typ: String): JObject = {
+  private def commonToJson(common: Common, typ: String): JObject =
     import org.json4s.JsonDSL._
-    common.user_id.orElse(common.anonymous_id) match {
+    common.user_id.orElse(common.anonymous_id) match
       case Some(userId) ⇒
         ("event" → typ) ~ ("entityType" → "user") ~ ("entityId" → userId) ~
         ("eventTime" → common.timestamp)
@@ -174,11 +160,8 @@ private[prediction] object SegmentIOConnector extends JsonConnector {
         throw new ConnectorException(
             "there was no `userId` or `anonymousId` in the common fields."
         )
-    }
-  }
-}
 
-object Events {
+object Events
 
   private[prediction] case class Track(
       event: String,
@@ -206,9 +189,8 @@ object Events {
       user_id: String,
       traits: Option[JObject]
   )
-}
 
-object Common {
+object Common
 
   private[prediction] case class Integrations(
       All: Boolean = false,
@@ -287,7 +269,6 @@ object Common {
       version: Option[String] = None,
       build: Option[String] = None
   )
-}
 
 private[prediction] case class Common(
     `type`: String,

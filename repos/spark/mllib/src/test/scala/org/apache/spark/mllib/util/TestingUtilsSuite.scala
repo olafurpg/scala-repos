@@ -23,9 +23,9 @@ import org.apache.spark.SparkFunSuite
 import org.apache.spark.mllib.linalg.Vectors
 import org.apache.spark.mllib.util.TestingUtils._
 
-class TestingUtilsSuite extends SparkFunSuite {
+class TestingUtilsSuite extends SparkFunSuite
 
-  test("Comparing doubles using relative error.") {
+  test("Comparing doubles using relative error.")
 
     assert(23.1 ~== 23.52 relTol 0.02)
     assert(23.1 ~== 22.74 relTol 0.02)
@@ -68,9 +68,8 @@ class TestingUtilsSuite extends SparkFunSuite {
           1.18 * -Double.MinPositiveValue relTol 0.012)
     assert(-Double.MinPositiveValue ~==
           1.38 * -Double.MinPositiveValue relTol 0.012)
-  }
 
-  test("Comparing doubles using absolute error.") {
+  test("Comparing doubles using absolute error.")
 
     assert(17.8 ~== 17.99 absTol 0.2)
     assert(17.8 ~== 17.61 absTol 0.2)
@@ -102,9 +101,8 @@ class TestingUtilsSuite extends SparkFunSuite {
           3 * Double.MinPositiveValue absTol 5 * Double.MinPositiveValue)
     assert(Double.MinPositiveValue !~==
           -4 * Double.MinPositiveValue absTol 5 * Double.MinPositiveValue)
-  }
 
-  test("Comparing vectors using relative error.") {
+  test("Comparing vectors using relative error.")
 
     // Comparisons of two dense vectors
     assert(Vectors.dense(Array(3.1, 3.5)) ~==
@@ -141,9 +139,8 @@ class TestingUtilsSuite extends SparkFunSuite {
 
     assert(Vectors.dense(Array(3.1, 3.5)) !~==
           Vectors.sparse(2, Array(0, 1), Array(3.135, 3.534)) relTol 0.01)
-  }
 
-  test("Comparing vectors using absolute error.") {
+  test("Comparing vectors using absolute error.")
 
     // Comparisons of two dense vectors
     assert(Vectors.dense(Array(3.1, 3.5, 0.0)) ~==
@@ -193,5 +190,3 @@ class TestingUtilsSuite extends SparkFunSuite {
 
     assert(Vectors.sparse(3, Array(0, 2), Array(3.1, 2.4)) !~==
           Vectors.dense(Array(3.1, 1E-3, 2.4)) absTol 1E-6)
-  }
-}

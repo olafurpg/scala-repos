@@ -24,7 +24,7 @@ case class Tournament(id: String,
                       startsAt: DateTime,
                       winnerId: Option[String] = None,
                       featuredId: Option[String] = None,
-                      spotlight: Option[Spotlight] = None) {
+                      spotlight: Option[Spotlight] = None)
 
   def isCreated = status == Status.Created
   def isStarted = status == Status.Started
@@ -35,10 +35,9 @@ case class Tournament(id: String,
     else if (scheduled && clock.hasIncrement) s"$name Inc $system"
     else s"$name $system"
 
-  def isMarathon = schedule.map(_.freq) exists {
+  def isMarathon = schedule.map(_.freq) exists
     case Schedule.Freq.ExperimentalMarathon | Schedule.Freq.Marathon => true
     case _ => false
-  }
 
   def isUnique = schedule.map(_.freq) exists (Schedule.Freq.Unique ==)
 
@@ -69,10 +68,9 @@ case class Tournament(id: String,
 
   def overlaps(other: Tournament) = interval overlaps other.interval
 
-  def similarTo(other: Tournament) = (schedule, other.schedule) match {
+  def similarTo(other: Tournament) = (schedule, other.schedule) match
     case (Some(s1), Some(s2)) if s1 similarTo s2 => true
     case _ => false
-  }
 
   def speed = Speed(clock.chessClock.some)
 
@@ -87,22 +85,19 @@ case class Tournament(id: String,
 
   def berserkable = system.berserkable && clock.chessClock.berserkable
 
-  def clockStatus = secondsToFinish |> { s =>
+  def clockStatus = secondsToFinish |>  s =>
     "%02d:%02d".format(s / 60, s % 60)
-  }
 
   def spotlightedNow =
-    spotlight.filter { s =>
-      !isFinished && s.homepageHours.?? { hours =>
+    spotlight.filter  s =>
+      !isFinished && s.homepageHours.??  hours =>
         startsAt.minusHours(hours) isBefore DateTime.now
-      }
-    } map { this -> _ }
-}
+    map { this -> _ }
 
 case class EnterableTournaments(
     tours: List[Tournament], scheduled: List[Tournament])
 
-object Tournament {
+object Tournament
 
   val minPlayers = 2
 
@@ -148,4 +143,3 @@ object Tournament {
                `private` = false,
                schedule = Some(sched),
                startsAt = sched.at)
-}

@@ -13,7 +13,7 @@ import org.scalatest.{Matchers, WordSpec}
 import scala.concurrent.duration._
 import scala.concurrent.{Await}
 
-class ClientSpec extends WordSpec with Matchers {
+class ClientSpec extends WordSpec with Matchers
   val testConf: Config =
     ConfigFactory.parseString("""
     akka.loggers = ["akka.testkit.TestEventListener"]
@@ -25,9 +25,9 @@ class ClientSpec extends WordSpec with Matchers {
   implicit val system = ActorSystem(getClass.getSimpleName, testConf)
   implicit val materializer = ActorMaterializer()
 
-  "HTTP Client" should {
+  "HTTP Client" should
 
-    "reuse connection pool" in {
+    "reuse connection pool" in
       val (_, hostname, port) = TestUtils.temporaryServerHostnameAndPort()
       val bindingFuture =
         Http().bindAndHandleSync(_ ⇒ HttpResponse(), hostname, port)
@@ -48,6 +48,3 @@ class ClientSpec extends WordSpec with Matchers {
       Http().hostPoolCache.size shouldBe 1
 
       Await.ready(binding.unbind(), 1.second)
-    }
-  }
-}

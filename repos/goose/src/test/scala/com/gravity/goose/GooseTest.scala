@@ -8,10 +8,10 @@ import org.junit.Assert._
   * User: jim
   * Date: 8/14/11
   */
-class GooseTest {
+class GooseTest
 
   @Test
-  def gooseTest() {
+  def gooseTest()
 
     //    implicit val config = new Configuration
     //    val url = "http://techcrunch.com/2011/08/13/2005-zuckerberg-didnt-want-to-take-over-the-world/"
@@ -28,14 +28,11 @@ class GooseTest {
     //    println("\nFINAL TALLY")
     //    println("\nTEXT: \n" + article2.cleanedArticleText)
     //    println("\nIMAGE: "+ article2.topImage.getImageSrc)
-  }
 
   @Test
-  def badlink() {
+  def badlink()
     implicit val config = new Configuration
     val url = "http://nolove888.com/2011/08/13/LINKNOTEXISTS"
     val goose = new Goose(config)
     val article = goose.extractContent(url)
     assertNull(article.topNode)
-  }
-}

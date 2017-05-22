@@ -31,7 +31,7 @@ import com.typesafe.config.ConfigFactory
   */
 @SerialVersionUID(1L)
 final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
-    extends Pool {
+    extends Pool
 
   require(nodes.nonEmpty, "Must specify list of remote target.nodes")
 
@@ -51,7 +51,7 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
 
   override def nrOfInstances(sys: ActorSystem): Int = local.nrOfInstances(sys)
 
-  override def newRoutee(routeeProps: Props, context: ActorContext): Routee = {
+  override def newRoutee(routeeProps: Props, context: ActorContext): Routee =
     val name = "c" + childNameCounter.incrementAndGet
     val deploy = Deploy(config = ConfigFactory.empty(),
                         routerConfig = routeeProps.routerConfig,
@@ -68,7 +68,6 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
                    name,
                    systemService = false)
     ActorRefRoutee(ref)
-  }
 
   override def createRouterActor(): RouterActor = local.createRouterActor()
 
@@ -79,12 +78,10 @@ final case class RemoteRouterConfig(local: Pool, nodes: Iterable[Address])
 
   override def resizer: Option[Resizer] = local.resizer
 
-  override def withFallback(other: RouterConfig): RouterConfig = other match {
+  override def withFallback(other: RouterConfig): RouterConfig = other match
     case RemoteRouterConfig(local: RemoteRouterConfig, nodes) ⇒
       throw new IllegalStateException(
           "RemoteRouterConfig is not allowed to wrap a RemoteRouterConfig")
     case RemoteRouterConfig(local: Pool, nodes) ⇒
       copy(local = this.local.withFallback(local).asInstanceOf[Pool])
     case _ ⇒ copy(local = this.local.withFallback(other).asInstanceOf[Pool])
-  }
-}

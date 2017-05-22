@@ -25,7 +25,7 @@ import com.twitter.summingbird.scalding._
 import com.twitter.summingbird.scalding
 import cascading.flow.FlowDef
 
-trait BatchedService[K, V] extends ExternalService[K, V] {
+trait BatchedService[K, V] extends ExternalService[K, V]
   // The batcher that describes this service
   def batcher: Batcher
   def ordering: Ordering[K]
@@ -54,15 +54,13 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
     */
   def lookup[W](incoming: TypedPipe[(Timestamp, (K, W))],
                 servStream: TypedPipe[(Timestamp, (K, Option[V]))])
-    : TypedPipe[(Timestamp, (K, (W, Option[V])))] = {
+    : TypedPipe[(Timestamp, (K, (W, Option[V])))] =
 
     def flatOpt[T](o: Option[Option[T]]): Option[T] = o.flatMap(identity)
 
     implicit val ord = ordering
-    LookupJoin(incoming, servStream, reducers).map {
+    LookupJoin(incoming, servStream, reducers).map
       case (t, (k, (w, optoptv))) => (t, (k, (w, flatOpt(optoptv))))
-    }
-  }
 
   protected def batchedLookup[W](
       covers: Interval[Timestamp],
@@ -70,55 +68,50 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
       last: (BatchID, FlowProducer[TypedPipe[(K, V)]]),
       streams: Iterable[(BatchID, FlowToPipe[(K, Option[V])])])
     : FlowToPipe[(K, (W, Option[V]))] =
-    Reader[FlowInput, KeyValuePipe[K, (W, Option[V])]] {
+    Reader[FlowInput, KeyValuePipe[K, (W, Option[V])]]
       (flowMode: (FlowDef, Mode)) =>
         val left = getKeys(flowMode)
         val earliestInLast = batcher.earliestTimeOf(last._1)
-        val liftedLast: KeyValuePipe[K, Option[V]] = last._2(flowMode).map {
+        val liftedLast: KeyValuePipe[K, Option[V]] = last._2(flowMode).map
           case (k, w) => (earliestInLast, (k, Some(w)))
-        }
         // TODO (https://github.com/twitter/summingbird/issues/91): we
         // could not bother to load streams outside the covers, but
         // probably we aren't anyway assuming the time spans are not
         // wildly mismatched
-        val right = streams.foldLeft(liftedLast) { (merged, item) =>
+        val right = streams.foldLeft(liftedLast)  (merged, item) =>
           merged ++ (item._2(flowMode))
-        }
         lookup(left, right)
-    }
 
   final def lookup[W](
       getKeys: PipeFactory[(K, W)]): PipeFactory[(K, (W, Option[V]))] =
-    StateWithError({ (in: FactoryInput) =>
+    StateWithError( (in: FactoryInput) =>
       val (timeSpan, mode) = in
 
       // This object combines some common scalding batching operations:
       val batchOps = new BatchedOperations(batcher)
 
       val coveringBatches = batchOps.coverIt(timeSpan)
-      readLast(coveringBatches.min, mode).right.flatMap {
+      readLast(coveringBatches.min, mode).right.flatMap
         batchLastFlow =>
           val (startingBatch, init) = batchLastFlow
           val streamBatches =
             BatchID.range(startingBatch.next, coveringBatches.max)
-          val batchStreams = streamBatches.map { b =>
+          val batchStreams = streamBatches.map  b =>
             (b, readStream(b, mode))
-          }
           // only produce continuous output, so stop at the first none:
-          val existing = batchStreams.takeWhile { _._2.isDefined }.collect {
+          val existing = batchStreams.takeWhile { _._2.isDefined }.collect
             case (batch, Some(flow)) => (batch, flow)
-          }
 
-          if (existing.isEmpty) {
+          if (existing.isEmpty)
             Left(List("[ERROR] Could not load any batches of the service stream in: " +
                     toString + " for: " + timeSpan.toString))
-          } else {
+          else
             val inBatches = List(startingBatch) ++ existing.map { _._1 }
             val bInt =
               BatchID.toInterval(inBatches).get // by construction this is an interval, so this can't throw
             val toRead =
               batchOps.intersect(bInt, timeSpan) // No need to read more than this
-            getKeys((toRead, mode)).right.map {
+            getKeys((toRead, mode)).right.map
               case ((available, outM), getFlow) =>
                 /*
                  * Note we can open more batches than we need to join, but
@@ -131,13 +124,9 @@ trait BatchedService[K, V] extends ExternalService[K, V] {
                                                    getFlow,
                                                    batchLastFlow,
                                                    existing)))
-            }
-          }
-      }
-    })
-}
+    )
 
-object BatchedService extends java.io.Serializable {
+object BatchedService extends java.io.Serializable
 
   /**
     * If you write the output of a sumByKey, you can use it as
@@ -148,18 +137,16 @@ object BatchedService extends java.io.Serializable {
       store: BatchedStore[K, V],
       sink: BatchedSink[(K, Option[V])],
       reducerOption: Option[Int] = None): BatchedService[K, V] =
-    new BatchedService[K, V] {
+    new BatchedService[K, V]
       override def ordering = store.ordering
-      override def batcher = {
+      override def batcher =
         assert(store.batcher == sink.batcher, "Batchers do not match")
         store.batcher
-      }
       override val reducers = reducerOption
       override def readStream(batchID: BatchID, mode: Mode) =
         sink.readStream(batchID, mode)
       override def readLast(exclusiveUB: BatchID, mode: Mode) =
         store.readLast(exclusiveUB, mode)
-    }
 
   /**
     * If you write the output JUST BEFORE sumByKey, you can use it as
@@ -172,4 +159,3 @@ object BatchedService extends java.io.Serializable {
       reducerOption: Option[Int] = None)
     : scalding.service.BatchedDeltaService[K, V] =
     new scalding.service.BatchedDeltaService[K, V](store, sink, reducerOption)
-}

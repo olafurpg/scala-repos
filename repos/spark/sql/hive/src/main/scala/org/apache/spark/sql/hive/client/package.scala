@@ -18,13 +18,13 @@
 package org.apache.spark.sql.hive
 
 /** Support for interacting with different versions of the HiveMetastoreClient */
-package object client {
+package object client
   private[client] abstract class HiveVersion(val fullVersion: String,
                                              val extraDeps: Seq[String] = Nil,
                                              val exclusions: Seq[String] = Nil)
 
   // scalastyle:off
-  private[hive] object hive {
+  private[hive] object hive
     case object v12 extends HiveVersion("0.12.0")
     case object v13 extends HiveVersion("0.13.1")
 
@@ -70,6 +70,4 @@ package object client {
                              "org.pentaho:pentaho-aggdesigner-algorithm",
                              "net.hydromatic:linq4j",
                              "net.hydromatic:quidem"))
-  }
   // scalastyle:on
-}

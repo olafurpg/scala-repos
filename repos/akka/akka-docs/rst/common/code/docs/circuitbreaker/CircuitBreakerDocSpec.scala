@@ -17,7 +17,7 @@ import akka.event.Logging
 class CircuitBreakerDocSpec {}
 
 //#circuit-breaker-initialization
-class DangerousActor extends Actor with ActorLogging {
+class DangerousActor extends Actor with ActorLogging
   import context.dispatcher
 
   val breaker =
@@ -35,11 +35,9 @@ class DangerousActor extends Actor with ActorLogging {
   def dangerousCall: String =
     "This really isn't that dangerous of a call after all"
 
-  def receive = {
+  def receive =
     case "is my middle name" =>
       breaker.withCircuitBreaker(Future(dangerousCall)) pipeTo sender()
     case "block for me" =>
       sender() ! breaker.withSyncCircuitBreaker(dangerousCall)
-  }
   //#circuit-breaker-usage
-}

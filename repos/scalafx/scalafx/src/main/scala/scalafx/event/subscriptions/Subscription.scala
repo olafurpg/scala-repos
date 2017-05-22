@@ -29,10 +29,9 @@ package scalafx.event.subscriptions
 /**
   * Trait used to remove Event listening.
   */
-trait Subscription {
+trait Subscription
 
   /**
     * Remove Event listening.
     */
   def cancel()
-}

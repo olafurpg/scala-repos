@@ -23,11 +23,11 @@ import scalikejdbc._
 /** JDBC implementation of [[EngineInstances]] */
 class JDBCEngineInstances(
     client: String, config: StorageClientConfig, prefix: String)
-    extends EngineInstances with Logging {
+    extends EngineInstances with Logging
 
   /** Database table name for this data access object */
   val tableName = JDBCUtils.prefixTableName(prefix, "engineinstances")
-  DB autoCommit { implicit session =>
+  DB autoCommit  implicit session =>
     sql"""
     create table if not exists $tableName (
       id varchar(100) not null primary key,
@@ -45,9 +45,8 @@ class JDBCEngineInstances(
       preparatorParams text not null,
       algorithmsParams text not null,
       servingParams text not null)""".execute().apply()
-  }
 
-  def insert(i: EngineInstance): String = DB localTx { implicit session =>
+  def insert(i: EngineInstance): String = DB localTx  implicit session =>
     val id = java.util.UUID.randomUUID().toString
     sql"""
     INSERT INTO $tableName VALUES(
@@ -67,9 +66,8 @@ class JDBCEngineInstances(
       ${i.algorithmsParams},
       ${i.servingParams})""".update().apply()
     id
-  }
 
-  def get(id: String): Option[EngineInstance] = DB localTx {
+  def get(id: String): Option[EngineInstance] = DB localTx
     implicit session =>
       sql"""
     SELECT
@@ -92,9 +90,8 @@ class JDBCEngineInstances(
         .map(resultToEngineInstance)
         .single()
         .apply()
-  }
 
-  def getAll(): Seq[EngineInstance] = DB localTx { implicit session =>
+  def getAll(): Seq[EngineInstance] = DB localTx  implicit session =>
     sql"""
     SELECT
       id,
@@ -113,7 +110,6 @@ class JDBCEngineInstances(
       algorithmsParams,
       servingParams
     FROM $tableName""".map(resultToEngineInstance).list().apply()
-  }
 
   def getLatestCompleted(engineId: String,
                          engineVersion: String,
@@ -122,7 +118,7 @@ class JDBCEngineInstances(
 
   def getCompleted(engineId: String,
                    engineVersion: String,
-                   engineVariant: String): Seq[EngineInstance] = DB localTx {
+                   engineVariant: String): Seq[EngineInstance] = DB localTx
     implicit s =>
       sql"""
     SELECT
@@ -148,9 +144,8 @@ class JDBCEngineInstances(
       engineVersion = $engineVersion AND
       engineVariant = $engineVariant
     ORDER BY startTime DESC""".map(resultToEngineInstance).list().apply()
-  }
 
-  def update(i: EngineInstance): Unit = DB localTx { implicit session =>
+  def update(i: EngineInstance): Unit = DB localTx  implicit session =>
     sql"""
     update $tableName set
       status = ${i.status},
@@ -168,14 +163,12 @@ class JDBCEngineInstances(
       algorithmsParams = ${i.algorithmsParams},
       servingParams = ${i.servingParams}
     where id = ${i.id}""".update().apply()
-  }
 
-  def delete(id: String): Unit = DB localTx { implicit session =>
+  def delete(id: String): Unit = DB localTx  implicit session =>
     sql"DELETE FROM $tableName WHERE id = $id".update().apply()
-  }
 
   /** Convert JDBC results to [[EngineInstance]] */
-  def resultToEngineInstance(rs: WrappedResultSet): EngineInstance = {
+  def resultToEngineInstance(rs: WrappedResultSet): EngineInstance =
     EngineInstance(id = rs.string("id"),
                    status = rs.string("status"),
                    startTime = rs.jodaDateTime("startTime"),
@@ -191,5 +184,3 @@ class JDBCEngineInstances(
                    preparatorParams = rs.string("preparatorParams"),
                    algorithmsParams = rs.string("algorithmsParams"),
                    servingParams = rs.string("servingParams"))
-  }
-}

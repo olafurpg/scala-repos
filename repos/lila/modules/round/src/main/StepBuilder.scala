@@ -9,7 +9,7 @@ import lila.socket.Step
 
 import play.api.libs.json._
 
-object StepBuilder {
+object StepBuilder
 
   private val logger = lila.round.logger.branch("StepBuilder")
 
@@ -18,8 +18,8 @@ object StepBuilder {
             variant: Variant,
             a: Option[(Pgn, Analysis)],
             initialFen: String,
-            withOpening: Boolean): JsArray = {
-    chess.Replay.gameWhileValid(pgnMoves, initialFen, variant) match {
+            withOpening: Boolean): JsArray =
+    chess.Replay.gameWhileValid(pgnMoves, initialFen, variant) match
       case (games, error) =>
         error foreach logChessError(id)
         val lastPly = games.lastOption.??(_.turns)
@@ -27,58 +27,52 @@ object StepBuilder {
           if (withOpening && Variant.openingSensibleVariants(variant))
             FullOpeningDB.findByFen
           else _ => None
-        val steps = games.map { g =>
+        val steps = games.map  g =>
           val fen = Forsyth >> g
           Step(ply = g.turns,
-               move = for {
+               move = for
                  uci <- g.board.history.lastMove
                  san <- g.pgnMoves.lastOption
-               } yield Step.Move(uci, san),
+               yield Step.Move(uci, san),
                fen = fen,
                check = g.situation.check,
                dests = None,
                opening = openingOf(fen),
                drops = None,
                crazyData = g.situation.board.crazyData)
-        }
         JsArray(
-            a.fold[Seq[Step]](steps) {
+            a.fold[Seq[Step]](steps)
             case (pgn, analysis) =>
               applyAnalysisAdvices(id,
                                    applyAnalysisEvals(steps, analysis),
                                    pgn,
                                    analysis,
                                    variant)
-          }
               .map(_.toJson))
-    }
-  }
 
   private def applyAnalysisEvals(
       steps: List[Step], analysis: Analysis): List[Step] =
-    steps.zipWithIndex map {
+    steps.zipWithIndex map
       case (step, index) =>
-        analysis.infos.lift(index - 1).fold(step) { info =>
+        analysis.infos.lift(index - 1).fold(step)  info =>
           step.copy(eval = Step
                   .Eval(cp = info.score.map(_.ceiled.centipawns),
                         mate = info.mate,
                         best = info.best)
                   .some)
-        }
-    }
 
   private def applyAnalysisAdvices(gameId: String,
                                    steps: List[Step],
                                    pgn: Pgn,
                                    analysis: Analysis,
                                    variant: Variant): List[Step] =
-    analysis.advices.foldLeft(steps) {
+    analysis.advices.foldLeft(steps)
       case (steps, ad) =>
         val index = ad.ply - analysis.startPly
-        (for {
+        (for
           before <- steps lift (index - 1)
           after <- steps lift index
-        } yield
+        yield
           steps
             .updated(index,
                      after
@@ -92,36 +86,29 @@ object StepBuilder {
                                      before,
                                      ad.info,
                                      variant).toList :: after.variations))) | steps
-    }
 
   private def makeVariation(gameId: String,
                             fromStep: Step,
                             info: Info,
-                            variant: Variant): List[Step] = {
-    chess.Replay.gameWhileValid(info.variation take 20, fromStep.fen, variant) match {
+                            variant: Variant): List[Step] =
+    chess.Replay.gameWhileValid(info.variation take 20, fromStep.fen, variant) match
       case (games, error) =>
         error foreach logChessError(gameId)
         val lastPly = games.lastOption.??(_.turns)
-        games.drop(1).map { g =>
+        games.drop(1).map  g =>
           Step(ply = g.turns,
-               move = for {
+               move = for
                  uci <- g.board.history.lastMove
                  san <- g.pgnMoves.lastOption
-               } yield Step.Move(uci, san),
+               yield Step.Move(uci, san),
                fen = Forsyth >> g,
                check = g.situation.check,
                dests = None,
                drops = None,
                crazyData = g.situation.board.crazyData)
-        }
-    }
-  }
 
   private val logChessError = (id: String) =>
     (err: String) =>
-      {
         val path = if (id == "synthetic") "analysis" else id
         logger.info(
             s"http://lichess.org/$path ${err.lines.toList.headOption | "?"}")
-  }
-}

@@ -19,7 +19,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * refactor a lot of code at once, synchronous methods are still available but should be
   * avoided in new code.
   */
-trait TaskTracker {
+trait TaskTracker
 
   def appTasksLaunchedSync(appId: PathId): Iterable[Task]
   def appTasksSync(appId: PathId): Iterable[Task]
@@ -44,65 +44,58 @@ trait TaskTracker {
   def hasAppTasksSync(appId: PathId): Boolean
   def hasAppTasks(appId: PathId)(
       implicit ec: ExecutionContext): Future[Boolean]
-}
 
-object TaskTracker {
+object TaskTracker
 
   /**
     * Contains all tasks grouped by app ID.
     */
   case class TasksByApp private (
-      appTasksMap: Map[PathId, TaskTracker.AppTasks]) {
+      appTasksMap: Map[PathId, TaskTracker.AppTasks])
     import TasksByApp._
 
     def allAppIdsWithTasks: Set[PathId] = appTasksMap.keySet
 
     def hasAppTasks(appId: PathId): Boolean = appTasksMap.contains(appId)
 
-    def appTasks(appId: PathId): Iterable[Task] = {
+    def appTasks(appId: PathId): Iterable[Task] =
       appTasksMap.get(appId).map(_.tasks).getOrElse(Iterable.empty)
-    }
 
-    def marathonAppTasks(appId: PathId): Iterable[MarathonTask] = {
+    def marathonAppTasks(appId: PathId): Iterable[MarathonTask] =
       appTasksMap.get(appId).map(_.marathonTasks).getOrElse(Iterable.empty)
-    }
 
     def marathonTask(taskId: Task.Id): Option[MarathonTask] =
-      for {
+      for
         app <- appTasksMap.get(taskId.appId)
         task <- app.taskMap.get(taskId)
-      } yield task
+      yield task
 
     def task(taskId: Task.Id): Option[Task] =
-      for {
+      for
         app <- appTasksMap.get(taskId.appId)
         taskState <- app.taskStateMap.get(taskId)
-      } yield taskState
+      yield taskState
 
     def allTasks: Iterable[Task] = appTasksMap.values.view.flatMap(_.tasks)
 
     private[tracker] def updateApp(appId: PathId)(
-        update: TaskTracker.AppTasks => TaskTracker.AppTasks): TasksByApp = {
+        update: TaskTracker.AppTasks => TaskTracker.AppTasks): TasksByApp =
       val updated = update(appTasksMap(appId))
-      if (updated.isEmpty) {
+      if (updated.isEmpty)
         log.info(s"Removed app [$appId] from tracker")
         copy(appTasksMap = appTasksMap - appId)
-      } else {
+      else
         log.debug(
             s"Updated app [$appId], currently ${updated.taskMap.size} tasks in total.")
         copy(appTasksMap = appTasksMap + (appId -> updated))
-      }
-    }
-  }
 
-  object TasksByApp {
+  object TasksByApp
     private val log = LoggerFactory.getLogger(getClass)
 
     def of(appTasks: collection.immutable.Map[PathId, TaskTracker.AppTasks])
-      : TasksByApp = {
+      : TasksByApp =
       new TasksByApp(
           appTasks.withDefault(appId => TaskTracker.AppTasks(appId)))
-    }
 
     def of(apps: TaskTracker.AppTasks*): TasksByApp =
       of(Map(apps.map(app => app.appId -> app): _*))
@@ -110,15 +103,13 @@ object TaskTracker {
     def forTasks(tasks: Task*): TasksByApp = of(
         tasks
           .groupBy(_.appId)
-          .map {
+          .map
             case (appId, appTasks) =>
               appId -> AppTasks.forTasks(appId, appTasks)
-          }
       )
 
     def empty: TasksByApp =
       of(collection.immutable.Map.empty[PathId, TaskTracker.AppTasks])
-  }
 
   /**
     * Contains only the tasks of the app with the given app ID.
@@ -127,7 +118,7 @@ object TaskTracker {
     * @param taskStateMap The tasks of this app by task ID. FIXME: change keys to Task.TaskID
     */
   case class AppTasks(
-      appId: PathId, taskStateMap: Map[Task.Id, Task] = Map.empty) {
+      appId: PathId, taskStateMap: Map[Task.Id, Task] = Map.empty)
 
     def isEmpty: Boolean = taskMap.isEmpty
     def contains(taskId: Task.Id): Boolean = taskMap.contains(taskId)
@@ -136,19 +127,15 @@ object TaskTracker {
     def tasks: Iterable[Task] = taskStateMap.values
     def marathonTasks: Iterable[MarathonTask] = taskMap.values
 
-    private[tracker] def withTask(task: Task): AppTasks = {
+    private[tracker] def withTask(task: Task): AppTasks =
       copy(taskStateMap = taskStateMap + (task.taskId -> task))
-    }
 
     private[tracker] def withoutTask(taskId: Task.Id): AppTasks =
       copy(taskStateMap = taskStateMap - taskId)
-  }
 
-  object AppTasks {
+  object AppTasks
     def apply(appId: PathId, tasks: Iterable[MarathonTask]): AppTasks =
       AppTasks.forTasks(appId, tasks.map(TaskSerializer.fromProto(_)))
     def forTasks(appId: PathId, tasks: Iterable[Task]): AppTasks =
       AppTasks(
           appId, tasks.map(taskState => taskState.taskId -> taskState).toMap)
-  }
-}

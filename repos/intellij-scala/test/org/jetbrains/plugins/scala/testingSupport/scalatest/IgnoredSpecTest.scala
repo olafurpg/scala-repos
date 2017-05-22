@@ -4,7 +4,7 @@ package org.jetbrains.plugins.scala.testingSupport.scalatest
   * @author Roman.Shein
   * @since 22.01.2015.
   */
-trait IgnoredSpecTest extends ScalaTestTestCase {
+trait IgnoredSpecTest extends ScalaTestTestCase
   val ignoredTestPath: List[String] = List(
       "[root]",
       "IgnoredTestSpec",
@@ -13,7 +13,7 @@ trait IgnoredSpecTest extends ScalaTestTestCase {
   val succeededTestPath: List[String] = List(
       "[root]", "IgnoredTestSpec", "An IgnoredTestSpec", "should run tests")
 
-  def testIgnoredTest(): Unit = {
+  def testIgnoredTest(): Unit =
     addFileToProject(
         "IgnoredTest.scala",
         """
@@ -46,5 +46,3 @@ trait IgnoredSpecTest extends ScalaTestTestCase {
         root =>
           checkResultTreeHasExactNamedPath(root, succeededTestPath: _*) &&
           checkResultTreeHasExactNamedPath(root, ignoredTestPath: _*))
-  }
-}

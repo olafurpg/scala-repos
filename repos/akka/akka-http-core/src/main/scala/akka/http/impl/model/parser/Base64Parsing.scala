@@ -22,7 +22,7 @@ import akka.parboiled2._
 /**
   * Rules for parsing Base-64 encoded strings.
   */
-private[parser] trait Base64Parsing {
+private[parser] trait Base64Parsing
   this: Parser ⇒
   import Base64Parsing._
 
@@ -56,20 +56,15 @@ private[parser] trait Base64Parsing {
     * stack using the given codec.
     */
   def base64StringOrBlock(
-      alphabet: CharPredicate, decoder: Decoder): Rule1[Array[Byte]] = {
+      alphabet: CharPredicate, decoder: Decoder): Rule1[Array[Byte]] =
     val start = cursor
-    rule {
-      oneOrMore(alphabet) ~ run {
-        decoder(input.sliceCharArray(start, cursor)) match {
+    rule
+      oneOrMore(alphabet) ~ run
+        decoder(input.sliceCharArray(start, cursor)) match
           case null ⇒ MISMATCH
           case bytes ⇒ push(bytes)
-        }
-      }
-    }
-  }
-}
 
-object Base64Parsing {
+object Base64Parsing
   type Decoder = Array[Char] ⇒ Array[Byte]
 
   val rfc2045Alphabet = CharPredicate(Base64.rfc2045().getAlphabet).asMaskBased
@@ -85,4 +80,3 @@ object Base64Parsing {
     codec.decodeFast(chars)
   def decodeBlock(codec: Base64)(chars: Array[Char]): Array[Byte] =
     codec.decode(chars)
-}

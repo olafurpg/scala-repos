@@ -17,7 +17,7 @@ import org.jetbrains.sbt.resolvers.SbtResolverIndexesManager
   * @since 7/17/14.
   */
 abstract class CompletionTestBase
-    extends completion.CompletionTestBase with MockSbt {
+    extends completion.CompletionTestBase with MockSbt
 
   override def folderPath = super.folderPath + "Sbt/"
   override def testFileExt = ".sbt"
@@ -27,7 +27,7 @@ abstract class CompletionTestBase
     * Instead of using original file copy its contents into
     * mock file prepending implicit SBT imports
     */
-  override def loadFile = {
+  override def loadFile =
     val fileName = getTestName(false) + testFileExt
     val filePath = folderPath + fileName
     val file = LocalFileSystem.getInstance.findFileByPath(
@@ -40,22 +40,19 @@ abstract class CompletionTestBase
     val mockFile = new LightVirtualFile(fileName, fileText)
     assert(mockFile != null, "Mock file can not be created")
     (fileName, mockFile)
-  }
 
-  override def loadAndSetFileText(filePath: String, file: VirtualFile) = {
+  override def loadAndSetFileText(filePath: String, file: VirtualFile) =
     val fileText = new String(file.contentsToByteArray())
     configureFromFileTextAdapter(filePath, fileText)
     fileText
-  }
 
-  override def checkResult(got: Array[String], _expected: String) {
+  override def checkResult(got: Array[String], _expected: String)
     import scala.collection.JavaConversions._
     val expected = _expected.split("\n")
     UsefulTestCase.assertContainsElements[String](
         got.toSet.toSeq, expected.toSeq)
-  }
 
-  override def setUp() {
+  override def setUp()
     super.setUpWithoutScalaLib()
     addSbtAsModuleDependency(getModuleAdapter)
     inWriteAction(
@@ -64,10 +61,7 @@ abstract class CompletionTestBase
           .asInstanceOf[StartupManagerImpl]
           .startCacheUpdate())
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
-  }
 
-  override def tearDown(): Unit = {
+  override def tearDown(): Unit =
     super.tearDown()
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
-  }
-}

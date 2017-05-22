@@ -13,26 +13,25 @@ import org.jetbrains.sbt.resolvers.{SbtResolver, SbtResolverIndexesManager}
   * @author Nikolay Obedin
   * @since 6/9/15.
   */
-class SbtModuleDataServiceTest extends ProjectDataServiceTestCase {
+class SbtModuleDataServiceTest extends ProjectDataServiceTestCase
 
   import ExternalSystemDataDsl._
 
   private def generateProject(
       imports: Seq[String],
       resolvers: Set[SbtResolver]): DataNode[ProjectData] =
-    new project {
+    new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
-      modules += new javaModule {
+      modules += new javaModule
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
         arbitraryNodes += new SbtModuleNode(imports, resolvers)
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
-  def doTest(imports: Seq[String], resolvers: Set[SbtResolver]): Unit = {
+  def doTest(imports: Seq[String], resolvers: Set[SbtResolver]): Unit =
     FileUtil.delete(SbtResolverIndexesManager.DEFAULT_INDEXES_DIR)
     importProjectData(generateProject(imports, resolvers))
     val module =
@@ -43,7 +42,6 @@ class SbtModuleDataServiceTest extends ProjectDataServiceTestCase {
 
     assert(SbtModule.getResolversFrom(module) == resolvers)
     resolvers.forall(r => SbtResolverIndexesManager().find(r).isDefined)
-  }
 
   def testEmptyImportsAndResolvers(): Unit =
     doTest(Seq.empty, Set.empty)
@@ -67,14 +65,12 @@ class SbtModuleDataServiceTest extends ProjectDataServiceTestCase {
                            "ivy resolver",
                            getProject.getBasePath)))
 
-  def testModuleIsNull(): Unit = {
-    val testProject = new project {
+  def testModuleIsNull(): Unit =
+    val testProject = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
       arbitraryNodes += new SbtModuleNode(Seq("some import"), Set.empty)
-    }.build.toDataNode
+    .build.toDataNode
 
     importProjectData(testProject)
-  }
-}

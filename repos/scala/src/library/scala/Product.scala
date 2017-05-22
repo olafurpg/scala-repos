@@ -17,7 +17,7 @@ package scala
   *  @version 1.0
   *  @since   2.3
   */
-trait Product extends Any with Equals {
+trait Product extends Any with Equals
 
   /** The n^th^ element of this product, 0-based.  In other words, for a
     *  product `A(x,,1,,, ..., x,,k,,)`, returns `x,,(n+1),,` where `0 < n < k`.
@@ -37,12 +37,11 @@ trait Product extends Any with Equals {
     *  @return     in the default implementation, an `Iterator[Any]`
     */
   def productIterator: Iterator[Any] =
-    new scala.collection.AbstractIterator[Any] {
+    new scala.collection.AbstractIterator[Any]
       private var c: Int = 0
       private val cmax = productArity
       def hasNext = c < cmax
       def next() = { val result = productElement(c); c += 1; result }
-    }
 
   /** A string used in the `toString` methods of derived classes.
     *  Implementations may override this method to prepend a string prefix
@@ -51,4 +50,3 @@ trait Product extends Any with Equals {
     *  @return   in the default implementation, the empty string
     */
   def productPrefix = ""
-}

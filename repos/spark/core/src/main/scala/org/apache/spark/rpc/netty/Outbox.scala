@@ -28,57 +28,47 @@ import org.apache.spark.internal.Logging
 import org.apache.spark.network.client.{RpcResponseCallback, TransportClient}
 import org.apache.spark.rpc.{RpcAddress, RpcEnvStoppedException}
 
-private[netty] sealed trait OutboxMessage {
+private[netty] sealed trait OutboxMessage
 
   def sendWith(client: TransportClient): Unit
 
   def onFailure(e: Throwable): Unit
-}
 
 private[netty] case class OneWayOutboxMessage(content: ByteBuffer)
-    extends OutboxMessage with Logging {
+    extends OutboxMessage with Logging
 
-  override def sendWith(client: TransportClient): Unit = {
+  override def sendWith(client: TransportClient): Unit =
     client.send(content)
-  }
 
-  override def onFailure(e: Throwable): Unit = {
-    e match {
+  override def onFailure(e: Throwable): Unit =
+    e match
       case e1: RpcEnvStoppedException => logWarning(e1.getMessage)
       case e1: Throwable => logWarning(s"Failed to send one-way RPC.", e1)
-    }
-  }
-}
 
 private[netty] case class RpcOutboxMessage(content: ByteBuffer,
                                            _onFailure: (Throwable) => Unit,
                                            _onSuccess: (TransportClient,
                                            ByteBuffer) => Unit)
-    extends OutboxMessage with RpcResponseCallback {
+    extends OutboxMessage with RpcResponseCallback
 
   private var client: TransportClient = _
   private var requestId: Long = _
 
-  override def sendWith(client: TransportClient): Unit = {
+  override def sendWith(client: TransportClient): Unit =
     this.client = client
     this.requestId = client.sendRpc(content, this)
-  }
 
-  def onTimeout(): Unit = {
+  def onTimeout(): Unit =
     require(client != null, "TransportClient has not yet been set.")
     client.removeRpcRequest(requestId)
-  }
 
-  override def onFailure(e: Throwable): Unit = {
+  override def onFailure(e: Throwable): Unit =
     _onFailure(e)
-  }
 
-  override def onSuccess(response: ByteBuffer): Unit = {
+  override def onSuccess(response: ByteBuffer): Unit =
     _onSuccess(client, response)
-  }
-}
 
-private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
+private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress)
 
   outbox => // Give this an alias so we can use it more clearly in closures.
 
@@ -108,93 +98,74 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
     * Send a message. If there is no active connection, cache it and launch a new connection. If
     * [[Outbox]] is stopped, the sender will be notified with a [[SparkException]].
     */
-  def send(message: OutboxMessage): Unit = {
-    val dropped = synchronized {
-      if (stopped) {
+  def send(message: OutboxMessage): Unit =
+    val dropped = synchronized
+      if (stopped)
         true
-      } else {
+      else
         messages.add(message)
         false
-      }
-    }
-    if (dropped) {
+    if (dropped)
       message.onFailure(
           new SparkException("Message is dropped because Outbox is stopped"))
-    } else {
+    else
       drainOutbox()
-    }
-  }
 
   /**
     * Drain the message queue. If there is other draining thread, just exit. If the connection has
     * not been established, launch a task in the `nettyEnv.clientConnectionExecutor` to setup the
     * connection.
     */
-  private def drainOutbox(): Unit = {
+  private def drainOutbox(): Unit =
     var message: OutboxMessage = null
-    synchronized {
-      if (stopped) {
+    synchronized
+      if (stopped)
         return
-      }
-      if (connectFuture != null) {
+      if (connectFuture != null)
         // We are connecting to the remote address, so just exit
         return
-      }
-      if (client == null) {
+      if (client == null)
         // There is no connect task but client is null, so we need to launch the connect task.
         launchConnectTask()
         return
-      }
-      if (draining) {
+      if (draining)
         // There is some thread draining, so just exit
         return
-      }
       message = messages.poll()
-      if (message == null) {
+      if (message == null)
         return
-      }
       draining = true
-    }
-    while (true) {
-      try {
+    while (true)
+      try
         val _client = synchronized { client }
-        if (_client != null) {
+        if (_client != null)
           message.sendWith(_client)
-        } else {
+        else
           assert(stopped == true)
-        }
-      } catch {
+      catch
         case NonFatal(e) =>
           handleNetworkFailure(e)
           return
-      }
-      synchronized {
-        if (stopped) {
+      synchronized
+        if (stopped)
           return
-        }
         message = messages.poll()
-        if (message == null) {
+        if (message == null)
           draining = false
           return
-        }
-      }
-    }
-  }
 
-  private def launchConnectTask(): Unit = {
+  private def launchConnectTask(): Unit =
     connectFuture = nettyEnv.clientConnectionExecutor.submit(
-        new Callable[Unit] {
+        new Callable[Unit]
 
-      override def call(): Unit = {
-        try {
+      override def call(): Unit =
+        try
           val _client = nettyEnv.createClient(address)
-          outbox.synchronized {
+          outbox.synchronized
             client = _client
-            if (stopped) {
+            if (stopped)
               closeClient()
-            }
-          }
-        } catch {
+        catch
           case ie: InterruptedException =>
             // exit
             return
@@ -202,27 +173,22 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
             outbox.synchronized { connectFuture = null }
             handleNetworkFailure(e)
             return
-        }
         outbox.synchronized { connectFuture = null }
         // It's possible that no thread is draining now. If we don't drain here, we cannot send the
         // messages until the next message arrives.
         drainOutbox()
-      }
-    })
-  }
+    )
 
   /**
     * Stop [[Inbox]] and notify the waiting messages with the cause.
     */
-  private def handleNetworkFailure(e: Throwable): Unit = {
-    synchronized {
+  private def handleNetworkFailure(e: Throwable): Unit =
+    synchronized
       assert(connectFuture == null)
-      if (stopped) {
+      if (stopped)
         return
-      }
       stopped = true
       closeClient()
-    }
     // Remove this Outbox from nettyEnv so that the further messages will create a new Outbox along
     // with a new connection
     nettyEnv.removeOutbox(address)
@@ -232,44 +198,34 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
     // We always check `stopped` before updating messages, so here we can make sure no thread will
     // update messages and it's safe to just drain the queue.
     var message = messages.poll()
-    while (message != null) {
+    while (message != null)
       message.onFailure(e)
       message = messages.poll()
-    }
     assert(messages.isEmpty)
-  }
 
-  private def closeClient(): Unit = synchronized {
+  private def closeClient(): Unit = synchronized
     // Not sure if `client.close` is idempotent. Just for safety.
-    if (client != null) {
+    if (client != null)
       client.close()
-    }
     client = null
-  }
 
   /**
     * Stop [[Outbox]]. The remaining messages in the [[Outbox]] will be notified with a
     * [[SparkException]].
     */
-  def stop(): Unit = {
-    synchronized {
-      if (stopped) {
+  def stop(): Unit =
+    synchronized
+      if (stopped)
         return
-      }
       stopped = true
-      if (connectFuture != null) {
+      if (connectFuture != null)
         connectFuture.cancel(true)
-      }
       closeClient()
-    }
 
     // We always check `stopped` before updating messages, so here we can make sure no thread will
     // update messages and it's safe to just drain the queue.
     var message = messages.poll()
-    while (message != null) {
+    while (message != null)
       message.onFailure(
           new SparkException("Message is dropped because Outbox is stopped"))
       message = messages.poll()
-    }
-  }
-}

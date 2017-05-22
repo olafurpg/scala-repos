@@ -8,11 +8,11 @@ import akka.util.ByteString
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RecipeByteStrings extends RecipeSpec {
+class RecipeByteStrings extends RecipeSpec
 
-  "Recipes for bytestring streams" must {
+  "Recipes for bytestring streams" must
 
-    "have a working chunker" in {
+    "have a working chunker" in
       val rawBytes = Source(
           List(ByteString(1, 2),
                ByteString(3),
@@ -24,48 +24,41 @@ class RecipeByteStrings extends RecipeSpec {
       import akka.stream.stage._
 
       class Chunker(val chunkSize: Int)
-          extends GraphStage[FlowShape[ByteString, ByteString]] {
+          extends GraphStage[FlowShape[ByteString, ByteString]]
         val in = Inlet[ByteString]("Chunker.in")
         val out = Outlet[ByteString]("Chunker.out")
         override val shape = FlowShape.of(in, out)
 
         override def createLogic(
             inheritedAttributes: Attributes): GraphStageLogic =
-          new GraphStageLogic(shape) {
+          new GraphStageLogic(shape)
             private var buffer = ByteString.empty
 
-            setHandler(out, new OutHandler {
-              override def onPull(): Unit = {
+            setHandler(out, new OutHandler
+              override def onPull(): Unit =
                 if (isClosed(in)) emitChunk()
                 else pull(in)
-              }
-            })
-            setHandler(in, new InHandler {
-              override def onPush(): Unit = {
+            )
+            setHandler(in, new InHandler
+              override def onPush(): Unit =
                 val elem = grab(in)
                 buffer ++= elem
                 emitChunk()
-              }
 
-              override def onUpstreamFinish(): Unit = {
+              override def onUpstreamFinish(): Unit =
                 if (buffer.isEmpty) completeStage()
                 // elements left in buffer, keep accepting downstream pulls
                 // and push from buffer until buffer is emitted
-              }
-            })
+            )
 
-            private def emitChunk(): Unit = {
-              if (buffer.isEmpty) {
+            private def emitChunk(): Unit =
+              if (buffer.isEmpty)
                 if (isClosed(in)) completeStage()
                 else pull(in)
-              } else {
+              else
                 val (chunk, nextBuffer) = buffer.splitAt(chunkSize)
                 buffer = nextBuffer
                 push(out, chunk)
-              }
-            }
-          }
-      }
 
       val chunksStream = rawBytes.via(new Chunker(ChunkLimit))
       //#bytestring-chunker
@@ -77,40 +70,35 @@ class RecipeByteStrings extends RecipeSpec {
       chunks.forall(_.size <= 2) should be(true)
       chunks.fold(ByteString())(_ ++ _) should be(
           ByteString(1, 2, 3, 4, 5, 6, 7, 8, 9))
-    }
 
-    "have a working bytes limiter" in {
+    "have a working bytes limiter" in
       val SizeLimit = 9
 
       //#bytes-limiter
       import akka.stream.stage._
       class ByteLimiter(val maximumBytes: Long)
-          extends GraphStage[FlowShape[ByteString, ByteString]] {
+          extends GraphStage[FlowShape[ByteString, ByteString]]
         val in = Inlet[ByteString]("ByteLimiter.in")
         val out = Outlet[ByteString]("ByteLimiter.out")
         override val shape = FlowShape.of(in, out)
 
         override def createLogic(
             inheritedAttributes: Attributes): GraphStageLogic =
-          new GraphStageLogic(shape) {
+          new GraphStageLogic(shape)
             private var count = 0
 
-            setHandlers(in, out, new InHandler with OutHandler {
+            setHandlers(in, out, new InHandler with OutHandler
 
-              override def onPull(): Unit = {
+              override def onPull(): Unit =
                 pull(in)
-              }
 
-              override def onPush(): Unit = {
+              override def onPush(): Unit =
                 val chunk = grab(in)
                 count += chunk.size
                 if (count > maximumBytes)
                   failStage(new IllegalStateException("Too much bytes"))
                 else push(out, chunk)
-              }
-            })
-          }
-      }
+            )
 
       val limiter = Flow[ByteString].via(new ByteLimiter(SizeLimit))
       //#bytes-limiter
@@ -131,13 +119,11 @@ class RecipeByteStrings extends RecipeSpec {
         .fold(ByteString())(_ ++ _) should be(
           ByteString(1, 2, 3, 4, 5, 6, 7, 8, 9))
 
-      an[IllegalStateException] must be thrownBy {
+      an[IllegalStateException] must be thrownBy
         Await.result(bytes2.via(limiter).limit(10).runWith(Sink.seq),
                      3.seconds)
-      }
-    }
 
-    "demonstrate compacting" in {
+    "demonstrate compacting" in
 
       val data = Source(
           List(ByteString(1, 2),
@@ -152,6 +138,3 @@ class RecipeByteStrings extends RecipeSpec {
       Await
         .result(compacted.limit(10).runWith(Sink.seq), 3.seconds)
         .forall(_.isCompact) should be(true)
-    }
-  }
-}

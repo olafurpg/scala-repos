@@ -1,14 +1,12 @@
-class InnerCompanionTraitRename {
+class InnerCompanionTraitRename
   sealed trait Mode
-  object Mode {
+  object Mode
     case object DropAllCreate extends Mode
     case object DropCreate extends Mode
     case object Create extends Mode
     case object None extends Mode
-  }
 
   class Instance(mode: /*caret*/ Mode = Mode.None)
-}
 /*
 class InnerCompanionTraitRename {
   sealed trait NameAfterRename

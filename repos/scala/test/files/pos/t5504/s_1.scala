@@ -1,4 +1,3 @@
 // a.scala
-package object foo {
+package object foo
   val m: List[_] = Nil
-}

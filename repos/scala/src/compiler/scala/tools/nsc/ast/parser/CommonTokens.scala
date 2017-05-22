@@ -2,7 +2,7 @@ package scala.tools.nsc
 package ast.parser
 
 /** Common code between Scala's Tokens and JavaTokens. */
-abstract class CommonTokens {
+abstract class CommonTokens
 
   def isIdentifier(code: Int): Boolean
   def isLiteral(code: Int): Boolean
@@ -109,4 +109,3 @@ abstract class CommonTokens {
   // S: <special symbols> = 130 - 139
   // J: <special symbols> = 140 - 179
   // J: <primitive types> = 180 - 189
-}

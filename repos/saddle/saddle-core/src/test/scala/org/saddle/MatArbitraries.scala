@@ -17,23 +17,22 @@ package org.saddle
 
 import org.scalacheck.Gen
 
-object MatArbitraries {
+object MatArbitraries
 
   // Generates Mat instance up to 10x10 with entries between -1e3/+1e3 and no NAs
   def matDouble: Gen[Mat[Double]] =
-    for {
+    for
       r <- Gen.choose(0, 10)
       c <- Gen.choose(0, 10)
       lst <- Gen.listOfN(r * c, Gen.chooseNum(-1e3, 1e3))
-    } yield Mat(r, c, lst.toArray)
+    yield Mat(r, c, lst.toArray)
 
   // Same, but with 10% NAs
   def matDoubleWithNA: Gen[Mat[Double]] =
-    for {
+    for
       r <- Gen.choose(0, 10)
       c <- Gen.choose(0, 10)
       lst <- Gen.listOfN(
           r * c,
           Gen.frequency((9, Gen.chooseNum(-1e3, 1e3)), (1, na.to[Double])))
-    } yield Mat(r, c, lst.toArray)
-}
+    yield Mat(r, c, lst.toArray)

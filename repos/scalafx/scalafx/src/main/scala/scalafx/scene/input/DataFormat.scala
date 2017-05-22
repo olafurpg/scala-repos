@@ -35,7 +35,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.input.InputIncludes.jfxDataFormat2sfx
 
-object DataFormat {
+object DataFormat
 
   implicit def sfxDataFormat2jfx(ie: DataFormat): jfxsi.DataFormat =
     if (ie != null) ie.delegate else null
@@ -75,7 +75,6 @@ object DataFormat {
     * Represents a URL, encoded as a String
     */
   val Url: DataFormat = jfxsi.DataFormat.URL
-}
 
 /**
   * Data format identifier used as means of identifying the data stored on a clipboard/dragboard.
@@ -92,7 +91,7 @@ object DataFormat {
   */
 class DataFormat(
     override val delegate: jfxsi.DataFormat = new jfxsi.DataFormat)
-    extends SFXDelegate[jfxsi.DataFormat] {
+    extends SFXDelegate[jfxsi.DataFormat]
 
   /**
     * Create a new DataFormat, specifying the set of ids that are associated with this data format.
@@ -105,4 +104,3 @@ class DataFormat(
     * Gets the unmodifiable set of identifiers for this DataFormat.
     */
   def identifiers: Set[String] = delegate.getIdentifiers
-}

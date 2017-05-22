@@ -1,10 +1,7 @@
-trait Functor[a] {
+trait Functor[a]
   type MyType [a]
-}
 
-object Test {
+object Test
   def listFunctor[a]: Functor[a] { type MyType[x] = List[x] } =
-    new Functor[a] {
+    new Functor[a]
       type MyType[t] = List[t]
-    }
-}

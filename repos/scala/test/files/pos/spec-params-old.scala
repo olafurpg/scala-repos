@@ -1,4 +1,4 @@
-class Foo[@specialized A : ClassManifest] {
+class Foo[@specialized A : ClassManifest]
 
   // conflicting in bounds, expect a normalized member calling m
   // and bridge + implementation in specialized subclasses
@@ -25,8 +25,6 @@ class Foo[@specialized A : ClassManifest] {
   def m6[@specialized B](x: B, y: A) =
     goal(y)
 
-  def goal(x: A) = {
+  def goal(x: A) =
     val xs = new Array[A](1)
     xs(0) = x
-  }
-}

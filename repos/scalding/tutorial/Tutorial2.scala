@@ -28,7 +28,7 @@ Check the output:
   cat tutorial/data/output2.txt
 
   **/
-class Tutorial2(args: Args) extends Job(args) {
+class Tutorial2(args: Args) extends Job(args)
 
   val input = TextLine("tutorial/data/hello.txt")
   val output = TextLine("tutorial/data/output2.txt")
@@ -47,9 +47,8 @@ class Tutorial2(args: Args) extends Job(args) {
     Unlike with a normal scala map{}, we always need to specify the
     types of the arguments to the anonymous function.
       **/
-    .map('line -> 'reversed) { line: String =>
+    .map('line -> 'reversed)  line: String =>
       line.reverse
-    }
 
     /**
     The map transformation in scalding is additive: the 'offset and 'line
@@ -59,4 +58,3 @@ class Tutorial2(args: Args) extends Job(args) {
       **/
     .project('reversed)
     .write(output)
-}

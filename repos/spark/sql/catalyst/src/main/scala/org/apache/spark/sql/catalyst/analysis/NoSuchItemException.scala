@@ -23,30 +23,24 @@ import org.apache.spark.sql.catalyst.catalog.ExternalCatalog.TablePartitionSpec
   * Thrown by a catalog when an item cannot be found. The analyzer will rethrow the exception
   * as an [[org.apache.spark.sql.AnalysisException]] with the correct position information.
   */
-abstract class NoSuchItemException extends Exception {
+abstract class NoSuchItemException extends Exception
   override def getMessage: String
-}
 
-class NoSuchDatabaseException(db: String) extends NoSuchItemException {
+class NoSuchDatabaseException(db: String) extends NoSuchItemException
   override def getMessage: String = s"Database $db not found"
-}
 
 class NoSuchTableException(db: String, table: String)
-    extends NoSuchItemException {
+    extends NoSuchItemException
   override def getMessage: String = s"Table $table not found in database $db"
-}
 
 class NoSuchPartitionException(
     db: String, table: String, spec: TablePartitionSpec)
-    extends NoSuchItemException {
+    extends NoSuchItemException
 
-  override def getMessage: String = {
+  override def getMessage: String =
     s"Partition not found in table $table database $db:\n" + spec.mkString(
         "\n")
-  }
-}
 
 class NoSuchFunctionException(db: String, func: String)
-    extends NoSuchItemException {
+    extends NoSuchItemException
   override def getMessage: String = s"Function $func not found in database $db"
-}

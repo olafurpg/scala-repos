@@ -18,20 +18,17 @@ package kafka.utils
 
 import joptsimple.OptionParser
 
-object ToolsUtils {
+object ToolsUtils
 
-  def validatePortOrDie(parser: OptionParser, hostPort: String) = {
+  def validatePortOrDie(parser: OptionParser, hostPort: String) =
     val hostPorts: Array[String] =
       if (hostPort.contains(',')) hostPort.split(",")
       else Array(hostPort)
-    val validHostPort = hostPorts.filter { hostPortData =>
+    val validHostPort = hostPorts.filter  hostPortData =>
       org.apache.kafka.common.utils.Utils.getPort(hostPortData) != null
-    }
     val isValid =
       !(validHostPort.isEmpty) && validHostPort.size == hostPorts.length
     if (!isValid)
       CommandLineUtils.printUsageAndDie(
           parser,
           "Please provide valid host:port like host1:9091,host2:9092\n ")
-  }
-}

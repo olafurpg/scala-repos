@@ -22,7 +22,7 @@ import java.sql.{Connection, Types}
 import org.apache.spark.sql.execution.datasources.jdbc.JdbcUtils
 import org.apache.spark.sql.types._
 
-private object PostgresDialect extends JdbcDialect {
+private object PostgresDialect extends JdbcDialect
 
   override def canHandle(url: String): Boolean =
     url.startsWith("jdbc:postgresql")
@@ -30,21 +30,20 @@ private object PostgresDialect extends JdbcDialect {
   override def getCatalystType(sqlType: Int,
                                typeName: String,
                                size: Int,
-                               md: MetadataBuilder): Option[DataType] = {
-    if (sqlType == Types.BIT && typeName.equals("bit") && size != 1) {
+                               md: MetadataBuilder): Option[DataType] =
+    if (sqlType == Types.BIT && typeName.equals("bit") && size != 1)
       Some(BinaryType)
-    } else if (sqlType == Types.OTHER) {
+    else if (sqlType == Types.OTHER)
       Some(StringType)
-    } else if (sqlType == Types.ARRAY) {
+    else if (sqlType == Types.ARRAY)
       val scale = md.build.getLong("scale").toInt
       // postgres array type names start with underscore
       toCatalystType(typeName.drop(1), size, scale).map(ArrayType(_))
-    } else None
-  }
+    else None
 
   private def toCatalystType(
       typeName: String, precision: Int, scale: Int): Option[DataType] =
-    typeName match {
+    typeName match
       case "bool" => Some(BooleanType)
       case "bit" => Some(BinaryType)
       case "int2" => Some(ShortType)
@@ -61,9 +60,8 @@ private object PostgresDialect extends JdbcDialect {
       case "date" => Some(DateType)
       case "numeric" | "decimal" => Some(DecimalType.bounded(precision, scale))
       case _ => None
-    }
 
-  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match {
+  override def getJDBCType(dt: DataType): Option[JdbcType] = dt match
     case StringType => Some(JdbcType("TEXT", Types.CHAR))
     case BinaryType => Some(JdbcType("BYTEA", Types.BINARY))
     case BooleanType => Some(JdbcType("BOOLEAN", Types.BOOLEAN))
@@ -81,14 +79,12 @@ private object PostgresDialect extends JdbcDialect {
       throw new IllegalArgumentException(
           s"Unsupported type in postgresql: $dt");
     case _ => None
-  }
 
-  override def getTableExistsQuery(table: String): String = {
+  override def getTableExistsQuery(table: String): String =
     s"SELECT 1 FROM $table LIMIT 1"
-  }
 
   override def beforeFetch(
-      connection: Connection, properties: Map[String, String]): Unit = {
+      connection: Connection, properties: Map[String, String]): Unit =
     super.beforeFetch(connection, properties)
 
     // According to the postgres jdbc documentation we need to be in autocommit=false if we actually
@@ -97,8 +93,5 @@ private object PostgresDialect extends JdbcDialect {
     //
     // See: https://jdbc.postgresql.org/documentation/head/query.html#query-with-cursor
     //
-    if (properties.getOrElse("fetchsize", "0").toInt > 0) {
+    if (properties.getOrElse("fetchsize", "0").toInt > 0)
       connection.setAutoCommit(false)
-    }
-  }
-}

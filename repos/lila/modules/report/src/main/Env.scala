@@ -8,7 +8,7 @@ import lila.common.PimpedConfig._
 final class Env(config: Config,
                 db: lila.db.Env,
                 system: ActorSystem,
-                hub: lila.hub.Env) {
+                hub: lila.hub.Env)
 
   private val CollectionReport = config getString "collection.report"
   private val ActorName = config getString "actor.name"
@@ -18,8 +18,8 @@ final class Env(config: Config,
   lazy val api = new ReportApi
 
   // api actor
-  system.actorOf(Props(new Actor {
-    def receive = {
+  system.actorOf(Props(new Actor
+    def receive =
       case lila.hub.actorApi.report.Cheater(userId, text) =>
         api.autoCheatReport(userId, text)
       case lila.hub.actorApi.report.Clean(userId) =>
@@ -34,17 +34,14 @@ final class Env(config: Config,
         api.autoInsultReport(userId, text)
       case lila.hub.actorApi.report.Booster(userId, accomplice) =>
         api.autoBoostReport(userId, accomplice)
-    }
-  }), name = ActorName)
+  ), name = ActorName)
 
   lazy val reportColl = db(CollectionReport)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "report" boot new Env(config = lila.common.PlayApp loadConfig "report",
                           db = lila.db.Env.current,
                           system = lila.common.PlayApp.system,
                           hub = lila.hub.Env.current)
-}

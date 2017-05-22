@@ -9,7 +9,7 @@ import org.scalacheck.Arbitrary.{arbitrary => getArbitrary}
 /**
   * Arbitrary instances for cats.data
   */
-object arbitrary extends ArbitraryInstances0 {
+object arbitrary extends ArbitraryInstances0
 
   // A special function1Arbitrary for testing operations like dropWhile specifically
   // in the context of Int => Boolean. Once scalacheck supports better Function1 arbitrary
@@ -42,9 +42,9 @@ object arbitrary extends ArbitraryInstances0 {
   implicit def iorArbitrary[A, B](
       implicit A: Arbitrary[A], B: Arbitrary[B]): Arbitrary[A Ior B] =
     Arbitrary(
-        Gen.oneOf(A.arbitrary.map(Ior.left), B.arbitrary.map(Ior.right), for {
+        Gen.oneOf(A.arbitrary.map(Ior.left), B.arbitrary.map(Ior.right), for
       a <- A.arbitrary; b <- B.arbitrary
-    } yield Ior.both(a, b)))
+    yield Ior.both(a, b)))
 
   implicit def kleisliArbitrary[F[_], A, B](
       implicit F: Arbitrary[F[B]]): Arbitrary[Kleisli[F, A, B]] =
@@ -102,10 +102,8 @@ object arbitrary extends ArbitraryInstances0 {
 
   implicit def function0Arbitrary[A : Arbitrary]: Arbitrary[() => A] =
     Arbitrary(getArbitrary[A].map(() => _))
-}
 
-private[discipline] sealed trait ArbitraryInstances0 {
+private[discipline] sealed trait ArbitraryInstances0
   implicit def writerTArbitrary[F[_], L, V](
       implicit F: Arbitrary[F[(L, V)]]): Arbitrary[WriterT[F, L, V]] =
     Arbitrary(F.arbitrary.map(WriterT(_)))
-}

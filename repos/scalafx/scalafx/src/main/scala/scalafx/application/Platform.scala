@@ -33,12 +33,11 @@ import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyBooleanProperty
 
 /** Application platform support, wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/application/Platform.html javafx.application.Platform]]. */
-object Platform {
+object Platform
 
   /** Causes the JavaFX application to terminate. */
-  def exit() {
+  def exit()
     jfxa.Platform.exit()
-  }
 
   /** Returns true if the calling thread is the JavaFX Application Thread. */
   def isFxApplicationThread: Boolean = jfxa.Platform.isFxApplicationThread
@@ -47,9 +46,8 @@ object Platform {
   def implicitExit: Boolean = jfxa.Platform.isImplicitExit
 
   /** Sets the implicitExit attribute to the specified value. */
-  def implicitExit_=(implicitExit: Boolean) {
+  def implicitExit_=(implicitExit: Boolean)
     jfxa.Platform.setImplicitExit(implicitExit)
-  }
 
   /** Queries whether a specific conditional feature is supported by the platform. */
   def isSupported(feature: ConditionalFeature) =
@@ -58,9 +56,8 @@ object Platform {
   /** Run the specified Runnable on the JavaFX Application Thread at some unspecified time in the future.
     * Returns immediately.
     */
-  def runLater(runnable: java.lang.Runnable) {
+  def runLater(runnable: java.lang.Runnable)
     jfxa.Platform.runLater(runnable)
-  }
 
   /** Run the specified code block on the JavaFX Application Thread at some unspecified time in the future.
     * Returns immediately.
@@ -72,14 +69,12 @@ object Platform {
     *   }
     * }}}
     */
-  def runLater[R](op: => R) {
+  def runLater[R](op: => R)
     runLater(
-        new Runnable {
-      def run() {
+        new Runnable
+      def run()
         op
-      }
-    })
-  }
+    )
 
   def isAccessibilityActive: Boolean = jfxa.Platform.isAccessibilityActive
 
@@ -97,4 +92,3 @@ object Platform {
     */
   def accessibilityActive: ReadOnlyBooleanProperty =
     jfxa.Platform.accessibilityActiveProperty
-}

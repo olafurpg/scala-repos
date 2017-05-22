@@ -32,7 +32,7 @@ import scala.collection.mutable
   */
 final class RingDeque[
     @specialized(Boolean, Int, Long, Double, Float, Short) A : ClassManifest](
-    _bound: Int) {
+    _bound: Int)
   val bound = _bound + 1
 
   private val ring = new Array[A](bound)
@@ -41,43 +41,36 @@ final class RingDeque[
 
   def isEmpty = front == rotate(back, -1)
 
-  def empty() {
+  def empty()
     back = rotate(front, 1)
-  }
 
-  def popFront(): A = {
+  def popFront(): A =
     val result = ring(front)
     moveFront(1)
     result
-  }
 
-  def pushFront(a: A) {
+  def pushFront(a: A)
     moveFront(-1)
     ring(front) = a
-  }
 
-  def removeFront(length: Int) {
+  def removeFront(length: Int)
     moveFront(length)
-  }
 
-  def popBack(): A = {
+  def popBack(): A =
     moveBack(-1)
     ring(rotate(back, -1))
-  }
 
-  def pushBack(a: A) {
+  def pushBack(a: A)
     ring(rotate(back, -1)) = a
     moveBack(1)
-  }
 
-  def removeBack(length: Int) {
+  def removeBack(length: Int)
     moveBack(-length)
-  }
 
   def length: Int =
     (if (back > front) back - front else (back + bound) - front) - 1
 
-  def toList: List[A] = {
+  def toList: List[A] =
     @inline
     @tailrec
     def buildList(i: Int, accum: List[A]): List[A] =
@@ -85,19 +78,15 @@ final class RingDeque[
       else buildList(i - 1, ring(i % bound) :: accum)
 
     buildList(front + length - 1, Nil)
-  }
 
   @inline
   private[this] def rotate(target: Int, delta: Int) =
     (target + delta + bound) % bound
 
   @inline
-  private[this] def moveFront(delta: Int) {
+  private[this] def moveFront(delta: Int)
     front = rotate(front, delta)
-  }
 
   @inline
-  private[this] def moveBack(delta: Int) {
+  private[this] def moveBack(delta: Int)
     back = rotate(back, delta)
-  }
-}

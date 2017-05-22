@@ -32,18 +32,15 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
-object AmbientLight {
+object AmbientLight
   implicit def sfxAmbientLight2jfx(al: AmbientLight): jfxs.AmbientLight =
     if (al != null) al.delegate else null
-}
 
 /** Defines an ambient light source object. Ambient light is a light source that seems to come from all directions. */
 class AmbientLight(
     override val delegate: jfxs.AmbientLight = new jfxs.AmbientLight())
-    extends LightBase(delegate) with SFXDelegate[jfxs.AmbientLight] {
+    extends LightBase(delegate) with SFXDelegate[jfxs.AmbientLight]
 
   /** Creates a new instance of `AmbientLight` class using the specified color. */
-  def this(color: Color) {
+  def this(color: Color)
     this(new jfxs.AmbientLight(color))
-  }
-}

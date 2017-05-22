@@ -1,8 +1,8 @@
 /** Illustrate the use of custom 'apply/update' methods. */
-object properties {
+object properties
 
   /** A mutable property whose getter and setter may be customized. */
-  case class Property[T](init: T) {
+  case class Property[T](init: T)
     private var value: T = init
 
     /** The getter function, defaults to identity. */
@@ -22,15 +22,13 @@ object properties {
 
     /** Change the setter */
     def set(newSetter: T => T) = { setter = newSetter; this }
-  }
 
-  class User {
+  class User
     // Create a property with custom getter and setter
-    val firstname = Property(""). /*!*/ get { v =>
+    val firstname = Property(""). /*!*/ get  v =>
       v.toUpperCase()
-    }. /*!*/ set { v =>
+    . /*!*/ set  v =>
       "Mr. " + v
-    }
     val lastname = Property("<noname>")
 
     /** Scala provides syntactic sugar for calling 'apply'. Simply
@@ -39,9 +37,8 @@ object properties {
       *  arguments.
       */
     override def toString() = firstname() + " " + lastname()
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val user1 = new User
 
     // Syntactic sugar for 'update': an assignment is translated to a
@@ -54,5 +51,3 @@ object properties {
 
     println("user1: " + user1)
     println("user2: " + user2)
-  }
-}

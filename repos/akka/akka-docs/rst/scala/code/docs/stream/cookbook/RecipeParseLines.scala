@@ -8,11 +8,11 @@ import scala.annotation.tailrec
 import scala.concurrent.Await
 import scala.concurrent.duration._
 
-class RecipeParseLines extends RecipeSpec {
+class RecipeParseLines extends RecipeSpec
 
-  "Recipe for parsing line from bytes" must {
+  "Recipe for parsing line from bytes" must
 
-    "work" in {
+    "work" in
       val rawData = Source(
           List(ByteString("Hello World"),
                ByteString("\r"),
@@ -34,6 +34,3 @@ class RecipeParseLines extends RecipeSpec {
                "Hello Akka!",
                "Hello Streams!",
                ""))
-    }
-  }
-}

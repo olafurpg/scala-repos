@@ -6,12 +6,12 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestTestCase
   * @author Roman.Shein
   * @since 10.02.2015.
   */
-trait FeatureSpecGenerator extends ScalaTestTestCase {
+trait FeatureSpecGenerator extends ScalaTestTestCase
   def featureSpecClassName = "FeatureSpecTest"
 
   def featureSpecFileName = featureSpecClassName + ".scala"
 
-  def addFeatureSpec() {
+  def addFeatureSpec()
     addFileToProject(
         featureSpecFileName,
         """
@@ -39,5 +39,3 @@ trait FeatureSpecGenerator extends ScalaTestTestCase {
         | feature("empty") {}
         |}
       """.stripMargin.trim())
-  }
-}

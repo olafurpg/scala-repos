@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
     |import scala.util.{Success, Failure}
@@ -9,4 +9,3 @@ object Test extends ReplTest {
     |def f3(b: Boolean) = if (b) Stream.Empty else new Stream.Cons(1, Stream.Empty)
     |def f4(b: Boolean) = if (b) Success(1) else Failure(new Exception(""))
     |""".stripMargin
-}

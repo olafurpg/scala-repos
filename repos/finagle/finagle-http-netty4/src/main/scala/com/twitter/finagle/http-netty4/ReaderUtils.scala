@@ -6,12 +6,12 @@ import com.twitter.io.{Buf, Reader}
 import com.twitter.util.{Future, Return}
 import io.netty.handler.codec.{http => NettyHttp}
 
-private[http4] object ReaderUtils {
+private[http4] object ReaderUtils
 
   /**
     * Serialize a http chunk into a Buf.
     */
-  def readChunk(chunk: Any): Future[Option[Buf]] = chunk match {
+  def readChunk(chunk: Any): Future[Option[Buf]] = chunk match
     case chunk: NettyHttp.LastHttpContent =>
       Future.None
 
@@ -23,7 +23,6 @@ private[http4] object ReaderUtils {
           new IllegalArgumentException(
               "invalid message \"%s\"".format(invalid))
       )
-  }
 
   /**
     * Translates a Buf into HttpContent. Beware: an empty buffer indicates end
@@ -40,15 +39,11 @@ private[http4] object ReaderUtils {
       r: Reader,
       // TODO Find a better number for bufSize, e.g. 32KiB - Buf overhead
       bufSize: Int = Int.MaxValue
-  ): Future[Unit] = {
-    r.read(bufSize).flatMap {
+  ): Future[Unit] =
+    r.read(bufSize).flatMap
       case None =>
         trans.write(NettyHttp.LastHttpContent.EMPTY_LAST_CONTENT)
       case Some(buf) =>
-        trans.write(chunkOfBuf(buf)).transform {
+        trans.write(chunkOfBuf(buf)).transform
           case Return(_) => streamChunks(trans, r, bufSize)
           case _ => Future(r.discard())
-        }
-    }
-  }
-}

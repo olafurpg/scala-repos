@@ -22,7 +22,7 @@ import org.scalatest.WordSpec
 import scala.collection.JavaConverters._
 import org.apache.hadoop.mapred.JobConf
 
-class ReplTest extends WordSpec {
+class ReplTest extends WordSpec
   import ReplImplicits._
   import ReplImplicitContext._
 
@@ -32,26 +32,24 @@ class ReplTest extends WordSpec {
   val tutorialData = "../tutorial/data"
   val helloPath = tutorialData + "/hello.txt"
 
-  def test() = {
+  def test() =
 
-    val suffix = mode match {
+    val suffix = mode match
       case _: CascadingLocal => "local"
       case _: HadoopMode => "hadoop"
-    }
     val testPath = "/tmp/scalding-repl/test/" + suffix + "/"
     val helloRef = List("Hello world", "Goodbye world")
 
-    "save -- TypedPipe[String]" in {
+    "save -- TypedPipe[String]" in
       val hello = TypedPipe.from(TextLine(helloPath))
       val out = TypedTsv[String](testPath + "output0.txt")
       hello.save(out)
 
       val output = out.toIterator.toList
       assert(output === helloRef)
-    }
 
-    "snapshot" should {
-      "only -- TypedPipe[String]" in {
+    "snapshot" should
+      "only -- TypedPipe[String]" in
         val hello = TypedPipe.from(TextLine(helloPath))
         val s: TypedPipe[String] = hello.snapshot
         // shallow verification that the snapshot was created correctly without
@@ -60,14 +58,12 @@ class ReplTest extends WordSpec {
         assert(s.toString.contains("IterablePipe") ||
             s.toString.contains("TypedPipeFactory"))
 
-        val pipeName = mode match {
+        val pipeName = mode match
           case m: HadoopMode => m.jobConf.get("hadoop.tmp.dir")
           case _ => "IterableSource"
-        }
         assert(s.toPipe(Fields.ALL).toString.contains(pipeName))
-      }
 
-      "can be mapped and saved -- TypedPipe[String]" in {
+      "can be mapped and saved -- TypedPipe[String]" in
         val s =
           TypedPipe.from(TextLine(helloPath)).flatMap(_.split("\\s+")).snapshot
 
@@ -78,9 +74,8 @@ class ReplTest extends WordSpec {
 
         val output = out.toIterator.toList
         assert(output === helloRef.flatMap(_.split("\\s+")).map(_.toLowerCase))
-      }
 
-      "tuples -- TypedPipe[(String,Int)]" in {
+      "tuples -- TypedPipe[(String,Int)]" in
         val s = TypedPipe
           .from(TextLine(helloPath))
           .flatMap(_.split("\\s+"))
@@ -91,24 +86,20 @@ class ReplTest extends WordSpec {
         assert(output === helloRef
               .flatMap(_.split("\\s+"))
               .map(w => (w.toLowerCase, w.length)))
-      }
 
-      "grouped -- Grouped[String,String]" which {
+      "grouped -- Grouped[String,String]" which
         val grp = TypedPipe.from(TextLine(helloPath)).groupBy(_.toLowerCase)
 
         val correct = helloRef.map(l => (l.toLowerCase, l))
 
-        "is explicit" in {
+        "is explicit" in
           (grp.snapshot.toList === correct)
-        }
 
         // Note: Must explicitly to toIterator because `grp.toList` resolves to `KeyedList.toList`
-        "is implicit" in {
+        "is implicit" in
           assert(grp.toIterator.toList === correct)
-        }
-      }
 
-      "joined -- CoGrouped[String, Long]" which {
+      "joined -- CoGrouped[String, Long]" which
         val linesByWord = TypedPipe
           .from(TextLine(helloPath))
           .flatMap(_.split("\\s+"))
@@ -124,29 +115,23 @@ class ReplTest extends WordSpec {
 
         val correct = Map("hello" -> 1.0, "goodbye" -> 3.0, "world" -> 4.0)
 
-        "is explicit" in {
+        "is explicit" in
           val s = grp.snapshot
           assert(s.toIterator.toMap === correct)
-        }
-        "is implicit" in {
+        "is implicit" in
           assert(grp.toIterator.toMap === correct)
-        }
-      }
 
-      "support toOption on ValuePipe" in {
+      "support toOption on ValuePipe" in
         val hello = TypedPipe.from(TextLine(helloPath))
         val res = hello.map(_.length).sum
         val correct = helloRef.map(_.length).sum
         assert(res.toOption === Some(correct))
-      }
-    }
 
-    "reset flow" in {
+    "reset flow" in
       resetFlowDef()
       assert(flowDef.getSources.asScala.isEmpty)
-    }
 
-    "run entire flow" in {
+    "run entire flow" in
       resetFlowDef()
       val hello = TypedPipe
         .from(TextLine(helloPath))
@@ -161,45 +146,34 @@ class ReplTest extends WordSpec {
 
       val words = out.toIterator.toSet
       assert(words === Set("hello", "world", "goodbye"))
-    }
 
-    "TypedPipe of a TextLine" should {
+    "TypedPipe of a TextLine" should
       val hello = TypedPipe.from(TextLine(helloPath))
-      "support toIterator" in {
-        hello.toIterator.foreach { line: String =>
+      "support toIterator" in
+        hello.toIterator.foreach  line: String =>
           assert(
               line.contains("Hello world") || line.contains("Goodbye world"))
-        }
-      }
-      "support toList" in {
+      "support toList" in
         assert(hello.toList === helloRef)
-      }
-    }
 
-    "toIterator should generate a snapshot for TypedPipe with" should {
+    "toIterator should generate a snapshot for TypedPipe with" should
       val hello = TypedPipe.from(TextLine(helloPath))
-      "flatMap" in {
+      "flatMap" in
         val out = hello.flatMap(_.split("\\s+")).toList
         assert(out === helloRef.flatMap(_.split("\\s+")))
-      }
-      "tuple" in {
+      "tuple" in
         assert(hello.map(l => (l, l.length)).toList === helloRef.map(
                 l => (l, l.length)))
-      }
-    }
-  }
 
-  "REPL in Local mode" should {
+  "REPL in Local mode" should
     mode = Local(strictSources = true)
     test()
-  }
 
-  "REPL in Hadoop mode" should {
+  "REPL in Hadoop mode" should
     mode = Hdfs(strict = true, new JobConf)
     test()
-  }
 
-  "findAllUpPath" should {
+  "findAllUpPath" should
     val root = Files.createTempDirectory("scalding-repl").toFile
     root.deleteOnExit()
 
@@ -209,20 +183,16 @@ class ReplTest extends WordSpec {
     val currentDirectory = new File(root, "arbitrary_directory")
     currentDirectory.mkdir()
 
-    "enumerate matching files" in {
+    "enumerate matching files" in
       root.setReadable(true)
 
       val actual = ScaldingILoop.findAllUpPath(
           currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List(matchingFile))
-    }
 
-    "ignore directories with restricted permissions" in {
+    "ignore directories with restricted permissions" in
       root.setReadable(false)
 
       val actual = ScaldingILoop.findAllUpPath(
           currentDirectory.getAbsolutePath)("this_matches")
       assert(actual === List.empty)
-    }
-  }
-}

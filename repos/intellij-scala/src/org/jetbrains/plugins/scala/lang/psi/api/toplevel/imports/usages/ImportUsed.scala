@@ -15,33 +15,28 @@ import com.intellij.psi.util.PsiTreeUtil
   *
   * @author ilyas
   */
-abstract sealed class ImportUsed(val e: PsiElement) {
+abstract sealed class ImportUsed(val e: PsiElement)
   override def toString: String = e.getText
 
   def qualName: Option[String]
-}
 
-object ImportUsed {
+object ImportUsed
   val key: Key[_root_.scala.collection.Set[ImportUsed]] =
     Key.create("scala.used.imports.key")
 
-  def unapply(importUsed: ImportUsed): Option[PsiElement] = {
+  def unapply(importUsed: ImportUsed): Option[PsiElement] =
     Some(importUsed.e)
-  }
-}
 
 /**
   * Class to mark whole import expression as used (qualified or ending with reference id)
   */
-case class ImportExprUsed(expr: ScImportExpr) extends ImportUsed(expr) {
-  override def qualName: Option[String] = {
+case class ImportExprUsed(expr: ScImportExpr) extends ImportUsed(expr)
+  override def qualName: Option[String] =
     if (expr.qualifier == null) None
     else if (expr.singleWildcard) Some(expr.qualifier.qualName + "._")
     else expr.reference.map(ref => expr.qualifier.qualName + "." + ref.refName)
-  }
 
   override def toString: String = "ImportExprUsed(" + super.toString + ")"
-}
 
 /**
   * Marks import selector as used <p>
@@ -71,15 +66,13 @@ case class ImportExprUsed(expr: ScImportExpr) extends ImportUsed(expr) {
   * reference to E may clash with some other in that place.
   *
   */
-case class ImportSelectorUsed(sel: ScImportSelector) extends ImportUsed(sel) {
-  override def qualName: Option[String] = {
+case class ImportSelectorUsed(sel: ScImportSelector) extends ImportUsed(sel)
+  override def qualName: Option[String] =
     val expr: ScImportExpr =
       PsiTreeUtil.getParentOfType(sel, classOf[ScImportExpr])
     expr.reference.map(ref => ref.qualName + "." + sel.reference.refName)
-  }
 
   override def toString: String = "ImportSelectorUsed(" + super.toString + ")"
-}
 
 /**
   * Marks import expression with trailing wildcard selector as used
@@ -88,11 +81,9 @@ case class ImportSelectorUsed(sel: ScImportSelector) extends ImportUsed(sel) {
   * import aaa.bbb.{A => B, C => _ , _}
   */
 case class ImportWildcardSelectorUsed(elem: ScImportExpr)
-    extends ImportUsed(elem) {
-  override def qualName: Option[String] = {
+    extends ImportUsed(elem)
+  override def qualName: Option[String] =
     elem.reference.map(ref => ref.qualName + "._")
-  }
 
   override def toString: String =
     "ImportWildcardSelectorUsed(" + super.toString + ")"
-}

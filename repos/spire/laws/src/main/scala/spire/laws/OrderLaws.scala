@@ -9,14 +9,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object OrderLaws {
-  def apply[A : Eq : Arbitrary] = new OrderLaws[A] {
+object OrderLaws
+  def apply[A : Eq : Arbitrary] = new OrderLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait OrderLaws[A] extends Laws {
+trait OrderLaws[A] extends Laws
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
@@ -46,6 +44,5 @@ trait OrderLaws[A] extends Laws {
       props: (String, Prop)*
   )
       extends DefaultRuleSet(name, parent, props: _*)
-}
 
 // vim: expandtab:ts=2:sw=2

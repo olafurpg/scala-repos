@@ -33,7 +33,7 @@ import scala.compat.Platform
   *
   *  @author Iulian Dragos, Burak Emir
   */
-trait Benchmark {
+trait Benchmark
 
   def show(arr: Array[Byte]): String =
     arr.mkString("[", ",", "]")
@@ -54,20 +54,18 @@ trait Benchmark {
     *  the execution times in milliseconds in reverse order of the execution.
     */
   def runBenchmark(noTimes: Int): List[Long] =
-    for (i <- List.range(1, noTimes + 1)) yield {
+    for (i <- List.range(1, noTimes + 1)) yield
       setUp
       val startTime = System.nanoTime
       var i = 0;
-      while (i < multiplier) {
+      while (i < multiplier)
         run()
         i += 1
-      }
       val stopTime = System.nanoTime
       tearDown
       Platform.collectGarbage
 
       (stopTime - startTime) / 1000000
-    }
 
   /** Prepare any data needed by the benchmark, but whose execution time
     *  should not be measured. This method is run before each call to the
@@ -96,20 +94,19 @@ trait Benchmark {
     * - optional argument `mult` specifies that the `n` runs are repeated
     *   `mult` times.
     */
-  def main(args: Array[String]) {
-    if (args.length > 0) {
+  def main(args: Array[String])
+    if (args.length > 0)
       val logFile = new java.io.OutputStreamWriter(System.out)
       if (args.length > 1) multiplier = args(1).toInt
       //logFile.write(prefix)
       val numbers: List[Long] = runBenchmark(args(0).toInt)
-      if (enableOutput) {
+      if (enableOutput)
         for (t <- numbers.init) logFile.write(t + "\t")
         logFile.write(numbers.last.toString)
 
         logFile.write(Platform.EOL)
         logFile.flush()
-      }
-    } else {
+    else
       println("Usage: scala benchmarks.program <runs> ")
       println("   or: scala benchmarks.program <runs> <multiplier>")
       println("""
@@ -117,6 +114,3 @@ trait Benchmark {
     <multiplier> causes the benchmark to be repeated <multiplier> times, each time for <runs>
     executions.
       """)
-    }
-  }
-}

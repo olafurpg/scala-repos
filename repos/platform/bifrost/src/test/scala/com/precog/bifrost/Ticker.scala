@@ -55,26 +55,22 @@ case class Schedule(at: Long, thunk: () => Any)
   * combination of these 2 classes allows the timing of future completion to be
   * synchronized a bit more.
   */
-class Ticker(ticks: AtomicLong) extends Actor {
+class Ticker(ticks: AtomicLong) extends Actor
   private var schedule: Map[Long, List[() => Any]] = Map.empty
 
-  def receive = {
+  def receive =
     case Tick =>
       val t = ticks.get()
-      schedule get t map { thunks =>
+      schedule get t map  thunks =>
         schedule = schedule - t
-        thunks.reverse foreach { t =>
+        thunks.reverse foreach  t =>
           t()
-        }
-      } getOrElse {
+      getOrElse
         ticks.getAndIncrement()
-      }
 
     case Schedule(n, thunk) =>
       val t = ticks.get() + n
       schedule = schedule + (t -> (thunk :: schedule.getOrElse(t, Nil)))
-  }
-}
 
 /**
   * This is a `Clock` whose time comes from an atomic long, which can be updated
@@ -83,16 +79,14 @@ class Ticker(ticks: AtomicLong) extends Actor {
   */
 class ManualClock(
     ticks: AtomicLong, start: DateTime = new DateTime, val duration: Long = 50)
-    extends Clock {
-  def now(): DateTime = {
+    extends Clock
+  def now(): DateTime =
     val cur = start.getMillis() + ticks.get() * duration
     new DateTime(cur)
-  }
 
   def instant(): Instant = new Instant(now().getMillis())
 
   def nanoTime(): Long = now().getMillis() * 1000
-}
 
 /**
   * This trait provides a way to schedule thunks for execution at somewhat
@@ -102,7 +96,7 @@ class ManualClock(
   * to `ticks`, which would presumably be used by the `Ticker` to keep track of
   * ticks processed.
   */
-trait SchedulableFuturesModule {
+trait SchedulableFuturesModule
   implicit def executionContext: ExecutionContext
 
   val ticks: AtomicLong = new AtomicLong
@@ -111,26 +105,20 @@ trait SchedulableFuturesModule {
 
   def ticker: ActorRef
 
-  def await[A, B](f: Future[A], atMost: Duration)(g: A => B): Future[B] = {
-    schedule(0) {
+  def await[A, B](f: Future[A], atMost: Duration)(g: A => B): Future[B] =
+    schedule(0)
       g(Await.result(f, atMost))
-    }
-  }
 
-  def schedule[A](n: Long)(f: => A): Future[A] = {
+  def schedule[A](n: Long)(f: => A): Future[A] =
     val promise = Promise[A]()
-    val thunk: () => Any = { () =>
-      try {
+    val thunk: () => Any =  () =>
+      try
         promise.success(f)
-      } catch {
+      catch
         case ex => promise.failure(ex)
-      }
-    }
 
     ticker ! Schedule(n, thunk)
 
     promise.future
-  }
 
   def waitFor(n: Long): Future[Unit] = schedule(n) { () }
-}

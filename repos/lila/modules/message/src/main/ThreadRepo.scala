@@ -9,7 +9,7 @@ import lila.db.api._
 import lila.db.Implicits._
 import tube.threadTube
 
-object ThreadRepo {
+object ThreadRepo
   import play.modules.reactivemongo.json._
 
   type ID = String
@@ -23,7 +23,7 @@ object ThreadRepo {
   def visibleByUser(user: ID, nb: Int): Fu[List[Thread]] =
     $find($query(visibleByUserQuery(user)) sort recentSort, nb)
 
-  def userUnreadIds(userId: String): Fu[List[String]] = {
+  def userUnreadIds(userId: String): Fu[List[String]] =
     import reactivemongo.bson._
     import reactivemongo.api.collections.bson.BSONBatchCommands.AggregationFramework._
     threadTube.coll
@@ -54,19 +54,16 @@ object ThreadRepo {
           ),
           allowDiskUse = false
       )
-      .map {
+      .map
         _.documents.headOption ?? { ~_.getAs[List[String]]("ids") }
-      }
-  }
 
-  def setRead(thread: Thread): Funit = {
-    List.fill(thread.nbUnread) {
+  def setRead(thread: Thread): Funit =
+    List.fill(thread.nbUnread)
       $update(
           $select(thread.id) ++ Json.obj("posts.isRead" -> false),
           $set("posts.$.isRead" -> true)
       )
-    }
-  }.sequenceFu.void
+  .sequenceFu.void
 
   def deleteFor(user: ID)(thread: ID) =
     $update($select(thread), $pull("visibleByUserIds", user))
@@ -84,4 +81,3 @@ object ThreadRepo {
   def visibleByUserQuery(user: String) = Json.obj("visibleByUserIds" -> user)
 
   val recentSort = $sort desc "updatedAt"
-}

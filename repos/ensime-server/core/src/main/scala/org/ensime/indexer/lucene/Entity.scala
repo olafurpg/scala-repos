@@ -2,6 +2,5 @@
 // Licence: http://www.gnu.org/licenses/gpl-3.0.en.html
 package org.ensime.indexer.lucene
 
-trait Entity extends Product {
+trait Entity extends Product
   def id: String
-}

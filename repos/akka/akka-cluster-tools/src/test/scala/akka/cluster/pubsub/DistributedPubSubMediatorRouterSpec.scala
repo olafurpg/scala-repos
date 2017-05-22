@@ -6,13 +6,12 @@ import org.scalatest.WordSpecLike
 import akka.actor.{ActorRef}
 import com.typesafe.config.ConfigFactory
 
-case class WrappedMessage(msg: String) extends RouterEnvelope {
+case class WrappedMessage(msg: String) extends RouterEnvelope
   override def message = msg
-}
 
 case class UnwrappedMessage(msg: String)
 
-object DistributedPubSubMediatorRouterSpec {
+object DistributedPubSubMediatorRouterSpec
   def config(routingLogic: String) = s"""
     akka.loglevel = INFO
     akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
@@ -20,15 +19,14 @@ object DistributedPubSubMediatorRouterSpec {
     akka.remote.log-remote-lifecycle-events = off
     akka.cluster.pub-sub.routing-logic = $routingLogic
   """
-}
 
-trait DistributedPubSubMediatorRouterSpec {
+trait DistributedPubSubMediatorRouterSpec
   this: WordSpecLike with TestKit with ImplicitSender ⇒
-  def nonUnwrappingPubSub(mediator: ActorRef, testActor: ActorRef, msg: Any) {
+  def nonUnwrappingPubSub(mediator: ActorRef, testActor: ActorRef, msg: Any)
 
     val path = testActor.path.toStringWithoutAddress
 
-    "keep the RouterEnvelope when sending to a local logical path" in {
+    "keep the RouterEnvelope when sending to a local logical path" in
 
       mediator ! DistributedPubSubMediator.Put(testActor)
 
@@ -37,9 +35,8 @@ trait DistributedPubSubMediatorRouterSpec {
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Remove(path)
-    }
 
-    "keep the RouterEnvelope when sending to a logical path" in {
+    "keep the RouterEnvelope when sending to a logical path" in
 
       mediator ! DistributedPubSubMediator.Put(testActor)
 
@@ -48,9 +45,8 @@ trait DistributedPubSubMediatorRouterSpec {
       expectMsg(msg)
 
       mediator ! DistributedPubSubMediator.Remove(path)
-    }
 
-    "keep the RouterEnvelope when sending to all actors on a logical path" in {
+    "keep the RouterEnvelope when sending to all actors on a logical path" in
 
       mediator ! DistributedPubSubMediator.Put(testActor)
 
@@ -58,9 +54,8 @@ trait DistributedPubSubMediatorRouterSpec {
       expectMsg(msg) // SendToAll does not use provided RoutingLogic
 
       mediator ! DistributedPubSubMediator.Remove(path)
-    }
 
-    "keep the RouterEnvelope when sending to a topic" in {
+    "keep the RouterEnvelope when sending to a topic" in
 
       mediator ! DistributedPubSubMediator.Subscribe("topic", testActor)
       expectMsgClass(classOf[DistributedPubSubMediator.SubscribeAck])
@@ -70,9 +65,8 @@ trait DistributedPubSubMediatorRouterSpec {
 
       mediator ! DistributedPubSubMediator.Unsubscribe("topic", testActor)
       expectMsgClass(classOf[DistributedPubSubMediator.UnsubscribeAck])
-    }
 
-    "keep the RouterEnvelope when sending to a topic for a group" in {
+    "keep the RouterEnvelope when sending to a topic for a group" in
 
       mediator ! DistributedPubSubMediator.Subscribe(
           "topic", Some("group"), testActor)
@@ -84,51 +78,38 @@ trait DistributedPubSubMediatorRouterSpec {
 
       mediator ! DistributedPubSubMediator.Unsubscribe("topic", testActor)
       expectMsgClass(classOf[DistributedPubSubMediator.UnsubscribeAck])
-    }
-  }
-}
 
 class DistributedPubSubMediatorWithRandomRouterSpec
     extends AkkaSpec(DistributedPubSubMediatorRouterSpec.config("random"))
     with DistributedPubSubMediatorRouterSpec with DefaultTimeout
-    with ImplicitSender {
+    with ImplicitSender
 
   val mediator = DistributedPubSub(system).mediator
 
-  "DistributedPubSubMediator when sending wrapped message" must {
+  "DistributedPubSubMediator when sending wrapped message" must
     val msg = WrappedMessage("hello")
     behave like nonUnwrappingPubSub(mediator, testActor, msg)
-  }
 
-  "DistributedPubSubMediator when sending unwrapped message" must {
+  "DistributedPubSubMediator when sending unwrapped message" must
     val msg = UnwrappedMessage("hello")
     behave like nonUnwrappingPubSub(mediator, testActor, msg)
-  }
-}
 
 class DistributedPubSubMediatorWithHashRouterSpec
     extends AkkaSpec(
         DistributedPubSubMediatorRouterSpec.config("consistent-hashing"))
     with DistributedPubSubMediatorRouterSpec with DefaultTimeout
-    with ImplicitSender {
+    with ImplicitSender
 
-  "DistributedPubSubMediator with Consistent Hash router" must {
-    "not be allowed" when {
-      "constructed by extension" in {
-        intercept[IllegalArgumentException] {
+  "DistributedPubSubMediator with Consistent Hash router" must
+    "not be allowed" when
+      "constructed by extension" in
+        intercept[IllegalArgumentException]
           DistributedPubSub(system).mediator
-        }
-      }
-      "constructed by settings" in {
-        intercept[IllegalArgumentException] {
+      "constructed by settings" in
+        intercept[IllegalArgumentException]
           val config = ConfigFactory
             .parseString(DistributedPubSubMediatorRouterSpec.config("random"))
             .withFallback(system.settings.config)
             .getConfig("akka.cluster.pub-sub")
           DistributedPubSubSettings(config).withRoutingLogic(
               ConsistentHashingRoutingLogic(system))
-        }
-      }
-    }
-  }
-}

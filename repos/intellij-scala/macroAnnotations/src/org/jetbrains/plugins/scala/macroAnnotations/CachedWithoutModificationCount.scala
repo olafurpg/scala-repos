@@ -23,50 +23,44 @@ class CachedWithoutModificationCount(
     synchronized: Boolean,
     valueWrapper: ValueWrapper,
     addToBuffer: ArrayBuffer[_ <: java.util.Map[_ <: Any, _ <: Any]]*)
-    extends StaticAnnotation {
+    extends StaticAnnotation
   def macroTransform(annottees: Any*): Any = macro CachedWithoutModificationCount.cachedWithoutModificationCountImpl
-}
 
-object CachedWithoutModificationCount {
+object CachedWithoutModificationCount
   def cachedWithoutModificationCountImpl(c: whitebox.Context)(
-      annottees: c.Tree*): c.Expr[Any] = {
+      annottees: c.Tree*): c.Expr[Any] =
     import CachedMacroUtil._
     import c.universe._
     implicit val x: c.type = c
 
     val analyzeCaches = analyzeCachesEnabled(c)
 
-    def parameters: (Boolean, ValueWrapper, List[Tree]) = {
+    def parameters: (Boolean, ValueWrapper, List[Tree]) =
       @tailrec
       def valueWrapperParam(valueWrapper: Tree): ValueWrapper =
-        valueWrapper match {
+        valueWrapper match
           case q"valueWrapper = $v" => valueWrapperParam(v)
           case q"ValueWrapper.$v" => ValueWrapper.withName(v.toString)
           case q"$v" => ValueWrapper.withName(v.toString)
-        }
 
-      c.prefix.tree match {
+      c.prefix.tree match
         case q"new CachedWithoutModificationCount(..$params)"
             if params.length >= 2 =>
-          val synch: Boolean = params.head match {
+          val synch: Boolean = params.head match
             case q"synchronized = $v" => c.eval[Boolean](c.Expr(v))
             case q"$v" => c.eval[Boolean](c.Expr(v))
-          }
           val valueWrapper = valueWrapperParam(params(1))
           val buffers: List[Tree] = params.drop(2)
           (synch, valueWrapper, buffers)
         case _ => abort("Wrong parameters")
-      }
-    }
 
     //annotation parameters
     val (synchronized, valueWrapper, buffersToAddTo) = parameters
 
-    annottees.toList match {
+    annottees.toList match
       case DefDef(mods, name, tpParams, paramss, retTp, rhs) :: Nil =>
-        if (retTp.isEmpty) {
+        if (retTp.isEmpty)
           abort("You must specify return type")
-        }
         //generated names
         val cacheVarName = c.freshName(name)
         val mapName = generateTermName(name.toString)
@@ -84,7 +78,7 @@ object CachedWithoutModificationCount {
           if (analyzeCaches)
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           else EmptyTree
-        val wrappedRetTp: Tree = valueWrapper match {
+        val wrappedRetTp: Tree = valueWrapper match
           case ValueWrapper.None => retTp
           case ValueWrapper.WeakReference =>
             tq"_root_.java.lang.ref.WeakReference[$retTp]"
@@ -92,26 +86,23 @@ object CachedWithoutModificationCount {
             tq"_root_.java.lang.ref.SoftReference[$retTp]"
           case ValueWrapper.SofterReference =>
             tq"_root_.com.intellij.util.SofterReference[$retTp]"
-        }
 
-        val addToBuffers = buffersToAddTo.map { buffer =>
+        val addToBuffers = buffersToAddTo.map  buffer =>
           q"$buffer += $mapName"
-        }
         val fields =
-          if (hasParameters) {
+          if (hasParameters)
             q"""
-            private val $mapName = new java.util.concurrent.ConcurrentHashMap[(..${flatParams
-              .map(_.tpt)}), $wrappedRetTp]()
+            private val $mapName = new java.util.concurrent.ConcurrentHashMap[(..$flatParams
+              .map(_.tpt)), $wrappedRetTp]()
             ..$analyzeCachesField
             ..$addToBuffers
           """
-          } else {
+          else
             q"""
             new _root_.scala.volatile()
             private var $cacheVarName: $wrappedRetTp = null.asInstanceOf[$wrappedRetTp]
             ..$analyzeCachesField
           """
-          }
 
         def getValuesFromMap: c.universe.Tree =
           q"""
@@ -123,13 +114,12 @@ object CachedWithoutModificationCount {
         val hasCacheExpired =
           if (valueWrapper == ValueWrapper.None)
             q"$cacheVarName == null.asInstanceOf[$wrappedRetTp]"
-          else {
+          else
             q"""
               $cacheVarName == null.asInstanceOf[$wrappedRetTp] || $cacheVarName.get() == null.asInstanceOf[$retTp]
             """
-          }
 
-        val wrappedResult = valueWrapper match {
+        val wrappedResult = valueWrapper match
           case ValueWrapper.None => q"cacheFunResult"
           case ValueWrapper.WeakReference =>
             q"new _root_.java.lang.ref.WeakReference(cacheFunResult)"
@@ -137,11 +127,10 @@ object CachedWithoutModificationCount {
             q"new _root_.java.lang.ref.SoftReference(cacheFunResult)"
           case ValueWrapper.SofterReference =>
             q"new _root_.com.intellij.util.SofterReference(cacheFunResult)"
-        }
 
         val functionContents = q"""
-            ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
-        else EmptyTree}
+            $if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree
             ..${if (hasParameters) getValuesFromMap else EmptyTree}
             val cacheHasExpired = $hasCacheExpired
             if (cacheHasExpired) {
@@ -149,18 +138,18 @@ object CachedWithoutModificationCount {
               $cacheVarName = $wrappedResult
               ..${if (hasParameters) putValuesIntoMap else EmptyTree}
             }
-            ${if (valueWrapper == ValueWrapper.None) q"$cacheVarName"
-        else q"$cacheVarName.get"}
+            $if (valueWrapper == ValueWrapper.None) q"$cacheVarName"
+        else q"$cacheVarName.get"
           """
         val getValuesIfHasParams =
-          if (hasParameters) {
+          if (hasParameters)
             q"""
               ..$getValuesFromMap
             """
-          } else q""
+          else q""
 
         val functionContentsInSynchronizedBlock =
-          if (synchronized) {
+          if (synchronized)
             q"""
               ..$getValuesIfHasParams
               if ($hasCacheExpired) {
@@ -170,11 +159,10 @@ object CachedWithoutModificationCount {
                 $functionContents
               }
             """
-          } else {
+          else
             q"""
               $functionContents
             """
-          }
         val actualCalculation =
           transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
         val updatedRhs = q"""
@@ -193,14 +181,10 @@ object CachedWithoutModificationCount {
         println(res)
         c.Expr(res)
       case _ => abort("You can only annotate one function!")
-    }
-  }
-}
 
-object ValueWrapper extends Enumeration {
+object ValueWrapper extends Enumeration
   type ValueWrapper = Value
   val None = Value("None")
   val SoftReference = Value("SoftReference")
   val WeakReference = Value("WeakReference")
   val SofterReference = Value("SofterReference")
-}

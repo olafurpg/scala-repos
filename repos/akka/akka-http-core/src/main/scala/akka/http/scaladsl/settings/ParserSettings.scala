@@ -20,7 +20,7 @@ import scala.compat.java8.OptionConverters
   * Public API but not intended for subclassing
   */
 abstract class ParserSettings private[akka]()
-    extends akka.http.javadsl.settings.ParserSettings {
+    extends akka.http.javadsl.settings.ParserSettings
   self: ParserSettingsImpl ⇒
   def maxUriLength: Int
   def maxMethodLength: Int
@@ -62,14 +62,12 @@ abstract class ParserSettings private[akka]()
     errorLoggingVerbosity
 
   override def getCustomMethods =
-    new Function[String, Optional[akka.http.javadsl.model.HttpMethod]] {
+    new Function[String, Optional[akka.http.javadsl.model.HttpMethod]]
       override def apply(t: String) = OptionConverters.toJava(customMethods(t))
-    }
   override def getCustomStatusCodes =
-    new Function[Int, Optional[akka.http.javadsl.model.StatusCode]] {
+    new Function[Int, Optional[akka.http.javadsl.model.StatusCode]]
       override def apply(t: Int) =
         OptionConverters.toJava(customStatusCodes(t))
-    }
 
   // ---
 
@@ -109,49 +107,41 @@ abstract class ParserSettings private[akka]()
     self.copy(errorLoggingVerbosity = newValue)
   def withHeaderValueCacheLimits(newValue: Map[String, Int]): ParserSettings =
     self.copy(headerValueCacheLimits = newValue)
-  def withCustomMethods(methods: HttpMethod*): ParserSettings = {
+  def withCustomMethods(methods: HttpMethod*): ParserSettings =
     val map = methods.map(m ⇒ m.name -> m).toMap
     self.copy(customMethods = map.get)
-  }
-  def withCustomStatusCodes(codes: StatusCode*): ParserSettings = {
+  def withCustomStatusCodes(codes: StatusCode*): ParserSettings =
     val map = codes.map(c ⇒ c.intValue -> c).toMap
     self.copy(customStatusCodes = map.get)
-  }
-}
 
-object ParserSettings extends SettingsCompanion[ParserSettings] {
+object ParserSettings extends SettingsCompanion[ParserSettings]
   trait CookieParsingMode
       extends akka.http.javadsl.settings.ParserSettings.CookieParsingMode
-  object CookieParsingMode {
+  object CookieParsingMode
     case object RFC6265 extends CookieParsingMode
     case object Raw extends CookieParsingMode
 
-    def apply(mode: String): CookieParsingMode = mode.toRootLowerCase match {
+    def apply(mode: String): CookieParsingMode = mode.toRootLowerCase match
       case "rfc6265" ⇒ RFC6265
       case "raw" ⇒ Raw
-    }
-  }
 
   trait ErrorLoggingVerbosity
       extends akka.http.javadsl.settings.ParserSettings.ErrorLoggingVerbosity
-  object ErrorLoggingVerbosity {
+  object ErrorLoggingVerbosity
     case object Off extends ErrorLoggingVerbosity
     case object Simple extends ErrorLoggingVerbosity
     case object Full extends ErrorLoggingVerbosity
 
     def apply(string: String): ErrorLoggingVerbosity =
-      string.toRootLowerCase match {
+      string.toRootLowerCase match
         case "off" ⇒ Off
         case "simple" ⇒ Simple
         case "full" ⇒ Full
         case x ⇒
           throw new IllegalArgumentException(
               s"[$x] is not a legal `error-logging-verbosity` setting")
-      }
-  }
 
   override def apply(config: Config): ParserSettings =
     ParserSettingsImpl(config)
   override def apply(configOverrides: String): ParserSettings =
     ParserSettingsImpl(configOverrides)
-}

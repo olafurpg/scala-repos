@@ -5,62 +5,54 @@ package lang.scaladoc
   * User: Dmitry Naydanov
   * Date: 12/29/11
   */
-class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
+class DocStubGenerationTest extends ScalaDocEnterActionTestBase
 
   import org.jetbrains.plugins.scala.lang.scaladoc.DocStubGenerationTest._
 
-  private def transformateGeneratedText(text: String): String = {
+  private def transformateGeneratedText(text: String): String =
     text.substring(standartHeader.length(), text.length())
-  }
 
-  private def genericTestStub(stub: String, testText: String) {
+  private def genericTestStub(stub: String, testText: String)
     checkGeneratedTextFromString(
         headerAndDocCommentStart, testText, stub, transformateGeneratedText)
-  }
 
-  def testSimpleMethodParamStub() {
+  def testSimpleMethodParamStub()
     genericTestStub("  /**\n   * \n   * @param i\n   * @param j\n   */\n" +
                     " def f(i: Int, j: Int) " + standartFooter,
                     " def f(i: Int, j: Int) " + standartFooter)
-  }
 
-  def testMethodSpecificStub() {
+  def testMethodSpecificStub()
     genericTestStub(
         "  /**\n   * \n   * @throws java.io.IOException\n   * @return\n   */\n" +
         "  @throws(classOf[java.io.IOException])\n def f(): Int = {1}}",
         " @throws(classOf[java.io.IOException])\n def f(): Int = {1}}")
-  }
 
-  def testMixedMethodStub() {
+  def testMixedMethodStub()
     genericTestStub(
         "  /**\n   * \n   * @param a\n   * @param b\n   * @tparam C\n   * @return\n   */\n" +
         " def f[C](a: String, b: String): Int = 1 }",
         " def f[C](a: String, b: String): Int = 1 }")
-  }
 
-  def testClassStub() {
+  def testClassStub()
     checkGeneratedTextFromString(
         standartDocCommentStart,
         "class A[E, T](i: Int, j: String) {}",
         "/**\n * \n * @param i\n * @param j\n * @tparam E\n * @tparam T\n */\n" +
         "class A[E, T](i: Int, j: String) {}")
-  }
 
-  def testTraitStub() {
+  def testTraitStub()
     checkGeneratedTextFromString(
         standartDocCommentStart,
         " trait F[A, B, C] {}",
         "/**\n * \n * @tparam A\n * @tparam B\n * @tparam C\n */\n" +
         "trait F[A, B, C] {}")
-  }
 
-  def testTypeAliasStub() {
+  def testTypeAliasStub()
     genericTestStub("  /**\n   * \n   * @tparam A\n   * @tparam B\n   */\n" +
                     " type AA[A, B] = String",
                     " type AA[A, B] = String")
-  }
 
-  def testInhFromScala() {
+  def testInhFromScala()
     val testText =
       " class B[T, E, U](a: Int, b: String, c: Any) extends A[T,E](a,b) {} }"
     val stub =
@@ -73,9 +65,8 @@ class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
                                  testText,
                                  stub,
                                  s => s.substring(header.length()))
-  }
 
-  def testOverrideScala() {
+  def testOverrideScala()
     val testText = "override def f[T](i: Int) {} }"
     val stub =
       "  /**\n    * \n    * @param i 777\n    * @tparam T lkjh\n    */\n   " +
@@ -86,9 +77,8 @@ class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
                                  testText,
                                  stub,
                                  s => s.substring(header.length))
-  }
 
-  def testScl9049() {
+  def testScl9049()
     val testText = "def fooboobar(i: Int)(j: String) { }"
     val assumed = """/**
         | * 
@@ -99,12 +89,9 @@ class DocStubGenerationTest extends ScalaDocEnterActionTestBase {
 
     checkGeneratedTextFromString(
         standartDocCommentStart, testText, assumed + testText)
-  }
-}
 
-object DocStubGenerationTest {
+object DocStubGenerationTest
   val standartHeader = "class A {\n"
   val standartFooter = " {} }"
   val standartDocCommentStart = "    /**\n"
   val headerAndDocCommentStart = standartHeader + standartDocCommentStart
-}

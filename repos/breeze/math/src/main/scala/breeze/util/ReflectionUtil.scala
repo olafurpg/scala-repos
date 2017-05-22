@@ -20,8 +20,8 @@ package breeze.util
   *
   * @author dlwh
   */
-object ReflectionUtil {
-  def boxedFromPrimitive(c: Class[_]): Class[_] = {
+object ReflectionUtil
+  def boxedFromPrimitive(c: Class[_]): Class[_] =
     import java.lang._
     require(
         c.isPrimitive, "can't get boxed representation of non-primitive type")
@@ -35,5 +35,3 @@ object ReflectionUtil {
     else if (c == Boolean.TYPE) classOf[java.lang.Boolean]
     else if (c == Void.TYPE) classOf[java.lang.Void]
     else sys.error("Shouldn't be here...")
-  }
-}

@@ -31,34 +31,29 @@ import org.apache.spark.ui.SparkUICssErrorHandler
 
 class UISeleniumSuite
     extends HiveThriftJdbcTest with WebBrowser with Matchers
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
 
   implicit var webDriver: WebDriver = _
   var server: HiveThriftServer2 = _
   val uiPort = 20000 + Random.nextInt(10000)
   override def mode: ServerMode.Value = ServerMode.binary
 
-  override def beforeAll(): Unit = {
-    webDriver = new HtmlUnitDriver {
+  override def beforeAll(): Unit =
+    webDriver = new HtmlUnitDriver
       getWebClient.setCssErrorHandler(new SparkUICssErrorHandler)
-    }
     super.beforeAll()
-  }
 
-  override def afterAll(): Unit = {
-    if (webDriver != null) {
+  override def afterAll(): Unit =
+    if (webDriver != null)
       webDriver.quit()
-    }
     super.afterAll()
-  }
 
-  override protected def serverStartCommand(port: Int) = {
+  override protected def serverStartCommand(port: Int) =
     val portConf =
-      if (mode == ServerMode.binary) {
+      if (mode == ServerMode.binary)
         ConfVars.HIVE_SERVER2_THRIFT_PORT
-      } else {
+      else
         ConfVars.HIVE_SERVER2_THRIFT_HTTP_PORT
-      }
 
     s"""$startScript
         |  --master local
@@ -72,10 +67,9 @@ class UISeleniumSuite
         |  --conf spark.ui.enabled=true
         |  --conf spark.ui.port=$uiPort
      """.stripMargin.split("\\s+").toSeq
-  }
 
-  ignore("thrift server ui test") {
-    withJdbcStatement { statement =>
+  ignore("thrift server ui test")
+    withJdbcStatement  statement =>
       val baseURL = s"http://localhost:$uiPort"
 
       val queries = Seq(
@@ -84,22 +78,16 @@ class UISeleniumSuite
 
       queries.foreach(statement.execute)
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         go to baseURL
         find(cssSelector("""ul li a[href*="sql"]""")) should not be None
-      }
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         go to (baseURL + "/sql")
         find(id("sessionstat")) should not be None
         find(id("sqlstat")) should not be None
 
         // check whether statements exists
-        queries.foreach { line =>
+        queries.foreach  line =>
           findAll(cssSelector("""ul table tbody tr td""")).map(_.text).toList should contain(
               line)
-        }
-      }
-    }
-  }
-}

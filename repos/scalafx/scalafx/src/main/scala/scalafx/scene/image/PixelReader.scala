@@ -34,15 +34,14 @@ import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Color
 
-object PixelReader {
+object PixelReader
   implicit def sfxPixelReader2jfx(pr: PixelReader): jfxsi.PixelReader =
     if (pr != null) pr.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/image/PixelReader.html]]
   */
-trait PixelReader extends SFXDelegate[jfxsi.PixelReader] {
+trait PixelReader extends SFXDelegate[jfxsi.PixelReader]
 
   /**
     * Reads a 32-bit integer representation of the color of a pixel from the specified coordinates in the surface.
@@ -70,9 +69,8 @@ trait PixelReader extends SFXDelegate[jfxsi.PixelReader] {
                 pixelformat: WritablePixelFormat[ByteBuffer],
                 buffer: Array[Byte],
                 offset: Int,
-                scanlineStride: Int) {
+                scanlineStride: Int)
     delegate.getPixels(x, y, w, h, pixelformat, buffer, offset, scanlineStride)
-  }
 
   /**
     * Reads pixel data from a rectangular region of the surface into the specified int array.
@@ -84,9 +82,8 @@ trait PixelReader extends SFXDelegate[jfxsi.PixelReader] {
                 pixelformat: WritablePixelFormat[IntBuffer],
                 buffer: Array[Int],
                 offset: Int,
-                scanlineStride: Int) {
+                scanlineStride: Int)
     delegate.getPixels(x, y, w, h, pixelformat, buffer, offset, scanlineStride)
-  }
 
   /**
     * Reads pixel data from a rectangular region of the surface into the specified buffer.
@@ -97,7 +94,5 @@ trait PixelReader extends SFXDelegate[jfxsi.PixelReader] {
                              h: Int,
                              pixelformat: WritablePixelFormat[B],
                              buffer: B,
-                             scanlineStride: Int) {
+                             scanlineStride: Int)
     delegate.getPixels(x, y, w, h, pixelformat, buffer, scanlineStride)
-  }
-}

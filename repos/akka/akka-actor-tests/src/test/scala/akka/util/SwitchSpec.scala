@@ -8,11 +8,11 @@ import org.scalatest.Matchers
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class SwitchSpec extends WordSpec with Matchers {
+class SwitchSpec extends WordSpec with Matchers
 
-  "Switch" must {
+  "Switch" must
 
-    "on and off" in {
+    "on and off" in
       val s = new Switch(false)
       s.isOff should ===(true)
       s.isOn should ===(false)
@@ -30,17 +30,14 @@ class SwitchSpec extends WordSpec with Matchers {
       s.switchOff(()) should ===(false)
       s.isOff should ===(true)
       s.isOn should ===(false)
-    }
 
-    "revert when exception" in {
+    "revert when exception" in
       val s = new Switch(false)
-      intercept[RuntimeException] {
+      intercept[RuntimeException]
         s.switchOn(throw new RuntimeException)
-      }
       s.isOff should ===(true)
-    }
 
-    "run action without locking" in {
+    "run action without locking" in
       val s = new Switch(false)
       s.ifOffYield("yes") should ===(Some("yes"))
       s.ifOnYield("no") should ===(None)
@@ -52,9 +49,8 @@ class SwitchSpec extends WordSpec with Matchers {
       s.ifOffYield("no") should ===(None)
       s.ifOn(()) should ===(true)
       s.ifOff(()) should ===(false)
-    }
 
-    "run action with locking" in {
+    "run action with locking" in
       val s = new Switch(false)
       s.whileOffYield("yes") should ===(Some("yes"))
       s.whileOnYield("no") should ===(None)
@@ -66,34 +62,27 @@ class SwitchSpec extends WordSpec with Matchers {
       s.whileOffYield("no") should ===(None)
       s.whileOn(()) should ===(true)
       s.whileOff(()) should ===(false)
-    }
 
-    "run first or second action depending on state" in {
+    "run first or second action depending on state" in
       val s = new Switch(false)
       s.fold("on")("off") should ===("off")
       s.switchOn(())
       s.fold("on")("off") should ===("on")
-    }
 
-    "do proper locking" in {
+    "do proper locking" in
       val s = new Switch(false)
 
-      s.locked {
+      s.locked
         Thread.sleep(500)
         s.switchOn(())
         s.isOn should ===(true)
-      }
 
       val latch = new CountDownLatch(1)
-      new Thread {
-        override def run(): Unit = {
+      new Thread
+        override def run(): Unit =
           s.switchOff(())
           latch.countDown()
-        }
-      }.start()
+      .start()
 
       latch.await(5, TimeUnit.SECONDS)
       s.isOff should ===(true)
-    }
-  }
-}

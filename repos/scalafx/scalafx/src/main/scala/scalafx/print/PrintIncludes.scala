@@ -62,7 +62,7 @@ object PrintIncludes extends PrintIncludes
   * @define PR PrintResolution
   * @define PS PrintSides
   */
-trait PrintIncludes {
+trait PrintIncludes
 
   /**
     * $START$COLL$.html $COLL$END
@@ -212,4 +212,3 @@ trait PrintIncludes {
     */
   implicit def jfxPrintSides2sfx(ps: jfxp.PrintSides): PrintSides =
     PrintSides.jfxEnum2sfx(ps)
-}

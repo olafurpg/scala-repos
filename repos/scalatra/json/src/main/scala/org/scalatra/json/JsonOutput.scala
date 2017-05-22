@@ -9,12 +9,11 @@ import org.json4s._
 import scala.io.Codec
 import scala.xml.XML
 
-object JsonOutput {
+object JsonOutput
   val VulnerabilityPrelude = ")]}',\n"
   val RosettaPrelude = "/**/"
-}
 
-trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
+trait JsonOutput[T] extends ApiFormats with JsonMethods[T]
 
   import org.scalatra.json.JsonOutput._
 
@@ -44,7 +43,7 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
   protected def transformResponseBody(body: JValue) = body
 
   override protected def renderPipeline =
-    ({
+    (
 
       case JsonResult(jv) => jv
 
@@ -57,12 +56,12 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
         response.characterEncoding = Some(Codec.UTF8.name)
         val writer = response.writer
 
-        val jsonpCallback = for {
+        val jsonpCallback = for
           paramName <- jsonpCallbackParameterNames
           callback <- params.get(paramName)
-        } yield callback
+        yield callback
 
-        jsonpCallback match {
+        jsonpCallback match
           case some :: _ =>
             // JSONP is not JSON, but JavaScript.
             contentType = formats("js")
@@ -76,17 +75,14 @@ trait JsonOutput[T] extends ApiFormats with JsonMethods[T] {
             if (jsonVulnerabilityGuard) writer.write(VulnerabilityPrelude)
             writeJson(transformResponseBody(jv), writer)
             ()
-        }
-    }: RenderPipeline) orElse super.renderPipeline
+    : RenderPipeline) orElse super.renderPipeline
 
-  protected def writeJsonAsXml(json: JValue, writer: Writer) {
+  protected def writeJsonAsXml(json: JValue, writer: Writer)
     if (json != JNothing)
       XML.write(response.writer,
                 xmlRootNode.copy(child = toXml(json)),
                 response.characterEncoding.get,
                 xmlDecl = true,
                 doctype = null)
-  }
 
   protected def writeJson(json: JValue, writer: Writer)
-}

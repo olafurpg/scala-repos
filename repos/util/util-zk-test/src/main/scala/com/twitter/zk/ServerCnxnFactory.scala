@@ -3,13 +3,12 @@ package com.twitter.zk
 import java.net.{InetAddress, InetSocketAddress}
 import org.apache.zookeeper.server.ZooKeeperServer
 
-sealed trait ServerCnxnFactory {
+sealed trait ServerCnxnFactory
   def getLocalPort: Int
   def startup(server: ZooKeeperServer): Unit
   def shutdown(): Unit
-}
 
-object ServerCnxnFactory {
+object ServerCnxnFactory
   private[this] val UnlimitedClients: java.lang.Integer = -1
 
   /**
@@ -52,9 +51,9 @@ object ServerCnxnFactory {
     * @return ServerCnxnFactory
     */
   def apply(sockAddr: InetSocketAddress,
-            maxClients: java.lang.Integer): ServerCnxnFactory = {
-    val factory = {
-      try {
+            maxClients: java.lang.Integer): ServerCnxnFactory =
+    val factory =
+      try
         val inst = java.lang.Class
           .forName("org.apache.zookeeper.server.NIOServerCnxnFactory")
           .newInstance
@@ -62,30 +61,22 @@ object ServerCnxnFactory {
           inst.getClass.getMethod("configure", sockAddr.getClass, Integer.TYPE)
         call.invoke(inst, sockAddr, maxClients)
         inst
-      } catch {
+      catch
         case t: ClassNotFoundException =>
           val constructor = java.lang.Class
             .forName("org.apache.zookeeper.server.NIOServerCnxn$Factory")
             .getConstructor(sockAddr.getClass, Integer.TYPE)
           constructor.newInstance(sockAddr, maxClients)
-      }
-    }
 
-    new ServerCnxnFactory {
-      def getLocalPort: Int = {
+    new ServerCnxnFactory
+      def getLocalPort: Int =
         val call = factory.getClass.getMethod("getLocalPort")
         call.invoke(factory).asInstanceOf[Int]
-      }
 
-      def startup(server: ZooKeeperServer): Unit = {
+      def startup(server: ZooKeeperServer): Unit =
         val call = factory.getClass.getMethod("startup", server.getClass)
         call.invoke(factory, server)
-      }
 
-      def shutdown(): Unit = {
+      def shutdown(): Unit =
         val call = factory.getClass.getMethod("shutdown")
         call.invoke(factory)
-      }
-    }
-  }
-}

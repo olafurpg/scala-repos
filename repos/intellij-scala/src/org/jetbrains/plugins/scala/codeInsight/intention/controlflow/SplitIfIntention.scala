@@ -14,17 +14,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 6/8/12
   */
-object SplitIfIntention {
+object SplitIfIntention
   def familyName = "Split If"
-}
 
-class SplitIfIntention extends PsiElementBaseIntentionAction {
+class SplitIfIntention extends PsiElementBaseIntentionAction
   def getFamilyName = SplitIfIntention.familyName
 
   override def getText: String = "Split into 2 'if's"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -42,9 +41,8 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
       return true
 
     false
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null || !ifStmt.isValid) return
@@ -74,14 +72,13 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
       .append(ifStmt.thenBranch.get.getText)
 
     val elseBranch = ifStmt.elseBranch.orNull
-    if (elseBranch != null) {
+    if (elseBranch != null)
       if (expr.toString().trim.endsWith("}")) expr.append(" else ")
       else expr.append("\nelse ")
       expr
         .append(elseBranch.getText)
         .append("\nelse ")
         .append(elseBranch.getText)
-    }
 
     val newIfStmt: ScExpression =
       ScalaPsiElementFactory.createExpressionFromText(
@@ -95,12 +92,9 @@ class SplitIfIntention extends PsiElementBaseIntentionAction {
         .getStartOffset -
       newIfStmt.asInstanceOf[ScIfStmt].getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       ifStmt.replaceExpression(newIfStmt, removeParenthesis = true)
       editor.getCaretModel.moveToOffset(start + diff)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

@@ -4,7 +4,7 @@ import com.twitter.util.StdBenchAnnotations
 import org.openjdk.jmh.annotations._
 
 @State(Scope.Benchmark)
-class HashableBench extends StdBenchAnnotations {
+class HashableBench extends StdBenchAnnotations
 
   private[this] var i = 0
 
@@ -17,8 +17,6 @@ class HashableBench extends StdBenchAnnotations {
   ).map(_.getBytes("UTF-8"))
 
   @Benchmark
-  def md5_leInt: Int = {
+  def md5_leInt: Int =
     i += 1
     Hashable.MD5_LEInt(inputs(i % inputs.length))
-  }
-}

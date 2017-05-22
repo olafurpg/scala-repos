@@ -27,16 +27,14 @@ class AnnouncerNotFoundException(scheme: String)
   */
 class MultipleAnnouncersPerSchemeException(
     announcers: Map[String, Seq[Announcer]])
-    extends NoStacktrace {
-  override def getMessage = {
+    extends NoStacktrace
+  override def getMessage =
     val msgs =
-      announcers map {
+      announcers map
         case (scheme, rs) =>
           "%s=(%s)".format(scheme, rs.map(_.getClass.getName).mkString(", "))
-      } mkString (" ")
+      mkString (" ")
     "Multiple announcers defined: %s".format(msgs)
-  }
-}
 
 /**
   * Indicates that a forum string passed to an [[com.twitter.finagle.Announcer]]
@@ -47,22 +45,19 @@ class MultipleAnnouncersPerSchemeException(
 class AnnouncerForumInvalid(forum: String)
     extends Exception("Announcer forum \"%s\" is not valid".format(forum))
 
-trait Announcement extends Closable {
+trait Announcement extends Closable
   def close(deadline: Time) = unannounce()
   def unannounce(): Future[Unit]
-}
 
-trait ProxyAnnouncement extends Announcement with Proxy {
+trait ProxyAnnouncement extends Announcement with Proxy
   val forums: List[String]
-}
 
-trait Announcer {
+trait Announcer
   val scheme: String
   def announce(addr: InetSocketAddress, name: String): Future[Announcement]
-}
 
-object Announcer {
-  private[this] lazy val announcers = {
+object Announcer
+  private[this] lazy val announcers =
     val announcers = LoadService[Announcer]()
     val log = Logger.getLogger(getClass.getName)
 
@@ -73,47 +68,37 @@ object Announcer {
     for (r <- announcers) log.info(
         "Announcer[%s] = %s(%s)".format(r.scheme, r.getClass.getName, r))
     announcers
-  }
 
   def get[T <: Announcer](clazz: Class[T]): Option[T] =
-    announcers find { _.getClass isAssignableFrom clazz } map {
+    announcers find { _.getClass isAssignableFrom clazz } map
       _.asInstanceOf[T]
-    }
 
   private[this] val _announcements =
     mutable.Set[(InetSocketAddress, List[String])]()
   def announcements = synchronized { _announcements.toSet }
 
-  def announce(addr: InetSocketAddress, forum: String): Future[Announcement] = {
-    val announcement = forum.split("!", 2) match {
+  def announce(addr: InetSocketAddress, forum: String): Future[Announcement] =
+    val announcement = forum.split("!", 2) match
       case Array(scheme, name) =>
-        announcers.find(_.scheme == scheme) match {
+        announcers.find(_.scheme == scheme) match
           case Some(announcer) => announcer.announce(addr, name)
           case None => Future.exception(new AnnouncerNotFoundException(scheme))
-        }
 
       case _ =>
         Future.exception(new AnnouncerForumInvalid(forum))
-    }
 
-    announcement map { ann =>
-      val lastForums = ann match {
+    announcement map  ann =>
+      val lastForums = ann match
         case a: ProxyAnnouncement => a.forums
         case _ => Nil
-      }
 
-      val proxyAnnouncement = new ProxyAnnouncement {
+      val proxyAnnouncement = new ProxyAnnouncement
         val self = ann
         def unannounce() = ann.unannounce()
         val forums = forum :: lastForums
-      }
 
-      synchronized {
+      synchronized
         _announcements -= ((addr, lastForums))
         _announcements += ((addr, proxyAnnouncement.forums))
-      }
 
       proxyAnnouncement
-    }
-  }
-}

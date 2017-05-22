@@ -30,6 +30,5 @@ import javafx.beans.{binding => jfxbb, property => jfxbp}
 import javafx.{geometry => jfxg}
 
 trait AlignmentPropertyDelegate
-    extends SFXDelegate[jfxbp.ReadOnlyObjectProperty[_]] {
+    extends SFXDelegate[jfxbp.ReadOnlyObjectProperty[_]]
   def alignment = jfxbb.Bindings.select[jfxg.Pos](delegate, "alignment")
-}

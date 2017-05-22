@@ -27,10 +27,9 @@ import org.apache.spark.annotation.DeveloperApi
   * Operations are not thread-safe.
   */
 @DeveloperApi
-object DataReadMethod extends Enumeration with Serializable {
+object DataReadMethod extends Enumeration with Serializable
   type DataReadMethod = Value
   val Memory, Disk, Hadoop, Network = Value
-}
 
 /**
   * :: DeveloperApi ::
@@ -40,16 +39,15 @@ object DataReadMethod extends Enumeration with Serializable {
 class InputMetrics private (_bytesRead: Accumulator[Long],
                             _recordsRead: Accumulator[Long],
                             _readMethod: Accumulator[String])
-    extends Serializable {
+    extends Serializable
 
-  private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
+  private[executor] def this(accumMap: Map[String, Accumulator[_]])
     this(TaskMetrics
            .getAccum[Long](accumMap, InternalAccumulator.input.BYTES_READ),
          TaskMetrics
            .getAccum[Long](accumMap, InternalAccumulator.input.RECORDS_READ),
          TaskMetrics.getAccum[String](
              accumMap, InternalAccumulator.input.READ_METHOD))
-  }
 
   /**
     * Create a new [[InputMetrics]] that is not associated with any particular task.
@@ -60,15 +58,13 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
     *
     * A better alternative is [[TaskMetrics.registerInputMetrics]].
     */
-  private[executor] def this() {
+  private[executor] def this()
     this(
         InternalAccumulator
           .createInputAccums()
-          .map { a =>
+          .map  a =>
         (a.name.get, a)
-      }
           .toMap[String, Accumulator[_]])
-  }
 
   /**
     * Total number of bytes read.
@@ -99,24 +95,20 @@ class InputMetrics private (_bytesRead: Accumulator[Long],
   private[spark] def setBytesRead(v: Long): Unit = _bytesRead.setValue(v)
   private[spark] def setReadMethod(v: DataReadMethod.Value): Unit =
     _readMethod.setValue(v.toString)
-}
 
 /**
   * Deprecated methods to preserve case class matching behavior before Spark 2.0.
   */
-object InputMetrics {
+object InputMetrics
 
   @deprecated(
       "matching on InputMetrics will not be supported in the future", "2.0.0")
-  def apply(readMethod: DataReadMethod.Value): InputMetrics = {
+  def apply(readMethod: DataReadMethod.Value): InputMetrics =
     val im = new InputMetrics
     im.setReadMethod(readMethod)
     im
-  }
 
   @deprecated(
       "matching on InputMetrics will not be supported in the future", "2.0.0")
-  def unapply(input: InputMetrics): Option[DataReadMethod.Value] = {
+  def unapply(input: InputMetrics): Option[DataReadMethod.Value] =
     Some(input.readMethod)
-  }
-}

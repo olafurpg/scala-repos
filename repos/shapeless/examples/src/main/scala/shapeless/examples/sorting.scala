@@ -21,7 +21,7 @@ package shapeless.examples
   * 
   * @author Miles Sabin
   */
-object Sorting {
+object Sorting
   import shapeless._
   import nat._
   import ops.nat._
@@ -53,28 +53,22 @@ object Sorting {
     * Type class extracting the least element from an HList of Nats at both type and value level.
     * Returns the least element and the remainder in it's original order.
     */
-  trait SelectLeast[L <: HList, M <: Nat, Rem <: HList] {
+  trait SelectLeast[L <: HList, M <: Nat, Rem <: HList]
     def apply(l: L): (M, Rem)
-  }
 
-  trait LowPrioritySelectLeast {
+  trait LowPrioritySelectLeast
     implicit def hlistSelectLeast1[H <: Nat, T <: HList] =
-      new SelectLeast[H :: T, H, T] {
+      new SelectLeast[H :: T, H, T]
         def apply(l: H :: T): (H, T) = (l.head, l.tail)
-      }
-  }
 
-  object SelectLeast extends LowPrioritySelectLeast {
+  object SelectLeast extends LowPrioritySelectLeast
     implicit def hlistSelectLeast3[
         H <: Nat, T <: HList, TM <: Nat, TRem <: HList](
         implicit tsl: SelectLeast[T, TM, TRem], ev: TM < H) =
-      new SelectLeast[H :: T, TM, H :: TRem] {
-        def apply(l: H :: T): (TM, H :: TRem) = {
+      new SelectLeast[H :: T, TM, H :: TRem]
+        def apply(l: H :: T): (TM, H :: TRem) =
           val (tm, rem) = tsl(l.tail)
           (tm, l.head :: rem)
-        }
-      }
-  }
 
   def selectLeast[L <: HList, M <: Nat, Rem <: HList](l: L)(
       implicit sl: SelectLeast[L, M, Rem]) = sl(l)
@@ -90,27 +84,21 @@ object Sorting {
   /**
     * Type class performing selection sort on an HList of Nats at both the type and value level. 
     */
-  trait SelectionSort[L <: HList, S <: HList] {
+  trait SelectionSort[L <: HList, S <: HList]
     def apply(l: L): S
-  }
 
-  trait LowPrioritySelectionSort {
-    implicit def hlistSelectionSort1[S <: HList] = new SelectionSort[S, S] {
+  trait LowPrioritySelectionSort
+    implicit def hlistSelectionSort1[S <: HList] = new SelectionSort[S, S]
       def apply(l: S): S = l
-    }
-  }
 
-  object SelectionSort extends LowPrioritySelectionSort {
+  object SelectionSort extends LowPrioritySelectionSort
     implicit def hlistSelectionSort2[
         L <: HList, M <: Nat, Rem <: HList, ST <: HList](
         implicit sl: SelectLeast[L, M, Rem], sr: SelectionSort[Rem, ST]) =
-      new SelectionSort[L, M :: ST] {
-        def apply(l: L) = {
+      new SelectionSort[L, M :: ST]
+        def apply(l: L) =
           val (m, rem) = sl(l)
           m :: sr(rem)
-        }
-      }
-  }
 
   def selectionSort[L <: HList, S <: HList](l: L)(
       implicit sort: SelectionSort[L, S]) = sort(l)
@@ -125,4 +113,3 @@ object Sorting {
   val sorted = selectionSort(unsorted)
   typed[_0 :: _1 :: _2 :: _3 :: _4 :: HNil](sorted)
   acceptNonDecreasing(sorted) // Compiles!     
-}

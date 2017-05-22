@@ -1,10 +1,8 @@
-object test {
-  abstract class Bar {
+object test
+  abstract class Bar
     type T
     def bar: Unit
-  }
-  new Bar {
+  new Bar
     type T = Int
     def bar = ()
-  }.bar
-}
+  .bar

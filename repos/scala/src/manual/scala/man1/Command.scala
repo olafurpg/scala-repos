@@ -9,7 +9,7 @@ package scala.man1
   *  @author Stephane Micheloud
   *  @version 1.0
   */
-trait Command {
+trait Command
   import _root_.scala.tools.docutil.ManPage._
 
   protected def cn: String
@@ -56,4 +56,3 @@ trait Command {
             "Report bugs to " & Mono("https://issues.scala-lang.org/") & ".")
 
   def manpage: Document
-}

@@ -17,23 +17,20 @@ import java.security.GeneralSecurityException
   */
 class CompositeX509TrustManager(
     trustManagers: Seq[X509TrustManager], algorithmChecker: AlgorithmChecker)
-    extends X509TrustManager {
+    extends X509TrustManager
 
   private val logger = org.slf4j.LoggerFactory.getLogger(getClass)
 
-  def getAcceptedIssuers: Array[X509Certificate] = {
+  def getAcceptedIssuers: Array[X509Certificate] =
     logger.debug("getAcceptedIssuers: ")
     val certificates = ArrayBuffer[X509Certificate]()
-    val exceptionList = withTrustManagers { trustManager =>
+    val exceptionList = withTrustManagers  trustManager =>
       certificates.appendAll(trustManager.getAcceptedIssuers)
-    }
     // getAcceptedIssuers should never throw an exception.
-    if (!exceptionList.isEmpty) {
+    if (!exceptionList.isEmpty)
       val msg = exceptionList(0).getMessage
       throw new CompositeCertificateException(msg, exceptionList.toArray)
-    }
     certificates.toArray
-  }
 
   // In 1.6, sun.security.ssl.X509TrustManagerImpl extends from com.sun.net.ssl.internal.ssl.X509ExtendedTrustManager
   // In 1.7, sun.security.ssl.X509TrustManagerImpl extends from javax.net.ssl.X509ExtendedTrustManager.
@@ -44,7 +41,7 @@ class CompositeX509TrustManager(
   //def checkClientTrusted(chain: Array[X509Certificate], authType: String, hostname: String, algorithm: String): Unit = ???
   //def checkServerTrusted(chain: Array[X509Certificate], authType: String, hostname: String, algorithm: String): Unit = ???
 
-  def checkClientTrusted(chain: Array[X509Certificate], authType: String) {
+  def checkClientTrusted(chain: Array[X509Certificate], authType: String)
     logger.debug("checkClientTrusted: chain = {}", debugChain(chain))
 
     val anchor: TrustAnchor = new TrustAnchor(chain(chain.length - 1), null)
@@ -53,21 +50,18 @@ class CompositeX509TrustManager(
     algorithmChecker.checkKeyAlgorithms(anchor.getTrustedCert)
 
     var trusted = false
-    val exceptionList = withTrustManagers { trustManager =>
+    val exceptionList = withTrustManagers  trustManager =>
       trustManager.checkClientTrusted(chain, authType)
       logger.debug(
           s"checkClientTrusted: trustManager $trustManager found a match for ${debugChain(chain)}")
       trusted = true
-    }
 
-    if (!trusted) {
+    if (!trusted)
       val msg = "No trust manager was able to validate this certificate chain."
       throw new CompositeCertificateException(msg, exceptionList.toArray)
-    }
-  }
 
   def checkServerTrusted(
-      chain: Array[X509Certificate], authType: String): Unit = {
+      chain: Array[X509Certificate], authType: String): Unit =
     logger.debug(
         s"checkServerTrusted: chain = ${debugChain(chain)}, authType = $authType")
 
@@ -80,29 +74,26 @@ class CompositeX509TrustManager(
     algorithmChecker.checkKeyAlgorithms(anchor.getTrustedCert)
 
     var trusted = false
-    val exceptionList = withTrustManagers { trustManager =>
+    val exceptionList = withTrustManagers  trustManager =>
       // always run through the trust manager before making any decisions
       trustManager.checkServerTrusted(chain, authType)
       logger.debug(
-          s"checkServerTrusted: trustManager $trustManager using authType $authType found a match for ${debugChain(
-          chain).toSeq}")
+          s"checkServerTrusted: trustManager $trustManager using authType $authType found a match for $debugChain(
+          chain).toSeq")
       trusted = true
-    }
 
-    if (!trusted) {
+    if (!trusted)
       val msg =
         s"No trust manager was able to validate this certificate chain: # of exceptions = ${exceptionList.size}"
       throw new CompositeCertificateException(msg, exceptionList.toArray)
-    }
-  }
 
   private def withTrustManagers(
-      block: (X509TrustManager => Unit)): Seq[Throwable] = {
+      block: (X509TrustManager => Unit)): Seq[Throwable] =
     val exceptionList = ArrayBuffer[Throwable]()
-    trustManagers.foreach { trustManager =>
-      try {
+    trustManagers.foreach  trustManager =>
+      try
         block(trustManager)
-      } catch {
+      catch
         case e: CertPathBuilderException =>
           logger.debug(
               "No path found to certificate: this usually means the CA is not in the trust store",
@@ -114,12 +105,7 @@ class CompositeX509TrustManager(
         case NonFatal(e) =>
           logger.debug("Unexpected exception!", e)
           exceptionList.append(e)
-      }
-    }
     exceptionList
-  }
 
-  override def toString = {
+  override def toString =
     s"CompositeX509TrustManager(trustManagers = [$trustManagers], algorithmChecker = $algorithmChecker)"
-  }
-}

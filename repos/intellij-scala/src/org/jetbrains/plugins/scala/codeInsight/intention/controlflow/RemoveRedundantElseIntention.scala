@@ -14,17 +14,16 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Ksenia.Sautina
   * @since 6/8/12
   */
-object RemoveRedundantElseIntention {
+object RemoveRedundantElseIntention
   def familyName = "Remove redundant Else"
-}
 
-class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
+class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction
   def getFamilyName = RemoveRedundantElseIntention.familyName
 
   override def getText: String = "Remove redundant 'else'"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
     if (ifStmt == null) return false
@@ -39,7 +38,7 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
     if (!(thenBranch.getTextRange.getEndOffset <= offset &&
             offset <= elseBranch.getTextRange.getStartOffset)) return false
 
-    thenBranch match {
+    thenBranch match
       case tb: ScBlockExpr =>
         val lastExpr = tb.lastExpr.orNull
         if (lastExpr == null) return false
@@ -51,10 +50,8 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
         if (e.isInstanceOf[ScThrowStmt]) return true
         false
       case _ => false
-    }
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val manager: PsiManager = PsiManager.getInstance(project)
     val ifStmt: ScIfStmt =
       PsiTreeUtil.getParentOfType(element, classOf[ScIfStmt], false)
@@ -75,7 +72,7 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       .find(_.getNode.getElementType != ScalaTokenTypes.tRBRACE)
       .getOrElse(return )
 
-    inWriteAction {
+    inWriteAction
       elseKeyWord.delete()
       elseBranch.delete()
       ifStmt.getParent.addRangeAfter(from, to, ifStmt)
@@ -84,6 +81,3 @@ class RemoveRedundantElseIntention extends PsiElementBaseIntentionAction {
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

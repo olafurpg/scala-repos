@@ -31,46 +31,42 @@ import org.jetbrains.sbt.project.settings.SbtProjectSettings
   */
 class SbtModuleBuilder
     extends AbstractExternalModuleBuilder[SbtProjectSettings](
-        SbtProjectSystem.Id, new SbtProjectSettings) {
+        SbtProjectSystem.Id, new SbtProjectSettings)
   private var sbtVersion = Versions.DefaultSbtVersion
 
   private var scalaVersion = Versions.DefaultScalaVersion
 
   def getModuleType = JavaModuleType.getModuleType
 
-  override def createModule(moduleModel: ModifiableModuleModel) = {
+  override def createModule(moduleModel: ModifiableModuleModel) =
     val root = getModuleFileDirectory.toFile
 
-    if (root.exists) {
+    if (root.exists)
       createProjectTemplateIn(root, getName, scalaVersion, sbtVersion)
       updateModulePath()
-    }
 
     super.createModule(moduleModel)
-  }
 
   // TODO customize the path in UI when IDEA-122951 will be implemented
-  private def updateModulePath() {
+  private def updateModulePath()
     val file = getModuleFilePath.toFile
     val path =
       file.getParent + "/" + Sbt.ModulesDirectory + "/" +
       file.getName.toLowerCase
     setModuleFilePath(path)
-  }
 
   override def modifySettingsStep(
-      settingsStep: SettingsStep): ModuleWizardStep = {
+      settingsStep: SettingsStep): ModuleWizardStep =
     val sbtVersionComboBox = new SComboBox(Array.empty)
     val scalaVersionComboBox = new SComboBox(Array.empty)
 
     val (scalaVersions, sbtVersions) =
-      withProgressSynchronously("Fetching available versions") { listener =>
+      withProgressSynchronously("Fetching available versions")  listener =>
         listener("Fetching Scala versions...")
         val scalaVersions = Versions.loadScalaVersions
         listener("Fetching SBT versions...")
         val sbtVersions = Versions.loadSbtVersions
         (scalaVersions, sbtVersions)
-      }
 
     sbtVersionComboBox.setItems(sbtVersions)
     scalaVersionComboBox.setItems(scalaVersions)
@@ -87,10 +83,10 @@ class SbtModuleBuilder
             "settings.label.create.empty.content.root.directories"))
 
     val step = new SdkSettingsStep(
-        settingsStep, this, new Condition[SdkTypeId] {
+        settingsStep, this, new Condition[SdkTypeId]
       def value(t: SdkTypeId): Boolean = t != null && t.isInstanceOf[JavaSdk]
-    }) {
-      override def updateDataModel() {
+    )
+      override def updateDataModel()
         sbtVersion = sbtVersionComboBox.getSelectedItem
         scalaVersion = scalaVersionComboBox.getSelectedItem
 
@@ -106,8 +102,6 @@ class SbtModuleBuilder
             useAutoImportCheckBox.isSelected)
         getExternalProjectSettings.setCreateEmptyContentRootDirectories(
             createContentDirsCheckBox.isSelected)
-      }
-    }
 
     createContentDirsCheckBox.setSelected(true)
     resolveClassifiersCheckBox.setSelected(true)
@@ -128,10 +122,9 @@ class SbtModuleBuilder
     settingsStep.addSettingsField("Download:", downloadPanel)
 
     step
-  }
 
   private def createProjectTemplateIn(
-      root: File, name: String, scalaVersion: String, sbtVersion: String) {
+      root: File, name: String, scalaVersion: String, sbtVersion: String)
     val buildFile = root / Sbt.BuildFile
     val projectDir = root / Sbt.ProjectDirectory
     val pluginsFile = projectDir / Sbt.PluginsFile
@@ -145,11 +138,10 @@ class SbtModuleBuilder
     writeToFile(pluginsFile, SbtModuleBuilder.PluginsDefinition)
     writeToFile(
         propertiesFile, SbtModuleBuilder.formatSbtProperties(sbtVersion))
-  }
 
   override def getNodeIcon = Sbt.Icon
 
-  override def setupRootModel(model: ModifiableRootModel) {
+  override def setupRootModel(model: ModifiableRootModel)
     val contentPath = getContentEntryPath
     if (StringUtil.isEmpty(contentPath)) return
 
@@ -174,22 +166,19 @@ class SbtModuleBuilder
     externalProjectSettings.setExternalProjectPath(getContentEntryPath)
     settings.linkProject(externalProjectSettings)
 
-    if (!externalProjectSettings.isUseAutoImport) {
+    if (!externalProjectSettings.isUseAutoImport)
       FileDocumentManager.getInstance.saveAllDocuments()
-      ApplicationManager.getApplication.invokeLater(new Runnable() {
+      ApplicationManager.getApplication.invokeLater(new Runnable()
         override def run(): Unit =
           ExternalSystemUtil.refreshProjects(
               new ImportSpecBuilder(model.getProject, SbtProjectSystem.Id)
                 .forceWhenUptodate()
                 .use(ProgressExecutionMode.IN_BACKGROUND_ASYNC)
             )
-      })
-    }
-  }
-}
+      )
 
 // TODO Allow to specify Scala and SBT versions in the project wizard UI
-private object SbtModuleBuilder {
+private object SbtModuleBuilder
   def formatProjectDefinition(name: String, scalaVersion: String) =
     s"""name := "$name"
       |
@@ -201,4 +190,3 @@ private object SbtModuleBuilder {
   def PluginsDefinition = "logLevel := Level.Warn"
 
   def formatSbtProperties(sbtVersion: String) = s"sbt.version = $sbtVersion"
-}

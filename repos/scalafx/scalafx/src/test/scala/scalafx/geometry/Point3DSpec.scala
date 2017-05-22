@@ -41,16 +41,14 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class Point3DSpec
     extends SimpleSFXDelegateSpec[jfxg.Point3D, Point3D](
-        classOf[jfxg.Point3D], classOf[Point3D]) {
+        classOf[jfxg.Point3D], classOf[Point3D])
 
   override protected def getScalaClassInstance = new Point3D(0, 0, 0)
 
   override protected def getJavaClassInstance = new jfxg.Point3D(0, 0, 0)
 
-  it should "report all zero cooordinates as Point3D.Zero" in {
+  it should "report all zero cooordinates as Point3D.Zero" in
     val zero = Point3D.Zero
     assert(zero.x === 0.0)
     assert(zero.y === 0.0)
     assert(zero.z === 0.0)
-  }
-}

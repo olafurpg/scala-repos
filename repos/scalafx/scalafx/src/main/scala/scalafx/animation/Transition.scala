@@ -38,7 +38,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define TR `Transition`
   */
-object Transition extends AnimationStatics {
+object Transition extends AnimationStatics
 
   /**
     * Converts a ScalaFX $TR to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Transition.html $TR]],
@@ -49,7 +49,6 @@ object Transition extends AnimationStatics {
     */
   implicit def sfxTransition2jfx(v: Transition): jfxa.Transition =
     if (v != null) v.delegate else null
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Transition.html $TR]].
@@ -60,14 +59,12 @@ object Transition extends AnimationStatics {
   * @define TR `Transition`
   */
 abstract class Transition(override val delegate: jfxa.Transition)
-    extends Animation(delegate) with SFXDelegate[jfxa.Transition] {
+    extends Animation(delegate) with SFXDelegate[jfxa.Transition]
 
   /**
     * Controls the timing for acceleration and deceleration at each $TR cycle. Default Value: `Interpolator.EASE_BOTH`.
     */
   def interpolator: ObjectProperty[jfxa.Interpolator] =
     delegate.interpolatorProperty
-  def interpolator_=(i: jfxa.Interpolator) {
+  def interpolator_=(i: jfxa.Interpolator)
     interpolator() = i
-  }
-}

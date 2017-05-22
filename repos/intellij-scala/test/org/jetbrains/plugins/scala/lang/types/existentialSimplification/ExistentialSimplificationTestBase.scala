@@ -18,13 +18,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScExistentialType, ScType}
   * @author Alexander Podkhalyuzin
   */
 abstract class ExistentialSimplificationTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   private val startExprMarker = "/*start*/"
   private val endExprMarker = "/*end*/"
 
   def folderPath: String = baseRootPath() + "types/existentialSimplification/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -53,18 +53,17 @@ abstract class ExistentialSimplificationTestBase
         scalaFile, startOffset + addOne, endOffset, classOf[ScExpression])
     assert(expr != null, "Not specified expression in range to infer type.")
     val typez = expr.getType(TypingContext.empty)
-    typez match {
+    typez match
       case Success(ttypez: ScExistentialType, _) =>
         val res = ScType.presentableText(ttypez.simplify())
         val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
         val text = lastPsi.getText
-        val output = lastPsi.getNode.getElementType match {
+        val output = lastPsi.getNode.getElementType match
           case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
           case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
             text.substring(2, text.length - 2).trim
           case _ =>
             assertTrue("Test result must be in last comment statement.", false)
-        }
         assertEquals(output, res)
       case Success(_, _) =>
         assert(
@@ -72,10 +71,7 @@ abstract class ExistentialSimplificationTestBase
       case Failure(msg, elem) =>
         assert(assertion = false,
                message = msg + " :: " +
-                 (elem match {
+                 (elem match
                      case Some(x) => x.getText
                      case None => "empty element"
-                   }))
-    }
-  }
-}
+                   ))

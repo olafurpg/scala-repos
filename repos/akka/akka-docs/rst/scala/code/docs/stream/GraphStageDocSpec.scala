@@ -16,16 +16,16 @@ import scala.concurrent.{Promise, Await, Future}
 import scala.concurrent.duration._
 import scala.collection.immutable.Iterable
 
-class GraphStageDocSpec extends AkkaSpec {
+class GraphStageDocSpec extends AkkaSpec
 
   implicit val materializer = ActorMaterializer()
 
-  "Demonstrate creation of GraphStage boilerplate" in {
+  "Demonstrate creation of GraphStage boilerplate" in
     //#boilerplate-example
     import akka.stream.SourceShape
     import akka.stream.stage.GraphStage
 
-    class NumbersSource extends GraphStage[SourceShape[Int]] {
+    class NumbersSource extends GraphStage[SourceShape[Int]]
       // Define the (sole) output port of this stage
       val out: Outlet[Int] = Outlet("NumbersSource")
       // Define the shape of this stage, which is SourceShape with the port we defined above
@@ -34,24 +34,22 @@ class GraphStageDocSpec extends AkkaSpec {
       // This is where the actual (possibly stateful) logic will live
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic = ???
-    }
     //#boilerplate-example
-  }
 
-  "Demonstrate creation of GraphStage Source" in {
+  "Demonstrate creation of GraphStage Source" in
     //#custom-source-example
     import akka.stream.SourceShape
     import akka.stream.Graph
     import akka.stream.stage.GraphStage
     import akka.stream.stage.OutHandler
 
-    class NumbersSource extends GraphStage[SourceShape[Int]] {
+    class NumbersSource extends GraphStage[SourceShape[Int]]
       val out: Outlet[Int] = Outlet("NumbersSource")
       override val shape: SourceShape[Int] = SourceShape(out)
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new GraphStageLogic(shape) {
+        new GraphStageLogic(shape)
           // All state MUST be inside the GraphStageLogic,
           // never inside the enclosing GraphStage.
           // This state is safe to access and modify from all the
@@ -59,14 +57,11 @@ class GraphStageDocSpec extends AkkaSpec {
           // registered handlers.
           private var counter = 1
 
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
+          setHandler(out, new OutHandler
+            override def onPull(): Unit =
               push(out, counter)
               counter += 1
-            }
-          })
-        }
-    }
+          )
     //#custom-source-example
 
     //#simple-source-usage
@@ -85,10 +80,9 @@ class GraphStageDocSpec extends AkkaSpec {
 
     Await.result(result1, 3.seconds) should ===(55)
     Await.result(result2, 3.seconds) should ===(5050)
-  }
 
   //#one-to-one
-  class Map[A, B](f: A => B) extends GraphStage[FlowShape[A, B]] {
+  class Map[A, B](f: A => B) extends GraphStage[FlowShape[A, B]]
 
     val in = Inlet[A]("Map.in")
     val out = Outlet[B]("Map.out")
@@ -96,22 +90,18 @@ class GraphStageDocSpec extends AkkaSpec {
     override val shape = FlowShape.of(in, out)
 
     override def createLogic(attr: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
+      new GraphStageLogic(shape)
+        setHandler(in, new InHandler
+          override def onPush(): Unit =
             push(out, f(grab(in)))
-          }
-        })
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
+        )
+        setHandler(out, new OutHandler
+          override def onPull(): Unit =
             pull(in)
-          }
-        })
-      }
-  }
+        )
   //#one-to-one
 
-  "Demonstrate a one to one element GraphStage" in {
+  "Demonstrate a one to one element GraphStage" in
     // tests:
     val stringLength = Flow.fromGraph(new Map[String, Int](_.length))
 
@@ -120,10 +110,9 @@ class GraphStageDocSpec extends AkkaSpec {
       .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(3, 3, 5))
-  }
 
   //#many-to-one
-  class Filter[A](p: A => Boolean) extends GraphStage[FlowShape[A, A]] {
+  class Filter[A](p: A => Boolean) extends GraphStage[FlowShape[A, A]]
 
     val in = Inlet[A]("Filter.in")
     val out = Outlet[A]("Filter.out")
@@ -132,24 +121,20 @@ class GraphStageDocSpec extends AkkaSpec {
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
+      new GraphStageLogic(shape)
+        setHandler(in, new InHandler
+          override def onPush(): Unit =
             val elem = grab(in)
             if (p(elem)) push(out, elem)
             else pull(in)
-          }
-        })
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
+        )
+        setHandler(out, new OutHandler
+          override def onPull(): Unit =
             pull(in)
-          }
-        })
-      }
-  }
+        )
   //#many-to-one
 
-  "Demonstrate a many to one element GraphStage" in {
+  "Demonstrate a many to one element GraphStage" in
 
     // tests:
     val evenFilter = Flow.fromGraph(new Filter[Int](_ % 2 == 0))
@@ -159,10 +144,9 @@ class GraphStageDocSpec extends AkkaSpec {
       .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(2, 4, 6))
-  }
 
   //#one-to-many
-  class Duplicator[A] extends GraphStage[FlowShape[A, A]] {
+  class Duplicator[A] extends GraphStage[FlowShape[A, A]]
 
     val in = Inlet[A]("Duplicator.in")
     val out = Outlet[A]("Duplicator.out")
@@ -171,38 +155,32 @@ class GraphStageDocSpec extends AkkaSpec {
 
     override def createLogic(
         inheritedAttributes: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
+      new GraphStageLogic(shape)
         // Again: note that all mutable state
         // MUST be inside the GraphStageLogic
         var lastElem: Option[A] = None
 
-        setHandler(in, new InHandler {
-          override def onPush(): Unit = {
+        setHandler(in, new InHandler
+          override def onPush(): Unit =
             val elem = grab(in)
             lastElem = Some(elem)
             push(out, elem)
-          }
 
-          override def onUpstreamFinish(): Unit = {
+          override def onUpstreamFinish(): Unit =
             if (lastElem.isDefined) emit(out, lastElem.get)
             complete(out)
-          }
-        })
-        setHandler(out, new OutHandler {
-          override def onPull(): Unit = {
-            if (lastElem.isDefined) {
+        )
+        setHandler(out, new OutHandler
+          override def onPull(): Unit =
+            if (lastElem.isDefined)
               push(out, lastElem.get)
               lastElem = None
-            } else {
+            else
               pull(in)
-            }
-          }
-        })
-      }
-  }
+        )
   //#one-to-many
 
-  "Demonstrate a one to many element GraphStage" in {
+  "Demonstrate a one to many element GraphStage" in
     // tests:
     val duplicator = Flow.fromGraph(new Duplicator[Int])
 
@@ -211,11 +189,10 @@ class GraphStageDocSpec extends AkkaSpec {
       .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1, 1, 2, 2, 3, 3))
-  }
 
-  "Demonstrate a simpler one to many stage" in {
+  "Demonstrate a simpler one to many stage" in
     //#simpler-one-to-many
-    class Duplicator[A] extends GraphStage[FlowShape[A, A]] {
+    class Duplicator[A] extends GraphStage[FlowShape[A, A]]
 
       val in = Inlet[A]("Duplicator.in")
       val out = Outlet[A]("Duplicator.out")
@@ -224,23 +201,19 @@ class GraphStageDocSpec extends AkkaSpec {
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new GraphStageLogic(shape) {
+        new GraphStageLogic(shape)
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
+          setHandler(in, new InHandler
+            override def onPush(): Unit =
               val elem = grab(in)
               // this will temporarily suspend this handler until the two elems
               // are emitted and then reinstates it
               emitMultiple(out, Iterable(elem, elem))
-            }
-          })
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
+          )
+          setHandler(out, new OutHandler
+            override def onPull(): Unit =
               pull(in)
-            }
-          })
-        }
-    }
+          )
     //#simpler-one-to-many
 
     // tests:
@@ -251,9 +224,8 @@ class GraphStageDocSpec extends AkkaSpec {
       .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1, 1, 2, 2, 3, 3))
-  }
 
-  "Demonstrate chaining of graph stages" in {
+  "Demonstrate chaining of graph stages" in
     val sink = Sink.fold[List[Int], Int](List.empty[Int])((acc, n) => acc :+ n)
 
     //#graph-stage-chain
@@ -266,15 +238,14 @@ class GraphStageDocSpec extends AkkaSpec {
     //#graph-stage-chain
 
     Await.result(resultFuture, 3.seconds) should ===(List(1, 1, 2, 2))
-  }
 
-  "Demonstrate an asynchronous side channel" in {
+  "Demonstrate an asynchronous side channel" in
     import system.dispatcher
     //#async-side-channel
     // will close upstream in all materializations of the graph stage instance
     // when the future completes
     class KillSwitch[A](switch: Future[Unit])
-        extends GraphStage[FlowShape[A, A]] {
+        extends GraphStage[FlowShape[A, A]]
 
       val in = Inlet[A]("KillSwitch.in")
       val out = Outlet[A]("KillSwitch.out")
@@ -283,23 +254,19 @@ class GraphStageDocSpec extends AkkaSpec {
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new GraphStageLogic(shape) {
+        new GraphStageLogic(shape)
 
-          override def preStart(): Unit = {
-            val callback = getAsyncCallback[Unit] { (_) =>
+          override def preStart(): Unit =
+            val callback = getAsyncCallback[Unit]  (_) =>
               completeStage()
-            }
             switch.foreach(callback.invoke)
-          }
 
-          setHandler(in, new InHandler {
+          setHandler(in, new InHandler
             override def onPush(): Unit = { push(out, grab(in)) }
-          })
-          setHandler(out, new OutHandler {
+          )
+          setHandler(out, new OutHandler
             override def onPull(): Unit = { pull(in) }
-          })
-        }
-    }
+          )
     //#async-side-channel
 
     // tests:
@@ -329,14 +296,13 @@ class GraphStageDocSpec extends AkkaSpec {
     switch.success(Unit)
 
     out.expectComplete()
-  }
 
-  "Demonstrate a graph stage with a timer" in {
+  "Demonstrate a graph stage with a timer" in
 
     //#timed
     // each time an event is pushed through it will trigger a period of silence
     class TimedGate[A](silencePeriod: FiniteDuration)
-        extends GraphStage[FlowShape[A, A]] {
+        extends GraphStage[FlowShape[A, A]]
 
       val in = Inlet[A]("TimedGate.in")
       val out = Outlet[A]("TimedGate.out")
@@ -345,30 +311,25 @@ class GraphStageDocSpec extends AkkaSpec {
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new TimerGraphStageLogic(shape) {
+        new TimerGraphStageLogic(shape)
 
           var open = false
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
+          setHandler(in, new InHandler
+            override def onPush(): Unit =
               val elem = grab(in)
               if (open) pull(in)
-              else {
+              else
                 push(out, elem)
                 open = true
                 scheduleOnce(None, silencePeriod)
-              }
-            }
-          })
-          setHandler(out, new OutHandler {
+          )
+          setHandler(out, new OutHandler
             override def onPull(): Unit = { pull(in) }
-          })
+          )
 
-          override protected def onTimer(timerKey: Any): Unit = {
+          override protected def onTimer(timerKey: Any): Unit =
             open = false
-          }
-        }
-    }
     //#timed
 
     // tests:
@@ -378,13 +339,12 @@ class GraphStageDocSpec extends AkkaSpec {
       .runFold(Seq.empty[Int])((elem, acc) => elem :+ acc)
 
     Await.result(result, 3.seconds) should ===(Seq(1))
-  }
 
-  "Demonstrate a custom materialized value" in {
+  "Demonstrate a custom materialized value" in
 
     //#materialized
     class FirstValue[A]
-        extends GraphStageWithMaterializedValue[FlowShape[A, A], Future[A]] {
+        extends GraphStageWithMaterializedValue[FlowShape[A, A], Future[A]]
 
       val in = Inlet[A]("FirstValue.in")
       val out = Outlet[A]("FirstValue.out")
@@ -392,35 +352,29 @@ class GraphStageDocSpec extends AkkaSpec {
       val shape = FlowShape.of(in, out)
 
       override def createLogicAndMaterializedValue(
-          inheritedAttributes: Attributes): (GraphStageLogic, Future[A]) = {
+          inheritedAttributes: Attributes): (GraphStageLogic, Future[A]) =
         val promise = Promise[A]()
-        val logic = new GraphStageLogic(shape) {
+        val logic = new GraphStageLogic(shape)
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
+          setHandler(in, new InHandler
+            override def onPush(): Unit =
               val elem = grab(in)
               promise.success(elem)
               push(out, elem)
 
               // replace handler with one just forwarding
-              setHandler(in, new InHandler {
-                override def onPush(): Unit = {
+              setHandler(in, new InHandler
+                override def onPush(): Unit =
                   push(out, grab(in))
-                }
-              })
-            }
-          })
+              )
+          )
 
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
+          setHandler(out, new OutHandler
+            override def onPull(): Unit =
               pull(in)
-            }
-          })
-        }
+          )
 
         (logic, promise.future)
-      }
-    }
     //#materialized
 
     // tests:
@@ -431,12 +385,11 @@ class GraphStageDocSpec extends AkkaSpec {
     val result: Future[Int] = flow.run()
 
     Await.result(result, 3.seconds) should ===(1)
-  }
 
-  "Demonstrate a detached graph stage" in {
+  "Demonstrate a detached graph stage" in
 
     //#detached
-    class TwoBuffer[A] extends GraphStage[FlowShape[A, A]] {
+    class TwoBuffer[A] extends GraphStage[FlowShape[A, A]]
 
       val in = Inlet[A]("TwoBuffer.in")
       val out = Outlet[A]("TwoBuffer.out")
@@ -445,56 +398,45 @@ class GraphStageDocSpec extends AkkaSpec {
 
       override def createLogic(
           inheritedAttributes: Attributes): GraphStageLogic =
-        new GraphStageLogic(shape) {
+        new GraphStageLogic(shape)
 
           val buffer = mutable.Queue[A]()
           def bufferFull = buffer.size == 2
           var downstreamWaiting = false
 
-          override def preStart(): Unit = {
+          override def preStart(): Unit =
             // a detached stage needs to start upstream demand
             // itself as it is not triggered by downstream demand
             pull(in)
-          }
 
-          setHandler(in, new InHandler {
-            override def onPush(): Unit = {
+          setHandler(in, new InHandler
+            override def onPush(): Unit =
               val elem = grab(in)
               buffer.enqueue(elem)
-              if (downstreamWaiting) {
+              if (downstreamWaiting)
                 downstreamWaiting = false
                 val bufferedElem = buffer.dequeue()
                 push(out, bufferedElem)
-              }
-              if (!bufferFull) {
+              if (!bufferFull)
                 pull(in)
-              }
-            }
 
-            override def onUpstreamFinish(): Unit = {
-              if (buffer.nonEmpty) {
+            override def onUpstreamFinish(): Unit =
+              if (buffer.nonEmpty)
                 // emit the rest if possible
                 emitMultiple(out, buffer.toIterator)
-              }
               completeStage()
-            }
-          })
+          )
 
-          setHandler(out, new OutHandler {
-            override def onPull(): Unit = {
-              if (buffer.isEmpty) {
+          setHandler(out, new OutHandler
+            override def onPull(): Unit =
+              if (buffer.isEmpty)
                 downstreamWaiting = true
-              } else {
+              else
                 val elem = buffer.dequeue
                 push(out, elem)
-              }
-              if (!bufferFull && !hasBeenPulled(in)) {
+              if (!bufferFull && !hasBeenPulled(in))
                 pull(in)
-              }
-            }
-          })
-        }
-    }
+          )
     //#detached
 
     // tests:
@@ -519,5 +461,3 @@ class GraphStageDocSpec extends AkkaSpec {
     publisher.sendNext(2)
 
     sub.cancel()
-  }
-}

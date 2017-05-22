@@ -8,7 +8,7 @@ private[nio] final class HeapByteBufferDoubleView private (
     _initialLimit: Int,
     _readOnly: Boolean,
     override private[nio] val isBigEndian: Boolean)
-    extends DoubleBuffer(_capacity, null, -1) {
+    extends DoubleBuffer(_capacity, null, -1)
 
   position(_initialPosition)
   limit(_initialLimit)
@@ -75,11 +75,10 @@ private[nio] final class HeapByteBufferDoubleView private (
   @inline
   private[nio] def store(index: Int, elem: Double): Unit =
     GenHeapBufferView(this).byteArrayBits.storeDouble(index, elem)
-}
 
-private[nio] object HeapByteBufferDoubleView {
+private[nio] object HeapByteBufferDoubleView
   private[nio] implicit object NewHeapByteBufferDoubleView
-      extends GenHeapBufferView.NewHeapBufferView[DoubleBuffer] {
+      extends GenHeapBufferView.NewHeapBufferView[DoubleBuffer]
     def bytesPerElem: Int = 8
 
     def apply(capacity: Int,
@@ -88,7 +87,7 @@ private[nio] object HeapByteBufferDoubleView {
               initialPosition: Int,
               initialLimit: Int,
               readOnly: Boolean,
-              isBigEndian: Boolean): DoubleBuffer = {
+              isBigEndian: Boolean): DoubleBuffer =
       new HeapByteBufferDoubleView(capacity,
                                    byteArray,
                                    byteArrayOffset,
@@ -96,11 +95,8 @@ private[nio] object HeapByteBufferDoubleView {
                                    initialLimit,
                                    readOnly,
                                    isBigEndian)
-    }
-  }
 
   @inline
   private[nio] def fromHeapByteBuffer(
       byteBuffer: HeapByteBuffer): DoubleBuffer =
     GenHeapBufferView.generic_fromHeapByteBuffer(byteBuffer)
-}

@@ -14,7 +14,7 @@ final class Env(config: AppConfig,
                 onStart: String => Unit,
                 prefApi: lila.pref.PrefApi,
                 relationApi: lila.relation.RelationApi,
-                system: ActorSystem) {
+                system: ActorSystem)
 
   private val FriendMemoTtl = config duration "friend.memo.ttl"
   private val CollectionUserConfig = config getString "collection.user_config"
@@ -34,9 +34,8 @@ final class Env(config: AppConfig,
 
   private[setup] lazy val userConfigColl = db(CollectionUserConfig)
   private[setup] lazy val anonConfigColl = db(CollectionAnonConfig)
-}
 
-object Env {
+object Env
 
   lazy val current =
     "setup" boot new Env(config = lila.common.PlayApp loadConfig "setup",
@@ -47,4 +46,3 @@ object Env {
                          prefApi = lila.pref.Env.current.api,
                          relationApi = lila.relation.Env.current.api,
                          system = lila.common.PlayApp.system)
-}

@@ -6,10 +6,10 @@ import mesosphere.marathon.core.task.Task
 import mesosphere.marathon.state.Timestamp
 import org.apache.mesos.{Protos => MesosProtos}
 
-class MarathonTaskFormatTest extends MarathonSpec {
+class MarathonTaskFormatTest extends MarathonSpec
   import Formats._
 
-  class Fixture {
+  class Fixture
     val time = Timestamp(1024)
     val network = MesosProtos.NetworkInfo
       .newBuilder()
@@ -48,9 +48,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
             .Reservation(Seq(Task.LocalVolumeId.unapply(
                                  "appid#container#random")).flatten,
                          MarathonTestHelper.taskReservationStateNew))
-  }
 
-  test("JSON serialization of a Task without IPs") {
+  test("JSON serialization of a Task without IPs")
     val f = new Fixture()
     val json = """
         |{
@@ -67,9 +66,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
     JsonTestHelper
       .assertThatJsonOf(f.taskWithoutIp)
       .correspondsToJsonString(json)
-  }
 
-  test("JSON serialization of a Task with multiple IPs") {
+  test("JSON serialization of a Task with multiple IPs")
     val f = new Fixture()
     val json = """
         |{
@@ -95,9 +93,8 @@ class MarathonTaskFormatTest extends MarathonSpec {
     JsonTestHelper
       .assertThatJsonOf(f.taskWithMultipleIPs)
       .correspondsToJsonString(json)
-  }
 
-  test("JSON serialization of a Task with reserved local volumes") {
+  test("JSON serialization of a Task with reserved local volumes")
     val f = new Fixture()
     val json = """
         |{
@@ -120,5 +117,3 @@ class MarathonTaskFormatTest extends MarathonSpec {
     JsonTestHelper
       .assertThatJsonOf(f.taskWithLocalVolumes)
       .correspondsToJsonString(json)
-  }
-}

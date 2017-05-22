@@ -29,16 +29,15 @@ import org.apache.spark.sql.types._
   * a single partition, and we use a single reducer to do the aggregation.).
   */
 case class Last(child: Expression, ignoreNullsExpr: Expression)
-    extends DeclarativeAggregate {
+    extends DeclarativeAggregate
 
   def this(child: Expression) = this(child, Literal.create(false, BooleanType))
 
-  private val ignoreNulls: Boolean = ignoreNullsExpr match {
+  private val ignoreNulls: Boolean = ignoreNullsExpr match
     case Literal(b: Boolean, BooleanType) => b
     case _ =>
       throw new AnalysisException(
           "The second argument of First should be a boolean literal.")
-  }
 
   override def children: Seq[Expression] = child :: Nil
 
@@ -61,32 +60,27 @@ case class Last(child: Expression, ignoreNullsExpr: Expression)
       /* last = */ Literal.create(null, child.dataType)
   )
 
-  override lazy val updateExpressions: Seq[Expression] = {
-    if (ignoreNulls) {
+  override lazy val updateExpressions: Seq[Expression] =
+    if (ignoreNulls)
       Seq(
           /* last = */ If(IsNull(child), last, child)
       )
-    } else {
+    else
       Seq(
           /* last = */ child
       )
-    }
-  }
 
-  override lazy val mergeExpressions: Seq[Expression] = {
-    if (ignoreNulls) {
+  override lazy val mergeExpressions: Seq[Expression] =
+    if (ignoreNulls)
       Seq(
           /* last = */ If(IsNull(last.right), last.left, last.right)
       )
-    } else {
+    else
       Seq(
           /* last = */ last.right
       )
-    }
-  }
 
   override lazy val evaluateExpression: AttributeReference = last
 
   override def toString: String =
     s"last($child)${if (ignoreNulls) " ignore nulls"}"
-}

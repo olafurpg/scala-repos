@@ -19,7 +19,7 @@
  */
 package com.precog.gjallerhorn
 
-object RunAll extends Runner {
+object RunAll extends Runner
   def tasks(settings: Settings) = List(
       new AccountsTask(settings),
       new SecurityTask(settings),
@@ -28,4 +28,3 @@ object RunAll extends Runner {
       new IngestTask(settings),
       new ScenariosTask(settings)
   )
-}

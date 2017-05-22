@@ -8,14 +8,13 @@ import org.joda.time.DateTime
 import reactivemongo.bson.BSONDocument
 import tube.postTube
 
-object PostRepo extends PostRepo(false) {
+object PostRepo extends PostRepo(false)
 
   def apply(troll: Boolean): PostRepo = troll.fold(PostRepoTroll, PostRepo)
-}
 
 object PostRepoTroll extends PostRepo(true)
 
-sealed abstract class PostRepo(troll: Boolean) {
+sealed abstract class PostRepo(troll: Boolean)
 
   private lazy val trollFilter = troll.fold(
       Json.obj(),
@@ -87,4 +86,3 @@ sealed abstract class PostRepo(troll: Boolean) {
 
   def idsByTopicId(topicId: String): Fu[List[String]] =
     postTube.coll.distinct("_id", BSONDocument("topicId" -> topicId).some) map lila.db.BSON.asStrings
-}

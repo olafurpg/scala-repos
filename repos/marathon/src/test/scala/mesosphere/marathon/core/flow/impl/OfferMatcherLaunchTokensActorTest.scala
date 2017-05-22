@@ -11,13 +11,12 @@ import org.mockito.Mockito
 import rx.lang.scala.{Observable, Subject}
 import rx.lang.scala.subjects.PublishSubject
 
-class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
-  test("initially setup tokens") {
+class OfferMatcherLaunchTokensActorTest extends MarathonSpec
+  test("initially setup tokens")
     Mockito.verify(taskStatusObservables).forAll
     Mockito.verify(offerMatcherManager).setLaunchTokens(conf.launchTokens())
-  }
 
-  test("refill on running tasks without health info") {
+  test("refill on running tasks without health info")
     // startup
     Mockito.verify(taskStatusObservables).forAll
     Mockito.verify(offerMatcherManager).setLaunchTokens(conf.launchTokens())
@@ -25,9 +24,8 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
     allObservable.onNext(TaskStatusUpdateTestHelper.running.wrapped)
 
     Mockito.verify(offerMatcherManager).addLaunchTokens(1)
-  }
 
-  test("refill on running healthy task") {
+  test("refill on running healthy task")
     // startup
     Mockito.verify(taskStatusObservables).forAll
     Mockito.verify(offerMatcherManager).setLaunchTokens(conf.launchTokens())
@@ -35,15 +33,13 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
     allObservable.onNext(TaskStatusUpdateTestHelper.runningHealthy.wrapped)
 
     Mockito.verify(offerMatcherManager).addLaunchTokens(1)
-  }
 
-  test("DO NOT refill on running UNhealthy task") {
+  test("DO NOT refill on running UNhealthy task")
     // startup
     Mockito.verify(taskStatusObservables).forAll
     Mockito.verify(offerMatcherManager).setLaunchTokens(conf.launchTokens())
 
     allObservable.onNext(TaskStatusUpdateTestHelper.runningUnhealthy.wrapped)
-  }
 
   private[this] implicit var actorSystem: ActorSystem = _
   private[this] var allObservable: Subject[TaskStatusUpdate] = _
@@ -52,7 +48,7 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
   private[this] var offerMatcherManager: OfferMatcherManager = _
   private[this] var actorRef: TestActorRef[OfferMatcherLaunchTokensActor] = _
 
-  before {
+  before
     actorSystem = ActorSystem()
     conf = new LaunchTokenConfig {}
     conf.afterInit()
@@ -65,13 +61,10 @@ class OfferMatcherLaunchTokensActorTest extends MarathonSpec {
         OfferMatcherLaunchTokensActor.props(
             conf, taskStatusObservables, offerMatcherManager)
     )
-  }
 
-  after {
+  after
     Mockito.verifyNoMoreInteractions(taskStatusObservables)
     Mockito.verifyNoMoreInteractions(offerMatcherManager)
 
     actorSystem.shutdown()
     actorSystem.awaitTermination()
-  }
-}

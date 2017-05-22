@@ -5,7 +5,7 @@ package algebra
   * A trait for things that have some notion of sign and the ability to ensure
   * something has a positive sign.
   */
-trait Signed[@sp(Double, Float, Int, Long) A] extends Any {
+trait Signed[@sp(Double, Float, Int, Long) A] extends Any
 
   /** Returns Zero if `a` is 0, Positive if `a` is positive, and Negative is `a` is negative. */
   def sign(a: A): Sign = Sign(signum(a))
@@ -23,17 +23,14 @@ trait Signed[@sp(Double, Float, Int, Long) A] extends Any {
   def isSignNonZero(a: A): Boolean = signum(a) != 0
   def isSignNonPositive(a: A): Boolean = signum(a) <= 0
   def isSignNonNegative(a: A): Boolean = signum(a) >= 0
-}
 
-object Signed {
+object Signed
   implicit def orderedRingIsSigned[A : Order : Ring]: Signed[A] =
     new OrderedRingIsSigned[A]
 
   def apply[A](implicit s: Signed[A]): Signed[A] = s
-}
 
 private[algebra] class OrderedRingIsSigned[A](implicit o: Order[A], r: Ring[A])
-    extends Signed[A] {
+    extends Signed[A]
   def signum(a: A): Int = o.compare(a, r.zero)
   def abs(a: A): A = if (signum(a) < 0) r.negate(a) else a
-}

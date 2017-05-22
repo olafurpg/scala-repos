@@ -16,7 +16,7 @@ import akka.util.JavaDurationConverters._
 
 import OptimalSizeExploringResizer._
 
-trait OptimalSizeExploringResizer extends Resizer {
+trait OptimalSizeExploringResizer extends Resizer
 
   /**
     * Report the messageCount as well as current routees so that the
@@ -28,9 +28,8 @@ trait OptimalSizeExploringResizer extends Resizer {
     */
   def reportMessageCount(
       currentRoutees: immutable.IndexedSeq[Routee], messageCounter: Long): Unit
-}
 
-case object OptimalSizeExploringResizer {
+case object OptimalSizeExploringResizer
 
   /**
     * INTERNAL API
@@ -73,7 +72,6 @@ case object OptimalSizeExploringResizer {
         explorationProbability = resizerCfg.getDouble("chance-of-exploration"),
         weightOfLatestMetric = resizerCfg.getDouble("weight-of-latest-metric"),
         downsizeRatio = resizerCfg.getDouble("downsize-ratio"))
-}
 
 /**
   * This resizer resizes the pool to an optimal size that provides
@@ -132,7 +130,7 @@ case class DefaultOptimalSizeExploringResizer(
     downsizeAfterUnderutilizedFor: Duration = 72.hours,
     explorationProbability: Double = 0.4,
     weightOfLatestMetric: Double = 0.5)
-    extends OptimalSizeExploringResizer {
+    extends OptimalSizeExploringResizer
 
   /**
     * Leave package accessible for testing purpose
@@ -187,35 +185,31 @@ case class DefaultOptimalSizeExploringResizer(
 
   private val actionInternalNanos = actionInterval.toNanos
 
-  def isTimeForResize(messageCounter: Long): Boolean = {
+  def isTimeForResize(messageCounter: Long): Boolean =
     System.nanoTime() > record.checkTime + actionInternalNanos
-  }
 
   def reportMessageCount(currentRoutees: immutable.IndexedSeq[Routee],
-                         messageCounter: Long): Unit = {
+                         messageCounter: Long): Unit =
     val (newPerfLog, newRecord) = updatedStats(currentRoutees, messageCounter)
 
     performanceLog = newPerfLog
     record = newRecord
-  }
 
   private[routing] def updatedStats(
       currentRoutees: immutable.IndexedSeq[Routee],
-      messageCounter: Long): (PerformanceLog, ResizeRecord) = {
+      messageCounter: Long): (PerformanceLog, ResizeRecord) =
     val now = LocalDateTime.now
     val currentSize = currentRoutees.length
 
     val messagesInRoutees =
-      currentRoutees map {
+      currentRoutees map
         case ActorRefRoutee(a: ActorRefWithCell) ⇒
-          a.underlying match {
+          a.underlying match
             case cell: ActorCell ⇒
               cell.mailbox.numberOfMessages +
               (if (cell.currentMessage != null) 1 else 0)
             case cell ⇒ cell.numberOfMessages
-          }
         case x ⇒ 0
-      }
 
     val totalQueueLength = messagesInRoutees.sum
     val utilized = messagesInRoutees.count(_ > 0)
@@ -234,23 +228,22 @@ case class DefaultOptimalSizeExploringResizer(
 
     val newPerformanceLog: PerformanceLog =
       if (fullyUtilized && record.underutilizationStreak.isEmpty &&
-          record.checkTime > 0) {
+          record.checkTime > 0)
         val totalMessageReceived = messageCounter - record.messageCount
         val queueSizeChange = record.totalQueueLength - totalQueueLength
         val totalProcessed = queueSizeChange + totalMessageReceived
-        if (totalProcessed > 0) {
+        if (totalProcessed > 0)
           val duration =
             Duration.fromNanos(System.nanoTime() - record.checkTime)
           val last: Duration = duration / totalProcessed
           //exponentially decrease the weight of old last metrics data
-          val toUpdate = performanceLog.get(currentSize).fold(last) {
+          val toUpdate = performanceLog.get(currentSize).fold(last)
             oldSpeed ⇒
               (oldSpeed * (1.0 - weightOfLatestMetric)) +
               (last * weightOfLatestMetric)
-          }
           performanceLog + (currentSize → toUpdate)
-        } else performanceLog
-      } else performanceLog
+        else performanceLog
+      else performanceLog
 
     val newRecord = record.copy(
         underutilizationStreak = newUnderutilizationStreak,
@@ -259,32 +252,29 @@ case class DefaultOptimalSizeExploringResizer(
         checkTime = System.nanoTime())
 
     (newPerformanceLog, newRecord)
-  }
 
-  def resize(currentRoutees: immutable.IndexedSeq[Routee]): Int = {
+  def resize(currentRoutees: immutable.IndexedSeq[Routee]): Int =
     val currentSize = currentRoutees.length
     val now = LocalDateTime.now
     val proposedChange =
       if (record.underutilizationStreak.fold(false)(_.start.isBefore(
-                  now.minus(downsizeAfterUnderutilizedFor.asJava)))) {
+                  now.minus(downsizeAfterUnderutilizedFor.asJava))))
         val downsizeTo =
           (record.underutilizationStreak.get.highestUtilization * downsizeRatio).toInt
         Math.min(downsizeTo - currentSize, 0)
-      } else if (performanceLog.isEmpty ||
-                 record.underutilizationStreak.isDefined) {
+      else if (performanceLog.isEmpty ||
+                 record.underutilizationStreak.isDefined)
         0
-      } else {
+      else
         if (!stopExploring && random.nextDouble() < explorationProbability)
           explore(currentSize)
         else optimize(currentSize)
-      }
     Math.max(lowerBound, Math.min(proposedChange + currentSize, upperBound)) -
     currentSize
-  }
 
-  private def optimize(currentSize: PoolSize): Int = {
+  private def optimize(currentSize: PoolSize): Int =
 
-    val adjacentDispatchWaits: Map[PoolSize, Duration] = {
+    val adjacentDispatchWaits: Map[PoolSize, Duration] =
       def adjacency = (size: Int) ⇒ Math.abs(currentSize - size)
       val sizes = performanceLog.keys.toSeq
       val numOfSizesEachSide =
@@ -301,21 +291,16 @@ case class DefaultOptimalSizeExploringResizer(
         .take(numOfSizesEachSide)
         .lastOption
         .getOrElse(currentSize)
-      performanceLog.filter {
+      performanceLog.filter
         case (size, _) ⇒ size >= leftBoundary && size <= rightBoundary
-      }
-    }
 
     val optimalSize = adjacentDispatchWaits.minBy(_._2)._1
     val movement = (optimalSize - currentSize) / 2.0
     if (movement < 0) Math.floor(movement).toInt
     else Math.ceil(movement).toInt
-  }
 
-  private def explore(currentSize: PoolSize): Int = {
+  private def explore(currentSize: PoolSize): Int =
     val change = Math.max(
         1, random.nextInt(Math.ceil(currentSize * exploreStepSize).toInt))
     if (random.nextDouble() < chanceOfScalingDownWhenFull) -change
     else change
-  }
-}

@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/input/KeyCode.html javafx.scene.input.KeyCode]] */
-object KeyCode extends SFXEnumDelegateCompanion[jfxsi.KeyCode, KeyCode] {
+object KeyCode extends SFXEnumDelegateCompanion[jfxsi.KeyCode, KeyCode]
 
   val Enter = new KeyCode(jfxsi.KeyCode.ENTER)
   @deprecated(
@@ -1213,10 +1213,9 @@ object KeyCode extends SFXEnumDelegateCompanion[jfxsi.KeyCode, KeyCode] {
 
   /** Parses textual representation of a key. */
   def keyCode(name: String): KeyCode = jfxsi.KeyCode.getKeyCode(name)
-}
 
 sealed case class KeyCode(override val delegate: jfxsi.KeyCode)
-    extends SFXEnumDelegate[jfxsi.KeyCode] {
+    extends SFXEnumDelegate[jfxsi.KeyCode]
 
   /** Gets name of this key code. */
   def name: String = delegate.getName
@@ -1247,4 +1246,3 @@ sealed case class KeyCode(override val delegate: jfxsi.KeyCode)
 
   /** Space, tab and enter */
   def isWhitespaceKey: Boolean = delegate.isWhitespaceKey
-}

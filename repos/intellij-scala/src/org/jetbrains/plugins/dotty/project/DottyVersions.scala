@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.project.{Version, Versions}
 /**
   * @author adkozlov
   */
-object DottyVersions extends Versions {
+object DottyVersions extends Versions
   val DottyVersion = Dotty.defaultVersion
 
   override protected val releaseVersionLine = """.+>(\d+.\d+.+)/<.*""".r
@@ -18,4 +18,3 @@ object DottyVersions extends Versions {
           s"$RepositoryUrl/${GroupId.replace('.', '/')}/$ArtifactId",
           Version(DefaultRevision),
           Seq(DefaultRevision))
-}

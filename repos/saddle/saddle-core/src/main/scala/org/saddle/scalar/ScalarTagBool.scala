@@ -26,7 +26,7 @@ import org.saddle.array.Sorter
 /**
   * Boolean ScalarTag
   */
-object ScalarTagBool extends ScalarTag[Boolean] {
+object ScalarTagBool extends ScalarTag[Boolean]
   def missing: Boolean = false
   def isMissing(v: Boolean): Boolean = false
   def notMissing(v: Boolean): Boolean = true
@@ -58,4 +58,3 @@ object ScalarTagBool extends ScalarTag[Boolean] {
     Vec(array.flatten(arrs.map(_.toArray)))
 
   override def toString = "ScalarTagBool"
-}

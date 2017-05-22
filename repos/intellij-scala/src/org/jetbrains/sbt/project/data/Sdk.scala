@@ -21,12 +21,11 @@ final case class JdkByName(name: String) extends Sdk
 final case class JdkByHome(home: File) extends Sdk
 final case class Android(version: String) extends Sdk
 
-object SdkUtils {
-  def findProjectSdk(sdk: Sdk): Option[projectRoots.Sdk] = sdk match {
+object SdkUtils
+  def findProjectSdk(sdk: Sdk): Option[projectRoots.Sdk] = sdk match
     case Android(version) => findAndroidJdkByVersion(version)
     case JdkByName(version) => allJdks.find(_.getName.contains(version))
     case JdkByHome(homeFile) => findJdkByHome(homeFile)
-  }
 
   def allAndroidSdks: Seq[projectRoots.Sdk] =
     inReadAction(
@@ -39,7 +38,7 @@ object SdkUtils {
     inReadAction(ProjectJdkTable.getInstance.getAllJdks.toSeq)
 
   def defaultJavaLanguageLevelIn(
-      jdk: projectRoots.Sdk): Option[LanguageLevel] = {
+      jdk: projectRoots.Sdk): Option[LanguageLevel] =
     val JavaLanguageLevels = Map("1.3" -> LanguageLevel.JDK_1_3,
                                  "1.4" -> LanguageLevel.JDK_1_4,
                                  "1.5" -> LanguageLevel.JDK_1_5,
@@ -49,40 +48,34 @@ object SdkUtils {
                                  "1.9" -> LanguageLevel.JDK_1_9)
     val jdkVersion = Option(jdk.getVersionString).getOrElse(jdk.getName)
 
-    JavaLanguageLevels.collectFirst {
+    JavaLanguageLevels.collectFirst
       case (name, level) if jdkVersion.contains(name) => level
-    }
-  }
 
-  def javaLanguageLevelFrom(javacOptions: Seq[String]): Option[LanguageLevel] = {
-    for {
+  def javaLanguageLevelFrom(javacOptions: Seq[String]): Option[LanguageLevel] =
+    for
       sourcePos <- Option(javacOptions.indexOf("-source")).filterNot(_ == -1)
       sourceValue <- javacOptions.lift(sourcePos + 1)
       languageLevel <- Option(LanguageLevel.parse(sourceValue))
-    } yield languageLevel
-  }
+    yield languageLevel
 
   private def findAndroidJdkByVersion(
-      version: String): Option[projectRoots.Sdk] = {
+      version: String): Option[projectRoots.Sdk] =
     def isGEQAsInt(fst: String, snd: String): Boolean =
-      try {
+      try
         val fstInt = fst.toInt
         val sndInt = snd.toInt
         fstInt >= sndInt
-      } catch {
+      catch
         case exc: NumberFormatException => false
-      }
 
-    val matchingSdks = for {
+    val matchingSdks = for
       sdk <- allAndroidSdks
       platformVersion <- Option(AndroidPlatform.getInstance(sdk))
                           .map(_.getApiLevel.toString) if isGEQAsInt(
                             platformVersion, version)
-    } yield sdk
+    yield sdk
     matchingSdks.headOption
-  }
 
   private def findJdkByHome(homeFile: File): Option[projectRoots.Sdk] =
     allJdks.find(jdk =>
           FileUtil.comparePaths(homeFile.getCanonicalPath, jdk.getHomePath) == 0)
-}

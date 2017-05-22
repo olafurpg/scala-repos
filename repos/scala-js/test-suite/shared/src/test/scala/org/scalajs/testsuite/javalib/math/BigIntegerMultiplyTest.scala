@@ -14,9 +14,9 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.AssertThrows._
 
-class BigIntegerMultiplyTest {
+class BigIntegerMultiplyTest
 
-  @Test def testCase1(): Unit = {
+  @Test def testCase1(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3)
     val bBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val aSign = -1
@@ -45,13 +45,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testCase10(): Unit = {
+  @Test def testCase10(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val aSign = -1
     val rBytes =
@@ -61,13 +59,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testCase2(): Unit = {
+  @Test def testCase2(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3)
     val bBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val aSign = -1
@@ -96,13 +92,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testCase3(): Unit = {
+  @Test def testCase3(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val bBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val aSign = 1
@@ -136,13 +130,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testCase4(): Unit = {
+  @Test def testCase4(): Unit =
     val aBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val bBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val aSign = 1
@@ -176,13 +168,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testCase5(): Unit = {
+  @Test def testCase5(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val bBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val aSign = 1
@@ -216,13 +206,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testCase6(): Unit = {
+  @Test def testCase6(): Unit =
     val aBytes = Array[Byte](10, 20, 30, 40, 50, 60, 70, 10, 20, 30)
     val bBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val aSign = 1
@@ -256,13 +244,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testCase7(): Unit = {
+  @Test def testCase7(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val bBytes = Array[Byte](0)
     val aSign = 1
@@ -273,13 +259,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(0, result.signum())
-  }
 
-  @Test def testCase8(): Unit = {
+  @Test def testCase8(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val aSign = 1
     val rBytes = Array[Byte](0)
@@ -288,13 +272,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(0, result.signum())
-  }
 
-  @Test def testCase9(): Unit = {
+  @Test def testCase9(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
     val aSign = 1
     val rBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 1, 2, 3, 4, 5)
@@ -303,13 +285,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testIntbyInt1(): Unit = {
+  @Test def testIntbyInt1(): Unit =
     val aBytes = Array[Byte](10, 20, 30, 40)
     val bBytes = Array[Byte](1, 2, 3, 4)
     val aSign = 1
@@ -320,13 +300,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testIntbyInt2(): Unit = {
+  @Test def testIntbyInt2(): Unit =
     val aBytes = Array[Byte](-1, -1, -1, -1)
     val bBytes = Array[Byte](-1, -1, -1, -1)
     val aSign = 1
@@ -337,21 +315,18 @@ class BigIntegerMultiplyTest {
     val result = aNumber.multiply(bNumber)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPowException(): Unit = {
+  @Test def testPowException(): Unit =
     val aBytes = Array[Byte](1, 2, 3, 4, 5, 6, 7)
     val aSign = 1
     val exp = -5
     val aNumber = new BigInteger(aSign, aBytes)
     expectThrows(classOf[ArithmeticException], aNumber.pow(exp))
-  }
 
-  @Test def testPowNegativeNumToEvenExp(): Unit = {
+  @Test def testPowNegativeNumToEvenExp(): Unit =
     val aBytes = Array[Byte](50, -26, 90, 69, 120, 32, 63, -103, -14, 35)
     val aSign = -1
     val exp = 4
@@ -398,13 +373,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.pow(exp)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPowNegativeNumToOddExp(): Unit = {
+  @Test def testPowNegativeNumToOddExp(): Unit =
     val aBytes = Array[Byte](50, -26, 90, 69, 120, 32, 63, -103, -14, 35)
     val aSign = -1
     val exp = 5
@@ -461,13 +434,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.pow(exp)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(-1, result.signum())
-  }
 
-  @Test def testPowNegativeNumToZeroExp(): Unit = {
+  @Test def testPowNegativeNumToZeroExp(): Unit =
     val aBytes = Array[Byte](50, -26, 90, 69, 120, 32, 63, -103, -14, 35)
     val aSign = -1
     val exp = 0
@@ -476,13 +447,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.pow(exp)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPowPositiveNum(): Unit = {
+  @Test def testPowPositiveNum(): Unit =
     val aBytes = Array[Byte](50, -26, 90, 69, 120, 32, 63, -103, -14, 35)
     val aSign = 1
     val exp = 5
@@ -539,13 +508,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.pow(exp)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPowPositiveNumToZeroExp(): Unit = {
+  @Test def testPowPositiveNumToZeroExp(): Unit =
     val aBytes = Array[Byte](50, -26, 90, 69, 120, 32, 63, -103, -14, 35)
     val aSign = 1
     val exp = 0
@@ -554,13 +521,11 @@ class BigIntegerMultiplyTest {
     val result = aNumber.pow(exp)
     var resBytes = Array.ofDim[Byte](rBytes.length)
     resBytes = result.toByteArray()
-    for (i <- 0 until resBytes.length) {
+    for (i <- 0 until resBytes.length)
       assertEquals(rBytes(i), resBytes(i))
-    }
     assertEquals(1, result.signum())
-  }
 
-  @Test def testPow31_issue_2045(): Unit = {
+  @Test def testPow31_issue_2045(): Unit =
     assertEquals(BigInt("2147483648"), BigInt(2).pow(31))
     assertEquals(BigInt("1326443518324400147398656"), BigInt(6).pow(31))
     assertEquals(
@@ -584,5 +549,3 @@ class BigIntegerMultiplyTest {
     assertEquals(
         BigInt("3511500884366740741319133039278240178576180323024896"),
         BigInt(46).pow(31))
-  }
-}

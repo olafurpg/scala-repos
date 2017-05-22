@@ -1,4 +1,4 @@
-class VarargsTest extends VarargsRemove {
+class VarargsTest extends VarargsRemove
   override def foo(i: Int, b: Boolean) {}
 
   super.foo(1, true)
@@ -11,4 +11,3 @@ class VarargsTest extends VarargsRemove {
 
   foo(i = 1, true)
   foo(i = 1, true)
-}

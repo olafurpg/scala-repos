@@ -12,9 +12,9 @@ import org.junit.Assert._
 
 import scala.runtime.BoxedUnit
 
-class ClassTest {
+class ClassTest
 
-  @Test def getPrimitiveTypeName(): Unit = {
+  @Test def getPrimitiveTypeName(): Unit =
     assertEquals("void", classOf[Unit].getName)
     assertEquals("boolean", classOf[Boolean].getName)
     assertEquals("char", classOf[Char].getName)
@@ -24,9 +24,8 @@ class ClassTest {
     assertEquals("long", classOf[Long].getName)
     assertEquals("float", classOf[Float].getName)
     assertEquals("double", classOf[Double].getName)
-  }
 
-  @Test def wellKnownClasses(): Unit = {
+  @Test def wellKnownClasses(): Unit =
     assertSame(classOf[Unit], scala.runtime.BoxedUnit.TYPE)
     assertSame(classOf[Unit], java.lang.Void.TYPE)
     assertSame(classOf[Boolean], java.lang.Boolean.TYPE)
@@ -48,26 +47,23 @@ class ClassTest {
     assertNotSame(classOf[java.lang.Long], java.lang.Long.TYPE)
     assertNotSame(classOf[java.lang.Float], java.lang.Float.TYPE)
     assertNotSame(classOf[java.lang.Double], java.lang.Double.TYPE)
-  }
 
-  @Test def getSimpleName(): Unit = {
+  @Test def getSimpleName(): Unit =
     assertEquals("Integer", classOf[java.lang.Integer].getSimpleName())
     assertEquals("Class", classOf[java.lang.Class[_]].getSimpleName())
     assertEquals("Map", classOf[scala.collection.Map[_, _]].getSimpleName())
     assertEquals(
         "InnerClass", classOf[ClassTestClass#InnerClass].getSimpleName())
-  }
 
-  @Test def getComponentType(): Unit = {
+  @Test def getComponentType(): Unit =
     @noinline
     def testNoInline(clazz: Class[_], componentType: Class[_]): Unit =
       assertEquals(componentType, clazz.getComponentType)
 
     @inline
-    def test(clazz: Class[_], componentType: Class[_]): Unit = {
+    def test(clazz: Class[_], componentType: Class[_]): Unit =
       testNoInline(clazz, componentType)
       assertEquals(componentType, clazz.getComponentType)
-    }
 
     test(classOf[Array[Object]], classOf[Object])
     test(classOf[Array[Int]], classOf[Int])
@@ -86,9 +82,6 @@ class ClassTest {
     test(classOf[String], null)
     test(classOf[Seq[_]], null)
     test(classOf[Unit], null)
-  }
-}
 
-class ClassTestClass {
+class ClassTestClass
   class InnerClass
-}

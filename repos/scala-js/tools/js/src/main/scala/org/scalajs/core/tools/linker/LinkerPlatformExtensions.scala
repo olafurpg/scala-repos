@@ -14,7 +14,7 @@ import org.scalajs.core.tools.linker.frontend.LinkerFrontend
 import org.scalajs.core.tools.linker.frontend.optimizer.IncOptimizer
 import org.scalajs.core.tools.linker.backend._
 
-trait LinkerPlatformExtensions {
+trait LinkerPlatformExtensions
   this: Linker.type =>
   def apply(
       semantics: Semantics = Semantics.Defaults,
@@ -22,7 +22,7 @@ trait LinkerPlatformExtensions {
       withSourceMap: Boolean = true,
       disableOptimizer: Boolean = false,
       frontendConfig: LinkerFrontend.Config = LinkerFrontend.Config(),
-      backendConfig: LinkerBackend.Config = LinkerBackend.Config()): Linker = {
+      backendConfig: LinkerBackend.Config = LinkerBackend.Config()): Linker =
     val optOptimizerFactory =
       if (disableOptimizer) None
       else Some(IncOptimizer.factory)
@@ -35,5 +35,3 @@ trait LinkerPlatformExtensions {
     val backend = new BasicLinkerBackend(
         semantics, outputMode, withSourceMap, backendConfig)
     new Linker(frontend, backend)
-  }
-}

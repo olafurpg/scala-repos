@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
 
   case class C[T, U <: String, O >: Object](x: Int, y: T)(z: U, b: Boolean)(
       s: O, val l: Int)
@@ -13,4 +13,3 @@ object Test extends App {
       new Object, 100)
   println(res)
   println(res.l)
-}

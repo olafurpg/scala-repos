@@ -6,39 +6,37 @@ import scalaz.NonEmptyList
 
 import lila.db.Implicits._
 
-private final class AggregationPipeline {
+private final class AggregationPipeline
 
   import lila.insight.{Dimension => D, Metric => M}
   import Storage._
   import Entry.{BSONFields => F}
 
   private lazy val movetimeIdDispatcher = MovetimeRange.reversedNoInf
-    .foldLeft[BSONValue](BSONInteger(MovetimeRange.MTRInf.id)) {
+    .foldLeft[BSONValue](BSONInteger(MovetimeRange.MTRInf.id))
     case (acc, mtr) =>
       BSONDocument(
           "$cond" -> BSONArray(BSONDocument("$lte" -> BSONArray(
                                        "$" + F.moves("t"), mtr.tenths.last)),
                                mtr.id,
                                acc))
-  }
   private lazy val materialIdDispatcher = BSONDocument(
       "$cond" -> BSONArray(
           BSONDocument("$eq" -> BSONArray("$" + F.moves("i"), 0)),
           MaterialRange.Equal.id,
           MaterialRange.reversedButEqualAndLast
-            .foldLeft[BSONValue](BSONInteger(MaterialRange.Up4.id)) {
+            .foldLeft[BSONValue](BSONInteger(MaterialRange.Up4.id))
         case (acc, mat) =>
           BSONDocument("$cond" -> BSONArray(
                   BSONDocument(mat.negative.fold("$lt", "$lte") -> BSONArray(
                           "$" + F.moves("i"), mat.imbalance)),
                   mat.id,
                   acc))
-      }))
-  private def dimensionGroupId(dim: Dimension[_]): BSONValue = dim match {
+      ))
+  private def dimensionGroupId(dim: Dimension[_]): BSONValue = dim match
     case Dimension.MovetimeRange => movetimeIdDispatcher
     case Dimension.MaterialRange => materialIdDispatcher
     case d => BSONString("$" + d.dbKey)
-  }
 
   private val sampleGames = Sample(10 * 1000)
   private val sortDate = Sort(Descending(F.date))
@@ -78,23 +76,22 @@ private final class AggregationPipeline {
       )).some
 
   def apply(question: Question[_],
-            userId: String): NonEmptyList[PipelineOperator] = {
+            userId: String): NonEmptyList[PipelineOperator] =
     import question.{dimension, metric, filters}
     val gameMatcher = combineDocs(
-        question.filters.collect {
+        question.filters.collect
       case f if f.dimension.isInGame => f.matcher
-    })
+    )
     def matchMoves(extraMatcher: BSONDocument = BSONDocument()) =
-      combineDocs(extraMatcher :: question.filters.collect {
+      combineDocs(extraMatcher :: question.filters.collect
         case f if f.dimension.isInMove => f.matcher
-      }).some.filterNot(_.isEmpty) map Match
+      ).some.filterNot(_.isEmpty) map Match
     def projectForMove =
       Project(
-          BSONDocument({
-        metric.dbKey :: dimension.dbKey :: filters.collect {
+          BSONDocument(
+        metric.dbKey :: dimension.dbKey :: filters.collect
           case Filter(d, _) if d.isInMove => d.dbKey
-        }
-      }.distinct.map(_ -> BSONBoolean(true)))).some
+      .distinct.map(_ -> BSONBoolean(true)))).some
 
     NonEmptyList.nel[PipelineOperator](
         Match(
@@ -104,12 +101,11 @@ private final class AggregationPipeline {
               .requiresAnalysis(metric)
               .??(BSONDocument(F.analysed -> true)) ++
             (Metric.requiresStableRating(metric) ||
-                Dimension.requiresStableRating(dimension)).?? {
+                Dimension.requiresStableRating(dimension)).??
               BSONDocument(F.provisional -> BSONDocument("$ne" -> true))
-            }
         ),
         /* sortDate :: */ sampleGames ::
-        ((metric match {
+        ((metric match
               case M.MeanCpl =>
                 List(
                     projectForMove,
@@ -248,11 +244,9 @@ private final class AggregationPipeline {
                     regroupStacked,
                     sliceStackedIds
                 )
-            }) :::
-            (dimension match {
+            ) :::
+            (dimension match
                   case D.Opening => List(sortNb, limit(12))
                   case _ => Nil
-                })).flatten
+                )).flatten
     )
-  }
-}

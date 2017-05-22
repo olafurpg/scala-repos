@@ -30,30 +30,26 @@ case class TokenizerTestData(rawText: String, wantedTokens: Array[String])
 
 class TokenizerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new Tokenizer)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t =
       new Tokenizer().setInputCol("myInputCol").setOutputCol("myOutputCol")
     testDefaultReadWrite(t)
-  }
-}
 
 class RegexTokenizerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   import org.apache.spark.ml.feature.RegexTokenizerSuite._
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new RegexTokenizer)
-  }
 
-  test("RegexTokenizer") {
+  test("RegexTokenizer")
     val tokenizer0 = new RegexTokenizer()
       .setGaps(false)
       .setPattern("\\w+|\\p{Punct}")
@@ -86,9 +82,8 @@ class RegexTokenizerSuite
             TokenizerTestData("Te,st.  punct", Array("te,st.", "punct"))
         ))
     testRegexTokenizer(tokenizer2, dataset2)
-  }
 
-  test("RegexTokenizer with toLowercase false") {
+  test("RegexTokenizer with toLowercase false")
     val tokenizer = new RegexTokenizer()
       .setInputCol("rawText")
       .setOutputCol("tokens")
@@ -98,9 +93,8 @@ class RegexTokenizerSuite
             TokenizerTestData("java scala", Array("java", "scala"))
         ))
     testRegexTokenizer(tokenizer, dataset)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new RegexTokenizer()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
@@ -109,15 +103,10 @@ class RegexTokenizerSuite
       .setPattern("hi")
       .setToLowercase(false)
     testDefaultReadWrite(t)
-  }
-}
 
-object RegexTokenizerSuite extends SparkFunSuite {
+object RegexTokenizerSuite extends SparkFunSuite
 
-  def testRegexTokenizer(t: RegexTokenizer, dataset: DataFrame): Unit = {
-    t.transform(dataset).select("tokens", "wantedTokens").collect().foreach {
+  def testRegexTokenizer(t: RegexTokenizer, dataset: DataFrame): Unit =
+    t.transform(dataset).select("tokens", "wantedTokens").collect().foreach
       case Row(tokens, wantedTokens) =>
         assert(tokens === wantedTokens)
-    }
-  }
-}

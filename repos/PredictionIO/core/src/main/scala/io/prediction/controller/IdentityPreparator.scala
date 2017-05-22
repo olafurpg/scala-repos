@@ -27,9 +27,8 @@ import scala.reflect._
   * @tparam TD Training data class.
   * @group Preparator
   */
-class IdentityPreparator[TD] extends BasePreparator[TD, TD] {
+class IdentityPreparator[TD] extends BasePreparator[TD, TD]
   def prepareBase(sc: SparkContext, td: TD): TD = td
-}
 
 /** Companion object of [[IdentityPreparator]] that conveniently returns an
   * instance of the class of [[IdentityPreparator]] for use with
@@ -37,7 +36,7 @@ class IdentityPreparator[TD] extends BasePreparator[TD, TD] {
   *
   * @group Preparator
   */
-object IdentityPreparator {
+object IdentityPreparator
 
   /** Produces an instance of the class of [[IdentityPreparator]].
     *
@@ -46,7 +45,6 @@ object IdentityPreparator {
   def apply[TD](ds: Class[_ <: BaseDataSource[TD, _, _, _]])
     : Class[IdentityPreparator[TD]] =
     classOf[IdentityPreparator[TD]]
-}
 
 /** DEPRECATED. Use [[IdentityPreparator]] instead.
   *
@@ -61,7 +59,7 @@ class PIdentityPreparator[TD] extends IdentityPreparator[TD]
   * @group Preparator
   */
 @deprecated("Use IdentityPreparator instead.", "0.9.2")
-object PIdentityPreparator {
+object PIdentityPreparator
 
   /** Produces an instance of the class of [[IdentityPreparator]].
     *
@@ -70,7 +68,6 @@ object PIdentityPreparator {
   def apply[TD](ds: Class[_ <: BaseDataSource[TD, _, _, _]])
     : Class[IdentityPreparator[TD]] =
     classOf[IdentityPreparator[TD]]
-}
 
 /** DEPRECATED. Use [[IdentityPreparator]] instead.
   *
@@ -85,7 +82,7 @@ class LIdentityPreparator[TD] extends IdentityPreparator[TD]
   * @group Preparator
   */
 @deprecated("Use IdentityPreparator instead.", "0.9.2")
-object LIdentityPreparator {
+object LIdentityPreparator
 
   /** Produces an instance of the class of [[IdentityPreparator]].
     *
@@ -94,4 +91,3 @@ object LIdentityPreparator {
   def apply[TD](ds: Class[_ <: BaseDataSource[TD, _, _, _]])
     : Class[IdentityPreparator[TD]] =
     classOf[IdentityPreparator[TD]]
-}

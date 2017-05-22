@@ -11,36 +11,33 @@ import org.jetbrains.jps.incremental.scala.remote.RemoteResourceOwner
   * User: Dmitry Naydanov
   * Date: 2/24/14
   */
-class RemoteServerRunner(project: Project) extends RemoteResourceOwner {
+class RemoteServerRunner(project: Project) extends RemoteResourceOwner
   protected val address = InetAddress.getByName(null)
 
   protected val port =
     ScalaCompileServerSettings.getInstance().COMPILE_SERVER_PORT
 
   def buildProcess(arguments: Seq[String], client: Client) =
-    new CompilationProcess {
+    new CompilationProcess
       val COUNT = 10
 
       var callbacks: Seq[() => Unit] = Seq.empty
 
-      override def addTerminationCallback(callback: => Unit) {
+      override def addTerminationCallback(callback: => Unit)
         this.callbacks = this.callbacks :+ (() => callback)
-      }
 
-      override def run() {
-        try {
-          for (i <- 0 until (COUNT - 1)) {
-            try {
+      override def run()
+        try
+          for (i <- 0 until (COUNT - 1))
+            try
               Thread.sleep(i * 20)
               send(serverAlias, arguments, client)
               return
-            } catch {
+            catch
               case _: ConnectException => Thread.sleep(100)
-            }
-          }
 
           send(serverAlias, arguments, client)
-        } catch {
+        catch
           case e: ConnectException =>
             val message = "Cannot connect to compile server at %s:%s".format(
                 address.toString, port)
@@ -53,26 +50,19 @@ class RemoteServerRunner(project: Project) extends RemoteResourceOwner {
             client.error(message)
             client.debug(
                 s"$message\n${e.toString}\n${e.getStackTrace.mkString("\n")}")
-        } finally {
+        finally
           callbacks.foreach(a => a())
-        }
-      }
 
-      override def stop() {
+      override def stop()
         CompileServerLauncher.ensureNotRunning(project)
-      }
-    }
-}
 
-class RemoteServerStopper(val port: Int) extends RemoteResourceOwner {
+class RemoteServerStopper(val port: Int) extends RemoteResourceOwner
   override protected val address: InetAddress = InetAddress.getByName(null)
 
   def sendStop(): Unit =
-    try {
+    try
       val stopCommand =
         "stop_" + ScalaCompileServerSettings.getInstance().COMPILE_SERVER_ID
       send(stopCommand, Seq(s"--nailgun-port $port"), null)
-    } catch {
+    catch
       case e: Exception =>
-    }
-}

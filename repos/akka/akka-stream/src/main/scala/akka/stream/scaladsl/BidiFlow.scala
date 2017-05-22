@@ -12,7 +12,7 @@ import scala.concurrent.duration.FiniteDuration
 
 final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     private[stream] override val module: Module)
-    extends Graph[BidiShape[I1, O1, I2, O2], Mat] {
+    extends Graph[BidiShape[I1, O1, I2, O2], Mat]
   override def shape = module.shape.asInstanceOf[BidiShape[I1, O1, I2, O2]]
 
   def asJava: javadsl.BidiFlow[I1, O1, I2, O2, Mat] =
@@ -60,7 +60,7 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     */
   def atopMat[OO1, II2, Mat2, M](
       bidi: Graph[BidiShape[O1, OO1, II2, I2], Mat2])(
-      combine: (Mat, Mat2) ⇒ M): BidiFlow[I1, OO1, II2, O2, M] = {
+      combine: (Mat, Mat2) ⇒ M): BidiFlow[I1, OO1, II2, O2, M] =
     val copy = bidi.module.carbonCopy
     val ins = copy.shape.inlets
     val outs = copy.shape.outlets
@@ -70,7 +70,6 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
           .wire(shape.out1, ins(0))
           .wire(outs(1), shape.in2)
           .replaceShape(BidiShape(shape.in1, outs(0), ins(1), shape.out2)))
-  }
 
   /**
     * Add the given Flow as the final step in a bidirectional transformation
@@ -113,7 +112,7 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
     * flow into the materialized value of the resulting [[Flow]].
     */
   def joinMat[Mat2, M](flow: Graph[FlowShape[O1, I2], Mat2])(
-      combine: (Mat, Mat2) ⇒ M): Flow[I1, O2, M] = {
+      combine: (Mat, Mat2) ⇒ M): Flow[I1, O2, M] =
     val copy = flow.module.carbonCopy
     val in = copy.shape.inlets.head
     val out = copy.shape.outlets.head
@@ -123,7 +122,6 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
           .wire(shape.out1, in)
           .wire(out, shape.in2)
           .replaceShape(FlowShape(shape.in1, shape.out2)))
-  }
 
   /**
     * Turn this BidiFlow around by 180 degrees, logically flipping it upside down in a protocol stack.
@@ -168,9 +166,8 @@ final class BidiFlow[-I1, +O1, -I2, +O2, +Mat](
 
   override def async: BidiFlow[I1, O1, I2, O2, Mat] =
     addAttributes(Attributes.asyncBoundary)
-}
 
-object BidiFlow {
+object BidiFlow
   private[this] val _identity: BidiFlow[Any, Any, Any, Any, NotUsed] =
     BidiFlow.fromFlows(Flow[Any], Flow[Any])
 
@@ -184,11 +181,10 @@ object BidiFlow {
   def fromGraph[I1, O1, I2, O2, Mat](
       graph: Graph[BidiShape[I1, O1, I2, O2], Mat])
     : BidiFlow[I1, O1, I2, O2, Mat] =
-    graph match {
+    graph match
       case bidi: BidiFlow[I1, O1, I2, O2, Mat] ⇒ bidi
       case bidi: javadsl.BidiFlow[I1, O1, I2, O2, Mat] ⇒ bidi.asScala
       case other ⇒ new BidiFlow(other.module)
-    }
 
   /**
     * Wraps two Flows to create a ''BidiFlow''. The materialized value of the resulting BidiFlow is determined
@@ -214,9 +210,9 @@ object BidiFlow {
       flow2: Graph[FlowShape[I2, O2], M2])(
       combine: (M1, M2) ⇒ M): BidiFlow[I1, O1, I2, O2, M] =
     fromGraph(
-        GraphDSL.create(flow1, flow2)(combine) { implicit b ⇒ (f1, f2) ⇒
+        GraphDSL.create(flow1, flow2)(combine)  implicit b ⇒ (f1, f2) ⇒
       BidiShape(f1.in, f1.out, f2.in, f2.out)
-    })
+    )
 
   /**
     * Wraps two Flows to create a ''BidiFlow''. The materialized value of the resulting BidiFlow is Unit.
@@ -261,4 +257,3 @@ object BidiFlow {
   def bidirectionalIdleTimeout[I, O](
       timeout: FiniteDuration): BidiFlow[I, I, O, O, NotUsed] =
     fromGraph(new Timers.IdleTimeoutBidi(timeout))
-}

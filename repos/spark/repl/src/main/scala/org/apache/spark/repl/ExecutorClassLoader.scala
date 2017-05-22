@@ -44,7 +44,7 @@ class ExecutorClassLoader(conf: SparkConf,
                           classUri: String,
                           parent: ClassLoader,
                           userClassPathFirst: Boolean)
-    extends ClassLoader with Logging {
+    extends ClassLoader with Logging
   val uri = new URI(classUri)
   val directory = uri.getPath
 
@@ -53,34 +53,31 @@ class ExecutorClassLoader(conf: SparkConf,
   // Allows HTTP connect and read timeouts to be controlled for testing / debugging purposes
   private[repl] var httpUrlConnectionTimeoutMillis: Int = -1
 
-  private val fetchFn: (String) => InputStream = uri.getScheme() match {
+  private val fetchFn: (String) => InputStream = uri.getScheme() match
     case "spark" => getClassFileInputStreamFromSparkRPC
     case "http" | "https" | "ftp" => getClassFileInputStreamFromHttpServer
     case _ =>
       val fileSystem =
         FileSystem.get(uri, SparkHadoopUtil.get.newConfiguration(conf))
       getClassFileInputStreamFromFileSystem(fileSystem)
-  }
 
-  override def getResource(name: String): URL = {
+  override def getResource(name: String): URL =
     parentLoader.getResource(name)
-  }
 
-  override def getResources(name: String): java.util.Enumeration[URL] = {
+  override def getResources(name: String): java.util.Enumeration[URL] =
     parentLoader.getResources(name)
-  }
 
-  override def findClass(name: String): Class[_] = {
-    userClassPathFirst match {
+  override def findClass(name: String): Class[_] =
+    userClassPathFirst match
       case true =>
         findClassLocally(name).getOrElse(parentLoader.loadClass(name))
-      case false => {
-          try {
+      case false =>
+          try
             parentLoader.loadClass(name)
-          } catch {
-            case e: ClassNotFoundException => {
+          catch
+            case e: ClassNotFoundException =>
                 val classOption = findClassLocally(name)
-                classOption match {
+                classOption match
                   case None =>
                     // If this class has a cause, it will break the internal assumption of Janino
                     // (the compiler used for Spark SQL code-gen).
@@ -89,16 +86,10 @@ class ExecutorClassLoader(conf: SparkConf,
                     // of generated class will fail.
                     throw new ClassNotFoundException(name)
                   case Some(a) => a
-                }
-              }
-          }
-        }
-    }
-  }
 
-  private def getClassFileInputStreamFromSparkRPC(path: String): InputStream = {
+  private def getClassFileInputStreamFromSparkRPC(path: String): InputStream =
     val channel = env.rpcEnv.openChannel(s"$classUri/$path")
-    new FilterInputStream(Channels.newInputStream(channel)) {
+    new FilterInputStream(Channels.newInputStream(channel))
 
       override def read(): Int = toClassNotFound(super.read())
 
@@ -107,76 +98,64 @@ class ExecutorClassLoader(conf: SparkConf,
       override def read(b: Array[Byte], offset: Int, len: Int) =
         toClassNotFound(super.read(b, offset, len))
 
-      private def toClassNotFound(fn: => Int): Int = {
-        try {
+      private def toClassNotFound(fn: => Int): Int =
+        try
           fn
-        } catch {
+        catch
           case e: Exception =>
             throw new ClassNotFoundException(path, e)
-        }
-      }
-    }
-  }
 
   private def getClassFileInputStreamFromHttpServer(
-      pathInDirectory: String): InputStream = {
+      pathInDirectory: String): InputStream =
     val url =
-      if (SparkEnv.get.securityManager.isAuthenticationEnabled()) {
+      if (SparkEnv.get.securityManager.isAuthenticationEnabled())
         val uri = new URI(classUri + "/" + urlEncode(pathInDirectory))
         val newuri = Utils.constructURIForAuthentication(
             uri, SparkEnv.get.securityManager)
         newuri.toURL
-      } else {
+      else
         new URL(classUri + "/" + urlEncode(pathInDirectory))
-      }
     val connection: HttpURLConnection = Utils
       .setupSecureURLConnection(
           url.openConnection(), SparkEnv.get.securityManager)
       .asInstanceOf[HttpURLConnection]
     // Set the connection timeouts (for testing purposes)
-    if (httpUrlConnectionTimeoutMillis != -1) {
+    if (httpUrlConnectionTimeoutMillis != -1)
       connection.setConnectTimeout(httpUrlConnectionTimeoutMillis)
       connection.setReadTimeout(httpUrlConnectionTimeoutMillis)
-    }
     connection.connect()
-    try {
-      if (connection.getResponseCode != 200) {
+    try
+      if (connection.getResponseCode != 200)
         // Close the error stream so that the connection is eligible for re-use
-        try {
+        try
           connection.getErrorStream.close()
-        } catch {
+        catch
           case ioe: IOException =>
             logError("Exception while closing error stream", ioe)
-        }
         throw new ClassNotFoundException(s"Class file not found at URL $url")
-      } else {
+      else
         connection.getInputStream
-      }
-    } catch {
+    catch
       case NonFatal(e) if !e.isInstanceOf[ClassNotFoundException] =>
         connection.disconnect()
         throw e
-    }
-  }
 
   private def getClassFileInputStreamFromFileSystem(fileSystem: FileSystem)(
-      pathInDirectory: String): InputStream = {
+      pathInDirectory: String): InputStream =
     val path = new Path(directory, pathInDirectory)
-    if (fileSystem.exists(path)) {
+    if (fileSystem.exists(path))
       fileSystem.open(path)
-    } else {
+    else
       throw new ClassNotFoundException(s"Class file not found at path $path")
-    }
-  }
 
-  def findClassLocally(name: String): Option[Class[_]] = {
+  def findClassLocally(name: String): Option[Class[_]] =
     val pathInDirectory = name.replace('.', '/') + ".class"
     var inputStream: InputStream = null
-    try {
+    try
       inputStream = fetchFn(pathInDirectory)
       val bytes = readAndTransformClass(name, inputStream)
       Some(defineClass(name, bytes, 0, bytes.length))
-    } catch {
+    catch
       case e: ClassNotFoundException =>
         // We did not find the class
         logDebug(s"Did not load class $name from REPL class server at $uri", e)
@@ -187,20 +166,16 @@ class ExecutorClassLoader(conf: SparkConf,
             s"Failed to check existence of class $name on REPL class server at $uri",
             e)
         None
-    } finally {
-      if (inputStream != null) {
-        try {
+    finally
+      if (inputStream != null)
+        try
           inputStream.close()
-        } catch {
+        catch
           case e: Exception =>
             logError("Exception while closing inputStream", e)
-        }
-      }
-    }
-  }
 
-  def readAndTransformClass(name: String, in: InputStream): Array[Byte] = {
-    if (name.startsWith("line") && name.endsWith("$iw$")) {
+  def readAndTransformClass(name: String, in: InputStream): Array[Byte] =
+    if (name.startsWith("line") && name.endsWith("$iw$"))
       // Class seems to be an interpreter "wrapper" object storing a val or var.
       // Replace its constructor with a dummy one that does not run the
       // initialization code placed there by the REPL. The val or var will
@@ -211,40 +186,34 @@ class ExecutorClassLoader(conf: SparkConf,
       val cleaner = new ConstructorCleaner(name, cw)
       cr.accept(cleaner, 0)
       return cw.toByteArray
-    } else {
+    else
       // Pass the class through unmodified
       val bos = new ByteArrayOutputStream
       val bytes = new Array[Byte](4096)
       var done = false
-      while (!done) {
+      while (!done)
         val num = in.read(bytes)
-        if (num >= 0) {
+        if (num >= 0)
           bos.write(bytes, 0, num)
-        } else {
+        else
           done = true
-        }
-      }
       return bos.toByteArray
-    }
-  }
 
   /**
     * URL-encode a string, preserving only slashes
     */
-  def urlEncode(str: String): String = {
+  def urlEncode(str: String): String =
     str.split('/').map(part => URLEncoder.encode(part, "UTF-8")).mkString("/")
-  }
-}
 
 class ConstructorCleaner(className: String, cv: ClassVisitor)
-    extends ClassVisitor(ASM5, cv) {
+    extends ClassVisitor(ASM5, cv)
   override def visitMethod(access: Int,
                            name: String,
                            desc: String,
                            sig: String,
-                           exceptions: Array[String]): MethodVisitor = {
+                           exceptions: Array[String]): MethodVisitor =
     val mv = cv.visitMethod(access, name, desc, sig, exceptions)
-    if (name == "<init>" && (access & ACC_STATIC) == 0) {
+    if (name == "<init>" && (access & ACC_STATIC) == 0)
       // This is the constructor, time to clean it; just output some new
       // instructions to mv that create the object and set the static MODULE$
       // field in the class to point to it, but do nothing otherwise.
@@ -259,8 +228,5 @@ class ConstructorCleaner(className: String, cv: ClassVisitor)
       mv.visitMaxs(-1, -1) // stack size and local vars will be auto-computed
       mv.visitEnd()
       return null
-    } else {
+    else
       return mv
-    }
-  }
-}

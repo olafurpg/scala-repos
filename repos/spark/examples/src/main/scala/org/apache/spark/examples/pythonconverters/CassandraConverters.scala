@@ -30,45 +30,37 @@ import org.apache.spark.api.python.Converter
   * output to a Map[String, Int]
   */
 class CassandraCQLKeyConverter
-    extends Converter[Any, java.util.Map[String, Int]] {
-  override def convert(obj: Any): java.util.Map[String, Int] = {
+    extends Converter[Any, java.util.Map[String, Int]]
+  override def convert(obj: Any): java.util.Map[String, Int] =
     val result = obj.asInstanceOf[java.util.Map[String, ByteBuffer]]
     result.asScala.mapValues(ByteBufferUtil.toInt).asJava
-  }
-}
 
 /**
   * Implementation of [[org.apache.spark.api.python.Converter]] that converts Cassandra
   * output to a Map[String, String]
   */
 class CassandraCQLValueConverter
-    extends Converter[Any, java.util.Map[String, String]] {
-  override def convert(obj: Any): java.util.Map[String, String] = {
+    extends Converter[Any, java.util.Map[String, String]]
+  override def convert(obj: Any): java.util.Map[String, String] =
     val result = obj.asInstanceOf[java.util.Map[String, ByteBuffer]]
     result.asScala.mapValues(ByteBufferUtil.string).asJava
-  }
-}
 
 /**
   * Implementation of [[org.apache.spark.api.python.Converter]] that converts a
   * Map[String, Int] to Cassandra key
   */
 class ToCassandraCQLKeyConverter
-    extends Converter[Any, java.util.Map[String, ByteBuffer]] {
-  override def convert(obj: Any): java.util.Map[String, ByteBuffer] = {
+    extends Converter[Any, java.util.Map[String, ByteBuffer]]
+  override def convert(obj: Any): java.util.Map[String, ByteBuffer] =
     val input = obj.asInstanceOf[java.util.Map[String, Int]]
     input.asScala.mapValues(ByteBufferUtil.bytes).asJava
-  }
-}
 
 /**
   * Implementation of [[org.apache.spark.api.python.Converter]] that converts a
   * List[String] to Cassandra value
   */
 class ToCassandraCQLValueConverter
-    extends Converter[Any, java.util.List[ByteBuffer]] {
-  override def convert(obj: Any): java.util.List[ByteBuffer] = {
+    extends Converter[Any, java.util.List[ByteBuffer]]
+  override def convert(obj: Any): java.util.List[ByteBuffer] =
     val input = obj.asInstanceOf[java.util.List[String]]
     input.asScala.map(ByteBufferUtil.bytes).asJava
-  }
-}

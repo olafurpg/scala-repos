@@ -20,23 +20,20 @@ import org.saddle._
 /**
   * Creates groups for each unique key in an index
   */
-class IndexGrouper[Y : ST : ORD](ix: Index[Y], sorted: Boolean = true) {
-  private lazy val uniq: Array[Y] = {
+class IndexGrouper[Y : ST : ORD](ix: Index[Y], sorted: Boolean = true)
+  private lazy val uniq: Array[Y] =
     val arr = ix.uniques.toArray
     if (sorted && !ix.isMonotonic)
       array.take(arr,
                  array.argsort(arr),
                  sys.error("Logic error in sorting group index"))
     else arr
-  }
 
   def keys: Array[Y] = uniq
 
   def groups: Array[(Y, Array[Int])] = for (k <- keys) yield (k, ix.get(k))
-}
 
-object IndexGrouper {
+object IndexGrouper
   def apply[Y : ST : ORD](ix: Index[Y]) = new IndexGrouper(ix)
   def apply[Y : ST : ORD](ix: Index[Y], sorted: Boolean = true) =
     new IndexGrouper(ix, sorted)
-}

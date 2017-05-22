@@ -64,7 +64,7 @@ object MediaIncludes extends MediaIncludes
   * @define TRAC Track
   * @define VDTC VideoTrack
   */
-trait MediaIncludes {
+trait MediaIncludes
 
   /**
     * $START$AUCL.html $AUCL$END
@@ -204,4 +204,3 @@ trait MediaIncludes {
     */
   implicit def jfxVideoTrack2sfx(vt: jfxsm.VideoTrack): VideoTrack =
     if (vt != null) new VideoTrack(vt) else null
-}

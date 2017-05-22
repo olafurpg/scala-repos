@@ -10,9 +10,9 @@ import play.api.libs.logback.ColoredLevel
   * Provides the old play.api.Logger$ColoredLevel library so that a deprecation message can be logged.
   */
 @deprecated("Use play.api.libs.logback.ColoredLevel instead", "2.5.0")
-class Logger$ColoredLevel extends ColoredLevel {
+class Logger$ColoredLevel extends ColoredLevel
 
-  override def start(): Unit = {
+  override def start(): Unit =
     super.start()
     val configLocation =
       Option(ConfigurationWatchListUtil.getMainWatchURL(getContext))
@@ -20,7 +20,5 @@ class Logger$ColoredLevel extends ColoredLevel {
     val migrationDocs =
       "https://www.playframework.com/documentation/2.5.x/Migration25#Change-to-Logback-configuration"
     addError(
-        s"You are using the deprecated ${this.getClass.getName} in $configLocation, please use ${classOf[
-        ColoredLevel].getName} instead. See $migrationDocs for more information.")
-  }
-}
+        s"You are using the deprecated ${this.getClass.getName} in $configLocation, please use $classOf[
+        ColoredLevel].getName instead. See $migrationDocs for more information.")

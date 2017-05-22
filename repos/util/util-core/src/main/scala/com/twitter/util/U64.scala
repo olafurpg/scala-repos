@@ -7,7 +7,7 @@ package com.twitter.util
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
 import scala.language.implicitConversions
 
-class RichU64Long(l64: Long) {
+class RichU64Long(l64: Long)
   import U64._
 
   def u64_<(y: Long): Boolean = u64_lt(l64, y)
@@ -30,29 +30,24 @@ class RichU64Long(l64: Long) {
   // Other arithmetic operations don't need unsigned equivalents
   // with 2s complement.
 
-  def toU64ByteArray: Array[Byte] = {
+  def toU64ByteArray: Array[Byte] =
     val bytes = new ByteArrayOutputStream(8)
     new DataOutputStream(bytes).writeLong(l64)
     bytes.toByteArray
-  }
 
   def toU64HexString = (new RichU64ByteArray(toU64ByteArray)).toU64HexString
-}
 
-class RichU64ByteArray(bytes: Array[Byte]) {
-  private def deSign(b: Byte): Int = {
-    if (b < 0) {
+class RichU64ByteArray(bytes: Array[Byte])
+  private def deSign(b: Byte): Int =
+    if (b < 0)
       b + 256
-    } else {
+    else
       b
-    }
-  }
 
   // Note: this is padded, so we have lexical ordering.
   def toU64HexString =
     bytes.map(deSign).map("%02x".format(_)).reduceLeft(_ + _)
   def toU64Long = new DataInputStream(new ByteArrayInputStream(bytes)).readLong
-}
 
 /**
   * RichU64String parses string as a 64-bit unsigned hexadecimal long,
@@ -62,37 +57,31 @@ class RichU64ByteArray(bytes: Array[Byte]) {
   * @throws NumberFormatException if string is not a non-negative hexadecimal
   * string
   */
-class RichU64String(string: String) {
-  private[this] def validateHexDigit(c: Char): Unit = {
+class RichU64String(string: String)
+  private[this] def validateHexDigit(c: Char): Unit =
     if (!(('0' <= c && c <= '9') || ('a' <= c && c <= 'f') ||
-            ('A' <= c && c <= 'F'))) {
+            ('A' <= c && c <= 'F')))
       throw new NumberFormatException("For input string: \"" + string + "\"")
-    }
-  }
 
-  if (string.length > 16) {
+  if (string.length > 16)
     throw new NumberFormatException("Number longer than 16 hex characters")
-  } else if (string.isEmpty) {
+  else if (string.isEmpty)
     throw new NumberFormatException("Empty string")
-  }
   string.foreach(validateHexDigit)
 
-  def toU64ByteArray: Array[Byte] = {
+  def toU64ByteArray: Array[Byte] =
     val padded = "0" * (16 - string.length()) + string
     (0 until 16 by 2)
       .map(i =>
-            {
           val parsed = Integer.parseInt(padded.slice(i, i + 2), 16)
           assert(parsed >= 0)
           parsed.toByte
-      })
+      )
       .toArray
-  }
 
   def toU64Long: Long = (new RichU64ByteArray(toU64ByteArray)).toU64Long
-}
 
-object U64 {
+object U64
   private val bigInt0x8000000000000000L = (0x7FFFFFFFFFFFFFFFL: BigInt) + 1
 
   val U64MAX = 0xFFFFFFFFFFFFFFFFL
@@ -115,4 +104,3 @@ object U64 {
 
   implicit def stringToRichU64String(string: String): RichU64String =
     new RichU64String(string)
-}

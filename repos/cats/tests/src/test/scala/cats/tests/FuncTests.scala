@@ -7,7 +7,7 @@ import cats.laws.discipline._
 import cats.laws.discipline.arbitrary._
 import org.scalacheck.Arbitrary
 
-class FuncTests extends CatsSuite {
+class FuncTests extends CatsSuite
   import cats.laws.discipline.eq._
   implicit def funcEq[F[_], A, B](
       implicit A: Arbitrary[A], FB: Eq[F[B]]): Eq[Func[F, A, B]] =
@@ -24,31 +24,24 @@ class FuncTests extends CatsSuite {
   checkAll("Cartesian[Func[Option, Int, ?]]",
            SerializableTests.serializable(Cartesian[Func[Option, Int, ?]]))
 
-  {
     implicit val funcApp = Func.funcApplicative[Option, Int]
     checkAll("Func[Option, Int, Int]",
              ApplicativeTests[Func[Option, Int, ?]].applicative[Int, Int, Int])
     checkAll("Applicative[Func[Option, Int, ?]]",
              SerializableTests.serializable(Applicative[Func[Option, Int, ?]]))
-  }
 
-  {
     implicit val funcApply = Func.funcApply[Option, Int]
     checkAll("Func[Option, Int, Int]",
              ApplyTests[Func[Option, Int, ?]].apply[Int, Int, Int])
     checkAll("Apply[Func[Option, Int, ?]]",
              SerializableTests.serializable(Apply[Func[Option, Int, ?]]))
-  }
 
-  {
     implicit val funcFunctor = Func.funcFunctor[Option, Int]
     checkAll("Func[Option, Int, Int]",
              FunctorTests[Func[Option, Int, ?]].functor[Int, Int, Int])
     checkAll("Functor[Func[Option, Int, ?]]",
              SerializableTests.serializable(Functor[Func[Option, Int, ?]]))
-  }
 
-  {
     implicit val appFuncApp = AppFunc.appFuncApplicative[Option, Int]
     implicit val iso =
       CartesianTests.Isomorphisms.invariant[AppFunc[Option, Int, ?]]
@@ -58,25 +51,18 @@ class FuncTests extends CatsSuite {
     checkAll(
         "Applicative[AppFunc[Option, Int, ?]]",
         SerializableTests.serializable(Applicative[AppFunc[Option, Int, ?]]))
-  }
 
-  test("product") {
-    val f = appFunc { (x: Int) =>
+  test("product")
+    val f = appFunc  (x: Int) =>
       (Some(x + 10): Option[Int])
-    }
-    val g = appFunc { (x: Int) =>
+    val g = appFunc  (x: Int) =>
       List(x * 2)
-    }
     val h = f product g
     val x = h.run(1)
     (x.first, x.second) should ===((Some(11), List(2)))
-  }
 
-  test("traverse") {
-    val f = Func.appFunc { (x: Int) =>
+  test("traverse")
+    val f = Func.appFunc  (x: Int) =>
       (Some(x + 10): Option[Int])
-    }
     val xs = f traverse List(1, 2, 3)
     xs should ===(Some(List(11, 12, 13)))
-  }
-}

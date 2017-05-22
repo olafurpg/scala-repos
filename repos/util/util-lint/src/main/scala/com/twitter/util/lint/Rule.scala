@@ -6,7 +6,7 @@ import java.util.regex.Pattern
   * A single lint rule, that when [[Rule.apply() run]] evaluates
   * whether or not there are any issues.
   */
-trait Rule {
+trait Rule
 
   /**
     * Runs this lint check.
@@ -32,9 +32,8 @@ trait Rule {
 
   /** A description of the issue and what problems it may cause. */
   def description: String
-}
 
-object Rule {
+object Rule
 
   /**
     * Factory method for creating a [[Rule]].
@@ -47,15 +46,12 @@ object Rule {
       desc: String
   )(
       fn: => Seq[Issue]
-  ): Rule = {
+  ): Rule =
     val _cat = category
-    new Rule {
+    new Rule
       def apply(): Seq[Issue] = fn
       def name: String = shortName
       def category: Category = _cat
       def description: String = desc
-    }
-  }
 
   private[Rule] val WhitespacePattern = Pattern.compile("\\s")
-}

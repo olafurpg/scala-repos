@@ -11,7 +11,7 @@ class RunSettings private (val color: Boolean,
                            val quiet: Boolean,
                            val verbose: Boolean,
                            val logAssert: Boolean,
-                           val logExceptionClass: Boolean) {
+                           val logExceptionClass: Boolean)
 
   private val ignoreRunnersSet = new HashSet[String]
 
@@ -21,47 +21,39 @@ class RunSettings private (val color: Boolean,
            verbose: Boolean,
            logAssert: Boolean,
            ignoreRunners: String,
-           logExceptionClass: Boolean) = {
+           logExceptionClass: Boolean) =
     this(color, decodeScalaNames, quiet, verbose, logAssert, logExceptionClass)
     for (s <- ignoreRunners.split(",")) ignoreRunnersSet.add(s.trim)
-  }
 
   def decodeName(name: String): String =
     if (decodeScalaNames) RunSettings.decodeScalaName(name) else name
 
-  def buildColoredMessage(t: Throwable, c1: String): String = {
+  def buildColoredMessage(t: Throwable, c1: String): String =
     if (t == null) "null"
-    else {
-      if (!logExceptionClass || (!logAssert && t.isInstanceOf[AssertionError])) {
+    else
+      if (!logExceptionClass || (!logAssert && t.isInstanceOf[AssertionError]))
         t.getMessage
-      } else {
+      else
         val b = new StringBuilder()
         val cn = decodeName(t.getClass.getName)
         val pos1 = cn.indexOf('$')
-        val pos2 = {
+        val pos2 =
           if (pos1 == -1) cn.lastIndexOf('.')
           else cn.lastIndexOf('.', pos1)
-        }
         if (pos2 == -1) b.append(c(cn, c1))
-        else {
+        else
           b.append(cn.substring(0, pos2))
           b.append('.')
           b.append(c(cn.substring(pos2 + 1), c1))
-        }
         b.append(": ").append(t.getMessage)
         b.toString()
-      }
-    }
-  }
 
   def buildInfoMessage(t: Throwable): String =
     buildColoredMessage(t, NNAME2)
 
   def buildErrorMessage(t: Throwable): String =
     buildColoredMessage(t, ENAME2)
-}
 
-object RunSettings {
+object RunSettings
   private[RunSettings] def decodeScalaName(name: String): String =
     Try(scala.reflect.NameTransformer.decode(name)).getOrElse(name)
-}

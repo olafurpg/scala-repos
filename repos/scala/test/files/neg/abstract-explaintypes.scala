@@ -1,4 +1,4 @@
-trait A {
+trait A
   type T <: A;
   def baz(): A;
   def bar(): T;
@@ -8,4 +8,3 @@ trait A {
   def foo4: A = baz().bar();
   def foo5: T = baz().baz();
   def foo6 = baz().baz();
-}

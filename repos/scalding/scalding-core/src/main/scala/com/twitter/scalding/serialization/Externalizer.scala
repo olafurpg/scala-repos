@@ -25,17 +25,14 @@ import com.twitter.chill.config.ScalaAnyRefMapConfig
 /**
   * We need to control the Kryo created
   */
-object Externalizer {
-  def apply[T](t: T): Externalizer[T] = {
+object Externalizer
+  def apply[T](t: T): Externalizer[T] =
     val e = new Externalizer[T]
     e.set(t)
     e
-  }
-}
 
 @DefaultSerializer(classOf[JavaSerializer])
-class Externalizer[T] extends ChillExtern[T] {
+class Externalizer[T] extends ChillExtern[T]
   protected override def kryo =
     new KryoHadoop(
         ScalaAnyRefMapConfig(Map("scalding.kryo.setreferences" -> "true")))
-}

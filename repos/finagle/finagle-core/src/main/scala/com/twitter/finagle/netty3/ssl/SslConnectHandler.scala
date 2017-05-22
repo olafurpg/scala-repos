@@ -20,37 +20,32 @@ import sun.security.util.HostnameChecker
   */
 private[netty3] class SslListenerConnectionHandler(
     sslHandler: SslHandler, onShutdown: () => Unit = () => Unit)
-    extends SimpleChannelUpstreamHandler {
+    extends SimpleChannelUpstreamHandler
 
   // delay propagating connection upstream until we've completed the handshake
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
     sslHandler
       .handshake()
       .addListener(
-          new ChannelFutureListener {
+          new ChannelFutureListener
         override def operationComplete(f: ChannelFuture): Unit =
-          if (f.isSuccess) {
+          if (f.isSuccess)
             SslListenerConnectionHandler. super.channelConnected(ctx, e)
-          } else {
+          else
             Channels.close(ctx.getChannel)
-          }
-      })
-  }
+      )
 
   override def exceptionCaught(
-      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ExceptionEvent): Unit =
     // remove the ssl handler so that it doesn't trap the disconnect
     if (e.getCause.isInstanceOf[SSLException]) ctx.getPipeline.remove("ssl")
     super.exceptionCaught(ctx, e)
-  }
 
   override def channelClosed(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
     onShutdown()
     super.channelClosed(ctx, e)
-  }
-}
 
 /**
   * Handle client-side SSL connections:
@@ -64,48 +59,43 @@ class SslConnectHandler(
     sslHandler: SslHandler,
     sessionError: SSLSession => Option[Throwable] = Function.const(None)
 )
-    extends SimpleChannelHandler {
+    extends SimpleChannelHandler
   private[this] val connectFuture = new AtomicReference[ChannelFuture](null)
 
-  private[this] def fail(c: Channel, t: Throwable) {
+  private[this] def fail(c: Channel, t: Throwable)
     Option(connectFuture.get) foreach { _.setFailure(t) }
     Channels.close(c)
-  }
 
-  private[this] def fail(c: Channel, exGen: (SocketAddress) => Throwable) {
+  private[this] def fail(c: Channel, exGen: (SocketAddress) => Throwable)
     val t = exGen(if (c != null) c.getRemoteAddress else null)
     fail(c, t)
-  }
 
   override def connectRequested(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
-    e match {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
+    e match
       case de: DownstreamChannelStateEvent =>
-        if (!connectFuture.compareAndSet(null, e.getFuture)) {
+        if (!connectFuture.compareAndSet(null, e.getFuture))
           fail(ctx.getChannel, new InconsistentStateException(_))
           return
-        }
 
         // proxy cancellation
         val wrappedConnectFuture = Channels.future(de.getChannel, true)
         de.getFuture.addListener(
-            new ChannelFutureListener {
+            new ChannelFutureListener
           override def operationComplete(f: ChannelFuture): Unit =
-            if (f.isCancelled) {
+            if (f.isCancelled)
               wrappedConnectFuture.cancel()
-            }
-        })
+        )
 
         // Proxy failures here so that if the connect fails, it is
         // propagated to the listener, not just on the channel.
         wrappedConnectFuture.addListener(
-            new ChannelFutureListener {
-          def operationComplete(f: ChannelFuture) {
+            new ChannelFutureListener
+          def operationComplete(f: ChannelFuture)
             if (f.isSuccess || f.isCancelled) return
 
             fail(f.getChannel, f.getCause)
-          }
-        })
+        )
 
         val wrappedEvent = new DownstreamChannelStateEvent(
             de.getChannel, wrappedConnectFuture, de.getState, de.getValue)
@@ -114,48 +104,40 @@ class SslConnectHandler(
 
       case _ =>
         fail(ctx.getChannel, new InconsistentStateException(_))
-    }
-  }
 
   // delay propagating connection upstream until we've completed the handshake
   override def channelConnected(
-      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit = {
-    if (connectFuture.get eq null) {
+      ctx: ChannelHandlerContext, e: ChannelStateEvent): Unit =
+    if (connectFuture.get eq null)
       fail(ctx.getChannel, new InconsistentStateException(_))
       return
-    }
 
     // proxy cancellations again.
     connectFuture.get.addListener(
-        new ChannelFutureListener {
+        new ChannelFutureListener
       override def operationComplete(f: ChannelFuture): Unit =
-        if (f.isCancelled) {
+        if (f.isCancelled)
           fail(ctx.getChannel, new ChannelClosedException(_))
-        }
-    })
+    )
 
     sslHandler
       .handshake()
-      .addListener(new ChannelFutureListener {
+      .addListener(new ChannelFutureListener
         override def operationComplete(f: ChannelFuture): Unit =
-          if (f.isSuccess) {
-            sessionError(sslHandler.getEngine.getSession) match {
+          if (f.isSuccess)
+            sessionError(sslHandler.getEngine.getSession) match
               case Some(t) =>
                 fail(ctx.getChannel, t)
               case None =>
                 connectFuture.get.setSuccess()
                 SslConnectHandler. super.channelConnected(ctx, e)
-            }
-          } else if (f.isCancelled) {
+          else if (f.isCancelled)
             fail(ctx.getChannel, new InconsistentStateException(_))
-          } else {
+          else
             fail(ctx.getChannel, new SslHandshakeException(f.getCause, _))
-          }
-      })
-  }
-}
+      )
 
-object SslConnectHandler {
+object SslConnectHandler
 
   /**
     * Run hostname verification on the session.  This will fail with a
@@ -165,17 +147,13 @@ object SslConnectHandler {
     * This uses [[sun.security.util.HostnameChecker]].  Any bugs are theirs.
     */
   def sessionHostnameVerifier(hostname: String)(
-      session: SSLSession): Option[Throwable] = {
+      session: SSLSession): Option[Throwable] =
     val checker = HostnameChecker.getInstance(HostnameChecker.TYPE_TLS)
-    val isValid = session.getPeerCertificates.headOption.exists {
+    val isValid = session.getPeerCertificates.headOption.exists
       case x509: X509Certificate =>
         Try { checker.`match`(hostname, x509) }.isReturn
       case _ => false
-    }
 
     if (isValid) None
-    else {
+    else
       Some(new SslHostVerificationException(session.getPeerPrincipal.getName))
-    }
-  }
-}

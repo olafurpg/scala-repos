@@ -1,14 +1,12 @@
-class A {
+class A
   def m = "a"
   protected def n = "a"
-}
 
-trait B {
+trait B
   def m = "b"
   protected def n = "b"
-}
 
-class C extends A with B {
+class C extends A with B
   override def m = "c"
   override protected def n = "c"
 
@@ -17,12 +15,10 @@ class C extends A with B {
   val f3 = () => super.m
   val f4 = () => this.m
 
-  val g1 = new runtime.AbstractFunction0[String] {
+  val g1 = new runtime.AbstractFunction0[String]
     def apply() = C. super [A].m
-  }
-  val g2 = new runtime.AbstractFunction0[String] {
+  val g2 = new runtime.AbstractFunction0[String]
     def apply() = C. super [B].m
-  }
   val g3 = new runtime.AbstractFunction0[String] { def apply() = C. super.m }
   val g4 = new runtime.AbstractFunction0[String] { def apply() = C.this.m }
 
@@ -31,17 +27,14 @@ class C extends A with B {
   val h3 = () => super.n
   val h4 = () => this.n
 
-  val i1 = new runtime.AbstractFunction0[String] {
+  val i1 = new runtime.AbstractFunction0[String]
     def apply() = C. super [A].n
-  }
-  val i2 = new runtime.AbstractFunction0[String] {
+  val i2 = new runtime.AbstractFunction0[String]
     def apply() = C. super [B].n
-  }
   val i3 = new runtime.AbstractFunction0[String] { def apply() = C. super.n }
   val i4 = new runtime.AbstractFunction0[String] { def apply() = C.this.n }
-}
 
-object Test extends App {
+object Test extends App
   val c = new C
   println(c.f1())
   println(c.f2())
@@ -62,4 +55,3 @@ object Test extends App {
   println(c.i2())
   println(c.i3())
   println(c.i4())
-}

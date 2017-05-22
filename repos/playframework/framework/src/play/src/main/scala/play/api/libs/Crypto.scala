@@ -13,7 +13,7 @@ import play.api.libs.crypto._
     "This class is deprecated and will be removed in future versions", "2.5.0")
 class Crypto @Inject()(
     signer: CookieSigner, tokenSigner: CSRFTokenSigner, aesCrypter: AESCrypter)
-    extends CookieSigner with CSRFTokenSigner with AESCrypter {
+    extends CookieSigner with CSRFTokenSigner with AESCrypter
 
   override def signToken(token: String): String = tokenSigner.signToken(token)
 
@@ -44,7 +44,6 @@ class Crypto @Inject()(
     signer.sign(message)
 
   override def sign(message: String): String = signer.sign(message)
-}
 
 /**
   * This class is not suitable for use as a general cryptographic library.
@@ -55,15 +54,15 @@ class Crypto @Inject()(
   */
 @deprecated(
     "This class is deprecated and will be removed in future versions", "2.5.0")
-object Crypto {
+object Crypto
 
   type CryptoException = play.api.libs.crypto.CryptoException
 
   private val cryptoCache: (Application) => Crypto =
     Application.instanceCache[Crypto]
 
-  def crypto: Crypto = {
-    Play.privateMaybeApplication.fold {
+  def crypto: Crypto =
+    Play.privateMaybeApplication.fold
       val config = new CryptoConfigParser(
           Environment.simple(),
           Configuration.from(
@@ -73,8 +72,7 @@ object Crypto {
       val tokenSigner = new CSRFTokenSignerProvider(cookieSigner).get
       val crypter = new AESCTRCrypter(config)
       new Crypto(cookieSigner, tokenSigner, crypter)
-    }(cryptoCache)
-  }
+    (cryptoCache)
 
   def sign(message: String, key: Array[Byte]): String =
     crypto.sign(message, key)
@@ -105,4 +103,3 @@ object Crypto {
 
   def decryptAES(value: String, privateKey: String): String =
     crypto.decryptAES(value, privateKey)
-}

@@ -1,11 +1,10 @@
 package java.util.concurrent.atomic
 
-class AtomicReferenceArray[E <: AnyRef](length: Int) extends Serializable {
+class AtomicReferenceArray[E <: AnyRef](length: Int) extends Serializable
 
-  def this(array: Array[E]) = {
+  def this(array: Array[E]) =
     this(array.size)
     System.arraycopy(array, 0, inner, 0, length)
-  }
 
   private val inner: Array[AnyRef] = new Array[AnyRef](length)
 
@@ -21,23 +20,19 @@ class AtomicReferenceArray[E <: AnyRef](length: Int) extends Serializable {
   final def lazySet(i: Int, newValue: E): Unit =
     set(i, newValue)
 
-  final def getAndSet(i: Int, newValue: E): E = {
+  final def getAndSet(i: Int, newValue: E): E =
     val ret = get(i)
     set(i, newValue)
     ret
-  }
 
-  final def compareAndSet(i: Int, expect: E, update: E): Boolean = {
+  final def compareAndSet(i: Int, expect: E, update: E): Boolean =
     if (get(i) ne expect) false
-    else {
+    else
       set(i, update)
       true
-    }
-  }
 
   final def weakCompareAndSet(i: Int, expect: E, update: E): Boolean =
     compareAndSet(i, expect, update)
 
   override def toString(): String =
     inner.mkString("[", ", ", "]")
-}

@@ -1,10 +1,8 @@
-class a {
-  try {} catch {
+class a
+  try {} catch
     case _ =>
-  }
 
   /*caret*/
-}
 /*
 abstract
 case

@@ -26,21 +26,17 @@ import scala.concurrent.Future
 import akka.util.Timeout
 import akka.pattern.ask
 
-object ClusterShardingCustomShardAllocationSpec {
-  class Entity extends Actor {
-    def receive = {
+object ClusterShardingCustomShardAllocationSpec
+  class Entity extends Actor
+    def receive =
       case id: Int ⇒ sender() ! id
-    }
-  }
 
-  val extractEntityId: ShardRegion.ExtractEntityId = {
+  val extractEntityId: ShardRegion.ExtractEntityId =
     case id: Int ⇒ (id.toString, id)
-  }
 
   val extractShardId: ShardRegion.ExtractShardId = msg ⇒
-    msg match {
+    msg match
       case id: Int ⇒ id.toString
-  }
 
   case object AllocateReq
   case class UseRegion(region: ActorRef)
@@ -49,10 +45,10 @@ object ClusterShardingCustomShardAllocationSpec {
   case class RebalanceShards(shards: Set[String])
   case object RebalanceShardsAck
 
-  class Allocator extends Actor {
+  class Allocator extends Actor
     var useRegion: Option[ActorRef] = None
     var rebalance = Set.empty[String]
-    def receive = {
+    def receive =
       case UseRegion(region) ⇒
         useRegion = Some(region)
         sender() ! UseRegionAck
@@ -64,33 +60,27 @@ object ClusterShardingCustomShardAllocationSpec {
       case RebalanceReq ⇒
         sender() ! rebalance
         rebalance = Set.empty
-    }
-  }
 
   case class TestAllocationStrategy(ref: ActorRef)
-      extends ShardAllocationStrategy {
+      extends ShardAllocationStrategy
     implicit val timeout = Timeout(3.seconds)
     override def allocateShard(
         requester: ActorRef,
         shardId: ShardRegion.ShardId,
         currentShardAllocations: Map[
             ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]])
-      : Future[ActorRef] = {
+      : Future[ActorRef] =
       (ref ? AllocateReq).mapTo[ActorRef]
-    }
 
     override def rebalance(
         currentShardAllocations: Map[
             ActorRef, immutable.IndexedSeq[ShardRegion.ShardId]],
         rebalanceInProgress: Set[ShardRegion.ShardId])
-      : Future[Set[ShardRegion.ShardId]] = {
+      : Future[Set[ShardRegion.ShardId]] =
       (ref ? RebalanceReq).mapTo[Set[String]]
-    }
-  }
-}
 
 abstract class ClusterShardingCustomShardAllocationSpecConfig(val mode: String)
-    extends MultiNodeConfig {
+    extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -110,7 +100,6 @@ abstract class ClusterShardingCustomShardAllocationSpecConfig(val mode: String)
     akka.persistence.snapshot-store.local.dir = "target/snapshots-ClusterShardingCustomShardAllocationSpec"
     akka.cluster.sharding.state-store-mode = "$mode"
     """))
-}
 
 object PersistentClusterShardingCustomShardAllocationSpecConfig
     extends ClusterShardingCustomShardAllocationSpecConfig("persistence")
@@ -136,7 +125,7 @@ class DDataClusterShardingCustomShardAllocationMultiJvmNode2
 
 abstract class ClusterShardingCustomShardAllocationSpec(
     config: ClusterShardingCustomShardAllocationSpecConfig)
-    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender {
+    extends MultiNodeSpec(config) with STMultiNodeSpec with ImplicitSender
   import ClusterShardingCustomShardAllocationSpec._
   import config._
 
@@ -148,29 +137,23 @@ abstract class ClusterShardingCustomShardAllocationSpec(
          "akka.persistence.snapshot-store.local.dir").map(
         s ⇒ new File(system.settings.config.getString(s)))
 
-  override protected def atStartup() {
-    runOn(first) {
+  override protected def atStartup()
+    runOn(first)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
-  override protected def afterTermination() {
-    runOn(first) {
+  override protected def afterTermination()
+    runOn(first)
       storageLocations.foreach(
           dir ⇒ if (dir.exists) FileUtils.deleteDirectory(dir))
-    }
-  }
 
-  def join(from: RoleName, to: RoleName): Unit = {
-    runOn(from) {
+  def join(from: RoleName, to: RoleName): Unit =
+    runOn(from)
       Cluster(system) join node(to).address
       startSharding()
-    }
     enterBarrier(from.name + "-joined")
-  }
 
-  def startSharding(): Unit = {
+  def startSharding(): Unit =
     ClusterSharding(system).start(
         typeName = "Entity",
         entityProps = Props[Entity],
@@ -179,97 +162,81 @@ abstract class ClusterShardingCustomShardAllocationSpec(
         extractShardId = extractShardId,
         allocationStrategy = TestAllocationStrategy(allocator),
         handOffStopMessage = PoisonPill)
-  }
 
   lazy val region = ClusterSharding(system).shardRegion("Entity")
 
   lazy val allocator = system.actorOf(Props[Allocator], "allocator")
 
-  s"Cluster sharding ($mode) with custom allocation strategy" must {
+  s"Cluster sharding ($mode) with custom allocation strategy" must
 
-    "setup shared journal" in {
+    "setup shared journal" in
       // start the Persistence extension
       Persistence(system)
-      runOn(first) {
+      runOn(first)
         system.actorOf(Props[SharedLeveldbStore], "store")
-      }
       enterBarrier("peristence-started")
 
-      runOn(first, second) {
+      runOn(first, second)
         system.actorSelection(node(first) / "user" / "store") ! Identify(None)
         val sharedStore = expectMsgType[ActorIdentity].ref.get
         SharedLeveldbJournal.setStore(sharedStore, system)
-      }
 
       enterBarrier("after-1")
-    }
 
-    "use specified region" in within(10.seconds) {
+    "use specified region" in within(10.seconds)
       join(first, first)
 
-      runOn(first) {
+      runOn(first)
         allocator ! UseRegion(region)
         expectMsg(UseRegionAck)
         region ! 1
         expectMsg(1)
         lastSender.path should be(region.path / "1" / "1")
-      }
       enterBarrier("first-started")
 
       join(second, first)
 
       region ! 2
       expectMsg(2)
-      runOn(first) {
+      runOn(first)
         lastSender.path should be(region.path / "2" / "2")
-      }
-      runOn(second) {
+      runOn(second)
         lastSender.path should be(
             node(first) / "system" / "sharding" / "Entity" / "2" / "2")
-      }
       enterBarrier("second-started")
 
-      runOn(first) {
+      runOn(first)
         system.actorSelection(node(second) / "system" / "sharding" / "Entity") ! Identify(
             None)
         val secondRegion = expectMsgType[ActorIdentity].ref.get
         allocator ! UseRegion(secondRegion)
         expectMsg(UseRegionAck)
-      }
       enterBarrier("second-active")
 
       region ! 3
       expectMsg(3)
-      runOn(second) {
+      runOn(second)
         lastSender.path should be(region.path / "3" / "3")
-      }
-      runOn(first) {
+      runOn(first)
         lastSender.path should be(
             node(second) / "system" / "sharding" / "Entity" / "3" / "3")
-      }
 
       enterBarrier("after-2")
-    }
 
-    "rebalance specified shards" in within(15.seconds) {
-      runOn(first) {
+    "rebalance specified shards" in within(15.seconds)
+      runOn(first)
         allocator ! RebalanceShards(Set("2"))
         expectMsg(RebalanceShardsAck)
 
-        awaitAssert {
+        awaitAssert
           val p = TestProbe()
           region.tell(2, p.ref)
           p.expectMsg(2.second, 2)
           p.lastSender.path should be(
               node(second) / "system" / "sharding" / "Entity" / "2" / "2")
-        }
 
         region ! 1
         expectMsg(1)
         lastSender.path should be(region.path / "1" / "1")
-      }
 
       enterBarrier("after-2")
-    }
-  }
-}

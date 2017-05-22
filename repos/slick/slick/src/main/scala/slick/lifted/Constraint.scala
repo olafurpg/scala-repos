@@ -27,7 +27,7 @@ final class ForeignKey(
     val targetTable: TableNode,
     val columnsShape: Shape[_ <: FlatShapeLevel, _, _, _])
 
-object ForeignKey {
+object ForeignKey
   def apply[TT <: AbstractTable[_], P](
       name: String,
       sourceTable: Node,
@@ -54,18 +54,15 @@ object ForeignKey {
       pShape
   )
 
-  def linearizeFieldRefs(n: Node): IndexedSeq[Node] = {
+  def linearizeFieldRefs(n: Node): IndexedSeq[Node] =
     val sels = new ArrayBuffer[Node]
-    def f(n: Node): Unit = n match {
+    def f(n: Node): Unit = n match
       case _: Select | _: Ref | _: TableNode => sels += n
       case _: ProductNode | _: OptionApply | _: GetOrElse |
           _: TypeMapping | _: ClientSideOp =>
         n.childrenForeach(f)
-    }
     f(n)
     sels
-  }
-}
 
 /** A query that selects data linked by a foreign key. */
 class ForeignKeyQuery[E <: AbstractTable[_], U](
@@ -76,25 +73,23 @@ class ForeignKeyQuery[E <: AbstractTable[_], U](
     generator: AnonSymbol,
     aliasedValue: E
 )
-    extends WrappingQuery[E, U, Seq](nodeDelegate, base) with Constraint {
+    extends WrappingQuery[E, U, Seq](nodeDelegate, base) with Constraint
 
   /** Combine the constraints of this `ForeignKeyQuery` with another one with the
     * same target table, leading to a single instance of the target table which
     * satisfies the constraints of both. */
-  def &(other: ForeignKeyQuery[E, U]): ForeignKeyQuery[E, U] = {
+  def &(other: ForeignKeyQuery[E, U]): ForeignKeyQuery[E, U] =
     val newFKs = fks ++ other.fks
-    val conditions = newFKs.map { fk =>
+    val conditions = newFKs.map  fk =>
       val sh =
         fk.columnsShape.asInstanceOf[Shape[FlatShapeLevel, Any, Any, Any]]
       Library.==.typed[Boolean](sh.toNode(fk.targetColumns(aliasedValue)),
                                 sh.toNode(fk.sourceColumns))
-    }.reduceLeft[Node]((a, b) => Library.And.typed[Boolean](a, b))
+    .reduceLeft[Node]((a, b) => Library.And.typed[Boolean](a, b))
     val newDelegate =
       Filter.ifRefutable(generator, targetBaseQuery.toNode, conditions)
     new ForeignKeyQuery[E, U](
         newDelegate, base, newFKs, targetBaseQuery, generator, aliasedValue)
-  }
-}
 
 /** An explicit primary key. Simple primary keys can also be represented by `O.PrimaryKey`
   * column options instead. */

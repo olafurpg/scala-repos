@@ -23,7 +23,7 @@ import javax.servlet.http._
 import net.liftweb.common._
 import net.liftweb.util._
 
-class HTTPServletSession(session: HttpSession) extends HTTPSession {
+class HTTPServletSession(session: HttpSession) extends HTTPSession
   private val LiftMagicID = "$lift_magic_session_thingy$"
 
   def sessionId: String = session.getId
@@ -49,31 +49,26 @@ class HTTPServletSession(session: HttpSession) extends HTTPSession {
   def removeAttribute(name: String) = session.removeAttribute(name)
 
   def terminate = session.invalidate
-}
 
 /**
   * Represents the "bridge" between HttpSession and LiftSession
   */
 case class SessionToServletBridge(uniqueId: String)
-    extends HttpSessionBindingListener with HttpSessionActivationListener {
-  def sessionDidActivate(se: HttpSessionEvent) = {
+    extends HttpSessionBindingListener with HttpSessionActivationListener
+  def sessionDidActivate(se: HttpSessionEvent) =
     SessionMaster
       .getSession(uniqueId, Empty)
       .foreach(ls => LiftSession.onSessionActivate.foreach(_ (ls)))
-  }
 
-  def sessionWillPassivate(se: HttpSessionEvent) = {
+  def sessionWillPassivate(se: HttpSessionEvent) =
     SessionMaster
       .getSession(uniqueId, Empty)
       .foreach(ls => LiftSession.onSessionPassivate.foreach(_ (ls)))
-  }
 
   def valueBound(event: HttpSessionBindingEvent) {}
 
   /**
     * When the session is unbound the the HTTP session, stop us
     */
-  def valueUnbound(event: HttpSessionBindingEvent) {
+  def valueUnbound(event: HttpSessionBindingEvent)
     SessionMaster.sendMsg(RemoveSession(uniqueId))
-  }
-}

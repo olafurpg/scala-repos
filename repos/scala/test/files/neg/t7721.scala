@@ -1,79 +1,65 @@
 import scala.language.reflectiveCalls
 
-trait A {
+trait A
   trait Concrete { def conco: Int = 1 }
   type Foo <: { def bippy: Int }
   type Bar <: { def barry: Int }
 
   implicit def barTag: scala.reflect.ClassTag[Bar]
 
-  def f1(x: Any) = x match {
+  def f1(x: Any) = x match
     case x: Foo with Concrete => x.bippy + x.conco
     case _ => -1
-  }
-  def f2(x: Any) = x match {
+  def f2(x: Any) = x match
     case x: Concrete with Foo => x.bippy + x.conco
     case _ => -1
-  }
-  def f3(x: Any) = x match {
+  def f3(x: Any) = x match
     case x: Foo with Bar => x.bippy + x.barry
     case _ => -1
-  }
-  def f4(x: Any) = x match {
+  def f4(x: Any) = x match
     case x: (Foo @unchecked) => x.bippy // warns, suppressed
     case _ => -1
-  }
-  def f5(x: Any) = x match {
+  def f5(x: Any) = x match
     case x: (Bar @unchecked) =>
       x.barry // warns (but about the "outer reference"), suppressed
     case _ => -1
-  }
-}
 
-trait B extends A {
+trait B extends A
   type Foo <: { def bippy: Int; def dingo: Int }
   type Bar <: { def barry: Int; def bongo: Int }
 
   override implicit def barTag: scala.reflect.ClassTag[Bar]
 
-  override def f1(x: Any) = x match {
+  override def f1(x: Any) = x match
     case x: Foo with Concrete => x.bippy + x.dingo + x.conco
     case _ => -1
-  }
-  override def f2(x: Any) = x match {
+  override def f2(x: Any) = x match
     case x: Concrete with Foo => x.bippy + x.dingo + x.conco
     case _ => -1
-  }
-  override def f3(x: Any) = x match {
+  override def f3(x: Any) = x match
     case x: Foo with Bar with Concrete =>
       x.bippy + x.barry + x.dingo + x.conco + x.bongo
     case _ => -1
-  }
-  override def f4(x: Any) = x match {
+  override def f4(x: Any) = x match
     case x: (Foo @unchecked) => x.bippy + x.dingo // warns, suppressed
     case _ => -1
-  }
-  override def f5(x: Any) = x match {
+  override def f5(x: Any) = x match
     case x: (Bar @unchecked) =>
       x.barry + x.bongo // warns (but about the "outer reference"), suppressed
     case _ => -1
-  }
-}
 
-object Test {
-  abstract class Base extends A {
-    trait Foo {
+object Test
+  abstract class Base extends A
+    trait Foo
       def bippy = 2
       def dingo = 3
-    }
-    trait Bar {
+    trait Bar
       def barry = 2
       def bongo = 3
-    }
     implicit def barTag: scala.reflect.ClassTag[Bar] =
       scala.reflect.ClassTag(classOf[Bar])
 
-    def run() {
+    def run()
       println("f1")
       wrap(f1(new Concrete {}))
       wrap(f1(new Foo {}))
@@ -124,20 +110,15 @@ object Test {
       wrap(f5(new Concrete with Bar {}))
       wrap(f5(new Concrete with Foo with Bar {}))
       wrap(f5(new Foo with Bar with Concrete {}))
-    }
-  }
 
   object ao extends Base
   object bo extends Base with B
 
-  private def wrap(body: => Any) {
+  private def wrap(body: => Any)
     try println(body) catch { case ex: NoSuchMethodException => println(ex) }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     ao.run()
     bo.run()
-  }
-}
 
 // java.lang.NoSuchMethodException: Test$$anon$1.bippy()

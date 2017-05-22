@@ -15,7 +15,7 @@ import spire.syntax.eq._
   *       `((a.inverse |+|? a).get |+|? b) === b`
   *
   */
-trait Groupoid[A] extends Any with Semigroupoid[A] {
+trait Groupoid[A] extends Any with Semigroupoid[A]
 
   /** Tests if `a` is an identity. */
   def isId(a: A)(implicit ev: Eq[A]): Boolean = a === leftId(a)
@@ -30,20 +30,16 @@ trait Groupoid[A] extends Any with Semigroupoid[A] {
   def rightId(a: A): A = partialOp(inverse(a), a).get
   def partialOpInverse(x: A, y: A): Opt[A] = partialOp(x, inverse(y))
   def opInverseIsDefined(x: A, y: A): Boolean = opIsDefined(x, inverse(y))
-}
 
-trait GroupoidLowPriority {
+trait GroupoidLowPriority
   implicit def fromGroup[A](implicit group: Group[A]): Groupoid[A] =
-    new Groupoid[A] {
+    new Groupoid[A]
       override def opIsDefined(x: A, y: A): Boolean = true
       override def opInverseIsDefined(x: A, y: A): Boolean = true
       def inverse(a: A): A = group.inverse(a)
       def partialOp(x: A, y: A): Opt[A] = Opt(group.op(x, y))
       override def partialOpInverse(x: A, y: A): Opt[A] =
         Opt(group.opInverse(x, y))
-    }
-}
 
-object Groupoid extends GroupoidLowPriority {
+object Groupoid extends GroupoidLowPriority
   @inline final def apply[A](implicit g: Groupoid[A]): Groupoid[A] = g
-}

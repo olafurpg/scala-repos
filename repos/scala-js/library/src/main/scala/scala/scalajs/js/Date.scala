@@ -21,7 +21,7 @@ package scala.scalajs.js
   * MDN
   */
 @native
-class Date extends Object {
+class Date extends Object
 
   def this(value: Double) = this()
   def this(value: String) = this()
@@ -194,11 +194,10 @@ class Date extends Object {
   def toISOString(): String = native
   def toJSON(key: Any): String = native
   def toJSON(): String = native
-}
 
 /** Factory for [[js.Date]] objects. */
 @native
-object Date extends Object {
+object Date extends Object
   def apply(): String = native
 
   /**
@@ -239,4 +238,3 @@ object Date extends Object {
     * MDN
     */
   def now(): Double = native
-}

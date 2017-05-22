@@ -25,34 +25,30 @@ import org.apache.kafka.common.config.types.Password
 import org.junit.{After, Before, Test}
 import org.junit.Assert._
 
-class KafkaTest {
+class KafkaTest
 
   val originalSecurityManager: SecurityManager = System.getSecurityManager
 
   class ExitCalled extends SecurityException {}
 
-  private class NoExitSecurityManager extends SecurityManager {
-    override def checkExit(status: Int): Unit = {
+  private class NoExitSecurityManager extends SecurityManager
+    override def checkExit(status: Int): Unit =
       throw new ExitCalled
-    }
 
     override def checkPermission(perm: Permission): Unit = {}
 
     override def checkPermission(perm: Permission, context: Object): Unit = {}
-  }
 
   @Before
-  def setSecurityManager(): Unit = {
+  def setSecurityManager(): Unit =
     System.setSecurityManager(new NoExitSecurityManager)
-  }
 
   @After
-  def setOriginalSecurityManager(): Unit = {
+  def setOriginalSecurityManager(): Unit =
     System.setSecurityManager(originalSecurityManager)
-  }
 
   @Test
-  def testGetKafkaConfigFromArgs(): Unit = {
+  def testGetKafkaConfigFromArgs(): Unit =
     val propertiesFile = prepareDefaultConfig()
 
     // We should load configuration file without any arguments
@@ -80,38 +76,33 @@ class KafkaTest {
                                      "broker.id=2")))
     assertEquals(2, config4.brokerId)
     assertEquals("compact", config4.logCleanupPolicy)
-  }
 
   @Test(expected = classOf[ExitCalled])
-  def testGetKafkaConfigFromArgsWrongSetValue(): Unit = {
+  def testGetKafkaConfigFromArgsWrongSetValue(): Unit =
     val propertiesFile = prepareDefaultConfig()
     KafkaConfig.fromProps(
         Kafka.getPropsFromArgs(Array(propertiesFile, "--override", "a=b=c")))
-  }
 
   @Test(expected = classOf[ExitCalled])
-  def testGetKafkaConfigFromArgsNonArgsAtTheEnd(): Unit = {
+  def testGetKafkaConfigFromArgsNonArgsAtTheEnd(): Unit =
     val propertiesFile = prepareDefaultConfig()
     KafkaConfig.fromProps(Kafka.getPropsFromArgs(
             Array(propertiesFile, "--override", "broker.id=1", "broker.id=2")))
-  }
 
   @Test(expected = classOf[ExitCalled])
-  def testGetKafkaConfigFromArgsNonArgsOnly(): Unit = {
+  def testGetKafkaConfigFromArgsNonArgsOnly(): Unit =
     val propertiesFile = prepareDefaultConfig()
     KafkaConfig.fromProps(Kafka.getPropsFromArgs(
             Array(propertiesFile, "broker.id=1", "broker.id=2")))
-  }
 
   @Test(expected = classOf[ExitCalled])
-  def testGetKafkaConfigFromArgsNonArgsAtTheBegging(): Unit = {
+  def testGetKafkaConfigFromArgsNonArgsAtTheBegging(): Unit =
     val propertiesFile = prepareDefaultConfig()
     KafkaConfig.fromProps(Kafka.getPropsFromArgs(
             Array(propertiesFile, "broker.id=1", "--override", "broker.id=2")))
-  }
 
   @Test
-  def testKafkaSslPasswords(): Unit = {
+  def testKafkaSslPasswords(): Unit =
     val propertiesFile = prepareDefaultConfig()
     val config = KafkaConfig.fromProps(
         Kafka.getPropsFromArgs(
@@ -129,24 +120,19 @@ class KafkaTest {
     assertEquals("key_password", config.sslKeyPassword.value)
     assertEquals("keystore_password", config.sslKeystorePassword.value)
     assertEquals("truststore_password", config.sslTruststorePassword.value)
-  }
 
-  def prepareDefaultConfig(): String = {
+  def prepareDefaultConfig(): String =
     prepareConfig(Array("broker.id=1", "zookeeper.connect=somewhere"))
-  }
 
-  def prepareConfig(lines: Array[String]): String = {
+  def prepareConfig(lines: Array[String]): String =
     val file = File.createTempFile("kafkatest", ".properties")
     file.deleteOnExit()
 
     val writer = new FileOutputStream(file)
-    lines.foreach { l =>
+    lines.foreach  l =>
       writer.write(l.getBytes)
       writer.write("\n".getBytes)
-    }
 
     writer.close
 
     file.getAbsolutePath
-  }
-}

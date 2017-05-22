@@ -20,7 +20,7 @@ import scala.util.control.Breaks
   */
 trait Traversable[+A]
     extends TraversableLike[A, Traversable[A]] with GenTraversable[A]
-    with TraversableOnce[A] with GenericTraversableTemplate[A, Traversable] {
+    with TraversableOnce[A] with GenericTraversableTemplate[A, Traversable]
   override def companion: GenericCompanion[Traversable] = Traversable
 
   override def seq: Traversable[A] = this
@@ -83,12 +83,11 @@ trait Traversable[+A]
   override def view
   override def view(from: Int, until: Int): TraversableView[A, Traversable[A]]
  */
-}
 
 /** $factoryInfo
   *  The current default implementation of a $Coll is a `List`.
   */
-object Traversable extends TraversableFactory[Traversable] { self =>
+object Traversable extends TraversableFactory[Traversable]  self =>
 
   /** Provides break functionality separate from client code */
   private[collection] val breaks: Breaks = new Breaks
@@ -99,7 +98,6 @@ object Traversable extends TraversableFactory[Traversable] { self =>
 
   def newBuilder[A]: Builder[A, Traversable[A]] =
     immutable.Traversable.newBuilder[A]
-}
 
 /** Explicit instantiation of the `Traversable` trait to reduce class file size in subclasses. */
 abstract class AbstractTraversable[+A] extends Traversable[A]

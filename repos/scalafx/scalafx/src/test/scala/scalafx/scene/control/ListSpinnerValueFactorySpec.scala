@@ -46,7 +46,7 @@ class ListSpinnerValueFactorySpec[Integer]
         SpinnerValueFactory.ListSpinnerValueFactory[Integer]](
         classOf[jfxsc.SpinnerValueFactory.ListSpinnerValueFactory[Integer]],
         classOf[SpinnerValueFactory.ListSpinnerValueFactory[Integer]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   override protected def getScalaClassInstance =
     new SpinnerValueFactory.ListSpinnerValueFactory(
@@ -55,4 +55,3 @@ class ListSpinnerValueFactorySpec[Integer]
   override protected def getJavaClassInstance =
     new jfxsc.SpinnerValueFactory.ListSpinnerValueFactory(
         new ObservableBuffer[Integer]())
-}

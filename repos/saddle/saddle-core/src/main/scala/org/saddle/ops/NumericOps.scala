@@ -37,7 +37,7 @@ package org.saddle.ops
   *
   * @tparam This The type of the class inheriting the NumericOps trait
   */
-trait NumericOps[+This] { repr: This =>
+trait NumericOps[+This]  repr: This =>
 
   // (element-wise) math ops
 
@@ -278,4 +278,3 @@ trait NumericOps[+This] { repr: This =>
     */
   def outer[B, That](other: B)(
       implicit op: BinOp[OuterProd, This, B, That]): That = op(repr, other)
-}

@@ -6,24 +6,21 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ImmediateStatsReceiverTest extends FunSuite with BeforeAndAfter {
+class ImmediateStatsReceiverTest extends FunSuite with BeforeAndAfter
 
   private[this] var registry: Metrics = _
 
-  before {
+  before
     registry = Metrics.createDetached()
-  }
 
-  private[this] def metrics(name: String): Option[Long] = {
+  private[this] def metrics(name: String): Option[Long] =
     val sample = registry.sample()
     if (!sample.containsKey(name)) None
-    else {
+    else
       val x = sample.get(name)
       Some(x.longValue())
-    }
-  }
 
-  test("ImmediateStatsReceiver report increment immediately") {
+  test("ImmediateStatsReceiver report increment immediately")
     val receiver = new ImmediateMetricsStatsReceiver(registry)
 
     assert(metrics("counter") == None)
@@ -45,5 +42,3 @@ class ImmediateStatsReceiverTest extends FunSuite with BeforeAndAfter {
     assert(metrics("stat.p99") == Some(99))
     assert(metrics("stat.min") == Some(1))
     assert(metrics("stat.max") == Some(100))
-  }
-}

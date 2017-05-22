@@ -32,7 +32,7 @@ import javafx.scene.{shape => jfxss}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object VertexFormat {
+object VertexFormat
 
   /**
     * Converts a ScalaFX VertexFormat to its JavaFX counterpart.
@@ -54,7 +54,6 @@ object VertexFormat {
     */
   val PointNormalTexcoord = new VertexFormat(
       jfxss.VertexFormat.POINT_NORMAL_TEXCOORD)
-}
 
 /**
   * Defines the format of the vertices in a mesh. A vertex consists of an array
@@ -68,7 +67,7 @@ object VertexFormat {
   * @define ORIGINALDOC Original Documentation]].
   */
 class VertexFormat(override val delegate: jfxss.VertexFormat)
-    extends SFXDelegate[jfxss.VertexFormat] {
+    extends SFXDelegate[jfxss.VertexFormat]
 
   /**
     * Returns the number of component indices that represents a vertex. For example,
@@ -102,4 +101,3 @@ class VertexFormat(override val delegate: jfxss.VertexFormat)
     * @return the offset to the texture coordinates component.
     */
   def texCoordIndexOffset: Int = delegate.getTexCoordIndexOffset
-}

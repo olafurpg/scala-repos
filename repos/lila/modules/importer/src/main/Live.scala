@@ -8,9 +8,9 @@ import lila.hub.actorApi.map.Tell
 import lila.round.actorApi.round._
 import scala.concurrent.duration._
 
-final class Live(roundMap: ActorRef) {
+final class Live(roundMap: ActorRef)
 
-  def create = {
+  def create =
     val variant = chess.variant.Standard
     val g = Game
       .make(game = chess.Game(variant),
@@ -22,39 +22,30 @@ final class Live(roundMap: ActorRef) {
             pgnImport = none)
       .start
     GameRepo insertDenormalized g inject g
-  }
 
   def move(id: String, move: String) =
-    GameRepo game id flatMap {
-      _ filter (g => g.playable && g.imported) match {
+    GameRepo game id flatMap
+      _ filter (g => g.playable && g.imported) match
         case None => fufail("No such playing game: " + id)
         case Some(game) =>
-          Uci(move) match {
+          Uci(move) match
             case None =>
-              move match {
+              move match
                 case "1-0" =>
-                  fuccess {
+                  fuccess
                     roundMap ! Tell(game.id, Resign(game.blackPlayer.id))
-                  }
                 case "0-1" =>
-                  fuccess {
+                  fuccess
                     roundMap ! Tell(game.id, Resign(game.whitePlayer.id))
-                  }
                 case "1/2-1/2" =>
-                  fuccess {
+                  fuccess
                     roundMap ! Tell(game.id, DrawForce)
-                  }
                 case m => fufail("Importer invalid move: " + m)
-              }
             case Some(uci) =>
-              fuccess {
+              fuccess
                 applyMove(Pov(game, game.player.color), uci)
-              }
-          }
-      }
-    }
 
-  private def applyMove(pov: Pov, uci: Uci) {
+  private def applyMove(pov: Pov, uci: Uci)
     roundMap ! Tell(pov.gameId,
                     HumanPlay(
                         playerId = pov.playerId,
@@ -62,5 +53,3 @@ final class Live(roundMap: ActorRef) {
                         blur = false,
                         lag = 0.millis
                     ))
-  }
-}

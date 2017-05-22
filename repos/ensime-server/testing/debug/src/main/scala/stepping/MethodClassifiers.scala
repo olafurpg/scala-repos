@@ -1,15 +1,13 @@
 package stepping
 
-class Defaults(someArg: String = "a default String") {
+class Defaults(someArg: String = "a default String")
 
-  def methWithDefaults(someArg1: String = "another default String") = {
+  def methWithDefaults(someArg1: String = "another default String") =
     println()
-  }
   def methWithDefaults2(arg1: String, arg2: Int = 42)(
       barg1: String, barg2: Int = arg2 + 1) = {}
-}
 
-trait BaseTrait {
+trait BaseTrait
   def concreteTraitMethod1(x: Int) = x
   def concreteTraitMethod2(x: Int, y: Int): Boolean = false
   def concreteTraitMethod3(x: Int, y: Long, z: String): Long = y
@@ -23,9 +21,8 @@ trait BaseTrait {
       x: Int, y: Double, z: String, t: Object): Unit = ()
 
   def concreteTraitMethodWithDefault(
-      someArg2: String = "yet another default String") = {
+      someArg2: String = "yet another default String") =
     someArg2
-  }
 
   def abstractMethodWithDefault(
       someArg3: String = "last default String"): String
@@ -34,29 +31,25 @@ trait BaseTrait {
   val abstractField1: String
   var concreteMField1: Int = 20
   var abstractMField1: String
-}
 
-class ConcreteClass extends BaseTrait {
+class ConcreteClass extends BaseTrait
   def abstractMethodWithDefault(someArg3: String): String = ""
 
   // static call to a Java method, but not a forwarder!
-  def console() {
+  def console()
     System.console()
-  }
 
   val abstractField1: String = "f1"
   var abstractMField1: String = "f2"
 
   private var fakePrivate: String = "fakePrivate"
 
-  class Inner {
+  class Inner
     //    fakePrivate
-  }
-}
 
-class MethodClassifiers {
+class MethodClassifiers
 
-  def mainTest() {
+  def mainTest()
     val d = new Defaults()
 
     d.methWithDefaults()
@@ -90,17 +83,13 @@ class MethodClassifiers {
                      42.0,
                      42.0,
                      42.0)
-  }
-}
 
-object MethodClassifiers {
+object MethodClassifiers
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     new MethodClassifiers().mainTest()
-  }
-}
 
-trait MaxArgs {
+trait MaxArgs
   def manyArgs(
       x1: Double,
       x2: Double,
@@ -125,6 +114,5 @@ trait MaxArgs {
       x21: Double,
       x22: Double
   ) = x1
-}
 
 class MaxArgsC extends MaxArgs

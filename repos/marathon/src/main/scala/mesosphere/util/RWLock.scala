@@ -2,14 +2,13 @@ package mesosphere.util
 
 import java.util.concurrent.locks.{Lock, ReentrantReadWriteLock}
 
-case class RWLock[T](private val value: T) {
+case class RWLock[T](private val value: T)
 
   private[this] val lock = new ReentrantReadWriteLock
 
-  private[this] def withLock[U](lock: Lock)(f: T => U): U = {
+  private[this] def withLock[U](lock: Lock)(f: T => U): U =
     scala.concurrent.blocking(lock.lock())
     try f(value) finally lock.unlock()
-  }
 
   /**
     * Returns the result of evaluating the supplied function with the
@@ -36,4 +35,3 @@ case class RWLock[T](private val value: T) {
     */
   def writeLock[U](f: T => U): U =
     withLock(lock.writeLock)(f)
-}

@@ -10,25 +10,21 @@ import spire.implicits._
 @BenchmarkMode(Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @State(Scope.Thread)
-class LongEqualityCheckBenchmark {
+class LongEqualityCheckBenchmark
 
   var a: Long = 0L
 
   var b: Long = 0L
 
   @Benchmark
-  def compare(x: Blackhole): Unit = {
+  def compare(x: Blackhole): Unit =
     x.consume(a compare b)
-  }
 
   @Benchmark
-  def eqeq(x: Blackhole): Unit = {
+  def eqeq(x: Blackhole): Unit =
     x.consume(a == b)
-  }
 
   @Benchmark
-  def eqeqeq(x: Blackhole): Unit = {
+  def eqeqeq(x: Blackhole): Unit =
     import spire.implicits._
     x.consume(a === b)
-  }
-}

@@ -9,13 +9,13 @@ import org.jetbrains.plugins.scala.codeInsight.ScalaCodeInsightTestBase
   * Date: 27.07.15.
   */
 abstract class ScalaCompleteStatementTestBase
-    extends ScalaCodeInsightTestBase {
+    extends ScalaCodeInsightTestBase
   protected def getDefaultScalaFileName = "dummy.scala"
 
   protected def getDefaultJavaFileName = "dummy.java"
 
   protected def configureAndCheckFile(
-      fileText: String, resultText: String, fileName: String) {
+      fileText: String, resultText: String, fileName: String)
     //We should change this setting in order to be sure EnterProcessor works without 'swap-settings-hack'
     //it was in org.jetbrains.plugins.scala.editor.smartEnter.ScalaSmartEnterProcessor#moveCaretInsideBracesIfAny
     CodeStyleSettingsManager
@@ -29,13 +29,9 @@ abstract class ScalaCompleteStatementTestBase
     CodeStyleSettingsManager
       .getSettings(getProjectAdapter)
       .KEEP_SIMPLE_BLOCKS_IN_ONE_LINE = false
-  }
 
-  def checkScalaFileByText(fileText: String, resultText: String) {
+  def checkScalaFileByText(fileText: String, resultText: String)
     configureAndCheckFile(fileText, resultText, getDefaultScalaFileName)
-  }
 
-  def checkJavaFileByText(fileText: String, resultText: String) {
+  def checkJavaFileByText(fileText: String, resultText: String)
     configureAndCheckFile(fileText, resultText, getDefaultJavaFileName)
-  }
-}

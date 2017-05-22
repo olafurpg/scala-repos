@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   // compiles:
   Map[Int, Value](0 -> KnownType(classOf[Object]), 1 -> UnknownValue())
 
@@ -11,17 +11,13 @@ object Test extends App {
   //     0 -> KnownType(classOf[Object]),
   //       ^
   // one error found
-}
-sealed trait Value {
+sealed trait Value
   def getType: Option[Class[_]]
-}
 
-case class UnknownValue() extends Value {
+case class UnknownValue() extends Value
   def getType = None
   // compiles if changed to:
   // def getType: Option[Class[_]] = None
-}
 
-case class KnownType(typ: Class[_]) extends Value {
+case class KnownType(typ: Class[_]) extends Value
   def getType = Some(typ)
-}

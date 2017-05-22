@@ -14,17 +14,14 @@ import org.junit.Test
 
 import java.util.Formatter
 
-class FormatterJSTest {
+class FormatterJSTest
 
-  @Test def `should_survive_undefined`(): Unit = {
+  @Test def `should_survive_undefined`(): Unit =
     val fmt = new Formatter()
     val res = fmt.format("%s", js.undefined).toString()
     fmt.close()
     assertEquals("undefined", res)
-  }
 
   @Test
-  def `should_allow_f_string_interpolation_to_survive_undefined`(): Unit = {
+  def `should_allow_f_string_interpolation_to_survive_undefined`(): Unit =
     assertEquals("undefined", f"${js.undefined}%s")
-  }
-}

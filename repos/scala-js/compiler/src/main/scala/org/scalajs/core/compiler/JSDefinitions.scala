@@ -11,7 +11,7 @@ import scala.tools.nsc._
   *
   *  @author Sébastien Doeraene
   */
-trait JSDefinitions { self: JSGlobalAddons =>
+trait JSDefinitions  self: JSGlobalAddons =>
   import global._
 
   // scalastyle:off line.size.limit
@@ -21,7 +21,7 @@ trait JSDefinitions { self: JSGlobalAddons =>
   import definitions._
   import rootMirror._
 
-  class JSDefinitionsClass {
+  class JSDefinitionsClass
 
     lazy val ScalaJSJSPackage = getPackage(
         newTermNameCached("scala.scalajs.js")) // compat 2.10/2.11
@@ -183,7 +183,5 @@ trait JSDefinitions { self: JSGlobalAddons =>
         BoxesRunTimeModule, newTermName("boxToCharacter"))
     lazy val BoxesRunTime_unboxToChar = getMemberMethod(
         BoxesRunTimeModule, newTermName("unboxToChar"))
-  }
 
   // scalastyle:on line.size.limit
-}

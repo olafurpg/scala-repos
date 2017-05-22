@@ -28,19 +28,17 @@ sealed trait HList
   *
   * @author Miles Sabin
   */
-final case class ::[+H, +T <: HList](head: H, tail: T) extends HList {
+final case class ::[+H, +T <: HList](head: H, tail: T) extends HList
   override def toString = head + " :: " + tail.toString
-}
 
 /**
   * Empty `HList` element type.
   *
   * @author Miles Sabin
   */
-sealed trait HNil extends HList {
+sealed trait HNil extends HList
   def ::[H](h: H) = akka.shapeless.::(h, this)
   override def toString = "HNil"
-}
 
 /**
   * Empty `HList` value.
@@ -49,7 +47,7 @@ sealed trait HNil extends HList {
   */
 case object HNil extends HNil
 
-object HList {
+object HList
   import syntax.HListOps
 
   def apply() = HNil
@@ -59,8 +57,6 @@ object HList {
   /**
     * Convenience aliases for HList :: and List :: allowing them to be used together within match expressions.
     */
-  object ListCompat {
+  object ListCompat
     val :: = scala.collection.immutable.::
     val #: = akka.shapeless.::
-  }
-}

@@ -7,7 +7,7 @@ import java.util.Date
 import org.json4s._
 import org.scalatra.util.conversion._
 
-trait JsonImplicitConversions extends TypeConverterSupport {
+trait JsonImplicitConversions extends TypeConverterSupport
   implicit protected def jsonFormats: Formats
 
   implicit val jsonToBoolean: TypeConverter[JValue, Boolean] = safe(
@@ -35,11 +35,11 @@ trait JsonImplicitConversions extends TypeConverterSupport {
       _.extract[String])
 
   implicit val jsonToBigInt: TypeConverter[JValue, BigInt] = safeOption(
-      _ match {
+      _ match
     case JInt(bigint) => Some(bigint)
     case JString(v) => Some(BigInt(v))
     case _ => None
-  })
+  )
 
   def jsonToDate(format: => String): TypeConverter[JValue, Date] =
     jsonToDateFormat(new SimpleDateFormat(format))
@@ -59,23 +59,18 @@ trait JsonImplicitConversions extends TypeConverterSupport {
   implicit def jsonToDateConversion(source: JValue) =
     new JsonDateConversion(source, jsonToDate(_))
 
-  implicit def jsonToSeqConversion(source: JValue) = new {
+  implicit def jsonToSeqConversion(source: JValue) = new
     def asSeq[T](implicit mf: Manifest[T],
                  tc: TypeConverter[JValue, T]): Option[Seq[T]] =
       jsonToSeq[T].apply(source)
-  }
-}
 
-object JsonConversions {
+object JsonConversions
 
-  class JsonValConversion[JValue](source: JValue) {
+  class JsonValConversion[JValue](source: JValue)
     private type JsonTypeConverter[T] = TypeConverter[JValue, T]
     def as[T : JsonTypeConverter]: Option[T] =
       implicitly[TypeConverter[JValue, T]].apply(source)
-  }
 
   class JsonDateConversion[JValue](
-      source: JValue, jsonToDate: String => TypeConverter[JValue, Date]) {
+      source: JValue, jsonToDate: String => TypeConverter[JValue, Date])
     def asDate(format: String): Option[Date] = jsonToDate(format).apply(source)
-  }
-}

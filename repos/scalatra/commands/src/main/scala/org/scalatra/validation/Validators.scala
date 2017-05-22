@@ -14,24 +14,21 @@ import scala.util.matching.Regex
 import scalaz.Scalaz._
 import scalaz._
 
-object Validators {
-  trait Validator[TValue] {
+object Validators
+  trait Validator[TValue]
     def validate[TResult >: TValue <: TValue](
         subject: TResult): FieldValidation[TResult]
-  }
 
   class PredicateValidator[TValue](
       fieldName: String, isValid: TValue ⇒ Boolean, messageFormat: String)
-      extends Validator[TValue] {
+      extends Validator[TValue]
     def validate[TResult >: TValue <: TValue](
-        value: TResult): FieldValidation[TResult] = {
+        value: TResult): FieldValidation[TResult] =
       if (isValid(value)) value.success
       else
         ValidationError(messageFormat.format(fieldName.underscore.humanize),
                         FieldName(fieldName),
                         ValidationFail).failure[TResult]
-    }
-  }
 
   def validate[TValue](fieldName: String,
                        messageFormat: String = "%s is invalid.",
@@ -198,15 +195,11 @@ object Validators {
       absolute: Boolean,
       allowLocalHost: Boolean,
       messageFormat: String = "%s must be a valid url.",
-      schemes: Seq[String]): Validator[String] = {
+      schemes: Seq[String]): Validator[String] =
     val validator = (url: String) ⇒
-      {
-        (allCatch opt {
+        (allCatch opt
               val u = URI.create(url).normalize()
               !absolute || u.isAbsolute
-            }).isDefined &&
+            ).isDefined &&
         (allowLocalHost || UrlValidator.getInstance().isValid(url))
-    }
     new PredicateValidator[String](fieldName, validator, messageFormat)
-  }
-}

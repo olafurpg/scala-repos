@@ -5,7 +5,7 @@ import org.jetbrains.plugins.scala.lang.optimize.OptimizeImportsTestBase
 /**
   * @author Nikolay.Tropin
   */
-class OptimizeImportsWildcardTest extends OptimizeImportsTestBase {
+class OptimizeImportsWildcardTest extends OptimizeImportsTestBase
 
   override def folderPath: String = super.folderPath + "wildcard/"
 
@@ -22,4 +22,3 @@ class OptimizeImportsWildcardTest extends OptimizeImportsTestBase {
   def testImplicitDef() = doTest()
 
   def testNameConflictTypeAlias() = doTest()
-}

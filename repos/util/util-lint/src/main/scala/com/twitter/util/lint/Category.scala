@@ -5,7 +5,7 @@ package com.twitter.util.lint
   */
 sealed trait Category
 
-object Category {
+object Category
 
   /**
     * Indicative of a possible performance issue.
@@ -16,4 +16,3 @@ object Category {
     * Indicative of a possible configuration issue.
     */
   case object Configuration extends Category
-}

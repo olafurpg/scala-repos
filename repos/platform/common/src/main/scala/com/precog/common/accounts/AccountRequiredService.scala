@@ -42,22 +42,20 @@ class AccountRequiredService[A, B](
                               (APIKey, Path) => Future[B],
                               A,
                               (APIKey, Path, AccountId) => Future[B]]
-    with Logging {
+    with Logging
   val service = (request: HttpRequest[A]) =>
-    {
-      delegate.service(request) map { f => (apiKey: APIKey, path: Path) =>
+      delegate.service(request) map  f => (apiKey: APIKey, path: Path) =>
         logger.debug("Locating account for request with apiKey " + apiKey)
 
-        request.parameters.get('ownerAccountId) map { accountId =>
+        request.parameters.get('ownerAccountId) map  accountId =>
           logger.debug("Using provided ownerAccountId: " + accountId)
-          accountFinder.findAccountDetailsById(accountId) flatMap {
+          accountFinder.findAccountDetailsById(accountId) flatMap
             case Some(account) => f(apiKey, path, account.accountId)
             case None =>
               Future(err(BadRequest, "Unknown account Id: " + accountId))
-          }
-        } getOrElse {
+        getOrElse
           logger.trace("Looking up accounts based on apiKey " + apiKey)
-          accountFinder.findAccountByAPIKey(apiKey) flatMap {
+          accountFinder.findAccountByAPIKey(apiKey) flatMap
             case Some(accountId) => f(apiKey, path, accountId)
             case None =>
               logger.warn(
@@ -65,14 +63,9 @@ class AccountRequiredService[A, B](
               Future(err(BadRequest,
                          "Unable to identify target account from apiKey " +
                          apiKey))
-          }
-        }
-      }
-  }
 
   val metadata = AboutMetadata(
       ParameterMetadata('ownerAccountId, None),
       DescriptionMetadata(
           "An explicit or implicit Precog account Id is required for the use of this service.")
   )
-}

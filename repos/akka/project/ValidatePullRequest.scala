@@ -16,40 +16,35 @@ import sbt._
 import scala.collection.immutable
 import scala.util.matching.Regex
 
-object ValidatePullRequest extends AutoPlugin {
+object ValidatePullRequest extends AutoPlugin
 
   override def trigger = allRequirements
   override def requires = plugins.JvmPlugin
 
-  sealed trait BuildMode {
+  sealed trait BuildMode
     def task: Option[TaskKey[_]]
     def log(projectName: String, l: Logger): Unit
-  }
-  case object BuildSkip extends BuildMode {
+  case object BuildSkip extends BuildMode
     override def task = None
     def log(projectName: String, l: Logger) =
       l.info(
           s"Skipping validation of [$projectName], as PR does NOT affect this project...")
-  }
-  case object BuildQuick extends BuildMode {
+  case object BuildQuick extends BuildMode
     override def task = Some(test in ValidatePR)
     def log(projectName: String, l: Logger) =
       l.info(
           s"Building [$projectName] in quick mode, as it's dependencies were affected by PR.")
-  }
-  case object BuildProjectChangedQuick extends BuildMode {
+  case object BuildProjectChangedQuick extends BuildMode
     override def task = Some(test in ValidatePR)
     def log(projectName: String, l: Logger) =
       l.info(
           s"Building [$projectName] as the root `project/` directory was affected by this PR.")
-  }
   final case class BuildCommentForcedAll(phrase: String, c: GHIssueComment)
-      extends BuildMode {
+      extends BuildMode
     override def task = Some(test in Test)
     def log(projectName: String, l: Logger) =
       l.info(
           s"GitHub PR comment [ ${c.getUrl} ] contains [$phrase], forcing BUILD ALL mode!")
-  }
 
   val ValidatePR = config("pr-validation") extend Test
 
@@ -98,19 +93,18 @@ object ValidatePullRequest extends AutoPlugin {
                                    name: String,
                                    graphsToTest: Seq[
                                        (Configuration, ModuleGraph)])(
-      log: Logger): Boolean = {
+      log: Logger): Boolean =
     val dirsOrExperimental =
       changedDirs.flatMap(dir => Set(dir, s"$dir-experimental"))
-    graphsToTest exists {
+    graphsToTest exists
       case (ivyScope, deps) =>
         log.debug(s"Analysing [$ivyScope] scoped dependencies...")
 
-        deps.nodes.foreach { m ⇒
+        deps.nodes.foreach  m ⇒
           log.debug(" -> " + m.id)
-        }
 
         // if this project depends on a modified module, we must test it
-        deps.nodes.exists { m =>
+        deps.nodes.exists  m =>
           // match just by name, we'd rather include too much than too little
           val dependsOnModule = dirsOrExperimental.find(m.id.name contains _)
           val depends = dependsOnModule.isDefined
@@ -118,9 +112,6 @@ object ValidatePullRequest extends AutoPlugin {
             log.info(
                 s"Project [$name] must be verified, because depends on [${dependsOnModule.get}]")
           depends
-        }
-    }
-  }
 
   def localTargetBranch: Option[String] = sys.env.get("PR_TARGET_BRANCH")
   def jenkinsTargetBranch: Option[String] = sys.env.get("ghprbTargetBranch")
@@ -128,30 +119,29 @@ object ValidatePullRequest extends AutoPlugin {
   def runningLocally: Boolean = !runningOnJenkins
 
   override lazy val buildSettings = Seq(
-      sourceBranch in Global in ValidatePR := {
+      sourceBranch in Global in ValidatePR :=
         sys.env.get(SourceBranchEnvVarName) orElse sys.env
           .get(SourcePullIdJenkinsEnvVarName)
           .map("pullreq/" + _) getOrElse // Set by "GitHub pull request builder plugin"
         "HEAD"
-      },
-      targetBranch in Global in ValidatePR := {
-        (localTargetBranch, jenkinsTargetBranch) match {
+      ,
+      targetBranch in Global in ValidatePR :=
+        (localTargetBranch, jenkinsTargetBranch) match
           case (Some(local), _) => local // local override
           case (None, Some(branch)) =>
             s"origin/$branch" // usually would be "master" or "release-2.3" etc
           case (None, None) =>
             "origin/master" // defaulting to diffing with "master"
-        }
-      },
+      ,
       buildAllKeyword in Global in ValidatePR := """PLS BUILD ALL""".r,
-      githubEnforcedBuildAll in Global in ValidatePR := {
-        sys.env.get(PullIdEnvVarName).map(_.toInt) flatMap {
+      githubEnforcedBuildAll in Global in ValidatePR :=
+        sys.env.get(PullIdEnvVarName).map(_.toInt) flatMap
           prId =>
             val log = streams.value.log
             val buildAllMagicPhrase = (buildAllKeyword in ValidatePR).value
             log.info("Checking GitHub comments for PR validation options...")
 
-            try {
+            try
               import scala.collection.JavaConverters._
               val gh = GitHubBuilder
                 .fromEnvironment()
@@ -165,19 +155,16 @@ object ValidatePullRequest extends AutoPlugin {
 
               def triggersBuildAll(c: GHIssueComment): Boolean =
                 buildAllMagicPhrase.findFirstIn(c.getBody).isDefined
-              comments collectFirst {
+              comments collectFirst
                 case c if triggersBuildAll(c) =>
                   BuildCommentForcedAll(buildAllMagicPhrase.toString(), c)
-              }
-            } catch {
+            catch
               case ex: Exception =>
                 log.warn(
                     "Unable to reach GitHub! Exception was: " + ex.getMessage)
                 None
-            }
-        }
-      },
-      changedDirectories in Global in ValidatePR := {
+      ,
+      changedDirectories in Global in ValidatePR :=
         val log = streams.value.log
 
         val prId = (sourceBranch in ValidatePR).value
@@ -197,7 +184,7 @@ object ValidatePullRequest extends AutoPlugin {
 
         val dirtyModuleNames: Set[String] =
           if (runningOnJenkins) Set.empty
-          else {
+          else
             val statusOutput = s"git status --short".!!.split("\n")
             val dirtyDirectories = statusOutput
               .map(l ⇒ l.trim.dropWhile(_ != ' ').drop(1))
@@ -208,13 +195,11 @@ object ValidatePullRequest extends AutoPlugin {
                 "Detected uncomitted changes in directories (including in dependency analysis): " +
                 dirtyDirectories.mkString("[", ",", "]"))
             dirtyDirectories
-          }
 
         val allModuleNames = dirtyModuleNames ++ diffedModuleNames
         log.info("Detected changes in directories: " +
             allModuleNames.mkString("[", ", ", "]"))
         allModuleNames
-      }
   )
 
   override lazy val projectSettings =
@@ -225,7 +210,7 @@ object ValidatePullRequest extends AutoPlugin {
           Tests.Argument(TestFrameworks.ScalaTest, "-l", "long-running"),
         testOptions in ValidatePR +=
           Tests.Argument(TestFrameworks.ScalaTest, "-l", "timing"),
-        projectBuildMode in ValidatePR := {
+        projectBuildMode in ValidatePR :=
           val log = streams.value.log
           log.debug(
               s"Analysing project (for inclusion in PR validation): [${name.value}]")
@@ -256,9 +241,9 @@ object ValidatePullRequest extends AutoPlugin {
           else if (changedDirs contains "project") BuildProjectChangedQuick
           else if (isDependency) BuildQuick
           else BuildSkip
-        },
+        ,
         additionalTasks in ValidatePR := Seq.empty,
-        validatePullRequest := Def.taskDyn {
+        validatePullRequest := Def.taskDyn
           val log = streams.value.log
           val buildMode = (projectBuildMode in ValidatePR).value
 
@@ -266,33 +251,28 @@ object ValidatePullRequest extends AutoPlugin {
 
           val validationTasks =
             buildMode.task.toSeq ++
-            (buildMode match {
+            (buildMode match
                   case BuildSkip =>
                     Seq.empty // do not run the additional task if project is skipped during pr validation
                   case _ => (additionalTasks in ValidatePR).value
-                })
+                )
 
           // Create a task for every validation task key and
           // then zip all of the tasks together discarding outputs.
           // Task failures are propagated as normal.
-          val zero: Def.Initialize[Seq[Task[Any]]] = Def.setting {
+          val zero: Def.Initialize[Seq[Task[Any]]] = Def.setting
             Seq(task())
-          }
           validationTasks
             .map(taskKey => Def.task { taskKey.value })
-            .foldLeft(zero) { (acc, current) =>
-              acc.zipWith(current) {
+            .foldLeft(zero)  (acc, current) =>
+              acc.zipWith(current)
                 case (taskSeq, task) =>
                   taskSeq :+ task.asInstanceOf[Task[Any]]
-              }
-            } apply { tasks: Seq[Task[Any]] =>
-            tasks.join map { seq =>
+            apply  tasks: Seq[Task[Any]] =>
+            tasks.join map  seq =>
               () /* Ignore the sequence of unit returned */
-            }
-          }
-        }.value
+        .value
     )
-}
 
 /**
   * This autoplugin adds Multi Jvm tests to validatePullRequest task.
@@ -303,7 +283,7 @@ object ValidatePullRequest extends AutoPlugin {
   * Making ValidatePullRequest depend on MultiNode is impossible, as then ValidatePullRequest
   * autoplugin would trigger only on projects which have both of these plugins enabled.
   */
-object MultiNodeWithPrValidation extends AutoPlugin {
+object MultiNodeWithPrValidation extends AutoPlugin
   import ValidatePullRequest._
 
   override def trigger = allRequirements
@@ -311,13 +291,12 @@ object MultiNodeWithPrValidation extends AutoPlugin {
   override lazy val projectSettings = Seq(
       additionalTasks in ValidatePR += MultiNode.multiTest
   )
-}
 
 /**
   * This autoplugin adds MiMa binary issue reporting to validatePullRequest task,
   * when a project has MimaPlugin autoplugin enabled.
   */
-object MimaWithPrValidation extends AutoPlugin {
+object MimaWithPrValidation extends AutoPlugin
   import ValidatePullRequest._
 
   override def trigger = allRequirements
@@ -325,13 +304,11 @@ object MimaWithPrValidation extends AutoPlugin {
   override lazy val projectSettings = Seq(
       additionalTasks in ValidatePR += reportBinaryIssues
   )
-}
 
-object UnidocWithPrValidation extends AutoPlugin {
+object UnidocWithPrValidation extends AutoPlugin
   import ValidatePullRequest._
 
   override def trigger = noTrigger
   override lazy val projectSettings = Seq(
       additionalTasks in ValidatePR += unidoc in Compile
   )
-}

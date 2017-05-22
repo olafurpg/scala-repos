@@ -3,7 +3,7 @@ package scalaparse.syntax
 import acyclic.file
 import fastparse.all._
 import Basic._
-object Identifiers {
+object Identifiers
 
   val Operator = P(
       !Keywords ~
@@ -22,7 +22,7 @@ object Identifiers {
   val BacktickId = P("`" ~ CharsWhile(_ != '`') ~ "`")
   val Id: P0 = P(BacktickId | PlainId)
 
-  def IdRest(allowDollar: Boolean) = {
+  def IdRest(allowDollar: Boolean) =
     val NonLetterDigitId = if (!allowDollar) "" else "$"
     val IdUnderscoreChunk = P(
         CharsWhile(_ == '_', min = 0) ~ CharsWhile(
@@ -30,7 +30,6 @@ object Identifiers {
         ))
     P(IdUnderscoreChunk.rep ~
         (CharsWhile(_ == '_') ~ CharsWhile(isOpChar, min = 0)).?)
-  }
 
   val alphaKeywords = Seq(
       "abstract",
@@ -77,9 +76,8 @@ object Identifiers {
       "macro"
   )
 
-  val AlphabetKeywords = P {
+  val AlphabetKeywords = P
     StringIn(alphaKeywords: _*) ~ !Letter
-  }
   val symbolKeywords = Seq(
       ":",
       ";",
@@ -94,11 +92,9 @@ object Identifiers {
       "\u21d2",
       "\u2190"
   )
-  val SymbolicKeywords = P {
+  val SymbolicKeywords = P
     StringIn(symbolKeywords: _*) ~ !OpChar
-  }
 
   val keywords = alphaKeywords ++ symbolKeywords
 
   val Keywords = P(AlphabetKeywords | SymbolicKeywords)
-}

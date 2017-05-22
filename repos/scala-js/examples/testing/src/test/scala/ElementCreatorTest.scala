@@ -3,11 +3,11 @@ import scala.scalajs.js.Dynamic.global
 
 import org.scalajs.jasminetest.JasmineTest
 
-object ElementCreatorTest extends JasmineTest {
+object ElementCreatorTest extends JasmineTest
 
-  describe("ElementCreator") {
+  describe("ElementCreator")
 
-    it("should be able to create an element in the body") {
+    it("should be able to create an element in the body")
       // create the element
       ElementCreator.create()
 
@@ -21,6 +21,3 @@ object ElementCreatorTest extends JasmineTest {
       // the Scala.js DOM API would make this easier
       expect(body.lastChild.tagName.toString == "H1").toBeTruthy
       expect(body.lastChild.innerHTML.toString == "Test").toBeTruthy
-    }
-  }
-}

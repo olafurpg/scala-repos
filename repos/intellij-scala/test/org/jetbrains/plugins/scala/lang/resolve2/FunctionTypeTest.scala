@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionTypeTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionTypeTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/type/"
-  }
 
   def testChoiceOne() = doTest()
   def testChoiceTwo() = doTest()
@@ -17,4 +16,3 @@ class FunctionTypeTest extends ResolveTestBase {
   def testInheritanceChild() = doTest()
   def testInheritanceParent() = doTest()
   def testParentheses() = doTest()
-}

@@ -11,7 +11,7 @@ package algebra
   * should be overridden by more efficient implementations.
   */
 trait Ring[@sp(Byte, Short, Int, Long, Float, Double) A]
-    extends Any with Rig[A] with Rng[A] {
+    extends Any with Rig[A] with Rng[A]
 
   /**
     * Defined to be equivalent to `additive.sumn(one, n)`. That is, `n`
@@ -19,11 +19,9 @@ trait Ring[@sp(Byte, Short, Int, Long, Float, Double) A]
     * negative.
     */
   def fromInt(n: Int): A = sumn(one, n)
-}
 
-object Ring {
+object Ring
   @inline final def apply[A](implicit r: Ring[A]): Ring[A] = r
-}
 
 /**
   * CRing is a Ring that is commutative under multiplication.
@@ -31,6 +29,5 @@ object Ring {
 trait CRing[@sp(Byte, Short, Int, Long, Float, Double) A]
     extends Any with Ring[A] with MultiplicativeCMonoid[A]
 
-object CRing {
+object CRing
   @inline final def apply[A](implicit r: CRing[A]): CRing[A] = r
-}

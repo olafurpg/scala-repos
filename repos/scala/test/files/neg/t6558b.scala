@@ -1,16 +1,12 @@
-class AnnotNotFound {
+class AnnotNotFound
   def foo(a: Any) = ()
 
-  foo {
+  foo
     @inargument
     def foo = 0
     foo
-  }
 
   () =>
-    {
       @infunction
       def foo = 0
       ()
-  }
-}

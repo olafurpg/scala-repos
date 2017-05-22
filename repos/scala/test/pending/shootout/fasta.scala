@@ -5,8 +5,8 @@
 
 import java.io._
 
-object fasta {
-  def main(args: Array[String]) = {
+object fasta
+  def main(args: Array[String]) =
 
     val ALU =
       "GGCCGGGCGCGGTGGCTCACGCCTGTAATCCCAGCACTTTGG" +
@@ -59,100 +59,85 @@ object fasta {
     s.writeRandomSequence(HomoSapiens, n * 5)
 
     s.close
-  }
 
-  def makeCumulative(a: Array[Tuple2[Char, Double]]) = {
+  def makeCumulative(a: Array[Tuple2[Char, Double]]) =
     var cp = 0.0
     a map
     (frequency =>
-          frequency match {
+          frequency match
             case (code, percent) =>
               cp = cp + percent; new Frequency(code.toByte, cp)
-        })
-  }
-}
+        )
 
 // We could use instances of Pair or Tuple2 but specific labels
 // make the code more readable than index numbers
 
-class Frequency(_code: Byte, _percent: Double) {
+class Frequency(_code: Byte, _percent: Double)
   var code = _code; var percent = _percent;
-}
 
 // extend the Java BufferedOutputStream class
 
-class FastaOutputStream(out: OutputStream) extends BufferedOutputStream(out) {
+class FastaOutputStream(out: OutputStream) extends BufferedOutputStream(out)
 
   private val LineLength = 60
   private val nl = '\n'.toByte
 
   def writeDescription(desc: String) = { write((">" + desc + "\n").getBytes) }
 
-  def writeRepeatingSequence(_alu: String, length: Int) = {
+  def writeRepeatingSequence(_alu: String, length: Int) =
     val alu = _alu.getBytes
     var n = length; var k = 0; val kn = alu.length;
 
-    while (n > 0) {
+    while (n > 0)
       val m = if (n < LineLength) n else LineLength
 
       var i = 0
-      while (i < m) {
+      while (i < m)
         if (k == kn) k = 0
         val b = alu(k)
-        if (count < buf.length) { buf(count) = b; count = count + 1 } else {
+        if (count < buf.length) { buf(count) = b; count = count + 1 } else
           write(b)
-        } // flush buffer
+        // flush buffer
         k = k + 1
         i = i + 1
-      }
 
       write(nl)
       n = n - LineLength
-    }
-  }
 
-  def writeRandomSequence(distribution: Array[Frequency], length: Int) = {
+  def writeRandomSequence(distribution: Array[Frequency], length: Int) =
     var n = length
-    while (n > 0) {
+    while (n > 0)
       val m = if (n < LineLength) n else LineLength
 
       var i = 0
-      while (i < m) {
+      while (i < m)
         val b = selectRandom(distribution)
-        if (count < buf.length) { buf(count) = b; count = count + 1 } else {
+        if (count < buf.length) { buf(count) = b; count = count + 1 } else
           write(b)
-        } // flush buffer
+        // flush buffer
         i = i + 1
-      }
 
-      if (count < buf.length) { buf(count) = nl; count = count + 1 } else {
+      if (count < buf.length) { buf(count) = nl; count = count + 1 } else
         write(nl)
-      } // flush buffer
+      // flush buffer
       n = n - LineLength
-    }
-  }
 
-  private def selectRandom(distribution: Array[Frequency]): Byte = {
+  private def selectRandom(distribution: Array[Frequency]): Byte =
     val n = distribution.length
     val r = RandomNumber scaledTo (1.0)
 
     var i = 0
-    while (i < n) {
+    while (i < n)
       if (r < distribution(i).percent) return distribution(i).code
       i = i + 1
-    }
     return distribution(n - 1).code
-  }
-}
 
-object RandomNumber {
+object RandomNumber
   private val IM = 139968
   private val IA = 3877
   private val IC = 29573
   private var seed = 42
 
-  def scaledTo(max: Double) = {
+  def scaledTo(max: Double) =
     seed = (seed * IA + IC) % IM
     max * seed / IM
-  }
-}

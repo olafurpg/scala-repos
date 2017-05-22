@@ -14,7 +14,7 @@ import akka.stream.testkit.{TestSubscriber, TestPublisher}
 import akka.util.ByteString
 import akka.testkit.AkkaSpec
 
-class PrepareResponseSpec extends AkkaSpec {
+class PrepareResponseSpec extends AkkaSpec
 
   val parserSettings = ParserSettings(system)
 
@@ -22,14 +22,13 @@ class PrepareResponseSpec extends AkkaSpec {
       StatusCodes.OK,
       HttpProtocols.`HTTP/1.1`,
       List(),
-      StreamedEntityCreator[ParserOutput, ResponseEntity] { entityChunks ⇒
-        val chunks = entityChunks.collect {
+      StreamedEntityCreator[ParserOutput, ResponseEntity]  entityChunks ⇒
+        val chunks = entityChunks.collect
           case EntityChunk(chunk) ⇒ chunk
           case EntityStreamError(info) ⇒ throw EntityStreamException(info)
-        }
         HttpEntity.Chunked(ContentTypes.`application/octet-stream`,
                            HttpEntity.limitableChunkSource(chunks))
-      },
+      ,
       closeRequested = false)
 
   val strictStart = ParserOutput.ResponseStart(
@@ -43,9 +42,9 @@ class PrepareResponseSpec extends AkkaSpec {
 
   val messageEnd = ParserOutput.MessageEnd
 
-  "The PrepareRequest stage" should {
+  "The PrepareRequest stage" should
 
-    "not lose demand that comes in while streaming entity" in {
+    "not lose demand that comes in while streaming entity" in
       implicit val mat = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
@@ -88,9 +87,8 @@ class PrepareResponseSpec extends AkkaSpec {
       // and that demand should go downstream
       // since the chunk end was consumed by the stage
       inSub.expectRequest(1)
-    }
 
-    "not lose demand that comes in while handling strict entity" in {
+    "not lose demand that comes in while handling strict entity" in
       implicit val mat = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
@@ -122,9 +120,8 @@ class PrepareResponseSpec extends AkkaSpec {
       // and that demand should go downstream
       // since the chunk end was consumed by the stage
       inSub.expectRequest(1)
-    }
 
-    "complete entity stream then complete stage when downstream cancels" in {
+    "complete entity stream then complete stage when downstream cancels" in
       // to make it possible to cancel a big file download for example
       // without downloading the entire response first
       implicit val mat = ActorMaterializer()
@@ -166,9 +163,8 @@ class PrepareResponseSpec extends AkkaSpec {
 
       entityProbe.expectComplete()
       inSub.expectCancellation()
-    }
 
-    "complete stage when downstream cancels before end of strict request has arrived" in {
+    "complete stage when downstream cancels before end of strict request has arrived" in
       implicit val mat = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
@@ -195,9 +191,8 @@ class PrepareResponseSpec extends AkkaSpec {
 
       // which should cancel the stage
       inSub.expectCancellation()
-    }
 
-    "cancel entire stage when the entity stream is canceled" in {
+    "cancel entire stage when the entity stream is canceled" in
       implicit val mat = ActorMaterializer()
 
       val inProbe = TestPublisher.manualProbe[ParserOutput.ResponseOutput]()
@@ -234,6 +229,3 @@ class PrepareResponseSpec extends AkkaSpec {
       // this means that the entire stage should
       // cancel
       inSub.expectCancellation()
-    }
-  }
-}

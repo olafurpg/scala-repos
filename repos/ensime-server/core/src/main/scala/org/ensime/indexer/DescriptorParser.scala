@@ -9,10 +9,10 @@ import org.parboiled2._
 import scala.annotation.switch
 import scala.util.{Failure, Success}
 
-object DescriptorParser {
-  def parse(desc: String): Descriptor = {
+object DescriptorParser
+  def parse(desc: String): Descriptor =
     val parser = new DescriptorParser(desc)
-    parser.Desc.run() match {
+    parser.Desc.run() match
       case Success(d) => d
       case Failure(error: ParseError) =>
         val msg =
@@ -20,12 +20,10 @@ object DescriptorParser {
         throw new Exception(s"Failed to parse descriptor: $msg")
       case Failure(other) =>
         throw new Exception("Failed to parse descriptor: ", other)
-    }
-  }
 
-  def parseType(desc: String): DescriptorType = {
+  def parseType(desc: String): DescriptorType =
     val parser = new DescriptorParser(desc)
-    parser.Type.run() match {
+    parser.Type.run() match
       case Success(d) => d
       case Failure(error: ParseError) =>
         val msg =
@@ -33,27 +31,22 @@ object DescriptorParser {
         throw new Exception(s"Failed to parse descriptor type: $msg")
       case Failure(other) =>
         throw new Exception("Failed to parse descriptor type: ", other)
-    }
-  }
   val PackageNamePredicate = CharPredicate.All -- ";/ "
   val ClassNameCharPredicate = CharPredicate.All -- ";/ "
-}
 
-class DescriptorParser(val input: ParserInput) extends Parser {
+class DescriptorParser(val input: ParserInput) extends Parser
   import ClassName._
 
-  def Desc: Rule1[Descriptor] = rule {
-    '(' ~ zeroOrMore(Type) ~ ')' ~ Type ~ EOI ~> {
+  def Desc: Rule1[Descriptor] = rule
+    '(' ~ zeroOrMore(Type) ~ ')' ~ Type ~ EOI ~>
       (paramSeq: Seq[DescriptorType], retType: DescriptorType) =>
         Descriptor(paramSeq.toList, retType)
-    }
-  }
 
-  def Type: Rule1[DescriptorType] = rule {
+  def Type: Rule1[DescriptorType] = rule
     // based on the example in the JSON Parser from Parboiled2 doing a one character lookahead here
     // all descriptor types can be inferred from the first character
-    run {
-      (cursorChar: @switch) match {
+    run
+      (cursorChar: @switch) match
         case 'L' => Class
         case 'Z' => Boolean
         case 'B' => Byte
@@ -66,30 +59,21 @@ class DescriptorParser(val input: ParserInput) extends Parser {
         case 'V' => Void
         case '[' => Array
         case _ => MISMATCH
-      }
-    }
-  }
 
-  private def Class: Rule1[DescriptorType] = rule {
+  private def Class: Rule1[DescriptorType] = rule
     'L' ~ Package ~ Name ~ ';' ~> ClassName.apply _
-  }
 
-  private def Name: Rule1[String] = rule {
+  private def Name: Rule1[String] = rule
     capture(oneOrMore(DescriptorParser.ClassNameCharPredicate))
-  }
 
-  private def Package: Rule1[PackageName] = rule {
-    zeroOrMore(capture(oneOrMore(DescriptorParser.PackageNamePredicate)) ~ '/') ~> {
+  private def Package: Rule1[PackageName] = rule
+    zeroOrMore(capture(oneOrMore(DescriptorParser.PackageNamePredicate)) ~ '/') ~>
       seq: Seq[String] =>
         PackageName(seq.toList)
-    }
-  }
 
-  private def Array: Rule1[DescriptorType] = rule {
-    '[' ~ Type ~> { c =>
+  private def Array: Rule1[DescriptorType] = rule
+    '[' ~ Type ~>  c =>
       ArrayDescriptor(c)
-    }
-  }
 
   private def Boolean: Rule1[ClassName] = rule { 'Z' ~ push(PrimitiveBoolean) }
   private def Byte: Rule1[ClassName] = rule { 'B' ~ push(PrimitiveByte) }
@@ -100,4 +84,3 @@ class DescriptorParser(val input: ParserInput) extends Parser {
   private def Float: Rule1[ClassName] = rule { 'F' ~ push(PrimitiveFloat) }
   private def Double: Rule1[ClassName] = rule { 'D' ~ push(PrimitiveDouble) }
   private def Void: Rule1[ClassName] = rule { 'V' ~ push(PrimitiveVoid) }
-}

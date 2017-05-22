@@ -13,7 +13,7 @@ import lila.user.User
 
 case class EventList(events: List[Event])
 
-sealed trait Member extends SocketMember {
+sealed trait Member extends SocketMember
 
   val color: Color
   val playerIdOption: Option[String]
@@ -25,23 +25,19 @@ sealed trait Member extends SocketMember {
   def watcher = !owner
 
   def onUserTv(userId: String) = userTv == Some(userId)
-}
 
-object Member {
+object Member
   def apply(channel: JsChannel,
             user: Option[User],
             color: Color,
             playerIdOption: Option[String],
             ip: String,
-            userTv: Option[String]): Member = {
+            userTv: Option[String]): Member =
     val userId = user map (_.id)
     val troll = user.??(_.troll)
     playerIdOption.fold[Member](
-        Watcher(channel, userId, color, troll, ip, userTv)) { playerId =>
+        Watcher(channel, userId, color, troll, ip, userTv))  playerId =>
       Owner(channel, userId, playerId, color, troll, ip)
-    }
-  }
-}
 
 case class Owner(channel: JsChannel,
                  userId: Option[String],
@@ -49,11 +45,10 @@ case class Owner(channel: JsChannel,
                  color: Color,
                  troll: Boolean,
                  ip: String)
-    extends Member {
+    extends Member
 
   val playerIdOption = playerId.some
   val userTv = none
-}
 
 case class Watcher(channel: JsChannel,
                    userId: Option[String],
@@ -61,10 +56,9 @@ case class Watcher(channel: JsChannel,
                    troll: Boolean,
                    ip: String,
                    userTv: Option[String])
-    extends Member {
+    extends Member
 
   val playerIdOption = none
-}
 
 case class Join(uid: String,
                 user: Option[User],
@@ -80,22 +74,20 @@ case class SocketStatus(version: Int,
                         whiteOnGame: Boolean,
                         whiteIsGone: Boolean,
                         blackOnGame: Boolean,
-                        blackIsGone: Boolean) {
+                        blackIsGone: Boolean)
   def onGame(color: Color) = color.fold(whiteOnGame, blackOnGame)
   def isGone(color: Color) = color.fold(whiteIsGone, blackIsGone)
-}
 case class SetGame(game: Option[lila.game.Game])
 
-package round {
+package round
 
   case class HumanPlay(playerId: String,
                        uci: Uci,
                        blur: Boolean,
                        lag: FiniteDuration,
-                       promise: Option[Promise[Unit]] = None) {
+                       promise: Option[Promise[Unit]] = None)
 
     val atNanos = nowNanos
-  }
 
   case class PlayResult(events: Events, fen: String, lastMove: Option[String])
 
@@ -122,7 +114,6 @@ package round {
   case class HoldAlert(playerId: String, mean: Int, sd: Int, ip: String)
   case class GoBerserk(color: Color)
   case class TournamentStanding(id: String)
-}
 
 private[round] case object GetNbRounds
 private[round] case object NotifyCrowd

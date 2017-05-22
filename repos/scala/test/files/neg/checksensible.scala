@@ -2,12 +2,11 @@ final class Bip { def <=(other: Bop) = true }
 final class Bop {}
 object Bep {}
 
-final class Zing {
+final class Zing
   def !=(other: Zing) = false
-}
 
 // 7 warnings
-class RefEqTest {
+class RefEqTest
   object Shmoopie
 
   (new AnyRef) eq (new AnyRef)
@@ -17,10 +16,9 @@ class RefEqTest {
   (new AnyRef) eq Shmoopie
   (new AnyRef) eq null
   null eq new AnyRef
-}
 
 // 13 warnings
-class EqEqValTest {
+class EqEqValTest
   var c = 0
 
   (c = 1) == 0
@@ -50,10 +48,9 @@ class EqEqValTest {
 
   (1 != println)
   (1 != 'sym)
-}
 
 // 12 warnings
-class EqEqRefTest {
+class EqEqRefTest
   val ref = new Bop
   ((x: Int) => x + 1) == null
   Bep == ((_: Int) + 1)
@@ -89,11 +86,9 @@ class EqEqRefTest {
   (null: AnyRef) == (null: AnyRef)
   (x1 <= x2)
 
-  def main(args: Array[String]) = {
+  def main(args: Array[String]) =
     val in = new java.io.FileInputStream(args(0))
     var c = 0
     while ((c = in.read) != -1) print(c.toChar)
 
     in.close
-  }
-}

@@ -3,7 +3,6 @@ package templating
 
 import lila.api.Context
 
-trait RequestHelper {
+trait RequestHelper
 
   def currentUrl(implicit ctx: Context) = ctx.req.host + ctx.req.uri
-}

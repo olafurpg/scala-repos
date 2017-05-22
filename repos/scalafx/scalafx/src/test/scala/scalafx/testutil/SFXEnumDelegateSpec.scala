@@ -71,24 +71,21 @@ abstract class SFXEnumDelegateSpec[
     scalaClass: Class[S],
     companion: SFXEnumDelegateCompanion[E, S])(
     implicit jfx2sfx: E => S = null, sfx2jfx: S => E = null)
-    extends SFXDelegateSpec[E, S](javaClass, scalaClass) {
+    extends SFXDelegateSpec[E, S](javaClass, scalaClass)
 
   private val javaEnumConstants = EnumSet.allOf(javaClass)
 
-  private def nameIsPresent(name: String) = {
-    try {
+  private def nameIsPresent(name: String) =
+    try
       val scalaEnum = companion(name)
       true
-    } catch {
+    catch
       case e: IllegalArgumentException => false
-    }
-  }
 
-  private def assertScalaEnumWithOrdinal(s: S, index: Int) {
+  private def assertScalaEnumWithOrdinal(s: S, index: Int)
     assert(s.delegate.ordinal() == index,
            "%s - Expected position: %d, actual: %d".format(
                s, s.delegate.ordinal(), index))
-  }
 
   protected override def getDesirableMethodName(javaMethod: Method): String =
     JavaBeanEvaluator.scalaizePropertyNames(javaMethod)
@@ -111,43 +108,34 @@ abstract class SFXEnumDelegateSpec[
   // TESTS - BEGIN 
   /////////////////
 
-  it should "declare all public declared methods of " + javaClass.getName in {
+  it should "declare all public declared methods of " + javaClass.getName in
     compareDeclaredMethods(javaClass, scalaClass)
-  }
 
-  it should "presents all constants from its original JavaFX class" in {
+  it should "presents all constants from its original JavaFX class" in
     val diff = javaEnumConstants -- companion.values.map(_.delegate)
 
     assert(diff.isEmpty, "Missing constants: " + diff.mkString(", "))
-  }
 
-  it should "generate all ScalaFX enums from JavaFX enums names" in {
+  it should "generate all ScalaFX enums from JavaFX enums names" in
     val missingJavaEnumNames =
       javaEnumConstants.map(_.name).filterNot(nameIsPresent(_))
 
     assert(missingJavaEnumNames.isEmpty,
            "Missing constants: " + missingJavaEnumNames.mkString(", "))
-  }
 
-  it should "not find a non registered name among enum constants" in {
-    intercept[IllegalArgumentException] {
+  it should "not find a non registered name among enum constants" in
+    intercept[IllegalArgumentException]
       companion("!@#$%")
-    }
-  }
 
-  it should "throw `IllegalArgumentException` if the argument is `null`" in {
-    intercept[IllegalArgumentException] {
+  it should "throw `IllegalArgumentException` if the argument is `null`" in
+    intercept[IllegalArgumentException]
       companion(null)
-    }
-  }
 
-  it should "presents its values at same order as its JavaFX enum ordinal" in {
-    companion.values.zipWithIndex.foreach({
+  it should "presents its values at same order as its JavaFX enum ordinal" in
+    companion.values.zipWithIndex.foreach(
       case (s, i) => assertScalaEnumWithOrdinal(s, i)
-    })
-  }
+    )
 
   ///////////////
   // TESTS - END 
   ///////////////
-}

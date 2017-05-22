@@ -25,58 +25,40 @@ import org.junit.runner.RunWith
 import LogDouble._;
 
 @RunWith(classOf[JUnitRunner])
-class LogDoubleTest extends FunSuite with Checkers {
+class LogDoubleTest extends FunSuite with Checkers
 
   import Arbitrary.arbitrary;
   implicit val ad: Arbitrary[Double] = Arbitrary(
-      for {
-    d <- arbitrary[Double](Arbitrary.arbDouble) map {
+      for
+    d <- arbitrary[Double](Arbitrary.arbDouble) map
       _ % 1000 abs
-    } suchThat {
+    suchThat
       _ > 0
-    }
-  } yield {
+  yield
     d
-  });
+  );
 
-  implicit def ae(x: Double) = new {
+  implicit def ae(x: Double) = new
     def =~=(y: Double) = math.abs(x - y) / x < 1E-6;
-  }
 
-  test("addition") {
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+  test("addition")
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         (d.toLogDouble + e.toLogDouble).value =~= d + e
-      }
-    }
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         e <= 0 || (d.toLogDouble + e).value =~= d + e
-      }
-    }
-  }
-  test("multiplication") {
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+  test("multiplication")
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         (d.toLogDouble * e.toLogDouble).value =~= d * e
-      }
-    }
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         e <= 0 || (d.toLogDouble * e).value =~= d * e
-      }
-    }
-  }
-  test("division") {
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+  test("division")
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         (d.toLogDouble / e.toLogDouble).value =~= d / e
-      }
-    }
-    check {
-      Prop.forAll { (d: Double, e: Double) =>
+    check
+      Prop.forAll  (d: Double, e: Double) =>
         e <= 0 || (d.toLogDouble / e).value =~= d / e
-      }
-    }
-  }
-}

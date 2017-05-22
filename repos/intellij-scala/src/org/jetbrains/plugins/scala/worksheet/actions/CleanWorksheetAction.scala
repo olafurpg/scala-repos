@@ -24,9 +24,9 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * @author Dmitry Naydanov        
   * @since 11/12/12
   */
-class CleanWorksheetAction() extends AnAction with TopComponentAction {
+class CleanWorksheetAction() extends AnAction with TopComponentAction
 
-  def actionPerformed(e: AnActionEvent) {
+  def actionPerformed(e: AnActionEvent)
     val project = e.getProject
     if (project == null) return //EA-72055
 
@@ -47,8 +47,8 @@ class CleanWorksheetAction() extends AnAction with TopComponentAction {
     val parent = splitPane.getParent
     if (parent == null) return
 
-    invokeLater {
-      inWriteAction {
+    invokeLater
+      inWriteAction
         CleanWorksheetAction.resetScrollModel(viewer)
 
         CleanWorksheetAction.cleanWorksheet(
@@ -57,25 +57,20 @@ class CleanWorksheetAction() extends AnAction with TopComponentAction {
         parent.remove(splitPane)
         parent.add(editor.getComponent, BorderLayout.CENTER)
         editor.getSettings.setFoldingOutlineShown(true)
-      }
-    }
-  }
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     val presentation = e.getPresentation
     presentation.setIcon(AllIcons.Actions.GC)
 
     updateInner(presentation, e.getProject)
-  }
 
   override def actionIcon = AllIcons.Actions.GC
 
   override def bundleKey = "worksheet.clear.button"
-}
 
-object CleanWorksheetAction {
-  def resetScrollModel(viewer: Editor) {
-    viewer match {
+object CleanWorksheetAction
+  def resetScrollModel(viewer: Editor)
+    viewer match
       case viewerEx: EditorImpl =>
         val commonModel = viewerEx.getScrollPane.getVerticalScrollBar.getModel
         viewerEx.getScrollPane.getVerticalScrollBar.setModel(
@@ -87,25 +82,18 @@ object CleanWorksheetAction {
             )
         )
       case _ =>
-    }
-  }
 
   def cleanWorksheet(node: ASTNode,
                      leftEditor: Editor,
                      rightEditor: Editor,
-                     project: Project) {
+                     project: Project)
     val rightDocument = rightEditor.getDocument
 
     WorksheetEditorPrinter.deleteWorksheetEvaluation(
         node.getPsi.asInstanceOf[ScalaFile])
 
-    if (rightDocument != null && !project.isDisposed) {
-      ApplicationManager.getApplication runWriteAction new Runnable {
-        override def run() {
+    if (rightDocument != null && !project.isDisposed)
+      ApplicationManager.getApplication runWriteAction new Runnable
+        override def run()
           rightDocument.setText("")
           PsiDocumentManager.getInstance(project).commitDocument(rightDocument)
-        }
-      }
-    }
-  }
-}

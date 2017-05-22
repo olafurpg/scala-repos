@@ -1,7 +1,7 @@
 import scala.tools.partest.SessionTest
 
 // Detected repl transcript paste: ctrl-D to finish.
-object Test extends SessionTest {
+object Test extends SessionTest
   def session =
     """|
    |scala> @deprecated(message="Please don't do that.", since="Time began.") def depp = "john"
@@ -20,4 +20,3 @@ object Test extends SessionTest {
    |b: String
    |
    |scala> :quit"""
-}

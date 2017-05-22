@@ -9,13 +9,11 @@ package play.api.data.validation
   * @param messages the error message, if more then one message is passed it will use the last one
   * @param args the error message arguments
   */
-case class ValidationError(messages: Seq[String], args: Any*) {
+case class ValidationError(messages: Seq[String], args: Any*)
 
   lazy val message = messages.last
-}
 
-object ValidationError {
+object ValidationError
 
   def apply(message: String, args: Any*) =
     new ValidationError(Seq(message), args: _*)
-}

@@ -14,7 +14,7 @@ import akka.cluster.ddata.GSetKey
 import akka.cluster.ddata.Key
 import akka.cluster.ddata.ORSet
 
-object ServiceRegistry {
+object ServiceRegistry
   import akka.cluster.ddata.Replicator._
 
   val props: Props = Props[ServiceRegistry]
@@ -46,9 +46,8 @@ object ServiceRegistry {
       extends Key[ORSet[ActorRef]](serviceName)
 
   private val AllServicesKey = GSetKey[ServiceKey]("service-keys")
-}
 
-class ServiceRegistry extends Actor with ActorLogging {
+class ServiceRegistry extends Actor with ActorLogging
   import akka.cluster.ddata.Replicator._
   import ServiceRegistry._
 
@@ -62,18 +61,16 @@ class ServiceRegistry extends Actor with ActorLogging {
   def serviceKey(serviceName: String): ServiceKey =
     ServiceKey("service:" + serviceName)
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     replicator ! Subscribe(AllServicesKey, self)
     cluster.subscribe(self,
                       ClusterEvent.InitialStateAsEvents,
                       classOf[ClusterEvent.LeaderChanged])
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     cluster.unsubscribe(self)
-  }
 
-  def receive = {
+  def receive =
     case Register(name, service) ⇒
       val dKey = serviceKey(name)
       // store the service names in a separate GSet to be able to
@@ -90,10 +87,9 @@ class ServiceRegistry extends Actor with ActorLogging {
       val newKeys = c.get(AllServicesKey).elements
       log.debug(
           "Services changed, added: {}, all: {}", (newKeys -- keys), newKeys)
-      (newKeys -- keys).foreach { dKey ⇒
+      (newKeys -- keys).foreach  dKey ⇒
         // subscribe to get notifications of when services with this name are added or removed
         replicator ! Subscribe(dKey, self)
-      }
       keys = newKeys
 
     case c @ Changed(ServiceKey(serviceName)) ⇒
@@ -118,14 +114,10 @@ class ServiceRegistry extends Actor with ActorLogging {
         for (refs ← services.valuesIterator; ref ← refs) context.unwatch(ref)
 
     case Terminated(ref) ⇒
-      val names = services.collect {
+      val names = services.collect
         case (name, refs) if refs.contains(ref) ⇒ name
-      }
-      names.foreach { name ⇒
+      names.foreach  name ⇒
         log.debug("Service with name [{}] terminated: {}", name, ref)
         replicator ! Update(serviceKey(name), ORSet(), WriteLocal)(_ - ref)
-      }
 
     case _: UpdateResponse[_] ⇒ // ok
-  }
-}

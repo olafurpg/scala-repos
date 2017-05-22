@@ -1,37 +1,28 @@
 package stepping
 
-object ForComprehensionListObject {
+object ForComprehensionListObject
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val l = List(new Object(), "deux", "quatre", "huit")
 
-    for (n <- l) {
+    for (n <- l)
       n
-    }
 
     foo(l)
     new ForComprehensionListObject(l).bar
-  }
 
-  def foo(l: List[Object]) {
+  def foo(l: List[Object])
 
-    for (n <- l) {
+    for (n <- l)
       n
-    }
-  }
-}
 
-class ForComprehensionListObject(l: List[Object]) {
+class ForComprehensionListObject(l: List[Object])
 
-  for (n <- l) {
+  for (n <- l)
     n
-  }
 
-  def bar() {
+  def bar()
 
-    for (n <- l) {
+    for (n <- l)
       n
-    }
-  }
-}

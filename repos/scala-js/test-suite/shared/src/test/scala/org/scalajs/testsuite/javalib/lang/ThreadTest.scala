@@ -12,31 +12,26 @@ import org.junit.Assert._
 
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class ThreadTest {
+class ThreadTest
 
-  @Test def getName_and_setName(): Unit = {
-    if (!executingInJVM) {
+  @Test def getName_and_setName(): Unit =
+    if (!executingInJVM)
       val t = Thread.currentThread()
       assertEquals("main", t.getName) // default name of the main thread
       t.setName("foo")
-      try {
+      try
         assertEquals("foo", t.getName)
-      } finally {
+      finally
         t.setName("main") // don't pollute the rest of the world with this test
-      }
       assertEquals("main", t.getName)
-    }
-  }
 
-  @Test def currentThread_getStackTrace(): Unit = {
+  @Test def currentThread_getStackTrace(): Unit =
     Thread.currentThread().getStackTrace()
-  }
 
-  @Test def getId(): Unit = {
+  @Test def getId(): Unit =
     assertTrue(Thread.currentThread().getId > 0)
-  }
 
-  @Test def interrupt_exist_and_the_status_is_properly_reflected(): Unit = {
+  @Test def interrupt_exist_and_the_status_is_properly_reflected(): Unit =
     val t = Thread.currentThread()
     assertFalse(t.isInterrupted())
     assertFalse(Thread.interrupted())
@@ -46,5 +41,3 @@ class ThreadTest {
     assertTrue(Thread.interrupted())
     assertFalse(t.isInterrupted())
     assertFalse(Thread.interrupted())
-  }
-}

@@ -10,14 +10,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object LatticeLaws {
-  def apply[A : Eq : Arbitrary] = new LatticeLaws[A] {
+object LatticeLaws
+  def apply[A : Eq : Arbitrary] = new LatticeLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait LatticeLaws[A] extends Laws {
+trait LatticeLaws[A] extends Laws
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
@@ -87,9 +85,7 @@ trait LatticeLaws[A] extends Laws {
       val parents: Seq[LatticeProperties],
       val props: (String, Prop)*
   )
-      extends RuleSet {
+      extends RuleSet
     val bases = Seq.empty
-  }
-}
 
 // vim: expandtab:ts=2:sw=2

@@ -31,23 +31,19 @@ case class DataSourceParams(
 
 case class ParallelDataSource(val dsp: DataSourceParams)
     extends PDataSource[
-        DataSourceParams, Integer, RDD[LabeledPoint], Vector, Double] {
+        DataSourceParams, Integer, RDD[LabeledPoint], Vector, Double]
   override def read(sc: SparkContext)
-    : Seq[(Integer, RDD[LabeledPoint], RDD[(Vector, Double)])] = {
+    : Seq[(Integer, RDD[LabeledPoint], RDD[(Vector, Double)])] =
     val input = sc.textFile(dsp.filepath)
-    val points = input.map { line =>
+    val points = input.map  line =>
       val parts = line.split(' ').map(_.toDouble)
       LabeledPoint(parts(0), Vectors.dense(parts.drop(1)))
-    }
 
-    MLUtils.kFold(points, dsp.k, dsp.seed).zipWithIndex.map {
+    MLUtils.kFold(points, dsp.k, dsp.seed).zipWithIndex.map
       case (dataSet, index) =>
         (Int.box(index),
          dataSet._1,
          dataSet._2.map(p => (p.features, p.label)))
-    }
-  }
-}
 
 case class AlgorithmParams(
     val numIterations: Int = 200, val stepSize: Double = 0.1)
@@ -55,31 +51,26 @@ case class AlgorithmParams(
 
 case class ParallelSGDAlgorithm(val ap: AlgorithmParams)
     extends P2LAlgorithm[
-        AlgorithmParams, RDD[LabeledPoint], RegressionModel, Vector, Double] {
+        AlgorithmParams, RDD[LabeledPoint], RegressionModel, Vector, Double]
 
-  def train(data: RDD[LabeledPoint]): RegressionModel = {
+  def train(data: RDD[LabeledPoint]): RegressionModel =
     LinearRegressionWithSGD.train(data, ap.numIterations, ap.stepSize)
-  }
 
-  def predict(model: RegressionModel, feature: Vector): Double = {
+  def predict(model: RegressionModel, feature: Vector): Double =
     model.predict(feature)
-  }
 
   @transient override lazy val querySerializer =
     Utils.json4sDefaultFormats + new VectorSerializer
-}
 
-object RegressionEngineFactory extends IEngineFactory {
-  def apply() = {
+object RegressionEngineFactory extends IEngineFactory
+  def apply() =
     new Engine(classOf[ParallelDataSource],
                classOf[IdentityPreparator[RDD[LabeledPoint]]],
                Map("SGD" -> classOf[ParallelSGDAlgorithm]),
                LAverageServing(classOf[ParallelSGDAlgorithm]))
-  }
-}
 
-object Run {
-  def main(args: Array[String]) {
+object Run
+  def main(args: Array[String])
     val filepath = new File("../data/lr_data.txt").getCanonicalPath
     val dataSourceParams = DataSourceParams(filepath, 3)
     val SGD = "SGD"
@@ -97,21 +88,17 @@ object Run {
         servingClassOpt = Some(LAverageServing(classOf[ParallelSGDAlgorithm])),
         evaluatorClassOpt = Some(classOf[MeanSquareError]),
         params = WorkflowParams(batch = "Imagine: Parallel Regression"))
-  }
-}
 
 class VectorSerializer
     extends CustomSerializer[Vector](
         format =>
-          ({
+          (
         case JArray(x) =>
-          val v = x.toArray.map { y =>
-            y match {
+          val v = x.toArray.map  y =>
+            y match
               case JDouble(z) => z
-            }
-          }
           new DenseVector(v)
-      }, {
+      ,
         case x: Vector =>
           JArray(x.toArray.toList.map(d => JDouble(d)))
-      }))
+      ))

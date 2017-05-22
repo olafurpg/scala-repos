@@ -43,7 +43,7 @@ class CoreModuleImpl @Inject()(
     taskOpFactory: TaskOpFactory,
     leaderInfo: LeaderInfo,
     clock: Clock)
-    extends CoreModule {
+    extends CoreModule
 
   // INFRASTRUCTURE LAYER
 
@@ -134,10 +134,9 @@ class CoreModuleImpl @Inject()(
   private[this] lazy val offersWanted =
     offerMatcherManagerModule.globalOfferMatcherWantsOffers
       .combineLatest(offerMatcherReconcilerModule.offersWantedObservable)
-      .map {
+      .map
         case (managerWantsOffers, reconciliationWantsOffers) =>
           managerWantsOffers || reconciliationWantsOffers
-      }
 
   lazy val maybeOfferReviver = flowActors.maybeOfferReviver(
       clock,
@@ -162,4 +161,3 @@ class CoreModuleImpl @Inject()(
   offerMatcherManagerModule
   launcherModule
   offerMatcherReconcilerModule.start()
-}

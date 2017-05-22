@@ -1,20 +1,19 @@
 import sbt._
 
-object TupleNInstances {
+object TupleNInstances
 
-  def apply(outputDir: File): File = {
+  def apply(outputDir: File): File =
     val header = "package scalaz\npackage std\n\n"
     val source =
-      header + (2 to 8).map { n =>
+      header + (2 to 8).map  n =>
         tupleNTraverse(n) + tupleNBindRec(n) + tupleNMonad(n)
-      }.mkString("\n")
+      .mkString("\n")
 
     val file = outputDir / "scalaz" / "std" / "TupleNInstances.scala"
     IO.write(file, source)
     file
-  }
 
-  def tupleNTraverse(n: Int): String = {
+  def tupleNTraverse(n: Int): String =
     val tparams = (1 until n).map("A" + _).mkString(", ")
     val fa = (1 until n).map("fa._" + _).mkString(", ")
 
@@ -26,9 +25,8 @@ private[std] trait Tuple${n}Functor[$tparams] extends Traverse[($tparams, ?)] {
     G.map(f(fa._$n))(($fa, _))
 }
 """
-  }
 
-  def tupleNBindRec(n: Int): String = {
+  def tupleNBindRec(n: Int): String =
     val tparams = (1 until n).map("A" + _).mkString(", ")
     val xs = (1 until n).map("x" + _).mkString(", ")
     val zs = (1 until n).map("z" + _).mkString(", ")
@@ -47,9 +45,9 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
     def go(${(1 until n).map(i => s"s$i: A$i").mkString(", ")})(z: A): ($tparams, B) =
       f(z) match {
         case (${(1 until n).map("a" + _).mkString(", ")}, b0) =>
-          ${(1 until n)
+          $(1 until n)
       .map(i => s"val x$i = _$i.append(s$i, a$i)")
-      .mkString("; ")}
+      .mkString("; ")
           b0 match {
             case -\\/(a0) => go($xs)(a0)
             case \\/-(b1) => ($xs, b1)
@@ -63,9 +61,8 @@ private[std] trait Tuple${n}BindRec[$tparams] extends BindRec[($tparams, ?)] wit
   }
 }
 """
-  }
 
-  def tupleNMonad(n: Int): String = {
+  def tupleNMonad(n: Int): String =
     val tparams = (1 until n).map("A" + _).mkString(", ")
 
     s"""
@@ -74,5 +71,3 @@ private[std] abstract class Tuple${n}Monad[$tparams] extends Monad[($tparams, ?)
   def point[A](a: => A) = (${(1 until n).map(i => s"_$i.zero").mkString(", ")}, a)
 }
 """
-  }
-}

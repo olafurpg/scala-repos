@@ -8,17 +8,16 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class DuplexChannelBufferTransportTest extends FunSuite with MockitoSugar {
+class DuplexChannelBufferTransportTest extends FunSuite with MockitoSugar
 
-  class DuplexChannelContext {
+  class DuplexChannelContext
     val in: ChannelBuffer = mock[ChannelBuffer]
     val out: ChannelBuffer = mock[ChannelBuffer]
     val t = new DuplexChannelBufferTransport(in, out)
-  }
 
   val bb = "hello".getBytes
 
-  test("DuplexChannelBufferTransport writes to the output ChannelBuffer") {
+  test("DuplexChannelBufferTransport writes to the output ChannelBuffer")
     val c = new DuplexChannelContext
     import c._
 
@@ -30,9 +29,8 @@ class DuplexChannelBufferTransportTest extends FunSuite with MockitoSugar {
 
     t.write(bb, 0, 5)
     verify(out).writeBytes(bb, 1, 2)
-  }
 
-  test("DuplexChannelBufferTransport reads from the input ChannelBuffer") {
+  test("DuplexChannelBufferTransport reads from the input ChannelBuffer")
     val c = new DuplexChannelContext
     import c._
 
@@ -41,5 +39,3 @@ class DuplexChannelBufferTransportTest extends FunSuite with MockitoSugar {
     val b = new Array[Byte](nReadable)
     assert(t.read(b, 0, 10) == nReadable)
     assert(t.read(b, 0, 3) == 3)
-  }
-}

@@ -15,7 +15,7 @@ case class MIndexInfo(table: MQName,
                       pages: Int,
                       filterCondition: Option[String])
 
-object MIndexInfo {
+object MIndexInfo
   def getIndexInfo(
       table: MQName, unique: Boolean = false, approximate: Boolean = false) =
     ResultSetAction[MIndexInfo](
@@ -23,7 +23,7 @@ object MIndexInfo {
                                 table.schema_?,
                                 table.name,
                                 unique,
-                                approximate)) { r =>
+                                approximate))  r =>
       MIndexInfo(MQName.from(r),
                  r.<<,
                  r.<<,
@@ -31,13 +31,11 @@ object MIndexInfo {
                  r.<<,
                  r.<<,
                  r.<<,
-                 r.nextStringOption match {
+                 r.nextStringOption match
                    case Some("A") => Some(true)
                    case Some("D") => Some(false)
                    case _ => None
-                 },
+                 ,
                  r.<<,
                  r.<<,
                  r.<<)
-    }
-}

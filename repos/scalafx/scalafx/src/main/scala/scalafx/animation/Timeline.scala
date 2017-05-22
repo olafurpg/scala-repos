@@ -37,7 +37,7 @@ import scalafx.delegate.SFXDelegate
   *
   * @define TM `Timeline`
   */
-object Timeline extends AnimationStatics {
+object Timeline extends AnimationStatics
 
   /**
     * Converts a ScalaFX $TM to a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Timeline.html $TM]],
@@ -55,14 +55,11 @@ object Timeline extends AnimationStatics {
     * @param keyFrames sequence of [[scalafx.animation.KeyFrame]]s.
     * @return A new $TM
     */
-  def apply(keyFrames: Seq[_ <: KeyFrame]) = {
+  def apply(keyFrames: Seq[_ <: KeyFrame]) =
     def kf = keyFrames
 
-    new Timeline {
+    new Timeline
       keyFrames = kf
-    }
-  }
-}
 
 /**
   * Wraps a [[http://docs.oracle.com/javase/8/javafx/api/javafx/animation/Timeline.html Timeline]].
@@ -76,7 +73,7 @@ object Timeline extends AnimationStatics {
   * @define DV Default value:
   */
 class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
-    extends Animation(delegate) with SFXDelegate[jfxa.Timeline] {
+    extends Animation(delegate) with SFXDelegate[jfxa.Timeline]
 
   // CONSTRUCTORS
 
@@ -93,7 +90,7 @@ class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
     * @param targetFramerate The custom target frame rate for this $TM
     * @param keyFrames $KF
     */
-  def this(targetFramerate: Double, keyFrames: Seq[_ <: KeyFrame]) = {
+  def this(targetFramerate: Double, keyFrames: Seq[_ <: KeyFrame]) =
     // HACK: for some reason this does not compile with scala 2.10.0-M7
     // this(new jfxa.Timeline(targetFramerate, keyFrames.map(_.delegate).toArray: _*))
     // solution from https://github.com/scalafx/scalafx/issues/7
@@ -103,7 +100,6 @@ class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
                           keyFrames
                             .map((keyFrame: KeyFrame) => keyFrame.delegate)
                             .toArray: _*))
-  }
 
   // PROPERTIES
 
@@ -111,8 +107,6 @@ class Timeline(override val delegate: jfxa.Timeline = new jfxa.Timeline())
     * $KF
     */
   def keyFrames = delegate.getKeyFrames
-  def keyFrames_=(kfs: Seq[_ <: KeyFrame]) {
+  def keyFrames_=(kfs: Seq[_ <: KeyFrame])
     val mapped = kfs.map((x: KeyFrame) => x.delegate)
     keyFrames.setAll(mapped)
-  }
-}

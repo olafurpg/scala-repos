@@ -1,4 +1,3 @@
 // bar.scala
-object Bar {
+object Bar
   val a = new FooImpl with AbstractOverrideFoo
-}

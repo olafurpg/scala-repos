@@ -7,7 +7,7 @@ import scala.concurrent.Future
 /**
   * Notifies the [[TaskTracker]] of task creation and termination.
   */
-trait TaskCreationHandler {
+trait TaskCreationHandler
 
   /**
     * Create a new task.
@@ -23,4 +23,3 @@ trait TaskCreationHandler {
     * If the task does not exist, the returned Future will not fail.
     */
   def terminated(taskId: Task.Id): Future[_]
-}

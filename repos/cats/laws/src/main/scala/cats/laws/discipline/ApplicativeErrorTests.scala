@@ -8,7 +8,7 @@ import cats.laws.discipline.arbitrary._
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
-trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F] {
+trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F]
   def laws: ApplicativeErrorLaws[F, E]
 
   def applicativeError[
@@ -27,8 +27,8 @@ trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F] {
       EqFXorEA: Eq[F[E Xor A]],
       EqXorTFEA: Eq[XorT[F, E, A]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
-    new RuleSet {
+      iso: Isomorphisms[F]): RuleSet =
+    new RuleSet
       def name: String = "applicativeError"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(applicative[A, B, C])
@@ -53,14 +53,9 @@ trait ApplicativeErrorTests[F[_], E] extends ApplicativeTests[F] {
           "applicativeError attempt consistent with attemptT" -> forAll(
               laws.attemptConsistentWithAttemptT[A] _)
       )
-    }
-  }
-}
 
-object ApplicativeErrorTests {
+object ApplicativeErrorTests
   def apply[F[_], E](
       implicit FE: ApplicativeError[F, E]): ApplicativeErrorTests[F, E] =
-    new ApplicativeErrorTests[F, E] {
+    new ApplicativeErrorTests[F, E]
       def laws: ApplicativeErrorLaws[F, E] = ApplicativeErrorLaws[F, E]
-    }
-}

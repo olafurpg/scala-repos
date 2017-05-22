@@ -26,7 +26,7 @@ import org.apache.spark.ml.param._
 /**
   * Trait for shared param regParam.
   */
-private[ml] trait HasRegParam extends Params {
+private[ml] trait HasRegParam extends Params
 
   /**
     * Param for regularization parameter (>= 0).
@@ -40,12 +40,11 @@ private[ml] trait HasRegParam extends Params {
 
   /** @group getParam */
   final def getRegParam: Double = $(regParam)
-}
 
 /**
   * Trait for shared param maxIter.
   */
-private[ml] trait HasMaxIter extends Params {
+private[ml] trait HasMaxIter extends Params
 
   /**
     * Param for maximum number of iterations (>= 0).
@@ -59,12 +58,11 @@ private[ml] trait HasMaxIter extends Params {
 
   /** @group getParam */
   final def getMaxIter: Int = $(maxIter)
-}
 
 /**
   * Trait for shared param featuresCol (default: "features").
   */
-private[ml] trait HasFeaturesCol extends Params {
+private[ml] trait HasFeaturesCol extends Params
 
   /**
     * Param for features column name.
@@ -77,12 +75,11 @@ private[ml] trait HasFeaturesCol extends Params {
 
   /** @group getParam */
   final def getFeaturesCol: String = $(featuresCol)
-}
 
 /**
   * Trait for shared param labelCol (default: "label").
   */
-private[ml] trait HasLabelCol extends Params {
+private[ml] trait HasLabelCol extends Params
 
   /**
     * Param for label column name.
@@ -95,12 +92,11 @@ private[ml] trait HasLabelCol extends Params {
 
   /** @group getParam */
   final def getLabelCol: String = $(labelCol)
-}
 
 /**
   * Trait for shared param predictionCol (default: "prediction").
   */
-private[ml] trait HasPredictionCol extends Params {
+private[ml] trait HasPredictionCol extends Params
 
   /**
     * Param for prediction column name.
@@ -113,12 +109,11 @@ private[ml] trait HasPredictionCol extends Params {
 
   /** @group getParam */
   final def getPredictionCol: String = $(predictionCol)
-}
 
 /**
   * Trait for shared param rawPredictionCol (default: "rawPrediction").
   */
-private[ml] trait HasRawPredictionCol extends Params {
+private[ml] trait HasRawPredictionCol extends Params
 
   /**
     * Param for raw prediction (a.k.a. confidence) column name.
@@ -133,12 +128,11 @@ private[ml] trait HasRawPredictionCol extends Params {
 
   /** @group getParam */
   final def getRawPredictionCol: String = $(rawPredictionCol)
-}
 
 /**
   * Trait for shared param probabilityCol (default: "probability").
   */
-private[ml] trait HasProbabilityCol extends Params {
+private[ml] trait HasProbabilityCol extends Params
 
   /**
     * Param for Column name for predicted class conditional probabilities. Note: Not all models output well-calibrated probability estimates! These probabilities should be treated as confidences, not precise probabilities.
@@ -153,12 +147,11 @@ private[ml] trait HasProbabilityCol extends Params {
 
   /** @group getParam */
   final def getProbabilityCol: String = $(probabilityCol)
-}
 
 /**
   * Trait for shared param varianceCol.
   */
-private[ml] trait HasVarianceCol extends Params {
+private[ml] trait HasVarianceCol extends Params
 
   /**
     * Param for Column name for the biased sample variance of prediction.
@@ -171,12 +164,11 @@ private[ml] trait HasVarianceCol extends Params {
 
   /** @group getParam */
   final def getVarianceCol: String = $(varianceCol)
-}
 
 /**
   * Trait for shared param threshold (default: 0.5).
   */
-private[ml] trait HasThreshold extends Params {
+private[ml] trait HasThreshold extends Params
 
   /**
     * Param for threshold in binary classification prediction, in range [0, 1].
@@ -192,12 +184,11 @@ private[ml] trait HasThreshold extends Params {
 
   /** @group getParam */
   def getThreshold: Double = $(threshold)
-}
 
 /**
   * Trait for shared param thresholds.
   */
-private[ml] trait HasThresholds extends Params {
+private[ml] trait HasThresholds extends Params
 
   /**
     * Param for Thresholds in multi-class classification to adjust the probability of predicting each class. Array must have length equal to the number of classes, with values >= 0. The class with largest value p/t is predicted, where p is the original probability of that class and t is the class' threshold.
@@ -211,12 +202,11 @@ private[ml] trait HasThresholds extends Params {
 
   /** @group getParam */
   def getThresholds: Array[Double] = $(thresholds)
-}
 
 /**
   * Trait for shared param inputCol.
   */
-private[ml] trait HasInputCol extends Params {
+private[ml] trait HasInputCol extends Params
 
   /**
     * Param for input column name.
@@ -227,12 +217,11 @@ private[ml] trait HasInputCol extends Params {
 
   /** @group getParam */
   final def getInputCol: String = $(inputCol)
-}
 
 /**
   * Trait for shared param inputCols.
   */
-private[ml] trait HasInputCols extends Params {
+private[ml] trait HasInputCols extends Params
 
   /**
     * Param for input column names.
@@ -243,12 +232,11 @@ private[ml] trait HasInputCols extends Params {
 
   /** @group getParam */
   final def getInputCols: Array[String] = $(inputCols)
-}
 
 /**
   * Trait for shared param outputCol (default: uid + "__output").
   */
-private[ml] trait HasOutputCol extends Params {
+private[ml] trait HasOutputCol extends Params
 
   /**
     * Param for output column name.
@@ -261,12 +249,11 @@ private[ml] trait HasOutputCol extends Params {
 
   /** @group getParam */
   final def getOutputCol: String = $(outputCol)
-}
 
 /**
   * Trait for shared param checkpointInterval.
   */
-private[ml] trait HasCheckpointInterval extends Params {
+private[ml] trait HasCheckpointInterval extends Params
 
   /**
     * Param for set checkpoint interval (>= 1) or disable checkpoint (-1). E.g. 10 means that the cache will get checkpointed every 10 iterations.
@@ -280,12 +267,11 @@ private[ml] trait HasCheckpointInterval extends Params {
 
   /** @group getParam */
   final def getCheckpointInterval: Int = $(checkpointInterval)
-}
 
 /**
   * Trait for shared param fitIntercept (default: true).
   */
-private[ml] trait HasFitIntercept extends Params {
+private[ml] trait HasFitIntercept extends Params
 
   /**
     * Param for whether to fit an intercept term.
@@ -298,12 +284,11 @@ private[ml] trait HasFitIntercept extends Params {
 
   /** @group getParam */
   final def getFitIntercept: Boolean = $(fitIntercept)
-}
 
 /**
   * Trait for shared param handleInvalid.
   */
-private[ml] trait HasHandleInvalid extends Params {
+private[ml] trait HasHandleInvalid extends Params
 
   /**
     * Param for how to handle invalid entries. Options are skip (which will filter out rows with bad values), or error (which will throw an errror). More options may be added later.
@@ -317,12 +302,11 @@ private[ml] trait HasHandleInvalid extends Params {
 
   /** @group getParam */
   final def getHandleInvalid: String = $(handleInvalid)
-}
 
 /**
   * Trait for shared param standardization (default: true).
   */
-private[ml] trait HasStandardization extends Params {
+private[ml] trait HasStandardization extends Params
 
   /**
     * Param for whether to standardize the training features before fitting the model.
@@ -337,12 +321,11 @@ private[ml] trait HasStandardization extends Params {
 
   /** @group getParam */
   final def getStandardization: Boolean = $(standardization)
-}
 
 /**
   * Trait for shared param seed (default: this.getClass.getName.hashCode.toLong).
   */
-private[ml] trait HasSeed extends Params {
+private[ml] trait HasSeed extends Params
 
   /**
     * Param for random seed.
@@ -354,12 +337,11 @@ private[ml] trait HasSeed extends Params {
 
   /** @group getParam */
   final def getSeed: Long = $(seed)
-}
 
 /**
   * Trait for shared param elasticNetParam.
   */
-private[ml] trait HasElasticNetParam extends Params {
+private[ml] trait HasElasticNetParam extends Params
 
   /**
     * Param for the ElasticNet mixing parameter, in range [0, 1]. For alpha = 0, the penalty is an L2 penalty. For alpha = 1, it is an L1 penalty.
@@ -373,12 +355,11 @@ private[ml] trait HasElasticNetParam extends Params {
 
   /** @group getParam */
   final def getElasticNetParam: Double = $(elasticNetParam)
-}
 
 /**
   * Trait for shared param tol.
   */
-private[ml] trait HasTol extends Params {
+private[ml] trait HasTol extends Params
 
   /**
     * Param for the convergence tolerance for iterative algorithms.
@@ -389,12 +370,11 @@ private[ml] trait HasTol extends Params {
 
   /** @group getParam */
   final def getTol: Double = $(tol)
-}
 
 /**
   * Trait for shared param stepSize.
   */
-private[ml] trait HasStepSize extends Params {
+private[ml] trait HasStepSize extends Params
 
   /**
     * Param for Step size to be used for each iteration of optimization.
@@ -407,12 +387,11 @@ private[ml] trait HasStepSize extends Params {
 
   /** @group getParam */
   final def getStepSize: Double = $(stepSize)
-}
 
 /**
   * Trait for shared param weightCol.
   */
-private[ml] trait HasWeightCol extends Params {
+private[ml] trait HasWeightCol extends Params
 
   /**
     * Param for weight column name. If this is not set or empty, we treat all instance weights as 1.0.
@@ -425,12 +404,11 @@ private[ml] trait HasWeightCol extends Params {
 
   /** @group getParam */
   final def getWeightCol: String = $(weightCol)
-}
 
 /**
   * Trait for shared param solver (default: "auto").
   */
-private[ml] trait HasSolver extends Params {
+private[ml] trait HasSolver extends Params
 
   /**
     * Param for the solver algorithm for optimization. If this is not set or empty, default value is 'auto'.
@@ -445,5 +423,4 @@ private[ml] trait HasSolver extends Params {
 
   /** @group getParam */
   final def getSolver: String = $(solver)
-}
 // scalastyle:on

@@ -1,4 +1,4 @@
-abstract class ImplicitRepeated {
+abstract class ImplicitRepeated
   trait T[+A, +B]
   trait X
 
@@ -13,4 +13,3 @@ abstract class ImplicitRepeated {
   f(1, 2) // should be implicitly resolved to alternative a)
   // ImplicitRepeated.this.f[Int, Nothing]("A", ImplicitRepeated.this.anyToN[Int](1), ImplicitRepeated.this.anyToN[Int](2));
   // ImplicitRepeated.this.f[Int, Nothing](ImplicitRepeated.this.anyToN[Int](1), ImplicitRepeated.this.anyToN[Int](2))
-}

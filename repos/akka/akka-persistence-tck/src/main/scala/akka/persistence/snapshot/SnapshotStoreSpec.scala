@@ -13,10 +13,9 @@ import akka.testkit.TestProbe
 import com.typesafe.config.ConfigFactory
 import com.typesafe.config.Config
 
-object SnapshotStoreSpec {
+object SnapshotStoreSpec
   val config =
     ConfigFactory.parseString("akka.persistence.publish-plugin-commands = on")
-}
 
 /**
   * This spec aims to verify custom akka-persistence [[SnapshotStore]] implementations.
@@ -31,39 +30,35 @@ object SnapshotStoreSpec {
   */
 abstract class SnapshotStoreSpec(config: Config)
     extends PluginSpec(config) with OptionalTests
-    with SnapshotStoreCapabilityFlags {
+    with SnapshotStoreCapabilityFlags
   implicit lazy val system = ActorSystem(
       "SnapshotStoreSpec", config.withFallback(SnapshotStoreSpec.config))
 
   private var senderProbe: TestProbe = _
   private var metadata: Seq[SnapshotMetadata] = Nil
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit =
     super.beforeEach()
     senderProbe = TestProbe()
     metadata = writeSnapshots()
-  }
 
   def snapshotStore: ActorRef =
     extension.snapshotStoreFor(null)
 
-  def writeSnapshots(): Seq[SnapshotMetadata] = {
-    1 to 5 map { i ⇒
+  def writeSnapshots(): Seq[SnapshotMetadata] =
+    1 to 5 map  i ⇒
       val metadata = SnapshotMetadata(pid, i + 10)
       snapshotStore.tell(SaveSnapshot(metadata, s"s-${i}"), senderProbe.ref)
       senderProbe.expectMsgPF() { case SaveSnapshotSuccess(md) ⇒ md }
-    }
-  }
 
-  "A snapshot store" must {
-    "not load a snapshot given an invalid persistenceId" in {
+  "A snapshot store" must
+    "not load a snapshot given an invalid persistenceId" in
       snapshotStore.tell(LoadSnapshot("invalid",
                                       SnapshotSelectionCriteria.Latest,
                                       Long.MaxValue),
                          senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(None, Long.MaxValue))
-    }
-    "not load a snapshot given non-matching timestamp criteria" in {
+    "not load a snapshot given non-matching timestamp criteria" in
       snapshotStore.tell(
           LoadSnapshot(
               pid,
@@ -71,8 +66,7 @@ abstract class SnapshotStoreSpec(config: Config)
               Long.MaxValue),
           senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(None, Long.MaxValue))
-    }
-    "not load a snapshot given non-matching sequence number criteria" in {
+    "not load a snapshot given non-matching sequence number criteria" in
       snapshotStore.tell(
           LoadSnapshot(pid, SnapshotSelectionCriteria(7), Long.MaxValue),
           senderProbe.ref)
@@ -81,15 +75,13 @@ abstract class SnapshotStoreSpec(config: Config)
           LoadSnapshot(pid, SnapshotSelectionCriteria.Latest, 7),
           senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(None, 7))
-    }
-    "load the most recent snapshot" in {
+    "load the most recent snapshot" in
       snapshotStore.tell(
           LoadSnapshot(pid, SnapshotSelectionCriteria.Latest, Long.MaxValue),
           senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(
               Some(SelectedSnapshot(metadata(4), s"s-5")), Long.MaxValue))
-    }
-    "load the most recent snapshot matching an upper sequence number bound" in {
+    "load the most recent snapshot matching an upper sequence number bound" in
       snapshotStore.tell(
           LoadSnapshot(pid, SnapshotSelectionCriteria(13), Long.MaxValue),
           senderProbe.ref)
@@ -100,8 +92,7 @@ abstract class SnapshotStoreSpec(config: Config)
           senderProbe.ref)
       senderProbe.expectMsg(
           LoadSnapshotResult(Some(SelectedSnapshot(metadata(2), s"s-3")), 13))
-    }
-    "load the most recent snapshot matching upper sequence number and timestamp bounds" in {
+    "load the most recent snapshot matching upper sequence number and timestamp bounds" in
       snapshotStore.tell(
           LoadSnapshot(pid,
                        SnapshotSelectionCriteria(13, metadata(2).timestamp),
@@ -117,8 +108,7 @@ abstract class SnapshotStoreSpec(config: Config)
           senderProbe.ref)
       senderProbe.expectMsg(
           LoadSnapshotResult(Some(SelectedSnapshot(metadata(2), s"s-3")), 13))
-    }
-    "delete a single snapshot identified by sequenceNr in snapshot metadata" in {
+    "delete a single snapshot identified by sequenceNr in snapshot metadata" in
       val md =
         metadata(2).copy(timestamp = 0L) // don't care about timestamp for delete of single snap
       val cmd = DeleteSnapshot(md)
@@ -135,8 +125,7 @@ abstract class SnapshotStoreSpec(config: Config)
                          senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(
               Some(SelectedSnapshot(metadata(1), s"s-2")), Long.MaxValue))
-    }
-    "delete all snapshots matching upper sequence number and timestamp bounds" in {
+    "delete all snapshots matching upper sequence number and timestamp bounds" in
       val md = metadata(2)
       val criteria = SnapshotSelectionCriteria(md.sequenceNr, md.timestamp)
       val cmd = DeleteSnapshots(pid, criteria)
@@ -161,8 +150,7 @@ abstract class SnapshotStoreSpec(config: Config)
           senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(
               Some(SelectedSnapshot(metadata(3), s"s-4")), Long.MaxValue))
-    }
-    "not delete snapshots with non-matching upper timestamp bounds" in {
+    "not delete snapshots with non-matching upper timestamp bounds" in
       val md = metadata(3)
       val criteria = SnapshotSelectionCriteria(md.sequenceNr, md.timestamp - 1)
       val cmd = DeleteSnapshots(pid, criteria)
@@ -181,13 +169,11 @@ abstract class SnapshotStoreSpec(config: Config)
           senderProbe.ref)
       senderProbe.expectMsg(LoadSnapshotResult(
               Some(SelectedSnapshot(metadata(3), s"s-4")), Long.MaxValue))
-    }
-    "save and overwrite snapshot with same sequence number" in {
+    "save and overwrite snapshot with same sequence number" in
       val md = metadata(4)
       snapshotStore.tell(SaveSnapshot(md, s"s-5-modified"), senderProbe.ref)
-      val md2 = senderProbe.expectMsgPF() {
+      val md2 = senderProbe.expectMsgPF()
         case SaveSnapshotSuccess(md2) ⇒ md2
-      }
       md2.sequenceNr should be(md.sequenceNr)
       snapshotStore.tell(LoadSnapshot(pid,
                                       SnapshotSelectionCriteria(md.sequenceNr),
@@ -197,6 +183,3 @@ abstract class SnapshotStoreSpec(config: Config)
       result.snapshot.get.snapshot should be("s-5-modified")
       result.snapshot.get.metadata.sequenceNr should be(md.sequenceNr)
       // metadata timestamp may have been changed
-    }
-  }
-}

@@ -14,19 +14,15 @@
 // Thus, we run the code and force the loading of class B -- if the
 // bytecode is incorrect, it will fail the test.
 
-final class A {
+final class A
   def f1 = true
   def f2 = true
   @inline def f3 = f1 || f2
-  class B {
+  class B
     def f() = 1 to 10 foreach (_ => f3)
-  }
   def f = (new B).f()
-}
 
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     // force the loading of B
     (new A).f
-  }
-}

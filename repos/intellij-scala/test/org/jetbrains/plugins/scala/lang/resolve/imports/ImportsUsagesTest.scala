@@ -9,50 +9,42 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
 /**
   * @author ilyas
   */
-class ImportsUsagesTest extends ScalaResolveTestCase {
+class ImportsUsagesTest extends ScalaResolveTestCase
   override def folderPath: String =
     super.folderPath() + "resolve/imports/simple/"
 
   def printResults(imports: Object) {}
 
-  def testStaticJava() {
-    findReferenceAtCaret() match {
+  def testStaticJava()
+    findReferenceAtCaret() match
       case r: PsiReference =>
         val resolve = r.resolve
         assert(resolve != null)
         assert(resolve.isInstanceOf[PsiField])
-    }
-  }
 
-  def testStaticJavaMethod() {
-    findReferenceAtCaret() match {
+  def testStaticJavaMethod()
+    findReferenceAtCaret() match
       case r: PsiReference =>
         val resolve = r.resolve
         assert(resolve != null)
         assert(resolve.isInstanceOf[PsiMethod])
-    }
-  }
 
-  def testSynthticClassesPriority() {
-    findReferenceAtCaret() match {
+  def testSynthticClassesPriority()
+    findReferenceAtCaret() match
       case r: PsiReference =>
         val resolve = r.resolve
         assert(resolve != null)
         assert(resolve.isInstanceOf[ScObject])
-    }
-  }
 
-  def testPredefPriority() {
-    findReferenceAtCaret() match {
+  def testPredefPriority()
+    findReferenceAtCaret() match
       case r: PsiReference =>
         val resolve = r.resolve
         assert(resolve != null)
         assert(resolve.isInstanceOf[ScObject])
-    }
-  }
 
-  def testaaa() {
-    findReferenceAtCaret() match {
+  def testaaa()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -66,11 +58,9 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
         assert(imports.size == 1)
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
 
-  def testSimpleImport() {
-    findReferenceAtCaret() match {
+  def testSimpleImport()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -85,11 +75,9 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
 
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
 
-  def testImportSelector() {
-    findReferenceAtCaret() match {
+  def testImportSelector()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -104,11 +92,9 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
 
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
 
-  def testShadow1() {
-    findReferenceAtCaret() match {
+  def testShadow1()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -123,11 +109,9 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
 
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
 
-  def testShadow() {
-    findReferenceAtCaret() match {
+  def testShadow()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -142,11 +126,9 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
 
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
 
-  def testimplicits() {
-    findReferenceAtCaret() match {
+  def testimplicits()
+    findReferenceAtCaret() match
       case r: PsiPolyVariantReference =>
         val results = r.multiResolve(false)
 
@@ -161,6 +143,3 @@ class ImportsUsagesTest extends ScalaResolveTestCase {
 
         printResults(imports)
       case _ => throw new Exception("Wrong reference!")
-    }
-  }
-}

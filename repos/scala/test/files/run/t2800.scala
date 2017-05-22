@@ -1,4 +1,4 @@
-object Test {
+object Test
   def f1 = ("": Any) match { case List(x @ _ *) => x; case _ => false }
   def f2 = (5: Any) match { case List(x @ _ *) => x; case _ => false }
   def f3 = (Nil: Any) match { case List(x @ _ *) => x; case _ => false }
@@ -16,7 +16,7 @@ object Test {
   def f13 = ("": Any) match { case Array(_ *) => true; case _ => false }
   def f14 = (Nil: Any) match { case Array(_ *) => true; case _ => false }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     println(f1)
     println(f2)
     println(f3)
@@ -31,5 +31,3 @@ object Test {
     println(f12)
     println(f13)
     println(f14)
-  }
-}

@@ -12,16 +12,16 @@ case class GroupUpdate(id: Option[PathId],
                        groups: Option[Set[GroupUpdate]] = None,
                        dependencies: Option[Set[PathId]] = None,
                        scaleBy: Option[Double] = None,
-                       version: Option[Timestamp] = None) {
+                       version: Option[Timestamp] = None)
 
   def groupId: PathId =
     id.getOrElse(throw new IllegalArgumentException("No group id was given!"))
 
-  def apply(current: Group, timestamp: Timestamp): Group = {
+  def apply(current: Group, timestamp: Timestamp): Group =
     require(scaleBy.isEmpty, "To apply the update, no scale should be given.")
     require(
         version.isEmpty, "To apply the update, no version should be given.")
-    val effectiveGroups = groups.fold(current.groups) { updates =>
+    val effectiveGroups = groups.fold(current.groups)  updates =>
       val currentIds = current.groups.map(_.id)
       val groupIds = updates.map(_.groupId.canonicalPath(current.id))
       val changedIds = currentIds.intersect(groupIds)
@@ -39,7 +39,6 @@ case class GroupUpdate(id: Option[PathId],
               update.toGroup(update.groupId.canonicalPath(current.id),
                              timestamp))
       groupUpdates.toSet ++ groupAdditions
-    }
     val effectiveApps: Set[AppDefinition] =
       apps.getOrElse(current.apps).map(toApp(current.id, _, timestamp))
     val effectiveDependencies = dependencies.fold(current.dependencies)(
@@ -49,15 +48,13 @@ case class GroupUpdate(id: Option[PathId],
           effectiveGroups,
           effectiveDependencies,
           timestamp)
-  }
 
   def toApp(
-      gid: PathId, app: AppDefinition, version: Timestamp): AppDefinition = {
+      gid: PathId, app: AppDefinition, version: Timestamp): AppDefinition =
     val appId = app.id.canonicalPath(gid)
     app.copy(id = appId,
              dependencies = app.dependencies.map(_.canonicalPath(gid)),
              versionInfo = AppDefinition.VersionInfo.OnlyVersion(version))
-  }
 
   def toGroup(gid: PathId, version: Timestamp): Group = Group(
       gid,
@@ -68,23 +65,20 @@ case class GroupUpdate(id: Option[PathId],
       dependencies.fold(Set.empty[PathId])(_.map(_.canonicalPath(gid))),
       version
   )
-}
 
-object GroupUpdate {
-  def apply(id: PathId, apps: Set[AppDefinition]): GroupUpdate = {
+object GroupUpdate
+  def apply(id: PathId, apps: Set[AppDefinition]): GroupUpdate =
     GroupUpdate(Some(id), if (apps.isEmpty) None else Some(apps))
-  }
   def apply(id: PathId,
             apps: Set[AppDefinition],
-            groups: Set[GroupUpdate]): GroupUpdate = {
+            groups: Set[GroupUpdate]): GroupUpdate =
     GroupUpdate(Some(id),
                 if (apps.isEmpty) None else Some(apps),
                 if (groups.isEmpty) None else Some(groups))
-  }
   def empty(id: PathId): GroupUpdate = GroupUpdate(Some(id))
 
   implicit val GroupUpdateValidator: Validator[GroupUpdate] =
-    validator[GroupUpdate] { group =>
+    validator[GroupUpdate]  group =>
       group is notNull
 
       group.version is theOnlyDefinedOptionIn(group)
@@ -93,5 +87,3 @@ object GroupUpdate {
       group.id is valid
       group.apps is valid
       group.groups is valid
-    }
-}

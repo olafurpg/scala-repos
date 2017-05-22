@@ -32,7 +32,7 @@ private[streaming] class StateDStream[
     preservePartitioning: Boolean,
     initialRDD: Option[RDD[(K, S)]]
 )
-    extends DStream[(K, S)](parent.ssc) {
+    extends DStream[(K, S)](parent.ssc)
 
   super.persist(StorageLevel.MEMORY_ONLY_SER)
 
@@ -43,95 +43,73 @@ private[streaming] class StateDStream[
   override val mustCheckpoint = true
 
   private[this] def computeUsingPreviousRDD(
-      parentRDD: RDD[(K, V)], prevStateRDD: RDD[(K, S)]) = {
+      parentRDD: RDD[(K, V)], prevStateRDD: RDD[(K, S)]) =
     // Define the function for the mapPartition operation on cogrouped RDD;
     // first map the cogrouped tuple to tuples of required type,
     // and then apply the update function
     val updateFuncLocal = updateFunc
     val finalFunc = (iterator: Iterator[(K, (Iterable[V], Iterable[S]))]) =>
-      {
         val i = iterator.map(
             t =>
-              {
             val itr = t._2._2.iterator
             val headOption = if (itr.hasNext) Some(itr.next()) else None
             (t._1, t._2._1.toSeq, headOption)
-        })
+        )
         updateFuncLocal(i)
-    }
     val cogroupedRDD = parentRDD.cogroup(prevStateRDD, partitioner)
     val stateRDD = cogroupedRDD.mapPartitions(finalFunc, preservePartitioning)
     Some(stateRDD)
-  }
 
-  override def compute(validTime: Time): Option[RDD[(K, S)]] = {
+  override def compute(validTime: Time): Option[RDD[(K, S)]] =
 
     // Try to get the previous state RDD
-    getOrCompute(validTime - slideDuration) match {
+    getOrCompute(validTime - slideDuration) match
 
-      case Some(prevStateRDD) => {
+      case Some(prevStateRDD) =>
           // If previous state RDD exists
 
           // Try to get the parent RDD
-          parent.getOrCompute(validTime) match {
-            case Some(parentRDD) => {
+          parent.getOrCompute(validTime) match
+            case Some(parentRDD) =>
                 // If parent RDD exists, then compute as usual
                 computeUsingPreviousRDD(parentRDD, prevStateRDD)
-              }
-            case None => {
+            case None =>
                 // If parent RDD does not exist
 
                 // Re-apply the update function to the old state RDD
                 val updateFuncLocal = updateFunc
                 val finalFunc = (iterator: Iterator[(K, S)]) =>
-                  {
                     val i = iterator.map(t => (t._1, Seq[V](), Option(t._2)))
                     updateFuncLocal(i)
-                }
                 val stateRDD =
                   prevStateRDD.mapPartitions(finalFunc, preservePartitioning)
                 Some(stateRDD)
-              }
-          }
-        }
 
-      case None => {
+      case None =>
           // If previous session RDD does not exist (first input data)
 
           // Try to get the parent RDD
-          parent.getOrCompute(validTime) match {
-            case Some(parentRDD) => {
+          parent.getOrCompute(validTime) match
+            case Some(parentRDD) =>
                 // If parent RDD exists, then compute as usual
-                initialRDD match {
-                  case None => {
+                initialRDD match
+                  case None =>
                       // Define the function for the mapPartition operation on grouped RDD;
                       // first map the grouped tuple to tuples of required type,
                       // and then apply the update function
                       val updateFuncLocal = updateFunc
                       val finalFunc = (iterator: Iterator[(K, Iterable[V])]) =>
-                        {
                           updateFuncLocal(iterator.map(
                                   tuple => (tuple._1, tuple._2.toSeq, None)))
-                      }
 
                       val groupedRDD = parentRDD.groupByKey(partitioner)
                       val sessionRDD = groupedRDD.mapPartitions(
                           finalFunc, preservePartitioning)
                       // logDebug("Generating state RDD for time " + validTime + " (first)")
                       Some(sessionRDD)
-                    }
-                  case Some(initialStateRDD) => {
+                  case Some(initialStateRDD) =>
                       computeUsingPreviousRDD(parentRDD, initialStateRDD)
-                    }
-                }
-              }
-            case None => {
+            case None =>
                 // If parent RDD does not exist, then nothing to do!
                 // logDebug("Not generating state RDD (no previous state, no parent)")
                 None
-              }
-          }
-        }
-    }
-  }
-}

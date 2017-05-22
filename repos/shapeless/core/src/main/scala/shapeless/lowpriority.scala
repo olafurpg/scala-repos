@@ -24,7 +24,7 @@ import scala.reflect.macros.whitebox
   */
 sealed trait LowPriority extends Serializable
 
-object LowPriority {
+object LowPriority
 
   implicit def materialize: LowPriority = macro LowPriorityMacros.mkLowPriority
 
@@ -49,27 +49,25 @@ object LowPriority {
     */
   sealed trait Ignoring[T] extends Serializable
 
-  object Ignoring {
+  object Ignoring
     implicit def materialize[T]: Ignoring[T] = macro LowPriorityMacros
       .mkLowPriorityIgnoring[T]
-  }
 
   /** For internal use by `LowPriority` */
   trait For[T] extends Serializable
 
   /** For internal use by `LowPriority` */
   trait ForIgnoring[I, T] extends Serializable
-}
 
 @macrocompat.bundle
 class LowPriorityMacros(val c: whitebox.Context)
-    extends OpenImplicitMacros with LowPriorityTypes {
+    extends OpenImplicitMacros with LowPriorityTypes
   import c.universe._
 
   def strictTpe = typeOf[Strict[_]].typeConstructor
 
   def mkLowPriority: Tree =
-    secondOpenImplicitTpe match {
+    secondOpenImplicitTpe match
       case Some(tpe) =>
         c.inferImplicitValue(
             appliedType(strictTpe, appliedType(lowPriorityForTpe, tpe)),
@@ -80,10 +78,9 @@ class LowPriorityMacros(val c: whitebox.Context)
 
       case None =>
         c.abort(c.enclosingPosition, "Can't get looked for implicit type")
-    }
 
   def mkLowPriorityIgnoring[T : WeakTypeTag]: Tree =
-    secondOpenImplicitTpe match {
+    secondOpenImplicitTpe match
       case Some(tpe) =>
         c.inferImplicitValue(
             appliedType(
@@ -96,11 +93,9 @@ class LowPriorityMacros(val c: whitebox.Context)
 
       case None =>
         c.abort(c.enclosingPosition, "Can't get looked for implicit type")
-    }
-}
 
 @macrocompat.bundle
-trait LowPriorityTypes {
+trait LowPriorityTypes
   val c: whitebox.Context
 
   import c.universe._
@@ -110,9 +105,9 @@ trait LowPriorityTypes {
   def lowPriorityForIgnoringTpe: Type =
     typeOf[LowPriority.ForIgnoring[_, _]].typeConstructor
 
-  object LowPriorityFor {
+  object LowPriorityFor
     def unapply(tpe: Type): Option[(String, Type)] =
-      tpe.dealias match {
+      tpe.dealias match
         case TypeRef(_, cpdTpe, List(highTpe))
             if cpdTpe.asType.toType.typeConstructor =:= lowPriorityForTpe =>
           Some(("", highTpe))
@@ -123,6 +118,3 @@ trait LowPriorityTypes {
           Some(ignored, tTpe)
         case _ =>
           None
-      }
-  }
-}

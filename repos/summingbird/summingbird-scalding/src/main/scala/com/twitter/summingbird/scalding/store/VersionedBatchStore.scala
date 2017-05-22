@@ -37,21 +37,20 @@ import scala.util.{Try => ScalaTry}
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-object VersionedBatchStore {
+object VersionedBatchStore
   def apply[K, V, K2, V2](rootPath: String, versionsToKeep: Int)(
       pack: (BatchID, (K, V)) => (K2, V2))(unpack: ((K2, V2)) => (K, V))(
       implicit batcher: Batcher,
       injection: Injection[(K2, V2), (Array[Byte], Array[Byte])],
       ordering: Ordering[K]): VersionedBatchStore[K, V, K2, V2] =
     new VersionedBatchStore(rootPath, versionsToKeep, batcher)(pack)(unpack)
-}
 
 /**
   * Allows subclasses to share the means of reading version numbers but
   * plug in methods to actually read or write the data.
   */
 abstract class VersionedBatchStoreBase[K, V](val rootPath: String)
-    extends BatchedStore[K, V] {
+    extends BatchedStore[K, V]
   import OrderedFromOrderingExt._
 
   /**
@@ -65,19 +64,16 @@ abstract class VersionedBatchStoreBase[K, V](val rootPath: String)
     */
   override def readLast(
       exclusiveUB: BatchID,
-      mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
-    mode match {
+      mode: Mode): Try[(BatchID, FlowProducer[TypedPipe[(K, V)]])] =
+    mode match
       case hdfs: HdfsMode =>
-        lastBatch(exclusiveUB, hdfs).map { Right(_) }.getOrElse {
+        lastBatch(exclusiveUB, hdfs).map { Right(_) }.getOrElse
           Left(List("No last batch available < %s for VersionedBatchStore(%s)"
                     .format(exclusiveUB, rootPath)))
-        }
       case _ =>
         Left(
             List("Mode: %s not supported for VersionedBatchStore(%s)".format(
                     mode, rootPath)))
-    }
-  }
 
   /**
     * These functions convert back and forth between a specific
@@ -95,17 +91,14 @@ abstract class VersionedBatchStoreBase[K, V](val rootPath: String)
 
   protected def lastBatch(
       exclusiveUB: BatchID,
-      mode: HdfsMode): Option[(BatchID, FlowProducer[TypedPipe[(K, V)]])] = {
+      mode: HdfsMode): Option[(BatchID, FlowProducer[TypedPipe[(K, V)]])] =
     val meta = HDFSMetadata(mode.conf, rootPath)
-    meta.versions.map { ver =>
+    meta.versions.map  ver =>
       (versionToBatchID(ver), readVersion(ver))
-    }.filter { _._1 < exclusiveUB }.reduceOption { (a, b) =>
+    .filter { _._1 < exclusiveUB }.reduceOption  (a, b) =>
       if (a._1 > b._1) a else b
-    }
-  }
 
   protected def readVersion(v: Long): FlowProducer[TypedPipe[(K, V)]]
-}
 
 /*
  * TODO (https://github.com/twitter/summingbird/issues/94): it looks
@@ -121,7 +114,7 @@ class VersionedBatchStore[K, V, K2, V2](
     implicit @transient injection: Injection[
         (K2, V2), (Array[Byte], Array[Byte])],
     override val ordering: Ordering[K])
-    extends VersionedBatchStoreBase[K, V](rootPath) {
+    extends VersionedBatchStoreBase[K, V](rootPath)
   @transient private val logger =
     LoggerFactory.getLogger(classOf[VersionedBatchStore[_, _, _, _]])
 
@@ -146,7 +139,7 @@ class VersionedBatchStore[K, V, K2, V2](
     * EXCLUSIVE upper bound on batchID, or "batchID.next".
     */
   override def writeLast(batchID: BatchID, lastVals: TypedPipe[(K, V)])(
-      implicit flowDef: FlowDef, mode: Mode): Unit = {
+      implicit flowDef: FlowDef, mode: Mode): Unit =
     val newVersion = batchIDToVersion(batchID)
     val target = VersionedKeyValSource[K2, V2](rootPath,
                                                sourceVersion = None,
@@ -154,24 +147,20 @@ class VersionedBatchStore[K, V, K2, V2](
                                                maxFailures = 0,
                                                versionsToKeep = versionsToKeep)
 
-    if (!target.sinkExists(mode)) {
+    if (!target.sinkExists(mode))
       logger.info(
           s"Versioned batched store version for $this @ $newVersion doesn't exist. Will write out.")
       lastVals.map(pack(batchID, _)).write(target)
-    } else {
+    else
       logger.warn(
           s"Versioned batched store version for $this @ $newVersion already exists! Will skip adding to plan.")
-    }
-  }
 
   /**
     * Returns a FlowProducer that supplies all data for the given
     * specific version within this store's rootPath.
     */
   protected def readVersion(v: Long): FlowProducer[TypedPipe[(K, V)]] =
-    Reader { (flowMode: (FlowDef, Mode)) =>
+    Reader  (flowMode: (FlowDef, Mode)) =>
       val mappable =
         VersionedKeyValSource[K2, V2](rootPath, sourceVersion = Some(v))
       TypedPipe.from(mappable).map(unpack)
-    }
-}

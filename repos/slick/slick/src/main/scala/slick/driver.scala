@@ -1,6 +1,6 @@
 package slick
 
-package object driver {
+package object driver
   @deprecated(
       "Use type `slick.jdbc.JdbcProfile` instead of `slick.driver.JdbcDriver`",
       "3.2")
@@ -10,12 +10,11 @@ package object driver {
       "Use type `slick.jdbc.JdbcProfile` instead of `slick.driver.JdbcProfile`",
       "3.2")
   type JdbcProfile = slick.jdbc.JdbcProfile
-  object JdbcProfile {
+  object JdbcProfile
     @deprecated(
         "Use object `slick.jdbc.JdbcCapabilities` instead of `slick.driver.JdbcProfile.capabilities`",
         "3.2")
     val capabilities = slick.jdbc.JdbcCapabilities
-  }
 
   @deprecated(
       "Use type `slick.jdbc.DerbyProfile` instead of `slick.driver.DerbyDriver`",
@@ -70,4 +69,3 @@ package object driver {
       "Use object `slick.jdbc.SQLiteProfile` instead of `slick.driver.SQLiteDriver`",
       "3.2")
   val SQLiteDriver = slick.jdbc.SQLiteProfile
-}

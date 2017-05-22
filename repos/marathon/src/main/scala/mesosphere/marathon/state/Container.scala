@@ -13,7 +13,7 @@ case class Container(
     volumes: Seq[Volume] = Nil,
     docker: Option[Container.Docker] = None)
 
-object Container {
+object Container
 
   object Empty extends Container
 
@@ -28,7 +28,7 @@ object Container {
       parameters: Seq[Parameter] = Nil,
       forcePullImage: Boolean = false)
 
-  object Docker {
+  object Docker
 
     /**
       * @param containerPort The container port to expose
@@ -45,62 +45,50 @@ object Container {
         servicePort: Int = 0,
         protocol: String = "tcp",
         name: Option[String] = None,
-        labels: Map[String, String] = Map.empty[String, String]) {
+        labels: Map[String, String] = Map.empty[String, String])
 
       require(protocol == "tcp" || protocol == "udp",
               "protocol can only be 'tcp' or 'udp'")
-    }
 
-    object PortMapping {
+    object PortMapping
       val TCP = "tcp"
       val UDP = "udp"
 
-      val portMappingValidator = validator[PortMapping] { portMapping =>
+      val portMappingValidator = validator[PortMapping]  portMapping =>
         portMapping.protocol is oneOf(TCP, UDP)
         portMapping.containerPort should be >= 0
         portMapping.hostPort should be >= 0
         portMapping.servicePort should be >= 0
-      }
-    }
 
     val uniquePortNames: Validator[Seq[PortMapping]] =
-      isTrue[Seq[PortMapping]]("Port names must be unique.") { portMappings =>
+      isTrue[Seq[PortMapping]]("Port names must be unique.")  portMappings =>
         val portNames = portMappings.flatMap(_.name)
         portNames.size == portNames.distinct.size
-      }
 
-    implicit val dockerValidator = validator[Docker] { docker =>
+    implicit val dockerValidator = validator[Docker]  docker =>
       docker.image is notEmpty
       docker.portMappings is optional(every(PortMapping.portMappingValidator)) and optional(
           uniquePortNames)
-    }
-  }
 
   // We need validation based on the container type, but don't have dedicated classes. Therefore this approach manually
   // delegates validation to the matching validator
-  implicit val validContainer: Validator[Container] = {
-    val validGeneralContainer = validator[Container] { container =>
+  implicit val validContainer: Validator[Container] =
+    val validGeneralContainer = validator[Container]  container =>
       container.volumes is every(valid)
-    }
 
-    val validDockerContainer: Validator[Container] = validator[Container] {
+    val validDockerContainer: Validator[Container] = validator[Container]
       container =>
         container.docker is notEmpty
         container.docker.each is valid
-    }
 
-    val validMesosContainer: Validator[Container] = validator[Container] {
+    val validMesosContainer: Validator[Container] = validator[Container]
       container =>
         container.docker is empty
-    }
 
-    new Validator[Container] {
-      override def apply(c: Container): Result = c.`type` match {
+    new Validator[Container]
+      override def apply(c: Container): Result = c.`type` match
         case Mesos.ContainerInfo.Type.MESOS => validate(c)(validMesosContainer)
         case Mesos.ContainerInfo.Type.DOCKER =>
           validate(c)(validDockerContainer)
         case _ => Failure(Set(RuleViolation(c.`type`, "unknown", None)))
-      }
-    } and validGeneralContainer
-  }
-}
+    and validGeneralContainer

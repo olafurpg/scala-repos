@@ -6,11 +6,11 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.generators.FunSuiteG
   * @author Roman.Shein
   * @since 20.01.2015.
   */
-trait FunSuiteSingleTestTest extends FunSuiteGenerator {
+trait FunSuiteSingleTestTest extends FunSuiteGenerator
   val funSuiteTestPath = List(
       "[root]", "FunSuiteTest", "should run single test")
 
-  def testFunSuite() {
+  def testFunSuite()
     addFunSuite()
 
     runTestByLocation(
@@ -22,5 +22,3 @@ trait FunSuiteSingleTestTest extends FunSuiteGenerator {
           checkResultTreeHasExactNamedPath(root, funSuiteTestPath: _*) &&
           checkResultTreeDoesNotHaveNodes(root, "should not run other tests"),
         debug = true)
-  }
-}

@@ -24,7 +24,7 @@ import scala.annotation.tailrec
   *  @define add  add
   *  @define Add  add
   */
-trait Growable[-A] extends Clearable {
+trait Growable[-A] extends Clearable
 
   /** ${Add}s a single element to this $coll.
     *
@@ -48,23 +48,18 @@ trait Growable[-A] extends Clearable {
     *  @param xs   the TraversableOnce producing the elements to $add.
     *  @return  the $coll itself.
     */
-  def ++=(xs: TraversableOnce[A]): this.type = {
+  def ++=(xs: TraversableOnce[A]): this.type =
     @tailrec
-    def loop(xs: scala.collection.LinearSeq[A]) {
-      if (xs.nonEmpty) {
+    def loop(xs: scala.collection.LinearSeq[A])
+      if (xs.nonEmpty)
         this += xs.head
         loop(xs.tail)
-      }
-    }
-    xs match {
+    xs match
       case xs: scala.collection.LinearSeq[_] => loop(xs)
       case xs => xs foreach +=
-    }
     this
-  }
 
   /** Clears the $coll's contents. After this operation, the
     *  $coll is empty.
     */
   def clear(): Unit
-}

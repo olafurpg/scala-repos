@@ -18,7 +18,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 /**
   * Public API but not intended for subclassing
   */
-abstract class ClientConnectionSettings private[akka]() {
+abstract class ClientConnectionSettings private[akka]()
   self: ClientConnectionSettingsImpl ⇒
   def getUserAgentHeader: Optional[UserAgent]
   def getConnectingTimeout: FiniteDuration
@@ -48,12 +48,10 @@ abstract class ClientConnectionSettings private[akka]() {
     self.copy(socketOptions = newValue.asScala.toList)
   def withParserSettings(newValue: ParserSettings): ClientConnectionSettings =
     self.copy(parserSettings = newValue.asScala)
-}
 
 object ClientConnectionSettings
-    extends SettingsCompanion[ClientConnectionSettings] {
+    extends SettingsCompanion[ClientConnectionSettings]
   def create(config: Config): ClientConnectionSettings =
     ClientConnectionSettingsImpl(config)
   def create(configOverrides: String): ClientConnectionSettings =
     ClientConnectionSettingsImpl(configOverrides)
-}

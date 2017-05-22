@@ -36,11 +36,11 @@ import scalafx.collections.ObservableBuffer
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.Node
 
-object XYChart {
+object XYChart
   implicit def sfxXYChart2jfx[X, Y](v: XYChart[X, Y]): jfxsc.XYChart[X, Y] =
     if (v != null) v.delegate else null
 
-  object Data {
+  object Data
     implicit def sfxXYChartData2jfx[X, Y](
         v: XYChart.Data[X, Y]): jfxsc.XYChart.Data[X, Y] =
       if (v != null) v.delegate else null
@@ -49,35 +49,29 @@ object XYChart {
 
     def apply[X, Y](x: X, y: Y, extraValue: Any) =
       new jfxsc.XYChart.Data[X, Y](x, y, extraValue)
-  }
 
   class Data[X, Y](
       override val delegate: jfxsc.XYChart.Data[X, Y] = new jfxsc.XYChart.Data[
             X, Y]())
-      extends SFXDelegate[jfxsc.XYChart.Data[X, Y]] {
+      extends SFXDelegate[jfxsc.XYChart.Data[X, Y]]
 
     def extraValue: ObjectProperty[AnyRef] = delegate.extraValueProperty
-    def extraValue_=(v: AnyRef) {
+    def extraValue_=(v: AnyRef)
       extraValue() = v
-    }
 
     def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-    def node_=(v: Node) {
+    def node_=(v: Node)
       node() = v
-    }
 
     def XValue: ObjectProperty[X] = delegate.XValueProperty
-    def XValue_=(v: X) {
+    def XValue_=(v: X)
       delegate.setXValue(v)
-    }
 
     def YValue: ObjectProperty[Y] = delegate.YValueProperty
-    def YValue_=(v: Y) {
+    def YValue_=(v: Y)
       delegate.setYValue(v)
-    }
-  }
 
-  object Series {
+  object Series
     implicit def sfxXYChartSeries2jfx[X, Y](
         v: XYChart.Series[X, Y]): jfxsc.XYChart.Series[X, Y] =
       if (v != null) v.delegate else null
@@ -88,87 +82,70 @@ object XYChart {
     def apply[X, Y](
         name: String, data: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) =
       new jfxsc.XYChart.Series[X, Y](name, data)
-  }
 
   class Series[X, Y](
       override val delegate: jfxsc.XYChart.Series[X, Y] = new jfxsc.XYChart.Series[
             X, Y]())
-      extends SFXDelegate[jfxsc.XYChart.Series[X, Y]] {
+      extends SFXDelegate[jfxsc.XYChart.Series[X, Y]]
 
     def chart: ReadOnlyObjectProperty[jfxsc.XYChart[X, Y]] =
       delegate.chartProperty
 
     def data = delegate.dataProperty
-    def data_=(v: ObservableBuffer[jfxsc.XYChart.Data[X, Y]]) {
+    def data_=(v: ObservableBuffer[jfxsc.XYChart.Data[X, Y]])
       data() = v
-    }
-    def data_=(v: Seq[jfxsc.XYChart.Data[X, Y]]) {
+    def data_=(v: Seq[jfxsc.XYChart.Data[X, Y]])
       data() = ObservableBuffer(v)
-    }
 
     def name: StringProperty = delegate.nameProperty
-    def name_=(v: String) {
+    def name_=(v: String)
       name() = v
-    }
 
     def node: ObjectProperty[jfxs.Node] = delegate.nodeProperty
-    def node_=(v: Node) {
+    def node_=(v: Node)
       node() = v
-    }
-  }
-}
 
 abstract class XYChart[X, Y](override val delegate: jfxsc.XYChart[X, Y])
-    extends Chart(delegate) with SFXDelegate[jfxsc.XYChart[X, Y]] {
+    extends Chart(delegate) with SFXDelegate[jfxsc.XYChart[X, Y]]
 
   def alternativeColumnFillVisible: BooleanProperty =
     delegate.alternativeColumnFillVisibleProperty
-  def alternativeColumnFillVisible_=(v: Boolean) {
+  def alternativeColumnFillVisible_=(v: Boolean)
     alternativeColumnFillVisible() = v
-  }
 
   def alternativeRowFillVisible: BooleanProperty =
     delegate.alternativeRowFillVisibleProperty
-  def alternativeRowFillVisible_=(v: Boolean) {
+  def alternativeRowFillVisible_=(v: Boolean)
     alternativeRowFillVisible() = v
-  }
 
   def data = delegate.dataProperty
-  def data_=(v: ObservableBuffer[jfxsc.XYChart.Series[X, Y]]) {
+  def data_=(v: ObservableBuffer[jfxsc.XYChart.Series[X, Y]])
     data() = v
-  }
-  def data_=(v: Seq[jfxsc.XYChart.Series[X, Y]]) {
+  def data_=(v: Seq[jfxsc.XYChart.Series[X, Y]])
     data() = ObservableBuffer(v)
-  }
-  def data_=(v: XYChart.Series[X, Y]) {
+  def data_=(v: XYChart.Series[X, Y])
     data() = ObservableBuffer[jfxsc.XYChart.Series[X, Y]](v)
-  }
 
   def horizontalGridLinesVisible: BooleanProperty =
     delegate.horizontalGridLinesVisibleProperty
-  def horizontalGridLinesVisible_=(v: Boolean) {
+  def horizontalGridLinesVisible_=(v: Boolean)
     horizontalGridLinesVisible() = v
-  }
 
   def horizontalZeroLineVisible: BooleanProperty =
     delegate.horizontalZeroLineVisibleProperty
-  def horizontalZeroLineVisible_=(v: Boolean) {
+  def horizontalZeroLineVisible_=(v: Boolean)
     horizontalZeroLineVisible() = v
-  }
 
   def verticalGridLinesVisible: BooleanProperty =
     delegate.verticalGridLinesVisibleProperty
-  def verticalGridLinesVisible_=(v: Boolean) {
+  def verticalGridLinesVisible_=(v: Boolean)
     verticalGridLinesVisible() = v
-  }
 
   def verticalZeroLineVisible: BooleanProperty =
     delegate.verticalZeroLineVisibleProperty
-  def verticalZeroLineVisible_=(v: Boolean) {
+  def verticalZeroLineVisible_=(v: Boolean)
     verticalZeroLineVisible() = v
-  }
 
   def XAxis: Axis[X] = delegate.getXAxis
 
   def YAxis: Axis[Y] = delegate.getYAxis
-}

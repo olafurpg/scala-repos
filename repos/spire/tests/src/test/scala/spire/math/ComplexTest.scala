@@ -5,16 +5,15 @@ import org.scalatest.FunSuite
 import spire.implicits.{eqOps => _, _}
 import java.math.MathContext
 
-class ComplexTest extends FunSuite {
-  test("create Complex[Double]") {
+class ComplexTest extends FunSuite
+  test("create Complex[Double]")
     val (real, imag) = (3.0, 44.0)
     val c = Complex(real, imag)
     assert(c.real === real)
     assert(c.imag === imag)
     assert(c === c)
-  }
 
-  test("create Complex[BigDecimal]") {
+  test("create Complex[BigDecimal]")
 
     implicit val mc = MathContext.DECIMAL128
 
@@ -23,9 +22,8 @@ class ComplexTest extends FunSuite {
     assert(c.real === real)
     assert(c.imag === imag)
     assert(c === c)
-  }
 
-  test("some basic equality stuff") {
+  test("some basic equality stuff")
     val one = Complex.one[Double]
     val i = Complex.i[Double]
 
@@ -44,9 +42,8 @@ class ComplexTest extends FunSuite {
     assert(i != 1)
     assert(i != 1.0)
     assert(i != one)
-  }
 
-  test("complex arithmetic") {
+  test("complex arithmetic")
     val i = Complex.i[Double]
 
     val a = 4.0 + 3.0 * i
@@ -68,9 +65,8 @@ class ComplexTest extends FunSuite {
     assert(a / b === Complex(2.0, -1.0))
     assert(b / c === Complex(0.5, 1.0))
     assert(a / c === Complex(2.0, 1.5))
-  }
 
-  test("test e^(i * pi) with Double") {
+  test("test e^(i * pi) with Double")
     val e = Complex(scala.math.E, 0.0)
     val pi = Complex(scala.math.Pi, 0.0)
     val i = Complex.i[Double]
@@ -80,9 +76,8 @@ class ComplexTest extends FunSuite {
     assert(z.real === 0.0)
     assert(z.imag < 0.000000000000001) // sigh...
     assert(z.imag > -0.000000000000001)
-  }
 
-  test("test roots of unity") {
+  test("test roots of unity")
     val one = Complex.one[Double]
     val i = Complex.i[Double]
 
@@ -93,9 +88,8 @@ class ComplexTest extends FunSuite {
     val c1 = math.cos(theta) + math.sin(theta) * i
     val c2 = -one - c1
     assert(Complex.rootsOfUnity[Double](3) === Array(one, c1, c2))
-  }
 
-  test("try using FastComplex") {
+  test("try using FastComplex")
     val fc = FastComplex
 
     val a = fc(3.0, -2.0)
@@ -117,9 +111,8 @@ class ComplexTest extends FunSuite {
 
     assert(fc.multiply(fc.i, fc.i) === fc(-1f, 0f))
     assert(fc.imag(fc(-1f, 0f)) === 0f)
-  }
 
-  test("try using FloatComplex") {
+  test("try using FloatComplex")
     val fc = FastComplex
 
     val a = FloatComplex(3.0, -2.0)
@@ -138,9 +131,8 @@ class ComplexTest extends FunSuite {
 
     assert(z.real == 0.0F)
     assert(z.imag < 0.000000001F)
-  }
 
-  test("complex trigonometry") {
+  test("complex trigonometry")
     // these are just a spot check to avoid sign errors
 
     assert(Complex(3.0, 5.0).sin == Complex(10.472508533940392,
@@ -160,11 +152,8 @@ class ComplexTest extends FunSuite {
                                              10.471557674805572))
     assert(Complex(-3.0, -5.0).cos == Complex(-73.46729221264526,
                                               -10.471557674805572))
-  }
 
-  test("complex norm") {
+  test("complex norm")
     assert(Complex(3.0, 4.0).norm == 5.0)
     // check against overflow
     assert(Complex((3e20).toFloat, (4e20).toFloat).norm == (5e20).toFloat)
-  }
-}

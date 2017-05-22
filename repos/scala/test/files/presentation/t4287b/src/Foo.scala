@@ -1,15 +1,12 @@
-trait Greeting {
+trait Greeting
   val name: String
   val msg = "How are you, " + name
-}
 
-object Greeting {
+object Greeting
   val hello = "hello"
-}
 
-class C(i: Int) extends {
+class C(i: Int) extends
   val nameElse = "Bob"
-} with Greeting {
+with Greeting
   val name = "avc"
   println(i /*#*/ )
-}

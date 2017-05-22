@@ -1,6 +1,5 @@
-object Main {
+object Main
   <div>
     <abbr></div>
     { "..." }
   </div>
-}

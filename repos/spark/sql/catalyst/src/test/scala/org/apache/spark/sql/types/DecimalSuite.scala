@@ -23,17 +23,16 @@ import org.scalatest.PrivateMethodTester
 
 import org.apache.spark.SparkFunSuite
 
-class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
+class DecimalSuite extends SparkFunSuite with PrivateMethodTester
 
   /** Check that a Decimal has the given string representation, precision and scale */
   private def checkDecimal(
-      d: Decimal, string: String, precision: Int, scale: Int): Unit = {
+      d: Decimal, string: String, precision: Int, scale: Int): Unit =
     assert(d.toString === string)
     assert(d.precision === precision)
     assert(d.scale === scale)
-  }
 
-  test("creating decimals") {
+  test("creating decimals")
     checkDecimal(new Decimal(), "0", 1, 0)
     checkDecimal(Decimal(BigDecimal("10.030")), "10.030", 5, 3)
     checkDecimal(Decimal(BigDecimal("10.030"), 4, 1), "10.0", 4, 1)
@@ -55,24 +54,21 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     intercept[IllegalArgumentException](Decimal(BigDecimal("10.030"), 2, 1))
     intercept[IllegalArgumentException](Decimal(BigDecimal("-9.95"), 2, 1))
     intercept[IllegalArgumentException](Decimal(1e17.toLong, 17, 0))
-  }
 
-  test("creating decimals with negative scale") {
+  test("creating decimals with negative scale")
     checkDecimal(Decimal(BigDecimal("98765"), 5, -3), "9.9E+4", 5, -3)
     checkDecimal(Decimal(BigDecimal("314.159"), 6, -2), "3E+2", 6, -2)
     checkDecimal(Decimal(BigDecimal(1.579e12), 4, -9), "1.579E+12", 4, -9)
     checkDecimal(Decimal(BigDecimal(1.579e12), 4, -10), "1.58E+12", 4, -10)
     checkDecimal(Decimal(103050709L, 9, -10), "1.03050709E+18", 9, -10)
     checkDecimal(Decimal(1e8.toLong, 10, -10), "1.00000000E+18", 10, -10)
-  }
 
-  test("double and long values") {
+  test("double and long values")
 
     /** Check that a Decimal converts to the given double and long values */
-    def checkValues(d: Decimal, doubleValue: Double, longValue: Long): Unit = {
+    def checkValues(d: Decimal, doubleValue: Double, longValue: Long): Unit =
       assert(d.toDouble === doubleValue)
       assert(d.toLong === longValue)
-    }
 
     checkValues(new Decimal(), 0.0, 0L)
     checkValues(Decimal(BigDecimal("10.030")), 10.03, 10L)
@@ -91,19 +87,17 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     checkValues(Decimal(Long.MinValue), Long.MinValue.toDouble, Long.MinValue)
     checkValues(Decimal(Double.MaxValue), Double.MaxValue, 0L)
     checkValues(Decimal(Double.MinValue), Double.MinValue, 0L)
-  }
 
   // Accessor for the BigDecimal value of a Decimal, which will be null if it's using Longs
   private val decimalVal = PrivateMethod[BigDecimal]('decimalVal)
 
   /** Check whether a decimal is represented compactly (passing whether we expect it to be) */
-  private def checkCompact(d: Decimal, expected: Boolean): Unit = {
+  private def checkCompact(d: Decimal, expected: Boolean): Unit =
     val isCompact = d.invokePrivate(decimalVal()).eq(null)
     assert(isCompact == expected,
            s"$d ${if (expected) "was not" else "was"} compact")
-  }
 
-  test("small decimals represented as unscaled long") {
+  test("small decimals represented as unscaled long")
     checkCompact(new Decimal(), true)
     checkCompact(Decimal(BigDecimal(10.03)), false)
     checkCompact(Decimal(BigDecimal(1e20)), false)
@@ -124,9 +118,8 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     checkCompact(Decimal(-1e18.toLong, 30, 10), false)
     checkCompact(Decimal(Long.MaxValue), false)
     checkCompact(Decimal(Long.MinValue), false)
-  }
 
-  test("hash code") {
+  test("hash code")
     assert(Decimal(123).hashCode() === (123).##)
     assert(Decimal(-123).hashCode() === (-123).##)
     assert(Decimal(Int.MaxValue).hashCode() === Int.MaxValue.##)
@@ -135,9 +128,8 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
 
     val reallyBig = BigDecimal("123182312312313232112312312123.1231231231")
     assert(Decimal(reallyBig).hashCode() === reallyBig.hashCode)
-  }
 
-  test("equals") {
+  test("equals")
     // The decimals on the left are stored compactly, while the ones on the right aren't
     checkCompact(Decimal(123), true)
     checkCompact(Decimal(BigDecimal(123)), false)
@@ -146,9 +138,8 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     assert(Decimal(123) === Decimal(BigDecimal("123.00")))
     assert(Decimal(-123) === Decimal(BigDecimal(-123)))
     assert(Decimal(-123) === Decimal(BigDecimal("-123.00")))
-  }
 
-  test("isZero") {
+  test("isZero")
     assert(Decimal(0).isZero)
     assert(Decimal(0, 4, 2).isZero)
     assert(Decimal("0").isZero)
@@ -157,9 +148,8 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     assert(!Decimal(1, 4, 2).isZero)
     assert(!Decimal("1").isZero)
     assert(!Decimal("0.001").isZero)
-  }
 
-  test("arithmetic") {
+  test("arithmetic")
     assert(Decimal(100) + Decimal(-100) === Decimal(0))
     assert(Decimal(100) + Decimal(-100) === Decimal(0))
     assert(Decimal(100) * Decimal(-100) === Decimal(-10000))
@@ -170,34 +160,28 @@ class DecimalSuite extends SparkFunSuite with PrivateMethodTester {
     assert(Decimal(100) % Decimal(3) === Decimal(1))
     assert(Decimal(-100) % Decimal(3) === Decimal(-1))
     assert(Decimal(100) % Decimal(0) === null)
-  }
 
   // regression test for SPARK-8359
-  test("accurate precision after multiplication") {
+  test("accurate precision after multiplication")
     val decimal = (Decimal(Long.MaxValue, 38, 0) * Decimal(
             Long.MaxValue, 38, 0)).toJavaBigDecimal
     assert(
         decimal.unscaledValue.toString === "85070591730234615847396907784232501249")
-  }
 
   // regression test for SPARK-8677
-  test("fix non-terminating decimal expansion problem") {
+  test("fix non-terminating decimal expansion problem")
     val decimal = Decimal(1.0, 10, 3) / Decimal(3.0, 10, 3)
     // The difference between decimal should not be more than 0.001.
     assert(decimal.toDouble - 0.333 < 0.001)
-  }
 
   // regression test for SPARK-8800
-  test("fix loss of precision/scale when doing division operation") {
+  test("fix loss of precision/scale when doing division operation")
     val a = Decimal(2) / Decimal(3)
     assert(a.toDouble < 1.0 && a.toDouble > 0.6)
     val b = Decimal(1) / Decimal(8)
     assert(b.toDouble === 0.125)
-  }
 
-  test("set/setOrNull") {
+  test("set/setOrNull")
     assert(new Decimal().set(10L, 10, 0).toUnscaledLong === 10L)
     assert(new Decimal().set(100L, 10, 0).toUnscaledLong === 100L)
     assert(Decimal(Long.MaxValue, 100, 0).toUnscaledLong === Long.MaxValue)
-  }
-}

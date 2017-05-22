@@ -17,7 +17,7 @@ import scala.concurrent.Future
   * will call this method only once per request.
   *
   */
-trait Authenticator extends Plugin {
+trait Authenticator extends Plugin
 
   /**
     * Read data from the http request and derive the calling identity.
@@ -39,4 +39,3 @@ trait Authenticator extends Plugin {
     * @param response the response to customize.
     */
   def handleNotAuthenticated(request: HttpRequest, response: HttpResponse)
-}

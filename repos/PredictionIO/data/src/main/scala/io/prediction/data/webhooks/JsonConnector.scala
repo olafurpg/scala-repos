@@ -17,7 +17,7 @@ package io.prediction.data.webhooks
 import org.json4s.JObject
 
 /** Connector for Webhooks connection */
-private[prediction] trait JsonConnector {
+private[prediction] trait JsonConnector
 
   // TODO: support conversion to multiple events?
 
@@ -26,4 +26,3 @@ private[prediction] trait JsonConnector {
     * @return Event JObject
     */
   def toEventJson(data: JObject): JObject
-}

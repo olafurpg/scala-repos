@@ -10,11 +10,10 @@ import org.jetbrains.sbt.project.template.activator.ScalaActivatorProjectTemplat
   * User: Dmitry.Naydanov, Pavel Fatin
   * Date: 11.03.14.
   */
-class SbtProjectTemplateFactory extends ProjectTemplatesFactory {
+class SbtProjectTemplateFactory extends ProjectTemplatesFactory
   override def getGroups = Array(ScalaProjectTemplatesFactory.Group)
 
   override def createTemplates(group: String, context: WizardContext) =
     if (context.isCreatingNewProject)
       Array(new SbtProjectTemplate(), new ScalaActivatorProjectTemplate)
     else Array.empty
-}

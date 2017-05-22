@@ -6,7 +6,7 @@ import com.twitter.finagle.serverset2.client.SessionState
 import org.apache.zookeeper.Watcher.Event.EventType
 import org.apache.zookeeper.Watcher.Event.KeeperState
 
-private[serverset2] object ApacheCreateMode {
+private[serverset2] object ApacheCreateMode
   def zkMap: Map[CreateMode, org.apache.zookeeper.CreateMode] = Map(
       CreateMode.Ephemeral -> org.apache.zookeeper.CreateMode.EPHEMERAL,
       CreateMode.EphemeralSequential -> org.apache.zookeeper.CreateMode.EPHEMERAL_SEQUENTIAL,
@@ -15,9 +15,8 @@ private[serverset2] object ApacheCreateMode {
   )
 
   val zk: CreateMode => org.apache.zookeeper.CreateMode = zkMap
-}
 
-private[serverset2] object ApacheNodeEvent {
+private[serverset2] object ApacheNodeEvent
   def map = Map(
       EventType.NodeChildrenChanged -> NodeEvent.ChildrenChanged,
       EventType.NodeCreated -> NodeEvent.Created,
@@ -26,9 +25,8 @@ private[serverset2] object ApacheNodeEvent {
   )
 
   def apply(event: EventType): NodeEvent = map(event)
-}
 
-private[serverset2] object ApacheSessionState {
+private[serverset2] object ApacheSessionState
   val map = Map(
       KeeperState.Unknown -> SessionState.Unknown,
       KeeperState.AuthFailed -> SessionState.AuthFailed,
@@ -41,4 +39,3 @@ private[serverset2] object ApacheSessionState {
   )
 
   def apply(state: KeeperState): SessionState = map(state)
-}

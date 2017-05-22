@@ -30,7 +30,7 @@ import S.?
   * @tparam T the type of item being paginated
   * @author nafg and Timothy Perrett
   */
-trait Paginator[T] extends Loggable {
+trait Paginator[T] extends Loggable
 
   /**
     * The total number of items
@@ -70,10 +70,8 @@ trait Paginator[T] extends Loggable {
   def zoomedPages =
     (List(curPage - 1020, curPage - 120, curPage - 20) ++
         (curPage - 10 to curPage + 10) ++ List(
-            curPage + 20, curPage + 120, curPage + 1020)) filter { n =>
+            curPage + 20, curPage + 120, curPage + 1020)) filter  n =>
       n >= 0 && n < numPages
-    }
-}
 
 /**
   * In many situations you'll want to sort things in your paginated view. 
@@ -84,7 +82,7 @@ trait Paginator[T] extends Loggable {
   *
   * @author nafg and Timothy Perrett
   */
-trait SortedPaginator[T, C] extends Paginator[T] {
+trait SortedPaginator[T, C] extends Paginator[T]
 
   /**
     * Pair of (column index, ascending)
@@ -117,14 +115,12 @@ trait SortedPaginator[T, C] extends Paginator[T] {
     * Example usage:
     * sortedPaginator.sort = sortedPaginator.sortedBy(columns.indexOf(clickedColumn))
     */
-  def sortedBy(column: Int): SortState = sort match {
+  def sortedBy(column: Int): SortState = sort match
     case (`column`, true) =>
       // descending is only if it was already sorted ascending
       (column, false)
     case _ =>
       (column, true)
-  }
-}
 
 /**
   * This is the paginator snippet. It provides page
@@ -143,7 +139,7 @@ trait SortedPaginator[T, C] extends Paginator[T] {
   *
   * @author nafg and Timothy Perrett
   */
-trait PaginatorSnippet[T] extends Paginator[T] {
+trait PaginatorSnippet[T] extends Paginator[T]
 
   /**
     * The "previous page" link text
@@ -210,11 +206,10 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   /**
     * Returns a URL used to link to a page starting at the given record offset.
     */
-  def pageUrl(offset: Long): String = {
+  def pageUrl(offset: Long): String =
     def originalUri =
       S.originalRequest.map(_.uri).openOr(sys.error("No request"))
     appendParams(originalUri, List(offsetParam -> offset.toString))
-  }
 
   /**
     * Returns XML that links to a page starting at the given record offset, if the offset is valid and not the current one.
@@ -227,18 +222,15 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   /**
     * Generates links to multiple pages with arbitrary XML delimiting them.
     */
-  def pagesXml(pages: Seq[Int])(sep: NodeSeq): NodeSeq = {
-    pages.toList map { n =>
+  def pagesXml(pages: Seq[Int])(sep: NodeSeq): NodeSeq =
+    pages.toList map  n =>
       pageXml(n * itemsPerPage, Text((n + 1).toString))
-    } match {
+    match
       case one :: Nil => one
       case first :: rest =>
-        rest.foldLeft(first) {
+        rest.foldLeft(first)
           case (a, b) => a ++ sep ++ b
-        }
       case Nil => Nil
-    }
-  }
 
   /**
     * This method binds template HTML based according to the specified
@@ -259,7 +251,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
     *  - `records-end`: end of currently visible records
     *  - `records-count`: total records count
     */
-  def paginate: CssSel = {
+  def paginate: CssSel =
     import scala.math._
 
     ".first *" #> pageXml(0, firstXml) & ".prev *" #> pageXml(
@@ -269,8 +261,6 @@ trait PaginatorSnippet[T] extends Paginator[T] {
         max(0, min(first + itemsPerPage, itemsPerPage * (numPages - 1))),
         nextXml
     ) & ".last *" #> pageXml(itemsPerPage * (numPages - 1), lastXml) & ".records *" #> currentXml & ".records-start *" #> recordsFrom & ".records-end *" #> recordsTo & ".records-count *" #> count
-  }
-}
 
 /**
   * This trait adds snippet functionality for sorted paginators.
@@ -279,7 +269,7 @@ trait PaginatorSnippet[T] extends Paginator[T] {
   * &lt;th&gt;&lt;sort:name/&gt;&lt;/th&gt;&lt;th&gt;&lt;sort:email/&gt;&lt;/th&gt; etc.
   */
 trait SortedPaginatorSnippet[T, C]
-    extends SortedPaginator[T, C] with PaginatorSnippet[T] {
+    extends SortedPaginator[T, C] with PaginatorSnippet[T]
 
   /**
     * The prefix to bind the sorting column headers
@@ -299,12 +289,11 @@ trait SortedPaginatorSnippet[T, C]
   /**
     * Calculates the page url taking sorting into account.
     */
-  def sortedPageUrl(offset: Long, sort: (Int, Boolean)) = sort match {
+  def sortedPageUrl(offset: Long, sort: (Int, Boolean)) = sort match
     case (col, ascending) =>
       appendParams(super.pageUrl(offset),
                    List(sortParam -> col.toString,
                         ascendingParam -> ascending.toString))
-  }
 
   /**
     * Overrides pageUrl and delegates to sortedPageUrl using the current sort
@@ -314,13 +303,12 @@ trait SortedPaginatorSnippet[T, C]
   /**
     * Overrides sort, giving the URL query parameters precedence
     */
-  override def sort = super.sort match {
+  override def sort = super.sort match
     case (col, ascending) =>
       (
           S.param("sort").map(toInt) openOr col,
           S.param("asc").map(toBoolean) openOr ascending
       )
-  }
 
   /**
     * This method binds template HTML based according to the specified
@@ -337,17 +325,13 @@ trait SortedPaginatorSnippet[T, C]
     * renders that column sorted, as well as the `.bar` element's contents
     * to contain a link to a page that renders that column sorted.
     */
-  override def paginate: CssSel = {
-    val headerTransforms = headers.zipWithIndex.map {
+  override def paginate: CssSel =
+    val headerTransforms = headers.zipWithIndex.map
       case ((binding, _), colIndex) =>
-        s".$binding *" #> { ns: NodeSeq =>
+        s".$binding *" #>  ns: NodeSeq =>
           <a href={sortedPageUrl(first, sortedBy(colIndex))}>{ns}</a>
-        }
-    }
 
     headerTransforms.foldLeft(super.paginate)(_ & _)
-  }
-}
 
 /**
   * Sort your paginated views by using lifts functions mapping. 
@@ -358,7 +342,7 @@ trait SortedPaginatorSnippet[T, C]
   * @author nafg and Timothy Perrett
   */
 trait StatefulSortedPaginatorSnippet[T, C]
-    extends SortedPaginatorSnippet[T, C] {
+    extends SortedPaginatorSnippet[T, C]
 
   /**
     * This method is called before the new page is served, to set up the state in advance.
@@ -371,7 +355,5 @@ trait StatefulSortedPaginatorSnippet[T, C]
     * Overrides to use Lift state rather than URL query parameters.
     */
   override def sortedPageUrl(offset: Long, sort: (Int, Boolean)) =
-    S.fmapFunc(S.NFuncHolder(() => registerThisSnippet)) { name =>
+    S.fmapFunc(S.NFuncHolder(() => registerThisSnippet))  name =>
       appendParams(super.sortedPageUrl(offset, sort), List(name -> "_"))
-    }
-}

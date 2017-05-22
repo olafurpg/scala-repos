@@ -32,24 +32,21 @@ import scala.collection.JavaConverters._
   * Source used to write some type T into a WritableSequenceFile using a codec on T
   * for serialization.
   */
-object BytesWritableCodec {
+object BytesWritableCodec
   def get =
-    Bijection.build[Array[Byte], BytesWritable] { arr =>
+    Bijection.build[Array[Byte], BytesWritable]  arr =>
       new BytesWritable(arr)
-    } { w =>
+     w =>
       Arrays.copyOfRange(w.getBytes, 0, w.getLength)
-    }
-}
 
-object CodecSource {
+object CodecSource
   def apply[T](paths: String*)(implicit codec: Injection[T, Array[Byte]]) =
     new CodecSource[T](paths)
-}
 
 class CodecSource[T] private (
     val hdfsPaths: Seq[String], val maxFailures: Int = 0)(
     implicit @transient injection: Injection[T, Array[Byte]])
-    extends FileSource with Mappable[T] with LocalTapSource {
+    extends FileSource with Mappable[T] with LocalTapSource
   import Dsl._
 
   val fieldSym = 'encodedBytes
@@ -67,20 +64,16 @@ class CodecSource[T] private (
   protected lazy val checkedInversion =
     new MaxFailuresCheck[T, BytesWritable](maxFailures)(injectionBox.get)
   override def transformForRead(pipe: Pipe) =
-    pipe.flatMap((fieldSym) -> (fieldSym)) { (bw: BytesWritable) =>
+    pipe.flatMap((fieldSym) -> (fieldSym))  (bw: BytesWritable) =>
       checkedInversion(bw)
-    }
 
   override def transformForWrite(pipe: Pipe) =
     pipe.mapTo((0) -> (fieldSym)) { injectionBox.get.apply(_: T) }
 
-  override def toIterator(implicit config: Config, mode: Mode): Iterator[T] = {
+  override def toIterator(implicit config: Config, mode: Mode): Iterator[T] =
     val tap = createTap(Read)(mode)
-    mode.openForRead(config, tap).asScala.flatMap { te =>
+    mode.openForRead(config, tap).asScala.flatMap  te =>
       checkedInversion(te
             .selectTuple(sourceFields)
             .getObject(0)
             .asInstanceOf[BytesWritable])
-    }
-  }
-}

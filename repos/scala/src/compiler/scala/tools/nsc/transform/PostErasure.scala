@@ -10,7 +10,7 @@ package transform
   */
 trait PostErasure
     extends InfoTransform with TypingTransformers
-    with scala.reflect.internal.transform.PostErasure {
+    with scala.reflect.internal.transform.PostErasure
   val global: Global
 
   import global._
@@ -23,8 +23,8 @@ trait PostErasure
   override def changesBaseClasses = false
 
   class PostErasureTransformer(unit: CompilationUnit)
-      extends TypingTransformer(unit) {
-    override def transform(tree: Tree) = {
+      extends TypingTransformer(unit)
+    override def transform(tree: Tree) =
       def finish(res: Tree) =
         logResult(s"Posterasure reduction\n  Old: $tree\n  New")(res)
 
@@ -38,7 +38,7 @@ trait PostErasure
         finish(localTyper typed
             (Apply(Select(lhs, op.name) setPos tree.pos, rhs :: Nil) setPos tree.pos))
 
-      super.transform(tree) setType elimErasedValueType(tree.tpe) match {
+      super.transform(tree) setType elimErasedValueType(tree.tpe) match
         case AsInstanceOf(v, tpe) if v.tpe <:< tpe =>
           finish(v) // x.asInstanceOf[X]       ==> x
         case ValueClass.BoxAndUnbox(v) =>
@@ -46,7 +46,3 @@ trait PostErasure
         case ValueClass.BoxAndCompare(v1, op, v2) =>
           binop(v1, op, v2) // new B(v1) == new B(v2)  ==> v1 == v2
         case tree => tree
-      }
-    }
-  }
-}

@@ -3,12 +3,11 @@ package syntax
 
 import cats.data.Xor
 
-trait EitherSyntax {
+trait EitherSyntax
   implicit def eitherSyntax[A, B](eab: Either[A, B]): EitherOps[A, B] =
     new EitherOps(eab)
-}
 
-final class EitherOps[A, B](val eab: Either[A, B]) extends AnyVal {
+final class EitherOps[A, B](val eab: Either[A, B]) extends AnyVal
 
   /**
     * Convert a `scala.util.Either` into a [[cats.data.Xor]].
@@ -28,4 +27,3 @@ final class EitherOps[A, B](val eab: Either[A, B]) extends AnyVal {
     * }}}
     */
   def toXor: A Xor B = Xor.fromEither(eab)
-}

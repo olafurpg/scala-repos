@@ -12,14 +12,14 @@ import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
-class FlowFromFutureSpec extends AkkaSpec {
+class FlowFromFutureSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "A Flow based on a Future" must {
-    "produce one element from already successful Future" in assertAllStagesStopped {
+  "A Flow based on a Future" must
+    "produce one element from already successful Future" in assertAllStagesStopped
       val c = TestSubscriber.manualProbe[Int]()
       val p = Source
         .fromFuture(Future.successful(1))
@@ -30,9 +30,8 @@ class FlowFromFutureSpec extends AkkaSpec {
       sub.request(1)
       c.expectNext(1)
       c.expectComplete()
-    }
 
-    "produce error from already failed Future" in assertAllStagesStopped {
+    "produce error from already failed Future" in assertAllStagesStopped
       val ex = new RuntimeException("test") with NoStackTrace
       val c = TestSubscriber.manualProbe[Int]()
       Source
@@ -40,9 +39,8 @@ class FlowFromFutureSpec extends AkkaSpec {
         .runWith(Sink.asPublisher(false))
         .subscribe(c)
       c.expectSubscriptionAndError(ex)
-    }
 
-    "produce one element when Future is completed" in assertAllStagesStopped {
+    "produce one element when Future is completed" in assertAllStagesStopped
       val promise = Promise[Int]()
       val c = TestSubscriber.manualProbe[Int]()
       Source
@@ -56,9 +54,8 @@ class FlowFromFutureSpec extends AkkaSpec {
       c.expectNext(1)
       c.expectComplete()
       c.expectNoMsg(100.millis)
-    }
 
-    "produce one element when Future is completed but not before request" in {
+    "produce one element when Future is completed but not before request" in
       val promise = Promise[Int]()
       val c = TestSubscriber.manualProbe[Int]()
       Source
@@ -71,9 +68,8 @@ class FlowFromFutureSpec extends AkkaSpec {
       sub.request(1)
       c.expectNext(1)
       c.expectComplete()
-    }
 
-    "produce elements with multiple subscribers" in assertAllStagesStopped {
+    "produce elements with multiple subscribers" in assertAllStagesStopped
       val promise = Promise[Int]()
       val p = Source.fromFuture(promise.future).runWith(Sink.asPublisher(true))
       val c1 = TestSubscriber.manualProbe[Int]()
@@ -89,9 +85,8 @@ class FlowFromFutureSpec extends AkkaSpec {
       c2.expectNext(1)
       c1.expectComplete()
       c2.expectComplete()
-    }
 
-    "allow cancel before receiving element" in {
+    "allow cancel before receiving element" in
       val promise = Promise[Int]()
       val p = Source.fromFuture(promise.future).runWith(Sink.asPublisher(true))
       val keepAlive = TestSubscriber.manualProbe[Int]()
@@ -104,6 +99,3 @@ class FlowFromFutureSpec extends AkkaSpec {
       c.expectNoMsg(500.millis)
       promise.success(1)
       c.expectNoMsg(200.millis)
-    }
-  }
-}

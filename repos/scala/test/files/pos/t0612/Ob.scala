@@ -1,5 +1,4 @@
 package test
 
-object Ob {
+object Ob
   protected[test] def f {}
-}

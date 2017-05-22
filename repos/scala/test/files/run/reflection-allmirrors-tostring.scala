@@ -1,7 +1,7 @@
 import scala.language.higherKinds
 import scala.reflect.runtime.universe._
 
-class C {
+class C
   val f1 = 2
   var f2 = 3
 
@@ -15,10 +15,9 @@ class C {
   object M
 
   override def toString = "an instance of C"
-}
 object M
 
-object Test extends App {
+object Test extends App
   val cm = scala.reflect.runtime.currentMirror
 //  println(cm)
 
@@ -45,4 +44,3 @@ object Test extends App {
   println(
       im.reflectClass(cc)
         .reflectConstructor(cc.info.member(termNames.CONSTRUCTOR).asMethod))
-}

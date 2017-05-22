@@ -27,49 +27,45 @@ import org.junit.Assert._
 import org.junit.Test
 import org.scalatest.Assertions.intercept
 
-class KafkaConfigTest {
+class KafkaConfigTest
 
   @Test
-  def testLogRetentionTimeHoursProvided() {
+  def testLogRetentionTimeHoursProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRetentionTimeHoursProp, "1")
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(60L * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
 
   @Test
-  def testLogRetentionTimeMinutesProvided() {
+  def testLogRetentionTimeMinutesProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRetentionTimeMinutesProp, "30")
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
 
   @Test
-  def testLogRetentionTimeMsProvided() {
+  def testLogRetentionTimeMsProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRetentionTimeMillisProp, "1800000")
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
 
   @Test
-  def testLogRetentionTimeNoConfigProvided() {
+  def testLogRetentionTimeNoConfigProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(24 * 7 * 60L * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
 
   @Test
-  def testLogRetentionTimeBothMinutesAndHoursProvided() {
+  def testLogRetentionTimeBothMinutesAndHoursProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRetentionTimeMinutesProp, "30")
@@ -77,10 +73,9 @@ class KafkaConfigTest {
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
 
   @Test
-  def testLogRetentionTimeBothMinutesAndMsProvided() {
+  def testLogRetentionTimeBothMinutesAndMsProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRetentionTimeMillisProp, "1800000")
@@ -88,9 +83,8 @@ class KafkaConfigTest {
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRetentionTimeMillis)
-  }
   @Test
-  def testLogRetentionUnlimited() {
+  def testLogRetentionUnlimited()
     val props1 =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     val props2 =
@@ -121,13 +115,11 @@ class KafkaConfigTest {
 
     props5.put("log.retention.ms", "0")
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       val cfg5 = KafkaConfig.fromProps(props5)
-    }
-  }
 
   @Test
-  def testLogRetentionValid {
+  def testLogRetentionValid
     val props1 =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     val props2 =
@@ -139,19 +131,15 @@ class KafkaConfigTest {
     props2.put("log.retention.minutes", "0")
     props3.put("log.retention.hours", "0")
 
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       val cfg1 = KafkaConfig.fromProps(props1)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       val cfg2 = KafkaConfig.fromProps(props2)
-    }
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       val cfg3 = KafkaConfig.fromProps(props3)
-    }
-  }
 
   @Test
-  def testAdvertiseDefaults() {
+  def testAdvertiseDefaults()
     val port = "9999"
     val hostName = "fake-host"
 
@@ -164,10 +152,9 @@ class KafkaConfigTest {
     val endpoint = endpoints.get(SecurityProtocol.PLAINTEXT).get
     assertEquals(endpoint.host, hostName)
     assertEquals(endpoint.port, port.toInt)
-  }
 
   @Test
-  def testAdvertiseConfigured() {
+  def testAdvertiseConfigured()
     val advertisedHostName = "routable-host"
     val advertisedPort = "1234"
 
@@ -181,10 +168,9 @@ class KafkaConfigTest {
 
     assertEquals(endpoint.host, advertisedHostName)
     assertEquals(endpoint.port, advertisedPort.toInt)
-  }
 
   @Test
-  def testAdvertisePortDefault() {
+  def testAdvertisePortDefault()
     val advertisedHostName = "routable-host"
     val port = "9999"
 
@@ -198,10 +184,9 @@ class KafkaConfigTest {
 
     assertEquals(endpoint.host, advertisedHostName)
     assertEquals(endpoint.port, port.toInt)
-  }
 
   @Test
-  def testAdvertiseHostNameDefault() {
+  def testAdvertiseHostNameDefault()
     val hostName = "routable-host"
     val advertisedPort = "9999"
 
@@ -215,10 +200,9 @@ class KafkaConfigTest {
 
     assertEquals(endpoint.host, hostName)
     assertEquals(endpoint.port, advertisedPort.toInt)
-  }
 
   @Test
-  def testDuplicateListeners() {
+  def testDuplicateListeners()
     val props = new Properties()
     props.put(KafkaConfig.BrokerIdProp, "1")
     props.put(KafkaConfig.ZkConnectProp, "localhost:2181")
@@ -237,20 +221,18 @@ class KafkaConfigTest {
     props.put(KafkaConfig.AdvertisedListenersProp,
               "PLAINTEXT://localhost:9091,TRACE://localhost:9091")
     assert(!isValidKafkaConfig(props))
-  }
 
   @Test
-  def testBadListenerProtocol() {
+  def testBadListenerProtocol()
     val props = new Properties()
     props.put(KafkaConfig.BrokerIdProp, "1")
     props.put(KafkaConfig.ZkConnectProp, "localhost:2181")
     props.put(KafkaConfig.ListenersProp, "BAD://localhost:9091")
 
     assert(!isValidKafkaConfig(props))
-  }
 
   @Test
-  def testCaseInsensitiveListenerProtocol() {
+  def testCaseInsensitiveListenerProtocol()
     val props = new Properties()
     props.put(KafkaConfig.BrokerIdProp, "1")
     props.put(KafkaConfig.ZkConnectProp, "localhost:2181")
@@ -258,10 +240,9 @@ class KafkaConfigTest {
               "plaintext://localhost:9091,SsL://localhost:9092")
 
     assert(isValidKafkaConfig(props))
-  }
 
   @Test
-  def testListenerDefaults() {
+  def testListenerDefaults()
     val props = new Properties()
     props.put(KafkaConfig.BrokerIdProp, "1")
     props.put(KafkaConfig.ZkConnectProp, "localhost:2181")
@@ -292,10 +273,9 @@ class KafkaConfigTest {
     assertEquals(
         conf3.advertisedListeners,
         CoreUtils.listenerListToEndPoints("PLAINTEXT://otherhost:2222"))
-  }
 
   @Test
-  def testVersionConfiguration() {
+  def testVersionConfiguration()
     val props = new Properties()
     props.put(KafkaConfig.BrokerIdProp, "1")
     props.put(KafkaConfig.ZkConnectProp, "localhost:2181")
@@ -317,28 +297,24 @@ class KafkaConfigTest {
 
     //check that latest is newer than 0.8.2
     assert(ApiVersion.latestVersion >= conf3.interBrokerProtocolVersion)
-  }
 
-  private def isValidKafkaConfig(props: Properties): Boolean = {
-    try {
+  private def isValidKafkaConfig(props: Properties): Boolean =
+    try
       KafkaConfig.fromProps(props)
       true
-    } catch {
+    catch
       case e: IllegalArgumentException => false
-    }
-  }
 
   @Test
-  def testUncleanLeaderElectionDefault() {
+  def testUncleanLeaderElectionDefault()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.uncleanLeaderElectionEnable, true)
-  }
 
   @Test
-  def testUncleanElectionDisabled() {
+  def testUncleanElectionDisabled()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(
@@ -346,10 +322,9 @@ class KafkaConfigTest {
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.uncleanLeaderElectionEnable, false)
-  }
 
   @Test
-  def testUncleanElectionEnabled() {
+  def testUncleanElectionEnabled()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(
@@ -357,31 +332,27 @@ class KafkaConfigTest {
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.uncleanLeaderElectionEnable, true)
-  }
 
   @Test
-  def testUncleanElectionInvalid() {
+  def testUncleanElectionInvalid()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.UncleanLeaderElectionEnableProp, "invalid")
 
-    intercept[ConfigException] {
+    intercept[ConfigException]
       KafkaConfig.fromProps(props)
-    }
-  }
 
   @Test
-  def testLogRollTimeMsProvided() {
+  def testLogRollTimeMsProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRollTimeMillisProp, "1800000")
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRollTimeMillis)
-  }
 
   @Test
-  def testLogRollTimeBothMsAndHoursProvided() {
+  def testLogRollTimeBothMsAndHoursProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.LogRollTimeMillisProp, "1800000")
@@ -389,60 +360,52 @@ class KafkaConfigTest {
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(30 * 60L * 1000L, cfg.logRollTimeMillis)
-  }
 
   @Test
-  def testLogRollTimeNoConfigProvided() {
+  def testLogRollTimeNoConfigProvided()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
 
     val cfg = KafkaConfig.fromProps(props)
     assertEquals(24 * 7 * 60L * 60L * 1000L, cfg.logRollTimeMillis)
-  }
 
   @Test
-  def testDefaultCompressionType() {
+  def testDefaultCompressionType()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.compressionType, "producer")
-  }
 
   @Test
-  def testValidCompressionType() {
+  def testValidCompressionType()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put("compression.type", "gzip")
     val serverConfig = KafkaConfig.fromProps(props)
 
     assertEquals(serverConfig.compressionType, "gzip")
-  }
 
   @Test
-  def testInvalidCompressionType() {
+  def testInvalidCompressionType()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.CompressionTypeProp, "abc")
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       KafkaConfig.fromProps(props)
-    }
-  }
 
   @Test
-  def testInvalidInterBrokerSecurityProtocol() {
+  def testInvalidInterBrokerSecurityProtocol()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.ListenersProp, "SSL://localhost:0")
     props.put(KafkaConfig.InterBrokerSecurityProtocolProp,
               SecurityProtocol.PLAINTEXT.toString)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       KafkaConfig.fromProps(props)
-    }
-  }
 
   @Test
-  def testEqualAdvertisedListenersProtocol() {
+  def testEqualAdvertisedListenersProtocol()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.ListenersProp,
@@ -450,36 +413,31 @@ class KafkaConfigTest {
     props.put(KafkaConfig.AdvertisedListenersProp,
               "PLAINTEXT://localhost:9092,SSL://localhost:9093")
     KafkaConfig.fromProps(props)
-  }
 
   @Test
-  def testInvalidAdvertisedListenersProtocol() {
+  def testInvalidAdvertisedListenersProtocol()
     val props =
       TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect, port = 8181)
     props.put(KafkaConfig.ListenersProp,
               "TRACE://localhost:9091,SSL://localhost:9093")
     props.put(
         KafkaConfig.AdvertisedListenersProp, "PLAINTEXT://localhost:9092")
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       KafkaConfig.fromProps(props)
-    }
-  }
 
   @Test
-  def testFromPropsInvalid() {
-    def getBaseProperties(): Properties = {
+  def testFromPropsInvalid()
+    def getBaseProperties(): Properties =
       val validRequiredProperties = new Properties()
       validRequiredProperties.put(KafkaConfig.ZkConnectProp, "127.0.0.1:2181")
       validRequiredProperties
-    }
     // to ensure a basis is valid - bootstraps all needed validation
     KafkaConfig.fromProps(getBaseProperties())
 
     KafkaConfig
       .configNames()
       .foreach(name =>
-            {
-          name match {
+          name match
             case KafkaConfig.ZkConnectProp => // ignore string
             case KafkaConfig.ZkSessionTimeoutMsProp =>
               assertPropertyInvalid(getBaseProperties(), name, "not_a_number")
@@ -724,12 +682,10 @@ class KafkaConfigTest {
             case nonNegativeIntProperty =>
               assertPropertyInvalid(
                   getBaseProperties(), name, "not_a_number", "-1")
-          }
-      })
-  }
+      )
 
   @Test
-  def testSpecificProperties(): Unit = {
+  def testSpecificProperties(): Unit =
     val defaults = new Properties()
     defaults.put(KafkaConfig.ZkConnectProp, "127.0.0.1:2181")
     // For ZkConnectionTimeoutMs
@@ -767,18 +723,13 @@ class KafkaConfigTest {
     assertEquals(10 * 60L * 1000L * 60, config.logRetentionTimeMillis)
     assertEquals(123L, config.logFlushIntervalMs)
     assertEquals(SnappyCompressionCodec, config.offsetsTopicCompressionCodec)
-  }
 
   private def assertPropertyInvalid(
-      validRequiredProps: => Properties, name: String, values: Any*) {
+      validRequiredProps: => Properties, name: String, values: Any*)
     values.foreach(
         (value) =>
-          {
         val props = validRequiredProps
         props.setProperty(name, value.toString)
-        intercept[Exception] {
+        intercept[Exception]
           KafkaConfig.fromProps(props)
-        }
-    })
-  }
-}
+    )

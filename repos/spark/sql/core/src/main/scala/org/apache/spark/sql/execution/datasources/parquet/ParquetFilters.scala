@@ -28,21 +28,19 @@ import org.apache.parquet.schema.PrimitiveType.PrimitiveTypeName
 import org.apache.spark.sql.sources
 import org.apache.spark.sql.types._
 
-private[sql] object ParquetFilters {
+private[sql] object ParquetFilters
   case class SetInFilter[T <: Comparable[T]](valueSet: Set[T])
-      extends UserDefinedPredicate[T] with Serializable {
+      extends UserDefinedPredicate[T] with Serializable
 
-    override def keep(value: T): Boolean = {
+    override def keep(value: T): Boolean =
       value != null && valueSet.contains(value)
-    }
 
     override def canDrop(statistics: Statistics[T]): Boolean = false
 
     override def inverseCanDrop(statistics: Statistics[T]): Boolean = false
-  }
 
   private val makeEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.eq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
@@ -71,10 +69,9 @@ private[sql] object ParquetFilters {
         binaryColumn(n),
         Option(v).map(b => Binary.fromByteArray(v.asInstanceOf[Array[Byte]])).orNull)
    */
-  }
 
   private val makeNotEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case BooleanType =>
       (n: String, v: Any) =>
         FilterApi.notEq(booleanColumn(n), v.asInstanceOf[java.lang.Boolean])
@@ -102,10 +99,9 @@ private[sql] object ParquetFilters {
         binaryColumn(n),
         Option(v).map(b => Binary.fromByteArray(v.asInstanceOf[Array[Byte]])).orNull)
    */
-  }
 
   private val makeLt: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.lt(intColumn(n), v.asInstanceOf[Integer])
@@ -129,10 +125,9 @@ private[sql] object ParquetFilters {
       (n: String, v: Any) =>
         FilterApi.lt(binaryColumn(n), Binary.fromByteArray(v.asInstanceOf[Array[Byte]]))
    */
-  }
 
   private val makeLtEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.ltEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -156,10 +151,9 @@ private[sql] object ParquetFilters {
       (n: String, v: Any) =>
         FilterApi.ltEq(binaryColumn(n), Binary.fromByteArray(v.asInstanceOf[Array[Byte]]))
    */
-  }
 
   private val makeGt: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gt(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -183,10 +177,9 @@ private[sql] object ParquetFilters {
       (n: String, v: Any) =>
         FilterApi.gt(binaryColumn(n), Binary.fromByteArray(v.asInstanceOf[Array[Byte]]))
    */
-  }
 
   private val makeGtEq: PartialFunction[
-      DataType, (String, Any) => FilterPredicate] = {
+      DataType, (String, Any) => FilterPredicate] =
     case IntegerType =>
       (n: String, v: Any) =>
         FilterApi.gtEq(intColumn(n), v.asInstanceOf[java.lang.Integer])
@@ -210,10 +203,9 @@ private[sql] object ParquetFilters {
       (n: String, v: Any) =>
         FilterApi.gtEq(binaryColumn(n), Binary.fromByteArray(v.asInstanceOf[Array[Byte]]))
    */
-  }
 
   private val makeInSet: PartialFunction[
-      DataType, (String, Set[Any]) => FilterPredicate] = {
+      DataType, (String, Set[Any]) => FilterPredicate] =
     case IntegerType =>
       (n: String, v: Set[Any]) =>
         FilterApi.userDefined(
@@ -243,7 +235,6 @@ private[sql] object ParquetFilters {
         FilterApi.userDefined(binaryColumn(n),
           SetInFilter(v.map(e => Binary.fromByteArray(e.asInstanceOf[Array[Byte]]))))
    */
-  }
 
   /**
     * SPARK-11955: The optional fields will have metadata StructType.metadataKeyForOptionalField.
@@ -252,22 +243,20 @@ private[sql] object ParquetFilters {
     * fields.
     */
   private def getFieldMap(dataType: DataType): Array[(String, DataType)] =
-    dataType match {
+    dataType match
       case StructType(fields) =>
-        fields.filter { f =>
+        fields.filter  f =>
           !f.metadata.contains(StructType.metadataKeyForOptionalField) ||
           !f.metadata.getBoolean(StructType.metadataKeyForOptionalField)
-        }.map(f => f.name -> f.dataType) ++ fields.flatMap { f =>
+        .map(f => f.name -> f.dataType) ++ fields.flatMap  f =>
           getFieldMap(f.dataType)
-        }
       case _ => Array.empty[(String, DataType)]
-    }
 
   /**
     * Converts data sources filters to Parquet filter predicates.
     */
   def createFilter(schema: StructType,
-                   predicate: sources.Filter): Option[FilterPredicate] = {
+                   predicate: sources.Filter): Option[FilterPredicate] =
     val dataTypeOf = getFieldMap(schema).toMap
 
     relaxParquetValidTypeMap
@@ -287,7 +276,7 @@ private[sql] object ParquetFilters {
     // physical planning does not set `NULL` to [[EqualTo]] but changes it to [[IsNull]] and etc.
     // Probably I missed something and obviously this should be changed.
 
-    predicate match {
+    predicate match
       case sources.IsNull(name) if dataTypeOf.contains(name) =>
         makeEq.lift(dataTypeOf(name)).map(_ (name, null))
       case sources.IsNotNull(name) if dataTypeOf.contains(name) =>
@@ -327,23 +316,21 @@ private[sql] object ParquetFilters {
         // NOT(a = 2), which will generate wrong results.
         // Pushing one side of AND down is only safe to do at the top level.
         // You can see ParquetRelation's initializeLocalJobFunc method as an example.
-        for {
+        for
           lhsFilter <- createFilter(schema, lhs)
           rhsFilter <- createFilter(schema, rhs)
-        } yield FilterApi.and(lhsFilter, rhsFilter)
+        yield FilterApi.and(lhsFilter, rhsFilter)
 
       case sources.Or(lhs, rhs) =>
-        for {
+        for
           lhsFilter <- createFilter(schema, lhs)
           rhsFilter <- createFilter(schema, rhs)
-        } yield FilterApi.or(lhsFilter, rhsFilter)
+        yield FilterApi.or(lhsFilter, rhsFilter)
 
       case sources.Not(pred) =>
         createFilter(schema, pred).map(FilterApi.not)
 
       case _ => None
-    }
-  }
 
   // !! HACK ALERT !!
   //
@@ -361,7 +348,7 @@ private[sql] object ParquetFilters {
   // legal except that it fails the `ValidTypeMap` check.
   //
   // Here we add `BINARY (ENUM)` into `ValidTypeMap` lazily via reflection to workaround this issue.
-  private lazy val relaxParquetValidTypeMap: Unit = {
+  private lazy val relaxParquetValidTypeMap: Unit =
     val constructor = Class
       .forName(classOf[ValidTypeMap].getCanonicalName + "$FullTypeDescriptor")
       .getDeclaredConstructor(
@@ -376,5 +363,3 @@ private[sql] object ParquetFilters {
       classOf[ValidTypeMap].getDeclaredMethods.find(_.getName == "add").get
     addMethod.setAccessible(true)
     addMethod.invoke(null, classOf[Binary], enumTypeDescriptor)
-  }
-}

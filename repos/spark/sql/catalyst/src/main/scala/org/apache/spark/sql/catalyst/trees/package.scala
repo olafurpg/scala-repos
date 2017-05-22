@@ -33,19 +33,16 @@ import org.apache.spark.internal.Logging
   *   <li>debugging support - pretty printing, easy splicing of trees, etc.</li>
   * </ul>
   */
-package object trees extends Logging {
+package object trees extends Logging
   // Since we want tree nodes to be lightweight, we create one logger for all treenode instances.
   protected override def logName = "catalyst.trees"
 
   /**
     * A [[TreeNode]] companion for reference equality for Hash based Collection.
     */
-  class TreeNodeRef(val obj: TreeNode[_]) {
-    override def equals(o: Any): Boolean = o match {
+  class TreeNodeRef(val obj: TreeNode[_])
+    override def equals(o: Any): Boolean = o match
       case that: TreeNodeRef => that.obj.eq(obj)
       case _ => false
-    }
 
     override def hashCode: Int = if (obj == null) 0 else obj.hashCode
-  }
-}

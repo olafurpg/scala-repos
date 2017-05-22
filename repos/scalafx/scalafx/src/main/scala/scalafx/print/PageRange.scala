@@ -36,7 +36,7 @@ import scalafx.delegate.SFXDelegate
 /**
   * Companion Object for [[scalafx.print.PageRange]].
   */
-object PageRange {
+object PageRange
 
   /**
     * Converts a ScalaFX PageRange to its JavaFX counterpart.
@@ -46,7 +46,6 @@ object PageRange {
     */
   implicit def sfxPageRange2jfx(pr: PageRange): jfxp.PageRange =
     if (pr != null) pr.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PageRange.html JavaFX PageRange]].
@@ -57,7 +56,7 @@ object PageRange {
   * @since 8.0
   */
 final class PageRange(override val delegate: jfxp.PageRange)
-    extends SFXDelegate[jfxp.PageRange] {
+    extends SFXDelegate[jfxp.PageRange]
 
   /**
     * Create a new PageRange with the specified start and end page numbers.
@@ -77,4 +76,3 @@ final class PageRange(override val delegate: jfxp.PageRange)
     * IntegerProperty representing the starting page number of the range.
     */
   def endPage: ReadOnlyIntegerProperty = delegate.endPageProperty
-}

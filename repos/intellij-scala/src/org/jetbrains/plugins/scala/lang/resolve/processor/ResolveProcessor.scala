@@ -21,23 +21,22 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.{Success, TypingContext
 
 import scala.collection.Set
 
-object ResolveProcessor {
-  def getQualifiedName(result: ScalaResolveResult, place: PsiElement): String = {
-    def defaultForTypeAlias(t: ScTypeAlias): String = {
+object ResolveProcessor
+  def getQualifiedName(result: ScalaResolveResult, place: PsiElement): String =
+    def defaultForTypeAlias(t: ScTypeAlias): String =
       if (t.getParent.isInstanceOf[ScTemplateBody] &&
-          t.containingClass != null) {
+          t.containingClass != null)
         "TypeAlias:" + t.containingClass.qualifiedName + "#" + t.name
-      } else null
-    }
+      else null
 
-    result.getActualElement match {
+    result.getActualElement match
       case c: ScTypeParam => null
       case c: ScObject => "Object:" + c.qualifiedName
       case c: PsiClass => "Class:" + c.qualifiedName
       case t: ScTypeAliasDefinition if t.typeParameters.length == 0 =>
-        t.aliasedType(TypingContext.empty) match {
+        t.aliasedType(TypingContext.empty) match
           case Success(tp, elem) =>
-            ScType.extractClass(tp, Option(place).map(_.getProject)) match {
+            ScType.extractClass(tp, Option(place).map(_.getProject)) match
               case Some(c: ScObject) => defaultForTypeAlias(t)
               case Some(td: ScTypeDefinition)
                   if td.typeParameters.length == 0 &&
@@ -46,35 +45,27 @@ object ResolveProcessor {
               case Some(c: PsiClass) if c.getTypeParameters.length == 0 =>
                 "Class:" + c.qualifiedName
               case _ => defaultForTypeAlias(t)
-            }
           case _ => defaultForTypeAlias(t)
-        }
       case t: ScTypeAlias => defaultForTypeAlias(t)
       case p: PsiPackage => "Package:" + p.getQualifiedName
       case _ => null
-    }
-  }
-}
 
 class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
                        val ref: PsiElement,
                        val name: String)
-    extends BaseProcessor(kinds) with PrecedenceHelper[String] {
+    extends BaseProcessor(kinds) with PrecedenceHelper[String]
   @volatile
   private var resolveScope: GlobalSearchScope = null
-  def getResolveScope: GlobalSearchScope = {
-    if (resolveScope == null) {
+  def getResolveScope: GlobalSearchScope =
+    if (resolveScope == null)
       resolveScope = ref.getResolveScope
-    }
     resolveScope
-  }
 
   protected def getPlace: PsiElement = ref
 
-  val isThisOrSuperResolve = ref.getParent match {
+  val isThisOrSuperResolve = ref.getParent match
     case _: ScThisReference | _: ScSuperReference => true
     case _ => false
-  }
 
   def emptyResultSet: Boolean = candidatesSet.isEmpty || levelSet.isEmpty
 
@@ -84,9 +75,8 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
     * This method useful for resetting precednce if we dropped
     * all found candidates to seek implicit conversion candidates.
     */
-  def resetPrecedence() {
+  def resetPrecedence()
     precedence = 0
-  }
 
   import org.jetbrains.plugins.scala.lang.resolve.processor.PrecedenceHelper.PrecedenceTypes._
   def checkImports(): Boolean = precedence <= IMPORT
@@ -95,58 +85,49 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
 
   def checkPredefinedClassesAndPackages(): Boolean = precedence <= SCALA_PREDEF
 
-  override protected def getQualifiedName(result: ScalaResolveResult): String = {
+  override protected def getQualifiedName(result: ScalaResolveResult): String =
     ResolveProcessor.getQualifiedName(result, getPlace)
-  }
 
   protected def getTopPrecedence(result: ScalaResolveResult): Int = precedence
 
-  protected def setTopPrecedence(result: ScalaResolveResult, i: Int) {
+  protected def setTopPrecedence(result: ScalaResolveResult, i: Int)
     precedence = i
-  }
 
   override def isUpdateHistory: Boolean = true
 
-  override def changedLevel = {
+  override def changedLevel =
     addChangedLevelToHistory()
 
-    def update: Boolean = {
+    def update: Boolean =
       val iterator = levelSet.iterator()
-      while (iterator.hasNext) {
+      while (iterator.hasNext)
         candidatesSet += iterator.next()
-      }
       qualifiedNamesSet.addAll(levelQualifiedNamesSet)
       levelSet.clear()
       levelQualifiedNamesSet.clear()
       false
-    }
     if (levelSet.isEmpty) true
     else if (precedence == OTHER_MEMBERS) update
     else !update
-  }
 
-  def isAccessible(named: PsiNamedElement, place: PsiElement): Boolean = {
-    val memb: PsiMember = {
-      named match {
+  def isAccessible(named: PsiNamedElement, place: PsiElement): Boolean =
+    val memb: PsiMember =
+      named match
         case memb: PsiMember => memb
         case pl =>
-          ScalaPsiUtil.nameContext(named) match {
+          ScalaPsiUtil.nameContext(named) match
             case memb: PsiMember => memb
             case _ => return true //something strange
-          }
-      }
-    }
     ResolveUtils.isAccessible(memb, place)
-  }
 
-  def execute(element: PsiElement, state: ResolveState): Boolean = {
+  def execute(element: PsiElement, state: ResolveState): Boolean =
     val named = element.asInstanceOf[PsiNamedElement]
     def nameShadow: Option[String] = Option(state.get(ResolverEnv.nameKey))
 
-    if (nameAndKindMatch(named, state)) {
+    if (nameAndKindMatch(named, state))
       val accessible = isAccessible(named, ref)
       if (accessibility && !accessible) return true
-      named match {
+      named match
         case o: ScObject
             if o.isPackageObject && JavaPsiFacade
               .getInstance(element.getProject)
@@ -181,48 +162,39 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
                                      boundClass = getBoundClass(state),
                                      fromType = getFromType(state),
                                      isAccessible = accessible))
-      }
-    }
     true
-  }
 
   protected def nameAndKindMatch(
-      named: PsiNamedElement, state: ResolveState): Boolean = {
+      named: PsiNamedElement, state: ResolveState): Boolean =
     val nameSet = state.get(ResolverEnv.nameKey)
     val elName =
-      if (nameSet == null) {
+      if (nameSet == null)
         val name = named.name
         if (name == null) return false
         if (name == "") return false
         name
-      } else nameSet
+      else nameSet
     val nameMatches = ScalaPsiUtil.memberNamesEquals(elName, name)
     nameMatches && kindMatches(named)
-  }
 
-  override def getHint[T](hintKey: Key[T]): T = {
-    hintKey match {
+  override def getHint[T](hintKey: Key[T]): T =
+    hintKey match
       case NameHint.KEY if name != "" => ScalaNameHint.asInstanceOf[T]
       case _ => super.getHint(hintKey)
-    }
-  }
 
-  override def candidatesS: Set[ScalaResolveResult] = {
+  override def candidatesS: Set[ScalaResolveResult] =
     var res = candidatesSet
     val iterator = levelSet.iterator()
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       res += iterator.next()
-    }
-    if (!compareWithIgnoredSet(res)) {
+    if (!compareWithIgnoredSet(res))
       res.clear()
       restartFromHistory()
       //now let's add everything again
       res = candidatesSet
       val iterator = levelSet.iterator()
-      while (iterator.hasNext) {
+      while (iterator.hasNext)
         res += iterator.next()
-      }
-    }
 
     /*
     This is also hack for self type elements to filter duplicates.
@@ -236,10 +208,10 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
       type FooType = Long
     }
      */
-    res.filter {
+    res.filter
       case r @ ScalaResolveResult(
           _: ScTypeAlias | _: ScClass | _: ScTrait, _) =>
-        res.foldLeft(true) {
+        res.foldLeft(true)
           case (false, _) => false
           case (true,
                 rr @ ScalaResolveResult(
@@ -248,18 +220,12 @@ class ResolveProcessor(override val kinds: Set[ResolveTargets.Value],
               .superTypeMembers(rr.element)
               .find(_ == r.element) == None
           case (true, _) => true
-        }
       case _ => true
-    }
-  }
 
-  object ScalaNameHint extends NameHint {
-    def getName(state: ResolveState) = {
+  object ScalaNameHint extends NameHint
+    def getName(state: ResolveState) =
       val stateName = state.get(ResolverEnv.nameKey)
       val result = if (stateName == null) name else stateName
       if (result != null && result.startsWith("`") && result.endsWith("`") &&
           result.length > 1) result.substring(1, result.length - 1)
       else result
-    }
-  }
-}

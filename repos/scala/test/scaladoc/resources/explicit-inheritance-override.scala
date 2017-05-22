@@ -1,5 +1,5 @@
 // This tests the implicit comment inheritance capabilities of scaladoc for class inheritance (no $super, no @inheritdoc)
-class InheritDocBase {
+class InheritDocBase
 
   /**
     * The base comment. And another sentence...
@@ -18,9 +18,8 @@ class InheritDocBase {
     * @todo Call mom.
     */
   def function[T](arg1: T, arg2: String): Double = 0.0d
-}
 
-class InheritDocDerived extends InheritDocBase {
+class InheritDocDerived extends InheritDocBase
 
   /**
     * Starting line
@@ -47,4 +46,3 @@ class InheritDocDerived extends InheritDocBase {
     * @todo StartTodo @inheritdoc And dad! EndTodo
     */
   override def function[T](arg1: T, arg2: String): Double = 1.0d
-}

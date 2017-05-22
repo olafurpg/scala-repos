@@ -17,7 +17,7 @@ package scalaz
   * @see [[scalaz.InvariantFunctor.InvariantFunctorLaw]]
   */
 ////
-trait InvariantFunctor[F[_]] { self =>
+trait InvariantFunctor[F[_]]  self =>
   ////
 
   import BijectionT.Bijection
@@ -32,7 +32,7 @@ trait InvariantFunctor[F[_]] { self =>
   /** Converts `ma` to a value of type `F[B]` using the provided isomorphism. */
   def xmapi[A, B](ma: F[A])(iso: A <=> B): F[B] = xmap(ma, iso.to, iso.from)
 
-  trait InvariantFunctorLaw {
+  trait InvariantFunctorLaw
 
     def invariantIdentity[A](fa: F[A])(implicit FA: Equal[F[A]]): Boolean =
       FA.equal(xmap[A, A](fa, x => x, x => x), fa)
@@ -42,19 +42,15 @@ trait InvariantFunctor[F[_]] { self =>
         implicit FC: Equal[F[C]]): Boolean =
       FC.equal(xmap(xmap(fa, f1, g1), f2, g2),
                xmap(fa, f2 compose f1, g1 compose g2))
-  }
 
   def invariantFunctorLaw = new InvariantFunctorLaw {}
   ////
-  val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F] {
+  val invariantFunctorSyntax = new scalaz.syntax.InvariantFunctorSyntax[F]
     def F = InvariantFunctor.this
-  }
-}
 
-object InvariantFunctor {
+object InvariantFunctor
   @inline
   def apply[F[_]](implicit F: InvariantFunctor[F]): InvariantFunctor[F] = F
 
   ////
   ////
-}

@@ -37,9 +37,9 @@ import org.apache.log4j.Logger
 @deprecated(
     "This class will be replaced by org.apache.kafka.tools.ProducerPerformance after the old producer client is removed",
     "0.9.0.0")
-object ProducerPerformance extends Logging {
+object ProducerPerformance extends Logging
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val logger = Logger.getLogger(getClass)
     val config = new ProducerPerfConfig(args)
     if (!config.isFixedSize)
@@ -58,10 +58,9 @@ object ProducerPerformance extends Logging {
           "start.time, end.time, compression, message.size, batch.size, total.data.sent.in.MB, MB.sec, " +
           "total.data.sent.in.nMsg, nMsg.sec")
 
-    for (i <- 0 until config.numThreads) {
+    for (i <- 0 until config.numThreads)
       executor.execute(new ProducerThread(
               i, config, totalBytesSent, totalMessagesSent, allDone, rand))
-    }
 
     allDone.await()
     val endMs = System.currentTimeMillis
@@ -79,9 +78,8 @@ object ProducerPerformance extends Logging {
             totalMessagesSent.get,
             totalMessagesSent.get / elapsedSecs))
     System.exit(0)
-  }
 
-  class ProducerPerfConfig(args: Array[String]) extends PerfConfig(args) {
+  class ProducerPerfConfig(args: Array[String]) extends PerfConfig(args)
     val brokerListOpt = parser
       .accepts(
           "broker-list",
@@ -202,7 +200,7 @@ object ProducerPerformance extends Logging {
         Utils.loadProps(options.valueOf(producerConfigOpt))
       else new Properties()
 
-    if (csvMetricsReporterEnabled) {
+    if (csvMetricsReporterEnabled)
       val props = new Properties()
       props.put("kafka.metrics.polling.interval.secs", "1")
       props.put(
@@ -214,10 +212,8 @@ object ProducerPerformance extends Logging {
       props.put("kafka.csv.metrics.reporter.enabled", "true")
       val verifiableProps = new VerifiableProperties(props)
       KafkaMetricsReporter.startReporters(verifiableProps)
-    }
 
     val messageSendGapMs = options.valueOf(messageSendGapMsOpt).intValue()
-  }
 
   class ProducerThread(val threadId: Int,
                        val config: ProducerPerfConfig,
@@ -225,14 +221,14 @@ object ProducerPerformance extends Logging {
                        val totalMessagesSent: AtomicLong,
                        val allDone: CountDownLatch,
                        val rand: Random)
-      extends Runnable {
+      extends Runnable
     val seqIdNumDigit = 10 // no. of digits for max int value
 
     val messagesPerThread = config.numMessages / config.numThreads
     debug("Messages per thread = " + messagesPerThread)
     val props = new Properties()
     val producer =
-      if (config.useNewProducer) {
+      if (config.useNewProducer)
         import org.apache.kafka.clients.producer.ProducerConfig
         props.putAll(config.producerProps)
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.brokerList)
@@ -251,16 +247,15 @@ object ProducerPerformance extends Logging {
         props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
                   "org.apache.kafka.common.serialization.ByteArraySerializer")
         new NewShinyProducer(props)
-      } else {
+      else
         props.putAll(config.producerProps)
         props.put("metadata.broker.list", config.brokerList)
         props.put("compression.codec", config.compressionCodec.codec.toString)
         props.put("send.buffer.bytes", (64 * 1024).toString)
-        if (!config.isSync) {
+        if (!config.isSync)
           props.put("producer.type", "async")
           props.put("batch.num.messages", config.batchSize.toString)
           props.put("queue.enqueue.timeout.ms", "-1")
-        }
         props.put("client.id", "producer-performance")
         props.put("request.required.acks",
                   config.producerRequestRequiredAcks.toString)
@@ -272,7 +267,6 @@ object ProducerPerformance extends Logging {
         props.put("serializer.class", classOf[DefaultEncoder].getName)
         props.put("key.serializer.class", classOf[NullEncoder[Long]].getName)
         new OldProducer(props)
-      }
 
     // generate the sequential message ID
     private val SEP = ":" // message field separator
@@ -282,7 +276,7 @@ object ProducerPerformance extends Logging {
     private var leftPaddedSeqId: String = ""
 
     private def generateMessageWithSeqId(
-        topic: String, msgId: Long, msgSize: Int): Array[Byte] = {
+        topic: String, msgId: Long, msgSize: Int): Array[Byte] =
       // Each thread gets a unique range of sequential no. for its ids.
       // Eg. 1000 msg in 10 threads => 100 msg per thread
       // thread 0 IDs :   0 ~  99
@@ -300,53 +294,43 @@ object ProducerPerformance extends Logging {
         String.format("%1$-" + msgSize + "s", msgHeader).replace(' ', 'x')
       debug(seqMsgString)
       seqMsgString.getBytes()
-    }
 
     private def generateProducerData(
-        topic: String, messageId: Long): Array[Byte] = {
+        topic: String, messageId: Long): Array[Byte] =
       val msgSize =
         if (config.isFixedSize) config.messageSize
         else 1 + rand.nextInt(config.messageSize)
-      if (config.seqIdMode) {
+      if (config.seqIdMode)
         val seqId =
           config.initialMessageId + (messagesPerThread * threadId) + messageId
         generateMessageWithSeqId(topic, seqId, msgSize)
-      } else {
+      else
         new Array[Byte](msgSize)
-      }
-    }
 
-    override def run {
+    override def run
       var bytesSent = 0L
       var nSends = 0
       var i: Long = 0L
       var message: Array[Byte] = null
 
-      while (i < messagesPerThread) {
-        try {
+      while (i < messagesPerThread)
+        try
           config.topics.foreach(topic =>
-                {
               message = generateProducerData(topic, i)
               producer.send(topic, BigInteger.valueOf(i).toByteArray, message)
               bytesSent += message.size
               nSends += 1
               if (config.messageSendGapMs > 0)
                 Thread.sleep(config.messageSendGapMs)
-          })
-        } catch {
+          )
+        catch
           case e: Throwable =>
             error("Error when sending message " + new String(message), e)
-        }
         i += 1
-      }
-      try {
+      try
         producer.close()
-      } catch {
+      catch
         case e: Throwable => error("Error when closing producer", e)
-      }
       totalBytesSent.addAndGet(bytesSent)
       totalMessagesSent.addAndGet(nSends)
       allDone.countDown()
-    }
-  }
-}

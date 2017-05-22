@@ -27,77 +27,65 @@ import scala.collection.mutable.ArrayBuffer
   * User: Alexander Podkhalyuzin
   * Date: 21.05.2008.
   */
-object ScalaCompletionUtil {
+object ScalaCompletionUtil
   val PREFIX_COMPLETION_KEY: Key[Boolean] = Key.create("prefix.completion.key")
 
-  def completeThis(ref: ScReferenceExpression): Boolean = {
-    ref.qualifier match {
+  def completeThis(ref: ScReferenceExpression): Boolean =
+    ref.qualifier match
       case Some(_) => false
       case None =>
-        ref.getParent match {
+        ref.getParent match
           case inf: ScInfixExpr if inf.operation == ref => false
           case postf: ScPostfixExpr if postf.operation == ref => false
           case pref: ScPrefixExpr if pref.operation == ref => false
           case _ => true
-        }
-    }
-  }
 
   def shouldRunClassNameCompletion(
       dummyPosition: PsiElement,
       parameters: CompletionParameters,
       prefixMatcher: PrefixMatcher,
       checkInvocationCount: Boolean = true,
-      lookingForAnnotations: Boolean = false): Boolean = {
+      lookingForAnnotations: Boolean = false): Boolean =
     if (checkInvocationCount && parameters.getInvocationCount < 2) return false
-    if (dummyPosition.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER) {
-      dummyPosition.getParent match {
+    if (dummyPosition.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER)
+      dummyPosition.getParent match
         case ref: ScReferenceElement if ref.qualifier.isDefined => return false
         case _ =>
-      }
-    }
     if (checkInvocationCount && parameters.getInvocationCount >= 2) return true
     val prefix = prefixMatcher.getPrefix
     val capitalized =
       prefix.length() > 0 &&
       prefix.substring(0, 1).capitalize == prefix.substring(0, 1)
     capitalized || lookingForAnnotations
-  }
 
   def generateAnonymousFunctionText(braceArgs: Boolean,
                                     params: scala.Seq[ScType],
                                     canonical: Boolean,
                                     withoutEnd: Boolean = false,
-                                    arrowText: String = "=>"): String = {
+                                    arrowText: String = "=>"): String =
     val text = new StringBuilder()
     if (braceArgs) text.append("case ")
     val paramNamesWithTypes = new ArrayBuffer[(String, ScType)]
-    def contains(name: String): Boolean = {
-      paramNamesWithTypes.exists {
+    def contains(name: String): Boolean =
+      paramNamesWithTypes.exists
         case (s, _) => s == name
-      }
-    }
-    for (param <- params) {
+    for (param <- params)
       val names = NameSuggester.suggestNamesByType(param)
       var name = if (names.length == 0) "x" else names(0)
-      if (contains(name)) {
+      if (contains(name))
         var count = 0
         var newName = name + count
-        while (contains(newName)) {
+        while (contains(newName))
           count += 1
           newName = name + count
-        }
         name = newName
-      }
       paramNamesWithTypes.+=(name -> param)
-    }
-    val iter = paramNamesWithTypes.map {
+    val iter = paramNamesWithTypes.map
       case (s, tp) =>
         s + ": " +
-        (if (canonical) {
+        (if (canonical)
            ScType.canonicalText(tp)
-         } else ScType.presentableText(tp))
-    }
+         else ScType.presentableText(tp))
     val paramsString =
       if (paramNamesWithTypes.size != 1 || !braceArgs)
         iter.mkString("(", ", ", ")")
@@ -105,61 +93,51 @@ object ScalaCompletionUtil {
     text.append(paramsString)
     if (!withoutEnd) text.append(" ").append(arrowText)
     text.toString()
-  }
 
-  def getLeafByOffset(offset: Int, element: PsiElement): PsiElement = {
-    if (offset < 0) {
+  def getLeafByOffset(offset: Int, element: PsiElement): PsiElement =
+    if (offset < 0)
       return null
-    }
     var candidate: PsiElement = element.getContainingFile
     if (candidate == null || candidate.getNode == null) return null
-    while (candidate.getNode.getChildren(null).nonEmpty) {
+    while (candidate.getNode.getChildren(null).nonEmpty)
       candidate = candidate.findElementAt(offset)
       if (candidate == null || candidate.getNode == null) return null
-    }
     candidate
-  }
 
   /**
     * first return value mean to stop here.
     * Second return value in case if first is true return second value
     */
-  def getForAll(parent: PsiElement, leaf: PsiElement): (Boolean, Boolean) = {
-    parent match {
+  def getForAll(parent: PsiElement, leaf: PsiElement): (Boolean, Boolean) =
+    parent match
       case _: ScalaFile =>
         if (leaf.getNextSibling != null &&
             leaf.getNextSibling.getNextSibling.isInstanceOf[ScPackaging] &&
             leaf.getNextSibling.getNextSibling.getText.indexOf('{') == -1)
           return (true, false)
       case _ =>
-    }
-    parent match {
+    parent match
       case _: ScalaFile | _: ScPackaging =>
         var node = leaf.getPrevSibling
         if (node.isInstanceOf[PsiWhiteSpace]) node = node.getPrevSibling
-        node match {
+        node match
           case x: PsiErrorElement =>
             val s = ErrMsg("wrong.top.statment.declaration")
-            x.getErrorDescription match {
+            x.getErrorDescription match
               case `s` => return (true, true)
               case _ => return (true, false)
-            }
           case _ => return (true, true)
-        }
       case expr: ScReferenceExpression =>
-        parent.getParent match {
+        parent.getParent match
           case _: ScBlockExpr | _: ScTemplateBody | _: ScBlock |
               _: ScCaseClause =>
             if (awful(parent, leaf)) return (true, true)
           case _ =>
-        }
       case _ =>
-    }
 
     (false, true)
-  }
 
-  def awful(parent: PsiElement, leaf: PsiElement): Boolean = {
+  def awful(parent: PsiElement, leaf: PsiElement): Boolean =
     (leaf.getPrevSibling == null ||
         leaf.getPrevSibling.getPrevSibling == null ||
         leaf.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaTokenTypes.kDEF) &&
@@ -168,13 +146,12 @@ object ScalaCompletionUtil {
         (parent.getPrevSibling.getPrevSibling.getNode.getElementType != ScalaElementTypes.MATCH_STMT ||
             !parent.getPrevSibling.getPrevSibling.getLastChild
               .isInstanceOf[PsiErrorElement]))
-  }
 
   val DUMMY_IDENTIFIER = "IntellijIdeaRulezzz"
 
   def checkClassWith(clazz: ScTypeDefinition,
                      additionText: String,
-                     manager: PsiManager): Boolean = {
+                     manager: PsiManager): Boolean =
     val classText: String = clazz.getText
     val text = removeDummy(classText + " " + additionText)
     val DUMMY = "dummy."
@@ -186,9 +163,8 @@ object ScalaCompletionUtil {
           text)
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
-  def checkElseWith(text: String, manager: PsiManager): Boolean = {
+  def checkElseWith(text: String, manager: PsiManager): Boolean =
     val DUMMY = "dummy."
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
@@ -198,9 +174,8 @@ object ScalaCompletionUtil {
           "class a {\n" + text + "\n}")
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
-  def checkDoWith(text: String, manager: PsiManager): Boolean = {
+  def checkDoWith(text: String, manager: PsiManager): Boolean =
     val DUMMY = "dummy."
     val dummyFile = PsiFileFactory
       .getInstance(manager.getProject)
@@ -210,11 +185,10 @@ object ScalaCompletionUtil {
           "class a {\n" + text + "\n}")
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
   def checkTypeWith(typez: ScTypeElement,
                     additionText: String,
-                    manager: PsiManager): Boolean = {
+                    manager: PsiManager): Boolean =
     val typeText = typez.getText
     val text = removeDummy(
         "class a { x:" + typeText + " " + additionText + "}")
@@ -228,11 +202,10 @@ object ScalaCompletionUtil {
       .asInstanceOf[ScalaFile]
     val value = !checkErrors(dummyFile)
     value
-  }
 
   def checkAnyTypeWith(typez: ScTypeElement,
                        additionText: String,
-                       manager: PsiManager): Boolean = {
+                       manager: PsiManager): Boolean =
     val typeText = typez.getText
     val text = removeDummy(
         "class a { val x:" + typeText + " " + additionText + "}")
@@ -246,11 +219,10 @@ object ScalaCompletionUtil {
       .asInstanceOf[ScalaFile]
     val value = !checkErrors(dummyFile)
     value
-  }
 
   def checkAnyWith(typez: PsiElement,
                    additionText: String,
-                   manager: PsiManager): Boolean = {
+                   manager: PsiManager): Boolean =
     val typeText = typez.getText
     val text = removeDummy("class a { " + typeText + " " + additionText + "}")
     val DUMMY = "dummy."
@@ -262,21 +234,18 @@ object ScalaCompletionUtil {
           text)
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
-  def removeDummy(text: String): String = {
+  def removeDummy(text: String): String =
     replaceDummy(text, "")
-  }
 
-  def replaceDummy(text: String, to: String): String = {
-    if (text.indexOf(DUMMY_IDENTIFIER) != -1) {
+  def replaceDummy(text: String, to: String): String =
+    if (text.indexOf(DUMMY_IDENTIFIER) != -1)
       text.replaceAll("\\w*" + DUMMY_IDENTIFIER, to)
-    } else text
-  }
+    else text
 
   def checkNewWith(news: ScNewTemplateDefinition,
                    additionText: String,
-                   manager: PsiManager): Boolean = {
+                   manager: PsiManager): Boolean =
     val newsText = news.getText
     val text = removeDummy("class a { " + newsText + " " + additionText + "}")
     val DUMMY = "dummy."
@@ -288,10 +257,9 @@ object ScalaCompletionUtil {
           text)
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
   def checkReplace(
-      elem: PsiElement, additionText: String, manager: PsiManager): Boolean = {
+      elem: PsiElement, additionText: String, manager: PsiManager): Boolean =
     val typeText = elem.getText
     var text = "class a { " + typeText + "}"
     if (text.indexOf(DUMMY_IDENTIFIER) == -1) return false
@@ -305,107 +273,90 @@ object ScalaCompletionUtil {
           text)
       .asInstanceOf[ScalaFile]
     !checkErrors(dummyFile)
-  }
 
-  private def checkErrors(elem: PsiElement): Boolean = {
-    elem match {
+  private def checkErrors(elem: PsiElement): Boolean =
+    elem match
       case _: PsiErrorElement => return true
       case _ =>
-    }
     val iterator = elem.getChildren.iterator
-    while (iterator.hasNext) {
+    while (iterator.hasNext)
       val child = iterator.next()
       if (checkErrors(child)) return true
-    }
     false
-  }
 
   /**
     * @param leaf Start PsiElement
     * @return (End PsiElement, ContainingFile.isScriptFile)
     */
   def processPsiLeafForFilter(leaf: PsiElement): (PsiElement, Boolean) =
-    Option(leaf) map { l =>
-      l.getContainingFile match {
+    Option(leaf) map  l =>
+      l.getContainingFile match
         case scriptFile: ScalaFile if scriptFile.isScriptFile() =>
           (leaf.getParent, true)
         case scalaFile: ScalaFile => (leaf, false)
         case _ => (null, false)
-      }
-    } getOrElse (null, false)
+    getOrElse (null, false)
 
-  def getDummyIdentifier(offset: Int, file: PsiFile): String = {
-    def isOpChar(c: Char): Boolean = {
+  def getDummyIdentifier(offset: Int, file: PsiFile): String =
+    def isOpChar(c: Char): Boolean =
       ScalaNamesUtil.isIdentifier("+" + c)
-    }
 
     val element = file.findElementAt(offset)
     val ref = file.findReferenceAt(offset)
-    if (element != null && ref != null) {
-      val text = ref match {
+    if (element != null && ref != null)
+      val text = ref match
         case ref: PsiElement => ref.getText
         case ref: PsiReference =>
           ref.getElement.getText //this case for anonymous method in ScAccessModifierImpl
-      }
       val id =
-        if (isOpChar(text(text.length - 1))) {
+        if (isOpChar(text(text.length - 1)))
           "+++++++++++++++++++++++"
-        } else {
-          val rest = ref match {
+        else
+          val rest = ref match
             case ref: PsiElement =>
               text.substring(offset - ref.getTextRange.getStartOffset + 1)
             case ref: PsiReference =>
               val from =
                 offset - ref.getElement.getTextRange.getStartOffset + 1
               if (from < text.length && from >= 0) text.substring(from) else ""
-          }
-          if (ScalaNamesUtil.isKeyword(rest)) {
+          if (ScalaNamesUtil.isKeyword(rest))
             CompletionUtil.DUMMY_IDENTIFIER
-          } else {
+          else
             CompletionUtil.DUMMY_IDENTIFIER_TRIMMED
-          }
-        }
 
       if (ref.getElement != null && ref.getElement.getPrevSibling != null &&
           ref.getElement.getPrevSibling.getNode.getElementType == ScalaTokenTypes.tSTUB)
         id + "`" else id
-    } else {
+    else
       if (element != null &&
-          element.getNode.getElementType == ScalaTokenTypes.tSTUB) {
+          element.getNode.getElementType == ScalaTokenTypes.tSTUB)
         CompletionUtil.DUMMY_IDENTIFIER_TRIMMED + "`"
-      } else {
+      else
         val actualElement = file.findElementAt(offset + 1)
         if (actualElement != null &&
-            ScalaNamesUtil.isKeyword(actualElement.getText)) {
+            ScalaNamesUtil.isKeyword(actualElement.getText))
           CompletionUtil.DUMMY_IDENTIFIER
-        } else {
+        else
           CompletionUtil.DUMMY_IDENTIFIER_TRIMMED
-        }
-      }
-    }
-  }
 
-  def positionFromParameters(parameters: CompletionParameters): PsiElement = {
+  def positionFromParameters(parameters: CompletionParameters): PsiElement =
 
     @tailrec
-    def inner(element: PsiElement): PsiElement = element match {
+    def inner(element: PsiElement): PsiElement = element match
       case null =>
         parameters.getPosition //we got to the top of the tree and didn't find a modificationTrackerOwner
       case owner: ScModificationTrackerOwner
           if owner.isValidModificationTrackerOwner() =>
-        if (owner.containingFile.contains(parameters.getOriginalFile)) {
+        if (owner.containingFile.contains(parameters.getOriginalFile))
           owner
             .getMirrorPositionForCompletion(
                 getDummyIdentifier(
                     parameters.getOffset, parameters.getOriginalFile),
                 parameters.getOffset - owner.getTextRange.getStartOffset)
             .getOrElse(parameters.getPosition)
-        } else parameters.getPosition
+        else parameters.getPosition
       case _ => inner(element.getContext)
-    }
     inner(parameters.getOriginalPosition)
-  }
 
   def isTypeDefiniton(position: PsiElement): Boolean =
     Option(PsiTreeUtil.getParentOfType(position, classOf[ScTypeElement])).isDefined
-}

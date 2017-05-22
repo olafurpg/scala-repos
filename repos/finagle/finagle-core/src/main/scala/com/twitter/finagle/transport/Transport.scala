@@ -17,7 +17,7 @@ import java.security.cert.Certificate
   * to some endpoint, typically via a channel pipeline that performs
   * encoding and decoding.
   */
-trait Transport[In, Out] extends Closable { self =>
+trait Transport[In, Out] extends Closable  self =>
 
   /**
     * Write {{req}} to this transport; the returned future
@@ -67,7 +67,7 @@ trait Transport[In, Out] extends Closable { self =>
     * @param g The function applied to the result of a `read`
     */
   def map[In1, Out1](f: In1 => In, g: Out => Out1): Transport[In1, Out1] =
-    new Transport[In1, Out1] {
+    new Transport[In1, Out1]
       def write(req: In1): Future[Unit] = Future(f(req)).flatMap(self.write)
       def read(): Future[Out1] = self.read().map(g)
       def status: Status = self.status
@@ -77,8 +77,6 @@ trait Transport[In, Out] extends Closable { self =>
       def peerCertificate: Option[Certificate] = self.peerCertificate
       def close(deadline: Time): Future[Unit] = self.close(deadline)
       override def toString: String = self.toString
-    }
-}
 
 /**
   * A collection of [[com.twitter.finagle.Stack.Param]]'s useful for configuring
@@ -86,7 +84,7 @@ trait Transport[In, Out] extends Closable { self =>
   *
   * @define $param a [[com.twitter.finagle.Stack.Param]] used to configure
   */
-object Transport {
+object Transport
 
   private[finagle] val peerCertCtx = new Contexts.local.Key[Certificate]
 
@@ -105,13 +103,11 @@ object Transport {
     * @param recv An option indicating the size of the receive buffer.
     * If None, the implementation default is used.
     */
-  case class BufferSizes(send: Option[Int], recv: Option[Int]) {
+  case class BufferSizes(send: Option[Int], recv: Option[Int])
     def mk(): (BufferSizes, Stack.Param[BufferSizes]) =
       (this, BufferSizes.param)
-  }
-  object BufferSizes {
+  object BufferSizes
     implicit val param = Stack.Param(BufferSizes(None, None))
-  }
 
   /**
     * $param the liveness of a `Transport`. These properties dictate the
@@ -130,48 +126,40 @@ object Transport {
       readTimeout: Duration,
       writeTimeout: Duration,
       keepAlive: Option[Boolean]
-  ) {
+  )
     def mk(): (Liveness, Stack.Param[Liveness]) =
       (this, Liveness.param)
-  }
-  object Liveness {
+  object Liveness
     implicit val param =
       Stack.Param(Liveness(Duration.Top, Duration.Top, None))
-  }
 
   /**
     * $param the verbosity of a `Transport`. Transport activity is
     * written to [[com.twitter.finagle.param.Logger]].
     */
-  case class Verbose(enabled: Boolean) {
+  case class Verbose(enabled: Boolean)
     def mk(): (Verbose, Stack.Param[Verbose]) =
       (this, Verbose.param)
-  }
-  object Verbose {
+  object Verbose
     implicit val param = Stack.Param(Verbose(enabled = false))
-  }
 
   /**
     * $param the TLS engine for a `Transport`.
     */
-  case class TLSClientEngine(e: Option[SocketAddress => ssl.Engine]) {
+  case class TLSClientEngine(e: Option[SocketAddress => ssl.Engine])
     def mk(): (TLSClientEngine, Stack.Param[TLSClientEngine]) =
       (this, TLSClientEngine.param)
-  }
-  object TLSClientEngine {
+  object TLSClientEngine
     implicit val param = Stack.Param(TLSClientEngine(None))
-  }
 
   /**
     * $param the TLS engine for a `Transport`.
     */
-  case class TLSServerEngine(e: Option[() => ssl.Engine]) {
+  case class TLSServerEngine(e: Option[() => ssl.Engine])
     def mk(): (TLSServerEngine, Stack.Param[TLSServerEngine]) =
       (this, TLSServerEngine.param)
-  }
-  object TLSServerEngine {
+  object TLSServerEngine
     implicit val param = Stack.Param(TLSServerEngine(None))
-  }
 
   /**
     * $param the options (i.e., socket options) of a `Transport`.
@@ -183,14 +171,12 @@ object Transport {
     * @param reuseAddr enables or disables `SO_REUSEADDR` option on a
     *                  transport socket. Default is `true`.
     */
-  case class Options(noDelay: Boolean, reuseAddr: Boolean) {
+  case class Options(noDelay: Boolean, reuseAddr: Boolean)
     def mk(): (Options, Stack.Param[Options]) = (this, Options.param)
-  }
 
-  object Options {
+  object Options
     implicit val param: Stack.Param[Options] =
       Stack.Param(Options(noDelay = true, reuseAddr = true))
-  }
 
   /**
     * Serializes the object stream from a `Transport` into a
@@ -217,12 +203,10 @@ object Transport {
     * @param f A mapping from `A` to `Future[Option[Buf]]`.
     */
   private[finagle] def copyToWriter[A](trans: Transport[_, A], w: Writer)(
-      f: A => Future[Option[Buf]]): Future[Unit] = {
-    trans.read().flatMap(f).flatMap {
+      f: A => Future[Option[Buf]]): Future[Unit] =
+    trans.read().flatMap(f).flatMap
       case None => Future.Done
       case Some(buf) => w.write(buf) before copyToWriter(trans, w)(f)
-    }
-  }
 
   /**
     * Collates a transport, using the collation function `chunkOfA`,
@@ -241,21 +225,19 @@ object Transport {
   private[finagle] def collate[A](
       trans: Transport[_, A],
       chunkOfA: A => Future[Option[Buf]]): Reader with Future[Unit] =
-    new Promise[Unit] with Reader {
+    new Promise[Unit] with Reader
       private[this] val rw = Reader.writable()
       become(
-          Transport.copyToWriter(trans, rw)(chunkOfA) respond {
+          Transport.copyToWriter(trans, rw)(chunkOfA) respond
         case Throw(exc) => rw.fail(exc)
         case Return(_) => rw.close()
-      })
+      )
 
       def read(n: Int) = rw.read(n)
 
-      def discard(): Unit = {
+      def discard(): Unit =
         rw.discard()
         raise(new Reader.ReaderDiscarded)
-      }
-    }
 
   /**
     * Casts an object transport to `Transport[In1, Out1]`. Note that this is
@@ -265,22 +247,20 @@ object Transport {
     */
   def cast[In1, Out1](trans: Transport[Any, Any]): Transport[In1, Out1] =
     trans.map(_.asInstanceOf[Any], _.asInstanceOf[Out1])
-}
 
 /**
   * A factory for transports: they are specially encoded as to be
   * polymorphic.
   */
-trait TransportFactory {
+trait TransportFactory
   def apply[In, Out](): Transport[In, Out]
-}
 
 /**
   * A [[Transport]] that defers all methods except `read` and `write`
   * to `self`.
   */
 abstract class TransportProxy[In, Out](self: Transport[In, Out])
-    extends Transport[In, Out] {
+    extends Transport[In, Out]
   def status: Status = self.status
   val onClose: Future[Throwable] = self.onClose
   def localAddress: SocketAddress = self.localAddress
@@ -288,36 +268,31 @@ abstract class TransportProxy[In, Out](self: Transport[In, Out])
   def peerCertificate: Option[Certificate] = self.peerCertificate
   def close(deadline: Time): Future[Unit] = self.close(deadline)
   override def toString: String = self.toString
-}
 
 /**
   * A `Transport` interface to a pair of queues (one for reading, one
   * for writing); useful for testing.
   */
 class QueueTransport[In, Out](writeq: AsyncQueue[In], readq: AsyncQueue[Out])
-    extends Transport[In, Out] {
+    extends Transport[In, Out]
   private[this] val closep = new Promise[Throwable]
 
-  def write(input: In) = {
+  def write(input: In) =
     writeq.offer(input)
     Future.Done
-  }
 
   def read(): Future[Out] =
-    readq.poll() onFailure { exc =>
+    readq.poll() onFailure  exc =>
       closep.updateIfEmpty(Throw(exc))
-    }
 
   def status = if (closep.isDefined) Status.Closed else Status.Open
-  def close(deadline: Time) = {
+  def close(deadline: Time) =
     val ex = new IllegalStateException(
         "close() is undefined on QueueTransport")
     closep.updateIfEmpty(Return(ex))
     Future.exception(ex)
-  }
 
   val onClose = closep
   val localAddress = new SocketAddress {}
   val remoteAddress = new SocketAddress {}
   def peerCertificate: Option[Certificate] = None
-}

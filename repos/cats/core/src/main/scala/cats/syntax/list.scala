@@ -3,10 +3,8 @@ package syntax
 
 import cats.data.NonEmptyList
 
-trait ListSyntax {
+trait ListSyntax
   implicit def listSyntax[A](la: List[A]): ListOps[A] = new ListOps(la)
-}
 
-final class ListOps[A](val la: List[A]) extends AnyVal {
+final class ListOps[A](val la: List[A]) extends AnyVal
   def toNel: Option[NonEmptyList[A]] = NonEmptyList.fromList(la)
-}

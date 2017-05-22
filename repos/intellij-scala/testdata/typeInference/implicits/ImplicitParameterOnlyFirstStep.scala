@@ -1,22 +1,17 @@
-object ImplicitParameterOnlyFirstStep {
+object ImplicitParameterOnlyFirstStep
   class A[T](val x: T)
 
-  object A {
+  object A
     implicit val a: A[Int] = new A[Int](1)
-  }
 
-  object C {
+  object C
     def foo[T]()(implicit a: A[T]) = a.x
 
-    def first {
+    def first
       foo()
-    }
 
-    def second {
+    def second
       implicit val a: A[String] = new A[String]("")
       /*start*/
       foo() /*end*/
-    }
-  }
-}
 //String

@@ -24,9 +24,8 @@ import net.liftweb.util.ConnectionIdentifier
 /**
   * Vend JDBC connections
   */
-trait ConnectionManager {
+trait ConnectionManager
   def newConnection(name: ConnectionIdentifier): Box[Connection]
   def releaseConnection(conn: Connection)
   def newSuperConnection(name: ConnectionIdentifier): Box[SuperConnection] =
     Empty
-}

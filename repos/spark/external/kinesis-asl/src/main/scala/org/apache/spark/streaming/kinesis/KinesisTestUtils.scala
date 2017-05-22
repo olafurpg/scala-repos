@@ -40,7 +40,7 @@ import org.apache.spark.internal.Logging
   *
   * PLEASE KEEP THIS FILE UNDER src/main AS PYTHON TESTS NEED ACCESS TO THIS FILE!
   */
-private[kinesis] class KinesisTestUtils extends Logging {
+private[kinesis] class KinesisTestUtils extends Logging
 
   val endpointUrl = KinesisTestUtils.endpointUrl
   val regionName = RegionUtils.getRegionByEndpoint(endpointUrl).getName()
@@ -55,35 +55,30 @@ private[kinesis] class KinesisTestUtils extends Logging {
   @volatile
   private var _streamName: String = _
 
-  protected lazy val kinesisClient = {
+  protected lazy val kinesisClient =
     val client = new AmazonKinesisClient(KinesisTestUtils.getAWSCredentials())
     client.setEndpoint(endpointUrl)
     client
-  }
 
-  private lazy val dynamoDB = {
+  private lazy val dynamoDB =
     val dynamoDBClient = new AmazonDynamoDBClient(
         new DefaultAWSCredentialsProviderChain())
     dynamoDBClient.setRegion(RegionUtils.getRegion(regionName))
     new DynamoDB(dynamoDBClient)
-  }
 
-  protected def getProducer(aggregate: Boolean): KinesisDataGenerator = {
-    if (!aggregate) {
+  protected def getProducer(aggregate: Boolean): KinesisDataGenerator =
+    if (!aggregate)
       new SimpleDataGenerator(kinesisClient)
-    } else {
+    else
       throw new UnsupportedOperationException(
           "Aggregation is not supported through this code path")
-    }
-  }
 
-  def streamName: String = {
+  def streamName: String =
     require(streamCreated,
             "Stream not yet created, call createStream() to create one")
     _streamName
-  }
 
-  def createStream(): Unit = {
+  def createStream(): Unit =
     require(!streamCreated, "Stream already created")
     _streamName = findNonExistentStreamName()
 
@@ -98,102 +93,86 @@ private[kinesis] class KinesisTestUtils extends Logging {
     waitForStreamToBeActive(_streamName)
     streamCreated = true
     logInfo(s"Created stream ${_streamName}")
-  }
 
   /**
     * Push data to Kinesis stream and return a map of
     * shardId -> seq of (data, seq number) pushed to corresponding shard
     */
   def pushData(testData: Seq[Int],
-               aggregate: Boolean): Map[String, Seq[(Int, String)]] = {
+               aggregate: Boolean): Map[String, Seq[(Int, String)]] =
     require(streamCreated,
             "Stream not yet created, call createStream() to create one")
     val producer = getProducer(aggregate)
     val shardIdToSeqNumbers = producer.sendData(streamName, testData)
     logInfo(s"Pushed $testData:\n\t ${shardIdToSeqNumbers.mkString("\n\t")}")
     shardIdToSeqNumbers.toMap
-  }
 
   /**
     * Expose a Python friendly API.
     */
-  def pushData(testData: java.util.List[Int]): Unit = {
+  def pushData(testData: java.util.List[Int]): Unit =
     pushData(testData.asScala, aggregate = false)
-  }
 
-  def deleteStream(): Unit = {
-    try {
-      if (streamCreated) {
+  def deleteStream(): Unit =
+    try
+      if (streamCreated)
         kinesisClient.deleteStream(streamName)
-      }
-    } catch {
+    catch
       case e: Exception =>
         logWarning(s"Could not delete stream $streamName")
-    }
-  }
 
-  def deleteDynamoDBTable(tableName: String): Unit = {
-    try {
+  def deleteDynamoDBTable(tableName: String): Unit =
+    try
       val table = dynamoDB.getTable(tableName)
       table.delete()
       table.waitForDelete()
-    } catch {
+    catch
       case e: Exception =>
         logWarning(s"Could not delete DynamoDB table $tableName")
-    }
-  }
 
   private def describeStream(
-      streamNameToDescribe: String): Option[StreamDescription] = {
-    try {
+      streamNameToDescribe: String): Option[StreamDescription] =
+    try
       val describeStreamRequest =
         new DescribeStreamRequest().withStreamName(streamNameToDescribe)
       val desc = kinesisClient
         .describeStream(describeStreamRequest)
         .getStreamDescription()
       Some(desc)
-    } catch {
+    catch
       case rnfe: ResourceNotFoundException =>
         None
-    }
-  }
 
-  private def findNonExistentStreamName(): String = {
+  private def findNonExistentStreamName(): String =
     var testStreamName: String = null
-    do {
+    do
       Thread.sleep(TimeUnit.SECONDS.toMillis(describeStreamPollTimeSeconds))
       testStreamName = s"KinesisTestUtils-${math.abs(Random.nextLong())}"
-    } while (describeStream(testStreamName).nonEmpty)
+    while (describeStream(testStreamName).nonEmpty)
     testStreamName
-  }
 
-  private def waitForStreamToBeActive(streamNameToWaitFor: String): Unit = {
+  private def waitForStreamToBeActive(streamNameToWaitFor: String): Unit =
     val startTime = System.currentTimeMillis()
     val endTime =
       startTime + TimeUnit.SECONDS.toMillis(createStreamTimeoutSeconds)
-    while (System.currentTimeMillis() < endTime) {
+    while (System.currentTimeMillis() < endTime)
       Thread.sleep(TimeUnit.SECONDS.toMillis(describeStreamPollTimeSeconds))
-      describeStream(streamNameToWaitFor).foreach { description =>
+      describeStream(streamNameToWaitFor).foreach  description =>
         val streamStatus = description.getStreamStatus()
         logDebug(s"\t- current state: $streamStatus\n")
-        if ("ACTIVE".equals(streamStatus)) {
+        if ("ACTIVE".equals(streamStatus))
           return
-        }
-      }
-    }
     require(false, s"Stream $streamName never became active")
-  }
-}
 
-private[kinesis] object KinesisTestUtils {
+private[kinesis] object KinesisTestUtils
 
   val envVarNameForEnablingTests = "ENABLE_KINESIS_TESTS"
   val endVarNameForEndpoint = "KINESIS_TEST_ENDPOINT_URL"
   val defaultEndpointUrl = "https://kinesis.us-west-2.amazonaws.com"
 
-  lazy val shouldRunTests = {
+  lazy val shouldRunTests =
     val isEnvSet = sys.env.get(envVarNameForEnablingTests) == Some("1")
-    if (isEnvSet) {
+    if (isEnvSet)
       // scalastyle:off println
       // Print this so that they are easily visible on the console and not hidden in the log4j logs.
       println(s"""
@@ -206,28 +185,24 @@ private[kinesis] object KinesisTestUtils {
           |(e.g. $endVarNameForEndpoint="https://kinesis.us-west-2.amazonaws.com").
         """.stripMargin)
       // scalastyle:on println
-    }
     isEnvSet
-  }
 
-  lazy val endpointUrl = {
+  lazy val endpointUrl =
     val url = sys.env.getOrElse(endVarNameForEndpoint, defaultEndpointUrl)
     // scalastyle:off println
     // Print this so that they are easily visible on the console and not hidden in the log4j logs.
     println(s"Using endpoint URL $url for creating Kinesis streams for tests.")
     // scalastyle:on println
     url
-  }
 
-  def isAWSCredentialsPresent: Boolean = {
+  def isAWSCredentialsPresent: Boolean =
     Try { new DefaultAWSCredentialsProviderChain().getCredentials() }.isSuccess
-  }
 
-  def getAWSCredentials(): AWSCredentials = {
+  def getAWSCredentials(): AWSCredentials =
     assert(
         shouldRunTests,
         "Kinesis test not enabled, should not attempt to get AWS credentials")
-    Try { new DefaultAWSCredentialsProviderChain().getCredentials() } match {
+    Try { new DefaultAWSCredentialsProviderChain().getCredentials() } match
       case Success(cred) => cred
       case Failure(e) =>
         throw new Exception(s"""
@@ -236,25 +211,21 @@ private[kinesis] object KinesisTestUtils {
              |to set the credentials in your system such that the DefaultAWSCredentialsProviderChain
              |can find the credentials.
            """.stripMargin)
-    }
-  }
-}
 
 /** A wrapper interface that will allow us to consolidate the code for synthetic data generation. */
-private[kinesis] trait KinesisDataGenerator {
+private[kinesis] trait KinesisDataGenerator
 
   /** Sends the data to Kinesis and returns the metadata for everything that has been sent. */
   def sendData(
       streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]]
-}
 
 private[kinesis] class SimpleDataGenerator(client: AmazonKinesisClient)
-    extends KinesisDataGenerator {
+    extends KinesisDataGenerator
   override def sendData(
-      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] = {
+      streamName: String, data: Seq[Int]): Map[String, Seq[(Int, String)]] =
     val shardIdToSeqNumbers =
       new mutable.HashMap[String, ArrayBuffer[(Int, String)]]()
-    data.foreach { num =>
+    data.foreach  num =>
       val str = num.toString
       val data = ByteBuffer.wrap(str.getBytes(StandardCharsets.UTF_8))
       val putRecordRequest = new PutRecordRequest()
@@ -268,8 +239,5 @@ private[kinesis] class SimpleDataGenerator(client: AmazonKinesisClient)
       val sentSeqNumbers = shardIdToSeqNumbers.getOrElseUpdate(
           shardId, new ArrayBuffer[(Int, String)]())
       sentSeqNumbers += ((num, seqNumber))
-    }
 
     shardIdToSeqNumbers.toMap
-  }
-}

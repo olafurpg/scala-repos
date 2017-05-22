@@ -5,11 +5,11 @@ import org.scalatest.{FunSpec, GivenWhenThen, Matchers}
 
 import scala.collection.SortedSet
 
-class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
+class PathIdTest extends FunSpec with GivenWhenThen with Matchers
 
-  describe("A PathId") {
+  describe("A PathId")
 
-    it("can be parsed from string") {
+    it("can be parsed from string")
       Given("A base id")
       val path = PathId("/a/b/c/d")
 
@@ -18,17 +18,15 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the path is equal")
       path should be(reference)
-    }
 
-    it("can parse the empty list from empty root string") {
+    it("can parse the empty list from empty root string")
       When("The same path as list")
       val reference = PathId("/")
 
       Then("the path is equal")
       PathId.empty should be(reference)
-    }
 
-    it("can be written and parsed from string") {
+    it("can be written and parsed from string")
       Given("A base id")
       val path = PathId("a/b/c/d")
 
@@ -37,9 +35,8 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the path is equal")
       path should be(reference)
-    }
 
-    it("can compute the canonical path when path is relative") {
+    it("can compute the canonical path when path is relative")
       Given("A base id")
       val id = PathId("/a/b/c/d")
 
@@ -48,18 +45,16 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the path is absolute and correct")
       path should be(PathId("/a/b/c/d/e/f"))
-    }
 
-    it("can compute the canonical path when path is absolute") {
+    it("can compute the canonical path when path is absolute")
 
       When("a relative path is canonized")
       val path = PathId("test/../a/b/c/d/d/../e/f/g/./../").canonicalPath()
 
       Then("the path is absolute and correct")
       path should be(PathId("/a/b/c/d/e/f"))
-    }
 
-    it("can compute the restOf with respect to a given path") {
+    it("can compute the restOf with respect to a given path")
       Given("A base id")
       val id = PathId("a/b/c")
 
@@ -68,9 +63,8 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the rest path is correct")
       path should be(PathId("d/e/f"))
-    }
 
-    it("can append to a path") {
+    it("can append to a path")
       Given("A base id")
       val id = PathId("/a/b/c")
 
@@ -79,9 +73,8 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
 
       Then("the path is appended correctly")
       path should be(PathId("/a/b/c/d/e/f"))
-    }
 
-    it("can give the taskTrackerRef path") {
+    it("can give the taskTrackerRef path")
       Given("base id's")
       val id1 = PathId("/a/b/c")
       val id2 = PathId("/a")
@@ -96,9 +89,8 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
       parent1 should be(PathId("/a/b"))
       parent2 should be(PathId.empty)
       parent3 should be(PathId.empty)
-    }
 
-    it("can convert to a hostname") {
+    it("can convert to a hostname")
       Given("base id's")
       val id1 = PathId("/a/b/c")
       val id2 = PathId("/a")
@@ -113,29 +105,24 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
       host1 should be("c.b.a")
       host2 should be("a")
       host3 should be("")
-    }
-  }
 
-  it("handles root paths") {
+  it("handles root paths")
     PathId("/").isRoot shouldBe true
     PathId("").isRoot shouldBe true
-  }
 
-  it("can match another PathId") {
+  it("can match another PathId")
     PathId("/a/b/c").includes(PathId("/a/b")) shouldBe true
     PathId("/a/b/c").includes(PathId("/a/b/d")) shouldBe false
     PathId("/a/b/c").includes(PathId("/a")) shouldBe true
     PathId("/a/b/c").includes(PathId("/other")) shouldBe false
-  }
 
-  it("can give all parents as sequence") {
+  it("can give all parents as sequence")
     val parents = PathId("/a/b/c/d").allParents
     parents should be(
         Seq(PathId("/a/b/c"), PathId("/a/b"), PathId("/a"), PathId("/")))
     parents should have size 4
-  }
 
-  describe("An ordered PathID collection") {
+  describe("An ordered PathID collection")
     val a = PathId("/a")
     val aa = a / "a"
     val ab = a / "b"
@@ -143,17 +130,12 @@ class PathIdTest extends FunSpec with GivenWhenThen with Matchers {
     val b = PathId("/b")
     val c = PathId("/c")
 
-    it("can be sorted if all paths are on the same level") {
+    it("can be sorted if all paths are on the same level")
       SortedSet(a, b, a).toSeq should equal(Seq(a, b))
-    }
 
-    it("can be sorted if with paths on different levels") {
+    it("can be sorted if with paths on different levels")
       SortedSet(a, b, aa, a).toSeq should equal(Seq(a, aa, b))
-    }
 
-    it("can be sorted if it was reversed") {
+    it("can be sorted if it was reversed")
       SortedSet(c, b, a).toSeq should equal(Seq(a, b, c))
       SortedSet(ac, ab, aa).toSeq should equal(Seq(aa, ab, ac))
-    }
-  }
-}

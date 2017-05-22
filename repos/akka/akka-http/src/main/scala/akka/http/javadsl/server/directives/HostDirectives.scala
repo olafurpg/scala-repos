@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 import akka.http.impl.server.RouteStructure.{GenericHostFilter, HostNameFilter}
 
-abstract class HostDirectives extends FileAndResourceDirectives {
+abstract class HostDirectives extends FileAndResourceDirectives
 
   /**
     * Rejects all requests with a host name different from the given one.
@@ -39,7 +39,5 @@ abstract class HostDirectives extends FileAndResourceDirectives {
   def host(predicate: akka.japi.function.Function[String, JBoolean],
            innerRoute: Route,
            moreInnerRoutes: Route*): Route =
-    new GenericHostFilter(innerRoute, moreInnerRoutes.toList) {
+    new GenericHostFilter(innerRoute, moreInnerRoutes.toList)
       def filter(hostName: String): Boolean = predicate.apply(hostName)
-    }
-}

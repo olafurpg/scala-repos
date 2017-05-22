@@ -5,25 +5,24 @@ import scala.concurrent.duration._
 import akka.stream._
 import akka.testkit.EventFilter
 
-class GraphZipWithSpec extends TwoStreamsSetup {
+class GraphZipWithSpec extends TwoStreamsSetup
   import GraphDSL.Implicits._
 
   override type Outputs = Int
 
-  override def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b) {
+  override def fixture(b: GraphDSL.Builder[_]): Fixture = new Fixture(b)
     val zip = b.add(ZipWith((_: Int) + (_: Int)))
     override def left: Inlet[Int] = zip.in0
     override def right: Inlet[Int] = zip.in1
     override def out: Outlet[Int] = zip.out
-  }
 
-  "ZipWith" must {
+  "ZipWith" must
 
-    "work in the happy case" in {
+    "work in the happy case" in
       val probe = TestSubscriber.manualProbe[Outputs]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val zip = b.add(ZipWith((_: Int) + (_: Int)))
           Source(1 to 4) ~> zip.in0
           Source(10 to 40 by 10) ~> zip.in1
@@ -31,7 +30,7 @@ class GraphZipWithSpec extends TwoStreamsSetup {
           zip.out ~> Sink.fromSubscriber(probe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val subscription = probe.expectSubscription()
@@ -46,13 +45,12 @@ class GraphZipWithSpec extends TwoStreamsSetup {
       probe.expectNext(44)
 
       probe.expectComplete()
-    }
 
-    "work in the sad case" in {
+    "work in the sad case" in
       val probe = TestSubscriber.manualProbe[Outputs]()
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val zip = b.add(ZipWith[Int, Int, Int]((_: Int) / (_: Int)))
 
           Source(1 to 4) ~> zip.in0
@@ -61,7 +59,7 @@ class GraphZipWithSpec extends TwoStreamsSetup {
           zip.out ~> Sink.fromSubscriber(probe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val subscription = probe.expectSubscription()
@@ -70,27 +68,23 @@ class GraphZipWithSpec extends TwoStreamsSetup {
       probe.expectNext(1 / -2)
       probe.expectNext(2 / -1)
 
-      EventFilter[ArithmeticException](occurrences = 1).intercept {
+      EventFilter[ArithmeticException](occurrences = 1).intercept
         subscription.request(2)
-      }
-      probe.expectError() match {
+      probe.expectError() match
         case a: java.lang.ArithmeticException ⇒
           a.getMessage should be("/ by zero")
-      }
       probe.expectNoMsg(200.millis)
-    }
 
     commonTests()
 
-    "work with one immediately completed and one nonempty publisher" in {
+    "work with one immediately completed and one nonempty publisher" in
       val subscriber1 = setup(completedPublisher, nonemptyPublisher(1 to 4))
       subscriber1.expectSubscriptionAndComplete()
 
       val subscriber2 = setup(nonemptyPublisher(1 to 4), completedPublisher)
       subscriber2.expectSubscriptionAndComplete()
-    }
 
-    "work with one delayed completed and one nonempty publisher" in {
+    "work with one delayed completed and one nonempty publisher" in
       val subscriber1 =
         setup(soonToCompletePublisher, nonemptyPublisher(1 to 4))
       subscriber1.expectSubscriptionAndComplete()
@@ -98,31 +92,28 @@ class GraphZipWithSpec extends TwoStreamsSetup {
       val subscriber2 =
         setup(nonemptyPublisher(1 to 4), soonToCompletePublisher)
       subscriber2.expectSubscriptionAndComplete()
-    }
 
-    "work with one immediately failed and one nonempty publisher" in {
+    "work with one immediately failed and one nonempty publisher" in
       val subscriber1 = setup(failedPublisher, nonemptyPublisher(1 to 4))
       subscriber1.expectSubscriptionAndError(TestException)
 
       val subscriber2 = setup(nonemptyPublisher(1 to 4), failedPublisher)
       subscriber2.expectSubscriptionAndError(TestException)
-    }
 
-    "work with one delayed failed and one nonempty publisher" in {
+    "work with one delayed failed and one nonempty publisher" in
       val subscriber1 = setup(soonToFailPublisher, nonemptyPublisher(1 to 4))
       subscriber1.expectSubscriptionAndError(TestException)
 
       val subscriber2 = setup(nonemptyPublisher(1 to 4), soonToFailPublisher)
       val subscription2 = subscriber2.expectSubscriptionAndError(TestException)
-    }
 
-    "zipWith a ETA expanded Person.apply (3 inputs)" in {
+    "zipWith a ETA expanded Person.apply (3 inputs)" in
       val probe = TestSubscriber.manualProbe[Person]()
 
       case class Person(name: String, surname: String, int: Int)
 
       RunnableGraph
-        .fromGraph(GraphDSL.create() { implicit b ⇒
+        .fromGraph(GraphDSL.create()  implicit b ⇒
           val zip = b.add(ZipWith(Person.apply _))
 
           Source.single("Caplin") ~> zip.in0
@@ -132,7 +123,7 @@ class GraphZipWithSpec extends TwoStreamsSetup {
           zip.out ~> Sink.fromSubscriber(probe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val subscription = probe.expectSubscription()
@@ -141,14 +132,13 @@ class GraphZipWithSpec extends TwoStreamsSetup {
       probe.expectNext(Person("Caplin", "Capybara", 3))
 
       probe.expectComplete()
-    }
 
-    "work with up to 22 inputs" in {
+    "work with up to 22 inputs" in
       val probe = TestSubscriber.manualProbe[String]()
 
       RunnableGraph
         .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+            GraphDSL.create()  implicit b ⇒
           val sum19 = (v1: Int, v2: String, v3: Int, v4: String,
           v5: Int, v6: String, v7: Int, v8: String,
           v9: Int, v10: String, v11: Int,
@@ -183,7 +173,7 @@ class GraphZipWithSpec extends TwoStreamsSetup {
           zip.out ~> Sink.fromSubscriber(probe)
 
           ClosedShape
-        })
+        )
         .run()
 
       val subscription = probe.expectSubscription()
@@ -192,6 +182,3 @@ class GraphZipWithSpec extends TwoStreamsSetup {
       probe.expectNext((1 to 19).mkString(""))
 
       probe.expectComplete()
-    }
-  }
-}

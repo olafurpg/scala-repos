@@ -61,7 +61,7 @@ object ConverterIncludes extends ConverterIncludes
   * @define SHSC ShortStringConverter
   * @define TISC TimeStringConverter
   */
-trait ConverterIncludes {
+trait ConverterIncludes
 
   /**
     * $START$BDSC.html $BDSC$END
@@ -236,4 +236,3 @@ trait ConverterIncludes {
   implicit def jfxTimeStringConverter2sfx(
       c: jfxuc.TimeStringConverter): TimeStringConverter =
     if (c != null) new TimeStringConverter(c) else null
-}

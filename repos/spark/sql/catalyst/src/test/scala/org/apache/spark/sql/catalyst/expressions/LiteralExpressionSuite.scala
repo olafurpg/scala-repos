@@ -25,9 +25,9 @@ import org.apache.spark.sql.catalyst.util.DateTimeUtils
 import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.CalendarInterval
 
-class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
+class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper
 
-  test("null") {
+  test("null")
     checkEvaluation(Literal.create(null, BooleanType), null)
     checkEvaluation(Literal.create(null, ByteType), null)
     checkEvaluation(Literal.create(null, ShortType), null)
@@ -45,9 +45,8 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(
         Literal.create(null, MapType(StringType, IntegerType)), null)
     checkEvaluation(Literal.create(null, StructType(Seq.empty)), null)
-  }
 
-  test("default") {
+  test("default")
     checkEvaluation(Literal.default(BooleanType), false)
     checkEvaluation(Literal.default(ByteType), 0.toByte)
     checkEvaluation(Literal.default(ShortType), 0.toShort)
@@ -70,55 +69,46 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
     checkEvaluation(
         Literal.default(StructType(StructField("a", StringType) :: Nil)),
         Row(""))
-  }
 
-  test("boolean literals") {
+  test("boolean literals")
     checkEvaluation(Literal(true), true)
     checkEvaluation(Literal(false), false)
-  }
 
-  test("int literals") {
-    List(0, 1, Int.MinValue, Int.MaxValue).foreach { d =>
+  test("int literals")
+    List(0, 1, Int.MinValue, Int.MaxValue).foreach  d =>
       checkEvaluation(Literal(d), d)
       checkEvaluation(Literal(d.toLong), d.toLong)
       checkEvaluation(Literal(d.toShort), d.toShort)
       checkEvaluation(Literal(d.toByte), d.toByte)
-    }
     checkEvaluation(Literal(Long.MinValue), Long.MinValue)
     checkEvaluation(Literal(Long.MaxValue), Long.MaxValue)
-  }
 
-  test("double literals") {
-    List(0.0, -0.0, Double.NegativeInfinity, Double.PositiveInfinity).foreach {
+  test("double literals")
+    List(0.0, -0.0, Double.NegativeInfinity, Double.PositiveInfinity).foreach
       d =>
         checkEvaluation(Literal(d), d)
         checkEvaluation(Literal(d.toFloat), d.toFloat)
-    }
     checkEvaluation(Literal(Double.MinValue), Double.MinValue)
     checkEvaluation(Literal(Double.MaxValue), Double.MaxValue)
     checkEvaluation(Literal(Float.MinValue), Float.MinValue)
     checkEvaluation(Literal(Float.MaxValue), Float.MaxValue)
-  }
 
-  test("string literals") {
+  test("string literals")
     checkEvaluation(Literal(""), "")
     checkEvaluation(Literal("test"), "test")
     checkEvaluation(Literal("\u0000"), "\u0000")
-  }
 
-  test("sum two literals") {
+  test("sum two literals")
     checkEvaluation(Add(Literal(1), Literal(1)), 2)
-  }
 
-  test("binary literals") {
+  test("binary literals")
     checkEvaluation(
         Literal.create(new Array[Byte](0), BinaryType), new Array[Byte](0))
     checkEvaluation(
         Literal.create(new Array[Byte](2), BinaryType), new Array[Byte](2))
-  }
 
-  test("decimal") {
-    List(-0.0001, 0.0, 0.001, 1.2, 1.1111, 5).foreach { d =>
+  test("decimal")
+    List(-0.0001, 0.0, 0.001, 1.2, 1.1111, 5).foreach  d =>
       checkEvaluation(Literal(Decimal(d)), Decimal(d))
       checkEvaluation(Literal(Decimal(d.toInt)), Decimal(d.toInt))
       checkEvaluation(Literal(Decimal(d.toLong)), Decimal(d.toLong))
@@ -127,8 +117,5 @@ class LiteralExpressionSuite extends SparkFunSuite with ExpressionEvalHelper {
       checkEvaluation(Literal(BigDecimal(d.toString)), Decimal(d))
       checkEvaluation(Literal(new java.math.BigDecimal(d.toString)),
                       Decimal(d))
-    }
-  }
 
   // TODO(davies): add tests for ArrayType, MapType and StructType
-}

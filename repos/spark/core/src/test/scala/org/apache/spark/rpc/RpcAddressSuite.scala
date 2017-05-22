@@ -19,37 +19,29 @@ package org.apache.spark.rpc
 
 import org.apache.spark.{SparkException, SparkFunSuite}
 
-class RpcAddressSuite extends SparkFunSuite {
+class RpcAddressSuite extends SparkFunSuite
 
-  test("hostPort") {
+  test("hostPort")
     val address = RpcAddress("1.2.3.4", 1234)
     assert(address.host == "1.2.3.4")
     assert(address.port == 1234)
     assert(address.hostPort == "1.2.3.4:1234")
-  }
 
-  test("fromSparkURL") {
+  test("fromSparkURL")
     val address = RpcAddress.fromSparkURL("spark://1.2.3.4:1234")
     assert(address.host == "1.2.3.4")
     assert(address.port == 1234)
-  }
 
-  test("fromSparkURL: a typo url") {
-    val e = intercept[SparkException] {
+  test("fromSparkURL: a typo url")
+    val e = intercept[SparkException]
       RpcAddress.fromSparkURL("spark://1.2. 3.4:1234")
-    }
     assert("Invalid master URL: spark://1.2. 3.4:1234" === e.getMessage)
-  }
 
-  test("fromSparkURL: invalid scheme") {
-    val e = intercept[SparkException] {
+  test("fromSparkURL: invalid scheme")
+    val e = intercept[SparkException]
       RpcAddress.fromSparkURL("invalid://1.2.3.4:1234")
-    }
     assert("Invalid master URL: invalid://1.2.3.4:1234" === e.getMessage)
-  }
 
-  test("toSparkURL") {
+  test("toSparkURL")
     val address = RpcAddress("1.2.3.4", 1234)
     assert(address.toSparkURL == "spark://1.2.3.4:1234")
-  }
-}

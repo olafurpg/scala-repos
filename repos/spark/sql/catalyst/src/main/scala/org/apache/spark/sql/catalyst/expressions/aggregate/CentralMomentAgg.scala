@@ -43,7 +43,7 @@ import org.apache.spark.sql.types._
   * @param child to compute central moments of.
   */
 abstract class CentralMomentAgg(child: Expression)
-    extends DeclarativeAggregate {
+    extends DeclarativeAggregate
 
   /**
     * The central moment order to be computed.
@@ -69,7 +69,7 @@ abstract class CentralMomentAgg(child: Expression)
   override val initialValues: Seq[Expression] =
     Array.fill(momentOrder + 1)(Literal(0.0))
 
-  override val updateExpressions: Seq[Expression] = {
+  override val updateExpressions: Seq[Expression] =
     val newN = n + Literal(1.0)
     val delta = child - avg
     val deltaN = delta / newN
@@ -79,18 +79,16 @@ abstract class CentralMomentAgg(child: Expression)
     val delta2 = delta * delta
     val deltaN2 = deltaN * deltaN
     val newM3 =
-      if (momentOrder >= 3) {
+      if (momentOrder >= 3)
         m3 - Literal(3.0) * deltaN * newM2 + delta * (delta2 - deltaN2)
-      } else {
+      else
         Literal(0.0)
-      }
     val newM4 =
-      if (momentOrder >= 4) {
+      if (momentOrder >= 4)
         m4 - Literal(4.0) * deltaN * newM3 - Literal(6.0) * deltaN2 * newM2 +
         delta * (delta * delta2 - deltaN * deltaN2)
-      } else {
+      else
         Literal(0.0)
-      }
 
     trimHigherOrder(
         Seq(
@@ -100,9 +98,8 @@ abstract class CentralMomentAgg(child: Expression)
             If(IsNull(child), m3, newM3),
             If(IsNull(child), m4, newM4)
         ))
-  }
 
-  override val mergeExpressions: Seq[Expression] = {
+  override val mergeExpressions: Seq[Expression] =
 
     val n1 = n.left
     val n2 = n.right
@@ -116,107 +113,91 @@ abstract class CentralMomentAgg(child: Expression)
     val newM2 = m2.left + m2.right + delta * deltaN * n1 * n2
     // `m3.right` is not available if momentOrder < 3
     val newM3 =
-      if (momentOrder >= 3) {
+      if (momentOrder >= 3)
         m3.left + m3.right + deltaN * deltaN * delta * n1 * n2 * (n1 - n2) +
         Literal(3.0) * deltaN * (n1 * m2.right - n2 * m2.left)
-      } else {
+      else
         Literal(0.0)
-      }
     // `m4.right` is not available if momentOrder < 4
     val newM4 =
-      if (momentOrder >= 4) {
+      if (momentOrder >= 4)
         m4.left + m4.right + deltaN * deltaN * deltaN * delta * n1 * n2 *
         (n1 * n1 - n1 * n2 + n2 * n2) + Literal(6.0) * deltaN * deltaN *
         (n1 * n1 * m2.right + n2 * n2 * m2.left) + Literal(4.0) * deltaN *
         (n1 * m3.right - n2 * m3.left)
-      } else {
+      else
         Literal(0.0)
-      }
 
     trimHigherOrder(Seq(newN, newAvg, newM2, newM3, newM4))
-  }
-}
 
 // Compute the population standard deviation of a column
-case class StddevPop(child: Expression) extends CentralMomentAgg(child) {
+case class StddevPop(child: Expression) extends CentralMomentAgg(child)
 
   override protected def momentOrder = 2
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0), Literal.create(null, DoubleType), Sqrt(m2 / n))
-  }
 
   override def prettyName: String = "stddev_pop"
-}
 
 // Compute the sample standard deviation of a column
-case class StddevSamp(child: Expression) extends CentralMomentAgg(child) {
+case class StddevSamp(child: Expression) extends CentralMomentAgg(child)
 
   override protected def momentOrder = 2
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0),
        Literal.create(null, DoubleType),
        If(n === Literal(1.0),
           Literal(Double.NaN),
           Sqrt(m2 / (n - Literal(1.0)))))
-  }
 
   override def prettyName: String = "stddev_samp"
-}
 
 // Compute the population variance of a column
-case class VariancePop(child: Expression) extends CentralMomentAgg(child) {
+case class VariancePop(child: Expression) extends CentralMomentAgg(child)
 
   override protected def momentOrder = 2
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0), Literal.create(null, DoubleType), m2 / n)
-  }
 
   override def prettyName: String = "var_pop"
-}
 
 // Compute the sample variance of a column
-case class VarianceSamp(child: Expression) extends CentralMomentAgg(child) {
+case class VarianceSamp(child: Expression) extends CentralMomentAgg(child)
 
   override protected def momentOrder = 2
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0),
        Literal.create(null, DoubleType),
        If(n === Literal(1.0), Literal(Double.NaN), m2 / (n - Literal(1.0))))
-  }
 
   override def prettyName: String = "var_samp"
-}
 
-case class Skewness(child: Expression) extends CentralMomentAgg(child) {
+case class Skewness(child: Expression) extends CentralMomentAgg(child)
 
   override def prettyName: String = "skewness"
 
   override protected def momentOrder = 3
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0),
        Literal.create(null, DoubleType),
        If(m2 === Literal(0.0),
           Literal(Double.NaN),
           Sqrt(n) * m3 / Sqrt(m2 * m2 * m2)))
-  }
-}
 
-case class Kurtosis(child: Expression) extends CentralMomentAgg(child) {
+case class Kurtosis(child: Expression) extends CentralMomentAgg(child)
 
   override protected def momentOrder = 4
 
-  override val evaluateExpression: Expression = {
+  override val evaluateExpression: Expression =
     If(n === Literal(0.0),
        Literal.create(null, DoubleType),
        If(m2 === Literal(0.0),
           Literal(Double.NaN),
           n * m4 / (m2 * m2) - Literal(3.0)))
-  }
 
   override def prettyName: String = "kurtosis"
-}

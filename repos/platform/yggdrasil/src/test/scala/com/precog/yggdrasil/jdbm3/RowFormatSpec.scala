@@ -37,7 +37,7 @@ import org.scalacheck.{Shrink, Arbitrary, Gen, Pretty}
 import scala.annotation.tailrec
 
 class RowFormatSpec
-    extends Specification with ScalaCheck with CValueGenerators {
+    extends Specification with ScalaCheck with CValueGenerators
   import Arbitrary._
   import ByteBufferPool._
 
@@ -46,54 +46,48 @@ class RowFormatSpec
 
   // This should generate some jpath ids, then generate CTypes for these.
   def genColumnRefs: Gen[List[ColumnRef]] =
-    Gen.listOf(Gen.alphaStr filter (_.size > 0)) flatMap { paths =>
+    Gen.listOf(Gen.alphaStr filter (_.size > 0)) flatMap  paths =>
       Gen
-        .sequence[List, List[ColumnRef]](paths.distinct.map { name =>
-          Gen.listOf(genCType) map {
+        .sequence[List, List[ColumnRef]](paths.distinct.map  name =>
+          Gen.listOf(genCType) map
             _.distinct map (ColumnRef(CPath(name), _))
-          }
-        })
+        )
         .map(_.flatten)
-    }
 
-  def groupConsecutive[A, B](as: List[A])(f: A => B) = {
+  def groupConsecutive[A, B](as: List[A])(f: A => B) =
     @tailrec
-    def build(as: List[A], prev: List[List[A]]): List[List[A]] = as match {
+    def build(as: List[A], prev: List[List[A]]): List[List[A]] = as match
       case Nil =>
         prev.reverse
       case a :: _ =>
         val bs =
-          as takeWhile { b =>
+          as takeWhile  b =>
             f(a) == f(b)
-          }
         build(as drop bs.size, bs :: prev)
-    }
 
     build(as, Nil)
-  }
 
   def genCValuesForColumnRefs(refs: List[ColumnRef]): Gen[List[CValue]] =
-    Gen.sequence[List, List[CValue]](groupConsecutive(refs)(_.selector) map {
+    Gen.sequence[List, List[CValue]](groupConsecutive(refs)(_.selector) map
       case refs =>
-        Gen.choose(0, refs.size - 1) flatMap {
+        Gen.choose(0, refs.size - 1) flatMap
           i =>
-            Gen.sequence[List, CValue](refs.zipWithIndex map {
+            Gen.sequence[List, CValue](refs.zipWithIndex map
               case (ColumnRef(_, cType), `i`) =>
                 Gen.frequency(5 -> genCValue(cType),
                               1 -> Gen.value(CUndefined))
               case (_, _) => Gen.value(CUndefined)
-            })
-        }
-    }) map (_.flatten)
+            )
+    ) map (_.flatten)
 
   def arrayColumnsFor(size: Int, refs: List[ColumnRef]): List[ArrayColumn[_]] =
     refs map JDBMSlice.columnFor(CPath.Identity, size) map (_._2)
 
-  def verify(rows: List[List[CValue]], cols: List[Column]) = {
-    rows.zipWithIndex foreach {
+  def verify(rows: List[List[CValue]], cols: List[Column]) =
+    rows.zipWithIndex foreach
       case (values, row) =>
         (values zip cols) foreach
-        (_ must beLike {
+        (_ must beLike
               case (CUndefined, col) if !col.isDefinedAt(row) => ok
               case (_, col) if !col.isDefinedAt(row) => ko
               case (CString(s), col: StrColumn) => col(row) must_== s
@@ -108,9 +102,7 @@ class RowFormatSpec
               case (CArray(xs, cType), col: HomogeneousArrayColumn[_])
                   if cType == col.tpe =>
                 col(row) must_== xs
-            })
-    }
-  }
+            )
 
   implicit lazy val arbColumnRefs = Arbitrary(genColumnRefs)
 
@@ -119,34 +111,29 @@ class RowFormatSpec
   implicit val shrinkRows: Shrink[List[List[CValue]]] =
     Shrink.shrinkAny[List[List[CValue]]]
 
-  "ValueRowFormat" should {
+  "ValueRowFormat" should
     checkRoundTrips(RowFormat.forValues(_))
-  }
 
   private def identityCols(len: Int): List[ColumnRef] =
-    (0 until len).map({ i =>
+    (0 until len).map( i =>
       ColumnRef(CPath(CPathIndex(i)), CLong)
-    })(scala.collection.breakOut)
+    )(scala.collection.breakOut)
 
-  "IdentitiesRowFormat" should {
-    "round-trip CLongs" in {
-      check { id: List[Long] =>
+  "IdentitiesRowFormat" should
+    "round-trip CLongs" in
+      check  id: List[Long] =>
         val rowFormat = RowFormat.IdentitiesRowFormatV1(identityCols(id.size))
         val cId: List[CValue] = id map (CLong(_))
         rowFormat.decode(rowFormat.encode(cId)) must_== cId
-      }
-    }
 
-    "encodeIdentities matches encode format" in {
-      check { id: List[Long] =>
+    "encodeIdentities matches encode format" in
+      check  id: List[Long] =>
         val rowFormat = RowFormat.IdentitiesRowFormatV1(identityCols(id.size))
         val cId: List[CValue] = id map (CLong(_))
         rowFormat.decode(rowFormat.encodeIdentities(id.toArray)) must_== cId
-      }
-    }
 
-    "round-trip CLongs -> Column -> CLongs" in {
-      check { id: List[Long] =>
+    "round-trip CLongs -> Column -> CLongs" in
+      check  id: List[Long] =>
         val columns = arrayColumnsFor(1, identityCols(id.size))
         val rowFormat = RowFormat.IdentitiesRowFormatV1(identityCols(id.size))
         val columnDecoder = rowFormat.ColumnDecoder(columns)
@@ -158,81 +145,65 @@ class RowFormatSpec
         verify(cId :: Nil, columns)
 
         rowFormat.decode(columnEncoder.encodeFromRow(0)) must_== cId
-      }
-    }
-  }
 
-  "SortingKeyRowFormat" should {
+  "SortingKeyRowFormat" should
     checkRoundTrips(RowFormat.forSortingKey(_))
 
-    "sort encoded as ValueFormat does" in {
-      check { refs: List[ColumnRef] =>
+    "sort encoded as ValueFormat does" in
+      check  refs: List[ColumnRef] =>
         val valueRowFormat = RowFormat.forValues(refs)
         val sortingKeyRowFormat = RowFormat.forSortingKey(refs)
         implicit val arbRows: Arbitrary[List[List[CValue]]] =
           Arbitrary(Gen.listOfN(10, genCValuesForColumnRefs(refs)))
 
-        check { (vals: List[List[CValue]]) =>
+        check  (vals: List[List[CValue]]) =>
           val valueEncoded = vals map (valueRowFormat.encode(_))
           val sortEncoded = vals map (sortingKeyRowFormat.encode(_))
 
           val sortedA =
-            valueEncoded.sorted(new Ordering[Array[Byte]] {
+            valueEncoded.sorted(new Ordering[Array[Byte]]
               def compare(a: Array[Byte], b: Array[Byte]) =
                 valueRowFormat.compare(a, b)
-            }) map (valueRowFormat.decode(_))
+            ) map (valueRowFormat.decode(_))
           val sortedB =
-            sortEncoded.sorted(new Ordering[Array[Byte]] {
+            sortEncoded.sorted(new Ordering[Array[Byte]]
               def compare(a: Array[Byte], b: Array[Byte]) =
                 sortingKeyRowFormat.compare(a, b)
-            }) map (sortingKeyRowFormat.decode(_))
+            ) map (sortingKeyRowFormat.decode(_))
 
           sortedA must_== sortedB
-        }
-      }
-    }.set(minTestsOk -> 500, maxDiscarded -> 500)
-  }
+    .set(minTestsOk -> 500, maxDiscarded -> 500)
 
-  def checkRoundTrips(toRowFormat: List[ColumnRef] => RowFormat) {
-    "survive round-trip from CValue -> Array[Byte] -> CValue" in {
-      check { (refs: List[ColumnRef]) =>
+  def checkRoundTrips(toRowFormat: List[ColumnRef] => RowFormat)
+    "survive round-trip from CValue -> Array[Byte] -> CValue" in
+      check  (refs: List[ColumnRef]) =>
         val rowFormat = toRowFormat(refs)
         implicit val arbColumnValues: Arbitrary[List[CValue]] =
           Arbitrary(genCValuesForColumnRefs(refs))
 
-        check { (vals: List[CValue]) =>
+        check  (vals: List[CValue]) =>
           assert(refs.size == vals.size)
           rowFormat.decode(rowFormat.encode(vals)) must_== vals
-        }
-      }
-    }
-    "survive rountrip from CValue -> Array[Byte] -> Column -> Array[Byte] -> CValue" in {
+    "survive rountrip from CValue -> Array[Byte] -> Column -> Array[Byte] -> CValue" in
       val size = 10
 
-      check { (refs: List[ColumnRef]) =>
+      check  (refs: List[ColumnRef]) =>
         val rowFormat = toRowFormat(refs)
         implicit val arbRows: Arbitrary[List[List[CValue]]] =
           Arbitrary(Gen.listOfN(size, genCValuesForColumnRefs(refs)))
 
-        check { (rows: List[List[CValue]]) =>
+        check  (rows: List[List[CValue]]) =>
           val columns = arrayColumnsFor(size, refs)
           val columnDecoder = rowFormat.ColumnDecoder(columns)
           val columnEncoder = rowFormat.ColumnEncoder(columns)
 
           // Fill up the columns with the values from the rows.
-          rows.zipWithIndex foreach {
+          rows.zipWithIndex foreach
             case (vals, row) =>
               columnDecoder.decodeToRow(row, rowFormat.encode(vals))
-          }
 
           verify(rows, columns)
 
-          rows.zipWithIndex foreach {
+          rows.zipWithIndex foreach
             case (vals, row) =>
               rowFormat.decode(columnEncoder.encodeFromRow(row)) must_== vals
-          }
-        }
-      }
-    }
-  }
-}

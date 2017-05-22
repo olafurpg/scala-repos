@@ -1,35 +1,28 @@
-class AnnotNotFound {
+class AnnotNotFound
   def foo(a: Any) = ()
 
-  foo {
+  foo
     @inargument
     def foo = 0
     foo
-  }
 
   () =>
-    {
       @infunction
       def foo = 0
       ()
-  }
 
   () =>
-    {
-      val bar: Int = {
+      val bar: Int =
         @nested
         val bar2: Int = 2
         2
-      }
       ()
-  }
 
   def func(@param x: Int): Int = 0
 
-  abstract class A {
+  abstract class A
     @typealias
     type B = Int
-  }
 
   @classs
   class C
@@ -42,4 +35,3 @@ class AnnotNotFound {
   class E(
       @valueparam x: Any
   )
-}

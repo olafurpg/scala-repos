@@ -1,6 +1,6 @@
 // This tests the implicit comment inheritance capabilities of scaladoc for usecases (no $super, no @inheritdoc)
 /** Testing use case inheritance */
-class UseCaseInheritance {
+class UseCaseInheritance
 
   /**
     * The base comment. And another sentence...
@@ -30,10 +30,9 @@ class UseCaseInheritance {
     * The overridden comment.
     */
   def function[T](implicit arg1: T, arg2: String): Double = 0.0d
-}
 
 /** Testing the override-use case interaction */
-class UseCaseOverrideInheritance extends UseCaseInheritance {
+class UseCaseOverrideInheritance extends UseCaseInheritance
 
   /**
     * @usecase def missing_arg[T](arg1: T): Double
@@ -56,4 +55,3 @@ class UseCaseOverrideInheritance extends UseCaseInheritance {
     * The overridden comment.
     */
   override def function[T](implicit arg1: T, arg2: String): Double = 0.0d
-}

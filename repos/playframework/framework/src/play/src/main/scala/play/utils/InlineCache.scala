@@ -38,7 +38,7 @@ import java.lang.ref.WeakReference
   * to be conservative.
   */
 private[play] final class InlineCache[A <: AnyRef, B](f: A => B)
-    extends (A => B) {
+    extends (A => B)
 
   /**
     * For performance, don't synchronize this value. Instead, let
@@ -49,7 +49,7 @@ private[play] final class InlineCache[A <: AnyRef, B](f: A => B)
     */
   var cache: WeakReference[(A, B)] = null
 
-  override def apply(a: A): B = {
+  override def apply(a: A): B =
     // Get the current value of the cache into a local variable.
     // If it's null then this is our first call to the function
     // (on this thread) so get a fresh value.
@@ -64,12 +64,9 @@ private[play] final class InlineCache[A <: AnyRef, B](f: A => B)
     if (inputOutput._1 ne a) return fresh(a)
     // We got the cached value, return it.
     inputOutput._2
-  }
 
   /** Get a fresh value and update the cache with it. */
-  private def fresh(a: A): B = {
+  private def fresh(a: A): B =
     val b = f(a)
     cache = new WeakReference((a, b))
     b
-  }
-}

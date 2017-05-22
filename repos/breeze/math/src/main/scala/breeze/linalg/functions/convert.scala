@@ -13,7 +13,7 @@ import breeze.math.Complex
   * }}}
   * @author dlwh
   */
-object convert extends UFunc with MappingUFunc {
+object convert extends UFunc with MappingUFunc
   @expand
   @expand.valify
   implicit def impl2[
@@ -25,9 +25,6 @@ object convert extends UFunc with MappingUFunc {
           _.toLong,
           _.toChar,
           _.toShort,
-          Complex(_, 0)) conv: From => To): Impl2[From, To.type, To] = {
-    new Impl2[From, To.type, To] {
+          Complex(_, 0)) conv: From => To): Impl2[From, To.type, To] =
+    new Impl2[From, To.type, To]
       def apply(v: From, v2: To.type): To = conv(v)
-    }
-  }
-}

@@ -21,6 +21,5 @@ package kafka.common
   * exist.
   */
 class ConsumerRebalanceFailedException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

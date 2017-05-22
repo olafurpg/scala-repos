@@ -16,9 +16,9 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
+class SocksConnectHandlerTest extends FunSuite with MockitoSugar
 
-  class SocksConnectHandlerHelper {
+  class SocksConnectHandlerHelper
     val ctx = mock[ChannelHandlerContext]
     val channel = mock[Channel]
     when(ctx.getChannel) thenReturn channel
@@ -40,28 +40,26 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     val connectRequested = new DownstreamChannelStateEvent(
         channel, connectFuture, ChannelState.CONNECTED, remoteAddress)
 
-    def sendBytesToServer(x: Byte, xs: Byte*) {
+    def sendBytesToServer(x: Byte, xs: Byte*)
       val ec = ArgumentCaptor.forClass(classOf[DownstreamMessageEvent])
       verify(ctx, atLeastOnce()).sendDownstream(ec.capture)
       val e = ec.getValue
       assert(
-          e.getMessage match {
+          e.getMessage match
         case buf: ChannelBuffer =>
           val a = Array(x, xs: _*)
           val bufBytes = Array.ofDim[Byte](buf.readableBytes())
           buf.getBytes(0, bufBytes)
           Arrays.equals(bufBytes, a)
-      })
-    }
+      )
 
-    def receiveBytesFromServer(ch: SocksConnectHandler, bytes: Array[Byte]) {
+    def receiveBytesFromServer(ch: SocksConnectHandler, bytes: Array[Byte])
       ch.handleUpstream(
           ctx,
           new UpstreamMessageEvent(
               channel, ChannelBuffers.wrappedBuffer(bytes), null))
-    }
 
-    def connectAndRemoveHandler(ch: SocksConnectHandler) {
+    def connectAndRemoveHandler(ch: SocksConnectHandler)
       assert(connectFuture.isDone)
       verify(pipeline).remove(ch)
 
@@ -73,9 +71,8 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
       assert(e.getChannel == channel)
       assert(e.getState == ChannelState.CONNECTED)
       assert(e.getValue == remoteAddress)
-    }
 
-    def checkDidClose() {
+    def checkDidClose()
       val ec = ArgumentCaptor.forClass(classOf[DownstreamChannelStateEvent])
       verify(pipeline).sendDownstream(ec.capture)
       val e = ec.getValue
@@ -83,11 +80,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
       assert(e.getFuture == closeFuture)
       assert(e.getState == ChannelState.OPEN)
       assert(e.getValue == java.lang.Boolean.FALSE)
-    }
-  }
 
   test(
-      "SocksConnectHandler should with no authentication upon connect wrap the downstream connect request") {
+      "SocksConnectHandler should with no authentication upon connect wrap the downstream connect request")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -101,10 +96,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(e.getFuture != connectFuture) // this is proxied
     assert(e.getState == ChannelState.CONNECTED)
     assert(e.getValue == proxyAddress)
-  }
 
   test(
-      "SocksConnectHandler should with no authentication upon connect propagate cancellation") {
+      "SocksConnectHandler should with no authentication upon connect propagate cancellation")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -117,10 +111,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!e.getFuture.isCancelled)
     connectFuture.cancel()
     assert(e.getFuture.isCancelled)
-  }
 
   test(
-      "SocksConnectHandler should with no authentication when connect is successful not propagate success") {
+      "SocksConnectHandler should with no authentication when connect is successful not propagate success")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -133,10 +126,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
-  }
 
   test(
-      "SocksConnectHandler should with no authentication when connect is successful propagate connection cancellation") {
+      "SocksConnectHandler should with no authentication when connect is successful propagate connection cancellation")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -150,10 +142,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
 
     connectFuture.cancel()
     checkDidClose()
-  }
 
   test(
-      "SocksConnectHandler should with no authentication when connect is successful do SOCKS negotiation") {
+      "SocksConnectHandler should with no authentication when connect is successful do SOCKS negotiation")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -165,20 +156,15 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
-    {
       // on connect send init
       sendBytesToServer(0x05, 0x01, 0x00)
-    }
 
-    {
       // when init response is received send connect request
       receiveBytesFromServer(ch, Array[Byte](0x05, 0x00))
 
       sendBytesToServer(
           0x05, 0x01, 0x00, 0x01, 0x7F, 0x00, 0x00, 0x01, portByte1, portByte2)
-    }
 
-    {
       // when connect response is received, propagate the connect and remove the handler
       receiveBytesFromServer(ch,
                              Array[Byte](0x05,
@@ -193,11 +179,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
                                          portByte2))
 
       connectAndRemoveHandler(ch)
-    }
-  }
 
   test(
-      "SocksConnectHandler should with no authentication propagate connection failure") {
+      "SocksConnectHandler should with no authentication propagate connection failure")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -213,10 +197,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     e.getFuture.setFailure(exc)
     assert(connectFuture.isDone)
     assert(connectFuture.getCause == exc)
-  }
 
   test(
-      "SocksConnectHandler should with username and password authentication when connect is successful do SOCKS negotiation") {
+      "SocksConnectHandler should with username and password authentication when connect is successful do SOCKS negotiation")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -234,27 +217,20 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
-    {
       // on connect send init
       sendBytesToServer(0x05, 0x01, 0x02)
-    }
 
-    {
       // when init response is received send user name and pass
       receiveBytesFromServer(ch, Array[Byte](0x05, 0x02))
 
       sendBytesToServer(0x01, 0x01, 0x75, 0x04, 0x70, 0x61, 0x73, 0x73)
-    }
 
-    {
       // when authenticated response is received send connect request
       receiveBytesFromServer(ch, Array[Byte](0x01, 0x00))
 
       sendBytesToServer(
           0x05, 0x01, 0x00, 0x01, 0x7F, 0x00, 0x00, 0x01, portByte1, portByte2)
-    }
 
-    {
       // when connect response is received, propagate the connect and remove the handler
       receiveBytesFromServer(ch,
                              Array[Byte](0x05,
@@ -269,11 +245,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
                                          portByte2))
 
       connectAndRemoveHandler(ch)
-    }
-  }
 
   test(
-      "SocksConnectHandler should with username and password authentication when connect is successful fail SOCKS negotiation when not authenticated") {
+      "SocksConnectHandler should with username and password authentication when connect is successful fail SOCKS negotiation when not authenticated")
     val h = new SocksConnectHandlerHelper
     import h._
 
@@ -291,30 +265,23 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(!connectFuture.isDone)
     verify(ctx, times(0)).sendUpstream(any[ChannelEvent])
 
-    {
       // on connect send init
       sendBytesToServer(0x05, 0x01, 0x02)
-    }
 
-    {
       // when init response is received send user name and pass
       receiveBytesFromServer(ch, Array[Byte](0x05, 0x02))
 
       sendBytesToServer(0x01, 0x01, 0x75, 0x04, 0x70, 0x61, 0x73, 0x73)
-    }
 
-    {
       // when not authenticated response is received disconnect
       receiveBytesFromServer(ch, Array[Byte](0x01, 0x01))
 
       assert(connectFuture.isDone)
       assert(connectFuture.getCause.isInstanceOf[ConnectionFailedException])
       checkDidClose()
-    }
-  }
 
   test(
-      "SocksConnectHandler should not add socket address resolve handler when proxy address is resolved") {
+      "SocksConnectHandler should not add socket address resolve handler when proxy address is resolved")
     val pipeline = new DefaultChannelPipeline
     SocksConnectHandler.addHandler(
         new InetSocketAddress(InetAddress.getLoopbackAddress, 2222),
@@ -324,10 +291,9 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     )
 
     assert(pipeline.get("socketAddressResolver") == null)
-  }
 
   test(
-      "SocksConnectHandler should add socket address resolve handler when proxy address is unresolved") {
+      "SocksConnectHandler should add socket address resolve handler when proxy address is unresolved")
     val pipeline = new DefaultChannelPipeline
     SocksConnectHandler.addHandler(
         InetSocketAddress.createUnresolved("meow.meow", 2222),
@@ -338,5 +304,3 @@ class SocksConnectHandlerTest extends FunSuite with MockitoSugar {
     assert(pipeline
           .get("socketAddressResolver")
           .isInstanceOf[SocketAddressResolveHandler])
-  }
-}

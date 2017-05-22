@@ -15,54 +15,49 @@ import org.jetbrains.plugins.scala.lang.psi.api.statements.params.ScParameterCla
   * @author Ksenia.Sautina
   * @since 1/31/13
   */
-class ScalaMethodCallFixer extends ScalaFixer {
+class ScalaMethodCallFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
-    val args = psiElement match {
+            psiElement: PsiElement): OperationPerformed =
+    val args = psiElement match
       case call: ScMethodCall => call.args
       case _ => return NoOperation
-    }
 
     val methodCall = psiElement.asInstanceOf[ScMethodCall]
 
-    if (args.lastChild.exists(_.getText == ")")) {
+    if (args.lastChild.exists(_.getText == ")"))
       val ref =
         Option(methodCall.deepestInvokedExpr).flatMap(_.getReference.toOption)
 
-      ref.map(_.resolve()) match {
+      ref.map(_.resolve()) match
         case Some(funDef: ScFunctionDefinition) =>
-          funDef.clauses match {
+          funDef.clauses match
             case Some(clauses) =>
               val cl = clauses.clauses
               if (cl.length < 2) return NoOperation
 
-              val rightArgs = {
+              val rightArgs =
                 var currentPsi = psiElement.getContainingFile.findElementAt(
                     editor.getCaretModel.getOffset)
 
                 while (currentPsi != null &&
                 methodCall.getTextRange.contains(currentPsi.getTextRange) &&
-                !currentPsi.isInstanceOf[ScArgumentExprList]) {
+                !currentPsi.isInstanceOf[ScArgumentExprList])
                   currentPsi = currentPsi.getParent
-                }
 
-                currentPsi match {
+                currentPsi match
                   case a: ScArgumentExprList => a
                   case _ => args
-                }
-              }
 
               if (rightArgs.getParent != null)
-                rightArgs.getParent.getParent match {
+                rightArgs.getParent.getParent match
                   case call: ScMethodCall if call.args != null =>
                     return NoOperation
                   case _ =>
-                }
 
-              rightArgs.matchedParameters match {
+              rightArgs.matchedParameters match
                 case mm if mm.nonEmpty && mm.head._2.paramInCode.isDefined =>
-                  mm.head._2.paramInCode.get.getParent match {
+                  mm.head._2.paramInCode.get.getParent match
                     case resolvedCl: ScParameterClause
                         if cl.contains(resolvedCl) && resolvedCl != cl.last =>
                       moveToEnd(editor, args.getLastChild)
@@ -70,33 +65,25 @@ class ScalaMethodCallFixer extends ScalaFixer {
                           args.getLastChild.getTextRange.getEndOffset, "()")
                       return WithReformat(1)
                     case _ =>
-                  }
                 case _ =>
-              }
             case _ =>
-          }
         case _ =>
-      }
 
       return NoOperation
-    }
 
     var endOffset: Int = -1
     var child = args.firstChild.orNull
     var flag = true
 
-    while (child != null && flag) {
-      child match {
+    while (child != null && flag)
+      child match
         case errorElement: PsiErrorElement =>
-          if (errorElement.getErrorDescription.indexOf("')'") >= 0) {
+          if (errorElement.getErrorDescription.indexOf("')'") >= 0)
             endOffset = errorElement.getTextRange.getStartOffset
             flag = false
-          }
         case _ =>
-      }
 
       child = child.getNextSibling
-    }
 
     if (endOffset == -1) endOffset = args.getTextRange.getEndOffset
 
@@ -110,5 +97,3 @@ class ScalaMethodCallFixer extends ScalaFixer {
     editor.getDocument.insertString(endOffset, ")")
 
     WithReformat(1)
-  }
-}

@@ -7,7 +7,7 @@ import sbt.internal.util.AttributeKey
   *
   * @tparam A the type of a task
   */
-trait ConcurrentRestrictions[A] {
+trait ConcurrentRestrictions[A]
 
   /** Internal state type used to describe a set of tasks. */
   type G
@@ -32,37 +32,33 @@ trait ConcurrentRestrictions[A] {
     * 5. forall g: G, a: A, b: A; !valid(add(g,a)) => !valid(add(add(g,b), a))
     */
   def valid(g: G): Boolean
-}
 
 import java.util.{LinkedList, Queue}
 import java.util.concurrent.{Executor, Executors, ExecutorCompletionService}
 import annotation.tailrec
 
-object ConcurrentRestrictions {
+object ConcurrentRestrictions
 
   /**
     * A ConcurrentRestrictions instance that places no restrictions on concurrently executing tasks.
     * @param zero the constant placeholder used for t
     */
   def unrestricted[A]: ConcurrentRestrictions[A] =
-    new ConcurrentRestrictions[A] {
+    new ConcurrentRestrictions[A]
       type G = Unit
       def empty = ()
       def add(g: G, a: A) = ()
       def remove(g: G, a: A) = ()
       def valid(g: G) = true
-    }
 
-  def limitTotal[A](i: Int): ConcurrentRestrictions[A] = {
+  def limitTotal[A](i: Int): ConcurrentRestrictions[A] =
     assert(i >= 1, "Maximum must be at least 1 (was " + i + ")")
-    new ConcurrentRestrictions[A] {
+    new ConcurrentRestrictions[A]
       type G = Int
       def empty = 0
       def add(g: Int, a: A) = g + 1
       def remove(g: Int, a: A) = g - 1
       def valid(g: Int) = g <= i
-    }
-  }
 
   /** A key object used for associating information with a task.*/
   final case class Tag(name: String)
@@ -86,30 +82,26 @@ object ConcurrentRestrictions {
     */
   def tagged[A](
       get: A => TagMap, validF: TagMap => Boolean): ConcurrentRestrictions[A] =
-    new ConcurrentRestrictions[A] {
+    new ConcurrentRestrictions[A]
       type G = TagMap
       def empty = Map.empty
       def add(g: TagMap, a: A) = merge(g, a, get)(_ + _)
       def remove(g: TagMap, a: A) = merge(g, a, get)(_ - _)
       def valid(g: TagMap) = validF(g)
-    }
 
   private[this] def merge[A](m: TagMap, a: A, get: A => TagMap)(
-      f: (Int, Int) => Int): TagMap = {
+      f: (Int, Int) => Int): TagMap =
     val aTags = get(a)
     val base = merge(m, aTags)(f)
     val un = if (aTags.isEmpty) update(base, Untagged, 1)(f) else base
     update(un, All, 1)(f)
-  }
 
   private[this] def update[A, B](m: Map[A, B], a: A, b: B)(
-      f: (B, B) => B): Map[A, B] = {
-    val newb = (m get a) match {
+      f: (B, B) => B): Map[A, B] =
+    val newb = (m get a) match
       case Some(bv) => f(bv, b)
       case None => b
-    }
     m.updated(a, newb)
-  }
   private[this] def merge[A, B](m: Map[A, B], n: Map[A, B])(
       f: (B, B) => B): Map[A, B] =
     (m /: n) { case (acc, (a, b)) => update(acc, a, b)(f) }
@@ -123,10 +115,9 @@ object ConcurrentRestrictions {
     */
   def completionService[A, R](
       tags: ConcurrentRestrictions[A],
-      warn: String => Unit): (CompletionService[A, R], () => Unit) = {
+      warn: String => Unit): (CompletionService[A, R], () => Unit) =
     val pool = Executors.newCachedThreadPool()
     (completionService[A, R](pool, tags, warn), () => pool.shutdownNow())
-  }
 
   /**
     * Constructs a CompletionService suitable for backing task execution based on the provided restrictions on concurrent task execution
@@ -135,12 +126,12 @@ object ConcurrentRestrictions {
   def completionService[A, R](
       backing: Executor,
       tags: ConcurrentRestrictions[A],
-      warn: String => Unit): CompletionService[A, R] = {
+      warn: String => Unit): CompletionService[A, R] =
 
     /** Represents submitted work for a task.*/
     final class Enqueue(val node: A, val work: () => R)
 
-    new CompletionService[A, R] {
+    new CompletionService[A, R]
 
       /** Backing service used to manage execution on threads once all constraints are satisfied. */
       private[this] val jservice = new ExecutorCompletionService[R](backing)
@@ -154,53 +145,44 @@ object ConcurrentRestrictions {
       /** Tasks that cannot be run yet because they cannot execute concurrently with the currently running tasks.*/
       private[this] val pending = new LinkedList[Enqueue]
 
-      def submit(node: A, work: () => R): Unit = synchronized {
+      def submit(node: A, work: () => R): Unit = synchronized
         val newState = tags.add(tagState, node)
         // if the new task is allowed to run concurrently with the currently running tasks,
         //   submit it to be run by the backing j.u.c.CompletionService
-        if (tags valid newState) {
+        if (tags valid newState)
           tagState = newState
           submitValid(node, work)
-        } else {
+        else
           if (running == 0) errorAddingToIdle()
           pending.add(new Enqueue(node, work))
-        }
-      }
-      private[this] def submitValid(node: A, work: () => R) = {
+      private[this] def submitValid(node: A, work: () => R) =
         running += 1
         val wrappedWork = () => try work() finally cleanup(node)
         CompletionService.submit(wrappedWork, jservice)
-      }
-      private[this] def cleanup(node: A): Unit = synchronized {
+      private[this] def cleanup(node: A): Unit = synchronized
         running -= 1
         tagState = tags.remove(tagState, node)
         if (!tags.valid(tagState))
           warn(
               "Invalid restriction: removing a completed node from a valid system must result in a valid system.")
         submitValid(new LinkedList)
-      }
       private[this] def errorAddingToIdle() =
         warn(
             "Invalid restriction: adding a node to an idle system must be allowed.")
 
       /** Submits pending tasks that are now allowed to executed. */
       @tailrec private[this] def submitValid(tried: Queue[Enqueue]): Unit =
-        if (pending.isEmpty) {
-          if (!tried.isEmpty) {
+        if (pending.isEmpty)
+          if (!tried.isEmpty)
             if (running == 0) errorAddingToIdle()
             pending.addAll(tried)
-          }
-        } else {
+        else
           val next = pending.remove()
           val newState = tags.add(tagState, next.node)
-          if (tags.valid(newState)) {
+          if (tags.valid(newState))
             tagState = newState
             submitValid(next.node, next.work)
-          } else tried.add(next)
+          else tried.add(next)
           submitValid(tried)
-        }
 
       def take(): R = jservice.take().get()
-    }
-  }
-}

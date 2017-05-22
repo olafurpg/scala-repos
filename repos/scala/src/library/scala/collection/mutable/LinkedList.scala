@@ -80,7 +80,7 @@ import generic._
 class LinkedList[A]()
     extends AbstractSeq[A] with LinearSeq[A]
     with GenericTraversableTemplate[A, LinkedList]
-    with LinkedListLike[A, LinkedList[A]] with Serializable {
+    with LinkedListLike[A, LinkedList[A]] with Serializable
   next = this
 
   /** Creates a new list. If the parameter next is null, the result is an empty list. Otherwise, the result is
@@ -98,27 +98,23 @@ class LinkedList[A]()
     *     n: scala.collection.mutable.LinkedList[Int] = LinkedList(2, 1)
     * }}}
     */
-  def this(elem: A, next: LinkedList[A]) {
+  def this(elem: A, next: LinkedList[A])
     this()
-    if (next != null) {
+    if (next != null)
       this.elem = elem
       this.next = next
-    }
-  }
 
   override def companion: GenericCompanion[LinkedList] = LinkedList
-}
 
 /** $factoryInfo
   *  @define Coll `LinkedList`
   *  @define coll linked list
   */
 @deprecated("Low-level linked lists are deprecated.", "2.11.0")
-object LinkedList extends SeqFactory[LinkedList] {
+object LinkedList extends SeqFactory[LinkedList]
   override def empty[A]: LinkedList[A] = new LinkedList[A]
   implicit def canBuildFrom[A]: CanBuildFrom[Coll, A, LinkedList[A]] =
     ReusableCBF.asInstanceOf[GenericCanBuildFrom[A]]
 
   def newBuilder[A]: Builder[A, LinkedList[A]] =
     (new MutableList) mapResult ((l: MutableList[A]) => l.toLinkedList)
-}

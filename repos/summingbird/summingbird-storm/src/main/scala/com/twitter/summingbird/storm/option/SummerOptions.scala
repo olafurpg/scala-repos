@@ -30,9 +30,8 @@ import com.twitter.util.Duration
 /**
   * See FlatMapOptions.scala for an explanation.
   */
-object SummerStormMetrics {
+object SummerStormMetrics
   def apply(metrics: => TraversableOnce[StormMetric[_]]) =
     new SummerStormMetrics(() => metrics)
   def unapply(metrics: SummerStormMetrics) = Some(metrics.metrics)
-}
 class SummerStormMetrics(val metrics: () => TraversableOnce[StormMetric[_]])

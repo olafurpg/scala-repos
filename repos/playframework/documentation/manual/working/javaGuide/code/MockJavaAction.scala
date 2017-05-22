@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2009-2016 Lightbend Inc. <https://www.lightbend.com>
  */
-package javaguide.testhelpers {
+package javaguide.testhelpers
 
   import java.util.concurrent.{CompletionStage, CompletableFuture}
 
@@ -14,24 +14,22 @@ package javaguide.testhelpers {
   import java.lang.reflect.Method
 
   abstract class MockJavaAction
-      extends Controller with Action[Http.RequestBody] { self =>
+      extends Controller with Action[Http.RequestBody]  self =>
 
     private lazy val components = new DefaultJavaHandlerComponents(
         play.api.Play.current.injector,
         new DefaultActionCreator
     )
 
-    private lazy val action = new JavaAction(components) {
+    private lazy val action = new JavaAction(components)
       val annotations = new JavaActionAnnotations(controller, method)
 
-      def parser = {
+      def parser =
         play.HandlerInvokerFactoryAccessor.javaBodyParserToScala(
             components.getBodyParser(annotations.parser)
         )
-      }
 
       def invocation = self.invocation
-    }
 
     def parser = action.parser
 
@@ -40,51 +38,44 @@ package javaguide.testhelpers {
     private val controller = this.getClass
     private val method = MockJavaActionJavaMocker.findActionMethod(this)
 
-    def invocation = {
-      method.invoke(this) match {
+    def invocation =
+      method.invoke(this) match
         case r: Result => CompletableFuture.completedFuture(r)
         case f: CompletionStage[_] => f.asInstanceOf[CompletionStage[Result]]
-      }
-    }
-  }
 
-  object MockJavaActionHelper {
+  object MockJavaActionHelper
 
     import Helpers.defaultAwaitTimeout
 
     def call(action: Action[Http.RequestBody],
              requestBuilder: play.mvc.Http.RequestBuilder)(
-        implicit mat: Materializer): Result = {
+        implicit mat: Materializer): Result =
       Helpers
         .await(
-            requestBuilder.body() match {
+            requestBuilder.body() match
           case null =>
             action.apply(requestBuilder.build()._underlyingRequest)
           case other =>
             Helpers.call(action,
                          requestBuilder.build()._underlyingRequest,
                          other.asBytes())
-        })
+        )
         .asJava
-    }
 
     def callWithStringBody(
         action: Action[Http.RequestBody],
         requestBuilder: play.mvc.Http.RequestBuilder,
-        body: String)(implicit mat: Materializer): Result = {
+        body: String)(implicit mat: Materializer): Result =
       Helpers
         .await(Helpers.call(
                 action, requestBuilder.build()._underlyingRequest, body))
         .asJava
-    }
 
-    def setContext(request: play.mvc.Http.RequestBuilder): Unit = {
+    def setContext(request: play.mvc.Http.RequestBuilder): Unit =
       Http.Context.current
         .set(JavaHelpers.createJavaContext(request.build()._underlyingRequest))
-    }
 
     def removeContext: Unit = Http.Context.current.remove()
-  }
 
   /**
     * Java should be mocked.
@@ -96,8 +87,8 @@ package javaguide.testhelpers {
     * They get a compile error from javac, and it seems to be because javac is trying ot import a synthetic method
     * that it shouldn't.  Hence, this object mocks java.
     */
-  object MockJavaActionJavaMocker {
-    def findActionMethod(obj: AnyRef): Method = {
+  object MockJavaActionJavaMocker
+    def findActionMethod(obj: AnyRef): Method =
       val maybeMethod = obj.getClass.getDeclaredMethods.find(!_.isSynthetic)
       val theMethod = maybeMethod.getOrElse(
           throw new RuntimeException(
@@ -105,17 +96,12 @@ package javaguide.testhelpers {
       )
       theMethod.setAccessible(true)
       theMethod
-    }
-  }
-}
 
 /**
   * javaBodyParserToScala is private to play
   */
-package play {
+package play
 
-  object HandlerInvokerFactoryAccessor {
+  object HandlerInvokerFactoryAccessor
     val javaBodyParserToScala =
       play.core.routing.HandlerInvokerFactory.javaBodyParserToScala _
-  }
-}

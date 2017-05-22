@@ -1,7 +1,7 @@
 import scala.tools.partest.ReplTest
 
 // t4216
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
       |import scala.reflect.ClassTag
@@ -16,4 +16,3 @@ object Test extends ReplTest {
       |f(new V(0))
       |o(new V(0))
       |""".stripMargin.trim
-}

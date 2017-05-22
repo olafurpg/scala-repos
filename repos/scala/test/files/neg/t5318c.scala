@@ -1,10 +1,9 @@
-class CompilerHang {
+class CompilerHang
   trait TC[M[_]]
   trait S[A]
 
-  class C[M[_]] {
+  class C[M[_]]
     type TCM = TC[M]
-  }
 
   // A nefarious implicit, to motivate the removal of `&& sym.owner.isTerm` from
   // `isFreeTypeParamNoSkolem`.
@@ -12,4 +11,3 @@ class CompilerHang {
     null
   def breakage[F[_]: TC] = 0
   breakage // type checker doesn't terminate, should report inference failure
-}

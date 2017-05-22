@@ -31,7 +31,7 @@ import javafx.{event => jfxe}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object EventType {
+object EventType
   implicit def sfxEventType2jfx[T <: jfxe.Event](
       et: EventType[T]): jfxe.EventType[T] =
     if (et != null) et.delegate else null
@@ -44,10 +44,9 @@ object EventType {
   @deprecated(
       "Use Root; ROOT will be removed in a future release", "8.0.60-R10")
   val ROOT = Root
-}
 
 class EventType[T <: jfxe.Event](override val delegate: jfxe.EventType[T])
-    extends SFXDelegate[jfxe.EventType[T]] {
+    extends SFXDelegate[jfxe.EventType[T]]
 
   /**
     * Constructs a new `EventType` with the specified super type and the name set to null. 
@@ -79,4 +78,3 @@ class EventType[T <: jfxe.Event](override val delegate: jfxe.EventType[T])
     * Gets the super type of this event type.
     */
   def superType = delegate.getSuperType
-}

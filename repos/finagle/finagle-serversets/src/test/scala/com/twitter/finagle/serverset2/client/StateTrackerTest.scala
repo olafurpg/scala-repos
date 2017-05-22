@@ -8,11 +8,11 @@ import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class StateTrackerTest extends FlatSpec {
+class StateTrackerTest extends FlatSpec
   val statsReceiver = new InMemoryStatsReceiver
 
-  "StateTracker" should "correctly count state durations" in {
-    Time.withCurrentTimeFrozen { tc =>
+  "StateTracker" should "correctly count state durations" in
+    Time.withCurrentTimeFrozen  tc =>
       val timer = new MockTimer
       val stateTracker = new StateTracker(statsReceiver, 1.second, timer)
       stateTracker.transition(SessionState.SyncConnected)
@@ -36,6 +36,3 @@ class StateTrackerTest extends FlatSpec {
       timer.tick() // StateTracker.timerTask should fire, increment
       assert(statsReceiver.counter(
               s"${SessionState.SyncConnected.name}_duration_ms")() == 7250)
-    }
-  }
-}

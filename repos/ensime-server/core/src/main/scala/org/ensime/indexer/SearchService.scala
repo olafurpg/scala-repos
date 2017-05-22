@@ -30,7 +30,7 @@ class SearchService(
     implicit actorSystem: ActorSystem,
     vfs: EnsimeVFS
 )
-    extends ClassfileIndexer with FileChangeListener with SLF4JLogging {
+    extends ClassfileIndexer with FileChangeListener with SLF4JLogging
 
   private val QUERY_TIMEOUT = 30 seconds
 
@@ -55,10 +55,9 @@ class SearchService(
   implicit val workerEC =
     actorSystem.dispatchers.lookup("akka.search-service-dispatcher")
 
-  private def scan(f: FileObject) = f.findFiles(ClassfileSelector) match {
+  private def scan(f: FileObject) = f.findFiles(ClassfileSelector) match
     case null => Nil
     case res => res.toList
-  }
 
   /**
     * Indexes everything, making best endeavours to avoid scanning what
@@ -67,131 +66,114 @@ class SearchService(
     *
     * @return the number of rows (removed, indexed) from the database.
     */
-  def refresh(): Future[(Int, Int)] = {
+  def refresh(): Future[(Int, Int)] =
     // it is much faster during startup to obtain the full list of
     // known files from the DB then and check against the disk, than
     // check each file against DatabaseService.outOfDate
-    def findStaleFileChecks(checks: Seq[FileCheck]): List[FileCheck] = {
+    def findStaleFileChecks(checks: Seq[FileCheck]): List[FileCheck] =
       log.info("findStaleFileChecks")
-      for {
+      for
         check <- checks
         name = check.file.getName.getURI if !check.file.exists || check.changed
-      } yield check
-    }.toList
+      yield check
+    .toList
 
     // delete the stale data before adding anything new
     // returns number of rows deleted
-    def deleteReferences(checks: List[FileCheck]): Future[Int] = {
+    def deleteReferences(checks: List[FileCheck]): Future[Int] =
       log.info(s"removing ${checks.size} stale files from the index")
       deleteInBatches(checks.map(_.file))
-    }
 
     // a snapshot of everything that we want to index
-    def findBases(): Set[FileObject] = {
+    def findBases(): Set[FileObject] =
       log.info("findBases")
-      config.modules.flatMap {
+      config.modules.flatMap
         case (name, m) =>
-          m.targetDirs.flatMap {
+          m.targetDirs.flatMap
             case d if !d.exists() => Nil
             case d if d.isJar => List(vfs.vfile(d))
             case d => scan(vfs.vfile(d))
-          } ::: m.testTargetDirs.flatMap {
+          ::: m.testTargetDirs.flatMap
             case d if !d.exists() => Nil
             case d if d.isJar => List(vfs.vfile(d))
             case d => scan(vfs.vfile(d))
-          } ::: m.compileJars.map(vfs.vfile) ::: m.testJars.map(vfs.vfile)
-      }
-    }.toSet ++ config.javaLibs.map(vfs.vfile)
+          ::: m.compileJars.map(vfs.vfile) ::: m.testJars.map(vfs.vfile)
+    .toSet ++ config.javaLibs.map(vfs.vfile)
 
     def indexBase(base: FileObject,
-                  fileCheck: Option[FileCheck]): Future[Option[Int]] = {
+                  fileCheck: Option[FileCheck]): Future[Option[Int]] =
       val outOfDate = fileCheck.map(_.changed).getOrElse(true)
       if (!outOfDate) Future.successful(None)
-      else {
+      else
         val check = FileCheck(base)
         extractSymbolsFromClassOrJar(base).flatMap(
             persist(check, _, commitIndex = false))
-      }
-    }
 
     // index all the given bases and return number of rows written
     def indexBases(
-        bases: Set[FileObject], checks: Seq[FileCheck]): Future[Int] = {
+        bases: Set[FileObject], checks: Seq[FileCheck]): Future[Int] =
       log.info("Indexing bases...")
       val checksLookup: Map[String, FileCheck] =
         checks.map(check => (check.filename -> check)).toMap
-      val basesWithChecks: Set[(FileObject, Option[FileCheck])] = bases.map {
+      val basesWithChecks: Set[(FileObject, Option[FileCheck])] = bases.map
         base =>
           (base, checksLookup.get(base.getName().getURI()))
-      }
       Future
-        .sequence(basesWithChecks.map {
+        .sequence(basesWithChecks.map
           case (file, check) => indexBase(file, check)
-        })
+        )
         .map(_.flatten.sum)
-    }
 
-    def commitIndex(): Future[Unit] = Future {
-      blocking {
+    def commitIndex(): Future[Unit] = Future
+      blocking
         log.debug("committing index to disk...")
         index.commit()
         log.debug("...done committing index")
-      }
-    }
 
     // chain together all the future tasks
-    for {
+    for
       checks <- db.knownFiles()
       stale = findStaleFileChecks(checks)
       deletes <- deleteReferences(stale)
       bases = findBases()
       added <- indexBases(bases, checks)
       _ <- commitIndex()
-    } yield (deletes, added)
-  }
+    yield (deletes, added)
 
   def refreshResolver(): Unit = resolver.update()
 
   def persist(check: FileCheck,
               symbols: List[FqnSymbol],
-              commitIndex: Boolean): Future[Option[Int]] = {
-    val iwork = Future {
+              commitIndex: Boolean): Future[Option[Int]] =
+    val iwork = Future
       blocking { index.persist(check, symbols, commitIndex) }
-    }
     val dwork = db.persist(check, symbols)
-    iwork.flatMap { _ =>
+    iwork.flatMap  _ =>
       dwork
-    }
-  }
 
   def extractSymbolsFromClassOrJar(file: FileObject): Future[List[FqnSymbol]] =
-    file match {
+    file match
       case classfile if classfile.getName.getExtension == "class" =>
         // too noisy to log
         val check = FileCheck(classfile)
-        Future {
-          blocking {
+        Future
+          blocking
             try extractSymbols(classfile, classfile) finally classfile.close()
-          }
-        }
       case jar =>
         log.debug(s"indexing $jar")
         val check = FileCheck(jar)
-        Future {
-          blocking {
+        Future
+          blocking
             val vJar = vfs.vjar(jar)
             try scan(vJar) flatMap (extractSymbols(jar, _)) finally vfs.nuke(
                 vJar)
-          }
-        }
-    }
 
   private val blacklist = Set("sun/", "sunw/", "com/sun/")
   private val ignore = Set("$$", "$worker$")
   import org.ensime.util.RichFileObject._
   private def extractSymbols(
-      container: FileObject, f: FileObject): List[FqnSymbol] = {
-    f.pathWithinArchive match {
+      container: FileObject, f: FileObject): List[FqnSymbol] =
+    f.pathWithinArchive match
       case Some(relative) if blacklist.exists(relative.startsWith) => Nil
       case _ =>
         val name = container.getName.getURI
@@ -215,7 +197,7 @@ class SearchService(
                     sourceUri,
                     clazz.source.line) :: clazz.methods.toList
             .filter(_.access == Public)
-            .map { method =>
+            .map  method =>
               val descriptor = method.descriptor.descriptorString
               FqnSymbol(None,
                         name,
@@ -225,7 +207,7 @@ class SearchService(
                         None,
                         sourceUri,
                         method.line)
-            } ::: clazz.fields.toList.filter(_.access == Public).map { field =>
+            ::: clazz.fields.toList.filter(_.access == Public).map  field =>
             val internal = field.clazz.internalString
             FqnSymbol(None,
                       name,
@@ -235,9 +217,9 @@ class SearchService(
                       Some(internal),
                       sourceUri,
                       clazz.source.line)
-          } ::: depickler.getTypeAliases.toList
+          ::: depickler.getTypeAliases.toList
             .filter(_.access == Public)
-            .map { rawType =>
+            .map  rawType =>
               FqnSymbol(None,
                         name,
                         path,
@@ -246,22 +228,18 @@ class SearchService(
                         None,
                         sourceUri,
                         None)
-            }
-    }
-  }.filterNot(sym => ignore.exists(sym.fqn.contains))
+  .filterNot(sym => ignore.exists(sym.fqn.contains))
 
   // TODO: provide context (user's current module and main/test)
   /** free-form search for classes */
-  def searchClasses(query: String, max: Int): List[FqnSymbol] = {
+  def searchClasses(query: String, max: Int): List[FqnSymbol] =
     val fqns = index.searchClasses(query, max)
     Await.result(db.find(fqns), QUERY_TIMEOUT) take max
-  }
 
   /** free-form search for classes and methods */
-  def searchClassesMethods(terms: List[String], max: Int): List[FqnSymbol] = {
+  def searchClassesMethods(terms: List[String], max: Int): List[FqnSymbol] =
     val fqns = index.searchClassesMethods(terms, max)
     Await.result(db.find(fqns), QUERY_TIMEOUT) take max
-  }
 
   /** only for exact fqns */
   def findUnique(fqn: String): Option[FqnSymbol] =
@@ -283,33 +261,29 @@ class SearchService(
   def deleteInBatches(
       files: List[FileObject],
       batchSize: Int = 1000
-  ): Future[Int] = {
+  ): Future[Int] =
     val removing = files.grouped(batchSize).map(delete)
     Future.sequence(removing).map(_.sum)
-  }
 
   // returns number of rows removed
-  def delete(files: List[FileObject]): Future[Int] = {
+  def delete(files: List[FileObject]): Future[Int] =
     // this doesn't speed up Lucene deletes, but it means that we
     // don't wait for Lucene before starting the H2 deletions.
     val iwork = Future { blocking { index.remove(files) } }
     val dwork = db.removeFiles(files)
     iwork.flatMap(_ => dwork)
-  }
 
   def fileChanged(f: FileObject): Unit = backlogActor ! IndexFile(f)
   def fileRemoved(f: FileObject): Unit = fileChanged(f)
   def fileAdded(f: FileObject): Unit = fileChanged(f)
 
-  def shutdown(): Future[Unit] = {
+  def shutdown(): Future[Unit] =
     db.shutdown()
-  }
-}
 
 case class IndexFile(f: FileObject)
 
 class IndexingQueueActor(searchService: SearchService)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
   import context.system
 
   import scala.concurrent.duration._
@@ -324,13 +298,12 @@ class IndexingQueueActor(searchService: SearchService)
   // debounce and give us a chance to batch (which is *much* faster)
   var worker: Cancellable = _
 
-  private def debounce(): Unit = {
+  private def debounce(): Unit =
     Option(worker).foreach(_.cancel())
     import context.dispatcher
     worker = system.scheduler.scheduleOnce(5 seconds, self, Process)
-  }
 
-  override def receive: Receive = {
+  override def receive: Receive =
     case IndexFile(f) =>
       todo += f.getName.getURI -> f
       debounce()
@@ -347,35 +320,29 @@ class IndexingQueueActor(searchService: SearchService)
       log.debug(s"Indexing ${batch.size} files")
 
       Future
-        .sequence(batch.map {
+        .sequence(batch.map
           case (_, f) =>
             if (!f.exists()) Future.successful(f -> Nil)
             else searchService.extractSymbolsFromClassOrJar(f).map(f ->)
-        })
-        .onComplete {
+        )
+        .onComplete
           case Failure(t) =>
             log.error(s"failed to index batch of ${batch.size} files", t)
           case Success(indexed) =>
             searchService
               .delete(indexed.map(_._1)(collection.breakOut))
-              .onComplete {
+              .onComplete
                 case Failure(t) =>
                   log.error(
                       s"failed to remove stale entries in ${batch.size} files",
                       t)
                 case Success(_) =>
-                  indexed.collect {
+                  indexed.collect
                     case (file, syms) if syms.isEmpty =>
                     case (file, syms) =>
                       searchService
                         .persist(FileCheck(file), syms, commitIndex = true)
-                        .onComplete {
+                        .onComplete
                           case Failure(t) =>
                             log.error(s"failed to persist entries in $file", t)
                           case Success(_) =>
-                        }
-                  }
-              }
-        }
-  }
-}

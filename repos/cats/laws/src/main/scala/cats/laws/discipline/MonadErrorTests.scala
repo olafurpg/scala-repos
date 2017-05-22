@@ -8,7 +8,7 @@ import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop.forAll
 
 trait MonadErrorTests[F[_], E]
-    extends ApplicativeErrorTests[F, E] with MonadTests[F] {
+    extends ApplicativeErrorTests[F, E] with MonadTests[F]
   def laws: MonadErrorLaws[F, E]
 
   def monadError[A : Arbitrary : Eq, B : Arbitrary : Eq, C : Arbitrary : Eq](
@@ -26,8 +26,8 @@ trait MonadErrorTests[F[_], E]
       EqFXorEA: Eq[F[E Xor A]],
       EqXorTFEA: Eq[XorT[F, E, A]],
       EqFABC: Eq[F[(A, B, C)]],
-      iso: Isomorphisms[F]): RuleSet = {
-    new RuleSet {
+      iso: Isomorphisms[F]): RuleSet =
+    new RuleSet
       def name: String = "monadError"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] =
@@ -35,13 +35,8 @@ trait MonadErrorTests[F[_], E]
       def props: Seq[(String, Prop)] = Seq(
           "monadError left zero" -> forAll(laws.monadErrorLeftZero[A, B] _)
       )
-    }
-  }
-}
 
-object MonadErrorTests {
+object MonadErrorTests
   def apply[F[_], E](implicit FE: MonadError[F, E]): MonadErrorTests[F, E] =
-    new MonadErrorTests[F, E] {
+    new MonadErrorTests[F, E]
       def laws: MonadErrorLaws[F, E] = MonadErrorLaws[F, E]
-    }
-}

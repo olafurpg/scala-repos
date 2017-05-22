@@ -29,16 +29,15 @@ case class Bookkeeping(val appId: Int, statusCode: StatusCode, event: Event)
 /* message to StatsActor */
 case class GetStats(val appId: Int)
 
-class StatsActor extends Actor {
+class StatsActor extends Actor
   implicit val system = context.system
   val log = Logging(system, this)
 
-  def getCurrent: DateTime = {
+  def getCurrent: DateTime =
     DateTime.now
       .withMinuteOfHour(0)
       .withSecondOfMinute(0)
       .withMillisOfSecond(0)
-  }
 
   var longLiveStats = new Stats(DateTime.now)
   var hourlyStats = new Stats(getCurrent)
@@ -46,21 +45,19 @@ class StatsActor extends Actor {
   var prevHourlyStats = new Stats(getCurrent.minusHours(1))
   prevHourlyStats.cutoff(hourlyStats.startTime)
 
-  def bookkeeping(appId: Int, statusCode: StatusCode, event: Event) {
+  def bookkeeping(appId: Int, statusCode: StatusCode, event: Event)
     val current = getCurrent
     // If the current hour is different from the stats start time, we create
     // another stats instance, and move the current to prev.
-    if (current != hourlyStats.startTime) {
+    if (current != hourlyStats.startTime)
       prevHourlyStats = hourlyStats
       prevHourlyStats.cutoff(current)
       hourlyStats = new Stats(current)
-    }
 
     hourlyStats.update(appId, statusCode, event)
     longLiveStats.update(appId, statusCode, event)
-  }
 
-  def receive: Actor.Receive = {
+  def receive: Actor.Receive =
     case Bookkeeping(appId, statusCode, event) =>
       bookkeeping(appId, statusCode, event)
     case GetStats(appId) =>
@@ -69,5 +66,3 @@ class StatsActor extends Actor {
                      "prevHour" -> prevHourlyStats.get(appId),
                      "longLive" -> longLiveStats.get(appId))
     case _ => log.error("Unknown message.")
-  }
-}

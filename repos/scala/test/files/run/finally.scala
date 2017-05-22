@@ -1,113 +1,96 @@
-object Test extends App {
+object Test extends App
 
   // test that finally is not covered by any exception handlers.
-  def throwCatchFinally {
-    try {
+  def throwCatchFinally
+    try
       bar
-    } catch {
+    catch
       case e: Throwable => println(e)
-    }
-  }
 
   // test that finally is not covered by any exception handlers.
-  def bar {
-    try {
+  def bar
+    try
       println("hi")
-    } catch {
+    catch
       case e: Throwable => println("SHOULD NOT GET HERE")
-    } finally {
+    finally
       println("In Finally")
       throw new RuntimeException("ouch")
-    }
-  }
 
   // return in catch (finally is executed)
-  def retCatch {
-    try {
+  def retCatch
+    try
       throw new Exception
-    } catch {
+    catch
       case e: Throwable =>
         println(e);
         return
-    } finally println("in finally")
-  }
+    finally println("in finally")
 
   // throw in catch (finally is executed, exception propagated)
-  def throwCatch {
-    try {
+  def throwCatch
+    try
       throw new Exception
-    } catch {
+    catch
       case e: Throwable =>
         println(e);
         throw e
-    } finally println("in finally")
-  }
+    finally println("in finally")
 
   // return inside body (finally is executed)
-  def retBody {
-    try {
+  def retBody
+    try
       return
-    } catch {
+    catch
       case e: Throwable =>
         println(e);
         throw e
-    } finally println("in finally")
-  }
+    finally println("in finally")
 
   // throw inside body (finally and catch are executed)
-  def throwBody {
-    try {
+  def throwBody
+    try
       throw new Exception
-    } catch {
+    catch
       case e: Throwable =>
         println(e);
-    } finally println("in finally")
-  }
+    finally println("in finally")
 
   // return inside finally (each finally is executed once)
-  def retFinally {
-    try {
-      try println("body") finally {
+  def retFinally
+    try
+      try println("body") finally
         println("in finally 1")
         return
-      }
-    } finally println("in finally 2")
-  }
+    finally println("in finally 2")
 
   // throw inside finally (finally is executed once, exception is propagated)
-  def throwFinally {
-    try {
-      try println("body") finally {
+  def throwFinally
+    try
+      try println("body") finally
         println("in finally")
         throw new Exception
-      }
-    } catch {
+    catch
       case e: Throwable => println(e)
-    }
-  }
 
   // nested finally blocks with return value
   def nestedFinallyBlocks: Int =
-    try {
-      try {
+    try
+      try
         return 10
-      } finally {
+      finally
         try { () } catch { case _: Throwable => () }
         println("in finally 1")
-      }
-    } finally {
+    finally
       println("in finally 2")
-    }
 
-  def test[A](m: => A, name: String) {
+  def test[A](m: => A, name: String)
     println("Running %s".format(name))
-    try {
+    try
       m
-    } catch {
+    catch
       case e: Throwable => println("COUGHT: " + e)
-    }
     println("-" * 40)
-  }
 
   test(throwCatchFinally, "throwCatchFinally")
   test(retCatch, "retCatch")
@@ -117,4 +100,3 @@ object Test extends App {
   test(retFinally, "retFinally")
   test(throwFinally, "throwFinally")
   test(nestedFinallyBlocks, "nestedFinallyBlocks")
-}

@@ -21,7 +21,7 @@ package com.precog
 package ragnarok
 package test
 
-object Platform868 extends PerfTestSuite {
+object Platform868 extends PerfTestSuite
   query("""
 billing     := //billing
 conversions := //conversions
@@ -33,4 +33,3 @@ solve 'customerId
   billing' ~ conversions'
   {customerId: 'customerId, lastDate: billing'.date}
     """)
-}

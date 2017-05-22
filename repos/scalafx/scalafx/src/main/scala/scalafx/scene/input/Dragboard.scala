@@ -39,10 +39,9 @@ import scalafx.scene.image.ImageIncludes.jfxImage2sfx
 /**
   * Object companion for [[scalafx.scene.input.Dragboard]].
   */
-object Dragboard {
+object Dragboard
   implicit def sfxDragboard2jfx(d: Dragboard): jfxsi.Dragboard =
     if (d != null) d.delegate else null
-}
 
 /**
   * Wraps a $JFX $URL0 $FC]].
@@ -56,33 +55,28 @@ object Dragboard {
   * @define ORIGINALDOC Original Documentation]].
   */
 class Dragboard(override val delegate: jfxsi.Dragboard)
-    extends Clipboard(delegate) with SFXDelegate[jfxsi.Dragboard] {
+    extends Clipboard(delegate) with SFXDelegate[jfxsi.Dragboard]
 
   /** The image used as a drag view. */
   def dragView: Image = delegate.getDragView
-  def dragView_=(image: Image): Unit = {
+  def dragView_=(image: Image): Unit =
     delegate.setDragView(image)
-  }
 
   /**
     * Sets the visual representation of data being transfered in a drag and drop gesture.
     */
-  def dragView_=(image: Image, offsetX: Double, offsetY: Double): Unit = {
+  def dragView_=(image: Image, offsetX: Double, offsetY: Double): Unit =
     delegate.setDragView(image)
-  }
 
   /** The x position of the cursor of the drag view image. */
   def dragViewOffsetX: Double = delegate.getDragViewOffsetX
-  def dragViewOffsetX_=(offsetX: Double): Unit = {
+  def dragViewOffsetX_=(offsetX: Double): Unit =
     delegate.setDragViewOffsetX(offsetX)
-  }
 
   /** The y position of the cursor of the drag view image. */
   def dragViewOffsetY: Double = delegate.getDragViewOffsetY
-  def dragViewOffsetY_=(offsetY: Double): Unit = {
+  def dragViewOffsetY_=(offsetY: Double): Unit =
     delegate.setDragViewOffsetY(offsetY)
-  }
 
   /** Transport modes supported by source of this drag operation. */
   def transferModes: Set[jfxsi.TransferMode] = delegate.getTransferModes
-}

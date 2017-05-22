@@ -9,7 +9,7 @@ package internal
 import scala.reflect.internal.util.FreshNameCreator
 import scala.util.matching.Regex
 
-trait FreshNames { self: Names with StdNames =>
+trait FreshNames  self: Names with StdNames =>
   // SI-6879 Keeps track of counters that are supposed to be globally unique
   //         as opposed to traditional freshers that are unique to compilation units.
   val globalFreshNameCreator = new FreshNameCreator
@@ -30,18 +30,14 @@ trait FreshNames { self: Names with StdNames =>
   // prefix that was used as a parameter to newName by stripping
   // global creator prefix and unique numerical suffix.
   // The creator prefix and numerical suffix may both be empty.
-  class FreshNameExtractor(creatorPrefix: String = "") {
+  class FreshNameExtractor(creatorPrefix: String = "")
 
     // name should start with creatorPrefix and end with number
-    val freshlyNamed = {
+    val freshlyNamed =
       val pre = if (!creatorPrefix.isEmpty) Regex quote creatorPrefix else ""
       s"""$pre(.*?)\\d*""".r
-    }
 
     def unapply(name: Name): Option[String] =
-      name.toString match {
+      name.toString match
         case freshlyNamed(prefix) => Some(prefix)
         case _ => None
-      }
-  }
-}

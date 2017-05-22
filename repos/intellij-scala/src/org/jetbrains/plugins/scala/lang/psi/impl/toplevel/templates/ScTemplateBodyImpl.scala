@@ -27,21 +27,19 @@ import org.jetbrains.plugins.scala.lang.psi.stubs.ScTemplateBodyStub
 class ScTemplateBodyImpl private (
     stub: StubElement[ScTemplateBody], nodeType: IElementType, node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node) with ScTemplateBody
-    with ScImportsHolder {
+    with ScImportsHolder
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScTemplateBodyStub) = {
+  def this(stub: ScTemplateBodyStub) =
     this(stub, ScalaElementTypes.TEMPLATE_BODY, null)
-  }
 
   override def toString: String = "ScTemplateBody"
 
-  def aliases: Array[ScTypeAlias] = {
+  def aliases: Array[ScTypeAlias] =
     val stub = getStub
-    if (stub != null) {
+    if (stub != null)
       stub.getChildrenByType(
           TokenSets.ALIASES_SET, JavaArrayFactoryUtil.ScTypeAliasFactory)
-    } else findChildrenByClass(classOf[ScTypeAlias])
-  }
+    else findChildrenByClass(classOf[ScTypeAlias])
 
   def functions: Array[ScFunction] =
     getStubOrPsiChildren(
@@ -61,44 +59,35 @@ class ScTemplateBodyImpl private (
   def holders: Array[ScDeclaredElementsHolder] =
     getStubOrPsiChildren(
         TokenSets.DECLARED_ELEMENTS_HOLDER,
-        JavaArrayFactoryUtil.ScDeclaredElementsHolderFactory).filterNot {
+        JavaArrayFactoryUtil.ScDeclaredElementsHolderFactory).filterNot
       case s: ScMember => s.isLocal
       case _ => false
-    }
 
   def exprs: Array[ScExpression] =
     getStubOrPsiChildren(TokenSets.EXPRESSION_BIT_SET,
-                         JavaArrayFactoryUtil.ScExpressionFactory).filterNot {
+                         JavaArrayFactoryUtil.ScExpressionFactory).filterNot
       case s: ScMember => s.isLocal
       case _ => false
-    }
 
-  def selfTypeElement: Option[ScSelfTypeElement] = {
+  def selfTypeElement: Option[ScSelfTypeElement] =
     val stub = getStub
-    if (stub != null) {
-      stub.findChildStubByType(ScalaElementTypes.SELF_TYPE) match {
+    if (stub != null)
+      stub.findChildStubByType(ScalaElementTypes.SELF_TYPE) match
         case null => return None
         case s => return Some(s.getPsi)
-      }
-    }
     Option(findChildByType[ScSelfTypeElement](ScalaElementTypes.SELF_TYPE))
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     val td = PsiTreeUtil.getContextOfType(this, classOf[ScTemplateDefinition])
-    if (td != null) {
+    if (td != null)
       if (!td.processDeclarationsForTemplateBody(
               processor, state, td.extendsBlock, place)) return false
-    }
     super.processDeclarations(processor, state, lastParent, place)
-  }
 
   override def controlFlowScope: Option[ScalaPsiElement] = Some(this)
 
-  override protected def childBeforeFirstImport: Option[PsiElement] = {
+  override protected def childBeforeFirstImport: Option[PsiElement] =
     selfTypeElement.orElse(super.childBeforeFirstImport)
-  }
-}

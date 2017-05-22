@@ -9,10 +9,10 @@ import org.jetbrains.plugins.hocon.psi.HKey
 /**
   * @author ghik
   */
-class HoconQualifiedNameProvider extends QualifiedNameProvider {
+class HoconQualifiedNameProvider extends QualifiedNameProvider
   def adjustElementToCopy(element: PsiElement): PsiElement = element
 
-  def getQualifiedName(element: PsiElement): String = element match {
+  def getQualifiedName(element: PsiElement): String = element match
     case key: HKey =>
       key.forParent(
           path =>
@@ -23,7 +23,6 @@ class HoconQualifiedNameProvider extends QualifiedNameProvider {
               .orNull
         )
     case _ => null
-  }
 
   def insertQualifiedName(fqn: String,
                           element: PsiElement,
@@ -32,4 +31,3 @@ class HoconQualifiedNameProvider extends QualifiedNameProvider {
     EditorModificationUtil.insertStringAtCaret(editor, fqn)
 
   def qualifiedNameToElement(fqn: String, project: Project): PsiElement = null
-}

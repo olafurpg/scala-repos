@@ -20,16 +20,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.imports.{ScImportExpr, 
   * User: Dmitry Naydanov
   * Date: 3/2/13
   */
-trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
+trait ScalaUnusedImportPassBase  self: TextEditorHighlightingPass =>
   def file: PsiFile
   def document: Document
 
   def collectAnnotations(
       unusedImports: Array[ImportUsed],
       annotationHolder: AnnotationHolder): Array[Annotation] =
-    unusedImports flatMap { imp: ImportUsed =>
-      {
-        val psiOption: Option[PsiElement] = imp match {
+    unusedImports flatMap  imp: ImportUsed =>
+        val psiOption: Option[PsiElement] = imp match
           case ImportExprUsed(expr)
               if !PsiTreeUtil.hasErrorElements(expr) &&
               !isLanguageFeatureImport(imp) =>
@@ -48,11 +47,10 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
               !isLanguageFeatureImport(imp) =>
             Some(e.getParent)
           case _ => None
-        }
 
         val qName = imp.qualName
 
-        psiOption match {
+        psiOption match
           case None => Seq[Annotation]()
           case Some(sel: ScImportSelector) if sel.importedName == "_" =>
             Seq[Annotation]()
@@ -70,11 +68,8 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
             qName.foreach(name =>
                   annotation.registerFix(new MarkImportAsAlwaysUsed(name)))
             Seq[Annotation](annotation)
-        }
-      }
-    }
 
-  protected def highlightAll(highlights: util.Collection[HighlightInfo]) {
+  protected def highlightAll(highlights: util.Collection[HighlightInfo])
     UpdateHighlightersUtil.setHighlightersToEditor(file.getProject,
                                                    document,
                                                    0,
@@ -82,7 +77,5 @@ trait ScalaUnusedImportPassBase { self: TextEditorHighlightingPass =>
                                                    highlights,
                                                    getColorsScheme,
                                                    getId)
-  }
 
   protected def getFixes: List[IntentionAction]
-}

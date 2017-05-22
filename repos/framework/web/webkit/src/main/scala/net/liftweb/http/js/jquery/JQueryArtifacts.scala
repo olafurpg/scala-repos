@@ -30,44 +30,39 @@ import JqJsCmds._
 import util.Helpers._
 import util.Props
 
-trait JQueryArtifacts extends JSArtifacts {
+trait JQueryArtifacts extends JSArtifacts
 
   /**
     * Toggles between current JS object and the object denominated by id
     */
-  def toggle(id: String) = JqId(id) ~> new JsMember {
+  def toggle(id: String) = JqId(id) ~> new JsMember
     def toJsCmd = "toggle()"
-  }
 
   /**
     * Hides the element denominated by id
     */
-  def hide(id: String) = JqId(id) ~> new JsMember {
+  def hide(id: String) = JqId(id) ~> new JsMember
     def toJsCmd = "hide()"
-  }
 
   /**
     * Shows the element denominated by this id
     */
-  def show(id: String) = JqId(id) ~> new JsMember {
+  def show(id: String) = JqId(id) ~> new JsMember
     def toJsCmd = "show()"
-  }
 
   /**
     * Shows the element denominated by id and puts the focus on it
     */
-  def showAndFocus(id: String) = JqId(id) ~> new JsMember {
+  def showAndFocus(id: String) = JqId(id) ~> new JsMember
     def toJsCmd =
       "show().each(function(i) {var t = this; setTimeout(function() { t.focus(); }, 200);})"
-  }
 
   /**
     * Serializes a form denominated by the id. It returns a query string
     * containing the fields that are to be submitted
     */
-  def serialize(id: String) = JqId(id) ~> new JsMember {
+  def serialize(id: String) = JqId(id) ~> new JsMember
     def toJsCmd = "serialize()"
-  }
 
   /**
     * Replaces the content of the node with the provided id with the markup given by content
@@ -97,16 +92,14 @@ trait JQueryArtifacts extends JSArtifacts {
   /**
     * Transforms a JSON object in to its string representation
     */
-  def jsonStringify(in: JsExp): JsExp = new JsExp {
+  def jsonStringify(in: JsExp): JsExp = new JsExp
     def toJsCmd = "JSON.stringify(" + in.toJsCmd + ")"
-  }
 
   /**
     * Converts a form denominated by formId into a JSON object
     */
-  def formToJSON(formId: String): JsExp = new JsExp() {
+  def formToJSON(formId: String): JsExp = new JsExp()
     def toJsCmd = "lift$.formToJSON('" + formId + "')";
-  }
 
   private def toJson(
       info: AjaxInfo, server: String, path: String => JsExp): String =
@@ -117,6 +110,5 @@ trait JQueryArtifacts extends JSArtifacts {
       .map("success : " + _)
       .toList ++ info.failFunc.map("error : " + _).toList mkString
     ("{ ", ", ", " }")
-}
 
 case object JQueryArtifacts extends JQueryArtifacts

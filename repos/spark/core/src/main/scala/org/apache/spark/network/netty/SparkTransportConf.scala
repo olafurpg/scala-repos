@@ -25,7 +25,7 @@ import org.apache.spark.network.util.{ConfigProvider, TransportConf}
   * Driver, or a standalone shuffle service) into a TransportConf with details on our environment
   * like the number of cores that are allocated to this JVM.
   */
-object SparkTransportConf {
+object SparkTransportConf
 
   /**
     * Specifies an upper bound on the number of Netty threads that Spark requires by default.
@@ -49,7 +49,7 @@ object SparkTransportConf {
     */
   def fromSparkConf(_conf: SparkConf,
                     module: String,
-                    numUsableCores: Int = 0): TransportConf = {
+                    numUsableCores: Int = 0): TransportConf =
     val conf = _conf.clone
 
     // Specify thread configuration based on our JVM's allocation of cores (rather than necessarily
@@ -59,19 +59,16 @@ object SparkTransportConf {
     conf.setIfMissing(s"spark.$module.io.serverThreads", numThreads.toString)
     conf.setIfMissing(s"spark.$module.io.clientThreads", numThreads.toString)
 
-    new TransportConf(module, new ConfigProvider {
+    new TransportConf(module, new ConfigProvider
       override def get(name: String): String = conf.get(name)
-    })
-  }
+    )
 
   /**
     * Returns the default number of threads for both the Netty client and server thread pools.
     * If numUsableCores is 0, we will use Runtime get an approximate number of available cores.
     */
-  private def defaultNumThreads(numUsableCores: Int): Int = {
+  private def defaultNumThreads(numUsableCores: Int): Int =
     val availableCores =
       if (numUsableCores > 0) numUsableCores
       else Runtime.getRuntime.availableProcessors()
     math.min(availableCores, MAX_DEFAULT_NETTY_THREADS)
-  }
-}

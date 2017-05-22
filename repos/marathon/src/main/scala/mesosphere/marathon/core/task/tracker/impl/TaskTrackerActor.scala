@@ -12,12 +12,11 @@ import mesosphere.marathon.metrics.Metrics.AtomicIntGauge
 import mesosphere.marathon.state.{PathId, Timestamp}
 import org.slf4j.LoggerFactory
 
-object TaskTrackerActor {
+object TaskTrackerActor
   def props(metrics: ActorMetrics,
             taskLoader: TaskLoader,
-            taskUpdaterProps: ActorRef => Props): Props = {
+            taskUpdaterProps: ActorRef => Props): Props =
     Props(new TaskTrackerActor(metrics, taskLoader, taskUpdaterProps))
-  }
 
   /** Query the current [[TaskTracker.AppTasks]] from the [[TaskTrackerActor]]. */
   private[impl] case object List
@@ -31,9 +30,8 @@ object TaskTrackerActor {
       deadline: Timestamp, taskId: Task.Id, action: TaskOpProcessor.Action)
 
   /** Describes where and what to send after an update event has beend processed by the [[TaskTrackerActor]]. */
-  private[impl] case class Ack(initiator: ActorRef, msg: Any = ()) {
+  private[impl] case class Ack(initiator: ActorRef, msg: Any = ())
     def sendAck(): Unit = initiator ! msg
-  }
 
   /** Inform the [[TaskTrackerActor]] of an updated task (after persistence). */
   private[impl] case class TaskUpdated(task: Task, ack: Ack)
@@ -41,18 +39,15 @@ object TaskTrackerActor {
   /** Inform the [[TaskTrackerActor]] of a removed task (after persistence). */
   private[impl] case class TaskRemoved(taskId: Task.Id, ack: Ack)
 
-  private[tracker] class ActorMetrics(metrics: Metrics) {
+  private[tracker] class ActorMetrics(metrics: Metrics)
     val stagedCount = metrics.gauge(
         "service.mesosphere.marathon.task.staged.count", new AtomicIntGauge)
     val runningCount = metrics.gauge(
         "service.mesosphere.marathon.task.running.count", new AtomicIntGauge)
 
-    def resetMetrics(): Unit = {
+    def resetMetrics(): Unit =
       stagedCount.setValue(0)
       runningCount.setValue(0)
-    }
-  }
-}
 
 /**
   * Holds the current in-memory version of all task state. It gets informed of task state changes
@@ -63,17 +58,16 @@ object TaskTrackerActor {
 private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
                                taskLoader: TaskLoader,
                                taskUpdaterProps: ActorRef => Props)
-    extends Actor with Stash {
+    extends Actor with Stash
 
   private[this] val log = LoggerFactory.getLogger(getClass)
   private[this] val updaterRef =
     context.actorOf(taskUpdaterProps(self), "updater")
 
-  override val supervisorStrategy = OneForOneStrategy() {
+  override val supervisorStrategy = OneForOneStrategy()
     case _: Exception => Escalate
-  }
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     super.preStart()
 
     log.info(s"${getClass.getSimpleName} is starting. Task loading initiated.")
@@ -82,18 +76,16 @@ private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
     import akka.pattern.pipe
     import context.dispatcher
     taskLoader.loadTasks().pipeTo(self)
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     metrics.resetMetrics()
 
     super.postStop()
-  }
 
   override def receive: Receive = initializing
 
   private[this] def initializing: Receive =
-    LoggingReceive.withLabel("initializing") {
+    LoggingReceive.withLabel("initializing")
       case appTasks: TaskTracker.TasksByApp =>
         log.info("Task loading complete.")
 
@@ -108,34 +100,30 @@ private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
 
       case stashMe: AnyRef =>
         stash()
-    }
 
   private[this] def withTasks(
-      appTasks: TaskTracker.TasksByApp, counts: TaskCounts): Receive = {
+      appTasks: TaskTracker.TasksByApp, counts: TaskCounts): Receive =
 
     def becomeWithUpdatedApp(appId: PathId)(
-        taskId: Task.Id, newTask: Option[Task]): Unit = {
-      val updatedAppTasks = newTask match {
+        taskId: Task.Id, newTask: Option[Task]): Unit =
+      val updatedAppTasks = newTask match
         case None => appTasks.updateApp(appId)(_.withoutTask(taskId))
         case Some(task) => appTasks.updateApp(appId)(_.withTask(task))
-      }
 
-      val updatedCounts = {
+      val updatedCounts =
         val oldTask = appTasks.task(taskId)
         // we do ignore health counts
         val oldTaskCount = TaskCounts(oldTask, healthStatuses = Map.empty)
         val newTaskCount = TaskCounts(newTask, healthStatuses = Map.empty)
         counts + newTaskCount - oldTaskCount
-      }
 
       context.become(withTasks(updatedAppTasks, updatedCounts))
-    }
 
     // this is run on any state change
     metrics.stagedCount.setValue(counts.tasksStaged)
     metrics.runningCount.setValue(counts.tasksRunning)
 
-    LoggingReceive.withLabel("withTasks") {
+    LoggingReceive.withLabel("withTasks")
       case TaskTrackerActor.List =>
         sender() ! appTasks
 
@@ -150,6 +138,3 @@ private class TaskTrackerActor(metrics: TaskTrackerActor.ActorMetrics,
       case msg @ TaskTrackerActor.TaskRemoved(taskId, ack) =>
         becomeWithUpdatedApp(taskId.appId)(taskId, newTask = None)
         ack.sendAck()
-    }
-  }
-}

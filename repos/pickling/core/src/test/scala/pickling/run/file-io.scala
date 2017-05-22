@@ -11,8 +11,8 @@ import scala.pickling.io.TextFileOutput
 case class Person(name: String)
 case class PersonNums(name: String, randNums: Array[Int])
 
-class FileIOTest extends FunSuite {
-  test("simple") {
+class FileIOTest extends FunSuite
+  test("simple")
     val p = Person("James")
 
     val tmpFile = File.createTempFile("pickling", "fileoutput")
@@ -24,9 +24,8 @@ class FileIOTest extends FunSuite {
     val fileContents = Source.fromFile(tmpFile).getLines.mkString("\n")
 
     assert(fileContents == p.pickle.value)
-  }
 
-  test("simple-w-collection") {
+  test("simple-w-collection")
     val p = PersonNums("James", (1 to 200).toArray)
 
     val tmpFile = File.createTempFile("pickling", "fileoutput")
@@ -38,9 +37,8 @@ class FileIOTest extends FunSuite {
     val fileContents = Source.fromFile(tmpFile).getLines.mkString("\n")
 
     assert(fileContents == p.pickle.value)
-  }
 
-  test("simple-w-collection-using-builder-directly") {
+  test("simple-w-collection-using-builder-directly")
     val p = PersonNums("James", (1 to 200).toArray)
 
     val tmpFile = File.createTempFile("pickling", "fileoutput")
@@ -54,5 +52,3 @@ class FileIOTest extends FunSuite {
     val fileContents = Source.fromFile(tmpFile).getLines.mkString("\n")
 
     assert(fileContents == p.pickle.value)
-  }
-}

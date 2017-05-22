@@ -19,32 +19,27 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.ScalaRefactoringUtil
   */
 class AncestorSelector(val condition: Condition[PsiElement],
                        val selectorType: SelectorType = First)
-    extends PostfixTemplateExpressionSelectorBase(condition) {
+    extends PostfixTemplateExpressionSelectorBase(condition)
 
-  override protected def getFilters(offset: Int): Condition[PsiElement] = {
+  override protected def getFilters(offset: Int): Condition[PsiElement] =
     and(super.getFilters(offset), getPsiErrorFilter)
-  }
 
   override def getNonFilteredExpressions(
       context: PsiElement,
       document: Document,
-      offset: Int): util.List[PsiElement] = {
-    ScalaPsiUtil.getParentOfType(context, classOf[ScExpression]) match {
+      offset: Int): util.List[PsiElement] =
+    ScalaPsiUtil.getParentOfType(context, classOf[ScExpression]) match
       case element: ScExpression =>
         val result = ContainerUtil.newLinkedList[PsiElement](element)
         var current: PsiElement = element.getParent
         while (current != null && current.getTextRange != null &&
         current.getTextRange.getEndOffset <= offset &&
-        (selectorType match {
+        (selectorType match
               case All => true
               case Topmost => current.isInstanceOf[ScExpression]
               case First => false
-            })) {
+            ))
           result.add(current)
           current = current.getParent
-        }
         result
       case _ => ContainerUtil.emptyList()
-    }
-  }
-}

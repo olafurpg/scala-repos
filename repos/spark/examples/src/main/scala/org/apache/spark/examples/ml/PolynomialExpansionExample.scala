@@ -25,8 +25,8 @@ import org.apache.spark.mllib.linalg.Vectors
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object PolynomialExpansionExample {
-  def main(args: Array[String]): Unit = {
+object PolynomialExpansionExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("PolynomialExpansionExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -47,6 +47,4 @@ object PolynomialExpansionExample {
     polyDF.select("polyFeatures").take(3).foreach(println)
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

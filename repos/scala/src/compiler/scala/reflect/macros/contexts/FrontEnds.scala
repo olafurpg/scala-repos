@@ -3,7 +3,7 @@ package contexts
 
 import scala.reflect.macros.runtime.AbortMacroException
 
-trait FrontEnds { self: Context =>
+trait FrontEnds  self: Context =>
 
   def echo(pos: Position, msg: String): Unit = universe.reporter.echo(pos, msg)
 
@@ -22,4 +22,3 @@ trait FrontEnds { self: Context =>
 
   def abort(pos: Position, msg: String): Nothing =
     throw new AbortMacroException(pos, msg)
-}

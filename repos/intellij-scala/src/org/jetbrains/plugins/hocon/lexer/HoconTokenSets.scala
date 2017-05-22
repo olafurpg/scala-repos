@@ -4,7 +4,7 @@ import com.intellij.psi.tree.TokenSet
 
 import scala.language.implicitConversions
 
-object HoconTokenSets {
+object HoconTokenSets
 
   import org.jetbrains.plugins.hocon.CommonUtil._
   import org.jetbrains.plugins.hocon.lexer.HoconTokenType._
@@ -31,13 +31,12 @@ object HoconTokenSets {
   case class Matcher(tokenSet: TokenSet,
                      requireNoNewLine: Boolean,
                      matchNewLine: Boolean,
-                     matchEof: Boolean) {
+                     matchEof: Boolean)
     def noNewLine = copy(requireNoNewLine = true)
 
     def orNewLineOrEof = copy(matchNewLine = true, matchEof = true)
 
     def orEof = copy(matchEof = true)
-  }
 
   implicit def token2Matcher(token: HoconTokenType): Matcher =
     Matcher(TokenSet.create(token),
@@ -50,4 +49,3 @@ object HoconTokenSets {
             requireNoNewLine = false,
             matchNewLine = false,
             matchEof = false)
-}

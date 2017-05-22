@@ -16,10 +16,9 @@
  */
 package org.apache.spark.sql.catalyst.parser
 
-trait ParserConf {
+trait ParserConf
   def supportQuotedId: Boolean
   def supportSQL11ReservedKeywords: Boolean
-}
 
 case class SimpleParserConf(supportQuotedId: Boolean = true,
                             supportSQL11ReservedKeywords: Boolean = false)

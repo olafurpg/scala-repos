@@ -10,7 +10,7 @@ import gitbucket.core.util.Version
   * Trait for define plugin interface.
   * To provide plugin, put Plugin class which mixed in this trait into the package root.
   */
-trait Plugin {
+trait Plugin
 
   val pluginId: String
   val pluginName: String
@@ -97,32 +97,25 @@ trait Plugin {
     */
   def initialize(registry: PluginRegistry,
                  context: ServletContext,
-                 settings: SystemSettings): Unit = {
-    (images ++ images(registry, context, settings)).foreach {
+                 settings: SystemSettings): Unit =
+    (images ++ images(registry, context, settings)).foreach
       case (id, in) =>
         registry.addImage(id, in)
-    }
-    (controllers ++ controllers(registry, context, settings)).foreach {
+    (controllers ++ controllers(registry, context, settings)).foreach
       case (path, controller) =>
         registry.addController(path, controller)
-    }
-    (javaScripts ++ javaScripts(registry, context, settings)).foreach {
+    (javaScripts ++ javaScripts(registry, context, settings)).foreach
       case (path, script) =>
         registry.addJavaScript(path, script)
-    }
-    (renderers ++ renderers(registry, context, settings)).foreach {
+    (renderers ++ renderers(registry, context, settings)).foreach
       case (extension, renderer) =>
         registry.addRenderer(extension, renderer)
-    }
-    (repositoryRoutings ++ repositoryRoutings(registry, context, settings)).foreach {
+    (repositoryRoutings ++ repositoryRoutings(registry, context, settings)).foreach
       routing =>
         registry.addRepositoryRouting(routing)
-    }
-    (receiveHooks ++ receiveHooks(registry, context, settings)).foreach {
+    (receiveHooks ++ receiveHooks(registry, context, settings)).foreach
       receiveHook =>
         registry.addReceiveHook(receiveHook)
-    }
-  }
 
   /**
     * This method is invoked in shutdown of plugin system.
@@ -136,9 +129,7 @@ trait Plugin {
     * Helper method to get a resource from classpath.
     */
   protected def fromClassPath(path: String): Array[Byte] =
-    using(getClass.getClassLoader.getResourceAsStream(path)) { in =>
+    using(getClass.getClassLoader.getResourceAsStream(path))  in =>
       val bytes = new Array[Byte](in.available)
       in.read(bytes)
       bytes
-    }
-}

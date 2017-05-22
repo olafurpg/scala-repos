@@ -7,41 +7,37 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class ZkNodeDataCacheTest extends FunSuite {
+class ZkNodeDataCacheTest extends FunSuite
 
   def nilZkSession = () => ZkSession.nil
 
   class ZkTestCache(
       clusterPath: String
   )
-      extends ZkNodeDataCache[String](clusterPath, "Test", NullStatsReceiver) {
+      extends ZkNodeDataCache[String](clusterPath, "Test", NullStatsReceiver)
     var parseNodeCalledCount = 0
     var shouldThrow = false
-    override def loadEntity(path: String) = {
+    override def loadEntity(path: String) =
       parseNodeCalledCount += 1
       if (shouldThrow) Future.exception(new Exception)
       else Future.value(Seq("a", "b"))
-    }
     override def parseNode(path: String, data: String) = Seq.empty
-  }
 
   private[this] def newCache = new ZkTestCache("/stuff")
 
-  test("ZkNodeDataCache#keys") {
+  test("ZkNodeDataCache#keys")
     val cache = newCache
     cache.get("key1")
     assert(cache.keys == Set("key1"))
-  }
 
-  test("ZkNodeDataCache#remove") {
+  test("ZkNodeDataCache#remove")
     val cache = newCache
     cache.get("key1")
     assert(cache.keys == Set("key1"))
     cache.remove("key1")
     assert(cache.keys == Set())
-  }
 
-  test("ZkNodeDataCache#get") {
+  test("ZkNodeDataCache#get")
     val cache = newCache
     cache.get("key1")
     assert(cache.keys == Set("key1"))
@@ -49,9 +45,8 @@ class ZkNodeDataCacheTest extends FunSuite {
     cache.get("key1")
     assert(cache.keys == Set("key1"))
     assert(cache.parseNodeCalledCount == 1)
-  }
 
-  test("ZkNodeDataCache#throw should not cache") {
+  test("ZkNodeDataCache#throw should not cache")
     val cache = newCache
     cache.shouldThrow = true
     cache.get("key1")
@@ -60,5 +55,3 @@ class ZkNodeDataCacheTest extends FunSuite {
     cache.get("key1")
     assert(cache.keys == Set("key1"))
     assert(cache.parseNodeCalledCount == 2)
-  }
-}

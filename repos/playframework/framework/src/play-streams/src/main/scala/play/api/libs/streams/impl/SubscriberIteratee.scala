@@ -9,7 +9,7 @@ import play.api.libs.iteratee._
 
 import scala.concurrent.{Promise, ExecutionContext, Future}
 
-private[streams] object SubscriberIteratee {
+private[streams] object SubscriberIteratee
 
   sealed trait State
 
@@ -46,20 +46,19 @@ private[streams] object SubscriberIteratee {
     * The subscription has been cancelled, the iteratee is done.
     */
   case object Cancelled extends State
-}
 
 import SubscriberIteratee._
 
 private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
     extends StateMachine[State](NotSubscribed) with Subscription
-    with Iteratee[T, Unit] {
+    with Iteratee[T, Unit]
   self =>
 
   def fold[B](folder: (Step[T, Unit]) => Future[B])(
-      implicit ec: ExecutionContext): Future[B] = {
+      implicit ec: ExecutionContext): Future[B] =
     val promise = Promise[B]()
     val pec = ec.prepare()
-    exclusive {
+    exclusive
       case NotSubscribed =>
         state = awaitDemand(promise, folder, pec)
         subscriber.onSubscribe(this)
@@ -69,32 +68,28 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
         throw new IllegalStateException(
             "fold invoked while already waiting for demand")
       case Demand(n) =>
-        if (n == 1) {
+        if (n == 1)
           state = NoDemand
-        } else {
+        else
           state = Demand(n - 1)
-        }
         demand(promise, folder, pec)
       case Cancelled =>
         cancelled(promise, folder, pec)
-    }
 
     promise.future
-  }
 
   private def awaitDemand[B](promise: Promise[B],
                              folder: (Step[T, Unit]) => Future[B],
-                             ec: ExecutionContext): AwaitingDemand = {
+                             ec: ExecutionContext): AwaitingDemand =
     AwaitingDemand(() => demand(promise, folder, ec),
                    () => cancelled(promise, folder, ec))
-  }
 
   private def demand[B](promise: Promise[B],
                         folder: (Step[T, Unit]) => Future[B],
-                        ec: ExecutionContext): Unit = {
-    Future {
+                        ec: ExecutionContext): Unit =
+    Future
       promise.completeWith(
-          folder(Step.Cont[T, Unit] {
+          folder(Step.Cont[T, Unit]
         case Input.EOF =>
           subscriber.onComplete()
           Done(())
@@ -103,36 +98,32 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
           self
         case Input.Empty =>
           self
-      }))
-    }(ec)
-  }
+      ))
+    (ec)
 
   private def cancelled[B](promise: Promise[B],
                            folder: (Step[T, Unit]) => Future[B],
-                           ec: ExecutionContext): Unit = {
-    Future {
+                           ec: ExecutionContext): Unit =
+    Future
       promise.completeWith(folder(Step.Done((), Input.Empty)))
-    }(ec)
-  }
+    (ec)
 
-  def cancel() = exclusive {
+  def cancel() = exclusive
     case AwaitingDemand(_, cancelled) =>
       cancelled()
       state = Cancelled
     case _ =>
       state = Cancelled
-  }
 
-  def request(n: Long) = exclusive {
+  def request(n: Long) = exclusive
     case NoDemand =>
       state = Demand(n)
     case AwaitingDemand(demand, _) =>
       demand()
-      if (n == 1) {
+      if (n == 1)
         state = NoDemand
-      } else {
+      else
         state = Demand(n - 1)
-      }
     case Demand(old) =>
       state = Demand(old + n)
     case Cancelled =>
@@ -140,5 +131,3 @@ private[streams] class SubscriberIteratee[T](subscriber: Subscriber[T])
     case NotSubscribed =>
       throw new IllegalStateException(
           "Demand requested before subscription made")
-  }
-}

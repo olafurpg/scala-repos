@@ -33,7 +33,7 @@ case class TestData(key: Int, value: String)
 case class ThreeCloumntable(key: Int, value: String, key1: String)
 
 class InsertIntoHiveTableSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfter {
+    extends QueryTest with TestHiveSingleton with BeforeAndAfter
   import hiveContext.implicits._
   import hiveContext.sql
 
@@ -41,15 +41,14 @@ class InsertIntoHiveTableSuite
     .parallelize((1 to 100).map(i => TestData(i, i.toString)))
     .toDF()
 
-  before {
+  before
     // Since every we are doing tests for DDL statements,
     // it is better to reset before every test.
     hiveContext.reset()
     // Register the testData, which will be used in every test.
     testData.registerTempTable("testData")
-  }
 
-  test("insertInto() HiveTable") {
+  test("insertInto() HiveTable")
     sql("CREATE TABLE createAndInsertTest (key int, value string)")
 
     // Add some data.
@@ -78,22 +77,18 @@ class InsertIntoHiveTableSuite
         sql("SELECT * FROM createAndInsertTest"),
         testData.collect().toSeq
     )
-  }
 
-  test("Double create fails when allowExisting = false") {
+  test("Double create fails when allowExisting = false")
     sql("CREATE TABLE doubleCreateAndInsertTest (key int, value string)")
 
-    intercept[QueryExecutionException] {
+    intercept[QueryExecutionException]
       sql("CREATE TABLE doubleCreateAndInsertTest (key int, value string)")
-    }
-  }
 
-  test("Double create does not fail when allowExisting = true") {
+  test("Double create does not fail when allowExisting = true")
     sql("CREATE TABLE doubleCreateAndInsertTest (key int, value string)")
     sql("CREATE TABLE IF NOT EXISTS doubleCreateAndInsertTest (key int, value string)")
-  }
 
-  test("SPARK-4052: scala.collection.Map as value type of MapType") {
+  test("SPARK-4052: scala.collection.Map as value type of MapType")
     val schema = StructType(
         StructField("m", MapType(StringType, StringType), true) :: Nil)
     val rowRDD = hiveContext.sparkContext.parallelize((1 to 100).map(i =>
@@ -109,9 +104,8 @@ class InsertIntoHiveTableSuite
     )
 
     sql("DROP TABLE hiveTableWithMapValue")
-  }
 
-  test("SPARK-4203:random partition directory order") {
+  test("SPARK-4203:random partition directory order")
     sql("CREATE TABLE tmp_table (key int, value string)")
     val tmpDir = Utils.createTempDir()
     val stagingDir = new HiveConf().getVar(HiveConf.ConfVars.STAGINGDIR)
@@ -141,17 +135,15 @@ class InsertIntoHiveTableSuite
         |partition (p1='a',p2='b',p3='c',p4='c',p5='4')
         |SELECT 'blarr' FROM tmp_table
       """.stripMargin)
-    def listFolders(path: File, acc: List[String]): List[List[String]] = {
+    def listFolders(path: File, acc: List[String]): List[List[String]] =
       val dir = path.listFiles()
-      val folders = dir.filter { e =>
+      val folders = dir.filter  e =>
         e.isDirectory && !e.getName().startsWith(stagingDir)
-      }.toList
-      if (folders.isEmpty) {
+      .toList
+      if (folders.isEmpty)
         List(acc.reverse)
-      } else {
+      else
         folders.flatMap(x => listFolders(x, x.getName :: acc))
-      }
-    }
     val expected = List(
         "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=2" :: Nil,
         "p1=a" :: "p2=b" :: "p3=c" :: "p4=c" :: "p5=3" :: Nil,
@@ -163,9 +155,8 @@ class InsertIntoHiveTableSuite
             _.toString))
     sql("DROP TABLE table_with_partition")
     sql("DROP TABLE tmp_table")
-  }
 
-  test("Insert ArrayType.containsNull == false") {
+  test("Insert ArrayType.containsNull == false")
     val schema = StructType(
         Seq(StructField("a", ArrayType(StringType, containsNull = false))))
     val rowRDD = hiveContext.sparkContext.parallelize(
@@ -179,9 +170,8 @@ class InsertIntoHiveTableSuite
         sql("SELECT * FROM hiveTableWithArrayValue"), rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithArrayValue")
-  }
 
-  test("Insert MapType.valueContainsNull == false") {
+  test("Insert MapType.valueContainsNull == false")
     val schema = StructType(Seq(StructField(
                 "m",
                 MapType(StringType, StringType, valueContainsNull = false))))
@@ -196,9 +186,8 @@ class InsertIntoHiveTableSuite
         sql("SELECT * FROM hiveTableWithMapValue"), rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithMapValue")
-  }
 
-  test("Insert StructType.fields.exists(_.nullable == false)") {
+  test("Insert StructType.fields.exists(_.nullable == false)")
     val schema = StructType(
         Seq(StructField("s",
                         StructType(Seq(StructField(
@@ -214,9 +203,8 @@ class InsertIntoHiveTableSuite
         sql("SELECT * FROM hiveTableWithStructValue"), rowRDD.collect().toSeq)
 
     sql("DROP TABLE hiveTableWithStructValue")
-  }
 
-  test("SPARK-5498:partition schema does not match table schema") {
+  test("SPARK-5498:partition schema does not match table schema")
     val testData = hiveContext.sparkContext
       .parallelize((1 to 10).map(i => TestData(i, i.toString)))
       .toDF()
@@ -261,5 +249,3 @@ class InsertIntoHiveTableSuite
         testData.collect().toSeq)
 
     sql("DROP TABLE table_with_partition")
-  }
-}

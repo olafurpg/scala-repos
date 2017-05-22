@@ -16,20 +16,19 @@ import scala.collection.JavaConversions.enumerationAsScalaIterator
 
 class ScalaUdpMulticastSpec
     extends TestKit(ActorSystem("ScalaUdpMulticastSpec")) with WordSpecLike
-    with BeforeAndAfter {
+    with BeforeAndAfter
 
-  "listener" should {
-    "send message back to sink" in {
+  "listener" should
+    "send message back to sink" in
       // TODO make this work consistently on all platforms
       pending
 
-      def okInterfaceToUse(iface: NetworkInterface): Boolean = {
+      def okInterfaceToUse(iface: NetworkInterface): Boolean =
         iface.getInetAddresses.exists(_.isInstanceOf[Inet6Address]) &&
         // awdl0 is a special interface on OSX that we cannot use
         iface.getDisplayName != "awdl0" &&
         // we do not want to use virtual docker interfaces
         !iface.getDisplayName.contains("docker")
-      }
       val Some(ipv6Iface) =
         NetworkInterface.getNetworkInterfaces.find(okInterfaceToUse)
 
@@ -52,16 +51,12 @@ class ScalaUdpMulticastSpec
 
       // unbind
       system.stop(listener)
-    }
-  }
 
-  def afterAll(): Unit = {
+  def afterAll(): Unit =
     TestKit.shutdownActorSystem(system)
-  }
-}
 
-object TestUtils {
-  def temporaryUdpIpv6Port(iface: NetworkInterface) = {
+object TestUtils
+  def temporaryUdpIpv6Port(iface: NetworkInterface) =
     val serverSocket =
       DatagramChannel.open(StandardProtocolFamily.INET6).socket()
     serverSocket.bind(
@@ -69,5 +64,3 @@ object TestUtils {
     val port = serverSocket.getLocalPort
     serverSocket.close()
     port
-  }
-}

@@ -10,14 +10,13 @@ package org.scalajs.jasminetest
 
 import sbt.testing._
 
-final class JasmineFramework extends Framework {
+final class JasmineFramework extends Framework
   private[this] var hasRunner = false
 
-  private object JasmineFingerprint extends SubclassFingerprint {
+  private object JasmineFingerprint extends SubclassFingerprint
     val isModule: Boolean = true
     val superclassName: String = "org.scalajs.jasminetest.JasmineTest"
     val requireNoArgConstructor: Boolean = true
-  }
 
   val name: String = "Jasmine for Scala.js"
 
@@ -25,25 +24,21 @@ final class JasmineFramework extends Framework {
 
   def runner(args: Array[String],
              remoteArgs: Array[String],
-             testClassLoader: ClassLoader): Runner = {
+             testClassLoader: ClassLoader): Runner =
     acquireRunner()
     new JasmineRunner(this, args, remoteArgs, testClassLoader)
-  }
 
   def slaveRunner(args: Array[String],
                   remoteArgs: Array[String],
                   testClassLoader: ClassLoader,
-                  channel: String => Unit): Runner = {
+                  channel: String => Unit): Runner =
     acquireRunner()
     new JasmineRunner(this, args, remoteArgs, testClassLoader)
-  }
 
   private[jasminetest] def runnerDone(): Unit = hasRunner = false
 
-  private def acquireRunner(): Unit = {
+  private def acquireRunner(): Unit =
     if (hasRunner)
       throw new IllegalStateException(
           "Jasmine doesn't support concurrent runs")
     hasRunner = true
-  }
-}

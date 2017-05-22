@@ -13,7 +13,7 @@ import lila.user.{User, UserRepo}
 import lila.common.HTTPRequest
 import tube.storeColl
 
-object Store {
+object Store
 
   private[security] def save(sessionId: String,
                              userId: String,
@@ -93,24 +93,21 @@ object Store {
       .cursor[UserSession]()
       .collect[List](nb)
 
-  def setFingerprint(id: String, fingerprint: String): Fu[String] = {
+  def setFingerprint(id: String, fingerprint: String): Fu[String] =
     import java.util.Base64
     import org.apache.commons.codec.binary.Hex
-    scala.concurrent.Future {
-      Base64.getEncoder encodeToString {
+    scala.concurrent.Future
+      Base64.getEncoder encodeToString
         Hex decodeHex fingerprint.toArray
-      } take 8
-    } flatMap { hash =>
+      take 8
+    flatMap  hash =>
       storeColl.update(
           BSONDocument("_id" -> id),
           BSONDocument("$set" -> BSONDocument("fp" -> hash))
       ) inject hash
-    }
-  }
 
-  case class Info(ip: String, ua: String, fp: Option[String]) {
+  case class Info(ip: String, ua: String, fp: Option[String])
     def fingerprint = fp.map(_.toString)
-  }
   private implicit val InfoBSONHandler = Macros.handler[Info]
 
   def findInfoByUser(userId: String): Fu[List[Info]] =
@@ -123,9 +120,8 @@ object Store {
       .cursor[Info]()
       .collect[List]()
 
-  private case class DedupInfo(_id: String, ip: String, ua: String) {
+  private case class DedupInfo(_id: String, ip: String, ua: String)
     def compositeKey = s"$ip $ua"
-  }
   private implicit val DedupInfoBSONHandler = Macros.handler[DedupInfo]
 
   def dedup(userId: String, keepSessionId: String): Funit =
@@ -136,7 +132,7 @@ object Store {
           ))
       .sort(BSONDocument("date" -> -1))
       .cursor[DedupInfo]()
-      .collect[List]() flatMap { sessions =>
+      .collect[List]() flatMap  sessions =>
       val olds = sessions
         .groupBy(_.compositeKey)
         .values
@@ -148,5 +144,3 @@ object Store {
             BSONDocument("_id" -> BSONDocument("$in" -> olds.map(_._id)))
         )
         .void
-    }
-}

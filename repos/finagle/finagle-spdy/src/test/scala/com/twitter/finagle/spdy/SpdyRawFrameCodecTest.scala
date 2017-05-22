@@ -8,7 +8,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class SpdyRawFrameCodecTest extends FunSuite {
+class SpdyRawFrameCodecTest extends FunSuite
 
   val headersFrame: Array[Byte] = Array[Int](
       0x80,
@@ -48,7 +48,7 @@ class SpdyRawFrameCodecTest extends FunSuite {
 
   def spdyFrameCodec = new SpdyRawFrameCodec(SpdyVersion.SPDY_3_1, 8192, 16384)
 
-  test("decode") {
+  test("decode")
     val channel = new DecoderEmbedder(spdyFrameCodec)
     channel.offer(ChannelBuffers.wrappedBuffer(headersFrame))
     val spdyHeadersFrame = channel.poll().asInstanceOf[SpdyHeadersFrame]
@@ -56,18 +56,14 @@ class SpdyRawFrameCodecTest extends FunSuite {
     assert(spdyHeadersFrame.headers.entries.get(0).getKey == "name")
     assert(spdyHeadersFrame.headers.entries.get(0).getValue == "value")
     assert(channel.finish == false)
-  }
 
-  test("encode") {
+  test("encode")
     val channel = new EncoderEmbedder(spdyFrameCodec)
     val spdyHeadersFrame = new DefaultSpdyHeadersFrame(1)
     spdyHeadersFrame.headers.add("name", "value")
     channel.offer(spdyHeadersFrame)
     val channelBuffer = channel.poll().asInstanceOf[ChannelBuffer]
     assert(channelBuffer.readableBytes == headersFrame.length)
-    headersFrame foreach { b =>
+    headersFrame foreach  b =>
       assert(channelBuffer.readByte == b)
-    }
     assert(channel.finish == false)
-  }
-}

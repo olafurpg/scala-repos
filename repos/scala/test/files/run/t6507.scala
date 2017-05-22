@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
 :silent
 class A { override def toString() = { println("!"); "A" } }
@@ -11,4 +11,3 @@ new A
 :silent
 res0
 """
-}

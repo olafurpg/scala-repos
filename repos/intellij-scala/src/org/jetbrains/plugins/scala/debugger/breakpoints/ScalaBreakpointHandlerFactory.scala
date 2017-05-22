@@ -5,11 +5,10 @@ import com.intellij.debugger.engine.{DebugProcessImpl, JavaBreakpointHandler, Ja
 /**
   * @author Nikolay.Tropin
   */
-class ScalaBreakpointHandlerFactory extends JavaBreakpointHandlerFactory {
+class ScalaBreakpointHandlerFactory extends JavaBreakpointHandlerFactory
   override def createHandler(
       process: DebugProcessImpl): JavaBreakpointHandler =
     new ScalaBreakpointHandler(process)
-}
 
 class ScalaBreakpointHandler(process: DebugProcessImpl)
     extends JavaBreakpointHandler(classOf[ScalaLineBreakpointType], process)

@@ -23,24 +23,19 @@ private[http] class HeaderParser(
     with AcceptHeader with AcceptLanguageHeader with CacheControlHeader
     with ContentDispositionHeader with ContentTypeHeader with CommonActions
     with IpAddressParsing with LinkHeader with SimpleHeaders
-    with StringBuilding with WebSocketHeaders {
+    with StringBuilding with WebSocketHeaders
   import CharacterClasses._
 
   // http://www.rfc-editor.org/errata_search.php?rfc=7230 errata id 4189
-  def `header-field-value`: Rule1[String] = rule {
+  def `header-field-value`: Rule1[String] = rule
     FWS ~ clearSB() ~ `field-value` ~ FWS ~ EOI ~ push(sb.toString)
-  }
-  def `field-value` = {
+  def `field-value` =
     var fwsStart = cursor
-    rule {
-      zeroOrMore(`field-value-chunk`).separatedBy {
+    rule
+      zeroOrMore(`field-value-chunk`).separatedBy
         // zeroOrMore because we need to also accept empty values
-        run { fwsStart = cursor } ~ FWS ~ &(`field-value-char`) ~ run {
+        run { fwsStart = cursor } ~ FWS ~ &(`field-value-char`) ~ run
           if (cursor > fwsStart) sb.append(' ')
-        }
-      }
-    }
-  }
   def `field-value-chunk` = rule { oneOrMore(`field-value-char` ~ appendSB()) }
   def `field-value-char` = rule { VCHAR | `obs-text` }
   def FWS = rule { zeroOrMore(WSP) ~ zeroOrMore(`obs-fold`) }
@@ -51,16 +46,14 @@ private[http] class HeaderParser(
   type Result = Either[ErrorInfo, HttpHeader]
   def parser: HeaderParser = this
   def success(result: HttpHeader :: HNil): Result = Right(result.head)
-  def parseError(error: ParseError): Result = {
+  def parseError(error: ParseError): Result =
     val formatter = new ErrorFormatter(showLine = false)
     Left(
         ErrorInfo(formatter.format(error, input),
                   formatter.formatErrorLine(error, input)))
-  }
-  def failure(error: Throwable): Result = error match {
+  def failure(error: Throwable): Result = error match
     case IllegalUriException(info) ⇒ Left(info)
     case NonFatal(e) ⇒ Left(ErrorInfo.fromCompoundString(e.getMessage))
-  }
   def ruleNotFound(ruleName: String): Result =
     throw HeaderParser.RuleNotFoundException
 
@@ -68,22 +61,19 @@ private[http] class HeaderParser(
     new UriParser(input, uriParsingMode = settings.uriParsingMode)
 
   def `cookie-value`: Rule1[String] =
-    settings.cookieParsingMode match {
+    settings.cookieParsingMode match
       case CookieParsingMode.RFC6265 ⇒ rule { `cookie-value-rfc-6265` }
       case CookieParsingMode.Raw ⇒ rule { `cookie-value-raw` }
-    }
 
   def createCookiePair(name: String, value: String): HttpCookiePair =
-    settings.cookieParsingMode match {
+    settings.cookieParsingMode match
       case CookieParsingMode.RFC6265 ⇒ HttpCookiePair(name, value)
       case CookieParsingMode.Raw ⇒ HttpCookiePair.raw(name, value)
-    }
-}
 
 /**
   * INTERNAL API.
   */
-private[http] object HeaderParser {
+private[http] object HeaderParser
   object RuleNotFoundException extends SingletonException
   object EmptyCookieException
       extends SingletonException(
@@ -91,13 +81,13 @@ private[http] object HeaderParser {
 
   def parseFull(headerName: String,
                 value: String,
-                settings: Settings = DefaultSettings): HeaderParser#Result = {
+                settings: Settings = DefaultSettings): HeaderParser#Result =
     import akka.parboiled2.EOI
     val v =
       value +
       EOI // this makes sure the parser isn't broken even if there's no trailing garbage in this value
     val parser = new HeaderParser(v, settings)
-    dispatch(parser, headerName) match {
+    dispatch(parser, headerName) match
       case r @ Right(_) if parser.cursor == v.length ⇒ r
       case r @ Right(_) ⇒
         Left(
@@ -108,8 +98,6 @@ private[http] object HeaderParser {
         Left(
             e.copy(summary = e.summary.filterNot(_ == EOI),
                    detail = e.detail.filterNot(_ == EOI)))
-    }
-  }
 
   val (dispatch, ruleNames) =
     DynamicRuleDispatch[HeaderParser, HttpHeader :: HNil](
@@ -171,21 +159,17 @@ private[http] object HeaderParser {
         "x-forwarded-for",
         "x-real-ip")
 
-  abstract class Settings {
+  abstract class Settings
     def uriParsingMode: Uri.ParsingMode
     def cookieParsingMode: ParserSettings.CookieParsingMode
-  }
   def Settings(
       uriParsingMode: Uri.ParsingMode = Uri.ParsingMode.Relaxed,
       cookieParsingMode: ParserSettings.CookieParsingMode = ParserSettings.CookieParsingMode.RFC6265)
-    : Settings = {
+    : Settings =
     val _uriParsingMode = uriParsingMode
     val _cookieParsingMode = cookieParsingMode
 
-    new Settings {
+    new Settings
       def uriParsingMode: Uri.ParsingMode = _uriParsingMode
       def cookieParsingMode: CookieParsingMode = _cookieParsingMode
-    }
-  }
   val DefaultSettings: Settings = Settings()
-}

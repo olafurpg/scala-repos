@@ -43,7 +43,7 @@ private[memory] class ExecutionMemoryPool(
     lock: Object,
     poolName: String
 )
-    extends MemoryPool(lock) with Logging {
+    extends MemoryPool(lock) with Logging
 
   /**
     * Map from taskAttemptId -> memory consumption in bytes
@@ -51,16 +51,14 @@ private[memory] class ExecutionMemoryPool(
   @GuardedBy("lock")
   private val memoryForTask = new mutable.HashMap[Long, Long]()
 
-  override def memoryUsed: Long = lock.synchronized {
+  override def memoryUsed: Long = lock.synchronized
     memoryForTask.values.sum
-  }
 
   /**
     * Returns the memory consumption, in bytes, for the given task.
     */
-  def getMemoryUsageForTask(taskAttemptId: Long): Long = lock.synchronized {
+  def getMemoryUsageForTask(taskAttemptId: Long): Long = lock.synchronized
     memoryForTask.getOrElse(taskAttemptId, 0L)
-  }
 
   /**
     * Try to acquire up to `numBytes` of memory for the given task and return the number of bytes
@@ -89,24 +87,23 @@ private[memory] class ExecutionMemoryPool(
       taskAttemptId: Long,
       maybeGrowPool: Long => Unit = (additionalSpaceNeeded: Long) => Unit,
       computeMaxPoolSize: () => Long = () =>
-          poolSize): Long = lock.synchronized {
+          poolSize): Long = lock.synchronized
     assert(numBytes > 0, s"invalid number of bytes requested: $numBytes")
 
     // TODO: clean up this clunky method signature
 
     // Add this task to the taskMemory map just so we can keep an accurate count of the number
     // of active tasks, to let other tasks ramp down their memory in calls to `acquireMemory`
-    if (!memoryForTask.contains(taskAttemptId)) {
+    if (!memoryForTask.contains(taskAttemptId))
       memoryForTask(taskAttemptId) = 0L
       // This will later cause waiting tasks to wake up and check numTasks again
       lock.notifyAll()
-    }
 
     // Keep looping until we're either sure that we don't want to grant this request (because this
     // task would have more than 1 / numActiveTasks of the memory) or we have enough free
     // memory to give it (we always let each task get at least 1 / (2 * numActiveTasks)).
     // TODO: simplify this to limit each task to its own slot
-    while (true) {
+    while (true)
       val numActiveTasks = memoryForTask.keys.size
       val curMem = memoryForTask(taskAttemptId)
 
@@ -133,49 +130,40 @@ private[memory] class ExecutionMemoryPool(
       // We want to let each task get at least 1 / (2 * numActiveTasks) before blocking;
       // if we can't give it this much now, wait for other tasks to free up memory
       // (this happens if older tasks allocated lots of memory before N grew)
-      if (toGrant < numBytes && curMem + toGrant < minMemoryPerTask) {
+      if (toGrant < numBytes && curMem + toGrant < minMemoryPerTask)
         logInfo(
             s"TID $taskAttemptId waiting for at least 1/2N of $poolName pool to be free")
         lock.wait()
-      } else {
+      else
         memoryForTask(taskAttemptId) += toGrant
         return toGrant
-      }
-    }
     0L // Never reached
-  }
 
   /**
     * Release `numBytes` of memory acquired by the given task.
     */
   def releaseMemory(numBytes: Long, taskAttemptId: Long): Unit =
-    lock.synchronized {
+    lock.synchronized
       val curMem = memoryForTask.getOrElse(taskAttemptId, 0L)
       var memoryToFree =
-        if (curMem < numBytes) {
+        if (curMem < numBytes)
           logWarning(
               s"Internal error: release called on $numBytes bytes but task only has $curMem bytes " +
               s"of memory from the $poolName pool")
           curMem
-        } else {
+        else
           numBytes
-        }
-      if (memoryForTask.contains(taskAttemptId)) {
+      if (memoryForTask.contains(taskAttemptId))
         memoryForTask(taskAttemptId) -= memoryToFree
-        if (memoryForTask(taskAttemptId) <= 0) {
+        if (memoryForTask(taskAttemptId) <= 0)
           memoryForTask.remove(taskAttemptId)
-        }
-      }
       lock.notifyAll() // Notify waiters in acquireMemory() that memory has been freed
-    }
 
   /**
     * Release all memory for the given task and mark it as inactive (e.g. when a task ends).
     * @return the number of bytes freed.
     */
-  def releaseAllMemoryForTask(taskAttemptId: Long): Long = lock.synchronized {
+  def releaseAllMemoryForTask(taskAttemptId: Long): Long = lock.synchronized
     val numBytesToFree = getMemoryUsageForTask(taskAttemptId)
     releaseMemory(numBytesToFree, taskAttemptId)
     numBytesToFree
-  }
-}

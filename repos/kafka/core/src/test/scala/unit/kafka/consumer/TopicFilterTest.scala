@@ -22,10 +22,10 @@ import org.junit.Test
 import kafka.coordinator.GroupCoordinator
 import org.apache.kafka.common.internals.TopicConstants
 
-class TopicFilterTest extends JUnitSuite {
+class TopicFilterTest extends JUnitSuite
 
   @Test
-  def testWhitelists() {
+  def testWhitelists()
 
     val topicFilter1 = new Whitelist("white1,white2")
     assertTrue(
@@ -59,10 +59,9 @@ class TopicFilterTest extends JUnitSuite {
         topicFilter4.isTopicAllowed("test-good", excludeInternalTopics = true))
     assertFalse(
         topicFilter4.isTopicAllowed("test-bad", excludeInternalTopics = true))
-  }
 
   @Test
-  def testBlacklists() {
+  def testBlacklists()
     val topicFilter1 = new Blacklist("black1")
     assertTrue(
         topicFilter1.isTopicAllowed("white2", excludeInternalTopics = true))
@@ -79,15 +78,13 @@ class TopicFilterTest extends JUnitSuite {
     assertTrue(
         topicFilter1.isTopicAllowed(TopicConstants.GROUP_METADATA_TOPIC_NAME,
                                     excludeInternalTopics = false))
-  }
 
   @Test
-  def testWildcardTopicCountGetTopicCountMapEscapeJson() {
-    def getTopicCountMapKey(regex: String): String = {
+  def testWildcardTopicCountGetTopicCountMapEscapeJson()
+    def getTopicCountMapKey(regex: String): String =
       val topicCount = new WildcardTopicCount(
           null, "consumerId", new Whitelist(regex), 1, true)
       topicCount.getTopicCountMap.head._1
-    }
     //lets make sure that the JSON strings are escaping as we expect
     //if they are not then when they get saved to zookeeper and read back out they will be broken on parse
     assertEquals("-\\\"-", getTopicCountMapKey("-\"-"))
@@ -102,5 +99,3 @@ class TopicFilterTest extends JUnitSuite {
     assertEquals("-\\\\u001f-", getTopicCountMapKey("-\\u001f-"))
     assertEquals("-\\\\u007f-", getTopicCountMapKey("-\\u007f-"))
     assertEquals("-\\\\u009f-", getTopicCountMapKey("-\\u009f-"))
-  }
-}

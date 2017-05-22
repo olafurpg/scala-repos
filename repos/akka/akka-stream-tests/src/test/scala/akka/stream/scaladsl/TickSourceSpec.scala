@@ -9,12 +9,12 @@ import akka.stream.testkit._
 import akka.stream.testkit.Utils._
 import akka.testkit.AkkaSpec
 
-class TickSourceSpec extends AkkaSpec {
+class TickSourceSpec extends AkkaSpec
 
   implicit val materializer = ActorMaterializer()
 
-  "A Flow based on tick publisher" must {
-    "produce ticks" in assertAllStagesStopped {
+  "A Flow based on tick publisher" must
+    "produce ticks" in assertAllStagesStopped
       val c = TestSubscriber.manualProbe[String]()
       Source.tick(1.second, 500.millis, "tick").to(Sink.fromSubscriber(c)).run()
       val sub = c.expectSubscription()
@@ -27,9 +27,8 @@ class TickSourceSpec extends AkkaSpec {
       c.expectNext("tick")
       sub.cancel()
       c.expectNoMsg(200.millis)
-    }
 
-    "drop ticks when not requested" in {
+    "drop ticks when not requested" in
       val c = TestSubscriber.manualProbe[String]()
       Source.tick(1.second, 1.second, "tick").to(Sink.fromSubscriber(c)).run()
       val sub = c.expectSubscription()
@@ -44,9 +43,8 @@ class TickSourceSpec extends AkkaSpec {
       c.expectNext("tick")
       sub.cancel()
       c.expectNoMsg(200.millis)
-    }
 
-    "reject multiple subscribers, but keep the first" in {
+    "reject multiple subscribers, but keep the first" in
       val p = Source
         .tick(1.second, 1.second, "tick")
         .runWith(Sink.asPublisher(false))
@@ -62,14 +60,13 @@ class TickSourceSpec extends AkkaSpec {
       sub1.request(2)
       c1.expectNext("tick")
       sub1.cancel()
-    }
 
-    "be usable with zip for a simple form of rate limiting" in {
+    "be usable with zip for a simple form of rate limiting" in
       val c = TestSubscriber.manualProbe[Int]()
 
       RunnableGraph
         .fromGraph(
-            GraphDSL.create() { implicit b ⇒
+            GraphDSL.create()  implicit b ⇒
           import GraphDSL.Implicits._
           val zip = b.add(Zip[Int, String]())
           Source(1 to 100) ~> zip.in0
@@ -77,7 +74,7 @@ class TickSourceSpec extends AkkaSpec {
           zip.out ~> Flow[(Int, String)].map { case (n, _) ⇒ n } ~> Sink
             .fromSubscriber(c)
           ClosedShape
-        })
+        )
         .run()
 
       val sub = c.expectSubscription()
@@ -87,9 +84,8 @@ class TickSourceSpec extends AkkaSpec {
       c.expectNext(2)
       c.expectNoMsg(200.millis)
       sub.cancel()
-    }
 
-    "be possible to cancel" in assertAllStagesStopped {
+    "be possible to cancel" in assertAllStagesStopped
       val c = TestSubscriber.manualProbe[String]()
       val tickSource = Source.tick(1.second, 500.millis, "tick")
       val cancellable = tickSource.to(Sink.fromSubscriber(c)).run()
@@ -105,6 +101,3 @@ class TickSourceSpec extends AkkaSpec {
       awaitCond(cancellable.isCancelled)
       sub.request(3)
       c.expectComplete()
-    }
-  }
-}

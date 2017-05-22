@@ -27,7 +27,7 @@ import scala.collection.mutable.ListBuffer
   * 9/6/13
   */
 abstract class ScalaRenameTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val caretMarker = "/*caret*/"
   private var myEditors: Map[VirtualFile, Editor] = null
   private var myDirectory: VirtualFile = null
@@ -41,7 +41,7 @@ abstract class ScalaRenameTestBase
     (folderPath + getTestName(true) + "/after")
       .replace(File.separatorChar, '/')
 
-  protected def doTest(newName: String = "NameAfterRename") {
+  protected def doTest(newName: String = "NameAfterRename")
     myDirectory = PsiTestUtil.createTestProjectStructure(
         projectAdapter, moduleAdapter, rootBefore, new util.HashSet[File]())
     VirtualFilePointerManager.getInstance
@@ -53,9 +53,9 @@ abstract class ScalaRenameTestBase
     PsiDocumentManager.getInstance(projectAdapter).commitAllDocuments()
     myEditors = createEditors(filesBefore)
 
-    for {
+    for
       CaretPosition(vFile, offset) <- caretPositions
-    } {
+    
       val file = getPsiManagerAdapter.findFile(vFile)
       val editor = myEditors(vFile)
       editor.getCaretModel.moveToOffset(offset)
@@ -68,65 +68,54 @@ abstract class ScalaRenameTestBase
 
       //rename back for next caret position
       doRename(editor, file, oldName)
-    }
-  }
 
-  private def fileText(file: VirtualFile): String = {
+  private def fileText(file: VirtualFile): String =
     val text = FileDocumentManager.getInstance().getDocument(file).getText
     StringUtil.convertLineSeparators(text)
-  }
 
   case class CaretPosition(file: VirtualFile, offset: Int)
 
   private def findCaretsAndRemoveMarkers(
-      files: Array[VirtualFile]): Seq[CaretPosition] = {
-    val caretsInFile: VirtualFile => Seq[CaretPosition] = { file =>
+      files: Array[VirtualFile]): Seq[CaretPosition] =
+    val caretsInFile: VirtualFile => Seq[CaretPosition] =  file =>
       var text = fileText(file)
       val fileLength = text.length
-      def findOffsets(s: String): Seq[Int] = {
+      def findOffsets(s: String): Seq[Int] =
         val result = ListBuffer[Int]()
         val length = caretMarker.length
         var occ = text.indexOf(caretMarker)
-        while (occ > 0) {
+        while (occ > 0)
           result += occ
           text = text.substring(0, occ) + text.substring(occ + length)
           occ = text.indexOf(caretMarker)
-        }
 
         result
-      }
       val result = findOffsets(text).map(offset => CaretPosition(file, offset))
-      if (result.nonEmpty) {
+      if (result.nonEmpty)
         inWriteAction(
             FileDocumentManager
               .getInstance()
               .getDocument(file)
               .replaceString(0, fileLength, text))
-      }
       result
-    }
     files.flatMap(caretsInFile)
-  }
 
   private def createEditors(
-      files: Array[VirtualFile]): Map[VirtualFile, Editor] = {
+      files: Array[VirtualFile]): Map[VirtualFile, Editor] =
     files.map(f => f -> createEditor(f)).toMap
-  }
 
-  private def createEditor(file: VirtualFile) = {
+  private def createEditor(file: VirtualFile) =
     LightPlatformCodeInsightTestCase.createEditor(file)
-  }
 
-  protected override def tearDown() {
+  protected override def tearDown()
     super.tearDown()
     inWriteAction(LightPlatformTestCase.closeAndDeleteProject())
-  }
 
   private def projectAdapter = getProjectAdapter
   private def moduleAdapter = getModuleAdapter
 
   private def doRename(
-      editor: Editor, file: PsiFile, newName: String): String = {
+      editor: Editor, file: PsiFile, newName: String): String =
     val element = TargetElementUtil.findTargetElement(
         InjectedLanguageUtil.getEditorForInjectedLanguageNoCommit(
             editor, file),
@@ -135,16 +124,14 @@ abstract class ScalaRenameTestBase
     val searchInComments =
       element.getText != null && element.getText.contains("Comments")
     var oldName: String = ""
-    inWriteAction {
+    inWriteAction
       val subst = RenamePsiElementProcessor
         .forElement(element)
         .substituteElementToRename(element, getEditorAdapter)
-      if (subst != null) {
+      if (subst != null)
         oldName = ScalaNamesUtil.scalaName(subst)
         new RenameProcessor(
             projectAdapter, subst, newName, searchInComments, false).run()
-      }
-    }
     PsiDocumentManager.getInstance(getProjectAdapter).commitAllDocuments()
     val document =
       PsiDocumentManager.getInstance(getProjectAdapter).getDocument(file)
@@ -153,5 +140,3 @@ abstract class ScalaRenameTestBase
       .doPostponedOperationsAndUnblockDocument(document)
     FileDocumentManager.getInstance.saveAllDocuments()
     oldName
-  }
-}

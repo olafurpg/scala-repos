@@ -57,7 +57,7 @@ package common
   * `List` has to be a common ancestor class or trait of `Type1` and `Type2`, and
   * no such type has a `value` method.
   */
-object HLists {
+object HLists
 
   /**
     * The base trait for `HList`s. Functions that take `HList`s will need a type
@@ -80,9 +80,8 @@ object HLists {
     * res0: net.liftweb.common.HLists.HCons[Type1,net.liftweb.common.HLists.HNil] = Type1(Value) :+: HNil
     * }}}
     */
-  final class HNil extends HList {
+  final class HNil extends HList
     override def toString = "HNil"
-  }
 
   /**
     * The HNil singleton.
@@ -108,9 +107,8 @@ object HLists {
     *       Type2(Other Value) :+: Type1(Value) :+: HNil
     * }}}
     */
-  final case class :+:[+H, +T <: HList](head: H, tail: T) extends HList {
+  final case class :+:[+H, +T <: HList](head: H, tail: T) extends HList
     override def toString = head + " :+: " + tail
-  }
 
   /**
     * Provides the methods that can be used on an `HList`. These are set apart
@@ -118,24 +116,19 @@ object HLists {
     * on the `:+:` class.
     */
   implicit final class HListMethods[ListSoFar <: HList](hlist: ListSoFar)
-      extends AnyRef {
-    def :+:[T](v: T): :+:[T, ListSoFar] = {
+      extends AnyRef
+    def :+:[T](v: T): :+:[T, ListSoFar] =
       HLists.:+:(v, hlist)
-    }
 
     /**
       * The length of this HList; note that this is O(n) in the list of elements.
       */
-    def length: Int = {
-      hlist match {
+    def length: Int =
+      hlist match
         case HNil =>
           0
         case head :+: rest =>
           1 + rest.length
-      }
-    }
-  }
-}
 
 /**
   * Encoding for "A is not a subtype of B".
@@ -148,7 +141,7 @@ sealed trait ExcludeThisType[A, B]
   *
   * Based on work by Miles Sabin.
   */
-object ExcludeThisType {
+object ExcludeThisType
   def unexpected: Nothing = sys.error("Unexpected invocation")
 
   // Uses ambiguity to rule out the cases we're trying to exclude
@@ -161,7 +154,5 @@ object ExcludeThisType {
       A, B >: A]: A ExcludeThisType B = unexpected
 
   // Type alias for context bound
-  type exclude[T] = {
+  type exclude[T] =
     type other[U] = U ExcludeThisType T
-  }
-}

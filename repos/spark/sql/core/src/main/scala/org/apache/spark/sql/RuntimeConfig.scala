@@ -22,7 +22,7 @@ package org.apache.spark.sql
   *
   * @since 2.0.0
   */
-abstract class RuntimeConfig {
+abstract class RuntimeConfig
 
   /**
     * Sets the given Spark runtime configuration property.
@@ -97,4 +97,3 @@ abstract class RuntimeConfig {
     * @since 2.0.0
     */
   def unsetHadoop(key: String): Unit
-}

@@ -12,7 +12,7 @@ package reflect
   *
   *  See the [[http://docs.scala-lang.org/overviews/macros/overview.html Macros Guide]] on how to get started with Scala macros.
   */
-package object macros {
+package object macros
 
   /** The Scala macros context.
     *
@@ -26,4 +26,3 @@ package object macros {
     */
   @deprecated("Use blackbox.Context or whitebox.Context instead", "2.11.0")
   type Context = whitebox.Context
-}

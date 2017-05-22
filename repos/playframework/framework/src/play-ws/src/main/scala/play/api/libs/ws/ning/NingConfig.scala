@@ -46,12 +46,10 @@ case class NingWSClientConfig(
   * Factory for creating NingWSClientConfig, for use from Java.
   */
 @deprecated("Use AhcWSConfigBuilder", "2.5")
-object NingWSClientConfigFactory {
+object NingWSClientConfigFactory
 
-  def forClientConfig(config: WSClientConfig) = {
+  def forClientConfig(config: WSClientConfig) =
     NingWSClientConfig(wsClientConfig = config)
-  }
-}
 
 /**
   * Builds a valid AsyncHttpClientConfig object from config.
@@ -60,7 +58,7 @@ object NingWSClientConfigFactory {
   */
 @deprecated("Use AhcConfigBuilder", "2.5")
 class NingAsyncHttpClientConfigBuilder(
-    ningConfig: NingWSClientConfig = NingWSClientConfig()) {
+    ningConfig: NingWSClientConfig = NingWSClientConfig())
 
   protected val addCustomSettings: DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder =
     identity
@@ -78,7 +76,7 @@ class NingAsyncHttpClientConfigBuilder(
     *
     * @return the resulting builder
     */
-  def configure(): DefaultAsyncHttpClientConfig.Builder = {
+  def configure(): DefaultAsyncHttpClientConfig.Builder =
     val config = ningConfig.wsClientConfig
 
     configureWS(ningConfig)
@@ -86,16 +84,14 @@ class NingAsyncHttpClientConfigBuilder(
     configureSSL(config.ssl)
 
     addCustomSettings(builder)
-  }
 
   /**
     * Configure and build the `AsyncHttpClientConfig` based on the settings provided
     *
     * @return the resulting builder
     */
-  def build(): AsyncHttpClientConfig = {
+  def build(): AsyncHttpClientConfig =
     configure().build()
-  }
 
   /**
     * Modify the underlying `DefaultAsyncHttpClientConfig.Builder` using the provided function, after defaults are set.
@@ -105,24 +101,21 @@ class NingAsyncHttpClientConfigBuilder(
     */
   def modifyUnderlying(
       modify: DefaultAsyncHttpClientConfig.Builder => DefaultAsyncHttpClientConfig.Builder)
-    : NingAsyncHttpClientConfigBuilder = {
-    new NingAsyncHttpClientConfigBuilder(ningConfig) {
+    : NingAsyncHttpClientConfigBuilder =
+    new NingAsyncHttpClientConfigBuilder(ningConfig)
       override val addCustomSettings =
         modify compose NingAsyncHttpClientConfigBuilder.this.addCustomSettings
       override val builder = NingAsyncHttpClientConfigBuilder.this.builder
-    }
-  }
 
   /**
     * Configures the global settings.
     */
-  def configureWS(ningConfig: NingWSClientConfig): Unit = {
+  def configureWS(ningConfig: NingWSClientConfig): Unit =
     val config = ningConfig.wsClientConfig
 
-    def toMillis(duration: Duration): Int = {
+    def toMillis(duration: Duration): Int =
       if (duration.isFinite()) duration.toMillis.toInt
       else -1
-    }
 
     builder
       .setConnectTimeout(toMillis(config.connectionTimeout))
@@ -156,11 +149,10 @@ class NingAsyncHttpClientConfigBuilder(
     // shutdownQuiet=2000 (milliseconds) and shutdownTimeout=15000 (milliseconds).
     builder.setShutdownQuietPeriod(0)
     builder.setShutdownTimeout(0)
-  }
 
   def configureProtocols(existingProtocols: Array[String],
-                         sslConfig: SSLConfig): Array[String] = {
-    val definedProtocols = sslConfig.enabledProtocols match {
+                         sslConfig: SSLConfig): Array[String] =
+    val definedProtocols = sslConfig.enabledProtocols match
       case Some(configuredProtocols) =>
         // If we are given a specific list of protocols, then return it in exactly that order,
         // assuming that it's actually possible in the SSL context.
@@ -171,62 +163,51 @@ class NingAsyncHttpClientConfigBuilder(
         Protocols.recommendedProtocols
           .filter(existingProtocols.contains)
           .toArray
-    }
 
-    if (!sslConfig.loose.allowWeakProtocols) {
+    if (!sslConfig.loose.allowWeakProtocols)
       val deprecatedProtocols = Protocols.deprecatedProtocols
-      for (deprecatedProtocol <- deprecatedProtocols) {
-        if (definedProtocols.contains(deprecatedProtocol)) {
+      for (deprecatedProtocol <- deprecatedProtocols)
+        if (definedProtocols.contains(deprecatedProtocol))
           throw new IllegalStateException(
               s"Weak protocol $deprecatedProtocol found in ws.ssl.protocols!")
-        }
-      }
-    }
     definedProtocols
-  }
 
   def configureCipherSuites(
-      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] = {
-    val definedCiphers = sslConfig.enabledCipherSuites match {
+      existingCiphers: Array[String], sslConfig: SSLConfig): Array[String] =
+    val definedCiphers = sslConfig.enabledCipherSuites match
       case Some(configuredCiphers) =>
         // If we are given a specific list of ciphers, return it in that order.
         configuredCiphers.filter(existingCiphers.contains(_)).toArray
 
       case None =>
         Ciphers.recommendedCiphers.filter(existingCiphers.contains(_)).toArray
-    }
 
-    if (!sslConfig.loose.allowWeakCiphers) {
+    if (!sslConfig.loose.allowWeakCiphers)
       val deprecatedCiphers = Ciphers.deprecatedCiphers
-      for (deprecatedCipher <- deprecatedCiphers) {
-        if (definedCiphers.contains(deprecatedCipher)) {
+      for (deprecatedCipher <- deprecatedCiphers)
+        if (definedCiphers.contains(deprecatedCipher))
           throw new IllegalStateException(
               s"Weak cipher $deprecatedCipher found in ws.ssl.ciphers!")
-        }
-      }
-    }
     definedCiphers
-  }
 
   /**
     * Configures the SSL.  Can use the system SSLContext.getDefault() if "ws.ssl.default" is set.
     */
-  def configureSSL(sslConfig: SSLConfig) {
+  def configureSSL(sslConfig: SSLConfig)
 
     // context!
     val sslContext =
-      if (sslConfig.default) {
+      if (sslConfig.default)
         logger.info(
             "buildSSLContext: ws.ssl.default is true, using default SSLContext")
         validateDefaultTrustManager(sslConfig)
         SSLContext.getDefault
-      } else {
+      else
         // break out the static methods as much as we can...
         val keyManagerFactory = buildKeyManagerFactory(sslConfig)
         val trustManagerFactory = buildTrustManagerFactory(sslConfig)
         new ConfigSSLContextBuilder(
             sslConfig, keyManagerFactory, trustManagerFactory).build()
-      }
 
     // protocols!
     val defaultParams = sslContext.getDefaultSSLParameters
@@ -244,17 +225,14 @@ class NingAsyncHttpClientConfigBuilder(
     builder.setAcceptAnyCertificate(sslConfig.loose.acceptAnyCertificate)
 
     builder.setSslEngineFactory(new JsseSslEngineFactory(sslContext))
-  }
 
-  def buildKeyManagerFactory(ssl: SSLConfig): KeyManagerFactoryWrapper = {
+  def buildKeyManagerFactory(ssl: SSLConfig): KeyManagerFactoryWrapper =
     new DefaultKeyManagerFactoryWrapper(ssl.keyManagerConfig.algorithm)
-  }
 
-  def buildTrustManagerFactory(ssl: SSLConfig): TrustManagerFactoryWrapper = {
+  def buildTrustManagerFactory(ssl: SSLConfig): TrustManagerFactoryWrapper =
     new DefaultTrustManagerFactoryWrapper(ssl.trustManagerConfig.algorithm)
-  }
 
-  def validateDefaultTrustManager(sslConfig: SSLConfig) {
+  def validateDefaultTrustManager(sslConfig: SSLConfig)
     // If we are using a default SSL context, we can't filter out certificates with weak algorithms
     // We ALSO don't have access to the trust manager from the SSLContext without doing horrible things
     // with reflection.
@@ -281,15 +259,11 @@ class NingAsyncHttpClientConfigBuilder(
       .toSet
     val algorithmChecker = new AlgorithmChecker(
         keyConstraints = constraints, signatureConstraints = Set())
-    for (cert <- trustManager.getAcceptedIssuers) {
-      try {
+    for (cert <- trustManager.getAcceptedIssuers)
+      try
         algorithmChecker.checkKeyAlgorithms(cert)
-      } catch {
+      catch
         case e: CertPathValidatorException =>
           logger.warn(
               "You are using ws.ssl.default=true and have a weak certificate in your default trust store!  (You can modify ws.ssl.disabledKeyAlgorithms to remove this message.)",
               e)
-      }
-    }
-  }
-}

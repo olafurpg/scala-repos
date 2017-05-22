@@ -40,12 +40,12 @@ import scalafx.scene.{Group, Scene}
 /**
   * Example adapted from code showed in [[http://docs.oracle.com/javafx/2/canvas/jfxpub-canvas.htm]].
   */
-object CanvasDoodleTest extends JFXApp {
+object CanvasDoodleTest extends JFXApp
 
   val canvas = new Canvas(200, 200)
 
   // Draw background with gradient
-  val rect = new Rectangle {
+  val rect = new Rectangle
     height = 400
     width = 400
     fill = new LinearGradient(0,
@@ -55,17 +55,14 @@ object CanvasDoodleTest extends JFXApp {
                               true,
                               CycleMethod.Reflect,
                               List(Stop(0, Color.Red), Stop(1, Color.Yellow)))
-  }
 
   val rootPane = new Group
   rootPane.children = List(rect, canvas)
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "Canvas Doodle Test"
-    scene = new Scene(400, 400) {
+    scene = new Scene(400, 400)
       root = rootPane
-    }
-  }
 
   canvas.translateX = 100
   canvas.translateY = 100
@@ -76,17 +73,12 @@ object CanvasDoodleTest extends JFXApp {
 
   // Clear away portions as the user drags the mouse
   canvas.onMouseDragged = (e: MouseEvent) =>
-    {
       gc.clearRect(e.x - 2, e.y - 2, 5, 5)
-  }
 
   // Fill the Canvas with a Blue rectangle when the user double-clicks
   canvas.onMouseClicked = (e: MouseEvent) =>
-    {
-      if (e.clickCount > 1) {
+      if (e.clickCount > 1)
         reset(Color.Blue)
-      }
-  }
 
   /**
     * Resets the canvas to its original look by filling in a rectangle covering
@@ -94,8 +86,6 @@ object CanvasDoodleTest extends JFXApp {
     *
     * @param color The color to fill
     */
-  private def reset(color: Color) {
+  private def reset(color: Color)
     gc.fill = color
     gc.fillRect(0, 0, canvas.width.get, canvas.height.get)
-  }
-}

@@ -5,12 +5,11 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.FunSuite
 
 @RunWith(classOf[JUnitRunner])
-class TracerTest extends FunSuite {
-  test("Combined tracers sample correctly") {
-    case class TestTracer(res: Option[Boolean]) extends Tracer {
+class TracerTest extends FunSuite
+  test("Combined tracers sample correctly")
+    case class TestTracer(res: Option[Boolean]) extends Tracer
       def record(record: Record) {}
       def sampleTrace(traceId: TraceId): Option[Boolean] = res
-    }
     val id = TraceId(None, None, SpanId(0L), None)
     assert(BroadcastTracer(
                Seq(TestTracer(None), TestTracer(None), TestTracer(None))
@@ -40,9 +39,8 @@ class TracerTest extends FunSuite {
                    TestTracer(Some(false)))
            ).sampleTrace(id) == Some(false),
            "If all Some(false) returns Some(false)")
-  }
 
-  test("check equality of tracers") {
+  test("check equality of tracers")
     val previous = DefaultTracer.self
     DefaultTracer.self = NullTracer
 
@@ -57,5 +55,3 @@ class TracerTest extends FunSuite {
 
     // Restore initial state
     DefaultTracer.self = previous
-  }
-}

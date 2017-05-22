@@ -20,7 +20,7 @@ import spire.std.bigInteger._
   * to a Long when possible.
   */
 sealed abstract class SafeLong
-    extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong] {
+    extends ScalaNumber with ScalaNumericConversions with Ordered[SafeLong]
   lhs =>
 
   def isZero: Boolean
@@ -30,61 +30,52 @@ sealed abstract class SafeLong
   def signum: Int
 
   final def +(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs + n
       case SafeLongBigInteger(n) => lhs + n
-    }
 
   final def -(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs - n
       case SafeLongBigInteger(n) => lhs - n
-    }
 
   final def *(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs * n
       case SafeLongBigInteger(n) => lhs * n
-    }
 
   final def /(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs / n
       case SafeLongBigInteger(n) => lhs / n
-    }
 
   final def %(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs % n
       case SafeLongBigInteger(n) => lhs % n
-    }
 
   final def /~(rhs: SafeLong): SafeLong =
     lhs / rhs
 
   final def /%(rhs: SafeLong): (SafeLong, SafeLong) =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs /% n
       case SafeLongBigInteger(n) => lhs /% n
-    }
 
   final def &(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs & n
       case SafeLongBigInteger(n) => lhs & n
-    }
 
   final def |(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs | n
       case SafeLongBigInteger(n) => lhs | n
-    }
 
   final def ^(rhs: SafeLong): SafeLong =
-    rhs match {
+    rhs match
       case SafeLongLong(n) => lhs ^ n
       case SafeLongBigInteger(n) => lhs ^ n
-    }
 
   def ===(that: SafeLong): Boolean =
     this == that
@@ -139,32 +130,28 @@ sealed abstract class SafeLong
     */
   final def **(k: Int): SafeLong = pow(k)
 
-  final def pow(k: Int): SafeLong = {
+  final def pow(k: Int): SafeLong =
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
-    @tailrec def loop(total: SafeLong, base: SafeLong, exp: Int): SafeLong = {
+    @tailrec def loop(total: SafeLong, base: SafeLong, exp: Int): SafeLong =
       if (exp == 0) total
       else if ((exp & 1) == 1) loop(total * base, base * base, exp >> 1)
       else loop(total, base * base, exp >> 1)
-    }
 
     loop(SafeLong.one, this, k)
-  }
 
-  final def modPow(k: Int, mod: SafeLong): SafeLong = {
+  final def modPow(k: Int, mod: SafeLong): SafeLong =
     if (k < 0) throw new IllegalArgumentException(s"negative exponent: $k")
 
     @tailrec
     def loop(
-        total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong = {
+        total: SafeLong, base: SafeLong, k: Int, mod: SafeLong): SafeLong =
       if (k == 0) total
       else if ((k & 1) == 1)
         loop((total * base) % mod, (base * base) % mod, k >> 1, mod)
       else loop(total, (base * base) % mod, k >> 1, mod)
-    }
 
     loop(SafeLong.one % mod, this, k, mod)
-  }
 
   def abs: SafeLong
 
@@ -183,10 +170,9 @@ sealed abstract class SafeLong
   private[math] def toBigInteger: BigInteger
 
   override def toString: String =
-    this match {
+    this match
       case SafeLongLong(n) => n.toString
       case SafeLongBigInteger(n) => n.toString
-    }
 
   final def isWhole: Boolean = true
 
@@ -194,9 +180,8 @@ sealed abstract class SafeLong
     toBigInteger.isProbablePrime(c)
 
   def bitLength: Int
-}
 
-object SafeLong extends SafeLongInstances {
+object SafeLong extends SafeLongInstances
 
   final val minusOne: SafeLong = SafeLongLong(-1L)
   final val zero: SafeLong = SafeLongLong(0L)
@@ -215,13 +200,12 @@ object SafeLong extends SafeLongInstances {
     else SafeLongBigInteger(x.bigInteger)
 
   private[math] def apply(s: String): SafeLong =
-    try {
+    try
       SafeLong(java.lang.Long.parseLong(s))
-    } catch {
+    catch
       case _: Exception => SafeLong(new BigInteger(s))
-    }
 
-  def longGcd(x: Long, y: Long): SafeLong = {
+  def longGcd(x: Long, y: Long): SafeLong =
     def absWrap(x: Long): SafeLong =
       if (x >= 0) SafeLong(x)
       else if (x == Long.MinValue) SafeLong.safe64
@@ -229,29 +213,26 @@ object SafeLong extends SafeLongInstances {
 
     if (x == 0) absWrap(y)
     else if (y == 0) absWrap(x)
-    else if (x == Long.MinValue) {
+    else if (x == Long.MinValue)
       if (y == Long.MinValue) SafeLong.safe64
       else spire.math.gcd(y, x % y)
-    } else if (y == Long.MinValue) SafeLongLong(spire.math.gcd(x, y % x))
+    else if (y == Long.MinValue) SafeLongLong(spire.math.gcd(x, y % x))
     else SafeLongLong(spire.math.gcd(x, y % x))
-  }
 
   def mixedGcd(x: Long, y: BigInteger): SafeLong =
-    if (y.signum == 0) {
+    if (y.signum == 0)
       if (x >= 0) SafeLongLong(x)
       else if (x == Long.MinValue) SafeLong.safe64
       else SafeLongLong(-x)
-    } else if (x == 0L) {
+    else if (x == 0L)
       SafeLong(y.abs)
-    } else if (x == Long.MinValue) {
+    else if (x == Long.MinValue)
       SafeLong(SafeLong.big64 gcd y)
-    } else {
+    else
       SafeLongLong(
           spire.math.gcd(x, (y remainder BigInteger.valueOf(x)).longValue))
-    }
-}
 
-private[math] final case class SafeLongLong(x: Long) extends SafeLong {
+private[math] final case class SafeLongLong(x: Long) extends SafeLong
 
   def isZero: Boolean = x == 0L
   def isOne: Boolean = x == 1L
@@ -320,49 +301,41 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
         SafeLongBigInteger(BigInteger.valueOf(x).negate()))
 
   override def <(that: SafeLong): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => x < y
       case SafeLongBigInteger(y) => y.signum > 0
-    }
 
   override def <=(that: SafeLong): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => x <= y
       case SafeLongBigInteger(y) => y.signum > 0
-    }
 
   override def >(that: SafeLong): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => x > y
       case SafeLongBigInteger(y) => y.signum < 0
-    }
 
   override def >=(that: SafeLong): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => x >= y
       case SafeLongBigInteger(y) => y.signum < 0
-    }
 
   def compare(that: SafeLong): Int =
-    that match {
+    that match
       case SafeLongLong(y) =>
         x compare y
       case SafeLongBigInteger(y) =>
         -y.signum
-    }
 
-  def <<(n: Int): SafeLong = {
+  def <<(n: Int): SafeLong =
     if (x == 0) return this
     if (n < 0) return this >> -n
-    if (n < 64) {
-      if (x >= 0) {
+    if (n < 64)
+      if (x >= 0)
         if (x <= (0x7fffffffffffffffL >> n)) return SafeLongLong(x << n)
-      } else {
+      else
         if (x >= (0x8000000000000000L >> n)) return SafeLongLong(x << n)
-      }
-    }
     SafeLongBigInteger(BigInteger.valueOf(x).shiftLeft(n))
-  }
 
   def >>(n: Int): SafeLong =
     if (n >= 64) (if (x >= 0) SafeLong.zero else SafeLong.minusOne)
@@ -372,12 +345,11 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
     else this << -n
 
   override def equals(that: Any): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => x == y
       case SafeLongBigInteger(y) => false
       case that: BigInt => if (that.bitLength > 63) false else that.toLong == x
       case that => that == x
-    }
 
   def abs: SafeLong =
     if (x >= 0) this
@@ -385,10 +357,9 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
     else SafeLong(-x)
 
   def gcd(that: SafeLong): SafeLong =
-    that match {
+    that match
       case SafeLongLong(y) => SafeLong.longGcd(x, y)
       case SafeLongBigInteger(y) => SafeLong.mixedGcd(x, y)
-    }
 
   def doubleValue: Double = x.toDouble
   def floatValue: Float = x.toFloat
@@ -404,10 +375,9 @@ private[math] final case class SafeLongLong(x: Long) extends SafeLong {
   def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = 64 - java.lang.Long.numberOfLeadingZeros(x)
-}
 
 private[math] final case class SafeLongBigInteger(x: BigInteger)
-    extends SafeLong {
+    extends SafeLong
 
   def isZero: Boolean = false // 0 will always be represented as a SafeLongLong
   def isOne: Boolean = false // 1 will always be represented as a SafeLongLong
@@ -427,10 +397,9 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 
   def %(y: Long): SafeLong = SafeLong(x remainder BigInteger.valueOf(y))
 
-  def /%(y: Long): (SafeLong, SafeLong) = {
+  def /%(y: Long): (SafeLong, SafeLong) =
     val Array(q, r) = x.divideAndRemainder(BigInteger.valueOf(y))
     (SafeLong(q), SafeLong(r))
-  }
 
   def &(y: Long): SafeLong = SafeLong(x and BigInteger.valueOf(y))
   def |(y: Long): SafeLong = SafeLong(x or BigInteger.valueOf(y))
@@ -450,10 +419,9 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
 
   def %(y: BigInteger): SafeLong = SafeLong(x remainder y)
 
-  def /%(y: BigInteger): (SafeLong, SafeLong) = {
+  def /%(y: BigInteger): (SafeLong, SafeLong) =
     val Array(q, r) = x divideAndRemainder y
     (SafeLong(q), SafeLong(r))
-  }
 
   def &(y: BigInteger): SafeLong = SafeLong(x and y)
   def |(y: BigInteger): SafeLong = SafeLong(x or y)
@@ -462,33 +430,30 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
   def unary_-(): SafeLong = SafeLong(x.negate())
 
   def compare(that: SafeLong): Int =
-    that match {
+    that match
       case SafeLongLong(y) =>
         x.signum
       case SafeLongBigInteger(y) =>
         x compareTo y
-    }
 
   def <<(n: Int): SafeLong = SafeLong(x.shiftLeft(n))
   def >>(n: Int): SafeLong = SafeLong(x.shiftRight(n))
 
   override def equals(that: Any): Boolean =
-    that match {
+    that match
       case SafeLongLong(y) => false
       case SafeLongBigInteger(y) => x == y
       case that: BigInt => x equals that.bigInteger
       case that => that == BigInt(x)
-    }
 
   def abs: SafeLong =
     if (x.signum >= 0) this
     else SafeLongBigInteger(x.negate())
 
   def gcd(that: SafeLong): SafeLong =
-    that match {
+    that match
       case SafeLongLong(y) => SafeLong.mixedGcd(y, x)
       case SafeLongBigInteger(y) => SafeLong(x gcd y)
-    }
 
   def doubleValue: Double = x.doubleValue
   def floatValue: Float = x.floatValue
@@ -509,9 +474,8 @@ private[math] final case class SafeLongBigInteger(x: BigInteger)
   def toBigDecimal: BigDecimal = BigDecimal(x)
 
   def bitLength: Int = x.bitLength
-}
 
-trait SafeLongInstances {
+trait SafeLongInstances
   @SerialVersionUID(1L)
   implicit object SafeLongAlgebra
       extends SafeLongIsEuclideanRing with SafeLongIsNRoot with Serializable
@@ -521,9 +485,8 @@ trait SafeLongInstances {
 
   implicit final val SafeLongTag =
     new NumberTag.LargeTag[SafeLong](NumberTag.Integral, SafeLong.zero)
-}
 
-private[math] trait SafeLongIsRing extends Ring[SafeLong] {
+private[math] trait SafeLongIsRing extends Ring[SafeLong]
   override def minus(a: SafeLong, b: SafeLong): SafeLong = a - b
   def negate(a: SafeLong): SafeLong = -a
   val one: SafeLong = SafeLong.one
@@ -533,29 +496,25 @@ private[math] trait SafeLongIsRing extends Ring[SafeLong] {
   val zero: SafeLong = SafeLong.zero
 
   override def fromInt(n: Int): SafeLong = SafeLong(n)
-}
 
 private[math] trait SafeLongIsEuclideanRing
-    extends EuclideanRing[SafeLong] with SafeLongIsRing {
+    extends EuclideanRing[SafeLong] with SafeLongIsRing
   def quot(a: SafeLong, b: SafeLong): SafeLong = a / b
   def mod(a: SafeLong, b: SafeLong): SafeLong = a % b
   override def quotmod(a: SafeLong, b: SafeLong): (SafeLong, SafeLong) = a /% b
   def gcd(a: SafeLong, b: SafeLong): SafeLong = a gcd b
-}
 
-private[math] trait SafeLongIsNRoot extends NRoot[SafeLong] {
+private[math] trait SafeLongIsNRoot extends NRoot[SafeLong]
   def nroot(a: SafeLong, k: Int): SafeLong =
-    a match {
+    a match
       case SafeLongLong(n) => SafeLong(NRoot[Long].nroot(n, k))
       case SafeLongBigInteger(n) => SafeLong(NRoot[BigInteger].nroot(n, k))
-    }
 
   def fpow(a: SafeLong, b: SafeLong): SafeLong =
     if (b.isValidInt) a.pow(b.toInt)
     else SafeLong(NRoot[BigInteger].fpow(a.toBigInteger, b.toBigInteger))
-}
 
-private[math] trait SafeLongOrder extends Order[SafeLong] {
+private[math] trait SafeLongOrder extends Order[SafeLong]
   override def eqv(x: SafeLong, y: SafeLong): Boolean = x == y
   override def neqv(x: SafeLong, y: SafeLong): Boolean = x != y
   override def gt(x: SafeLong, y: SafeLong): Boolean = x > y
@@ -563,15 +522,12 @@ private[math] trait SafeLongOrder extends Order[SafeLong] {
   override def lt(x: SafeLong, y: SafeLong): Boolean = x < y
   override def lteqv(x: SafeLong, y: SafeLong): Boolean = x <= y
   def compare(x: SafeLong, y: SafeLong): Int = x compare y
-}
 
-private[math] trait SafeLongIsSigned extends Signed[SafeLong] {
+private[math] trait SafeLongIsSigned extends Signed[SafeLong]
   def signum(a: SafeLong): Int = a.signum
   def abs(a: SafeLong): SafeLong = a.abs
-}
 
 private[math] trait SafeLongIsReal
-    extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned {
+    extends IsIntegral[SafeLong] with SafeLongOrder with SafeLongIsSigned
   def toDouble(n: SafeLong): Double = n.toDouble
   def toBigInt(n: SafeLong): BigInt = n.toBigInt
-}

@@ -26,8 +26,8 @@ import org.apache.spark.sql.types.{ArrayType, DecimalType}
 import org.apache.spark.tags.DockerTest
 
 @DockerTest
-class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
-  override val db = new DatabaseOnDocker {
+class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite
+  override val db = new DatabaseOnDocker
     override val imageName = "postgres:9.4.5"
     override val env = Map(
         "POSTGRES_PASSWORD" -> "rootpass"
@@ -35,9 +35,8 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
     override val jdbcPort = 5432
     override def getJdbcUrl(ip: String, port: Int): String =
       s"jdbc:postgresql://$ip:$port/postgres?user=postgres&password=rootpass"
-  }
 
-  override def dataPreparation(conn: Connection): Unit = {
+  override def dataPreparation(conn: Connection): Unit =
     conn.prepareStatement("CREATE DATABASE foo").executeUpdate()
     conn.setCatalog("foo")
     conn
@@ -55,9 +54,8 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
           "B'1000100101', E'\\\\xDEADBEEF', true, '172.16.0.42', '192.168.0.0/16', " +
           """'{1, 2}', '{"a", null, "b"}', '{0.11, 0.22}', '{0.11, 0.22}', 'd1')""")
       .executeUpdate()
-  }
 
-  test("Type mapping for various types") {
+  test("Type mapping for various types")
     val df = sqlContext.read.jdbc(jdbcUrl, "bar", new Properties)
     val rows = df.collect()
     assert(rows.length == 1)
@@ -101,9 +99,8 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
     assert(rows(0).getSeq(13) == Seq("0.11", "0.22").map(
             BigDecimal(_).bigDecimal))
     assert(rows(0).getString(14) == "d1")
-  }
 
-  test("Basic write test") {
+  test("Basic write test")
     val df = sqlContext.read.jdbc(jdbcUrl, "bar", new Properties)
     // Test only that it doesn't crash.
     df.write.jdbc(jdbcUrl, "public.barcopy", new Properties)
@@ -114,10 +111,8 @@ class PostgresIntegrationSuite extends DockerJDBCIntegrationSuite {
           .schema(13)
           .dataType == ArrayType(DecimalType(2, 2), true))
     // Test write null values.
-    df.select(df.queryExecution.analyzed.output.map { a =>
+    df.select(df.queryExecution.analyzed.output.map  a =>
         Column(Literal.create(null, a.dataType)).as(a.name)
-      }: _*)
+      : _*)
       .write
       .jdbc(jdbcUrl, "public.barcopy2", new Properties)
-  }
-}

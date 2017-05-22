@@ -10,7 +10,7 @@ import lila.i18n.Env.{current => i18nEnv}
 import lila.i18n.{LangList, I18nDomain, I18nKey}
 import lila.user.UserContext
 
-trait I18nHelper {
+trait I18nHelper
 
   private def pool = i18nEnv.pool
   private def transInfos = i18nEnv.transInfos
@@ -41,27 +41,24 @@ trait I18nHelper {
   def transValidationPattern(trans: String) =
     (trans contains "%s") option ".*%s.*"
 
-  def langFallbackLinks(implicit ctx: UserContext) = Html {
+  def langFallbackLinks(implicit ctx: UserContext) = Html
     pool
       .preferredNames(ctx.req, 3)
-      .map {
+      .map
         case (code, name) =>
           """<a class="lang_fallback" lang="%s" href="%s">%s</a>""".format(
               code, langUrl(Lang(code))(I18nDomain(ctx.req.domain)), name)
-      }
       .mkString("")
       .replace(uriPlaceholder, ctx.req.uri)
-  }
 
   private lazy val langAnnotationsBase: String =
-    pool.names.keySet diff Set("fp", "kb", "le", "tp", "pi", "io") map {
+    pool.names.keySet diff Set("fp", "kb", "le", "tp", "pi", "io") map
       code =>
         s"""<link rel="alternate" hreflang="$code" href="http://$code.lichess.org%"/>"""
-    } mkString ""
+    mkString ""
 
-  def langAnnotations(implicit ctx: UserContext) = Html {
+  def langAnnotations(implicit ctx: UserContext) = Html
     langAnnotationsBase.replace("%", ctx.req.uri)
-  }
 
   def commonDomain(implicit ctx: UserContext): String =
     I18nDomain(ctx.req.domain).commonDomain
@@ -76,4 +73,3 @@ trait I18nHelper {
 
   private def langUrl(lang: Lang)(i18nDomain: I18nDomain) =
     protocol + (i18nDomain withLang lang).domain + uriPlaceholder
-}

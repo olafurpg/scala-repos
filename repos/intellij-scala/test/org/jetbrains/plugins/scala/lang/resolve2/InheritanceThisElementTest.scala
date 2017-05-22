@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class InheritanceThisElementTest extends ResolveTestBase {
-  override def folderPath: String = {
+class InheritanceThisElementTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "inheritance/this/element/"
-  }
 
   //TODO scriptthis
 //  def testBlock = doTest
@@ -21,4 +20,3 @@ class InheritanceThisElementTest extends ResolveTestBase {
 //  def testFunction = doTest
   def testObject() = doTest()
   def testTrait() = doTest()
-}

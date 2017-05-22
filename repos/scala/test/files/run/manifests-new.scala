@@ -1,22 +1,20 @@
 import scala.language.{higherKinds, postfixOps}
 import scala.reflect.runtime.universe._
 
-object Test {
-  object Variances extends Enumeration {
+object Test
+  object Variances extends Enumeration
     val CO, IN, CONTRA = Value
-  }
   import Variances.{CO, IN, CONTRA}
 
-  object SubtypeRelationship extends Enumeration {
+  object SubtypeRelationship extends Enumeration
     val NONE, SAME, SUB, SUPER = Value
-  }
   import SubtypeRelationship.{NONE, SAME, SUB, SUPER}
 
   class VarianceTester[T, U, CC[_]](expected: Variances.Value)(
       implicit ev1: TypeTag[T],
       ev2: TypeTag[U],
       ev3: TypeTag[CC[T]],
-      ev4: TypeTag[CC[U]]) {
+      ev4: TypeTag[CC[U]])
 
     def elements = List(ev1.tpe <:< ev2.tpe, ev2.tpe <:< ev1.tpe)
     def containers = List(ev3.tpe <:< ev4.tpe, ev4.tpe <:< ev3.tpe)
@@ -37,15 +35,13 @@ object Test {
       if (isUnrelated) allContainerVariances forall (_ == false)
       else if (isSame) allContainerVariances forall (_ == true)
       else
-        expected match {
+        expected match
           case CO =>
             showsCovariance && !showsContravariance && !showsInvariance
           case IN =>
             showsInvariance && !showsCovariance && !showsContravariance
           case CONTRA =>
             showsContravariance && !showsCovariance && !showsInvariance
-        }
-  }
 
   def showsCovariance[T, U, CC[_]](implicit ev1: TypeTag[T],
                                    ev2: TypeTag[U],
@@ -66,12 +62,11 @@ object Test {
     new VarianceTester[T, U, CC](CONTRA) showsExpectedVariance
 
   def typeCompare[T, U](implicit ev1: TypeTag[T], ev2: TypeTag[U]) =
-    (ev1.tpe <:< ev2.tpe, ev2.tpe <:< ev1.tpe) match {
+    (ev1.tpe <:< ev2.tpe, ev2.tpe <:< ev1.tpe) match
       case (true, true) => SAME
       case (true, false) => SUB
       case (false, true) => SUPER
       case (false, false) => NONE
-    }
 
   def assertAnyRef[T : TypeTag] =
     List(
@@ -102,7 +97,7 @@ object Test {
       "testVariancesVia"
   )
 
-  def runAllTests = {
+  def runAllTests =
     assertAnyVal[AnyVal]
     assertAnyVal[Unit]
     assertAnyVal[Int]
@@ -166,7 +161,5 @@ object Test {
     assertNoRelationship[Boolean, String]
     assertNoRelationship[List[Boolean], List[String]]
     assertNoRelationship[Set[Boolean], Set[String]]
-  }
 
   def main(args: Array[String]): Unit = runAllTests
-}

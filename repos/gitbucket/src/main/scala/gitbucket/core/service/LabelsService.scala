@@ -4,7 +4,7 @@ import gitbucket.core.model.Label
 import gitbucket.core.model.Profile._
 import profile.simple._
 
-trait LabelsService {
+trait LabelsService
 
   def getLabels(
       owner: String, repository: String)(implicit s: Session): List[Label] =
@@ -42,8 +42,6 @@ trait LabelsService {
       .update(labelName, color)
 
   def deleteLabel(owner: String, repository: String, labelId: Int)(
-      implicit s: Session): Unit = {
+      implicit s: Session): Unit =
     IssueLabels.filter(_.byLabel(owner, repository, labelId)).delete
     Labels.filter(_.byPrimaryKey(owner, repository, labelId)).delete
-  }
-}

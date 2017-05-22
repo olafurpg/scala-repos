@@ -25,7 +25,7 @@ case class ASTNode(token: Token,
                    stopIndex: Int,
                    children: List[ASTNode],
                    stream: TokenRewriteStream)
-    extends TreeNode[ASTNode] {
+    extends TreeNode[ASTNode]
 
   /** Cache the number of children. */
   val numChildren: Int = children.size
@@ -34,26 +34,22 @@ case class ASTNode(token: Token,
   val pattern: Some[(String, List[ASTNode])] = Some((token.getText, children))
 
   /** Line in which the ASTNode starts. */
-  lazy val line: Int = {
+  lazy val line: Int =
     val line = token.getLine
-    if (line == 0) {
+    if (line == 0)
       if (children.nonEmpty) children.head.line
       else 0
-    } else {
+    else
       line
-    }
-  }
 
   /** Position of the Character at which ASTNode starts. */
-  lazy val positionInLine: Int = {
+  lazy val positionInLine: Int =
     val line = token.getCharPositionInLine
-    if (line == -1) {
+    if (line == -1)
       if (children.nonEmpty) children.head.positionInLine
       else 0
-    } else {
+    else
       line
-    }
-  }
 
   /** Origin of the ASTNode. */
   override val origin: Origin = Origin(Some(line), Some(positionInLine))
@@ -62,10 +58,9 @@ case class ASTNode(token: Token,
   lazy val source: String = stream.toOriginalString(startIndex, stopIndex)
 
   /** Get the source text that remains after this token. */
-  lazy val remainder: String = {
+  lazy val remainder: String =
     stream.fill()
     stream.toOriginalString(stopIndex + 1, stream.size() - 1).trim()
-  }
 
   def text: String = token.getText
 
@@ -77,24 +72,19 @@ case class ASTNode(token: Token,
     * Right now this function only checks the name, type, text and children of the node
     * for equality.
     */
-  def treeEquals(other: ASTNode): Boolean = {
-    def check(f: ASTNode => Any): Boolean = {
+  def treeEquals(other: ASTNode): Boolean =
+    def check(f: ASTNode => Any): Boolean =
       val l = f(this)
       val r = f(other)
       (l == null && r == null) || l.equals(r)
-    }
-    if (other == null) {
+    if (other == null)
       false
-    } else if (!check(_.token.getType) || !check(_.token.getText) ||
-               !check(_.numChildren)) {
+    else if (!check(_.token.getType) || !check(_.token.getText) ||
+               !check(_.numChildren))
       false
-    } else {
-      children.zip(other.children).forall {
+    else
+      children.zip(other.children).forall
         case (l, r) => l treeEquals r
-      }
-    }
-  }
 
   override def simpleString: String =
     s"$text $line, $startIndex, $stopIndex, $positionInLine "
-}

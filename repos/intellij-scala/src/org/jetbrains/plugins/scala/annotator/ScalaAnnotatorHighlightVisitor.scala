@@ -21,33 +21,31 @@ import scala.collection.JavaConversions
   * Date: 31.05.2010
   */
 class ScalaAnnotatorHighlightVisitor(project: Project)
-    extends HighlightVisitor {
+    extends HighlightVisitor
   def order: Int = 0
 
   private var myHolder: HighlightInfoHolder = null
   private var myRefCountHolder: ScalaRefCountHolder = null
   private var myAnnotationHolder: AnnotationHolderImpl = null
 
-  override def suitableForFile(file: PsiFile): Boolean = file match {
+  override def suitableForFile(file: PsiFile): Boolean = file match
     case _: ScalaFile => true
     case otherFile => ScalaLanguageDerivative hasDerivativeOnFile otherFile
-  }
 
-  def visit(element: PsiElement) {
+  def visit(element: PsiElement)
     runAnnotator(element)
-  }
 
   def analyze(file: PsiFile,
               updateWholeFile: Boolean,
               holder: HighlightInfoHolder,
-              action: Runnable): Boolean = {
+              action: Runnable): Boolean =
 //    val time = System.currentTimeMillis()
     var success = true
-    try {
+    try
       myHolder = holder
       myAnnotationHolder = new AnnotationHolderImpl(
           holder.getAnnotationSession)
-      if (updateWholeFile) {
+      if (updateWholeFile)
         val project: Project = file.getProject
         val refCountHolder: ScalaRefCountHolder =
           ScalaRefCountHolder.getInstance(file)
@@ -56,47 +54,36 @@ class ScalaAnnotatorHighlightVisitor(project: Project)
           PsiDocumentManager.getInstance(project).getDocument(file)
         val dirtyScope: TextRange =
           if (document == null) file.getTextRange
-          else {
-            DaemonCodeAnalyzer.getInstance(project) match {
+          else
+            DaemonCodeAnalyzer.getInstance(project) match
               case analyzerImpl: DaemonCodeAnalyzerImpl =>
                 val fileStatusMap = analyzerImpl.getFileStatusMap
                 fileStatusMap.getFileDirtyScope(document, Pass.UPDATE_ALL)
               case _ => file.getTextRange
-            }
-          }
         success = refCountHolder.analyze(action, dirtyScope, file)
-      } else {
+      else
         myRefCountHolder = null
         action.run()
-      }
-    } finally {
+    finally
       myHolder = null
       myAnnotationHolder = null
       myRefCountHolder = null
-    }
     // TODO We should probably create a dedicated registry property that enables printing of the running time.
     // Otherwise, the output always pollutes the console, even when there's no need for that data.
     // IDEA's "internal mode" is a too coarse-grained switch for that.
 //    val method: Long = System.currentTimeMillis() - time
 //    if (method > 100 && ApplicationManager.getApplication.isInternal) println(s"File: ${file.getName}, Time: $method")
     success
-  }
 
-  override def clone: HighlightVisitor = {
+  override def clone: HighlightVisitor =
     new ScalaAnnotatorHighlightVisitor(project)
-  }
 
-  private def runAnnotator(element: PsiElement) {
-    if (DumbService.getInstance(project).isDumb) {
+  private def runAnnotator(element: PsiElement)
+    if (DumbService.getInstance(project).isDumb)
       return
-    }
     (new ScalaAnnotator).annotate(element, myAnnotationHolder)
-    if (myAnnotationHolder.hasAnnotations) {
+    if (myAnnotationHolder.hasAnnotations)
       import scala.collection.JavaConversions._
-      for (annotation <- myAnnotationHolder) {
+      for (annotation <- myAnnotationHolder)
         myHolder.add(HighlightInfo.fromAnnotation(annotation))
-      }
       myAnnotationHolder.clear()
-    }
-  }
-}

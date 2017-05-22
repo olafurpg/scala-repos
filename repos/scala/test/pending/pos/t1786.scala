@@ -9,7 +9,7 @@ class SomeClass(val intValue: Int)
 class MyClass[T <: SomeClass](val myValue: T)
 class Flooz[A >: Null <: SomeClass, T >: Null <: A](var value: T)
 
-class A {
+class A
   def f1(i: MyClass[_]) = i.myValue.intValue
   def f2(i: MyClass[_ <: SomeClass]) = i.myValue.intValue
   // def f3[T](i: MyClass[T])                   = i.myValue.intValue
@@ -23,4 +23,3 @@ class A {
   class MyClass2(x: MyClass[_]) { val p = x.myValue.intValue }
   // class MyClass3[T <: String](x: MyClass[T]) { val p = x.myValue.intValue + x.myValue.length }
   // class MyClass4[T >: Null](x: MyClass[T]) { val p = x.myValue.intValue }
-}

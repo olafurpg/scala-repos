@@ -24,14 +24,13 @@ import scala.language.implicitConversions
   *
   * @group Engine
   */
-abstract class EngineFactory {
+abstract class EngineFactory
 
   /** Creates an instance of an [[Engine]]. */
   def apply(): BaseEngine[_, _, _, _]
 
   /** Override this method to programmatically return engine parameters. */
   def engineParams(key: String): EngineParams = EngineParams()
-}
 
 /** DEPRECATED. Use [[EngineFactory]] instead.
   *

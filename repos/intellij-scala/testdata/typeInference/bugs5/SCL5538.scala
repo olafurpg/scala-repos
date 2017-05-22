@@ -1,14 +1,12 @@
-object SCL5538 {
+object SCL5538
 
-  class A {
+  class A
     def aMethod = 42
-  }
 
-  object B {
+  object B
     trait C
 
     implicit def cToA(c: C): A = new A
-  }
 
   class D extends B.C
 
@@ -16,5 +14,4 @@ object SCL5538 {
 
   /*start*/
   d.aMethod /*end*/
-}
 //Int

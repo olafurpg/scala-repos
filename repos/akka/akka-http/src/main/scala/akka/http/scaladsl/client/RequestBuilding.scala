@@ -15,10 +15,10 @@ import akka.http.scaladsl.model._
 import headers.HttpCredentials
 import HttpMethods._
 
-trait RequestBuilding extends TransformerPipelineSupport {
+trait RequestBuilding extends TransformerPipelineSupport
   type RequestTransformer = HttpRequest ⇒ HttpRequest
 
-  class RequestBuilder(val method: HttpMethod) {
+  class RequestBuilder(val method: HttpMethod)
     def apply(): HttpRequest =
       apply("/")
 
@@ -47,17 +47,15 @@ trait RequestBuilding extends TransformerPipelineSupport {
         uri: Uri, content: Option[T])(implicit m: ToEntityMarshaller[T],
                                       timeout: Timeout = Timeout(1.second),
                                       ec: ExecutionContext): HttpRequest =
-      content match {
+      content match
         case None ⇒ apply(uri, HttpEntity.Empty)
         case Some(value) ⇒
           val entity =
             Await.result(Marshal(value).to[RequestEntity], timeout.duration)
           apply(uri, entity)
-      }
 
     def apply(uri: Uri, entity: RequestEntity): HttpRequest =
       HttpRequest(method, uri, Nil, entity)
-  }
 
   val Get = new RequestBuilder(GET)
   val Post = new RequestBuilder(POST)
@@ -74,11 +72,10 @@ trait RequestBuilding extends TransformerPipelineSupport {
     _.mapHeaders(header +: _)
 
   def addHeader(headerName: String, headerValue: String): RequestTransformer =
-    HttpHeader.parse(headerName, headerValue) match {
+    HttpHeader.parse(headerName, headerValue) match
       case HttpHeader.ParsingResult.Ok(h, Nil) ⇒ addHeader(h)
       case result ⇒
         throw new IllegalArgumentException(result.errors.head.formatPretty)
-    }
 
   def addHeaders(first: HttpHeader, more: HttpHeader*): RequestTransformer =
     _.mapHeaders(_ ++ (first +: more))
@@ -110,6 +107,5 @@ trait RequestBuilding extends TransformerPipelineSupport {
 
   implicit def header2AddHeader(header: HttpHeader): RequestTransformer =
     addHeader(header)
-}
 
 object RequestBuilding extends RequestBuilding

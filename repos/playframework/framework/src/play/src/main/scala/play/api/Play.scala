@@ -17,10 +17,9 @@ import org.apache.xerces.impl.Constants
 import javax.xml.XMLConstants
 
 /** Application mode, either `DEV`, `TEST`, or `PROD`. */
-object Mode extends Enumeration {
+object Mode extends Enumeration
   type Mode = Value
   val Dev, Test, Prod = Value
-}
 
 /**
   * High-level API to access Play global features.
@@ -31,7 +30,7 @@ object Mode extends Enumeration {
   * import play.api.Play.current
   * }}}
   */
-object Play {
+object Play
 
   private val logger = Logger(Play.getClass)
 
@@ -108,14 +107,14 @@ object Play {
     *
     * @param app the application to start
     */
-  def start(app: Application) {
+  def start(app: Application)
 
     // First stop previous app if exists
     stop(_currentApp)
 
     _currentApp = app
 
-    Threads.withContextClassLoader(app.classloader) {
+    Threads.withContextClassLoader(app.classloader)
       // Call before start now
       app.global.beforeStart(app)
 
@@ -125,62 +124,51 @@ object Play {
 
       // If the global plugin is loaded, then send it a start now.
       app.global.onStart(app)
-    }
 
-    app.mode match {
+    app.mode match
       case Mode.Test =>
       case mode => logger.info("Application started (" + mode + ")")
-    }
-  }
 
   /**
     * Stops the given application.
     */
-  def stop(app: Application) {
-    if (app != null) {
-      Threads.withContextClassLoader(app.classloader) {
+  def stop(app: Application)
+    if (app != null)
+      Threads.withContextClassLoader(app.classloader)
         app.global.onStop(app)
-        try { Await.ready(app.stop(), Duration.Inf) } catch {
+        try { Await.ready(app.stop(), Duration.Inf) } catch
           case NonFatal(e) => logger.warn("Error stopping application", e)
-        }
-      }
-    }
     _currentApp = null
-  }
 
   /**
     * @deprecated inject the [[play.api.Environment]] instead
     */
   @deprecated("inject the play.api.Environment instead", "2.5.0")
   def resourceAsStream(name: String)(
-      implicit app: Application): Option[InputStream] = {
+      implicit app: Application): Option[InputStream] =
     app.resourceAsStream(name)
-  }
 
   /**
     * @deprecated inject the [[play.api.Environment]] instead
     */
   @deprecated("inject the play.api.Environment instead", "2.5.0")
-  def resource(name: String)(implicit app: Application): Option[java.net.URL] = {
+  def resource(name: String)(implicit app: Application): Option[java.net.URL] =
     app.resource(name)
-  }
 
   /**
     * @deprecated inject the [[play.api.Environment]] instead
     */
   @deprecated("inject the play.api.Environment instead", "2.5.0")
-  def getFile(relativePath: String)(implicit app: Application): File = {
+  def getFile(relativePath: String)(implicit app: Application): File =
     app.getFile(relativePath)
-  }
 
   /**
     * @deprecated inject the [[play.api.Environment]] instead
     */
   @deprecated("inject the play.api.Environment instead", "2.5.0")
   def getExistingFile(relativePath: String)(
-      implicit app: Application): Option[File] = {
+      implicit app: Application): Option[File] =
     app.getExistingFile(relativePath)
-  }
 
   /**
     * @deprecated inject the [[play.api.Application]] instead
@@ -254,4 +242,3 @@ object Play {
     */
   implicit def materializer(implicit app: Application): Materializer =
     app.materializer
-}

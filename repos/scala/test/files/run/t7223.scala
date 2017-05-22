@@ -1,16 +1,13 @@
-class D(val a: () => Int => () => Any) {
+class D(val a: () => Int => () => Any)
   a()(0)()
-}
 
 object Crash
     extends D(
         () =>
-          { (x: Int) =>
-        { () =>
+          (x: Int) =>
+        () =>
           { new { println(x.toString) } }
-        }
-    })
+    )
 
-object Test extends App {
+object Test extends App
   Crash
-}

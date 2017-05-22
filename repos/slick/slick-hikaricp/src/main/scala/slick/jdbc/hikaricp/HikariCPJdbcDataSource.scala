@@ -10,30 +10,28 @@ import slick.util.ConfigExtensionMethods._
   * See `slick.jdbc.JdbcBackend#Database.forConfig` for documentation on the config parameters. */
 class HikariCPJdbcDataSource(val ds: com.zaxxer.hikari.HikariDataSource,
                              val hconf: com.zaxxer.hikari.HikariConfig)
-    extends JdbcDataSource {
+    extends JdbcDataSource
   def createConnection(): Connection = ds.getConnection()
   def close(): Unit = ds.close()
-}
 
-object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
+object HikariCPJdbcDataSource extends JdbcDataSourceFactory
   import com.zaxxer.hikari._
 
   def forConfig(c: Config,
                 driver: Driver,
                 name: String,
-                classLoader: ClassLoader): HikariCPJdbcDataSource = {
+                classLoader: ClassLoader): HikariCPJdbcDataSource =
     if (driver ne null)
       throw new SlickException(
           "An explicit Driver object is not supported by HikariCPJdbcDataSource")
     val hconf = new HikariConfig()
 
     // Connection settings
-    if (c.hasPath("dataSourceClass")) {
+    if (c.hasPath("dataSourceClass"))
       hconf.setDataSourceClassName(c.getString("dataSourceClass"))
-    } else {
+    else
       Option(c.getStringOr("driverClassName", c.getStringOr("driver")))
         .map(hconf.setDriverClassName _)
-    }
     hconf.setJdbcUrl(c.getStringOr("url", null))
     c.getStringOpt("user").foreach(hconf.setUsername)
     c.getStringOpt("password").foreach(hconf.setPassword)
@@ -65,5 +63,3 @@ object HikariCPJdbcDataSource extends JdbcDataSourceFactory {
 
     val ds = new HikariDataSource(hconf)
     new HikariCPJdbcDataSource(ds, hconf)
-  }
-}

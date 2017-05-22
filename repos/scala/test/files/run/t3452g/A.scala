@@ -1,6 +1,5 @@
-trait TraversableLike[A, Repr] {
+trait TraversableLike[A, Repr]
   def tail: Repr = null.asInstanceOf[Repr]
-}
 
 abstract class AbstractTrav[A] extends TraversableLike[A, AbstractTrav[A]]
 

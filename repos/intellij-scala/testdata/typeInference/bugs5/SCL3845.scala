@@ -1,13 +1,10 @@
-class A {
+class A
   class B
   val value: B = new B
-}
 
-trait T {
+trait T
   this: A =>
-  def getList(): B = {
+  def getList(): B =
     /*start*/
     value /*end*/
-  }
-}
 //T.this.B

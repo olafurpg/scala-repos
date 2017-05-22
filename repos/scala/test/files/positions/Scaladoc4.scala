@@ -1,4 +1,4 @@
-object Scaladoc4 {
+object Scaladoc4
 
   /**
     * Foo
@@ -6,4 +6,3 @@ object Scaladoc4 {
   2 + 2
 
   def f {}
-}

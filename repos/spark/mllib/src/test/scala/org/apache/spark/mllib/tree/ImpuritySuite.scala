@@ -23,18 +23,13 @@ import org.apache.spark.mllib.tree.impurity.{EntropyAggregator, GiniAggregator}
 /**
   * Test suites for [[GiniAggregator]] and [[EntropyAggregator]].
   */
-class ImpuritySuite extends SparkFunSuite {
-  test("Gini impurity does not support negative labels") {
+class ImpuritySuite extends SparkFunSuite
+  test("Gini impurity does not support negative labels")
     val gini = new GiniAggregator(2)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       gini.update(Array(0.0, 1.0, 2.0), 0, -1, 0.0)
-    }
-  }
 
-  test("Entropy does not support negative labels") {
+  test("Entropy does not support negative labels")
     val entropy = new EntropyAggregator(2)
-    intercept[IllegalArgumentException] {
+    intercept[IllegalArgumentException]
       entropy.update(Array(0.0, 1.0, 2.0), 0, -1, 0.0)
-    }
-  }
-}

@@ -13,17 +13,15 @@ import org.jboss.netty.buffer.ChannelBuffers
 import org.jboss.netty.channel.{ChannelHandlerContext, ChannelPipelineFactory, Channels, MessageEvent, SimpleChannelDownstreamHandler}
 
 private[finagle] object ThriftServerFramedPipelineFactory
-    extends ChannelPipelineFactory {
-  def getPipeline() = {
+    extends ChannelPipelineFactory
+  def getPipeline() =
     val pipeline = Channels.pipeline()
     pipeline.addLast("thriftFrameCodec", new ThriftFrameCodec)
     pipeline.addLast("byteEncoder", new ThriftServerChannelBufferEncoder)
     pipeline.addLast("byteDecoder", new ThriftChannelBufferDecoder)
     pipeline
-  }
-}
 
-object ThriftServerFramedCodec {
+object ThriftServerFramedCodec
   def apply(statsReceiver: StatsReceiver = NullStatsReceiver) =
     new ThriftServerFramedCodecFactory(statsReceiver)
 
@@ -31,10 +29,9 @@ object ThriftServerFramedCodec {
     new ThriftServerFramedCodecFactory(protocolFactory)
 
   def get() = apply()
-}
 
 class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
-    extends CodecFactory[Array[Byte], Array[Byte]]#Server {
+    extends CodecFactory[Array[Byte], Array[Byte]]#Server
   def this(statsReceiver: StatsReceiver) =
     this(Protocols.binaryFactory(statsReceiver = statsReceiver))
 
@@ -42,13 +39,12 @@ class ThriftServerFramedCodecFactory(protocolFactory: TProtocolFactory)
 
   def apply(config: ServerCodecConfig) =
     new ThriftServerFramedCodec(config, protocolFactory)
-}
 
 class ThriftServerFramedCodec(
     config: ServerCodecConfig,
     protocolFactory: TProtocolFactory = Protocols.binaryFactory()
 )
-    extends Codec[Array[Byte], Array[Byte]] {
+    extends Codec[Array[Byte], Array[Byte]]
   def pipelineFactory: ChannelPipelineFactory =
     ThriftServerFramedPipelineFactory
 
@@ -64,17 +60,16 @@ class ThriftServerFramedCodec(
     TraceInitializerFilter.serverModule[Array[Byte], Array[Byte]]
 
   override val protocolLibraryName: String = "thrift"
-}
 
 private[finagle] case class ThriftServerPreparer(
-    protocolFactory: TProtocolFactory, serviceName: String) {
+    protocolFactory: TProtocolFactory, serviceName: String)
   private[this] val uncaughtExceptionsFilter = new UncaughtAppExceptionFilter(
       protocolFactory)
 
   def prepare(
       factory: ServiceFactory[Array[Byte], Array[Byte]],
       params: Stack.Params
-  ): ServiceFactory[Array[Byte], Array[Byte]] = factory.map { service =>
+  ): ServiceFactory[Array[Byte], Array[Byte]] = factory.map  service =>
     val payloadSize = new PayloadSizeFilter[Array[Byte], Array[Byte]](
         params[param.Stats].statsReceiver, _.length, _.length)
 
@@ -84,13 +79,11 @@ private[finagle] case class ThriftServerPreparer(
       .andThen(ttwitter)
       .andThen(uncaughtExceptionsFilter)
       .andThen(service)
-  }
-}
 
 private[thrift] class ThriftServerChannelBufferEncoder
-    extends SimpleChannelDownstreamHandler {
-  override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) = {
-    e.getMessage match {
+    extends SimpleChannelDownstreamHandler
+  override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) =
+    e.getMessage match
       // An empty array indicates a oneway reply.
       case array: Array[Byte] if (!array.isEmpty) =>
         val buffer = ChannelBuffers.wrappedBuffer(array)
@@ -98,11 +91,8 @@ private[thrift] class ThriftServerChannelBufferEncoder
       case array: Array[Byte] =>
         e.getFuture.setSuccess()
       case _ => throw new IllegalArgumentException("no byte array")
-    }
-  }
-}
 
-private[finagle] object UncaughtAppExceptionFilter {
+private[finagle] object UncaughtAppExceptionFilter
 
   /**
     * Creates a Thrift exception message for the given `exception` and thrift `thriftRequest`
@@ -112,7 +102,7 @@ private[finagle] object UncaughtAppExceptionFilter {
       thriftRequest: Buf,
       throwable: Throwable,
       protocolFactory: TProtocolFactory
-  ): Buf = {
+  ): Buf =
     val reqBytes = Buf.ByteArray.Owned.extract(thriftRequest)
     // NB! This is technically incorrect for one-way calls,
     // but we have no way of knowing it here. We may
@@ -133,22 +123,18 @@ private[finagle] object UncaughtAppExceptionFilter {
     x.write(buffer())
     buffer().writeMessageEnd()
     Buf.ByteArray.Owned(buffer.toArray)
-  }
-}
 
 private[finagle] class UncaughtAppExceptionFilter(
     protocolFactory: TProtocolFactory)
-    extends SimpleFilter[Array[Byte], Array[Byte]] {
+    extends SimpleFilter[Array[Byte], Array[Byte]]
   import UncaughtAppExceptionFilter.writeExceptionMessage
 
   def apply(
       request: Array[Byte],
       service: Service[Array[Byte], Array[Byte]]
   ): Future[Array[Byte]] =
-    service(request).handle {
+    service(request).handle
       case e if !e.isInstanceOf[TException] =>
         val buf = Buf.ByteArray.Owned(request)
         val msg = writeExceptionMessage(buf, e, protocolFactory)
         Buf.ByteArray.Owned.extract(msg)
-    }
-}

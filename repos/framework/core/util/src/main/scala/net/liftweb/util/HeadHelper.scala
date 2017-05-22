@@ -27,7 +27,7 @@ import Helpers._
 /**
   * This object provides functions to setup the head section of html documents.</p>
   */
-object HeadHelper {
+object HeadHelper
 
   /**
     * This method returns its parameter unmodified.
@@ -38,23 +38,21 @@ object HeadHelper {
     * Removes duplicate node but treats <stript> and <link> tags differently. <script> containing the
     * same src attribute and <link> containing the same href attribute value are considered duplicates.
     */
-  def removeHtmlDuplicates(in: NodeSeq): NodeSeq = {
+  def removeHtmlDuplicates(in: NodeSeq): NodeSeq =
     var jsSources: Set[String] = Set()
     var hrefs: Set[String] = Set()
 
     Text("\n\t") ++
-    (in flatMap { e =>
-          val src = e.attributes("src") match {
+    (in flatMap  e =>
+          val src = e.attributes("src") match
             case null => null
             case x => x.text
-          }
 
-          val href = e.attributes("href") match {
+          val href = e.attributes("href") match
             case null => null
             case x => x.text
-          }
 
-          e match {
+          e match
             case e: Elem
                 if (e.label == "script") && (src != null) &&
                 (jsSources contains src) =>
@@ -76,9 +74,7 @@ object HeadHelper {
             case e: Text if (e.text.trim.length == 0) => NodeSeq.Empty
 
             case e => e
-          }
-        }).flatMap(e => e ++ Text("\n\t"))
-  }
+        ).flatMap(e => e ++ Text("\n\t"))
 
   /**
     * This method finds all &lt;head&gt; tags that are descendants of
@@ -86,18 +82,17 @@ object HeadHelper {
     * the contents of those tags into the &lt;head&gt; tag closest
     * to the root of the XML tree.
     */
-  def mergeToHtmlHead(xhtml: NodeSeq): NodeSeq = {
+  def mergeToHtmlHead(xhtml: NodeSeq): NodeSeq =
 
     val headInBody: NodeSeq = (for (body <- xhtml \ "body";
-    head <- findElems(body)(_.label == "head")) yield head.child).flatMap {
+    head <- findElems(body)(_.label == "head")) yield head.child).flatMap
       e =>
         e
-    }
 
-    if (headInBody.isEmpty) {
+    if (headInBody.isEmpty)
       xhtml
-    } else {
-      def xform(in: NodeSeq, inBody: Boolean): NodeSeq = in flatMap {
+    else
+      def xform(in: NodeSeq, inBody: Boolean): NodeSeq = in flatMap
         case e: Elem if !inBody && e.label == "body" =>
           Elem(e.prefix,
                e.label,
@@ -128,9 +123,5 @@ object HeadHelper {
           xform(g.child, inBody)
 
         case x => x
-      }
 
       xform(xhtml, false)
-    }
-  }
-}

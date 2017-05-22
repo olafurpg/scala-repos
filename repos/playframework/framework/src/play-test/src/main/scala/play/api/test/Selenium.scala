@@ -19,7 +19,7 @@ import org.openqa.selenium.support.ui.FluentWait
   * @param webDriver The WebDriver instance to use.
   */
 case class TestBrowser(webDriver: WebDriver, baseUrl: Option[String])
-    extends FluentAdapter(webDriver) {
+    extends FluentAdapter(webDriver)
 
   baseUrl.map(baseUrl => withDefaultUrl(baseUrl))
 
@@ -33,13 +33,11 @@ case class TestBrowser(webDriver: WebDriver, baseUrl: Option[String])
     *   )
     * }}}
     */
-  def submit(selector: String, fields: (String, String)*): Fluent = {
-    fields.foreach {
+  def submit(selector: String, fields: (String, String)*): Fluent =
+    fields.foreach
       case (fieldName, fieldValue) =>
         fill(s"${selector} *[name=${fieldName}]").`with`(fieldValue)
-    }
     super.submit(selector)
-  }
 
   /**
     * Repeatedly applies this instance's input value to the given block until one of the following occurs:
@@ -51,16 +49,13 @@ case class TestBrowser(webDriver: WebDriver, baseUrl: Option[String])
     * @param timeUnit duration
     * @param block code to be executed
     */
-  def waitUntil[T](timeout: Int, timeUnit: TimeUnit)(block: => T): T = {
+  def waitUntil[T](timeout: Int, timeUnit: TimeUnit)(block: => T): T =
     val wait =
       new FluentWait[WebDriver](webDriver).withTimeout(timeout, timeUnit)
-    val f = new Function[WebDriver, T]() {
-      def apply(driver: WebDriver): T = {
+    val f = new Function[WebDriver, T]()
+      def apply(driver: WebDriver): T =
         block
-      }
-    }
     wait.until(f)
-  }
 
   /**
     * Repeatedly applies this instance's input value to the given block until one of the following occurs:
@@ -78,12 +73,11 @@ case class TestBrowser(webDriver: WebDriver, baseUrl: Option[String])
     * to set cookies, manage timeouts among other things
     */
   def manage: WebDriver.Options = super.getDriver.manage
-}
 
 /**
   * Helper utilities to build TestBrowsers
   */
-object TestBrowser {
+object TestBrowser
 
   /**
     * Creates an in-memory WebBrowser (using HtmlUnit)
@@ -109,22 +103,18 @@ object TestBrowser {
   def of[WEBDRIVER <: WebDriver](
       webDriver: Class[WEBDRIVER], baseUrl: Option[String] = None) =
     TestBrowser(WebDriverFactory(webDriver), baseUrl)
-}
 
-object WebDriverFactory {
+object WebDriverFactory
 
   /**
     * Creates a Selenium Web Driver and configures it
     * @param clazz Type of driver to create
     * @return The driver instance
     */
-  def apply[D <: WebDriver](clazz: Class[D]): WebDriver = {
+  def apply[D <: WebDriver](clazz: Class[D]): WebDriver =
     val driver = clazz.newInstance
     // Driver-specific configuration
-    driver match {
+    driver match
       case htmlunit: HtmlUnitDriver => htmlunit.setJavascriptEnabled(true)
       case _ =>
-    }
     driver
-  }
-}

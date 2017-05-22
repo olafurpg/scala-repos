@@ -7,7 +7,7 @@ import com.twitter.finagle.Stack
   *
   * @see [[DefaultLoadBalancingParams]]
   */
-trait WithDefaultLoadBalancer[A <: Stack.Parameterized[A]] {
+trait WithDefaultLoadBalancer[A <: Stack.Parameterized[A]]
   self: Stack.Parameterized[A] =>
 
   /**
@@ -23,4 +23,3 @@ trait WithDefaultLoadBalancer[A <: Stack.Parameterized[A]] {
     */
   val withLoadBalancer: DefaultLoadBalancingParams[A] =
     new DefaultLoadBalancingParams(self)
-}

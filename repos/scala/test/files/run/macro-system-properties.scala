@@ -1,7 +1,7 @@
 import scala.tools.nsc._
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code =
     """
     import scala.language.experimental._, scala.reflect.macros.blackbox.Context
@@ -14,4 +14,3 @@ object Test extends ReplTest {
     object Test { class C(implicit a: Any) { GrabContext.grab } }
     object Test { class C(implicit a: Any) { GrabContext.grab } }
   """
-}

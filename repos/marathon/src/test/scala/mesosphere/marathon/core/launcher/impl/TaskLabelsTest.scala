@@ -7,8 +7,8 @@ import mesosphere.util.state.FrameworkId
 import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import org.apache.mesos.{Protos => MesosProtos}
 
-class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
-  test("no labels => no taskId") {
+class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers
+  test("no labels => no taskId")
     val f = new Fixture
 
     Given("unlabeled resources")
@@ -18,9 +18,8 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
 
     Then("we don't get any taskIds")
     taskIds should be(empty)
-  }
 
-  test("correct labels => taskId") {
+  test("correct labels => taskId")
     val f = new Fixture
 
     Given("correctly labeled resources")
@@ -30,9 +29,8 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
 
     Then("we get as many taskIds as resources")
     taskIds should be(Iterable.fill(f.labeledResources.size)(f.taskId))
-  }
 
-  test("labels with incorrect frameworkId are ignored") {
+  test("labels with incorrect frameworkId are ignored")
     val f = new Fixture
 
     Given("labeled resources for other framework")
@@ -42,9 +40,8 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
 
     Then("we don't get task ids")
     taskIds should be(empty)
-  }
 
-  class Fixture {
+  class Fixture
     import scala.collection.JavaConverters._
 
     val appId = PathId("/test")
@@ -58,7 +55,7 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
     require(unlabeledResources.forall(!_.hasReservation))
 
     def labelResourcesFor(
-        frameworkId: FrameworkId): Iterable[MesosProtos.Resource] = {
+        frameworkId: FrameworkId): Iterable[MesosProtos.Resource] =
       MarathonTestHelper
         .makeBasicOffer(
             reservation = Some(TaskLabels.labelsForTask(frameworkId, taskId)),
@@ -66,7 +63,6 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
         )
         .getResourcesList
         .asScala
-    }
 
     val labeledResources = labelResourcesFor(frameworkId)
     require(labeledResources.nonEmpty)
@@ -75,5 +71,3 @@ class TaskLabelsTest extends FunSuite with GivenWhenThen with Matchers {
     val labeledResourcesForOtherFramework = labelResourcesFor(otherFrameworkId)
     require(labeledResourcesForOtherFramework.nonEmpty)
     require(labeledResourcesForOtherFramework.forall(_.hasReservation))
-  }
-}

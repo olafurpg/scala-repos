@@ -28,7 +28,7 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * User: Dmitry Naydanov
   * Date: 1/15/14
   */
-class WorksheetCompiler {
+class WorksheetCompiler
 
   /**
     * @param callback (Name, AddToClasspath)
@@ -37,7 +37,7 @@ class WorksheetCompiler {
                     worksheetFile: ScalaFile,
                     callback: (String, String) => Unit,
                     ifEditor: Option[Editor],
-                    auto: Boolean) {
+                    auto: Boolean)
     import org.jetbrains.plugins.scala.worksheet.processor.WorksheetCompiler._
 
     val worksheetVirtual = worksheetFile.getVirtualFile
@@ -57,7 +57,7 @@ class WorksheetCompiler {
     val oldContent = contentManager findContent ERROR_CONTENT_NAME
     if (oldContent != null) contentManager.removeContent(oldContent, true)
 
-    WorksheetSourceProcessor.process(worksheetFile, ifEditor, iteration) match {
+    WorksheetSourceProcessor.process(worksheetFile, ifEditor, iteration) match
       case Left((code, name)) =>
         FileUtil.writeToFile(tempFile, code)
 
@@ -74,22 +74,20 @@ class WorksheetCompiler {
         worksheetPrinter.scheduleWorksheetUpdate()
 
         val onError = (msg: String) =>
-          {
             NotificationUtil
               .builder(project, msg)
               .setGroup("Scala")
               .setNotificationType(NotificationType.ERROR)
               .setTitle(CONFIG_ERROR_HEADER)
               .show()
-        }
 
         val consumer = new RemoteServerConnector.CompilerInterfaceImpl(
             task, worksheetPrinter, None, auto)
 
-        task.start(new Runnable {
-          override def run() {
+        task.start(new Runnable
+          override def run()
             //todo smth with exit code
-            try {
+            try
               val module = RunWorksheetAction getModuleFor worksheetFile
 
               if (module == null) onError("Can't find Scala module to run")
@@ -99,25 +97,22 @@ class WorksheetCompiler {
                     tempFile,
                     outputDir,
                     name
-                ).compileAndRun(new Runnable {
-                  override def run() {
+                ).compileAndRun(new Runnable
+                  override def run()
                     if (runType == OutOfProcessServer)
                       callback(name, outputDir.getAbsolutePath)
-                  }
-                }, worksheetVirtual, consumer)
-            } catch {
+                , worksheetVirtual, consumer)
+            catch
               case ex: IllegalArgumentException => onError(ex.getMessage)
-            }
-          }
-        }, new Runnable { override def run() {} })
+        , new Runnable { override def run() {} })
       case Right(errorMessage: PsiErrorElement) =>
         if (auto) return
         val pos = editor.offsetToLogicalPosition(errorMessage.getTextOffset)
 
         val treeError = new CompilerErrorTreeView(project, null)
 
-        ApplicationManager.getApplication.invokeLater(new Runnable {
-          override def run() {
+        ApplicationManager.getApplication.invokeLater(new Runnable
+          override def run()
             val file = errorMessage.getContainingFile.getVirtualFile
             if (file == null || !file.isValid) return
 
@@ -135,18 +130,15 @@ class WorksheetCompiler {
 
             openMessageView(project, errorContent, treeError)
             editor.getCaretModel moveToLogicalPosition pos
-          }
-        })
+        )
 
       case _ =>
-    }
-  }
 
   private def openMessageView(
-      project: Project, content: Content, treeView: CompilerErrorTreeView) {
+      project: Project, content: Content, treeView: CompilerErrorTreeView)
     val commandProcessor = CommandProcessor.getInstance()
-    commandProcessor.executeCommand(project, new Runnable {
-      override def run() {
+    commandProcessor.executeCommand(project, new Runnable
+      override def run()
         Disposer.register(content, treeView, null)
         val messageView =
           ServiceManager.getService(project, classOf[MessageView])
@@ -155,12 +147,9 @@ class WorksheetCompiler {
         val toolWindow =
           ToolWindowManager getInstance project getToolWindow ToolWindowId.MESSAGES_WINDOW
         if (toolWindow != null) toolWindow.show(null)
-      }
-    }, null, null)
-  }
-}
+    , null, null)
 
-object WorksheetCompiler extends WorksheetPerFileConfig {
+object WorksheetCompiler extends WorksheetPerFileConfig
   private val MAKE_BEFORE_RUN = new FileAttribute(
       "ScalaWorksheetMakeBeforeRun", 1, true)
   private val CP_MODULE_NAME = new FileAttribute(
@@ -174,9 +163,8 @@ object WorksheetCompiler extends WorksheetPerFileConfig {
 
   def isMakeBeforeRun(file: PsiFile) = isEnabled(file, MAKE_BEFORE_RUN)
 
-  def setMakeBeforeRun(file: PsiFile, isMake: Boolean) = {
+  def setMakeBeforeRun(file: PsiFile, isMake: Boolean) =
     setEnabled(file, MAKE_BEFORE_RUN, isMake)
-  }
 
   def getModuleForCpName(file: PsiFile) =
     FileAttributeUtilCache.readAttribute(CP_MODULE_NAME, file)
@@ -184,11 +172,9 @@ object WorksheetCompiler extends WorksheetPerFileConfig {
   def setModuleForCpName(file: PsiFile, moduleName: String) =
     FileAttributeUtilCache.writeAttribute(CP_MODULE_NAME, file, moduleName)
 
-  def getRunType(project: Project): WorksheetMakeType = {
-    if (ScalaCompileServerSettings.getInstance().COMPILE_SERVER_ENABLED) {
+  def getRunType(project: Project): WorksheetMakeType =
+    if (ScalaCompileServerSettings.getInstance().COMPILE_SERVER_ENABLED)
       if (ScalaProjectSettings.getInstance(project).isInProcessMode)
         InProcessServer
       else OutOfProcessServer
-    } else NonServer
-  }
-}
+    else NonServer

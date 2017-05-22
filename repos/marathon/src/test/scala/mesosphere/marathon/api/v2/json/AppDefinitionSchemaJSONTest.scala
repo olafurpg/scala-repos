@@ -9,8 +9,8 @@ import org.scalatest.GivenWhenThen
   * Since the JSON is not representable by an AppDefinition,
   * JSON is used directly.
   */
-class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
-  test("command health checks WITHOUT a nested value should be rejected") {
+class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen
+  test("command health checks WITHOUT a nested value should be rejected")
     Given(
         "an app definition WITHOUT a nested value in command section of a health check")
     val json = """
@@ -28,9 +28,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should fail")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = false)
-  }
 
-  test("command health checks WITH a nested value should be accepted") {
+  test("command health checks WITH a nested value should be accepted")
     Given(
         "an app definition WITH a nested value in command section of a health check")
     val json =
@@ -49,9 +48,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should succeed")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = true)
-  }
 
-  test("discoveryInfo ports WITH a correct protocol should be accepted") {
+  test("discoveryInfo ports WITH a correct protocol should be accepted")
     Given("an app definition WITH a discovery info with a TCP and a UDP port")
     val json = """
         |{
@@ -70,9 +68,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should succeed")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = true)
-  }
 
-  test("discoveryInfo ports WITH an incorrect protocol should be rejected") {
+  test("discoveryInfo ports WITH an incorrect protocol should be rejected")
     Given("an app definition WITH a discovery info with a FOO protocol port")
     val json = """
         |{
@@ -90,9 +87,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should succeed")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = false)
-  }
 
-  test("command constrains WITH array of arrays of strings should succeed") {
+  test("command constrains WITH array of arrays of strings should succeed")
     Given("constrains WITH nested arrays of strings")
     val json = """
         |{
@@ -107,9 +103,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should succeed")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = true)
-  }
 
-  test("command constrains WITH unknown constraint should fail") {
+  test("command constrains WITH unknown constraint should fail")
     Given("constrains WITH nested arrays of strings")
     val json = """
         |{
@@ -124,9 +119,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should succeed")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = false)
-  }
 
-  test("command constrains WITH array of strings and boolean should fail") {
+  test("command constrains WITH array of strings and boolean should fail")
     Given("constrains WITH nested array of something")
     val json = """
         |{
@@ -138,9 +132,8 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should fail")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = false)
-  }
 
-  test("command constrains WITH array of one string should fail") {
+  test("command constrains WITH array of one string should fail")
     Given("constrains WITH nested array of something")
     val json = """
         |{
@@ -152,5 +145,3 @@ class AppDefinitionSchemaJSONTest extends MarathonSpec with GivenWhenThen {
 
     Then("validation should fail")
     MarathonTestHelper.validateJsonSchemaForString(json, valid = false)
-  }
-}

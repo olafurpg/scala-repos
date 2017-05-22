@@ -55,7 +55,7 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     kafkaParams: Map[String, String],
     topics: Map[String, Int],
     storageLevel: StorageLevel)
-    extends Receiver[(K, V)](storageLevel) with Logging {
+    extends Receiver[(K, V)](storageLevel) with Logging
 
   private val groupId = kafkaParams("group.id")
   private val AUTO_OFFSET_COMMIT = "auto.commit.enable"
@@ -87,7 +87,7 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
   /** Thread pool running the handlers for receiving message from multiple topics and partitions. */
   private var messageHandlerThreadPool: ThreadPoolExecutor = null
 
-  override def onStart(): Unit = {
+  override def onStart(): Unit =
     logInfo(s"Starting Kafka Consumer Stream with group: $groupId")
 
     // Initialize the topic-partition / offset hash map.
@@ -101,11 +101,10 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     blockGenerator = supervisor.createBlockGenerator(new GeneratedBlockHandler)
 
     if (kafkaParams.contains(AUTO_OFFSET_COMMIT) &&
-        kafkaParams(AUTO_OFFSET_COMMIT) == "true") {
+        kafkaParams(AUTO_OFFSET_COMMIT) == "true")
       logWarning(
           s"$AUTO_OFFSET_COMMIT should be set to false in ReliableKafkaReceiver, " +
           "otherwise we will manually set it to false to turn off auto offset commit in Kafka")
-    }
 
     val props = new Properties()
     kafkaParams.foreach(param => props.put(param._1, param._2))
@@ -145,176 +144,143 @@ private[streaming] class ReliableKafkaReceiver[K : ClassTag,
     val topicMessageStreams =
       consumerConnector.createMessageStreams(topics, keyDecoder, valueDecoder)
 
-    topicMessageStreams.values.foreach { streams =>
-      streams.foreach { stream =>
+    topicMessageStreams.values.foreach  streams =>
+      streams.foreach  stream =>
         messageHandlerThreadPool.submit(new MessageHandler(stream))
-      }
-    }
-  }
 
-  override def onStop(): Unit = {
-    if (messageHandlerThreadPool != null) {
+  override def onStop(): Unit =
+    if (messageHandlerThreadPool != null)
       messageHandlerThreadPool.shutdown()
       messageHandlerThreadPool = null
-    }
 
-    if (consumerConnector != null) {
+    if (consumerConnector != null)
       consumerConnector.shutdown()
       consumerConnector = null
-    }
 
-    if (zkClient != null) {
+    if (zkClient != null)
       zkClient.close()
       zkClient = null
-    }
 
-    if (blockGenerator != null) {
+    if (blockGenerator != null)
       blockGenerator.stop()
       blockGenerator = null
-    }
 
-    if (topicPartitionOffsetMap != null) {
+    if (topicPartitionOffsetMap != null)
       topicPartitionOffsetMap.clear()
       topicPartitionOffsetMap = null
-    }
 
-    if (blockOffsetMap != null) {
+    if (blockOffsetMap != null)
       blockOffsetMap.clear()
       blockOffsetMap = null
-    }
-  }
 
   /** Store a Kafka message and the associated metadata as a tuple. */
   private def storeMessageAndMetadata(
-      msgAndMetadata: MessageAndMetadata[K, V]): Unit = {
+      msgAndMetadata: MessageAndMetadata[K, V]): Unit =
     val topicAndPartition = TopicAndPartition(
         msgAndMetadata.topic, msgAndMetadata.partition)
     val data = (msgAndMetadata.key, msgAndMetadata.message)
     val metadata = (topicAndPartition, msgAndMetadata.offset)
     blockGenerator.addDataWithCallback(data, metadata)
-  }
 
   /** Update stored offset */
   private def updateOffset(
-      topicAndPartition: TopicAndPartition, offset: Long): Unit = {
+      topicAndPartition: TopicAndPartition, offset: Long): Unit =
     topicPartitionOffsetMap.put(topicAndPartition, offset)
-  }
 
   /**
     * Remember the current offsets for each topic and partition. This is called when a block is
     * generated.
     */
-  private def rememberBlockOffsets(blockId: StreamBlockId): Unit = {
+  private def rememberBlockOffsets(blockId: StreamBlockId): Unit =
     // Get a snapshot of current offset map and store with related block id.
     val offsetSnapshot = topicPartitionOffsetMap.toMap
     blockOffsetMap.put(blockId, offsetSnapshot)
     topicPartitionOffsetMap.clear()
-  }
 
   /**
     * Store the ready-to-be-stored block and commit the related offsets to zookeeper. This method
     * will try a fixed number of times to push the block. If the push fails, the receiver is stopped.
     */
   private def storeBlockAndCommitOffset(
-      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+      blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit =
     var count = 0
     var pushed = false
     var exception: Exception = null
-    while (!pushed && count <= 3) {
-      try {
+    while (!pushed && count <= 3)
+      try
         store(arrayBuffer.asInstanceOf[mutable.ArrayBuffer[(K, V)]])
         pushed = true
-      } catch {
+      catch
         case ex: Exception =>
           count += 1
           exception = ex
-      }
-    }
-    if (pushed) {
+    if (pushed)
       Option(blockOffsetMap.get(blockId)).foreach(commitOffset)
       blockOffsetMap.remove(blockId)
-    } else {
+    else
       stop("Error while storing block into Spark", exception)
-    }
-  }
 
   /**
     * Commit the offset of Kafka's topic/partition, the commit mechanism follow Kafka 0.8.x's
     * metadata schema in Zookeeper.
     */
-  private def commitOffset(offsetMap: Map[TopicAndPartition, Long]): Unit = {
-    if (zkClient == null) {
+  private def commitOffset(offsetMap: Map[TopicAndPartition, Long]): Unit =
+    if (zkClient == null)
       val thrown = new IllegalStateException(
           "Zookeeper client is unexpectedly null")
       stop("Zookeeper client is not initialized before commit offsets to ZK",
            thrown)
       return
-    }
 
-    for ((topicAndPart, offset) <- offsetMap) {
-      try {
+    for ((topicAndPart, offset) <- offsetMap)
+      try
         val topicDirs = new ZKGroupTopicDirs(groupId, topicAndPart.topic)
         val zkPath =
           s"${topicDirs.consumerOffsetDir}/${topicAndPart.partition}"
 
         ZkUtils.updatePersistentPath(zkClient, zkPath, offset.toString)
-      } catch {
+      catch
         case e: Exception =>
           logWarning(
               s"Exception during commit offset $offset for topic" +
               s"${topicAndPart.topic}, partition ${topicAndPart.partition}",
               e)
-      }
 
       logInfo(
           s"Committed offset $offset for topic ${topicAndPart.topic}, " +
           s"partition ${topicAndPart.partition}")
-    }
-  }
 
   /** Class to handle received Kafka message. */
   private final class MessageHandler(stream: KafkaStream[K, V])
-      extends Runnable {
-    override def run(): Unit = {
-      while (!isStopped) {
-        try {
+      extends Runnable
+    override def run(): Unit =
+      while (!isStopped)
+        try
           val streamIterator = stream.iterator()
-          while (streamIterator.hasNext) {
+          while (streamIterator.hasNext)
             storeMessageAndMetadata(streamIterator.next)
-          }
-        } catch {
+        catch
           case e: Exception =>
             reportError("Error handling message", e)
-        }
-      }
-    }
-  }
 
   /** Class to handle blocks generated by the block generator. */
-  private final class GeneratedBlockHandler extends BlockGeneratorListener {
+  private final class GeneratedBlockHandler extends BlockGeneratorListener
 
-    def onAddData(data: Any, metadata: Any): Unit = {
+    def onAddData(data: Any, metadata: Any): Unit =
       // Update the offset of the data that was added to the generator
-      if (metadata != null) {
+      if (metadata != null)
         val (topicAndPartition, offset) =
           metadata.asInstanceOf[(TopicAndPartition, Long)]
         updateOffset(topicAndPartition, offset)
-      }
-    }
 
-    def onGenerateBlock(blockId: StreamBlockId): Unit = {
+    def onGenerateBlock(blockId: StreamBlockId): Unit =
       // Remember the offsets of topics/partitions when a block has been generated
       rememberBlockOffsets(blockId)
-    }
 
     def onPushBlock(
-        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit = {
+        blockId: StreamBlockId, arrayBuffer: mutable.ArrayBuffer[_]): Unit =
       // Store block and commit the blocks offset
       storeBlockAndCommitOffset(blockId, arrayBuffer)
-    }
 
-    def onError(message: String, throwable: Throwable): Unit = {
+    def onError(message: String, throwable: Throwable): Unit =
       reportError(message, throwable)
-    }
-  }
-}

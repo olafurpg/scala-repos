@@ -47,36 +47,31 @@ class TextFormatterChangeSpec
     extends SimpleSFXDelegateSpec[
         jfxsc.TextFormatter.Change, TextFormatter.Change](
         classOf[jfxsc.TextFormatter.Change], classOf[TextFormatter.Change])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   // A bit elaborated way of creating an instance of TextFormatter.Change that cannot be created directly.
-  val change = {
+  val change =
     // Initialize JavaFX, just in case it is not running yet
     BootstrapApplication.launch()
 
     // Create a TextField and generate change by changing its `text` value
     var changeOption: Option[jfxsc.TextFormatter.Change] = None
-    val textField = {
+    val textField =
       val converter =
         new FormatStringConverter[Number](NumberFormat.getCurrencyInstance)
-      val filter: (TextFormatter.Change) => TextFormatter.Change = {
+      val filter: (TextFormatter.Change) => TextFormatter.Change =
         c: TextFormatter.Change =>
           // Capture `change` object created by JavaFX
           changeOption = Some(c)
           c
-      }
 
-      new TextField {
+      new TextField
         textFormatter = new TextFormatter[Number](converter, 1000, filter)
-      }
-    }
 
     textField.text = "250"
     changeOption.get
-  }
 
   override protected def getScalaClassInstance: TextFormatter.Change =
     new TextFormatter.Change(change)
   override protected def getJavaClassInstance: jfxsc.TextFormatter.Change =
     change
-}

@@ -9,15 +9,14 @@
 
 package scala
 
-object Product1 {
+object Product1
   def unapply[T1](x: Product1[T1]): Option[Product1[T1]] =
     Some(x)
-}
 
 /** Product1 is a cartesian product of 1 component.
   *  @since 2.3
   */
-trait Product1[@specialized(Int, Long, Double) +T1] extends Any with Product {
+trait Product1[@specialized(Int, Long, Double) +T1] extends Any with Product
 
   /** The arity of this product.
     *  @return 1
@@ -32,13 +31,11 @@ trait Product1[@specialized(Int, Long, Double) +T1] extends Any with Product {
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
     */
   def _1: T1
-}

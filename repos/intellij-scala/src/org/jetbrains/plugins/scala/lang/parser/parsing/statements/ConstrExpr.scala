@@ -17,10 +17,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions.SelfInvocatio
  *              | '{' SelfInvocation {semi BlockStat} '}'
  */
 
-object ConstrExpr {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ConstrExpr
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val constrExprMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
         ConstrBlock parse builder
         constrExprMarker.drop()
@@ -29,8 +29,5 @@ object ConstrExpr {
         SelfInvocation parse builder
         constrExprMarker.done(ScalaElementTypes.CONSTR_EXPR)
         return true
-    }
     //this line for compiler
     true
-  }
-}

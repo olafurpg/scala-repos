@@ -11,7 +11,7 @@ class ScalaObjectEvaluationTest
 class ScalaObjectEvaluationTest_212
     extends ScalaObjectEvaluationTestBase with ScalaVersion_2_12
 
-abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
+abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase
   addFileWithBreakpoints("SimpleObject.scala",
                          s"""
        |object EvaluateObjects {
@@ -49,8 +49,8 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
        |  object Inner
        |}
       """.stripMargin.trim())
-  def testEvaluateObjects() {
-    runDebugger() {
+  def testEvaluateObjects()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("Simple", "Simple$")
       evalStartsWith("qual.Simple", "qual.Simple$")
@@ -60,8 +60,6 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
       evalStartsWith("qual.StableInner.Inner", "qual.StableInner$Inner$")
       evalStartsWith(
           "val x = new qual.ClassInner(); x.Inner", "qual.ClassInner$Inner$")
-    }
-  }
 
   addFileWithBreakpoints("InnerClassObjectFromObject.scala",
                          s"""
@@ -87,13 +85,10 @@ abstract class ScalaObjectEvaluationTestBase extends ScalaDebuggerTestCase {
        |  }
        |}
       """.stripMargin.trim())
-  def testInnerClassObjectFromObject() {
-    runDebugger() {
+  def testInnerClassObjectFromObject()
+    runDebugger()
       waitForBreakpoint()
       evalStartsWith("SS.G", "InnerClassObjectFromObject$S$SS$G")
       evalStartsWith("SS.S", "InnerClassObjectFromObject$S$SS$S")
       evalStartsWith("S", "InnerClassObjectFromObject$S$SS$S")
       evalStartsWith("SS", "InnerClassObjectFromObject$S$SS$")
-    }
-  }
-}

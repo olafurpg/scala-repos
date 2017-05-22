@@ -15,15 +15,12 @@ import Path._
   * @param assets A list of assets directories, paired with the prefix they should be served from.
   */
 class AssetsClassLoader(parent: ClassLoader, assets: Seq[(String, File)])
-    extends ClassLoader(parent) {
-  override def findResource(name: String) = {
-    assets.collectFirst {
+    extends ClassLoader(parent)
+  override def findResource(name: String) =
+    assets.collectFirst
       case (prefix, dir) if exists(name, prefix, dir) =>
         (dir / name.substring(prefix.length)).toURI.toURL
-    }.orNull
-  }
+    .orNull
 
-  def exists(name: String, prefix: String, dir: File) = {
+  def exists(name: String, prefix: String, dir: File) =
     name.startsWith(prefix) && (dir / name.substring(prefix.length)).isFile
-  }
-}

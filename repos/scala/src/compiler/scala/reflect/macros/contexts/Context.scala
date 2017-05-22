@@ -7,7 +7,7 @@ abstract class Context
     extends scala.reflect.macros.blackbox.Context
     with scala.reflect.macros.whitebox.Context with Aliases with Enclosures
     with Names with Reifiers with FrontEnds with Infrastructure with Typers
-    with Parsers with Evals with ExprUtils with Traces with Internals {
+    with Parsers with Evals with ExprUtils with Traces with Internals
 
   val universe: Global
 
@@ -18,4 +18,3 @@ abstract class Context
   val prefix: Expr[PrefixType]
 
   val expandee: Tree
-}

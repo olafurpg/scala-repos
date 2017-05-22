@@ -1,6 +1,4 @@
-object Test {
-  def foo: Any = {
+object Test
+  def foo: Any =
     case class Foo() {}
     Foo;
-  }
-}

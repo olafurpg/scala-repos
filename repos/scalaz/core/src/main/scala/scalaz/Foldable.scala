@@ -6,7 +6,7 @@ package scalaz
   * values of that type.
   */
 ////
-trait Foldable[F[_]] { self =>
+trait Foldable[F[_]]  self =>
   ////
   import collection.generic.CanBuildFrom
 
@@ -15,49 +15,43 @@ trait Foldable[F[_]] { self =>
 
   /** As `foldMap` but returning `None` if the foldable is empty and `Some` otherwise */
   def foldMap1Opt[A, B](fa: F[A])(f: A => B)(
-      implicit F: Semigroup[B]): Option[B] = {
+      implicit F: Semigroup[B]): Option[B] =
     import std.option._
     foldMap(fa)(x => some(f(x)))
-  }
 
   /**Right-associative fold of a structure. */
   def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B): B
 
   /**The composition of Foldables `F` and `G`, `[x]F[G[x]]`, is a Foldable */
   def compose[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => F[G[α]]]] =
-    new CompositionFoldable[F, G] {
+    new CompositionFoldable[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /** The composition of Foldable `F` and Bifoldable `G`, `[x, y]F[G[x, y]]`, is a Bifoldable */
   def bicompose[G[_, _]: Bifoldable]: Bifoldable[λ[(α, β) => F[G[α, β]]]] =
-    new CompositionFoldableBifoldable[F, G] {
+    new CompositionFoldableBifoldable[F, G]
       def F = self
       def G = implicitly
-    }
 
   /**The product of Foldables `F` and `G`, `[x](F[x], G[x]])`, is a Foldable */
   def product[G[_]](implicit G0: Foldable[G]): Foldable[λ[α => (F[α], G[α])]] =
-    new ProductFoldable[F, G] {
+    new ProductFoldable[F, G]
       implicit def F = self
       implicit def G = G0
-    }
 
   /**The product of Foldable `F` and Foldable1 `G`, `[x](F[x], G[x]])`, is a Foldable1 */
   def product0[G[_]](
       implicit G0: Foldable1[G]): Foldable1[λ[α => (F[α], G[α])]] =
-    new ProductFoldable1R[F, G] {
+    new ProductFoldable1R[F, G]
       def F = self
       def G = G0
-    }
 
   /**Left-associative fold of a structure. */
-  def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B = {
+  def foldLeft[A, B](fa: F[A], z: B)(f: (B, A) => B): B =
     import Dual._, Endo._, syntax.std.all._
     Tag.unwrap(foldMap(fa)((a: A) => Dual(Endo.endo(f.flip.curried(a))))(
             dualMonoid)) apply (z)
-  }
 
   /**Right-associative, monadic fold of a structure. */
   def foldRightM[G[_], A, B](
@@ -92,9 +86,8 @@ trait Foldable[F[_]] { self =>
 
   /** `traverse_` specialized to `State` **/
   def traverseS_[S, A, B](fa: F[A])(f: A => State[S, B]): State[S, Unit] =
-    State { s: S =>
+    State  s: S =>
       (foldLeft(fa, s)((s, a) => f(a)(s)._1), ())
-    }
 
   /** Strict sequencing in an applicative functor `M` that ignores the value in `fa`. */
   def sequence_[M[_], A](fa: F[M[A]])(implicit a: Applicative[M]): M[Unit] =
@@ -167,10 +160,10 @@ trait Foldable[F[_]] { self =>
     * @return the element at index `i` in a `Some`, or `None` if the given index falls outside of the range
     */
   def index[A](fa: F[A], i: Int): Option[A] =
-    foldLeft[A, (Int, Option[A])](fa, (0, None)) {
+    foldLeft[A, (Int, Option[A])](fa, (0, None))
       case ((idx, elem), curr) =>
         (idx + 1, elem orElse { if (idx == i) Some(curr) else None })
-    }._2
+    ._2
 
   /**
     * @return the element at index `i`, or `default` if the given index falls outside of the range
@@ -222,49 +215,45 @@ trait Foldable[F[_]] { self =>
 
   /** The greatest element of `fa`, or None if `fa` is empty. */
   def maximum[A : Order](fa: F[A]): Option[A] =
-    foldLeft(fa, none[A]) {
+    foldLeft(fa, none[A])
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == GT) x else y)
-    }
 
   /** The greatest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
   def maximumOf[A, B : Order](fa: F[A])(f: A => B): Option[B] =
-    foldLeft(fa, none[B]) {
+    foldLeft(fa, none[B])
       case (None, a) => some(f(a))
       case (Some(b), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == GT) b else bb)
-    }
 
   /** The element `a` of `fa` which yields the greatest value of `f(a)`, or None if `fa` is empty. */
   def maximumBy[A, B : Order](fa: F[A])(f: A => B): Option[A] =
-    foldLeft(fa, none[(A, B)]) {
+    foldLeft(fa, none[(A, B)])
       case (None, a) => some(a -> f(a))
       case (Some(x @ (a, b)), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == GT) x else aa -> bb)
-    } map (_._1)
+    map (_._1)
 
   /** The smallest element of `fa`, or None if `fa` is empty. */
   def minimum[A : Order](fa: F[A]): Option[A] =
-    foldLeft(fa, none[A]) {
+    foldLeft(fa, none[A])
       case (None, y) => some(y)
       case (Some(x), y) => some(if (Order[A].order(x, y) == LT) x else y)
-    }
 
   /** The smallest value of `f(a)` for each element `a` of `fa`, or None if `fa` is empty. */
   def minimumOf[A, B : Order](fa: F[A])(f: A => B): Option[B] =
-    foldLeft(fa, none[B]) {
+    foldLeft(fa, none[B])
       case (None, a) => some(f(a))
       case (Some(b), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == LT) b else bb)
-    }
 
   /** The element `a` of `fa` which yields the smallest value of `f(a)`, or None if `fa` is empty. */
   def minimumBy[A, B : Order](fa: F[A])(f: A => B): Option[A] =
-    foldLeft(fa, none[(A, B)]) {
+    foldLeft(fa, none[(A, B)])
       case (None, a) => some(a -> f(a))
       case (Some(x @ (a, b)), aa) =>
         val bb = f(aa); some(if (Order[B].order(b, bb) == LT) x else aa -> bb)
-    } map (_._1)
+    map (_._1)
 
   def sumr[A](fa: F[A])(implicit A: Monoid[A]): A =
     foldRight(fa, A.zero)(A.append)
@@ -293,9 +282,9 @@ trait Foldable[F[_]] { self =>
 
   /** Insert an `A` between every A, yielding the sum. */
   def intercalate[A](fa: F[A], a: A)(implicit A: Monoid[A]): A =
-    (foldRight(fa, none[A]) { (l, oa) =>
+    (foldRight(fa, none[A])  (l, oa) =>
       some(A.append(l, oa map (A.append(a, _)) getOrElse A.zero))
-    }).getOrElse(A.zero)
+    ).getOrElse(A.zero)
 
   /**
     * Splits the elements into groups that alternatively satisfy and don't satisfy the predicate p.
@@ -303,14 +292,13 @@ trait Foldable[F[_]] { self =>
   def splitWith[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
     foldRight(fa, (List[NonEmptyList[A]](), None: Option[Boolean]))(
         (a, b) =>
-          {
         val pa = p(a)
-        (b match {
+        (b match
           case (_, None) => NonEmptyList(a) :: Nil
           case (x, Some(q)) =>
             if (pa == q) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
-        }, Some(pa))
-    })._1
+        , Some(pa))
+    )._1
 
   /**
     * Selects groups of elements that satisfy p and discards others.
@@ -318,35 +306,34 @@ trait Foldable[F[_]] { self =>
   def selectSplit[A](fa: F[A])(p: A => Boolean): List[NonEmptyList[A]] =
     foldRight(fa, (List[NonEmptyList[A]](), false))(
         (a, xb) =>
-          xb match {
-        case (x, b) => {
+          xb match
+        case (x, b) =>
             val pa = p(a)
             (if (pa) if (b) (a <:: x.head) :: x.tail else NonEmptyList(a) :: x
              else x,
              pa)
-          }
-    })._1
+    )._1
 
   /** ``O(n log n)`` complexity */
   def distinct[A](fa: F[A])(implicit A: Order[A]): IList[A] =
-    foldLeft(fa, (ISet.empty[A], IList.empty[A])) {
+    foldLeft(fa, (ISet.empty[A], IList.empty[A]))
       case ((seen, acc), a) =>
         if (seen.notMember(a)) (seen.insert(a), a :: acc)
         else (seen, acc)
-    }._2.reverse
+    ._2.reverse
 
   /** ``O(n^2^)`` complexity */
   def distinctE[A](fa: F[A])(implicit A: Equal[A]): IList[A] =
-    foldLeft(fa, IList.empty[A]) {
+    foldLeft(fa, IList.empty[A])
       case (seen, a) =>
         if (!IList.instances.element(seen, a)) a :: seen
         else seen
-    }.reverse
+    .reverse
 
   def collapse[X[_], A](x: F[A])(implicit A: ApplicativePlus[X]): X[A] =
     foldRight(x, A.empty[A])((a, b) => A.plus(A.point(a), b))
 
-  trait FoldableLaw {
+  trait FoldableLaw
     import std.vector._
 
     /** Left fold is consistent with foldMap. */
@@ -358,16 +345,13 @@ trait Foldable[F[_]] { self =>
     def rightFMConsistent[A : Equal](fa: F[A]): Boolean =
       Equal[Vector[A]].equal(foldMap(fa)(Vector(_)),
                              foldRight(fa, Vector.empty[A])(_ +: _))
-  }
   def foldableLaw = new FoldableLaw {}
 
   ////
-  val foldableSyntax = new scalaz.syntax.FoldableSyntax[F] {
+  val foldableSyntax = new scalaz.syntax.FoldableSyntax[F]
     def F = Foldable.this
-  }
-}
 
-object Foldable {
+object Foldable
   @inline def apply[F[_]](implicit F: Foldable[F]): Foldable[F] = F
 
   ////
@@ -384,10 +368,9 @@ object Foldable {
     * }
     * }}}
     */
-  trait FromFoldMap[F[_]] extends Foldable[F] {
+  trait FromFoldMap[F[_]] extends Foldable[F]
     override def foldRight[A, B](fa: F[A], z: => B)(f: (A, => B) => B) =
       foldMap(fa)((a: A) => (Endo.endo(f(a, _: B)))) apply z
-  }
 
   /**
     * Template trait to define `Foldable` in terms of `foldr`
@@ -402,10 +385,8 @@ object Foldable {
     * }
     * }}}
     */
-  trait FromFoldr[F[_]] extends Foldable[F] {
+  trait FromFoldr[F[_]] extends Foldable[F]
     override def foldMap[A, B](fa: F[A])(f: A => B)(implicit F: Monoid[B]) =
       foldr[A, B](fa, F.zero)(x => y => F.append(f(x), y))
-  }
 
   ////
-}

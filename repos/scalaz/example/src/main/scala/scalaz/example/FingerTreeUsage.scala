@@ -3,14 +3,13 @@ package example
 
 import collection.immutable.Stream
 
-object FingerTreeUsage extends App {
+object FingerTreeUsage extends App
   import FingerTree._
   import std.anyVal._
 
   def streamToTree[A](stream: Stream[A]): FingerTree[Int, A] =
-    stream.foldLeft(empty(SizeReducer[A])) {
+    stream.foldLeft(empty(SizeReducer[A]))
       case (t, x) => (t :+ x)
-    }
 
   val intStream = Stream.from(1)
 
@@ -51,4 +50,3 @@ object FingerTreeUsage extends App {
 
   println(streamToTree(intStream.take(10))
         .traverseTree[Option, Int, Int](i => Some(i + 1)))
-}

@@ -1,8 +1,7 @@
 package a
 
-class A {
+class A
   val x: /*ref*/ ArrayBuffer
-}
 /*
 package a
 

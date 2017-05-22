@@ -3,7 +3,7 @@
   */
 import scala.language.reflectiveCalls
 
-object Test {
+object Test
   def len(x: { def length: Int }) = x.length
   def f1(x: { def apply(x: Int): Long }) = x(0)
   def f2(x: { def apply(x: Int): Byte }) = x(0)
@@ -27,7 +27,7 @@ object Test {
   // doesn't work yet, see #3197
   // def fclone(x:{ def clone(): AnyRef }) = x.clone()
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val longs = Array(5L)
     val bytes = Array(5: Byte)
     val strs = Array("abcde", "fghjij")
@@ -54,8 +54,6 @@ object Test {
     f12(strs, "jabooboo")
     println(longs(0))
     println(strs(0))
-    f13(new {
+    f13(new
       def update(x: Int, y: String): List[Int] = { println("hi mom"); Nil }
-    }, "irrelevant")
-  }
-}
+    , "irrelevant")

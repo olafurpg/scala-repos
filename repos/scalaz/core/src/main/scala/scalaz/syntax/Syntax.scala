@@ -1,7 +1,7 @@
 package scalaz
 package syntax
 
-trait Syntaxes {
+trait Syntaxes
 
   //
   // Type classes over * -> *
@@ -134,7 +134,6 @@ trait Syntaxes {
   //
 
   object all extends ToTypeClassOps with ToDataOps
-}
 
 trait ToDataOps
     extends ToIdOps with ToTreeOps with ToReducerOps with ToWriterOps

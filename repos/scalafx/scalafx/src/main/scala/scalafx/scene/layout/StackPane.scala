@@ -37,16 +37,15 @@ import scalafx.geometry.{Insets, Pos}
 import scalafx.scene.Node
 import scalafx.scene.Node.sfxNode2jfx
 
-object StackPane {
+object StackPane
   implicit def sfxStackPane2jfx(v: StackPane): jfxsl.StackPane =
     if (v != null) v.delegate else null
 
   /**
     * Removes all hbox constraints from the child node.
     */
-  def clearConstraints(child: jfxs.Node) {
+  def clearConstraints(child: jfxs.Node)
     jfxsl.StackPane.clearConstraints(child)
-  }
 
   /**
     * Returns the child's alignment constraint if set.
@@ -56,9 +55,8 @@ object StackPane {
   /**
     * Sets the alignment for the child when contained by a stackpane.
     */
-  def setAlignment(child: Node, value: Pos) {
+  def setAlignment(child: Node, value: Pos)
     jfxsl.StackPane.setAlignment(child, value)
-  }
 
   /**
     * Returns the child's margin constraint if set.
@@ -68,10 +66,8 @@ object StackPane {
   /**
     * Sets the margin for the child when contained by an hbox.
     */
-  def setMargin(child: Node, value: Insets) {
+  def setMargin(child: Node, value: Insets)
     jfxsl.StackPane.setMargin(child, value)
-  }
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/StackPane.html]]

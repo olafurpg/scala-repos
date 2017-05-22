@@ -36,7 +36,7 @@ import scalafx.scene.Group
   * In ScalaFX 8 use of Bindings.select* leads to IllegalArgumentException: "... property ... doesn't exist" exceptions.
   * The same code works fine in ScalaFX 2.
   */
-object BindingSelectDemo extends App {
+object BindingSelectDemo extends App
 
   val group = new Group()
 
@@ -48,4 +48,3 @@ object BindingSelectDemo extends App {
   //   Exception in thread "main" java.lang.IllegalArgumentException: The first property 'width' doesn't exist
   println("ScalaFX `selectDouble`")
   group.parent.selectDouble("width")
-}

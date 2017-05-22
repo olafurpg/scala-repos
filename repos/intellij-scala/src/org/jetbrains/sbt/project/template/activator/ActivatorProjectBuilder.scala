@@ -29,14 +29,13 @@ import org.jetbrains.sbt.project.template.activator.ActivatorRepoProcessor.DocDa
   */
 class ActivatorProjectBuilder
     extends AbstractExternalModuleBuilder[SbtProjectSettings](
-        SbtProjectSystem.Id, new SbtProjectSettings) {
+        SbtProjectSystem.Id, new SbtProjectSettings)
   //TODO Refactor me
   private var allTemplates: Map[String, DocData] = Map.empty
   private val repoProcessor = new ActivatorCachedRepoProcessor
-  private lazy val settingsComponents = {
+  private lazy val settingsComponents =
     downloadTemplateList()
     new ActivatorTemplateList(allTemplates.toArray)
-  }
 
   override def getGroupName: String = "Scala"
 
@@ -44,7 +43,7 @@ class ActivatorProjectBuilder
 
   override def getNodeIcon: Icon = Sbt.Icon
 
-  override def createModule(moduleModel: ModifiableModuleModel): Module = {
+  override def createModule(moduleModel: ModifiableModuleModel): Module =
     val oldPath = getModuleFilePath
     val file = new File(oldPath)
     val path = file.getParent + "/" + file.getName.toLowerCase
@@ -62,12 +61,11 @@ class ActivatorProjectBuilder
 
     setupModule(module)
     module
-  }
 
-  override def setupRootModel(modifiableRootModel: ModifiableRootModel) {
+  override def setupRootModel(modifiableRootModel: ModifiableRootModel)
     val selected = settingsComponents.getSelectedTemplate
 
-    allTemplates.get(selected) match {
+    allTemplates.get(selected) match
       case Some(info) =>
         val contentPath = getContentEntryPath
         if (StringUtil isEmpty contentPath) return
@@ -82,7 +80,6 @@ class ActivatorProjectBuilder
 
         createStub(info.id, contentPath)
       case _ => error("Can't download template")
-    }
 
     modifiableRootModel.inheritSdk()
 
@@ -95,24 +92,22 @@ class ActivatorProjectBuilder
 
     getExternalProjectSettings setExternalProjectPath getContentEntryPath
     settings linkProject getExternalProjectSettings
-  }
 
   override def getModuleType: ModuleType[_ <: ModuleBuilder] =
     JavaModuleType.getModuleType
 
   override def modifySettingsStep(
-      settingsStep: SettingsStep): ModuleWizardStep = {
+      settingsStep: SettingsStep): ModuleWizardStep =
     settingsStep.addSettingsComponent(settingsComponents.getMainPanel)
 
-    new SdkSettingsStep(settingsStep, this, new Condition[SdkTypeId] {
+    new SdkSettingsStep(settingsStep, this, new Condition[SdkTypeId]
       def value(t: SdkTypeId): Boolean = t != null && t.isInstanceOf[JavaSdk]
-    }) {
+    )
 
-      override def updateDataModel() {
+      override def updateDataModel()
         settingsStep.getContext setProjectJdk myJdkComboBox.getSelectedJdk
-      }
 
-      override def validate(): Boolean = {
+      override def validate(): Boolean =
         val context = settingsStep.getContext
 
         if (context.isCreatingNewProject &&
@@ -125,31 +120,24 @@ class ActivatorProjectBuilder
           error("SBT Project name must be valid Scala identifier")
 
         true
-      }
-    }
-  }
 
   private def error(msg: String) =
     throw new ConfigurationException(msg, "Error")
 
-  private def createStub(id: String, path: String) {
+  private def createStub(id: String, path: String)
     val moduleDir = new File(path)
     if (!moduleDir.exists()) moduleDir.mkdirs()
 
     doWithProgress(repoProcessor.createTemplate(id, moduleDir, error),
                    "Downloading template...")
-  }
 
-  private def downloadTemplateList() {
+  private def downloadTemplateList()
     doWithProgress({ allTemplates = repoProcessor.extractRepoData() },
     "Downloading list of templates...")
-  }
 
-  private def doWithProgress(body: => Unit, title: String) {
+  private def doWithProgress(body: => Unit, title: String)
     ProgressManager
       .getInstance()
-      .runProcessWithProgressSynchronously(new Runnable {
+      .runProcessWithProgressSynchronously(new Runnable
         override def run(): Unit = body
-      }, title, false, null)
-  }
-}
+      , title, false, null)

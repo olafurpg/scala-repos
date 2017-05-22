@@ -2,7 +2,7 @@ package com.twitter.util
 
 import java.util.concurrent.TimeUnit
 
-class CountDownLatch(val initialCount: Int) {
+class CountDownLatch(val initialCount: Int)
   val underlying = new java.util.concurrent.CountDownLatch(initialCount)
   def count = underlying.getCount
   def isZero = count == 0
@@ -10,7 +10,5 @@ class CountDownLatch(val initialCount: Int) {
   def await() = underlying.await()
   def await(timeout: Duration) =
     underlying.await(timeout.inMillis, TimeUnit.MILLISECONDS)
-  def within(timeout: Duration) = await(timeout) || {
+  def within(timeout: Duration) = await(timeout) ||
     throw new TimeoutException(timeout.toString)
-  }
-}

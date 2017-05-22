@@ -5,7 +5,7 @@ package com.gravity.goose
   * User: jim
   * Date: 5/13/11
   */
-object TalkToMeGoose {
+object TalkToMeGoose
 
   /**
     * you can use this method if you want to run goose from the command line to extract html from a bashscript
@@ -23,19 +23,15 @@ object TalkToMeGoose {
     *
     * @param args
     */
-  def main(args: Array[String]) {
-    try {
+  def main(args: Array[String])
+    try
       val url: String = args(0)
       val config: Configuration = new Configuration
       config.enableImageFetching = false
       val goose = new Goose(config)
       val article = goose.extractContent(url)
       println(article.cleanedArticleText)
-    } catch {
-      case e: Exception => {
+    catch
+      case e: Exception =>
           System.out.println(
               "Make sure you pass in a valid URL: " + e.toString)
-        }
-    }
-  }
-}

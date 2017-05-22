@@ -16,9 +16,8 @@ import java.util.concurrent.CompletionStage
   */
 //#handler
 trait Handler
-    extends akka.japi.function.Function[RequestContext, RouteResult] {
+    extends akka.japi.function.Function[RequestContext, RouteResult]
   override def apply(ctx: RequestContext): RouteResult
-}
 //#handler
 
 /**
@@ -30,6 +29,5 @@ trait Handler
   */
 trait AsyncHandler
     extends akka.japi.function.Function[
-        RequestContext, CompletionStage[RouteResult]] {
+        RequestContext, CompletionStage[RouteResult]]
   override def apply(ctx: RequestContext): CompletionStage[RouteResult]
-}

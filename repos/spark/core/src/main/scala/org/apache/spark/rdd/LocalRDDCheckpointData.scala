@@ -34,12 +34,12 @@ import org.apache.spark.util.Utils
   */
 private[spark] class LocalRDDCheckpointData[T : ClassTag](
     @transient private val rdd: RDD[T])
-    extends RDDCheckpointData[T](rdd) with Logging {
+    extends RDDCheckpointData[T](rdd) with Logging
 
   /**
     * Ensure the RDD is fully cached so the partitions can be recovered later.
     */
-  protected override def doCheckpoint(): CheckpointRDD[T] = {
+  protected override def doCheckpoint(): CheckpointRDD[T] =
     val level = rdd.getStorageLevel
 
     // Assume storage level uses disk; otherwise memory eviction may cause data loss
@@ -50,18 +50,14 @@ private[spark] class LocalRDDCheckpointData[T : ClassTag](
     // must cache any missing partitions. TODO: avoid running another job here (SPARK-8582).
     val action = (tc: TaskContext, iterator: Iterator[T]) =>
       Utils.getIteratorSize(iterator)
-    val missingPartitionIndices = rdd.partitions.map(_.index).filter { i =>
+    val missingPartitionIndices = rdd.partitions.map(_.index).filter  i =>
       !SparkEnv.get.blockManager.master.contains(RDDBlockId(rdd.id, i))
-    }
-    if (missingPartitionIndices.nonEmpty) {
+    if (missingPartitionIndices.nonEmpty)
       rdd.sparkContext.runJob(rdd, action, missingPartitionIndices)
-    }
 
     new LocalCheckpointRDD[T](rdd)
-  }
-}
 
-private[spark] object LocalRDDCheckpointData {
+private[spark] object LocalRDDCheckpointData
 
   val DEFAULT_STORAGE_LEVEL = StorageLevel.MEMORY_AND_DISK
 
@@ -74,8 +70,6 @@ private[spark] object LocalRDDCheckpointData {
     *
     * This method is idempotent.
     */
-  def transformStorageLevel(level: StorageLevel): StorageLevel = {
+  def transformStorageLevel(level: StorageLevel): StorageLevel =
     StorageLevel(
         useDisk = true, level.useMemory, level.deserialized, level.replication)
-  }
-}

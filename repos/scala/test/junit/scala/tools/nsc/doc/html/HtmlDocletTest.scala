@@ -8,9 +8,9 @@ import org.junit.runners.JUnit4
 import scala.tools.testing.AssertUtil._
 
 @RunWith(classOf[JUnit4])
-class HtmlDocletTest {
+class HtmlDocletTest
   @Test
-  def testSyntaxHighlightingUnicode() {
+  def testSyntaxHighlightingUnicode()
     val in = "unicode: …"
 
     val out = SyntaxHigh(in).toString
@@ -18,5 +18,3 @@ class HtmlDocletTest {
     // SI-9038, this failed with
     // "unicode: …" != "unicode: ￢ﾀﾦ"
     assertEquals(in, out)
-  }
-}

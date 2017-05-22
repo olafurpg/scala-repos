@@ -40,9 +40,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class TriangleMeshSpec
     extends SimpleSFXDelegateSpec[jfxss.TriangleMesh, TriangleMesh](
-        classOf[jfxss.TriangleMesh], classOf[TriangleMesh]) {
+        classOf[jfxss.TriangleMesh], classOf[TriangleMesh])
 
-  trait TestData {
+  trait TestData
     val mesh = new TriangleMesh()
     val emptyIntArray = Array[Int]()
     val emptyFloatArray = Array[Float]()
@@ -50,7 +50,6 @@ class TriangleMeshSpec
     // TODO: Add tests for invalid array lengths.
     val intArray = Array(0, 1, 2, 3, 4, 5)
     val floatArray = Array(0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 6.0f)
-  }
 
   /**
     * Test integer array contents.
@@ -58,16 +57,13 @@ class TriangleMeshSpec
     * @param ao Observable array
     * @param a Basic array.
     */
-  def testIntArray(oa: ObservableIntegerArray, a: Array[Int]) {
+  def testIntArray(oa: ObservableIntegerArray, a: Array[Int])
     assert(oa.isEmpty === a.isEmpty)
     assert(oa.length === a.length)
-    for (i <- 0 until oa.length) {
+    for (i <- 0 until oa.length)
       assert(oa(i) === a(i))
-    }
-    intercept[ArrayIndexOutOfBoundsException] {
+    intercept[ArrayIndexOutOfBoundsException]
       val invalid = oa(a.length)
-    }
-  }
 
   /**
     * Test integer array contents.
@@ -75,36 +71,29 @@ class TriangleMeshSpec
     * @param ao Observable array
     * @param a Basic array.
     */
-  def testFloatArray(oa: ObservableFloatArray, a: Array[Float]) {
+  def testFloatArray(oa: ObservableFloatArray, a: Array[Float])
     assert(oa.isEmpty === a.isEmpty)
     assert(oa.length === a.length)
-    for (i <- 0 until oa.length) {
+    for (i <- 0 until oa.length)
       assert(oa(i) === a(i))
-    }
-    intercept[ArrayIndexOutOfBoundsException] {
+    intercept[ArrayIndexOutOfBoundsException]
       val invalid = oa(a.length)
-    }
-  }
 
-  it should "report the correct array component sizes" in {
-    new TestData {
+  it should "report the correct array component sizes" in
+    new TestData
       assert(mesh.faceElementSize === 6)
       assert(mesh.pointElementSize === 3)
       assert(mesh.texCoordElementSize === 2)
-    }
-  }
 
-  it should "construct new mesh with empty arrays" in {
-    new TestData {
+  it should "construct new mesh with empty arrays" in
+    new TestData
       testFloatArray(mesh.points, emptyFloatArray)
       testFloatArray(mesh.texCoords, emptyFloatArray)
       testIntArray(mesh.faces, emptyIntArray)
       testIntArray(mesh.faceSmoothingGroups, emptyIntArray)
-    }
-  }
 
-  it should "allow mesh arrays to be assigned to basic arrays" in {
-    new TestData {
+  it should "allow mesh arrays to be assigned to basic arrays" in
+    new TestData
       mesh.points = floatArray
       testFloatArray(mesh.points, floatArray)
       mesh.texCoords = floatArray
@@ -113,6 +102,3 @@ class TriangleMeshSpec
       testIntArray(mesh.faces, intArray)
       mesh.faceSmoothingGroups = intArray
       testIntArray(mesh.faceSmoothingGroups, intArray)
-    }
-  }
-}

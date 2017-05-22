@@ -19,7 +19,7 @@ package org.apache.spark.repl
 
 import org.apache.spark.internal.Logging
 
-object Main extends Logging {
+object Main extends Logging
 
   initializeLogIfNecessary(true)
 
@@ -29,8 +29,6 @@ object Main extends Logging {
 
   def interp_=(i: SparkILoop) { _interp = i }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     _interp = new SparkILoop
     _interp.process(args)
-  }
-}

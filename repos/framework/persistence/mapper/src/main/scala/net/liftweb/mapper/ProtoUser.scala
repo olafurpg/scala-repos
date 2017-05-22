@@ -36,7 +36,7 @@ import net.liftweb.proto.{ProtoUser => GenProtoUser}
   * last name, email, etc.
   */
 trait ProtoUser[T <: ProtoUser[T]]
-    extends KeyedMapper[Long, T] with UserIdAsString { self: T =>
+    extends KeyedMapper[Long, T] with UserIdAsString  self: T =>
 
   override def primaryKeyField: MappedLongIndex[T] = id
 
@@ -70,10 +70,9 @@ trait ProtoUser[T <: ProtoUser[T]]
   lazy val firstName: MappedString[T] = new MyFirstName(this, 32)
 
   protected class MyFirstName(obj: T, size: Int)
-      extends MappedString(obj, size) {
+      extends MappedString(obj, size)
     override def displayName = fieldOwner.firstNameDisplayName
     override val fieldId = Some(Text("txtFirstName"))
-  }
 
   /**
     * The string name for the first name field
@@ -92,10 +91,9 @@ trait ProtoUser[T <: ProtoUser[T]]
   lazy val lastName: MappedString[T] = new MyLastName(this, 32)
 
   protected class MyLastName(obj: T, size: Int)
-      extends MappedString(obj, size) {
+      extends MappedString(obj, size)
     override def displayName = fieldOwner.lastNameDisplayName
     override val fieldId = Some(Text("txtLastName"))
-  }
 
   /**
     * The last name string
@@ -113,13 +111,12 @@ trait ProtoUser[T <: ProtoUser[T]]
     */
   lazy val email: MappedEmail[T] = new MyEmail(this, 48)
 
-  protected class MyEmail(obj: T, size: Int) extends MappedEmail(obj, size) {
+  protected class MyEmail(obj: T, size: Int) extends MappedEmail(obj, size)
     override def dbIndexed_? = true
     override def validations =
       valUnique(S.?("unique.email.address")) _ :: super.validations
     override def displayName = fieldOwner.emailDisplayName
     override val fieldId = Some(Text("txtEmail"))
-  }
 
   /**
     * The email first name
@@ -137,9 +134,8 @@ trait ProtoUser[T <: ProtoUser[T]]
     */
   lazy val password: MappedPassword[T] = new MyPassword(this)
 
-  protected class MyPassword(obj: T) extends MappedPassword(obj) {
+  protected class MyPassword(obj: T) extends MappedPassword(obj)
     override def displayName = fieldOwner.passwordDisplayName
-  }
 
   /**
     * The display name for the password field
@@ -157,34 +153,30 @@ trait ProtoUser[T <: ProtoUser[T]]
     */
   lazy val superUser: MappedBoolean[T] = new MySuperUser(this)
 
-  protected class MySuperUser(obj: T) extends MappedBoolean(obj) {
+  protected class MySuperUser(obj: T) extends MappedBoolean(obj)
     override def defaultValue = false
-  }
 
-  def niceName: String = (firstName.get, lastName.get, email.get) match {
+  def niceName: String = (firstName.get, lastName.get, email.get) match
     case (f, l, e) if f.length > 1 && l.length > 1 =>
       f + " " + l + " (" + e + ")"
     case (f, _, e) if f.length > 1 => f + " (" + e + ")"
     case (_, l, e) if l.length > 1 => l + " (" + e + ")"
     case (_, _, e) => e
-  }
 
-  def shortName: String = (firstName.get, lastName.get) match {
+  def shortName: String = (firstName.get, lastName.get) match
     case (f, l) if f.length > 1 && l.length > 1 => f + " " + l
     case (f, _) if f.length > 1 => f
     case (_, l) if l.length > 1 => l
     case _ => email.get
-  }
 
   def niceNameWEmailLink = <a href={"mailto:"+email.get}>{niceName}</a>
-}
 
 /**
   * Mix this trait into the the Mapper singleton for User and you
   * get a bunch of user functionality including password reset, etc.
   */
 trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
-    extends KeyedMetaMapper[Long, ModelType] with GenProtoUser {
+    extends KeyedMetaMapper[Long, ModelType] with GenProtoUser
   self: ModelType =>
 
   type TheUserType = ModelType
@@ -201,7 +193,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
       from: FieldPointerType): FieldPointerBridge = new MyPointer(from)
 
   protected class MyPointer(from: FieldPointerType)
-      extends FieldPointerBridge {
+      extends FieldPointerBridge
 
     /**
       * What is the display name of this field?
@@ -211,11 +203,9 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     /**
       * Does this represent a pointer to a Password field
       */
-    def isPasswordField_? : Boolean = from match {
+    def isPasswordField_? : Boolean = from match
       case a: MappedPassword[_] => true
       case _ => false
-    }
-  }
 
   /**
     * Convert an instance of TheUserType to the Bridge trait
@@ -226,7 +216,7 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
   /**
     * Bridges from TheUserType to methods used in this class
     */
-  protected class MyUserBridge(in: TheUserType) extends UserBridge {
+  protected class MyUserBridge(in: TheUserType) extends UserBridge
 
     /**
       * Convert the user's primary key to a String
@@ -273,9 +263,8 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     /**
       * Set the unique ID for this user to a new value
       */
-    def resetUniqueId(): TheUserType = {
+    def resetUniqueId(): TheUserType =
       in.uniqueId.reset()
-    }
 
     /**
       * Return the unique ID for the user
@@ -290,16 +279,14 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
     /**
       * Given a list of string, set the password
       */
-    def setPasswordFromListString(pwd: List[String]): TheUserType = {
+    def setPasswordFromListString(pwd: List[String]): TheUserType =
       in.password.setList(pwd)
       in
-    }
 
     /**
       * Save the user to backing store
       */
     def save(): Boolean = in.save
-  }
 
   /**
     * Given a field pointer and an instance, get the field on that instance
@@ -350,13 +337,12 @@ trait MetaMegaProtoUser[ModelType <: MegaProtoUser[ModelType]]
          email,
          locale,
          timezone)
-}
 
 /**
   * ProtoUser is bare bones.  MetaProtoUser contains a bunch
   * more fields including a validated flag, locale, timezone, etc.
   */
-trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
+trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T]  self: T =>
 
   /**
     * The unique id field for the User. This field
@@ -372,10 +358,9 @@ trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
   lazy val uniqueId: MappedUniqueId[T] = new MyUniqueId(this, 32)
 
   protected class MyUniqueId(obj: T, size: Int)
-      extends MappedUniqueId(obj, size) {
+      extends MappedUniqueId(obj, size)
     override def dbIndexed_? = true
     override def writePermission_? = true
-  }
 
   /**
     * The has the user been validated.
@@ -389,10 +374,9 @@ trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
     */
   lazy val validated: MappedBoolean[T] = new MyValidated(this)
 
-  protected class MyValidated(obj: T) extends MappedBoolean[T](obj) {
+  protected class MyValidated(obj: T) extends MappedBoolean[T](obj)
     override def defaultValue = false
     override val fieldId = Some(Text("txtValidated"))
-  }
 
   /**
     * The locale field for the User.
@@ -406,10 +390,9 @@ trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
     */
   lazy val locale = new MyLocale(this)
 
-  protected class MyLocale(obj: T) extends MappedLocale[T](obj) {
+  protected class MyLocale(obj: T) extends MappedLocale[T](obj)
     override def displayName = fieldOwner.localeDisplayName
     override val fieldId = Some(Text("txtLocale"))
-  }
 
   /**
     * The time zone field for the User.
@@ -423,10 +406,9 @@ trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
     */
   lazy val timezone = new MyTimeZone(this)
 
-  protected class MyTimeZone(obj: T) extends MappedTimeZone[T](obj) {
+  protected class MyTimeZone(obj: T) extends MappedTimeZone[T](obj)
     override def displayName = fieldOwner.timezoneDisplayName
     override val fieldId = Some(Text("txtTimeZone"))
-  }
 
   /**
     * The string for the timezone field
@@ -437,4 +419,3 @@ trait MegaProtoUser[T <: MegaProtoUser[T]] extends ProtoUser[T] { self: T =>
     * The string for the locale field
     */
   def localeDisplayName = S.?("locale")
-}

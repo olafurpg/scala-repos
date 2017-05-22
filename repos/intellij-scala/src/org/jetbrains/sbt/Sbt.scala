@@ -8,7 +8,7 @@ import com.intellij.openapi.util.IconLoader
 /**
   * @author Pavel Fatin
   */
-object Sbt {
+object Sbt
   val Name = "SBT"
 
   val FileExtension = "sbt"
@@ -54,11 +54,9 @@ object Sbt {
 
   lazy val FileIcon = IconLoader.getIcon("/sbt-file.png")
 
-  def isProjectDefinitionFile(project: Project, file: File): Boolean = {
+  def isProjectDefinitionFile(project: Project, file: File): Boolean =
     val baseDir = new File(project.getBasePath)
     val projectDir = baseDir / Sbt.ProjectDirectory
     file.getName == Sbt.BuildFile && file.isUnder(baseDir) ||
     file.getName.endsWith(s".${Sbt.FileExtension}") && file.isUnder(baseDir) ||
     file.getName.endsWith(".scala") && file.isUnder(projectDir)
-  }
-}

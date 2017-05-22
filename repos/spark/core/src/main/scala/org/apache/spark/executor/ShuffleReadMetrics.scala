@@ -32,9 +32,9 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
                                   _localBytesRead: Accumulator[Long],
                                   _fetchWaitTime: Accumulator[Long],
                                   _recordsRead: Accumulator[Long])
-    extends Serializable {
+    extends Serializable
 
-  private[executor] def this(accumMap: Map[String, Accumulator[_]]) {
+  private[executor] def this(accumMap: Map[String, Accumulator[_]])
     this(TaskMetrics.getAccum[Int](
              accumMap, InternalAccumulator.shuffleRead.REMOTE_BLOCKS_FETCHED),
          TaskMetrics.getAccum[Int](
@@ -47,7 +47,6 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
              accumMap, InternalAccumulator.shuffleRead.FETCH_WAIT_TIME),
          TaskMetrics.getAccum[Long](
              accumMap, InternalAccumulator.shuffleRead.RECORDS_READ))
-  }
 
   /**
     * Create a new [[ShuffleReadMetrics]] that is not associated with any particular task.
@@ -59,15 +58,13 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
     * A better alternative is [[TaskMetrics.registerTempShuffleReadMetrics]] followed by
     * [[TaskMetrics.mergeShuffleReadMetrics]].
     */
-  private[spark] def this() {
+  private[spark] def this()
     this(
         InternalAccumulator
           .createShuffleReadAccums()
-          .map { a =>
+          .map  a =>
         (a.name.get, a)
-      }
           .toMap)
-  }
 
   /**
     * Number of remote blocks fetched in this shuffle by this task.
@@ -132,4 +129,3 @@ class ShuffleReadMetrics private (_remoteBlocksFetched: Accumulator[Int],
   private[spark] def setFetchWaitTime(v: Long): Unit =
     _fetchWaitTime.setValue(v)
   private[spark] def setRecordsRead(v: Long): Unit = _recordsRead.setValue(v)
-}

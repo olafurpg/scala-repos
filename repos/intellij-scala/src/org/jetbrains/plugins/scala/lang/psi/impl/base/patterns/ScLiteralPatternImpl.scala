@@ -16,17 +16,13 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Date: 28.02.2008
   */
 class ScLiteralPatternImpl(node: ASTNode)
-    extends ScalaPsiElementImpl(node) with ScLiteralPattern {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    extends ScalaPsiElementImpl(node) with ScLiteralPattern
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   override def toString: String = "LiteralPattern"
 
-  override def getType(ctx: TypingContext) = {
+  override def getType(ctx: TypingContext) =
     getLiteral.getType(TypingContext.empty)
-  }
-}

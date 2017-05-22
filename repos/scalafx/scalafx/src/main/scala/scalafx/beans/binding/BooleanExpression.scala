@@ -31,13 +31,12 @@ import javafx.beans.{binding => jfxbb}
 
 import scala.language.implicitConversions
 
-object BooleanExpression {
+object BooleanExpression
   implicit def sfxBooleanExpression2jfx(
       be: BooleanExpression): jfxbb.BooleanExpression =
     if (be != null) be.delegate else null
-}
 
-class BooleanExpression(val delegate: jfxbb.BooleanExpression) {
+class BooleanExpression(val delegate: jfxbb.BooleanExpression)
   def ===(v: ObservableBooleanValue) = delegate.isEqualTo(v)
   def ===(v: BooleanExpression) = delegate.isEqualTo(v.delegate)
 
@@ -51,4 +50,3 @@ class BooleanExpression(val delegate: jfxbb.BooleanExpression) {
   def ||(v: BooleanExpression) = delegate.or(v.delegate)
 
   def unary_!() = delegate.not()
-}

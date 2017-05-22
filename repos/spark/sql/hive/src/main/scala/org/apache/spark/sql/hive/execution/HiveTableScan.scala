@@ -46,7 +46,7 @@ private[hive] case class HiveTableScan(
     requestedAttributes: Seq[Attribute],
     relation: MetastoreRelation,
     partitionPruningPred: Seq[Expression])(@transient val context: HiveContext)
-    extends LeafNode {
+    extends LeafNode
 
   require(
       partitionPruningPred.isEmpty || relation.hiveQlTable.isPartitioned,
@@ -65,13 +65,12 @@ private[hive] case class HiveTableScan(
   // Bind all partition key attribute references in the partition pruning predicate for later
   // evaluation.
   private[this] val boundPruningPred =
-    partitionPruningPred.reduceLeftOption(And).map { pred =>
+    partitionPruningPred.reduceLeftOption(And).map  pred =>
       require(
           pred.dataType == BooleanType,
           s"Data type of predicate $pred must be BooleanType rather than ${pred.dataType}.")
 
       BindReferences.bindReference(pred, relation.partitionKeys)
-    }
 
   // Create a local copy of hiveconf,so that scan specific modifications should not impact
   // other queries
@@ -85,11 +84,10 @@ private[hive] case class HiveTableScan(
   private[this] val hadoopReader = new HadoopTableReader(
       attributes, relation, context, hiveExtraConf)
 
-  private[this] def castFromString(value: String, dataType: DataType) = {
+  private[this] def castFromString(value: String, dataType: DataType) =
     Cast(Literal(value), dataType).eval(null)
-  }
 
-  private def addColumnMetadataToConf(hiveConf: HiveConf) {
+  private def addColumnMetadataToConf(hiveConf: HiveConf)
     // Specifies needed column IDs for those non-partitioning columns.
     val neededColumnIDs =
       attributes.flatMap(relation.columnOrdinals.get).map(o => o: Integer)
@@ -115,7 +113,6 @@ private[hive] case class HiveTableScan(
     hiveConf.set(serdeConstants.LIST_COLUMN_TYPES, columnTypeNames)
     hiveConf.set(serdeConstants.LIST_COLUMNS,
                  relation.attributes.map(_.name).mkString(","))
-  }
 
   /**
     * Prunes partitions not involve the query plan.
@@ -123,47 +120,36 @@ private[hive] case class HiveTableScan(
     * @param partitions All partitions of the relation.
     * @return Partitions that are involved in the query plan.
     */
-  private[hive] def prunePartitions(partitions: Seq[HivePartition]) = {
-    boundPruningPred match {
+  private[hive] def prunePartitions(partitions: Seq[HivePartition]) =
+    boundPruningPred match
       case None => partitions
       case Some(shouldKeep) =>
-        partitions.filter { part =>
+        partitions.filter  part =>
           val dataTypes = relation.partitionKeys.map(_.dataType)
-          val castedValues = part.getValues.asScala.zip(dataTypes).map {
+          val castedValues = part.getValues.asScala.zip(dataTypes).map
             case (value, dataType) => castFromString(value, dataType)
-          }
 
           // Only partitioned values are needed here, since the predicate has already been bound to
           // partition key attribute references.
           val row = InternalRow.fromSeq(castedValues)
           shouldKeep.eval(row).asInstanceOf[Boolean]
-        }
-    }
-  }
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     // Using dummyCallSite, as getCallSite can turn out to be expensive with
     // with multiple partitions.
     val rdd =
-      if (!relation.hiveQlTable.isPartitioned) {
-        Utils.withDummyCallSite(sqlContext.sparkContext) {
+      if (!relation.hiveQlTable.isPartitioned)
+        Utils.withDummyCallSite(sqlContext.sparkContext)
           hadoopReader.makeRDDForTable(relation.hiveQlTable)
-        }
-      } else {
-        Utils.withDummyCallSite(sqlContext.sparkContext) {
+      else
+        Utils.withDummyCallSite(sqlContext.sparkContext)
           hadoopReader.makeRDDForPartitionedTable(prunePartitions(
                   relation.getHiveQlPartitions(partitionPruningPred)))
-        }
-      }
     val numOutputRows = longMetric("numOutputRows")
-    rdd.mapPartitionsInternal { iter =>
+    rdd.mapPartitionsInternal  iter =>
       val proj = UnsafeProjection.create(schema)
-      iter.map { r =>
+      iter.map  r =>
         numOutputRows += 1
         proj(r)
-      }
-    }
-  }
 
   override def output: Seq[Attribute] = attributes
-}

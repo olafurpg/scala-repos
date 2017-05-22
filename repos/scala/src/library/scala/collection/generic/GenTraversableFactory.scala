@@ -37,12 +37,11 @@ import scala.language.higherKinds
   */
 abstract class GenTraversableFactory[
     CC[X] <: GenTraversable[X] with GenericTraversableTemplate[X, CC]]
-    extends GenericCompanion[CC] {
+    extends GenericCompanion[CC]
 
   private[this] val ReusableCBFInstance: GenericCanBuildFrom[Nothing] =
-    new GenericCanBuildFrom[Nothing] {
+    new GenericCanBuildFrom[Nothing]
       override def apply() = newBuilder[Nothing]
-    }
   def ReusableCBF: GenericCanBuildFrom[Nothing] = ReusableCBFInstance
 
   /** A generic implementation of the `CanBuildFrom` trait, which forwards
@@ -50,7 +49,7 @@ abstract class GenTraversableFactory[
     *  $coll `from`, and which forwards all calls of `apply()` to the
     *  `newBuilder` method of this factory.
     */
-  class GenericCanBuildFrom[A] extends CanBuildFrom[CC[_], A, CC[A]] {
+  class GenericCanBuildFrom[A] extends CanBuildFrom[CC[_], A, CC[A]]
 
     /** Creates a new builder on request of a collection.
       *  @param from  the collection requesting the builder to be created.
@@ -62,14 +61,13 @@ abstract class GenTraversableFactory[
       *  @return the result of invoking the `newBuilder` method of this factory.
       */
     def apply() = newBuilder[A]
-  }
 
   /** Concatenates all argument collections into a single $coll.
     *
     *  @param xss the collections that are to be concatenated.
     *  @return the concatenation of all the collections.
     */
-  def concat[A](xss: Traversable[A]*): CC[A] = {
+  def concat[A](xss: Traversable[A]*): CC[A] =
     val b = newBuilder[A]
     // At present we're using IndexedSeq as a proxy for "has a cheap size method".
     if (xss forall (_.isInstanceOf[IndexedSeq[_]]))
@@ -77,23 +75,20 @@ abstract class GenTraversableFactory[
 
     for (xs <- xss.seq) b ++= xs
     b.result()
-  }
 
   /** Produces a $coll containing the results of some element computation a number of times.
     *  @param   n  the number of elements contained in the $coll.
     *  @param   elem the element computation
     *  @return  A $coll that contains the results of `n` evaluations of `elem`.
     */
-  def fill[A](n: Int)(elem: => A): CC[A] = {
+  def fill[A](n: Int)(elem: => A): CC[A] =
     val b = newBuilder[A]
     b.sizeHint(n)
     var i = 0
-    while (i < n) {
+    while (i < n)
       b += elem
       i += 1
-    }
     b.result()
-  }
 
   /** Produces a two-dimensional $coll containing the results of some element computation a number of times.
     *  @param   n1  the number of elements in the 1st dimension
@@ -144,16 +139,14 @@ abstract class GenTraversableFactory[
     *  @param  f   The function computing element values
     *  @return A $coll consisting of elements `f(0), ..., f(n -1)`
     */
-  def tabulate[A](n: Int)(f: Int => A): CC[A] = {
+  def tabulate[A](n: Int)(f: Int => A): CC[A] =
     val b = newBuilder[A]
     b.sizeHint(n)
     var i = 0
-    while (i < n) {
+    while (i < n)
       b += f(i)
       i += 1
-    }
     b.result()
-  }
 
   /** Produces a two-dimensional $coll containing values of a given function over ranges of integer values starting from 0.
     *  @param   n1  the number of elements in the 1st dimension
@@ -219,7 +212,7 @@ abstract class GenTraversableFactory[
     *  @param step  the difference between successive elements of the $coll (must be positive or negative)
     *  @return      a $coll with values `start, start + step, ...` up to, but excluding `end`
     */
-  def range[T : Integral](start: T, end: T, step: T): CC[T] = {
+  def range[T : Integral](start: T, end: T, step: T): CC[T] =
     val num = implicitly[Integral[T]]
     import num._
 
@@ -228,12 +221,10 @@ abstract class GenTraversableFactory[
     b sizeHint immutable.NumericRange.count(
         start, end, step, isInclusive = false)
     var i = start
-    while (if (step < zero) end < i else i < end) {
+    while (if (step < zero) end < i else i < end)
       b += i
       i += step
-    }
     b.result()
-  }
 
   /** Produces a $coll containing repeated applications of a function to a start value.
     *
@@ -242,20 +233,16 @@ abstract class GenTraversableFactory[
     *  @param f     the function that's repeatedly applied
     *  @return      a $coll with `len` values in the sequence `start, f(start), f(f(start)), ...`
     */
-  def iterate[A](start: A, len: Int)(f: A => A): CC[A] = {
+  def iterate[A](start: A, len: Int)(f: A => A): CC[A] =
     val b = newBuilder[A]
-    if (len > 0) {
+    if (len > 0)
       b.sizeHint(len)
       var acc = start
       var i = 1
       b += acc
 
-      while (i < len) {
+      while (i < len)
         acc = f(acc)
         i += 1
         b += acc
-      }
-    }
     b.result()
-  }
-}

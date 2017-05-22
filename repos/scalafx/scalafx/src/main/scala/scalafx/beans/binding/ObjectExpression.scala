@@ -32,13 +32,12 @@ import javafx.beans.{binding => jfxbb}
 import scala.language.implicitConversions
 import scalafx.beans.value.ObservableValue
 
-object ObjectExpression {
+object ObjectExpression
   implicit def sfxObjectExpression2jfx[J](
       oe: ObjectExpression[J]): jfxbb.ObjectExpression[J] =
     if (oe != null) oe.delegate else null
-}
 
-class ObjectExpression[J](val delegate: jfxbb.ObjectExpression[J]) {
+class ObjectExpression[J](val delegate: jfxbb.ObjectExpression[J])
   def ===(v: Null) = delegate.isNull
   def ===(v: ObservableObjectValue[_]) = delegate.isEqualTo(v)
   // explicit conversion needed due to AnyRef typed method
@@ -61,4 +60,3 @@ class ObjectExpression[J](val delegate: jfxbb.ObjectExpression[J]) {
   def selectLong(s: String) = jfxbb.Bindings.selectLong(this.delegate, s)
   def selectString(s: String) = jfxbb.Bindings.selectString(this.delegate, s)
   def select[T](s: String) = jfxbb.Bindings.select[T](this.delegate, s)
-}

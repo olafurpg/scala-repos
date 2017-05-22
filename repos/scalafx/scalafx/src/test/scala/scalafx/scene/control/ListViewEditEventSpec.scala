@@ -44,7 +44,7 @@ class ListViewEditEventSpec[T <: Any]
     extends SimpleSFXDelegateSpec[
         jfxsc.ListView.EditEvent[T], ListView.EditEvent[T]](
         classOf[jfxsc.ListView.EditEvent[T]], classOf[ListView.EditEvent[T]])
-    with RunOnApplicationThread {
+    with RunOnApplicationThread
 
   /*
    * In third argument, I it was used simply null compiler throws a error with message:
@@ -54,4 +54,3 @@ class ListViewEditEventSpec[T <: Any]
   override def getJavaClassInstance =
     new jfxsc.ListView.EditEvent[T](
         new jfxsc.ListView[T], null, null.asInstanceOf[T], 0)
-}

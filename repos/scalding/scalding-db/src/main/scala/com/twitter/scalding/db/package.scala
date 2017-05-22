@@ -22,9 +22,8 @@ import com.twitter.scalding.db.macros.impl.{ColumnDefinitionProviderImpl, DBType
 // The implicits in the jdbc.macro's package
 // These are to allow us to auto provide our Type Classes without the user possibly knowing
 // all of the various ways we could build it.
-package object macros {
+package object macros
   implicit def toColumnDefinitionProvider[T]: ColumnDefinitionProvider[T] = macro ColumnDefinitionProviderImpl[
       T]
   implicit def toDBTypeDescriptor[T]: DBTypeDescriptor[T] = macro DBTypeDescriptorImpl[
       T]
-}

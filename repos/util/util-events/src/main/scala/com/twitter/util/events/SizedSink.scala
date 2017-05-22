@@ -5,7 +5,7 @@ import com.twitter.util.events.Event.Type
 import java.util.concurrent.atomic.AtomicLong
 import scala.collection.mutable.ArrayBuffer
 
-object SizedSink {
+object SizedSink
 
   // use the next largest power of two for performance reasons.
   // eg: http://psy-lob-saw.blogspot.com/2014/11/the-mythical-modulo-mask.html
@@ -27,10 +27,9 @@ object SizedSink {
   private[twitter] def apply(
       approxSize: Int,
       milliTime: () => Long = () => System.currentTimeMillis()
-  ): Sink = {
+  ): Sink =
     require(approxSize > 0, s"approxSize must be positive: $approxSize")
     new SizedSink(nextPowOf2(approxSize), milliTime)
-  }
 
   private class MutableEvent(var etype: Type,
                              var whenMillis: Long,
@@ -38,7 +37,7 @@ object SizedSink {
                              var objectVal: Object,
                              var doubleVal: Double,
                              var traceIdVal: Long,
-                             var spanIdVal: Long) {
+                             var spanIdVal: Long)
     def isDefined: Boolean = etype != null
 
     def toEvent: Event =
@@ -49,8 +48,6 @@ object SizedSink {
             doubleVal,
             traceIdVal,
             spanIdVal)
-  }
-}
 
 /**
   * An in-memory circular buffer of events. When `capacity` is reached,
@@ -66,7 +63,7 @@ object SizedSink {
   *          This is exposed to allow for more control in tests.
   */
 class SizedSink private[events](capacity: Int, milliTime: () => Long)
-    extends Sink {
+    extends Sink
   import SizedSink._
 
   require(capacity > 0, s"capacity must be positive: $capacity")
@@ -84,7 +81,7 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
 
   private[this] val pos = new AtomicLong(0)
 
-  private[this] val evs = Array.fill(capacity) {
+  private[this] val evs = Array.fill(capacity)
     new MutableEvent(
         etype = null,
         whenMillis = -1L,
@@ -94,7 +91,6 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
         traceIdVal = Event.NoTraceId,
         spanIdVal = Event.NoSpanId
     )
-  }
 
   override def event(
       etype: Type,
@@ -103,7 +99,7 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
       doubleVal: Double = Event.NoDouble,
       traceIdVal: Long = Event.NoTraceId,
       spanIdVal: Long = Event.NoSpanId
-  ): Unit = {
+  ): Unit =
     require(etype != null)
 
     // reserve our position where the write will go.
@@ -114,7 +110,7 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
     // we need the lock to be exclusive to avoid the case of another writer
     // wrapping back around and trying to write back into this slot.
     val ev = evs(slot)
-    ev.synchronized {
+    ev.synchronized
       ev.etype = etype
       ev.whenMillis = millis
       ev.longVal = longVal
@@ -122,20 +118,13 @@ class SizedSink private[events](capacity: Int, milliTime: () => Long)
       ev.doubleVal = doubleVal
       ev.traceIdVal = traceIdVal
       ev.spanIdVal = spanIdVal
-    }
-  }
 
-  override def events: Iterator[Event] = {
+  override def events: Iterator[Event] =
     val out = new ArrayBuffer[Event](capacity)
 
-    0.until(capacity).foreach { i =>
+    0.until(capacity).foreach  i =>
       val ev = evs(i)
-      ev.synchronized {
-        if (ev.isDefined) {
+      ev.synchronized
+        if (ev.isDefined)
           out += ev.toEvent
-        }
-      }
-    }
     out.iterator
-  }
-}

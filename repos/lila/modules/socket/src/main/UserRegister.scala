@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import actorApi.{SocketLeave, SocketEnter}
 import lila.hub.actorApi.{SendTo, SendTos, WithUserIds}
 
-private final class UserRegister extends Actor {
+private final class UserRegister extends Actor
 
   context.system.lilaBus.subscribe(self, 'users, 'socketDoor)
 
@@ -17,7 +17,7 @@ private final class UserRegister extends Actor {
 
   val users = mutable.Map.empty[UserId, mutable.Map[UID, SocketMember]]
 
-  def receive = {
+  def receive =
 
     case SendTo(userId, msg) => sendTo(userId, msg)
 
@@ -26,25 +26,17 @@ private final class UserRegister extends Actor {
     case WithUserIds(f) => f(users.keys)
 
     case SocketEnter(uid, member) =>
-      member.userId foreach { userId =>
-        users get userId match {
+      member.userId foreach  userId =>
+        users get userId match
           case None => users += (userId -> mutable.Map(uid -> member))
           case Some(members) => members += (uid -> member)
-        }
-      }
 
     case SocketLeave(uid, member) =>
-      member.userId foreach { userId =>
-        users get userId foreach { members =>
+      member.userId foreach  userId =>
+        users get userId foreach  members =>
           members -= uid
           if (members.isEmpty) users -= userId
-        }
-      }
-  }
 
-  private def sendTo(userId: String, msg: JsObject) {
-    users get userId foreach { members =>
+  private def sendTo(userId: String, msg: JsObject)
+    users get userId foreach  members =>
       members.values foreach (_ push msg)
-    }
-  }
-}

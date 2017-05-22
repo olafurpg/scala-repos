@@ -8,7 +8,7 @@ import Tags._
 import org.scalacheck.Prop._
 import org.scalacheck.Prop.forAll
 
-object OptionTest extends SpecLite {
+object OptionTest extends SpecLite
 
   checkAll("Option", order.laws[Option[Int]])
   checkAll("Option @@ First", order.laws[FirstOption[Int]])
@@ -35,21 +35,18 @@ object OptionTest extends SpecLite {
   checkAll("Option @@ Min", monad.laws[MinOption])
   checkAll("Option @@ Max", monad.laws[MaxOption])
 
-  "None is less than anything else" ! forAll { (x: Option[Int]) =>
+  "None is less than anything else" ! forAll  (x: Option[Int]) =>
     Order[Option[Int]].greaterThanOrEqual(x, None)
-  }
 
-  "None is ignored in Option[A]@@Min" ! forAll { (x: Option[Int]) =>
+  "None is ignored in Option[A]@@Min" ! forAll  (x: Option[Int]) =>
     import syntax.monoid._
     (Min(x) |+| Min(None)) must_=== Min(x)
-  }
 
-  "None is ignored in Option[A]@@Max" ! forAll { (x: Option[Int]) =>
+  "None is ignored in Option[A]@@Max" ! forAll  (x: Option[Int]) =>
     import syntax.monoid._
     (Max(x) |+| Max(None)) must_=== Max(x)
-  }
 
-  object instances {
+  object instances
     def equal[A : Equal] = Equal[Option[A]]
     def order[A : Order] = Order[Option[A]]
     def semigroup[A : Semigroup] = Monoid[Option[A]]
@@ -61,5 +58,3 @@ object OptionTest extends SpecLite {
 
     // checking absence of ambiguity
     def equal[A : Order] = Equal[Option[A]]
-  }
-}

@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentMap
 
 import com.google.common.collect.MapMaker
 
-object OuterScopes {
+object OuterScopes
   @transient
   lazy val outerScopes: ConcurrentMap[String, AnyRef] =
     new MapMaker().weakValues().makeMap()
@@ -36,7 +36,5 @@ object OuterScopes {
     * Warning: this function operates on the assumption that there is only ever one instance of any
     * given wrapper class.
     */
-  def addOuterScope(outer: AnyRef): Unit = {
+  def addOuterScope(outer: AnyRef): Unit =
     outerScopes.putIfAbsent(outer.getClass.getName, outer)
-  }
-}

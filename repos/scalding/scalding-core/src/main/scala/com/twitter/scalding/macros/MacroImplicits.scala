@@ -20,7 +20,7 @@ import scala.language.experimental.macros
 import com.twitter.scalding._
 import com.twitter.scalding.macros.impl._
 
-object MacroImplicits {
+object MacroImplicits
 
   /**
     * This method provides proof that the given type is a case class.
@@ -31,4 +31,3 @@ object MacroImplicits {
     .caseClassTupleConverterImpl[T]
   implicit def materializeCaseClassTypeDescriptor[T]: TypeDescriptor[T] = macro TypeDescriptorProviderImpl
     .caseClassTypeDescriptorImpl[T]
-}

@@ -20,7 +20,7 @@ import scala.{specialized => spec}
 /**
   * Factory methods to generate Vec instances
   */
-package object vec {
+package object vec
 
   /**
     * Generate a uniform random Vec[Long] of a certain number of elements
@@ -82,11 +82,10 @@ package object vec {
     * Generate a Vec[Double] containing a certain number of ones
     * @param sz Number of elements of ones vec
     */
-  def ones(sz: Int): Vec[Double] = {
+  def ones(sz: Int): Vec[Double] =
     val tmp = Array.ofDim[Double](sz)
     array.fill(tmp, 1.0)
     tmp
-  }
 
   /**
     * Generate a Vec[Double] containing a certain number of zeros
@@ -111,7 +110,5 @@ package object vec {
     * @tparam T type of elements in array
     */
   def repeat[@spec(Boolean, Int, Long, Double) T : ST](
-      v: Array[T], n: Int): Array[T] = {
+      v: Array[T], n: Int): Array[T] =
     array.flatten(for (i <- 1 to n) yield v)
-  }
-}

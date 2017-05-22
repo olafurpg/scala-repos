@@ -33,14 +33,13 @@ import scalafx.Includes._
 import scalafx.beans.property.ReadOnlyObjectProperty
 import scalafx.delegate.SFXDelegate
 
-object ListCell {
+object ListCell
   implicit def sfxListCell2jfx[T](l: ListCell[T]): jfxsc.ListCell[T] =
     if (l != null) l.delegate else null
-}
 
 class ListCell[T](
     override val delegate: jfxsc.ListCell[T] = new jfxsc.ListCell[T])
-    extends IndexedCell(delegate) with SFXDelegate[jfxsc.ListCell[T]] {
+    extends IndexedCell(delegate) with SFXDelegate[jfxsc.ListCell[T]]
 
   /**
     * The ListView associated with this Cell.
@@ -51,7 +50,5 @@ class ListCell[T](
   /**
     * Updates the ListView associated with this Cell.
     */
-  def updateListView(listView: ListView[T]) {
+  def updateListView(listView: ListView[T])
     delegate.updateListView(listView)
-  }
-}

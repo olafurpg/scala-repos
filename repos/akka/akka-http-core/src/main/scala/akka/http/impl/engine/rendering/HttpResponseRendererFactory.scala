@@ -25,34 +25,31 @@ import headers._
 private[http] class HttpResponseRendererFactory(
     serverHeader: Option[headers.Server],
     responseHeaderSizeHint: Int,
-    log: LoggingAdapter) {
+    log: LoggingAdapter)
 
   private val renderDefaultServerHeader: Rendering ⇒ Unit =
-    serverHeader match {
+    serverHeader match
       case Some(h) ⇒
         val bytes = (new ByteArrayRendering(32) ~~ h ~~ CrLf).get
         _ ~~ bytes
       case None ⇒
         _ ⇒
           ()
-    }
 
   // as an optimization we cache the Date header of the last second here
   @volatile private[this] var cachedDateHeader: (Long, Array[Byte]) =
     (0L, null)
 
-  private def dateHeader: Array[Byte] = {
+  private def dateHeader: Array[Byte] =
     var (cachedSeconds, cachedBytes) = cachedDateHeader
     val now = currentTimeMillis()
-    if (now / 1000 > cachedSeconds) {
+    if (now / 1000 > cachedSeconds)
       cachedSeconds = now / 1000
       val r = new ByteArrayRendering(48)
       DateTime(now).renderRfc1123DateTimeString(r ~~ headers.Date) ~~ CrLf
       cachedBytes = r.get
       cachedDateHeader = cachedSeconds -> cachedBytes
-    }
     cachedBytes
-  }
 
   // split out so we can stabilize by overriding in tests
   protected def currentTimeMillis(): Long = System.currentTimeMillis()
@@ -63,14 +60,14 @@ private[http] class HttpResponseRendererFactory(
 
   object HttpResponseRenderer
       extends GraphStage[FlowShape[
-              ResponseRenderingContext, ResponseRenderingOutput]] {
+              ResponseRenderingContext, ResponseRenderingOutput]]
     val in = Inlet[ResponseRenderingContext]("in")
     val out = Outlet[ResponseRenderingOutput]("out")
     val shape: FlowShape[ResponseRenderingContext, ResponseRenderingOutput] =
       FlowShape(in, out)
 
     def createLogic(inheritedAttributes: Attributes): GraphStageLogic =
-      new GraphStageLogic(shape) {
+      new GraphStageLogic(shape)
         var closeMode: CloseMode =
           DontClose // signals what to do after the current response
         def close: Boolean = closeMode != DontClose
@@ -78,49 +75,44 @@ private[http] class HttpResponseRendererFactory(
           if (cond) closeMode = CloseConnection
         var transferring = false
 
-        setHandler(in, new InHandler {
+        setHandler(in, new InHandler
           override def onPush(): Unit =
-            render(grab(in)) match {
+            render(grab(in)) match
               case Strict(outElement) ⇒
                 push(out, outElement)
                 if (close) completeStage()
               case Streamed(outStream) ⇒ transfer(outStream)
-            }
 
           override def onUpstreamFinish(): Unit =
             if (transferring) closeMode = CloseConnection
             else completeStage()
-        })
-        val waitForDemandHandler = new OutHandler {
+        )
+        val waitForDemandHandler = new OutHandler
           def onPull(): Unit = pull(in)
-        }
         setHandler(out, waitForDemandHandler)
-        def transfer(outStream: Source[ResponseRenderingOutput, Any]): Unit = {
+        def transfer(outStream: Source[ResponseRenderingOutput, Any]): Unit =
           transferring = true
           val sinkIn =
             new SubSinkInlet[ResponseRenderingOutput]("RenderingSink")
-          sinkIn.setHandler(new InHandler {
+          sinkIn.setHandler(new InHandler
             override def onPush(): Unit = push(out, sinkIn.grab())
             override def onUpstreamFinish(): Unit =
               if (close) completeStage()
-              else {
+              else
                 transferring = false
                 setHandler(out, waitForDemandHandler)
                 if (isAvailable(out)) pull(in)
-              }
-          })
-          setHandler(out, new OutHandler {
+          )
+          setHandler(out, new OutHandler
             override def onPull(): Unit = sinkIn.pull()
-            override def onDownstreamFinish(): Unit = {
+            override def onDownstreamFinish(): Unit =
               completeStage()
               sinkIn.cancel()
-            }
-          })
+          )
           sinkIn.pull()
           outStream.runWith(sinkIn.sink)(interpreter.subFusingMaterializer)
-        }
 
-        def render(ctx: ResponseRenderingContext): StrictOrStreamed = {
+        def render(ctx: ResponseRenderingContext): StrictOrStreamed =
           val r = new ByteStringRendering(responseHeaderSizeHint)
 
           import ctx.response._
@@ -128,12 +120,11 @@ private[http] class HttpResponseRendererFactory(
             entity.isKnownEmpty || ctx.requestMethod == HttpMethods.HEAD
 
           def renderStatusLine(): Unit =
-            protocol match {
+            protocol match
               case `HTTP/1.1` ⇒
                 if (status eq StatusCodes.OK) r ~~ DefaultStatusLineBytes
                 else r ~~ StatusLineStartBytes ~~ status ~~ CrLf
               case `HTTP/1.0` ⇒ r ~~ protocol ~~ ' ' ~~ status ~~ CrLf
-            }
 
           def render(h: HttpHeader) = r ~~ h ~~ CrLf
 
@@ -149,9 +140,9 @@ private[http] class HttpResponseRendererFactory(
                             serverSeen: Boolean = false,
                             transferEncodingSeen: Boolean = false,
                             dateSeen: Boolean = false): Unit =
-            remaining match {
+            remaining match
               case head :: tail ⇒
-                head match {
+                head match
                   case x: `Content-Length` ⇒
                     suppressionWarning(
                         log,
@@ -186,7 +177,7 @@ private[http] class HttpResponseRendererFactory(
                                   dateSeen = true)
 
                   case x: `Transfer-Encoding` ⇒
-                    x.withChunkedPeeled match {
+                    x.withChunkedPeeled match
                       case None ⇒
                         suppressionWarning(log, head)
                         renderHeaders(tail,
@@ -206,7 +197,6 @@ private[http] class HttpResponseRendererFactory(
                                       serverSeen,
                                       transferEncodingSeen = true,
                                       dateSeen)
-                    }
 
                   case x: Connection ⇒
                     val connectionHeader =
@@ -260,29 +250,27 @@ private[http] class HttpResponseRendererFactory(
                                   serverSeen,
                                   transferEncodingSeen,
                                   dateSeen)
-                }
 
               case Nil ⇒
                 if (!serverSeen) renderDefaultServerHeader(r)
                 if (!dateSeen) r ~~ dateHeader
 
                 // Do we close the connection after this response?
-                closeIf {
+                closeIf
                   // if we are prohibited to keep-alive by the spec
                   alwaysClose ||
                   // if the client wants to close and we don't override
                   (ctx.closeRequested &&
                       ((connHeader eq null) || !connHeader.hasKeepAlive)) ||
                   // if the application wants to close explicitly
-                  (protocol match {
+                  (protocol match
                         case `HTTP/1.1` ⇒
                           (connHeader ne null) && connHeader.hasClose
                         case `HTTP/1.0` ⇒
                           if (connHeader eq null)
                             ctx.requestProtocol == `HTTP/1.1`
                           else !connHeader.hasKeepAlive
-                      })
-                }
+                      )
 
                 // Do we render an explicit Connection header?
                 val renderConnectionHeader =
@@ -295,18 +283,15 @@ private[http] class HttpResponseRendererFactory(
                 if (renderConnectionHeader)
                   r ~~ Connection ~~
                   (if (close) CloseBytes else KeepAliveBytes) ~~ CrLf
-                else if (connHeader != null && connHeader.hasUpgrade) {
+                else if (connHeader != null && connHeader.hasUpgrade)
                   r ~~ connHeader ~~ CrLf
-                  headers.collectFirst {
+                  headers.collectFirst
                     case u: UpgradeToWebSocketResponseHeader ⇒ u
-                  }.foreach { header ⇒
+                  .foreach  header ⇒
                     closeMode = SwitchToWebSocket(header.handler)
-                  }
-                }
                 if (mustRenderTransferEncodingChunkedHeader &&
                     !transferEncodingSeen)
                   r ~~ `Transfer-Encoding` ~~ ChunkedBytes ~~ CrLf
-            }
 
           def renderContentLengthHeader(contentLength: Long) =
             if (status.allowsEntity)
@@ -319,7 +304,7 @@ private[http] class HttpResponseRendererFactory(
 
           def completeResponseRendering(
               entity: ResponseEntity): StrictOrStreamed =
-            entity match {
+            entity match
               case HttpEntity.Strict(_, data) ⇒
                 renderHeaders(headers.toList)
                 renderEntityContentType(r, entity)
@@ -327,13 +312,11 @@ private[http] class HttpResponseRendererFactory(
 
                 if (!noEntity) r ~~ data
 
-                Strict {
-                  closeMode match {
+                Strict
+                  closeMode match
                     case SwitchToWebSocket(handler) ⇒
                       ResponseRenderingOutput.SwitchToWebSocket(r.get, handler)
                     case _ ⇒ ResponseRenderingOutput.HttpData(r.get)
-                  }
-                }
 
               case HttpEntity.Default(_, contentLength, data) ⇒
                 renderHeaders(headers.toList)
@@ -355,23 +338,18 @@ private[http] class HttpResponseRendererFactory(
                   completeResponseRendering(
                       HttpEntity.CloseDelimited(
                           contentType, chunks.map(_.data)))
-                else {
+                else
                   renderHeaders(headers.toList)
                   renderEntityContentType(r, entity) ~~ CrLf
                   Streamed(byteStrings(chunks.via(ChunkTransformer.flow)))
-                }
-            }
 
           renderStatusLine()
           completeResponseRendering(entity)
-        }
-      }
 
     sealed trait StrictOrStreamed
     case class Strict(bytes: ResponseRenderingOutput) extends StrictOrStreamed
     case class Streamed(source: Source[ResponseRenderingOutput, Any])
         extends StrictOrStreamed
-  }
 
   sealed trait CloseMode
   case object DontClose extends CloseMode
@@ -380,7 +358,6 @@ private[http] class HttpResponseRendererFactory(
       handler: Either[Graph[FlowShape[FrameEvent, FrameEvent], Any],
                       Graph[FlowShape[Message, Message], Any]])
       extends CloseMode
-}
 
 /**
   * INTERNAL API
@@ -395,7 +372,7 @@ private[http] final case class ResponseRenderingContext(
 private[http] sealed trait ResponseRenderingOutput
 
 /** INTERNAL API */
-private[http] object ResponseRenderingOutput {
+private[http] object ResponseRenderingOutput
   private[http] case class HttpData(bytes: ByteString)
       extends ResponseRenderingOutput
   private[http] case class SwitchToWebSocket(
@@ -403,4 +380,3 @@ private[http] object ResponseRenderingOutput {
       handler: Either[Graph[FlowShape[FrameEvent, FrameEvent], Any],
                       Graph[FlowShape[Message, Message], Any]])
       extends ResponseRenderingOutput
-}

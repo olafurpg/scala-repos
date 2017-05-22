@@ -29,32 +29,29 @@ import org.specs2.mutable.Specification
 
 import json._
 
-package mongoclienttestdocs {
+package mongoclienttestdocs
   case class SessCollection(
       _id: ObjectId, name: String, dbtype: String, count: Int)
-      extends MongoDocument[SessCollection] {
+      extends MongoDocument[SessCollection]
 
     def meta = SessCollection
-  }
 
-  object SessCollection extends MongoDocumentMeta[SessCollection] {
+  object SessCollection extends MongoDocumentMeta[SessCollection]
     override def formats = super.formats + new ObjectIdSerializer
     // create a unique index on name
     createIndex(("name" -> 1), true)
-  }
-}
 
 /**
   * Systems under specification for MongoDocumentMongoClient.
   */
-class MongoDocumentMongoClientSpec extends Specification with MongoTestKit {
+class MongoDocumentMongoClientSpec extends Specification with MongoTestKit
   "MongoDocumentMongoClient Specification".title
 
   import mongoclienttestdocs._
 
   override def mongo = new MongoClient("127.0.0.1", 27017)
 
-  "MongoClient example" in {
+  "MongoClient example" in
 
     checkMongoIsRunning
 
@@ -68,5 +65,3 @@ class MongoDocumentMongoClientSpec extends Specification with MongoTestKit {
     SessCollection.save(tc3)
 
     success
-  }
-}

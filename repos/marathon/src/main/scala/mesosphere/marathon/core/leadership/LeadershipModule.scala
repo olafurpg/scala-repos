@@ -5,7 +5,7 @@ import com.twitter.common.zookeeper.ZooKeeperClient
 import mesosphere.marathon.LeadershipAbdication
 import mesosphere.marathon.core.leadership.impl._
 
-trait LeadershipModule {
+trait LeadershipModule
 
   /**
     * Create a wrapper around an actor which should only be active if this instance of Marathon is the
@@ -19,15 +19,12 @@ trait LeadershipModule {
   def startWhenLeader(props: Props, name: String): ActorRef
 
   def coordinator(): LeadershipCoordinator
-}
 
-object LeadershipModule {
+object LeadershipModule
   def apply(actorRefFactory: ActorRefFactory,
             zk: ZooKeeperClient,
-            leader: LeadershipAbdication): LeadershipModule = {
+            leader: LeadershipAbdication): LeadershipModule =
     new LeadershipModuleImpl(actorRefFactory, zk, leader)
-  }
-}
 
 /**
   * This module provides a utility function for starting actors only when our instance is the current leader.
@@ -40,33 +37,30 @@ private[leadership] class LeadershipModuleImpl(
     actorRefFactory: ActorRefFactory,
     zk: ZooKeeperClient,
     leader: LeadershipAbdication)
-    extends LeadershipModule {
+    extends LeadershipModule
 
   private[this] var whenLeaderRefs = Set.empty[ActorRef]
   private[this] var started: Boolean = false
 
-  override def startWhenLeader(props: Props, name: String): ActorRef = {
+  override def startWhenLeader(props: Props, name: String): ActorRef =
     require(!started, "already started")
     val proxyProps = WhenLeaderActor.props(props)
     val actorRef = actorRefFactory.actorOf(proxyProps, name)
     whenLeaderRefs += actorRef
     actorRef
-  }
 
   override def coordinator(): LeadershipCoordinator = coordinator_
 
-  private[this] lazy val coordinator_ = {
+  private[this] lazy val coordinator_ =
     require(!started, "already started")
     started = true
 
     val props = LeadershipCoordinatorActor.props(whenLeaderRefs)
     val actorRef = actorRefFactory.actorOf(props, "leaderShipCoordinator")
     new LeadershipCoordinatorDelegate(actorRef)
-  }
 
   /**
     * Register this actor by default.
     */
   startWhenLeader(AbdicateOnConnectionLossActor.props(zk, leader),
                   "AbdicateOnConnectionLoss")
-}

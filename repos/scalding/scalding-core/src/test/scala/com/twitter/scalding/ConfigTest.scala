@@ -22,22 +22,19 @@ import org.scalacheck.Prop.forAll
 
 import scala.util.Success
 
-class ConfigTest extends WordSpec with Matchers {
-  "A Config" should {
-    "cascadingAppJar works" in {
+class ConfigTest extends WordSpec with Matchers
+  "A Config" should
+    "cascadingAppJar works" in
       val cls = getClass
       Config.default.setCascadingAppJar(cls).getCascadingAppJar should contain(
           Success(cls))
-    }
-    "default has serialization set" in {
+    "default has serialization set" in
       val sers = Config.default.get("io.serializations").get.split(",").toList
       sers.last shouldBe
       (classOf[com.twitter.chill.hadoop.KryoSerialization].getName)
-    }
-    "default has chill configured" in {
+    "default has chill configured" in
       Config.default.get(com.twitter.chill.config.ConfiguredInstantiator.KEY) should not be empty
-    }
-    "setting timestamp twice does not change it" in {
+    "setting timestamp twice does not change it" in
       val date = RichDate.now
       val (oldDate, newConf) = Config.empty.maybeSetSubmittedTimestamp(date)
       oldDate shouldBe empty
@@ -46,13 +43,11 @@ class ConfigTest extends WordSpec with Matchers {
         newConf.maybeSetSubmittedTimestamp(date + Seconds(1))
       stillOld should contain(date)
       new2 shouldBe newConf
-    }
-    "adding UniqueIDs works" in {
+    "adding UniqueIDs works" in
       assert(Config.empty.getUniqueIds.size === 0)
       val (id, conf) = Config.empty.ensureUniqueId
       assert(conf.getUniqueIds === (Set(id)))
-    }
-    "Default serialization should have tokens" in {
+    "Default serialization should have tokens" in
       Config.default.getCascadingSerializationTokens should not be empty
       Config.default.getCascadingSerializationTokens.values
         .map(Class.forName)
@@ -67,7 +62,7 @@ class ConfigTest extends WordSpec with Matchers {
       // Tokens are a subset of Kryo registered classes
       (kryoClasses & tokenClasses) shouldBe tokenClasses
       // the only Kryo classes we don't assign tokens for are the primitives + array
-      (kryoClasses -- tokenClasses).forall { c =>
+      (kryoClasses -- tokenClasses).forall  c =>
         // primitives cannot be forName'd
         val prim = Set(classOf[Boolean],
                        classOf[Byte],
@@ -79,40 +74,29 @@ class ConfigTest extends WordSpec with Matchers {
                        classOf[Char]).map(_.getName)
 
         prim(c) || Class.forName(c).isArray
-      } shouldBe true
-    }
-  }
-}
+      shouldBe true
 
-object ConfigProps extends Properties("Config") {
+object ConfigProps extends Properties("Config")
   implicit def arbConfig: Arbitrary[Config] =
     Arbitrary(Arbitrary.arbitrary[Map[String, String]].map(Config(_)))
 
-  property(".+(k, v).get(k) == Some(v)") = forAll {
+  property(".+(k, v).get(k) == Some(v)") = forAll
     (c: Config, k: String, v: String) =>
       (c + (k, v)).get(k) == Some(v)
-  }
-  property(".-(k).get(k) == None") = forAll { (c: Config, k: String) =>
+  property(".-(k).get(k) == None") = forAll  (c: Config, k: String) =>
     (c - k).get(k) == None
-  }
-  property("++ unions keys") = forAll { (c1: Config, c2: Config) =>
+  property("++ unions keys") = forAll  (c1: Config, c2: Config) =>
     (c1 ++ c2).toMap.keySet == (c1.toMap.keySet | c2.toMap.keySet)
-  }
-  property("++ == c2.orElse(c1)") = forAll {
+  property("++ == c2.orElse(c1)") = forAll
     (c1: Config, c2: Config, keys: Set[String]) =>
       val merged = c1 ++ c2
       val testKeys = c1.toMap.keySet | c2.toMap.keySet ++ keys
-      testKeys.forall { k =>
+      testKeys.forall  k =>
         merged.get(k) == c2.get(k).orElse(c1.get(k))
-      }
-  }
-  property("adding many UniqueIDs works") = forAll { (l: List[String]) =>
-    val uids = l.filterNot { s =>
+  property("adding many UniqueIDs works") = forAll  (l: List[String]) =>
+    val uids = l.filterNot  s =>
       s.isEmpty || s.contains(",")
-    }.map(UniqueID(_))
-    (uids.foldLeft(Config.empty) { (conf, id) =>
+    .map(UniqueID(_))
+    (uids.foldLeft(Config.empty)  (conf, id) =>
             conf.addUniqueId(id)
-          }
           .getUniqueIds == uids.toSet)
-  }
-}

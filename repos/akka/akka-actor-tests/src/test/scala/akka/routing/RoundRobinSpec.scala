@@ -15,7 +15,7 @@ import akka.actor.Terminated
 import akka.actor.ActorRef
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
+class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender
 
   def routeeSize(router: ActorRef): Int =
     Await
@@ -24,22 +24,20 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       .routees
       .size
 
-  "round robin pool" must {
+  "round robin pool" must
 
-    "be able to shut down its instance" in {
+    "be able to shut down its instance" in
       val helloLatch = new TestLatch(5)
       val stopLatch = new TestLatch(5)
 
       val actor =
-        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor {
-          def receive = {
+        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor
+          def receive =
             case "hello" ⇒ helloLatch.countDown()
-          }
 
-          override def postStop() {
+          override def postStop()
             stopLatch.countDown()
-          }
-        })), "round-robin-shutdown")
+        )), "round-robin-shutdown")
 
       actor ! "hello"
       actor ! "hello"
@@ -50,9 +48,8 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
 
       system.stop(actor)
       Await.ready(stopLatch, 5 seconds)
-    }
 
-    "deliver messages in a round robin fashion" in {
+    "deliver messages in a round robin fashion" in
       val connectionCount = 10
       val iterationCount = 10
       val doneLatch = new TestLatch(connectionCount)
@@ -61,19 +58,17 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       var replies = Map.empty[Int, Int].withDefaultValue(0)
 
       val actor = system.actorOf(RoundRobinPool(connectionCount).props(
-                                     routeeProps = Props(new Actor {
+                                     routeeProps = Props(new Actor
                                    lazy val id = counter.getAndIncrement()
-                                   def receive = {
+                                   def receive =
                                      case "hit" ⇒ sender() ! id
                                      case "end" ⇒ doneLatch.countDown()
-                                   }
-                                 })),
+                                 )),
                                  "round-robin")
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount)
         val id = Await.result((actor ? "hit").mapTo[Int], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
-      }
 
       counter.get should ===(connectionCount)
 
@@ -81,35 +76,31 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       Await.ready(doneLatch, 5 seconds)
 
       replies.values foreach { _ should ===(iterationCount) }
-    }
 
-    "deliver a broadcast message using the !" in {
+    "deliver a broadcast message using the !" in
       val helloLatch = new TestLatch(5)
       val stopLatch = new TestLatch(5)
 
       val actor =
-        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor {
-          def receive = {
+        system.actorOf(RoundRobinPool(5).props(routeeProps = Props(new Actor
+          def receive =
             case "hello" ⇒ helloLatch.countDown()
-          }
 
-          override def postStop() {
+          override def postStop()
             stopLatch.countDown()
-          }
-        })), "round-robin-broadcast")
+        )), "round-robin-broadcast")
 
       actor ! akka.routing.Broadcast("hello")
       Await.ready(helloLatch, 5 seconds)
 
       system.stop(actor)
       Await.ready(stopLatch, 5 seconds)
-    }
 
-    "be controlled with management messages" in {
+    "be controlled with management messages" in
       val actor =
-        system.actorOf(RoundRobinPool(3).props(routeeProps = Props(new Actor {
+        system.actorOf(RoundRobinPool(3).props(routeeProps = Props(new Actor
           def receive = Actor.emptyBehavior
-        })), "round-robin-managed")
+        )), "round-robin-managed")
 
       routeeSize(actor) should ===(3)
       actor ! AdjustPoolSize(+4)
@@ -122,12 +113,10 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       routeeSize(actor) should ===(6)
       actor ! RemoveRoutee(other)
       routeeSize(actor) should ===(5)
-    }
-  }
 
-  "round robin group" must {
+  "round robin group" must
 
-    "deliver messages in a round robin fashion" in {
+    "deliver messages in a round robin fashion" in
       val connectionCount = 10
       val iterationCount = 10
       val doneLatch = new TestLatch(connectionCount)
@@ -135,43 +124,38 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
       var replies = Map.empty[String, Int].withDefaultValue(0)
 
       val paths =
-        (1 to connectionCount) map { n ⇒
-          val ref = system.actorOf(Props(new Actor {
-            def receive = {
+        (1 to connectionCount) map  n ⇒
+          val ref = system.actorOf(Props(new Actor
+            def receive =
               case "hit" ⇒ sender() ! self.path.name
               case "end" ⇒ doneLatch.countDown()
-            }
-          }), name = "target-" + n)
+          ), name = "target-" + n)
           ref.path.toStringWithoutAddress
-        }
 
       val actor =
         system.actorOf(RoundRobinGroup(paths).props(), "round-robin-group1")
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount)
         val id = Await.result((actor ? "hit").mapTo[String], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
-      }
 
       actor ! akka.routing.Broadcast("end")
       Await.ready(doneLatch, 5 seconds)
 
       replies.values foreach { _ should ===(iterationCount) }
-    }
-  }
 
-  "round robin logic used in actor" must {
-    "deliver messages in a round robin fashion" in {
+  "round robin logic used in actor" must
+    "deliver messages in a round robin fashion" in
       val connectionCount = 10
       val iterationCount = 10
 
       var replies = Map.empty[String, Int].withDefaultValue(0)
 
-      val actor = system.actorOf(Props(new Actor {
+      val actor = system.actorOf(Props(new Actor
         var n = 0
         var router = Router(RoundRobinRoutingLogic())
 
-        def receive = {
+        def receive =
           case p: Props ⇒
             n += 1
             val c = context.actorOf(p, name = "child-" + n)
@@ -181,31 +165,24 @@ class RoundRobinSpec extends AkkaSpec with DefaultTimeout with ImplicitSender {
             router = router.removeRoutee(c)
             if (router.routees.isEmpty) context.stop(self)
           case other ⇒ router.route(other, sender())
-        }
-      }))
+      ))
 
       val childProps = Props(
-          new Actor {
-        def receive = {
+          new Actor
+        def receive =
           case "hit" ⇒ sender() ! self.path.name
           case "end" ⇒ context.stop(self)
-        }
-      })
+      )
 
-      (1 to connectionCount) foreach { _ ⇒
+      (1 to connectionCount) foreach  _ ⇒
         actor ! childProps
-      }
 
-      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount) {
+      for (_ ← 1 to iterationCount; _ ← 1 to connectionCount)
         val id = Await.result((actor ? "hit").mapTo[String], timeout.duration)
         replies = replies + (id -> (replies(id) + 1))
-      }
 
       watch(actor)
       actor ! akka.routing.Broadcast("end")
       expectTerminated(actor)
 
       replies.values foreach { _ should ===(iterationCount) }
-    }
-  }
-}

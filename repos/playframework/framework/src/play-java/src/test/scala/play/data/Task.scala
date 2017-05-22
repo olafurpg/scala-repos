@@ -7,7 +7,7 @@ import java.util.Date
 import scala.beans.BeanProperty
 import scala.annotation.meta.field
 
-class Task {
+class Task
 
   type Min = play.data.validation.Constraints.Min @field
   type Required = play.data.validation.Constraints.Required @field
@@ -31,4 +31,3 @@ class Task {
 
   @BeanProperty
   var endDate: Date = _
-}

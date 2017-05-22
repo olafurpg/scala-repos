@@ -14,7 +14,7 @@ import SeedSize.Seed256
   * The only method used by netty ssl is engineNextBytes(bytes)
   */
 @deprecated("Use AES256CounterSecureRNG instead", "2.4")
-class AES256CounterInetRNG extends java.security.SecureRandomSpi {
+class AES256CounterInetRNG extends java.security.SecureRandomSpi
   private val rng = new AESCounterRNG(engineGenerateSeed(Seed256))
 
   /**
@@ -40,4 +40,3 @@ class AES256CounterInetRNG extends java.security.SecureRandomSpi {
     */
   override protected def engineGenerateSeed(numBytes: Int): Array[Byte] =
     InternetSeedGenerator.getInstance.generateSeed(numBytes)
-}

@@ -8,37 +8,31 @@ import utest._
   * but does not build an AST. Demonstrates the use of `~/` cuts
   * to provide excellent error-reporting almost for free
   */
-object JsonTests extends TestSuite {
+object JsonTests extends TestSuite
 
   /**
     * A very small, very simple JSON AST
     */
-  object Js {
-    sealed trait Val extends Any {
+  object Js
+    sealed trait Val extends Any
       def value: Any
       def apply(i: Int): Val = this.asInstanceOf[Arr].value(i)
       def apply(s: java.lang.String): Val =
         this.asInstanceOf[Obj].value.find(_._1 == s).get._2
-    }
     case class Str(value: java.lang.String) extends AnyVal with Val
     case class Obj(value: (java.lang.String, Val)*) extends AnyVal with Val
     case class Arr(value: Val*) extends AnyVal with Val
     case class Num(value: Double) extends AnyVal with Val
-    case object False extends Val {
+    case object False extends Val
       def value = false
-    }
-    case object True extends Val {
+    case object True extends Val
       def value = true
-    }
-    case object Null extends Val {
+    case object Null extends Val
       def value = null
-    }
-  }
 
-  case class NamedFunction[T, V](f: T => V, name: String) extends (T => V) {
+  case class NamedFunction[T, V](f: T => V, name: String) extends (T => V)
     def apply(t: T) = f(t)
     override def toString() = name
-  }
   // Here is the parser
   val Whitespace = NamedFunction(" \r\n".contains(_: Char), "Whitespace")
   val Digits = NamedFunction('0' to '9' contains (_: Char), "Digits")
@@ -76,29 +70,26 @@ object JsonTests extends TestSuite {
       space ~ (obj | array | string | `true` | `false` | `null` | number) ~ space
   )
 
-  val tests = TestSuite {
-    'pass {
-      def test(p: P[_], s: String) = p.parse(s) match {
+  val tests = TestSuite
+    'pass
+      def test(p: P[_], s: String) = p.parse(s) match
         case Parsed.Success(v, i) =>
           val expectedIndex = s.length
           assert(i == expectedIndex)
         case f: Parsed.Failure =>
           throw new Exception(f.extra.traced.fullStack.mkString("\n"))
-      }
 
-      'parts {
+      'parts
         * - test(number, "12031.33123E-2")
         * - test(string, "\"i am a cow lol omfg\"")
         * - test(array, """[1, 2, "omg", ["wtf", "bbq", 42]]""")
         * - test(obj, """{"omg": "123", "wtf": 456, "bbq": "789"}""")
-      }
-      'jsonExpr - {
+      'jsonExpr -
         val Parsed.Success(value, _) = jsonExpr.parse(
             """{"omg": "123", "wtf": 12.4123}"""
         )
         assert(
             value == Js.Obj("omg" -> Js.Str("123"), "wtf" -> Js.Num(12.4123)))
-      }
       'bigJsonExpr - test(jsonExpr,
                           """
             {
@@ -123,18 +114,15 @@ object JsonTests extends TestSuite {
                 ]
             }
       """)
-    }
-    'fail {
-      def check(s: String, expectedError: String) = {
-        jsonExpr.parse(s) match {
+    'fail
+      def check(s: String, expectedError: String) =
+        jsonExpr.parse(s) match
           case s: Parsed.Success[_] =>
             throw new Exception("Parsing should have failed:")
           case f: Parsed.Failure =>
             val error = f.extra.traced.trace
             val expected = expectedError.trim
             assert(error == expected)
-        }
-      }
       * - check(
           """
         }
@@ -415,6 +403,3 @@ object JsonTests extends TestSuite {
           jsonExpr:1:0 / obj:2:9 / pair:11:14 / jsonExpr:12:28 / array:12:29 / ("]" | ","):22:9 ..."}\n        "
         """
       )
-    }
-  }
-}

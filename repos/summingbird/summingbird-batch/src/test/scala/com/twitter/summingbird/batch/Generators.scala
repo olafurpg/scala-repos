@@ -24,35 +24,28 @@ import com.twitter.algebird.Interval
 /**
   * Generators useful in testing Summingbird's batch module.
   */
-object Generators {
-  implicit val batchIdArb: Arbitrary[BatchID] = Arbitrary {
+object Generators
+  implicit val batchIdArb: Arbitrary[BatchID] = Arbitrary
     Arbitrary.arbitrary[Long].map { BatchID(_) }
-  }
 
-  implicit val arbTimestamp: Arbitrary[Timestamp] = Arbitrary {
+  implicit val arbTimestamp: Arbitrary[Timestamp] = Arbitrary
     // a relevant 200 or so year range
     Gen.choose(-137878042589500L, 137878042589500L).map { Timestamp(_) }
-  }
 
-  implicit val dateArb: Arbitrary[java.util.Date] = Arbitrary {
+  implicit val dateArb: Arbitrary[java.util.Date] = Arbitrary
     // a relevant 200 or so year range
-    Gen.choose(-137878042589500L, 137878042589500L).map {
+    Gen.choose(-137878042589500L, 137878042589500L).map
       new java.util.Date(_)
-    }
-  }
 
   implicit def intervalArb[T : Arbitrary : Ordering]: Arbitrary[Interval[T]] =
-    Arbitrary {
-      for {
+    Arbitrary
+      for
         l <- Arbitrary.arbitrary[T]
         u <- Arbitrary.arbitrary[T]
-      } yield Interval.leftClosedRightOpen(l, u)
-    }
+      yield Interval.leftClosedRightOpen(l, u)
 
   case class SmallLong(get: Long)
-  implicit val smallLong: Arbitrary[SmallLong] = Arbitrary {
-    for {
+  implicit val smallLong: Arbitrary[SmallLong] = Arbitrary
+    for
       v <- Gen.choose(-100L, 100L)
-    } yield SmallLong(v)
-  }
-}
+    yield SmallLong(v)

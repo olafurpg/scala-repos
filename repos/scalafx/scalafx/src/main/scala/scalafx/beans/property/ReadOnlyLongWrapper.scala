@@ -33,7 +33,7 @@ import scala.language.implicitConversions
 import scalafx.Includes._
 import scalafx.delegate.SFXDelegate
 
-object ReadOnlyLongWrapper {
+object ReadOnlyLongWrapper
   implicit def sfxReadOnlyLongWrapper2jfx(
       w: ReadOnlyLongWrapper): jfxbp.ReadOnlyLongWrapper =
     if (w != null) w.delegate else null
@@ -43,14 +43,13 @@ object ReadOnlyLongWrapper {
     */
   def apply(value: Long) =
     new ReadOnlyLongWrapper(new jfxbp.ReadOnlyLongWrapper(value))
-}
 
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/property/ReadOnlyLongWrapper.html javafx.beans.property.ReadOnlyLongWrapper]] */
 class ReadOnlyLongWrapper(
     override val delegate: jfxbp.ReadOnlyLongWrapper = new jfxbp.ReadOnlyLongWrapper(
           ))
     extends LongProperty(delegate)
-    with SFXDelegate[jfxbp.ReadOnlyLongWrapper] {
+    with SFXDelegate[jfxbp.ReadOnlyLongWrapper]
 
   /** Creates a new ReadOnlyLongWrapper instance.
     * @param bean the bean of this ReadOnlyLongWrapper
@@ -69,4 +68,3 @@ class ReadOnlyLongWrapper(
 
   /** The read-only property, that is synchronized with this ReadOnlyLongWrapper. */
   def readOnlyProperty: ReadOnlyLongProperty = delegate.getReadOnlyProperty
-}

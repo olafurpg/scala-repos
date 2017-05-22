@@ -31,12 +31,11 @@ import org.apache.spark.storage._
 import org.apache.spark.util.Utils
 
 /** A group of writers for a ShuffleMapTask, one writer per reducer. */
-private[spark] trait ShuffleWriterGroup {
+private[spark] trait ShuffleWriterGroup
   val writers: Array[DiskBlockObjectWriter]
 
   /** @param success Indicates all writes were successful. If false, no blocks will be recorded. */
   def releaseWriters(success: Boolean)
-}
 
 /**
   * Manages assigning disk-based block writers to shuffle tasks. Each shuffle task gets one file
@@ -45,7 +44,7 @@ private[spark] trait ShuffleWriterGroup {
 // Note: Changes to the format in this file should be kept in sync with
 // org.apache.spark.network.shuffle.ExternalShuffleBlockResolver#getHashBasedShuffleBlockData().
 private[spark] class FileShuffleBlockResolver(conf: SparkConf)
-    extends ShuffleBlockResolver with Logging {
+    extends ShuffleBlockResolver with Logging
 
   private val transportConf = SparkTransportConf.fromSparkConf(conf, "shuffle")
 
@@ -58,13 +57,12 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
   /**
     * Contains all the state related to a particular shuffle.
     */
-  private class ShuffleState(val numReducers: Int) {
+  private class ShuffleState(val numReducers: Int)
 
     /**
       * The mapIds of all map tasks completed on this Executor for this shuffle.
       */
     val completedMapTasks = new ConcurrentLinkedQueue[Int]()
-  }
 
   private val shuffleStates = new ConcurrentHashMap[ShuffleId, ShuffleState]
 
@@ -76,69 +74,56 @@ private[spark] class FileShuffleBlockResolver(conf: SparkConf)
                  mapId: Int,
                  numReducers: Int,
                  serializer: Serializer,
-                 writeMetrics: ShuffleWriteMetrics): ShuffleWriterGroup = {
-    new ShuffleWriterGroup {
-      private val shuffleState: ShuffleState = {
+                 writeMetrics: ShuffleWriteMetrics): ShuffleWriterGroup =
+    new ShuffleWriterGroup
+      private val shuffleState: ShuffleState =
         // Note: we do _not_ want to just wrap this java ConcurrentHashMap into a Scala map and use
         // .getOrElseUpdate() because that's actually NOT atomic.
         shuffleStates.putIfAbsent(shuffleId, new ShuffleState(numReducers))
         shuffleStates.get(shuffleId)
-      }
       val openStartTime = System.nanoTime
       val serializerInstance = serializer.newInstance()
-      val writers: Array[DiskBlockObjectWriter] = {
-        Array.tabulate[DiskBlockObjectWriter](numReducers) { bucketId =>
+      val writers: Array[DiskBlockObjectWriter] =
+        Array.tabulate[DiskBlockObjectWriter](numReducers)  bucketId =>
           val blockId = ShuffleBlockId(shuffleId, mapId, bucketId)
           val blockFile = blockManager.diskBlockManager.getFile(blockId)
           val tmp = Utils.tempFileWith(blockFile)
           blockManager.getDiskWriter(
               blockId, tmp, serializerInstance, bufferSize, writeMetrics)
-        }
-      }
       // Creating the file to write to and creating a disk writer both involve interacting with
       // the disk, so should be included in the shuffle write time.
       writeMetrics.incWriteTime(System.nanoTime - openStartTime)
 
-      override def releaseWriters(success: Boolean) {
+      override def releaseWriters(success: Boolean)
         shuffleState.completedMapTasks.add(mapId)
-      }
-    }
-  }
 
-  override def getBlockData(blockId: ShuffleBlockId): ManagedBuffer = {
+  override def getBlockData(blockId: ShuffleBlockId): ManagedBuffer =
     val file = blockManager.diskBlockManager.getFile(blockId)
     new FileSegmentManagedBuffer(transportConf, file, 0, file.length)
-  }
 
   /** Remove all the blocks / files and metadata related to a particular shuffle. */
-  def removeShuffle(shuffleId: ShuffleId): Boolean = {
+  def removeShuffle(shuffleId: ShuffleId): Boolean =
     // Do not change the ordering of this, if shuffleStates should be removed only
     // after the corresponding shuffle blocks have been removed
     val cleaned = removeShuffleBlocks(shuffleId)
     shuffleStates.remove(shuffleId)
     cleaned
-  }
 
   /** Remove all the blocks / files related to a particular shuffle. */
-  private def removeShuffleBlocks(shuffleId: ShuffleId): Boolean = {
-    Option(shuffleStates.get(shuffleId)) match {
+  private def removeShuffleBlocks(shuffleId: ShuffleId): Boolean =
+    Option(shuffleStates.get(shuffleId)) match
       case Some(state) =>
         for (mapId <- state.completedMapTasks.asScala;
-        reduceId <- 0 until state.numReducers) {
+        reduceId <- 0 until state.numReducers)
           val blockId = new ShuffleBlockId(shuffleId, mapId, reduceId)
           val file = blockManager.diskBlockManager.getFile(blockId)
-          if (!file.delete()) {
+          if (!file.delete())
             logWarning(s"Error deleting ${file.getPath()}")
-          }
-        }
         logInfo("Deleted all files for shuffle " + shuffleId)
         true
       case None =>
         logInfo(
             "Could not find files for shuffle " + shuffleId + " for deleting")
         false
-    }
-  }
 
   override def stop(): Unit = {}
-}

@@ -33,7 +33,7 @@ import com.precog.util.IOUtils
 
 trait PrecogLibSpecs[M[+ _]]
     extends Specification with EvaluatorTestSupport[M]
-    with LongIdMemoryDatasetConsumer[M] {
+    with LongIdMemoryDatasetConsumer[M]
   self =>
 
   import Function._
@@ -44,12 +44,10 @@ trait PrecogLibSpecs[M[+ _]]
 
   import TableModule.CrossOrder._
 
-  def testEval(graph: DepGraph): Set[SEvent] = {
-    consumeEval(graph, defaultEvaluationContext) match {
+  def testEval(graph: DepGraph): Set[SEvent] =
+    consumeEval(graph, defaultEvaluationContext) match
       case Success(results) => results
       case Failure(error) => throw error
-    }
-  }
 
   private val line = Line(1, 1, "")
   private def const[A : CValueType](a: A) = Const(CValueType[A](a))(line)
@@ -78,8 +76,8 @@ trait PrecogLibSpecs[M[+ _]]
     Join(WrapObject, Cross(None), const("url"), const("http://server-error"))(
         line)
 
-  "enrichment" should {
-    "enrich a homogenous set" in {
+  "enrichment" should
+    "enrich a homogenous set" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/hom/numbers4"))(line),
@@ -89,9 +87,8 @@ trait PrecogLibSpecs[M[+ _]]
       result must haveSize(6)
       val numbers = result collect { case (_, SDecimal(n)) => n }
       numbers must_== Set(0, -1, 1, 42, 1, -23)
-    }
 
-    "enrich a homogenous set by wrapping" in {
+    "enrich a homogenous set by wrapping" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/hom/numbers4"))(line),
@@ -100,14 +97,12 @@ trait PrecogLibSpecs[M[+ _]]
       val result = testEval(input)
       result must haveSize(6)
       val numbers =
-        result flatMap {
+        result flatMap
           case (_, SObject(fields)) =>
             fields get "abc" collect { case SDecimal(n) => n }
-        }
       numbers must_== Set(0, -1, 1, 42, 1, -23)
-    }
 
-    "enrich a heterogeneous set" in {
+    "enrich a heterogeneous set" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/het/numbers6"))(line),
@@ -124,35 +119,29 @@ trait PrecogLibSpecs[M[+ _]]
                         STrue,
                         SDecimal(5),
                         SObject(Map.empty))
-    }
 
-    "misbehaving enricher fails" in {
+    "misbehaving enricher fails" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/hom/numbers4"))(line),
                        misbehave)(line)
 
       testEval(input) must throwA[Throwable]
-    }
 
-    "empty enricher fails" in {
+    "empty enricher fails" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/hom/numbers4"))(line),
                        empty)(line)
 
       testEval(input) must throwA[Throwable]
-    }
 
-    "failing enricher fails" in {
+    "failing enricher fails" in
       val input = Join(BuiltInFunction2Op(Enrichment),
                        Cross(None),
                        dag.AbsoluteLoad(const("/hom/numbers4"))(line),
                        serverError)(line)
 
       testEval(input) must throwA[Throwable]
-    }
-  }
-}
 
 object PrecogLibSpecs extends PrecogLibSpecs[test.YId] with test.YIdInstances

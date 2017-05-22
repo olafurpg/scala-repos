@@ -2,7 +2,7 @@ package scalaz.example
 package transformers
 package typecheck
 
-object TypeCheckerWithExplicitTypes_MonadTransformers {
+object TypeCheckerWithExplicitTypes_MonadTransformers
 
   import TypeCheckerWithExplicitTypesAST._
   import scalaz.ReaderT
@@ -27,14 +27,14 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
   def liftK[T, U](e: String \/ U): ReaderT[V, T, U] =
     kleisli[V, T, U]((env: T) => e)
 
-  def typeCheck(expr: Exp): ReaderT[V, TypeEnv, Type] = expr match {
+  def typeCheck(expr: Exp): ReaderT[V, TypeEnv, Type] = expr match
     case Lit(v) => liftK(success(litToTy(v)))
     case Id(x) =>
       for { env <- ask[V, TypeEnv]; res <- liftK(find(x, env)) } yield res
     // make sure the first branch is a boolean and then
     // make sure the second and third branches have the same type
     case If(tst, texp, fexp) =>
-      for {
+      for
         t <- typeCheck(tst)
         _ <- liftK(
             compare(t,
@@ -45,18 +45,18 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
         rt <- typeCheck(fexp)
         res <- liftK(compare(
                 lt, rt, lt, "if branches not the same type, got: " + (lt, rt)))
-      } yield res
+      yield res
     case Fun(arg, argType, body) =>
-      for {
+      for
         t <- local((env: TypeEnv) => env + (arg -> argType))(typeCheck(body))
-      } yield TyLam(argType, t)
+      yield TyLam(argType, t)
     // make sure the first argument to function application is indeed a function
     // then make sure that the arguments match the explicit declarations
     case App(operator, operand) =>
-      for {
+      for
         operatorType <- typeCheck(operator)
         operandType <- typeCheck(operand)
-        res <- liftK(operatorType match {
+        res <- liftK(operatorType match
           case TyLam(argType, resultType) =>
             compare(argType,
                     operandType,
@@ -66,7 +66,5 @@ object TypeCheckerWithExplicitTypes_MonadTransformers {
           case _ =>
             typeError("function application expected function, but got: " +
                 operatorType)
-        })
-      } yield res
-  }
-}
+        )
+      yield res

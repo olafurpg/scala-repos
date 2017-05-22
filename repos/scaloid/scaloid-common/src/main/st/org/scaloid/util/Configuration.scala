@@ -18,7 +18,7 @@ import android.util.DisplayMetrics
   *   if(dpi >= HDPI) SButton("You have a high resolution display!")
   * }}}
   */
-object Configuration {
+object Configuration
   @inline def conf(implicit context: Context) =
     context.getResources.getConfiguration
 
@@ -63,4 +63,3 @@ object Configuration {
   val XXHDPI = 480 // DisplayMetrics.DENSITY_XXHIGH // added in API level 16
 
   val XXXHDPI = 640 // DisplayMetrics.DENSITY_XXXHIGH // added in API level 18
-}

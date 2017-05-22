@@ -1,14 +1,12 @@
-final class Opt[+A >: Null](val value: A) extends AnyVal {
+final class Opt[+A >: Null](val value: A) extends AnyVal
   def get: A = value
   def isEmpty = value == null
-}
-object Opt {
+object Opt
   final val None = new Opt[Null](null)
   def apply[A >: Null](value: A): Opt[A] =
     if (value == null) None else new Opt[A](value)
-}
 
-object ValueOpt {
+object ValueOpt
   // public java.lang.String unapply(java.lang.Object);
   //        0: aload_1
   //        1: instanceof    #16                 // class java/lang/String
@@ -43,14 +41,12 @@ object ValueOpt {
   //       69: astore        5
   //       71: aload         5
   //       73: areturn
-  def unapply(x: Any): Opt[String] = x match {
+  def unapply(x: Any): Opt[String] = x match
     case _: String => Opt("String")
     case _: List[_] => Opt("List")
     case _: Int => Opt("Int")
     case _ => Opt.None
-  }
-}
-object RegularOpt {
+object RegularOpt
   // public scala.Option<java.lang.String> unapply(java.lang.Object);
   //        0: aload_1
   //        1: instanceof    #16                 // class java/lang/String
@@ -83,27 +79,21 @@ object RegularOpt {
   //       63: astore_2
   //       64: aload_2
   //       65: areturn
-  def unapply(x: Any): Option[String] = x match {
+  def unapply(x: Any): Option[String] = x match
     case _: String => Some("String")
     case _: List[_] => Some("List")
     case _: Int => Some("Int")
     case _ => None
-  }
-}
 
-object Test {
-  def f(x: Any) = x match {
+object Test
+  def f(x: Any) = x match
     case ValueOpt(s) => s
     case _ => "Something else"
-  }
-  def g(x: Any) = x match {
+  def g(x: Any) = x match
     case RegularOpt(s) => s
     case _ => "Something else"
-  }
   val xs = List("abc", Nil, 5, Test)
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     xs map f foreach println
     xs map g foreach println
-  }
-}

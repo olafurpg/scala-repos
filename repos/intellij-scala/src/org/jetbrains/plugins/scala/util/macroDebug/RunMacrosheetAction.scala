@@ -19,10 +19,10 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * @author Dmitry Naydanov        
   * @since 10/17/12
   */
-class RunMacrosheetAction extends AnAction with TopComponentAction {
+class RunMacrosheetAction extends AnAction with TopComponentAction
   def createBlankEditor(project: Project,
                         defaultText: String = "",
-                        lang: Language = StdLanguages.TEXT): Editor = {
+                        lang: Language = StdLanguages.TEXT): Editor =
     val editor = EditorFactory.getInstance.createViewer(
         PsiDocumentManager
           .getInstance(project)
@@ -32,9 +32,8 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
         project)
     editor setBorder null
     editor
-  }
 
-  def actionPerformed(e: AnActionEvent) {
+  def actionPerformed(e: AnActionEvent)
     val editor =
       FileEditorManager.getInstance(e.getProject).getSelectedTextEditor
     if (editor == null) return
@@ -42,7 +41,7 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
     val psiFile: PsiFile = PsiDocumentManager
       .getInstance(e.getProject)
       .getPsiFile(editor.getDocument)
-    psiFile match {
+    psiFile match
       case file: ScalaFile =>
         val viewer = WorksheetEditorPrinter
           .newMacrosheetUiFor(editor, file.getVirtualFile)
@@ -50,17 +49,14 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
 
         val project = e.getProject
 
-        if (viewer != null) {
-          ApplicationManager.getApplication.invokeAndWait(new Runnable {
-            override def run() {
-              extensions.inWriteAction {
+        if (viewer != null)
+          ApplicationManager.getApplication.invokeAndWait(new Runnable
+            override def run()
+              extensions.inWriteAction
                 CleanWorksheetAction.resetScrollModel(viewer)
                 CleanWorksheetAction.cleanWorksheet(
                     file.getNode, editor, viewer, project)
-              }
-            }
-          }, ModalityState.any())
-        }
+          , ModalityState.any())
 
         ScalaMacroDebuggingUtil.macrosToExpand.clear()
         ScalaMacroDebuggingUtil.allMacroCalls.foreach(
@@ -68,16 +64,12 @@ class RunMacrosheetAction extends AnAction with TopComponentAction {
         ScalaMacroDebuggingUtil.expandMacros(project)
 
       case _ =>
-    }
-  }
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     ScalaActionUtil.enableAndShowIfInScalaFile(e)
-  }
 
   override def actionIcon = AllIcons.Actions.Execute
 
   override def bundleKey = "worksheet.execute.button"
 
   override def shortcutId: Option[String] = Some("Scala.RunWorksheet")
-}

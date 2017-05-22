@@ -17,37 +17,35 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                                  bookmarkApi: lila.bookmark.BookmarkApi,
                                  crosstableApi: lila.game.CrosstableApi,
                                  prefApi: lila.pref.PrefApi,
-                                 makeUrl: String => String) {
+                                 makeUrl: String => String)
 
   def list(
       teamId: String, nb: Option[Int], engine: Option[Boolean]): Fu[JsObject] =
-    lila.team.MemberRepo userIdsByTeam teamId map (_ take makeNb(nb)) flatMap UserRepo.enabledByIds map {
+    lila.team.MemberRepo userIdsByTeam teamId map (_ take makeNb(nb)) flatMap UserRepo.enabledByIds map
       users =>
         Json.obj(
             "list" -> JsArray(
-                users map { u =>
+                users map  u =>
                   jsonView(u) ++ Json.obj("url" -> makeUrl(s"@/${u.username}"))
-                }
             )
         )
-    }
 
   def one(username: String)(implicit ctx: Context): Fu[Option[JsObject]] =
-    UserRepo named username flatMap {
+    UserRepo named username flatMap
       case None => fuccess(none)
       case Some(u) =>
         GameRepo mostUrgentGame u zip
-        (ctx.me.filter(u !=) ?? { me =>
+        (ctx.me.filter(u !=) ??  me =>
               crosstableApi.nbGames(me.id, u.id)
-            }) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
-            u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId.?? {
+            ) zip relationApi.countFollowing(u.id) zip relationApi.countFollowers(
+            u.id) zip ctx.isAuth.?? { prefApi followable u.id } zip ctx.userId.??
           relationApi.fetchRelation(_, u.id)
-        } zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map {
+        zip ctx.userId.?? { relationApi.fetchFollows(u.id, _) } map
           case ((((((gameOption, nbGamesWithMe), following), followers),
                   followable),
                  relation),
                 isFollowed) =>
-            jsonView(u) ++ {
+            jsonView(u) ++
               Json.obj(
                   "url" -> makeUrl(s"@/$username"),
                   "playing" -> gameOption.map(
@@ -71,9 +69,7 @@ private[api] final class UserApi(jsonView: lila.user.JsonView,
                       "blocking" -> relation.contains(false),
                       "followsYou" -> isFollowed
                   ))
-            }.noNull
-        } map (_.some)
-    }
+            .noNull
+        map (_.some)
 
   private def makeNb(nb: Option[Int]) = math.min(100, nb | 10)
-}

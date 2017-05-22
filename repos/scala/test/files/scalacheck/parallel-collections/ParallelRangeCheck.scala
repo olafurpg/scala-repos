@@ -13,7 +13,7 @@ import scala.collection.parallel.ops._
 
 class ParallelRangeCheck(val tasksupport: TaskSupport)
     extends ParallelSeqCheck[Int]("ParallelRange[Int]")
-    with ops.IntSeqOperators {
+    with ops.IntSeqOperators
   // ForkJoinTasks.defaultForkJoinPool.setMaximumPoolSize(Runtime.getRuntime.availableProcessors * 2)
   // ForkJoinTasks.defaultForkJoinPool.setParallelism(Runtime.getRuntime.availableProcessors * 2)
 
@@ -26,15 +26,12 @@ class ParallelRangeCheck(val tasksupport: TaskSupport)
   def ofSize(vals: Seq[Gen[Int]], sz: Int) =
     throw new UnsupportedOperationException
 
-  override def instances(vals: Seq[Gen[Int]]): Gen[Seq[Int]] = sized { start =>
-    sized { end =>
-      sized { step =>
+  override def instances(vals: Seq[Gen[Int]]): Gen[Seq[Int]] = sized  start =>
+    sized  end =>
+      sized  step =>
         new Range(start, end, if (step != 0) step else 1)
-      }
-    }
-  }
 
-  def fromSeq(a: Seq[Int]) = a match {
+  def fromSeq(a: Seq[Int]) = a match
     case r: Range =>
       val pr = ParRange(r.start, r.end, r.step, false)
       pr.tasksupport = tasksupport
@@ -44,12 +41,9 @@ class ParallelRangeCheck(val tasksupport: TaskSupport)
       pa.tasksupport = tasksupport
       for (i <- 0 until a.length) pa(i) = a(i)
       pa
-  }
 
-  override def traversable2Seq(t: Traversable[Int]): Seq[Int] = t match {
+  override def traversable2Seq(t: Traversable[Int]): Seq[Int] = t match
     case r: Range => r
     case _ => t.toSeq
-  }
 
   def values = Seq(choose(-100, 100))
-}

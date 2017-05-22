@@ -1,13 +1,12 @@
 import scala.language.reflectiveCalls
 
-class A { this_a =>
+class A  this_a =>
 
   def b = new B
   class B { def a: this_a.type = this_a }
-}
 trait A2 { def c = () }
 
-object Test {
+object Test
   val v1 = new A { def c = () }
   val v2 = new A with A2 {}
   val v3: A { def c: Unit } = null
@@ -18,7 +17,7 @@ object Test {
   var x2 = new A with A2 {}
   var x3: A { def c: Unit } = null
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val mv1 = new A { def c = () }
     val mv2 = new A with A2 {}
     val mv3: A { def c: Unit } = null
@@ -41,5 +40,3 @@ object Test {
     md1.b.a.c
     md2.b.a.c
     md3.b.a.c
-  }
-}

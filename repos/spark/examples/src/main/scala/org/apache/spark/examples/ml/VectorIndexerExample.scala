@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.VectorIndexer
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object VectorIndexerExample {
-  def main(args: Array[String]): Unit = {
+object VectorIndexerExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("VectorIndexerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -51,6 +51,4 @@ object VectorIndexerExample {
     indexedData.show()
     // $example off$
     sc.stop()
-  }
-}
 // scalastyle:on println

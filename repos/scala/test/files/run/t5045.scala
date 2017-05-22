@@ -1,6 +1,6 @@
 import scala.language.postfixOps
 
-object Test extends App {
+object Test extends App
 
   import scala.util.matching.{Regex, UnanchoredRegex}
 
@@ -16,36 +16,28 @@ object Test extends App {
   def test(msg: String)(strs: Seq[String]): Unit =
     println("%40s  %s".format(msg, strs mkString " "))
 
-  test("extract an exact match") {
+  test("extract an exact match")
     val dateP1(y, m, d) = dateStr
     Seq(List(y, m, d).mkString("-"), dateStr)
-  }
 
-  test("extract from middle of string") {
+  test("extract from middle of string")
     val dateP1(y, m, d) = "Tested on " + dateStr + "."
     Seq(List(y, m, d).mkString("-"), dateStr)
-  }
 
-  test("extract from middle of string (P2)") {
+  test("extract from middle of string (P2)")
     val dateP2(y, m, d) = "Tested on " + dateStr + "."
     Seq(List(y, m, d).mkString("-"), dateStr)
-  }
 
-  test("extract from middle of string (P3)") {
+  test("extract from middle of string (P3)")
     val dateP2(y, m, d) = "Tested on " + dateStr + "."
     Seq(List(y, m, d).mkString("-"), dateStr)
-  }
 
-  def copyright(in: String): String = in match {
+  def copyright(in: String): String = in match
     case dateP1(year, month, day) => "Copyright " + year
     case _ => "No copyright"
-  }
 
-  test("copyright example has date") {
+  test("copyright example has date")
     Seq(copyright("Date of this document: " + dateStr), "Copyright " + yearStr)
-  }
 
-  test("copyright example missing date") {
+  test("copyright example missing date")
     Seq(copyright("Date of this document: unknown"), "No copyright")
-  }
-}

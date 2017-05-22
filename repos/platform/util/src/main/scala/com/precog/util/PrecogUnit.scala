@@ -28,6 +28,5 @@ package com.precog.util
   */
 sealed trait PrecogUnit
 
-object PrecogUnit extends PrecogUnit {
+object PrecogUnit extends PrecogUnit
   implicit def liftUnit(unit: Unit): PrecogUnit = this
-}

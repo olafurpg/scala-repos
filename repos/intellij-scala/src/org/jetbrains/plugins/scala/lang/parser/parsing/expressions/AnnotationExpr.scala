@@ -16,36 +16,30 @@ import org.jetbrains.plugins.scala.lang.parser.util.ParserUtils
 /*
  * AnnotationExpr ::= Constr [[nl] '{' {NameValuePair} '}']
  */
-object AnnotationExpr {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object AnnotationExpr
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val annotExprMarker = builder.mark
-    if (!Constructor.parse(builder, isAnnotation = true)) {
+    if (!Constructor.parse(builder, isAnnotation = true))
       annotExprMarker.drop()
       return false
-    }
 
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLBRACE =>
-        if (builder.twoNewlinesBeforeCurrentToken) {
+        if (builder.twoNewlinesBeforeCurrentToken)
           annotExprMarker.done(ScalaElementTypes.ANNOTATION_EXPR)
           return true
-        }
 
         builder.advanceLexer() //Ate }
         builder.enableNewlines
 
-        def foo() {
-          while (NameValuePair.parse(builder)) {
-            builder.getTokenType match {
+        def foo()
+          while (NameValuePair.parse(builder))
+            builder.getTokenType match
               case ScalaTokenTypes.tCOMMA => builder.advanceLexer()
               case _ =>
-            }
-            while (builder.getTokenType == ScalaTokenTypes.tCOMMA) {
+            while (builder.getTokenType == ScalaTokenTypes.tCOMMA)
               builder.error(ScalaBundle.message("wrong.annotation.expression"))
               builder.advanceLexer()
-            }
-          }
-        }
 
         ParserUtils.parseLoopUntilRBrace(builder, foo)
         builder.restoreNewlinesState
@@ -55,6 +49,3 @@ object AnnotationExpr {
       case _ =>
         annotExprMarker.done(ScalaElementTypes.ANNOTATION_EXPR)
         true
-    }
-  }
-}

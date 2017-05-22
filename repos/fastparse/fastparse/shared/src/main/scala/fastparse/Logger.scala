@@ -3,6 +3,5 @@ import acyclic.file
 import scala.annotation.implicitNotFound
 
 case class Logger(f: String => Unit)
-object Logger {
+object Logger
   implicit val stdout = Logger(println)
-}

@@ -54,48 +54,43 @@ private[kafka] class KafkaRDD[K : ClassTag,
     leaders: Map[TopicAndPartition, (String, Int)],
     messageHandler: MessageAndMetadata[K, V] => R
 )
-    extends RDD[R](sc, Nil) with Logging with HasOffsetRanges {
-  override def getPartitions: Array[Partition] = {
-    offsetRanges.zipWithIndex.map {
+    extends RDD[R](sc, Nil) with Logging with HasOffsetRanges
+  override def getPartitions: Array[Partition] =
+    offsetRanges.zipWithIndex.map
       case (o, i) =>
         val (host, port) = leaders(TopicAndPartition(o.topic, o.partition))
         new KafkaRDDPartition(
             i, o.topic, o.partition, o.fromOffset, o.untilOffset, host, port)
-    }.toArray
-  }
+    .toArray
 
   override def count(): Long = offsetRanges.map(_.count).sum
 
   override def countApprox(
       timeout: Long,
       confidence: Double = 0.95
-  ): PartialResult[BoundedDouble] = {
+  ): PartialResult[BoundedDouble] =
     val c = count
     new PartialResult(new BoundedDouble(c, 1.0, c, c), true)
-  }
 
   override def isEmpty(): Boolean = count == 0L
 
-  override def take(num: Int): Array[R] = {
+  override def take(num: Int): Array[R] =
     val nonEmptyPartitions = this.partitions
       .map(_.asInstanceOf[KafkaRDDPartition])
       .filter(_.count > 0)
 
-    if (num < 1 || nonEmptyPartitions.isEmpty) {
+    if (num < 1 || nonEmptyPartitions.isEmpty)
       return new Array[R](0)
-    }
 
     // Determine in advance how many messages need to be taken from each partition
-    val parts = nonEmptyPartitions.foldLeft(Map[Int, Int]()) {
+    val parts = nonEmptyPartitions.foldLeft(Map[Int, Int]())
       (result, part) =>
         val remain = num - result.values.sum
-        if (remain > 0) {
+        if (remain > 0)
           val taken = Math.min(remain, part.count)
           result + (part.index -> taken.toInt)
-        } else {
+        else
           result
-        }
-    }
 
     val buf = new ArrayBuffer[R]
     val res = context.runJob(
@@ -105,13 +100,11 @@ private[kafka] class KafkaRDD[K : ClassTag,
         parts.keys.toArray)
     res.foreach(buf ++= _)
     buf.toArray
-  }
 
-  override def getPreferredLocations(thePart: Partition): Seq[String] = {
+  override def getPreferredLocations(thePart: Partition): Seq[String] =
     val part = thePart.asInstanceOf[KafkaRDDPartition]
     // TODO is additional hostname resolution necessary here
     Seq(part.host)
-  }
 
   private def errBeginAfterEnd(part: KafkaRDDPartition): String =
     s"Beginning offset ${part.fromOffset} is after the ending offset ${part.untilOffset} " +
@@ -129,25 +122,22 @@ private[kafka] class KafkaRDD[K : ClassTag,
     s"for topic ${part.topic} partition ${part.partition} start ${part.fromOffset}." +
     " This should not happen, and indicates a message may have been skipped"
 
-  override def compute(thePart: Partition, context: TaskContext): Iterator[R] = {
+  override def compute(thePart: Partition, context: TaskContext): Iterator[R] =
     val part = thePart.asInstanceOf[KafkaRDDPartition]
     assert(part.fromOffset <= part.untilOffset, errBeginAfterEnd(part))
-    if (part.fromOffset == part.untilOffset) {
+    if (part.fromOffset == part.untilOffset)
       log.info(
           s"Beginning offset ${part.fromOffset} is the same as ending offset " +
           s"skipping ${part.topic} ${part.partition}")
       Iterator.empty
-    } else {
+    else
       new KafkaRDDIterator(part, context)
-    }
-  }
 
   private class KafkaRDDIterator(part: KafkaRDDPartition, context: TaskContext)
-      extends NextIterator[R] {
+      extends NextIterator[R]
 
-    context.addTaskCompletionListener { context =>
+    context.addTaskCompletionListener  context =>
       closeIfNeeded()
-    }
 
     log.info(s"Computing topic ${part.topic}, partition ${part.partition} " +
         s"offsets ${part.fromOffset} -> ${part.untilOffset}")
@@ -167,8 +157,8 @@ private[kafka] class KafkaRDD[K : ClassTag,
 
     // The idea is to use the provided preferred host, except on task retry attempts,
     // to minimize number of kafka metadata requests
-    private def connectLeader: SimpleConsumer = {
-      if (context.attemptNumber > 0) {
+    private def connectLeader: SimpleConsumer =
+      if (context.attemptNumber > 0)
         kc.connectLeader(part.topic, part.partition)
           .fold(
               errs =>
@@ -177,27 +167,22 @@ private[kafka] class KafkaRDD[K : ClassTag,
                     errs.mkString("\n")),
               consumer => consumer
           )
-      } else {
+      else
         kc.connect(part.host, part.port)
-      }
-    }
 
-    private def handleFetchErr(resp: FetchResponse) {
-      if (resp.hasError) {
+    private def handleFetchErr(resp: FetchResponse)
+      if (resp.hasError)
         val err = resp.errorCode(part.topic, part.partition)
         if (err == ErrorMapping.LeaderNotAvailableCode ||
-            err == ErrorMapping.NotLeaderForPartitionCode) {
+            err == ErrorMapping.NotLeaderForPartitionCode)
           log.error(
               s"Lost leader for topic ${part.topic} partition ${part.partition}, " +
               s" sleeping for ${kc.config.refreshLeaderBackoffMs}ms")
           Thread.sleep(kc.config.refreshLeaderBackoffMs)
-        }
         // Let normal rdd retry sort out reconnect attempts
         throw ErrorMapping.exceptionFor(err)
-      }
-    }
 
-    private def fetchBatch: Iterator[MessageAndOffset] = {
+    private def fetchBatch: Iterator[MessageAndOffset] =
       val req = new FetchRequestBuilder()
         .addFetch(part.topic,
                   part.partition,
@@ -211,30 +196,26 @@ private[kafka] class KafkaRDD[K : ClassTag,
         .messageSet(part.topic, part.partition)
         .iterator
         .dropWhile(_.offset < requestOffset)
-    }
 
-    override def close(): Unit = {
-      if (consumer != null) {
+    override def close(): Unit =
+      if (consumer != null)
         consumer.close()
-      }
-    }
 
-    override def getNext(): R = {
-      if (iter == null || !iter.hasNext) {
+    override def getNext(): R =
+      if (iter == null || !iter.hasNext)
         iter = fetchBatch
-      }
-      if (!iter.hasNext) {
+      if (!iter.hasNext)
         assert(requestOffset == part.untilOffset, errRanOutBeforeEnd(part))
         finished = true
         null.asInstanceOf[R]
-      } else {
+      else
         val item = iter.next()
-        if (item.offset >= part.untilOffset) {
+        if (item.offset >= part.untilOffset)
           assert(item.offset == part.untilOffset,
                  errOvershotEnd(item.offset, part))
           finished = true
           null.asInstanceOf[R]
-        } else {
+        else
           requestOffset = item.nextOffset
           messageHandler(
               new MessageAndMetadata(part.topic,
@@ -243,13 +224,8 @@ private[kafka] class KafkaRDD[K : ClassTag,
                                      item.offset,
                                      keyDecoder,
                                      valueDecoder))
-        }
-      }
-    }
-  }
-}
 
-private[kafka] object KafkaRDD {
+private[kafka] object KafkaRDD
   import KafkaCluster.LeaderOffset
 
   /**
@@ -273,19 +249,17 @@ private[kafka] object KafkaRDD {
       fromOffsets: Map[TopicAndPartition, Long],
       untilOffsets: Map[TopicAndPartition, LeaderOffset],
       messageHandler: MessageAndMetadata[K, V] => R
-  ): KafkaRDD[K, V, U, T, R] = {
-    val leaders = untilOffsets.map {
+  ): KafkaRDD[K, V, U, T, R] =
+    val leaders = untilOffsets.map
       case (tp, lo) =>
         tp -> (lo.host, lo.port)
-    }.toMap
+    .toMap
 
-    val offsetRanges = fromOffsets.map {
+    val offsetRanges = fromOffsets.map
       case (tp, fo) =>
         val uo = untilOffsets(tp)
         OffsetRange(tp.topic, tp.partition, fo, uo.offset)
-    }.toArray
+    .toArray
 
     new KafkaRDD[K, V, U, T, R](
         sc, kafkaParams, offsetRanges, leaders, messageHandler)
-  }
-}

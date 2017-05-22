@@ -39,12 +39,12 @@ import org.junit.Test
 import scala.collection.JavaConverters._
 import scala.collection.Map
 
-class ReplicaManagerTest {
+class ReplicaManagerTest
 
   val topic = "test-topic"
 
   @Test
-  def testHighWaterMarkDirectoryMapping() {
+  def testHighWaterMarkDirectoryMapping()
     val props = TestUtils.createBrokerConfig(1, TestUtils.MockZkConnect)
     val config = KafkaConfig.fromProps(props)
     val zkClient = EasyMock.createMock(classOf[ZkClient])
@@ -62,19 +62,17 @@ class ReplicaManagerTest {
                                 new MockScheduler(time),
                                 mockLogMgr,
                                 new AtomicBoolean(false))
-    try {
+    try
       val partition = rm.getOrCreatePartition(topic, 1)
       partition.getOrCreateReplica(1)
       rm.checkpointHighWatermarks()
-    } finally {
+    finally
       // shutdown the replica manager upon test completion
       rm.shutdown(false)
       metrics.close()
-    }
-  }
 
   @Test
-  def testHighwaterMarkRelativeDirectoryMapping() {
+  def testHighwaterMarkRelativeDirectoryMapping()
     val props = TestUtils.createBrokerConfig(1, TestUtils.MockZkConnect)
     props.put("log.dir", TestUtils.tempRelativeDir("data").getAbsolutePath)
     val config = KafkaConfig.fromProps(props)
@@ -93,19 +91,17 @@ class ReplicaManagerTest {
                                 new MockScheduler(time),
                                 mockLogMgr,
                                 new AtomicBoolean(false))
-    try {
+    try
       val partition = rm.getOrCreatePartition(topic, 1)
       partition.getOrCreateReplica(1)
       rm.checkpointHighWatermarks()
-    } finally {
+    finally
       // shutdown the replica manager upon test completion
       rm.shutdown(checkpointHW = false)
       metrics.close()
-    }
-  }
 
   @Test
-  def testIllegalRequiredAcks() {
+  def testIllegalRequiredAcks()
     val props = TestUtils.createBrokerConfig(1, TestUtils.MockZkConnect)
     val config = KafkaConfig.fromProps(props)
     val zkClient = EasyMock.createMock(classOf[ZkClient])
@@ -124,11 +120,10 @@ class ReplicaManagerTest {
                                 mockLogMgr,
                                 new AtomicBoolean(false),
                                 Option(this.getClass.getName))
-    try {
-      def callback(responseStatus: Map[TopicPartition, PartitionResponse]) = {
+    try
+      def callback(responseStatus: Map[TopicPartition, PartitionResponse]) =
         assert(
             responseStatus.values.head.errorCode == Errors.INVALID_REQUIRED_ACKS.code)
-      }
       rm.appendMessages(
           timeout = 0,
           requiredAcks = 3,
@@ -137,16 +132,14 @@ class ReplicaManagerTest {
                 new TopicPartition("test1", 0) -> new ByteBufferMessageSet(
                     new Message("first message".getBytes))),
           responseCallback = callback)
-    } finally {
+    finally
       rm.shutdown(checkpointHW = false)
       metrics.close()
-    }
 
     TestUtils.verifyNonDaemonThreadsStatus(this.getClass.getName)
-  }
 
   @Test
-  def testClearPurgatoryOnBecomingFollower() {
+  def testClearPurgatoryOnBecomingFollower()
     val props = TestUtils.createBrokerConfig(0, TestUtils.MockZkConnect)
     props.put("log.dir", TestUtils.tempRelativeDir("data").getAbsolutePath)
     val config = KafkaConfig.fromProps(props)
@@ -166,24 +159,22 @@ class ReplicaManagerTest {
                                 mockLogMgr,
                                 new AtomicBoolean(false))
 
-    try {
+    try
       var produceCallbackFired = false
       def produceCallback(
-          responseStatus: Map[TopicPartition, PartitionResponse]) = {
+          responseStatus: Map[TopicPartition, PartitionResponse]) =
         assertEquals("Should give NotLeaderForPartitionException",
                      Errors.NOT_LEADER_FOR_PARTITION.code,
                      responseStatus.values.head.errorCode)
         produceCallbackFired = true
-      }
 
       var fetchCallbackFired = false
       def fetchCallback(responseStatus: Map[
-              TopicAndPartition, FetchResponsePartitionData]) = {
+              TopicAndPartition, FetchResponsePartitionData]) =
         assertEquals("Should give NotLeaderForPartitionException",
                      Errors.NOT_LEADER_FOR_PARTITION.code,
                      responseStatus.values.head.error)
         fetchCallbackFired = true
-      }
 
       val aliveBrokers = Seq(
           new Broker(0, "host0", 0), new Broker(1, "host1", 1))
@@ -248,9 +239,6 @@ class ReplicaManagerTest {
 
       assertTrue(produceCallbackFired)
       assertTrue(fetchCallbackFired)
-    } finally {
+    finally
       rm.shutdown(checkpointHW = false)
       metrics.close()
-    }
-  }
-}

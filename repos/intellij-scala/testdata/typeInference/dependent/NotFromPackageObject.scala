@@ -1,19 +1,14 @@
-package a {
-  package b {
+package a
+  package b
     class U
-  }
-  package object b {
+  package object b
     def U = 123
-  }
-}
 
-package c {
+package c
   import a.b.U
 
-  object C {
+  object C
     val x: U = new U
     /*start*/
     x /*end*/
-  }
-}
 //U

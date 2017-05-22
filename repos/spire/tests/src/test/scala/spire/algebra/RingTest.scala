@@ -12,7 +12,7 @@ import spire.implicits.{eqOps => _, _}
 
 import java.math.MathContext
 
-class RingTest extends FunSuite {
+class RingTest extends FunSuite
 
   /**
     * We use this function to avoid duplicating our tests for all the different
@@ -20,7 +20,7 @@ class RingTest extends FunSuite {
     *
     *   a=-3  b=3  c=-9
     */
-  def runWith[@sp A : Ring : ClassTag](cls: String)(a: A, b: A, c: A): Unit = {
+  def runWith[@sp A : Ring : ClassTag](cls: String)(a: A, b: A, c: A): Unit =
 
     val m = implicitly[ClassTag[A]]
 
@@ -62,7 +62,6 @@ class RingTest extends FunSuite {
     runTest("fromInt(3)")(assert(Ring[A].fromInt(3) == b))
 
     runTest("3 pow 2")(assert((b pow 2) === -c))
-  }
 
   implicit val mc: MathContext = MathContext.DECIMAL128
   implicit val jetDim = JetDim(7)
@@ -83,8 +82,7 @@ class RingTest extends FunSuite {
       Complex(BigDecimal(-9), BigDecimal(0)))
   runWith[Jet[Double]]("Jet[Double]")(Jet(-3), Jet(3), Jet(-9))
 
-  {
-    class XRing extends Ring[String] {
+    class XRing extends Ring[String]
       def toX(n: Int) = if (n > 0) "x" * n else "-" + "x" * -n
       def fromX(s: String) =
         if (s.startsWith("-")) -(s.length - 1) else s.length
@@ -98,7 +96,6 @@ class RingTest extends FunSuite {
       def plus(a: String, b: String) = binop(a, b)(_ + _)
       def times(a: String, b: String) = binop(a, b)(_ * _)
       def zero = ""
-    }
 
     def x(n: Int) = xIsRing.fromInt(n)
 
@@ -119,5 +116,3 @@ class RingTest extends FunSuite {
     test("3 ** 2") { assert(x(3) ** 2 === x(9)) }
     test("3 ** 3") { assert(x(3) ** 3 === x(27)) }
     test("3 ** 4") { assert(x(3) ** 4 === x(81)) }
-  }
-}

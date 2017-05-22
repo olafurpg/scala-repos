@@ -8,20 +8,19 @@ import scala.concurrent.Future
 import org.scalatest.concurrent.ScalaFutures
 import scala.concurrent.duration._
 
-class RecipeSeq extends RecipeSpec {
+class RecipeSeq extends RecipeSpec
 
-  "Draining to a strict sequence" must {
+  "Draining to a strict sequence" must
 
-    "not be done unsafely" in {
+    "not be done unsafely" in
       val mySource = Source(1 to 3).map(_.toString)
       //#draining-to-seq-unsafe
       // Dangerous: might produce a collection with 2 billion elements!
       val f: Future[Seq[String]] = mySource.runWith(Sink.seq)
       //#draining-to-seq-unsafe
       f.futureValue should ===(Seq("1", "2", "3"))
-    }
 
-    "be done safely" in {
+    "be done safely" in
       val mySource = Source(1 to 3).map(_.toString)
       //#draining-to-seq-safe
       val MAX_ALLOWED_SIZE = 100
@@ -37,6 +36,3 @@ class RecipeSeq extends RecipeSpec {
       //#draining-to-seq-safe
       limited.futureValue should ===(Seq("1", "2", "3"))
       ignoreOverflow.futureValue should ===(Seq("1", "2", "3"))
-    }
-  }
-}

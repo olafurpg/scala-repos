@@ -10,7 +10,7 @@ import akka.persistence.query.EventEnvelope
 /**
   * A plugin may optionally support this query by implementing this trait.
   */
-trait EventsByTagQuery extends ReadJournal {
+trait EventsByTagQuery extends ReadJournal
 
   /**
     * Query events that have a specific tag. A tag can for example correspond to an
@@ -36,4 +36,3 @@ trait EventsByTagQuery extends ReadJournal {
     * stored events is provided by [[CurrentEventsByTagQuery#currentEventsByTag]].
     */
   def eventsByTag(tag: String, offset: Long): Source[EventEnvelope, NotUsed]
-}

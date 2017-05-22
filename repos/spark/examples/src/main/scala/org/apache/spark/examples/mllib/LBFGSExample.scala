@@ -27,9 +27,9 @@ import org.apache.spark.mllib.optimization.{LBFGS, LogisticGradient, SquaredL2Up
 import org.apache.spark.mllib.util.MLUtils
 // $example off$
 
-object LBFGSExample {
+object LBFGSExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
 
     val conf = new SparkConf().setAppName("LBFGSExample")
     val sc = new SparkContext(conf)
@@ -74,10 +74,9 @@ object LBFGSExample {
     model.clearThreshold()
 
     // Compute raw scores on the test set.
-    val scoreAndLabels = test.map { point =>
+    val scoreAndLabels = test.map  point =>
       val score = model.predict(point.features)
       (score, point.label)
-    }
 
     // Get evaluation metrics.
     val metrics = new BinaryClassificationMetrics(scoreAndLabels)
@@ -87,6 +86,4 @@ object LBFGSExample {
     loss.foreach(println)
     println("Area under ROC = " + auROC)
     // $example off$
-  }
-}
 // scalastyle:on println

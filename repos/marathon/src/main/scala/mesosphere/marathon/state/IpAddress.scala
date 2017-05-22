@@ -8,32 +8,28 @@ import org.apache.mesos.{Protos => mesos}
 
 case class IpAddress(groups: Seq[String] = Nil,
                      labels: Map[String, String] = Map.empty[String, String],
-                     discoveryInfo: DiscoveryInfo = DiscoveryInfo.empty) {
+                     discoveryInfo: DiscoveryInfo = DiscoveryInfo.empty)
 
-  def toProto: Protos.IpAddress = {
+  def toProto: Protos.IpAddress =
     val builder = Protos.IpAddress.newBuilder
     groups.foreach(builder.addGroups)
-    labels.map {
+    labels.map
       case (key, value) =>
         mesos.Label.newBuilder.setKey(key).setValue(value).build
-    }.foreach(builder.addLabels)
+    .foreach(builder.addLabels)
     builder.setDiscoveryInfo(discoveryInfo.toProto)
     builder.build
-  }
-}
 
-object IpAddress {
+object IpAddress
   def empty: IpAddress = IpAddress()
 
-  def fromProto(proto: Protos.IpAddress): IpAddress = {
+  def fromProto(proto: Protos.IpAddress): IpAddress =
     IpAddress(
         groups = proto.getGroupsList.asScala.toIndexedSeq,
-        labels = proto.getLabelsList.asScala.map { p =>
+        labels = proto.getLabelsList.asScala.map  p =>
           p.getKey -> p.getValue
-        }.toMap,
+        .toMap,
         discoveryInfo = if (proto.hasDiscoveryInfo)
             DiscoveryInfo.fromProto(proto.getDiscoveryInfo)
           else DiscoveryInfo.empty
     )
-  }
-}

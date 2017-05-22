@@ -152,7 +152,7 @@ object ControlIncludes extends ControlIncludes
   * @define TRSM TreeSortMode
   * @define TRTP TreeTablePosition
   */
-trait ControlIncludes extends CellIncludes {
+trait ControlIncludes extends CellIncludes
 
   /**
     * $START$ACCD.html $ACCD$END
@@ -770,13 +770,12 @@ trait ControlIncludes extends CellIncludes {
    */
   implicit def jfxTableColumnBase2sfx[S, T](
       tbcb: jfxsc.TableColumnBase[S, T]): TableColumnBase[S, T] =
-    new TableColumnBase[S, T](tbcb) {
+    new TableColumnBase[S, T](tbcb)
 
       import scalafx.collections.CollectionIncludes._
 
       def columns: ObservableBuffer[_ <: jfxsc.TableColumnBase[S, _]] =
         delegate.getColumns
-    }
 
   /**
     * $START$TVFM.html $TVFM$END
@@ -828,13 +827,12 @@ trait ControlIncludes extends CellIncludes {
     */
   implicit def jfxToggle2sfx(t: jfxsc.Toggle): Toggle =
     if (t != null)
-      new Toggle {
+      new Toggle
         override val delegate = t
         def userData: AnyRef = delegate.getUserData
-        def userData_=(v: AnyRef) {
+        def userData_=(v: AnyRef)
           delegate.setUserData(v)
-        }
-      } else null
+      else null
 
   /**
     * $START$SPRT.html $SPRT$END
@@ -855,9 +853,9 @@ trait ControlIncludes extends CellIncludes {
   implicit def jfxSkin2sfxSkin[C <: jfxsc.Skinnable](
       s: jfxsc.Skin[C]): Skin[C] =
     if (s != null)
-      new Skin[C] {
+      new Skin[C]
         override val delegate = s
-      } else null
+      else null
 
   /**
     * $START$SNBE.html $SNBE$END
@@ -877,9 +875,9 @@ trait ControlIncludes extends CellIncludes {
     */
   implicit def jfxSkinnable2sfxSkinnable(s: jfxsc.Skinnable): Skinnable =
     if (s != null)
-      new Skinnable {
+      new Skinnable
         override val delegate = s
-      } else null
+      else null
 
   /**
     * $START$PRGI.html $PRGI$END
@@ -1225,4 +1223,3 @@ trait ControlIncludes extends CellIncludes {
       ttvfm: jfxsc.TreeTableView.TreeTableViewFocusModel[S]) =
     if (ttvfm != null) new TreeTableView.TreeTableViewFocusModel[S](ttvfm)
     else null
-}

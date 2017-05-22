@@ -33,17 +33,16 @@ import org.scalatest.junit.JUnitRunner
 import scalafx.beans.property.StringProperty
 
 @RunWith(classOf[JUnitRunner])
-class SubscriptionEventHandler extends FlatSpec {
+class SubscriptionEventHandler extends FlatSpec
 
-  "A subscription" should "be created from EventSources" in {
+  "A subscription" should "be created from EventSources" in
     val property: StringProperty = StringProperty("")
     var called = false
 
     val subscription =
-      property onInvalidate {
+      property onInvalidate
         called = true
         ()
-      }
 
     property set "one"
     assert(called === true)
@@ -52,5 +51,3 @@ class SubscriptionEventHandler extends FlatSpec {
     subscription.cancel()
     property set "two"
     assert(called === false)
-  }
-}

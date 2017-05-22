@@ -31,7 +31,7 @@ private[events] object approxNumEvents
   *  - `event` is expected to be called many orders of magnitude
   *    more frequently than `events`.
   */
-trait Sink {
+trait Sink
 
   /**
     * Event input is captured as individual fields in service of
@@ -90,17 +90,16 @@ trait Sink {
     * Java compatibility for [[recording_=]].
     */
   def setRecording(enabled: Boolean): Unit = recording_=(enabled)
-}
 
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.util.events.Sinks]].
   */
-object Sink {
+object Sink
 
   /**
     * A sink that ignores all input.
     */
-  val Null: Sink = new Sink {
+  val Null: Sink = new Sink
     override def event(
         etype: Type,
         longVal: Long,
@@ -111,29 +110,25 @@ object Sink {
     ): Unit = ()
 
     override def events: Iterator[Event] = Iterator.empty
-  }
 
   /**
     * An unsized sink. Convenient for testing.
     */
   def of(buffer: scala.collection.mutable.Buffer[Event]): Sink =
-    new Sink {
+    new Sink
       def events = buffer.iterator
       def event(
           e: Event.Type, l: Long, o: Object, d: Double, t: Long, s: Long) =
         buffer += Event(e, com.twitter.util.Time.now, l, o, d, t, s)
-    }
 
   // exposed for testing
-  private[events] def newDefault: Sink = {
-    if (!sinkEnabled.apply()) {
+  private[events] def newDefault: Sink =
+    if (!sinkEnabled.apply())
       Null
-    } else if (approxNumEvents() <= 0) {
+    else if (approxNumEvents() <= 0)
       Null
-    } else {
+    else
       SizedSink(approxNumEvents())
-    }
-  }
 
   /**
     * The global default `Sink`.
@@ -150,4 +145,3 @@ object Sink {
     * there is a place to store recorded events.
     */
   def enabled: Boolean = default ne Null
-}

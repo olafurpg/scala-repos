@@ -15,14 +15,14 @@ import scala.concurrent.duration._
 
 class ResidentTaskIntegrationTest
     extends IntegrationFunSuite with SingleMarathonIntegrationTest
-    with Matchers with BeforeAndAfter with GivenWhenThen {
+    with Matchers with BeforeAndAfter with GivenWhenThen
 
   import Fixture._
 
   //clean up state before running the test case
   before(cleanUp())
 
-  test("resident task can be deployed and write to persistent volume") { f =>
+  test("resident task can be deployed and write to persistent volume")  f =>
     Given("An app that writes into a persistent volume")
     val containerPath = "persistent-volume"
     val app = f.residentApp(containerPath = containerPath,
@@ -35,9 +35,8 @@ class ResidentTaskIntegrationTest
     waitForStatusUpdates(StatusUpdate.TASK_RUNNING)
     waitForEvent(Event.DEPLOYMENT_SUCCESS)
     waitForStatusUpdates(StatusUpdate.TASK_FINISHED)
-  }
 
-  test("persistent volume will be re-attached and keep state") { f =>
+  test("persistent volume will be re-attached and keep state")  f =>
     Given("An app that writes into a persistent volume")
     val containerPath = "persistent-volume"
     val app = f.residentApp(containerPath = containerPath,
@@ -76,9 +75,8 @@ class ResidentTaskIntegrationTest
     waitForStatusUpdates(StatusUpdate.TASK_RUNNING)
     waitForEvent(Event.DEPLOYMENT_SUCCESS)
     waitForStatusUpdates(StatusUpdate.TASK_FINISHED)
-  }
 
-  test("resident task is launched completely on reserved resources") { f =>
+  test("resident task is launched completely on reserved resources")  f =>
     Given("A resident app")
     val app = f.residentApp(
         portDefinitions = Seq.empty /* prevent problems by randomized port assignment */ )
@@ -89,13 +87,11 @@ class ResidentTaskIntegrationTest
     Then("used and reserved resources correspond to the app")
     val state: RestResult[ITMesosState] = mesos.state
 
-    withClue("used_resources") {
+    withClue("used_resources")
       state.value.agents.head.usedResources should equal(f.itMesosResources)
-    }
-    withClue("reserved_resources") {
+    withClue("reserved_resources")
       state.value.agents.head.reservedResourcesByRole.get("foo") should equal(
           Some(f.itMesosResources))
-    }
 
     When("the app is suspended")
     f.suspendSuccessfully(app.id)
@@ -103,20 +99,17 @@ class ResidentTaskIntegrationTest
     Then("there are no used resources anymore but there are the same reserved resources")
     val state2: RestResult[ITMesosState] = mesos.state
 
-    withClue("used_resources") {
+    withClue("used_resources")
       state2.value.agents.head.usedResources should be(empty)
-    }
-    withClue("reserved_resources") {
+    withClue("reserved_resources")
       state2.value.agents.head.reservedResourcesByRole.get("foo") should equal(
           Some(f.itMesosResources))
-    }
 
   // we check for a blank slate of mesos reservations after each test
   // TODO: Once we wait for the unreserves before finishing the StopApplication deployment step,
   // we should test that here
-  }
 
-  test("Scale Up") { f =>
+  test("Scale Up")  f =>
     Given("A resident app with 0 instances")
     val app = f.createSuccessfully(f.residentApp(instances = 0))
 
@@ -125,9 +118,8 @@ class ResidentTaskIntegrationTest
 
     Then("exactly 5 tasks have been created")
     f.launchedTasks(app.id).size shouldBe 5
-  }
 
-  test("Scale Down") { f =>
+  test("Scale Down")  f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(f.residentApp(instances = 5))
 
@@ -139,9 +131,8 @@ class ResidentTaskIntegrationTest
     all.size shouldBe 5
     all.count(_.launched) shouldBe 0
     all.count(_.suspended) shouldBe 5
-  }
 
-  test("Restart") { f =>
+  test("Restart")  f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(
         f.residentApp(
@@ -164,9 +155,8 @@ class ResidentTaskIntegrationTest
 
     And("no extra task was created")
     all.size shouldBe 5
-  }
 
-  test("Config Change") { f =>
+  test("Config Change")  f =>
     Given("a resident app with 5 instances")
     val app = f.createSuccessfully(
         f.residentApp(
@@ -191,7 +181,6 @@ class ResidentTaskIntegrationTest
 
     And("no extra task was created")
     all should have size (5)
-  }
 
   /**
     * FIXME (3043): implement the following tests. TASK_LOST can be induced when launching a task with permission:
@@ -202,38 +191,33 @@ class ResidentTaskIntegrationTest
     *
     * (From http://mesos.apache.org/documentation/latest/authorization/)
     */
-  ignore("taskLostBehavior = RELAUNCH_AFTER_TIMEOUT, timeout = 10s") { f =>
+  ignore("taskLostBehavior = RELAUNCH_AFTER_TIMEOUT, timeout = 10s")  f =>
     Given("A resident app with 1 instance")
     When("The task is lost")
     Then("The task is not relaunched within the timeout")
     And("The task is relaunched with a new Id after the timeout")
-  }
 
-  ignore("taskLostBehavior = WAIT_FOREVER") { f =>
+  ignore("taskLostBehavior = WAIT_FOREVER")  f =>
     Given("A resident app with 1 instance")
     When("The task is lost")
     Then("No timeout is scheduled") // can we easily verify this?
     And("The task is not relaunched") // can we verify this without waiting?
-  }
 
-  ignore("relaunchEscalationTimeoutSeconds = 5s") { f =>
+  ignore("relaunchEscalationTimeoutSeconds = 5s")  f =>
     Given("A resident app with 1 instance")
     When("The task terminates")
     And("We don't get an offer within the timeout")
     Then("We launch a new task on any matching offer")
-  }
 
   private[this] def test(testName: String, testTags: Tag*)(
-      testFun: (Fixture) => Unit): Unit = {
+      testFun: (Fixture) => Unit): Unit =
     super.test(testName, testTags: _*)(testFun(new Fixture))
-  }
 
   private[this] def ignore(testName: String, testTags: Tag*)(
-      testFun: (Fixture) => Unit): Unit = {
+      testFun: (Fixture) => Unit): Unit =
     super.ignore(testName, testTags: _*)(testFun(new Fixture))
-  }
 
-  class Fixture {
+  class Fixture
 
     val cpus: Double = 0.001
     val mem: Double = 1.0
@@ -248,7 +232,7 @@ class ResidentTaskIntegrationTest
                     instances: Int = 1,
                     backoffDuration: FiniteDuration = 1.hour,
                     portDefinitions: Seq[PortDefinition] = PortDefinitions(0))
-      : AppDefinition = {
+      : AppDefinition =
 
       val appId: PathId = PathId(
           s"/$testBasePath/app-${IdGenerator.generate()}")
@@ -284,82 +268,68 @@ class ResidentTaskIntegrationTest
       )
 
       app
-    }
 
-    def createSuccessfully(app: AppDefinition): AppDefinition = {
+    def createSuccessfully(app: AppDefinition): AppDefinition =
       createAsynchronously(app)
       waitForEvent(Event.DEPLOYMENT_SUCCESS)
       app
-    }
 
-    def createAsynchronously(app: AppDefinition): AppDefinition = {
+    def createAsynchronously(app: AppDefinition): AppDefinition =
       val result = marathon.createAppV2(app)
       result.code should be(201) //Created
       extractDeploymentIds(result) should have size 1
       app
-    }
 
     def scaleToSuccessfully(
-        appId: PathId, instances: Int): Iterable[ITEnrichedTask] = {
+        appId: PathId, instances: Int): Iterable[ITEnrichedTask] =
       val result =
         marathon.updateApp(appId, AppUpdate(instances = Some(instances)))
       result.code should be(200) // OK
       waitForEvent(Event.DEPLOYMENT_SUCCESS)
       waitForTasks(appId, instances)
-    }
 
     def suspendSuccessfully(appId: PathId): Iterable[ITEnrichedTask] =
       scaleToSuccessfully(appId, 0)
 
-    def updateSuccessfully(appId: PathId, update: AppUpdate): VersionString = {
+    def updateSuccessfully(appId: PathId, update: AppUpdate): VersionString =
       val result = marathon.updateApp(appId, update)
       result.code shouldBe 200
       waitForEvent(Event.DEPLOYMENT_SUCCESS)
       result.value.version.toString
-    }
 
-    def restartSuccessfully(app: AppDefinition): VersionString = {
+    def restartSuccessfully(app: AppDefinition): VersionString =
       val result = marathon.restartApp(app.id)
       result.code shouldBe 200
       waitForEvent(Event.DEPLOYMENT_SUCCESS)
       result.value.version.toString
-    }
 
-    def allTasks(appId: PathId): Iterable[ITEnrichedTask] = {
+    def allTasks(appId: PathId): Iterable[ITEnrichedTask] =
       Try(marathon.tasks(appId)).map(_.value).getOrElse(Nil)
-    }
 
     def launchedTasks(appId: PathId): Iterable[ITEnrichedTask] =
       allTasks(appId).filter(_.launched)
 
     def suspendedTasks(appId: PathId): Iterable[ITEnrichedTask] =
       allTasks(appId).filter(_.suspended)
-  }
 
-  object Fixture {
+  object Fixture
     type VersionString = String
 
-    object Event {
+    object Event
       val STATUS_UPDATE_EVENT = "status_update_event"
       val DEPLOYMENT_SUCCESS = "deployment_success"
-    }
 
-    object StatusUpdate {
+    object StatusUpdate
       val TASK_FINISHED = "TASK_FINISHED"
       val TASK_RUNNING = "TASK_RUNNING"
       val TASK_FAILED = "TASK_FAILED"
-    }
 
     /**
       * Resident Tasks reside in the TaskTracker even after they terminate and after the associated app is deleted.
       * To prevent spurious state in the above test cases, each test case should use a unique appId.
       */
-    object IdGenerator {
+    object IdGenerator
       private[this] var index: Int = 0
-      def generate(): String = {
+      def generate(): String =
         index += 1
         index.toString
-      }
-    }
-  }
-}

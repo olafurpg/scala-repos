@@ -28,14 +28,13 @@ import java.util.function.Consumer
   * Java compatible Results
   */
 object JavaResults
-    extends Results with DefaultWriteables with DefaultContentTypeOfs {
+    extends Results with DefaultWriteables with DefaultContentTypeOfs
   def writeContent(
       mimeType: String)(implicit codec: Codec): Writeable[Content] =
     Writeable((content: Content) => codec.encode(contentBody(content)),
               Some(ContentTypes.withCharset(mimeType)))
-  def contentBody(content: Content): String = content match {
+  def contentBody(content: Content): String = content match
     case xml: play.twirl.api.Xml => xml.body.trim; case c => c.body
-  }
   def writeString(mimeType: String)(implicit codec: Codec): Writeable[String] =
     Writeable((s: String) => codec.encode(s),
               Some(ContentTypes.withCharset(mimeType)))
@@ -51,13 +50,12 @@ object JavaResults
   def emptyHeaders = Map.empty[String, String]
   def empty = Results.EmptyContent()
   def chunked[A](onConnected: Consumer[Channel[A]],
-                 onDisconnected: Runnable): Enumerator[A] = {
+                 onDisconnected: Runnable): Enumerator[A] =
     Concurrent.unicast[A](
         onStart = (channel: Channel[A]) => onConnected.accept(channel),
         onComplete = onDisconnected.run(),
         onError = (_: String, _: Input[A]) => onDisconnected.run()
     )(internalContext)
-  }
   //play.api.libs.iteratee.Enumerator.imperative[A](onComplete = onDisconnected)
   def chunked(
       stream: java.io.InputStream, chunkSize: Int): Source[ByteString, _] =
@@ -79,20 +77,18 @@ object JavaResults
     Source
       .fromPublisher(Streams.enumeratorToPublisher(enumerator))
       .map(ByteString.apply)
-}
 
-object JavaResultExtractor {
+object JavaResultExtractor
 
   def getCookies(responseHeader: ResponseHeader): JCookies =
-    new JCookies {
+    new JCookies
       private val cookies = Cookies.fromSetCookieHeader(
           responseHeader.headers.get(HeaderNames.SET_COOKIE))
 
-      def get(name: String): JCookie = {
+      def get(name: String): JCookie =
         cookies.get(name).map(makeJavaCookie).orNull
-      }
 
-      private def makeJavaCookie(cookie: Cookie): JCookie = {
+      private def makeJavaCookie(cookie: Cookie): JCookie =
         new JCookie(cookie.name,
                     cookie.value,
                     cookie.maxAge.map(i => new Integer(i)).orNull,
@@ -100,12 +96,9 @@ object JavaResultExtractor {
                     cookie.domain.orNull,
                     cookie.secure,
                     cookie.httpOnly)
-      }
 
-      def iterator: java.util.Iterator[JCookie] = {
+      def iterator: java.util.Iterator[JCookie] =
         cookies.toIterator.map(makeJavaCookie).asJava
-      }
-    }
 
   def getSession(responseHeader: ResponseHeader): JSession =
     new JSession(
@@ -138,18 +131,15 @@ object JavaResultExtractor {
 
   @varargs
   def withHeader(
-      responseHeader: ResponseHeader, nameValues: String*): ResponseHeader = {
-    if (nameValues.length % 2 != 0) {
+      responseHeader: ResponseHeader, nameValues: String*): ResponseHeader =
+    if (nameValues.length % 2 != 0)
       throw new IllegalArgumentException(
           "Unmatched name - withHeaders must be invoked with an even number of string arguments")
-    }
     val toAdd = nameValues.grouped(2).map(pair => pair(0) -> pair(1))
     responseHeader.copy(headers = responseHeader.headers ++ toAdd)
-  }
 
   def getBody(
       result: JResult, timeout: Long, materializer: Materializer): ByteString =
     Await.result(
         FutureConverters.toScala(result.body.consumeData(materializer)),
         timeout.millis)
-}

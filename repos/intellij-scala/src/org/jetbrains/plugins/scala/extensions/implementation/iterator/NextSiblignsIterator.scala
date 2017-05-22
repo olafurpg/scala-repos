@@ -5,14 +5,12 @@ import com.intellij.psi.PsiElement
 /**
   * Pavel.Fatin, 11.05.2010
   */
-class NextSiblignsIterator(element: PsiElement) extends Iterator[PsiElement] {
+class NextSiblignsIterator(element: PsiElement) extends Iterator[PsiElement]
   private var current = element.getNextSibling
 
   def hasNext = current != null
 
-  def next() = {
+  def next() =
     val result = current
     current = current.getNextSibling
     result
-  }
-}

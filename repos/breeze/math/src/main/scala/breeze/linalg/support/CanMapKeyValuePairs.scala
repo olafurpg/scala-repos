@@ -22,11 +22,10 @@ package breeze.linalg.support
   * @author dramage
   * @author dlwh
   */
-trait CanMapKeyValuePairs[-From, +K, +A, -B, +To] {
+trait CanMapKeyValuePairs[-From, +K, +A, -B, +To]
 
   /** Maps all key-value pairs from the given collection. */
   def map(from: From, fn: ((K, A) => B)): To
 
   /** Maps all active key-value pairs from the given collection. */
   def mapActive(from: From, fn: ((K, A) => B)): To
-}

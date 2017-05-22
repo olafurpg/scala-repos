@@ -15,31 +15,27 @@ import scalaz.Tags._
 import scala.concurrent._
 import scala.concurrent.duration._
 
-class FutureTest extends SpecLite {
+class FutureTest extends SpecLite
 
   val duration: Duration = 1.seconds
 
   implicit val throwableEqual: Equal[Throwable] = Equal.equalA[Throwable]
 
-  {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap {
+    implicit def futureEqual[A : Equal] = Equal[Throwable \/ A] contramap
       future: Future[A] =>
         val futureWithError = future.map(\/-(_)).recover { case e => -\/(e) }
         Await.result(futureWithError, duration)
-    }
 
     implicit def futureShow[A : Show]: Show[Future[A]] =
-      Contravariant[Show].contramap(Show[String \/ A]) { future: Future[A] =>
+      Contravariant[Show].contramap(Show[String \/ A])  future: Future[A] =>
         val futureWithError =
           future.map(\/-(_)).recover { case e => -\/(e.toString) }
         Await.result(futureWithError, duration)
-      }
 
-    case class SomeFailure(n: Int) extends Exception {
+    case class SomeFailure(n: Int) extends Exception
       override def toString = s"SomeFailure($n)"
-    }
 
     implicit val ArbitraryThrowable: Arbitrary[Throwable] = Arbitrary(
         arbitrary[Int].map(SomeFailure))
@@ -57,54 +53,43 @@ class FutureTest extends SpecLite {
 
     // Scope these away from the rest as Comonad[Future] is a little evil.
     // Should fail to compile by default: implicitly[Comonad[Future]]
-    {
       implicit val cm: Comonad[Future] = futureComonad(duration)
       checkAll(comonad.laws[Future])
-    }
 
-    "issues 964" ! {
+    "issues 964" !
       val f = Future.failed[Int => Int](SomeFailure(2))
       val fa = Future.failed[Int](SomeFailure(1))
 
       val B = Bind[scala.concurrent.Future]
       B.bind(f)(g => B.map(fa)(g)) must_=== B.ap(fa)(f)
-    }
-  }
 
-  "Nondeterminism[Future]" should {
+  "Nondeterminism[Future]" should
     implicit val es: ExecutionContext =
       ExecutionContext.fromExecutor(Executors.newFixedThreadPool(1))
 
-    "fetch first completed future in chooseAny" ! forAll { (xs: Vector[Int]) =>
+    "fetch first completed future in chooseAny" ! forAll  (xs: Vector[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       def loop(is: List[Int],
                fs: Seq[Future[Int]],
                acc: Vector[Int]): Future[Vector[Int]] =
-        is match {
+        is match
           case i :: is0 =>
             promises(i).complete(scala.util.Try(xs(i)))
-            Nondeterminism[Future].chooseAny(fs).get.flatMap {
+            Nondeterminism[Future].chooseAny(fs).get.flatMap
               case (x, fs0) =>
                 loop(is0, fs0, acc :+ x)
-            }
           case Nil =>
             Future(acc)
-        }
 
       val sorted = xs.zipWithIndex.sorted
       val sortedF =
         loop(sorted.map(_._2).toList, promises.map(_.future), Vector.empty)
       Await.result(sortedF, duration) must_== sorted.map(_._1)
-    }
 
-    "gather maintains order" ! forAll { (xs: List[Int]) =>
+    "gather maintains order" ! forAll  (xs: List[Int]) =>
       val promises = Vector.fill(xs.size)(Promise[Int]())
       val f = Nondeterminism[Future].gather(promises.map(_.future))
-      (promises zip xs).reverseIterator.foreach {
+      (promises zip xs).reverseIterator.foreach
         case (p, x) =>
           p.complete(scala.util.Try(x))
-      }
       Await.result(f, duration) must_== xs
-    }
-  }
-}

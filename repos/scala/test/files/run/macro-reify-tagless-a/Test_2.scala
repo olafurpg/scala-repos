@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   //val list: List[String] = Macros.foo("hello world")
   //println(list)
 
@@ -14,7 +14,5 @@ object Test extends App {
       List(list),
       Apply(Select(Ident(definitions.PredefModule), TermName("println")),
             List(Ident(list.name))))
-  try cm.mkToolBox().eval(tree) catch {
+  try cm.mkToolBox().eval(tree) catch
     case ex: Throwable => println(ex.getMessage)
-  }
-}

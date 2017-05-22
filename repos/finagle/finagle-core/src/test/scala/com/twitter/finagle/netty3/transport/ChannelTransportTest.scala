@@ -16,7 +16,7 @@ import scala.language.reflectiveCalls
 
 @RunWith(classOf[JUnitRunner])
 class ChannelTransportTest
-    extends FunSuite with MockitoSugar with OneInstancePerTest {
+    extends FunSuite with MockitoSugar with OneInstancePerTest
 
   // For some reason, the scala compiler has a difficult time with
   // mockito's vararg-v-singlearg 'thenReturns'. We force the
@@ -39,20 +39,19 @@ class ChannelTransportTest
   pipeline.attach(ch, sink)
   val trans = new ChannelTransport[String, String](ch)
 
-  def sendUpstream(e: ChannelEvent) {
+  def sendUpstream(e: ChannelEvent)
     val handler = pipeline.getLast.asInstanceOf[ChannelUpstreamHandler]
     val ctx = mock[ChannelHandlerContext]
     handler.handleUpstream(ctx, e)
-  }
 
   def sendUpstreamMessage[T <: Object](msg: T) =
-    sendUpstream({
+    sendUpstream(
       val e = mock[MessageEvent]
       when(e.getMessage).thenReturn(msg)
       e
-    })
+    )
 
-  def newProxyCtx() = new {
+  def newProxyCtx() = new
     val f = trans.write("one")
     assert(!f.isDefined)
     val captor = ArgumentCaptor.forClass(classOf[ChannelEvent])
@@ -60,19 +59,17 @@ class ChannelTransportTest
     assert(captor.getValue.getClass == classOf[DownstreamMessageEvent])
     val dsme = captor.getValue.asInstanceOf[DownstreamMessageEvent]
     assert(dsme.getMessage == "one")
-  }
 
   test(
-      "write to the underlying channel, proxying the underlying ChannelFuture (ok)") {
+      "write to the underlying channel, proxying the underlying ChannelFuture (ok)")
     val ctx = newProxyCtx()
     import ctx._
 
     dsme.getFuture.setSuccess()
     assert(Await.result(f.liftToTry) == Return.Unit)
-  }
 
   test(
-      "write to the underlying channel, proxying the underlying ChannelFuture (err)") {
+      "write to the underlying channel, proxying the underlying ChannelFuture (err)")
     val ctx = newProxyCtx()
     import ctx._
 
@@ -80,47 +77,43 @@ class ChannelTransportTest
     dsme.getFuture.setFailure(exc)
     val exc1 = intercept[ChannelException] { Await.result(f) }
     assert(exc1 == ChannelException(exc, remoteAddress))
-  }
 
-  test("service reads before read())") {
+  test("service reads before read())")
     sendUpstreamMessage("a reply!")
     assert(Await.result(trans.read()) == "a reply!")
-  }
 
-  test("service reads after read()") {
+  test("service reads after read()")
     val f = trans.read()
     assert(!f.isDefined)
     sendUpstreamMessage("a reply!")
     assert(Await.result(f) == "a reply!")
-  }
 
-  test("closes on interrupted read") {
+  test("closes on interrupted read")
     val f = trans.read()
     assert(!f.isDefined)
     val closep = trans.onClose
     assert(!closep.isDefined)
     f.raise(new Exception("cancel"))
     assert(closep.isDefined)
-  }
 
-  test("maintains interestops") {
+  test("maintains interestops")
     // Not yet connected.
     verify(ch, never).setReadable(Matchers.any[Boolean])
 
-    sendUpstream({
+    sendUpstream(
       val e = mock[ChannelStateEvent]
       when(e.getState).thenReturn(ChannelState.CONNECTED)
       when(e.getValue).thenReturn(java.lang.Boolean.TRUE)
       e
-    })
+    )
 
     // Initially don't do anything: we buffer one item.
     verify(ch, never).setReadable(Matchers.any[Boolean])
 
-    val f = for {
+    val f = for
       a <- trans.read()
       b <- trans.read()
-    } yield Seq(a, b)
+    yield Seq(a, b)
     verify(ch, never).setReadable(Matchers.any[Boolean])
 
     // Now we need to make sure that, if we have successive
@@ -166,72 +159,65 @@ class ChannelTransportTest
     assert(!trans.read().isDefined)
     verify(ch, times(1)).setReadable(false)
     verify(ch, times(1)).setReadable(true)
-  }
 
-  test("FIFO queue messages") {
+  test("FIFO queue messages")
     for (i <- 0 until 10) sendUpstreamMessage("message:%d".format(i))
 
     for (i <- 0 until 10) assert(
         Await.result(trans.read()) == "message:%d".format(i))
 
     assert(!trans.read().isDefined)
-  }
 
   val exc = new Exception("sad panda")
 
-  test("handle exceptions on subsequent ops") {
-    sendUpstream({
+  test("handle exceptions on subsequent ops")
+    sendUpstream(
       val e = mock[ExceptionEvent]
       when(e.getCause).thenReturn(exc)
       e
-    })
+    )
 
     val exc1 = intercept[ChannelException] { Await.result(trans.read()) }
     assert(exc1 == ChannelException(exc, remoteAddress))
-  }
 
-  test("handle exceptions on pending reads") {
+  test("handle exceptions on pending reads")
     // writes are taken care of by netty
     val f = trans.read()
     assert(!f.isDefined)
-    sendUpstream({
+    sendUpstream(
       val e = mock[ExceptionEvent]
       when(e.getCause).thenReturn(exc)
       e
-    })
+    )
 
     val exc1 = intercept[ChannelException] { Await.result(f) }
     assert(exc1 == ChannelException(exc, remoteAddress))
-  }
 
-  test("satisfy onClose") {
+  test("satisfy onClose")
     assert(!trans.onClose.isDefined)
     val exc = new Exception("close exception")
-    sendUpstream({
+    sendUpstream(
       val e = mock[ExceptionEvent]
       when(e.getCause).thenReturn(exc)
       e
-    })
+    )
 
     assert(Await.result(trans.onClose) == ChannelException(exc, remoteAddress))
-  }
 
-  test("satisfy pending reads") {
+  test("satisfy pending reads")
     val f = trans.read()
     assert(!f.isDefined)
 
     sendUpstreamMessage("a")
     sendUpstreamMessage("b")
     val exc = new Exception("nope")
-    sendUpstream({
+    sendUpstream(
       val e = mock[ExceptionEvent]
       when(e.getCause).thenReturn(exc)
       e
-    })
+    )
 
     assert(f.poll == Some(Return("a")))
     assert(trans.read().poll == Some(Return("b")))
     assert(
         trans.read().poll == Some(Throw(ChannelException(exc, remoteAddress))))
-  }
-}

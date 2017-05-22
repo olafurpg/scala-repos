@@ -15,12 +15,12 @@ import Opcodes._
 // classes referred to by DynamicInvoker won't be available and DynamicInvoker won't
 // verify. So the test includes a version check that short-circuits the whole test
 // on JDK 6
-object Test extends DirectTest {
+object Test extends DirectTest
   override def extraSettings: String =
     "-Yopt:l:classpath -usejavacp -d " + testOutput.path + " -cp " +
     testOutput.path
 
-  def generateClass() {
+  def generateClass()
     val invokerClassName = "DynamicInvoker"
     val bootstrapMethodName = "bootstrap"
     val bootStrapMethodType =
@@ -139,7 +139,6 @@ object Test extends DirectTest {
     val fos = new FileOutputStream(
         new File(s"${testOutput.path}/$invokerClassName.class"))
     try fos write bytes finally fos.close()
-  }
 
   def code =
     """
@@ -149,19 +148,16 @@ object Driver {
 }
 """
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
-    try {
+    try
       // this test is only valid under JDK 1.7+
-      testUnderJavaAtLeast("1.7") {
+      testUnderJavaAtLeast("1.7")
         generateClass()
         compile()
         ()
-      } otherwise {
+      otherwise
         ()
-      }
-    } finally System.setErr(prevErr)
-  }
-}
+    finally System.setErr(prevErr)

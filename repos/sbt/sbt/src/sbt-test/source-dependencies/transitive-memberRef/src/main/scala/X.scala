@@ -1,5 +1,4 @@
 package test
 
-class X {
+class X
   def bar(b: B) = b
-}

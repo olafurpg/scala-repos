@@ -13,24 +13,20 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScTrait
   */
 class AbstractValueInTraitInspection
     extends AbstractInspection(
-        "ScalaAbstractValueInTrait", "Abstract Value in Trait") {
-  def actionFor(holder: ProblemsHolder) = {
+        "ScalaAbstractValueInTrait", "Abstract Value in Trait")
+  def actionFor(holder: ProblemsHolder) =
     //todo: we should use dataflow analysis to get if it's safe to use declaration here
     case v: ScValueDeclaration if v.getParent.isInstanceOf[ScTemplateBody] =>
-      v.containingClass match {
+      v.containingClass match
         case t: ScTrait =>
           holder.registerProblem(v,
                                  "Abstract value used in trait",
                                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
         case _ =>
-      }
     case v: ScVariableDeclaration =>
-      v.containingClass match {
+      v.containingClass match
         case t: ScTrait =>
           holder.registerProblem(v,
                                  "Abstract variable used in trait",
                                  ProblemHighlightType.GENERIC_ERROR_OR_WARNING)
         case _ =>
-      }
-  }
-}

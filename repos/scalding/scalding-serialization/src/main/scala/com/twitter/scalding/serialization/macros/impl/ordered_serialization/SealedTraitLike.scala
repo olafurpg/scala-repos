@@ -22,7 +22,7 @@ import com.twitter.scalding._
 import com.twitter.scalding.serialization.OrderedSerialization
 import com.twitter.scalding.serialization.Hasher.int.{hash => intHash}
 
-object SealedTraitLike {
+object SealedTraitLike
 
   /**
     * Compare Binary for generating similar types of binary comparasion code
@@ -37,7 +37,7 @@ object SealedTraitLike {
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def compareBinary(c: Context)(
       inputStreamA: c.TermName, inputStreamB: c.TermName)(
-      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
+      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
     val valueA = freshT("valueA")
@@ -45,11 +45,11 @@ object SealedTraitLike {
     val idxCmp = freshT("idxCmp")
 
     val compareSameTypes: Tree = subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (existing, (idx, tpe, tBuf)) =>
           val commonCmp: Tree = tBuf.compareBinary(inputStreamA, inputStreamB)
 
-          existing match {
+          existing match
             case Some(t) =>
               Some(q"""
               if($valueA == $idx) {
@@ -65,8 +65,6 @@ object SealedTraitLike {
                 } else {
                   sys.error("unreachable code -- this could only be reached by corruption in serialization.")
                 }""")
-          }
-      }
       .get
 
     q"""
@@ -80,17 +78,16 @@ object SealedTraitLike {
           $compareSameTypes
         }
       """
-  }
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def hash(c: Context)(element: c.TermName)(
-      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
+      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (optiExisting, (idx, tpe, tBuf)) =>
           val innerArg = freshT("innerArg")
           val elementHash: Tree = q"""
@@ -98,7 +95,7 @@ object SealedTraitLike {
               ${tBuf.hash(innerArg)}
             """
 
-          optiExisting match {
+          optiExisting match
             case Some(s) =>
               Some(q"""
             if($element.isInstanceOf[$tpe]) {
@@ -115,28 +112,25 @@ object SealedTraitLike {
               _root_.scala.Int.MaxValue
             }
             """)
-          }
-      }
       .get
-  }
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def put(c: Context)(inputStream: c.TermName, element: c.TermName)(
-      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
+      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val innerArg = freshT("innerArg")
     subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (optiExisting, (idx, tpe, tBuf)) =>
           val commonPut: Tree =
             q"""val $innerArg: $tpe = $element.asInstanceOf[$tpe]
               ${tBuf.put(inputStream, innerArg)}
               """
 
-          optiExisting match {
+          optiExisting match
             case Some(s) =>
               Some(q"""
             if($element.isInstanceOf[$tpe]) {
@@ -153,32 +147,29 @@ object SealedTraitLike {
               $commonPut
             }
             """)
-          }
-      }
       .get
-  }
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def length(c: Context)(element: c.Tree)(
       subData: List[(Int, c.Type, TreeOrderedBuf[c.type])])
-    : CompileTimeLengthTypes[c.type] = {
+    : CompileTimeLengthTypes[c.type] =
     import CompileTimeLengthTypes._
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val prevSizeData = subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (optiTree, (idx, tpe, tBuf)) =>
           val baseLenT: Tree =
-            tBuf.length(q"$element.asInstanceOf[$tpe]") match {
+            tBuf.length(q"$element.asInstanceOf[$tpe]") match
               case m: MaybeLengthCalculation[_] =>
                 m.asInstanceOf[MaybeLengthCalculation[c.type]].t
 
               case f: FastLengthCalculation[_] =>
-                q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen(${f
+                q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.DynamicLen($f
                   .asInstanceOf[FastLengthCalculation[c.type]]
-                  .t})"""
+                  .t)"""
 
               case _: NoLengthCalculationAvailable[_] =>
                 return NoLengthCalculationAvailable(c)
@@ -186,7 +177,6 @@ object SealedTraitLike {
                 q"""_root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.ConstLen(${const.toInt})"""
               case e =>
                 sys.error("unexpected input to union length code of " + e)
-            }
           val tmpPreLen = freshT("tmpPreLen")
 
           val lenT = q"""
@@ -201,7 +191,7 @@ object SealedTraitLike {
             _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.NoLengthCalculation
           }): _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.MaybeLength
         """
-          optiTree match {
+          optiTree match
             case Some(t) =>
               Some(q"""
             if($element.isInstanceOf[$tpe]) {
@@ -217,28 +207,25 @@ object SealedTraitLike {
           } else {
             sys.error("Unreachable code, did not match sealed trait type")
             }""")
-          }
-      }
       .get
 
     MaybeLengthCalculation(c)(prevSizeData)
-  }
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def get(c: Context)(inputStream: c.TermName)(
-      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
+      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
     val valueA = freshT("valueA")
 
     val expandedOut = subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (existing, (idx, tpe, tBuf)) =>
           val extract = q"${tBuf.get(inputStream)}"
 
-          existing match {
+          existing match
             case Some(t) =>
               Some(q"""
             if($valueA == $idx) {
@@ -255,21 +242,18 @@ object SealedTraitLike {
             sys.error("Did not understand sealed trait with idx: " + $valueA + ", this should only happen in a serialization failure.")
           }
             """)
-          }
-      }
       .get
 
     q"""
         val $valueA: Int = $inputStream.readByte.toInt
         $expandedOut
       """
-  }
 
   // This `_.get` could be removed by switching `subData` to a non-empty list type
   @SuppressWarnings(Array("org.brianmckenna.wartremover.warts.OptionPartial"))
   def compare(c: Context)(
       cmpType: c.Type, elementA: c.TermName, elementB: c.TermName)(
-      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree = {
+      subData: List[(Int, c.Type, TreeOrderedBuf[c.type])]): c.Tree =
     import c.universe._
 
     def freshT(id: String) = newTermName(c.fresh(id))
@@ -280,9 +264,9 @@ object SealedTraitLike {
     val idxB = freshT("idxB")
 
     val toIdOpt: Tree = subData
-      .foldLeft(Option.empty[Tree]) {
+      .foldLeft(Option.empty[Tree])
         case (existing, (idx, tpe, _)) =>
-          existing match {
+          existing match
             case Some(t) =>
               Some(q"""
             if($arg.isInstanceOf[$tpe]) {
@@ -298,13 +282,11 @@ object SealedTraitLike {
               } else {
                 sys.error("This should be unreachable code, failure in serializer or deserializer to reach here.")
               }""")
-          }
-      }
       .get
 
-    val compareSameTypes: Option[Tree] = subData.foldLeft(Option.empty[Tree]) {
+    val compareSameTypes: Option[Tree] = subData.foldLeft(Option.empty[Tree])
       case (existing, (idx, tpe, tBuf)) =>
-        val commonCmp = {
+        val commonCmp =
           val aTerm = freshT("aTerm")
           val bTerm = freshT("bTerm")
           q"""
@@ -312,9 +294,8 @@ object SealedTraitLike {
           val $bTerm: $tpe = $elementB.asInstanceOf[$tpe]
           ${tBuf.compare(aTerm, bTerm)}
         """
-        }
 
-        existing match {
+        existing match
           case Some(t) =>
             Some(q"""
             if($idxA == $idx) {
@@ -330,8 +311,6 @@ object SealedTraitLike {
               } else {
                 $idxCmp
               }""")
-        }
-    }
 
     val compareFn = q"""
       def instanceToIdx($arg: $cmpType): Int = {
@@ -350,5 +329,3 @@ object SealedTraitLike {
     """
 
     compareFn
-  }
-}

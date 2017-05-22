@@ -39,19 +39,18 @@ import org.apache.spark.sql.types.NumericType
 class RelationalGroupedDataset protected[sql](
     df: DataFrame,
     groupingExprs: Seq[Expression],
-    groupType: RelationalGroupedDataset.GroupType) {
+    groupType: RelationalGroupedDataset.GroupType)
 
-  private[this] def toDF(aggExprs: Seq[Expression]): DataFrame = {
+  private[this] def toDF(aggExprs: Seq[Expression]): DataFrame =
     val aggregates =
-      if (df.sqlContext.conf.dataFrameRetainGroupColumns) {
+      if (df.sqlContext.conf.dataFrameRetainGroupColumns)
         groupingExprs ++ aggExprs
-      } else {
+      else
         aggExprs
-      }
 
     val aliasedAgg = aggregates.map(alias)
 
-    groupType match {
+    groupType match
       case RelationalGroupedDataset.GroupByType =>
         Dataset.newDataFrame(
             df.sqlContext,
@@ -69,43 +68,36 @@ class RelationalGroupedDataset protected[sql](
         Dataset.newDataFrame(
             df.sqlContext,
             Pivot(aliasedGrps, pivotCol, values, aggExprs, df.logicalPlan))
-    }
-  }
 
   // Wrap UnresolvedAttribute with UnresolvedAlias, as when we resolve UnresolvedAttribute, we
   // will remove intermediate Alias for ExtractValue chain, and we need to alias it again to
   // make it a NamedExpression.
-  private[this] def alias(expr: Expression): NamedExpression = expr match {
+  private[this] def alias(expr: Expression): NamedExpression = expr match
     case u: UnresolvedAttribute => UnresolvedAlias(u)
     case expr: NamedExpression => expr
     case expr: Expression => Alias(expr, usePrettyExpression(expr).sql)()
-  }
 
   private[this] def aggregateNumericColumns(colNames: String*)(
-      f: Expression => AggregateFunction): DataFrame = {
+      f: Expression => AggregateFunction): DataFrame =
 
     val columnExprs =
-      if (colNames.isEmpty) {
+      if (colNames.isEmpty)
         // No columns specified. Use all numeric columns.
         df.numericColumns
-      } else {
+      else
         // Make sure all specified columns are numeric.
-        colNames.map { colName =>
+        colNames.map  colName =>
           val namedExpr = df.resolve(colName)
-          if (!namedExpr.dataType.isInstanceOf[NumericType]) {
+          if (!namedExpr.dataType.isInstanceOf[NumericType])
             throw new AnalysisException(
                 s""""$colName" is not a numeric column. """ +
                 "Aggregation function can only be applied on a numeric column.")
-          }
           namedExpr
-        }
-      }
     toDF(columnExprs.map(expr => f(expr).toAggregateExpression()))
-  }
 
-  private[this] def strToExpr(expr: String): (Expression => Expression) = {
-    val exprToFunc: (Expression => Expression) = { (inputExpr: Expression) =>
-      expr.toLowerCase match {
+  private[this] def strToExpr(expr: String): (Expression => Expression) =
+    val exprToFunc: (Expression => Expression) =  (inputExpr: Expression) =>
+      expr.toLowerCase match
         // We special handle a few cases that have alias that are not in function registry.
         case "avg" | "average" | "mean" =>
           UnresolvedFunction("avg", inputExpr :: Nil, isDistinct = false)
@@ -114,17 +106,13 @@ class RelationalGroupedDataset protected[sql](
         // Also special handle count because we need to take care count(*).
         case "count" | "size" =>
           // Turn count(*) into count(1)
-          inputExpr match {
+          inputExpr match
             case s: Star => Count(Literal(1)).toAggregateExpression()
             case _ => Count(inputExpr).toAggregateExpression()
-          }
         case name =>
           UnresolvedFunction(name, inputExpr :: Nil, isDistinct = false)
-      }
-    }
     (inputExpr: Expression) =>
       exprToFunc(inputExpr)
-  }
 
   /**
     * (Scala-specific) Compute aggregates by specifying a map from column name to
@@ -141,9 +129,8 @@ class RelationalGroupedDataset protected[sql](
     *
     * @since 1.3.0
     */
-  def agg(aggExpr: (String, String), aggExprs: (String, String)*): DataFrame = {
+  def agg(aggExpr: (String, String), aggExprs: (String, String)*): DataFrame =
     agg((aggExpr +: aggExprs).toMap)
-  }
 
   /**
     * (Scala-specific) Compute aggregates by specifying a map from column name to
@@ -160,13 +147,12 @@ class RelationalGroupedDataset protected[sql](
     *
     * @since 1.3.0
     */
-  def agg(exprs: Map[String, String]): DataFrame = {
+  def agg(exprs: Map[String, String]): DataFrame =
     toDF(
-        exprs.map {
+        exprs.map
       case (colName, expr) =>
         strToExpr(expr)(df(colName).expr)
-    }.toSeq)
-  }
+    .toSeq)
 
   /**
     * (Java-specific) Compute aggregates by specifying a map from column name to
@@ -181,9 +167,8 @@ class RelationalGroupedDataset protected[sql](
     *
     * @since 1.3.0
     */
-  def agg(exprs: java.util.Map[String, String]): DataFrame = {
+  def agg(exprs: java.util.Map[String, String]): DataFrame =
     agg(exprs.asScala.toMap)
-  }
 
   /**
     * Compute aggregates by specifying a series of aggregate columns. Note that this function by
@@ -217,9 +202,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def agg(expr: Column, exprs: Column*): DataFrame = {
+  def agg(expr: Column, exprs: Column*): DataFrame =
     toDF((expr +: exprs).map(_.expr))
-  }
 
   /**
     * Count the number of rows for each group.
@@ -238,9 +222,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def mean(colNames: String*): DataFrame = {
+  def mean(colNames: String*): DataFrame =
     aggregateNumericColumns(colNames: _*)(Average)
-  }
 
   /**
     * Compute the max value for each numeric columns for each group.
@@ -250,9 +233,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def max(colNames: String*): DataFrame = {
+  def max(colNames: String*): DataFrame =
     aggregateNumericColumns(colNames: _*)(Max)
-  }
 
   /**
     * Compute the mean value for each numeric columns for each group.
@@ -262,9 +244,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def avg(colNames: String*): DataFrame = {
+  def avg(colNames: String*): DataFrame =
     aggregateNumericColumns(colNames: _*)(Average)
-  }
 
   /**
     * Compute the min value for each numeric column for each group.
@@ -274,9 +255,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def min(colNames: String*): DataFrame = {
+  def min(colNames: String*): DataFrame =
     aggregateNumericColumns(colNames: _*)(Min)
-  }
 
   /**
     * Compute the sum for each numeric columns for each group.
@@ -286,9 +266,8 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.3.0
     */
   @scala.annotation.varargs
-  def sum(colNames: String*): DataFrame = {
+  def sum(colNames: String*): DataFrame =
     aggregateNumericColumns(colNames: _*)(Sum)
-  }
 
   /**
     * Pivots a column of the current [[DataFrame]] and perform the specified aggregation.
@@ -307,7 +286,7 @@ class RelationalGroupedDataset protected[sql](
     * @param pivotColumn Name of the column to pivot.
     * @since 1.6.0
     */
-  def pivot(pivotColumn: String): RelationalGroupedDataset = {
+  def pivot(pivotColumn: String): RelationalGroupedDataset =
     // This is to prevent unintended OOM errors when the number of distinct values is large
     val maxValues =
       df.sqlContext.conf.getConf(SQLConf.DATAFRAME_PIVOT_MAX_VALUES)
@@ -321,16 +300,14 @@ class RelationalGroupedDataset protected[sql](
       .take(maxValues + 1)
       .toSeq
 
-    if (values.length > maxValues) {
+    if (values.length > maxValues)
       throw new AnalysisException(
           s"The pivot column $pivotColumn has more than $maxValues distinct values, " +
           "this could indicate an error. " +
           s"If this was intended, set ${SQLConf.DATAFRAME_PIVOT_MAX_VALUES.key} " +
           "to at least the number of distinct values of the pivot column.")
-    }
 
     pivot(pivotColumn, values)
-  }
 
   /**
     * Pivots a column of the current [[DataFrame]] and perform the specified aggregation.
@@ -350,8 +327,8 @@ class RelationalGroupedDataset protected[sql](
     * @param values List of values that will be translated to columns in the output DataFrame.
     * @since 1.6.0
     */
-  def pivot(pivotColumn: String, values: Seq[Any]): RelationalGroupedDataset = {
-    groupType match {
+  def pivot(pivotColumn: String, values: Seq[Any]): RelationalGroupedDataset =
+    groupType match
       case RelationalGroupedDataset.GroupByType =>
         new RelationalGroupedDataset(
             df,
@@ -364,8 +341,6 @@ class RelationalGroupedDataset protected[sql](
       case _ =>
         throw new UnsupportedOperationException(
             "pivot is only supported after a groupBy")
-    }
-  }
 
   /**
     * Pivots a column of the current [[DataFrame]] and perform the specified aggregation.
@@ -386,21 +361,18 @@ class RelationalGroupedDataset protected[sql](
     * @since 1.6.0
     */
   def pivot(pivotColumn: String,
-            values: java.util.List[Any]): RelationalGroupedDataset = {
+            values: java.util.List[Any]): RelationalGroupedDataset =
     pivot(pivotColumn, values.asScala)
-  }
-}
 
 /**
   * Companion object for GroupedData.
   */
-private[sql] object RelationalGroupedDataset {
+private[sql] object RelationalGroupedDataset
 
   def apply(df: DataFrame,
             groupingExprs: Seq[Expression],
-            groupType: GroupType): RelationalGroupedDataset = {
+            groupType: GroupType): RelationalGroupedDataset =
     new RelationalGroupedDataset(df, groupingExprs, groupType: GroupType)
-  }
 
   /**
     * The Grouping Type
@@ -427,4 +399,3 @@ private[sql] object RelationalGroupedDataset {
     */
   private[sql] case class PivotType(pivotCol: Expression, values: Seq[Literal])
       extends GroupType
-}

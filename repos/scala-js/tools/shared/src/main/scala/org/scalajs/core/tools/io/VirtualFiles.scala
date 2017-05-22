@@ -11,7 +11,7 @@ import org.scalajs.core.tools.json._
 
 /** A virtual input file.
   */
-trait VirtualFile {
+trait VirtualFile
 
   /** Path of the file, including everything.
     *  Unique if possible (used for lookup). */
@@ -34,26 +34,22 @@ trait VirtualFile {
   def exists: Boolean
 
   /** URI for this virtual file */
-  def toURI: URI = {
+  def toURI: URI =
     new URI(
         "virtualfile", // Pseudo-Scheme
         path, // Scheme specific part
         null // Fragment
     )
-  }
-}
 
-object VirtualFile {
+object VirtualFile
 
   /** Splits at the last slash and returns remainder */
-  def nameFromPath(path: String): String = {
+  def nameFromPath(path: String): String =
     val pos = path.lastIndexOf('/')
     if (pos == -1) path
     else path.substring(pos + 1)
-  }
-}
 
-trait RelativeVirtualFile extends VirtualFile {
+trait RelativeVirtualFile extends VirtualFile
 
   /** Relative path with respect to some container.
     *
@@ -62,11 +58,10 @@ trait RelativeVirtualFile extends VirtualFile {
     *  path is the path inside the Jar.
     */
   def relativePath: String
-}
 
 /** A virtual input file.
   */
-trait VirtualTextFile extends VirtualFile {
+trait VirtualTextFile extends VirtualFile
 
   /** Returns the content of the file. */
   def content: String
@@ -78,57 +73,49 @@ trait VirtualTextFile extends VirtualFile {
     *  Lines do not contain the new line characters.
     */
   def readLines(): List[String] = IO.readLines(reader)
-}
 
-object VirtualTextFile {
+object VirtualTextFile
   def empty(path: String): VirtualTextFile =
     new MemVirtualTextFile(path)
-}
 
-trait WritableVirtualTextFile extends VirtualTextFile {
+trait WritableVirtualTextFile extends VirtualTextFile
   def contentWriter: Writer
-}
 
 /** A virtual binary input file.
   */
-trait VirtualBinaryFile extends VirtualFile {
+trait VirtualBinaryFile extends VirtualFile
 
   /** Returns the content of the file. */
   def content: Array[Byte]
 
   /** Returns a new InputStream of the file. */
   def inputStream: InputStream = new ByteArrayInputStream(content)
-}
 
-trait WritableVirtualBinaryFile extends VirtualBinaryFile {
+trait WritableVirtualBinaryFile extends VirtualBinaryFile
   def outputStream: OutputStream
-}
 
 /** A virtual input file which contains JavaScript code.
   *  It may have a source map associated with it.
   */
-trait VirtualJSFile extends VirtualTextFile {
+trait VirtualJSFile extends VirtualTextFile
 
   /** Optionally, content of the source map file associated with this
     *  JavaScript source.
     */
   def sourceMap: Option[String] = None
-}
 
-object VirtualJSFile {
+object VirtualJSFile
   def empty(path: String): VirtualJSFile =
     new MemVirtualJSFile(path).withVersion(Some(path))
-}
 
 trait WritableVirtualJSFile
-    extends WritableVirtualTextFile with VirtualJSFile {
+    extends WritableVirtualTextFile with VirtualJSFile
   def sourceMapWriter: Writer
-}
 
 /** A virtual Scala.js IR file.
   *  It contains the class info and the IR tree.
   */
-trait VirtualScalaJSIRFile extends VirtualFile {
+trait VirtualScalaJSIRFile extends VirtualFile
 
   /** Class info of this file. */
   def info: ir.Infos.ClassInfo =
@@ -140,20 +127,19 @@ trait VirtualScalaJSIRFile extends VirtualFile {
 
   /** Class info and IR tree of this file. */
   def infoAndTree: (ir.Infos.ClassInfo, ir.Trees.ClassDef)
-}
 
 /** Base trait for virtual Scala.js IR files that are serialized as binary file.
   */
 trait VirtualSerializedScalaJSIRFile
-    extends VirtualBinaryFile with VirtualScalaJSIRFile {
+    extends VirtualBinaryFile with VirtualScalaJSIRFile
 
   /** Class info of this file. */
-  override def info: ir.Infos.ClassInfo = {
+  override def info: ir.Infos.ClassInfo =
     // Overridden to read only the necessary parts
     val stream = inputStream
-    try {
+    try
       ir.InfoSerializers.deserialize(stream)
-    } catch {
+    catch
       case e: ir.IRVersionNotSupportedException =>
         throw new ir.IRVersionNotSupportedException(
             e.version,
@@ -164,73 +150,60 @@ trait VirtualSerializedScalaJSIRFile
 
       case e: IOException =>
         throw new IOException(s"Failed to deserialize info of $path", e)
-    } finally {
+    finally
       stream.close()
-    }
-  }
 
   /** Class info and IR tree of this file. */
-  override def infoAndTree: (ir.Infos.ClassInfo, ir.Trees.ClassDef) = {
+  override def infoAndTree: (ir.Infos.ClassInfo, ir.Trees.ClassDef) =
     val stream = inputStream
-    try {
+    try
       val (version, info) = ir.InfoSerializers.deserializeWithVersion(stream)
       val tree = ir.Serializers
         .deserialize(stream, version)
         .asInstanceOf[ir.Trees.ClassDef]
         (info, tree)
-    } catch {
+    catch
       case e: IOException =>
         throw new IOException(s"Failed to deserialize $path", e)
-    } finally {
+    finally
       stream.close()
-    }
-  }
-}
 
-trait VirtualJarFile extends VirtualBinaryFile {
+trait VirtualJarFile extends VirtualBinaryFile
 
   /** All the `*.sjsir` files in this Jar
     *
     *  It is up to the implementation whether these files are read lazily or not.
     *  The default implementation reads them into memory.
     */
-  def sjsirFiles: Seq[VirtualScalaJSIRFile with RelativeVirtualFile] = {
-    findEntries(_.endsWith(".sjsir")) { (entry, stream) =>
+  def sjsirFiles: Seq[VirtualScalaJSIRFile with RelativeVirtualFile] =
+    findEntries(_.endsWith(".sjsir"))  (entry, stream) =>
       val file = new JarEntryIRFile(path, entry.getName)
       file.content = IO.readInputStreamToByteArray(stream)
       file
-    }
-  }
 
-  def jsFiles: Seq[VirtualJSFile with RelativeVirtualFile] = {
-    findEntries(_.endsWith(".js")) { (entry, stream) =>
+  def jsFiles: Seq[VirtualJSFile with RelativeVirtualFile] =
+    findEntries(_.endsWith(".js"))  (entry, stream) =>
       val file = new JarEntryJSFile(path, entry.getName)
       file.content = IO.readInputStreamToString(stream)
       file
-    }
-  }
 
-  def jsDependencyManifests: Seq[JSDependencyManifest] = {
-    findEntries(_ == JSDependencyManifest.ManifestFileName) { (_, stream) =>
+  def jsDependencyManifests: Seq[JSDependencyManifest] =
+    findEntries(_ == JSDependencyManifest.ManifestFileName)  (_, stream) =>
       val json = readJSON(new InputStreamReader(stream, "UTF-8"))
       fromJSON[JSDependencyManifest](json)
-    }
-  }
 
   private def findEntries[T](cond: String => Boolean)(
-      mkResult: (ZipEntry, InputStream) => T): Seq[T] = {
+      mkResult: (ZipEntry, InputStream) => T): Seq[T] =
     val stream = new ZipInputStream(inputStream)
-    try {
+    try
       Iterator
         .continually(stream.getNextEntry())
         .takeWhile(_ != null)
         .filter(entry => cond(entry.getName))
         .map(entry => mkResult(entry, stream))
         .toList
-    } finally {
+    finally
       stream.close()
-    }
-  }
 
   private class JarEntryIRFile(outerPath: String, val relativePath: String)
       extends MemVirtualSerializedScalaJSIRFile(s"$outerPath:$relativePath")
@@ -239,4 +212,3 @@ trait VirtualJarFile extends VirtualBinaryFile {
   private class JarEntryJSFile(outerPath: String, val relativePath: String)
       extends MemVirtualJSFile(s"$outerPath:$relativePath")
       with RelativeVirtualFile
-}

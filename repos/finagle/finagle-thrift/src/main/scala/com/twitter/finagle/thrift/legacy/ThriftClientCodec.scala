@@ -11,11 +11,11 @@ import org.jboss.netty.handler.codec.replay.{ReplayingDecoder, VoidEnum}
   * Translate ThriftCalls to their wire representation
   */
 private[thrift] class ThriftClientEncoder(protocolFactory: TProtocolFactory)
-    extends SimpleChannelDownstreamHandler {
+    extends SimpleChannelDownstreamHandler
   protected var seqid = 0
 
   override def writeRequested(ctx: ChannelHandlerContext, e: MessageEvent) =
-    e.getMessage match {
+    e.getMessage match
       case call: ThriftCall[_, _] =>
         val buffer = ChannelBuffers.dynamicBuffer()
         val transport = new ChannelBufferToTransport(buffer)
@@ -29,22 +29,20 @@ private[thrift] class ThriftClientEncoder(protocolFactory: TProtocolFactory)
                        e.getRemoteAddress)
       case _: Throwable =>
         Channels.fireExceptionCaught(ctx, new IllegalArgumentException)
-    }
-}
 
 /**
   * Translate wire representation to ThriftReply
   */
 private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
-    extends ReplayingDecoder[VoidEnum] {
+    extends ReplayingDecoder[VoidEnum]
   def decodeThriftReply(ctx: ChannelHandlerContext,
                         channel: Channel,
-                        buffer: ChannelBuffer): Object = {
+                        buffer: ChannelBuffer): Object =
     val transport = new ChannelBufferToTransport(buffer)
     val protocol = protocolFactory.getProtocol(transport)
     val message = protocol.readMessageBegin()
 
-    message.`type` match {
+    message.`type` match
       case TMessageType.EXCEPTION =>
         // Create an event for any TApplicationExceptions.  Though these are
         // usually protocol-level errors, so there's not much the client can do.
@@ -62,8 +60,6 @@ private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
             new TApplicationException(
                 TApplicationException.INVALID_MESSAGE_TYPE))
         null
-    }
-  }
 
   override def decode(ctx: ChannelHandlerContext,
                       channel: Channel,
@@ -73,4 +69,3 @@ private[thrift] class ThriftClientDecoder(protocolFactory: TProtocolFactory)
     // as no-ops. This only happens with the ReplayingDecoder.
     if (buffer.readable) decodeThriftReply(ctx, channel, buffer)
     else null
-}

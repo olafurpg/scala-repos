@@ -22,7 +22,7 @@ import org.scalajs.core.tools.linker.backend.{LinkerBackend, BasicLinkerBackend}
 
 /** The Scala.js linker */
 final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
-    extends GenLinker {
+    extends GenLinker
 
   require(!backend.withSourceMap || frontend.withSourceMap,
           "Frontend must have source maps enabled if backend has them enabled")
@@ -44,34 +44,27 @@ final class Linker(frontend: LinkerFrontend, backend: LinkerBackend)
 
   def link(irFiles: Seq[VirtualScalaJSIRFile],
            output: WritableVirtualJSFile,
-           logger: Logger): Unit = {
-    guard {
+           logger: Logger): Unit =
+    guard
       val unit = frontend.link(irFiles, backend.symbolRequirements, logger)
       backend.emit(unit, output, logger)
-    }
-  }
 
   @inline
-  private[this] def guard[T](body: => T): T = {
-    if (!_linking.compareAndSet(false, true)) {
+  private[this] def guard[T](body: => T): T =
+    if (!_linking.compareAndSet(false, true))
       throw new IllegalStateException("Linker used concurrently")
-    }
 
-    if (!_valid) {
+    if (!_valid)
       throw new IllegalStateException(
           "Linker is invalid due to a previous exception in a component")
-    }
 
-    try {
+    try
       body
-    } catch {
+    catch
       case t: Throwable =>
         _valid = false
         throw t
-    } finally {
+    finally
       _linking.set(false)
-    }
-  }
-}
 
 object Linker extends LinkerPlatformExtensions

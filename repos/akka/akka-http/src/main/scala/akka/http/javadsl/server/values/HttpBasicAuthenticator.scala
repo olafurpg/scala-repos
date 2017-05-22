@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 /**
   * Represents existing or missing Http Basic authentication credentials.
   */
-trait BasicCredentials {
+trait BasicCredentials
 
   /**
     * Were credentials provided in the request?
@@ -30,7 +30,6 @@ trait BasicCredentials {
     * Verifies the given secret against the one sent in the request.
     */
   def verify(secret: String): Boolean
-}
 
 /**
   * Implement this class to provide an HTTP Basic authentication check. The [[#authenticate]] method needs to be implemented
@@ -38,7 +37,7 @@ trait BasicCredentials {
   * the user as a [[akka.http.javadsl.server.RequestVal]].
   */
 abstract class HttpBasicAuthenticator[T](val realm: String)
-    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T] {
+    extends AbstractDirective with ExtractionImplBase[T] with RequestVal[T]
   protected[http] implicit def classTag: ClassTag[T] =
     reflect.classTag[AnyRef].asInstanceOf[ClassTag[T]]
   def authenticate(credentials: BasicCredentials): CompletionStage[Optional[T]]
@@ -62,4 +61,3 @@ abstract class HttpBasicAuthenticator[T](val realm: String)
   protected[http] final def createRoute(
       first: Route, others: Array[Route]): Route =
     RouteStructure.BasicAuthentication(this)(first, others.toList)
-}

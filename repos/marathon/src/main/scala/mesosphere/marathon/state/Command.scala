@@ -6,7 +6,7 @@ import org.apache.mesos.{Protos => MesosProtos}
 //   - user
 //   - URIs
 case class Command(value: String)
-    extends MarathonState[MesosProtos.CommandInfo, Command] {
+    extends MarathonState[MesosProtos.CommandInfo, Command]
 
   def toProto: MesosProtos.CommandInfo =
     MesosProtos.CommandInfo.newBuilder.setValue(this.value).build
@@ -18,4 +18,3 @@ case class Command(value: String)
     mergeFromProto(MesosProtos.CommandInfo.parseFrom(bytes))
 
   override def version: Timestamp = Timestamp.zero
-}

@@ -1,4 +1,3 @@
-package object test {
+package object test
   trait PackageError
   object PackageError
-}

@@ -1,4 +1,4 @@
-object Test {
+object Test
   def foo(x: Boolean): Int = 1
   def foo(x: Int): Int = 2
 
@@ -6,4 +6,3 @@ object Test {
 
   /* line: 3 */
   foo("")
-}

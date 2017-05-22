@@ -26,26 +26,23 @@ import JavaStreamEnrichments._
 import java.io._
 import scala.util.{Try, Success}
 
-object LawTester {
+object LawTester
   def apply[T : Arbitrary](base: String, laws: Iterable[Law[T]]): Properties =
     new LawTester(implicitly[Arbitrary[T]].arbitrary, base, laws) {}
-}
 
 abstract class LawTester[T](g: Gen[T], base: String, laws: Iterable[Law[T]])
-    extends Properties(base) {
-  laws.foreach {
+    extends Properties(base)
+  laws.foreach
     case Law1(name, fn) => property(name) = forAll(g)(fn)
     case Law2(name, fn) => property(name) = forAll(g, g)(fn)
     case Law3(name, fn) => property(name) = forAll(g, g, g)(fn)
-  }
-}
 
-object SerializationProperties extends Properties("SerializationProperties") {
+object SerializationProperties extends Properties("SerializationProperties")
 
   import OrderedSerialization.{resultFrom, CompareFailure, readThenCompare}
 
   implicit val intOrderedSerialization: OrderedSerialization[Int] =
-    new OrderedSerialization[Int] {
+    new OrderedSerialization[Int]
       def read(in: InputStream) = Try(Reader.read[Int](in))
       def write(o: OutputStream, t: Int) = Try(Writer.write[Int](o, t))
       def hash(t: Int) = t.hashCode
@@ -54,7 +51,6 @@ object SerializationProperties extends Properties("SerializationProperties") {
         readThenCompare(a, b)(this)
       val staticSize = Some(4)
       def dynamicSize(i: Int) = staticSize
-    }
 
   implicit val stringOrdSer: OrderedSerialization[String] =
     new StringOrderedSerialization
@@ -68,10 +64,10 @@ object SerializationProperties extends Properties("SerializationProperties") {
   class IntTryWrapperClass(val x: Int)
 
   implicit val myTryIntWrapperOrdSer: OrderedSerialization[IntTryWrapperClass] =
-    OrderedSerialization.viaTryTransform[IntTryWrapperClass, Int](_.x, {
+    OrderedSerialization.viaTryTransform[IntTryWrapperClass, Int](_.x,
       x: Int =>
         Success(new IntTryWrapperClass(x))
-    })
+    )
 
   implicit val arbIntWrapperClass: Arbitrary[IntWrapperClass] = Arbitrary(
       implicitly[Arbitrary[Int]].arbitrary.map(new IntWrapperClass(_)))
@@ -85,54 +81,48 @@ object SerializationProperties extends Properties("SerializationProperties") {
     new OrderedSerialization2[A, B](implicitly, implicitly)
 
   def serializeSequenceCompare[T : OrderedSerialization](g: Gen[T]): Prop =
-    forAll(Gen.listOf(g)) { list =>
+    forAll(Gen.listOf(g))  list =>
       // make sure the list is even in size:
       val pairList = (if (list.size % 2 == 1) list.tail else list).grouped(2)
       val baos1 = new ByteArrayOutputStream
       val baos2 = new ByteArrayOutputStream
-      pairList.foreach {
+      pairList.foreach
         case Seq(a, b) =>
           Serialization.write(baos1, a)
           Serialization.write(baos2, b)
         case _ => sys.error("unreachable")
-      }
       // now the compares must match:
       val in1 = baos1.toInputStream
       val in2 = baos2.toInputStream
-      pairList.forall {
+      pairList.forall
         case Seq(a, b) =>
           OrderedSerialization.compareBinary[T](in1, in2) == OrderedSerialization
             .resultFrom(OrderedSerialization.compare(a, b))
         case _ => sys.error("unreachable")
-      }
-    }
 
   def serializeSequenceCompare[T : OrderedSerialization : Arbitrary]: Prop =
     serializeSequenceCompare[T](implicitly[Arbitrary[T]].arbitrary)
 
   def serializeSequenceEquiv[T : Serialization](g: Gen[T]): Prop =
-    forAll(Gen.listOf(g)) { list =>
+    forAll(Gen.listOf(g))  list =>
       // make sure the list is even in size:
       val pairList = (if (list.size % 2 == 1) list.tail else list).grouped(2)
       val baos1 = new ByteArrayOutputStream
       val baos2 = new ByteArrayOutputStream
-      pairList.foreach {
+      pairList.foreach
         case Seq(a, b) =>
           Serialization.write(baos1, a)
           Serialization.write(baos2, b)
         case _ => sys.error("unreachable")
-      }
       // now the compares must match:
       val in1 = baos1.toInputStream
       val in2 = baos2.toInputStream
-      pairList.forall {
+      pairList.forall
         case Seq(a, b) =>
           val rta = Serialization.read[T](in1).get
           val rtb = Serialization.read[T](in2).get
           Serialization.equiv(a, rta) && Serialization.equiv(b, rtb)
         case _ => sys.error("unreachable")
-      }
-    }
   def serializeSequenceEquiv[T : Serialization : Arbitrary]: Prop =
     serializeSequenceEquiv[T](implicitly[Arbitrary[T]].arbitrary)
 
@@ -180,4 +170,3 @@ object SerializationProperties extends Properties("SerializationProperties") {
   include(
       LawTester("IntTryWrapperClass Ordered",
                 OrderedSerialization.allLaws[IntTryWrapperClass]))
-}

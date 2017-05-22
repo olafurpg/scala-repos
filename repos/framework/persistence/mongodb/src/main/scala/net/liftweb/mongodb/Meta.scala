@@ -30,12 +30,12 @@ import com.mongodb._
 
 import JsonDSL._
 
-private[mongodb] object Meta {
+private[mongodb] object Meta
 
   /*
    * For converting scala objects into DBObject values
    */
-  object Reflection {
+  object Reflection
     import java.lang.reflect._
 
     /*
@@ -64,7 +64,7 @@ private[mongodb] object Meta {
     /*
      * This is used to convert DBObjects into JObjects
      */
-    def primitive2jvalue(a: Any) = a match {
+    def primitive2jvalue(a: Any) = a match
       case x: String => JString(x)
       case x: Int => JInt(x)
       case x: Long => JInt(x)
@@ -82,7 +82,6 @@ private[mongodb] object Meta {
       case x: java.lang.Boolean => JBool(x.asInstanceOf[Boolean])
       case x: java.lang.Short => JInt(BigInt(x.asInstanceOf[Short]))
       case _ => sys.error("not a primitive " + a.asInstanceOf[AnyRef].getClass)
-    }
 
     /*
      * Date types require formatting
@@ -94,17 +93,15 @@ private[mongodb] object Meta {
 
     def datetype_?(clazz: Class[_]) = datetypes contains clazz
 
-    def datetype2jvalue(a: Any)(implicit formats: Formats) = a match {
+    def datetype2jvalue(a: Any)(implicit formats: Formats) = a match
       case x: Calendar => JsonDate(x.getTime)(formats)
       case x: Date => JsonDate(x)(formats)
       case x: DateTime => JsonDateTime(x)(formats)
-    }
 
-    def datetype2dbovalue(a: Any) = a match {
+    def datetype2dbovalue(a: Any) = a match
       case x: Calendar => x.getTime
       case x: Date => x
       case x: DateTime => x.toDate
-    }
 
     /*
      * Extended Mongo types.
@@ -117,14 +114,12 @@ private[mongodb] object Meta {
     /*
      * Definitive place for JValue conversion of mongo types
      */
-    def mongotype2jvalue(a: Any)(implicit formats: Formats) = a match {
+    def mongotype2jvalue(a: Any)(implicit formats: Formats) = a match
       case x: ObjectId => JsonObjectId.asJValue(x, formats)
       case x: Pattern => JsonRegex(x)
       case x: UUID => JsonUUID(x)
       case x: DBRef => sys.error("DBRefs are not supported.")
       case _ => sys.error("not a mongotype " + a.asInstanceOf[AnyRef].getClass)
-    }
-  }
 
   @deprecated("use JsonDate.apply", "2.6")
   def dateAsJValue(d: Date, formats: Formats): JValue =
@@ -139,4 +134,3 @@ private[mongodb] object Meta {
   @deprecated("use JsonObjectId.asJValue", "2.6")
   def objectIdAsJValue(oid: ObjectId, formats: Formats): JValue =
     JsonObjectId.asJValue(oid, formats)
-}

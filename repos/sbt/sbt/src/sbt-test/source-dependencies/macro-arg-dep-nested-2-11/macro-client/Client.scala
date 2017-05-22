@@ -1,5 +1,4 @@
 package macros
 
-object Client {
+object Client
   Provider.printTree(Provider.printTree(Foo.str))
-}

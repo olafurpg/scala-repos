@@ -52,16 +52,13 @@ import scala.compat.java8.FutureConverters
   * [[org.reactivestreams.Processor]] instances. The returned reactive stream
   * is fully started and active.
   */
-package object scaladsl {
+package object scaladsl
   implicit class SourceToCompletionStage[Out, T](
       val src: Source[Out, Future[T]])
-      extends AnyVal {
+      extends AnyVal
     def toCompletionStage(): Source[Out, CompletionStage[T]] =
       src.mapMaterializedValue(FutureConverters.toJava)
-  }
   implicit class SinkToCompletionStage[In, T](val sink: Sink[In, Future[T]])
-      extends AnyVal {
+      extends AnyVal
     def toCompletionStage(): Sink[In, CompletionStage[T]] =
       sink.mapMaterializedValue(FutureConverters.toJava)
-  }
-}

@@ -17,7 +17,7 @@
 
 package org.apache.spark.ui
 
-private[spark] object ToolTips {
+private[spark] object ToolTips
   val SCHEDULER_DELAY =
     """Scheduler delay includes time to ship the task from the scheduler to
        the executor, and time to send the task result from the executor to the scheduler. If
@@ -90,4 +90,3 @@ private[spark] object ToolTips {
 
   val TASK_TIME =
     "Shaded red when garbage collection (GC) time is over 10% of task time"
-}

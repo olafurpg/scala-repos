@@ -6,6 +6,5 @@ package play.api
 /**
   * Contains the Cache access API.
   */
-package object cache {
+package object cache
   type NamedCache = play.cache.NamedCache
-}

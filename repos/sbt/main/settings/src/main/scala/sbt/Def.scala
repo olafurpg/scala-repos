@@ -8,7 +8,7 @@ import Scope.{ThisScope, GlobalScope}
 import KeyRanks.{DTask, Invisible}
 
 /** A concrete settings system that uses `sbt.Scope` for the scope type. */
-object Def extends Init[Scope] with TaskMacroExtra {
+object Def extends Init[Scope] with TaskMacroExtra
   type Classpath = Seq[Attributed[File]]
 
   def settings(ss: SettingsDefinition*): Seq[Setting[_]] =
@@ -27,38 +27,34 @@ object Def extends Init[Scope] with TaskMacroExtra {
 
   lazy val showFullKey: Show[ScopedKey[_]] = showFullKey(None)
   def showFullKey(keyNameColor: Option[String]): Show[ScopedKey[_]] =
-    new Show[ScopedKey[_]] {
+    new Show[ScopedKey[_]]
       def apply(key: ScopedKey[_]) = displayFull(key, keyNameColor)
-    }
 
   def showRelativeKey(
       current: ProjectRef,
       multi: Boolean,
       keyNameColor: Option[String] = None): Show[ScopedKey[_]] =
-    new Show[ScopedKey[_]] {
+    new Show[ScopedKey[_]]
       def apply(key: ScopedKey[_]) =
         Scope.display(key.scope,
                       colored(key.key.label, keyNameColor),
                       ref => displayRelative(current, multi, ref))
-    }
   def displayRelative(
       current: ProjectRef, multi: Boolean, project: Reference): String =
-    project match {
+    project match
       case BuildRef(current.build) => "{.}/"
       case `current` => if (multi) current.project + "/" else ""
       case ProjectRef(current.build, x) => x + "/"
       case _ => Reference.display(project) + "/"
-    }
   def displayFull(scoped: ScopedKey[_]): String = displayFull(scoped, None)
   def displayFull(scoped: ScopedKey[_], keyNameColor: Option[String]): String =
     Scope.display(scoped.scope, colored(scoped.key.label, keyNameColor))
   def displayMasked(scoped: ScopedKey[_], mask: ScopeMask): String =
     Scope.displayMasked(scoped.scope, scoped.key.label, mask)
 
-  def colored(s: String, color: Option[String]): String = color match {
+  def colored(s: String, color: Option[String]): String = color match
     case Some(c) => c + s + scala.Console.RESET
     case None => s
-  }
 
   override def deriveAllowed[T](
       s: Setting[T], allowDynamic: Boolean): Option[String] =
@@ -79,9 +75,8 @@ object Def extends Init[Scope] with TaskMacroExtra {
   private[this] def definedSettingString(s: Setting[_]): String =
     s"derived setting ${s.key.key.label}${positionString(s)}"
   private[this] def positionString(s: Setting[_]): String =
-    s.positionString match {
+    s.positionString match
       case None => ""; case Some(pos) => s" defined at $pos"
-    }
 
   /**
     * A default Parser for splitting input into space-separated arguments.
@@ -147,13 +142,12 @@ object Def extends Init[Scope] with TaskMacroExtra {
   private[sbt] def dummy[T : Manifest](
       name: String, description: String): (TaskKey[T], Task[T]) =
     (TaskKey[T](name, description, DTask), dummyTask(name))
-  private[sbt] def dummyTask[T](name: String): Task[T] = {
+  private[sbt] def dummyTask[T](name: String): Task[T] =
     import std.TaskExtra.{task => newTask, _}
     val base: Task[T] =
       newTask(sys.error("Dummy task '" + name +
               "' did not get converted to a full task.")) named name
     base.copy(info = base.info.set(isDummyTask, true))
-  }
   private[sbt] def isDummy(t: Task[_]): Boolean =
     t.info.attributes.get(isDummyTask) getOrElse false
   private[sbt] val isDummyTask = AttributeKey[Boolean](
@@ -166,12 +160,10 @@ object Def extends Init[Scope] with TaskMacroExtra {
     Def.dummy[std.Streams[ScopedKey[_]]](
         "streams-manager",
         "Streams manager, which provides streams for different contexts.")
-}
 // these need to be mixed into the sbt package object because the target doesn't involve Initialize or anything in Def
-trait TaskMacroExtra {
+trait TaskMacroExtra
   implicit def macroValueT[T](in: Task[T]): std.MacroValue[T] = ???
   implicit def macroValueIn[T](in: InputTask[T]): std.InputEvaluated[T] = ???
   implicit def parserToInput[T](in: Parser[T]): std.ParserInput[T] = ???
   implicit def stateParserToInput[T](
       in: State => Parser[T]): std.ParserInput[T] = ???
-}

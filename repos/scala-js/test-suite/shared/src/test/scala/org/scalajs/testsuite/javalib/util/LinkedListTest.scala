@@ -18,11 +18,11 @@ import java.util.LinkedList
 
 import scala.reflect.ClassTag
 
-class LinkedListTest extends AbstractListTest {
+class LinkedListTest extends AbstractListTest
 
   override def factory: LinkedListFactory = new LinkedListFactory
 
-  @Test def add_and_remove_properly_in_head_and_last_positions(): Unit = {
+  @Test def add_and_remove_properly_in_head_and_last_positions(): Unit =
     val ll = new LinkedList[Int]()
 
     ll.addLast(1)
@@ -36,9 +36,8 @@ class LinkedListTest extends AbstractListTest {
     ll.removeLast()
     ll.addFirst(2)
     assertEquals(2, ll.peekLast())
-  }
 
-  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit = {
+  @Test def could_be_instantiated_with_a_prepopulated_Collection(): Unit =
     val s = Seq(1, 5, 2, 3, 4)
     val l = asJavaCollection(s)
     val ll = new LinkedList[Int](l)
@@ -48,9 +47,8 @@ class LinkedListTest extends AbstractListTest {
     for (i <- 0 until s.size) assertEquals(s(i), ll.poll())
 
     assertTrue(ll.isEmpty)
-  }
 
-  @Test def should_add_multiple_element_in_one_operation(): Unit = {
+  @Test def should_add_multiple_element_in_one_operation(): Unit =
     val l = asJavaCollection(Set(1, 5, 2, 3, 4))
     val ll = new LinkedList[Int]()
 
@@ -59,11 +57,10 @@ class LinkedListTest extends AbstractListTest {
     assertEquals(5, ll.size())
     ll.add(6)
     assertEquals(6, ll.size())
-  }
 
   @Test
   def `could_be_instantiated_with_a_prepopulated_Collection_-_LinkedListTest`(
-      ): Unit = {
+      ): Unit =
     val s = Seq(1, 5, 2, 3, 4)
     val l = asJavaCollection(s)
     val ll = new LinkedList[Int](l)
@@ -73,9 +70,8 @@ class LinkedListTest extends AbstractListTest {
     for (i <- 0 until s.size) assertEquals(s(i), ll.poll())
 
     assertTrue(ll.isEmpty)
-  }
 
-  @Test def should_retrieve_the_last_element(): Unit = {
+  @Test def should_retrieve_the_last_element(): Unit =
     val llInt = new LinkedList[Int]()
 
     assertTrue(llInt.add(1000))
@@ -93,9 +89,8 @@ class LinkedListTest extends AbstractListTest {
     assertTrue(llDouble.add(+10000.987))
     assertTrue(llDouble.add(-0.987))
     assertEquals(-0.987, llDouble.pollLast(), 0.0)
-  }
 
-  @Test def should_perform_as_a_stack_with_push_and_pop(): Unit = {
+  @Test def should_perform_as_a_stack_with_push_and_pop(): Unit =
     val llInt = new LinkedList[Int]()
 
     llInt.push(1000)
@@ -119,9 +114,8 @@ class LinkedListTest extends AbstractListTest {
     assertEquals(-0.987, llDouble.pop(), 0.0)
     assertEquals(+10000.987, llDouble.pop(), 0.0)
     assertTrue(llString.isEmpty())
-  }
 
-  @Test def should_poll_and_peek_elements(): Unit = {
+  @Test def should_poll_and_peek_elements(): Unit =
     val pq = new LinkedList[String]()
 
     assertTrue(pq.add("one"))
@@ -142,9 +136,8 @@ class LinkedListTest extends AbstractListTest {
 
     assertNull(pq.peekLast)
     assertNull(pq.pollLast)
-  }
 
-  @Test def should_remove_occurrences_of_provided_elements(): Unit = {
+  @Test def should_remove_occurrences_of_provided_elements(): Unit =
     val l = asJavaCollection(Seq("one", "two", "three", "two", "one"))
     val ll = new LinkedList[String](l)
 
@@ -157,33 +150,27 @@ class LinkedListTest extends AbstractListTest {
     assertTrue(ll.removeFirstOccurrence("three"))
     assertFalse(ll.removeLastOccurrence("three"))
     assertTrue(ll.isEmpty)
-  }
 
-  @Test def should_iterate_over_elements_in_both_directions(): Unit = {
+  @Test def should_iterate_over_elements_in_both_directions(): Unit =
     val s = Seq("one", "two", "three")
     val l = asJavaCollection(s)
     val ll = new LinkedList[String](l)
 
     val iter = ll.iterator()
-    for (i <- 0 until l.size()) {
+    for (i <- 0 until l.size())
       assertTrue(iter.hasNext())
       assertEquals(s(i), iter.next())
-    }
     assertFalse(iter.hasNext())
 
     val diter = ll.descendingIterator()
-    for (i <- (0 until l.size()).reverse) {
+    for (i <- (0 until l.size()).reverse)
       assertTrue(diter.hasNext())
       assertEquals(s(i), diter.next())
-    }
     assertFalse(diter.hasNext())
-  }
-}
 
-class LinkedListFactory extends AbstractListFactory {
+class LinkedListFactory extends AbstractListFactory
   override def implementationName: String =
     "java.util.LinkedList"
 
   override def empty[E : ClassTag]: LinkedList[E] =
     new LinkedList[E]()
-}

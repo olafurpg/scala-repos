@@ -49,7 +49,7 @@ trait BeanIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/beans/package-summary.html `javafx.beans`]] Interfaces to
   * their ScalaFX counterparts.
   */
-trait LowerPriorityIncludes {
+trait LowerPriorityIncludes
 
   /**
     * Converts a
@@ -60,9 +60,8 @@ trait LowerPriorityIncludes {
     * @return ScalaFX Observable
     */
   implicit def jfxObservable2sfx(o: jfxb.Observable): Observable =
-    new Observable {
+    new Observable
       override def delegate = o
-    }
 
   /**
     * Converts a
@@ -74,8 +73,6 @@ trait LowerPriorityIncludes {
     */
   implicit def jfxObservableValue2sfx[T](
       ov: jfxbv.ObservableValue[T]): ObservableValue[T, T] =
-    new ObservableValue[T, T] {
+    new ObservableValue[T, T]
       override def delegate = ov
       override def value = delegate.getValue
-    }
-}

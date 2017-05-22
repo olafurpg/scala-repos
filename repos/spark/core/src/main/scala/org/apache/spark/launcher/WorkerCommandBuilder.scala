@@ -31,12 +31,12 @@ import org.apache.spark.deploy.Command
   */
 private[spark] class WorkerCommandBuilder(
     sparkHome: String, memoryMb: Int, command: Command)
-    extends AbstractCommandBuilder {
+    extends AbstractCommandBuilder
 
   childEnv.putAll(command.environment.asJava)
   childEnv.put(CommandBuilderUtils.ENV_SPARK_HOME, sparkHome)
 
-  override def buildCommand(env: JMap[String, String]): JList[String] = {
+  override def buildCommand(env: JMap[String, String]): JList[String] =
     val cmd = buildJavaCommand(
         command.classPathEntries.mkString(File.pathSeparator))
     cmd.add(s"-Xms${memoryMb}M")
@@ -45,8 +45,6 @@ private[spark] class WorkerCommandBuilder(
     CommandBuilderUtils.addPermGenSizeOpt(cmd)
     addOptionString(cmd, getenv("SPARK_JAVA_OPTS"))
     cmd
-  }
 
   def buildCommand(): JList[String] =
     buildCommand(new JHashMap[String, String]())
-}

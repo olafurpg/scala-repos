@@ -27,29 +27,27 @@ import java.io.File
 // Use the scalacheck generators
 import scala.collection.mutable.Buffer
 
-class TypedWriteIncrementalJob(args: Args) extends Job(args) {
+class TypedWriteIncrementalJob(args: Args) extends Job(args)
   import RichPipeEx._
   val pipe = TypedPipe.from(TypedTsv[Int]("input"))
 
   implicit val inj = Injection.connect[(Int, Int), (Array[Byte], Array[Byte])]
 
-  pipe.map { k =>
+  pipe.map  k =>
     (k, k)
-  }.writeIncremental(VersionedKeyValSource[Int, Int]("output"))
-}
+  .writeIncremental(VersionedKeyValSource[Int, Int]("output"))
 
-class MoreComplexTypedWriteIncrementalJob(args: Args) extends Job(args) {
+class MoreComplexTypedWriteIncrementalJob(args: Args) extends Job(args)
   import RichPipeEx._
   val pipe = TypedPipe.from(TypedTsv[Int]("input"))
 
   implicit val inj = Injection.connect[(Int, Int), (Array[Byte], Array[Byte])]
 
-  pipe.map { k =>
+  pipe.map  k =>
     (k, k)
-  }.group.sum.writeIncremental(VersionedKeyValSource[Int, Int]("output"))
-}
+  .group.sum.writeIncremental(VersionedKeyValSource[Int, Int]("output"))
 
-class ToIteratorJob(args: Args) extends Job(args) {
+class ToIteratorJob(args: Args) extends Job(args)
   import RichPipeEx._
   val source = VersionedKeyValSource[Int, Int]("input")
 
@@ -60,75 +58,64 @@ class ToIteratorJob(args: Args) extends Job(args) {
 
   duplicatedPipe.group.sum
     .writeIncremental(VersionedKeyValSource[Int, Int]("output"))
-}
 
-class VersionedKeyValSourceTest extends WordSpec with Matchers {
+class VersionedKeyValSourceTest extends WordSpec with Matchers
   val input = (1 to 100).toList
 
-  "A TypedWriteIncrementalJob" should {
+  "A TypedWriteIncrementalJob" should
     JobTest(new TypedWriteIncrementalJob(_))
       .source(TypedTsv[Int]("input"), input)
       .sink[(Int, Int)](
-          VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
+          VersionedKeyValSource[Array[Byte], Array[Byte]]("output"))
         outputBuffer: Buffer[(Int, Int)] =>
-          "Outputs must be as expected" in {
+          "Outputs must be as expected" in
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
-            assert(input.map { k =>
+            assert(input.map  k =>
               (k, k)
-            }.sortBy(_._1).toString === outputBuffer
+            .sortBy(_._1).toString === outputBuffer
                   .sortBy(_._1)
                   .toList
                   .toString)
-          }
-      }
       .run
       .finish
-  }
 
-  "A MoreComplexTypedWriteIncrementalJob" should {
+  "A MoreComplexTypedWriteIncrementalJob" should
     JobTest(new MoreComplexTypedWriteIncrementalJob(_))
       .source(TypedTsv[Int]("input"), input)
       .sink[(Int, Int)](
-          VersionedKeyValSource[Array[Byte], Array[Byte]]("output")) {
+          VersionedKeyValSource[Array[Byte], Array[Byte]]("output"))
         outputBuffer: Buffer[(Int, Int)] =>
-          "Outputs must be as expected" in {
+          "Outputs must be as expected" in
             assert(outputBuffer.size === input.size)
             val singleInj = implicitly[Injection[Int, Array[Byte]]]
-            assert(input.map { k =>
+            assert(input.map  k =>
               (k, k)
-            }.sortBy(_._1).toString === outputBuffer
+            .sortBy(_._1).toString === outputBuffer
                   .sortBy(_._1)
                   .toList
                   .toString)
-          }
-      }
       .run
       .finish
-  }
 
-  "A ToIteratorJob" should {
-    "return the values via toIterator" in {
+  "A ToIteratorJob" should
+    "return the values via toIterator" in
       JobTest(new ToIteratorJob(_))
         .source(VersionedKeyValSource[Int, Int]("input"), input.zip(input))
-        .sink(VersionedKeyValSource[Int, Int]("output")) {
+        .sink(VersionedKeyValSource[Int, Int]("output"))
           outputBuffer: Buffer[(Int, Int)] =>
             val (keys, vals) = outputBuffer.unzip
             assert(keys.map { _ * 2 } === vals)
-        }
         .run
         .finish
-    }
-  }
 
-  "A VersionedKeyValSource" should {
-    "Validate that explicitly provided versions exist" in {
+  "A VersionedKeyValSource" should
+    "Validate that explicitly provided versions exist" in
       val path = setupLocalVersionStore(100L to 102L)
 
       val thrown =
-        the[InvalidSourceException] thrownBy {
+        the[InvalidSourceException] thrownBy
           validateVersion(path, Some(103))
-        }
       assert(thrown.getMessage === "Version 103 does not exist. " +
           "Currently available versions are: [102, 101, 100]")
 
@@ -137,24 +124,20 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
 
       // should not throw
       validateVersion(path)
-    }
-  }
 
   /**
     * Creates a temp dir and then creates the provided versions within it.
     */
-  private def setupLocalVersionStore(versions: Seq[Long]): String = {
+  private def setupLocalVersionStore(versions: Seq[Long]): String =
     val root = Files.createTempDir()
     root.deleteOnExit()
     val store = new VersionedStore(root.getAbsolutePath)
-    versions foreach { v =>
+    versions foreach  v =>
       val p = store.createVersion(v)
       new File(p).mkdirs()
       store.succeedVersion(p)
-    }
 
     root.getAbsolutePath
-  }
 
   /**
     * Creates a VersionedKeyValSource using the provided version
@@ -163,4 +146,3 @@ class VersionedKeyValSourceTest extends WordSpec with Matchers {
   private def validateVersion(path: String, version: Option[Long] = None) =
     VersionedKeyValSource(path = path, sourceVersion = version)
       .validateTaps(Hdfs(false, new JobConf()))
-}

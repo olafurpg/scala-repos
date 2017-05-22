@@ -7,7 +7,7 @@ import std.AllInstances._
 import scalaz.scalacheck.ScalazProperties._
 import scalaz.scalacheck.ScalazArbitrary._
 
-object TupleTest extends SpecLite {
+object TupleTest extends SpecLite
 
   type A = Int
   type B = Int
@@ -61,22 +61,18 @@ object TupleTest extends SpecLite {
 
   checkAll("Tuple2", associative.laws[Tuple2])
 
-  "syntax" should {
+  "syntax" should
     import std.tuple.tupleSyntax._
-    "mapElements" in {
+    "mapElements" in
       (1, 2).mapElements(_1 = 2 *) must_=== ((2, 2))
-    }
-    "toIndexedSeq" in {
+    "toIndexedSeq" in
       val as: IndexedSeq[Int] = (1, 2).toIndexedSeq
       as.toList must_=== (List(1, 2))
-    }
-    "fold" in {
+    "fold" in
       (1, 2).fold(_ + _) must_=== (3)
-    }
-  }
 
-  object instances {
-    object tuple1 {
+  object instances
+    object tuple1
       def show[A : Show] = Show[Tuple1[A]]
       def equal[A : Equal] = Equal[Tuple1[A]]
       def order[A : Order] = Order[Tuple1[A]]
@@ -90,8 +86,7 @@ object TupleTest extends SpecLite {
       // checking absence of ambiguity
       def equal[A : Order] = Equal[Tuple1[A]]
       def semigroup[A : Monoid] = Semigroup[Tuple1[A]]
-    }
-    object tuple2 {
+    object tuple2
       def show[A : Show, B : Show] = Show[(A, B)]
       def equal[A : Equal, B : Equal] = Equal[(A, B)]
       def order[A : Order, B : Order] = Order[(A, B)]
@@ -109,14 +104,10 @@ object TupleTest extends SpecLite {
       def equal[A : Order, B : Order] = Equal[(A, B)]
       def semigroup[A : Monoid, B : Monoid] = Semigroup[(A, B)]
       def functor[A : Monoid] = Functor[(A, ?)]
-    }
-    object tuple3 {
+    object tuple3
       def show[A : Show, B : Show, C : Show] = Show[(A, B, C)]
       def equal[A : Equal, B : Equal, C : Equal] = Equal[(A, B, C)]
       def order[A : Order, B : Order, C : Order] = Order[(A, B, C)]
       def semigroup[A : Semigroup, B : Semigroup, C : Semigroup] =
         Semigroup[(A, B, C)]
       def monoid[A : Monoid, B : Monoid, C : Monoid] = Monoid[(A, B, C)]
-    }
-  }
-}

@@ -37,7 +37,7 @@ import scalafx.delegate.SFXDelegate
   * Object companion for [[scalafx.scene.control.TablePositionBase]]
   * @since 8.0
   */
-object TableSelectionModel {
+object TableSelectionModel
 
   /**
     * Converts a ScalaFX TablePositionBase into a JavaFX version.
@@ -49,7 +49,6 @@ object TableSelectionModel {
   implicit def sfxTableSelectionModel2jfx[T](
       tsm: TableSelectionModel[T]): jfxsc.TableSelectionModel[T] =
     if (tsm != null) tsm.delegate else null
-}
 
 /**
   * Wraps JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TableSelectionModel.html TableSelectionModel]].
@@ -62,7 +61,7 @@ object TableSelectionModel {
 class TableSelectionModel[T](
     override val delegate: jfxsc.TableSelectionModel[T])
     extends MultipleSelectionModel[T](delegate)
-    with SFXDelegate[jfxsc.TableSelectionModel[T]] {
+    with SFXDelegate[jfxsc.TableSelectionModel[T]]
 
   //    protected abstract int getItemCount()
 
@@ -77,9 +76,8 @@ class TableSelectionModel[T](
     */
   def cellSelectionEnabled: BooleanProperty =
     delegate.cellSelectionEnabledProperty
-  def cellSelectionEnabled_=(v: Boolean) {
+  def cellSelectionEnabled_=(v: Boolean)
     cellSelectionEnabled() = v
-  }
 
   /**
     * Convenience function which tests whether the given row and column index is currently selected in this
@@ -91,51 +89,44 @@ class TableSelectionModel[T](
   /**
     * Selects the cell at the given row/column intersection.
     */
-  def select(row: Int, column: TableColumnBase[T, _]) {
+  def select(row: Int, column: TableColumnBase[T, _])
     delegate.select(row, column)
-  }
 
   /**
     * Clears all selection, and then selects the cell at the given row/column intersection.
     */
-  def clearAndSelect(row: Int, column: TableColumnBase[T, _]) {
+  def clearAndSelect(row: Int, column: TableColumnBase[T, _])
     delegate.clearAndSelect(row, column)
-  }
 
   /**
     * Removes selection from the specified row/column position (in view indexes).
     */
-  def clearSelection(row: Int, column: TableColumnBase[T, _]) {
+  def clearSelection(row: Int, column: TableColumnBase[T, _])
     delegate.clearSelection(row, column)
-  }
 
   /**
     * Selects the cell directly above the currently selected cell.
     */
-  def selectAboveCell() {
+  def selectAboveCell()
     delegate.selectAboveCell()
-  }
 
   /**
     * Selects the cell directly below the currently selected cell.
     */
-  def selectBelowCell() {
+  def selectBelowCell()
     delegate.selectBelowCell()
-  }
 
   /**
     * Selects the cell to the left of the currently selected cell.
     */
-  def selectLeftCell() {
+  def selectLeftCell()
     delegate.selectLeftCell()
-  }
 
   /**
     * Selects the cell to the right of the currently selected cell.
     */
-  def selectRightCell() {
+  def selectRightCell()
     delegate.selectRightCell()
-  }
 
   /**
     * Selects the cells in the range (minRow, minColumn) to (maxRow, maxColumn), inclusive.
@@ -143,7 +134,5 @@ class TableSelectionModel[T](
   def selectRange(minRow: Int,
                   minColumn: TableColumnBase[T, _],
                   maxRow: Int,
-                  maxColumn: TableColumnBase[T, _]) {
+                  maxColumn: TableColumnBase[T, _])
     delegate.selectRange(minRow, minColumn, maxRow, maxColumn)
-  }
-}

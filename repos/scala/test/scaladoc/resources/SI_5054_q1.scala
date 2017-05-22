@@ -1,4 +1,4 @@
-class SI_5054_q1 {
+class SI_5054_q1
 
   /**
     * A simple comment
@@ -7,4 +7,3 @@ class SI_5054_q1 {
     * @usecase def test(): Int
     */
   def test(implicit lost: Int): Int = lost
-}

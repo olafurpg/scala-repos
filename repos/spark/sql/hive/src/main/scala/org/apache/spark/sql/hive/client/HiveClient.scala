@@ -28,7 +28,7 @@ import org.apache.spark.sql.catalyst.expressions.Expression
   * internal and external classloaders for a given version of Hive and thus must expose only
   * shared classes.
   */
-private[hive] trait HiveClient {
+private[hive] trait HiveClient
 
   /** Returns the Hive Version of this client. */
   def version: HiveVersion
@@ -59,9 +59,8 @@ private[hive] trait HiveClient {
   def setCurrentDatabase(databaseName: String): Unit
 
   /** Returns the metadata for specified database, throwing an exception if it doesn't exist */
-  final def getDatabase(name: String): CatalogDatabase = {
+  final def getDatabase(name: String): CatalogDatabase =
     getDatabaseOption(name).getOrElse(throw new NoSuchDatabaseException(name))
-  }
 
   /** Returns the metadata for a given database, or None if it doesn't exist. */
   def getDatabaseOption(name: String): Option[CatalogDatabase]
@@ -70,10 +69,9 @@ private[hive] trait HiveClient {
   def listDatabases(pattern: String): Seq[String]
 
   /** Returns the specified table, or throws [[NoSuchTableException]]. */
-  final def getTable(dbName: String, tableName: String): CatalogTable = {
+  final def getTable(dbName: String, tableName: String): CatalogTable =
     getTableOption(dbName, tableName).getOrElse(
         throw new NoSuchTableException(dbName, tableName))
-  }
 
   /** Returns the metadata for the specified table or None if it doesn't exist. */
   def getTableOption(dbName: String, tableName: String): Option[CatalogTable]
@@ -154,19 +152,16 @@ private[hive] trait HiveClient {
   final def getPartition(
       dbName: String,
       tableName: String,
-      spec: ExternalCatalog.TablePartitionSpec): CatalogTablePartition = {
-    getPartitionOption(dbName, tableName, spec).getOrElse {
+      spec: ExternalCatalog.TablePartitionSpec): CatalogTablePartition =
+    getPartitionOption(dbName, tableName, spec).getOrElse
       throw new NoSuchPartitionException(dbName, tableName, spec)
-    }
-  }
 
   /** Returns the specified partition or None if it does not exist. */
   final def getPartitionOption(db: String,
                                table: String,
                                spec: ExternalCatalog.TablePartitionSpec)
-    : Option[CatalogTablePartition] = {
+    : Option[CatalogTablePartition] =
     getPartitionOption(getTable(db, table), spec)
-  }
 
   /** Returns the specified partition or None if it does not exist. */
   def getPartitionOption(
@@ -175,9 +170,8 @@ private[hive] trait HiveClient {
 
   /** Returns all partitions for the given table. */
   final def getAllPartitions(
-      db: String, table: String): Seq[CatalogTablePartition] = {
+      db: String, table: String): Seq[CatalogTablePartition] =
     getAllPartitions(getTable(db, table))
-  }
 
   /** Returns all partitions for the given table. */
   def getAllPartitions(table: CatalogTable): Seq[CatalogTablePartition]
@@ -226,10 +220,9 @@ private[hive] trait HiveClient {
   def alterFunction(db: String, func: CatalogFunction): Unit
 
   /** Return an existing function in the database, assuming it exists. */
-  final def getFunction(db: String, name: String): CatalogFunction = {
+  final def getFunction(db: String, name: String): CatalogFunction =
     getFunctionOption(db, name).getOrElse(
         throw new NoSuchFunctionException(db, name))
-  }
 
   /** Return an existing function in the database, or None if it doesn't exist. */
   def getFunctionOption(db: String, name: String): Option[CatalogFunction]
@@ -248,4 +241,3 @@ private[hive] trait HiveClient {
 
   /** Used for testing only.  Removes all metadata from this instance of Hive. */
   def reset(): Unit
-}

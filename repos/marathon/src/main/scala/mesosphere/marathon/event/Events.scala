@@ -14,22 +14,20 @@ import org.slf4j.LoggerFactory
 
 //scalastyle:off number.of.types
 
-trait EventSubscriber[C <: ScallopConf, M <: AbstractModule] {
+trait EventSubscriber[C <: ScallopConf, M <: AbstractModule]
   def configuration(): Class[C]
   def module(): Option[Class[M]]
-}
 
 //TODO(FL): Wire this up such that events are optional.
-trait EventConfiguration extends ScallopConf {
+trait EventConfiguration extends ScallopConf
 
   lazy val eventSubscriber = opt[String](
       "event_subscriber",
       descr = "The event subscription module to use. E.g. http_callback.",
       required = false,
       noshort = true)
-}
 
-class EventModule(conf: EventConfiguration) extends AbstractModule {
+class EventModule(conf: EventConfiguration) extends AbstractModule
 
   val log = LoggerFactory.getLogger(getClass.getName)
   def configure() {}
@@ -39,24 +37,20 @@ class EventModule(conf: EventConfiguration) extends AbstractModule {
   @Singleton
   @Inject
   def provideEventBus(system: ActorSystem): EventStream = system.eventStream
-}
 
-object EventModule {
+object EventModule
   final val busName = "events"
-}
 
 /** Local leadership events. They are not delivered via the event endpoints. */
 sealed trait LocalLeadershipEvent
 
-object LocalLeadershipEvent {
+object LocalLeadershipEvent
   case object ElectedAsLeader extends LocalLeadershipEvent
   case object Standby extends LocalLeadershipEvent
-}
 
-sealed trait MarathonEvent {
+sealed trait MarathonEvent
   val eventType: String
   val timestamp: String
-}
 
 // api
 
@@ -116,9 +110,8 @@ case class EventStreamDetached(remoteAddress: String,
 
 // health checks
 
-sealed trait MarathonHealthCheckEvent extends MarathonEvent {
+sealed trait MarathonHealthCheckEvent extends MarathonEvent
   def appId(): PathId
-}
 
 case class AddHealthCheck(appId: PathId,
                           version: Timestamp,

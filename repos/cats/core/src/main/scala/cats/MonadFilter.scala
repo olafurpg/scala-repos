@@ -10,7 +10,7 @@ import simulacrum.typeclass
   * used when pattern matching or using guards in for comprehensions.
   */
 @typeclass
-trait MonadFilter[F[_]] extends Monad[F] {
+trait MonadFilter[F[_]] extends Monad[F]
 
   def empty[A]: F[A]
 
@@ -19,4 +19,3 @@ trait MonadFilter[F[_]] extends Monad[F] {
 
   def filterM[A](fa: F[A])(f: A => F[Boolean]): F[A] =
     flatMap(fa)(a => flatMap(f(a))(b => if (b) pure(a) else empty[A]))
-}

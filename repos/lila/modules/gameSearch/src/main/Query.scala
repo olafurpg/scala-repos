@@ -24,7 +24,7 @@ case class Query(user1: Option[String] = None,
                  sorting: Sorting = Sorting.default,
                  analysed: Option[Boolean] = None,
                  whiteUser: Option[String] = None,
-                 blackUser: Option[String] = None) {
+                 blackUser: Option[String] = None)
 
   def nonEmpty =
     user1.nonEmpty || user2.nonEmpty || winner.nonEmpty ||
@@ -32,9 +32,8 @@ case class Query(user1: Option[String] = None,
     status.nonEmpty || turns.nonEmpty || averageRating.nonEmpty ||
     hasAi.nonEmpty || aiLevel.nonEmpty || rated.nonEmpty || date.nonEmpty ||
     duration.nonEmpty || clock.nonEmpty || analysed.nonEmpty
-}
 
-object Query {
+object Query
 
   import lila.common.Form._
   import play.api.libs.json._
@@ -44,7 +43,7 @@ object Query {
   private implicit val clockingJsonWriter = Json.writes[Clocking]
   implicit val jsonWriter = Json.writes[Query]
 
-  val durations = {
+  val durations =
     ((30, "30 seconds") :: options(List(60,
                                         60 * 2,
                                         60 * 3,
@@ -60,7 +59,6 @@ object Query {
     (60 * 60 * 24 * 7, "One week") :+ (60 * 60 * 24 * 7 * 2, "Two weeks") :+
     (60 * 60 * 24 * 30, "One month") :+ (60 * 60 * 24 * 30 * 3, "Three months") :+
     (60 * 60 * 24 * 30 * 6, "6 months") :+ (60 * 60 * 24 * 365, "One year")
-  }
 
   val clockInits =
     List(
@@ -90,35 +88,30 @@ object Query {
   val winnerColors = List(1 -> "White", 2 -> "Black", 3 -> "None")
 
   val perfs =
-    lila.rating.PerfType.nonPuzzle map { v =>
+    lila.rating.PerfType.nonPuzzle map  v =>
       v.id -> v.name
-    }
 
   val sources =
-    lila.game.Source.searchable map { v =>
+    lila.game.Source.searchable map  v =>
       v.id -> v.name.capitalize
-    }
 
   val modes =
-    Mode.all map { mode =>
+    Mode.all map  mode =>
       mode.id -> mode.name.capitalize
-    }
 
   val turns = options(
       (1 to 5) ++ (10 to 45 by 5) ++ (50 to 90 by 10) ++ (100 to 300 by 25),
       "%d move{s}")
 
   val averageRatings =
-    (RatingRange.min to RatingRange.max by 100).toList map { e =>
+    (RatingRange.min to RatingRange.max by 100).toList map  e =>
       e -> (e + " Rating")
-    }
 
   val hasAis = List(0 -> "Human opponent", 1 -> "Computer opponent")
 
   val aiLevels =
-    (1 to 8) map { l =>
+    (1 to 8) map  l =>
       l -> ("level " + l)
-    }
 
   val dates =
     List("0d" -> "Now") ++ options(List(1, 2, 6), "h", "%d hour{s} ago") ++ options(
@@ -128,11 +121,10 @@ object Query {
         1 to 6, "m", "%d month{s} ago") ++ options(
         1 to 5, "y", "%d year{s} ago")
 
-  val statuses = Status.finishedNotCheated.map {
+  val statuses = Status.finishedNotCheated.map
     case s if s.is(_.Timeout) => none
     case s if s.is(_.NoStart) => none
     case s if s.is(_.Outoftime) => Some(s.id -> "Clock Flag")
     case s if s.is(_.VariantEnd) => Some(s.id -> "Variant End")
     case s => Some(s.id -> s.toString)
-  }.flatten
-}
+  .flatten

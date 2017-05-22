@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import scala.reflect.internal.util.StringContextStripMarginOps
   def check(actual: Any, expected: Any) =
     if (actual != expected)
@@ -24,4 +24,3 @@ object Test extends App {
   check(sm""" ${" "} ||""", "   ||")
 
   check(sm"\n", raw"\n".stripMargin)
-}

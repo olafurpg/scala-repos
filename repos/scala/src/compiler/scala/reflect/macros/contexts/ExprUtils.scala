@@ -1,7 +1,7 @@
 package scala.reflect.macros
 package contexts
 
-trait ExprUtils { self: Context =>
+trait ExprUtils  self: Context =>
 
   import universe._
 
@@ -33,4 +33,3 @@ trait ExprUtils { self: Context =>
         TypeTag[String](definitions.StringClass.toTypeConstructor))
 
   def literal(x: Char) = Expr[Char](Literal(Constant(x)))(TypeTag.Char)
-}

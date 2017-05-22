@@ -20,19 +20,18 @@ case class MColumn(table: MQName,
                    isNullable: Option[Boolean],
                    scope: Option[MQName],
                    sourceDataType: Option[Int],
-                   isAutoInc: Option[Boolean]) {
+                   isAutoInc: Option[Boolean])
 
   def sqlTypeName = JdbcTypesComponent.typeNames.get(sqlType)
   def getColumnPrivileges = MColumnPrivilege.getColumnPrivileges(table, name)
-}
 
-object MColumn {
+object MColumn
   def getColumns(tablePattern: MQName, columnPattern: String) =
     ResultSetAction[MColumn](
         _.metaData.getColumns(tablePattern.catalog_?,
                               tablePattern.schema_?,
                               tablePattern.name,
-                              columnPattern)) { r =>
+                              columnPattern))  r =>
       MColumn(MQName.from(r),
               r.<<,
               r.<<,
@@ -40,11 +39,11 @@ object MColumn {
               r.<<,
               r.skip.<<,
               r.<<,
-              r.nextInt match {
+              r.nextInt match
                 case DatabaseMetaData.columnNoNulls => Some(false)
                 case DatabaseMetaData.columnNullable => Some(true)
                 case _ => None
-              },
+              ,
               r.<<,
               r.<<,
               r.skip.skip.<<,
@@ -53,5 +52,3 @@ object MColumn {
               if (r.hasMoreColumns) MQName.optionalFrom(r) else None,
               r.<<?,
               if (r.hasMoreColumns) DatabaseMeta.yesNoOpt(r) else None)
-    }
-}

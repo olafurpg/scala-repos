@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class QualifierSourceTest extends ResolveTestBase {
-  override def folderPath: String = {
+class QualifierSourceTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "qualifier/source/"
-  }
 
   def testChainLong() = doTest()
   def testChainDeep() = doTest()
@@ -17,4 +16,3 @@ class QualifierSourceTest extends ResolveTestBase {
 //  def testPackageObject = doTest
   //TODO packageobject
 //  def testPackageObjectAsValue = doTest
-}

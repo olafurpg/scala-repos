@@ -1,6 +1,6 @@
 import scala.reflect.runtime.universe._
 
-object Test extends App {
+object Test extends App
   val n = 1000
   val rng = new scala.util.Random()
   val tasks = List(
@@ -15,11 +15,9 @@ object Test extends App {
   val threads =
     (1 to n) map
     (i =>
-          new Thread(s"Reflector-$i") {
-            override def run(): Unit = {
+          new Thread(s"Reflector-$i")
+            override def run(): Unit =
               val result = perms(diceRolls(i - 1)).map(_ ())
               assert(result.sorted == List(false, false, true, true))
-            }
-        })
+        )
   threads foreach (_.start)
-}

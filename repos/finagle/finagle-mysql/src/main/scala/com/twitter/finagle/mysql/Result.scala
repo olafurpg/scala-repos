@@ -8,17 +8,16 @@ sealed trait Result
 /**
   * A decoder for Results contained in a single packet.
   */
-trait Decoder[T <: Result] extends (Packet => Try[T]) {
+trait Decoder[T <: Result] extends (Packet => Try[T])
   def apply(packet: Packet): Try[T] = Try(decode(packet))
   def decode(packet: Packet): T
-}
 
 /**
   * First result received from the server as part of the connection phase.
   * [[http://dev.mysql.com/doc/internals/en/connection-phase-packets.html]]
   */
-object HandshakeInit extends Decoder[HandshakeInit] {
-  def decode(packet: Packet) = {
+object HandshakeInit extends Decoder[HandshakeInit]
+  def decode(packet: Packet) =
     val br = BufferReader(packet.body)
     val protocol = br.readByte()
     val bytesVersion = br.readNullTerminatedBytes()
@@ -57,8 +56,6 @@ object HandshakeInit extends Decoder[HandshakeInit] {
         charset,
         status
     )
-  }
-}
 
 case class HandshakeInit(
     protocol: Byte,
@@ -76,8 +73,8 @@ case class HandshakeInit(
   * to indicate that a command has completed succesfully.
   * [[http://dev.mysql.com/doc/internals/en/generic-response-packets.html#packet-OK_Packet]]
   */
-object OK extends Decoder[OK] {
-  def decode(packet: Packet) = {
+object OK extends Decoder[OK]
+  def decode(packet: Packet) =
     val br = BufferReader(packet.body, offset = 1)
     OK(
         br.readLengthCodedBinary(),
@@ -86,8 +83,6 @@ object OK extends Decoder[OK] {
         br.readUnsignedShort(),
         new String(br.takeRest())
     )
-  }
-}
 
 case class OK(
     affectedRows: Long,
@@ -102,16 +97,14 @@ case class OK(
   * Represents the Error Packet received from the server and the data sent along with it.
   * [[http://dev.mysql.com/doc/internals/en/generic-response-packets.html#packet-ERR_Packet]]
   */
-object Error extends Decoder[Error] {
-  def decode(packet: Packet) = {
+object Error extends Decoder[Error]
+  def decode(packet: Packet) =
     // start reading after flag byte
     val br = BufferReader(packet.body, offset = 1)
     val code = br.readShort()
     val state = new String(br.take(6))
     val msg = new String(br.takeRest())
     Error(code, state, msg)
-  }
-}
 
 case class Error(code: Short, sqlState: String, message: String) extends Result
 
@@ -120,12 +113,10 @@ case class Error(code: Short, sqlState: String, message: String) extends Result
   * contains any warnings and the server status.
   * [[http://dev.mysql.com/doc/internals/en/generic-response-packets.html#packet-EOF_Packet]]
   */
-object EOF extends Decoder[EOF] {
-  def decode(packet: Packet) = {
+object EOF extends Decoder[EOF]
+  def decode(packet: Packet) =
     val br = BufferReader(packet.body, offset = 1)
     EOF(br.readShort(), br.readShort())
-  }
-}
 
 case class EOF(warnings: Short, serverStatus: Short) extends Result
 
@@ -135,8 +126,8 @@ case class EOF(warnings: Short, serverStatus: Short) extends Result
   * meta-data associated with a Row.
   * [[http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-Protocol::ColumnDefinition41]]
   */
-object Field extends Decoder[Field] {
-  def decode(packet: Packet): Field = {
+object Field extends Decoder[Field]
+  def decode(packet: Packet): Field =
     val bw = BufferReader(packet.body)
     val bytesCatalog = bw.readLengthCodedBytes()
     val bytesDb = bw.readLengthCodedBytes()
@@ -170,8 +161,6 @@ object Field extends Decoder[Field] {
         flags,
         decimals
     )
-  }
-}
 
 case class Field(
     catalog: String,
@@ -186,10 +175,9 @@ case class Field(
     flags: Short,
     decimals: Byte
 )
-    extends Result {
+    extends Result
   def id: String = if (name.isEmpty) origName else name
   override val toString = "Field(%s)".format(id)
-}
 
 /**
   * Meta data returned from the server in response to
@@ -197,8 +185,8 @@ case class Field(
   * COM_STMT_PREPARE.
   * [[http://dev.mysql.com/doc/internals/en/com-stmt-prepare-response.html#packet-COM_STMT_PREPARE_OK]]
   */
-object PrepareOK extends Decoder[PrepareOK] {
-  def decode(header: Packet) = {
+object PrepareOK extends Decoder[PrepareOK]
+  def decode(header: Packet) =
     val br = BufferReader(header.body, 1)
     val stmtId = br.readInt()
     val numCols = br.readUnsignedShort()
@@ -206,8 +194,6 @@ object PrepareOK extends Decoder[PrepareOK] {
     br.skip(1)
     val warningCount = br.readUnsignedShort()
     PrepareOK(stmtId, numCols, numParams, warningCount)
-  }
-}
 
 case class PrepareOK(
     id: Int,
@@ -233,7 +219,7 @@ object CloseStatementOK extends OK(0, 0, 0, 0, "Internal Close OK")
   * [[http://dev.mysql.com/doc/internals/en/com-query-response.html#packet-ProtocolText::Resultset]]
   * [[http://dev.mysql.com/doc/internals/en/binary-protocol-resultset.html]]
   */
-object ResultSet {
+object ResultSet
   def apply(isBinaryEncoded: Boolean)(
       header: Packet,
       fieldPackets: Seq[Packet],
@@ -242,7 +228,7 @@ object ResultSet {
     Try(decode(isBinaryEncoded)(header, fieldPackets, rowPackets))
 
   def decode(isBinaryEncoded: Boolean)(
-      header: Packet, fieldPackets: Seq[Packet], rowPackets: Seq[Packet]) = {
+      header: Packet, fieldPackets: Seq[Packet], rowPackets: Seq[Packet]) =
     val fields = fieldPackets.map(Field.decode(_)).toIndexedSeq
 
     // A name -> index map used to allow quick lookups for rows based on name.
@@ -254,15 +240,11 @@ object ResultSet {
       * a prepared statement, respectively.
       */
     val rows =
-      rowPackets map { p: Packet =>
+      rowPackets map  p: Packet =>
         if (!isBinaryEncoded) new StringEncodedRow(p.body, fields, indexMap)
         else new BinaryEncodedRow(p.body, fields, indexMap)
-      }
 
     ResultSet(fields, rows)
-  }
-}
 
-case class ResultSet(fields: Seq[Field], rows: Seq[Row]) extends Result {
+case class ResultSet(fields: Seq[Field], rows: Seq[Row]) extends Result
   override def toString = s"ResultSet(${fields.size}, ${rows.size})"
-}

@@ -10,7 +10,7 @@ import org.apache.commons.io.IOUtils
 
 import scala.annotation.tailrec
 
-object BasicHttpClient {
+object BasicHttpClient
 
   /**
     * Very basic HTTP client, for when we want to be very low level about our assertions.
@@ -26,55 +26,44 @@ object BasicHttpClient {
   def makeRequests(port: Int,
                    checkClosed: Boolean = false,
                    trickleFeed: Option[Long] = None)(
-      requests: BasicRequest*): Seq[BasicResponse] = {
+      requests: BasicRequest*): Seq[BasicResponse] =
     val client = new BasicHttpClient(port)
-    try {
+    try
       var requestNo = 0
-      val responses = requests.flatMap { request =>
+      val responses = requests.flatMap  request =>
         requestNo += 1
         client.sendRequest(
             request, requestNo.toString, trickleFeed = trickleFeed)
-      }
 
-      if (checkClosed) {
-        try {
+      if (checkClosed)
+        try
           val line = client.reader.readLine()
-          if (line != null) {
+          if (line != null)
             throw new RuntimeException(
                 "Unexpected data after responses received: " + line)
-          }
-        } catch {
+        catch
           case timeout: SocketTimeoutException => throw timeout
-        }
-      }
 
       responses
-    } finally {
+    finally
       client.close()
-    }
-  }
 
   def pipelineRequests(
-      port: Int, requests: BasicRequest*): Seq[BasicResponse] = {
+      port: Int, requests: BasicRequest*): Seq[BasicResponse] =
     val client = new BasicHttpClient(port)
 
-    try {
+    try
       var requestNo = 0
-      requests.foreach { request =>
+      requests.foreach  request =>
         requestNo += 1
         client.sendRequest(
             request, requestNo.toString, waitForResponses = false)
-      }
-      for (i <- 0 until requests.length) yield {
+      for (i <- 0 until requests.length) yield
         client.readResponse(requestNo.toString)
-      }
-    } finally {
+    finally
       client.close()
-    }
-  }
-}
 
-class BasicHttpClient(port: Int) {
+class BasicHttpClient(port: Int)
   val s = new Socket("localhost", port)
   s.setSoTimeout(5000)
   val out = new OutputStreamWriter(s.getOutputStream)
@@ -93,49 +82,40 @@ class BasicHttpClient(port: Int) {
   def sendRequest(request: BasicRequest,
                   requestDesc: String,
                   waitForResponses: Boolean = true,
-                  trickleFeed: Option[Long] = None): Seq[BasicResponse] = {
+                  trickleFeed: Option[Long] = None): Seq[BasicResponse] =
     out.write(s"${request.method} ${request.uri} ${request.version}\r\n")
     out.write("Host: localhost\r\n")
-    request.headers.foreach { header =>
+    request.headers.foreach  header =>
       out.write(s"${header._1}: ${header._2}\r\n")
-    }
     out.write("\r\n")
 
-    def writeBody() = {
-      if (request.body.length > 0) {
-        trickleFeed match {
+    def writeBody() =
+      if (request.body.length > 0)
+        trickleFeed match
           case Some(timeout) =>
-            request.body.grouped(8192).foreach { chunk =>
+            request.body.grouped(8192).foreach  chunk =>
               out.write(chunk)
               out.flush()
               Thread.sleep(timeout)
-            }
           case None =>
             out.write(request.body)
-        }
-      }
       out.flush()
-    }
 
-    if (waitForResponses) {
-      request.headers.get("Expect").filter(_ == "100-continue").map { _ =>
+    if (waitForResponses)
+      request.headers.get("Expect").filter(_ == "100-continue").map  _ =>
         out.flush()
         val response = readResponse(requestDesc + " continue")
-        if (response.status == 100) {
+        if (response.status == 100)
           writeBody()
           Seq(response, readResponse(requestDesc))
-        } else {
+        else
           Seq(response)
-        }
-      } getOrElse {
+      getOrElse
         writeBody()
         Seq(readResponse(requestDesc))
-      }
-    } else {
+    else
       writeBody()
       Nil
-    }
-  }
 
   /**
     * Read a response
@@ -143,105 +123,86 @@ class BasicHttpClient(port: Int) {
     * @param responseDesc Description of the response, for error reporting
     * @return The response
     */
-  def readResponse(responseDesc: String) = {
-    try {
+  def readResponse(responseDesc: String) =
+    try
       val statusLine = reader.readLine()
-      if (statusLine == null) {
+      if (statusLine == null)
         // The line can be null when the CI system doesn't respond in time.
         // so retry repeatedly by throwing IOException.
         throw new IOException(s"No response $responseDesc: EOF reached")
-      }
 
-      val (version, status, reasonPhrase) = statusLine.split(" ", 3) match {
+      val (version, status, reasonPhrase) = statusLine.split(" ", 3) match
         case Array(v, s, r) => (v, s.toInt, r)
         case Array(v, s) => (v, s.toInt, "")
         case _ =>
           throw new RuntimeException(
               "Invalid status line for response " + responseDesc + ": " +
               statusLine)
-      }
       // Read headers
-      def readHeaders: List[(String, String)] = {
+      def readHeaders: List[(String, String)] =
         val header = reader.readLine()
-        if (header.length == 0) {
+        if (header.length == 0)
           Nil
-        } else {
-          val parsed = header.split(":", 2) match {
+        else
+          val parsed = header.split(":", 2) match
             case Array(name, value) => (name.trim(), value.trim())
             case Array(name) => (name, "")
-          }
           parsed :: readHeaders
-        }
-      }
       val headers = readHeaders.toMap
 
-      def readCompletely(length: Int): String = {
-        if (length == 0) {
+      def readCompletely(length: Int): String =
+        if (length == 0)
           ""
-        } else {
+        else
           val buf = new Array[Char](length)
-          def readFromOffset(offset: Int): Unit = {
+          def readFromOffset(offset: Int): Unit =
             val read = reader.read(buf, offset, length - offset)
             if (read + offset < length) readFromOffset(read + offset) else ()
-          }
           readFromOffset(0)
           new String(buf)
-        }
-      }
 
       // Read body
       val body =
-        headers.get(TRANSFER_ENCODING).filter(_ == CHUNKED).map { _ =>
-          def readChunks: List[String] = {
+        headers.get(TRANSFER_ENCODING).filter(_ == CHUNKED).map  _ =>
+          def readChunks: List[String] =
             val chunkLength = Integer.parseInt(reader.readLine())
-            if (chunkLength == 0) {
+            if (chunkLength == 0)
               Nil
-            } else {
+            else
               val chunk = readCompletely(chunkLength)
               // Ignore newline after chunk
               reader.readLine()
               chunk :: readChunks
-            }
-          }
           (readChunks.toSeq, readHeaders.toMap)
-        } toRight {
-          headers.get(CONTENT_LENGTH).map { length =>
+        toRight
+          headers.get(CONTENT_LENGTH).map  length =>
             readCompletely(length.toInt)
-          } getOrElse {
+          getOrElse
             if (status != CONTINUE && status != NOT_MODIFIED &&
-                status != NO_CONTENT) {
+                status != NO_CONTENT)
               consumeRemaining(reader)
-            } else {
+            else
               ""
-            }
-          }
-        }
 
       BasicResponse(version, status, reasonPhrase, headers, body)
-    } catch {
+    catch
       case io: IOException =>
         throw io
       case e: Exception =>
         throw new RuntimeException(
             s"Exception while reading response $responseDesc ${e.getClass.getName}: ${e.getMessage}",
             e)
-    }
-  }
 
-  private def consumeRemaining(reader: BufferedReader): String = {
+  private def consumeRemaining(reader: BufferedReader): String =
     val writer = new StringWriter()
-    try {
+    try
       IOUtils.copy(reader, writer)
-    } catch {
+    catch
       case timeout: SocketTimeoutException => throw timeout
-    }
     writer.toString
-  }
 
-  def close() = {
+  def close() =
     s.close()
-  }
-}
 
 /**
   * A basic response

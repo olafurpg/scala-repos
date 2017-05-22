@@ -19,10 +19,10 @@ import org.apache.spark.SPARK_VERSION
 /**
   *  Machinery for the asynchronous initialization of the repl.
   */
-private[repl] trait SparkILoopInit { self: SparkILoop =>
+private[repl] trait SparkILoopInit  self: SparkILoop =>
 
   /** Print a welcome message */
-  def printWelcome() {
+  def printWelcome()
     echo("""Welcome to
       ____              __
      / __/__  ___ _____/ /__
@@ -36,11 +36,9 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
     echo(welcomeMsg)
     echo("Type in expressions to have them evaluated.")
     echo("Type :help for more information.")
-  }
 
-  protected def asyncMessage(msg: String) {
+  protected def asyncMessage(msg: String)
     if (isReplInfo || isReplPower) echoAndRefresh(msg)
-  }
 
   private val initLock = new java.util.concurrent.locks.ReentrantLock()
   private val initCompilerCondition =
@@ -49,10 +47,9 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
     initLock.newCondition() // signal the whole repl is initialized
   private val initStart = System.nanoTime
 
-  private def withLock[T](body: => T): T = {
+  private def withLock[T](body: => T): T =
     initLock.lock()
     try body finally initLock.unlock()
-  }
   // a condition used to ensure serial access to the compiler.
   @volatile private var initIsComplete = false
   @volatile private var initError: String = null
@@ -68,19 +65,17 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
 
   // Spins off a thread which awaits a single message once the interpreter
   // has been initialized.
-  protected def createAsyncListener() = {
-    io.spawn {
+  protected def createAsyncListener() =
+    io.spawn
       withLock(initCompilerCondition.await())
       asyncMessage("[info] compiler init time: " + elapsed() + " s.")
       postInitialization()
-    }
-  }
 
   // called from main repl loop
-  protected def awaitInitialized(): Boolean = {
+  protected def awaitInitialized(): Boolean =
     if (!initIsComplete)
       withLock { while (!initIsComplete) initLoopCondition.await() }
-    if (initError != null) {
+    if (initError != null)
       // scalastyle:off println
       println("""
         |Failed to initialize the REPL due to an unexpected error.
@@ -88,8 +83,7 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
         |%s.""".stripMargin.format(initError))
       // scalastyle:on println
       false
-    } else true
-  }
+    else true
   // private def warningsThunks = List(
   //   () => intp.bind("lastWarnings", "" + typeTag[List[(Position, String)]], intp.lastWarnings _),
   // )
@@ -103,26 +97,23 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
   //   warningsThunks
   // )
   // called once after init condition is signalled
-  protected def postInitialization() {
-    try {
+  protected def postInitialization()
+    try
       postInitThunks foreach (f => addThunk(f()))
       runThunks()
-    } catch {
+    catch
       case ex: Throwable =>
         initError = stackTraceString(ex)
         throw ex
-    } finally {
+    finally
       initIsComplete = true
 
-      if (isAsync) {
+      if (isAsync)
         asyncMessage("[info] total init time: " + elapsed() + " s.")
         withLock(initLoopCondition.signal())
-      }
-    }
-  }
 
-  def initializeSpark() {
-    intp.beQuietDuring {
+  def initializeSpark()
+    intp.beQuietDuring
       command("""
         @transient val sc = {
           val _sc = org.apache.spark.repl.Main.interp.createSparkContext()
@@ -142,23 +133,17 @@ private[repl] trait SparkILoopInit { self: SparkILoop =>
       command("import sqlContext.implicits._")
       command("import sqlContext.sql")
       command("import org.apache.spark.sql.functions._")
-    }
-  }
 
   // code to be executed only after the interpreter is initialized
   // and the lazy val `global` can be accessed without risk of deadlock.
   private var pendingThunks: List[() => Unit] = Nil
-  protected def addThunk(body: => Unit) = synchronized {
+  protected def addThunk(body: => Unit) = synchronized
     pendingThunks :+= (() => body)
-  }
-  protected def runThunks(): Unit = synchronized {
+  protected def runThunks(): Unit = synchronized
     if (pendingThunks.nonEmpty)
       logDebug("Clearing " + pendingThunks.size + " thunks.")
 
-    while (pendingThunks.nonEmpty) {
+    while (pendingThunks.nonEmpty)
       val thunk = pendingThunks.head
       pendingThunks = pendingThunks.tail
       thunk()
-    }
-  }
-}

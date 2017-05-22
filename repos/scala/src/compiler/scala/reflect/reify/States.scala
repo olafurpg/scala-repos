@@ -1,6 +1,6 @@
 package scala.reflect.reify
 
-trait States { self: Reifier =>
+trait States  self: Reifier =>
 
   import global._
 
@@ -23,29 +23,26 @@ trait States { self: Reifier =>
   // todo. rewrite the reifier so that we don't need mutable state anymore
   // to aid you with that I've already removed all the setters from the reifier
   // so all the places that involve mutations are forced to do that by explicitly mentioning `state`
-  class State {
+  class State
     var symtab = SymbolTable()
     var reifyTreeSymbols = false
     var reifyTreeTypes = false
     private var _reificationIsConcrete = true
     def reificationIsConcrete: Boolean = _reificationIsConcrete
-    def reificationIsConcrete_=(value: Boolean): Unit = {
+    def reificationIsConcrete_=(value: Boolean): Unit =
       _reificationIsConcrete = value
-      if (!value && concrete) {
-        current match {
+      if (!value && concrete)
+        current match
           case tpe: Type =>
             CannotReifyWeakType(s" having unresolved type parameter $tpe")
           case sym: Symbol =>
             CannotReifyWeakType(
                 s" referring to ${sym.kindString} ${sym.fullName} local to the reifee")
           case _ => CannotReifyWeakType("")
-        }
-      }
-    }
     var reifyStack = reifee :: Nil
     var localSymbols = Map[Symbol, Int]()
 
-    def backup: State = {
+    def backup: State =
       val backup = new State
       backup.symtab = this.symtab
       backup.reifyTreeSymbols = this.reifyTreeSymbols
@@ -54,15 +51,11 @@ trait States { self: Reifier =>
       backup.reifyStack = this.reifyStack
       backup.localSymbols = this.localSymbols
       backup
-    }
 
-    def restore(backup: State): Unit = {
+    def restore(backup: State): Unit =
       this.symtab = backup.symtab
       this.reifyTreeSymbols = backup.reifyTreeSymbols
       this.reifyTreeTypes = backup.reifyTreeTypes
       this._reificationIsConcrete = backup._reificationIsConcrete
       this.reifyStack = backup.reifyStack
       this.localSymbols = backup.localSymbols
-    }
-  }
-}

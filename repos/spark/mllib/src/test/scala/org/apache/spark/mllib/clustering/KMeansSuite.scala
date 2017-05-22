@@ -25,11 +25,11 @@ import org.apache.spark.mllib.util.{LocalClusterSparkContext, MLlibTestSparkCont
 import org.apache.spark.mllib.util.TestingUtils._
 import org.apache.spark.util.Utils
 
-class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
+class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext
 
   import org.apache.spark.mllib.clustering.KMeans.{K_MEANS_PARALLEL, RANDOM}
 
-  test("single cluster") {
+  test("single cluster")
     val data = sc.parallelize(
         Array(
             Vectors.dense(1.0, 2.0, 6.0),
@@ -67,9 +67,8 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
                          runs = 1,
                          initializationMode = K_MEANS_PARALLEL)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
-  }
 
-  test("no distinct points") {
+  test("no distinct points")
     val data = sc.parallelize(Array(Vectors.dense(1.0, 2.0, 3.0),
                                     Vectors.dense(1.0, 2.0, 3.0),
                                     Vectors.dense(1.0, 2.0, 3.0)),
@@ -79,9 +78,8 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Make sure code runs.
     var model = KMeans.train(data, k = 2, maxIterations = 1)
     assert(model.clusterCenters.size === 2)
-  }
 
-  test("more clusters than points") {
+  test("more clusters than points")
     val data = sc.parallelize(
         Array(Vectors.dense(1.0, 2.0, 3.0), Vectors.dense(1.0, 3.0, 4.0)),
         2)
@@ -89,14 +87,13 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     // Make sure code runs.
     var model = KMeans.train(data, k = 3, maxIterations = 1)
     assert(model.clusterCenters.size === 3)
-  }
 
-  test("deterministic initialization") {
+  test("deterministic initialization")
     // Create a large-ish set of points for clustering
     val points = List.tabulate(1000)(n => Vectors.dense(n, n))
     val rdd = sc.parallelize(points, 3)
 
-    for (initMode <- Seq(RANDOM, K_MEANS_PARALLEL)) {
+    for (initMode <- Seq(RANDOM, K_MEANS_PARALLEL))
       // Create three deterministic models and compare cluster means
       val model1 = KMeans.train(rdd,
                                 k = 10,
@@ -114,14 +111,11 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
                                 seed = 42)
       val centers2 = model2.clusterCenters
 
-      centers1.zip(centers2).foreach {
+      centers1.zip(centers2).foreach
         case (c1, c2) =>
           assert(c1 ~== c2 absTol 1E-14)
-      }
-    }
-  }
 
-  test("single cluster with big dataset") {
+  test("single cluster with big dataset")
     val smallData = Array(
         Vectors.dense(1.0, 2.0, 6.0),
         Vectors.dense(1.0, 3.0, 0.0),
@@ -160,12 +154,11 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
                          runs = 1,
                          initializationMode = K_MEANS_PARALLEL)
     assert(model.clusterCenters.head ~== center absTol 1E-5)
-  }
 
-  test("single cluster with sparse data") {
+  test("single cluster with sparse data")
 
     val n = 10000
-    val data = sc.parallelize((1 to 100).flatMap { i =>
+    val data = sc.parallelize((1 to 100).flatMap  i =>
       val x = i / 1000.0
       Array(
           Vectors.sparse(n, Seq((0, 1.0 + x), (1, 2.0), (2, 6.0))),
@@ -175,7 +168,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
           Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 + x))),
           Vectors.sparse(n, Seq((0, 1.0), (1, 4.0), (2, 6.0 - x)))
       )
-    }, 4)
+    , 4)
 
     data.persist()
 
@@ -211,21 +204,17 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     assert(model.clusterCenters.head ~== center absTol 1E-5)
 
     data.unpersist()
-  }
 
-  test("k-means|| initialization") {
+  test("k-means|| initialization")
 
     case class VectorWithCompare(x: Vector)
-        extends Ordered[VectorWithCompare] {
-      override def compare(that: VectorWithCompare): Int = {
+        extends Ordered[VectorWithCompare]
+      override def compare(that: VectorWithCompare): Int =
         if (this.x.toArray.foldLeft[Double](0.0)((acc, x) => acc + x * x) > that.x.toArray
-              .foldLeft[Double](0.0)((acc, x) => acc + x * x)) {
+              .foldLeft[Double](0.0)((acc, x) => acc + x * x))
           -1
-        } else {
+        else
           1
-        }
-      }
-    }
 
     val points = Seq(
         Vectors.dense(1.0, 2.0, 6.0),
@@ -263,9 +252,8 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
           .sortBy(VectorWithCompare(_))
           .zip(points.sortBy(VectorWithCompare(_)))
           .forall(x => x._1 ~== (x._2) absTol 1E-5))
-  }
 
-  test("two clusters") {
+  test("two clusters")
     val points = Seq(
         Vectors.dense(0.0, 0.0),
         Vectors.dense(0.0, 0.1),
@@ -276,7 +264,7 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     )
     val rdd = sc.parallelize(points, 3)
 
-    for (initMode <- Seq(RANDOM, K_MEANS_PARALLEL)) {
+    for (initMode <- Seq(RANDOM, K_MEANS_PARALLEL))
       // Two iterations are sufficient no matter where the initial centers are.
       val model =
         KMeans.train(rdd, k = 2, maxIterations = 2, runs = 1, initMode)
@@ -288,28 +276,23 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
       assert(predicts(3) === predicts(4))
       assert(predicts(3) === predicts(5))
       assert(predicts(0) != predicts(3))
-    }
-  }
 
-  test("model save/load") {
+  test("model save/load")
     val tempDir = Utils.createTempDir()
     val path = tempDir.toURI.toString
 
-    Array(true, false).foreach {
+    Array(true, false).foreach
       case selector =>
         val model = KMeansSuite.createModel(10, 3, selector)
         // Save model, load it back, and compare.
-        try {
+        try
           model.save(sc, path)
           val sameModel = KMeansModel.load(sc, path)
           KMeansSuite.checkEqual(model, sameModel)
-        } finally {
+        finally
           Utils.deleteRecursively(tempDir)
-        }
-    }
-  }
 
-  test("Initialize using given cluster centers") {
+  test("Initialize using given cluster centers")
     val points = Seq(
         Vectors.dense(0.0, 0.0),
         Vectors.dense(1.0, 0.0),
@@ -328,23 +311,19 @@ class KMeansSuite extends SparkFunSuite with MLlibTestSparkContext {
     // comparing the returned model and the initial model
     assert(returnModel.clusterCenters(0) === initialModel.clusterCenters(0))
     assert(returnModel.clusterCenters(1) === initialModel.clusterCenters(1))
-  }
-}
 
-object KMeansSuite extends SparkFunSuite {
-  def createModel(dim: Int, k: Int, isSparse: Boolean): KMeansModel = {
-    val singlePoint = isSparse match {
+object KMeansSuite extends SparkFunSuite
+  def createModel(dim: Int, k: Int, isSparse: Boolean): KMeansModel =
+    val singlePoint = isSparse match
       case true =>
         Vectors.sparse(dim, Array.empty[Int], Array.empty[Double])
       case _ =>
         Vectors.dense(Array.fill[Double](dim)(0.0))
-    }
     new KMeansModel(Array.fill[Vector](k)(singlePoint))
-  }
 
-  def checkEqual(a: KMeansModel, b: KMeansModel): Unit = {
+  def checkEqual(a: KMeansModel, b: KMeansModel): Unit =
     assert(a.k === b.k)
-    a.clusterCenters.zip(b.clusterCenters).foreach {
+    a.clusterCenters.zip(b.clusterCenters).foreach
       case (ca: SparseVector, cb: SparseVector) =>
         assert(ca === cb)
       case (ca: DenseVector, cb: DenseVector) =>
@@ -352,28 +331,21 @@ object KMeansSuite extends SparkFunSuite {
       case _ =>
         throw new AssertionError(
             "checkEqual failed since the two clusters were not identical.\n")
-    }
-  }
-}
 
-class KMeansClusterSuite extends SparkFunSuite with LocalClusterSparkContext {
+class KMeansClusterSuite extends SparkFunSuite with LocalClusterSparkContext
 
-  test("task size should be small in both training and prediction") {
+  test("task size should be small in both training and prediction")
     val m = 4
     val n = 200000
     val points = sc
       .parallelize(0 until m, 2)
-      .mapPartitionsWithIndex { (idx, iter) =>
+      .mapPartitionsWithIndex  (idx, iter) =>
         val random = new Random(idx)
         iter.map(i => Vectors.dense(Array.fill(n)(random.nextDouble)))
-      }
       .cache()
-    for (initMode <- Seq(KMeans.RANDOM, KMeans.K_MEANS_PARALLEL)) {
+    for (initMode <- Seq(KMeans.RANDOM, KMeans.K_MEANS_PARALLEL))
       // If we serialize data directly in the task closure, the size of the serialized task would be
       // greater than 1MB and hence Spark would throw an error.
       val model = KMeans.train(points, 2, 2, 1, initMode)
       val predictions = model.predict(points).collect()
       val cost = model.computeCost(points)
-    }
-  }
-}

@@ -25,9 +25,9 @@ import org.scalacheck.{Prop, Arbitrary}
 import breeze.math.Complex
 
 @RunWith(classOf[JUnitRunner])
-class NumericsTest extends FunSuite with Checkers with Matchers {
+class NumericsTest extends FunSuite with Checkers with Matchers
 
-  test("softmax") {
+  test("softmax")
     import math.{log => mlog}
     import breeze.linalg.softmax
     (softmax(mlog(5.0), mlog(2)) should be(mlog(7) +- 1e-10))
@@ -49,63 +49,55 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     (softmax(DenseVector(s)) should be(mlog(15) +- 1e-10))
     (softmax(DenseVector(s)(0 until s.length - 1)) should be(
             mlog(10) +- 1e-10))
-  }
 
-  test("logDiff") {
+  test("logDiff")
     import breeze.linalg.logDiff
     (logDiff(log(5), log(2)) should be(log(3) +- 1e-10))
     (logDiff(log(5), log(5)) should be(Double.NegativeInfinity))
 
     an[IllegalArgumentException] should be thrownBy logDiff(log(5), log(6))
-  }
 
   import Arbitrary._
 
-  implicit def ae(x: Double) = new {
+  implicit def ae(x: Double) = new
     def =~=(y: Double) = breeze.numerics.closeTo(x, y, 1E-6)
-  }
 
   // TODO 2.9 filter out Double.MaxValue.
-  test("softmax is approximately associative") {
+  test("softmax is approximately associative")
     check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+        Prop.forAll  (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       softmax(a, softmax(b, c)) =~= softmax(softmax(a, b), c)
-    })
+    )
     check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+        Prop.forAll  (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) ||
       softmax(a, softmax(b, c)) =~= softmax(Array(a, b, c))
-    })
-  }
+    )
 
-  test("sum distributes over softmax") {
+  test("sum distributes over softmax")
     check(
-        Prop.forAll { (a: Double, b: Double, c: Double) =>
+        Prop.forAll  (a: Double, b: Double, c: Double) =>
       Seq(a, b, c).exists(x => x > 1E300 || x < -1E300) || (a + softmax(b, c)) =~=
       (softmax(a + b, a + c))
-    })
-  }
+    )
 
-  test("exp(digamma(x)) ≈ x - .5, x >= 10") {
+  test("exp(digamma(x)) ≈ x - .5, x >= 10")
     check(
-        Prop.forAll { (a: Double) =>
+        Prop.forAll  (a: Double) =>
       a.abs < 10 || a.abs > Double.MaxValue / 2 ||
       exp(breeze.numerics.digamma(a.abs)) =~= (a.abs - .5)
-    })
-  }
+    )
 
-  test("lgamma") {
+  test("lgamma")
     import breeze.numerics.{lgamma => lg}
     lg(10) should be(12.8018274801 +- 1E-8)
-  }
 
-  test("lbeta") {
+  test("lbeta")
     assert(
         exp(breeze.numerics.lbeta(breeze.linalg.DenseVector(1.0, 2.0))) === 0.5)
-  }
 
-  test("incomplete gamma") {
+  test("incomplete gamma")
     import breeze.numerics.{lgamma => lg}
     import breeze.numerics.gammp
     lg(3.0, 4.0) should be(0.4212028764812177 +- 1E-8)
@@ -119,9 +111,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     gammp(3.0, 1.0) should be(0.08030139707139419 +- 1E-8)
     gammp(3.0, 4.0) should be(0.7618966944464557 +- 1E-8)
     gammp(3.0, 10.0) should be(0.9972306042844884 +- 1E-8)
-  }
 
-  test("erf") {
+  test("erf")
     import breeze.numerics.{erf, erfi}
     erf(3.0) should be(.9999779095030014 +- 1E-8)
     erf(-3.0) should be(-.9999779095030014 +- 1E-8)
@@ -129,9 +120,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     erfi(3.0) should be(1629.994622601567 +- 1E-4)
     erfi(-3.0) should be(-1629.994622601567 +- 1E-4)
     erf(1E-4) should be(0.00011283791708567767 +- 1E-8)
-  }
 
-  test("basic ufunc tests") {
+  test("basic ufunc tests")
     import breeze.numerics._
     exp(DenseVector(0.0))
     exp(DenseVector(0.0f))
@@ -139,9 +129,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     log(SparseVector(Complex.zero))
     log(SparseVector(0.0))
     exp(SparseVector(0.0f))
-  }
 
-  test("in place works for exp") {
+  test("in place works for exp")
     import breeze.numerics._
     val v = DenseVector.rand(20)
     val expv = exp(v)
@@ -157,18 +146,16 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     val svexp = exp(sv)
     exp.inPlace(sv)
     assert(sv === svexp)
-  }
 
-  test("isOdd/isEven") {
+  test("isOdd/isEven")
     assert(isOdd(1), "1 should be odd!")
     assert(isEven(0.0), "0.0 should be even!")
     assert(isEven(DenseVector(2.0f, 1.5f, -3.0f)) == DenseVector(true,
                                                                  false,
                                                                  false),
            "an array of floats")
-  }
 
-  test("sinc") {
+  test("sinc")
     val testThreshold = 1.0E-15
     assert(abs(sinc(1d) - 0.8414709848078965) < testThreshold)
     assert(abs(sinc(1f) - 0.8414709848078965) < testThreshold * 1.0E8)
@@ -180,9 +167,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
                                         0.09385522838839844,
                                         -0.18920062382698205,
                                         0.8414709848078965)) < testThreshold)
-  }
 
-  test("sincpi") {
+  test("sincpi")
     val testThreshold = 1.0E-15
     assert(abs(sincpi(1d) - 3.898171832519376E-17) < testThreshold)
     assert(abs(sincpi(1f) - 3.898171832519376E-17) < testThreshold * 1.0E8)
@@ -194,9 +180,8 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
                                           0.127323954473516,
                                           -3.898171832519376E-17,
                                           -0.212206590789194)) < testThreshold)
-  }
 
-  test("nextPower") {
+  test("nextPower")
     assert(nextExponent10(0.05d) == -1d)
     //assert( nextExponent10(0d) == Double.NegativeInfinity )
     assert(nextExponent10(15d) == 2d)
@@ -210,20 +195,16 @@ class NumericsTest extends FunSuite with Checkers with Matchers {
     assert(nextPower2(0.2d) == 0.25d)
     //assert( nextPower2(0d) == 1d )
     assert(nextPower2(15d) == 16d)
-  }
 
-  test("log") {
+  test("log")
     assert(log(2d, 4d) == 2d)
     assert(log(3d, 81d) == 4d)
-  }
 
-  test("pow") {
+  test("pow")
     assert(pow(2d, 4d) == 16)
     assert(pow.inPlace(DenseVector(2d, 3d), 4d) == DenseVector(16d, 81d))
-  }
 
 //  test("with sink") {
 //    assert( log.withSink(DenseVector(0.0))(DenseVector(4d)) == 2d )
 //
 //  }
-}

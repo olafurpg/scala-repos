@@ -24,7 +24,7 @@ import org.apache.zookeeper.data.Stat
 
 import scala.collection._
 
-object ReplicationUtils extends Logging {
+object ReplicationUtils extends Logging
 
   private val IsrChangeNotificationPrefix = "isr_change_"
 
@@ -33,7 +33,7 @@ object ReplicationUtils extends Logging {
                          partitionId: Int,
                          newLeaderAndIsr: LeaderAndIsr,
                          controllerEpoch: Int,
-                         zkVersion: Int): (Boolean, Int) = {
+                         zkVersion: Int): (Boolean, Int) =
     debug(
         "Updated ISR for partition [%s,%d] to %s".format(
             topic, partitionId, newLeaderAndIsr.isr.mkString(",")))
@@ -45,59 +45,52 @@ object ReplicationUtils extends Logging {
     Int) = zkUtils.conditionalUpdatePersistentPath(
         path, newLeaderData, zkVersion, Some(checkLeaderAndIsrZkData))
     updatePersistentPath
-  }
 
   def propagateIsrChanges(
-      zkUtils: ZkUtils, isrChangeSet: Set[TopicAndPartition]): Unit = {
+      zkUtils: ZkUtils, isrChangeSet: Set[TopicAndPartition]): Unit =
     val isrChangeNotificationPath: String = zkUtils
       .createSequentialPersistentPath(
         ZkUtils.IsrChangeNotificationPath + "/" + IsrChangeNotificationPrefix,
         generateIsrChangeJson(isrChangeSet))
     debug("Added " + isrChangeNotificationPath + " for " + isrChangeSet)
-  }
 
   def checkLeaderAndIsrZkData(
       zkUtils: ZkUtils,
       path: String,
-      expectedLeaderAndIsrInfo: String): (Boolean, Int) = {
-    try {
+      expectedLeaderAndIsrInfo: String): (Boolean, Int) =
+    try
       val writtenLeaderAndIsrInfo = zkUtils.readDataMaybeNull(path)
       val writtenLeaderOpt = writtenLeaderAndIsrInfo._1
       val writtenStat = writtenLeaderAndIsrInfo._2
       val expectedLeader = parseLeaderAndIsr(
           expectedLeaderAndIsrInfo, path, writtenStat)
-      writtenLeaderOpt match {
+      writtenLeaderOpt match
         case Some(writtenData) =>
           val writtenLeader = parseLeaderAndIsr(writtenData, path, writtenStat)
-          (expectedLeader, writtenLeader) match {
+          (expectedLeader, writtenLeader) match
             case (Some(expectedLeader), Some(writtenLeader)) =>
               if (expectedLeader == writtenLeader)
                 return (true, writtenStat.getVersion())
             case _ =>
-          }
         case None =>
-      }
-    } catch {
+    catch
       case e1: Exception =>
-    }
     (false, -1)
-  }
 
   def getLeaderIsrAndEpochForPartition(
       zkUtils: ZkUtils,
       topic: String,
-      partition: Int): Option[LeaderIsrAndControllerEpoch] = {
+      partition: Int): Option[LeaderIsrAndControllerEpoch] =
     val leaderAndIsrPath = getTopicPartitionLeaderAndIsrPath(topic, partition)
     val (leaderAndIsrOpt, stat) = zkUtils.readDataMaybeNull(leaderAndIsrPath)
     leaderAndIsrOpt.flatMap(leaderAndIsrStr =>
           parseLeaderAndIsr(leaderAndIsrStr, leaderAndIsrPath, stat))
-  }
 
   private def parseLeaderAndIsr(
       leaderAndIsrStr: String,
       path: String,
-      stat: Stat): Option[LeaderIsrAndControllerEpoch] = {
-    Json.parseFull(leaderAndIsrStr).flatMap { m =>
+      stat: Stat): Option[LeaderIsrAndControllerEpoch] =
+    Json.parseFull(leaderAndIsrStr).flatMap  m =>
       val leaderIsrAndEpochInfo = m.asInstanceOf[Map[String, Any]]
       val leader = leaderIsrAndEpochInfo.get("leader").get.asInstanceOf[Int]
       val epoch =
@@ -111,15 +104,11 @@ object ReplicationUtils extends Logging {
       Some(LeaderIsrAndControllerEpoch(
               LeaderAndIsr(leader, epoch, isr, zkPathVersion),
               controllerEpoch))
-    }
-  }
 
   private def generateIsrChangeJson(
-      isrChanges: Set[TopicAndPartition]): String = {
+      isrChanges: Set[TopicAndPartition]): String =
     val partitions = isrChanges
       .map(tp => Map("topic" -> tp.topic, "partition" -> tp.partition))
       .toArray
     Json.encode(Map("version" -> IsrChangeNotificationListener.version,
                     "partitions" -> partitions))
-  }
-}

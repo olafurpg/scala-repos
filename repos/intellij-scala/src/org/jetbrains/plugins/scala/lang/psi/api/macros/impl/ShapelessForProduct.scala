@@ -29,15 +29,15 @@ import org.jetbrains.plugins.scala.lang.psi.types._
   * @author Mikhail.Mutcianko
   *         date 22.12.14
   */
-object ShapelessForProduct extends ScalaMacroTypeable {
+object ShapelessForProduct extends ScalaMacroTypeable
 
   override def checkMacro(
-      macros: ScFunction, context: MacroContext): Option[ScType] = {
+      macros: ScFunction, context: MacroContext): Option[ScType] =
     if (!context.expectedType.isDefined) return None
     val manager = ScalaPsiManager.instance(context.place.getProject)
     val clazz = manager.getCachedClass(
         "shapeless.Generic", context.place.getResolveScope, ClassCategory.TYPE)
-    clazz match {
+    clazz match
       case c: ScTypeDefinition =>
         val tpt = c.typeParameters
         if (tpt.length == 0) return None
@@ -50,7 +50,7 @@ object ShapelessForProduct extends ScalaMacroTypeable {
             Set.empty,
             new ScUndefinedSubstitutor())
         if (!res) return None
-        undefSubst.getSubstitutor match {
+        undefSubst.getSubstitutor match
           case Some(subst) =>
             val productLikeType = subst.subst(undef)
             val parts =
@@ -65,17 +65,15 @@ object ShapelessForProduct extends ScalaMacroTypeable {
                                               context.place.getResolveScope,
                                               ClassCategory.TYPE)
             if (hnil == null) return None
-            val repr = parts.foldRight(ScDesignatorType(hnil): ScType) {
+            val repr = parts.foldRight(ScDesignatorType(hnil): ScType)
               case (part, resultType) =>
                 ScParameterizedType(
                     ScDesignatorType(coloncolon), Seq(part, resultType))
-            }
-            ScalaPsiUtil.getCompanionModule(c) match {
+            ScalaPsiUtil.getCompanionModule(c) match
               case Some(obj: ScObject) =>
-                val elem = obj.members.find {
+                val elem = obj.members.find
                   case a: ScTypeAlias if a.name == "Aux" => true
                   case _ => false
-                }
                 if (!elem.isDefined) return None
                 Some(
                     ScParameterizedType(
@@ -85,10 +83,5 @@ object ShapelessForProduct extends ScalaMacroTypeable {
                             superReference = false),
                         Seq(productLikeType, repr)))
               case _ => None
-            }
           case _ => None
-        }
       case _ => None
-    }
-  }
-}

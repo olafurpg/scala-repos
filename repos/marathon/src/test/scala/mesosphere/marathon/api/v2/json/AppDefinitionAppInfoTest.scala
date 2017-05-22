@@ -9,7 +9,7 @@ import play.api.libs.json.{Writes, JsObject, Json}
 import scala.collection.immutable.Seq
 import org.apache.mesos.{Protos => mesos}
 
-class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
+class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen
   import Formats._
 
   val app = AppDefinition(PathId("/test"), cmd = Some("sleep 123"))
@@ -25,7 +25,7 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
       Identifiable("deployment1")
   )
 
-  test("app with taskCounts") {
+  test("app with taskCounts")
     Given("an app with counts")
     val extended = AppInfo(app, maybeCounts = Some(counts))
 
@@ -38,9 +38,8 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
           "tasksUnhealthy" -> 1
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
-  }
 
-  test("app with deployments") {
+  test("app with deployments")
     Given("an app with deployments")
     val extended = AppInfo(app, maybeDeployments = Some(deployments))
 
@@ -50,9 +49,8 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
           "deployments" -> Seq(Json.obj("id" -> "deployment1"))
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
-  }
 
-  test("app with taskCounts + deployments (show that combinations work)") {
+  test("app with taskCounts + deployments (show that combinations work)")
     Given("an app with counts")
     val extended = AppInfo(
         app, maybeCounts = Some(counts), maybeDeployments = Some(deployments))
@@ -68,9 +66,8 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
           "deployments" -> Seq(Json.obj("id" -> "deployment1"))
       )
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
-  }
 
-  test("app with lastTaskFailure") {
+  test("app with lastTaskFailure")
     Given("an app with a lastTaskFailure")
     val lastTaskFailure = new TaskFailure(
         appId = PathId("/myapp"),
@@ -105,5 +102,3 @@ class AppDefinitionAppInfoTest extends MarathonSpec with GivenWhenThen {
        |""".stripMargin('|')).as[JsObject]
     val expectedJson = Json.toJson(app).as[JsObject] ++ lastTaskFailureJson
     JsonTestHelper.assertThatJsonOf(extended).correspondsToJsonOf(expectedJson)
-  }
-}

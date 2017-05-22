@@ -38,17 +38,14 @@ import java.util.WeakHashMap
   *
   * This uses JUL, but it should be obvious how to use other backends.
   */
-trait LogFacet extends ProductISOFacet {
-  trait LogOps extends ProductISOOps {
+trait LogFacet extends ProductISOFacet
+  trait LogOps extends ProductISOOps
     val logger: Logger
-  }
 
   val ops: LogOps
 
-  trait LogMethods { self: C =>
+  trait LogMethods  self: C =>
     protected def log: Logger = ops.logger
-  }
-}
 
 /**
   * A la carte facet that uses a `WeakHashMap` to cache instances
@@ -77,8 +74,8 @@ trait LogFacet extends ProductISOFacet {
   * reclaim the space, as the GC may decide that the `WeakReference`
   * container itself is worthy of collection.
   */
-trait CachedFacet extends ProductISOFacet {
-  trait CachedOps extends ProductISOOps {
+trait CachedFacet extends ProductISOFacet
+  trait CachedOps extends ProductISOOps
     // we use our own synchronization to avoid unnecessary object creation
     // in getOrElseUpdate style queries.
     private val cache = new WeakHashMap[C, WeakReference[C]]()
@@ -87,49 +84,39 @@ trait CachedFacet extends ProductISOFacet {
     // use this variant if you don't want auto-caching
     // and uncomment the method in CachedMethods
     //def apply(p: P): C = fromProduct(p)
-    def unapply(c: C): Option[P] = {
-      val found = uncache.synchronized {
+    def unapply(c: C): Option[P] =
+      val found = uncache.synchronized
         uncache.get(c)
-      }
       if (found != null) found.get
-      else {
+      else
         val extracted = Some(toProduct(c))
-        val found = uncache.synchronized {
+        val found = uncache.synchronized
           // this could potentially hit
           uncache.put(c, new WeakReference(extracted))
-        }
         if (found != null) found.get else extracted
-      }
-    }
-    def intern(c: C): C = cache.synchronized {
+    def intern(c: C): C = cache.synchronized
       val found = cache.get(c)
       if (found != null) found.get
-      else {
+      else
         cache.put(c, new WeakReference(c))
         c
-      }
-    }
     def alive(): Long = cache.synchronized { cache.size() }
     def aliveExtracted(): Long = uncache.synchronized { uncache.size() }
-  }
 
   val ops: CachedOps
 
-  trait CachedMethods { self: C =>
+  trait CachedMethods  self: C =>
     // def intern: C = ops.intern(self)
-  }
 
-  trait CachedCompanion {
+  trait CachedCompanion
     @nonGeneric def apply(elems: ops.P): C = ops.apply(elems)
     @nonGeneric def unapply(s: C): Option[ops.P] = ops.unapply(s)
     @nonGeneric def alive(): Long = ops.alive()
     @nonGeneric def aliveExtracted(): Long = ops.aliveExtracted()
-  }
-}
 
 trait CachedCaseClassDefns
     extends LogFacet with CachedFacet with ProductFacet
-    with PolymorphicEqualityFacet with CopyFacet with ToStringFacet {
+    with PolymorphicEqualityFacet with CopyFacet with ToStringFacet
 
   trait CaseClassOps
       extends LogOps with CachedOps with ProductOps with PolymorphicEqualityOps
@@ -139,9 +126,8 @@ trait CachedCaseClassDefns
 
   trait CaseClass
       extends LogMethods with CachedMethods with ProductMethods
-      with PolymorphicEqualityMethods with CopyMethods with ToStringMethods {
+      with PolymorphicEqualityMethods with CopyMethods with ToStringMethods
     self: C =>
-  }
 
   val ops: CaseClassOps
 
@@ -153,9 +139,9 @@ trait CachedCaseClassDefns
       tup: Tupler.Aux[Repr0, P0],
       pgen0: Generic.Aux[P0, Repr0],
       typ0: Typeable[C],
-      tag0: ClassTag[C]) = {
+      tag0: ClassTag[C]) =
     val fqn = tag0.runtimeClass.getName
-    new CaseClassOps {
+    new CaseClassOps
       type Repr = Repr0
       type LRepr = LRepr0
       type P = P0
@@ -167,25 +153,20 @@ trait CachedCaseClassDefns
       val logger = Logger.getLogger(fqn)
       val productPrefix = fqn.split("(\\.|\\$)").last
       val productArity = toInt()
-    }
-  }
-}
 
 /**
   * Demo of a Shapeless a la carte case class with interning.
   *
   * shapeless-examples/runMain shapeless.examples.ALaCacheDemo
   */
-object ALaCacheDemo extends App {
-  object FooDefns extends CachedCaseClassDefns {
+object ALaCacheDemo extends App
+  object FooDefns extends CachedCaseClassDefns
     type C = Foo
     val ops = Ops
     object Foo extends CaseClassCompanion
     // keep the constructor private so everybody has to go through .apply
-    class Foo private[FooDefns](val i: Int, val s: String) extends CaseClass {
+    class Foo private[FooDefns](val i: Int, val s: String) extends CaseClass
       def stuff = log.info("hello")
-    }
-  }
   import FooDefns._
 
   // Companion apply
@@ -251,4 +232,3 @@ object ALaCacheDemo extends App {
   // toString
   val fooStr = foo.toString
   assert("Foo(23,foo)" == fooStr)
-}

@@ -11,7 +11,7 @@ import sbt.internal.util.appmacro.ContextUtil
 import sbt.internal.util.complete.Parser
 
 /** Implementation detail.  The wrap methods temporarily hold inputs (as a Tree, at compile time) until a task or setting macro processes it. */
-object InputWrapper {
+object InputWrapper
   /* The names of the wrapper methods should be obscure.
 	* Wrapper checking is based solely on this name, so it must not conflict with a user method name.
 	* The user should never see this method because it is compile-time only and only used internally by the task macro system.*/
@@ -84,7 +84,7 @@ object InputWrapper {
     */
   def wrapImpl[T : c.WeakTypeTag, S <: AnyRef with Singleton](
       c: Context, s: S, wrapName: String)(ts: c.Expr[Any], pos: c.Position)(
-      implicit it: c.TypeTag[s.type]): c.Expr[T] = {
+      implicit it: c.TypeTag[s.type]): c.Expr[T] =
     import c.universe.{Apply => ApplyTree, _}
     import compat._
     val util = new ContextUtil[c.type](c)
@@ -105,10 +105,9 @@ object InputWrapper {
     //     if hit the untyped trees, before we could get to refchecks and the desired @compileTimeOnly warning.
     val typedTree = c.typeCheck(tree)
     c.Expr[T](typedTree)
-  }
 
   def valueMacroImpl[T : c.WeakTypeTag](c: Context): c.Expr[T] =
-    ContextUtil.selectMacroImpl[T](c) { (ts, pos) =>
+    ContextUtil.selectMacroImpl[T](c)  (ts, pos) =>
       val tpe = ts.tree.tpe
       if (tpe <:< c.weakTypeOf[Initialize[Task[T]]])
         InputWrapper.wrapInitTask[T](c)(ts, pos)
@@ -121,68 +120,56 @@ object InputWrapper {
       else if (tpe <:< c.weakTypeOf[Initialize[InputTask[T]]])
         InputWrapper.wrapInitInputTask[T](c)(ts, pos)
       else c.abort(pos, s"Internal sbt error. Unexpected type ${tpe.widen}")
-    }
   def taskValueMacroImpl[T : c.WeakTypeTag](c: Context): c.Expr[Task[T]] =
-    ContextUtil.selectMacroImpl[Task[T]](c) { (ts, pos) =>
+    ContextUtil.selectMacroImpl[Task[T]](c)  (ts, pos) =>
       val tpe = ts.tree.tpe
       if (tpe <:< c.weakTypeOf[Initialize[Task[T]]])
         InputWrapper.wrapInit[Task[T]](c)(ts, pos)
       else c.abort(pos, s"Internal sbt error. Unexpected type ${tpe.widen}")
-    }
 
   /** Translates <task: TaskKey[T]>.previous(format) to Previous.runtime(<task>)(format).value*/
   def previousMacroImpl[T : c.WeakTypeTag](c: Context)(
-      format: c.Expr[sbinary.Format[T]]): c.Expr[Option[T]] = {
+      format: c.Expr[sbinary.Format[T]]): c.Expr[Option[T]] =
     import c.universe._
-    c.macroApplication match {
+    c.macroApplication match
       case a @ Apply(Select(Apply(_, t :: Nil), tp), fmt) =>
-        if (t.tpe <:< c.weakTypeOf[TaskKey[T]]) {
+        if (t.tpe <:< c.weakTypeOf[TaskKey[T]])
           val tsTyped = c.Expr[TaskKey[T]](t)
-          val newTree = c.universe.reify {
+          val newTree = c.universe.reify
             Previous.runtime[T](tsTyped.splice)(format.splice)
-          }
           wrapPrevious[T](c)(newTree, a.pos)
-        } else
+        else
           c.abort(a.pos, s"Internal sbt error. Unexpected type ${t.tpe.widen}")
       case x => ContextUtil.unexpectedTree(x)
-    }
-  }
-}
 
-sealed abstract class MacroTaskValue[T] {
+sealed abstract class MacroTaskValue[T]
   @compileTimeOnly(
       "`taskValue` can only be used within a setting macro, such as :=, +=, ++=, or Def.setting.") def taskValue: Task[
       T] = macro InputWrapper.taskValueMacroImpl[T]
-}
-sealed abstract class MacroValue[T] {
+sealed abstract class MacroValue[T]
   @compileTimeOnly(
       "`value` can only be used within a task or setting macro, such as :=, +=, ++=, Def.task, or Def.setting.") def value: T = macro InputWrapper
     .valueMacroImpl[T]
-}
-sealed abstract class ParserInput[T] {
+sealed abstract class ParserInput[T]
   @compileTimeOnly(
       "`parsed` can only be used within an input task macro, such as := or Def.inputTask.") def parsed: T = macro ParserInput
     .parsedMacroImpl[T]
-}
-sealed abstract class InputEvaluated[T] {
+sealed abstract class InputEvaluated[T]
   @compileTimeOnly(
       "`evaluated` can only be used within an input task macro, such as := or Def.inputTask.") def evaluated: T = macro InputWrapper
     .valueMacroImpl[T]
-}
-sealed abstract class ParserInputTask[T] {
+sealed abstract class ParserInputTask[T]
   @compileTimeOnly(
       "`parsed` can only be used within an input task macro, such as := or Def.inputTask.") def parsed: Task[
       T] = macro ParserInput.parsedInputMacroImpl[T]
-}
-sealed abstract class MacroPrevious[T] {
+sealed abstract class MacroPrevious[T]
   @compileTimeOnly(
       "`previous` can only be used within a task macro, such as :=, +=, ++=, or Def.task.") def previous(
       implicit format: sbinary.Format[T]): Option[T] = macro InputWrapper
     .previousMacroImpl[T]
-}
 
 /** Implementation detail.  The wrap method temporarily holds the input parser (as a Tree, at compile time) until the input task macro processes it. */
-object ParserInput {
+object ParserInput
   /* The name of the wrapper method should be obscure.
 	* Wrapper checking is based solely on this name, so it must not conflict with a user method name.
 	* The user should never see this method because it is compile-time only and only used internally by the task macros.*/
@@ -215,39 +202,36 @@ object ParserInput {
     c.universe.reify(t.splice.parser)
 
   def parsedInputMacroImpl[T : c.WeakTypeTag](c: Context): c.Expr[Task[T]] =
-    ContextUtil.selectMacroImpl[Task[T]](c) { (p, pos) =>
+    ContextUtil.selectMacroImpl[Task[T]](c)  (p, pos) =>
       import c.universe.reify
       val tpe = p.tree.tpe
-      if (tpe <:< c.weakTypeOf[InputTask[T]]) {
+      if (tpe <:< c.weakTypeOf[InputTask[T]])
         val e = c.Expr[InputTask[T]](p.tree)
         wrap[Task[T]](c)(inputParser(c)(e), pos)
-      } else if (tpe <:< c.weakTypeOf[Initialize[InputTask[T]]]) {
+      else if (tpe <:< c.weakTypeOf[Initialize[InputTask[T]]])
         val e = c.Expr[Initialize[InputTask[T]]](p.tree)
         wrapInit[Task[T]](c)(reify { Def.toIParser(e.splice) }, pos)
-      } else
+      else
         c.abort(
             pos,
             s"Internal sbt error. Unexpected type ${tpe.normalize} in parsedInputMacroImpl.")
-    }
 
   /** Implements `Parser[T].parsed` by wrapping the Parser with the ParserInput wrapper.*/
   def parsedMacroImpl[T : c.WeakTypeTag](c: Context): c.Expr[T] =
-    ContextUtil.selectMacroImpl[T](c) { (p, pos) =>
+    ContextUtil.selectMacroImpl[T](c)  (p, pos) =>
       import c.universe.reify
       val tpe = p.tree.tpe
-      if (tpe <:< c.weakTypeOf[Parser[T]]) {
+      if (tpe <:< c.weakTypeOf[Parser[T]])
         val e = c.Expr[Parser[T]](p.tree)
         wrap[T](c)(reify { Def.toSParser(e.splice) }, pos)
-      } else if (tpe <:< c.weakTypeOf[State => Parser[T]]) wrap[T](c)(p, pos)
-      else if (tpe <:< c.weakTypeOf[Initialize[Parser[T]]]) {
+      else if (tpe <:< c.weakTypeOf[State => Parser[T]]) wrap[T](c)(p, pos)
+      else if (tpe <:< c.weakTypeOf[Initialize[Parser[T]]])
         val e = c.Expr[Initialize[Parser[T]]](p.tree)
         val es = reify { Def.toISParser(e.splice) }
         wrapInit[T](c)(es, pos)
-      } else if (tpe <:< c.weakTypeOf[Initialize[State => Parser[T]]])
+      else if (tpe <:< c.weakTypeOf[Initialize[State => Parser[T]]])
         wrapInit[T](c)(p, pos)
       else
         c.abort(
             pos,
             s"Internal sbt error. Unexpected type ${tpe.normalize} in parsedMacroImpl")
-    }
-}

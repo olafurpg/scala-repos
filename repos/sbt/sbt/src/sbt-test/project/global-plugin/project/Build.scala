@@ -1,5 +1,4 @@
 import sbt._
 
-object Test {
+object Test
   assert(test.Global.x == 3);
-}

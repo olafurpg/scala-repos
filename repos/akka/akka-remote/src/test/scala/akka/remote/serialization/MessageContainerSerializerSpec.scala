@@ -11,18 +11,17 @@ import akka.actor.SelectParent
 import akka.actor.SelectChildPattern
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
-class MessageContainerSerializerSpec extends AkkaSpec {
+class MessageContainerSerializerSpec extends AkkaSpec
 
   val ser = SerializationExtension(system)
 
-  "DaemonMsgCreateSerializer" must {
+  "DaemonMsgCreateSerializer" must
 
-    "resolve serializer for ActorSelectionMessage" in {
+    "resolve serializer for ActorSelectionMessage" in
       ser.serializerFor(classOf[ActorSelectionMessage]).getClass should ===(
           classOf[MessageContainerSerializer])
-    }
 
-    "serialize and de-serialize ActorSelectionMessage" in {
+    "serialize and de-serialize ActorSelectionMessage" in
       verifySerialization(
           ActorSelectionMessage("hello",
                                 Vector(SelectChildName("user"),
@@ -32,10 +31,6 @@ class MessageContainerSerializerSpec extends AkkaSpec {
                                        SelectChildPattern("*"),
                                        SelectChildName("c")),
                                 wildcardFanOut = true))
-    }
 
-    def verifySerialization(msg: AnyRef): Unit = {
+    def verifySerialization(msg: AnyRef): Unit =
       ser.deserialize(ser.serialize(msg).get, msg.getClass).get should ===(msg)
-    }
-  }
-}

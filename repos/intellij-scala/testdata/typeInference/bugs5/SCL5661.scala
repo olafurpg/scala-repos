@@ -1,4 +1,4 @@
-object SCL5661 {
+object SCL5661
 
   val y: String = "text"
 
@@ -7,5 +7,4 @@ object SCL5661 {
 
   /*start*/
   failfunc(Map(y -> 1)) /*end*/
-}
 //Int

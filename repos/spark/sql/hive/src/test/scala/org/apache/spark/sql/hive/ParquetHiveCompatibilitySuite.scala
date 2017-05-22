@@ -27,7 +27,7 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 import org.apache.spark.sql.internal.SQLConf
 
 class ParquetHiveCompatibilitySuite
-    extends ParquetCompatibilityTest with TestHiveSingleton {
+    extends ParquetCompatibilityTest with TestHiveSingleton
 
   /**
     * Set the staging directory (and hence path to ignore Parquet files under)
@@ -35,31 +35,29 @@ class ParquetHiveCompatibilitySuite
     */
   private val stagingDir = new HiveConf().getVar(HiveConf.ConfVars.STAGINGDIR)
 
-  override protected def logParquetSchema(path: String): Unit = {
-    val schema = readParquetSchema(path, { path =>
+  override protected def logParquetSchema(path: String): Unit =
+    val schema = readParquetSchema(path,  path =>
       !path.getName.startsWith("_") && !path.getName.startsWith(stagingDir)
-    })
+    )
 
     logInfo(s"""Schema of the Parquet file written by parquet-avro:
          |$schema
        """.stripMargin)
-  }
 
   private def testParquetHiveCompatibility(
-      row: Row, hiveTypes: String*): Unit = {
-    withTable("parquet_compat") {
-      withTempPath { dir =>
+      row: Row, hiveTypes: String*): Unit =
+    withTable("parquet_compat")
+      withTempPath  dir =>
         val path = dir.getCanonicalPath
 
         // Hive columns are always nullable, so here we append a all-null row.
         val rows = row :: Row(Seq.fill(row.length)(null): _*) :: Nil
 
         // Don't convert Hive metastore Parquet tables to let Hive write those Parquet files.
-        withSQLConf(HiveContext.CONVERT_METASTORE_PARQUET.key -> "false") {
-          withTempTable("data") {
-            val fields = hiveTypes.zipWithIndex.map {
+        withSQLConf(HiveContext.CONVERT_METASTORE_PARQUET.key -> "false")
+          withTempTable("data")
+            val fields = hiveTypes.zipWithIndex.map
               case (typ, index) => s"  col_$index $typ"
-            }
 
             val ddl = s"""CREATE TABLE parquet_compat(
                  |${fields.mkString(",\n")}
@@ -81,21 +79,15 @@ class ParquetHiveCompatibilitySuite
               .registerTempTable("data")
             sqlContext.sql(
                 "INSERT INTO TABLE parquet_compat SELECT * FROM data")
-          }
-        }
 
         logParquetSchema(path)
 
         // Unfortunately parquet-hive doesn't add `UTF8` annotation to BINARY when writing strings.
         // Have to assume all BINARY values are strings here.
-        withSQLConf(SQLConf.PARQUET_BINARY_AS_STRING.key -> "true") {
+        withSQLConf(SQLConf.PARQUET_BINARY_AS_STRING.key -> "true")
           checkAnswer(sqlContext.read.parquet(path), rows)
-        }
-      }
-    }
-  }
 
-  test("simple primitives") {
+  test("simple primitives")
     testParquetHiveCompatibility(
         Row(true, 1.toByte, 2.toShort, 3, 4.toLong, 5.1f, 6.1d, "foo"),
         "BOOLEAN",
@@ -106,14 +98,12 @@ class ParquetHiveCompatibilitySuite
         "FLOAT",
         "DOUBLE",
         "STRING")
-  }
 
-  test("SPARK-10177 timestamp") {
+  test("SPARK-10177 timestamp")
     testParquetHiveCompatibility(
         Row(Timestamp.valueOf("2015-08-24 00:31:00")), "TIMESTAMP")
-  }
 
-  test("array") {
+  test("array")
     testParquetHiveCompatibility(
         Row(Seq[Integer](1: Integer, null, 2: Integer, null),
             Seq[String]("foo", null, "bar", null),
@@ -122,24 +112,19 @@ class ParquetHiveCompatibilitySuite
         "ARRAY<INT>",
         "ARRAY<STRING>",
         "ARRAY<ARRAY<INT>>")
-  }
 
-  test("map") {
+  test("map")
     testParquetHiveCompatibility(
         Row(Map[Integer, String]((1: Integer) -> "foo", (2: Integer) -> null)),
         "MAP<INT, STRING>")
-  }
 
   // HIVE-11625: Parquet map entries with null keys are dropped by Hive
-  ignore("map entries with null keys") {
+  ignore("map entries with null keys")
     testParquetHiveCompatibility(
         Row(Map[Integer, String](null.asInstanceOf[Integer] -> "bar",
                                  null.asInstanceOf[Integer] -> null)),
         "MAP<INT, STRING>")
-  }
 
-  test("struct") {
+  test("struct")
     testParquetHiveCompatibility(Row(Row(1, Seq("foo", "bar", null))),
                                  "STRUCT<f0: INT, f1: ARRAY<STRING>>")
-  }
-}

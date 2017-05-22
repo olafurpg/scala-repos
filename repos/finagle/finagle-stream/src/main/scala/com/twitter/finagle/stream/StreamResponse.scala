@@ -3,7 +3,7 @@ package com.twitter.finagle.stream
 import com.twitter.concurrent.Offer
 import com.twitter.io.Buf
 
-trait StreamResponse { self =>
+trait StreamResponse  self =>
 
   /**
     * This represents the actual HTTP reply (response headers) for this
@@ -27,19 +27,16 @@ trait StreamResponse { self =>
     * abort further processing of the response.
     */
   def release(): Unit
-}
 
-object StreamResponse {
+object StreamResponse
 
   /**
     * HTTP status code.
     */
-  case class Status(code: Int) {
+  case class Status(code: Int)
     require(100 <= code && code <= 505)
-  }
 
   /**
     * Represents structural parts of the HTTP response.
     */
   case class Info(version: Version, status: Status, headers: Seq[Header])
-}

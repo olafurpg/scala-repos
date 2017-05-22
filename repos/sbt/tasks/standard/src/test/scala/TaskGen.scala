@@ -6,7 +6,7 @@ package sbt
 import org.scalacheck._
 import Gen.choose
 
-object TaskGen extends std.TaskExtra {
+object TaskGen extends std.TaskExtra
   // upper bounds to make the tests finish in reasonable time
   val MaxTasks = 100
   val MaxWorkers = 29
@@ -18,7 +18,7 @@ object TaskGen extends std.TaskExtra {
   val TaskListGen =
     MaxTasksGen.flatMap(size => Gen.listOfN(size, Arbitrary.arbInt.arbitrary))
 
-  def run[T](root: Task[T], checkCycles: Boolean, maxWorkers: Int): Result[T] = {
+  def run[T](root: Task[T], checkCycles: Boolean, maxWorkers: Int): Result[T] =
     val (service, shutdown) = CompletionService[Task[_], Completed](maxWorkers)
     val dummies = std.Transform.DummyTaskMap(Nil)
     val x =
@@ -26,10 +26,7 @@ object TaskGen extends std.TaskExtra {
                         Execute.noTriggers,
                         ExecuteProgress.empty[Task])(std.Transform(dummies))
     try { x.run(root)(service) } finally { shutdown() }
-  }
   def tryRun[T](root: Task[T], checkCycles: Boolean, maxWorkers: Int): T =
-    run(root, checkCycles, maxWorkers) match {
+    run(root, checkCycles, maxWorkers) match
       case Value(v) => v
       case Inc(i) => throw i
-    }
-}

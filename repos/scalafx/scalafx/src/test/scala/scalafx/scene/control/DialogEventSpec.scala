@@ -42,10 +42,9 @@ import scalafx.testutil.SimpleSFXDelegateSpec
 @RunWith(classOf[JUnitRunner])
 class DialogEventSpec
     extends SimpleSFXDelegateSpec[jfxsc.DialogEvent, DialogEvent](
-        classOf[jfxsc.DialogEvent], classOf[DialogEvent]) {
+        classOf[jfxsc.DialogEvent], classOf[DialogEvent])
 
   override protected def getScalaClassInstance =
     new DialogEvent(getJavaClassInstance)
   override protected def getJavaClassInstance =
     new jfxsc.DialogEvent(null, jfxsc.DialogEvent.ANY)
-}

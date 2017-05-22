@@ -13,10 +13,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.{ScBlockExpr, ScWhileStmt}
   * @since 1/30/13
   */
 @SuppressWarnings(Array("HardCodedStringLiteral"))
-class ScalaWhileConditionFixer extends ScalaFixer {
+class ScalaWhileConditionFixer extends ScalaFixer
   def apply(editor: Editor,
             processor: ScalaSmartEnterProcessor,
-            psiElement: PsiElement): OperationPerformed = {
+            psiElement: PsiElement): OperationPerformed =
     val whileStatement =
       PsiTreeUtil.getParentOfType(psiElement, classOf[ScWhileStmt], false)
     if (whileStatement == null) return NoOperation
@@ -25,7 +25,7 @@ class ScalaWhileConditionFixer extends ScalaFixer {
     val leftParenthesis = whileStatement.getLeftParenthesis.orNull
     val rightParenthesis = whileStatement.getRightParenthesis.orNull
 
-    whileStatement.condition match {
+    whileStatement.condition match
       case None
           if leftParenthesis != null &&
           !leftParenthesis.getNextSibling.isInstanceOf[PsiErrorElement] &&
@@ -53,17 +53,13 @@ class ScalaWhileConditionFixer extends ScalaFixer {
         WithReformat(1)
       case Some(cond)
           if rightParenthesis != null && whileStatement.body.isDefined =>
-        whileStatement.body match {
+        whileStatement.body match
           case Some(block: ScBlockExpr) =>
             return placeInWholeBlock(block, editor)
           case Some(expr) => moveToEnd(editor, expr)
           case _ =>
-        }
         WithReformat(0)
       case Some(cond) if rightParenthesis == null =>
         doc.insertString(cond.getTextRange.getEndOffset, ")")
         WithReformat(0)
       case _ => NoOperation
-    }
-  }
-}

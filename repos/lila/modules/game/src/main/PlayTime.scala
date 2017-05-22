@@ -9,14 +9,14 @@ import tube.gameTube
 import play.api.libs.iteratee.Iteratee
 import reactivemongo.bson._
 
-object PlayTime {
+object PlayTime
 
   private val moveTimeField = Game.BSONFields.moveTimes
   private val tvField = Game.BSONFields.tvAt
 
-  def apply(user: User): Fu[User.PlayTime] = user.playTime match {
+  def apply(user: User): Fu[User.PlayTime] = user.playTime match
     case Some(pt) => fuccess(pt)
-    case None => {
+    case None =>
         gameTube.coll
           .find(BSONDocument(
                   Game.BSONFields.playerUids -> user.id,
@@ -29,15 +29,13 @@ object PlayTime {
               ))
           .cursor[BSONDocument]()
           .enumerate() |>>>
-        (Iteratee.fold(User.PlayTime(0, 0)) {
+        (Iteratee.fold(User.PlayTime(0, 0))
               case (pt, doc) =>
                 val t =
-                  doc.getAs[ByteArray](moveTimeField) ?? { times =>
+                  doc.getAs[ByteArray](moveTimeField) ??  times =>
                     BinaryFormat.moveTime.read(times).sum
-                  } / 10
+                  / 10
                 val isTv = doc.get(tvField).isDefined
                 User.PlayTime(pt.total + t, pt.tv + isTv.fold(t, 0))
-            })
-      }.addEffect { UserRepo.setPlayTime(user, _) }
-  }
-}
+            )
+      .addEffect { UserRepo.setPlayTime(user, _) }

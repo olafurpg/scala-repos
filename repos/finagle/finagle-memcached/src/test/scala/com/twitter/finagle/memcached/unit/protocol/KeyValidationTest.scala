@@ -9,25 +9,23 @@ import com.twitter.finagle.memcached.protocol.KeyValidation
 import com.twitter.io.{Buf, Charsets}
 
 @RunWith(classOf[JUnitRunner])
-class KeyValidationTest extends FunSuite {
+class KeyValidationTest extends FunSuite
 
   private class BasicKeyValidation(
       override val keys: Seq[Buf]
   )
       extends KeyValidation
 
-  test("reject invalid key that is too long") {
+  test("reject invalid key that is too long")
     val length = 251
     val key = "x" * length
 
-    val x = intercept[IllegalArgumentException] {
+    val x = intercept[IllegalArgumentException]
       new BasicKeyValidation(Seq(Buf.Utf8(key)))
-    }
     assert(x.getMessage.contains("key cannot be longer than"))
     assert(x.getMessage.contains("(" + length + ")"))
-  }
 
-  test("reject invalid key with whitespace or control chars") {
+  test("reject invalid key with whitespace or control chars")
     val bads =
       Seq(
           "hi withwhitespace",
@@ -36,12 +34,8 @@ class KeyValidationTest extends FunSuite {
           "andheres\nanewline"
       ) map { Buf.Utf8(_) }
 
-    bads foreach { bad =>
-      val x = intercept[IllegalArgumentException] {
+    bads foreach  bad =>
+      val x = intercept[IllegalArgumentException]
         new BasicKeyValidation(Seq(bad))
-      }
       assert(x.getMessage.contains(
               "key cannot have whitespace or control characters"))
-    }
-  }
-}

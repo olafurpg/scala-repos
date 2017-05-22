@@ -5,7 +5,7 @@ import org.joda.time.DateTime
 import chess.format.FEN
 import chess.variant.Variant
 
-sealed trait Work {
+sealed trait Work
   def _id: Work.Id
   def game: Work.Game
   def tries: Int
@@ -23,35 +23,31 @@ sealed trait Work {
   def nonAcquired = !isAcquired
 
   def acquiredBefore(date: DateTime) = acquiredAt.??(_ isBefore date)
-}
 
-object Work {
+object Work
 
   case class Id(value: String) extends AnyVal with StringValue
 
-  case class Acquired(clientKey: Client.Key, date: DateTime) {
+  case class Acquired(clientKey: Client.Key, date: DateTime)
 
     def ageInMillis = nowMillis - date.getMillis
 
     override def toString = s"by $clientKey at $date"
-  }
 
   case class Game(id: String,
                   initialFen: Option[FEN],
                   variant: Variant,
-                  moves: String) {
+                  moves: String)
 
     def moveList = moves.split(' ').toList
-  }
 
   case class Sender(userId: Option[String],
                     ip: Option[String],
                     mod: Boolean,
-                    system: Boolean) {
+                    system: Boolean)
 
     override def toString =
       if (system) "lichess" else userId orElse ip getOrElse "unknown"
-  }
 
   case class Move(_id: Work.Id, // random
                   game: Game,
@@ -60,7 +56,7 @@ object Work {
                   tries: Int,
                   acquired: Option[Acquired],
                   createdAt: DateTime)
-      extends Work {
+      extends Work
 
     def skill = Client.Skill.Move
 
@@ -79,7 +75,6 @@ object Work {
 
     override def toString =
       s"id:$id game:${game.id} level:$level tries:$tries currentFen:$currentFen acquired:$acquired"
-  }
 
   case class Analysis(_id: Work.Id, // random
                       sender: Sender,
@@ -89,7 +84,7 @@ object Work {
                       tries: Int,
                       acquired: Option[Acquired],
                       createdAt: DateTime)
-      extends Work {
+      extends Work
 
     def skill = Client.Skill.Analysis
 
@@ -107,7 +102,5 @@ object Work {
 
     override def toString =
       s"id:$id game:${game.id} tries:$tries requestedBy:$sender acquired:$acquired"
-  }
 
   def makeId = Id(scala.util.Random.alphanumeric take 8 mkString)
-}

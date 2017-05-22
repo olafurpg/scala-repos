@@ -18,14 +18,14 @@ case class Group(id: PathId,
                  groups: Set[Group] = defaultGroups,
                  dependencies: Set[PathId] = defaultDependencies,
                  version: Timestamp = defaultVersion)
-    extends MarathonState[GroupDefinition, Group] with IGroup {
+    extends MarathonState[GroupDefinition, Group] with IGroup
 
   override def mergeFromProto(msg: GroupDefinition): Group =
     Group.fromProto(msg)
   override def mergeFromProto(bytes: Array[Byte]): Group =
     Group.fromProto(GroupDefinition.parseFrom(bytes))
 
-  override def toProto: GroupDefinition = {
+  override def toProto: GroupDefinition =
     GroupDefinition.newBuilder
       .setId(id.toString)
       .setVersion(version.toString)
@@ -33,86 +33,70 @@ case class Group(id: PathId,
       .addAllGroups(groups.map(_.toProto))
       .addAllDependencies(dependencies.map(_.toString))
       .build()
-  }
 
-  def findGroup(fn: Group => Boolean): Option[Group] = {
-    def in(groups: List[Group]): Option[Group] = groups match {
+  def findGroup(fn: Group => Boolean): Option[Group] =
+    def in(groups: List[Group]): Option[Group] = groups match
       case head :: rest =>
         if (fn(head)) Some(head) else in(rest).orElse(in(head.groups.toList))
       case Nil => None
-    }
     if (fn(this)) Some(this) else in(groups.toList)
-  }
 
   def app(appId: PathId): Option[AppDefinition] =
     group(appId.parent).flatMap(_.apps.find(_.id == appId))
 
-  def group(gid: PathId): Option[Group] = {
+  def group(gid: PathId): Option[Group] =
     if (id == gid) Some(this)
-    else {
+    else
       val restPath = gid.restOf(id)
       groups.find(_.id.restOf(id).root == restPath.root).flatMap(_.group(gid))
-    }
-  }
 
   def updateApp(path: PathId,
                 fn: Option[AppDefinition] => AppDefinition,
-                timestamp: Timestamp): Group = {
+                timestamp: Timestamp): Group =
     val groupId = path.parent
-    makeGroup(groupId).update(timestamp) { group =>
+    makeGroup(groupId).update(timestamp)  group =>
       if (group.id == groupId)
         group.putApplication(fn(group.apps.find(_.id == path))) else group
-    }
-  }
 
-  def update(path: PathId, fn: Group => Group, timestamp: Timestamp): Group = {
-    makeGroup(path).update(timestamp) { group =>
+  def update(path: PathId, fn: Group => Group, timestamp: Timestamp): Group =
+    makeGroup(path).update(timestamp)  group =>
       if (group.id == path) fn(group) else group
-    }
-  }
 
   def updateApps(timestamp: Timestamp = Timestamp.now())(
-      fn: AppDefinition => AppDefinition): Group = {
-    update(timestamp) { group =>
+      fn: AppDefinition => AppDefinition): Group =
+    update(timestamp)  group =>
       group.copy(apps = group.apps.map(fn))
-    }
-  }
 
   def update(timestamp: Timestamp = Timestamp.now())(
-      fn: Group => Group): Group = {
-    def in(groups: List[Group]): List[Group] = groups match {
+      fn: Group => Group): Group =
+    def in(groups: List[Group]): List[Group] = groups match
       case head :: rest => head.update(timestamp)(fn) :: in(rest)
       case Nil => Nil
-    }
     fn(this.copy(groups = in(groups.toList).toSet, version = timestamp))
-  }
 
-  def updateGroup(fn: Group => Option[Group]): Option[Group] = {
+  def updateGroup(fn: Group => Option[Group]): Option[Group] =
     fn(this).map(_.copy(groups = groups.flatMap(_.updateGroup(fn))))
-  }
 
   /** Removes the group with the given gid if it exists */
-  def remove(gid: PathId, timestamp: Timestamp = Timestamp.now()): Group = {
+  def remove(gid: PathId, timestamp: Timestamp = Timestamp.now()): Group =
     copy(groups = groups.filter(_.id != gid).map(_.remove(gid, timestamp)),
          version = timestamp)
-  }
 
   /**
     * Add the given app definition to this group replacing any previously existing app definition with the same ID.
     *
     * If a group exists with a conflicting ID which does not contain any app definition, replace that as well.
     */
-  private def putApplication(appDef: AppDefinition): Group = {
+  private def putApplication(appDef: AppDefinition): Group =
     copy(
         // If there is a group with a conflicting id which contains no app definitions,
         // replace it. Otherwise do not replace it. Validation will catch conflicting app/group IDs later.
-        groups = groups.filter { group =>
+        groups = groups.filter  group =>
           group.id != appDef.id || group.containsApps
-        },
+        ,
         // replace potentially existing app definition
         apps = apps.filter(_.id != appDef.id) + appDef
     )
-  }
 
   /**
     * Remove the app with the given id if it is a direct child of this group.
@@ -122,16 +106,14 @@ case class Group(id: PathId,
   def removeApplication(appId: PathId): Group =
     copy(apps = apps.filter(_.id != appId))
 
-  def makeGroup(gid: PathId): Group = {
+  def makeGroup(gid: PathId): Group =
     if (gid.isEmpty) this //group already exists
-    else {
+    else
       val (change, remaining) =
         groups.partition(_.id.restOf(id).root == gid.root)
       val toUpdate = change.headOption.getOrElse(
           Group.empty.copy(id = id.append(gid.rootPath)))
       this.copy(groups = remaining + toUpdate.makeGroup(gid.child))
-    }
-  }
 
   lazy val transitiveApps: Set[AppDefinition] =
     this.apps ++ groups.flatMap(_.transitiveApps)
@@ -142,21 +124,21 @@ case class Group(id: PathId,
   lazy val transitiveAppGroups: Set[Group] =
     transitiveGroups.filter(_.apps.nonEmpty)
 
-  lazy val applicationDependencies: List[(AppDefinition, AppDefinition)] = {
+  lazy val applicationDependencies: List[(AppDefinition, AppDefinition)] =
     var result = List.empty[(AppDefinition, AppDefinition)]
     val allGroups = transitiveGroups
 
     //group->group dependencies
-    for {
+    for
       group <- allGroups
       dependencyId <- group.dependencies
       dependency <- allGroups.find(_.id == dependencyId)
       app <- group.transitiveApps
       dependentApp <- dependency.transitiveApps
-    } result ::= app -> dependentApp
+    result ::= app -> dependentApp
 
     //app->group/app dependencies
-    for {
+    for
       group <- transitiveAppGroups
       app <- group.apps
       dependencyId <- app.dependencies
@@ -165,30 +147,26 @@ case class Group(id: PathId,
         .find(_.id == dependencyId)
         .map(_.transitiveApps)
       dependent <- dependentApp orElse dependentGroup getOrElse Set.empty
-    } result ::= app -> dependent
+    result ::= app -> dependent
     result
-  }
 
-  def dependencyGraph: DirectedGraph[AppDefinition, DefaultEdge] = {
+  def dependencyGraph: DirectedGraph[AppDefinition, DefaultEdge] =
     val graph = new DefaultDirectedGraph[AppDefinition, DefaultEdge](
         classOf[DefaultEdge])
     for (app <- transitiveApps) graph.addVertex(app)
     for ((app, dependent) <- applicationDependencies) graph.addEdge(
         app, dependent)
     new UnmodifiableDirectedGraph(graph)
-  }
 
-  def appsWithNoDependencies: Set[AppDefinition] = {
+  def appsWithNoDependencies: Set[AppDefinition] =
     val g = dependencyGraph
-    g.vertexSet.filter { v =>
+    g.vertexSet.filter  v =>
       g.outDegreeOf(v) == 0
-    }.toSet
-  }
+    .toSet
 
-  def hasNonCyclicDependencies: Boolean = {
+  def hasNonCyclicDependencies: Boolean =
     !new CycleDetector[AppDefinition, DefaultEdge](dependencyGraph)
       .detectCycles()
-  }
 
   /** @return true if and only if this group directly or indirectly contains app definitions. */
   def containsApps: Boolean = apps.nonEmpty || groups.exists(_.containsApps)
@@ -203,26 +181,23 @@ case class Group(id: PathId,
     * Identify an other group as the same, if id and version is the same.
     * Override the default equals implementation generated by scalac, which is very expensive.
     */
-  override def equals(obj: Any): Boolean = {
-    obj match {
+  override def equals(obj: Any): Boolean =
+    obj match
       case that: Group =>
         (that eq this) || (that.id == id && that.version == version)
       case _ => false
-    }
-  }
 
   /**
     * Compute the hashCode of an app only by id.
     * Override the default equals implementation generated by scalac, which is very expensive.
     */
   override def hashCode(): Int = id.hashCode()
-}
 
-object Group {
+object Group
   def empty: Group = Group(PathId(Nil))
   def emptyWithId(id: PathId): Group = empty.copy(id = id)
 
-  def fromProto(msg: GroupDefinition): Group = {
+  def fromProto(msg: GroupDefinition): Group =
     Group(
         id = msg.getId.toPath,
         apps = msg.getAppsList.map(AppDefinition.fromProto).toSet,
@@ -230,7 +205,6 @@ object Group {
         dependencies = msg.getDependenciesList.map(PathId.apply).toSet,
         version = Timestamp(msg.getVersion)
     )
-  }
 
   def defaultApps: Set[AppDefinition] = Set.empty
   def defaultGroups: Set[Group] = Set.empty
@@ -238,7 +212,7 @@ object Group {
   def defaultVersion: Timestamp = Timestamp.now()
 
   private def validNestedGroup(base: PathId): Validator[Group] =
-    validator[Group] { group =>
+    validator[Group]  group =>
       group.id is validPathWithBase(base)
       group.apps is every(AppDefinition.validNestedAppDefinition(base))
       group is noAppsAndGroupsWithSameName
@@ -248,61 +222,53 @@ object Group {
 
       group.dependencies is every(validPathWithBase(base))
       group.groups is every(valid(validNestedGroup(base)))
-    }
 
-  implicit val validRootGroup: Validator[Group] = new Validator[Group] {
-    override def apply(group: Group): Result = {
+  implicit val validRootGroup: Validator[Group] = new Validator[Group]
+    override def apply(group: Group): Result =
       validate(group)(validator = validNestedGroup(PathId.empty))
-    }
-  }
 
   def validGroupWithConfig(maxApps: Option[Int])(
-      implicit validator: Validator[Group]): Validator[Group] = {
-    new Validator[Group] {
-      override def apply(group: Group): Result = {
-        maxApps.filter(group.transitiveApps.size > _).map { num =>
+      implicit validator: Validator[Group]): Validator[Group] =
+    new Validator[Group]
+      override def apply(group: Group): Result =
+        maxApps.filter(group.transitiveApps.size > _).map  num =>
           Failure(Set(RuleViolation(
                       group,
                       s"""This Marathon instance may only handle up to $num Apps!
                 |(Override with command line option --max_apps)""".stripMargin,
                       None)))
-        } getOrElse Success
-      } and validator(group)
-    }
-  }
+        getOrElse Success
+      and validator(group)
 
   private def noAppsAndGroupsWithSameName: Validator[Group] =
-    isTrue(s"Groups and Applications may not have the same identifier.") {
+    isTrue(s"Groups and Applications may not have the same identifier.")
       group =>
         val groupIds = group.groups.map(_.id)
         val clashingIds = group.apps.map(_.id).intersect(groupIds)
         clashingIds.isEmpty
-    }
 
   private def noCyclicDependencies(group: Group): Validator[Set[PathId]] =
-    isTrue("Dependency graph has cyclic dependencies.") { _ =>
+    isTrue("Dependency graph has cyclic dependencies.")  _ =>
       group.hasNonCyclicDependencies
-    }
 
-  private def validPorts: Validator[Group] = {
-    new Validator[Group] {
-      override def apply(group: Group): Result = {
-        val groupViolations = group.apps.flatMap { app =>
-          val ruleViolations = app.containerServicePorts.toSeq.flatMap {
+  private def validPorts: Validator[Group] =
+    new Validator[Group]
+      override def apply(group: Group): Result =
+        val groupViolations = group.apps.flatMap  app =>
+          val ruleViolations = app.containerServicePorts.toSeq.flatMap
             servicePorts =>
-              for {
+              for
                 existingApp <- group.transitiveApps.toList
                                   if existingApp.id != app.id // in case of an update, do not compare the app against itself
                 existingServicePort <- existingApp.portMappings.toList.flatten
                                         .map(_.servicePort)
                                           if existingServicePort != 0 // ignore zero ports, which will be chosen at random
                                       if servicePorts contains existingServicePort
-              } yield
+              yield
                 RuleViolation(
                     app.id,
                     s"Requested service port $existingServicePort conflicts with a service port in app ${existingApp.id}",
                     None)
-          }
 
           if (ruleViolations.isEmpty) None
           else
@@ -311,11 +277,6 @@ object Group {
                                "app contains conflicting ports",
                                None,
                                ruleViolations.toSet))
-        }
 
         if (groupViolations.isEmpty) Success
         else Failure(groupViolations.toSet)
-      }
-    }
-  }
-}

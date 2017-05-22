@@ -10,7 +10,7 @@ import play.api.libs.json.jackson.JacksonJson
 /**
   * Helper functions to handle JsValues.
   */
-object Json {
+object Json
 
   /**
     * Parse a String representing a json, and return it as a JsValue.
@@ -253,4 +253,3 @@ object Json {
     * }}}
     */
   def format[A]: OFormat[A] = macro JsMacroImpl.formatImpl[A]
-}

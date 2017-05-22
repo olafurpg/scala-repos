@@ -17,63 +17,56 @@ import scala.util.Try
 class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
                                  stream: EventStream,
                                  maxOutStanding: Int)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   private[http] var outstanding = List.empty[MarathonEvent]
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     stream.subscribe(self, classOf[MarathonEvent])
     stream.publish(EventStreamAttached(handle.remoteAddress))
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     log.info(s"Stop actor $handle")
     stream.unsubscribe(self)
     stream.publish(EventStreamDetached(handle.remoteAddress))
     Try(handle.close()) //ignore, if this fails
-  }
 
   override def receive: Receive = waitForEvent
 
-  def waitForEvent: Receive = {
+  def waitForEvent: Receive =
     case event: MarathonEvent =>
       outstanding = event :: outstanding
       sendAllMessages()
-  }
 
-  def stashEvents: Receive = handleWorkDone orElse {
+  def stashEvents: Receive = handleWorkDone orElse
     case event: MarathonEvent if outstanding.size >= maxOutStanding =>
       dropEvent(event)
     case event: MarathonEvent => outstanding = event :: outstanding
-  }
 
-  def handleWorkDone: Receive = {
+  def handleWorkDone: Receive =
     case WorkDone => sendAllMessages()
     case Status.Failure(ex) =>
       handleException(ex)
       sendAllMessages()
-  }
 
-  private[this] def sendAllMessages(): Unit = {
-    if (outstanding.nonEmpty) {
+  private[this] def sendAllMessages(): Unit =
+    if (outstanding.nonEmpty)
       val toSend = outstanding.reverse
       outstanding = List.empty[MarathonEvent]
       context.become(stashEvents)
-      val sendFuture = Future {
+      val sendFuture = Future
         toSend.foreach(event =>
               handle.sendEvent(event.eventType,
                                Json.stringify(eventToJson(event))))
         WorkDone
-      }(ThreadPoolContext.ioContext)
+      (ThreadPoolContext.ioContext)
 
       import context.dispatcher
       sendFuture pipeTo self
-    } else {
+    else
       context.become(waitForEvent)
-    }
-  }
 
-  private[this] def handleException(ex: Throwable): Unit = ex match {
+  private[this] def handleException(ex: Throwable): Unit = ex match
     case eof: EOFException =>
       log.info(
           s"Received EOF from stream handle $handle. Ignore subsequent events.")
@@ -82,13 +75,9 @@ class HttpEventStreamHandleActor(handle: HttpEventStreamHandle,
       context.become(Actor.emptyBehavior)
     case _ =>
       log.warning("Could not send message to {} reason: {}", handle, ex)
-  }
 
-  private[this] def dropEvent(event: MarathonEvent): Unit = {
+  private[this] def dropEvent(event: MarathonEvent): Unit =
     log.warning("Ignore event {} for handle {} (slow consumer)", event, handle)
-  }
-}
 
-object HttpEventStreamHandleActor {
+object HttpEventStreamHandleActor
   object WorkDone
-}

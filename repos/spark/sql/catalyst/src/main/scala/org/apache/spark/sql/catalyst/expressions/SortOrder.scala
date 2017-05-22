@@ -24,36 +24,31 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.collection.unsafe.sort.PrefixComparators.BinaryPrefixComparator
 import org.apache.spark.util.collection.unsafe.sort.PrefixComparators.DoublePrefixComparator
 
-abstract sealed class SortDirection {
+abstract sealed class SortDirection
   def sql: String
-}
 
-case object Ascending extends SortDirection {
+case object Ascending extends SortDirection
   override def sql: String = "ASC"
-}
 
-case object Descending extends SortDirection {
+case object Descending extends SortDirection
   override def sql: String = "DESC"
-}
 
 /**
   * An expression that can be used to sort a tuple.  This class extends expression primarily so that
   * transformations over expression will descend into its child.
   */
 case class SortOrder(child: Expression, direction: SortDirection)
-    extends UnaryExpression with Unevaluable {
+    extends UnaryExpression with Unevaluable
 
   /** Sort order is not foldable because we don't have an eval for it. */
   override def foldable: Boolean = false
 
-  override def checkInputDataTypes(): TypeCheckResult = {
-    if (RowOrdering.isOrderable(dataType)) {
+  override def checkInputDataTypes(): TypeCheckResult =
+    if (RowOrdering.isOrderable(dataType))
       TypeCheckResult.TypeCheckSuccess
-    } else {
+    else
       TypeCheckResult.TypeCheckFailure(
           s"cannot sort data type ${dataType.simpleString}")
-    }
-  }
 
   override def dataType: DataType = child.dataType
   override def nullable: Boolean = child.nullable
@@ -62,23 +57,22 @@ case class SortOrder(child: Expression, direction: SortDirection)
   override def sql: String = child.sql + " " + direction.sql
 
   def isAscending: Boolean = direction == Ascending
-}
 
 /**
   * An expression to generate a 64-bit long prefix used in sorting.
   */
-case class SortPrefix(child: SortOrder) extends UnaryExpression {
+case class SortPrefix(child: SortOrder) extends UnaryExpression
 
   override def eval(input: InternalRow): Any =
     throw new UnsupportedOperationException
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val childCode = child.child.gen(ctx)
     val input = childCode.value
     val BinaryPrefixCmp = classOf[BinaryPrefixComparator].getName
     val DoublePrefixCmp = classOf[DoublePrefixComparator].getName
 
-    val (nullValue: Long, prefixCode: String) = child.child.dataType match {
+    val (nullValue: Long, prefixCode: String) = child.child.dataType match
       case BooleanType =>
         (Long.MinValue, s"$input ? 1L : 0L")
       case _: IntegralType =>
@@ -93,20 +87,18 @@ case class SortPrefix(child: SortOrder) extends UnaryExpression {
       case dt: DecimalType
           if dt.precision - dt.scale <= Decimal.MAX_LONG_DIGITS =>
         val prefix =
-          if (dt.precision <= Decimal.MAX_LONG_DIGITS) {
+          if (dt.precision <= Decimal.MAX_LONG_DIGITS)
             s"$input.toUnscaledLong()"
-          } else {
+          else
             // reduce the scale to fit in a long
             val p = Decimal.MAX_LONG_DIGITS
             val s = p - (dt.precision - dt.scale)
             s"$input.changePrecision($p, $s) ? $input.toUnscaledLong() : ${Long.MinValue}L"
-          }
         (Long.MinValue, prefix)
       case dt: DecimalType =>
         (DoublePrefixComparator.computePrefix(Double.NegativeInfinity),
          s"$DoublePrefixCmp.computePrefix($input.toDouble())")
       case _ => (0L, "0L")
-    }
 
     childCode.code + s"""
       |long ${ev.value} = ${nullValue}L;
@@ -115,7 +107,5 @@ case class SortPrefix(child: SortOrder) extends UnaryExpression {
       |  ${ev.value} = $prefixCode;
       |}
     """.stripMargin
-  }
 
   override def dataType: DataType = LongType
-}

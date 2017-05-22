@@ -15,7 +15,7 @@ import scala.annotation.switch
 import scala.collection.immutable
 import scala.io.Codec
 
-trait StdNames { self: SymbolTable =>
+trait StdNames  self: SymbolTable =>
 
   def encode(str: String): TermName =
     newTermNameCached(NameTransformer.encode(str))
@@ -30,18 +30,16 @@ trait StdNames { self: SymbolTable =>
     *  Solution: Keywords extends CommonNames and uses early defs to beat the
     *  CommonNames constructor out of the starting gate.  This is its builder.
     */
-  private class KeywordSetBuilder {
+  private class KeywordSetBuilder
     private var kws: Set[TermName] = Set()
-    def apply(s: String): TermName = {
+    def apply(s: String): TermName =
       val result = newTermNameCached(s)
       kws = kws + result
       result
-    }
     def result: Set[TermName] = try kws finally kws = null
-  }
 
   private[reflect] def compactifyName(orig: String): String = compactify(orig)
-  private final object compactify extends (String => String) {
+  private final object compactify extends (String => String)
     val md5 = MessageDigest.getInstance("MD5")
 
     /**
@@ -68,7 +66,7 @@ trait StdNames { self: SymbolTable =>
         (settings.maxClassfileName.value - maxSuffixLength -
             2 * marker.length - 32)
     )
-    def toMD5(s: String, edge: Int): String = {
+    def toMD5(s: String, edge: Int): String =
       val prefix = s take edge
       val suffix = s takeRight edge
 
@@ -78,12 +76,10 @@ trait StdNames { self: SymbolTable =>
       val md5chars = (md5.digest() map (b => (b & 0xFF).toHexString)).mkString
 
       prefix + marker + md5chars + marker + suffix
-    }
     def apply(s: String): String = (if (s.length <= MaxNameLength) s
                                     else toMD5(s, MaxNameLength / 4))
-  }
 
-  abstract class CommonNames extends NamesApi {
+  abstract class CommonNames extends NamesApi
     type NameType >: Null <: Name
     // Masking some implicits so as to allow our targeted => NameType.
     protected val stringToTermName = null
@@ -126,12 +122,11 @@ trait StdNames { self: SymbolTable =>
       * Ensures that name mangling does not accidentally make a class respond `true` to any of
       * isAnonymousClass, isAnonymousFunction, isDelambdafyFunction, e.g. by introducing "$anon".
       */
-    def ensureNonAnon(name: String) = {
+    def ensureNonAnon(name: String) =
       name
         .replace(nme.ANON_CLASS_NAME.toString, NESTED_IN_ANON_CLASS)
         .replace(nme.ANON_FUN_NAME.toString, NESTED_IN_ANON_FUN)
         .replace(nme.DELAMBDAFY_LAMBDA_CLASS_NAME.toString, NESTED_IN_LAMBDA)
-    }
 
     // value types (and AnyRef) are all used as terms as well
     // as (at least) arguments to the @specialize annotation.
@@ -162,11 +157,10 @@ trait StdNames { self: SymbolTable =>
     final val ERROR: NameType = "<error>"
     final val NO_NAME: NameType = "<none>" // formerly NOSYMBOL
     final val WILDCARD: NameType = "_"
-  }
 
   /** This should be the first trait in the linearization. */
   // abstract class Keywords extends CommonNames {
-  abstract class Keywords extends {
+  abstract class Keywords extends
     private val kw = new KeywordSetBuilder
 
     final val ABSTRACTkw: TermName = kw("abstract")
@@ -223,11 +217,10 @@ trait StdNames { self: SymbolTable =>
     final val ATkw: TermName = kw("@")
 
     final val keywords = kw.result
-  } with CommonNames {
+  with CommonNames
     final val javaKeywords = new JavaKeywords()
-  }
 
-  abstract class TypeNames extends Keywords with TypeNamesApi {
+  abstract class TypeNames extends Keywords with TypeNamesApi
     override type NameType = TypeName
 
     protected implicit def createNameType(name: String): TypeName =
@@ -310,9 +303,8 @@ trait StdNames { self: SymbolTable =>
       (name dropRight SINGLETON_SUFFIX.length).toTypeName
     def singletonName(name: Name): TypeName =
       (name append SINGLETON_SUFFIX).toTypeName
-  }
 
-  abstract class TermNames extends Keywords with TermNamesApi {
+  abstract class TermNames extends Keywords with TermNamesApi
     override type NameType = TermName
 
     protected implicit def createNameType(name: String): TermName =
@@ -404,18 +396,16 @@ trait StdNames { self: SymbolTable =>
     def isModuleName(name: Name) = name endsWith MODULE_SUFFIX_NAME
 
     /** Is name a variable name? */
-    def isVariableName(name: Name): Boolean = {
+    def isVariableName(name: Name): Boolean =
       val first = name.startChar
       (((first.isLower && first.isLetter) || first == '_') &&
           (name != nme.false_) && (name != nme.true_) && (name != nme.null_))
-    }
 
-    def isOpAssignmentName(name: Name) = name match {
+    def isOpAssignmentName(name: Name) = name match
       case raw.NE | raw.LE | raw.GE | EMPTY => false
       case _ =>
         name.endChar == '=' && name.startChar != '=' &&
         isOperatorPart(name.startChar)
-    }
 
     private def expandedNameInternal(
         name: TermName, base: Symbol, separator: String): TermName =
@@ -437,7 +427,7 @@ trait StdNames { self: SymbolTable =>
       *  part of the string after that; but if the string is "$$$" or longer,
       *  be sure to retain the extra dollars.
       */
-    def unexpandedName(name: Name): Name = name lastIndexOf "$$" match {
+    def unexpandedName(name: Name): Name = name lastIndexOf "$$" match
       case 0 | -1 => name
       case idx0 =>
         // Sketchville - We've found $$ but if it's part of $$$ or $$$$
@@ -446,7 +436,6 @@ trait StdNames { self: SymbolTable =>
         var idx = idx0
         while (idx > 0 && name.charAt(idx - 1) == '$') idx -= 1
         name drop idx + 2
-    }
 
     @deprecated("Use unexpandedName", "2.11.0")
     def originalName(name: Name): Name = unexpandedName(name)
@@ -487,7 +476,7 @@ trait StdNames { self: SymbolTable =>
       */
     def splitSpecializedName(name: Name): (Name, String, String) =
       // DUPLICATED LOGIC WITH `unspecializedName`
-      if (name endsWith SPECIALIZED_SUFFIX) {
+      if (name endsWith SPECIALIZED_SUFFIX)
         val name1 = name dropRight SPECIALIZED_SUFFIX.length
         val idxC = name1 lastIndexOf 'c'
         val idxM = name1 lastIndexOf 'm'
@@ -495,7 +484,7 @@ trait StdNames { self: SymbolTable =>
         (name1.subName(0, idxM - 1),
          name1.subName(idxC + 1, name1.length).toString,
          name1.subName(idxM + 1, idxC).toString)
-      } else (name, "", "")
+      else (name, "", "")
 
     // Nominally, name$default$N, encoded for <init>
     def defaultGetterName(name: Name, pos: Int): TermName =
@@ -505,10 +494,10 @@ trait StdNames { self: SymbolTable =>
     def defaultGetterToMethod(name: Name): TermName =
       (if (name startsWith DEFAULT_GETTER_INIT_STRING) nme.CONSTRUCTOR
        else
-         name indexOf DEFAULT_GETTER_STRING match {
+         name indexOf DEFAULT_GETTER_STRING match
            case -1 => name.toTermName
            case idx => name.toTermName take idx
-         })
+         )
 
     def localDummyName(clazz: Symbol): TermName =
       newTermName(LOCALDUMMY_PREFIX + clazz.name + ">")
@@ -560,7 +549,7 @@ trait StdNames { self: SymbolTable =>
     val x_8: NameType = "x$8"
     val x_9: NameType = "x$9"
 
-    @switch def syntheticParamName(i: Int): TermName = i match {
+    @switch def syntheticParamName(i: Int): TermName = i match
       case 0 => nme.x_0
       case 1 => nme.x_1
       case 2 => nme.x_2
@@ -572,9 +561,8 @@ trait StdNames { self: SymbolTable =>
       case 8 => nme.x_8
       case 9 => nme.x_9
       case _ => newTermName("x$" + i)
-    }
 
-    @switch def productAccessorName(j: Int): TermName = j match {
+    @switch def productAccessorName(j: Int): TermName = j match
       case 1 => nme._1
       case 2 => nme._2
       case 3 => nme._3
@@ -598,7 +586,6 @@ trait StdNames { self: SymbolTable =>
       case 21 => nme._21
       case 22 => nme._22
       case _ => newTermName("_" + j)
-    }
 
     val ??? = encode("???")
 
@@ -870,7 +857,7 @@ trait StdNames { self: SymbolTable =>
     val SyntacticVarDef: NameType = "SyntacticVarDef"
 
     // unencoded operators
-    object raw {
+    object raw
       final val BANG: NameType = "!"
       final val BAR: NameType = "|"
       final val DOLLAR: NameType = "$"
@@ -883,7 +870,6 @@ trait StdNames { self: SymbolTable =>
       final val TILDE: NameType = "~"
 
       final val isUnary: Set[Name] = Set(MINUS, PLUS, TILDE, BANG)
-    }
 
     // value-conversion methods
     val toByte: NameType = "toByte"
@@ -965,18 +951,17 @@ trait StdNames { self: SymbolTable =>
     val testLessThan: NameType = "testLessThan"
     val testNotEqual: NameType = "testNotEqual"
 
-    def toUnaryName(name: TermName): TermName = name match {
+    def toUnaryName(name: TermName): TermName = name match
       case raw.MINUS => UNARY_-
       case raw.PLUS => UNARY_+
       case raw.TILDE => UNARY_~
       case raw.BANG => UNARY_!
       case _ => name
-    }
 
     /** The name of a method which stands in for a primitive operation
       *  during structural type dispatch.
       */
-    def primitiveInfixMethodName(name: Name): TermName = name match {
+    def primitiveInfixMethodName(name: Name): TermName = name match
       case OR => takeOr
       case XOR => takeXor
       case AND => takeAnd
@@ -997,11 +982,10 @@ trait StdNames { self: SymbolTable =>
       case ZOR => takeConditionalOr
       case ZAND => takeConditionalAnd
       case _ => NO_NAME
-    }
 
     /** Postfix/prefix, really.
       */
-    def primitivePostfixMethodName(name: Name): TermName = name match {
+    def primitivePostfixMethodName(name: Name): TermName = name match
       case UNARY_! => takeNot
       case UNARY_+ => positive
       case UNARY_- => negate
@@ -1014,13 +998,11 @@ trait StdNames { self: SymbolTable =>
       case `toFloat` => toFloat
       case `toDouble` => toDouble
       case _ => NO_NAME
-    }
 
     def primitiveMethodName(name: Name): TermName =
-      primitiveInfixMethodName(name) match {
+      primitiveInfixMethodName(name) match
         case NO_NAME => primitivePostfixMethodName(name)
         case name => name
-      }
 
     /** Translate a String into a list of simple TypeNames and TermNames.
       *  In all segments before the last, type/term is determined by whether
@@ -1044,11 +1026,11 @@ trait StdNames { self: SymbolTable =>
       *  that Lorax#Zax.type would work, but this is not accepted by the parser.
       *  For the purposes of referencing that object, the syntax is allowed.
       */
-    def segments(name: String, assumeTerm: Boolean): List[Name] = {
+    def segments(name: String, assumeTerm: Boolean): List[Name] =
       def mkName(str: String, term: Boolean): Name =
         if (term) newTermName(str) else newTypeName(str)
 
-      name.indexWhere(ch => ch == '.' || ch == '#') match {
+      name.indexWhere(ch => ch == '.' || ch == '#') match
         // it's the last segment: the parameter tells us whether type or term
         case -1 =>
           if (name == "") scala.Nil else scala.List(mkName(name, assumeTerm))
@@ -1057,8 +1039,6 @@ trait StdNames { self: SymbolTable =>
           val (simple, div, rest) =
             (name take idx, name charAt idx, name drop idx + 1)
           mkName(simple, div == '.') :: segments(rest, assumeTerm)
-      }
-    }
 
     def newBitmapName(bitmapPrefix: Name, n: Int) =
       bitmapPrefix append ("" + n)
@@ -1073,7 +1053,6 @@ trait StdNames { self: SymbolTable =>
     val BITMAP_CHECKINIT_TRANSIENT: NameType =
       BITMAP_PREFIX +
       "inittrans$" // initialization bitmap for transient checkinit values
-  }
 
   lazy val typeNames: tpnme.type = tpnme
 
@@ -1081,25 +1060,23 @@ trait StdNames { self: SymbolTable =>
 
   /** For fully qualified type names.
     */
-  object fulltpnme extends TypeNames {
+  object fulltpnme extends TypeNames
     val RuntimeNothing: NameType = "scala.runtime.Nothing$"
     val RuntimeNull: NameType = "scala.runtime.Null$"
-  }
 
   /** Java binary names, like scala/runtime/Nothing$.
     */
-  object binarynme {
+  object binarynme
     def toBinary(name: Name) = name mapName (_.replace('.', '/'))
 
     val RuntimeNothing = toBinary(fulltpnme.RuntimeNothing).toTypeName
     val RuntimeNull = toBinary(fulltpnme.RuntimeNull).toTypeName
-  }
 
   val javanme = nme.javaKeywords
 
   lazy val termNames: nme.type = nme
 
-  object nme extends TermNames {
+  object nme extends TermNames
     def moduleVarName(name: TermName): TermName =
       newTermNameCached("" + name + MODULE_VAR_SUFFIX)
 
@@ -1115,9 +1092,8 @@ trait StdNames { self: SymbolTable =>
     val reflParamsCacheName: NameType = "reflParams$Cache"
     val reflMethodName: NameType = "reflMethod$Method"
     val argument: NameType = "<argument>"
-  }
 
-  class JavaKeywords {
+  class JavaKeywords
     private val kw = new KeywordSetBuilder
 
     final val ABSTRACTkw: TermName = kw("abstract")
@@ -1172,9 +1148,8 @@ trait StdNames { self: SymbolTable =>
     final val WHILEkw: TermName = kw("while")
 
     final val keywords = kw.result
-  }
 
-  sealed abstract class SymbolNames {
+  sealed abstract class SymbolNames
     protected val stringToTermName = null
     protected val stringToTypeName = null
     protected implicit def createNameType(s: String): TypeName =
@@ -1217,7 +1192,5 @@ trait StdNames { self: SymbolTable =>
         tpnme.Float -> BoxedFloat,
         tpnme.Double -> BoxedDouble
     )
-  }
 
   lazy val sn: SymbolNames = new SymbolNames {}
-}

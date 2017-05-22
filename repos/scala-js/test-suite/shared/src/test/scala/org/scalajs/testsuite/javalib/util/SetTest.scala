@@ -19,11 +19,11 @@ import java.{util => ju, lang => jl}
 import scala.collection.JavaConversions._
 import scala.reflect.ClassTag
 
-trait SetTest extends CollectionTest {
+trait SetTest extends CollectionTest
 
   def factory: SetFactory
 
-  def testSetApi(): Unit = {
+  def testSetApi(): Unit =
     testCollectionApi()
     shouldCheckSetSize()
     shouldStoreIntegers_Set()
@@ -35,9 +35,8 @@ trait SetTest extends CollectionTest {
     shouldCheckContainedElemsPresence()
     shouldPutAWholeCollectionInto()
     shouldIterateOverElements()
-  }
 
-  @Test def shouldCheckSetSize(): Unit = {
+  @Test def shouldCheckSetSize(): Unit =
     val hs = factory.empty[String]
 
     assertEquals(0, hs.size())
@@ -45,35 +44,29 @@ trait SetTest extends CollectionTest {
     assertEquals(1, hs.size())
     assertTrue(hs.add("TWO"))
     assertEquals(2, hs.size())
-  }
 
-  @Test def shouldStoreIntegers_Set(): Unit = {
+  @Test def shouldStoreIntegers_Set(): Unit =
     val hs = factory.empty[Int]
 
     assertTrue(hs.add(100))
     assertEquals(1, hs.size())
     assertTrue(hs.contains(100))
     assertEquals(100, hs.iterator.next())
-  }
 
-  @Test def shouldStoreObjectsWithSameHashCodeButDifferentTypes(): Unit = {
+  @Test def shouldStoreObjectsWithSameHashCodeButDifferentTypes(): Unit =
     val hs = factory.empty[AnyRef]
-    trait A extends Comparable[A] {
+    trait A extends Comparable[A]
       def compareTo(o: A): Int = toString.compareTo(o.toString)
-    }
-    object B extends A {
+    object B extends A
       override def hashCode(): Int = 42
-    }
-    object C extends A {
+    object C extends A
       override def hashCode(): Int = 42
-    }
 
     assertTrue(hs.add(B))
     assertTrue(hs.add(C))
     assertEquals(2, hs.size())
-  }
 
-  @Test def shouldStoreDoublesAlsoInCornerCases(): Unit = {
+  @Test def shouldStoreDoublesAlsoInCornerCases(): Unit =
     val hs = factory.empty[Double]
 
     assertTrue(hs.add(11111.0))
@@ -106,12 +99,10 @@ trait SetTest extends CollectionTest {
     assertTrue(hs.contains(Double.NaN))
     assertTrue(hs.contains(+0.0))
     assertTrue(hs.contains(-0.0))
-  }
 
-  @Test def shouldStoreCustomObjects_Set(): Unit = {
-    case class TestObj(num: Int) extends jl.Comparable[TestObj] {
+  @Test def shouldStoreCustomObjects_Set(): Unit =
+    case class TestObj(num: Int) extends jl.Comparable[TestObj]
       override def compareTo(o: TestObj): Int = o.num - num
-    }
 
     val hs = factory.empty[TestObj]
 
@@ -119,9 +110,8 @@ trait SetTest extends CollectionTest {
     assertEquals(1, hs.size())
     assertTrue(hs.contains(TestObj(100)))
     assertEquals(100, hs.iterator.next().num)
-  }
 
-  @Test def shouldRemoveStoredElements_Set(): Unit = {
+  @Test def shouldRemoveStoredElements_Set(): Unit =
     val hs = factory.empty[String]
 
     assertEquals(0, hs.size())
@@ -151,9 +141,8 @@ trait SetTest extends CollectionTest {
     assertEquals(1, hs.size())
     assertTrue(hs.contains("ONE"))
     assertFalse(hs.contains("TWO"))
-  }
 
-  @Test def shouldBeClearedWithOneOperation_Set(): Unit = {
+  @Test def shouldBeClearedWithOneOperation_Set(): Unit =
     val hs = factory.empty[String]
 
     assertTrue(hs.add("ONE"))
@@ -163,71 +152,59 @@ trait SetTest extends CollectionTest {
     hs.clear()
     assertEquals(0, hs.size())
     assertTrue(hs.isEmpty)
-  }
 
-  @Test def shouldCheckContainedElemsPresence(): Unit = {
+  @Test def shouldCheckContainedElemsPresence(): Unit =
     val hs = factory.empty[String]
 
     assertTrue(hs.add("ONE"))
     assertTrue(hs.contains("ONE"))
     assertFalse(hs.contains("TWO"))
-    if (factory.allowsNullElement) {
+    if (factory.allowsNullElement)
       assertFalse(hs.contains(null))
       assertTrue(hs.add(null))
       assertTrue(hs.contains(null))
-    } else {
+    else
       expectThrows(classOf[Exception], hs.add(null))
-    }
-  }
 
-  @Test def shouldPutAWholeCollectionInto(): Unit = {
+  @Test def shouldPutAWholeCollectionInto(): Unit =
     val hs = factory.empty[String]
 
-    if (factory.allowsNullElement) {
+    if (factory.allowsNullElement)
       val l = List[String]("ONE", "TWO", (null: String))
       assertTrue(hs.addAll(asJavaCollection(l)))
       assertEquals(3, hs.size)
       assertTrue(hs.contains("ONE"))
       assertTrue(hs.contains("TWO"))
       assertTrue(hs.contains(null))
-    } else {
-      expectThrows(classOf[Exception], {
+    else
+      expectThrows(classOf[Exception],
         val l = List[String]("ONE", "TWO", (null: String))
         hs.addAll(asJavaCollection(l))
-      })
-    }
-  }
+      )
 
-  @Test def shouldIterateOverElements(): Unit = {
+  @Test def shouldIterateOverElements(): Unit =
     val hs = factory.empty[String]
 
-    val l = {
+    val l =
       if (factory.allowsNullElement) List[String]("ONE", "TWO", (null: String))
       else List[String]("ONE", "TWO", "THREE")
-    }
     assertTrue(hs.addAll(asJavaCollection(l)))
     assertEquals(3, hs.size)
 
     val iter = hs.iterator()
-    val result = {
-      for (i <- 0 until 3) yield {
+    val result =
+      for (i <- 0 until 3) yield
         assertTrue(iter.hasNext())
         iter.next()
-      }
-    }
     assertFalse(iter.hasNext())
     assertTrue(result.containsAll(l))
     assertTrue(l.containsAll(result))
-  }
-}
 
-object SetFactory {
+object SetFactory
   def allFactories: Iterator[SetFactory] =
     AbstractSetFactory.allFactories ++ SortedSetFactory.allFactories ++ NavigableSetFactory.allFactories
-}
 
-trait SetFactory extends CollectionFactory {
+trait SetFactory extends CollectionFactory
   def empty[E : ClassTag]: ju.Set[E]
 
   def allowsNullElement: Boolean
-}

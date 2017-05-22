@@ -35,32 +35,27 @@ import scalafx.scene.layout.{Priority, VBox}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 
-class EnsembleInnerShadow extends EnsembleExample {
+class EnsembleInnerShadow extends EnsembleExample
 
-  def getContent = {
-    new VBox {
+  def getContent =
+    new VBox
       vgrow = Priority.Always
       hgrow = Priority.Always
       spacing = 10
       padding = Insets(20)
       children = List(
-          new Label {
+          new Label
             text = "Ensemble Inner Shadow 1"
             font = new Font("Arial Black", 30)
             textFill = Color.web("#BBBBBB")
-            effect = new InnerShadow {
+            effect = new InnerShadow
               offsetX = 3
               offsetY = 3
               radius = 5d
-            }
-          },
-          new Label {
+          ,
+          new Label
             text = "Ensemble Inner Shadow 2"
             font = new Font("Arial Black", 30)
             textFill = Color.web("#BBBBBB")
             effect = new InnerShadow()
-          }
       )
-    }
-  }
-}

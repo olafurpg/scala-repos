@@ -7,21 +7,19 @@ import lila.common.paginator.Paginator
 import lila.common.PimpedJson._
 import lila.game.{Game, PerfPicker}
 
-final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
+final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi)
 
   import lila.round.JsonView._
 
   def filter(filterName: String, pag: Paginator[Game])(
-      implicit ctx: Context): JsObject = {
+      implicit ctx: Context): JsObject =
     val bookmarkedIds = ctx.userId ?? bookmarkApi.gameIds
-    implicit val gameWriter = Writes[Game] { g =>
+    implicit val gameWriter = Writes[Game]  g =>
       write(g, bookmarkedIds(g.id))
-    }
     Json.obj(
         "filter" -> filterName,
         "paginator" -> lila.common.paginator.PaginatorJson(pag)
     )
-  }
 
   private def write(g: Game, bookmarked: Boolean) =
     Json
@@ -35,12 +33,12 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
           "turns" -> g.turns,
           "status" -> g.status,
           "clock" -> g.clock,
-          "correspondence" -> g.daysPerTurn.map { d =>
+          "correspondence" -> g.daysPerTurn.map  d =>
             Json.obj("daysPerTurn" -> d)
-          },
+          ,
           "opening" -> g.opening,
           "players" -> JsObject(
-              g.players map { p =>
+              g.players map  p =>
             p.color.name -> Json
               .obj(
                   "userId" -> p.userId,
@@ -50,7 +48,7 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
                   "ratingDiff" -> p.ratingDiff
               )
               .noNull
-          }),
+          ),
           "fen" -> Forsyth.exportBoard(g.toChess.board),
           "lastMove" -> g.castleLastMoveTime.lastMoveString,
           "opening" -> g.opening,
@@ -59,4 +57,3 @@ final class UserGameApi(bookmarkApi: lila.bookmark.BookmarkApi) {
           "bookmarked" -> bookmarked.option(true)
       )
       .noNull
-}

@@ -35,7 +35,7 @@ import scala.tools.nsc.reporters.ConsoleReporter
       }
   * }}}
   */
-abstract class ScaladocModelTest extends DirectTest {
+abstract class ScaladocModelTest extends DirectTest
 
   /** Override this to give scaladoc command line parameters */
   def scaladocSettings: String
@@ -59,39 +59,36 @@ abstract class ScaladocModelTest extends DirectTest {
   // Implementation follows:
   override def extraSettings: String = "-usejavacp"
 
-  override def show(): Unit = {
+  override def show(): Unit =
     // redirect err to out, for logging
     val prevErr = System.err
     System.setErr(System.out)
 
-    try {
+    try
       // 1 - compile with scaladoc and get the model out
-      val universe = model.getOrElse({
+      val universe = model.getOrElse(
         sys.error("Scaladoc Model Test ERROR: No universe generated!")
-      })
+      )
       // 2 - check the model generated
       testModel(universe.rootPackage)
       println("Done.")
-    } catch {
+    catch
       case e: Exception =>
         println(e)
         e.printStackTrace
-    }
     // set err back to the real err handler
     System.setErr(prevErr)
-  }
 
   private[this] var settings: doc.Settings = null
 
   // create a new scaladoc compiler
-  private[this] def newDocFactory: DocFactory = {
+  private[this] def newDocFactory: DocFactory =
     settings = new doc.Settings(_ => ())
     settings.scaladocQuietRun = true // yaay, no more "model contains X documentable templates"!
     val args = extraSettings + " " + scaladocSettings
     new ScalaDoc.Command((CommandLineParser tokenize (args)), settings) // side-effecting, I think
     val docFact = new DocFactory(new ConsoleReporter(settings), settings)
     docFact
-  }
 
   // compile with scaladoc and output the result
   def model: Option[Universe] = newDocFactory.makeUniverse(Right(code))
@@ -100,9 +97,9 @@ abstract class ScaladocModelTest extends DirectTest {
   override def isDebug = false
 
   // finally, enable easy navigation inside the entities
-  object access {
+  object access
 
-    implicit class TemplateAccess(tpl: DocTemplateEntity) {
+    implicit class TemplateAccess(tpl: DocTemplateEntity)
       def _class(name: String): DocTemplateEntity =
         getTheFirst(_classes(name), tpl.qualifiedName + ".class(" + name + ")")
       def _classes(name: String): List[DocTemplateEntity] =
@@ -175,11 +172,11 @@ abstract class ScaladocModelTest extends DirectTest {
         getTheFirst(_absTypeTpls(name),
                     tpl.qualifiedName + ".abstractType(" + name + ")")
       def _absTypeTpls(name: String): List[DocTemplateEntity] =
-        tpl.members.collect({
+        tpl.members.collect(
           case dtpl: DocTemplateEntity with AbstractType
               if dtpl.name == name =>
             dtpl
-        })
+        )
 
       def _aliasType(name: String): MemberEntity =
         getTheFirst(
@@ -191,83 +188,72 @@ abstract class ScaladocModelTest extends DirectTest {
         getTheFirst(_aliasTypeTpls(name),
                     tpl.qualifiedName + ".aliasType(" + name + ")")
       def _aliasTypeTpls(name: String): List[DocTemplateEntity] =
-        tpl.members.collect({
+        tpl.members.collect(
           case dtpl: DocTemplateEntity with AliasType if dtpl.name == name =>
             dtpl
-        })
-    }
+        )
 
-    trait WithMembers {
+    trait WithMembers
       def members: List[MemberEntity]
       def _member(name: String): MemberEntity =
         getTheFirst(_members(name), this.toString + ".member(" + name + ")")
       def _members(name: String): List[MemberEntity] =
         members.filter(_.name == name)
-    }
-    implicit class PackageAccess(pack: Package) extends TemplateAccess(pack) {
+    implicit class PackageAccess(pack: Package) extends TemplateAccess(pack)
       def _package(name: String): Package =
         getTheFirst(
             _packages(name), pack.qualifiedName + ".package(" + name + ")")
       def _packages(name: String): List[Package] =
         pack.packages.filter(_.name == name)
-    }
     implicit class DocTemplateEntityMembers(val underlying: DocTemplateEntity)
-        extends WithMembers {
+        extends WithMembers
       def members = underlying.members
-    }
     implicit class ImplicitConversionMembers(
         val underlying: ImplicitConversion)
-        extends WithMembers {
+        extends WithMembers
       def members = underlying.members
-    }
 
-    def getTheFirst[T](list: List[T], expl: String): T = list.length match {
+    def getTheFirst[T](list: List[T], expl: String): T = list.length match
       case 1 => list.head
       case 0 => sys.error("Error getting " + expl + ": No such element.")
       case _ =>
         sys.error(
             "Error getting " + expl + ": " + list.length +
             " elements with this name. " + "All elements in list: [" + list
-              .map({
+              .map(
             case ent: Entity => ent.kind + " " + ent.qualifiedName
             case other => other.toString
-          })
+          )
               .mkString(", ") + "]")
-    }
 
-    def extractCommentText(c: Any) = {
-      def extractText(body: Any): String = body match {
+    def extractCommentText(c: Any) =
+      def extractText(body: Any): String = body match
         case s: String => s
         case s: Seq[_] => s.toList.map(extractText(_)).mkString
         case p: Product =>
           p.productIterator.toList.map(extractText(_)).mkString
         case _ => ""
-      }
-      c match {
+      c match
         case c: Comment =>
           extractText(c.body)
         case b: Body =>
           extractText(b)
-      }
-    }
 
     def countLinks(c: Comment, p: EntityLink => Boolean): Int =
       countLinksInBody(c.body, p)
 
-    def countLinksInBody(body: Body, p: EntityLink => Boolean): Int = {
-      def countLinks(b: Any): Int = b match {
+    def countLinksInBody(body: Body, p: EntityLink => Boolean): Int =
+      def countLinks(b: Any): Int = b match
         case el: EntityLink if p(el) => 1
         case s: Seq[_] => s.toList.map(countLinks(_)).sum
         case p: Product => p.productIterator.toList.map(countLinks(_)).sum
         case _ => 0
-      }
       countLinks(body)
-    }
 
     def testDiagram(doc: DocTemplateEntity,
                     diag: Option[Diagram],
                     nodes: Int,
-                    edges: Int) = {
+                    edges: Int) =
       assert(diag.isDefined, doc.qualifiedName + " diagram missing")
       assert(diag.get.nodes.length == nodes,
              doc.qualifiedName + "'s diagram: node count " +
@@ -275,6 +261,3 @@ abstract class ScaladocModelTest extends DirectTest {
       assert(diag.get.edges.map(_._2.length).sum == edges,
              doc.qualifiedName + "'s diagram: edge count " +
              diag.get.edges.length + " == " + edges)
-    }
-  }
-}

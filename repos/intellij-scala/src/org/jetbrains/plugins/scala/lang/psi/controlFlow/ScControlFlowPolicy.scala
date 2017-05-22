@@ -8,12 +8,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
   * Nikolay.Tropin
   * 2014-04-14
   */
-trait ScControlFlowPolicy {
+trait ScControlFlowPolicy
   def isElementAccepted(named: PsiNamedElement): Boolean
 
   def usedVariable(ref: ScReferenceElement): Option[PsiNamedElement] =
-    ref.resolve() match {
+    ref.resolve() match
       case named: PsiNamedElement if isElementAccepted(named) => Some(named)
       case _ => None
-    }
-}

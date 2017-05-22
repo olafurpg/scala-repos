@@ -20,7 +20,7 @@ package org.apache.spark.sql.catalyst.expressions
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types.IntegerType
 
-class AttributeSetSuite extends SparkFunSuite {
+class AttributeSetSuite extends SparkFunSuite
 
   val aUpper = AttributeReference("A", IntegerType)(exprId = ExprId(1))
   val aLower = AttributeReference("a", IntegerType)(exprId = ExprId(1))
@@ -33,43 +33,37 @@ class AttributeSetSuite extends SparkFunSuite {
 
   val aAndBSet = AttributeSet(aUpper :: bUpper :: Nil)
 
-  test("sanity check") {
+  test("sanity check")
     assert(aUpper != aLower)
     assert(bUpper != bLower)
-  }
 
-  test("checks by id not name") {
+  test("checks by id not name")
     assert(aSet.contains(aUpper) === true)
     assert(aSet.contains(aLower) === true)
     assert(aSet.contains(fakeA) === false)
 
     assert(aSet.contains(bUpper) === false)
     assert(aSet.contains(bLower) === false)
-  }
 
-  test("++ preserves AttributeSet") {
+  test("++ preserves AttributeSet")
     assert((aSet ++ bSet).contains(aUpper) === true)
     assert((aSet ++ bSet).contains(aLower) === true)
-  }
 
-  test("extracts all references references") {
+  test("extracts all references references")
     val addSet = AttributeSet(Add(aUpper, Alias(bUpper, "test")()) :: Nil)
     assert(addSet.contains(aUpper))
     assert(addSet.contains(aLower))
     assert(addSet.contains(bUpper))
     assert(addSet.contains(bLower))
-  }
 
-  test("dedups attributes") {
+  test("dedups attributes")
     assert(AttributeSet(aUpper :: aLower :: Nil).size === 1)
-  }
 
-  test("subset") {
+  test("subset")
     assert(aSet.subsetOf(aAndBSet) === true)
     assert(aAndBSet.subsetOf(aSet) === false)
-  }
 
-  test("equality") {
+  test("equality")
     assert(aSet != aAndBSet)
     assert(aAndBSet != aSet)
     assert(aSet != bSet)
@@ -77,5 +71,3 @@ class AttributeSetSuite extends SparkFunSuite {
 
     assert(aSet == aSet)
     assert(aSet == AttributeSet(aUpper :: Nil))
-  }
-}

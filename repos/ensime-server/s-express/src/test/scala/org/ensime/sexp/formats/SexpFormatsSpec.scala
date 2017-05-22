@@ -4,14 +4,14 @@ package org.ensime.sexp.formats
 
 import org.ensime.sexp._
 
-class SexpFormatsSpec extends FormatSpec with SexpFormats {
+class SexpFormatsSpec extends FormatSpec with SexpFormats
 
   val foo = SexpString("foo")
   val bar = SexpSymbol("bar")
 
   def assertFormat(sexp: Sexp): Unit = assertFormat(sexp, sexp)
 
-  "SexpFormats" should "support SexpAtoms" in {
+  "SexpFormats" should "support SexpAtoms" in
     assertFormat(SexpNil)
     assertFormat(SexpPosInf)
     assertFormat(SexpNegInf)
@@ -19,13 +19,9 @@ class SexpFormatsSpec extends FormatSpec with SexpFormats {
     assertFormat(SexpNumber(1))
     assertFormat(SexpString("hello"))
     assertFormat(SexpSymbol("hello"))
-  }
 
-  it should "support SexpList" in {
+  it should "support SexpList" in
     assertFormat(SexpList(foo, bar))
-  }
 
-  it should "support SexpCons" in {
+  it should "support SexpCons" in
     assertFormat(SexpCons(foo, bar))
-  }
-}

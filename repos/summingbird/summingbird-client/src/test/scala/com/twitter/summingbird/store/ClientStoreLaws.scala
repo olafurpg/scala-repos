@@ -12,20 +12,18 @@ import org.scalacheck._
   * present in the map will be mapped to successful futures. Missing
   * keys are interpreted as failed futures.
   */
-case class TestStore[K, +V](m: Map[K, Option[V]]) extends ReadableStore[K, V] {
+case class TestStore[K, +V](m: Map[K, Option[V]]) extends ReadableStore[K, V]
   override def get(k: K) =
     m.get(k)
       .map { Future.value(_) }
       .getOrElse(Future.exception(new RuntimeException("fail!")))
-}
 
-class ClientStoreLaws extends WordSpec {
+class ClientStoreLaws extends WordSpec
 
   /** Batcher that always returns a batch of 10. */
-  implicit val batcher = new AbstractBatcher {
+  implicit val batcher = new AbstractBatcher
     def batchOf(t: Timestamp) = BatchID(10)
     def earliestTimeOf(batch: BatchID) = Timestamp(0)
-  }
 
   val offline = TestStore[String, (BatchID, Int)](
       Map(
@@ -62,42 +60,32 @@ class ClientStoreLaws extends WordSpec {
   val keys = Set("a", "b", "c", "d", "e", "f")
   val retMap = clientStore.multiGet(keys)
 
-  def assertPresent[T](f: Future[T], comparison: T) {
+  def assertPresent[T](f: Future[T], comparison: T)
     assert(Await.result(f.liftToTry).isReturn && Await.result(f) == comparison)
-  }
 
-  "ClientStore should return a map from multiGet of the same size as the input request" in {
+  "ClientStore should return a map from multiGet of the same size as the input request" in
     assert(keys == retMap.keySet)
-  }
-  "ClientStore should return Some(v) (properly merged) if either offline and online have values" in {
+  "ClientStore should return Some(v) (properly merged) if either offline and online have values" in
     assertPresent(retMap("a"), Some(3))
     assertPresent(retMap("b"), Some(1))
     assertPresent(retMap("c"), Some(2))
-  }
-  "ClientStore should return None if both offline and online have None for all batches" in {
+  "ClientStore should return None if both offline and online have None for all batches" in
     assertPresent(retMap("d"), None)
-  }
-  "ClientStore should fail a key when offline succeeds and online fails" in {
+  "ClientStore should fail a key when offline succeeds and online fails" in
     assert(Await.result(retMap("e").liftToTry).isThrow)
-  }
-  "ClientStore should fail a key when offline fails and online succeeds" in {
+  "ClientStore should fail a key when offline fails and online succeeds" in
     assert(Await.result(retMap("f").liftToTry).isThrow)
-  }
-}
 
-class ClientStoreProps extends Properties("ClientStore") {
+class ClientStoreProps extends Properties("ClientStore")
 
   implicit def batchArb: Arbitrary[BatchID] =
     Arbitrary(Gen.choose(0L, 100L).map(BatchID(_)))
 
-  property("OfflineLTEQ Batch works") = Prop.forAll {
+  property("OfflineLTEQ Batch works") = Prop.forAll
     (b: BatchID, offset: Int) =>
       val offline = Future.value(Some((b, 0)))
       val nextB = BatchID(b.id + offset)
-      if (offset >= 0) {
+      if (offset >= 0)
         Await.result(ClientStore.offlineLTEQBatch(0, nextB, offline)) == offline.get
-      } else {
+      else
         Await.ready(ClientStore.offlineLTEQBatch(0, nextB, offline)).isThrow
-      }
-  }
-}

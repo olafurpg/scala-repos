@@ -4,7 +4,7 @@ import acyclic.file
 
 import fastparse.all._
 import fastparse.CharPredicates._
-object Basic {
+object Basic
   val UnicodeEscape = P("u" ~ HexDigit ~ HexDigit ~ HexDigit ~ HexDigit)
 
   //Numbers and digits
@@ -23,19 +23,17 @@ object Basic {
   val Semi = P(";" | Newline.rep(1))
   val OpChar = P(CharPred(isOpChar))
 
-  def isOpChar(c: Char) = {
+  def isOpChar(c: Char) =
     // scalac 2.10 crashes if OtherOrMathSymbol below is substituted by its body
     // Same thing for LetterDigit, LowerChar, UpperChar
     fastparse.CharPredicates.isOtherSymbol(c) ||
     fastparse.CharPredicates.isMathSymbol(c) ||
     "!#%&*+-/:<=>?@\\^|~".contains(c)
-  }
   val Letter = P(CharPred(c => c.isLetter | c.isDigit | "$_".contains(c)))
   val LetterDigitDollarUnderscore = P(
       CharPred(c => c.isLetter | c.isDigit | "$_".contains(c)))
   val Lower = P(CharPred(c => c.isLower || "$_".contains(c)))
   val Upper = P(CharPred(_.isUpper))
-}
 
 /**
   * Most keywords don't just require the correct characters to match,
@@ -43,10 +41,9 @@ object Basic {
   * order for it to be a keyword. This enforces that rule for key-words
   * (W) and key-operators (O) which have different non-match criteria.
   */
-object Key {
+object Key
   def W(s: String) =
     P(s ~ !Basic.LetterDigitDollarUnderscore)(sourcecode.Name(s"`$s`"))
   // If the operator is followed by a comment, stop early so we can parse the comment
   def O(s: String) =
     P(s ~ (!Basic.OpChar | &("/*" | "//")))(sourcecode.Name(s"`$s`"))
-}

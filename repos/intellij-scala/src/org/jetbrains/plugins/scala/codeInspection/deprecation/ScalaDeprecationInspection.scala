@@ -17,14 +17,14 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * User: Alexander Podkhalyuzin
   * Date: 13.04.2010
   */
-class ScalaDeprecationInspection extends LocalInspectionTool {
+class ScalaDeprecationInspection extends LocalInspectionTool
   override def buildVisitor(
-      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor = {
+      holder: ProblemsHolder, isOnTheFly: Boolean): PsiElementVisitor =
     def checkDeprecated(result: Option[ScalaResolveResult],
                         elementToHighlight: PsiElement,
-                        name: String) {
+                        name: String)
       val refElement = result.getOrElse(return ).element
-      refElement match {
+      refElement match
         case param: ScParameter
             if result.get.isNamedParameter &&
             !ScalaPsiUtil.memberNamesEquals(param.name, name) =>
@@ -40,25 +40,22 @@ class ScalaDeprecationInspection extends LocalInspectionTool {
           return
         case _: PsiNamedElement =>
         case _ => return
-      }
       val context =
         ScalaPsiUtil.nameContext(refElement.asInstanceOf[PsiNamedElement])
-      context match {
+      context match
         case doc: PsiDocCommentOwner =>
-          doc match {
+          doc match
             case _: ScPrimaryConstructor =>
             case f: PsiMethod if f.isConstructor =>
             case _ => if (!doc.isDeprecated) return
-          }
           if (!doc.isDeprecated &&
               !Option(doc.containingClass).exists(_.isDeprecated)) return
         case _ => return
-      }
-      val message = for {
+      val message = for
         holder <- context.asOptionOf[ScAnnotationsHolder]
         annotation <- holder.hasAnnotation("scala.deprecated")
         message <- ScalaPsiUtil.readAttribute(annotation, "value")
-      } yield message
+      yield message
 
       val description: String = Seq(Some("Symbol " + name + " is deprecated"),
                                     message).flatten.mkString(". ")
@@ -69,33 +66,23 @@ class ScalaDeprecationInspection extends LocalInspectionTool {
               true,
               ProblemHighlightType.LIKE_DEPRECATED,
               isOnTheFly))
-    }
 
-    new ScalaElementVisitor {
-      override def visitFunction(fun: ScFunction) {
+    new ScalaElementVisitor
+      override def visitFunction(fun: ScFunction)
         //todo: check super method is deprecated
-      }
 
-      override def visitReference(ref: ScReferenceElement) {
+      override def visitReference(ref: ScReferenceElement)
         if (!ref.isValid) return
         checkDeprecated(ref.bind(), ref.nameId, ref.refName)
-      }
 
-      override def visitReferenceExpression(ref: ScReferenceExpression) {
+      override def visitReferenceExpression(ref: ScReferenceExpression)
         visitReference(ref)
-      }
 
-      override def visitTypeProjection(proj: ScTypeProjection) {
+      override def visitTypeProjection(proj: ScTypeProjection)
         visitReference(proj)
-      }
-    }
-  }
 
-  override def getID: String = {
+  override def getID: String =
     "ScalaDeprecation"
-  }
 
-  override def isEnabledByDefault: Boolean = {
+  override def isEnabledByDefault: Boolean =
     true
-  }
-}

@@ -21,11 +21,11 @@ import scala.language.reflectiveCalls
 
 class CategoricalNaiveBayesTest
     extends FlatSpec with Matchers with SharedSparkContext
-    with NaiveBayesFixture {
+    with NaiveBayesFixture
   val Tolerance = .0001
   val labeledPoints = fruit.labeledPoints
 
-  "Model" should "have log priors and log likelihoods" in {
+  "Model" should "have log priors and log likelihoods" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
@@ -67,9 +67,8 @@ class CategoricalNaiveBayesTest
         -1.3863 +- Tolerance)
     model.likelihoods(fruit.OtherFruit)(2)(fruit.NotYellow) should be(
         -.2877 +- Tolerance)
-  }
 
-  "Model's log score" should "be the log score of the given point" in {
+  "Model's log score" should "be the log score of the given point" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
@@ -78,9 +77,8 @@ class CategoricalNaiveBayesTest
 
     score should not be None
     score.get should be(-4.2304 +- Tolerance)
-  }
 
-  it should "be negative infinity for a point with a non-existing feature" in {
+  it should "be negative infinity for a point with a non-existing feature" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
@@ -89,9 +87,8 @@ class CategoricalNaiveBayesTest
 
     score should not be None
     score.get should be(Double.NegativeInfinity)
-  }
 
-  it should "be none for a point with a non-existing label" in {
+  it should "be none for a point with a non-existing label" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
@@ -99,9 +96,8 @@ class CategoricalNaiveBayesTest
             "Not Exist", Array(fruit.Long, fruit.NotSweet, fruit.Yellow)))
 
     score should be(None)
-  }
 
-  it should "use the provided default likelihood function" in {
+  it should "use the provided default likelihood function" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
@@ -115,13 +111,10 @@ class CategoricalNaiveBayesTest
 
     score should not be None
     score.get should be(-4.9236 +- Tolerance)
-  }
 
-  "Model predict" should "return the correct label" in {
+  "Model predict" should "return the correct label" in
     val labeledPointsRdd = sc.parallelize(labeledPoints)
     val model = CategoricalNaiveBayes.train(labeledPointsRdd)
 
     val label = model.predict(Array(fruit.Long, fruit.Sweet, fruit.Yellow))
     label should be(fruit.Banana)
-  }
-}

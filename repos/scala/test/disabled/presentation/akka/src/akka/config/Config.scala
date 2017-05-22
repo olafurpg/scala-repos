@@ -15,55 +15,49 @@ class ModuleNotAvailableException(message: String, cause: Throwable = null)
   *
   * @author <a href="http://jonasboner.com">Jonas Bon&#233;r</a>
   */
-object Config {
+object Config
   val VERSION = "1.1.3"
 
-  val HOME = {
-    val envHome = System.getenv("AKKA_HOME") match {
+  val HOME =
+    val envHome = System.getenv("AKKA_HOME") match
       case null | "" | "." => None
       case value => Some(value)
-    }
 
-    val systemHome = System.getProperty("akka.home") match {
+    val systemHome = System.getProperty("akka.home") match
       case null | "" => None
       case value => Some(value)
-    }
 
     envHome orElse systemHome
-  }
 
-  val config: Configuration = try {
-    val confName = {
-      val envConf = System.getenv("AKKA_MODE") match {
+  val config: Configuration = try
+    val confName =
+      val envConf = System.getenv("AKKA_MODE") match
         case null | "" => None
         case value => Some(value)
-      }
 
-      val systemConf = System.getProperty("akka.mode") match {
+      val systemConf = System.getProperty("akka.mode") match
         case null | "" => None
         case value => Some(value)
-      }
 
       (envConf orElse systemConf)
         .map("akka." + _ + ".conf")
         .getOrElse("akka.conf")
-    }
 
     val newInstance =
-      if (System.getProperty("akka.config", "") != "") {
+      if (System.getProperty("akka.config", "") != "")
         val configFile = System.getProperty("akka.config", "")
         println("Loading config from -Dakka.config=" + configFile)
         Configuration.fromFile(configFile)
-      } else if (getClass.getClassLoader.getResource(confName) ne null) {
+      else if (getClass.getClassLoader.getResource(confName) ne null)
         println("Loading config [" + confName +
             "] from the application classpath.")
         Configuration.fromResource(confName, getClass.getClassLoader)
-      } else if (HOME.isDefined) {
+      else if (HOME.isDefined)
         val configFile = HOME.get + "/config/" + confName
         println("AKKA_HOME is defined as [" + HOME.get +
             "], loading config from [" + configFile + "].")
         Configuration.fromFile(configFile)
-      } else {
+      else
         println(
             "\nCan't load '" +
             confName + "'." + "\nOne of the three ways of locating the '" +
@@ -74,7 +68,6 @@ object Config {
             "\nI have no way of finding the '" + confName +
             "' configuration file." + "\nUsing default values everywhere.")
         Configuration.fromString("akka {}") // default empty config
-      }
 
     val configVersion = newInstance.getString("akka.version", VERSION)
     if (configVersion != VERSION)
@@ -84,13 +77,12 @@ object Config {
           "]")
 
     newInstance
-  } catch {
+  catch
     case e =>
       System.err.println("Couldn't parse config, fatal error.")
       e.printStackTrace(System.err)
       System.exit(-1)
       throw e
-  }
 
   val CONFIG_VERSION = config.getString("akka.version", VERSION)
 
@@ -98,4 +90,3 @@ object Config {
 
   val startTime = System.currentTimeMillis
   def uptime = (System.currentTimeMillis - startTime) / 1000
-}

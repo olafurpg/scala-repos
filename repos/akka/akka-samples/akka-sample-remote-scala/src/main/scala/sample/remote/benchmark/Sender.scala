@@ -11,8 +11,8 @@ import akka.actor.Props
 import akka.actor.ActorSystem
 import com.typesafe.config.ConfigFactory
 
-object Sender {
-  def main(args: Array[String]): Unit = {
+object Sender
+  def main(args: Array[String]): Unit =
     val system = ActorSystem("Sys", ConfigFactory.load("calculator"))
 
     val remoteHostPort = if (args.length >= 1) args(0) else "127.0.0.1:2553"
@@ -23,7 +23,6 @@ object Sender {
 
     system.actorOf(
         Sender.props(remotePath, totalMessages, burstSize, payloadSize), "snd")
-  }
 
   def props(path: String,
             totalMessages: Int,
@@ -39,11 +38,10 @@ object Sender {
   case class Continue(
       remaining: Int, startTime: Long, burstStartTime: Long, n: Int)
       extends Echo
-}
 
 class Sender(
     path: String, totalMessages: Int, burstSize: Int, payloadSize: Int)
-    extends Actor {
+    extends Actor
   import Sender._
 
   val payload: Array[Byte] = Vector.fill(payloadSize)("a").mkString.getBytes
@@ -58,7 +56,7 @@ class Sender(
 
   def receive = identifying
 
-  def identifying: Receive = {
+  def identifying: Receive =
     case ActorIdentity(`path`, Some(actor)) =>
       context.watch(actor)
       context.become(active(actor))
@@ -67,9 +65,8 @@ class Sender(
     case ActorIdentity(`path`, None) =>
       println(s"Remote actor not available: $path")
     case ReceiveTimeout => sendIdentifyRequest()
-  }
 
-  def active(actor: ActorRef): Receive = {
+  def active(actor: ActorRef): Receive =
     case Warmup =>
       sendBatch(actor, burstSize)
       actor ! Start
@@ -87,12 +84,11 @@ class Sender(
       val duration = (now - t0).nanos.toMillis
       val roundTripMillis = (now - t1).nanos.toMillis
       maxRoundTripMillis = math.max(maxRoundTripMillis, roundTripMillis)
-      if (duration >= 500) {
+      if (duration >= 500)
         val throughtput = (n * 1000.0 / duration).toInt
         println(
             s"It took $duration ms to deliver $n messages, throughtput $throughtput msg/s, " +
             s"latest round-trip $roundTripMillis ms, remaining $remaining of $totalMessages")
-      }
 
       val nextRemaining = sendBatch(actor, remaining)
       if (nextRemaining == 0) actor ! Done
@@ -114,16 +110,12 @@ class Sender(
     case Terminated(`actor`) =>
       println("Receiver terminated")
       context.system.terminate()
-  }
 
   /**
     * @return remaining messages after sending the batch
     */
-  def sendBatch(actor: ActorRef, remaining: Int): Int = {
+  def sendBatch(actor: ActorRef, remaining: Int): Int =
     val batchSize = math.min(remaining, burstSize)
-    (1 to batchSize) foreach { x =>
+    (1 to batchSize) foreach  x =>
       actor ! payload
-    }
     remaining - batchSize
-  }
-}

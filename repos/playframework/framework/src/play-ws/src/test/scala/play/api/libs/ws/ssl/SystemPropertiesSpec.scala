@@ -10,7 +10,7 @@ import java.security.Security
 
 import play.api.libs.ws.WSClientConfig
 
-object SystemPropertiesSpec extends Specification with After {
+object SystemPropertiesSpec extends Specification with After
 
   sequential
 
@@ -18,9 +18,9 @@ object SystemPropertiesSpec extends Specification with After {
 
   val sp = new SystemConfiguration()
 
-  "SystemProperties" should {
+  "SystemProperties" should
 
-    "disableCheckRevocation should not be set normally" in {
+    "disableCheckRevocation should not be set normally" in
       val config = WSClientConfig(ssl = SSLConfig(checkRevocation = None))
 
       val originalOscp = Security.getProperty("ocsp.enable")
@@ -31,9 +31,8 @@ object SystemPropertiesSpec extends Specification with After {
       Security.getProperty("ocsp.enable") must_== originalOscp
       System.getProperty("com.sun.security.enableCRLDP") must beNull
       System.getProperty("com.sun.net.ssl.checkRevocation") must beNull
-    }
 
-    "disableCheckRevocation is set explicitly" in {
+    "disableCheckRevocation is set explicitly" in
       val config =
         WSClientConfig(ssl = SSLConfig(checkRevocation = Some(true)))
 
@@ -43,20 +42,18 @@ object SystemPropertiesSpec extends Specification with After {
       Security.getProperty("ocsp.enable") must be("true")
       System.getProperty("com.sun.security.enableCRLDP") must be("true")
       System.getProperty("com.sun.net.ssl.checkRevocation") must be("true")
-    }
 
     // @see http://www.oracle.com/technetwork/java/javase/documentation/tlsreadme2-176330.html
-    "allowLegacyHelloMessages is not set" in {
+    "allowLegacyHelloMessages is not set" in
       val config = WSClientConfig(ssl = SSLConfig(
                 loose = SSLLooseConfig(allowLegacyHelloMessages = None)))
 
       sp.configure(config)
 
       System.getProperty("sun.security.ssl.allowLegacyHelloMessages") must beNull
-    }
 
     // @see http://www.oracle.com/technetwork/java/javase/documentation/tlsreadme2-176330.html
-    "allowLegacyHelloMessages is set" in {
+    "allowLegacyHelloMessages is set" in
       val config = WSClientConfig(ssl = SSLConfig(
                 loose = SSLLooseConfig(allowLegacyHelloMessages = Some(true))))
 
@@ -64,20 +61,18 @@ object SystemPropertiesSpec extends Specification with After {
 
       System.getProperty("sun.security.ssl.allowLegacyHelloMessages") must be(
           "true")
-    }
 
     // @see http://www.oracle.com/technetwork/java/javase/documentation/tlsreadme2-176330.html
-    "allowUnsafeRenegotiation not set" in {
+    "allowUnsafeRenegotiation not set" in
       val config = WSClientConfig(ssl = SSLConfig(
                 loose = SSLLooseConfig(allowUnsafeRenegotiation = None)))
 
       sp.configure(config)
 
       System.getProperty("sun.security.ssl.allowUnsafeRenegotiation") must beNull
-    }
 
     // @see http://www.oracle.com/technetwork/java/javase/documentation/tlsreadme2-176330.html
-    "allowUnsafeRenegotiation is set" in {
+    "allowUnsafeRenegotiation is set" in
       val config = WSClientConfig(ssl = SSLConfig(
                 loose = SSLLooseConfig(allowUnsafeRenegotiation = Some(true))))
 
@@ -85,6 +80,3 @@ object SystemPropertiesSpec extends Specification with After {
 
       System.getProperty("sun.security.ssl.allowUnsafeRenegotiation") must be(
           "true")
-    }
-  }
-}

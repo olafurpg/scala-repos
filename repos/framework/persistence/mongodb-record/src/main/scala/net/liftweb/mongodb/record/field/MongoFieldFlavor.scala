@@ -29,7 +29,7 @@ import com.mongodb.DBObject
 /**
   * Describes common aspects related to Mongo fields
   */
-trait MongoFieldFlavor[MyType] {
+trait MongoFieldFlavor[MyType]
 
   /*
    * convert this field's value into a DBObject so it can be stored in Mongo.
@@ -42,11 +42,9 @@ trait MongoFieldFlavor[MyType] {
   /**
     * Returns the field's value as a valid JavaScript expression
     */
-  def asJs = asJValue match {
+  def asJs = asJValue match
     case JNothing => JsNull
     case jv => JsRaw(compactRender(jv))
-  }
 
   /** Encode the field value into a JValue */
   def asJValue: JValue
-}

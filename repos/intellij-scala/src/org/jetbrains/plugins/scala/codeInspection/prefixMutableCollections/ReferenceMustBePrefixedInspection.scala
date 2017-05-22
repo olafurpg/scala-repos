@@ -19,37 +19,31 @@ import org.jetbrains.plugins.scala.lang.resolve.ScalaResolveResult
   * @since 26.05.12
   */
 class ReferenceMustBePrefixedInspection
-    extends AbstractInspection(id, displayName) {
-  def actionFor(holder: ProblemsHolder) = {
+    extends AbstractInspection(id, displayName)
+  def actionFor(holder: ProblemsHolder) =
     case ref: ScReferenceElement
         if ref.qualifier.isEmpty &&
         !ref.getParent.isInstanceOf[ScImportSelector] =>
-      ref.bind() match {
+      ref.bind() match
         case Some(r: ScalaResolveResult) if r.nameShadow.isEmpty =>
-          r.getActualElement match {
+          r.getActualElement match
             case clazz: PsiClass if ScalaPsiUtil.hasStablePath(clazz) =>
               val qualName = clazz.qualifiedName
               if (ScalaCodeStyleSettings
                     .getInstance(holder.getProject)
-                    .hasImportWithPrefix(qualName)) {
+                    .hasImportWithPrefix(qualName))
                 holder.registerProblem(
                     ref, getDisplayName, new AddPrefixFix(ref, clazz))
-              }
             case _ =>
-          }
         case _ =>
-      }
-  }
-}
 
-object ReferenceMustBePrefixedInspection {
+object ReferenceMustBePrefixedInspection
   val id = "ReferenceMustBePrefixed"
   val displayName = "Reference must be prefixed"
-}
 
 class AddPrefixFix(ref: ScReferenceElement, clazz: PsiClass)
-    extends AbstractFixOnTwoPsiElements(AddPrefixFix.hint, ref, clazz) {
-  def doApplyFix(project: Project) {
+    extends AbstractFixOnTwoPsiElements(AddPrefixFix.hint, ref, clazz)
+  def doApplyFix(project: Project)
     val refElem = getFirstElement
     val cl = getSecondElement
     if (!refElem.isValid || !cl.isValid) return
@@ -59,26 +53,20 @@ class AddPrefixFix(ref: ScReferenceElement, clazz: PsiClass)
       JavaPsiFacade.getInstance(cl.getProject).findPackage(packageName)
     if (parts.length < 2) return
     val newRefText = parts.takeRight(2).mkString(".")
-    refElem match {
+    refElem match
       case stRef: ScStableCodeReferenceElement =>
         stRef.replace(ScalaPsiElementFactory.createReferenceFromText(
-                newRefText, stRef.getManager)) match {
+                newRefText, stRef.getManager)) match
           case r: ScStableCodeReferenceElement =>
             r.qualifier.foreach(_.bindToPackage(pckg, addImport = true))
           case _ =>
-        }
       case ref: ScReferenceExpression =>
         ref.replace(ScalaPsiElementFactory.createExpressionWithContextFromText(
-                newRefText, ref.getContext, ref)) match {
+                newRefText, ref.getContext, ref)) match
           case ScReferenceExpression.withQualifier(q: ScReferenceExpression) =>
             q.bindToPackage(pckg, addImport = true)
           case _ =>
-        }
       case _ =>
-    }
-  }
-}
 
-object AddPrefixFix {
+object AddPrefixFix
   val hint = "Add prefix to reference"
-}

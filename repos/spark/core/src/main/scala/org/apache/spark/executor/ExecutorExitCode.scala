@@ -27,7 +27,7 @@ import org.apache.spark.util.SparkExitCode._
   * exit codes 128+ arise on some Unix-likes as a result of signals, and it appears that the
   * OpenJDK JVM may use exit code 1 in some of its own "last chance" code.
   */
-private[spark] object ExecutorExitCode {
+private[spark] object ExecutorExitCode
 
   /** DiskStore failed to create a local temporary directory after many attempts. */
   val DISK_STORE_FAILED_TO_CREATE_DIR = 53
@@ -44,8 +44,8 @@ private[spark] object ExecutorExitCode {
     */
   val HEARTBEAT_FAILURE = 56
 
-  def explainExitCode(exitCode: Int): String = {
-    exitCode match {
+  def explainExitCode(exitCode: Int): String =
+    exitCode match
       case UNCAUGHT_EXCEPTION => "Uncaught exception"
       case UNCAUGHT_EXCEPTION_TWICE =>
         "Uncaught exception, and logging the exception failed"
@@ -62,11 +62,8 @@ private[spark] object ExecutorExitCode {
         "Unable to send heartbeats to driver."
       case _ =>
         "Unknown executor exit code (" + exitCode + ")" +
-        (if (exitCode > 128) {
+        (if (exitCode > 128)
            " (died from signal " + (exitCode - 128) + "?)"
-         } else {
+         else
            ""
-         })
-    }
-  }
-}
+         )

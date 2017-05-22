@@ -25,12 +25,11 @@ import scala.reflect.ClassTag
 /**
   * A serializer implementation that always returns two elements in a deserialization stream.
   */
-class TestSerializer extends Serializer {
+class TestSerializer extends Serializer
   override def newInstance(): TestSerializerInstance =
     new TestSerializerInstance
-}
 
-class TestSerializerInstance extends SerializerInstance {
+class TestSerializerInstance extends SerializerInstance
   override def serialize[T : ClassTag](t: T): ByteBuffer =
     throw new UnsupportedOperationException
 
@@ -46,19 +45,15 @@ class TestSerializerInstance extends SerializerInstance {
   override def deserialize[T : ClassTag](
       bytes: ByteBuffer, loader: ClassLoader): T =
     throw new UnsupportedOperationException
-}
 
-class TestDeserializationStream extends DeserializationStream {
+class TestDeserializationStream extends DeserializationStream
 
   private var count = 0
 
-  override def readObject[T : ClassTag](): T = {
+  override def readObject[T : ClassTag](): T =
     count += 1
-    if (count == 3) {
+    if (count == 3)
       throw new EOFException
-    }
     new Object().asInstanceOf[T]
-  }
 
   override def close(): Unit = {}
-}

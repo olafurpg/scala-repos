@@ -3,7 +3,7 @@ package plugins
 
 import Keys._
 
-object MavenResolverPlugin extends AutoPlugin {
+object MavenResolverPlugin extends AutoPlugin
   override def requires = IvyPlugin
   override def trigger = allRequirements
 
@@ -11,4 +11,3 @@ object MavenResolverPlugin extends AutoPlugin {
       updateOptions := updateOptions.value.withResolverConverter(
           MavenResolverConverter.converter)
   )
-}

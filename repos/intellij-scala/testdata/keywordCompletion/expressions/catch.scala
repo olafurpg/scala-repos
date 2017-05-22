@@ -1,8 +1,7 @@
-class a {
+class a
   try {}
 
   /*caret*/
-}
 /*
 abstract
 case

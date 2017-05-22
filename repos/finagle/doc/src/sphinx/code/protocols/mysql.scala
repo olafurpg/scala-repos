@@ -4,18 +4,16 @@ import com.twitter.util.Await
 import com.twitter.finagle.client.DefaultPool
 import com.twitter.conversions.time._
 
-object Shared {
+object Shared
   //#processRow
   def processRow(row: Row): Option[Long] =
-    row("product").flatMap {
+    row("product").flatMap
       case LongValue(l) => Some(l)
       case IntValue(i) => Some(i.toLong)
       case _ => None
-    }
   //#processRow
-}
 
-object ServiceFactoryExample {
+object ServiceFactoryExample
   import Shared._
 
   //#client
@@ -30,25 +28,21 @@ object ServiceFactoryExample {
     .newClient("127.0.0.1:3306")
   //#client
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     //#query0
-    val product = client().flatMap { service =>
+    val product = client().flatMap  service =>
       // `service` is checked out from the pool.
-      service(QueryRequest("SELECT 5*5 AS `product`")) map {
+      service(QueryRequest("SELECT 5*5 AS `product`")) map
         case rs: ResultSet => rs.rows.map(processRow)
         case _ => Seq.empty
-      } ensure {
+      ensure
         // put `service` back into the pool.
         service.close()
-      }
-    }
     //#query0
 
     println(Await.result(product))
-  }
-}
 
-object RichExample {
+object RichExample
   import Shared._
 
   //#richClient
@@ -63,10 +57,8 @@ object RichExample {
     .newRichClient("127.0.0.1:3306")
   //#richClient
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     //#query1
     val product = richClient.select("SELECT 5*5 AS `product`")(processRow)
     //#query1
     println(Await.result(product))
-  }
-}

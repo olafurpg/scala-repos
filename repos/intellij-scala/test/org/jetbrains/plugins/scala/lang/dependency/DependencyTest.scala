@@ -8,8 +8,8 @@ import org.junit.Assert
 /**
   * Pavel Fatin
   */
-class DependencyTest extends SimpleTestCase {
-  def testClass() {
+class DependencyTest extends SimpleTestCase
+  def testClass()
     assertDependenciesAre("""
     object O {
       class C
@@ -17,17 +17,15 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScClass: C", "O.C"))
-  }
 
-  def testSyntheticClass() {
+  def testSyntheticClass()
     assertDependenciesAre("""
     object O {
       classOf[Int]
     }
     """)
-  }
 
-  def testObject() {
+  def testObject()
     assertDependenciesAre("""
     object O {
       object Foo
@@ -35,9 +33,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("Foo", "ScObject: Foo", "O.Foo"))
-  }
 
-  def testQualifier() {
+  def testQualifier()
     assertDependenciesAre("""
     object O {
       object Foo
@@ -45,9 +42,8 @@ class DependencyTest extends SimpleTestCase {
     O.Foo
     """,
                           ("O", "ScObject: O", "O"))
-  }
 
-  def testPrimaryConstructor() {
+  def testPrimaryConstructor()
     assertDependenciesAre("""
     object O {
       class C
@@ -55,9 +51,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "PrimaryConstructor", "O.C"))
-  }
 
-  def testSecondaryConstructor() {
+  def testSecondaryConstructor()
     assertDependenciesAre("""
     object O {
       class C(i: Int, s: String) {
@@ -69,9 +64,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: this", "O.C"))
-  }
 
-  def testCaseClassCopy() {
+  def testCaseClassCopy()
     assertDependenciesAre("""
     object O {
       case class C(v: Any)
@@ -79,9 +73,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: apply", "O.C"))
-  }
 
-  def testSyntheticApply() {
+  def testSyntheticApply()
     assertDependenciesAre("""
     object O {
       case class C()
@@ -89,9 +82,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: apply", "O.C"))
-  }
 
-  def testSyntheticUnapply() {
+  def testSyntheticUnapply()
     assertDependenciesAre("""
     object O {
       case class C()
@@ -101,9 +93,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: unapply", "O.C"))
-  }
 
-  def testSyntheticInfixUnapply() {
+  def testSyntheticInfixUnapply()
     assertDependenciesAre("""
     object O {
       case class C(a: Any, b: Any)
@@ -113,9 +104,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: unapply", "O.C"))
-  }
 
-  def testSyntheticUnapplySeq() {
+  def testSyntheticUnapplySeq()
     assertDependenciesAre("""
     object O {
       case class C(seq: Any*)
@@ -125,9 +115,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("C", "ScFunctionDefinition: unapplySeq", "O.C"))
-  }
 
-  def testExplicitApply() {
+  def testExplicitApply()
     assertDependenciesAre("""
     object O {
       object Foo {
@@ -137,9 +126,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("Foo", "ScFunctionDefinition: apply", "O.Foo"))
-  }
 
-  def testExplicitUnapply() {
+  def testExplicitUnapply()
     assertDependenciesAre("""
     object O {
       object Foo {
@@ -151,9 +139,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
-  }
 
-  def testExplicitInfixUnapply() {
+  def testExplicitInfixUnapply()
     assertDependenciesAre("""
     object O {
       object Foo {
@@ -165,9 +152,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("Foo", "ScFunctionDefinition: unapply", "O.Foo"))
-  }
 
-  def testExplicitUnapplySeq() {
+  def testExplicitUnapplySeq()
     assertDependenciesAre("""
     object O {
       object Foo {
@@ -179,9 +165,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("Foo", "ScFunctionDefinition: unapplySeq", "O.Foo"))
-  }
 
-  def testFunction() {
+  def testFunction()
     assertDependenciesAre("""
     object O {
       def foo() {}
@@ -189,27 +174,24 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("foo", "ScFunctionDefinition: foo", "O.foo"))
-  }
 
-  def testValue() {
+  def testValue()
     assertDependenciesAre("""
     object O {
       val foo = 1
       foo
     }""",
                           ("foo", "ReferencePattern: foo", "O.foo"))
-  }
 
-  def testVariable() {
+  def testVariable()
     assertDependenciesAre("""
     object O {
       var foo = 1
       foo
     }""",
                           ("foo", "ReferencePattern: foo", "O.foo"))
-  }
 
-  def testNonStaticMembers() {
+  def testNonStaticMembers()
     assertDependenciesAre("""
     object O {
       class A {
@@ -225,9 +207,8 @@ class DependencyTest extends SimpleTestCase {
     }
     """,
                           ("A", "PrimaryConstructor", "O.A"))
-  }
 
-  def testInheritedMemberImport() {
+  def testInheritedMemberImport()
     assertDependenciesAre("""
     object O {
       trait A {
@@ -240,7 +221,6 @@ class DependencyTest extends SimpleTestCase {
                           ("A", "ScTrait: A", "O.A"),
                           ("B", "ScObject: B", "O.B"),
                           ("foo", "ScFunctionDefinition: foo", "O.B.foo"))
-  }
 
   // package
   // implicit conversions
@@ -248,7 +228,7 @@ class DependencyTest extends SimpleTestCase {
   // injected
 
   private def assertDependenciesAre(@Language("Scala") code: String,
-                                    expectations: (String, String, String)*) {
+                                    expectations: (String, String, String)*)
     val file = parseText(code)
 
     val descriptors = Dependency
@@ -256,5 +236,3 @@ class DependencyTest extends SimpleTestCase {
       .map(it => (it.source.getText, it.target.toString, it.path.asString))
 
     Assert.assertEquals(expectations.toList, descriptors.toList)
-  }
-}

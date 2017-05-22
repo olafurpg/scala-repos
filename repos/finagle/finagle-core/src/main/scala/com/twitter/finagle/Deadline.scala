@@ -18,17 +18,16 @@ import com.twitter.util.{Try, Return, Throw, Time, Duration}
   * @param deadline the time by which the action must complete.
   */
 case class Deadline(timestamp: Time, deadline: Time)
-    extends Ordered[Deadline] {
+    extends Ordered[Deadline]
   def compare(that: Deadline): Int = this.deadline.compare(that.deadline)
   def expired: Boolean = Time.now > deadline
   def remaining: Duration = deadline - Time.now
-}
 
 /**
   * A broadcast context for deadlines.
   */
 object Deadline
-    extends Contexts.broadcast.Key[Deadline]("com.twitter.finagle.Deadline") {
+    extends Contexts.broadcast.Key[Deadline]("com.twitter.finagle.Deadline")
 
   /**
     * Returns the current request's deadline, if set.
@@ -39,10 +38,9 @@ object Deadline
   /**
     * Construct a deadline from a timeout.
     */
-  def ofTimeout(timeout: Duration): Deadline = {
+  def ofTimeout(timeout: Duration): Deadline =
     val now = Time.now
     Deadline(now, now + timeout)
-  }
 
   /**
     * Construct a new deadline, representing the combined deadline
@@ -53,14 +51,13 @@ object Deadline
   def combined(d1: Deadline, d2: Deadline): Deadline =
     Deadline(d1.timestamp max d2.timestamp, d1.deadline min d2.deadline)
 
-  def marshal(deadline: Deadline): Buf = {
+  def marshal(deadline: Deadline): Buf =
     val bytes = new Array[Byte](16)
     ByteArrays.put64be(bytes, 0, deadline.timestamp.inNanoseconds)
     ByteArrays.put64be(bytes, 8, deadline.deadline.inNanoseconds)
     Buf.ByteArray.Owned(bytes)
-  }
 
-  def tryUnmarshal(body: Buf): Try[Deadline] = {
+  def tryUnmarshal(body: Buf): Try[Deadline] =
     if (body.length != 16)
       return Throw(new IllegalArgumentException(
               s"Invalid body. Length ${body.length} but required 16"))
@@ -71,5 +68,3 @@ object Deadline
 
     Return(Deadline(
             Time.fromNanoseconds(timestamp), Time.fromNanoseconds(deadline)))
-  }
-}

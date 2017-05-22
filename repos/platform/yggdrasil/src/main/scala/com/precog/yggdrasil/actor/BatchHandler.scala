@@ -41,8 +41,8 @@ import scalaz.syntax.monoid._
 case class BatchComplete(requestor: ActorRef, checkpoint: YggCheckpoint)
 case class BatchFailed(requestor: ActorRef, checkpoint: YggCheckpoint)
 
-class BatchCompleteNotifier(p: Promise[BatchComplete]) extends Actor {
-  def receive = {
+class BatchCompleteNotifier(p: Promise[BatchComplete]) extends Actor
+  def receive =
     case complete: BatchComplete =>
       p.complete(Right(complete))
       self ! PoisonPill
@@ -51,8 +51,6 @@ class BatchCompleteNotifier(p: Promise[BatchComplete]) extends Actor {
       p.complete(Left(new RuntimeException(
                   "Received non-complete notification: " + other.toString)))
       self ! PoisonPill
-  }
-}
 
 /**
   * A batch handler actor is responsible for tracking confirmation of persistence for
@@ -62,16 +60,15 @@ class BatchHandler(ingestActor: ActorRef,
                    requestor: ActorRef,
                    checkpoint: YggCheckpoint,
                    ingestTimeout: Timeout)
-    extends Actor with Logging {
+    extends Actor with Logging
   private var remaining = -1
 
-  override def preStart() = {
+  override def preStart() =
     logger.debug("Starting new BatchHandler reporting to " + requestor)
     context.system.scheduler
       .scheduleOnce(ingestTimeout.duration, self, PoisonPill)
-  }
 
-  def receive = {
+  def receive =
     case ProjectionUpdatesExpected(count) =>
       remaining += (count + 1)
       logger.trace(
@@ -111,20 +108,16 @@ class BatchHandler(ingestActor: ActorRef,
 
     case other =>
       logger.warn("Received unexpected message in BatchHandler: " + other)
-  }
 
-  override def postStop() = {
+  override def postStop() =
     // if the ingest isn't complete by the timeout, ask the requestor to retry
-    if (remaining != 0) {
+    if (remaining != 0)
       logger.info("Sending incomplete with %d remaining to %s".format(
               remaining, requestor))
       ingestActor ! BatchFailed(requestor, checkpoint)
-    } else {
+    else
       // update the metadatabase, by way of notifying the ingest actor
       // so that any pending completions that arrived out of order can be cleared.
       logger.info("Sending complete on batch to " + requestor)
       ingestActor ! BatchComplete(requestor, checkpoint)
-    }
-  }
-}
 // vim: set ts=4 sw=4 et:

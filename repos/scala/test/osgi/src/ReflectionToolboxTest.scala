@@ -14,20 +14,19 @@ import org.ops4j.pax.exam.spi.reactors.{ExamReactorStrategy, PerMethod}
 import org.ops4j.pax.swissbox.tracker.ServiceLookup
 import org.osgi.framework.BundleContext
 
-class C {
+class C
   val f1 = 2
-}
 
 @RunWith(classOf[PaxExam])
 @ExamReactorStrategy(Array(classOf[PerMethod]))
-class ReflectionToolBoxTest extends ScalaOsgiHelper {
+class ReflectionToolBoxTest extends ScalaOsgiHelper
 
   @Configuration
   def config(): Array[exam.Option] =
     standardOptions
 
   @Test
-  def basicMirrorThroughOsgi(): Unit = {
+  def basicMirrorThroughOsgi(): Unit =
     // Note - this tries to make sure when pulling a toolbox, we get the compiler.
     import scala.reflect.runtime.universe._
     import scala.tools.reflect.ToolBox
@@ -41,5 +40,3 @@ class ReflectionToolBoxTest extends ScalaOsgiHelper {
         "Evaluate expression using local class.",
         2,
         tb.eval(tb.parse("(new tools.test.osgi.reflection.toolbox.C).f1")))
-  }
-}

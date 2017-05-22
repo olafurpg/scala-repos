@@ -43,7 +43,6 @@ import scalafx.testutil.{PositionDelegateSpec, SimpleSFXDelegateSpec}
 class ScaleSpec
     extends SimpleSFXDelegateSpec[jfxst.Scale, Scale](
         classOf[jfxst.Scale], classOf[Scale])
-    with PositionDelegateSpec[Scale] {
+    with PositionDelegateSpec[Scale]
 
   val positionDelegate = new Scale(new jfxst.Scale)
-}

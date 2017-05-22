@@ -1,4 +1,4 @@
-class SameBytecode {
+class SameBytecode
   def foo(a: Int, b: String) = 0
   def foo(a: Int, b: Any) = 0
 
@@ -6,4 +6,3 @@ class SameBytecode {
   def b = foo(a = 0, "")
   def c = foo(0, b = "")
   def d = foo(a = 0, b = "")
-}

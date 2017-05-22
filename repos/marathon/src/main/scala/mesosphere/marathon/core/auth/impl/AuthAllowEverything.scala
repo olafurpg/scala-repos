@@ -5,7 +5,7 @@ import mesosphere.marathon.plugin.http.{HttpRequest, HttpResponse}
 
 import scala.concurrent.Future
 
-object AuthAllowEverything extends Authorizer with Authenticator {
+object AuthAllowEverything extends Authorizer with Authenticator
 
   private[this] val defaultIdentity = Future.successful(Some(new Identity {}))
 
@@ -21,4 +21,3 @@ object AuthAllowEverything extends Authorizer with Authenticator {
   override def isAuthorized[Resource](principal: Identity,
                                       action: AuthorizedAction[Resource],
                                       resource: Resource): Boolean = true
-}

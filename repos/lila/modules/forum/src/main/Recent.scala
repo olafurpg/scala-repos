@@ -10,32 +10,30 @@ import lila.user.User
 private[forum] final class Recent(postApi: PostApi,
                                   ttl: Duration,
                                   nb: Int,
-                                  publicCategIds: List[String]) {
+                                  publicCategIds: List[String])
 
   private type GetTeams = String => Set[String]
 
   def apply(user: Option[User], getTeams: GetTeams): Fu[List[MiniForumPost]] =
-    userCacheKey(user, getTeams) |> { key =>
+    userCacheKey(user, getTeams) |>  key =>
       cache(key)(fetch(key))
-    }
 
-  def team(teamId: String): Fu[List[MiniForumPost]] = {
+  def team(teamId: String): Fu[List[MiniForumPost]] =
     // prepend empty language list
     val key = ";" + teamSlug(teamId)
     cache(key)(fetch(key))
-  }
 
   def invalidate: Funit = fuccess(cache.clear)
 
   import makeTimeout.large
 
   private def userCacheKey(user: Option[User], getTeams: GetTeams): String =
-    user.fold("en")(_.langs.mkString(",")) :: {
+    user.fold("en")(_.langs.mkString(",")) ::
       (user.??(_.troll) ?? List("[troll]")) :::
       (user ?? MasterGranter(Permission.StaffForum))
         .fold(staffCategIds, publicCategIds) :::
       ((user.map(_.id) ?? getTeams) map teamSlug).toList
-    } mkString ";"
+    mkString ";"
 
   private lazy val staffCategIds = "staff" :: publicCategIds
 
@@ -45,11 +43,10 @@ private[forum] final class Recent(postApi: PostApi,
     langStr.split(",").toList filter (_.nonEmpty)
 
   private def fetch(key: String): Fu[List[MiniForumPost]] =
-    (key.split(";").toList match {
+    (key.split(";").toList match
       case langs :: "[troll]" :: categs =>
         PostRepoTroll.recentInCategs(nb)(categs, parseLangs(langs))
       case langs :: categs =>
         PostRepo.recentInCategs(nb)(categs, parseLangs(langs))
       case categs => PostRepo.recentInCategs(nb)(categs, parseLangs("en"))
-    }) flatMap postApi.miniPosts
-}
+    ) flatMap postApi.miniPosts

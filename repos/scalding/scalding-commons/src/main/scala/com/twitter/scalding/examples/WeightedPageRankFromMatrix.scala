@@ -38,7 +38,7 @@ import com.twitter.scalding.mathematics.Matrix._
   * Don't forget to set the number of reducers for this job:
   * -D mapred.reduce.tasks=n
   */
-class WeightedPageRankFromMatrix(args: Args) extends Job(args) {
+class WeightedPageRankFromMatrix(args: Args) extends Job(args)
 
   val d = args("d").toDouble // aka damping factor
   val n = args("n").toInt // number of nodes in the graph
@@ -71,63 +71,55 @@ class WeightedPageRankFromMatrix(args: Args) extends Job(args) {
     * Recurse and iterate again iff we are under the max number of iterations and
     * vector has not converged.
     */
-  override def next = {
+  override def next =
     val diff = TypedTsv[Double](diffLoc).toIterator.next
 
-    if (currentIteration + 1 < maxIterations && diff > convergenceThreshold) {
+    if (currentIteration + 1 < maxIterations && diff > convergenceThreshold)
       val newArgs =
         args + ("currentIteration", Some((currentIteration + 1).toString))
       Some(clone(newArgs))
-    } else {
+    else
       None
-    }
-  }
 
   /**
     * Measure convergence by  calculating the total of the absolute difference
     * between the previous and next vectors. This stores the result after
     * calculation.
     */
-  def measureConvergenceAndStore() {
-    (previousVector - nextVector).mapWithIndex {
+  def measureConvergenceAndStore()
+    (previousVector - nextVector).mapWithIndex
       case (value, index) => math.abs(value)
-    }.sum.write(TypedTsv[Double](diffLoc))
-  }
+    .sum.write(TypedTsv[Double](diffLoc))
 
   /**
     * Load or generate on first iteration the matrix M^ given A.
     */
-  def M_hat: Matrix[Int, Int, Double] = {
+  def M_hat: Matrix[Int, Int, Double] =
 
-    if (currentIteration == 0) {
+    if (currentIteration == 0)
       val A = matrixFromTsv(edgesLoc)
       val M = A.rowL1Normalize.transpose
       val M_hat = d * M
 
       M_hat.write(Tsv(rootDir + "/constants/M_hat"))
-    } else {
+    else
       matrixFromTsv(rootDir + "/constants/M_hat")
-    }
-  }
 
   /**
     * Load or generate on first iteration the prior vector given d and n.
     */
-  def priorVector: ColVector[Int, Double] = {
+  def priorVector: ColVector[Int, Double] =
 
-    if (currentIteration == 0) {
+    if (currentIteration == 0)
       val onesVector = colVectorFromTsv(onesVectorLoc)
       val priorVector = ((1 - d) / n) * onesVector.toMatrix(0)
 
       priorVector.getCol(0).write(Tsv(rootDir + "/constants/priorVector"))
-    } else {
+    else
       colVectorFromTsv(rootDir + "/constants/priorVector")
-    }
-  }
 
   def matrixFromTsv(input: String): Matrix[Int, Int, Double] =
     TypedTsv[(Int, Int, Double)](input).toMatrix
 
   def colVectorFromTsv(input: String): ColVector[Int, Double] =
     TypedTsv[(Int, Double)](input).toCol
-}

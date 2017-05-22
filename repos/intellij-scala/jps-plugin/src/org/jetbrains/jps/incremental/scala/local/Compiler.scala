@@ -6,6 +6,5 @@ import org.jetbrains.jps.incremental.scala.data.CompilationData
 /**
   * @author Pavel Fatin
   */
-trait Compiler {
+trait Compiler
   def compile(compilationData: CompilationData, client: Client)
-}

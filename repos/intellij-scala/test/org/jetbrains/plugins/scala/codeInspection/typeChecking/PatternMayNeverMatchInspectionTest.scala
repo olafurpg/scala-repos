@@ -8,14 +8,14 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * Date: 21.12.15.
   */
 class PatternMayNeverMatchInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   override protected def classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[PatternMayNeverMatchInspection]
 
   override protected def annotation: String =
     PatternMayNeverMatchInspection.inspectionName
 
-  def testSCL9668(): Unit = {
+  def testSCL9668(): Unit =
     val code = s"""
         |object Moo {
         |  (1, 2) match {
@@ -31,5 +31,3 @@ class PatternMayNeverMatchInspectionTest
         |trait Foo
       """.stripMargin
     checkTextHasError(code)
-  }
-}

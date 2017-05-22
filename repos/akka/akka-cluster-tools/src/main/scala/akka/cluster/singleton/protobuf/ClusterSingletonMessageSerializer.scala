@@ -19,7 +19,7 @@ import akka.serialization.SerializerWithStringManifest
   */
 private[akka] class ClusterSingletonMessageSerializer(
     val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest with BaseSerializer
 
   private lazy val serialization = SerializationExtension(system)
 
@@ -31,17 +31,17 @@ private[akka] class ClusterSingletonMessageSerializer(
   private val emptyByteArray = Array.empty[Byte]
 
   private val fromBinaryMap = collection.immutable
-    .HashMap[String, Array[Byte] ⇒ AnyRef](HandOverToMeManifest -> { _ ⇒
+    .HashMap[String, Array[Byte] ⇒ AnyRef](HandOverToMeManifest ->  _ ⇒
     HandOverToMe
-  }, HandOverInProgressManifest -> { _ ⇒
+  , HandOverInProgressManifest ->  _ ⇒
     HandOverInProgress
-  }, HandOverDoneManifest -> { _ ⇒
+  , HandOverDoneManifest ->  _ ⇒
     HandOverDone
-  }, TakeOverFromMeManifest -> { _ ⇒
+  , TakeOverFromMeManifest ->  _ ⇒
     TakeOverFromMe
-  })
+  )
 
-  override def manifest(obj: AnyRef): String = obj match {
+  override def manifest(obj: AnyRef): String = obj match
     case HandOverToMe ⇒ HandOverToMeManifest
     case HandOverInProgress ⇒ HandOverInProgressManifest
     case HandOverDone ⇒ HandOverDoneManifest
@@ -49,9 +49,8 @@ private[akka] class ClusterSingletonMessageSerializer(
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
-  override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  override def toBinary(obj: AnyRef): Array[Byte] = obj match
     case HandOverToMe ⇒ emptyByteArray
     case HandOverInProgress ⇒ emptyByteArray
     case HandOverDone ⇒ emptyByteArray
@@ -59,13 +58,10 @@ private[akka] class ClusterSingletonMessageSerializer(
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-    fromBinaryMap.get(manifest) match {
+    fromBinaryMap.get(manifest) match
       case Some(f) ⇒ f(bytes)
       case None ⇒
         throw new IllegalArgumentException(
             s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}]")
-    }
-}

@@ -61,7 +61,7 @@ case object NamedNoPrefix extends NamingScheme
   * This class contains the core macro implementations. This is in a separate module to allow it to be in
   * a separate compilation unit, which makes it easier to provide helper methods interfacing with macros.
   */
-object FieldsProviderImpl {
+object FieldsProviderImpl
   def toFieldsImpl[T](c: Context)(
       implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] =
     toFieldsCommonImpl(c, NamedWithPrefix, false)(T)
@@ -84,13 +84,13 @@ object FieldsProviderImpl {
 
   def toFieldsCommonImpl[T](
       c: Context, namingScheme: NamingScheme, allowUnknownTypes: Boolean)(
-      implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] = {
+      implicit T: c.WeakTypeTag[T]): c.Expr[cascading.tuple.Fields] =
     import c.universe._
 
     import TypeDescriptorProviderImpl.{optionInner, evidentColumn}
 
     def isNumbered(t: Type): Boolean =
-      t match {
+      t match
         case tpe if tpe =:= typeOf[Boolean] => true
         case tpe if tpe =:= typeOf[Short] => true
         case tpe if tpe =:= typeOf[Int] => true
@@ -99,59 +99,50 @@ object FieldsProviderImpl {
         case tpe if tpe =:= typeOf[Double] => true
         case tpe if tpe =:= typeOf[String] => true
         case tpe =>
-          optionInner(c)(tpe) match {
+          optionInner(c)(tpe) match
             case Some(t) => isNumbered(t)
             case None => false
-          }
-      }
 
-    object FieldBuilder {
+    object FieldBuilder
       // This is method on the object to work around this compiler bug: SI-6231
-      def toFieldsTree(fb: FieldBuilder, scheme: NamingScheme): Tree = {
-        val nameTree = scheme match {
+      def toFieldsTree(fb: FieldBuilder, scheme: NamingScheme): Tree =
+        val nameTree = scheme match
           case Indexed =>
             val indices = fb.names.zipWithIndex.map(_._2)
             q"""_root_.scala.Array.apply[_root_.java.lang.Comparable[_]](..$indices)"""
           case _ =>
             q"""_root_.scala.Array.apply[_root_.java.lang.Comparable[_]](..${fb.names})"""
-        }
         q"""new _root_.cascading.tuple.Fields($nameTree,
           _root_.scala.Array.apply[_root_.java.lang.reflect.Type](..${fb.columnTypes}))
          """
-      }
-    }
-    sealed trait FieldBuilder {
+    sealed trait FieldBuilder
       def columnTypes: Vector[Tree]
       def names: Vector[String]
-    }
-    case class Primitive(name: String, tpe: Type) extends FieldBuilder {
+    case class Primitive(name: String, tpe: Type) extends FieldBuilder
       def columnTypes = Vector(q"""_root_.scala.Predef.classOf[$tpe]""")
       def names = Vector(name)
-    }
-    case class OptionBuilder(of: FieldBuilder) extends FieldBuilder {
+    case class OptionBuilder(of: FieldBuilder) extends FieldBuilder
       // Options just use Object as the type, due to the way cascading works on number types
       def columnTypes =
         of.columnTypes.map(
             _ => q"""_root_.scala.Predef.classOf[_root_.java.lang.Object]""")
       def names = of.names
-    }
     case class CaseClassBuilder(prefix: String, members: Vector[FieldBuilder])
-        extends FieldBuilder {
+        extends FieldBuilder
       def columnTypes = members.flatMap(_.columnTypes)
       def names =
-        for {
+        for
           member <- members
           name <- member.names
-        } yield
+        yield
           if (namingScheme == NamedWithPrefix && prefix.nonEmpty)
             s"$prefix.$name" else name
-    }
 
     /**
       * This returns a List of pairs which flatten fieldType into (class, name) pairs
       */
     def matchField(fieldType: Type, name: String): FieldBuilder =
-      fieldType match {
+      fieldType match
         case tpe if tpe =:= typeOf[String] => Primitive(name, tpe)
         case tpe if tpe =:= typeOf[Boolean] => Primitive(name, tpe)
         case tpe if tpe =:= typeOf[Short] => Primitive(name, tpe)
@@ -164,23 +155,22 @@ object FieldsProviderImpl {
           OptionBuilder(matchField(innerType, name))
         case tpe
             if (tpe.typeSymbol.isClass && tpe.typeSymbol.asClass.isCaseClass) =>
-          CaseClassBuilder(name, expandMethod(tpe).map {
+          CaseClassBuilder(name, expandMethod(tpe).map
             case (t, s) => matchField(t, s)
-          })
+          )
         case tpe if allowUnknownTypes => Primitive(name, tpe)
         case tpe =>
           c.abort(c.enclosingPosition, s"${T.tpe} is unsupported at $tpe")
-      }
 
     def expandMethod(outerTpe: Type): Vector[(Type, String)] =
-      outerTpe.declarations.collect {
+      outerTpe.declarations.collect
         case m: MethodSymbol if m.isCaseAccessor => m
-      }.map { accessorMethod =>
+      .map  accessorMethod =>
         val fieldName = accessorMethod.name.toTermName.toString
         val fieldType = accessorMethod.returnType.asSeenFrom(
             outerTpe, outerTpe.typeSymbol.asClass)
         (fieldType, fieldName)
-      }.toVector
+      .toVector
 
     val builder = matchField(T.tpe, "")
     if (builder.columnTypes.isEmpty)
@@ -190,5 +180,3 @@ object FieldsProviderImpl {
     val scheme = if (isNumbered(T.tpe)) Indexed else namingScheme
     val tree = FieldBuilder.toFieldsTree(builder, scheme)
     c.Expr[cascading.tuple.Fields](tree)
-  }
-}

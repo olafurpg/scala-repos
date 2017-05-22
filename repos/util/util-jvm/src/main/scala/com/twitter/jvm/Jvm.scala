@@ -41,7 +41,7 @@ case class Heap(
 case class Safepoint(syncTimeMillis: Long, totalTimeMillis: Long, count: Long)
 
 case class PoolState(
-    numCollections: Long, capacity: StorageUnit, used: StorageUnit) {
+    numCollections: Long, capacity: StorageUnit, used: StorageUnit)
   def -(other: PoolState) = PoolState(
       numCollections = this.numCollections - other.numCollections,
       capacity = other.capacity,
@@ -52,12 +52,11 @@ case class PoolState(
   override def toString =
     "PoolState(n=%d,remaining=%s[%s of %s])".format(
         numCollections, capacity - used, used, capacity)
-}
 
 /**
   * A handle to a garbage collected memory pool.
   */
-trait Pool {
+trait Pool
 
   /** Get the current state of this memory pool. */
   def state(): PoolState
@@ -69,16 +68,13 @@ trait Pool {
     *
     * @return Future of the samples rate (in bps).
     */
-  def estimateAllocRate(period: Duration, timer: Timer): Future[Long] = {
+  def estimateAllocRate(period: Duration, timer: Timer): Future[Long] =
     val elapsed = Stopwatch.start()
     val begin = state()
-    timer.doLater(period) {
+    timer.doLater(period)
       val end = state()
       val interval = elapsed()
       ((end - begin).used.inBytes * 1000) / interval.inMilliseconds
-    }
-  }
-}
 
 case class Gc(
     count: Long,
@@ -97,12 +93,11 @@ case class Snapshot(
   * Access JVM internal performance counters. We maintain a strict
   * interface so that we are decoupled from the actual underlying JVM.
   */
-trait Jvm {
+trait Jvm
   import Jvm.log
 
-  trait Opts {
+  trait Opts
     def compileThresh: Option[Int]
-  }
 
   /**
     * Current VM-specific options.
@@ -142,7 +137,7 @@ trait Jvm {
     * same is true of the internal datastructures used by foreachGc,
     * but they are svelte.
     */
-  def foreachGc(f: Gc => Unit) {
+  def foreachGc(f: Gc => Unit)
     val Period = 1.second
     val LogPeriod = 30.minutes
     @volatile var missedCollections = 0L
@@ -150,35 +145,29 @@ trait Jvm {
 
     val lastByName =
       new ConcurrentHashMap[String, java.lang.Long](16, 0.75f, 1)
-    def sample(): Unit = {
+    def sample(): Unit =
       val Snapshot(_, _, gcs) = snap
 
-      for (gc @ Gc(count, name, _, _) <- gcs) {
+      for (gc @ Gc(count, name, _, _) <- gcs)
         val lastCount = lastByName.get(name)
-        if (lastCount == null) {
+        if (lastCount == null)
           f(gc)
-        } else if (lastCount != count) {
+        else if (lastCount != count)
           missedCollections += count - 1 - lastCount
-          if (missedCollections > 0 && Time.now - lastLog > LogPeriod) {
-            if (log.isLoggable(Level.FINE)) {
+          if (missedCollections > 0 && Time.now - lastLog > LogPeriod)
+            if (log.isLoggable(Level.FINE))
               log.fine("Missed %d collections for %s due to sampling".format(
                       missedCollections, name))
-            }
             lastLog = Time.now
             missedCollections = 0
-          }
           f(gc)
-        }
 
         lastByName.put(name, count)
-      }
-    }
 
     executor.scheduleAtFixedRate(new Runnable { def run() = sample() },
                                  0 /*initial delay*/,
                                  Period.inMilliseconds,
                                  TimeUnit.MILLISECONDS)
-  }
 
   /**
     * Monitors Gcs using `foreachGc`, and returns a function to query
@@ -186,20 +175,18 @@ trait Jvm {
     * to the number of Gcs that happened since the queried time. The
     * result is returned in reverse chronological order.
     */
-  def monitorGcs(bufferFor: Duration): Time => Seq[Gc] = {
+  def monitorGcs(bufferFor: Duration): Time => Seq[Gc] =
     require(bufferFor > 0.seconds)
     @volatile var buffer = Nil: List[Gc]
 
     // We assume that timestamps from foreachGc are monotonic.
-    foreachGc {
+    foreachGc
       case gc @ Gc(_, _, timestamp, _) =>
         val floor = timestamp - bufferFor
         buffer = (gc :: buffer).takeWhile(_.timestamp > floor)
-    }
 
     (since: Time) =>
       buffer.takeWhile(_.timestamp > since)
-  }
 
   def forceGc(): Unit
 
@@ -210,47 +197,41 @@ trait Jvm {
     * TODO: take into account the standard callstack around scala
     * invocations better.
     */
-  def mainClassName: String = {
-    val mainClass = for {
-      (_, stack) <- Thread.getAllStackTraces().asScala.find {
+  def mainClassName: String =
+    val mainClass = for
+      (_, stack) <- Thread.getAllStackTraces().asScala.find
         case (t, s) => t.getName == "main"
-      }
-      frame <- stack.reverse.find { elem =>
+      frame <- stack.reverse.find  elem =>
         !(elem.getClassName.startsWith("scala.tools.nsc.MainGenericRunner"))
-      }
-    } yield frame.getClassName
+    yield frame.getClassName
 
     mainClass.getOrElse("unknown")
-  }
-}
 
 /**
   * See [[Jvms]] for Java compatibility.
   */
-object Jvm {
+object Jvm
 
   /**
     * Return the current process id.
     *
     * @note this is fragile as the RuntimeMXBean doesn't specify the name format.
     */
-  lazy val ProcessId: Option[Int] = try {
+  lazy val ProcessId: Option[Int] = try
     ManagementFactory.getRuntimeMXBean.getName
       .split("@")
       .headOption
       .map(_.toInt)
-  } catch {
+  catch
     case NonFatal(t) =>
       log.log(Level.WARNING, "failed to find process id", t)
       None
-  }
 
   private lazy val executor = Executors.newScheduledThreadPool(
       1, new NamedPoolThreadFactory("util-jvm-timer", true))
 
-  private lazy val _jvm = try new Hotspot catch {
+  private lazy val _jvm = try new Hotspot catch
     case NonFatal(_) => NilJvm
-  }
 
   private val log = Logger.getLogger(getClass.getName)
 
@@ -272,12 +253,11 @@ object Jvm {
   case class MetaspaceUsage(used: StorageUnit,
                             capacity: StorageUnit,
                             maxCapacity: StorageUnit)
-}
 
 /**
   * Java compatibility for [[Jvm]].
   */
-object Jvms {
+object Jvms
 
   /**
     * Java compatibility for [[Jvm.ProcessId]].
@@ -289,4 +269,3 @@ object Jvms {
     * Java compatibility for [[Jvm.apply()]].
     */
   def get(): Jvm = Jvm()
-}

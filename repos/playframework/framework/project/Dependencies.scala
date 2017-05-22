@@ -4,7 +4,7 @@
 import sbt._
 import buildinfo.BuildInfo
 
-object Dependencies {
+object Dependencies
 
   val akkaVersion = "2.4.2"
 
@@ -62,11 +62,10 @@ object Dependencies {
   val scalaJava8Compat =
     "org.scala-lang.modules" %% "scala-java8-compat" % "0.7.0"
   def scalaParserCombinators(scalaVersion: String) =
-    CrossVersion.partialVersion(scalaVersion) match {
+    CrossVersion.partialVersion(scalaVersion) match
       case Some((2, major)) if major >= 11 =>
         Seq("org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4")
       case _ => Nil
-    }
 
   val springFrameworkVersion = "4.2.4.RELEASE"
 
@@ -149,12 +148,11 @@ object Dependencies {
         scalaVersion)
 
   private def sbtPluginDep(
-      sbtVersion: String, scalaVersion: String, moduleId: ModuleID) = {
+      sbtVersion: String, scalaVersion: String, moduleId: ModuleID) =
     moduleId.extra(
         "sbtVersion" -> CrossVersion.binarySbtVersion(sbtVersion),
         "scalaVersion" -> CrossVersion.binaryScalaVersion(scalaVersion)
     )
-  }
 
   def runSupportDependencies(sbtVersion: String, scalaVersion: String) =
     Seq(
@@ -163,11 +161,10 @@ object Dependencies {
 
   // use partial version so that non-standard scala binary versions from dbuild also work
   def sbtIO(sbtVersion: String, scalaVersion: String): ModuleID =
-    CrossVersion.partialVersion(scalaVersion) match {
+    CrossVersion.partialVersion(scalaVersion) match
       case Some((2, major)) if major >= 11 =>
         "org.scala-sbt" %% "io" % "0.13.11" % "provided"
       case _ => "org.scala-sbt" % "io" % sbtVersion % "provided"
-    }
 
   val jnotify = "net.contentobjects.jnotify" % "jnotify" % "0.94-play-1"
 
@@ -181,11 +178,10 @@ object Dependencies {
 
   // use partial version so that non-standard scala binary versions from dbuild also work
   def sbtRcClient(scalaBinaryVersion: String): ModuleID =
-    CrossVersion.partialVersion(scalaBinaryVersion) match {
+    CrossVersion.partialVersion(scalaBinaryVersion) match
       case Some((2, 10)) => "com.typesafe.sbtrc" % "client-2-10" % sbtRcVersion
       case Some((2, 11)) => "com.typesafe.sbtrc" % "client-2-11" % sbtRcVersion
       case _ => sys.error(s"Unsupported scala version: $scalaBinaryVersion")
-    }
 
   def forkRunDependencies(scalaBinaryVersion: String) = Seq(
       sbtRcActorClient(scalaBinaryVersion),
@@ -194,13 +190,12 @@ object Dependencies {
 
   // use partial version so that non-standard scala binary versions from dbuild also work
   def sbtRcActorClient(scalaBinaryVersion: String): ModuleID =
-    CrossVersion.partialVersion(scalaBinaryVersion) match {
+    CrossVersion.partialVersion(scalaBinaryVersion) match
       case Some((2, 10)) =>
         "com.typesafe.sbtrc" % "actor-client-2-10" % sbtRcVersion
       case Some((2, 11)) =>
         "com.typesafe.sbtrc" % "actor-client-2-11" % sbtRcVersion
       case _ => sys.error(s"Unsupported scala version: $scalaBinaryVersion")
-    }
 
   def sbtForkRunPluginDependencies(sbtVersion: String, scalaVersion: String) =
     Seq(
@@ -211,7 +206,7 @@ object Dependencies {
 
   val typesafeConfig = "com.typesafe" % "config" % "1.3.0"
 
-  def sbtDependencies(sbtVersion: String, scalaVersion: String) = {
+  def sbtDependencies(sbtVersion: String, scalaVersion: String) =
     def sbtDep(moduleId: ModuleID) =
       sbtPluginDep(sbtVersion, scalaVersion, moduleId)
 
@@ -225,7 +220,6 @@ object Dependencies {
         sbtDep("com.typesafe.sbt" % "sbt-web" % "1.3.0"),
         sbtDep("com.typesafe.sbt" % "sbt-js-engine" % "1.1.3")
     ) ++ specsBuild.map(_ % Test) ++ logback.map(_ % Test)
-  }
 
   val playdocWebjarDependencies = Seq(
       "org.webjars" % "jquery" % "2.2.0" % "webjars",
@@ -291,4 +285,3 @@ object Dependencies {
   val playDocsSbtPluginDependencies = Seq(
       "com.typesafe.play" %% "play-doc" % "1.3.0"
   )
-}

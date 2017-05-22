@@ -32,7 +32,7 @@ import org.apache.spark.sql.types.{DataType, DoubleType, StructType}
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
 private[ml] trait DecisionTreeParams
-    extends PredictorParams with HasCheckpointInterval with HasSeed {
+    extends PredictorParams with HasCheckpointInterval with HasSeed
 
   /**
     * Maximum depth of the tree (>= 0).
@@ -181,7 +181,7 @@ private[ml] trait DecisionTreeParams
                                  numClasses: Int,
                                  oldAlgo: OldAlgo.Algo,
                                  oldImpurity: OldImpurity,
-                                 subsamplingRate: Double): OldStrategy = {
+                                 subsamplingRate: Double): OldStrategy =
     val strategy = OldStrategy.defaultStrategy(oldAlgo)
     strategy.impurity = oldImpurity
     strategy.checkpointInterval = getCheckpointInterval
@@ -195,13 +195,11 @@ private[ml] trait DecisionTreeParams
     strategy.categoricalFeaturesInfo = categoricalFeatures
     strategy.subsamplingRate = subsamplingRate
     strategy
-  }
-}
 
 /**
   * Parameters for Decision Tree-based classification algorithms.
   */
-private[ml] trait TreeClassifierParams extends Params {
+private[ml] trait TreeClassifierParams extends Params
 
   /**
     * Criterion used for information gain calculation (case-insensitive).
@@ -227,23 +225,19 @@ private[ml] trait TreeClassifierParams extends Params {
   final def getImpurity: String = $(impurity).toLowerCase
 
   /** Convert new impurity to old impurity. */
-  private[ml] def getOldImpurity: OldImpurity = {
-    getImpurity match {
+  private[ml] def getOldImpurity: OldImpurity =
+    getImpurity match
       case "entropy" => OldEntropy
       case "gini" => OldGini
       case _ =>
         // Should never happen because of check in setter method.
         throw new RuntimeException(
             s"TreeClassifierParams was given unrecognized impurity: $impurity.")
-    }
-  }
-}
 
-private[ml] object TreeClassifierParams {
+private[ml] object TreeClassifierParams
   // These options should be lowercase.
   final val supportedImpurities: Array[String] =
     Array("entropy", "gini").map(_.toLowerCase)
-}
 
 private[ml] trait DecisionTreeClassifierParams
     extends DecisionTreeParams with TreeClassifierParams
@@ -251,7 +245,7 @@ private[ml] trait DecisionTreeClassifierParams
 /**
   * Parameters for Decision Tree-based regression algorithms.
   */
-private[ml] trait TreeRegressorParams extends Params {
+private[ml] trait TreeRegressorParams extends Params
 
   /**
     * Criterion used for information gain calculation (case-insensitive).
@@ -277,46 +271,39 @@ private[ml] trait TreeRegressorParams extends Params {
   final def getImpurity: String = $(impurity).toLowerCase
 
   /** Convert new impurity to old impurity. */
-  private[ml] def getOldImpurity: OldImpurity = {
-    getImpurity match {
+  private[ml] def getOldImpurity: OldImpurity =
+    getImpurity match
       case "variance" => OldVariance
       case _ =>
         // Should never happen because of check in setter method.
         throw new RuntimeException(
             s"TreeRegressorParams was given unrecognized impurity: $impurity")
-    }
-  }
-}
 
-private[ml] object TreeRegressorParams {
+private[ml] object TreeRegressorParams
   // These options should be lowercase.
   final val supportedImpurities: Array[String] =
     Array("variance").map(_.toLowerCase)
-}
 
 private[ml] trait DecisionTreeRegressorParams
-    extends DecisionTreeParams with TreeRegressorParams with HasVarianceCol {
+    extends DecisionTreeParams with TreeRegressorParams with HasVarianceCol
 
   override protected def validateAndTransformSchema(
       schema: StructType,
       fitting: Boolean,
-      featuresDataType: DataType): StructType = {
+      featuresDataType: DataType): StructType =
     val newSchema =
       super.validateAndTransformSchema(schema, fitting, featuresDataType)
-    if (isDefined(varianceCol) && $(varianceCol).nonEmpty) {
+    if (isDefined(varianceCol) && $(varianceCol).nonEmpty)
       SchemaUtils.appendColumn(newSchema, $(varianceCol), DoubleType)
-    } else {
+    else
       newSchema
-    }
-  }
-}
 
 /**
   * Parameters for Decision Tree-based ensemble algorithms.
   *
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
-private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
+private[ml] trait TreeEnsembleParams extends DecisionTreeParams
 
   /**
     * Fraction of the training data used for learning each decision tree, in range (0, 1].
@@ -346,21 +333,19 @@ private[ml] trait TreeEnsembleParams extends DecisionTreeParams {
   private[ml] def getOldStrategy(categoricalFeatures: Map[Int, Int],
                                  numClasses: Int,
                                  oldAlgo: OldAlgo.Algo,
-                                 oldImpurity: OldImpurity): OldStrategy = {
+                                 oldImpurity: OldImpurity): OldStrategy =
     super.getOldStrategy(categoricalFeatures,
                          numClasses,
                          oldAlgo,
                          oldImpurity,
                          getSubsamplingRate)
-  }
-}
 
 /**
   * Parameters for Random Forest algorithms.
   *
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
-private[ml] trait RandomForestParams extends TreeEnsembleParams {
+private[ml] trait RandomForestParams extends TreeEnsembleParams
 
   /**
     * Number of trees to train (>= 1).
@@ -403,8 +388,8 @@ private[ml] trait RandomForestParams extends TreeEnsembleParams {
       this,
       "featureSubsetStrategy",
       "The number of features to consider for splits at each tree node." +
-      s" Supported options: ${RandomForestParams.supportedFeatureSubsetStrategies
-        .mkString(", ")}",
+      s" Supported options: $RandomForestParams.supportedFeatureSubsetStrategies
+        .mkString(", ")",
       (value: String) =>
         RandomForestParams.supportedFeatureSubsetStrategies.contains(
             value.toLowerCase))
@@ -424,13 +409,11 @@ private[ml] trait RandomForestParams extends TreeEnsembleParams {
   /** @group getParam */
   final def getFeatureSubsetStrategy: String =
     $(featureSubsetStrategy).toLowerCase
-}
 
-private[ml] object RandomForestParams {
+private[ml] object RandomForestParams
   // These options should be lowercase.
   final val supportedFeatureSubsetStrategies: Array[String] =
     Array("auto", "all", "onethird", "sqrt", "log2").map(_.toLowerCase)
-}
 
 /**
   * Parameters for Gradient-Boosted Tree algorithms.
@@ -438,7 +421,7 @@ private[ml] object RandomForestParams {
   * Note: Marked as private and DeveloperApi since this may be made public in the future.
   */
 private[ml] trait GBTParams
-    extends TreeEnsembleParams with HasMaxIter with HasStepSize {
+    extends TreeEnsembleParams with HasMaxIter with HasStepSize
 
   /* TODO: Add this doc when we add this param.  SPARK-7132
    * Threshold for stopping early when runWithValidation is used.
@@ -464,24 +447,21 @@ private[ml] trait GBTParams
     */
   def setStepSize(value: Double): this.type = set(stepSize, value)
 
-  override def validateParams(): Unit = {
+  override def validateParams(): Unit =
     require(
         ParamValidators.inRange(
             0, 1, lowerInclusive = false, upperInclusive = true)(getStepSize),
         "GBT parameter stepSize should be in interval (0, 1], " +
         s"but it given invalid value $getStepSize.")
-  }
 
   /** (private[ml]) Create a BoostingStrategy instance to use with the old API. */
   private[ml] def getOldBoostingStrategy(
       categoricalFeatures: Map[Int, Int],
-      oldAlgo: OldAlgo.Algo): OldBoostingStrategy = {
+      oldAlgo: OldAlgo.Algo): OldBoostingStrategy =
     val strategy = super.getOldStrategy(
         categoricalFeatures, numClasses = 2, oldAlgo, OldVariance)
     // NOTE: The old API does not support "seed" so we ignore it.
     new OldBoostingStrategy(strategy, getOldLossType, getMaxIter, getStepSize)
-  }
 
   /** Get old Gradient Boosting Loss type */
   private[ml] def getOldLossType: OldLoss
-}

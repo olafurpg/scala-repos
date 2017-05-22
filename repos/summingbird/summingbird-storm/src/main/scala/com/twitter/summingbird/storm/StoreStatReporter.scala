@@ -31,7 +31,7 @@ import com.twitter.util.{Promise, Future}
 class MergeableStatReporter[K, V](
     context: TopologyContext, val self: Mergeable[K, V])
     extends MergeableProxy[K, V]
-    with MergeableReporter[Mergeable[K, V], K, V] {
+    with MergeableReporter[Mergeable[K, V], K, V]
   private def buildMetric(s: String) =
     context.registerMetric("store/%s".format(s), new CountMetric, 10)
   val mergeMetric = buildMetric("merge")
@@ -40,29 +40,25 @@ class MergeableStatReporter[K, V](
   val mergeFailedMetric = buildMetric("mergeFailed")
   val multiMergeTuplesMetric = buildMetric("multiMergeTuples")
 
-  override def traceMerge(kv: (K, V), request: Future[Option[V]]) = {
+  override def traceMerge(kv: (K, V), request: Future[Option[V]]) =
     mergeMetric.incr()
-    request.onFailure { _ =>
+    request.onFailure  _ =>
       mergeFailedMetric.incr()
-    }.unit
-  }
+    .unit
 
   override def traceMultiMerge[K1 <: K](
-      kvs: Map[K1, V], request: Map[K1, Future[Option[V]]]) = {
+      kvs: Map[K1, V], request: Map[K1, Future[Option[V]]]) =
     multiMergeMetric.incr()
     multiMergeTuplesMetric.incrBy(request.size)
-    request.map {
+    request.map
       case (k, v) =>
-        val failureWrapV = v.onFailure { _ =>
+        val failureWrapV = v.onFailure  _ =>
           multiMergeTupleFailedMetric.incr()
-        }.unit
+        .unit
         (k, failureWrapV)
-    }
-  }
-}
 
 class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
-    extends StoreProxy[K, V] with StoreReporter[Store[K, V], K, V] {
+    extends StoreProxy[K, V] with StoreReporter[Store[K, V], K, V]
   private def buildMetric(s: String) =
     context.registerMetric("store/%s".format(s), new CountMetric, 10)
   val putMetric = buildMetric("put")
@@ -78,44 +74,37 @@ class StoreStatReporter[K, V](context: TopologyContext, val self: Store[K, V])
   val multiGetTupleFailedMetric = buildMetric("multiGetTupleFailed")
 
   override def traceMultiGet[K1 <: K](
-      ks: Set[K1], request: Map[K1, Future[Option[V]]]) = {
+      ks: Set[K1], request: Map[K1, Future[Option[V]]]) =
     multiGetMetric.incr()
     multiGetTuplesMetric.incrBy(request.size)
 
-    request.map {
+    request.map
       case (k, v) =>
-        val failureWrapV = v.onFailure { _ =>
+        val failureWrapV = v.onFailure  _ =>
           multiGetTupleFailedMetric.incr()
-        }.unit
+        .unit
         (k, failureWrapV)
-    }
-  }
 
-  override def traceGet(k: K, request: Future[Option[V]]) = {
+  override def traceGet(k: K, request: Future[Option[V]]) =
     getMetric.incr()
-    request.onFailure { _ =>
+    request.onFailure  _ =>
       getFailedMetric.incr()
-    }.unit
-  }
+    .unit
 
-  override def tracePut(kv: (K, Option[V]), request: Future[Unit]) = {
+  override def tracePut(kv: (K, Option[V]), request: Future[Unit]) =
     putMetric.incr()
-    request.onFailure { _ =>
+    request.onFailure  _ =>
       putFailedMetric.incr()
-    }.unit
-  }
+    .unit
 
   override def traceMultiPut[K1 <: K](
-      kvs: Map[K1, Option[V]], request: Map[K1, Future[Unit]]) = {
+      kvs: Map[K1, Option[V]], request: Map[K1, Future[Unit]]) =
     multiPutMetric.incr()
     multiPutTuplesMetric.incrBy(request.size)
 
-    request.map {
+    request.map
       case (k, v) =>
-        val failureWrapV = v.onFailure { _ =>
+        val failureWrapV = v.onFailure  _ =>
           multiPutTupleFailedMetric.incr()
-        }.unit
+        .unit
         (k, failureWrapV)
-    }
-  }
-}

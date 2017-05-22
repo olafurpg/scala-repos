@@ -1,9 +1,7 @@
 package tests
 
-class AA extends A {
+class AA extends A
   override type NameAfterRename = this.type
-}
 
-trait A {
+trait A
   type NameAfterRename
-}

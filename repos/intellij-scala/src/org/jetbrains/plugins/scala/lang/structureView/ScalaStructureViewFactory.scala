@@ -12,16 +12,13 @@ import org.jetbrains.plugins.scala.lang.psi.api.ScalaFile
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-class ScalaStructureViewFactory extends PsiStructureViewFactory {
+class ScalaStructureViewFactory extends PsiStructureViewFactory
   def getStructureViewBuilder(psiFile: PsiFile): StructureViewBuilder =
-    psiFile match {
+    psiFile match
       case sf: ScalaFile =>
-        if (sf.getName == ScalaLanguageConsoleView.SCALA_CONSOLE) {
+        if (sf.getName == ScalaLanguageConsoleView.SCALA_CONSOLE)
           val console = ScalaConsoleInfo.getConsole(sf)
           new ScalaStructureViewBuilder(sf, console)
-        } else {
+        else
           new ScalaStructureViewBuilder(sf)
-        }
       case _ => null
-    }
-}

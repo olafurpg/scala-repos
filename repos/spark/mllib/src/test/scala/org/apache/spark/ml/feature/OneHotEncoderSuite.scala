@@ -29,9 +29,9 @@ import org.apache.spark.sql.types._
 
 class OneHotEncoderSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
-  def stringIndexed(): DataFrame = {
+  def stringIndexed(): DataFrame =
     val data = sc.parallelize(
         Seq((0, "a"), (1, "b"), (2, "c"), (3, "a"), (4, "a"), (5, "c")), 2)
     val df = sqlContext.createDataFrame(data).toDF("id", "label")
@@ -40,13 +40,11 @@ class OneHotEncoderSuite
       .setOutputCol("labelIndex")
       .fit(df)
     indexer.transform(df)
-  }
 
-  test("params") {
+  test("params")
     ParamsSuite.checkParams(new OneHotEncoder)
-  }
 
-  test("OneHotEncoder dropLast = false") {
+  test("OneHotEncoder dropLast = false")
     val transformed = stringIndexed()
     val encoder = new OneHotEncoder()
       .setInputCol("labelIndex")
@@ -57,10 +55,9 @@ class OneHotEncoderSuite
     val output = encoded
       .select("id", "labelVec")
       .rdd
-      .map { r =>
+      .map  r =>
         val vec = r.getAs[Vector](1)
         (r.getInt(0), vec(0), vec(1), vec(2))
-      }
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
@@ -71,9 +68,8 @@ class OneHotEncoderSuite
                        (4, 1.0, 0.0, 0.0),
                        (5, 0.0, 1.0, 0.0))
     assert(output === expected)
-  }
 
-  test("OneHotEncoder dropLast = true") {
+  test("OneHotEncoder dropLast = true")
     val transformed = stringIndexed()
     val encoder =
       new OneHotEncoder().setInputCol("labelIndex").setOutputCol("labelVec")
@@ -82,10 +78,9 @@ class OneHotEncoderSuite
     val output = encoded
       .select("id", "labelVec")
       .rdd
-      .map { r =>
+      .map  r =>
         val vec = r.getAs[Vector](1)
         (r.getInt(0), vec(0), vec(1))
-      }
       .collect()
       .toSet
     // a -> 0, b -> 2, c -> 1
@@ -96,9 +91,8 @@ class OneHotEncoderSuite
                        (4, 1.0, 0.0),
                        (5, 0.0, 1.0))
     assert(output === expected)
-  }
 
-  test("input column with ML attribute") {
+  test("input column with ML attribute")
     val attr =
       NominalAttribute.defaultAttr.withValues("small", "medium", "large")
     val df = sqlContext
@@ -116,9 +110,8 @@ class OneHotEncoderSuite
     assert(group.getAttr(1) === BinaryAttribute.defaultAttr
           .withName("medium")
           .withIndex(1))
-  }
 
-  test("input column without ML attribute") {
+  test("input column without ML attribute")
     val df = sqlContext
       .createDataFrame(Seq(0.0, 1.0, 2.0, 1.0).map(Tuple1.apply))
       .toDF("index")
@@ -133,17 +126,15 @@ class OneHotEncoderSuite
     assert(group.getAttr(1) === BinaryAttribute.defaultAttr
           .withName("1")
           .withIndex(1))
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new OneHotEncoder()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setDropLast(false)
     testDefaultReadWrite(t)
-  }
 
-  test("OneHotEncoder with varying types") {
+  test("OneHotEncoder with varying types")
     val df = stringIndexed()
     val dfWithTypes = df
       .withColumn("shortLabel", df("labelIndex").cast(ShortType))
@@ -157,7 +148,7 @@ class OneHotEncoderSuite
                      "intLabel",
                      "floatLabel",
                      "decimalLabel")
-    for (col <- cols) {
+    for (col <- cols)
       val encoder = new OneHotEncoder()
         .setInputCol(col)
         .setOutputCol("labelVec")
@@ -167,10 +158,9 @@ class OneHotEncoderSuite
       val output = encoded
         .select("id", "labelVec")
         .rdd
-        .map { r =>
+        .map  r =>
           val vec = r.getAs[Vector](1)
           (r.getInt(0), vec(0), vec(1), vec(2))
-        }
         .collect()
         .toSet
       // a -> 0, b -> 2, c -> 1
@@ -181,6 +171,3 @@ class OneHotEncoderSuite
                          (4, 1.0, 0.0, 0.0),
                          (5, 0.0, 1.0, 0.0))
       assert(output === expected)
-    }
-  }
-}

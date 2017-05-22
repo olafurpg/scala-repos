@@ -3,7 +3,7 @@
   */
 import akka.persistence.PersistentActor
 
-object PersistenceMultiDocSpec {
+object PersistenceMultiDocSpec
 
   val DefaultConfig =
     """
@@ -16,9 +16,8 @@ object PersistenceMultiDocSpec {
   """
 
   //#default-plugins
-  trait ActorWithDefaultPlugins extends PersistentActor {
+  trait ActorWithDefaultPlugins extends PersistentActor
     override def persistenceId = "123"
-  }
   //#default-plugins
 
   val OverrideConfig = s"""
@@ -41,12 +40,10 @@ object PersistenceMultiDocSpec {
   """
 
   //#override-plugins
-  trait ActorWithOverridePlugins extends PersistentActor {
+  trait ActorWithOverridePlugins extends PersistentActor
     override def persistenceId = "123"
     // Absolute path to the journal plugin configuration entry in the `reference.conf`.
     override def journalPluginId = "akka.persistence.chronicle.journal"
     // Absolute path to the snapshot store plugin configuration entry in the `reference.conf`.
     override def snapshotPluginId = "akka.persistence.chronicle.snapshot-store"
-  }
   //#override-plugins
-}

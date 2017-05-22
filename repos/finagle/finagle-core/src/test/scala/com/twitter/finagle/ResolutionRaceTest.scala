@@ -7,7 +7,7 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.{AssertionsForJUnit, JUnitRunner}
 
 @RunWith(classOf[JUnitRunner])
-class ResolutionRaceTest extends FunSuite with AssertionsForJUnit {
+class ResolutionRaceTest extends FunSuite with AssertionsForJUnit
 
   private[this] val Echoer = Service.mk[String, String](Future.value)
 
@@ -20,25 +20,21 @@ class ResolutionRaceTest extends FunSuite with AssertionsForJUnit {
    */
   // Fails in CI, see CSL-1307 and CSL-1358
   if (!sys.props.contains("SKIP_FLAKY"))
-    test("resolution raciness") {
+    test("resolution raciness")
       val socketAddr = new InetSocketAddress(InetAddress.getLoopbackAddress, 0)
       val server = Echo.serve(socketAddr, Echoer)
       val addr = server.boundAddress.asInstanceOf[InetSocketAddress]
       val dest = "asyncinet!localhost:%d".format(addr.getPort)
-      try {
-        1 to 1000 foreach { i =>
+      try
+        1 to 1000 foreach  i =>
           val phrase = "%03d [%s]".format(i, dest)
           val echo = Echo.newService(dest)
-          try {
+          try
             val echoed = Await.result(echo(phrase))
             assert(echoed == phrase)
-          } finally Await.ready(echo.close())
-        }
-      } catch {
+          finally Await.ready(echo.close())
+      catch
         case _: NoBrokersAvailableException =>
           fail("resolution is racy")
-      } finally {
+      finally
         Await.result(server.close())
-      }
-    }
-}

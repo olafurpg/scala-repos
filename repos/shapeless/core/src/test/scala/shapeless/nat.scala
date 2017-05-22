@@ -20,7 +20,7 @@ import org.junit.Test
 import org.junit.Assert._
 import shapeless.test.illTyped
 
-class NatTests {
+class NatTests
   import nat._
   import ops.nat._
 
@@ -28,7 +28,7 @@ class NatTests {
   def check(expected: Nat)(actually: => Check[expected.N]) {}
 
   @Test
-  def testNat {
+  def testNat
     implicitly[Succ[_1] =:= _2]
 
     implicitly[Pred.Aux[_19, _18]]
@@ -95,7 +95,7 @@ class NatTests {
     illTyped(""" implicitly[LT[_5, _5]] """)
     illTyped(""" implicitly[LTEq[_6, _5]] """)
 
-    def relativeToN_LT[N <: Nat]: Unit = {
+    def relativeToN_LT[N <: Nat]: Unit =
       implicitly[LT[_0, Succ[N]]]
       implicitly[LT[N, Succ[N]]]
       implicitly[LTEq[_0, N]]
@@ -106,7 +106,6 @@ class NatTests {
       illTyped(""" implicitly[LT[N, N]] """)
       illTyped(""" implicitly[LTEq[_1, N]] """)
       illTyped(""" implicitly[LTEq[Succ[N], N]] """)
-    }
 
     implicitly[GT[_5, _3]]
     implicitly[GT[_15, _10]]
@@ -116,7 +115,7 @@ class NatTests {
     illTyped(""" implicitly[GT[_5, _5]] """)
     illTyped(""" implicitly[GTEq[_5, _6]] """)
 
-    def relativeToN_GT[N <: Nat]: Unit = {
+    def relativeToN_GT[N <: Nat]: Unit =
       implicitly[GT[Succ[N], _0]]
       implicitly[GT[Succ[N], N]]
       implicitly[GTEq[N, _0]]
@@ -127,7 +126,6 @@ class NatTests {
       illTyped(""" implicitly[GT[N, N]] """)
       illTyped(""" implicitly[GTEq[N, _1]] """)
       illTyped(""" implicitly[GTEq[N, Succ[N]]] """)
-    }
 
     implicitly[Min.Aux[_0, _0, _0]]
     implicitly[Min.Aux[_5, _2, _2]]
@@ -271,5 +269,3 @@ class NatTests {
     assertEquals(20, _20.toInt)
     assertEquals(21, _21.toInt)
     assertEquals(22, _22.toInt)
-  }
-}

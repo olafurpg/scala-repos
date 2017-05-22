@@ -12,19 +12,17 @@ import rx.lang.scala.{Observable, Subscription}
 import scala.annotation.tailrec
 import scala.concurrent.duration._
 
-private[flow] object ReviveOffersActor {
+private[flow] object ReviveOffersActor
   def props(clock: Clock,
             conf: ReviveOffersConfig,
             marathonEventStream: EventStream,
             offersWanted: Observable[Boolean],
-            driverHolder: MarathonSchedulerDriverHolder): Props = {
+            driverHolder: MarathonSchedulerDriverHolder): Props =
     Props(new ReviveOffersActor(
             clock, conf, marathonEventStream, offersWanted, driverHolder))
-  }
 
   private[impl] case object TimedCheck
   private[impl] case class OffersWanted(wanted: Boolean)
-}
 
 /**
   * Revive offers whenever interest is signaled but maximally every 5 seconds.
@@ -35,7 +33,7 @@ private[impl] class ReviveOffersActor(
     marathonEventStream: EventStream,
     offersWanted: Observable[Boolean],
     driverHolder: MarathonSchedulerDriverHolder)
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   private[impl] var subscription: Subscription = _
   private[impl] var offersCurrentlyWanted: Boolean = false
@@ -43,25 +41,23 @@ private[impl] class ReviveOffersActor(
   private[impl] var lastRevive: Timestamp = Timestamp(0)
   private[impl] var nextReviveCancellableOpt: Option[Cancellable] = None
 
-  override def preStart(): Unit = {
+  override def preStart(): Unit =
     subscription = offersWanted.map(OffersWanted(_)).subscribe(self ! _)
     marathonEventStream.subscribe(self, classOf[SchedulerRegisteredEvent])
     marathonEventStream.subscribe(self, classOf[SchedulerReregisteredEvent])
-  }
 
-  override def postStop(): Unit = {
+  override def postStop(): Unit =
     subscription.unsubscribe()
     nextReviveCancellableOpt.foreach(_.cancel())
     nextReviveCancellableOpt = None
     marathonEventStream.unsubscribe(self)
-  }
 
   @tailrec
-  private[this] def reviveOffers(): Unit = {
+  private[this] def reviveOffers(): Unit =
     val now: Timestamp = clock.now()
     val nextRevive = lastRevive + conf.minReviveOffersInterval().milliseconds
 
-    if (nextRevive <= now) {
+    if (nextRevive <= now)
       log.info("=> revive offers NOW, canceling any scheduled revives")
       nextReviveCancellableOpt.foreach(_.cancel())
       nextReviveCancellableOpt = None
@@ -70,17 +66,16 @@ private[impl] class ReviveOffersActor(
       lastRevive = now
 
       revivesNeeded -= 1
-      if (revivesNeeded > 0) {
+      if (revivesNeeded > 0)
         log.info(
             "{} further revives still needed. Repeating reviveOffers according to --{} {}",
             revivesNeeded,
             conf.reviveOffersRepetitions.name,
             conf.reviveOffersRepetitions())
         reviveOffers()
-      }
-    } else {
+    else
       lazy val untilNextRevive = now until nextRevive
-      if (nextReviveCancellableOpt.isEmpty) {
+      if (nextReviveCancellableOpt.isEmpty)
         log.info(
             "=> Schedule next revive at {} in {}, adhering to --{} {} (ms)",
             nextRevive,
@@ -88,22 +83,18 @@ private[impl] class ReviveOffersActor(
             conf.minReviveOffersInterval.name,
             conf.minReviveOffersInterval())
         nextReviveCancellableOpt = Some(schedulerCheck(untilNextRevive))
-      } else if (log.isDebugEnabled) {
+      else if (log.isDebugEnabled)
         log.info("=> Next revive already scheduled at {} not yet due for {}",
                  nextRevive,
                  untilNextRevive)
-      }
-    }
-  }
 
-  override def receive: Receive = LoggingReceive {
+  override def receive: Receive = LoggingReceive
     Seq(
         receiveOffersWantedNotifications,
         receiveReviveOffersEvents
     ).reduceLeft[Receive](_.orElse[Any, Unit](_))
-  }
 
-  private[this] def receiveOffersWantedNotifications: Receive = {
+  private[this] def receiveOffersWantedNotifications: Receive =
     case OffersWanted(true) =>
       log.info("Received offers WANTED notification")
       offersCurrentlyWanted = true
@@ -116,37 +107,30 @@ private[impl] class ReviveOffersActor(
       revivesNeeded = 0
       nextReviveCancellableOpt.foreach(_.cancel())
       nextReviveCancellableOpt = None
-  }
 
-  def initiateNewSeriesOfRevives(): Unit = {
+  def initiateNewSeriesOfRevives(): Unit =
     revivesNeeded = conf.reviveOffersRepetitions()
     reviveOffers()
-  }
 
-  private[this] def receiveReviveOffersEvents: Receive = {
+  private[this] def receiveReviveOffersEvents: Receive =
     case msg @ (_: SchedulerRegisteredEvent | _: SchedulerReregisteredEvent |
         OfferReviverDelegate.ReviveOffers) =>
-      if (offersCurrentlyWanted) {
+      if (offersCurrentlyWanted)
         log.info(
             s"Received reviveOffers notification: ${msg.getClass.getSimpleName}")
         initiateNewSeriesOfRevives()
-      } else {
+      else
         log.info(
             s"Ignoring ${msg.getClass.getSimpleName} because no one is currently interested in offers")
-      }
 
     case ReviveOffersActor.TimedCheck =>
       log.info(s"Received TimedCheck")
-      if (revivesNeeded > 0) {
+      if (revivesNeeded > 0)
         reviveOffers()
-      } else {
+      else
         log.info("=> no revives needed right now")
-      }
-  }
 
-  protected def schedulerCheck(duration: FiniteDuration): Cancellable = {
+  protected def schedulerCheck(duration: FiniteDuration): Cancellable =
     import context.dispatcher
     context.system.scheduler
       .scheduleOnce(duration, self, ReviveOffersActor.TimedCheck)
-  }
-}

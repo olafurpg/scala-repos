@@ -1,7 +1,7 @@
 package java.io
 
 class FilterInputStream protected (protected val in: InputStream)
-    extends InputStream {
+    extends InputStream
 
   override def read(): Int =
     in.read()
@@ -21,4 +21,3 @@ class FilterInputStream protected (protected val in: InputStream)
   override def mark(readlimit: Int): Unit = in.mark(readlimit)
   override def markSupported(): Boolean = in.markSupported()
   override def reset(): Unit = in.reset()
-}

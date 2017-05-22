@@ -6,7 +6,7 @@ import slick.jdbc.GetResult.GetString
 /**
   * Accessor methods for various database meta data.
   */
-object DatabaseMeta {
+object DatabaseMeta
 
   def getCatalogs = ResultSetAction[String](_.metaData.getCatalogs())
 
@@ -14,9 +14,8 @@ object DatabaseMeta {
 
   private[meta] def yesNoOpt(r: PositionedResult) =
     if (r.hasMoreColumns)
-      r.nextString match {
+      r.nextString match
         case "YES" => Some(true)
         case "NO" => Some(false)
         case _ => None
-      } else None
-}
+      else None

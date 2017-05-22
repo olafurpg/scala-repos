@@ -27,9 +27,8 @@ import org.apache.commons.math3.random.{RandomGenerator, JDKRandomGenerator}
 class LevyDistribution(mu: Double,
                        c: Double,
                        generator: RandomGenerator = new JDKRandomGenerator())
-    extends ApacheContinuousDistribution {
+    extends ApacheContinuousDistribution
   protected final val inner = new ApacheLevyDistribution(generator, mu, c)
-}
 
 object LevyDistribution
     extends ContinuousDistributionUFuncProvider[Double, LevyDistribution]

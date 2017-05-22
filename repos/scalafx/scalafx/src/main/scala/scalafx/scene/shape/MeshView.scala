@@ -33,21 +33,18 @@ import scalafx.Includes._
 import scalafx.beans.property.ObjectProperty
 import scalafx.delegate.SFXDelegate
 
-object MeshView {
+object MeshView
   implicit def sfxMeshView2jfx(mv: MeshView): jfxss.MeshView =
     if (mv != null) mv.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/shape/MeshView.html]].
   */
 class MeshView(override val delegate: jfxss.MeshView = new jfxss.MeshView())
-    extends Shape3D(delegate) with SFXDelegate[jfxss.MeshView] {
+    extends Shape3D(delegate) with SFXDelegate[jfxss.MeshView]
 
   def this(mesh: Mesh) = this(new jfxss.MeshView(mesh))
 
   def mesh: ObjectProperty[jfxss.Mesh] = delegate.meshProperty
-  def mesh_=(m: Mesh) {
+  def mesh_=(m: Mesh)
     ObjectProperty.fillProperty[jfxss.Mesh](this.mesh, m)
-  }
-}

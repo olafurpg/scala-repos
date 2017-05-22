@@ -41,7 +41,7 @@ object UtilIncludes extends UtilIncludes
   * [[http://docs.oracle.com/javase/8/javafx/api/javafx/util/package-summary.html `javafx.util`]]
   * Classes to their ScalaFX counterparts.
   */
-trait UtilIncludes {
+trait UtilIncludes
 
   /**
     * Converts a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/util/Callback.html `Callback`]] to a Function1.
@@ -63,9 +63,8 @@ trait UtilIncludes {
     * @return a JavaFX Callback that will call ScalaFX function.
     */
   implicit def function12jfxCallback[P, R](f: (P) => R): Callback[P, R] =
-    new jfxu.Callback[P, R] {
+    new jfxu.Callback[P, R]
       def call(param: P) = f(param)
-    }
 
   /**
     * Convert a JavaFX [[http://docs.oracle.com/javase/8/javafx/api/javafx/util/Pair.html Pair]] in a Scala Tuple2.
@@ -120,8 +119,6 @@ trait UtilIncludes {
     */
   implicit def jfxStringConverter2sfx[T](
       c: jfxu.StringConverter[T]): StringConverter[T] =
-    new StringConverter[T] {
+    new StringConverter[T]
       def fromString(string: String): T = c.fromString(string)
       def toString(t: T): String = c.toString(t)
-    }
-}

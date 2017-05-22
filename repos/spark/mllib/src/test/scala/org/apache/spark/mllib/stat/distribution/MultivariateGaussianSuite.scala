@@ -23,8 +23,8 @@ import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
 class MultivariateGaussianSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
-  test("univariate") {
+    extends SparkFunSuite with MLlibTestSparkContext
+  test("univariate")
     val x1 = Vectors.dense(0.0)
     val x2 = Vectors.dense(1.5)
 
@@ -38,9 +38,8 @@ class MultivariateGaussianSuite
     val dist2 = new MultivariateGaussian(mu, sigma2)
     assert(dist2.pdf(x1) ~== 0.19947 absTol 1E-5)
     assert(dist2.pdf(x2) ~== 0.15057 absTol 1E-5)
-  }
 
-  test("multivariate") {
+  test("multivariate")
     val x1 = Vectors.dense(0.0, 0.0)
     val x2 = Vectors.dense(1.0, 1.0)
 
@@ -54,9 +53,8 @@ class MultivariateGaussianSuite
     val dist2 = new MultivariateGaussian(mu, sigma2)
     assert(dist2.pdf(x1) ~== 0.060155 absTol 1E-5)
     assert(dist2.pdf(x2) ~== 0.033971 absTol 1E-5)
-  }
 
-  test("multivariate degenerate") {
+  test("multivariate degenerate")
     val x1 = Vectors.dense(0.0, 0.0)
     val x2 = Vectors.dense(1.0, 1.0)
 
@@ -65,9 +63,8 @@ class MultivariateGaussianSuite
     val dist = new MultivariateGaussian(mu, sigma)
     assert(dist.pdf(x1) ~== 0.11254 absTol 1E-5)
     assert(dist.pdf(x2) ~== 0.068259 absTol 1E-5)
-  }
 
-  test("SPARK-11302") {
+  test("SPARK-11302")
     val x = Vectors.dense(629, 640, 1.7188, 618.19)
     val mu = Vectors.dense(1055.3910505836575,
                            1070.489299610895,
@@ -94,5 +91,3 @@ class MultivariateGaussianSuite
     val dist = new MultivariateGaussian(mu, sigma)
     // Agrees with R's dmvnorm: 7.154782e-05
     assert(dist.pdf(x) ~== 7.154782224045512E-5 absTol 1E-9)
-  }
-}

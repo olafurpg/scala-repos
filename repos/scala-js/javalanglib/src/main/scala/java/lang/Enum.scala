@@ -1,7 +1,7 @@
 package java.lang
 
 abstract class Enum[E <: Enum[E]] protected (_name: String, _ordinal: Int)
-    extends Comparable[E] with java.io.Serializable {
+    extends Comparable[E] with java.io.Serializable
 
   final def name(): String = _name
 
@@ -24,7 +24,6 @@ abstract class Enum[E <: Enum[E]] protected (_name: String, _ordinal: Int)
   // final def getDeclaringClass(): Class[E]
 
   override protected final def finalize(): Unit = ()
-}
 
 // Not implemented:
 // def valueOf[T <: Enum[T]](enumType: Class[T], name:String): T

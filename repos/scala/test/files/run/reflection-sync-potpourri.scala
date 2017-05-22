@@ -5,7 +5,7 @@ import scala.reflect.runtime.universe._
 // 2) symbols are correctly materialized into PackageScopes (no dupes)
 // 3) unpickling works okay even we unpickle the same symbol a lot of times
 
-object Test extends App {
+object Test extends App
   def foo[T : TypeTag](x: T) = typeOf[T].toString
   val n = 1000
   val rng = new scala.util.Random()
@@ -14,16 +14,15 @@ object Test extends App {
                    () => typeOf[scala.io.BufferedSource],
                    () => typeOf[scala.io.Codec])
   val perms = types.permutations.toList
-  def force(lazytpe: () => Type): String = {
+  def force(lazytpe: () => Type): String =
     lazytpe().typeSymbol.info
     lazytpe().toString
-  }
   val diceRolls = List.fill(n)(rng.nextInt(perms.length))
   val threads =
     (1 to n) map
     (i =>
-          new Thread(s"Reflector-$i") {
-            override def run(): Unit = {
+          new Thread(s"Reflector-$i")
+            override def run(): Unit =
               val s1 = foo("42")
               val s2 = perms(diceRolls(i - 1))
                 .map(x => force(x))
@@ -32,7 +31,5 @@ object Test extends App {
               assert(s1 == "String" || s1 == "java.lang.String")
               assert(
                   s2 == "java.lang.annotation.Annotation, java.lang.reflect.Method, scala.io.BufferedSource, scala.io.Codec")
-            }
-        })
+        )
   threads foreach (_.start)
-}

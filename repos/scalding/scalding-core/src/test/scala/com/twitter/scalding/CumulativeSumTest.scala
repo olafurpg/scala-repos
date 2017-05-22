@@ -4,39 +4,32 @@ import org.scalatest.WordSpec
 
 import com.twitter.scalding.typed.CumulativeSum._
 
-class AddRankingWithCumulativeSum(args: Args) extends Job(args) {
+class AddRankingWithCumulativeSum(args: Args) extends Job(args)
   TypedPipe
     .from(TypedTsv[(String, Double)]("input1"))
-    .map {
+    .map
       case (gender, height) =>
         (gender, (height, 1L))
-    }
     .cumulativeSum
-    .map {
+    .map
       case (gender, (height, rank)) =>
         (gender, height, rank)
-    }
     .write(TypedTsv("result1"))
-}
 
-class AddRankingWithPartitionedCumulativeSum(args: Args) extends Job(args) {
+class AddRankingWithPartitionedCumulativeSum(args: Args) extends Job(args)
   TypedPipe
     .from(TypedTsv[(String, Double)]("input1"))
-    .map {
+    .map
       case (gender, height) =>
         (gender, (height, 1L))
-    }
-    .cumulativeSum { h =>
+    .cumulativeSum  h =>
       (h / 100).floor.toLong
-    }
-    .map {
+    .map
       case (gender, (height, rank)) =>
         (gender, height, rank)
-    }
     .write(TypedTsv("result1"))
-}
 
-class CumulativeSumTest1 extends WordSpec {
+class CumulativeSumTest1 extends WordSpec
 
   // --- A simple ranking job
   val sampleInput1 = List(("male", "165.2"),
@@ -62,35 +55,26 @@ class CumulativeSumTest1 extends WordSpec {
                             ("female", 272.2, 4),
                             ("female", 228.6, 3))
 
-  "A simple ranking cumulative sum job" should {
+  "A simple ranking cumulative sum job" should
     JobTest("com.twitter.scalding.AddRankingWithCumulativeSum")
       .source(TypedTsv[(String, Double)]("input1"), sampleInput1)
       .sink[(String, Double, Long)](
-          TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
-        "produce correct number of records when filtering out null values" in {
+          TypedTsv[(String, Double, Long)]("result1"))  outBuf1 =>
+        "produce correct number of records when filtering out null values" in
           assert(outBuf1.size === 10)
-        }
-        "create correct ranking per group, 1st being the heighest person of that group" in {
+        "create correct ranking per group, 1st being the heighest person of that group" in
           assert(outBuf1.toSet === expectedOutput1)
-        }
-      }
       .run
       .finish
-  }
 
-  "A partitioned ranking cumulative sum job" should {
+  "A partitioned ranking cumulative sum job" should
     JobTest("com.twitter.scalding.AddRankingWithPartitionedCumulativeSum")
       .source(TypedTsv[(String, Double)]("input1"), sampleInput1)
       .sink[(String, Double, Long)](
-          TypedTsv[(String, Double, Long)]("result1")) { outBuf1 =>
-        "produce correct number of records when filtering out null values" in {
+          TypedTsv[(String, Double, Long)]("result1"))  outBuf1 =>
+        "produce correct number of records when filtering out null values" in
           assert(outBuf1.size === 10)
-        }
-        "create correct ranking per group, 1st being the heighest person of that group" in {
+        "create correct ranking per group, 1st being the heighest person of that group" in
           assert(outBuf1.toSet === expectedOutput1)
-        }
-      }
       .run
       .finish
-  }
-}

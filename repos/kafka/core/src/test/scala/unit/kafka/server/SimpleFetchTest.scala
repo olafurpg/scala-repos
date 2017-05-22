@@ -34,7 +34,7 @@ import org.easymock.EasyMock
 import org.I0Itec.zkclient.ZkClient
 import org.junit.Assert._
 
-class SimpleFetchTest {
+class SimpleFetchTest
 
   val replicaLagTimeMaxMs = 100L
   val replicaFetchWaitMaxMs = 100
@@ -73,7 +73,7 @@ class SimpleFetchTest {
   var replicaManager: ReplicaManager = null
 
   @Before
-  def setUp() {
+  def setUp()
     // create nice mock since we don't particularly care about zkclient calls
     val zkUtils = EasyMock.createNiceMock(classOf[ZkUtils])
     EasyMock.replay(zkUtils)
@@ -142,13 +142,11 @@ class SimpleFetchTest {
     val allReplicas = List(leaderReplica, followerReplica)
     allReplicas.foreach(partition.addReplicaIfNotExists(_))
     partition.inSyncReplicas = allReplicas.toSet
-  }
 
   @After
-  def tearDown() {
+  def tearDown()
     replicaManager.shutdown(false)
     metrics.close()
-  }
 
   /**
     * The scenario for this test is that there is one topic that has one partition
@@ -167,7 +165,7 @@ class SimpleFetchTest {
     * This test also verifies counts of fetch requests recorded by the ReplicaManager
     */
   @Test
-  def testReadFromLog() {
+  def testReadFromLog()
     val initialTopicCount = BrokerTopicStats
       .getBrokerTopicStats(topic)
       .totalFetchRequestRate
@@ -210,5 +208,3 @@ class SimpleFetchTest {
                    .getBrokerAllTopicsStats()
                    .totalFetchRequestRate
                    .count());
-  }
-}

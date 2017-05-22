@@ -26,7 +26,7 @@ import org.apache.spark.util.SizeEstimator
   * We sample with a slow exponential back-off using the SizeEstimator to amortize the time,
   * as each call to SizeEstimator is somewhat expensive (order of a few milliseconds).
   */
-private[spark] trait SizeTracker {
+private[spark] trait SizeTracker
 
   import SizeTracker._
 
@@ -54,54 +54,45 @@ private[spark] trait SizeTracker {
     * Reset samples collected so far.
     * This should be called after the collection undergoes a dramatic change in size.
     */
-  protected def resetSamples(): Unit = {
+  protected def resetSamples(): Unit =
     numUpdates = 1
     nextSampleNum = 1
     samples.clear()
     takeSample()
-  }
 
   /**
     * Callback to be invoked after every update.
     */
-  protected def afterUpdate(): Unit = {
+  protected def afterUpdate(): Unit =
     numUpdates += 1
-    if (nextSampleNum == numUpdates) {
+    if (nextSampleNum == numUpdates)
       takeSample()
-    }
-  }
 
   /**
     * Take a new sample of the current collection's size.
     */
-  private def takeSample(): Unit = {
+  private def takeSample(): Unit =
     samples.enqueue(Sample(SizeEstimator.estimate(this), numUpdates))
     // Only use the last two samples to extrapolate
-    if (samples.size > 2) {
+    if (samples.size > 2)
       samples.dequeue()
-    }
-    val bytesDelta = samples.toList.reverse match {
+    val bytesDelta = samples.toList.reverse match
       case latest :: previous :: tail =>
         (latest.size - previous.size).toDouble /
         (latest.numUpdates - previous.numUpdates)
       // If fewer than 2 samples, assume no change
       case _ => 0
-    }
     bytesPerUpdate = math.max(0, bytesDelta)
     nextSampleNum = math.ceil(numUpdates * SAMPLE_GROWTH_RATE).toLong
-  }
 
   /**
     * Estimate the current size of the collection in bytes. O(1) time.
     */
-  def estimateSize(): Long = {
+  def estimateSize(): Long =
     assert(samples.nonEmpty)
     val extrapolatedDelta =
       bytesPerUpdate * (numUpdates - samples.last.numUpdates)
     (samples.last.size + extrapolatedDelta).toLong
-  }
-}
 
-private object SizeTracker {
+private object SizeTracker
   case class Sample(size: Long, numUpdates: Long)
-}

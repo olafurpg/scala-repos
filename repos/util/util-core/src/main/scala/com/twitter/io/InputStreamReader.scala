@@ -10,7 +10,7 @@ import com.twitter.util.{Closable, CloseAwaitably, Future, FuturePool, Time}
   */
 class InputStreamReader private[io](
     inputStream: InputStream, maxBufferSize: Int, pool: FuturePool)
-    extends Reader with Closable with CloseAwaitably {
+    extends Reader with Closable with CloseAwaitably
   private[this] val mutex = new AsyncMutex()
   @volatile private[this] var discarded = false
 
@@ -23,29 +23,25 @@ class InputStreamReader private[io](
     * the read operation.  Any failure indicates an error; an empty buffer
     * indicates that the stream has completed.
     */
-  def read(n: Int): Future[Option[Buf]] = {
+  def read(n: Int): Future[Option[Buf]] =
     if (discarded) return Future.exception(new Reader.ReaderDiscarded())
     if (n == 0) return Future.value(Some(Buf.Empty))
 
-    mutex.acquire() flatMap { permit =>
-      pool {
-        try {
+    mutex.acquire() flatMap  permit =>
+      pool
+        try
           if (discarded) throw new Reader.ReaderDiscarded()
           val size = n min maxBufferSize
           val buffer = new Array[Byte](size)
           val c = inputStream.read(buffer, 0, size)
           if (c == -1) None
           else Some(Buf.ByteArray.Owned(buffer, 0, c))
-        } catch {
+        catch
           case exc: InterruptedException =>
             discarded = true
             throw exc
-        }
-      } ensure {
+      ensure
         permit.release()
-      }
-    }
-  }
 
   /**
     * Discard this reader: its output is no longer required.
@@ -55,15 +51,12 @@ class InputStreamReader private[io](
   /**
     * Discards this Reader and closes the underlying InputStream
     */
-  def close(deadline: Time) = closeAwaitably {
+  def close(deadline: Time) = closeAwaitably
     discard()
     pool { inputStream.close() }
-  }
-}
 
-object InputStreamReader {
+object InputStreamReader
   val DefaultMaxBufferSize = 4096
   def apply(
       inputStream: InputStream, maxBufferSize: Int = DefaultMaxBufferSize) =
     new InputStreamReader(inputStream, maxBufferSize)
-}

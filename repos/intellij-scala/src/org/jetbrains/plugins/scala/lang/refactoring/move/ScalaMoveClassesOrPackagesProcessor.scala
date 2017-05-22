@@ -20,23 +20,21 @@ class ScalaMoveClassesOrPackagesProcessor(project: Project,
                                           searchInComments: Boolean,
                                           searchInNonJavaFiles: Boolean,
                                           moveCallback: MoveCallback)
-    extends {
+    extends
   private val expandedElements =
     if (ScalaApplicationSettings.getInstance().MOVE_COMPANION)
-      elements.flatMap {
+      elements.flatMap
         case td: ScTypeDefinition =>
           td :: ScalaPsiUtil.getBaseCompanionModule(td).toList
         case e => List(e)
-      } else elements
-} with MoveClassesOrPackagesProcessor(project,
+      else elements
+with MoveClassesOrPackagesProcessor(project,
                                       expandedElements,
                                       moveDestination,
                                       searchInComments,
                                       searchInNonJavaFiles,
-                                      moveCallback) {
-  extensions.inWriteAction {
+                                      moveCallback)
+  extensions.inWriteAction
     expandedElements.foreach(c =>
           ScalaMoveUtil.saveMoveDestination(
               c, moveDestination.getTargetDirectory(c.getContainingFile)))
-  }
-}

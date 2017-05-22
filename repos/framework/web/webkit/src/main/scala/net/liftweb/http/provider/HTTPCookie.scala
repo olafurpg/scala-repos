@@ -23,10 +23,9 @@ import net.liftweb.common.{Box, Empty, Full}
 /**
   * Companion module for creating HTTPCookie objects
   */
-object HTTPCookie {
+object HTTPCookie
   def apply(name: String, value: String) =
     new HTTPCookie(name, Full(value), Empty, Empty, Empty, Empty, Empty)
-}
 
 /**
   * Repersents an immutable representation of an HTTP Cookie
@@ -39,11 +38,10 @@ case class HTTPCookie(name: String,
                       version: Box[Int],
                       secure_? : Box[Boolean],
                       httpOnly: Box[Boolean] = Empty)
-    extends java.lang.Cloneable {
-  override def clone(): HTTPCookie = {
+    extends java.lang.Cloneable
+  override def clone(): HTTPCookie =
     super.clone()
     copy()
-  }
 
   /**
     * Returns a new HTTPCookie that preserve existing member values but sets the httpOnly attribute
@@ -97,4 +95,3 @@ case class HTTPCookie(name: String,
     */
   def setSecure(newSecure: Boolean): HTTPCookie =
     copy(secure_? = Box !! newSecure)
-}

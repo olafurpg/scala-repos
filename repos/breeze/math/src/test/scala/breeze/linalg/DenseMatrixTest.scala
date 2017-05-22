@@ -26,9 +26,9 @@ import breeze.util.DoubleImplicits
 
 @RunWith(classOf[JUnitRunner])
 class DenseMatrixTest
-    extends FunSuite with Checkers with Matchers with DoubleImplicits {
+    extends FunSuite with Checkers with Matchers with DoubleImplicits
 
-  test("Slicing") {
+  test("Slicing")
     val m = DenseMatrix((0, 1, 2), (3, 4, 5))
 
     // slice sub-matrix
@@ -84,16 +84,14 @@ class DenseMatrixTest
     val s7b = m(0 to 1, 0)
     s7b += 1
     assert(m === DenseMatrix((3, 4, 7), (6, 4, 6)))
-  }
 
-  test("Multiple Slicing") {
+  test("Multiple Slicing")
     val m = new DenseMatrix[Int](6, 6, (1 to 36).toArray)
     val slice1 = m(1 to 3, 1 to 3)
     assert(slice1(::, 1) === DenseVector(14, 15, 16))
     assert(slice1(::, 1 to 2) === DenseMatrix((14, 20), (15, 21), (16, 22)))
-  }
 
-  test("Transpose") {
+  test("Transpose")
     val m = DenseMatrix((1, 2, 3), (4, 5, 6))
 
     // check that the double transpose gives us back the original
@@ -104,9 +102,8 @@ class DenseMatrixTest
     assert(t === DenseMatrix((1, 4), (2, 5), (3, 6)))
     t(0, 1) = 0
     assert(m === DenseMatrix((1, 2, 3), (0, 5, 6)))
-  }
 
-  test("Sliced Transpose") {
+  test("Sliced Transpose")
     val m = DenseMatrix((0, 1, 2), (3, 4, 5))
 
     // column of original looks same as row of tranpose
@@ -145,7 +142,6 @@ class DenseMatrixTest
     val t3 = m.t(0 to 1, 0)
     assert(s3.t === t3)
 
-    {
       val s2 = m(0 to 1, ::)
       val t2 = m.t(::, 0 to 1)
       assert(s2.t === t2)
@@ -155,10 +151,8 @@ class DenseMatrixTest
       val t3 = m.t(0 to 1, ::)
       assert(s3.t === t3)
       assert(s3 === t3.t)
-    }
-  }
 
-  test("Min/Max") {
+  test("Min/Max")
     val m = DenseMatrix((1, 0, 0), (2, 3, -1))
     assert(argmin(m) === (1, 2))
     assert(argmax(m) === (1, 1))
@@ -166,9 +160,8 @@ class DenseMatrixTest
     assert(max(m) === 3)
     assert(minMax(m) === (-1, 3))
     assert(ptp(m) === 4)
-  }
 
-  test("elementwise max") {
+  test("elementwise max")
     val v = DenseVector(2, 0, 3, 2, -1).asDenseMatrix
     val v2 = DenseVector(3, -1, 3, 4, -4).asDenseMatrix
 
@@ -176,9 +169,8 @@ class DenseMatrixTest
     assert(max(v, 2) === DenseVector(2, 2, 3, 2, 2).asDenseMatrix)
 
     assert(min(v, 2) === DenseVector(2, 0, 2, 2, -1).asDenseMatrix)
-  }
 
-  test("Min/Max[Float]") {
+  test("Min/Max[Float]")
     val m = convert(DenseMatrix((1, 0, 0), (2, 3, -1)), Float)
     assert(argmin(m) === (1, 2))
     assert(argmax(m) === (1, 1))
@@ -186,9 +178,8 @@ class DenseMatrixTest
     assert(max(m) === 3)
     assert(minMax(m) === (-1.0f, 3.0f))
     assert(ptp(m) === 4)
-  }
 
-  test("Min/Max[Double]") {
+  test("Min/Max[Double]")
     val m = convert(DenseMatrix((1, 0, 0), (2, 3, -1)), Double)
     assert(argmin(m) === (1, 2))
     assert(argmax(m) === (1, 1))
@@ -196,9 +187,8 @@ class DenseMatrixTest
     assert(max(m) === 3)
     assert(minMax(m) === (-1.0, 3.0))
     assert(ptp(m) === 4)
-  }
 
-  test("Min/Max[Long]") {
+  test("Min/Max[Long]")
     val m = convert(DenseMatrix((1, 0, 0), (2, 3, -1)), Long)
     assert(argmin(m) === (1, 2))
     assert(argmax(m) === (1, 1))
@@ -206,9 +196,8 @@ class DenseMatrixTest
     assert(max(m) === 3)
     assert(minMax(m) === (-1L, 3L))
     assert(ptp(m) === 4)
-  }
 
-  test("MapValues") {
+  test("MapValues")
     val a: DenseMatrix[Int] = DenseMatrix((1, 0, 0), (2, 3, -1))
 
     val b1: DenseMatrix[Int] = a.mapValues(_ + 1)
@@ -219,7 +208,6 @@ class DenseMatrixTest
 
     val b3 = a.t.mapValues(_ + 1)
     assert(b3 === DenseMatrix((2, 3), (1, 4), (1, 0)))
-  }
 
   /*
   test("Map Triples") {
@@ -258,34 +246,29 @@ class DenseMatrixTest
 
    */
 
-  test("set") {
-    {
+  test("set")
       val a = DenseMatrix.zeros[Int](2, 2)
       val b = DenseMatrix((1, 0), (2, 3))
       a := b
       assert(a === b)
-    }
     val a = DenseMatrix.zeros[Int](2, 3)
     val b = DenseMatrix((1, 0, 5), (2, 3, -1))
     a := b
     assert(a === b)
-  }
 
-  test("horzcat") {
+  test("horzcat")
     val a: DenseMatrix[Int] = DenseMatrix((1, 0, 5), (2, 3, -1))
     val result: DenseMatrix[Int] =
       DenseMatrix((1, 0, 5, 1, 0, 5), (2, 3, -1, 2, 3, -1))
     assert(DenseMatrix.horzcat(a, a) === result)
-  }
 
-  test("vertcat") {
+  test("vertcat")
     val a: DenseMatrix[Int] = DenseMatrix((1, 0, 5), (2, 3, -1))
     val result: DenseMatrix[Int] =
       DenseMatrix((1, 0, 5), (2, 3, -1), (1, 0, 5), (2, 3, -1))
     assert(DenseMatrix.vertcat(a, a) === result)
-  }
 
-  test("Multiply") {
+  test("Multiply")
     val a = DenseMatrix((1.0, 2.0, 3.0), (4.0, 5.0, 6.0))
     val b = DenseMatrix((7.0, -2.0, 8.0), (-3.0, -3.0, 1.0), (12.0, 0.0, 5.0))
     val c = DenseVector(6.0, 2.0, 3.0)
@@ -312,9 +295,8 @@ class DenseMatrixTest
     val z: DenseMatrix[Double] = b * (b + 1.0)
     assert(z === DenseMatrix(
             (164.0, 5.0, 107.0), (-5.0, 10.0, -27.0), (161.0, -7.0, 138.0)))
-  }
 
-  test("Multiply Int") {
+  test("Multiply Int")
     val a = DenseMatrix((1, 2, 3), (4, 5, 6))
     val b = DenseMatrix((7, -2, 8), (-3, -3, 1), (12, 0, 5))
     val c = DenseVector(6, 2, 3)
@@ -334,16 +316,14 @@ class DenseMatrixTest
 
     val z: DenseMatrix[Int] = b * ((b + 1): DenseMatrix[Int])
     assert(z === DenseMatrix((164, 5, 107), (-5, 10, -27), (161, -7, 138)))
-  }
 
-  test("Multiply Boolean") {
+  test("Multiply Boolean")
     val a = DenseMatrix((true, true, true), (true, true, true))
     val b = DenseMatrix(
         (true, false, true), (true, false, true), (true, false, true))
     assert(a * b === DenseMatrix((true, false, true), (true, false, true)))
-  }
 
-  test("Multiply Float") {
+  test("Multiply Float")
     val a = DenseMatrix((1.0f, 2.0f, 3.0f), (4.0f, 5.0f, 6.0f))
     val b = DenseMatrix(
         (7.0f, -2.0f, 8.0f), (-3.0f, -3.0f, 1.0f), (12.0f, 0.0f, 5.0f))
@@ -374,9 +354,8 @@ class DenseMatrixTest
         z === DenseMatrix((164.0f, 5.0f, 107.0f),
                           (-5.0f, 10.0f, -27.0f),
                           (161.0f, -7.0f, 138.0f)))
-  }
 
-  test("Multiply Complex") {
+  test("Multiply Complex")
 
     val a = DenseMatrix((Complex(1, 1), Complex(2, 2), Complex(3, 3)),
                         (Complex(4, 4), Complex(5, 5), Complex(6, 6)))
@@ -396,9 +375,8 @@ class DenseMatrixTest
             Complex(62, 62), Complex(-21, -21), Complex(87, 87)))
     assert(b.t * c === DenseVector(
             Complex(72, -72), Complex(-18, 18), Complex(65, -65)))
-  }
 
-  test("Multiply BigDecimal") {
+  test("Multiply BigDecimal")
     val a = DenseMatrix((1, 2, 3), (4, 5, 6)).mapValues(BigDecimal(_))
     val b =
       DenseMatrix((7, -2, 8), (-3, -3, 1), (12, 0, 5)).mapValues(BigDecimal(_))
@@ -424,48 +402,42 @@ class DenseMatrixTest
       b * ((b + BigDecimal(1)): DenseMatrix[BigDecimal])
     assert(z === DenseMatrix((164, 5, 107), (-5, 10, -27), (161, -7, 138))
           .mapValues(BigDecimal(_)))
-  }
 
-  test("toDenseVector") {
+  test("toDenseVector")
     val a = DenseMatrix((1, 2, 3), (4, 5, 6))
     val b = a(0 to 1, 1 to 2)
     val c = b.t
     assert(a.toDenseVector === DenseVector(1, 4, 2, 5, 3, 6))
     assert(b.toDenseVector === DenseVector(2, 5, 3, 6))
     assert(c.toDenseVector === DenseVector(2, 3, 5, 6))
-  }
 
-  test("flattenView") {
+  test("flattenView")
     val a = DenseMatrix((1, 2, 3), (4, 5, 6))
     a.flatten(true)(2) = 4
     assert(a === DenseMatrix((1, 4, 3), (4, 5, 6)))
-  }
 
-  test("Trace") {
+  test("Trace")
     assert(trace(DenseMatrix((1, 2), (4, 5))) === 1 + 5)
     assert(trace(DenseMatrix((1, 2, 3), (3, 4, 5), (5, 6, 7))) == 1 + 4 + 7)
     assert(trace(DenseMatrix((1, 2, 3), (4, 5, 6), (7, 8, 9))) === 1 + 5 + 9)
-  }
 
-  test("Reshape") {
+  test("Reshape")
     val m: DenseMatrix[Int] = DenseMatrix((1, 2, 3), (4, 5, 6))
     val r: DenseMatrix[Int] = m.reshape(3, 2, true)
     assert(m.data eq r.data)
     assert(r.rows === 3)
     assert(r.cols === 2)
     assert(r === DenseMatrix((1, 5), (4, 3), (2, 6)))
-  }
 
-  test("Reshape transpose") {
+  test("Reshape transpose")
     val m: DenseMatrix[Int] = DenseMatrix((1, 2, 3), (4, 5, 6)).t
     val r: DenseMatrix[Int] = m.reshape(2, 3, true)
     assert(m.data eq r.data)
     assert(r.rows === 2)
     assert(r.cols === 3)
     assert(r === DenseMatrix((1, 5), (4, 3), (2, 6)).t)
-  }
 
-  test("Solve") {
+  test("Solve")
     // square solve
     val r1: DenseMatrix[Double] =
       DenseMatrix((1.0, 3.0), (2.0, 0.0)) \ DenseMatrix((1.0, 2.0), (3.0, 4.0))
@@ -496,9 +468,8 @@ class DenseMatrixTest
         max(abs(r4 - DenseMatrix((0.9166666666666667, 1.9166666666666672),
                                  (-0.08333333333333352,
                                   -0.08333333333333436)))) < 1E-5)
-  }
 
-  test("Solve Float") {
+  test("Solve Float")
     // square solve
     val r1: DenseMatrix[Float] =
       DenseMatrix((1.0f, 3.0f), (2.0f, 0.0f)) \ DenseMatrix((1.0f, 2.0f),
@@ -532,17 +503,15 @@ class DenseMatrixTest
         max(abs(r4 - DenseMatrix((0.9166666666666667f, 1.9166666666666672f),
                                  (-0.08333333333333352f,
                                   -0.08333333333333436f)))) < 1E-5)
-  }
 
-  test("GH#29 transpose solve is broken") {
+  test("GH#29 transpose solve is broken")
     val A = DenseMatrix((1.0, 0.0), (1.0, -1.0))
     val t = DenseVector(1.0, 0.0)
 
     assert(A \ t === DenseVector(1.0, 1.0))
     assert(A.t \ t === DenseVector(1.0, 0.0))
-  }
 
-  test("sum") {
+  test("sum")
     // Test square and rectangular matrices
     val A = DenseMatrix((1.0, 3.0), (2.0, 4.0))
     assert(sum(A, Axis._0) === DenseVector(3.0, 7.0).t)
@@ -562,9 +531,8 @@ class DenseMatrixTest
         sum(DenseMatrix((1.0, 3.0), (2.0, 4.0), (5.0, 6.0)), Axis._1) === DenseVector(
             4.0, 6.0, 11.0))
     assert(sum(A) === 10.0)
-  }
 
-  test("normalize rows and columns") {
+  test("normalize rows and columns")
     val A = DenseMatrix((1.0, 3.0), (2.0, 4.0))
     assert(normalize(A, Axis._0, 1) === DenseMatrix((1.0 / 3.0, 3.0 / 7.0),
                                                     (2.0 / 3.0, 4.0 / 7.0)))
@@ -575,20 +543,17 @@ class DenseMatrixTest
     dm := normalize(dm, Axis._1, 2)
     assert(abs(sum(dm(0, ::).t.map(x => x * x)) - 1.0) < 1E-4,
            dm.toString + " not normalized!")
-  }
 
-  test("Generic Dense ops") {
+  test("Generic Dense ops")
     // mostly for coverage
     val a = DenseMatrix.create[String](1, 1, Array("SSS"))
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3) = ":("
       assert(false, "Shouldn't be here!")
-    }
     assert(a(0, 0) === "SSS")
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       a(3, 3)
       assert(false, "Shouldn't be here!")
-    }
 
     a(0, 0) = ":("
     assert(a(0, 0) === ":(")
@@ -598,34 +563,28 @@ class DenseMatrixTest
     val b = DenseMatrix.zeros[String](1, 1)
     b := a
     assert(b === a)
-  }
 
-  test("toString with no rows doesn't throw") {
+  test("toString with no rows doesn't throw")
     DenseMatrix.zeros[Double](0, 2).toString
-  }
 
-  test("GH #30: Shaped solve of transposed and slice matrix does not work") {
+  test("GH #30: Shaped solve of transposed and slice matrix does not work")
     val A = DenseMatrix((1.0, 0.0), (1.0, -1.0))
     val i = DenseMatrix.eye[Double](2)
     val res = i \ A.t(::, 1)
     assert(res === DenseVector(1.0, -1.0))
     val res2 = i \ A(1, ::).t
     assert(res2 === DenseVector(1.0, -1.0))
-  }
 
-  test("GH #148: out of bounds slice throws") {
+  test("GH #148: out of bounds slice throws")
     val temp2 = DenseMatrix.tabulate(5, 5)((x: Int, y: Int) => x + y * 10)
-    intercept[IndexOutOfBoundsException] {
+    intercept[IndexOutOfBoundsException]
       temp2(Range(4, 6), 3)
-    }
-  }
 
-  test("softmax on dm slices") {
+  test("softmax on dm slices")
     val a = DenseMatrix((1.0, 2.0, 3.0))
     assert(softmax(a(::, 1)) === 2.0)
-  }
 
-  test("Delete") {
+  test("Delete")
     val a = DenseMatrix((1, 2, 3), (4, 5, 6), (7, 8, 9))
     assert(a.delete(0, Axis._0) === DenseMatrix((4, 5, 6), (7, 8, 9)))
     assert(a.delete(1, Axis._0) === DenseMatrix((1, 2, 3), (7, 8, 9)))
@@ -640,53 +599,45 @@ class DenseMatrixTest
 
     assert(a.delete(Seq(0, 2), Axis._0) === DenseMatrix((4, 5, 6)))
     assert(a.delete(Seq(1, 2), Axis._0) === DenseMatrix((1, 2, 3)))
-  }
 
-  test("Big Int zeros are the right thing") {
+  test("Big Int zeros are the right thing")
     val dm = DenseMatrix.zeros[BigInt](1, 1)
     assert(dm(0, 0) === BigInt(0))
-  }
 
-  test("BigInt multiply") {
+  test("BigInt multiply")
     val m = DenseMatrix((BigInt(1), BigInt(1)), (BigInt(1), BigInt(0)))
     val m2 = DenseMatrix((1, 1), (1, 0))
     assert(m * m === convert(m2 * m2, Int))
-  }
 
-  test("comparisons") {
+  test("comparisons")
     val one = DenseMatrix.ones[Double](5, 6)
     val zero = DenseMatrix.zeros[Double](5, 6)
     assert((one :> zero) === DenseMatrix.ones[Boolean](5, 6))
-  }
 
-  test("Some ill-typedness") {
+  test("Some ill-typedness")
     import shapeless.test.illTyped
-    illTyped {
+    illTyped
       """
         val one = DenseMatrix.ones[Double](5, 6)
         val z = DenseVector.zeros[Double](5)
         (z + one)
       """
-    }
-  }
 
-  test("ensure we don't crash on weird strides") {
+  test("ensure we don't crash on weird strides")
     val dm = DenseMatrix.zeros[Double](3, 3)
 
     assert((dm(::, 0 until 0) * dm(0 until 0, ::)) === dm)
     assert((dm(0 until 0, ::) * dm(::, 0 until 0)) === DenseMatrix
           .zeros[Double](0, 0))
 //    assert( (dm(::, 2 until 0 by -1) * dm(2 until 0 by -1, ::)) === dm)
-  }
 
-  test("Ensure a += a.t gives the right result") {
+  test("Ensure a += a.t gives the right result")
     val dm = DenseMatrix.rand[Double](3, 3)
     val dmdmt = dm + dm.t
     dm += dm.t
     assert(dm === dmdmt)
-  }
 
-  test("#221") {
+  test("#221")
     val data = Array(1,
                      2,
                      3,
@@ -802,84 +753,72 @@ class DenseMatrixTest
 
     val sl2 = area(1 until area.rows, 0 until area.cols)
     assert(sl2 === DenseMatrix((3, 4, 5, 6, 7), (3, 4, 5, 6, 7)))
-  }
 
-  test("DenseMatrix construction with list of lists") {
+  test("DenseMatrix construction with list of lists")
     val dm = DenseMatrix(
         List(List(1, 2, 3, 0, 0, 0, 0, 0, 0),
              List(0, 0, 0, 1, 2, 3, 0, 0, 0),
              List(0, 0, 0, 0, 0, 0, 1, 2, 3)): _*)
-  }
 
-  test("#265: slices of :: and IndexedSeq") {
+  test("#265: slices of :: and IndexedSeq")
     val dm = DenseMatrix((0, 1, 2), (3, 4, 5))
     assert(dm(::, IndexedSeq(2, 1, 0)).toDenseMatrix === fliplr(dm))
     assert(dm(IndexedSeq(1, 0), ::).toDenseMatrix === flipud(dm))
-  }
 
-  test("#278: don't crash on solve when majorStride == 0") {
+  test("#278: don't crash on solve when majorStride == 0")
     val d = DenseVector[Double]()
     val m = DenseMatrix.tabulate(0, 0) { case x => 0.0 }
     assert(m \ d === d)
-  }
 
-  test("#283: slice of dm by dm boolean") {
+  test("#283: slice of dm by dm boolean")
     val dm = DenseMatrix((0, 1, 2), (3, 4, 5))
     dm(dm :>= 2) := 3
     assert(dm === DenseMatrix((0, 1, 3), (3, 3, 3)))
-  }
 
-  test("#286: argsort diverging implicit") {
+  test("#286: argsort diverging implicit")
     val dm = DenseMatrix((0.1f), (0.0f))
 
     assert(argsort(dm) === IndexedSeq((1, 0), (0, 0)))
-  }
 
-  test("#289: sigmoid dm slice") {
+  test("#289: sigmoid dm slice")
     val m = DenseMatrix.zeros[Double](10, 10)
     assert(sigmoid(m(::, 0 to 5)) === DenseMatrix.fill(10, 6)(0.5))
     assert(sigmoid(m(::, 3 to 5)) === DenseMatrix.fill(10, 3)(0.5))
-  }
 
   def matricesNearlyEqual(A: DenseMatrix[Double],
                           B: DenseMatrix[Double],
-                          threshold: Double = 1E-6) {
+                          threshold: Double = 1E-6)
     for (i <- 0 until A.rows; j <- 0 until A.cols) A(i, j) should be(
         B(i, j) +- threshold)
-  }
 
-  test("#336 argmax for Dense Matrices") {
+  test("#336 argmax for Dense Matrices")
     val m = DenseMatrix.zeros[Double](3, 3)
     m(2, ::) := DenseVector(1.0, 2.0, 3.0).t
     assert(argmax(m(2, ::).t) === 2)
     assert(max(m(2, ::).t) === 3.0)
-  }
 
-  test("lhs scalars") {
+  test("lhs scalars")
     assert(1.0 :/ (DenseMatrix.fill(2, 2)(10.0)) === DenseMatrix.fill(2, 2)(
             1 / 10.0))
     assert(
         1.0 :- (DenseMatrix.fill(2, 2)(10.0)) === DenseMatrix.fill(2, 2)(-9.0))
-  }
 
-  test("mapping ufunc") {
+  test("mapping ufunc")
     val r = DenseMatrix.rand(100, 100)
     val explicit = new DenseMatrix(100, 100, r.data.map(math.sin))
     assert(sin(r) == explicit)
     sin.inPlace(r)
     assert(explicit == r)
-  }
 
-  test("mapping ufunc, strides") {
+  test("mapping ufunc, strides")
     val r = (DenseMatrix.rand(100, 100)).apply(10 until 27, 4 until 37 by 4)
     var explicit = new DenseMatrix(100, 100, r.data.map(math.sin))
     explicit = explicit(10 until 27, 4 until 37 by 4)
     assert(sin(r) == explicit)
     sin.inPlace(r)
     assert(explicit == r)
-  }
 
-  test("#449") {
+  test("#449")
 
     val m = DenseMatrix.rand(10, 10)
 
@@ -890,14 +829,11 @@ class DenseMatrixTest
     m(List(1, 2, 3), 0 to 0) := m(List(1, 2, 3), 0 to 0) //WORKS FINE
     m(List(1, 2, 3), 0) := m(List(1, 2, 3), 0) //NOT WORKING
     m(1 to 3, 0) := m(1 to 3, 0) //WORKS FINE
-  }
 
-  test("#476: DM * DV when rows == 0") {
+  test("#476: DM * DV when rows == 0")
     val m = DenseMatrix.zeros[Double](0, 10)
     val v = DenseVector.zeros[Double](10)
     assert(m * v == DenseVector.zeros[Double](0))
     val m2 = DenseMatrix.zeros[Double](10, 0)
     val v2 = DenseVector.zeros[Double](0)
     assert(m2 * v2 == DenseVector.zeros[Double](10))
-  }
-}

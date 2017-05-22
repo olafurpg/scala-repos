@@ -1,20 +1,17 @@
-object Test extends App {
-  def check(expected: Any, actual: Any, msg: String = "") = {
+object Test extends App
+  def check(expected: Any, actual: Any, msg: String = "") =
     if (expected != actual) sys.error(s"($actual != $expected) $msg")
-  }
   val ls = List(1, 3, 2, 1)
-  for (N <- -1 to (ls.length + 1)) {
+  for (N <- -1 to (ls.length + 1))
     check(ls.takeRight(N), ls.view.takeRight(N).toList, s"takeRight($N)")
     check(ls.dropRight(N), ls.view.dropRight(N).toList, s"dropRight($N)")
-  }
-  for (N <- 1 to (ls.length + 1)) {
+  for (N <- 1 to (ls.length + 1))
     check(ls.sliding(N).toList,
           ls.view.sliding(N).toList.map(_.toList),
           s"sliding($N)")
     check(ls.sliding(N, 2).toList,
           ls.view.sliding(N, 2).toList.map(_.toList),
           s"sliding($N, 2)")
-  }
   for (b <- List(true, false)) check(
       ls.filterNot(x => true), ls.view.filterNot(x => true), s"filterNot($b)")
 
@@ -43,4 +40,3 @@ object Test extends App {
   check(Buffer(1, 2, 3).tail.length,
         Buffer(1, 2, 3).view.tail.length,
         "Buffer#tail#length")
-}

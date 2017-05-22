@@ -17,15 +17,14 @@ import akka.event.LoggerMessageQueueSemantics
 /**
   * Base trait for all classes that wants to be able use the SLF4J logging infrastructure.
   */
-trait SLF4JLogging {
+trait SLF4JLogging
   @transient
   lazy val log = Logger(this.getClass.getName)
-}
 
 /**
   * Logger is a factory for obtaining SLF4J-Loggers
   */
-object Logger {
+object Logger
 
   /**
     * @param logger - which logger
@@ -39,16 +38,14 @@ object Logger {
     * @return a Logger for the specified parameters
     */
   def apply(logClass: Class[_], logSource: String): SLFLogger =
-    logClass match {
+    logClass match
       case c if c == classOf[DummyClassForStringSources] ⇒ apply(logSource)
       case _ ⇒ SLFLoggerFactory getLogger logClass
-    }
 
   /**
     * Returns the SLF4J Root Logger
     */
   def root: SLFLogger = apply(SLFLogger.ROOT_LOGGER_NAME)
-}
 
 /**
   * SLF4J logger.
@@ -58,18 +55,18 @@ object Logger {
   */
 class Slf4jLogger
     extends Actor with SLF4JLogging
-    with RequiresMessageQueue[LoggerMessageQueueSemantics] {
+    with RequiresMessageQueue[LoggerMessageQueueSemantics]
 
   val mdcThreadAttributeName = "sourceThread"
   val mdcActorSystemAttributeName = "sourceActorSystem"
   val mdcAkkaSourceAttributeName = "akkaSource"
   val mdcAkkaTimestamp = "akkaTimestamp"
 
-  def receive = {
+  def receive =
 
     case event @ Error(cause, logSource, logClass, message) ⇒
-      withMdc(logSource, event) {
-        cause match {
+      withMdc(logSource, event)
+        cause match
           case Error.NoCause | null ⇒
             Logger(logClass, logSource).error(
                 if (message != null) message.toString else null)
@@ -78,45 +75,37 @@ class Slf4jLogger
                                                 message.toString
                                               else cause.getLocalizedMessage,
                                               cause)
-        }
-      }
 
     case event @ Warning(logSource, logClass, message) ⇒
-      withMdc(logSource, event) {
+      withMdc(logSource, event)
         Logger(logClass, logSource).warn("{}", message.asInstanceOf[AnyRef])
-      }
 
     case event @ Info(logSource, logClass, message) ⇒
-      withMdc(logSource, event) {
+      withMdc(logSource, event)
         Logger(logClass, logSource).info("{}", message.asInstanceOf[AnyRef])
-      }
 
     case event @ Debug(logSource, logClass, message) ⇒
-      withMdc(logSource, event) {
+      withMdc(logSource, event)
         Logger(logClass, logSource).debug("{}", message.asInstanceOf[AnyRef])
-      }
 
     case InitializeLogger(_) ⇒
       log.info("Slf4jLogger started")
       sender() ! LoggerInitialized
-  }
 
   @inline
   final def withMdc(logSource: String, logEvent: LogEvent)(
-      logStatement: ⇒ Unit) {
+      logStatement: ⇒ Unit)
     MDC.put(mdcAkkaSourceAttributeName, logSource)
     MDC.put(mdcThreadAttributeName, logEvent.thread.getName)
     MDC.put(mdcAkkaTimestamp, formatTimestamp(logEvent.timestamp))
     MDC.put(mdcActorSystemAttributeName, actorSystemName)
     logEvent.mdc foreach { case (k, v) ⇒ MDC.put(k, String.valueOf(v)) }
-    try logStatement finally {
+    try logStatement finally
       MDC.remove(mdcAkkaSourceAttributeName)
       MDC.remove(mdcThreadAttributeName)
       MDC.remove(mdcAkkaTimestamp)
       MDC.remove(mdcActorSystemAttributeName)
       logEvent.mdc.keys.foreach(k ⇒ MDC.remove(k))
-    }
-  }
 
   /**
     * Override this method to provide a differently formatted timestamp
@@ -127,7 +116,6 @@ class Slf4jLogger
     Helpers.currentTimeMillisToUTCString(timestamp)
 
   private val actorSystemName = context.system.name
-}
 
 /**
   * [[akka.event.LoggingFilter]] that uses the log level defined in the SLF4J
@@ -136,7 +124,7 @@ class Slf4jLogger
   */
 class Slf4jLoggingFilter(
     settings: ActorSystem.Settings, eventStream: EventStream)
-    extends LoggingFilter {
+    extends LoggingFilter
   def isErrorEnabled(logClass: Class[_], logSource: String) =
     (eventStream.logLevel >= ErrorLevel) &&
     Logger(logClass, logSource).isErrorEnabled
@@ -149,4 +137,3 @@ class Slf4jLoggingFilter(
   def isDebugEnabled(logClass: Class[_], logSource: String) =
     (eventStream.logLevel >= DebugLevel) &&
     Logger(logClass, logSource).isDebugEnabled
-}

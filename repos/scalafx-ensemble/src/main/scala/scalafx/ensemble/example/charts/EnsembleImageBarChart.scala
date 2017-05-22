@@ -47,13 +47,13 @@ import scalafx.scene.chart.XYChart
   * @resource truck-s.png
   * @resource van-s.png
   */
-class EnsembleImageBarChart extends EnsembleExample {
+class EnsembleImageBarChart extends EnsembleExample
 
-  def getContent = new BarChart(new CategoryAxis(), new NumberAxis()) {
+  def getContent = new BarChart(new CategoryAxis(), new NumberAxis())
     legendVisible = false
     stylesheets +=
       this.getClass.getResource("ImageBarChart.css").toExternalForm
-    data = new XYChart.Series[String, Number]() {
+    data = new XYChart.Series[String, Number]()
       name = "Sales Per Product"
       data = Seq(
           XYChart.Data[String, Number]("SUV", 120),
@@ -61,6 +61,3 @@ class EnsembleImageBarChart extends EnsembleExample {
           XYChart.Data[String, Number]("Truck", 180),
           XYChart.Data[String, Number]("Van", 20)
       )
-    }
-  }
-}

@@ -40,7 +40,7 @@ import scalafx.scene.text.{Font, FontWeight}
   * @author Rafael
   *
   */
-class SliderControl(title: String) extends HBox {
+class SliderControl(title: String) extends HBox
 
   private val strBackground = "-fx-background-color: rgb(%d, %d, %d);"
   private val strForeground = "-fx-text-fill: rgb(%d, %d, %d);"
@@ -52,32 +52,28 @@ class SliderControl(title: String) extends HBox {
 
   def value = this.realValue
 
-  def value_=(d: Double) {
-    if (d < Min) {
+  def value_=(d: Double)
+    if (d < Min)
       value() = Min
-    } else if (d > Max) {
+    else if (d > Max)
       value() = Max
-    } else {
+    else
       value() = d
-    }
-  }
 
   val selectedControl = new BooleanProperty()
 
-  val chbSelected = new CheckBox {
+  val chbSelected = new CheckBox
     id = "chbSelected"
     selected <==> selectedControl
-  }
 
-  val lblTitle = new Label {
+  val lblTitle = new Label
     id = "lblTitle"
     text = title
     style <== cssForeground
-  }
   lblTitle.font = Font.font(
       lblTitle.font().family, FontWeight.Bold, lblTitle.font().size)
 
-  val sldValue = new Slider {
+  val sldValue = new Slider
     id = "sldValue"
     blockIncrement = 1.0
     majorTickUnit = 50.0
@@ -90,14 +86,12 @@ class SliderControl(title: String) extends HBox {
     hgrow = Priority.Always
     style <== cssForeground
     value <==> realValue
-  }
 
-  val lblValue = new Label {
+  val lblValue = new Label
     id = "lblValue"
     text <== realValue.asString("%03.0f")
     hgrow = Priority.Never
     style <== cssForeground
-  }
   lblValue.font = Font.font(
       lblValue.font().family, FontWeight.Bold, lblValue.font().size)
 
@@ -108,16 +102,13 @@ class SliderControl(title: String) extends HBox {
   style <== cssBackground
 
   onScroll = (event: ScrollEvent) =>
-    {
-      if (event.eventType == ScrollEvent.Scroll) {
+      if (event.eventType == ScrollEvent.Scroll)
         val multiplier = if (event.isControlDown) 10 else 1
         val delta = -(event.getDeltaY.toInt / 10)
 
         value = (value.get + multiplier * delta)
-      }
-  }
 
-  def changeColor(backgroundColor: Color, foregroundColor: Color) {
+  def changeColor(backgroundColor: Color, foregroundColor: Color)
     this.cssBackground() = strBackground.format(
         doubleToInt(backgroundColor.red),
         doubleToInt(backgroundColor.green),
@@ -126,8 +117,6 @@ class SliderControl(title: String) extends HBox {
         doubleToInt(foregroundColor.red),
         doubleToInt(foregroundColor.green),
         doubleToInt(foregroundColor.blue))
-  }
 
   override def toString =
     "%s[%s, %b]".format(title, lblValue.text.get, selectedControl.value)
-}

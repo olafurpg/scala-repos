@@ -12,7 +12,7 @@ import scala.tools.nsc.io._
 
 /** Interface of interactive compiler to a client such as an IDE
   */
-object REPL {
+object REPL
 
   val versionMsg =
     "Scala compiler " + Properties.versionString + " -- " +
@@ -22,56 +22,45 @@ object REPL {
 
   var reporter: ConsoleReporter = _
 
-  private def replError(msg: String) {
+  private def replError(msg: String)
     reporter.error( /*new Position */ FakePos("scalac"),
                    msg + "\n  scalac -help  gives more information")
-  }
 
-  def process(args: Array[String]) {
+  def process(args: Array[String])
     val settings = new Settings(replError)
     reporter = new ConsoleReporter(settings)
     val command = new CompilerCommand(args.toList, settings)
     if (command.settings.version) reporter.echo(versionMsg)
-    else {
-      try {
-        object compiler extends Global(command.settings, reporter) {
+    else
+      try
+        object compiler extends Global(command.settings, reporter)
 //          printTypings = true
-        }
-        if (reporter.hasErrors) {
+        if (reporter.hasErrors)
           reporter.flush()
           return
-        }
-        if (command.shouldStopWithInfo) {
+        if (command.shouldStopWithInfo)
           reporter.echo(command.getInfoMessage(compiler))
-        } else {
+        else
           run(compiler)
-        }
-      } catch {
+      catch
         case ex @ FatalError(msg) =>
           if (true || command.settings.debug) // !!!
             ex.printStackTrace()
           reporter.error(null, "fatal error: " + msg)
-      }
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     process(args)
     sys.exit(if (reporter.hasErrors) 1 else 0)
-  }
 
-  def loop(action: (String) => Unit) {
+  def loop(action: (String) => Unit)
     Console.print(prompt)
-    try {
+    try
       val line = Console.readLine()
-      if (line.length() > 0) {
+      if (line.length() > 0)
         action(line)
-      }
       loop(action)
-    } catch {
+    catch
       case _: java.io.EOFException => //nop
-    }
-  }
 
   /** Commands:
     *
@@ -79,36 +68,32 @@ object REPL {
     *  typeat file off1 off2?
     *  complete file off1 off2?
     */
-  def run(comp: Global) {
+  def run(comp: Global)
     val reloadResult = new Response[Unit]
     val typeatResult = new Response[comp.Tree]
     val completeResult = new Response[List[comp.Member]]
     val typedResult = new Response[comp.Tree]
     val structureResult = new Response[comp.Tree]
 
-    def makePos(file: String, off1: String, off2: String) = {
+    def makePos(file: String, off1: String, off2: String) =
       val source = toSourceFile(file)
       comp.rangePos(source, off1.toInt, off1.toInt, off2.toInt)
-    }
 
-    def doTypeAt(pos: Position) {
+    def doTypeAt(pos: Position)
       comp.askTypeAt(pos, typeatResult)
       show(typeatResult)
-    }
 
-    def doComplete(pos: Position) {
+    def doComplete(pos: Position)
       comp.askTypeCompletion(pos, completeResult)
       show(completeResult)
-    }
 
-    def doStructure(file: String) {
+    def doStructure(file: String)
       comp.askParsedEntered(
           toSourceFile(file), keepLoaded = false, structureResult)
       show(structureResult)
-    }
 
-    loop { line =>
-      (line split " ").toList match {
+    loop  line =>
+      (line split " ").toList match
         case "reload" :: args =>
           comp.askReload(args map toSourceFile, reloadResult)
           show(reloadResult)
@@ -144,21 +129,15 @@ object REPL {
                   | structure <file>
                   | quit
                   |""".stripMargin)
-      }
-    }
-  }
 
   def toSourceFile(name: String) =
     new BatchSourceFile(new PlainFile(new java.io.File(name)))
 
-  def using[T, U](svar: Response[T])(op: T => U): Option[U] = {
-    val res = svar.get match {
+  def using[T, U](svar: Response[T])(op: T => U): Option[U] =
+    val res = svar.get match
       case Left(result) => Some(op(result))
       case Right(exc) => exc.printStackTrace; println("ERROR: " + exc); None
-    }
     svar.clear()
     res
-  }
 
   def show[T](svar: Response[T]) = using(svar)(res => println("==> " + res))
-}

@@ -34,7 +34,7 @@ import scalafx.delegate._
 /** Wrapper for [[http://docs.oracle.com/javase/8/javafx/api/javafx/geometry/HorizontalDirection.html javafx.geometry.HorizontalDirection]] */
 object HorizontalDirection
     extends SFXEnumDelegateCompanion[
-        jfxg.HorizontalDirection, HorizontalDirection] {
+        jfxg.HorizontalDirection, HorizontalDirection]
 
   /** A direction to the left. */
   val Left = new HorizontalDirection(jfxg.HorizontalDirection.LEFT)
@@ -50,7 +50,6 @@ object HorizontalDirection
 
   protected override def unsortedValues: Array[HorizontalDirection] =
     Array(Left, Right)
-}
 
 sealed case class HorizontalDirection(
     override val delegate: jfxg.HorizontalDirection)

@@ -18,23 +18,21 @@ import scala.math.sqrt
 case class LogNormal(
     mu: Double, sigma: Double)(implicit rand: RandBasis = Rand)
     extends ContinuousDistr[Double] with Moments[Double, Double] with HasCdf
-    with HasInverseCdf {
+    with HasInverseCdf
   private val myGaussian = Gaussian(mu, sigma)
   require(sigma > 0, "Sigma must be positive, but got " + sigma)
 
   /**
     * Gets one sample from the distribution. Equivalent to sample()
     */
-  def draw(): Double = {
+  def draw(): Double =
     exp(myGaussian.draw())
-  }
 
-  def unnormalizedLogPdf(x: Double): Double = {
+  def unnormalizedLogPdf(x: Double): Double =
     if (x <= 0.0) return Double.NegativeInfinity
     val logx = log(x)
     val rad = (logx - mu) / sigma
     -(rad * rad / 2) - logx
-  }
 
   lazy val logNormalizer: Double = log(sqrt(2 * Math.PI)) + log(sigma)
 
@@ -51,9 +49,8 @@ case class LogNormal(
     */
   def cdf(x: Double) = myGaussian.cdf(log(x))
 
-  override def probability(x: Double, y: Double): Double = {
+  override def probability(x: Double, y: Double): Double =
     myGaussian.probability(log(x), log(y))
-  }
 
   override def toString: String = ScalaRunTime._toString(this)
 
@@ -64,11 +61,10 @@ case class LogNormal(
   def entropy: Double = 0.5 + 0.5 * math.log(2 * math.Pi * sigma * sigma) + mu
 
   def mode: Double = exp(mu - sigma * sigma)
-}
 
 object LogNormal
     extends ExponentialFamily[LogNormal, Double]
-    with ContinuousDistributionUFuncProvider[Double, LogNormal] {
+    with ContinuousDistributionUFuncProvider[Double, LogNormal]
   type Parameter = (Double, Double)
 
   import Gaussian.SufficientStatistic
@@ -76,9 +72,8 @@ object LogNormal
 
   def emptySufficientStatistic = Gaussian.emptySufficientStatistic
 
-  def sufficientStatisticFor(t: Double) = {
+  def sufficientStatisticFor(t: Double) =
     SufficientStatistic(1, math.log(t), 0)
-  }
 
   def mle(stats: SufficientStatistic): (Double, Double) = Gaussian.mle(stats)
 
@@ -87,4 +82,3 @@ object LogNormal
   def likelihoodFunction(
       stats: SufficientStatistic): DiffFunction[(Double, Double)] =
     Gaussian.likelihoodFunction(stats)
-}

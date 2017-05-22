@@ -26,21 +26,17 @@ import scala.collection.JavaConverters._
   * @author Sam Ritchie
   * @author Ashu Singhal
   */
-private[summingbird] object ConfigBijection {
+private[summingbird] object ConfigBijection
   implicit val fromMap: Bijection[Map[String, AnyRef], Configuration] =
-    new Bijection[Map[String, AnyRef], Configuration] {
-      override def apply(config: Map[String, AnyRef]) = {
+    new Bijection[Map[String, AnyRef], Configuration]
+      override def apply(config: Map[String, AnyRef]) =
         val conf = new Configuration(false) // false means don't read defaults
         config foreach { case (k, v) => conf.set(k, v.toString) }
         conf
-      }
       override def invert(config: Configuration) =
-        config.asScala.foldLeft(Map[String, AnyRef]()) { (m, entry) =>
+        config.asScala.foldLeft(Map[String, AnyRef]())  (m, entry) =>
           val k = entry.getKey
           val v = entry.getValue
           m + (k -> v)
-        }
-    }
   val fromJavaMap: Bijection[JMap[String, AnyRef], Configuration] =
     Bijection.connect[JMap[String, AnyRef], Map[String, AnyRef], Configuration]
-}

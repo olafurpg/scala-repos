@@ -26,7 +26,7 @@ import org.saddle.array.Sorter
 /**
   * Double ScalarTag
   */
-object ScalarTagDouble extends ScalarTag[Double] {
+object ScalarTagDouble extends ScalarTag[Double]
   def missing: Double = Double.NaN
   def isMissing(v: Double): Boolean = (v != v)
   def notMissing(v: Double): Boolean = (v == v)
@@ -61,4 +61,3 @@ object ScalarTagDouble extends ScalarTag[Double] {
     Vec(array.flatten(arrs.map(_.toArray)))
 
   override def toString = "ScalarTagDouble"
-}

@@ -7,8 +7,8 @@ final case class Job(title: String)
 final case class Person(name: String, age: Int, job: Job)
 case class Philipp(mother: Person)
 
-class NestedNonPrimitiveFieldsTest extends FunSuite {
-  test("main") {
+class NestedNonPrimitiveFieldsTest extends FunSuite
+  test("main")
     val gudrun = Person("gudrun", 62, Job("Teacher"))
     val pckl = Philipp(gudrun).pickle
     // Note:  Previously pickling would consider non-final case classes as final, and would elide the types.
@@ -27,5 +27,3 @@ class NestedNonPrimitiveFieldsTest extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(pckl.unpickle[Philipp] === Philipp(gudrun))
-  }
-}

@@ -13,83 +13,73 @@ import org.scalatest.{FlatSpecLike, Matchers, BeforeAndAfterAll}
 import akka.testkit.{TestActors, TestKit, ImplicitSender, EventFilter}
 
 //#testkit
-object FaultHandlingDocSpec {
+object FaultHandlingDocSpec
   //#supervisor
   //#child
   import akka.actor.Actor
 
   //#child
-  class Supervisor extends Actor {
+  class Supervisor extends Actor
     //#strategy
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
     import scala.concurrent.duration._
 
     override val supervisorStrategy =
-      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute)
         case _: ArithmeticException => Resume
         case _: NullPointerException => Restart
         case _: IllegalArgumentException => Stop
         case _: Exception => Escalate
-      }
     //#strategy
 
-    def receive = {
+    def receive =
       case p: Props => sender() ! context.actorOf(p)
-    }
-  }
   //#supervisor
 
   //#supervisor2
-  class Supervisor2 extends Actor {
+  class Supervisor2 extends Actor
     //#strategy2
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
     import scala.concurrent.duration._
 
     override val supervisorStrategy =
-      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute)
         case _: ArithmeticException => Resume
         case _: NullPointerException => Restart
         case _: IllegalArgumentException => Stop
         case _: Exception => Escalate
-      }
     //#strategy2
 
-    def receive = {
+    def receive =
       case p: Props => sender() ! context.actorOf(p)
-    }
     // override default to kill all children during restart
     override def preRestart(cause: Throwable, msg: Option[Any]) {}
-  }
   //#supervisor2
 
-  class Supervisor3 extends Actor {
+  class Supervisor3 extends Actor
     //#default-strategy-fallback
     import akka.actor.OneForOneStrategy
     import akka.actor.SupervisorStrategy._
     import scala.concurrent.duration._
 
     override val supervisorStrategy =
-      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute) {
+      OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1 minute)
         case _: ArithmeticException => Resume
         case t =>
           super.supervisorStrategy.decider.applyOrElse(t, (_: Any) => Escalate)
-      }
     //#default-strategy-fallback
 
     def receive = Actor.emptyBehavior
-  }
 
   //#child
-  class Child extends Actor {
+  class Child extends Actor
     var state = 0
-    def receive = {
+    def receive =
       case ex: Exception => throw ex
       case x: Int => state = x
       case "get" => sender() ! state
-    }
-  }
   //#child
 
   val testConf: Config =
@@ -98,11 +88,10 @@ object FaultHandlingDocSpec {
         loggers = ["akka.testkit.TestEventListener"]
       }
   """)
-}
 //#testkit
 class FaultHandlingDocSpec(_system: ActorSystem)
     extends TestKit(_system) with ImplicitSender with FlatSpecLike
-    with Matchers with BeforeAndAfterAll {
+    with Matchers with BeforeAndAfterAll
 
   def this() =
     this(
@@ -115,11 +104,10 @@ class FaultHandlingDocSpec(_system: ActorSystem)
       }
       """)))
 
-  override def afterAll {
+  override def afterAll
     TestKit.shutdownActorSystem(system)
-  }
 
-  "A supervisor" must "apply the chosen strategy for its child" in {
+  "A supervisor" must "apply the chosen strategy for its child" in
     //#testkit
 
     //#create
@@ -129,7 +117,7 @@ class FaultHandlingDocSpec(_system: ActorSystem)
     val child =
       expectMsgType[ActorRef] // retrieve answer from TestKit’s testActor
     //#create
-    EventFilter.warning(occurrences = 1) intercept {
+    EventFilter.warning(occurrences = 1) intercept
       //#resume
       child ! 42 // set state to 42
       child ! "get"
@@ -139,22 +127,19 @@ class FaultHandlingDocSpec(_system: ActorSystem)
       child ! "get"
       expectMsg(42)
       //#resume
-    }
-    EventFilter[NullPointerException](occurrences = 1) intercept {
+    EventFilter[NullPointerException](occurrences = 1) intercept
       //#restart
       child ! new NullPointerException // crash it harder
       child ! "get"
       expectMsg(0)
       //#restart
-    }
-    EventFilter[IllegalArgumentException](occurrences = 1) intercept {
+    EventFilter[IllegalArgumentException](occurrences = 1) intercept
       //#stop
       watch(child) // have testActor watch “child”
       child ! new IllegalArgumentException // break it
       expectMsgPF() { case Terminated(`child`) => () }
       //#stop
-    }
-    EventFilter[Exception]("CRASH", occurrences = 2) intercept {
+    EventFilter[Exception]("CRASH", occurrences = 2) intercept
       //#escalate-kill
       supervisor ! Props[Child] // create new child
       val child2 = expectMsgType[ActorRef]
@@ -163,9 +148,8 @@ class FaultHandlingDocSpec(_system: ActorSystem)
       expectMsg(0)
 
       child2 ! new Exception("CRASH") // escalate failure
-      expectMsgPF() {
+      expectMsgPF()
         case t @ Terminated(`child2`) if t.existenceConfirmed => ()
-      }
       //#escalate-kill
       //#escalate-restart
       val supervisor2 = system.actorOf(Props[Supervisor2], "supervisor2")
@@ -181,9 +165,6 @@ class FaultHandlingDocSpec(_system: ActorSystem)
       child3 ! "get"
       expectMsg(0)
       //#escalate-restart
-    }
     //#testkit
     // code here
-  }
-}
 //#testkit

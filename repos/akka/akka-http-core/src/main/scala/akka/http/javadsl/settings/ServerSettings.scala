@@ -19,7 +19,7 @@ import scala.concurrent.duration.{Duration, FiniteDuration}
 /**
   * Public API but not intended for subclassing
   */
-abstract class ServerSettings { self: ServerSettingsImpl ⇒
+abstract class ServerSettings  self: ServerSettingsImpl ⇒
   def getServerHeader: Optional[Server]
   def getTimeouts: ServerSettings.Timeouts
   def getMaxConnections: Int
@@ -67,10 +67,9 @@ abstract class ServerSettings { self: ServerSettingsImpl ⇒
   def withWebsocketRandomFactory(
       newValue: java.util.function.Supplier[Random]): ServerSettings =
     self.copy(websocketRandomFactory = () ⇒ newValue.get())
-}
 
-object ServerSettings extends SettingsCompanion[ServerSettings] {
-  trait Timeouts {
+object ServerSettings extends SettingsCompanion[ServerSettings]
+  trait Timeouts
     def idleTimeout: Duration
     def requestTimeout: Duration
     def bindTimeout: FiniteDuration
@@ -85,10 +84,8 @@ object ServerSettings extends SettingsCompanion[ServerSettings] {
 
     /** INTERNAL API */
     protected def self = this.asInstanceOf[ServerSettingsImpl.Timeouts]
-  }
 
   override def create(config: Config): ServerSettings =
     ServerSettingsImpl(config)
   override def create(configOverrides: String): ServerSettings =
     ServerSettingsImpl(configOverrides)
-}

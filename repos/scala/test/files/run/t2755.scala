@@ -1,7 +1,7 @@
 // Test cases: the only place we can cut and paste without crying
 // ourself to sleep.
-object Test {
-  def f1(a: Any) = a match {
+object Test
+  def f1(a: Any) = a match
     case x: Array[Int] => x(0)
     case x: Array[Double] => 2
     case x: Array[Float] => x.sum.toInt
@@ -9,8 +9,7 @@ object Test {
     case x: Array[AnyRef] => 5
     case x: Array[_] => 6
     case _ => 7
-  }
-  def f2(a: Array[_]) = a match {
+  def f2(a: Array[_]) = a match
     case x: Array[Int] => x(0)
     case x: Array[Double] => 2
     case x: Array[Float] => x.sum.toInt
@@ -18,8 +17,7 @@ object Test {
     case x: Array[AnyRef] => 5
     case x: Array[_] => 6
     case _ => 7
-  }
-  def f3[T](a: Array[T]) = a match {
+  def f3[T](a: Array[T]) = a match
     case x: Array[Int] => x(0)
     case x: Array[Double] => 2
     case x: Array[Float] => x.sum.toInt
@@ -27,9 +25,8 @@ object Test {
     case x: Array[AnyRef] => 5
     case x: Array[_] => 6
     case _ => 7
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     println(f1(Array(1, 2, 3)))
     println(f1(Array(1.0, -2.0, 3.0, 1.0)))
     println(f1(Array(1.0f, 2.0f, 3.0f, -3.0f)))
@@ -53,5 +50,3 @@ object Test {
     println(f3(new Array[Any](10))) // should match as Array[AnyRef]
     println(f3(Array(1L)))
     println(f3(null))
-  }
-}

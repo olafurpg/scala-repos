@@ -26,37 +26,33 @@ import scala.collection.JavaConverters._
   * @since 6/9/15.
   */
 class ModuleExtDataServiceTest
-    extends ProjectDataServiceTestCase with UsefulTestCaseHelper {
+    extends ProjectDataServiceTestCase with UsefulTestCaseHelper
 
   import ExternalSystemDataDsl._
 
-  override def setUp(): Unit = {
+  override def setUp(): Unit =
     super.setUp()
     setUpJdks()
-  }
 
   def testWithoutScalaLibrary(): Unit =
     importProjectData(generateScalaProject("2.11.5", None, Seq.empty))
 
-  def testWithIncompatibleScalaLibrary(): Unit = {
+  def testWithIncompatibleScalaLibrary(): Unit =
     importProjectData(
         generateScalaProject("2.11.5", Some("2.10.4"), Seq.empty))
     // FIXME: fix notifications on Windows
     //assertNotificationsCount(NotificationSource.PROJECT_SYNC, NotificationCategory.WARNING, SbtProjectSystem.Id, 1)
-  }
 
-  def testWithCompatibleScalaLibrary(): Unit = {
+  def testWithCompatibleScalaLibrary(): Unit =
     doTestAndCheckScalaSdk("2.11.1", "2.11.5")
     doTestAndCheckScalaSdk("2.10.4", "2.10.3")
-  }
 
-  def testWithTheSameVersionOfScalaLibrary(): Unit = {
+  def testWithTheSameVersionOfScalaLibrary(): Unit =
     doTestAndCheckScalaSdk("2.11.6", "2.11.6")
     doTestAndCheckScalaSdk("2.10.4", "2.10.4")
     doTestAndCheckScalaSdk("2.9.2", "2.9.2")
-  }
 
-  def testCompilerOptionsSetup(): Unit = {
+  def testCompilerOptionsSetup(): Unit =
     val options = Seq(
         "-g:source",
         "-Xplugin:test-plugin.jar",
@@ -109,19 +105,17 @@ class ModuleExtDataServiceTest
     assertFalse(compilerConfiguration.specialization)
     assertTrue(compilerConfiguration.uncheckedWarnings)
     assertFalse(compilerConfiguration.warnings)
-  }
 
-  def testModuleIsNull(): Unit = {
-    val testProject = new project {
+  def testModuleIsNull(): Unit =
+    val testProject = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
       arbitraryNodes += new ModuleExtNode(
           Some(Version("2.11.5")), Seq.empty, Seq.empty, None, Seq.empty)
-    }.build.toDataNode
+    .build.toDataNode
 
     importProjectData(testProject)
-  }
 
   def testValidJavaSdk(): Unit =
     doTestSdk(Some(JdkByName("1.8")),
@@ -144,14 +138,13 @@ class ModuleExtDataServiceTest
   def testAbsentSdk(): Unit =
     doTestSdk(None, defaultJdk, LanguageLevel.JDK_1_7)
 
-  def testValidJdkByHome(): Unit = {
+  def testValidJdkByHome(): Unit =
     val jdk =
       ProjectJdkTable.getInstance().findJdk(IdeaTestUtil.getMockJdk18.getName)
     doTestSdk(
         Some(JdkByHome(new File(jdk.getHomePath))), jdk, LanguageLevel.JDK_1_8)
-  }
 
-  def testJavacOptions(): Unit = {
+  def testJavacOptions(): Unit =
     val options = Seq(
         "-g:none",
         "-nowarn",
@@ -165,30 +158,27 @@ class ModuleExtDataServiceTest
     val compilerConfiguration = CompilerConfiguration.getInstance(getProject)
     assertEquals(
         "1.8", compilerConfiguration.getBytecodeTargetLevel(getModule))
-  }
 
-  def testScalaSdkForEvictedVersion(): Unit = {
+  def testScalaSdkForEvictedVersion(): Unit =
     import org.jetbrains.plugins.scala.project._
 
     val evictedVersion = "2.11.2"
     val newVersion = "2.11.6"
 
-    val projectData = new project {
+    val projectData = new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
       arbitraryNodes += new SbtProjectNode(
           Seq.empty, None, Seq.empty, "", getProject.getBasePath)
 
-      val evictedScalaLibrary = new library {
+      val evictedScalaLibrary = new library
         name := s"org.scala-lang:scala-library:$evictedVersion"
-      }
-      val newScalaLibrary = new library {
+      val newScalaLibrary = new library
         name := s"org.scala-lang:scala-library:$newVersion"
-      }
       libraries ++= Seq(evictedScalaLibrary, newScalaLibrary)
 
-      modules += new javaModule {
+      modules += new javaModule
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
@@ -198,8 +188,7 @@ class ModuleExtDataServiceTest
                                             Seq.empty,
                                             None,
                                             Seq.empty)
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
     importProjectData(projectData)
 
@@ -209,7 +198,6 @@ class ModuleExtDataServiceTest
       .filter(_.getName.contains(newVersion))
       .exists(_.isScalaSdk)
     assertTrue("Scala library is not set up", isLibrarySetUp)
-  }
 
   private def generateScalaProject(
       scalaVersion: String,
@@ -231,19 +219,18 @@ class ModuleExtDataServiceTest
       scalacOptions: Seq[String],
       jdk: Option[Sdk],
       javacOptions: Seq[String]): DataNode[ProjectData] =
-    new project {
+    new project
       name := getProject.getName
       ideDirectoryPath := getProject.getBasePath
       linkedProjectPath := getProject.getBasePath
       arbitraryNodes += new SbtProjectNode(
           Seq.empty, None, Seq.empty, "", getProject.getBasePath)
 
-      val scalaLibrary = scalaLibraryVersion.map { version =>
+      val scalaLibrary = scalaLibraryVersion.map  version =>
         new library { name := "org.scala-lang:scala-library:" + version }
-      }
       scalaLibrary.foreach(libraries += _)
 
-      modules += new javaModule {
+      modules += new javaModule
         name := "Module 1"
         moduleFileDirectoryPath := getProject.getBasePath + "/module1"
         externalConfigPath := getProject.getBasePath + "/module1"
@@ -253,11 +240,10 @@ class ModuleExtDataServiceTest
                                             scalacOptions,
                                             jdk,
                                             javacOptions)
-      }
-    }.build.toDataNode
+    .build.toDataNode
 
   private def doTestAndCheckScalaSdk(
-      scalaVersion: String, scalaLibraryVersion: String): Unit = {
+      scalaVersion: String, scalaLibraryVersion: String): Unit =
     import org.jetbrains.plugins.scala.project._
     importProjectData(generateScalaProject(
             scalaVersion, Some(scalaLibraryVersion), Seq.empty))
@@ -267,7 +253,6 @@ class ModuleExtDataServiceTest
       .filter(_.getName.contains("scala-library"))
       .exists(_.isScalaSdk)
     assertTrue("Scala library is not set up", isLibrarySetUp)
-  }
 
   private def doTestSdk(sdk: Option[Sdk],
                         expectedSdk: projectRoots.Sdk,
@@ -277,36 +262,31 @@ class ModuleExtDataServiceTest
   private def doTestSdk(sdk: Option[Sdk],
                         javacOptions: Seq[String],
                         expectedSdk: projectRoots.Sdk,
-                        expectedLanguageLevel: LanguageLevel): Unit = {
+                        expectedLanguageLevel: LanguageLevel): Unit =
     importProjectData(generateJavaProject(sdk, javacOptions))
 
     val moduleRootManager = ModuleRootManager.getInstance(getModule)
-    if (sdk.flatMap(SdkUtils.findProjectSdk).isEmpty) {
+    if (sdk.flatMap(SdkUtils.findProjectSdk).isEmpty)
       assertTrue(moduleRootManager.isSdkInherited)
-    } else {
+    else
       assertEquals(expectedSdk, moduleRootManager.getSdk)
       val languageLevelModuleExtension =
         LanguageLevelModuleExtensionImpl.getInstance(getModule)
       val actualLanguageLevel = languageLevelModuleExtension.getLanguageLevel
       assertEquals(expectedLanguageLevel, actualLanguageLevel)
-    }
-  }
 
-  private def setUpJdks(): Unit = {
-    ApplicationManagerEx.getApplicationEx.runWriteAction(new Runnable {
-      def run(): Unit = {
+  private def setUpJdks(): Unit =
+    ApplicationManagerEx.getApplicationEx.runWriteAction(new Runnable
+      def run(): Unit =
         val projectJdkTable = ProjectJdkTable.getInstance()
         projectJdkTable.getAllJdks.foreach(projectJdkTable.removeJdk)
         projectJdkTable.addJdk(IdeaTestUtil.getMockJdk17)
         projectJdkTable.addJdk(IdeaTestUtil.getMockJdk18)
-      }
-    })
+    )
     // TODO: find a way to create mock Android SDK
-  }
 
   private def defaultJdk: projectRoots.Sdk =
     ProjectJdkTable.getInstance().getAllJdks.head
 
   override def getModule: Module =
     ModuleManager.getInstance(getProject).findModuleByName("Module 1")
-}

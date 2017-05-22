@@ -8,80 +8,70 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 5/12/12
   */
-class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
+class DeMorganLawIntentionTest extends ScalaIntentionTestBase
   def familyName = DeMorganLawIntention.familyName
 
-  def test() {
+  def test()
     val text = "if (a |<caret>| b) {}"
     val resultText = "if (!(!a &<caret>& !b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test2() {
+  def test2()
     val text = "if (a &<caret>& b) {}"
     val resultText = "if (!(!a |<caret>| !b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test3() {
+  def test3()
     val text = "if (!a |<caret>| b) {}"
     val resultText = "if (!(a &<caret>& !b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test4() {
+  def test4()
     val text = "if (a |<caret>| !b) {}"
     val resultText = "if (!(!a &<caret>& b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test5() {
+  def test5()
     val text = "if (!a |<caret>| !b) {}"
     val resultText = "if (!(a &<caret>& b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test6() {
+  def test6()
     val text = "if (!a &<caret>& b) {}"
     val resultText = "if (!(a |<caret>| !b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test7() {
+  def test7()
     val text = "if (a <caret>&& !b) {}"
     val resultText = "if (!(!a <caret>|| b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test8() {
+  def test8()
     val text = "if (!a &&<caret> !b) {}"
     val resultText = "if (!(a ||<caret> b)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test9() {
+  def test9()
     val text = "if (true |<caret>| false) {}"
     val resultText = "if (!(false &<caret>& true)) {}"
 
     doTest(text, resultText)
-  }
 
-  def test10() {
+  def test10()
     val text = "!(!left &<caret>& !right)"
     val resultText = "left |<caret>| right"
 
     doTest(text, resultText)
-  }
 
-  def test11() {
+  def test11()
     val text = """
         |val % = true
         |!(!(%) &<caret>& !(%))
@@ -92,9 +82,8 @@ class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test12() {
+  def test12()
     val text = """
         |val % = true
         |% |<caret>| %
@@ -105,9 +94,8 @@ class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test13() {
+  def test13()
     val text = """
         |val b = true
         |(true equals b) |<caret>| true
@@ -118,9 +106,8 @@ class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test14() {
+  def test14()
     val text = """
         |val b = true
         |!(!(true equals b) &<caret>& false)
@@ -131,9 +118,8 @@ class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def test15() {
+  def test15()
     val text = """
         |val % = true
         |(%) |<caret>| (%)
@@ -144,5 +130,3 @@ class DeMorganLawIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

@@ -10,7 +10,7 @@ import scala.concurrent.forkjoin._
 import java.util.concurrent.{ArrayBlockingQueue, BlockingQueue, Callable, ExecutorService, LinkedBlockingQueue, RejectedExecutionHandler, RejectedExecutionException, SynchronousQueue, TimeUnit, ThreadFactory, ThreadPoolExecutor}
 import java.util.concurrent.atomic.{AtomicReference, AtomicLong}
 
-object ThreadPoolConfig {
+object ThreadPoolConfig
   type QueueFactory = () ⇒ BlockingQueue[Runnable]
 
   val defaultAllowCoreThreadTimeout: Boolean = false
@@ -43,22 +43,19 @@ object ThreadPoolConfig {
 
   def reusableQueue(queueFactory: QueueFactory): QueueFactory =
     reusableQueue(queueFactory())
-}
 
 /**
   * Function0 without the fun stuff (mostly for the sake of the Java API side of things)
   */
-trait ExecutorServiceFactory {
+trait ExecutorServiceFactory
   def createExecutorService: ExecutorService
-}
 
 /**
   * Generic way to specify an ExecutorService to a Dispatcher, create it with the given name if desired
   */
-trait ExecutorServiceFactoryProvider {
+trait ExecutorServiceFactoryProvider
   def createExecutorServiceFactory(
       id: String, threadFactory: ThreadFactory): ExecutorServiceFactory
-}
 
 /**
   * A small configuration DSL to create ThreadPoolExecutors that can be provided as an ExecutorServiceFactoryProvider to Dispatcher
@@ -71,10 +68,10 @@ final case class ThreadPoolConfig(
     queueFactory: ThreadPoolConfig.QueueFactory = ThreadPoolConfig
         .linkedBlockingQueue(),
     rejectionPolicy: RejectedExecutionHandler = ThreadPoolConfig.defaultRejectionPolicy)
-    extends ExecutorServiceFactoryProvider {
+    extends ExecutorServiceFactoryProvider
   class ThreadPoolExecutorServiceFactory(val threadFactory: ThreadFactory)
-      extends ExecutorServiceFactory {
-    def createExecutorService: ExecutorService = {
+      extends ExecutorServiceFactory
+    def createExecutorService: ExecutorService =
       val service: ThreadPoolExecutor = new ThreadPoolExecutor(
           corePoolSize,
           maxPoolSize,
@@ -82,29 +79,23 @@ final case class ThreadPoolConfig(
           threadTimeout.unit,
           queueFactory(),
           threadFactory,
-          rejectionPolicy) with LoadMetrics {
+          rejectionPolicy) with LoadMetrics
         def atFullThrottle(): Boolean = this.getActiveCount >= this.getPoolSize
-      }
       service.allowCoreThreadTimeOut(allowCorePoolTimeout)
       service
-    }
-  }
   final def createExecutorServiceFactory(
-      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory = {
-    val tf = threadFactory match {
+      id: String, threadFactory: ThreadFactory): ExecutorServiceFactory =
+    val tf = threadFactory match
       case m: MonitorableThreadFactory ⇒
         // add the dispatcher id to the thread names
         m.withName(m.name + "-" + id)
       case other ⇒ other
-    }
     new ThreadPoolExecutorServiceFactory(tf)
-  }
-}
 
 /**
   * A DSL to configure and create a MessageDispatcher with a ThreadPoolExecutor
   */
-final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
+final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig)
   import ThreadPoolConfig._
 
   def withNewThreadPoolWithCustomBlockingQueue(
@@ -168,30 +159,24 @@ final case class ThreadPoolConfigBuilder(config: ThreadPoolConfig) {
       fs: Option[Function[ThreadPoolConfigBuilder, ThreadPoolConfigBuilder]]*)
     : ThreadPoolConfigBuilder =
     fs.foldLeft(this)((c, f) ⇒ f.map(_ (c)).getOrElse(c))
-}
 
-object MonitorableThreadFactory {
+object MonitorableThreadFactory
   val doNothing: Thread.UncaughtExceptionHandler =
-    new Thread.UncaughtExceptionHandler() {
+    new Thread.UncaughtExceptionHandler()
       def uncaughtException(thread: Thread, cause: Throwable) = ()
-    }
 
   private[akka] class AkkaForkJoinWorkerThread(_pool: ForkJoinPool)
-      extends ForkJoinWorkerThread(_pool) with BlockContext {
-    override def blockOn[T](thunk: ⇒ T)(implicit permission: CanAwait): T = {
+      extends ForkJoinWorkerThread(_pool) with BlockContext
+    override def blockOn[T](thunk: ⇒ T)(implicit permission: CanAwait): T =
       val result = new AtomicReference[Option[T]](None)
       ForkJoinPool.managedBlock(
-          new ForkJoinPool.ManagedBlocker {
-        def block(): Boolean = {
+          new ForkJoinPool.ManagedBlocker
+        def block(): Boolean =
           result.set(Some(thunk))
           true
-        }
         def isReleasable = result.get.isDefined
-      })
+      )
       result.get.get // Exception intended if None
-    }
-  }
-}
 
 final case class MonitorableThreadFactory(
     name: String,
@@ -199,32 +184,29 @@ final case class MonitorableThreadFactory(
     contextClassLoader: Option[ClassLoader],
     exceptionHandler: Thread.UncaughtExceptionHandler = MonitorableThreadFactory.doNothing,
     protected val counter: AtomicLong = new AtomicLong)
-    extends ThreadFactory with ForkJoinPool.ForkJoinWorkerThreadFactory {
+    extends ThreadFactory with ForkJoinPool.ForkJoinWorkerThreadFactory
 
-  def newThread(pool: ForkJoinPool): ForkJoinWorkerThread = {
+  def newThread(pool: ForkJoinPool): ForkJoinWorkerThread =
     val t = wire(new MonitorableThreadFactory.AkkaForkJoinWorkerThread(pool))
     // Name of the threads for the ForkJoinPool are not customizable. Change it here.
     t.setName(name + "-" + counter.incrementAndGet())
     t
-  }
 
   def newThread(runnable: Runnable): Thread =
     wire(new Thread(runnable, name + "-" + counter.incrementAndGet()))
 
   def withName(newName: String): MonitorableThreadFactory = copy(newName)
 
-  protected def wire[T <: Thread](t: T): T = {
+  protected def wire[T <: Thread](t: T): T =
     t.setUncaughtExceptionHandler(exceptionHandler)
     t.setDaemon(daemonic)
     contextClassLoader foreach t.setContextClassLoader
     t
-  }
-}
 
 /**
   * As the name says
   */
-trait ExecutorServiceDelegate extends ExecutorService {
+trait ExecutorServiceDelegate extends ExecutorService
 
   def executor: ExecutorService
 
@@ -260,18 +242,15 @@ trait ExecutorServiceDelegate extends ExecutorService {
   def invokeAny[T](
       callables: Collection[_ <: Callable[T]], l: Long, timeUnit: TimeUnit) =
     executor.invokeAny(callables, l, timeUnit)
-}
 
 /**
   * The RejectedExecutionHandler used by Akka, it improves on CallerRunsPolicy
   * by throwing a RejectedExecutionException if the executor isShutdown.
   * (CallerRunsPolicy silently discards the runnable in this case, which is arguably broken)
   */
-class SaneRejectedExecutionHandler extends RejectedExecutionHandler {
+class SaneRejectedExecutionHandler extends RejectedExecutionHandler
   def rejectedExecution(
-      runnable: Runnable, threadPoolExecutor: ThreadPoolExecutor): Unit = {
+      runnable: Runnable, threadPoolExecutor: ThreadPoolExecutor): Unit =
     if (threadPoolExecutor.isShutdown)
       throw new RejectedExecutionException("Shutdown")
     else runnable.run()
-  }
-}

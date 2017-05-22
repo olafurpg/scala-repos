@@ -1,3 +1,2 @@
-object Test extends T with Application {
+object Test extends T with Application
   val x: String = foo("abc")
-}

@@ -8,14 +8,14 @@ import mesosphere.util.state.FrameworkId
 import org.apache.mesos.{Protos => Mesos}
 
 class TaskOpFactoryHelper(private val principalOpt: Option[String],
-                          private val roleOpt: Option[String]) {
+                          private val roleOpt: Option[String])
 
   private[this] val offerOperationFactory = new OfferOperationFactory(
       principalOpt, roleOpt)
 
   def launch(taskInfo: Mesos.TaskInfo,
              newTask: Task,
-             oldTask: Option[Task] = None): TaskOp.Launch = {
+             oldTask: Option[Task] = None): TaskOp.Launch =
 
     assume(newTask.taskId.mesosTaskId == taskInfo.getTaskId,
            "marathon task id and mesos task id must be equal")
@@ -23,14 +23,13 @@ class TaskOpFactoryHelper(private val principalOpt: Option[String],
     def createOperations = Seq(offerOperationFactory.launch(taskInfo))
 
     TaskOp.Launch(taskInfo, newTask, oldTask, createOperations)
-  }
 
   def reserveAndCreateVolumes(
       frameworkId: FrameworkId,
       newTask: Task,
       resources: Iterable[Mesos.Resource],
       localVolumes: Iterable[LocalVolume],
-      oldTask: Option[Task] = None): TaskOp.ReserveAndCreateVolumes = {
+      oldTask: Option[Task] = None): TaskOp.ReserveAndCreateVolumes =
 
     def createOperations =
       Seq(offerOperationFactory.reserve(
@@ -40,5 +39,3 @@ class TaskOpFactoryHelper(private val principalOpt: Option[String],
 
     TaskOp.ReserveAndCreateVolumes(
         newTask, resources, localVolumes, oldTask, createOperations)
-  }
-}

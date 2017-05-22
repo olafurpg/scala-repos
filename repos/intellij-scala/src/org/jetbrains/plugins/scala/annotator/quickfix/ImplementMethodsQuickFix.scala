@@ -14,14 +14,12 @@ import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil
   * Date: 22.09.2008
   */
 class ImplementMethodsQuickFix(clazz: ScTemplateDefinition)
-    extends IntentionAction {
+    extends IntentionAction
   def getText: String = ScalaBundle.message("implement.methods.fix")
   def startInWriteAction: Boolean = false
   def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     clazz.isValid && clazz.getManager.isInProject(file) && file.isWritable
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
     ScalaOIUtil.invokeOverrideImplement(
         project, editor, file, isImplement = true)
-  }
   def getFamilyName: String = ScalaBundle.message("implement.methods.fix")
-}

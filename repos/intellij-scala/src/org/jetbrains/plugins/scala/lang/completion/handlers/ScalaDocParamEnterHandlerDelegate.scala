@@ -15,43 +15,37 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTag
   * User: Dmitry Naydanov
   * Date: 2/1/12
   */
-class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
+class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter
   override def postProcessEnter(
-      file: PsiFile, editor: Editor, dataContext: DataContext): Result = {
-    if (!file.isInstanceOf[ScalaFile]) {
+      file: PsiFile, editor: Editor, dataContext: DataContext): Result =
+    if (!file.isInstanceOf[ScalaFile])
       return Result.Continue
-    }
 
     val scalaFile = file.asInstanceOf[ScalaFile]
     val caretOffset = editor.getCaretModel.getOffset
 
-    if (scalaFile.elementAt(caretOffset).isEmpty) {
+    if (scalaFile.elementAt(caretOffset).isEmpty)
       return Result.Continue
-    }
 
     var nextParent = scalaFile.elementAt(caretOffset).get
     val document = editor.getDocument
 
-    while (!nextParent.isInstanceOf[ScDocTag]) {
+    while (!nextParent.isInstanceOf[ScDocTag])
       nextParent = nextParent.getParent
-      if (nextParent == null || nextParent.isInstanceOf[ScalaFile]) {
+      if (nextParent == null || nextParent.isInstanceOf[ScalaFile])
         return Result.Continue
-      }
-    }
     val tagParent = nextParent.asInstanceOf[ScDocTag]
     val tagValueElement = tagParent.getValueElement
     val tagNameElement = tagParent.getNameElement
 
-    if (tagParent.getNameElement == null) {
+    if (tagParent.getNameElement == null)
       return Result.Continue
-    }
 
     val probData =
       if (tagValueElement != null) tagValueElement.getNextSibling
       else tagNameElement.getNextSibling
-    if (probData == null) {
+    if (probData == null)
       return Result.Continue
-    }
     val nextProbData =
       if (probData.getNextSibling != null) probData.getNextSibling.getNode
       else null
@@ -59,24 +53,20 @@ class ScalaDocParamEnterHandlerDelegate extends EnterHandlerDelegateAdapter {
     val startOffset = tagParent.getNameElement.getTextRange.getStartOffset
     val endOffset =
       probData.getTextRange.getStartOffset +
-      (Option(nextProbData).map(_.getElementType) match {
+      (Option(nextProbData).map(_.getElementType) match
             case Some(ScalaDocTokenType.DOC_COMMENT_DATA) =>
               probData.getTextLength
             case Some(ScalaDocTokenType.DOC_COMMENT_LEADING_ASTERISKS) => 1
             case _ => 0
-          })
+          )
 
     if (document.getLineNumber(caretOffset) - 1 == document.getLineNumber(
-            tagParent.getNameElement.getTextOffset)) {
+            tagParent.getNameElement.getTextOffset))
       val toInsert = StringUtil.repeat(" ", endOffset - startOffset)
-      extensions.inWriteAction {
+      extensions.inWriteAction
         document.insertString(caretOffset, toInsert)
         PsiDocumentManager
           .getInstance(file.getProject)
           .commitDocument(document)
-      }
-    }
 
     Result.Continue
-  }
-}

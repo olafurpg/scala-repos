@@ -1,7 +1,6 @@
-object Test extends App {
-  def foo[T <% Ordered[T]](x: T) {
+object Test extends App
+  def foo[T <% Ordered[T]](x: T)
     Console.println("" + (x < x) + " " + (x <= x))
-  }
   def bar(x: Unit): Unit = foo(x);
   def bar(x: Boolean): Unit = foo(x);
   def bar(x: Byte): Unit = foo(x);
@@ -19,4 +18,3 @@ object Test extends App {
   bar(1l)
   bar(1.0f)
   bar(1.0)
-}

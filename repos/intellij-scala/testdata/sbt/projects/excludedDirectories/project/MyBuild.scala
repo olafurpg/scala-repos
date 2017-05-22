@@ -3,7 +3,7 @@ import Keys._
 
 import sbtide.Keys._
 
-object MyBuild extends Build {
+object MyBuild extends Build
   lazy val root = project
     .in(file("."))
     .settings(
@@ -12,4 +12,3 @@ object MyBuild extends Build {
             file("directory") / "to" / "exclude" / "2"
         )
     )
-}

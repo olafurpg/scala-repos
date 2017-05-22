@@ -41,7 +41,7 @@ class C extends A[Double]
 /** conv1-9 should be the same, conv10 should not be ambiguous while conv11 should be ambiguous */
 class D extends A[AnyRef]
 
-class X[T] {
+class X[T]
   def conv1: AnyRef = ???
   def conv2: T = ???
   def conv3(l: Int): AnyRef = ???
@@ -53,9 +53,8 @@ class X[T] {
   def conv9(l: String): AnyRef = ???
   def conv10(l: T): T = ???
   def conv11(l: T): T = ???
-}
 
-class Z[T] {
+class Z[T]
   def conv1: AnyRef = ???
   def conv2: T = ???
   def conv3(p: Int): AnyRef = ???
@@ -67,9 +66,7 @@ class Z[T] {
   def conv9(p: AnyRef): AnyRef = ???
   def conv10(p: Int): T = ???
   def conv11(p: String): T = ???
-}
 
-object A {
+object A
   implicit def AtoX[T](a: A[T]) = new X[T]
   implicit def AtoZ[T](a: A[T]) = new Z[T]
-}

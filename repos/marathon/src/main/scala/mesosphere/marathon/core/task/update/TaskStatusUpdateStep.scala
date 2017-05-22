@@ -11,9 +11,8 @@ import scala.concurrent.Future
   *
   * There is a list of these which is called in sequence by the TaskStatusUpdateProcessor for every update.
   */
-trait TaskStatusUpdateStep {
+trait TaskStatusUpdateStep
   def name: String
 
   def processUpdate(
       timestamp: Timestamp, task: Task, mesosStatus: TaskStatus): Future[_]
-}

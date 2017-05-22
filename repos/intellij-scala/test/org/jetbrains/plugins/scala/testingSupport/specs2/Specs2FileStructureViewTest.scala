@@ -6,14 +6,13 @@ import org.jetbrains.plugins.scala.lang.structureView.elements.impl.TestStructur
   * @author Roman.Shein
   * @since 20.04.2015.
   */
-abstract class Specs2FileStructureViewTest extends Specs2TestCase {
+abstract class Specs2FileStructureViewTest extends Specs2TestCase
 
-  private def prepareAndRunTestInner(status: Int, tests: String*) = {
+  private def prepareAndRunTestInner(status: Int, tests: String*) =
     prepareFile()
     runFileStructureViewTest("SpecsFileStrctureViewTest", status, tests: _*)
-  }
 
-  protected def prepareFile(): Unit = {
+  protected def prepareFile(): Unit =
     addFileToProject("SpecsFileStrctureViewTest.scala",
                      """|import org.specs2.mutable.Specification
         |
@@ -47,7 +46,6 @@ abstract class Specs2FileStructureViewTest extends Specs2TestCase {
         |  }
         |}
       """.stripMargin)
-  }
 
   def testShouldView(): Unit =
     prepareAndRunTestInner(normalStatusId, "\"parent\"")
@@ -66,9 +64,7 @@ abstract class Specs2FileStructureViewTest extends Specs2TestCase {
   def testPending(): Unit =
     prepareAndRunTestInner(pendingStatusId, "\"pending\"", "\"pending2\"")
 
-  def testHierarchy(): Unit = {
+  def testHierarchy(): Unit =
     prepareFile()
     runFileStructureViewTest(
         "SpecsFileStrctureViewTest", "\"child1\"", Some("\"parent\""))
-  }
-}

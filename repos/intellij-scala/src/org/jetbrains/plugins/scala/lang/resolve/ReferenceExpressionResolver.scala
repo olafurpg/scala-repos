@@ -15,26 +15,23 @@ import org.jetbrains.plugins.scala.lang.resolve.processor.MethodResolveProcessor
 import scala.collection.Set
 
 class ReferenceExpressionResolver(shapesOnly: Boolean)
-    extends ResolveCache.PolyVariantResolver[ResolvableReferenceExpression] {
+    extends ResolveCache.PolyVariantResolver[ResolvableReferenceExpression]
   case class ContextInfo(arguments: Option[Seq[Expression]],
                          expectedType: () => Option[ScType],
                          isUnderscore: Boolean)
 
-  private def argumentsOf(ref: PsiElement): Seq[Expression] = {
-    ref.getContext match {
+  private def argumentsOf(ref: PsiElement): Seq[Expression] =
+    ref.getContext match
       case infixExpr: ScInfixExpr =>
         //TODO should rOp really be parsed as Tuple (not as argument list)?
-        infixExpr.rOp match {
+        infixExpr.rOp match
           case t: ScTuple => t.exprs
           case op => Seq(op)
-        }
       case methodCall: ScMethodCall => methodCall.argumentExpressions
-    }
-  }
 
   private def getContextInfo(
-      ref: ResolvableReferenceExpression, e: ScExpression): ContextInfo = {
-    e.getContext match {
+      ref: ResolvableReferenceExpression, e: ScExpression): ContextInfo =
+    e.getContext match
       case generic: ScGenericCall => getContextInfo(ref, generic)
       case call: ScMethodCall if !call.isUpdateCall =>
         ContextInfo(Some(call.argumentExpressions),
@@ -53,16 +50,15 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
         ContextInfo(
             if (ref.rightAssoc) Some(Seq(inf.lOp))
             else
-              inf.rOp match {
+              inf.rOp match
                 case tuple: ScTuple => Some(tuple.exprs) // See SCL-2001
                 case unit: ScUnitExpr => Some(Nil) // See SCL-3485
                 case e: ScParenthesisedExpr =>
-                  e.expr match {
+                  e.expr match
                     case Some(expr) => Some(Seq(expr))
                     case _ => Some(Nil)
-                  }
                 case rOp => Some(Seq(rOp))
-              },
+              ,
             () => None,
             isUnderscore = false)
       case parents: ScParenthesisedExpr => getContextInfo(ref, parents)
@@ -71,14 +67,12 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
       case pref: ScPrefixExpr if ref == pref.operation =>
         getContextInfo(ref, pref)
       case _ => ContextInfo(None, () => e.expectedType(), isUnderscore = false)
-    }
-  }
 
   private def kinds(
       ref: ResolvableReferenceExpression,
       e: ScExpression,
-      incomplete: Boolean): scala.collection.Set[ResolveTargets.Value] = {
-    e.getContext match {
+      incomplete: Boolean): scala.collection.Set[ResolveTargets.Value] =
+    e.getContext match
       case gen: ScGenericCall => kinds(ref, gen, incomplete)
       case parents: ScParenthesisedExpr => kinds(ref, parents, incomplete)
       case _: ScMethodCall | _: ScUnderscoreSection => StdKinds.methodRef
@@ -86,28 +80,23 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
       case postf: ScPostfixExpr if ref == postf.operation => StdKinds.methodRef
       case pref: ScPrefixExpr if ref == pref.operation => StdKinds.methodRef
       case _ => ref.getKinds(incomplete)
-    }
-  }
 
-  private def getTypeArgs(e: ScExpression): Seq[ScTypeElement] = {
-    e.getContext match {
+  private def getTypeArgs(e: ScExpression): Seq[ScTypeElement] =
+    e.getContext match
       case generic: ScGenericCall => generic.arguments
       case parents: ScParenthesisedExpr => getTypeArgs(parents)
       case _ => Seq.empty
-    }
-  }
 
   def resolve(reference: ResolvableReferenceExpression,
-              incomplete: Boolean): Array[ResolveResult] = {
+              incomplete: Boolean): Array[ResolveResult] =
     val name =
       if (reference.isUnaryOperator) "unary_" + reference.refName
       else reference.refName
 
-    if (name == ScImplicitlyConvertible.IMPLICIT_REFERENCE_NAME) {
+    if (name == ScImplicitlyConvertible.IMPLICIT_REFERENCE_NAME)
       val data =
         reference.getUserData(ScImplicitlyConvertible.FAKE_RESOLVE_RESULT_KEY)
       if (data != null) return Array(data)
-    }
 
     val info = getContextInfo(reference, reference)
 
@@ -119,7 +108,7 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
 
     val prevInfoTypeParams = reference.getPrevTypeInfoParams
 
-    def nonAssignResolve: Array[ResolveResult] = {
+    def nonAssignResolve: Array[ResolveResult] =
       def processor(smartProcessor: Boolean): MethodResolveProcessor =
         new MethodResolveProcessor(reference,
                                    name,
@@ -130,29 +119,25 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
                                    expectedOption,
                                    info.isUnderscore,
                                    shapesOnly,
-                                   enableTupling = true) {
-          override def candidatesS: Set[ScalaResolveResult] = {
+                                   enableTupling = true)
+          override def candidatesS: Set[ScalaResolveResult] =
             if (!smartProcessor) super.candidatesS
-            else {
+            else
               val iterator = reference.shapeResolve
                 .map(_.asInstanceOf[ScalaResolveResult])
                 .iterator
-              while (iterator.hasNext) {
+              while (iterator.hasNext)
                 levelSet.add(iterator.next())
-              }
               super.candidatesS
-            }
-          }
-        }
 
       var result: Array[ResolveResult] = Array.empty
-      if (shapesOnly) {
+      if (shapesOnly)
         result = reference.doResolve(
             reference, processor(smartProcessor = false))
-      } else {
+      else
         val candidatesS =
           processor(smartProcessor = true).candidatesS //let's try to avoid treeWalkUp
-        if (candidatesS.isEmpty || candidatesS.forall(!_.isApplicable())) {
+        if (candidatesS.isEmpty || candidatesS.forall(!_.isApplicable()))
           // it has another resolve only in one case:
           // clazz.ref(expr)
           // clazz has method ref with one argument, but it's not ok
@@ -161,11 +146,9 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
           // this is ugly, but it can improve performance
           result = reference.doResolve(
               reference, processor(smartProcessor = false))
-        } else {
+        else
           result = candidatesS.toArray
-        }
-      }
-      if (result.isEmpty && reference.isAssignmentOperator) {
+      if (result.isEmpty && reference.isAssignmentOperator)
         val assignProcessor = new MethodResolveProcessor(
             reference,
             reference.refName.init,
@@ -177,11 +160,7 @@ class ReferenceExpressionResolver(shapesOnly: Boolean)
         result = reference.doResolve(reference, assignProcessor)
         result.map(r =>
               r.asInstanceOf[ScalaResolveResult].copy(isAssignment = true): ResolveResult)
-      } else {
+      else
         result
-      }
-    }
 
     nonAssignResolve
-  }
-}

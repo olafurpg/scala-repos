@@ -1,19 +1,18 @@
-object Test extends App {
+object Test extends App
 
   lazy val w = 10
 
   /** normal test */
-  def testLazy = {
+  def testLazy =
     lazy val t = { Console.println("forced lazy val t"); 42 }
     lazy val p = t / 2
     lazy val q = { println("forced lazy val q"); 10 }
     println("q = " + q)
     println("p = " + p)
     1 + t + t
-  }
 
   /** test 32 lazy vals, which should spill over multiple byte bitmaps. */
-  def testLazy32 = {
+  def testLazy32 =
     lazy val t00 = { Console.println("forced lazy val t00"); 0 }
     lazy val t01 = { Console.println("forced lazy val t01"); 1 }
     lazy val t02 = { Console.println("forced lazy val t02"); 2 }
@@ -63,10 +62,9 @@ object Test extends App {
     println("Sum is: " + sum)
     println("Sum again is: " + sum2)
     println("Sum again again is: " + sum3)
-  }
 
   /** test 8 lazy vals, which should fit one byte bitmap. */
-  def testLazy8 = {
+  def testLazy8 =
     lazy val t00 = { Console.println("forced lazy val t00"); 0 }
     lazy val t01 = { Console.println("forced lazy val t01"); 1 }
     lazy val t02 = { Console.println("forced lazy val t02"); 2 }
@@ -83,10 +81,9 @@ object Test extends App {
     println("Sum is: " + sum)
     println("Sum again is: " + sum2)
     println("Sum again again is: " + sum3)
-  }
 
   /** test 9 lazy vals, which should spill over two bitmaps. */
-  def testLazy9 = {
+  def testLazy9 =
     lazy val t00 = { Console.println("forced lazy val t00"); 0 }
     lazy val t01 = { Console.println("forced lazy val t01"); 1 }
     lazy val t02 = { Console.println("forced lazy val t02"); 2 }
@@ -104,88 +101,70 @@ object Test extends App {
     println("Sum is: " + sum)
     println("Sum again is: " + sum2)
     println("Sum again again is: " + sum3)
-  }
 
   /** test recursive method with lazy vals and a single forced */
-  def testLazyRec(n: Int): Int = {
+  def testLazyRec(n: Int): Int =
     lazy val t = { println("forced lazy val t at n = " + n); 42 }
     if (n > 0) testLazyRec(n - 1)
     else t
-  }
 
   /** test recursive method with lazy vals and all vals forced */
-  def testLazyRecMany(n: Int): Int = {
+  def testLazyRecMany(n: Int): Int =
     lazy val t = { println("forced lazy val t at n = " + n); 42 }
-    if (n > 0) {
+    if (n > 0)
       testLazyRecMany(n - 1);
       t * t
-    } else t
-  }
+    else t
 
-  def testRecVal {
+  def testRecVal
     lazy val twos: List[Int] = 2 :: twos
     lazy val ones: Stream[Int] = Stream.cons(1, ones)
 
     println("First 5 elements of ones: " + ones.take(5).toList)
-  }
 
   // should compile without error
-  def testMutualRecVal {
+  def testMutualRecVal
     lazy val odd: Int = 1 + even
     lazy val even: Int = 1 + odd
 
     ()
-  }
 
-  def testReturnInLazyVal: Boolean = {
+  def testReturnInLazyVal: Boolean =
     lazy val go = { return false }
     go
-  }
 
-  {
     lazy val inCtor = "I am initialized when the constructor is run"
     inCtor
-  }
 
-  class CtorBlock {
-    {
-      lazy val inCtor = {
+  class CtorBlock
+      lazy val inCtor =
         println("I am initialized when the constructor is run")
         42
-      }
       inCtor
-    }
-  }
 
   // ticket #1589, should not crash
-  class Test {
-    val x = {
+  class Test
+    val x =
       lazy val t = "abc";
       t
-    }
-  }
 
   // see #1589
-  object NestedLazyVals {
-    lazy val x = {
+  object NestedLazyVals
+    lazy val x =
       lazy val y = { println("forcing y"); 42; }
       println("forcing x")
       y
-    }
 
     val x1 = 5 + { lazy val y = 10; y }
 
     println(x)
     println(x1)
-  }
 
-  trait TNestedLazyVals {
+  trait TNestedLazyVals
     lazy val x = { lazy val y = 42; y }
-  }
 
-  object ONestedLazyVals extends TNestedLazyVals {
+  object ONestedLazyVals extends TNestedLazyVals
     println(x)
-  }
 
   println(testLazy)
   testLazy32
@@ -198,4 +177,3 @@ object Test extends App {
   println(testReturnInLazyVal)
   NestedLazyVals
   ONestedLazyVals
-}

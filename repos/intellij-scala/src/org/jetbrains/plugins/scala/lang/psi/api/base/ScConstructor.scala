@@ -17,15 +17,14 @@ import scala.collection.Seq
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-trait ScConstructor extends ScalaPsiElement {
+trait ScConstructor extends ScalaPsiElement
   def typeElement: ScTypeElement
 
   def simpleTypeElement: Option[ScSimpleTypeElement]
 
-  def typeArgList: Option[ScTypeArgs] = typeElement match {
+  def typeArgList: Option[ScTypeArgs] = typeElement match
     case x: ScParameterizedTypeElement => Some(x.typeArgList)
     case _ => None
-  }
 
   def args = findChild(classOf[ScArgumentExprList])
 
@@ -45,25 +44,19 @@ trait ScConstructor extends ScalaPsiElement {
   def reference: Option[ScStableCodeReferenceElement]
 
   def matchedParameters: Seq[(ScExpression, Parameter)]
-}
 
-object ScConstructor {
+object ScConstructor
   def unapply(
-      c: ScConstructor): Option[(ScTypeElement, Seq[ScArgumentExprList])] = {
+      c: ScConstructor): Option[(ScTypeElement, Seq[ScArgumentExprList])] =
     Option(c).map(it => (it.typeElement, it.arguments))
-  }
 
-  object byReference {
-    def unapply(ref: ScReferenceElement): Option[ScConstructor] = {
-      PsiTreeUtil.getParentOfType(ref, classOf[ScConstructor]) match {
+  object byReference
+    def unapply(ref: ScReferenceElement): Option[ScConstructor] =
+      PsiTreeUtil.getParentOfType(ref, classOf[ScConstructor]) match
         case null => None
         case c if c.reference.contains(ref) => Some(c)
         case _ => None
-      }
-    }
-  }
 
   new A(i = 1)(s = "A")
-}
 
 class A(i: Int)(s: String)

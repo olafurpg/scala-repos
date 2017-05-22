@@ -20,6 +20,5 @@ package kafka.common
   * Thrown when a request is made for partition on a broker that is NOT a leader for that partition
   */
 class NotLeaderForPartitionException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

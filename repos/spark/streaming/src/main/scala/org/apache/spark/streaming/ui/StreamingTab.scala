@@ -28,7 +28,7 @@ import org.apache.spark.ui.{SparkUI, SparkUITab}
   */
 private[spark] class StreamingTab(val ssc: StreamingContext)
     extends SparkUITab(StreamingTab.getSparkUI(ssc), "streaming")
-    with Logging {
+    with Logging
 
   import StreamingTab._
 
@@ -42,22 +42,16 @@ private[spark] class StreamingTab(val ssc: StreamingContext)
   attachPage(new StreamingPage(this))
   attachPage(new BatchPage(this))
 
-  def attach() {
+  def attach()
     getSparkUI(ssc).attachTab(this)
     getSparkUI(ssc).addStaticHandler(STATIC_RESOURCE_DIR, "/static/streaming")
-  }
 
-  def detach() {
+  def detach()
     getSparkUI(ssc).detachTab(this)
     getSparkUI(ssc).removeStaticHandler("/static/streaming")
-  }
-}
 
-private object StreamingTab {
-  def getSparkUI(ssc: StreamingContext): SparkUI = {
-    ssc.sc.ui.getOrElse {
+private object StreamingTab
+  def getSparkUI(ssc: StreamingContext): SparkUI =
+    ssc.sc.ui.getOrElse
       throw new SparkException(
           "Parent SparkUI to attach this tab to not found!")
-    }
-  }
-}

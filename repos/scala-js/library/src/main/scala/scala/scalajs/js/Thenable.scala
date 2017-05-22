@@ -27,7 +27,7 @@ import scala.concurrent.Future
   *  values of `B` do not have a `then` method.
   */
 @ScalaJSDefined
-trait Thenable[+A] extends js.Object {
+trait Thenable[+A] extends js.Object
   def `then`[B](
       onFulfilled: js.Function1[A, B | Thenable[B]],
       onRejected: js.UndefOr[js.Function1[scala.Any, B | Thenable[B]]])
@@ -37,10 +37,9 @@ trait Thenable[+A] extends js.Object {
       onFulfilled: Unit,
       onRejected: js.UndefOr[js.Function1[scala.Any, B | Thenable[B]]])
     : Thenable[B]
-}
 
-object Thenable {
-  implicit class ThenableOps[+A](val p: Thenable[A]) extends AnyVal {
+object Thenable
+  implicit class ThenableOps[+A](val p: Thenable[A]) extends AnyVal
 
     /** Converts the [[Thenable]] into a Scala [[scala.concurrent.Future Future]].
       *
@@ -48,24 +47,22 @@ object Thenable {
       *  [[scala.concurrent.Future Future]] is always properly typed, and
       *  operations on it will be well-typed in turn.
       */
-    def toFuture: Future[A] = {
+    def toFuture: Future[A] =
       // Help for inference
       def defined[A](x: A): js.UndefOr[A] = x
 
       val p2 = scala.concurrent.Promise[A]()
-      p.`then`[Unit]({ (v: A) =>
+      p.`then`[Unit]( (v: A) =>
         p2.success(v)
         (): Unit | Thenable[Unit]
-      }, defined { (e: scala.Any) =>
-        p2.failure(e match {
+      , defined  (e: scala.Any) =>
+        p2.failure(e match
           case th: Throwable => th
           case _ => JavaScriptException(e)
-        })
+        )
         (): Unit | Thenable[Unit]
-      })
+      )
       p2.future
-    }
-  }
 
   /** Implicits for [[Thenable]]s.
     *
@@ -76,8 +73,6 @@ object Thenable {
     *  Unlike the `then` methods in [[Thenable]],
     *  [[scala.concurrent.Future Future]]'s operations are always well-typed.
     */
-  object Implicits {
+  object Implicits
     implicit def thenable2future[A](p: Thenable[A]): Future[A] =
       p.toFuture
-  }
-}

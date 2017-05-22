@@ -17,34 +17,29 @@ import scala.beans.BeanProperty
 )
 class SbtLocalSettings(project: Project)
     extends AbstractExternalSystemLocalSettings(SbtProjectSystem.Id, project)
-    with PersistentStateComponent[SbtLocalSettingsState] {
+    with PersistentStateComponent[SbtLocalSettingsState]
 
   var sbtSupportSuggested = false
   var lastUpdateTimestamp = 0L
 
-  def getState = {
+  def getState =
     val state = new SbtLocalSettingsState
     fillState(state)
     state.setSbtSupportSuggested(sbtSupportSuggested)
     state.setLastUpdateTimestamp(lastUpdateTimestamp)
     state
-  }
 
-  def loadState(state: SbtLocalSettingsState) {
+  def loadState(state: SbtLocalSettingsState)
     super [AbstractExternalSystemLocalSettings].loadState(state)
     sbtSupportSuggested = state.getSbtSupportSuggested
     lastUpdateTimestamp = state.getLastUpdateTimestamp
-  }
-}
 
-class SbtLocalSettingsState extends AbstractExternalSystemLocalSettings.State {
+class SbtLocalSettingsState extends AbstractExternalSystemLocalSettings.State
   @BeanProperty
   var sbtSupportSuggested: Boolean = false
   @BeanProperty
   var lastUpdateTimestamp: Long = 0
-}
 
-object SbtLocalSettings {
+object SbtLocalSettings
   def getInstance(project: Project) =
     ServiceManager.getService(project, classOf[SbtLocalSettings])
-}

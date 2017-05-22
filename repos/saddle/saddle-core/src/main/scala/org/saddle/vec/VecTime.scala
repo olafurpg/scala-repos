@@ -34,7 +34,7 @@ import org.saddle.buffer.BufferInt
   */
 class VecTime(
     val times: Vec[Long], val tzone: DateTimeZone = ISO_CHRONO.getZone)
-    extends Vec[DateTime] {
+    extends Vec[DateTime]
 
   @transient lazy val scalarTag = ScalarTagTime
 
@@ -125,51 +125,44 @@ class VecTime(
   protected def copy = vl2vt(Vec(times.contents))
 
   private[saddle] def toArray = times.toArray.map(l2t)
-}
 
-object VecTime {
+object VecTime
   @transient lazy private val sm = ScalarTagTime
   @transient lazy private val sl = ScalarTagLong
 
   /**
     * Create a new VecTime from an array of times
     */
-  def apply(times: Array[DateTime]): VecTime = {
+  def apply(times: Array[DateTime]): VecTime =
     val millis = array.empty[Long](times.length)
     var i = 0
-    while (i < millis.length) {
+    while (i < millis.length)
       val t = times(i)
       millis(i) = if (sm.isMissing(t)) sl.missing else t.getMillis
       i += 1
-    }
     new VecTime(Vec(millis))
-  }
 
   /**
     * Create a new VecTime from a sequence of times
     */
-  def apply(timeSeq: DateTime*): VecTime = {
+  def apply(timeSeq: DateTime*): VecTime =
     val times = timeSeq.toArray
     val millis = array.empty[Long](times.length)
     var i = 0
-    while (i < millis.length) {
+    while (i < millis.length)
       val t = times(i)
       millis(i) = if (sm.isMissing(t)) sl.missing else t.getMillis
       i += 1
-    }
     new VecTime(Vec(millis))
-  }
 
   /**
     * Concatenate several Vec[DateTime] instances into one
     */
-  def concat(arr: IndexedSeq[Vec[DateTime]]): VecTime = {
-    val vecs = arr.map {
-      _ match {
+  def concat(arr: IndexedSeq[Vec[DateTime]]): VecTime =
+    val vecs = arr.map
+      _ match
         case vt: VecTime => vt
         case v => VecTime(v.toArray)
-      }
-    }
 
     // calculate offset for each subsequent vec of bytes
     val sz = vecs.foldLeft(0) { case (o, v) => o + v.length }
@@ -177,13 +170,10 @@ object VecTime {
     val databuf = Array.ofDim[Long](sz)
 
     var c = 0 // byte counter
-    vecs.zipWithIndex.foreach {
+    vecs.zipWithIndex.foreach
       case (v, vidx) =>
         val vlen = v.length
         var i = 0
         while (i < vlen) { databuf(c) = v.times(i); i += 1; c += 1 }
-    }
 
     new VecTime(Vec(databuf))
-  }
-}

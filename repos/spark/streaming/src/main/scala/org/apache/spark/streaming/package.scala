@@ -33,6 +33,5 @@ package org.apache.spark
   * the [[org.apache.spark.streaming.api.java.JavaDStream]] and the
   * [[org.apache.spark.streaming.api.java.JavaPairDStream]] which have the DStream functionality.
   */
-package object streaming {
+package object streaming
   // For package docs only
-}

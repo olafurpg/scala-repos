@@ -11,12 +11,11 @@ import scala.language.postfixOps
   * Without that issue being fixed, the this test runs forever and never
   * terminates. With that issue fixed, it should complete trivially quickly.
   */
-object GnipSubSyntaxTest extends TestSuite {
-  class GnipRuleParser {
-    val White = WhitespaceApi.Wrapper {
+object GnipSubSyntaxTest extends TestSuite
+  class GnipRuleParser
+    val White = WhitespaceApi.Wrapper
       import fastparse.all._
       NoTrace(" ".rep)
-    }
     import fastparse.noApi._
     import White._
 
@@ -35,22 +34,16 @@ object GnipSubSyntaxTest extends TestSuite {
       P(keywordGroup.rep(min = 1)) !
 
     def parse(rule: String) = P(Start ~ gnipKeywordPhrase ~ End).parse(rule)
-  }
 
-  object GnipRuleValidator {
+  object GnipRuleValidator
     import fastparse.core.Parsed._
     import fastparse.core.ParseError
 
-    def apply(rule: String) = (new GnipRuleParser).parse(rule) match {
+    def apply(rule: String) = (new GnipRuleParser).parse(rule) match
       case Success(matched, index) => scala.util.Success(matched)
       case f @ Failure(_, index, extra) => scala.util.Failure(ParseError(f))
-    }
-  }
 
-  val tests = TestSuite {
-    'fail {
+  val tests = TestSuite
+    'fail
       assert(GnipRuleValidator(
               "( ab ( cd ( ef ( gh ( ij ( ( hello ( world ) bla ) lol ) hehe ) ) ) xz )").isFailure)
-    }
-  }
-}

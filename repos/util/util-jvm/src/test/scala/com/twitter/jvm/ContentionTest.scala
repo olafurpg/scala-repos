@@ -10,40 +10,38 @@ import org.scalatest.time.{Millis, Seconds, Span}
 
 import com.twitter.util.{Await, Promise}
 
-class Philosopher {
+class Philosopher
   val ready = new Promise[Unit]
   private val lock = new ReentrantLock()
-  def dine(neighbor: Philosopher): Unit = {
+  def dine(neighbor: Philosopher): Unit =
     lock.lockInterruptibly()
     ready.setValue(Unit)
     Await.ready(neighbor.ready)
     neighbor.dine(this)
     lock.unlock()
-  }
-}
 
 @RunWith(classOf[JUnitRunner])
-class ContentionTest extends FunSuite with Eventually {
+class ContentionTest extends FunSuite with Eventually
 
   implicit override val patienceConfig = PatienceConfig(
       timeout = scaled(Span(15, Seconds)), interval = scaled(Span(5, Millis)))
 
-  test("Deadlocks") {
+  test("Deadlocks")
     val c = new ContentionSnapshot()
 
     val descartes = new Philosopher()
     val plato = new Philosopher()
 
     val d = new Thread(
-        new Runnable() {
+        new Runnable()
       def run() { descartes.dine(plato) }
-    })
+    )
     d.start()
 
     val p = new Thread(
-        new Runnable() {
+        new Runnable()
       def run() { plato.dine(descartes) }
-    })
+    )
     p.start()
     Await.all(descartes.ready, plato.ready)
 
@@ -53,5 +51,3 @@ class ContentionTest extends FunSuite with Eventually {
     p.join()
     d.join()
     assert(c.snap().deadlocks.size == 0)
-  }
-}

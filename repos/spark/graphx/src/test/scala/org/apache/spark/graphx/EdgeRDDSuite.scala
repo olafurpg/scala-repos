@@ -20,17 +20,14 @@ package org.apache.spark.graphx
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.storage.StorageLevel
 
-class EdgeRDDSuite extends SparkFunSuite with LocalSparkContext {
+class EdgeRDDSuite extends SparkFunSuite with LocalSparkContext
 
-  test("cache, getStorageLevel") {
+  test("cache, getStorageLevel")
     // test to see if getStorageLevel returns correct value after caching
-    withSpark { sc =>
+    withSpark  sc =>
       val verts = sc.parallelize(
           List((0L, 0), (1L, 1), (1L, 2), (2L, 3), (2L, 3), (2L, 3)))
       val edges = EdgeRDD.fromEdges(sc.parallelize(List.empty[Edge[Int]]))
       assert(edges.getStorageLevel == StorageLevel.NONE)
       edges.cache()
       assert(edges.getStorageLevel == StorageLevel.MEMORY_ONLY)
-    }
-  }
-}

@@ -21,7 +21,7 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScImportSelector](parent, elemType)
-    with ScImportSelectorStub {
+    with ScImportSelectorStub
   var referenceText: StringRef = _
   var name: StringRef = _
   private var myReference: SofterReference[ScStableCodeReferenceElement] = null
@@ -32,7 +32,7 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
                _ <: StubElement[_ <: PsiElement], _ <: PsiElement],
            refText: String,
            importedName: String,
-           isAliasedImport: Boolean) {
+           isAliasedImport: Boolean)
     this(
         parent,
         elemType
@@ -40,16 +40,14 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
     this.referenceText = StringRef.fromString(refText)
     this.name = StringRef.fromString(importedName)
     this.aliasImport = isAliasedImport
-  }
 
   def isAliasedImport: Boolean = aliasImport
 
-  def reference: ScStableCodeReferenceElement = {
-    if (myReference != null) {
+  def reference: ScStableCodeReferenceElement =
+    if (myReference != null)
       val referenceElement = myReference.get
       if (referenceElement != null && (referenceElement.getContext eq getPsi))
         return myReference.get
-    }
     val res =
       if (referenceText == StringRef.fromString("")) null
       else
@@ -57,7 +55,5 @@ class ScImportSelectorStubImpl[ParentPsi <: PsiElement](
             StringRef.toString(referenceText), getPsi, null)
     myReference = new SofterReference[ScStableCodeReferenceElement](res)
     res
-  }
 
   def importedName: String = StringRef.toString(name)
-}

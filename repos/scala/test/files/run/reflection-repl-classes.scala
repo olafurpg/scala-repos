@@ -1,6 +1,6 @@
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   def code = """
     |class A
     |
@@ -19,4 +19,3 @@ object Test extends ReplTest {
     |
     |mm(new A)
     |""".stripMargin
-}

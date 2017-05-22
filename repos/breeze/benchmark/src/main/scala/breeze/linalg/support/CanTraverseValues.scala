@@ -7,7 +7,7 @@ object CanTraverseValuesBenchmark
     extends MyRunner(classOf[CanTraverseValuesBenchmark])
 
 class CanTraverseValuesBenchmark
-    extends BreezeBenchmark with BuildsRandomVectors {
+    extends BreezeBenchmark with BuildsRandomVectors
 
   /*
   def timeSumWithCanTraverseValues(reps: Int) = runWith(reps, { randomArray(1024*8) })(arr => {
@@ -81,22 +81,17 @@ class CanTraverseValuesBenchmark
    */
 
   def timeMaxMatrixCols(reps: Int) =
-    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+    runWith(reps, { randomMatrix(40, 1024) })  arr =>
       max(arr(::, *))
-    }
 
   def timeMaxMatrixRows(reps: Int) =
-    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+    runWith(reps, { randomMatrix(40, 1024) })  arr =>
       max(arr(*, ::))
-    }
 
   def timeMinMatrixCols(reps: Int) =
-    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+    runWith(reps, { randomMatrix(40, 1024) })  arr =>
       min(arr(::, *))
-    }
 
   def timeMinMatrixRows(reps: Int) =
-    runWith(reps, { randomMatrix(40, 1024) }) { arr =>
+    runWith(reps, { randomMatrix(40, 1024) })  arr =>
       max(arr(*, ::))
-    }
-}

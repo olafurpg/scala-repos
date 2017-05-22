@@ -34,7 +34,7 @@ import scalafx.delegate.{SFXEnumDelegate, SFXEnumDelegateCompanion}
   * Companion Object for [[scalafx.print.PrintSides]].
   */
 object PrintSides
-    extends SFXEnumDelegateCompanion[jfxp.PrintSides, PrintSides] {
+    extends SFXEnumDelegateCompanion[jfxp.PrintSides, PrintSides]
 
   /**
     * Two sided printing where the vertical edge of the paper is to be used for binding such as in a book.
@@ -53,7 +53,6 @@ object PrintSides
 
   protected override def unsortedValues: Array[PrintSides] =
     Array(Duplex, OneSided, Tumble)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/print/PrintSides.html JavaFX PrintSides]].

@@ -36,14 +36,13 @@ import scalafx.collections._
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.Paint
 
-object SubScene {
+object SubScene
   implicit def sfxSubScene2jfx(v: SubScene): jfxs.SubScene =
     if (v != null) v.delegate else null
-}
 
 /** Wraps [[http://docs.oracle.com/javafx/8/api/javafx/scene/SubScene.html]]. */
 class SubScene(override val delegate: jfxs.SubScene)
-    extends Node(delegate) with SFXDelegate[jfxs.SubScene] {
+    extends Node(delegate) with SFXDelegate[jfxs.SubScene]
 
   // TODO Combine common features with Scene in a trait used by both.
 
@@ -84,21 +83,19 @@ class SubScene(override val delegate: jfxs.SubScene)
 
   /** Defines the root Node of the SubScene scene graph. */
   def root: ObjectProperty[jfxs.Parent] = delegate.rootProperty
-  def root_=(v: Parent) {
+  def root_=(v: Parent)
     ObjectProperty.fillProperty[jfxs.Parent](this.root, v)
-  }
 
   /**
     * Returns Nodes children from this Scene's `root`.
     */
-  def getChildren = root.value match {
+  def getChildren = root.value match
     case group: jfxs.Group => group.getChildren
     case pane: jfxsl.Pane => pane.getChildren
     case _ =>
       throw new IllegalStateException(
           "Cannot access children of root: " + root +
           "\nUse a class that extends Group or Pane, or override the getChildren method.")
-  }
 
   /**
     * Returns Content's Node children from this Scene's `root`.
@@ -111,36 +108,31 @@ class SubScene(override val delegate: jfxs.SubScene)
     *
     * @param c list of Nodes children from this Scene's `root` to replace prior content.
     */
-  def content_=(c: Iterable[Node]) {
+  def content_=(c: Iterable[Node])
     fillSFXCollection(this.content, c)
-  }
 
   /**
     * Sets a Node child, replacing the prior content. If you want append to current content, use `add` or similar.
     *
     * @param n Node child to replace prior content.
     */
-  def content_=(n: Node) {
+  def content_=(n: Node)
     fillSFXCollectionWithOne(this.content, n)
-  }
 
   /** Specifies the type of camera use for rendering this SubScene. */
   def camera: ObjectProperty[jfxs.Camera] = delegate.cameraProperty
-  def camera_=(v: Camera) {
+  def camera_=(v: Camera)
     ObjectProperty.fillProperty[jfxs.Camera](this.camera, v)
-  }
 
   /** Defines the background fill of this SubScene. */
   def fill: ObjectProperty[jfxsp.Paint] = delegate.fillProperty
-  def fill_=(v: Paint) {
+  def fill_=(v: Paint)
     ObjectProperty.fillProperty[jfxsp.Paint](this.fill, v)
-  }
 
   /** Defines the height of this SubScene. */
   def height: DoubleProperty = delegate.heightProperty
-  def height_=(v: Double) {
+  def height_=(v: Double)
     height() = v
-  }
 
   /**
     * The URL of the user-agent stylesheet that will be used by this Scene in place of the the platform-default
@@ -168,16 +160,13 @@ class SubScene(override val delegate: jfxs.SubScene)
     *             component only. Any leading '/' character of the `[path]` is ignored and the `[path]` is
     *             treated as a path relative to the root of the application's classpath.
     */
-  def userAgentStylesheet_=(url: String) {
+  def userAgentStylesheet_=(url: String)
     ObjectProperty.fillProperty[String](userAgentStylesheet, url)
-  }
 
   /** Defines the width of this SubScene. */
   def width: DoubleProperty = delegate.widthProperty
-  def width_=(v: Double) {
+  def width_=(v: Double)
     width() = v
-  }
 
   /** Return true if this SubScene is anti-aliased otherwise false. */
   def isAntiAliasing: Boolean = delegate.isAntiAliasing
-}

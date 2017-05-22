@@ -26,7 +26,7 @@ import com.gravity.goose.Article
 import collection.mutable.ListBuffer
 import org.jsoup.select.{TagsEvaluator, Collector, Elements}
 
-trait DocumentCleaner {
+trait DocumentCleaner
 
   /**
     * User: Jim Plush
@@ -38,7 +38,7 @@ trait DocumentCleaner {
     */
   import DocumentCleaner._
 
-  def clean(article: Article): Document = {
+  def clean(article: Article): Document =
 
     trace("Starting cleaning phase with DefaultDocumentCleaner")
 
@@ -59,81 +59,69 @@ trait DocumentCleaner {
 
     //    docToClean = convertDivsToParagraphs(docToClean, "span")
     docToClean
-  }
 
   /**
     * replaces <em> tags with textnodes
     */
-  private def cleanEmTags(doc: Document): Document = {
+  private def cleanEmTags(doc: Document): Document =
     val ems: Elements = doc.getElementsByTag("em")
 
-    for {
+    for
       node <- ems
       images: Elements = node.getElementsByTag("img") if (images.size == 0)
-    } {
+    
       val tn: TextNode = new TextNode(node.text, doc.baseUri)
       node.replaceWith(tn)
-    }
     trace(ems.size + " EM tags modified")
     doc
-  }
 
   /**
     * takes care of the situation where you have a span tag nested in a paragraph tag
     * e.g. businessweek2.txt
     */
-  private def cleanUpSpanTagsInParagraphs(doc: Document) = {
+  private def cleanUpSpanTagsInParagraphs(doc: Document) =
     val spans: Elements = doc.getElementsByTag("span")
-    for (item <- spans) {
-      if (item.parent().nodeName() == "p") {
+    for (item <- spans)
+      if (item.parent().nodeName() == "p")
         val tn: TextNode = new TextNode(item.text, doc.baseUri)
         item.replaceWith(tn)
         trace("Replacing nested span with TextNode: " + item.text())
-      }
-    }
     doc
-  }
 
   /**
     * remove those css drop caps where they put the first letter in big text in the 1st paragraph
     */
-  private def removeDropCaps(doc: Document): Document = {
+  private def removeDropCaps(doc: Document): Document =
     val items: Elements = doc.select("span[class~=(dropcap|drop_cap)]")
     trace(items.size + " dropcap tags removed")
-    for (item <- items) {
+    for (item <- items)
       val tn: TextNode = new TextNode(item.text, doc.baseUri)
       item.replaceWith(tn)
-    }
     doc
-  }
 
-  private def removeScriptsAndStyles(doc: Document): Document = {
+  private def removeScriptsAndStyles(doc: Document): Document =
 
     val scripts: Elements = doc.getElementsByTag("script")
-    for (item <- scripts) {
+    for (item <- scripts)
       item.remove()
-    }
     trace(scripts.size + " script tags removed")
 
     val styles: Elements = doc.getElementsByTag("style")
     import scala.collection.JavaConversions._
-    for (style <- styles) {
+    for (style <- styles)
       style.remove()
-    }
     trace(styles.size + " style tags removed")
     doc
-  }
 
-  private def cleanBadTags(doc: Document): Document = {
+  private def cleanBadTags(doc: Document): Document =
     val children: Elements = doc.body.children
     val naughtyList: Elements = children.select(queryNaughtyIDs)
     trace(naughtyList.size + " naughty ID elements found")
 
     import scala.collection.JavaConversions._
-    for (node <- naughtyList) {
+    for (node <- naughtyList)
       trace("Removing node with id: " + node.id)
       removeNode(node)
-    }
 
     val naughtyList2: Elements = children.select(queryNaughtyIDs)
     trace(naughtyList2.size + " naughty ID elements found after removal")
@@ -142,10 +130,9 @@ trait DocumentCleaner {
 
     trace(naughtyClasses.size + " naughty CLASS elements found")
 
-    for (node <- naughtyClasses) {
+    for (node <- naughtyClasses)
       trace("Removing node with class: " + node.className)
       removeNode(node)
-    }
 
     val naughtyClasses2: Elements = children.select(queryNaughtyClasses)
     trace(naughtyClasses2.size + " naughty CLASS elements found after removal")
@@ -154,219 +141,188 @@ trait DocumentCleaner {
 
     trace(naughtyList5.size + " naughty Name elements found")
 
-    for (node <- naughtyList5) {
+    for (node <- naughtyList5)
 
       trace(
           "Removing node with class: " + node.attr("class") + " id: " +
           node.id + " name: " + node.attr("name"))
 
       removeNode(node)
-    }
     doc
-  }
 
   /**
     * removes nodes that may have a certain pattern that matches against a class or id tag
     *
     * @param pattern
     */
-  private def removeNodesViaRegEx(doc: Document, pattern: Pattern): Document = {
-    try {
+  private def removeNodesViaRegEx(doc: Document, pattern: Pattern): Document =
+    try
       val naughtyList: Elements =
         doc.getElementsByAttributeValueMatching("id", pattern)
 
       trace(
           naughtyList.size + " ID elements found against pattern: " + pattern)
 
-      for (node <- naughtyList) {
+      for (node <- naughtyList)
         removeNode(node)
-      }
       val naughtyList3: Elements =
         doc.getElementsByAttributeValueMatching("class", pattern)
       trace(naughtyList3.size + " CLASS elements found against pattern: " +
           pattern)
 
-      for (node <- naughtyList3) {
+      for (node <- naughtyList3)
         removeNode(node)
-      }
-    } catch {
-      case e: IllegalArgumentException => {
+    catch
+      case e: IllegalArgumentException =>
           warn(e, e.toString)
-        }
-    }
     doc
-  }
 
   /**
     * Apparently jsoup expects the node's parent to not be null and throws if it is. Let's be safe.
     * @param node the node to remove from the doc
     */
-  private def removeNode(node: Element) {
+  private def removeNode(node: Element)
     if (node == null || node.parent == null) return
     node.remove()
-  }
 
-  def replaceElementsWithPara(doc: Document, div: Element) {
+  def replaceElementsWithPara(doc: Document, div: Element)
     val newDoc: Document = new Document(doc.baseUri)
     val newNode: Element = newDoc.createElement("p")
     newNode.append(div.html)
     div.replaceWith(newNode)
-  }
 
   private def convertWantedTagsToParagraphs(
-      doc: Document, wantedTags: TagsEvaluator): Document = {
+      doc: Document, wantedTags: TagsEvaluator): Document =
 
     val selected = Collector.collect(wantedTags, doc)
 
-    for (elem <- selected) {
-      if (Collector.collect(blockElemementTags, elem).isEmpty) {
+    for (elem <- selected)
+      if (Collector.collect(blockElemementTags, elem).isEmpty)
         replaceElementsWithPara(doc, elem)
-      } else {
+      else
         val replacements = getReplacementNodes(doc, elem)
         elem.children().foreach(_.remove())
         replacements.foreach(
             n =>
-              {
-            try {
+            try
               elem.appendChild(n)
-            } catch {
+            catch
               case ex: Exception => info(ex, "Failed to append cleaned child!")
-            }
-        })
-      }
-    }
+        )
 
     doc
-  }
 
   private def convertDivsToParagraphs(
-      doc: Document, domType: String): Document = {
+      doc: Document, domType: String): Document =
     trace("Starting to replace bad divs...")
     var badDivs: Int = 0
     var convertedTextNodes: Int = 0
     val divs: Elements = doc.getElementsByTag(domType)
     var divIndex = 0
 
-    for (div <- divs) {
-      try {
+    for (div <- divs)
+      try
         val divToPElementsMatcher: Matcher =
           divToPElementsPattern.matcher(div.html.toLowerCase)
-        if (divToPElementsMatcher.find == false) {
+        if (divToPElementsMatcher.find == false)
           replaceElementsWithPara(doc, div)
           badDivs += 1;
-        } else {
+        else
           val replaceNodes = getReplacementNodes(doc, div)
 
           div.children().foreach(_.remove())
           replaceNodes.foreach(
               node =>
-                {
 
-              try {
+              try
                 div.appendChild(node)
-              } catch {
+              catch
                 case e: Exception => info(e, e.toString)
-              }
-          })
-        }
-      } catch {
-        case e: NullPointerException => {
+          )
+      catch
+        case e: NullPointerException =>
             logger.error(e.toString)
-          }
-      }
       divIndex += 1
-    }
 
     trace(
         "Found %d total %s with %d bad ones replaced and %d textnodes converted inside %s"
           .format(divs.size, domType, badDivs, convertedTextNodes, domType))
 
     doc
-  }
 
   /**
     * go through all the div's nodes and clean up dangling text nodes and get rid of obvious jank
     */
-  def getFlushedBuffer(replacementText: scala.StringBuilder, doc: Document) = {
+  def getFlushedBuffer(replacementText: scala.StringBuilder, doc: Document) =
     val bufferedText = replacementText.toString()
     trace("Flushing TextNode Buffer: " + bufferedText.trim())
     val newDoc: Document = new Document(doc.baseUri)
     val newPara: Element = newDoc.createElement("p")
     newPara.html(replacementText.toString())
     newPara
-  }
 
-  def getReplacementNodes(doc: Document, div: Element) = {
+  def getReplacementNodes(doc: Document, div: Element) =
 
     val replacementText: StringBuilder = new StringBuilder
     val nodesToReturn = new ListBuffer[Node]()
 
     val nodesToRemove = new ListBuffer[Node]()
 
-    for {
+    for
 
       kid <- div.childNodes()
-    } {
+    
 
-      if (kid.nodeName() == "p" && replacementText.size > 0) {
+      if (kid.nodeName() == "p" && replacementText.size > 0)
 
         // flush the buffer of text
         val newNode = getFlushedBuffer(replacementText, doc)
         nodesToReturn += newNode
         replacementText.clear()
 
-        if (kid.isInstanceOf[Element]) {
+        if (kid.isInstanceOf[Element])
           val kidElem = kid.asInstanceOf[Element]
           nodesToReturn += kidElem
-        }
-      } else if (kid.nodeName == "#text") {
+      else if (kid.nodeName == "#text")
 
         val kidTextNode = kid.asInstanceOf[TextNode]
         val kidText = kidTextNode.attr("text")
         val replaceText = tabsAndNewLinesReplacements.replaceAll(kidText)
-        if (replaceText.trim().length > 1) {
+        if (replaceText.trim().length > 1)
 
           var prevSibNode = kidTextNode.previousSibling()
           while (prevSibNode != null && prevSibNode.nodeName() == "a" &&
-          prevSibNode.attr("grv-usedalready") != "yes") {
+          prevSibNode.attr("grv-usedalready") != "yes")
             replacementText.append(" " + prevSibNode.outerHtml() + " ")
             nodesToRemove += prevSibNode
             prevSibNode.attr("grv-usedalready", "yes")
             prevSibNode = if (prevSibNode.previousSibling() == null) null
             else prevSibNode.previousSibling()
-          }
           // add the text of the node
           replacementText.append(replaceText)
 
           //          check the next set of links that might be after text (see businessinsider2.txt)
           var nextSibNode = kidTextNode.nextSibling()
           while (nextSibNode != null && nextSibNode.nodeName() == "a" &&
-          nextSibNode.attr("grv-usedalready") != "yes") {
+          nextSibNode.attr("grv-usedalready") != "yes")
             replacementText.append(" " + nextSibNode.outerHtml() + " ")
             nodesToRemove += nextSibNode
             nextSibNode.attr("grv-usedalready", "yes")
             nextSibNode = if (nextSibNode.nextSibling() == null) null
             else nextSibNode.nextSibling()
-          }
-        }
         nodesToRemove += kid
-      } else {
+      else
         nodesToReturn += kid
-      }
-    }
     // flush out anything still remaining
-    if (replacementText.size > 0) {
+    if (replacementText.size > 0)
       val newNode = getFlushedBuffer(replacementText, doc)
       nodesToReturn += newNode
       replacementText.clear()
-    }
 
     nodesToRemove.foreach(_.remove())
     nodesToReturn
-  }
-}
 
-object DocumentCleaner extends Logging {
+object DocumentCleaner extends Logging
   var sb: StringBuilder = new StringBuilder
 
   // create negative elements
@@ -405,4 +361,3 @@ object DocumentCleaner extends Logging {
   val twitterPattern: Pattern = Pattern.compile("[^-]twitter")
 
   val logPrefix = "Cleaner: "
-}

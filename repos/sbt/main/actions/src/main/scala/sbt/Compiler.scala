@@ -15,15 +15,14 @@ import sbt.internal.librarymanagement.{ComponentManager, IvyConfiguration}
 import sbt.librarymanagement.{ModuleID, CrossVersion, VersionNumber}
 import sbt.util.Logger
 
-object Compiler {
+object Compiler
   val DefaultMaxErrors = 100
   private[sbt] def defaultCompilerBridgeSource(sv: String): ModuleID =
-    VersionNumber(sv) match {
+    VersionNumber(sv) match
       case VersionNumber(ns, _, _)
           if (ns.size == 3) && (ns(0) == 2) && (ns(1) <= 10) =>
         scalaCompilerBridgeSource2_10
       case _ => scalaCompilerBridgeSource2_11
-    }
   private[sbt] def scalaCompilerBridgeSource2_10: ModuleID =
     ModuleID(xsbti.ArtifactInfo.SbtOrganization,
              "compiler-bridge_2.10",
@@ -113,12 +112,11 @@ object Compiler {
 
   def compilers(
       cpOptions: ClasspathOptions, ivyConfiguration: IvyConfiguration)(
-      implicit app: AppConfiguration, log: Logger): Compilers = {
+      implicit app: AppConfiguration, log: Logger): Compilers =
     val scalaProvider = app.provider.scalaProvider
     val instance = ScalaInstance(scalaProvider.version, scalaProvider.launcher)
     val sourceModule = scalaCompilerBridgeSource2_11
     compilers(instance, cpOptions, None, ivyConfiguration, sourceModule)
-  }
 
   // def compilers(instance: ScalaInstance, cpOptions: ClasspathOptions)(implicit app: AppConfiguration, log: Logger): Compilers =
   //   compilers(instance, cpOptions, None)
@@ -129,18 +127,17 @@ object Compiler {
                 javaHome: Option[File],
                 ivyConfiguration: IvyConfiguration,
                 sourcesModule: ModuleID)(
-      implicit app: AppConfiguration, log: Logger): Compilers = {
+      implicit app: AppConfiguration, log: Logger): Compilers =
     val scalac = scalaCompiler(
         instance, cpOptions, javaHome, ivyConfiguration, sourcesModule)
     val javac = JavaTools.directOrFork(instance, cpOptions, javaHome)
     IncrementalCompilerImpl.Compilers(scalac, javac)
-  }
   def scalaCompiler(instance: ScalaInstance,
                     cpOptions: ClasspathOptions,
                     javaHome: Option[File],
                     ivyConfiguration: IvyConfiguration,
                     sourcesModule: ModuleID)(
-      implicit app: AppConfiguration, log: Logger): AnalyzingCompiler = {
+      implicit app: AppConfiguration, log: Logger): AnalyzingCompiler =
     val launcher = app.provider.scalaProvider.launcher
     val componentManager = new ComponentManager(launcher.globalLock,
                                                 app.provider.components,
@@ -149,13 +146,11 @@ object Compiler {
     val provider = ComponentCompiler.interfaceProvider(
         componentManager, ivyConfiguration, sourcesModule)
     new AnalyzingCompiler(instance, provider, cpOptions)
-  }
 
-  def compile(in: Inputs, log: Logger): CompileResult = {
+  def compile(in: Inputs, log: Logger): CompileResult =
     sbt.inc.IncrementalCompilerUtil.defaultIncrementalCompiler.compile(in, log)
     // import in.inputs.config._
     // compile(in, log, new LoggerReporter(maxErrors, log, sourcePositionMapper))
-  }
   // def compile(in: Inputs, log: Logger, reporter: xsbti.Reporter): CompileResult =
   //   {
   //     import in.inputs.compilers._
@@ -173,11 +168,8 @@ object Compiler {
   //   }
 
   private[sbt] def foldMappers[A](mappers: Seq[A => Option[A]]) =
-    mappers.foldRight({ p: A =>
+    mappers.foldRight( p: A =>
       p
-    }) { (mapper, mappers) =>
-      { p: A =>
+    )  (mapper, mappers) =>
+      p: A =>
         mapper(p).getOrElse(mappers(p))
-      }
-    }
-}

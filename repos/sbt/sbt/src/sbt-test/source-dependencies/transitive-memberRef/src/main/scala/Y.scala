@@ -1,5 +1,4 @@
 package test
 
-class Y {
+class Y
   def baz(x: X) = x
-}

@@ -48,7 +48,7 @@ import scalafx.event.subscriptions.Subscription
   * @define OL [[http://docs.oracle.com/javase/8/javafx/api/javafx/collections/ObservableList.html `ObservableList`]]
   * @define buf `Buffer`
   */
-object ObservableBuffer extends SeqFactory[ObservableBuffer] {
+object ObservableBuffer extends SeqFactory[ObservableBuffer]
 
   /**
     * Extracts an $OL from an $OB.
@@ -63,9 +63,8 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     * The standard `CanBuildFrom` instance for $OB objects.
     */
   implicit def canBuildFrom[T]: CanBuildFrom[Coll, T, ObservableBuffer[T]] =
-    new GenericCanBuildFrom[T] {
+    new GenericCanBuildFrom[T]
       override def apply() = newBuilder[T]
-    }
 
   /**
     * The default builder for $OB objects.
@@ -170,9 +169,8 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     *
     * @param buffer Buffer to be shuffled
     */
-  def shuffle[T](buffer: ObservableBuffer[T]) {
+  def shuffle[T](buffer: ObservableBuffer[T])
     jfxc.FXCollections.shuffle(buffer)
-  }
 
   /**
     * Shuffles all elements in the $OB. Fires only '''one''' change notification on the $buf.
@@ -180,22 +178,20 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     * @param buffer Buffer to be shuffled
     * @param rnd the random generator used for shuffling
     */
-  def shuffle[T](buffer: ObservableBuffer[T], rnd: ju.Random) {
+  def shuffle[T](buffer: ObservableBuffer[T], rnd: ju.Random)
     jfxc.FXCollections.shuffle(buffer, rnd)
-  }
 
   /**
     * Concatenates more $OB's into one.
     *
     * @param buffers $buf to concatenate
     */
-  def concat[T](buffers: ObservableBuffer[T]*): ObservableBuffer[T] = {
+  def concat[T](buffers: ObservableBuffer[T]*): ObservableBuffer[T] =
     val lists: java.util.List[jfxc.ObservableList[T]] =
       new java.util.ArrayList[jfxc.ObservableList[T]]
     buffers.foreach(buf => lists.add(buf.delegate))
 
     ObservableBuffer[T](jfxc.FXCollections.concat(lists: _*))
-  }
 
   /**
     * Revert the order in the $OB. Fires only '''one''' change notification on the list.
@@ -208,9 +204,8 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     *
     * @param buffer $buf to be reverted.
     */
-  def revertBuffer[T](buffer: ObservableBuffer[T]) {
+  def revertBuffer[T](buffer: ObservableBuffer[T])
     jfxc.FXCollections.reverse(buffer.delegate)
-  }
 
   /**
     * Fills the provided $buf with obj. Fires only one change notification on the $buf.
@@ -218,9 +213,8 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     * @param buffer $buf to Fill
     * @param obj the object to fill the $buf with
     */
-  def fillAll[T](buffer: ObservableBuffer[T], obj: T) {
+  def fillAll[T](buffer: ObservableBuffer[T], obj: T)
     jfxc.FXCollections.fill(buffer, obj)
-  }
 
   /**
     * Rotates the $buf by distance. Fires only one change notification on the $buf.
@@ -228,12 +222,10 @@ object ObservableBuffer extends SeqFactory[ObservableBuffer] {
     * @param buffer the $buf to be rotated
     * @param distance the distance of rotation
     */
-  def rotate[T](buffer: ObservableBuffer[T], distance: Int) {
+  def rotate[T](buffer: ObservableBuffer[T], distance: Int)
     jfxc.FXCollections.rotate(buffer, distance)
-  }
 
   // HELPER METHODS - END
-}
 
 /**
   * Wrapper class to JavaFX's
@@ -255,7 +247,7 @@ class ObservableBuffer[T](
     extends mutable.Buffer[T] with mutable.BufferLike[T, ObservableBuffer[T]]
     with GenericTraversableTemplate[T, ObservableBuffer]
     with mutable.Builder[T, ObservableBuffer[T]] with Observable
-    with SFXDelegate[jfxc.ObservableList[T]] {
+    with SFXDelegate[jfxc.ObservableList[T]]
 
   /**
     * The factory companion object that builds instances of class $OB.
@@ -274,12 +266,11 @@ class ObservableBuffer[T](
     * @param xs The traversable object.
     * @return A new $OB consisting of all the elements of this $buf and `xs`. $noCL
     */
-  override def ++(xs: GenTraversableOnce[T]) = {
+  override def ++(xs: GenTraversableOnce[T]) =
     val ob = new ObservableBuffer[T]
     ob.appendAll(this)
     ob.appendAll(xs.toList)
     ob
-  }
 
   /**
     * Appends a single element to this $OB. $WhyOverride
@@ -287,10 +278,9 @@ class ObservableBuffer[T](
     * @param elem the element to add.
     * @return $ownOB
     */
-  def +=(elem: T) = {
+  def +=(elem: T) =
     delegate.add(elem)
     this
-  }
 
   /**
     * Appends two or more elements to this $OB. $WhyOverride
@@ -309,10 +299,9 @@ class ObservableBuffer[T](
     * @param xs traversable object.
     * @return $ownOB
     */
-  override def ++=(xs: TraversableOnce[T]) = {
+  override def ++=(xs: TraversableOnce[T]) =
     delegate.addAll(xs.toIterable)
     this
-  }
 
   /**
     * Prepends a single element to this buffer. $WhyOverride
@@ -320,10 +309,9 @@ class ObservableBuffer[T](
     * @param elem Element to prepend
     * @return $ownOB
     */
-  def +=:(elem: T) = {
+  def +=:(elem: T) =
     delegate.add(0, elem)
     this
-  }
 
   /**
     * Appends a single element to this buffer. $WhyOverride
@@ -331,10 +319,9 @@ class ObservableBuffer[T](
     * @param elem Element to append
     * @return $ownOB
     */
-  def :+=(elem: T) = {
+  def :+=(elem: T) =
     delegate.add(elem)
     this
-  }
 
   /**
     * Creates a new $OB with all the elements of this collection except `elem`. $noCL
@@ -342,11 +329,10 @@ class ObservableBuffer[T](
     * @param elem Element to remove
     * @return A new $OB consisting of all the elements of this $buf except `elem`. $noCL
     */
-  override def -(elem: T) = {
+  override def -(elem: T) =
     val ob = new ObservableBuffer[T]
     this.filterNot(_ != elem).foreach(ob += _)
     ob
-  }
 
   /**
     * Creates a new collection with all the elements of this collection except the two
@@ -358,12 +344,11 @@ class ObservableBuffer[T](
     * @return a new $OB consisting of all the elements of this $buf except `elem1`, `elem2` and
     *         those in `elems`. $noCL
     */
-  override def -(elem1: T, elem2: T, elems: T*) = {
+  override def -(elem1: T, elem2: T, elems: T*) =
     val xs = mutable.Buffer(elem1, elem2) ++= elems
     val ob = new ObservableBuffer[T]
     this.filterNot(xs.contains(_)).foreach(ob += _)
     ob
-  }
 
   /**
     * Creates a new $OB with all the elements of this $buf except those provided by
@@ -372,12 +357,11 @@ class ObservableBuffer[T](
     * @param xs The traversable object.
     * @return A new $OB with all the elements of this $buf except those in `xs`. $noCL
     */
-  override def --(xs: GenTraversableOnce[T]) = {
+  override def --(xs: GenTraversableOnce[T]) =
     val ob = new ObservableBuffer[T]
     val list = xs.toList
     this.filterNot(list.contains(_)).foreach(ob += _)
     ob
-  }
 
   /**
     * Removes two or more elements from this $OB.
@@ -387,10 +371,9 @@ class ObservableBuffer[T](
     * @param elems Other elements to remove
     * @return $ownOB
     */
-  override def -=(elem1: T, elem2: T, elems: T*) = {
+  override def -=(elem1: T, elem2: T, elems: T*) =
     delegate.removeAll(mutable.Buffer(elem1, elem2) ++= elems)
     this
-  }
 
   /**
     * Removes all elements produced by an iterator from this buffer.
@@ -398,10 +381,9 @@ class ObservableBuffer[T](
     * @param xs the traversable object with elements to remove.
     * @return $ownOB
     */
-  override def --=(xs: TraversableOnce[T]) = {
+  override def --=(xs: TraversableOnce[T]) =
     delegate.removeAll(xs.toIterable)
     this
-  }
 
   /**
     * Selects an element by its index in the buffer.
@@ -414,9 +396,8 @@ class ObservableBuffer[T](
   /**
     * Clears the $OB's contents. After this operation, the $buf is empty.
     */
-  def clear() {
+  def clear()
     delegate.clear()
-  }
 
   /**
     * Inserts new elements at a given index into this $buf.
@@ -424,20 +405,18 @@ class ObservableBuffer[T](
     * @param n the index where new elements are inserted.
     * @param elems  the traversable collection containing the elements to insert.
     */
-  def insertAll(n: Int, elems: Traversable[T]) {
+  def insertAll(n: Int, elems: Traversable[T])
     delegate.addAll(n, elems.toIterable)
-  }
 
   /**
     * Creates a new [[http://www.scala-lang.org/api/current/scala/collection/Iterator.html `Iterator`]].
     */
-  def iterator = new Iterator[T] {
+  def iterator = new Iterator[T]
     val it = delegate.iterator
 
     def hasNext = it.hasNext
 
     def next() = it.next()
-  }
 
   /**
     * Length of this $OB.
@@ -464,9 +443,8 @@ class ObservableBuffer[T](
     * @param n the index which refers to the first element to remove.
     * @param count  the number of elements to remove.
     */
-  override def remove(n: Int, count: Int) {
+  override def remove(n: Int, count: Int)
     delegate.subList(n, n + count).clear()
-  }
 
   /**
     * Remove a range of elements. Use this method if you want a functionality such as
@@ -476,9 +454,8 @@ class ObservableBuffer[T](
     * @param from the start of the range to remove (inclusive)
     * @param to  the end of the range to remove (exclusive)
     */
-  def removeRange(from: Int, to: Int) {
+  def removeRange(from: Int, to: Int)
     delegate.remove(from, to)
-  }
 
   /**
     * Replaces element at given index with a new value.
@@ -486,9 +463,8 @@ class ObservableBuffer[T](
     * @param n the index of the element to replace.
     * @param newelem new value to be positioned at position n.
     */
-  def update(n: Int, newelem: T) {
+  def update(n: Int, newelem: T)
     delegate.set(n, newelem)
-  }
 
   /**
     * Retains only the elements in this list that are contained in the specified collection.
@@ -497,9 +473,8 @@ class ObservableBuffer[T](
     *
     * @param elems the traversable collection containing elements to be retained in this list
     */
-  def retainAll(elems: T*) {
+  def retainAll(elems: T*)
     delegate.retainAll(elems)
-  }
 
   /**
     * Retains only the elements in this list that are contained in the specified collection.
@@ -508,9 +483,8 @@ class ObservableBuffer[T](
     *
     * @param elems the traversable collection containing elements to be retained in this list
     */
-  def retainAll(elems: Iterable[T]) {
+  def retainAll(elems: Iterable[T])
     delegate.retainAll(elems)
-  }
 
   /**
     * Replace all oldVal elements in the list with newVal element. Fires only '''one''' change
@@ -530,18 +504,16 @@ class ObservableBuffer[T](
     *
     * @param typeTag information about if this type is a `Comparable` subclass or not.
     */
-  def sort()(implicit typeTag: WeakTypeTag[T]) {
-    if (typeTag.tpe <:< typeOf[Comparable[_]]) {
-      jfxc.FXCollections.sort(delegate, new ju.Comparator[T] {
+  def sort()(implicit typeTag: WeakTypeTag[T])
+    if (typeTag.tpe <:< typeOf[Comparable[_]])
+      jfxc.FXCollections.sort(delegate, new ju.Comparator[T]
         def compare(p1: T, p2: T) =
           p1.asInstanceOf[Comparable[T]].compareTo(p2)
-      })
-    } else {
+      )
+    else
       throw new IllegalStateException(
           "Type of this Observable List does not implement " +
           "java.util.Comparable. Please use a Comparator function.")
-    }
-  }
 
   /**
     * Sorts this $OB using a Comparator function
@@ -549,12 +521,11 @@ class ObservableBuffer[T](
     * @param lt Comparator function that returns `true` if first element was lesser than second
     *           or `false` otherwise.
     */
-  def sort(lt: (T, T) => Boolean) {
-    jfxc.FXCollections.sort(delegate, new ju.Comparator[T] {
+  def sort(lt: (T, T) => Boolean)
+    jfxc.FXCollections.sort(delegate, new ju.Comparator[T]
       def compare(p1: T, p2: T) =
         if (lt(p1, p2)) -1 else if (lt(p2, p1)) 1 else 0
-    })
-  }
+    )
 
   import scalafx.collections.ObservableBuffer._
 
@@ -567,38 +538,29 @@ class ObservableBuffer[T](
     * @return A subscription object
     */
   def onChange[T1 >: T](
-      op: (ObservableBuffer[T], Seq[Change[T1]]) => Unit): Subscription = {
-    val listener = new jfxc.ListChangeListener[T1] {
-      def onChanged(c: jfxc.ListChangeListener.Change[_ <: T1]) {
+      op: (ObservableBuffer[T], Seq[Change[T1]]) => Unit): Subscription =
+    val listener = new jfxc.ListChangeListener[T1]
+      def onChanged(c: jfxc.ListChangeListener.Change[_ <: T1])
         var changes = ArrayBuffer.empty[Change[T1]]
-        while (c.next()) {
-          if (c.wasPermutated()) {
-            changes += Reorder(c.getFrom, c.getTo, { x =>
+        while (c.next())
+          if (c.wasPermutated())
+            changes += Reorder(c.getFrom, c.getTo,  x =>
               c.getPermutation(x)
-            })
-          } else if (c.wasUpdated()) {
+            )
+          else if (c.wasUpdated())
             changes += Update(c.getFrom, c.getTo)
-          } else {
-            if (c.wasRemoved()) {
+          else
+            if (c.wasRemoved())
               changes += Remove(c.getFrom, c.getRemoved)
-            }
-            if (c.wasAdded()) {
+            if (c.wasAdded())
               changes += Add(c.getFrom, c.getAddedSubList)
-            }
-          }
-        }
         op(ObservableBuffer.this, changes)
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
 
   /**
     * Add a listener function to list's changes. This function '''will not handle''' this buffer's
@@ -607,19 +569,13 @@ class ObservableBuffer[T](
     * @param op No-argument function to be activated when some change in this $OB was made.
     * @return A `subscription` object
     */
-  def onChange[T1 >: T](op: => Unit): Subscription = {
-    val listener = new jfxc.ListChangeListener[T1] {
-      def onChanged(c: jfxc.ListChangeListener.Change[_ <: T1]) {
+  def onChange[T1 >: T](op: => Unit): Subscription =
+    val listener = new jfxc.ListChangeListener[T1]
+      def onChanged(c: jfxc.ListChangeListener.Change[_ <: T1])
         op
-      }
-    }
 
     delegate.addListener(listener)
 
-    new Subscription {
-      def cancel() {
+    new Subscription
+      def cancel()
         delegate.removeListener(listener)
-      }
-    }
-  }
-}

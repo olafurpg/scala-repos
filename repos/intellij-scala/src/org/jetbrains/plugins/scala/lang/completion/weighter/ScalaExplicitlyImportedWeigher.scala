@@ -21,8 +21,8 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * @author Alexander Podkhalyuzin
   */
-class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
-  def applyQualifier(qual: String, position: PsiElement): Option[Integer] = {
+class ScalaExplicitlyImportedWeigher extends ProximityWeigher
+  def applyQualifier(qual: String, position: PsiElement): Option[Integer] =
     if (position == null) return None
     val index = qual.lastIndexOf('.')
     val qualNoPoint = if (index < 0) null else qual.substring(0, index)
@@ -32,152 +32,118 @@ class ScalaExplicitlyImportedWeigher extends ProximityWeigher {
       if (tuple != null) tuple._1 else null
     val currentModCount =
       position.getManager.getModificationTracker.getModificationCount
-    if (buffer == null || tuple._2 != currentModCount) {
+    if (buffer == null || tuple._2 != currentModCount)
       @tailrec
-      def treeWalkup(place: PsiElement, lastParent: PsiElement) {
+      def treeWalkup(place: PsiElement, lastParent: PsiElement)
         if (place == null) return
-        place match {
+        place match
           case holder: ScImportsHolder =>
             buffer ++= holder.getImportsForLastParent(lastParent)
             if (place.isInstanceOf[ScalaFile]) return
           case _ =>
-        }
         treeWalkup(place.getContext, place)
-      }
       buffer = new ArrayBuffer[ScImportStmt]()
       treeWalkup(position.getContext, position)
       position.putUserData(
           ScalaExplicitlyImportedWeigher.key, (buffer, currentModCount))
-    }
     val iter = buffer.iterator
-    while (iter.hasNext) {
+    while (iter.hasNext)
       val stmt = iter.next()
       val exprIter = stmt.importExprs.iterator
-      while (exprIter.hasNext) {
+      while (exprIter.hasNext)
         val expr = exprIter.next()
-        if (expr.singleWildcard && qualNoPoint != null) {
-          for (resolve <- expr.qualifier.multiResolve(false)) resolve match {
+        if (expr.singleWildcard && qualNoPoint != null)
+          for (resolve <- expr.qualifier.multiResolve(false)) resolve match
             case ScalaResolveResult(pack: PsiPackage, _) =>
               if (qualNoPoint == pack.getQualifiedName) return Some(3)
             case ScalaResolveResult(clazz: PsiClass, _) =>
               if (qualNoPoint == clazz.qualifiedName) return Some(3)
             case _ =>
-          }
-        } else if (expr.selectorSet.isDefined) {
-          for (selector <- expr.selectors) {
-            for (resolve <- selector.reference.multiResolve(false)) {
-              resolve match {
+        else if (expr.selectorSet.isDefined)
+          for (selector <- expr.selectors)
+            for (resolve <- selector.reference.multiResolve(false))
+              resolve match
                 case ScalaResolveResult(clazz: PsiClass, _) =>
                   if (qual == clazz.qualifiedName) return Some(3)
                 case _ =>
-              }
-            }
-          }
-        } else {
-          expr.reference match {
+        else
+          expr.reference match
             case Some(ref) =>
-              for (resolve <- ref.multiResolve(false)) resolve match {
+              for (resolve <- ref.multiResolve(false)) resolve match
                 case ScalaResolveResult(clazz: PsiClass, _) =>
                   if (qual == clazz.qualifiedName) return Some(3)
                 case _ =>
-              }
             case None =>
-          }
-        }
-      }
-    }
     if (qualNoPoint != null && qualNoPoint == "scala" ||
-        qualNoPoint == "java.lang" || qualNoPoint == "scala.Predef") {
+        qualNoPoint == "java.lang" || qualNoPoint == "scala.Predef")
       if (qualNoPoint == "java.lang") return Some(1)
       else return Some(2)
-    }
     None
-  }
 
-  def applyToMember(member: ScMember, position: PsiElement): Option[Integer] = {
-    member.getContext match {
+  def applyToMember(member: ScMember, position: PsiElement): Option[Integer] =
+    member.getContext match
       case tb: ScTemplateBody =>
         val clazz: PsiClass = member.containingClass
-        clazz match {
+        clazz match
           case obj: ScObject =>
             val qualNoPoint = obj.qualifiedName
-            if (qualNoPoint != null) {
-              val memberName = member match {
+            if (qualNoPoint != null)
+              val memberName = member match
                 case named: ScNamedElement => named.name
                 case _ => member.getName
-              }
               val qual = qualNoPoint + "." + memberName
-              applyQualifier(qual, position) match {
+              applyQualifier(qual, position) match
                 case Some(x) => return Some(x)
                 case None =>
-              }
-            }
           case _ =>
-        }
       case _ =>
-    }
     None
-  }
 
-  def weigh(element: PsiElement, location: ProximityLocation): Integer = {
+  def weigh(element: PsiElement, location: ProximityLocation): Integer =
     val position: PsiElement = location.getPosition
-    if (position == null) {
+    if (position == null)
       return 0
-    }
     val elementFile: PsiFile = element.getContainingFile
     val positionFile: PsiFile = position.getContainingFile
     if (!positionFile.isInstanceOf[ScalaFile]) return 0
     if (positionFile != null && elementFile != null &&
-        positionFile.getOriginalFile == elementFile.getOriginalFile) {
+        positionFile.getOriginalFile == elementFile.getOriginalFile)
       return 3
-    }
-    element match {
+    element match
       case clazz: PsiClass if clazz.qualifiedName != null =>
         val qual: String = clazz.qualifiedName
-        applyQualifier(qual, position) match {
+        applyQualifier(qual, position) match
           case Some(x) => return x
           case None =>
-        }
       case member: ScMember =>
-        applyToMember(member, position) match {
+        applyToMember(member, position) match
           case Some(x) => return x
           case None =>
-        }
       case member: PsiMember if member.hasModifierProperty("static") =>
         val clazz = member.containingClass
-        if (clazz != null && clazz.qualifiedName != null) {
+        if (clazz != null && clazz.qualifiedName != null)
           val qualNoPoint = clazz.qualifiedName
-          val memberName = member match {
+          val memberName = member match
             case named: ScNamedElement => named.name
             case _ => member.getName
-          }
           val qual = qualNoPoint + "." + memberName
-          applyQualifier(qual, position) match {
+          applyQualifier(qual, position) match
             case Some(x) => return x
             case None =>
-          }
-        }
       case b: ScBindingPattern =>
-        ScalaPsiUtil.nameContext(b) match {
+        ScalaPsiUtil.nameContext(b) match
           case v: ScValue =>
-            applyToMember(v, position) match {
+            applyToMember(v, position) match
               case Some(x) => return x
               case None =>
-            }
           case v: ScVariable =>
-            applyToMember(v, position) match {
+            applyToMember(v, position) match
               case Some(x) => return x
               case None =>
-            }
           case _ =>
-        }
       case _ =>
-    }
     0
-  }
-}
 
-object ScalaExplicitlyImportedWeigher {
+object ScalaExplicitlyImportedWeigher
   private[weighter] val key: Key[(ArrayBuffer[ScImportStmt], Long)] =
     Key.create("scala.explicitly.imported.weigher.key")
-}

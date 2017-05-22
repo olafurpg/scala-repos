@@ -12,16 +12,13 @@ import com.intellij.openapi.project.Project
   */
 class ScalaConsoleRunConfigurationEditor(
     project: Project, configuration: ScalaConsoleRunConfiguration)
-    extends SettingsEditor[ScalaConsoleRunConfiguration] {
+    extends SettingsEditor[ScalaConsoleRunConfiguration]
   val form = new ScalaConsoleRunConfigurationForm(project, configuration)
 
-  def resetEditorFrom(s: ScalaConsoleRunConfiguration) {
+  def resetEditorFrom(s: ScalaConsoleRunConfiguration)
     form(s)
-  }
 
-  def applyEditorTo(s: ScalaConsoleRunConfiguration) {
+  def applyEditorTo(s: ScalaConsoleRunConfiguration)
     s(form)
-  }
 
   def createEditor: JComponent = form.getPanel
-}

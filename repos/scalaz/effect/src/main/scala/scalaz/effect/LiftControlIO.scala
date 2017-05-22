@@ -6,7 +6,7 @@ package effect
   *
   */
 ////
-trait LiftControlIO[F[_]] { self =>
+trait LiftControlIO[F[_]]  self =>
   ////
   import IO._
 
@@ -15,15 +15,12 @@ trait LiftControlIO[F[_]] { self =>
   // derived functions
 
   ////
-  val liftControlIOSyntax = new scalaz.syntax.effect.LiftControlIOSyntax[F] {
+  val liftControlIOSyntax = new scalaz.syntax.effect.LiftControlIOSyntax[F]
     def F = LiftControlIO.this
-  }
-}
 
-object LiftControlIO {
+object LiftControlIO
   @inline def apply[F[_]](implicit F: LiftControlIO[F]): LiftControlIO[F] = F
 
   ////
 
   ////
-}

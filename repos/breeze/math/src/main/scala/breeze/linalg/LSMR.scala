@@ -18,7 +18,7 @@ import breeze.util.SerializableLogging
   *
   * @author dlwh
   **/
-object LSMR extends SerializableLogging {
+object LSMR extends SerializableLogging
 
   /**
     * Solves the problem min pow(norm(A * x - b), 2) + regularization * pow(norm(x), 2)
@@ -32,7 +32,7 @@ object LSMR extends SerializableLogging {
       implicit multMV: OpMulMatrix.Impl2[M, V, V],
       transA: CanTranspose[M, MT],
       multMTV: OpMulMatrix.Impl2[MT, V, V],
-      ispace: MutableInnerProductVectorSpace[V, Double]): V = {
+      ispace: MutableInnerProductVectorSpace[V, Double]): V =
     import ispace._
 
     val lambda = math.sqrt(regularization)
@@ -46,16 +46,14 @@ object LSMR extends SerializableLogging {
     var u = copy(b)
     val normb = norm(u)
     var beta = norm(u)
-    if (beta > 0) {
+    if (beta > 0)
       u /= beta
-    }
 
     var v = multMTV(At, u)
     var x = v * 0.0
     var alpha = norm(v)
-    if (alpha > 0) {
+    if (alpha > 0)
       v /= alpha
-    }
 
     var alphabar = alpha
     var zetabar = alpha * beta
@@ -81,15 +79,14 @@ object LSMR extends SerializableLogging {
 
     var converged = false
     var iter = 0
-    while (!converged && iter < maxIter) {
+    while (!converged && iter < maxIter)
       iter += 1
       u = multMV(A, v) - u * alpha
       beta = norm(u)
 
-      if (beta > 0) {
+      if (beta > 0)
         u /= beta
         v = multMTV(At, u) - v * beta
-      }
 
       alpha = norm(v)
       if (alpha > 0) v /= alpha
@@ -163,17 +160,15 @@ object LSMR extends SerializableLogging {
 
       // Estimate cond(A).
       maxrbar = max(maxrbar, rhobarold)
-      if (iter > 1) {
+      if (iter > 1)
         minrbar = min(minrbar, rhobarold)
-      }
 
       var condA = max(maxrbar, rhotemp) / min(minrbar, rhotemp)
 
       // Estimate cond(A).
       maxrbar = max(maxrbar, rhobarold)
-      if (iter > 1) {
+      if (iter > 1)
         minrbar = min(minrbar, rhobarold)
-      }
       condA = max(maxrbar, rhotemp) / min(minrbar, rhotemp)
 
       // Test for convergence.
@@ -195,8 +190,5 @@ object LSMR extends SerializableLogging {
 
       converged = normr == 0.0 || (iter >= maxIter) || (test1 < rtol) ||
       (test2 < atol)
-    }
 
     x
-  }
-}

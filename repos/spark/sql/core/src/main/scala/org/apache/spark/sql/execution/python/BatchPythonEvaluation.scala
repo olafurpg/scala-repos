@@ -41,17 +41,17 @@ import org.apache.spark.sql.types.{StructField, StructType}
   */
 case class BatchPythonEvaluation(
     udf: PythonUDF, output: Seq[Attribute], child: SparkPlan)
-    extends SparkPlan {
+    extends SparkPlan
 
   def children: Seq[SparkPlan] = child :: Nil
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val inputRDD = child.execute().map(_.copy())
     val bufferSize = inputRDD.conf.getInt("spark.buffer.size", 65536)
     val reuseWorker = inputRDD.conf.getBoolean(
         "spark.python.worker.reuse", defaultValue = true)
 
-    inputRDD.mapPartitions { iter =>
+    inputRDD.mapPartitions  iter =>
       EvaluatePython.registerPicklers() // register pickler for Row
 
       // The queue used to buffer input rows so we can drain it to
@@ -66,13 +66,12 @@ case class BatchPythonEvaluation(
 
       // Input iterator to Python: input rows are grouped so we send them in batches to Python.
       // For each row, add it to the queue.
-      val inputIterator = iter.grouped(100).map { inputRows =>
-        val toBePickled = inputRows.map { row =>
+      val inputIterator = iter.grouped(100).map  inputRows =>
+        val toBePickled = inputRows.map  row =>
           queue.add(row)
           EvaluatePython.toJava(currentRow(row), schema)
-        }.toArray
+        .toArray
         pickle.dumps(toBePickled)
-      }
 
       val context = TaskContext.get()
 
@@ -88,13 +87,9 @@ case class BatchPythonEvaluation(
       val joined = new JoinedRow
       val resultProj = UnsafeProjection.create(output, output)
 
-      outputIterator.flatMap { pickedResult =>
+      outputIterator.flatMap  pickedResult =>
         val unpickledBatch = unpickle.loads(pickedResult)
         unpickledBatch.asInstanceOf[java.util.ArrayList[Any]].asScala
-      }.map { result =>
+      .map  result =>
         row(0) = EvaluatePython.fromJava(result, udf.dataType)
         resultProj(joined(queue.poll(), row))
-      }
-    }
-  }
-}

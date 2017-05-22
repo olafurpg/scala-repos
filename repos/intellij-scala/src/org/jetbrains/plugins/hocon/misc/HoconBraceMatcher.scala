@@ -4,7 +4,7 @@ import com.intellij.lang.{BracePair, PairedBraceMatcher}
 import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 
-class HoconBraceMatcher extends PairedBraceMatcher {
+class HoconBraceMatcher extends PairedBraceMatcher
 
   import org.jetbrains.plugins.hocon.CommonUtil._
   import org.jetbrains.plugins.hocon.lexer.HoconTokenSets._
@@ -25,4 +25,3 @@ class HoconBraceMatcher extends PairedBraceMatcher {
 
   def getCodeConstructStart(file: PsiFile, openingBraceOffset: Int) =
     openingBraceOffset
-}

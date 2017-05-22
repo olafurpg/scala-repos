@@ -20,7 +20,7 @@ import BackendReporting._
  *  @version 1.0
  *
  */
-abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
+abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters
   import global._
   import definitions._
   import bTypes._
@@ -38,18 +38,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     * Cache the value of delambdafy == "inline" for each run. We need to query this value many
     * times, so caching makes sense.
     */
-  object delambdafyInline {
+  object delambdafyInline
     private var runId = -1
     private var value = false
 
-    def apply(): Boolean = {
-      if (runId != global.currentRunId) {
+    def apply(): Boolean =
+      if (runId != global.currentRunId)
         runId = global.currentRunId
         value = settings.Ydelambdafy.value == "inline"
-      }
       value
-    }
-  }
 
   /**
     * True if `classSym` is an anonymous class or a local class. I.e., false if `classSym` is a
@@ -57,28 +54,26 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     * It is also used to decide whether the "owner" field in the InnerClass attribute should be
     * null.
     */
-  def isAnonymousOrLocalClass(classSym: Symbol): Boolean = {
+  def isAnonymousOrLocalClass(classSym: Symbol): Boolean =
     assert(classSym.isClass, s"not a class: $classSym")
     val r =
       exitingPickler(classSym.isAnonymousClass) ||
       !classSym.originalOwner.isClass
-    if (r) {
+    if (r)
       // phase travel necessary: after flatten, the name includes the name of outer classes.
       // if some outer name contains $lambda, a non-lambda class is considered lambda.
       assert(exitingPickler(!classSym.isDelambdafyFunction), classSym.name)
-    }
     r
-  }
 
   /**
     * The next enclosing definition in the source structure. Includes anonymous function classes
     * under delambdafy:inline, even though they are only generated during UnCurry.
     */
-  def nextEnclosing(sym: Symbol): Symbol = {
+  def nextEnclosing(sym: Symbol): Symbol =
     val origOwner = sym.originalOwner
     // phase travel necessary: after flatten, the name includes the name of outer classes.
     // if some outer name contains $anon, a non-anon class is considered anon.
-    if (delambdafyInline() && sym.rawowner.isAnonymousFunction) {
+    if (delambdafyInline() && sym.rawowner.isAnonymousFunction)
       // SI-9105: special handling for anonymous functions under delambdafy:inline.
       //
       //   class C { def t = () => { def f { class Z } } }
@@ -108,10 +103,8 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       // not into the anonymous function class. The originalOwner chain is Z - f - C.
       if (sym.originalOwner.rawowner == sym.rawowner) sym.originalOwner
       else sym.rawowner
-    } else {
+    else
       origOwner
-    }
-  }
 
   def nextEnclosingClass(sym: Symbol): Symbol =
     if (sym.isClass) sym
@@ -145,33 +138,30 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     * This is a source-level property, so we need to use the originalOwner chain to reconstruct it.
     */
   private def enclosingMethodForEnclosingMethodAttribute(
-      classSym: Symbol): Option[Symbol] = {
+      classSym: Symbol): Option[Symbol] =
     assert(classSym.isClass, classSym)
 
-    def doesNotExist(method: Symbol) = {
+    def doesNotExist(method: Symbol) =
       //     Value classes. Member methods of value classes exist in the generated box class. However,
       //     nested methods lifted into a value class are moved to the companion object and don't exist
       //     in the value class itself. We can identify such nested methods: the initial enclosing class
       //     is a value class, but the current owner is some other class (the module class).
       val enclCls = nextEnclosingClass(method)
       exitingPickler(enclCls.isDerivedValueClass) && method.owner != enclCls
-    }
 
-    def enclosingMethod(sym: Symbol): Option[Symbol] = {
+    def enclosingMethod(sym: Symbol): Option[Symbol] =
       if (sym.isClass || sym == NoSymbol) None
-      else if (sym.isMethod) {
+      else if (sym.isMethod)
         if (doesNotExist(sym)) None else Some(sym)
-      } else enclosingMethod(nextEnclosing(sym))
-    }
+      else enclosingMethod(nextEnclosing(sym))
     enclosingMethod(nextEnclosing(classSym))
-  }
 
   /**
     * The enclosing class for emitting the EnclosingMethod attribute. Since this is a source-level
     * property, this method looks at the originalOwner chain. See doc in BTypes.
     */
   private def enclosingClassForEnclosingMethodAttribute(
-      classSym: Symbol): Symbol = {
+      classSym: Symbol): Symbol =
     assert(classSym.isClass, classSym)
     val r = nextEnclosingClass(nextEnclosing(classSym))
     // this should be an assertion, but we are more cautious for now as it was introduced before the 2.11.6 minor release
@@ -179,7 +169,6 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       devWarning(
           s"enclosing class of $classSym should not be an implementation artifact class: $r")
     r
-  }
 
   final case class EnclosingMethodEntry(
       owner: String, name: String, methodDescriptor: String)
@@ -195,32 +184,29 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
   def enclosingMethodAttribute(
       classSym: Symbol,
       classDesc: Symbol => String,
-      methodDesc: Symbol => String): Option[EnclosingMethodEntry] = {
+      methodDesc: Symbol => String): Option[EnclosingMethodEntry] =
     // trait impl classes are always top-level, see comment in BTypes
     if (isAnonymousOrLocalClass(classSym) &&
-        !considerAsTopLevelImplementationArtifact(classSym)) {
+        !considerAsTopLevelImplementationArtifact(classSym))
       val enclosingClass = enclosingClassForEnclosingMethodAttribute(classSym)
       val methodOpt =
-        enclosingMethodForEnclosingMethodAttribute(classSym) match {
+        enclosingMethodForEnclosingMethodAttribute(classSym) match
           case some @ Some(m) =>
-            if (m.owner != enclosingClass) {
+            if (m.owner != enclosingClass)
               // This should never happen. In case it does, it prevents emitting an invalid
               // EnclosingMethod attribute: if the attribute specifies an enclosing method,
               // it needs to exist in the specified enclosing class.
               devWarning(
                   s"the owner of the enclosing method ${m.locationString} should be the same as the enclosing class $enclosingClass")
               None
-            } else some
+            else some
           case none => none
-        }
       Some(
           EnclosingMethodEntry(classDesc(enclosingClass),
                                methodOpt.map(_.javaSimpleName.toString).orNull,
                                methodOpt.map(methodDesc).orNull))
-    } else {
+    else
       None
-    }
-  }
 
   /**
     * This is basically a re-implementation of sym.isStaticOwner, but using the originalOwner chain.
@@ -243,17 +229,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     */
   def completeSilentlyAndCheckErroneous(sym: Symbol): Boolean =
     if (sym.hasCompleteInfo) false
-    else {
+    else
       val originalReporter = global.reporter
       val storeReporter = new reporters.StoreReporter()
       global.reporter = storeReporter
-      try {
+      try
         sym.info
-      } finally {
+      finally
         global.reporter = originalReporter
-      }
       sym.isErroneous
-    }
 
   /**
     * Build the [[InlineInfo]] for a class symbol.
@@ -261,30 +245,27 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
   def buildInlineInfoFromClassSymbol(
       classSym: Symbol,
       classSymToInternalName: Symbol => InternalName,
-      methodSymToDescriptor: Symbol => String): InlineInfo = {
+      methodSymToDescriptor: Symbol => String): InlineInfo =
     val traitSelfType =
-      if (classSym.isTrait) {
+      if (classSym.isTrait)
         // The mixin phase uses typeOfThis for the self parameter in implementation class methods.
         val selfSym = classSym.typeOfThis.typeSymbol
         if (selfSym != classSym) Some(classSymToInternalName(selfSym))
         else None
-      } else {
+      else
         None
-      }
 
     val isEffectivelyFinal = classSym.isEffectivelyFinal
 
-    val sam = {
+    val sam =
       if (classSym.isEffectivelyFinal) None
-      else {
+      else
         // Phase travel necessary. For example, nullary methods (getter of an abstract val) get an
         // empty parameter list in later phases and would therefore be picked as SAM.
         val samSym = exitingPickler(definitions.findSam(classSym.tpe))
         if (samSym == NoSymbol) None
         else
           Some(samSym.javaSimpleName.toString + methodSymToDescriptor(samSym))
-      }
-    }
 
     var warning = Option.empty[ClassSymbolInfoFailureSI9111]
 
@@ -292,15 +273,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     // primitive methods (e.g., `isInstanceOf`) have non-erased types, which confuses [[typeToBType]].
     val methodInlineInfos = classSym.info.decls.iterator
       .filter(m => m.isMethod && !scalaPrimitives.isPrimitive(m))
-      .flatMap({
+      .flatMap(
         case methodSym =>
-          if (completeSilentlyAndCheckErroneous(methodSym)) {
+          if (completeSilentlyAndCheckErroneous(methodSym))
             // Happens due to SI-9111. Just don't provide any MethodInlineInfo for that method, we don't need fail the compiler.
             if (!classSym.isJavaDefined)
               devWarning("SI-9111 should only be possible for Java classes")
             warning = Some(ClassSymbolInfoFailureSI9111(classSym.fullName))
             None
-          } else {
+          else
             val name =
               methodSym.javaSimpleName.toString // same as in genDefDef
             val signature = name + methodSymToDescriptor(methodSym)
@@ -320,21 +301,18 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                 annotatedNoInline = methodSym.hasAnnotation(ScalaNoInlineClass)
             )
             Some((signature, info))
-          }
-      })
+      )
       .toMap
 
     InlineInfo(
         traitSelfType, isEffectivelyFinal, sam, methodInlineInfos, warning)
-  }
 
   /*
    * must-single-thread
    */
   def getFileForClassfile(
-      base: AbstractFile, clsName: String, suffix: String): AbstractFile = {
+      base: AbstractFile, clsName: String, suffix: String): AbstractFile =
     getFile(base, clsName, suffix)
-  }
 
   /*
    * must-single-thread
@@ -343,15 +321,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       csym: Symbol,
       cName: String,
       cunit: CompilationUnit): _root_.scala.tools.nsc.io.AbstractFile =
-    _root_.scala.util.Try {
+    _root_.scala.util.Try
       outputDirectory(csym)
-    }.recover {
+    .recover
       case ex: Throwable =>
         reporter.error(
             cunit.body.pos,
             s"Couldn't create file for class $cName\n${ex.getMessage}")
         null
-    }.get
+    .get
 
   var pickledBytes = 0 // statistics
 
@@ -367,62 +345,56 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    *  The internal name of the least common ancestor of the types given by inameA and inameB.
    *  It's what ASM needs to know in order to compute stack map frames, http://asm.ow2.org/doc/developer-guide.html#controlflow
    */
-  final class CClassWriter(flags: Int) extends asm.ClassWriter(flags) {
+  final class CClassWriter(flags: Int) extends asm.ClassWriter(flags)
 
     /**
       * This method is thread-safe: it depends only on the BTypes component, which does not depend
       * on global. TODO @lry move to a different place where no global is in scope, on bTypes.
       */
-    override def getCommonSuperClass(inameA: String, inameB: String): String = {
+    override def getCommonSuperClass(inameA: String, inameB: String): String =
       val a = classBTypeFromInternalName(inameA)
       val b = classBTypeFromInternalName(inameB)
       val lub = a.jvmWiseLUB(b).get
       val lubName = lub.internalName
       assert(lubName != "scala/Any")
       lubName // ASM caches the answer during the lifetime of a ClassWriter. We outlive that. Not sure whether caching on our side would improve things.
-    }
-  }
 
   /*
    * must-single-thread
    */
-  object isJavaEntryPoint {
+  object isJavaEntryPoint
 
     /*
      * must-single-thread
      */
-    def apply(sym: Symbol, csymCompUnit: CompilationUnit): Boolean = {
-      def fail(msg: String, pos: Position = sym.pos) = {
+    def apply(sym: Symbol, csymCompUnit: CompilationUnit): Boolean =
+      def fail(msg: String, pos: Position = sym.pos) =
         reporter.warning(
             sym.pos,
             sym.name +
-            s" has a main method with parameter type Array[String], but ${sym
-              .fullName('.')} will not be a runnable program.\n  Reason: $msg"
+            s" has a main method with parameter type Array[String], but $sym
+              .fullName('.') will not be a runnable program.\n  Reason: $msg"
             // TODO: make this next claim true, if possible
             //   by generating valid main methods as static in module classes
             //   not sure what the jvm allows here
             // + "  You can still run the program by calling it as " + sym.javaSimpleName + " instead."
             )
         false
-      }
-      def failNoForwarder(msg: String) = {
+      def failNoForwarder(msg: String) =
         fail(s"$msg, which means no static forwarder can be generated.\n")
-      }
       val possibles =
         if (sym.hasModuleFlag) (sym.tpe nonPrivateMember nme.main).alternatives
         else Nil
       val hasApproximate =
-        possibles exists { m =>
-          m.info match {
+        possibles exists  m =>
+          m.info match
             case MethodType(p :: Nil, _) =>
               p.tpe.typeSymbol == definitions.ArrayClass
             case _ => false
-          }
-        }
       // At this point it's a module with a main-looking method, so either succeed or warn that it isn't.
-      hasApproximate && {
+      hasApproximate &&
         // Before erasure so we can identify generic mains.
-        enteringErasure {
+        enteringErasure
           val companion = sym.linkedClassOfClass
 
           if (definitions.hasJavaMainMethod(companion))
@@ -435,9 +407,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           // Now either succeeed, or issue some additional warnings for things which look like
           // attempts to be java main methods.
           else
-            (possibles exists definitions.isJavaMainMethod) || {
-              possibles exists { m =>
-                m.info match {
+            (possibles exists definitions.isJavaMainMethod) ||
+              possibles exists  m =>
+                m.info match
                   case PolyType(_, _) =>
                     fail("main methods cannot be generic.")
                   case MethodType(params, res) =>
@@ -450,24 +422,17 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                            m.pos)
                   case tp =>
                     fail(s"don't know what this is: $tp", m.pos)
-                }
-              }
-            }
-        }
-      }
-    }
-  }
 
   /*
    * must-single-thread
    */
-  def initBytecodeWriter(entryPoints: List[Symbol]): BytecodeWriter = {
-    settings.outputDirs.getSingleOutput match {
+  def initBytecodeWriter(entryPoints: List[Symbol]): BytecodeWriter =
+    settings.outputDirs.getSingleOutput match
       case Some(f) if f hasExtension "jar" =>
         // If no main class was specified, see if there's only one
         // entry point among the classes going into the jar.
-        if (settings.mainClass.isDefault) {
-          entryPoints map (_.fullName('.')) match {
+        if (settings.mainClass.isDefault)
+          entryPoints map (_.fullName('.')) match
             case Nil =>
               log("No Main-Class designated or discovered.")
             case name :: Nil =>
@@ -475,38 +440,32 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
               settings.mainClass.value = name
             case names =>
               log(s"No Main-Class due to multiple entry points:\n  ${names.mkString("\n  ")}")
-          }
-        } else log(s"Main-Class was specified: ${settings.mainClass.value}")
+        else log(s"Main-Class was specified: ${settings.mainClass.value}")
 
         new DirectToJarfileWriter(f.file)
 
       case _ => factoryNonJarBytecodeWriter()
-    }
-  }
 
   /*
    *  must-single-thread
    */
-  def fieldSymbols(cls: Symbol): List[Symbol] = {
+  def fieldSymbols(cls: Symbol): List[Symbol] =
     for (f <- cls.info.decls.toList; if !f.isMethod && f.isTerm &&
              !f.isModule) yield f
-  }
 
   /*
    * can-multi-thread
    */
-  def methodSymbols(cd: ClassDef): List[Symbol] = {
+  def methodSymbols(cd: ClassDef): List[Symbol] =
     cd.impl.body collect { case dd: DefDef => dd.symbol }
-  }
 
   /*
    *  must-single-thread
    */
   def serialVUID(csym: Symbol): Option[Long] =
-    csym getAnnotation definitions.SerialVersionUIDAttr collect {
+    csym getAnnotation definitions.SerialVersionUIDAttr collect
       case AnnotationInfo(_, _, (_, LiteralAnnotArg(const)) :: Nil) =>
         const.longValue
-    }
 
   /*
    * Populates the InnerClasses JVM attribute with `refedInnerClasses`. See also the doc on inner
@@ -521,17 +480,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    * can-multi-thread
    */
   final def addInnerClasses(
-      jclass: asm.ClassVisitor, refedInnerClasses: List[ClassBType]) {
+      jclass: asm.ClassVisitor, refedInnerClasses: List[ClassBType])
     val allNestedClasses =
       refedInnerClasses.flatMap(_.enclosingNestedClassesChain.get).distinct
 
     // sorting ensures nested classes are listed after their enclosing class thus satisfying the Eclipse Java compiler
-    for (nestedClass <- allNestedClasses.sortBy(_.internalName.toString)) {
+    for (nestedClass <- allNestedClasses.sortBy(_.internalName.toString))
       // Extract the innerClassEntry - we know it exists, enclosingNestedClassesChain only returns nested classes.
       val Some(e) = nestedClass.innerClassAttributeEntry.get
       jclass.visitInnerClass(e.name, e.outerName, e.innerName, e.flags)
-    }
-  }
 
   /*
    * Custom attribute (JVMS 4.7.1) "ScalaSig" used as marker only
@@ -545,45 +502,41 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
    * while the "Signature" attribute can be associated to classes, methods, and fields.)
    *
    */
-  trait BCPickles {
+  trait BCPickles
 
     import scala.reflect.internal.pickling.{PickleFormat, PickleBuffer}
 
-    val versionPickle = {
+    val versionPickle =
       val vp = new PickleBuffer(new Array[Byte](16), -1, 0)
       assert(vp.writeIndex == 0, vp)
       vp writeNat PickleFormat.MajorVersion
       vp writeNat PickleFormat.MinorVersion
       vp writeNat 0
       vp
-    }
 
     /*
      * can-multi-thread
      */
     def createJAttribute(
-        name: String, b: Array[Byte], offset: Int, len: Int): asm.Attribute = {
+        name: String, b: Array[Byte], offset: Int, len: Int): asm.Attribute =
       val dest = new Array[Byte](len)
       System.arraycopy(b, offset, dest, 0, len)
       new asm.CustomAttr(name, dest)
-    }
 
     /*
      * can-multi-thread
      */
-    def pickleMarkerLocal = {
+    def pickleMarkerLocal =
       createJAttribute(tpnme.ScalaSignatureATTR.toString,
                        versionPickle.bytes,
                        0,
                        versionPickle.writeIndex)
-    }
 
     /*
      * can-multi-thread
      */
-    def pickleMarkerForeign = {
+    def pickleMarkerForeign =
       createJAttribute(tpnme.ScalaATTR.toString, new Array[Byte](0), 0, 0)
-    }
 
     /*  Returns a ScalaSignature annotation if it must be added to this class, none otherwise.
      *  This annotation must be added to the class' annotations list when generating them.
@@ -607,25 +560,22 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      *  must-single-thread
      */
     def getAnnotPickle(
-        jclassName: String, sym: Symbol): Option[AnnotationInfo] = {
-      currentRun.symData get sym match {
+        jclassName: String, sym: Symbol): Option[AnnotationInfo] =
+      currentRun.symData get sym match
         case Some(pickle) if !nme.isModuleName(newTermName(jclassName)) =>
-          val scalaAnnot = {
+          val scalaAnnot =
             val sigBytes = ScalaSigBytes(pickle.bytes.take(pickle.writeIndex))
             AnnotationInfo(
                 sigBytes.sigAnnot, Nil, (nme.bytes, sigBytes) :: Nil)
-          }
           pickledBytes += pickle.writeIndex
           currentRun.symData -= sym
           currentRun.symData -= sym.companionSymbol
           Some(scalaAnnot)
         case _ =>
           None
-      }
-    }
-  } // end of trait BCPickles
+  // end of trait BCPickles
 
-  trait BCInnerClassGen {
+  trait BCInnerClassGen
 
     def debugLevel = settings.debuginfo.indexOfChoice
 
@@ -636,7 +586,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     /**
       * The class internal name for a given class symbol.
       */
-    final def internalName(sym: Symbol): String = {
+    final def internalName(sym: Symbol): String =
       // For each java class, the scala compiler creates a class and a module (thus a module class).
       // If the `sym` is a java module class, we use the java class instead. This ensures that the
       // ClassBType is created from the main class (instead of the module class).
@@ -646,7 +596,6 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
         if (sym.isJavaDefined && sym.isModuleClass)
           exitingPickler(sym.linkedClassOfClass) else sym
       classBTypeFromSymbol(classSym).internalName
-    }
 
     /**
       * The jvm descriptor of a type.
@@ -658,9 +607,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       */
     final def descriptor(sym: Symbol): String =
       classBTypeFromSymbol(sym).descriptor
-  } // end of trait BCInnerClassGen
+  // end of trait BCInnerClassGen
 
-  trait BCAnnotGen extends BCInnerClassGen {
+  trait BCAnnotGen extends BCInnerClassGen
     private lazy val AnnotationRetentionPolicyModule =
       AnnotationRetentionPolicyAttr.companionModule
     private lazy val AnnotationRetentionPolicySourceValue =
@@ -673,15 +622,14 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     /** Whether an annotation should be emitted as a Java annotation
       * .initialize: if 'annot' is read from pickle, atp might be uninitialized
       */
-    private def shouldEmitAnnotation(annot: AnnotationInfo) = {
+    private def shouldEmitAnnotation(annot: AnnotationInfo) =
       annot.symbol.initialize.isJavaDefined &&
       annot.matches(ClassfileAnnotationClass) &&
       retentionPolicyOf(annot) != AnnotationRetentionPolicySourceValue &&
       annot.args.isEmpty
-    }
 
-    private def isRuntimeVisible(annot: AnnotationInfo): Boolean = {
-      annot.atp.typeSymbol.getAnnotation(AnnotationRetentionAttr) match {
+    private def isRuntimeVisible(annot: AnnotationInfo): Boolean =
+      annot.atp.typeSymbol.getAnnotation(AnnotationRetentionAttr) match
         case Some(retentionAnnot) =>
           retentionAnnot.assocs.contains(nme.value -> LiteralAnnotArg(
                   Constant(AnnotationRetentionPolicyRuntimeValue)))
@@ -689,73 +637,64 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           // SI-8926: if the annotation class symbol doesn't have a @RetentionPolicy annotation, the
           // annotation is emitted with visibility `RUNTIME`
           true
-      }
-    }
 
     private def retentionPolicyOf(annot: AnnotationInfo): Symbol =
       annot.atp.typeSymbol
         .getAnnotation(AnnotationRetentionAttr)
         .map(_.assocs)
         .flatMap(assoc =>
-              assoc.collectFirst {
+              assoc.collectFirst
             case (`nme`.value, LiteralAnnotArg(Constant(value: Symbol))) =>
               value
-        })
+        )
         .getOrElse(AnnotationRetentionPolicyClassValue)
 
-    def ubytesToCharArray(bytes: Array[Byte]): Array[Char] = {
+    def ubytesToCharArray(bytes: Array[Byte]): Array[Char] =
       val ca = new Array[Char](bytes.length)
       var idx = 0
-      while (idx < bytes.length) {
+      while (idx < bytes.length)
         val b: Byte = bytes(idx)
         assert((b & ~0x7f) == 0)
         ca(idx) = b.asInstanceOf[Char]
         idx += 1
-      }
 
       ca
-    }
 
-    final def arrEncode(sb: ScalaSigBytes): Array[String] = {
+    final def arrEncode(sb: ScalaSigBytes): Array[String] =
       var strs: List[String] = Nil
       val bSeven: Array[Byte] = sb.sevenBitsMayBeZero
       // chop into slices of at most 65535 bytes, counting 0x00 as taking two bytes (as per JVMS 4.4.7 The CONSTANT_Utf8_info Structure)
       var prevOffset = 0
       var offset = 0
       var encLength = 0
-      while (offset < bSeven.length) {
+      while (offset < bSeven.length)
         val deltaEncLength = (if (bSeven(offset) == 0) 2 else 1)
         val newEncLength = encLength.toLong + deltaEncLength
-        if (newEncLength >= 65535) {
+        if (newEncLength >= 65535)
           val ba = bSeven.slice(prevOffset, offset)
           strs ::= new java.lang.String(ubytesToCharArray(ba))
           encLength = 0
           prevOffset = offset
-        } else {
+        else
           encLength += deltaEncLength
           offset += 1
-        }
-      }
-      if (prevOffset < offset) {
+      if (prevOffset < offset)
         assert(offset == bSeven.length)
         val ba = bSeven.slice(prevOffset, offset)
         strs ::= new java.lang.String(ubytesToCharArray(ba))
-      }
       assert(strs.size > 1, "encode instead as one String via strEncode()") // TODO too strict?
       strs.reverse.toArray
-    }
 
     /*
      *  can-multi-thread
      */
-    private def strEncode(sb: ScalaSigBytes): String = {
+    private def strEncode(sb: ScalaSigBytes): String =
       val ca = ubytesToCharArray(sb.sevenBitsMayBeZero)
       new java.lang.String(ca)
       // debug val bvA = new asm.ByteVector; bvA.putUTF8(s)
       // debug val enc: Array[Byte] = scala.reflect.internal.pickling.ByteCodecs.encode(bytes)
       // debug assert(enc(idx) == bvA.getByte(idx + 2))
       // debug assert(bvA.getLength == enc.size + 2)
-    }
 
     /*
      * For arg a LiteralAnnotArg(constt) with const.tag in {ClazzTag, EnumTag}
@@ -765,12 +704,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def emitArgument(av: asm.AnnotationVisitor,
                      name: String,
-                     arg: ClassfileAnnotArg) {
-      (arg: @unchecked) match {
+                     arg: ClassfileAnnotArg)
+      (arg: @unchecked) match
 
         case LiteralAnnotArg(const) =>
-          if (const.isNonUnitAnyVal) { av.visit(name, const.value) } else {
-            const.tag match {
+          if (const.isNonUnitAnyVal) { av.visit(name, const.value) } else
+            const.tag match
               case StringTag =>
                 assert(const.value != null, const) // TODO this invariant isn't documented in `case class Constant`
                 av.visit(name, const.stringValue) // `stringValue` special-cases null, but that execution path isn't exercised for a const with StringTag
@@ -782,19 +721,17 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                 val evalue =
                   const.symbolValue.name.toString // value the actual enumeration value.
                 av.visitEnum(name, edesc, evalue)
-            }
-          }
 
         case sb @ ScalaSigBytes(bytes) =>
           // see http://www.scala-lang.org/sid/10 (Storage of pickled Scala signatures in class files)
           // also JVMS Sec. 4.7.16.1 The element_value structure and JVMS Sec. 4.4.7 The CONSTANT_Utf8_info Structure.
-          if (sb.fitsInOneString) {
+          if (sb.fitsInOneString)
             av.visit(name, strEncode(sb))
-          } else {
+          else
             val arrAnnotV: asm.AnnotationVisitor = av.visitArray(name)
             for (arg <- arrEncode(sb)) { arrAnnotV.visit(name, arg) }
             arrAnnotV.visitEnd()
-          } // for the lazy val in ScalaSigBytes to be GC'ed, the invoker of emitAnnotations() should hold the ScalaSigBytes in a method-local var that doesn't escape.
+          // for the lazy val in ScalaSigBytes to be GC'ed, the invoker of emitAnnotations() should hold the ScalaSigBytes in a method-local var that doesn't escape.
 
         case ArrayAnnotArg(args) =>
           val arrAnnotV: asm.AnnotationVisitor = av.visitArray(name)
@@ -808,8 +745,6 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
             descriptor(typ) // the class descriptor of the nested annotation class
           val nestedVisitor = av.visitAnnotation(name, desc)
           emitAssocs(nestedVisitor, assocs)
-      }
-    }
 
     /*
      * In general,
@@ -817,83 +752,71 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      * but not  necessarily always.
      */
     def emitAssocs(
-        av: asm.AnnotationVisitor, assocs: List[(Name, ClassfileAnnotArg)]) {
-      for ((name, value) <- assocs) {
+        av: asm.AnnotationVisitor, assocs: List[(Name, ClassfileAnnotArg)])
+      for ((name, value) <- assocs)
         emitArgument(av, name.toString(), value)
-      }
       av.visitEnd()
-    }
 
     /*
      * must-single-thread
      */
     def emitAnnotations(
-        cw: asm.ClassVisitor, annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+        cw: asm.ClassVisitor, annotations: List[AnnotationInfo])
+      for (annot <- annotations; if shouldEmitAnnotation(annot))
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = cw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
         emitAssocs(av, assocs)
-      }
-    }
 
     /*
      * must-single-thread
      */
     def emitAnnotations(
-        mw: asm.MethodVisitor, annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+        mw: asm.MethodVisitor, annotations: List[AnnotationInfo])
+      for (annot <- annotations; if shouldEmitAnnotation(annot))
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = mw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
         emitAssocs(av, assocs)
-      }
-    }
 
     /*
      * must-single-thread
      */
     def emitAnnotations(
-        fw: asm.FieldVisitor, annotations: List[AnnotationInfo]) {
-      for (annot <- annotations; if shouldEmitAnnotation(annot)) {
+        fw: asm.FieldVisitor, annotations: List[AnnotationInfo])
+      for (annot <- annotations; if shouldEmitAnnotation(annot))
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val av = fw.visitAnnotation(descriptor(typ), isRuntimeVisible(annot))
         emitAssocs(av, assocs)
-      }
-    }
 
     /*
      * must-single-thread
      */
     def emitParamAnnotations(
-        jmethod: asm.MethodVisitor, pannotss: List[List[AnnotationInfo]]) {
+        jmethod: asm.MethodVisitor, pannotss: List[List[AnnotationInfo]])
       val annotationss = pannotss map (_ filter shouldEmitAnnotation)
       if (annotationss forall (_.isEmpty)) return
       for ((annots, idx) <- annotationss.zipWithIndex;
-      annot <- annots) {
+      annot <- annots)
         val AnnotationInfo(typ, args, assocs) = annot
         assert(args.isEmpty, args)
         val pannVisitor: asm.AnnotationVisitor =
           jmethod.visitParameterAnnotation(
               idx, descriptor(typ), isRuntimeVisible(annot))
         emitAssocs(pannVisitor, assocs)
-      }
-    }
 
     /*
      * must-single-thread
      */
-    def emitParamNames(jmethod: asm.MethodVisitor, params: List[Symbol]) = {
-      for (param <- params) {
+    def emitParamNames(jmethod: asm.MethodVisitor, params: List[Symbol]) =
+      for (param <- params)
         var access = asm.Opcodes.ACC_FINAL
         if (param.isArtifact) access |= asm.Opcodes.ACC_SYNTHETIC
         jmethod.visitParameter(param.name.decoded, access)
-      }
-    }
-  } // end of trait BCAnnotGen
+  // end of trait BCAnnotGen
 
-  trait BCJGenSigGen {
+  trait BCJGenSigGen
 
     // @M don't generate java generics sigs for (members of) implementation
     // classes, as they are monomorphic (TODO: ok?)
@@ -913,13 +836,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      *
      * must-single-thread
      */
-    def getGenericSignature(sym: Symbol, owner: Symbol): String = {
+    def getGenericSignature(sym: Symbol, owner: Symbol): String =
       val memberTpe = enteringErasure(owner.thisType.memberInfo(sym))
       getGenericSignature(sym, owner, memberTpe)
-    }
 
     def getGenericSignature(
-        sym: Symbol, owner: Symbol, memberTpe: Type): String = {
+        sym: Symbol, owner: Symbol, memberTpe: Type): String =
       if (!needsGenericSignature(sym)) { return null }
 
       val jsOpt: Option[String] = erasure.javaSig(sym, memberTpe)
@@ -928,22 +850,19 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       val sig = jsOpt.get
       log(sig) // This seems useful enough in the general case.
 
-      def wrap(op: => Unit) = {
+      def wrap(op: => Unit) =
         try { op; true } catch { case _: Throwable => false }
-      }
 
-      if (settings.Xverify) {
+      if (settings.Xverify)
         // Run the signature parser to catch bogus signatures.
-        val isValidSignature = wrap {
+        val isValidSignature = wrap
           // Alternative: scala.tools.reflect.SigParser (frontend to sun.reflect.generics.parser.SignatureParser)
           import scala.tools.asm.util.CheckClassAdapter
           if (sym.isMethod) { CheckClassAdapter checkMethodSignature sig } // requires asm-util.jar
-          else if (sym.isTerm) { CheckClassAdapter checkFieldSignature sig } else {
+          else if (sym.isTerm) { CheckClassAdapter checkFieldSignature sig } else
             CheckClassAdapter checkClassSignature sig
-          }
-        }
 
-        if (!isValidSignature) {
+        if (!isValidSignature)
           reporter.warning(
               sym.pos,
               """|compiler bug: created invalid generic signature for %s in %s
@@ -952,14 +871,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
               """.trim.stripMargin
                 .format(sym, sym.owner.skipPackageObject.fullName, sig))
           return null
-        }
-      }
 
-      if ((settings.check containsName phaseName)) {
+      if ((settings.check containsName phaseName))
         val normalizedTpe = enteringErasure(erasure.prepareSigMap(memberTpe))
         val bytecodeTpe = owner.thisType.memberInfo(sym)
         if (!sym.isType && !sym.isConstructor &&
-            !(erasure.erasure(sym)(normalizedTpe) =:= bytecodeTpe)) {
+            !(erasure.erasure(sym)(normalizedTpe) =:= bytecodeTpe))
           reporter.warning(
               sym.pos,
               """|compiler bug: created generic signature for %s in %s that does not conform to its erasure
@@ -975,14 +892,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                                           normalizedTpe,
                                           bytecodeTpe))
           return null
-        }
-      }
 
       sig
-    }
-  } // end of trait BCJGenSigGen
+  // end of trait BCJGenSigGen
 
-  trait BCForwardersGen extends BCAnnotGen with BCJGenSigGen {
+  trait BCForwardersGen extends BCAnnotGen with BCJGenSigGen
 
     /* Adds a @remote annotation, actual use unknown.
      *
@@ -991,22 +905,18 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      * must-single-thread
      */
     def addRemoteExceptionAnnot(
-        isRemoteClass: Boolean, isJMethodPublic: Boolean, meth: Symbol) {
-      def hasThrowsRemoteException = meth.annotations.exists {
+        isRemoteClass: Boolean, isJMethodPublic: Boolean, meth: Symbol)
+      def hasThrowsRemoteException = meth.annotations.exists
         case ThrownException(exc) =>
           exc.typeSymbol == definitions.RemoteExceptionClass
         case _ => false
-      }
-      val needsAnnotation = {
+      val needsAnnotation =
         (isRemoteClass || isRemote(meth) && isJMethodPublic) &&
         !hasThrowsRemoteException
-      }
-      if (needsAnnotation) {
+      if (needsAnnotation)
         val c = Constant(definitions.RemoteExceptionClass.tpe)
         val arg = Literal(c) setType c.tpe
         meth.addAnnotation(appliedType(definitions.ThrowsClass, c.tpe), arg)
-      }
-    }
 
     /* Add a forwarder for method m. Used only from addForwarders().
      *
@@ -1015,12 +925,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     private def addForwarder(isRemoteClass: Boolean,
                              jclass: asm.ClassVisitor,
                              module: Symbol,
-                             m: Symbol): Unit = {
+                             m: Symbol): Unit =
       def staticForwarderGenericSignature(
-          sym: Symbol, moduleClass: Symbol): String = {
+          sym: Symbol, moduleClass: Symbol): String =
         if (sym.isDeferred)
           null // only add generic signature if method concrete; bug #1745
-        else {
+        else
           // SI-3452 Static forwarder generation uses the same erased signature as the method if forwards to.
           // By rights, it should use the signature as-seen-from the module class, and add suitable
           // primitive and value-class boxing/unboxing.
@@ -1031,8 +941,6 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           if (erasedMemberType =:= sym.info)
             getGenericSignature(sym, moduleClass, memberTpe)
           else null
-        }
-      }
 
       val moduleName = internalName(module)
       val methodInfo = module.thisType.memberInfo(m)
@@ -1078,12 +986,11 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
                                   descriptor(module))
 
       var index = 0
-      for (jparamType <- paramJavaTypes) {
+      for (jparamType <- paramJavaTypes)
         mirrorMethod.visitVarInsn(
             jparamType.typedOpcode(asm.Opcodes.ILOAD), index)
         assert(!jparamType.isInstanceOf[MethodBType], jparamType)
         index += jparamType.size
-      }
 
       mirrorMethod.visitMethodInsn(asm.Opcodes.INVOKEVIRTUAL,
                                    moduleName,
@@ -1094,7 +1001,6 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       mirrorMethod.visitMaxs(0, 0) // just to follow protocol, dummy arguments
       mirrorMethod.visitEnd()
-    }
 
     /* Add forwarders for all methods defined in `module` that don't conflict
      *  with methods in the companion class of `module`. A conflict arises when
@@ -1106,37 +1012,33 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     def addForwarders(isRemoteClass: Boolean,
                       jclass: asm.ClassVisitor,
                       jclassName: String,
-                      moduleClass: Symbol) {
+                      moduleClass: Symbol)
       assert(moduleClass.isModuleClass, moduleClass)
       debuglog(s"Dumping mirror class for object: $moduleClass")
 
       val linkedClass = moduleClass.companionClass
-      lazy val conflictingNames: Set[Name] = {
-        (linkedClass.info.members collect {
+      lazy val conflictingNames: Set[Name] =
+        (linkedClass.info.members collect
               case sym if sym.name.isTermName => sym.name
-            }).toSet
-      }
+            ).toSet
       debuglog(
           s"Potentially conflicting names for forwarders: $conflictingNames")
 
       for (m <- moduleClass.info.membersBasedOnFlags(
-          BCodeHelpers.ExcludedForwarderFlags, symtab.Flags.METHOD)) {
+          BCodeHelpers.ExcludedForwarderFlags, symtab.Flags.METHOD))
         if (m.isType || m.isDeferred || (m.owner eq definitions.ObjectClass) ||
             m.isConstructor)
           debuglog(
               s"No forwarder for '$m' from $jclassName to '$moduleClass': ${m.isType} || ${m.isDeferred} || ${m.owner eq definitions.ObjectClass} || ${m.isConstructor}")
         else if (conflictingNames(m.name))
           log(
-              s"No forwarder for $m due to conflict with ${linkedClass.info
-            .member(m.name)}")
+              s"No forwarder for $m due to conflict with $linkedClass.info
+            .member(m.name)")
         else if (m.hasAccessBoundary)
           log(s"No forwarder for non-public member $m")
-        else {
+        else
           log(s"Adding static forwarder for '$m' from $jclassName to '$moduleClass'")
           addForwarder(isRemoteClass, jclass, moduleClass, m)
-        }
-      }
-    }
 
     /*
      * Quoting from JVMS 4.7.5 The Exceptions Attribute
@@ -1148,15 +1050,13 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      *
      * must-single-thread
      */
-    def getExceptions(excs: List[AnnotationInfo]): List[String] = {
-      for (ThrownException(tp) <- excs.distinct) yield {
+    def getExceptions(excs: List[AnnotationInfo]): List[String] =
+      for (ThrownException(tp) <- excs.distinct) yield
         val erased = enteringErasure(erasure.erasure(tp.typeSymbol)(tp))
         internalName(erased.typeSymbol)
-      }
-    }
-  } // end of trait BCForwardersGen
+  // end of trait BCForwardersGen
 
-  trait BCClassGen extends BCInnerClassGen {
+  trait BCClassGen extends BCInnerClassGen
 
     // Used as threshold above which a tableswitch bytecode instruction is preferred over a lookupswitch.
     // There's a space tradeoff between these multi-branch instructions (details in the JVM spec).
@@ -1168,7 +1068,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      *
      *  can-multi-thread
      */
-    def addSerialVUID(id: Long, jclass: asm.ClassVisitor) {
+    def addSerialVUID(id: Long, jclass: asm.ClassVisitor)
       // add static serialVersionUID field if `clasz` annotated with `@SerialVersionUID(uid: Long)`
       jclass
         .visitField(
@@ -1179,8 +1079,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
             new java.lang.Long(id)
         )
         .visitEnd()
-    }
-  } // end of trait BCClassGen
+  // end of trait BCClassGen
 
   /* functionality for building plain and mirror classes */
   abstract class JCommonBuilder
@@ -1188,7 +1087,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       with BCPickles {}
 
   /* builder of mirror classes */
-  class JMirrorBuilder extends JCommonBuilder {
+  class JMirrorBuilder extends JCommonBuilder
 
     /* Generate a mirror class for a top-level module. A mirror class is a class
      *  containing only static methods that forward to the corresponding method
@@ -1199,7 +1098,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      *  must-single-thread
      */
     def genMirrorClass(
-        moduleClass: Symbol, cunit: CompilationUnit): asm.tree.ClassNode = {
+        moduleClass: Symbol, cunit: CompilationUnit): asm.tree.ClassNode =
       assert(moduleClass.isModuleClass)
       assert(moduleClass.companionClass == NoSymbol, moduleClass)
 
@@ -1231,11 +1130,10 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       ("" + moduleClass.name) // this side-effect is necessary, really.
 
       mirrorClass
-    }
-  } // end of class JMirrorBuilder
+  // end of class JMirrorBuilder
 
   /* builder of bean info classes */
-  class JBeanInfoBuilder extends BCInnerClassGen {
+  class JBeanInfoBuilder extends BCInnerClassGen
 
     /*
      * Generate a bean info class that describes the given class.
@@ -1247,7 +1145,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
     def genBeanInfoClass(cls: Symbol,
                          cunit: CompilationUnit,
                          fieldSymbols: List[Symbol],
-                         methodSymbols: List[Symbol]): asm.tree.ClassNode = {
+                         methodSymbols: List[Symbol]): asm.tree.ClassNode =
 
       def javaSimpleName(s: Symbol): String = { s.javaSimpleName.toString }
 
@@ -1272,13 +1170,12 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
 
       for (f <- fieldSymbols if f.hasGetter;
       g = f.getterIn(cls);
-      s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$")) {
+      s = f.setterIn(cls); if g.isPublic && !(f.name startsWith "$"))
         // inserting $outer breaks the bean
         fieldList = javaSimpleName(f) :: javaSimpleName(g) :: (if (s != NoSymbol)
                                                                  javaSimpleName(
                                                                      s)
                                                                else null) :: fieldList
-      }
 
       val methodList: List[String] =
         for (m <- methodSymbols if !m.isConstructor && m.isPublic &&
@@ -1299,18 +1196,15 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           UNIT
       )
 
-      def push(lst: List[String]) {
+      def push(lst: List[String])
         var fi = 0
-        for (f <- lst) {
+        for (f <- lst)
           constructor.visitInsn(asm.Opcodes.DUP)
           constructor.visitLdcInsn(new java.lang.Integer(fi))
-          if (f == null) { constructor.visitInsn(asm.Opcodes.ACONST_NULL) } else {
+          if (f == null) { constructor.visitInsn(asm.Opcodes.ACONST_NULL) } else
             constructor.visitLdcInsn(f)
-          }
           constructor.visitInsn(StringRef.typedOpcode(asm.Opcodes.IASTORE))
           fi += 1
-        }
-      }
 
       constructor.visitCode()
 
@@ -1343,10 +1237,9 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
       beanInfoClass.visitEnd()
 
       beanInfoClass
-    }
-  } // end of class JBeanInfoBuilder
+  // end of class JBeanInfoBuilder
 
-  trait JAndroidBuilder { self: BCInnerClassGen =>
+  trait JAndroidBuilder  self: BCInnerClassGen =>
 
     /* From the reference documentation of the Android SDK:
      *  The `Parcelable` interface identifies classes whose instances can be written to and restored from a `Parcel`.
@@ -1367,7 +1260,7 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
      */
     def legacyAddCreatorCode(clinit: asm.MethodVisitor,
                              cnode: asm.tree.ClassNode,
-                             thisName: String) {
+                             thisName: String)
       val androidCreatorType = classBTypeFromSymbol(AndroidCreatorClass)
       val tdesc_creator = androidCreatorType.descriptor
 
@@ -1408,49 +1301,42 @@ abstract class BCodeHelpers extends BCodeIdiomatic with BytecodeWriters {
           "CREATOR",
           tdesc_creator
       )
-    }
-  } // end of trait JAndroidBuilder
-}
+  // end of trait JAndroidBuilder
 
-object BCodeHelpers {
-  val ExcludedForwarderFlags = {
+object BCodeHelpers
+  val ExcludedForwarderFlags =
     import scala.tools.nsc.symtab.Flags._
     // Should include DEFERRED but this breaks findMember.
     SPECIALIZED | LIFTED | PROTECTED | STATIC | EXPANDEDNAME | BridgeAndPrivateFlags | MACRO
-  }
 
   /**
     * Valid flags for InnerClass attribute entry.
     * See http://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html#jvms-4.7.6
     */
-  val INNER_CLASSES_FLAGS = {
+  val INNER_CLASSES_FLAGS =
     asm.Opcodes.ACC_PUBLIC | asm.Opcodes.ACC_PRIVATE | asm.Opcodes.ACC_PROTECTED | asm.Opcodes.ACC_STATIC | asm.Opcodes.ACC_FINAL | asm.Opcodes.ACC_INTERFACE | asm.Opcodes.ACC_ABSTRACT | asm.Opcodes.ACC_SYNTHETIC | asm.Opcodes.ACC_ANNOTATION | asm.Opcodes.ACC_ENUM
-  }
 
-  class TestOp(val op: Int) extends AnyVal {
+  class TestOp(val op: Int) extends AnyVal
     import TestOp._
-    def negate = this match {
+    def negate = this match
       case EQ => NE
       case NE => EQ
       case LT => GE
       case GE => LT
       case GT => LE
       case LE => GT
-    }
     def opcodeIF = asm.Opcodes.IFEQ + op
     def opcodeIFICMP = asm.Opcodes.IF_ICMPEQ + op
-  }
 
-  object TestOp {
+  object TestOp
     val EQ = new TestOp(0)
     val NE = new TestOp(1)
     val LT = new TestOp(2)
     val GE = new TestOp(3)
     val GT = new TestOp(4)
     val LE = new TestOp(5)
-  }
 
-  class InvokeStyle(val style: Int) extends AnyVal {
+  class InvokeStyle(val style: Int) extends AnyVal
     import InvokeStyle._
     def isVirtual: Boolean = this == Virtual
     def isStatic: Boolean = this == Static
@@ -1458,13 +1344,10 @@ object BCodeHelpers {
     def isSuper: Boolean = this == Super
 
     def hasInstance = this != Static
-  }
 
-  object InvokeStyle {
+  object InvokeStyle
     val Virtual = new InvokeStyle(0) // InvokeVirtual or InvokeInterface
     val Static = new InvokeStyle(1) // InvokeStatic
     val Special =
       new InvokeStyle(2) // InvokeSpecial (private methods, constructors)
     val Super = new InvokeStyle(3) // InvokeSpecial (super calls)
-  }
-}

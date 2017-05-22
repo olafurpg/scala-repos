@@ -16,19 +16,17 @@ import akka.cluster.metrics.MetricsGossipEnvelope
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class MessageSerializerSpec
     extends AkkaSpec(
-        "akka.actor.provider = akka.cluster.ClusterActorRefProvider") {
+        "akka.actor.provider = akka.cluster.ClusterActorRefProvider")
 
   val serializer = new MessageSerializer(
       system.asInstanceOf[ExtendedActorSystem])
 
-  def checkSerialization(obj: AnyRef): Unit = {
+  def checkSerialization(obj: AnyRef): Unit =
     val blob = serializer.toBinary(obj)
     val ref = serializer.fromBinary(blob, serializer.manifest(obj))
-    obj match {
+    obj match
       case _ ⇒
         ref should ===(obj)
-    }
-  }
 
   import MemberStatus._
 
@@ -43,9 +41,9 @@ class MessageSerializerSpec
   val f1 = TestMember(
       Address("akka.tcp", "sys", "f", 2552), Removed, Set("r2", "r3"))
 
-  "ClusterMessages" must {
+  "ClusterMessages" must
 
-    "be serializable" in {
+    "be serializable" in
 
       val metricsGossip = MetricsGossip(
           Set(NodeMetrics(a1.address, 4711, Set(Metric("foo", 1.2, None))),
@@ -62,6 +60,3 @@ class MessageSerializerSpec
 
       checkSerialization(
           MetricsGossipEnvelope(a1.address, metricsGossip, true))
-    }
-  }
-}

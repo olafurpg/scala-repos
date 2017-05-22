@@ -49,7 +49,7 @@ import scalafx.util.StringConverter
   * @define FTVRET A Function that will return a TreeCell that is able to work on the type of element contained within the
   *         TreeView root, and all of its children (recursively).
   */
-object CheckBoxTreeCell {
+object CheckBoxTreeCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -64,17 +64,15 @@ object CheckBoxTreeCell {
       selectedProperty: TreeItem[T] => ObservableValue[
           Boolean, java.lang.Boolean])
     : jfxu.Callback[jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]] =
-    new jfxu.Callback[jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]] {
+    new jfxu.Callback[jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]]
       def call(x: jfxsc.TreeItem[T]) = selectedProperty(x)
-    }
 
   private[cell] implicit def sfxStringConverterTreeItem2jfxConverter[T](
       converter: StringConverter[TreeItem[T]])
     : jfxu.StringConverter[jfxsc.TreeItem[T]] =
-    new jfxu.StringConverter[jfxsc.TreeItem[T]] {
+    new jfxu.StringConverter[jfxsc.TreeItem[T]]
       def fromString(str: String) = converter.fromString(str)
       def toString(item: jfxsc.TreeItem[T]) = converter.toString(item)
-    }
 
   /**
     * Creates a cell factory for use in a TreeView control, although there is a major assumption when used in a
@@ -138,7 +136,6 @@ object CheckBoxTreeCell {
                          jfxsc.TreeItem[T], jfxbv.ObservableValue[JBoolean]],
                      converter: jfxu.StringConverter[jfxsc.TreeItem[T]]) =
     jfxscc.CheckBoxTreeCell.forTreeView[T](getSelectedProperty, converter)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxListCell.html $CBTC]]
@@ -158,7 +155,7 @@ class CheckBoxTreeCell[T](
     with ConvertableCell[jfxscc.CheckBoxTreeCell[T], T, jfxsc.TreeItem[T]]
     with StateSelectableCell[jfxscc.CheckBoxTreeCell[T], T, jfxsc.TreeItem[T]]
     with UpdatableCell[jfxscc.CheckBoxTreeCell[T], T]
-    with SFXDelegate[jfxscc.CheckBoxTreeCell[T]] {
+    with SFXDelegate[jfxscc.CheckBoxTreeCell[T]]
 
   /**
     * Creates a $CBTC for use in a TreeView control via a cell factory.
@@ -179,4 +176,3 @@ class CheckBoxTreeCell[T](
   def this(selectedProperty: TreeItem[T] => ObservableValue[Boolean, JBoolean],
            converter: StringConverter[TreeItem[T]]) =
     this(new jfxscc.CheckBoxTreeCell[T](selectedProperty, converter))
-}

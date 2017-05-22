@@ -57,7 +57,7 @@ import org.apache.spark.storage.StorageLevel
   */
 private[mllib] abstract class PeriodicCheckpointer[T](
     val checkpointInterval: Int, val sc: SparkContext)
-    extends Logging {
+    extends Logging
 
   /** FIFO queue of past checkpointed Datasets */
   private val checkpointQueue = mutable.Queue[T]()
@@ -75,36 +75,31 @@ private[mllib] abstract class PeriodicCheckpointer[T](
     *
     * @param newData  New Dataset created from previous Datasets in the lineage.
     */
-  def update(newData: T): Unit = {
+  def update(newData: T): Unit =
     persist(newData)
     persistedQueue.enqueue(newData)
     // We try to maintain 2 Datasets in persistedQueue to support the semantics of this class:
     // Users should call [[update()]] when a new Dataset has been created,
     // before the Dataset has been materialized.
-    while (persistedQueue.size > 3) {
+    while (persistedQueue.size > 3)
       val dataToUnpersist = persistedQueue.dequeue()
       unpersist(dataToUnpersist)
-    }
     updateCount += 1
 
     // Handle checkpointing (after persisting)
     if ((updateCount % checkpointInterval) == 0 &&
-        sc.getCheckpointDir.nonEmpty) {
+        sc.getCheckpointDir.nonEmpty)
       // Add new checkpoint before removing old checkpoints.
       checkpoint(newData)
       checkpointQueue.enqueue(newData)
       // Remove checkpoints before the latest one.
       var canDelete = true
-      while (checkpointQueue.size > 1 && canDelete) {
+      while (checkpointQueue.size > 1 && canDelete)
         // Delete the oldest checkpoint only if the next checkpoint exists.
-        if (isCheckpointed(checkpointQueue.head)) {
+        if (isCheckpointed(checkpointQueue.head))
           removeCheckpointFile()
-        } else {
+        else
           canDelete = false
-        }
-      }
-    }
-  }
 
   /** Checkpoint the Dataset */
   protected def checkpoint(data: T): Unit
@@ -127,29 +122,23 @@ private[mllib] abstract class PeriodicCheckpointer[T](
   /**
     * Call this at the end to delete any remaining checkpoint files.
     */
-  def deleteAllCheckpoints(): Unit = {
-    while (checkpointQueue.nonEmpty) {
+  def deleteAllCheckpoints(): Unit =
+    while (checkpointQueue.nonEmpty)
       removeCheckpointFile()
-    }
-  }
 
   /**
     * Dequeue the oldest checkpointed Dataset, and remove its checkpoint files.
     * This prints a warning but does not fail if the files cannot be removed.
     */
-  private def removeCheckpointFile(): Unit = {
+  private def removeCheckpointFile(): Unit =
     val old = checkpointQueue.dequeue()
     // Since the old checkpoint is not deleted by Spark, we manually delete it.
     val fs = FileSystem.get(sc.hadoopConfiguration)
-    getCheckpointFiles(old).foreach { checkpointFile =>
-      try {
+    getCheckpointFiles(old).foreach  checkpointFile =>
+      try
         fs.delete(new Path(checkpointFile), true)
-      } catch {
+      catch
         case e: Exception =>
           logWarning(
               "PeriodicCheckpointer could not remove old checkpoint file: " +
               checkpointFile)
-      }
-    }
-  }
-}

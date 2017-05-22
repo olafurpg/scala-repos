@@ -21,7 +21,7 @@ class RepositorySettingsController
     with AccountService with WebHookService with ProtectedBranchService
     with CommitStatusService with OwnerAuthenticator with UsersAuthenticator
 
-trait RepositorySettingsControllerBase extends ControllerBase {
+trait RepositorySettingsControllerBase extends ControllerBase
   self: RepositoryService with AccountService with WebHookService with ProtectedBranchService with CommitStatusService with OwnerAuthenticator with UsersAuthenticator =>
 
   // for repository options
@@ -74,92 +74,87 @@ trait RepositorySettingsControllerBase extends ControllerBase {
   /**
     * Redirect to the Options page.
     */
-  get("/:owner/:repository/settings")(ownerOnly { repository =>
+  get("/:owner/:repository/settings")(ownerOnly  repository =>
     redirect(s"/${repository.owner}/${repository.name}/settings/options")
-  })
+  )
 
   /**
     * Display the Options page.
     */
-  get("/:owner/:repository/settings/options")(ownerOnly {
+  get("/:owner/:repository/settings/options")(ownerOnly
     html.options(_, flash.get("info"))
-  })
+  )
 
   /**
     * Save the repository options.
     */
-  post("/:owner/:repository/settings/options", optionsForm)(ownerOnly {
+  post("/:owner/:repository/settings/options", optionsForm)(ownerOnly
     (form, repository) =>
       saveRepositoryOptions(
           repository.owner,
           repository.name,
           form.description,
-          repository.repository.parentUserName.map { _ =>
+          repository.repository.parentUserName.map  _ =>
             repository.repository.isPrivate
-          } getOrElse form.isPrivate
+          getOrElse form.isPrivate
       )
       // Change repository name
-      if (repository.name != form.repositoryName) {
+      if (repository.name != form.repositoryName)
         // Update database
         renameRepository(repository.owner,
                          repository.name,
                          repository.owner,
                          form.repositoryName)
         // Move git repository
-        defining(getRepositoryDir(repository.owner, repository.name)) { dir =>
+        defining(getRepositoryDir(repository.owner, repository.name))  dir =>
           FileUtils.moveDirectory(
               dir, getRepositoryDir(repository.owner, form.repositoryName))
-        }
         // Move wiki repository
-        defining(getWikiRepositoryDir(repository.owner, repository.name)) {
+        defining(getWikiRepositoryDir(repository.owner, repository.name))
           dir =>
             FileUtils.moveDirectory(dir,
                                     getWikiRepositoryDir(repository.owner,
                                                          form.repositoryName))
-        }
-      }
       flash += "info" -> "Repository settings has been updated."
       redirect(s"/${repository.owner}/${form.repositoryName}/settings/options")
-  })
+  )
 
   /** branch settings */
   get("/:owner/:repository/settings/branches")(
-      ownerOnly { repository =>
+      ownerOnly  repository =>
     val protecteions =
       getProtectedBranchList(repository.owner, repository.name)
     html.branches(repository, protecteions, flash.get("info"))
-  });
+  );
 
   /** Update default branch */
   post(
       "/:owner/:repository/settings/update_default_branch", defaultBranchForm)(
-      ownerOnly {
+      ownerOnly
     (form, repository) =>
-      if (repository.branchList.find(_ == form.defaultBranch).isEmpty) {
+      if (repository.branchList.find(_ == form.defaultBranch).isEmpty)
         redirect(s"/${repository.owner}/${repository.name}/settings/options")
-      } else {
+      else
         saveRepositoryDefaultBranch(
             repository.owner, repository.name, form.defaultBranch)
         // Change repository HEAD
-        using(Git.open(getRepositoryDir(repository.owner, repository.name))) {
+        using(Git.open(getRepositoryDir(repository.owner, repository.name)))
           git =>
             git.getRepository
               .updateRef(Constants.HEAD, true)
               .link(Constants.R_HEADS + form.defaultBranch)
-        }
         flash += "info" -> "Repository default branch has been updated."
         redirect(s"/${repository.owner}/${repository.name}/settings/branches")
-      }
-  })
+  )
 
   /** Branch protection for branch */
-  get("/:owner/:repository/settings/branches/:branch")(ownerOnly {
+  get("/:owner/:repository/settings/branches/:branch")(ownerOnly
     repository =>
       import gitbucket.core.api._
       val branch = params("branch")
-      if (repository.branchList.find(_ == branch).isEmpty) {
+      if (repository.branchList.find(_ == branch).isEmpty)
         redirect(s"/${repository.owner}/${repository.name}/settings/branches")
-      } else {
+      else
         val protection = ApiBranchProtection(
             getProtectedBranchInfo(repository.owner, repository.name, branch))
         val lastWeeks = getRecentStatuesContexts(
@@ -170,93 +165,89 @@ trait RepositorySettingsControllerBase extends ControllerBase {
           (lastWeeks ++ protection.status.contexts).toSeq.sortBy(identity)
         html.branchprotection(
             repository, branch, protection, knownContexts, flash.get("info"))
-      }
-  })
+  )
 
   /**
     * Display the Collaborators page.
     */
   get("/:owner/:repository/settings/collaborators")(
-      ownerOnly { repository =>
+      ownerOnly  repository =>
     html.collaborators(
         getCollaborators(repository.owner, repository.name),
         getAccountByUserName(repository.owner).get.isGroupAccount,
         repository)
-  })
+  )
 
   /**
     * Add the collaborator.
     */
   post("/:owner/:repository/settings/collaborators/add", collaboratorForm)(
-      ownerOnly { (form, repository) =>
-    if (!getAccountByUserName(repository.owner).get.isGroupAccount) {
+      ownerOnly  (form, repository) =>
+    if (!getAccountByUserName(repository.owner).get.isGroupAccount)
       addCollaborator(repository.owner, repository.name, form.userName)
-    }
     redirect(s"/${repository.owner}/${repository.name}/settings/collaborators")
-  })
+  )
 
   /**
     * Add the collaborator.
     */
   get("/:owner/:repository/settings/collaborators/remove")(
-      ownerOnly { repository =>
-    if (!getAccountByUserName(repository.owner).get.isGroupAccount) {
+      ownerOnly  repository =>
+    if (!getAccountByUserName(repository.owner).get.isGroupAccount)
       removeCollaborator(repository.owner, repository.name, params("name"))
-    }
     redirect(s"/${repository.owner}/${repository.name}/settings/collaborators")
-  })
+  )
 
   /**
     * Display the web hook page.
     */
   get("/:owner/:repository/settings/hooks")(
-      ownerOnly { repository =>
+      ownerOnly  repository =>
     html.hooks(getWebHooks(repository.owner, repository.name),
                repository,
                flash.get("info"))
-  })
+  )
 
   /**
     * Display the web hook edit page.
     */
   get("/:owner/:repository/settings/hooks/new")(
-      ownerOnly { repository =>
+      ownerOnly  repository =>
     val webhook = WebHook(repository.owner, repository.name, "", None)
     html.edithooks(
         webhook, Set(WebHook.Push), repository, flash.get("info"), true)
-  })
+  )
 
   /**
     * Add the web hook URL.
     */
   post("/:owner/:repository/settings/hooks/new", webHookForm(false))(
-      ownerOnly { (form, repository) =>
+      ownerOnly  (form, repository) =>
     addWebHook(
         repository.owner, repository.name, form.url, form.events, form.token)
     flash += "info" -> s"Webhook ${form.url} created"
     redirect(s"/${repository.owner}/${repository.name}/settings/hooks")
-  })
+  )
 
   /**
     * Delete the web hook URL.
     */
   get("/:owner/:repository/settings/hooks/delete")(
-      ownerOnly { repository =>
+      ownerOnly  repository =>
     deleteWebHook(repository.owner, repository.name, params("url"))
     flash += "info" -> s"Webhook ${params("url")} deleted"
     redirect(s"/${repository.owner}/${repository.name}/settings/hooks")
-  })
+  )
 
   /**
     * Send the test request to registered web hook URLs.
     */
-  ajaxPost("/:owner/:repository/settings/hooks/test")(ownerOnly { repository =>
+  ajaxPost("/:owner/:repository/settings/hooks/test")(ownerOnly  repository =>
     def _headers(h: Array[org.apache.http.Header]): Array[Array[String]] =
-      h.map { h =>
+      h.map  h =>
         Array(h.getName, h.getValue)
-      }
 
-    using(Git.open(getRepositoryDir(repository.owner, repository.name))) { git =>
+    using(Git.open(getRepositoryDir(repository.owner, repository.name)))  git =>
       import scala.collection.JavaConverters._
       import scala.concurrent.duration._
       import scala.concurrent._
@@ -268,7 +259,7 @@ trait RepositorySettingsControllerBase extends ControllerBase {
       val token = Some(params("token"))
       val dummyWebHookInfo =
         WebHook(repository.owner, repository.name, url, token)
-      val dummyPayload = {
+      val dummyPayload =
         val ownerAccount = getAccountByUserName(repository.owner).get
         val commits =
           if (repository.commitCount == 0) List.empty
@@ -300,12 +291,11 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                 .map(ObjectId.fromString)
                 .getOrElse(ObjectId.zeroId())
           )
-      }
 
       val (webHook, json, reqFuture, resFuture) =
         callWebHook(WebHook.Push, List(dummyWebHookInfo), dummyPayload).head
 
-      val toErrorMap: PartialFunction[Throwable, Map[String, String]] = {
+      val toErrorMap: PartialFunction[Throwable, Map[String, String]] =
         case e: java.net.UnknownHostException =>
           Map("error" -> ("Unknown host " + e.getMessage))
         case e: java.lang.IllegalArgumentException =>
@@ -313,7 +303,6 @@ trait RepositorySettingsControllerBase extends ControllerBase {
         case e: org.apache.http.client.ClientProtocolException =>
           Map("error" -> ("invalid url"))
         case NonFatal(e) => Map("error" -> (e.getClass + " " + e.getMessage))
-      }
 
       contentType = formats("json")
       org.json4s.jackson.Serialization.write(
@@ -340,73 +329,68 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                     .recover(toErrorMap),
                   20 seconds)
           ))
-    }
-  })
+  )
 
   /**
     * Display the web hook edit page.
     */
   get("/:owner/:repository/settings/hooks/edit")(
-      ownerOnly { repository =>
-    getWebHook(repository.owner, repository.name, params("url")).map {
+      ownerOnly  repository =>
+    getWebHook(repository.owner, repository.name, params("url")).map
       case (webhook, events) =>
         html.edithooks(webhook, events, repository, flash.get("info"), false)
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
   /**
     * Update web hook settings.
     */
   post("/:owner/:repository/settings/hooks/edit", webHookForm(true))(
-      ownerOnly { (form, repository) =>
+      ownerOnly  (form, repository) =>
     updateWebHook(
         repository.owner, repository.name, form.url, form.events, form.token)
     flash += "info" -> s"webhook ${form.url} updated"
     redirect(s"/${repository.owner}/${repository.name}/settings/hooks")
-  })
+  )
 
   /**
     * Display the danger zone.
     */
-  get("/:owner/:repository/settings/danger")(ownerOnly {
+  get("/:owner/:repository/settings/danger")(ownerOnly
     html.danger(_)
-  })
+  )
 
   /**
     * Transfer repository ownership.
     */
-  post("/:owner/:repository/settings/transfer", transferForm)(ownerOnly {
+  post("/:owner/:repository/settings/transfer", transferForm)(ownerOnly
     (form, repository) =>
       // Change repository owner
-      if (repository.owner != form.newOwner) {
-        LockUtil.lock(s"${repository.owner}/${repository.name}") {
+      if (repository.owner != form.newOwner)
+        LockUtil.lock(s"${repository.owner}/${repository.name}")
           // Update database
           renameRepository(repository.owner,
                            repository.name,
                            form.newOwner,
                            repository.name)
           // Move git repository
-          defining(getRepositoryDir(repository.owner, repository.name)) {
+          defining(getRepositoryDir(repository.owner, repository.name))
             dir =>
               FileUtils.moveDirectory(
                   dir, getRepositoryDir(form.newOwner, repository.name))
-          }
           // Move wiki repository
-          defining(getWikiRepositoryDir(repository.owner, repository.name)) {
+          defining(getWikiRepositoryDir(repository.owner, repository.name))
             dir =>
               FileUtils.moveDirectory(
                   dir, getWikiRepositoryDir(form.newOwner, repository.name))
-          }
-        }
-      }
       redirect(s"/${form.newOwner}/${repository.name}")
-  })
+  )
 
   /**
     * Delete the repository.
     */
-  post("/:owner/:repository/settings/delete")(ownerOnly { repository =>
-    LockUtil.lock(s"${repository.owner}/${repository.name}") {
+  post("/:owner/:repository/settings/delete")(ownerOnly  repository =>
+    LockUtil.lock(s"${repository.owner}/${repository.name}")
       deleteRepository(repository.owner, repository.name)
 
       FileUtils.deleteDirectory(
@@ -415,53 +399,47 @@ trait RepositorySettingsControllerBase extends ControllerBase {
           getWikiRepositoryDir(repository.owner, repository.name))
       FileUtils.deleteDirectory(
           getTemporaryDir(repository.owner, repository.name))
-    }
     redirect(s"/${repository.owner}")
-  })
+  )
 
   /**
     * Provides duplication check for web hook url.
     */
-  private def webHook(needExists: Boolean): Constraint = new Constraint() {
+  private def webHook(needExists: Boolean): Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
-      if (getWebHook(params("owner"), params("repository"), value).isDefined != needExists) {
+      if (getWebHook(params("owner"), params("repository"), value).isDefined != needExists)
         Some(
-            if (needExists) {
+            if (needExists)
           "URL had not been registered yet."
-        } else {
+        else
           "URL had been registered already."
-        })
-      } else {
+        )
+      else
         None
-      }
-  }
 
-  private def webhookEvents = new ValueType[Set[WebHook.Event]] {
+  private def webhookEvents = new ValueType[Set[WebHook.Event]]
     def convert(name: String,
                 params: Map[String, String],
-                messages: Messages): Set[WebHook.Event] = {
-      WebHook.Event.values.flatMap { t =>
+                messages: Messages): Set[WebHook.Event] =
+      WebHook.Event.values.flatMap  t =>
         params.get(name + "." + t.name).map(_ => t)
-      }.toSet
-    }
+      .toSet
     def validate(name: String,
                  params: Map[String, String],
                  messages: Messages): Seq[(String, String)] =
-      if (convert(name, params, messages).isEmpty) {
+      if (convert(name, params, messages).isEmpty)
         Seq(name -> messages("error.required").format(name))
-      } else {
+      else
         Nil
-      }
-  }
 
   /**
     * Provides Constraint to validate the collaborator name.
     */
-  private def collaborator: Constraint = new Constraint() {
+  private def collaborator: Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
-      getAccountByUserName(value) match {
+      getAccountByUserName(value) match
         case None => Some("User does not exist.")
         case Some(x) if (x.isGroupAccount) => Some("User does not exist.")
         case Some(x)
@@ -471,46 +449,35 @@ trait RepositorySettingsControllerBase extends ControllerBase {
                   .contains(x.userName)) =>
           Some("User can access this repository already.")
         case _ => None
-      }
-  }
 
   /**
     * Duplicate check for the rename repository name.
     */
-  private def renameRepositoryName: Constraint = new Constraint() {
+  private def renameRepositoryName: Constraint = new Constraint()
     override def validate(name: String,
                           value: String,
                           params: Map[String, String],
                           messages: Messages): Option[String] =
-      params.get("repository").filter(_ != value).flatMap { _ =>
-        params.get("owner").flatMap { userName =>
+      params.get("repository").filter(_ != value).flatMap  _ =>
+        params.get("owner").flatMap  userName =>
           getRepositoryNamesOfUser(userName)
             .find(_ == value)
             .map(_ => "Repository already exists.")
-        }
-      }
-  }
 
   /**
     * Provides Constraint to validate the repository transfer user.
     */
-  private def transferUser: Constraint = new Constraint() {
+  private def transferUser: Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
-      getAccountByUserName(value) match {
+      getAccountByUserName(value) match
         case None => Some("User does not exist.")
         case Some(x) =>
-          if (x.userName == params("owner")) {
+          if (x.userName == params("owner"))
             Some("This is current repository owner.")
-          } else {
-            params.get("repository").flatMap { repositoryName =>
+          else
+            params.get("repository").flatMap  repositoryName =>
               getRepositoryNamesOfUser(x.userName)
                 .find(_ == repositoryName)
-                .map { _ =>
+                .map  _ =>
                   "User already has same repository."
-                }
-            }
-          }
-      }
-  }
-}

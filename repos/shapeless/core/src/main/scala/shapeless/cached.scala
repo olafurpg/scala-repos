@@ -53,24 +53,22 @@ import scala.reflect.macros.whitebox
   */
 case class Cached[+T](value: T) extends AnyVal
 
-object Cached {
+object Cached
   implicit def materialize[I]: Cached[I] = macro CachedMacros
     .materializeCached[I]
 
   def implicitly[T](implicit cached: Cached[T]): T = cached.value
-}
 
-object CachedMacros {
+object CachedMacros
   var deriving = false
   var cache = List.empty[(Any, Any)]
-}
 
 @macrocompat.bundle
 class CachedMacros(override val c: whitebox.Context)
-    extends LazyMacros(c) with OpenImplicitMacros {
+    extends LazyMacros(c) with OpenImplicitMacros
   import c.universe._
 
-  def materializeCached[T : WeakTypeTag]: Tree = {
+  def materializeCached[T : WeakTypeTag]: Tree =
     // Getting the actual type parameter T, using the same trick as Lazy/Strict
     val tpe = openImplicitTpeParam.getOrElse(weakTypeOf[T])
 
@@ -87,22 +85,21 @@ class CachedMacros(override val c: whitebox.Context)
           "an implicit earlier, so that the whole Lazy/Strict itself gets cached. Caching " +
           "is disabled here.")
 
-    if (CachedMacros.deriving || concurrentLazy) {
+    if (CachedMacros.deriving || concurrentLazy)
       // Caching only the first (root) Cached, not subsequent ones as here
       val tree0 = c.inferImplicitValue(tpe)
       if (tree0 == EmptyTree)
         c.abort(c.enclosingPosition, s"Implicit $tpe not found")
       q"_root_.shapeless.Cached($tree0)"
-    } else {
+    else
       CachedMacros.deriving = true
 
-      try {
+      try
         val treeOpt =
-          CachedMacros.cache.asInstanceOf[List[(Type, Tree)]].collectFirst {
+          CachedMacros.cache.asInstanceOf[List[(Type, Tree)]].collectFirst
             case (eTpe, eTree) if eTpe =:= tpe => eTree
-          }
 
-        treeOpt.getOrElse {
+        treeOpt.getOrElse
           // Cached instances are derived like Lazy or Strict instances.
           // Trying to derive them in a standalone way raised
           // https://github.com/fommil/spray-json-shapeless/issues/14.
@@ -114,10 +111,5 @@ class CachedMacros(override val c: whitebox.Context)
 
           CachedMacros.cache = (tpe -> tree) :: CachedMacros.cache
           tree
-        }
-      } finally {
+      finally
         CachedMacros.deriving = false
-      }
-    }
-  }
-}

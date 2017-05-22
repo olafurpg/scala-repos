@@ -1,13 +1,11 @@
-object Main {
+object Main
   class A()
-  case class RichA() {
+  case class RichA()
     def apply(s: String): Int = 1
-  }
   implicit def toRichA(a: A): RichA = null
   val a = new A()
   implicit def i2s(x: Int): String = ""
   a( /*start*/ 23 /*end*/ )
-}
 /*
 Seq(any2ArrowAssoc,
     any2Ensuring,

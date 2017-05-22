@@ -52,7 +52,7 @@ private[spark] abstract class Task[T](
     val stageAttemptId: Int,
     val partitionId: Int,
     val initialAccumulators: Seq[Accumulator[_]])
-    extends Serializable {
+    extends Serializable
 
   /**
     * Called by [[org.apache.spark.executor.Executor]] to run this task.
@@ -63,7 +63,7 @@ private[spark] abstract class Task[T](
     */
   final def run(taskAttemptId: Long,
                 attemptNumber: Int,
-                metricsSystem: MetricsSystem): T = {
+                metricsSystem: MetricsSystem): T =
     SparkEnv.get.blockManager.registerTask(taskAttemptId)
     context = new TaskContextImpl(stageId,
                                   partitionId,
@@ -74,21 +74,20 @@ private[spark] abstract class Task[T](
                                   initialAccumulators)
     TaskContext.setTaskContext(context)
     taskThread = Thread.currentThread()
-    if (_killed) {
+    if (_killed)
       kill(interruptThread = false)
-    }
-    try {
+    try
       runTask(context)
-    } catch {
+    catch
       case e: Throwable =>
         // Catch all errors; run task failure callbacks, and rethrow the exception.
         context.markTaskFailed(e)
         throw e
-    } finally {
+    finally
       // Call the task completion callbacks.
       context.markTaskCompleted()
-      try {
-        Utils.tryLogNonFatalError {
+      try
+        Utils.tryLogNonFatalError
           // Release memory used by this thread for unrolling blocks
           SparkEnv.get.blockManager.memoryStore.releaseUnrollMemoryForThisTask()
           // Notify any tasks waiting for execution memory to be freed to wake up and try to
@@ -97,18 +96,13 @@ private[spark] abstract class Task[T](
           // not be strictly necessary, we should revisit whether we can remove this in the future.
           val memoryManager = SparkEnv.get.memoryManager
           memoryManager.synchronized { memoryManager.notifyAll() }
-        }
-      } finally {
+      finally
         TaskContext.unset()
-      }
-    }
-  }
 
   private var taskMemoryManager: TaskMemoryManager = _
 
-  def setTaskMemoryManager(taskMemoryManager: TaskMemoryManager): Unit = {
+  def setTaskMemoryManager(taskMemoryManager: TaskMemoryManager): Unit =
     this.taskMemoryManager = taskMemoryManager
-  }
 
   def runTask(context: TaskContext): T
 
@@ -148,15 +142,12 @@ private[spark] abstract class Task[T](
     * filter out the accumulators whose values should not be included on failures.
     */
   def collectAccumulatorUpdates(
-      taskFailed: Boolean = false): Seq[AccumulableInfo] = {
-    if (context != null) {
-      context.taskMetrics.accumulatorUpdates().filter { a =>
+      taskFailed: Boolean = false): Seq[AccumulableInfo] =
+    if (context != null)
+      context.taskMetrics.accumulatorUpdates().filter  a =>
         !taskFailed || a.countFailedValues
-      }
-    } else {
+    else
       Seq.empty[AccumulableInfo]
-    }
-  }
 
   /**
     * Kills a task by setting the interrupted flag to true. This relies on the upper level Spark
@@ -164,16 +155,12 @@ private[spark] abstract class Task[T](
     * be called multiple times.
     * If interruptThread is true, we will also call Thread.interrupt() on the Task's executor thread.
     */
-  def kill(interruptThread: Boolean) {
+  def kill(interruptThread: Boolean)
     _killed = true
-    if (context != null) {
+    if (context != null)
       context.markInterrupted()
-    }
-    if (interruptThread && taskThread != null) {
+    if (interruptThread && taskThread != null)
       taskThread.interrupt()
-    }
-  }
-}
 
 /**
   * Handles transmission of tasks and their dependencies, because this can be slightly tricky. We
@@ -182,7 +169,7 @@ private[spark] abstract class Task[T](
   * the task might depend on one of the JARs. Thus we serialize each task as multiple objects, by
   * first writing out its dependencies.
   */
-private[spark] object Task {
+private[spark] object Task
 
   /**
     * Serialize a task and the current app dependencies (files and JARs added to the SparkContext)
@@ -190,31 +177,28 @@ private[spark] object Task {
   def serializeWithDependencies(task: Task[_],
                                 currentFiles: HashMap[String, Long],
                                 currentJars: HashMap[String, Long],
-                                serializer: SerializerInstance): ByteBuffer = {
+                                serializer: SerializerInstance): ByteBuffer =
 
     val out = new ByteBufferOutputStream(4096)
     val dataOut = new DataOutputStream(out)
 
     // Write currentFiles
     dataOut.writeInt(currentFiles.size)
-    for ((name, timestamp) <- currentFiles) {
+    for ((name, timestamp) <- currentFiles)
       dataOut.writeUTF(name)
       dataOut.writeLong(timestamp)
-    }
 
     // Write currentJars
     dataOut.writeInt(currentJars.size)
-    for ((name, timestamp) <- currentJars) {
+    for ((name, timestamp) <- currentJars)
       dataOut.writeUTF(name)
       dataOut.writeLong(timestamp)
-    }
 
     // Write the task itself and finish
     dataOut.flush()
     val taskBytes = serializer.serialize(task)
     Utils.writeByteBuffer(taskBytes, out)
     out.toByteBuffer
-  }
 
   /**
     * Deserialize the list of dependencies in a task serialized with serializeWithDependencies,
@@ -224,7 +208,7 @@ private[spark] object Task {
     * @return (taskFiles, taskJars, taskBytes)
     */
   def deserializeWithDependencies(serializedTask: ByteBuffer)
-    : (HashMap[String, Long], HashMap[String, Long], ByteBuffer) = {
+    : (HashMap[String, Long], HashMap[String, Long], ByteBuffer) =
 
     val in = new ByteBufferInputStream(serializedTask)
     val dataIn = new DataInputStream(in)
@@ -232,20 +216,16 @@ private[spark] object Task {
     // Read task's files
     val taskFiles = new HashMap[String, Long]()
     val numFiles = dataIn.readInt()
-    for (i <- 0 until numFiles) {
+    for (i <- 0 until numFiles)
       taskFiles(dataIn.readUTF()) = dataIn.readLong()
-    }
 
     // Read task's JARs
     val taskJars = new HashMap[String, Long]()
     val numJars = dataIn.readInt()
-    for (i <- 0 until numJars) {
+    for (i <- 0 until numJars)
       taskJars(dataIn.readUTF()) = dataIn.readLong()
-    }
 
     // Create a sub-buffer for the rest of the data, which is the serialized Task object
     val subBuffer =
       serializedTask.slice() // ByteBufferInputStream will have read just up to task
     (taskFiles, taskJars, subBuffer)
-  }
-}

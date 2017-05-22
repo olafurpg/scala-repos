@@ -16,26 +16,20 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.expressions._
  * ScalaExpr ::= '{' Block '}'
  */
 
-object ScalaExpr {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    builder.getTokenType match {
+object ScalaExpr
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    builder.getTokenType match
       case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_START =>
         builder.advanceLexer()
         builder.enableNewlines
       case _ => return false
-    }
-    if (!Block.parse(builder, hasBrace = false, needNode = true)) {
+    if (!Block.parse(builder, hasBrace = false, needNode = true))
       builder error ErrMsg("xml.scala.expression.exected")
-    }
-    while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON) {
+    while (builder.getTokenType == ScalaTokenTypes.tSEMICOLON)
       builder.advanceLexer()
-    }
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypesEx.SCALA_IN_XML_INJECTION_END =>
         builder.advanceLexer()
       case _ => builder error ErrMsg("xml.scala.injection.end.expected")
-    }
     builder.restoreNewlinesState
     true
-  }
-}

@@ -50,7 +50,7 @@ class InvalidSourceException(message: String) extends RuntimeException(message)
   * hdfsPaths represents user-supplied list that was detected as not containing any valid paths.
   */
 class InvalidSourceTap(val hdfsPaths: Iterable[String])
-    extends SourceTap[JobConf, RecordReader[_, _]] {
+    extends SourceTap[JobConf, RecordReader[_, _]]
 
   private final val randomId = UUID.randomUUID.toString
 
@@ -79,11 +79,9 @@ class InvalidSourceTap(val hdfsPaths: Iterable[String])
   // In the worst case if the flow plan is misconfigured,
   // openForRead on mappers should fail when using this tap.
   override def sourceConfInit(
-      flow: FlowProcess[JobConf], conf: JobConf): Unit = {
+      flow: FlowProcess[JobConf], conf: JobConf): Unit =
     conf.setInputFormat(classOf[cascading.tap.hadoop.io.MultiInputFormat])
     super.sourceConfInit(flow, conf)
-  }
-}
 
 /*
  * Denotes the access mode for a Source
@@ -96,18 +94,16 @@ case object Write extends AccessMode
 // declaration leaves some type parameters underspecified.  Fill in the type
 // parameters with wildcards so the Scala compiler doesn't complain.
 
-object HadoopSchemeInstance {
+object HadoopSchemeInstance
   def apply(scheme: Scheme[_, _, _, _, _]) =
     scheme.asInstanceOf[Scheme[
             JobConf, RecordReader[_, _], OutputCollector[_, _], _, _]]
-}
 
-object CastHfsTap {
+object CastHfsTap
   // The scala compiler has problems with the generics in Cascading
   def apply(
       tap: Hfs): Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]] =
     tap.asInstanceOf[Tap[JobConf, RecordReader[_, _], OutputCollector[_, _]]]
-}
 
 /**
   * Every source must have a correct toString method.  If you use
@@ -118,7 +114,7 @@ object CastHfsTap {
   * methods attached that run on mappers or reducers, which will happen
   * if you implement transformForRead or transformForWrite.
   */
-abstract class Source extends java.io.Serializable {
+abstract class Source extends java.io.Serializable
 
   /**
     * The mock passed in to scalding.JobTest may be considered
@@ -136,7 +132,7 @@ abstract class Source extends java.io.Serializable {
     */
   def sourceId: String = toString
 
-  def read(implicit flowDef: FlowDef, mode: Mode): Pipe = {
+  def read(implicit flowDef: FlowDef, mode: Mode): Pipe =
     checkFlowDefNotNull
 
     //workaround for a type erasure problem, this is a map of String -> Tap[_,_,_]
@@ -150,41 +146,34 @@ abstract class Source extends java.io.Serializable {
     assert(!sources.containsKey(srcName),
            "Source %s had collision in uuid: %s".format(this, uuid))
     sources.put(srcName, createTap(Read)(mode))
-    FlowStateMap.mutate(flowDef) { st =>
+    FlowStateMap.mutate(flowDef)  st =>
       (st.addSource(srcName, this), ())
-    }
-    (mode, transformInTest) match {
+    (mode, transformInTest) match
       case (test: TestMode, false) => new Pipe(srcName)
       case _ => transformForRead(new Pipe(srcName))
-    }
-  }
 
   /**
     * write the pipe but return the input so it can be chained into
     * the next operation
     */
-  def writeFrom(pipe: Pipe)(implicit flowDef: FlowDef, mode: Mode): Pipe = {
+  def writeFrom(pipe: Pipe)(implicit flowDef: FlowDef, mode: Mode): Pipe =
     checkFlowDefNotNull
 
     //insane workaround for scala compiler bug
     val sinks = flowDef.getSinks.asInstanceOf[JMap[String, Any]]
     val sinkName = sourceId
-    if (!sinks.containsKey(sinkName)) {
+    if (!sinks.containsKey(sinkName))
       sinks.put(sinkName, createTap(Write)(mode))
-    }
-    val newPipe = (mode, transformInTest) match {
+    val newPipe = (mode, transformInTest) match
       case (test: TestMode, false) => pipe
       case _ => transformForWrite(pipe)
-    }
     val outPipe = new Pipe(sinkName, newPipe)
     flowDef.addTail(outPipe)
     pipe
-  }
 
-  protected def checkFlowDefNotNull(implicit flowDef: FlowDef, mode: Mode) {
+  protected def checkFlowDefNotNull(implicit flowDef: FlowDef, mode: Mode)
     assert(flowDef != null,
            "Trying to access null FlowDef while in mode: %s".format(mode))
-  }
 
   protected def transformForWrite(pipe: Pipe) = pipe
   protected def transformForRead(pipe: Pipe) = pipe
@@ -201,7 +190,7 @@ abstract class Source extends java.io.Serializable {
 
   @deprecated("replace with Mappable.toIterator", "0.9.0")
   def readAtSubmitter[T](
-      implicit mode: Mode, conv: TupleConverter[T]): Stream[T] = {
+      implicit mode: Mode, conv: TupleConverter[T]): Stream[T] =
     validateTaps(mode)
     val tap = createTap(Read)(mode)
     mode
@@ -209,8 +198,6 @@ abstract class Source extends java.io.Serializable {
       .asScala
       .map { conv(_) }
       .toStream
-  }
-}
 
 /**
   * Usually as soon as we open a source, we read and do some mapping
@@ -223,46 +210,40 @@ abstract class Source extends java.io.Serializable {
   * NOTE: If we don't make this extend Source, established implicits are ambiguous
   * when TDsl is in scope.
   */
-trait Mappable[+T] extends Source with TypedSource[T] {
+trait Mappable[+T] extends Source with TypedSource[T]
 
   final def mapTo[U](out: Fields)(mf: (T) => U)(
-      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe = {
+      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe =
     RichPipe(read(flowDef, mode))
       .mapTo[T, U](sourceFields -> out)(mf)(converter, setter)
-  }
 
   /**
     * If you want to filter, you should use this and output a 0 or 1 length Iterable.
     * Filter does not change column names, and we generally expect to change columns here
     */
   final def flatMapTo[U](out: Fields)(mf: (T) => TraversableOnce[U])(
-      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe = {
+      implicit flowDef: FlowDef, mode: Mode, setter: TupleSetter[U]): Pipe =
     RichPipe(read(flowDef, mode))
       .flatMapTo[T, U](sourceFields -> out)(mf)(converter, setter)
-  }
 
   /**
     * Allows you to read a Tap on the submit node NOT FOR USE IN THE MAPPERS OR REDUCERS.
     * Typical use might be to read in Job.next to determine if another job is needed
     */
-  def toIterator(implicit config: Config, mode: Mode): Iterator[T] = {
+  def toIterator(implicit config: Config, mode: Mode): Iterator[T] =
     validateTaps(mode)
     val tap = createTap(Read)(mode)
     val conv = converter
-    mode.openForRead(config, tap).asScala.map { te =>
+    mode.openForRead(config, tap).asScala.map  te =>
       conv(te.selectEntry(sourceFields))
-    }
-  }
-}
 
 /**
   * Mappable extension that defines the proper converter
   * implementation for a Mappable with a single item.
   */
-trait SingleMappable[T] extends Mappable[T] {
+trait SingleMappable[T] extends Mappable[T]
   override def converter[U >: T] =
     TupleConverter.asSuperConverter(TupleConverter.singleConverter[T])
-}
 
 /**
   * A tap that output nothing. It is used to drive execution of a task for side effect only. This
@@ -272,29 +253,27 @@ class NullTap[Config, Input, Output, SourceContext, SinkContext]
     extends SinkTap[Config, Output](
         new NullScheme[Config, Input, Output, SourceContext, SinkContext](
             Fields.NONE, Fields.ALL),
-        SinkMode.UPDATE) {
+        SinkMode.UPDATE)
 
   def getIdentifier = "nullTap"
   def openForWrite(flowProcess: FlowProcess[Config], output: Output) =
-    new TupleEntryCollector {
+    new TupleEntryCollector
       override def add(te: TupleEntry) {}
       override def add(t: CTuple) {}
       protected def collect(te: TupleEntry) {}
-    }
 
   def createResource(conf: Config) = true
   def deleteResource(conf: Config) = false
   def resourceExists(conf: Config) = true
   def getModifiedTime(conf: Config) = 0
-}
 
-trait BaseNullSource extends Source {
+trait BaseNullSource extends Source
   override def createTap(readOrWrite: AccessMode)(
-      implicit mode: Mode): Tap[_, _, _] = {
-    readOrWrite match {
+      implicit mode: Mode): Tap[_, _, _] =
+    readOrWrite match
       case Read => throw new Exception("not supported, reading from null")
       case Write =>
-        mode match {
+        mode match
           case Hdfs(_, _) =>
             new NullTap[
                 JobConf, RecordReader[_, _], OutputCollector[_, _], Any, Any]
@@ -302,10 +281,6 @@ trait BaseNullSource extends Source {
             new NullTap[Properties, InputStream, OutputStream, Any, Any]
           case Test(_) =>
             new NullTap[Properties, InputStream, OutputStream, Any, Any]
-        }
-    }
-  }
-}
 
 /**
   * A source outputs nothing. It is used to drive execution of a task for side effect only.

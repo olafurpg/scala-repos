@@ -29,7 +29,7 @@ import akka.util.Helpers.ConfigOps
 class DeadlineFailureDetector(
     val acceptableHeartbeatPause: FiniteDuration,
     val heartbeatInterval: FiniteDuration)(implicit clock: Clock)
-    extends FailureDetector {
+    extends FailureDetector
 
   /**
     * Constructor that reads parameters from config.
@@ -67,8 +67,6 @@ class DeadlineFailureDetector(
 
   override def isMonitoring: Boolean = active
 
-  final override def heartbeat(): Unit = {
+  final override def heartbeat(): Unit =
     heartbeatTimestamp = clock()
     active = true
-  }
-}

@@ -20,29 +20,27 @@ import cascading.stats.{CascadeStats, CascadingStats, FlowStats}
 
 import scala.util.{Failure, Try}
 
-object JobStats {
-  def apply(stats: CascadingStats): JobStats = {
+object JobStats
+  def apply(stats: CascadingStats): JobStats =
     val m = statsMap(stats)
     new JobStats(
-        stats match {
+        stats match
       case cs: CascadeStats => m
       case fs: FlowStats =>
         m + ("flow_step_stats" -> fs.getFlowStepStats.asScala.map(statsMap))
-    })
-  }
+    )
 
   private def counterMap(
       stats: CascadingStats): Map[String, Map[String, Long]] =
-    stats.getCounterGroups.asScala.map { group =>
+    stats.getCounterGroups.asScala.map  group =>
       (group,
        stats
          .getCountersFor(group)
          .asScala
-         .map { counter =>
+         .map  counter =>
            (counter, stats.getCounterValue(group, counter))
-         }
          .toMap)
-    }.toMap
+    .toMap
 
   private def statsMap(stats: CascadingStats): Map[String, Any] =
     Map("counters" -> counterMap(stats),
@@ -63,44 +61,38 @@ object JobStats {
     */
   def toCounters(cMap: Any): Try[Map[String, Map[String, Long]]] =
     // This really sucks, but this is what happens when you let Map[String, Any] into your code
-    cMap match {
+    cMap match
       case m: Map[_, _] =>
-        Try {
-          m.foldLeft(Map.empty[String, Map[String, Long]]) {
+        Try
+          m.foldLeft(Map.empty[String, Map[String, Long]])
             case (acc, (k: String, v: Any)) =>
-              v match {
+              v match
                 case m: Map[_, _] =>
                   acc +
-                  (k -> m.foldLeft(Map.empty[String, Long]) {
+                  (k -> m.foldLeft(Map.empty[String, Long])
                         case (acc2, (k: String, v: Long)) => acc2 + (k -> v)
                         case (_, kv) =>
                           sys.error("inner k, v not (String, Long):" + kv)
-                      })
+                      )
                 case _ => sys.error("inner values are not Maps: " + v)
-              }
             case kv => sys.error("Map does not contain string keys: " + (kv))
-          }
-        }
       case _ =>
         Failure(new Exception("%s not a Map[String, Any]".format(cMap)))
-    }
 
   def toJsonValue(a: Any): String =
     if (a == null) "null"
-    else {
-      Try(a.toString.toInt).recoverWith {
+    else
+      Try(a.toString.toInt).recoverWith
         case t: Throwable => Try(a.toString.toDouble)
-      }.recover {
+      .recover
         case t: Throwable =>
           val s = a.toString
           "\"%s\"".format(s)
-      }.get.toString
-    }
-}
+      .get.toString
 
 // Simple wrapper for a Map that contains the useful info from the job flow's stats
 // If you want to write this, call toMap and use json, etc... to write it
-case class JobStats(toMap: Map[String, Any]) {
+case class JobStats(toMap: Map[String, Any])
   def counters: Map[String, Map[String, Long]] =
     toMap
       .get("counters")
@@ -109,7 +101,6 @@ case class JobStats(toMap: Map[String, Any]) {
       .get
 
   def toJson: String =
-    toMap.map {
+    toMap.map
       case (k, v) => "\"%s\" : %s".format(k, JobStats.toJsonValue(v))
-    }.mkString("{", ",", "}")
-}
+    .mkString("{", ",", "}")

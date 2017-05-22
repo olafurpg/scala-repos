@@ -20,7 +20,7 @@ class TCPServer(
     shutdownOnLastDisconnect: Boolean,
     preferredPort: Option[Int]
 )
-    extends Actor with ActorLogging {
+    extends Actor with ActorLogging
 
   import Tcp._
   import context.system
@@ -32,7 +32,7 @@ class TCPServer(
   IO(Tcp) ! Bind(
       self, new InetSocketAddress("127.0.0.1", preferredPort.getOrElse(0)))
 
-  def receive = {
+  def receive =
     case b @ Bound(localAddress) =>
       val boundPort = localAddress.getPort
       log.info(s"Bound server on port $boundPort")
@@ -45,12 +45,11 @@ class TCPServer(
       activeConnections -= 1
       log.info(
           "Client disconnected - active clients now: " + activeConnections)
-      if (activeConnections == 0 && shutdownOnLastDisconnect) {
+      if (activeConnections == 0 && shutdownOnLastDisconnect)
         log.info(
             "Shutdown on last disconnect set - requesting server shutdown")
         context.parent ! ShutdownRequest(
             "Last client disconnected and shtudownOnLastDisconnect set")
-      }
 
     case c @ Connected(remote, local) =>
       log.info(s"Connection from " + remote.getHostName + "")
@@ -63,5 +62,3 @@ class TCPServer(
       activeConnections += 1
       log.info("Client connected - active clients now: " + activeConnections)
       connection ! Register(handler)
-  }
-}

@@ -6,29 +6,27 @@ import scala.language.experimental.macros
 
 class body(tree: Any) extends StaticAnnotation
 
-object Macros {
-  def selFieldImpl(c: Context) = {
+object Macros
+  def selFieldImpl(c: Context) =
     import c.universe._
     val field = c.macroApplication.symbol
     val bodyAnn = field.annotations.filter(_.tree.tpe <:< typeOf[body]).head
     c.Expr[Any](bodyAnn.tree.children(1))
-  }
 
-  def mkObjectImpl(c: Context)(xs: c.Expr[Any]*) = {
+  def mkObjectImpl(c: Context)(xs: c.Expr[Any]*) =
     import c.universe._
     import Flag._
     // val kvps = xs.toList map { case q"${_}(${Literal(Constant(name: String))}).->[${_}]($value)" => name -> value }
     val kvps =
-      xs.map(_.tree).toList map {
+      xs.map(_.tree).toList map
         case Apply(
             TypeApply(
             Select(Apply(_, List(Literal(Constant(name: String)))), _), _),
             List(value)) =>
           name -> value
-      }
     // val fields = kvps map { case (k, v) => q"@body($v) def ${TermName(k)} = macro Macros.selFieldImpl" }
     val fields =
-      kvps map {
+      kvps map
         case (k, v) =>
           DefDef(Modifiers(MACRO,
                            typeNames.EMPTY,
@@ -40,7 +38,6 @@ object Macros {
                  Nil,
                  Ident(TypeName("Any")),
                  Select(Ident(TermName("Macros")), TermName("selFieldImpl")))
-      }
     // q"import scala.language.experimental.macros; class Workaround { ..$fields }; new Workaround{}"
     c.Expr[Any](
         Block(
@@ -87,9 +84,6 @@ object Macros {
                                       Literal(Constant(())))))))),
             Apply(Select(New(Ident(TypeName("$anon"))), termNames.CONSTRUCTOR),
                   List())))
-  }
-}
 
-object mkObject {
+object mkObject
   def apply(xs: Any*): Any = macro Macros.mkObjectImpl
-}

@@ -7,7 +7,7 @@ import akka.testkit._
 import akka.remote.testkit.{MultiNodeConfig, MultiNodeSpec, STMultiNodeSpec}
 import akka.remote.testconductor.RoleName
 
-object PiercingShouldKeepQuarantineSpec extends MultiNodeConfig {
+object PiercingShouldKeepQuarantineSpec extends MultiNodeConfig
   val first = role("first")
   val second = role("second")
 
@@ -17,12 +17,9 @@ object PiercingShouldKeepQuarantineSpec extends MultiNodeConfig {
       akka.remote.retry-gate-closed-for = 0.5s
                               """)))
 
-  class Subject extends Actor {
-    def receive = {
+  class Subject extends Actor
+    def receive =
       case "getuid" ⇒ sender() ! AddressUidExtension(context.system).addressUid
-    }
-  }
-}
 
 class PiercingShouldKeepQuarantineSpecMultiJvmNode1
     extends PiercingShouldKeepQuarantineSpec
@@ -31,16 +28,16 @@ class PiercingShouldKeepQuarantineSpecMultiJvmNode2
 
 abstract class PiercingShouldKeepQuarantineSpec
     extends MultiNodeSpec(PiercingShouldKeepQuarantineSpec)
-    with STMultiNodeSpec with ImplicitSender {
+    with STMultiNodeSpec with ImplicitSender
 
   import PiercingShouldKeepQuarantineSpec._
 
   override def initialParticipants = roles.size
 
-  "While probing through the quarantine remoting" must {
+  "While probing through the quarantine remoting" must
 
-    "not lose existing quarantine marker" taggedAs LongRunningTest in {
-      runOn(first) {
+    "not lose existing quarantine marker" taggedAs LongRunningTest in
+      runOn(first)
         enterBarrier("actors-started")
 
         // Communicate with second system
@@ -56,20 +53,14 @@ abstract class PiercingShouldKeepQuarantineSpec
         Thread.sleep(1000)
 
         // Quarantine is up -- Should not be able to communicate with remote system any more
-        for (_ ← 1 to 4) {
+        for (_ ← 1 to 4)
           system.actorSelection(node(second) / "user" / "subject") ! "getuid"
           expectNoMsg(2.seconds)
-        }
 
         enterBarrier("quarantine-intact")
-      }
 
-      runOn(second) {
+      runOn(second)
         system.actorOf(Props[Subject], "subject")
         enterBarrier("actors-started")
         enterBarrier("actor-identified")
         enterBarrier("quarantine-intact")
-      }
-    }
-  }
-}

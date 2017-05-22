@@ -10,14 +10,12 @@ import org.typelevel.discipline.Laws
 import org.scalacheck.{Arbitrary, Prop}
 import org.scalacheck.Prop._
 
-object LatticePartialOrderLaws {
-  def apply[A : Eq : Arbitrary] = new LatticePartialOrderLaws[A] {
+object LatticePartialOrderLaws
+  def apply[A : Eq : Arbitrary] = new LatticePartialOrderLaws[A]
     def Equ = Eq[A]
     def Arb = implicitly[Arbitrary[A]]
-  }
-}
 
-trait LatticePartialOrderLaws[A] extends Laws {
+trait LatticePartialOrderLaws[A] extends Laws
 
   implicit def Equ: Eq[A]
   implicit def Arb: Arbitrary[A]
@@ -100,6 +98,5 @@ trait LatticePartialOrderLaws[A] extends Laws {
       val props: (String, Prop)*
   )
       extends RuleSet
-}
 
 // vim: expandtab:ts=2:sw=2

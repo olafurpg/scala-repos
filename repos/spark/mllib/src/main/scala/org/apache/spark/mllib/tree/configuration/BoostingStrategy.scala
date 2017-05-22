@@ -54,14 +54,14 @@ case class BoostingStrategy @Since("1.4.0")(
     @Since("1.2.0") @BeanProperty var numIterations: Int = 100,
     @Since("1.2.0") @BeanProperty var learningRate: Double = 0.1,
     @Since("1.4.0") @BeanProperty var validationTol: Double = 0.001)
-    extends Serializable {
+    extends Serializable
 
   /**
     * Check validity of parameters.
     * Throws exception if invalid.
     */
-  private[spark] def assertValid(): Unit = {
-    treeStrategy.algo match {
+  private[spark] def assertValid(): Unit =
+    treeStrategy.algo match
       case Classification =>
         require(treeStrategy.numClasses == 2,
                 "Only binary classification is supported for boosting.")
@@ -71,16 +71,13 @@ case class BoostingStrategy @Since("1.4.0")(
         throw new IllegalArgumentException(
             s"BoostingStrategy given invalid algo parameter: ${treeStrategy.algo}." +
             s"  Valid settings are: Classification, Regression.")
-    }
     require(
         learningRate > 0 && learningRate <= 1,
         "Learning rate should be in range (0, 1]. Provided learning rate is " +
         s"$learningRate.")
-  }
-}
 
 @Since("1.2.0")
-object BoostingStrategy {
+object BoostingStrategy
 
   /**
     * Returns default configuration for the boosting algorithm
@@ -88,9 +85,8 @@ object BoostingStrategy {
     * @return Configuration for boosting algorithm
     */
   @Since("1.2.0")
-  def defaultParams(algo: String): BoostingStrategy = {
+  def defaultParams(algo: String): BoostingStrategy =
     defaultParams(Algo.fromString(algo))
-  }
 
   /**
     * Returns default configuration for the boosting algorithm
@@ -100,10 +96,10 @@ object BoostingStrategy {
     * @return Configuration for boosting algorithm
     */
   @Since("1.3.0")
-  def defaultParams(algo: Algo): BoostingStrategy = {
+  def defaultParams(algo: Algo): BoostingStrategy =
     val treeStrategy = Strategy.defaultStrategy(algo)
     treeStrategy.maxDepth = 3
-    algo match {
+    algo match
       case Algo.Classification =>
         treeStrategy.numClasses = 2
         new BoostingStrategy(treeStrategy, LogLoss)
@@ -112,6 +108,3 @@ object BoostingStrategy {
       case _ =>
         throw new IllegalArgumentException(
             s"$algo is not supported by boosting.")
-    }
-  }
-}

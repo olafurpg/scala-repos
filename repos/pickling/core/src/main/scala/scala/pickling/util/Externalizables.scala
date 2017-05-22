@@ -5,7 +5,7 @@ import scala.language.experimental.macros
 import scala.reflect.macros.Context
 import java.io.ObjectInput
 
-object Externalizables {
+object Externalizables
 
   /** Generates a specialized `ObjectInput` instance.
     *
@@ -24,7 +24,7 @@ object Externalizables {
   def genOutput[T]: ArrayObjectOutput = macro genOutputImpl[T]
 
   def genInputImpl[T : c.WeakTypeTag](c: Context)(
-      arg: c.Expr[T]): c.Expr[ObjectInput] = {
+      arg: c.Expr[T]): c.Expr[ObjectInput] =
     import c.universe._
     import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
 
@@ -32,9 +32,8 @@ object Externalizables {
 
     // TODO: abort if T not a tuple type
 
-    val targs = tag.tpe match {
+    val targs = tag.tpe match
       case TypeRef(_, _, args) => args
-    }
 
     // extract argument trees of `arg` tuple (to avoid allocating and destructuring a tuple)
     // note: passing a tuple created using `->` doesn't work
@@ -53,10 +52,10 @@ object Externalizables {
 
     def readTree(is: List[Int]): Tree =
       if (is.isEmpty) q"???"
-      else if (is.size == 1) {
+      else if (is.size == 1)
         val argName = newTermName("x" + is.head)
         q"state += 1; $argName"
-      } else if (is.size == 2) {
+      else if (is.size == 2)
         val argName0 = newTermName("x" + is.head)
         val argName1 = newTermName("x" + is.tail.head)
         q"""
@@ -64,7 +63,7 @@ object Externalizables {
           if (state == ${is.head}) $argName0
           else $argName1
         """
-      } else if (is.size == 3) {
+      else if (is.size == 3)
         val argName0 = newTermName("x" + is.head)
         val argName1 = newTermName("x" + is.tail.head)
         val argName2 = newTermName("x" + is.tail.tail.head)
@@ -74,35 +73,31 @@ object Externalizables {
           else if (state == ${is.tail.head}) $argName1
           else $argName2
         """
-      } else c.abort(c.enclosingPosition, "more arguments not supported")
+      else c.abort(c.enclosingPosition, "more arguments not supported")
 
     // create class parameter list
     // (val x0: Int, val x1: Int, val x2: Array[Byte], val x3: Int, val x4: Long, ...)
-    val params = for ((targ, i) <- targs.zipWithIndex) yield {
+    val params = for ((targ, i) <- targs.zipWithIndex) yield
       val name = newTermName("x" + i)
       q"val $name: $targ"
-    }
 
     // per type a sorted list of indices
-    val perType = targs.zipWithIndex.groupBy { case (targ, i) => targ }.map {
+    val perType = targs.zipWithIndex.groupBy { case (targ, i) => targ }.map
       case (targ, things) => (targ, (things.map { case (_, i) => i }).sorted)
-    }
 
     def finalTree(tpe: Type): Tree =
       readTree(perType.getOrElse(tpe, List[Int]()))
 
     // copy contents of `xi` where i is the index of `typeOf[Array[Byte]]` in `perType` map
-    val readFullyTree: Tree = {
+    val readFullyTree: Tree =
       val arrIndices = perType.getOrElse(typeOf[Array[Byte]], List[Int]())
-      if (arrIndices.isEmpty) {
+      if (arrIndices.isEmpty)
         // Array[Byte] unused
         q"???"
-      } else {
+      else
         val name = newTermName("x" + arrIndices.head)
         // TODO: faster array copy using Unsafe?
         q"System.arraycopy($name, 0, x, 0, x.length)"
-      }
-    }
 
     val dummyName = c.fresh(newTypeName("DummyObjectInput"))
     val instance: Tree = q"""
@@ -135,9 +130,8 @@ object Externalizables {
     """
 
     c.Expr[ObjectInput](instance)
-  }
 
-  def genOutputImpl[T : c.WeakTypeTag](c: Context): c.Expr[ArrayObjectOutput] = {
+  def genOutputImpl[T : c.WeakTypeTag](c: Context): c.Expr[ArrayObjectOutput] =
     import c.universe._
     import definitions.{BooleanTpe, ByteTpe, CharTpe, DoubleTpe, FloatTpe, IntTpe, LongTpe, ShortTpe}
 
@@ -145,9 +139,8 @@ object Externalizables {
 
     // TODO: abort if T not a tuple type
 
-    val targs = tag.tpe match {
+    val targs = tag.tpe match
       case TypeRef(_, _, args) => args
-    }
 
     /* see java.io.DataOutput:
        writeBoolean(boolean v)
@@ -181,51 +174,48 @@ object Externalizables {
      */
 
     // we assume the methods corresponding to the "writeTree" bodies are called in the right order
-    def writeTree(is: List[Int], tpeName: String): Tree = {
+    def writeTree(is: List[Int], tpeName: String): Tree =
       val fldName = newTermName(tpeName + "Arr")
       if (is.isEmpty) q"???"
-      else if (is.size == 1) {
+      else if (is.size == 1)
         q"{ state += 1; $fldName(0) = x }"
-      } else if (is.size == 2) {
+      else if (is.size == 2)
         q"""
           state += 1
           if (state == ${is.head}) $fldName(0) = x
           else $fldName(1) = x
         """
-      } else if (is.size == 3) {
+      else if (is.size == 3)
         q"""
           state += 1
           if (state == ${is.head}) $fldName(0) = x
           else if (state == ${is.tail.head}) $fldName(1) = x
           else $fldName(2) = x
         """
-      } else c.abort(c.enclosingPosition, "more arguments not supported")
-    }
+      else c.abort(c.enclosingPosition, "more arguments not supported")
 
     // per type a sorted list of indices
-    val perType = targs.zipWithIndex.groupBy { case (targ, i) => targ }.map {
+    val perType = targs.zipWithIndex.groupBy { case (targ, i) => targ }.map
       case (targ, things) => (targ, (things.map { case (_, i) => i }).sorted)
-    }
 
     // create array-valued fields
     // val byteArr: Array[Int] = Array.ofDim[Int](3)
     // ...
     val fields =
-      (for (targ <- storage.keys) yield {
+      (for (targ <- storage.keys) yield
         val TypeRef(_, classSym, _) = targ
         val tpestr = classSym.name.toString.toLowerCase
         val name = newTermName(tpestr + "Arr")
         val storageTpe = storage(targ)
         val size = perType.getOrElse(targ, List[Int]()).size
         q"val $name: Array[$storageTpe] = Array.ofDim[$storageTpe]($size)"
-      }) ++ Seq(
+      ) ++ Seq(
           // implementation restriction: only store a single array
-          q"val arrByteArr: Array[Array[Byte]] = Array.ofDim[Array[Byte]](1)", {
+          q"val arrByteArr: Array[Array[Byte]] = Array.ofDim[Array[Byte]](1)",
             val storageTpe = storage(typeOf[AnyRef])
-            q"val anyRefArr: Array[$storageTpe] = Array.ofDim[$storageTpe](${perType
+            q"val anyRefArr: Array[$storageTpe] = Array.ofDim[$storageTpe]($perType
               .getOrElse(typeOf[AnyRef], List[Int]())
-              .size})"
-          }
+              .size)"
       )
 
     def finalTree(tpe: Type, tpeName: String): Tree =
@@ -254,8 +244,8 @@ object Externalizables {
         def close(): Unit = ???
         def flush(): Unit = ???
         def write(x1: Array[Byte],x2: Int,x3: Int): Unit = ???
-        def write(x: Array[Byte]): Unit = ${finalTree(
-        typeOf[Array[Byte]], "arrByte")}
+        def write(x: Array[Byte]): Unit = $finalTree(
+        typeOf[Array[Byte]], "arrByte")
         def write(x: Int): Unit = ???
         def writeObject(x: Any): Unit = ${finalTree(typeOf[AnyRef], "anyRef")}
       }
@@ -263,5 +253,3 @@ object Externalizables {
     """
 
     c.Expr[ArrayObjectOutput](instance)
-  }
-}

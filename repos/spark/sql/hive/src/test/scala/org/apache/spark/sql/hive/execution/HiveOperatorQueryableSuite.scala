@@ -23,10 +23,10 @@ import org.apache.spark.sql.hive.test.TestHiveSingleton
 /**
   * A set of tests that validates commands can also be queried by like a table
   */
-class HiveOperatorQueryableSuite extends QueryTest with TestHiveSingleton {
+class HiveOperatorQueryableSuite extends QueryTest with TestHiveSingleton
   import hiveContext._
 
-  test("SPARK-5324 query result of describe command") {
+  test("SPARK-5324 query result of describe command")
     hiveContext.loadTestTable("src")
 
     // register a describe command to be a temp table
@@ -41,5 +41,3 @@ class HiveOperatorQueryableSuite extends QueryTest with TestHiveSingleton {
 
     checkAnswer(sql("select col_name, data_type, comment from mydesc"),
                 Seq(Row("key", "int", null), Row("value", "string", null)))
-  }
-}

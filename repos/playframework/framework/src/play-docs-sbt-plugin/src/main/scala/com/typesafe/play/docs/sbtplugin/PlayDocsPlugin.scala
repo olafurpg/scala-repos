@@ -20,8 +20,8 @@ import sbt.Keys._
 import scala.collection.JavaConverters._
 import scala.util.control.NonFatal
 
-object Imports {
-  object PlayDocsKeys {
+object Imports
+  object PlayDocsKeys
     val manualPath = SettingKey[File](
         "playDocsManualPath", "The location of the manual", KeyRanks.CSetting)
     val docsVersion = SettingKey[String](
@@ -90,15 +90,12 @@ object Imports {
 
     val evaluateSbtFiles = TaskKey[Unit](
         "evaluateSbtFiles", "Evaluate all the sbt files in the project")
-  }
 
-  sealed trait PlayDocsResource {
+  sealed trait PlayDocsResource
     def file: File
-  }
   case class PlayDocsDirectoryResource(file: File) extends PlayDocsResource
   case class PlayDocsJarFileResource(file: File, base: Option[String])
       extends PlayDocsResource
-}
 
 /**
   * This plugin is used by all Play modules that themselves have compiled and tested markdown documentation, for example,
@@ -107,7 +104,7 @@ object Imports {
   *
   * Any changes to this plugin need to be made in consideration of the downstream projects that depend on it.
   */
-object PlayDocsPlugin extends AutoPlugin {
+object PlayDocsPlugin extends AutoPlugin
 
   import Imports._
   import Imports.PlayDocsKeys._
@@ -175,62 +172,57 @@ object PlayDocsPlugin extends AutoPlugin {
         // Need to ensure that templates in the Java docs get Java imports, and in the Scala docs get Scala imports
         sourceGenerators in Test <+= (javaManualSourceDirectories,
                                       javaTwirlSourceManaged,
-                                      streams) map { (from, to, s) =>
+                                      streams) map  (from, to, s) =>
           compileTemplates(from,
                            to,
                            TemplateImports.defaultJavaTemplateImports.asScala,
                            s.log)
-        },
+        ,
         sourceGenerators in Test <+= (scalaManualSourceDirectories,
                                       scalaTwirlSourceManaged,
-                                      streams) map { (from, to, s) =>
+                                      streams) map  (from, to, s) =>
           compileTemplates(from,
                            to,
                            TemplateImports.defaultScalaTemplateImports.asScala,
                            s.log)
-        },
-        routesCompilerTasks in Test := {
+        ,
+        routesCompilerTasks in Test :=
           val javaRoutes = (javaManualSourceDirectories.value * "*.routes").get
           val scalaRoutes =
             (scalaManualSourceDirectories.value * "*.routes").get
           val commonRoutes =
             (commonManualSourceDirectories.value * "*.routes").get
           (javaRoutes.map(_ -> Seq("play.libs.F")) ++ scalaRoutes.map(_ -> Nil) ++ commonRoutes
-                .map(_ -> Nil)).map {
+                .map(_ -> Nil)).map
             case (file, imports) =>
               RoutesCompilerTask(file, imports, true, true, true)
-          }
-        },
+        ,
         routesGenerator := InjectedRoutesGenerator,
-        evaluateSbtFiles := {
+        evaluateSbtFiles :=
           val unit = loadedBuild.value.units(thisProjectRef.value.build)
           val (eval, structure) =
             Load.defaultLoad(state.value, unit.localBase, state.value.log)
           val sbtFiles =
             ((unmanagedSourceDirectories in Test).value * "*.sbt").get
           val log = state.value.log
-          if (sbtFiles.nonEmpty) {
+          if (sbtFiles.nonEmpty)
             log.info("Testing .sbt files...")
-          }
-          val result = sbtFiles.map {
+          val result = sbtFiles.map
             sbtFile =>
               val relativeFile = relativeTo(baseDirectory.value)(sbtFile)
                 .getOrElse(sbtFile.getAbsolutePath)
-              try {
+              try
                 EvaluateConfigurations.evaluateConfiguration(
                     eval(), sbtFile, unit.imports)(unit.loader)
                 log.info(s"  ${Colors.green("+")} $relativeFile")
                 true
-              } catch {
+              catch
                 case NonFatal(_) =>
                   log.error(s" ${Colors.yellow("x")} $relativeFile")
                   false
-              }
-          }
-          if (result.contains(false)) {
+          if (result.contains(false))
             throw new TestsFailedException
-          }
-        },
+        ,
         parallelExecution in Test := false,
         javacOptions in Test ++= Seq("-g", "-Xlint:deprecation"),
         testOptions in Test += Tests.Argument(TestFrameworks.Specs2,
@@ -244,11 +236,11 @@ object PlayDocsPlugin extends AutoPlugin {
                          "--ignore-runners=org.specs2.runner.JUnitRunner")
     )
 
-  val docsJarFileSetting: Def.Initialize[Task[Option[File]]] = Def.task {
+  val docsJarFileSetting: Def.Initialize[Task[Option[File]]] = Def.task
     val jars = update.value
       .matching(configurationFilter("docs") && artifactFilter(`type` = "jar"))
       .toList
-    jars match {
+    jars match
       case Nil =>
         streams.value.log.error("No docs jar was resolved")
         None
@@ -258,11 +250,9 @@ object PlayDocsPlugin extends AutoPlugin {
         streams.value.log
           .error("Multiple docs jars were resolved: " + multiple)
         multiple.headOption
-    }
-  }
 
   // Run a documentation server
-  val docsRunSetting: Def.Initialize[InputTask[Unit]] = Def.inputTask {
+  val docsRunSetting: Def.Initialize[InputTask[Unit]] = Def.inputTask
     val args = Def.spaceDelimited().parsed
     val port = args.headOption.map(_.toInt).getOrElse(9000)
 
@@ -272,15 +262,12 @@ object PlayDocsPlugin extends AutoPlugin {
     val sbtLoader = this.getClass.getClassLoader
     val classloader = new java.net.URLClassLoader(
         classpath.map(_.data.toURI.toURL).toArray,
-        null /* important here, don't depend of the sbt classLoader! */ ) {
-      override def loadClass(name: String): Class[_] = {
-        if (play.core.Build.sharedClasses.contains(name)) {
+        null /* important here, don't depend of the sbt classLoader! */ )
+      override def loadClass(name: String): Class[_] =
+        if (play.core.Build.sharedClasses.contains(name))
           sbtLoader.loadClass(name)
-        } else {
+        else
           super.loadClass(name)
-        }
-      }
-    }
 
     val allResources = PlayDocsKeys.resources.value
 
@@ -290,10 +277,10 @@ object PlayDocsPlugin extends AutoPlugin {
         "fromResources", classOf[Array[java.io.File]], classOf[Array[String]])
 
     val files = allResources.map(_.file).toArray[File]
-    val baseDirs = allResources.map {
+    val baseDirs = allResources.map
       case PlayDocsJarFileResource(_, base) => base.orNull
       case PlayDocsDirectoryResource(_) => null
-    }.toArray[String]
+    .toArray[String]
 
     val buildDocHandler = fromResourcesMethod.invoke(null, files, baseDirs)
 
@@ -306,7 +293,7 @@ object PlayDocsPlugin extends AutoPlugin {
                                       classOf[Callable[_]],
                                       classOf[java.lang.Integer])
 
-    val translationReport = new Callable[File] {
+    val translationReport = new Callable[File]
       def call() =
         Project
           .runTask(cachedTranslationCodeSamplesReport, state.value)
@@ -315,8 +302,7 @@ object PlayDocsPlugin extends AutoPlugin {
           .toEither
           .right
           .get
-    }
-    val forceTranslationReport = new Callable[File] {
+    val forceTranslationReport = new Callable[File]
       def call() =
         Project
           .runTask(translationCodeSamplesReport, state.value)
@@ -325,7 +311,6 @@ object PlayDocsPlugin extends AutoPlugin {
           .toEither
           .right
           .get
-    }
     val docServerStart = constructor.newInstance()
     val server: ServerWithStop = startMethod
       .invoke(docServerStart,
@@ -347,30 +332,25 @@ object PlayDocsPlugin extends AutoPlugin {
 
     server.stop()
     buildDocHandler.asInstanceOf[Closeable].close()
-  }
 
-  private lazy val consoleReader = {
+  private lazy val consoleReader =
     val cr = new jline.console.ConsoleReader
     // Because jline, whenever you create a new console reader, turns echo off. Stupid thing.
     cr.getTerminal.setEchoEnabled(true)
     cr
-  }
 
-  private def waitForKey() = {
+  private def waitForKey() =
     consoleReader.getTerminal.setEchoEnabled(false)
-    def waitEOF() {
-      consoleReader.readCharacter() match {
+    def waitEOF()
+      consoleReader.readCharacter() match
         case 4 => // STOP
         case 11 =>
           consoleReader.clearScreen(); waitEOF()
         case 10 =>
           println(); waitEOF()
         case _ => waitEOF()
-      }
-    }
     waitEOF()
     consoleReader.getTerminal.setEchoEnabled(true)
-  }
 
   val templateFormats = Map("html" -> "play.twirl.api.HtmlFormat")
   val templateFilter = "*.scala.*"
@@ -379,7 +359,7 @@ object PlayDocsPlugin extends AutoPlugin {
   def compileTemplates(sourceDirectories: Seq[File],
                        target: File,
                        imports: Seq[String],
-                       log: Logger) = {
+                       log: Logger) =
     play.twirl.sbt.TemplateCompiler.compile(sourceDirectories,
                                             target,
                                             templateFormats,
@@ -389,5 +369,3 @@ object PlayDocsPlugin extends AutoPlugin {
                                             templateCodec,
                                             false,
                                             log)
-  }
-}

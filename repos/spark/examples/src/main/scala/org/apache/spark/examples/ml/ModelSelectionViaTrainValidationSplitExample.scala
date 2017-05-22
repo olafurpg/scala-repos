@@ -25,9 +25,9 @@ import org.apache.spark.ml.tuning.{ParamGridBuilder, TrainValidationSplit}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object ModelSelectionViaTrainValidationSplitExample {
+object ModelSelectionViaTrainValidationSplitExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf()
       .setAppName("ModelSelectionViaTrainValidationSplitExample")
     val sc = new SparkContext(conf)
@@ -69,5 +69,3 @@ object ModelSelectionViaTrainValidationSplitExample {
     // $example off$
 
     sc.stop()
-  }
-}

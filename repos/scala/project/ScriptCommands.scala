@@ -3,11 +3,11 @@ import Keys._
 import complete.DefaultParsers._
 
 /** Custom commands for use by the Jenkins scripts. This keeps the surface area and call syntax small. */
-object ScriptCommands {
+object ScriptCommands
   def all = Seq(setupPublishCore)
 
   /** Set up the environment for `validate/publish-core`. The argument is the Artifactory snapshot repository URL. */
-  def setupPublishCore = Command.single("setupPublishCore") {
+  def setupPublishCore = Command.single("setupPublishCore")
     case (state, url) =>
       Project
         .extract(state)
@@ -22,5 +22,3 @@ object ScriptCommands {
                 scalacOptions in Compile in ThisBuild += "-optimise"
             ),
             state)
-  }
-}

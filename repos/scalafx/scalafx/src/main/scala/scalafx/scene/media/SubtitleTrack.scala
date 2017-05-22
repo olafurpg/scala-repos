@@ -31,10 +31,9 @@ import javafx.scene.{media => jfxsm}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object SubtitleTrack {
+object SubtitleTrack
   implicit def sfxSubtitleTrack2jfx(st: SubtitleTrack): jfxsm.SubtitleTrack =
     if (st != null) st.delegate else null
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/media/SubtitleTrack.html]].

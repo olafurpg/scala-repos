@@ -26,7 +26,7 @@ import org.apache.spark.sql.{DataFrame, Row}
 
 class NormalizerSuite
     extends SparkFunSuite with MLlibTestSparkContext
-    with DefaultReadWriteTest {
+    with DefaultReadWriteTest
 
   @transient var data: Array[Vector] = _
   @transient var dataFrame: DataFrame = _
@@ -34,7 +34,7 @@ class NormalizerSuite
   @transient var l1Normalized: Array[Vector] = _
   @transient var l2Normalized: Array[Vector] = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
 
     data = Array(
@@ -67,37 +67,31 @@ class NormalizerSuite
     normalizer = new Normalizer()
       .setInputCol("features")
       .setOutputCol("normalized_features")
-  }
 
-  def collectResult(result: DataFrame): Array[Vector] = {
-    result.select("normalized_features").collect().map {
+  def collectResult(result: DataFrame): Array[Vector] =
+    result.select("normalized_features").collect().map
       case Row(features: Vector) => features
-    }
-  }
 
-  def assertTypeOfVector(lhs: Array[Vector], rhs: Array[Vector]): Unit = {
-    assert((lhs, rhs).zipped.forall {
+  def assertTypeOfVector(lhs: Array[Vector], rhs: Array[Vector]): Unit =
+    assert((lhs, rhs).zipped.forall
       case (v1: DenseVector, v2: DenseVector) => true
       case (v1: SparseVector, v2: SparseVector) => true
       case _ => false
-    }, "The vector type should be preserved after normalization.")
-  }
+    , "The vector type should be preserved after normalization.")
 
-  def assertValues(lhs: Array[Vector], rhs: Array[Vector]): Unit = {
-    assert((lhs, rhs).zipped.forall { (vector1, vector2) =>
+  def assertValues(lhs: Array[Vector], rhs: Array[Vector]): Unit =
+    assert((lhs, rhs).zipped.forall  (vector1, vector2) =>
       vector1 ~== vector2 absTol 1E-5
-    }, "The vector value is not correct after normalization.")
-  }
+    , "The vector value is not correct after normalization.")
 
-  test("Normalization with default parameter") {
+  test("Normalization with default parameter")
     val result = collectResult(normalizer.transform(dataFrame))
 
     assertTypeOfVector(data, result)
 
     assertValues(result, l2Normalized)
-  }
 
-  test("Normalization with setter") {
+  test("Normalization with setter")
     normalizer.setP(1)
 
     val result = collectResult(normalizer.transform(dataFrame))
@@ -105,17 +99,13 @@ class NormalizerSuite
     assertTypeOfVector(data, result)
 
     assertValues(result, l1Normalized)
-  }
 
-  test("read/write") {
+  test("read/write")
     val t = new Normalizer()
       .setInputCol("myInputCol")
       .setOutputCol("myOutputCol")
       .setP(3.0)
     testDefaultReadWrite(t)
-  }
-}
 
-private object NormalizerSuite {
+private object NormalizerSuite
   case class FeatureData(features: Vector)
-}

@@ -10,16 +10,16 @@ import com.typesafe.tools.mima.core.ProblemFilters._
 import com.typesafe.tools.mima.plugin.MimaPlugin.mimaDefaultSettings
 import com.typesafe.tools.mima.plugin.MimaKeys.{binaryIssueFilters, previousArtifacts}
 
-object ScalatraBuild extends Build {
+object ScalatraBuild extends Build
   import Dependencies._
 
   lazy val scalatraSettings =
     mimaDefaultSettings ++ Seq(
         organization := "org.scalatra",
         crossScalaVersions := Seq("2.11.7", "2.10.6"),
-        scalaVersion <<= (crossScalaVersions) { versions =>
+        scalaVersion <<= (crossScalaVersions)  versions =>
           versions.head
-        },
+        ,
         scalacOptions ++= Seq("-target:jvm-1.7",
                               "-unchecked",
                               "-deprecation",
@@ -47,11 +47,9 @@ object ScalatraBuild extends Build {
             "org.scala-lang" % "scala-reflect" % scalaVersion.value,
             "org.scala-lang" % "scala-compiler" % scalaVersion.value
         ),
-        previousArtifacts := {
-          Set("2.4.0").map {
+        previousArtifacts :=
+          Set("2.4.0").map
             organization.value % s"${name.value}_${scalaBinaryVersion.value}" % _
-          }
-        }
     ) ++ net.virtualvoid.sbt.graph.Plugin.graphSettings ++ mavenCentralFrouFrou ++ scalariformSettings
 
   lazy val scalatraProject = Project(
@@ -98,7 +96,6 @@ object ScalatraBuild extends Build {
         base = file("core"),
         settings = scalatraSettings ++ Seq(
               libraryDependencies <++= scalaVersion(sv =>
-                    {
                 val default = Seq(
                     servletApi % "provided;test",
                     slf4jApi,
@@ -112,7 +109,7 @@ object ScalatraBuild extends Build {
                 )
                 if (sv.startsWith("2.10")) default
                 else default ++ Seq(parserCombinators, xml)
-            }),
+            ),
               libraryDependencies ++= Seq(akkaTestkit % "test"),
               description := "The core Scalatra framework",
               binaryIssueFilters ++= Seq(
@@ -267,10 +264,10 @@ object ScalatraBuild extends Build {
         id = "scalatra-swagger",
         base = file("swagger"),
         settings = scalatraSettings ++ Seq(
-              libraryDependencies <++= (scalaVersion) { sv =>
+              libraryDependencies <++= (scalaVersion)  sv =>
               val com = Seq(json4sExt, logbackClassic % "provided")
               if (sv.startsWith("2.10")) com else parserCombinators +: com
-            },
+            ,
               description := "Scalatra integration with Swagger"
           )
     ) dependsOn
@@ -364,7 +361,7 @@ object ScalatraBuild extends Build {
         scalatraAuth, scalatraFileupload, scalatraJetty, scalatraCommands,
         scalatraAtmosphere)
 
-  object Dependencies {
+  object Dependencies
     lazy val parserCombinators =
       "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4"
     lazy val xml = "org.scala-lang.modules" %% "scala-xml" % "1.0.5"
@@ -453,10 +450,9 @@ object ScalatraBuild extends Build {
     private val scalateVersion = "1.7.1"
     private val scalatestVersion = "2.2.5"
     private val specs2Version = "3.7.2"
-  }
 
   lazy val manifestSetting =
-    packageOptions <+= (name, version, organization) map {
+    packageOptions <+= (name, version, organization) map
       (title, version, vendor) =>
         Package.ManifestAttributes(
             "Created-By" -> "Simple Build Tool",
@@ -470,7 +466,6 @@ object ScalatraBuild extends Build {
             "Implementation-Vendor-Id" -> vendor,
             "Implementation-Vendor" -> vendor
         )
-    }
 
   // Things we care about primarily because Maven Central demands them
   lazy val mavenCentralFrouFrou = Seq(
@@ -479,7 +474,7 @@ object ScalatraBuild extends Build {
       licenses :=
         Seq(("BSD",
              new URL("http://github.com/scalatra/scalatra/raw/HEAD/LICENSE"))),
-      pomExtra <<= (pomExtra, name, description) { (pom, name, desc) =>
+      pomExtra <<= (pomExtra, name, description)  (pom, name, desc) =>
         pom ++ Group(
             <scm>
         <url>http://github.com/scalatra/scalatra</url>
@@ -563,11 +558,9 @@ object ScalatraBuild extends Build {
         </developer>
       </developers>
         )
-      }
   )
 
   lazy val doNotPublish = Seq(publish := {},
                               publishLocal := {},
                               PgpKeys.publishSigned := {},
                               PgpKeys.publishLocalSigned := {})
-}

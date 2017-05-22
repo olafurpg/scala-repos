@@ -26,10 +26,9 @@ import scala.collection.generic.{CanBuildFrom, IsTraversableLike}
   * 
   * @author Miles Sabin
   */
-final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
+final class Sized[+Repr, L <: Nat] private (val unsized: Repr)
   // Cannot extend AnyVal in 2.10, see https://issues.scala-lang.org/browse/SI-6260
   override def toString = unsized.toString
-}
 
 /**
   * Carrier for `Sized` operations.
@@ -40,7 +39,7 @@ final class Sized[+Repr, L <: Nat] private (val unsized: Repr) {
   * @author Miles Sabin
   */
 class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
-    s: Sized[Repr, L], itl: IsTraversableLike[Repr] { type A = A0 }) { outer =>
+    s: Sized[Repr, L], itl: IsTraversableLike[Repr] { type A = A0 })  outer =>
   import nat._
   import ops.nat._
   import LT._
@@ -142,23 +141,21 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
     * Prepend the argument element to this collection. The resulting collection will be statically known to have a size
     * one greater than this collection.
     */
-  def +:(elem: A0)(implicit cbf: CanBuildFrom[Repr, A0, Repr]) = {
+  def +:(elem: A0)(implicit cbf: CanBuildFrom[Repr, A0, Repr]) =
     val builder = cbf.apply(s.unsized)
     builder += elem
     builder ++= s.unsized.toIterator
     wrap[Repr, Succ[L]](builder.result)
-  }
 
   /**
     * Append the argument element to this collection. The resulting collection will be statically known to have a size
     * one greater than this collection.
     */
-  def :+(elem: A0)(implicit cbf: CanBuildFrom[Repr, A0, Repr]) = {
+  def :+(elem: A0)(implicit cbf: CanBuildFrom[Repr, A0, Repr]) =
     val builder = cbf.apply(s.unsized)
     builder ++= s.unsized.toIterator
     builder += elem
     wrap[Repr, Succ[L]](builder.result)
-  }
 
   /**
     * Append the argument collection to this collection. The resulting collection will be statically known to have
@@ -190,13 +187,11 @@ class SizedOps[A0, Repr : AdditiveCollection, L <: Nat](
   def tupled[L0 <: HList, T](
       implicit hl: ToHList.Aux[Repr, L, L0], t: Tupler.Aux[L0, T]): T =
     t(hl(s))
-}
 
-trait LowPrioritySized {
+trait LowPrioritySized
   implicit def sizedToRepr[Repr](s: Sized[Repr, _]): Repr = s.unsized
-}
 
-object Sized extends LowPrioritySized {
+object Sized extends LowPrioritySized
   implicit def sizedOps[Repr, L <: Nat](s: Sized[Repr, L])(
       implicit itl: IsTraversableLike[Repr],
       ev: AdditiveCollection[Repr]): SizedOps[itl.A, Repr, L] =
@@ -212,7 +207,6 @@ object Sized extends LowPrioritySized {
     new Sized[Repr, L](r)
 
   def unapplySeq[Repr, L <: Nat](x: Sized[Repr, L]) = Some(x.unsized)
-}
 
 /**
   * Evidence that `Repr` instances can be nested in a `Sized`.
@@ -223,7 +217,7 @@ object Sized extends LowPrioritySized {
   */
 trait AdditiveCollection[Repr] extends Serializable
 
-object AdditiveCollection {
+object AdditiveCollection
   import scala.collection.immutable.Queue
   import scala.collection.LinearSeq
 
@@ -256,4 +250,3 @@ object AdditiveCollection {
   implicit def defaultAdditiveCollection[T]: AdditiveCollection[
       collection.immutable.IndexedSeq[T]] =
     new AdditiveCollection[collection.immutable.IndexedSeq[T]] {}
-}

@@ -42,7 +42,7 @@ import org.apache.spark.streaming.Duration
   */
 private[kinesis] class KinesisRecordProcessor[T](
     receiver: KinesisReceiver[T], workerId: String)
-    extends IRecordProcessor with Logging {
+    extends IRecordProcessor with Logging
 
   // shardId populated during initialize()
   @volatile
@@ -53,10 +53,9 @@ private[kinesis] class KinesisRecordProcessor[T](
     *
     * @param shardId assigned by the KCL to this particular RecordProcessor.
     */
-  override def initialize(shardId: String) {
+  override def initialize(shardId: String)
     this.shardId = shardId
     logInfo(s"Initialized workerId $workerId with shardId $shardId")
-  }
 
   /**
     * This method is called by the KCL when a batch of records is pulled from the Kinesis stream.
@@ -68,15 +67,15 @@ private[kinesis] class KinesisRecordProcessor[T](
     *   in the DStream
     */
   override def processRecords(
-      batch: List[Record], checkpointer: IRecordProcessorCheckpointer) {
-    if (!receiver.isStopped()) {
-      try {
+      batch: List[Record], checkpointer: IRecordProcessorCheckpointer)
+    if (!receiver.isStopped())
+      try
         receiver.addRecords(shardId, batch)
         logDebug(
             s"Stored: Worker $workerId stored ${batch.size} records for shardId $shardId")
         receiver.setCheckpointer(shardId, checkpointer)
-      } catch {
-        case NonFatal(e) => {
+      catch
+        case NonFatal(e) =>
             /*
              *  If there is a failure within the batch, the batch will not be checkpointed.
              *  This will potentially cause records since the last checkpoint to be processed
@@ -89,15 +88,11 @@ private[kinesis] class KinesisRecordProcessor[T](
 
             /* Rethrow the exception to the Kinesis Worker that is managing this RecordProcessor. */
             throw e
-          }
-      }
-    } else {
+    else
       /* RecordProcessor has been stopped. */
       logInfo(
           s"Stopped:  KinesisReceiver has stopped for workerId $workerId" +
           s" and shardId $shardId.  No more records will be processed.")
-    }
-  }
 
   /**
     * Kinesis Client Library is shutting down this Worker for 1 of 2 reasons:
@@ -110,9 +105,9 @@ private[kinesis] class KinesisRecordProcessor[T](
     * @param reason for shutdown (ShutdownReason.TERMINATE or ShutdownReason.ZOMBIE)
     */
   override def shutdown(
-      checkpointer: IRecordProcessorCheckpointer, reason: ShutdownReason) {
+      checkpointer: IRecordProcessorCheckpointer, reason: ShutdownReason)
     logInfo(s"Shutdown:  Shutting down workerId $workerId with reason $reason")
-    reason match {
+    reason match
       /*
        * TERMINATE Use Case.  Checkpoint.
        * Checkpoint to indicate that all records from the shard have been drained and processed.
@@ -129,11 +124,8 @@ private[kinesis] class KinesisRecordProcessor[T](
        */
       case _ =>
         receiver.removeCheckpointer(shardId, null) // return null so that we don't checkpoint
-    }
-  }
-}
 
-private[kinesis] object KinesisRecordProcessor extends Logging {
+private[kinesis] object KinesisRecordProcessor extends Logging
 
   /**
     * Retry the given amount of times with a random backoff time (millis) less than the
@@ -149,44 +141,36 @@ private[kinesis] object KinesisRecordProcessor extends Logging {
     */
   @annotation.tailrec
   def retryRandom[T](
-      expression: => T, numRetriesLeft: Int, maxBackOffMillis: Int): T = {
-    util.Try { expression } match {
+      expression: => T, numRetriesLeft: Int, maxBackOffMillis: Int): T =
+    util.Try { expression } match
       /* If the function succeeded, evaluate to x. */
       case util.Success(x) => x
       /* If the function failed, either retry or throw the exception */
       case util.Failure(e) =>
-        e match {
+        e match
           /* Retry:  Throttling or other Retryable exception has occurred */
           case _: ThrottlingException | _: KinesisClientLibDependencyException
-              if numRetriesLeft > 1 => {
+              if numRetriesLeft > 1 =>
               val backOffMillis = Random.nextInt(maxBackOffMillis)
               Thread.sleep(backOffMillis)
               logError(
                   s"Retryable Exception:  Random backOffMillis=${backOffMillis}",
                   e)
               retryRandom(expression, numRetriesLeft - 1, maxBackOffMillis)
-            }
           /* Throw:  Shutdown has been requested by the Kinesis Client Library. */
-          case _: ShutdownException => {
+          case _: ShutdownException =>
               logError(
                   s"ShutdownException:  Caught shutdown exception, skipping checkpoint.",
                   e)
               throw e
-            }
           /* Throw:  Non-retryable exception has occurred with the Kinesis Client Library */
-          case _: InvalidStateException => {
+          case _: InvalidStateException =>
               logError(
                   s"InvalidStateException:  Cannot save checkpoint to the DynamoDB table used" +
                   s" by the Amazon Kinesis Client Library.  Table likely doesn't exist.",
                   e)
               throw e
-            }
           /* Throw:  Unexpected exception has occurred */
-          case _ => {
+          case _ =>
               logError(s"Unexpected, non-retryable exception.", e)
               throw e
-            }
-        }
-    }
-  }
-}

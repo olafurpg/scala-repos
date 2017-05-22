@@ -13,11 +13,11 @@ import breeze.stats.distributions.RandBasis
   * @date 04/30/2014.
   */
 @RunWith(classOf[JUnitRunner])
-class randomTest extends FunSuite {
+class randomTest extends FunSuite
 
   implicit val basis = RandBasis.mt0
 
-  test("rand/randn") {
+  test("rand/randn")
     val rand1000 = rand(1000)
     val maxR1000: Double = max(rand1000)
     val minR1000: Double = min(rand1000)
@@ -27,9 +27,8 @@ class randomTest extends FunSuite {
 
     val randn10000 = randn(10000)
     assert(abs(mean(randn10000)) < 0.05, mean(randn10000))
-  }
 
-  test("randomDouble/randomInt") {
+  test("randomDouble/randomInt")
     val randDoub1000 = randomDouble(1000, (10d, 15d))
     val maxRD1000: Double = max(randDoub1000)
     val minRD1000: Double = min(randDoub1000)
@@ -42,5 +41,3 @@ class randomTest extends FunSuite {
     assert(maxRI1000 > 8 && maxRI1000 <= 9 && minRI1000 < 6 && minRI1000 >= 5,
            maxRI1000 + " " + maxRI1000 + " " + minRI1000 + " " + minRI1000)
     assert(randI1000.rows == 17 && randI1000.cols == 202)
-  }
-}

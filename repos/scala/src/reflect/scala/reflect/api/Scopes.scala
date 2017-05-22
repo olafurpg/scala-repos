@@ -21,7 +21,7 @@ package api
   *
   * @group ReflectionAPI
   */
-trait Scopes { self: Universe =>
+trait Scopes  self: Universe =>
 
   /** The base type of all scopes.
     *  @template
@@ -43,7 +43,7 @@ trait Scopes { self: Universe =>
   /** The API that all member scopes support
     *  @group API
     */
-  trait MemberScopeApi extends ScopeApi {
+  trait MemberScopeApi extends ScopeApi
 
     /** Sorts the symbols included in this scope so that:
       *    1) Symbols appear in the linearization order of their owners.
@@ -51,5 +51,3 @@ trait Scopes { self: Universe =>
       *    3) Synthetic members (e.g. getters/setters for vals/vars) might appear in arbitrary order.
       */
     def sorted: List[Symbol]
-  }
-}

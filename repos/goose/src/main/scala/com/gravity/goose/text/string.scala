@@ -23,22 +23,18 @@ package com.gravity.goose.text
   * Date: 5/13/11
   * Time: 12:11 AM
   */
-object string {
-  def isNullOrEmpty(input: String): Boolean = {
+object string
+  def isNullOrEmpty(input: String): Boolean =
     if (input == null) return true
     if (input.length == 0) return true
     false
-  }
 
   val empty: String = ""
   val emptyArray: Array[String] = Array[String](empty)
   var SPACE_SPLITTER: StringSplitter = new StringSplitter(" ")
 
-  def tryToInt(input: String): Option[Int] = {
-    try {
+  def tryToInt(input: String): Option[Int] =
+    try
       Some(input.toInt)
-    } catch {
+    catch
       case _: Exception => None
-    }
-  }
-}

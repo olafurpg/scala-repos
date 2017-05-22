@@ -15,9 +15,9 @@ import mesosphere.util.state.memory.InMemoryStore
 import org.scalatest.{GivenWhenThen, Matchers}
 
 class MigrationTo0_13Test
-    extends MarathonSpec with GivenWhenThen with Matchers {
+    extends MarathonSpec with GivenWhenThen with Matchers
 
-  test("migrate tasks in zk") {
+  test("migrate tasks in zk")
     val f = new Fixture
     Given("some tasks that are stored in old path style")
     val appId = "/test/app1".toRootPath
@@ -41,9 +41,8 @@ class MigrationTo0_13Test
     taskKeys should not contain f.legacyStoreKey(appId, task1.getId)
     taskKeys should contain(task2.getId)
     taskKeys should not contain f.legacyStoreKey(appId, task2.getId)
-  }
 
-  test("Migrating a migrated task throws an Exception") {
+  test("Migrating a migrated task throws an Exception")
     val f = new Fixture
     Given("some tasks that are stored in old path style")
     val appId = "/test/app1".toRootPath
@@ -57,10 +56,9 @@ class MigrationTo0_13Test
     val result = f.migration.migrateKey(task1.getId).failed.futureValue
     result.isInstanceOf[StreamCorruptedException]
     result.getMessage.contains("invalid stream header")
-  }
 
   test(
-      "Already migrated tasks will be excluded from a subsequent migration attempt") {
+      "Already migrated tasks will be excluded from a subsequent migration attempt")
     val f = new Fixture
     Given("some tasks that are stored in old path style")
     val appId = "/test/app1".toRootPath
@@ -94,9 +92,8 @@ class MigrationTo0_13Test
     taskKeys2 should not contain f.legacyStoreKey(appId, task1.getId)
     taskKeys2 should contain(task2.getId)
     taskKeys2 should not contain f.legacyStoreKey(appId, task2.getId)
-  }
 
-  test("migrating frameworkId to framework:id") {
+  test("migrating frameworkId to framework:id")
     import FrameworkIdValues._
     val f = new Fixture
     val frameworkId = FrameworkId("myFramework")
@@ -116,9 +113,8 @@ class MigrationTo0_13Test
     And("The new key should be present and contain the correct value")
     namesAfterMigration should contain(newName)
     f.frameworkIdStore.fetch(newName).futureValue should be(Some(frameworkId))
-  }
 
-  test("migrating frameworkId does nothing for non-existent node") {
+  test("migrating frameworkId does nothing for non-existent node")
     val f = new Fixture
 
     Given("a non-existing frameworkId")
@@ -129,9 +125,8 @@ class MigrationTo0_13Test
 
     Then("Nothing should have happened")
     f.frameworkIdStore.names().futureValue should be(empty)
-  }
 
-  test("migrating frameworkId is skipped if framework:id already exists") {
+  test("migrating frameworkId is skipped if framework:id already exists")
     import FrameworkIdValues._
     val f = new Fixture
     val frameworkId = FrameworkId("myFramework")
@@ -150,9 +145,8 @@ class MigrationTo0_13Test
     newNames.size should be(1)
     newNames should contain(newName)
     f.frameworkIdStore.fetch(newName).futureValue should be(Some(frameworkId))
-  }
 
-  class Fixture {
+  class Fixture
     lazy val uuidGenerator =
       Generators.timeBasedGenerator(EthernetAddress.fromInterface())
     lazy val state = new InMemoryStore
@@ -168,10 +162,9 @@ class MigrationTo0_13Test
                   .setId(UUID.randomUUID().toString)
                   .build()),
         prefix = TaskRepository.storePrefix)
-    lazy val taskRepo = {
+    lazy val taskRepo =
       val metrics = new Metrics(new MetricRegistry)
       new TaskRepository(entityStore, metrics)
-    }
     lazy val frameworkIdStore = new MarathonStore[FrameworkId](
         store = state,
         metrics = metrics,
@@ -183,13 +176,10 @@ class MigrationTo0_13Test
 
     def legacyStoreKey(appId: PathId, taskId: String): String =
       appId.safePath + ":" + taskId
-  }
 
-  object FrameworkIdValues {
+  object FrameworkIdValues
     val oldName = "frameworkId"
     val newName = "framework:id"
-  }
-}
 
 import java.io._
 
@@ -197,29 +187,25 @@ import mesosphere.util.state.{PersistentEntity, PersistentStore}
 
 import scala.concurrent.Future
 
-private[state] class LegacyTaskStore(store: PersistentStore) {
+private[state] class LegacyTaskStore(store: PersistentStore)
 
   val PREFIX = "task:"
   val ID_DELIMITER = ":"
 
-  private[this] def getKey(appId: PathId, taskId: String): String = {
+  private[this] def getKey(appId: PathId, taskId: String): String =
     PREFIX + appId.safePath + ID_DELIMITER + taskId
-  }
 
   private[this] def serialize(
-      task: MarathonTask, sink: ObjectOutputStream): Unit = {
+      task: MarathonTask, sink: ObjectOutputStream): Unit =
     val size = task.getSerializedSize
     sink.writeInt(size)
     sink.write(task.toByteArray)
     sink.flush()
-  }
 
-  def store(appId: PathId, task: MarathonTask): Future[PersistentEntity] = {
+  def store(appId: PathId, task: MarathonTask): Future[PersistentEntity] =
     val byteStream = new ByteArrayOutputStream()
     val output = new ObjectOutputStream(byteStream)
     serialize(task, output)
     val bytes = byteStream.toByteArray
     val key: String = getKey(appId, task.getId)
     store.create(key, bytes)
-  }
-}

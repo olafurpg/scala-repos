@@ -11,21 +11,17 @@ import org.scalajs.jasminetest.JasmineTest
 
 import scala.scalajs.js
 
-object RhinoLinkFailureTest extends JasmineTest {
+object RhinoLinkFailureTest extends JasmineTest
 
-  when("rhino").describe("Rhino Linking") {
+  when("rhino").describe("Rhino Linking")
 
-    it("should throw an exception if it fails loading a class") {
+    it("should throw an exception if it fails loading a class")
 
       // scala.collection.parallel.Splitter$ is not defined
-      try {
+      try
         val pool = scala.collection.parallel.Splitter.empty
         sys.error("Should not reach here")
-      } catch {
+      catch
         case js.JavaScriptException(e) =>
           // Make sure offending class is reported
           expect(e.toString).toContain("sc_parallel_Splitter$")
-      }
-    }
-  }
-}

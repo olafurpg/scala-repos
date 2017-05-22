@@ -1,6 +1,6 @@
 package com.twitter.util
 
-object Local {
+object Local
 
   /**
     * Represents the current state of all [[Local locals]] for a given
@@ -24,33 +24,29 @@ object Local {
     */
   def restore(saved: Context): Unit = localCtx.set(saved)
 
-  private def add(): Int = synchronized {
+  private def add(): Int = synchronized
     size += 1
     size - 1
-  }
 
-  private def set(i: Int, v: Option[_]): Unit = {
+  private def set(i: Int, v: Option[_]): Unit =
     assert(i < size)
     var ctx = localCtx.get
 
     if (ctx == null) ctx = new Array[Option[_]](size)
-    else {
+    else
       val oldCtx = ctx
       ctx = new Array[Option[_]](size)
       System.arraycopy(oldCtx, 0, ctx, 0, oldCtx.length)
-    }
 
     ctx(i) = v
     localCtx.set(ctx)
-  }
 
-  private def get(i: Int): Option[_] = {
+  private def get(i: Int): Option[_] =
     val ctx = localCtx.get
     if (ctx == null || ctx.length <= i) return None
 
     val v = ctx(i)
     if (v == null) None else v
-  }
 
   private def clear(i: Int): Unit =
     set(i, None)
@@ -64,11 +60,10 @@ object Local {
   /**
     * Execute a block with the given Locals, restoring current values upon completion.
     */
-  def let[U](ctx: Context)(f: => U): U = {
+  def let[U](ctx: Context)(f: => U): U =
     val saved = save()
     restore(ctx)
     try f finally restore(saved)
-  }
 
   /**
     * Execute a block with all Locals clear, restoring
@@ -81,16 +76,12 @@ object Local {
     * type whose Local context is saved when calling `closed`
     * and restored upon invocation.
     */
-  def closed[R](fn: () => R): () => R = {
+  def closed[R](fn: () => R): () => R =
     val closure = Local.save()
     () =>
-      {
         val save = Local.save()
         Local.restore(closure)
         try fn() finally Local.restore(save)
-      }
-  }
-}
 
 /**
   * A Local is a [[ThreadLocal]] whose scope is flexible. The state of all Locals may
@@ -108,7 +99,7 @@ object Local {
   * Note: the implementation is optimized for situations in which save and
   * restore optimizations are dominant.
   */
-final class Local[T] {
+final class Local[T]
   private[this] val me = Local.add()
 
   /**
@@ -134,21 +125,19 @@ final class Local[T] {
     * Execute a block with a specific Local value, restoring the current state
     * upon completion.
     */
-  def let[U](value: T)(f: => U): U = {
+  def let[U](value: T)(f: => U): U =
     val saved = apply()
     set(Some(value))
     try f finally set(saved)
-  }
 
   /**
     * Execute a block with the Local cleared, restoring the current state upon
     * completion.
     */
-  def letClear[U](f: => U): U = {
+  def letClear[U](f: => U): U =
     val saved = apply()
     clear()
     try f finally set(saved)
-  }
 
   /**
     * Clear the Local's value. Other [[Local Locals]] are not modified.
@@ -156,4 +145,3 @@ final class Local[T] {
     * General usage should be via [[letClear]] to avoid leaks.
     */
   def clear(): Unit = Local.clear(me)
-}

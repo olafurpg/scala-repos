@@ -8,26 +8,25 @@ import scala.reflect.api.{Mirror, TypeCreator, Universe => ApiUniverse}
 // sure, it's convenient, but then refactoring reflection / reification becomes a pain
 // `ClassTag` tags are fine, because they don't need a reifier to be generated
 
-trait StdTags {
+trait StdTags
   val u: ApiUniverse with Singleton
   val m: Mirror[u.type]
 
   lazy val tagOfListOfString: u.TypeTag[List[String]] =
-    u.TypeTag[List[String]](m, new TypeCreator {
-      def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type = {
+    u.TypeTag[List[String]](m, new TypeCreator
+      def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         val u = m.universe
         u.appliedType(u.definitions.ListClass.toType,
                       List(u.definitions.StringClass.toType))
-      }
-    })
+    )
 
   protected def tagOfStaticClass[T : ClassTag]: u.TypeTag[T] =
-    u.TypeTag[T](m, new TypeCreator {
+    u.TypeTag[T](m, new TypeCreator
       def apply[U <: ApiUniverse with Singleton](m: Mirror[U]): U#Type =
         m.staticClass(classTag[T].runtimeClass.getName)
           .toTypeConstructor
           .asInstanceOf[U#Type]
-    })
+    )
   lazy val tagOfInt = u.TypeTag.Int
   lazy val tagOfString = tagOfStaticClass[String]
   lazy val tagOfFile = tagOfStaticClass[scala.tools.nsc.io.File]
@@ -38,16 +37,13 @@ trait StdTags {
   lazy val tagOfBigDecimal = tagOfStaticClass[BigDecimal]
   lazy val tagOfCalendar = tagOfStaticClass[java.util.Calendar]
   lazy val tagOfDate = tagOfStaticClass[java.util.Date]
-}
 
-object StdRuntimeTags extends StdTags {
+object StdRuntimeTags extends StdTags
   val u: scala.reflect.runtime.universe.type = scala.reflect.runtime.universe
   val m = u.runtimeMirror(getClass.getClassLoader)
   // we need getClass.getClassLoader to support the stuff from scala-compiler.jar
-}
 
-abstract class StdContextTags extends StdTags {
+abstract class StdContextTags extends StdTags
   val tc: scala.reflect.macros.contexts.Context
   val u: tc.universe.type = tc.universe
   val m = tc.mirror
-}

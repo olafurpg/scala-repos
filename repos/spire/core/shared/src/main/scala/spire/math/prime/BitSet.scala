@@ -14,22 +14,19 @@ import spire.syntax.cfor._
   * segments can get. Until our sieving is more efficient, we don't
   * want segments that big anyway, so this is OK.
   */
-object BitSet {
+object BitSet
   def alloc(length: Int): BitSet =
     new BitSet(length, new Array[Int](length >>> 5))
-}
 
-case class BitSet(length: Int, array: Array[Int]) {
+case class BitSet(length: Int, array: Array[Int])
 
-  def +=(n: Int): Unit = {
+  def +=(n: Int): Unit =
     val q = n >>> 5
     array(q) = array(q) | (1 << (n & 31))
-  }
 
-  def -=(n: Int): Unit = {
+  def -=(n: Int): Unit =
     val q = n >>> 5
     array(q) = array(q) & ~(1 << (n & 31))
-  }
 
   def update(n: Int, b: Boolean): Unit =
     if (b) this += n else this -= n
@@ -39,4 +36,3 @@ case class BitSet(length: Int, array: Array[Int]) {
 
   def clear(): Unit =
     cfor(0)(_ < array.length, _ + 1)(array(_) = 0)
-}

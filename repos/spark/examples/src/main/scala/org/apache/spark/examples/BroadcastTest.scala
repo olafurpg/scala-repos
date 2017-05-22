@@ -23,8 +23,8 @@ import org.apache.spark.{SparkConf, SparkContext}
 /**
   * Usage: BroadcastTest [slices] [numElem] [blockSize]
   */
-object BroadcastTest {
-  def main(args: Array[String]) {
+object BroadcastTest
+  def main(args: Array[String])
 
     val blockSize = if (args.length > 2) args(2) else "4096"
 
@@ -38,7 +38,7 @@ object BroadcastTest {
 
     val arr1 = (0 until num).toArray
 
-    for (i <- 0 until 3) {
+    for (i <- 0 until 3)
       println("Iteration " + i)
       println("===========")
       val startTime = System.nanoTime
@@ -50,9 +50,6 @@ object BroadcastTest {
       println(
           "Iteration %d took %.0f milliseconds".format(
               i, (System.nanoTime - startTime) / 1E6))
-    }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

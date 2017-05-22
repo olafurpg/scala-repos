@@ -20,7 +20,7 @@ import scala.concurrent.Future
 
 class HealthCheckActorTest
     extends MarathonActorSupport with MarathonSpec with Matchers
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
 
   override lazy implicit val system: ActorSystem = ActorSystem(
       name = "system",
@@ -29,7 +29,7 @@ class HealthCheckActorTest
   )
 
   // regression test for #934
-  test("should not dispatch health checks for staging tasks") {
+  test("should not dispatch health checks for staging tasks")
     val tracker = mock[TaskTracker]
     val latch = TestLatch(1)
 
@@ -54,22 +54,19 @@ class HealthCheckActorTest
                                  mock[MarathonScheduler],
                                  HealthCheck(),
                                  tracker,
-                                 system.eventStream) {
-              override val workerProps = Props {
+                                 system.eventStream)
+              override val workerProps = Props
                 latch.countDown()
                 new TestActors.EchoActor
-              }
-            }
         )
     )
 
     actor.underlyingActor.dispatchJobs()
 
     latch.isOpen should be(false)
-  }
 
   // regression test for #1456
-  test("task should be killed if health check fails") {
+  test("task should be killed if health check fails")
     val tracker: TaskTracker = mock[TaskTracker]
     val scheduler: MarathonScheduler = mock[MarathonScheduler]
     val holder: MarathonSchedulerDriverHolder =
@@ -106,5 +103,3 @@ class HealthCheckActorTest
     verify(driver).killTask(task.taskId.mesosTaskId)
 
     verifyNoMoreInteractions(tracker, driver, scheduler)
-  }
-}

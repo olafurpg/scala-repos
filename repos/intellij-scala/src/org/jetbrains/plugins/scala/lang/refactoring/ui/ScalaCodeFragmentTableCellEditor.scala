@@ -12,14 +12,11 @@ import com.intellij.refactoring.ui.CodeFragmentTableCellEditorBase
   */
 class ScalaCodeFragmentTableCellEditor(project: Project)
     extends CodeFragmentTableCellEditorBase(
-        project, ScalaFileType.SCALA_FILE_TYPE) {
+        project, ScalaFileType.SCALA_FILE_TYPE)
 
-  override def stopCellEditing: Boolean = {
+  override def stopCellEditing: Boolean =
     val editor: Editor = myEditorTextField.getEditor
-    if (editor != null) {
+    if (editor != null)
       JavaReferenceImporter.autoImportReferenceAtCursor(
           editor, myCodeFragment, true)
-    }
     super.stopCellEditing
-  }
-}

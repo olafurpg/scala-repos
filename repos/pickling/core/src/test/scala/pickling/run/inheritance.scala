@@ -3,21 +3,19 @@ package scala.pickling.inheritance
 import org.scalatest.FunSuite
 import scala.pickling._, scala.pickling.Defaults._, json._
 
-abstract class Creature {
+abstract class Creature
   val species: String
-}
 
-abstract class Person extends Creature {
+abstract class Person extends Creature
   val species = "human"
   val name: String
   val age: Int
-}
 
 case class Firefighter(val name: String, val age: Int, val salary: Int)
     extends Person
 
-class InheritanceTest extends FunSuite {
-  test("main") {
+class InheritanceTest extends FunSuite
+  test("main")
     val f = new Firefighter("Josephine", 48, 40000)
 
     val pickleF = (f: Firefighter).pickle
@@ -55,5 +53,3 @@ class InheritanceTest extends FunSuite {
       |}
     """.trim.stripMargin)
     assert(pickleC.unpickle[Creature] === f)
-  }
-}

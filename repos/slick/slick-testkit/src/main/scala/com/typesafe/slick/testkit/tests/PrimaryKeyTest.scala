@@ -2,18 +2,17 @@ package com.typesafe.slick.testkit.tests
 
 import com.typesafe.slick.testkit.util.{RelationalTestDB, AsyncTest}
 
-class PrimaryKeyTest extends AsyncTest[RelationalTestDB] {
+class PrimaryKeyTest extends AsyncTest[RelationalTestDB]
   import tdb.profile.api._
 
-  def test = {
+  def test =
 
-    class A(tag: Tag) extends Table[(Int, Int, String)](tag, "a") {
+    class A(tag: Tag) extends Table[(Int, Int, String)](tag, "a")
       def k1 = column[Int]("k1")
       def k2 = column[Int]("k2")
       def s = column[String]("s")
       def * = (k1, k2, s)
       def pk = primaryKey("pk_a", (k1, k2))
-    }
     val as = TableQuery[A]
 
     as.baseTableRow.primaryKeys.map(_.name).toSet shouldBe Set("pk_a")
@@ -29,5 +28,3 @@ class PrimaryKeyTest extends AsyncTest[RelationalTestDB] {
         (as += (1, 1, "a11-conflict")).failed,
         as.schema.drop
     )
-  }
-}

@@ -42,19 +42,17 @@ import org.joda.time.Instant
 import shapeless._
 import scalaz.{NonEmptyList => NEL}
 
-object v1 {
+object v1
   case class GrantDetails(grantId: GrantId,
                           name: Option[String],
                           description: Option[String],
                           permissions: Set[Permission],
                           createdAt: Instant,
-                          expirationDate: Option[DateTime]) {
-    def isValidAt(timestamp: Instant) = {
+                          expirationDate: Option[DateTime])
+    def isValidAt(timestamp: Instant) =
       createdAt.isBefore(timestamp) &&
       expirationDate.forall(_.isAfter(timestamp))
-    }
-  }
-  object GrantDetails {
+  object GrantDetails
     implicit val grantDetailsIso =
       Iso.hlist(GrantDetails.apply _, GrantDetails.unapply _)
 
@@ -64,14 +62,13 @@ object v1 {
 
     implicit val (decomposerV1, extractorV1) =
       IsoSerialization.serialization[GrantDetails](schema)
-  }
 
   case class APIKeyDetails(apiKey: APIKey,
                            name: Option[String],
                            description: Option[String],
                            grants: Set[GrantDetails],
                            issuerChain: List[APIKey])
-  object APIKeyDetails {
+  object APIKeyDetails
     implicit val apiKeyDetailsIso =
       Iso.hlist(APIKeyDetails.apply _, APIKeyDetails.unapply _)
 
@@ -80,21 +77,18 @@ object v1 {
 
     implicit val (decomposerV1, extractorV1) =
       IsoSerialization.serialization[APIKeyDetails](schema)
-  }
 
   case class NewGrantRequest(name: Option[String],
                              description: Option[String],
                              parentIds: Set[GrantId],
                              permissions: Set[Permission],
-                             expirationDate: Option[DateTime]) {
-    def isExpired(at: Option[DateTime]) = (expirationDate, at) match {
+                             expirationDate: Option[DateTime])
+    def isExpired(at: Option[DateTime]) = (expirationDate, at) match
       case (None, _) => false
       case (_, None) => true
       case (Some(expiry), Some(ref)) => expiry.isBefore(ref)
-    }
-  }
 
-  object NewGrantRequest {
+  object NewGrantRequest
     private implicit val reqPermDecomposer = Permission.decomposerV1Base
     implicit val newGrantRequestIso =
       Iso.hlist(NewGrantRequest.apply _, NewGrantRequest.unapply _)
@@ -106,13 +100,12 @@ object v1 {
       IsoSerialization.decomposer[NewGrantRequest](schemaV1)
     implicit val extractorV1 =
       IsoSerialization.extractor[NewGrantRequest](schemaV1)
-  }
 
   case class NewAPIKeyRequest(name: Option[String],
                               description: Option[String],
                               grants: Set[NewGrantRequest])
 
-  object NewAPIKeyRequest {
+  object NewAPIKeyRequest
     implicit val newAPIKeyRequestIso =
       Iso.hlist(NewAPIKeyRequest.apply _, NewAPIKeyRequest.unapply _)
 
@@ -124,7 +117,7 @@ object v1 {
     def newAccount(accountId: AccountId,
                    name: Option[String] = None,
                    description: Option[String] = None,
-                   parentIds: Set[GrantId] = Set()) = {
+                   parentIds: Set[GrantId] = Set()) =
       val path = Path("/%s/".format(accountId))
       val permissions = Account.newAccountPermissions(accountId, path)
       val grantRequest = NewGrantRequest(
@@ -135,8 +128,5 @@ object v1 {
           None)
 
       NewAPIKeyRequest(name, description, Set(grantRequest))
-    }
-  }
-}
 
 // vim: set ts=4 sw=4 et:

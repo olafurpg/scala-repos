@@ -4,20 +4,20 @@ import scala.collection.mutable.FlatHashTable
 import scala.collection.mutable.HashSet
 import scala.collection.parallel.mutable.ParHashSet
 
-object Test extends App {
+object Test extends App
   test(
-      new Creator {
+      new Creator
     def create[A] = new HashSet[A]
     def hashSetType = "HashSet"
-  })
+  )
 
   test(
-      new Creator {
+      new Creator
     def create[A] = new ParHashSet[A]
     def hashSetType = "ParHashSet"
-  })
+  )
 
-  def test(creator: Creator) {
+  def test(creator: Creator)
     println("*** " + creator.hashSetType + " primitives")
     val h1 = creator.create[Int]
     for (i <- 0 until 20) h1 += i
@@ -42,9 +42,9 @@ object Test extends App {
         (for (i <- 20 until 40) yield
           i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println(
-        (h2.toList map { x =>
+        (h2.toList map  x =>
           "" + x
-        }).sorted mkString ",")
+        ).sorted mkString ",")
 
     h2 -= null
     h2 -= "" + 0
@@ -53,11 +53,8 @@ object Test extends App {
         (for (i <- 0 until 20) yield
           i + " " + (h2 contains ("" + i))).toList.sorted mkString (","))
     println
-  }
 
-  trait Creator {
+  trait Creator
     def create[A]: GenSet[A] with Cloneable with FlatHashTable[A] with Growable[
         A] with Shrinkable[A]
     def hashSetType: String
-  }
-}

@@ -9,7 +9,7 @@ import akka.http.scaladsl.model.{HttpResponse, HttpRequest}
 /**
   * Enables programmatic access to the server-side request timeout logic.
   */
-trait TimeoutAccess extends akka.http.javadsl.TimeoutAccess {
+trait TimeoutAccess extends akka.http.javadsl.TimeoutAccess
 
   /**
     * Tries to set a new timeout.
@@ -38,4 +38,3 @@ trait TimeoutAccess extends akka.http.javadsl.TimeoutAccess {
     * the previously set timeout has expired!
     */
   def update(timeout: Duration, handler: HttpRequest ⇒ HttpResponse): Unit
-}

@@ -10,19 +10,16 @@ import akka.util.ByteString
 import akka.parboiled2
 import parboiled2._
 
-object BitBuilder {
-  implicit class BitBuilderContext(val ctx: StringContext) {
-    def b(args: Any*): ByteString = {
+object BitBuilder
+  implicit class BitBuilderContext(val ctx: StringContext)
+    def b(args: Any*): ByteString =
       val input = ctx.parts.mkString.replace("\r\n", "\n")
       val parser = new BitSpecParser(input)
       val bits = parser.parseBits()
       bits.get.toByteString
-    }
-  }
-}
 
-final case class Bits(elements: Seq[Bits.BitElement]) {
-  def toByteString: ByteString = {
+final case class Bits(elements: Seq[Bits.BitElement])
+  def toByteString: ByteString =
     import Bits._
 
     val bits = elements.map(_.bits).sum
@@ -33,7 +30,7 @@ final case class Bits(elements: Seq[Bits.BitElement]) {
     def rec(byteIdx: Int, bitIdx: Int, remaining: Seq[Bits.BitElement]): Unit =
       if (bitIdx >= 8) rec(byteIdx + 1, bitIdx - 8, remaining)
       else
-        remaining match {
+        remaining match
           case Zero +: rest ⇒
             // zero by default
             rec(byteIdx, bitIdx + 1, rest)
@@ -52,34 +49,27 @@ final case class Bits(elements: Seq[Bits.BitElement]) {
             else rec(byteIdx, bitIdx + numBits, rest)
           case Nil ⇒
             require(bitIdx == 0 && byteIdx == bits / 8)
-        }
     rec(0, 0, elements)
 
     ByteString(data) // this could be ByteString1C
-  }
-}
-object Bits {
-  sealed trait BitElement {
+object Bits
+  sealed trait BitElement
     def bits: Int
-  }
-  sealed abstract class SingleBit extends BitElement {
+  sealed abstract class SingleBit extends BitElement
     def bits: Int = 1
-  }
   case object Zero extends SingleBit
   case object One extends SingleBit
   case class Multibit(bits: Int, value: Long) extends BitElement
-}
 
-class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
+class BitSpecParser(val input: ParserInput) extends parboiled2.Parser
   import Bits._
   def parseBits(): Try[Bits] =
-    bits.run() match {
+    bits.run() match
       case s: Success[Bits] ⇒ s
       case Failure(e: ParseError) ⇒
         Failure(new RuntimeException(
                 formatError(e, new ErrorFormatter(showTraces = true))))
       case _ ⇒ throw new IllegalStateException()
-    }
 
   def bits: Rule1[Bits] = rule { zeroOrMore(element) ~ EOI ~> (Bits(_)) }
 
@@ -87,20 +77,15 @@ class BitSpecParser(val input: ParserInput) extends parboiled2.Parser {
   def ws = rule { zeroOrMore(wsElement) }
   def wsElement = rule { WSChar | comment }
   def comment =
-    rule {
+    rule
       '#' ~ zeroOrMore(!'\n' ~ ANY) ~ '\n'
-    }
 
-  def element: Rule1[BitElement] = rule {
+  def element: Rule1[BitElement] = rule
     zero | one | multi
-  }
   def zero: Rule1[BitElement] = rule { '0' ~ push(Zero) ~ ws }
   def one: Rule1[BitElement] = rule { '1' ~ push(One) ~ ws }
-  def multi: Rule1[Multibit] = rule {
+  def multi: Rule1[Multibit] = rule
     capture(oneOrMore('x' ~ ws)) ~> (_.count(_ == 'x')) ~ '=' ~ value ~ ws ~> Multibit
-  }
-  def value: Rule1[Long] = rule {
+  def value: Rule1[Long] = rule
     capture(oneOrMore(CharPredicate.HexDigit)) ~>
     ((str: String) ⇒ java.lang.Long.parseLong(str, 16))
-  }
-}

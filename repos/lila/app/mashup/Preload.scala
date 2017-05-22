@@ -23,7 +23,7 @@ final class Preload(tv: Tv,
                     countRounds: () => Int,
                     lobbyApi: lila.api.LobbyApi,
                     getPlayban: String => Fu[Option[TempBan]],
-                    lightUser: String => Option[LightUser]) {
+                    lightUser: String => Option[LightUser])
 
   private type Response = (JsObject, List[Entry], List[MiniForumPost],
   List[Tournament], List[Simul], Option[Game], List[User.LightPerf],
@@ -36,7 +36,7 @@ final class Preload(tv: Tv,
     lobbyApi(ctx) zip posts zip tours zip simuls zip tv.getBest zip
     (ctx.userId ?? timelineEntries) zip leaderboard(true) zip tourneyWinners(
         10) zip dailyPuzzle() zip streamsOnAir() zip (ctx.userId ?? getPlayban) zip
-    (ctx.me ?? Preload.currentGame(lightUser)) map {
+    (ctx.me ?? Preload.currentGame(lightUser)) map
       case (((((((((((data, posts), tours), simuls), feat), entries), lead),
                 tWinners),
                puzzle),
@@ -57,24 +57,19 @@ final class Preload(tv: Tv,
          playban,
          currentGame,
          countRounds())
-    }
-}
 
-object Preload {
+object Preload
 
   case class CurrentGame(pov: Pov, json: JsObject, opponent: String)
 
   def currentGame(lightUser: String => Option[LightUser])(user: User) =
-    GameRepo.urgentGames(user) map { povs =>
-      povs.find { p =>
+    GameRepo.urgentGames(user) map  povs =>
+      povs.find  p =>
         p.game.nonAi && p.game.hasClock && p.isMyTurn
-      } map { pov =>
+      map  pov =>
         val opponent = lila.game.Namer.playerString(pov.opponent)(lightUser)
         CurrentGame(pov = pov,
                     opponent = opponent,
                     json = Json.obj("id" -> pov.game.id,
                                     "color" -> pov.color.name,
                                     "opponent" -> opponent))
-      }
-    }
-}

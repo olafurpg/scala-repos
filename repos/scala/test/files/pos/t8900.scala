@@ -1,11 +1,8 @@
 package foo
 package lambdaking
 
-class Test {
+class Test
   def byname(b: => Any) = ???
-  def foo: Any = {
-    def bar: Any = {
+  def foo: Any =
+    def bar: Any =
       byname(bar)
-    }
-  }
-}

@@ -23,18 +23,16 @@ import java.util.Properties
 /**
   * Helper functions for dealing with command line utilities
   */
-object CommandLineUtils extends Logging {
+object CommandLineUtils extends Logging
 
   /**
     * Check that all the listed options are present
     */
   def checkRequiredArgs(
-      parser: OptionParser, options: OptionSet, required: OptionSpec[_]*) {
-    for (arg <- required) {
+      parser: OptionParser, options: OptionSet, required: OptionSpec[_]*)
+    for (arg <- required)
       if (!options.has(arg))
         printUsageAndDie(parser, "Missing required argument \"" + arg + "\"")
-    }
-  }
 
   /**
     * Check that none of the listed options are present
@@ -42,46 +40,38 @@ object CommandLineUtils extends Logging {
   def checkInvalidArgs(parser: OptionParser,
                        options: OptionSet,
                        usedOption: OptionSpec[_],
-                       invalidOptions: Set[OptionSpec[_]]) {
-    if (options.has(usedOption)) {
-      for (arg <- invalidOptions) {
+                       invalidOptions: Set[OptionSpec[_]])
+    if (options.has(usedOption))
+      for (arg <- invalidOptions)
         if (options.has(arg))
           printUsageAndDie(parser,
                            "Option \"" + usedOption +
                            "\" can't be used with option\"" + arg + "\"")
-      }
-    }
-  }
 
   /**
     * Print usage and exit
     */
-  def printUsageAndDie(parser: OptionParser, message: String): Nothing = {
+  def printUsageAndDie(parser: OptionParser, message: String): Nothing =
     System.err.println(message)
     parser.printHelpOn(System.err)
     sys.exit(1)
-  }
 
   /**
     * Parse key-value pairs in the form key=value
     */
   def parseKeyValueArgs(args: Iterable[String],
-                        acceptMissingValue: Boolean = true): Properties = {
+                        acceptMissingValue: Boolean = true): Properties =
     val splits = args.map(_ split "=").filterNot(_.length == 0)
 
     val props = new Properties
-    for (a <- splits) {
-      if (a.length == 1) {
+    for (a <- splits)
+      if (a.length == 1)
         if (acceptMissingValue) props.put(a(0), "")
         else
           throw new IllegalArgumentException(s"Missing value for key ${a(0)}")
-      } else if (a.length == 2) props.put(a(0), a(1))
-      else {
+      else if (a.length == 2) props.put(a(0), a(1))
+      else
         System.err.println(
             "Invalid command line properties: " + args.mkString(" "))
         System.exit(1)
-      }
-    }
     props
-  }
-}

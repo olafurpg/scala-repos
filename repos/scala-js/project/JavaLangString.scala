@@ -15,9 +15,9 @@ import ir.Position.NoPosition
   *  compile even a mocked version of java.lang.String. So we have to bypass
   *  entirely the compiler to define java.lang.String.
   */
-object JavaLangString {
+object JavaLangString
 
-  val InfoAndTree = {
+  val InfoAndTree =
     implicit val DummyPos = NoPosition
 
     val ThisType = ClassType(StringClass)
@@ -40,20 +40,20 @@ object JavaLangString {
                                     AnyType,
                                     mutable = false,
                                     rest = false)),
-                      BooleanType, {
+                      BooleanType,
                         BinaryOp(BinaryOp.===,
                                  This()(ThisType),
                                  VarRef(Ident("that", Some("that")))(AnyType))
-                      })(OptimizerHints.empty.withInline(true), None),
+                      )(OptimizerHints.empty.withInline(true), None),
             /* def hashCode(): Int = RuntimeString.hashCode(this) */
             MethodDef(static = false,
                       Ident("hashCode__I", Some("hashCode__I")),
                       Nil,
-                      IntType, {
+                      IntType,
                         Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
                               Ident("hashCode__T__I", Some("hashCode__T__I")),
                               List(This()(ThisType)))(IntType)
-                      })(OptimizerHints.empty.withInline(true), None),
+                      )(OptimizerHints.empty.withInline(true), None),
             /* def compareTo(that: String): Int = RuntimeString.compareTo(this, that) */
             MethodDef(static = false,
                       Ident("compareTo__T__I", Some("compareTo__T__I")),
@@ -61,14 +61,14 @@ object JavaLangString {
                                     ThisType,
                                     mutable = false,
                                     rest = false)),
-                      IntType, {
+                      IntType,
                         Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
                               Ident("compareTo__T__T__I",
                                     Some("compareTo__T__T__I")),
                               List(This()(ThisType),
                                    VarRef(Ident("that", Some("that")))(
                                        ThisType)))(IntType)
-                      })(OptimizerHints.empty.withInline(true), None),
+                      )(OptimizerHints.empty.withInline(true), None),
             /* def compareTo(that: Object): Int = compareTo(that.asInstanceOf[String]) */
             MethodDef(
                 static = false,
@@ -77,20 +77,20 @@ object JavaLangString {
                               AnyType,
                               mutable = false,
                               rest = false)),
-                IntType, {
+                IntType,
                   Apply(This()(ThisType),
                         Ident("compareTo__T__I", Some("compareTo__T__I")),
                         List(AsInstanceOf(
                                 VarRef(Ident("that", Some("that")))(AnyType),
                                 ThisType)))(IntType)
-                })(OptimizerHints.empty.withInline(true), None),
+                )(OptimizerHints.empty.withInline(true), None),
             /* def toString(): String = this */
             MethodDef(static = false,
                       Ident("toString__T", Some("toString__T")),
                       Nil,
-                      ClassType(StringClass), {
+                      ClassType(StringClass),
                         This()(ThisType)
-                      })(OptimizerHints.empty.withInline(true), None),
+                      )(OptimizerHints.empty.withInline(true), None),
             /* def charAt(i: Int): Char = RuntimeString.charAt(this, i) */
             MethodDef(
                 static = false,
@@ -99,22 +99,22 @@ object JavaLangString {
                               IntType,
                               mutable = false,
                               rest = false)),
-                IntType, {
+                IntType,
                   Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
                         Ident("charAt__T__I__C", Some("charAt__T__I__C")),
                         List(This()(ThisType),
                              VarRef(Ident("i", Some("i")))(IntType)))(IntType)
-                })(OptimizerHints.empty.withInline(true), None),
+                )(OptimizerHints.empty.withInline(true), None),
             /* def length(): Int = RuntimeString.length(this) */
             MethodDef(
                 static = false,
                 Ident("length__I", Some("length__I")),
                 Nil,
-                IntType, {
+                IntType,
                   Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
                         Ident("length__T__I", Some("length__T__I")),
                         List(This()(ThisType)))(IntType)
-                })(OptimizerHints.empty.withInline(true), None),
+                )(OptimizerHints.empty.withInline(true), None),
             /* def subSequence(begin: Int, end: Int): CharSequence =
              *   RuntimeString.subSequence(this, begin, end)
              */
@@ -132,7 +132,7 @@ object JavaLangString {
                              mutable = false,
                              rest = false)
                 ),
-                ClassType("jl_CharSequence"), {
+                ClassType("jl_CharSequence"),
                   Apply(LoadModule(ClassType("sjsr_RuntimeString$")),
                         Ident("subSequence__T__I__I__jl_CharSequence",
                               Some("subSequence__T__I__I__jl_CharSequence")),
@@ -140,12 +140,10 @@ object JavaLangString {
                              VarRef(Ident("begin", Some("begin")))(IntType),
                              VarRef(Ident("end", Some("end")))(IntType)))(
                       ClassType("jl_CharSequence"))
-                })(OptimizerHints.empty.withInline(true), None)
+                )(OptimizerHints.empty.withInline(true), None)
         ))(OptimizerHints.empty)
 
     val hashedClassDef = Hashers.hashClassDef(classDef)
     val info = generateClassInfo(hashedClassDef)
 
     (info, hashedClassDef)
-  }
-}

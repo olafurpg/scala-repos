@@ -10,12 +10,12 @@ import org.jetbrains.plugins.scala.overrideImplement.{ScAliasMember, ScalaOIUtil
 /**
   * Pavel Fatin
   */
-object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
+object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition]
   def kind = classOf[ScTemplateDefinition]
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
+               typeAware: Boolean)
     if (!typeAware) return
 
     val isNew = definition.isInstanceOf[ScNewTemplateDefinition]
@@ -27,39 +27,31 @@ object ObjectCreationImpossible extends AnnotatorPart[ScTemplateDefinition] {
 
     val hasAbstract = refs.flatMap(_._2.toSeq).exists(t => isAbstract(t._1))
 
-    if (hasAbstract) {
-      refs.headOption.foreach {
+    if (hasAbstract)
+      refs.headOption.foreach
         case (refElement, Some(psiClass)) =>
           import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil._
 
-          val undefined = for {
+          val undefined = for
             member <- getMembersToImplement(definition)
                          if !member.isInstanceOf[ScAliasMember] // See SCL-2887
-          } yield {
-            try {
+          yield
+            try
               (member.getText, member.getParentNodeDelegate.getText)
-            } catch {
+            catch
               case iae: IllegalArgumentException =>
                 throw new RuntimeException("memer: " + member.getText, iae)
-            }
-          }
 
-          if (undefined.nonEmpty) {
+          if (undefined.nonEmpty)
             val element =
               if (isNew) refElement
               else definition.asInstanceOf[ScObject].nameId
             val annotation = holder.createErrorAnnotation(
                 element, message(undefined.toSeq: _*))
             annotation.registerFix(new ImplementMethodsQuickFix(definition))
-          }
         case _ =>
-      }
-    }
-  }
 
-  def message(members: (String, String)*) = {
+  def message(members: (String, String)*) =
     "Object creation impossible, since %s".format(members
           .map(p => " member %s in %s is not defined".format(p._1, p._2))
           .mkString("; "))
-  }
-}

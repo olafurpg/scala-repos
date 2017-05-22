@@ -5,16 +5,15 @@ import org.scalatest.WordSpec
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class DiagnosticsTest extends WordSpec {
-  "Diagnostics" should {
-    "print distribution" in {
+class DiagnosticsTest extends WordSpec
+  "Diagnostics" should
+    "print distribution" in
       val hosts = 1 until 500 map { "10.1.1." + _ + ":11211:4" }
 
-      val nodes = hosts.map { s =>
+      val nodes = hosts.map  s =>
         val Array(host, port, weight) = s.split(":")
         val identifier = host + ":" + port
         KetamaNode(identifier, weight.toInt, identifier)
-      }
 
       val hashFunctions = List(
           "FNV1_32" -> KeyHasher.FNV1_32,
@@ -36,6 +35,3 @@ class DiagnosticsTest extends WordSpec {
       //   val duration = (Time.now - start).inMilliseconds
       //   println("%s\n  distribution: %.5f\n  duration: %dms\n".format(s, dev, duration))
       // }
-    }
-  }
-}

@@ -6,7 +6,7 @@ import reactivemongo.api._
 import lila.db.api._
 import tube.requestTube
 
-object RequestRepo {
+object RequestRepo
 
   type ID = String
 
@@ -32,4 +32,3 @@ object RequestRepo {
     $select(Request.makeId(teamId, userId))
   def teamQuery(teamId: ID) = Json.obj("team" -> teamId)
   def teamsQuery(teamIds: List[ID]) = Json.obj("team" -> $in(teamIds))
-}

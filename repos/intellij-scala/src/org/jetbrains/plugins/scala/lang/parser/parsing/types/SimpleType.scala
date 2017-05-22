@@ -22,14 +22,14 @@ import scala.annotation.tailrec
  *              | '(' Types [','] ')'
  */
 
-object SimpleType {
+object SimpleType
   def parse(builder: ScalaPsiBuilder,
             isPattern: Boolean,
-            multipleSQBrackets: Boolean = true): Boolean = {
+            multipleSQBrackets: Boolean = true): Boolean =
     @tailrec
     def parseTail(
-        curMarker: PsiBuilder.Marker, checkSQBracket: Boolean = true) {
-      builder.getTokenType match {
+        curMarker: PsiBuilder.Marker, checkSQBracket: Boolean = true)
+      builder.getTokenType match
         case ScalaTokenTypes.tLSQBRACKET if checkSQBracket =>
           val newMarker = curMarker.precede
           TypeArgs.parse(builder, isPattern)
@@ -38,7 +38,7 @@ object SimpleType {
         case ScalaTokenTypes.tINNER_CLASS =>
           val newMarker = curMarker.precede
           builder.advanceLexer() //Ate #
-          builder.getTokenType match {
+          builder.getTokenType match
             case ScalaTokenTypes.tIDENTIFIER =>
               builder.advanceLexer() //Ate id
               curMarker.done(ScalaElementTypes.TYPE_PROJECTION)
@@ -46,35 +46,30 @@ object SimpleType {
             case _ =>
               newMarker.drop()
               curMarker.drop()
-          }
         case _ =>
           curMarker.drop()
-      }
-    }
 
     val simpleMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tLPARENTHESIS =>
         val tupleMarker = builder.mark
         builder.advanceLexer()
         builder.disableNewlines
         val (_, isTuple) = Types parse builder
-        builder.getTokenType match {
+        builder.getTokenType match
           case ScalaTokenTypes.tCOMMA =>
             builder.advanceLexer() //Ate ,
-            builder.getTokenType match {
+            builder.getTokenType match
               case ScalaTokenTypes.tRPARENTHESIS =>
                 builder.advanceLexer() //Ate )
                 if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
-                else {
+                else
                   builder.error("Identifier expected, but ',' found")
                   tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
-                }
               case _ =>
                 builder error ScalaBundle.message("rparenthesis.expected")
                 if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
                 else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
-            }
           case ScalaTokenTypes.tRPARENTHESIS =>
             builder.advanceLexer() //Ate )
             if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
@@ -83,16 +78,15 @@ object SimpleType {
             builder error ScalaBundle.message("rparenthesis.expected")
             if (isTuple) tupleMarker.done(ScalaElementTypes.TUPLE_TYPE)
             else tupleMarker.done(ScalaElementTypes.TYPE_IN_PARENTHESIS)
-        }
         builder.restoreNewlinesState
       case ScalaTokenTypes.kTHIS | ScalaTokenTypes.tIDENTIFIER |
           ScalaTokenTypes.kSUPER =>
         val newMarker = builder.mark
         Path parse (builder, ScalaElementTypes.REFERENCE)
-        builder.getTokenType match {
+        builder.getTokenType match
           case ScalaTokenTypes.tDOT =>
             builder.advanceLexer() //Ate .
-            builder.getTokenType match {
+            builder.getTokenType match
               case ScalaTokenTypes.kTYPE =>
                 builder.advanceLexer() //Ate type
                 newMarker.done(ScalaElementTypes.SIMPLE_TYPE)
@@ -101,18 +95,13 @@ object SimpleType {
                 val fMarker = builder.mark
                 StableId parse (builder, ScalaElementTypes.REFERENCE)
                 fMarker.done(ScalaElementTypes.SIMPLE_TYPE)
-            }
           case _ =>
             newMarker.rollbackTo()
             val fMarker = builder.mark
             StableId parse (builder, ScalaElementTypes.REFERENCE)
             fMarker.done(ScalaElementTypes.SIMPLE_TYPE)
-        }
       case _ =>
         simpleMarker.rollbackTo()
         return false
-    }
     parseTail(simpleMarker)
     true
-  }
-}

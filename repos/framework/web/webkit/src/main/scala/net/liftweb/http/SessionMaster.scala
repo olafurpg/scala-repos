@@ -43,7 +43,7 @@ case class SessionInfo(session: LiftSession,
   * Manages LiftSessions because the servlet container is less than optimal at
   * timing sessions out.
   */
-object SessionMaster extends LiftActor with Loggable {
+object SessionMaster extends LiftActor with Loggable
   private val nsessions: ConcurrentHashMap[String, SessionInfo] =
     new ConcurrentHashMap()
   private val killedSessions: ConcurrentHashMap[String, Long] =
@@ -67,67 +67,56 @@ object SessionMaster extends LiftActor with Loggable {
   var sessionCheckFuncs: List[
       (Map[String, SessionInfo], SessionInfo => Unit) => Unit] =
     ((ses: Map[String, SessionInfo], destroyer: SessionInfo => Unit) =>
-      {
         val now = millis
 
-        for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator) {
+        for ((id, info @ SessionInfo(session, _, _, _, _)) <- ses.iterator)
           if (now - session.lastServiceTime > session.inactivityLength ||
-              session.markedForTermination) {
+              session.markedForTermination)
             logger.info(" Session " + id + " expired")
             destroyer(info)
-          } else {
+          else
             session.doCometActorCleanup()
             session.cleanupUnseenFuncs()
-          }
-        }
-      }) :: Nil
+      ) :: Nil
 
-  def getSession(req: Req, otherId: Box[String]): Box[LiftSession] = {
+  def getSession(req: Req, otherId: Box[String]): Box[LiftSession] =
     val dead = otherId.map(killedSessions.containsKey(_)) openOr false
 
     if (dead) Failure("dead session", Empty, Empty)
-    else {
-      val ret = this.synchronized {
-        otherId.flatMap(a => Box !! nsessions.get(a)) match {
+    else
+      val ret = this.synchronized
+        otherId.flatMap(a => Box !! nsessions.get(a)) match
           case Full(session) => lockAndBump(Full(session))
           // for stateless requests, vend a stateless session if none is found
           case _ if req.stateless_? =>
-            lockAndBump {
+            lockAndBump
               req.sessionId.flatMap(a => Box !! nsessions.get(a))
-            } or Full(LiftRules.statelessSession.vend.apply(req))
+            or Full(LiftRules.statelessSession.vend.apply(req))
           case _ => getSession(req.request, otherId)
-        }
-      }
 
       ret
-    }
-  }
 
   /**
     * End comet long polling for all sessions. This allows a clean reload of Nginx
     * because Nginx children stick around for long polling.
     */
-  def breakOutAllComet() {
+  def breakOutAllComet()
     import scala.collection.JavaConversions._
 
     val ses = lockRead(nsessions)
-    ses.valuesIterator.foreach {
+    ses.valuesIterator.foreach
       _.session.breakOutComet()
-    }
-  }
 
   def getSession(id: String, otherId: Box[String]): Box[LiftSession] =
-    lockAndBump {
+    lockAndBump
       val dead =
         killedSessions.containsKey(id) ||
         (otherId.map(killedSessions.containsKey(_)) openOr false)
 
       if (dead)(Failure("Dead session", Empty, Empty))
-      else {
+      else
         otherId.flatMap(a => Box !! nsessions.get(a)) or
         (Box !! nsessions.get(id))
-      }
-    }
 
   /**
     * Put an Actor in this list and the Actor will receive a message
@@ -141,26 +130,24 @@ object SessionMaster extends LiftActor with Loggable {
     */
   def getSession(
       httpSession: => HTTPSession, otherId: Box[String]): Box[LiftSession] =
-    lockAndBump {
+    lockAndBump
       otherId.flatMap(a => Box !! nsessions.get(a)) or
       (Box !! nsessions.get(httpSession.sessionId))
-    }
 
   /**
     * Returns a LiftSession or Empty if not found
     */
   def getSession(req: HTTPRequest, otherId: Box[String]): Box[LiftSession] =
-    lockAndBump {
+    lockAndBump
       otherId.flatMap(a => Box !! nsessions.get(a)) or req.sessionId.flatMap(
           id => Box !! nsessions.get(id))
-    }
 
   /**
     * Increments the count and last access time for the session
     */
   private def lockAndBump(f: => Box[SessionInfo]): Box[LiftSession] =
-    this.synchronized {
-      f.map { s =>
+    this.synchronized
+      f.map  s =>
         nsessions.put(s.session.underlyingId,
                       SessionInfo(s.session,
                                   s.userAgent,
@@ -169,16 +156,12 @@ object SessionMaster extends LiftActor with Loggable {
                                   millis))
 
         s.session
-      }
-    }
 
-  private def lockRead[T](f: => T): T = this.synchronized {
+  private def lockRead[T](f: => T): T = this.synchronized
     f
-  }
 
-  private def lockWrite[T](f: => T): T = this.synchronized {
+  private def lockWrite[T](f: => T): T = this.synchronized
     f
-  }
 
   /**
     * Adds a new session to SessionMaster
@@ -186,72 +169,60 @@ object SessionMaster extends LiftActor with Loggable {
   def addSession(liftSession: LiftSession,
                  req: Req,
                  userAgent: Box[String],
-                 ipAddress: Box[String]) {
-    lockAndBump {
+                 ipAddress: Box[String])
+    lockAndBump
       Full(SessionInfo(liftSession, userAgent, ipAddress, -1, 0L)) // bumped twice during session creation.  Ticket #529 DPP
-    }
-    S.init(Box !! req, liftSession) {
+    S.init(Box !! req, liftSession)
       liftSession.startSession()
       LiftSession.afterSessionCreate.foreach(_ (liftSession, req))
-    }
 
     liftSession.httpSession.foreach(_.link(liftSession))
-  }
 
   protected def messageHandler = reaction
 
   /**
     * Shut down all sessions
     */
-  private[http] def shutDownAllSessions() {
+  private[http] def shutDownAllSessions()
     import scala.collection.JavaConversions._
 
     val ses = lockRead(nsessions)
-    ses.foreach {
+    ses.foreach
       case (key, sess) =>
-        if (!sess.session.markedForShutDown_?) {
+        if (!sess.session.markedForShutDown_?)
           sess.session.markedForShutDown_? = true
           this ! RemoveSession(key)
-        }
-    }
 
-    while (true) {
+    while (true)
       val s2 = lockRead(nsessions)
       if (s2.size == 0) return
       Thread.sleep(50)
-    }
-  }
 
   def isDead(sessionId: String): Boolean =
     killedSessions.containsKey(sessionId)
 
-  private val reaction: PartialFunction[Any, Unit] = {
+  private val reaction: PartialFunction[Any, Unit] =
     case RemoveSession(sessionId) =>
       val ses = lockRead(nsessions)
-      (Box !! ses.get(sessionId)).foreach {
+      (Box !! ses.get(sessionId)).foreach
         case SessionInfo(s, _, _, _, _) =>
           killedSessions.put(s.underlyingId, Helpers.millis)
           s.markedForShutDown_? = true
           Schedule.schedule(() =>
-                              {
-                                try {
+                                try
                                   s.doShutDown
-                                  try {
+                                  try
                                     s.httpSession.foreach(_.unlink(s))
-                                  } catch {
+                                  catch
                                     case e: Exception =>
                                     // ignore... sometimes you can't do this and it's okay
-                                  }
-                                } catch {
+                                catch
                                   case e: Exception =>
                                     logger.warn("Failure in remove session", e)
-                                }
-                            },
+                            ,
                             0.seconds)
-          lockWrite {
+          lockWrite
             nsessions.remove(sessionId)
-          }
-      }
 
     case CheckAndPurge =>
       import scala.collection.JavaConversions._
@@ -264,64 +235,49 @@ object SessionMaster extends LiftActor with Loggable {
       removeKeys.foreach(s => killedSessions.remove(s))
 
       val ses = Map(
-          lockRead {
+          lockRead
         nsessions
-      }.toList: _*)
+      .toList: _*)
 
-      for {
+      for
         f <- sessionCheckFuncs
-      } {
-        if (Props.inGAE) {
+      
+        if (Props.inGAE)
           f(ses,
             shutDown =>
-              {
-                if (!shutDown.session.markedForShutDown_?) {
+                if (!shutDown.session.markedForShutDown_?)
                   shutDown.session.markedForShutDown_? = true
                   this.sendMsg(RemoveSession(shutDown.session.underlyingId))
-                }
-            })
-        } else {
+            )
+        else
           Schedule.schedule(
               () =>
                 f(ses,
                   shutDown =>
-                    {
-                      if (!shutDown.session.markedForShutDown_?) {
+                      if (!shutDown.session.markedForShutDown_?)
                         shutDown.session.markedForShutDown_? = true
 
                         this ! RemoveSession(shutDown.session.underlyingId)
-                      }
-                  }),
+                  ),
               0.seconds)
-        }
-      }
 
-      if (!Props.inGAE) {
+      if (!Props.inGAE)
         sessionWatchers.foreach(_ ! SessionWatcherInfo(ses))
         doPing()
-      }
-  }
 
   private[http] def sendMsg(in: Any): Unit =
     if (!Props.inGAE) this ! in
-    else {
-      lockWrite {
-        tryo {
+    else
+      lockWrite
+        tryo
           if (reaction.isDefinedAt(in)) reaction.apply(in)
-        }
-      }
-    }
 
-  private def doPing() {
-    if (!Props.inGAE) {
-      try {
+  private def doPing()
+    if (!Props.inGAE)
+      try
         Schedule.schedule(this, CheckAndPurge, 10.seconds)
-      } catch {
+      catch
         case e: Exception =>
           logger.error("Couldn't start SessionMaster ping", e)
-      }
-    }
-  }
 
   doPing()
-}

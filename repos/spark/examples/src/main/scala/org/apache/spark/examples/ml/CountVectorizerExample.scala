@@ -24,8 +24,8 @@ import org.apache.spark.ml.feature.{CountVectorizer, CountVectorizerModel}
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object CountVectorizerExample {
-  def main(args: Array[String]) {
+object CountVectorizerExample
+  def main(args: Array[String])
     val conf = new SparkConf().setAppName("CounterVectorizerExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -53,6 +53,4 @@ object CountVectorizerExample {
 
     cvModel.transform(df).select("features").show()
     // $example off$
-  }
-}
 // scalastyle:on println

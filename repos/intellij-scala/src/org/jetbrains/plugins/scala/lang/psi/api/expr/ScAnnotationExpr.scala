@@ -13,37 +13,32 @@ import org.jetbrains.plugins.scala.lang.psi.impl.expr.ScNameValuePairImpl
   * @author Alexander Podkhalyuzin
   * Date: 07.03.2008
   */
-trait ScAnnotationExpr extends ScalaPsiElement {
+trait ScAnnotationExpr extends ScalaPsiElement
   def constr = findChildByClassScala(classOf[ScConstructor])
   def getAttributes: Seq[ScNameValuePair] =
     findArgExprs
       .map(_.findChildrenByType(ScalaElementTypes.ASSIGN_STMT))
       .getOrElse(Seq.empty)
-      .map {
+      .map
         case stmt: ScAssignStmt => new ScNameValueAssignment(stmt)
-      }
 
   def getAnnotationParameters = findArgExprs.map(_.exprs).getOrElse(Seq.empty)
 
-  private def findArgExprs: Option[ScArgumentExprList] = {
+  private def findArgExprs: Option[ScArgumentExprList] =
     val constr = findChildByClassScala(classOf[ScConstructor])
     if (constr == null) return None
 
     val args = constr.findFirstChildByType(ScalaElementTypes.ARG_EXPRS)
-    args match {
+    args match
       case scArgExpr: ScArgumentExprList => Some(scArgExpr)
       case _ => None
-    }
-  }
 
   private class ScNameValueAssignment(assign: ScAssignStmt)
-      extends ScNameValuePairImpl(assign.getNode) {
+      extends ScNameValuePairImpl(assign.getNode)
     override def nameId: PsiElement = assign.getLExpression
 
     override def getValue: PsiAnnotationMemberValue =
-      (assign.getRExpression map {
+      (assign.getRExpression map
             case annotationMember: PsiAnnotationMemberValue => annotationMember
             case _ => null
-          }).orNull
-  }
-}
+          ).orNull

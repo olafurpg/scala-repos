@@ -47,7 +47,7 @@ import scalafx.util.StringConverter
   * @define BUFITEMSPARAM A `ObservableBuffer` containing $ITEMSPARAM
   * @define FTCRET A Function that will return a `TableCell` that is able to work on the type of element contained within the `TableColumn`.
   */
-object ChoiceBoxTableCell {
+object ChoiceBoxTableCell
 
   /**
     * Converts a ScalaFX $CBTC to its JavaFX counterpart.
@@ -146,7 +146,6 @@ object ChoiceBoxTableCell {
   @deprecated(message = "Use forTableColumn[S, T](T*)", since = "1.0")
   def forTableColumn[S, T](items: Array[T]) =
     jfxscc.ChoiceBoxTableCell.forTableColumn[S, T](items: _*)
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ChoiceBoxListCell.html $CBLC]]
@@ -166,7 +165,7 @@ class ChoiceBoxTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTableCell[
     with ConvertableCell[jfxscc.ChoiceBoxTableCell[S, T], T, T]
     with UpdatableCell[jfxscc.ChoiceBoxTableCell[S, T], T]
     with ItemableCell[jfxscc.ChoiceBoxTableCell[S, T], T]
-    with SFXDelegate[jfxscc.ChoiceBoxTableCell[S, T]] {
+    with SFXDelegate[jfxscc.ChoiceBoxTableCell[S, T]]
 
   /**
     * Creates a default $CBLC instance with the given items being used to populate the ChoiceBox when
@@ -204,4 +203,3 @@ class ChoiceBoxTableCell[S, T](override val delegate: jfxscc.ChoiceBoxTableCell[
     * @param items $ITEMSPARAM
     */
   def this(items: T*) = this(new jfxscc.ChoiceBoxTableCell[S, T](items: _*))
-}

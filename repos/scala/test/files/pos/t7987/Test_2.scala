@@ -1,12 +1,9 @@
-class C[T] {
+class C[T]
   def foo = 0
-}
 
-object Test {
+object Test
   implicit def AnyToC[T](a: Any): C[T] = new C[T]
   // was: "macro not expanded"
-  Macro {
+  Macro
     "".foo
     ()
-  }
-}

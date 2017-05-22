@@ -6,7 +6,7 @@ import play.api.libs.ws.WS
 import play.api.Play.current
 
 // http://detectlanguage.com
-final class DetectLanguage(url: String, key: String) {
+final class DetectLanguage(url: String, key: String)
 
   private case class Detection(
       language: String, confidence: Float, isReliable: Boolean)
@@ -20,8 +20,8 @@ final class DetectLanguage(url: String, key: String) {
       .post(Map(
               "key" -> Seq(key),
               "q" -> Seq(message take messageMaxLength)
-          )) map { response =>
-      (response.json \ "data" \ "detections").asOpt[List[Detection]] match {
+          )) map  response =>
+      (response.json \ "data" \ "detections").asOpt[List[Detection]] match
         case None =>
           lila
             .log("DetectLanguage")
@@ -30,18 +30,14 @@ final class DetectLanguage(url: String, key: String) {
         case Some(res) =>
           res.filter(_.isReliable).sortBy(-_.confidence).headOption map
           (_.language) flatMap Lang.get
-      }
-    } recover {
+    recover
       case e: Exception =>
         lila.log("DetectLanguage").warn(e.getMessage, e)
         Lang("en").some
-    }
-}
 
-object DetectLanguage {
+object DetectLanguage
 
   import com.typesafe.config.Config
   def apply(config: Config): DetectLanguage =
     new DetectLanguage(
         url = config getString "api.url", key = config getString "api.key")
-}

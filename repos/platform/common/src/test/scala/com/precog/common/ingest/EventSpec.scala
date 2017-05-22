@@ -35,51 +35,37 @@ import blueeyes.json.serialization.Extractor._
 import scalaz._
 
 class EventSpec
-    extends Specification with ArbitraryEventMessage with ScalaCheck {
+    extends Specification with ArbitraryEventMessage with ScalaCheck
   implicit val arbEvent = Arbitrary(genRandomIngest)
-  "serialization of an event" should {
-    "read back the data that was written" in check { in: Ingest =>
-      in.serialize.validated[Ingest] must beLike {
+  "serialization of an event" should
+    "read back the data that was written" in check  in: Ingest =>
+      in.serialize.validated[Ingest] must beLike
         case Success(out) => out must_== in
-      }
-    }
-  }
 
-  "Event serialization" should {
-    "Handle V0 format" in {
+  "Event serialization" should
+    "Handle V0 format" in
       (JObject(
           "tokenId" -> JString("1234"),
           "path" -> JString("/test/"),
-          "data" -> JObject("test" -> JNum(1)))).validated[Ingest] must beLike {
+          "data" -> JObject("test" -> JNum(1)))).validated[Ingest] must beLike
         case Success(_) => ok
-      }
-    }
 
-    "Handle V1 format" in {
+    "Handle V1 format" in
       (JObject("apiKey" -> JString("1234"),
                "path" -> JString("/test/"),
                "data" -> JObject("test" -> JNum(1)),
-               "metadata" -> JArray())).validated[Ingest] must beLike {
+               "metadata" -> JArray())).validated[Ingest] must beLike
         case Success(_) => ok
         case Failure(Thrown(ex)) =>
           throw ex
-      }
-    }
-  }
 
-  "Archive serialization" should {
-    "Handle V0 format" in {
+  "Archive serialization" should
+    "Handle V0 format" in
       JObject("tokenId" -> JString("1234"), "path" -> JString("/test/"))
-        .validated[Archive] must beLike {
+        .validated[Archive] must beLike
         case Success(_) => ok
-      }
-    }
 
-    "Handle V1 format" in {
+    "Handle V1 format" in
       JObject("apiKey" -> JString("1234"), "path" -> JString("/test/"))
-        .validated[Archive] must beLike {
+        .validated[Archive] must beLike
         case Success(_) => ok
-      }
-    }
-  }
-}

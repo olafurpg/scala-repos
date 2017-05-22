@@ -51,11 +51,11 @@ import scalaz.{NonEmptyList => NEL}
 import scalaz.\/._
 import scalaz.syntax.std.option._
 
-object KafkaEventStore {
+object KafkaEventStore
   def apply(
       config: Configuration, permissionsFinder: PermissionsFinder[Future])(
       implicit executor: ExecutionContext)
-    : Validation[NEL[String], (EventStore[Future], Stoppable)] = {
+    : Validation[NEL[String], (EventStore[Future], Stoppable)] =
     val localConfig = config.detach("local")
     val centralConfig = config.detach("central")
     println("Central config %s".format(centralConfig.toString()))
@@ -64,7 +64,7 @@ object KafkaEventStore {
             centralConfig.get[String]("zk.connect")))
     centralConfig
       .get[String]("zk.connect")
-      .toSuccess(NEL("central.zk.connect configuration parameter is required")) map {
+      .toSuccess(NEL("central.zk.connect configuration parameter is required")) map
       centralZookeeperHosts =>
         val serviceUID = ZookeeperSystemCoordination.extractServiceUID(config)
         val coordination = ZookeeperSystemCoordination(
@@ -75,55 +75,48 @@ object KafkaEventStore {
         val Some((eventStore, esStop)) = LocalKafkaEventStore(localConfig)
 
         val stoppables =
-          if (config[Boolean]("relay_data", true)) {
+          if (config[Boolean]("relay_data", true))
             val (_, raStop) = KafkaRelayAgent(
                 permissionsFinder, eventIdSeq, localConfig, centralConfig)
             esStop.parent(raStop)
-          } else esStop
+          else esStop
 
         (eventStore, stoppables)
-    }
-  }
-}
 
 class LocalKafkaEventStore(
     producer: Producer[String, Message],
     topic: String,
     maxMessageSize: Int,
     messagePadding: Int)(implicit executor: ExecutionContext)
-    extends EventStore[Future] with Logging {
+    extends EventStore[Future] with Logging
   logger.info(
       "Creating LocalKafkaEventStore for %s with max message size = %d".format(
           topic, maxMessageSize))
   private[this] val codec = new KafkaEventCodec
   private implicit val M = new blueeyes.bkka.FutureMonad(executor)
 
-  def save(event: Event, timeout: Timeout) = {
+  def save(event: Event, timeout: Timeout) =
     @tailrec
     def encodeAll(
         toEncode: List[Event],
-        messages: Vector[Message]): StoreFailure \/ Vector[Message] = {
-      toEncode match {
+        messages: Vector[Message]): StoreFailure \/ Vector[Message] =
+      toEncode match
         case x :: xs =>
           val message = codec.toMessage(x)
-          if (message.size + messagePadding <= maxMessageSize) {
+          if (message.size + messagePadding <= maxMessageSize)
             encodeAll(xs, messages :+ message)
-          } else {
+          else
             val postSplit = x.split(2)
-            if (postSplit.length == 1) {
+            if (postSplit.length == 1)
               logger.error(
                   "Failed to reach reasonable message size for event: %s"
                     .format(event))
               left(StoreFailure(
                       "Failed insertion due to excessively large event(s)!"))
-            } else {
+            else
               encodeAll(postSplit ::: xs, messages)
-            }
-          }
 
         case Nil => right(messages)
-      }
-    }
 
     val toSend = event.fold(
         ingest => encodeAll(List(event), Vector.empty),
@@ -131,25 +124,20 @@ class LocalKafkaEventStore(
         storeFile => encodeAll(List(event), Vector.empty)
     )
 
-    toSend traverse { kafkaMessages =>
-      Future {
-        producer send {
+    toSend traverse  kafkaMessages =>
+      Future
+        producer send
           new ProducerData[String, Message](topic, kafkaMessages)
-        }
         PrecogUnit
-      }
-    }
-  }
-}
 
-object LocalKafkaEventStore {
+object LocalKafkaEventStore
   def apply(config: Configuration)(implicit executor: ExecutionContext)
-    : Option[(EventStore[Future], Stoppable)] = {
+    : Option[(EventStore[Future], Stoppable)] =
     val localTopic = config[String]("topic")
     val maxMessageSize = config[Int]("broker.max_message_size", 1000000)
     val messagePadding = config[Int]("message_padding", 100)
 
-    val localProperties: java.util.Properties = {
+    val localProperties: java.util.Properties =
       val props = JProperties.configurationToProperties(config)
       val host = config[String]("broker.host")
       val port = config[Int]("broker.port")
@@ -157,7 +145,6 @@ object LocalKafkaEventStore {
       //props.setProperty("serializer.class", "com.precog.common.kafka.KafkaEventCodec")
       props.setProperty("max.message.size", maxMessageSize.toString)
       props
-    }
 
     val producer =
       new Producer[String, Message](new ProducerConfig(localProperties))
@@ -165,5 +152,3 @@ object LocalKafkaEventStore {
 
     Some(new LocalKafkaEventStore(
             producer, localTopic, maxMessageSize, messagePadding) -> stoppable)
-  }
-}

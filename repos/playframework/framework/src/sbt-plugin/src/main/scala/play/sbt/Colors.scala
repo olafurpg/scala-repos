@@ -3,7 +3,7 @@
  */
 package play.sbt
 
-object Colors {
+object Colors
 
   import play.runsupport.{Colors => RunColors}
 
@@ -17,4 +17,3 @@ object Colors {
   def white(str: String): String = RunColors.white(str)
   def black(str: String): String = RunColors.black(str)
   def yellow(str: String): String = RunColors.yellow(str)
-}

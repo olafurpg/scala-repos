@@ -3,7 +3,7 @@ package lila.memo
 import scala.collection.JavaConversions._
 import scala.concurrent.duration.Duration
 
-final class ExpireSetMemo(ttl: Duration) {
+final class ExpireSetMemo(ttl: Duration)
 
   protected val cache = Builder.expiry[String, Boolean](ttl)
 
@@ -12,9 +12,8 @@ final class ExpireSetMemo(ttl: Duration) {
 
   def put(key: String) { cache.put(key, true) }
 
-  def putAll(keys: Iterable[String]) {
+  def putAll(keys: Iterable[String])
     keys.toList.distinct foreach { cache.put(_, true) }
-  }
 
   def remove(key: String) { cache invalidate key }
 
@@ -23,4 +22,3 @@ final class ExpireSetMemo(ttl: Duration) {
   def keySet: Set[String] = keys.toSet
 
   def count = keys.toList.size
-}

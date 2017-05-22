@@ -5,14 +5,13 @@ import javax.servlet.http.{HttpServletRequest, HttpServletResponse}
 
 import org.scalatra.util.RicherString._
 
-trait ScentryConfig {
+trait ScentryConfig
   val login = "/login"
   val returnTo = "/"
   val returnToKey = "returnTo"
   val failureUrl = "/unauthenticated"
-}
 
-trait ScentrySupport[UserType <: AnyRef] extends Initializable {
+trait ScentrySupport[UserType <: AnyRef] extends Initializable
   self: ScalatraBase ⇒
 
   type ScentryConfiguration <: ScentryConfig
@@ -23,39 +22,34 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
 
   private[this] var _strategiesFromConfig = List[String]()
 
-  abstract override def initialize(config: ConfigT) {
+  abstract override def initialize(config: ConfigT)
     super.initialize(config)
     readStrategiesFromConfig(config)
-  }
 
-  private def initializeScentry = {
+  private def initializeScentry =
     val store = new ScentryAuthStore.SessionAuthStore(this)
     request.setAttribute(
         Scentry.ScentryRequestKey,
         new Scentry[UserType](self, toSession, fromSession, store))
-  }
 
   private def readStrategiesFromConfig(config: ConfigT) =
-    _strategiesFromConfig = {
+    _strategiesFromConfig =
       config.context.getInitParameter("scentry.strategies").blankOption map
       (s ⇒ (s split ";").toList) getOrElse Nil
-    }
 
-  private def registerStrategiesFromConfig = _strategiesFromConfig foreach {
+  private def registerStrategiesFromConfig = _strategiesFromConfig foreach
     strategyClassName ⇒
       val strategy = Class
         .forName(strategyClassName)
         .newInstance
         .asInstanceOf[ScentryStrategy[UserType]]
       strategy registerWith scentry
-  }
 
-  private[this] def createScentry() = {
+  private[this] def createScentry() =
     initializeScentry
     configureScentry
     registerStrategiesFromConfig
     registerAuthStrategies
-  }
 
   protected def configureScentry() = {}
 
@@ -66,10 +60,9 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
   protected def registerAuthStrategies() = {}
 
   protected def scentry(
-      implicit request: HttpServletRequest): Scentry[UserType] = {
+      implicit request: HttpServletRequest): Scentry[UserType] =
     if (!request.contains(Scentry.ScentryRequestKey)) createScentry()
     request(Scentry.ScentryRequestKey).asInstanceOf[Scentry[UserType]]
-  }
   protected def scentryOption(
       implicit request: HttpServletRequest): Option[Scentry[UserType]] =
     Option(request(Scentry.ScentryRequestKey))
@@ -93,4 +86,3 @@ trait ScentrySupport[UserType <: AnyRef] extends Initializable {
   protected def logOut()(
       implicit request: HttpServletRequest, response: HttpServletResponse) =
     scentry.logout()
-}

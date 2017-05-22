@@ -14,9 +14,9 @@ import scala.tools.partest.ASMConverters
 import ASMConverters._
 
 @RunWith(classOf[JUnit4])
-class EmptyLabelsAndLineNumbersTest {
+class EmptyLabelsAndLineNumbersTest
   @Test
-  def removeEmptyLineNumbers(): Unit = {
+  def removeEmptyLineNumbers(): Unit =
     val ops = List[(Instruction, Boolean)](
         Label(1),
         LineNumber(1, Label(1)),
@@ -41,10 +41,9 @@ class EmptyLabelsAndLineNumbersTest {
     val method = genMethod()(ops.map(_._1): _*)
     assertTrue(LocalOptImpls.removeEmptyLineNumbers(method))
     assertSameCode(instructionsFromMethod(method), ops.filter(_._2).map(_._1))
-  }
 
   @Test
-  def badlyLocatedLineNumbers(): Unit = {
+  def badlyLocatedLineNumbers(): Unit =
     def t(ops: Instruction*) =
       assertThrows[AssertionError](
           LocalOptImpls.removeEmptyLineNumbers(genMethod()(ops: _*)))
@@ -52,10 +51,9 @@ class EmptyLabelsAndLineNumbersTest {
     // line numbers have to be right after their referenced label node
     t(LineNumber(0, Label(1)), Label(1))
     t(Label(0), Label(1), LineNumber(0, Label(0)))
-  }
 
   @Test
-  def removeEmptyLabels(): Unit = {
+  def removeEmptyLabels(): Unit =
     val handler = List(
         ExceptionHandler(
             Label(4), Label(5), Label(6), Some("java/lang/Throwable")))
@@ -102,9 +100,7 @@ class EmptyLabelsAndLineNumbersTest {
     assertSameCode(
         m.instructions, ops(1, 1, 7, 7, 7, 10).filter(_._2).map(_._1))
     assertTrue(
-        m.handlers match {
+        m.handlers match
       case List(ExceptionHandler(Label(4), Label(4), Label(4), _)) => true
       case _ => false
-    })
-  }
-}
+    )

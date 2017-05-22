@@ -4,7 +4,7 @@ package org.jetbrains.jps.incremental.scala.remote.play
   * User: Dmitry.Naydanov
   * Date: 12.02.15.
   */
-object WatcherCommands {
+object WatcherCommands
   val START = "start"
   val STOP = "stop"
   val IS_RUNNING = "running"
@@ -13,4 +13,3 @@ object WatcherCommands {
   val FALSE = "false"
 
   def toMessage(v: Boolean) = if (v) TRUE else FALSE
-}

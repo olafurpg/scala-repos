@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 /**
   * Tools related to app/group versioning.
   */
-object GroupVersioningUtil {
+object GroupVersioningUtil
   private[this] val log = LoggerFactory.getLogger(getClass)
 
   /**
@@ -20,43 +20,36 @@ object GroupVersioningUtil {
     * @return the updated group with updated app versions
     */
   def updateVersionInfoForChangedApps(
-      version: Timestamp, from: Group, to: Group): Group = {
+      version: Timestamp, from: Group, to: Group): Group =
 
     def updateAppVersionInfo(maybeOldApp: Option[AppDefinition],
-                             newApp: AppDefinition): AppDefinition = {
-      val newVersionInfo = maybeOldApp match {
+                             newApp: AppDefinition): AppDefinition =
+      val newVersionInfo = maybeOldApp match
         case None =>
           log.info(s"[${newApp.id}]: new app detected")
           AppDefinition.VersionInfo.forNewConfig(newVersion = version)
         case Some(oldApp) =>
-          if (oldApp.isUpgrade(newApp)) {
+          if (oldApp.isUpgrade(newApp))
             log.info(
                 s"[${newApp.id}]: upgrade detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withConfigChange(newVersion = version)
-          } else if (oldApp.isOnlyScaleChange(newApp)) {
+          else if (oldApp.isOnlyScaleChange(newApp))
             log.info(
                 s"[${newApp.id}]: scaling op detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withScaleOrRestartChange(newVersion = version)
-          } else if (oldApp.versionInfo != newApp.versionInfo &&
-                     newApp.versionInfo == VersionInfo.NoVersion) {
+          else if (oldApp.versionInfo != newApp.versionInfo &&
+                     newApp.versionInfo == VersionInfo.NoVersion)
             log.info(
                 s"[${newApp.id}]: restart detected for app (oldVersion ${oldApp.versionInfo})")
             oldApp.versionInfo.withScaleOrRestartChange(newVersion = version)
-          } else {
+          else
             oldApp.versionInfo
-          }
-      }
 
       newApp.copy(versionInfo = newVersionInfo)
-    }
 
     val originalApps = from.transitiveApps.map(app => app.id -> app).toMap
-    val updatedTargetApps = to.transitiveApps.flatMap { newApp =>
+    val updatedTargetApps = to.transitiveApps.flatMap  newApp =>
       val updated = updateAppVersionInfo(originalApps.get(newApp.id), newApp)
       if (updated.versionInfo != newApp.versionInfo) Some(updated) else None
-    }
-    updatedTargetApps.foldLeft(to) { (resultGroup, updatedApp) =>
+    updatedTargetApps.foldLeft(to)  (resultGroup, updatedApp) =>
       resultGroup.updateApp(updatedApp.id, _ => updatedApp, version)
-    }
-  }
-}

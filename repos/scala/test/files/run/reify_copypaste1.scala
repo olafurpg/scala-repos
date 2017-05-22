@@ -4,7 +4,7 @@ import scala.reflect.runtime.universe.definitions._
 import scala.reflect.runtime.universe.Flag._
 import scala.tools.reflect.ToolBox
 
-object Test extends App {
+object Test extends App
   val stdout = System.out
   val output = new java.io.ByteArrayOutputStream()
   System.setOut(new java.io.PrintStream(output))
@@ -30,4 +30,3 @@ object Test extends App {
   output.reset()
   toolBox.eval(Block(stats, expr))
   stdout.println(output.toString)
-}

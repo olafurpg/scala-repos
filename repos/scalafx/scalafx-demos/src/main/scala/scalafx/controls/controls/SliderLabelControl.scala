@@ -42,93 +42,75 @@ import scalafx.util.converter.DoubleStringConverter
   * @author rafael
   *
   */
-class SliderLabelControl(property: DoubleProperty) extends FlowPane {
+class SliderLabelControl(property: DoubleProperty) extends FlowPane
 
   def this(intProp: IntegerProperty) =
     this(
-        new DoubleProperty(intProp.getValue, intProp.name) {
+        new DoubleProperty(intProp.getValue, intProp.name)
       override def value = intProp.value.toDouble
-      override def value_=(v: Double) {
+      override def value_=(v: Double)
         intProp.value = v.toInt
-      }
-    })
+    )
 
   val originalPattern = "%02.1f"
 
-  val slider = new Slider {
+  val slider = new Slider
     value <==> property
     hgrow = Priority.Always
     labelFormatter = new DoubleStringConverter()
-  }
 
-  val lblValue = new Label {
+  val lblValue = new Label
     text <== slider.value.asString(originalPattern)
     hgrow = Priority.Sometimes
-  }
 
-  def blockIncrement_=(v: Double) {
+  def blockIncrement_=(v: Double)
     slider.blockIncrement = v
-  }
 
-  def pattern_=(v: String) {
+  def pattern_=(v: String)
     slider.labelFormatter = new DoubleStringConverter
     lblValue.text <== slider.value.asString(v)
-  }
 
-  def majorTickUnit_=(v: Double) {
+  def majorTickUnit_=(v: Double)
     slider.majorTickUnit = v
-  }
 
   def max = slider.max
-  def max_=(v: Double) {
+  def max_=(v: Double)
     slider.max = v
-  }
 
   def min = slider.min
-  def min_=(v: Double) {
+  def min_=(v: Double)
     slider.min = v
-  }
 
-  def minorTickCount_=(v: Int) {
+  def minorTickCount_=(v: Int)
     slider.minorTickCount = v
-  }
 
-  def showTickLabels_=(v: Boolean) {
+  def showTickLabels_=(v: Boolean)
     slider.showTickLabels = v
-  }
 
-  def showTickMarks_=(v: Boolean) {
+  def showTickMarks_=(v: Boolean)
     slider.showTickMarks = v
-  }
 
-  def snapToTicks_=(v: Boolean) {
+  def snapToTicks_=(v: Boolean)
     slider.snapToTicks = v
-  }
 
   super.children = List(slider, lblValue)
   super.hgap = 5.0
-}
 
-object SliderLabelControlDemo extends JFXApp {
+object SliderLabelControlDemo extends JFXApp
 
   val x: java.lang.Double = 5.0
   val value = new IntegerProperty(1.asInstanceOf[java.lang.Object], "value")
   //new DoubleProperty(x, "Value")
 
-  val lblValue = new Label {
+  val lblValue = new Label
     text <== value.asString("%2d")
-  }
 
   val sldValue = new SliderLabelControl(value)
 
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     height = 100
     width = 200
     title = "Slider Label Control Demo"
-    scene = new Scene {
-      content = new FlowPane {
+    scene = new Scene
+      content = new FlowPane
         children = List(lblValue, sldValue)
-      }
-    }
-  }
-}

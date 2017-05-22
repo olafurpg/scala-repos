@@ -15,7 +15,7 @@ package generic
   *  @author Sean McDirmid
   *  @since  2.8
   */
-trait Sorted[K, +This <: Sorted[K, This]] {
+trait Sorted[K, +This <: Sorted[K, This]]
   def ordering: Ordering[K]
 
   /** The current collection */
@@ -70,7 +70,7 @@ trait Sorted[K, +This <: Sorted[K, This]] {
   /** Create a range projection of this collection with no lower-bound.
     *  @param to The upper-bound (inclusive) of the ranged projection.
     */
-  def to(to: K): This = {
+  def to(to: K): This =
     val i = keySet.from(to).iterator
     if (i.isEmpty) return repr
     val next = i.next()
@@ -78,7 +78,6 @@ trait Sorted[K, +This <: Sorted[K, This]] {
       if (i.isEmpty) repr
       else until(i.next())
     else until(next)
-  }
 
   /**
     * Creates an iterator over all the keys(or elements)  contained in this
@@ -92,21 +91,18 @@ trait Sorted[K, +This <: Sorted[K, This]] {
     */
   def keysIteratorFrom(start: K): Iterator[K]
 
-  protected def hasAll(j: Iterator[K]): Boolean = {
+  protected def hasAll(j: Iterator[K]): Boolean =
     val i = keySet.iterator
     if (i.isEmpty) return j.isEmpty
 
     var in = i.next()
-    while (j.hasNext) {
+    while (j.hasNext)
       val jn = j.next()
-      while ({
+      while (
         val n = compare(jn, in)
         if (n == 0) false
         else if (n < 0) return false
         else if (!i.hasNext) return false
         else true
-      }) in = i.next()
-    }
+      ) in = i.next()
     true
-  }
-}

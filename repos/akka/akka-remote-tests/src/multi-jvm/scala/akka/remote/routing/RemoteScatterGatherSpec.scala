@@ -16,13 +16,11 @@ import akka.routing.RoutedActorRef
 import akka.testkit._
 import akka.testkit.TestEvent._
 
-object RemoteScatterGatherMultiJvmSpec extends MultiNodeConfig {
+object RemoteScatterGatherMultiJvmSpec extends MultiNodeConfig
 
-  class SomeActor extends Actor {
-    def receive = {
+  class SomeActor extends Actor
+    def receive =
       case "hit" ⇒ sender() ! self
-    }
-  }
 
   val first = role("first")
   val second = role("second")
@@ -38,7 +36,6 @@ object RemoteScatterGatherMultiJvmSpec extends MultiNodeConfig {
         target.nodes = ["@first@", "@second@", "@third@"]
       }
     """)
-}
 
 class RemoteScatterGatherMultiJvmNode1 extends RemoteScatterGatherSpec
 class RemoteScatterGatherMultiJvmNode2 extends RemoteScatterGatherSpec
@@ -47,22 +44,21 @@ class RemoteScatterGatherMultiJvmNode4 extends RemoteScatterGatherSpec
 
 class RemoteScatterGatherSpec
     extends MultiNodeSpec(RemoteScatterGatherMultiJvmSpec) with STMultiNodeSpec
-    with ImplicitSender with DefaultTimeout {
+    with ImplicitSender with DefaultTimeout
   import RemoteScatterGatherMultiJvmSpec._
 
   def initialParticipants = roles.size
 
-  "A remote ScatterGatherFirstCompleted pool" must {
-    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" taggedAs LongRunningTest in {
+  "A remote ScatterGatherFirstCompleted pool" must
+    "be locally instantiated on a remote node and be able to communicate through its RemoteActorRef" taggedAs LongRunningTest in
 
       system.eventStream.publish(
           Mute(EventFilter.warning(pattern = ".*received dead letter from.*")))
 
-      runOn(first, second, third) {
+      runOn(first, second, third)
         enterBarrier("start", "broadcast-end", "end", "done")
-      }
 
-      runOn(fourth) {
+      runOn(fourth)
         enterBarrier("start")
         val actor =
           system.actorOf(ScatterGatherFirstCompletedPool(
@@ -74,19 +70,17 @@ class RemoteScatterGatherSpec
         val connectionCount = 3
         val iterationCount = 10
 
-        for (i ← 0 until iterationCount; k ← 0 until connectionCount) {
+        for (i ← 0 until iterationCount; k ← 0 until connectionCount)
           actor ! "hit"
-        }
 
         val replies: Map[Address, Int] = (receiveWhile(
-            5.seconds, messages = connectionCount * iterationCount) {
+            5.seconds, messages = connectionCount * iterationCount)
           case ref: ActorRef ⇒ ref.path.address
-        }).foldLeft(Map(node(first).address -> 0,
+        ).foldLeft(Map(node(first).address -> 0,
                         node(second).address -> 0,
-                        node(third).address -> 0)) {
+                        node(third).address -> 0))
           case (replyMap, address) ⇒
             replyMap + (address -> (replyMap(address) + 1))
-        }
 
         enterBarrier("broadcast-end")
         actor ! Broadcast(PoisonPill)
@@ -99,9 +93,5 @@ class RemoteScatterGatherSpec
         // "Terminate" to a shut down node
         system.stop(actor)
         enterBarrier("done")
-      }
 
       enterBarrier("done")
-    }
-  }
-}

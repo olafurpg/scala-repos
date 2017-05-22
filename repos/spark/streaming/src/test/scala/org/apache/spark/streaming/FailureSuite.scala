@@ -29,35 +29,29 @@ import org.apache.spark.util.Utils
   * This testsuite tests master failures at random times while the stream is running using
   * the real clock.
   */
-class FailureSuite extends SparkFunSuite with BeforeAndAfter with Logging {
+class FailureSuite extends SparkFunSuite with BeforeAndAfter with Logging
 
   private val batchDuration: Duration = Milliseconds(1000)
   private val numBatches = 30
   private var directory: File = null
 
-  before {
+  before
     directory = Utils.createTempDir()
-  }
 
-  after {
-    if (directory != null) {
+  after
+    if (directory != null)
       Utils.deleteRecursively(directory)
-    }
     StreamingContext.getActive().foreach { _.stop() }
 
     // Stop SparkContext if active
     SparkContext
       .getOrCreate(new SparkConf().setMaster("local").setAppName("bla"))
       .stop()
-  }
 
-  test("multiple failures with map") {
+  test("multiple failures with map")
     MasterFailureTest.testMap(
         directory.getAbsolutePath, numBatches, batchDuration)
-  }
 
-  test("multiple failures with updateStateByKey") {
+  test("multiple failures with updateStateByKey")
     MasterFailureTest.testUpdateStateByKey(
         directory.getAbsolutePath, numBatches, batchDuration)
-  }
-}

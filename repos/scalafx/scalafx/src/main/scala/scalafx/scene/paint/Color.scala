@@ -32,7 +32,7 @@ import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 import scalafx.scene.paint.PaintIncludes._
 
-object Color {
+object Color
   implicit def sfxColor2jfx(c: Color): jfxsp.Color =
     if (c != null) c.delegate else null
 
@@ -762,10 +762,9 @@ object Color {
       "Use YellowGreen; YELLOWGREEN will be removed in a future release.",
       "1.0.0-R9")
   val YELLOWGREEN = YellowGreen
-}
 
 class Color(override val delegate: jfxsp.Color)
-    extends Paint(delegate) with SFXDelegate[jfxsp.Color] {
+    extends Paint(delegate) with SFXDelegate[jfxsp.Color]
 
   /**
     * The red component of the Color, in the range 0.0-1.0.
@@ -852,4 +851,3 @@ class Color(override val delegate: jfxsp.Color)
     * Creates a new Color that is a more saturated version of this Color.
     */
   def saturate: Color = delegate.saturate
-}

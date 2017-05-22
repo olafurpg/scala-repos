@@ -17,26 +17,20 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.statements.{Dcl, Def, Emp
  *              | 'type' TypeDef
  */
 
-object RefineStat {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
-    builder.getTokenType match {
+object RefineStat
+  def parse(builder: ScalaPsiBuilder): Boolean =
+    builder.getTokenType match
       case ScalaTokenTypes.kTYPE =>
-        if (!Def.parse(builder, isMod = false)) {
-          if (!Dcl.parse(builder, isMod = false)) {
+        if (!Def.parse(builder, isMod = false))
+          if (!Dcl.parse(builder, isMod = false))
             EmptyDcl.parse(builder, isMod = false)
-          }
-        }
         return true
       case ScalaTokenTypes.kVAR | ScalaTokenTypes.kVAL |
           ScalaTokenTypes.kDEF =>
-        if (Dcl.parse(builder, isMod = false)) {
+        if (Dcl.parse(builder, isMod = false))
           return true
-        } else {
+        else
           EmptyDcl.parse(builder, isMod = false)
           return true
-        }
       case _ =>
         return false
-    }
-  }
-}

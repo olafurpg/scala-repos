@@ -1,6 +1,6 @@
 import scala.tools.partest.DirectTest
 
-object Test extends DirectTest {
+object Test extends DirectTest
 
   override def extraSettings: String =
     s"-usejavacp -Yinfer-argument-types -Xprint-pos -Xprint:typer -Yrangepos -Ystop-after:typer -d ${testOutput.path}"
@@ -17,9 +17,6 @@ class B extends A {
 }
   """.trim
 
-  override def show(): Unit = {
-    Console.withErr(System.out) {
+  override def show(): Unit =
+    Console.withErr(System.out)
       compile()
-    }
-  }
-}

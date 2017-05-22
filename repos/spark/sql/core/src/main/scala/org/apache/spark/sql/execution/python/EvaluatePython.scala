@@ -41,56 +41,51 @@ import org.apache.spark.unsafe.types.UTF8String
 case class EvaluatePython(udf: PythonUDF,
                           child: LogicalPlan,
                           resultAttribute: AttributeReference)
-    extends logical.UnaryNode {
+    extends logical.UnaryNode
 
   def output: Seq[Attribute] = child.output :+ resultAttribute
 
   // References should not include the produced attribute.
   override def references: AttributeSet = udf.references
-}
 
-object EvaluatePython {
+object EvaluatePython
   def apply(udf: PythonUDF, child: LogicalPlan): EvaluatePython =
     new EvaluatePython(
         udf, child, AttributeReference("pythonUDF", udf.dataType)())
 
-  def takeAndServe(df: DataFrame, n: Int): Int = {
+  def takeAndServe(df: DataFrame, n: Int): Int =
     registerPicklers()
-    df.withNewExecutionId {
+    df.withNewExecutionId
       val iter = new SerDeUtil.AutoBatchedPickler(
           df.queryExecution.executedPlan
             .executeTake(n)
             .iterator
-            .map { row =>
+            .map  row =>
           EvaluatePython.toJava(row, df.schema)
-        })
+        )
       PythonRDD.serveIterator(iter, s"serve-DataFrame")
-    }
-  }
 
   /**
     * Helper for converting from Catalyst type to java type suitable for Pyrolite.
     */
-  def toJava(obj: Any, dataType: DataType): Any = (obj, dataType) match {
+  def toJava(obj: Any, dataType: DataType): Any = (obj, dataType) match
     case (null, _) => null
 
     case (row: InternalRow, struct: StructType) =>
       val values = new Array[Any](row.numFields)
       var i = 0
-      while (i < row.numFields) {
+      while (i < row.numFields)
         values(i) = toJava(
             row.get(i, struct.fields(i).dataType), struct.fields(i).dataType)
         i += 1
-      }
       new GenericRowWithSchema(values, struct)
 
     case (a: ArrayData, array: ArrayType) =>
       val values = new java.util.ArrayList[Any](a.numElements())
       a.foreach(array.elementType,
                 (_, e) =>
-                  {
                     values.add(toJava(e, array.elementType))
-                })
+                )
       values
 
     case (map: MapData, mt: MapType) =>
@@ -98,9 +93,8 @@ object EvaluatePython {
       map.foreach(mt.keyType,
                   mt.valueType,
                   (k, v) =>
-                    {
                       jmap.put(toJava(k, mt.keyType), toJava(v, mt.valueType))
-                  })
+                  )
       jmap
 
     case (ud, udt: UserDefinedType[_]) => toJava(ud, udt.sqlType)
@@ -110,13 +104,12 @@ object EvaluatePython {
     case (s: UTF8String, StringType) => s.toString
 
     case (other, _) => other
-  }
 
   /**
     * Converts `obj` to the type specified by the data type, or returns null if the type of obj is
     * unexpected. Because Python doesn't enforce the type.
     */
-  def fromJava(obj: Any, dataType: DataType): Any = (obj, dataType) match {
+  def fromJava(obj: Any, dataType: DataType): Any = (obj, dataType) match
     case (null, _) => null
 
     case (c: Boolean, BooleanType) => c
@@ -154,9 +147,9 @@ object EvaluatePython {
 
     case (c: java.util.List[_], ArrayType(elementType, _)) =>
       new GenericArrayData(
-          c.asScala.map { e =>
+          c.asScala.map  e =>
         fromJava(e, elementType)
-      }.toArray)
+      .toArray)
 
     case (c, ArrayType(elementType, _)) if c.getClass.isArray =>
       new GenericArrayData(
@@ -170,40 +163,37 @@ object EvaluatePython {
 
     case (c, StructType(fields)) if c.getClass.isArray =>
       val array = c.asInstanceOf[Array[_]]
-      if (array.length != fields.length) {
+      if (array.length != fields.length)
         throw new IllegalStateException(
             s"Input row doesn't have expected number of values required by the schema. " +
             s"${fields.length} fields are required while ${array.length} values are provided."
         )
-      }
       new GenericInternalRow(
           array
             .zip(fields)
-            .map {
+            .map
           case (e, f) => fromJava(e, f.dataType)
-        })
+        )
 
     case (_, udt: UserDefinedType[_]) => fromJava(obj, udt.sqlType)
 
     // all other unexpected type should be null, or we will have runtime exception
     // TODO(davies): we could improve this by try to cast the object to expected type
     case (c, _) => null
-  }
 
   private val module = "pyspark.sql.types"
 
   /**
     * Pickler for StructType
     */
-  private class StructTypePickler extends IObjectPickler {
+  private class StructTypePickler extends IObjectPickler
 
     private val cls = classOf[StructType]
 
-    def register(): Unit = {
+    def register(): Unit =
       Pickler.registerCustomPickler(cls, this)
-    }
 
-    def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
+    def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit =
       out.write(Opcodes.GLOBAL)
       out.write((module + "\n" + "_parse_datatype_json_string" +
               "\n").getBytes(StandardCharsets.UTF_8))
@@ -211,28 +201,25 @@ object EvaluatePython {
       pickler.save(schema.json)
       out.write(Opcodes.TUPLE1)
       out.write(Opcodes.REDUCE)
-    }
-  }
 
   /**
     * Pickler for external row.
     */
-  private class RowPickler extends IObjectPickler {
+  private class RowPickler extends IObjectPickler
 
     private val cls = classOf[GenericRowWithSchema]
 
     // register this to Pickler and Unpickler
-    def register(): Unit = {
+    def register(): Unit =
       Pickler.registerCustomPickler(this.getClass, this)
       Pickler.registerCustomPickler(cls, this)
-    }
 
-    def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit = {
-      if (obj == this) {
+    def pickle(obj: Object, out: OutputStream, pickler: Pickler): Unit =
+      if (obj == this)
         out.write(Opcodes.GLOBAL)
         out.write((module + "\n" + "_create_row_inbound_converter" +
                 "\n").getBytes(StandardCharsets.UTF_8))
-      } else {
+      else
         // it will be memorized by Pickler to save some bytes
         pickler.save(this)
         val row = obj.asInstanceOf[GenericRowWithSchema]
@@ -243,15 +230,11 @@ object EvaluatePython {
 
         out.write(Opcodes.MARK)
         var i = 0
-        while (i < row.values.length) {
+        while (i < row.values.length)
           pickler.save(row.values(i))
           i += 1
-        }
         out.write(Opcodes.TUPLE)
         out.write(Opcodes.REDUCE)
-      }
-    }
-  }
 
   private[this] var registered = false
 
@@ -259,25 +242,19 @@ object EvaluatePython {
     * This should be called before trying to serialize any above classes un cluster mode,
     * this should be put in the closure
     */
-  def registerPicklers(): Unit = {
-    synchronized {
-      if (!registered) {
+  def registerPicklers(): Unit =
+    synchronized
+      if (!registered)
         SerDeUtil.initialize()
         new StructTypePickler().register()
         new RowPickler().register()
         registered = true
-      }
-    }
-  }
 
   /**
     * Convert an RDD of Java objects to an RDD of serialized Python objects, that is usable by
     * PySpark.
     */
-  def javaToPython(rdd: RDD[Any]): RDD[Array[Byte]] = {
-    rdd.mapPartitions { iter =>
+  def javaToPython(rdd: RDD[Any]): RDD[Array[Byte]] =
+    rdd.mapPartitions  iter =>
       registerPicklers() // let it called in executor
       new SerDeUtil.AutoBatchedPickler(iter)
-    }
-  }
-}

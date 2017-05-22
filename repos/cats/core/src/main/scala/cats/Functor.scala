@@ -11,7 +11,7 @@ import functor.Contravariant
   * Must obey the laws defined in cats.laws.FunctorLaws.
   */
 @typeclass
-trait Functor[F[_]] extends functor.Invariant[F] { self =>
+trait Functor[F[_]] extends functor.Invariant[F]  self =>
   def map[A, B](fa: F[A])(f: A => B): F[B]
 
   def imap[A, B](fa: F[A])(f: A => B)(fi: B => A): F[B] = map(fa)(f)
@@ -22,10 +22,9 @@ trait Functor[F[_]] extends functor.Invariant[F] { self =>
     * map a G[F[A]] to a G[F[B]].
     */
   def compose[G[_]](implicit GG: Functor[G]): Functor[Lambda[X => F[G[X]]]] =
-    new Functor.Composite[F, G] {
+    new Functor.Composite[F, G]
       def F: Functor[F] = self
       def G: Functor[G] = GG
-    }
 
   /**
     * Compose this functor F with a Contravariant Functor G to produce a new Contravariant Functor
@@ -33,10 +32,9 @@ trait Functor[F[_]] extends functor.Invariant[F] { self =>
     */
   override def composeWithContravariant[G[_]](
       implicit GG: Contravariant[G]): Contravariant[Lambda[X => F[G[X]]]] =
-    new Functor.ContravariantComposite[F, G] {
+    new Functor.ContravariantComposite[F, G]
       def F: Functor[F] = self
       def G: Contravariant[G] = GG
-    }
 
   override def composeWithFunctor[
       G[_]: Functor]: Functor[Lambda[X => F[G[X]]]] = compose[G]
@@ -63,23 +61,19 @@ trait Functor[F[_]] extends functor.Invariant[F] { self =>
     * Replaces the `A` value in `F[A]` with the supplied value.
     */
   def as[A, B](fa: F[A], b: B): F[B] = map(fa)(_ => b)
-}
 
-object Functor {
-  trait Composite[F[_], G[_]] extends Functor[Lambda[X => F[G[X]]]] {
+object Functor
+  trait Composite[F[_], G[_]] extends Functor[Lambda[X => F[G[X]]]]
     def F: Functor[F]
     def G: Functor[G]
 
     override def map[A, B](fa: F[G[A]])(f: A => B): F[G[B]] =
       F.map(fa)(G.lift(f))
-  }
 
   trait ContravariantComposite[F[_], G[_]]
-      extends Contravariant[Lambda[X => F[G[X]]]] {
+      extends Contravariant[Lambda[X => F[G[X]]]]
     def F: Functor[F]
     def G: Contravariant[G]
 
     override def contramap[A, B](fa: F[G[A]])(f: B => A): F[G[B]] =
       F.map(fa)(ga => G.contramap(ga)(f))
-  }
-}

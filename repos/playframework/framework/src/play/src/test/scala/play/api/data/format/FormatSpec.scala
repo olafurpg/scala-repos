@@ -9,9 +9,9 @@ import java.util.{UUID, Date, TimeZone}
 import play.api.data._
 import play.api.data.Forms._
 
-object FormatSpec extends Specification {
-  "dateFormat" should {
-    "support custom time zones" in {
+object FormatSpec extends Specification
+  "dateFormat" should
+    "support custom time zones" in
       val data = Map("date" -> "00:00")
 
       val format = Formats.dateFormat(
@@ -23,68 +23,54 @@ object FormatSpec extends Specification {
         Formats.dateFormat("HH:mm", TimeZone.getTimeZone("GMT+0000"))
       format2.bind("date", data).right.map(_.getTime) should beRight(0L)
       format2.unbind("date", new Date(0L)) should equalTo(data)
-    }
-  }
 
-  "A simple mapping of BigDecimalFormat" should {
-    "return a BigDecimal" in {
+  "A simple mapping of BigDecimalFormat" should
+    "return a BigDecimal" in
       Form("value" -> bigDecimal)
         .bind(Map("value" -> "10.23"))
         .fold(
             formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
+              { "The mapping should not fail." must equalTo("Error") },
               number =>
                 number must equalTo(BigDecimal("10.23"))
-            }
         )
-    }
-  }
 
-  "A complex mapping of BigDecimalFormat" should {
-    "12.23 must be a valid bigDecimal(10,2)" in {
+  "A complex mapping of BigDecimalFormat" should
+    "12.23 must be a valid bigDecimal(10,2)" in
       Form("value" -> bigDecimal(10, 2))
         .bind(Map("value" -> "10.23"))
         .fold(
             formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
+              { "The mapping should not fail." must equalTo("Error") },
               number =>
                 number must equalTo(BigDecimal("10.23"))
-            }
         )
-    }
 
-    "12.23 must not be a valid bigDecimal(10,1) : Too many decimals" in {
+    "12.23 must not be a valid bigDecimal(10,1) : Too many decimals" in
       Form("value" -> bigDecimal(10, 1))
         .bind(Map("value" -> "10.23"))
         .fold(
             formWithErrors =>
-              {
                 formWithErrors.errors.head.message must equalTo(
                     "error.real.precision")
-            }, { number =>
+            ,  number =>
               "The mapping should fail." must equalTo("Error")
-            }
         )
-    }
 
-    "12111.23 must not be a valid bigDecimal(5,2) : Too many digits" in {
+    "12111.23 must not be a valid bigDecimal(5,2) : Too many digits" in
       Form("value" -> bigDecimal(5, 2))
         .bind(Map("value" -> "12111.23"))
         .fold(
             formWithErrors =>
-              {
                 formWithErrors.errors.head.message must equalTo(
                     "error.real.precision")
-            }, { number =>
+            ,  number =>
               "The mapping should fail." must equalTo("Error")
-            }
         )
-    }
-  }
 
-  "A UUID mapping" should {
+  "A UUID mapping" should
 
-    "return a proper UUID when given one" in {
+    "return a proper UUID when given one" in
 
       val testUUID = UUID.randomUUID()
 
@@ -92,30 +78,25 @@ object FormatSpec extends Specification {
         .bind(Map("value" -> testUUID.toString))
         .fold(
             formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
+              { "The mapping should not fail." must equalTo("Error") },
               uuid =>
                 uuid must equalTo(testUUID)
-            }
         )
-    }
 
-    "give an error when an invalid UUID is passed in" in {
+    "give an error when an invalid UUID is passed in" in
 
       Form("value" -> uuid)
         .bind(Map("value" -> "Joe"))
         .fold(
             formWithErrors =>
-              { formWithErrors.errors.head.message must equalTo("error.uuid") }, {
+              { formWithErrors.errors.head.message must equalTo("error.uuid") },
               uuid =>
                 uuid must equalTo(UUID.randomUUID())
-            }
         )
-    }
-  }
 
-  "A char mapping" should {
+  "A char mapping" should
 
-    "return a proper Char when given one" in {
+    "return a proper Char when given one" in
 
       val testChar = 'M'
 
@@ -123,26 +104,19 @@ object FormatSpec extends Specification {
         .bind(Map("value" -> testChar.toString))
         .fold(
             formWithErrors =>
-              { "The mapping should not fail." must equalTo("Error") }, {
+              { "The mapping should not fail." must equalTo("Error") },
               char =>
                 char must equalTo(testChar)
-            }
         )
-    }
 
-    "give an error when an empty string is passed in" in {
+    "give an error when an empty string is passed in" in
 
       Form("value" -> char)
         .bind(Map("value" -> " "))
         .fold(
             formWithErrors =>
-              {
                 formWithErrors.errors.head.message must equalTo(
                     "error.required")
-            }, { char =>
+            ,  char =>
               char must equalTo('X')
-            }
         )
-    }
-  }
-}

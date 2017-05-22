@@ -1,4 +1,4 @@
-class SCL6514 {
+class SCL6514
   implicit def foo(implicit i: Int = 123): String = "text"
 
   implicit val l: List[Int] = List.empty
@@ -11,5 +11,4 @@ class SCL6514 {
 
   /*start*/
   m /*end*/
-}
 //List[Int]

@@ -40,20 +40,19 @@ import scalafx.delegate.SFXDelegate
 import scalafx.event.{Event, EventHandlerDelegate, EventType}
 import scalafx.scene.Node
 
-object TreeItem {
+object TreeItem
   implicit def sfxTreeItemToJfx[T](v: TreeItem[T]): jfxsc.TreeItem[T] =
     if (v != null) v.delegate else null
 
-  object TreeModificationEvent {
+  object TreeModificationEvent
     implicit def sfxTreeModificationEvent2jfx[T](
         v: TreeModificationEvent[T]): jfxsc.TreeItem.TreeModificationEvent[T] =
       if (v != null) v.delegate else null
-  }
 
   class TreeModificationEvent[T](
       override val delegate: jfxsc.TreeItem.TreeModificationEvent[T])
       extends Event(delegate)
-      with SFXDelegate[jfxsc.TreeItem.TreeModificationEvent[T]] {
+      with SFXDelegate[jfxsc.TreeItem.TreeModificationEvent[T]]
 
     /**
       * Constructs a basic TreeModificationEvent - this is useful in situations
@@ -162,7 +161,6 @@ object TreeItem {
       * TreeItems were removed.
       */
     def wasRemoved: Boolean = delegate.wasRemoved
-  }
 
   /**
     * An EventType used when the TreeItem receives a modification to its
@@ -214,14 +212,13 @@ object TreeItem {
     * property.
     */
   def valueChangedEvent = jfxsc.TreeItem.valueChangedEvent
-}
 
 /**
   * Wraps [[http://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/TreeItem.html javafx.scene.control.TreeItem]] class.
   */
 class TreeItem[T](
     override val delegate: jfxsc.TreeItem[T] = new jfxsc.TreeItem[T])
-    extends EventHandlerDelegate with SFXDelegate[jfxsc.TreeItem[T]] {
+    extends EventHandlerDelegate with SFXDelegate[jfxsc.TreeItem[T]]
 
   /**
     * Creates a TreeItem with the value property set to the provided object.
@@ -239,17 +236,15 @@ class TreeItem[T](
     * The expanded state of this TreeItem.
     */
   def expanded: BooleanProperty = delegate.expandedProperty
-  def expanded_=(v: Boolean) {
+  def expanded_=(v: Boolean)
     expanded() = v
-  }
 
   /**
     * The node that is generally shown to the left of the value property.
     */
   def graphic: ObjectProperty[jfxs.Node] = delegate.graphicProperty
-  def graphic_=(v: Node) {
+  def graphic_=(v: Node)
     graphic() = v
-  }
 
   /**
     * Represents the TreeItem leaf property, which is true if the TreeItem has no children.
@@ -267,18 +262,16 @@ class TreeItem[T](
     * this TreeItem.
     */
   def value: ObjectProperty[T] = delegate.valueProperty
-  def value_=(v: T) {
+  def value_=(v: T)
     value.set(v)
-  }
 
   /**
     * The children of this TreeItem.
     */
   def children: ObservableBuffer[jfxsc.TreeItem[T]] = delegate.getChildren
-  def children_=(items: Seq[TreeItem[T]]) {
+  def children_=(items: Seq[TreeItem[T]])
     children.clear()
     items.foreach(children += _)
-  }
 
   /**
     * Returns the next sibling of the TreeItem.
@@ -303,4 +296,3 @@ class TreeItem[T](
 
   override protected def eventHandlerDelegate =
     delegate.asInstanceOf[EventHandled]
-}

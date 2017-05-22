@@ -6,12 +6,12 @@ import fastparse.all._
 
 import scala.language.implicitConversions
 
-trait Xml extends Core {
+trait Xml extends Core
   def Patterns: P0
   val XmlExpr = P(WL ~ Xml.XmlContent ~ (WL ~ Xml.Element).rep)
   val XmlPattern = P(WL ~ Xml.ElemPattern)
 
-  private[this] object Xml {
+  private[this] object Xml
     val BaseChar = P(
         CharIn(
             '\u0041' to '\u005A',
@@ -306,5 +306,3 @@ trait Xml extends Core {
     val ContentP1 = P(
         ElemPattern | Reference | CDSect | PI | Comment | ScalaPatterns)
     val ScalaPatterns = P("{" ~ Patterns ~ WL ~ "}")
-  }
-}

@@ -11,7 +11,7 @@ import scala.math.Ordered
   * An ordered wrapper for UTC timestamps.
   */
 abstract case class Timestamp private (private val utcDateTime: DateTime)
-    extends Ordered[Timestamp] {
+    extends Ordered[Timestamp]
   def compare(that: Timestamp): Int =
     this.utcDateTime compareTo that.utcDateTime
 
@@ -19,18 +19,16 @@ abstract case class Timestamp private (private val utcDateTime: DateTime)
 
   def toDateTime: DateTime = utcDateTime
 
-  def until(other: Timestamp): FiniteDuration = {
+  def until(other: Timestamp): FiniteDuration =
     val millis = other.utcDateTime.getMillis - utcDateTime.getMillis
     FiniteDuration(millis, TimeUnit.MILLISECONDS)
-  }
 
   def +(duration: FiniteDuration): Timestamp =
     Timestamp(utcDateTime.getMillis + duration.toMillis)
   def -(duration: FiniteDuration): Timestamp =
     Timestamp(utcDateTime.getMillis - duration.toMillis)
-}
 
-object Timestamp {
+object Timestamp
 
   /**
     * Returns a new Timestamp representing the instant that is the supplied
@@ -59,4 +57,3 @@ object Timestamp {
   def now(): Timestamp = Timestamp(System.currentTimeMillis)
 
   def zero: Timestamp = Timestamp(0)
-}

@@ -22,7 +22,7 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
     elemType: IStubElementType[
         _ <: StubElement[_ <: PsiElement], _ <: PsiElement])
     extends StubBaseWrapper[ScParameter](parent, elemType)
-    with ScParameterStub {
+    with ScParameterStub
   private var name: String = _
   private var typeText: String = _
   private var myTypeElement: SofterReference[Option[ScTypeElement]] = null
@@ -48,7 +48,7 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
            isVar: Boolean,
            isCallByName: Boolean,
            defaultExprText: Option[String],
-           deprecatedName: Option[String]) = {
+           deprecatedName: Option[String]) =
     this(
         parent,
         elemType
@@ -63,7 +63,6 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
     this._isCallByName = isCallByName
     this.defaultExprText = defaultExprText
     this._deprecatedName = deprecatedName
-  }
 
   def this(parent: StubElement[ParentPsi],
            elemType: IStubElementType[
@@ -77,7 +76,7 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
            isVar: Boolean,
            isCallByName: Boolean,
            defaultExprText: Option[String],
-           deprecatedName: Option[String]) = {
+           deprecatedName: Option[String]) =
     this(
         parent,
         elemType
@@ -92,19 +91,17 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
     this._isCallByName = isCallByName
     this.defaultExprText = defaultExprText
     this._deprecatedName = deprecatedName
-  }
 
   def getName: String = name
 
   def getTypeText: String = typeText
 
-  def getTypeElement: Option[ScTypeElement] = {
-    if (myTypeElement != null) {
+  def getTypeElement: Option[ScTypeElement] =
+    if (myTypeElement != null)
       val typeElement = myTypeElement.get
       if (typeElement != null &&
           (typeElement.isEmpty || (typeElement.get.getContext eq getPsi)))
         return typeElement
-    }
     val res: Option[ScTypeElement] =
       if (getTypeText != "")
         Some(
@@ -113,7 +110,6 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
       else None
     myTypeElement = new SofterReference[Option[ScTypeElement]](res)
     res
-  }
 
   def isStable: Boolean = stable
 
@@ -129,24 +125,20 @@ class ScParameterStubImpl[ParentPsi <: PsiElement](
 
   def getDefaultExprText: Option[String] = defaultExprText
 
-  def getDefaultExpr: Option[ScExpression] = {
-    if (myDefaultExpression != null) {
+  def getDefaultExpr: Option[ScExpression] =
+    if (myDefaultExpression != null)
       val expression = myDefaultExpression.get
       if (expression != null &&
           (expression.isEmpty || (expression.get.getContext eq getPsi)))
         return expression
-    }
-    val res: Option[ScExpression] = getDefaultExprText match {
+    val res: Option[ScExpression] = getDefaultExprText match
       case None => None
       case Some("") => None
       case Some(text) =>
         Some(
             ScalaPsiElementFactory.createExpressionWithContextFromText(
                 text, getPsi, null))
-    }
     myDefaultExpression = new SofterReference[Option[ScExpression]](res)
     res
-  }
 
   def deprecatedName: Option[String] = _deprecatedName
-}

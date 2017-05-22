@@ -29,7 +29,7 @@ import org.apache.spark.sql.types.{ArrayType, StringType, StructType}
 /**
   * stop words list
   */
-private[spark] object StopWords {
+private[spark] object StopWords
 
   /**
     * Use the same default stopwords list as scikit-learn.
@@ -355,7 +355,6 @@ private[spark] object StopWords {
       "yours",
       "yourself",
       "yourselves")
-}
 
 /**
   * :: Experimental ::
@@ -366,7 +365,7 @@ private[spark] object StopWords {
 @Experimental
 class StopWordsRemover(override val uid: String)
     extends Transformer with HasInputCol with HasOutputCol
-    with DefaultParamsWritable {
+    with DefaultParamsWritable
 
   def this() = this(Identifiable.randomUID("stopWords"))
 
@@ -408,40 +407,33 @@ class StopWordsRemover(override val uid: String)
 
   setDefault(stopWords -> StopWords.English, caseSensitive -> false)
 
-  override def transform(dataset: DataFrame): DataFrame = {
+  override def transform(dataset: DataFrame): DataFrame =
     val outputSchema = transformSchema(dataset.schema)
     val t =
-      if ($(caseSensitive)) {
+      if ($(caseSensitive))
         val stopWordsSet = $(stopWords).toSet
-        udf { terms: Seq[String] =>
+        udf  terms: Seq[String] =>
           terms.filter(s => !stopWordsSet.contains(s))
-        }
-      } else {
+      else
         val toLower = (s: String) => if (s != null) s.toLowerCase else s
         val lowerStopWords = $(stopWords).map(toLower(_)).toSet
-        udf { terms: Seq[String] =>
+        udf  terms: Seq[String] =>
           terms.filter(s => !lowerStopWords.contains(toLower(s)))
-        }
-      }
 
     val metadata = outputSchema($(outputCol)).metadata
     dataset.select(col("*"), t(col($(inputCol))).as($(outputCol), metadata))
-  }
 
-  override def transformSchema(schema: StructType): StructType = {
+  override def transformSchema(schema: StructType): StructType =
     val inputType = schema($(inputCol)).dataType
     require(inputType.sameType(ArrayType(StringType)),
             s"Input type must be ArrayType(StringType) but got $inputType.")
     SchemaUtils.appendColumn(
         schema, $(outputCol), inputType, schema($(inputCol)).nullable)
-  }
 
   override def copy(extra: ParamMap): StopWordsRemover = defaultCopy(extra)
-}
 
 @Since("1.6.0")
-object StopWordsRemover extends DefaultParamsReadable[StopWordsRemover] {
+object StopWordsRemover extends DefaultParamsReadable[StopWordsRemover]
 
   @Since("1.6.0")
   override def load(path: String): StopWordsRemover = super.load(path)
-}

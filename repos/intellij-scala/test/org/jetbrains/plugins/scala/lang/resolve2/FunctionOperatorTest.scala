@@ -3,10 +3,9 @@ package org.jetbrains.plugins.scala.lang.resolve2
 /**
   * Pavel.Fatin, 02.02.2010
   */
-class FunctionOperatorTest extends ResolveTestBase {
-  override def folderPath: String = {
+class FunctionOperatorTest extends ResolveTestBase
+  override def folderPath: String =
     super.folderPath + "function/operator/"
-  }
 
   def testDot() = doTest()
   def testDotAndParentheses() = doTest()
@@ -25,4 +24,3 @@ class FunctionOperatorTest extends ResolveTestBase {
   def testQualifierObject() = doTest()
   //TODO
 //  def testQualifierThis = doTest
-}

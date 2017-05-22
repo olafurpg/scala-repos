@@ -25,7 +25,7 @@ package mutable
 @SerialVersionUID(5219213543849892588L)
 class History[Evt, Pub]
     extends AbstractIterable[(Pub, Evt)] with Subscriber[Evt, Pub]
-    with Iterable[(Pub, Evt)] with Serializable {
+    with Iterable[(Pub, Evt)] with Serializable
   protected val log: Queue[(Pub, Evt)] = new Queue
   val maxHistory: Int = 1000
 
@@ -34,11 +34,10 @@ class History[Evt, Pub]
     *  @param pub   the publisher.
     *  @param event the event.
     */
-  def notify(pub: Pub, event: Evt) {
+  def notify(pub: Pub, event: Evt)
     if (log.length >= maxHistory) log.dequeue()
 
     log.enqueue((pub, event))
-  }
 
   override def size: Int = log.length
   def iterator: Iterator[(Pub, Evt)] = log.iterator
@@ -50,9 +49,7 @@ class History[Evt, Pub]
     *
     *  @return true, iff both history objects contain the same sequence of elements.
     */
-  override def equals(obj: Any): Boolean = obj match {
+  override def equals(obj: Any): Boolean = obj match
     case that: History[_, _] => this.log equals that.log
     case _ => false
-  }
   override def hashCode = log.hashCode()
-}

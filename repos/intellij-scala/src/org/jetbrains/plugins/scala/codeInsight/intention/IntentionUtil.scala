@@ -8,42 +8,37 @@ import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.{PsiComment, PsiDocumentManager, PsiElement, PsiWhiteSpace}
 import org.jetbrains.plugins.scala.extensions.PsiElementExt
 
-object IntentionUtil {
+object IntentionUtil
   def collectComments(
       element: PsiElement,
-      onElementLine: Boolean = false): CommentsAroundElement = {
-    def hasLineBreaks(whiteSpace: PsiElement): Boolean = {
+      onElementLine: Boolean = false): CommentsAroundElement =
+    def hasLineBreaks(whiteSpace: PsiElement): Boolean =
       if (!onElementLine) false
       else StringUtil.containsLineBreak(whiteSpace.getText)
-    }
 
-    def getElements(it: Iterator[PsiElement]) = {
-      def acceptableElem(elem: PsiElement) = {
+    def getElements(it: Iterator[PsiElement]) =
+      def acceptableElem(elem: PsiElement) =
         (elem.isInstanceOf[PsiComment] || elem.isInstanceOf[PsiWhiteSpace]) &&
         !hasLineBreaks(elem)
-      }
 
-      it.takeWhile { a =>
+      it.takeWhile  a =>
         acceptableElem(a)
-      }.filter(a => a.isInstanceOf[PsiComment]).toSeq
-    }
+      .filter(a => a.isInstanceOf[PsiComment]).toSeq
 
     CommentsAroundElement(getElements(element.prevSiblings).reverse,
                           getElements(element.nextSiblings).reverse)
-  }
 
   def hasOtherComments(
       element: PsiElement,
-      commentsAroundElement: CommentsAroundElement): Boolean = {
+      commentsAroundElement: CommentsAroundElement): Boolean =
     val allComments =
       PsiTreeUtil.getChildrenOfTypeAsList(element, classOf[PsiComment])
     allComments.size() > commentsAroundElement.before.size +
     commentsAroundElement.after.size
-  }
 
   def addComments(commentsAroundElement: CommentsAroundElement,
                   parent: PsiElement,
-                  anchor: PsiElement): Unit = {
+                  anchor: PsiElement): Unit =
     if ((parent == null) || (anchor == null)) return
 
     val before = commentsAroundElement.before
@@ -58,7 +53,6 @@ object IntentionUtil {
             parent.getNode.addChild(c.getNode, anchor.getNextSibling.getNode)
           else parent.getNode.addChild(c.getNode))
     before.foreach(c => parent.getNode.addChild(c.getNode, anchor.getNode))
-  }
 
   case class CommentsAroundElement(
       before: Seq[PsiElement], after: Seq[PsiElement])
@@ -66,7 +60,7 @@ object IntentionUtil {
   def startTemplate(elem: PsiElement,
                     context: PsiElement,
                     expression: Expression,
-                    editor: Editor): Unit = {
+                    editor: Editor): Unit =
     val project = context.getProject
     val manager = PsiDocumentManager.getInstance(project)
     manager.commitAllDocuments()
@@ -77,5 +71,3 @@ object IntentionUtil {
     TemplateManager
       .getInstance(project)
       .startTemplate(editor, builder.buildInlineTemplate())
-  }
-}

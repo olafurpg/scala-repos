@@ -50,7 +50,7 @@ import org.apache.spark.sql.types.{StructField, StructType}
   * ==Evaluation==
   * The result of expressions can be evaluated using the `Expression.apply(Row)` method.
   */
-package object expressions {
+package object expressions
 
   /**
     * Used as input into expressions whose output does not depend on any input value.
@@ -75,21 +75,17 @@ package object expressions {
     * `next()` has been called on the [[Iterator]] that produced it. Instead, the user must call
     * `InternalRow.copy()` and hold on to the returned [[InternalRow]] before calling `next()`.
     */
-  abstract class MutableProjection extends Projection {
+  abstract class MutableProjection extends Projection
     def currentValue: InternalRow
 
     /** Uses the given row to store the output of the projection. */
     def target(row: MutableRow): MutableProjection
-  }
 
   /**
     * Helper functions for working with `Seq[Attribute]`.
     */
-  implicit class AttributeSeq(attrs: Seq[Attribute]) {
+  implicit class AttributeSeq(attrs: Seq[Attribute])
 
     /** Creates a StructType with a schema matching this `Seq[Attribute]`. */
-    def toStructType: StructType = {
+    def toStructType: StructType =
       StructType(attrs.map(a => StructField(a.name, a.dataType, a.nullable)))
-    }
-  }
-}

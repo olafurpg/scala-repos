@@ -10,19 +10,19 @@ package org.scalajs.core.ir
 
 import Trees._
 
-object Transformers {
+object Transformers
 
-  abstract class Transformer {
+  abstract class Transformer
     final def transformStat(tree: Tree): Tree =
       transform(tree, isStat = true)
 
     final def transformExpr(tree: Tree): Tree =
       transform(tree, isStat = false)
 
-    def transform(tree: Tree, isStat: Boolean): Tree = {
+    def transform(tree: Tree, isStat: Boolean): Tree =
       implicit val pos = tree.pos
 
-      tree match {
+      tree match
         // Definitions
 
         case VarDef(ident, vtpe, mutable, rhs) =>
@@ -179,9 +179,9 @@ object Transformers {
 
         case JSObjectConstr(fields) =>
           JSObjectConstr(
-              fields map {
+              fields map
             case (name, value) => (name, transformExpr(value))
-          })
+          )
 
         // Atomic expressions
 
@@ -200,12 +200,9 @@ object Transformers {
 
         case _ =>
           sys.error(s"Invalid tree in transform() of class ${tree.getClass}")
-      }
-    }
-  }
 
-  abstract class ClassTransformer extends Transformer {
-    def transformClassDef(tree: ClassDef): ClassDef = {
+  abstract class ClassTransformer extends Transformer
+    def transformClassDef(tree: ClassDef): ClassDef =
       val ClassDef(name, kind, superClass, parents, jsName, defs) = tree
       ClassDef(name,
                kind,
@@ -213,12 +210,11 @@ object Transformers {
                parents,
                jsName,
                defs.map(transformDef))(tree.optimizerHints)(tree.pos)
-    }
 
-    def transformDef(tree: Tree): Tree = {
+    def transformDef(tree: Tree): Tree =
       implicit val pos = tree.pos
 
-      tree match {
+      tree match
         case FieldDef(_, _, _) =>
           tree
 
@@ -242,7 +238,3 @@ object Transformers {
         case _ =>
           sys.error(
               s"Invalid tree in transformDef() of class ${tree.getClass}")
-      }
-    }
-  }
-}

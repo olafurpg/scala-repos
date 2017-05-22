@@ -41,7 +41,7 @@ private[spark] class ShuffleMapStage(
     firstJobId: Int,
     callSite: CallSite,
     val shuffleDep: ShuffleDependency[_, _, _])
-    extends Stage(id, rdd, numTasks, parents, firstJobId, callSite) {
+    extends Stage(id, rdd, numTasks, parents, firstJobId, callSite)
 
   private[this] var _mapStageJobs: List[ActiveJob] = Nil
 
@@ -64,14 +64,12 @@ private[spark] class ShuffleMapStage(
   def mapStageJobs: Seq[ActiveJob] = _mapStageJobs
 
   /** Adds the job to the active job list. */
-  def addActiveJob(job: ActiveJob): Unit = {
+  def addActiveJob(job: ActiveJob): Unit =
     _mapStageJobs = job :: _mapStageJobs
-  }
 
   /** Removes the job from the active job list. */
-  def removeActiveJob(job: ActiveJob): Unit = {
+  def removeActiveJob(job: ActiveJob): Unit =
     _mapStageJobs = _mapStageJobs.filter(_ != job)
-  }
 
   /**
     * Number of partitions that have shuffle outputs.
@@ -87,60 +85,49 @@ private[spark] class ShuffleMapStage(
   def isAvailable: Boolean = _numAvailableOutputs == numPartitions
 
   /** Returns the sequence of partition ids that are missing (i.e. needs to be computed). */
-  override def findMissingPartitions(): Seq[Int] = {
+  override def findMissingPartitions(): Seq[Int] =
     val missing = (0 until numPartitions).filter(id => outputLocs(id).isEmpty)
     assert(
         missing.size == numPartitions - _numAvailableOutputs,
         s"${missing.size} missing, expected ${numPartitions - _numAvailableOutputs}")
     missing
-  }
 
-  def addOutputLoc(partition: Int, status: MapStatus): Unit = {
+  def addOutputLoc(partition: Int, status: MapStatus): Unit =
     val prevList = outputLocs(partition)
     outputLocs(partition) = status :: prevList
-    if (prevList == Nil) {
+    if (prevList == Nil)
       _numAvailableOutputs += 1
-    }
-  }
 
-  def removeOutputLoc(partition: Int, bmAddress: BlockManagerId): Unit = {
+  def removeOutputLoc(partition: Int, bmAddress: BlockManagerId): Unit =
     val prevList = outputLocs(partition)
     val newList = prevList.filterNot(_.location == bmAddress)
     outputLocs(partition) = newList
-    if (prevList != Nil && newList == Nil) {
+    if (prevList != Nil && newList == Nil)
       _numAvailableOutputs -= 1
-    }
-  }
 
   /**
     * Returns an array of [[MapStatus]] (index by partition id). For each partition, the returned
     * value contains only one (i.e. the first) [[MapStatus]]. If there is no entry for the partition,
     * that position is filled with null.
     */
-  def outputLocInMapOutputTrackerFormat(): Array[MapStatus] = {
+  def outputLocInMapOutputTrackerFormat(): Array[MapStatus] =
     outputLocs.map(_.headOption.orNull)
-  }
 
   /**
     * Removes all shuffle outputs associated with this executor. Note that this will also remove
     * outputs which are served by an external shuffle server (if one exists), as they are still
     * registered with this execId.
     */
-  def removeOutputsOnExecutor(execId: String): Unit = {
+  def removeOutputsOnExecutor(execId: String): Unit =
     var becameUnavailable = false
-    for (partition <- 0 until numPartitions) {
+    for (partition <- 0 until numPartitions)
       val prevList = outputLocs(partition)
       val newList = prevList.filterNot(_.location.executorId == execId)
       outputLocs(partition) = newList
-      if (prevList != Nil && newList == Nil) {
+      if (prevList != Nil && newList == Nil)
         becameUnavailable = true
         _numAvailableOutputs -= 1
-      }
-    }
-    if (becameUnavailable) {
+    if (becameUnavailable)
       logInfo(
           "%s is now unavailable on executor %s (%d/%d, %s)".format(
               this, execId, _numAvailableOutputs, numPartitions, isAvailable))
-    }
-  }
-}

@@ -33,13 +33,12 @@ Check the output:
   cat tutorial/data/output4.txt
 
   **/
-class Tutorial4(args: Args) extends Job(args) {
+class Tutorial4(args: Args) extends Job(args)
 
   //we probably don't need to bother with vals for input/output anymore
   TextLine(args("input")).read
-    .flatMap('line -> 'word) { line: String =>
+    .flatMap('line -> 'word)  line: String =>
       line.split("\\s")
-    }
 
     /**
     To count the words, first we need to group by word.
@@ -57,13 +56,11 @@ class Tutorial4(args: Args) extends Job(args) {
     In this case, the only aggregation we care about is size: how many values are
     in the group.
       **/
-    .groupBy('word) { group =>
+    .groupBy('word)  group =>
       group.size
-    }
 
     /**
     No project is needed here because the groupBy has eliminated everything but 'word
     and the size field.
       **/
     .write(Tsv(args("output")))
-}

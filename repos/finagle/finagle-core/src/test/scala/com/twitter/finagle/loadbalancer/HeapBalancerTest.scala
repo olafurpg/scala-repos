@@ -12,46 +12,40 @@ import scala.util.Random
 
 @RunWith(classOf[JUnitRunner])
 class HeapBalancerTest
-    extends FunSuite with MockitoSugar with AssertionsForJUnit {
+    extends FunSuite with MockitoSugar with AssertionsForJUnit
   class LoadedFactory(which: String)
-      extends ServiceFactory[Unit, LoadedFactory] {
+      extends ServiceFactory[Unit, LoadedFactory]
     var load = 0
     var _status: Status = Status.Open
     var _closed = false
 
     def setStatus(x: Status) { _status = x }
 
-    def apply(conn: ClientConnection) = Future.value {
+    def apply(conn: ClientConnection) = Future.value
       load += 1
-      new Service[Unit, LoadedFactory] {
+      new Service[Unit, LoadedFactory]
         def apply(req: Unit) = Future.value(LoadedFactory.this)
         override def close(deadline: Time) = { load -= 1; Future.Done }
-      }
-    }
 
     override def status = _status
     def isClosed = _closed
-    def close(deadline: Time) = {
+    def close(deadline: Time) =
       _closed = true
       Future.Done
-    }
     override def toString = "LoadedFactory<%s>".format(which)
-  }
 
-  class Ctx {
+  class Ctx
     val N = 10
     val statsReceiver = new InMemoryStatsReceiver
     val half1, half2 =
-      0 until N / 2 map { i =>
+      0 until N / 2 map  i =>
         new LoadedFactory(i.toString)
-      }
     val factories = half1 ++ half2
     val group =
       Group.mutable[ServiceFactory[Unit, LoadedFactory]](factories: _*)
-    val nonRng = new Random {
+    val nonRng = new Random
       private[this] val i = new AtomicInteger(0)
       override def nextInt(n: Int) = i.incrementAndGet() % n
-    }
 
     val exc = new NoBrokersAvailableException
 
@@ -66,9 +60,8 @@ class HeapBalancerTest
       assert(statsReceiver.gauges(Seq(name))() == value.toFloat)
     def assertCounter(name: String, value: Int) =
       assert(statsReceiver.counters(Seq(name)) == value.toFloat)
-  }
 
-  test("balancer with empty cluster has Closed status") {
+  test("balancer with empty cluster has Closed status")
     val emptyCluster = Group.empty[ServiceFactory[Unit, LoadedFactory]]
     val b = new HeapBalancer[Unit, LoadedFactory](
         Activity(emptyCluster.set.map(Activity.Ok(_))),
@@ -77,10 +70,9 @@ class HeapBalancerTest
         new Random
     )
     assert(b.status == Status.Closed)
-  }
 
-  for (status <- Seq(Status.Closed, Status.Busy, Status.Open)) {
-    test(s"balancer with entirely $status cluster has $status status") {
+  for (status <- Seq(Status.Closed, Status.Busy, Status.Open))
+    test(s"balancer with entirely $status cluster has $status status")
       val node = new LoadedFactory("1")
       node._status = status
 
@@ -93,10 +85,8 @@ class HeapBalancerTest
           new Random
       )
       assert(b.status == status)
-    }
-  }
 
-  test("least-loaded balancing") {
+  test("least-loaded balancing")
     val ctx = new Ctx
     import ctx._
 
@@ -114,9 +104,8 @@ class HeapBalancerTest
     // f is now least-loaded
     val f1 = Await.result(Await.result(b())(()))
     assert(f1 eq f)
-  }
 
-  test("pick only healthy services") {
+  test("pick only healthy services")
     val ctx = new Ctx
     import ctx._
 
@@ -130,9 +119,8 @@ class HeapBalancerTest
     assert(factories(1).load == 1)
 
     for (f <- factories drop 2) assert(f.load == 3)
-  }
 
-  test("handle dynamic groups") {
+  test("handle dynamic groups")
     val ctx = new Ctx
     import ctx._
 
@@ -156,9 +144,8 @@ class HeapBalancerTest
     val made2 = Seq.fill(N) { Await.result(b()) }
     for (f <- factories) assert(f.load == 3)
     assert(newFactory.load == 2)
-  }
 
-  test("safely remove a host from group before releasing it") {
+  test("safely remove a host from group before releasing it")
     val ctx = new Ctx
     import ctx._
 
@@ -170,9 +157,8 @@ class HeapBalancerTest
     group() -= newFactory
     made2.close()
     assert(newFactory.load == 0)
-  }
 
-  test("close a factory when removed") {
+  test("close a factory when removed")
     val ctx = new Ctx
     import ctx._
 
@@ -180,9 +166,8 @@ class HeapBalancerTest
     group() --= half1
     Await.result(b()).close()
     for (f <- half1) assert(f.isClosed)
-  }
 
-  test("report stats correctly") {
+  test("report stats correctly")
     val ctx = new Ctx
     import ctx._
 
@@ -212,9 +197,8 @@ class HeapBalancerTest
     assertGauge("size", 10)
     assertCounter("adds", 11)
     assertCounter("removes", 1)
-  }
 
-  test("return NoBrokersAvailableException when empty") {
+  test("return NoBrokersAvailableException when empty")
     val ctx = new Ctx
 
     val heapBalancerEmptyGroup = "HeapBalancerEmptyGroup"
@@ -226,9 +210,8 @@ class HeapBalancerTest
     )
     val exc = intercept[NoBrokersAvailableException] { Await.result(b()) }
     assert(exc.getMessage.contains(heapBalancerEmptyGroup))
-  }
 
-  test("balance evenly between nonhealthy services") {
+  test("balance evenly between nonhealthy services")
     val ctx = new Ctx
     import ctx._
 
@@ -236,9 +219,8 @@ class HeapBalancerTest
     for (f <- factories) f.setStatus(Status.Closed)
     for (_ <- 0 until 100 * N) b()
     for (f <- factories) assert(f.load == 101)
-  }
 
-  test("balance somewhat evenly between two non-loaded hosts") {
+  test("balance somewhat evenly between two non-loaded hosts")
     val ctx = new Ctx
     import ctx._
     // Use 2 nodes for this test
@@ -247,13 +229,12 @@ class HeapBalancerTest
     // Sequentially issue requests to the 2 nodes.
     // Requests should end up getting serviced by more than just one
     // of the nodes.
-    val results = (0 until N).foldLeft(Map.empty[LoadedFactory, Int]) {
+    val results = (0 until N).foldLeft(Map.empty[LoadedFactory, Int])
       case (map, i) =>
         val sequentialRequest = Await.result(b())
         val chosenNode = factories.filter(_.load == 1).head
         sequentialRequest.close()
         map + (chosenNode -> (map.getOrElse(chosenNode, 0) + 1))
-    }
 
     // Assert that all two nodes were chosen
     assert(results.keys.size == 2)
@@ -261,9 +242,8 @@ class HeapBalancerTest
     // ensure the distribution is fair (because the rng is deterministic)
     assert(calls(0) == calls(1))
     assert(calls.sum == N)
-  }
 
-  test("recover nonhealthy services when they become available again") {
+  test("recover nonhealthy services when they become available again")
     val ctx = new Ctx
     import ctx._
 
@@ -277,9 +257,8 @@ class HeapBalancerTest
 
     assert(f0.load == 201)
     for (f <- factories drop 1) assert(f.load == 101)
-  }
 
-  test("properly remove a nonhealthy service") {
+  test("properly remove a nonhealthy service")
     val ctx = new Ctx
     import ctx._
 
@@ -293,9 +272,8 @@ class HeapBalancerTest
 
     for (_ <- 0 until N) b()
     assert(factories(1).load == 1)
-  }
 
-  test("disable/enable multiple ServiceFactories") {
+  test("disable/enable multiple ServiceFactories")
     val ctx = new Ctx
     import ctx._
 
@@ -317,9 +295,8 @@ class HeapBalancerTest
     assertGauge("size", N)
 
     assertGauge("available", N)
-  }
 
-  test("balance evenly between 2 unhealthy services") {
+  test("balance evenly between 2 unhealthy services")
     val ctx = new Ctx
     import ctx._
 
@@ -354,5 +331,3 @@ class HeapBalancerTest
     for (_ <- 0 until 1000) b()
     assert(factories(0).load == 1502)
     assert(factories(1).load == 1502)
-  }
-}

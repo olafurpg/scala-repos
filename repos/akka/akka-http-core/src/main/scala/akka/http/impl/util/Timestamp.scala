@@ -12,7 +12,7 @@ import scala.concurrent.duration._
   * We mark it private[http] because we don't want to support it as public API.
   */
 private[http] class Timestamp private (val timestampNanos: Long)
-    extends AnyVal {
+    extends AnyVal
 
   def +(period: Duration): Timestamp =
     if (isNever) this
@@ -30,14 +30,11 @@ private[http] class Timestamp private (val timestampNanos: Long)
 
   def isFinite: Boolean = timestampNanos < Long.MaxValue
   def isNever: Boolean = timestampNanos == Long.MaxValue
-}
 
-private[http] object Timestamp {
+private[http] object Timestamp
   def now: Timestamp = new Timestamp(System.nanoTime())
   def never: Timestamp = new Timestamp(Long.MaxValue)
 
-  implicit object Ordering extends Ordering[Timestamp] {
+  implicit object Ordering extends Ordering[Timestamp]
     def compare(x: Timestamp, y: Timestamp): Int =
       math.signum(x.timestampNanos - y.timestampNanos).toInt
-  }
-}

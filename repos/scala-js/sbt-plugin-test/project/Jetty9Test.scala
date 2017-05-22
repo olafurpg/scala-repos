@@ -16,12 +16,12 @@ import java.io.File
 
 import scala.concurrent.duration._
 
-object Jetty9Test {
+object Jetty9Test
 
   private val jettyPort = 23548
 
   val runSetting =
-    run <<= Def.inputTask {
+    run <<= Def.inputTask
       val jsEnv = (loadedJSEnv in Compile).value.asInstanceOf[ComJSEnv]
       val jsConsole = scalaJSConsole.value
 
@@ -50,27 +50,24 @@ object Jetty9Test {
       val jetty = setupJetty((resourceDirectory in Compile).value)
 
       jetty.addLifeCycleListener(
-          new AbstractLifeCycle.AbstractLifeCycleListener {
-        override def lifeCycleStarted(event: LifeCycle): Unit = {
-          try {
+          new AbstractLifeCycle.AbstractLifeCycleListener
+        override def lifeCycleStarted(event: LifeCycle): Unit =
+          try
             runner.send(s"http://localhost:$jettyPort/test.txt")
             val msg = runner.receive()
             val expected = "It works!"
             if (msg != expected)
               sys.error(s"""received "$msg" instead of "$expected"""")
-          } finally {
+          finally
             runner.close()
             jetty.stop()
-          }
-        }
-      })
+      )
 
       jetty.start()
       runner.await(30.seconds)
       jetty.join()
-    }
 
-  private def setupJetty(dir: File): Server = {
+  private def setupJetty(dir: File): Server =
     val server = new Server(jettyPort)
 
     val resource_handler = new ResourceHandler()
@@ -81,5 +78,3 @@ object Jetty9Test {
     server.setHandler(handlers)
 
     server
-  }
-}

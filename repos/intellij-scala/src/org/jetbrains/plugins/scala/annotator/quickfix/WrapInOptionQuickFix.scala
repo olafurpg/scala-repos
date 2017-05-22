@@ -18,48 +18,39 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScParameterizedType, ScType}
 class WrapInOptionQuickFix(expr: ScExpression,
                            expectedType: TypeResult[ScType],
                            exprType: TypeResult[ScType])
-    extends IntentionAction {
+    extends IntentionAction
   def getText: String = ScalaBundle.message("wrap.in.option.hint")
 
   def getFamilyName: String = ScalaBundle.message("wrap.in.option.name")
 
-  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean = {
+  def isAvailable(project: Project, editor: Editor, file: PsiFile): Boolean =
     WrapInOptionQuickFix.isAvailable(expr, expectedType, exprType)
-  }
 
-  def invoke(project: Project, editor: Editor, file: PsiFile) {
-    if (expr.isValid) {
+  def invoke(project: Project, editor: Editor, file: PsiFile)
+    if (expr.isValid)
       val newText = "Option(" + expr.getText + ")"
       val newExpr = ScalaPsiElementFactory.createExpressionFromText(
           newText, expr.getManager)
       expr.replaceExpression(newExpr, removeParenthesis = true)
-    }
-  }
 
   def startInWriteAction(): Boolean = true
-}
 
-object WrapInOptionQuickFix {
+object WrapInOptionQuickFix
   def isAvailable(expr: ScExpression,
                   expectedType: TypeResult[ScType],
-                  exprType: TypeResult[ScType]): Boolean = {
+                  exprType: TypeResult[ScType]): Boolean =
     var result = false
-    for {
+    for
       scType <- exprType
       expectedType <- expectedType
-    } {
-      expectedType match {
+    
+      expectedType match
         case ScParameterizedType(des, Seq(typeArg)) =>
-          ScType.extractClass(des) match {
+          ScType.extractClass(des) match
             case Some(scClass: ScClass)
                 if scClass.qualifiedName == "scala.Option" &&
                 scType.conforms(typeArg) =>
               result = true
             case _ =>
-          }
         case _ =>
-      }
-    }
     result
-  }
-}

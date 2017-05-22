@@ -22,7 +22,7 @@ import syntax.functor._
   * 
   * This method takes a Function from A => B and turns an F[A] into an F[B]
   */
-object FunctorUsage extends App {
+object FunctorUsage extends App
 
   val len: String => Int = _.length
 
@@ -92,14 +92,12 @@ object FunctorUsage extends App {
   var database = Map("abc" → 1, "aaa" → 2, "qqq" → 3)
 
   // Return a Task which removes items from our database and returns the number of items deleted
-  def del(f: String => Boolean): Task[Int] = Task.delay {
-    val (count, db) = database.foldRight(0 → List.empty[(String, Int)]) {
+  def del(f: String => Boolean): Task[Int] = Task.delay
+    val (count, db) = database.foldRight(0 → List.empty[(String, Int)])
       case ((k, _), (d, r)) if f(k) => (d + 1, r)
       case (i, (d, r)) => (d, i :: r)
-    }
     database = db.toMap
     count
-  }
 
   // This is a task which will delete two of the three items in our database,
   val delTask = del(_.startsWith("a"))
@@ -130,4 +128,3 @@ object FunctorUsage extends App {
   val listOpt = Functor[List] compose Functor[Option]
   assert(listOpt.map(List(Some(1), None, Some(3)))(_ + 1) === List(
           Some(2), None, Some(4)))
-}

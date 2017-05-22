@@ -37,7 +37,7 @@ trait Function1[
                  scala.Float,
                  scala.Long,
                  scala.Double) +R]
-    extends AnyRef { self =>
+    extends AnyRef  self =>
 
   /** Apply the body of this function to the argument.
     *  @return   the result of function application.
@@ -51,9 +51,8 @@ trait Function1[
     *  @return       a new function `f` such that `f(x) == apply(g(x))`
     */
   @annotation.unspecialized
-  def compose[A](g: A => T1): A => R = { x =>
+  def compose[A](g: A => T1): A => R =  x =>
     apply(g(x))
-  }
 
   /** Composes two instances of Function1 in a new Function1, with this function applied first.
     *
@@ -62,9 +61,7 @@ trait Function1[
     *  @return       a new function `f` such that `f(x) == g(apply(x))`
     */
   @annotation.unspecialized
-  def andThen[A](g: R => A): T1 => A = { x =>
+  def andThen[A](g: R => A): T1 => A =  x =>
     g(apply(x))
-  }
 
   override def toString() = "<function1>"
-}

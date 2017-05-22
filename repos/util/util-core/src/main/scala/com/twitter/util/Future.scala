@@ -9,17 +9,16 @@ import scala.collection.mutable
 import scala.runtime.NonLocalReturnControl
 
 class FutureNonLocalReturnControl(cause: NonLocalReturnControl[_])
-    extends Exception(cause) {
+    extends Exception(cause)
   override def getMessage: String =
     "Invalid use of `return` in closure passed to a Future"
-}
 
 /**
   * @see [[Futures]] for Java-friendly APIs.
   * @see The [[http://twitter.github.io/finagle/guide/Futures.html user guide]]
   *      on concurrent programming with Futures.
   */
-object Future {
+object Future
   val DEFAULT_TIMEOUT: Duration = Duration.Top
 
   /** A successfully satisfied constant `Unit`-typed `Future` of `()` */
@@ -58,9 +57,8 @@ object Future {
     scala.Function.const(NotApplied) _
   private val toUnit: Any => Future[Unit] = scala.Function.const(Unit)
   private val toVoid: Any => Future[Void] = scala.Function.const(Void)
-  private val AlwaysMasked: PartialFunction[Throwable, Boolean] = {
+  private val AlwaysMasked: PartialFunction[Throwable, Boolean] =
     case _ => true
-  }
 
   // Exception used to raise on Futures.
   private[this] val RaiseException = new Exception with NoStacktrace
@@ -109,17 +107,15 @@ object Future {
   /**
     * A `Unit`-typed `Future` that is satisfied after `howlong`.
     */
-  def sleep(howlong: Duration)(implicit timer: Timer): Future[Unit] = {
+  def sleep(howlong: Duration)(implicit timer: Timer): Future[Unit] =
     if (howlong <= Duration.Zero) return Future.Done
 
     val p = new Promise[Unit]
     val task = timer.schedule(howlong.fromNow) { p.setDone() }
-    p.setInterruptHandler {
+    p.setInterruptHandler
       case e =>
         if (p.updateIfEmpty(Throw(e))) task.cancel()
-    }
     p
-  }
 
   /**
     * Creates a satisfied `Future` from the result of running `a`.
@@ -132,12 +128,11 @@ object Future {
     *       some care must be taken with blocking code.
     */
   def apply[A](a: => A): Future[A] =
-    try {
+    try
       const(Try(a))
-    } catch {
+    catch
       case nlrc: NonLocalReturnControl[_] =>
         Future.exception(new FutureNonLocalReturnControl(nlrc))
-    }
 
   def unapply[A](f: Future[A]): Option[Try[A]] = f.poll
 
@@ -154,41 +149,34 @@ object Future {
     * never satisfied.  In this example, `Future.monitored { f1
     * onSuccess g; f0 }` will cancel f0 so that f0 never hangs.
     */
-  def monitored[A](mkFuture: => Future[A]): Future[A] = {
+  def monitored[A](mkFuture: => Future[A]): Future[A] =
     val p = new Promise[A]()
     val monitored = new Monitored[A](p)
-    monitored {
+    monitored
       val f = mkFuture
       p.forwardInterruptsTo(f)
       f.respond(monitored.setTo(_))
-    }
     p
-  }
 
   private[this] class Monitored[A](private[this] var p: Promise[A])
-      extends Monitor {
-    private[this] def getAndSetNull(): Promise[A] = synchronized {
+      extends Monitor
+    private[this] def getAndSetNull(): Promise[A] = synchronized
       val prev = p
       if (p != null) p = null
       prev
-    }
 
-    def setTo(r: Try[A]): Unit = {
+    def setTo(r: Try[A]): Unit =
       val prev = getAndSetNull()
       if (prev != null) prev.update(r)
-    }
 
-    def handle(exc: Throwable): Boolean = {
+    def handle(exc: Throwable): Boolean =
       val prev = getAndSetNull()
-      if (prev == null) {
+      if (prev == null)
         false
-      } else {
+      else
         prev.raise(exc)
         prev.setException(exc)
         true
-      }
-    }
-  }
 
   /**
     * Flattens a nested future.  Same as ffa.flatten, but easier to call from Java.
@@ -208,22 +196,18 @@ object Future {
     * @see [[collectToTry]] if you want to be able to see the results of each
     *     `Future` regardless of if they succeed or fail.
     */
-  def join[A](fs: Seq[Future[A]]): Future[Unit] = {
+  def join[A](fs: Seq[Future[A]]): Future[Unit] =
     if (fs.isEmpty) Unit
-    else {
+    else
       val count = new AtomicInteger(fs.size)
       val p = Promise.interrupts[Unit](fs: _*)
-      for (f <- fs) {
-        f respond {
+      for (f <- fs)
+        f respond
           case Return(_) =>
             if (count.decrementAndGet() == 0) p.update(Return.Unit)
           case Throw(cause) =>
             p.updateIfEmpty(Throw(cause))
-        }
-      }
       p
-    }
-  }
 
   /* The following joins are generated with this code:
   scala -e '
@@ -252,9 +236,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * do.
     */
   def join[A, B](a: Future[A], b: Future[B]): Future[(A, B)] =
-    join(Seq(a, b)) map { _ =>
+    join(Seq(a, b)) map  _ =>
       (Await.result(a), Await.result(b))
-    }
 
   /**
     * Join 3 futures. The returned future is complete when all
@@ -263,9 +246,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     */
   def join[A, B, C](
       a: Future[A], b: Future[B], c: Future[C]): Future[(A, B, C)] =
-    join(Seq(a, b, c)) map { _ =>
+    join(Seq(a, b, c)) map  _ =>
       (Await.result(a), Await.result(b), Await.result(c))
-    }
 
   /**
     * Join 4 futures. The returned future is complete when all
@@ -276,9 +258,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       a: Future[A],
       b: Future[B],
       c: Future[C],
-      d: Future[D]): Future[(A, B, C, D)] = join(Seq(a, b, c, d)) map { _ =>
+      d: Future[D]): Future[(A, B, C, D)] = join(Seq(a, b, c, d)) map  _ =>
     (Await.result(a), Await.result(b), Await.result(c), Await.result(d))
-  }
 
   /**
     * Join 5 futures. The returned future is complete when all
@@ -290,13 +271,12 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                           c: Future[C],
                           d: Future[D],
                           e: Future[E]): Future[(A, B, C, D, E)] =
-    join(Seq(a, b, c, d, e)) map { _ =>
+    join(Seq(a, b, c, d, e)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
        Await.result(d),
        Await.result(e))
-    }
 
   /**
     * Join 6 futures. The returned future is complete when all
@@ -309,14 +289,13 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                              d: Future[D],
                              e: Future[E],
                              f: Future[F]): Future[(A, B, C, D, E, F)] =
-    join(Seq(a, b, c, d, e, f)) map { _ =>
+    join(Seq(a, b, c, d, e, f)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
        Await.result(d),
        Await.result(e),
        Await.result(f))
-    }
 
   /**
     * Join 7 futures. The returned future is complete when all
@@ -330,7 +309,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                 e: Future[E],
                                 f: Future[F],
                                 g: Future[G]): Future[(A, B, C, D, E, F, G)] =
-    join(Seq(a, b, c, d, e, f, g)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -338,7 +317,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(e),
        Await.result(f),
        Await.result(g))
-    }
 
   /**
     * Join 8 futures. The returned future is complete when all
@@ -354,7 +332,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       f: Future[F],
       g: Future[G],
       h: Future[H]): Future[(A, B, C, D, E, F, G, H)] =
-    join(Seq(a, b, c, d, e, f, g, h)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -363,7 +341,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(f),
        Await.result(g),
        Await.result(h))
-    }
 
   /**
     * Join 9 futures. The returned future is complete when all
@@ -380,7 +357,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       g: Future[G],
       h: Future[H],
       i: Future[I]): Future[(A, B, C, D, E, F, G, H, I)] =
-    join(Seq(a, b, c, d, e, f, g, h, i)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -390,7 +367,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(g),
        Await.result(h),
        Await.result(i))
-    }
 
   /**
     * Join 10 futures. The returned future is complete when all
@@ -408,7 +384,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       h: Future[H],
       i: Future[I],
       j: Future[J]): Future[(A, B, C, D, E, F, G, H, I, J)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -419,7 +395,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(h),
        Await.result(i),
        Await.result(j))
-    }
 
   /**
     * Join 11 futures. The returned future is complete when all
@@ -438,7 +413,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       i: Future[I],
       j: Future[J],
       k: Future[K]): Future[(A, B, C, D, E, F, G, H, I, J, K)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -450,7 +425,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(i),
        Await.result(j),
        Await.result(k))
-    }
 
   /**
     * Join 12 futures. The returned future is complete when all
@@ -470,7 +444,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       j: Future[J],
       k: Future[K],
       l: Future[L]): Future[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -483,7 +457,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(j),
        Await.result(k),
        Await.result(l))
-    }
 
   /**
     * Join 13 futures. The returned future is complete when all
@@ -504,7 +477,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       k: Future[K],
       l: Future[L],
       m: Future[M]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -518,7 +491,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(k),
        Await.result(l),
        Await.result(m))
-    }
 
   /**
     * Join 14 futures. The returned future is complete when all
@@ -540,7 +512,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       l: Future[L],
       m: Future[M],
       n: Future[N]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -555,7 +527,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(l),
        Await.result(m),
        Await.result(n))
-    }
 
   /**
     * Join 15 futures. The returned future is complete when all
@@ -578,7 +549,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       m: Future[M],
       n: Future[N],
       o: Future[O]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -594,7 +565,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(m),
        Await.result(n),
        Await.result(o))
-    }
 
   /**
     * Join 16 futures. The returned future is complete when all
@@ -618,7 +588,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       n: Future[N],
       o: Future[O],
       p: Future[P]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -635,7 +605,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(n),
        Await.result(o),
        Await.result(p))
-    }
 
   /**
     * Join 17 futures. The returned future is complete when all
@@ -660,7 +629,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                                               p: Future[P],
                                                               q: Future[Q])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -678,7 +647,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(o),
        Await.result(p),
        Await.result(q))
-    }
 
   /**
     * Join 18 futures. The returned future is complete when all
@@ -704,7 +672,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                                                  q: Future[Q],
                                                                  r: Future[R])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map { _ =>
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -723,7 +691,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(p),
        Await.result(q),
        Await.result(r))
-    }
 
   /**
     * Join 19 futures. The returned future is complete when all
@@ -751,7 +718,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       r: Future[R],
       s: Future[S])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map {
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -772,7 +739,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(q),
          Await.result(r),
          Await.result(s))
-    }
 
   /**
     * Join 20 futures. The returned future is complete when all
@@ -801,7 +767,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       s: Future[S],
       t: Future[T])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map {
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -823,7 +789,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(r),
          Await.result(s),
          Await.result(t))
-    }
 
   /**
     * Join 21 futures. The returned future is complete when all
@@ -853,7 +818,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       t: Future[T],
       u: Future[U])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map {
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -876,7 +841,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(s),
          Await.result(t),
          Await.result(u))
-    }
 
   /**
     * Join 22 futures. The returned future is complete when all
@@ -907,7 +871,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       u: Future[U],
       v: Future[V]): Future[
       (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V)] =
-    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)) map {
+    join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -931,7 +895,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(t),
          Await.result(u),
          Await.result(v))
-    }
 
   /**
     * Creates a `Future` that is satisfied when all futures in `fs`
@@ -970,12 +933,11 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     */
   def traverseSequentially[A, B](as: Seq[A])(
       f: A => Future[B]): Future[Seq[B]] =
-    as.foldLeft(Future.value(Vector.empty[B])) { (resultsFuture, nextItem) =>
-      for {
+    as.foldLeft(Future.value(Vector.empty[B]))  (resultsFuture, nextItem) =>
+      for
         results <- resultsFuture
         nextResult <- f(nextItem)
-      } yield results :+ nextResult
-    }
+      yield results :+ nextResult
 
   /**
     * Collect the results from the given futures into a new future of
@@ -990,34 +952,28 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * @see [[join]] if you are not interested in the results of the individual
     *     `Futures`, only when they are complete.
     */
-  def collect[A](fs: Seq[Future[A]]): Future[Seq[A]] = {
-    if (fs.isEmpty) {
+  def collect[A](fs: Seq[Future[A]]): Future[Seq[A]] =
+    if (fs.isEmpty)
       Future(Seq[A]())
-    } else {
+    else
       val fsSize = fs.size
       val results = new AtomicReferenceArray[A](fsSize)
       val count = new AtomicInteger(fsSize)
       val p = Promise.interrupts[Seq[A]](fs: _*)
-      for ((f, i) <- fs.iterator.zipWithIndex) {
-        f respond {
+      for ((f, i) <- fs.iterator.zipWithIndex)
+        f respond
           case Return(x) =>
             results.set(i, x)
-            if (count.decrementAndGet() == 0) {
+            if (count.decrementAndGet() == 0)
               val resultsArray = new mutable.ArraySeq[A](fsSize)
               var j = 0
-              while (j < fsSize) {
+              while (j < fsSize)
                 resultsArray(j) = results.get(j)
                 j += 1
-              }
               p.setValue(resultsArray)
-            }
           case Throw(cause) =>
             p.updateIfEmpty(Throw(cause))
-        }
-      }
       p
-    }
-  }
 
   /**
     * Collect the results from the given map `fs` of futures into a new future
@@ -1029,12 +985,10 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     */
   def collect[A, B](fs: Map[A, Future[B]]): Future[Map[A, B]] =
     if (fs.isEmpty) Future(Map.empty[A, B])
-    else {
+    else
       val (keys, values) = fs.toSeq.unzip
-      Future.collect(values) map { seq =>
+      Future.collect(values) map  seq =>
         keys.zip(seq)(scala.collection.breakOut): Map[A, B]
-      }
-    }
 
   /**
     * Collect the results from the given futures into a new future of
@@ -1080,19 +1034,16 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * @see [[selectIndex]] which can be more performant in some situations.
     */
   def select[A](fs: Seq[Future[A]]): Future[(Try[A], Seq[Future[A]])] =
-    if (fs.isEmpty) {
+    if (fs.isEmpty)
       Future.exception(new IllegalArgumentException("empty future list"))
-    } else {
+    else
       val p = Promise.interrupts[(Try[A], Seq[Future[A]])](fs: _*)
       val as = fs.map(f => (Promise.attached(f), f))
-      for ((a, f) <- as) a respond { t =>
-        if (!p.isDefined) {
+      for ((a, f) <- as) a respond  t =>
+        if (!p.isDefined)
           p.updateIfEmpty(Return(t -> fs.filterNot(_ eq f)))
           for (z <- as) z._1.detach()
-        }
-      }
       p
-    }
 
   /**
     * Select the index into `fs` of the first future to be satisfied.
@@ -1102,27 +1053,22 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * @see [[select]] which can be an easier API to use.
     */
   def selectIndex[A](fs: IndexedSeq[Future[A]]): Future[Int] =
-    if (fs.isEmpty) {
+    if (fs.isEmpty)
       Future.exception(new IllegalArgumentException("empty future list"))
-    } else {
+    else
       val p = Promise.interrupts[Int](fs: _*)
       val as = fs.map(Promise.attached)
       var i = 0
-      while (i < as.size) {
+      while (i < as.size)
         val ii = i
-        as(ii) ensure {
-          if (!p.isDefined && p.updateIfEmpty(Return(ii))) {
+        as(ii) ensure
+          if (!p.isDefined && p.updateIfEmpty(Return(ii)))
             var j = 0
-            while (j < as.size) {
+            while (j < as.size)
               as(j).detach()
               j += 1
-            }
-          }
-        }
         i += 1
-      }
       p
-    }
 
   /**
     * "Select" off the first future to be satisfied.  Return this as a
@@ -1141,10 +1087,9 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * Repeat a computation that returns a Future some number of times, after each
     * computation completes.
     */
-  def times[A](n: Int)(f: => Future[A]): Future[Unit] = {
+  def times[A](n: Int)(f: => Future[A]): Future[Unit] =
     val count = new AtomicInteger(0)
     whileDo(count.getAndIncrement() < n)(f)
-  }
 
   /**
     * Perform the effects of the supplied Future only when the provided
@@ -1157,16 +1102,14 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * Repeat a computation that returns a Future while some predicate obtains,
     * after each computation completes.
     */
-  def whileDo[A](p: => Boolean)(f: => Future[A]): Future[Unit] = {
-    def loop(): Future[Unit] = {
+  def whileDo[A](p: => Boolean)(f: => Future[A]): Future[Unit] =
+    def loop(): Future[Unit] =
       if (p)
-        f flatMap { _ =>
+        f flatMap  _ =>
           loop()
-        } else Future.Unit
-    }
+        else Future.Unit
 
     loop()
-  }
 
   case class NextThrewException(cause: Throwable)
       extends IllegalArgumentException("'next' threw an exception", cause)
@@ -1176,23 +1119,19 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * applying `body` to each iteration. The returned future
     * indicates completion (via an exception).
     */
-  def each[A](next: => Future[A])(body: A => Unit): Future[Nothing] = {
+  def each[A](next: => Future[A])(body: A => Unit): Future[Nothing] =
     def go(): Future[Nothing] =
-      try next flatMap { a =>
+      try next flatMap  a =>
         body(a); go()
-      } catch {
+      catch
         case NonFatal(exc) =>
           Future.exception(NextThrewException(exc))
-      }
 
     go()
-  }
 
-  def parallel[A](n: Int)(f: => Future[A]): Seq[Future[A]] = {
-    (0 until n) map { i =>
+  def parallel[A](n: Int)(f: => Future[A]): Seq[Future[A]] =
+    (0 until n) map  i =>
       f
-    }
-  }
 
   /**
     * Creates a "batched" Future that, given a function
@@ -1236,11 +1175,9 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       f: Seq[In] => Future[Seq[Out]]
   )(
       implicit timer: Timer
-  ): Batcher[In, Out] = {
+  ): Batcher[In, Out] =
     new Batcher[In, Out](new BatchExecutor[In, Out](
             sizeThreshold, timeThreshold, sizePercentile, f))
-  }
-}
 
 class FutureCancelledException
     extends Exception("The future was cancelled with Future.cancel")
@@ -1256,7 +1193,7 @@ class FutureCancelledException
   * @see [[Future.addEventListener]] for using it with a `Future`.
   * @see [[FutureTransformer]] for a Java API for transforming the results of Futures.
   */
-trait FutureEventListener[T] {
+trait FutureEventListener[T]
 
   /**
     * A side-effect which is invoked if the computation completes successfully.
@@ -1267,7 +1204,6 @@ trait FutureEventListener[T] {
     * A side-effect which is invoked if the computation completes unsuccessfully.
     */
   def onFailure(cause: Throwable): Unit
-}
 
 /**
   * An alternative interface for performing Future transformations;
@@ -1289,7 +1225,7 @@ trait FutureEventListener[T] {
   * @see [[Future.transformedBy]] for using it with a `Future`.
   * @see [[FutureEventListener]] for a Java API for side-effects.
   */
-abstract class FutureTransformer[-A, +B] {
+abstract class FutureTransformer[-A, +B]
 
   /**
     * Invoked if the computation completes successfully. Returns the
@@ -1316,7 +1252,6 @@ abstract class FutureTransformer[-A, +B] {
     * value.
     */
   def handle(throwable: Throwable): B = throw throwable
-}
 
 /**
   * Represents an asynchronous value.
@@ -1337,7 +1272,7 @@ abstract class FutureTransformer[-A, +B] {
   *      on concurrent programming with Futures.
   * @see [[Futures]] for Java-friendly APIs.
   */
-abstract class Future[+A] extends Awaitable[A] {
+abstract class Future[+A] extends Awaitable[A]
   import Future.DEFAULT_TIMEOUT
 
   /**
@@ -1379,9 +1314,8 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[respond]] if you need the result of the computation for
     *     usage in the side-effect.
     */
-  def ensure(f: => Unit): Future[A] = respond { _ =>
+  def ensure(f: => Unit): Future[A] = respond  _ =>
     f
-  }
 
   /**
     * Block indefinitely, wait for the result of the Future to be available.
@@ -1428,13 +1362,12 @@ abstract class Future[+A] extends Awaitable[A] {
     */
   @deprecated("Use Await.result(future.liftToTry)", "6.2.x")
   final def get(timeout: Duration): Try[A] =
-    try {
+    try
       Return(Await.result(this, timeout))
-    } catch {
+    catch
       // For legacy reasons, we catch even
       // fatal exceptions.
       case e: Throwable => Throw(e)
-    }
 
   /**
     * Polls for an available result.  If the Future has been
@@ -1481,15 +1414,13 @@ abstract class Future[+A] extends Awaitable[A] {
     *
     * ''Note'': On timeout, the underlying future is interrupted.
     */
-  def raiseWithin(timer: Timer, timeout: Duration, exc: Throwable): Future[A] = {
+  def raiseWithin(timer: Timer, timeout: Duration, exc: Throwable): Future[A] =
     if (timeout == Duration.Top || isDefined) return this
 
-    within(timer, timeout, Future.raiseException) rescue {
+    within(timer, timeout, Future.raiseException) rescue
       case e if e eq Future.raiseException =>
         this.raise(exc)
         Future.exception(exc)
-    }
-  }
 
   /**
     * Same as the other within, but with an implicit timer. Sometimes this is more convenient.
@@ -1516,31 +1447,27 @@ abstract class Future[+A] extends Awaitable[A] {
     * @param timeout indicates how long you are willing to wait for the result to be available.
     * @param exc exception to throw.
     */
-  def within(timer: Timer, timeout: Duration, exc: => Throwable): Future[A] = {
+  def within(timer: Timer, timeout: Duration, exc: => Throwable): Future[A] =
     if (timeout == Duration.Top || isDefined) return this
 
     val p = Promise.interrupts[A](this)
-    val task = timer.schedule(timeout.fromNow) {
+    val task = timer.schedule(timeout.fromNow)
       p.updateIfEmpty(Throw(exc))
-    }
-    respond { r =>
+    respond  r =>
       task.cancel()
       p.updateIfEmpty(r)
-    }
     p
-  }
 
   /**
     * Delay the completion of this Future for at least
     * `howlong` from now.
     */
-  def delayed(howlong: Duration)(implicit timer: Timer): Future[A] = {
+  def delayed(howlong: Duration)(implicit timer: Timer): Future[A] =
     if (howlong == Duration.Zero) return this
 
     val p = Promise.interrupts[A](this)
     timer.schedule(howlong.fromNow) { p.become(this) }
     p
-  }
 
   /**
     * When this future completes, run `f` on that completed result
@@ -1569,10 +1496,9 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[map]]
     */
   def flatMap[B](f: A => Future[B]): Future[B] =
-    transform {
+    transform
       case Return(v) => f(v)
       case t: Throw[_] => Future.const[B](t.cast[B])
-    }
 
   /**
     * Sequentially compose `this` with `f`. This is as [[flatMap]], but
@@ -1581,10 +1507,9 @@ abstract class Future[+A] extends Awaitable[A] {
     */
   def before[B](
       f: => Future[B])(implicit ev: this.type <:< Future[Unit]): Future[B] =
-    transform {
+    transform
       case Return(_) => f
       case t: Throw[_] => Future.const[B](t.cast[B])
-    }
 
   /**
     * If this, the original future, results in an exceptional computation,
@@ -1600,12 +1525,12 @@ abstract class Future[+A] extends Awaitable[A] {
   def rescue[B >: A](
       rescueException: PartialFunction[Throwable, Future[B]]
   ): Future[B] =
-    transform({
+    transform(
       case Throw(t) =>
         val result = rescueException.applyOrElse(t, Future.AlwaysNotApplied)
         if (result eq Future.NotApplied) this else result
       case _ => this
-    })
+    )
 
   /**
     * Invoke the callback only if the Future returns successfully. Useful for Scala `for`
@@ -1627,14 +1552,12 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[onSuccess]] for side-effecting chained computations.
     */
   def map[B](f: A => B): Future[B] =
-    transform {
+    transform
       case Return(r) => Future { f(r) }
       case t: Throw[_] => Future.const[B](t.cast[B])
-    }
 
-  def filter(p: A => Boolean): Future[A] = transform { x: Try[A] =>
+  def filter(p: A => Boolean): Future[A] = transform  x: Try[A] =>
     Future.const(x.filter(p))
-  }
 
   def withFilter(p: A => Boolean): Future[A] = filter(p)
 
@@ -1649,10 +1572,10 @@ abstract class Future[+A] extends Awaitable[A] {
     *     the computation.
     */
   def onSuccess(f: A => Unit): Future[A] =
-    respond({
+    respond(
       case Return(value) => f(value)
       case _ =>
-    })
+    )
 
   /**
     * Invoke the function on the error, if the computation was
@@ -1671,10 +1594,9 @@ abstract class Future[+A] extends Awaitable[A] {
     *     the computation.
     */
   def onFailure(fn: Throwable => Unit): Future[A] =
-    respond {
+    respond
       case Throw(t) => fn(t)
       case _ =>
-    }
 
   /**
     * Register a [[FutureEventListener]] to be invoked when the
@@ -1688,10 +1610,9 @@ abstract class Future[+A] extends Awaitable[A] {
     *     a new `Future` from the result of a computation.
     */
   def addEventListener(listener: FutureEventListener[_ >: A]): Future[A] =
-    respond {
+    respond
       case Throw(cause) => listener.onFailure(cause)
       case Return(value) => listener.onSuccess(value)
-    }
 
   /**
     * Transform the `Future[A]` into a `Future[B]` using the
@@ -1708,10 +1629,9 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[addEventListener]] for a Java friendly way to perform side-effects.
     */
   def transformedBy[B](transformer: FutureTransformer[A, B]): Future[B] =
-    transform {
+    transform
       case Return(v) => transformer.flatMap(v)
       case Throw(t) => transformer.rescue(t)
-    }
 
   /**
     * If this, the original future, results in an exceptional computation,
@@ -1725,11 +1645,10 @@ abstract class Future[+A] extends Awaitable[A] {
     * @see [[rescue]]
     */
   def handle[B >: A](
-      rescueException: PartialFunction[Throwable, B]): Future[B] = rescue {
+      rescueException: PartialFunction[Throwable, B]): Future[B] = rescue
     case e: Throwable if rescueException.isDefinedAt(e) =>
       Future(rescueException(e))
     case e: Throwable => this
-  }
 
   /**
     * Choose the first Future to be satisfied.
@@ -1737,18 +1656,15 @@ abstract class Future[+A] extends Awaitable[A] {
     * @param other another Future
     * @return a new Future whose result is that of the first of this and other to return
     */
-  def select[U >: A](other: Future[U]): Future[U] = {
+  def select[U >: A](other: Future[U]): Future[U] =
     val p = Promise.interrupts[U](other, this)
     val a = Promise.attached(other)
     val b = Promise.attached(this)
-    a respond { t =>
+    a respond  t =>
       if (p.updateIfEmpty(t)) b.detach()
-    }
-    b respond { t =>
+    b respond  t =>
       if (p.updateIfEmpty(t)) a.detach()
-    }
     p
-  }
 
   /**
     * A synonym for [[select]]: Choose the first `Future` to be satisfied.
@@ -1758,18 +1674,15 @@ abstract class Future[+A] extends Awaitable[A] {
   /**
     * Combines two `Futures` into one `Future` of the `Tuple2` of the two results.
     */
-  def join[B](other: Future[B]): Future[(A, B)] = {
+  def join[B](other: Future[B]): Future[(A, B)] =
     val p = Promise.interrupts[(A, B)](this, other)
-    this.respond {
+    this.respond
       case Throw(t) => p.update(Throw(t))
       case Return(a) =>
-        other.respond {
+        other.respond
           case Throw(t) => p.update(Throw(t))
           case Return(b) => p.update(Return((a, b)))
-        }
-    }
     p
-  }
 
   /**
     * Convert this `Future[A]` to a `Future[Unit]` by discarding the result.
@@ -1797,30 +1710,25 @@ abstract class Future[+A] extends Awaitable[A] {
     *
     * @see [[com.twitter.util.Promise.become]]
     */
-  def proxyTo[B >: A](other: Promise[B]) {
-    if (other.isDefined) {
+  def proxyTo[B >: A](other: Promise[B])
+    if (other.isDefined)
       throw new IllegalStateException(
-          s"Cannot call proxyTo on an already satisfied Promise: ${Await
-        .result(other.liftToTry)}")
-    }
+          s"Cannot call proxyTo on an already satisfied Promise: $Await
+        .result(other.liftToTry)")
     respond { other() = _ }
-  }
 
   /**
     * An [[com.twitter.concurrent.Offer Offer]] for this future.
     *
     * The offer is activated when the future is satisfied.
     */
-  def toOffer: Offer[Try[A]] = new Offer[Try[A]] {
-    def prepare() = transform { res: Try[A] =>
-      val tx = new Tx[Try[A]] {
+  def toOffer: Offer[Try[A]] = new Offer[Try[A]]
+    def prepare() = transform  res: Try[A] =>
+      val tx = new Tx[Try[A]]
         def ack(): Future[Tx.Result[Try[A]]] = Future.value(Tx.Commit(res))
         def nack(): Unit = ()
-      }
 
       Future.value(tx)
-    }
-  }
 
   /**
     * Convert a Twitter Future to a Java native Future. This should
@@ -1829,51 +1737,43 @@ abstract class Future[+A] extends Awaitable[A] {
     *
     * http://download.oracle.com/javase/6/docs/api/java/util/concurrent/Future.html#cancel(boolean)
     */
-  def toJavaFuture: JavaFuture[_ <: A] = {
+  def toJavaFuture: JavaFuture[_ <: A] =
     val f = this
-    new JavaFuture[A] {
+    new JavaFuture[A]
       val wasCancelled = new AtomicBoolean(false)
 
-      override def cancel(mayInterruptIfRunning: Boolean): Boolean = {
+      override def cancel(mayInterruptIfRunning: Boolean): Boolean =
         if (wasCancelled.compareAndSet(false, true))
           f.raise(new CancellationException)
         true
-      }
 
       override def isCancelled: Boolean = wasCancelled.get
       override def isDone: Boolean = isCancelled || f.isDefined
 
-      override def get(): A = {
+      override def get(): A =
         if (isCancelled) throw new CancellationException
         Await.result(f)
-      }
 
-      override def get(time: Long, timeUnit: TimeUnit): A = {
+      override def get(time: Long, timeUnit: TimeUnit): A =
         if (isCancelled) throw new CancellationException
         Await.result(f, Duration.fromTimeUnit(time, timeUnit))
-      }
-    }
-  }
 
   /**
     * Converts a `Future[Future[B]]` into a `Future[B]`.
     */
   def flatten[B](implicit ev: A <:< Future[B]): Future[B] =
-    flatMap[B] { x =>
+    flatMap[B]  x =>
       x
-    }
 
   /**
     * Returns an identical future except that it ignores interrupts which match a predicate
     */
-  def mask(pred: PartialFunction[Throwable, Boolean]): Future[A] = {
+  def mask(pred: PartialFunction[Throwable, Boolean]): Future[A] =
     val p = Promise[A]()
-    p.setInterruptHandler {
+    p.setInterruptHandler
       case t if !PartialFunction.cond(t)(pred) => this.raise(t)
-    }
     this.proxyTo(p)
     p
-  }
 
   /**
     * Returns an identical future that ignores all interrupts
@@ -1885,13 +1785,10 @@ abstract class Future[+A] extends Awaitable[A] {
     *
     * Note that {{{Future.exception(e).willEqual(Future.exception(e)) == Future.value(true)}}}.
     */
-  def willEqual[B](that: Future[B]): Future[Boolean] = {
-    this.transform { thisResult =>
-      that.transform { thatResult =>
+  def willEqual[B](that: Future[B]): Future[Boolean] =
+    this.transform  thisResult =>
+      that.transform  thatResult =>
         Future.value(thisResult == thatResult)
-      }
-    }
-  }
 
   /**
     * Returns the result of the computation as a `Future[Try[A]]`.
@@ -1902,12 +1799,10 @@ abstract class Future[+A] extends Awaitable[A] {
     * Lowers a `Future[Try[T]]` into a `Future[T]`.
     */
   def lowerFromTry[T](implicit ev: A <:< Try[T]): Future[T] =
-    this.flatMap { a =>
-      ev(a) match {
+    this.flatMap  a =>
+      ev(a) match
         case Return(t) => Future.value(t)
         case Throw(exc) => Future.exception(exc)
-      }
-    }
 
   /**
     * Makes a derivative `Future` which will be satisfied with the result
@@ -1924,59 +1819,52 @@ abstract class Future[+A] extends Awaitable[A] {
     * satisfied, because closures that are attached to this derivative
     * `Future` will not be held onto by the killer `Future`.
     */
-  def interruptible(): Future[A] = {
+  def interruptible(): Future[A] =
     if (isDefined) return this
 
     val p = Promise.attached(this)
-    p setInterruptHandler {
+    p setInterruptHandler
       case t: Throwable =>
         if (p.detach()) p.setException(t)
-    }
     p
-  }
-}
 
 /**
   * A `Future` that is already completed.
   *
   * These are cheap in construction compared to `Promises`.
   */
-class ConstFuture[A](result: Try[A]) extends Future[A] {
-  def respond(k: Try[A] => Unit): Future[A] = {
+class ConstFuture[A](result: Try[A]) extends Future[A]
+  def respond(k: Try[A] => Unit): Future[A] =
     val saved = Local.save()
     Scheduler.submit(
-        new Runnable {
-      def run() {
+        new Runnable
+      def run()
         val current = Local.save()
         Local.restore(saved)
         try k(result) catch Monitor.catcher finally Local.restore(current)
-      }
-    })
+    )
     this
-  }
 
   def raise(interrupt: Throwable): Unit = ()
 
-  def transform[B](f: Try[A] => Future[B]): Future[B] = {
+  def transform[B](f: Try[A] => Future[B]): Future[B] =
     val p = new Promise[B]
     val saved = Local.save()
-    Scheduler.submit(new Runnable {
-      def run() {
+    Scheduler.submit(new Runnable
+      def run()
         val current = Local.save()
         Local.restore(saved)
-        val computed = try f(result) catch {
+        val computed = try f(result) catch
           case e: NonLocalReturnControl[_] =>
             Future.exception(new FutureNonLocalReturnControl(e))
           case NonFatal(e) => Future.exception(e)
           case t: Throwable =>
             Monitor.handle(t)
             throw t
-        } finally Local.restore(current)
+        finally Local.restore(current)
         p.become(computed)
-      }
-    })
+    )
     p
-  }
 
   def poll: Option[Try[A]] = Some(result)
 
@@ -1998,12 +1886,11 @@ class ConstFuture[A](result: Try[A]) extends Future[A] {
     result()
 
   def isReady(implicit permit: Awaitable.CanAwait) = true
-}
 
 /**
   * Twitter Future utility methods for ease of use from java
   */
-object Futures {
+object Futures
   /* The following joins are generated with this code:
   scala -e '
   val meths = for (end <- ''b'' to ''v''; ps = ''a'' to end) yield
@@ -2031,9 +1918,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * do.
     */
   def join[A, B](a: Future[A], b: Future[B]): Future[(A, B)] =
-    Future.join(Seq(a, b)) map { _ =>
+    Future.join(Seq(a, b)) map  _ =>
       (Await.result(a), Await.result(b))
-    }
 
   /**
     * Join 3 futures. The returned future is complete when all
@@ -2042,9 +1928,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     */
   def join[A, B, C](
       a: Future[A], b: Future[B], c: Future[C]): Future[(A, B, C)] =
-    Future.join(Seq(a, b, c)) map { _ =>
+    Future.join(Seq(a, b, c)) map  _ =>
       (Await.result(a), Await.result(b), Await.result(c))
-    }
 
   /**
     * Join 4 futures. The returned future is complete when all
@@ -2055,9 +1940,8 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                        b: Future[B],
                        c: Future[C],
                        d: Future[D]): Future[(A, B, C, D)] =
-    Future.join(Seq(a, b, c, d)) map { _ =>
+    Future.join(Seq(a, b, c, d)) map  _ =>
       (Await.result(a), Await.result(b), Await.result(c), Await.result(d))
-    }
 
   /**
     * Join 5 futures. The returned future is complete when all
@@ -2069,13 +1953,12 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                           c: Future[C],
                           d: Future[D],
                           e: Future[E]): Future[(A, B, C, D, E)] =
-    Future.join(Seq(a, b, c, d, e)) map { _ =>
+    Future.join(Seq(a, b, c, d, e)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
        Await.result(d),
        Await.result(e))
-    }
 
   /**
     * Join 6 futures. The returned future is complete when all
@@ -2088,14 +1971,13 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                              d: Future[D],
                              e: Future[E],
                              f: Future[F]): Future[(A, B, C, D, E, F)] =
-    Future.join(Seq(a, b, c, d, e, f)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
        Await.result(d),
        Await.result(e),
        Await.result(f))
-    }
 
   /**
     * Join 7 futures. The returned future is complete when all
@@ -2109,7 +1991,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                 e: Future[E],
                                 f: Future[F],
                                 g: Future[G]): Future[(A, B, C, D, E, F, G)] =
-    Future.join(Seq(a, b, c, d, e, f, g)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2117,7 +1999,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(e),
        Await.result(f),
        Await.result(g))
-    }
 
   /**
     * Join 8 futures. The returned future is complete when all
@@ -2133,7 +2014,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       f: Future[F],
       g: Future[G],
       h: Future[H]): Future[(A, B, C, D, E, F, G, H)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2142,7 +2023,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(f),
        Await.result(g),
        Await.result(h))
-    }
 
   /**
     * Join 9 futures. The returned future is complete when all
@@ -2159,7 +2039,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       g: Future[G],
       h: Future[H],
       i: Future[I]): Future[(A, B, C, D, E, F, G, H, I)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2169,7 +2049,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(g),
        Await.result(h),
        Await.result(i))
-    }
 
   /**
     * Join 10 futures. The returned future is complete when all
@@ -2187,7 +2066,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       h: Future[H],
       i: Future[I],
       j: Future[J]): Future[(A, B, C, D, E, F, G, H, I, J)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2198,7 +2077,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(h),
        Await.result(i),
        Await.result(j))
-    }
 
   /**
     * Join 11 futures. The returned future is complete when all
@@ -2217,7 +2095,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       i: Future[I],
       j: Future[J],
       k: Future[K]): Future[(A, B, C, D, E, F, G, H, I, J, K)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2229,7 +2107,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(i),
        Await.result(j),
        Await.result(k))
-    }
 
   /**
     * Join 12 futures. The returned future is complete when all
@@ -2249,7 +2126,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       j: Future[J],
       k: Future[K],
       l: Future[L]): Future[(A, B, C, D, E, F, G, H, I, J, K, L)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2262,7 +2139,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(j),
        Await.result(k),
        Await.result(l))
-    }
 
   /**
     * Join 13 futures. The returned future is complete when all
@@ -2283,7 +2159,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       k: Future[K],
       l: Future[L],
       m: Future[M]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2297,7 +2173,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(k),
        Await.result(l),
        Await.result(m))
-    }
 
   /**
     * Join 14 futures. The returned future is complete when all
@@ -2319,7 +2194,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       l: Future[L],
       m: Future[M],
       n: Future[N]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2334,7 +2209,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(l),
        Await.result(m),
        Await.result(n))
-    }
 
   /**
     * Join 15 futures. The returned future is complete when all
@@ -2357,7 +2231,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       m: Future[M],
       n: Future[N],
       o: Future[O]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2373,7 +2247,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(m),
        Await.result(n),
        Await.result(o))
-    }
 
   /**
     * Join 16 futures. The returned future is complete when all
@@ -2397,7 +2270,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       n: Future[N],
       o: Future[O],
       p: Future[P]): Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map { _ =>
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2414,7 +2287,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(n),
        Await.result(o),
        Await.result(p))
-    }
 
   /**
     * Join 17 futures. The returned future is complete when all
@@ -2439,7 +2311,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                                               p: Future[P],
                                                               q: Future[Q])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map {
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -2458,7 +2330,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(o),
          Await.result(p),
          Await.result(q))
-    }
 
   /**
     * Join 18 futures. The returned future is complete when all
@@ -2484,7 +2355,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                                                                  q: Future[Q],
                                                                  r: Future[R])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map {
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -2504,7 +2375,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(p),
          Await.result(q),
          Await.result(r))
-    }
 
   /**
     * Join 19 futures. The returned future is complete when all
@@ -2532,7 +2402,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       r: Future[R],
       s: Future[S])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S)] =
-    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map {
+    Future.join(Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -2553,7 +2423,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(q),
          Await.result(r),
          Await.result(s))
-    }
 
   /**
     * Join 20 futures. The returned future is complete when all
@@ -2583,7 +2452,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
       t: Future[T])
     : Future[(A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T)] =
     Future.join(
-        Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map {
+        Seq(a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t)) map
       _ =>
         (Await.result(a),
          Await.result(b),
@@ -2605,7 +2474,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
          Await.result(r),
          Await.result(s),
          Await.result(t))
-    }
 
   /**
     * Join 21 futures. The returned future is complete when all
@@ -2655,7 +2523,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                     r,
                     s,
                     t,
-                    u)) map { _ =>
+                    u)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2677,7 +2545,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(s),
        Await.result(t),
        Await.result(u))
-    }
 
   /**
     * Join 22 futures. The returned future is complete when all
@@ -2729,7 +2596,7 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
                     s,
                     t,
                     u,
-                    v)) map { _ =>
+                    v)) map  _ =>
       (Await.result(a),
        Await.result(b),
        Await.result(c),
@@ -2752,7 +2619,6 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
        Await.result(t),
        Await.result(u),
        Await.result(v))
-    }
 
   /**
     * Take a sequence of Futures, wait till they all complete
@@ -2785,10 +2651,9 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * to be satisfied and the rest of the futures.
     */
   def select[A](fs: JList[Future[A]]): Future[(Try[A], JList[Future[A]])] =
-    Future.select(fs.asScala) map {
+    Future.select(fs.asScala) map
       case (first, rest) =>
         (first, rest.asJava)
-    }
 
   /**
     * Collect the results from the given futures into a new future of
@@ -2827,46 +2692,38 @@ def join[%s](%s): Future[(%s)] = join(Seq(%s)) map { _ => (%s) }""".format(
     * Lowers a Future[Try[T]] into a Future[T].
     */
   def lowerFromTry[T](f: Future[Try[T]]): Future[T] = f.lowerFromTry
-}
 
 /**
   * A future with no future (never completes).
   */
-class NoFuture extends Future[Nothing] {
+class NoFuture extends Future[Nothing]
   def respond(k: Try[Nothing] => Unit): Future[Nothing] = this
   def transform[B](f: Try[Nothing] => Future[B]): Future[B] = this
 
   def raise(interrupt: Throwable) {}
 
   // Awaitable
-  private[this] def sleepThenTimeout(timeout: Duration): TimeoutException = {
+  private[this] def sleepThenTimeout(timeout: Duration): TimeoutException =
     Thread.sleep(timeout.inMilliseconds)
     new TimeoutException(timeout.toString)
-  }
 
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
   def ready(timeout: Duration)(
-      implicit permit: Awaitable.CanAwait): this.type = {
+      implicit permit: Awaitable.CanAwait): this.type =
     throw sleepThenTimeout(timeout)
-  }
 
   @throws(classOf[Exception])
-  def result(timeout: Duration)(implicit permit: Awaitable.CanAwait): Nothing = {
+  def result(timeout: Duration)(implicit permit: Awaitable.CanAwait): Nothing =
     throw sleepThenTimeout(timeout)
-  }
 
   def poll: Option[Try[Nothing]] = None
 
   def isReady(implicit permit: Awaitable.CanAwait) = false
-}
 
-class FutureTask[A](fn: => A) extends Promise[A] with Runnable {
-  def run() {
+class FutureTask[A](fn: => A) extends Promise[A] with Runnable
+  def run()
     update(Try(fn))
-  }
-}
 
-object FutureTask {
+object FutureTask
   def apply[A](fn: => A) = new FutureTask[A](fn)
-}

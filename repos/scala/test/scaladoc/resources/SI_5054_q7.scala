@@ -1,4 +1,4 @@
-trait SI_5054_q7 {
+trait SI_5054_q7
 
   /**
     * The full definition, either used with an implicit value or with an explicit one.
@@ -20,4 +20,3 @@ trait SI_5054_q7 {
     * Example: `test2(3)`
     */
   def test(implicit lost: Int): Int
-}

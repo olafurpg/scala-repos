@@ -1,4 +1,4 @@
-object Scaladoc3 {
+object Scaladoc3
 
   /**
     * Foo
@@ -6,4 +6,3 @@ object Scaladoc3 {
   import scala.collection.mutable.ArrayBuffer
 
   def f {}
-}

@@ -7,14 +7,13 @@ private[i18n] case class Translation(id: Int,
                                      text: String,
                                      author: Option[String] = None,
                                      comment: Option[String] = None,
-                                     createdAt: DateTime) {
+                                     createdAt: DateTime)
 
   def lines = text.split("\n").toList
 
   override def toString = "#%d %s".format(id, code)
-}
 
-private[i18n] object Translation {
+private[i18n] object Translation
 
   import lila.db.JsTube
   import JsTube.Helpers._
@@ -28,4 +27,3 @@ private[i18n] object Translation {
         .reads[Translation],
       Json.writes[Translation] andThen (__.json update writeDate('createdAt))
   )
-}

@@ -6,7 +6,7 @@ import scala.scalajs.js
   *  An ArrayBuffer is a block of contiguous, non-resizable memory.
   */
 @js.native
-class ArrayBuffer(length: Int) extends js.Object {
+class ArrayBuffer(length: Int) extends js.Object
 
   /** Length of this buffer in bytes */
   val byteLength: Int = js.native
@@ -17,4 +17,3 @@ class ArrayBuffer(length: Int) extends js.Object {
   // Note: Some specifications specify a static isView method on ArrayBuffer
   // that checks whether a given object is an ArrayBufferView. We omit it here
   // since neither Node.js nor PhantomJS support it at the time of writing.
-}

@@ -6,8 +6,8 @@ import java.io.{OutputStream, ByteArrayOutputStream, ByteArrayInputStream}
 
 import scala.pickling._, scala.pickling.Defaults._, binary._
 
-class BinaryOutputStreamTest extends FunSuite {
-  test("pickle to OutputStream") {
+class BinaryOutputStreamTest extends FunSuite
+  test("pickle to OutputStream")
     val obj1 = Employee("James", 30)
     val obj2 = Employee("Jim", 40)
 
@@ -23,5 +23,3 @@ class BinaryOutputStreamTest extends FunSuite {
 
     assert(obj1.toString == readObj1.toString)
     assert(obj2.toString == readObj2.toString)
-  }
-}

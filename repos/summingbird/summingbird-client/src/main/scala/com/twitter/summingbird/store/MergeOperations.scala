@@ -23,7 +23,7 @@ import com.twitter.storehaus.FutureCollector
 import com.twitter.summingbird.batch.BatchID
 import com.twitter.util.{Future, Return, Try}
 
-object MergeOperations {
+object MergeOperations
   type FOpt[T] = Future[Option[T]]
 
   // TODO (https://github.com/twitter/summingbird/issues/71): the
@@ -42,18 +42,16 @@ object MergeOperations {
 
   def collect[T, U](seq: Seq[(T, Future[U])])(
       implicit collect: FutureCollector[(T, U)]): Future[Seq[(T, U)]] =
-    collect {
+    collect
       seq.map { case (t, futureU) => futureU.map(t -> _) }
-    }
 
   def mergeResults[K, V : Semigroup](
       m1: Map[K, Future[Seq[Option[(BatchID, V)]]]],
       m2: Map[K, Future[Seq[Option[(BatchID, V)]]]])
     : Map[K, Future[Option[(BatchID, V)]]] =
-    Semigroup.plus(m1, m2).map {
+    Semigroup.plus(m1, m2).map
       case (k, v) =>
         k -> v.map(sortedSum(_))
-    }
 
   def dropBatches[K, V](
       m: Map[K, Future[Option[(BatchID, V)]]]): Map[K, Future[Option[V]]] =
@@ -64,21 +62,17 @@ object MergeOperations {
     */
   def pivotBatches[K, V](m: Map[(K, BatchID), FOpt[V]])
     : Map[K, Future[Seq[Option[(BatchID, V)]]]] =
-    pivot.withValue(m).map {
+    pivot.withValue(m).map
       case (k, it) =>
-        k -> collect(it.toSeq).map {
+        k -> collect(it.toSeq).map
           _.map { case (batchID, optV) => optV.map(batchID -> _) }
-        }
-    }
 
   def decrementOfflineBatch[K, V](m: Map[K, FOpt[(BatchID, V)]])
     : Map[K, Future[Seq[Option[(BatchID, V)]]]] =
-    m.map {
+    m.map
       case (k, futureOptV) =>
-        k -> futureOptV.map { optV =>
+        k -> futureOptV.map  optV =>
           Seq(optV.map { case (batchID, v) => (batchID.prev, v) })
-        }
-    }
 
   /**
     * Selects the most recent BatchID between the offlineStore and the BatchID calculated
@@ -87,7 +81,7 @@ object MergeOperations {
     */
   def expand(offlineReturn: Option[BatchID],
              nowBatch: BatchID,
-             batchesToKeep: Int): Iterable[BatchID] = {
+             batchesToKeep: Int): Iterable[BatchID] =
     val initBatch = Semigroup
       .plus(
           Some(nowBatch - (batchesToKeep - 1)),
@@ -96,17 +90,14 @@ object MergeOperations {
       .get // This will never throw, as this option can never be None
     // (because we included an explicit "Some" inside)
     BatchID.range(initBatch, nowBatch)
-  }
 
   def generateOnlineKeys[K](ks: Seq[K], nowBatch: BatchID, batchesToKeep: Int)(
       lookup: K => FOpt[BatchID])(
       implicit collect: FutureCollector[(K, Iterable[BatchID])])
     : Future[Set[(K, BatchID)]] =
-    for {
+    for
       collected <- collect(
-          ks.map { k =>
+          ks.map  k =>
             lookup(k).map { k -> expand(_, nowBatch, batchesToKeep) }
-          }
       )
-    } yield pivot.invert(collected.toMap).toSet
-}
+    yield pivot.invert(collected.toMap).toSet

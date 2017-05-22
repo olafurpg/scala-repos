@@ -52,16 +52,13 @@ private[streaming] class KafkaInputDStream[K : ClassTag,
     useReliableReceiver: Boolean,
     storageLevel: StorageLevel
 )
-    extends ReceiverInputDStream[(K, V)](_ssc) with Logging {
+    extends ReceiverInputDStream[(K, V)](_ssc) with Logging
 
-  def getReceiver(): Receiver[(K, V)] = {
-    if (!useReliableReceiver) {
+  def getReceiver(): Receiver[(K, V)] =
+    if (!useReliableReceiver)
       new KafkaReceiver[K, V, U, T](kafkaParams, topics, storageLevel)
-    } else {
+    else
       new ReliableKafkaReceiver[K, V, U, T](kafkaParams, topics, storageLevel)
-    }
-  }
-}
 
 private[streaming] class KafkaReceiver[K : ClassTag,
                                        V : ClassTag,
@@ -71,19 +68,17 @@ private[streaming] class KafkaReceiver[K : ClassTag,
     topics: Map[String, Int],
     storageLevel: StorageLevel
 )
-    extends Receiver[(K, V)](storageLevel) with Logging {
+    extends Receiver[(K, V)](storageLevel) with Logging
 
   // Connection to Kafka
   var consumerConnector: ConsumerConnector = null
 
-  def onStop() {
-    if (consumerConnector != null) {
+  def onStop()
+    if (consumerConnector != null)
       consumerConnector.shutdown()
       consumerConnector = null
-    }
-  }
 
-  def onStart() {
+  def onStart()
 
     logInfo(
         "Starting Kafka Consumer Stream with group: " + kafkaParams(
@@ -115,31 +110,22 @@ private[streaming] class KafkaReceiver[K : ClassTag,
 
     val executorPool = ThreadUtils.newDaemonFixedThreadPool(
         topics.values.sum, "KafkaMessageHandler")
-    try {
+    try
       // Start the messages handler for each partition
-      topicMessageStreams.values.foreach { streams =>
-        streams.foreach { stream =>
+      topicMessageStreams.values.foreach  streams =>
+        streams.foreach  stream =>
           executorPool.submit(new MessageHandler(stream))
-        }
-      }
-    } finally {
+    finally
       executorPool.shutdown() // Just causes threads to terminate after work is done
-    }
-  }
 
   // Handles Kafka messages
-  private class MessageHandler(stream: KafkaStream[K, V]) extends Runnable {
-    def run() {
+  private class MessageHandler(stream: KafkaStream[K, V]) extends Runnable
+    def run()
       logInfo("Starting MessageHandler.")
-      try {
+      try
         val streamIterator = stream.iterator()
-        while (streamIterator.hasNext()) {
+        while (streamIterator.hasNext())
           val msgAndMetadata = streamIterator.next()
           store((msgAndMetadata.key, msgAndMetadata.message))
-        }
-      } catch {
+      catch
         case e: Throwable => reportError("Error handling message; exiting", e)
-      }
-    }
-  }
-}

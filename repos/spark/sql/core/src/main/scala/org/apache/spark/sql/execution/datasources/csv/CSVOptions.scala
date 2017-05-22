@@ -24,45 +24,38 @@ import org.apache.spark.sql.execution.datasources.{CompressionCodecs, ParseModes
 
 private[sql] class CSVOptions(
     @transient private val parameters: Map[String, String])
-    extends Logging with Serializable {
+    extends Logging with Serializable
 
-  private def getChar(paramName: String, default: Char): Char = {
+  private def getChar(paramName: String, default: Char): Char =
     val paramValue = parameters.get(paramName)
-    paramValue match {
+    paramValue match
       case None => default
       case Some(value) if value.length == 0 => '\u0000'
       case Some(value) if value.length == 1 => value.charAt(0)
       case _ =>
         throw new RuntimeException(
             s"$paramName cannot be more than one character")
-    }
-  }
 
-  private def getInt(paramName: String, default: Int): Int = {
+  private def getInt(paramName: String, default: Int): Int =
     val paramValue = parameters.get(paramName)
-    paramValue match {
+    paramValue match
       case None => default
       case Some(value) =>
-        try {
+        try
           value.toInt
-        } catch {
+        catch
           case e: NumberFormatException =>
             throw new RuntimeException(
                 s"$paramName should be an integer. Found $value")
-        }
-    }
-  }
 
-  private def getBool(paramName: String, default: Boolean = false): Boolean = {
+  private def getBool(paramName: String, default: Boolean = false): Boolean =
     val param = parameters.getOrElse(paramName, default.toString)
-    if (param.toLowerCase == "true") {
+    if (param.toLowerCase == "true")
       true
-    } else if (param.toLowerCase == "false") {
+    else if (param.toLowerCase == "false")
       false
-    } else {
+    else
       throw new Exception(s"$paramName flag can be true or false")
-    }
-  }
 
   val delimiter = CSVTypeCast.toChar(
       parameters.getOrElse("sep", parameters.getOrElse("delimiter", ",")))
@@ -81,10 +74,9 @@ private[sql] class CSVOptions(
   val ignoreTrailingWhiteSpaceFlag = getBool("ignoreTrailingWhiteSpace")
 
   // Parse mode flags
-  if (!ParseModes.isValidMode(parseMode)) {
+  if (!ParseModes.isValidMode(parseMode))
     logWarning(
         s"$parseMode is not a valid parse mode. Using ${ParseModes.DEFAULT}.")
-  }
 
   val failFast = ParseModes.isFailFastMode(parseMode)
   val dropMalformed = ParseModes.isDropMalformedMode(parseMode)
@@ -92,10 +84,9 @@ private[sql] class CSVOptions(
 
   val nullValue = parameters.getOrElse("nullValue", "")
 
-  val compressionCodec: Option[String] = {
+  val compressionCodec: Option[String] =
     val name = parameters.get("compression").orElse(parameters.get("codec"))
     name.map(CompressionCodecs.getCodecClassName)
-  }
 
   val maxColumns = getInt("maxColumns", 20480)
 
@@ -106,4 +97,3 @@ private[sql] class CSVOptions(
   val isCommentSet = this.comment != '\u0000'
 
   val rowSeparator = "\n"
-}

@@ -50,9 +50,9 @@ import org.apache.spark.{SparkConf, SparkContext}
  * cassandra-cli.
  *
  */
-object CassandraTest {
+object CassandraTest
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("casDemo")
     // Get a SparkContext
     val sc = new SparkContext(sparkConf)
@@ -92,12 +92,10 @@ object CassandraTest {
                                     classOf[SortedMap[ByteBuffer, IColumn]])
 
     // Let us first get all the paragraphs from the retrieved rows
-    val paraRdd = casRdd.map {
-      case (key, value) => {
+    val paraRdd = casRdd.map
+      case (key, value) =>
           ByteBufferUtil.string(
               value.get(ByteBufferUtil.bytes("para")).value())
-        }
-    }
 
     // Lets get the word count in paras
     val counts = paraRdd
@@ -105,12 +103,11 @@ object CassandraTest {
       .map(word => (word, 1))
       .reduceByKey(_ + _)
 
-    counts.collect().foreach {
+    counts.collect().foreach
       case (word, count) => println(word + ":" + count)
-    }
 
-    counts.map {
-      case (word, count) => {
+    counts.map
+      case (word, count) =>
           val colWord = new org.apache.cassandra.thrift.Column()
           colWord.setName(ByteBufferUtil.bytes("word"))
           colWord.setValue(ByteBufferUtil.bytes(word))
@@ -133,16 +130,13 @@ object CassandraTest {
             .column_or_supercolumn
             .setColumn(colCount)
             (outputkey, mutations)
-        }
-    }.saveAsNewAPIHadoopFile("casDemo",
+    .saveAsNewAPIHadoopFile("casDemo",
                              classOf[ByteBuffer],
                              classOf[List[Mutation]],
                              classOf[ColumnFamilyOutputFormat],
                              job.getConfiguration)
 
     sc.stop()
-  }
-}
 // scalastyle:on println
 
 /*

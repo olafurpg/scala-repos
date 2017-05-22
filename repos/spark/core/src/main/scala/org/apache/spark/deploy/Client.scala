@@ -41,7 +41,7 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
                              driverArgs: ClientArguments,
                              masterEndpoints: Seq[RpcEndpointRef],
                              conf: SparkConf)
-    extends ThreadSafeRpcEndpoint with Logging {
+    extends ThreadSafeRpcEndpoint with Logging
 
   // A scheduled executor used to send messages at the specified time.
   private val forwardMessageThread =
@@ -51,18 +51,18 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
   private val forwardMessageExecutionContext = ExecutionContext.fromExecutor(
       forwardMessageThread,
       t =>
-        t match {
+        t match
           case ie: InterruptedException => // Exit normally
           case e: Throwable =>
             logError(e.getMessage, e)
             System.exit(SparkExitCode.UNCAUGHT_EXCEPTION)
-      })
+      )
 
   private val lostMasters = new HashSet[RpcAddress]
   private var activeMasterEndpoint: RpcEndpointRef = null
 
-  override def onStart(): Unit = {
-    driverArgs.cmd match {
+  override def onStart(): Unit =
+    driverArgs.cmd match
       case "launch" =>
         // TODO: We could add an env variable here and intercept it in `sc.addJar` that would
         //       truncate filesystem paths similar to what YARN does. For now, we just require
@@ -70,16 +70,14 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
         val mainClass = "org.apache.spark.deploy.worker.DriverWrapper"
 
         val classPathConf = "spark.driver.extraClassPath"
-        val classPathEntries = sys.props.get(classPathConf).toSeq.flatMap {
+        val classPathEntries = sys.props.get(classPathConf).toSeq.flatMap
           cp =>
             cp.split(java.io.File.pathSeparator)
-        }
 
         val libraryPathConf = "spark.driver.extraLibraryPath"
-        val libraryPathEntries = sys.props.get(libraryPathConf).toSeq.flatMap {
+        val libraryPathEntries = sys.props.get(libraryPathConf).toSeq.flatMap
           cp =>
             cp.split(java.io.File.pathSeparator)
-        }
 
         val extraJavaOptsConf = "spark.driver.extraJavaOptions"
         val extraJavaOpts = sys.props
@@ -110,27 +108,23 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
         val driverId = driverArgs.driverId
         ayncSendToMasterAndForwardReply[KillDriverResponse](
             RequestKillDriver(driverId))
-    }
-  }
 
   /**
     * Send the message to master and forward the reply to self asynchronously.
     */
   private def ayncSendToMasterAndForwardReply[T : ClassTag](
-      message: Any): Unit = {
-    for (masterEndpoint <- masterEndpoints) {
+      message: Any): Unit =
+    for (masterEndpoint <- masterEndpoints)
       masterEndpoint
         .ask[T](message)
-        .onComplete {
+        .onComplete
           case Success(v) => self.send(v)
           case Failure(e) =>
             logWarning(s"Error sending messages to master $masterEndpoint", e)
-        }(forwardMessageExecutionContext)
-    }
-  }
+        (forwardMessageExecutionContext)
 
   /* Find out driver status then exit the JVM */
-  def pollAndReportStatus(driverId: String) {
+  def pollAndReportStatus(driverId: String)
     // Since ClientEndpoint is the only RpcEndpoint in the process, blocking the event loop thread
     // is fine.
     logInfo("... waiting before polling master for driver state")
@@ -138,7 +132,7 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
     logInfo("... polling master for driver state")
     val statusResponse = activeMasterEndpoint
       .askWithRetry[DriverStatusResponse](RequestDriverStatus(driverId))
-    statusResponse.found match {
+    statusResponse.found match
       case false =>
         logError(s"ERROR: Cluster master did not recognize $driverId")
         System.exit(-1)
@@ -147,91 +141,74 @@ private class ClientEndpoint(override val rpcEnv: RpcEnv,
         // Worker node, if present
         (statusResponse.workerId,
          statusResponse.workerHostPort,
-         statusResponse.state) match {
+         statusResponse.state) match
           case (Some(id), Some(hostPort), Some(DriverState.RUNNING)) =>
             logInfo(s"Driver running on $hostPort ($id)")
           case _ =>
-        }
         // Exception, if present
-        statusResponse.exception.map { e =>
+        statusResponse.exception.map  e =>
           logError(s"Exception from cluster was: $e")
           e.printStackTrace()
           System.exit(-1)
-        }
         System.exit(0)
-    }
-  }
 
-  override def receive: PartialFunction[Any, Unit] = {
+  override def receive: PartialFunction[Any, Unit] =
 
     case SubmitDriverResponse(master, success, driverId, message) =>
       logInfo(message)
-      if (success) {
+      if (success)
         activeMasterEndpoint = master
         pollAndReportStatus(driverId.get)
-      } else if (!Utils.responseFromBackup(message)) {
+      else if (!Utils.responseFromBackup(message))
         System.exit(-1)
-      }
 
     case KillDriverResponse(master, driverId, success, message) =>
       logInfo(message)
-      if (success) {
+      if (success)
         activeMasterEndpoint = master
         pollAndReportStatus(driverId)
-      } else if (!Utils.responseFromBackup(message)) {
+      else if (!Utils.responseFromBackup(message))
         System.exit(-1)
-      }
-  }
 
-  override def onDisconnected(remoteAddress: RpcAddress): Unit = {
-    if (!lostMasters.contains(remoteAddress)) {
+  override def onDisconnected(remoteAddress: RpcAddress): Unit =
+    if (!lostMasters.contains(remoteAddress))
       logError(s"Error connecting to master $remoteAddress.")
       lostMasters += remoteAddress
       // Note that this heuristic does not account for the fact that a Master can recover within
       // the lifetime of this client. Thus, once a Master is lost it is lost to us forever. This
       // is not currently a concern, however, because this client does not retry submissions.
-      if (lostMasters.size >= masterEndpoints.size) {
+      if (lostMasters.size >= masterEndpoints.size)
         logError("No master is available, exiting.")
         System.exit(-1)
-      }
-    }
-  }
 
   override def onNetworkError(
-      cause: Throwable, remoteAddress: RpcAddress): Unit = {
-    if (!lostMasters.contains(remoteAddress)) {
+      cause: Throwable, remoteAddress: RpcAddress): Unit =
+    if (!lostMasters.contains(remoteAddress))
       logError(s"Error connecting to master ($remoteAddress).")
       logError(s"Cause was: $cause")
       lostMasters += remoteAddress
-      if (lostMasters.size >= masterEndpoints.size) {
+      if (lostMasters.size >= masterEndpoints.size)
         logError("No master is available, exiting.")
         System.exit(-1)
-      }
-    }
-  }
 
-  override def onError(cause: Throwable): Unit = {
+  override def onError(cause: Throwable): Unit =
     logError(s"Error processing messages, exiting.")
     cause.printStackTrace()
     System.exit(-1)
-  }
 
-  override def onStop(): Unit = {
+  override def onStop(): Unit =
     forwardMessageThread.shutdownNow()
-  }
-}
 
 /**
   * Executable utility for starting and terminating drivers inside of a standalone cluster.
   */
-object Client {
-  def main(args: Array[String]) {
+object Client
+  def main(args: Array[String])
     // scalastyle:off println
-    if (!sys.props.contains("SPARK_SUBMIT")) {
+    if (!sys.props.contains("SPARK_SUBMIT"))
       println(
           "WARNING: This client is deprecated and will be removed in a future version of Spark")
       println("Use ./bin/spark-submit with \"--master spark://host:port\"")
-    }
     // scalastyle:on println
 
     val conf = new SparkConf()
@@ -254,5 +231,3 @@ object Client {
         new ClientEndpoint(rpcEnv, driverArgs, masterEndpoints, conf))
 
     rpcEnv.awaitTermination()
-  }
-}

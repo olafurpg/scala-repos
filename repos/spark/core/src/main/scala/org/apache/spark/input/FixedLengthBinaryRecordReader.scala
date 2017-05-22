@@ -36,7 +36,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit
   * value = the record itself (BytesWritable)
   */
 private[spark] class FixedLengthBinaryRecordReader
-    extends RecordReader[LongWritable, BytesWritable] {
+    extends RecordReader[LongWritable, BytesWritable]
 
   private var splitStart: Long = 0L
   private var splitEnd: Long = 0L
@@ -46,22 +46,18 @@ private[spark] class FixedLengthBinaryRecordReader
   private var recordKey: LongWritable = null
   private var recordValue: BytesWritable = null
 
-  override def close() {
-    if (fileInputStream != null) {
+  override def close()
+    if (fileInputStream != null)
       fileInputStream.close()
-    }
-  }
 
-  override def getCurrentKey: LongWritable = {
+  override def getCurrentKey: LongWritable =
     recordKey
-  }
 
-  override def getCurrentValue: BytesWritable = {
+  override def getCurrentValue: BytesWritable =
     recordValue
-  }
 
-  override def getProgress: Float = {
-    splitStart match {
+  override def getProgress: Float =
+    splitStart match
       case x if x == splitEnd => 0.0.toFloat
       case _ =>
         Math
@@ -71,11 +67,9 @@ private[spark] class FixedLengthBinaryRecordReader
               1.0
           )
           .toFloat
-    }
-  }
 
   override def initialize(
-      inputSplit: InputSplit, context: TaskAttemptContext) {
+      inputSplit: InputSplit, context: TaskAttemptContext)
     // the file input
     val fileSplit = inputSplit.asInstanceOf[FileSplit]
 
@@ -91,10 +85,9 @@ private[spark] class FixedLengthBinaryRecordReader
     val conf = context.getConfiguration
     // check compression
     val codec = new CompressionCodecFactory(conf).getCodec(file)
-    if (codec != null) {
+    if (codec != null)
       throw new IOException(
           "FixedLengthRecordReader does not support reading compressed files")
-    }
     // get the record length
     recordLength = FixedLengthBinaryInputFormat.getRecordLength(context)
     // get the filesystem
@@ -105,21 +98,18 @@ private[spark] class FixedLengthBinaryRecordReader
     fileInputStream.seek(splitStart)
     // set our current position
     currentPosition = splitStart
-  }
 
-  override def nextKeyValue(): Boolean = {
-    if (recordKey == null) {
+  override def nextKeyValue(): Boolean =
+    if (recordKey == null)
       recordKey = new LongWritable()
-    }
     // the key is a linear index of the record, given by the
     // position the record starts divided by the record length
     recordKey.set(currentPosition / recordLength)
     // the recordValue to place the bytes into
-    if (recordValue == null) {
+    if (recordValue == null)
       recordValue = new BytesWritable(new Array[Byte](recordLength))
-    }
     // read a record if the currentPosition is less than the split end
-    if (currentPosition < splitEnd) {
+    if (currentPosition < splitEnd)
       // setup a buffer to store the record
       val buffer = recordValue.getBytes
       fileInputStream.readFully(buffer)
@@ -127,7 +117,4 @@ private[spark] class FixedLengthBinaryRecordReader
       currentPosition = currentPosition + recordLength
       // return true
       return true
-    }
     false
-  }
-}

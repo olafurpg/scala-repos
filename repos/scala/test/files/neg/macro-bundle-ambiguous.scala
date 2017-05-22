@@ -1,14 +1,11 @@
 import scala.reflect.macros.whitebox._
 import scala.language.experimental.macros
 
-class Macros(val c: Context) {
+class Macros(val c: Context)
   def impl = ???
-}
 
-object Macros {
+object Macros
   def impl(c: Context) = ???
-}
 
-object Test extends App {
+object Test extends App
   def foo: Unit = macro Macros.impl
-}

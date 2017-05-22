@@ -8,7 +8,7 @@ import com.twitter.util.{Time, Activity, Future, Promise}
   * A Balancer mix-in which provides the collection over which to load balance
   * by observing `activity`.
   */
-private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
+private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady
   private[this] val ready = new Promise[Unit]
   def onReady: Future[Unit] = ready
 
@@ -25,7 +25,7 @@ private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
    *
    * The observation is terminated when the Balancer is closed.
    */
-  private[this] val observation = activity.states.respond {
+  private[this] val observation = activity.states.respond
     case Activity.Pending =>
     case Activity.Ok(newList) =>
       update(newList)
@@ -35,16 +35,11 @@ private trait Updating[Req, Rep] extends Balancer[Req, Rep] with OnReady {
       // On resolution failure, consider the
       // load balancer ready (to serve errors).
       ready.setDone()
-  }
 
-  override def close(deadline: Time): Future[Unit] = {
+  override def close(deadline: Time): Future[Unit] =
     observation
       .close(deadline)
-      .transform { _ =>
+      .transform  _ =>
         super.close(deadline)
-      }
-      .ensure {
+      .ensure
         ready.setDone()
-      }
-  }
-}

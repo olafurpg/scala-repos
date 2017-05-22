@@ -25,7 +25,7 @@ import com.twitter.scalding.{Mode, TypedPipe}
   * Use this class to easily change, for instance, the pruning
   * for an existing store.
   */
-abstract class ProxyBatchedStore[K, V] extends batch.BatchedStore[K, V] {
+abstract class ProxyBatchedStore[K, V] extends batch.BatchedStore[K, V]
   def proxy: batch.BatchedStore[K, V]
   override def batcher = proxy.batcher
   override def ordering = proxy.ordering
@@ -39,4 +39,3 @@ abstract class ProxyBatchedStore[K, V] extends batch.BatchedStore[K, V] {
 
   override def toString =
     "ProxyBatchedStore(proxyingFor=%s)".format(proxy.toString)
-}

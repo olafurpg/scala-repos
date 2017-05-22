@@ -31,13 +31,12 @@ import javafx.{geometry => jfxg}
 import scala.language.implicitConversions
 import scalafx.delegate.SFXDelegate
 
-object Dimension2D {
+object Dimension2D
   implicit def sfxDimension2D2jfx(d: Dimension2D): jfxg.Dimension2D =
     if (d != null) d.delegate else null
-}
 
 class Dimension2D(override val delegate: jfxg.Dimension2D)
-    extends SFXDelegate[jfxg.Dimension2D] {
+    extends SFXDelegate[jfxg.Dimension2D]
 
   /**
     * Constructs a Dimension2D with the specified width and height.
@@ -54,4 +53,3 @@ class Dimension2D(override val delegate: jfxg.Dimension2D)
     * The width of the dimension.
     */
   def width = delegate.getWidth
-}

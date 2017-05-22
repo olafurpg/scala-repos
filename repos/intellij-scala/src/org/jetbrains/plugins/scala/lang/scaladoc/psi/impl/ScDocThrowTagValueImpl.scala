@@ -14,7 +14,7 @@ import org.jetbrains.plugins.scala.lang.scaladoc.psi.api.ScDocTagValue
   * Date: 12/9/11
   */
 class ScDocThrowTagValueImpl(node: ASTNode)
-    extends ScStableCodeReferenceElementImpl(node) with ScDocTagValue {
+    extends ScStableCodeReferenceElementImpl(node) with ScDocTagValue
   def getValue: String = getText
 
   override def getName = getText
@@ -23,4 +23,3 @@ class ScDocThrowTagValueImpl(node: ASTNode)
 
   override def getKinds(incomplete: Boolean, completion: Boolean) =
     StdKinds.stableQualOrClass
-}

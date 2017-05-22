@@ -13,7 +13,7 @@ import org.osgi.framework.BundleContext
   */
 class OsgiActorSystemFactory(val context: BundleContext,
                              val fallbackClassLoader: Option[ClassLoader],
-                             config: Config = ConfigFactory.empty) {
+                             config: Config = ConfigFactory.empty)
 
   /*
    * Classloader that delegates to the bundle for which the factory is creating an ActorSystem
@@ -40,13 +40,12 @@ class OsgiActorSystemFactory(val context: BundleContext,
     * ensuring that the default/reference configuration is loaded from the akka-actor bundle.
     * Configuration files found in akka-actor bundle
     */
-  def actorSystemConfig(context: BundleContext): Config = {
+  def actorSystemConfig(context: BundleContext): Config =
     config.withFallback(
         ConfigFactory
           .load(classloader)
           .withFallback(ConfigFactory.defaultReference(
                   OsgiActorSystemFactory.akkaActorClassLoader)))
-  }
 
   /**
     * Determine the name for the [[akka.actor.ActorSystem]]
@@ -55,9 +54,8 @@ class OsgiActorSystemFactory(val context: BundleContext,
   def actorSystemName(name: Option[String]): String =
     name.getOrElse(
         "bundle-%s-ActorSystem".format(context.getBundle.getBundleId))
-}
 
-object OsgiActorSystemFactory {
+object OsgiActorSystemFactory
 
   /**
     * Class loader of akka-actor bundle.
@@ -69,4 +67,3 @@ object OsgiActorSystemFactory {
    */
   def apply(context: BundleContext, config: Config): OsgiActorSystemFactory =
     new OsgiActorSystemFactory(context, Some(akkaActorClassLoader), config)
-}

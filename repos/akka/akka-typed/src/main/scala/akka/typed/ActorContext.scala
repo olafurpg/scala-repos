@@ -28,7 +28,7 @@ import scala.concurrent.ExecutionContextExecutor
   * the [[ActorSystem]] it is part of, methods for querying the list of child Actors it
   * created, access to [[Terminated DeathWatch]] and timed message scheduling.
   */
-trait ActorContext[T] {
+trait ActorContext[T]
 
   /**
     * The identity of this Actor, bound to the lifecycle of this Actor instance.
@@ -146,7 +146,6 @@ trait ActorContext[T] {
     * these ActorRefs or to stop them when no longer needed.
     */
   def spawnAdapter[U](f: U ⇒ T): ActorRef[U]
-}
 
 /**
   * An [[ActorContext]] for synchronous execution of a [[Behavior]] that
@@ -157,7 +156,7 @@ trait ActorContext[T] {
   */
 class StubbedActorContext[T](val name: String, override val props: Props[T])(
     override implicit val system: ActorSystem[Nothing])
-    extends ActorContext[T] {
+    extends ActorContext[T]
 
   val inbox = Inbox.sync[T](name)
   override val self = inbox.ref
@@ -169,13 +168,12 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
     _children.values map (_.ref)
   override def child(name: String): Option[ActorRef[Nothing]] =
     _children get name map (_.ref)
-  override def spawnAnonymous[U](props: Props[U]): ActorRef[U] = {
+  override def spawnAnonymous[U](props: Props[U]): ActorRef[U] =
     val i = Inbox.sync[U](childName.next())
     _children += i.ref.untypedRef.path.name -> i
     i.ref
-  }
   override def spawn[U](props: Props[U], name: String): ActorRef[U] =
-    _children get name match {
+    _children get name match
       case Some(_) ⇒
         throw new untyped.InvalidActorNameException(
             s"actor name $name is already taken")
@@ -183,14 +181,12 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
         val i = Inbox.sync[U](name)
         _children += name -> i
         i.ref
-    }
-  override def actorOf(props: untyped.Props): untyped.ActorRef = {
+  override def actorOf(props: untyped.Props): untyped.ActorRef =
     val i = Inbox.sync[Any](childName.next())
     _children += i.ref.untypedRef.path.name -> i
     i.ref.untypedRef
-  }
   override def actorOf(props: untyped.Props, name: String): untyped.ActorRef =
-    _children get name match {
+    _children get name match
       case Some(_) ⇒
         throw new untyped.InvalidActorNameException(
             s"actor name $name is already taken")
@@ -198,14 +194,11 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
         val i = Inbox.sync[Any](name)
         _children += name -> i
         i.ref.untypedRef
-    }
-  override def stop(child: ActorRef[Nothing]): Boolean = {
+  override def stop(child: ActorRef[Nothing]): Boolean =
     // removal is asynchronous, so don’t do it here; explicit removeInbox needed from outside
-    _children.get(child.path.name) match {
+    _children.get(child.path.name) match
       case None ⇒ false
       case Some(inbox) ⇒ inbox.ref == child
-    }
-  }
   def watch[U](other: ActorRef[U]): ActorRef[U] = other
   def watch(other: akka.actor.ActorRef): other.type = other
   def unwatch[U](other: ActorRef[U]): ActorRef[U] = other
@@ -214,10 +207,9 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
 
   def schedule[U](delay: FiniteDuration,
                   target: ActorRef[U],
-                  msg: U): untyped.Cancellable = new untyped.Cancellable {
+                  msg: U): untyped.Cancellable = new untyped.Cancellable
     def cancel() = false
     def isCancelled = true
-  }
   implicit def executionContext: ExecutionContextExecutor =
     system.executionContext
   def spawnAdapter[U](f: U ⇒ T): ActorRef[U] = ???
@@ -225,7 +217,6 @@ class StubbedActorContext[T](val name: String, override val props: Props[T])(
   def getInbox[U](name: String): Inbox.SyncInbox[U] =
     _children(name).asInstanceOf[Inbox.SyncInbox[U]]
   def removeInbox(name: String): Unit = _children -= name
-}
 
 /*
  * TODO

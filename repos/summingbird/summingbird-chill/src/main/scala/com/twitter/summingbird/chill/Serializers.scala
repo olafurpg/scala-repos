@@ -18,22 +18,18 @@ package com.twitter.summingbird.chill
 import com.twitter.chill._
 import com.twitter.summingbird.batch.{BatchID, Timestamp}
 
-class BatchIDSerializer extends KSerializer[BatchID] {
+class BatchIDSerializer extends KSerializer[BatchID]
   val optimizeForPositive = true
-  def write(kser: Kryo, out: Output, batch: BatchID) {
+  def write(kser: Kryo, out: Output, batch: BatchID)
     out.writeLong(batch.id, optimizeForPositive)
-  }
 
   def read(kser: Kryo, in: Input, cls: Class[BatchID]): BatchID =
     BatchID(in.readLong(optimizeForPositive))
-}
 
-class TimestampSerializer extends KSerializer[Timestamp] {
+class TimestampSerializer extends KSerializer[Timestamp]
   val optimizeForPositive = true
-  def write(kser: Kryo, out: Output, ts: Timestamp) {
+  def write(kser: Kryo, out: Output, ts: Timestamp)
     out.writeLong(ts.milliSinceEpoch, optimizeForPositive)
-  }
 
   def read(kser: Kryo, in: Input, cls: Class[Timestamp]): Timestamp =
     Timestamp(in.readLong(optimizeForPositive))
-}

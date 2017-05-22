@@ -8,10 +8,9 @@ package scala.tools.docutil
 
 import scala.language.implicitConversions
 
-object ManPage {
-  abstract class AbstractText {
+object ManPage
+  abstract class AbstractText
     def &(more: AbstractText) = SeqText(this, more)
-  }
 
   case class SeqText(components: AbstractText*) extends AbstractText
   case class SeqPara(components: AbstractText*) extends AbstractText
@@ -48,7 +47,7 @@ object ManPage {
 
   case class Section(title: String, paragraphs: Paragraph*)
 
-  object Category extends Enumeration {
+  object Category extends Enumeration
     val USER_COMMANDS = Value(1, "USER COMMANDS")
     val SYSTEM_CALLS = Value(2, "SYSTEM CALLS")
     val SUBROUTINES = Value(3, "SUBROUTINES")
@@ -56,9 +55,8 @@ object ManPage {
     val FILE_FORMATS = Value(5, "FILE FORMAT DESCRIPTIONS")
     val GAMES = Value(6, "GAMES")
     val MISCELLANEOUS = Value(7, "MISCELLANEOUS")
-  }
 
-  abstract class Document {
+  abstract class Document
     import Category._
     var title: String = ""
     var author: String = ""
@@ -67,5 +65,3 @@ object ManPage {
     var category: Value = USER_COMMANDS
     var encoding: String = "iso-8859-1"
     var sections: List[Section] = Nil
-  }
-}

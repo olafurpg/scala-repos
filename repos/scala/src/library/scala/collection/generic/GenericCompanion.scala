@@ -23,7 +23,7 @@ import scala.language.higherKinds
   *  @define coll  collection
   *  @define Coll  `CC`
   */
-abstract class GenericCompanion[+CC[X] <: GenTraversable[X]] {
+abstract class GenericCompanion[+CC[X] <: GenTraversable[X]]
 
   /** The underlying collection type with unknown element type */
   protected[this] type Coll = CC[_]
@@ -43,12 +43,9 @@ abstract class GenericCompanion[+CC[X] <: GenTraversable[X]] {
     *  @param elems  the elements of the created $coll
     *  @return a new $coll with elements `elems`
     */
-  def apply[A](elems: A*): CC[A] = {
+  def apply[A](elems: A*): CC[A] =
     if (elems.isEmpty) empty[A]
-    else {
+    else
       val b = newBuilder[A]
       b ++= elems
       b.result()
-    }
-  }
-}

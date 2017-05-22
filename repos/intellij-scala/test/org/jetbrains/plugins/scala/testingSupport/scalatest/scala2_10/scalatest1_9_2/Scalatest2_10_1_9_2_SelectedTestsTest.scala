@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.singleTest.ScalaTest
   * @author Roman.Shein
   * @since 11.02.2015.
   */
-class Scalatest2_10_1_9_2_SelectedTestsTest extends {
+class Scalatest2_10_1_9_2_SelectedTestsTest extends
   override val featureSpecConfigTestName = "Feature 1 Scenario: Scenario A"
   override val featureSpecTestPath = List(
       "[root]", "Feature 1 Scenario: Scenario A")
@@ -22,4 +22,4 @@ class Scalatest2_10_1_9_2_SelectedTestsTest extends {
   override val funSuiteTestPath = List("[root]", "should run single test")
   override val wordSpecTestPath = List(
       "[root]", "WordSpecTest should Run single test")
-} with Scalatest2_10_1_9_2_Base with ScalaTestSingleTestTest {}
+with Scalatest2_10_1_9_2_Base with ScalaTestSingleTestTest {}

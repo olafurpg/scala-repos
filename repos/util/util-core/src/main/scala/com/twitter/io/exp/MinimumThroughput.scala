@@ -8,7 +8,7 @@ import com.twitter.util._
   * [[Reader Readers]] and [[Writer Writers]] that have minimum bytes
   * per second throughput limits.
   */
-object MinimumThroughput {
+object MinimumThroughput
 
   private val BpsNoElapsed = -1d
 
@@ -17,7 +17,7 @@ object MinimumThroughput {
   /** internal marker used to raise on read/write timeouts. */
   private case object MinThroughputTimeoutException extends NoStacktrace
 
-  private abstract class Min(minBps: Double) {
+  private abstract class Min(minBps: Double)
     assert(minBps >= 0, s"minBps must be non-negative: $minBps")
 
     // we rely on the `reader.read` and `writer.write` contract that only
@@ -27,14 +27,12 @@ object MinimumThroughput {
     @volatile protected[this] var elapsed = Duration.Zero
 
     /** Calculate and return the current bps */
-    def bps: Double = {
+    def bps: Double =
       val elapsedSecs = elapsed.inSeconds
-      if (elapsedSecs == 0) {
+      if (elapsedSecs == 0)
         BpsNoElapsed
-      } else {
+      else
         bytes.toDouble / elapsedSecs.toDouble
-      }
-    }
 
     /**
       * Return a cap on how long we're willing to wait for the operation to
@@ -48,20 +46,18 @@ object MinimumThroughput {
           .max(MinDeadline)
 
     /** Verify if we are over the min bps requirements. */
-    def throughputOk: Boolean = {
+    def throughputOk: Boolean =
       val newBps = bps
       newBps >= minBps || newBps == BpsNoElapsed
-    }
 
     def newBelowThroughputException: BelowThroughputException =
       new BelowThroughputException(elapsed, bps, minBps)
-  }
 
   private class MinReader(reader: Reader, minBps: Double, timer: Timer)
-      extends Min(minBps) with Reader {
+      extends Min(minBps) with Reader
     def discard(): Unit = reader.discard()
 
-    def read(n: Int): Future[Option[Buf]] = {
+    def read(n: Int): Future[Option[Buf]] =
       val deadline = nextDeadline(n)
 
       val start = Time.now
@@ -69,9 +65,9 @@ object MinimumThroughput {
         .read(n)
         .raiseWithin(timer, deadline, MinThroughputTimeoutException)
 
-      read.transform { res =>
+      read.transform  res =>
         elapsed += Time.now - start
-        res match {
+        res match
           case Throw(MinThroughputTimeoutException) =>
             discard()
             Future.exception(newBelowThroughputException)
@@ -82,22 +78,17 @@ object MinimumThroughput {
           case Return(Some(buf)) =>
             // read some bytes, see if we're still good in terms of bps
             bytes += buf.length
-            if (throughputOk) {
+            if (throughputOk)
               read
-            } else {
+            else
               discard()
               Future.exception(newBelowThroughputException)
-            }
-        }
-      }
-    }
-  }
 
   private class MinWriter(writer: Writer, minBps: Double, timer: Timer)
-      extends Min(minBps) with Writer {
+      extends Min(minBps) with Writer
     def fail(cause: Throwable): Unit = writer.fail(cause)
 
-    override def write(buf: Buf): Future[Unit] = {
+    override def write(buf: Buf): Future[Unit] =
       val numBytes = buf.length
       val deadline = nextDeadline(numBytes)
 
@@ -106,9 +97,9 @@ object MinimumThroughput {
         .write(buf)
         .raiseWithin(timer, deadline, MinThroughputTimeoutException)
 
-      write.transform { res =>
+      write.transform  res =>
         elapsed += Time.now - start
-        res match {
+        res match
           case Throw(MinThroughputTimeoutException) =>
             val ex = newBelowThroughputException
             fail(ex)
@@ -118,17 +109,12 @@ object MinimumThroughput {
           case Return(_) =>
             // wrote some bytes, see if we're still good in terms of bps
             bytes += numBytes
-            if (throughputOk) {
+            if (throughputOk)
               write
-            } else {
+            else
               val ex = newBelowThroughputException
               fail(ex)
               Future.exception(ex)
-            }
-        }
-      }
-    }
-  }
 
   /**
     * Ensures that the throughput of [[Reader.read reads]] happen
@@ -153,4 +139,3 @@ object MinimumThroughput {
     */
   def writer(writer: Writer, minBps: Double, timer: Timer): Writer =
     new MinWriter(writer, minBps, timer)
-}

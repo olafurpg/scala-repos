@@ -30,7 +30,7 @@ import org.junit.Assert._
 @deprecated(
     "This test has been deprecated and it will be removed in a future release",
     "0.10.0.0")
-class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
+class AutoOffsetResetTest extends KafkaServerTestHarness with Logging
 
   def generateConfigs() =
     List(KafkaConfig.fromProps(TestUtils.createBrokerConfig(0, zkConnect)))
@@ -46,18 +46,16 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
     Logger.getLogger(classOf[kafka.server.KafkaRequestHandler])
 
   @Before
-  override def setUp() {
+  override def setUp()
     super.setUp()
     // temporarily set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.FATAL)
-  }
 
   @After
-  override def tearDown() {
+  override def tearDown()
     // restore set request handler logger to a higher level
     requestHandlerLogger.setLevel(Level.ERROR)
     super.tearDown
-  }
 
   @Test
   def testResetToEarliestWhenOffsetTooHigh() =
@@ -81,7 +79,7 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
    * then reset the offset to the given value and consume until we get no new messages. 
    * Returns the count of messages received.
    */
-  def resetAndConsume(numMessages: Int, resetTo: String, offset: Long): Int = {
+  def resetAndConsume(numMessages: Int, resetTo: String, offset: Long): Int =
     TestUtils.createTopic(zkUtils, topic, 1, 1, servers)
 
     val producer: Producer[String, Array[Byte]] = TestUtils.createProducer(
@@ -110,18 +108,14 @@ class AutoOffsetResetTest extends KafkaServerTestHarness with Logging {
 
     var received = 0
     val iter = messageStream.iterator
-    try {
-      for (i <- 0 until numMessages) {
+    try
+      for (i <- 0 until numMessages)
         iter.next // will throw a timeout exception if the message isn't there
         received += 1
-      }
-    } catch {
+    catch
       case e: ConsumerTimeoutException =>
         info("consumer timed out after receiving " + received + " messages.")
-    } finally {
+    finally
       producer.close()
       consumerConnector.shutdown
-    }
     received
-  }
-}

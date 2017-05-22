@@ -27,7 +27,7 @@ import scala.reflect.ClassTag
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 trait PersistentFSM[S <: FSMState, D, E]
-    extends PersistentActor with PersistentFSMBase[S, D, E] with ActorLogging {
+    extends PersistentActor with PersistentFSMBase[S, D, E] with ActorLogging
   import akka.persistence.fsm.PersistentFSM._
 
   /**
@@ -66,14 +66,13 @@ trait PersistentFSM[S <: FSMState, D, E]
   /**
     * After recovery events are handled as in usual FSM actor
     */
-  override def receiveCommand: Receive = {
+  override def receiveCommand: Receive =
     super [PersistentFSMBase].receive
-  }
 
   /**
     * Discover the latest recorded state
     */
-  override def receiveRecover: Receive = {
+  override def receiveRecover: Receive =
     case domainEventTag(event) ⇒
       startWith(stateName, applyEvent(event, stateData))
     case StateChangeEvent(stateIdentifier, timeout) ⇒
@@ -81,48 +80,40 @@ trait PersistentFSM[S <: FSMState, D, E]
     case RecoveryCompleted ⇒
       initialize()
       onRecoveryCompleted()
-  }
 
   /**
     * Persist FSM State and FSM State Data
     */
-  override private[akka] def applyState(nextState: State): Unit = {
+  override private[akka] def applyState(nextState: State): Unit =
     var eventsToPersist: immutable.Seq[Any] = nextState.domainEvents.toList
 
     //Prevent StateChangeEvent persistence when staying in the same state, except when state defines a timeout
-    if (nextState.notifies || nextState.timeout.nonEmpty) {
+    if (nextState.notifies || nextState.timeout.nonEmpty)
       eventsToPersist = eventsToPersist :+ StateChangeEvent(
           nextState.stateName.identifier, nextState.timeout)
-    }
 
-    if (eventsToPersist.isEmpty) {
+    if (eventsToPersist.isEmpty)
       //If there are no events to persist, just apply the state
       super.applyState(nextState)
-    } else {
+    else
       //Persist the events and apply the new state after all event handlers were executed
       var nextData: D = stateData
       var handlersExecutedCounter = 0
 
-      def applyStateOnLastHandler() = {
+      def applyStateOnLastHandler() =
         handlersExecutedCounter += 1
-        if (handlersExecutedCounter == eventsToPersist.size) {
+        if (handlersExecutedCounter == eventsToPersist.size)
           super.applyState(nextState using nextData)
           nextState.afterTransitionDo(stateData)
-        }
-      }
 
-      persistAll[Any](eventsToPersist) {
+      persistAll[Any](eventsToPersist)
         case domainEventTag(event) ⇒
           nextData = applyEvent(event, nextData)
           applyStateOnLastHandler()
         case StateChangeEvent(stateIdentifier, timeout) ⇒
           applyStateOnLastHandler()
-      }
-    }
-  }
-}
 
-object PersistentFSM {
+object PersistentFSM
 
   /**
     * Base persistent event class
@@ -142,9 +133,8 @@ object PersistentFSM {
   /**
     * FSMState base trait, makes possible for simple default serialization by conversion to String
     */
-  trait FSMState {
+  trait FSMState
     def identifier: String
-  }
 
   /**
     * A partial function value which does not match anything and can be used to
@@ -154,10 +144,9 @@ object PersistentFSM {
     * onTermination(FSM.NullFunction)
     * }}}
     */
-  object NullFunction extends PartialFunction[Any, Nothing] {
+  object NullFunction extends PartialFunction[Any, Nothing]
     def isDefinedAt(o: Any) = false
     def apply(o: Any) = sys.error("undefined")
-  }
 
   /**
     * Message type which is sent directly to the subscribed actor in
@@ -225,7 +214,7 @@ object PersistentFSM {
   private[persistence] final case class Timer(
       name: String, msg: Any, repeat: Boolean, generation: Int)(
       context: ActorContext)
-      extends NoSerializationVerificationNeeded {
+      extends NoSerializationVerificationNeeded
     private var ref: Option[Cancellable] = _
     private val scheduler = context.system.scheduler
     private implicit val executionContext = context.dispatcher
@@ -235,19 +224,16 @@ object PersistentFSM {
           else scheduler.scheduleOnce(timeout, actor, this))
 
     def cancel(): Unit =
-      if (ref.isDefined) {
+      if (ref.isDefined)
         ref.get.cancel()
         ref = None
-      }
-  }
 
   /**
     * This extractor is just convenience for matching a (S, S) pair, including a
     * reminder what the new state is.
     */
-  object -> {
+  object ->
     def unapply[S](in: (S, S)) = Some(in)
-  }
 
   /**
     * Log Entry of the [[akka.actor.LoggingFSM]], can be obtained by calling `getLog`.
@@ -266,9 +252,9 @@ object PersistentFSM {
                                   stopReason: Option[Reason] = None,
                                   replies: List[Any] = Nil,
                                   domainEvents: Seq[E] = Nil,
-                                  afterTransitionDo: D ⇒ Unit = { _: D ⇒
-                                  })(
-      private[akka] val notifies: Boolean = true) {
+                                  afterTransitionDo: D ⇒ Unit =  _: D ⇒
+                                  )(
+      private[akka] val notifies: Boolean = true)
 
     /**
       * Copy object and update values if needed.
@@ -281,7 +267,7 @@ object PersistentFSM {
         replies: List[Any] = replies,
         notifies: Boolean = notifies,
         domainEvents: Seq[E] = domainEvents,
-        afterTransitionDo: D ⇒ Unit = afterTransitionDo): State[S, D, E] = {
+        afterTransitionDo: D ⇒ Unit = afterTransitionDo): State[S, D, E] =
       State(stateName,
             stateData,
             timeout,
@@ -289,7 +275,6 @@ object PersistentFSM {
             replies,
             domainEvents,
             afterTransitionDo)(notifies)
-    }
 
     /**
       * Modify state transition descriptor to include a state timeout for the
@@ -298,54 +283,46 @@ object PersistentFSM {
       *
       * Use Duration.Inf to deactivate an existing timeout.
       */
-    def forMax(timeout: Duration): State[S, D, E] = timeout match {
+    def forMax(timeout: Duration): State[S, D, E] = timeout match
       case f: FiniteDuration ⇒ copy(timeout = Some(f))
       case _ ⇒ copy(timeout = None)
-    }
 
     /**
       * Send reply to sender of the current message, if available.
       *
       * @return this state transition descriptor
       */
-    def replying(replyValue: Any): State[S, D, E] = {
+    def replying(replyValue: Any): State[S, D, E] =
       copy(replies = replyValue :: replies)
-    }
 
     /**
       * Modify state transition descriptor with new state data. The data will be
       * set when transitioning to the new state.
       */
     private[akka] def using(
-        @deprecatedName('nextStateDate) nextStateData: D): State[S, D, E] = {
+        @deprecatedName('nextStateDate) nextStateData: D): State[S, D, E] =
       copy(stateData = nextStateData)
-    }
 
     /**
       * INTERNAL API.
       */
-    private[akka] def withStopReason(reason: Reason): State[S, D, E] = {
+    private[akka] def withStopReason(reason: Reason): State[S, D, E] =
       copy(stopReason = Some(reason))
-    }
 
-    private[akka] def withNotification(notifies: Boolean): State[S, D, E] = {
+    private[akka] def withNotification(notifies: Boolean): State[S, D, E] =
       copy(notifies = notifies)
-    }
 
     /**
       * Specify domain events to be applied when transitioning to the new state.
       */
-    @varargs def applying(events: E*): State[S, D, E] = {
+    @varargs def applying(events: E*): State[S, D, E] =
       copy(domainEvents = domainEvents ++ events)
-    }
 
     /**
       * Register a handler to be triggered after the state has been persisted successfully
       */
-    def andThen(handler: D ⇒ Unit): State[S, D, E] = {
+    def andThen(handler: D ⇒ Unit): State[S, D, E] =
       copy(afterTransitionDo = handler)
-    }
-  }
 
   /**
     * All messages sent to the [[akka.actor.FSM]] will be wrapped inside an
@@ -361,7 +338,6 @@ object PersistentFSM {
   final case class StopEvent[S, D](
       reason: Reason, currentState: S, stateData: D)
       extends NoSerializationVerificationNeeded
-}
 
 /**
   * Java API: compatible with lambda expressions
@@ -371,7 +347,7 @@ object PersistentFSM {
   * This is an EXPERIMENTAL feature and is subject to change until it has received more real world testing.
   */
 abstract class AbstractPersistentFSM[S <: FSMState, D, E]
-    extends AbstractPersistentFSMBase[S, D, E] with PersistentFSM[S, D, E] {
+    extends AbstractPersistentFSMBase[S, D, E] with PersistentFSM[S, D, E]
   import java.util.function.Consumer
 
   /**
@@ -394,7 +370,6 @@ abstract class AbstractPersistentFSM[S <: FSMState, D, E]
     * Used for identifying domain events during recovery
     */
   def domainEventClass: Class[E]
-}
 
 /**
   * Java API: compatible with lambda expressions

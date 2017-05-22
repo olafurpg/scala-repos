@@ -1,3 +1,2 @@
-trait MixinWithSymbol { self: MotherClass =>
+trait MixinWithSymbol  self: MotherClass =>
   def symbolFromTrait: Any = 'traitSymbol
-}

@@ -31,29 +31,26 @@ import org.apache.spark.util.ManualClock
   * Tests whether scope information is passed from DStream operations to RDDs correctly.
   */
 class DStreamScopeSuite
-    extends SparkFunSuite with BeforeAndAfter with BeforeAndAfterAll {
+    extends SparkFunSuite with BeforeAndAfter with BeforeAndAfterAll
   private var ssc: StreamingContext = null
   private val batchDuration: Duration = Seconds(1)
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
     val conf = new SparkConf().setMaster("local").setAppName("test")
     conf.set("spark.streaming.clock", classOf[ManualClock].getName())
     ssc = new StreamingContext(new SparkContext(conf), batchDuration)
-  }
 
-  override def afterAll(): Unit = {
-    try {
+  override def afterAll(): Unit =
+    try
       ssc.stop(stopSparkContext = true)
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
   before { assertPropertiesNotSet() }
   after { assertPropertiesNotSet() }
 
-  test("dstream without scope") {
+  test("dstream without scope")
     val dummyStream = new DummyDStream(ssc)
     dummyStream.initialize(Time(0))
 
@@ -63,9 +60,8 @@ class DStreamScopeSuite
     assert(dummyStream.getOrCompute(Time(1000)).get.scope === None)
     assert(dummyStream.getOrCompute(Time(2000)).get.scope === None)
     assert(dummyStream.getOrCompute(Time(3000)).get.scope === None)
-  }
 
-  test("input dstream without scope") {
+  test("input dstream without scope")
     val inputStream = new DummyInputDStream(ssc)
     inputStream.initialize(Time(0))
 
@@ -80,16 +76,13 @@ class DStreamScopeSuite
     assertScopeCorrect(baseScope.get, scope1.get, 1000)
     assertScopeCorrect(baseScope.get, scope2.get, 2000)
     assertScopeCorrect(baseScope.get, scope3.get, 3000)
-  }
 
-  test("scoping simple operations") {
+  test("scoping simple operations")
     val inputStream = new DummyInputDStream(ssc)
-    val mappedStream = inputStream.map { i =>
+    val mappedStream = inputStream.map  i =>
       i + 1
-    }
-    val filteredStream = mappedStream.filter { i =>
+    val filteredStream = mappedStream.filter  i =>
       i % 2 == 0
-    }
     filteredStream.initialize(Time(0))
 
     val mappedScopeBase =
@@ -117,9 +110,8 @@ class DStreamScopeSuite
     assertScopeCorrect(filteredScopeBase.get, filteredScope1.get, 1000)
     assertScopeCorrect(filteredScopeBase.get, filteredScope2.get, 2000)
     assertScopeCorrect(filteredScopeBase.get, filteredScope3.get, 3000)
-  }
 
-  test("scoping nested operations") {
+  test("scoping nested operations")
     val inputStream = new DummyInputDStream(ssc)
     // countByKeyAndWindow internally uses reduceByKeyAndWindow, but only countByKeyAndWindow
     // should appear in scope
@@ -139,8 +131,8 @@ class DStreamScopeSuite
     assertScopeCorrect(countScopeBase.get, countScope3.get, 3000)
 
     // All streams except the input stream should share the same scopes as `countStream`
-    def testStream(stream: DStream[_]): Unit = {
-      if (stream != inputStream) {
+    def testStream(stream: DStream[_]): Unit =
+      if (stream != inputStream)
         val myScopeBase = stream.baseScope.map(RDDOperationScope.fromJson)
         val myScope1 = stream.getOrCompute(Time(1000)).get.scope
         val myScope2 = stream.getOrCompute(Time(2000)).get.scope
@@ -152,16 +144,12 @@ class DStreamScopeSuite
         assert(myScope3 === countScope3)
         // Climb upwards to test the parent streams
         stream.dependencies.foreach(testStream)
-      }
-    }
     testStream(countStream)
-  }
 
-  test("transform should allow RDD operations to be captured in scopes") {
+  test("transform should allow RDD operations to be captured in scopes")
     val inputStream = new DummyInputDStream(ssc)
-    val transformedStream = inputStream.transform {
+    val transformedStream = inputStream.transform
       _.map { _ -> 1 }.reduceByKey(_ + _)
-    }
     transformedStream.initialize(Time(0))
 
     val transformScopeBase =
@@ -179,20 +167,17 @@ class DStreamScopeSuite
     assertNestedScopeCorrect(transformScope3.get, 3000)
 
     def assertNestedScopeCorrect(
-        rddScope: RDDOperationScope, batchTime: Long): Unit = {
+        rddScope: RDDOperationScope, batchTime: Long): Unit =
       assert(rddScope.name === "reduceByKey")
       assert(rddScope.parent.isDefined)
       assertScopeCorrect(
           transformScopeBase.get, rddScope.parent.get, batchTime)
-    }
-  }
 
-  test("foreachRDD should allow RDD operations to be captured in scope") {
+  test("foreachRDD should allow RDD operations to be captured in scope")
     val inputStream = new DummyInputDStream(ssc)
     val generatedRDDs = new ArrayBuffer[RDD[(Int, Int)]]
-    inputStream.foreachRDD { rdd =>
+    inputStream.foreachRDD  rdd =>
       generatedRDDs += rdd.map { _ -> 1 }.reduceByKey(_ + _)
-    }
     val batchCounter = new BatchCounter(ssc)
     ssc.start()
     val clock = ssc.scheduler.clock.asInstanceOf[ManualClock]
@@ -210,27 +195,24 @@ class DStreamScopeSuite
 
     val rddScopes = generatedRDDs.map { _.scope }
     assertDefined(rddScopes: _*)
-    rddScopes.zipWithIndex.foreach {
+    rddScopes.zipWithIndex.foreach
       case (rddScope, idx) =>
         assert(rddScope.get.name === "reduceByKey")
         assert(rddScope.get.parent.isDefined)
         assertScopeCorrect(
             foreachBaseScope.get, rddScope.get.parent.get, (idx + 1) * 1000)
-    }
-  }
 
   /** Assert that the RDD operation scope properties are not set in our SparkContext. */
-  private def assertPropertiesNotSet(): Unit = {
+  private def assertPropertiesNotSet(): Unit =
     assert(ssc != null)
     assert(ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_KEY) == null)
     assert(
         ssc.sc.getLocalProperty(SparkContext.RDD_SCOPE_NO_OVERRIDE_KEY) == null)
-  }
 
   /** Assert that the given RDD scope inherits the name and ID of the base scope correctly. */
   private def assertScopeCorrect(baseScope: RDDOperationScope,
                                  rddScope: RDDOperationScope,
-                                 batchTime: Long): Unit = {
+                                 batchTime: Long): Unit =
     val (baseScopeId, baseScopeName) = (baseScope.id, baseScope.name)
     val formattedBatchTime = UIUtils.formatBatchTime(
         batchTime, ssc.graph.batchDuration.milliseconds, showYYYYMMSS = false)
@@ -238,12 +220,8 @@ class DStreamScopeSuite
     assert(
         rddScope.name.replaceAll("\\n", " ") === s"$baseScopeName @ $formattedBatchTime")
     assert(rddScope.parent.isEmpty) // There should not be any higher scope
-  }
 
   /** Assert that all the specified options are defined. */
-  private def assertDefined[T](options: Option[T]*): Unit = {
-    options.zipWithIndex.foreach {
+  private def assertDefined[T](options: Option[T]*): Unit =
+    options.zipWithIndex.foreach
       case (o, i) => assert(o.isDefined, s"Option $i was empty!")
-    }
-  }
-}

@@ -12,9 +12,9 @@ import spire.implicits.{eqOps => _, _}
 
 import java.math.MathContext
 
-class SignedTest extends FunSuite {
+class SignedTest extends FunSuite
   def runWith[@sp(Int, Long, Float, Double) A : Signed : ClassTag](
-      neg: A, pos: A, zero: A): Unit = {
+      neg: A, pos: A, zero: A): Unit =
     val m = implicitly[ClassTag[A]]
 
     //// the name to use for this A
@@ -46,7 +46,6 @@ class SignedTest extends FunSuite {
     runTest("zero.isSignNonNegative")(assert(zero.isSignNonNegative))
     runTest("neg.isSignNonPositive")(assert(neg.isSignNonPositive))
     runTest("zero.isSignNonPositive")(assert(zero.isSignNonPositive))
-  }
 
   runWith[Int](-3, 3, 0)
   runWith[Long](-3, 3, 0)
@@ -57,4 +56,3 @@ class SignedTest extends FunSuite {
   runWith[Rational](-3, 3, 0)
   runWith[Algebraic](-3, 3, 0)
   runWith[Complex[Double]](-3, 3, 0)
-}

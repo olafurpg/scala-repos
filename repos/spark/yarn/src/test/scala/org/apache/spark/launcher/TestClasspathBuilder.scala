@@ -23,7 +23,7 @@ import java.util.{List => JList, Map => JMap}
   * Exposes AbstractCommandBuilder to the YARN tests, so that they can build classpaths the same
   * way other cluster managers do.
   */
-private[spark] class TestClasspathBuilder extends AbstractCommandBuilder {
+private[spark] class TestClasspathBuilder extends AbstractCommandBuilder
 
   childEnv.put(
       CommandBuilderUtils.ENV_SPARK_HOME, sys.props("spark.test.home"))
@@ -34,4 +34,3 @@ private[spark] class TestClasspathBuilder extends AbstractCommandBuilder {
   /** Not used by the YARN tests. */
   override def buildCommand(env: JMap[String, String]): JList[String] =
     throw new UnsupportedOperationException()
-}

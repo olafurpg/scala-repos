@@ -11,17 +11,16 @@ import akka.http.impl.util.JavaMapping.Implicits._
 
 sealed abstract class HttpEncodingRange
     extends jm.headers.HttpEncodingRange with ValueRenderable
-    with WithQValue[HttpEncodingRange] {
+    with WithQValue[HttpEncodingRange]
   def qValue: Float
   def matches(encoding: HttpEncoding): Boolean
 
   /** Java API */
   def matches(encoding: jm.headers.HttpEncoding): Boolean =
     matches(encoding.asScala)
-}
 
-object HttpEncodingRange {
-  case class `*`(qValue: Float) extends HttpEncodingRange {
+object HttpEncodingRange
+  case class `*`(qValue: Float) extends HttpEncodingRange
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
     final def render[R <: Rendering](r: R): r.type =
       if (qValue < 1.0f) r ~~ "*;q=" ~~ qValue else r ~~ '*'
@@ -29,38 +28,33 @@ object HttpEncodingRange {
     def withQValue(qValue: Float) =
       if (qValue == 1.0f) `*`
       else if (qValue != this.qValue) `*`(qValue.toFloat) else this
-  }
   object `*` extends `*`(1.0f)
 
   final case class One(encoding: HttpEncoding, qValue: Float)
-      extends HttpEncodingRange {
+      extends HttpEncodingRange
     require(0.0f <= qValue && qValue <= 1.0f, "qValue must be >= 0 and <= 1.0")
     def matches(encoding: HttpEncoding) =
       this.encoding.value.equalsIgnoreCase(encoding.value)
     def withQValue(qValue: Float) = One(encoding, qValue)
     def render[R <: Rendering](r: R): r.type =
       if (qValue < 1.0f) r ~~ encoding ~~ ";q=" ~~ qValue else r ~~ encoding
-  }
 
   implicit def apply(encoding: HttpEncoding): HttpEncodingRange =
     apply(encoding, 1.0f)
   def apply(encoding: HttpEncoding, qValue: Float): HttpEncodingRange =
     One(encoding, qValue)
-}
 
 final case class HttpEncoding private[http](value: String)
     extends jm.headers.HttpEncoding with LazyValueBytesRenderable
-    with WithQValue[HttpEncodingRange] {
+    with WithQValue[HttpEncodingRange]
   def withQValue(qValue: Float): HttpEncodingRange =
     HttpEncodingRange(this, qValue.toFloat)
-}
 
-object HttpEncoding {
+object HttpEncoding
   def custom(value: String): HttpEncoding = apply(value)
-}
 
 // see http://www.iana.org/assignments/http-parameters/http-parameters.xml
-object HttpEncodings extends ObjectRegistry[String, HttpEncoding] {
+object HttpEncodings extends ObjectRegistry[String, HttpEncoding]
   // format: OFF
   val compress         = register("compress")
   val chunked          = register("chunked")
@@ -75,4 +69,3 @@ object HttpEncodings extends ObjectRegistry[String, HttpEncoding] {
     register(encoding.value.toRootLowerCase, encoding)
   private def register(value: String): HttpEncoding =
     register(HttpEncoding(value))
-}

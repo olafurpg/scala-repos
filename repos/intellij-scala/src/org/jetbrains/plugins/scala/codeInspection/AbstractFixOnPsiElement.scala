@@ -11,7 +11,7 @@ import com.intellij.psi.{PsiElement, PsiFile, SmartPointerManager}
   */
 abstract class AbstractFixOnPsiElement[T <: PsiElement](
     name: String, startElement: T, endElement: T)
-    extends LocalQuickFixOnPsiElement(startElement, endElement) {
+    extends LocalQuickFixOnPsiElement(startElement, endElement)
 
   def this(name: String, element: T) = this(name, element, element)
 
@@ -19,31 +19,27 @@ abstract class AbstractFixOnPsiElement[T <: PsiElement](
 
   override def getFamilyName = getText
 
-  def getElement: T = {
-    try {
+  def getElement: T =
+    try
       val elem = getStartElement.asInstanceOf[T]
       if (elem.isValid) elem
       else null.asInstanceOf[T]
-    } catch {
+    catch
       case e: ClassCastException => null.asInstanceOf[T]
-    }
-  }
 
   override def invoke(project: Project,
                       file: PsiFile,
                       startElement: PsiElement,
-                      endElement: PsiElement): Unit = {
+                      endElement: PsiElement): Unit =
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
     if (getElement == null) return
     doApplyFix(project)
-  }
 
   def doApplyFix(project: Project)
-}
 
 abstract class AbstractFixOnTwoPsiElements[T <: PsiElement, S <: PsiElement](
     name: String, first: T, second: S)
-    extends LocalQuickFixOnPsiElement(first) {
+    extends LocalQuickFixOnPsiElement(first)
 
   private val secondRef = SmartPointerManager
     .getInstance(second.getProject)
@@ -53,30 +49,25 @@ abstract class AbstractFixOnTwoPsiElements[T <: PsiElement, S <: PsiElement](
 
   override def getFamilyName = getText
 
-  def getFirstElement: T = {
-    try {
+  def getFirstElement: T =
+    try
       val elem = getStartElement.asInstanceOf[T]
       if (elem.isValid) elem
       else null.asInstanceOf[T]
-    } catch {
+    catch
       case e: ClassCastException => null.asInstanceOf[T]
-    }
-  }
 
-  def getSecondElement: S = {
+  def getSecondElement: S =
     val elem = secondRef.getElement
     if (elem != null && elem.isValid) elem
     else null.asInstanceOf[S]
-  }
 
   override def invoke(project: Project,
                       file: PsiFile,
                       startElement: PsiElement,
-                      endElement: PsiElement): Unit = {
+                      endElement: PsiElement): Unit =
     if (!FileModificationService.getInstance.prepareFileForWrite(file)) return
     if (getFirstElement == null || getSecondElement == null) return
     doApplyFix(project)
-  }
 
   def doApplyFix(project: Project)
-}

@@ -26,7 +26,7 @@ class SubSource[+Out, +Mat](
     delegate: scaladsl.SubFlow[Out,
                                Mat,
                                scaladsl.Source[Out, Mat]#Repr,
-                               scaladsl.RunnableGraph[Mat]]) {
+                               scaladsl.RunnableGraph[Mat]])
 
   /** Converts this Flow to its Scala DSL counterpart */
   def asScala: scaladsl.SubFlow[
@@ -146,9 +146,9 @@ class SubSource[+Out, +Mat](
   def mapConcat[T](
       f: function.Function[Out, java.lang.Iterable[T]]): SubSource[T, Mat] =
     new SubSource(
-        delegate.mapConcat { elem ⇒
+        delegate.mapConcat  elem ⇒
       Util.immutableSeq(f(elem))
-    })
+    )
 
   /**
     * Transform each input element into an `Iterable` of output elements that is
@@ -178,11 +178,11 @@ class SubSource[+Out, +Mat](
       f: function.Creator[function.Function[Out, java.lang.Iterable[T]]])
     : SubSource[T, Mat] =
     new SubSource(
-        delegate.statefulMapConcat { () ⇒
+        delegate.statefulMapConcat  () ⇒
       val fun = f.create()
       elem ⇒
         Util.immutableSeq(fun(elem))
-    })
+    )
 
   /**
     * Transform this stream by applying the given function to each of the elements
@@ -377,9 +377,8 @@ class SubSource[+Out, +Mat](
     * See also [[Flow.take]], [[Flow.takeWithin]], [[Flow.takeWhile]]
     */
   def limitWeighted(n: Long)(
-      costFn: function.Function[Out, Long]): javadsl.SubSource[Out, Mat] = {
+      costFn: function.Function[Out, Long]): javadsl.SubSource[Out, Mat] =
     new SubSource(delegate.limitWeighted(n)(costFn.apply))
-  }
 
   def sliding(
       n: Int,
@@ -908,9 +907,9 @@ class SubSource[+Out, +Mat](
     new SubSource(
         delegate
           .prefixAndTail(n)
-          .map {
+          .map
         case (taken, tail) ⇒ akka.japi.Pair(taken.asJava, tail.asJava)
-      })
+      )
 
   /**
     * Transform each input element into a `Source` of output elements that is
@@ -1375,4 +1374,3 @@ class SubSource[+Out, +Mat](
     */
   def log(name: String): SubSource[Out, Mat] =
     this.log(name, ConstantFun.javaIdentityFunction[Out], null)
-}

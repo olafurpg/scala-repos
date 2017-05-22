@@ -13,7 +13,7 @@ import scala.tools.util.PathResolver.Defaults
   *  The abstract settings are commented as to why they are as yet
   *  implemented in MutableSettings rather than mutation-generically.
   */
-trait StandardScalaSettings { self: AbsScalaSettings =>
+trait StandardScalaSettings  self: AbsScalaSettings =>
 
   /** Path related settings.
     */
@@ -82,4 +82,3 @@ trait StandardScalaSettings { self: AbsScalaSettings =>
   val verbose = BooleanSetting(
       "-verbose", "Output messages about what the compiler is doing.")
   val version = BooleanSetting("-version", "Print product version and exit.")
-}

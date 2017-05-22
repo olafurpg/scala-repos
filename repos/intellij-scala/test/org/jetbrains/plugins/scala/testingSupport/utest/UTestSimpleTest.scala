@@ -6,13 +6,13 @@ import org.jetbrains.plugins.scala.lang.structureView.elements.impl.TestStructur
   * @author Roman.Shein
   * @since 13.05.2015.
   */
-trait UTestSimpleTest extends UTestTestCase {
+trait UTestSimpleTest extends UTestTestCase
 
   protected def uTestTestName = "UTestTest"
 
   protected def uTestFileName = uTestTestName + ".scala"
 
-  protected def addUTestTest(): Unit = {
+  protected def addUTestTest(): Unit =
     addFileToProject(uTestFileName,
                      """
         |import utest._
@@ -46,7 +46,6 @@ trait UTestSimpleTest extends UTestTestCase {
         |  }
         |}
       """.stripMargin.trim())
-  }
 
   protected val inner2_1Path = List(
       "[root]", uTestTestName, "tests", "outer2", "inner2_1")
@@ -58,7 +57,7 @@ trait UTestSimpleTest extends UTestTestCase {
   protected val failedPath = List(
       "[root]", uTestTestName, "failedTest", "failed")
 
-  def testSingleTest(): Unit = {
+  def testSingleTest(): Unit =
     addUTestTest()
 
     runTestByLocation(
@@ -69,9 +68,8 @@ trait UTestSimpleTest extends UTestTestCase {
         root =>
           checkResultTreeHasExactNamedPath(root, inner2_1Path) &&
           checkResultTreeDoesNotHaveNodes(root, "outer1", "inner1_1"))
-  }
 
-  def testSameName(): Unit = {
+  def testSameName(): Unit =
     addUTestTest()
 
     runTestByLocation(
@@ -81,10 +79,9 @@ trait UTestSimpleTest extends UTestTestCase {
         checkConfigAndSettings(
             _, uTestTestName, "sameName\\sameName\\sameName"),
         root => checkResultTreeHasExactNamedPath(root, sameNamePath))
-  }
 
   //TODO for some reason, tests are launched, but never reported (also, jvm running the test hangs and never terminates, even after root idea process is terminated)
-  def testMethod(): Unit = {
+  def testMethod(): Unit =
     addUTestTest()
 
     runTestByLocation(
@@ -96,9 +93,8 @@ trait UTestSimpleTest extends UTestTestCase {
           checkResultTreeHasExactNamedPath(root, outer1_Path) &&
           checkResultTreeHasExactNamedPath(root, inner2_1Path) &&
           checkResultTreeDoesNotHaveNodes(root, "inner1_1", "sameName"))
-  }
 
-  def testClassSuite(): Unit = {
+  def testClassSuite(): Unit =
     addUTestTest()
 
     runTestByLocation(3,
@@ -111,9 +107,8 @@ trait UTestSimpleTest extends UTestTestCase {
                         checkResultTreeHasExactNamedPath(root, outer1_Path) &&
                         checkResultTreeHasExactNamedPath(root, inner1_1Path) &&
                         checkResultTreeHasExactNamedPath(root, failedPath))
-  }
 
-  def testFileStructureView(): Unit = {
+  def testFileStructureView(): Unit =
     addUTestTest()
     //notice that we only test here nodes that produce TestStructureViewElement in file structure view
     //this means that root test scopes (methods) are not tested here; instead, they are tested in testFileStructureViewHierarchy
@@ -124,27 +119,24 @@ trait UTestSimpleTest extends UTestTestCase {
                              "\"inner2_1\"",
                              "\"inner1_1\"",
                              "\"sameName\"")
-  }
 
-  def testFileStructureViewHierarchy(): Unit = {
+  def testFileStructureViewHierarchy(): Unit =
     addUTestTest()
     runFileStructureViewTest(uTestTestName, "\"sameName\"", Some("sameName"))
     runFileStructureViewTest(
         uTestTestName, "\"sameName\"", Some("\"sameName\""))
     runFileStructureViewTest(uTestTestName, "\"outer2\"", Some("tests"))
     runFileStructureViewTest(uTestTestName, "\"inner2_1\"", Some("\"outer2\""))
-  }
 
-  def testDuplicateConfig(): Unit = {
+  def testDuplicateConfig(): Unit =
     addUTestTest()
     runDuplicateConfigTest(
         8,
         10,
         uTestFileName,
         checkConfigAndSettings(_, uTestTestName, "tests\\outer2\\inner2_1"))
-  }
 
-  def testGoToSourceSuccessful(): Unit = {
+  def testGoToSourceSuccessful(): Unit =
     addUTestTest()
     runGoToSourceTest(4,
                       7,
@@ -152,9 +144,8 @@ trait UTestSimpleTest extends UTestTestCase {
                       checkConfigAndSettings(_, uTestTestName, "tests"),
                       List("[root]", uTestTestName, "tests"),
                       4)
-  }
 
-  def testGoToSourceFailed(): Unit = {
+  def testGoToSourceFailed(): Unit =
     addUTestTest()
     //notice that 'goToSource' now travels only to method: right now, we don't identify exact line of code in test
     //execution completion callback
@@ -165,5 +156,3 @@ trait UTestSimpleTest extends UTestTestCase {
         checkConfigAndSettings(_, uTestTestName, "failedTest\\failed"),
         failedPath,
         24)
-  }
-}

@@ -5,7 +5,7 @@ import spire.random.rng._
 
 import org.scalatest.FunSuite
 
-class GeneratorTest extends FunSuite {
+class GeneratorTest extends FunSuite
 
   /**
     * This is just a very basic sanity check.
@@ -50,25 +50,21 @@ class GeneratorTest extends FunSuite {
        Well19937c,
        Well44497a,
        Well44497b,
-       PcgXshRr64_32).foreach { gen =>
+       PcgXshRr64_32).foreach  gen =>
     val name = getName(gen)
 
-    bases.foreach { mod =>
+    bases.foreach  mod =>
       test("%s nextInt(%d) distributed within %.2f%%" format
-          (name, mod, threshold * 100)) {
+          (name, mod, threshold * 100))
         val histogram = new Array[Int](mod)
         //val rng = gen.fromTime()
         val rng = gen.fromTime(13572468L)
-        for (i <- 0 until size) {
+        for (i <- 0 until size)
           val n: Int = rng.nextInt(mod)
           histogram(n) += 1
-        }
         val ratio = 1.0 * size / mod
         val deviation = histogram.toList.map(n => (1.0 - (n / ratio)).abs)
         assert(deviation.filter(_ > threshold) === Nil)
-      }
-    }
-  }
 
   // def diagnostic {
   //   val nums = List(3, 5, 7, 11, 13, 17, 19, 23, 29, 31)
@@ -90,4 +86,3 @@ class GeneratorTest extends FunSuite {
   //     nums.foreach(mod => doit(name, mod, rng.nextInt _))
   //   }
   // }
-}

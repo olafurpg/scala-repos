@@ -20,7 +20,7 @@ import org.scalatest.WordSpec
 import com.twitter.scalding._
 import com.twitter.scalding.typed.FlattenGroup._
 
-class MultiJoinTest extends WordSpec {
+class MultiJoinTest extends WordSpec
 
   def addKeys[V](t: Seq[V]): Seq[(Int, V)] =
     t.iterator.zipWithIndex.map { case (v, k) => (k, v) }.toSeq
@@ -41,32 +41,28 @@ class MultiJoinTest extends WordSpec {
   // note that these tests are essentially compile-time tests, all
   // we are testing is that this compiles
 
-  "The flatten methods" should {
-    "actually match the outputs of joins" in {
+  "The flatten methods" should
+    "actually match the outputs of joins" in
 
       val joinedFlat: CoGrouped[Int,
                                 (Double, Long, String, Set[Int],
-                                Map[Int, Int])] = joined.mapValues { x =>
+                                Map[Int, Int])] = joined.mapValues  x =>
         flattenNestedTuple(x)
-      }
 
       val leftJoinedFlat: CoGrouped[Int,
                                     (Double, Option[Long], Option[String],
                                     Option[Set[Int]], Option[Map[Int, Int]])] =
-        leftJoined.mapValues { x =>
+        leftJoined.mapValues  x =>
           flattenNestedTuple(x)
-        }
 
       val outerJoinedFlat: CoGrouped[Int,
                                      (Option[Double], Option[Long],
                                      Option[String], Option[Set[Int]],
                                      Option[Map[Int, Int]])] =
-        outerJoined.mapValues { x =>
+        outerJoined.mapValues  x =>
           flattenNestedOptionTuple(x)
-        }
-    }
 
-    "Have implicit flattenValueTuple methods for low arity" in {
+    "Have implicit flattenValueTuple methods for low arity" in
 
       val joinedFlat: CoGrouped[Int,
                                 (Double, Long, String, Set[Int],
@@ -82,6 +78,3 @@ class MultiJoinTest extends WordSpec {
                                      Option[String], Option[Set[Int]],
                                      Option[Map[Int, Int]])] =
         outerJoined.flattenValueTuple
-    }
-  }
-}

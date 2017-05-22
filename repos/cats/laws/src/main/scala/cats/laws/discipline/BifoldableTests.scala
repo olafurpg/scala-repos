@@ -6,7 +6,7 @@ import org.scalacheck.Arbitrary
 import org.scalacheck.Prop._
 import org.typelevel.discipline.Laws
 
-trait BifoldableTests[F[_, _]] extends Laws {
+trait BifoldableTests[F[_, _]] extends Laws
   def laws: BifoldableLaws[F]
 
   def bifoldable[A : Arbitrary, B : Arbitrary, C : Arbitrary : Monoid : Eq](
@@ -19,9 +19,7 @@ trait BifoldableTests[F[_, _]] extends Laws {
         "bifoldRight consistent with bifoldMap" -> forAll(
             laws.bifoldRightConsistentWithBifoldMap[A, B, C] _)
     )
-}
 
-object BifoldableTests {
+object BifoldableTests
   def apply[F[_, _]: Bifoldable]: BifoldableTests[F] =
     new BifoldableTests[F] { def laws: BifoldableLaws[F] = BifoldableLaws[F] }
-}

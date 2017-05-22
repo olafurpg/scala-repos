@@ -8,7 +8,7 @@ import org.jetbrains.plugins.hocon.lexer.HoconTokenType
 
 class HoconQuoteHandler
     extends SimpleTokenSetQuoteHandler(HoconTokenType.QuotedString)
-    with JavaLikeQuoteHandler {
+    with JavaLikeQuoteHandler
 
   override protected def isNonClosedLiteral(
       iterator: HighlighterIterator, chars: CharSequence) =
@@ -24,4 +24,3 @@ class HoconQuoteHandler
   def needParenthesesAroundConcatenation(element: PsiElement) = false
 
   def isAppropriateElementTypeForLiteral(tokenType: IElementType) = true
-}

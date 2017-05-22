@@ -9,7 +9,7 @@ import org.jetbrains.sbt.project.template.activator.TemplateListModel.FullTempla
   */
 class TemplateListModel(
     val items: Array[(String, ActivatorRepoProcessor.DocData)])
-    extends JavaAbstractListModel {
+    extends JavaAbstractListModel
   private val temp = 12
 
   private val dumbData =
@@ -23,10 +23,9 @@ class TemplateListModel(
     * model changing (so new model will probably have other amount of items and other indices). Also we can't preserve
     * id's only as we want to show items in actual order without ugly hacks like using LinkedHashSet 
     */
-  private val (indexedItems, idToItem) = {
+  private val (indexedItems, idToItem) =
     val a1 = items.sortBy(a => a._2.title)
     (a1.map { case (a, b) => FullTemplateData(a, b) }, a1.toMap)
-  }
 
   override def getSize: Int = Math.max(indexedItems.length, temp)
 
@@ -46,10 +45,7 @@ class TemplateListModel(
     if (i < indexedItems.length && i > -1) indexedItems(i) else dumbFullData
 
   private def getData(id: String) = idToItem.getOrElse(id, dumbData)
-}
 
-object TemplateListModel {
-  case class FullTemplateData(id: String, docData: DocData) {
+object TemplateListModel
+  case class FullTemplateData(id: String, docData: DocData)
     override def toString: String = docData.toString
-  }
-}

@@ -8,7 +8,7 @@ import cats.functor.Contravariant
 import cats.laws.discipline._
 import cats.laws.discipline.arbitrary.{constArbitrary, oneAndArbitrary}
 
-class ConstTests extends CatsSuite {
+class ConstTests extends CatsSuite
 
   implicit val iso = CartesianTests.Isomorphisms
     .invariant[Const[String, ?]](Const.constTraverse)
@@ -30,7 +30,6 @@ class ConstTests extends CatsSuite {
            SerializableTests.serializable(Traverse[Const[String, ?]]))
 
   // Get Apply[Const[C : Semigroup, ?]], not Applicative[Const[C : Monoid, ?]]
-  {
     implicit def nonEmptyListSemigroup[A]: Semigroup[NonEmptyList[A]] =
       SemigroupK[NonEmptyList].algebra
     implicit val iso = CartesianTests.Isomorphisms
@@ -40,7 +39,6 @@ class ConstTests extends CatsSuite {
     checkAll(
         "Apply[Const[NonEmptyList[String], ?]]",
         SerializableTests.serializable(Apply[Const[NonEmptyList[String], ?]]))
-  }
 
   // Algebra checks for Serializability of instances as part of the laws
   checkAll("Monoid[Const[Int, String]]", GroupLaws[Const[Int, String]].monoid)
@@ -67,15 +65,12 @@ class ConstTests extends CatsSuite {
   checkAll(
       "Bifoldable[Const]", SerializableTests.serializable(Bifoldable[Const]))
 
-  test("show") {
+  test("show")
 
     Const(1).show should ===("Const(1)")
 
-    forAll { const: Const[Int, String] =>
+    forAll  const: Const[Int, String] =>
       const.show.startsWith("Const(") should ===(true)
       const.show.contains(const.getConst.show)
       const.show should ===(implicitly[Show[Const[Int, String]]].show(const))
       const.show should ===(const.retag[Boolean].show)
-    }
-  }
-}

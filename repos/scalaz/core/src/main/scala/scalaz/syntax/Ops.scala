@@ -1,5 +1,4 @@
 package scalaz.syntax
 
-trait Ops[A] {
+trait Ops[A]
   def self: A
-}

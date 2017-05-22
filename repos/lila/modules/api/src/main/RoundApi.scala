@@ -22,10 +22,10 @@ private[api] final class RoundApi(
     bookmarkApi: lila.bookmark.BookmarkApi,
     getTourAndRanks: Game => Fu[Option[TourAndRanks]],
     getSimul: Simul.ID => Fu[Option[Simul]],
-    lightUser: String => Option[LightUser]) {
+    lightUser: String => Option[LightUser])
 
   def player(pov: Pov, apiVersion: Int)(implicit ctx: Context): Fu[JsObject] =
-    GameRepo.initialFen(pov.game) flatMap { initialFen =>
+    GameRepo.initialFen(pov.game) flatMap  initialFen =>
       jsonView.playerJson(
           pov,
           ctx.pref,
@@ -35,17 +35,15 @@ private[api] final class RoundApi(
           withBlurs = ctx.me ?? Granter(_.ViewBlurs)) zip getTourAndRanks(
           pov.game) zip (pov.game.simulId ?? getSimul) zip
       (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) zip forecastApi
-        .loadForDisplay(pov) map {
+        .loadForDisplay(pov) map
         case ((((json, tourOption), simulOption), note), forecast) =>
           (blindMode _ compose withTournament(pov, tourOption) _ compose withSimul(
                   pov, simulOption) _ compose withSteps(
                   pov, none, initialFen, withOpening = false) _ compose withNote(
-                  note) _ compose withBookmark(ctx.me ?? {
+                  note) _ compose withBookmark(ctx.me ??
                 bookmarkApi.bookmarked(pov.game, _)
-              }) _ compose withForecastCount(forecast.map(_.steps.size)) _)(
+              ) _ compose withForecastCount(forecast.map(_.steps.size)) _)(
               json)
-      }
-    }
 
   def watcher(pov: Pov,
               apiVersion: Int,
@@ -55,7 +53,7 @@ private[api] final class RoundApi(
               withMoveTimes: Boolean = false,
               withOpening: Boolean = false)(
       implicit ctx: Context): Fu[JsObject] =
-    initialFenO.fold(GameRepo initialFen pov.game)(fuccess) flatMap {
+    initialFenO.fold(GameRepo initialFen pov.game)(fuccess) flatMap
       initialFen =>
         jsonView.watcherJson(
             pov,
@@ -67,7 +65,7 @@ private[api] final class RoundApi(
             initialFen = initialFen,
             withMoveTimes = withMoveTimes) zip getTourAndRanks(pov.game) zip
         (pov.game.simulId ?? getSimul) zip
-        (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) map {
+        (ctx.me ?? (me => noteApi.get(pov.gameId, me.id))) map
           case (((json, tourOption), simulOption), note) =>
             (blindMode _ compose withTournament(pov, tourOption) _ compose withSimul(
                     pov,
@@ -78,19 +76,16 @@ private[api] final class RoundApi(
                     initialFen,
                     withOpening = withOpening) _ compose withAnalysis(analysis) _)(
                 json)
-        }
-    }
 
   def userAnalysisJson(pov: Pov,
                        pref: Pref,
                        initialFen: Option[String],
                        orientation: chess.Color,
                        owner: Boolean) =
-    owner.??(forecastApi loadForDisplay pov).flatMap { fco =>
+    owner.??(forecastApi loadForDisplay pov).flatMap  fco =>
       jsonView.userAnalysisJson(pov, pref, orientation, owner = owner) map withSteps(
           pov, none, initialFen, withOpening = true) _ map withForecast(
           pov, owner, fco) _
-    }
 
   private def withSteps(pov: Pov,
                         a: Option[(Pgn, Analysis)],
@@ -112,36 +107,34 @@ private[api] final class RoundApi(
     if (v) json + ("bookmarked" -> JsBoolean(true)) else json
 
   private def withForecastCount(count: Option[Int])(json: JsObject) =
-    count.filter(0 !=).fold(json) { c =>
+    count.filter(0 !=).fold(json)  c =>
       json + ("forecastCount" -> JsNumber(c))
-    }
 
   private def withForecast(
       pov: Pov, owner: Boolean, fco: Option[Forecast])(json: JsObject) =
     if (pov.game.forecastable && owner)
       json +
-      ("forecast" -> {
+      ("forecast" ->
             if (pov.forecastable)
-              fco.fold[JsValue](Json.obj("none" -> true)) { fc =>
+              fco.fold[JsValue](Json.obj("none" -> true))  fc =>
                 import Forecast.forecastJsonWriter
                 Json toJson fc
-              } else Json.obj("onMyTurn" -> true)
-          })
+              else Json.obj("onMyTurn" -> true)
+          )
     else json
 
   private def withAnalysis(a: Option[(Pgn, Analysis)])(json: JsObject) =
-    a.fold(json) {
+    a.fold(json)
       case (pgn, analysis) =>
         json +
         ("analysis" -> Json.obj(
                 "white" -> analysisApi.player(chess.Color.White)(analysis),
                 "black" -> analysisApi.player(chess.Color.Black)(analysis)
             ))
-    }
 
   private def withTournament(
       pov: Pov, tourOption: Option[TourAndRanks])(json: JsObject) =
-    tourOption.fold(json) { data =>
+    tourOption.fold(json)  data =>
       json +
       ("tournament" -> Json
             .obj(
@@ -150,17 +143,16 @@ private[api] final class RoundApi(
                 "running" -> data.tour.isStarted,
                 "berserkable" -> data.tour.isStarted.option(
                     data.tour.berserkable),
-                "nbSecondsForFirstMove" -> data.tour.isStarted.option {
+                "nbSecondsForFirstMove" -> data.tour.isStarted.option
                   SecondsToDoFirstMove.secondsToMoveFor(data.tour)
-                },
+                ,
                 "ranks" -> data.tour.isStarted.option(Json.obj(
                         "white" -> data.whiteRank, "black" -> data.blackRank))
             )
             .noNull)
-    }
 
   private def withSimul(pov: Pov, simulOption: Option[Simul])(json: JsObject) =
-    simulOption.fold(json) { simul =>
+    simulOption.fold(json)  simul =>
       json +
       ("simul" -> Json.obj(
               "id" -> simul.id,
@@ -168,8 +160,6 @@ private[api] final class RoundApi(
               "name" -> simul.name,
               "nbPlaying" -> simul.playingPairings.size
           ))
-    }
 
   private def blindMode(js: JsObject)(implicit ctx: Context) =
     ctx.blindMode.fold(js + ("blind" -> JsBoolean(true)), js)
-}

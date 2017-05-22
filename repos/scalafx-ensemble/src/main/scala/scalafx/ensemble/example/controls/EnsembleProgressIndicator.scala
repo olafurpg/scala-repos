@@ -32,31 +32,27 @@ import scalafx.geometry.Insets
 import scalafx.scene.control.ProgressIndicator
 import scalafx.scene.layout.GridPane
 
-class EnsembleProgressIndicator extends EnsembleExample {
+class EnsembleProgressIndicator extends EnsembleExample
 
-  def getContent = {
+  def getContent =
     // Progress Indicators 1, 2, 3, 4
-    val p1 = new ProgressIndicator {
+    val p1 = new ProgressIndicator
       prefWidth = 50
       prefHeight = 50
-    }
-    val p2 = new ProgressIndicator {
+    val p2 = new ProgressIndicator
       prefWidth = 50
       prefHeight = 50
       progress = 0.25F
-    }
-    val p3 = new ProgressIndicator {
+    val p3 = new ProgressIndicator
       prefWidth = 50
       prefHeight = 50
       progress = 0.50F
-    }
-    val p4 = new ProgressIndicator {
+    val p4 = new ProgressIndicator
       prefWidth = 50
       prefHeight = 50
       progress = 1.0F
-    }
     //Add all progress indicators in grid pane
-    new GridPane() {
+    new GridPane()
       hgap = 20
       vgap = 20
       padding = Insets(20)
@@ -64,6 +60,3 @@ class EnsembleProgressIndicator extends EnsembleExample {
       add(p2, 0, 1)
       add(p3, 1, 1)
       add(p4, 2, 1)
-    }
-  }
-}

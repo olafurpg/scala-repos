@@ -11,24 +11,23 @@ import com.typesafe.config.ConfigFactory
 import play.api.PlayConfig
 import play.api.test.WithApplication
 
-object SSLConfigParserSpec extends Specification {
+object SSLConfigParserSpec extends Specification
 
   // We can get horrible concurrent modification exceptions in the logger if we run
   // several WithApplication at the same time.  Usually happens in the build.
   sequential
 
-  "SSLConfigParser" should {
+  "SSLConfigParser" should
 
-    def parseThis(input: String)(implicit app: play.api.Application) = {
+    def parseThis(input: String)(implicit app: play.api.Application) =
       val config = ConfigFactory
         .parseString(input)
         .withFallback(
             ConfigFactory.defaultReference().getConfig("play.ws.ssl"))
       val parser = new SSLConfigParser(PlayConfig(config), app.classloader)
       parser.parse()
-    }
 
-    "parse ws.ssl base section" in new WithApplication() {
+    "parse ws.ssl base section" in new WithApplication()
       val actual =
         parseThis("""
                                 |default = true
@@ -44,9 +43,8 @@ object SSLConfigParserSpec extends Specification {
       actual.default must beTrue
       actual.protocol must_== "TLSv1.1"
       actual.checkRevocation must beSome(true)
-      actual.revocationLists must beSome.which {
+      actual.revocationLists must beSome.which
         _ must beEqualTo(Seq(new java.net.URL("http://example.com")))
-      }
       actual.enabledCipherSuites must beSome.which(
           _ must containTheSameElementsAs(
               Seq("TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA")))
@@ -57,9 +55,8 @@ object SSLConfigParserSpec extends Specification {
       actual.disabledKeyAlgorithms must containTheSameElementsAs(
           Seq("RSA keySize < 1024"))
       actual.secureRandom must beNone
-    }
 
-    "parse ws.ssl.loose section" in new WithApplication() {
+    "parse ws.ssl.loose section" in new WithApplication()
       val actual = parseThis("""
                                 |loose = {
                                 | allowLegacyHelloMessages = true
@@ -74,13 +71,11 @@ object SSLConfigParserSpec extends Specification {
       actual.loose.allowWeakCiphers must beTrue
       actual.loose.allowWeakProtocols must beTrue
       actual.loose.acceptAnyCertificate must beTrue
-    }
 
-    "say debug is disabled if all debug is disabled" in new WithApplication() {
+    "say debug is disabled if all debug is disabled" in new WithApplication()
       parseThis("").debug.enabled must beFalse
-    }
 
-    "parse ws.ssl.debug section" in new WithApplication() {
+    "parse ws.ssl.debug section" in new WithApplication()
       val actual = parseThis("""
                                 |debug = {
                                 |certpath = true
@@ -110,24 +105,21 @@ object SSLConfigParserSpec extends Specification {
       actual.debug.ssl must beTrue
 
       actual.debug.defaultctx must beTrue
-      actual.debug.handshake must beSome.which { handshake =>
+      actual.debug.handshake must beSome.which  handshake =>
         handshake.data must beTrue
         handshake.verbose must beTrue
-      }
       actual.debug.keygen must beTrue
       actual.debug.keymanager must beTrue
       actual.debug.pluggability must beTrue
-      actual.debug.record must beSome.which { record =>
+      actual.debug.record must beSome.which  record =>
         record.packet must beTrue
         record.plaintext must beTrue
-      }
       actual.debug.session must beTrue
       actual.debug.sessioncache must beTrue
       actual.debug.sslctx must beTrue
       actual.debug.trustmanager must beTrue
-    }
 
-    "parse ws.ssl.debug section with all" in new WithApplication() {
+    "parse ws.ssl.debug section with all" in new WithApplication()
       val actual = parseThis("""
                                 |debug = {
                                 |certpath = true
@@ -141,9 +133,8 @@ object SSLConfigParserSpec extends Specification {
 
       // everything else is false, all wins everything.
       actual.debug.all must beTrue
-    }
 
-    "parse ws.ssl.debug section with ssl" in new WithApplication() {
+    "parse ws.ssl.debug section with ssl" in new WithApplication()
       val actual = parseThis("""
                                 |debug = {
                                 |ssl = true
@@ -151,9 +142,8 @@ object SSLConfigParserSpec extends Specification {
                               """.stripMargin)
       actual.debug.enabled must beTrue
       actual.debug.ssl must beTrue
-    }
 
-    "parse ws.ssl.trustBuilder section" in new WithApplication() {
+    "parse ws.ssl.trustBuilder section" in new WithApplication()
       val info = parseThis("""
                               |trustManager = {
                               |  algorithm = "trustme"
@@ -168,9 +158,8 @@ object SSLConfigParserSpec extends Specification {
       val tsi = tmc.trustStoreConfigs(0)
       tsi.filePath must beSome.which(_ must beEqualTo("trusted"))
       tsi.storeType must_== "storeType"
-    }
 
-    "parse ws.ssl.keyManager section" in new WithApplication() {
+    "parse ws.ssl.keyManager section" in new WithApplication()
       val info =
         parseThis("""
                               |keyManager = {
@@ -193,14 +182,12 @@ object SSLConfigParserSpec extends Specification {
       val fileStoreConfig = kmc.keyStoreConfigs(0)
       fileStoreConfig.filePath must beSome.which(_ must beEqualTo("cacerts"))
       fileStoreConfig.storeType must_== "storeType"
-      fileStoreConfig.password must beSome.which {
+      fileStoreConfig.password must beSome.which
         _ must beEqualTo("password1")
-      }
       val stringStoreConfig = kmc.keyStoreConfigs(1)
       stringStoreConfig.data must beSome.which(_ must beEqualTo("data"))
-    }
 
-    "fail on ws.ssl.keyManager with no path defined" in new WithApplication() {
+    "fail on ws.ssl.keyManager with no path defined" in new WithApplication()
       parseThis("""
                    |keyManager = {
                    |  algorithm = "keyStore"
@@ -209,6 +196,3 @@ object SSLConfigParserSpec extends Specification {
                    |  ]
                    |}
                  """.stripMargin).must(throwAn[AssertionError])
-    }
-  }
-}

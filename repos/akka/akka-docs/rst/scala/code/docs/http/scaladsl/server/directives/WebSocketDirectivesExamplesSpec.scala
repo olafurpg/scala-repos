@@ -15,10 +15,10 @@ import docs.http.scaladsl.server.RoutingSpec
 import akka.http.scaladsl.model.ws.{TextMessage, Message, BinaryMessage}
 import akka.http.scaladsl.testkit.WSProbe
 
-class WebSocketDirectivesExamplesSpec extends RoutingSpec {
-  "greeter-service" in {
+class WebSocketDirectivesExamplesSpec extends RoutingSpec
+  "greeter-service" in
     def greeter: Flow[Message, Message, Any] =
-      Flow[Message].mapConcat {
+      Flow[Message].mapConcat
         case tm: TextMessage ⇒
           TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
                 .single("!")) :: Nil
@@ -26,17 +26,15 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
           Nil
-      }
-    val websocketRoute = path("greeter") {
+    val websocketRoute = path("greeter")
       handleWebSocketMessages(greeter)
-    }
 
     // tests:
     // create a testing probe representing the client-side
     val wsClient = WSProbe()
 
     // WS creates a WebSocket request for testing
-    WS("/greeter", wsClient.flow) ~> websocketRoute ~> check {
+    WS("/greeter", wsClient.flow) ~> websocketRoute ~> check
       // check response for WS Upgrade headers
       isWebSocketUpgrade shouldEqual true
 
@@ -52,12 +50,10 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
 
       wsClient.sendCompletion()
       wsClient.expectCompletion()
-    }
-  }
 
-  "handle-multiple-protocols" in {
+  "handle-multiple-protocols" in
     def greeterService: Flow[Message, Message, Any] =
-      Flow[Message].mapConcat {
+      Flow[Message].mapConcat
         case tm: TextMessage ⇒
           TextMessage(Source.single("Hello ") ++ tm.textStream ++ Source
                 .single("!")) :: Nil
@@ -65,7 +61,6 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
           // ignore binary messages but drain content to avoid the stream being clogged
           bm.dataStream.runWith(Sink.ignore)
           Nil
-      }
 
     def echoService: Flow[Message, Message, Any] =
       Flow[Message]
@@ -73,17 +68,16 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
         .buffer(1, OverflowStrategy.backpressure)
 
     def websocketMultipleProtocolRoute =
-      path("services") {
+      path("services")
         handleWebSocketMessagesForProtocol(greeterService, "greeter") ~ handleWebSocketMessagesForProtocol(
             echoService, "echo")
-      }
 
     // tests:
     val wsClient = WSProbe()
 
     // WS creates a WebSocket request for testing
-    WS("/services", wsClient.flow, List("other", "echo")) ~> websocketMultipleProtocolRoute ~> check {
-      expectWebSocketUpgradeWithProtocol { protocol ⇒
+    WS("/services", wsClient.flow, List("other", "echo")) ~> websocketMultipleProtocolRoute ~> check
+      expectWebSocketUpgradeWithProtocol  protocol ⇒
         protocol shouldEqual "echo"
 
         wsClient.sendMessage("Peter")
@@ -97,7 +91,3 @@ class WebSocketDirectivesExamplesSpec extends RoutingSpec {
 
         wsClient.sendCompletion()
         wsClient.expectCompletion()
-      }
-    }
-  }
-}

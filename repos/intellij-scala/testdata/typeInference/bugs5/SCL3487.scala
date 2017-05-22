@@ -1,4 +1,4 @@
-object SCL3487 {
+object SCL3487
   class A[T](val t: T)
   class B[T](val t: T)
   implicit val a: A[String] = new A("text")
@@ -7,5 +7,4 @@ object SCL3487 {
 
   /*start*/
   foo /*end*/
-}
 //(String, Int)

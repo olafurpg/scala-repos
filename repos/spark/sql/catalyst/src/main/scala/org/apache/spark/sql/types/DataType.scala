@@ -31,7 +31,7 @@ import org.apache.spark.util.Utils
   * The base type of all Spark SQL data types.
   */
 @DeveloperApi
-abstract class DataType extends AbstractDataType {
+abstract class DataType extends AbstractDataType
 
   /**
     * Enables matching against DataType for expressions:
@@ -48,13 +48,12 @@ abstract class DataType extends AbstractDataType {
   def defaultSize: Int
 
   /** Name of the type used in JSON serialization. */
-  def typeName: String = {
+  def typeName: String =
     this.getClass.getSimpleName
       .stripSuffix("$")
       .stripSuffix("Type")
       .stripSuffix("UDT")
       .toLowerCase
-  }
 
   private[sql] def jsonValue: JValue = typeName
 
@@ -95,13 +94,12 @@ abstract class DataType extends AbstractDataType {
 
   override private[sql] def acceptsType(other: DataType): Boolean =
     sameType(other)
-}
 
-object DataType {
+object DataType
 
   def fromJson(json: String): DataType = parseDataType(parse(json))
 
-  private val nonDecimalNameToType = {
+  private val nonDecimalNameToType =
     Seq(NullType,
         DateType,
         TimestampType,
@@ -115,29 +113,24 @@ object DataType {
         ByteType,
         StringType,
         CalendarIntervalType).map(t => t.typeName -> t).toMap
-  }
 
   /** Given the string representation of a type, return its DataType */
-  private def nameToType(name: String): DataType = {
+  private def nameToType(name: String): DataType =
     val FIXED_DECIMAL = """decimal\(\s*(\d+)\s*,\s*(\-?\d+)\s*\)""".r
-    name match {
+    name match
       case "decimal" => DecimalType.USER_DEFAULT
       case FIXED_DECIMAL(precision, scale) =>
         DecimalType(precision.toInt, scale.toInt)
       case other => nonDecimalNameToType(other)
-    }
-  }
 
-  private object JSortedObject {
+  private object JSortedObject
     def unapplySeq(value: JValue): Option[List[(String, JValue)]] =
-      value match {
+      value match
         case JObject(seq) => Some(seq.toList.sortBy(_._1))
         case _ => None
-      }
-  }
 
   // NOTE: Map fields must be sorted in alphabetical order to keep consistent with the Python side.
-  private[sql] def parseDataType(json: JValue): DataType = json match {
+  private[sql] def parseDataType(json: JValue): DataType = json match
     case JString(name) =>
       nameToType(name)
 
@@ -172,9 +165,8 @@ object DataType {
                        ("sqlType", v: JValue),
                        ("type", JString("udt"))) =>
       new PythonUserDefinedType(parseDataType(v), pyClass, serialized)
-  }
 
-  private def parseStructField(json: JValue): StructField = json match {
+  private def parseStructField(json: JValue): StructField = json match
     case JSortedObject(("metadata", metadata: JObject),
                        ("name", JString(name)),
                        ("nullable", JBool(nullable)),
@@ -188,11 +180,10 @@ object DataType {
                        ("nullable", JBool(nullable)),
                        ("type", dataType: JValue)) =>
       StructField(name, parseDataType(dataType), nullable)
-  }
 
   protected[types] def buildFormattedString(
-      dataType: DataType, prefix: String, builder: StringBuilder): Unit = {
-    dataType match {
+      dataType: DataType, prefix: String, builder: StringBuilder): Unit =
+    dataType match
       case array: ArrayType =>
         array.buildFormattedString(prefix, builder)
       case struct: StructType =>
@@ -200,15 +191,13 @@ object DataType {
       case map: MapType =>
         map.buildFormattedString(prefix, builder)
       case _ =>
-    }
-  }
 
   /**
     * Compares two types, ignoring nullability of ArrayType, MapType, StructType.
     */
   private[types] def equalsIgnoreNullability(
-      left: DataType, right: DataType): Boolean = {
-    (left, right) match {
+      left: DataType, right: DataType): Boolean =
+    (left, right) match
       case (ArrayType(leftElementType, _), ArrayType(rightElementType, _)) =>
         equalsIgnoreNullability(leftElementType, rightElementType)
       case (MapType(leftKeyType, leftValueType, _),
@@ -217,13 +206,10 @@ object DataType {
         equalsIgnoreNullability(leftValueType, rightValueType)
       case (StructType(leftFields), StructType(rightFields)) =>
         leftFields.length == rightFields.length &&
-        leftFields.zip(rightFields).forall {
+        leftFields.zip(rightFields).forall
           case (l, r) =>
             l.name == r.name && equalsIgnoreNullability(l.dataType, r.dataType)
-        }
       case (l, r) => l == r
-    }
-  }
 
   /**
     * Compares two types, ignoring compatible nullability of ArrayType, MapType, StructType.
@@ -240,8 +226,8 @@ object DataType {
     *   of `fromField.nullable` and `toField.nullable` are false.
     */
   private[sql] def equalsIgnoreCompatibleNullability(
-      from: DataType, to: DataType): Boolean = {
-    (from, to) match {
+      from: DataType, to: DataType): Boolean =
+    (from, to) match
       case (ArrayType(fromElement, fn), ArrayType(toElement, tn)) =>
         (tn || !fn) &&
         equalsIgnoreCompatibleNullability(fromElement, toElement)
@@ -252,15 +238,11 @@ object DataType {
 
       case (StructType(fromFields), StructType(toFields)) =>
         fromFields.length == toFields.length &&
-        fromFields.zip(toFields).forall {
+        fromFields.zip(toFields).forall
           case (fromField, toField) =>
             fromField.name == toField.name &&
             (toField.nullable || !fromField.nullable) &&
             equalsIgnoreCompatibleNullability(fromField.dataType,
                                               toField.dataType)
-        }
 
       case (fromDataType, toDataType) => fromDataType == toDataType
-    }
-  }
-}

@@ -15,7 +15,7 @@ class AdaDeltaGradientDescent[T](rho: Double,
     implicit vspace: MutableFiniteCoordinateField[T, _, Double],
     rand: RandBasis = Rand)
     extends StochasticGradientDescent[T](
-        1d, maxIter, tolerance, minImprovementWindow) {
+        1d, maxIter, tolerance, minImprovementWindow)
 
   val epsilon = 1e-6
   import vspace._
@@ -23,15 +23,14 @@ class AdaDeltaGradientDescent[T](rho: Double,
   case class History(avgSqGradient: T, avgSqDelta: T)
 
   override protected def initialHistory(
-      f: StochasticDiffFunction[T], init: T): History = {
+      f: StochasticDiffFunction[T], init: T): History =
     History(zeroLike(init), zeroLike(init))
-  }
 
   override protected def updateHistory(newX: T,
                                        newGrad: T,
                                        newVal: Double,
                                        f: StochasticDiffFunction[T],
-                                       oldState: State): History = {
+                                       oldState: State): History =
     val oldAvgSqGradient = oldState.history.avgSqGradient
     val newAvgSqGradient =
       (oldAvgSqGradient * rho) + ((newGrad :* newGrad) * (1 - rho))
@@ -41,9 +40,8 @@ class AdaDeltaGradientDescent[T](rho: Double,
     val newAvgSqDelta = (oldAvgSqDelta * rho) + ((delta :* delta) * (1 - rho))
 
     History(newAvgSqGradient, newAvgSqDelta)
-  }
 
-  override protected def takeStep(state: State, dir: T, stepSize: Double): T = {
+  override protected def takeStep(state: State, dir: T, stepSize: Double): T =
     val newAvgSqGradient =
       (state.history.avgSqGradient * rho) :+
       ((state.grad :* state.grad) * (1 - rho))
@@ -51,14 +49,10 @@ class AdaDeltaGradientDescent[T](rho: Double,
     val rmsDelta = sqrt(state.history.avgSqDelta + epsilon)
     val delta = dir :* rmsDelta :/ rmsGradient
     state.x + delta
-  }
 
   override def determineStepSize(
-      state: State, f: StochasticDiffFunction[T], dir: T) = {
+      state: State, f: StochasticDiffFunction[T], dir: T) =
     defaultStepSize
-  }
 
-  override protected def adjust(newX: T, newGrad: T, newVal: Double) = {
+  override protected def adjust(newX: T, newGrad: T, newVal: Double) =
     newVal -> newGrad
-  }
-}

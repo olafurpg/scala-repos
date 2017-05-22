@@ -1,7 +1,7 @@
 import scala.tools.nsc.doc.model._
 import scala.tools.partest.ScaladocModelTest
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code =
     """
@@ -11,7 +11,7 @@ object Test extends ScaladocModelTest {
   // no need for special settings
   def scaladocSettings = ""
 
-  def testModel(rootPackage: Package) = {
+  def testModel(rootPackage: Package) =
     import access._
     val comment = rootPackage
       ._class("Docable")
@@ -20,5 +20,3 @@ object Test extends ScaladocModelTest {
       .map(_.body.toString.trim)
       .getOrElse("")
     assert(comment.contains("Doc"), comment)
-  }
-}

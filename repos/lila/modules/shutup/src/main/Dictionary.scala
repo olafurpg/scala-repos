@@ -5,7 +5,7 @@ package lila.shutup
   * - words are automatically leetified. "tit" will also match "t1t", "t-i-t", and more.
   * - words do not partial match. "anal" will NOT match "analysis".
   */
-private object Dictionary {
+private object Dictionary
 
   def en: List[String] =
     dict("""
@@ -166,4 +166,3 @@ wog
 """)
 
   private def dict(words: String) = words.lines.filter(_.nonEmpty).toList
-}

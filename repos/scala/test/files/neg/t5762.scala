@@ -1,11 +1,10 @@
 class D[-A]
 
-object Test {
+object Test
   var bippy: Boolean = true
-  def f1(x: D[Int with String]) = x match {
+  def f1(x: D[Int with String]) = x match
     case _: D[Int] if bippy => 1
     case _: D[String] => 2
-  }
   // Correctly warns:
   //
   // a.scala:5: warning: non variable type-argument Int in type pattern D[Int] is unchecked since it is eliminated by erasure
@@ -16,9 +15,7 @@ object Test {
   //             ^
   // two warnings found
 
-  def f2(x: D[D[Int] with D[String]]) = x match {
+  def f2(x: D[D[Int] with D[String]]) = x match
     case _: D[D[Int]] if bippy => 1
     case _: D[D[String]] => 2
-  }
   // No warnings!
-}

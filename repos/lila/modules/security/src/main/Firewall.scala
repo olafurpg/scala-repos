@@ -17,7 +17,7 @@ import lila.db.api._
 import tube.firewallTube
 
 final class Firewall(
-    cookieName: Option[String], enabled: Boolean, cachedIpsTtl: Duration) {
+    cookieName: Option[String], enabled: Boolean, cachedIpsTtl: Duration)
 
   // def requestHandler(req: RequestHeader): Fu[Option[Handler]] =
   //   cookieName.filter(_ => enabled) ?? { cn =>
@@ -30,37 +30,33 @@ final class Firewall(
   //   }
 
   def blocks(req: RequestHeader): Fu[Boolean] =
-    if (enabled) {
-      cookieName.fold(blocksIp(req.remoteAddress)) { cn =>
+    if (enabled)
+      cookieName.fold(blocksIp(req.remoteAddress))  cn =>
         blocksIp(req.remoteAddress) map (_ || blocksCookies(req.cookies, cn))
-      } addEffect { v =>
+      addEffect  v =>
         if (v) lila.mon.security.firewall.block()
-      }
-    } else fuccess(false)
+    else fuccess(false)
 
   def accepts(req: RequestHeader): Fu[Boolean] = blocks(req) map (!_)
 
-  def blockIp(ip: String): Funit = validIp(ip) ?? {
+  def blockIp(ip: String): Funit = validIp(ip) ??
     $update(Json.obj("_id" -> ip),
             Json.obj("_id" -> ip, "date" -> $date(DateTime.now)),
             upsert = true) >>- refresh
-  }
 
   def unblockIps(ips: Iterable[String]): Funit =
     $remove($select.byIds(ips filter validIp)) >>- refresh
 
   private def infectCookie(name: String)(implicit req: RequestHeader) =
-    Action {
+    Action
       logger.info("Infect cookie " + formatReq(req))
       val cookie = LilaCookie.cookie(name, Random nextStringUppercase 32)
       Redirect("/") withCookies cookie
-    }
 
   def blocksIp(ip: String): Fu[Boolean] = ips contains ip
 
-  private def refresh {
+  private def refresh
     ips.clear
-  }
 
   private def formatReq(req: RequestHeader) =
     "%s %s %s".format(
@@ -78,7 +74,7 @@ final class Firewall(
 
   private type IP = Vector[Byte]
 
-  private lazy val ips = new {
+  private lazy val ips = new
     private val cache: Cache[Set[IP]] = LruCache(timeToLive = cachedIpsTtl)
     private def strToIp(ip: String) =
       InetAddress.getByName(ip).getAddress.toVector
@@ -86,10 +82,7 @@ final class Firewall(
     def clear { cache.clear }
     def contains(ip: String) = apply map (_ contains strToIp(ip))
     def fetch: Fu[Set[IP]] =
-      firewallTube.coll.distinct("_id") map { res =>
+      firewallTube.coll.distinct("_id") map  res =>
         lila.db.BSON.asStringSet(res) map strToIp
-      } addEffect { ips =>
+      addEffect  ips =>
         lila.mon.security.firewall.ip(ips.size)
-      }
-  }
-}

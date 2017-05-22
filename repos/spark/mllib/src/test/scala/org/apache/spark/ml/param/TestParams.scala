@@ -22,7 +22,7 @@ import org.apache.spark.ml.util.Identifiable
 
 /** A subclass of Params for testing. */
 class TestParams(override val uid: String)
-    extends Params with HasHandleInvalid with HasMaxIter with HasInputCol {
+    extends Params with HasHandleInvalid with HasMaxIter with HasInputCol
 
   def this() = this(Identifiable.randomUID("testParams"))
 
@@ -35,4 +35,3 @@ class TestParams(override val uid: String)
   def clearMaxIter(): this.type = clear(maxIter)
 
   override def copy(extra: ParamMap): TestParams = defaultCopy(extra)
-}

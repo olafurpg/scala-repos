@@ -7,7 +7,7 @@ import lila.common.PimpedConfig._
 
 final class Env(config: Config,
                 scheduler: lila.common.Scheduler,
-                messageApi: lila.message.Api) {
+                messageApi: lila.message.Api)
 
   private val PrismicApiUrl = config getString "prismic.api_url"
   private val PrismicCollection = config getString "prismic.collection"
@@ -29,22 +29,16 @@ final class Env(config: Config,
       lastPostCache = lastPostCache,
       lichessUserId = NotifySender)
 
-  {
     import scala.concurrent.duration._
 
-    scheduler.effect(NotifyDelay, "blog: notify check") {
+    scheduler.effect(NotifyDelay, "blog: notify check")
       notifier.apply
-    }
-    scheduler.once(1 minute) {
+    scheduler.once(1 minute)
       notifier.apply
-    }
-  }
-}
 
-object Env {
+object Env
 
   lazy val current: Env =
     "blog" boot new Env(config = lila.common.PlayApp loadConfig "blog",
                         scheduler = lila.common.PlayApp.scheduler,
                         messageApi = lila.message.Env.current.api)
-}

@@ -3,18 +3,17 @@ package org.jetbrains.plugins.scala.codeInsight.intention.types
 import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
 
 class ConvertJavaToScalaCollectionIntentionTest
-    extends ScalaIntentionTestBase {
+    extends ScalaIntentionTestBase
   def familyName: String = ConvertJavaToScalaCollectionIntention.getFamilyName
 
-  def testIntentionIsAvailable() {
+  def testIntentionIsAvailable()
     checkIntentionIsAvailable("""
         |class UsesJavaCollections {
         |  val list = new java.util.ArrayList<caret>[String]()
         |}
       """)
-  }
 
-  def testIntentionIsAvailable_Iterable() {
+  def testIntentionIsAvailable_Iterable()
     checkIntentionIsAvailable(
         """
         |class UsesJavaCollections {
@@ -23,9 +22,8 @@ class ConvertJavaToScalaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Collection() {
+  def testIntentionIsAvailable_Collection()
     checkIntentionIsAvailable(
         """
         |class UsesJavaCollections {
@@ -34,9 +32,8 @@ class ConvertJavaToScalaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsAvailable_Iterator() {
+  def testIntentionIsAvailable_Iterator()
     checkIntentionIsAvailable(
         """
         |class UsesJavaCollections {
@@ -44,9 +41,8 @@ class ConvertJavaToScalaCollectionIntentionTest
         |}
       """
     )
-  }
 
-  def testIntentionIsNotAvailable() {
+  def testIntentionIsNotAvailable()
     checkIntentionIsNotAvailable("""
         |import scala.collection.JavaConverters._
         |
@@ -54,9 +50,8 @@ class ConvertJavaToScalaCollectionIntentionTest
         |  val list = new java.util.ArrayList<caret>[String]().asScala
         |}
       """)
-  }
 
-  def testIntentionAction_Simple() {
+  def testIntentionAction_Simple()
     val text = """
         |class UsesJavaCollections {
         |  val list = new java.util.HashMap<caret>[String, Int]()
@@ -72,9 +67,8 @@ class ConvertJavaToScalaCollectionIntentionTest
       """
 
     doTest(text, resultText)
-  }
 
-  def testIntentionAction_Import_Already_Exists() {
+  def testIntentionAction_Import_Already_Exists()
     val text = """
         |import java.util
         |
@@ -96,5 +90,3 @@ class ConvertJavaToScalaCollectionIntentionTest
       """
 
     doTest(text, resultText)
-  }
-}

@@ -3,7 +3,7 @@ package laws
 
 import cats.syntax.all._
 
-trait AlternativeLaws[F[_]] extends ApplicativeLaws[F] with MonoidKLaws[F] {
+trait AlternativeLaws[F[_]] extends ApplicativeLaws[F] with MonoidKLaws[F]
   implicit override def F: Alternative[F]
   implicit def algebra[A]: Monoid[F[A]] = F.algebra[A]
 
@@ -17,9 +17,7 @@ trait AlternativeLaws[F[_]] extends ApplicativeLaws[F] with MonoidKLaws[F] {
   def alternativeRightDistributivity[A, B](
       fa: F[A], ff: F[A => B], fg: F[A => B]): IsEq[F[B]] =
     ((ff |+| fg) ap fa) <-> ((ff ap fa) |+| (fg ap fa))
-}
 
-object AlternativeLaws {
+object AlternativeLaws
   def apply[F[_]](implicit ev: Alternative[F]): AlternativeLaws[F] =
     new AlternativeLaws[F] { def F: Alternative[F] = ev }
-}

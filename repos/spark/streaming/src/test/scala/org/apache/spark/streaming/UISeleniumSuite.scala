@@ -34,31 +34,26 @@ import org.apache.spark.ui.SparkUICssErrorHandler
   */
 class UISeleniumSuite
     extends SparkFunSuite with WebBrowser with Matchers with BeforeAndAfterAll
-    with TestSuiteBase {
+    with TestSuiteBase
 
   implicit var webDriver: WebDriver = _
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     super.beforeAll()
-    webDriver = new HtmlUnitDriver {
+    webDriver = new HtmlUnitDriver
       getWebClient.setCssErrorHandler(new SparkUICssErrorHandler)
-    }
-  }
 
-  override def afterAll(): Unit = {
-    try {
-      if (webDriver != null) {
+  override def afterAll(): Unit =
+    try
+      if (webDriver != null)
         webDriver.quit()
-      }
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
 
   /**
     * Create a test SparkStreamingContext with the SparkUI enabled.
     */
-  private def newSparkStreamingContext(): StreamingContext = {
+  private def newSparkStreamingContext(): StreamingContext =
     val conf = new SparkConf()
       .setMaster("local")
       .setAppName("test")
@@ -66,39 +61,33 @@ class UISeleniumSuite
     val ssc = new StreamingContext(conf, Seconds(1))
     assert(ssc.sc.ui.isDefined, "Spark UI is not started!")
     ssc
-  }
 
-  private def setupStreams(ssc: StreamingContext): Unit = {
+  private def setupStreams(ssc: StreamingContext): Unit =
     val rdds = Queue(ssc.sc.parallelize(1 to 4, 4))
     val inputStream = ssc.queueStream(rdds)
-    inputStream.foreachRDD { rdd =>
+    inputStream.foreachRDD  rdd =>
       rdd.foreach(_ => {})
       rdd.foreach(_ => {})
-    }
-    inputStream.foreachRDD { rdd =>
+    inputStream.foreachRDD  rdd =>
       rdd.foreach(_ => {})
-      try {
+      try
         rdd.foreach(_ => throw new RuntimeException("Oops"))
-      } catch {
+      catch
         case e: SparkException if e.getMessage.contains("Oops") =>
-      }
-    }
-  }
 
-  test("attaching and detaching a Streaming tab") {
-    withStreamingContext(newSparkStreamingContext()) { ssc =>
+  test("attaching and detaching a Streaming tab")
+    withStreamingContext(newSparkStreamingContext())  ssc =>
       setupStreams(ssc)
       ssc.start()
 
       val sparkUI = ssc.sparkContext.ui.get
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         go to (sparkUI.appUIAddress.stripSuffix("/"))
         find(cssSelector("""ul li a[href*="streaming"]""")) should not be
         (None)
-      }
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         // check whether streaming page exists
         go to (sparkUI.appUIAddress.stripSuffix("/") + "/streaming")
         val h3Text = findAll(cssSelector("h3")).map(_.text).toSeq
@@ -127,24 +116,22 @@ class UISeleniumSuite
                 "Completed Batches \\(last \\d+ out of \\d+\\)")) should be(
             true)
 
-        findAll(cssSelector("""#active-batches-table th""")).map(_.text).toSeq should be {
+        findAll(cssSelector("""#active-batches-table th""")).map(_.text).toSeq should be
           List("Batch Time",
                "Input Size",
                "Scheduling Delay (?)",
                "Processing Time (?)",
                "Output Ops: Succeeded/Total",
                "Status")
-        }
         findAll(cssSelector("""#completed-batches-table th"""))
           .map(_.text)
-          .toSeq should be {
+          .toSeq should be
           List("Batch Time",
                "Input Size",
                "Scheduling Delay (?)",
                "Processing Time (?)",
                "Total Delay (?)",
                "Output Ops: Succeeded/Total")
-        }
 
         val batchLinks = findAll(cssSelector("""#completed-batches-table a"""))
           .flatMap(_.attribute("href"))
@@ -160,7 +147,7 @@ class UISeleniumSuite
         summaryText should contain("Processing time:")
         summaryText should contain("Total delay:")
 
-        findAll(cssSelector("""#batch-job-table th""")).map(_.text).toSeq should be {
+        findAll(cssSelector("""#batch-job-table th""")).map(_.text).toSeq should be
           List("Output Op Id",
                "Description",
                "Output Op Duration",
@@ -170,7 +157,6 @@ class UISeleniumSuite
                "Stages: Succeeded/Total",
                "Tasks (for all stages): Succeeded/Total",
                "Error")
-        }
 
         // Check we have 2 output op ids
         val outputOpIds = findAll(cssSelector(".output-op-id-cell")).toSeq
@@ -213,20 +199,14 @@ class UISeleniumSuite
         go to
         (sparkUI.appUIAddress.stripSuffix("/") + "/streaming/batch/?id=12345")
         webDriver.getPageSource should include("does not exist")
-      }
 
       ssc.stop(false)
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         go to (sparkUI.appUIAddress.stripSuffix("/"))
         find(cssSelector("""ul li a[href*="streaming"]""")) should be(None)
-      }
 
-      eventually(timeout(10 seconds), interval(50 milliseconds)) {
+      eventually(timeout(10 seconds), interval(50 milliseconds))
         go to (sparkUI.appUIAddress.stripSuffix("/") + "/streaming")
         val h3Text = findAll(cssSelector("h3")).map(_.text).toSeq
         h3Text should not contain ("Streaming Statistics")
-      }
-    }
-  }
-}

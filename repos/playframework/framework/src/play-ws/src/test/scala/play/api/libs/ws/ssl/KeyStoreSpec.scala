@@ -6,11 +6,11 @@ package play.api.libs.ws.ssl
 import org.specs2.mutable._
 import org.specs2.mock.Mockito
 
-class KeyStoreSpec extends Specification with Mockito {
+class KeyStoreSpec extends Specification with Mockito
 
-  "StringBasedKeyStoreBuilder" should {
+  "StringBasedKeyStoreBuilder" should
 
-    "create several certificate" in {
+    "create several certificate" in
       val builder =
         new StringBasedKeyStoreBuilder("""-----BEGIN CERTIFICATE-----
         |MIIDIDCCAomgAwIBAgIENd70zzANBgkqhkiG9w0BAQUFADBOMQswCQYDVQQGEwJV
@@ -65,6 +65,3 @@ class KeyStoreSpec extends Specification with Mockito {
 
       val certs = builder.build()
       certs.size() must be_==(3)
-    }
-  }
-}

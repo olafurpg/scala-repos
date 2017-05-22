@@ -22,7 +22,7 @@ class AccountController
     with GroupManagerAuthenticator with ReadableUsersAuthenticator
     with AccessTokenService with WebHookService with RepositoryCreationService
 
-trait AccountControllerBase extends AccountManagementControllerBase {
+trait AccountControllerBase extends AccountManagementControllerBase
   self: AccountService with RepositoryService with ActivityService with WikiService with LabelsService with SshKeyService with OneselfAuthenticator with UsersAuthenticator with GroupManagerAuthenticator with ReadableUsersAuthenticator with AccessTokenService with WebHookService with RepositoryCreationService =>
 
   case class AccountNewForm(userName: String,
@@ -138,10 +138,10 @@ trait AccountControllerBase extends AccountManagementControllerBase {
   /**
     * Displays user information.
     */
-  get("/:userName") {
+  get("/:userName")
     val userName = params("userName")
-    getAccountByUserName(userName).map { account =>
-      params.getOrElse("tab", "repositories") match {
+    getAccountByUserName(userName).map  account =>
+      params.getOrElse("tab", "repositories") match
         // Public Activity
         case "activity" =>
           gitbucket.core.account.html.activity(account,
@@ -152,19 +152,18 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                                                                    true))
 
         // Members
-        case "members" if (account.isGroupAccount) => {
+        case "members" if (account.isGroupAccount) =>
             val members = getGroupMembers(account.userName)
             gitbucket.core.account.html.members(
                 account,
                 members.map(_.userName),
                 context.loginAccount.exists(x =>
-                      members.exists { member =>
+                      members.exists  member =>
                     member.userName == x.userName && member.isManager
-                }))
-          }
+                ))
 
         // Repositories
-        case _ => {
+        case _ =>
             val members = getGroupMembers(account.userName)
             gitbucket.core.account.html.repositories(
                 account,
@@ -172,43 +171,37 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                   Nil else getGroupsByUserName(userName),
                 getVisibleRepositories(context.loginAccount, Some(userName)),
                 context.loginAccount.exists(x =>
-                      members.exists { member =>
+                      members.exists  member =>
                     member.userName == x.userName && member.isManager
-                }))
-          }
-      }
-    } getOrElse NotFound
-  }
+                ))
+    getOrElse NotFound
 
-  get("/:userName.atom") {
+  get("/:userName.atom")
     val userName = params("userName")
     contentType = "application/atom+xml; type=feed"
     helper.xml.feed(getActivitiesByUser(userName, true))
-  }
 
-  get("/:userName/_avatar") {
+  get("/:userName/_avatar")
     val userName = params("userName")
-    getAccountByUserName(userName).flatMap(_.image).map { image =>
+    getAccountByUserName(userName).flatMap(_.image).map  image =>
       RawData(FileUtil.getMimeType(image),
               new java.io.File(getUserUploadDir(userName), image))
-    } getOrElse {
+    getOrElse
       contentType = "image/png"
       Thread.currentThread.getContextClassLoader
         .getResourceAsStream("noimage.png")
-    }
-  }
 
   get("/:userName/_edit")(
-      oneselfOnly {
+      oneselfOnly
     val userName = params("userName")
-    getAccountByUserName(userName).map { x =>
+    getAccountByUserName(userName).map  x =>
       html.edit(x, flash.get("info"))
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
-  post("/:userName/_edit", editForm)(oneselfOnly { form =>
+  post("/:userName/_edit", editForm)(oneselfOnly  form =>
     val userName = params("userName")
-    getAccountByUserName(userName).map { account =>
+    getAccountByUserName(userName).map  account =>
       updateAccount(account.copy(
               password = form.password.map(sha1).getOrElse(account.password),
               fullName = form.fullName,
@@ -218,13 +211,13 @@ trait AccountControllerBase extends AccountManagementControllerBase {
       updateImage(userName, form.fileId, form.clearImage)
       flash += "info" -> "Account information has been updated."
       redirect(s"/${userName}/_edit")
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
-  get("/:userName/_delete")(oneselfOnly {
+  get("/:userName/_delete")(oneselfOnly
     val userName = params("userName")
 
-    getAccountByUserName(userName, true).foreach {
+    getAccountByUserName(userName, true).foreach
       account =>
 //      // Remove repositories
 //      getRepositoryNamesOfUser(userName).foreach { repositoryName =>
@@ -238,84 +231,77 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
         removeUserRelatedData(userName)
         updateAccount(account.copy(isRemoved = true))
-    }
 
     session.invalidate
     redirect("/")
-  })
+  )
 
   get("/:userName/_ssh")(
-      oneselfOnly {
+      oneselfOnly
     val userName = params("userName")
-    getAccountByUserName(userName).map { x =>
+    getAccountByUserName(userName).map  x =>
       html.ssh(x, getPublicKeys(x.userName))
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
   post("/:userName/_ssh", sshKeyForm)(
-      oneselfOnly { form =>
+      oneselfOnly  form =>
     val userName = params("userName")
     addPublicKey(userName, form.title, form.publicKey)
     redirect(s"/${userName}/_ssh")
-  })
+  )
 
   get("/:userName/_ssh/delete/:id")(
-      oneselfOnly {
+      oneselfOnly
     val userName = params("userName")
     val sshKeyId = params("id").toInt
     deletePublicKey(userName, sshKeyId)
     redirect(s"/${userName}/_ssh")
-  })
+  )
 
-  get("/:userName/_application")(oneselfOnly {
+  get("/:userName/_application")(oneselfOnly
     val userName = params("userName")
-    getAccountByUserName(userName).map {
+    getAccountByUserName(userName).map
       x =>
         var tokens = getAccessTokens(x.userName)
-        val generatedToken = flash.get("generatedToken") match {
-          case Some((tokenId: Int, token: String)) => {
+        val generatedToken = flash.get("generatedToken") match
+          case Some((tokenId: Int, token: String)) =>
               val gt = tokens.find(_.accessTokenId == tokenId)
-              gt.map { t =>
+              gt.map  t =>
                 tokens = tokens.filterNot(_ == t)
                 (t, token)
-              }
-            }
           case _ => None
-        }
         html.application(x, tokens, generatedToken)
-    } getOrElse NotFound
-  })
+    getOrElse NotFound
+  )
 
   post("/:userName/_personalToken", personalTokenForm)(
-      oneselfOnly { form =>
+      oneselfOnly  form =>
     val userName = params("userName")
-    getAccountByUserName(userName).map { x =>
+    getAccountByUserName(userName).map  x =>
       val (tokenId, token) = generateAccessToken(userName, form.note)
       flash += "generatedToken" -> (tokenId, token)
-    }
     redirect(s"/${userName}/_application")
-  })
+  )
 
   get("/:userName/_personalToken/delete/:id")(
-      oneselfOnly {
+      oneselfOnly
     val userName = params("userName")
     val tokenId = params("id").toInt
     deleteAccessToken(userName, tokenId)
     redirect(s"/${userName}/_application")
-  })
+  )
 
-  get("/register") {
-    if (context.settings.allowAccountRegistration) {
-      if (context.loginAccount.isDefined) {
+  get("/register")
+    if (context.settings.allowAccountRegistration)
+      if (context.loginAccount.isDefined)
         redirect("/")
-      } else {
+      else
         html.register()
-      }
-    } else NotFound
-  }
+    else NotFound
 
-  post("/register", newForm) { form =>
-    if (context.settings.allowAccountRegistration) {
+  post("/register", newForm)  form =>
+    if (context.settings.allowAccountRegistration)
       createAccount(form.userName,
                     sha1(form.password),
                     form.fullName,
@@ -324,47 +310,43 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                     form.url)
       updateImage(form.userName, form.fileId, false)
       redirect("/signin")
-    } else NotFound
-  }
+    else NotFound
 
   get("/groups/new")(
-      usersOnly {
+      usersOnly
     html.group(None,
                List(GroupMember("", context.loginAccount.get.userName, true)))
-  })
+  )
 
   post("/groups/new", newGroupForm)(
-      usersOnly { form =>
+      usersOnly  form =>
     createGroup(form.groupName, form.url)
     updateGroupMembers(form.groupName,
                        form.members
                          .split(",")
-                         .map {
-                           _.split(":") match {
+                         .map
+                           _.split(":") match
                              case Array(userName, isManager) =>
                                (userName, isManager.toBoolean)
-                           }
-                         }
                          .toList)
     updateImage(form.groupName, form.fileId, false)
     redirect(s"/${form.groupName}")
-  })
+  )
 
   get("/:groupName/_editgroup")(
-      managersOnly {
-    defining(params("groupName")) { groupName =>
+      managersOnly
+    defining(params("groupName"))  groupName =>
       html.group(getAccountByUserName(groupName, true),
                  getGroupMembers(groupName))
-    }
-  })
+  )
 
-  get("/:groupName/_deletegroup")(managersOnly {
-    defining(params("groupName")) {
+  get("/:groupName/_deletegroup")(managersOnly
+    defining(params("groupName"))
       groupName =>
         // Remove from GROUP_MEMBER
         updateGroupMembers(groupName, Nil)
         // Remove repositories
-        getRepositoryNamesOfUser(groupName).foreach {
+        getRepositoryNamesOfUser(groupName).foreach
           repositoryName =>
             deleteRepository(groupName, repositoryName)
             FileUtils.deleteDirectory(
@@ -373,107 +355,96 @@ trait AccountControllerBase extends AccountManagementControllerBase {
                 getWikiRepositoryDir(groupName, repositoryName))
             FileUtils.deleteDirectory(
                 getTemporaryDir(groupName, repositoryName))
-        }
-    }
     redirect("/")
-  })
+  )
 
-  post("/:groupName/_editgroup", editGroupForm)(managersOnly { form =>
+  post("/:groupName/_editgroup", editGroupForm)(managersOnly  form =>
     defining(params("groupName"),
              form.members
                .split(",")
-               .map {
-                 _.split(":") match {
+               .map
+                 _.split(":") match
                    case Array(userName, isManager) =>
                      (userName, isManager.toBoolean)
-                 }
-               }
-               .toList) {
+               .toList)
       case (groupName, members) =>
-        getAccountByUserName(groupName, true).map {
+        getAccountByUserName(groupName, true).map
           account =>
             updateGroup(groupName, form.url, false)
 
             // Update GROUP_MEMBER
             updateGroupMembers(form.groupName, members)
             // Update COLLABORATOR for group repositories
-            getRepositoryNamesOfUser(form.groupName).foreach {
+            getRepositoryNamesOfUser(form.groupName).foreach
               repositoryName =>
                 removeCollaborators(form.groupName, repositoryName)
-                members.foreach {
+                members.foreach
                   case (userName, isManager) =>
                     addCollaborator(form.groupName, repositoryName, userName)
-                }
-            }
 
             updateImage(form.groupName, form.fileId, form.clearImage)
             redirect(s"/${form.groupName}")
-        } getOrElse NotFound
-    }
-  })
+        getOrElse NotFound
+  )
 
   /**
     * Show the new repository form.
     */
   get("/new")(
-      usersOnly {
+      usersOnly
     html.newrepo(getGroupsByUserName(context.loginAccount.get.userName),
                  context.settings.isCreateRepoOptionPublic)
-  })
+  )
 
   /**
     * Create new repository.
     */
-  post("/new", newRepositoryForm)(usersOnly { form =>
-    LockUtil.lock(s"${form.owner}/${form.name}") {
-      if (getRepository(form.owner, form.name).isEmpty) {
+  post("/new", newRepositoryForm)(usersOnly  form =>
+    LockUtil.lock(s"${form.owner}/${form.name}")
+      if (getRepository(form.owner, form.name).isEmpty)
         createRepository(context.loginAccount.get,
                          form.owner,
                          form.name,
                          form.description,
                          form.isPrivate,
                          form.createReadme)
-      }
 
       // redirect to the repository
       redirect(s"/${form.owner}/${form.name}")
-    }
-  })
+  )
 
-  get("/:owner/:repository/fork")(readableUsersOnly { repository =>
+  get("/:owner/:repository/fork")(readableUsersOnly  repository =>
     val loginAccount = context.loginAccount.get
     val loginUserName = loginAccount.userName
     val groups = getGroupsByUserName(loginUserName)
-    groups match {
+    groups match
       case _: List[String] =>
-        val managerPermissions = groups.map { group =>
+        val managerPermissions = groups.map  group =>
           val members = getGroupMembers(group)
           context.loginAccount.exists(x =>
-                members.exists { member =>
+                members.exists  member =>
               member.userName == x.userName && member.isManager
-          })
-        }
+          )
         helper.html.forkrepository(
             repository,
             (groups zip managerPermissions).toMap
         )
       case _ => redirect(s"/${loginUserName}")
-    }
-  })
+  )
 
-  post("/:owner/:repository/fork", accountForm)(readableUsersOnly {
+  post("/:owner/:repository/fork", accountForm)(readableUsersOnly
     (form, repository) =>
       val loginAccount = context.loginAccount.get
       val loginUserName = loginAccount.userName
       val accountName = form.accountName
 
-      LockUtil.lock(s"${accountName}/${repository.name}") {
+      LockUtil.lock(s"${accountName}/${repository.name}")
         if (getRepository(accountName, repository.name).isDefined ||
             (accountName != loginUserName &&
-                !getGroupsByUserName(loginUserName).contains(accountName))) {
+                !getGroupsByUserName(loginUserName).contains(accountName)))
           // redirect to the repository if repository already exists
           redirect(s"/${accountName}/${repository.name}")
-        } else {
+        else
           // Insert to the database at first
           val originUserName =
             repository.repository.originUserName.getOrElse(repository.owner)
@@ -493,11 +464,9 @@ trait AccountControllerBase extends AccountManagementControllerBase {
 
           // Add collaborators for group repository
           val ownerAccount = getAccountByUserName(accountName).get
-          if (ownerAccount.isGroupAccount) {
-            getGroupMembers(accountName).foreach { member =>
+          if (ownerAccount.isGroupAccount)
+            getGroupMembers(accountName).foreach  member =>
               addCollaborator(accountName, repository.name, member.userName)
-            }
-          }
 
           // Insert default labels
           insertDefaultLabels(accountName, repository.name)
@@ -517,58 +486,44 @@ trait AccountControllerBase extends AccountManagementControllerBase {
               repository.owner, repository.name, loginUserName, accountName)
           // redirect to the repository
           redirect(s"/${accountName}/${repository.name}")
-        }
-      }
-  })
+  )
 
-  private def existsAccount: Constraint = new Constraint() {
+  private def existsAccount: Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
       if (getAccountByUserName(value).isEmpty)
         Some("User or group does not exist.") else None
-  }
 
-  private def uniqueRepository: Constraint = new Constraint() {
+  private def uniqueRepository: Constraint = new Constraint()
     override def validate(name: String,
                           value: String,
                           params: Map[String, String],
                           messages: Messages): Option[String] =
-      params.get("owner").flatMap { userName =>
+      params.get("owner").flatMap  userName =>
         getRepositoryNamesOfUser(userName)
           .find(_ == value)
           .map(_ => "Repository already exists.")
-      }
-  }
 
-  private def members: Constraint = new Constraint() {
-    override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
-      if (value
-            .split(",")
-            .exists {
-              _.split(":") match {
-                case Array(userName, isManager) => isManager.toBoolean
-              }
-            }) None else Some("Must select one manager at least.")
-    }
-  }
-
-  private def validPublicKey: Constraint = new Constraint() {
+  private def members: Constraint = new Constraint()
     override def validate(
         name: String, value: String, messages: Messages): Option[String] =
-      SshUtil.str2PublicKey(value) match {
+      if (value
+            .split(",")
+            .exists
+              _.split(":") match
+                case Array(userName, isManager) => isManager.toBoolean
+            ) None else Some("Must select one manager at least.")
+
+  private def validPublicKey: Constraint = new Constraint()
+    override def validate(
+        name: String, value: String, messages: Messages): Option[String] =
+      SshUtil.str2PublicKey(value) match
         case Some(_) => None
         case None => Some("Key is invalid.")
-      }
-  }
 
-  private def validAccountName: Constraint = new Constraint() {
+  private def validAccountName: Constraint = new Constraint()
     override def validate(
-        name: String, value: String, messages: Messages): Option[String] = {
-      getAccountByUserName(value) match {
+        name: String, value: String, messages: Messages): Option[String] =
+      getAccountByUserName(value) match
         case Some(_) => None
         case None => Some("Invalid Group/User Account.")
-      }
-    }
-  }
-}

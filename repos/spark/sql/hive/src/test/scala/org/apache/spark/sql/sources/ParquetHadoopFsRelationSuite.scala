@@ -27,34 +27,32 @@ import org.apache.spark.sql._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
 
-class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
+class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest
   import testImplicits._
 
   override val dataSourceName: String = "parquet"
 
   // Parquet does not play well with NullType.
   override protected def supportsDataType(dataType: DataType): Boolean =
-    dataType match {
+    dataType match
       case _: NullType => false
       case _: CalendarIntervalType => false
       case _ => true
-    }
 
   test(
-      "save()/load() - partitioned table - simple queries - partition columns in data") {
-    withTempDir { file =>
+      "save()/load() - partitioned table - simple queries - partition columns in data")
+    withTempDir  file =>
       val basePath = new Path(file.getCanonicalPath)
       val fs = basePath.getFileSystem(SparkHadoopUtil.get.conf)
       val qualifiedBasePath = fs.makeQualified(basePath)
 
-      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar")) {
+      for (p1 <- 1 to 2; p2 <- Seq("foo", "bar"))
         val partitionDir = new Path(qualifiedBasePath, s"p1=$p1/p2=$p2")
         sparkContext
           .parallelize(for (i <- 1 to 3) yield (i, s"val_$i", p1))
           .toDF("a", "b", "p1")
           .write
           .parquet(partitionDir.toString)
-      }
 
       val dataSchemaWithPartition = StructType(
           dataSchema.fields :+ StructField("p1", IntegerType, nullable = true))
@@ -63,11 +61,9 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
             .format(dataSourceName)
             .option("dataSchema", dataSchemaWithPartition.json)
             .load(file.getCanonicalPath))
-    }
-  }
 
-  test("SPARK-7868: _temporary directories should be ignored") {
-    withTempPath { dir =>
+  test("SPARK-7868: _temporary directories should be ignored")
+    withTempPath  dir =>
       val df = Seq("a", "b", "c").zipWithIndex.toDF()
 
       df.write.format("parquet").save(dir.getCanonicalPath)
@@ -77,12 +73,10 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
       checkAnswer(
           hiveContext.read.format("parquet").load(dir.getCanonicalPath),
           df.collect())
-    }
-  }
 
   test(
-      "SPARK-8014: Avoid scanning output directory when SaveMode isn't SaveMode.Append") {
-    withTempDir { dir =>
+      "SPARK-8014: Avoid scanning output directory when SaveMode isn't SaveMode.Append")
+    withTempDir  dir =>
       val path = dir.getCanonicalPath
       val df = Seq(1 -> "a").toDF()
 
@@ -97,21 +91,18 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       // This should only complain that the destination directory already exists, rather than file
       // "empty" is not a Parquet file.
-      assert {
-        intercept[AnalysisException] {
+      assert
+        intercept[AnalysisException]
           df.write.format("parquet").mode(SaveMode.ErrorIfExists).save(path)
-        }.getMessage.contains("already exists")
-      }
+        .getMessage.contains("already exists")
 
       // This shouldn't throw anything.
       df.write.format("parquet").mode(SaveMode.Overwrite).save(path)
       checkAnswer(hiveContext.read.format("parquet").load(path), df)
-    }
-  }
 
-  test("SPARK-8079: Avoid NPE thrown from BaseWriterContainer.abortJob") {
-    withTempPath { dir =>
-      intercept[AnalysisException] {
+  test("SPARK-8079: Avoid NPE thrown from BaseWriterContainer.abortJob")
+    withTempPath  dir =>
+      intercept[AnalysisException]
         // Parquet doesn't allow field names with spaces.  Here we are intentionally making an
         // exception thrown from the `ParquetRelation2.prepareForWriteJob()` method to trigger
         // the bug.  Please refer to spark-8079 for more details.
@@ -121,13 +112,10 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
           .write
           .format("parquet")
           .save(dir.getCanonicalPath)
-      }
-    }
-  }
 
   test(
-      "SPARK-8604: Parquet data source should write summary file while doing appending") {
-    withTempPath { dir =>
+      "SPARK-8604: Parquet data source should write summary file while doing appending")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
       val df = sqlContext.range(0, 5).toDF()
       df.write.mode(SaveMode.Overwrite).parquet(path)
@@ -144,11 +132,9 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
 
       assert(fs.exists(summaryPath))
       assert(fs.exists(commonSummaryPath))
-    }
-  }
 
-  test("SPARK-10334 Projections and filters should be kept in physical plan") {
-    withTempPath { dir =>
+  test("SPARK-10334 Projections and filters should be kept in physical plan")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
       sqlContext
@@ -164,14 +150,12 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
           physicalPlan.collect { case p: execution.Project => p }.length === 1)
       assert(
           physicalPlan.collect { case p: execution.Filter => p }.length === 1)
-    }
-  }
 
   test(
-      "SPARK-11500: Not deterministic order of columns when using merging schemas.") {
+      "SPARK-11500: Not deterministic order of columns when using merging schemas.")
     import testImplicits._
-    withSQLConf(SQLConf.PARQUET_SCHEMA_MERGING_ENABLED.key -> "true") {
-      withTempPath { dir =>
+    withSQLConf(SQLConf.PARQUET_SCHEMA_MERGING_ENABLED.key -> "true")
+      withTempPath  dir =>
         val pathOne = s"${dir.getCanonicalPath}/part=1"
         Seq(1, 1).zipWithIndex.toDF("a", "b").write.parquet(pathOne)
         val pathTwo = s"${dir.getCanonicalPath}/part=2"
@@ -184,12 +168,9 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         assert(
             sqlContext.read.parquet(dir.getCanonicalPath).schema.map(_.name) === Seq(
                 "a", "b", "c", "d", "part"))
-      }
-    }
-  }
 
-  test(s"SPARK-13537: Fix readBytes in VectorizedPlainValuesReader") {
-    withTempPath { file =>
+  test(s"SPARK-13537: Fix readBytes in VectorizedPlainValuesReader")
+    withTempPath  file =>
       val path = file.getCanonicalPath
 
       val schema = new StructType()
@@ -225,13 +206,11 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
         .orderBy("index")
 
       checkAnswer(loadedDF, df)
-    }
-  }
 
   test(
-      "SPARK-13543: Support for specifying compression codec for Parquet via option()") {
-    withSQLConf(SQLConf.PARQUET_COMPRESSION.key -> "UNCOMPRESSED") {
-      withTempPath { dir =>
+      "SPARK-13543: Support for specifying compression codec for Parquet via option()")
+    withSQLConf(SQLConf.PARQUET_COMPRESSION.key -> "UNCOMPRESSED")
+      withTempPath  dir =>
         val path = s"${dir.getCanonicalPath}/table1"
         val df = (1 to 5).map(i => (i, (i % 2).toString)).toDF("a", "b")
         df.write.option("compression", "GzIP").parquet(path)
@@ -241,7 +220,3 @@ class ParquetHadoopFsRelationSuite extends HadoopFsRelationTest {
 
         val copyDf = sqlContext.read.parquet(path)
         checkAnswer(df, copyDf)
-      }
-    }
-  }
-}

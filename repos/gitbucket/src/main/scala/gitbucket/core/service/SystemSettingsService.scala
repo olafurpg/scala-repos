@@ -7,13 +7,13 @@ import ControlUtil._
 import SystemSettingsService._
 import javax.servlet.http.HttpServletRequest
 
-trait SystemSettingsService {
+trait SystemSettingsService
 
   def baseUrl(implicit request: HttpServletRequest): String =
     loadSystemSettings().baseUrl(request)
 
-  def saveSystemSettings(settings: SystemSettings): Unit = {
-    defining(new java.util.Properties()) { props =>
+  def saveSystemSettings(settings: SystemSettings): Unit =
+    defining(new java.util.Properties())  props =>
       settings.baseUrl.foreach(
           x => props.setProperty(BaseURL, x.replaceFirst("/\\Z", "")))
       settings.information.foreach(x => props.setProperty(Information, x))
@@ -31,8 +31,8 @@ trait SystemSettingsService {
       settings.sshHost.foreach(x => props.setProperty(SshHost, x.trim))
       settings.sshPort.foreach(x => props.setProperty(SshPort, x.toString))
       props.setProperty(UseSMTP, settings.useSMTP.toString)
-      if (settings.useSMTP) {
-        settings.smtp.foreach { smtp =>
+      if (settings.useSMTP)
+        settings.smtp.foreach  smtp =>
           props.setProperty(SmtpHost, smtp.host)
           smtp.port.foreach(x => props.setProperty(SmtpPort, x.toString))
           smtp.user.foreach(props.setProperty(SmtpUser, _))
@@ -40,12 +40,10 @@ trait SystemSettingsService {
           smtp.ssl.foreach(x => props.setProperty(SmtpSsl, x.toString))
           smtp.fromAddress.foreach(props.setProperty(SmtpFromAddress, _))
           smtp.fromName.foreach(props.setProperty(SmtpFromName, _))
-        }
-      }
       props.setProperty(
           LdapAuthentication, settings.ldapAuthentication.toString)
-      if (settings.ldapAuthentication) {
-        settings.ldap.map { ldap =>
+      if (settings.ldapAuthentication)
+        settings.ldap.map  ldap =>
           props.setProperty(LdapHost, ldap.host)
           ldap.port.foreach(x => props.setProperty(LdapPort, x.toString))
           ldap.bindDN.foreach(x => props.setProperty(LdapBindDN, x))
@@ -62,21 +60,14 @@ trait SystemSettingsService {
           ldap.tls.foreach(x => props.setProperty(LdapTls, x.toString))
           ldap.ssl.foreach(x => props.setProperty(LdapSsl, x.toString))
           ldap.keystore.foreach(x => props.setProperty(LdapKeystore, x))
-        }
-      }
-      using(new java.io.FileOutputStream(GitBucketConf)) { out =>
+      using(new java.io.FileOutputStream(GitBucketConf))  out =>
         props.store(out, null)
-      }
-    }
-  }
 
-  def loadSystemSettings(): SystemSettings = {
-    defining(new java.util.Properties()) { props =>
-      if (GitBucketConf.exists) {
-        using(new java.io.FileInputStream(GitBucketConf)) { in =>
+  def loadSystemSettings(): SystemSettings =
+    defining(new java.util.Properties())  props =>
+      if (GitBucketConf.exists)
+        using(new java.io.FileInputStream(GitBucketConf))  in =>
           props.load(in)
-        }
-      }
       SystemSettings(
           getOptionValue[String](props, BaseURL, None)
             .map(x => x.replaceFirst("/\\Z", "")),
@@ -91,7 +82,7 @@ trait SystemSettingsService {
           getOptionValue[String](props, SshHost, None).map(_.trim),
           getOptionValue(props, SshPort, Some(DefaultSshPort)),
           getValue(props, UseSMTP, getValue(props, Notification, false)), // handle migration scenario from only notification to useSMTP
-          if (getValue(props, UseSMTP, getValue(props, Notification, false))) {
+          if (getValue(props, UseSMTP, getValue(props, Notification, false)))
             Some(
                 Smtp(getValue(props, SmtpHost, ""),
                      getOptionValue(props, SmtpPort, Some(DefaultSmtpPort)),
@@ -100,11 +91,11 @@ trait SystemSettingsService {
                      getOptionValue[Boolean](props, SmtpSsl, None),
                      getOptionValue(props, SmtpFromAddress, None),
                      getOptionValue(props, SmtpFromName, None)))
-          } else {
+          else
             None
-          },
+          ,
           getValue(props, LdapAuthentication, false),
-          if (getValue(props, LdapAuthentication, false)) {
+          if (getValue(props, LdapAuthentication, false))
             Some(
                 Ldap(
                     getValue(props, LdapHost, ""),
@@ -119,15 +110,11 @@ trait SystemSettingsService {
                     getOptionValue[Boolean](props, LdapTls, None),
                     getOptionValue[Boolean](props, LdapSsl, None),
                     getOptionValue(props, LdapKeystore, None)))
-          } else {
+          else
             None
-          }
       )
-    }
-  }
-}
 
-object SystemSettingsService {
+object SystemSettingsService
   import scala.reflect.ClassTag
 
   case class SystemSettings(baseUrl: Option[String],
@@ -144,15 +131,14 @@ object SystemSettingsService {
                             useSMTP: Boolean,
                             smtp: Option[Smtp],
                             ldapAuthentication: Boolean,
-                            ldap: Option[Ldap]) {
+                            ldap: Option[Ldap])
     def baseUrl(request: HttpServletRequest): String =
       baseUrl.fold(request.baseUrl)(_.stripSuffix("/"))
 
     def sshAddress: Option[SshAddress] =
-      for {
+      for
         host <- sshHost if ssh
-      } yield SshAddress(host, sshPort.getOrElse(DefaultSshPort))
-  }
+      yield SshAddress(host, sshPort.getOrElse(DefaultSshPort))
 
   case class Ldap(host: String,
                   port: Option[Int],
@@ -217,23 +203,19 @@ object SystemSettingsService {
 
   private def getValue[A : ClassTag](
       props: java.util.Properties, key: String, default: A): A =
-    defining(props.getProperty(key)) { value =>
+    defining(props.getProperty(key))  value =>
       if (value == null || value.isEmpty) default
       else convertType(value).asInstanceOf[A]
-    }
 
   private def getOptionValue[A : ClassTag](props: java.util.Properties,
                                            key: String,
                                            default: Option[A]): Option[A] =
-    defining(props.getProperty(key)) { value =>
+    defining(props.getProperty(key))  value =>
       if (value == null || value.isEmpty) default
       else Some(convertType(value)).asInstanceOf[Option[A]]
-    }
 
   private def convertType[A : ClassTag](value: String) =
-    defining(implicitly[ClassTag[A]].runtimeClass) { c =>
+    defining(implicitly[ClassTag[A]].runtimeClass)  c =>
       if (c == classOf[Boolean]) value.toBoolean
       else if (c == classOf[Int]) value.toInt
       else value
-    }
-}

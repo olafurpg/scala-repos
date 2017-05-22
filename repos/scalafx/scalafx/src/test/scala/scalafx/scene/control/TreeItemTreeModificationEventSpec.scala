@@ -44,8 +44,7 @@ class TreeItemTreeModificationEventSpec[T]
     extends SimpleSFXDelegateSpec[jfxsc.TreeItem.TreeModificationEvent[T],
                                   TreeItem.TreeModificationEvent[T]](
         classOf[jfxsc.TreeItem.TreeModificationEvent[T]],
-        classOf[TreeItem.TreeModificationEvent[T]]) {
+        classOf[TreeItem.TreeModificationEvent[T]])
 
   override def getJavaClassInstance =
     new jfxsc.TreeItem.TreeModificationEvent[T](null, new jfxsc.TreeItem[T])
-}

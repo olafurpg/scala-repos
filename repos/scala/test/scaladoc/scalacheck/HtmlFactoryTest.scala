@@ -5,24 +5,19 @@ import java.net.{URLClassLoader, URLDecoder}
 import scala.collection.mutable
 import scala.xml.NodeSeq
 
-object XMLUtil {
+object XMLUtil
   import scala.xml._
 
-  def stripGroup(seq: Node): Node = {
-    seq match {
-      case group: Group => {
+  def stripGroup(seq: Node): Node =
+    seq match
+      case group: Group =>
           <div class="group">{ group.nodes.map(stripGroup _) }</div>
-        }
-      case e: Elem => {
+      case e: Elem =>
           val child = e.child.map(stripGroup _)
           Elem(e.prefix, e.label, e.attributes, e.scope, child: _*)
-        }
       case _ => seq
-    }
-  }
-}
 
-object Test extends Properties("HtmlFactory") {
+object Test extends Properties("HtmlFactory")
 
   final val RESOURCES = "test/scaladoc/resources/"
 
@@ -30,7 +25,7 @@ object Test extends Properties("HtmlFactory") {
   import scala.tools.nsc.doc.{DocFactory, Settings}
   import scala.tools.nsc.doc.html.HtmlFactory
 
-  def getClasspath = {
+  def getClasspath =
     // these things can be tricky
     // this test previously relied on the assumption that the current thread's classloader is an url classloader and contains all the classpaths
     // does partest actually guarantee this? to quote Leonard Nimoy: The answer, of course, is no.
@@ -40,9 +35,8 @@ object Test extends Properties("HtmlFactory") {
       Thread.currentThread.getContextClassLoader.asInstanceOf[URLClassLoader]
     val paths = loader.getURLs.map(u => URLDecoder.decode(u.getPath))
     paths mkString java.io.File.pathSeparator
-  }
 
-  def createFactory = {
+  def createFactory =
     val settings = new Settings({ Console.err.println(_) })
     settings.scaladocQuietRun = true
     settings.nowarn.value = true
@@ -51,29 +45,23 @@ object Test extends Properties("HtmlFactory") {
 
     val reporter = new scala.tools.nsc.reporters.ConsoleReporter(settings)
     new DocFactory(reporter, settings)
-  }
 
-  def createTemplates(basename: String): collection.Map[String, NodeSeq] = {
+  def createTemplates(basename: String): collection.Map[String, NodeSeq] =
     val result = mutable.Map[String, NodeSeq]()
 
-    createFactory.makeUniverse(Left(List(RESOURCES + basename))) match {
-      case Some(universe) => {
+    createFactory.makeUniverse(Left(List(RESOURCES + basename))) match
+      case Some(universe) =>
           new HtmlFactory(universe, new ScalaDocReporter(universe.settings))
             .writeTemplates((page) =>
-                {
               result += (page.absoluteLinkTo(page.path) -> page.body)
-          })
-        }
+          )
       case _ =>
-    }
 
     result
-  }
 
-  def createTemplate(scala: String) = {
+  def createTemplate(scala: String) =
     val html = scala.stripSuffix(".scala") + ".html"
     createTemplates(scala)(html)
-  }
 
   /**
     * This tests the text without the markup - ex:
@@ -97,20 +85,19 @@ object Test extends Properties("HtmlFactory") {
     * NOTE: Comparison is done ignoring all whitespace
     */
   def checkText(scalaFile: String, debug: Boolean = true)(
-      checks: (Option[String], String, Boolean)*): Boolean = {
+      checks: (Option[String], String, Boolean)*): Boolean =
     val htmlFile = scalaFile.stripSuffix(".scala") + ".html"
     val htmlAllFiles = createTemplates(scalaFile)
     var result = true
 
-    for ((fileHint, check, expected) <- checks) {
+    for ((fileHint, check, expected) <- checks)
       // resolve the file to be checked
-      val fileName = fileHint match {
+      val fileName = fileHint match
         case Some(file) =>
           if (file endsWith ".html") file
           else file + ".html"
         case None =>
           htmlFile
-      }
       val fileTextPretty =
         htmlAllFiles(fileName).text.replace('→', ' ').replaceAll("\\s+", " ")
       val fileText = fileTextPretty.replaceAll(" ", "")
@@ -119,7 +106,7 @@ object Test extends Properties("HtmlFactory") {
       val checkText = checkTextPretty.replaceAll(" ", "")
 
       val checkValue = fileText.contains(checkText) == expected
-      if (debug && (!checkValue)) {
+      if (debug && (!checkValue))
         Console.err.println("")
         Console.err.println(
             "HTML Check failed for resource file " + scalaFile + ":")
@@ -128,73 +115,53 @@ object Test extends Properties("HtmlFactory") {
         Console.err.println(
             "NOTE: The whitespaces are eliminated before matching!")
         Console.err.println("")
-      }
       result &&= checkValue
-    }
 
     result
-  }
 
   def shortComments(root: scala.xml.Node) =
-    XMLUtil.stripGroup(root).descendant.flatMap {
-      case e: scala.xml.Elem => {
-          if (e.attribute("class").toString.contains("shortcomment")) {
+    XMLUtil.stripGroup(root).descendant.flatMap
+      case e: scala.xml.Elem =>
+          if (e.attribute("class").toString.contains("shortcomment"))
             Some(e)
-          } else {
+          else
             None
-          }
-        }
       case _ => None
-    }
 
-  property("Trac #3790") = {
-    createTemplate("Trac3790.scala") match {
-      case node: scala.xml.Node => {
+  property("Trac #3790") =
+    createTemplate("Trac3790.scala") match
+      case node: scala.xml.Node =>
           val comments = shortComments(node)
 
           comments.exists { _.toString.contains(">A lazy String\n</p>") } &&
           comments.exists { _.toString.contains(">A non-lazy String\n</p>") }
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4306") = {
+  property("Trac #4306") =
     val files = createTemplates("Trac4306.scala")
     files("com/example/trac4306/foo/package$$Bar.html") != None
-  }
 
-  property("Trac #4366") = {
-    createTemplate("Trac4366.scala") match {
-      case node: scala.xml.Node => {
-          shortComments(node).exists { n =>
-            {
+  property("Trac #4366") =
+    createTemplate("Trac4366.scala") match
+      case node: scala.xml.Node =>
+          shortComments(node).exists  n =>
               val str = n.toString
               str.contains("<code>foo</code>") && str.contains("</strong>")
-            }
-          }
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4358") = {
-    createTemplate("Trac4358.scala") match {
+  property("Trac #4358") =
+    createTemplate("Trac4358.scala") match
       case node: scala.xml.Node =>
-        !shortComments(node).exists {
+        !shortComments(node).exists
           _.toString.contains("<em>i.</em>")
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4180") = {
+  property("Trac #4180") =
     createTemplate("Trac4180.scala") != None
-  }
 
-  property("Trac #4372") = {
-    createTemplate("Trac4372.scala") match {
-      case node: scala.xml.Node => {
+  property("Trac #4372") =
+    createTemplate("Trac4372.scala") match
+      case node: scala.xml.Node =>
           val html = node.toString
           html.contains(
               "<span title=\"gt4s: $plus$colon\" class=\"name\">+:</span>") &&
@@ -202,79 +169,60 @@ object Test extends Properties("HtmlFactory") {
               "<span title=\"gt4s: $minus$colon\" class=\"name\">-:</span>") &&
           html.contains(
               """<span class="params">(<span name="n">n: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>""")
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4374 - public") = {
+  property("Trac #4374 - public") =
     val files = createTemplates("Trac4374.scala")
-    files("WithPublic.html") match {
-      case node: scala.xml.Node => {
+    files("WithPublic.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains("""href="WithPublic$.html"""") &&
           files.get("WithPublic$.html") != None
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4374 - private") = {
+  property("Trac #4374 - private") =
     val files = createTemplates("Trac4374.scala")
-    files("WithPrivate.html") match {
-      case node: scala.xml.Node => {
+    files("WithPrivate.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           !s.contains("""href="WithPrivate$.html"""") &&
           files.get("WithPrivate$.html") == None
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4325 - files") = {
+  property("Trac #4325 - files") =
     val files = createTemplates("Trac4325.scala")
 
     files.get("WithSynthetic.html") != None &&
     files.get("WithSynthetic$.html") == None &&
     files.get("WithObject.html") != None &&
     files.get("WithObject$.html") != None
-  }
 
-  property("Trac #4325 - Don't link to syntetic companion") = {
+  property("Trac #4325 - Don't link to syntetic companion") =
     val files = createTemplates("Trac4325.scala")
 
-    files("WithSynthetic.html") match {
-      case node: scala.xml.Node => {
+    files("WithSynthetic.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           !s.contains("""href="WithSynthetic$.html"""")
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4325 - Link to companion") = {
+  property("Trac #4325 - Link to companion") =
     val files = createTemplates("Trac4325.scala")
 
-    files("WithObject.html") match {
-      case node: scala.xml.Node => {
+    files("WithObject.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains("""href="WithObject$.html"""")
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4420 - no whitespace at end of line") = {
+  property("Trac #4420 - no whitespace at end of line") =
     val files = createTemplates("Trac4420.scala")
 
-    files("TestA.html") match {
-      case node: scala.xml.Node => {
+    files("TestA.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains("""See YYY for more details""")
-        }
       case _ => false
-    }
-  }
   //
   // property("Trac #484 - refinements and existentials") = {
   //   val files = createTemplates("Trac484.scala")
@@ -297,91 +245,67 @@ object Test extends Properties("HtmlFactory") {
   //   }
   // }
 
-  property("Trac #4289") = {
+  property("Trac #4289") =
     val files = createTemplates("Trac4289.scala")
 
-    files("Subclass.html") match {
-      case node: scala.xml.Node => {
-          node.toString.contains {
+    files("Subclass.html") match
+      case node: scala.xml.Node =>
+          node.toString.contains
             """<dt>returns</dt><dd class="cmt"><p>123</p></dd>"""
-          }
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4409") = {
-    createTemplate("Trac4409.scala") match {
-      case node: scala.xml.Node => {
+  property("Trac #4409") =
+    createTemplate("Trac4409.scala") match
+      case node: scala.xml.Node =>
           !node.toString.contains("""<div class="block"><ol>since""")
-        }
       case _ => false
-    }
-  }
 
-  property("Trac #4452") = {
-    createTemplate("Trac4452.scala") match {
+  property("Trac #4452") =
+    createTemplate("Trac4452.scala") match
       case node: scala.xml.Node =>
         !node.toString.contains(">*")
       case _ => false
-    }
-  }
 
-  property("SI-4421") = {
-    createTemplate("SI_4421.scala") match {
-      case node: scala.xml.Node => {
+  property("SI-4421") =
+    createTemplate("SI_4421.scala") match
+      case node: scala.xml.Node =>
           val html = node.toString
           html.contains(">Example:") && html.contains(">Note<")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4589") = {
-    createTemplate("SI_4589.scala") match {
-      case node: scala.xml.Node => {
+  property("SI-4589") =
+    createTemplate("SI_4589.scala") match
+      case node: scala.xml.Node =>
           val html = node.toString
           html.contains(">x0123456789: <") &&
           html.contains(">x012345678901234567890123456789: <")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4714: Should decode symbolic type alias name.") = {
-    createTemplate("SI_4715.scala") match {
-      case node: scala.xml.Node => {
+  property("SI-4714: Should decode symbolic type alias name.") =
+    createTemplate("SI_4715.scala") match
+      case node: scala.xml.Node =>
           val html = node.toString
           html.contains(">:+:<")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4287: Default arguments of synthesized constructor") = {
+  property("SI-4287: Default arguments of synthesized constructor") =
     val files = createTemplates("SI_4287.scala")
 
-    files("ClassWithSugar.html") match {
-      case node: scala.xml.Node => {
+    files("ClassWithSugar.html") match
+      case node: scala.xml.Node =>
           node.toString.contains(">123<")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4507: Default arguments of synthesized constructor") = {
-    createTemplate("SI_4507.scala") match {
+  property("SI-4507: Default arguments of synthesized constructor") =
+    createTemplate("SI_4507.scala") match
       case node: scala.xml.Node =>
         !node.toString.contains(
             "<li>returns silently when evaluating true and true</li>")
       case _ => false
-    }
-  }
 
-  property("SI-4898: Use cases and links should not crash scaladoc") = {
+  property("SI-4898: Use cases and links should not crash scaladoc") =
     createTemplate("SI_4898.scala")
     true
-  }
 
   property("SI-5054: Use cases should override their original members") = checkText(
       "SI_5054_q1.scala")(
@@ -478,7 +402,7 @@ object Test extends Properties("HtmlFactory") {
        true)
   )
 
-  for (useCaseFile <- List("UseCaseInheritance", "UseCaseOverrideInheritance")) {
+  for (useCaseFile <- List("UseCaseInheritance", "UseCaseOverrideInheritance"))
     property("Comment inheritance: Correct comment inheritance for usecases") = checkText(
         "implicit-inheritance-usecase.scala")(
         (Some(useCaseFile),
@@ -551,7 +475,6 @@ object Test extends Properties("HtmlFactory") {
             """,
          true)
     )
-  }
 
   property("Comment inheritance: Correct explicit inheritance for override") = checkText(
       "explicit-inheritance-override.scala")(
@@ -650,11 +573,11 @@ object Test extends Properties("HtmlFactory") {
       // traits E, F and H shouldn't crash scaladoc but we don't need to check the output
   )
 
-  property("Indentation normalization for code blocks") = {
+  property("Indentation normalization for code blocks") =
     val files = createTemplates("code-indent.scala")
 
-    files("C.html") match {
-      case node: scala.xml.Node => {
+    files("C.html") match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains(
               "<pre>a typicial indented\ncomment on multiple\ncomment lines</pre>") &&
@@ -664,82 +587,64 @@ object Test extends Properties("HtmlFactory") {
               "<pre>a ragged example\na (condition)\n  the t h e n branch\nan alternative\n  the e l s e branch</pre>") &&
           s.contains("<pre>Trait example {\n  Val x = a\n  Val y = b\n}</pre>") &&
           s.contains("<pre>l1\n\nl2\n\nl3\n\nl4\n\nl5</pre>")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4014: Scaladoc omits @author: no authors") = {
+  property("SI-4014: Scaladoc omits @author: no authors") =
     val noAuthors = createTemplates("SI-4014_0.scala")("Foo.html")
 
-    noAuthors match {
-      case node: scala.xml.Node => {
+    noAuthors match
+      case node: scala.xml.Node =>
           val s = node.toString
           !s.contains("Author")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4014: Scaladoc omits @author: one author") = {
+  property("SI-4014: Scaladoc omits @author: one author") =
     val oneAuthor = createTemplates("SI-4014_1.scala")("Foo.html")
 
-    oneAuthor match {
-      case node: scala.xml.Node => {
+    oneAuthor match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains("<h6>Author:</h6>") &&
           s.contains("<p>The Only Author</p>")
-        }
       case _ => false
-    }
-  }
 
-  property("SI-4014: Scaladoc omits @author: two authors") = {
+  property("SI-4014: Scaladoc omits @author: two authors") =
     val twoAuthors = createTemplates("SI-4014_2.scala")("Foo.html")
 
-    twoAuthors match {
-      case node: scala.xml.Node => {
+    twoAuthors match
+      case node: scala.xml.Node =>
           val s = node.toString
           s.contains("<h6>Authors:</h6>") &&
           s.contains("<p>The First Author</p>") &&
           s.contains("<p>The Second Author</p>")
-        }
       case _ => false
-    }
-  }
 
-  {
     val files = createTemplates("basic.scala")
     //println(files)
 
-    property("class") = files.get("com/example/p1/Clazz.html") match {
-      case Some(node: scala.xml.Node) => {
+    property("class") = files.get("com/example/p1/Clazz.html") match
+      case Some(node: scala.xml.Node) =>
           property("implicit conversion") = node.toString contains "<span class=\"modifier\">implicit </span>"
 
           property("gt4s") = node.toString contains "title=\"gt4s: $colon$colon\""
 
           property("gt4s of a deprecated method") = node.toString contains "title=\"gt4s: $colon$colon$colon$colon. Deprecated: "
           true
-        }
       case _ => false
-    }
     property("package") = files.get("com/example/p1/index.html") != None
 
-    property("package object") = files("com/example/p1/index.html") match {
+    property("package object") = files("com/example/p1/index.html") match
       case node: scala.xml.Node =>
         node.toString contains "com.example.p1#packageObjectMethod"
       case _ => false
-    }
 
-    property("lower bound") = files("com/example/p1/LowerBound.html") match {
+    property("lower bound") = files("com/example/p1/LowerBound.html") match
       case node: scala.xml.Node => true
       case _ => false
-    }
 
-    property("upper bound") = files("com/example/p1/UpperBound.html") match {
+    property("upper bound") = files("com/example/p1/UpperBound.html") match
       case node: scala.xml.Node => true
       case _ => false
-    }
 
     property("SI-8514: No inconsistencies") = checkText("SI-8514.scala")(
         (Some("a/index"),
@@ -755,73 +660,63 @@ object Test extends Properties("HtmlFactory") {
          """,
          true)
     )
-  }
 
   // SI-8144
-  {
-    implicit class AttributesAwareNode(val node: NodeSeq) {
+    implicit class AttributesAwareNode(val node: NodeSeq)
 
       def \@(attrName: String): String =
         node \ ("@" + attrName) text
 
       def \@(attrName: String, attrValue: String): NodeSeq =
         node filter { _ \ ("@" + attrName) exists (_.text == attrValue) }
-    }
 
-    implicit class AssertionAwareNode(node: scala.xml.NodeSeq) {
+    implicit class AssertionAwareNode(node: scala.xml.NodeSeq)
 
-      def assertTypeLink(expectedUrl: String): Boolean = {
+      def assertTypeLink(expectedUrl: String): Boolean =
         val linkElement: NodeSeq =
           node \\ "div" \@ ("id", "definition") \\ "span" \@
           ("class", "permalink") \ "a"
         linkElement \@ "href" == expectedUrl
-      }
 
       def assertMemberLink(group: String)(
-          memberName: String, expectedUrl: String): Boolean = {
+          memberName: String, expectedUrl: String): Boolean =
         val linkElement: NodeSeq =
           node \\ "div" \@ ("id", group) \\ "li" \@ ("name", memberName) \\ "span" \@
           ("class", "permalink") \ "a"
         linkElement \@ "href" == expectedUrl
-      }
 
-      def assertValuesLink(memberName: String, expectedUrl: String): Boolean = {
+      def assertValuesLink(memberName: String, expectedUrl: String): Boolean =
         val linkElement: NodeSeq =
           node \\ "div" \@ ("class", "values members") \\ "li" \@
           ("name", memberName) \\ "span" \@ ("class", "permalink") \ "a"
         linkElement \@ "href" == expectedUrl
-      }
-    }
 
     val files = createTemplates("SI-8144.scala")
 
     def check(pagePath: String)(
         f: NodeSeq => org.scalacheck.Prop): org.scalacheck.Prop =
-      files(pagePath) match {
+      files(pagePath) match
         case node: scala.xml.Node => f(XMLUtil.stripGroup(node))
         case _ => false
-      }
 
     property("SI-8144: Members' permalink - inner package") = check(
-        "some/pack/index.html") { node =>
+        "some/pack/index.html")  node =>
       ("type link" |: node.assertTypeLink("../../some/pack/index.html")) &&
       ("member: SomeType (object)" |: node.assertValuesLink(
               "some.pack.SomeType", "../../some/pack/index.html#SomeType")) &&
       ("member: SomeType (class)" |: node.assertMemberLink("types")(
               "some.pack.SomeType",
               "../../some/pack/index.html#SomeTypeextendsAnyRef"))
-    }
 
     property("SI-8144: Members' permalink - companion object") = check(
-        "some/pack/SomeType$.html") { node =>
+        "some/pack/SomeType$.html")  node =>
       ("type link" |: node.assertTypeLink("../../some/pack/SomeType$.html")) &&
       ("member: someVal" |: node.assertMemberLink("allMembers")(
               "some.pack.SomeType#someVal",
               "../../some/pack/SomeType$.html#someVal:String"))
-    }
 
     property("SI-8144: Members' permalink - class") = check(
-        "some/pack/SomeType.html") { node =>
+        "some/pack/SomeType.html")  node =>
       ("type link" |: node.assertTypeLink("../../some/pack/SomeType.html")) &&
       ("constructor " |: node.assertMemberLink("constructors")(
               "some.pack.SomeType#<init>",
@@ -835,13 +730,8 @@ object Test extends Properties("HtmlFactory") {
       ("member: def >@<():TypeAlias " |: node.assertValuesLink(
               "some.pack.SomeType#>@<",
               "../../some/pack/SomeType.html#>@<():SomeType.this.TypeAlias"))
-    }
-  }
 
-  property("SI-9599 Multiple @todo formatted with comma on separate line") = {
-    createTemplates("SI-9599.scala")("X.html") match {
+  property("SI-9599 Multiple @todo formatted with comma on separate line") =
+    createTemplates("SI-9599.scala")("X.html") match
       case node: scala.xml.Node => node.text.contains("todo3todo2todo1")
       case _ => false
-    }
-  }
-}

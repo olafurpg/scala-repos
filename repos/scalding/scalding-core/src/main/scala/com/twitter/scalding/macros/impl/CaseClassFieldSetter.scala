@@ -24,7 +24,7 @@ import scala.util.Try
   * Helper to set fields from a case class to other "container" types
   * E.g. cascading Tuple, jdbc PreparedStatement
   */
-trait CaseClassFieldSetter {
+trait CaseClassFieldSetter
 
   // mark the field as absent/null
   def absent(c: Context)(idx: Int, container: c.TermName): c.Tree
@@ -39,4 +39,3 @@ trait CaseClassFieldSetter {
                        idx: Int,
                        container: c.TermName,
                        fieldValue: c.Tree): Try[c.Tree]
-}

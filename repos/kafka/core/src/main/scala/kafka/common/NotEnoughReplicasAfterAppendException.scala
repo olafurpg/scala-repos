@@ -23,6 +23,5 @@ package kafka.common
   * was already appended to the log. Producer retries will cause duplicates.
   */
 class NotEnoughReplicasAfterAppendException(message: String)
-    extends RuntimeException(message) {
+    extends RuntimeException(message)
   def this() = this(null)
-}

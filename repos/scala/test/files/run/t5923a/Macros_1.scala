@@ -2,16 +2,14 @@ import scala.reflect.macros.whitebox.Context
 import language.experimental.macros
 
 case class C[T](t: String)
-object C {
+object C
   implicit def foo[T]: C[T] = macro Macros.impl[T]
-}
 
-object Macros {
-  def impl[T](c: Context)(ttag: c.WeakTypeTag[T]) = {
+object Macros
+  def impl[T](c: Context)(ttag: c.WeakTypeTag[T]) =
     import c.universe._
     import internal._
     val ttag0 = ttag;
-    {
       // When we're expanding implicitly[C[Nothing]], the type inferencer will see
       // that foo[T] returns C[T] and that we request an implicit of type C[Nothing].
       //
@@ -41,16 +39,12 @@ object Macros {
       // because there's no way to know whether having T here stands for a failed attempt to infer Nothing
       // or for a failed attempt to infer anything, but at least we're in full control of making the best
       // of this sad situation.
-      implicit def ttag: WeakTypeTag[T] = {
+      implicit def ttag: WeakTypeTag[T] =
         val tpe = ttag0.tpe
         val sym = tpe.typeSymbol.asType
         if (sym.isParameter && !isSkolem(sym))
           TypeTag.Nothing.asInstanceOf[TypeTag[T]]
         else ttag0
-      }
       reify(
           C[T](c.Expr[String](Literal(Constant(weakTypeOf[T].toString)))
                 .splice))
-    }
-  }
-}

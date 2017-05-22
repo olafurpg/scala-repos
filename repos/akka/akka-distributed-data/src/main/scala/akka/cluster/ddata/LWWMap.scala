@@ -6,7 +6,7 @@ package akka.cluster.ddata
 import akka.cluster.Cluster
 import akka.cluster.UniqueAddress
 
-object LWWMap {
+object LWWMap
   private val _empty: LWWMap[Any] = new LWWMap(ORMap.empty)
   def empty[A]: LWWMap[A] = _empty.asInstanceOf[LWWMap[A]]
   def apply(): LWWMap[Any] = _empty
@@ -20,7 +20,6 @@ object LWWMap {
     * Extract the [[LWWMap#entries]].
     */
   def unapply[A](m: LWWMap[A]): Option[Map[String, A]] = Some(m.entries)
-}
 
 /**
   * Specialized [[ORMap]] with [[LWWRegister]] values.
@@ -41,7 +40,7 @@ object LWWMap {
 final class LWWMap[A] private[akka](
     private[akka] val underlying: ORMap[LWWRegister[A]])
     extends ReplicatedData with ReplicatedDataSerialization
-    with RemovedNodePruning {
+    with RemovedNodePruning
   import LWWRegister.{Clock, defaultClock}
 
   type T = LWWMap[A]
@@ -49,17 +48,15 @@ final class LWWMap[A] private[akka](
   /**
     * Scala API: All entries of the map.
     */
-  def entries: Map[String, A] = underlying.entries.map {
+  def entries: Map[String, A] = underlying.entries.map
     case (k, r) ⇒ k -> r.value
-  }
 
   /**
     * Java API: All entries of the map.
     */
-  def getEntries(): java.util.Map[String, A] = {
+  def getEntries(): java.util.Map[String, A] =
     import scala.collection.JavaConverters._
     entries.asJava
-  }
 
   def get(key: String): Option[A] = underlying.get(key).map(_.value)
 
@@ -72,10 +69,9 @@ final class LWWMap[A] private[akka](
   /**
     * Adds an entry to the map
     */
-  def +(entry: (String, A))(implicit node: Cluster): LWWMap[A] = {
+  def +(entry: (String, A))(implicit node: Cluster): LWWMap[A] =
     val (key, value) = entry
     put(node, key, value)
-  }
 
   /**
     * Adds an entry to the map
@@ -112,13 +108,11 @@ final class LWWMap[A] private[akka](
   private[akka] def put(node: UniqueAddress,
                         key: String,
                         value: A,
-                        clock: Clock[A]): LWWMap[A] = {
-    val newRegister = underlying.get(key) match {
+                        clock: Clock[A]): LWWMap[A] =
+    val newRegister = underlying.get(key) match
       case Some(r) ⇒ r.withValue(node, value, clock)
       case None ⇒ LWWRegister(node, value, clock)
-    }
     new LWWMap(underlying.put(node, key, newRegister))
-  }
 
   /**
     * Removes an entry from the map.
@@ -158,17 +152,14 @@ final class LWWMap[A] private[akka](
 
   override def toString: String = s"LWW$entries" //e.g. LWWMap(a -> 1, b -> 2)
 
-  override def equals(o: Any): Boolean = o match {
+  override def equals(o: Any): Boolean = o match
     case other: LWWMap[_] ⇒ underlying == other.underlying
     case _ ⇒ false
-  }
 
   override def hashCode: Int = underlying.hashCode
-}
 
-object LWWMapKey {
+object LWWMapKey
   def create[A](id: String): Key[LWWMap[A]] = LWWMapKey(id)
-}
 
 @SerialVersionUID(1L)
 final case class LWWMapKey[A](_id: String)

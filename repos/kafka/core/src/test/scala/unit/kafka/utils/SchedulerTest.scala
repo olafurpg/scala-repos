@@ -21,7 +21,7 @@ import java.util.concurrent.atomic._
 import org.junit.{Test, After, Before}
 import kafka.utils.TestUtils.retry
 
-class SchedulerTest {
+class SchedulerTest
 
   val scheduler = new KafkaScheduler(1)
   val mockTime = new MockTime
@@ -29,17 +29,15 @@ class SchedulerTest {
   val counter2 = new AtomicInteger(0)
 
   @Before
-  def setup() {
+  def setup()
     scheduler.startup()
-  }
 
   @After
-  def teardown() {
+  def teardown()
     scheduler.shutdown()
-  }
 
   @Test
-  def testMockSchedulerNonPeriodicTask() {
+  def testMockSchedulerNonPeriodicTask()
     mockTime.scheduler.schedule("test1", counter1.getAndIncrement, delay = 1)
     mockTime.scheduler.schedule("test2", counter2.getAndIncrement, delay = 100)
     assertEquals("Counter1 should not be incremented prior to task running.",
@@ -57,10 +55,9 @@ class SchedulerTest {
         1,
         counter1.get)
     assertEquals("Counter2 should now be incremented.", 1, counter2.get)
-  }
 
   @Test
-  def testMockSchedulerPeriodicTask() {
+  def testMockSchedulerPeriodicTask()
     mockTime.scheduler.schedule(
         "test1", counter1.getAndIncrement, delay = 1, period = 1)
     mockTime.scheduler.schedule(
@@ -77,10 +74,9 @@ class SchedulerTest {
     mockTime.sleep(100)
     assertEquals("Counter1 should be incremented 101 times", 101, counter1.get)
     assertEquals("Counter2 should not be incremented once", 1, counter2.get)
-  }
 
   @Test
-  def testReentrantTaskInMockScheduler() {
+  def testReentrantTaskInMockScheduler()
     mockTime.scheduler.schedule(
         "test1",
         () =>
@@ -89,28 +85,23 @@ class SchedulerTest {
         delay = 1)
     mockTime.sleep(1)
     assertEquals(1, counter2.get)
-  }
 
   @Test
-  def testNonPeriodicTask() {
+  def testNonPeriodicTask()
     scheduler.schedule("test", counter1.getAndIncrement, delay = 0)
-    retry(30000) {
+    retry(30000)
       assertEquals(counter1.get, 1)
-    }
     Thread.sleep(5)
     assertEquals("Should only run once", 1, counter1.get)
-  }
 
   @Test
-  def testPeriodicTask() {
+  def testPeriodicTask()
     scheduler.schedule("test", counter1.getAndIncrement, delay = 0, period = 5)
-    retry(30000) {
+    retry(30000)
       assertTrue("Should count to 20", counter1.get >= 20)
-    }
-  }
 
   @Test
-  def testRestart() {
+  def testRestart()
     // schedule a task to increment a counter
     mockTime.scheduler.schedule("test1", counter1.getAndIncrement, delay = 1)
     mockTime.sleep(1)
@@ -124,5 +115,3 @@ class SchedulerTest {
     mockTime.scheduler.schedule("test1", counter1.getAndIncrement, delay = 1)
     mockTime.sleep(1)
     assertEquals(2, counter1.get())
-  }
-}

@@ -14,7 +14,6 @@ class ScalaTryPostfixTemplate
         "try",
         "try { exp } catch {}",
         new ScalaPostfixTemplatePsiInfo,
-        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost)) {
+        new AncestorSelector(SelectorConditions.ANY_EXPR, Topmost))
 
   override def getSurrounder = new ScalaWithTryCatchSurrounder
-}

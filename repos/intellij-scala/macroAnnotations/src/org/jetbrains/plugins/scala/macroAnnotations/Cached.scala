@@ -20,48 +20,42 @@ import scala.reflect.macros.whitebox
   */
 class Cached(
     synchronized: Boolean, modificationCount: ModCount, psiElement: Any)
-    extends StaticAnnotation {
+    extends StaticAnnotation
   def macroTransform(annottees: Any*) = macro Cached.cachedImpl
-}
 
-object Cached {
-  def cachedImpl(c: whitebox.Context)(annottees: c.Tree*): c.Expr[Any] = {
+object Cached
+  def cachedImpl(c: whitebox.Context)(annottees: c.Tree*): c.Expr[Any] =
     import CachedMacroUtil._
     import c.universe._
     implicit val x: c.type = c
 
     def abort(message: String) = c.abort(c.enclosingPosition, message)
 
-    def parameters: (Boolean, ModCount.Value, Tree) = {
+    def parameters: (Boolean, ModCount.Value, Tree) =
       @tailrec
       def modCountParam(modCount: c.universe.Tree): ModCount.Value =
-        modCount match {
+        modCount match
           case q"modificationCount = $v" => modCountParam(v)
           case q"ModCount.$v" => ModCount.withName(v.toString)
           case q"$v" => ModCount.withName(v.toString)
-        }
 
-      c.prefix.tree match {
+      c.prefix.tree match
         case q"new Cached(..$params)" if params.length == 3 =>
-          val synch: Boolean = params.head match {
+          val synch: Boolean = params.head match
             case q"synchronized = $v" => c.eval[Boolean](c.Expr(v))
             case q"$v" => c.eval[Boolean](c.Expr(v))
-          }
           val modCount: ModCount.Value = modCountParam(params(1))
           val psiElement = params(2)
           (synch, modCount, psiElement)
         case _ => abort("Wrong parameters")
-      }
-    }
 
     //annotation parameters
     val (synchronized, modCount, psiElement) = parameters
 
-    annottees.toList match {
+    annottees.toList match
       case DefDef(mods, name, tpParams, paramss, retTp, rhs) :: Nil =>
-        if (retTp.isEmpty) {
+        if (retTp.isEmpty)
           abort("You must specify return type")
-        }
         //generated names
         val cacheVarName = c.freshName(name)
         val modCountVarName = c.freshName(name)
@@ -82,14 +76,14 @@ object Cached {
             q"private val $cacheStatsName = $cacheStatisticsFQN($keyId, $defdefFQN)"
           else EmptyTree
         val fields =
-          if (hasParameters) {
+          if (hasParameters)
             q"""
             private val $mapName = _root_.com.intellij.util.containers.ContainerUtil.
                 newConcurrentMap[(..${flatParams.map(_.tpt)}), ($retTp, _root_.scala.Long)]()
 
             ..$analyzeCachesField
           """
-          } else {
+          else
             q"""
             new _root_.scala.volatile()
             private var $cacheVarName: _root_.scala.Option[$retTp] = _root_.scala.None
@@ -98,7 +92,6 @@ object Cached {
 
             ..$analyzeCachesField
           """
-          }
 
         def getValuesFromMap: c.universe.Tree = q"""
             var ($cacheVarName, $modCountVarName) = _root_.scala.Option($mapName.get(..$paramNames)) match {
@@ -110,11 +103,11 @@ object Cached {
           q"$mapName.put((..$paramNames), ($cacheVarName.get, $modCountVarName))"
 
         val getValuesIfHasParams =
-          if (hasParameters) {
+          if (hasParameters)
             q"""
               ..$getValuesFromMap
             """
-          } else q""
+          else q""
 
         val functionContents = q"""
             ..$getValuesIfHasParams
@@ -127,7 +120,7 @@ object Cached {
             $cacheVarName.get
           """
         val functionContentsInSynchronizedBlock =
-          if (synchronized) {
+          if (synchronized)
             //double checked locking
             q"""
               ..$getValuesIfHasParams
@@ -138,23 +131,21 @@ object Cached {
                 $functionContents
               }
             """
-          } else {
+          else
             q"""
               $functionContents
             """
-          }
 
         val actualCalculation =
           transformRhsToAnalyzeCaches(c)(cacheStatsName, retTp, rhs)
 
-        val currModCount = modCount match {
+        val currModCount = modCount match
           case ModCount.getBlockModificationCount =>
             q"val currModCount = $cachesUtilFQN.enclosingModificationOwner($psiElement).getModificationCount"
           case ModCount.getOutOfCodeBlockModificationCount =>
             q"val currModCount = $scalaPsiManagerFQN.instance($psiElement.getProject).getModificationCount"
           case _ =>
             q"val currModCount = $psiElement.getManager.getModificationTracker.${TermName(modCount.toString)}"
-        }
         val updatedRhs = q"""
           def $cachedFunName(): $retTp = {
             $actualCalculation
@@ -162,8 +153,8 @@ object Cached {
           $cachesUtilFQN.incrementModCountForFunsWithModifiedReturn()
           ..$currModCount
           def cacheHasExpired(opt: Option[Any], cacheCount: Long) = opt.isEmpty || currModCount != cacheCount
-          ${if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
-        else EmptyTree}
+          $if (analyzeCaches) q"$cacheStatsName.aboutToEnterCachedArea()"
+        else EmptyTree
           $functionContentsInSynchronizedBlock
         """
         val updatedDef = DefDef(
@@ -175,6 +166,3 @@ object Cached {
         CachedMacroUtil.println(res)
         c.Expr(res)
       case _ => abort("You can only annotate one function!")
-    }
-  }
-}

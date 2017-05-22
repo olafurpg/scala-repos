@@ -26,24 +26,22 @@ import scala.util.Random
 import kafka.utils.TestUtils
 import kafka.common.InvalidOffsetException
 
-class OffsetIndexTest extends JUnitSuite {
+class OffsetIndexTest extends JUnitSuite
 
   var idx: OffsetIndex = null
   val maxEntries = 30
 
   @Before
-  def setup() {
+  def setup()
     this.idx = new OffsetIndex(
         file = nonExistantTempFile(), baseOffset = 45L, maxIndexSize = 30 * 8)
-  }
 
   @After
-  def teardown() {
+  def teardown()
     if (this.idx != null) this.idx.file.delete()
-  }
 
   @Test
-  def randomLookupTest() {
+  def randomLookupTest()
     assertEquals("Not present value should return physical offset 0.",
                  OffsetPosition(idx.baseOffset, 0),
                  idx.lookup(92L))
@@ -53,9 +51,8 @@ class OffsetIndexTest extends JUnitSuite {
     val size = idx.maxEntries
     val vals: Seq[(Long, Int)] =
       monotonicSeq(base, size).map(_.toLong).zip(monotonicSeq(0, size))
-    vals.foreach { x =>
+    vals.foreach  x =>
       idx.append(x._1, x._2)
-    }
 
     // should be able to find all those values
     for ((logical, physical) <- vals) assertEquals(
@@ -68,7 +65,7 @@ class OffsetIndexTest extends JUnitSuite {
       new immutable.TreeMap[Long, (Long, Int)]() ++ vals.map(p => (p._1, p))
     val offsets = (idx.baseOffset until vals.last._1.toInt).toArray
     Collections.shuffle(Arrays.asList(offsets))
-    for (offset <- offsets.take(30)) {
+    for (offset <- offsets.take(30))
       val rightAnswer =
         if (offset < valMap.firstKey) OffsetPosition(idx.baseOffset, 0)
         else
@@ -77,11 +74,9 @@ class OffsetIndexTest extends JUnitSuite {
       assertEquals("The index should give the same answer as the sorted map",
                    rightAnswer,
                    idx.lookup(offset))
-    }
-  }
 
   @Test
-  def lookupExtremeCases() {
+  def lookupExtremeCases()
     assertEquals("Lookup on empty file",
                  OffsetPosition(idx.baseOffset, 0),
                  idx.lookup(idx.baseOffset))
@@ -91,28 +86,24 @@ class OffsetIndexTest extends JUnitSuite {
     assertEquals(
         OffsetPosition(idx.baseOffset + idx.maxEntries, idx.maxEntries - 1),
         idx.lookup(idx.baseOffset + idx.maxEntries))
-  }
 
   @Test
-  def appendTooMany() {
-    for (i <- 0 until idx.maxEntries) {
+  def appendTooMany()
+    for (i <- 0 until idx.maxEntries)
       val offset = idx.baseOffset + i + 1
       idx.append(offset, i)
-    }
     assertWriteFails("Append should fail on a full index",
                      idx,
                      idx.maxEntries + 1,
                      classOf[IllegalArgumentException])
-  }
 
   @Test(expected = classOf[InvalidOffsetException])
-  def appendOutOfOrder() {
+  def appendOutOfOrder()
     idx.append(51, 0)
     idx.append(50, 1)
-  }
 
   @Test
-  def testReopen() {
+  def testReopen()
     val first = OffsetPosition(51, 0)
     val sec = OffsetPosition(52, 1)
     idx.append(first.offset, first.position)
@@ -127,10 +118,9 @@ class OffsetIndexTest extends JUnitSuite {
                      idxRo,
                      53,
                      classOf[IllegalArgumentException])
-  }
 
   @Test
-  def truncate() {
+  def truncate()
     val idx = new OffsetIndex(
         file = nonExistantTempFile(), baseOffset = 0L, maxIndexSize = 10 * 8)
     idx.truncate()
@@ -168,33 +158,26 @@ class OffsetIndexTest extends JUnitSuite {
     idx.truncate()
     assertEquals("Full truncation should leave no entries", 0, idx.entries())
     idx.append(0, 0)
-  }
 
   def assertWriteFails[T](
-      message: String, idx: OffsetIndex, offset: Int, klass: Class[T]) {
-    try {
+      message: String, idx: OffsetIndex, offset: Int, klass: Class[T])
+    try
       idx.append(offset, 1)
       fail(message)
-    } catch {
+    catch
       case e: Exception =>
         assertEquals("Got an unexpected exception.", klass, e.getClass)
-    }
-  }
 
-  def monotonicSeq(base: Int, len: Int): Seq[Int] = {
+  def monotonicSeq(base: Int, len: Int): Seq[Int] =
     val rand = new Random(1L)
     val vals = new mutable.ArrayBuffer[Int](len)
     var last = base
-    for (i <- 0 until len) {
+    for (i <- 0 until len)
       last += rand.nextInt(15) + 1
       vals += last
-    }
     vals
-  }
 
-  def nonExistantTempFile(): File = {
+  def nonExistantTempFile(): File =
     val file = TestUtils.tempFile()
     file.delete()
     file
-  }
-}

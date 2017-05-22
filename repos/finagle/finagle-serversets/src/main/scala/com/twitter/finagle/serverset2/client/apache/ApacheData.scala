@@ -2,24 +2,22 @@ package com.twitter.finagle.serverset2.client.apache
 
 import com.twitter.finagle.serverset2.client.Data
 
-private[serverset2] object ApacheData {
-  object ACL {
+private[serverset2] object ApacheData
+  object ACL
     def apply(a: org.apache.zookeeper.data.ACL): Data.ACL =
       Data.ACL(a.getPerms, Id(a.getId))
 
     def zk(a: Data.ACL): org.apache.zookeeper.data.ACL =
       new org.apache.zookeeper.data.ACL(a.perms, Id.zk(a.id))
-  }
 
-  object Id {
+  object Id
     def apply(id: org.apache.zookeeper.data.Id): Data.Id =
       Data.Id(id.getScheme, id.getId)
 
     def zk(id: Data.Id): org.apache.zookeeper.data.Id =
       new org.apache.zookeeper.data.Id(id.scheme, id.id)
-  }
 
-  object Stat {
+  object Stat
     def apply(st: org.apache.zookeeper.data.Stat): Data.Stat =
       Data.Stat(czxid = st.getCzxid,
                 mzxid = st.getMzxid,
@@ -45,5 +43,3 @@ private[serverset2] object ApacheData {
                                          st.dataLength,
                                          st.numChildren,
                                          st.pzxid)
-  }
-}

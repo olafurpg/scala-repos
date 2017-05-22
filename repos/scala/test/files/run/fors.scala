@@ -4,7 +4,7 @@
 
 //############################################################################
 
-object Test extends App {
+object Test extends App
   val xs = List(1, 2, 3)
   val ys = List('a, 'b, 'c)
 
@@ -14,7 +14,7 @@ object Test extends App {
 
   /////////////////// old syntax ///////////////////
 
-  def testOld {
+  def testOld
     println("\ntestOld")
 
     // lists
@@ -35,11 +35,10 @@ object Test extends App {
     for (x <- ar) print(x + " "); println
     for (x <- ar; if x.toInt > 97) print(x + " "); println
     for { x <- ar if x.toInt > 97 } print(x + " "); println
-  }
 
   /////////////////// new syntax ///////////////////
 
-  def testNew {
+  def testNew
     println("\ntestNew")
 
     // lists
@@ -57,17 +56,15 @@ object Test extends App {
     for { x <- it if x % 2 == 0 } print(x + " "); println
     for (x <- it;
     y = 2 if x % y == 0) print(x + " "); println
-    for {
+    for
       x <- it
       y = 2 if x % y == 0
-    } print(x + " "); println
+    print(x + " "); println
 
     // arrays
     for (x <- ar) print(x + " "); println
-  }
 
   ////////////////////////////////////////////////////
 
   testOld
   testNew
-}

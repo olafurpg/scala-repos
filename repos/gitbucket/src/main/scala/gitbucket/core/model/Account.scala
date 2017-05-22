@@ -1,12 +1,12 @@
 package gitbucket.core.model
 
-trait AccountComponent { self: Profile =>
+trait AccountComponent  self: Profile =>
   import profile.simple._
   import self._
 
   lazy val Accounts = TableQuery[Accounts]
 
-  class Accounts(tag: Tag) extends Table[Account](tag, "ACCOUNT") {
+  class Accounts(tag: Tag) extends Table[Account](tag, "ACCOUNT")
     val userName = column[String]("USER_NAME", O PrimaryKey)
     val fullName = column[String]("FULL_NAME")
     val mailAddress = column[String]("MAIL_ADDRESS")
@@ -32,8 +32,6 @@ trait AccountComponent { self: Profile =>
        image.?,
        groupAccount,
        removed) <> (Account.tupled, Account.unapply)
-  }
-}
 
 case class Account(
     userName: String,

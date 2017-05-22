@@ -16,7 +16,7 @@ import scala.concurrent.Await
 @Threads(1)
 @Warmup(iterations = 10, time = 5, timeUnit = TimeUnit.SECONDS, batchSize = 1)
 @Measurement(iterations = 20)
-class ForkJoinActorBenchmark {
+class ForkJoinActorBenchmark
   import ForkJoinActorBenchmark._
 
   @Param(Array("1", "5"))
@@ -28,7 +28,7 @@ class ForkJoinActorBenchmark {
   implicit var system: ActorSystem = _
 
   @Setup(Level.Trial)
-  def setup(): Unit = {
+  def setup(): Unit =
     system = ActorSystem("ForkJoinActorBenchmark",
                          ConfigFactory.parseString(s"""| akka {
         |   log-dead-letters = off
@@ -45,18 +45,16 @@ class ForkJoinActorBenchmark {
         |   }
         | }
       """.stripMargin))
-  }
 
   @TearDown(Level.Trial)
-  def shutdown(): Unit = {
+  def shutdown(): Unit =
     system.terminate()
     Await.ready(system.whenTerminated, 15.seconds)
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MILLISECONDS)
   @OperationsPerInvocation(messages)
-  def pingPong(): Unit = {
+  def pingPong(): Unit =
     val ping = system.actorOf(Props[ForkJoinActorBenchmark.PingPong])
     val pong = system.actorOf(Props[ForkJoinActorBenchmark.PingPong])
 
@@ -67,12 +65,11 @@ class ForkJoinActorBenchmark {
     p.expectTerminated(ping, timeout)
     p.watch(pong)
     p.expectTerminated(pong, timeout)
-  }
 
   @Benchmark
   @Measurement(timeUnit = TimeUnit.MILLISECONDS)
   @OperationsPerInvocation(messages)
-  def floodPipe(): Unit = {
+  def floodPipe(): Unit =
 
     val end = system.actorOf(Props(classOf[ForkJoinActorBenchmark.Pipe], None))
     val middle =
@@ -86,41 +83,33 @@ class ForkJoinActorBenchmark {
     p.watch(end)
 
     def send(left: Int): Unit =
-      if (left > 0) {
+      if (left > 0)
         beginning ! message
         send(left - 1)
-      }
 
     send(messages / 4) // we have 4 actors in the pipeline
 
     beginning ! stop
 
     p.expectTerminated(end, timeout)
-  }
-}
 
-object ForkJoinActorBenchmark {
+object ForkJoinActorBenchmark
   final val stop = "stop"
   final val message = "message"
   final val timeout = 15.seconds
   final val messages = 400000
-  class Pipe(next: Option[ActorRef]) extends Actor {
-    def receive = {
+  class Pipe(next: Option[ActorRef]) extends Actor
+    def receive =
       case m @ `message` =>
         if (next.isDefined) next.get forward m
       case s @ `stop` =>
         context stop self
         if (next.isDefined) next.get forward s
-    }
-  }
-  class PingPong extends Actor {
+  class PingPong extends Actor
     var left = messages / 2
-    def receive = {
+    def receive =
       case `message` =>
         if (left <= 1) context stop self
 
         sender() ! message
         left -= 1
-    }
-  }
-}

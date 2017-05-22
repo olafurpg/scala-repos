@@ -21,7 +21,7 @@ abstract class BaseRunConfiguration(
     val configurationFactory: ConfigurationFactory,
     val name: String)
     extends ModuleBasedConfiguration[RunConfigurationModule](
-        name, new RunConfigurationModule(project), configurationFactory) {
+        name, new RunConfigurationModule(project), configurationFactory)
   def mainClass: String
   val defaultJavaOptions = "-Djline.terminal=NONE"
   val useJavaCp = "-usejavacp"
@@ -38,39 +38,34 @@ abstract class BaseRunConfiguration(
   def getValidModules: java.util.List[Module] =
     getProject.modulesWithScala.toList.asJava
 
-  override def writeExternal(element: Element) {
+  override def writeExternal(element: Element)
     super.writeExternal(element)
     writeModule(element)
     JDOMExternalizer.write(element, "vmparams4", javaOptions)
     JDOMExternalizer.write(element, "workingDirectory", workingDirectory)
-  }
 
-  override def readExternal(element: Element) {
+  override def readExternal(element: Element)
     super.readExternal(element)
     readModule(element)
     javaOptions = JDOMExternalizer.readString(element, "vmparams4")
-    if (javaOptions == null) {
+    if (javaOptions == null)
       javaOptions = JDOMExternalizer.readString(element, "vmparams")
       if (javaOptions != null) javaOptions += s" $defaultJavaOptions"
-    }
     val str = JDOMExternalizer.readString(element, "workingDirectory")
     if (str != null) workingDirectory = str
-  }
 
-  def createParams: JavaParameters = {
+  def createParams: JavaParameters =
     val module = getModule
     if (module == null) throw new ExecutionException("Module is not specified")
 
-    val scalaSdk = module.scalaSdk.getOrElse {
+    val scalaSdk = module.scalaSdk.getOrElse
       throw new ExecutionException(
           "No Scala facet configured for module " + module.getName)
-    }
 
     val rootManager = ModuleRootManager.getInstance(module)
     val sdk = rootManager.getSdk
-    if (sdk == null || !sdk.getSdkType.isInstanceOf[JavaSdkType]) {
+    if (sdk == null || !sdk.getSdkType.isInstanceOf[JavaSdkType])
       throw CantRunException.noJdkForModule(module)
-    }
 
     val params = new JavaParameters()
     params.getVMParametersList.addParametersString(javaOptions)
@@ -84,5 +79,3 @@ abstract class BaseRunConfiguration(
     params.setMainClass(mainClass)
     params.configureByModule(module, JavaParameters.JDK_AND_CLASSES_AND_TESTS)
     params
-  }
-}

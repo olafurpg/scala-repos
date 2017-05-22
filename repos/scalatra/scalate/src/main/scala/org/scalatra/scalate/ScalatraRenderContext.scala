@@ -17,12 +17,11 @@ class ScalatraRenderContext(protected val kernel: ServletBase,
                             out: PrintWriter,
                             req: HttpServletRequest,
                             res: HttpServletResponse)
-    extends ServletRenderContext(engine, out, req, res, kernel.servletContext) {
+    extends ServletRenderContext(engine, out, req, res, kernel.servletContext)
 
-  def flash: scala.collection.Map[String, Any] = kernel match {
+  def flash: scala.collection.Map[String, Any] = kernel match
     case flashMapSupport: FlashMapSupport => flashMapSupport.flash(request)
     case _ => Map.empty
-  }
 
   def session: HttpSession = kernel.session(request)
 
@@ -32,46 +31,39 @@ class ScalatraRenderContext(protected val kernel: ServletBase,
 
   def multiParams: MultiParams = kernel.multiParams(request)
 
-  def format: String = kernel match {
+  def format: String = kernel match
     case af: ApiFormats => af.format(request, response)
     case _ => ""
-  }
 
   @deprecated(
       "`format` now means the same as `responseFormat`, `responseFormat` will be removed eventually",
       "2.3")
   def responseFormat: String = format
 
-  def fileMultiParams: FileMultiParams = kernel match {
+  def fileMultiParams: FileMultiParams = kernel match
     case fu: FileUploadSupport => fu.fileMultiParams(request)
     case _ => new FileMultiParams()
-  }
 
-  def fileParams: scala.collection.Map[String, FileItem] = kernel match {
+  def fileParams: scala.collection.Map[String, FileItem] = kernel match
     case fu: FileUploadSupport => fu.fileParams(request)
     case _ => Map.empty
-  }
 
-  def csrfKey = kernel match {
+  def csrfKey = kernel match
     case csrfTokenSupport: CsrfTokenSupport => csrfTokenSupport.csrfKey
     case _ => ""
-  }
 
-  def csrfToken = kernel match {
+  def csrfToken = kernel match
     case csrfTokenSupport: CsrfTokenSupport =>
       csrfTokenSupport.csrfToken(request)
     case _ => ""
-  }
-  def xsrfKey = kernel match {
+  def xsrfKey = kernel match
     case csrfTokenSupport: XsrfTokenSupport => csrfTokenSupport.xsrfKey
     case _ => ""
-  }
 
-  def xsrfToken = kernel match {
+  def xsrfToken = kernel match
     case csrfTokenSupport: XsrfTokenSupport =>
       csrfTokenSupport.xsrfToken(request)
     case _ => ""
-  }
 
   /**
     * Calculate a URL for a reversible route and some params.
@@ -115,4 +107,3 @@ class ScalatraRenderContext(protected val kernel: ServletBase,
           params: Map[String, String],
           splats: Iterable[String]): String =
     UrlGenerator.url(route, params, splats)(request)
-}

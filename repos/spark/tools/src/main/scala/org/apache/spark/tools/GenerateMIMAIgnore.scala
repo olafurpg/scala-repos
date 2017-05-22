@@ -36,7 +36,7 @@ import org.clapper.classutil.ClassFinder
   * package-private that wasn't before. This exists only to help catch certain classes of changes
   * which might be difficult to catch during review.
   */
-object GenerateMIMAIgnore {
+object GenerateMIMAIgnore
   private val classLoader = Thread.currentThread().getContextClassLoader
   private val mirror = runtimeMirror(classLoader)
 
@@ -51,14 +51,14 @@ object GenerateMIMAIgnore {
     * are package private.
     * Returns the tuple of such classes and members.
     */
-  private def privateWithin(packageName: String): (Set[String], Set[String]) = {
+  private def privateWithin(packageName: String): (Set[String], Set[String]) =
 
     val classes = getClasses(packageName)
     val ignoredClasses = mutable.HashSet[String]()
     val ignoredMembers = mutable.HashSet[String]()
 
-    for (className <- classes) {
-      try {
+    for (className <- classes)
+      try
         val classSymbol =
           mirror.classSymbol(Class.forName(className, false, classLoader))
         val moduleSymbol = mirror.staticModule(className)
@@ -67,44 +67,38 @@ object GenerateMIMAIgnore {
           isPackagePrivateModule(moduleSymbol) || classSymbol.isPrivate
         /* Inner classes defined within a private[spark] class or object are effectively
          invisible, so we account for them as package private. */
-        lazy val indirectlyPrivateSpark = {
+        lazy val indirectlyPrivateSpark =
           val maybeOuter = className.toString.takeWhile(_ != '$')
-          if (maybeOuter != className) {
+          if (maybeOuter != className)
             isPackagePrivate(mirror.classSymbol(
                     Class.forName(maybeOuter, false, classLoader))) ||
             isPackagePrivateModule(mirror.staticModule(maybeOuter))
-          } else {
+          else
             false
-          }
-        }
-        if (directlyPrivateSpark || indirectlyPrivateSpark) {
+        if (directlyPrivateSpark || indirectlyPrivateSpark)
           ignoredClasses += className
-        }
         // check if this class has package-private/annotated members.
         ignoredMembers ++= getAnnotatedOrPackagePrivateMembers(classSymbol)
-      } catch {
+      catch
         // scalastyle:off println
         case _: Throwable => println("Error instrumenting class:" + className)
         // scalastyle:on println
-      }
-    }
     (ignoredClasses.flatMap(c => Seq(c, c.replace("$", "#"))).toSet,
      ignoredMembers.toSet)
-  }
 
   /** Scala reflection does not let us see inner function even if they are upgraded
     * to public for some reason. So had to resort to java reflection to get all inner
     * functions with $$ in there name.
     */
-  def getInnerFunctions(classSymbol: unv.ClassSymbol): Seq[String] = {
-    try {
+  def getInnerFunctions(classSymbol: unv.ClassSymbol): Seq[String] =
+    try
       Class
         .forName(classSymbol.fullName, false, classLoader)
         .getMethods
         .map(_.getName)
         .filter(_.contains("$$"))
         .map(classSymbol.fullName + "." + _)
-    } catch {
+    catch
       case t: Throwable =>
         // scalastyle:off println
         println(
@@ -112,19 +106,16 @@ object GenerateMIMAIgnore {
             classSymbol.fullName)
         // scalastyle:on println
         Seq.empty[String]
-    }
-  }
 
   private def getAnnotatedOrPackagePrivateMembers(
-      classSymbol: unv.ClassSymbol) = {
+      classSymbol: unv.ClassSymbol) =
     classSymbol.typeSignature.members
       .filterNot(
           x => x.fullName.startsWith("java") || x.fullName.startsWith("scala"))
       .filter(x => isPackagePrivate(x))
       .map(_.fullName) ++ getInnerFunctions(classSymbol)
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     import scala.tools.nsc.io.File
     val (privateClasses, privateMembers) = privateWithin("org.apache.spark")
     val previousContents = Try(File(".generated-mima-class-excludes").lines())
@@ -142,25 +133,21 @@ object GenerateMIMAIgnore {
         previousMembersContents + privateMembers.mkString("\n"))
     println("Created : .generated-mima-member-excludes in current directory.")
     // scalastyle:on println
-  }
 
-  private def shouldExclude(name: String) = {
+  private def shouldExclude(name: String) =
     // Heuristic to remove JVM classes that do not correspond to user-facing classes in Scala
     name.contains("anon") || name.endsWith("$class") || name.contains("$sp") ||
     name.contains("hive") || name.contains("Hive")
-  }
 
   /**
     * Scans all classes accessible from the context class loader which belong to the given package
     * and subpackages both from directories and jars present on the classpath.
     */
-  private def getClasses(packageName: String): Set[String] = {
+  private def getClasses(packageName: String): Set[String] =
     val finder = ClassFinder()
     finder.getClasses
       .map(_.name)
       .filter(_.startsWith(packageName))
       .filterNot(shouldExclude)
       .toSet
-  }
-}
 // scalastyle:on classforname

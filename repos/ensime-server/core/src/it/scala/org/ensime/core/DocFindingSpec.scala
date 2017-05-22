@@ -8,12 +8,12 @@ import org.ensime.util.EnsimeSpec
 class DocFindingSpec
     extends EnsimeSpec with IsolatedRichPresentationCompilerFixture
     with RichPresentationCompilerTestUtils
-    with ReallyRichPresentationCompilerFixture {
+    with ReallyRichPresentationCompilerFixture
   import ReallyRichPresentationCompilerFixture._
 
   val original = EnsimeConfigFixture.DocsTestProject
 
-  "PresentationCompiler" should "calculate doc signatures" in withPresCompiler {
+  "PresentationCompiler" should "calculate doc signatures" in withPresCompiler
     (config, cc) =>
       runForPositionInCompiledSource(
           config,
@@ -62,10 +62,10 @@ class DocFindingSpec
           "    List(1, 2).coll@31@ect { case 1 => 5 }",
           "  }",
           "}"
-      ) { (p, label, cc) =>
+      )  (p, label, cc) =>
         val sig = cc.askDocSignatureAtPoint(p).get
 
-        label match {
+        label match
           case "0" =>
             sig.scala shouldBe DocSig(DocFqn("scala", "Some"),
                                       Some("map[B](f:A=>B):Option[B]"))
@@ -185,7 +185,3 @@ class DocFindingSpec
                     DocFqn("scala.collection.immutable", "List"),
                     Some("collect[B,That](pf:PartialFunction[A,B])(implicitbf:scala.collection.generic.CanBuildFrom[List[A],B,That]):That"))
             sig.scala shouldBe expected
-        }
-      }
-  }
-}

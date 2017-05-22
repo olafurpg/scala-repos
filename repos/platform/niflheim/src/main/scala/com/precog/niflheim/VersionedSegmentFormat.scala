@@ -37,47 +37,36 @@ import scalaz.{Validation, Success, Failure}
   * error.
   */
 case class VersionedSegmentFormat(formats: Map[Int, SegmentFormat])
-    extends SegmentFormat with Versioning {
+    extends SegmentFormat with Versioning
   val magic: Short = 0x0536.toShort
-  val (version, format) = {
+  val (version, format) =
     val (ver, format) = formats.maxBy(_._1)
     (ver.toShort, format)
-  }
 
-  object writer extends SegmentWriter {
-    def writeSegment(channel: WritableByteChannel, segment: Segment) = {
-      for {
+  object writer extends SegmentWriter
+    def writeSegment(channel: WritableByteChannel, segment: Segment) =
+      for
         _ <- writeVersion(channel)
         _ <- format.writer.writeSegment(channel, segment)
-      } yield PrecogUnit
-    }
-  }
+      yield PrecogUnit
 
-  object reader extends SegmentReader {
+  object reader extends SegmentReader
     def readSegmentId(
-        channel: ReadableByteChannel): Validation[IOException, SegmentId] = {
-      readVersion(channel) flatMap { version =>
-        formats get version map { format =>
+        channel: ReadableByteChannel): Validation[IOException, SegmentId] =
+      readVersion(channel) flatMap  version =>
+        formats get version map  format =>
           format.reader.readSegmentId(channel)
-        } getOrElse {
+        getOrElse
           Failure(new IOException(
                   "Invalid version found. Expected one of %s, found %d." format
                   (formats.keys mkString ",", version)))
-        }
-      }
-    }
 
     def readSegment(
-        channel: ReadableByteChannel): Validation[IOException, Segment] = {
-      readVersion(channel) flatMap { version =>
-        formats get version map { format =>
+        channel: ReadableByteChannel): Validation[IOException, Segment] =
+      readVersion(channel) flatMap  version =>
+        formats get version map  format =>
           format.reader.readSegment(channel)
-        } getOrElse {
+        getOrElse
           Failure(new IOException(
                   "Invalid version found. Expected one of %s, found %d." format
                   (formats.keys mkString ",", version)))
-        }
-      }
-    }
-  }
-}

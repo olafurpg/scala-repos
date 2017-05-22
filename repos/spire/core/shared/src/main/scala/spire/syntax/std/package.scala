@@ -1,7 +1,7 @@
 package spire
 package syntax
 
-package object std {
+package object std
   object int extends IntSyntax
   object long extends LongSyntax
   object double extends DoubleSyntax
@@ -9,4 +9,3 @@ package object std {
 
   object array extends ArraySyntax
   object seq extends SeqSyntax
-}

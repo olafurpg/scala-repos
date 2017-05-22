@@ -8,18 +8,17 @@ package data
   * context along with the `A` value.
   */
 final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
-    extends Serializable {
+    extends Serializable
 
   def flatMap[B](fas: A => StateT[F, S, B])(
       implicit F: Monad[F]): StateT[F, S, B] =
     StateT(
         s =>
-          F.flatMap(runF) { fsf =>
-        F.flatMap(fsf(s)) {
+          F.flatMap(runF)  fsf =>
+        F.flatMap(fsf(s))
           case (s, a) =>
             fas(a).run(s)
-        }
-    })
+    )
 
   def map[B](f: A => B)(implicit F: Monad[F]): StateT[F, S, B] =
     transform { case (s, a) => (s, f(a)) }
@@ -64,9 +63,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     */
   def transform[B](f: (S, A) => (S, B))(
       implicit F: Monad[F]): StateT[F, S, B] =
-    transformF { fsa =>
+    transformF  fsa =>
       F.map(fsa) { case (s, a) => f(s, a) }
-    }
 
   /**
     * Like [[transform]], but allows the context to change from `F` to `G`.
@@ -95,13 +93,11 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     */
   def transformS[R](
       f: R => S, g: (R, S) => R)(implicit F: Monad[F]): StateT[F, R, A] =
-    StateT { r =>
-      F.flatMap(runF) { ff =>
+    StateT  r =>
+      F.flatMap(runF)  ff =>
         val s = f(r)
         val nextState = ff(s)
         F.map(nextState) { case (s, a) => (g(r, s), a) }
-      }
-    }
 
   /**
     * Modify the state (`S`) component.
@@ -120,9 +116,8 @@ final class StateT[F[_], S, A](val runF: F[S => F[(S, A)]])
     */
   def get(implicit F: Monad[F]): StateT[F, S, S] =
     inspect(identity)
-}
 
-object StateT extends StateTInstances {
+object StateT extends StateTInstances
   def apply[F[_], S, A](f: S => F[(S, A)])(
       implicit F: Applicative[F]): StateT[F, S, A] =
     new StateT(F.pure(f))
@@ -132,12 +127,11 @@ object StateT extends StateTInstances {
 
   def pure[F[_], S, A](a: A)(implicit F: Applicative[F]): StateT[F, S, A] =
     StateT(s => F.pure((s, a)))
-}
 
-private[data] sealed abstract class StateTInstances {
+private[data] sealed abstract class StateTInstances
   implicit def stateTMonadState[F[_], S](
       implicit F: Monad[F]): MonadState[StateT[F, S, ?], S] =
-    new MonadState[StateT[F, S, ?], S] {
+    new MonadState[StateT[F, S, ?], S]
       def pure[A](a: A): StateT[F, S, A] =
         StateT.pure(a)
 
@@ -151,18 +145,15 @@ private[data] sealed abstract class StateTInstances {
 
       override def map[A, B](fa: StateT[F, S, A])(f: A => B): StateT[F, S, B] =
         fa.map(f)
-    }
 
   implicit def stateTLift[M[_], S](implicit M: Applicative[M])
     : TransLift[({ type λ[α[_], β] = StateT[α, S, β] })#λ, M] =
-    new TransLift[({ type λ[α[_], β] = StateT[α, S, β] })#λ, M] {
+    new TransLift[({ type λ[α[_], β] = StateT[α, S, β] })#λ, M]
       def liftT[A](ma: M[A]): StateT[M, S, A] = StateT(s => M.map(ma)(s -> _))
-    }
-}
 
 // To workaround SI-7139 `object State` needs to be defined inside the package object
 // together with the type alias.
-private[data] abstract class StateFunctions {
+private[data] abstract class StateFunctions
 
   def apply[S, A](f: S => (S, A)): State[S, A] =
     StateT.applyF(Now((s: S) => Now(f(s))))
@@ -191,4 +182,3 @@ private[data] abstract class StateFunctions {
     * Set the state to `s` and return Unit.
     */
   def set[S](s: S): State[S, Unit] = State(_ => (s, ()))
-}

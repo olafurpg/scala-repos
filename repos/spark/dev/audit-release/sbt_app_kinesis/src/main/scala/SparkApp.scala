@@ -23,14 +23,11 @@ import scala.util.Try
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 
-object SimpleApp {
-  def main(args: Array[String]) {
+object SimpleApp
+  def main(args: Array[String])
     val foundKinesis = Try(Class.forName(
             "org.apache.spark.streaming.kinesis.KinesisUtils")).isSuccess
-    if (!foundKinesis) {
+    if (!foundKinesis)
       println("Kinesis not loaded via kinesis-asl")
       System.exit(-1)
-    }
-  }
-}
 // scalastyle:on println

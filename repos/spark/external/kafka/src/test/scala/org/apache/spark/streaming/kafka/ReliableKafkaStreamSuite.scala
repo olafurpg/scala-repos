@@ -36,7 +36,7 @@ import org.apache.spark.util.Utils
 
 class ReliableKafkaStreamSuite
     extends SparkFunSuite with BeforeAndAfterAll with BeforeAndAfter
-    with Eventually {
+    with Eventually
 
   private val sparkConf = new SparkConf()
     .setMaster("local[4]")
@@ -51,7 +51,7 @@ class ReliableKafkaStreamSuite
   private var ssc: StreamingContext = _
   private var tempDirectory: File = null
 
-  override def beforeAll(): Unit = {
+  override def beforeAll(): Unit =
     kafkaTestUtils = new KafkaTestUtils
     kafkaTestUtils.setup()
 
@@ -63,30 +63,24 @@ class ReliableKafkaStreamSuite
     )
 
     tempDirectory = Utils.createTempDir()
-  }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     Utils.deleteRecursively(tempDirectory)
 
-    if (kafkaTestUtils != null) {
+    if (kafkaTestUtils != null)
       kafkaTestUtils.teardown()
       kafkaTestUtils = null
-    }
-  }
 
-  before {
+  before
     ssc = new StreamingContext(sparkConf, Milliseconds(500))
     ssc.checkpoint(tempDirectory.getAbsolutePath)
-  }
 
-  after {
-    if (ssc != null) {
+  after
+    if (ssc != null)
       ssc.stop()
       ssc = null
-    }
-  }
 
-  test("Reliable Kafka input stream with single topic") {
+  test("Reliable Kafka input stream with single topic")
     val topic = "test-topic"
     kafkaTestUtils.createTopic(topic)
     kafkaTestUtils.sendMessages(topic, data)
@@ -98,40 +92,33 @@ class ReliableKafkaStreamSuite
       KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
           ssc, kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_ONLY)
     val result = new mutable.HashMap[String, Long]()
-    stream.map { case (k, v) => v }.foreachRDD { r =>
+    stream.map { case (k, v) => v }.foreachRDD  r =>
       val ret = r.collect()
-      ret.foreach { v =>
+      ret.foreach  v =>
         val count = result.getOrElseUpdate(v, 0) + 1
         result.put(v, count)
-      }
-    }
     ssc.start()
 
-    eventually(timeout(20000 milliseconds), interval(200 milliseconds)) {
+    eventually(timeout(20000 milliseconds), interval(200 milliseconds))
       // A basic process verification for ReliableKafkaReceiver.
       // Verify whether received message number is equal to the sent message number.
       assert(data.size === result.size)
       // Verify whether each message is the same as the data to be verified.
-      data.keys.foreach { k =>
+      data.keys.foreach  k =>
         assert(data(k) === result(k).toInt)
-      }
       // Verify the offset number whether it is equal to the total message number.
       assert(getCommitOffset(groupId, topic, 0) === Some(29L))
-    }
-  }
 
-  test("Reliable Kafka input stream with multiple topics") {
+  test("Reliable Kafka input stream with multiple topics")
     val topics = Map("topic1" -> 1, "topic2" -> 1, "topic3" -> 1)
-    topics.foreach {
+    topics.foreach
       case (t, _) =>
         kafkaTestUtils.createTopic(t)
         kafkaTestUtils.sendMessages(t, data)
-    }
 
     // Before started, verify all the group/topic/partition offsets are 0.
-    topics.foreach {
+    topics.foreach
       case (t, _) => assert(getCommitOffset(groupId, t, 0) === None)
-    }
 
     // Consuming all the data sent to the broker which will potential commit the offsets internally.
     val stream =
@@ -140,22 +127,17 @@ class ReliableKafkaStreamSuite
     stream.foreachRDD(_ => Unit)
     ssc.start()
 
-    eventually(timeout(20000 milliseconds), interval(100 milliseconds)) {
+    eventually(timeout(20000 milliseconds), interval(100 milliseconds))
       // Verify the offset for each group/topic to see whether they are equal to the expected one.
-      topics.foreach {
+      topics.foreach
         case (t, _) => assert(getCommitOffset(groupId, t, 0) === Some(29L))
-      }
-    }
-  }
 
   /** Getting partition offset from Zookeeper. */
   private def getCommitOffset(
-      groupId: String, topic: String, partition: Int): Option[Long] = {
+      groupId: String, topic: String, partition: Int): Option[Long] =
     val topicDirs = new ZKGroupTopicDirs(groupId, topic)
     val zkPath = s"${topicDirs.consumerOffsetDir}/$partition"
     ZkUtils
       .readDataMaybeNull(kafkaTestUtils.zookeeperClient, zkPath)
       ._1
       .map(_.toLong)
-  }
-}

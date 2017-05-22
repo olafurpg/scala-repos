@@ -6,7 +6,7 @@ import spire.syntax.cfor._
 /**
   * Created by dlwh on 8/14/15.
   */
-class SqDistBenchmark extends BreezeBenchmark {
+class SqDistBenchmark extends BreezeBenchmark
   assert(usingNatives)
 
   val x1, x2 = DenseMatrix.rand(20, 200)
@@ -144,30 +144,23 @@ class SqDistBenchmark extends BreezeBenchmark {
   }
    */
 
-  def timeVectorSquaredDistance(reps: Int) = {
+  def timeVectorSquaredDistance(reps: Int) =
     var sum = 0.0
-    cforRange(0 until reps) { i =>
+    cforRange(0 until reps)  i =>
       sum += squaredDistance(v1, v2)
-    }
 
     sum
-  }
 
-  def timeOldSquaredDistance(reps: Int) = {
+  def timeOldSquaredDistance(reps: Int) =
     var squaredDistance = 0.0
-    cforRange(0 until reps) { _ =>
-      zipValues(v1, v2).foreach { (a, b) =>
+    cforRange(0 until reps)  _ =>
+      zipValues(v1, v2).foreach  (a, b) =>
         val score = a - b
         squaredDistance += (score * score)
-      }
       squaredDistance
-    }
-  }
-}
 
 object SqDistBenchmark extends MyRunner(classOf[SqDistBenchmark])
 
-object SqDistX extends App {
+object SqDistX extends App
   println((new SqDistBenchmark).timeVectorSquaredDistance(10000000))
   //  (new SqDistBenchmark).timeVectorizedCopyX1(10000)
-}

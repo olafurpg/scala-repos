@@ -24,11 +24,11 @@ import kafka.utils.{ToolsUtils, CommandLineUtils, Logging, ZkUtils}
 import kafka.api.OffsetRequest
 import org.apache.kafka.clients.producer.{ProducerRecord, KafkaProducer, ProducerConfig}
 
-object ReplayLogProducer extends Logging {
+object ReplayLogProducer extends Logging
 
   private val GroupId: String = "replay-log-producer"
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val config = new Config(args)
 
     val executor = Executors.newFixedThreadPool(config.numThreads)
@@ -59,9 +59,8 @@ object ReplayLogProducer extends Logging {
 
     threadList.foreach(_.shutdown)
     consumerConnector.shutdown
-  }
 
-  class Config(args: Array[String]) {
+  class Config(args: Array[String])
     val parser = new OptionParser
     val zkConnectOpt = parser
       .accepts(
@@ -142,24 +141,23 @@ object ReplayLogProducer extends Logging {
     producerProps.put(
         ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
         "org.apache.kafka.common.serialization.ByteArraySerializer")
-  }
 
   class ZKConsumerThread(
       config: Config, stream: KafkaStream[Array[Byte], Array[Byte]])
-      extends Thread with Logging {
+      extends Thread with Logging
     val shutdownLatch = new CountDownLatch(1)
     val producer =
       new KafkaProducer[Array[Byte], Array[Byte]](config.producerProps)
 
-    override def run() {
+    override def run()
       info("Starting consumer thread..")
       var messageCount: Int = 0
-      try {
+      try
         val iter =
           if (config.numMessages >= 0) stream.slice(0, config.numMessages)
           else stream
-        for (messageAndMetadata <- iter) {
-          try {
+        for (messageAndMetadata <- iter)
+          try
             val response = producer.send(
                 new ProducerRecord[Array[Byte], Array[Byte]](
                     config.outputTopic,
@@ -167,26 +165,18 @@ object ReplayLogProducer extends Logging {
                     messageAndMetadata.timestamp,
                     messageAndMetadata.key(),
                     messageAndMetadata.message()))
-            if (config.isSync) {
+            if (config.isSync)
               response.get()
-            }
             messageCount += 1
-          } catch {
+          catch
             case ie: Exception => error("Skipping this message", ie)
-          }
-        }
-      } catch {
+      catch
         case e: ConsumerTimeoutException =>
           error("consumer thread timing out", e)
-      }
       info("Sent " + messageCount + " messages")
       shutdownLatch.countDown
       info("thread finished execution !")
-    }
 
-    def shutdown() {
+    def shutdown()
       shutdownLatch.await
       producer.close
-    }
-  }
-}

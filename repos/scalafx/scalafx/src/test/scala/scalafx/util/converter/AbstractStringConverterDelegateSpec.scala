@@ -64,23 +64,21 @@ abstract private[converter] class AbstractStringConverterDelegateSpec[
     scalaClass: Class[S])(
     implicit jfx2sfx: C => D = null, sfx2jfx: D => C = null)
     extends SimpleSFXDelegateSpec[C, D](
-        javaConverterClass, scalaConverterClass) {
+        javaConverterClass, scalaConverterClass)
 
-  private def runConverterForExamples() {
+  private def runConverterForExamples()
 
     val converter = getConverterForExample
 
-    def runConversionsForExamples(s: S, string: String) {
+    def runConversionsForExamples(s: S, string: String)
       val sToString = converter.toString(s)
       sToString should equal(string)
 
       val stringToS = converter.fromString(string)
       stringToS should equal(s)
-    }
 
     examples.foreach(
         example => runConversionsForExamples(example._1, example._2))
-  }
 
   protected val dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
 
@@ -88,7 +86,5 @@ abstract private[converter] class AbstractStringConverterDelegateSpec[
 
   protected def getConverterForExample = this.getScalaClassInstance
 
-  it should "convert %s to String and vice-versa".format(scalaClass) in {
+  it should "convert %s to String and vice-versa".format(scalaClass) in
     this.runConverterForExamples()
-  }
-}

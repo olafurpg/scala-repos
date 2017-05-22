@@ -16,7 +16,7 @@ import scala.language.implicitConversions
   *
   *  @author Philipp Haller
   */
-object JavaConversions {
+object JavaConversions
 
   /**
     * Creates a new `ExecutionContext` which uses the provided `ExecutorService`.
@@ -30,4 +30,3 @@ object JavaConversions {
     */
   implicit def asExecutionContext(exec: Executor): ExecutionContextExecutor =
     ExecutionContext.fromExecutor(exec)
-}

@@ -17,7 +17,6 @@ final class JasmineEvent(
     val throwable: OptionalThrowable = new OptionalThrowable,
     val duration: Long = -1L
 )
-    extends Event {
+    extends Event
   def fullyQualifiedName: String = taskDef.fullyQualifiedName
   def fingerprint: Fingerprint = taskDef.fingerprint
-}

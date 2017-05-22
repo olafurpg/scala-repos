@@ -17,8 +17,8 @@ package com.twitter.scalding
 
 import org.scalatest.{Matchers, WordSpec}
 
-class PageRankTest extends WordSpec with Matchers {
-  "A PageRank job" should {
+class PageRankTest extends WordSpec with Matchers
+  "A PageRank job" should
     JobTest(new com.twitter.scalding.examples.PageRank(_))
       .arg("input", "inputFile")
       .arg("output", "outputFile")
@@ -30,19 +30,16 @@ class PageRankTest extends WordSpec with Matchers {
       .source(Tsv("inputFile"),
               List((1L, "2", 1.0), (2L, "1,3", 1.0), (3L, "2", 1.0)))
       //Don't check the tempBuffer:
-      .sink[(Long, String, Double)](Tsv("tempBuffer")) { ob =>
+      .sink[(Long, String, Double)](Tsv("tempBuffer"))  ob =>
         ()
-      }
-      .sink[Double](TypedTsv[Double]("error")) { ob =>
-        "have low error" in {
+      .sink[Double](TypedTsv[Double]("error"))  ob =>
+        "have low error" in
           ob.head should be <= 0.05
-        }
-      }
-      .sink[(Long, String, Double)](Tsv("outputFile")) { outputBuffer =>
-        val pageRank = outputBuffer.map { res =>
+      .sink[(Long, String, Double)](Tsv("outputFile"))  outputBuffer =>
+        val pageRank = outputBuffer.map  res =>
           (res._1, res._3)
-        }.toMap
-        "correctly compute pagerank" in {
+        .toMap
+        "correctly compute pagerank" in
           val d = 0.85
           val twoPR = (1.0 + 2 * d) / (1.0 + d)
           val otherPR = (1.0 + d / 2.0) / (1.0 + d)
@@ -51,9 +48,5 @@ class PageRankTest extends WordSpec with Matchers {
           pageRank(1L) shouldBe otherPR +- 0.1
           pageRank(2L) shouldBe twoPR +- 0.1
           pageRank(3L) shouldBe otherPR +- 0.1
-        }
-      }
       .run
       .finish
-  }
-}

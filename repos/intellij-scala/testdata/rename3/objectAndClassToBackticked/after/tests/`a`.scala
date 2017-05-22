@@ -1,6 +1,6 @@
 package tests
 
-object `a` {
+object `a`
   val x = 0
 
   def qqq() = {}
@@ -8,17 +8,12 @@ object `a` {
   def apply() = {}
 
   def unapply(i: Int) = Some(i)
-}
 
-class `a` {
+class `a`
   def baz() = {}
-}
 
-object Test {
-  def main(args: Array[String]) {
+object Test
+  def main(args: Array[String])
     `a`()
-    1 match {
+    1 match
       case `a`(i) =>
-    }
-  }
-}

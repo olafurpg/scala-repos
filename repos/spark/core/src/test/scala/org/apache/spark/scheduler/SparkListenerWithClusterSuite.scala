@@ -29,16 +29,15 @@ import org.apache.spark.scheduler.cluster.ExecutorInfo
   */
 class SparkListenerWithClusterSuite
     extends SparkFunSuite with LocalSparkContext with BeforeAndAfter
-    with BeforeAndAfterAll {
+    with BeforeAndAfterAll
 
   /** Length of time to wait while draining listener events. */
   val WAIT_TIMEOUT_MILLIS = 10000
 
-  before {
+  before
     sc = new SparkContext("local-cluster[2,1,1024]", "SparkListenerSuite")
-  }
 
-  test("SparkListener sends executor added message") {
+  test("SparkListener sends executor added message")
     val listener = new SaveExecutorInfo
     sc.addSparkListener(listener)
 
@@ -55,13 +54,9 @@ class SparkListenerWithClusterSuite
     assert(listener.addedExecutorInfo.size == 2)
     assert(listener.addedExecutorInfo("0").totalCores == 1)
     assert(listener.addedExecutorInfo("1").totalCores == 1)
-  }
 
-  private class SaveExecutorInfo extends SparkListener {
+  private class SaveExecutorInfo extends SparkListener
     val addedExecutorInfo = mutable.Map[String, ExecutorInfo]()
 
-    override def onExecutorAdded(executor: SparkListenerExecutorAdded) {
+    override def onExecutorAdded(executor: SparkListenerExecutorAdded)
       addedExecutorInfo(executor.executorId) = executor.executorInfo
-    }
-  }
-}

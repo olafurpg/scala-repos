@@ -13,11 +13,11 @@ import scala.collection.immutable.Seq
 
 class AppDefinitionFormatsTest
     extends MarathonSpec with AppAndGroupFormats with HealthCheckFormats
-    with Matchers with FetchUriFormats {
+    with Matchers with FetchUriFormats
 
   import Formats.PathIdFormat
 
-  object Fixture {
+  object Fixture
     val a1 = AppDefinition(
         id = "app1".toPath,
         cmd = Some("sleep 10"),
@@ -31,9 +31,8 @@ class AppDefinitionFormatsTest
         "version": "1970-01-01T00:00:00.001Z"
       }
     """)
-  }
 
-  test("ToJson") {
+  test("ToJson")
     import AppDefinition._
     import Fixture._
 
@@ -73,9 +72,8 @@ class AppDefinitionFormatsTest
     (r1 \ "upgradeStrategy").as[UpgradeStrategy] should equal(
         DefaultUpgradeStrategy)
     (r1 \ "residency").asOpt[String] should equal(None)
-  }
 
-  test("ToJson should serialize full version info") {
+  test("ToJson should serialize full version info")
     import Fixture._
 
     val r1 = Json.toJson(
@@ -89,9 +87,8 @@ class AppDefinitionFormatsTest
         "1970-01-01T00:00:00.002Z")
     (r1 \ "versionInfo" \ "lastConfigChangeAt").as[String] should equal(
         "1970-01-01T00:00:00.001Z")
-  }
 
-  test("FromJson") {
+  test("FromJson")
     import AppDefinition._
     import Fixture._
 
@@ -123,9 +120,8 @@ class AppDefinitionFormatsTest
     r1.dependencies should equal(DefaultDependencies)
     r1.upgradeStrategy should equal(DefaultUpgradeStrategy)
     r1.acceptedResourceRoles should not be ('defined)
-  }
 
-  test("FromJSON should ignore VersionInfo") {
+  test("FromJSON should ignore VersionInfo")
     val app = Json.parse("""{
         |  "id": "test",
         |  "version": "1970-01-01T00:00:00.002Z",
@@ -136,74 +132,62 @@ class AppDefinitionFormatsTest
         |}""".stripMargin).as[AppDefinition]
 
     app.versionInfo shouldBe a[OnlyVersion]
-  }
 
-  test("FromJSON should fail for empty id") {
+  test("FromJSON should fail for empty id")
     val json = Json.parse(""" { "id": "" }""")
     a[JsResultException] shouldBe thrownBy { json.as[AppDefinition] }
-  }
 
-  test("FromJSON should fail when using / as an id") {
+  test("FromJSON should fail when using / as an id")
     val json = Json.parse(""" { "id": "/" }""")
     a[JsResultException] shouldBe thrownBy { json.as[AppDefinition] }
-  }
 
-  test("FromJSON should not fail when 'cpus' is greater than 0") {
+  test("FromJSON should not fail when 'cpus' is greater than 0")
     val json = Json.parse(""" { "id": "test", "cpus": 0.0001 }""")
-    noException should be thrownBy {
+    noException should be thrownBy
       json.as[AppDefinition]
-    }
-  }
 
-  test("""ToJSON should correctly handle missing acceptedResourceRoles""") {
+  test("""ToJSON should correctly handle missing acceptedResourceRoles""")
     val appDefinition =
       AppDefinition(id = PathId("test"), acceptedResourceRoles = None)
     val json = Json.toJson(appDefinition)
     (json \ "acceptedResourceRoles").asOpt[Set[String]] should be(None)
-  }
 
-  test("""ToJSON should correctly handle acceptedResourceRoles""") {
+  test("""ToJSON should correctly handle acceptedResourceRoles""")
     val appDefinition = AppDefinition(
         id = PathId("test"), acceptedResourceRoles = Some(Set("a")))
     val json = Json.toJson(appDefinition)
     (json \ "acceptedResourceRoles").asOpt[Set[String]] should be(
         Some(Set("a")))
-  }
 
   test(
-      """FromJSON should parse "acceptedResourceRoles": ["production", "*"] """) {
+      """FromJSON should parse "acceptedResourceRoles": ["production", "*"] """)
     val json = Json.parse(
         """ { "id": "test", "acceptedResourceRoles": ["production", "*"] }""")
     val appDef = json.as[AppDefinition]
     appDef.acceptedResourceRoles should equal(Some(Set("production", "*")))
-  }
 
-  test("""FromJSON should parse "acceptedResourceRoles": ["*"] """) {
+  test("""FromJSON should parse "acceptedResourceRoles": ["*"] """)
     val json =
       Json.parse(""" { "id": "test", "acceptedResourceRoles": ["*"] }""")
     val appDef = json.as[AppDefinition]
     appDef.acceptedResourceRoles should equal(Some(Set("*")))
-  }
 
   test(
-      "FromJSON should fail when 'acceptedResourceRoles' is defined but empty") {
+      "FromJSON should fail when 'acceptedResourceRoles' is defined but empty")
     val json = Json.parse(""" { "id": "test", "acceptedResourceRoles": [] }""")
     a[JsResultException] shouldBe thrownBy { json.as[AppDefinition] }
-  }
 
-  test("FromJSON should read the default upgrade strategy") {
+  test("FromJSON should read the default upgrade strategy")
     val json = Json.parse(""" { "id": "test" }""")
     val appDef = json.as[AppDefinition]
     appDef.upgradeStrategy should be(UpgradeStrategy.empty)
-  }
 
-  test("FromJSON should read the residency upgrade strategy") {
+  test("FromJSON should read the residency upgrade strategy")
     val json = Json.parse(""" { "id": "test", "residency": {}}""")
     val appDef = json.as[AppDefinition]
     appDef.upgradeStrategy should be(UpgradeStrategy.forResidentTasks)
-  }
 
-  test("FromJSON should read the default residency automatically residency ") {
+  test("FromJSON should read the default residency automatically residency ")
     val json = Json.parse("""
         |{
         |  "id": "resident",
@@ -219,9 +203,8 @@ class AppDefinitionFormatsTest
       """.stripMargin)
     val appDef = json.as[AppDefinition]
     appDef.residency should be(Some(Residency.defaultResidency))
-  }
 
-  test("""FromJSON should parse "residency" """) {
+  test("""FromJSON should parse "residency" """)
     val appDef = Json.parse("""{
         |  "id": "test",
         |  "residency": {
@@ -233,9 +216,8 @@ class AppDefinitionFormatsTest
     appDef.residency should equal(Some(Residency(
                 300,
                 Protos.ResidencyDefinition.TaskLostBehavior.RELAUNCH_AFTER_TIMEOUT)))
-  }
 
-  test("ToJson should serialize residency") {
+  test("ToJson should serialize residency")
     import Fixture._
 
     val json = Json.toJson(a1.copy(residency = Some(Residency(
@@ -245,5 +227,3 @@ class AppDefinitionFormatsTest
         7200)
     (json \ "residency" \ "taskLostBehavior").as[String] should equal(
         Protos.ResidencyDefinition.TaskLostBehavior.WAIT_FOREVER.name())
-  }
-}

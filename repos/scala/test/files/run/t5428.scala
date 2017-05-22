@@ -1,12 +1,11 @@
 import collection.mutable.{Stack, StackProxy}
 
-class A extends StackProxy[Int] {
+class A extends StackProxy[Int]
   val self = Stack[Int]()
-}
 
-object Test {
+object Test
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val a = new A
 
     a push 3
@@ -18,5 +17,3 @@ object Test {
     println(a)
 
     a.pop
-  }
-}

@@ -22,9 +22,9 @@ import org.apache.spark.mllib.linalg.{DenseVector, SparseVector, Vector, Vectors
 import org.apache.spark.mllib.util.MLlibTestSparkContext
 import org.apache.spark.mllib.util.TestingUtils._
 
-class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
+class IDFSuite extends SparkFunSuite with MLlibTestSparkContext
 
-  test("idf") {
+  test("idf")
     val n = 4
     val localTermFrequencies = Seq(
         Vectors.sparse(n, Array(1, 3), Array(1.0, 2.0)),
@@ -35,13 +35,12 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val termFrequencies = sc.parallelize(localTermFrequencies, 2)
     val idf = new IDF
     val model = idf.fit(termFrequencies)
-    val expected = Vectors.dense(Array(0, 3, 1, 2).map { x =>
+    val expected = Vectors.dense(Array(0, 3, 1, 2).map  x =>
       math.log((m + 1.0) / (x + 1.0))
-    })
+    )
     assert(model.idf ~== expected absTol 1e-12)
 
     val assertHelper = (tfidf: Array[Vector]) =>
-      {
         assert(tfidf.size === 3)
         val tfidf0 = tfidf(0).asInstanceOf[SparseVector]
         assert(tfidf0.indices === Array(1, 3))
@@ -57,16 +56,14 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
         val tfidf2 = tfidf(2).asInstanceOf[SparseVector]
         assert(tfidf2.indices === Array(1))
         assert(tfidf2.values(0) ~== (1.0 * expected(1)) absTol 1e-12)
-    }
     // Transforms a RDD
     val tfidf = model.transform(termFrequencies).collect()
     assertHelper(tfidf)
     // Transforms local vectors
     val localTfidf = localTermFrequencies.map(model.transform(_)).toArray
     assertHelper(localTfidf)
-  }
 
-  test("idf minimum document frequency filtering") {
+  test("idf minimum document frequency filtering")
     val n = 4
     val localTermFrequencies = Seq(
         Vectors.sparse(n, Array(1, 3), Array(1.0, 2.0)),
@@ -78,17 +75,15 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
     val idf = new IDF(minDocFreq = 1)
     val model = idf.fit(termFrequencies)
     val expected = Vectors.dense(
-        Array(0, 3, 1, 2).map { x =>
-      if (x > 0) {
+        Array(0, 3, 1, 2).map  x =>
+      if (x > 0)
         math.log((m + 1.0) / (x + 1.0))
-      } else {
+      else
         0
-      }
-    })
+    )
     assert(model.idf ~== expected absTol 1e-12)
 
     val assertHelper = (tfidf: Array[Vector]) =>
-      {
         assert(tfidf.size === 3)
         val tfidf0 = tfidf(0).asInstanceOf[SparseVector]
         assert(tfidf0.indices === Array(1, 3))
@@ -104,12 +99,9 @@ class IDFSuite extends SparkFunSuite with MLlibTestSparkContext {
         val tfidf2 = tfidf(2).asInstanceOf[SparseVector]
         assert(tfidf2.indices === Array(1))
         assert(tfidf2.values(0) ~== (1.0 * expected(1)) absTol 1e-12)
-    }
     // Transforms a RDD
     val tfidf = model.transform(termFrequencies).collect()
     assertHelper(tfidf)
     // Transforms local vectors
     val localTfidf = localTermFrequencies.map(model.transform(_)).toArray
     assertHelper(localTfidf)
-  }
-}

@@ -3,11 +3,11 @@ package mesosphere.marathon.integration.facades
 import org.scalatest.{Matchers, GivenWhenThen, FunSuite}
 import play.api.libs.json.Json
 
-class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
+class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen
   import MesosFacade._
   import MesosFormats._
 
-  test("parse sample") {
+  test("parse sample")
     Given("a sample state.json")
     val f = new Fixture
 
@@ -104,9 +104,8 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
             "ports" -> "[31000-31902, 31904-32000]"
         )
     )
-  }
 
-  class Fixture {
+  class Fixture
     val sampleStatusJson =
       """
         |{
@@ -395,5 +394,3 @@ class MesosFormatsTest extends FunSuite with Matchers with GivenWhenThen {
         |  ]
         |}
       """.stripMargin
-  }
-}

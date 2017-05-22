@@ -13,23 +13,22 @@ import scala.language.implicitConversions
   *  code generating code should look a lot like the code it
   *  generates.
   */
-trait TreeDSL {
+trait TreeDSL
   val global: Global
 
   import global._
   import definitions._
 
-  object CODE {
+  object CODE
     // Add a null check to a Tree => Tree function
     def nullSafe[T](f: Tree => Tree, ifNull: Tree): Tree => Tree =
       tree => IF(tree MEMBER_== NULL) THEN ifNull ELSE f(tree)
 
     def returning[T](x: T)(f: T => Unit): T = util.returning(x)(f)
 
-    object LIT extends (Any => Literal) {
+    object LIT extends (Any => Literal)
       def typed(x: Any) = apply(x) setType ConstantType(Constant(x))
       def apply(x: Any) = Literal(Constant(x))
-    }
 
     // Boring, predictable trees.
     def TRUE = LIT typed true
@@ -43,7 +42,7 @@ trait TreeDSL {
     def fn(lhs: Tree, op: Symbol, args: Tree*) =
       Apply(Select(lhs, op), args.toList)
 
-    class TreeMethods(target: Tree) {
+    class TreeMethods(target: Tree)
 
       /** logical/comparison ops **/
       def OR(other: Tree) =
@@ -62,12 +61,11 @@ trait TreeDSL {
         *  a member called nme.EQ.  Not sure if that should happen, but we can be
         *  robust by dragging in Any regardless.
         */
-      def MEMBER_==(other: Tree) = {
+      def MEMBER_==(other: Tree) =
         val opSym =
           if (target.tpe == null) NoSymbol else target.tpe member nme.EQ
         if (opSym == NoSymbol) ANY_==(other)
         else fn(target, opSym, other)
-      }
       def ANY_EQ(other: Tree) = OBJ_EQ(other AS ObjectTpe)
       def ANY_==(other: Tree) = fn(target, Any_==, other)
       def ANY_!=(other: Tree) = fn(target, Any_!=, other)
@@ -113,26 +111,21 @@ trait TreeDSL {
       def IS_OBJ(tpe: Type) = gen.mkIsInstanceOf(target, tpe, any = false)
 
       def GETCLASS() = fn(target, Object_getClass)
-    }
 
-    case class SelectStart(tree: Select) {
+    case class SelectStart(tree: Select)
       def apply(args: Tree*) = Apply(tree, args.toList)
-    }
 
-    class CaseStart(pat: Tree, guard: Tree) {
+    class CaseStart(pat: Tree, guard: Tree)
       def IF(g: Tree): CaseStart = new CaseStart(pat, g)
       def ==>(body: Tree): CaseDef = CaseDef(pat, guard, body)
-    }
 
-    class IfStart(cond: Tree, thenp: Tree) {
+    class IfStart(cond: Tree, thenp: Tree)
       def THEN(x: Tree) = new IfStart(cond, x)
       def ELSE(elsep: Tree) = If(cond, thenp, elsep)
       def ENDIF = If(cond, thenp, EmptyTree)
-    }
-    class TryStart(body: Tree, catches: List[CaseDef], fin: Tree) {
+    class TryStart(body: Tree, catches: List[CaseDef], fin: Tree)
       def CATCH(xs: CaseDef*) = new TryStart(body, xs.toList, fin)
       def ENDTRY = Try(body, catches, fin)
-    }
 
     def CASE(pat: Tree): CaseStart = new CaseStart(pat, EmptyTree)
     def DEFAULT: CaseStart = new CaseStart(Ident(nme.WILDCARD), EmptyTree)
@@ -167,5 +160,3 @@ trait TreeDSL {
     implicit def mkTreeFromSelectStart(ss: SelectStart): Select = ss.tree
     implicit def mkTreeMethodsFromSelectStart(ss: SelectStart): TreeMethods =
       mkTreeMethods(ss.tree)
-  }
-}

@@ -7,17 +7,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class GroupRepository(val store: EntityStore[Group],
                       val maxVersions: Option[Int] = None,
                       val metrics: Metrics)
-    extends EntityRepository[Group] {
+    extends EntityRepository[Group]
 
   val zkRootName = GroupRepository.zkRootName
 
-  def group(id: String): Future[Option[Group]] = timedRead {
+  def group(id: String): Future[Option[Group]] = timedRead
     this.store.fetch(id)
-  }
 
-  def rootGroup(): Future[Option[Group]] = timedRead {
+  def rootGroup(): Future[Option[Group]] = timedRead
     this.store.fetch(zkRootName)
-  }
   def rootGroupOrEmpty(): Future[Group] =
     rootGroup().map(_.getOrElse(Group.empty))(
         ExecutionContext.Implicits.global)
@@ -27,8 +25,6 @@ class GroupRepository(val store: EntityStore[Group],
 
   def store(path: String, group: Group): Future[Group] =
     storeWithVersion(path, group.version, group)
-}
 
-object GroupRepository {
+object GroupRepository
   val zkRootName = "root"
-}

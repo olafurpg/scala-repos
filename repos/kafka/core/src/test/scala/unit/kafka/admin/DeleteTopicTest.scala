@@ -26,10 +26,10 @@ import org.junit.Test
 import java.util.Properties
 import kafka.common.{TopicAlreadyMarkedForDeletionException, TopicAndPartition}
 
-class DeleteTopicTest extends ZooKeeperTestHarness {
+class DeleteTopicTest extends ZooKeeperTestHarness
 
   @Test
-  def testDeleteTopicWithAllAliveReplicas() {
+  def testDeleteTopicWithAllAliveReplicas()
     val topicAndPartition = TopicAndPartition("test", 0)
     val topic = topicAndPartition.topic
     val servers = createTestTopicAndCluster(topic)
@@ -37,10 +37,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     AdminUtils.deleteTopic(zkUtils, topic)
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testResumeDeleteTopicWithRecoveredFollower() {
+  def testResumeDeleteTopicWithRecoveredFollower()
     val topicAndPartition = TopicAndPartition("test", 0)
     val topic = topicAndPartition.topic
     val servers = createTestTopicAndCluster(topic)
@@ -68,10 +67,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     follower.startup()
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testResumeDeleteTopicOnControllerFailover() {
+  def testResumeDeleteTopicOnControllerFailover()
     val topicAndPartition = TopicAndPartition("test", 0)
     val topic = topicAndPartition.topic
     val servers = createTestTopicAndCluster(topic)
@@ -101,10 +99,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
 
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testPartitionReassignmentDuringDeleteTopic() {
+  def testPartitionReassignmentDuringDeleteTopic()
     val expectedReplicaAssignment = Map(0 -> List(0, 1, 2))
     val topic = "test"
     val topicAndPartition = TopicAndPartition(topic, 0)
@@ -144,7 +141,6 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     // wait until reassignment is completed
     TestUtils.waitUntilTrue(
         () =>
-          {
             val partitionsBeingReassigned =
               zkUtils.getPartitionsBeingReassigned().mapValues(_.newReplicas);
             ReassignPartitionsCommand.checkIfPartitionReassignmentSucceeded(
@@ -153,7 +149,7 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
                 newReplicas,
                 Map(topicAndPartition -> newReplicas),
                 partitionsBeingReassigned) == ReassignmentFailed;
-        },
+        ,
         "Partition reassignment shouldn't complete.")
     val controllerId = zkUtils.getController()
     val controller =
@@ -169,10 +165,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     follower.startup()
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     allServers.foreach(_.shutdown())
-  }
 
   @Test
-  def testDeleteTopicDuringAddPartition() {
+  def testDeleteTopicDuringAddPartition()
     val topic = "test"
     val servers = createTestTopicAndCluster(topic)
     val leaderIdOpt = zkUtils.getLeaderForPartition(topic, 0)
@@ -194,10 +189,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
         () => servers.forall(_.getLogManager().getLog(newPartition).isEmpty),
         "Replica logs not for new partition [test,1] not deleted after delete topic is complete.")
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testAddPartitionDuringDeleteTopic() {
+  def testAddPartitionDuringDeleteTopic()
     val topic = "test"
     val topicAndPartition = TopicAndPartition(topic, 0)
     val servers = createTestTopicAndCluster(topic)
@@ -211,10 +205,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     assertTrue("Replica logs not deleted after delete topic is complete",
                servers.forall(_.getLogManager().getLog(newPartition).isEmpty))
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testRecreateTopicAfterDeletion() {
+  def testRecreateTopicAfterDeletion()
     val expectedReplicaAssignment = Map(0 -> List(0, 1, 2))
     val topic = "test"
     val topicAndPartition = TopicAndPartition(topic, 0)
@@ -237,10 +230,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
               _.getLogManager().getLog(topicAndPartition).isDefined),
         "Replicas for topic test not created.")
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testDeleteNonExistingTopic() {
+  def testDeleteNonExistingTopic()
     val topicAndPartition = TopicAndPartition("test", 0)
     val topic = topicAndPartition.topic
     val servers = createTestTopicAndCluster(topic)
@@ -262,10 +254,9 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
       TestUtils.waitUntilLeaderIsElectedOrChanged(zkUtils, topic, 0, 1000)
     assertTrue("Leader should exist for topic test", leaderIdOpt.isDefined)
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testDeleteTopicWithCleaner() {
+  def testDeleteTopicWithCleaner()
     val topicName = "test"
     val topicAndPartition = TopicAndPartition(topicName, 0)
     val topic = topicAndPartition.topic
@@ -295,37 +286,33 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
     TestUtils.verifyTopicDeletion(zkUtils, "test", 1, servers)
 
     servers.foreach(_.shutdown())
-  }
 
   @Test
-  def testDeleteTopicAlreadyMarkedAsDeleted() {
+  def testDeleteTopicAlreadyMarkedAsDeleted()
     val topicAndPartition = TopicAndPartition("test", 0)
     val topic = topicAndPartition.topic
     val servers = createTestTopicAndCluster(topic)
 
-    try {
+    try
       // start topic deletion
       AdminUtils.deleteTopic(zkUtils, topic)
       // try to delete topic marked as deleted
       AdminUtils.deleteTopic(zkUtils, topic)
       fail("Expected TopicAlreadyMarkedForDeletionException")
-    } catch {
+    catch
       case e: TopicAlreadyMarkedForDeletionException => // expected exception
-    }
 
     TestUtils.verifyTopicDeletion(zkUtils, topic, 1, servers)
     servers.foreach(_.shutdown())
-  }
 
-  private def createTestTopicAndCluster(topic: String): Seq[KafkaServer] = {
+  private def createTestTopicAndCluster(topic: String): Seq[KafkaServer] =
 
     val brokerConfigs = TestUtils.createBrokerConfigs(3, zkConnect, false)
     brokerConfigs.foreach(p => p.setProperty("delete.topic.enable", "true"))
     createTestTopicAndCluster(topic, brokerConfigs)
-  }
 
   private def createTestTopicAndCluster(
-      topic: String, brokerConfigs: Seq[Properties]): Seq[KafkaServer] = {
+      topic: String, brokerConfigs: Seq[Properties]): Seq[KafkaServer] =
     val expectedReplicaAssignment = Map(0 -> List(0, 1, 2))
     val topicAndPartition = TopicAndPartition(topic, 0)
     // create brokers
@@ -341,12 +328,11 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
               _.getLogManager().getLog(topicAndPartition).isDefined),
         "Replicas for topic test not created")
     servers
-  }
 
   private def writeDups(
-      numKeys: Int, numDups: Int, log: Log): Seq[(Int, Int)] = {
+      numKeys: Int, numDups: Int, log: Log): Seq[(Int, Int)] =
     var counter = 0
-    for (dup <- 0 until numDups; key <- 0 until numKeys) yield {
+    for (dup <- 0 until numDups; key <- 0 until numKeys) yield
       val count = counter
       log.append(
           TestUtils.singleMessageSet(payload = counter.toString.getBytes,
@@ -354,6 +340,3 @@ class DeleteTopicTest extends ZooKeeperTestHarness {
           assignOffsets = true)
       counter += 1
       (key, count)
-    }
-  }
-}

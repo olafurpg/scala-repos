@@ -32,7 +32,7 @@ import Variance._
   *  The former is true for both Covariant and Bivariant, but the latter is true
   *  only for Covariant.
   */
-final class Variance private (val flags: Int) extends AnyVal {
+final class Variance private (val flags: Int) extends AnyVal
   def isBivariant = flags == 2
   def isCovariant = flags == 1 // excludes bivariant
   def isInvariant = flags == 0
@@ -66,13 +66,11 @@ final class Variance private (val flags: Int) extends AnyVal {
                            else if (isInvariant) "invariant"
                            else "" // noisy to print bivariant on everything without type parameters
                            )
-}
 
-object Variance {
-  implicit class SbtCompat(val v: Variance) {
+object Variance
+  implicit class SbtCompat(val v: Variance)
     def <(other: Int) = v.flags < other
     def >(other: Int) = v.flags > other
-  }
 
   def fold(variances: List[Variance]): Variance =
     (if (variances.isEmpty) Bivariant
@@ -81,4 +79,3 @@ object Variance {
   val Covariant = new Variance(1)
   val Contravariant = new Variance(-1)
   val Invariant = new Variance(0)
-}

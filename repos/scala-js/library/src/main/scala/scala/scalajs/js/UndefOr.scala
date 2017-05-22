@@ -23,19 +23,17 @@ import scala.scalajs.js.|.Evidence
 @scala.scalajs.js.annotation.RawJSType // Don't do this at home!
 sealed trait UndefOr[+A]
 
-sealed abstract class UndefOrLowPrioImplicits {
+sealed abstract class UndefOrLowPrioImplicits
 
   /** Upcast `A` to `UndefOr[B1 | B2]`.
     *
     *  This needs evidence that `A <: B1 | B2`.
     */
   implicit def any2undefOrUnion[A, B1, B2](a: A)(
-      implicit ev: Evidence[A, B1 | B2]): UndefOr[B1 | B2] = {
+      implicit ev: Evidence[A, B1 | B2]): UndefOr[B1 | B2] =
     a.asInstanceOf[UndefOr[B1 | B2]]
-  }
-}
 
-object UndefOr extends UndefOrLowPrioImplicits {
+object UndefOr extends UndefOrLowPrioImplicits
   implicit def any2undefOrA[A](value: A): UndefOr[A] =
     value.asInstanceOf[UndefOr[A]]
 
@@ -45,12 +43,11 @@ object UndefOr extends UndefOrLowPrioImplicits {
   implicit def undefOr2jsAny[A](value: UndefOr[A])(
       implicit ev: A => Any): Any =
     value.map(ev).asInstanceOf[Any]
-}
 
 /** @define option [[UndefOr]]
   *  @define none [[undefined]]
   */
-final class UndefOrOps[A](val self: UndefOr[A]) extends AnyVal {
+final class UndefOrOps[A](val self: UndefOr[A]) extends AnyVal
   import UndefOrOps._
 
   /** Returns true if the option is `undefined`, false otherwise.
@@ -248,19 +245,16 @@ final class UndefOrOps[A](val self: UndefOr[A]) extends AnyVal {
     */
   @inline final def toOption: Option[A] =
     if (isEmpty) None else Some(this.forceGet)
-}
 
-object UndefOrOps {
+object UndefOrOps
 
   /** We need a whole WithFilter class to honor the "doesn't create a new
     *  collection" contract even though it seems unlikely to matter much in a
     *  collection with max size 1.
     */
-  class WithFilter[A](self: UndefOr[A], p: A => Boolean) {
+  class WithFilter[A](self: UndefOr[A], p: A => Boolean)
     def map[B](f: A => B): UndefOr[B] = self filter p map f
     def flatMap[B](f: A => UndefOr[B]): UndefOr[B] = self filter p flatMap f
     def foreach[U](f: A => U): Unit = self filter p foreach f
     def withFilter(q: A => Boolean): WithFilter[A] =
       new WithFilter[A](self, x => p(x) && q(x))
-  }
-}

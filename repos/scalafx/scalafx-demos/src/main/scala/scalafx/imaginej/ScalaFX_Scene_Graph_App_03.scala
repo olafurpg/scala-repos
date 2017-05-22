@@ -56,57 +56,50 @@ import scalafx.scene.shape.Rectangle
   * http://docs.oracle.com/javafx/2.0/scenegraph/jfxpub-scenegraph.htm
   *
   */
-object ScalaFX_Scene_Graph_App_03 extends JFXApp {
-  val rectangle = new Rectangle {
+object ScalaFX_Scene_Graph_App_03 extends JFXApp
+  val rectangle = new Rectangle
     x = 0
     y = 0
     width = 250
     height = 250
     fill = Color.Blue
-  }
-  stage = new PrimaryStage {
+  stage = new PrimaryStage
     title = "ScalaFX Scene Graph App 03"
-    scene = new Scene(500, 500) {
+    scene = new Scene(500, 500)
       fill = Color.Black
       content = List(
           rectangle
       )
-    }
-    val parallelTransition = new ParallelTransition {
+    val parallelTransition = new ParallelTransition
       node = rectangle
       cycleCount = Timeline.Indefinite
       autoReverse = true
       interpolator = Interpolator.EaseBoth
       children = Seq(
-          new TranslateTransition {
+          new TranslateTransition
             duration = (2 s)
             toX = 390
             toY = 390
-          },
-          new FillTransition {
+          ,
+          new FillTransition
             duration = (2 s)
             toValue = Color.Red
-          },
-          new RotateTransition {
+          ,
+          new RotateTransition
             duration = (2 s)
             toAngle = 360
-          },
-          new SequentialTransition {
+          ,
+          new SequentialTransition
             children = Seq(
-                new ScaleTransition {
+                new ScaleTransition
                   duration = (1 s)
                   toX = 0.1
                   toY = 0.1
-                },
-                new ScaleTransition {
+                ,
+                new ScaleTransition
                   duration = (1 s)
                   toX = 1
                   toY = 1
-                }
             )
-          }
       )
-    }
     parallelTransition.play()
-  }
-}

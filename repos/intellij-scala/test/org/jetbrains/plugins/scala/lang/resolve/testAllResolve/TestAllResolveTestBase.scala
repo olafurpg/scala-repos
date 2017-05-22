@@ -14,10 +14,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.base.ScReferenceElement
   * Date: 24.11.2009
   */
 abstract class TestAllResolveTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   def folderPath: String = baseRootPath() + "resolve/testAllResolve/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
 
     val filePath = folderPath + getTestName(false) + ".scala"
@@ -28,8 +28,8 @@ abstract class TestAllResolveTestBase
             new File(file.getCanonicalPath), CharsetToolkit.UTF8))
     configureFromFileTextAdapter(getTestName(false) + ".scala", fileText)
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
-    scalaFile.accept(new ScalaRecursiveElementVisitor {
-      override def visitReference(ref: ScReferenceElement) {
+    scalaFile.accept(new ScalaRecursiveElementVisitor
+      override def visitReference(ref: ScReferenceElement)
         val resolve = ref.resolve()
         assertNotNull(
             "Failed on reference: " + ref.getText +
@@ -37,7 +37,4 @@ abstract class TestAllResolveTestBase
             ref.getTextRange.getEndOffset + ")",
             resolve)
         super.visitReference(ref)
-      }
-    })
-  }
-}
+    )

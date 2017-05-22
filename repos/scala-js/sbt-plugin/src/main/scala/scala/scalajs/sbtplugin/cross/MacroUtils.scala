@@ -10,19 +10,19 @@ package org.scalajs.sbtplugin.cross
 
 import scala.reflect.macros.Context
 
-private[cross] object MacroUtils {
+private[cross] object MacroUtils
 
   // Copied from sbt.std.KeyMacros
 
   def definingValName(
-      c: Context, invalidEnclosingTree: String => String): String = {
+      c: Context, invalidEnclosingTree: String => String): String =
     import c.universe._
     val methodName = c.macroApplication.symbol.name
 
     // trim is not strictly correct, but macros don't expose the API necessary
     def processName(n: Name): String = n.decoded.trim
 
-    def enclosingVal(trees: List[c.Tree]): String = trees match {
+    def enclosingVal(trees: List[c.Tree]): String = trees match
       case vd @ ValDef(_, name, _, _) :: ts =>
         processName(name)
 
@@ -37,10 +37,8 @@ private[cross] object MacroUtils {
       case _ =>
         c.error(c.enclosingPosition, invalidEnclosingTree(methodName.decoded))
         "<error>"
-    }
 
     enclosingVal(enclosingTrees(c).toList)
-  }
 
   def enclosingTrees(c: Context): Seq[c.Tree] =
     c.asInstanceOf[reflect.macros.runtime.Context]
@@ -48,4 +46,3 @@ private[cross] object MacroUtils {
       .context
       .enclosingContextChain
       .map(_.tree.asInstanceOf[c.Tree])
-}

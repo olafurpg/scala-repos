@@ -17,16 +17,15 @@ import scala.collection.mutable
   * @author Ksenia.Sautina
   * @since 4/20/12
   */
-object FlipComparisonInInfixExprIntention {
+object FlipComparisonInInfixExprIntention
   def familyName = "Flip comparison in infix expression."
-}
 
 class FlipComparisonInInfixExprIntention
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName = FlipComparisonInInfixExprIntention.familyName
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null) return false
@@ -44,17 +43,15 @@ class FlipComparisonInInfixExprIntention
 
     val notChanged =
       mutable.HashSet[String]("==", "!=", "equals", "eq", "ne", "&&", "||")
-    if (notChanged.contains(oper)) {
+    if (notChanged.contains(oper))
       setText("Flip '" + oper + "'")
-    } else {
+    else
       val replaceOper = Map(">" -> "<", "<" -> ">", ">=" -> "<=", "<=" -> ">=")
       setText("Flip '" + oper + "' to '" + replaceOper(oper) + "'")
-    }
 
     true
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val infixExpr: ScInfixExpr =
       PsiTreeUtil.getParentOfType(element, classOf[ScInfixExpr], false)
     if (infixExpr == null || !infixExpr.isValid) return
@@ -94,12 +91,9 @@ class FlipComparisonInInfixExprIntention
         .getTextRange
         .getStartOffset - newInfixExpr.getTextRange.getStartOffset
 
-    inWriteAction {
+    inWriteAction
       infixExpr.replace(newInfixExpr)
       editor.getCaretModel.moveToOffset(start + diff + size)
       PsiDocumentManager
         .getInstance(project)
         .commitDocument(editor.getDocument)
-    }
-  }
-}

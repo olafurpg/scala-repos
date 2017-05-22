@@ -21,7 +21,7 @@ case class Tuple2[
     @specialized(Int, Long, Double, Char, Boolean /*, AnyRef*/ ) +T1,
     @specialized(Int, Long, Double, Char, Boolean /*, AnyRef*/ ) +T2](
     _1: T1, _2: T2)
-    extends Product2[T1, T2] {
+    extends Product2[T1, T2]
   override def toString() = "(" + _1 + "," + _2 + ")"
 
   /** Swaps the elements of this `Tuple`.
@@ -29,4 +29,3 @@ case class Tuple2[
     * second element is the first element of this Tuple.
     */
   def swap: Tuple2[T2, T1] = Tuple2(_2, _1)
-}

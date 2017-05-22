@@ -13,9 +13,8 @@ import org.jetbrains.plugins.scala.lang.psi.impl.statements.ScMacroDefinitionImp
   * User: Jason Zaugg
   */
 class ScMacroDefinitionElementType
-    extends ScFunctionElementType[ScMacroDefinition]("macro definition") {
+    extends ScFunctionElementType[ScMacroDefinition]("macro definition")
   def createElement(node: ASTNode): PsiElement =
     new ScMacroDefinitionImpl(node)
 
   def createPsi(stub: ScFunctionStub) = new ScMacroDefinitionImpl(stub)
-}

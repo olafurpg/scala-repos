@@ -33,7 +33,7 @@ import java.io.IOException
 /**
   * Helper functions common to clients (producer, consumer, or admin)
   */
-object ClientUtils extends Logging {
+object ClientUtils extends Logging
 
   /**
     * Used by the producer to send a metadata request since it has access to the ProducerConfig
@@ -48,7 +48,7 @@ object ClientUtils extends Logging {
   def fetchTopicMetadata(topics: Set[String],
                          brokers: Seq[BrokerEndPoint],
                          producerConfig: ProducerConfig,
-                         correlationId: Int): TopicMetadataResponse = {
+                         correlationId: Int): TopicMetadataResponse =
     var fetchMetaDataSucceeded: Boolean = false
     var i: Int = 0
     val topicMetadataRequest = new TopicMetadataRequest(
@@ -61,39 +61,35 @@ object ClientUtils extends Logging {
     // shuffle the list of brokers before sending metadata requests so that most requests don't get routed to the
     // same broker
     val shuffledBrokers = Random.shuffle(brokers)
-    while (i < shuffledBrokers.size && !fetchMetaDataSucceeded) {
+    while (i < shuffledBrokers.size && !fetchMetaDataSucceeded)
       val producer: SyncProducer =
         ProducerPool.createSyncProducer(producerConfig, shuffledBrokers(i))
       info(
           "Fetching metadata from broker %s with correlation id %d for %d topic(s) %s"
             .format(shuffledBrokers(i), correlationId, topics.size, topics))
-      try {
+      try
         topicMetadataResponse = producer.send(topicMetadataRequest)
         fetchMetaDataSucceeded = true
-      } catch {
+      catch
         case e: Throwable =>
           warn(
               "Fetching topic metadata with correlation id %d for topics [%s] from broker [%s] failed"
                 .format(correlationId, topics, shuffledBrokers(i).toString),
               e)
           t = e
-      } finally {
+      finally
         i = i + 1
         producer.close()
-      }
-    }
-    if (!fetchMetaDataSucceeded) {
+    if (!fetchMetaDataSucceeded)
       throw new KafkaException(
           "fetching topic metadata for topics [%s] from broker [%s] failed"
             .format(topics, shuffledBrokers),
           t)
-    } else {
+    else
       debug(
           "Successfully fetched metadata for %d topic(s) %s".format(
               topics.size, topics))
-    }
     topicMetadataResponse
-  }
 
   /**
     * Used by a non-producer client to send a metadata request
@@ -106,7 +102,7 @@ object ClientUtils extends Logging {
                          brokers: Seq[BrokerEndPoint],
                          clientId: String,
                          timeoutMs: Int,
-                         correlationId: Int = 0): TopicMetadataResponse = {
+                         correlationId: Int = 0): TopicMetadataResponse =
     val props = new Properties()
     props.put(
         "metadata.broker.list", brokers.map(_.connectionString).mkString(","))
@@ -114,33 +110,30 @@ object ClientUtils extends Logging {
     props.put("request.timeout.ms", timeoutMs.toString)
     val producerConfig = new ProducerConfig(props)
     fetchTopicMetadata(topics, brokers, producerConfig, correlationId)
-  }
 
   /**
     * Parse a list of broker urls in the form host1:port1, host2:port2, ...
     */
-  def parseBrokerList(brokerListStr: String): Seq[BrokerEndPoint] = {
+  def parseBrokerList(brokerListStr: String): Seq[BrokerEndPoint] =
     val brokersStr = CoreUtils.parseCsvList(brokerListStr)
 
-    brokersStr.zipWithIndex.map {
+    brokersStr.zipWithIndex.map
       case (address, brokerId) =>
         BrokerEndPoint.createBrokerEndPoint(brokerId, address)
-    }
-  }
 
   /**
     * Creates a blocking channel to a random broker
     */
   def channelToAnyBroker(
-      zkUtils: ZkUtils, socketTimeoutMs: Int = 3000): BlockingChannel = {
+      zkUtils: ZkUtils, socketTimeoutMs: Int = 3000): BlockingChannel =
     var channel: BlockingChannel = null
     var connected = false
-    while (!connected) {
+    while (!connected)
       val allBrokers =
         zkUtils.getAllBrokerEndPointsForChannel(SecurityProtocol.PLAINTEXT)
-      Random.shuffle(allBrokers).find { broker =>
+      Random.shuffle(allBrokers).find  broker =>
         trace("Connecting to broker %s:%d.".format(broker.host, broker.port))
-        try {
+        try
           channel = new BlockingChannel(broker.host,
                                         broker.port,
                                         BlockingChannel.UseDefaultBufferSize,
@@ -150,20 +143,16 @@ object ClientUtils extends Logging {
           debug("Created channel to broker %s:%d.".format(channel.host,
                                                           channel.port))
           true
-        } catch {
+        catch
           case e: Exception =>
             if (channel != null) channel.disconnect()
             channel = null
             info("Error while creating channel to %s:%d.".format(broker.host,
                                                                  broker.port))
             false
-        }
-      }
       connected = if (channel == null) false else true
-    }
 
     channel
-  }
 
   /**
     * Creates a blocking channel to the offset manager of the given group
@@ -171,17 +160,17 @@ object ClientUtils extends Logging {
   def channelToOffsetManager(group: String,
                              zkUtils: ZkUtils,
                              socketTimeoutMs: Int = 3000,
-                             retryBackOffMs: Int = 1000) = {
+                             retryBackOffMs: Int = 1000) =
     var queryChannel = channelToAnyBroker(zkUtils)
 
     var offsetManagerChannelOpt: Option[BlockingChannel] = None
 
-    while (!offsetManagerChannelOpt.isDefined) {
+    while (!offsetManagerChannelOpt.isDefined)
 
       var coordinatorOpt: Option[BrokerEndPoint] = None
 
-      while (!coordinatorOpt.isDefined) {
-        try {
+      while (!coordinatorOpt.isDefined)
+        try
           if (!queryChannel.isConnected)
             queryChannel = channelToAnyBroker(zkUtils)
           debug("Querying %s:%d to locate offset manager for %s.".format(
@@ -195,7 +184,7 @@ object ClientUtils extends Logging {
               consumerMetadataResponse.toString)
           if (consumerMetadataResponse.errorCode == Errors.NONE.code)
             coordinatorOpt = consumerMetadataResponse.coordinatorOpt
-          else {
+          else
             debug(
                 "Query to %s:%d to locate offset manager for %s failed - will retry in %d milliseconds."
                   .format(queryChannel.host,
@@ -203,23 +192,20 @@ object ClientUtils extends Logging {
                           group,
                           retryBackOffMs))
             Thread.sleep(retryBackOffMs)
-          }
-        } catch {
+        catch
           case ioe: IOException =>
             info("Failed to fetch consumer metadata from %s:%d.".format(
                     queryChannel.host, queryChannel.port))
             queryChannel.disconnect()
-        }
-      }
 
       val coordinator = coordinatorOpt.get
       if (coordinator.host == queryChannel.host &&
-          coordinator.port == queryChannel.port) {
+          coordinator.port == queryChannel.port)
         offsetManagerChannelOpt = Some(queryChannel)
-      } else {
+      else
         val connectString = "%s:%d".format(coordinator.host, coordinator.port)
         var offsetManagerChannel: BlockingChannel = null
-        try {
+        try
           debug("Connecting to offset manager %s.".format(connectString))
           offsetManagerChannel = new BlockingChannel(
               coordinator.host,
@@ -230,16 +216,11 @@ object ClientUtils extends Logging {
           offsetManagerChannel.connect()
           offsetManagerChannelOpt = Some(offsetManagerChannel)
           queryChannel.disconnect()
-        } catch {
+        catch
           case ioe: IOException => // offsets manager may have moved
             info("Error while connecting to %s.".format(connectString))
             if (offsetManagerChannel != null) offsetManagerChannel.disconnect()
             Thread.sleep(retryBackOffMs)
             offsetManagerChannelOpt = None // just in case someone decides to change shutdownChannel to not swallow exceptions
-        }
-      }
-    }
 
     offsetManagerChannelOpt.get
-  }
-}

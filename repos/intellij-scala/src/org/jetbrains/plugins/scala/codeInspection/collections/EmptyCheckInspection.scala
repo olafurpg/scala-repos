@@ -6,16 +6,15 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 /**
   * @author Nikolay.Tropin
   */
-class EmptyCheckInspection extends OperationOnCollectionInspection {
+class EmptyCheckInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(CheckIsEmpty, CheckNonEmpty, CheckIsDefined)
-}
 
-object CheckIsEmpty extends SimplificationType {
+object CheckIsEmpty extends SimplificationType
   override def hint: String = InspectionBundle.message("replace.with.isEmpty")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case _ `.isEmpty` () => None
       case CheckIsEmpty(qual, start, end) if !isArray(qual) =>
         Some(
@@ -23,10 +22,9 @@ object CheckIsEmpty extends SimplificationType {
               .withText(invocationText(qual, "isEmpty"))
               .highlightRange(start, end))
       case _ => None
-    }
 
-  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] = {
-    val firstLevel = expr match {
+  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] =
+    val firstLevel = expr match
       case (coll `.sizeOrLength` ()) `==` literal("0") if coll != null =>
         Some((coll, coll.end, expr.end))
       case coll `.isEmpty` () if coll != null =>
@@ -40,28 +38,23 @@ object CheckIsEmpty extends SimplificationType {
       case scalaNone() `==` coll if isOption(coll) =>
         Some((coll, expr.start, coll.start))
       case _ => None
-    }
     extractInner(firstLevel)
-  }
 
   def extractInner(firstLevel: Option[(ScExpression, Int, Int)])
-    : Option[(ScExpression, Int, Int)] = {
-    firstLevel match {
+    : Option[(ScExpression, Int, Int)] =
+    firstLevel match
       case None => None
       case Some((inner @ coll `.headOption` (), start, end)) if coll != null =>
         Some(coll, Math.min(coll.end, start), Math.max(inner.end, end))
       case Some((inner @ coll `.lastOption` (), start, end)) if coll != null =>
         Some(coll, Math.min(coll.end, start), Math.max(inner.end, end))
       case _ => firstLevel
-    }
-  }
-}
 
-object CheckNonEmpty extends SimplificationType {
+object CheckNonEmpty extends SimplificationType
   override def hint: String = InspectionBundle.message("replace.with.nonEmpty")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case qual `.nonEmpty` () => None
       case CheckNonEmpty(qual, start, end)
           if !isOption(qual) && !isArray(qual) =>
@@ -70,10 +63,9 @@ object CheckNonEmpty extends SimplificationType {
               .withText(invocationText(qual, "nonEmpty"))
               .highlightRange(start, end))
       case _ => None
-    }
 
-  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] = {
-    val firstLevel = expr match {
+  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] =
+    val firstLevel = expr match
       case qual `.nonEmpty` () if qual != null =>
         Some((qual, qual.end, expr.end))
       case (qual `.sizeOrLength` ()) `!=` literal("0") if qual != null =>
@@ -91,17 +83,14 @@ object CheckNonEmpty extends SimplificationType {
       case qual `.isDefined` () if isOption(qual) =>
         Some(qual, qual.end, expr.end)
       case _ => None
-    }
     CheckIsEmpty.extractInner(firstLevel)
-  }
-}
 
-object CheckIsDefined extends SimplificationType {
+object CheckIsDefined extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.isDefined")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case _ `.isDefined` () => None
       case CheckIsDefined(qual, start, end) =>
         Some(
@@ -109,13 +98,9 @@ object CheckIsDefined extends SimplificationType {
               .withText(invocationText(qual, "isDefined"))
               .highlightRange(start, end))
       case _ => None
-    }
 
-  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] = {
-    expr match {
+  def unapply(expr: ScExpression): Option[(ScExpression, Int, Int)] =
+    expr match
       case CheckNonEmpty(qual, start, end) if isOption(qual) =>
         Some((qual, start, end))
       case _ => None
-    }
-  }
-}

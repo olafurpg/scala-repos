@@ -1,6 +1,6 @@
 package sbt
 
-object Import {
+object Import
 
   // sbt.io
   val AllPassFilter = sbt.io.AllPassFilter
@@ -178,7 +178,7 @@ object Import {
   type ~>[-K[_], +V[_]] = sbt.internal.util.~>[K, V]
 
   // sbt.internal.util.complete
-  object complete {
+  object complete
     val Completion = sbt.internal.util.complete.Completion
     type Completion = sbt.internal.util.complete.Completion
     val Completions = sbt.internal.util.complete.Completions
@@ -211,10 +211,9 @@ object Import {
     type TypeString = sbt.internal.util.complete.TypeString
     val UpperBound = sbt.internal.util.complete.UpperBound
     type UpperBound = sbt.internal.util.complete.UpperBound
-  }
 
   // sbt.internal.util.appmacro
-  object appmacro {
+  object appmacro
     import scala.reflect._
     import macros._
 
@@ -233,10 +232,9 @@ object Import {
     type MonadInstance = sbt.internal.util.appmacro.MonadInstance
     type TupleBuilder = sbt.internal.util.appmacro.TupleBuilder
     val TupleNBuilder = sbt.internal.util.appmacro.TupleNBuilder
-  }
 
   // sbt.internal.util.logic
-  object logic {
+  object logic
     val Atom = sbt.internal.util.logic.Atom
     type Atom = sbt.internal.util.logic.Atom
     val Clause = sbt.internal.util.logic.Clause
@@ -249,7 +247,6 @@ object Import {
     val Logic = sbt.internal.util.logic.Logic
     val Negated = sbt.internal.util.logic.Negated
     type Negated = sbt.internal.util.logic.Negated
-  }
 
   // sbt.librarymanagement
   val Artifact = sbt.librarymanagement.Artifact
@@ -418,7 +415,7 @@ object Import {
   type UpdateReportLite = sbt.internal.librarymanagement.UpdateReportLite
 
   // sbt.internal.inc.classpath
-  object classpath {
+  object classpath
     type CachedClassLoader = sbt.internal.inc.classpath.CachedClassLoader
     type ClassFilter = sbt.internal.inc.classpath.ClassFilter
     type ClassLoaderCache = sbt.internal.inc.classpath.ClassLoaderCache
@@ -439,7 +436,6 @@ object Import {
     type RawResources = sbt.internal.inc.classpath.RawResources
     val RawURL = sbt.internal.inc.classpath.RawURL
     type SelfFirstLoader = sbt.internal.inc.classpath.SelfFirstLoader
-  }
 
   type IncOptions = xsbti.compile.IncOptions
   type Analysis = sbt.internal.inc.Analysis
@@ -447,4 +443,3 @@ object Import {
   val ClassfileManager = sbt.internal.inc.ClassfileManager
   type ScalaInstance = sbt.internal.inc.ScalaInstance
   val ScalaInstance = sbt.internal.inc.ScalaInstance
-}

@@ -7,10 +7,10 @@ import org.jetbrains.plugins.scala.codeInsight.intentions.ScalaIntentionTestBase
   * @author Ksenia.Sautina
   * @since 6/6/12
   */
-class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
+class MergeElseIfIntentionTest extends ScalaIntentionTestBase
   val familyName = MergeElseIfIntention.familyName
 
-  def testMergeElseIf() {
+  def testMergeElseIf()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -43,9 +43,8 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeElseIf2() {
+  def testMergeElseIf2()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -74,9 +73,8 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeElseIf3() {
+  def testMergeElseIf3()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -109,9 +107,8 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeElseIf4() {
+  def testMergeElseIf4()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -142,9 +139,8 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeElseIf5() {
+  def testMergeElseIf5()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -174,9 +170,8 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
 
-  def testMergeElseIf6() {
+  def testMergeElseIf6()
     val text = """
         |class MergeElseIf {
         |  def mthd() {
@@ -202,5 +197,3 @@ class MergeElseIfIntentionTest extends ScalaIntentionTestBase {
       """
 
     doTest(text, resultText)
-  }
-}

@@ -8,27 +8,24 @@ import scala.reflect.internal.settings.MutableSettings
   *  This should be refined, so that settings are settable via command
   *  line options or properties.
   */
-private[reflect] class Settings extends MutableSettings {
+private[reflect] class Settings extends MutableSettings
 
   trait Setting extends SettingValue {}
 
-  class BooleanSetting(x: Boolean) extends Setting {
+  class BooleanSetting(x: Boolean) extends Setting
     type T = Boolean
     protected var v: Boolean = x
     override def value: Boolean = v
-  }
 
-  class IntSetting(x: Int) extends Setting {
+  class IntSetting(x: Int) extends Setting
     type T = Int
     protected var v: Int = x
     override def value: Int = v
-  }
 
-  class MultiStringSetting(xs: List[String]) extends Setting {
+  class MultiStringSetting(xs: List[String]) extends Setting
     type T = List[String]
     protected var v: List[String] = xs
     override def value: List[String] = v
-  }
 
   val Xexperimental = new BooleanSetting(false)
   val XfullLubs = new BooleanSetting(false)
@@ -51,4 +48,3 @@ private[reflect] class Settings extends MutableSettings {
   val Yrecursion = new IntSetting(0)
   val maxClassfileName = new IntSetting(255)
   def isScala211 = true
-}

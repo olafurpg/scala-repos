@@ -6,7 +6,7 @@ import java.util.Date
 
 case class ApiPersonIdent(name: String, email: String, date: Date)
 
-object ApiPersonIdent {
+object ApiPersonIdent
   def author(commit: CommitInfo): ApiPersonIdent =
     ApiPersonIdent(name = commit.authorName,
                    email = commit.authorEmailAddress,
@@ -15,4 +15,3 @@ object ApiPersonIdent {
     ApiPersonIdent(name = commit.committerName,
                    email = commit.committerEmailAddress,
                    date = commit.commitTime)
-}

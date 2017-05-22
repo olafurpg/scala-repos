@@ -20,61 +20,55 @@ import akka.serialization.SerializerWithStringManifest
   * Protobuf serializer for [[akka.cluster.metrics.ClusterMetricsMessage]] types.
   */
 class MessageSerializer(val system: ExtendedActorSystem)
-    extends SerializerWithStringManifest with BaseSerializer {
+    extends SerializerWithStringManifest with BaseSerializer
 
   private final val BufferSize = 4 * 1024
 
   private val MetricsGossipEnvelopeManifest = "a"
 
-  override def manifest(obj: AnyRef): String = obj match {
+  override def manifest(obj: AnyRef): String = obj match
     case _: MetricsGossipEnvelope ⇒ MetricsGossipEnvelopeManifest
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
-  override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  override def toBinary(obj: AnyRef): Array[Byte] = obj match
     case m: MetricsGossipEnvelope ⇒
       compress(metricsGossipEnvelopeToProto(m))
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass} in [${getClass.getName}]")
-  }
 
-  def compress(msg: MessageLite): Array[Byte] = {
+  def compress(msg: MessageLite): Array[Byte] =
     val bos = new ByteArrayOutputStream(BufferSize)
     val zip = new GZIPOutputStream(bos)
     try msg.writeTo(zip) finally zip.close()
     bos.toByteArray
-  }
 
-  def decompress(bytes: Array[Byte]): Array[Byte] = {
+  def decompress(bytes: Array[Byte]): Array[Byte] =
     val in = new GZIPInputStream(new ByteArrayInputStream(bytes))
     val out = new ByteArrayOutputStream()
     val buffer = new Array[Byte](BufferSize)
 
-    @tailrec def readChunk(): Unit = in.read(buffer) match {
+    @tailrec def readChunk(): Unit = in.read(buffer) match
       case -1 ⇒ ()
       case n ⇒
         out.write(buffer, 0, n)
         readChunk()
-    }
 
     try readChunk() finally in.close()
     out.toByteArray
-  }
 
   override def fromBinary(bytes: Array[Byte], manifest: String): AnyRef =
-    manifest match {
+    manifest match
       case MetricsGossipEnvelopeManifest ⇒
         metricsGossipEnvelopeFromBinary(bytes)
       case _ ⇒
         throw new IllegalArgumentException(
             s"Unimplemented deserialization of message with manifest [$manifest] in [${getClass.getName}")
-    }
 
   private def addressToProto(address: Address): cm.Address.Builder =
-    address match {
+    address match
       case Address(protocol, actorSystem, Some(host), Some(port)) ⇒
         cm.Address
           .newBuilder()
@@ -85,32 +79,27 @@ class MessageSerializer(val system: ExtendedActorSystem)
       case _ ⇒
         throw new IllegalArgumentException(
             s"Address [$address] could not be serialized: host or port missing.")
-    }
 
   @volatile
   private var protocolCache: String = null
   @volatile
   private var systemCache: String = null
 
-  private def getProtocol(address: cm.Address): String = {
+  private def getProtocol(address: cm.Address): String =
     val p = address.getProtocol
     val pc = protocolCache
     if (pc == p) pc
-    else {
+    else
       protocolCache = p
       p
-    }
-  }
 
-  private def getSystem(address: cm.Address): String = {
+  private def getSystem(address: cm.Address): String =
     val s = address.getSystem
     val sc = systemCache
     if (sc == s) sc
-    else {
+    else
       systemCache = s
       s
-    }
-  }
 
   private def addressFromProto(address: cm.Address): Address =
     Address(getProtocol(address),
@@ -120,15 +109,14 @@ class MessageSerializer(val system: ExtendedActorSystem)
 
   private def mapWithErrorMessage[T](
       map: Map[T, Int], value: T, unknown: String): Int =
-    map.get(value) match {
+    map.get(value) match
       case Some(x) ⇒ x
       case _ ⇒
         throw new IllegalArgumentException(
             s"Unknown $unknown [$value] in cluster message")
-    }
 
   private def metricsGossipEnvelopeToProto(
-      envelope: MetricsGossipEnvelope): cm.MetricsGossipEnvelope = {
+      envelope: MetricsGossipEnvelope): cm.MetricsGossipEnvelope =
     import scala.collection.breakOut
     val allNodeMetrics = envelope.gossip.nodes
     val allAddresses: Vector[Address] = allNodeMetrics.map(_.address)(breakOut)
@@ -144,14 +132,13 @@ class MessageSerializer(val system: ExtendedActorSystem)
       mapWithErrorMessage(metricNamesMapping, name, "address")
 
     def ewmaToProto(ewma: Option[EWMA]): Option[cm.NodeMetrics.EWMA.Builder] =
-      ewma.map { x ⇒
+      ewma.map  x ⇒
         cm.NodeMetrics.EWMA.newBuilder().setValue(x.value).setAlpha(x.alpha)
-      }
 
-    def numberToProto(number: Number): cm.NodeMetrics.Number.Builder = {
+    def numberToProto(number: Number): cm.NodeMetrics.Number.Builder =
       import cm.NodeMetrics.Number
       import cm.NodeMetrics.NumberType
-      number match {
+      number match
         case n: jl.Double ⇒
           Number
             .newBuilder()
@@ -175,16 +162,13 @@ class MessageSerializer(val system: ExtendedActorSystem)
             .newBuilder()
             .setType(NumberType.Serialized)
             .setSerialized(ByteString.copyFrom(bos.toByteArray))
-      }
-    }
 
-    def metricToProto(metric: Metric): cm.NodeMetrics.Metric.Builder = {
+    def metricToProto(metric: Metric): cm.NodeMetrics.Metric.Builder =
       val builder = cm.NodeMetrics.Metric
         .newBuilder()
         .setNameIndex(mapName(metric.name))
         .setNumber(numberToProto(metric.value))
       ewmaToProto(metric.average).map(builder.setEwma).getOrElse(builder)
-    }
 
     def nodeMetricsToProto(nodeMetrics: NodeMetrics): cm.NodeMetrics.Builder =
       cm.NodeMetrics
@@ -207,7 +191,6 @@ class MessageSerializer(val system: ExtendedActorSystem)
             .addAllNodeMetrics(nodeMetrics.asJava))
       .setReply(envelope.reply)
       .build
-  }
 
   private def metricsGossipEnvelopeFromBinary(
       bytes: Array[Byte]): MetricsGossipEnvelope =
@@ -215,7 +198,7 @@ class MessageSerializer(val system: ExtendedActorSystem)
         cm.MetricsGossipEnvelope.parseFrom(decompress(bytes)))
 
   private def metricsGossipEnvelopeFromProto(
-      envelope: cm.MetricsGossipEnvelope): MetricsGossipEnvelope = {
+      envelope: cm.MetricsGossipEnvelope): MetricsGossipEnvelope =
     import scala.collection.breakOut
     val mgossip = envelope.getGossip
     val addressMapping: Vector[Address] =
@@ -226,9 +209,9 @@ class MessageSerializer(val system: ExtendedActorSystem)
     def ewmaFromProto(ewma: cm.NodeMetrics.EWMA): Option[EWMA] =
       Some(EWMA(ewma.getValue, ewma.getAlpha))
 
-    def numberFromProto(number: cm.NodeMetrics.Number): Number = {
+    def numberFromProto(number: cm.NodeMetrics.Number): Number =
       import cm.NodeMetrics.NumberType
-      number.getType.getNumber match {
+      number.getType.getNumber match
         case NumberType.Double_VALUE ⇒
           jl.Double.longBitsToDouble(number.getValue64)
         case NumberType.Long_VALUE ⇒ number.getValue64
@@ -242,8 +225,6 @@ class MessageSerializer(val system: ExtendedActorSystem)
           val obj = in.readObject
           in.close()
           obj.asInstanceOf[jl.Number]
-      }
-    }
 
     def metricFromProto(metric: cm.NodeMetrics.Metric): Metric =
       Metric(metricNameMapping(metric.getNameIndex),
@@ -262,5 +243,3 @@ class MessageSerializer(val system: ExtendedActorSystem)
     MetricsGossipEnvelope(addressFromProto(envelope.getFrom),
                           MetricsGossip(nodeMetrics),
                           envelope.getReply)
-  }
-}

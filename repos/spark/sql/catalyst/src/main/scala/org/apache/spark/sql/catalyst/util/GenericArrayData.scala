@@ -23,7 +23,7 @@ import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.types.{DataType, Decimal}
 import org.apache.spark.unsafe.types.{CalendarInterval, UTF8String}
 
-class GenericArrayData(val array: Array[Any]) extends ArrayData {
+class GenericArrayData(val array: Array[Any]) extends ArrayData
 
   def this(seq: Seq[Any]) = this(seq.toArray)
   def this(list: java.util.List[Any]) = this(list.asScala)
@@ -64,66 +64,54 @@ class GenericArrayData(val array: Array[Any]) extends ArrayData {
 
   override def toString(): String = array.mkString("[", ",", "]")
 
-  override def equals(o: Any): Boolean = {
-    if (!o.isInstanceOf[GenericArrayData]) {
+  override def equals(o: Any): Boolean =
+    if (!o.isInstanceOf[GenericArrayData])
       return false
-    }
 
     val other = o.asInstanceOf[GenericArrayData]
-    if (other eq null) {
+    if (other eq null)
       return false
-    }
 
     val len = numElements()
-    if (len != other.numElements()) {
+    if (len != other.numElements())
       return false
-    }
 
     var i = 0
-    while (i < len) {
-      if (isNullAt(i) != other.isNullAt(i)) {
+    while (i < len)
+      if (isNullAt(i) != other.isNullAt(i))
         return false
-      }
-      if (!isNullAt(i)) {
+      if (!isNullAt(i))
         val o1 = array(i)
         val o2 = other.array(i)
-        o1 match {
+        o1 match
           case b1: Array[Byte] =>
             if (!o2.isInstanceOf[Array[Byte]] ||
-                !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]])) {
+                !java.util.Arrays.equals(b1, o2.asInstanceOf[Array[Byte]]))
               return false
-            }
           case f1: Float if java.lang.Float.isNaN(f1) =>
             if (!o2.isInstanceOf[Float] ||
-                !java.lang.Float.isNaN(o2.asInstanceOf[Float])) {
+                !java.lang.Float.isNaN(o2.asInstanceOf[Float]))
               return false
-            }
           case d1: Double if java.lang.Double.isNaN(d1) =>
             if (!o2.isInstanceOf[Double] ||
-                !java.lang.Double.isNaN(o2.asInstanceOf[Double])) {
+                !java.lang.Double.isNaN(o2.asInstanceOf[Double]))
               return false
-            }
           case _ =>
-            if (o1 != o2) {
+            if (o1 != o2)
               return false
-            }
-        }
-      }
       i += 1
-    }
     true
-  }
 
-  override def hashCode: Int = {
+  override def hashCode: Int =
     var result: Int = 37
     var i = 0
     val len = numElements()
-    while (i < len) {
+    while (i < len)
       val update: Int =
-        if (isNullAt(i)) {
+        if (isNullAt(i))
           0
-        } else {
-          array(i) match {
+        else
+          array(i) match
             case b: Boolean => if (b) 0 else 1
             case b: Byte => b.toInt
             case s: Short => s.toInt
@@ -135,11 +123,6 @@ class GenericArrayData(val array: Array[Any]) extends ArrayData {
               (b ^ (b >>> 32)).toInt
             case a: Array[Byte] => java.util.Arrays.hashCode(a)
             case other => other.hashCode()
-          }
-        }
       result = 37 * result + update
       i += 1
-    }
     result
-  }
-}

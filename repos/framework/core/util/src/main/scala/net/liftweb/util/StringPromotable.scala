@@ -9,34 +9,27 @@ import scala.language.implicitConversions
   */
 trait StringPromotable
 
-object StringPromotable {
+object StringPromotable
   implicit def jsCmdToStrPromo(in: ToJsCmd): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in.toJsCmd
-    }
 
   implicit def jsCmdToStrPromo(in: (_, ToJsCmd)): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in._2.toJsCmd
-    }
 
   implicit def intToStrPromo(in: Int): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in.toString
-    }
 
   implicit def symbolToStrPromo(in: Symbol): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in.name
-    }
 
   implicit def longToStrPromo(in: Long): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in.toString
-    }
 
   implicit def booleanToStrPromo(in: Boolean): StringPromotable =
-    new StringPromotable {
+    new StringPromotable
       override val toString = in.toString
-    }
-}

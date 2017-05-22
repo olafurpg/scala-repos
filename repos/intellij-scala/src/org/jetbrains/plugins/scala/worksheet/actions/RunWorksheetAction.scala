@@ -38,37 +38,33 @@ import org.jetbrains.plugins.scala.worksheet.ui.WorksheetEditorPrinter
   * @author Dmitry Naydanov        
   * @since 10/17/12
   */
-class RunWorksheetAction extends AnAction with TopComponentAction {
-  def actionPerformed(e: AnActionEvent) {
+class RunWorksheetAction extends AnAction with TopComponentAction
+  def actionPerformed(e: AnActionEvent)
     RunWorksheetAction.runCompiler(e.getProject, auto = false)
-  }
 
-  override def update(e: AnActionEvent) {
+  override def update(e: AnActionEvent)
     val presentation = e.getPresentation
     presentation.setIcon(AllIcons.Actions.Execute)
     val shortcuts = KeymapManager.getInstance.getActiveKeymap
       .getShortcuts("Scala.RunWorksheet")
-    if (shortcuts.nonEmpty) {
+    if (shortcuts.nonEmpty)
       val shortcutText = " (" + KeymapUtil.getShortcutText(shortcuts(0)) + ")"
       presentation.setText(
           ScalaBundle.message("worksheet.execute.button") + shortcutText)
-    }
 
     updateInner(presentation, e.getProject)
-  }
 
   override def actionIcon = AllIcons.Actions.Execute
 
   override def bundleKey = "worksheet.execute.button"
 
   override def shortcutId: Option[String] = Some("Scala.RunWorksheet")
-}
 
-object RunWorksheetAction {
+object RunWorksheetAction
   private val runnerClassName =
     "org.jetbrains.plugins.scala.worksheet.MyWorksheetRunner"
 
-  def runCompiler(project: Project, auto: Boolean) {
+  def runCompiler(project: Project, auto: Boolean)
     UsageTrigger.trigger("scala.worksheet")
 
     if (project == null) return
@@ -77,7 +73,7 @@ object RunWorksheetAction {
 
     if (editor == null) return
 
-    if (project.hasDotty) {
+    if (project.hasDotty)
       PopupUtil.showBalloonForComponent(
           editor.getComponent,
           "Worksheet is not supported for Dotty yet",
@@ -85,70 +81,59 @@ object RunWorksheetAction {
           true,
           null)
       return
-    }
 
     val psiFile =
       PsiDocumentManager.getInstance(project).getPsiFile(editor.getDocument)
     WorksheetProcessManager.stop(psiFile.getVirtualFile)
 
-    psiFile match {
+    psiFile match
       case file: ScalaFile if file.isWorksheetFile =>
         val viewer = WorksheetViewerInfo getViewer editor
 
-        if (viewer != null) {
-          ApplicationManager.getApplication.invokeAndWait(new Runnable {
-            override def run() {
-              scala.extensions.inWriteAction {
+        if (viewer != null)
+          ApplicationManager.getApplication.invokeAndWait(new Runnable
+            override def run()
+              scala.extensions.inWriteAction
                 CleanWorksheetAction.resetScrollModel(viewer)
                 if (!auto)
                   CleanWorksheetAction.cleanWorksheet(
                       file.getNode, editor, viewer, project)
-              }
-            }
-          }, ModalityState.any())
-        }
+          , ModalityState.any())
 
-        def runnable() = {
+        def runnable() =
           new WorksheetCompiler().compileAndRun(
               editor,
               file,
               (className: String, addToCp: String) =>
-                {
-                  ApplicationManager.getApplication invokeLater new Runnable {
-                    override def run() {
+                  ApplicationManager.getApplication invokeLater new Runnable
+                    override def run()
                       executeWorksheet(file.getName,
                                        project,
                                        file.getContainingFile,
                                        className,
                                        addToCp)
-                    }
-                  }
-              },
+              ,
               Option(editor),
               auto)
-        }
 
-        if (WorksheetCompiler isMakeBeforeRun psiFile) {
+        if (WorksheetCompiler isMakeBeforeRun psiFile)
           CompilerManager
             .getInstance(project)
-            .make(getModuleFor(file), new CompileStatusNotification {
+            .make(getModuleFor(file), new CompileStatusNotification
               override def finished(aborted: Boolean,
                                     errors: Int,
                                     warnings: Int,
-                                    compileContext: CompileContext) {
+                                    compileContext: CompileContext)
                 if (!aborted && errors == 0) runnable()
-              }
-            })
-        } else runnable()
+            )
+        else runnable()
       case _ =>
-    }
-  }
 
   def executeWorksheet(name: String,
                        project: Project,
                        file: PsiFile,
                        mainClassName: String,
-                       addToCp: String) {
+                       addToCp: String)
     val virtualFile = file.getVirtualFile
     val params = createParameters(
         getModuleFor(file),
@@ -159,30 +144,27 @@ object RunWorksheetAction {
         virtualFile.getCanonicalPath) //todo extract default java options??
 
     setUpUiAndRun(params.createOSProcessHandler(), file)
-  }
 
   private def createParameters(module: Module,
                                mainClassName: String,
                                workingDirectory: String,
                                additionalCp: String,
                                consoleArgs: String,
-                               worksheetField: String) = {
+                               worksheetField: String) =
     import _root_.scala.collection.JavaConverters._
 
     if (module == null) throw new ExecutionException("Module is not specified")
 
     val project = module.getProject
 
-    val scalaSdk = module.scalaSdk.getOrElse {
+    val scalaSdk = module.scalaSdk.getOrElse
       throw new ExecutionException(
           "No Scala facet configured for module " + module.getName)
-    }
 
     val rootManager = ModuleRootManager.getInstance(module)
     val sdk = rootManager.getSdk
-    if (sdk == null || !sdk.getSdkType.isInstanceOf[JavaSdkType]) {
+    if (sdk == null || !sdk.getSdkType.isInstanceOf[JavaSdkType])
       throw CantRunException.noJdkForModule(module)
-    }
 
     val params = new JavaParameters()
     val files = scalaSdk.compilerClasspath
@@ -202,9 +184,8 @@ object RunWorksheetAction {
     params.getProgramParametersList prepend mainClassName //IMPORTANT! this must be first program argument
 
     params
-  }
 
-  private def setUpUiAndRun(handler: OSProcessHandler, file: PsiFile) {
+  private def setUpUiAndRun(handler: OSProcessHandler, file: PsiFile)
     val virtualFile = file.getVirtualFile
 
     val editor = EditorHelper openInEditor file
@@ -212,29 +193,24 @@ object RunWorksheetAction {
     val worksheetPrinter =
       WorksheetEditorPrinter.newWorksheetUiFor(editor, virtualFile)
 
-    val myProcessListener: ProcessAdapter = new ProcessAdapter {
-      override def onTextAvailable(event: ProcessEvent, outputType: Key[_]) {
+    val myProcessListener: ProcessAdapter = new ProcessAdapter
+      override def onTextAvailable(event: ProcessEvent, outputType: Key[_])
         val text = event.getText
         if (ConsoleViewContentType.NORMAL_OUTPUT == ConsoleViewContentType
-              .getConsoleViewType(outputType)) {
+              .getConsoleViewType(outputType))
           worksheetPrinter processLine text
-        }
-      }
 
-      override def processTerminated(event: ProcessEvent): Unit = {
+      override def processTerminated(event: ProcessEvent): Unit =
         worksheetPrinter.flushBuffer()
-      }
-    }
 
     worksheetPrinter.scheduleWorksheetUpdate()
     handler.addProcessListener(myProcessListener)
 
     handler.startNotify()
-  }
 
   def isScratchWorksheet(
       vFileOpt: Option[VirtualFile], project: Project): Boolean =
-    vFileOpt.exists {
+    vFileOpt.exists
       case vFile =>
         ScratchFileService
           .getInstance()
@@ -242,28 +218,23 @@ object RunWorksheetAction {
           .isInstanceOf[ScratchRootType] && ScalaProjectSettings
           .getInstance(project)
           .isTreatScratchFilesAsWorksheet
-    }
 
   def isScratchWorksheet(file: PsiFile): Boolean =
     isScratchWorksheet(Option(file.getVirtualFile), file.getProject)
 
-  def getModuleFor(vFile: VirtualFile, project: Project): Module = {
-    vFile match {
+  def getModuleFor(vFile: VirtualFile, project: Project): Module =
+    vFile match
       case _: VirtualFileWithId =>
         Option(
             ProjectFileIndex.SERVICE getInstance project getModuleForFile vFile) getOrElse project.anyScalaModule
           .map(_.module)
           .orNull
       case _ => project.anyScalaModule.map(_.module).orNull
-    }
-  }
 
   def getModuleFor(file: PsiFile): Module =
-    WorksheetCompiler.getModuleForCpName(file) flatMap {
+    WorksheetCompiler.getModuleForCpName(file) flatMap
       case name =>
-        scala.extensions.inReadAction {
+        scala.extensions.inReadAction
           Option(
               ModuleManager getInstance file.getProject findModuleByName name)
-        }
-    } getOrElse getModuleFor(file.getVirtualFile, file.getProject)
-}
+    getOrElse getModuleFor(file.getVirtualFile, file.getProject)

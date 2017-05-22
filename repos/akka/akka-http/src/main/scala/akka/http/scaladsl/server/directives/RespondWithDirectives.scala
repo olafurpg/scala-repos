@@ -4,7 +4,7 @@ package directives
 import akka.http.scaladsl.model._
 import scala.collection.immutable
 
-trait RespondWithDirectives {
+trait RespondWithDirectives
   import BasicDirectives._
 
   /**
@@ -46,6 +46,5 @@ trait RespondWithDirectives {
   def respondWithDefaultHeaders(
       responseHeaders: immutable.Seq[HttpHeader]): Directive0 =
     mapResponse(_.withDefaultHeaders(responseHeaders))
-}
 
 object RespondWithDirectives extends RespondWithDirectives

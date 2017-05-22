@@ -5,7 +5,7 @@ package transform
 
 import scala.language.existentials
 
-trait Transforms { self: SymbolTable =>
+trait Transforms  self: SymbolTable =>
 
   /** We need to encode laziness by hand here because the three components refChecks, uncurry and erasure
     *  are overwritten by objects in Global.
@@ -13,15 +13,13 @@ trait Transforms { self: SymbolTable =>
     *  In the absence of this, the Lazy functionality should probably be somewhere
     *  in the standard library. Or is it already?
     */
-  private class Lazy[T](op: => T) {
+  private class Lazy[T](op: => T)
     private var value: T = _
     private var _isDefined = false
     def isDefined = _isDefined
-    def force: T = {
+    def force: T =
       if (!isDefined) { value = op; _isDefined = true }
       value
-    }
-  }
 
   private val refChecksLazy = new Lazy(
       new { val global: Transforms.this.type = self } with RefChecks)
@@ -47,4 +45,3 @@ trait Transforms { self: SymbolTable =>
 
   def transformedType(tpe: Type) =
     postErasure.elimErasedValueType(erasure.scalaErasure(uncurry.uncurry(tpe)))
-}

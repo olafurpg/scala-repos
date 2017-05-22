@@ -9,6 +9,5 @@ package algebra
 trait Rng[@sp(Byte, Short, Int, Long, Float, Double) A]
     extends Any with Semiring[A] with AdditiveAbGroup[A]
 
-object Rng {
+object Rng
   @inline final def apply[A](implicit r: Rng[A]): Rng[A] = r
-}

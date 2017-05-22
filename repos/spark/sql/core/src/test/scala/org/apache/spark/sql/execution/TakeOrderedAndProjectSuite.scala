@@ -25,25 +25,23 @@ import org.apache.spark.sql.catalyst.expressions.Literal
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
+class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext
 
   private var rand: Random = _
   private var seed: Long = 0
 
-  protected override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit =
     super.beforeAll()
     seed = System.currentTimeMillis()
     rand = new Random(seed)
-  }
 
-  private def generateRandomInputData(): DataFrame = {
+  private def generateRandomInputData(): DataFrame =
     val schema = new StructType()
       .add("a", IntegerType, nullable = false)
       .add("b", IntegerType, nullable = false)
     val inputData = Seq.fill(10000)(Row(rand.nextInt(), rand.nextInt()))
     sqlContext.createDataFrame(
         sparkContext.parallelize(Random.shuffle(inputData), 10), schema)
-  }
 
   /**
     * Adds a no-op filter to the child plan in order to prevent executeCollect() from being
@@ -55,8 +53,8 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
   val limit = 250
   val sortOrder = 'a.desc :: 'b.desc :: Nil
 
-  test("TakeOrderedAndProject.doExecute without project") {
-    withClue(s"seed = $seed") {
+  test("TakeOrderedAndProject.doExecute without project")
+    withClue(s"seed = $seed")
       checkThatPlansAgree(
           generateRandomInputData(),
           input =>
@@ -65,11 +63,9 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
             GlobalLimit(limit,
                         LocalLimit(limit, Sort(sortOrder, true, input))),
           sortAnswers = false)
-    }
-  }
 
-  test("TakeOrderedAndProject.doExecute with project") {
-    withClue(s"seed = $seed") {
+  test("TakeOrderedAndProject.doExecute with project")
+    withClue(s"seed = $seed")
       checkThatPlansAgree(
           generateRandomInputData(),
           input =>
@@ -81,6 +77,3 @@ class TakeOrderedAndProjectSuite extends SparkPlanTest with SharedSQLContext {
                                    Project(Seq(input.output.last),
                                            Sort(sortOrder, true, input)))),
           sortAnswers = false)
-    }
-  }
-}

@@ -12,10 +12,10 @@ import org.jetbrains.plugins.scala.lang.psi.api.toplevel.typedef.ScObject
   * User: Dmitry.Naydanov
   * Date: 23.10.15.
   */
-class ScalaRunLineMarkerContributor extends RunLineMarkerContributor {
+class ScalaRunLineMarkerContributor extends RunLineMarkerContributor
   override def getInfo(element: PsiElement): Info =
     if (element.getNode.getElementType == ScalaTokenTypes.tIDENTIFIER)
-      element.getParent match {
+      element.getParent match
         case fun: ScFunctionDefinition
             if ScalaApplicationConfigurationProducer.findMain(
                 fun, firstContMethodOnly = true) != null =>
@@ -25,10 +25,9 @@ class ScalaRunLineMarkerContributor extends RunLineMarkerContributor {
                 element, firstTemplateDefOnly = true) != null =>
           createInfo(0)
         case _ => null
-      } else null
+      else null
 
   private def createInfo(order: Int) =
     new Info(ApplicationConfigurationType.getInstance.getIcon,
              null,
              ExecutorAction.getActions(order): _*)
-}

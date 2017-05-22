@@ -13,12 +13,12 @@ import org.jetbrains.plugins.scala.overrideImplement.ScalaOIUtil._
 /**
   * Pavel Fatin
   */
-object NeedsToBeAbstract extends AnnotatorPart[ScTemplateDefinition] {
+object NeedsToBeAbstract extends AnnotatorPart[ScTemplateDefinition]
   def kind = classOf[ScTemplateDefinition]
 
   def annotate(definition: ScTemplateDefinition,
                holder: AnnotationHolder,
-               typeAware: Boolean) {
+               typeAware: Boolean)
     if (!typeAware) return
 
     if (definition.isInstanceOf[ScNewTemplateDefinition]) return
@@ -27,29 +27,23 @@ object NeedsToBeAbstract extends AnnotatorPart[ScTemplateDefinition] {
 
     if (isAbstract(definition)) return
 
-    val undefined = for {
+    val undefined = for
       member <- getMembersToImplement(definition, withOwn = true)
                    if !member.isInstanceOf[ScAliasMember] // See SCL-2887
-    } yield (member.getText, member.getParentNodeDelegate.getText)
+    yield (member.getText, member.getParentNodeDelegate.getText)
 
-    if (undefined.nonEmpty) {
+    if (undefined.nonEmpty)
       val annotation = holder.createErrorAnnotation(
           definition.nameId,
           message(
               kindOf(definition), definition.name, undefined.iterator.next))
-      definition match {
+      definition match
         case owner: ScModifierListOwner =>
           annotation.registerFix(new AddModifierQuickFix(owner, "abstract"))
         case _ =>
-      }
-      if (getMembersToImplement(definition).nonEmpty) {
+      if (getMembersToImplement(definition).nonEmpty)
         annotation.registerFix(new ImplementMethodsQuickFix(definition))
-      }
-    }
-  }
 
-  def message(kind: String, name: String, member: (String, String)) = {
+  def message(kind: String, name: String, member: (String, String)) =
     "%s '%s' must either be declared abstract or implement abstract member '%s' in '%s'"
       .format(kind, name, member._1, member._2)
-  }
-}

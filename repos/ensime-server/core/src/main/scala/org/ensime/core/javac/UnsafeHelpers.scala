@@ -22,11 +22,11 @@ import com.sun.tools.javac.tree.JCTree._
   *
   * -aemon
   */
-trait UnsafeHelpers extends SLF4JLogging {
+trait UnsafeHelpers extends SLF4JLogging
 
   protected def unsafeGetElement(
-      info: CompilationInfo, t: Tree): Option[Element] = {
-    t match {
+      info: CompilationInfo, t: Tree): Option[Element] =
+    t match
       case t: JCCompilationUnit => Some(t.packge)
       case t: JCClassDecl => Some(t.sym)
       case t: JCMethodDecl => Some(t.sym)
@@ -40,6 +40,3 @@ trait UnsafeHelpers extends SLF4JLogging {
       case t: JCTypeApply => unsafeGetElement(info, t.clazz)
       case t: JCTree => if (t.`type` != null) Some(t.`type`.tsym) else None
       case _ => None
-    }
-  }
-}

@@ -30,16 +30,16 @@ import org.apache.spark.mllib.util.MLUtils
   * }}}
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object SampledRDDs {
+object SampledRDDs
 
   case class Params(
       input: String = "data/mllib/sample_binary_classification_data.txt")
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("SampledRDDs") {
+    val parser = new OptionParser[Params]("SampledRDDs")
       head(
           "SampledRDDs: an example app for randomly generated and sampled RDDs.")
       opt[String]("input")
@@ -52,16 +52,13 @@ object SampledRDDs {
         | bin/spark-submit --class org.apache.spark.examples.mllib.SampledRDDs \
         |  examples/target/scala-*/spark-examples-*.jar
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       sys.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"SampledRDDs with $params")
     val sc = new SparkContext(conf)
 
@@ -69,9 +66,8 @@ object SampledRDDs {
 
     val examples = MLUtils.loadLibSVMFile(sc, params.input)
     val numExamples = examples.count()
-    if (numExamples == 0) {
+    if (numExamples == 0)
       throw new RuntimeException("Error: Data file had no samples to load.")
-    }
     println(
         s"Loaded data with $numExamples examples from file: ${params.input}")
 
@@ -89,9 +85,8 @@ object SampledRDDs {
     println()
 
     // Example: RDD.sampleByKey() and RDD.sampleByKeyExact()
-    val keyedRDD = examples.map { lp =>
+    val keyedRDD = examples.map  lp =>
       (lp.label.toInt, lp.features)
-    }
     println(s"  Keyed data using label (Int) as key ==> Orig")
     //  Count examples per label in original data.
     val keyCounts = keyedRDD.countByKey()
@@ -118,24 +113,19 @@ object SampledRDDs {
     //  Compare samples
     println(s"   \tFractions of examples with key")
     println(s"Key\tOrig\tApprox Sample\tExact Sample")
-    keyCounts.keys.toSeq.sorted.foreach { key =>
+    keyCounts.keys.toSeq.sorted.foreach  key =>
       val origFrac = keyCounts(key) / numExamples.toDouble
       val approxFrac =
-        if (sizeB != 0) {
+        if (sizeB != 0)
           keyCountsB.getOrElse(key, 0L) / sizeB.toDouble
-        } else {
+        else
           0
-        }
       val exactFrac =
-        if (sizeBExact != 0) {
+        if (sizeBExact != 0)
           keyCountsBExact.getOrElse(key, 0L) / sizeBExact.toDouble
-        } else {
+        else
           0
-        }
       println(s"$key\t$origFrac\t$approxFrac\t$exactFrac")
-    }
 
     sc.stop()
-  }
-}
 // scalastyle:on println

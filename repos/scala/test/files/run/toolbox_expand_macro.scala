@@ -3,7 +3,7 @@ import scala.reflect.runtime.{universe => ru}
 import scala.reflect.runtime.{currentMirror => cm}
 import scala.tools.reflect.{ToolBox}
 
-object Test extends App {
+object Test extends App
   val toolBox = cm.mkToolBox()
   val x = 21
   val runtimeMacro = q"""object RuntimeMacro {
@@ -19,4 +19,3 @@ object Test extends App {
     }"""
   val s = toolBox.define(runtimeMacro)
   println(toolBox.eval(q"$s.add(21)"))
-}

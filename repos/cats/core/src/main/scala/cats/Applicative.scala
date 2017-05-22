@@ -14,7 +14,7 @@ import cats.std.list._
   * Must obey the laws defined in cats.laws.ApplicativeLaws.
   */
 @typeclass
-trait Applicative[F[_]] extends Apply[F] { self =>
+trait Applicative[F[_]] extends Apply[F]  self =>
 
   /**
     * `pure` lifts any value into the Applicative Functor.
@@ -45,10 +45,9 @@ trait Applicative[F[_]] extends Apply[F] { self =>
     */
   def compose[G[_]](
       implicit GG: Applicative[G]): Applicative[λ[α => F[G[α]]]] =
-    new CompositeApplicative[F, G] {
+    new CompositeApplicative[F, G]
       implicit def F: Applicative[F] = self
       implicit def G: Applicative[G] = GG
-    }
 
   def traverse[A, G[_], B](value: G[A])(f: A => F[B])(
       implicit G: Traverse[G]): F[G[B]] =
@@ -56,13 +55,11 @@ trait Applicative[F[_]] extends Apply[F] { self =>
 
   def sequence[G[_], A](as: G[F[A]])(implicit G: Traverse[G]): F[G[A]] =
     G.sequence(as)(this)
-}
 
 trait CompositeApplicative[F[_], G[_]]
-    extends Applicative[λ[α => F[G[α]]]] with CompositeApply[F, G] {
+    extends Applicative[λ[α => F[G[α]]]] with CompositeApply[F, G]
 
   implicit def F: Applicative[F]
   implicit def G: Applicative[G]
 
   def pure[A](a: A): F[G[A]] = F.pure(G.pure(a))
-}

@@ -36,14 +36,13 @@ import scalafx.collections.ObservableBuffer
   * but javafx generated instead pair of delete-remove changes. It differs from its own documentation.
   * Theoretically I still can create delegate object that would generate such change.
   */
-object Example1App extends App {
+object Example1App extends App
   val items: ObservableBuffer[String] = ObservableBuffer()
 
   items.onChange(
       (_, changes) =>
-        {
       println(s"onChange(_, $changes")
-      for (change <- changes) change match {
+      for (change <- changes) change match
         case ObservableBuffer.Add(_, _) => println(s"  case Add    : $change")
         case ObservableBuffer.Remove(_, _) =>
           println(s"  case Remove : $change")
@@ -51,11 +50,9 @@ object Example1App extends App {
           println(s"  case Reorder: $change")
         case ObservableBuffer.Update(_, _) =>
           println(s"  case Update: $change")
-      }
-  })
+  )
 
   println("items += \"test\"")
   items += "test"
   println("items(0) = \"update\"")
   items(0) = "update"
-}

@@ -27,7 +27,7 @@ import org.apache.spark.rdd.RDD
   * via [[io.prediction.controller.CustomQuerySerializer]]
   */
 @DeveloperApi
-trait BaseQuerySerializer {
+trait BaseQuerySerializer
 
   /** :: DeveloperApi ::
     * Serializer for Scala query classes using
@@ -41,7 +41,6 @@ trait BaseQuerySerializer {
     */
   @DeveloperApi
   @transient lazy val gsonTypeAdapterFactories = Seq.empty[TypeAdapterFactory]
-}
 
 /** :: DeveloperApi ::
   * Base class of all algorithm controllers
@@ -53,7 +52,7 @@ trait BaseQuerySerializer {
   */
 @DeveloperApi
 abstract class BaseAlgorithm[PD, M, Q, P]
-    extends AbstractDoer with BaseQuerySerializer {
+    extends AbstractDoer with BaseQuerySerializer
 
   /** :: DeveloperApi ::
     * Engine developers should not use this directly. This is called by workflow
@@ -115,9 +114,7 @@ abstract class BaseAlgorithm[PD, M, Q, P]
     *
     * @return Type signature of query
     */
-  def queryClass: Class[Q] = {
+  def queryClass: Class[Q] =
     val types = TypeResolver.resolveRawArguments(
         classOf[BaseAlgorithm[PD, M, Q, P]], getClass)
     types(2).asInstanceOf[Class[Q]]
-  }
-}

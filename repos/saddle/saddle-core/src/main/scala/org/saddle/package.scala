@@ -49,7 +49,7 @@ import org.saddle.scalar.ScalarTag
   * Inspiration for Saddle comes from many sources, including the R programming language, the
   * pandas data analysis library for Python, and the Scala collections library.
   */
-package object saddle {
+package object saddle
   // ********************** Some type aliases, save our fingers in typing
 
   /**
@@ -82,12 +82,11 @@ package object saddle {
     * }}}
     *
     */
-  def clock[T](op: => T): (Double, T) = {
+  def clock[T](op: => T): (Double, T) =
     val s = System.nanoTime
     val r = op
     val e = System.nanoTime
     ((e - s) / 1e9, r)
-  }
 
   /**
     * Syntactic sugar, allow '->' to generate an (inclusive) index slice
@@ -165,7 +164,7 @@ package object saddle {
     *  Note since `Boolean`s can only take on two values, it has no `na` primitive
     *  bit pattern.
     */
-  object na {
+  object na
 
     /**
       * Generates a primitive missing value bit pattern.
@@ -183,7 +182,6 @@ package object saddle {
       scalar.ScalarTagDouble.missing
 
     override def toString = "na"
-  }
 
   // Augment Seq with a few conversion methods
   //
@@ -201,9 +199,8 @@ package object saddle {
     * @param s  A value of type Seq[T]
     * @tparam T Type of elements of Vec
     */
-  implicit def seqToVec[T : ST](s: Seq[T]) = new {
+  implicit def seqToVec[T : ST](s: Seq[T]) = new
     def toVec: Vec[T] = Vec(s: _*)
-  }
 
   /**
     * Augments Seq with a toIndex method that returns a new Index instance.
@@ -218,9 +215,8 @@ package object saddle {
     * @param ix A value of type Seq[X]
     * @tparam X Type of index elements
     */
-  implicit def seqToIndex[X : ST : ORD](ix: Seq[X]) = new {
+  implicit def seqToIndex[X : ST : ORD](ix: Seq[X]) = new
     def toIndex: Index[X] = Index(ix: _*)
-  }
 
   /**
     * Augments Seq with a toSeries method that returns a new Series instance.
@@ -236,9 +232,8 @@ package object saddle {
     * @tparam T Type of data elements of Series
     * @tparam X Type of index elements of Series
     */
-  implicit def seqToSeries[T : ST, X : ST : ORD](s: Seq[(X, T)]) = new {
+  implicit def seqToSeries[T : ST, X : ST : ORD](s: Seq[(X, T)]) = new
     def toSeries: Series[X, T] = Series(s: _*)
-  }
 
   /**
     * Augments Seq with a toFrame method that returns a new Frame instance.
@@ -263,15 +258,12 @@ package object saddle {
     * @tparam CX Type of col index elements of Frame
     */
   implicit def seqToFrame[RX : ST : ORD, CX : ST : ORD, T : ST](
-      s: Seq[(RX, CX, T)]) = new {
-    def toFrame: Frame[RX, CX, T] = {
+      s: Seq[(RX, CX, T)]) = new
+    def toFrame: Frame[RX, CX, T] =
       val grp = s.map { case (r, c, v) => ((r, c), v) }
       grp.toSeries.pivot
-    }
-  }
 
   /**
     * Constant used in string byte-level manipulation
     */
   val UTF8 = "UTF-8"
-}

@@ -1,7 +1,7 @@
 import scala.tools.nsc._
 import scala.tools.partest.ReplTest
 
-object Test extends ReplTest {
+object Test extends ReplTest
   override def extraSettings = "-deprecation"
   def code = <code>
 // basics
@@ -144,7 +144,7 @@ def f(e: Exp) = e match {{  // non-exhaustive warning here
 
 </code>.text
 
-  def appendix() = {
+  def appendix() =
     val settings = new Settings
     settings.classpath.value = sys.props("java.class.path")
     val interp = new interpreter.IMain(settings)
@@ -153,7 +153,5 @@ def f(e: Exp) = e match {{  // non-exhaustive warning here
     interp.reset()
     interp.interpret("\"after reset\"")
     interp.interpret("plusOne(5) // should be undefined now")
-  }
 
   appendix()
-}

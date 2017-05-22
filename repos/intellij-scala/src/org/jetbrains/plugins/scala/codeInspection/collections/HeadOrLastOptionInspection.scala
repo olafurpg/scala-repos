@@ -7,22 +7,21 @@ import org.jetbrains.plugins.scala.lang.psi.api.expr.ScExpression
 /**
   * @author Nikolay.Tropin
   */
-class HeadOrLastOptionInspection extends OperationOnCollectionInspection {
+class HeadOrLastOptionInspection extends OperationOnCollectionInspection
   override def possibleSimplificationTypes: Array[SimplificationType] =
     Array(IfElseToHeadOption,
           IfElseToLastOption,
           LiftToHeadOption,
           LiftToLastOption)
-}
 
-object IfElseToHeadOption extends SimplificationType {
+object IfElseToHeadOption extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.headOption")
   override def description: String =
     InspectionBundle.message("ifstmt.to.headOption")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case IfStmt(
           CheckIsEmpty(coll, _, _), scalaNone(), scalaSome(coll2 `.head` ()))
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
@@ -38,17 +37,15 @@ object IfElseToHeadOption extends SimplificationType {
               .withText(invocationText(coll, "headOption"))
               .highlightAll)
       case _ => None
-    }
-}
 
-object IfElseToLastOption extends SimplificationType {
+object IfElseToLastOption extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.lastOption")
   override def description: String =
     InspectionBundle.message("ifstmt.to.lastOption")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case IfStmt(
           CheckIsEmpty(coll, _, _), scalaNone(), scalaSome(coll2 `.last` ()))
           if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
@@ -64,34 +61,30 @@ object IfElseToLastOption extends SimplificationType {
               .withText(invocationText(coll, "lastOption"))
               .highlightAll)
       case _ => None
-    }
-}
 
-object LiftToHeadOption extends SimplificationType {
+object LiftToHeadOption extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.headOption")
   override def description: String =
     InspectionBundle.message("lift.to.headOption")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case (coll `.lift` ()) `.apply`(literal("0")) =>
         Some(
             replace(expr)
               .withText(invocationText(coll, "headOption"))
               .highlightFrom(coll))
       case _ => None
-    }
-}
 
-object LiftToLastOption extends SimplificationType {
+object LiftToLastOption extends SimplificationType
   override def hint: String =
     InspectionBundle.message("replace.with.lastOption")
   override def description: String =
     InspectionBundle.message("lift.to.lastOption")
 
   override def getSimplification(expr: ScExpression): Option[Simplification] =
-    expr match {
+    expr match
       case (coll `.lift` ()) `.apply` (coll2 `.sizeOrLength` () `-` literal(
           "1")) if PsiEquivalenceUtil.areElementsEquivalent(coll, coll2) =>
         Some(
@@ -99,5 +92,3 @@ object LiftToLastOption extends SimplificationType {
               .withText(invocationText(coll, "lastOption"))
               .highlightFrom(coll))
       case _ => None
-    }
-}

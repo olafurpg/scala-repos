@@ -5,16 +5,13 @@ import org.junit.Assert._
 
 class MultiCompilationSecondUnitTest extends MultiCompilationTest
 
-class MultiCompilationSecondUnitTestCheck {
-  @Test def testInDifferentCompilationUnits(): Unit = {
+class MultiCompilationSecondUnitTestCheck
+  @Test def testInDifferentCompilationUnits(): Unit =
     // Test for issue #2112
     val boot = JUnitUtil.loadBootstrapper(
         "org.scalajs.testsuite.junit.MultiCompilationSecondUnitTest")
-    try {
+    try
       boot.invoke(boot.newInstance(), "testFromMultiCompilation")
-    } catch {
+    catch
       case e: Throwable =>
         fail(s"Could not invoke a test: ${e.getMessage}")
-    }
-  }
-}

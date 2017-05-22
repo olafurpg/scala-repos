@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicReference
 import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
-object AsyncQueue {
+object AsyncQueue
   private sealed trait State[+T]
   private case object Idle extends State[Nothing]
   private case class Offering[T](q: Queue[T]) extends State[T]
@@ -14,7 +14,6 @@ object AsyncQueue {
 
   /** Indicates there is no max capacity */
   private val UnboundedCapacity = Int.MaxValue
-}
 
 /**
   * An asynchronous FIFO queue. In addition to providing [[offer]]
@@ -25,7 +24,7 @@ object AsyncQueue {
   * The default is unbounded, but any other positive value can be used to limit
   * the max queue size. Note that `Int.MaxValue` is used to denote unbounded.
   */
-class AsyncQueue[T](maxPendingOffers: Int) {
+class AsyncQueue[T](maxPendingOffers: Int)
   import AsyncQueue._
 
   /**
@@ -42,31 +41,28 @@ class AsyncQueue[T](maxPendingOffers: Int) {
   /**
     * Returns the current number of pending elements.
     */
-  def size: Int = state.get match {
+  def size: Int = state.get match
     case Offering(q) => q.size
     case _ => 0
-  }
 
   private[this] def queueOf[E](e: E): Queue[E] =
     Queue.empty.enqueue(e)
 
-  private[this] def pollExcepting(s: Excepting[T]): Future[T] = {
+  private[this] def pollExcepting(s: Excepting[T]): Future[T] =
     val q = s.q
-    if (q.isEmpty) {
+    if (q.isEmpty)
       Future.exception(s.exc)
-    } else {
+    else
       val (elem, nextq) = q.dequeue
       val nextState = Excepting(nextq, s.exc)
       if (state.compareAndSet(s, nextState)) Future.value(elem) else poll()
-    }
-  }
 
   /**
     * Retrieves and removes the head of the queue, completing the
     * returned future when the element is available.
     */
   @tailrec
-  final def poll(): Future[T] = state.get match {
+  final def poll(): Future[T] = state.get match
     case Idle =>
       val p = new Promise[T]
       if (state.compareAndSet(Idle, Polling(queueOf(p)))) p else poll()
@@ -82,7 +78,6 @@ class AsyncQueue[T](maxPendingOffers: Int) {
 
     case s: Excepting[T] =>
       pollExcepting(s)
-  }
 
   /**
     * Insert the given element at the tail of the queue.
@@ -90,7 +85,7 @@ class AsyncQueue[T](maxPendingOffers: Int) {
     * @return `true` if the item was successfully added, `false` otherwise.
     */
   @tailrec
-  final def offer(elem: T): Boolean = state.get match {
+  final def offer(elem: T): Boolean = state.get match
     case Idle =>
       if (!state.compareAndSet(Idle, Offering(queueOf(elem)))) offer(elem)
       else true
@@ -105,16 +100,14 @@ class AsyncQueue[T](maxPendingOffers: Int) {
     case s @ Polling(q) =>
       val (waiter, nextq) = q.dequeue
       val nextState = if (nextq.nonEmpty) Polling(nextq) else Idle
-      if (state.compareAndSet(s, nextState)) {
+      if (state.compareAndSet(s, nextState))
         waiter.setValue(elem)
         true
-      } else {
+      else
         offer(elem)
-      }
 
     case Excepting(_, _) =>
       false // Drop.
-  }
 
   /**
     * Drains any pending elements into a `Try[Queue]`.
@@ -124,7 +117,7 @@ class AsyncQueue[T](maxPendingOffers: Int) {
     * Otherwise, return a `Return(Queue)` of the pending elements.
     */
   @tailrec
-  final def drain(): Try[Queue[T]] = state.get match {
+  final def drain(): Try[Queue[T]] = state.get match
     case s @ Offering(q) =>
       if (state.compareAndSet(s, Idle)) Return(q)
       else drain()
@@ -135,7 +128,6 @@ class AsyncQueue[T](maxPendingOffers: Int) {
       Throw(e)
     case _ =>
       Return(Queue.empty)
-  }
 
   /**
     * Fail the queue: current and subsequent pollers will be completed
@@ -151,7 +143,7 @@ class AsyncQueue[T](maxPendingOffers: Int) {
     * No new elements are admitted to the queue after it has been failed.
     */
   @tailrec
-  final def fail(exc: Throwable, discard: Boolean): Unit = state.get match {
+  final def fail(exc: Throwable, discard: Boolean): Unit = state.get match
     case Idle =>
       if (!state.compareAndSet(Idle, Excepting(Queue.empty, exc)))
         fail(exc, discard)
@@ -165,7 +157,5 @@ class AsyncQueue[T](maxPendingOffers: Int) {
       if (!state.compareAndSet(s, Excepting(nextq, exc))) fail(exc, discard)
 
     case Excepting(_, _) => // Just take the first one.
-  }
 
   override def toString = "AsyncQueue<%s>".format(state.get)
-}

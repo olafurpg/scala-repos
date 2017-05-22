@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.testingSupport.scalatest.ScalaTestWholeSuiteT
   * @author Roman.Shein
   * @since 11.02.2015.
   */
-class Scalatest2_10_1_9_2_WholeSuiteTest extends {
+class Scalatest2_10_1_9_2_WholeSuiteTest extends
   override val featureSpecTestPaths = List(
       List("[root]", "FeatureSpecTest", "Feature 1 Scenario: Scenario A"),
       List("[root]", "FeatureSpecTest", "Feature 1 Scenario: Scenario B"),
@@ -33,4 +33,4 @@ class Scalatest2_10_1_9_2_WholeSuiteTest extends {
   override val wordSpecTestPaths = List(
       List("[root]", "WordSpecTest", "WordSpecTest should Run single test"),
       List("[root]", "WordSpecTest", "WordSpecTest should ignore other tests"))
-} with Scalatest2_10_1_9_2_Base with ScalaTestWholeSuiteTest {}
+with Scalatest2_10_1_9_2_Base with ScalaTestWholeSuiteTest {}

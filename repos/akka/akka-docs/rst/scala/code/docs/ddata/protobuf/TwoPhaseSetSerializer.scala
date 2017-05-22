@@ -15,64 +15,54 @@ import docs.ddata.TwoPhaseSet
 import docs.ddata.protobuf.msg.TwoPhaseSetMessages
 
 class TwoPhaseSetSerializer(val system: ExtendedActorSystem)
-    extends Serializer with SerializationSupport {
+    extends Serializer with SerializationSupport
 
   override def includeManifest: Boolean = false
 
   override def identifier = 99999
 
-  override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  override def toBinary(obj: AnyRef): Array[Byte] = obj match
     case m: TwoPhaseSet ⇒ twoPhaseSetToProto(m).toByteArray
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass}")
-  }
 
   override def fromBinary(
-      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef =
     twoPhaseSetFromBinary(bytes)
-  }
 
   def twoPhaseSetToProto(
-      twoPhaseSet: TwoPhaseSet): TwoPhaseSetMessages.TwoPhaseSet = {
+      twoPhaseSet: TwoPhaseSet): TwoPhaseSetMessages.TwoPhaseSet =
     val b = TwoPhaseSetMessages.TwoPhaseSet.newBuilder()
     // using java collections and sorting for performance (avoid conversions)
     val adds = new ArrayList[String]
     twoPhaseSet.adds.elements.foreach(adds.add)
-    if (!adds.isEmpty) {
+    if (!adds.isEmpty)
       Collections.sort(adds)
       b.addAllAdds(adds)
-    }
     val removals = new ArrayList[String]
     twoPhaseSet.removals.elements.foreach(removals.add)
-    if (!removals.isEmpty) {
+    if (!removals.isEmpty)
       Collections.sort(removals)
       b.addAllRemovals(removals)
-    }
     b.build()
-  }
 
-  def twoPhaseSetFromBinary(bytes: Array[Byte]): TwoPhaseSet = {
+  def twoPhaseSetFromBinary(bytes: Array[Byte]): TwoPhaseSet =
     val msg = TwoPhaseSetMessages.TwoPhaseSet.parseFrom(bytes)
     TwoPhaseSet(adds = GSet(msg.getAddsList.iterator.asScala.toSet),
                 removals = GSet(msg.getRemovalsList.iterator.asScala.toSet))
-  }
-}
 //#serializer
 
 class TwoPhaseSetSerializerWithCompression(system: ExtendedActorSystem)
-    extends TwoPhaseSetSerializer(system) {
+    extends TwoPhaseSetSerializer(system)
   //#compression
-  override def toBinary(obj: AnyRef): Array[Byte] = obj match {
+  override def toBinary(obj: AnyRef): Array[Byte] = obj match
     case m: TwoPhaseSet ⇒ compress(twoPhaseSetToProto(m))
     case _ ⇒
       throw new IllegalArgumentException(
           s"Can't serialize object of type ${obj.getClass}")
-  }
 
   override def fromBinary(
-      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef = {
+      bytes: Array[Byte], clazz: Option[Class[_]]): AnyRef =
     twoPhaseSetFromBinary(decompress(bytes))
-  }
   //#compression
-}

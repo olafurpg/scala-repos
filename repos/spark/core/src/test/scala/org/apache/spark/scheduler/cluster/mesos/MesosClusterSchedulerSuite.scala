@@ -33,24 +33,22 @@ import org.apache.spark.deploy.Command
 import org.apache.spark.deploy.mesos.MesosDriverDescription
 
 class MesosClusterSchedulerSuite
-    extends SparkFunSuite with LocalSparkContext with MockitoSugar {
+    extends SparkFunSuite with LocalSparkContext with MockitoSugar
 
   private val command = new Command(
       "mainClass", Seq("arg"), Map(), Seq(), Seq(), Seq())
   private var scheduler: MesosClusterScheduler = _
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     val conf = new SparkConf()
     conf.setMaster("mesos://localhost:5050")
     conf.setAppName("spark mesos")
     scheduler = new MesosClusterScheduler(
-        new BlackHoleMesosClusterPersistenceEngineFactory, conf) {
+        new BlackHoleMesosClusterPersistenceEngineFactory, conf)
       override def start(): Unit = { ready = true }
-    }
     scheduler.start()
-  }
 
-  test("can queue drivers") {
+  test("can queue drivers")
     val response = scheduler.submitDriver(
         new MesosDriverDescription("d1",
                                    "jar",
@@ -77,9 +75,8 @@ class MesosClusterSchedulerSuite
     val queuedDrivers = state.queuedDrivers.toList
     assert(queuedDrivers(0).submissionId == response.submissionId)
     assert(queuedDrivers(1).submissionId == response2.submissionId)
-  }
 
-  test("can kill queued drivers") {
+  test("can kill queued drivers")
     val response = scheduler.submitDriver(
         new MesosDriverDescription("d1",
                                    "jar",
@@ -95,9 +92,8 @@ class MesosClusterSchedulerSuite
     assert(killResponse.success)
     val state = scheduler.getSchedulerState()
     assert(state.queuedDrivers.isEmpty)
-  }
 
-  test("can handle multiple roles") {
+  test("can handle multiple roles")
     val driver = mock[SchedulerDriver]
     val response = scheduler.submitDriver(
         new MesosDriverDescription("d1",
@@ -172,5 +168,3 @@ class MesosClusterSchedulerSuite
         Matchers.eq(Collections.singleton(offer.getId)),
         capture.capture()
     )
-  }
-}

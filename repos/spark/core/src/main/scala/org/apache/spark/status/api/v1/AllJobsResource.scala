@@ -26,51 +26,43 @@ import org.apache.spark.ui.jobs.JobProgressListener
 import org.apache.spark.ui.jobs.UIData.JobUIData
 
 @Produces(Array(MediaType.APPLICATION_JSON))
-private[v1] class AllJobsResource(ui: SparkUI) {
+private[v1] class AllJobsResource(ui: SparkUI)
 
   @GET
   def jobsList(@QueryParam("status") statuses: JList[JobExecutionStatus])
-    : Seq[JobData] = {
+    : Seq[JobData] =
     val statusToJobs: Seq[(JobExecutionStatus, Seq[JobUIData])] =
       AllJobsResource.getStatusToJobs(ui)
-    val adjStatuses: JList[JobExecutionStatus] = {
-      if (statuses.isEmpty) {
+    val adjStatuses: JList[JobExecutionStatus] =
+      if (statuses.isEmpty)
         Arrays.asList(JobExecutionStatus.values(): _*)
-      } else {
+      else
         statuses
-      }
-    }
-    val jobInfos = for {
+    val jobInfos = for
       (status, jobs) <- statusToJobs
       job <- jobs if adjStatuses.contains(status)
-    } yield {
+    yield
       AllJobsResource.convertJobData(job, ui.jobProgressListener, false)
-    }
     jobInfos.sortBy { -_.jobId }
-  }
-}
 
-private[v1] object AllJobsResource {
+private[v1] object AllJobsResource
 
-  def getStatusToJobs(ui: SparkUI): Seq[(JobExecutionStatus, Seq[JobUIData])] = {
-    val statusToJobs = ui.jobProgressListener.synchronized {
+  def getStatusToJobs(ui: SparkUI): Seq[(JobExecutionStatus, Seq[JobUIData])] =
+    val statusToJobs = ui.jobProgressListener.synchronized
       Seq(
           JobExecutionStatus.RUNNING -> ui.jobProgressListener.activeJobs.values.toSeq,
           JobExecutionStatus.SUCCEEDED -> ui.jobProgressListener.completedJobs.toSeq,
           JobExecutionStatus.FAILED -> ui.jobProgressListener.failedJobs.reverse.toSeq
       )
-    }
     statusToJobs
-  }
 
   def convertJobData(job: JobUIData,
                      listener: JobProgressListener,
-                     includeStageDetails: Boolean): JobData = {
-    listener.synchronized {
+                     includeStageDetails: Boolean): JobData =
+    listener.synchronized
       val lastStageInfo = listener.stageIdToInfo.get(job.stageIds.max)
-      val lastStageData = lastStageInfo.flatMap { s =>
+      val lastStageData = lastStageInfo.flatMap  s =>
         listener.stageIdToData.get((s.stageId, s.attemptId))
-      }
       val lastStageName = lastStageInfo.map { _.name }
         .getOrElse("(Unknown Stage Name)")
       val lastStageDescription = lastStageData.flatMap { _.description }
@@ -93,6 +85,3 @@ private[v1] object AllJobsResource {
           numSkippedStages = job.numSkippedStages,
           numFailedStages = job.numFailedStages
       )
-    }
-  }
-}

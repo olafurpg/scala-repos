@@ -74,7 +74,7 @@ final class elidable(final val level: Int)
   *
   *  @since 2.8
   */
-object elidable {
+object elidable
 
   /** The levels `ALL` and `OFF` are confusing in this context because
     *  the sentiment being expressed when using the annotation is at cross
@@ -118,4 +118,3 @@ object elidable {
       "MAXIMUM" -> MAXIMUM,
       "MINIMUM" -> MINIMUM
   )
-}

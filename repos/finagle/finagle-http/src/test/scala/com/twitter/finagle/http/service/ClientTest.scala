@@ -12,10 +12,10 @@ import org.scalatest.FunSuite
 import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
-class ClientTest extends FunSuite {
+class ClientTest extends FunSuite
   def withServer(factory: ServiceFactory[Request, Response])(
       spec: ClientBuilder.Complete[Request, Response] => Unit
-  ): Unit = {
+  ): Unit =
     val server = Http.serve(new InetSocketAddress(0), factory)
     val serverAddress = server.boundAddress.asInstanceOf[InetSocketAddress]
 
@@ -24,26 +24,22 @@ class ClientTest extends FunSuite {
       .hostConnectionLimit(1)
       .codec(HttpCodec())
 
-    try spec(builder) finally {
+    try spec(builder) finally
       Await.result(server.close())
-    }
-  }
 
   var counter = 0
 
   def failingFactory: ServiceFactory[Request, Response] =
-    new FailingFactory[Request, Response](new Exception("bye")) {
-      override def apply(conn: ClientConnection) = {
+    new FailingFactory[Request, Response](new Exception("bye"))
+      override def apply(conn: ClientConnection) =
         counter += 1
         super.apply(conn)
-      }
-    }
 
-  test("report a closed connection when the server doesn't reply") {
-    withServer(failingFactory) { clientBuilder =>
+  test("report a closed connection when the server doesn't reply")
+    withServer(failingFactory)  clientBuilder =>
       counter = 0
       val client = clientBuilder.build()
-      try {
+      try
         // No failures have happened yet.
         assert(client.isAvailable == true)
         val future = client(Request(Version.Http11, Method.Get, "/"))
@@ -51,23 +47,18 @@ class ClientTest extends FunSuite {
         assert(resolved.isThrow == true)
         val Throw(cause) = resolved
         intercept[ChannelClosedException] { throw cause }
-      } finally client.close()
-    }
-  }
+      finally client.close()
 
   test(
-      "report a closed connection when the server doesn't reply, without retrying") {
-    withServer(failingFactory) { clientBuilder =>
+      "report a closed connection when the server doesn't reply, without retrying")
+    withServer(failingFactory)  clientBuilder =>
       counter = 0
       val client = clientBuilder.retries(10).build()
-      try {
+      try
         val future = client(Request(Version.Http11, Method.Get, "/"))
         val resolved = Try(Await.result(future, 1.second))
         assert(resolved.isThrow == true)
         val Throw(cause) = resolved
         intercept[ChannelClosedException] { throw cause }
         assert(counter == 1)
-      } finally client.close()
-    }
-  }
-}
+      finally client.close()

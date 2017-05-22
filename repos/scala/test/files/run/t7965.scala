@@ -1,6 +1,6 @@
 // Test that scala doesn't apply boxing or varargs conversions to the
 // @PolymorphicSignature magical methods, MethodHandle#{invoke, invokeExact}
-object Test {
+object Test
   val code =
     """
 
@@ -39,11 +39,10 @@ object Test {
 }
 
 """
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     if (util.Properties.isJavaAtLeast("1.7")) test()
-  }
 
-  def test() {
+  def test()
     import scala.reflect.runtime._
     import scala.tools.reflect.ToolBox
 
@@ -51,5 +50,3 @@ object Test {
     val tb = m.mkToolBox()
     import tb._
     eval(parse(code))
-  }
-}

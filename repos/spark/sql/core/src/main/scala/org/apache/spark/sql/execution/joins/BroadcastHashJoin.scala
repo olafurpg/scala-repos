@@ -42,7 +42,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
                              condition: Option[Expression],
                              left: SparkPlan,
                              right: SparkPlan)
-    extends BinaryNode with HashJoin with CodegenSupport {
+    extends BinaryNode with HashJoin with CodegenSupport
 
   override private[sql] lazy val metrics = Map(
       "numOutputRows" -> SQLMetrics.createLongMetric(sparkContext,
@@ -51,23 +51,21 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
   override def outputPartitioning: Partitioning =
     streamedPlan.outputPartitioning
 
-  override def requiredChildDistribution: Seq[Distribution] = {
+  override def requiredChildDistribution: Seq[Distribution] =
     val mode = HashedRelationBroadcastMode(canJoinKeyFitWithinLong,
                                            rewriteKeyExpr(buildKeys),
                                            buildPlan.output)
-    buildSide match {
+    buildSide match
       case BuildLeft =>
         BroadcastDistribution(mode) :: UnspecifiedDistribution :: Nil
       case BuildRight =>
         UnspecifiedDistribution :: BroadcastDistribution(mode) :: Nil
-    }
-  }
 
-  protected override def doExecute(): RDD[InternalRow] = {
+  protected override def doExecute(): RDD[InternalRow] =
     val numOutputRows = longMetric("numOutputRows")
 
     val broadcastRelation = buildPlan.executeBroadcast[HashedRelation]()
-    streamedPlan.execute().mapPartitions { streamedIter =>
+    streamedPlan.execute().mapPartitions  streamedIter =>
       val joinedRow = new JoinedRow()
       val hashTable = broadcastRelation.value
       TaskContext
@@ -77,12 +75,12 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
       val keyGenerator = streamSideKeyGenerator
       val resultProj = createResultProjection
 
-      joinType match {
+      joinType match
         case Inner =>
           hashJoin(streamedIter, hashTable, numOutputRows)
 
         case LeftOuter =>
-          streamedIter.flatMap { currentRow =>
+          streamedIter.flatMap  currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withLeft(currentRow)
             leftOuterIterator(rowKey,
@@ -90,10 +88,9 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
                               hashTable.get(rowKey),
                               resultProj,
                               numOutputRows)
-          }
 
         case RightOuter =>
-          streamedIter.flatMap { currentRow =>
+          streamedIter.flatMap  currentRow =>
             val rowKey = keyGenerator(currentRow)
             joinedRow.withRight(currentRow)
             rightOuterIterator(rowKey,
@@ -101,7 +98,6 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
                                joinedRow,
                                resultProj,
                                numOutputRows)
-          }
 
         case LeftSemi =>
           hashSemiJoin(streamedIter, hashTable, numOutputRows)
@@ -109,35 +105,28 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
         case x =>
           throw new IllegalArgumentException(
               s"BroadcastHashJoin should not take $x as the JoinType")
-      }
-    }
-  }
 
-  override def upstreams(): Seq[RDD[InternalRow]] = {
+  override def upstreams(): Seq[RDD[InternalRow]] =
     streamedPlan.asInstanceOf[CodegenSupport].upstreams()
-  }
 
-  override def doProduce(ctx: CodegenContext): String = {
+  override def doProduce(ctx: CodegenContext): String =
     streamedPlan.asInstanceOf[CodegenSupport].produce(ctx, this)
-  }
 
   override def doConsume(
-      ctx: CodegenContext, input: Seq[ExprCode], row: String): String = {
-    joinType match {
+      ctx: CodegenContext, input: Seq[ExprCode], row: String): String =
+    joinType match
       case Inner => codegenInner(ctx, input)
       case LeftOuter | RightOuter => codegenOuter(ctx, input)
       case LeftSemi => codegenSemi(ctx, input)
       case x =>
         throw new IllegalArgumentException(
             s"BroadcastHashJoin should not take $x as the JoinType")
-    }
-  }
 
   /**
     * Returns a tuple of Broadcast of HashedRelation and the variable name for it.
     */
   private def prepareBroadcast(
-      ctx: CodegenContext): (Broadcast[HashedRelation], String) = {
+      ctx: CodegenContext): (Broadcast[HashedRelation], String) =
     // create a name for HashedRelation
     val broadcastRelation = buildPlan.executeBroadcast[HashedRelation]()
     val broadcast = ctx.addReferenceObj("broadcast", broadcastRelation)
@@ -150,44 +139,41 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          | incPeakExecutionMemory($relationTerm.getMemorySize());
        """.stripMargin)
     (broadcastRelation, relationTerm)
-  }
 
   /**
     * Returns the code for generating join key for stream side, and expression of whether the key
     * has any null in it or not.
     */
   private def genStreamSideJoinKey(
-      ctx: CodegenContext, input: Seq[ExprCode]): (ExprCode, String) = {
+      ctx: CodegenContext, input: Seq[ExprCode]): (ExprCode, String) =
     ctx.currentVars = input
-    if (canJoinKeyFitWithinLong) {
+    if (canJoinKeyFitWithinLong)
       // generate the join key as Long
       val expr = rewriteKeyExpr(streamedKeys).head
       val ev = BindReferences
         .bindReference(expr, streamedPlan.output)
         .gen(ctx)
         (ev, ev.isNull)
-    } else {
+    else
       // generate the join key as UnsafeRow
       val keyExpr =
         streamedKeys.map(BindReferences.bindReference(_, streamedPlan.output))
       val ev = GenerateUnsafeProjection.createCode(ctx, keyExpr)
       (ev, s"${ev.value}.anyNull()")
-    }
-  }
 
   /**
     * Generates the code for variable of build side.
     */
   private def genBuildSideVars(
-      ctx: CodegenContext, matched: String): Seq[ExprCode] = {
+      ctx: CodegenContext, matched: String): Seq[ExprCode] =
     ctx.currentVars = null
     ctx.INPUT_ROW = matched
-    buildPlan.output.zipWithIndex.map {
+    buildPlan.output.zipWithIndex.map
       case (a, i) =>
         val ev = BoundReference(i, a.dataType, a.nullable).gen(ctx)
-        if (joinType == Inner) {
+        if (joinType == Inner)
           ev
-        } else {
+        else
           // the variables are needed even there is no matched rows
           val isNull = ctx.freshName("isNull")
           val value = ctx.freshName("value")
@@ -201,14 +187,11 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
           |}
          """.stripMargin
           ExprCode(code, isNull, value)
-        }
-    }
-  }
 
   /**
     * Generates the code for Inner join.
     */
-  private def codegenInner(ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def codegenInner(ctx: CodegenContext, input: Seq[ExprCode]): String =
     val (broadcastRelation, relationTerm) = prepareBroadcast(ctx)
     val (keyEv, anyNull) = genStreamSideJoinKey(ctx, input)
     val matched = ctx.freshName("matched")
@@ -216,7 +199,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     val checkCondition =
-      if (condition.isDefined) {
+      if (condition.isDefined)
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
@@ -231,15 +214,13 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |${ev.code}
          |if (${ev.isNull} || !${ev.value}) continue;
        """.stripMargin
-      } else {
+      else
         ""
-      }
 
-    val resultVars = buildSide match {
+    val resultVars = buildSide match
       case BuildLeft => buildVars ++ input
       case BuildRight => input ++ buildVars
-    }
-    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation]) {
+    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation])
       s"""
          |// generate join key for stream side
          |${keyEv.code}
@@ -250,7 +231,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |$numOutput.add(1);
          |${consume(ctx, resultVars)}
        """.stripMargin
-    } else {
+    else
       ctx.copyResult = true
       val matches = ctx.freshName("matches")
       val bufferType = classOf[CompactBuffer[UnsafeRow]].getName
@@ -270,13 +251,11 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |  ${consume(ctx, resultVars)}
          |}
        """.stripMargin
-    }
-  }
 
   /**
     * Generates the code for left or right outer join.
     */
-  private def codegenOuter(ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def codegenOuter(ctx: CodegenContext, input: Seq[ExprCode]): String =
     val (broadcastRelation, relationTerm) = prepareBroadcast(ctx)
     val (keyEv, anyNull) = genStreamSideJoinKey(ctx, input)
     val matched = ctx.freshName("matched")
@@ -286,7 +265,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     // filter the output via condition
     val conditionPassed = ctx.freshName("conditionPassed")
     val checkCondition =
-      if (condition.isDefined) {
+      if (condition.isDefined)
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
@@ -303,15 +282,13 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |  $conditionPassed = !${ev.isNull} && ${ev.value};
          |}
        """.stripMargin
-      } else {
+      else
         s"final boolean $conditionPassed = true;"
-      }
 
-    val resultVars = buildSide match {
+    val resultVars = buildSide match
       case BuildLeft => buildVars ++ input
       case BuildRight => input ++ buildVars
-    }
-    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation]) {
+    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation])
       s"""
          |// generate join key for stream side
          |${keyEv.code}
@@ -321,15 +298,15 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |if (!$conditionPassed) {
          |  $matched = null;
          |  // reset the variables those are already evaluated.
-         |  ${buildVars
+         |  $buildVars
            .filter(_.code == "")
            .map(v => s"${v.isNull} = true;")
-           .mkString("\n")}
+           .mkString("\n")
          |}
          |$numOutput.add(1);
          |${consume(ctx, resultVars)}
        """.stripMargin
-    } else {
+    else
       ctx.copyResult = true
       val matches = ctx.freshName("matches")
       val bufferType = classOf[CompactBuffer[UnsafeRow]].getName
@@ -353,13 +330,11 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |  ${consume(ctx, resultVars)}
          |}
        """.stripMargin
-    }
-  }
 
   /**
     * Generates the code for left semi join.
     */
-  private def codegenSemi(ctx: CodegenContext, input: Seq[ExprCode]): String = {
+  private def codegenSemi(ctx: CodegenContext, input: Seq[ExprCode]): String =
     val (broadcastRelation, relationTerm) = prepareBroadcast(ctx)
     val (keyEv, anyNull) = genStreamSideJoinKey(ctx, input)
     val matched = ctx.freshName("matched")
@@ -367,7 +342,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
     val numOutput = metricTerm(ctx, "numOutputRows")
 
     val checkCondition =
-      if (condition.isDefined) {
+      if (condition.isDefined)
         val expr = condition.get
         // evaluate the variables from build side that used by condition
         val eval = evaluateRequiredVariables(
@@ -382,11 +357,10 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |${ev.code}
          |if (${ev.isNull} || !${ev.value}) continue;
        """.stripMargin
-      } else {
+      else
         ""
-      }
 
-    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation]) {
+    if (broadcastRelation.value.isInstanceOf[UniqueHashedRelation])
       s"""
          |// generate join key for stream side
          |${keyEv.code}
@@ -397,7 +371,7 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |$numOutput.add(1);
          |${consume(ctx, input)}
        """.stripMargin
-    } else {
+    else
       val matches = ctx.freshName("matches")
       val bufferType = classOf[CompactBuffer[UnsafeRow]].getName
       val i = ctx.freshName("i")
@@ -421,6 +395,3 @@ case class BroadcastHashJoin(leftKeys: Seq[Expression],
          |$numOutput.add(1);
          |${consume(ctx, input)}
        """.stripMargin
-    }
-  }
-}

@@ -28,7 +28,7 @@ import org.apache.spark.mllib.tree.model.{Split => OldSplit}
   * to choose the left or right path.
   */
 @DeveloperApi
-sealed trait Split extends Serializable {
+sealed trait Split extends Serializable
 
   /** Index of feature which this split tests */
   def featureIndex: Int
@@ -49,12 +49,11 @@ sealed trait Split extends Serializable {
 
   /** Convert to old Split format */
   private[tree] def toOld: OldSplit
-}
 
-private[tree] object Split {
+private[tree] object Split
 
-  def fromOld(oldSplit: OldSplit, categoricalFeatures: Map[Int, Int]): Split = {
-    oldSplit.featureType match {
+  def fromOld(oldSplit: OldSplit, categoricalFeatures: Map[Int, Int]): Split =
+    oldSplit.featureType match
       case OldFeatureType.Categorical =>
         new CategoricalSplit(featureIndex = oldSplit.feature,
                              _leftCategories = oldSplit.categories.toArray,
@@ -62,9 +61,6 @@ private[tree] object Split {
       case OldFeatureType.Continuous =>
         new ContinuousSplit(
             featureIndex = oldSplit.feature, threshold = oldSplit.threshold)
-    }
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -79,7 +75,7 @@ final class CategoricalSplit private[ml](
     override val featureIndex: Int,
     _leftCategories: Array[Double],
     @Since("2.0.0") val numCategories: Int)
-    extends Split {
+    extends Split
 
   require(
       _leftCategories.forall(cat => 0 <= cat && cat < numCategories),
@@ -92,73 +88,59 @@ final class CategoricalSplit private[ml](
   private val isLeft: Boolean = _leftCategories.length <= numCategories / 2
 
   /** Set of categories determining the splitting rule, along with [[isLeft]]. */
-  private val categories: Set[Double] = {
-    if (isLeft) {
+  private val categories: Set[Double] =
+    if (isLeft)
       _leftCategories.toSet
-    } else {
+    else
       setComplement(_leftCategories.toSet)
-    }
-  }
 
-  override private[ml] def shouldGoLeft(features: Vector): Boolean = {
-    if (isLeft) {
+  override private[ml] def shouldGoLeft(features: Vector): Boolean =
+    if (isLeft)
       categories.contains(features(featureIndex))
-    } else {
+    else
       !categories.contains(features(featureIndex))
-    }
-  }
 
   override private[tree] def shouldGoLeft(
-      binnedFeature: Int, splits: Array[Split]): Boolean = {
-    if (isLeft) {
+      binnedFeature: Int, splits: Array[Split]): Boolean =
+    if (isLeft)
       categories.contains(binnedFeature.toDouble)
-    } else {
+    else
       !categories.contains(binnedFeature.toDouble)
-    }
-  }
 
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case other: CategoricalSplit =>
         featureIndex == other.featureIndex && isLeft == other.isLeft &&
         categories == other.categories
       case _ => false
-    }
-  }
 
-  override private[tree] def toOld: OldSplit = {
+  override private[tree] def toOld: OldSplit =
     val oldCats =
-      if (isLeft) {
+      if (isLeft)
         categories
-      } else {
+      else
         setComplement(categories)
-      }
     OldSplit(featureIndex,
              threshold = 0.0,
              OldFeatureType.Categorical,
              oldCats.toList)
-  }
 
   /** Get sorted categories which split to the left */
-  def leftCategories: Array[Double] = {
+  def leftCategories: Array[Double] =
     val cats = if (isLeft) categories else setComplement(categories)
     cats.toArray.sorted
-  }
 
   /** Get sorted categories which split to the right */
-  def rightCategories: Array[Double] = {
+  def rightCategories: Array[Double] =
     val cats = if (isLeft) setComplement(categories) else categories
     cats.toArray.sorted
-  }
 
   /** [0, numCategories) \ cats */
-  private def setComplement(cats: Set[Double]): Set[Double] = {
+  private def setComplement(cats: Set[Double]): Set[Double] =
     Range(0, numCategories)
       .map(_.toDouble)
       .filter(cat => !cats.contains(cat))
       .toSet
-  }
-}
 
 /**
   * :: DeveloperApi ::
@@ -170,35 +152,28 @@ final class CategoricalSplit private[ml](
 @DeveloperApi
 final class ContinuousSplit private[ml](
     override val featureIndex: Int, val threshold: Double)
-    extends Split {
+    extends Split
 
-  override private[ml] def shouldGoLeft(features: Vector): Boolean = {
+  override private[ml] def shouldGoLeft(features: Vector): Boolean =
     features(featureIndex) <= threshold
-  }
 
   override private[tree] def shouldGoLeft(
-      binnedFeature: Int, splits: Array[Split]): Boolean = {
-    if (binnedFeature == splits.length) {
+      binnedFeature: Int, splits: Array[Split]): Boolean =
+    if (binnedFeature == splits.length)
       // > last split, so split right
       false
-    } else {
+    else
       val featureValueUpperBound =
         splits(binnedFeature).asInstanceOf[ContinuousSplit].threshold
       featureValueUpperBound <= threshold
-    }
-  }
 
-  override def equals(o: Any): Boolean = {
-    o match {
+  override def equals(o: Any): Boolean =
+    o match
       case other: ContinuousSplit =>
         featureIndex == other.featureIndex && threshold == other.threshold
       case _ =>
         false
-    }
-  }
 
-  override private[tree] def toOld: OldSplit = {
+  override private[tree] def toOld: OldSplit =
     OldSplit(
         featureIndex, threshold, OldFeatureType.Continuous, List.empty[Double])
-  }
-}

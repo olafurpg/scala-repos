@@ -8,7 +8,7 @@ import sbt.internal.util.AttributeKey
 /**
   * http://www.scala-sbt.org/0.13/tutorial/Scopes.html
   */
-class ScopedKeySpec extends Specification {
+class ScopedKeySpec extends Specification
   def is =
     s2"""
 
@@ -18,50 +18,48 @@ class ScopedKeySpec extends Specification {
     ${beParsedAs("fullClasspath", ThisScope, "fullClasspath")}
 
   test:fullClasspath should
-    ${beParsedAs(
-        "test:fullClasspath", ThisScope in ConfigKey("test"), "fullClasspath")}
+    $beParsedAs(
+        "test:fullClasspath", ThisScope in ConfigKey("test"), "fullClasspath")
 
   *:fullClasspath
     ${beParsedAs("*:fullClasspath", GlobalScope, "fullClasspath")}
 
   aea33a/test:fullClasspath   
-    ${beParsedAs("aea33a/test:fullClasspath",
+    $beParsedAs("aea33a/test:fullClasspath",
                  ThisScope in (LocalProject("aea33a"), ConfigKey("test")),
-                 "fullClasspath")}
+                 "fullClasspath")
 
   doc::fullClasspath
-    ${beParsedAs("doc::fullClasspath",
+    $beParsedAs("doc::fullClasspath",
                  ThisScope in AttributeKey("doc"),
-                 "fullClasspath")}
+                 "fullClasspath")
 
   {file:/hello/}aea33a/test:fullClasspath
-    ${beParsedAs(
+    $beParsedAs(
         "{file:/hello/}aea33a/test:fullClasspath",
         ThisScope in
         (ProjectRef(new URI("file:/hello/"), "aea33a"), ConfigKey("test")),
-        "fullClasspath")}
+        "fullClasspath")
 
   {file:/hello/}/test:fullClasspath
-    ${beParsedAs("{file:/hello/}/test:fullClasspath",
+    $beParsedAs("{file:/hello/}/test:fullClasspath",
                  ThisScope in
                  (BuildRef(new URI("file:/hello/")), ConfigKey("test")),
-                 "fullClasspath")}
+                 "fullClasspath")
 
   {.}/test:fullClasspath
-    ${beParsedAs("{.}/test:fullClasspath",
+    $beParsedAs("{.}/test:fullClasspath",
                  ThisScope in (ThisBuild, ConfigKey("test")),
-                 "fullClasspath")}
+                 "fullClasspath")
 
   {file:/hello/}/compile:doc::fullClasspath
-    ${beParsedAs("{file:/hello/}/compile:doc::fullClasspath",
+    $beParsedAs("{file:/hello/}/compile:doc::fullClasspath",
                  ThisScope in
                  (BuildRef(new URI("file:/hello/")), ConfigKey("compile"),
                      AttributeKey("doc")),
-                 "fullClasspath")}
+                 "fullClasspath")
                                                                 """
 
-  def beParsedAs(cmd: String, scope0: Scope, key0: String) = {
+  def beParsedAs(cmd: String, scope0: Scope, key0: String) =
     val (scope, key) = parseScopedKey(cmd)
     (scope must_== scope0) and (key must_== key0)
-  }
-}

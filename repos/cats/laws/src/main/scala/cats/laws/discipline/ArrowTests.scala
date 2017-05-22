@@ -8,7 +8,7 @@ import org.scalacheck.Prop
 import Prop._
 
 trait ArrowTests[F[_, _]]
-    extends CategoryTests[F] with SplitTests[F] with StrongTests[F] {
+    extends CategoryTests[F] with SplitTests[F] with StrongTests[F]
   def laws: ArrowLaws[F]
 
   def arrow[A : Arbitrary,
@@ -35,7 +35,7 @@ trait ArrowTests[F[_, _]]
       EqFAEDE: Eq[F[(A, E), (D, E)]],
       EqFEAED: Eq[F[(E, A), (E, D)]],
       EqFACDBCD: Eq[F[((A, C), D), (B, (C, D))]]): RuleSet =
-    new RuleSet {
+    new RuleSet
       def name: String = "arrow"
       def bases: Seq[(String, RuleSet)] = Nil
       def parents: Seq[RuleSet] = Seq(
@@ -52,10 +52,7 @@ trait ArrowTests[F[_, _]]
           "arrow unit" -> forAll(laws.arrowUnit[A, B, C] _),
           "arrow association" -> forAll(laws.arrowAssociation[A, B, C, D] _)
       )
-    }
-}
 
-object ArrowTests {
+object ArrowTests
   def apply[F[_, _]: Arrow]: ArrowTests[F] =
     new ArrowTests[F] { def laws: ArrowLaws[F] = ArrowLaws[F] }
-}

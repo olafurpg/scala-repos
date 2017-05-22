@@ -1,3 +1,2 @@
-object Overlap5 {
+object Overlap5
   class A[T : List, U]
-}

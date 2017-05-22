@@ -16,55 +16,46 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *            | '_' ':' TypePat
  *            | Pattern2
  */
-object Pattern1 {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object Pattern1
+  def parse(builder: ScalaPsiBuilder): Boolean =
 
-    def isVarId = {
+    def isVarId =
       val text = builder.getTokenText
       text.substring(0, 1).toLowerCase != text.substring(0, 1) ||
       (text.apply(0) == '`' && text.apply(text.length - 1) == '`')
-    }
 
     val pattern1Marker = builder.mark
     val backupMarker = builder.mark
-    builder.getTokenType match {
+    builder.getTokenType match
       case ScalaTokenTypes.tIDENTIFIER =>
-        if (isVarId) {
+        if (isVarId)
           backupMarker.rollbackTo()
-        } else {
+        else
           builder.advanceLexer() //Ate id
-          builder.getTokenType match {
+          builder.getTokenType match
             case ScalaTokenTypes.tCOLON =>
               builder.advanceLexer() //Ate :
               backupMarker.drop()
-              if (!TypePattern.parse(builder)) {
+              if (!TypePattern.parse(builder))
                 builder error ScalaBundle.message("wrong.type")
-              }
               pattern1Marker.done(ScalaElementTypes.TYPED_PATTERN)
               return true
 
             case _ =>
               backupMarker.rollbackTo()
-          }
-        }
       case ScalaTokenTypes.tUNDER =>
         builder.advanceLexer() //Ate _
-        builder.getTokenType match {
+        builder.getTokenType match
           case ScalaTokenTypes.tCOLON =>
             builder.advanceLexer() //Ate :
             backupMarker.drop()
-            if (!TypePattern.parse(builder)) {
+            if (!TypePattern.parse(builder))
               builder error ScalaBundle.message("wrong.type")
-            }
             pattern1Marker.done(ScalaElementTypes.TYPED_PATTERN)
             return true
           case _ =>
             backupMarker.rollbackTo()
-        }
       case _ =>
         backupMarker.drop()
-    }
     pattern1Marker.drop()
     Pattern2.parse(builder, forDef = false)
-  }
-}

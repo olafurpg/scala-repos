@@ -29,32 +29,29 @@ import org.apache.spark.sql.catalyst.plans.logical.{LogicalPlan, ReturnAnswer}
   * While this is not a public class, we should avoid changing the function names for the sake of
   * changing them, because a lot of developers use the feature for debugging.
   */
-class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
+class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan)
 
   def assertAnalyzed(): Unit =
-    try sqlContext.sessionState.analyzer.checkAnalysis(analyzed) catch {
+    try sqlContext.sessionState.analyzer.checkAnalysis(analyzed) catch
       case e: AnalysisException =>
         val ae = new AnalysisException(
             e.message, e.line, e.startPosition, Some(analyzed))
         ae.setStackTrace(e.getStackTrace)
         throw ae
-    }
 
   lazy val analyzed: LogicalPlan =
     sqlContext.sessionState.analyzer.execute(logical)
 
-  lazy val withCachedData: LogicalPlan = {
+  lazy val withCachedData: LogicalPlan =
     assertAnalyzed()
     sqlContext.cacheManager.useCachedData(analyzed)
-  }
 
   lazy val optimizedPlan: LogicalPlan =
     sqlContext.sessionState.optimizer.execute(withCachedData)
 
-  lazy val sparkPlan: SparkPlan = {
+  lazy val sparkPlan: SparkPlan =
     SQLContext.setActive(sqlContext)
     sqlContext.sessionState.planner.plan(ReturnAnswer(optimizedPlan)).next()
-  }
 
   // executedPlan should not be used to initialize any SparkPlan. It should be
   // only used for execution.
@@ -67,13 +64,12 @@ class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
   protected def stringOrError[A](f: => A): String =
     try f.toString catch { case e: Throwable => e.toString }
 
-  def simpleString: String = {
+  def simpleString: String =
     s"""== Physical Plan ==
        |${stringOrError(executedPlan)}
       """.stripMargin.trim
-  }
 
-  override def toString: String = {
+  override def toString: String =
     def output =
       analyzed.output
         .map(o => s"${o.name}: ${o.dataType.simpleString}")
@@ -89,5 +85,3 @@ class QueryExecution(val sqlContext: SQLContext, val logical: LogicalPlan) {
        |== Physical Plan ==
        |${stringOrError(executedPlan)}
     """.stripMargin.trim
-  }
-}

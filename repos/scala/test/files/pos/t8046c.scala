@@ -1,9 +1,8 @@
-trait One {
+trait One
   type Op [A]
   type Alias[A] = Op[A]
-}
 
-trait Three extends One {
+trait Three extends One
   trait Op[A] extends (A => A)
 
   def f1(f: Op[Int]) = f(5)
@@ -15,4 +14,3 @@ trait Three extends One {
   //  required: T1
   //   def f4[T <: Alias[Int]](f: T) = f(5)
   //                                     ^
-}

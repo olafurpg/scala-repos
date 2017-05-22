@@ -13,34 +13,32 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * Date: 05.11.15.
   */
 class ScalaInjectedStringLiteralManipulator
-    extends AbstractElementManipulator[ScLiteral] {
+    extends AbstractElementManipulator[ScLiteral]
   override def handleContentChange(
-      expr: ScLiteral, range: TextRange, newContent: String): ScLiteral = {
+      expr: ScLiteral, range: TextRange, newContent: String): ScLiteral =
     val oldText = expr.getText
-    val contentString = expr.getFirstChild.getNode.getElementType match {
+    val contentString = expr.getFirstChild.getNode.getElementType match
       case ScalaTokenTypes.tMULTILINE_STRING => newContent
       case _ => StringUtil escapeStringCharacters newContent
-    }
     val newText =
       oldText.substring(0, range.getStartOffset) + contentString +
       oldText.substring(range.getEndOffset)
 
-    expr match {
+    expr match
       case inter: ScInterpolatedStringLiteral =>
         val quotes = if (inter.isMultiLineString) "\"\"\"" else "\""
 
-        inter.reference.map {
+        inter.reference.map
           case ref =>
             ScalaPsiElementFactory.createExpressionFromText(
                 s"${ref.getText}$quotes$newContent$quotes", expr.getManager)
-        } match {
+        match
           case Some(l: ScLiteral) =>
             expr.replace(l)
             l
           case _ =>
             throw new IncorrectOperationException(
                 "cannot handle content change")
-        }
       case str if str.isString =>
         val newExpr = ScalaPsiElementFactory.createExpressionFromText(
             newText, str.getManager)
@@ -54,29 +52,23 @@ class ScalaInjectedStringLiteralManipulator
         str
       case _ =>
         throw new IncorrectOperationException("cannot handle content change")
-    }
-  }
 
-  override def getRangeInElement(element: ScLiteral): TextRange = {
+  override def getRangeInElement(element: ScLiteral): TextRange =
     if (element.isString)
-      element match {
+      element match
         case interp: ScInterpolatedStringLiteral =>
-          val prefixLength = interp.reference match {
+          val prefixLength = interp.reference match
             case Some(ref) => ref.getText.length
             case _ => 0
-          }
           getLiteralRange(element.getText.substring(prefixLength))
             .shiftRight(prefixLength)
         case _ =>
           getLiteralRange(element.getText)
-      } else TextRange.from(0, element.getTextLength)
-  }
+      else TextRange.from(0, element.getTextLength)
 
-  private def getLiteralRange(text: String): TextRange = {
+  private def getLiteralRange(text: String): TextRange =
     val tripleQuote = "\"\"\""
 
     if (text.length >= 6 && text.startsWith(tripleQuote) &&
         text.endsWith(tripleQuote)) new TextRange(3, text.length - 3)
     else new TextRange(1, Math.max(1, text.length - 1))
-  }
-}

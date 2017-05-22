@@ -1,6 +1,6 @@
 //inner class
-class ReturnSeveralOutput2 {
-  def foo(i: Int): Int = {
+class ReturnSeveralOutput2
+  def foo(i: Int): Int =
     /*start*/
 
     val x = i
@@ -11,8 +11,6 @@ class ReturnSeveralOutput2 {
     /*end*/
     println(x + y + z + zz)
     i
-  }
-}
 /*
 //inner class
 class ReturnSeveralOutput2 {

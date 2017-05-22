@@ -21,7 +21,7 @@ import org.scalacheck._
 import Gen._
 import Arbitrary.arbitrary
 
-trait JValueGen {
+trait JValueGen
   def genJValue: Gen[JValue] =
     frequency((5, genSimple), (1, wrap(genArray)), (1, wrap(genObject)))
   def genSimple: Gen[JValue] =
@@ -51,28 +51,25 @@ trait JValueGen {
           classOf[JObject])
 
   def listSize = choose(0, 5).sample.get
-}
 
-trait NodeGen {
+trait NodeGen
   import Xml.{XmlNode, XmlElem}
   import scala.xml.{Node, NodeSeq, Text}
 
   def genXml: Gen[Node] = frequency((2, wrap(genNode)), (3, genElem))
 
   def genNode =
-    for {
+    for
       name <- genName
-      node <- Gen.containerOfN[List, Node](children, genXml) map { seq =>
+      node <- Gen.containerOfN[List, Node](children, genXml) map  seq =>
         new XmlNode(name, seq)
-      }
-    } yield node
+    yield node
 
   def genElem =
-    for {
+    for
       name <- genName
       value <- arbitrary[String]
-    } yield new XmlElem(name, value)
+    yield new XmlElem(name, value)
 
   def genName = frequency((2, identifier), (1, const("const")))
   private def children = choose(1, 3).sample.get
-}

@@ -1,4 +1,4 @@
-object Test extends App {
+object Test extends App
   import Double.NaN
 
   // NaN must not equal NaN no matter what optimizations are applied
@@ -25,25 +25,21 @@ object Test extends App {
   if (NaN != x) println("if (NaN != x) is good")
   else println("if (NaN != x) is broken")
 
-  x match {
+  x match
     case 0.0d => println("x matched 0!")
     case NaN => println("x matched NaN!")
     case _ => println("x matching was good")
-  }
 
-  NaN match {
+  NaN match
     case 0.0d => println("NaN matched 0!")
     case NaN => println("NaN matched NaN!")
     case _ => println("NaN matching was good")
-  }
 
   var z = 0.0d
   var i = 0
-  while (i < 10) {
+  while (i < 10)
     if (i % 2 == 0) z = NaN
     else z = NaN
     i += 1
-  }
   if (z.isNaN && i == 10) println("loop with NaN was good")
   else println("loop with NaN was broken")
-}

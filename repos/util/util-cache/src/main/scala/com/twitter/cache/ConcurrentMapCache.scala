@@ -16,22 +16,19 @@ import java.util.concurrent.ConcurrentMap
   * with a [[ConcurrentMap]] can be found at [[FutureCache$.fromMap]].
   */
 class ConcurrentMapCache[K, V](underlying: ConcurrentMap[K, Future[V]])
-    extends FutureCache[K, V] {
+    extends FutureCache[K, V]
   def get(key: K): Option[Future[V]] = Option(underlying.get(key))
 
   def set(key: K, value: Future[V]): Unit = underlying.put(key, value)
 
-  def getOrElseUpdate(key: K)(compute: => Future[V]): Future[V] = {
+  def getOrElseUpdate(key: K)(compute: => Future[V]): Future[V] =
     val p = Promise[V]
-    underlying.putIfAbsent(key, p) match {
+    underlying.putIfAbsent(key, p) match
       case null =>
         p.become(compute)
         p
       case oldv => oldv
-    }
-  }
 
   def evict(key: K, value: Future[V]): Boolean = underlying.remove(key, value)
 
   def size: Int = underlying.size()
-}

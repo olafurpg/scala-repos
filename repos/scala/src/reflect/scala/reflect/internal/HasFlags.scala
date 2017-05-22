@@ -7,7 +7,7 @@ import Flags._
 /** Common code utilized by Modifiers (which carry the flags associated
   *  with Trees) and Symbol.
   */
-trait HasFlags {
+trait HasFlags
   type AccessBoundaryType
   type AnnotationType
 
@@ -127,49 +127,41 @@ trait HasFlags {
   def isDeferredOrJavaDefault = hasFlag(DEFERRED | JAVA_DEFAULTMETHOD)
   def isDeferredNotJavaDefault = isDeferred && !hasFlag(JAVA_DEFAULTMETHOD)
 
-  def flagBitsToString(bits: Long): String = {
+  def flagBitsToString(bits: Long): String =
     // Fast path for common case
     if (bits == 0L) ""
-    else {
+    else
       var sb: StringBuilder = null
       var i = 0
-      while (i <= MaxBitPosition) {
+      while (i <= MaxBitPosition)
         val flag = Flags.rawFlagPickledOrder(i)
-        if ((bits & flag) != 0L) {
+        if ((bits & flag) != 0L)
           val s = resolveOverloadedFlag(flag)
-          if (s.length > 0) {
+          if (s.length > 0)
             if (sb eq null) sb = new StringBuilder append s
             else if (sb.length == 0) sb append s
             else sb append " " append s
-          }
-        }
         i += 1
-      }
       if (sb eq null) "" else sb.toString
-    }
-  }
 
-  def accessString: String = {
+  def accessString: String =
     val pw = if (hasAccessBoundary) privateWithin.toString else ""
 
-    if (pw == "") {
+    if (pw == "")
       if (hasAllFlags(PrivateLocal)) "private[this]"
       else if (hasAllFlags(ProtectedLocal)) "protected[this]"
       else if (hasFlag(PRIVATE)) "private"
       else if (hasFlag(PROTECTED)) "protected"
       else ""
-    } else if (hasFlag(PROTECTED)) "protected[" + pw + "]"
+    else if (hasFlag(PROTECTED)) "protected[" + pw + "]"
     else "private[" + pw + "]"
-  }
-  protected def calculateFlagString(basis: Long): String = {
+  protected def calculateFlagString(basis: Long): String =
     val access = accessString
     val nonAccess = flagBitsToString(basis & ~AccessFlags)
 
     if (access == "") nonAccess
     else if (nonAccess == "") access
     else nonAccess + " " + access
-  }
 
   // Guess this can't be deprecated seeing as it's in the reflect API.
   def isParameter = hasFlag(PARAM)
-}

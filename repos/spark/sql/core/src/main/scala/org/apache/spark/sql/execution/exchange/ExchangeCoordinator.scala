@@ -83,7 +83,7 @@ private[sql] class ExchangeCoordinator(
     numExchanges: Int,
     advisoryTargetPostShuffleInputSize: Long,
     minNumPostShufflePartitions: Option[Int] = None)
-    extends Logging {
+    extends Logging
 
   // The registered Exchange operators.
   private[this] val exchanges = ArrayBuffer[ShuffleExchange]()
@@ -102,9 +102,8 @@ private[sql] class ExchangeCoordinator(
     * be called in the `doPrepare` method of an [[ShuffleExchange]] operator.
     */
   @GuardedBy("this")
-  def registerExchange(exchange: ShuffleExchange): Unit = synchronized {
+  def registerExchange(exchange: ShuffleExchange): Unit = synchronized
     exchanges += exchange
-  }
 
   def isEstimated: Boolean = estimated
 
@@ -113,7 +112,7 @@ private[sql] class ExchangeCoordinator(
     * mapOutputStatistics provided by all pre-shuffle stages.
     */
   private[sql] def estimatePartitionStartIndices(
-      mapOutputStatistics: Array[MapOutputStatistics]): Array[Int] = {
+      mapOutputStatistics: Array[MapOutputStatistics]): Array[Int] =
     // If we have mapOutputStatistics.length < numExchange, it is because we do not submit
     // a stage when the number of partitions of this dependency is 0.
     assert(mapOutputStatistics.length <= numExchanges)
@@ -121,7 +120,7 @@ private[sql] class ExchangeCoordinator(
     // If minNumPostShufflePartitions is defined, it is possible that we need to use a
     // value less than advisoryTargetPostShuffleInputSize as the target input size of
     // a post shuffle task.
-    val targetPostShuffleInputSize = minNumPostShufflePartitions match {
+    val targetPostShuffleInputSize = minNumPostShufflePartitions match
       case Some(numPartitions) =>
         val totalPostShuffleInputSize =
           mapOutputStatistics.map(_.bytesByPartitionId.sum).sum
@@ -137,7 +136,6 @@ private[sql] class ExchangeCoordinator(
         math.min(maxPostShuffleInputSize, advisoryTargetPostShuffleInputSize)
 
       case None => advisoryTargetPostShuffleInputSize
-    }
 
     logInfo(
         s"advisoryTargetPostShuffleInputSize: $advisoryTargetPostShuffleInputSize, " +
@@ -166,44 +164,39 @@ private[sql] class ExchangeCoordinator(
     var postShuffleInputSize = 0L
 
     var i = 0
-    while (i < numPreShufflePartitions) {
+    while (i < numPreShufflePartitions)
       // We calculate the total size of ith pre-shuffle partitions from all pre-shuffle stages.
       // Then, we add the total size to postShuffleInputSize.
       var j = 0
-      while (j < mapOutputStatistics.length) {
+      while (j < mapOutputStatistics.length)
         postShuffleInputSize += mapOutputStatistics(j).bytesByPartitionId(i)
         j += 1
-      }
 
       // If the current postShuffleInputSize is equal or greater than the
       // targetPostShuffleInputSize, We need to add a new element in partitionStartIndices.
-      if (postShuffleInputSize >= targetPostShuffleInputSize) {
-        if (i < numPreShufflePartitions - 1) {
+      if (postShuffleInputSize >= targetPostShuffleInputSize)
+        if (i < numPreShufflePartitions - 1)
           // Next start index.
           partitionStartIndices += i + 1
-        } else {
+        else
           // This is the last element. So, we do not need to append the next start index to
           // partitionStartIndices.
-        }
         // reset postShuffleInputSize.
         postShuffleInputSize = 0L
-      }
 
       i += 1
-    }
 
     partitionStartIndices.toArray
-  }
 
   @GuardedBy("this")
-  private def doEstimationIfNecessary(): Unit = synchronized {
+  private def doEstimationIfNecessary(): Unit = synchronized
     // It is unlikely that this method will be called from multiple threads
     // (when multiple threads trigger the execution of THIS physical)
     // because in common use cases, we will create new physical plan after
     // users apply operations (e.g. projection) to an existing DataFrame.
     // However, if it happens, we have synchronized to make sure only one
     // thread will trigger the job submission.
-    if (!estimated) {
+    if (!estimated)
       // Make sure we have the expected number of registered Exchange operators.
       assert(exchanges.length == numExchanges)
 
@@ -216,68 +209,57 @@ private[sql] class ExchangeCoordinator(
       val submittedStageFutures =
         ArrayBuffer[SimpleFutureAction[MapOutputStatistics]]()
       var i = 0
-      while (i < numExchanges) {
+      while (i < numExchanges)
         val exchange = exchanges(i)
         val shuffleDependency = exchange.prepareShuffleDependency()
         shuffleDependencies += shuffleDependency
-        if (shuffleDependency.rdd.partitions.length != 0) {
+        if (shuffleDependency.rdd.partitions.length != 0)
           // submitMapStage does not accept RDD with 0 partition.
           // So, we will not submit this dependency.
           submittedStageFutures +=
             exchange.sqlContext.sparkContext.submitMapStage(shuffleDependency)
-        }
         i += 1
-      }
 
       // Wait for the finishes of those submitted map stages.
       val mapOutputStatistics =
         new Array[MapOutputStatistics](submittedStageFutures.length)
       var j = 0
-      while (j < submittedStageFutures.length) {
+      while (j < submittedStageFutures.length)
         // This call is a blocking call. If the stage has not finished, we will wait at here.
         mapOutputStatistics(j) = submittedStageFutures(j).get()
         j += 1
-      }
 
       // Now, we estimate partitionStartIndices. partitionStartIndices.length will be the
       // number of post-shuffle partitions.
       val partitionStartIndices =
-        if (mapOutputStatistics.length == 0) {
+        if (mapOutputStatistics.length == 0)
           None
-        } else {
+        else
           Some(estimatePartitionStartIndices(mapOutputStatistics))
-        }
 
       var k = 0
-      while (k < numExchanges) {
+      while (k < numExchanges)
         val exchange = exchanges(k)
         val rdd = exchange.preparePostShuffleRDD(
             shuffleDependencies(k), partitionStartIndices)
         newPostShuffleRDDs.put(exchange, rdd)
 
         k += 1
-      }
 
       // Finally, we set postShuffleRDDs and estimated.
       assert(postShuffleRDDs.isEmpty)
       assert(newPostShuffleRDDs.size() == numExchanges)
       postShuffleRDDs.putAll(newPostShuffleRDDs)
       estimated = true
-    }
-  }
 
-  def postShuffleRDD(exchange: ShuffleExchange): ShuffledRowRDD = {
+  def postShuffleRDD(exchange: ShuffleExchange): ShuffledRowRDD =
     doEstimationIfNecessary()
 
-    if (!postShuffleRDDs.containsKey(exchange)) {
+    if (!postShuffleRDDs.containsKey(exchange))
       throw new IllegalStateException(
           s"The given $exchange is not registered in this coordinator.")
-    }
 
     postShuffleRDDs.get(exchange)
-  }
 
-  override def toString: String = {
+  override def toString: String =
     s"coordinator[target post-shuffle partition size: $advisoryTargetPostShuffleInputSize]"
-  }
-}

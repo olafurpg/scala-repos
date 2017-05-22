@@ -1,12 +1,11 @@
 import scala.reflect.runtime.universe._
 
-object Test extends App {
-  reify {
-    case class M[A](value: A) {
+object Test extends App
+  reify
+    case class M[A](value: A)
       def bind[B](k: A => M[B]): M[B] = k(value)
       def map[B](f: A => B): M[B] = bind(x => unitM(f(x)))
       def flatMap[B](f: A => M[B]): M[B] = bind(f)
-    }
 
     def unitM[A](a: A): M[A] = M(a)
 
@@ -22,34 +21,28 @@ object Test extends App {
     case class App(fun: Term, arg: Term) extends Term
 
     trait Value
-    case object Wrong extends Value {
+    case object Wrong extends Value
       override def toString() = "wrong"
-    }
-    case class Num(n: Int) extends Value {
+    case class Num(n: Int) extends Value
       override def toString() = n.toString()
-    }
-    case class Fun(f: Value => M[Value]) extends Value {
+    case class Fun(f: Value => M[Value]) extends Value
       override def toString() = "<function>"
-    }
 
     type Environment = List[Tuple2[Name, Value]]
 
-    def lookup(x: Name, e: Environment): M[Value] = e match {
+    def lookup(x: Name, e: Environment): M[Value] = e match
       case List() => unitM(Wrong)
       case (y, b) :: e1 => if (x == y) unitM(b) else lookup(x, e1)
-    }
 
-    def add(a: Value, b: Value): M[Value] = (a, b) match {
+    def add(a: Value, b: Value): M[Value] = (a, b) match
       case (Num(m), Num(n)) => unitM(Num(m + n))
       case _ => unitM(Wrong)
-    }
 
-    def apply(a: Value, b: Value): M[Value] = a match {
+    def apply(a: Value, b: Value): M[Value] = a match
       case Fun(k) => k(b)
       case _ => unitM(Wrong)
-    }
 
-    def interp(t: Term, e: Environment): M[Value] = t match {
+    def interp(t: Term, e: Environment): M[Value] = t match
       case Var(x) => lookup(x, e)
       case Con(n) => unitM(Num(n))
       case Add(l, r) =>
@@ -61,7 +54,6 @@ object Test extends App {
         for (a <- interp(f, e);
         b <- interp(t, e);
         c <- apply(a, b)) yield c
-    }
 
     def test(t: Term): String =
       showM(interp(t, List()))
@@ -71,5 +63,4 @@ object Test extends App {
 
     println(test(term0))
     println(test(term1))
-  }.eval
-}
+  .eval

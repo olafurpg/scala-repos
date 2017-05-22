@@ -21,73 +21,65 @@ import org.jetbrains.plugins.scala.lang.refactoring.util.InplaceRenameHelper
 import scala.collection.JavaConverters._
 
 class ConvertImplicitBoundsToImplicitParameter
-    extends PsiElementBaseIntentionAction {
+    extends PsiElementBaseIntentionAction
   def getFamilyName: String = "Convert Implicit Bounds"
 
   override def getText: String =
     "Convert view and context bounds to implicit parameters"
 
   def isAvailable(
-      project: Project, editor: Editor, element: PsiElement): Boolean = {
+      project: Project, editor: Editor, element: PsiElement): Boolean =
     canBeConverted(element)
-  }
 
-  override def invoke(project: Project, editor: Editor, element: PsiElement) {
+  override def invoke(project: Project, editor: Editor, element: PsiElement)
     val addedParams = doConversion(element)
     runRenamingTemplate(addedParams)
-  }
-}
 
-object ConvertImplicitBoundsToImplicitParameter {
+object ConvertImplicitBoundsToImplicitParameter
 
-  def canBeConverted(element: PsiElement): Boolean = {
+  def canBeConverted(element: PsiElement): Boolean =
     val paramTypeElement: ScTypeBoundsOwner =
       PsiTreeUtil.getParentOfType(element, classOf[ScTypeBoundsOwner], false)
     val scTypeParamOwner: ScTypeParametersOwner = PsiTreeUtil.getParentOfType(
         paramTypeElement, classOf[ScTypeParametersOwner], true)
     paramTypeElement != null && paramTypeElement.hasImplicitBound &&
     !scTypeParamOwner.isInstanceOf[ScTrait]
-  }
 
-  def doConversion(element: PsiElement): Seq[ScParameter] = {
+  def doConversion(element: PsiElement): Seq[ScParameter] =
     if (element == null || !element.isValid) return Seq.empty
     val (function: ScMethodLike,
          paramOwner: ScParameterOwner,
          typeParamOwner: ScTypeParametersOwner) = PsiTreeUtil.getParentOfType(
-        element, classOf[ScParameterOwner], false) match {
+        element, classOf[ScParameterOwner], false) match
       case x: ScFunction => (x, x, x)
       case x: ScClass => (x.constructor.getOrElse(return Seq.empty), x, x)
       case _ => return Seq.empty
-    }
-    def removeImplicitBounds() {
+    def removeImplicitBounds()
       typeParamOwner.typeParameters.foreach(_.removeImplicitBounds())
-    }
     val declaredClauses: Seq[ScParameterClause] = paramOwner.allClauses
     val manager = paramOwner.getManager
-    declaredClauses.lastOption match {
+    declaredClauses.lastOption match
       case Some(paramClause) if paramClause.isImplicit =>
         // Already has an implicit parameter clause: delete it, add the bounds, then
         // add the parameters from the deleted clause the the new one.
         paramClause.delete()
-        function.effectiveParameterClauses.lastOption match {
+        function.effectiveParameterClauses.lastOption match
           case Some(implicitParamClause) if implicitParamClause.isImplicit =>
             val newClause = ScalaPsiElementFactory.createClauseFromText(
                 implicitParamClause.getText, manager)
             val addedParametersCount = newClause.parameters.size
-            for (p <- paramClause.parameters) {
+            for (p <- paramClause.parameters)
               val newParam = ScalaPsiElementFactory.createParameterFromText(
                   p.getText, manager)
               newClause.addParameter(newParam)
-            }
             val addedClause =
               function.parameterList.addClause(newClause).clauses.last
             removeImplicitBounds()
             UndoUtil.markPsiFileForUndo(function.getContainingFile)
             addedClause.parameters.take(addedParametersCount)
           case _ => Seq.empty
-        }
       case _ =>
-        function.effectiveParameterClauses.lastOption match {
+        function.effectiveParameterClauses.lastOption match
           case Some(implicitParamClause) if implicitParamClause.isImplicit =>
             // for a constructor, might need to add an empty parameter section before the
             // implicit section.
@@ -95,28 +87,22 @@ object ConvertImplicitBoundsToImplicitParameter {
               .drop(declaredClauses.size)
               .headOption
             var result: Seq[ScParameter] = Seq.empty
-            for (c <- extra) {
+            for (c <- extra)
               val newClause =
                 ScalaPsiElementFactory.createClauseFromText(c.getText, manager)
               val addedParametersCount = c.parameters.size
               val addedClause =
                 function.parameterList.addClause(newClause).clauses.last
               result = addedClause.parameters.take(addedParametersCount)
-            }
             removeImplicitBounds()
             UndoUtil.markPsiFileForUndo(function.getContainingFile)
             result
           case _ => Seq.empty
-        }
-    }
-  }
 
-  def runRenamingTemplate(params: Seq[ScParameter]): Unit = {
+  def runRenamingTemplate(params: Seq[ScParameter]): Unit =
     if (params.isEmpty) return
 
     val parent = PsiTreeUtil.findCommonParent(params.asJava)
     val helper = new InplaceRenameHelper(parent)
     params.foreach(p => helper.addGroup(p, Seq.empty, Seq.empty))
     helper.startRenaming()
-  }
-}

@@ -23,7 +23,7 @@ package scala.concurrent.duration
   * does not take into account changes to the system clock (such as leap
   * seconds).
   */
-case class Deadline private (time: FiniteDuration) extends Ordered[Deadline] {
+case class Deadline private (time: FiniteDuration) extends Ordered[Deadline]
 
   /**
     * Return a deadline advanced (i.e., moved into the future) by the given duration.
@@ -68,9 +68,8 @@ case class Deadline private (time: FiniteDuration) extends Ordered[Deadline] {
     * The natural ordering for deadline is determined by the natural order of the underlying (finite) duration.
     */
   def compare(other: Deadline) = time compare other.time
-}
 
-object Deadline {
+object Deadline
 
   /**
     * Construct a deadline due exactly at the point where this method is called. Useful for then
@@ -82,7 +81,5 @@ object Deadline {
   /**
     * The natural ordering for deadline is determined by the natural order of the underlying (finite) duration.
     */
-  implicit object DeadlineIsOrdered extends Ordering[Deadline] {
+  implicit object DeadlineIsOrdered extends Ordering[Deadline]
     def compare(a: Deadline, b: Deadline) = a compare b
-  }
-}

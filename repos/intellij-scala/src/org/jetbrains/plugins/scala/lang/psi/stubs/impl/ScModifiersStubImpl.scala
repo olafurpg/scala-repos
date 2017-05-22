@@ -20,8 +20,7 @@ class ScModifiersStubImpl[ParentPsi <: PsiElement](
     modifiers: Array[String] = ArrayUtil.EMPTY_STRING_ARRAY,
     explicitModifiers: Boolean = false)
     extends StubBaseWrapper[ScModifierList](parent, elemType)
-    with ScModifiersStub {
+    with ScModifiersStub
   def getModifiers: Array[String] = modifiers
 
   def hasExplicitModifiers: Boolean = explicitModifiers
-}

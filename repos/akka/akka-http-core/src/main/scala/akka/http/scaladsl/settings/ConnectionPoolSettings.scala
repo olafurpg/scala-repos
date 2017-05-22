@@ -12,7 +12,7 @@ import scala.concurrent.duration.Duration
 /**
   * Public API but not intended for subclassing
   */
-abstract class ConnectionPoolSettings extends js.ConnectionPoolSettings {
+abstract class ConnectionPoolSettings extends js.ConnectionPoolSettings
   self: ConnectionPoolSettingsImpl ⇒
   def maxConnections: Int
   def maxRetries: Int
@@ -49,11 +49,9 @@ abstract class ConnectionPoolSettings extends js.ConnectionPoolSettings {
   def withConnectionSettings(
       newValue: ClientConnectionSettings): ConnectionPoolSettings =
     self.copy(connectionSettings = newValue)
-}
 
 object ConnectionPoolSettings
-    extends SettingsCompanion[ConnectionPoolSettings] {
+    extends SettingsCompanion[ConnectionPoolSettings]
   override def apply(config: Config) = ConnectionPoolSettingsImpl(config)
   override def apply(configOverrides: String) =
     ConnectionPoolSettingsImpl(configOverrides)
-}

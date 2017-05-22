@@ -31,7 +31,7 @@ import org.apache.spark.sql.execution.SparkPlan
   *  @groupname row Row
   *  @groupprio row -1
   */
-package object sql {
+package object sql
 
   /**
     * Converts a logical plan into zero or more SparkPlans.  This API is exposed for experimenting
@@ -44,4 +44,3 @@ package object sql {
       SparkPlan]
 
   type DataFrame = Dataset[Row]
-}

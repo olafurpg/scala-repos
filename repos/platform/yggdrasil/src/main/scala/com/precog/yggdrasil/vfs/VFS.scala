@@ -59,53 +59,47 @@ import scalaz.syntax.std.list._
 import scalaz.effect.IO
 
 sealed trait Version
-object Version {
+object Version
   case object Current extends Version
   case class Archived(uuid: UUID) extends Version
-}
 
-object VFSModule {
+object VFSModule
   def bufferOutput[M[+ _]: Monad](
       stream0: StreamT[M, CharBuffer],
       charset: Charset = Charset.forName("UTF-8"),
-      bufferSize: Int = 64 * 1024): StreamT[M, Array[Byte]] = {
+      bufferSize: Int = 64 * 1024): StreamT[M, Array[Byte]] =
     val encoder = charset.newEncoder()
 
     def loop(stream: StreamT[M, CharBuffer],
              buf: ByteBuffer,
-             arr: Array[Byte]): StreamT[M, Array[Byte]] = {
-      StreamT(stream.uncons map {
+             arr: Array[Byte]): StreamT[M, Array[Byte]] =
+      StreamT(stream.uncons map
         case Some((cbuf, tail)) =>
           val result = encoder.encode(cbuf, buf, false)
-          if (result == CoderResult.OVERFLOW) {
+          if (result == CoderResult.OVERFLOW)
             val arr2 = new Array[Byte](bufferSize)
             StreamT.Yield(arr, loop(cbuf :: tail, ByteBuffer.wrap(arr2), arr2))
-          } else {
+          else
             StreamT.Skip(loop(tail, buf, arr))
-          }
 
         case None =>
           val result = encoder.encode(CharBuffer.wrap(""), buf, true)
-          if (result == CoderResult.OVERFLOW) {
+          if (result == CoderResult.OVERFLOW)
             val arr2 = new Array[Byte](bufferSize)
             StreamT.Yield(arr, loop(stream, ByteBuffer.wrap(arr2), arr2))
-          } else {
+          else
             StreamT.Yield(Arrays.copyOf(arr, buf.position), StreamT.empty)
-          }
-      })
-    }
+      )
 
     val arr = new Array[Byte](bufferSize)
     loop(stream0, ByteBuffer.wrap(arr), arr)
-  }
-}
 
-trait VFSModule[M[+ _], Block] extends Logging {
+trait VFSModule[M[+ _], Block] extends Logging
   import ResourceError._
 
   type Projection <: ProjectionLike[M, Block]
 
-  sealed trait Resource {
+  sealed trait Resource
     def mimeType: MimeType
     def authorities: Authorities
     def byteStream(requestedMimeTypes: Seq[MimeType])(
@@ -116,25 +110,22 @@ trait VFSModule[M[+ _], Block] extends Logging {
 
     protected def asByteStream(mimeType: MimeType)(
         implicit M: Monad[M]): OptionT[M, StreamT[M, Array[Byte]]]
-  }
 
-  object Resource {
+  object Resource
     def asQuery(path: Path, version: Version)(implicit M: Monad[M])
-      : Resource => EitherT[M, ResourceError, String] = { resource =>
+      : Resource => EitherT[M, ResourceError, String] =  resource =>
       def notAQuery =
         notFound(
             "Requested resource at %s version %s cannot be interpreted as a Quirrel query."
               .format(path.path, version))
-      EitherT {
+      EitherT
         resource.fold(
             br => br.asString.run.map(_.toRightDisjunction(notAQuery)),
             _ => \/.left(notAQuery).point[M]
         )
-      }
-    }
 
     def asProjection(path: Path, version: Version)(implicit M: Monad[M])
-      : Resource => EitherT[M, ResourceError, Projection] = { resource =>
+      : Resource => EitherT[M, ResourceError, Projection] =  resource =>
       def notAProjection =
         notFound(
             "Requested resource at %s version %s cannot be interpreted as a Quirrel projection."
@@ -143,10 +134,8 @@ trait VFSModule[M[+ _], Block] extends Logging {
           _ => EitherT.left(notAProjection.point[M]),
           pr => EitherT.right(pr.projection)
       )
-    }
-  }
 
-  trait ProjectionResource extends Resource {
+  trait ProjectionResource extends Resource
     def append(data: NIHDB.Batch): IO[PrecogUnit]
     def recordCount(implicit M: Monad[M]): M[Long]
     def projection(implicit M: Monad[M]): M[Projection]
@@ -156,25 +145,23 @@ trait VFSModule[M[+ _], Block] extends Logging {
       projectionResource(this)
 
     def byteStream(requestedMimeTypes: Seq[MimeType])(implicit M: Monad[M])
-      : OptionT[M, (MimeType, StreamT[M, Array[Byte]])] = {
+      : OptionT[M, (MimeType, StreamT[M, Array[Byte]])] =
       import FileContent._
       // Map to the type we'll use for conversion and the type we report to the user
       // FIXME: We're dealing with MimeType in too many places here
       val acceptableMimeTypes =
-        ((Seq(ApplicationJson, XJsonStream, TextCSV).map { mt =>
+        ((Seq(ApplicationJson, XJsonStream, TextCSV).map  mt =>
               mt -> (mt, mt)
-            }) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
+            ) ++ Seq(AnyMimeType -> (XJsonStream, XJsonStream),
                       OctetStream -> (XJsonStream, OctetStream))).toMap
-      for {
+      for
         selectedMT <- OptionT(
             M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
         (conversionMT, returnMT) = acceptableMimeTypes(selectedMT)
         stream <- asByteStream(conversionMT)
-      } yield (returnMT, stream)
-    }
-  }
+      yield (returnMT, stream)
 
-  trait BlobResource extends Resource {
+  trait BlobResource extends Resource
     def asString(implicit M: Monad[M]): OptionT[M, String]
     def byteLength: Long
 
@@ -183,26 +170,23 @@ trait VFSModule[M[+ _], Block] extends Logging {
       blobResource(this)
 
     def byteStream(requestedMimeTypes: Seq[MimeType])(implicit M: Monad[M])
-      : OptionT[M, (MimeType, StreamT[M, Array[Byte]])] = {
+      : OptionT[M, (MimeType, StreamT[M, Array[Byte]])] =
       import FileContent._
       val acceptableMimeTypes = Map(mimeType -> mimeType,
                                     AnyMimeType -> mimeType,
                                     OctetStream -> OctetStream)
-      for {
+      for
         selectedMT <- OptionT(
             M.point(requestedMimeTypes.find(acceptableMimeTypes.contains)))
         stream <- asByteStream(selectedMT)
-      } yield (selectedMT, stream)
-    }
-  }
+      yield (selectedMT, stream)
 
-  trait VFSCompanionLike {
+  trait VFSCompanionLike
     def toJsonElements(block: Block): Vector[JValue]
     def derefValue(block: Block): Block
     def blockSize(block: Block): Int
     def pathStructure(selector: CPath)(implicit M: Monad[M])
       : Projection => EitherT[M, ResourceError, PathStructure]
-  }
 
   type VFSCompanion <: VFSCompanionLike
   def VFS: VFSCompanion
@@ -210,7 +194,7 @@ trait VFSModule[M[+ _], Block] extends Logging {
   /**
     * VFS is an unsecured interface to the virtual filesystem; validation must be performed higher in the stack.
     */
-  abstract class VFS(implicit M: Monad[M]) {
+  abstract class VFS(implicit M: Monad[M])
     def writeAll(data: Seq[(Long, EventMessage)]): IO[PrecogUnit]
 
     def writeAllSync(
@@ -232,5 +216,3 @@ trait VFSModule[M[+ _], Block] extends Logging {
     def findPathMetadata(path: Path): EitherT[M, ResourceError, PathMetadata]
 
     def currentVersion(path: Path): M[Option[VersionEntry]]
-  }
-}

@@ -12,16 +12,16 @@ import akka.stream.testkit.scaladsl.TestSource
 import akka.stream.testkit.scaladsl.TestSink
 import akka.testkit.AkkaSpec
 
-class FlowExpandSpec extends AkkaSpec {
+class FlowExpandSpec extends AkkaSpec
 
   val settings = ActorMaterializerSettings(system).withInputBuffer(
       initialSize = 2, maxSize = 2)
 
   implicit val materializer = ActorMaterializer(settings)
 
-  "Expand" must {
+  "Expand" must
 
-    "pass-through elements unchanged when there is no rate difference" in {
+    "pass-through elements unchanged when there is no rate difference" in
       // Shadow the fuzzed materializer (see the ordering guarantee needed by the for loop below).
       implicit val materializer =
         ActorMaterializer(settings.withFuzzing(false))
@@ -36,16 +36,14 @@ class FlowExpandSpec extends AkkaSpec {
         .to(Sink.fromSubscriber(subscriber))
         .run()
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         // Order is important here: If the request comes first it will be extrapolated!
         publisher.sendNext(i)
         subscriber.requestNext(i)
-      }
 
       subscriber.cancel()
-    }
 
-    "expand elements while upstream is silent" in {
+    "expand elements while upstream is silent" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.probe[Int]()
 
@@ -58,9 +56,8 @@ class FlowExpandSpec extends AkkaSpec {
 
       publisher.sendNext(42)
 
-      for (i ← 1 to 100) {
+      for (i ← 1 to 100)
         subscriber.requestNext(42)
-      }
 
       publisher.sendNext(-42)
 
@@ -69,9 +66,8 @@ class FlowExpandSpec extends AkkaSpec {
       subscriber.requestNext(-42)
 
       subscriber.cancel()
-    }
 
-    "do not drop last element" in {
+    "do not drop last element" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.probe[Int]()
 
@@ -93,18 +89,16 @@ class FlowExpandSpec extends AkkaSpec {
 
       subscriber.requestNext(2)
       subscriber.expectComplete()
-    }
 
-    "work on a variable rate chain" in {
-      val future = Source(1 to 100).map { i ⇒
+    "work on a variable rate chain" in
+      val future = Source(1 to 100).map  i ⇒
         if (ThreadLocalRandom.current().nextBoolean()) Thread.sleep(10); i
-      }.expand(Iterator.continually(_)).runFold(Set.empty[Int])(_ + _)
+      .expand(Iterator.continually(_)).runFold(Set.empty[Int])(_ + _)
 
       Await.result(future, 10.seconds) should contain theSameElementsAs
       (1 to 100).toSet
-    }
 
-    "backpressure publisher when subscriber is slower" in {
+    "backpressure publisher when subscriber is slower" in
       val publisher = TestPublisher.probe[Int]()
       val subscriber = TestSubscriber.probe[Int]()
 
@@ -120,18 +114,16 @@ class FlowExpandSpec extends AkkaSpec {
 
       var pending = publisher.pending
       // Deplete pending requests coming from input buffer
-      while (pending > 0) {
+      while (pending > 0)
         publisher.unsafeSendNext(2)
         pending -= 1
-      }
 
       // The above sends are absorbed in the input buffer, and will result in two one-sized batch requests
       pending += publisher.expectRequest()
       pending += publisher.expectRequest()
-      while (pending > 0) {
+      while (pending > 0)
         publisher.unsafeSendNext(2)
         pending -= 1
-      }
 
       publisher.expectNoMsg(1.second)
 
@@ -141,9 +133,8 @@ class FlowExpandSpec extends AkkaSpec {
 
       // Now production is resumed
       publisher.expectRequest()
-    }
 
-    "work properly with finite extrapolations" in {
+    "work properly with finite extrapolations" in
       val (source, sink) = TestSource
         .probe[Int]
         .expand(i ⇒ Iterator.from(0).map(i -> _).take(3))
@@ -156,6 +147,3 @@ class FlowExpandSpec extends AkkaSpec {
         .expectNoMsg(100.millis)
       source.sendNext(2).sendComplete()
       sink.expectNext(2 -> 0).expectComplete()
-    }
-  }
-}

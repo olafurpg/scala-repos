@@ -14,11 +14,11 @@ import org.jetbrains.sbt.project.SbtProjectSystem
 /**
   * @author Nikolay.Tropin
   */
-class SbtOrderEnumeratorHandler extends OrderEnumerationHandler {
+class SbtOrderEnumeratorHandler extends OrderEnumerationHandler
   override def shouldAddDependency(
       orderEntry: OrderEntry,
-      settings: OrderEnumeratorSettings): AddDependencyType = {
-    (orderEntry, settings) match {
+      settings: OrderEnumeratorSettings): AddDependencyType =
+    (orderEntry, settings) match
       case (library: LibraryOrderEntry, enumerator: ModuleOrderEnumerator) =>
         val isTransitive = getModuleFromEnumerator(enumerator).fold(false)(
             _ != library.getOwnerModule)
@@ -26,11 +26,9 @@ class SbtOrderEnumeratorHandler extends OrderEnumerationHandler {
         else AddDependencyType.DEFAULT
       case _ =>
         AddDependencyType.DEFAULT
-    }
-  }
 
   private def getModuleFromEnumerator(
-      enumerator: ModuleOrderEnumerator): Option[Module] = {
+      enumerator: ModuleOrderEnumerator): Option[Module] =
     // This method assumes that `processRootModules` in `ModuleOrderEnumerator` calls
     // given processor only on module extracted from its underlying `ModuleRootModel`.
     // If this behaviour is subject to change, it's better to roll back to reflection calls to inner fields.
@@ -39,20 +37,15 @@ class SbtOrderEnumeratorHandler extends OrderEnumerationHandler {
     enumerator.processRootModules(
         new CommonProcessors.CollectProcessor[Module](modules))
     modules.asScala.headOption
-  }
-}
 
 class SbtOrderEnumeratorHandlerFactory
-    extends OrderEnumerationHandler.Factory {
+    extends OrderEnumerationHandler.Factory
   override def createHandler(module: Module): OrderEnumerationHandler =
     new SbtOrderEnumeratorHandler
 
-  override def isApplicable(project: Project): Boolean = {
+  override def isApplicable(project: Project): Boolean =
     ModuleManager.getInstance(project).getModules.exists(isApplicable)
-  }
 
-  override def isApplicable(module: Module): Boolean = {
+  override def isApplicable(module: Module): Boolean =
     ExternalSystemApiUtil.isExternalSystemAwareModule(
         SbtProjectSystem.Id, module)
-  }
-}

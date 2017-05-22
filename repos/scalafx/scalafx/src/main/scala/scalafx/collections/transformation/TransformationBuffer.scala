@@ -34,7 +34,7 @@ import scalafx.Includes._
 import scalafx.collections.{ObservableBuffer, ObservableBufferBase}
 import scalafx.delegate.SFXDelegate
 
-object TransformationBuffer {
+object TransformationBuffer
 
   /**
     * Converts a ScalaFX TransformationBuffer to its JavaFX counterpart TransformationList.
@@ -45,7 +45,6 @@ object TransformationBuffer {
   implicit def sfxTransformationBuffer2jfx[E, F](
       v: TransformationBuffer[E, F]): jfxct.TransformationList[E, F] =
     if (v != null) v.delegate else null
-}
 
 /**
   * A base class for all buffers that wraps other buffers in a way that changes the buffer's elements, order,
@@ -65,7 +64,7 @@ object TransformationBuffer {
 abstract class TransformationBuffer[E, F](
     override val delegate: jfxct.TransformationList[E, F])
     extends ObservableBufferBase[E](delegate)
-    with SFXDelegate[jfxct.TransformationList[E, F]] {
+    with SFXDelegate[jfxct.TransformationList[E, F]]
 
   /**
     * The source list specified in the constructor of this transformation list.
@@ -90,4 +89,3 @@ abstract class TransformationBuffer[E, F](
     */
   def isInTransformationChain(buffer: ObservableBuffer[_]): Boolean =
     delegate.isInTransformationChain(buffer.delegate)
-}

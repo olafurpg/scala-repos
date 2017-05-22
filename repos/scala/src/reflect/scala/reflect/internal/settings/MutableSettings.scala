@@ -10,7 +10,7 @@ package settings
 
 /** A mutable Settings object.
   */
-abstract class MutableSettings extends AbsSettings {
+abstract class MutableSettings extends AbsSettings
 
   type Setting <: SettingValue
   type BooleanSetting <: Setting { type T = Boolean }
@@ -18,7 +18,7 @@ abstract class MutableSettings extends AbsSettings {
   type MultiStringSetting <: Setting { type T = List[String] }
 
   // basically this is a value which remembers if it's been modified
-  trait SettingValue extends AbsSettingValue {
+  trait SettingValue extends AbsSettingValue
     protected var v: T
     protected var setByUser: Boolean = false
 
@@ -26,15 +26,13 @@ abstract class MutableSettings extends AbsSettings {
     def isDefault = !setByUser
     def isSetByUser = setByUser
     def value: T = v
-    def value_=(arg: T) = {
+    def value_=(arg: T) =
       setByUser = true
       v = arg
       postSetHook()
-    }
 
     /** Returns Some(value) in the case of a value set by user and None otherwise. */
     def valueSetByUser: Option[T] = if (isSetByUser) Some(value) else None
-  }
 
   def Xexperimental: BooleanSetting
   def XfullLubs: BooleanSetting
@@ -58,12 +56,10 @@ abstract class MutableSettings extends AbsSettings {
   def maxClassfileName: IntSetting
 
   def isScala211: Boolean
-}
 
-object MutableSettings {
+object MutableSettings
   import scala.language.implicitConversions
 
   /** Support the common use case, `if (settings.debug) println("Hello, martin.")` */
   @inline implicit def reflectSettingToBoolean(
       s: MutableSettings#BooleanSetting): Boolean = s.value
-}

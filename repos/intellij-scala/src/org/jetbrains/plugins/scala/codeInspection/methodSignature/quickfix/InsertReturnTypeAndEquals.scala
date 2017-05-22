@@ -14,9 +14,9 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
 class InsertReturnTypeAndEquals(functionDef: ScFunctionDefinition)
     extends AbstractFixOnPsiElement(
         InspectionBundle.message("insert.return.type.and.equals"),
-        functionDef) {
+        functionDef)
 
-  def doApplyFix(project: Project): Unit = {
+  def doApplyFix(project: Project): Unit =
     val funDef = getElement
     funDef.removeAssignment()
     funDef.removeExplicitType()
@@ -27,5 +27,3 @@ class InsertReturnTypeAndEquals(functionDef: ScFunctionDefinition)
     val assign = fakeDecl.findFirstChildByType(ScalaTokenTypes.tASSIGN)
     val body = funDef.body.get
     funDef.addRangeAfter(colon, assign, body.getPrevSiblingNotWhitespace)
-  }
-}

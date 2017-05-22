@@ -23,12 +23,12 @@ import org.jetbrains.plugins.scala.util.ScalaUtils
   * Date: 16.06.2009
   */
 abstract class InlineRefactoringTestBase
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val caretMarker = "/*caret*/"
 
   protected def folderPath = baseRootPath() + "inline/"
 
-  protected def doTest() {
+  protected def doTest()
     import _root_.junit.framework.Assert._
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
@@ -49,27 +49,24 @@ abstract class InlineRefactoringTestBase
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     var element = CommonDataKeys.PSI_ELEMENT.getData(
         DataManager.getInstance().getDataContextFromFocus.getResult)
-    if (element == null) {
+    if (element == null)
       element = BaseRefactoringAction.getElementAtCaret(editor, scalaFile)
-    }
 
     var res: String = null
     val firstPsi = scalaFile.findElementAt(0)
-    val warning = firstPsi.getNode.getElementType match {
+    val warning = firstPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT =>
         ScalaBundle.message(firstPsi.getText.substring(2).trim)
       case _ => null
-    }
     val lastPsi = scalaFile.findElementAt(scalaFile.getText.length - 1)
     //start to inline
-    try {
-      ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable {
-        def run() {
+    try
+      ScalaUtils.runWriteActionDoNotRequestConfirmation(new Runnable
+        def run()
           GenericInlineHandler.invoke(element, editor, new ScalaInlineHandler)
-        }
-      }, getProjectAdapter, "Test")
+      , getProjectAdapter, "Test")
       res = scalaFile.getText.substring(0, lastPsi.getTextOffset).trim //getImportStatements.map(_.getText()).mkString("\n")
-    } catch {
+    catch
       case e: RefactoringErrorHintException =>
         assert(e.getMessage == warning,
                s"Warning should be: $warning, but is: ${e.getMessage}")
@@ -77,17 +74,13 @@ abstract class InlineRefactoringTestBase
       case e: Exception =>
         assert(
             assertion = false, message = e.getMessage + "\n" + e.getStackTrace)
-    }
 
     val text = lastPsi.getText
-    val output = lastPsi.getNode.getElementType match {
+    val output = lastPsi.getNode.getElementType match
       case ScalaTokenTypes.tLINE_COMMENT => text.substring(2).trim
       case ScalaTokenTypes.tBLOCK_COMMENT | ScalaTokenTypes.tDOC_COMMENT =>
         text.substring(2, text.length - 2).trim
       case _ =>
         assertTrue("Test result must be in last comment statement.", false)
         ""
-    }
     assertEquals(output, res.trim.trim.replace(caretMarker, ""))
-  }
-}

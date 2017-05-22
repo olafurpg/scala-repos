@@ -11,28 +11,25 @@ import org.joda.time.format.DateTimeFormat
 import lila.common.LightUser
 
 final class PgnDump(
-    netBaseUrl: String, getLightUser: String => Option[LightUser]) {
+    netBaseUrl: String, getLightUser: String => Option[LightUser])
 
   import PgnDump._
 
-  def apply(game: Game, initialFen: Option[String]): Pgn = {
-    val imported = game.pgnImport.flatMap { pgni =>
+  def apply(game: Game, initialFen: Option[String]): Pgn =
+    val imported = game.pgnImport.flatMap  pgni =>
       Parser.full(pgni.pgn).toOption
-    }
     val ts = tags(game, initialFen, imported)
     val fenSituation =
-      ts find (_.name == Tag.FEN) flatMap {
+      ts find (_.name == Tag.FEN) flatMap
         case Tag(_, fen) => Forsyth <<< fen
-      }
     val moves2 = fenSituation
       .??(_.situation.color.black)
       .fold(".." :: game.pgnMoves, game.pgnMoves)
     Pgn(ts, turns(moves2, fenSituation.map(_.fullMoveNumber) | 1))
-  }
 
   private val fileR = """[\s,]""".r
 
-  def filename(game: Game): String = gameLightUsers(game) match {
+  def filename(game: Game): String = gameLightUsers(game) match
     case (wu, bu) =>
       fileR.replaceAllIn("lichess_pgn_%s_%s_vs_%s.%s.pgn".format(
                              dateFormat.print(game.createdAt),
@@ -41,7 +38,6 @@ final class PgnDump(
                              game.id
                          ),
                          "_")
-  }
 
   private def gameUrl(id: String) = s"$netBaseUrl/$id"
 
@@ -67,13 +63,13 @@ final class PgnDump(
   private def tags(game: Game,
                    initialFen: Option[String],
                    imported: Option[ParsedPgn]): List[Tag] =
-    gameLightUsers(game) match {
+    gameLightUsers(game) match
       case (wu, bu) =>
         List(
-            Tag(_.Event, imported.flatMap(_ tag "event") | {
+            Tag(_.Event, imported.flatMap(_ tag "event") |
               if (game.imported) "Import"
               else game.rated.fold("Rated game", "Casual game")
-            }),
+            ),
             Tag(_.Site, gameUrl(game.id)),
             Tag(_.Date,
                 imported.flatMap(_ tag "date") | dateFormat.print(
@@ -85,43 +81,39 @@ final class PgnDump(
             Tag("BlackElo", rating(game.blackPlayer)),
             Tag("PlyCount", game.turns),
             Tag(_.Variant, game.variant.name.capitalize),
-            Tag(_.TimeControl, game.clock.fold("-") { c =>
+            Tag(_.TimeControl, game.clock.fold("-")  c =>
               s"${c.limit}+${c.increment}"
-            }),
+            ),
             Tag(_.ECO, game.opening.fold("?")(_.opening.eco)),
             Tag(_.Opening, game.opening.fold("?")(_.opening.name)),
-            Tag(_.Termination, {
+            Tag(_.Termination,
               import chess.Status._
-              game.status match {
+              game.status match
                 case Created | Started => "Unterminated"
                 case Aborted | NoStart => "Abandoned"
                 case Timeout | Outoftime => "Time forfeit"
                 case Resign | Draw | Stalemate | Mate | VariantEnd => "Normal"
                 case Cheat => "Rules infraction"
                 case UnknownFinish => "Unknown"
-              }
-            })
+            )
         ) ::: customStartPosition(game.variant).??(List(
                 Tag(_.FEN, initialFen | "?"),
                 Tag("SetUp", "1")
             ))
-    }
 
   private def turns(moves: List[String], from: Int): List[chessPgn.Turn] =
-    (moves grouped 2).zipWithIndex.toList map {
+    (moves grouped 2).zipWithIndex.toList map
       case (moves, index) =>
         chessPgn.Turn(number = index + from,
-                      white = moves.headOption filter (".." !=) map {
+                      white = moves.headOption filter (".." !=) map
                         chessPgn.Move(_)
-                      },
+                      ,
                       black = moves lift 1 map { chessPgn.Move(_) })
-    } filterNot (_.isEmpty)
-}
+    filterNot (_.isEmpty)
 
-object PgnDump {
+object PgnDump
 
   def result(game: Game) =
     game.finished.fold(game.winnerColor.fold("1/2-1/2")(
                            color => color.white.fold("1-0", "0-1")),
                        "*")
-}

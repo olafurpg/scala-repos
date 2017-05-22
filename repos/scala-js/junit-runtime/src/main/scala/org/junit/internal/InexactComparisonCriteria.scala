@@ -6,7 +6,7 @@ package org.junit.internal
 import org.junit.Assert
 
 class InexactComparisonCriteria private (val fDelta: AnyRef)
-    extends ComparisonCriteria {
+    extends ComparisonCriteria
 
   def this(delta: Double) =
     this(delta: java.lang.Double)
@@ -15,9 +15,7 @@ class InexactComparisonCriteria private (val fDelta: AnyRef)
     this(delta: java.lang.Float)
 
   override protected def assertElementsEqual(
-      expected: AnyRef, actual: AnyRef): Unit = {
+      expected: AnyRef, actual: AnyRef): Unit =
     Assert.assertEquals(expected.asInstanceOf[Double],
                         actual.asInstanceOf[Double],
                         fDelta.asInstanceOf[Double])
-  }
-}

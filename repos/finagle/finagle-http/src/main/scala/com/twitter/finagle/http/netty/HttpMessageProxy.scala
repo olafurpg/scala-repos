@@ -4,7 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer
 import org.jboss.netty.handler.codec.http.{HttpHeaders, HttpMessage, HttpVersion}
 
 /** Proxy for HttpMessage.  Used by Request and Response. */
-private[finagle] trait HttpMessageProxy extends Proxy {
+private[finagle] trait HttpMessageProxy extends Proxy
   protected[finagle] def httpMessage: HttpMessage
   protected[finagle] def getHttpMessage(): HttpMessage = httpMessage
   def self = httpMessage
@@ -28,4 +28,3 @@ private[finagle] trait HttpMessageProxy extends Proxy {
 
   def setChunked(chunked: Boolean): Unit =
     httpMessage.setChunked(chunked)
-}

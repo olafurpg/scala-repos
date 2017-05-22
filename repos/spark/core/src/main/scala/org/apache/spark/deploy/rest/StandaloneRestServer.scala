@@ -53,7 +53,7 @@ private[deploy] class StandaloneRestServer(host: String,
                                            masterConf: SparkConf,
                                            masterEndpoint: RpcEndpointRef,
                                            masterUrl: String)
-    extends RestSubmissionServer(host, requestedPort, masterConf) {
+    extends RestSubmissionServer(host, requestedPort, masterConf)
 
   protected override val submitRequestServlet =
     new StandaloneSubmitRequestServlet(masterEndpoint, masterUrl, masterConf)
@@ -61,16 +61,15 @@ private[deploy] class StandaloneRestServer(host: String,
       masterEndpoint, masterConf)
   protected override val statusRequestServlet =
     new StandaloneStatusRequestServlet(masterEndpoint, masterConf)
-}
 
 /**
   * A servlet for handling kill requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneKillRequestServlet(
     masterEndpoint: RpcEndpointRef, conf: SparkConf)
-    extends KillRequestServlet {
+    extends KillRequestServlet
 
-  protected def handleKill(submissionId: String): KillSubmissionResponse = {
+  protected def handleKill(submissionId: String): KillSubmissionResponse =
     val response =
       masterEndpoint.askWithRetry[DeployMessages.KillDriverResponse](
           DeployMessages.RequestKillDriver(submissionId))
@@ -80,23 +79,20 @@ private[rest] class StandaloneKillRequestServlet(
     k.submissionId = submissionId
     k.success = response.success
     k
-  }
-}
 
 /**
   * A servlet for handling status requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneStatusRequestServlet(
     masterEndpoint: RpcEndpointRef, conf: SparkConf)
-    extends StatusRequestServlet {
+    extends StatusRequestServlet
 
-  protected def handleStatus(submissionId: String): SubmissionStatusResponse = {
+  protected def handleStatus(submissionId: String): SubmissionStatusResponse =
     val response =
       masterEndpoint.askWithRetry[DeployMessages.DriverStatusResponse](
           DeployMessages.RequestDriverStatus(submissionId))
-    val message = response.exception.map {
+    val message = response.exception.map
       s"Exception from the cluster:\n" + formatException(_)
-    }
     val d = new SubmissionStatusResponse
     d.serverSparkVersion = sparkVersion
     d.submissionId = submissionId
@@ -106,15 +102,13 @@ private[rest] class StandaloneStatusRequestServlet(
     d.workerHostPort = response.workerHostPort.orNull
     d.message = message.orNull
     d
-  }
-}
 
 /**
   * A servlet for handling submit requests passed to the [[StandaloneRestServer]].
   */
 private[rest] class StandaloneSubmitRequestServlet(
     masterEndpoint: RpcEndpointRef, masterUrl: String, conf: SparkConf)
-    extends SubmitRequestServlet {
+    extends SubmitRequestServlet
 
   /**
     * Build a driver description from the fields specified in the submit request.
@@ -125,14 +119,12 @@ private[rest] class StandaloneSubmitRequestServlet(
     * cluster mode yet.
     */
   private def buildDriverDescription(
-      request: CreateSubmissionRequest): DriverDescription = {
+      request: CreateSubmissionRequest): DriverDescription =
     // Required fields, including the main class because python is not yet supported
-    val appResource = Option(request.appResource).getOrElse {
+    val appResource = Option(request.appResource).getOrElse
       throw new SubmitRestMissingFieldException("Application jar is missing.")
-    }
-    val mainClass = Option(request.mainClass).getOrElse {
+    val mainClass = Option(request.mainClass).getOrElse
       throw new SubmitRestMissingFieldException("Main class is missing.")
-    }
 
     // Optional fields
     val sparkProperties = request.sparkProperties
@@ -177,7 +169,6 @@ private[rest] class StandaloneSubmitRequestServlet(
                           actualDriverCores,
                           actualSuperviseDriver,
                           command)
-  }
 
   /**
     * Handle the submit request and construct an appropriate response to return to the client.
@@ -188,8 +179,8 @@ private[rest] class StandaloneSubmitRequestServlet(
   protected override def handleSubmit(
       requestMessageJson: String,
       requestMessage: SubmitRestProtocolMessage,
-      responseServlet: HttpServletResponse): SubmitRestProtocolResponse = {
-    requestMessage match {
+      responseServlet: HttpServletResponse): SubmitRestProtocolResponse =
+    requestMessage match
       case submitRequest: CreateSubmissionRequest =>
         val driverDescription = buildDriverDescription(submitRequest)
         val response =
@@ -202,15 +193,11 @@ private[rest] class StandaloneSubmitRequestServlet(
         submitResponse.submissionId = response.driverId.orNull
         val unknownFields = findUnknownFields(
             requestMessageJson, requestMessage)
-        if (unknownFields.nonEmpty) {
+        if (unknownFields.nonEmpty)
           // If there are fields that the server does not know about, warn the client
           submitResponse.unknownFields = unknownFields
-        }
         submitResponse
       case unexpected =>
         responseServlet.setStatus(HttpServletResponse.SC_BAD_REQUEST)
         handleError(
             s"Received message of unexpected type ${unexpected.messageType}.")
-    }
-  }
-}

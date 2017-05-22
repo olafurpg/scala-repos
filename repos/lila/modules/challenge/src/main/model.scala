@@ -2,15 +2,12 @@ package lila.challenge
 
 case class AllChallenges(in: List[Challenge], out: List[Challenge])
 
-sealed trait Direction {
+sealed trait Direction
   val name = toString.toLowerCase
-}
-object Direction {
+object Direction
   case object In extends Direction // I can accept this challenge
   case object Out extends Direction // I created this challenge
-}
 
-object Event {
+object Event
   case class Create(c: Challenge)
   case class Accept(c: Challenge, joinerId: Option[String])
-}

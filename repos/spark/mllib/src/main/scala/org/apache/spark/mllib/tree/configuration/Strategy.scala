@@ -81,21 +81,19 @@ class Strategy @Since("1.3.0")(
     @Since("1.2.0") @BeanProperty var subsamplingRate: Double = 1,
     @Since("1.2.0") @BeanProperty var useNodeIdCache: Boolean = false,
     @Since("1.2.0") @BeanProperty var checkpointInterval: Int = 10)
-    extends Serializable {
+    extends Serializable
 
   /**
     */
   @Since("1.2.0")
-  def isMulticlassClassification: Boolean = {
+  def isMulticlassClassification: Boolean =
     algo == Classification && numClasses > 2
-  }
 
   /**
     */
   @Since("1.2.0")
-  def isMulticlassWithCategoricalFeatures: Boolean = {
+  def isMulticlassWithCategoricalFeatures: Boolean =
     isMulticlassClassification && (categoricalFeaturesInfo.size > 0)
-  }
 
   /**
     * Java-friendly constructor for [[org.apache.spark.mllib.tree.configuration.Strategy]]
@@ -107,7 +105,7 @@ class Strategy @Since("1.3.0")(
            numClasses: Int,
            maxBins: Int,
            categoricalFeaturesInfo: java.util.Map[
-               java.lang.Integer, java.lang.Integer]) {
+               java.lang.Integer, java.lang.Integer])
     this(algo,
          impurity,
          maxDepth,
@@ -118,35 +116,32 @@ class Strategy @Since("1.3.0")(
            .asInstanceOf[java.util.Map[Int, Int]]
            .asScala
            .toMap)
-  }
 
   /**
     * Sets Algorithm using a String.
     */
   @Since("1.2.0")
-  def setAlgo(algo: String): Unit = algo match {
+  def setAlgo(algo: String): Unit = algo match
     case "Classification" => setAlgo(Classification)
     case "Regression" => setAlgo(Regression)
-  }
 
   /**
     * Sets categoricalFeaturesInfo using a Java Map.
     */
   @Since("1.2.0")
   def setCategoricalFeaturesInfo(categoricalFeaturesInfo: java.util.Map[
-          java.lang.Integer, java.lang.Integer]): Unit = {
+          java.lang.Integer, java.lang.Integer]): Unit =
     this.categoricalFeaturesInfo = categoricalFeaturesInfo
       .asInstanceOf[java.util.Map[Int, Int]]
       .asScala
       .toMap
-  }
 
   /**
     * Check validity of parameters.
     * Throws exception if invalid.
     */
-  private[spark] def assertValid(): Unit = {
-    algo match {
+  private[spark] def assertValid(): Unit =
+    algo match
       case Classification =>
         require(
             numClasses >= 2,
@@ -165,7 +160,6 @@ class Strategy @Since("1.3.0")(
         throw new IllegalArgumentException(
             s"DecisionTree Strategy given invalid algo parameter: $algo." +
             s"  Valid settings are: Classification, Regression.")
-    }
     require(
         maxDepth >= 0,
         s"DecisionTree Strategy given invalid maxDepth parameter: $maxDepth." +
@@ -184,13 +178,12 @@ class Strategy @Since("1.3.0")(
         subsamplingRate > 0 && subsamplingRate <= 1,
         s"DecisionTree Strategy requires subsamplingRate <=1 and >0, but was given " +
         s"$subsamplingRate")
-  }
 
   /**
     * Returns a shallow copy of this instance.
     */
   @Since("1.2.0")
-  def copy: Strategy = {
+  def copy: Strategy =
     new Strategy(algo,
                  impurity,
                  maxDepth,
@@ -204,27 +197,24 @@ class Strategy @Since("1.3.0")(
                  subsamplingRate,
                  useNodeIdCache,
                  checkpointInterval)
-  }
-}
 
 @Since("1.2.0")
-object Strategy {
+object Strategy
 
   /**
     * Construct a default set of parameters for [[org.apache.spark.mllib.tree.DecisionTree]]
     * @param algo  "Classification" or "Regression"
     */
   @Since("1.2.0")
-  def defaultStrategy(algo: String): Strategy = {
+  def defaultStrategy(algo: String): Strategy =
     defaultStrategy(Algo.fromString(algo))
-  }
 
   /**
     * Construct a default set of parameters for [[org.apache.spark.mllib.tree.DecisionTree]]
     * @param algo Algo.Classification or Algo.Regression
     */
   @Since("1.3.0")
-  def defaultStrategy(algo: Algo): Strategy = algo match {
+  def defaultStrategy(algo: Algo): Strategy = algo match
     case Algo.Classification =>
       new Strategy(algo = Classification,
                    impurity = Gini,
@@ -235,9 +225,7 @@ object Strategy {
                    impurity = Variance,
                    maxDepth = 10,
                    numClasses = 0)
-  }
 
   @deprecated("Use Strategy.defaultStrategy instead.", "1.5.0")
   @Since("1.2.0")
   def defaultStategy(algo: Algo): Strategy = defaultStrategy(algo)
-}

@@ -46,7 +46,7 @@ class ScalaUnusedImportPass(val file: PsiFile,
               s"File text range is null: ${file.getClass}")
         else file.getTextRange,
         true,
-        highlightInfoProcessor) with ScalaUnusedImportPassBase {
+        highlightInfoProcessor) with ScalaUnusedImportPassBase
   protected def getFixes: List[IntentionAction] =
     List(
         new ScalaOptimizeImportsFix, new ScalaEnableOptimizeImportsOnTheFlyFix)
@@ -55,8 +55,8 @@ class ScalaUnusedImportPass(val file: PsiFile,
   private var myOptimizeImportsRunnable: Runnable = null
 
   override def collectInformationWithProgress(
-      progress: ProgressIndicator): Unit = {
-    file match {
+      progress: ProgressIndicator): Unit =
+    file match
       case scalaFile: ScalaFile
           if HighlightingLevelManager.getInstance(file.getProject) shouldInspect file =>
         val unusedImports: Array[ImportUsed] =
@@ -69,49 +69,42 @@ class ScalaUnusedImportPass(val file: PsiFile,
         annotations foreach
         (annotation => list add (HighlightInfo fromAnnotation annotation))
 
-        if (ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY) {
+        if (ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY)
           myOptimizeImportsRunnable = new ScalaImportOptimizer()
             .processFile(file, progress)
-        }
 
         myHighlights = list
       case _: ScalaFile => myHighlights = Collections.emptyList()
       case _ =>
-    }
-  }
 
-  override def applyInformationWithProgress(): Unit = {
+  override def applyInformationWithProgress(): Unit =
     if (myHighlights == null) return
     highlightAll(myHighlights)
     ScalaUnusedImportPass.markFileUpToDate(file)
 
-    if (editor != null && !myHighlights.isEmpty) {
+    if (editor != null && !myHighlights.isEmpty)
       if (myOptimizeImportsRunnable != null &&
           ScalaApplicationSettings.getInstance().OPTIMIZE_IMPORTS_ON_THE_FLY &&
           ScalaUnusedImportPass.timeToOptimizeImports(file) &&
-          file.isWritable) {
+          file.isWritable)
         ScalaUnusedImportPass.invokeOnTheFlyImportOptimizer(
             myOptimizeImportsRunnable, file)
-      }
-    }
-  }
-}
 
-object ScalaUnusedImportPass {
+object ScalaUnusedImportPass
   private val SCALA_LAST_POST_PASS_TIMESTAMP: Key[java.lang.Long] =
     Key.create("SCALA_LAST_POST_PASS_TIMESTAMP")
   private val LOG = Logger.getInstance(getClass)
 
   //todo: copy/paste from QuickFixFactoryImpl
   private def invokeOnTheFlyImportOptimizer(
-      runnable: Runnable, file: PsiFile) {
+      runnable: Runnable, file: PsiFile)
     val project: Project = file.getProject
     val document: Document =
       PsiDocumentManager.getInstance(project).getDocument(file)
     if (document == null) return
     val stamp: Long = document.getModificationStamp
-    ApplicationManager.getApplication.invokeLater(new Runnable {
-      def run() {
+    ApplicationManager.getApplication.invokeLater(new Runnable
+      def run()
         if (project.isDisposed || document.getModificationStamp != stamp)
           return
         val undoManager: UndoManager = UndoManager.getInstance(project)
@@ -121,37 +114,31 @@ object ScalaUnusedImportPass {
         val beforeText: String = file.getText
         val oldStamp: Long = document.getModificationStamp
         DocumentUtil.writeInRunUndoTransparentAction(runnable)
-        if (oldStamp != document.getModificationStamp) {
+        if (oldStamp != document.getModificationStamp)
           val afterText: String = file.getText
-          if (Comparing.strEqual(beforeText, afterText)) {
+          if (Comparing.strEqual(beforeText, afterText))
             LOG.error(LogMessageEx.createEvent(
                     "Import optimizer  hasn't optimized any imports",
                     file.getViewProvider.getVirtualFile.getPath,
                     AttachmentFactory.createAttachment(
                         file.getViewProvider.getVirtualFile)))
-          }
-        }
-      }
-    })
-  }
+    )
 
-  private[codeInspection] def isUpToDate(file: PsiFile): Boolean = {
+  private[codeInspection] def isUpToDate(file: PsiFile): Boolean =
     val lastStamp = file.getUserData(SCALA_LAST_POST_PASS_TIMESTAMP)
     val currentStamp: Long = PsiModificationTracker.SERVICE
       .getInstance(file.getProject)
       .getModificationCount
     lastStamp != null && lastStamp == currentStamp ||
     !ProblemHighlightFilter.shouldHighlightFile(file)
-  }
 
-  private def markFileUpToDate(file: PsiFile) {
+  private def markFileUpToDate(file: PsiFile)
     val lastStamp: java.lang.Long = PsiModificationTracker.SERVICE
       .getInstance(file.getProject)
       .getModificationCount
     file.putUserData(SCALA_LAST_POST_PASS_TIMESTAMP, lastStamp)
-  }
 
-  private def timeToOptimizeImports(file: PsiFile): Boolean = {
+  private def timeToOptimizeImports(file: PsiFile): Boolean =
     if (!ScalaApplicationSettings.getInstance.OPTIMIZE_IMPORTS_ON_THE_FLY)
       return false
     val codeAnalyzer: DaemonCodeAnalyzerEx =
@@ -161,9 +148,8 @@ object ScalaUnusedImportPass {
     if (!codeAnalyzer.isErrorAnalyzingFinished(file)) return false
     val errors: Boolean = containsErrorsPreventingOptimize(file)
     !errors && DaemonListeners.canChangeFileSilently(file)
-  }
 
-  private def containsErrorsPreventingOptimize(file: PsiFile): Boolean = {
+  private def containsErrorsPreventingOptimize(file: PsiFile): Boolean =
     val document: Document =
       PsiDocumentManager.getInstance(file.getProject).getDocument(file)
     if (document == null) return true
@@ -174,10 +160,8 @@ object ScalaUnusedImportPass {
           HighlightSeverity.ERROR,
           0,
           document.getTextLength,
-          new Processor[HighlightInfo] {
+          new Processor[HighlightInfo]
             def process(error: HighlightInfo): Boolean =
               false //todo: only unresolved ref issues?
-          })
+          )
     hasErrorsExceptUnresolvedImports
-  }
-}

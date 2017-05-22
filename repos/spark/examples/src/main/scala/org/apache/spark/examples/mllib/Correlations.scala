@@ -32,17 +32,17 @@ import org.apache.spark.mllib.util.MLUtils
   * By default, this loads a synthetic dataset from `data/mllib/sample_linear_regression_data.txt`.
   * If you use it as a template to create your own app, please use `spark-submit` to submit your app.
   */
-object Correlations {
+object Correlations
 
   case class Params(
       input: String = "data/mllib/sample_linear_regression_data.txt")
       extends AbstractParams[Params]
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
 
     val defaultParams = Params()
 
-    val parser = new OptionParser[Params]("Correlations") {
+    val parser = new OptionParser[Params]("Correlations")
       head("Correlations: an example app for computing correlations")
       opt[String]("input")
         .text(
@@ -55,16 +55,13 @@ object Correlations {
         |  examples/target/scala-*/spark-examples-*.jar \
         |  --input data/mllib/sample_linear_regression_data.txt
         """.stripMargin)
-    }
 
-    parser.parse(args, defaultParams).map { params =>
+    parser.parse(args, defaultParams).map  params =>
       run(params)
-    } getOrElse {
+    getOrElse
       sys.exit(1)
-    }
-  }
 
-  def run(params: Params) {
+  def run(params: Params)
     val conf = new SparkConf().setAppName(s"Correlations with $params")
     val sc = new SparkContext(conf)
 
@@ -81,15 +78,12 @@ object Correlations {
     println(s"Correlation ($corrType) between label and each feature")
     println(s"Feature\tCorrelation")
     var feature = 0
-    while (feature < numFeatures) {
+    while (feature < numFeatures)
       val featureRDD = examples.map(_.features(feature))
       val corr = Statistics.corr(labelRDD, featureRDD)
       println(s"$feature\t$corr")
       feature += 1
-    }
     println()
 
     sc.stop()
-  }
-}
 // scalastyle:on println

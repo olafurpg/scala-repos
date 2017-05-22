@@ -33,7 +33,7 @@ import scalafx.Includes._
 import scalafx.beans.property.DoubleProperty
 import scalafx.delegate.SFXDelegate
 
-object QuadCurve {
+object QuadCurve
   implicit def sfxQuadCurve2jfx(v: QuadCurve): jfxss.QuadCurve =
     if (v != null) v.delegate else null
 
@@ -45,37 +45,29 @@ object QuadCurve {
             endY: Double) =
     new QuadCurve(
         new jfxss.QuadCurve(startX, startY, controlX, controlY, endX, endY))
-}
 
 class QuadCurve(override val delegate: jfxss.QuadCurve = new jfxss.QuadCurve())
-    extends Shape(delegate) with SFXDelegate[jfxss.QuadCurve] {
+    extends Shape(delegate) with SFXDelegate[jfxss.QuadCurve]
   def controlX: DoubleProperty = delegate.controlXProperty
-  def controlX_=(v: Double) {
+  def controlX_=(v: Double)
     controlX() = v
-  }
 
   def controlY: DoubleProperty = delegate.controlYProperty
-  def controlY_=(v: Double) {
+  def controlY_=(v: Double)
     controlY() = v
-  }
 
   def endX: DoubleProperty = delegate.endXProperty
-  def endX_=(v: Double) {
+  def endX_=(v: Double)
     endX() = v
-  }
 
   def endY: DoubleProperty = delegate.endYProperty
-  def endY_=(v: Double) {
+  def endY_=(v: Double)
     endY() = v
-  }
 
   def startX: DoubleProperty = delegate.startXProperty
-  def startX_=(v: Double) {
+  def startX_=(v: Double)
     startX() = v
-  }
 
   def startY: DoubleProperty = delegate.startYProperty
-  def startY_=(v: Double) {
+  def startY_=(v: Double)
     startY() = v
-  }
-}

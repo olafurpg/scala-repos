@@ -1,5 +1,4 @@
 package a
 
-class Foo {
+class Foo
   protected[Foo] var x = 0
-}

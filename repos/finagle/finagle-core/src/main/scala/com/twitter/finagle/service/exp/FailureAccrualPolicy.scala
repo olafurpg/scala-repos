@@ -15,7 +15,7 @@ import com.twitter.util.Duration
   * @see The [[https://twitter.github.io/finagle/guide/Clients.html#failure-accrual user guide]]
   *      for more details.
   */
-abstract class FailureAccrualPolicy {
+abstract class FailureAccrualPolicy
 
   /** Invoked by FailureAccrualFactory when a request is successful. */
   def recordSuccess(): Unit
@@ -32,9 +32,8 @@ abstract class FailureAccrualPolicy {
     * probing. Used to reset any history.
     */
   def revived(): Unit
-}
 
-object FailureAccrualPolicy {
+object FailureAccrualPolicy
 
   private[this] val Success = 1
   private[this] val Failure = 0
@@ -66,7 +65,7 @@ object FailureAccrualPolicy {
       requiredSuccessRate: Double,
       window: Int,
       markDeadFor: Stream[Duration]
-  ): FailureAccrualPolicy = new FailureAccrualPolicy {
+  ): FailureAccrualPolicy = new FailureAccrualPolicy
 
     // Pad the back of the stream to mark dead for a constant amount (300 seconds)
     // when the stream runs out.
@@ -80,28 +79,23 @@ object FailureAccrualPolicy {
     private[this] var totalRequests = 0L
     private[this] val successRate = new Ema(window)
 
-    def recordSuccess(): Unit = synchronized {
+    def recordSuccess(): Unit = synchronized
       totalRequests += 1
       successRate.update(totalRequests, Success)
-    }
 
-    def markDeadOnFailure(): Option[Duration] = synchronized {
+    def markDeadOnFailure(): Option[Duration] = synchronized
       totalRequests += 1
       val sr = successRate.update(totalRequests, Failure)
-      if (totalRequests >= window && sr < requiredSuccessRate) {
+      if (totalRequests >= window && sr < requiredSuccessRate)
         val duration = nextMarkDeadFor.head
         nextMarkDeadFor = nextMarkDeadFor.tail
         Some(duration)
-      } else {
+      else
         None
-      }
-    }
 
-    def revived(): Unit = synchronized {
+    def revived(): Unit = synchronized
       nextMarkDeadFor = freshMarkDeadFor
       successRate.reset()
-    }
-  }
 
   /**
     * A policy based on a maximum number of consecutive failures. If `numFailures`
@@ -116,7 +110,7 @@ object FailureAccrualPolicy {
   def consecutiveFailures(
       numFailures: Int,
       markDeadFor: Stream[Duration]
-  ): FailureAccrualPolicy = new FailureAccrualPolicy {
+  ): FailureAccrualPolicy = new FailureAccrualPolicy
 
     // Pad the back of the stream to mark dead for a constant amount (300 seconds)
     // when the stream runs out.
@@ -129,24 +123,18 @@ object FailureAccrualPolicy {
 
     private[this] var consecutiveFailures = 0L
 
-    def recordSuccess(): Unit = synchronized {
+    def recordSuccess(): Unit = synchronized
       consecutiveFailures = 0
-    }
 
-    def markDeadOnFailure(): Option[Duration] = synchronized {
+    def markDeadOnFailure(): Option[Duration] = synchronized
       consecutiveFailures += 1
-      if (consecutiveFailures >= numFailures) {
+      if (consecutiveFailures >= numFailures)
         val duration = nextMarkDeadFor.head
         nextMarkDeadFor = nextMarkDeadFor.tail
         Some(duration)
-      } else {
+      else
         None
-      }
-    }
 
-    def revived(): Unit = synchronized {
+    def revived(): Unit = synchronized
       consecutiveFailures = 0
       nextMarkDeadFor = freshMarkDeadFor
-    }
-  }
-}

@@ -19,7 +19,7 @@ package org.apache.spark
 
 import org.apache.mesos.Protos.{TaskState => MesosTaskState}
 
-private[spark] object TaskState extends Enumeration {
+private[spark] object TaskState extends Enumeration
 
   val LAUNCHING, RUNNING, FINISHED, FAILED, KILLED, LOST = Value
 
@@ -32,16 +32,15 @@ private[spark] object TaskState extends Enumeration {
 
   def isFinished(state: TaskState): Boolean = FINISHED_STATES.contains(state)
 
-  def toMesos(state: TaskState): MesosTaskState = state match {
+  def toMesos(state: TaskState): MesosTaskState = state match
     case LAUNCHING => MesosTaskState.TASK_STARTING
     case RUNNING => MesosTaskState.TASK_RUNNING
     case FINISHED => MesosTaskState.TASK_FINISHED
     case FAILED => MesosTaskState.TASK_FAILED
     case KILLED => MesosTaskState.TASK_KILLED
     case LOST => MesosTaskState.TASK_LOST
-  }
 
-  def fromMesos(mesosState: MesosTaskState): TaskState = mesosState match {
+  def fromMesos(mesosState: MesosTaskState): TaskState = mesosState match
     case MesosTaskState.TASK_STAGING => LAUNCHING
     case MesosTaskState.TASK_STARTING => LAUNCHING
     case MesosTaskState.TASK_RUNNING => RUNNING
@@ -50,5 +49,3 @@ private[spark] object TaskState extends Enumeration {
     case MesosTaskState.TASK_KILLED => KILLED
     case MesosTaskState.TASK_LOST => LOST
     case MesosTaskState.TASK_ERROR => LOST
-  }
-}

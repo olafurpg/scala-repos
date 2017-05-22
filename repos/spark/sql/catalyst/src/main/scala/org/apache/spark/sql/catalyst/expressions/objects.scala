@@ -47,7 +47,7 @@ case class StaticInvoke(staticObject: Class[_],
                         functionName: String,
                         arguments: Seq[Expression] = Nil,
                         propagateNull: Boolean = true)
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
 
   val objectName = staticObject.getName.stripSuffix("$")
 
@@ -58,18 +58,17 @@ case class StaticInvoke(staticObject: Class[_],
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported.")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val javaType = ctx.javaType(dataType)
     val argGen = arguments.map(_.gen(ctx))
     val argString = argGen.map(_.value).mkString(", ")
 
-    if (propagateNull) {
+    if (propagateNull)
       val objNullCheck =
-        if (ctx.defaultValue(dataType) == "null") {
+        if (ctx.defaultValue(dataType) == "null")
           s"${ev.isNull} = ${ev.value} == null;"
-        } else {
+        else
           ""
-        }
 
       val argsNonNull = s"!(${argGen.map(_.isNull).mkString(" || ")})"
       s"""
@@ -83,16 +82,13 @@ case class StaticInvoke(staticObject: Class[_],
           $objNullCheck
         }
        """
-    } else {
+    else
       s"""
         ${argGen.map(_.code).mkString("\n")}
 
         $javaType ${ev.value} = $objectName.$functionName($argString);
         final boolean ${ev.isNull} = ${ev.value} == null;
       """
-    }
-  }
-}
 
 /**
   * Calls the specified function on an object, optionally passing arguments.  If the `targetObject`
@@ -111,7 +107,7 @@ case class Invoke(targetObject: Expression,
                   functionName: String,
                   dataType: DataType,
                   arguments: Seq[Expression] = Nil)
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
 
   override def nullable: Boolean = true
   override def children: Seq[Expression] = arguments.+:(targetObject)
@@ -120,7 +116,7 @@ case class Invoke(targetObject: Expression,
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported.")
 
-  lazy val method = targetObject.dataType match {
+  lazy val method = targetObject.dataType match
     case ObjectType(cls) =>
       cls.getMethods
         .find(_.getName == functionName)
@@ -128,9 +124,8 @@ case class Invoke(targetObject: Expression,
         .getReturnType
         .getName
     case _ => ""
-  }
 
-  lazy val unboxer = (dataType, method) match {
+  lazy val unboxer = (dataType, method) match
     case (IntegerType, "java.lang.Object") =>
       (s: String) =>
         s"((java.lang.Integer)$s).intValue()"
@@ -153,9 +148,8 @@ case class Invoke(targetObject: Expression,
       (s: String) =>
         s"((java.lang.Boolean)$s).booleanValue()"
       case _ => identity[String] _
-  }
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val javaType = ctx.javaType(dataType)
     val obj = targetObject.gen(ctx)
     val argGen = arguments.map(_.gen(ctx))
@@ -164,11 +158,10 @@ case class Invoke(targetObject: Expression,
     // If the function can return null, we do an extra check to make sure our null bit is still set
     // correctly.
     val objNullCheck =
-      if (ctx.defaultValue(dataType) == "null") {
+      if (ctx.defaultValue(dataType) == "null")
         s"${ev.isNull} = ${ev.value} == null;"
-      } else {
+      else
         ""
-      }
 
     val value = unboxer(s"${obj.value}.$functionName($argString)")
 
@@ -182,18 +175,15 @@ case class Invoke(targetObject: Expression,
         ${ctx.defaultValue(dataType)} : ($javaType) $value;
       $objNullCheck
     """
-  }
 
   override def toString: String = s"$targetObject.$functionName"
-}
 
-object NewInstance {
+object NewInstance
   def apply(cls: Class[_],
             arguments: Seq[Expression],
             dataType: DataType,
             propagateNull: Boolean = true): NewInstance =
     new NewInstance(cls, arguments, propagateNull, dataType, None)
-}
 
 /**
   * Constructs a new instance of the given class, using the result of evaluating the specified
@@ -214,7 +204,7 @@ case class NewInstance(cls: Class[_],
                        propagateNull: Boolean,
                        dataType: DataType,
                        outerPointer: Option[Literal])
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
   private val className = cls.getName
 
   override def nullable: Boolean = propagateNull
@@ -225,7 +215,7 @@ case class NewInstance(cls: Class[_],
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported.")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val javaType = ctx.javaType(dataType)
     val argGen = arguments.map(_.gen(ctx))
     val argString = argGen.map(_.value).mkString(", ")
@@ -237,13 +227,12 @@ case class NewInstance(cls: Class[_],
          ${outer.map(_.code.mkString("")).getOrElse("")}
        """.stripMargin
 
-    val constructorCall = outer.map { gen =>
+    val constructorCall = outer.map  gen =>
       s"""${gen.value}.new ${cls.getSimpleName}($argString)"""
-    }.getOrElse {
+    .getOrElse
       s"new $className($argString)"
-    }
 
-    if (propagateNull && argGen.nonEmpty) {
+    if (propagateNull && argGen.nonEmpty)
       val argsNonNull = s"!(${argGen.map(_.isNull).mkString(" || ")})"
 
       s"""
@@ -256,18 +245,15 @@ case class NewInstance(cls: Class[_],
           ${ev.isNull} = false;
         }
        """
-    } else {
+    else
       s"""
         $setup
 
         final $javaType ${ev.value} = $constructorCall;
         final boolean ${ev.isNull} = false;
       """
-    }
-  }
 
   override def toString: String = s"newInstance($cls)"
-}
 
 /**
   * Given an expression that returns on object of type `Option[_]`, this expression unwraps the
@@ -277,7 +263,7 @@ case class NewInstance(cls: Class[_],
   * @param child An expression that returns an `Option`
   */
 case class UnwrapOption(dataType: DataType, child: Expression)
-    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes {
+    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes
 
   override def nullable: Boolean = true
 
@@ -287,7 +273,7 @@ case class UnwrapOption(dataType: DataType, child: Expression)
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val javaType = ctx.javaType(dataType)
     val inputObject = child.gen(ctx)
 
@@ -298,8 +284,6 @@ case class UnwrapOption(dataType: DataType, child: Expression)
       $javaType ${ev.value} =
         ${ev.isNull} ? ${ctx.defaultValue(dataType)} : ($javaType)${inputObject.value}.get();
     """
-  }
-}
 
 /**
   * Converts the result of evaluating `child` into an option, checking both the isNull bit and
@@ -308,7 +292,7 @@ case class UnwrapOption(dataType: DataType, child: Expression)
   * @param optType The type of this option.
   */
 case class WrapOption(child: Expression, optType: DataType)
-    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes {
+    extends UnaryExpression with NonSQLExpression with ExpectsInputTypes
 
   override def dataType: DataType = ObjectType(classOf[Option[_]])
 
@@ -320,7 +304,7 @@ case class WrapOption(child: Expression, optType: DataType)
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val inputObject = child.gen(ctx)
 
     s"""
@@ -331,35 +315,29 @@ case class WrapOption(child: Expression, optType: DataType)
         ${inputObject.isNull} ?
         scala.Option$$.MODULE$$.apply(null) : new scala.Some(${inputObject.value});
     """
-  }
-}
 
 /**
   * A place holder for the loop variable used in [[MapObjects]].  This should never be constructed
   * manually, but will instead be passed into the provided lambda function.
   */
 case class LambdaVariable(value: String, isNull: String, dataType: DataType)
-    extends LeafExpression with Unevaluable with NonSQLExpression {
+    extends LeafExpression with Unevaluable with NonSQLExpression
 
   override def nullable: Boolean = true
 
-  override def gen(ctx: CodegenContext): ExprCode = {
+  override def gen(ctx: CodegenContext): ExprCode =
     ExprCode(code = "", value = value, isNull = isNull)
-  }
-}
 
-object MapObjects {
+object MapObjects
   private val curId = new java.util.concurrent.atomic.AtomicInteger()
 
   def apply(function: Expression => Expression,
             inputData: Expression,
-            elementType: DataType): MapObjects = {
+            elementType: DataType): MapObjects =
     val loopValue = "MapObjects_loopValue" + curId.getAndIncrement()
     val loopIsNull = "MapObjects_loopIsNull" + curId.getAndIncrement()
     val loopVar = LambdaVariable(loopValue, loopIsNull, elementType)
     MapObjects(loopVar, function(loopVar), inputData)
-  }
-}
 
 /**
   * Applies the given expression to every element of a collection of items, returning the result
@@ -378,11 +356,11 @@ object MapObjects {
 case class MapObjects private (loopVar: LambdaVariable,
                                lambdaFunction: Expression,
                                inputData: Expression)
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
 
   @tailrec
   private def itemAccessorMethod(dataType: DataType): String => String =
-    dataType match {
+    dataType match
       case NullType =>
         val nullTypeClassName = NullType.getClass.getName + ".MODULE$"
         (i: String) =>
@@ -427,10 +405,9 @@ case class MapObjects private (loopVar: LambdaVariable,
         case DateType =>
         (i: String) =>
           s".getInt($i)"
-    }
 
   private lazy val (lengthFunction, itemAccessor, primitiveElement) =
-    inputData.dataType match {
+    inputData.dataType match
       case ObjectType(cls) if classOf[Seq[_]].isAssignableFrom(cls) =>
         (".size()", (i: String) => s".apply($i)", false)
       case ObjectType(cls) if cls.isArray =>
@@ -439,15 +416,13 @@ case class MapObjects private (loopVar: LambdaVariable,
           if classOf[java.util.List[_]].isAssignableFrom(cls) =>
         (".size()", (i: String) => s".get($i)", false)
       case ArrayType(t, _) =>
-        val (sqlType, primitiveElement) = t match {
+        val (sqlType, primitiveElement) = t match
           case m: MapType => (m, false)
           case s: StructType => (s, false)
           case s: StringType => (s, false)
           case udt: UserDefinedType[_] => (udt.sqlType, false)
           case o => (o, true)
-        }
         (".numElements()", itemAccessorMethod(sqlType), primitiveElement)
-    }
 
   override def nullable: Boolean = true
 
@@ -459,7 +434,7 @@ case class MapObjects private (loopVar: LambdaVariable,
 
   override def dataType: DataType = ArrayType(lambdaFunction.dataType)
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val javaType = ctx.javaType(dataType)
     val elementJavaType = ctx.javaType(loopVar.dataType)
     val genInputData = inputData.gen(ctx)
@@ -474,21 +449,19 @@ case class MapObjects private (loopVar: LambdaVariable,
     // Specifically, we have to insert the [$dataLength] in between the type and any extra nested
     // array declarations (i.e. new String[1][]).
     val arrayConstructor =
-      if (convertedType contains "[]") {
+      if (convertedType contains "[]")
         val rawType = convertedType.takeWhile(_ != '[')
         val arrayPart =
           convertedType.reverse.takeWhile(c => c == '[' || c == ']').reverse
         s"new $rawType[$dataLength]$arrayPart"
-      } else {
+      else
         s"new $convertedType[$dataLength]"
-      }
 
     val loopNullCheck =
-      if (primitiveElement) {
+      if (primitiveElement)
         s"boolean ${loopVar.isNull} = ${genInputData.value}.isNullAt($loopIndex);"
-      } else {
+      else
         s"boolean ${loopVar.isNull} = ${genInputData.isNull} || ${loopVar.value} == null;"
-      }
 
     s"""
       ${genInputData.code}
@@ -521,8 +494,6 @@ case class MapObjects private (loopVar: LambdaVariable,
         ${ev.value} = new ${classOf[GenericArrayData].getName}($convertedArray);
       }
     """
-  }
-}
 
 /**
   * Constructs a new external row, using the result of evaluating the specified expressions
@@ -531,7 +502,7 @@ case class MapObjects private (loopVar: LambdaVariable,
   * @param children A list of expression to use as content of the external row.
   */
 case class CreateExternalRow(children: Seq[Expression], schema: StructType)
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
 
   override def dataType: DataType = ObjectType(classOf[Row])
 
@@ -541,14 +512,14 @@ case class CreateExternalRow(children: Seq[Expression], schema: StructType)
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val rowClass = classOf[GenericRowWithSchema].getName
     val values = ctx.freshName("values")
     val schemaField = ctx.addReferenceObj("schema", schema)
     s"""
       boolean ${ev.isNull} = false;
       final Object[] $values = new Object[${children.size}];
-    """ + children.zipWithIndex.map {
+    """ + children.zipWithIndex.map
       case (e, i) =>
         val eval = e.gen(ctx)
         eval.code + s"""
@@ -558,34 +529,30 @@ case class CreateExternalRow(children: Seq[Expression], schema: StructType)
             $values[$i] = ${eval.value};
           }
          """
-    }.mkString("\n") +
+    .mkString("\n") +
     s"final ${classOf[Row].getName} ${ev.value} = new $rowClass($values, this.$schemaField);"
-  }
-}
 
 /**
   * Serializes an input object using a generic serializer (Kryo or Java).
   * @param kryo if true, use Kryo. Otherwise, use Java.
   */
 case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression with NonSQLExpression
 
   override def eval(input: InternalRow): Any =
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported")
 
-  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String =
     // Code to initialize the serializer.
     val serializer = ctx.freshName("serializer")
-    val (serializerClass, serializerInstanceClass) = {
-      if (kryo) {
+    val (serializerClass, serializerInstanceClass) =
+      if (kryo)
         (classOf[KryoSerializer].getName,
          classOf[KryoSerializerInstance].getName)
-      } else {
+      else
         (classOf[JavaSerializer].getName,
          classOf[JavaSerializerInstance].getName)
-      }
-    }
     val sparkConf = s"new ${classOf[SparkConf].getName}()"
     ctx.addMutableState(
         serializerInstanceClass,
@@ -602,10 +569,8 @@ case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
         ${ev.value} = $serializer.serialize(${input.value}, null).array();
       }
      """
-  }
 
   override def dataType: DataType = BinaryType
-}
 
 /**
   * Serializes an input object using a generic serializer (Kryo or Java).  Note that the ClassTag
@@ -614,20 +579,18 @@ case class EncodeUsingSerializer(child: Expression, kryo: Boolean)
   */
 case class DecodeUsingSerializer[T](
     child: Expression, tag: ClassTag[T], kryo: Boolean)
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression with NonSQLExpression
 
-  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String =
     // Code to initialize the serializer.
     val serializer = ctx.freshName("serializer")
-    val (serializerClass, serializerInstanceClass) = {
-      if (kryo) {
+    val (serializerClass, serializerInstanceClass) =
+      if (kryo)
         (classOf[KryoSerializer].getName,
          classOf[KryoSerializerInstance].getName)
-      } else {
+      else
         (classOf[JavaSerializer].getName,
          classOf[JavaSerializerInstance].getName)
-      }
-    }
     val sparkConf = s"new ${classOf[SparkConf].getName}()"
     ctx.addMutableState(
         serializerInstanceClass,
@@ -645,17 +608,15 @@ case class DecodeUsingSerializer[T](
           $serializer.deserialize(java.nio.ByteBuffer.wrap(${input.value}), null);
       }
      """
-  }
 
   override def dataType: DataType = ObjectType(tag.runtimeClass)
-}
 
 /**
   * Initialize a Java Bean instance by setting its field values via setters.
   */
 case class InitializeJavaBean(
     beanInstance: Expression, setters: Map[String, Expression])
-    extends Expression with NonSQLExpression {
+    extends Expression with NonSQLExpression
 
   override def nullable: Boolean = beanInstance.nullable
   override def children: Seq[Expression] = beanInstance +: setters.values.toSeq
@@ -665,17 +626,16 @@ case class InitializeJavaBean(
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported.")
 
-  override def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val instanceGen = beanInstance.gen(ctx)
 
-    val initialize = setters.map {
+    val initialize = setters.map
       case (setterMethod, fieldValue) =>
         val fieldGen = fieldValue.gen(ctx)
         s"""
            ${fieldGen.code}
            ${instanceGen.value}.$setterMethod(${fieldGen.value});
          """
-    }
 
     ev.isNull = instanceGen.isNull
     ev.value = instanceGen.value
@@ -686,8 +646,6 @@ case class InitializeJavaBean(
         ${initialize.mkString("\n")}
       }
      """
-  }
-}
 
 /**
   * Asserts that input values of a non-nullable child expression are not null.
@@ -698,7 +656,7 @@ case class InitializeJavaBean(
   * non-null `s`, `s.i` can't be null.
   */
 case class AssertNotNull(child: Expression, walkedTypePath: Seq[String])
-    extends UnaryExpression with NonSQLExpression {
+    extends UnaryExpression with NonSQLExpression
 
   override def dataType: DataType = child.dataType
 
@@ -708,7 +666,7 @@ case class AssertNotNull(child: Expression, walkedTypePath: Seq[String])
     throw new UnsupportedOperationException(
         "Only code-generated evaluation is supported.")
 
-  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String = {
+  override protected def genCode(ctx: CodegenContext, ev: ExprCode): String =
     val childGen = child.gen(ctx)
 
     val errMsg =
@@ -730,5 +688,3 @@ case class AssertNotNull(child: Expression, walkedTypePath: Seq[String])
         throw new RuntimeException((String) references[$idx]);
       }
      """
-  }
-}

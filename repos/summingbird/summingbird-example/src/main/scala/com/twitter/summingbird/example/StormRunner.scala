@@ -29,18 +29,16 @@ import com.twitter.util.Await
 import twitter4j.TwitterStreamFactory
 import twitter4j.conf.ConfigurationBuilder
 
-object ExeStorm {
-  def main(args: Array[String]) {
+object ExeStorm
+  def main(args: Array[String])
     Executor(args, StormRunner(_))
-  }
-}
 
 /**
   * The following object contains code to execute the Summingbird
   * WordCount job defined in ExampleJob.scala on a storm
   * cluster.
   */
-object StormRunner {
+object StormRunner
 
   /**
     * These imports bring the requisite serialization injections, the
@@ -112,16 +110,15 @@ object StormRunner {
     * you all set up if you don't already have memcache installed
     * locally.)
     */
-  def apply(args: Args): StormExecutionConfig = {
-    new StormExecutionConfig {
+  def apply(args: Args): StormExecutionConfig =
+    new StormExecutionConfig
       override val name = "SummingbirdExample"
 
       // No Ackers
       override def transformConfig(
-          config: Map[String, AnyRef]): Map[String, AnyRef] = {
+          config: Map[String, AnyRef]): Map[String, AnyRef] =
         config ++ List(
             (BTConfig.TOPOLOGY_ACKER_EXECUTORS -> (new java.lang.Integer(0))))
-      }
 
       override def getNamedOptions: Map[String, Options] = Map(
           "DEFAULT" -> Options()
@@ -131,8 +128,6 @@ object StormRunner {
             .set(CacheSize(100))
         )
       override def graph = wordCount[Storm](spout, storeSupplier)
-    }
-  }
 
   /**
     * Once you've got this running in the background, fire up another
@@ -149,7 +144,5 @@ object StormRunner {
     * }}}
     */
   def lookup(word: String): Option[Long] =
-    Await.result {
+    Await.result
       stringLongStore.get(word -> StatusStreamer.batcher.currentBatch)
-    }
-}

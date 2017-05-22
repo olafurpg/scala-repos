@@ -19,27 +19,25 @@ object AkkaHttpAssetsSpec
 
 trait AssetsSpec
     extends PlaySpecification with WsTestClient
-    with ServerIntegrationSpecification {
+    with ServerIntegrationSpecification
 
   sequential
 
-  "Assets controller" should {
+  "Assets controller" should
 
     val defaultCacheControl = Some("public, max-age=3600")
     val aggressiveCacheControl = Some("public, max-age=31536000")
 
-    def withServer[T](block: WSClient => T): T = {
-      Server.withRouter(ServerConfig(mode = Mode.Prod, port = Some(0))) {
+    def withServer[T](block: WSClient => T): T =
+      Server.withRouter(ServerConfig(mode = Mode.Prod, port = Some(0)))
         case req => Assets.versioned("/testassets", req.path)
-      } { implicit port =>
+       implicit port =>
         implicit val materializer = Play.current.materializer
         withClient(block)
-      }
-    }
 
     val etagPattern = """([wW]/)?"([^"]|\\")*""""
 
-    "serve an asset" in withServer { client =>
+    "serve an asset" in withServer  client =>
       val result = await(client.url("/bar.txt").get())
 
       result.status must_== OK
@@ -50,9 +48,8 @@ trait AssetsSpec
       result.header(VARY) must beNone
       result.header(CONTENT_ENCODING) must beNone
       result.header(CACHE_CONTROL) must_== defaultCacheControl
-    }
 
-    "serve an asset in a subdirectory" in withServer { client =>
+    "serve an asset in a subdirectory" in withServer  client =>
       val result = await(client.url("/subdir/baz.txt").get())
 
       result.status must_== OK
@@ -63,9 +60,8 @@ trait AssetsSpec
       result.header(VARY) must beNone
       result.header(CONTENT_ENCODING) must beNone
       result.header(CACHE_CONTROL) must_== defaultCacheControl
-    }
 
-    "serve an asset with spaces in the name" in withServer { client =>
+    "serve an asset with spaces in the name" in withServer  client =>
       val result = await(client.url("/foo%20bar.txt").get())
 
       result.status must_== OK
@@ -76,18 +72,16 @@ trait AssetsSpec
       result.header(VARY) must beNone
       result.header(CONTENT_ENCODING) must beNone
       result.header(CACHE_CONTROL) must_== defaultCacheControl
-    }
 
-    "serve a non gzipped asset when gzip is available but not requested" in withServer {
+    "serve a non gzipped asset when gzip is available but not requested" in withServer
       client =>
         val result = await(client.url("/foo.txt").get())
 
         result.body must_== "This is a test asset."
         result.header(VARY) must beSome(ACCEPT_ENCODING)
         result.header(CONTENT_ENCODING) must beNone
-    }
 
-    "serve a gzipped asset" in withServer { client =>
+    "serve a gzipped asset" in withServer  client =>
       val result = await(
           client.url("/foo.txt").withHeaders(ACCEPT_ENCODING -> "gzip").get())
 
@@ -100,9 +94,8 @@ trait AssetsSpec
       // release deflate resources
       is.close()
       success
-    }
 
-    "return not modified when etag matches" in withServer { client =>
+    "return not modified when etag matches" in withServer  client =>
       val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
       val result =
         await(client.url("/foo.txt").withHeaders(IF_NONE_MATCH -> etag) get ())
@@ -112,9 +105,8 @@ trait AssetsSpec
       result.header(CACHE_CONTROL) must_== defaultCacheControl
       result.header(ETAG) must beSome(matching(etagPattern))
       result.header(LAST_MODIFIED) must beSome
-    }
 
-    "return not modified when multiple etags supply and one matches" in withServer {
+    "return not modified when multiple etags supply and one matches" in withServer
       client =>
         val Some(etag) = await(client.url("/foo.txt").get()).header(ETAG)
         val result = await(client
@@ -124,9 +116,8 @@ trait AssetsSpec
 
         result.status must_== NOT_MODIFIED
         result.body must beEmpty
-    }
 
-    "return asset when etag doesn't match" in withServer { client =>
+    "return asset when etag doesn't match" in withServer  client =>
       val result = await(client
             .url("/foo.txt")
             .withHeaders(IF_NONE_MATCH -> "\"foobar\"")
@@ -134,9 +125,8 @@ trait AssetsSpec
 
       result.status must_== OK
       result.body must_== "This is a test asset."
-    }
 
-    "return not modified when not modified since" in withServer { client =>
+    "return not modified when not modified since" in withServer  client =>
       val Some(timestamp) =
         await(client.url("/foo.txt").get()).header(LAST_MODIFIED)
       val result = await(client
@@ -151,9 +141,8 @@ trait AssetsSpec
       result.header(DATE) must beSome
       result.header(ETAG) must beNone
       result.header(CACHE_CONTROL) must beNone
-    }
 
-    "return asset when modified since" in withServer { client =>
+    "return asset when modified since" in withServer  client =>
       val result = await(client
             .url("/foo.txt")
             .withHeaders(IF_MODIFIED_SINCE -> "Tue, 13 Mar 2012 13:08:36 GMT")
@@ -161,9 +150,8 @@ trait AssetsSpec
 
       result.status must_== OK
       result.body must_== "This is a test asset."
-    }
 
-    "ignore if modified since header if if none match header is set" in withServer {
+    "ignore if modified since header if if none match header is set" in withServer
       client =>
         val result = await(
             client
@@ -176,9 +164,8 @@ trait AssetsSpec
 
         result.status must_== OK
         result.body must_== "This is a test asset."
-    }
 
-    "return the asset if the if modified since header can't be parsed" in withServer {
+    "return the asset if the if modified since header can't be parsed" in withServer
       client =>
         val result = await(client
               .url("/foo.txt")
@@ -187,23 +174,20 @@ trait AssetsSpec
 
         result.status must_== OK
         result.body must_== "This is a test asset."
-    }
 
-    "return 200 if the asset is empty" in withServer { client =>
+    "return 200 if the asset is empty" in withServer  client =>
       val result = await(client.url("/empty.txt").get())
 
       result.status must_== OK
       result.body must beEmpty
-    }
 
-    "return 404 for files that don't exist" in withServer { client =>
+    "return 404 for files that don't exist" in withServer  client =>
       val result = await(client.url("/nosuchfile.txt").get())
 
       result.status must_== NOT_FOUND
       result.header(CONTENT_TYPE) must beSome.which(_.startsWith("text/html"))
-    }
 
-    "serve a versioned asset" in withServer { client =>
+    "serve a versioned asset" in withServer  client =>
       val result = await(client
             .url("/versioned/sub/12345678901234567890123456789012-foo.txt")
             .get())
@@ -216,22 +200,14 @@ trait AssetsSpec
       result.header(VARY) must beNone
       result.header(CONTENT_ENCODING) must beNone
       result.header(CACHE_CONTROL) must_== aggressiveCacheControl
-    }
 
-    "return not found when the path is a directory" in {
-      "if the directory is on the file system" in withServer { client =>
+    "return not found when the path is a directory" in
+      "if the directory is on the file system" in withServer  client =>
         await(client.url("/subdir").get()).status must_== NOT_FOUND
-      }
-      "if the directory is a jar entry" in {
-        Server.withRouter() {
+      "if the directory is a jar entry" in
+        Server.withRouter()
           case req => Assets.versioned("/scala", req.path)
-        } { implicit port =>
+         implicit port =>
           implicit val materializer = Play.current.materializer
-          withClient { client =>
+          withClient  client =>
             await(client.url("/collection").get()).status must_== NOT_FOUND
-          }
-        }
-      }
-    }
-  }
-}

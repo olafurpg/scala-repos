@@ -6,7 +6,7 @@ import org.jetbrains.plugins.scala.testingSupport.IntegrationTest
   * @author Roman.Shein
   * @since 26.01.2015.
   */
-abstract class Specs2GoToSourceTest extends Specs2TestCase {
+abstract class Specs2GoToSourceTest extends Specs2TestCase
   private def addGoToSourceTest(testName: String) =
     addFileToProject(
         testName + ".scala",
@@ -35,7 +35,7 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
             |}
           """.stripMargin)
 
-  def testGoToSuccessfulLocation(): Unit = {
+  def testGoToSuccessfulLocation(): Unit =
     val testName = "SuccessfulGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -46,9 +46,8 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
         checkConfigAndSettings(_, testName, "run fine"),
         List("[root]", testName, "Successful test should", "run fine"),
         4)
-  }
 
-  def testGoToPendingLocation(): Unit = {
+  def testGoToPendingLocation(): Unit =
     val testName = "PendingGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -59,9 +58,8 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
         checkConfigAndSettings(_, testName, "be pending"),
         List("[root]", testName, "Pending test should", "be pending"),
         9)
-  }
 
-  def testGoToIgnoredLocation(): Unit = {
+  def testGoToIgnoredLocation(): Unit =
     val testName = "IgnoredGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -72,9 +70,8 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
         checkConfigAndSettings(_, testName, "be ignored"),
         List("[root]", testName, "Ignored test should", "be ignored"),
         14)
-  }
 
-  def testGoToFailedLocation(): Unit = {
+  def testGoToFailedLocation(): Unit =
     val testName = "FailedGoToLocationTest"
     addGoToSourceTest(testName)
 
@@ -84,5 +81,3 @@ abstract class Specs2GoToSourceTest extends Specs2TestCase {
                       checkConfigAndSettings(_, testName, "fail"),
                       List("[root]", testName, "Failed test should", "fail"),
                       19)
-  }
-}

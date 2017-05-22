@@ -1,52 +1,41 @@
 sealed trait KrafsDescription
 
-abstract class NotWorkingEnum extends Enumeration {
+abstract class NotWorkingEnum extends Enumeration
 
   type ExtendedValue = Value with KrafsDescription
 
-  def Enum(inDescription: String): ExtendedValue = {
+  def Enum(inDescription: String): ExtendedValue =
     new Val(nextId) with KrafsDescription {}
-  }
-}
 
-abstract class WorkingEnum extends Enumeration {
+abstract class WorkingEnum extends Enumeration
 
   type ExtendedValue = Value
 
-  def Enum(inDescription: String): ExtendedValue = {
+  def Enum(inDescription: String): ExtendedValue =
     new Val(nextId) {}
-  }
-}
 
-object NotWorkingTab extends NotWorkingEnum {
+object NotWorkingTab extends NotWorkingEnum
   val a = Enum("A")
   val b = Enum("B")
-}
 
-object WorkingTab extends WorkingEnum {
+object WorkingTab extends WorkingEnum
   val a = Enum("A")
   val b = Enum("B")
-}
 
-object Test extends App {
+object Test extends App
   testGris()
   testWorking()
 
-  def testGris() {
+  def testGris()
     val pipp = NotWorkingTab.b
-    pipp match {
+    pipp match
       case NotWorkingTab.a => ???
       case NotWorkingTab.b =>
       case _ => ???
-    }
-  }
 
-  def testWorking() {
+  def testWorking()
     val stuff = WorkingTab.a
-    stuff match {
+    stuff match
       case WorkingTab.a =>
       case WorkingTab.b => ???
       case _ => ???
-    }
-  }
-}

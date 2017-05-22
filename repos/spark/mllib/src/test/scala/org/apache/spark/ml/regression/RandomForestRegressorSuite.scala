@@ -31,24 +31,23 @@ import org.apache.spark.sql.DataFrame
   * Test suite for [[RandomForestRegressor]].
   */
 class RandomForestRegressorSuite
-    extends SparkFunSuite with MLlibTestSparkContext {
+    extends SparkFunSuite with MLlibTestSparkContext
 
   import RandomForestRegressorSuite.compareAPIs
 
   private var orderedLabeledPoints50_1000: RDD[LabeledPoint] = _
 
-  override def beforeAll() {
+  override def beforeAll()
     super.beforeAll()
     orderedLabeledPoints50_1000 = sc.parallelize(
         EnsembleTestHelper.generateOrderedLabeledPoints(
             numFeatures = 50, 1000))
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests calling train()
   /////////////////////////////////////////////////////////////////////////////
 
-  def regressionTestWithContinuousFeatures(rf: RandomForestRegressor) {
+  def regressionTestWithContinuousFeatures(rf: RandomForestRegressor)
     val categoricalFeaturesInfo = Map.empty[Int, Int]
     val newRF = rf
       .setImpurity("variance")
@@ -58,21 +57,18 @@ class RandomForestRegressorSuite
       .setFeatureSubsetStrategy("auto")
       .setSeed(123)
     compareAPIs(orderedLabeledPoints50_1000, newRF, categoricalFeaturesInfo)
-  }
 
   test("Regression with continuous features:" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+      " comparing DecisionTree vs. RandomForest(numTrees = 1)")
     val rf = new RandomForestRegressor()
     regressionTestWithContinuousFeatures(rf)
-  }
 
   test("Regression with continuous features and node Id cache :" +
-      " comparing DecisionTree vs. RandomForest(numTrees = 1)") {
+      " comparing DecisionTree vs. RandomForest(numTrees = 1)")
     val rf = new RandomForestRegressor().setCacheNodeIds(true)
     regressionTestWithContinuousFeatures(rf)
-  }
 
-  test("Feature importance with toy data") {
+  test("Feature importance with toy data")
     val rf = new RandomForestRegressor()
       .setImpurity("variance")
       .setMaxDepth(3)
@@ -93,7 +89,6 @@ class RandomForestRegressorSuite
     assert(mostImportantFeature === 1)
     assert(importances.toArray.sum === 1.0)
     assert(importances.toArray.forall(_ >= 0.0))
-  }
 
   /////////////////////////////////////////////////////////////////////////////
   // Tests of model save/load
@@ -119,9 +114,8 @@ class RandomForestRegressorSuite
     }
   }
  */
-}
 
-private object RandomForestRegressorSuite extends SparkFunSuite {
+private object RandomForestRegressorSuite extends SparkFunSuite
 
   /**
     * Train 2 models on the given dataset, one using the old API and one using the new API.
@@ -129,7 +123,7 @@ private object RandomForestRegressorSuite extends SparkFunSuite {
     */
   def compareAPIs(data: RDD[LabeledPoint],
                   rf: RandomForestRegressor,
-                  categoricalFeatures: Map[Int, Int]): Unit = {
+                  categoricalFeatures: Map[Int, Int]): Unit =
     val numFeatures = data.first().features.size
     val oldStrategy = rf.getOldStrategy(categoricalFeatures,
                                         numClasses = 0,
@@ -150,5 +144,3 @@ private object RandomForestRegressorSuite extends SparkFunSuite {
         categoricalFeatures)
     TreeTests.checkEqual(oldModelAsNew, newModel)
     assert(newModel.numFeatures === numFeatures)
-  }
-}

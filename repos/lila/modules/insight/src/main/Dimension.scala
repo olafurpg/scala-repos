@@ -13,15 +13,14 @@ sealed abstract class Dimension[A : BSONValueHandler](
     val dbKey: String,
     val position: Position,
     val valueName: A => String,
-    val description: Html) {
+    val description: Html)
 
   implicit def bson = implicitly[BSONValueHandler[A]]
 
   def isInGame = position == Position.Game
   def isInMove = position == Position.Move
-}
 
-object Dimension {
+object Dimension
 
   import BSONHandlers._
   import Position._
@@ -160,16 +159,15 @@ object Dimension {
                  PieceRole,
                  MyCastling,
                  OpCastling)
-  val byKey = all map { p =>
+  val byKey = all map  p =>
     (p.key, p)
-  } toMap
+  toMap
 
-  def requiresStableRating(d: Dimension[_]) = d match {
+  def requiresStableRating(d: Dimension[_]) = d match
     case OpponentStrength => true
     case _ => false
-  }
 
-  def valuesOf[X](d: Dimension[X]): List[X] = d match {
+  def valuesOf[X](d: Dimension[X]): List[X] = d match
     case Perf => PerfType.nonPuzzle
     case Phase => lila.insight.Phase.all
     case Result => lila.insight.Result.all
@@ -182,9 +180,8 @@ object Dimension {
     case MyCastling | OpCastling => lila.insight.Castling.all
     case QueenTrade => lila.insight.QueenTrade.all
     case MaterialRange => lila.insight.MaterialRange.all
-  }
 
-  def valueByKey[X](d: Dimension[X], key: String): Option[X] = d match {
+  def valueByKey[X](d: Dimension[X], key: String): Option[X] = d match
     case Perf => PerfType.byKey get key
     case Phase => parseIntOption(key) flatMap lila.insight.Phase.byId.get
     case Result => parseIntOption(key) flatMap lila.insight.Result.byId.get
@@ -202,15 +199,13 @@ object Dimension {
     case QueenTrade => lila.insight.QueenTrade(key == "true").some
     case MaterialRange =>
       parseIntOption(key) flatMap lila.insight.MaterialRange.byId.get
-  }
 
-  def valueToJson[X](d: Dimension[X])(v: X): play.api.libs.json.JsObject = {
+  def valueToJson[X](d: Dimension[X])(v: X): play.api.libs.json.JsObject =
     play.api.libs.json.Json
       .obj("key" -> valueKey(d)(v), "name" -> d.valueName(v))
-  }
 
   def valueKey[X](d: Dimension[X])(v: X): String =
-    (d match {
+    (d match
       case Perf => v.key
       case Phase => v.id
       case Result => v.id
@@ -223,23 +218,19 @@ object Dimension {
       case MyCastling | OpCastling => v.id
       case QueenTrade => v.id
       case MaterialRange => v.id
-    }).toString
+    ).toString
 
   def filtersOf[X](d: Dimension[X], selected: List[X]): BSONDocument =
-    d match {
+    d match
       case Dimension.MovetimeRange =>
-        selected match {
+        selected match
           case Nil => BSONDocument()
           case xs =>
             BSONDocument(
                 d.dbKey -> BSONDocument("$in" -> xs.flatMap(_.tenths.list)))
-        }
       case _ =>
-        selected map d.bson.write match {
+        selected map d.bson.write match
           case Nil => BSONDocument()
           case List(x) => BSONDocument(d.dbKey -> x)
           case xs =>
             BSONDocument(d.dbKey -> BSONDocument("$in" -> BSONArray(xs)))
-        }
-    }
-}

@@ -17,21 +17,18 @@
 
 package org.apache.spark.sql.catalyst.expressions
 
-protected class AttributeEquals(val a: Attribute) {
-  override def hashCode(): Int = a match {
+protected class AttributeEquals(val a: Attribute)
+  override def hashCode(): Int = a match
     case ar: AttributeReference => ar.exprId.hashCode()
     case a => a.hashCode()
-  }
 
   override def equals(other: Any): Boolean =
-    (a, other.asInstanceOf[AttributeEquals].a) match {
+    (a, other.asInstanceOf[AttributeEquals].a) match
       case (a1: AttributeReference, a2: AttributeReference) =>
         a1.exprId == a2.exprId
       case (a1, a2) => a1 == a2
-    }
-}
 
-object AttributeSet {
+object AttributeSet
 
   /** Returns an empty [[AttributeSet]]. */
   val empty = apply(Iterable.empty)
@@ -41,11 +38,9 @@ object AttributeSet {
     new AttributeSet(Set(new AttributeEquals(a)))
 
   /** Constructs a new [[AttributeSet]] given a sequence of [[Expression Expressions]]. */
-  def apply(baseSet: Iterable[Expression]): AttributeSet = {
+  def apply(baseSet: Iterable[Expression]): AttributeSet =
     new AttributeSet(
         baseSet.flatMap(_.references).map(new AttributeEquals(_)).toSet)
-  }
-}
 
 /**
   * A Set designed to hold [[AttributeReference]] objects, that performs equality checking using
@@ -59,15 +54,14 @@ object AttributeSet {
   * when the transformation was a no-op).
   */
 class AttributeSet private (val baseSet: Set[AttributeEquals])
-    extends Traversable[Attribute] with Serializable {
+    extends Traversable[Attribute] with Serializable
 
   /** Returns true if the members of this AttributeSet and other are the same. */
-  override def equals(other: Any): Boolean = other match {
+  override def equals(other: Any): Boolean = other match
     case otherSet: AttributeSet =>
       otherSet.size == baseSet.size &&
       baseSet.map(_.a).forall(otherSet.contains)
     case _ => false
-  }
 
   /** Returns true if this set contains an Attribute with the same expression id as `elem` */
   def contains(elem: NamedExpression): Boolean =
@@ -130,4 +124,3 @@ class AttributeSet private (val baseSet: Set[AttributeEquals])
   override def toString: String = "{" + baseSet.map(_.a).mkString(", ") + "}"
 
   override def isEmpty: Boolean = baseSet.isEmpty
-}

@@ -6,7 +6,7 @@ import scalaz.scalacheck.ScalazArbitrary._
 import Const._
 import org.scalacheck.Prop.forAll
 
-object ConstTest extends SpecLite {
+object ConstTest extends SpecLite
   checkAll("Const", order.laws[Const[Int, String]])
 
   checkAll("Const List", applicative.laws[λ[α => Const[List[Int], α]]])
@@ -15,13 +15,11 @@ object ConstTest extends SpecLite {
   checkAll(traverse.laws[Const[Int, ?]])
   checkAll(contravariant.laws[Const[Int, ?]])
 
-  "const functions" in {
-    "const" ! forAll { (x: Int, y: Function0[String]) =>
+  "const functions" in
+    "const" ! forAll  (x: Int, y: Function0[String]) =>
       const(x)(y) == x
-    }
-  }
 
-  object instances {
+  object instances
     def functor[C] = Functor[Const[C, ?]]
     def traverse[C] = Traverse[Const[C, ?]]
     def functorMax[C : Monoid] = Functor[Const[C, ?]]
@@ -30,5 +28,3 @@ object ConstTest extends SpecLite {
     def equal[C : Equal, A] = Equal[Const[C, A]]
     def equalMax[C : Order, A] = Equal[Const[C, A]]
     def order[C : Order, A] = Order[Const[C, A]]
-  }
-}

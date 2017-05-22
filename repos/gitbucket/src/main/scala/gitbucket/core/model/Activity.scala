@@ -1,13 +1,13 @@
 package gitbucket.core.model
 
-trait ActivityComponent extends TemplateComponent { self: Profile =>
+trait ActivityComponent extends TemplateComponent  self: Profile =>
   import profile.simple._
   import self._
 
   lazy val Activities = TableQuery[Activities]
 
   class Activities(tag: Tag)
-      extends Table[Activity](tag, "ACTIVITY") with BasicTemplate {
+      extends Table[Activity](tag, "ACTIVITY") with BasicTemplate
     val activityId = column[Int]("ACTIVITY_ID", O AutoInc)
     val activityUserName = column[String]("ACTIVITY_USER_NAME")
     val activityType = column[String]("ACTIVITY_TYPE")
@@ -23,8 +23,6 @@ trait ActivityComponent extends TemplateComponent { self: Profile =>
        additionalInfo.?,
        activityDate,
        activityId) <> (Activity.tupled, Activity.unapply)
-  }
-}
 
 case class Activity(
     userName: String,

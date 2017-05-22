@@ -1,8 +1,7 @@
-object SCL6807 {
-  object literal extends scala.Dynamic {
+object SCL6807
+  object literal extends scala.Dynamic
     def applyDynamic(s: String)(r: String) = 1
     def applyDynamicNamed(s: String)(r: (String, Any)) = "2"
-  }
 
   val x = literal
 
@@ -14,5 +13,4 @@ object SCL6807 {
    x(""),
    this x (x = 2),
    x(x = 2)) /*end*/
-}
 //(String, Int, String, String, Int, String, String)

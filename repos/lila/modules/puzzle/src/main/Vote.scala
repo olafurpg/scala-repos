@@ -1,6 +1,6 @@
 package lila.puzzle
 
-case class Vote(up: Int, down: Int, sum: Int) {
+case class Vote(up: Int, down: Int, sum: Int)
 
   def add(v: Boolean) =
     copy(
@@ -21,13 +21,11 @@ case class Vote(up: Int, down: Int, sum: Int) {
   def percent = 50 + (sum.toDouble / count * 50).toInt
 
   def computeSum = copy(sum = up - down)
-}
 
-object Vote {
+object Vote
 
   val default = Vote(0, 0, 0)
   val disable = Vote(0, 9000, 0).computeSum
 
   import reactivemongo.bson.Macros
   implicit val voteBSONHandler = Macros.handler[Vote]
-}

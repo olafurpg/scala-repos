@@ -19,8 +19,8 @@ package org.apache.spark.util.collection
 
 import org.apache.spark.SparkFunSuite
 
-class CompactBufferSuite extends SparkFunSuite {
-  test("empty buffer") {
+class CompactBufferSuite extends SparkFunSuite
+  test("empty buffer")
     val b = new CompactBuffer[Int]
     assert(b.size === 0)
     assert(b.iterator.toList === Nil)
@@ -30,23 +30,20 @@ class CompactBufferSuite extends SparkFunSuite {
     intercept[IndexOutOfBoundsException] { b(1) }
     intercept[IndexOutOfBoundsException] { b(2) }
     intercept[IndexOutOfBoundsException] { b(-1) }
-  }
 
-  test("basic inserts") {
+  test("basic inserts")
     val b = new CompactBuffer[Int]
     assert(b.size === 0)
     assert(b.iterator.toList === Nil)
-    for (i <- 0 until 1000) {
+    for (i <- 0 until 1000)
       b += i
       assert(b.size === i + 1)
       assert(b(i) === i)
-    }
     assert(b.iterator.toList === (0 until 1000).toList)
     assert(b.iterator.toList === (0 until 1000).toList)
     assert(b.size === 1000)
-  }
 
-  test("adding sequences") {
+  test("adding sequences")
     val b = new CompactBuffer[Int]
     assert(b.size === 0)
     assert(b.iterator.toList === Nil)
@@ -94,18 +91,14 @@ class CompactBufferSuite extends SparkFunSuite {
     assert(
         b.iterator.toList === (1 to 4).flatMap(i => 0 until 10).toList ++ List(
             0, 0, 1, 0, 1, 2))
-  }
 
-  test("adding the same buffer to itself") {
+  test("adding the same buffer to itself")
     val b = new CompactBuffer[Int]
     assert(b.size === 0)
     assert(b.iterator.toList === Nil)
     b += 1
     assert(b.toList === List(1))
-    for (j <- 1 until 8) {
+    for (j <- 1 until 8)
       b ++= b
       assert(b.size === (1 << j))
       assert(b.iterator.toList === (1 to (1 << j)).map(i => 1).toList)
-    }
-  }
-}

@@ -6,29 +6,27 @@ import org.scalatra.BasicAuthExample.AuthenticationSupport
 import org.scalatra.auth.strategy.{BasicAuthStrategy, BasicAuthSupport}
 import org.scalatra.auth.{ScentryConfig, ScentrySupport}
 
-object BasicAuthExample {
+object BasicAuthExample
 
   case class MyUser(id: String)
 
   class OurBasicAuthStrategy(
       protected override val app: ScalatraBase, realm: String)
-      extends BasicAuthStrategy[MyUser](app, realm) {
+      extends BasicAuthStrategy[MyUser](app, realm)
 
     protected def validate(userName: String, password: String)(
         implicit request: HttpServletRequest,
-        response: HttpServletResponse): Option[MyUser] = {
+        response: HttpServletResponse): Option[MyUser] =
       if (userName == "scalatra" && password == "scalatra")
         Some(MyUser("scalatra"))
       else None
-    }
 
     protected def getUserId(user: MyUser)(
         implicit request: HttpServletRequest,
         response: HttpServletResponse): String = user.id
-  }
 
   trait AuthenticationSupport
-      extends ScentrySupport[MyUser] with BasicAuthSupport[MyUser] {
+      extends ScentrySupport[MyUser] with BasicAuthSupport[MyUser]
     self: ScalatraBase =>
 
     val realm = "Scalatra Basic Auth Example"
@@ -39,20 +37,15 @@ object BasicAuthExample {
     protected val scentryConfig =
       (new ScentryConfig {}).asInstanceOf[ScentryConfiguration]
 
-    override protected def configureScentry = {
-      scentry.unauthenticated {
+    override protected def configureScentry =
+      scentry.unauthenticated
         scentry.strategies("Basic").unauthenticated()
-      }
-    }
 
-    override protected def registerAuthStrategies = {
+    override protected def registerAuthStrategies =
       scentry.register("Basic", new OurBasicAuthStrategy(_, realm))
-    }
-  }
-}
 
-class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
-  get("/?") {
+class BasicAuthExample extends ScalatraServlet with AuthenticationSupport
+  get("/?")
     basicAuth
     val nodes = Seq(
         <h1>Hello from Scalatra</h1>,
@@ -61,9 +54,8 @@ class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
 
     Template.page(
         "Basic Auth Example", nodes, url(_, includeServletPath = false))
-  }
 
-  get("/linked") {
+  get("/linked")
     basicAuth
     val nodes = Seq(
         <h1>Hello from Scalatra</h1>,
@@ -72,5 +64,3 @@ class BasicAuthExample extends ScalatraServlet with AuthenticationSupport {
 
     Template.page(
         "Basic Auth Example", nodes, url(_, includeServletPath = false))
-  }
-}

@@ -1,5 +1,5 @@
-object Test {
-  def main(args: Array[String]): Unit = {
+object Test
+  def main(args: Array[String]): Unit =
     val a: Array[String] =
       "goobledy bing, goobledy bling, wikka wokka wup.".split("")
     val b = java.util.Arrays.asList(a: _*)
@@ -9,5 +9,3 @@ object Test {
     // they are pointing to the same array
     import scala.collection.JavaConversions._
     assert(a sameElements b)
-  }
-}

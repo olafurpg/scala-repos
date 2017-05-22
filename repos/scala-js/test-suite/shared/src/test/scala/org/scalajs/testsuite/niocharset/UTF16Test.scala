@@ -17,8 +17,8 @@ import org.junit.Test
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
 abstract class BaseUTF16Test(charset: Charset)
-    extends BaseCharsetTest(charset) {
-  @Test def decode(): Unit = {
+    extends BaseCharsetTest(charset)
+  @Test def decode(): Unit =
     // ASCII characters
     testDecode(bb"0042 006f 006e 006a 006f 0075 0072")(cb"Bonjour")
 
@@ -50,20 +50,18 @@ abstract class BaseUTF16Test(charset: Charset)
     testDecode(bb"dfff")(Malformed(2))
 
     // High UTF-16 surrogates not followed by low surrogates
-    if (!executingInJVM) {
+    if (!executingInJVM)
       testDecode(bb"d800 0041")(Malformed(2), cb"A")
       testDecode(bb"d800 d800")(Malformed(2), Malformed(2))
       testDecode(bb"d800 d835 dcd7")(Malformed(2), cb"\ud835\udcd7")
       testDecode(bb"dbff 0041")(Malformed(2), cb"A")
       testDecode(bb"dbff db8f")(Malformed(2), Malformed(2))
       testDecode(bb"dbff d835 dcd7")(Malformed(2), cb"\ud835\udcd7")
-    }
 
     // Lonely byte at the end
     testDecode(bb"0041 41")(cb"A", Malformed(1))
-  }
 
-  @Test def encode(): Unit = {
+  @Test def encode(): Unit =
     // ASCII characters
     testEncode(cb"Bonjour")(bb"0042 006f 006e 006a 006f 0075 0072")
 
@@ -102,51 +100,43 @@ abstract class BaseUTF16Test(charset: Charset)
     testEncode(cb"\udbffA")(Malformed(1), bb"0041")
     testEncode(cb"\udbff\udb8f")(Malformed(1), Malformed(1))
     testEncode(cb"\udbff\ud835\udcd7")(Malformed(1), bb"d835 dcd7")
-  }
-}
 
 class UTF16BETest extends BaseUTF16Test(Charset.forName("UTF-16BE"))
 
-class UTF16LETest extends BaseUTF16Test(Charset.forName("UTF-16LE")) {
+class UTF16LETest extends BaseUTF16Test(Charset.forName("UTF-16LE"))
   import UTF16LETest._
 
   override protected def testDecode(in: ByteBuffer)(
-      outParts: OutPart[CharBuffer]*): Unit = {
+      outParts: OutPart[CharBuffer]*): Unit =
     flipByteBuffer(in)
     super.testDecode(in)(outParts: _*)
-  }
 
   override protected def testEncode(in: CharBuffer)(
-      outParts: OutPart[ByteBuffer]*): Unit = {
+      outParts: OutPart[ByteBuffer]*): Unit =
     for (BufferPart(buf) <- outParts) flipByteBuffer(buf)
     super.testEncode(in)(outParts: _*)
-  }
-}
 
-object UTF16LETest {
+object UTF16LETest
 
   /** Flips all pairs of bytes in a byte buffer, except a potential lonely
     *  last byte.
     */
-  def flipByteBuffer(buf: ByteBuffer): Unit = {
+  def flipByteBuffer(buf: ByteBuffer): Unit =
     buf.mark()
-    while (buf.remaining() >= 2) {
+    while (buf.remaining() >= 2)
       val high = buf.get()
       val low = buf.get()
       buf.position(buf.position - 2)
       buf.put(low)
       buf.put(high)
-    }
     buf.reset()
-  }
-}
 
-class UTF16Test extends BaseUTF16Test(Charset.forName("UTF-16")) {
+class UTF16Test extends BaseUTF16Test(Charset.forName("UTF-16"))
   def BigEndianBOM: ByteBuffer =
     ByteBuffer.wrap(Array(0xfe.toByte, 0xff.toByte))
 
   override protected def testDecode(in: ByteBuffer)(
-      outParts: OutPart[CharBuffer]*): Unit = {
+      outParts: OutPart[CharBuffer]*): Unit =
     // Without BOM, big endian is assumed
     super.testDecode(in)(outParts: _*)
 
@@ -158,11 +148,8 @@ class UTF16Test extends BaseUTF16Test(Charset.forName("UTF-16")) {
     // With BOM, little endian
     UTF16LETest.flipByteBuffer(inWithBOM)
     super.testDecode(inWithBOM)(outParts: _*)
-  }
 
   override protected def testEncode(in: CharBuffer)(
-      outParts: OutPart[ByteBuffer]*): Unit = {
+      outParts: OutPart[ByteBuffer]*): Unit =
     if (in.remaining == 0) super.testEncode(in)(outParts: _*)
     else super.testEncode(in)(BufferPart(BigEndianBOM) +: outParts: _*)
-  }
-}

@@ -25,7 +25,7 @@ import akka.http.scaladsl.model.ws.{BinaryMessage, TextMessage, Message}
   *
   * Requesting elements is handled automatically.
   */
-trait WSProbe {
+trait WSProbe
   def flow: Flow[Message, Message, NotUsed]
 
   /**
@@ -93,9 +93,8 @@ trait WSProbe {
     * on WSProbe don't allow fine enough control over the message flow.
     */
   def outProbe: TestPublisher.Probe[Message]
-}
 
-object WSProbe {
+object WSProbe
 
   /**
     * Creates a WSProbe to use in tests against websocket handlers.
@@ -105,7 +104,7 @@ object WSProbe {
     */
   def apply(maxChunks: Int = 1000, maxChunkCollectionMills: Long = 5000)(
       implicit system: ActorSystem, materializer: Materializer): WSProbe =
-    new WSProbe {
+    new WSProbe
       val subscriber = TestSubscriber.probe[Message]()
       val publisher = TestPublisher.probe[Message]()
 
@@ -120,7 +119,7 @@ object WSProbe {
       def sendCompletion(): Unit = publisher.sendComplete()
 
       def expectMessage(): Message = subscriber.requestNext()
-      def expectMessage(text: String): Unit = expectMessage() match {
+      def expectMessage(text: String): Unit = expectMessage() match
         case t: TextMessage ⇒
           val collectedMessage = collect(t.textStream)(_ + _)
           assert(
@@ -129,8 +128,7 @@ object WSProbe {
         case _ ⇒
           throw new AssertionError(
               s"""Expected TextMessage("$text") but got BinaryMessage""")
-      }
-      def expectMessage(bytes: ByteString): Unit = expectMessage() match {
+      def expectMessage(bytes: ByteString): Unit = expectMessage() match
         case t: BinaryMessage ⇒
           val collectedMessage = collect(t.dataStream)(_ ++ _)
           assert(
@@ -139,7 +137,6 @@ object WSProbe {
         case _ ⇒
           throw new AssertionError(
               s"""Expected BinaryMessage("$bytes") but got TextMessage""")
-      }
 
       def expectNoMessage(): Unit = subscriber.expectNoMsg()
       def expectNoMessage(max: FiniteDuration): Unit =
@@ -156,5 +153,3 @@ object WSProbe {
           .runWith(Sink.head)
           .awaitResult(maxChunkCollectionMills.millis)
           .reduce(reduce)
-    }
-}

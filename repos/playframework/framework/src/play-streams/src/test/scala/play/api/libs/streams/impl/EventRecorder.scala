@@ -14,7 +14,7 @@ import scala.concurrent.duration.{FiniteDuration, SECONDS, MILLISECONDS}
   */
 class EventRecorder(nextTimeout: FiniteDuration = FiniteDuration(20, SECONDS),
                     isEmptyDelay: FiniteDuration = FiniteDuration(
-                          200, MILLISECONDS)) {
+                          200, MILLISECONDS))
 
   private val events = new LinkedBlockingQueue[AnyRef]
 
@@ -22,13 +22,10 @@ class EventRecorder(nextTimeout: FiniteDuration = FiniteDuration(20, SECONDS),
   def record(e: AnyRef) = events.add(e)
 
   /** Pull the next event, waiting up to `nextTimeout`. */
-  def next(): AnyRef = {
+  def next(): AnyRef =
     events.poll(nextTimeout.length, nextTimeout.unit)
-  }
 
   /** Wait for `isEmptyDelay` then check if the event queue is empty. */
-  def isEmptyAfterDelay(waitMillis: Long = 50): Boolean = {
+  def isEmptyAfterDelay(waitMillis: Long = 50): Boolean =
     Thread.sleep(isEmptyDelay.toMillis)
     events.isEmpty
-  }
-}

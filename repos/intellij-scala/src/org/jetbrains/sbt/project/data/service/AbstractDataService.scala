@@ -23,7 +23,7 @@ import scala.collection.JavaConversions._
   * @author Pavel Fatin
   */
 abstract class AbstractDataService[E, I](key: Key[E])
-    extends AbstractProjectDataService[E, I] {
+    extends AbstractProjectDataService[E, I]
 
   def createImporter(toImport: Seq[DataNode[E]],
                      projectData: ProjectData,
@@ -39,7 +39,6 @@ abstract class AbstractDataService[E, I](key: Key[E])
       modelsProvider: IdeModifiableModelsProvider): Unit =
     createImporter(toImport.toSeq, projectData, project, modelsProvider)
       .importData()
-}
 
 /**
   * The purposes of this trait are the following:
@@ -49,7 +48,7 @@ abstract class AbstractDataService[E, I](key: Key[E])
   *      dragging them into each and every method of ProjectDataService
   *    - Abstract from External System's API which is rather unstable
   */
-trait Importer[E] {
+trait Importer[E]
   val dataToImport: Seq[DataNode[E]]
   val projectData: ProjectData
   val project: Project
@@ -87,17 +86,17 @@ trait Importer[E] {
   // Utility methods
 
   def getIdeModuleByNode(node: DataNode[_]): Option[Module] =
-    for {
+    for
       moduleData <- Option(node.getData(ProjectKeys.MODULE))
       module <- findIdeModule(moduleData)
-    } yield module
+    yield module
 
   def getScalaLibraries: Set[Library] =
     modelsProvider.getAllLibraries
       .filter(l => Option(l.getName).exists(_.contains(ScalaLibraryName)))
       .toSet
 
-  def getScalaLibraries(module: Module): Set[Library] = {
+  def getScalaLibraries(module: Module): Set[Library] =
     val collector = new CollectProcessor[Library]()
     getModifiableRootModel(module)
       .orderEntries()
@@ -105,17 +104,16 @@ trait Importer[E] {
       .forEachLibrary(collector)
     collector.getResults.toSet
       .filter(l => Option(l.getName).exists(_.contains(ScalaLibraryName)))
-  }
 
   def executeProjectChangeAction(action: => Unit): Unit =
     ExternalSystemApiUtil.executeProjectChangeAction(
-        new DisposeAwareProjectChange(project) {
+        new DisposeAwareProjectChange(project)
       override def execute(): Unit = action
-    })
+    )
 
   def convertToScalaSdk(library: Library,
                         languageLevel: ScalaLanguageLevel,
-                        compilerClasspath: Seq[File]): ScalaSdk = {
+                        compilerClasspath: Seq[File]): ScalaSdk =
     val properties = new ScalaLibraryProperties()
     properties.languageLevel = languageLevel
     properties.compilerClasspath = compilerClasspath
@@ -125,8 +123,6 @@ trait Importer[E] {
     model.setProperties(properties)
 
     new ScalaSdk(library)
-  }
-}
 
 abstract class AbstractImporter[E](
     val dataToImport: Seq[DataNode[E]],

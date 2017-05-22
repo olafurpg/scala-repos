@@ -5,12 +5,11 @@ package std
 import scalaz.std.{option => o}
 import scalaz.Tags.{Last, First}
 
-final class OptionOps[A](self: Option[A]) {
+final class OptionOps[A](self: Option[A])
   final def cata[X](some: A => X, none: => X): X = o.cata(self)(some, none)
 
-  final class Fold[X](s: A => X) {
+  final class Fold[X](s: A => X)
     def none(n: => X): X = cata(s, n)
-  }
 
   /**
     * Returns the provided function `s` applied to item contained in the Option if it is defined,
@@ -25,12 +24,10 @@ final class OptionOps[A](self: Option[A]) {
     */
   final def some[X](s: A => X): Fold[X] = new Fold(s)
 
-  final class Conditional[X](s: => X) {
-    def |(n: => X): X = self match {
+  final class Conditional[X](s: => X)
+    def |(n: => X): X = self match
       case None => n
       case Some(_) => s
-    }
-  }
 
   /**
     * Ternary operator. Note that the arguments s and n are call-by-name.
@@ -102,9 +99,7 @@ final class OptionOps[A](self: Option[A]) {
     o.foldLiftOpt[A, B](self)(b, k)
 
   final def toMaybe: Maybe[A] = o.toMaybe(self)
-}
 
-trait ToOptionOps {
+trait ToOptionOps
   implicit def ToOptionOpsFromOption[A](a: Option[A]): OptionOps[A] =
     new OptionOps(a)
-}

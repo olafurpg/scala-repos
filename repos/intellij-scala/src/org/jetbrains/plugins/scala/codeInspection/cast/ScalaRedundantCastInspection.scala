@@ -14,19 +14,19 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypingContext
   * Pavel Fatin
   */
 class ScalaRedundantCastInspection
-    extends AbstractInspection("Redundant cast") {
-  def actionFor(holder: ProblemsHolder) = {
+    extends AbstractInspection("Redundant cast")
+  def actionFor(holder: ProblemsHolder) =
     case call: ScGenericCall =>
-      call.referencedExpr.children.toList match {
+      call.referencedExpr.children.toList match
         case List(left: ScExpression,
                   ElementText("."),
                   ElementText("asInstanceOf")) =>
           for (actualType <- left.getType(TypingContext.empty).toOption;
           typeArgument <- call.arguments.headOption;
           castType <- typeArgument.getType(TypingContext.empty)
-                         if actualType.equiv(castType)) {
+                         if actualType.equiv(castType))
 
-            val descriptor = {
+            val descriptor =
               val range = new TextRange(left.getTextLength, call.getTextLength)
 
               val message = "Casting '%s' to '%s' is redundant".format(
@@ -42,20 +42,13 @@ class ScalaRedundantCastInspection
                   range,
                   null,
                   false)
-            }
 
             holder.registerProblem(descriptor)
-          }
         case _ =>
-      }
-  }
 
   class RemoveCastQuickFix(c: ScGenericCall, e: ScExpression)
-      extends AbstractFixOnTwoPsiElements("Remove Redundant Cast", c, e) {
-    def doApplyFix(project: Project) {
+      extends AbstractFixOnTwoPsiElements("Remove Redundant Cast", c, e)
+    def doApplyFix(project: Project)
       val (call, expr) = (getFirstElement, getSecondElement)
       call.getParent.addBefore(expr, call)
       call.delete()
-    }
-  }
-}

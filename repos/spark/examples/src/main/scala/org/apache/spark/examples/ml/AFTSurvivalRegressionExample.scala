@@ -28,9 +28,9 @@ import org.apache.spark.sql.SQLContext
 /**
   * An example for AFTSurvivalRegression.
   */
-object AFTSurvivalRegressionExample {
+object AFTSurvivalRegressionExample
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("AFTSurvivalRegressionExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -61,6 +61,4 @@ object AFTSurvivalRegressionExample {
     // $example off$
 
     sc.stop()
-  }
-}
 // scalastyle:on println

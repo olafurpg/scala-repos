@@ -1,11 +1,9 @@
-class OneInput {
-  def foo {
+class OneInput
+  def foo
     val i = 34
     /*start*/
     i * i
     /*end*/
-  }
-}
 /*
 class OneInput {
   def foo {

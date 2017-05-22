@@ -11,20 +11,18 @@ import akka.actor.SupervisorStrategy
 import akka.japi.Util.immutableSeq
 import akka.actor.ActorSystem
 
-object RandomRoutingLogic {
+object RandomRoutingLogic
   def apply(): RandomRoutingLogic = new RandomRoutingLogic
-}
 
 /**
   * Randomly selects one of the target routees to send a message to
   */
 @SerialVersionUID(1L)
-final class RandomRoutingLogic extends RoutingLogic {
+final class RandomRoutingLogic extends RoutingLogic
   override def select(
       message: Any, routees: immutable.IndexedSeq[Routee]): Routee =
     if (routees.isEmpty) NoRoutee
     else routees(ThreadLocalRandom.current.nextInt(routees.size))
-}
 
 /**
   * A router pool that randomly selects one of the target routees to send a message to.
@@ -63,7 +61,7 @@ final case class RandomPool(
     override val supervisorStrategy: SupervisorStrategy = Pool.defaultSupervisorStrategy,
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId,
     override val usePoolDispatcher: Boolean = false)
-    extends Pool with PoolOverrideUnsetConfig[RandomPool] {
+    extends Pool with PoolOverrideUnsetConfig[RandomPool]
 
   def this(config: Config) =
     this(nrOfInstances = config.getInt("nr-of-instances"),
@@ -106,7 +104,6 @@ final case class RandomPool(
     */
   override def withFallback(other: RouterConfig): RouterConfig =
     this.overrideUnsetConfig(other)
-}
 
 /**
   * A router group that randomly selects one of the target routees to send a message to.
@@ -125,7 +122,7 @@ final case class RandomPool(
 final case class RandomGroup(
     override val paths: immutable.Iterable[String],
     override val routerDispatcher: String = Dispatchers.DefaultDispatcherId)
-    extends Group {
+    extends Group
 
   def this(config: Config) =
     this(paths = immutableSeq(config.getStringList("routees.paths")))
@@ -150,4 +147,3 @@ final case class RandomGroup(
     */
   def withDispatcher(dispatcherId: String): RandomGroup =
     copy(routerDispatcher = dispatcherId)
-}

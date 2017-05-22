@@ -20,64 +20,56 @@ package org.apache.spark.ml.feature
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types._
 
-class RFormulaParserSuite extends SparkFunSuite {
+class RFormulaParserSuite extends SparkFunSuite
   private def checkParse(formula: String,
                          label: String,
                          terms: Seq[String],
-                         schema: StructType = new StructType) {
+                         schema: StructType = new StructType)
     val resolved = RFormulaParser.parse(formula).resolve(schema)
     assert(resolved.label == label)
-    val simpleTerms = terms.map { t =>
-      if (t.contains(":")) {
+    val simpleTerms = terms.map  t =>
+      if (t.contains(":"))
         t.split(":").toSeq
-      } else {
+      else
         Seq(t)
-      }
-    }
     assert(resolved.terms == simpleTerms)
-  }
 
-  test("parse simple formulas") {
+  test("parse simple formulas")
     checkParse("y ~ x", "y", Seq("x"))
     checkParse("y ~ x + x", "y", Seq("x"))
     checkParse("y~x+z", "y", Seq("x", "z"))
     checkParse("y ~   ._fo..o  ", "y", Seq("._fo..o"))
     checkParse("resp ~ A_VAR + B + c123", "resp", Seq("A_VAR", "B", "c123"))
-  }
 
-  test("parse dot") {
+  test("parse dot")
     val schema = (new StructType)
       .add("a", "int", true)
       .add("b", "long", false)
       .add("c", "string", true)
     checkParse("a ~ .", "a", Seq("b", "c"), schema)
-  }
 
-  test("parse deletion") {
+  test("parse deletion")
     val schema = (new StructType)
       .add("a", "int", true)
       .add("b", "long", false)
       .add("c", "string", true)
     checkParse("a ~ c - b", "a", Seq("c"), schema)
-  }
 
-  test("parse additions and deletions in order") {
+  test("parse additions and deletions in order")
     val schema = (new StructType)
       .add("a", "int", true)
       .add("b", "long", false)
       .add("c", "string", true)
     checkParse("a ~ . - b + . - c", "a", Seq("b"), schema)
-  }
 
-  test("dot ignores complex column types") {
+  test("dot ignores complex column types")
     val schema = (new StructType)
       .add("a", "int", true)
       .add("b", "tinyint", false)
       .add("c", "map<string, string>", true)
     checkParse("a ~ .", "a", Seq("b"), schema)
-  }
 
-  test("parse intercept") {
+  test("parse intercept")
     assert(RFormulaParser.parse("a ~ b").hasIntercept)
     assert(RFormulaParser.parse("a ~ b + 1").hasIntercept)
     assert(RFormulaParser.parse("a ~ b - 0").hasIntercept)
@@ -85,9 +77,8 @@ class RFormulaParserSuite extends SparkFunSuite {
     assert(!RFormulaParser.parse("a ~ b + 0").hasIntercept)
     assert(!RFormulaParser.parse("a ~ b - 1").hasIntercept)
     assert(!RFormulaParser.parse("a ~ b + 1 - 1").hasIntercept)
-  }
 
-  test("parse interactions") {
+  test("parse interactions")
     checkParse("y ~ a:b", "y", Seq("a:b"))
     checkParse("y ~ ._a:._x", "y", Seq("._a:._x"))
     checkParse("y ~ foo:bar", "y", Seq("foo:bar"))
@@ -95,9 +86,8 @@ class RFormulaParserSuite extends SparkFunSuite {
     checkParse("y ~ q + a:b:c + b:c + c:d + z",
                "y",
                Seq("q", "a:b:c", "b:c", "c:d", "z"))
-  }
 
-  test("parse basic interactions with dot") {
+  test("parse basic interactions with dot")
     val schema = (new StructType)
       .add("a", "int", true)
       .add("b", "long", false)
@@ -106,10 +96,9 @@ class RFormulaParserSuite extends SparkFunSuite {
     checkParse("a ~ .:b", "a", Seq("b", "c:b", "d:b"), schema)
     checkParse("a ~ b:.", "a", Seq("b", "b:c", "b:d"), schema)
     checkParse("a ~ .:b:.:.:c:d:.", "a", Seq("b:c:d"), schema)
-  }
 
   // Test data generated in R with terms.formula(y ~ .:., data = iris)
-  test("parse all to all iris interactions") {
+  test("parse all to all iris interactions")
     val schema = (new StructType)
       .add("Sepal.Length", "double", true)
       .add("Sepal.Width", "double", true)
@@ -134,10 +123,9 @@ class RFormulaParserSuite extends SparkFunSuite {
                    "Petal.Length:Species",
                    "Petal.Width:Species"),
                schema)
-  }
 
   // Test data generated in R with terms.formula(y ~ .:. - Species:., data = iris)
-  test("parse interaction negation with iris") {
+  test("parse interaction negation with iris")
     val schema = (new StructType)
       .add("Sepal.Length", "double", true)
       .add("Sepal.Width", "double", true)
@@ -158,5 +146,3 @@ class RFormulaParserSuite extends SparkFunSuite {
                    "Sepal.Width:Petal.Width",
                    "Petal.Length:Petal.Width"),
                schema)
-  }
-}

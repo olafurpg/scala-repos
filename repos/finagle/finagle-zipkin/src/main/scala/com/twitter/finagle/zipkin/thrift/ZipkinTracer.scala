@@ -8,7 +8,7 @@ import com.twitter.io.Buf
 import com.twitter.util.events.{Event, Sink}
 import com.twitter.util.{Time, Throw, Try}
 
-private object Json {
+private object Json
   import com.fasterxml.jackson.annotation.{JsonTypeInfo, JsonInclude}
   import com.fasterxml.jackson.core.`type`.TypeReference
   import com.fasterxml.jackson.databind.{ObjectMapper, JavaType, JsonNode}
@@ -41,11 +41,10 @@ private object Json {
   // Configures the mapper to include class information for Annotation.
   object TypeResolverBuilder
       extends ObjectMapper.DefaultTypeResolverBuilder(
-          ObjectMapper.DefaultTyping.NON_FINAL) {
+          ObjectMapper.DefaultTyping.NON_FINAL)
     override def useForType(typ: JavaType) =
       // Note: getRawClass would be an Object if not for `Envelope`.
       typ.getRawClass == classOf[Annotation]
-  }
 
   mapper.setDefaultTyping(TypeResolverBuilder
         .init(JsonTypeInfo.Id.CLASS, null)
@@ -59,34 +58,31 @@ private object Json {
   def deserialize[T : Manifest](node: JsonNode): T =
     mapper.readValue(node.traverse, typeReference[T])
 
-  private[this] def typeReference[T : Manifest] = new TypeReference[T] {
+  private[this] def typeReference[T : Manifest] = new TypeReference[T]
     override def getType = typeFromManifest(manifest[T])
-  }
 
   private[this] def typeFromManifest(m: Manifest[_]): Type =
     if (m.typeArguments.isEmpty) m.runtimeClass
     else
-      new ParameterizedType {
+      new ParameterizedType
         def getRawType = m.runtimeClass
         def getActualTypeArguments =
           m.typeArguments.map(typeFromManifest).toArray
         def getOwnerType = null
-      }
-}
 
-object ZipkinTracer {
+object ZipkinTracer
 
   lazy val default: Tracer = mk()
 
   /**
     * The [[com.twitter.util.events.Event.Type Event.Type]] for trace events.
     */
-  val Trace: Event.Type = {
+  val Trace: Event.Type =
 
-    new Event.Type {
+    new Event.Type
       val id = "Trace"
 
-      def serialize(event: Event) = event match {
+      def serialize(event: Event) = event match
         case Event(etype, _, _, _: Annotation.BinaryAnnotation, _, _, _)
             if etype eq this =>
           Throw(
@@ -101,16 +97,15 @@ object ZipkinTracer {
 
         case _ =>
           Throw(new IllegalArgumentException("unknown format: " + event))
-      }
 
       def deserialize(buf: Buf) =
-        for {
-          env <- Buf.Utf8.unapply(buf) match {
+        for
+          env <- Buf.Utf8.unapply(buf) match
                   case None =>
                     Throw(new IllegalArgumentException("unknown format"))
                   case Some(str) => Try(Json.deserialize[Json.Envelope](str))
-                } if env.id == id
-        } yield {
+                if env.id == id
+        yield
           val when = Time.fromMilliseconds(env.when)
           // This line fails without the JsonDeserialize annotation in Envelope.
           val tid = env.traceId.getOrElse(Event.NoTraceId)
@@ -120,9 +115,6 @@ object ZipkinTracer {
                 objectVal = env.data,
                 traceIdVal = tid,
                 spanIdVal = sid)
-        }
-    }
-  }
 
   /**
     * @param scribeHost Host to send trace data to
@@ -170,7 +162,6 @@ object ZipkinTracer {
        Host().getPort,
        statsReceiver,
        Sampler.DefaultSampleRate)
-}
 
 /**
   * Tracer that supports sampling. Will pass through a subset of the records.
@@ -181,7 +172,7 @@ object ZipkinTracer {
   */
 class SamplingTracer(
     underlyingTracer: Tracer, initialSampleRate: Float, sink: Sink)
-    extends Tracer {
+    extends Tracer
 
   /**
     * Tracer that supports sampling. Will pass through a subset of the records.
@@ -211,23 +202,18 @@ class SamplingTracer(
     sampler.setSampleRate(sampleRate)
   def getSampleRate: Float = sampler.sampleRate
 
-  def record(record: Record) {
-    if (sampler.sampleRecord(record)) {
+  def record(record: Record)
+    if (sampler.sampleRecord(record))
       underlyingTracer.record(record)
-      if (sink.recording) {
-        if (Trace.hasId) {
+      if (sink.recording)
+        if (Trace.hasId)
           val traceId = Trace.id
           sink.event(ZipkinTracer.Trace,
                      objectVal = record.annotation,
                      traceIdVal = traceId.traceId.self,
                      spanIdVal = traceId.spanId.self)
-        } else {
+        else
           sink.event(ZipkinTracer.Trace, objectVal = record.annotation)
-        }
-      }
-    }
-  }
-}
 
 class ZipkinTracer(tracer: RawZipkinTracer, initialRate: Float)
     extends SamplingTracer(tracer, initialRate)

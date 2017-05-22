@@ -5,7 +5,7 @@ import scala.tools.partest.ScaladocModelTest
 import java.net.{URI, URL}
 import java.io.File
 
-object Test extends ScaladocModelTest {
+object Test extends ScaladocModelTest
 
   override def code =
     """
@@ -32,7 +32,7 @@ object Test extends ScaladocModelTest {
 
   def scalaURL = "http://bog.us"
 
-  override def scaladocSettings = {
+  override def scaladocSettings =
     val scalaLibUri = getClass.getClassLoader
       .getResource("scala/Function1.class")
       .getPath
@@ -40,20 +40,17 @@ object Test extends ScaladocModelTest {
     val scalaLibPath = new URI(scalaLibUri).getPath
     val externalArg = s"$scalaLibPath#$scalaURL"
     "-no-link-warnings -doc-external-doc " + externalArg
-  }
 
-  def testModel(rootPackage: Package) {
+  def testModel(rootPackage: Package)
     import access._
     val test = rootPackage._object("Test")
 
-    def check(memberDef: Def, expected: Int) {
+    def check(memberDef: Def, expected: Int)
       val externals =
-        memberDef.valueParams(0)(0).resultType.refEntity collect {
+        memberDef.valueParams(0)(0).resultType.refEntity collect
           case (_, (LinkToExternal(name, url), _)) =>
             assert(url.contains(scalaURL)); name
-        }
       assert(externals.size == expected)
-    }
 
     check(test._method("foo"), 1)
     check(test._method("bar"), 0)
@@ -73,13 +70,10 @@ object Test extends ScaladocModelTest {
       )
       .map(scalaURL + "/index.html#" + _)
 
-    def isExpectedExternalLink(l: EntityLink) = l.link match {
+    def isExpectedExternalLink(l: EntityLink) = l.link match
       case LinkToExternal(name, url) =>
         assert(expectedUrls contains url, url); true
       case _ => false
-    }
 
     assert(countLinks(test.comment.get, isExpectedExternalLink) == 8,
            countLinks(test.comment.get, isExpectedExternalLink) + " == 8")
-  }
-}

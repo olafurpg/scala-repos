@@ -12,7 +12,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.result.TypeResult
   * @author Alexander Podkhalyuzin
   * Date: 22.02.2008
   */
-trait ScSelfInvocation extends ScalaPsiElement {
+trait ScSelfInvocation extends ScalaPsiElement
   def args: Option[ScArgumentExprList] = findChild(classOf[ScArgumentExprList])
 
   def arguments: Seq[ScArgumentExprList] =
@@ -27,4 +27,3 @@ trait ScSelfInvocation extends ScalaPsiElement {
   def multiType(i: Int): Seq[TypeResult[ScType]]
 
   def thisElement: PsiElement = getFirstChild
-}

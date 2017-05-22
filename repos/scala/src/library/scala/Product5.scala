@@ -9,16 +9,15 @@
 
 package scala
 
-object Product5 {
+object Product5
   def unapply[T1, T2, T3, T4, T5](
       x: Product5[T1, T2, T3, T4, T5]): Option[Product5[T1, T2, T3, T4, T5]] =
     Some(x)
-}
 
 /** Product5 is a cartesian product of 5 components.
   *  @since 2.3
   */
-trait Product5[+T1, +T2, +T3, +T4, +T5] extends Any with Product {
+trait Product5[+T1, +T2, +T3, +T4, +T5] extends Any with Product
 
   /** The arity of this product.
     *  @return 5
@@ -33,14 +32,13 @@ trait Product5[+T1, +T2, +T3, +T4, +T5] extends Any with Product {
     *  @throws  IndexOutOfBoundsException
     */
   @throws(classOf[IndexOutOfBoundsException])
-  override def productElement(n: Int) = n match {
+  override def productElement(n: Int) = n match
     case 0 => _1
     case 1 => _2
     case 2 => _3
     case 3 => _4
     case 4 => _5
     case _ => throw new IndexOutOfBoundsException(n.toString())
-  }
 
   /** A projection of element 1 of this Product.
     *  @return   A projection of element 1.
@@ -66,4 +64,3 @@ trait Product5[+T1, +T2, +T3, +T4, +T5] extends Any with Product {
     *  @return   A projection of element 5.
     */
   def _5: T5
-}

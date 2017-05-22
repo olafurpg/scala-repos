@@ -9,13 +9,13 @@ import org.jetbrains.plugins.scala.codeInspection.ScalaLightInspectionFixtureTes
   * 9/27/13
   */
 class MatchToPartialFunctionInspectionTest
-    extends ScalaLightInspectionFixtureTestAdapter {
+    extends ScalaLightInspectionFixtureTestAdapter
   protected val classOfInspection: Class[_ <: LocalInspectionTool] =
     classOf[MatchToPartialFunctionInspection]
   protected val annotation: String =
     MatchToPartialFunctionInspection.inspectionName
 
-  def testInVal() = {
+  def testInVal() =
     val text = s"""val f: (Int) => Null = ${START}_ match $END{
                  |  case 0 => null
                  |  case _ => null
@@ -26,9 +26,8 @@ class MatchToPartialFunctionInspectionTest
                    |}"""
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testInArgumentInParentheses() = {
+  def testInArgumentInParentheses() =
     val text = s"""list.map(${START}x => x match $END{
       |  case Some(value) =>
       |  case None =>
@@ -40,9 +39,8 @@ class MatchToPartialFunctionInspectionTest
 
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testInArgumentInBraces() {
+  def testInArgumentInBraces()
     val text = s"""list.map {
       |  ${START}x => x match $END{
       |    case Some(value) =>
@@ -55,9 +53,8 @@ class MatchToPartialFunctionInspectionTest
       |}"""
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testWithPossibleImplicitConversion() {
+  def testWithPossibleImplicitConversion()
     val text = s"""
          |val list = List(Some(1))
          |list.map {
@@ -74,9 +71,8 @@ class MatchToPartialFunctionInspectionTest
         |}"""
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testInArgumentList() {
+  def testInArgumentList()
     val text = s"""def foo(f: Int => Any, i: Int)
       |foo(${START}x => x match $END{
       |  case 1 => null
@@ -89,9 +85,8 @@ class MatchToPartialFunctionInspectionTest
       |}, 2)"""
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testUseOfArgument() {
+  def testUseOfArgument()
     val text = s"""val f: (Int) => Null = ${START}x => x match $END{
       |  case 0 =>
       |    x + 1
@@ -110,9 +105,8 @@ class MatchToPartialFunctionInspectionTest
       |}"""
     checkTextHasError(text)
     testFix(text, result, annotation)
-  }
 
-  def testInOverloadedMethod(): Unit = {
+  def testInOverloadedMethod(): Unit =
     val text = s"""
          |object test {
          |  object Bar {
@@ -131,9 +125,8 @@ class MatchToPartialFunctionInspectionTest
          |}
          """.stripMargin
     checkTextHasNoErrors(text)
-  }
 
-  def testInOverloadedMethodInfix(): Unit = {
+  def testInOverloadedMethodInfix(): Unit =
     val text = s"""
        |object test {
        |  object Bar {
@@ -152,5 +145,3 @@ class MatchToPartialFunctionInspectionTest
        |}
      """.stripMargin
     checkTextHasNoErrors(text)
-  }
-}

@@ -7,6 +7,5 @@ package cats
   */
 trait MonadError[F[_], E] extends ApplicativeError[F, E] with Monad[F]
 
-object MonadError {
+object MonadError
   def apply[F[_], E](implicit F: MonadError[F, E]): MonadError[F, E] = F
-}

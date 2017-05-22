@@ -33,9 +33,9 @@ import org.apache.spark.sql.execution.datasources.parquet.test.avro._
 import org.apache.spark.sql.test.SharedSQLContext
 
 class ParquetAvroCompatibilitySuite
-    extends ParquetCompatibilityTest with SharedSQLContext {
+    extends ParquetCompatibilityTest with SharedSQLContext
   private def withWriter[T <: IndexedRecord](path: String, schema: Schema)(
-      f: AvroParquetWriter[T] => Unit): Unit = {
+      f: AvroParquetWriter[T] => Unit): Unit =
     logInfo(
         s"""Writing Avro records with the following Avro schema into Parquet file:
          |
@@ -44,15 +44,14 @@ class ParquetAvroCompatibilitySuite
 
     val writer = new AvroParquetWriter[T](new Path(path), schema)
     try f(writer) finally writer.close()
-  }
 
-  test("required primitives") {
-    withTempPath { dir =>
+  test("required primitives")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[AvroPrimitives](path, AvroPrimitives.getClassSchema) {
+      withWriter[AvroPrimitives](path, AvroPrimitives.getClassSchema)
         writer =>
-          (0 until 10).foreach { i =>
+          (0 until 10).foreach  i =>
             writer.write(
                 AvroPrimitives
                   .newBuilder()
@@ -65,12 +64,10 @@ class ParquetAvroCompatibilitySuite
                           s"val_$i".getBytes(StandardCharsets.UTF_8)))
                   .setStringColumn(s"val_$i")
                   .build())
-          }
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
         Row(i % 2 == 0,
             i,
             i.toLong * 10,
@@ -78,19 +75,17 @@ class ParquetAvroCompatibilitySuite
             i.toDouble + 0.2d,
             s"val_$i".getBytes(StandardCharsets.UTF_8),
             s"val_$i")
-      })
-    }
-  }
+      )
 
-  test("optional primitives") {
-    withTempPath { dir =>
+  test("optional primitives")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
       withWriter[AvroOptionalPrimitives](
-          path, AvroOptionalPrimitives.getClassSchema) { writer =>
-        (0 until 10).foreach { i =>
+          path, AvroOptionalPrimitives.getClassSchema)  writer =>
+        (0 until 10).foreach  i =>
           val record =
-            if (i % 3 == 0) {
+            if (i % 3 == 0)
               AvroOptionalPrimitives
                 .newBuilder()
                 .setMaybeBoolColumn(null)
@@ -101,7 +96,7 @@ class ParquetAvroCompatibilitySuite
                 .setMaybeBinaryColumn(null)
                 .setMaybeStringColumn(null)
                 .build()
-            } else {
+            else
               AvroOptionalPrimitives
                 .newBuilder()
                 .setMaybeBoolColumn(i % 2 == 0)
@@ -113,18 +108,15 @@ class ParquetAvroCompatibilitySuite
                         s"val_$i".getBytes(StandardCharsets.UTF_8)))
                 .setMaybeStringColumn(s"val_$i")
                 .build()
-            }
 
           writer.write(record)
-        }
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
-        if (i % 3 == 0) {
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
+        if (i % 3 == 0)
           Row.apply(Seq.fill(7)(null): _*)
-        } else {
+        else
           Row(i % 2 == 0,
               i,
               i.toLong * 10,
@@ -132,57 +124,47 @@ class ParquetAvroCompatibilitySuite
               i.toDouble + 0.2d,
               s"val_$i".getBytes(StandardCharsets.UTF_8),
               s"val_$i")
-        }
-      })
-    }
-  }
+      )
 
-  test("non-nullable arrays") {
-    withTempPath { dir =>
+  test("non-nullable arrays")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
       withWriter[AvroNonNullableArrays](path,
-                                        AvroNonNullableArrays.getClassSchema) {
+                                        AvroNonNullableArrays.getClassSchema)
         writer =>
-          (0 until 10).foreach { i =>
-            val record = {
+          (0 until 10).foreach  i =>
+            val record =
               val builder = AvroNonNullableArrays
                 .newBuilder()
                 .setStringsColumn(Seq.tabulate(3)(i => s"val_$i").asJava)
 
-              if (i % 3 == 0) {
+              if (i % 3 == 0)
                 builder.setMaybeIntsColumn(null).build()
-              } else {
+              else
                 builder
                   .setMaybeIntsColumn(Seq.tabulate(3)(Int.box).asJava)
                   .build()
-              }
-            }
 
             writer.write(record)
-          }
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
         Row(Seq.tabulate(3)(i => s"val_$i"),
             if (i % 3 == 0) null else Seq.tabulate(3)(identity))
-      })
-    }
-  }
+      )
 
-  ignore("nullable arrays (parquet-avro 1.7.0 does not properly support this)") {
+  ignore("nullable arrays (parquet-avro 1.7.0 does not properly support this)")
     // TODO Complete this test case after upgrading to parquet-mr 1.8+
-  }
 
-  test("SPARK-10136 array of primitive array") {
-    withTempPath { dir =>
+  test("SPARK-10136 array of primitive array")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[AvroArrayOfArray](path, AvroArrayOfArray.getClassSchema) {
+      withWriter[AvroArrayOfArray](path, AvroArrayOfArray.getClassSchema)
         writer =>
-          (0 until 10).foreach { i =>
+          (0 until 10).foreach  i =>
             writer.write(
                 AvroArrayOfArray
                   .newBuilder()
@@ -191,90 +173,73 @@ class ParquetAvroCompatibilitySuite
                         .map(_.asJava)
                         .asJava)
                   .build())
-          }
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
         Row(Seq.tabulate(3, 3)((i, j) => i * 3 + j))
-      })
-    }
-  }
+      )
 
-  test("map of primitive array") {
-    withTempPath { dir =>
+  test("map of primitive array")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[AvroMapOfArray](path, AvroMapOfArray.getClassSchema) {
+      withWriter[AvroMapOfArray](path, AvroMapOfArray.getClassSchema)
         writer =>
-          (0 until 10).foreach { i =>
+          (0 until 10).foreach  i =>
             writer.write(
                 AvroMapOfArray
                   .newBuilder()
                   .setStringToIntsColumn(Seq
-                        .tabulate(3) { i =>
+                        .tabulate(3)  i =>
                   i.toString -> Seq.tabulate(3)(j => i + j: Integer).asJava
-                }
                         .toMap
                         .asJava)
                   .build())
-          }
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
         Row(Seq
               .tabulate(3)(i => i.toString -> Seq.tabulate(3)(j => i + j))
               .toMap)
-      })
-    }
-  }
+      )
 
-  test("various complex types") {
-    withTempPath { dir =>
+  test("various complex types")
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[ParquetAvroCompat](path, ParquetAvroCompat.getClassSchema) {
+      withWriter[ParquetAvroCompat](path, ParquetAvroCompat.getClassSchema)
         writer =>
           (0 until 10).foreach(i => writer.write(makeParquetAvroCompat(i)))
-      }
 
       logParquetSchema(path)
 
-      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map { i =>
+      checkAnswer(sqlContext.read.parquet(path), (0 until 10).map  i =>
         Row(Seq.tabulate(3)(n => s"arr_${i + n}"),
             Seq.tabulate(3)(n => n.toString -> (i + n: Integer)).toMap,
             Seq
-              .tabulate(3) { n =>
-                (i + n).toString -> Seq.tabulate(3) { m =>
+              .tabulate(3)  n =>
+                (i + n).toString -> Seq.tabulate(3)  m =>
                   Row(Seq.tabulate(3)(j => i + j + m), s"val_${i + m}")
-                }
-              }
               .toMap)
-      })
-    }
-  }
+      )
 
-  def makeParquetAvroCompat(i: Int): ParquetAvroCompat = {
-    def makeComplexColumn(i: Int): JMap[String, JList[Nested]] = {
+  def makeParquetAvroCompat(i: Int): ParquetAvroCompat =
+    def makeComplexColumn(i: Int): JMap[String, JList[Nested]] =
       Seq
-        .tabulate(3) { n =>
+        .tabulate(3)  n =>
           (i + n).toString -> Seq
-            .tabulate(3) { m =>
+            .tabulate(3)  m =>
               Nested
                 .newBuilder()
                 .setNestedIntsColumn(
                     Seq.tabulate(3)(j => i + j + m: Integer).asJava)
                 .setNestedStringColumn(s"val_${i + m}")
                 .build()
-            }
             .asJava
-        }
         .toMap
         .asJava
-    }
 
     ParquetAvroCompat
       .newBuilder()
@@ -283,23 +248,17 @@ class ParquetAvroCompatibilitySuite
           Seq.tabulate(3)(n => n.toString -> (i + n: Integer)).toMap.asJava)
       .setComplexColumn(makeComplexColumn(i))
       .build()
-  }
 
-  test("SPARK-9407 Push down predicates involving Parquet ENUM columns") {
+  test("SPARK-9407 Push down predicates involving Parquet ENUM columns")
     import testImplicits._
 
-    withTempPath { dir =>
+    withTempPath  dir =>
       val path = dir.getCanonicalPath
 
-      withWriter[ParquetEnum](path, ParquetEnum.getClassSchema) { writer =>
-        (0 until 4).foreach { i =>
+      withWriter[ParquetEnum](path, ParquetEnum.getClassSchema)  writer =>
+        (0 until 4).foreach  i =>
           writer.write(
               ParquetEnum.newBuilder().setSuit(Suit.values.apply(i)).build())
-        }
-      }
 
       checkAnswer(sqlContext.read.parquet(path).filter('suit === "SPADES"),
                   Row("SPADES"))
-    }
-  }
-}

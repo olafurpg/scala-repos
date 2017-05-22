@@ -24,10 +24,10 @@ import CompileTimeLengthTypes._
 import java.nio.ByteBuffer
 import com.twitter.scalding.serialization.OrderedSerialization
 
-object ProductOrderedBuf {
+object ProductOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     import c.universe._
     val validTypes: List[Type] = List(
         typeOf[Product1[Any]],
@@ -220,34 +220,30 @@ object ProductOrderedBuf {
                          Any,
                          Any]])
 
-    def validType(curType: Type): Boolean = {
-      validTypes.find { t =>
+    def validType(curType: Type): Boolean =
+      validTypes.find  t =>
         curType <:< t
-      }.isDefined
-    }
+      .isDefined
 
     // The `_.get` is safe since it's always preceded by a matching
     // `_.isDefined` check in `validType`
     @SuppressWarnings(
         Array("org.brianmckenna.wartremover.warts.OptionPartial"))
-    def symbolFor(subType: Type): Type = {
-      val superType = validTypes.find { t =>
+    def symbolFor(subType: Type): Type =
+      val superType = validTypes.find  t =>
         subType.erasure <:< t
-      }.get
+      .get
       subType.baseType(superType.typeSymbol)
-    }
 
-    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    val pf: PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
       case tpe if validType(tpe.erasure) =>
         ProductOrderedBuf(c)(buildDispatcher, tpe, symbolFor(tpe))
-    }
     pf
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
       originalType: c.Type,
-      outerType: c.Type): TreeOrderedBuf[c.type] = {
+      outerType: c.Type): TreeOrderedBuf[c.type] =
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(id))
 
@@ -255,15 +251,14 @@ object ProductOrderedBuf {
     val elementData: List[(c.universe.Type, TermName, TreeOrderedBuf[c.type])] =
       outerType.declarations.collect { case m: MethodSymbol => m }
         .filter(m => m.name.toTermName.toString.startsWith("_"))
-        .map { accessorMethod =>
+        .map  accessorMethod =>
           val fieldType = accessorMethod.returnType.asSeenFrom(
               outerType, outerType.typeSymbol.asClass)
           val b: TreeOrderedBuf[c.type] = dispatcher(fieldType)
           (fieldType, accessorMethod.name.toTermName, b)
-        }
         .toList
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
@@ -276,9 +271,9 @@ object ProductOrderedBuf {
       override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         ProductLike.put(c)(inputStream, element)(elementData)
 
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
 
-        val getValProcessor = elementData.map {
+        val getValProcessor = elementData.map
           case (tpe, accessorSymbol, tBuf) =>
             val curR = freshT("curR")
             val builderTree = q"""
@@ -287,12 +282,10 @@ object ProductOrderedBuf {
           }
         """
             (builderTree, curR)
-        }
         q"""
        ..${getValProcessor.map(_._1)}
        new ${originalType}(..${getValProcessor.map(_._2)})
         """
-      }
       override def compare(
           elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
         ProductLike.compare(c)(elementA, elementB)(elementData)
@@ -302,6 +295,3 @@ object ProductOrderedBuf {
 
       override def length(element: Tree) =
         ProductLike.length(c)(element)(elementData)
-    }
-  }
-}

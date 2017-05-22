@@ -1,6 +1,6 @@
 trait Box[K[A[x]]]
 
-object Box {
+object Box
   // type constructor composition
   sealed trait ∙[A[_], B[_]] { type l[T] = A[B[T]] }
 
@@ -9,7 +9,7 @@ object Box {
 
   def split[K[A[x]], B[x]](base: Box[K]): SplitBox[K, B] = ???
 
-  class Composed[B[_], L[A[x]]] {
+  class Composed[B[_], L[A[x]]]
     val box: Box[L] = ???
 
     type Split[A[x]] = L[(A ∙ B)#l]
@@ -18,5 +18,3 @@ object Box {
     //Either of these work:
     val a1: Box[Split] = Box.split[L, B](box)
     val a2: Box[({ type l[A[x]] = L[(A ∙ B)#l] })#l] = Box.split(box)
-  }
-}

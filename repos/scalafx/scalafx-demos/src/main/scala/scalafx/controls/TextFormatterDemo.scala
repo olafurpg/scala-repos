@@ -42,40 +42,32 @@ import scalafx.util.converter.FormatStringConverter
 /**
   * Demonstrates a TextField control with a TextFormatter that formats the content.
   */
-object TextFormatterDemo extends JFXApp {
+object TextFormatterDemo extends JFXApp
 
-  val infoLabel = new Label {
+  val infoLabel = new Label
     text = "" +
     "Demonstrates a TextField control with a TextFormatter. Text is formatted as a currency. " +
     "Move slider or edit the text field content."
     wrapText = true
     prefHeight = Region.USE_COMPUTED_SIZE
-  }
 
   val slider = new Slider(0, 10000, 1000)
 
-  val textField = {
+  val textField =
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale.US)
     val converter = new FormatStringConverter[Number](currencyFormat)
-    new TextField {
-      textFormatter = new TextFormatter(converter) {
+    new TextField
+      textFormatter = new TextFormatter(converter)
         value <==> slider.value
-      }
       maxWidth = 140
       maxHeight = Region.USE_COMPUTED_SIZE
-    }
-  }
 
-  stage = new PrimaryStage {
-    scene = new Scene(300, 200) {
+  stage = new PrimaryStage
+    scene = new Scene(300, 200)
       title = "TextFormatter Demo"
-      root = new VBox {
+      root = new VBox
         children = Seq(infoLabel, textField, slider)
         padding = Insets(20)
         spacing = 12
-      }
-    }
-  }
 
   slider.requestFocus()
-}

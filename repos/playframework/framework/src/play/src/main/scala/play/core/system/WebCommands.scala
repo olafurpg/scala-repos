@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 /**
   * Handlers for web commands.
   */
-trait WebCommands {
+trait WebCommands
 
   /**
     * Add a handler to be called on ApplicationProvider.handleWebCommand.
@@ -24,24 +24,20 @@ trait WebCommands {
     */
   def handleWebCommand(
       request: RequestHeader, buildLink: BuildLink, path: File): Option[Result]
-}
 
 /**
   * Default implementation of web commands.
   */
 @Singleton
-class DefaultWebCommands extends WebCommands {
+class DefaultWebCommands extends WebCommands
   private[this] val handlers = ArrayBuffer.empty[HandleWebCommandSupport]
 
-  def addHandler(handler: HandleWebCommandSupport): Unit = synchronized {
+  def addHandler(handler: HandleWebCommandSupport): Unit = synchronized
     handlers += handler
-  }
 
   def handleWebCommand(request: RequestHeader,
                        buildLink: BuildLink,
-                       path: File): Option[Result] = synchronized {
-    (handlers.toStream flatMap {
+                       path: File): Option[Result] = synchronized
+    (handlers.toStream flatMap
           _.handleWebCommand(request, buildLink, path).toSeq
-        }).headOption
-  }
-}
+        ).headOption

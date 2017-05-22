@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicLong
   * @param classPath The compiler classpath where classfiles are searched and read from.
   */
 class ByteCodeRepository[BT <: BTypes](
-    val classPath: ClassFileLookup[AbstractFile], val btypes: BT) {
+    val classPath: ClassFileLookup[AbstractFile], val btypes: BT)
   import btypes._
 
   /**
@@ -51,64 +51,57 @@ class ByteCodeRepository[BT <: BTypes](
   private val targetSize = 500
 
   private object lruCounter
-      extends AtomicLong(0l) with collection.generic.Clearable {
+      extends AtomicLong(0l) with collection.generic.Clearable
     def clear(): Unit = { this.set(0l) }
-  }
   recordPerRunCache(lruCounter)
 
   /**
     * Prevent the code repository from growing too large. Profiling reveals that the average size
     * of a ClassNode is about 30 kb. I observed having 17k+ classes in the cache, i.e., 500 mb.
     */
-  private def limitCacheSize(): Unit = {
-    if (parsedClasses.size > maxCacheSize) {
+  private def limitCacheSize(): Unit =
+    if (parsedClasses.size > maxCacheSize)
       // OK if multiple threads get here
       val minimalLRU = parsedClasses.valuesIterator
-        .collect({
+        .collect(
           case Right((_, lru)) => lru
-        })
+        )
         .toList
         .sorted(Ordering.Long.reverse)
         .drop(targetSize)
         .headOption
         .getOrElse(Long.MaxValue)
-      parsedClasses retain {
+      parsedClasses retain
         case (_, Right((_, lru))) => lru > minimalLRU
         case _ => false
-      }
-    }
-  }
 
-  def add(classNode: ClassNode, source: Source) = {
+  def add(classNode: ClassNode, source: Source) =
     if (source == CompilationUnit) compilingClasses(classNode.name) = classNode
     else
       parsedClasses(classNode.name) = Right(
           (classNode, lruCounter.incrementAndGet()))
-  }
 
   /**
     * The class node and source for an internal name. If the class node is not yet available, it is
     * parsed from the classfile on the compile classpath.
     */
   def classNodeAndSource(internalName: InternalName)
-    : Either[ClassNotFound, (ClassNode, Source)] = {
+    : Either[ClassNotFound, (ClassNode, Source)] =
     classNode(internalName) map
     (n =>
-          {
             val source =
               if (compilingClasses contains internalName) CompilationUnit
               else Classfile
             (n, source)
-        })
-  }
+        )
 
   /**
     * The class node for an internal name. If the class node is not yet available, it is parsed from
     * the classfile on the compile classpath.
     */
-  def classNode(internalName: InternalName): Either[ClassNotFound, ClassNode] = {
-    compilingClasses.get(internalName).map(Right(_)) getOrElse {
-      val r = parsedClasses.get(internalName) match {
+  def classNode(internalName: InternalName): Either[ClassNotFound, ClassNode] =
+    compilingClasses.get(internalName).map(Right(_)) getOrElse
+      val r = parsedClasses.get(internalName) match
         case Some(l @ Left(_)) => l
         case Some(r @ Right((classNode, _))) =>
           parsedClasses(internalName) = Right(
@@ -120,10 +113,7 @@ class ByteCodeRepository[BT <: BTypes](
             parseClass(internalName).map((_, lruCounter.incrementAndGet()))
           parsedClasses(internalName) = res
           res
-      }
       r.map(_._1)
-    }
-  }
 
   /**
     * The field node for a field matching `name` and `descriptor`, accessed in class `classInternalName`.
@@ -135,24 +125,20 @@ class ByteCodeRepository[BT <: BTypes](
   def fieldNode(
       classInternalName: InternalName,
       name: String,
-      descriptor: String): Either[FieldNotFound, (FieldNode, InternalName)] = {
+      descriptor: String): Either[FieldNotFound, (FieldNode, InternalName)] =
     def fieldNodeImpl(parent: InternalName)
-      : Either[FieldNotFound, (FieldNode, InternalName)] = {
-      classNode(parent) match {
+      : Either[FieldNotFound, (FieldNode, InternalName)] =
+      classNode(parent) match
         case Left(e) =>
           Left(FieldNotFound(name, descriptor, classInternalName, Some(e)))
         case Right(c) =>
-          c.fields.asScala.find(f => f.name == name && f.desc == descriptor) match {
+          c.fields.asScala.find(f => f.name == name && f.desc == descriptor) match
             case Some(f) => Right((f, parent))
             case None =>
               if (c.superName == null)
                 Left(FieldNotFound(name, descriptor, classInternalName, None))
               else fieldNode(c.superName, name, descriptor)
-          }
-      }
-    }
     fieldNodeImpl(classInternalName)
-  }
 
   /**
     * The method node for a method matching `name` and `descriptor`, accessed in class `ownerInternalNameOrArrayDescriptor`.
@@ -169,32 +155,28 @@ class ByteCodeRepository[BT <: BTypes](
   def methodNode(ownerInternalNameOrArrayDescriptor: String,
                  name: String,
                  descriptor: String)
-    : Either[MethodNotFound, (MethodNode, InternalName)] = {
+    : Either[MethodNotFound, (MethodNode, InternalName)] =
     // on failure, returns a list of class names that could not be found on the classpath
     def methodNodeImpl(ownerInternalName: InternalName)
-      : Either[List[ClassNotFound], (MethodNode, InternalName)] = {
-      classNode(ownerInternalName) match {
+      : Either[List[ClassNotFound], (MethodNode, InternalName)] =
+      classNode(ownerInternalName) match
         case Left(e) => Left(List(e))
         case Right(c) =>
-          c.methods.asScala.find(m => m.name == name && m.desc == descriptor) match {
+          c.methods.asScala.find(m => m.name == name && m.desc == descriptor) match
             case Some(m) => Right((m, ownerInternalName))
             case None =>
               findInParents(
                   Option(c.superName) ++: c.interfaces.asScala.toList, Nil)
-          }
-      }
-    }
 
     // find the MethodNode in one of the parent classes
     def findInParents(
         parents: List[InternalName], failedClasses: List[ClassNotFound])
       : Either[List[ClassNotFound], (MethodNode, InternalName)] =
-      parents match {
+      parents match
         case x :: xs =>
           methodNodeImpl(x).left
             .flatMap(failed => findInParents(xs, failed ::: failedClasses))
         case Nil => Left(failedClasses)
-      }
 
     // In a MethodInsnNode, the `owner` field may be an array descriptor, for example when invoking `clone`. We don't have a method node to return in this case.
     if (ownerInternalNameOrArrayDescriptor.charAt(0) == '[')
@@ -204,12 +186,11 @@ class ByteCodeRepository[BT <: BTypes](
       methodNodeImpl(ownerInternalNameOrArrayDescriptor).left.map(
           MethodNotFound(
               name, descriptor, ownerInternalNameOrArrayDescriptor, _))
-  }
 
   private def parseClass(
-      internalName: InternalName): Either[ClassNotFound, ClassNode] = {
+      internalName: InternalName): Either[ClassNotFound, ClassNode] =
     val fullName = internalName.replace('/', '.')
-    classPath.findClassFile(fullName) map { classFile =>
+    classPath.findClassFile(fullName) map  classFile =>
       val classNode = new asm.tree.ClassNode()
       val classReader = new asm.ClassReader(classFile.toByteArray)
 
@@ -230,15 +211,12 @@ class ByteCodeRepository[BT <: BTypes](
       //   https://jcp.org/aboutJava/communityprocess/final/jsr045/index.html
       removeLineNumberNodes(classNode)
       classNode
-    } match {
+    match
       case Some(node) => Right(node)
       case None =>
         Left(ClassNotFound(internalName, javaDefinedClasses(internalName)))
-    }
-  }
-}
 
-object ByteCodeRepository {
+object ByteCodeRepository
 
   /**
     * The source of a ClassNode in the ByteCodeRepository. Can be either [[CompilationUnit]] if the
@@ -247,4 +225,3 @@ object ByteCodeRepository {
   sealed trait Source
   object CompilationUnit extends Source
   object Classfile extends Source
-}

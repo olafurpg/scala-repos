@@ -17,7 +17,7 @@ import org.scalatest.mock.MockitoSugar
 import scala.language.postfixOps
 
 // all this so we can spy() on a client.
-class MockClient extends Client {
+class MockClient extends Client
   def set(queueName: String, value: Buf, expiry: Time = Time.epoch) = null
   def get(
       queueName: String, waitUpTo: Duration = 0.seconds): Future[Option[Buf]] =
@@ -27,20 +27,17 @@ class MockClient extends Client {
   def read(queueName: String): ReadHandle = null
   def write(queueName: String, offer: Offer[Buf]): Future[Throwable] = null
   def close() {}
-}
 
 @RunWith(classOf[JUnitRunner])
-class ClientTest extends FunSuite with MockitoSugar {
-  trait GlobalHelper {
+class ClientTest extends FunSuite with MockitoSugar
+  trait GlobalHelper
     def buf(i: Int) = Buf.Utf8(i.toString)
-    def msg(i: Int) = {
+    def msg(i: Int) =
       val m = mock[ReadMessage]
       when(m.bytes) thenReturn buf(i)
       m
-    }
-  }
 
-  trait ClientReliablyHelper extends GlobalHelper {
+  trait ClientReliablyHelper extends GlobalHelper
     val messages = new Broker[ReadMessage]
     val error = new Broker[Throwable]
     val client = Mockito.spy(new MockClient)
@@ -48,10 +45,9 @@ class ClientTest extends FunSuite with MockitoSugar {
     when(rh.messages) thenReturn messages.recv
     when(rh.error) thenReturn error.recv
     when(client.read("foo")) thenReturn rh
-  }
 
-  test("Client.readReliably should proxy messages") {
-    new ClientReliablyHelper {
+  test("Client.readReliably should proxy messages")
+    new ClientReliablyHelper
       val h = client.readReliably("foo")
       verify(client).read("foo")
 
@@ -65,11 +61,9 @@ class ClientTest extends FunSuite with MockitoSugar {
       assert(Await.result(f) == m)
 
       assert((h.messages ?).isDefined == false)
-    }
-  }
 
-  test("Client.readReliably should reconnect on failure") {
-    new ClientReliablyHelper {
+  test("Client.readReliably should reconnect on failure")
+    new ClientReliablyHelper
       val h = client.readReliably("foo")
       verify(client).read("foo")
       val m = msg(0)
@@ -97,12 +91,10 @@ class ClientTest extends FunSuite with MockitoSugar {
       messages2 ! m2
       assert(f.isDefined == true)
       assert(Await.result(f) == m2)
-    }
-  }
 
-  test("Client.readReliably should reconnect on failure(with delay)") {
-    Time.withCurrentTimeFrozen { tc =>
-      new ClientReliablyHelper {
+  test("Client.readReliably should reconnect on failure(with delay)")
+    Time.withCurrentTimeFrozen  tc =>
+      new ClientReliablyHelper
         val timer = new MockTimer
         val delays = Stream(1.seconds, 2.seconds, 3.second)
         val h = client.readReliably("foo", timer, delays)
@@ -110,7 +102,7 @@ class ClientTest extends FunSuite with MockitoSugar {
 
         val errf = (h.error ?)
 
-        delays.zipWithIndex foreach {
+        delays.zipWithIndex foreach
           case (delay, i) =>
             verify(client, times(i + 1)).read("foo")
             error ! new Exception("sad panda")
@@ -118,27 +110,21 @@ class ClientTest extends FunSuite with MockitoSugar {
             timer.tick()
             verify(client, times(i + 2)).read("foo")
             assert(errf.isDefined == false)
-        }
 
         error ! new Exception("final sad panda")
 
         assert(errf.isDefined == true)
         assert(Await.result(errf) == OutOfRetriesException)
-      }
-    }
-  }
 
-  test("Client.readReliably should close on close requested") {
-    new ClientReliablyHelper {
+  test("Client.readReliably should close on close requested")
+    new ClientReliablyHelper
       val h = client.readReliably("foo")
       verify(rh, times(0)).close()
       h.close()
       verify(rh).close()
-    }
-  }
 
-  test("ConnectedClient.read should interrupt current request on close") {
-    new GlobalHelper {
+  test("ConnectedClient.read should interrupt current request on close")
+    new GlobalHelper
       val queueName = "foo"
       val queueNameBuf = Buf.Utf8(queueName)
       val factory = mock[ServiceFactory[Command, Response]]
@@ -151,10 +137,9 @@ class ClientTest extends FunSuite with MockitoSugar {
       when(factory.apply()) thenReturn Future(service)
       val promise = new Promise[Response]()
       @volatile var wasInterrupted = false
-      promise.setInterruptHandler {
+      promise.setInterruptHandler
         case _cause =>
           wasInterrupted = true
-      }
       when(service(open)) thenReturn promise
       when(service(closeAndOpen)) thenReturn promise
       when(service(abort)) thenReturn Future(Values(Seq()))
@@ -164,11 +149,9 @@ class ClientTest extends FunSuite with MockitoSugar {
       assert(wasInterrupted == false)
       rh.close()
       assert(wasInterrupted == true)
-    }
-  }
 
   test(
-      "ThriftConnectedClient.read should interrupt current trift request on close") {
+      "ThriftConnectedClient.read should interrupt current trift request on close")
     val queueName = "foo"
     val clientFactory = mock[FinagledClientFactory]
     val finagledClient = mock[FinagledClosableClient]
@@ -178,10 +161,9 @@ class ClientTest extends FunSuite with MockitoSugar {
     val promise = new Promise[Seq[Item]]()
 
     @volatile var wasInterrupted = false
-    promise.setInterruptHandler {
+    promise.setInterruptHandler
       case _cause =>
         wasInterrupted = true
-    }
 
     when(finagledClient.get(queueName, 1, Int.MaxValue, Int.MaxValue)) thenReturn promise
 
@@ -190,5 +172,3 @@ class ClientTest extends FunSuite with MockitoSugar {
     assert(wasInterrupted == false)
     rh.close()
     assert(wasInterrupted == true)
-  }
-}

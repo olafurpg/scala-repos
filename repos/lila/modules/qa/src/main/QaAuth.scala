@@ -4,15 +4,13 @@ import lila.security.Granter
 import lila.user.{User, UserContext}
 import org.joda.time.DateTime
 
-object QaAuth {
+object QaAuth
 
-  def canEdit(q: Question)(implicit ctx: UserContext) = noTroll { u =>
+  def canEdit(q: Question)(implicit ctx: UserContext) = noTroll  u =>
     (q ownBy u) || Granter(_.ModerateQa)(u)
-  }
 
-  def canEdit(a: Answer)(implicit ctx: UserContext) = noTroll { u =>
+  def canEdit(a: Answer)(implicit ctx: UserContext) = noTroll  u =>
     (a ownBy u) || Granter(_.ModerateQa)(u)
-  }
 
   def canAsk(implicit ctx: UserContext) = noKid(noTroll(isNotN00b))
 
@@ -32,4 +30,3 @@ object QaAuth {
   private def isNotN00b(u: User) = !isN00b(u)
 
   def isN00b(u: User) = u.createdAt isAfter DateTime.now.minusWeeks(1)
-}

@@ -1,4 +1,4 @@
-object Test {
+object Test
   def M[N[O[_]]] = ()
   type A[_] = Any
   type B[_ [_]] = Any
@@ -13,4 +13,3 @@ object Test {
   M[B] // okay, (B :: (* -> * -> *) is kind-conformant to (N :: * -> * -> *)
 
   M[C] // error, (C :: (* -> * -> * -> *) not kind-conformant to (N :: * -> * -> *)
-}

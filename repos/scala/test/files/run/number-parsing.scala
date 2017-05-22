@@ -1,5 +1,5 @@
-object Test {
-  def numTests() = {
+object Test
+  def numTests() =
     val MinusZero = Float.box(-0.0f)
     val PlusZero = Float.box(0.0f)
 
@@ -14,18 +14,13 @@ object Test {
         -5.max(2),
         -5 max 2
     ) foreach (num => assert(num == 2))
-  }
 
-  case class Foo(val x: Double) {
+  case class Foo(val x: Double)
     def unary_- : Foo = Foo(-x)
     def +(other: Foo): Foo = Foo(x + other.x)
-  }
-  def objTests = {
+  def objTests =
     assert(-Foo(5.0) + Foo(10.0) == Foo(5.0))
     assert(-Foo(5.0).+(Foo(10.0)) == Foo(-15.0))
-  }
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit =
     numTests()
-  }
-}

@@ -23,11 +23,11 @@ import java.io.InputStream
 
 import org.apache.kafka.common.record.{KafkaLZ4BlockInputStream, KafkaLZ4BlockOutputStream}
 
-object CompressionFactory {
+object CompressionFactory
 
   def apply(compressionCodec: CompressionCodec,
-            stream: OutputStream): OutputStream = {
-    compressionCodec match {
+            stream: OutputStream): OutputStream =
+    compressionCodec match
       case DefaultCompressionCodec => new GZIPOutputStream(stream)
       case GZIPCompressionCodec => new GZIPOutputStream(stream)
       case SnappyCompressionCodec =>
@@ -38,12 +38,10 @@ object CompressionFactory {
       case _ =>
         throw new kafka.common.UnknownCodecException(
             "Unknown Codec: " + compressionCodec)
-    }
-  }
 
   def apply(
-      compressionCodec: CompressionCodec, stream: InputStream): InputStream = {
-    compressionCodec match {
+      compressionCodec: CompressionCodec, stream: InputStream): InputStream =
+    compressionCodec match
       case DefaultCompressionCodec => new GZIPInputStream(stream)
       case GZIPCompressionCodec => new GZIPInputStream(stream)
       case SnappyCompressionCodec =>
@@ -54,6 +52,3 @@ object CompressionFactory {
       case _ =>
         throw new kafka.common.UnknownCodecException(
             "Unknown Codec: " + compressionCodec)
-    }
-  }
-}

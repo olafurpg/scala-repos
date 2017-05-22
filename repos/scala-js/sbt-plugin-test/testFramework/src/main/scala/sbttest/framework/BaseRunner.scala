@@ -7,7 +7,7 @@ abstract class BaseRunner(
     val remoteArgs: Array[String],
     private[framework] val testClassLoader: ClassLoader
 )
-    extends Runner {
+    extends Runner
 
   protected def newTask(taskDef: TaskDef): Task =
     new DummyTask(taskDef, this)
@@ -20,4 +20,3 @@ abstract class BaseRunner(
 
   def deserializeTask(task: String, deserializer: String => TaskDef): Task =
     newTask(deserializer(task))
-}

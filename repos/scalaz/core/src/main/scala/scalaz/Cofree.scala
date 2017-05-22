@@ -1,7 +1,7 @@
 package scalaz
 
 /** A cofree comonad for some functor `S`, i.e. an `S`-branching stream. */
-sealed abstract class Cofree[S[_], A] {
+sealed abstract class Cofree[S[_], A]
 
   def head: A
 
@@ -38,10 +38,9 @@ sealed abstract class Cofree[S[_], A] {
 
   /** Folds over this cofree structure, returning all the intermediate values in a new structure. */
   def scanr[B](g: (A, S[Cofree[S, B]]) => B)(
-      implicit S: Functor[S]): Cofree[S, B] = {
+      implicit S: Functor[S]): Cofree[S, B] =
     val qs = S.map(tail)(_ scanr g)
     Cofree(g(head, qs), qs)
-  }
 
   /** Redecorates the structure with values representing entire substructures. */
   final def duplicate(implicit S: Functor[S]): Cofree[S, Cofree[S, A]] =
@@ -77,9 +76,8 @@ sealed abstract class Cofree[S[_], A] {
   final def zap[G[_], B](fs: Free[G, A => B])(
       implicit G: Functor[G], d: Zap[S, G]): B =
     zapWith(fs)((a, f) => f(a))
-}
 
-object Cofree extends CofreeInstances {
+object Cofree extends CofreeInstances
 
   def apply[S[_], A](h: A, t: S[Cofree[S, A]]): Cofree[S, A] =
     applyT(h, Trampoline.done(t))
@@ -93,7 +91,7 @@ object Cofree extends CofreeInstances {
   //creates an instance of Cofree that trampolines all of the calls to the tail so we get stack safety
   def applyT[S[_], A](a: A, tf: Free[Function0, S[Cofree[S, A]]])(
       implicit T: Functor[λ[a => Free[Function0, a]]]): Cofree[S, A] =
-    new Cofree[S, A] {
+    new Cofree[S, A]
 
       def head = a
 
@@ -102,7 +100,6 @@ object Cofree extends CofreeInstances {
       def applyCofree[B](f: A => B, g: Cofree[S, A] => Cofree[S, B])(
           implicit S: Functor[S]): Cofree[S, B] =
         applyT(f(head), T.map(t)(S.lift(g)))
-    }
 
   private[scalaz] final type CofreeZip[F[_], A] = Cofree[F, A] @@ Tags.Zip
 
@@ -117,93 +114,75 @@ object Cofree extends CofreeInstances {
 
   def unfold[F[_], A, B](b: B)(f: B => (A, F[B]))(
       implicit F: Functor[F],
-      T: Functor[λ[a => Free[Function0, a]]]): Cofree[F, A] = {
+      T: Functor[λ[a => Free[Function0, a]]]): Cofree[F, A] =
     val (a, fb) = f(b)
     val nt = T.map(Trampoline.done(fb))(F.lift(unfold(_)(f)))
     Cofree.applyT(a, nt)
-  }
 
   def mapUnfold[F[_], W[_], A](z: W[A])(f: W ~> F)(
       implicit W: Comonad[W]): Cofree[F, A] =
     Cofree.delay(W copoint z, f(W.extend(z)(mapUnfold(_: W[A])(f))))
-}
 
 import Cofree.CofreeZip
 
-sealed abstract class CofreeInstances4 {
+sealed abstract class CofreeInstances4
 
   /** low priority `Foldable1` instance */
   implicit def cofreeFoldable[F[_]: Foldable]: Foldable1[Cofree[F, ?]] =
-    new CofreeFoldable[F] {
+    new CofreeFoldable[F]
       def F = implicitly
-    }
-}
 
-sealed abstract class CofreeInstances3 extends CofreeInstances4 {
+sealed abstract class CofreeInstances3 extends CofreeInstances4
 
   /** low priority `Traverse1` instance */
   implicit def cofreeTraverse[F[_]: Traverse]: Traverse1[Cofree[F, ?]] =
-    new CofreeTraverse[F] {
+    new CofreeTraverse[F]
       def F = implicitly
-    }
 
   implicit def cofreeZipFunctor[F[_]: Functor]: Functor[CofreeZip[F, ?]] =
-    new CofreeZipFunctor[F] {
+    new CofreeZipFunctor[F]
       def F = implicitly
-    }
-}
 
-sealed abstract class CofreeInstances2 extends CofreeInstances3 {
+sealed abstract class CofreeInstances2 extends CofreeInstances3
 
   /** high priority `Foldable1` instance. more efficient */
   implicit def cofreeFoldable1[F[_]: Foldable1]: Foldable1[Cofree[F, ?]] =
-    new CofreeFoldable1[F] {
+    new CofreeFoldable1[F]
       def F = implicitly
-    }
 
   implicit def cofreeBind[F[_]: Plus : Functor]: Bind[Cofree[F, ?]] =
-    new CofreeBind[F] {
+    new CofreeBind[F]
       def F = implicitly
       def G = implicitly
-    }
-}
 
-sealed abstract class CofreeInstances1 extends CofreeInstances2 {
+sealed abstract class CofreeInstances1 extends CofreeInstances2
 
   /** high priority `Traverse1` instance. more efficient */
   implicit def cofreeTraverse1[F[_]: Traverse1]: Traverse1[Cofree[F, ?]] =
-    new CofreeTraverse1[F] {
+    new CofreeTraverse1[F]
       def F = implicitly
-    }
 
   implicit def cofreeZipApply[F[_]: Apply]: Apply[CofreeZip[F, ?]] =
-    new CofreeZipApply[F] {
+    new CofreeZipApply[F]
       def F = implicitly
-    }
-}
 
-sealed abstract class CofreeInstances0 extends CofreeInstances1 {
+sealed abstract class CofreeInstances0 extends CofreeInstances1
   implicit def cofreeZipApplicative[F[_]: Applicative]: Applicative[CofreeZip[
           F, ?]] =
-    new CofreeZipApplicative[F] {
+    new CofreeZipApplicative[F]
       def F = implicitly
-    }
 
   implicit def cofreeMonad[F[_]: PlusEmpty : Functor]: Monad[Cofree[F, ?]] =
-    new CofreeMonad[F] {
+    new CofreeMonad[F]
       def F = implicitly
       def G = implicitly
-    }
-}
 
-sealed abstract class CofreeInstances extends CofreeInstances0 {
+sealed abstract class CofreeInstances extends CofreeInstances0
   implicit def cofreeComonad[S[_]: Functor]: Comonad[Cofree[S, ?]] =
-    new CofreeComonad[S] {
+    new CofreeComonad[S]
       def F = implicitly
-    }
-}
 
-private trait CofreeComonad[S[_]] extends Comonad[Cofree[S, ?]] {
+private trait CofreeComonad[S[_]] extends Comonad[Cofree[S, ?]]
   implicit def F: Functor[S]
 
   def copoint[A](p: Cofree[S, A]) = p.head
@@ -213,17 +192,15 @@ private trait CofreeComonad[S[_]] extends Comonad[Cofree[S, ?]] {
   override final def map[A, B](fa: Cofree[S, A])(f: A => B) = fa map f
 
   def cobind[A, B](fa: Cofree[S, A])(f: (Cofree[S, A]) => B) = fa extend f
-}
 
-private trait CofreeZipFunctor[F[_]] extends Functor[CofreeZip[F, ?]] {
+private trait CofreeZipFunctor[F[_]] extends Functor[CofreeZip[F, ?]]
   implicit def F: Functor[F]
 
   override final def map[A, B](fa: CofreeZip[F, A])(f: A => B) =
     Tags.Zip(Tag unwrap fa map f)
-}
 
 private trait CofreeZipApply[F[_]]
-    extends Apply[CofreeZip[F, ?]] with CofreeZipFunctor[F] {
+    extends Apply[CofreeZip[F, ?]] with CofreeZipFunctor[F]
   implicit def F: Apply[F]
 
   override final def ap[A, B](
@@ -239,41 +216,36 @@ private trait CofreeZipApply[F[_]]
                                 .t
                                 .map(fab =>
                                       F.apply2(Tags.Zip.subst(fat),
-                                               Tags.Zip.subst(fab)) { (a, b) =>
+                                               Tags.Zip.subst(fab))  (a, b) =>
                                 Tag.unwrap(ap(a)(b))
-                            })))
+                            )))
         )
-}
 
 private trait CofreeZipApplicative[F[_]]
-    extends Applicative[CofreeZip[F, ?]] with CofreeZipApply[F] {
+    extends Applicative[CofreeZip[F, ?]] with CofreeZipApply[F]
   implicit def F: Applicative[F]
 
   def point[A](a: => A) =
     Tags.Zip(
         Cofree.delay(a, F.point(Tag.unwrap[Cofree[F, A], Tags.Zip](point(a)))))
-}
 
 private trait CofreeBind[F[_]]
-    extends Bind[Cofree[F, ?]] with CofreeComonad[F] {
+    extends Bind[Cofree[F, ?]] with CofreeComonad[F]
   implicit def F: Functor[F]
   implicit def G: Plus[F]
 
-  def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] = {
+  def bind[A, B](fa: Cofree[F, A])(f: A => Cofree[F, B]): Cofree[F, B] =
     val c = f(fa.head)
     Cofree.applyT(
         c.head, c.t.map(ct => G.plus(c.tail, F.map(fa.tail)(bind(_)(f)))))
-  }
-}
 
 private trait CofreeMonad[F[_]]
-    extends Monad[Cofree[F, ?]] with CofreeBind[F] {
+    extends Monad[Cofree[F, ?]] with CofreeBind[F]
   implicit def G: PlusEmpty[F]
 
   def point[A](a: => A): Cofree[F, A] = Cofree(a, G.empty)
-}
 
-private trait CofreeFoldable[F[_]] extends Foldable1[Cofree[F, ?]] {
+private trait CofreeFoldable[F[_]] extends Foldable1[Cofree[F, ?]]
   implicit def F: Foldable[F]
 
   override final def foldMap[A, B](fa: Cofree[F, A])(f: A => B)(
@@ -293,33 +265,29 @@ private trait CofreeFoldable[F[_]] extends Foldable1[Cofree[F, ?]] {
     F.foldLeft(fa.tail, z(fa.head))((b, c) => foldLeft(c, b)(f))
 
   override def foldMapRight1[A, B](fa: Cofree[F, A])(z: A => B)(
-      f: (A, => B) => B): B = {
+      f: (A, => B) => B): B =
     import std.option.none
-    foldRight(fa, none[B]) {
+    foldRight(fa, none[B])
       case (l, None) => Some(z(l))
       case (l, Some(r)) => Some(f(l, r))
-    }.getOrElse(sys.error("foldMapRight1"))
-  }
+    .getOrElse(sys.error("foldMapRight1"))
 
   override def foldMap1[A, B](fa: Cofree[F, A])(f: A => B)(
-      implicit S: Semigroup[B]): B = {
+      implicit S: Semigroup[B]): B =
     val h = f(fa.head)
     F.foldMap1Opt(fa.tail)(foldMap1(_)(f)).map(S.append(h, _)).getOrElse(h)
-  }
-}
 
 private trait CofreeFoldable1[F[_]]
-    extends Foldable1[Cofree[F, ?]] with CofreeFoldable[F] {
+    extends Foldable1[Cofree[F, ?]] with CofreeFoldable[F]
   implicit def F: Foldable1[F]
 
   override final def foldMap1[A, B](fa: Cofree[F, A])(f: A => B)(
       implicit S: Semigroup[B]): B =
     S.append(f(fa.head), F.foldMap1(fa.tail)(foldMap1(_)(f)))
-}
 
 private trait CofreeTraverse[F[_]]
     extends Traverse1[Cofree[F, ?]] with CofreeFoldable[F]
-    with CofreeComonad[F] {
+    with CofreeComonad[F]
   implicit def F: Traverse[F]
 
   override final def traverseImpl[G[_], A, B](fa: Cofree[F, A])(f: A => G[B])(
@@ -332,14 +300,12 @@ private trait CofreeTraverse[F[_]]
       .traverse(fa.tail)(a => -\/(traverse1(a)(f)))
       .fold(ftl => G.apply2(f(fa.head), ftl)(Cofree(_, _)),
             tl => G.map(f(fa.head))(Cofree.apply(_, tl)))
-}
 
 private trait CofreeTraverse1[F[_]]
     extends Traverse1[Cofree[F, ?]] with CofreeTraverse[F]
-    with CofreeFoldable1[F] {
+    with CofreeFoldable1[F]
   implicit def F: Traverse1[F]
 
   override def traverse1Impl[G[_], A, B](fa: Cofree[F, A])(f: A => G[B])(
       implicit G: Apply[G]): G[Cofree[F, B]] =
     G.apply2(f(fa.head), F.traverse1(fa.tail)(traverse1(_)(f)))(Cofree(_, _))
-}

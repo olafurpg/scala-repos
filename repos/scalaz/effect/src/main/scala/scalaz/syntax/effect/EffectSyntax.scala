@@ -1,6 +1,6 @@
 package scalaz.syntax.effect
 
-trait EffectSyntaxes {
+trait EffectSyntaxes
 
   object id extends ToIdOps
 
@@ -9,7 +9,6 @@ trait EffectSyntaxes {
   object monadCatchIO extends ToMonadCatchIOOps
 
   object all extends ToAllEffectTypeClassOps
-}
 
 trait ToAllEffectTypeClassOps
     extends ToIdOps with ToResourceOps with ToMonadCatchIOOps

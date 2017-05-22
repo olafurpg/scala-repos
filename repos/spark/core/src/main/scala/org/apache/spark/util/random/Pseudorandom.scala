@@ -24,8 +24,7 @@ import org.apache.spark.annotation.DeveloperApi
   * A class with pseudorandom behavior.
   */
 @DeveloperApi
-trait Pseudorandom {
+trait Pseudorandom
 
   /** Set random seed. */
   def setSeed(seed: Long)
-}

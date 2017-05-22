@@ -15,18 +15,16 @@ import akka.japi.function.{Function => JFn, Function2 => JFn2}
 
 import org.reactivestreams.{Subscription, Subscriber, Publisher}
 
-object AccumulatorSpec extends org.specs2.mutable.Specification {
+object AccumulatorSpec extends org.specs2.mutable.Specification
   import scala.collection.JavaConversions.asJavaIterable
 
-  def withMaterializer[T](block: Materializer => T) = {
+  def withMaterializer[T](block: Materializer => T) =
     val system = ActorSystem("test")
-    try {
+    try
       block(ActorMaterializer()(system))
-    } finally {
+    finally
       system.terminate()
       Await.result(system.whenTerminated, Duration.Inf)
-    }
-  }
 
   def sum: Accumulator[Int, Int] =
     Accumulator.fromSink(Sink.fold[Int, Int](
@@ -39,67 +37,56 @@ object AccumulatorSpec extends org.specs2.mutable.Specification {
 
   def errorSource[T] =
     Source.fromPublisher(
-        new Publisher[T] {
-      def subscribe(s: Subscriber[_ >: T]) = {
-        s.onSubscribe(new Subscription {
+        new Publisher[T]
+      def subscribe(s: Subscriber[_ >: T]) =
+        s.onSubscribe(new Subscription
           def cancel() = s.onComplete()
           def request(n: Long) = s.onError(new RuntimeException("error"))
-        })
-      }
-    })
+        )
+    )
 
-  "an accumulator" should {
-    "be flattenable from a future of itself" in {
-      "for a successful future" in withMaterializer { m =>
+  "an accumulator" should
+    "be flattenable from a future of itself" in
+      "for a successful future" in withMaterializer  m =>
         val completable = new CompletableFuture[Accumulator[Int, Int]]()
 
         val fAcc = Accumulator.flatten[Int, Int](completable, m)
         completable complete sum
 
         await(fAcc.run(source, m)) must_== 6
-      }
 
-      "for a failed future" in withMaterializer { implicit m =>
+      "for a failed future" in withMaterializer  implicit m =>
         val completable = new CompletableFuture[Accumulator[Int, Int]]()
 
         val fAcc = Accumulator.flatten[Int, Int](completable, m)
         completable.completeExceptionally(new RuntimeException("failed"))
 
-        await(fAcc.run(source, m)) must throwA[ExecutionException].like {
+        await(fAcc.run(source, m)) must throwA[ExecutionException].like
           case ex =>
             val cause = ex.getCause
             cause.isInstanceOf[RuntimeException] must beTrue and
             (cause.getMessage must_== "failed")
-        }
-      }
 
-      "for a failed stream" in withMaterializer { implicit m =>
+      "for a failed stream" in withMaterializer  implicit m =>
         val completable = new CompletableFuture[Accumulator[Int, Int]]()
 
         val fAcc = Accumulator.flatten[Int, Int](completable, m)
         completable complete sum
 
-        await(fAcc.run(errorSource, m)) must throwA[ExecutionException].like {
+        await(fAcc.run(errorSource, m)) must throwA[ExecutionException].like
           case ex =>
             val cause = ex.getCause
             cause.isInstanceOf[RuntimeException] must beTrue and
             (cause.getMessage must_== "error")
-        }
-      }
-    }
 
-    "be compatible with Java accumulator" in {
-      "Java asScala" in withMaterializer { implicit m =>
+    "be compatible with Java accumulator" in
+      "Java asScala" in withMaterializer  implicit m =>
         val sink = sum.toSink.mapMaterializedValue(
-            new JFn[CompletionStage[Int], Future[Int]] {
+            new JFn[CompletionStage[Int], Future[Int]]
           def apply(f: CompletionStage[Int]): Future[Int] =
             FutureConverters.toScala(f)
-        })
+        )
 
         sawait(play.api.libs.streams
               .Accumulator(sink.asScala)
               .run(source.asScala)) must_== 6
-      }
-    }
-  }
-}

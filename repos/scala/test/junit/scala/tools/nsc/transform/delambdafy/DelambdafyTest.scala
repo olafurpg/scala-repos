@@ -13,9 +13,9 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(classOf[JUnit4])
-class DelambdafyTest {
+class DelambdafyTest
   def compileToMultipleOutputWithDelamdbafyMethod(
-      ): List[(String, Array[Byte])] = {
+      ): List[(String, Array[Byte])] =
     val codeForMultiOutput =
       """
 object Delambdafy {
@@ -64,12 +64,9 @@ object Delambdafy {
     val classfiles = getGeneratedClassfiles(outDir)
     outDir.delete()
     classfiles
-  }
 
   @Test
-  def shouldFindOutputFoldersForAllPromotedLambdasAsMethod(): Unit = {
+  def shouldFindOutputFoldersForAllPromotedLambdasAsMethod(): Unit =
     val actual = compileToMultipleOutputWithDelamdbafyMethod()
 
     assertTrue(actual.length > 0)
-  }
-}

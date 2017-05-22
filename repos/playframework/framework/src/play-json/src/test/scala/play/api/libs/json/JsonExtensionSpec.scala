@@ -59,25 +59,21 @@ case class Program(id: Long,
                    name: String,
                    logoPath: Option[String],
                    logoThumb: Option[String])
-object Program {
+object Program
   def programs = List.empty[Program]
-}
 
 case class Person(name: String, age: Int)
-object Person {
+object Person
   implicit val personReads: Reads[Person] = Json.reads[Person]
   implicit val personWrites: OWrites[Person] = Json.writes[Person]
-}
 
-package foreign {
+package foreign
   case class Foreigner(name: String)
-}
-object ForeignTest {
+object ForeignTest
   implicit val foreignerReads: Reads[foreign.Foreigner] =
     Json.reads[foreign.Foreigner]
   implicit val foreignerWrites: OWrites[foreign.Foreigner] =
     Json.writes[foreign.Foreigner]
-}
 
 import play.api.libs.json._
 
@@ -91,19 +87,17 @@ case class WrappedGenericIntString(intString: GenericCaseClass2[Int, String])
 case class VarArgsOnly(ints: Int*)
 case class LastVarArg(name: String, ints: Int*)
 
-object Person2 {
+object Person2
   implicit val person2Fmt: OFormat[Person2] = Json.format[Person2]
-}
 
 case class CustomApply(a: Int, b: String)
-object CustomApply {
+object CustomApply
   def apply(): CustomApply = apply(10, "foo")
-}
 
-object JsonExtensionSpec extends Specification {
+object JsonExtensionSpec extends Specification
 
-  "JsonExtension" should {
-    "create a reads[User]" in {
+  "JsonExtension" should
+    "create a reads[User]" in
       import play.api.libs.json.Json
 
       //object User {def apply(age:Int):User = User(age,"")}
@@ -111,18 +105,16 @@ object JsonExtensionSpec extends Specification {
 
       Json.fromJson[User](Json.obj("name" -> "toto", "age" -> 45)) must beEqualTo(
           JsSuccess(User(45, "toto")))
-    }
 
-    "create a writes[User]" in {
+    "create a writes[User]" in
       import play.api.libs.json.Json
 
       implicit val userWrites = Json.writes[User]
 
       Json.toJson(User(45, "toto")) must beEqualTo(
           Json.obj("name" -> "toto", "age" -> 45))
-    }
 
-    "create a format[User]" in {
+    "create a format[User]" in
       import play.api.libs.json.Json
 
       implicit val userFormat = Json.format[User]
@@ -131,9 +123,8 @@ object JsonExtensionSpec extends Specification {
           JsSuccess(User(45, "toto")))
       Json.toJson(User(45, "toto")) must beEqualTo(
           Json.obj("name" -> "toto", "age" -> 45))
-    }
 
-    "create a reads[Dog]" in {
+    "create a reads[Dog]" in
       import play.api.libs.json.Json
 
       implicit val userReads = Json.reads[User]
@@ -145,9 +136,8 @@ object JsonExtensionSpec extends Specification {
               "master" -> Json.obj("name" -> "toto", "age" -> 45)
           )
       ) must beEqualTo(JsSuccess(Dog("medor", User(45, "toto"))))
-    }
 
-    "create a writes[Dog]" in {
+    "create a writes[Dog]" in
       import play.api.libs.json.Json
 
       implicit val userWrites = Json.writes[User]
@@ -159,9 +149,8 @@ object JsonExtensionSpec extends Specification {
               "master" -> Json.obj("name" -> "toto", "age" -> 45)
           )
       )
-    }
 
-    "create a format[Dog]" in {
+    "create a format[Dog]" in
       import play.api.libs.json.Json
 
       implicit val userFormat = Json.format[User]
@@ -180,9 +169,8 @@ object JsonExtensionSpec extends Specification {
               "master" -> Json.obj("name" -> "toto", "age" -> 45)
           )
       )
-    }
 
-    "create a reads[RecUser]" in {
+    "create a reads[RecUser]" in
       import play.api.libs.json.Json
 
       implicit val catReads = Json.reads[Cat]
@@ -207,9 +195,8 @@ object JsonExtensionSpec extends Specification {
               )
           )
       )
-    }
 
-    "create a writes[RecUser]" in {
+    "create a writes[RecUser]" in
       import play.api.libs.json.Json
 
       implicit val catWrites = Json.writes[Cat]
@@ -232,9 +219,8 @@ object JsonExtensionSpec extends Specification {
                                              "friends" -> Json.arr()))
           )
       )
-    }
 
-    "create a format[RecUser]" in {
+    "create a format[RecUser]" in
       import play.api.libs.json.Json
 
       implicit val catFormat = Json.format[Cat]
@@ -277,9 +263,8 @@ object JsonExtensionSpec extends Specification {
                                              "friends" -> Json.arr()))
           )
       )
-    }
 
-    "create a reads[User1]" in {
+    "create a reads[User1]" in
       import play.api.libs.json.Json
 
       implicit val userReads = Json.reads[User1]
@@ -297,9 +282,8 @@ object JsonExtensionSpec extends Specification {
               )
           )
       )
-    }
 
-    "create a writes[User1]" in {
+    "create a writes[User1]" in
       import play.api.libs.json.Json
 
       implicit val userWrites = Json.writes[User1]
@@ -315,9 +299,8 @@ object JsonExtensionSpec extends Specification {
               "friend" -> Json.obj("name" -> "tom")
           )
       )
-    }
 
-    "create a format[User1]" in {
+    "create a format[User1]" in
       import play.api.libs.json.Json
 
       implicit val userFormat = Json.format[User1]
@@ -347,9 +330,8 @@ object JsonExtensionSpec extends Specification {
               "friend" -> Json.obj("name" -> "tom")
           )
       )
-    }
 
-    "create a format[WrappedGenericInt]" in {
+    "create a format[WrappedGenericInt]" in
       import play.api.libs.json.Json._
       import play.api.libs.functional.syntax._
 
@@ -369,9 +351,8 @@ object JsonExtensionSpec extends Specification {
       Json.toJson(wrapped) must beEqualTo(expectedJsObj)
       Json.fromJson[WrappedGenericInt](expectedJsObj).get must beEqualTo(
           wrapped)
-    }
 
-    "create a format[WrappedGenericIntString]" in {
+    "create a format[WrappedGenericIntString]" in
       import play.api.libs.json.Json._
       import play.api.libs.functional.syntax._
 
@@ -390,9 +371,8 @@ object JsonExtensionSpec extends Specification {
       Json.toJson(genericHolder) must beEqualTo(expectedJsObj)
       Json.fromJson[WrappedGenericIntString](expectedJsObj).get must beEqualTo(
           genericHolder)
-    }
 
-    "VarArgsOnly reads, writes, format" should {
+    "VarArgsOnly reads, writes, format" should
 
       val reads = Json.reads[VarArgsOnly]
       val writes = Json.writes[VarArgsOnly]
@@ -401,22 +381,18 @@ object JsonExtensionSpec extends Specification {
       val obj = VarArgsOnly(1, 2, 3)
       val jsObj = Json.obj("ints" -> Seq(1, 2, 3))
 
-      "formats should be able to read and write" in {
+      "formats should be able to read and write" in
         Json.toJson(obj)(format) must beEqualTo(jsObj)
         jsObj.as[VarArgsOnly](format) must beEqualTo(obj)
-      }
 
-      "reads should be able to read valid Json and ignore invalid Json" in {
+      "reads should be able to read valid Json and ignore invalid Json" in
         jsObj.as[VarArgsOnly](reads) must beEqualTo(obj)
         Json.fromJson[VarArgsOnly](Json.obj("hello" -> "world"))(reads).isError must beTrue
-      }
 
-      "writes should be able to spit out valid json" in {
+      "writes should be able to spit out valid json" in
         Json.toJson(obj)(writes) must beEqualTo(jsObj)
-      }
-    }
 
-    "LastVarArg reads, writes, format" should {
+    "LastVarArg reads, writes, format" should
 
       val reads = Json.reads[LastVarArg]
       val writes = Json.writes[LastVarArg]
@@ -425,22 +401,18 @@ object JsonExtensionSpec extends Specification {
       val obj = LastVarArg("hello", 1, 2, 3)
       val jsObj = Json.obj("name" -> "hello", "ints" -> Seq(1, 2, 3))
 
-      "formats should be able to read and write" in {
+      "formats should be able to read and write" in
         Json.toJson(obj)(format) must beEqualTo(jsObj)
         jsObj.as[LastVarArg](format) must beEqualTo(obj)
-      }
 
-      "reads should be able to read valid Json and ignore invalid Json" in {
+      "reads should be able to read valid Json and ignore invalid Json" in
         jsObj.as[LastVarArg](reads) must beEqualTo(obj)
         Json.fromJson[LastVarArg](Json.obj("hello" -> "world"))(reads).isError must beTrue
-      }
 
-      "writes should be able to spit out valid json" in {
+      "writes should be able to spit out valid json" in
         Json.toJson(obj)(writes) must beEqualTo(jsObj)
-      }
-    }
 
-    "manage Map[String, User]" in {
+    "manage Map[String, User]" in
       import play.api.libs.json.Json
 
       implicit val userReads = Json.reads[UserMap]
@@ -452,28 +424,24 @@ object JsonExtensionSpec extends Specification {
       ) must beEqualTo(
           JsSuccess(UserMap("toto", Map("tutu" -> UserMap("tutu"))))
       )
-    }
 
-    "manage Boxed class" in {
+    "manage Boxed class" in
       import play.api.libs.functional.syntax._
 
       implicit def idReads[A](implicit rds: Reads[A]): Reads[Id[A]] =
-        Reads[Id[A]] { js =>
+        Reads[Id[A]]  js =>
           rds.reads(js).map(Id[A](_))
-        }
 
       //val c2Reads1 = Json.reads[C2]
 
-      implicit def c1Reads[A](implicit rds: Reads[Id[A]]) = {
+      implicit def c1Reads[A](implicit rds: Reads[Id[A]]) =
         ((__ \ 'id).read(rds) and (__ \ 'name).read[String])((id,
             name) => C1[A](id, name))
-      }
 
       val js = Json.obj("id" -> 123L, "name" -> "toto")
 
       js.validate(c1Reads[Long]).get must beEqualTo(
           C1[Long](Id[Long](123L), "toto"))
-    }
 
     /**
       * test to validate it doesn't compile if missing implicit
@@ -485,54 +453,47 @@ object JsonExtensionSpec extends Specification {
       * success
       * }
       */
-    "test 21 fields" in {
+    "test 21 fields" in
       implicit val XReads = Json.reads[X]
       implicit val XWrites = Json.writes[X]
       implicit val XFormat = Json.format[X]
       success
-    }
 
-    "test inception with overriden object" in {
+    "test inception with overriden object" in
       implicit val programFormat = Json.reads[Program]
       success
-    }
 
-    "test case class 1 field" in {
+    "test case class 1 field" in
       implicit val totoReads = Json.reads[Toto]
       implicit val totoWrites = Json.writes[Toto]
       implicit val totoFormat = Json.format[Toto]
       success
-    }
 
-    "test case class 1 field option" in {
+    "test case class 1 field option" in
       implicit val toto2Reads = Json.reads[Toto2]
       implicit val toto2Writes = Json.writes[Toto2]
       implicit val toto2Format = Json.format[Toto2]
       success
-    }
 
-    "test case class 1 field list" in {
+    "test case class 1 field list" in
       implicit val toto3Reads = Json.reads[Toto3]
       implicit val toto3Writes = Json.writes[Toto3]
       implicit val toto3Format = Json.format[Toto3]
       success
-    }
 
-    "test case class 1 field set" in {
+    "test case class 1 field set" in
       implicit val toto4Reads = Json.reads[Toto4]
       implicit val toto4Writes = Json.writes[Toto4]
       implicit val toto4Format = Json.format[Toto4]
       success
-    }
 
-    "test case class 1 field map" in {
+    "test case class 1 field map" in
       implicit val toto5Reads = Json.reads[Toto5]
       implicit val toto5Writes = Json.writes[Toto5]
       implicit val toto5Format = Json.format[Toto5]
       success
-    }
 
-    "test case class 1 field seq[Dog]" in {
+    "test case class 1 field seq[Dog]" in
       implicit val userFormat = Json.format[User]
       implicit val dogFormat = Json.format[Dog]
       implicit val toto6Reads = Json.reads[Toto6]
@@ -557,19 +518,16 @@ object JsonExtensionSpec extends Specification {
                   Dog("brutus", User(23, "tata"))
               ))
       )
-    }
 
-    "test case reads in companion object" in {
+    "test case reads in companion object" in
       Json.fromJson[Person](Json.toJson(Person("bob", 15))).get must beEqualTo(
           Person("bob", 15))
-    }
 
-    "test case single-field in companion object" in {
+    "test case single-field in companion object" in
       Json.fromJson[Person2](Json.toJson(Person2(List("bob", "bobby")))).get must beEqualTo(
           Person2(List("bob", "bobby")))
-    }
 
-    "test hygiene" in {
+    "test hygiene" in
       val play = ""
       type LazyHelper = Any; val LazyHelper = ()
       val scala = ""
@@ -582,9 +540,8 @@ object JsonExtensionSpec extends Specification {
       implicit val toto2Writes = Json.writes[Toto2]
       implicit val toto2Format = Json.format[Toto2]
       success
-    }
 
-    "create a format[CustomApply]" in {
+    "create a format[CustomApply]" in
       import play.api.libs.json.Json
 
       implicit val fmt = Json.format[CustomApply]
@@ -595,6 +552,3 @@ object JsonExtensionSpec extends Specification {
           Json.obj("a" -> 5, "b" -> "foo"))
       Json.toJson(CustomApply()) must beEqualTo(
           Json.obj("a" -> 10, "b" -> "foo"))
-    }
-  }
-}

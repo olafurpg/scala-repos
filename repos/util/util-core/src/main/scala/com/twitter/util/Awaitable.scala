@@ -8,7 +8,7 @@ import scala.collection.JavaConverters._
   * Wait for the result of some action. Awaitable is not used
   * directly, but through the `Await` object.
   */
-trait Awaitable[+T] {
+trait Awaitable[+T]
   import Awaitable._
 
   /**
@@ -33,11 +33,9 @@ trait Awaitable[+T] {
     * [[com.twitter.util.Awaitable.ready Awaitable.ready]] block?
     */
   def isReady(implicit permit: CanAwait): Boolean
-}
 
-object Awaitable {
+object Awaitable
   sealed trait CanAwait
-}
 
 /**
   * Synchronously await the result of some action by blocking the current
@@ -77,7 +75,7 @@ object Awaitable {
   * passed to each awaitable in turn, meaning max await time will be
   * awaitables.size * timeout.
   */
-object Await {
+object Await
   import Awaitable._
   private implicit object AwaitPermit extends CanAwait
 
@@ -95,10 +93,9 @@ object Await {
     */
   @throws(classOf[TimeoutException])
   @throws(classOf[InterruptedException])
-  def ready[T <: Awaitable[_]](awaitable: T, timeout: Duration): T = {
+  def ready[T <: Awaitable[_]](awaitable: T, timeout: Duration): T =
     if (awaitable.isReady) awaitable.ready(timeout)
     else Scheduler.blocking { awaitable.ready(timeout) }
-  }
 
   /** $result */
   @throws(classOf[Exception])
@@ -144,10 +141,9 @@ object Await {
   def all(awaitables: java.util.Collection[Awaitable[_]],
           timeout: Duration): Unit =
     all(awaitables.asScala.toSeq, timeout)
-}
 
 // See http://stackoverflow.com/questions/26643045/java-interoperability-woes-with-scala-generics-and-boxing
-private[util] trait CloseAwaitably0[U <: Unit] extends Awaitable[U] {
+private[util] trait CloseAwaitably0[U <: Unit] extends Awaitable[U]
   private[this] val onClose = new Promise[U]
   private[this] val closed = new AtomicBoolean(false)
 
@@ -155,23 +151,20 @@ private[util] trait CloseAwaitably0[U <: Unit] extends Awaitable[U] {
     * closeAwaitably is intended to be used as a wrapper for
     * `close`. The underlying `f` will be called at most once.
     */
-  protected def closeAwaitably(f: => Future[U]): Future[U] = {
+  protected def closeAwaitably(f: => Future[U]): Future[U] =
     if (closed.compareAndSet(false, true)) onClose.become(f)
     onClose
-  }
 
   def ready(timeout: Duration)(
-      implicit permit: Awaitable.CanAwait): this.type = {
+      implicit permit: Awaitable.CanAwait): this.type =
     onClose.ready(timeout)
     this
-  }
 
   def result(timeout: Duration)(implicit permit: Awaitable.CanAwait): U =
     onClose.result(timeout)
 
   def isReady(implicit permit: Awaitable.CanAwait): Boolean =
     onClose.isReady
-}
 
 /**
   * A mixin to make an [[com.twitter.util.Awaitable]] out

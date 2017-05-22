@@ -7,8 +7,7 @@ import scala.language.experimental.macros
 /**
   * @author Mansur Ashraf.
   */
-object BinaryOrdering {
+object BinaryOrdering
 
   implicit def ordSer[T]: OrderedSerialization[T] = macro com.twitter.scalding.serialization.macros.impl
     .OrderedSerializationProviderImpl[T]
-}

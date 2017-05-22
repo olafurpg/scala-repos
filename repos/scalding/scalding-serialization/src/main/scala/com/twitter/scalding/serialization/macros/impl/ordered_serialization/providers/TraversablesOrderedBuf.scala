@@ -36,10 +36,10 @@ sealed trait MaybeArray
 case object IsArray extends MaybeArray
 case object NotArray extends MaybeArray
 
-object TraversablesOrderedBuf {
+object TraversablesOrderedBuf
   def dispatch(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]])
-    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] = {
+    : PartialFunction[c.Type, TreeOrderedBuf[c.type]] =
     case tpe if tpe.erasure =:= c.universe.typeOf[Iterable[Any]] =>
       TraversablesOrderedBuf(c)(buildDispatcher, tpe, NoSort, NotArray)
     case tpe if tpe.erasure =:= c.universe.typeOf[sci.Iterable[Any]] =>
@@ -91,13 +91,12 @@ object TraversablesOrderedBuf {
     case tpe
         if tpe.erasure =:= c.universe.typeOf[sci.ListMap[Any, Any]].erasure =>
       TraversablesOrderedBuf(c)(buildDispatcher, tpe, DoSort, NotArray)
-  }
 
   def apply(c: Context)(
       buildDispatcher: => PartialFunction[c.Type, TreeOrderedBuf[c.type]],
       outerType: c.Type,
       maybeSort: ShouldSort,
-      maybeArray: MaybeArray): TreeOrderedBuf[c.type] = {
+      maybeArray: MaybeArray): TreeOrderedBuf[c.type] =
 
     import c.universe._
     def freshT(id: String) = newTermName(c.fresh(s"fresh_$id"))
@@ -109,15 +108,14 @@ object TraversablesOrderedBuf {
     // When dealing with a map we have 2 type args, and need to generate the tuple type
     // it would correspond to if we .toList the Map.
     val innerType =
-      if (outerType.asInstanceOf[TypeRefApi].args.size == 2) {
+      if (outerType.asInstanceOf[TypeRefApi].args.size == 2)
         val (tpe1, tpe2) = (outerType.asInstanceOf[TypeRefApi].args(0),
                             outerType.asInstanceOf[TypeRefApi].args(1))
         val containerType = typeOf[Tuple2[Any, Any]].asInstanceOf[TypeRef]
         import compat._
         TypeRef.apply(containerType.pre, containerType.sym, List(tpe1, tpe2))
-      } else {
+      else
         outerType.asInstanceOf[TypeRefApi].args.head
-      }
 
     val innerTypes = outerType.asInstanceOf[TypeRefApi].args
 
@@ -136,11 +134,11 @@ object TraversablesOrderedBuf {
       }
     """
 
-    new TreeOrderedBuf[c.type] {
+    new TreeOrderedBuf[c.type]
       override val ctx: c.type = c
       override val tpe = outerType
       override def compareBinary(
-          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) = {
+          inputStreamA: ctx.TermName, inputStreamB: ctx.TermName) =
         val innerCompareFn = freshT("innerCompareFn")
         val a = freshT("a")
         val b = freshT("b")
@@ -152,9 +150,8 @@ object TraversablesOrderedBuf {
         };
         _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.TraversableHelpers.rawCompare($inputStreamA, $inputStreamB)($innerCompareFn)
       """
-      }
 
-      override def put(inputStream: ctx.TermName, element: ctx.TermName) = {
+      override def put(inputStream: ctx.TermName, element: ctx.TermName) =
         val asArray = freshT("asArray")
         val bytes = freshT("bytes")
         val len = freshT("len")
@@ -162,7 +159,7 @@ object TraversablesOrderedBuf {
         val innerElement = freshT("innerElement")
         val cmpRes = freshT("cmpRes")
 
-        maybeSort match {
+        maybeSort match
           case DoSort =>
             q"""
           val $len = $element.size
@@ -188,13 +185,11 @@ object TraversablesOrderedBuf {
             ${innerBuf.put(inputStream, innerElement)}
         }
         """
-        }
-      }
-      override def hash(element: ctx.TermName): ctx.Tree = {
+      override def hash(element: ctx.TermName): ctx.Tree =
         val currentHash = freshT("currentHash")
         val len = freshT("len")
         val target = freshT("target")
-        maybeSort match {
+        maybeSort match
           case NoSort =>
             q"""
             var $currentHash: Int = _root_.com.twitter.scalding.serialization.MurmurHashUtils.seed
@@ -202,8 +197,8 @@ object TraversablesOrderedBuf {
             $element.foreach { t =>
               val $target = t
               $currentHash =
-                _root_.com.twitter.scalding.serialization.MurmurHashUtils.mixH1($currentHash, ${innerBuf
-              .hash(target)})
+                _root_.com.twitter.scalding.serialization.MurmurHashUtils.mixH1($currentHash, $innerBuf
+              .hash(target))
               // go ahead and compute the length so we don't traverse twice for lists
               $len += 1
             }
@@ -223,15 +218,13 @@ object TraversablesOrderedBuf {
             // Might as well be fancy when we mix in the length
             _root_.com.twitter.scalding.serialization.MurmurHashUtils.fmix($currentHash, $len)
             """
-        }
-      }
 
-      override def get(inputStream: ctx.TermName): ctx.Tree = {
+      override def get(inputStream: ctx.TermName): ctx.Tree =
         val len = freshT("len")
         val firstVal = freshT("firstVal")
         val travBuilder = freshT("travBuilder")
         val iter = freshT("iter")
-        val extractionTree = maybeArray match {
+        val extractionTree = maybeArray match
           case IsArray =>
             q"""val $travBuilder = new Array[..$innerTypes]($len)
             var $iter = 0
@@ -251,7 +244,6 @@ object TraversablesOrderedBuf {
             }
             $travBuilder.result : $outerType
             """
-        }
         q"""
         val $len: Int = $inputStream.readPosVarInt
         if($len > 0) {
@@ -265,15 +257,14 @@ object TraversablesOrderedBuf {
           $companionSymbol.empty : $outerType
         }
       """
-      }
 
       override def compare(
-          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree = {
+          elementA: ctx.TermName, elementB: ctx.TermName): ctx.Tree =
 
         val a = freshT("a")
         val b = freshT("b")
         val cmpFnName = freshT("cmpFnName")
-        maybeSort match {
+        maybeSort match
           case DoSort =>
             q"""
               _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.TraversableHelpers.sortedCompare[${innerBuf.tpe}]($elementA, $elementB)($innerOrd)
@@ -283,15 +274,13 @@ object TraversablesOrderedBuf {
             q"""
               _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.TraversableHelpers.iteratorCompare[${innerBuf.tpe}]($elementA.iterator, $elementB.iterator)($innerOrd)
               """
-        }
-      }
 
       override val lazyOuterVariables: Map[String, ctx.Tree] =
         innerBuf.lazyOuterVariables
 
-      override def length(element: Tree): CompileTimeLengthTypes[c.type] = {
+      override def length(element: Tree): CompileTimeLengthTypes[c.type] =
 
-        innerBuf.length(q"$element.head") match {
+        innerBuf.length(q"$element.head") match
           case const: ConstantLengthCalculation[_] =>
             FastLengthCalculation(c)(q"""{
               posVarIntSize($element.size) + $element.size * ${const.toInt}
@@ -327,8 +316,3 @@ object TraversablesOrderedBuf {
                 _root_.com.twitter.scalding.serialization.macros.impl.ordered_serialization.runtime_helpers.NoLengthCalculation
               }
             """)
-        }
-      }
-    }
-  }
-}

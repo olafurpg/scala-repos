@@ -10,8 +10,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 
 @RunWith(classOf[JUnitRunner])
-class PrepareCacheTest extends FunSuite with MockitoSugar {
-  test("cache prepare requests") {
+class PrepareCacheTest extends FunSuite with MockitoSugar
+  test("cache prepare requests")
     val dispatcher = mock[Service[Request, Result]]
     val stmtId = 2
     when(dispatcher(any[Request]))
@@ -39,5 +39,3 @@ class PrepareCacheTest extends FunSuite with MockitoSugar {
     // evicted element is not in cache.
     svc(PrepareRequest("SELECT 1"))
     verify(dispatcher, times(2)).apply(PrepareRequest("SELECT 1"))
-  }
-}

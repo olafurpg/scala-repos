@@ -14,22 +14,19 @@ import org.jetbrains.plugins.scala.util.ScalaLanguageDerivative
   * Date: 17.02.2010
   */
 class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
-    extends GlobalSearchScope(project) {
+    extends GlobalSearchScope(project)
   val myIndex = ProjectRootManager.getInstance(project).getFileIndex
 
-  def isSearchInLibraries: Boolean = {
+  def isSearchInLibraries: Boolean =
     null == myDelegate || myDelegate.isSearchInLibraries
-  }
 
-  def compare(file1: VirtualFile, file2: VirtualFile): Int = {
+  def compare(file1: VirtualFile, file2: VirtualFile): Int =
     if (null != myDelegate) myDelegate.compare(file1, file2) else 0
-  }
 
-  def isSearchInModuleContent(aModule: Module): Boolean = {
+  def isSearchInModuleContent(aModule: Module): Boolean =
     null == myDelegate || myDelegate.isSearchInModuleContent(aModule)
-  }
 
-  def contains(file: VirtualFile): Boolean = {
+  def contains(file: VirtualFile): Boolean =
     (null == myDelegate || myDelegate.contains(file)) &&
     ((FileTypeManager
               .getInstance()
@@ -38,27 +35,20 @@ class ScalaSourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
         myIndex.isInSourceContent(file) ||
         StdFileTypes.CLASS.getDefaultExtension == file.getExtension &&
         myIndex.isInLibraryClasses(file))
-  }
-}
 
 class SourceFilterScope(myDelegate: GlobalSearchScope, project: Project)
-    extends GlobalSearchScope(project) {
+    extends GlobalSearchScope(project)
   val myIndex = ProjectRootManager.getInstance(project).getFileIndex
 
-  override def contains(file: VirtualFile): Boolean = {
+  override def contains(file: VirtualFile): Boolean =
     (myDelegate == null || myDelegate.contains(file)) &&
     myIndex.isInSourceContent(file)
-  }
 
-  override def compare(file1: VirtualFile, file2: VirtualFile): Int = {
+  override def compare(file1: VirtualFile, file2: VirtualFile): Int =
     if (myDelegate == null) myDelegate.compare(file1, file2) else 0
-  }
 
-  override def isSearchInModuleContent(aModule: Module): Boolean = {
+  override def isSearchInModuleContent(aModule: Module): Boolean =
     myDelegate == null || myDelegate.isSearchInModuleContent(aModule)
-  }
 
-  override def isSearchInLibraries: Boolean = {
+  override def isSearchInLibraries: Boolean =
     myDelegate == null || myDelegate.isSearchInLibraries
-  }
-}

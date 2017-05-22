@@ -14,7 +14,7 @@ class VariablesFromPatternsEvaluationTest_212
     extends VariablesFromPatternsEvaluationTestBase with ScalaVersion_2_12
 
 abstract class VariablesFromPatternsEvaluationTestBase
-    extends ScalaDebuggerTestCase {
+    extends ScalaDebuggerTestCase
   addFileWithBreakpoints("Match.scala",
                          s"""
        |object Match {
@@ -29,8 +29,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testMatch() {
-    runDebugger() {
+  def testMatch()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("all", "(List(1, 2),Some(z),None)")
       evalEquals("list", "List(1, 2)")
@@ -40,8 +40,6 @@ abstract class VariablesFromPatternsEvaluationTestBase
       evalEquals("z", "z")
       evalEquals("some", "Some(z)")
       evalEquals("args", "[]")
-    }
-  }
 
   addFileWithBreakpoints("MatchInForStmt.scala",
                          s"""
@@ -59,8 +57,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testMatchInForStmt() {
-    runDebugger() {
+  def testMatchInForStmt()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("all", "(List(1, 2),Some(z),List(aa, 1))")
       evalEquals("x", "(List(1, 2),Some(z),List(aa, 1))")
@@ -74,10 +72,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
       evalEquals("ss", "aa")
       evalEquals("i", "1")
       evalEquals("args", "[]")
-    }
-  }
 
-  addFileWithBreakpoints("RegexMatch.scala", {
+  addFileWithBreakpoints("RegexMatch.scala",
     val pattern = """"(-)?(\\d+)(\\.\\d*)?".r"""
     s"""
          |object RegexMatch {
@@ -92,16 +88,14 @@ abstract class VariablesFromPatternsEvaluationTestBase
          |  }
          |}
       """.stripMargin.trim()
-  })
-  def testRegexMatch() {
-    runDebugger() {
+  )
+  def testRegexMatch()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("number", "-2.5")
       evalEquals("sign", "-")
       evalEquals("dec", ".5")
       evalEquals("name", "name")
-    }
-  }
 
   addFileWithBreakpoints("Multilevel.scala",
                          s"""
@@ -124,8 +118,8 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testMultilevel() {
-    runDebugger() {
+  def testMultilevel()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("name", "name")
       evalEquals("args", "[]")
@@ -133,8 +127,6 @@ abstract class VariablesFromPatternsEvaluationTestBase
       evalEquals("some", "Some(List(1, 2))")
       evalEquals("seq", "List(1, 2)")
       evalEquals("two", "2")
-    }
-  }
 
   addFileWithBreakpoints("LocalInMatch.scala",
                          s"""
@@ -152,16 +144,14 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testLocalInMatch() {
-    runDebugger() {
+  def testLocalInMatch()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("name", "name")
       evalEquals("args", "[]")
       evalEquals("some", "Some(a)")
       evalEquals("a", "a")
       evalEquals("i", "10")
-    }
-  }
 
   addFileWithBreakpoints("AnonymousInMatch.scala",
                          s"""
@@ -178,14 +168,11 @@ abstract class VariablesFromPatternsEvaluationTestBase
        |  }
        |}
       """.stripMargin.trim())
-  def testAnonymousInMatch() {
-    runDebugger() {
+  def testAnonymousInMatch()
+    runDebugger()
       waitForBreakpoint()
       evalEquals("name", "name")
       evalEquals("args", "[]")
       evalEquals("some", "Some(a)")
       evalEquals("a", "a")
       evalEquals("i", "10")
-    }
-  }
-}

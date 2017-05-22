@@ -31,18 +31,15 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
                                       nodeType: IElementType,
                                       node: ASTNode)
     extends ScalaStubBasedElementImpl(stub, nodeType, node)
-    with ScReferencePattern with ContributedReferenceHost {
-  override def accept(visitor: PsiElementVisitor) {
-    visitor match {
+    with ScReferencePattern with ContributedReferenceHost
+  override def accept(visitor: PsiElementVisitor)
+    visitor match
       case visitor: ScalaElementVisitor => super.accept(visitor)
       case _ => super.accept(visitor)
-    }
-  }
 
   def this(node: ASTNode) = { this(null, null, node) }
-  def this(stub: ScReferencePatternStub) = {
+  def this(stub: ScReferencePatternStub) =
     this(stub, ScalaElementTypes.REFERENCE_PATTERN, null)
-  }
 
   override def isIrrefutableFor(t: Option[ScType]): Boolean = true
 
@@ -53,43 +50,36 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
 
   override def toString: String = "ReferencePattern: " + name
 
-  override def getType(ctx: TypingContext) = {
-    expectedType match {
+  override def getType(ctx: TypingContext) =
+    expectedType match
       case Some(x) => Success(x, Some(this))
       case _ => Failure("Cannot define expected type", Some(this))
-    }
-  }
 
-  override def getReferences: Array[PsiReference] = {
+  override def getReferences: Array[PsiReference] =
     PsiReferenceService.getService.getContributedReferences(this)
-  }
 
-  override def getNavigationElement = getContainingFile match {
-    case sf: ScalaFile if sf.isCompiled => {
+  override def getNavigationElement = getContainingFile match
+    case sf: ScalaFile if sf.isCompiled =>
         val parent =
           PsiTreeUtil.getParentOfType(this, classOf[ScMember]) // there is no complicated pattern-based declarations in decompiled files
-        if (parent != null) {
+        if (parent != null)
           val navElem = parent.getNavigationElement
-          navElem match {
+          navElem match
             case holder: ScDeclaredElementsHolder =>
               holder.declaredElements.find(_.name == name).getOrElse(navElem)
             case x => x
-          }
-        } else super.getNavigationElement
-      }
+        else super.getNavigationElement
     case _ => super.getNavigationElement
-  }
 
   override def processDeclarations(processor: PsiScopeProcessor,
                                    state: ResolveState,
                                    lastParent: PsiElement,
-                                   place: PsiElement): Boolean = {
+                                   place: PsiElement): Boolean =
     ScalaPsiUtil.processImportLastParent(
         processor, state, place, lastParent, getType(TypingContext.empty))
-  }
 
-  override def delete() {
-    getContext match {
+  override def delete()
+    getContext match
       case pList: ScPatternList if pList.patterns == Seq(this) =>
         val context: PsiElement = pList.getContext
         context.getContext.deleteChildRange(context, context)
@@ -114,9 +104,6 @@ class ScReferencePatternImpl private (stub: StubElement[ScReferencePattern],
         val anonymousRefPattern =
           ScalaPsiElementFactory.createWildcardPattern(getManager)
         replace(anonymousRefPattern)
-    }
-  }
 
   override def getOriginalElement: PsiElement =
     super [ScReferencePattern].getOriginalElement
-}

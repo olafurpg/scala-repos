@@ -24,32 +24,29 @@ import yggdrasil._
 import bytecode.{BinaryOperationType, JNumberT, JBooleanT, JTextT, Library, Instructions}
 
 trait OpFinderModule[M[+ _]]
-    extends Instructions with TableModule[M] with TableLibModule[M] {
+    extends Instructions with TableModule[M] with TableLibModule[M]
   import instructions._
 
-  trait OpFinder {
+  trait OpFinder
     def op1ForUnOp(op: UnaryOperation): library.Op1
     def op2ForBinOp(op: BinaryOperation): Option[library.Op2]
-  }
-}
 
 trait StdLibOpFinderModule[M[+ _]]
-    extends Instructions with StdLibModule[M] with OpFinderModule[M] {
+    extends Instructions with StdLibModule[M] with OpFinderModule[M]
   import instructions._
   import library._
 
-  trait StdLibOpFinder extends OpFinder {
-    override def op1ForUnOp(op: UnaryOperation) = op match {
+  trait StdLibOpFinder extends OpFinder
+    override def op1ForUnOp(op: UnaryOperation) = op match
       case BuiltInFunction1Op(op1) => op1
       case New | WrapArray => sys.error("assertion error")
       case Comp => Unary.Comp
       case Neg => Unary.Neg
-    }
 
-    override def op2ForBinOp(op: BinaryOperation) = {
+    override def op2ForBinOp(op: BinaryOperation) =
       import instructions._
 
-      op match {
+      op match
         case BuiltInFunction2Op(op2) => Some(op2)
         case Add => Some(Infix.Add)
         case Sub => Some(Infix.Sub)
@@ -71,7 +68,3 @@ trait StdLibOpFinderModule[M[+ _]]
         case WrapObject | JoinObject | JoinArray | ArraySwap | DerefMetadata |
             DerefObject | DerefArray =>
           None
-      }
-    }
-  }
-}

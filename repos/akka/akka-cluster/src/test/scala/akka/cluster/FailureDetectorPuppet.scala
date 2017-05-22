@@ -12,7 +12,7 @@ import akka.event.EventStream
   * User controllable "puppet" failure detector.
   */
 class FailureDetectorPuppet(config: Config, ev: EventStream)
-    extends FailureDetector {
+    extends FailureDetector
 
   trait Status
   object Up extends Status
@@ -25,12 +25,10 @@ class FailureDetectorPuppet(config: Config, ev: EventStream)
 
   def markNodeAsAvailable(): Unit = status.set(Up)
 
-  override def isAvailable: Boolean = status.get match {
+  override def isAvailable: Boolean = status.get match
     case Unknown | Up ⇒ true
     case Down ⇒ false
-  }
 
   override def isMonitoring: Boolean = status.get != Unknown
 
   override def heartbeat(): Unit = status.compareAndSet(Unknown, Up)
-}

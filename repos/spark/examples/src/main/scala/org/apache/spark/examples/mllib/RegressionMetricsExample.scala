@@ -26,8 +26,8 @@ import org.apache.spark.mllib.util.MLUtils
 // $example off$
 import org.apache.spark.sql.SQLContext
 
-object RegressionMetricsExample {
-  def main(args: Array[String]): Unit = {
+object RegressionMetricsExample
+  def main(args: Array[String]): Unit =
     val conf = new SparkConf().setAppName("RegressionMetricsExample")
     val sc = new SparkContext(conf)
     val sqlContext = new SQLContext(sc)
@@ -42,10 +42,9 @@ object RegressionMetricsExample {
     val model = LinearRegressionWithSGD.train(data, numIterations)
 
     // Get predictions
-    val valuesAndPreds = data.map { point =>
+    val valuesAndPreds = data.map  point =>
       val prediction = model.predict(point.features)
       (prediction, point.label)
-    }
 
     // Instantiate metrics object
     val metrics = new RegressionMetrics(valuesAndPreds)
@@ -63,6 +62,4 @@ object RegressionMetricsExample {
     // Explained variance
     println(s"Explained variance = ${metrics.explainedVariance}")
     // $example off$
-  }
-}
 // scalastyle:on println

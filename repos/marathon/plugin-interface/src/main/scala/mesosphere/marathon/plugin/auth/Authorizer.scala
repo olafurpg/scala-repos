@@ -10,7 +10,7 @@ import mesosphere.marathon.plugin.plugin.Plugin
   * [[Identity]] is a custom implementation that represents a person or system that has access to Marathon.
   * [[AuthorizedAction]] is the action
   */
-trait Authorizer extends Plugin {
+trait Authorizer extends Plugin
 
   /**
     * Decide whether it is allowed for the given principal to perform the given action on the given resource.
@@ -31,4 +31,3 @@ trait Authorizer extends Plugin {
     * @param response the response to customize.
     */
   def handleNotAuthorized(principal: Identity, response: HttpResponse)
-}

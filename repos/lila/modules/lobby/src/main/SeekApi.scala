@@ -15,7 +15,7 @@ final class SeekApi(coll: Coll,
                     archiveColl: Coll,
                     blocking: String => Fu[Set[String]],
                     maxPerPage: Int,
-                    maxPerUser: Int) {
+                    maxPerUser: Int)
 
   private sealed trait CacheKey
   private object ForAnon extends CacheKey
@@ -27,28 +27,25 @@ final class SeekApi(coll: Coll,
       .sort(BSONDocument("createdAt" -> -1))
       .cursor[Seek]()
 
-  private val cache = AsyncCache[CacheKey, List[Seek]](f = {
+  private val cache = AsyncCache[CacheKey, List[Seek]](f =
     case ForAnon => allCursor.collect[List](maxPerPage)
     case ForUser => allCursor.collect[List]()
-  }, timeToLive = 3.seconds)
+  , timeToLive = 3.seconds)
 
   def forAnon = cache(ForAnon)
 
   def forUser(user: User): Fu[List[Seek]] =
-    blocking(user.id) flatMap { blocking =>
+    blocking(user.id) flatMap  blocking =>
       forUser(LobbyUser.make(user, blocking))
-    }
 
-  def forUser(user: LobbyUser): Fu[List[Seek]] = cache(ForUser) map { seeks =>
-    val filtered = seeks.filter { seek =>
+  def forUser(user: LobbyUser): Fu[List[Seek]] = cache(ForUser) map  seeks =>
+    val filtered = seeks.filter  seek =>
       seek.user.id == user.id || Biter.canJoin(seek, user)
-    }
     noDupsFor(user, filtered) take maxPerPage
-  }
 
   private def noDupsFor(user: LobbyUser, seeks: List[Seek]) =
     seeks
-      .foldLeft(List[Seek]() -> Set[String]()) {
+      .foldLeft(List[Seek]() -> Set[String]())
         case ((res, h), seek) if seek.user.id == user.id => (seek :: res, h)
         case ((res, h), seek) =>
           val seekH =
@@ -59,7 +56,6 @@ final class SeekApi(coll: Coll,
                  seek.user.id) mkString ","
           if (h contains seekH) (res, h)
           else (seek :: res, h + seekH)
-      }
       ._1
       .reverse
 
@@ -67,11 +63,11 @@ final class SeekApi(coll: Coll,
     coll.find(BSONDocument("_id" -> id)).one[Seek]
 
   def insert(seek: Seek) =
-    coll.insert(seek) >> findByUser(seek.user.id).flatMap {
+    coll.insert(seek) >> findByUser(seek.user.id).flatMap
       case seeks if seeks.size <= maxPerUser => funit
       case seeks =>
         seeks.drop(maxPerUser).map(remove).sequenceFu
-    } >> cache.clear
+    >> cache.clear
 
   def findByUser(userId: String): Fu[List[Seek]] =
     coll
@@ -83,13 +79,12 @@ final class SeekApi(coll: Coll,
   def remove(seek: Seek) =
     coll.remove(BSONDocument("_id" -> seek.id)).void >> cache.clear
 
-  def archive(seek: Seek, gameId: String) = {
+  def archive(seek: Seek, gameId: String) =
     val archiveDoc =
       Seek.seekBSONHandler.write(seek) ++ BSONDocument(
           "gameId" -> gameId, "archivedAt" -> DateTime.now)
     coll.remove(BSONDocument("_id" -> seek.id)).void >> cache.clear >> archiveColl
       .insert(archiveDoc)
-  }
 
   def findArchived(gameId: String): Fu[Option[Seek]] =
     archiveColl.find(BSONDocument("gameId" -> gameId)).one[Seek]
@@ -101,4 +96,3 @@ final class SeekApi(coll: Coll,
               "user.id" -> userId
           ))
       .void >> cache.clear
-}

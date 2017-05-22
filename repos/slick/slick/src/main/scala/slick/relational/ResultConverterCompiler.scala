@@ -8,21 +8,19 @@ import org.slf4j.LoggerFactory
 
 /** Create a ResultConverter for parameters and result sets. Subclasses have
   * to provide profile-specific createColumnConverter implementations. */
-trait ResultConverterCompiler[Domain <: ResultConverterDomain] {
+trait ResultConverterCompiler[Domain <: ResultConverterDomain]
 
-  def compile(n: Node): ResultConverter[Domain, _] = n match {
+  def compile(n: Node): ResultConverter[Domain, _] = n match
     case InsertColumn(paths, fs, _) =>
-      val pathConvs = paths.map {
+      val pathConvs = paths.map
         case Select(_, ElementSymbol(idx)) =>
           createColumnConverter(n, idx, Some(fs))
-      }
       if (pathConvs.length == 1) pathConvs.head
       else CompoundResultConverter(1, pathConvs.toSeq: _*)
     case OptionApply(InsertColumn(paths, fs, _)) =>
-      val pathConvs = paths.map {
+      val pathConvs = paths.map
         case Select(_, ElementSymbol(idx)) =>
           createColumnConverter(n, idx, Some(fs))
-      }
       if (pathConvs.length == 1) pathConvs.head
       else CompoundResultConverter(1, pathConvs.toSeq: _*)
     case Select(_, ElementSymbol(idx)) => createColumnConverter(n, idx, None)
@@ -47,7 +45,6 @@ trait ResultConverterCompiler[Domain <: ResultConverterDomain] {
       createOptionRebuildingConverter(discConv, dataConv)
     case n =>
       throw new SlickException("Unexpected node in ResultSetMapping: " + n)
-  }
 
   def createGetOrElseResultConverter[T](
       rc: ResultConverter[Domain, Option[T]],
@@ -75,27 +72,22 @@ trait ResultConverterCompiler[Domain <: ResultConverterDomain] {
       idx: Int,
       column: Option[FieldSymbol]): ResultConverter[Domain, _]
 
-  def compileMapping(n: Node): CompiledMapping = {
+  def compileMapping(n: Node): CompiledMapping =
     val rc = compile(n)
     ResultConverterCompiler.logger.debug("Compiled ResultConverter", rc)
     CompiledMapping(rc, n.nodeType).infer()
-  }
-}
 
-object ResultConverterCompiler {
+object ResultConverterCompiler
   protected lazy val logger = new SlickLogger(
       LoggerFactory.getLogger(classOf[ResultConverterCompiler[_]]))
-}
 
 /** A node that wraps a ResultConverter */
 final case class CompiledMapping(
     converter: ResultConverter[_ <: ResultConverterDomain, _], buildType: Type)
-    extends NullaryNode with SimplyTypedNode {
+    extends NullaryNode with SimplyTypedNode
   type Self = CompiledMapping
   def rebuild = copy()
-  override def getDumpInfo = {
+  override def getDumpInfo =
     val di = super.getDumpInfo
     di.copy(mainInfo = "",
             children = di.children ++ Vector(("converter", converter)))
-  }
-}

@@ -27,26 +27,22 @@ import org.apache.spark.sql.catalyst.util.quietly
 import org.apache.spark.sql.hive.test.TestHiveSingleton
 
 class ErrorPositionSuite
-    extends QueryTest with TestHiveSingleton with BeforeAndAfterEach {
+    extends QueryTest with TestHiveSingleton with BeforeAndAfterEach
   import hiveContext.implicits._
 
-  override protected def beforeEach(): Unit = {
+  override protected def beforeEach(): Unit =
     super.beforeEach()
-    if (sqlContext.tableNames().contains("src")) {
+    if (sqlContext.tableNames().contains("src"))
       sqlContext.dropTempTable("src")
-    }
     Seq((1, "")).toDF("key", "value").registerTempTable("src")
     Seq((1, 1, 1)).toDF("a", "a", "b").registerTempTable("dupAttributes")
-  }
 
-  override protected def afterEach(): Unit = {
-    try {
+  override protected def afterEach(): Unit =
+    try
       sqlContext.dropTempTable("src")
       sqlContext.dropTempTable("dupAttributes")
-    } finally {
+    finally
       super.afterEach()
-    }
-  }
 
   positionTest(
       "ambiguous attribute reference 1", "SELECT a from dupAttributes", "a")
@@ -120,9 +116,8 @@ class ErrorPositionSuite
 
   positionTest("bad relation", "SELECT * FROM badTable", "badTable")
 
-  ignore("other expressions") {
+  ignore("other expressions")
     positionTest("bad addition", "SELECT 1 + array(1)", "1 + array")
-  }
 
   /**
     * Creates a test that checks to see if the error thrown when analyzing a given query includes
@@ -132,14 +127,13 @@ class ErrorPositionSuite
     * @param query the query to analyze
     * @param token a unique token in the string that should be indicated by the exception
     */
-  def positionTest(name: String, query: String, token: String): Unit = {
+  def positionTest(name: String, query: String, token: String): Unit =
     def ast = ParseDriver.parsePlan(query, hiveContext.conf)
     def parseTree = Try(quietly(ast.treeString)).getOrElse("<failed to parse>")
 
-    test(name) {
-      val error = intercept[AnalysisException] {
+    test(name)
+      val error = intercept[AnalysisException]
         quietly(hiveContext.sql(query))
-      }
 
       assert(!error.getMessage.contains("Seq("))
       assert(!error.getMessage.contains("List("))
@@ -147,23 +141,20 @@ class ErrorPositionSuite
       val (line, expectedLineNum) = query
         .split("\n")
         .zipWithIndex
-        .collect {
+        .collect
           case (l, i) if l.contains(token) => (l, i + 1)
-        }
         .headOption
         .getOrElse(sys.error(s"Invalid test. Token $token not in $query"))
-      val actualLine = error.line.getOrElse {
+      val actualLine = error.line.getOrElse
         fail(
             s"line not returned for error '${error.getMessage}' on token $token\n$parseTree"
         )
-      }
       assert(actualLine === expectedLineNum, "wrong line")
 
       val expectedStart = line.indexOf(token)
-      val actualStart = error.startPosition.getOrElse {
+      val actualStart = error.startPosition.getOrElse
         fail(
             s"start not returned for error on token $token\n${ast.treeString}")
-      }
       assert(expectedStart === actualStart, s"""Incorrect start position.
           |== QUERY ==
           |$query
@@ -177,6 +168,3 @@ class ErrorPositionSuite
           |0123456789 123456789 1234567890
           |          2         3
         """.stripMargin)
-    }
-  }
-}

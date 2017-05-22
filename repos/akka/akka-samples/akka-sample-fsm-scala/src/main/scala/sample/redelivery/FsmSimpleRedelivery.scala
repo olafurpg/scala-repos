@@ -8,7 +8,7 @@ import scala.concurrent.duration._
 import java.util.concurrent.ThreadLocalRandom
 import java.util.UUID
 
-object SimpleOrderedRedeliverer {
+object SimpleOrderedRedeliverer
 
   /**
     * Props for creating a [[SimpleOrderedRedeliverer]].
@@ -49,7 +49,6 @@ object SimpleOrderedRedeliverer {
     * Private message used only inside of the [[SimpleOrderedRedeliverer]] to signalize a tick of its retry timer.
     */
   private case object Retry
-}
 
 /**
   * An actor-in-the-middle kind. Takes care of message redelivery between two or more sides.
@@ -73,7 +72,7 @@ object SimpleOrderedRedeliverer {
   */
 class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration)
     extends Actor
-    with FSM[SimpleOrderedRedeliverer.State, SimpleOrderedRedeliverer.Data] {
+    with FSM[SimpleOrderedRedeliverer.State, SimpleOrderedRedeliverer.Data]
   import SimpleOrderedRedeliverer._
 
   // So that we don't make a typo when referencing this timer.
@@ -86,21 +85,19 @@ class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration)
     * Will process the provided request, sending an [[Ackable]] to its recipient and resetting the inner timer.
     * @return a new post-processing state.
     */
-  def process(request: Deliver, requester: ActorRef): State = {
+  def process(request: Deliver, requester: ActorRef): State =
     request.to ! Ackable(requester, request.msg, request.uuid)
     setTimer(RetryTimer, Retry, retryTimeout, repeat = false)
     goto(AwaitingAck) using LastRequest(request, requester)
-  }
 
   /*
    * When [[Idle]], accept new requests and process them, replying with [[WillTry]].
    */
-  when(Idle) {
+  when(Idle)
     case Event(request: Deliver, _) =>
       process(request, sender()) replying AcceptedForDelivery(request.uuid)
-  }
 
-  when(AwaitingAck) {
+  when(AwaitingAck)
 
     /*
      * When awaiting the [[Ack]] and receiver seems not to have made it,
@@ -127,35 +124,30 @@ class SimpleOrderedRedeliverer(retryTimeout: FiniteDuration)
      */
     case Event(request: Deliver, LastRequest(current, _)) =>
       stay() replying Busy(request.uuid, current.uuid)
-  }
-}
 
-object Receiver {
+object Receiver
 
   /**
     * Props for creating a [[Receiver]].
     */
   def props = Props(classOf[Receiver])
-}
 
-class Receiver extends Actor {
+class Receiver extends Actor
 
   /**
     * Simulate losing 75% of all messages on the receiving end. We want to see the redelivery in action!
     */
   def shouldSendAck = ThreadLocalRandom.current.nextDouble() < 0.25
 
-  def receive = {
+  def receive =
     case SimpleOrderedRedeliverer.Ackable(from, msg, uuid) =>
       val goingToSendAck = shouldSendAck
-      println(s"""  [Receiver] got "$msg"; ${if (goingToSendAck) ""
-      else " ***NOT***"} going to send Ack this time""")
+      println(s"""  [Receiver] got "$msg"; $if (goingToSendAck) ""
+      else " ***NOT***" going to send Ack this time""")
       // Send a [[SimpleOrderedRedeliverer.Ack]] -- if they're lucky!
       if (goingToSendAck) sender() ! SimpleOrderedRedeliverer.Ack(uuid)
-  }
-}
 
-object Requester {
+object Requester
 
   /**
     * Props for creating a [[Requester]].
@@ -166,9 +158,8 @@ object Requester {
     * Requester-private message used to drive the simulation.
     */
   private case object Tick
-}
 
-class Requester extends Actor {
+class Requester extends Actor
   import Requester._
   import context.dispatcher
 
@@ -195,7 +186,7 @@ class Requester extends Actor {
   def nextTickIn: FiniteDuration =
     (1.0 + ThreadLocalRandom.current.nextDouble() * 9.0).seconds
 
-  def receive = {
+  def receive =
     case Tick =>
       val msg = util.Random.shuffle(messages).head
       val uuid = UUID.randomUUID()
@@ -217,10 +208,8 @@ class Requester extends Actor {
      * and [[SimpleOrderedRedeliverer.Busy]] messages.
      */
     case msg => println(s"[Requester] got $msg")
-  }
-}
 
-object FsmSimpleRedelivery extends App {
+object FsmSimpleRedelivery extends App
 
   val system = ActorSystem()
 
@@ -228,4 +217,3 @@ object FsmSimpleRedelivery extends App {
    * Start a new [[Requester]] actor.
    */
   system.actorOf(Requester.props)
-}

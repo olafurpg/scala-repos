@@ -13,7 +13,7 @@ import org.junit.Assert._
 import org.scalajs.testsuite.utils.AssertThrows._
 import org.scalajs.testsuite.utils.Platform.executingInJVM
 
-class StringBufferTest {
+class StringBufferTest
 
   def newBuf: java.lang.StringBuffer =
     new java.lang.StringBuffer
@@ -21,7 +21,7 @@ class StringBufferTest {
   def initBuf(str: String): java.lang.StringBuffer =
     new java.lang.StringBuffer(str)
 
-  @Test def append(): Unit = {
+  @Test def append(): Unit =
     assertEquals("asdf", newBuf.append("asdf").toString)
     assertEquals("null", newBuf.append(null: AnyRef).toString)
     assertEquals("null", newBuf.append(null: String).toString)
@@ -35,9 +35,8 @@ class StringBufferTest {
     assertEquals("100000", newBuf.append(100000).toString)
     assertEquals("2.5", newBuf.append(2.5f).toString)
     assertEquals("3.5", newBuf.append(3.5).toString)
-  }
 
-  @Test def insert(): Unit = {
+  @Test def insert(): Unit =
     assertEquals("asdf", newBuf.insert(0, "asdf").toString)
     assertEquals("null", newBuf.insert(0, null: AnyRef).toString)
     assertEquals("null", newBuf.insert(0, null: String).toString)
@@ -68,9 +67,8 @@ class StringBufferTest {
                  initBuf("abcd").insert(5, "whatever"))
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuf("abcd").insert(-1, "whatever"))
-  }
 
-  @Test def deleteCharAt(): Unit = {
+  @Test def deleteCharAt(): Unit =
     assertEquals("023", initBuf("0123").deleteCharAt(1).toString)
     assertEquals("123", initBuf("0123").deleteCharAt(0).toString)
     assertEquals("012", initBuf("0123").deleteCharAt(3).toString)
@@ -78,9 +76,8 @@ class StringBufferTest {
                  initBuf("0123").deleteCharAt(-1))
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuf("0123").deleteCharAt(4))
-  }
 
-  @Test def replace(): Unit = {
+  @Test def replace(): Unit =
     assertEquals("0bc3", initBuf("0123").replace(1, 3, "bc").toString)
     assertEquals("abcd", initBuf("0123").replace(0, 4, "abcd").toString)
     assertEquals("abcd", initBuf("0123").replace(0, 10, "abcd").toString)
@@ -91,9 +88,8 @@ class StringBufferTest {
 
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuf("0123").replace(-1, 3, "x"))
-  }
 
-  @Test def setCharAt(): Unit = {
+  @Test def setCharAt(): Unit =
     val buf = newBuf
     buf.append("foobar")
 
@@ -105,14 +101,12 @@ class StringBufferTest {
 
     expectThrows(classOf[IndexOutOfBoundsException], buf.setCharAt(-1, 'h'))
     expectThrows(classOf[IndexOutOfBoundsException], buf.setCharAt(6, 'h'))
-  }
 
-  @Test def ensureCapacity(): Unit = {
+  @Test def ensureCapacity(): Unit =
     // test that ensureCapacity is linking
     newBuf.ensureCapacity(10)
-  }
 
-  @Test def should_properly_setLength(): Unit = {
+  @Test def should_properly_setLength(): Unit =
     val buf = newBuf
     buf.append("foobar")
 
@@ -120,9 +114,8 @@ class StringBufferTest {
 
     assertEquals("foo", { buf.setLength(3); buf.toString })
     assertEquals("foo\u0000\u0000\u0000", { buf.setLength(6); buf.toString })
-  }
 
-  @Test def appendCodePoint(): Unit = {
+  @Test def appendCodePoint(): Unit =
     val buf = newBuf
     buf.appendCodePoint(0x61)
     assertEquals("a", buf.toString)
@@ -131,10 +124,8 @@ class StringBufferTest {
     buf.append("fixture")
     buf.appendCodePoint(0x00010FFFF)
     assertEquals("a\uD800\uDC00fixture\uDBFF\uDFFF", buf.toString)
-  }
-}
 
-class StringBuilderTest {
+class StringBuilderTest
 
   def newBuilder: java.lang.StringBuilder =
     new java.lang.StringBuilder
@@ -142,7 +133,7 @@ class StringBuilderTest {
   def initBuilder(str: String): java.lang.StringBuilder =
     new java.lang.StringBuilder(str)
 
-  @Test def append(): Unit = {
+  @Test def append(): Unit =
     assertEquals("asdf", newBuilder.append("asdf").toString)
     assertEquals("null", newBuilder.append(null: AnyRef).toString)
     assertEquals("null", newBuilder.append(null: String).toString)
@@ -157,9 +148,8 @@ class StringBuilderTest {
     assertEquals("100000", newBuilder.append(100000).toString)
     assertEquals("2.5", newBuilder.append(2.5f).toString)
     assertEquals("3.5", newBuilder.append(3.5).toString)
-  }
 
-  @Test def insert(): Unit = {
+  @Test def insert(): Unit =
     assertEquals("asdf", newBuilder.insert(0, "asdf").toString)
     assertEquals("null", newBuilder.insert(0, null: AnyRef).toString)
     assertEquals("null", newBuilder.insert(0, null: String).toString)
@@ -194,14 +184,12 @@ class StringBuilderTest {
                  initBuilder("abcd").insert(5, "whatever"))
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuilder("abcd").insert(-1, "whatever"))
-  }
 
   @Test
-  def should_allow_string_interpolation_to_survive_null_and_undefined(): Unit = {
+  def should_allow_string_interpolation_to_survive_null_and_undefined(): Unit =
     assertEquals("null", s"${null}")
-  }
 
-  @Test def deleteCharAt(): Unit = {
+  @Test def deleteCharAt(): Unit =
     assertEquals("023", initBuilder("0123").deleteCharAt(1).toString)
     assertEquals("123", initBuilder("0123").deleteCharAt(0).toString)
     assertEquals("012", initBuilder("0123").deleteCharAt(3).toString)
@@ -209,9 +197,8 @@ class StringBuilderTest {
                  initBuilder("0123").deleteCharAt(-1))
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuilder("0123").deleteCharAt(4))
-  }
 
-  @Test def replace(): Unit = {
+  @Test def replace(): Unit =
     assertEquals("0bc3", initBuilder("0123").replace(1, 3, "bc").toString)
     assertEquals("abcd", initBuilder("0123").replace(0, 4, "abcd").toString)
     assertEquals("abcd", initBuilder("0123").replace(0, 10, "abcd").toString)
@@ -224,9 +211,8 @@ class StringBuilderTest {
 
     expectThrows(classOf[StringIndexOutOfBoundsException],
                  initBuilder("0123").replace(-1, 3, "x"))
-  }
 
-  @Test def setCharAt(): Unit = {
+  @Test def setCharAt(): Unit =
     val b = newBuilder
     b.append("foobar")
 
@@ -238,14 +224,12 @@ class StringBuilderTest {
 
     expectThrows(classOf[IndexOutOfBoundsException], b.setCharAt(-1, 'h'))
     expectThrows(classOf[IndexOutOfBoundsException], b.setCharAt(6, 'h'))
-  }
 
-  @Test def ensureCapacity(): Unit = {
+  @Test def ensureCapacity(): Unit =
     // test that ensureCapacity is linking
     newBuilder.ensureCapacity(10)
-  }
 
-  @Test def should_properly_setLength(): Unit = {
+  @Test def should_properly_setLength(): Unit =
     val b = newBuilder
     b.append("foobar")
 
@@ -253,9 +237,8 @@ class StringBuilderTest {
 
     assertEquals("foo", { b.setLength(3); b.toString })
     assertEquals("foo\u0000\u0000\u0000", { b.setLength(6); b.toString })
-  }
 
-  @Test def appendCodePoint(): Unit = {
+  @Test def appendCodePoint(): Unit =
     val b = newBuilder
     b.appendCodePoint(0x61)
     assertEquals("a", b.toString)
@@ -264,5 +247,3 @@ class StringBuilderTest {
     b.append("fixture")
     b.appendCodePoint(0x00010FFFF)
     assertEquals("a\uD800\uDC00fixture\uDBFF\uDFFF", b.toString)
-  }
-}

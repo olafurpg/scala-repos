@@ -10,7 +10,7 @@
   */
 package object play
 
-package play {
+package play
 
   /**
     * Contains the public API for Scala developers.
@@ -42,4 +42,3 @@ package play {
     *
     */
   package object api
-}

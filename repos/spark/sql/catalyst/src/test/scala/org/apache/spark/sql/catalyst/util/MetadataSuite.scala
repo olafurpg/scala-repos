@@ -22,7 +22,7 @@ import org.json4s.jackson.JsonMethods.parse
 import org.apache.spark.SparkFunSuite
 import org.apache.spark.sql.types.{Metadata, MetadataBuilder}
 
-class MetadataSuite extends SparkFunSuite {
+class MetadataSuite extends SparkFunSuite
 
   val baseMetadata = new MetadataBuilder()
     .putString("purpose", "ml")
@@ -55,7 +55,7 @@ class MetadataSuite extends SparkFunSuite {
     .putMetadataArray("features", Array(age, gender))
     .build()
 
-  test("metadata builder and getters") {
+  test("metadata builder and getters")
     assert(age.contains("summary") === false)
     assert(age.contains("index") === true)
     assert(age.getLong("index") === 1L)
@@ -81,15 +81,11 @@ class MetadataSuite extends SparkFunSuite {
     assert(gender.getStringArray("categories").toSeq === Seq("male", "female"))
     assert(metadata.contains("features") === true)
     assert(metadata.getMetadataArray("features").toSeq === Seq(age, gender))
-  }
 
-  test("metadata json conversion") {
+  test("metadata json conversion")
     val json = metadata.json
-    withClue("toJson must produce a valid JSON string") {
+    withClue("toJson must produce a valid JSON string")
       parse(json)
-    }
     val parsed = Metadata.fromJson(json)
     assert(parsed === metadata)
     assert(parsed.## === metadata.##)
-  }
-}

@@ -15,9 +15,8 @@ import scala.collection.JavaConverters._
 import scala.collection.SortedMap
 import scala.collection.immutable.Seq
 
-sealed trait DeploymentAction {
+sealed trait DeploymentAction
   def app: AppDefinition
-}
 
 // application has not been started before
 final case class StartApplication(app: AppDefinition, scaleTo: Int)
@@ -48,11 +47,10 @@ final case class ResolveArtifacts(
   *
   * @param actions the actions of this step that maybe executed in parallel
   */
-final case class DeploymentStep(actions: Seq[DeploymentAction]) {
+final case class DeploymentStep(actions: Seq[DeploymentAction])
   def +(step: DeploymentStep): DeploymentStep =
     DeploymentStep(actions ++ step.actions)
   def nonEmpty(): Boolean = actions.nonEmpty
-}
 
 /**
   * A deployment plan consists of the [[mesosphere.marathon.upgrade.DeploymentStep]]s necessary to
@@ -70,7 +68,7 @@ final case class DeploymentPlan(id: String,
                                 target: Group,
                                 steps: Seq[DeploymentStep],
                                 version: Timestamp)
-    extends MarathonState[Protos.DeploymentPlanDefinition, DeploymentPlan] {
+    extends MarathonState[Protos.DeploymentPlanDefinition, DeploymentPlan]
 
   /**
     * Reverts this plan by applying the reverse changes to the given Group.
@@ -93,13 +91,12 @@ final case class DeploymentPlan(id: String,
     // FIXME: check for group change conflicts?
     affectedApplicationIds.intersect(other.affectedApplicationIds).nonEmpty
 
-  def createdOrUpdatedApps: Seq[AppDefinition] = {
+  def createdOrUpdatedApps: Seq[AppDefinition] =
     target.transitiveApps.toIndexedSeq
       .filter(app => affectedApplicationIds(app.id))
-  }
 
-  override def toString: String = {
-    def appString(app: AppDefinition): String = {
+  override def toString: String =
+    def appString(app: AppDefinition): String =
       val cmdString = app.cmd.fold("")(cmd => ", cmd=\"" + cmd + "\"")
       val argsString =
         app.args.fold("")(args => ", args=\"" + args.mkString(" ") + "\"")
@@ -109,8 +106,7 @@ final case class DeploymentPlan(id: String,
         maybeDockerImage.fold("")(image => ", image=\"" + image + "\"")
 
       s"App(${app.id}$dockerImageString$cmdString$argsString))"
-    }
-    def actionString(a: DeploymentAction): String = a match {
+    def actionString(a: DeploymentAction): String = a match
       case StartApplication(app, scale) =>
         s"Start(${appString(app)}, instances=$scale)"
       case StopApplication(app) => s"Stop(${appString(app)})"
@@ -122,17 +118,15 @@ final case class DeploymentPlan(id: String,
         s"Scale(${appString(app)}, instances=$scale$killTasksString)"
       case RestartApplication(app) => s"Restart(${appString(app)})"
       case ResolveArtifacts(app, urls) => s"Resolve(${appString(app)}, $urls})"
-    }
     val stepString =
-      if (steps.nonEmpty) {
-        steps.map {
+      if (steps.nonEmpty)
+        steps.map
           _.actions.map(actionString).mkString("  * ", "\n  * ", "")
-        }.zipWithIndex.map {
+        .zipWithIndex.map
           case (stepsString, index) => s"step ${index + 1}:\n$stepsString"
-        }.mkString("\n", "\n", "")
-      } else " NO STEPS"
+        .mkString("\n", "\n", "")
+      else " NO STEPS"
     s"DeploymentPlan $version$stepString\n"
-  }
 
   override def mergeFromProto(bytes: Array[Byte]): DeploymentPlan =
     mergeFromProto(Protos.DeploymentPlanDefinition.parseFrom(bytes))
@@ -152,9 +146,8 @@ final case class DeploymentPlan(id: String,
       .setTarget(target.toProto)
       .setVersion(version.toString)
       .build()
-}
 
-object DeploymentPlan {
+object DeploymentPlan
   private val log = LoggerFactory.getLogger(getClass)
 
   def empty: DeploymentPlan =
@@ -193,30 +186,27 @@ object DeploymentPlan {
     * similar logic.
     */
   private[upgrade] def appsGroupedByLongestPath(
-      group: Group): SortedMap[Int, Set[AppDefinition]] = {
+      group: Group): SortedMap[Int, Set[AppDefinition]] =
 
     import org.jgrapht.DirectedGraph
     import org.jgrapht.graph.DefaultEdge
 
     def longestPathFromVertex[V](
-        g: DirectedGraph[V, DefaultEdge], vertex: V): Seq[V] = {
+        g: DirectedGraph[V, DefaultEdge], vertex: V): Seq[V] =
       val outgoingEdges: Set[DefaultEdge] =
         if (g.containsVertex(vertex)) g.outgoingEdgesOf(vertex).asScala.toSet
         else Set[DefaultEdge]()
 
       if (outgoingEdges.isEmpty) Seq(vertex)
       else
-        outgoingEdges.map { e =>
+        outgoingEdges.map  e =>
           vertex +: longestPathFromVertex(g, g.getEdgeTarget(e))
-        }.maxBy(_.length)
-    }
+        .maxBy(_.length)
 
-    val unsortedEquivalenceClasses = group.transitiveApps.groupBy { app =>
+    val unsortedEquivalenceClasses = group.transitiveApps.groupBy  app =>
       longestPathFromVertex(group.dependencyGraph, app).length
-    }
 
     SortedMap(unsortedEquivalenceClasses.toSeq: _*)
-  }
 
   /**
     * Returns a sequence of deployment steps, the order of which is derived
@@ -225,18 +215,18 @@ object DeploymentPlan {
   def dependencyOrderedSteps(
       original: Group,
       target: Group,
-      toKill: Map[PathId, Iterable[Task]]): Seq[DeploymentStep] = {
+      toKill: Map[PathId, Iterable[Task]]): Seq[DeploymentStep] =
     val originalApps: Map[PathId, AppDefinition] =
       original.transitiveApps.map(app => app.id -> app).toMap
 
     val appsByLongestPath: SortedMap[Int, Set[AppDefinition]] =
       appsGroupedByLongestPath(target)
 
-    appsByLongestPath.valuesIterator.map {
+    appsByLongestPath.valuesIterator.map
       (equivalenceClass: Set[AppDefinition]) =>
-        val actions: Set[DeploymentAction] = equivalenceClass.flatMap {
+        val actions: Set[DeploymentAction] = equivalenceClass.flatMap
           (newApp: AppDefinition) =>
-            originalApps.get(newApp.id) match {
+            originalApps.get(newApp.id) match
               // New app.
               case None =>
                 Some(ScaleApplication(newApp, newApp.instances))
@@ -253,12 +243,9 @@ object DeploymentPlan {
               // Other cases require no action.
               case _ =>
                 None
-            }
-        }
 
         DeploymentStep(actions.to[Seq])
-    }.to[Seq]
-  }
+    .to[Seq]
 
   /**
     * @param original the root group before the deployment
@@ -274,7 +261,7 @@ object DeploymentPlan {
       target: Group,
       resolveArtifacts: Seq[ResolveArtifacts] = Seq.empty,
       version: Timestamp = Timestamp.now(),
-      toKill: Map[PathId, Iterable[Task]] = Map.empty): DeploymentPlan = {
+      toKill: Map[PathId, Iterable[Task]] = Map.empty): DeploymentPlan =
 
     // Lookup maps for original and target apps.
     val originalApps: Map[PathId, AppDefinition] =
@@ -291,18 +278,18 @@ object DeploymentPlan {
 
     // 1. Destroy apps that do not exist in the target.
     steps += DeploymentStep(
-        (originalApps -- targetApps.keys).valuesIterator.map { oldApp =>
+        (originalApps -- targetApps.keys).valuesIterator.map  oldApp =>
           StopApplication(oldApp)
-        }.to[Seq]
+        .to[Seq]
     )
 
     // 2. Start apps that do not exist in the original, requiring only 0
     //    instances.  These are scaled as needed in the dependency-ordered
     //    steps that follow.
     steps += DeploymentStep(
-        (targetApps -- originalApps.keys).valuesIterator.map { newApp =>
+        (targetApps -- originalApps.keys).valuesIterator.map  newApp =>
           StartApplication(newApp, 0)
-        }.to[Seq]
+        .to[Seq]
     )
 
     // 3. For each app in each dependency class,
@@ -329,11 +316,8 @@ object DeploymentPlan {
     )
 
     result
-  }
 
   implicit lazy val deploymentPlanIsValid: Validator[DeploymentPlan] =
-    validator[DeploymentPlan] { plan =>
+    validator[DeploymentPlan]  plan =>
       plan.createdOrUpdatedApps as "app" is every(
           valid(AppDefinition.updateIsValid(plan.original)))
-    }
-}

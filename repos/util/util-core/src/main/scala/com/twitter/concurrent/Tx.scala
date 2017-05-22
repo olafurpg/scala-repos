@@ -13,7 +13,7 @@ import com.twitter.util.{Future, Promise}
   *   3. Once a transaction has been acknowledged by a party, that
   *   acknowledgment must be honored: The party cannot subsequently nack.
   */
-trait Tx[+T] {
+trait Tx[+T]
   import Tx.Result
 
   /**
@@ -29,12 +29,11 @@ trait Tx[+T] {
     * acknowledging it.
     */
   def nack()
-}
 
 /**
   * Note: There is a Java-friendly API for this object: [[com.twitter.concurrent.Txs]].
   */
-object Tx {
+object Tx
   sealed trait Result[+T]
   case object Abort extends Result[Nothing]
   case class Commit[T](value: T) extends Result[T]
@@ -42,20 +41,18 @@ object Tx {
   /**
     * A transaction that will always `ack()` with `Abort`.
     */
-  val aborted: Tx[Nothing] = new Tx[Nothing] {
+  val aborted: Tx[Nothing] = new Tx[Nothing]
     def ack() = Future.value(Abort)
     def nack() {}
-  }
 
   /**
     * A `Tx` that will always commit the given value immediately.
     *
     * Note: Updates here must also be done at [[com.twitter.concurrent.Txs.newConstTx()]].
     */
-  def const[T](msg: T): Tx[T] = new Tx[T] {
+  def const[T](msg: T): Tx[T] = new Tx[T]
     def ack() = Future.value(Commit(msg))
     def nack() {}
-  }
 
   /**
     * Analog of `Option.apply()` for Java compatibility.
@@ -76,7 +73,7 @@ object Tx {
     *
     * @return a `Tx` object for each participant, (sender, receiver)
     */
-  def twoParty[T](msg: T): (Tx[Unit], Tx[T]) = {
+  def twoParty[T](msg: T): (Tx[Unit], Tx[T]) =
     sealed trait State
     case object Idle extends State
     case class Ackd(who: AnyRef, confirm: Boolean => Unit) extends State
@@ -86,15 +83,15 @@ object Tx {
     var state: State = Idle
     val lock = new {}
 
-    class Party[U](msg: U) extends Tx[U] {
-      def ack(): Future[Result[U]] = lock.synchronized {
-        state match {
+    class Party[U](msg: U) extends Tx[U]
+      def ack(): Future[Result[U]] = lock.synchronized
+        state match
           case Idle =>
             val p = new Promise[Result[U]]
-            state = Ackd(this, {
+            state = Ackd(this,
               case true => p.setValue(Commit(msg))
               case false => p.setValue(Abort)
-            })
+            )
             p
 
           case Ackd(who, confirm) if who ne this =>
@@ -114,12 +111,10 @@ object Tx {
 
           case Done =>
             throw AlreadyDone
-        }
-      }
 
-      def nack() {
-        lock.synchronized {
-          state match {
+      def nack()
+        lock.synchronized
+          state match
             case Idle => state = Nackd(this)
             case Nackd(who) if who ne this => state = Done
             case Ackd(who, confirm) if who ne this =>
@@ -131,11 +126,5 @@ object Tx {
               throw AlreadyNackd
             case Done =>
               throw AlreadyDone
-          }
-        }
-      }
-    }
 
     (new Party(()), new Party(msg))
-  }
-}

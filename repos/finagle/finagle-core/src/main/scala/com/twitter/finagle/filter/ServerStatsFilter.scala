@@ -7,27 +7,24 @@ import com.twitter.finagle.{param, Service, ServiceFactory, SimpleFilter, Stack,
 import com.twitter.util.{Future, Stopwatch, Time, Duration}
 import java.util.concurrent.TimeUnit
 
-private[finagle] object ServerStatsFilter {
+private[finagle] object ServerStatsFilter
   val role = Stack.Role("ServerStats")
 
   /**
     * Creates a [[com.twitter.finagle.Stackable]] [[com.twitter.finagle.filter.ServerStatsFilter]].
     */
   def module[Req, Rep]: Stackable[ServiceFactory[Req, Rep]] =
-    new Stack.Module1[param.Stats, ServiceFactory[Req, Rep]] {
+    new Stack.Module1[param.Stats, ServiceFactory[Req, Rep]]
       val role = ServerStatsFilter.role
       val description =
         "Record elapsed execution time, transit latency, deadline budget, of underlying service"
-      def make(_stats: param.Stats, next: ServiceFactory[Req, Rep]) = {
+      def make(_stats: param.Stats, next: ServiceFactory[Req, Rep]) =
         val param.Stats(statsReceiver) = _stats
         new ServerStatsFilter(statsReceiver).andThen(next)
-      }
-    }
 
   /** Used as a sentinel with reference equality to indicate the absence of a deadline */
   private val NoDeadline = Deadline(Time.Undefined, Time.Undefined)
   private val NoDeadlineFn = () => NoDeadline
-}
 
 /**
   * A [[com.twitter.finagle.Filter]] that records the elapsed execution
@@ -39,18 +36,15 @@ private[finagle] object ServerStatsFilter {
   */
 private[finagle] class ServerStatsFilter[Req, Rep](
     statsReceiver: StatsReceiver, nowNanos: () => Long)
-    extends SimpleFilter[Req, Rep] {
+    extends SimpleFilter[Req, Rep]
   def this(statsReceiver: StatsReceiver) =
     this(statsReceiver, Stopwatch.systemNanos)
 
   private[this] val handletime = statsReceiver.stat("handletime_us")
 
-  def apply(request: Req, service: Service[Req, Rep]): Future[Rep] = {
+  def apply(request: Req, service: Service[Req, Rep]): Future[Rep] =
     val startAt = nowNanos()
-    try service(request) finally {
+    try service(request) finally
       val elapsedNs = nowNanos() - startAt
       handletime.add(
           TimeUnit.MICROSECONDS.convert(elapsedNs, TimeUnit.NANOSECONDS))
-    }
-  }
-}

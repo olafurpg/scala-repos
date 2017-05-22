@@ -11,11 +11,11 @@ import org.jetbrains.plugins.scala.lang.psi.types.ScType
   * User: Alefas
   * Date: 19.10.11
   */
-class ScalaLiteralEvaluator(value: AnyRef, tp: ScType) extends Evaluator {
-  def evaluate(context: EvaluationContextImpl): AnyRef = {
+class ScalaLiteralEvaluator(value: AnyRef, tp: ScType) extends Evaluator
+  def evaluate(context: EvaluationContextImpl): AnyRef =
     if (value == null) return null
     val vm = context.getDebugProcess.getVirtualMachineProxy
-    value match {
+    value match
       case s: String => vm.mirrorOf(s)
       case b: java.lang.Boolean =>
         DebuggerUtil.createValue(vm, tp, b.booleanValue())
@@ -28,20 +28,14 @@ class ScalaLiteralEvaluator(value: AnyRef, tp: ScType) extends Evaluator {
       case n: java.lang.Number =>
         DebuggerUtil.createValue(vm, tp, n.longValue())
       case _ => throw EvaluationException("unknown type of literal")
-    }
-  }
 
   def getModifier: Modifier = null
-}
 
-object ScalaLiteralEvaluator {
-  def apply(l: ScLiteral): ScalaLiteralEvaluator = {
+object ScalaLiteralEvaluator
+  def apply(l: ScLiteral): ScalaLiteralEvaluator =
     val tp = l.getType().getOrAny
     val value = l.getValue
     import org.jetbrains.plugins.scala.lang.psi.types.Null
-    if (value == null && tp != Null) {
+    if (value == null && tp != Null)
       throw EvaluationException(s"Literal ${l.getText} has null value")
-    }
     new ScalaLiteralEvaluator(value, tp)
-  }
-}

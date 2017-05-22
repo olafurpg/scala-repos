@@ -41,7 +41,7 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
                                                   cores: Int,
                                                   userClassPath: Seq[URL],
                                                   env: SparkEnv)
-    extends ThreadSafeRpcEndpoint with ExecutorBackend with Logging {
+    extends ThreadSafeRpcEndpoint with ExecutorBackend with Logging
 
   private[this] val stopping = new AtomicBoolean(false)
   var executor: Executor = null
@@ -52,37 +52,33 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
   private[this] val ser: SerializerInstance =
     env.closureSerializer.newInstance()
 
-  override def onStart() {
+  override def onStart()
     logInfo("Connecting to driver: " + driverUrl)
     rpcEnv
       .asyncSetupEndpointRefByURI(driverUrl)
-      .flatMap { ref =>
+      .flatMap  ref =>
         // This is a very fast action so we can use "ThreadUtils.sameThread"
         driver = Some(ref)
         ref.ask[RegisterExecutorResponse](
             RegisterExecutor(executorId, self, cores, extractLogUrls))
-      }(ThreadUtils.sameThread)
-      .onComplete {
+      (ThreadUtils.sameThread)
+      .onComplete
         // This is a very fast action so we can use "ThreadUtils.sameThread"
         case Success(msg) =>
-          Utils.tryLogNonFatalError {
+          Utils.tryLogNonFatalError
             Option(self).foreach(_.send(msg)) // msg must be RegisterExecutorResponse
-          }
-        case Failure(e) => {
+        case Failure(e) =>
             logError(s"Cannot register with driver: $driverUrl", e)
             System.exit(1)
-          }
-      }(ThreadUtils.sameThread)
-  }
+      (ThreadUtils.sameThread)
 
-  def extractLogUrls: Map[String, String] = {
+  def extractLogUrls: Map[String, String] =
     val prefix = "SPARK_LOG_URL_"
     sys.env
       .filterKeys(_.startsWith(prefix))
       .map(e => (e._1.substring(prefix.length).toLowerCase, e._2))
-  }
 
-  override def receive: PartialFunction[Any, Unit] = {
+  override def receive: PartialFunction[Any, Unit] =
     case RegisteredExecutor(hostname) =>
       logInfo("Successfully registered with driver")
       executor = new Executor(
@@ -93,10 +89,10 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
       System.exit(1)
 
     case LaunchTask(data) =>
-      if (executor == null) {
+      if (executor == null)
         logError("Received LaunchTask command but executor was null")
         System.exit(1)
-      } else {
+      else
         val taskDesc = ser.deserialize[TaskDescription](data.value)
         logInfo("Got assigned task " + taskDesc.taskId)
         executor.launchTask(this,
@@ -104,15 +100,13 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
                             attemptNumber = taskDesc.attemptNumber,
                             taskDesc.name,
                             taskDesc.serializedTask)
-      }
 
     case KillTask(taskId, _, interruptThread) =>
-      if (executor == null) {
+      if (executor == null)
         logError("Received KillTask command but executor was null")
         System.exit(1)
-      } else {
+      else
         executor.killTask(taskId, interruptThread)
-      }
 
     case StopExecutor =>
       stopping.set(true)
@@ -126,30 +120,24 @@ private[spark] class CoarseGrainedExecutorBackend(override val rpcEnv: RpcEnv,
       executor.stop()
       stop()
       rpcEnv.shutdown()
-  }
 
-  override def onDisconnected(remoteAddress: RpcAddress): Unit = {
-    if (stopping.get()) {
+  override def onDisconnected(remoteAddress: RpcAddress): Unit =
+    if (stopping.get())
       logInfo(s"Driver from $remoteAddress disconnected during shutdown")
-    } else if (driver.exists(_.address == remoteAddress)) {
+    else if (driver.exists(_.address == remoteAddress))
       logError(s"Driver $remoteAddress disassociated! Shutting down.")
       System.exit(1)
-    } else {
+    else
       logWarning(s"An unknown ($remoteAddress) driver disconnected.")
-    }
-  }
 
-  override def statusUpdate(taskId: Long, state: TaskState, data: ByteBuffer) {
+  override def statusUpdate(taskId: Long, state: TaskState, data: ByteBuffer)
     val msg = StatusUpdate(executorId, taskId, state, data)
-    driver match {
+    driver match
       case Some(driverRef) => driverRef.send(msg)
       case None =>
         logWarning(s"Drop $msg because has not yet connected to driver")
-    }
-  }
-}
 
-private[spark] object CoarseGrainedExecutorBackend extends Logging {
+private[spark] object CoarseGrainedExecutorBackend extends Logging
 
   private def run(driverUrl: String,
                   executorId: String,
@@ -157,11 +145,11 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
                   cores: Int,
                   appId: String,
                   workerUrl: Option[String],
-                  userClassPath: Seq[URL]) {
+                  userClassPath: Seq[URL])
 
     Utils.initDaemon(log)
 
-    SparkHadoopUtil.get.runAsSparkUser { () =>
+    SparkHadoopUtil.get.runAsSparkUser  () =>
       // Debug code
       Utils.checkHost(hostname)
 
@@ -182,19 +170,16 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
 
       // Create SparkEnv using properties we fetched from the driver.
       val driverConf = new SparkConf()
-      for ((key, value) <- props) {
+      for ((key, value) <- props)
         // this is required for SSL in standalone mode
-        if (SparkConf.isExecutorStartupConf(key)) {
+        if (SparkConf.isExecutorStartupConf(key))
           driverConf.setIfMissing(key, value)
-        } else {
+        else
           driverConf.set(key, value)
-        }
-      }
-      if (driverConf.contains("spark.yarn.credentials.file")) {
+      if (driverConf.contains("spark.yarn.credentials.file"))
         logInfo("Will periodically update credentials from: " +
             driverConf.get("spark.yarn.credentials.file"))
         SparkHadoopUtil.get.startExecutorDelegationTokenRenewer(driverConf)
-      }
 
       val env = SparkEnv.createExecutorEnv(
           driverConf, executorId, hostname, port, cores, isLocal = false)
@@ -203,16 +188,13 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
           "Executor",
           new CoarseGrainedExecutorBackend(
               env.rpcEnv, driverUrl, executorId, cores, userClassPath, env))
-      workerUrl.foreach { url =>
+      workerUrl.foreach  url =>
         env.rpcEnv.setupEndpoint("WorkerWatcher",
                                  new WorkerWatcher(env.rpcEnv, url))
-      }
       env.rpcEnv.awaitTermination()
       SparkHadoopUtil.get.stopExecutorDelegationTokenRenewer()
-    }
-  }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     var driverUrl: String = null
     var executorId: String = null
     var hostname: String = null
@@ -222,8 +204,8 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
     val userClassPath = new mutable.ListBuffer[URL]()
 
     var argv = args.toList
-    while (!argv.isEmpty) {
-      argv match {
+    while (!argv.isEmpty)
+      argv match
         case ("--driver-url") :: value :: tail =>
           driverUrl = value
           argv = tail
@@ -252,13 +234,10 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
           System.err.println(s"Unrecognized options: ${tail.mkString(" ")}")
           // scalastyle:on println
           printUsageAndExit()
-      }
-    }
 
     if (driverUrl == null || executorId == null || hostname == null ||
-        cores <= 0 || appId == null) {
+        cores <= 0 || appId == null)
       printUsageAndExit()
-    }
 
     run(driverUrl,
         executorId,
@@ -268,9 +247,8 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
         workerUrl,
         userClassPath)
     System.exit(0)
-  }
 
-  private def printUsageAndExit() = {
+  private def printUsageAndExit() =
     // scalastyle:off println
     System.err.println("""
       |Usage: CoarseGrainedExecutorBackend [options]
@@ -286,5 +264,3 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       |""".stripMargin)
     // scalastyle:on println
     System.exit(1)
-  }
-}

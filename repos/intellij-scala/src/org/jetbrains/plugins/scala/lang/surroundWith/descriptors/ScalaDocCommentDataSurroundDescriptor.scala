@@ -13,7 +13,7 @@ import scala.collection.mutable.ArrayBuffer
   * User: Dmitry Naydanov
   * Date: 3/2/12
   */
-class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
+class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor
   val surrounders = Array[Surrounder](new ScalaDocWithBoldSurrounder,
                                       new ScalaDocWithUnderlinedSurrounder,
                                       new ScalaDocWithMonospaceSurrounder,
@@ -22,7 +22,7 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
                                       new ScalaDocWithSuperscriptSurrounder)
 
   def getElementsToSurround(
-      file: PsiFile, startOffset: Int, endOffset: Int): Array[PsiElement] = {
+      file: PsiFile, startOffset: Int, endOffset: Int): Array[PsiElement] =
     if (endOffset == startOffset) return PsiElement.EMPTY_ARRAY
 
     val validBoundElements = Set(DOC_COMMENT_DATA, DOC_WHITESPACE)
@@ -43,24 +43,22 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
       return PsiElement.EMPTY_ARRAY
 
     val isFirstElementMarked =
-      if (checkBoundElement(startElement)) {
+      if (checkBoundElement(startElement))
         //cannot extract function because of return
         false
-      } else {
+      else
         if (checkSyntaxBoundElement(startElement, true)) true
         else return PsiElement.EMPTY_ARRAY
-      }
 
     val isLastElementMarked =
-      if (checkBoundElement(endElement)) {
+      if (checkBoundElement(endElement))
         false
-      } else {
+      else
         if (checkSyntaxBoundElement(endElement, false)) true
         else return PsiElement.EMPTY_ARRAY
-      }
 
-    if (startElement.getParent != endElement.getParent) {
-      (isFirstElementMarked, isLastElementMarked) match {
+    if (startElement.getParent != endElement.getParent)
+      (isFirstElementMarked, isLastElementMarked) match
         case (true, true)
             if
             (startElement.getParent.getParent == endElement.getParent.getParent) =>
@@ -69,36 +67,31 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
         case (false, true)
             if (startElement.getParent == endElement.getParent.getParent) =>
         case _ => return PsiElement.EMPTY_ARRAY
-      }
-    } else if (isFirstElementMarked && isLastElementMarked) {
+    else if (isFirstElementMarked && isLastElementMarked)
       // in case <selection>__blah blah__</selection>
       return Array(startElement.getParent)
-    }
 
-    if (endElement == startElement) {
+    if (endElement == startElement)
       return Array(startElement)
-    }
 
     var (nextElement, elementsToSurround) =
-      if (isFirstElementMarked) {
+      if (isFirstElementMarked)
         if (startElement.getParent.getTextRange.getEndOffset <= endOffset)
           (startElement.getParent.getNextSibling,
            ArrayBuffer(startElement.getParent))
         else return PsiElement.EMPTY_ARRAY
-      } else {
+      else
         (startElement.getNextSibling, ArrayBuffer(startElement))
-      }
     val lastBoundElement =
-      if (isLastElementMarked) {
+      if (isLastElementMarked)
         if (endElement.getTextOffset >= startOffset) (endElement.getParent)
         else return PsiElement.EMPTY_ARRAY
-      } else {
+      else
         endElement
-      }
 
     var hasAsterisk = false
 
-    do {
+    do
       if (nextElement == null) return PsiElement.EMPTY_ARRAY
 
       if ((!Set(DOC_COMMENT_DATA,
@@ -108,23 +101,20 @@ class ScalaDocCommentDataSurroundDescriptor extends SurroundDescriptor {
                 .isInstanceOf[ScaladocSyntaxElementType]) ||
           (nextElement.getNode.getElementType == DOC_WHITESPACE &&
               nextElement.getText.indexOf("\n") != nextElement.getText
-                .lastIndexOf("\n"))) {
+                .lastIndexOf("\n")))
         return PsiElement.EMPTY_ARRAY
-      } else if (nextElement.getNode.getElementType == DOC_COMMENT_LEADING_ASTERISKS) {
+      else if (nextElement.getNode.getElementType == DOC_COMMENT_LEADING_ASTERISKS)
         if (hasAsterisk) return PsiElement.EMPTY_ARRAY
         hasAsterisk = true
-      } else if (nextElement.getNode.getElementType != DOC_WHITESPACE) {
+      else if (nextElement.getNode.getElementType != DOC_WHITESPACE)
         hasAsterisk = false
-      }
 
       elementsToSurround += nextElement
-    } while (nextElement != lastBoundElement &&
+    while (nextElement != lastBoundElement &&
     (nextElement = nextElement.getNextSibling, true)._2);
 
     elementsToSurround.toArray
-  }
 
   def getSurrounders: Array[Surrounder] = surrounders
 
   def isExclusive: Boolean = false
-}

@@ -32,56 +32,51 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.test.SharedSQLContext
 import org.apache.spark.sql.types._
 
-class PlannerSuite extends SharedSQLContext {
+class PlannerSuite extends SharedSQLContext
   import testImplicits._
 
   setupTestData()
 
-  private def testPartialAggregationPlan(query: LogicalPlan): Unit = {
+  private def testPartialAggregationPlan(query: LogicalPlan): Unit =
     val planner = sqlContext.sessionState.planner
     import planner._
     val plannedOption = Aggregation(query).headOption
     val planned = plannedOption.getOrElse(
         fail(s"Could query play aggregation query $query. Is it an aggregation query?"))
-    val aggregations = planned.collect {
+    val aggregations = planned.collect
       case n if n.nodeName contains "Aggregate" => n
-    }
 
     // For the new aggregation code path, there will be four aggregate operator for
     // distinct aggregations.
     assert(aggregations.size == 2 || aggregations.size == 4,
            s"The plan of query $query does not have partial aggregations.")
-  }
 
-  test("count is partially aggregated") {
+  test("count is partially aggregated")
     val query =
       testData.groupBy('value).agg(count('key)).queryExecution.analyzed
     testPartialAggregationPlan(query)
-  }
 
-  test("count distinct is partially aggregated") {
+  test("count distinct is partially aggregated")
     val query =
       testData.groupBy('value).agg(countDistinct('key)).queryExecution.analyzed
     testPartialAggregationPlan(query)
-  }
 
-  test("mixed aggregates are partially aggregated") {
+  test("mixed aggregates are partially aggregated")
     val query = testData
       .groupBy('value)
       .agg(count('value), countDistinct('key))
       .queryExecution
       .analyzed
     testPartialAggregationPlan(query)
-  }
 
   test(
-      "sizeInBytes estimation of limit operator for broadcast hash join optimization") {
-    def checkPlan(fieldTypes: Seq[DataType]): Unit = {
-      withTempTable("testLimit") {
+      "sizeInBytes estimation of limit operator for broadcast hash join optimization")
+    def checkPlan(fieldTypes: Seq[DataType]): Unit =
+      withTempTable("testLimit")
         val fields =
-          fieldTypes.zipWithIndex.map {
+          fieldTypes.zipWithIndex.map
             case (dataType, index) => StructField(s"c${index}", dataType, true)
-          } :+ StructField("key", IntegerType, true)
+          :+ StructField("key", IntegerType, true)
         val schema = StructType(fields)
         val row = Row.fromSeq(Seq.fill(fields.size)(null))
         val rowRDD = sparkContext.parallelize(row :: Nil)
@@ -95,26 +90,21 @@ class PlannerSuite extends SharedSQLContext {
             |FROM testData2 l JOIN (SELECT * FROM testLimit LIMIT 1) r ON (l.a = r.key)
           """.stripMargin).queryExecution.sparkPlan
 
-        val broadcastHashJoins = planned.collect {
+        val broadcastHashJoins = planned.collect
           case join: BroadcastHashJoin => join
-        }
-        val sortMergeJoins = planned.collect {
+        val sortMergeJoins = planned.collect
           case join: SortMergeJoin => join
-        }
 
         assert(broadcastHashJoins.size === 1, "Should use broadcast hash join")
         assert(sortMergeJoins.isEmpty, "Should not use sort merge join")
-      }
-    }
 
     val simpleTypes =
       NullType :: BooleanType :: ByteType :: ShortType :: IntegerType :: LongType :: FloatType :: DoubleType :: DecimalType(
           10,
           5) :: DecimalType.SYSTEM_DEFAULT :: DateType :: TimestampType :: StringType :: BinaryType :: Nil
 
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "16434") {
+    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "16434")
       checkPlan(simpleTypes)
-    }
 
     val complexTypes =
       ArrayType(DoubleType, true) :: ArrayType(StringType, false) :: MapType(
@@ -125,14 +115,12 @@ class PlannerSuite extends SharedSQLContext {
               StructField("b", ArrayType(DoubleType), nullable = false),
               StructField("c", DoubleType, nullable = false))) :: Nil
 
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "901617") {
+    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "901617")
       checkPlan(complexTypes)
-    }
-  }
 
-  test("InMemoryRelation statistics propagation") {
-    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "81920") {
-      withTempTable("tiny") {
+  test("InMemoryRelation statistics propagation")
+    withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "81920")
+      withTempTable("tiny")
         testData.limit(3).registerTempTable("tiny")
         sql("CACHE TABLE tiny")
 
@@ -140,83 +128,69 @@ class PlannerSuite extends SharedSQLContext {
         val b = sqlContext.table("tiny").as("b")
         val planned = a.join(b, $"a.key" === $"b.key").queryExecution.sparkPlan
 
-        val broadcastHashJoins = planned.collect {
+        val broadcastHashJoins = planned.collect
           case join: BroadcastHashJoin => join
-        }
-        val sortMergeJoins = planned.collect {
+        val sortMergeJoins = planned.collect
           case join: SortMergeJoin => join
-        }
 
         assert(broadcastHashJoins.size === 1, "Should use broadcast hash join")
         assert(sortMergeJoins.isEmpty, "Should not use shuffled hash join")
 
         sqlContext.clearCache()
-      }
-    }
-  }
 
-  test("SPARK-11390 explain should print PushedFilters of PhysicalRDD") {
-    withTempPath { file =>
+  test("SPARK-11390 explain should print PushedFilters of PhysicalRDD")
+    withTempPath  file =>
       val path = file.getCanonicalPath
       testData.write.parquet(path)
       val df = sqlContext.read.parquet(path)
       sqlContext.registerDataFrameAsTable(df, "testPushed")
 
-      withTempTable("testPushed") {
+      withTempTable("testPushed")
         val exp =
           sql("select * from testPushed where key = 15").queryExecution.sparkPlan
         assert(exp.toString.contains(
                 "PushedFilters: [IsNotNull(key), EqualTo(key,15)]"))
-      }
-    }
-  }
 
-  test("efficient terminal limit -> sort should use TakeOrderedAndProject") {
+  test("efficient terminal limit -> sort should use TakeOrderedAndProject")
     val query = testData.select('key, 'value).sort('key).limit(2)
     val planned = query.queryExecution.executedPlan
     assert(planned.isInstanceOf[execution.TakeOrderedAndProject])
     assert(planned.output === testData.select('key, 'value).logicalPlan.output)
-  }
 
-  test("terminal limit -> project -> sort should use TakeOrderedAndProject") {
+  test("terminal limit -> project -> sort should use TakeOrderedAndProject")
     val query =
       testData.select('key, 'value).sort('key).select('value, 'key).limit(2)
     val planned = query.queryExecution.executedPlan
     assert(planned.isInstanceOf[execution.TakeOrderedAndProject])
     assert(planned.output === testData.select('value, 'key).logicalPlan.output)
-  }
 
   test(
-      "terminal limits that are not handled by TakeOrderedAndProject should use CollectLimit") {
+      "terminal limits that are not handled by TakeOrderedAndProject should use CollectLimit")
     val query = testData.select('value).limit(2)
     val planned = query.queryExecution.sparkPlan
     assert(planned.isInstanceOf[CollectLimit])
     assert(planned.output === testData.select('value).logicalPlan.output)
-  }
 
-  test("TakeOrderedAndProject can appear in the middle of plans") {
+  test("TakeOrderedAndProject can appear in the middle of plans")
     val query =
       testData.select('key, 'value).sort('key).limit(2).filter('key === 3)
     val planned = query.queryExecution.executedPlan
     assert(planned.find(_.isInstanceOf[TakeOrderedAndProject]).isDefined)
-  }
 
-  test("CollectLimit can appear in the middle of a plan when caching is used") {
+  test("CollectLimit can appear in the middle of a plan when caching is used")
     val query = testData.select('key, 'value).limit(2).cache()
     val planned =
       query.queryExecution.optimizedPlan.asInstanceOf[InMemoryRelation]
     assert(planned.child.isInstanceOf[CollectLimit])
-  }
 
-  test("PartitioningCollection") {
-    withTempTable("normal", "small", "tiny") {
+  test("PartitioningCollection")
+    withTempTable("normal", "small", "tiny")
       testData.registerTempTable("normal")
       testData.limit(10).registerTempTable("small")
       testData.limit(3).registerTempTable("tiny")
 
       // Disable broadcast join
-      withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "-1") {
-        {
+      withSQLConf(SQLConf.AUTO_BROADCASTJOIN_THRESHOLD.key -> "-1")
           val numExchanges = sql(
               """
               |SELECT *
@@ -224,13 +198,11 @@ class PlannerSuite extends SharedSQLContext {
               |  normal JOIN small ON (normal.key = small.key)
               |  JOIN tiny ON (small.key = tiny.key)
             """.stripMargin
-          ).queryExecution.executedPlan.collect {
+          ).queryExecution.executedPlan.collect
             case exchange: ShuffleExchange => exchange
-          }.length
+          .length
           assert(numExchanges === 5)
-        }
 
-        {
           // This second query joins on different keys:
           val numExchanges = sql(
               """
@@ -239,16 +211,12 @@ class PlannerSuite extends SharedSQLContext {
               |  normal JOIN small ON (normal.key = small.key)
               |  JOIN tiny ON (normal.key = tiny.key)
             """.stripMargin
-          ).queryExecution.executedPlan.collect {
+          ).queryExecution.executedPlan.collect
             case exchange: ShuffleExchange => exchange
-          }.length
+          .length
           assert(numExchanges === 5)
-        }
-      }
-    }
-  }
 
-  test("collapse adjacent repartitions") {
+  test("collapse adjacent repartitions")
     val doubleRepartitioned =
       testData.repartition(10).repartition(20).coalesce(5)
     def countRepartitions(plan: LogicalPlan): Int =
@@ -256,12 +224,10 @@ class PlannerSuite extends SharedSQLContext {
     assert(countRepartitions(doubleRepartitioned.queryExecution.logical) === 3)
     assert(
         countRepartitions(doubleRepartitioned.queryExecution.optimizedPlan) === 1)
-    doubleRepartitioned.queryExecution.optimizedPlan match {
+    doubleRepartitioned.queryExecution.optimizedPlan match
       case r: Repartition =>
         assert(r.numPartitions === 5)
         assert(r.shuffle === false)
-    }
-  }
 
   // --- Unit tests of EnsureRequirements ---------------------------------------------------------
 
@@ -270,25 +236,21 @@ class PlannerSuite extends SharedSQLContext {
   // do they satisfy the distribution requirements? As a result, we need at least four test cases.
 
   private def assertDistributionRequirementsAreSatisfied(
-      outputPlan: SparkPlan): Unit = {
+      outputPlan: SparkPlan): Unit =
     if (outputPlan.children.length > 1 &&
         outputPlan.requiredChildDistribution.toSet != Set(
-            UnspecifiedDistribution)) {
+            UnspecifiedDistribution))
       val childPartitionings = outputPlan.children.map(_.outputPartitioning)
-      if (!Partitioning.allCompatible(childPartitionings)) {
+      if (!Partitioning.allCompatible(childPartitionings))
         fail(s"Partitionings are not compatible: $childPartitionings")
-      }
-    }
-    outputPlan.children.zip(outputPlan.requiredChildDistribution).foreach {
+    outputPlan.children.zip(outputPlan.requiredChildDistribution).foreach
       case (child, requiredDist) =>
         assert(
             child.outputPartitioning.satisfies(requiredDist),
             s"$child output partitioning does not satisfy $requiredDist:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements with incompatible child partitionings which satisfy distribution") {
+      "EnsureRequirements with incompatible child partitionings which satisfy distribution")
     // Consider an operator that requires inputs that are clustered by two expressions (e.g.
     // sort merge join where there are multiple columns in the equi-join condition)
     val clusteringA = Literal(1) :: Nil
@@ -315,13 +277,11 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.isEmpty) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.isEmpty)
       fail(s"Exchange should have been added:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements with child partitionings with different numbers of output partitions") {
+      "EnsureRequirements with child partitionings with different numbers of output partitions")
     // This is similar to the previous test, except it checks that partitionings are not compatible
     // unless they produce the same number of partitions.
     val clustering = Literal(1) :: Nil
@@ -339,10 +299,9 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-  }
 
   test(
-      "EnsureRequirements with compatible child partitionings that do not satisfy distribution") {
+      "EnsureRequirements with compatible child partitionings that do not satisfy distribution")
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     // The left and right inputs have compatible partitionings but they do not satisfy the
     // distribution because they are clustered on different columns. Thus, we need to shuffle.
@@ -359,13 +318,11 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.isEmpty) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.isEmpty)
       fail(s"Exchange should have been added:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements with compatible child partitionings that satisfy distribution") {
+      "EnsureRequirements with compatible child partitionings that satisfy distribution")
     // In this case, all requirements are satisfied and no exchange should be added.
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     val childPartitioning = HashPartitioning(Literal(1) :: Nil, 5)
@@ -381,14 +338,12 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.nonEmpty) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.nonEmpty)
       fail(s"Exchange should not have been added:\n$outputPlan")
-    }
-  }
 
   // This is a regression test for SPARK-9703
   test(
-      "EnsureRequirements should not repartition if only ordering requirement is unsatisfied") {
+      "EnsureRequirements should not repartition if only ordering requirement is unsatisfied")
     // Consider an operator that imposes both output distribution and  ordering requirements on its
     // children, such as sort sort merge join. If the distribution requirements are satisfied but
     // the output ordering requirements are unsatisfied, then the planner should only add sorts and
@@ -406,12 +361,10 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.nonEmpty) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.nonEmpty)
       fail(s"No Exchanges should have been added:\n$outputPlan")
-    }
-  }
 
-  test("EnsureRequirements adds sort when there is no existing ordering") {
+  test("EnsureRequirements adds sort when there is no existing ordering")
     val orderingA = SortOrder(Literal(1), Ascending)
     val orderingB = SortOrder(Literal(2), Ascending)
     assert(orderingA != orderingB)
@@ -423,13 +376,11 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case s: Sort => true }.isEmpty) {
+    if (outputPlan.collect { case s: Sort => true }.isEmpty)
       fail(s"Sort should have been added:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements skips sort when required ordering is prefix of existing ordering") {
+      "EnsureRequirements skips sort when required ordering is prefix of existing ordering")
     val orderingA = SortOrder(Literal(1), Ascending)
     val orderingB = SortOrder(Literal(2), Ascending)
     assert(orderingA != orderingB)
@@ -441,14 +392,12 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case s: Sort => true }.nonEmpty) {
+    if (outputPlan.collect { case s: Sort => true }.nonEmpty)
       fail(s"No sorts should have been added:\n$outputPlan")
-    }
-  }
 
   // This is a regression test for SPARK-11135
   test(
-      "EnsureRequirements adds sort when required ordering isn't a prefix of existing ordering") {
+      "EnsureRequirements adds sort when required ordering isn't a prefix of existing ordering")
     val orderingA = SortOrder(Literal(1), Ascending)
     val orderingB = SortOrder(Literal(2), Ascending)
     assert(orderingA != orderingB)
@@ -460,13 +409,11 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case s: Sort => true }.isEmpty) {
+    if (outputPlan.collect { case s: Sort => true }.isEmpty)
       fail(s"Sort should have been added:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements eliminates Exchange if child has Exchange with same partitioning") {
+      "EnsureRequirements eliminates Exchange if child has Exchange with same partitioning")
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     val finalPartitioning = HashPartitioning(Literal(1) :: Nil, 5)
     val childPartitioning = HashPartitioning(Literal(2) :: Nil, 5)
@@ -482,13 +429,11 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.size == 2) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.size == 2)
       fail(s"Topmost Exchange should have been eliminated:\n$outputPlan")
-    }
-  }
 
   test(
-      "EnsureRequirements does not eliminate Exchange with different partitioning") {
+      "EnsureRequirements does not eliminate Exchange with different partitioning")
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     // Number of partitions differ
     val finalPartitioning = HashPartitioning(Literal(1) :: Nil, 8)
@@ -505,14 +450,12 @@ class PlannerSuite extends SharedSQLContext {
     val outputPlan =
       EnsureRequirements(sqlContext.sessionState.conf).apply(inputPlan)
     assertDistributionRequirementsAreSatisfied(outputPlan)
-    if (outputPlan.collect { case e: ShuffleExchange => true }.size == 1) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.size == 1)
       fail(s"Topmost Exchange should not have been eliminated:\n$outputPlan")
-    }
-  }
 
   // ---------------------------------------------------------------------------------------------
 
-  test("Reuse exchanges") {
+  test("Reuse exchanges")
     val distribution = ClusteredDistribution(Literal(1) :: Nil)
     val finalPartitioning = HashPartitioning(Literal(1) :: Nil, 5)
     val childPartitioning = HashPartitioning(Literal(2) :: Nil, 5)
@@ -534,12 +477,10 @@ class PlannerSuite extends SharedSQLContext {
 
     val outputPlan =
       ReuseExchange(sqlContext.sessionState.conf).apply(inputPlan)
-    if (outputPlan.collect { case e: ReusedExchange => true }.size != 1) {
+    if (outputPlan.collect { case e: ReusedExchange => true }.size != 1)
       fail(s"Should re-use the shuffle:\n$outputPlan")
-    }
-    if (outputPlan.collect { case e: ShuffleExchange => true }.size != 1) {
+    if (outputPlan.collect { case e: ShuffleExchange => true }.size != 1)
       fail(s"Should have only one shuffle:\n$outputPlan")
-    }
 
     // nested exchanges
     val inputPlan2 =
@@ -552,14 +493,10 @@ class PlannerSuite extends SharedSQLContext {
 
     val outputPlan2 =
       ReuseExchange(sqlContext.sessionState.conf).apply(inputPlan2)
-    if (outputPlan2.collect { case e: ReusedExchange => true }.size != 2) {
+    if (outputPlan2.collect { case e: ReusedExchange => true }.size != 2)
       fail(s"Should re-use the two shuffles:\n$outputPlan2")
-    }
-    if (outputPlan2.collect { case e: ShuffleExchange => true }.size != 2) {
+    if (outputPlan2.collect { case e: ShuffleExchange => true }.size != 2)
       fail(s"Should have only two shuffles:\n$outputPlan")
-    }
-  }
-}
 
 // Used for unit-testing EnsureRequirements
 private case class DummySparkPlan(
@@ -569,8 +506,7 @@ private case class DummySparkPlan(
     override val requiredChildDistribution: Seq[Distribution] = Nil,
     override val requiredChildOrdering: Seq[Seq[SortOrder]] = Nil
 )
-    extends SparkPlan {
+    extends SparkPlan
   override protected def doExecute(): RDD[InternalRow] =
     throw new NotImplementedError
   override def output: Seq[Attribute] = Seq.empty
-}

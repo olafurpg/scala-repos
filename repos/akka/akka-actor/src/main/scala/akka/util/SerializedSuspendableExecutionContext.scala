@@ -9,7 +9,7 @@ import scala.util.control.NonFatal
 import scala.annotation.{tailrec, switch}
 import akka.dispatch.AbstractNodeQueue
 
-private[akka] object SerializedSuspendableExecutionContext {
+private[akka] object SerializedSuspendableExecutionContext
   final val Off = 0
   final val On = 1
   final val Suspended = 2
@@ -17,11 +17,10 @@ private[akka] object SerializedSuspendableExecutionContext {
   def apply(throughput: Int)(implicit context: ExecutionContext)
     : SerializedSuspendableExecutionContext =
     new SerializedSuspendableExecutionContext(throughput)(
-        context match {
+        context match
       case s: SerializedSuspendableExecutionContext ⇒ s.context
       case other ⇒ other
-    })
-}
+    )
 
 /**
   * This `ExecutionContext` allows to wrap an underlying `ExecutionContext` and provide guaranteed serial execution
@@ -34,21 +33,19 @@ private[akka] object SerializedSuspendableExecutionContext {
   */
 private[akka] final class SerializedSuspendableExecutionContext(
     throughput: Int)(val context: ExecutionContext)
-    extends AbstractNodeQueue[Runnable] with Runnable with ExecutionContext {
+    extends AbstractNodeQueue[Runnable] with Runnable with ExecutionContext
   import SerializedSuspendableExecutionContext._
   require(
       throughput > 0,
       s"SerializedSuspendableExecutionContext.throughput must be greater than 0 but was $throughput")
 
   private final val state = new AtomicInteger(Off)
-  @tailrec private final def addState(newState: Int): Boolean = {
+  @tailrec private final def addState(newState: Int): Boolean =
     val c = state.get
     state.compareAndSet(c, c | newState) || addState(newState)
-  }
-  @tailrec private final def remState(oldState: Int) {
+  @tailrec private final def remState(oldState: Int)
     val c = state.get
     if (state.compareAndSet(c, c & ~oldState)) attach() else remState(oldState)
-  }
 
   /**
     * Resumes execution of tasks until `suspend` is called,
@@ -63,18 +60,15 @@ private[akka] final class SerializedSuspendableExecutionContext(
     */
   final def suspend(): Unit = addState(Suspended)
 
-  final def run(): Unit = {
+  final def run(): Unit =
     @tailrec def run(done: Int): Unit =
-      if (done < throughput && state.get == On) {
-        poll() match {
+      if (done < throughput && state.get == On)
+        poll() match
           case null ⇒ ()
           case some ⇒
             try some.run() catch { case NonFatal(t) ⇒ context reportFailure t }
             run(done + 1)
-        }
-      }
     try run(0) finally remState(On)
-  }
 
   final def attach(): Unit =
     if (!isEmpty() && state.compareAndSet(Off, On)) context execute this
@@ -89,10 +83,8 @@ private[akka] final class SerializedSuspendableExecutionContext(
     */
   final def size(): Int = count()
 
-  override final def toString: String = (state.get: @switch) match {
+  override final def toString: String = (state.get: @switch) match
     case 0 ⇒ "Off"
     case 1 ⇒ "On"
     case 2 ⇒ "Off & Suspended"
     case 3 ⇒ "On & Suspended"
-  }
-}

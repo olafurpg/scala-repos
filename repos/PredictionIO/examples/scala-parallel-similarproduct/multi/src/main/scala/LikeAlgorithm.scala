@@ -13,11 +13,11 @@ import grizzled.slf4j.Logger
 // ADDED
 // Extend original ALSAlgorithm and override train() function to handle
 // like and dislike events
-class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
+class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap)
 
   @transient lazy override val logger = Logger[this.type]
 
-  override def train(sc: SparkContext, data: PreparedData): ALSModel = {
+  override def train(sc: SparkContext, data: PreparedData): ALSModel =
     require(!data.likeEvents.take(1).isEmpty,
             s"likeEvents in PreparedData cannot be empty." +
             " Please check if DataSource generates TrainingData" +
@@ -35,12 +35,12 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
     val itemStringIntMap = BiMap.stringInt(data.items.keys)
 
     // collect Item as Map and convert ID to Int index
-    val items: Map[Int, Item] = data.items.map {
+    val items: Map[Int, Item] = data.items.map
       case (id, item) =>
         (itemStringIntMap(id), item)
-    }.collectAsMap.toMap
+    .collectAsMap.toMap
 
-    val mllibRatings = data.likeEvents.map { r =>
+    val mllibRatings = data.likeEvents.map  r =>
       // Convert user and item String IDs to Int index for MLlib
       val uindex = userStringIntMap.getOrElse(r.user, -1)
       val iindex = itemStringIntMap.getOrElse(r.item, -1)
@@ -55,12 +55,12 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
 
       // key is (uindex, iindex) tuple, value is (like, t) tuple
       ((uindex, iindex), (r.like, r.t))
-    }.filter {
+    .filter
       case ((u, i), v) =>
         //val  = d
         // keep events with valid user and item index
         (u != -1) && (i != -1)
-    }.reduceByKey {
+    .reduceByKey
       case (v1, v2) => // MODIFIED
         // An user may like an item and change to dislike it later,
         // or vice versa. Use the latest value for this case.
@@ -68,14 +68,14 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
         val (like2, t2) = v2
         // keep the latest value
         if (t1 > t2) v1 else v2
-    }.map {
+    .map
       case ((u, i), (like, t)) => // MODIFIED
         // With ALS.trainImplicit(), we can use negative value to indicate
         // nagative siginal (ie. dislike)
         val r = if (like) 1 else -1
         // MLlibRating requires integer index for user and item
         MLlibRating(u, i, r)
-    }.cache()
+    .cache()
 
     // MLLib ALS cannot handle empty training data.
     require(!mllibRatings.take(1).isEmpty,
@@ -97,5 +97,3 @@ class LikeAlgorithm(ap: ALSAlgorithmParams) extends ALSAlgorithm(ap) {
         itemStringIntMap = itemStringIntMap,
         items = items
     )
-  }
-}

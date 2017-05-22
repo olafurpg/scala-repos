@@ -15,12 +15,10 @@ import org.jetbrains.plugins.scala.lang.parser.parsing.builder.ScalaPsiBuilder
  *                       [[nl] '(' 'implicit' ClassParams ')']
  */
 
-object ClassParamClauses {
-  def parse(builder: ScalaPsiBuilder): Boolean = {
+object ClassParamClauses
+  def parse(builder: ScalaPsiBuilder): Boolean =
     val classParamClausesMarker = builder.mark
     while (ClassParamClause parse builder) {}
     ImplicitClassParamClause parse builder
     classParamClausesMarker.done(ScalaElementTypes.PARAM_CLAUSES)
     true
-  }
-}

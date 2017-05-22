@@ -135,7 +135,7 @@ import scala.tools.nsc.backend.jvm.opt.BytecodeUtils._
   * Note on updating the call graph: whenever an optimization eliminates a callsite or a closure
   * instantiation, we eliminate the corresponding entry from the call graph.
   */
-class LocalOpt[BT <: BTypes](val btypes: BT) {
+class LocalOpt[BT <: BTypes](val btypes: BT)
   import LocalOptImpls._
   import btypes._
   import coreBTypes._
@@ -157,7 +157,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     * @return A set containing the eliminated instructions
     */
   def minimalRemoveUnreachableCode(
-      method: MethodNode, ownerClassName: InternalName): Boolean = {
+      method: MethodNode, ownerClassName: InternalName): Boolean =
     // In principle, for the inliner, a single removeUnreachableCodeImpl would be enough. But that
     // would potentially leave behind stale handlers (empty try block) which is not legal in the
     // classfile. So we run both removeUnreachableCodeImpl and removeEmptyExceptionHandlers.
@@ -171,22 +171,19 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     // For correctness, after removing unreachable code, we have to eliminate empty exception
     // handlers, see scaladoc of def methodOptimizations. Removing an live handler may render more
     // code unreachable and therefore requires running another round.
-    def removalRound(): Boolean = {
+    def removalRound(): Boolean =
       val (insnsRemoved, liveLabels) = removeUnreachableCodeImpl(
           method, ownerClassName)
-      if (insnsRemoved) {
+      if (insnsRemoved)
         val liveHandlerRemoved =
           removeEmptyExceptionHandlers(method).exists(h => liveLabels(h.start))
         if (liveHandlerRemoved) removalRound()
-      }
       insnsRemoved
-    }
 
     val changed = removalRound()
     if (changed) removeUnusedLocalVariableNodes(method)()
     unreachableCodeEliminated += method
     changed
-  }
 
   /**
     * Remove unreachable instructions from all (non-abstract) methods and apply various other
@@ -195,12 +192,10 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     * @param clazz The class whose methods are optimized
     * @return      `true` if unreachable code was eliminated in some method, `false` otherwise.
     */
-  def methodOptimizations(clazz: ClassNode): Boolean = {
-    !compilerSettings.YoptNone && clazz.methods.asScala.foldLeft(false) {
+  def methodOptimizations(clazz: ClassNode): Boolean =
+    !compilerSettings.YoptNone && clazz.methods.asScala.foldLeft(false)
       case (changed, method) =>
         methodOptimizations(method, clazz.name) || changed
-    }
-  }
 
   /**
     * Run method-level optimizations, see comment on class [[LocalOpt]].
@@ -208,7 +203,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     * Returns `true` if the bytecode of `method` was changed.
     */
   def methodOptimizations(
-      method: MethodNode, ownerClassName: InternalName): Boolean = {
+      method: MethodNode, ownerClassName: InternalName): Boolean =
     if (method.instructions.size == 0)
       return false // fast path for abstract methods
 
@@ -242,14 +237,12 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     val doTrace =
       compilerSettings.YoptTrace.isSetByUser &&
       compilerSettings.YoptTrace.value == ownerClassName + "." + method.name
-    def traceIfChanged(optName: String): Unit = if (doTrace) {
+    def traceIfChanged(optName: String): Unit = if (doTrace)
       val after = AsmUtils.textify(method)
-      if (currentTrace != after) {
+      if (currentTrace != after)
         println(s"after $optName")
         println(after)
-      }
       currentTrace = after
-    }
 
     /**
       * Runs the optimizations that depend on each other in a loop until reaching a fixpoint. See
@@ -264,7 +257,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
                      requestPushPop: Boolean,
                      requestStoreLoad: Boolean,
                      firstIteration: Boolean,
-                     maxRecursion: Int = 10): (Boolean, Boolean) = {
+                     maxRecursion: Int = 10): (Boolean, Boolean) =
       if (maxRecursion == 0) return (false, false)
 
       traceIfChanged("beforeMethodOpt")
@@ -386,11 +379,10 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         copyPropChanged || storesRemoved || pushPopRemoved ||
         storeLoadRemoved || handlersRemoved || jumpsChanged
       (codeChanged, requireEliminateUnusedLocals)
-    }
 
     val (nullnessDceBoxesCastsCopypropPushpopOrJumpsChanged,
          requireEliminateUnusedLocals) =
-      if (AsmAnalyzer.sizeOKForBasicValue(method)) {
+      if (AsmAnalyzer.sizeOKForBasicValue(method))
         // we run DCE even if the method is already in the `unreachableCodeEliminated` map: the DCE
         // here is more thorough than `minimalRemoveUnreachableCode` that run before inlining.
         val r = removalRound(requestNullness = true,
@@ -403,7 +395,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         if (compilerSettings.YoptUnreachableCode)
           unreachableCodeEliminated += method
         r
-      } else (false, false)
+      else (false, false)
 
     // (*) Removing stale local variable descriptors is required for correctness, see comment in `methodOptimizations`
     val localsRemoved =
@@ -434,7 +426,6 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
 
     nullnessDceBoxesCastsCopypropPushpopOrJumpsChanged || localsRemoved ||
     lineNumbersRemoved || labelsRemoved
-  }
 
   /**
     * Apply various optimizations based on nullness analysis information.
@@ -447,8 +438,8 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     *   - scala.runtime.BoxesRunTime.unboxToX(null) is rewritten to a zero-value load
     */
   def nullnessOptimizations(
-      method: MethodNode, ownerClassName: InternalName): Boolean = {
-    AsmAnalyzer.sizeOKForNullness(method) && {
+      method: MethodNode, ownerClassName: InternalName): Boolean =
+    AsmAnalyzer.sizeOKForNullness(method) &&
       lazy val nullnessAnalyzer =
         new AsmAnalyzer(method, ownerClassName, new NullnessAnalyzer(btypes))
 
@@ -457,9 +448,8 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       def frameAt(insn: AbstractInsnNode): Option[Frame[NullnessValue]] =
         Option(nullnessAnalyzer.frameAt(insn))
 
-      def nullness(insn: AbstractInsnNode, slot: Int): Option[NullnessValue] = {
+      def nullness(insn: AbstractInsnNode, slot: Int): Option[NullnessValue] =
         frameAt(insn).map(_.getValue(slot))
-      }
 
       def isNull(insn: AbstractInsnNode, slot: Int) =
         nullness(insn, slot).contains(NullValue)
@@ -469,7 +459,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
         mutable.Map.empty[AbstractInsnNode, List[AbstractInsnNode]]
 
       val it = method.instructions.iterator()
-      while (it.hasNext) it.next() match {
+      while (it.hasNext) it.next() match
         case vi: VarInsnNode if isNull(vi, vi.`var`) =>
           if (vi.getOpcode == ALOAD)
             toReplace(vi) = List(new InsnNode(ACONST_NULL))
@@ -481,7 +471,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           val isIfNull = ji.getOpcode == IFNULL
           val isIfNonNull = ji.getOpcode == IFNONNULL
           if (isIfNull || isIfNonNull)
-            for (frame <- frameAt(ji)) {
+            for (frame <- frameAt(ji))
               val nullness = frame.peekStack(0)
               val taken =
                 nullness == NullValue && isIfNull ||
@@ -489,16 +479,15 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
               val avoided =
                 nullness == NotNullValue && isIfNull ||
                 nullness == NullValue && isIfNonNull
-              if (taken || avoided) {
+              if (taken || avoided)
                 val jump =
                   if (taken) List(new JumpInsnNode(GOTO, ji.label)) else Nil
                 toReplace(ji) = getPop(1) :: jump
-              }
-            } else {
+            else
             val isIfEq = ji.getOpcode == IF_ACMPEQ
             val isIfNe = ji.getOpcode == IF_ACMPNE
             if (isIfEq || isIfNe)
-              for (frame <- frameAt(ji)) {
+              for (frame <- frameAt(ji))
                 val aNullness = frame.peekStack(1)
                 val bNullness = frame.peekStack(0)
                 val eq = aNullness == NullValue && bNullness == NullValue
@@ -507,45 +496,35 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
                   aNullness == NotNullValue && bNullness == NullValue
                 val taken = isIfEq && eq || isIfNe && ne
                 val avoided = isIfEq && ne || isIfNe && eq
-                if (taken || avoided) {
+                if (taken || avoided)
                   val jump =
                     if (taken) List(new JumpInsnNode(GOTO, ji.label)) else Nil
                   toReplace(ji) = getPop(1) :: getPop(1) :: jump
-                }
-              }
-          }
 
         case ti: TypeInsnNode =>
           if (ti.getOpcode == INSTANCEOF)
-            for (frame <- frameAt(ti) if frame.peekStack(0) == NullValue) {
+            for (frame <- frameAt(ti) if frame.peekStack(0) == NullValue)
               toReplace(ti) = List(getPop(1), new InsnNode(ICONST_0))
-            }
 
         case mi: MethodInsnNode =>
           if (isScalaUnbox(mi))
-            for (frame <- frameAt(mi) if frame.peekStack(0) == NullValue) {
+            for (frame <- frameAt(mi) if frame.peekStack(0) == NullValue)
               toReplace(mi) = List(
                   getPop(1),
                   loadZeroForTypeSort(Type.getReturnType(mi.desc).getSort))
-            }
 
         case _ =>
-      }
 
-      def removeFromCallGraph(insn: AbstractInsnNode): Unit = insn match {
+      def removeFromCallGraph(insn: AbstractInsnNode): Unit = insn match
         case mi: MethodInsnNode => callGraph.removeCallsite(mi, method)
         case _ =>
-      }
 
-      for ((oldOp, newOps) <- toReplace) {
+      for ((oldOp, newOps) <- toReplace)
         for (newOp <- newOps) method.instructions.insertBefore(oldOp, newOp)
         method.instructions.remove(oldOp)
         removeFromCallGraph(oldOp)
-      }
 
       toReplace.nonEmpty
-    }
-  }
 
   /**
     * Removes unreachable basic blocks.
@@ -554,7 +533,7 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     */
   def removeUnreachableCodeImpl(
       method: MethodNode,
-      ownerClassName: InternalName): (Boolean, Set[LabelNode]) = {
+      ownerClassName: InternalName): (Boolean, Set[LabelNode]) =
     val a = new AsmAnalyzer(method, ownerClassName)
     val frames = a.analyzer.getFrames
 
@@ -564,12 +543,12 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     var maxLocals = parametersSize(method)
     var maxStack = 0
     val itr = method.instructions.iterator()
-    while (itr.hasNext) {
+    while (itr.hasNext)
       val insn = itr.next()
       val isLive = frames(i) != null
       if (isLive) maxStack = math.max(maxStack, frames(i).getStackSize)
 
-      insn match {
+      insn match
         case l: LabelNode =>
           // label nodes are not removed: they might be referenced for example in a LocalVariableNode
           if (isLive) liveLabels += l
@@ -582,26 +561,21 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
           maxLocals = math.max(maxLocals, i.`var` + 1)
 
         case _ =>
-          if (!isLive || insn.getOpcode == NOP) {
+          if (!isLive || insn.getOpcode == NOP)
             // Instruction iterators allow removing during iteration.
             // Removing is O(1): instructions are doubly linked list elements.
             itr.remove()
             changed = true
-            insn match {
+            insn match
               case invocation: MethodInsnNode =>
                 callGraph.removeCallsite(invocation, method)
               case indy: InvokeDynamicInsnNode =>
                 callGraph.removeClosureInstantiation(indy, method)
               case _ =>
-            }
-          }
-      }
       i += 1
-    }
     method.maxLocals = maxLocals
     method.maxStack = maxStack
     (changed, liveLabels)
-  }
 
   /**
     * Eliminate `CHECKCAST` instructions that are statically known to succeed. This is safe if the
@@ -616,13 +590,12 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
     * always returns false, so we'd also need nullness information.
     */
   def eliminateRedundantCasts(
-      method: MethodNode, owner: InternalName): Boolean = {
-    AsmAnalyzer.sizeOKForBasicValue(method) && {
+      method: MethodNode, owner: InternalName): Boolean =
+    AsmAnalyzer.sizeOKForBasicValue(method) &&
       def isSubType(aRefDesc: String, bClass: InternalName): Boolean =
-        aRefDesc == bClass || bClass == ObjectRef.internalName || {
+        aRefDesc == bClass || bClass == ObjectRef.internalName ||
           (bTypeForDescriptorOrInternalNameFromClassfile(aRefDesc) conformsTo classBTypeFromParsedClassfile(
                   bClass)).getOrElse(false)
-        }
 
       lazy val typeAnalyzer = new NonLubbingTypeFlowAnalyzer(method, owner)
 
@@ -630,25 +603,20 @@ class LocalOpt[BT <: BTypes](val btypes: BT) {
       val toRemove = mutable.Set.empty[TypeInsnNode]
 
       val it = method.instructions.iterator()
-      while (it.hasNext) it.next() match {
+      while (it.hasNext) it.next() match
         case ti: TypeInsnNode if ti.getOpcode == CHECKCAST =>
           val frame = typeAnalyzer.frameAt(ti)
           val valueTp = frame.getValue(frame.stackTop)
           if (valueTp.isReference &&
-              isSubType(valueTp.getType.getDescriptor, ti.desc)) {
+              isSubType(valueTp.getType.getDescriptor, ti.desc))
             toRemove += ti
-          }
 
         case _ =>
-      }
 
       toRemove foreach method.instructions.remove
       toRemove.nonEmpty
-    }
-  }
-}
 
-object LocalOptImpls {
+object LocalOptImpls
 
   /**
     * Remove exception handlers that cover empty code blocks. A block is considered empty if it
@@ -663,30 +631,26 @@ object LocalOptImpls {
     * @return the set of removed handlers
     */
   def removeEmptyExceptionHandlers(
-      method: MethodNode): Set[TryCatchBlockNode] = {
+      method: MethodNode): Set[TryCatchBlockNode] =
 
     /** True if there exists code between start and end. */
     def containsExecutableCode(
-        start: AbstractInsnNode, end: LabelNode): Boolean = {
+        start: AbstractInsnNode, end: LabelNode): Boolean =
       start != end &&
-      ((start.getOpcode: @switch) match {
+      ((start.getOpcode: @switch) match
             // FrameNode, LabelNode and LineNumberNode have opcode == -1.
             case -1 | GOTO => containsExecutableCode(start.getNext, end)
             case _ => true
-          })
-    }
+          )
 
     var removedHandlers = Set.empty[TryCatchBlockNode]
     val handlersIter = method.tryCatchBlocks.iterator()
-    while (handlersIter.hasNext) {
+    while (handlersIter.hasNext)
       val handler = handlersIter.next()
-      if (!containsExecutableCode(handler.start, handler.end)) {
+      if (!containsExecutableCode(handler.start, handler.end))
         removedHandlers += handler
         handlersIter.remove()
-      }
-    }
     removedHandlers
-  }
 
   /**
     * Remove all non-parameter entries from the local variable table which denote variables that are
@@ -698,31 +662,27 @@ object LocalOptImpls {
     */
   def removeUnusedLocalVariableNodes(method: MethodNode)(
       firstLocalIndex: Int = parametersSize(method),
-      renumber: Int => Int = identity): Boolean = {
+      renumber: Int => Int = identity): Boolean =
     @tailrec
     def variableIsUsed(
-        start: AbstractInsnNode, end: LabelNode, varIndex: Int): Boolean = {
+        start: AbstractInsnNode, end: LabelNode, varIndex: Int): Boolean =
       start != end &&
-      (start match {
+      (start match
             case v: VarInsnNode if v.`var` == varIndex => true
             case i: IincInsnNode if i.`var` == varIndex => true
             case _ => variableIsUsed(start.getNext, end, varIndex)
-          })
-    }
+          )
 
     val initialNumVars = method.localVariables.size
     val localsIter = method.localVariables.iterator()
-    while (localsIter.hasNext) {
+    while (localsIter.hasNext)
       val local = localsIter.next()
       val index = local.index
       // parameters and `this` (the lowest indices, starting at 0) are never removed or renumbered
-      if (index >= firstLocalIndex) {
+      if (index >= firstLocalIndex)
         if (!variableIsUsed(local.start, local.end, index)) localsIter.remove()
         else if (renumber(index) != index) local.index = renumber(index)
-      }
-    }
     method.localVariables.size != initialNumVars
-  }
 
   /**
     * Compact the local variable slots used in the method's implementation. This prevents having
@@ -734,12 +694,12 @@ object LocalOptImpls {
     *
     * This could be improved by doing proper register allocation.
     */
-  def compactLocalVariables(method: MethodNode): Boolean = {
+  def compactLocalVariables(method: MethodNode): Boolean =
     // This array is built up to map local variable indices from old to new.
     val renumber = collection.mutable.ArrayBuffer.empty[Int]
 
     // Add the index of the local variable used by `varIns` to the `renumber` array.
-    def addVar(varIns: AbstractInsnNode, slot: Int): Unit = {
+    def addVar(varIns: AbstractInsnNode, slot: Int): Unit =
       val index = slot
       val isWide = isSize2LoadOrStore(varIns.getOpcode)
 
@@ -749,7 +709,6 @@ object LocalOptImpls {
 
       renumber(index) = index
       if (isWide) renumber(index + 1) = index
-    }
 
     // first phase: collect all used local variables. if the variable at index x is used, set
     // renumber(x) = x, otherwise renumber(x) = -1. if the variable is wide (long or double), set
@@ -757,41 +716,35 @@ object LocalOptImpls {
 
     val firstLocalIndex = parametersSize(method)
     for (i <- 0 until firstLocalIndex) renumber += i // parameters and `this` are always used.
-    method.instructions.iterator().asScala foreach {
+    method.instructions.iterator().asScala foreach
       case VarInstruction(varIns, slot) => addVar(varIns, slot)
       case _ =>
-    }
 
     // assign the next free slot to each used local variable.
     // for example, rewrite (0, 1, -1, 3, -1, 5) to (0, 1, -1, 2, -1, 3).
 
     var nextIndex = firstLocalIndex
-    for (i <- firstLocalIndex until renumber.length if renumber(i) != -1) {
+    for (i <- firstLocalIndex until renumber.length if renumber(i) != -1)
       renumber(i) = nextIndex
       nextIndex += 1
-    }
 
     // Update the local variable descriptors according to the renumber table, and eliminate stale entries
     val removedLocalVariableDescriptors =
       removeUnusedLocalVariableNodes(method)(firstLocalIndex, renumber)
 
     if (nextIndex == renumber.length) removedLocalVariableDescriptors
-    else {
+    else
       // update variable instructions according to the renumber table
       method.maxLocals = nextIndex
-      method.instructions.iterator().asScala.foreach {
+      method.instructions.iterator().asScala.foreach
         case VarInstruction(varIns, slot) =>
           val oldIndex = slot
           if (oldIndex >= firstLocalIndex && renumber(oldIndex) != oldIndex)
-            varIns match {
+            varIns match
               case vi: VarInsnNode => vi.`var` = renumber(slot)
               case ii: IincInsnNode => ii.`var` = renumber(slot)
-            }
         case _ =>
-      }
       true
-    }
-  }
 
   /**
     * Removes LineNumberNodes that don't describe any executable instructions.
@@ -799,28 +752,24 @@ object LocalOptImpls {
     * This method expects (and asserts) that the `start` label of each LineNumberNode is the
     * lexically preceding label declaration.
     */
-  def removeEmptyLineNumbers(method: MethodNode): Boolean = {
-    def isEmpty(node: AbstractInsnNode): Boolean = node.getNext match {
+  def removeEmptyLineNumbers(method: MethodNode): Boolean =
+    def isEmpty(node: AbstractInsnNode): Boolean = node.getNext match
       case null => true
       case l: LineNumberNode => true
       case n if n.getOpcode >= 0 => false
       case n => isEmpty(n)
-    }
 
     val initialSize = method.instructions.size
     val iterator = method.instructions.iterator()
     var previousLabel: LabelNode = null
-    while (iterator.hasNext) {
-      iterator.next match {
+    while (iterator.hasNext)
+      iterator.next match
         case label: LabelNode => previousLabel = label
         case line: LineNumberNode if isEmpty(line) =>
           assert(line.start == previousLabel)
           iterator.remove()
         case _ =>
-      }
-    }
     method.instructions.size != initialSize
-  }
 
   /**
     * Removes unreferenced label declarations, also squashes sequences of label definitions.
@@ -828,32 +777,29 @@ object LocalOptImpls {
     *      [ops];              Label(a); Label(b);  [ops];
     *   => subs([ops], b, a);  Label(a);            subs([ops], b, a);
     */
-  def removeEmptyLabelNodes(method: MethodNode): Boolean = {
+  def removeEmptyLabelNodes(method: MethodNode): Boolean =
     val references = labelReferences(method)
 
     val initialSize = method.instructions.size
     val iterator = method.instructions.iterator()
     var prev: LabelNode = null
-    while (iterator.hasNext) {
-      iterator.next match {
+    while (iterator.hasNext)
+      iterator.next match
         case label: LabelNode =>
           if (!references.contains(label)) iterator.remove()
-          else if (prev != null) {
+          else if (prev != null)
             references(label).foreach(substituteLabel(_, label, prev))
             iterator.remove()
-          } else prev = label
+          else prev = label
 
         case instruction =>
           if (instruction.getOpcode >= 0) prev = null
-      }
-    }
     method.instructions.size != initialSize
-  }
 
   /**
     * Apply various simplifications to branching instructions.
     */
-  def simplifyJumps(method: MethodNode): Boolean = {
+  def simplifyJumps(method: MethodNode): Boolean =
     var changed = false
 
     val allHandlers = method.tryCatchBlocks.asScala.toSet
@@ -863,7 +809,7 @@ object LocalOptImpls {
 
     val jumpInsns = mutable.LinkedHashMap.empty[JumpInsnNode, Boolean]
 
-    for (insn <- method.instructions.iterator().asScala) insn match {
+    for (insn <- method.instructions.iterator().asScala) insn match
       case l: LabelNode =>
         activeHandlers ++= allHandlers.filter(_.start == l)
         activeHandlers = activeHandlers.filter(_.end != l)
@@ -872,25 +818,20 @@ object LocalOptImpls {
         jumpInsns(ji) = activeHandlers.nonEmpty
 
       case _ =>
-    }
 
     var _jumpTargets: Set[AbstractInsnNode] = null
-    def jumpTargets = {
-      if (_jumpTargets == null) {
+    def jumpTargets =
+      if (_jumpTargets == null)
         _jumpTargets = jumpInsns.keysIterator.map(_.label).toSet
-      }
       _jumpTargets
-    }
 
-    def removeJumpFromMap(jump: JumpInsnNode) = {
+    def removeJumpFromMap(jump: JumpInsnNode) =
       jumpInsns.remove(jump)
       _jumpTargets = null
-    }
 
-    def replaceJumpByPop(jump: JumpInsnNode) = {
+    def replaceJumpByPop(jump: JumpInsnNode) =
       removeJumpAndAdjustStack(method, jump)
       removeJumpFromMap(jump)
-    }
 
     /**
       * Removes a conditional jump if it is followed by a GOTO to the same destination.
@@ -901,19 +842,17 @@ object LocalOptImpls {
       * Introduces 1 or 2 POP instructions, depending on the number of values consumed by the CondJump.
       */
     def simplifyThenElseSameTarget(insn: AbstractInsnNode): Boolean =
-      insn match {
+      insn match
         case ConditionalJump(jump) =>
-          nextExecutableInstruction(insn) match {
+          nextExecutableInstruction(insn) match
             case Some(Goto(elseJump))
                 if sameTargetExecutableInstruction(jump, elseJump) =>
               replaceJumpByPop(jump)
               true
 
             case _ => false
-          }
 
         case _ => false
-      }
 
     /**
       * Replace jumps to a sequence of GOTO instructions by a jump to the final destination.
@@ -923,18 +862,16 @@ object LocalOptImpls {
       *
       * If there's a loop of GOTOs, the initial jump is replaced by one of the labels in the loop.
       */
-    def collapseJumpChains(insn: AbstractInsnNode): Boolean = insn match {
+    def collapseJumpChains(insn: AbstractInsnNode): Boolean = insn match
       case JumpNonJsr(jump) =>
         val target = finalJumpTarget(jump)
         if (jump.label == target) false
-        else {
+        else
           jump.label = target
           _jumpTargets = null
           true
-        }
 
       case _ => false
-    }
 
     /**
       * Eliminates unnecessary jump instructions
@@ -944,14 +881,13 @@ object LocalOptImpls {
       *
       * Introduces 0, 1 or 2 POP instructions, depending on the number of values consumed by the Jump.
       */
-    def removeJumpToSuccessor(insn: AbstractInsnNode): Boolean = insn match {
+    def removeJumpToSuccessor(insn: AbstractInsnNode): Boolean = insn match
       case JumpNonJsr(jump)
           if nextExecutableInstruction(jump, alsoKeep = Set(jump.label)) contains jump.label =>
         replaceJumpByPop(jump)
         true
 
       case _ => false
-    }
 
     /**
       * If the "else" part of a conditional branch is a simple GOTO, negates the conditional branch
@@ -964,12 +900,12 @@ object LocalOptImpls {
       * be some other jump to the GOTO, and eliminating it would change behavior.
       */
     def simplifyBranchOverGoto(
-        insn: AbstractInsnNode, inTryBlock: Boolean): Boolean = insn match {
+        insn: AbstractInsnNode, inTryBlock: Boolean): Boolean = insn match
       case ConditionalJump(jump) =>
         // don't skip over jump targets, see doc comment
-        nextExecutableInstruction(jump, alsoKeep = jumpTargets) match {
+        nextExecutableInstruction(jump, alsoKeep = jumpTargets) match
           case Some(Goto(goto)) =>
-            if (nextExecutableInstruction(goto, alsoKeep = Set(jump.label)) contains jump.label) {
+            if (nextExecutableInstruction(goto, alsoKeep = Set(jump.label)) contains jump.label)
               val newJump = new JumpInsnNode(
                   negateJumpOpcode(jump.getOpcode), goto.label)
               method.instructions.set(jump, newJump)
@@ -977,12 +913,10 @@ object LocalOptImpls {
               jumpInsns(newJump) = inTryBlock
               replaceJumpByPop(goto)
               true
-            } else false
+            else false
 
           case _ => false
-        }
       case _ => false
-    }
 
     /**
       * Inlines xRETURN and ATHROW
@@ -998,47 +932,40 @@ object LocalOptImpls {
     def simplifyGotoReturn(
         instruction: AbstractInsnNode, inTryBlock: Boolean): Boolean =
       !inTryBlock &&
-      (instruction match {
+      (instruction match
             case Goto(jump) =>
-              nextExecutableInstruction(jump.label) match {
+              nextExecutableInstruction(jump.label) match
                 case Some(target) =>
-                  if (isReturn(target) || target.getOpcode == ATHROW) {
+                  if (isReturn(target) || target.getOpcode == ATHROW)
                     method.instructions.set(jump, target.clone(null))
                     removeJumpFromMap(jump)
                     true
-                  } else false
+                  else false
 
                 case _ => false
-              }
             case _ => false
-          })
+          )
 
-    def run(): Boolean = {
+    def run(): Boolean =
       var changed = false
 
       // `.toList` because we're modifying the map while iterating over it
       for ((jumpInsn, inTryBlock) <- jumpInsns.toList
                                         if jumpInsns.contains(jumpInsn) &&
-                                    isJumpNonJsr(jumpInsn)) {
+                                    isJumpNonJsr(jumpInsn))
         var jumpRemoved = simplifyThenElseSameTarget(jumpInsn)
 
-        if (!jumpRemoved) {
+        if (!jumpRemoved)
           changed = collapseJumpChains(jumpInsn) || changed
           jumpRemoved = removeJumpToSuccessor(jumpInsn)
 
-          if (!jumpRemoved) {
+          if (!jumpRemoved)
             changed = simplifyBranchOverGoto(jumpInsn, inTryBlock) || changed
             changed = simplifyGotoReturn(jumpInsn, inTryBlock) || changed
-          }
-        }
 
         changed ||= jumpRemoved
-      }
 
       if (changed) run()
       changed
-    }
 
     run()
-  }
-}

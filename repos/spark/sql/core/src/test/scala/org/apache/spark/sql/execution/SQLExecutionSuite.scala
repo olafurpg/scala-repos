@@ -22,54 +22,47 @@ import java.util.Properties
 import org.apache.spark.{SparkConf, SparkContext, SparkFunSuite}
 import org.apache.spark.sql.SQLContext
 
-class SQLExecutionSuite extends SparkFunSuite {
+class SQLExecutionSuite extends SparkFunSuite
 
-  test("concurrent query execution (SPARK-10548)") {
+  test("concurrent query execution (SPARK-10548)")
     // Try to reproduce the issue with the old SparkContext
     val conf = new SparkConf().setMaster("local[*]").setAppName("test")
     val badSparkContext = new BadSparkContext(conf)
-    try {
+    try
       testConcurrentQueryExecution(badSparkContext)
       fail("unable to reproduce SPARK-10548")
-    } catch {
+    catch
       case e: IllegalArgumentException =>
         assert(e.getMessage.contains(SQLExecution.EXECUTION_ID_KEY))
-    } finally {
+    finally
       badSparkContext.stop()
-    }
 
     // Verify that the issue is fixed with the latest SparkContext
     val goodSparkContext = new SparkContext(conf)
-    try {
+    try
       testConcurrentQueryExecution(goodSparkContext)
-    } finally {
+    finally
       goodSparkContext.stop()
-    }
-  }
 
-  test("concurrent query execution with fork-join pool (SPARK-13747)") {
+  test("concurrent query execution with fork-join pool (SPARK-13747)")
     val sc = new SparkContext("local[*]", "test")
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
-    try {
+    try
       // Should not throw IllegalArgumentException
-      (1 to 100).par.foreach { _ =>
+      (1 to 100).par.foreach  _ =>
         sc.parallelize(1 to 5)
-          .map { i =>
+          .map  i =>
             (i, i)
-          }
           .toDF("a", "b")
           .count()
-      }
-    } finally {
+    finally
       sc.stop()
-    }
-  }
 
   /**
     * Trigger SPARK-10548 by mocking a parent and its child thread executing queries concurrently.
     */
-  private def testConcurrentQueryExecution(sc: SparkContext): Unit = {
+  private def testConcurrentQueryExecution(sc: SparkContext): Unit =
     val sqlContext = new SQLContext(sc)
     import sqlContext.implicits._
 
@@ -80,42 +73,33 @@ class SQLExecutionSuite extends SparkFunSuite {
     // Before starting the thread, mutate the execution ID in the parent.
     // The child thread should not see the effect of this change.
     var throwable: Option[Throwable] = None
-    val child = new Thread {
-      override def run(): Unit = {
-        try {
+    val child = new Thread
+      override def run(): Unit =
+        try
           sc.parallelize(1 to 100)
-            .map { i =>
+            .map  i =>
               (i, i)
-            }
             .toDF("a", "b")
             .collect()
-        } catch {
+        catch
           case t: Throwable =>
             throwable = Some(t)
-        }
-      }
-    }
     sc.setLocalProperty(SQLExecution.EXECUTION_ID_KEY, "anything")
     child.start()
     child.join()
 
     // The throwable is thrown from the child thread so it doesn't have a helpful stack trace
-    throwable.foreach { t =>
+    throwable.foreach  t =>
       t.setStackTrace(t.getStackTrace ++ Thread.currentThread.getStackTrace)
       throw t
-    }
-  }
-}
 
 /**
   * A bad [[SparkContext]] that does not clone the inheritable thread local properties
   * when passing them to children threads.
   */
-private class BadSparkContext(conf: SparkConf) extends SparkContext(conf) {
+private class BadSparkContext(conf: SparkConf) extends SparkContext(conf)
   protected[spark] override val localProperties =
-    new InheritableThreadLocal[Properties] {
+    new InheritableThreadLocal[Properties]
       override protected def childValue(parent: Properties): Properties =
         new Properties(parent)
       override protected def initialValue(): Properties = new Properties()
-    }
-}

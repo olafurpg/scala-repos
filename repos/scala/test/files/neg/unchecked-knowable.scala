@@ -14,7 +14,7 @@ trait B4 extends B2
 class Bippy
 trait Dingus
 
-class A {
+class A
   /*   warn */
   (new Bippy).isInstanceOf[A1]
   /*   warn */
@@ -23,4 +23,3 @@ class A {
   (null: Dingus).isInstanceOf[B1]
   /* nowarn */
   ((new Bippy): Any).isInstanceOf[A1]
-}

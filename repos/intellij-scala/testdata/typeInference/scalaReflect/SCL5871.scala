@@ -1,4 +1,4 @@
-object SCL5871 {
+object SCL5871
   import scala.reflect.runtime.{universe => ru}
 
   def foo(x: ru.TypeTag[String]): Boolean = false
@@ -10,5 +10,4 @@ object SCL5871 {
   /*start*/
   (foo(scala.reflect.runtime.universe.typeTag[String]),
    goo(ru.typeTag[String])) /*end*/
-}
 //(Boolean, Boolean)

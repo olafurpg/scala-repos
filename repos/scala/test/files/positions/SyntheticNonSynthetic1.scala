@@ -1,3 +1,2 @@
-object SyntheticNonSynthetic1 {
+object SyntheticNonSynthetic1
   val foo: List[Class[_ <: Throwable]] = Nil
-}

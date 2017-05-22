@@ -15,7 +15,7 @@
  */
 
 package net.liftweb
-package object mapper {
+package object mapper
   type SuperConnection = db.SuperConnection
   type ConnectionIdentifier = util.ConnectionIdentifier
   type DriverType = db.DriverType
@@ -26,4 +26,3 @@ package object mapper {
   def DBLogEntry = db.DBLogEntry
   def DefaultConnectionIdentifier = util.DefaultConnectionIdentifier
   def DriverType = db.DriverType
-}

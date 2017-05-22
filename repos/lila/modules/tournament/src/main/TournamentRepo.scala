@@ -10,7 +10,7 @@ import lila.db.BSON.BSONJodaDateTimeHandler
 import lila.db.Implicits._
 import lila.db.paginator.BSONAdapter
 
-object TournamentRepo {
+object TournamentRepo
 
   private lazy val coll = Env.current.tournamentColl
 
@@ -205,33 +205,29 @@ object TournamentRepo {
               "private" -> BSONDocument("$exists" -> false)
           ))
       .sort(BSONDocument("startsAt" -> 1))
-      .toList[Tournament](none) map {
+      .toList[Tournament](none) map
       _.filter(_.isStillWorthEntering)
-    }
 
   private def isPromotable(tour: Tournament) =
-    tour.startsAt isBefore DateTime.now.plusMinutes {
-      tour.schedule.map(_.freq) map {
+    tour.startsAt isBefore DateTime.now.plusMinutes
+      tour.schedule.map(_.freq) map
         case Schedule.Freq.Marathon => 24 * 60
         case Schedule.Freq.Unique => 24 * 60
         case Schedule.Freq.Monthly => 6 * 60
         case Schedule.Freq.Weekly => 3 * 60
         case Schedule.Freq.Daily => 1 * 60
         case _ => 30
-      } getOrElse 30
-    }
+      getOrElse 30
 
   def promotable: Fu[List[Tournament]] =
-    stillWorthEntering zip publicCreatedSorted(24 * 60) map {
+    stillWorthEntering zip publicCreatedSorted(24 * 60) map
       case (started, created) =>
         (started ::: created)
-          .foldLeft(List.empty[Tournament]) {
+          .foldLeft(List.empty[Tournament])
             case (acc, tour) if !isPromotable(tour) => acc
             case (acc, tour) if acc.exists(_ similarTo tour) => acc
             case (acc, tour) => tour :: acc
-          }
           .reverse
-    }
 
   def scheduledUnfinished: Fu[List[Tournament]] =
     coll
@@ -247,23 +243,21 @@ object TournamentRepo {
       .cursor[Tournament]()
       .collect[List]()
 
-  def scheduledDedup: Fu[List[Tournament]] = scheduledCreated map {
+  def scheduledDedup: Fu[List[Tournament]] = scheduledCreated map
     import Schedule.Freq
-    _.flatMap { tour =>
+    _.flatMap  tour =>
       tour.schedule map (tour -> _)
-    }.foldLeft(List[Tournament]() -> none[Freq]) {
+    .foldLeft(List[Tournament]() -> none[Freq])
         case ((tours, skip), (_, sched)) if skip.contains(sched.freq) =>
           (tours, skip)
         case ((tours, skip), (tour, sched)) =>
-          (tour :: tours, sched.freq match {
+          (tour :: tours, sched.freq match
             case Freq.Daily => Freq.Eastern.some
             case Freq.Eastern => Freq.Daily.some
             case _ => skip
-          })
-      }
+          )
       ._1
       .reverse
-  }
 
   def lastFinishedScheduledByFreq(
       freq: Schedule.Freq, since: DateTime): Fu[List[Tournament]] =
@@ -315,4 +309,3 @@ object TournamentRepo {
           ) ++ nonEmptySelect)
       .cursor[Tournament]()
       .collect[List]()
-}

@@ -46,43 +46,35 @@ import org.scalatest.prop._
 @RunWith(classOf[JUnitRunner])
 class SpectralProjectedGradientTest
     extends PropSpec with PropertyChecks with OptimizeTestBaseTrait
-    with VectorMatchers with Matchers {
+    with VectorMatchers with Matchers
 
-  property("optimize a simple multivariate gaussian") {
+  property("optimize a simple multivariate gaussian")
     val optimizer =
       new SpectralProjectedGradient[DenseVector[Double]](tolerance = 1.0E-9)
-    forAll { init: DenseVector[Double] =>
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+    forAll  init: DenseVector[Double] =>
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (sum((x - 3.0) :^ 2.0), (x * 2.0) - 6.0)
-        }
-      }
 
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(DenseVector.fill(result.size)(3.0),
                                 allowedDeviation = 1E-5)
-    }
-  }
 
-  property("optimize a simple multivariate gaussian with projection") {
+  property("optimize a simple multivariate gaussian with projection")
     val optimizer = new SpectralProjectedGradient[DenseVector[Double]](
         tolerance = 1.0E-5, projection = _.map(scala.math.min(_, 2.0)))
 
-    forAll { init: DenseVector[Double] =>
+    forAll  init: DenseVector[Double] =>
       init := clip(init, Double.NegativeInfinity, 2.0)
-      val f = new DiffFunction[DenseVector[Double]] {
-        def calculate(x: DenseVector[Double]) = {
+      val f = new DiffFunction[DenseVector[Double]]
+        def calculate(x: DenseVector[Double]) =
           (sum((x - 3.0) :^ 4.0), (x - 3.0) :^ 3.0 :* 4.0)
-        }
-      }
 
       val result = optimizer.minimize(f, init)
       result should beSimilarTo(DenseVector.fill(result.size)(2.0),
                                 allowedDeviation = 1E-10)
-    }
-  }
 
-  property("simple linear solve without projection") {
+  property("simple linear solve without projection")
     val n = 5
     val H = new DenseMatrix(n,
                             n,
@@ -127,9 +119,8 @@ class SpectralProjectedGradientTest
     val spgResult =
       new SpectralProjectedGradient[DenseVector[Double]]().minimize(cost, init)
     assert(norm(x - spgResult, inf) < 1e-4, s"$x $spgResult")
-  }
 
-  property("simple linear solve with L1 projection") {
+  property("simple linear solve with L1 projection")
     val Hl1 = new DenseMatrix(25,
                               25,
                               Array(
@@ -818,5 +809,3 @@ class SpectralProjectedGradientTest
       .minimizeAndReturnState(cost, DenseVector.zeros[Double](25))
     println(s"SpectralProjectedGradient L1 projection iters ${spgResult.iter}")
     assert(norm(spgResult.x - octaveL1, 2) < 1e-4)
-  }
-}

@@ -1,5 +1,4 @@
 package b
 
-object Settings {
+object Settings
   val Y = "b.Settings"
-}

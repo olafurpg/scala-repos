@@ -7,8 +7,8 @@ import scala.pickling._, scala.pickling.Defaults._, json._
 final case class Person(name: String, age: Int)
 case class Philipp(mother: Person)
 
-class NonPrimitiveFieldTest extends FunSuite {
-  test("main") {
+class NonPrimitiveFieldTest extends FunSuite
+  test("main")
     val gudrun = Person("Gudrun", 62)
     val pckl = Philipp(gudrun).pickle
     assert(
@@ -22,5 +22,3 @@ class NonPrimitiveFieldTest extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(pckl.unpickle[Philipp] === Philipp(gudrun))
-  }
-}

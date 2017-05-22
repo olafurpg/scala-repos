@@ -25,23 +25,22 @@ import java.util.{Map => JMap, List => JList}
   * The rule is to never use this class directly in input or return types, but
   * only to add methods to FlowDef.
   */
-class RichFlowDef(val fd: FlowDef) {
+class RichFlowDef(val fd: FlowDef)
   // allow .asScala conversions
   import collection.JavaConverters._
 
   // RichPipe and RichFlowDef implicits
   import Dsl._
 
-  def copy: FlowDef = {
+  def copy: FlowDef =
     val newFd = new FlowDef
     newFd.mergeFrom(fd)
     newFd
-  }
 
   /**
     * Merge state from FlowDef excluding Sources/Sinks/Tails (sometimes we don't want both)
     */
-  private[scalding] def mergeMiscFrom(o: FlowDef): Unit = {
+  private[scalding] def mergeMiscFrom(o: FlowDef): Unit =
     // See the cascading code that this string is a "," separated set.
     StringUtility.fastSplit(o.getTags, ",").foreach(fd.addTag)
 
@@ -52,42 +51,35 @@ class RichFlowDef(val fd: FlowDef) {
 
     fd.setAssertionLevel(preferLeft(fd.getAssertionLevel, o.getAssertionLevel))
     fd.setName(preferLeft(fd.getName, o.getName))
-  }
 
   private[this] def preferLeft[T](left: T, right: T): T =
     Option(left).getOrElse(right)
 
-  private[this] def mergeLeft[K, V](left: JMap[K, V], right: JMap[K, V]) {
-    right.asScala.foreach {
+  private[this] def mergeLeft[K, V](left: JMap[K, V], right: JMap[K, V])
+    right.asScala.foreach
       case (k, v) =>
         if (!left.containsKey(k)) left.put(k, v)
-    }
-  }
-  private[this] def appendLeft[T](left: JList[T], right: JList[T]) {
+  private[this] def appendLeft[T](left: JList[T], right: JList[T])
     val existing = left.asScala.toSet
     right.asScala.filterNot(existing).foreach(left.add)
-  }
 
   /**
     * Mutate current flow def to add all sources/sinks/etc from given FlowDef
     */
-  def mergeFrom(o: FlowDef): Unit = {
+  def mergeFrom(o: FlowDef): Unit =
     mergeLeft(fd.getSources, o.getSources)
     mergeLeft(fd.getSinks, o.getSinks)
     appendLeft(fd.getTails, o.getTails)
 
     fd.mergeMiscFrom(o)
     // Merge the FlowState
-    FlowStateMap.get(o).foreach { oFS =>
-      FlowStateMap.mutate(fd) { current =>
+    FlowStateMap.get(o).foreach  oFS =>
+      FlowStateMap.mutate(fd)  current =>
         // overwrite the items from o with current
         (current.copy(
              sourceMap = oFS.sourceMap ++ current.sourceMap,
              flowConfigUpdates = oFS.flowConfigUpdates ++ current.flowConfigUpdates),
          ())
-      }
-    }
-  }
 
   /**
     * find all heads reachable from the tails (as a set of names)
@@ -97,7 +89,7 @@ class RichFlowDef(val fd: FlowDef) {
   /**
     * New flow def with only sources upstream from tails.
     */
-  def withoutUnusedSources: FlowDef = {
+  def withoutUnusedSources: FlowDef =
 
     // add taps associated with heads to localFlow
     val filteredSources =
@@ -108,12 +100,11 @@ class RichFlowDef(val fd: FlowDef) {
     newFd.addSources(filteredSources)
 
     newFd
-  }
 
   /**
     * FlowDef that only includes things upstream from the given Pipe
     */
-  def onlyUpstreamFrom(pipe: Pipe): FlowDef = {
+  def onlyUpstreamFrom(pipe: Pipe): FlowDef =
     val newFd = new FlowDef
     // don't copy any sources/sinks
     newFd.mergeMiscFrom(fd)
@@ -127,31 +118,23 @@ class RichFlowDef(val fd: FlowDef) {
       .map(_.getName)
       .toSet
 
-    headNames.foreach { head =>
+    headNames.foreach  head =>
       // TODO: make sure we handle checkpoints correctly
-      if (!newSrcs.containsKey(head)) {
+      if (!newSrcs.containsKey(head))
         newFd.addSource(head, sourceTaps.get(head))
-      }
-    }
 
     val sinks = fd.getSinks
-    if (sinks.containsKey(pipe.getName)) {
+    if (sinks.containsKey(pipe.getName))
       newFd.addTailSink(pipe, sinks.get(pipe.getName))
-    }
     // Update the FlowState:
-    FlowStateMap.get(fd).foreach { thisFS =>
-      val subFlowState = thisFS.sourceMap.foldLeft(Map[String, Source]()) {
+    FlowStateMap.get(fd).foreach  thisFS =>
+      val subFlowState = thisFS.sourceMap.foldLeft(Map[String, Source]())
         case (newfs, kv @ (name, source)) =>
           if (headNames(name)) newfs + kv
           else newfs
-      }
-      FlowStateMap.mutate(newFd) { oldFS =>
+      FlowStateMap.mutate(newFd)  oldFS =>
         (oldFS.copy(
              sourceMap = subFlowState,
              flowConfigUpdates = thisFS.flowConfigUpdates ++ oldFS.flowConfigUpdates),
          ())
-      }
-    }
     newFd
-  }
-}

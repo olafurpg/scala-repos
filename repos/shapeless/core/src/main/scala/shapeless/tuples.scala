@@ -1,6 +1,6 @@
 package shapeless
 
-object Tuple {
+object Tuple
   import ops.tuple._
 
   /**
@@ -14,4 +14,3 @@ object Tuple {
     */
   def fill[A](n1: Nat, n2: Nat)(elem: A)(
       implicit fill: Fill[(n1.N, n2.N), A]): fill.Out = fill(elem)
-}

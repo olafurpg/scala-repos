@@ -2,83 +2,68 @@ package test
 
 /* check that members defined in sub-block are not visible*/
 
-class Completion1 {
+class Completion1
 
-  def f {
+  def f
 
-    def ff {
+    def ff
 
-      def fff {
+      def fff
         /*_*/
-      }
 
       /*_*/
 
-      class ffc {
+      class ffc
         /*_*/
-      }
 
       /*_*/
-    }
 
     /*_*/
 
-    class fc {
+    class fc
 
-      def fcf {
+      def fcf
         /*_*/
-      }
 
       /*_*/
 
-      class fcc {
+      class fcc
         /*_*/
-      }
 
       /*_*/
-    }
 
     /*_*/
-  }
 
   /*_*/
 
-  class c {
+  class c
 
-    class cc {
+    class cc
 
-      class ccc {
+      class ccc
         /*_*/
-      }
 
       /*_*/
 
-      def ccf {
+      def ccf
         /*_*/
-      }
 
       /*_*/
-    }
 
     /*_*/
 
-    def cf {
+    def cf
 
-      class cfc {
+      class cfc
         /*_*/
-      }
 
       /*_*/
 
-      def cff {
+      def cff
         /*_*/
-      }
 
       /*_*/
-    }
 
     /*_*/
-  }
 
   /*_*/
-}

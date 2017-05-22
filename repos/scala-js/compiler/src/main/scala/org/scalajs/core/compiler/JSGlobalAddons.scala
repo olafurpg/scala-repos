@@ -13,7 +13,7 @@ import scala.collection.mutable
   *
   *  @author Sébastien Doeraene
   */
-trait JSGlobalAddons extends JSDefinitions with Compat210Component {
+trait JSGlobalAddons extends JSDefinitions with Compat210Component
   val global: Global
 
   import global._
@@ -21,15 +21,14 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
   import definitions._
 
   /** JavaScript primitives, used in jscode */
-  object jsPrimitives extends JSPrimitives {
+  object jsPrimitives extends JSPrimitives
     // scalastyle:ignore
     val global: JSGlobalAddons.this.global.type = JSGlobalAddons.this.global
     val jsAddons: ThisJSGlobalAddons =
       JSGlobalAddons.this.asInstanceOf[ThisJSGlobalAddons]
-  }
 
   /** global javascript interop related helpers */
-  object jsInterop {
+  object jsInterop
     // scalastyle:ignore
     import scala.reflect.NameTransformer
     import scala.reflect.internal.Flags
@@ -41,37 +40,32 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
     private val methodExportPrefix = exportPrefix + "meth$"
     private val propExportPrefix = exportPrefix + "prop$"
 
-    trait ExportInfo {
+    trait ExportInfo
       val jsName: String
       val pos: Position
       val isNamed: Boolean
-    }
 
-    private def assertValidForRegistration(sym: Symbol): Unit = {
+    private def assertValidForRegistration(sym: Symbol): Unit =
       assert(sym.isConstructor || sym.isClass,
              "Can only register constructors or classes for export")
-    }
 
     def clearRegisteredExports(): Unit =
       exportedSymbols.clear()
 
-    def registerForExport(sym: Symbol, infos: List[ExportInfo]): Unit = {
+    def registerForExport(sym: Symbol, infos: List[ExportInfo]): Unit =
       assert(!exportedSymbols.contains(sym), "Same symbol exported twice")
       assertValidForRegistration(sym)
       exportedSymbols.put(sym, infos)
-    }
 
-    def registeredExportsOf(sym: Symbol): List[ExportInfo] = {
+    def registeredExportsOf(sym: Symbol): List[ExportInfo] =
       assertValidForRegistration(sym)
       exportedSymbols.getOrElse(sym, Nil)
-    }
 
     /** creates a name for an export specification */
-    def scalaExportName(jsName: String, isProp: Boolean): TermName = {
+    def scalaExportName(jsName: String, isProp: Boolean): TermName =
       val pref = if (isProp) propExportPrefix else methodExportPrefix
       val encname = NameTransformer.encode(jsName)
       newTermName(pref + encname)
-    }
 
     /** checks if the given symbol is a JSExport */
     def isExport(sym: Symbol): Boolean =
@@ -81,37 +75,31 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
     /** retrieves the originally assigned jsName of this export and whether it
       *  is a property
       */
-    def jsExportInfo(name: Name): (String, Boolean) = {
-      def dropPrefix(prefix: String) = {
-        if (name.startsWith(prefix)) {
+    def jsExportInfo(name: Name): (String, Boolean) =
+      def dropPrefix(prefix: String) =
+        if (name.startsWith(prefix))
           // We can't decode right away due to $ separators
           val enc = name.encoded.substring(prefix.length)
           Some(NameTransformer.decode(enc))
-        } else None
-      }
+        else None
 
       dropPrefix(methodExportPrefix).map((_, false)) orElse dropPrefix(
           propExportPrefix).map((_, true)) getOrElse sys.error(
           "non-exported name passed to jsInfoSpec")
-    }
 
     def isJSProperty(sym: Symbol): Boolean = isJSGetter(sym) || isJSSetter(sym)
 
-    @inline private def enteringUncurryIfAtPhaseAfter[A](op: => A): A = {
+    @inline private def enteringUncurryIfAtPhaseAfter[A](op: => A): A =
       if (currentRun.uncurryPhase != NoPhase &&
-          isAtPhaseAfter(currentRun.uncurryPhase)) {
+          isAtPhaseAfter(currentRun.uncurryPhase))
         enteringPhase(currentRun.uncurryPhase)(op)
-      } else {
+      else
         op
-      }
-    }
 
     /** has this symbol to be translated into a JS getter (both directions)? */
-    def isJSGetter(sym: Symbol): Boolean = {
-      sym.tpe.params.isEmpty && enteringUncurryIfAtPhaseAfter {
+    def isJSGetter(sym: Symbol): Boolean =
+      sym.tpe.params.isEmpty && enteringUncurryIfAtPhaseAfter
         sym.tpe.isInstanceOf[NullaryMethodType]
-      }
-    }
 
     /** has this symbol to be translated into a JS setter (both directions)? */
     def isJSSetter(sym: Symbol): Boolean =
@@ -130,24 +118,18 @@ trait JSGlobalAddons extends JSDefinitions with Compat210Component {
       *  If it is not explicitly specified with an `@JSName` annotation, the
       *  JS name is inferred from the Scala name.
       */
-    def jsNameOf(sym: Symbol): String = {
-      sym.getAnnotation(JSNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
+    def jsNameOf(sym: Symbol): String =
+      sym.getAnnotation(JSNameAnnotation).flatMap(_.stringArg(0)) getOrElse
         val base = sym.unexpandedName.decoded.stripSuffix("_=")
         if (!sym.isMethod) base.stripSuffix(" ")
         else base
-      }
-    }
 
     /** Gets the fully qualified JS name of a static class of module Symbol.
       *
       *  This is the JS name of the symbol qualified by the fully qualified JS
       *  name of its original owner if the latter is a native JS object.
       */
-    def fullJSNameOf(sym: Symbol): String = {
+    def fullJSNameOf(sym: Symbol): String =
       assert(sym.isClass, s"fullJSNameOf called for non-class symbol $sym")
-      sym.getAnnotation(JSFullNameAnnotation).flatMap(_.stringArg(0)) getOrElse {
+      sym.getAnnotation(JSFullNameAnnotation).flatMap(_.stringArg(0)) getOrElse
         jsNameOf(sym)
-      }
-    }
-  }
-}

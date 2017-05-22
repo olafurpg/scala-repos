@@ -26,19 +26,16 @@ import java.nio.channels.{ReadableByteChannel, WritableByteChannel}
 
 import scalaz.Validation
 
-trait SegmentWriter {
+trait SegmentWriter
   def writeSegment(channel: WritableByteChannel,
                    segment: Segment): Validation[IOException, PrecogUnit]
-}
 
-trait SegmentReader {
+trait SegmentReader
   def readSegmentId(
       channel: ReadableByteChannel): Validation[IOException, SegmentId]
   def readSegment(
       channel: ReadableByteChannel): Validation[IOException, Segment]
-}
 
-trait SegmentFormat {
+trait SegmentFormat
   def reader: SegmentReader
   def writer: SegmentWriter
-}

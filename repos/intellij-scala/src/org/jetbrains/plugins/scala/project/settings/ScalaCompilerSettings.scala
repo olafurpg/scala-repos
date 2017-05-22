@@ -6,10 +6,9 @@ import org.jetbrains.plugins.scala.project.{CompileOrder, DebuggingInfoLevel}
 /**
   * @author Pavel Fatin
   */
-class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
-  def this() {
+class ScalaCompilerSettings(state: ScalaCompilerSettingsState)
+  def this()
     this(new ScalaCompilerSettingsState())
-  }
 
   loadState(state)
 
@@ -75,61 +74,53 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
 
   private val PluginOptionPattern = "-Xplugin:(.+)".r
 
-  def toOptions: Seq[String] = {
+  def toOptions: Seq[String] =
     val debuggingLevelToOption = DebuggingOptions.map(_.swap)
 
-    val toggledOptions = ToggleOptions.collect {
+    val toggledOptions = ToggleOptions.collect
       case (option, getter, _) if getter() => option
-    }
 
     val debuggingLevelOption = debuggingLevelToOption(debuggingInfoLevel)
 
     val pluginOptions = plugins.map(path => "-Xplugin:" + path)
 
     (toggledOptions :+ debuggingLevelOption) ++ pluginOptions ++ additionalCompilerOptions
-  }
 
-  def initFrom(options: Seq[String]) {
+  def initFrom(options: Seq[String])
     initFrom0(normalized(options))
-  }
 
   def sbtIncOptions =
     SbtIncrementalOptions(
         nameHashing, recompileOnMacroDef, transitiveStep, recompileAllFraction)
 
-  private def initFrom0(options: Seq[String]) {
+  private def initFrom0(options: Seq[String])
     val optionToSetter = ToggleOptions.map(it => (it._1, it._3)).toMap
 
-    optionToSetter.foreach {
+    optionToSetter.foreach
       case (option, setter) => setter(options.contains(option))
-    }
 
     debuggingInfoLevel = DebuggingOptions
       .find(p => options.contains(p._1))
       .map(_._2)
       .getOrElse(DebuggingInfoLevel.Vars)
 
-    plugins = options collect {
+    plugins = options collect
       case PluginOptionPattern(path) => path
-    }
 
-    additionalCompilerOptions = options.filterNot { option =>
+    additionalCompilerOptions = options.filterNot  option =>
       optionToSetter.keySet.contains(option) ||
       DebuggingOptions.keySet.contains(option) ||
       PluginOptionPattern.findFirstIn(option).isDefined
-    }
-  }
 
-  private def normalized(options: Seq[String]): Seq[String] = options.flatMap {
+  private def normalized(options: Seq[String]): Seq[String] = options.flatMap
     case "-language:macros" =>
       Seq("-language:experimental.macros")
     case option =>
       if (option.startsWith("-language:"))
         option.substring(10).split(",").map("-language:" + _)
       else Seq(option)
-  }
 
-  def loadState(state: ScalaCompilerSettingsState) {
+  def loadState(state: ScalaCompilerSettingsState)
     compileOrder = state.compileOrder
 
     nameHashing = state.nameHashing
@@ -158,9 +149,8 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
     debuggingInfoLevel = state.debuggingInfoLevel
     additionalCompilerOptions = state.additionalCompilerOptions.toSeq
     plugins = state.plugins.toSeq
-  }
 
-  def getState = {
+  def getState =
     val state = new ScalaCompilerSettingsState()
     state.compileOrder = compileOrder
 
@@ -191,5 +181,3 @@ class ScalaCompilerSettings(state: ScalaCompilerSettingsState) {
     state.additionalCompilerOptions = additionalCompilerOptions.toArray
     state.plugins = plugins.toArray
     state
-  }
-}

@@ -17,36 +17,33 @@ import DataViewExt._
 
 object DataViewTest extends Requires.TypedArray
 
-class DataViewTest {
+class DataViewTest
 
-  @Test def arrayBuffer_only_constructor(): Unit = {
+  @Test def arrayBuffer_only_constructor(): Unit =
     val buf = new ArrayBuffer(10)
     val view = new DataView(buf)
     assertTrue(view.isInstanceOf[DataView])
     assertEquals(10, view.byteLength)
     assertEquals(0, view.byteOffset)
     assertEquals(0, view.getInt8(0))
-  }
 
-  @Test def arrayBuffer_and_offset_constructor(): Unit = {
+  @Test def arrayBuffer_and_offset_constructor(): Unit =
     val buf = new ArrayBuffer(10)
     val view = new DataView(buf, 2)
     assertTrue(view.isInstanceOf[DataView])
     assertEquals(8, view.byteLength)
     assertEquals(2, view.byteOffset)
     assertEquals(0, view.getInt8(0))
-  }
 
-  @Test def arrayBuffer_offset_and_length_constructor(): Unit = {
+  @Test def arrayBuffer_offset_and_length_constructor(): Unit =
     val buf = new ArrayBuffer(10)
     val view = new DataView(buf, 3, 2)
     assertTrue(view.isInstanceOf[DataView])
     assertEquals(2, view.byteLength)
     assertEquals(3, view.byteOffset)
     assertEquals(0, view.getInt8(0))
-  }
 
-  @Test def getInt8(): Unit = {
+  @Test def getInt8(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setInt8(0, 1)
@@ -57,9 +54,8 @@ class DataViewTest {
     assertEquals(127, view.getInt8(1))
     assertEquals(0, view.getInt8(2))
     assertEquals(-50, view.getInt8(3))
-  }
 
-  @Test def getUint8(): Unit = {
+  @Test def getUint8(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setInt8(0, 1)
@@ -68,9 +64,8 @@ class DataViewTest {
     assertEquals(1, view.getUint8(0))
     assertEquals(129, view.getUint8(1))
     assertEquals(0, view.getUint8(2))
-  }
 
-  @Test def getInt16(): Unit = {
+  @Test def getInt16(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setUint8(0, 0x01)
@@ -82,9 +77,8 @@ class DataViewTest {
     assertEquals(-255, view.getInt16(0, true))
     assertEquals(-77, view.getInt16(1))
     assertEquals(0x30B3, view.getInt16(2, true))
-  }
 
-  @Test def getUint16(): Unit = {
+  @Test def getUint16(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setUint8(0, 0x01)
@@ -96,9 +90,8 @@ class DataViewTest {
     assertEquals(0xFF01, view.getUint16(0, true))
     assertEquals(0xFFB3, view.getUint16(1))
     assertEquals(0x30B3, view.getUint16(2, true))
-  }
 
-  @Test def getInt32(): Unit = {
+  @Test def getInt32(): Unit =
     val view = new DataView(new ArrayBuffer(5))
 
     view.setUint8(0, 0x01)
@@ -111,9 +104,8 @@ class DataViewTest {
     assertEquals(0x30B3FF01, view.getInt32(0, true))
     assertEquals(0xFFB3301A, view.getInt32(1)) // is negative since Int
     assertEquals(0x1A30B3FF, view.getInt32(1, true))
-  }
 
-  @Test def getInt64_through_DataViewExt(): Unit = {
+  @Test def getInt64_through_DataViewExt(): Unit =
     val view = new DataView(new ArrayBuffer(9))
 
     view.setUint8(0, 0x01)
@@ -130,9 +122,8 @@ class DataViewTest {
     assertEquals(0xBD5C741A30B3FF01L, view.getInt64(0, true))
     assertEquals(0xFFB3301A745CBDAFL, view.getInt64(1))
     assertEquals(0xAFBD5C741A30B3FFL, view.getInt64(1, true))
-  }
 
-  @Test def getUint32(): Unit = {
+  @Test def getUint32(): Unit =
     val view = new DataView(new ArrayBuffer(5))
 
     view.setUint8(0, 0x01)
@@ -145,9 +136,8 @@ class DataViewTest {
     assertEquals(0x30B3FF01, view.getUint32(0, true))
     assertEquals(0xFFB3301AL.toDouble, view.getUint32(1))
     assertEquals(0x1A30B3FF, view.getUint32(1, true))
-  }
 
-  @Test def getFloat32(): Unit = {
+  @Test def getFloat32(): Unit =
     val view = new DataView(new ArrayBuffer(5))
 
     view.setFloat32(0, 0.1f)
@@ -156,9 +146,8 @@ class DataViewTest {
     assertNotEquals(0.1, view.getFloat32(1), 1E-7)
     assertNotEquals(0.1, view.getFloat32(0, true), 1E-7)
     assertNotEquals(0.1, view.getFloat32(1, true), 1E-7)
-  }
 
-  @Test def getFloat64(): Unit = {
+  @Test def getFloat64(): Unit =
     val view = new DataView(new ArrayBuffer(9))
 
     view.setFloat64(0, 0.5)
@@ -167,9 +156,8 @@ class DataViewTest {
     assertNotEquals(0.5, view.getFloat64(1), 0.0)
     assertNotEquals(0.5, view.getFloat64(0, true), 0.0)
     assertNotEquals(0.5, view.getFloat64(1, true), 0.0)
-  }
 
-  @Test def setInt8(): Unit = {
+  @Test def setInt8(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setInt8(0, 1)
@@ -181,9 +169,8 @@ class DataViewTest {
     assertEquals(0x7F, view.getUint8(1))
     assertEquals(0xEC, view.getUint8(2))
     assertEquals(0xCE, view.getUint8(3))
-  }
 
-  @Test def setUint8(): Unit = {
+  @Test def setUint8(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setUint8(0, 0x01)
@@ -195,9 +182,8 @@ class DataViewTest {
     assertEquals(-4, view.getInt8(1))
     assertEquals(0x4D, view.getInt8(2))
     assertEquals(-116, view.getInt8(3))
-  }
 
-  @Test def setInt16(): Unit = {
+  @Test def setInt16(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setInt16(0, 0x7F3B, true)
@@ -207,9 +193,8 @@ class DataViewTest {
     assertEquals(0x7F, view.getUint8(1))
     assertEquals(0xFF, view.getUint8(2))
     assertEquals(0xFF, view.getUint8(3))
-  }
 
-  @Test def setUint16(): Unit = {
+  @Test def setUint16(): Unit =
     val view = new DataView(new ArrayBuffer(4))
 
     view.setUint16(0, 0x7F3B, true)
@@ -226,9 +211,8 @@ class DataViewTest {
     assertEquals(0x03, view.getUint8(1))
     assertEquals(0xBC, view.getUint8(2))
     assertEquals(0xBA, view.getUint8(3))
-  }
 
-  @Test def setInt32(): Unit = {
+  @Test def setInt32(): Unit =
     val view = new DataView(new ArrayBuffer(8))
 
     view.setInt32(0, 0x7F3B8342, true)
@@ -242,9 +226,8 @@ class DataViewTest {
     assertEquals(0x10, view.getUint8(5))
     assertEquals(0x20, view.getUint8(6))
     assertEquals(0x00, view.getUint8(7))
-  }
 
-  @Test def setUint32(): Unit = {
+  @Test def setUint32(): Unit =
     val view = new DataView(new ArrayBuffer(8))
 
     view.setUint32(0, 0x7F3B8342, true)
@@ -258,9 +241,8 @@ class DataViewTest {
     assertEquals(0x10, view.getUint8(5))
     assertEquals(0x20, view.getUint8(6))
     assertEquals(0x00, view.getUint8(7))
-  }
 
-  @Test def setInt64_through_DataViewExt(): Unit = {
+  @Test def setInt64_through_DataViewExt(): Unit =
     val view = new DataView(new ArrayBuffer(16))
 
     view.setInt64(0, 0x01FFB3301A745CBDL, true)
@@ -283,9 +265,8 @@ class DataViewTest {
     assertEquals(0x7D, view.getUint8(13))
     assertEquals(0xE1, view.getUint8(14))
     assertEquals(0xB5, view.getUint8(15))
-  }
 
-  @Test def setFloat32(): Unit = {
+  @Test def setFloat32(): Unit =
     val view = new DataView(new ArrayBuffer(5))
 
     view.setFloat32(0, 0.1f)
@@ -299,9 +280,8 @@ class DataViewTest {
 
     assertNotEquals(0.1, view.getFloat32(0, true), 1E-7)
     assertEquals(0.4, view.getFloat32(1, true), 1E-7)
-  }
 
-  @Test def setFloat64(): Unit = {
+  @Test def setFloat64(): Unit =
     val view = new DataView(new ArrayBuffer(9))
 
     view.setFloat64(0, 0.5)
@@ -315,5 +295,3 @@ class DataViewTest {
 
     assertNotEquals(0.5, view.getFloat64(0, true), 0.0)
     assertEquals(0.6, view.getFloat64(1, true), 0.0)
-  }
-}

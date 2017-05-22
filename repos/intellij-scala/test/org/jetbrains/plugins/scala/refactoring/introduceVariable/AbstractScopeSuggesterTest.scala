@@ -21,14 +21,14 @@ import org.junit.Assert
   * on 10/15/15
   */
 abstract class AbstractScopeSuggesterTest
-    extends ScalaLightPlatformCodeInsightTestCaseAdapter {
+    extends ScalaLightPlatformCodeInsightTestCaseAdapter
   val BEGIN_MARKER: String = "/*begin*/"
   val END_MARKER: String = "/*end*/"
 
   protected def folderPath =
     baseRootPath() + "introduceVariable/scopeSuggester/"
 
-  protected def doTest(suggestedScopesNames: Seq[String]) {
+  protected def doTest(suggestedScopesNames: Seq[String])
     val filePath = folderPath + getTestName(false) + ".scala"
     val file = LocalFileSystem.getInstance.findFileByPath(
         filePath.replace(File.separatorChar, '/'))
@@ -53,10 +53,9 @@ abstract class AbstractScopeSuggesterTest
     val scalaFile = getFileAdapter.asInstanceOf[ScalaFile]
     var element = CommonDataKeys.PSI_ELEMENT.getData(
         DataManager.getInstance().getDataContextFromFocus.getResult)
-    if (element == null) {
+    if (element == null)
       element = PsiTreeUtil.findElementOfClassAtRange(
           scalaFile, startOffset, endOffset, classOf[PsiElement])
-    }
 
     assert(element.isInstanceOf[ScTypeElement],
            "Selected element should be ScTypeElement")
@@ -69,5 +68,3 @@ abstract class AbstractScopeSuggesterTest
         element.asInstanceOf[ScTypeElement])
     Assert.assertEquals(scopes.map(_.getName).sorted.mkString(", "),
                         suggestedScopesNames.sorted.mkString(", "))
-  }
-}

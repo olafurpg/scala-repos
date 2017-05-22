@@ -16,41 +16,35 @@ import org.jetbrains.plugins.scala.lang.psi.impl.ScalaPsiElementFactory
   * @author Alexander Podkhalyuzin
   * Date: 20.02.2008
   */
-trait ScClass extends ScTypeDefinition with ScParameterOwner {
+trait ScClass extends ScTypeDefinition with ScParameterOwner
   def constructor: Option[ScPrimaryConstructor]
 
-  def secondaryConstructors: Seq[ScFunction] = {
+  def secondaryConstructors: Seq[ScFunction] =
     functions.filter(_.isConstructor)
-  }
 
-  def constructors: Array[PsiMethod] = {
+  def constructors: Array[PsiMethod] =
     (secondaryConstructors ++ constructor.toSeq).toArray
-  }
 
-  def clauses: Option[ScParameters] = constructor match {
+  def clauses: Option[ScParameters] = constructor match
     case Some(x: ScPrimaryConstructor) => Some(x.parameterList)
     case None => None
-  }
 
-  def addEmptyParens() {
-    clauses match {
+  def addEmptyParens()
+    clauses match
       case Some(c) =>
         val clause =
           ScalaPsiElementFactory.createClauseFromText("()", getManager)
         c.addClause(clause)
       case _ =>
-    }
-  }
 
-  protected def typeParamString: String = {
+  protected def typeParamString: String =
     if (typeParameters.nonEmpty)
       typeParameters.map(ScalaPsiUtil.typeParamString).mkString("[", ", ", "]")
     else ""
-  }
 
   def tooBigForUnapply: Boolean = constructor.exists(_.parameters.length > 22)
 
-  def getSyntheticMethodsText: List[String] = {
+  def getSyntheticMethodsText: List[String] =
     val typeParamStringRes =
       if (typeParameters.nonEmpty)
         typeParameters.map(_.name).mkString("[", ", ", "]")
@@ -58,15 +52,15 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
 
     val unapply: Option[String] =
       if (tooBigForUnapply) None
-      else {
-        val paramStringRes = constructor match {
+      else
+        val paramStringRes = constructor match
           case Some(x: ScPrimaryConstructor) =>
             val clauses = x.parameterList.clauses
             if (clauses.isEmpty) "scala.Boolean"
-            else {
+            else
               val params = clauses.head.parameters
               if (params.isEmpty) "scala.Boolean"
-              else {
+              else
                 val strings = params.map(
                     p =>
                       (if (p.isRepeatedParameter) "scala.Seq[" else "") +
@@ -76,26 +70,21 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                     "scala.Option[" + (if (strings.length > 1) "(" else ""),
                     ", ",
                     (if (strings.length > 1) ")" else "") + "]")
-              }
-            }
           case None => "scala.Boolean"
-        }
-        val unapplyName = constructor match {
+        val unapplyName = constructor match
           case Some(x: ScPrimaryConstructor) =>
-            (for {
+            (for
               c1 <- x.parameterList.clauses.headOption
               plast <- c1.parameters.lastOption if plast.isRepeatedParameter
-            } yield "unapplySeq").getOrElse("unapply")
+            yield "unapplySeq").getOrElse("unapply")
           case None => "unapply"
-        }
         Option(
             s"def $unapplyName$typeParamString(x$$0: $name$typeParamStringRes): $paramStringRes = throw new Error()")
-      }
 
     val apply: Option[String] =
       if (hasModifierProperty("abstract")) None
-      else {
-        val paramString = constructor match {
+      else
+        val paramString = constructor match
           case Some(x: ScPrimaryConstructor) =>
             (if (x.parameterList.clauses.length == 1 &&
                  x.parameterList.clauses.head.isImplicit) "()" else "") +
@@ -114,14 +103,11 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
                           if (c.isImplicit) "(implicit " else "(", ", ", ")"))
               .mkString("")
           case None => ""
-        }
 
         Option(
             s"def apply$typeParamString$paramString: $name$typeParamStringRes = throw new Error()")
-      }
 
     List(apply, unapply).flatten
-  }
 
   def getSyntheticImplicitMethod: Option[ScFunction]
 
@@ -131,4 +117,3 @@ trait ScClass extends ScTypeDefinition with ScParameterOwner {
 
   override def accept(visitor: ScalaElementVisitor): Unit =
     visitor.visitClass(this)
-}

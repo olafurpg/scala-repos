@@ -1,4 +1,4 @@
-object SCL4662 {
+object SCL4662
   import scala.reflect.runtime.universe._
   import scala.reflect.runtime.{currentMirror => m}
   import scala.reflect.runtime.universe
@@ -9,8 +9,8 @@ object SCL4662 {
     * Date: 04.09.12
     * Time: 21:39
     */
-  object SomeObject {
-    def main(args: Array[String]) {
+  object SomeObject
+    def main(args: Array[String])
       case class Test(a: String, b: List[Int])
       val lookAtMe = m.reflect(Test)
       val value = universe.typeOf[Test]
@@ -19,13 +19,10 @@ object SCL4662 {
       /*start*/
       methods.flatMap(
           e =>
-            try {
+            try
           Some(lookAtMe.reflectMethod(e))
-        } catch {
+        catch
           case e: Throwable =>
             e.printStackTrace(); None
-      }) /*end*/
-    }
-  }
-}
+      ) /*end*/
 //Array[runtime.universe.MethodMirror]

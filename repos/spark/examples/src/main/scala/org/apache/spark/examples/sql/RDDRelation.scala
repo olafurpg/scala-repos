@@ -25,8 +25,8 @@ import org.apache.spark.sql.{SaveMode, SQLContext}
 // names and types.
 case class Record(key: Int, value: String)
 
-object RDDRelation {
-  def main(args: Array[String]) {
+object RDDRelation
+  def main(args: Array[String])
     val sparkConf = new SparkConf().setAppName("RDDRelation")
     val sc = new SparkContext(sparkConf)
     val sqlContext = new SQLContext(sc)
@@ -84,6 +84,4 @@ object RDDRelation {
     sqlContext.sql("SELECT * FROM parquetFile").collect().foreach(println)
 
     sc.stop()
-  }
-}
 // scalastyle:on println

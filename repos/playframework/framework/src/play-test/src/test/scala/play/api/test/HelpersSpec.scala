@@ -14,93 +14,73 @@ import scala.concurrent.Future
 
 import org.specs2.mutable._
 
-class HelpersSpec extends Specification {
+class HelpersSpec extends Specification
 
-  "inMemoryDatabase" should {
+  "inMemoryDatabase" should
 
-    "change database with a name argument" in {
+    "change database with a name argument" in
       val inMemoryDatabaseConfiguration = inMemoryDatabase("test")
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
           "org.h2.Driver")
-      inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {
+      inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which
         url =>
           url.startsWith("jdbc:h2:mem:play-test-")
-      }
-    }
 
-    "add options" in {
+    "add options" in
       val inMemoryDatabaseConfiguration = inMemoryDatabase(
           "test", Map("MODE" -> "PostgreSQL", "DB_CLOSE_DELAY" -> "-1"))
       inMemoryDatabaseConfiguration.get("db.test.driver") must beSome(
           "org.h2.Driver")
-      inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which {
+      inMemoryDatabaseConfiguration.get("db.test.url") must beSome.which
         url =>
           """^jdbc:h2:mem:play-test([0-9-]+);MODE=PostgreSQL;DB_CLOSE_DELAY=-1$""".r
             .findFirstIn(url)
             .isDefined
-      }
-    }
-  }
 
-  "contentAsString" should {
+  "contentAsString" should
 
-    "extract the content from Result as String" in {
+    "extract the content from Result as String" in
       contentAsString(Future.successful(Ok("abc"))) must_== "abc"
-    }
 
-    "extract the content from Content as String" in {
-      val content = new Content {
+    "extract the content from Content as String" in
+      val content = new Content
         val body: String = "abc"
         val contentType: String = "text/plain"
-      }
       contentAsString(content) must_== "abc"
-    }
-  }
 
-  "contentAsBytes" should {
+  "contentAsBytes" should
 
-    "extract the content from Result as Bytes" in {
+    "extract the content from Result as Bytes" in
       contentAsBytes(Future.successful(Ok("abc"))) must_==
         ByteString(97, 98, 99)
-    }
 
-    "extract the content from chunked Result as Bytes" in {
+    "extract the content from chunked Result as Bytes" in
       implicit val system = ActorSystem()
-      try {
+      try
         implicit val mat = ActorMaterializer()
         contentAsBytes(
             Future.successful(Ok.chunked(Source(List("a", "b", "c"))))) must_==
           ByteString(97, 98, 99)
-      } finally {
+      finally
         system.terminate()
-      }
-    }
 
-    "extract the content from Content as Bytes" in {
-      val content = new Content {
+    "extract the content from Content as Bytes" in
+      val content = new Content
         val body: String = "abc"
         val contentType: String = "text/plain"
-      }
       contentAsBytes(content) must_== Array(97, 98, 99)
-    }
-  }
 
-  "contentAsJson" should {
+  "contentAsJson" should
 
-    "extract the content from Result as Json" in {
+    "extract the content from Result as Json" in
       val jsonResult = Ok("""{"play":["java","scala"]}""").as(
           "application/json")
       (contentAsJson(Future.successful(jsonResult)) \ "play").as[List[String]] must_==
         List("java", "scala")
-    }
 
-    "extract the content from Content as Json" in {
-      val jsonContent = new Content {
+    "extract the content from Content as Json" in
+      val jsonContent = new Content
         val body: String = """{"play":["java","scala"]}"""
         val contentType: String = "application/json"
-      }
       (contentAsJson(jsonContent) \ "play").as[List[String]] must_==
         List("java", "scala")
-    }
-  }
-}

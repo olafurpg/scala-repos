@@ -24,24 +24,22 @@ import interplay.PlayBuildBase.autoImport._
 
 import scala.util.control.NonFatal
 
-object BuildSettings {
+object BuildSettings
   // Binary compatibility is tested against this version
   val previousVersion = "2.5.0"
 
   // Argument for setting size of permgen space or meta space for all forked processes
   val maxMetaspace = s"-XX:MaxMetaspaceSize=384m"
 
-  val snapshotBranch = {
-    try {
+  val snapshotBranch =
+    try
       val branch = "git rev-parse --abbrev-ref HEAD".!!.trim
-      if (branch == "HEAD") {
+      if (branch == "HEAD")
         // not on a branch, get the hash
         "git rev-parse HEAD".!!.trim
-      } else branch
-    } catch {
+      else branch
+    catch
       case NonFatal(_) => "unknown"
-    }
-  }
 
   /**
     * These settings are used by all projects
@@ -70,13 +68,12 @@ object BuildSettings {
     */
   def playRuntimeSettings: Seq[Setting[_]] =
     playCommonSettings ++ mimaDefaultSettings ++ Seq(
-        previousArtifacts := {
-          if (crossPaths.value) {
+        previousArtifacts :=
+          if (crossPaths.value)
             Set(organization.value % s"${moduleName.value}_${scalaBinaryVersion.value}" % previousVersion)
-          } else {
+          else
             Set(organization.value % moduleName.value % previousVersion)
-          }
-        },
+        ,
         Docs.apiDocsInclude := true
     )
 
@@ -88,7 +85,7 @@ object BuildSettings {
   /**
     * A project that is shared between the SBT runtime and the Play runtime
     */
-  def PlayNonCrossBuiltProject(name: String, dir: String): Project = {
+  def PlayNonCrossBuiltProject(name: String, dir: String): Project =
     Project(name, file("src/" + dir))
       .enablePlugins(PlaySbtLibrary)
       .settings(playRuntimeSettings: _*)
@@ -97,33 +94,30 @@ object BuildSettings {
           autoScalaLibrary := false,
           crossPaths := false
       )
-  }
 
   /**
     * A project that is only used when running in development.
     */
-  def PlayDevelopmentProject(name: String, dir: String): Project = {
+  def PlayDevelopmentProject(name: String, dir: String): Project =
     Project(name, file("src/" + dir))
       .enablePlugins(PlayLibrary)
       .settings(playCommonSettings: _*)
       .settings(
           (javacOptions in compile) ~=
-          (_.map {
+          (_.map
                 case "1.8" => "1.6"
                 case other => other
-              })
+              )
       )
-  }
 
   /**
     * A project that is in the Play runtime
     */
-  def PlayCrossBuiltProject(name: String, dir: String): Project = {
+  def PlayCrossBuiltProject(name: String, dir: String): Project =
     Project(name, file("src/" + dir))
       .enablePlugins(PlayLibrary)
       .settings(playRuntimeSettings: _*)
       .settings(omnidocSettings: _*)
-  }
 
   def omnidocSettings: Seq[Setting[_]] = Omnidoc.projectSettings ++ Seq(
       omnidocSnapshotBranch := snapshotBranch,
@@ -143,32 +137,28 @@ object BuildSettings {
 
   def playFullScriptedSettings: Seq[Setting[_]] =
     ScriptedPlugin.scriptedSettings ++ Seq(
-        ScriptedPlugin.scriptedLaunchOpts <+= version apply { v =>
+        ScriptedPlugin.scriptedLaunchOpts <+= version apply  v =>
           s"-Dproject.version=$v"
-        }
     ) ++ playScriptedSettings
 
   /**
     * A project that runs in the SBT runtime
     */
-  def PlaySbtProject(name: String, dir: String): Project = {
+  def PlaySbtProject(name: String, dir: String): Project =
     Project(name, file("src/" + dir))
       .enablePlugins(PlaySbtLibrary)
       .settings(playCommonSettings: _*)
-  }
 
   /**
     * A project that *is* an SBT plugin
     */
-  def PlaySbtPluginProject(name: String, dir: String): Project = {
+  def PlaySbtPluginProject(name: String, dir: String): Project =
     Project(name, file("src/" + dir))
       .enablePlugins(PlaySbtPlugin)
       .settings(playCommonSettings: _*)
       .settings(playScriptedSettings: _*)
-  }
-}
 
-object PlayBuild extends Build {
+object PlayBuild extends Build
 
   import Dependencies._
   import BuildSettings._
@@ -253,7 +243,7 @@ object PlayBuild extends Build {
         sourceDirectories in (Compile, TwirlKeys.compileTemplates) :=
         (unmanagedSourceDirectories in Compile).value,
         TwirlKeys.templateImports += "play.api.templates.PlayMagic._",
-        mappings in (Compile, packageSrc) ++= {
+        mappings in (Compile, packageSrc) ++=
           // Add both the templates, useful for end users to read, and the Scala sources that they get compiled to,
           // so omnidoc can compile and produce scaladocs for them.
           val twirlSources =
@@ -268,7 +258,7 @@ object PlayBuild extends Build {
               relativeTo(twirlTarget), errorIfNone = false)
 
           twirlSources ++ twirlCompiledSources
-        },
+        ,
         Docs.apiDocsIncludeManaged := true
     )
     .settings(Docs.playdocSettings: _*)
@@ -373,10 +363,9 @@ object PlayBuild extends Build {
         // This only publishes the sbt plugin projects on each scripted run.
         // The runtests script does a full publish before running tests.
         // When developing the sbt plugins, run a publishLocal in the root project first.
-        scriptedDependencies := {
+        scriptedDependencies :=
           val () = publishLocal.value
           val () = (publishLocal in RoutesCompilerProject).value
-        }
     )
     .dependsOn(SbtRoutesCompilerProject, SbtRunSupportProject)
 
@@ -413,11 +402,11 @@ object PlayBuild extends Build {
                 // This only publishes the sbt plugin projects on each scripted run.
                 // The runtests script does a full publish before running tests.
                 // When developing the sbt plugins, run a publishLocal in the root project first.
-                scriptedDependencies := {
+                scriptedDependencies :=
                   val () = publishLocal.value
                   val () = (publishLocal in SbtPluginProject).value
                   val () = (publishLocal in SbtRoutesCompilerProject).value
-                })
+                )
       .dependsOn(SbtForkRunProtocolProject, SbtPluginProject)
 
   lazy val PlayLogback = PlayCrossBuiltProject("Play-Logback", "play-logback")
@@ -548,4 +537,3 @@ object PlayBuild extends Build {
     )
     .settings(Release.settings: _*)
     .aggregate(publishedProjects: _*)
-}

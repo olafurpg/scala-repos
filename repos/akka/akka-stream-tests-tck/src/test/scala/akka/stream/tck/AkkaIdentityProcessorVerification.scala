@@ -16,7 +16,7 @@ import org.testng.annotations.AfterClass
 abstract class AkkaIdentityProcessorVerification[T](
     env: TestEnvironment, publisherShutdownTimeout: Long)
     extends IdentityProcessorVerification[T](env, publisherShutdownTimeout)
-    with TestNGSuiteLike with ActorSystemLifecycle {
+    with TestNGSuiteLike with ActorSystemLifecycle
 
   def this(printlnDebug: Boolean) =
     this(new TestEnvironment(Timeouts.defaultTimeoutMillis, printlnDebug),
@@ -29,15 +29,13 @@ abstract class AkkaIdentityProcessorVerification[T](
         new Exception("Unable to serve subscribers right now!"))
 
   def processorFromSubscriberAndPublisher(
-      sub: Subscriber[T], pub: Publisher[T]): Processor[T, T] = {
-    new Processor[T, T] {
+      sub: Subscriber[T], pub: Publisher[T]): Processor[T, T] =
+    new Processor[T, T]
       override def onSubscribe(s: Subscription): Unit = sub.onSubscribe(s)
       override def onError(t: Throwable): Unit = sub.onError(t)
       override def onComplete(): Unit = sub.onComplete()
       override def onNext(t: T): Unit = sub.onNext(t)
       override def subscribe(s: Subscriber[_ >: T]): Unit = pub.subscribe(s)
-    }
-  }
 
   /** By default Akka Publishers do not support Fanout! */
   override def maxSupportedSubscribers: Long = 1L
@@ -46,8 +44,6 @@ abstract class AkkaIdentityProcessorVerification[T](
     Executors.newFixedThreadPool(3)
 
   @AfterClass
-  def shutdownPublisherExecutorService(): Unit = {
+  def shutdownPublisherExecutorService(): Unit =
     publisherExecutorService.shutdown()
     publisherExecutorService.awaitTermination(3, TimeUnit.SECONDS)
-  }
-}

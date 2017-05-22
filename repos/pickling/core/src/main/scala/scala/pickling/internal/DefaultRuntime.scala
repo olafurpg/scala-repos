@@ -14,7 +14,7 @@ import scala.reflect.runtime.universe.Mirror
   *   - This supports runtime pickler/unpickler generation via scala reflection.
   *   - This uses an actual lock to keep reflective usages safe.
   */
-class DefaultRuntime extends spi.PicklingRuntime {
+class DefaultRuntime extends spi.PicklingRuntime
   override val GRL = new ReentrantLock()
 
   /** Gives access to the current refRegistry. */
@@ -34,4 +34,3 @@ class DefaultRuntime extends spi.PicklingRuntime {
   /** A registry of picklers for runtime lookup/usage. */
   override val picklers: PicklerRegistry = new DefaultPicklerRegistry(
       new DefaultRuntimePicklerGenerator(GRL))
-}

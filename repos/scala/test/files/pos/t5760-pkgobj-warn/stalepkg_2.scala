@@ -1,8 +1,6 @@
 package object stalepkg {}
 
-package stalepkg {
+package stalepkg
   class Foo
-  object Test {
+  object Test
     def main(args: Array[String]) {}
-  }
-}

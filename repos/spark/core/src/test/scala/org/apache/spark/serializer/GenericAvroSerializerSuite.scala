@@ -27,7 +27,7 @@ import org.apache.avro.generic.GenericData.Record
 import org.apache.spark.{SharedSparkContext, SparkFunSuite}
 
 class GenericAvroSerializerSuite
-    extends SparkFunSuite with SharedSparkContext {
+    extends SparkFunSuite with SharedSparkContext
   conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
 
   val schema: Schema = SchemaBuilder
@@ -38,13 +38,12 @@ class GenericAvroSerializerSuite
   val record = new Record(schema)
   record.put("data", "test data")
 
-  test("schema compression and decompression") {
+  test("schema compression and decompression")
     val genericSer = new GenericAvroSerializer(conf.getAvroSchema)
     assert(schema === genericSer.decompress(
             ByteBuffer.wrap(genericSer.compress(schema))))
-  }
 
-  test("record serialization and deserialization") {
+  test("record serialization and deserialization")
     val genericSer = new GenericAvroSerializer(conf.getAvroSchema)
 
     val outputStream = new ByteArrayOutputStream()
@@ -55,9 +54,8 @@ class GenericAvroSerializerSuite
 
     val input = new Input(new ByteArrayInputStream(outputStream.toByteArray))
     assert(genericSer.deserializeDatum(input) === record)
-  }
 
-  test("uses schema fingerprint to decrease message size") {
+  test("uses schema fingerprint to decrease message size")
     val genericSerFull = new GenericAvroSerializer(conf.getAvroSchema)
 
     val output = new Output(new ByteArrayOutputStream())
@@ -74,9 +72,8 @@ class GenericAvroSerializerSuite
     val fingerprintLength = output.total - beginningFingerprintPosition
 
     assert(fingerprintLength < normalLength)
-  }
 
-  test("caches previously seen schemas") {
+  test("caches previously seen schemas")
     val genericSer = new GenericAvroSerializer(conf.getAvroSchema)
     val compressedSchema = genericSer.compress(schema)
     val decompressedSchema =
@@ -85,5 +82,3 @@ class GenericAvroSerializerSuite
     assert(compressedSchema.eq(genericSer.compress(schema)))
     assert(decompressedSchema.eq(
             genericSer.decompress(ByteBuffer.wrap(compressedSchema))))
-  }
-}

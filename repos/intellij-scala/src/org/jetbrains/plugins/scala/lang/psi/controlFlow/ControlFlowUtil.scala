@@ -7,13 +7,13 @@ import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 /**
   * @author ilyas
   */
-object ControlFlowUtil {
+object ControlFlowUtil
 
   /**
     * Detects connected components in a control-flow graph
     */
   def detectConnectedComponents(
-      cfg: Seq[Instruction]): Seq[collection.Set[Instruction]] = {
+      cfg: Seq[Instruction]): Seq[collection.Set[Instruction]] =
     val mainSeq = new ListBuffer[Instruction]
     mainSeq ++= cfg
     mainSeq.sortBy(_.num)
@@ -21,26 +21,19 @@ object ControlFlowUtil {
 
     @tailrec
     def inner(next: Iterable[Instruction],
-              currentSet: mutable.HashSet[Instruction]): Unit = {
-      if (next.isEmpty) {
+              currentSet: mutable.HashSet[Instruction]): Unit =
+      if (next.isEmpty)
         buffer += currentSet
         mainSeq --= currentSet
-      } else {
+      else
         val currentSucc = new ArrayBuffer[Instruction]
-        for (n <- next if !currentSet.contains(n)) {
+        for (n <- next if !currentSet.contains(n))
           currentSucc ++= n.succ
           currentSet += n
-        }
         inner(currentSucc, currentSet)
-      }
-    }
 
-    while (mainSeq.nonEmpty) {
-      mainSeq.headOption match {
+    while (mainSeq.nonEmpty)
+      mainSeq.headOption match
         case Some(h) => inner(Seq(h), new mutable.HashSet[Instruction])
         case None =>
-      }
-    }
     buffer
-  }
-}

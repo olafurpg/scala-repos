@@ -23,7 +23,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.storage.TestBlockId
 import org.apache.spark.storage.memory.MemoryStore
 
-class StaticMemoryManagerSuite extends MemoryManagerSuite {
+class StaticMemoryManagerSuite extends MemoryManagerSuite
   private val conf = new SparkConf().set("spark.storage.unrollFraction", "0.4")
 
   /**
@@ -31,7 +31,7 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     */
   private def makeThings(
       maxExecutionMem: Long,
-      maxStorageMem: Long): (StaticMemoryManager, MemoryStore) = {
+      maxStorageMem: Long): (StaticMemoryManager, MemoryStore) =
     val mm = new StaticMemoryManager(
         conf,
         maxOnHeapExecutionMemory = maxExecutionMem,
@@ -39,11 +39,10 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
         numCores = 1)
     val ms = makeMemoryStore(mm)
     (mm, ms)
-  }
 
   override protected def createMemoryManager(
       maxOnHeapExecutionMemory: Long,
-      maxOffHeapExecutionMemory: Long): StaticMemoryManager = {
+      maxOffHeapExecutionMemory: Long): StaticMemoryManager =
     new StaticMemoryManager(
         conf.clone
           .set("spark.memory.fraction", "1")
@@ -53,9 +52,8 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
         maxOnHeapExecutionMemory = maxOnHeapExecutionMemory,
         maxStorageMemory = 0,
         numCores = 1)
-  }
 
-  test("basic execution memory") {
+  test("basic execution memory")
     val maxExecutionMem = 1000L
     val taskAttemptId = 0L
     val (mm, _) = makeThings(maxExecutionMem, Long.MaxValue)
@@ -82,9 +80,8 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     mm.releaseExecutionMemory(
         maxExecutionMem, taskAttemptId, MemoryMode.ON_HEAP)
     assert(mm.executionMemoryUsed === 0L)
-  }
 
-  test("basic storage memory") {
+  test("basic storage memory")
     val maxStorageMem = 1000L
     val dummyBlock = TestBlockId("you can see the world you brought to live")
     val (mm, ms) = makeThings(Long.MaxValue, maxStorageMem)
@@ -126,9 +123,8 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     // Release beyond what was acquired
     mm.releaseStorageMemory(100L)
     assert(mm.storageMemoryUsed === 0L)
-  }
 
-  test("execution and storage isolation") {
+  test("execution and storage isolation")
     val maxExecutionMem = 200L
     val maxStorageMem = 1000L
     val taskAttemptId = 0L
@@ -156,9 +152,8 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     mm.releaseAllStorageMemory()
     assert(mm.storageMemoryUsed === 0L)
     assert(mm.executionMemoryUsed === 67L)
-  }
 
-  test("unroll memory") {
+  test("unroll memory")
     val maxStorageMem = 1000L
     val dummyBlock = TestBlockId("lonely water")
     val (mm, ms) = makeThings(Long.MaxValue, maxStorageMem)
@@ -190,5 +185,3 @@ class StaticMemoryManagerSuite extends MemoryManagerSuite {
     // Release beyond what was acquired
     mm.releaseUnrollMemory(maxStorageMem)
     assert(mm.storageMemoryUsed === 0L)
-  }
-}

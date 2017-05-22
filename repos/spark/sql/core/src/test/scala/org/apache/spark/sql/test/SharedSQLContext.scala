@@ -22,7 +22,7 @@ import org.apache.spark.sql.SQLContext
 /**
   * Helper trait for SQL test suites where all tests share a single [[TestSQLContext]].
   */
-trait SharedSQLContext extends SQLTestUtils {
+trait SharedSQLContext extends SQLTestUtils
 
   /**
     * The [[TestSQLContext]] to use for all tests in this suite.
@@ -40,26 +40,20 @@ trait SharedSQLContext extends SQLTestUtils {
   /**
     * Initialize the [[TestSQLContext]].
     */
-  protected override def beforeAll(): Unit = {
+  protected override def beforeAll(): Unit =
     SQLContext.clearSqlListener()
-    if (_ctx == null) {
+    if (_ctx == null)
       _ctx = new TestSQLContext
-    }
     // Ensure we have initialized the context before calling parent code
     super.beforeAll()
-  }
 
   /**
     * Stop the underlying [[org.apache.spark.SparkContext]], if any.
     */
-  protected override def afterAll(): Unit = {
-    try {
-      if (_ctx != null) {
+  protected override def afterAll(): Unit =
+    try
+      if (_ctx != null)
         _ctx.sparkContext.stop()
         _ctx = null
-      }
-    } finally {
+    finally
       super.afterAll()
-    }
-  }
-}

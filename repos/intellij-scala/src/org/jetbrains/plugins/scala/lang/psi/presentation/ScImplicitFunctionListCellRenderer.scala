@@ -22,13 +22,13 @@ import org.jetbrains.plugins.scala.util.JListCompatibility
   * Date: 15.06.2010
   */
 class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
-    extends ScImplicitFunctionListCellRendererAdapter {
+    extends ScImplicitFunctionListCellRendererAdapter
   def getListCellRendererComponentAdapter(
       containter: JListCompatibility.JListContainer,
       value: Any,
       index: Int,
       isSelected: Boolean,
-      cellHasFocus: Boolean) = {
+      cellHasFocus: Boolean) =
     val attrFirstPart = EditorColorsManager
       .getInstance()
       .getGlobalScheme
@@ -51,30 +51,28 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
     val secondPart = tuple.getSecondPart
     val comp = getSuperListCellRendererComponent(
         containter.getList, item, index, isSelected, cellHasFocus)
-    comp match {
+    comp match
       case container: Container =>
         val colored =
           container.getComponents.apply(2).asInstanceOf[SimpleColoredComponent]
-        if (item == actual) {
+        if (item == actual)
           colored.clear()
           colored.setIcon(actual.getIcon(0))
           colored.append(getElementText(actual),
                          SimpleTextAttributes.REGULAR_BOLD_ATTRIBUTES)
-        }
 
-        if (firstPart.contains(item)) {
+        if (firstPart.contains(item))
           colored.setBackground(if (isSelected)
                 UIUtil.getListSelectionBackground else implicitFirstPart)
-        } else if (secondPart.contains(item)) {
+        else if (secondPart.contains(item))
           colored.setBackground(if (isSelected)
                 UIUtil.getListSelectionBackground else implicitSecondPart)
-        } else {
+        else
           throw new RuntimeException(
               "Implicit conversions list contains unknown value: " + item)
-        }
 
         val rightRenderer: DefaultListCellRenderer = getRightCellRenderer(item)
-        if (rightRenderer != null) {
+        if (rightRenderer != null)
           val rightCellRendererComponent: Component =
             DefaultListCellRendererAdapter.getListCellRendererComponent(
                 rightRenderer,
@@ -83,28 +81,24 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
                 index,
                 isSelected,
                 cellHasFocus)
-          val color: Color = isSelected match {
+          val color: Color = isSelected match
             case true => UIUtil.getListSelectionBackground
             case false if firstPart.contains(item) => implicitFirstPart
             case false if secondPart.contains(item) => implicitSecondPart
             case _ =>
               throw new RuntimeException(
                   "Implicit conversions list contains unknown value: " + item)
-          }
           rightCellRendererComponent.setBackground(color)
           add(rightCellRendererComponent, BorderLayout.EAST)
           val spacer: JPanel = new JPanel
           spacer.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2))
           spacer.setBackground(color)
           add(spacer, BorderLayout.CENTER)
-        }
       case _ =>
-    }
     comp
-  }
 
-  override def getElementText(element: PsiNamedElement) = {
-    element match {
+  override def getElementText(element: PsiNamedElement) =
+    element match
       case method: ScFunction =>
         method.name +
         PresentationUtil.presentationString(method.paramClauses) + ": " +
@@ -113,11 +107,8 @@ class ScImplicitFunctionListCellRenderer(actual: PsiNamedElement)
         b.name + ": " + PresentationUtil.presentationString(
             b.getType(TypingContext.empty).getOrAny)
       case _ => element.name
-    }
-  }
 
   def getIconFlags: Int = 0
 
   def getContainerText(element: PsiNamedElement, name: String) =
     null //todo: add package name
-}

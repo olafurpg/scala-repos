@@ -1,12 +1,9 @@
-class A {
-  def f(b: Boolean) = {
-    locally {
+class A
+  def f(b: Boolean) =
+    locally
       while (b == false) ()
       // or:
       // do () while (b == false)
-    }
-  }
-}
 // 
 // [Now checking: erasure]
 // [check: erasure] New symbols: BoxedUnit UNIT runtime scala

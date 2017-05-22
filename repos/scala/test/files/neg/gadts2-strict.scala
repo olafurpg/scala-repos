@@ -1,5 +1,5 @@
 // A copy of pos/gadts2, which must fail under -Xstrict-inference.
-object Test {
+object Test
 
   abstract class Number
   case class MyInt(n: Int) extends Number
@@ -9,18 +9,14 @@ object Test {
   case class Cell[a](var x: a) extends Term[a]
   final case class NumTerm(val n: Number) extends Term[Number]
 
-  def f[a](t: Term[a], c: Cell[a]) {
-    t match {
+  def f[a](t: Term[a], c: Cell[a])
+    t match
       case NumTerm(n) => c.x = MyDouble(1.0)
-    }
-  }
 
   val x: Term[Number] = NumTerm(MyInt(5))
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
     val cell = Cell[Number](MyInt(6))
     Console.println(cell)
     f[Number](new NumTerm(MyInt(5)), cell)
     Console.println(cell)
-  }
-}

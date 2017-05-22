@@ -22,10 +22,9 @@ import org.saddle.scalar._
 /**
   * Machinery for concatenating arrays of differing types, with NA-handling
   */
-private[saddle] trait LowPriorityConcatImplicits {
+private[saddle] trait LowPriorityConcatImplicits
   implicit def waa[T <: Any] =
     new Concat.Promoter[T, T, T](Concat.id, Concat.id)
-}
 
 /**
   * Provides a way to append two arrays of possibly different types together by
@@ -33,7 +32,7 @@ private[saddle] trait LowPriorityConcatImplicits {
   *
   * Key method is Concat.append(array1, array2)
   */
-object Concat extends LowPriorityConcatImplicits {
+object Concat extends LowPriorityConcatImplicits
   val sy = ScalarTagByte
   val sc = ScalarTagChar
   val ss = ScalarTagShort
@@ -285,19 +284,15 @@ object Concat extends LowPriorityConcatImplicits {
              @spec(Boolean, Byte, Int, Long, Double) B,
              @spec(Boolean, Byte, Int, Long, Double) C](
       a1: Array[A], a2: Array[B])(
-      implicit wd: Promoter[A, B, C], mc: ST[C]): Array[C] = {
+      implicit wd: Promoter[A, B, C], mc: ST[C]): Array[C] =
     val result = array.empty[C](a1.length + a2.length)
     var i = 0
-    while (i < a1.length) {
+    while (i < a1.length)
       result(i) = wd.promoteA(a1(i))
       i += 1
-    }
     var j = 0
-    while (j < a2.length) {
+    while (j < a2.length)
       result(i) = wd.promoteB(a2(j))
       i += 1
       j += 1
-    }
     result
-  }
-}

@@ -17,29 +17,26 @@ import io.netty.util.concurrent.GenericFutureListener
 @Sharable
 private[finagle] class WriteCompletionTimeoutHandler(
     timer: Timer, timeout: Duration)
-    extends ChannelOutboundHandlerAdapter {
+    extends ChannelOutboundHandlerAdapter
 
   override def write(
-      ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise) {
-    val task = timer.doLater(timeout) {
+      ctx: ChannelHandlerContext, msg: Any, promise: ChannelPromise)
+    val task = timer.doLater(timeout)
       val writeExn =
         if (ctx.channel != null)
           new WriteTimedOutException(ctx.channel.remoteAddress)
         else new WriteTimedOutException
 
       ctx.fireExceptionCaught(writeExn)
-    }
 
     // cancel task on write completion irrespective of outcome
     promise.addListener(
-        new GenericFutureListener[ChannelPromise] {
+        new GenericFutureListener[ChannelPromise]
       def operationComplete(future: ChannelPromise): Unit =
         task.raise(TimeoutCancelled)
-    })
+    )
 
     super.write(ctx, msg, promise)
-  }
-}
 
 // raised on timeout task after write completes
 private[channel] object TimeoutCancelled

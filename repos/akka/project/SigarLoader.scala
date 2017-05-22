@@ -9,7 +9,7 @@ import sbt.Keys._
 /**
   * Sigar java agent injection build settings.
   */
-object SigarLoader {
+object SigarLoader
 
   import Dependencies.Compile.Provided.sigarLoader
 
@@ -30,12 +30,11 @@ object SigarLoader {
   /** Sigar agent command line option property. */
   val sigarFolderProperty = "kamon.sigar.folder"
 
-  def provideSigarOptions = (sigarArtifact, sigarFolder) map {
+  def provideSigarOptions = (sigarArtifact, sigarFolder) map
     (artifact, folder) =>
       "-javaagent:" + artifact + "=" + sigarFolderProperty + "=" + folder
-  }
 
-  def locateSigarArtifact = update map { report =>
+  def locateSigarArtifact = update map  report =>
     val artifactList = report.matching(
         moduleFilter(organization = sigarLoader.organization,
                      name = sigarLoader.name)
@@ -43,10 +42,9 @@ object SigarLoader {
     require(artifactList.size == 1,
             "Expecting single artifact, while found: " + artifactList)
     artifactList(0)
-  }
 
   // TODO remove Sigar form test:test* classpath, it is provided by Sigar agent.
-  lazy val sigarSettings = {
+  lazy val sigarSettings =
     Seq(
         //
         // Prepare Sigar agent options.
@@ -62,5 +60,3 @@ object SigarLoader {
               javaOptions in Test += sigarOptions.value
           )
         else Seq())
-  }
-}

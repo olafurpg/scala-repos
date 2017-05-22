@@ -8,38 +8,35 @@ import akka.actor._
 import akka.routing.RoundRobinPool
 import akka.actor.OneForOneStrategy
 
-object ClusterRouterSupervisorSpec {
+object ClusterRouterSupervisorSpec
 
-  class KillableActor(testActor: ActorRef) extends Actor {
+  class KillableActor(testActor: ActorRef) extends Actor
 
-    def receive = {
+    def receive =
       case "go away" ⇒
         throw new IllegalArgumentException("Goodbye then!")
-    }
-  }
-}
 
 @org.junit.runner.RunWith(classOf[org.scalatest.junit.JUnitRunner])
 class ClusterRouterSupervisorSpec
     extends AkkaSpec("""
   akka.actor.provider = "akka.cluster.ClusterActorRefProvider"
   akka.remote.netty.tcp.port = 0
-""") {
+""")
 
   import ClusterRouterSupervisorSpec._
 
-  "Cluster aware routers" must {
+  "Cluster aware routers" must
 
-    "use provided supervisor strategy" in {
+    "use provided supervisor strategy" in
       val router = system.actorOf(
           ClusterRouterPool(
               RoundRobinPool(nrOfInstances = 1,
                              supervisorStrategy = OneForOneStrategy(
-                                   loggingEnabled = false) {
+                                   loggingEnabled = false)
                                case _ ⇒
                                  testActor ! "supervised"
                                  SupervisorStrategy.Stop
-                             }),
+                             ),
               ClusterRouterPoolSettings(totalInstances = 1,
                                         maxInstancesPerNode = 1,
                                         allowLocalRoutees = true,
@@ -49,6 +46,3 @@ class ClusterRouterSupervisorSpec
 
       router ! "go away"
       expectMsg("supervised")
-    }
-  }
-}

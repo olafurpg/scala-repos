@@ -31,7 +31,7 @@ import org.apache.spark.metrics.MetricsSystem
 class GangliaSink(val property: Properties,
                   val registry: MetricRegistry,
                   securityMgr: SecurityManager)
-    extends Sink {
+    extends Sink
   val GANGLIA_KEY_PERIOD = "period"
   val GANGLIA_DEFAULT_PERIOD = 10
 
@@ -52,13 +52,11 @@ class GangliaSink(val property: Properties,
   def propertyToOption(prop: String): Option[String] =
     Option(property.getProperty(prop))
 
-  if (!propertyToOption(GANGLIA_KEY_HOST).isDefined) {
+  if (!propertyToOption(GANGLIA_KEY_HOST).isDefined)
     throw new Exception("Ganglia sink requires 'host' property.")
-  }
 
-  if (!propertyToOption(GANGLIA_KEY_PORT).isDefined) {
+  if (!propertyToOption(GANGLIA_KEY_PORT).isDefined)
     throw new Exception("Ganglia sink requires 'port' property.")
-  }
 
   val host = propertyToOption(GANGLIA_KEY_HOST).get
   val port = propertyToOption(GANGLIA_KEY_PORT).get.toInt
@@ -84,15 +82,11 @@ class GangliaSink(val property: Properties,
     .convertRatesTo(TimeUnit.SECONDS)
     .build(ganglia)
 
-  override def start() {
+  override def start()
     reporter.start(pollPeriod, pollUnit)
-  }
 
-  override def stop() {
+  override def stop()
     reporter.stop()
-  }
 
-  override def report() {
+  override def report()
     reporter.report()
-  }
-}

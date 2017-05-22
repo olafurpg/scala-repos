@@ -7,8 +7,8 @@ class D
 final class E
 case class C(val x: String, val y: Int, val d: D, val e: E)
 
-class NullJsonTest extends FunSuite {
-  test("main") {
+class NullJsonTest extends FunSuite
+  test("main")
     val c = C(null, 0, null, null)
     val pickle = c.pickle
     assert(pickle.value === """
@@ -21,5 +21,3 @@ class NullJsonTest extends FunSuite {
       |}
     """.stripMargin.trim)
     assert(pickle.unpickle[C].toString === c.toString)
-  }
-}

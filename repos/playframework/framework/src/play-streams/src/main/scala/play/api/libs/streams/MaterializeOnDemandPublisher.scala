@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.reactivestreams.{Publisher, Subscriber, Subscription}
 import play.api.libs.concurrent.StateMachine
 
-private[play] object MaterializeOnDemandPublisher {
+private[play] object MaterializeOnDemandPublisher
   sealed trait State
 
   /**
@@ -33,7 +33,6 @@ private[play] object MaterializeOnDemandPublisher {
     * Demand is being forwarded through the subscription obtained by the forwarding subscriber.
     */
   case class ForwardingDemand(subscription: Subscription) extends State
-}
 
 import MaterializeOnDemandPublisher._
 
@@ -46,15 +45,14 @@ import MaterializeOnDemandPublisher._
   */
 private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
     implicit mat: Materializer)
-    extends StateMachine[State](AwaitingDemand) with Publisher[T] {
+    extends StateMachine[State](AwaitingDemand) with Publisher[T]
 
-  def subscribe(subscriber: Subscriber[_ >: T]) = {
+  def subscribe(subscriber: Subscriber[_ >: T]) =
     subscriber.onSubscribe(new ForwardingSubscription(subscriber))
-  }
 
   class ForwardingSubscription(subscriber: Subscriber[_ >: T])
-      extends Subscription {
-    def cancel() = exclusive {
+      extends Subscription
+    def cancel() = exclusive
       case ForwardingDemand(subscription) =>
         state = Cancelled
         subscription.cancel()
@@ -63,9 +61,8 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
         // If we're already cancelled, we stay cancelled.
         // If we're caching demand, we short circuit that, and just cancel.
         state = Cancelled
-    }
 
-    def request(n: Long) = exclusive {
+    def request(n: Long) = exclusive
       case AwaitingDemand =>
         state = CachingDemand(n)
         source.runWith(
@@ -76,13 +73,11 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
       // nop, as required by the spec
       case ForwardingDemand(subscription) =>
         subscription.request(n)
-    }
-  }
 
   class ForwardingSubscriber[S >: T](subscriber: Subscriber[S])
-      extends Subscriber[S] {
+      extends Subscriber[S]
 
-    def onSubscribe(subscription: Subscription) = exclusive {
+    def onSubscribe(subscription: Subscription) = exclusive
       case CachingDemand(demand) =>
         state = ForwardingDemand(subscription)
         subscription.request(demand)
@@ -94,12 +89,9 @@ private[play] class MaterializeOnDemandPublisher[T](source: Source[T, _])(
       case AwaitingDemand =>
         throw new IllegalStateException(
             "Impossible state: awaiting demand when a forwarding subscriber has already been created")
-    }
 
     def onError(t: Throwable) = subscriber.onError(t)
 
     def onComplete() = subscriber.onComplete()
 
     def onNext(s: S) = subscriber.onNext(s)
-  }
-}

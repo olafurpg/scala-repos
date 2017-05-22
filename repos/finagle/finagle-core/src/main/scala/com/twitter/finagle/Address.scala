@@ -15,7 +15,7 @@ import scala.util.control.NoStackTrace
   */
 sealed trait Address
 
-object Address {
+object Address
   private[finagle] val failing: Address =
     Address.Failed(new IllegalArgumentException("failing") with NoStackTrace)
 
@@ -41,10 +41,9 @@ object Address {
   /** Create a new loopback [[Address]] with the given `port`. */
   def apply(port: Int): Address =
     Address(new InetSocketAddress(port))
-}
 
-package exp {
-  object Address {
+package exp
+  object Address
 
     /** Create a new [[Address]] with the given [[com.twitter.finagle.ServiceFactory]]. */
     def apply[Req, Rep](
@@ -59,13 +58,11 @@ package exp {
         factory: com.twitter.finagle.ServiceFactory[Req, Rep],
         metadata: Addr.Metadata)
         extends Address
-  }
-}
 
 /**
   * A Java adaptation of the [[com.twitter.finagle.Address]] companion object.
   */
-object Addresses {
+object Addresses
 
   /**
     * @see com.twitter.finagle.Address.Inet
@@ -85,4 +82,3 @@ object Addresses {
     */
   def newFailedAddress(cause: Throwable): Address =
     Address.Failed(cause)
-}

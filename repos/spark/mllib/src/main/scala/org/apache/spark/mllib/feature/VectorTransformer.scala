@@ -28,7 +28,7 @@ import org.apache.spark.rdd.RDD
   */
 @Since("1.1.0")
 @DeveloperApi
-trait VectorTransformer extends Serializable {
+trait VectorTransformer extends Serializable
 
   /**
     * Applies transformation on a vector.
@@ -46,11 +46,10 @@ trait VectorTransformer extends Serializable {
     * @return transformed RDD[Vector].
     */
   @Since("1.1.0")
-  def transform(data: RDD[Vector]): RDD[Vector] = {
+  def transform(data: RDD[Vector]): RDD[Vector] =
     // Later in #1498 , all RDD objects are sent via broadcasting instead of RPC.
     // So it should be no longer necessary to explicitly broadcast `this` object.
     data.map(x => this.transform(x))
-  }
 
   /**
     * Applies transformation on an JavaRDD[Vector].
@@ -59,7 +58,5 @@ trait VectorTransformer extends Serializable {
     * @return transformed JavaRDD[Vector].
     */
   @Since("1.1.0")
-  def transform(data: JavaRDD[Vector]): JavaRDD[Vector] = {
+  def transform(data: JavaRDD[Vector]): JavaRDD[Vector] =
     transform(data.rdd)
-  }
-}

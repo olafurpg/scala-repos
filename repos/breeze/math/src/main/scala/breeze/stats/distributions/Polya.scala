@@ -30,12 +30,11 @@ import breeze.numerics._
 class Polya[T, @specialized(Int) I](
     params: T)(implicit space: MutableEnumeratedCoordinateField[T, I, Double],
                rand: RandBasis = Rand)
-    extends DiscreteDistr[I] {
+    extends DiscreteDistr[I]
   import space._
   private val innerDirichlet = new Dirichlet(params)
-  def draw() = {
+  def draw() =
     Multinomial(innerDirichlet.draw).get
-  }
 
   lazy val logNormalizer = -lbeta(params)
 
@@ -50,23 +49,20 @@ class Polya[T, @specialized(Int) I](
 //    val adjustForCount = ev(x).valuesIterator.foldLeft(lgamma(ev(x).sum+1))( (acc,v) => acc-lgamma(v+1))
 //    adjustForCount + lbeta(ev(x + params))
 //  }
-}
 
-object Polya {
+object Polya
 
   /**
     * Creates a new symmetric Polya of dimension k
     */
   def sym(alpha: Double, k: Int) =
-    this(Array.tabulate(k) { x =>
+    this(Array.tabulate(k)  x =>
       alpha
-    })
+    )
 
   /**
     * Creates a new Polya of dimension k with the given parameters
     */
-  def apply(arr: Array[Double]) = {
+  def apply(arr: Array[Double]) =
     val swapped: Array[(Int, Double)] = arr.zipWithIndex.map(_.swap)
     new Polya(Counter(swapped.toIndexedSeq: _*))
-  }
-}

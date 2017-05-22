@@ -29,7 +29,7 @@ import org.apache.spark.sql.test.SQLTestUtils
   * Base class for writing tests for individual physical operators. For an example of how this
   * class's test helper methods can be used, see [[SortSuite]].
   */
-private[sql] abstract class SparkPlanTest extends SparkFunSuite {
+private[sql] abstract class SparkPlanTest extends SparkFunSuite
   protected def sqlContext: SQLContext
 
   /**
@@ -44,12 +44,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
   protected def checkAnswer(input: DataFrame,
                             planFunction: SparkPlan => SparkPlan,
                             expectedAnswer: Seq[Row],
-                            sortAnswers: Boolean = true): Unit = {
+                            sortAnswers: Boolean = true): Unit =
     doCheckAnswer(input :: Nil,
                   (plans: Seq[SparkPlan]) => planFunction(plans.head),
                   expectedAnswer,
                   sortAnswers)
-  }
 
   /**
     * Runs the plan and makes sure the answer matches the expected result.
@@ -65,12 +64,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
                              right: DataFrame,
                              planFunction: (SparkPlan, SparkPlan) => SparkPlan,
                              expectedAnswer: Seq[Row],
-                             sortAnswers: Boolean = true): Unit = {
+                             sortAnswers: Boolean = true): Unit =
     doCheckAnswer(left :: right :: Nil,
                   (plans: Seq[SparkPlan]) => planFunction(plans(0), plans(1)),
                   expectedAnswer,
                   sortAnswers)
-  }
 
   /**
     * Runs the plan and makes sure the answer matches the expected result.
@@ -84,13 +82,11 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
   protected def doCheckAnswer(input: Seq[DataFrame],
                               planFunction: Seq[SparkPlan] => SparkPlan,
                               expectedAnswer: Seq[Row],
-                              sortAnswers: Boolean = true): Unit = {
+                              sortAnswers: Boolean = true): Unit =
     SparkPlanTest.checkAnswer(
-        input, planFunction, expectedAnswer, sortAnswers, sqlContext) match {
+        input, planFunction, expectedAnswer, sortAnswers, sqlContext) match
       case Some(errorMessage) => fail(errorMessage)
       case None =>
-    }
-  }
 
   /**
     * Runs the plan and makes sure the answer matches the result produced by a reference plan.
@@ -108,22 +104,19 @@ private[sql] abstract class SparkPlanTest extends SparkFunSuite {
       input: DataFrame,
       planFunction: SparkPlan => SparkPlan,
       expectedPlanFunction: SparkPlan => SparkPlan,
-      sortAnswers: Boolean = true): Unit = {
+      sortAnswers: Boolean = true): Unit =
     SparkPlanTest.checkAnswer(input,
                               planFunction,
                               expectedPlanFunction,
                               sortAnswers,
-                              sqlContext) match {
+                              sqlContext) match
       case Some(errorMessage) => fail(errorMessage)
       case None =>
-    }
-  }
-}
 
 /**
   * Helper methods for writing tests of individual physical operators.
   */
-object SparkPlanTest {
+object SparkPlanTest
 
   /**
     * Runs the plan and makes sure the answer matches the result produced by a reference plan.
@@ -139,15 +132,15 @@ object SparkPlanTest {
                   planFunction: SparkPlan => SparkPlan,
                   expectedPlanFunction: SparkPlan => SparkPlan,
                   sortAnswers: Boolean,
-                  sqlContext: SQLContext): Option[String] = {
+                  sqlContext: SQLContext): Option[String] =
 
     val outputPlan = planFunction(input.queryExecution.sparkPlan)
     val expectedOutputPlan = expectedPlanFunction(
         input.queryExecution.sparkPlan)
 
-    val expectedAnswer: Seq[Row] = try {
+    val expectedAnswer: Seq[Row] = try
       executePlan(expectedOutputPlan, sqlContext)
-    } catch {
+    catch
       case NonFatal(e) =>
         val errorMessage = s"""
              | Exception thrown while executing Spark plan to calculate expected answer:
@@ -157,11 +150,10 @@ object SparkPlanTest {
              | ${org.apache.spark.sql.catalyst.util.stackTraceToString(e)}
           """.stripMargin
         return Some(errorMessage)
-    }
 
-    val actualAnswer: Seq[Row] = try {
+    val actualAnswer: Seq[Row] = try
       executePlan(outputPlan, sqlContext)
-    } catch {
+    catch
       case NonFatal(e) =>
         val errorMessage = s"""
              | Exception thrown while executing Spark plan:
@@ -171,11 +163,10 @@ object SparkPlanTest {
              | ${org.apache.spark.sql.catalyst.util.stackTraceToString(e)}
           """.stripMargin
         return Some(errorMessage)
-    }
 
     SQLTestUtils
       .compareAnswers(actualAnswer, expectedAnswer, sortAnswers)
-      .map { errorMessage =>
+      .map  errorMessage =>
         s"""
          | Results do not match.
          | Actual result Spark plan:
@@ -184,8 +175,6 @@ object SparkPlanTest {
          | $expectedOutputPlan
          | $errorMessage
        """.stripMargin
-      }
-  }
 
   /**
     * Runs the plan and makes sure the answer matches the expected result.
@@ -200,13 +189,13 @@ object SparkPlanTest {
                   planFunction: Seq[SparkPlan] => SparkPlan,
                   expectedAnswer: Seq[Row],
                   sortAnswers: Boolean,
-                  sqlContext: SQLContext): Option[String] = {
+                  sqlContext: SQLContext): Option[String] =
 
     val outputPlan = planFunction(input.map(_.queryExecution.sparkPlan))
 
-    val sparkAnswer: Seq[Row] = try {
+    val sparkAnswer: Seq[Row] = try
       executePlan(outputPlan, sqlContext)
-    } catch {
+    catch
       case NonFatal(e) =>
         val errorMessage = s"""
              | Exception thrown while executing Spark plan:
@@ -216,36 +205,29 @@ object SparkPlanTest {
              | ${org.apache.spark.sql.catalyst.util.stackTraceToString(e)}
           """.stripMargin
         return Some(errorMessage)
-    }
 
-    SQLTestUtils.compareAnswers(sparkAnswer, expectedAnswer, sortAnswers).map {
+    SQLTestUtils.compareAnswers(sparkAnswer, expectedAnswer, sortAnswers).map
       errorMessage =>
         s"""
          | Results do not match for Spark plan:
          | $outputPlan
          | $errorMessage
        """.stripMargin
-    }
-  }
 
   private def executePlan(
-      outputPlan: SparkPlan, sqlContext: SQLContext): Seq[Row] = {
+      outputPlan: SparkPlan, sqlContext: SQLContext): Seq[Row] =
     // A very simple resolver to make writing tests easier. In contrast to the real resolver
     // this is always case sensitive and does not try to handle scoping or complex type resolution.
     val resolvedPlan = sqlContext.sessionState.prepareForExecution.execute(
-        outputPlan transform {
+        outputPlan transform
           case plan: SparkPlan =>
             val inputMap =
               plan.children.flatMap(_.output).map(a => (a.name, a)).toMap
-            plan transformExpressions {
+            plan transformExpressions
               case UnresolvedAttribute(Seq(u)) =>
                 inputMap.getOrElse(
                     u,
                     sys.error(
                         s"Invalid Test: Cannot resolve $u given input $inputMap"))
-            }
-        }
     )
     resolvedPlan.executeCollectPublic().toSeq
-  }
-}

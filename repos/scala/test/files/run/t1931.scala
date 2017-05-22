@@ -1,6 +1,6 @@
 import scala.tools.partest.SessionTest
 
-object Test extends SessionTest {
+object Test extends SessionTest
 
   def session =
     """
@@ -39,4 +39,3 @@ scala> Predef.f
 res4: Int = 42
 
 scala> :quit"""
-}

@@ -10,7 +10,7 @@ import symtab._
 import Flags._
 import scala.tools.nsc.util.ClassPath
 
-abstract class AddInterfaces extends InfoTransform { self: Erasure =>
+abstract class AddInterfaces extends InfoTransform  self: Erasure =>
   import global._ // the global environment
   import definitions._ // standard classes and methods
 
@@ -18,61 +18,51 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
     */
   override def phaseNewFlags: Long = lateDEFERRED
 
-  def transformMixinInfo(tp: Type): Type = tp match {
+  def transformMixinInfo(tp: Type): Type = tp match
     case ClassInfoType(parents, decls, clazz)
         if clazz.isPackageClass || !clazz.isJavaDefined =>
-      val parents1 = parents match {
+      val parents1 = parents match
         case Nil => Nil
         case hd :: tl =>
           assert(!hd.typeSymbol.isTrait, clazz)
           if (clazz.isTrait) ObjectTpe :: tl
           else parents
-      }
-      if (clazz.isTrait) {
-        decls foreach { sym =>
+      if (clazz.isTrait)
+        decls foreach  sym =>
           if (!sym.isType)
             sym.info // initialize to set lateMETHOD flag if necessary
-        }
-      }
       if (parents1 eq parents) tp
       else ClassInfoType(parents1, decls, clazz)
     case _ =>
       tp
-  }
 
 // Tree transformation --------------------------------------------------------------
   private class ChangeOwnerAndReturnTraverser(
       oldowner: Symbol, newowner: Symbol)
-      extends ChangeOwnerTraverser(oldowner, newowner) {
-    override def traverse(tree: Tree) {
-      tree match {
+      extends ChangeOwnerTraverser(oldowner, newowner)
+    override def traverse(tree: Tree)
+      tree match
         case _: Return => change(tree.symbol)
         case _ =>
-      }
       super.traverse(tree)
-    }
-  }
 
-  private def mkAssign(clazz: Symbol, assignSym: Symbol, rhs: Tree): Tree = {
+  private def mkAssign(clazz: Symbol, assignSym: Symbol, rhs: Tree): Tree =
     val qual = Select(This(clazz), assignSym)
     if (assignSym.isSetter) Apply(qual, List(rhs))
     else Assign(qual, rhs)
-  }
 
   /** Add calls to supermixin constructors
     *    `super[mix].$init$()`
     *  to tree, which is assumed to be the body of a constructor of class clazz.
     */
-  private def addMixinConstructorCalls(tree: Tree, clazz: Symbol): Tree = {
-    def mixinConstructorCall(mc: Symbol): Tree = atPos(tree.pos) {
+  private def addMixinConstructorCalls(tree: Tree, clazz: Symbol): Tree =
+    def mixinConstructorCall(mc: Symbol): Tree = atPos(tree.pos)
       Apply(SuperSelect(clazz, mc.primaryConstructor), Nil)
-    }
-    val mixinConstructorCalls: List[Tree] = {
+    val mixinConstructorCalls: List[Tree] =
       for (mc <- clazz.mixinClasses.reverse if mc.isTrait &&
                 mc.primaryConstructor != NoSymbol) yield
         mixinConstructorCall(mc)
-    }
-    tree match {
+    tree match
 
       case Block(Nil, expr) =>
         // AnyVal constructor - have to provide a real body so the
@@ -91,13 +81,11 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
             tree,
             presuper ::: (supercall :: mixinConstructorCalls ::: rest),
             expr)
-    }
-  }
 
-  protected val mixinTransformer = new Transformer {
-    override def transform(tree: Tree): Tree = {
+  protected val mixinTransformer = new Transformer
+    override def transform(tree: Tree): Tree =
       val sym = tree.symbol
-      val tree1 = tree match {
+      val tree1 = tree match
         case DefDef(_, _, _, _, _, _)
             if sym.isClassConstructor && sym.isPrimaryConstructor &&
             sym.owner != ArrayClass =>
@@ -108,8 +96,4 @@ abstract class AddInterfaces extends InfoTransform { self: Erasure =>
           treeCopy.Template(tree, parents1, noSelfType, body)
         case _ =>
           tree
-      }
       super.transform(tree1)
-    }
-  }
-}

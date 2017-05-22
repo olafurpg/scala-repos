@@ -21,7 +21,7 @@ import org.jetbrains.plugins.scala.lang.psi.types.{ScSubstitutor, ScType}
   * @author Alexander Podkhalyuzin
   * Date: 04.05.2008
   */
-object ScalaElementPresentation {
+object ScalaElementPresentation
 
   //TODO refactor with name getters
 
@@ -36,19 +36,18 @@ object ScalaElementPresentation {
     else "unnamed"
 
   def getPrimaryConstructorPresentableText(
-      constructor: ScPrimaryConstructor): String = {
+      constructor: ScPrimaryConstructor): String =
     val presentableText: StringBuffer = new StringBuffer
     presentableText.append("this")
     if (constructor.parameters != null)
       presentableText.append(
           StructureViewUtil.getParametersAsString(constructor.parameterList))
     presentableText.toString
-  }
 
   def getMethodPresentableText(
       function: ScFunction,
       fast: Boolean = true,
-      subst: ScSubstitutor = ScSubstitutor.empty): String = {
+      subst: ScSubstitutor = ScSubstitutor.empty): String =
     val presentableText: StringBuffer = new StringBuffer
     presentableText.append(
         if (!function.isConstructor) function.name else "this")
@@ -60,42 +59,34 @@ object ScalaElementPresentation {
       presentableText.append(StructureViewUtil.getParametersAsString(
               function.paramClauses, fast, subst))
 
-    if (fast) {
-      function.returnTypeElement match {
+    if (fast)
+      function.returnTypeElement match
         case Some(rt) => presentableText.append(": ").append(rt.getText)
         case _ => //do nothing
-      }
-    } else {
+    else
       presentableText.append(": ")
-      try {
+      try
         val typez = subst.subst(function.returnType.getOrAny)
         presentableText.append(ScType.presentableText(typez))
-      } catch {
+      catch
         case e: IndexNotReadyException => presentableText.append("NoTypeInfo")
-      }
-    }
 
     presentableText.toString
-  }
 
   def getTypeAliasPresentableText(typeAlias: ScTypeAlias): String =
     if (typeAlias.nameId != null) typeAlias.nameId.getText else "type unnamed"
 
   def getPresentableText(elem: PsiElement): String = elem.getText
 
-  def getValOrVarPresentableText(elem: ScNamedElement): String = {
-    val typeText = elem match {
+  def getValOrVarPresentableText(elem: ScNamedElement): String =
+    val typeText = elem match
       case typed: TypingContextOwner =>
         ": " + typed.getType().getOrAny.presentableText
       case _ => ""
-    }
-    val keyword = ScalaPsiUtil.nameContext(elem) match {
+    val keyword = ScalaPsiUtil.nameContext(elem) match
       case _: ScVariable => ScalaKeyword.VAR
       case _: ScValue => ScalaKeyword.VAL
       case param: ScClassParameter if param.isVar => ScalaKeyword.VAR
       case param: ScClassParameter if param.isVal => ScalaKeyword.VAL
       case _ => ""
-    }
     s"$keyword ${elem.name}$typeText"
-  }
-}

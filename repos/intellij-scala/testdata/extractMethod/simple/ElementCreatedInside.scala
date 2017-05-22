@@ -1,13 +1,11 @@
-class A {
-  def foo {
+class A
+  def foo
     /*start*/
 
     val j = 77
     /*end*/
 
     val i = j
-  }
-}
 /*
 class A {
   def foo {
